@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -65,8 +65,7 @@ class Layer;
 	coordinating and linking a window's WinBorder half with its messaging half, dispatching 
 	mouse and key events from the server to its window, and other such things.
 */
-class ServerWindow
-{
+class ServerWindow {
 public:
 								ServerWindow(	const char *string,
 												ServerApp *winapp,
@@ -74,7 +73,7 @@ public:
 												port_id looperPort,
 												int32 handlerID);
 	virtual						~ServerWindow(void);
-	
+
 			void				Init(	BRect frame,
 										uint32 wlook, uint32 wfeel, uint32 wflags,
 										uint32 wwksindex);
@@ -92,7 +91,7 @@ public:
 			void				Minimize(bool status);
 			void				Zoom(void);
 			void				ScreenModeChanged(const BRect frame, const color_space cspace);
-	
+
 			// util methods.	
 			void				SendMessageToClient(const BMessage* msg,
 													int32 target = B_NULL_TOKEN,
@@ -117,6 +116,7 @@ private:
 			Layer*				CreateLayerTree(Layer *localRoot, LinkMsgReader &link);
 			void				SetLayerState(Layer *layer, LinkMsgReader &link);
 			void				SetLayerFontState(Layer *layer, LinkMsgReader &link);
+			void				ClientDied(bool crashed);
 
 			// message handle methods.
 			void				DispatchMessage(int32 code, LinkMsgReader &link);

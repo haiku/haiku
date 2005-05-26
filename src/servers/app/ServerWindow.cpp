@@ -108,18 +108,18 @@ write_to_buffer(int8 **_buffer, Type value)
 
 	*_buffer = (int8 *)(typedBuffer);
 }
-//------------------------------------------------------------------------------
+
+
+//	#pragma mark -
+
 /*!
-	\brief Contructor
+	\brief Constructor
 	
 	Does a lot of stuff to set up for the window - new decorator, new winborder, spawn a 
 	monitor thread.
 */
-ServerWindow::ServerWindow(	const char *string,
-							ServerApp *winapp,
-							port_id winport,
-							port_id looperPort,
-							int32 handlerID)
+ServerWindow::ServerWindow(const char *string, ServerApp *winapp,
+	port_id winport, port_id looperPort, int32 handlerID)
 	: fServerApp(winapp),
 	// fClientWinPort is the port to which the app awaits messages from the server
 	fClientWinPort(winport),
@@ -158,54 +158,34 @@ void
 ServerWindow::Init(BRect frame, uint32 wlook, 
 	uint32 wfeel, uint32 wflags, uint32 wwksindex)
 {
-	char		newName[60];
-	sprintf(newName, "%ld: %s", fClientTeamID, fName);
-	fWinBorder = new WinBorder(	frame,
-								newName,
-								wlook,
-								wfeel,
-								wflags,
-								wwksindex,
-								this,
-								desktop->GetDisplayDriver());
+	char name[60];
+	snprintf(name, sizeof(name), "%ld: %s", fClientTeamID, fName);
+
+	fWinBorder = new WinBorder(frame, name, wlook, wfeel, wflags,
+		wwksindex, this, desktop->GetDisplayDriver());
 
 	// Spawn our message-monitoring thread
 	fMonitorThreadID = spawn_thread(MonitorWin, fName, B_NORMAL_PRIORITY, this);
-	
-	if(fMonitorThreadID != B_NO_MORE_THREADS && fMonitorThreadID != B_NO_MEMORY)
+	if (fMonitorThreadID >= B_OK)
 		resume_thread(fMonitorThreadID);
 }
-//------------------------------------------------------------------------------
+
+
 //!Tears down all connections the main app_server objects, and deletes some internals.
 ServerWindow::~ServerWindow(void)
 {
-	STRACE(("*ServerWindow (%s):~ServerWindow()\n",fName));
-	
-	if (fWinBorder)
-	{
-		delete fWinBorder;
-		fWinBorder = NULL;
-	}
+	STRACE(("*ServerWindow (%s):~ServerWindow()\n", fName));
 
-	fCurrentLayer = NULL;
+	delete fWinBorder;
+	delete fMsgSender;
+	delete fMsgReader;
 
-	if(fMsgSender)
-	{
-		delete fMsgSender;
-		fMsgSender=NULL;
-	}
-		
-	if(fMsgReader)
-	{
-		delete fMsgReader;
-		fMsgReader=NULL;
-	}
-	
 	STRACE(("#ServerWindow(%s) will exit NOW\n", fName));
 }
 
 //! Forces the window border to update its decorator
-void ServerWindow::ReplaceDecorator(void)
+void
+ServerWindow::ReplaceDecorator(void)
 {
 	if (!IsLocked())
 		debugger("you must lock a ServerWindow object before calling ::ReplaceDecorator()\n");
@@ -213,44 +193,47 @@ void ServerWindow::ReplaceDecorator(void)
 	STRACE(("ServerWindow %s: Replace Decorator\n",fName));
 	fWinBorder->UpdateDecorator();
 }
-//------------------------------------------------------------------------------
+
 //! Requests that the ServerWindow's BWindow quit
-void ServerWindow::Quit(void)
+void
+ServerWindow::Quit(void)
 {
 	// NOTE: if you do something else, other than sending a port message, PLEASE lock
 	STRACE(("ServerWindow %s: Quit\n",fName));
-	BMessage msg;
-	
-	msg.what = B_QUIT_REQUESTED;
-	
+
+	BMessage msg(B_QUIT_REQUESTED);
 	SendMessageToClient(&msg);
 }
-//------------------------------------------------------------------------------
+
 //! Shows the window's WinBorder
-void ServerWindow::Show(void)
+void
+ServerWindow::Show(void)
 {
 	// NOTE: if you do something else, other than sending a port message, PLEASE lock
 	STRACE(("ServerWindow %s: Show\n",fName));
 
-	if(!fWinBorder->IsHidden())
+	if (!fWinBorder->IsHidden())
 		return;
 
 	fWinBorder->GetRootLayer()->ShowWinBorder(fWinBorder);
 }
-//------------------------------------------------------------------------------
+
 //! Hides the window's WinBorder
-void ServerWindow::Hide(void)
+void
+ServerWindow::Hide(void)
 {
 	// NOTE: if you do something else, other than sending a port message, PLEASE lock
 	STRACE(("ServerWindow %s: Hide\n",fName));
 
-	if(fWinBorder->IsHidden())
+	if (fWinBorder->IsHidden())
 		return;
 
 	fWinBorder->GetRootLayer()->HideWinBorder(fWinBorder);
 }
-//------------------------------------------------------------------------------
-void ServerWindow::Minimize(bool status)
+
+
+void
+ServerWindow::Minimize(bool status)
 {
 	// NOTE: if you do something else, other than sending a port message, PLEASE lock
 	// This function doesn't need much -- check to make sure that we should and
@@ -258,94 +241,92 @@ void ServerWindow::Minimize(bool status)
 	// does all the heavy lifting for us. :)
 	bool sendMessages = false;
 
-	if (status)
-	{
-		if (!fWinBorder->IsHidden())
-		{
+	if (status) {
+		if (!fWinBorder->IsHidden()) {
 			Hide();
 			sendMessages = true;
 		}
-	}
-	else
-	{
-		if (fWinBorder->IsHidden())
-		{
+	} else {
+		if (fWinBorder->IsHidden()) {
 			Show();
 			sendMessages = true;
 		}
 	}
-	
-	if (sendMessages)
-	{
+
+	if (sendMessages) {
 		BMessage msg;
 		msg.what = B_MINIMIZE;
 		msg.AddInt64("when", real_time_clock_usecs());
 		msg.AddBool("minimize", status);
-	
+
 		SendMessageToClient(&msg);
 	}
 }
-//------------------------------------------------------------------------------
-// Sends a message to the client to perform a Zoom
-void ServerWindow::Zoom(void)
+
+//! Sends a message to the client to perform a Zoom
+void
+ServerWindow::Zoom(void)
 {
 	// NOTE: if you do something else, other than sending a port message, PLEASE lock
-	BMessage msg;
-	msg.what=B_ZOOM;
+	BMessage msg(B_ZOOM);
 	SendMessageToClient(&msg);
 }
-//------------------------------------------------------------------------------
+
 /*!
 	\brief Notifies window of a change in screen resolution
 	\param frame Size of the new resolution
 	\param color_space Color space of the new screen mode
 */
-void ServerWindow::ScreenModeChanged(const BRect frame, const color_space cspace)
+void
+ServerWindow::ScreenModeChanged(const BRect frame, const color_space colorSpace)
 {
-	STRACE(("ServerWindow %s: ScreenModeChanged\n",fName));
-	BMessage msg;
-	
-	msg.what = B_SCREEN_CHANGED;
+	STRACE(("ServerWindow %s: ScreenModeChanged\n", fName));
+
+	BMessage msg(B_SCREEN_CHANGED);
 	msg.AddRect("frame", frame);
-	msg.AddInt32("mode", (int32)cspace);
-	
+	msg.AddInt32("mode", (int32)colorSpace);
+
 	SendMessageToClient(&msg);
 }
-//------------------------------------------------------------------------------
+
 /*!
 	\brief Locks the window
 	\return B_OK if everything is ok, B_ERROR if something went wrong
 */
-status_t ServerWindow::Lock(void)
+status_t
+ServerWindow::Lock(void)
 {
-	STRACE(("\nServerWindow %s: Lock\n",fName));
-	
-	return (fLocker.Lock())?B_OK:B_ERROR;
+	STRACE(("\nServerWindow %s: Lock\n", fName));
+
+	return fLocker.Lock() ? B_OK : B_ERROR;
 }
-//------------------------------------------------------------------------------
+
 //! Unlocks the window
-void ServerWindow::Unlock(void)
+void
+ServerWindow::Unlock(void)
 {
-	STRACE(("ServerWindow %s: Unlock\n\n",fName));
-	
+	STRACE(("ServerWindow %s: Unlock\n\n", fName));
+
 	fLocker.Unlock();
 }
-//------------------------------------------------------------------------------
+
 /*!
 	\brief Determines whether or not the window is locked
 	\return True if locked, false if not.
 */
-bool ServerWindow::IsLocked(void) const
+bool
+ServerWindow::IsLocked(void) const
 {
 	return fLocker.IsLocked();
 }
-//------------------------------------------------------------------------------
+
 /*!
 	\brief Sets the font state for a layer
 	\param layer The layer to set the font
 */
 inline
-void ServerWindow::SetLayerFontState(Layer *layer, LinkMsgReader &link)
+void
+ServerWindow::SetLayerFontState(Layer *layer, LinkMsgReader &link)
 {
 	STRACE(("ServerWindow %s: SetLayerFontStateMessage for layer %s\n",
 			fName, layer->fName->String()));
@@ -353,9 +334,11 @@ void ServerWindow::SetLayerFontState(Layer *layer, LinkMsgReader &link)
 
 	layer->fLayerData->ReadFontFromLink(link);
 }
-//------------------------------------------------------------------------------
+
+
 inline
-void ServerWindow::SetLayerState(Layer *layer, LinkMsgReader &link)
+void
+ServerWindow::SetLayerState(Layer *layer, LinkMsgReader &link)
 {
 	STRACE(("ServerWindow %s: SetLayerState for layer %s\n",fName,
 			 layer->fName->String()));
@@ -364,9 +347,11 @@ void ServerWindow::SetLayerState(Layer *layer, LinkMsgReader &link)
 	layer->fLayerData->ReadFromLink(link);
 	// TODO: Rebuild clipping here?
 }
-//------------------------------------------------------------------------------
+
+
 inline
-Layer * ServerWindow::CreateLayerTree(Layer *localRoot, LinkMsgReader &link)
+Layer *
+ServerWindow::CreateLayerTree(Layer *localRoot, LinkMsgReader &link)
 {
 	// NOTE: no need to check for a lock. This is a private method.
 
@@ -379,7 +364,7 @@ Layer * ServerWindow::CreateLayerTree(Layer *localRoot, LinkMsgReader &link)
 	bool hidden;
 	int32 childCount;
 	char *name = NULL;
-		
+
 	link.Read<int32>(&token);
 	link.ReadString(&name);
 	link.Read<BRect>(&frame);
@@ -389,40 +374,39 @@ Layer * ServerWindow::CreateLayerTree(Layer *localRoot, LinkMsgReader &link)
 	link.Read<uint32>(&flags);
 	link.Read<bool>(&hidden);
 	link.Read<int32>(&childCount);
-			
+
 	STRACE(("ServerWindow(%s)::CreateLayerTree()-> layer %s, token %ld\n", fName,name,token));
 
-	Layer *newLayer;
-	newLayer = new Layer(frame, name, token, resizeMask, 
+	Layer *newLayer = new Layer(frame, name, token, resizeMask, 
 			flags, desktop->GetDisplayDriver());
-	if (name)
-		free(name);
+
+	free(name);
 
 	// there is no way of setting this, other than manually :-)
-	newLayer->fHidden		= hidden;
-	newLayer->fEventMask	= eventMask;
-	newLayer->fEventOptions	= eventOptions;
-	newLayer->fOwner		= fWinBorder;
+	newLayer->fHidden = hidden;
+	newLayer->fEventMask = eventMask;
+	newLayer->fEventOptions = eventOptions;
+	newLayer->fOwner = fWinBorder;
 
 	// add the new Layer to the tree structure.
-	if(localRoot)
+	if (localRoot)
 		localRoot->AddChild(newLayer, NULL);
 
 	return newLayer;
 }
-//------------------------------------------------------------------------------
-void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
+
+
+void
+ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 {
-	if (fCurrentLayer == NULL && code != AS_LAYER_CREATE_ROOT)
-	{
+	if (fCurrentLayer == NULL && code != AS_LAYER_CREATE_ROOT) {
 		printf("ServerWindow %s received unexpected code - message offset %ld before top_view attached.\n",fName, code - SERVER_TRUE);
 		return;
 	}
 
-	RootLayer		*myRootLayer = fWinBorder->GetRootLayer();
+	RootLayer *myRootLayer = fWinBorder->GetRootLayer();
 
-	switch(code)
-	{
+	switch (code) {
 		//--------- BView Messages -----------------
 		case AS_LAYER_SCROLL:
 		{
@@ -2042,7 +2026,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 	desktop->GetDisplayDriver()->ConstrainClippingRegion(NULL);
 	fWinBorder->GetRootLayer()->Unlock();
 }
-//------------------------------------------------------------------------------
+
 /*!
 	\brief Message-dispatching loop for the ServerWindow
 
@@ -2050,17 +2034,17 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 	\param data The thread's ServerWindow
 	\return Throwaway code. Always 0.
 */
-int32 ServerWindow::MonitorWin(void *data)
+int32
+ServerWindow::MonitorWin(void *data)
 {
-	ServerWindow 	*win = (ServerWindow *)data;
+	ServerWindow *win = (ServerWindow *)data;
 	LinkMsgReader *ses = win->fMsgReader;
-	
-	bool			quitting = false;
-	int32			code;
-	status_t		err = B_OK;
-	
-	while(!quitting)
-	{
+
+	bool quitting = false;
+	int32 code;
+	status_t err = B_OK;
+
+	while (!quitting) {
 //		printf("info: ServerWindow::MonitorWin listening on port %ld.\n", win->fMessagePort);
 		code = AS_CLIENT_DEAD;
 		err = ses->GetNextMessage(&code);
@@ -2069,34 +2053,33 @@ int32 ServerWindow::MonitorWin(void *data)
 
 		win->Lock();
 
-		switch(code)
-		{
+		switch (code) {
 			case AS_DELETE_WINDOW:
 			case AS_CLIENT_DEAD:
 			{
 				// this means the client has been killed
 				STRACE(("ServerWindow %s received 'AS_CLIENT_DEAD/AS_DELETE_WINDOW' message code\n",win->Title()));
-//				RootLayer		*myRootLayer = win->fWinBorder->GetRootLayer();
 
-//				quitting = true;
+				//RootLayer *rootLayer = fWinBorder->GetRootLayer();
 
 				// we are preparing to delete a ServerWindow, RootLayer should be aware
 				// of that and stop for a moment.
 				// also we must wait a bit for the associated WinBorder to become hidden
-//				while(1)
-//				{
-//					myRootLayer->Lock();
-//					if (win->IsHidden())
-//						break;
-//					else
-//						myRootLayer->Unlock();
-//				}
+				//while(1) {
+				//	myRootLayer->Lock();
+				//	if (IsHidden())
+				//		break;
+				//	else
+				//		rootLayer->Unlock();
+				//}
+
 				// ServerWindow's destructor takes care of pulling this object off the desktop.
 				if (!win->fWinBorder->IsHidden())
 					CRITICAL("ServerWindow: a window must be hidden before it's deleted\n");
-				delete win;
-//				myRootLayer->Unlock();
 
+				delete win;
+				//	rootLayer->Unlock();
+				
 				exit_thread(0);
 				break;
 			}
@@ -2164,8 +2147,8 @@ ServerWindow::_CopyBits(RootLayer* rootLayer, Layer* layer,
 }
 
 
-//------------------------------------------------------------------------------
-void ServerWindow::SendMessageToClient(const BMessage* msg, int32 target, bool usePreferred) const
+void
+ServerWindow::SendMessageToClient(const BMessage* msg, int32 target, bool usePreferred) const
 {
 	ssize_t size = msg->FlattenedSize();
 	char* buffer = new char[size];
@@ -2177,11 +2160,9 @@ void ServerWindow::SendMessageToClient(const BMessage* msg, int32 target, bool u
 							fClientLooperPort, target, usePreferred, 100000);
 		if (ret < B_OK)
 			fprintf(stderr, "ServerWindow::SendMessageToClient(): %s\n", strerror(ret));
-
 	} else
 		printf("PANIC: ServerWindow %s: can't flatten message in 'SendMessageToClient()'\n", fName);
 
 	delete[] buffer;
 }
-//------------------------------------------------------------------------------
 
