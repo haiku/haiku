@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -524,10 +524,10 @@ void AppServer::InitDecorators(void)
 	\param buffer Attachment buffer for the message.
 	
 */
-void AppServer::DispatchMessage(int32 code, BPortLink &msg)
+void
+AppServer::DispatchMessage(int32 code, BPortLink &msg)
 {
-	switch(code)
-	{
+	switch (code) {
 		case AS_CREATE_APP:
 		{
 			// Create the ServerApp to node monitor a new BApplication
@@ -540,35 +540,40 @@ void AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			// 4) char * - signature of the regular app
 
 			// Find the necessary data
-			team_id	clientTeamID=-1;
-			port_id	clientLooperPort=-1;
-			port_id app_port=-1;
-			int32 htoken=B_NULL_TOKEN;
-			char *app_signature=NULL;
+			team_id	clientTeamID = -1;
+			port_id	clientLooperPort = -1;
+			port_id app_port = -1;
+			int32 htoken = B_NULL_TOKEN;
+			char *app_signature = NULL;
 
 			msg.Read<port_id>(&app_port);
 			msg.Read<port_id>(&clientLooperPort);
 			msg.Read<team_id>(&clientTeamID);
 			msg.Read<int32>(&htoken);
 			msg.ReadString(&app_signature);
-			
-			// Create the ServerApp subthread for this app
-			acquire_sem(fAppListLock);
-			
-			port_id server_listen=create_port(DEFAULT_MONITOR_PORT_SIZE, app_signature);
-			if(server_listen<B_OK)
-			{
-				release_sem(fAppListLock);
+
+			port_id server_listen = create_port(DEFAULT_MONITOR_PORT_SIZE, app_signature);
+			if (server_listen < B_OK) {
 				printf("No more ports left. Time to crash. Have a nice day! :)\n");
 				break;
 			}
-			ServerApp *newapp=NULL;
-			newapp= new ServerApp(app_port,server_listen, clientLooperPort, clientTeamID, 
-					htoken, app_signature);
+			
+			// we let the application own the port, so that we get aware when it's gone
+			if (set_port_owner(server_listen, clientTeamID) < B_OK) {
+				delete_port(server_listen);
+				printf("Could not transfer port ownership to client %ld!\n", clientTeamID);
+				break;
+			}
+
+			// Create the ServerApp subthread for this app
+			acquire_sem(fAppListLock);
+
+			ServerApp *app = new ServerApp(app_port,server_listen, clientLooperPort,
+				clientTeamID, htoken, app_signature);
 
 			// add the new ServerApp to the known list of ServerApps
-			fAppList->AddItem(newapp);
-			
+			fAppList->AddItem(app);
+
 			release_sem(fAppListLock);
 
 			BPortLink replylink(app_port);
@@ -577,34 +582,29 @@ void AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			replylink.Flush();
 
 			// This is necessary because BPortLink::ReadString allocates memory
-			if(app_signature)
-				free(app_signature);
-
+			free(app_signature);
 			break;
 		}
 		case AS_DELETE_APP:
 		{
 			// Delete a ServerApp. Received only from the respective ServerApp when a
 			// BApplication asks it to quit.
-			
+
 			// Attached Data:
 			// 1) thread_id - thread ID of the ServerApp to be deleted
-			
-			int32 	i=0,
-					appnum=fAppList->CountItems();
-			
-			ServerApp *srvapp=NULL;
-			thread_id srvapp_id=-1;
 
-			if(msg.Read<thread_id>(&srvapp_id)<B_OK)
+			int32 i = 0, appnum = fAppList->CountItems();
+			ServerApp *srvapp = NULL;
+			thread_id srvapp_id = -1;
+
+			if (msg.Read<thread_id>(&srvapp_id) < B_OK)
 				break;
 
 			acquire_sem(fAppListLock);
 
 			// Run through the list of apps and nuke the proper one
-			for(i= 0; i < appnum; i++)
-			{
-				srvapp=(ServerApp *)fAppList->ItemAt(i);
+			for (i = 0; i < appnum; i++) {
+				srvapp = (ServerApp *)fAppList->ItemAt(i);
 
 				if(srvapp != NULL && srvapp->MonitorThreadID() == srvapp_id)
 				{

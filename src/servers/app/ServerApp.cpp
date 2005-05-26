@@ -86,7 +86,7 @@
 	MIME fSignature.
 */
 ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort,
-					 team_id clientTeamID, int32 handlerID, const char* signature)
+	team_id clientTeamID, int32 handlerID, const char* signature)
 		:
 		fClientAppPort(sendport),
 		fMessagePort(rcvport),
@@ -109,18 +109,18 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort
 {
 	if (fSignature == "")
 		fSignature = "application/x-vnd.NULL-application-signature";
-	
+
 	// although this isn't pretty, ATM we have only one RootLayer.
 	// there should be a way that this ServerApp be attached to a particular
 	// RootLayer to know which RootLayer's cursor to modify.
 	ServerCursor *defaultCursor = 
 		desktop->ActiveRootLayer()->GetCursorManager().GetCursor(B_CURSOR_DEFAULT);
-	
+
 	if (defaultCursor) {
 		fAppCursor = new ServerCursor(defaultCursor);
 		fAppCursor->SetOwningTeam(fClientTeamID);
 	}
-	
+
 //	fLockSem = create_sem(1, "ServerApp sem");
 
 	Run();
@@ -301,15 +301,26 @@ ServerApp::MonitorApp(void *data)
 	int32 code;
 	status_t err = B_OK;
 	
-	while(!app->fQuitting) {
+	while (!app->fQuitting) {
 		STRACE(("info: ServerApp::MonitorApp listening on port %ld.\n", app->fMessagePort));
 		err = msgqueue.GetNextMessage(&code);
 		if (err < B_OK) {
 			STRACE(("ServerApp::MonitorApp(): GetNextMessage returned %s\n", strerror(err)));
+
+			// ToDo: this should kill the app, but it doesn't work
+			port_id	serverport = find_port(SERVER_PORT_NAME);
+			if (serverport == B_NAME_NOT_FOUND){
+				printf("PANIC: ServerApp %s could not find the app_server port!\n",app->fSignature.String());
+				break;
+			}
+			app->fMsgSender->SetPort(serverport);
+			app->fMsgSender->StartMessage(AS_DELETE_APP);
+			app->fMsgSender->Attach(&app->fMonitorThreadID, sizeof(thread_id));
+			app->fMsgSender->Flush();
 			break;
 		}
 
-		switch(code) {
+		switch (code) {
 			case AS_CREATE_WINDOW:
 			{
 				// Create the ServerWindow to node monitor a new OBWindow
