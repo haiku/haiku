@@ -123,7 +123,8 @@ InodeAllocator::Keep()
 		return status;
 	}
 
-	status = publish_vnode(volume->ID(), fInode->ID(), fInode);
+	if (!fInode->IsSymLink())
+		status = publish_vnode(volume->ID(), fInode->ID(), fInode);
 
 	fTransaction = NULL;
 	fInode = NULL;

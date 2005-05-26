@@ -841,13 +841,12 @@ bfs_create_symlink(void *_ns, void *_directory, const char *name, const char *pa
 		// we don't have to do that here...
 		status = link->WriteAt(transaction, 0, (const uint8 *)path, &length);
 	}
-	// ToDo: would be nice if Inode::Create() would wait with publish_vnode()
-	//	until here, so that the link can be accessed directly
 
 	if (status == B_OK)
 		status = link->WriteBack(transaction);
 
-	// Inode::Create() left the inode locked in memory
+	// Inode::Create() left the inode locked in memory, and also doesn't publish links
+	publish_vnode(volume->ID(), id, link);
 	put_vnode(volume->ID(), id);
 
 	if (status == B_OK) {
@@ -1344,7 +1343,7 @@ bfs_read_link(void *_ns, void *_node, char *buffer, size_t *_bufferSize)
 		return B_OK;
 	}
 
-	*_bufferSize = strlcpy(buffer, inode->Node().short_symlink, bufferSize);
+	*_bufferSize = strlcpy(buffer, inode->Node().short_symlink, bufferSize) + 1;
 	if (*_bufferSize > bufferSize)
 		return B_BUFFER_OVERFLOW;
 
