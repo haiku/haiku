@@ -203,6 +203,7 @@ typedef struct {
 			uint32 free;		/* nr. of useable free 32-bit words remaining in buffer */
 			uint32 max;			/* command buffer's useable size in 32-bit words */
 		} dma;
+		bool agp_mode;			/* card is running in AGP mode */
 	} engine;
 
 	/* fixme:
