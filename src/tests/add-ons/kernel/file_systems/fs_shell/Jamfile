@@ -33,7 +33,7 @@ rule BuildLibFSShell
 }
 
 {
-	local defines = [ FDefines USER DEBUG _GNU_SOURCE ] ;
+	local defines = [ FDefines USER _GNU_SOURCE ] ;
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) -fno-exceptions -fno-rtti ;
 }
