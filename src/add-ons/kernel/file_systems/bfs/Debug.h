@@ -1,6 +1,6 @@
 /* Debug - debug stuff
  *
- * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef DEBUG_H
@@ -71,7 +71,7 @@
 	#define PRINT(x) ;
 	#define REPORT_ERROR(status) ;
 	#define RETURN_ERROR(status) return status;
-	#define FATAL(x) { __out("bfs: "); __out x; panic("BFS!\n"); }
+	#define FATAL(x) { __out("bfs: "); __out x; sync(); panic("BFS!\n"); }
 	#define INFORM(x) { __out("bfs: "); __out x; }
 	#define FUNCTION() ;
 	#define FUNCTION_START(x) ;
