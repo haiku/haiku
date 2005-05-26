@@ -125,11 +125,13 @@ acquire_spinlock(spinlock *lock)
 		}
 	} else {
 #if DEBUG_SPINLOCKS
+		int32 oldValue;
 		if (are_interrupts_enabled())
 			panic("acquire_spinlock: attempt to acquire lock %p with interrupts enabled\n", lock);
-		if (atomic_set((int32 *)lock, 1) != 0) {
-			panic("acquire_spinlock: attempt to acquire lock %p twice on non-SMP system (last caller: %p)\n", 
-				lock, find_lock_caller(lock));
+		oldValue = atomic_set((int32 *)lock, 1);
+		if (oldValue != 0) {
+			panic("acquire_spinlock: attempt to acquire lock %p twice on non-SMP system (last caller: %p, value %ld)\n", 
+				lock, find_lock_caller(lock), oldValue);
 		}
 
 		push_lock_caller(arch_get_caller(), lock);
