@@ -397,10 +397,11 @@ status_t nv_acc_init_dma()
 		{
 			/* DMA target node is PCI */
 			ACCW(PR_CTX0_A, 0x00023002);
+//			ACCW(PR_CTX0_A, 0x00033002);//AGP
 			/* point at the DMA buffer via main system memory */
 //			ACCW(PR_CTX2_A, (ACCR(PR_CTX2_A) +
 //				(((uint32)((uint8 *)(si->framebuffer_pci))) & 0xfffff000)));
-			ACCW(PR_CTX2_A, ((uint32)((uint8 *)(si->dma_buffer_pci))));
+			ACCW(PR_CTX2_A, (((uint32)((uint8 *)(si->dma_buffer_pci))) | 0x00000002));
 		}
 
 //3D stuff:
