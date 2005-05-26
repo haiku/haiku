@@ -206,13 +206,16 @@ struct PrintPartitionsVisitor : public BDiskDeviceVisitor {
 					name = "";
 			}
 		}
+		const char *type = partition->ContentType();
+		if (type == NULL)
+			type = "<unknown>";
 
 		BPath path;
 		if (partition->IsMounted())
 			partition->GetMountPoint(&path);
 
 		printf("%-16s %-20s %s\n",
-			name, partition->ContentType(), partition->IsMounted() ? path.Path() : "");
+			name, type, partition->IsMounted() ? path.Path() : "");
 		return false;
 	}
 
