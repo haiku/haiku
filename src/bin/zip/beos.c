@@ -31,7 +31,7 @@
 
 #include <kernel/fs_attr.h>
 #include <storage/Mime.h>
-#include <support/byteorder.h>
+#include <support/ByteOrder.h>
 
 
 #define PAD 0

@@ -5,10 +5,11 @@
 #include <OS.h>
 #include <Drivers.h>
 #include <KernelExport.h>
+#include <ByteOrder.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/stat.h>
-#include <byteorder.h>
 
 #include <USB.h>
 #include <USB_spec.h>
@@ -16,16 +17,16 @@
 #include "USB_audio_spec.h"
 #include "USB_audio_utils.h"
 
-extern void 	set_triplet(int8* ptr, uint32 param);
+extern void set_triplet(int8* ptr, uint32 param);
 
 uint32
-get_triplet(int8* ptr) {
-        uint32 lsb = ptr[0] & 0xff;
-        uint32 hsb = ptr[1] & 0xff;
-        uint32 msb = ptr[2] & 0xff;
-        uint32 res;
-        res = (msb << 16) | (hsb << 8) | (lsb);
-        return res;
+get_triplet(int8 *ptr)
+{
+	uint32 lsb = ptr[0] & 0xff;
+	uint32 hsb = ptr[1] & 0xff;
+	uint32 msb = ptr[2] & 0xff;
+
+	return (msb << 16) | (hsb << 8) | (lsb);
 }
 
 
@@ -33,14 +34,15 @@ get_triplet(int8* ptr) {
  *	 dump a whole configuration
  */
 
-void dump_usb_configuration_info(const usb_configuration_info *conf)
+void
+dump_usb_configuration_info(const usb_configuration_info *conf)
 {
-	usb_interface_info* inf;
-	int i,j,k;
+	usb_interface_info *inf;
+	int i, j, k;
 	bool isactive;
 
 	dprintf("Dumping usb_configuration_info... %d interfaces\n", conf->interface_count);
-	for (i=0; i<conf->interface_count; i++) {
+	for (i = 0; i < conf->interface_count; i++) {
 		dprintf("INTERFACE %d, %d alternatitives:\n", i, conf->interface[i].alt_count);
 		for (j=0; j<conf->interface[i].alt_count; j++) {
 			isactive = &conf->interface[i].alt[j] == conf->interface[i].active;
@@ -57,21 +59,26 @@ void dump_usb_configuration_info(const usb_configuration_info *conf)
 	}
 }
 
-void dump_interface_descriptor(usb_interface_descriptor* intf_des) 
+
+void
+dump_interface_descriptor(usb_interface_descriptor *intf_des)
 {
-	dprintf("  interface descriptor: %d bytes\n",intf_des->length);
-	dprintf("    interface_number:  %d\n",intf_des->interface_number);
-	dprintf("    alternate_setting: %d\n",intf_des->alternate_setting);
-	dprintf("    num_endpoints:     %d\n",intf_des->num_endpoints);
-	dprintf("    class/sub/prot:    %d/%d/%d\n",intf_des->interface_class, intf_des->interface_subclass, intf_des->interface_protocol);
-	dprintf("    interface str:     %d\n",intf_des->interface);
+	dprintf("  interface descriptor: %d bytes\n", intf_des->length);
+	dprintf("    interface_number:  %d\n", intf_des->interface_number);
+	dprintf("    alternate_setting: %d\n", intf_des->alternate_setting);
+	dprintf("    num_endpoints:     %d\n", intf_des->num_endpoints);
+	dprintf("    class/sub/prot:    %d/%d/%d\n",  intf_des->interface_class,
+		intf_des->interface_subclass, intf_des->interface_protocol);
+	dprintf("    interface str:     %d\n", intf_des->interface);
 }
 
-void dump_interface(usb_interface_info* inf)
+
+void
+dump_interface(usb_interface_info *inf)
 {
 	int i;
-	usb_interface_descriptor* intf_des = inf->descr;
-	
+	usb_interface_descriptor *intf_des = inf->descr;
+
 	dump_interface_descriptor(intf_des);
 	if (inf->descr->interface_class == 1) {
 		if (inf->descr->interface_subclass == 1) {
@@ -92,7 +99,9 @@ void dump_interface(usb_interface_info* inf)
 	//}
 }
 
-char* attr(int8 attrib)
+
+char *
+attr(int8 attrib)
 {
 	switch (attrib) {
 		case 0x00: return "Control";
@@ -103,7 +112,9 @@ char* attr(int8 attrib)
 	return "?";
 }
 
-void dump_endpoint_info(int i, usb_endpoint_info* ep_inf)
+
+void
+dump_endpoint_info(int i, usb_endpoint_info *ep_inf)
 {
 	dprintf("    endpoint %d:\n",i);
 	dprintf("      address:         %d, %s\n",ep_inf->descr->endpoint_address & 0x07, (ep_inf->descr->endpoint_address & 0x80)?"IN":"OUT");
@@ -117,7 +128,9 @@ void dump_endpoint_info(int i, usb_endpoint_info* ep_inf)
  *	dump class 1/1/0
  */
 
-void dump_usb_class_110(usb_endpoint_info* ep_inf, size_t endpoint_count,  int8** ptr, size_t count) 
+void
+dump_usb_class_110(usb_endpoint_info *ep_inf, size_t endpoint_count,
+	int8 **ptr, size_t count)
 {
 	int i, length;
 	int8* data;
@@ -169,7 +182,9 @@ void dump_usb_class_110(usb_endpoint_info* ep_inf, size_t endpoint_count,  int8*
 	}
 }
 
-void dump_usb_audiocontrol_header_descriptor(int8* data)
+
+void
+dump_usb_audiocontrol_header_descriptor(int8 *data)
 {	
 	int i;
 	usb_audiocontrol_header_descriptor* h = (usb_audiocontrol_header_descriptor*)data;
@@ -179,12 +194,14 @@ void dump_usb_audiocontrol_header_descriptor(int8* data)
 	dprintf("    bcd_release_no: 0x%x\n", h->bcd_release_no);
 	dprintf("    total_length:   %d bytes\n", h->total_length);
 	dprintf("    in_collection:  %d\n", h->in_collection);
-	for (i=0; i<h->in_collection; i++) {
+	for (i = 0; i < h->in_collection; i++) {
 		dprintf("    %d\n", h->interface_numbers[i]);
 	}
 }
 
-void dump_usb_input_terminal_descriptor(int8* data)
+
+void
+dump_usb_input_terminal_descriptor(int8 *data)
 {
 	usb_input_terminal_descriptor* it = (usb_input_terminal_descriptor*)data;
 
@@ -199,7 +216,9 @@ void dump_usb_input_terminal_descriptor(int8* data)
 	dprintf("    terminal str:   %d\n", it->terminal);
 }
 
-void dump_usb_output_terminal_descriptor(int8* data)
+
+void
+dump_usb_output_terminal_descriptor(int8 *data)
 {
 	usb_output_terminal_descriptor* ot = (usb_output_terminal_descriptor*)data;
 
@@ -212,7 +231,9 @@ void dump_usb_output_terminal_descriptor(int8* data)
 	dprintf("    terminal str:   %d\n", ot->terminal);
 }
 
-void dump_usb_selector_unit_descriptor(int8* data)
+
+void
+dump_usb_selector_unit_descriptor(int8 *data)
 {
 	int i;
 	usb_selector_unit_descriptor* su = (usb_selector_unit_descriptor*)data;
@@ -227,7 +248,10 @@ void dump_usb_selector_unit_descriptor(int8* data)
 	dprintf("    selector str:   %d\n", su->input_pins[i]); // or selector_string
 }
 
-void bma_dec(int16 bitmap) {
+
+void
+bma_dec(int16 bitmap)
+{
 	if (bitmap & 0x0001) dprintf("Mute ");
 	if (bitmap & 0x0002) dprintf("Volume ");
 	if (bitmap & 0x0004) dprintf("Bass ");
@@ -241,7 +265,9 @@ void bma_dec(int16 bitmap) {
 	dprintf("\n");
 }
 
-void dump_usb_feature_unit_descriptor(int8* data)
+
+void
+dump_usb_feature_unit_descriptor(int8 *data)
 {
 	// warning: either doc is out of date, or this & 1325 implementation is wrong on control_size vs bma_controls[] length 
 	int i, length;
@@ -270,7 +296,9 @@ void dump_usb_feature_unit_descriptor(int8* data)
  *	dump class 1/2/0
  */
 
-void dump_usb_class_120(usb_endpoint_info* ep_inf, size_t endpoint_count, int8** ptr, size_t count) 
+void
+dump_usb_class_120(usb_endpoint_info *ep_inf, 
+	size_t endpoint_count, int8 **ptr, size_t count)
 {
 	int i, length;
 	int8* data;
@@ -316,19 +344,24 @@ void dump_usb_class_120(usb_endpoint_info* ep_inf, size_t endpoint_count, int8**
 	}
 }
 
-void dump_usb_as_interface_descriptor(int8* data)
+
+void
+dump_usb_as_interface_descriptor(int8 *data)
 {
 	usb_as_interface_descriptor* as = (usb_as_interface_descriptor*)data;
-
 }
 
-void dump_usb_type_I_format_descriptor(int8* data)
+
+void
+dump_usb_type_I_format_descriptor(int8 *data)
 {
 	int i;
 	usb_type_I_format_descriptor* fmt = (usb_type_I_format_descriptor*)data;
 }
 
-void dump_usb_as_cs_endpoint_descriptor(int8* data)
+
+void
+dump_usb_as_cs_endpoint_descriptor(int8 *data)
 {
 	usb_as_cs_endpoint_descriptor* ep = (usb_as_cs_endpoint_descriptor*)data;
 
@@ -344,13 +377,15 @@ void dump_usb_as_cs_endpoint_descriptor(int8* data)
  * Last resort...
  */
 
-void dump_descr(int8* data)
+void
+dump_descr(int8 *data)
 {
 	dump_data(data + 1, *data);
 }
 
 
-void dump_data(int8* data, int length)
+void
+dump_data(int8 *data, int length)
 {
 	int i;
 	for (i=0; i<length; i++) {

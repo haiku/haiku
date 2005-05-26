@@ -34,11 +34,11 @@ All rights reserved.
 
 //	PoseView scripting interface
 
-#include <byteorder.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
+#include <ByteOrder.h>
 #include <Debug.h>
 #include <Message.h>
 #include <PropertyInfo.h>
