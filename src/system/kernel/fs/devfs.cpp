@@ -1150,14 +1150,16 @@ static status_t
 devfs_read_link(fs_volume _fs, fs_vnode _link, char *buffer, size_t *_bufferSize)
 {
 	struct devfs_vnode *link = (struct devfs_vnode *)_link;
+	size_t bufferSize = *_bufferSize;
 
 	if (!S_ISLNK(link->stream.type))
 		return B_BAD_VALUE;
 
-	if (*_bufferSize <= link->stream.u.symlink.length) {
-		*_bufferSize = link->stream.u.symlink.length + 1;
+	*_bufferSize = link->stream.u.symlink.length + 1;
+		// we always need to return the number of bytes we intend to write!
+
+	if (bufferSize <= link->stream.u.symlink.length)
 		return B_BUFFER_OVERFLOW;
-	}
 
 	memcpy(buffer, link->stream.u.symlink.path, link->stream.u.symlink.length + 1);
 	return B_OK;
