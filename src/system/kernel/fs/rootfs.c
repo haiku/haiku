@@ -34,7 +34,7 @@ struct rootfs_stream {
 	mode_t type;
 	struct stream_dir {
 		struct rootfs_vnode *dir_head;
-		struct rootfs_cookie *jar_head;
+		struct list cookies;
 	} dir;
 	struct stream_symlink {
 		char *path;
@@ -64,12 +64,10 @@ struct rootfs {
 };
 
 // dircookie, dirs are only types of streams supported by rootfs
-struct rootfs_cookie {
-	struct rootfs_cookie *next;
-	struct rootfs_cookie *prev;
-	struct rootfs_vnode *ptr;
-	int oflags;
-	int state;	// iteration state
+struct rootfs_dir_cookie {
+	struct list_link link;
+	struct rootfs_vnode *current;
+	int32 state;	// iteration state
 };
 
 // directory iteration states
@@ -110,7 +108,8 @@ rootfs_vnode_compare_func(void *_v, const void *_key)
 
 
 static struct rootfs_vnode *
-rootfs_create_vnode(struct rootfs *fs, struct rootfs_vnode *parent, const char *name, int type)
+rootfs_create_vnode(struct rootfs *fs, struct rootfs_vnode *parent,
+	const char *name, int type)
 {
 	struct rootfs_vnode *vnode;
 
@@ -133,6 +132,9 @@ rootfs_create_vnode(struct rootfs *fs, struct rootfs_vnode *parent, const char *
 	vnode->gid = parent ? parent->gid : getegid();
 		// inherit group from parent if possible
 
+	if (S_ISDIR(type))
+		list_init(&vnode->stream.dir.cookies);
+
 	return vnode;
 }
 
@@ -148,51 +150,23 @@ rootfs_delete_vnode(struct rootfs *fs, struct rootfs_vnode *v, bool force_delete
 	// remove it from the global hash table
 	hash_remove(fs->vnode_list_hash, v);
 
-	if (v->name != NULL)
-		free(v->name);
+	free(v->name);
 	free(v);
 
 	return 0;
 }
 
 
-static void
-insert_cookie_in_jar(struct rootfs_vnode *dir, struct rootfs_cookie *cookie)
-{
-	cookie->next = dir->stream.dir.jar_head;
-	dir->stream.dir.jar_head = cookie;
-	cookie->prev = NULL;
-}
-
-
-#if 0
-static void
-remove_cookie_from_jar(struct rootfs_vnode *dir, struct rootfs_cookie *cookie)
-{
-	// ToDo: why is this function not called?
-
-	if (cookie->next)
-		cookie->next->prev = cookie->prev;
-	if (cookie->prev)
-		cookie->prev->next = cookie->next;
-	if (dir->stream.dir.jar_head == cookie)
-		dir->stream.dir.jar_head = cookie->next;
-
-	cookie->prev = cookie->next = NULL;
-}
-#endif
-
-
 /* makes sure none of the dircookies point to the vnode passed in */
 
 static void
-update_dircookies(struct rootfs_vnode *dir, struct rootfs_vnode *v)
+update_dir_cookies(struct rootfs_vnode *dir, struct rootfs_vnode *vnode)
 {
-	struct rootfs_cookie *cookie;
+	struct rootfs_dir_cookie *cookie = NULL;
 
-	for (cookie = dir->stream.dir.jar_head; cookie; cookie = cookie->next) {
-		if (cookie->ptr == v)
-			cookie->ptr = v->dir_next;
+	while ((cookie = list_get_next_item(&dir->stream.dir.cookies, cookie)) != NULL) {
+		if (cookie->current == vnode)
+			cookie->current = vnode->dir_next;
 	}
 }
 
@@ -200,34 +174,53 @@ update_dircookies(struct rootfs_vnode *dir, struct rootfs_vnode *v)
 static struct rootfs_vnode *
 rootfs_find_in_dir(struct rootfs_vnode *dir, const char *path)
 {
-	struct rootfs_vnode *v;
+	struct rootfs_vnode *vnode;
 
 	if (!strcmp(path, "."))
 		return dir;
 	if (!strcmp(path, ".."))
 		return dir->parent;
 
-	for (v = dir->stream.dir.dir_head; v; v = v->dir_next) {
-		if (strcmp(v->name, path) == 0)
-			return v;
+	for (vnode = dir->stream.dir.dir_head; vnode; vnode = vnode->dir_next) {
+		if (strcmp(vnode->name, path) == 0)
+			return vnode;
 	}
 	return NULL;
 }
 
 
 static status_t
-rootfs_insert_in_dir(struct rootfs_vnode *dir, struct rootfs_vnode *v)
+rootfs_insert_in_dir(struct rootfs *fs, struct rootfs_vnode *dir,
+	struct rootfs_vnode *vnode)
 {
-	v->dir_next = dir->stream.dir.dir_head;
-	dir->stream.dir.dir_head = v;
+	// make sure the directory stays sorted alphabetically
 
+	struct rootfs_vnode *node = dir->stream.dir.dir_head, *last = NULL;
+	while (node && strcmp(node->name, vnode->name) < 0) {
+		last = node;
+		node = node->dir_next;
+	}
+	if (last == NULL) {
+		// the new vnode is the first entry in the list
+		vnode->dir_next = dir->stream.dir.dir_head;
+		dir->stream.dir.dir_head = vnode;
+	} else {
+		// insert after that node
+		vnode->dir_next = last->dir_next;
+		last->dir_next = vnode;
+	}
+
+	vnode->parent = dir;
 	dir->modification_time = time(NULL);
+
+	notify_stat_changed(fs->id, dir->id, B_STAT_MODIFICATION_TIME);
 	return B_OK;
 }
 
 
 static status_t
-rootfs_remove_from_dir(struct rootfs_vnode *dir, struct rootfs_vnode *findit)
+rootfs_remove_from_dir(struct rootfs *fs, struct rootfs_vnode *dir,
+	struct rootfs_vnode *findit)
 {
 	struct rootfs_vnode *v;
 	struct rootfs_vnode *last_v;
@@ -235,7 +228,7 @@ rootfs_remove_from_dir(struct rootfs_vnode *dir, struct rootfs_vnode *findit)
 	for (v = dir->stream.dir.dir_head, last_v = NULL; v; last_v = v, v = v->dir_next) {
 		if (v == findit) {
 			/* make sure all dircookies dont point to this vnode */
-			update_dircookies(dir, v);
+			update_dir_cookies(dir, v);
 
 			if (last_v)
 				last_v->dir_next = v->dir_next;
@@ -244,6 +237,7 @@ rootfs_remove_from_dir(struct rootfs_vnode *dir, struct rootfs_vnode *findit)
 			v->dir_next = NULL;
 
 			dir->modification_time = time(NULL);
+			notify_stat_changed(fs->id, dir->id, B_STAT_MODIFICATION_TIME);
 			return B_OK;
 		}
 	}
@@ -263,7 +257,7 @@ rootfs_is_dir_empty(struct rootfs_vnode *dir)
 static status_t
 remove_node(struct rootfs *fs, struct rootfs_vnode *directory, struct rootfs_vnode *vnode)
 {
-	rootfs_remove_from_dir(directory, vnode);
+	rootfs_remove_from_dir(fs, directory, vnode);
 	notify_entry_removed(fs->id, directory->id, vnode->name, vnode->id);
 
 	// schedule this vnode to be removed when it's ref goes to zero
@@ -516,8 +510,6 @@ rootfs_open(fs_volume _fs, fs_vnode _v, int oflags, fs_cookie *_cookie)
 	// allow to open the file, but it can't be done anything with it
 
 	*_cookie = NULL;
-		// initialize the cookie, because rootfs_free_cookie() relies on it
-
 	return B_OK;
 }
 
@@ -538,14 +530,6 @@ rootfs_close(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
 static status_t
 rootfs_free_cookie(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
 {
-	struct rootfs_cookie *cookie = _cookie;
-#ifdef TRACE_ROOTFS
-	struct rootfs_vnode *v = _v;
-
-	TRACE(("rootfs_freecookie: entry vnode %p, cookie %p\n", v, cookie));
-#endif
-	free(cookie);
-
 	return B_OK;
 }
 
@@ -601,13 +585,9 @@ rootfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name, int mode, vnod
 		status = B_NO_MEMORY;
 		goto err;
 	}
-	vnode->parent = dir;
-	rootfs_insert_in_dir(dir, vnode);
 
+	rootfs_insert_in_dir(fs, dir, vnode);
 	hash_insert(fs->vnode_list_hash, vnode);
-
-	vnode->stream.dir.dir_head = NULL;
-	vnode->stream.dir.jar_head = NULL;
 
 	notify_entry_created(fs->id, dir->id, name, vnode->id);
 
@@ -638,24 +618,23 @@ rootfs_open_dir(fs_volume _fs, fs_vnode _v, fs_cookie *_cookie)
 {
 	struct rootfs *fs = (struct rootfs *)_fs;
 	struct rootfs_vnode *vnode = (struct rootfs_vnode *)_v;
-	struct rootfs_cookie *cookie;
+	struct rootfs_dir_cookie *cookie;
 
 	TRACE(("rootfs_open: vnode %p\n", vnode));
 
 	if (!S_ISDIR(vnode->stream.type))
 		return B_BAD_VALUE;
 
-	cookie = malloc(sizeof(struct rootfs_cookie));
+	cookie = malloc(sizeof(struct rootfs_dir_cookie));
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 
 	mutex_lock(&fs->lock);
 
-	cookie->ptr = vnode->stream.dir.dir_head;
-	//cookie->oflags = oflags;
+	cookie->current = vnode->stream.dir.dir_head;
 	cookie->state = ITERATION_STATE_BEGIN;
 
-	insert_cookie_in_jar(vnode, cookie);
+	list_add_item(&vnode->stream.dir.cookies, cookie);
 	*_cookie = cookie;
 
 	mutex_unlock(&fs->lock);
@@ -665,10 +644,23 @@ rootfs_open_dir(fs_volume _fs, fs_vnode _v, fs_cookie *_cookie)
 
 
 static status_t
+rootfs_free_dir_cookie(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
+{
+	struct rootfs_dir_cookie *cookie = _cookie;
+	struct rootfs_vnode *vnode = _v;
+
+	list_remove_item(&vnode->stream.dir.cookies, cookie);
+	free(cookie);
+
+	return B_OK;
+}
+
+
+static status_t
 rootfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, struct dirent *dirent, size_t bufferSize, uint32 *_num)
 {
 	struct rootfs_vnode *vnode = (struct rootfs_vnode *)_vnode;
-	struct rootfs_cookie *cookie = _cookie;
+	struct rootfs_dir_cookie *cookie = _cookie;
 	struct rootfs *fs = _fs;
 	status_t status = B_OK;
 	struct rootfs_vnode *childNode = NULL;
@@ -694,7 +686,7 @@ rootfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, struct dirent
 			nextState = cookie->state + 1;
 			break;
 		default:
-			childNode = cookie->ptr;
+			childNode = cookie->current;
 			if (childNode) {
 				name = childNode->name;
 				nextChildNode = childNode->dir_next;
@@ -722,7 +714,7 @@ rootfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, struct dirent
 	if (status < B_OK)
 		goto err;
 
-	cookie->ptr = nextChildNode;
+	cookie->current = nextChildNode;
 	cookie->state = nextState;
 	status = B_OK;
 
@@ -736,13 +728,13 @@ err:
 static status_t
 rootfs_rewind_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie)
 {
-	struct rootfs *fs = _fs;
+	struct rootfs_dir_cookie *cookie = _cookie;
 	struct rootfs_vnode *vnode = _vnode;
-	struct rootfs_cookie *cookie = _cookie;
+	struct rootfs *fs = _fs;
 
 	mutex_lock(&fs->lock);
 
-	cookie->ptr = vnode->stream.dir.dir_head;
+	cookie->current = vnode->stream.dir.dir_head;
 	cookie->state = ITERATION_STATE_BEGIN;
 
 	mutex_unlock(&fs->lock);
@@ -824,9 +816,8 @@ rootfs_symlink(fs_volume _fs, fs_vnode _dir, const char *name, const char *path,
 		status = B_NO_MEMORY;
 		goto err;
 	}
-	vnode->parent = dir;
-	rootfs_insert_in_dir(dir, vnode);
 
+	rootfs_insert_in_dir(fs, dir, vnode);
 	hash_insert(fs->vnode_list_hash, vnode);
 
 	vnode->stream.symlink.path = strdup(path);
@@ -914,32 +905,22 @@ rootfs_rename(fs_volume _fs, fs_vnode _fromDir, const char *fromName, fs_vnode _
 		remove_node(fs, toDirectory, targetVnode);
 	}
 
-	if (fromDirectory == toDirectory) {
-		// rename to a different name in the same directory
-
-		// change the name on this node
-		if (nameBuffer == NULL) {
-			// we can just copy it
-			strcpy(vnode->name, toName);
-		} else {
-			free(vnode->name);
-			vnode->name = nameBuffer;
-		}
-
-		/* no need to remove and add it unless the dir is sorting */
-#if 0
-		// remove it from the dir
-		rootfs_remove_from_dir(fromDirectory, vnode);
-
-		// add it back to the dir with the new name
-		rootfs_insert_in_dir(toDirectory, vnode);
-#endif
+	// change the name on this node
+	if (nameBuffer == NULL) {
+		// we can just copy it
+		strcpy(vnode->name, toName);
 	} else {
-		// different target directory from source
-
-		rootfs_remove_from_dir(fromDirectory, vnode);
-		rootfs_insert_in_dir(toDirectory, vnode);
+		free(vnode->name);
+		vnode->name = nameBuffer;
 	}
+
+	// remove it from the dir
+	rootfs_remove_from_dir(fs, fromDirectory, vnode);
+
+	// Add it back to the dir with the new name.
+	// We need to do this even in the same directory, 
+	// so that it keeps sorted correctly.
+	rootfs_insert_in_dir(fs, toDirectory, vnode);
 
 	notify_entry_moved(fs->id, fromDirectory->id, fromName, toDirectory->id, toName, vnode->id);
 	status = B_OK;
@@ -1095,8 +1076,8 @@ file_system_module_info gRootFileSystem = {
 	&rootfs_create_dir,
 	&rootfs_remove_dir,
 	&rootfs_open_dir,
-	&rootfs_close,			// we are using the same operations for directories
-	&rootfs_free_cookie,	// and files here - that's intended, not by accident
+	&rootfs_close,			// same as for files - it does nothing, anyway
+	&rootfs_free_dir_cookie,
 	&rootfs_read_dir,
 	&rootfs_rewind_dir,
 
