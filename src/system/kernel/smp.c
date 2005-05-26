@@ -1,24 +1,23 @@
 /*
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 /* Functionality for symetrical multi-processors */
 
-#include <kernel.h>
 #include <thread.h>
-#include <console.h>
-#include <debug.h>
 #include <int.h>
-#include <arch/int.h>
 #include <smp.h>
-#include <malloc.h>
-#include <Errors.h>
-
 #include <cpu.h>
 #include <arch/cpu.h>
 #include <arch/smp.h>
+#include <arch/int.h>
+#include <arch/debug.h>
 
+#include <stdlib.h>
 #include <string.h>
 
 #define DEBUG_SPINLOCKS 1
@@ -73,6 +72,42 @@ static int smp_num_cpus = 1;
 
 static int smp_process_pending_ici(int curr_cpu);
 
+#ifdef DEBUG_SPINLOCKS
+#define NUM_LAST_CALLERS	32
+
+static struct {
+	void		*caller;
+	spinlock	*lock;
+} sLastCaller[NUM_LAST_CALLERS];
+static int32 sLastIndex = 0;
+
+
+static void
+push_lock_caller(void *caller, spinlock *lock)
+{
+	sLastCaller[sLastIndex].caller = caller;
+	sLastCaller[sLastIndex].lock = lock;	
+
+	if (++sLastIndex >= NUM_LAST_CALLERS)
+		sLastIndex = 0;
+}
+
+
+static void *
+find_lock_caller(spinlock *lock)
+{
+	int32 i;
+
+	for (i = 0; i < NUM_LAST_CALLERS; i++) {
+		if (sLastCaller[i].lock == lock)
+			return sLastCaller[i].caller;
+	}
+
+	return NULL;
+}
+#endif	// DEBUG_SPINLOCKS
+
+
 void
 acquire_spinlock(spinlock *lock)
 {
@@ -89,12 +124,16 @@ acquire_spinlock(spinlock *lock)
 				break;
 		}
 	} else {
-		#if DEBUG_SPINLOCKS
-			if (are_interrupts_enabled())
-				panic("acquire_spinlock: attempt to acquire lock %p with interrupts enabled\n", lock);
-			if (atomic_set((int32 *)lock, 1) != 0)
-				panic("acquire_spinlock: attempt to acquire lock %p twice on non-SMP system\n", lock);
-		#endif
+#if DEBUG_SPINLOCKS
+		if (are_interrupts_enabled())
+			panic("acquire_spinlock: attempt to acquire lock %p with interrupts enabled\n", lock);
+		if (atomic_set((int32 *)lock, 1) != 0) {
+			panic("acquire_spinlock: attempt to acquire lock %p twice on non-SMP system (last caller: %p)\n", 
+				lock, find_lock_caller(lock));
+		}
+
+		push_lock_caller(arch_get_caller(), lock);
+#endif
 	}
 }
  
@@ -103,10 +142,10 @@ static void
 acquire_spinlock_nocheck(spinlock *lock)
 {
 	if (smp_num_cpus > 1) {
-		#if DEBUG_SPINLOCKS
-			if (are_interrupts_enabled())
-				panic("acquire_spinlock_nocheck: attempt to acquire lock %p with interrupts enabled\n", lock);
-		#endif
+#if DEBUG_SPINLOCKS
+		if (are_interrupts_enabled())
+			panic("acquire_spinlock_nocheck: attempt to acquire lock %p with interrupts enabled\n", lock);
+#endif
 		while (1) {
 			while(*lock != 0)
 				PAUSE();
@@ -114,12 +153,12 @@ acquire_spinlock_nocheck(spinlock *lock)
 				break;
 		}
 	} else {
-		#if DEBUG_SPINLOCKS
-			if (are_interrupts_enabled())
-				panic("acquire_spinlock_nocheck: attempt to acquire lock %p with interrupts enabled\n", lock);
-			if (atomic_set((int32 *)lock, 1) != 0)
-				panic("acquire_spinlock_nocheck: attempt to acquire lock %p twice on non-SMP system\n", lock);
-		#endif
+#if DEBUG_SPINLOCKS
+		if (are_interrupts_enabled())
+			panic("acquire_spinlock_nocheck: attempt to acquire lock %p with interrupts enabled\n", lock);
+		if (atomic_set((int32 *)lock, 1) != 0)
+			panic("acquire_spinlock_nocheck: attempt to acquire lock %p twice on non-SMP system\n", lock);
+#endif
 	}
 }
 
