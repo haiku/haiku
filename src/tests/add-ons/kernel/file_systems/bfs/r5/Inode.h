@@ -35,7 +35,6 @@ enum inode_type {
 	S_FILE			= S_IFREG,
 	S_SYMLINK		= S_IFLNK,
 
-	S_REGULAR		= (S_DIRECTORY | S_FILE | S_SYMLINK),
 	S_INDEX_TYPES	= (S_STR_INDEX | S_INT_INDEX | S_UINT_INDEX | S_LONG_LONG_INDEX
 						| S_ULONG_LONG_INDEX | S_FLOAT_INDEX | S_DOUBLE_INDEX)
 };
@@ -101,11 +100,11 @@ class Inode : public CachedBlock {
 
 		bool IsAttributeDirectory() const { return (Mode() & S_ATTR_DIR) != 0; }
 		bool IsAttribute() const { return Mode() & S_ATTR; }
-		bool IsFile() const { return Mode() & S_IFREG; }
+		bool IsFile() const { return (Mode() & (S_IFMT | S_ATTR)) == S_FILE; }
 		bool IsRegularNode() const { return (Mode() & (S_ATTR_DIR | S_INDEX_DIR | S_ATTR)) == 0; }
 			// a regular node in the standard namespace (i.e. not an index or attribute)
 		bool IsSymLink() const { return S_ISLNK(Mode()); }
-		bool HasUserAccessableStream() const { return S_ISREG(Mode()); }
+		bool HasUserAccessableStream() const { return IsFile(); }
 			// currently only files can be accessed with bfs_read()/bfs_write()
 
 		off_t Size() const { return Node()->data.Size(); }

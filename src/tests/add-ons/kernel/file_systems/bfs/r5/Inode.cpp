@@ -965,7 +965,7 @@ Inode::CreateAttribute(Transaction *transaction, const char *name, uint32 type, 
 
 	// Inode::Create() locks the inode for us
 	return Inode::Create(transaction, attributes, name, 
-		S_ATTR | S_REGULAR | 0666, 0, type, NULL, attribute);
+		S_ATTR | S_FILE | 0666, 0, type, NULL, attribute);
 }
 
 
@@ -2064,7 +2064,7 @@ Inode::Create(Transaction *transaction, Inode *parent, const char *name, int32 m
 	inode->UpdateOldLastModified();
 
 	// The "size" & "last_modified" indices don't contain directories
-	if ((mode & (S_FILE | S_SYMLINK)) != 0) {
+	if (inode->IsFile() || inode->IsSymLink()) {
 		// if adding to these indices fails, the inode creation will not be harmed;
 		// they are considered less important than the "name" index
 		if (inode->IsFile())
