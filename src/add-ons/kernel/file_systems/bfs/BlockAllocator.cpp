@@ -1,6 +1,6 @@
 /* BlockAllocator - block bitmap handling and allocation policies
  *
- * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -994,10 +994,11 @@ BlockAllocator::CheckNextNode(check_control *control)
 
 			// Check for the correct mode of the node (if the mode of the
 			// file don't fit to its parent, there is a serious problem)
-			if ((cookie->parent_mode & S_ATTR_DIR && !inode->IsAttribute())
-				|| (cookie->parent_mode & S_INDEX_DIR && !inode->IsIndex())
-				|| ((cookie->parent_mode & S_DIRECTORY | S_ATTR_DIR | S_INDEX_DIR) == S_DIRECTORY
-					&& inode->Mode() & (S_ATTR | S_ATTR_DIR | S_INDEX_DIR))) {
+			if (((cookie->parent_mode & S_ATTR_DIR) != 0 && !inode->IsAttribute())
+				|| ((cookie->parent_mode & S_INDEX_DIR) != 0 && !inode->IsIndex())
+				|| ((cookie->parent_mode & (S_DIRECTORY | S_ATTR_DIR | S_INDEX_DIR)) 
+						== S_DIRECTORY
+					&& (inode->Mode() & (S_ATTR | S_ATTR_DIR | S_INDEX_DIR)) != 0)) {
 				FATAL(("inode at %Ld is of wrong type: %o (parent %o at %Ld)!\n",
 					inode->BlockNumber(), inode->Mode(), cookie->parent_mode, cookie->parent->BlockNumber()));
 
