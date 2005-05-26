@@ -57,8 +57,7 @@ static const char *kUsage =
 	"  -publishall        - ignored\n"
 	"  -publishbfs        - ignored\n"
 	"  -publishhfs        - ignored\n"
-	"  -publishdos        - ignored\n"
-;
+	"  -publishdos        - ignored\n";
 
 // application name
 const char *kAppName = __progname;
@@ -200,8 +199,12 @@ struct PrintPartitionsVisitor : public BDiskDeviceVisitor {
 		const char *name = partition->ContentName();
 		if (name == NULL || name[0] == '\0') {
 			name = partition->Name();
-			if (name == NULL || name[0] == '\0')
-				name = "<unnamed>";
+			if (name == NULL || name[0] == '\0') {
+				if (partition->ContainsFileSystem())
+					name = "<unnamed>";
+				else
+					name = "";
+			}
 		}
 
 		BPath path;
