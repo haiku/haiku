@@ -216,12 +216,7 @@ ServerApp::PingTarget(void)
 {
 	team_info tinfo;
 	if (get_team_info(fClientTeamID,&tinfo) == B_BAD_TEAM_ID) {
-		port_id serverport = find_port(SERVER_PORT_NAME);
-		if (serverport == B_NAME_NOT_FOUND) {
-			printf("PANIC: ServerApp %s could not find the app_server port in PingTarget()!\n",fSignature.String());
-			return false;
-		}
-		fMsgSender->SetPort(serverport);
+		fMsgSender->SetPort(gAppServerPort);
 		fMsgSender->StartMessage(AS_DELETE_APP);
 		fMsgSender->Attach(&fMonitorThreadID, sizeof(thread_id));
 		fMsgSender->Flush();
@@ -308,12 +303,7 @@ ServerApp::MonitorApp(void *data)
 			STRACE(("ServerApp::MonitorApp(): GetNextMessage returned %s\n", strerror(err)));
 
 			// ToDo: this should kill the app, but it doesn't work
-			port_id	serverport = find_port(SERVER_PORT_NAME);
-			if (serverport == B_NAME_NOT_FOUND){
-				printf("PANIC: ServerApp %s could not find the app_server port!\n",app->fSignature.String());
-				break;
-			}
-			app->fMsgSender->SetPort(serverport);
+			app->fMsgSender->SetPort(gAppServerPort);
 			app->fMsgSender->StartMessage(AS_DELETE_APP);
 			app->fMsgSender->Attach(&app->fMonitorThreadID, sizeof(thread_id));
 			app->fMsgSender->Flush();
@@ -393,12 +383,7 @@ ServerApp::MonitorApp(void *data)
 				STRACE(("ServerApp %s: B_QUIT_REQUESTED\n",app->fSignature.String()));
 				// Our BApplication sent us this message when it quit.
 				// We need to ask the app_server to delete ourself.
-				port_id	serverport = find_port(SERVER_PORT_NAME);
-				if (serverport == B_NAME_NOT_FOUND){
-					printf("PANIC: ServerApp %s could not find the app_server port!\n",app->fSignature.String());
-					break;
-				}
-				app->fMsgSender->SetPort(serverport);
+				app->fMsgSender->SetPort(gAppServerPort);
 				app->fMsgSender->StartMessage(AS_DELETE_APP);
 				app->fMsgSender->Attach(&app->fMonitorThreadID, sizeof(thread_id));
 				app->fMsgSender->Flush();

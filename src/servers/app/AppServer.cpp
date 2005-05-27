@@ -73,6 +73,8 @@
 
 Desktop *desktop;
 
+port_id gAppServerPort;
+
 // TODO: Global ? Is it really needed ?
 //! Used to access the app_server from new_decorator
 AppServer *app_server=NULL;
@@ -100,23 +102,25 @@ AppServer::AppServer(void) :
 	fMessagePort = create_port(200, SERVER_PORT_NAME);
 	if (fMessagePort == B_NO_MORE_PORTS)
 		debugger("app_server could not create message port");
-	
+
+	gAppServerPort = fMessagePort;
+
 	// Create the input port. The input_server will send it's messages here.
 	// TODO: If we want multiple user support we would need an individual
 	// port for each user and do the following for each RootLayer.
 	fServerInputPort = create_port(200, SERVER_INPUT_PORT);
 	if (fServerInputPort == B_NO_MORE_PORTS)
 		debugger("app_server could not create input port");
-	
-	fAppList= new BList();
-	fQuittingServer= false;
-	make_decorator= NULL;
-	
+
+	fAppList = new BList();
+	fQuittingServer = false;
+	make_decorator = NULL;
+
 	// We need this in order for new_decorator to be able to instantiate new decorators
-	app_server=this;
+	app_server = this;
 
 	// Create the font server and scan the proper directories.
-	fontserver=new FontServer;
+	fontserver = new FontServer;
 	fontserver->Lock();
 
 	// Used for testing purposes
@@ -168,37 +172,36 @@ AppServer::AppServer(void) :
 	}
 
 	fontserver->Unlock();
-	
-	
+
 	// Load the GUI colors here and set the global set to the values contained therein. If this
 	// is not possible, set colors to the defaults
-	if(!LoadGUIColors(&gui_colorset))
+	if (!LoadGUIColors(&gui_colorset))
 		gui_colorset.SetToDefaults();
 
 	InitDecorators();
 
 	// Set up the Desktop
-	desktop= new Desktop();
+	desktop = new Desktop();
 	desktop->Init();
 
 	// Create the bitmap allocator. Object declared in BitmapManager.cpp
-	bitmapmanager= new BitmapManager();
+	bitmapmanager = new BitmapManager();
 
 	// This is necessary to mediate access between the Poller and app_server threads
-	fActiveAppLock= create_sem(1,"app_server_active_sem");
+	fActiveAppLock = create_sem(1,"app_server_active_sem");
 
 	// This locker is for app_server and Picasso to vy for control of the ServerApp list
-	fAppListLock= create_sem(1,"app_server_applist_sem");
+	fAppListLock = create_sem(1,"app_server_applist_sem");
 
 	// This locker is to mediate access to the make_decorator pointer
-	fDecoratorLock= create_sem(1,"app_server_decor_sem");
-	
+	fDecoratorLock = create_sem(1,"app_server_decor_sem");
+
 	// Spawn our thread-monitoring thread
-	fPicassoThreadID= spawn_thread(PicassoThread,"picasso", B_NORMAL_PRIORITY, this);
+	fPicassoThreadID = spawn_thread(PicassoThread, "picasso", B_NORMAL_PRIORITY, this);
 	if (fPicassoThreadID >= 0)
 		resume_thread(fPicassoThreadID);
 
-	fDecoratorName="Default";
+	fDecoratorName ="Default";
 
 #if 0
 	LaunchCursorThread();
@@ -878,6 +881,10 @@ AppServer::FindApp(const char *sig)
 	return NULL;
 }
 
+
+//	#pragma mark -
+
+
 /*!
 	\brief Creates a new decorator instance
 	\param rect Frame size
@@ -919,7 +926,7 @@ int
 main(int argc, char** argv)
 {
 	// There can be only one....
-	if (find_port(SERVER_PORT_NAME) != B_NAME_NOT_FOUND)
+	if (find_port(SERVER_PORT_NAME) >= B_OK)
 		return -1;
 
 	srand(real_time_clock_usecs());

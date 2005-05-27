@@ -1,5 +1,11 @@
-#ifndef	_OPENBEOS_APP_SERVER_H_
-#define	_OPENBEOS_APP_SERVER_H_
+/*
+ * Copyright (c) 2001-2005, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Author: DarkWyrm <bpmagic@columbus.rr.com>
+ */
+#ifndef	_HAIKU_APP_SERVER_H_
+#define	_HAIKU_APP_SERVER_H_
 
 #include <OS.h>
 #include <Locker.h>
@@ -26,10 +32,10 @@ class BitmapManager;
 	application start and quit messages. It also starts the housekeeping threads
 	and initializes most of the server's globals.
 */
-#if TEST_MODE
-class AppServer : public BApplication
-#else
+
 class AppServer
+#if TEST_MODE
+	: public BApplication
 #endif
 {
 public:
@@ -94,5 +100,6 @@ Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel
 extern BitmapManager *bitmapmanager;
 extern ColorSet gui_colorset;
 extern AppServer *app_server;
+extern port_id gAppServerPort;
 
-#endif
+#endif	/* _HAIKU_APP_SERVER_H_ */
