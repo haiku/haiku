@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -38,25 +38,26 @@
 	\param which System cursor specifier defined in SysCursor.h
 	\param cursor The new cursor
 */
-void set_syscursor(cursor_which which, const BCursor *cursor)
+void
+set_syscursor(cursor_which which, const BCursor *cursor)
 {
-	port_id server=find_port(SERVER_PORT_NAME);
-	if(server!=B_NAME_NOT_FOUND)
-	{
-		BPortLink link(server);
-		link.StartMessage(AS_SET_SYSCURSOR_BCURSOR);
-		link.Attach<cursor_which>(which);
-		
-		// The easy (and clean) way for us to access the cursor's token
-		// would be to make it a friend function of the BCursor class. One problem:
-		// we couldn't build this under R5. For R1, we'll use a hack which we can
-		// get away with because it has to be binary compatible.
-		int32 *hack=(int32*)cursor;
-		link.Attach<int32>(hack[0]);
-//		link.Attach<int32>(cursor->m_serverToken);
+	port_id server = find_port(SERVER_PORT_NAME);
+	if (server < B_OK)
+		return;
 
-		link.Flush();
-	}
+	BPortLink link(server);
+	link.StartMessage(AS_SET_SYSCURSOR_BCURSOR);
+	link.Attach<cursor_which>(which);
+	
+	// The easy (and clean) way for us to access the cursor's token
+	// would be to make it a friend function of the BCursor class. One problem:
+	// we couldn't build this under R5. For R1, we'll use a hack which we can
+	// get away with because it has to be binary compatible.
+	int32 *hack=(int32*)cursor;
+	link.Attach<int32>(hack[0]);
+//	link.Attach<int32>(cursor->m_serverToken);
+
+	link.Flush();
 }
 
 /*!
@@ -64,33 +65,34 @@ void set_syscursor(cursor_which which, const BCursor *cursor)
 	\param which System cursor specifier defined in SysCursor.h
 	\param bitmap BBitmap to represent the new cursor. Size should be 48x48 or less.
 */
-void set_syscursor(cursor_which which, const BBitmap *bitmap)
+void
+set_syscursor(cursor_which which, const BBitmap *bitmap)
 {
-	port_id server=find_port(SERVER_PORT_NAME);
-	if(server!=B_NAME_NOT_FOUND)
-	{
-		BPortLink link(server);
-		link.StartMessage(AS_SET_SYSCURSOR_BBITMAP);
-		link.Attach<cursor_which>(which);
-		
-		// Just like the BCursor version, we will use a hack until R1.
-		int32 *hack=(int32*)bitmap;
-		hack+=(sizeof(int32)*4)+sizeof(color_space)+sizeof(BRect);
-		link.Attach<int32>(hack[0]);
+	port_id server = find_port(SERVER_PORT_NAME);
+	if (server < B_OK)
+		return;
 
-		link.Flush();
-	}
+	BPortLink link(server);
+	link.StartMessage(AS_SET_SYSCURSOR_BBITMAP);
+	link.Attach<cursor_which>(which);
+	
+	// Just like the BCursor version, we will use a hack until R1.
+	int32 *hack=(int32*)bitmap;
+	hack+=(sizeof(int32)*4)+sizeof(color_space)+sizeof(BRect);
+	link.Attach<int32>(hack[0]);
+
+	link.Flush();
 }
 
 /*!
 	\brief Returns the cursor specifier currently shown
 	\return Returns B_CURSOR_OTHER if an application-set cursor. Otherwise, see SysCursor.h
 */
-cursor_which get_syscursor(void)
+cursor_which
+get_syscursor(void)
 {
-	port_id server=find_port(SERVER_PORT_NAME);
-	if(server >= 0)
-	{
+	port_id server = find_port(SERVER_PORT_NAME);
+	if (server >= B_OK) {
 		int32 code = SERVER_FALSE;
 		BPrivate::BAppServerLink link;
 		cursor_which which;
@@ -98,10 +100,10 @@ cursor_which get_syscursor(void)
 		link.SetSendPort(server);
 		link.StartMessage(AS_GET_SYSCURSOR);
 		link.FlushWithReply(&code);
-		
-		if (code == SERVER_TRUE)
-			if (link.Read<cursor_which>(&which) == B_OK)
-				return which;
+
+		if (code == SERVER_TRUE
+			&& link.Read<cursor_which>(&which) == B_OK)
+			return which;
 	}
 	return B_CURSOR_INVALID;
 }
@@ -110,25 +112,30 @@ cursor_which get_syscursor(void)
 	\brief Changes the application cursor to the specified cursor
 	\param which System cursor specifier defined in SysCursor.h
 */
-void setcursor(cursor_which which)
+void
+setcursor(cursor_which which)
 {
-	port_id server=find_port(SERVER_PORT_NAME);
-	if(server >= 0)
-	{
-		BPortLink link(server);
-		link.StartMessage(AS_SET_CURSOR_SYSTEM);
-		link.Flush();
-	}
+	port_id server = find_port(SERVER_PORT_NAME);
+	if (server < B_OK)
+		return;
+
+	BPortLink link(server);
+	link.StartMessage(AS_SET_CURSOR_SYSTEM);
+	link.Flush();
 }
+
+
+//	#pragma mark -
+
 
 /*!
 	\brief Constructor
 	\name Name of the cursor set.
 */
 CursorSet::CursorSet(const char *name)
- : BMessage()
+	: BMessage()
 {
-	AddString("name",(name)?name:"Untitled");
+	AddString("name", name ? name : "Untitled");
 }
 
 /*!
@@ -140,20 +147,18 @@ CursorSet::CursorSet(const char *name)
 	- \c B_BAD_VALUE: path is NULL
 	- \c other value: See BFile::SetTo and BMessage::Flatten return codes
 */
-status_t CursorSet::Save(const char *path,int32 saveflags)
+status_t
+CursorSet::Save(const char *path, int32 saveflags)
 {
-	if(!path)
+	if (!path)
 		return B_BAD_VALUE;
-	status_t stat=B_OK;
 
 	BFile file;
-	stat=file.SetTo(path,B_READ_WRITE | saveflags);
-	if(stat!=B_OK)
-		return stat;
-	
-	stat=Flatten(&file);
-	
-	return stat;
+	status_t status = file.SetTo(path, B_READ_WRITE | saveflags);
+	if (status != B_OK)
+		return status;
+
+	return Flatten(&file);
 }
 
 /*!
@@ -164,20 +169,18 @@ status_t CursorSet::Save(const char *path,int32 saveflags)
 	- \c B_BAD_VALUE: path is NULL
 	- \c other value: See BFile::SetTo and BMessage::Flatten return codes
 */
-status_t CursorSet::Load(const char *path)
+status_t
+CursorSet::Load(const char *path)
 {
-	if(!path)
+	if (!path)
 		return B_BAD_VALUE;
-	status_t stat=B_OK;
 
 	BFile file;
-	stat=file.SetTo(path, B_READ_ONLY);
-	if(stat!=B_OK)
-		return stat;
+	status_t status = file.SetTo(path, B_READ_ONLY);
+	if (status != B_OK)
+		return status;
 
-	stat=Unflatten(&file);
-
-	return stat;
+	return Unflatten(&file);
 }
 
 /*!
@@ -187,14 +190,15 @@ status_t CursorSet::Load(const char *path)
 	\param hotspot The recipient of the hotspot for the cursor
 	\return B_BAD_VALUE if cursor is NULL, otherwise B_OK
 */
-status_t CursorSet::AddCursor(cursor_which which,const BBitmap *cursor, const BPoint &hotspot)
+status_t
+CursorSet::AddCursor(cursor_which which, const BBitmap *cursor, const BPoint &hotspot)
 {
-	if(!cursor)
+	if (!cursor)
 		return B_BAD_VALUE;
-	
+
 	// Remove the data if it exists already
 	RemoveData(CursorWhichToString(which));
-	
+
 	// Actually add the data to our set
 	BMessage msg((int32)which);
 
@@ -220,21 +224,20 @@ status_t CursorSet::AddCursor(cursor_which which,const BBitmap *cursor, const BP
 	When possible, it is better to use the BBitmap version of AddCursor because this 
 	function must convert the R5 cursor data into a BBitmap
 */
-status_t CursorSet::AddCursor(cursor_which which, int8 *data)
+status_t
+CursorSet::AddCursor(cursor_which which, int8 *data)
 {
 	// Convert cursor data to a bitmap because all cursors are internally stored
 	// as bitmaps
-	if(!data)
+	if (!data)
 		return B_BAD_VALUE;
-	
-	BBitmap *bmp=CursorDataToBitmap(data);
+
+	BBitmap *bmp = CursorDataToBitmap(data);
 	BPoint pt(data[2],data[3]);
-	
-	status_t stat=AddCursor(which,bmp,pt);
-	
-	if(bmp)
-		delete bmp;
-	
+
+	status_t stat = AddCursor(which,bmp,pt);
+
+	delete bmp;
 	return stat;
 }
 
@@ -242,7 +245,8 @@ status_t CursorSet::AddCursor(cursor_which which, int8 *data)
 	\brief Removes the data associated with the specifier from the cursor set
 	\param which System cursor specifier defined in SysCursor.h
 */
-void CursorSet::RemoveCursor(cursor_which which)
+void
+CursorSet::RemoveCursor(cursor_which which)
 {
 	RemoveData(CursorWhichToString(which));
 }
@@ -260,39 +264,37 @@ void CursorSet::RemoveCursor(cursor_which which)
 	
 	BBitmaps created by this function are the responsibility of the caller.
 */
-status_t CursorSet::FindCursor(cursor_which which, BBitmap **cursor, BPoint *hotspot)
+status_t
+CursorSet::FindCursor(cursor_which which, BBitmap **cursor, BPoint *hotspot)
 {
-
-	if(!cursor || !hotspot);
+	if (!cursor || !hotspot);
 		return B_BAD_VALUE;
-	
-	BMessage msg;
 
-	if(FindMessage(CursorWhichToString(which),&msg)!=B_OK)
+	BMessage msg;
+	if (FindMessage(CursorWhichToString(which), &msg) != B_OK)
 		return B_NAME_NOT_FOUND;
-	
+
 	const void *buffer;
 	const char *tempstr;
 	int32 bufferLength;
 	BBitmap *bmp;
 	BPoint hotpt;
-	
-	if(msg.FindString("class",&tempstr)!=B_OK)
+
+	if (msg.FindString("class", &tempstr) != B_OK)
 		return B_ERROR;
-	
-	if(msg.FindPoint("hotspot",&hotpt)!=B_OK)
+
+	if (msg.FindPoint("hotspot", &hotpt) != B_OK)
 		return B_ERROR;
-	
-		
-	if(strcmp(tempstr, "cursor")==0)
-	{
-		bmp=new BBitmap( msg.FindRect("_frame"),
-					(color_space) msg.FindInt32("_cspace"),true );
-		msg.FindData("_data",B_RAW_TYPE,(const void **)&buffer, (ssize_t*)&bufferLength);
+
+	if (strcmp(tempstr, "cursor") == 0) {
+		bmp = new BBitmap(msg.FindRect("_frame"),
+			(color_space)msg.FindInt32("_cspace"), true);
+		msg.FindData("_data", B_RAW_TYPE, (const void **)&buffer,
+			(ssize_t *)&bufferLength);
 		memcpy(bmp->Bits(), buffer, bufferLength);
 
-		*cursor=bmp;
-		*hotspot=hotpt;
+		*cursor = bmp;
+		*hotspot = hotpt;
 		return B_OK;
 	}
 	return B_ERROR;
@@ -310,32 +312,33 @@ status_t CursorSet::FindCursor(cursor_which which, BBitmap **cursor, BPoint *hot
 	
 	BBitmaps created by this function are the responsibility of the caller.
 */
-status_t CursorSet::FindCursor(cursor_which which, ServerCursor **cursor)
+status_t
+CursorSet::FindCursor(cursor_which which, ServerCursor **_cursor)
 {
 	BMessage msg;
-	
-	if(FindMessage(CursorWhichToString(which),&msg)!=B_OK)
+	if (FindMessage(CursorWhichToString(which), &msg) != B_OK)
 		return B_NAME_NOT_FOUND;
-	
-	const void *buffer;
-	const char *tempstr;
-	int32 bufferLength;
-	ServerCursor *csr;
-	BPoint hotpt;
-	
-	if(msg.FindString("class",&tempstr)!=B_OK)
-		return B_ERROR;
-	
-	if(msg.FindPoint("hotspot",&hotpt)!=B_OK)
+
+	const char *className;
+	BPoint hotspot;
+
+	if (msg.FindString("class", &className) != B_OK)
 		return B_ERROR;
 
-	if(strcmp(tempstr, "cursor")==0)
-	{
-		csr=new ServerCursor(msg.FindRect("_frame"),(color_space) msg.FindInt32("_cspace"),0, hotpt);
-		msg.FindData("_data",B_RAW_TYPE,(const void **)&buffer, (ssize_t*)&bufferLength);
-		memcpy(csr->Bits(), buffer, bufferLength);
+	if (msg.FindPoint("hotspot", &hotspot) != B_OK)
+		return B_ERROR;
 
-		*cursor=csr;
+	if (strcmp(className, "cursor") == 0) {
+		ServerCursor *cursor = new ServerCursor(msg.FindRect("_frame"),
+			(color_space)msg.FindInt32("_cspace"), 0, hotspot);
+
+		const void *buffer;
+		int32 bufferLength;
+		msg.FindData("_data",B_RAW_TYPE, (const void **)&buffer,
+			(ssize_t *)&bufferLength);
+		memcpy(cursor->Bits(), buffer, bufferLength);
+
+		*_cursor = cursor;
 		return B_OK;
 	}
 	return B_ERROR;
@@ -345,11 +348,13 @@ status_t CursorSet::FindCursor(cursor_which which, ServerCursor **cursor)
 	\brief Returns the name of the set
 	\return The name of the set
 */
-const char *CursorSet::GetName(void)
+const char *
+CursorSet::GetName(void)
 {
 	const char *name;
-	if(FindString("name",&name)==B_OK)
+	if (FindString("name", &name) == B_OK)
 		return name;
+
 	return NULL;
 }
 
@@ -359,12 +364,14 @@ const char *CursorSet::GetName(void)
 	
 	This function will fail if given a NULL name
 */
-void CursorSet::SetName(const char *name)
+void
+CursorSet::SetName(const char *name)
 {
-	if(!name)
+	if (!name)
 		return;
+
 	RemoveData("name");
-	AddString("name",name);
+	AddString("name", name);
 }
 
 
@@ -373,10 +380,10 @@ void CursorSet::SetName(const char *name)
 	\param which System cursor specifier defined in SysCursor.h
 	\return Name for the cursor specifier
 */
-const char *CursorWhichToString(cursor_which which)
+const char *
+CursorWhichToString(cursor_which which)
 {
-	switch(which)
-	{
+	switch (which) {
 		case B_CURSOR_DEFAULT:
 			return "Default";
 		case B_CURSOR_TEXT:
@@ -409,46 +416,44 @@ const char *CursorWhichToString(cursor_which which)
 	
 	BBitmaps returned by this function are always in the RGBA32 color space
 */
-BBitmap *CursorDataToBitmap(int8 *data)
+BBitmap *
+CursorDataToBitmap(int8 *data)
 {
 	// 68-byte array used in R5 for holding cursors.
 	// This API has serious problems and should be deprecated(but supported) in R2
 
 	// Now that we have all the setup, we're going to map (for now) the cursor
 	// to RGBA32. Eventually, there will be support for 16 and 8-bit depths
-	if(data)
-	{	
-	 	BBitmap *bmp=new BBitmap(BRect(0,0,15,15),B_RGBA32,0);
-		uint32 black=0xFF000000,
-			white=0xFFFFFFFF,
-			*bmppos;
-		uint16	*cursorpos, *maskpos,cursorflip, maskflip,
-				cursorval, maskval,powval;
-		uint8 	i,j,*_buffer;
+	if (data) {
+	 	BBitmap *bmp = new BBitmap(BRect(0,0,15,15),B_RGBA32,0);
+		uint32 black = 0xFF000000, white=0xFFFFFFFF, *bmppos;
+		uint16 *cursorpos, *maskpos, cursorflip, maskflip;
+		uint16 cursorval, maskval, powval;
+		uint8 i, j, *_buffer;
+
 		_buffer=(uint8*)bmp->Bits();
 		cursorpos=(uint16*)(data+4);
 		maskpos=(uint16*)(data+36);
 		
 		// for each row in the cursor data
-		for(j=0;j<16;j++)
-		{
-			bmppos=(uint32*)(_buffer+ (j*bmp->BytesPerRow()) );
-	
+		for (j = 0; j < 16; j++) {
+			bmppos = (uint32*)(_buffer+ (j*bmp->BytesPerRow()) );
+
 			// On intel, our bytes end up swapped, so we must swap them back
-			cursorflip=(cursorpos[j] & 0xFF) << 8;
+			cursorflip = (cursorpos[j] & 0xFF) << 8;
 			cursorflip |= (cursorpos[j] & 0xFF00) >> 8;
-			
-			maskflip=(maskpos[j] & 0xFF) << 8;
+
+			maskflip = (maskpos[j] & 0xFF) << 8;
 			maskflip |= (maskpos[j] & 0xFF00) >> 8;
-	
+
 			// for each column in each row of cursor data
-			for(i=0;i<16;i++)
-			{
+			for (i = 0; i < 16; i++) {
 				// Get the values and dump them to the bitmap
-				powval=1 << (15-i);
-				cursorval=cursorflip & powval;
-				maskval=maskflip & powval;
-				bmppos[i]=((cursorval!=0)?black:white) & ((maskval>0)?0xFFFFFFFF:0x00FFFFFF);
+				powval = 1 << (15-i);
+				cursorval = cursorflip & powval;
+				maskval = maskflip & powval;
+				bmppos[i] = (cursorval != 0 ? black : white) 
+					& (maskval > 0 ? 0xFFFFFFFF : 0x00FFFFFF);
 			}
 		}
 		return bmp;
