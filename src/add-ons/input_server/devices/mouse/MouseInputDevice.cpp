@@ -4,7 +4,7 @@
 //
 // MouseInputDevice.cpp
 //
-// Copyright (c) 2004 Haiku Project
+// Copyright (c) 2004-2005 Haiku Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -174,10 +174,15 @@ MouseInputDevice::Start(const char *name, void *cookie)
 	LOG("%s(%s)\n", __PRETTY_FUNCTION__, name);
 
 	device->fd = open(device->path, O_RDWR);
-	if (device->fd<0)
-		return B_ERROR;
+	if (device->fd < 0)
+		return device->fd;
 
-	InitFromSettings(device);
+	status_t status = InitFromSettings(device);
+	if (status < B_OK) {
+		LOG_ERR("%s: can't initialize from settings: %s\n",
+			name, strerror(status));
+		return status;
+	}
 	
 	char threadName[B_OS_NAME_LENGTH];
 	snprintf(threadName, B_OS_NAME_LENGTH, "%s watcher", name);
@@ -186,7 +191,18 @@ MouseInputDevice::Start(const char *name, void *cookie)
 	device->device_watcher = spawn_thread(DeviceWatcher, threadName,
 		kMouseThreadPriority, device);
 	
-	resume_thread(device->device_watcher);
+	if (device->device_watcher < B_OK) {
+		LOG_ERR("%s: can't spawn watching thread: %s\n",
+			name, strerror(device->device_watcher));
+		return device->device_watcher;
+	}
+		
+	status = resume_thread(device->device_watcher);
+	if (status < B_OK) {
+		LOG_ERR("%s: can't resume watching thread: %s\n",
+			name, strerror(status));
+		return status;
+	}
 	
 	return B_OK;
 }
@@ -203,6 +219,8 @@ MouseInputDevice::Stop(const char *name, void *cookie)
 	
 	device->active = false;
 	if (device->device_watcher >= 0) {
+		// TODO: This is done to unblock the thread,
+		// which is waiting on a semaphore.
 		suspend_thread(device->device_watcher);
 		resume_thread(device->device_watcher);
 		status_t dummy;
@@ -218,14 +236,15 @@ MouseInputDevice::Control(const char *name, void *cookie,
 						  uint32 command, BMessage *message)
 {
 	LOG("%s(%s, code: %lu)\n", __PRETTY_FUNCTION__, name, command);
-
+	status_t status = B_BAD_VALUE;
+	
 	if (command == B_NODE_MONITOR)
-		HandleMonitor(message);
+		status = HandleMonitor(message);
 	else if (command >= B_MOUSE_TYPE_CHANGED 
 		&& command <= B_MOUSE_ACCELERATION_CHANGED) {
-		InitFromSettings(cookie, command);
+		status = InitFromSettings(cookie, command);
 	}
-	return B_OK;
+	return status;
 }
 
 
@@ -242,7 +261,6 @@ MouseInputDevice::HandleMonitor(BMessage *message)
 	if ((opcode != B_ENTRY_CREATED)
 	        && (opcode != B_ENTRY_REMOVED))
 	        return B_OK;
-	
 	
 	BEntry entry;
 	BPath path;
@@ -264,9 +282,9 @@ MouseInputDevice::HandleMonitor(BMessage *message)
 	        return status;
 	
 	if (opcode == B_ENTRY_CREATED)
-	        AddDevice(path.Path());
+		status = AddDevice(path.Path());
 	else
-	        RemoveDevice(path.Path());
+		status = RemoveDevice(path.Path());
 	
 	return status;	
 }
@@ -333,8 +351,12 @@ MouseInputDevice::DeviceWatcher(void *arg)
 		int32 xdelta = movements.xdelta * dev->settings.accel.speed >> 15;
 		int32 ydelta = movements.ydelta * dev->settings.accel.speed >> 15;
 
-                LOG("%s: x: %ld, y: %ld, \n", dev->device_ref.name, xdelta, ydelta);
+		LOG("%s: x: %ld, y: %ld, \n", dev->device_ref.name, xdelta, ydelta);
 
+		// TODO: Here we send B_MOUSE_UP/DOWN before B_MOUSE_MOVED.
+		// This could be the cause of the bug in RootLayer.cpp:
+		// "mouse position changed in B_MOUSE_DOWN from last B_MOUSE_MOVED".
+		// Might be wiser to switch the order.
 		if (buttons != 0) {
 			message = new BMessage(B_MOUSE_UP);				
 			if ((buttons & movements.buttons) > 0) {
