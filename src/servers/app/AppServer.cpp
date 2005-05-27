@@ -73,6 +73,7 @@
 
 Desktop *desktop;
 
+// TODO: Global ? Is it really needed ?
 //! Used to access the app_server from new_decorator
 AppServer *app_server=NULL;
 
@@ -248,7 +249,8 @@ AppServer::~AppServer(void)
 	\param data Pointer to the app_server to which the thread belongs
 	\return Throwaway value - always 0
 */
-int32 AppServer::PicassoThread(void *data)
+int32
+AppServer::PicassoThread(void *data)
 {
 	int32		i;
 	AppServer	*appserver=(AppServer*)data;
@@ -378,7 +380,8 @@ AppServer::CursorThread(void* data)
 	\brief The call that starts it all...
 	\return Always 0
 */
-thread_id AppServer::Run(void)
+thread_id
+AppServer::Run(void)
 {
 	MainLoop();
 	kill_thread(fPicassoThreadID);
@@ -387,7 +390,8 @@ thread_id AppServer::Run(void)
 
 
 //! Main message-monitoring loop for the regular message port - no input messages!
-void AppServer::MainLoop(void)
+void
+AppServer::MainLoop(void)
 {
 	BPortLink pmsg(-1,fMessagePort);
 	int32 code=0;
@@ -409,8 +413,6 @@ void AppServer::MainLoop(void)
 			case B_QUIT_REQUESTED:
 			case AS_CREATE_APP:
 			case AS_DELETE_APP:
-			case AS_SCREEN_GET_MODE:
-			case AS_SCREEN_SET_MODE:
 			case AS_UPDATED_CLIENT_FONTLIST:
 			case AS_QUERY_FONTS_CHANGED:
 			case AS_SET_UI_COLORS:
@@ -438,7 +440,8 @@ void AppServer::MainLoop(void)
 	If the server cannot load the specified decorator, nothing changes. Passing a 
 	NULL string to this function sets the decorator	to the internal one.
 */
-bool AppServer::LoadDecorator(const char *path)
+bool
+AppServer::LoadDecorator(const char *path)
 {
 	// Loads a window decorator based on the supplied path and forces a decorator update.
 	// If it cannot load the specified decorator, it will retain the current one and
@@ -485,7 +488,8 @@ bool AppServer::LoadDecorator(const char *path)
 }
 
 //! Loads decorator settings on disk or the default if settings are invalid
-void AppServer::InitDecorators(void)
+void
+AppServer::InitDecorators(void)
 {
 	BMessage settings;
 
@@ -824,7 +828,8 @@ AppServer::DispatchMessage(int32 code, BPortLink &msg)
 	Quite useful for notification for things like server shutdown, system 
 	color changes, etc.
 */
-void AppServer::Broadcast(int32 code)
+void
+AppServer::Broadcast(int32 code)
 {
 	ServerApp	*app= NULL;
 	
@@ -847,7 +852,8 @@ void AppServer::Broadcast(int32 code)
 	This call should be made only when necessary because it locks the app list 
 	while it does its searching.
 */
-ServerApp *AppServer::FindApp(const char *sig)
+ServerApp *
+AppServer::FindApp(const char *sig)
 {
 	if(!sig)
 		return NULL;
@@ -883,7 +889,8 @@ ServerApp *AppServer::FindApp(const char *sig)
 	If a decorator has not been set, we use the default one packaged in with the app_server 
 	being that we can't do anything with a window without one.
 */
-Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,
+Decorator *
+new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,
 	int32 wflags, DisplayDriver *ddriver)
 {
 	Decorator *dec=NULL;
@@ -908,14 +915,15 @@ Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel
 	\param argv String array of the command-line arguments
 	\return -1 if the app_server is already running, 0 if everything's OK.
 */
-int main( int argc, char** argv )
+int
+main(int argc, char** argv)
 {
 	// There can be only one....
-	if(find_port(SERVER_PORT_NAME)!=B_NAME_NOT_FOUND)
+	if (find_port(SERVER_PORT_NAME) != B_NAME_NOT_FOUND)
 		return -1;
 
 	srand(real_time_clock_usecs());
-	AppServer	app_server;
+	AppServer app_server;
 	app_server.Run();
 	return 0;
 }
