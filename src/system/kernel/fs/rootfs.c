@@ -644,14 +644,17 @@ rootfs_open_dir(fs_volume _fs, fs_vnode _v, fs_cookie *_cookie)
 
 
 static status_t
-rootfs_free_dir_cookie(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
+rootfs_free_dir_cookie(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie)
 {
 	struct rootfs_dir_cookie *cookie = _cookie;
-	struct rootfs_vnode *vnode = _v;
+	struct rootfs_vnode *vnode = _vnode;
+	struct rootfs *fs = _fs;
 
+	mutex_lock(&fs->lock);
 	list_remove_item(&vnode->stream.dir.cookies, cookie);
-	free(cookie);
+	mutex_unlock(&fs->lock);
 
+	free(cookie);
 	return B_OK;
 }
 
