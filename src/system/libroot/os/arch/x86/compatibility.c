@@ -11,6 +11,8 @@
 
 int _kset_mon_limit_(int num);
 int _kset_fd_limit_(int num);
+int _kget_cpu_state_(int cpuNum);
+int _kset_cpu_state_(int cpuNum, int state);
 
 
 int
@@ -25,3 +27,18 @@ _kset_fd_limit_(int num)
 {
 	return B_ERROR;
 }
+
+
+int
+_kget_cpu_state_(int cpuNum)
+{
+	return 1;
+}
+
+
+int
+_kset_cpu_state_(int cpuNum, int state)
+{
+	return state ? B_OK : B_ERROR;
+}
+
