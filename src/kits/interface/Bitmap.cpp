@@ -777,6 +777,7 @@ BBitmap::BBitmap(const BBitmap *source, bool acceptsViews,
 */
 BBitmap::~BBitmap()
 {
+	delete fWindow;
 	CleanUp();
 }
 
@@ -2291,11 +2292,17 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 		fToken = -1;
 		fOrigArea = -1;
 	}
-
+	
+	fInitError = error;
 	// TODO: on success, handle clearing to white if the flags say so. Needs to be
 	// dependent on color space.
 
-	fInitError = error;
+	if (fInitError == B_OK) {
+		if (flags & B_BITMAP_ACCEPTS_VIEWS) {
+			// TODO: this probably needs to be a special kind of BWindow
+			fWindow = new BWindow(Bounds(), "offscreen window", B_UNTYPED_WINDOW, 0);	
+		}
+	}
 }
 
 // CleanUp
