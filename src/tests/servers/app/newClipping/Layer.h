@@ -1,3 +1,7 @@
+
+#ifndef __LAYER_H__
+#define __LAYER_H__
+
 #include <OS.h>
 #include <Region.h>
 #include <Rect.h>
@@ -22,6 +26,9 @@ public:
 			void			Hide();
 			void			Show();
 
+			void			Invalidate(	const BRegion &invalid,
+										const Layer *startFrom = NULL);
+
 	virtual	void			MovedByHook(float dx, float dy) { }
 	virtual	void			ResizedByHook(float dx, float dy, bool automatic) { }
 	virtual	void			ScrolledByHook(float dx, float dy) { }
@@ -31,16 +38,16 @@ public:
 			Layer*			VirtualUpperSibling() const;
 			Layer*			VirtualLowerSibling() const;
 
-			void			Invalidate(	const BRegion &invalid,
-										const Layer *startFrom = NULL);
 			void			RebuildVisibleRegions(	const BRegion &invalid,
 													const Layer *startFrom);
-			void			ConvertToScreen2(BRect* rect);
+			void			ConvertToScreen2(BRect* rect) const;
+			void			ConvertToScreen2(BRegion* reg) const; 
 			MyView*			GetRootLayer() const;
 			void			SetRootLayer(MyView* view) { fView = view; }
 
 			BRegion*		Visible() { return &fVisible; }
 			BRegion*		FullVisible() { return &fFullVisible; }
+			void			GetWantedRegion(BRegion &reg);
 
 			BRect			Frame() const { return fFrame; }
 			BRect			Bounds() const { BRect r(fFrame);
@@ -49,14 +56,20 @@ public:
 			const char*		Name() const { return fName; }
 			Layer*			Parent() const { return fParent; }
 			void			PrintToStream() const;
+			bool			IsTopLayer() const { return fView? true: false; }
 
 			rgb_color		HighColor() const { return fColor; }
 
 			void			rebuild_visible_regions(const BRegion &invalid,
 													const BRegion &parentLocalVisible,
 													const Layer *startFrom);
+protected:
+			rgb_color		fColor;
+
 private:
-			void			set_user_regions(BRegion &reg);
+	virtual	void			operate_on_visible(BRegion &region);
+	virtual	void			set_user_regions(BRegion &reg);
+
 			void			clear_visible_regions();
 			void			resize_layer_frame_by(float x, float y);
 			void			resize_redraw_more_regions(BRegion &redraw);
@@ -68,7 +81,6 @@ private:
 			BRect			fFrame;
 			BPoint			fOrigin;
 			uint32			fResizeMode;
-			rgb_color		fColor;
 
 			Layer*			fBottom;
 			Layer*			fUpper;
@@ -79,5 +91,7 @@ private:
 			uint32			fFlags;
 			bool			fHidden;
 
-			MyView*		fView;
+			MyView*			fView;
 };
+
+#endif

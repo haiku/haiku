@@ -50,13 +50,11 @@ Layer* MyView::FindLayer(Layer *lay, const char *bytes) const
 
 void MyView::CopyRegion(BRegion *reg, float dx, float dy)
 {
+	// Yes... in this sandbox app, do a redraw.
 wind->Lock();
-//	ConstrainClippingRegion(&r);
-//	CopyBits(Bounds(), Bounds().OffsetByCopy(dx, dy));
-	// TODO: properly do that!
-	// LAME, I know!
-	CopyBits(reg->Frame(), reg->Frame().OffsetByCopy(dx, dy));
-//	ConstrainClippingRegion(NULL);
+	ConstrainClippingRegion(reg);
+	DrawSubTree(topLayer);
+	Flush();
 wind->Unlock();
 }
 
@@ -93,9 +91,9 @@ void MyView::DrawSubTree(Layer* lay)
 	}
 	ConstrainClippingRegion(lay->Visible());
 	SetHighColor(lay->HighColor());
-	BRect	temp = lay->Bounds();
-	lay->ConvertToScreen2(&temp);
-	FillRect(temp);
+	BRegion	reg;
+	lay->GetWantedRegion(reg);
+	FillRect(reg.Frame());
 	Flush();
 	ConstrainClippingRegion(NULL);
 }

@@ -10,6 +10,7 @@
 
 #include "MyView.h"
 #include "Layer.h"
+#include "WinBorder.h"
 
 #define ApplicationSignature "application/x-vnd.generic-SkeletonApplication"
 
@@ -80,17 +81,23 @@ bool clsMainWindow::QuitRequested()
 void clsMainWindow::test1()
 {
 	Layer		*topLayer = fView->topLayer;
-//	Layer		*parent;
 
 	rgb_color	c;
-	BRect		temp;
 
 	c.red = rand()/256;
 	c.green = rand()/256;
 	c.blue = rand()/256;
-	Layer	*lay1 = new Layer(BRect(20,20,300,220), "lay1", B_FOLLOW_NONE, 0, c);
-	topLayer->AddLayer(lay1);
-
+//	Layer	*lay1
+//		= new Layer(BRect(20,20,300,220), "lay1", B_FOLLOW_NONE, 0, c);
+//		= new WinBorder(BRect(20,20,300,220), "lay1", B_FOLLOW_NONE, 0, c);
+//	topLayer->AddLayer(lay1);
+// ------
+	WinBorder	*wb1 = new WinBorder(BRect(20,20,300,220), "wb1", B_FOLLOW_NONE, 0, c);
+	topLayer->AddLayer(wb1);
+	Layer	*lay1
+		= new Layer(BRect(0,0,280,200), "lay1", B_FOLLOW_NONE, 0, c);
+	wb1->AddLayer(lay1);
+// ------
 	c.red = rand()/256;
 	c.green = rand()/256;
 	c.blue = rand()/256;
@@ -107,9 +114,9 @@ void clsMainWindow::test1()
 			0, c);
 	lay2->AddLayer(lay3);
 
-	temp	= lay1->Bounds();
-	lay1->ConvertToScreen2(&temp);
-	topLayer->RebuildVisibleRegions(BRegion(temp), lay1);
+	BRegion		temp;
+	wb1->GetWantedRegion(temp);
+	topLayer->RebuildVisibleRegions(temp, wb1);
 
 	wind->Lock();
 	fView->Invalidate();
@@ -128,7 +135,7 @@ void clsMainWindow::test1()
 
 	lay2->ResizeBy(-45, -55);
 
-/*
+
 	snooze(2000000);
 
 	lay1->ScrollBy(0,50);
@@ -144,7 +151,7 @@ void clsMainWindow::test1()
 	snooze(2000000);
 
 	lay1->Invalidate(BRect(0,0,500,500));
-*/
+
 }
 
 int main()

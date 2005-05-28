@@ -41,7 +41,7 @@ Layer::~Layer()
 	}
 }
 
-void Layer::ConvertToScreen2(BRect* rect)
+void Layer::ConvertToScreen2(BRect* rect) const
 {
 	MyView *view = GetRootLayer();
 	if (view)
@@ -51,6 +51,19 @@ void Layer::ConvertToScreen2(BRect* rect)
 			rect->OffsetBy(fFrame.left, fFrame.top);
 
 			fParent->ConvertToScreen2(rect);
+		}
+}
+
+void Layer::ConvertToScreen2(BRegion* reg) const
+{
+	MyView *view = GetRootLayer();
+	if (view)
+		if (fParent)
+		{
+			reg->OffsetBy(-fOrigin.x, -fOrigin.y);
+			reg->OffsetBy(fFrame.left, fFrame.top);
+
+			fParent->ConvertToScreen2(reg);
 		}
 }
 
@@ -422,6 +435,11 @@ void Layer::ScrollBy(float dx, float dy)
 		ScrolledByHook(dx, dy);
 }
 
+void Layer::GetWantedRegion(BRegion &reg)
+{
+	set_user_regions(reg);
+}
+
 void Layer::set_user_regions(BRegion &reg)
 {
 // OPT: maybe we should have all these cached in a 'fFull' member
@@ -525,6 +543,14 @@ void Layer::rebuild_visible_regions(const BRegion &invalid,
 	// the visible region of this layer is what left after all its children took
 	// what they could.
 	fVisible.Include(&common);
+
+	// we don't need this ATM
+	//operate_on_visible(fVisible);
+}
+
+void Layer::operate_on_visible(BRegion &reg)
+{
+	// Empty Hook function
 }
 
 void Layer::clear_visible_regions()
