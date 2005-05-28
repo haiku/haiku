@@ -162,7 +162,7 @@ ServerWindow::Init(BRect frame, uint32 wlook,
 	snprintf(name, sizeof(name), "%ld: %s", fClientTeamID, fName);
 
 	fWinBorder = new WinBorder(frame, name, wlook, wfeel, wflags,
-		wwksindex, this, desktop->GetDisplayDriver());
+		wwksindex, this, gDesktop->GetDisplayDriver());
 
 	// Spawn our message-monitoring thread
 	fMonitorThreadID = spawn_thread(MonitorWin, fName, B_NORMAL_PRIORITY, this);
@@ -378,7 +378,7 @@ ServerWindow::CreateLayerTree(Layer *localRoot, LinkMsgReader &link)
 	STRACE(("ServerWindow(%s)::CreateLayerTree()-> layer %s, token %ld\n", fName,name,token));
 
 	Layer *newLayer = new Layer(frame, name, token, resizeMask, 
-			flags, desktop->GetDisplayDriver());
+			flags, gDesktop->GetDisplayDriver());
 
 	free(name);
 
@@ -1179,7 +1179,7 @@ ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			link.Read<int32>(&mainToken);
 			link.Read(&teamID, sizeof(team_id));
 			
-			wb = desktop->FindWinBorderByServerWindowTokenAndTeamID(mainToken, teamID);
+			wb = gDesktop->FindWinBorderByServerWindowTokenAndTeamID(mainToken, teamID);
 			if(wb)
 			{
 				fMsgSender->StartMessage(SERVER_TRUE);
@@ -1208,7 +1208,7 @@ ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			link.Read<int32>(&mainToken);
 			link.Read(&teamID, sizeof(team_id));
 			
-			wb = desktop->FindWinBorderByServerWindowTokenAndTeamID(mainToken, teamID);
+			wb = gDesktop->FindWinBorderByServerWindowTokenAndTeamID(mainToken, teamID);
 			if(wb)
 			{
 				fMsgSender->StartMessage(SERVER_TRUE);
@@ -1488,8 +1488,8 @@ ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			// 1) BPoint mouse location
 			// 2) int32 button state
 
-			fMsgSender->Attach<BPoint>(desktop->GetDisplayDriver()->GetCursorPosition());
-			fMsgSender->Attach<int32>(desktop->ActiveRootLayer()->Buttons());
+			fMsgSender->Attach<BPoint>(gDesktop->GetDisplayDriver()->GetCursorPosition());
+			fMsgSender->Attach<int32>(gDesktop->ActiveRootLayer()->Buttons());
 
 			fMsgSender->Flush();
 			break;
@@ -1510,10 +1510,10 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 	if (fWinBorder->fInUpdate)
 		rreg.IntersectWith(&fWinBorder->yUpdateReg);
 
-	desktop->GetDisplayDriver()->ConstrainClippingRegion(&rreg);
+	gDesktop->GetDisplayDriver()->ConstrainClippingRegion(&rreg);
 //	rgb_color  rrr = fCurrentLayer->fLayerData->viewcolor.GetColor32();
 //	RGBColor c(rand()%255,rand()%255,rand()%255);
-//	desktop->GetDisplayDriver()->FillRect(BRect(0,0,639,479), c);
+//	gDesktop->GetDisplayDriver()->FillRect(BRect(0,0,639,479), c);
 
 	switch (code) {
 		case AS_STROKE_LINE:
@@ -1530,7 +1530,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			if (fCurrentLayer && fCurrentLayer->fLayerData) {
 				BPoint p1(x1,y1);
 				BPoint p2(x2,y2);
-				desktop->GetDisplayDriver()->StrokeLine(fCurrentLayer->ConvertToTop(p1),
+				gDesktop->GetDisplayDriver()->StrokeLine(fCurrentLayer->ConvertToTop(p1),
 														fCurrentLayer->ConvertToTop(p2),
 														fCurrentLayer->fLayerData);
 				
@@ -1552,7 +1552,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			link.Read<BRect>(&rect);
 			
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				desktop->GetDisplayDriver()->InvertRect(fCurrentLayer->ConvertToTop(rect));
+				gDesktop->GetDisplayDriver()->InvertRect(fCurrentLayer->ConvertToTop(rect));
 			break;
 		}
 		case AS_STROKE_RECT:
@@ -1567,7 +1567,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			BRect rect(left,top,right,bottom);
 			
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				desktop->GetDisplayDriver()->StrokeRect(fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->StrokeRect(fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_FILL_RECT:
@@ -1577,7 +1577,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			BRect rect;
 			link.Read<BRect>(&rect);
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				desktop->GetDisplayDriver()->FillRect(fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->FillRect(fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT:
@@ -1677,7 +1677,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			link.Read<float>(&angle);
 			link.Read<float>(&span);
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				desktop->GetDisplayDriver()->StrokeArc(fCurrentLayer->ConvertToTop(r),angle,span,fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->StrokeArc(fCurrentLayer->ConvertToTop(r),angle,span,fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_FILL_ARC:
@@ -1691,7 +1691,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			link.Read<float>(&angle);
 			link.Read<float>(&span);
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				desktop->GetDisplayDriver()->FillArc(fCurrentLayer->ConvertToTop(r),angle,span,fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->FillArc(fCurrentLayer->ConvertToTop(r),angle,span,fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_STROKE_BEZIER:
@@ -1710,7 +1710,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 				for (i=0; i<4; i++)
 					pts[i]=fCurrentLayer->ConvertToTop(pts[i]);
 				
-				desktop->GetDisplayDriver()->StrokeBezier(pts,fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->StrokeBezier(pts,fCurrentLayer->fLayerData);
 			}
 			delete [] pts;
 			break;
@@ -1731,7 +1731,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 				for (i=0; i<4; i++)
 					pts[i]=fCurrentLayer->ConvertToTop(pts[i]);
 				
-				desktop->GetDisplayDriver()->FillBezier(pts,fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->FillBezier(pts,fCurrentLayer->fLayerData);
 			}
 			delete [] pts;
 			break;
@@ -1743,7 +1743,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			BRect rect;
 			link.Read<BRect>(&rect);
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				desktop->GetDisplayDriver()->StrokeEllipse(fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->StrokeEllipse(fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_FILL_ELLIPSE:
@@ -1753,7 +1753,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			BRect rect;
 			link.Read<BRect>(&rect);
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				desktop->GetDisplayDriver()->FillEllipse(fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->FillEllipse(fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_STROKE_ROUNDRECT:
@@ -1767,7 +1767,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			link.Read<float>(&yrad);
 			
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				desktop->GetDisplayDriver()->StrokeRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad,fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->StrokeRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad,fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_FILL_ROUNDRECT:
@@ -1781,7 +1781,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			link.Read<float>(&yrad);
 			
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				desktop->GetDisplayDriver()->FillRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad,fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->FillRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad,fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_STROKE_TRIANGLE:
@@ -1801,7 +1801,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 				for(int i=0;i<3;i++)
 					pts[i]=fCurrentLayer->ConvertToTop(pts[i]);
 				
-				desktop->GetDisplayDriver()->StrokeTriangle(pts,fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->StrokeTriangle(pts,fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
 			}
 			break;
 		}
@@ -1822,7 +1822,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 				for(int i=0;i<3;i++)
 					pts[i]=fCurrentLayer->ConvertToTop(pts[i]);
 				
-				desktop->GetDisplayDriver()->FillTriangle(pts,fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->FillTriangle(pts,fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
 			}
 			break;
 		}
@@ -1847,7 +1847,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			for(int32 i=0; i<pointcount; i++)
 				pointlist[i]=fCurrentLayer->ConvertToTop(pointlist[i]);
 			
-			desktop->GetDisplayDriver()->StrokePolygon(pointlist,pointcount,polyframe,
+			gDesktop->GetDisplayDriver()->StrokePolygon(pointlist,pointcount,polyframe,
 					fCurrentLayer->fLayerData,isclosed);
 			
 			delete [] pointlist;
@@ -1872,7 +1872,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			for(int32 i=0; i<pointcount; i++)
 				pointlist[i]=fCurrentLayer->ConvertToTop(pointlist[i]);
 			
-			desktop->GetDisplayDriver()->FillPolygon(pointlist,pointcount,polyframe,fCurrentLayer->fLayerData);
+			gDesktop->GetDisplayDriver()->FillPolygon(pointlist,pointcount,polyframe,fCurrentLayer->fLayerData);
 			
 			delete [] pointlist;
 			
@@ -1901,7 +1901,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			for(int32 i=0; i<ptcount; i++)
 				ptlist[i]=fCurrentLayer->ConvertToTop(ptlist[i]);
 			
-			desktop->GetDisplayDriver()->StrokeShape(shaperect, opcount, oplist, ptcount, ptlist, fCurrentLayer->fLayerData);
+			gDesktop->GetDisplayDriver()->StrokeShape(shaperect, opcount, oplist, ptcount, ptlist, fCurrentLayer->fLayerData);
 			delete oplist;
 			delete ptlist;
 			
@@ -1930,7 +1930,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			for(int32 i=0; i<ptcount; i++)
 				ptlist[i]=fCurrentLayer->ConvertToTop(ptlist[i]);
 			
-			desktop->GetDisplayDriver()->FillShape(shaperect, opcount, oplist, ptcount, ptlist, fCurrentLayer->fLayerData);
+			gDesktop->GetDisplayDriver()->FillShape(shaperect, opcount, oplist, ptcount, ptlist, fCurrentLayer->fLayerData);
 
 			delete oplist;
 			delete ptlist;
@@ -1954,7 +1954,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			// in repeatedly calling FillRect(), this is definitely in need of optimization. At
 			// least it works for now. :)
 			for(int32 i=0; i<rectcount; i++)
-				desktop->GetDisplayDriver()->FillRect(fCurrentLayer->ConvertToTop(rectlist[i]),fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->FillRect(fCurrentLayer->ConvertToTop(rectlist[i]),fCurrentLayer->fLayerData);
 			
 			delete [] rectlist;
 			
@@ -1991,7 +1991,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 					index->pt1=fCurrentLayer->ConvertToTop(index->pt1);
 					index->pt2=fCurrentLayer->ConvertToTop(index->pt2);
 				}				
-				desktop->GetDisplayDriver()->StrokeLineArray(linecount,linedata,fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->StrokeLineArray(linecount,linedata,fCurrentLayer->fLayerData);
 			}
 			break;
 		}
@@ -2009,7 +2009,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			link.ReadString(&string);
 			
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				desktop->GetDisplayDriver()->DrawString(string, length,
+				gDesktop->GetDisplayDriver()->DrawString(string, length,
 														fCurrentLayer->ConvertToTop(location),
 														fCurrentLayer->fLayerData);
 			
@@ -2023,7 +2023,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 		}
 	}
 
-	desktop->GetDisplayDriver()->ConstrainClippingRegion(NULL);
+	gDesktop->GetDisplayDriver()->ConstrainClippingRegion(NULL);
 	fWinBorder->GetRootLayer()->Unlock();
 }
 

@@ -70,14 +70,12 @@
 #endif
 
 // Globals
-
-Desktop *desktop;
+Desktop *gDesktop;
 
 port_id gAppServerPort;
 
-// TODO: Global ? Is it really needed ?
 //! Used to access the app_server from new_decorator
-AppServer *app_server=NULL;
+static AppServer *sAppServer = NULL;
 
 //! Default background color for workspaces
 //RGBColor workspace_default_color(51,102,160);
@@ -117,7 +115,7 @@ AppServer::AppServer(void) :
 	make_decorator = NULL;
 
 	// We need this in order for new_decorator to be able to instantiate new decorators
-	app_server = this;
+	sAppServer = this;
 
 	// Create the font server and scan the proper directories.
 	fontserver = new FontServer;
@@ -181,8 +179,8 @@ AppServer::AppServer(void) :
 	InitDecorators();
 
 	// Set up the Desktop
-	desktop = new Desktop();
-	desktop->Init();
+	gDesktop = new Desktop();
+	gDesktop->Init();
 
 	// Create the bitmap allocator. Object declared in BitmapManager.cpp
 	bitmapmanager = new BitmapManager();
@@ -232,7 +230,7 @@ AppServer::~AppServer(void)
 
 	delete bitmapmanager;
 
-	delete desktop;
+	delete gDesktop;
 
 	// If these threads are still running, kill them - after this, if exit_poller
 	// is deleted, who knows what will happen... These things will just return an
@@ -367,7 +365,7 @@ AppServer::CursorThread(void* data)
 			p.y = *app->fCursorAddr & 0x7fff;
 			p.x = *app->fCursorAddr >> 15 & 0x7fff;
 
-			desktop->GetDisplayDriver()->MoveCursorTo(p.x, p.y);
+			gDesktop->GetDisplayDriver()->MoveCursorTo(p.x, p.y);
 			STRACE(("CursorThread : %f, %f\n", p.x, p.y));
 		}
 
@@ -799,7 +797,7 @@ AppServer::DispatchMessage(int32 code, BPortLink &msg)
 
 			release_sem(fAppListLock);
 
-			delete desktop;
+			delete gDesktop;
 			delete fAppList;
 			delete bitmapmanager;
 			delete fontserver;
@@ -816,7 +814,7 @@ AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			// although this isn't pretty, ATM we only have RootLayer.
 			// this messages should be handled somewhere into a RootLayer
 			// specific area - this set is intended for a RootLayer.
-			desktop->ActiveRootLayer()->GetCursorManager().SetDefaults();
+			gDesktop->ActiveRootLayer()->GetCursorManager().SetDefaults();
 			break;
 		}
 		default:
@@ -902,10 +900,10 @@ new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,
 {
 	Decorator *dec=NULL;
 
-	if(!app_server->make_decorator)
-		dec=new DefaultDecorator(rect,wlook,wfeel,wflags);
+	if (!sAppServer->make_decorator)
+		dec = new DefaultDecorator(rect, wlook, wfeel, wflags);
 	else
-		dec=app_server->make_decorator(rect,wlook,wfeel,wflags);
+		dec = sAppServer->make_decorator(rect, wlook, wfeel, wflags);
 
 	gui_colorset.Lock();
 	dec->SetDriver(ddriver);

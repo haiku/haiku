@@ -269,7 +269,7 @@ int32 RootLayer::WorkingThread(void *data)
 				WinBorder	*toWinBorder = NULL;
 				messageQueue.Read<WinBorder*>(&winBorder);
 				messageQueue.Read<WinBorder*>(&toWinBorder);
-				desktop->AddWinBorderToSubset(winBorder, toWinBorder);
+				oneRootLayer->fDesktop->AddWinBorderToSubset(winBorder, toWinBorder);
 				break;
 			}
 			case AS_ROOTLAYER_REMOVE_FROM_SUBSET:
@@ -278,7 +278,7 @@ int32 RootLayer::WorkingThread(void *data)
 				WinBorder	*fromWinBorder = NULL;
 				messageQueue.Read<WinBorder*>(&winBorder);
 				messageQueue.Read<WinBorder*>(&fromWinBorder);
-				desktop->RemoveWinBorderFromSubset(winBorder, fromWinBorder);
+				oneRootLayer->fDesktop->RemoveWinBorderFromSubset(winBorder, fromWinBorder);
 				break;
 			}
 			case AS_ROOTLAYER_WINBORDER_SET_WORKSPACES:
@@ -558,9 +558,9 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 		fWorkspace[index] = new Workspace(index, 0xFF00FF00, kDefaultWorkspaceColor);
 
 		// we need to lock the window list here so no other window can be created 
-		desktop->Lock();
+		fDesktop->Lock();
 
-		const BList&	windowList = desktop->WindowList();
+		const BList&	windowList = fDesktop->WindowList();
 
 		int32			ptrCount = windowList.CountItems();
 		WinBorder		**ptrWin = (WinBorder**)windowList.Items();
@@ -575,7 +575,7 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 			}
 		}
 
-		desktop->Unlock();
+		fDesktop->Unlock();
 	}
 	rgb_color bg = fWorkspace[index]->BGColor().GetColor32();
 	if ((bg.red + bg.green + bg.blue) / 3 > 128)
@@ -1891,7 +1891,7 @@ void RootLayer::change_winBorder_feel(WinBorder *winBorder, int32 newFeel)
 		winBorder->Hide(false);
 	}
 
-	desktop->SetWinBorderFeel(winBorder, newFeel);
+	gDesktop->SetWinBorderFeel(winBorder, newFeel);
 
 	if (isVisible)
 	{

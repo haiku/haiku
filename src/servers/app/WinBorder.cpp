@@ -118,7 +118,7 @@ cnt = 0; // for debugging
 
 	RebuildFullRegion();
 
-	desktop->AddWinBorder(this);
+	gDesktop->AddWinBorder(this);
 
 	STRACE(("WinBorder %s:\n",GetName()));
 	STRACE(("\tFrame: (%.1f,%.1f,%.1f,%.1f)\n",r.left,r.top,r.right,r.bottom));
@@ -129,7 +129,7 @@ WinBorder::~WinBorder(void)
 {
 	STRACE(("WinBorder(%s)::~WinBorder()\n",GetName()));
 
-	desktop->RemoveWinBorder(this);
+	gDesktop->RemoveWinBorder(this);
 
 	if (fTopLayer){
 		delete fTopLayer;

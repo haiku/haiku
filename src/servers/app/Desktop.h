@@ -119,6 +119,6 @@ private:
 	bool		fFFMouseMode;
 };
 
-extern Desktop *desktop;
+extern Desktop *gDesktop;
 
 #endif // _DESKTOP_H_

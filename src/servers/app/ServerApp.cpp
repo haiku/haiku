@@ -114,7 +114,7 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort
 	// there should be a way that this ServerApp be attached to a particular
 	// RootLayer to know which RootLayer's cursor to modify.
 	ServerCursor *defaultCursor = 
-		desktop->ActiveRootLayer()->GetCursorManager().GetCursor(B_CURSOR_DEFAULT);
+		gDesktop->ActiveRootLayer()->GetCursorManager().GetCursor(B_CURSOR_DEFAULT);
 
 	if (defaultCursor) {
 		fAppCursor = new ServerCursor(defaultCursor);
@@ -159,7 +159,7 @@ ServerApp::~ServerApp(void)
 	// although this isn't pretty, ATM we have only one RootLayer.
 	// there should be a way that this ServerApp be attached to a particular
 	// RootLayer to know which RootLayer's cursor to modify.
-	desktop->ActiveRootLayer()->GetCursorManager().RemoveAppCursors(fClientTeamID);
+	gDesktop->ActiveRootLayer()->GetCursorManager().RemoveAppCursors(fClientTeamID);
 	delete_sem(fLockSem);
 	
 	STRACE(("#ServerApp %s:~ServerApp()\n",fSignature.String()));
@@ -275,7 +275,7 @@ ServerApp::SetAppCursor(void)
 	// there should be a way that this ServerApp be attached to a particular
 	// RootLayer to know which RootLayer's cursor to modify.
 	if (fAppCursor)
-		desktop->ActiveRootLayer()->GetDisplayDriver()->SetCursor(fAppCursor);
+		gDesktop->ActiveRootLayer()->GetDisplayDriver()->SetCursor(fAppCursor);
 }
 
 /*!
@@ -428,7 +428,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			for(int32 i=0; i<fSWindowList->CountItems(); i++)
 			{
 				win=(ServerWindow*)fSWindowList->ItemAt(i);
-				win->GetWinBorder->UpdateColors();
+				win->GetWinBorder()->UpdateColors();
 				win->SendMessageToClient(AS_UPDATE_COLORS, msg);
 			}
 */			break;
@@ -445,7 +445,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			for(int32 i=0; i<fSWindowList->CountItems(); i++)
 			{
 				win=(ServerWindow*)fSWindowList->ItemAt(i);
-				win->GetWinBorder->UpdateFont();
+				win->GetWinBorder()->UpdateFont();
 				win->SendMessageToClient(AS_UPDATE_FONTS, msg);
 			}
 */			break;
@@ -703,7 +703,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			msg.Read<uint32>(&mode); 	 
 			msg.Read<bool>(&stick); 	 
   	 
-			RootLayer *root=desktop->ActiveRootLayer(); 	 
+			RootLayer *root=gDesktop->ActiveRootLayer(); 	 
 			Workspace *workspace=root->WorkspaceAt(index); 	 
   	 
 			if (!workspace) { 	 
@@ -737,7 +737,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// although this isn't pretty, ATM we have only one RootLayer.
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
-			desktop->ActiveRootLayer()->GetDisplayDriver()->ShowCursor();
+			gDesktop->ActiveRootLayer()->GetDisplayDriver()->ShowCursor();
 			fCursorHidden = false;
 			break;
 		}
@@ -747,7 +747,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// although this isn't pretty, ATM we have only one RootLayer.
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
-			desktop->ActiveRootLayer()->GetDisplayDriver()->HideCursor();
+			gDesktop->ActiveRootLayer()->GetDisplayDriver()->HideCursor();
 			fCursorHidden = true;
 			break;
 		}
@@ -757,7 +757,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// although this isn't pretty, ATM we have only one RootLayer.
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
-			desktop->ActiveRootLayer()->GetDisplayDriver()->ObscureCursor();
+			gDesktop->ActiveRootLayer()->GetDisplayDriver()->ObscureCursor();
 			break;
 		}
 		case AS_QUERY_CURSOR_HIDDEN:
@@ -786,16 +786,16 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// otherwise be easy to crash the server by calling SetCursor a
 			// sufficient number of times
 			if(fAppCursor)
-				desktop->ActiveRootLayer()->GetCursorManager().DeleteCursor(fAppCursor->ID());
+				gDesktop->ActiveRootLayer()->GetCursorManager().DeleteCursor(fAppCursor->ID());
 
 			fAppCursor = new ServerCursor(cdata);
 			fAppCursor->SetOwningTeam(fClientTeamID);
 			fAppCursor->SetAppSignature(fSignature.String());
-			desktop->ActiveRootLayer()->GetCursorManager().AddCursor(fAppCursor);
+			gDesktop->ActiveRootLayer()->GetCursorManager().AddCursor(fAppCursor);
 			// although this isn't pretty, ATM we have only one RootLayer.
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
-			desktop->ActiveRootLayer()->GetDisplayDriver()->SetCursor(fAppCursor);
+			gDesktop->ActiveRootLayer()->GetDisplayDriver()->SetCursor(fAppCursor);
 			break;
 		}
 		case AS_SET_CURSOR_BCURSOR:
@@ -818,8 +818,8 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
 			ServerCursor	*cursor;
-			if ((cursor = desktop->ActiveRootLayer()->GetCursorManager().FindCursor(ctoken)))
-				desktop->ActiveRootLayer()->GetDisplayDriver()->SetCursor(cursor);
+			if ((cursor = gDesktop->ActiveRootLayer()->GetCursorManager().FindCursor(ctoken)))
+				gDesktop->ActiveRootLayer()->GetDisplayDriver()->SetCursor(cursor);
 			
 			if(sync)
 			{
@@ -850,7 +850,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// although this isn't pretty, ATM we have only one RootLayer.
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
-			desktop->ActiveRootLayer()->GetCursorManager().AddCursor(fAppCursor);
+			gDesktop->ActiveRootLayer()->GetCursorManager().AddCursor(fAppCursor);
 			
 			// Synchronous message - BApplication is waiting on the cursor's ID
 			replylink.SetSendPort(replyport);
@@ -873,7 +873,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// although this isn't pretty, ATM we have only one RootLayer.
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
-			desktop->ActiveRootLayer()->GetCursorManager().DeleteCursor(ctoken);
+			gDesktop->ActiveRootLayer()->GetCursorManager().DeleteCursor(ctoken);
 			break;
 		}
 		case AS_GET_SCROLLBAR_INFO:
@@ -882,7 +882,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// Attached data:
 			// 1) port_id reply port - synchronous message
 
-			scroll_bar_info sbi=desktop->ScrollBarInfo();
+			scroll_bar_info sbi=gDesktop->ScrollBarInfo();
 
 			port_id replyport;
 			msg.Read<int32>(&replyport);
@@ -901,7 +901,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			scroll_bar_info sbi;
 			msg.Read<scroll_bar_info>(&sbi);
 
-			desktop->SetScrollBarInfo(sbi);
+			gDesktop->SetScrollBarInfo(sbi);
 			break;
 		}
 		case AS_FOCUS_FOLLOWS_MOUSE:
@@ -915,7 +915,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 
 			replylink.SetSendPort(replyport);
 			replylink.StartMessage(SERVER_TRUE);
-			replylink.Attach<bool>(desktop->FFMouseInUse());
+			replylink.Attach<bool>(gDesktop->FFMouseInUse());
 			replylink.Flush();
 			break;
 		}
@@ -927,7 +927,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			scroll_bar_info sbi;
 			msg.Read<scroll_bar_info>(&sbi);
 
-			desktop->SetScrollBarInfo(sbi);*/
+			gDesktop->SetScrollBarInfo(sbi);*/
 			break;
 		}
 		case AS_SET_MOUSE_MODE:
@@ -938,7 +938,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			mode_mouse mmode;
 			msg.Read<mode_mouse>(&mmode);
 
-			desktop->SetFFMouseMode(mmode);
+			gDesktop->SetFFMouseMode(mmode);
 			break;
 		}
 		case AS_GET_MOUSE_MODE:
@@ -947,7 +947,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// Attached data:
 			// 1) port_id reply port - synchronous message
 
-			mode_mouse mmode=desktop->FFMouseMode();
+			mode_mouse mmode=gDesktop->FFMouseMode();
 			
 			port_id replyport = -1;
 			msg.Read<int32>(&replyport);
@@ -1209,7 +1209,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 				font.SetSize(size);
 				font.SetSpacing(spacing);
 
-				width = desktop->GetDisplayDriver()->StringWidth(string, length, font);
+				width = gDesktop->GetDisplayDriver()->StringWidth(string, length, font);
 				// NOTE: The line below will return the exact same thing. However,
 				// the line above uses the AGG rendering backend, for which glyph caching
 				// actually works. It is about 20 times faster!
@@ -1890,7 +1890,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// We have the screen_id and the workspace number, with these
 			// we need to find the corresponding "driver", and call getmode on it
 			display_mode mode;
-			desktop->GetDisplayDriver()->GetMode(mode);
+			gDesktop->GetDisplayDriver()->GetMode(mode);
 			// actually this isn't still enough as different workspaces can
 			// have different display_modes
 			
@@ -1929,10 +1929,10 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			
 			// TODO: Adi doesn't like this: see if
 			// messaging is better.
-			desktop->ActiveRootLayer()->Lock();
+			gDesktop->ActiveRootLayer()->Lock();
 			// TODO: This should return something
-			desktop->GetDisplayDriver()->SetMode(mode);
-			desktop->ActiveRootLayer()->Unlock();
+			gDesktop->GetDisplayDriver()->SetMode(mode);
+			gDesktop->ActiveRootLayer()->Unlock();
 		
 			int32 replyport;
 			msg.Read<int32>(&replyport);
