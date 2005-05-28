@@ -191,9 +191,7 @@ ServerApp::Run(void)
 	if (fMonitorThreadID < B_OK)
 		return false;
 
-	resume_thread(fMonitorThreadID);
-		
-	return true;
+	return resume_thread(fMonitorThreadID) == B_OK;
 }
 
 /*!
@@ -266,7 +264,8 @@ ServerApp::Activate(bool value)
 	fIsActive = value;
 	SetAppCursor();
 }
- 
+
+
 //! Sets the cursor to the application cursor, if any.
 void
 ServerApp::SetAppCursor(void)
@@ -277,6 +276,7 @@ ServerApp::SetAppCursor(void)
 	if (fAppCursor)
 		gDesktop->ActiveRootLayer()->GetDisplayDriver()->SetCursor(fAppCursor);
 }
+
 
 /*!
 	\brief The thread function ServerApps use to monitor messages
@@ -399,6 +399,7 @@ ServerApp::MonitorApp(void *data)
 
 	return 0;
 }
+
 
 /*!
 	\brief Handler function for BApplication API messages
