@@ -393,18 +393,18 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off
 	if (block->transaction != NULL && block->transaction->id != transactionID) {
 		// ToDo: we have to wait here until the other transaction is done.
 		//	Maybe we should even panic, since we can't prevent any deadlocks.
-		panic("block_cache_get_writable(): asked to get busy writable block\n");
+		panic("get_writable_cached_block(): asked to get busy writable block (transaction %ld)\n", block->transaction->id);
 		return NULL;
 	}
 	if (block->transaction == NULL && transactionID != -1) {
 		// get new transaction
 		cache_transaction *transaction = lookup_transaction(cache, transactionID);
 		if (transaction == NULL) {
-			panic("block_cache_get_writable(): invalid transaction %ld!\n", transactionID);
+			panic("get_writable_cached_block(): invalid transaction %ld!\n", transactionID);
 			return NULL;
 		}
 		if (!transaction->open) {
-			panic("block_cache_get_writable(): transaction already done!\n");
+			panic("get_writable_cached_block(): transaction already done!\n");
 			return NULL;
 		}
 
@@ -554,11 +554,11 @@ cache_end_transaction(void *_cache, int32 id, transaction_notification_hook hook
 	block_cache *cache = (block_cache *)_cache;
 	BenaphoreLocker locker(cache);
 
-	TRACE(("cache_transaction_end(id = %ld)\n", id));
+	TRACE(("cache_end_transaction(id = %ld)\n", id));
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL) {
-		panic("cache_transaction_end(): invalid transaction ID\n");
+		panic("cache_end_transaction(): invalid transaction ID\n");
 		return B_BAD_VALUE;
 	}
 
@@ -601,6 +601,33 @@ cache_abort_transaction(void *_cache, int32 id)
 	block_cache *cache = (block_cache *)_cache;
 	BenaphoreLocker locker(cache);
 
+	TRACE(("cache_abort_transaction(id = %ld)\n", id));
+
+	cache_transaction *transaction = lookup_transaction(cache, id);
+	if (transaction == NULL) {
+		panic("cache_abort_transaction(): invalid transaction ID\n");
+		return B_BAD_VALUE;
+	}
+
+	// iterate through all blocks and restore their original contents
+
+	cached_block *block = transaction->first_block, *next;
+	for (; block != NULL; block = next) {
+		next = block->transaction_next;
+
+		if (block->original != NULL) {
+			TRACE(("cache_abort_transaction(id = %ld): restored contents of block %Ld\n",
+				transaction->id, block->block_number));
+			memcpy(block->data, block->original, cache->block_size);
+			cache->allocator->Put(block->data);
+			block->original = NULL;
+		}
+
+		block->transaction_next = NULL;
+		block->transaction = NULL;
+	}
+
+	delete_transaction(cache, transaction);
 	return B_OK;
 }
 
