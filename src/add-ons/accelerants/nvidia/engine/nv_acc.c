@@ -777,17 +777,25 @@ status_t nv_acc_init()
 	case NV04A:
 	case NV10A:
 		/* location of active screen in framebuffer */
+		/* (confirmed NV05: OFFSET0 is 2D destination buffer offset) */
 		ACCW(OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+		/* (confirmed NV05: OFFSET1 is 2D source buffer offset) */
 		ACCW(OFFSET1, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+		/* (confirmed NV05: OFFSET2 is 3D color buffer offset) */
 		ACCW(OFFSET2, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+		/* (confirmed NV05: OFFSET3 is 3D depth buffer offset) */
 		ACCW(OFFSET3, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
 		ACCW(OFFSET4, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
 		ACCW(OFFSET5, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
 
 		/* setup buffer pitch */
+		/* (confirmed NV05: PITCH0 is 2D destination buffer pitch) */
 		ACCW(PITCH0, (si->fbc.bytes_per_row & 0x0000ffff));
+		/* (confirmed NV05: PITCH1 is 2D source buffer pitch) */
 		ACCW(PITCH1, (si->fbc.bytes_per_row & 0x0000ffff));
+		/* (confirmed NV05: PITCH2 is 3D color buffer pitch) */
 		ACCW(PITCH2, (si->fbc.bytes_per_row & 0x0000ffff));
+		/* (confirmed NV05: PITCH3 is 3D depth buffer pitch) */
 		ACCW(PITCH3, (si->fbc.bytes_per_row & 0x0000ffff));
 		ACCW(PITCH4, (si->fbc.bytes_per_row & 0x0000ffff));
 		break;
