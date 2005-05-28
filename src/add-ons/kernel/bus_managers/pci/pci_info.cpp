@@ -1,6 +1,6 @@
 /* 
-** Copyright 2003, Marcus Overhagen. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2003-2005, Marcus Overhagen. All rights reserved.
+** Distributed under the terms of the MIT License.
 */
 
 
@@ -8,6 +8,7 @@
 #include <PCI.h>
 #include <string.h>
 #include "pci_info.h"
+#include "pci_priv.h"
 #include "pci.h"
 
 #define PCI_VERBOSE	1
@@ -18,16 +19,18 @@
 #endif
 
 
-void print_bridge_info(pci_info *info, bool verbose);
-void print_generic_info(pci_info *info, bool verbose);
-void print_info_basic(pci_info *info, bool verbose);
+void print_bridge_info(const pci_info *info, bool verbose);
+void print_generic_info(const pci_info *info, bool verbose);
+void print_capabilities(const pci_info *info);
+void print_info_basic(const pci_info *info, bool verbose);
 void get_vendor_info(uint16 vendorID, const char **venShort, const char **venFull);
 void get_device_info(uint16 vendorID, uint16 deviceID, const char **devShort, const char **devFull);
 const char *get_class_info(uint8 class_base, uint8 class_sub, uint8 class_api);
+const char *get_capability_name(uint8 cap_id);
 
 
 void
-print_bridge_info(pci_info *info, bool verbose)
+print_bridge_info(const pci_info *info, bool verbose)
 {
 	TRACE(("PCI:   primary_bus %02x, secondary_bus %02x, subordinate_bus %02x, secondary_latency %02x\n",
 			info->u.h1.primary_bus, info->u.h1.secondary_bus, info->u.h1.subordinate_bus, info->u.h1.secondary_latency));
@@ -52,7 +55,7 @@ print_bridge_info(pci_info *info, bool verbose)
 
 
 void
-print_generic_info(pci_info *info, bool verbose)
+print_generic_info(const pci_info *info, bool verbose)
 {
 	TRACE(("PCI:   ROM base host %08lx, pci %08lx, size %08lx\n",
 			info->u.h0.rom_base, info->u.h0.rom_base_pci, info->u.h0.rom_size));
@@ -68,7 +71,51 @@ print_generic_info(pci_info *info, bool verbose)
 
 
 void
-print_info_basic(pci_info *info, bool verbose)
+print_capabilities(const pci_info *info)
+{
+	uint16	status;
+	uint8	cap_ptr;
+	uint8	cap_id;
+	int		i;
+
+	TRACE(("PCI:   Capabilities: "));
+	
+	status = pci_read_config(info->bus, info->device, info->function, PCI_status, 2);
+	if (!(status & PCI_status_capabilities)) {
+		TRACE(("(not supported)\n"));
+		return;
+	}
+	
+	cap_ptr = pci_read_config(info->bus, info->device, info->function, PCI_capabilities_ptr, 1);
+	cap_ptr &= ~3;
+	if (!cap_ptr) {
+		TRACE(("(empty list)\n"));
+		return;
+	}
+
+	for (i = 0; i < 48; i++) {
+		const char *name;
+		cap_id  = pci_read_config(info->bus, info->device, info->function, cap_ptr, 1);
+		cap_ptr = pci_read_config(info->bus, info->device, info->function, cap_ptr + 1, 1);
+		cap_ptr &= ~3;
+		if (i) {
+			TRACE((", "));
+		}
+		name = get_capability_name(cap_id);
+		if (name) {
+			TRACE(("%s", name));
+		} else {
+			TRACE(("0x%02x", cap_id));
+		}
+		if (!cap_ptr)
+			break;
+	}
+	TRACE(("\n"));
+}
+
+
+void
+print_info_basic(const pci_info *info, bool verbose)
 {
 	TRACE(("PCI: bus %2d, device %2d, function %2d: vendor %04x, device %04x, revision %02x\n",
 			info->bus, info->device, info->function, info->vendor_id, info->device_id, info->revision));
@@ -102,7 +149,7 @@ print_info_basic(pci_info *info, bool verbose)
 	}
 	TRACE(("PCI:   line_size %02x, latency %02x, header_type %02x, BIST %02x\n",
 			info->line_size, info->latency, info->header_type, info->bist));
-
+			
 	switch (info->header_type) {
 		case 0:
 			print_generic_info(info, verbose);
@@ -113,6 +160,8 @@ print_info_basic(pci_info *info, bool verbose)
 		default:
 			TRACE(("PCI:   unknown header type\n"));
 	}
+
+	print_capabilities(info);
 }
 
 
@@ -528,6 +577,42 @@ get_class_info(uint8 class_base, uint8 class_sub, uint8 class_api)
 
 		default:
 			return "Unknown device class base";
+	}
+}
+
+
+const char *
+get_capability_name(uint8 cap_id)
+{
+	switch (cap_id) {
+		case PCI_cap_id_reserved:
+			return "reserved";
+		case PCI_cap_id_pm:
+			return "PM";
+		case PCI_cap_id_agp:
+			return "AGP";
+		case PCI_cap_id_vpd:
+			return "VPD";
+		case PCI_cap_id_slotid:
+			return "SlotID";
+		case PCI_cap_id_msi:
+			return "MSI";
+		case PCI_cap_id_chswp:
+			return "chswp";
+		case PCI_cap_id_pcix:
+			return "PCI-X";
+		case PCI_cap_id_ldt:
+			return "ldt";
+		case PCI_cap_id_vendspec:
+			return "vendspec";
+		case PCI_cap_id_debugport:
+			return "DebugPort";
+		case PCI_cap_id_cpci_rsrcctl:
+			return "cpci_rsrcctl";
+		case PCI_cap_id_hotplug:
+			return "HotPlug";
+		default:
+			return NULL;
 	}
 }
 
