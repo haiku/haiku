@@ -18,6 +18,7 @@
 
 #include <Application.h>
 #include <Bitmap.h>
+#include <GraphicsDefs.h>
 #include <Locker.h>
 #include <View.h>
 #include <Window.h>
@@ -118,40 +119,6 @@ const rgb_color kSystemPalette[] = {
  { 255, 255, 255, 255 }
 };
 
-// is_supported
-/*!	\brief Returns whether or not a color space is supported by BBitmap.
-	\param colorSpace The color space in question.
-	\return \c true, if \a colorSpace is supported, \c false otherwise.
-*/
-static inline
-bool
-is_supported(color_space colorSpace)
-{
-	bool result = false;
-	switch (colorSpace) {
-		// supported
-		case B_RGB32:		case B_RGBA32:		case B_RGB24:
-		case B_RGB32_BIG:	case B_RGBA32_BIG:	case B_RGB24_BIG:
-		case B_RGB16:		case B_RGB15:		case B_RGBA15:
-		case B_RGB16_BIG:	case B_RGB15_BIG:	case B_RGBA15_BIG:
-		case B_CMAP8:		case B_GRAY8:		case B_GRAY1:
-		case B_YCbCr422: case B_YCbCr411: case B_YCbCr444: case B_YCbCr420:
-		case B_YUV422: case B_YUV411: case B_YUV444: case B_YUV420:
-		case B_UVL24: case B_UVL32: case B_UVLA32:
-		case B_LAB24: case B_LAB32: case B_LABA32:
-		case B_HSI24: case B_HSI32: case B_HSIA32:
-		case B_HSV24: case B_HSV32: case B_HSVA32:
-		case B_HLS24: case B_HLS32: case B_HLSA32:
-		case B_CMY24: case B_CMY32: case B_CMYA32: case B_CMYK32:
-			result = true;
-			break;
-		// unsupported
-		case B_NO_COLOR_SPACE:
-		case B_YUV9: case B_YUV12:
-			break;
-	}
-	return result;
-}
 
 // get_raw_bytes_per_row
 /*!	\brief Returns the number of bytes per row needed to store the actual
@@ -2222,7 +2189,7 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 	CleanUp();
 
 	// check params
-	if (!bounds.IsValid() || !is_supported(colorSpace))
+	if (!bounds.IsValid() || !bitmaps_support_space(colorSpace, NULL))
 		error = B_BAD_VALUE;
 	if (error == B_OK) {
 		int32 bpr = get_bytes_per_row(colorSpace, bounds.IntegerWidth() + 1);

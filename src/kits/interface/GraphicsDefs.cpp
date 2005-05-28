@@ -48,14 +48,8 @@ const uint32 B_TRANSPARENT_MAGIC_RGBA32_BIG = 0x77747700;
 // misc.
 const struct screen_id B_MAIN_SCREEN_ID = {0};
 
-// GraphicsDefs.h
 
-// Note: one would think that these functions need to query the app server to retrieve
-// the needed values, since this kind of stuff is kept server side. Well, a quick 
-// examination of the asm dump showed that it's not the case, at least on BeOS R5.
-// libbe probably keeps some global struct which is updated when the resolution changes.
-
-_IMPEXP_BE status_t
+status_t
 get_pixel_size_for(color_space space, size_t *pixelChunk, size_t *rowAlignment, size_t *pixelsPerChunk)
 {
 	// TODO: Implement
@@ -63,9 +57,34 @@ get_pixel_size_for(color_space space, size_t *pixelChunk, size_t *rowAlignment, 
 }
 
 
-_IMPEXP_BE bool
+bool
 bitmaps_support_space(color_space space, uint32 *supportFlags)
 {
-	// TODO: Implement
-	return false;
+	// TODO: fill supportFlags with the supported flags:
+	// - B_VIEWS_SUPPORT_DRAW_BITMAP
+	// - B_BITMAPS_SUPPORT_ATTACHED_VIEWS
+	bool result = false;
+	switch (space) {
+		// supported
+		case B_RGB32:		case B_RGBA32:		case B_RGB24:
+		case B_RGB32_BIG:	case B_RGBA32_BIG:	case B_RGB24_BIG:
+		case B_RGB16:		case B_RGB15:		case B_RGBA15:
+		case B_RGB16_BIG:	case B_RGB15_BIG:	case B_RGBA15_BIG:
+		case B_CMAP8:		case B_GRAY8:		case B_GRAY1:
+		case B_YCbCr422: case B_YCbCr411: case B_YCbCr444: case B_YCbCr420:
+		case B_YUV422: case B_YUV411: case B_YUV444: case B_YUV420:
+		case B_UVL24: case B_UVL32: case B_UVLA32:
+		case B_LAB24: case B_LAB32: case B_LABA32:
+		case B_HSI24: case B_HSI32: case B_HSIA32:
+		case B_HSV24: case B_HSV32: case B_HSVA32:
+		case B_HLS24: case B_HLS32: case B_HLSA32:
+		case B_CMY24: case B_CMY32: case B_CMYA32: case B_CMYK32:
+			result = true;
+			break;
+		// unsupported
+		case B_NO_COLOR_SPACE:
+		case B_YUV9: case B_YUV12:
+			break;
+	}
+	return result;
 }
