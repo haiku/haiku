@@ -236,7 +236,7 @@ ServerApp::PostMessage(int32 code)
 /*!
 	\brief Send a message to the ServerApp's BApplication
 	\param msg The message to send
-*//*
+*/
 void
 ServerApp::SendMessageToClient(const BMessage *msg) const
 {
@@ -250,7 +250,7 @@ ServerApp::SendMessageToClient(const BMessage *msg) const
 
 	delete [] buffer;
 }
-*/
+
 /*!
 	\brief Sets the ServerApp's active status
 	\param value The new status of the ServerApp.
