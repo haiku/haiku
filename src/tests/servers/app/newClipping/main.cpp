@@ -57,7 +57,7 @@ void clsApp::ReadyToRun()
 clsMainWindow::clsMainWindow(const char *uWindowTitle)
 :
 	BWindow(
-		BRect(50, 50, 500, 450),
+		BRect(50, 50, 800, 650),
 		uWindowTitle,
 		B_TITLED_WINDOW_LOOK,
 		B_NORMAL_WINDOW_FEEL,
@@ -92,10 +92,10 @@ void clsMainWindow::test1()
 //		= new WinBorder(BRect(20,20,300,220), "lay1", B_FOLLOW_NONE, 0, c);
 //	topLayer->AddLayer(lay1);
 // ------
-	WinBorder	*wb1 = new WinBorder(BRect(20,20,300,220), "wb1", B_FOLLOW_NONE, 0, c);
+	WinBorder	*wb1 = new WinBorder(BRect(20,20,300,220), "wb1", B_FOLLOW_NONE, B_FULL_UPDATE_ON_RESIZE, c);
 	topLayer->AddLayer(wb1);
-	Layer	*lay1
-		= new Layer(BRect(0,0,280,200), "lay1", B_FOLLOW_NONE, 0, c);
+		// same size as wb1
+	Layer	*lay1 = new Layer(BRect(0,0,280,200), "lay1", B_FOLLOW_NONE, 0, c);
 	wb1->AddLayer(lay1);
 // ------
 	c.red = rand()/256;
@@ -114,14 +114,62 @@ void clsMainWindow::test1()
 			0, c);
 	lay2->AddLayer(lay3);
 
+	c.red = rand()/256;
+	c.green = rand()/256;
+	c.blue = rand()/256;
+	Layer	*lay12 = new Layer(BRect(170,20,290,150), "lay21",
+			B_FOLLOW_NONE,
+			B_FULL_UPDATE_ON_RESIZE, c);
+	lay1->AddLayer(lay12);
+
+	c.red = rand()/256;
+	c.green = rand()/256;
+	c.blue = rand()/256;
+	Layer	*lay13 = new Layer(BRect(20,20,100,100), "lay31",
+			B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
+			0, c);
+	lay12->AddLayer(lay13);
+
+
+//---------
+	c.red = rand()/256;
+	c.green = rand()/256;
+	c.blue = rand()/256;
+	WinBorder	*wb2 = new WinBorder(BRect(280,120,600,420), "wb2", B_FOLLOW_NONE, B_FULL_UPDATE_ON_RESIZE, c);
+	topLayer->AddLayer(wb2);
+	Layer	*lay21 = new Layer(wb2->Bounds().OffsetToCopy(0,0), "lay21", B_FOLLOW_NONE, 0, c);
+	wb2->AddLayer(lay21);
+
+	c.red = rand()/256;
+	c.green = rand()/256;
+	c.blue = rand()/256;
+	Layer	*lay22 = new Layer(BRect(20,20,150,150), "lay22",
+			B_FOLLOW_NONE,
+			0, c);
+	lay21->AddLayer(lay22);
+
+//---------
+
 	BRegion		temp;
 	wb1->GetWantedRegion(temp);
 	topLayer->RebuildVisibleRegions(temp, wb1);
+
+	wb2->GetWantedRegion(temp);
+	topLayer->RebuildVisibleRegions(temp, wb2);
 
 	wind->Lock();
 	fView->Invalidate();
 	wind->Unlock();
 
+	snooze(2000000);
+
+	wb1->Hide();
+
+	snooze(2000000);
+
+	wb1->Show();
+
+/*
 
 	snooze(2000000);
 
@@ -151,7 +199,7 @@ void clsMainWindow::test1()
 	snooze(2000000);
 
 	lay1->Invalidate(BRect(0,0,500,500));
-
+*/
 }
 
 int main()

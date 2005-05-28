@@ -67,7 +67,7 @@ protected:
 			rgb_color		fColor;
 
 private:
-	virtual	void			operate_on_visible(BRegion &region);
+	virtual	bool			alter_visible_for_children(BRegion &region);
 	virtual	void			set_user_regions(BRegion &reg);
 
 			void			clear_visible_regions();
@@ -87,6 +87,7 @@ private:
 			Layer*			fLower;
 			Layer*			fTop;
 			Layer*			fParent;
+	mutable	Layer*			fCurrent;
 
 			uint32			fFlags;
 			bool			fHidden;

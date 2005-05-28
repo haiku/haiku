@@ -11,14 +11,22 @@ public:
 	virtual				~MyView();
 
 	virtual	void		Draw(BRect area);
+	virtual void		MouseDown(BPoint where); 
+	virtual void		MouseUp(BPoint where); 
+	virtual void		MouseMoved(BPoint where, uint32 code, const BMessage *a_message);
 
 			void		CopyRegion(BRegion *reg, float dx, float dy);
 			void		RequestRedraw();			
 
-			Layer*		FindLayer(Layer *lay, const char *bytes) const;
+			Layer*		FindLayer(Layer *lay, BPoint &where) const;
 
 			Layer		*topLayer;
 			BRegion		fRedrawReg;
 private:
 			void		DrawSubTree(Layer* lay);
+
+			bool		fTracking;
+			BPoint		fLastPos;
+			Layer		*fMovingLayer;
+			bool		fIsResize;
 };

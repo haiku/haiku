@@ -25,6 +25,8 @@ Layer::Layer(BRect frame, const char* name, uint32 rm, uint32 flags, rgb_color c
 	fTop = NULL;
 	fParent = NULL;
 	fView = NULL;
+	fCurrent = NULL;
+	fHidden = false;
 
 	strcpy(fName, name);
 }
@@ -80,22 +82,26 @@ MyView* Layer::GetRootLayer() const
 
 Layer* Layer::VirtualBottomChild() const
 {
-	return fBottom;
+	fCurrent = fBottom;
+	return fCurrent;
 }
 
 Layer* Layer::VirtualTopChild() const
 {
-	return fTop;
+	fCurrent = fTop;
+	return fCurrent;
 }
 
 Layer* Layer::VirtualUpperSibling() const
 {
-	return fUpper;
+	fCurrent = fCurrent->fUpper;
+	return fCurrent;
 }
 
 Layer* Layer::VirtualLowerSibling() const
 {
-	return fLower;
+	fCurrent = fCurrent->fLower;
+	return fCurrent;
 }
 
 void Layer::AddLayer(Layer* layer)
@@ -189,16 +195,12 @@ Layer::Show()
 
 	if (fParent && !fParent->IsVisuallyHidden() && GetRootLayer())
 	{
-		BRect r(Bounds());
+		BRegion invalid;
 
-		if (r.IsValid())
-		{
-			ConvertToScreen2(&r);
+		set_user_regions(invalid);
 
-			BRegion invalid(r);
-
+		if (invalid.CountRects() > 0)
 			fParent->Invalidate(invalid, this);
-		}
 	}
 }
 
@@ -296,8 +298,6 @@ Layer::resize_redraw_more_regions(BRegion &redraw)
 
 void Layer::ResizeBy(float dx, float dy)
 {
-// TODO: center and right alligned view must be fully redrawn - ISN'T THIS DONE ALREADY? - TEST!
-
 	fFrame.Set(fFrame.left, fFrame.top, fFrame.right+dx, fFrame.bottom+dy);
 
 	// resize children using their resize_mask.
@@ -305,15 +305,19 @@ void Layer::ResizeBy(float dx, float dy)
 				lay; lay = VirtualUpperSibling())
 			lay->resize_layer_frame_by(dx, dy);
 
+	// call hook function
+	if (dx != 0.0f || dy != 0.0f)
+		ResizedByHook(dx, dy, false); // manual
+
 	if (!IsVisuallyHidden() && GetRootLayer())
 	{
 		BRegion oldFullVisible(fFullVisible);
+		BRegion oldVisible(fVisible);
 
-		// we'll invalidate the old position and the new, maxmial, one (bounds in screen coords).
-		BRegion invalid(fFullVisible);
-		BRect	r(Bounds());
-		ConvertToScreen2(&r);
-		invalid.Include(r);
+		// we'll invalidate the old area and the new, maxmial one.
+		BRegion invalid;
+		set_user_regions(invalid);
+		invalid.Include(&fFullVisible);
 
 		clear_visible_regions();
 
@@ -336,34 +340,35 @@ void Layer::ResizeBy(float dx, float dy)
 					lay; lay = VirtualUpperSibling())
 			lay->resize_redraw_more_regions(redrawReg);
 
-
 		// add redrawReg to our RootLayer's redraw region.
 		GetRootLayer()->fRedrawReg.Include(&redrawReg);
 		// include layer's visible region in case we want a full update on resize
 		if (fFlags & B_FULL_UPDATE_ON_RESIZE && fVisible.Frame().IsValid())
+		{
 			GetRootLayer()->fRedrawReg.Include(&fVisible);
+			GetRootLayer()->fRedrawReg.Include(&oldVisible);
+		}
 		// clear canvas and set invalid regions for affected WinBorders
 		GetRootLayer()->RequestRedraw(); // TODO: what if we pass (fParent, startFromTHIS, &redrawReg)?
 	}
-
-	// call hook function
-	if (dx != 0.0f || dy != 0.0f)
-		ResizedByHook(dx, dy, false); // manual
 }
 
 void Layer::MoveBy(float dx, float dy)
 {
 	fFrame.Set(fFrame.left+dx, fFrame.top+dy, fFrame.right+dx, fFrame.bottom+dy);
 
+	// call hook function
+	if (dx != 0.0f || dy != 0.0f)
+		MovedByHook(dx, dy);
+
 	if (!IsVisuallyHidden() && GetRootLayer())
 	{
 		BRegion oldFullVisible(fFullVisible);
 
-		// we'll invalidate the old position and the new, maxmial, one (bounds in screen coords).
-		BRegion invalid(fFullVisible);
-		BRect	r(Bounds());
-		ConvertToScreen2(&r);
-		invalid.Include(r);
+		// we'll invalidate the old position and the new, maxmial one.
+		BRegion invalid;
+		set_user_regions(invalid);
+		invalid.Include(&fFullVisible);
 
 		clear_visible_regions();
 
@@ -393,10 +398,6 @@ void Layer::MoveBy(float dx, float dy)
 		GetRootLayer()->fRedrawReg.Include(&redrawReg);
 		GetRootLayer()->RequestRedraw(); // TODO: what if we pass (fParent, startFromTHIS, &redrawReg)?
 	}
-
-	// call hook function
-	if (dx != 0.0f || dy != 0.0f)
-		MovedByHook(dx, dy);
 }
 
 void Layer::ScrollBy(float dx, float dy)
@@ -528,6 +529,11 @@ void Layer::rebuild_visible_regions(const BRegion &invalid,
 		// common is invalid. Same goes for the last two in the 'for' statement below.
 	}
 
+	// this is to allow a layer to hide some parts of itself so children
+	// won't take them.
+	BRegion unalteredVisible(common);
+	bool altered = alter_visible_for_children(common);
+
 	for (Layer *lay = VirtualBottomChild(); lay ; lay = VirtualUpperSibling())
 	{
 		if (lay == startFrom)
@@ -536,21 +542,28 @@ void Layer::rebuild_visible_regions(const BRegion &invalid,
 		if (fullRebuild)
 			lay->rebuild_visible_regions(invalid, common, lay->VirtualBottomChild());
 
+		// to let children know much they can take from parent's visible region
 		common.Exclude(&lay->fFullVisible);
+		// all that a child took must be excluded from our visible region
 		fVisible.Exclude(&lay->fFullVisible);
+		// we've hidden some parts of our visible region from our children,
+		// and we must be in sysnc with this region too...
+		if (altered)
+			unalteredVisible.Exclude(&lay->fFullVisible);
 	}
 
 	// the visible region of this layer is what left after all its children took
 	// what they could.
-	fVisible.Include(&common);
-
-	// we don't need this ATM
-	//operate_on_visible(fVisible);
+	if (altered)
+		fVisible.Include(&unalteredVisible);
+	else
+		fVisible.Include(&common);
 }
 
-void Layer::operate_on_visible(BRegion &reg)
+bool Layer::alter_visible_for_children(BRegion &reg)
 {
 	// Empty Hook function
+	return false;
 }
 
 void Layer::clear_visible_regions()
@@ -561,21 +574,15 @@ void Layer::clear_visible_regions()
 
 	fVisible.MakeEmpty();
 	fFullVisible.MakeEmpty();
-	Layer	*child = VirtualBottomChild();
-	while (child)
-	{
+	for (Layer *child = VirtualBottomChild(); child;
+				child = VirtualUpperSibling())
 		child->clear_visible_regions();
-		child = child->VirtualUpperSibling();
-	}
 }
 
 void Layer::PrintToStream() const
 {
 	printf("-> %s\n", fName);
-	Layer *child = VirtualBottomChild();
-	while(child)
-	{
+	for (Layer *child = VirtualBottomChild(); child;
+				child = VirtualUpperSibling())
 		child->PrintToStream();
-		child = child->VirtualUpperSibling();
-	}
 }
