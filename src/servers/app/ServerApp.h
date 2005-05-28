@@ -100,7 +100,8 @@ private:
 	// port we receive messages from our BApplication
 	port_id	fMessagePort;
 			// TODO: find out why there is both the app port and the looper port. Do 
-			// we really need both?
+			// we really need both? Actually, we aren't using any of these ports,
+			// as BAppServerLink/BPortlink's messages always contain the reply port
 	// To send a message to the client, write a BMessage to this port
 	port_id	fClientLooperPort;
 	
@@ -121,6 +122,7 @@ private:
 		  
 	ServerCursor *fAppCursor;
 	
+	// TODO: Not used.
 	sem_id fLockSem;
 	
 	bool fCursorHidden;

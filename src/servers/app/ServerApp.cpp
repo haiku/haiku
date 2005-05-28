@@ -121,8 +121,6 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort
 		fAppCursor->SetOwningTeam(fClientTeamID);
 	}
 
-//	fLockSem = create_sem(1, "ServerApp sem");
-
 	Run();
 
 	STRACE(("ServerApp %s:\n", fSignature.String()));
@@ -240,7 +238,7 @@ ServerApp::PostMessage(int32 code)
 /*!
 	\brief Send a message to the ServerApp's BApplication
 	\param msg The message to send
-*/
+*//*
 void
 ServerApp::SendMessageToClient(const BMessage *msg) const
 {
@@ -254,7 +252,7 @@ ServerApp::SendMessageToClient(const BMessage *msg) const
 
 	delete [] buffer;
 }
-
+*/
 /*!
 	\brief Sets the ServerApp's active status
 	\param value The new status of the ServerApp.
@@ -430,7 +428,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			for(int32 i=0; i<fSWindowList->CountItems(); i++)
 			{
 				win=(ServerWindow*)fSWindowList->ItemAt(i);
-				win->fWinBorder->UpdateColors();
+				win->GetWinBorder->UpdateColors();
 				win->SendMessageToClient(AS_UPDATE_COLORS, msg);
 			}
 */			break;
@@ -447,7 +445,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			for(int32 i=0; i<fSWindowList->CountItems(); i++)
 			{
 				win=(ServerWindow*)fSWindowList->ItemAt(i);
-				win->fWinBorder->UpdateFont();
+				win->GetWinBorder->UpdateFont();
 				win->SendMessageToClient(AS_UPDATE_FONTS, msg);
 			}
 */			break;
@@ -571,7 +569,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			{
 				win = (ServerWindow*)fSWindowList->ItemAt(i);
 				win->Lock();
-				win->fWinBorder->UpdateDecorator();
+				const_cast<WinBorder *>(win->GetWinBorder())->UpdateDecorator();
 				win->Unlock();
 			}
 			break;

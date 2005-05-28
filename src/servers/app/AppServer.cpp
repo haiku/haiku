@@ -80,7 +80,7 @@ port_id gAppServerPort;
 AppServer *app_server=NULL;
 
 //! Default background color for workspaces
-RGBColor workspace_default_color(51,102,160);
+//RGBColor workspace_default_color(51,102,160);
 
 //! System-wide GUI color object
 ColorSet gui_colorset;

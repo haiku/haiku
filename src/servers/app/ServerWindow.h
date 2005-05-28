@@ -131,9 +131,7 @@ private:
 										  int32 xOffset, int32 yOffset) const;
 
 protected:	
-	friend class ServerApp;
 	friend class WinBorder;
-	friend class Screen; 
 	friend class Layer;
 	
 			char				fName[50];
