@@ -1064,7 +1064,7 @@ BView::DragMessage(BMessage *message, BRect dragRect, BHandler *replyTo)
 	if (replyTo == NULL)
 		replyTo = this;
 	
-	if (replyTo->Looper())
+	if (replyTo->Looper() == NULL)
 		debugger("DragMessage: warning - the Handler needs a looper");
 
 	do_owner_check_no_pick();
