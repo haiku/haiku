@@ -53,8 +53,29 @@ static bool sBochsOutput = false;
 #endif
 
 
-static char
-keyboard_getchar(void)
+static void
+put_char(const char c)
+{
+#if BOCHS_DEBUG_HACK
+	if (sBochsOutput) {
+		out8(c, 0xe9);
+		return;
+	}
+#endif
+
+	// wait until the transmitter empty bit is set
+	while ((in8(sSerialBasePort + SERIAL_LINE_STATUS) & 0x20) == 0)
+		;
+
+	out8(c, sSerialBasePort + SERIAL_TRANSMIT_BUFFER);
+}
+
+
+//	#pragma mark -
+
+
+char
+arch_debug_blue_screen_getchar(void)
 {
 	/* polling the keyboard, similar to code in keyboard
 	 * driver, but without using an interrupt
@@ -102,33 +123,12 @@ keyboard_getchar(void)
 }
 
 
-static void
-put_char(const char c)
-{
-#if BOCHS_DEBUG_HACK
-	if (sBochsOutput) {
-		out8(c, 0xe9);
-		return;
-	}
-#endif
-
-	// wait until the transmitter empty bit is set
-	while ((in8(sSerialBasePort + SERIAL_LINE_STATUS) & 0x20) == 0)
-		;
-
-	out8(c, sSerialBasePort + SERIAL_TRANSMIT_BUFFER);
-}
-
-
-//	#pragma mark -
-
-
 char
 arch_debug_serial_getchar(void)
 {
 #if BOCHS_DEBUG_HACK
 	if (sBochsOutput)
-		return keyboard_getchar();
+		return arch_debug_blue_screen_getchar();
 #endif
 
 	while ((in8(sSerialBasePort + SERIAL_LINE_STATUS) & 0x1) == 0)
@@ -138,7 +138,7 @@ arch_debug_serial_getchar(void)
 }
 
 
-char
+void
 arch_debug_serial_putchar(const char c)
 {
 	if (c == '\n') {
@@ -146,8 +146,6 @@ arch_debug_serial_putchar(const char c)
 		put_char('\n');
 	} else if (c != '\r')
 		put_char(c);
-
-	return c;
 }
 
 
@@ -166,18 +164,15 @@ arch_debug_serial_early_boot_message(const char *string)
 {
 	// this function will only be called in fatal situations
 	// ToDo: also enable output via text console?!
-	arch_debug_console_init(NULL, NULL);
+	arch_debug_console_init(NULL);
 	arch_debug_serial_puts(string);
 }
 
 
 status_t
-arch_debug_console_init(kernel_args *args, char (**_blueScreenGetChar)(void))
+arch_debug_console_init(kernel_args *args)
 {
 	uint16 divisor = (uint16)(115200 / kSerialBaudRate);
-
-	if (_blueScreenGetChar)
-		*_blueScreenGetChar = keyboard_getchar;
 
 	// only use the port if we could find one, else use the standard port
 	if (args->platform_args.serial_base_ports[0] != 0)

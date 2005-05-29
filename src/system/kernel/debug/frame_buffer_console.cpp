@@ -4,6 +4,7 @@
  */
 
 #include <KernelExport.h>
+#include <kernel.h>
 #include <lock.h>
 #include <boot_item.h>
 #include <fs/devfs.h>
@@ -298,7 +299,7 @@ console_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
-			return sConsole.frame_buffer != NULL ? B_OK : B_ERROR;
+			return frame_buffer_console_available() ? B_OK : B_ERROR;
 		case B_MODULE_UNINIT:
 			return B_OK;
 
@@ -323,10 +324,7 @@ console_module_info gFrameBufferConsoleModule = {
 };
 
 
-//	#pragma mark -
-
-
-status_t
+static status_t
 frame_buffer_update(addr_t baseAddress, int32 width, int32 height, int32 depth, int32 bytesPerRow)
 {
 	TRACE(("frame_buffer_update(buffer = %p, width = %ld, height = %ld, depth = %ld, bytesPerRow = %ld)\n",
@@ -352,6 +350,16 @@ frame_buffer_update(addr_t baseAddress, int32 width, int32 height, int32 depth, 
 
 	mutex_unlock(&sConsole.lock);
 	return B_OK;
+}
+
+
+//	#pragma mark -
+
+
+bool
+frame_buffer_console_available(void)
+{
+	return sConsole.frame_buffer != NULL;
 }
 
 
@@ -400,5 +408,21 @@ frame_buffer_console_init(kernel_args *args)
 	add_boot_item(FRAME_BUFFER_BOOT_INFO, &sBootInfo, sizeof(frame_buffer_boot_info));
 
 	return B_OK;
+}
+
+
+//	#pragma mark -
+
+
+status_t
+_user_frame_buffer_update(addr_t baseAddress, int32 width, int32 height,
+	int32 depth, int32 bytesPerRow)
+{
+	if (geteuid() != 0)
+		return B_NOT_ALLOWED;
+	if (IS_USER_ADDRESS(baseAddress))
+		return B_BAD_ADDRESS;
+
+	return frame_buffer_update(baseAddress, width, height, depth, bytesPerRow);
 }
 

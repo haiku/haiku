@@ -8,18 +8,18 @@
 
 /* This file contains the debugger */
 
+#include "blue_screen.h"
+
 #include <debug.h>
-#include <arch/int.h>
-#include <smp.h>
-#include <console.h>
+#include <frame_buffer_console.h>
 #include <gdb.h>
+
+#include <smp.h>
 #include <int.h>
 #include <vm.h>
 #include <driver_settings.h>
-
 #include <arch/debug_console.h>
 #include <arch/debug.h>
-#include <arch/cpu.h>
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -38,12 +38,10 @@ typedef struct debugger_command {
 int dbg_register_file[B_MAX_CPU_COUNT][14];
 	/* XXXmpetit -- must be made generic */
 
-char (*sBlueScreenGetChar)(void) = NULL;
-	// this will be set by arch_debug_console_init()
-
 static bool sSerialDebugEnabled = false;
 static bool sSyslogOutputEnabled = false;
 static bool sBlueScreenEnabled = false;
+static bool sBlueScreenOutput = false;
 static spinlock sSpinlock = 0;
 static int sDebuggerOnCPU = -1;
 
@@ -99,8 +97,8 @@ read_line(char *buf, int max_len)
 	int cur_history_spot = cur_line;
 
 	char (*readChar)(void);
-	if (sBlueScreenEnabled && sBlueScreenGetChar != NULL)
-		readChar = sBlueScreenGetChar;
+	if (sBlueScreenEnabled)
+		readChar = blue_screen_getchar;
 	else
 		readChar = arch_debug_serial_getchar;
 
@@ -178,7 +176,7 @@ read_line(char *buf, int max_len)
 				break;
 			case '$':
 			case '+':
-				if (readChar != sBlueScreenGetChar) {
+				if (!sBlueScreenEnabled) {
 					/* HACK ALERT!!!
 					 *
 					 * If we get a $ at the beginning of the line
@@ -244,18 +242,14 @@ parse_line(char *buf, char **argv, int *argc, int max_args)
 static void
 kernel_debugger_loop(void)
 {
-	struct debugger_command *cmd;
-	int argc;
-
 	dprintf("Running on CPU %d\n", smp_get_current_cpu());
-	if (sBlueScreenEnabled && sBlueScreenGetChar == NULL)
-		dprintf("Only serial keyboard input available.\n");
 
 	sDebuggerOnCPU = smp_get_current_cpu();
 
-	cmd = NULL;
-
 	for (;;) {
+		struct debugger_command *cmd = NULL;
+		int argc;
+
 		dprintf("kdebug> ");
 		read_line(line_buf[cur_line], LINE_BUF_SIZE);
 		parse_line(line_buf[cur_line], args, &argc, MAX_ARGS);
@@ -333,19 +327,19 @@ cmd_continue(int argc, char **argv)
 //	#pragma mark -
 
 
-char
+void
 debug_putchar(char c)
 {
 	cpu_status state = disable_interrupts();
 	acquire_spinlock(&sSpinlock);
 
 	if (sSerialDebugEnabled)
-		c = arch_debug_serial_putchar(c);
+		arch_debug_serial_putchar(c);
+	if (sBlueScreenOutput)
+		blue_screen_putchar(c);
 
 	release_spinlock(&sSpinlock);
 	restore_interrupts(state);
-
-	return c;
 }
 
 
@@ -357,6 +351,8 @@ debug_puts(const char *s)
 
 	if (sSerialDebugEnabled)
 		arch_debug_serial_puts(s);
+	if (sBlueScreenOutput)
+		blue_screen_puts(s);
 
 	release_spinlock(&sSpinlock);
 	restore_interrupts(state);
@@ -373,7 +369,7 @@ debug_early_boot_message(const char *string)
 status_t
 debug_init(kernel_args *args)
 {
-	return arch_debug_console_init(args, &sBlueScreenGetChar);
+	return arch_debug_console_init(args);
 }
 
 
@@ -389,6 +385,9 @@ debug_init_post_vm(kernel_args *args)
 	add_debugger_command("exit", &cmd_continue, NULL);
 	add_debugger_command("es", &cmd_continue, NULL);
 
+	frame_buffer_console_init(args);
+	arch_debug_console_init_settings(args);
+
 	// get debug settings
 	handle = load_driver_settings("kernel");
 	if (handle != NULL) {
@@ -396,13 +395,14 @@ debug_init_post_vm(kernel_args *args)
 			sSerialDebugEnabled = true;
 		if (get_driver_boolean_parameter(handle, "syslog_debug_output", false, false))
 			sSyslogOutputEnabled = true;
-		if (get_driver_boolean_parameter(handle, "bluescreen", false, false))
-			sBlueScreenEnabled = true;
+		if (get_driver_boolean_parameter(handle, "bluescreen", false, false)) {
+			if (blue_screen_init() == B_OK)
+				sBlueScreenEnabled = true;
+		}
 
 		unload_driver_settings(handle);
 	}
 
-	arch_debug_console_init_settings(args);
 	return arch_debug_init(args);
 }
 
@@ -522,14 +522,20 @@ kernel_debugger(const char *message)
 		smp_send_broadcast_ici(SMP_MSG_CPU_HALT, 0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
 	}
 
-	if (message) {
-		dprintf(message);
-		dprintf("\n");
+	if (sBlueScreenEnabled) {
+		sBlueScreenOutput = true;
+		blue_screen_enter();
 	}
 
-	dprintf("Welcome to Kernel Debugging Land...\n");
+	if (message) {
+		kprintf(message);
+		kprintf("\n");
+	}
+
+	kprintf("Welcome to Kernel Debugging Land...\n");
 	kernel_debugger_loop();
 
+	sBlueScreenOutput = false;
 	kernel_startup = false;
 	restore_interrupts(state);
 
@@ -548,7 +554,7 @@ set_dprintf_enabled(bool newState)
 
 
 void
-dprintf(const char *fmt, ...)
+dprintf(const char *format, ...)
 {
 	cpu_status state;
 	va_list args;
@@ -563,14 +569,37 @@ dprintf(const char *fmt, ...)
 	state = disable_interrupts();
 	acquire_spinlock(&sSpinlock);
 
-	va_start(args, fmt);
-	vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE, fmt, args);
+	va_start(args, format);
+	vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE, format, args);
 	va_end(args);
 
 	arch_debug_serial_puts(sOutputBuffer);
+	if (sBlueScreenOutput)
+		blue_screen_puts(sOutputBuffer);
 
 	release_spinlock(&sSpinlock);
 	restore_interrupts(state);
+}
+
+
+/**	Similar to dprintf() but thought to be used in the kernel
+ *	debugger only.
+ */
+
+void
+kprintf(const char *format, ...)
+{
+	va_list args;
+
+	// ToDo: don't print anything if the debugger is not running!
+
+	va_start(args, format);
+	vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE, format, args);
+	va_end(args);
+
+	arch_debug_serial_puts(sOutputBuffer);
+	if (sBlueScreenOutput)
+		blue_screen_puts(sOutputBuffer);
 }
 
 

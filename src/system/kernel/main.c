@@ -12,7 +12,6 @@
 #include <OS.h>
 
 #include <boot/kernel_args.h>
-#include <console.h>
 #include <debug.h>
 #include <arch/faults.h>
 #include <ksyscalls.h>
@@ -213,9 +212,6 @@ main2(void *unused)
 
 	TRACE(("Mount boot file system\n"));
 	vfs_mount_boot_file_system(&ka);
-
-	TRACE(("Init console\n"));
-	con_init(&ka);
 
 	//net_init_postdev(&ka);
 

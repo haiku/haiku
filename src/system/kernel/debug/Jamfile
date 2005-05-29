@@ -3,7 +3,7 @@ SubDir OBOS_TOP src system kernel debug ;
 UsePrivateHeaders [ FDirName kernel debug ] ;
 
 KernelMergeObject kernel_debug.o :
-	console.c
+	blue_screen.cpp
 	debug.c
 	frame_buffer_console.cpp
 	gdb.c
