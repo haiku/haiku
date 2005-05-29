@@ -99,8 +99,9 @@ find_lock_caller(spinlock *lock)
 	int32 i;
 
 	for (i = 0; i < NUM_LAST_CALLERS; i++) {
-		if (sLastCaller[i].lock == lock)
-			return sLastCaller[i].caller;
+		int32 index = (NUM_LAST_CALLERS + sLastIndex - 1 - i) % NUM_LAST_CALLERS;
+		if (sLastCaller[index].lock == lock)
+			return sLastCaller[index].caller;
 	}
 
 	return NULL;
@@ -134,7 +135,7 @@ acquire_spinlock(spinlock *lock)
 				lock, find_lock_caller(lock), oldValue);
 		}
 
-		push_lock_caller(arch_get_caller(), lock);
+		push_lock_caller(arch_debug_get_caller(), lock);
 #endif
 	}
 }

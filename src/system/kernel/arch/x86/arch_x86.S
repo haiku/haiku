@@ -153,7 +153,7 @@ done:
 	jmp		done
 
 
-FUNCTION(arch_dbg_save_registers):
+FUNCTION(arch_debug_save_registers):
 	pushl	%esi
 	pushl	%eax
 	movl	12(%esp), %esi
@@ -163,7 +163,7 @@ FUNCTION(arch_dbg_save_registers):
 	movl	%ecx, 8(%esi)
 	movl	%edx, 12(%esi)
 
-	lea	16(%esp), %eax
+	lea		16(%esp), %eax
 	movl	%eax, 16(%esi)	// caller's %esp
 	movl	%ebp, 20(%esi)
 
@@ -173,7 +173,6 @@ FUNCTION(arch_dbg_save_registers):
 
 	movl	8(%esp), %eax
 	movl	%eax, 32(%esi)	// caller's %ebp
-
 
 	pushfl
 	popl	%eax

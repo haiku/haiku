@@ -18,9 +18,9 @@ struct kernel_args;
 extern "C" {
 #endif
 
-status_t arch_dbg_init(kernel_args *args);
-void *arch_get_caller(void);
-void arch_dbg_save_registers(int *);
+status_t arch_debug_init(kernel_args *args);
+void *arch_debug_get_caller(void);
+void arch_debug_save_registers(int *);
 
 #ifdef __cplusplus
 }

@@ -1,9 +1,13 @@
+/*
+ * Copyright 2005, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2002, Manuel J. Petit. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
+
 /* Contains the code to interface with a remote GDB */
 
-/*
-** Copyright 2002, Manuel J. Petit. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -14,21 +18,20 @@
 #include <arch/dbg_console.h>
 
 
-enum { INIT= 0, CMDREAD, CKSUM1, CKSUM2, WAITACK, QUIT, GDBSTATES };
+enum { INIT = 0, CMDREAD, CKSUM1, CKSUM2, WAITACK, QUIT, GDBSTATES };
 
 
 static char cmd[512];
-static int  cmd_ptr;
-static int  checksum;
+static int cmd_ptr;
+static int checksum;
 
 static char reply[512];
 
 static char safe_mem[512];
 
 
-/*
- * utility functions
- */
+// utility functions
+
 
 static int
 parse_nibble(int input)
@@ -48,30 +51,27 @@ parse_nibble(int input)
 }
 
 
+//	#pragma mark - GDB protocol
 
-/*
- * GDB protocol ACK & NAK & Reply
- *
- */
 
 static void
 gdb_ack(void)
 {
-	dbg_putch('+');
+	debug_putchar('+');
 }
 
 
 static void
 gdb_nak(void)
 {
-	dbg_putch('-');
+	debug_putchar('-');
 }
 
 
 static void
 gdb_resend_reply(void)
 {
-	dbg_puts(reply);
+	debug_puts(reply);
 }
 
 
@@ -151,10 +151,8 @@ gdb_memreply(char const *bytes, int numbytes)
 }
 
 
+//	#pragma mark - checksum verification
 
-/*
- * checksum verification
- */
 
 static int
 gdb_verify_checksum(void)
@@ -174,9 +172,8 @@ gdb_verify_checksum(void)
 }
 
 
-/*
- * command parsing an dispatching
- */
+//	#pragma mark - command parsing
+
 
 static int
 gdb_parse_command(void)
@@ -331,10 +328,8 @@ gdb_parse_command(void)
 }
 
 
+//	#pragma mark - protocol state machine
 
-/*
- * GDB protocol state machine
- */
 
 static int
 gdb_init_handler(int input)
@@ -486,7 +481,7 @@ gdb_state_machine(void)
 	int c;
 
 	while (state != QUIT) {
-		c = arch_dbg_con_read();
+		c = arch_debug_serial_getchar();
 		state = gdb_state_dispatch(state, c);
 	}
 

@@ -1,12 +1,12 @@
-/* This file contains the debugger */
-
 /*
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de
+ * Distributed under the terms of the Haiku License.
+ *
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
+
+/* This file contains the debugger */
 
 #include <debug.h>
 #include <arch/int.h>
@@ -15,6 +15,7 @@
 #include <gdb.h>
 #include <int.h>
 #include <vm.h>
+#include <driver_settings.h>
 
 #include <arch/dbg_console.h>
 #include <arch/debug.h>
@@ -37,9 +38,14 @@ typedef struct debugger_command {
 int dbg_register_file[B_MAX_CPU_COUNT][14];
 	/* XXXmpetit -- must be made generic */
 
+char (*sBlueScreenGetChar)(void) = NULL;
+	// this will be set by arch_debug_console_init()
+
 static bool sSerialDebugEnabled = false;
-static spinlock dbg_spinlock = 0;
-static int debugger_on_cpu = -1;
+static bool sSyslogOutputEnabled = false;
+static bool sBlueScreenEnabled = false;
+static spinlock sSpinlock = 0;
+static int sDebuggerOnCPU = -1;
 
 static struct debugger_command *sCommands;
 
@@ -51,7 +57,7 @@ static char sOutputBuffer[OUTPUT_BUFFER_SIZE];
 #define HISTORY_SIZE 16
 
 static char line_buf[HISTORY_SIZE][LINE_BUF_SIZE] = { "", };
-static char parse_line[LINE_BUF_SIZE] = "";
+static char sParseLine[LINE_BUF_SIZE] = "";
 static int cur_line = 0;
 static char *args[MAX_ARGS] = { NULL, };
 
@@ -85,43 +91,50 @@ find_command(char *name)
 
 
 static int
-debug_read_line(char *buf, int max_len)
+read_line(char *buf, int max_len)
 {
 	char c;
 	int ptr = 0;
 	bool done = false;
 	int cur_history_spot = cur_line;
 
+	char (*readChar)(void);
+	if (sBlueScreenEnabled && sBlueScreenGetChar != NULL)
+		readChar = sBlueScreenGetChar;
+	else
+		readChar = arch_debug_serial_getchar;
+
 	while (!done) {
-		c = arch_dbg_con_read();
+		c = readChar();
+
 		switch (c) {
 			case '\n':
 			case '\r':
 				buf[ptr++] = '\0';
-				dbg_puts("\n");
+				debug_putchar('\n');
 				done = true;
 				break;
 			case 8: // backspace
 				if (ptr > 0) {
-					dbg_puts("\x1b[1D"); // move to the left one
-					dbg_putch(' ');
-					dbg_puts("\x1b[1D"); // move to the left one
+					debug_puts("\x1b[1D"); // move to the left one
+					debug_putchar(' ');
+					debug_puts("\x1b[1D"); // move to the left one
 					ptr--;
 				}
 				break;
 			case 27: // escape sequence
-				c = arch_dbg_con_read(); // should be '['
-				c = arch_dbg_con_read();
+				c = readChar(); // should be '['
+				c = readChar();
 				switch (c) {
 					case 67: // right arrow acts like space
 						buf[ptr++] = ' ';
-						dbg_putch(' ');
+						debug_putchar(' ');
 						break;
 					case 68: // left arrow acts like backspace
 						if (ptr > 0) {
-							dbg_puts("\x1b[1D"); // move to the left one
-							dbg_putch(' ');
-							dbg_puts("\x1b[1D"); // move to the left one
+							debug_puts("\x1b[1D"); // move to the left one
+							debug_putchar(' ');
+							debug_puts("\x1b[1D"); // move to the left one
 							ptr--;
 						}
 						break;
@@ -150,7 +163,7 @@ debug_read_line(char *buf, int max_len)
 //						dprintf("2c %d h %d ch %d\n", cur_line, history_line, cur_history_spot);
 
 						// swap the current line with something from the history
-						if(ptr > 0)
+						if (ptr > 0)
 							dprintf("\x1b[%dD", ptr); // move to beginning of line
 
 						strcpy(buf, line_buf[history_line]);
@@ -165,26 +178,27 @@ debug_read_line(char *buf, int max_len)
 				break;
 			case '$':
 			case '+':
-				/* HACK ALERT!!!
-				 *
-				 * If we get a $ at the beginning of the line
-				 * we assume we are talking with GDB
-				 */
-				if (ptr == 0) {
-					strcpy(buf, "gdb");
-					ptr= 4;
-					done= true;
-					break;
-				} else {
-					/* fall thru */
+				if (readChar != sBlueScreenGetChar) {
+					/* HACK ALERT!!!
+					 *
+					 * If we get a $ at the beginning of the line
+					 * we assume we are talking with GDB
+					 */
+					if (ptr == 0) {
+						strcpy(buf, "gdb");
+						ptr = 4;
+						done = true;
+						break;
+					} 
 				}
+				/* supposed to fall through */
 			default:
 				buf[ptr++] = c;
-				dbg_putch(c);
+				debug_putchar(c);
 		}
 		if (ptr >= max_len - 2) {
 			buf[ptr++] = '\0';
-			dbg_puts("\n");
+			debug_puts("\n");
 			done = true;
 			break;
 		}
@@ -194,27 +208,27 @@ debug_read_line(char *buf, int max_len)
 
 
 static int
-debug_parse_line(char *buf, char **argv, int *argc, int max_args)
+parse_line(char *buf, char **argv, int *argc, int max_args)
 {
 	int pos = 0;
 
-	strcpy(parse_line, buf);
+	strcpy(sParseLine, buf);
 
-	if (!isspace(parse_line[0])) {
-		argv[0] = parse_line;
+	if (!isspace(sParseLine[0])) {
+		argv[0] = sParseLine;
 		*argc = 1;
 	} else
 		*argc = 0;
 
-	while (parse_line[pos] != '\0') {
-		if (isspace(parse_line[pos])) {
-			parse_line[pos] = '\0';
+	while (sParseLine[pos] != '\0') {
+		if (isspace(sParseLine[pos])) {
+			sParseLine[pos] = '\0';
 			// scan all of the whitespace out of this
-			while (isspace(parse_line[++pos]))
+			while (isspace(sParseLine[++pos]))
 				;
-			if (parse_line[pos] == '\0')
+			if (sParseLine[pos] == '\0')
 				break;
-			argv[*argc] = &parse_line[pos];
+			argv[*argc] = &sParseLine[pos];
 			(*argc)++;
 
 			if (*argc >= max_args - 1)
@@ -230,28 +244,28 @@ debug_parse_line(char *buf, char **argv, int *argc, int max_args)
 static void
 kernel_debugger_loop(void)
 {
-	int argc;
 	struct debugger_command *cmd;
-	cpu_status state;
+	int argc;
 
-	state = disable_interrupts();
+	dprintf("Running on CPU %d\n", smp_get_current_cpu());
+	if (sBlueScreenEnabled && sBlueScreenGetChar == NULL)
+		dprintf("Only serial keyboard input available.\n");
 
-	dprintf("kernel debugger on cpu %d\n", smp_get_current_cpu());
-	debugger_on_cpu = smp_get_current_cpu();
+	sDebuggerOnCPU = smp_get_current_cpu();
 
 	cmd = NULL;
 
 	for (;;) {
 		dprintf("kdebug> ");
-		debug_read_line(line_buf[cur_line], LINE_BUF_SIZE);
-		debug_parse_line(line_buf[cur_line], args, &argc, MAX_ARGS);
+		read_line(line_buf[cur_line], LINE_BUF_SIZE);
+		parse_line(line_buf[cur_line], args, &argc, MAX_ARGS);
 
 		// We support calling last executed command again if
 		// B_KDEDUG_CONT was returned last time, so cmd != NULL
 		if (argc <= 0 && cmd == NULL)
 			continue;
 
-		debugger_on_cpu = smp_get_current_cpu();
+		sDebuggerOnCPU = smp_get_current_cpu();
 
 		if (argc > 0)
 			cmd = find_command(args[0]);
@@ -272,41 +286,6 @@ kernel_debugger_loop(void)
 		if (cur_line >= HISTORY_SIZE)
 			cur_line = 0;
 	}
-
-	restore_interrupts(state);
-}
-
-
-char
-dbg_putch(char c)
-{
-	char ret;
-	cpu_status state = disable_interrupts();
-	acquire_spinlock(&dbg_spinlock);
-
-	if (sSerialDebugEnabled)
-		ret = arch_dbg_con_putch(c);
-	else
-		ret = c;
-
-	release_spinlock(&dbg_spinlock);
-	restore_interrupts(state);
-
-	return ret;
-}
-
-
-void
-dbg_puts(const char *s)
-{
-	cpu_status state = disable_interrupts();
-	acquire_spinlock(&dbg_spinlock);
-
-	if (sSerialDebugEnabled)
-		arch_dbg_con_puts(s);
-
-	release_spinlock(&dbg_spinlock);
-	restore_interrupts(state);
 }
 
 
@@ -351,16 +330,58 @@ cmd_continue(int argc, char **argv)
 }
 
 
+//	#pragma mark -
+
+
+char
+debug_putchar(char c)
+{
+	cpu_status state = disable_interrupts();
+	acquire_spinlock(&sSpinlock);
+
+	if (sSerialDebugEnabled)
+		c = arch_debug_serial_putchar(c);
+
+	release_spinlock(&sSpinlock);
+	restore_interrupts(state);
+
+	return c;
+}
+
+
+void
+debug_puts(const char *s)
+{
+	cpu_status state = disable_interrupts();
+	acquire_spinlock(&sSpinlock);
+
+	if (sSerialDebugEnabled)
+		arch_debug_serial_puts(s);
+
+	release_spinlock(&sSpinlock);
+	restore_interrupts(state);
+}
+
+
+void
+debug_early_boot_message(const char *string)
+{
+	arch_debug_serial_early_boot_message(string);
+}
+
+
 status_t
 debug_init(kernel_args *args)
 {
-	return arch_dbg_con_init(args);
+	return arch_debug_console_init(args, &sBlueScreenGetChar);
 }
 
 
 status_t
 debug_init_post_vm(kernel_args *args)
 {
+	void *handle;
+
 	add_debugger_command("help", &cmd_help, "List all debugger commands");
 	add_debugger_command("reboot", &cmd_reboot, "Reboot the system");
 	add_debugger_command("gdb", &cmd_gdb, "Connect to remote gdb");
@@ -368,18 +389,23 @@ debug_init_post_vm(kernel_args *args)
 	add_debugger_command("exit", &cmd_continue, NULL);
 	add_debugger_command("es", &cmd_continue, NULL);
 
-	arch_dbg_con_init_settings(args);
-	return arch_dbg_init(args);
+	// get debug settings
+	handle = load_driver_settings("kernel");
+	if (handle != NULL) {
+		if (get_driver_boolean_parameter(handle, "serial_debug_output", true, true))
+			sSerialDebugEnabled = true;
+		if (get_driver_boolean_parameter(handle, "syslog_debug_output", false, false))
+			sSyslogOutputEnabled = true;
+		if (get_driver_boolean_parameter(handle, "bluescreen", false, false))
+			sBlueScreenEnabled = true;
+
+		unload_driver_settings(handle);
+	}
+
+	arch_debug_console_init_settings(args);
+	return arch_debug_init(args);
 }
 
-// ToDo: this one is probably not needed
-#if 0
-bool
-dbg_get_serial_debug()
-{
-	return sSerialDebugEnabled;
-}
-#endif
 
 //	#pragma mark -
 //	public API
@@ -400,12 +426,12 @@ add_debugger_command(char *name, int (*func)(int, char **), char *desc)
 	cmd->description = desc;
 
 	state = disable_interrupts();
-	acquire_spinlock(&dbg_spinlock);
+	acquire_spinlock(&sSpinlock);
 
 	cmd->next = sCommands;
 	sCommands = cmd;
 
-	release_spinlock(&dbg_spinlock);
+	release_spinlock(&sSpinlock);
 	restore_interrupts(state);
 
 	return B_NO_ERROR;
@@ -420,7 +446,7 @@ remove_debugger_command(char * name, int (*func)(int, char **))
 	cpu_status state;
 
 	state = disable_interrupts();
-	acquire_spinlock(&dbg_spinlock);
+	acquire_spinlock(&sSpinlock);
 
 	while (cmd) {
 		if (!strcmp(cmd->name, name) && cmd->func == func)
@@ -437,7 +463,7 @@ remove_debugger_command(char * name, int (*func)(int, char **))
 			prev->next = cmd->next;
 	}
 
-	release_spinlock(&dbg_spinlock);
+	release_spinlock(&sSpinlock);
 	restore_interrupts(state);
 
 	if (cmd) {
@@ -457,29 +483,38 @@ parse_expression(const char *expression)
 
 
 void
-panic(const char *fmt, ...)
+panic(const char *format, ...)
 {
-	int ret = 0;
 	va_list args;
 	char temp[128];
-	cpu_status state;
 	
+	set_dprintf_enabled(true);
+
+	va_start(args, format);
+	vsnprintf(temp, sizeof(temp), format, args);
+	va_end(args);
+
+	dprintf("PANIC: %s", temp);
+	kernel_debugger(NULL);
+}
+
+
+void
+kernel_debugger(const char *message)
+{
+	cpu_status state;
+
+	arch_debug_save_registers(&dbg_register_file[smp_get_current_cpu()][0]);
+	set_dprintf_enabled(true);
+
+	state = disable_interrupts();
+
 	// XXX by setting kernel_startup = true, we disable
 	// XXX the interrupt check in semaphore code etc.
 	// XXX should be renamed?
 	kernel_startup = true;
 
-	set_dprintf_enabled(true);
-
-	state = disable_interrupts();
-
-	va_start(args, fmt);
-	ret = vsprintf(temp, fmt, args);
-	va_end(args);
-
-	dprintf("PANIC%d: %s", smp_get_current_cpu(), temp);
-
-	if (debugger_on_cpu != smp_get_current_cpu()) {
+	if (sDebuggerOnCPU != smp_get_current_cpu()) {
 		// halt all of the other cpus
 
 		// XXX need to flush current smp mailbox to make sure this goes
@@ -487,24 +522,18 @@ panic(const char *fmt, ...)
 		smp_send_broadcast_ici(SMP_MSG_CPU_HALT, 0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
 	}
 
-	kernel_debugger(NULL);
-
-	restore_interrupts(state);
-}
-
-
-void
-kernel_debugger(const char * message)
-{
-	arch_dbg_save_registers(&(dbg_register_file[smp_get_current_cpu()][0]));
-
 	if (message) {
 		dprintf(message);
 		dprintf("\n");
-	};
+	}
 
 	dprintf("Welcome to Kernel Debugging Land...\n");
 	kernel_debugger_loop();
+
+	kernel_startup = false;
+	restore_interrupts(state);
+
+	// ToDo: in case we change dbg_register_file - don't we want to restore it?
 }
 
 
@@ -532,15 +561,15 @@ dprintf(const char *fmt, ...)
 	//	interrupts?
 
 	state = disable_interrupts();
-	acquire_spinlock(&dbg_spinlock);
+	acquire_spinlock(&sSpinlock);
 
 	va_start(args, fmt);
 	vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE, fmt, args);
 	va_end(args);
 
-	arch_dbg_con_puts(sOutputBuffer);
+	arch_debug_serial_puts(sOutputBuffer);
 
-	release_spinlock(&dbg_spinlock);
+	release_spinlock(&sSpinlock);
 	restore_interrupts(state);
 }
 
@@ -563,7 +592,7 @@ _user_debug_output(const char *userString)
 
 	do {
 		length = user_strlcpy(string, userString, sizeof(string));
-		dbg_puts(string);
+		debug_puts(string);
 		userString += sizeof(string) - 1;
 	} while (length >= (ssize_t)sizeof(string));
 }

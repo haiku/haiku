@@ -18,13 +18,13 @@ struct kernel_args;
 extern "C" {
 #endif
 
-char arch_dbg_con_read(void);
-char arch_dbg_con_putch(char c);
-void arch_dbg_con_puts(const char *s);
+char arch_debug_serial_getchar(void);
+char arch_debug_serial_putchar(char c);
+void arch_debug_serial_puts(const char *s);
+void arch_debug_serial_early_boot_message(const char *string);
 
-void arch_dbg_con_early_boot_message(const char *string);
-status_t arch_dbg_con_init(struct kernel_args *args);
-status_t arch_dbg_con_init_settings(struct kernel_args *args);
+status_t arch_debug_console_init(struct kernel_args *args, char (**blueScreenGetChar)(void));
+status_t arch_debug_console_init_settings(struct kernel_args *args);
 
 #ifdef __cplusplus
 }

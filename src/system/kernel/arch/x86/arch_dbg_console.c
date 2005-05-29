@@ -53,59 +53,52 @@ static bool sBochsOutput = false;
 #endif
 
 
-char
-arch_dbg_con_read(void)
+static char
+keyboard_getchar(void)
 {
-#if BOCHS_DEBUG_HACK
-	if (sBochsOutput) {
-		/* polling the keyboard, similar to code in keyboard
-		 * driver, but without using an interrupt
-		 */
-		static const char unshifted_keymap[128] = {
-			0, 27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 8, '\t',
-			'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n', 0, 'a', 's',
-			'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`', 0, '\\', 'z', 'x', 'c', 'v',
-			'b', 'n', 'm', ',', '.', '/', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			'\\', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-		};
-		const char shifted_keymap[128] = {
-			0, 27, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', 8, '\t',
-			'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n', 0, 'A', 'S',
-			'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', '~', 0, '|', 'Z', 'X', 'C', 'V',
-			'B', 'N', 'M', '<', '>', '?', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-		};	
-		static bool shift = false;
-		static uint8 last = 0;
-		uint8 key, ascii = 0;
-		do {
-			while ((key = in8(0x60)) == last)
-				;
-			last = key;
-			if (key & 0x80) {
-				if (key == (0x80 + 42) || key == (54 + 0x80))
-					shift = false;
-			} else {
-				if (key == 42 || key == 54)
-					shift = true;
-				else
-					ascii = shift ? shifted_keymap[key] : unshifted_keymap[key];
-			}
-		} while (!ascii);
-		return ascii;
-	}
-#endif
+	/* polling the keyboard, similar to code in keyboard
+	 * driver, but without using an interrupt
+	 */
+	static const char unshifted_keymap[128] = {
+		0, 27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 8, '\t',
+		'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n', 0, 'a', 's',
+		'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`', 0, '\\', 'z', 'x', 'c', 'v',
+		'b', 'n', 'm', ',', '.', '/', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		'\\', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	};
+	static const char shifted_keymap[128] = {
+		0, 27, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', 8, '\t',
+		'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n', 0, 'A', 'S',
+		'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', '~', 0, '|', 'Z', 'X', 'C', 'V',
+		'B', 'N', 'M', '<', '>', '?', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	};	
+	static bool shift = false;
+	static uint8 last = 0;
+	uint8 key, ascii = 0;
 
-	while ((in8(sSerialBasePort + SERIAL_LINE_STATUS) & 0x1) == 0)
-		;
+	do {
+		while ((key = in8(0x60)) == last)
+			;
+		last = key;
+		if (key & 0x80) {
+			if (key == (0x80 + 42) || key == (54 + 0x80))
+				shift = false;
+		} else {
+			if (key == 42 || key == 54)
+				shift = true;
+			else
+				ascii = shift ? shifted_keymap[key] : unshifted_keymap[key];
+		}
+	} while (!ascii);
 
-	return in8(sSerialBasePort + SERIAL_RECEIVE_BUFFER);
+	return ascii;
 }
 
 
@@ -127,8 +120,26 @@ put_char(const char c)
 }
 
 
+//	#pragma mark -
+
+
 char
-arch_dbg_con_putch(const char c)
+arch_debug_serial_getchar(void)
+{
+#if BOCHS_DEBUG_HACK
+	if (sBochsOutput)
+		return keyboard_getchar();
+#endif
+
+	while ((in8(sSerialBasePort + SERIAL_LINE_STATUS) & 0x1) == 0)
+		;
+
+	return in8(sSerialBasePort + SERIAL_RECEIVE_BUFFER);
+}
+
+
+char
+arch_debug_serial_putchar(const char c)
 {
 	if (c == '\n') {
 		put_char('\r');
@@ -141,29 +152,32 @@ arch_dbg_con_putch(const char c)
 
 
 void
-arch_dbg_con_puts(const char *s)
+arch_debug_serial_puts(const char *s)
 {
 	while (*s != '\0') {
-		arch_dbg_con_putch(*s);
+		arch_debug_serial_putchar(*s);
 		s++;
 	}
 }
 
 
 void
-arch_dbg_con_early_boot_message(const char *string)
+arch_debug_serial_early_boot_message(const char *string)
 {
 	// this function will only be called in fatal situations
 	// ToDo: also enable output via text console?!
-	arch_dbg_con_init(NULL);
-	arch_dbg_con_puts(string);
+	arch_debug_console_init(NULL, NULL);
+	arch_debug_serial_puts(string);
 }
 
 
 status_t
-arch_dbg_con_init(kernel_args *args)
+arch_debug_console_init(kernel_args *args, char (**_blueScreenGetChar)(void))
 {
 	uint16 divisor = (uint16)(115200 / kSerialBaudRate);
+
+	if (_blueScreenGetChar)
+		*_blueScreenGetChar = keyboard_getchar;
 
 	// only use the port if we could find one, else use the standard port
 	if (args->platform_args.serial_base_ports[0] != 0)
@@ -179,7 +193,7 @@ arch_dbg_con_init(kernel_args *args)
 
 
 status_t
-arch_dbg_con_init_settings(kernel_args *args)
+arch_debug_console_init_settings(kernel_args *args)
 {
 	uint32 baudRate = kSerialBaudRate;
 	uint16 basePort = sSerialBasePort;
@@ -197,13 +211,15 @@ arch_dbg_con_init_settings(kernel_args *args)
 		value = get_driver_parameter(handle, "serial_debug_port", NULL, NULL);
 		if (value != NULL) {
 			int32 number = strtol(value, NULL, 0);
-			if (number < MAX_SERIAL_PORTS) {
+			if (number >= MAX_SERIAL_PORTS) {
+				// use as port number directly
+				basePort = number;
+			} else if (number >= 0) {
 				// use as index into port array
 				if (args->platform_args.serial_base_ports[number] != 0)
 					basePort = args->platform_args.serial_base_ports[number];
 			} else {
-				// use as port number directly
-				basePort = number;
+				// ignore value and use default
 			}
 		}
 

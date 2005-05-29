@@ -49,7 +49,7 @@ already_visited(uint32 *visited, int32 *_last, int32 *_num, uint32 ebp)
 
 
 static int
-dbg_stack_trace(int argc, char **argv)
+stack_trace(int argc, char **argv)
 {
 	uint32 previousLocations[NUM_PREVIOUS_LOCATIONS];
 	struct iframe_stack *frameStack;
@@ -156,7 +156,7 @@ dbg_stack_trace(int argc, char **argv)
 
 
 void *
-arch_get_caller(void)
+arch_debug_get_caller(void)
 {
 	// It looks like you would get the wrong stack frame here, but
 	// since read_ebp() is an assembler inline macro, GCC seems to 
@@ -169,12 +169,12 @@ arch_get_caller(void)
 
 
 status_t
-arch_dbg_init(kernel_args *args)
+arch_debug_init(kernel_args *args)
 {
 	// at this stage, the debugger command system is alive
 
-	add_debugger_command("where", &dbg_stack_trace, "Stack crawl for current thread");
-	add_debugger_command("sc", &dbg_stack_trace, NULL);
+	add_debugger_command("where", &stack_trace, "Same as \"sc\"");
+	add_debugger_command("sc", &stack_trace, "Stack crawl for current thread");
 
 	return B_NO_ERROR;
 }

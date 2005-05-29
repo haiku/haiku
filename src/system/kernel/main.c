@@ -67,7 +67,7 @@ _start(kernel_args *oldka, int cpu_num)
 		// This is something we cannot handle right now - release kernels
 		// should always be able to handle the kernel_args of earlier
 		// released kernels.
-		arch_dbg_con_early_boot_message("Version mismatch between boot loader and kernel!\n");
+		debug_early_boot_message("Version mismatch between boot loader and kernel!\n");
 		return -1;
 	}
 
