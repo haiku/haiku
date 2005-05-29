@@ -1615,30 +1615,26 @@ find_thread(const char *name)
 status_t
 rename_thread(thread_id id, const char *name)
 {
-	status_t status = B_OK;
-	struct thread *thread;
+	struct thread *thread = thread_get_current_thread();
+	status_t status = B_BAD_THREAD_ID;
+	cpu_status state;
 
 	if (name == NULL)
 		return B_BAD_VALUE;
 
-	thread = thread_get_current_thread();
-	if (thread->id == id) {
-		// it's ourself, so we know we aren't in the run queue, and we can manipulate
-		// our structure directly
-		strlcpy(thread->name, name, B_OS_NAME_LENGTH);
-	} else {
-		cpu_status state = disable_interrupts();
-		GRAB_THREAD_LOCK();
+	state = disable_interrupts();
+	GRAB_THREAD_LOCK();
 
+	if (thread->id != id)
 		thread = thread_get_thread_struct_locked(id);
-		if (thread) {
-			strlcpy(thread->name, name, B_OS_NAME_LENGTH);
-		} else
-			status = B_BAD_THREAD_ID;
 
-		RELEASE_THREAD_LOCK();
-		restore_interrupts(state);
+	if (thread != NULL) {
+		strlcpy(thread->name, name, B_OS_NAME_LENGTH);
+		status = B_OK;
 	}
+
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(state);
 
 	return status;
 }
