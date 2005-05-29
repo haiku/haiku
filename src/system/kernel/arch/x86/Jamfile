@@ -5,8 +5,8 @@ SubDirHdrs [ FObjectsDir src system kernel ] ;
 
 KernelStaticLibrary libx86 :
 	arch_cpu.c
-	arch_dbg_console.c
 	arch_debug.c
+	arch_debug_console.c
 	arch_elf.c
 	arch_faults.c
 	arch_int.c
