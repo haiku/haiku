@@ -355,11 +355,14 @@ void Layer::ResizeBy(float dx, float dy)
 
 void Layer::MoveBy(float dx, float dy)
 {
-	fFrame.Set(fFrame.left+dx, fFrame.top+dy, fFrame.right+dx, fFrame.bottom+dy);
+	if (dx == 0.0f && dy == 0.0f)
+		return;
+
+//	fFrame.Set(fFrame.left+dx, fFrame.top+dy, fFrame.right+dx, fFrame.bottom+dy);
+	fFrame.OffsetBy(dx, dy);
 
 	// call hook function
-	if (dx != 0.0f || dy != 0.0f)
-		MovedByHook(dx, dy);
+	MovedByHook(dx, dy);
 
 	if (!IsVisuallyHidden() && GetRootLayer())
 	{

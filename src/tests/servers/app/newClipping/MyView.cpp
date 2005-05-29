@@ -15,6 +15,7 @@ MyView::MyView(BRect frame, const char *name, uint32 resizingMode, uint32 flags)
 	SetViewColor(B_TRANSPARENT_COLOR);
 	fTracking	= false;
 	fIsResize	= false;
+	fIs2ndButton= false;
 	fMovingLayer = NULL;
 
 	rgb_color	col;
@@ -49,27 +50,41 @@ Layer* MyView::FindLayer(Layer *lay, BPoint &where) const
 
 void MyView::MouseDown(BPoint where)
 {
-	fTracking = true;
 	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+	int32		buttons;
+	Looper()->CurrentMessage()->FindInt32("buttons", &buttons);
 	fLastPos = where;
-	fMovingLayer = FindLayer(topLayer, where);
-	if (fMovingLayer == topLayer)
-		fMovingLayer = NULL;
-	if (fMovingLayer)
+	if (buttons == B_PRIMARY_MOUSE_BUTTON)
 	{
-		BRect	bounds(fMovingLayer->Bounds());
-		fMovingLayer->ConvertToScreen2(&bounds);
-		BRect	resizeRect(bounds.right-10, bounds.bottom-10, bounds.right, bounds.bottom);
-		if (resizeRect.Contains(where))
-			fIsResize = true;
-		else
-			fIsResize = false;
+		fTracking = true;
+		fMovingLayer = FindLayer(topLayer, where);
+		if (fMovingLayer == topLayer)
+			fMovingLayer = NULL;
+		if (fMovingLayer)
+		{
+			BRect	bounds(fMovingLayer->Bounds());
+			fMovingLayer->ConvertToScreen2(&bounds);
+			BRect	resizeRect(bounds.right-10, bounds.bottom-10, bounds.right, bounds.bottom);
+			if (resizeRect.Contains(where))
+				fIsResize = true;
+			else
+				fIsResize = false;
+		}
+	}
+	else if (buttons == B_SECONDARY_MOUSE_BUTTON)
+	{
+		fIs2ndButton = true;
+	}
+	else if (buttons == B_TERTIARY_MOUSE_BUTTON)
+	{
+		DrawSubTree(topLayer);
 	}
 }
 
 void MyView::MouseUp(BPoint where)
 {
 	fTracking = false;
+	fIs2ndButton = false;
 	fMovingLayer = NULL;
 }
 
@@ -93,27 +108,67 @@ void MyView::MouseMoved(BPoint where, uint32 code, const BMessage *a_message)
 			}
 		}
 	}
+	else if (fIs2ndButton)
+	{
+		SetHighColor(0,0,0);
+		StrokeLine(fLastPos, where);
+		Flush();
+		fLastPos = where;
+	}
+}
+
+void MyView::MessageReceived(BMessage *msg)
+{
+	switch(msg->what)
+	{
+		case B_MOUSE_WHEEL_CHANGED:
+		{
+			float	dy;
+			msg->FindFloat("be:wheel_delta_y", &dy);
+
+			BPoint	pt;
+			uint32	buttons;
+			Layer	*lay;
+			GetMouse(&pt, &buttons, false);
+			if ((lay = FindLayer(topLayer, pt)))
+				lay->ScrollBy(0, dy*5);
+			break;
+		}
+		default:
+			BView::MessageReceived(msg);
+	}
 }
 
 void MyView::CopyRegion(BRegion *reg, float dx, float dy)
 {
 	// Yes... in this sandbox app, do a redraw.
+	reg->OffsetBy(dx, dy);
 wind->Lock();
 	ConstrainClippingRegion(reg);
+	PushState();
 	DrawSubTree(topLayer);
-	Flush();
+	PopState();
+	ConstrainClippingRegion(NULL);
 wind->Unlock();
 }
 
 void MyView::RequestRedraw()
 {
 	wind->Lock();
-	Invalidate();
+	ConstrainClippingRegion(&fRedrawReg);
+	PushState();
+	DrawSubTree(topLayer);
+	PopState();
+	ConstrainClippingRegion(NULL);
+
+	fRedrawReg.MakeEmpty();
+
 	wind->Unlock();
 }
 
 void MyView::Draw(BRect area)
 {
+/*
 	ConstrainClippingRegion(&fRedrawReg);
 //FillRect(Bounds());
 //Flush();
@@ -123,6 +178,7 @@ void MyView::Draw(BRect area)
 	PopState();
 	ConstrainClippingRegion(NULL);
 	fRedrawReg.MakeEmpty();
+*/
 }
 
 void MyView::DrawSubTree(Layer* lay)

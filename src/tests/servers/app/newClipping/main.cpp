@@ -66,6 +66,7 @@ clsMainWindow::clsMainWindow(const char *uWindowTitle)
 	wind = this;
 	fView = new MyView(Bounds(), "emu", B_FOLLOW_ALL, B_WILL_DRAW);
 	AddChild(fView);
+	fView->MakeFocus(true);
 }
 
 clsMainWindow::~clsMainWindow()
@@ -157,15 +158,13 @@ void clsMainWindow::test1()
 	wb2->GetWantedRegion(temp);
 	topLayer->RebuildVisibleRegions(temp, wb2);
 
-	wind->Lock();
-	fView->Invalidate();
-	wind->Unlock();
+	fView->RequestRedraw();
 
-	snooze(2000000);
+	snooze(1000000);
 
 	wb1->Hide();
 
-	snooze(2000000);
+	snooze(1000000);
 
 	wb1->Show();
 

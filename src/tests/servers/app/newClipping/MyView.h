@@ -14,6 +14,7 @@ public:
 	virtual void		MouseDown(BPoint where); 
 	virtual void		MouseUp(BPoint where); 
 	virtual void		MouseMoved(BPoint where, uint32 code, const BMessage *a_message);
+	virtual	void		MessageReceived(BMessage*);
 
 			void		CopyRegion(BRegion *reg, float dx, float dy);
 			void		RequestRedraw();			
@@ -29,4 +30,5 @@ private:
 			BPoint		fLastPos;
 			Layer		*fMovingLayer;
 			bool		fIsResize;
+			bool		fIs2ndButton;
 };
