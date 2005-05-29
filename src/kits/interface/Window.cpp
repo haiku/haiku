@@ -206,6 +206,17 @@ BWindow::BWindow(BMessage* data)
 }
 
 
+BWindow::BWindow(BRect frame, color_space depth,
+				uint32 bitmapFlags, int32 rowBytes)
+		:
+		BLooper("offscreen bitmap")
+{
+	// TODO: Implement for real
+	decomposeType(B_UNTYPED_WINDOW, &fLook, &fFeel);
+	InitData(frame, "offscreen", fLook, fFeel, 0, 0);
+}
+
+
 BWindow::~BWindow()
 {
 	// the following lines, remove all existing shortcuts and delete accelList

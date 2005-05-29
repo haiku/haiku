@@ -563,8 +563,6 @@ BView::ConvertFromScreen(BPoint *pt) const
 
 	do_owner_check_no_pick();
 
-	// TODO: I could be wrong, but shouldn't these
-	// be swapped ?
 	ConvertFromParent(pt);
 	parent->ConvertFromScreen(pt);
 }
@@ -609,7 +607,6 @@ BView::ConvertFromScreen(BRect *rect) const
 
 	do_owner_check_no_pick();
 
-	// TODO: See above
 	ConvertFromParent(rect);
 	parent->ConvertFromScreen(rect);
 }
@@ -1128,7 +1125,7 @@ BView::DragMessage(BMessage *message, BBitmap *image,
 	if (replyTo == NULL)
 		replyTo = this;
 
-	if (replyTo->Looper())
+	if (replyTo->Looper() == NULL)
 		debugger("DragMessage: warning - the Handler needs a looper");
 
 	do_owner_check_no_pick();

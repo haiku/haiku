@@ -2298,10 +2298,8 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 	// dependent on color space.
 
 	if (fInitError == B_OK) {
-		if (flags & B_BITMAP_ACCEPTS_VIEWS) {
-			// TODO: this probably needs to be a special kind of BWindow
-			fWindow = new BWindow(Bounds(), "offscreen window", B_UNTYPED_WINDOW, 0);	
-		}
+		if (flags & B_BITMAP_ACCEPTS_VIEWS)
+			fWindow = new BWindow(Bounds(), fColorSpace, flags, fBytesPerRow);
 	}
 }
 
