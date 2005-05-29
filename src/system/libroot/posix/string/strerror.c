@@ -464,23 +464,26 @@ char *
 strerror(int error)
 {
 	static char unknown[48];
-	const char *system;
 	uint32 i;
 
 	char *description = error_description(error);
 	if (description != NULL)
 		return description;
 
-	system = "";
-	for (i = 0; i < kNumErrorBases; i++) {
-		if (kErrorBases[i].base <= error
-			&& ((i + 1 < kNumErrorBases && kErrorBases[i + 1].base > error)
-				|| i + 1 == kNumErrorBases)) {
-			system = kErrorBases[i].name;
-			break;
+	if (error < B_OK) {
+		const char *system = "";
+		for (i = 0; i < kNumErrorBases; i++) {
+			if (kErrorBases[i].base <= error
+				&& ((i + 1 < kNumErrorBases && kErrorBases[i + 1].base > error)
+					|| i + 1 == kNumErrorBases)) {
+				system = kErrorBases[i].name;
+				break;
+			}
 		}
-	}
-	sprintf(unknown, "Unknown %sError (%d)", system, error);
+		sprintf(unknown, "Unknown %sError (%d)", system, error);
+	} else
+		sprintf(unknown, "No Error (%ld)", error);
+
 	return unknown;
 }
 
