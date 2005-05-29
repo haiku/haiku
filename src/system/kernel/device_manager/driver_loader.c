@@ -19,7 +19,7 @@
 #include <string.h>
 
 
-#define TRACE_DRIVER_LOADER
+//#define TRACE_DRIVER_LOADER
 #ifdef TRACE_DRIVER_LOADER
 #	define TRACE(x) dprintf x
 #else

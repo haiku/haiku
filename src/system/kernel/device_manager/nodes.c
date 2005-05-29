@@ -31,7 +31,7 @@
 #include <string.h>
 
 
-#define TRACE_NODES
+//#define TRACE_NODES
 #ifdef TRACE_NODES
 #	define TRACE(x) dprintf x
 #else

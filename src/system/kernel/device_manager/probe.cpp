@@ -31,7 +31,7 @@
 #include <string.h>
 
 
-#define TRACE_PROBE
+//#define TRACE_PROBE
 #ifdef TRACE_PROBE
 #	define TRACE(x) dprintf x
 #else
@@ -1120,8 +1120,10 @@ get_nodes_for_device_type(device_node_info *node, struct list *list, const char 
 	}
 
 	if (matches) {
+#ifdef TRACE_PROBE
 		dprintf("** NODE MATCHES TYPE %s\n", type);
 		dm_dump_node(node, 0);
+#endif
 		return add_device_node(list, node);
 	}
 

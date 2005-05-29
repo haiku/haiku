@@ -21,7 +21,7 @@
 #include <stdlib.h>
 
 
-#define TRACE_REGISTRATION
+//#define TRACE_REGISTRATION
 #ifdef TRACE_REGISTRATION
 #	define TRACE(x) dprintf x
 #else

@@ -26,7 +26,7 @@
 #include <stdlib.h>
 
 
-#define TRACE_SCAN
+//#define TRACE_SCAN
 #ifdef TRACE_SCAN
 #	define TRACE(x) dprintf x
 #else
