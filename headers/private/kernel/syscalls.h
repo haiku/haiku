@@ -268,7 +268,10 @@ int sys_socket(int family, int type, int proto);
 /* System informations */
 extern status_t		_kern_get_system_info(system_info *info, size_t size);
 
+/* Debug output */
 extern void			_kern_debug_output(const char *message);
+extern status_t		_kern_frame_buffer_update(addr_t baseAddress, int32 width,
+						int32 height, int32 depth, int32 bytesPerRow);
 
 /* messaging service */
 extern area_id		_kern_register_messaging_service(sem_id lockingSem,

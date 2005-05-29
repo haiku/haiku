@@ -193,6 +193,9 @@ console_get_size(int32 *_width, int32 *_height)
 static void
 console_move_cursor(int32 x, int32 y)
 {
+	if (!frame_buffer_console_available())
+		return;
+
 	draw_cursor(sConsole.cursor_x, sConsole.cursor_y);
 	draw_cursor(x, y);
 	
@@ -204,7 +207,8 @@ console_move_cursor(int32 x, int32 y)
 static void
 console_put_glyph(int32 x, int32 y, uint8 glyph, uint8 attr)
 {
-	if (x >= sConsole.columns || y >= sConsole.rows)
+	if (x >= sConsole.columns || y >= sConsole.rows
+		|| !frame_buffer_console_available())
 		return;
 
 	render_glyph(x, y, glyph, attr);
@@ -214,7 +218,8 @@ console_put_glyph(int32 x, int32 y, uint8 glyph, uint8 attr)
 static void
 console_fill_glyph(int32 x, int32 y, int32 width, int32 height, uint8 glyph, uint8 attr)
 {
-	if (x >= sConsole.columns || y >= sConsole.rows)
+	if (x >= sConsole.columns || y >= sConsole.rows
+		|| !frame_buffer_console_available())
 		return;
 
 	int32 left = x + width;
@@ -236,6 +241,9 @@ console_fill_glyph(int32 x, int32 y, int32 width, int32 height, uint8 glyph, uin
 static void
 console_blit(int32 srcx, int32 srcy, int32 width, int32 height, int32 destx, int32 desty)
 {
+	if (!frame_buffer_console_available())
+		return;
+
 	height *= CHAR_HEIGHT;
 	srcy *= CHAR_HEIGHT;
 	desty *= CHAR_HEIGHT;
@@ -261,6 +269,9 @@ console_blit(int32 srcx, int32 srcy, int32 width, int32 height, int32 destx, int
 static void
 console_clear(uint8 attr)
 {
+	if (!frame_buffer_console_available())
+		return;
+
 	switch (sConsole.bytes_per_pixel) {
 		case 1:
 			if (sConsole.depth >= 8) {
@@ -420,7 +431,7 @@ _user_frame_buffer_update(addr_t baseAddress, int32 width, int32 height,
 {
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
-	if (IS_USER_ADDRESS(baseAddress))
+	if (IS_USER_ADDRESS(baseAddress) && baseAddress != NULL)
 		return B_BAD_ADDRESS;
 
 	return frame_buffer_update(baseAddress, width, height, depth, bytesPerRow);

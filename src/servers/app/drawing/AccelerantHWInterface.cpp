@@ -42,6 +42,15 @@
 #	define ATRACE(x) ;
 #endif
 
+
+// This call updates the frame buffer used by the on-screen KDL
+#ifdef __HAIKU__
+extern "C" status_t _kern_frame_buffer_update(void *baseAddress,
+						int32 width, int32 height,
+						int32 depth, int32 bytesPerRow);
+#endif
+
+
 // constructor
 AccelerantHWInterface::AccelerantHWInterface()
 	:	HWInterface(),
@@ -357,6 +366,17 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 	fFrontBuffer->SetDisplayMode(fDisplayMode);
 	if (UpdateFrameBufferConfig() != B_OK)
 		return B_ERROR;
+
+	// Update the frame buffer used by the on-screen KDL
+#ifdef __HAIKU__
+	uint32 depth = (fFrameBufferConfig.bytes_per_row / fDisplayMode.virtual_width) << 3;
+	if (fDisplayMode.space == B_RGB15)
+		depth = 15;
+
+	_kern_frame_buffer_update(fFrameBufferConfig.frame_buffer,
+		fDisplayMode.virtual_width, fDisplayMode.virtual_height,
+		depth, fFrameBufferConfig.bytes_per_row);
+#endif
 
 	// update backbuffer if neccessary
 	if (!fBackBuffer || fBackBuffer->Width() != fDisplayMode.virtual_width

@@ -34,6 +34,7 @@
 #include <safemode.h>
 #include <arch/system_info.h>
 #include <messaging.h>
+#include <frame_buffer_console.h>
 
 #include <malloc.h>
 #include <string.h>
