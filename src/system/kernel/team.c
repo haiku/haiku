@@ -1173,7 +1173,7 @@ exec_team(int32 argCount, char **args, int32 envCount, char **env)
 	struct thread *thread;
 	thread_id nubThreadID = -1;
 
-	TRACE(("exec_team(path = \"%s\", argc = %ld, envCount = %ld)\n", args[0], argCount, envCount));
+	TRACE(("exec_team(path = \"%s\", argc = %ld, envCount = %ld): team %lx\n", args[0], argCount, envCount, team->id));
 
 	// switching the kernel at run time is probably not a good idea :)
 	if (team == team_get_kernel_team())
@@ -1301,7 +1301,7 @@ fork_team(void)
 	status_t status;
 	int32 cookie;
 
-	TRACE(("fork_team()\n"));
+	TRACE(("fork_team(): team %lx\n", parentTeam->id));
 
 	if (parentTeam == team_get_kernel_team())
 		return B_NOT_ALLOWED;

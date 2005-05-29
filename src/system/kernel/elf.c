@@ -546,7 +546,8 @@ elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *sym,
 			// it's undefined, must be outside this image, try the other image
 			sym2 = elf_find_symbol(shared_image, new_symname);
 			if (!sym2) {
-				dprintf("!sym2: elf_resolve_symbol: could not resolve symbol '%s'\n", new_symname);
+				dprintf("\"%s\": could not resolve symbol '%s'\n",
+					image->name, new_symname);
 				return B_MISSING_SYMBOL;
 			}
 
