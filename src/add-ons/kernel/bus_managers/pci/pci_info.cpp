@@ -150,7 +150,7 @@ print_info_basic(const pci_info *info, bool verbose)
 	TRACE(("PCI:   line_size %02x, latency %02x, header_type %02x, BIST %02x\n",
 			info->line_size, info->latency, info->header_type, info->bist));
 			
-	switch (info->header_type) {
+	switch (info->header_type & PCI_header_type_mask) {
 		case 0:
 			print_generic_info(info, verbose);
 			break;
