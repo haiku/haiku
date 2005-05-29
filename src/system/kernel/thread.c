@@ -174,7 +174,10 @@ create_thread_struct(const char *name, thread_id threadID)
 			return NULL;
 	}
 
-	strlcpy(t->name, name, B_OS_NAME_LENGTH);
+	if (name != NULL)
+		strlcpy(t->name, name, B_OS_NAME_LENGTH);
+	else
+		strcpy(t->name, "unnamed thread");
 
 	t->id = threadID >= 0 ? threadID : allocate_thread_id();
 	t->team = NULL;
@@ -328,6 +331,8 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 	status_t status;
 	bool abort = false;
 	bool debugNewThread = false;
+
+	TRACE(("create_thread(%s, id = %ld, %s)\n", name, threadID, kernel ? "kernel" : "user"));
 
 	t = create_thread_struct(name, threadID);
 	if (t == NULL)
@@ -1904,11 +1909,12 @@ _user_spawn_thread(int32 (*entry)(thread_func, void *), const char *userName, in
 	thread_id threadID;
 
 	if (!IS_USER_ADDRESS(entry) || entry == NULL
-		|| !IS_USER_ADDRESS(userName)
-		|| user_strlcpy(name, userName, B_OS_NAME_LENGTH) < B_OK)
+		|| (userName != NULL && (!IS_USER_ADDRESS(userName)
+			|| user_strlcpy(name, userName, B_OS_NAME_LENGTH) < B_OK)))
 		return B_BAD_ADDRESS;
 
-	threadID = create_thread(name, thread_get_current_thread()->team->id, entry,
+	threadID = create_thread(userName != NULL ? name : "user thread",
+		thread_get_current_thread()->team->id, entry,
 		data1, data2, priority, false, -1);
 
 	user_debug_thread_created(threadID);
