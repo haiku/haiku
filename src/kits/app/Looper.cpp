@@ -1146,8 +1146,10 @@ status_t BLooper::_LockComplete(BLooper* loop, int32 old, thread_id this_tid,
 	// What is this for?  Hope I'm not missing something conceptually here ...
 	return B_ERROR;
 }
-//------------------------------------------------------------------------------
-void BLooper::InitData()
+
+
+void
+BLooper::InitData()
 {
 	fOwner = B_ERROR;
 	fRunCalled = false;
@@ -1159,27 +1161,28 @@ void BLooper::InitData()
 	fTerminating = false;
 	fMsgPort = -1;
 
-	if (sTeamID == -1)
-	{
+	if (sTeamID == -1) {
 		thread_info info;
 		get_thread_info(find_thread(NULL), &info);
 		sTeamID = info.team;
 	}
-
 }
-//------------------------------------------------------------------------------
-void BLooper::InitData(const char* name, int32 priority, int32 port_capacity)
+
+
+void
+BLooper::InitData(const char *name, int32 priority, int32 portCapacity)
 {
 	InitData();
 
+	if (name == NULL)
+		name = "anonymous looper";
+
 	fLockSem = create_sem(1, name);
 
-	if (port_capacity <= 0)
-	{
-		port_capacity = B_LOOPER_PORT_DEFAULT_CAPACITY;
-	}
+	if (portCapacity <= 0)
+		portCapacity = B_LOOPER_PORT_DEFAULT_CAPACITY;
 
-	fMsgPort = create_port(port_capacity, name ? name : "LooperPort");
+	fMsgPort = create_port(portCapacity, name);
 
 	fInitPriority = priority;
 
@@ -1187,8 +1190,10 @@ void BLooper::InitData(const char* name, int32 priority, int32 port_capacity)
 	AddLooper(this);
 	AddHandler(this);
 }
-//------------------------------------------------------------------------------
-void BLooper::AddMessage(BMessage* msg)
+
+
+void
+BLooper::AddMessage(BMessage* msg)
 {
 	// NOTE: Why is this here?
 }
