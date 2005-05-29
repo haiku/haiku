@@ -1,3 +1,6 @@
+#serial_debug_output false
+	# enables serial debug output
+
 #serial_debug_port 0
 	# possible values: <num>|<port>
 	# serial interface number (as enumerated by the BIOS) or the
@@ -7,6 +10,13 @@
 #serial_debug_speed 115200
 	# possibe values: <9600|19200|38400|57600|115200>
 
+#syslog_debug_output false
+	# enables syslog debug output - all debug output is also sent to
+	# the syslog service
+
+#bluescreen false
+	# enables on-screen KDL
+
 #bochs_debug_output false
 	# Activates Bochs debug output if enabled in the kernel
 	# (available on x86 as a build option only)
@@ -14,3 +24,7 @@
 #qemu_single_step_hack false
 	# Activates a hack that allows single-stepping under qemu
 	# to work.
+
+#load_symbols false
+	# load kernel and kernel add-on symbols
+
