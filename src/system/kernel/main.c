@@ -15,7 +15,6 @@
 #include <console.h>
 #include <debug.h>
 #include <arch/faults.h>
-#include <arch/dbg_console.h>
 #include <ksyscalls.h>
 #include <vm.h>
 #include <timer.h>
