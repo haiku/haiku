@@ -28,7 +28,7 @@
  * A packet read from the mouse data port is composed of
  * three bytes:
  * byte 0: status byte, where
- * - bit 4: Y overflow (1 = true)
+ * - bit 7: Y overflow (1 = true)
  * - bit 6: X overflow (1 = true)
  * - bit 5: MSB of Y offset
  * - bit 4: MSB of X offset
