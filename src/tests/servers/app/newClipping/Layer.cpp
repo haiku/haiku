@@ -501,6 +501,7 @@ void Layer::rebuild_visible_regions(const BRegion &invalid,
 	// intersect maximum wanted region with the invalid region
 	BRegion common;
 	set_user_regions(common);
+
 	common.IntersectWith(&invalid);
 	// if the resulted region is not valid, this layer is not in the catchment area
 	// of the region being invalidated
@@ -514,6 +515,11 @@ void Layer::rebuild_visible_regions(const BRegion &invalid,
 	{
 		// we have something to include to our fullVisible. It may already be in
 		// there, but we'll never know.
+
+// TODO: further analyze the next 2 lines.
+		fFullVisible.Exclude(&invalid);
+		fVisible.Exclude(&invalid);
+
 		fFullVisible.Include(&common);
 	}
 	else
@@ -585,6 +591,8 @@ void Layer::clear_visible_regions()
 void Layer::PrintToStream() const
 {
 	printf("-> %s\n", fName);
+	fVisible.PrintToStream();
+	fFullVisible.PrintToStream();
 	for (Layer *child = VirtualBottomChild(); child;
 				child = VirtualUpperSibling())
 		child->PrintToStream();
