@@ -223,13 +223,6 @@ AddOnManager::RegisterAddOns()
 			fHandler->AddDirectory(&nref);
 		}
 	}
-
-	// ToDo: this is for our own convenience only, and should be removed
-	//	in the final release
-	if ((directory.SetTo("/boot/home/develop/openbeos/current/distro/x86.R1/beos/system/add-ons/media/plugins") == B_OK)
-		&& (directory.GetNodeRef(&nref) == B_OK)) {
-		fHandler->AddDirectory(&nref);
-	}
 }
 
 
