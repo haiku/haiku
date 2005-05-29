@@ -17,6 +17,9 @@
 
 #include <util/DoublyLinkedList.h>
 
+#define USE_BE_APPLICATION 0
+	// define this if the debug server should be a standard BApplication
+
 static const char *kSignature = "application/x-vnd.haiku-debug-server";
 
 // message what codes
@@ -94,7 +97,13 @@ private:
 };
 
 // DebugServer
-class DebugServer : public BApplication {
+class DebugServer 
+#if USE_BE_APPLICATION
+	: public BApplication
+#else
+	: public BLooper 
+#endif
+{
 public:
 	DebugServer(status_t &error);
 
@@ -203,6 +212,39 @@ ThreadDebugHandler::HandleMessage(DebugMessage *message)
 	// We just print the error and send a message to ourselves.
 	printf("debug_server: Thread %ld entered the debugger: %s\n", fThread,
 		buffer);
+
+// TODO: Temporary solution. Remove when attaching gdb is working.
+#if 1
+	// print a stacktrace
+	void *ip = NULL;
+	void *stackFrameAddress = NULL;
+	debug_context context;
+	status_t error = init_debug_context(&context,
+		message->Data().origin.nub_port);
+	
+	if (error == B_OK) {
+		error = debug_get_instruction_pointer(&context,
+			message->Data().origin.thread, &ip, &stackFrameAddress);
+	}
+
+	if (error == B_OK) {
+		printf("stack trace, current PC %p:\n", ip);
+
+		for (int32 i = 0; i < 50; i++) {
+			debug_stack_frame_info stackFrameInfo;
+
+			error = debug_get_stack_frame(&context, stackFrameAddress,
+				&stackFrameInfo);
+			if (error < B_OK || stackFrameInfo.parent_frame == NULL)
+				break;
+
+			printf("  (%p)  %p\n", stackFrameInfo.frame,
+				stackFrameInfo.return_address);
+			stackFrameAddress = stackFrameInfo.parent_frame;
+		}
+	}
+#endif
+
 	BMessage alertMessage(*fInvoker->Message());
 	alertMessage.AddInt32("which", 1);
 	fInvoker->Invoke(&alertMessage);
@@ -369,13 +411,20 @@ TeamDebugHandler::_DeleteThreadHandler(ThreadDebugHandler *handler)
 
 // constructor
 DebugServer::DebugServer(status_t &error)
+#if USE_BE_APPLICATION
 	: BApplication(kSignature, &error),
+#else
+	: BLooper(kSignature),
+#endif
 	  fListenerPort(-1),
 	  fListener(-1),
 	  fTerminating(false),
 	  fTeamDebugHandlers(),
 	  fDebugMessages()
 {
+#if !USE_BE_APPLICATION
+	error = B_OK;
+#endif
 }
 
 // Init
@@ -430,8 +479,13 @@ DebugServer::MessageReceived(BMessage *message)
 
 			delete message;
 		}
-	} else
+	} else {
+#if USE_BE_APPLICATION
 		BApplication::MessageReceived(message);
+#else
+		BLooper::MessageReceived(message);
+#endif
+	}
 }
 
 // EnterDebugger
@@ -446,10 +500,11 @@ DebugServer::EnterDebugger(TeamDebugHandler *handler)
 void
 DebugServer::KillTeam(TeamDebugHandler *handler)
 {
-
 	team_id team = handler->Team();
+	team_info info;
+	get_team_info(team, &info);
 
-	fprintf(stderr, "debug_server: Killing team %ld\n", team);
+	fprintf(stderr, "debug_server: Killing team %ld (%s)\n", team, info.args);
 
 	kill_team(team);
 
@@ -541,7 +596,6 @@ main()
 			strerror(error));
 		exit(1);
 	}
-
 	// init application
 	error = server.Init();
 	if (error != B_OK) {
@@ -552,5 +606,8 @@ main()
 
 	server.Run();
 
+#if !USE_BE_APPLICATION
+	wait_for_thread(server.Thread(), NULL);
+#endif
 	return 0;
 }

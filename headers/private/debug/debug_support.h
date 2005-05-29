@@ -32,6 +32,23 @@ ssize_t debug_read_memory(debug_context *context, const void *address,
 ssize_t debug_read_string(debug_context *context, const void *_address,
 			char *buffer, size_t size);
 
+status_t debug_get_cpu_state(debug_context *context, thread_id thread,
+			debug_debugger_message *messageCode, debug_cpu_state *cpuState);
+
+
+// stack trace support
+
+typedef struct debug_stack_frame_info {
+	void	*frame;
+	void	*parent_frame;
+	void	*return_address;
+} debug_stack_frame_info;
+
+status_t debug_get_instruction_pointer(debug_context *context, thread_id thread,
+			void **ip, void **stackFrameAddress);
+status_t debug_get_stack_frame(debug_context *context,
+			void *stackFrameAddress, debug_stack_frame_info *stackFrameInfo);
+
 
 #ifdef __cplusplus
 }	// extern "C"

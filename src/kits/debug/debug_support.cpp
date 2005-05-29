@@ -3,9 +3,13 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <string.h>
 
 #include <debug_support.h>
+
+#include "arch_debug_support.h"
+
 
 // init_debug_context
 status_t
@@ -179,3 +183,56 @@ debug_read_string(debug_context *context, const void *_address, char *buffer,
 	return sumRead;
 }
 
+
+status_t
+debug_get_cpu_state(debug_context *context, thread_id thread,
+	debug_debugger_message *messageCode, debug_cpu_state *cpuState)
+{
+	if (!context || !cpuState)
+		return B_BAD_VALUE;
+
+	// prepare message
+	debug_nub_get_cpu_state message;
+	message.reply_port = context->reply_port;
+	message.thread = thread;
+
+	// send message
+	debug_nub_get_cpu_state_reply reply;
+	status_t error = send_debug_message(context, B_DEBUG_MESSAGE_GET_CPU_STATE,
+		&message, sizeof(message), &reply, sizeof(reply));
+	if (error == B_OK)
+		error = reply.error;
+
+	// get state
+	if (error == B_OK) {
+		*cpuState = reply.cpu_state;
+		if (messageCode)
+			*messageCode = reply.message;
+	}
+
+	return error;
+}
+
+
+status_t
+debug_get_instruction_pointer(debug_context *context, thread_id thread,
+	void **ip, void **stackFrameAddress)
+{
+	if (!context || !ip || !stackFrameAddress)
+		return B_BAD_VALUE;
+
+	return arch_debug_get_instruction_pointer(context, thread, ip,
+		stackFrameAddress);
+}
+
+
+status_t
+debug_get_stack_frame(debug_context *context, void *stackFrameAddress,
+	debug_stack_frame_info *stackFrameInfo)
+{
+	if (!context || !stackFrameAddress || !stackFrameInfo)
+		return B_BAD_VALUE;
+
+	return arch_debug_get_stack_frame(context, stackFrameAddress,
+		stackFrameInfo);
+}

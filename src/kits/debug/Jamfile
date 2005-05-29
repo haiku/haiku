@@ -2,9 +2,14 @@ SubDir OBOS_TOP src kits debug ;
 
 UsePrivateHeaders debug ;
 UsePrivateHeaders shared ;
+SubDirHdrs [ FDirName $(SUBDIR) arch ] ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) arch $(OBOS_ARCH) ] ;
 
 SharedLibrary debug :
 	debug_support.cpp
+
+	arch_debug_support.cpp
 ;
 
 LinkSharedOSLibs libdebug.so :
