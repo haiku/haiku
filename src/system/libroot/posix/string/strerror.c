@@ -482,7 +482,7 @@ strerror(int error)
 		}
 		sprintf(unknown, "Unknown %sError (%d)", system, error);
 	} else
-		sprintf(unknown, "No Error (%ld)", error);
+		sprintf(unknown, "No Error (%d)", error);
 
 	return unknown;
 }
