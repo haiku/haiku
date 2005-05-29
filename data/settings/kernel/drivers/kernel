@@ -1,14 +1,16 @@
-#serial_debug_port <num>|<port>
+#serial_debug_port 0
+	# possible values: <num>|<port>
 	# serial interface number (as enumerated by the BIOS) or the
 	# base port of the serial interface to be used for kernel
 	# debug output and the kernel debugger
 
-#serial_debug_speed <9600|19200|38400|57600|115200>
+#serial_debug_speed 115200
+	# possibe values: <9600|19200|38400|57600|115200>
 
-#bochs_debug_output true
+#bochs_debug_output false
 	# Activates Bochs debug output if enabled in the kernel
 	# (available on x86 as a build option only)
 
-#qemu_single_step_hack true
+#qemu_single_step_hack false
 	# Activates a hack that allows single-stepping under qemu
 	# to work.
