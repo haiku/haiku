@@ -109,7 +109,7 @@ BEOS_BIN="touch sync ln listarea listattr listsem listport \
 	strace rmdir error ifconfig ping traceroute arp pppconfig \
 	ppp_up gdb tail zip unzip mountvolume top"
 
-BEOS_APPS="MiniTerminal People ShowImage Clock"
+BEOS_APPS="MiniTerminal People ShowImage Clock Pulse"
 BEOS_PREFERENCES="DataTranslations Mouse Keyboard Keymap Menu ScrollBar Sounds Media FileTypes"
 
 BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so libmedia.so libtracker.so \
@@ -357,8 +357,14 @@ $cp ${sPrefix}data/system/boot/Bootscript \
 $cp ${sPrefix}data/etc/profile ${sPrefix}data/etc/termcap $targetDir/beos/etc/
 $cp ${sPrefix}src/tests/kernel/boot_floppy/fortune/fortunes $targetDir/beos/etc/
 $cp -r ${sPrefix}distro/${arch}.R1/beos/etc $targetDir/beos/
+
 $cp ${sPrefix}data/settings/kernel/drivers/kernel \
 	$targetDir/home/config/settings/kernel/drivers/
+if [ -e data/settings/kernel/drivers/vesa ]; then
+	$cp ${sPrefix}data/settings/kernel/drivers/vesa \
+		$targetDir/home/config/settings/kernel/drivers/
+fi
+
 $ln -sf /boot/beos/etc/timezones/Europe/Paris \
 	$targetDir/home/config/settings/timezone
 $cp ${sPrefix}distro/${arch}.R1/beos/etc/Keymap/US-International \
@@ -470,6 +476,11 @@ echo "Installing fonts..."
 cd $sourceDir/distro/${arch}.R1/beos/etc/
 $cd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/etc/
 $cp -r ${sPrefix}fonts $targetDir/beos/etc/
+if [ -e /boot/beos/etc/fonts/ttfonts/Swiss721.ttf ]; then
+	$cp ${sPrefix}/boot/beos/etc/fonts/ttfonts/Courier10Pitch.ttf $targetDir/beos/etc/fonts/ttfonts/
+	$cp ${sPrefix}/boot/beos/etc/fonts/ttfonts/Swiss721_Bold.ttf $targetDir/beos/etc/fonts/ttfonts/
+	$cp ${sPrefix}/boot/beos/etc/fonts/ttfonts/Swiss721.ttf $targetDir/beos/etc/fonts/ttfonts/
+fi
 
 # install MIME database
 mimeDBSource=$sourceDir/src/data/beos_mime
@@ -524,6 +535,7 @@ sync
 
 if [ ! $alreadyMounted ]; then
 	echo Unmounting ...
+	$fsShellCommand sync
 	$fsShellCommand quit
 fi
 
