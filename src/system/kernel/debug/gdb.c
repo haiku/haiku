@@ -15,7 +15,7 @@
 #include <smp.h>
 #include <debug.h>
 #include <gdb.h>
-#include <arch/dbg_console.h>
+#include <arch/debug_console.h>
 
 
 enum { INIT = 0, CMDREAD, CKSUM1, CKSUM2, WAITACK, QUIT, GDBSTATES };
