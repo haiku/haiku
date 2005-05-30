@@ -31,6 +31,7 @@
 #include <MenuItem.h>
 #include <Path.h>
 #include <PropertyInfo.h>
+#include <Screen.h>
 #include <Window.h>
 
 #include <MenuWindow.h>
@@ -356,17 +357,16 @@ bool
 BMenu::AddList(BList *list, int32 index)
 {
 	// TODO: test this function, it's not documented in the bebook.
-	int32 numItems = 0;
-	if (list != NULL)
-		numItems = list->CountItems();
+	if (list == NULL)
+		return false;
 	
+	int32 numItems = list->CountItems();
 	for (int32 i = 0; i < numItems; i++) {
 		BMenuItem *item = static_cast<BMenuItem *>(list->ItemAt(i));
 		if (item != NULL)
 			_AddItem(item, index + i);
 	}	
 	
-	// TODO: return false if needed
 	return true;
 }
 
@@ -406,7 +406,7 @@ BMenu::RemoveItems(int32 index, int32 count, bool del)
 bool
 BMenu::RemoveItem(BMenu *submenu)
 {
-	for (int i = 0; i < fItems.CountItems(); i++)
+	for (int32 i = 0; i < fItems.CountItems(); i++)
 		if (static_cast<BMenuItem *>(fItems.ItemAt(i))->Submenu() == submenu)
 			return RemoveItems(i, 1, NULL, false);
 
@@ -501,22 +501,32 @@ BMenu::FindItem(uint32 command) const
 status_t 
 BMenu::SetTargetForItems(BHandler *handler)
 {
-	for (int32 i = 0; i < fItems.CountItems(); i++)
-		if (ItemAt(i)->SetTarget(handler) < B_OK)
-			return B_ERROR;
-
-	return B_OK;
+	// TODO: Test what beos returns here in
+	// case there are no items
+	status_t status = B_OK;
+	for (int32 i = 0; i < fItems.CountItems(); i++) {
+		status = ItemAt(i)->SetTarget(handler);
+		if (status < B_OK)
+			break;
+	}
+	
+	return status;
 }
 
 
 status_t
 BMenu::SetTargetForItems(BMessenger messenger)
 {
-	for (int32 i = 0; i < fItems.CountItems(); i++)
-		if (ItemAt(i)->SetTarget(messenger) < B_OK)
-			return B_ERROR;
+	// TODO: Test what beos returns here in
+	// case there are no items
+	status_t status = B_OK;
+	for (int32 i = 0; i < fItems.CountItems(); i++) {
+		status = ItemAt(i)->SetTarget(messenger);
+		if (status < B_OK)
+			break;
+	}
 
-	return B_OK;
+	return status;
 }
 
 
@@ -603,11 +613,14 @@ BMenu::MaxContentWidth() const
 BMenuItem *
 BMenu::FindMarked()
 {
-	for (int i = 0; i < fItems.CountItems(); i++)
-		if (((BMenuItem*)fItems.ItemAt(i))->IsMarked())
-			return (BMenuItem*)fItems.ItemAt(i);
+	BMenuItem *item = NULL;
+	for (int32 i = 0; i < fItems.CountItems(); i++) {
+		item = ItemAt(i);
+		if (item->IsMarked())
+			break;
+	}
 
-	return NULL;
+	return item;
 }
 
 
@@ -1102,14 +1115,9 @@ BMenu::_track(int *action, long start)
 					
 			item = HitTestItems(location, B_ORIGIN);
 						
-			// TODO: Sometimes the menu flickers a bit.
-			// try to be smarter and suggest an update area, 
-			// instead of invalidating the whole view.
 			if (item != NULL) {
-				if (item != fSelected) {
+				if (item != fSelected)
 					SelectItem(item);
-					Invalidate();
-				}
 				
 				int submenuAction = 0;
 				BMenuItem *submenuItem = NULL;	
@@ -1381,8 +1389,9 @@ void
 BMenu::DrawItems(BRect updateRect)
 {
 	for (int32 i = 0; i < fItems.CountItems(); i++) {
-		if (ItemAt(i)->Frame().Intersects(updateRect))
-			ItemAt(i)->Draw();			
+		BMenuItem *item = ItemAt(i);
+		if (item->Frame().Intersects(updateRect))
+			item->Draw();			
 	}
 }
 
@@ -1421,11 +1430,18 @@ BMenu::OverSuper(BPoint location)
 bool
 BMenu::OverSubmenu(BMenuItem *item, BPoint loc)
 {
-	// TODO: we assume that loc is in screen coords
-	if (!item->Submenu())
+	// we assume that loc is in screen coords
+	BMenu *subMenu = item->Submenu();
+	if (subMenu == NULL)
 		return false;
 	
-	return item->Submenu()->Window()->Frame().Contains(loc);
+	if (subMenu->Window()->Frame().Contains(loc))
+		return true;
+
+	if (subMenu->fSelected == NULL)
+		return false;
+
+	return subMenu->OverSubmenu(subMenu->fSelected, loc);
 }
 
 
@@ -1554,7 +1570,12 @@ BMenu::NextItem(BMenuItem *item, bool forward) const
 bool 
 BMenu::IsItemVisible(BMenuItem *item) const
 {
-	return false;
+	BRect itemFrame = item->Frame();
+	ConvertToScreen(&itemFrame);
+	
+	BRect visibilityFrame = Window()->Frame() & BScreen(Window()).Frame();
+		
+	return visibilityFrame.Intersects(itemFrame);
 }
 
 

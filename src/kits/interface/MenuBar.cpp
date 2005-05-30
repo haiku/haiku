@@ -395,13 +395,14 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 {
 	// TODO: This function is very incomplete and just partially working:
 	// For example, it doesn't respect the "sticky mode" setting.
-	// Cleanup
+	// Cleanup: We shouldn't use two nested loops. This simplifies the code
+	// but doesn't work well
 	BMenuItem *resultItem = NULL;
 	BWindow *window = Window();
 	int localAction;
 	bool exitLoop = false;
 	do {
-		if (window->LockLooperWithTimeout(200000) < B_OK)
+		if (window->LockWithTimeout(200000) < B_OK)
 			break;
 		
 		BPoint where;
@@ -432,7 +433,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 					
 					resultItem = menu->_track(&localAction, startIndex);
 					
-					if (window->LockLooperWithTimeout(200000) < B_OK)
+					if (window->LockWithTimeout(200000) < B_OK)
 						break;
 						
 					// the returned action is "5" when the BMenu is closed.
@@ -487,12 +488,10 @@ BMenuBar::RestoreFocus()
 		if (BPrivate::gDefaultTokens.GetToken(fPrevFocusToken, B_HANDLER_TOKEN,
 				(void **)&handler, NULL) == B_OK) {
 			BView *view = dynamic_cast<BView *>(handler);
-			// TODO: Are there other things to do in case the BHandler
-			// is not a BView ?
 			if (view != NULL)
 				view->MakeFocus();
 		}
-		fPrevFocusToken = NULL;
+		fPrevFocusToken = -1;
 		window->Unlock();
 	}
 }
