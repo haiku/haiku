@@ -1,0 +1,6 @@
+SubDir OBOS_TOP src bin playsound ;
+
+BinCommand playsound :
+	playsound.cpp
+	: be media
+;
