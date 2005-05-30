@@ -192,9 +192,10 @@ handle_keyboard_interrupt(void *data)
 		keyInfo.timestamp = system_time();
 		keyInfo.scancode = scancode;
 
-		while (packet_buffer_write(sKeyBuffer, (uint8 *)&keyInfo, sizeof(keyInfo)) == 0) {
-			// if there is no space left in the buffer, we start dropping old key strokes
-			packet_buffer_flush(sKeyBuffer, sizeof(keyInfo));
+		if (packet_buffer_write(sKeyBuffer, (uint8 *)&keyInfo, sizeof(keyInfo)) == 0) {
+			// If there is no space left in the buffer, we drop this key stroke. We avoid
+			// dropping old key strokes, to not destroy what already was typed.
+			return B_HANDLED_INTERRUPT;
 		}
 
 		release_sem_etc(sKeyboardSem, 1, B_DO_NOT_RESCHEDULE);
