@@ -238,8 +238,27 @@ ThreadDebugHandler::HandleMessage(DebugMessage *message)
 			if (error < B_OK || stackFrameInfo.parent_frame == NULL)
 				break;
 
-			printf("  (%p)  %p\n", stackFrameInfo.frame,
+			// find area containing the IP
+			team_id team = fTeamHandler->Team();
+			bool useAreaInfo = false;
+			area_info info;
+			int32 cookie = 0;
+			while (get_next_area_info(team, &cookie, &info) == B_OK) {
+				if ((addr_t)info.address <= (addr_t)stackFrameInfo.return_address
+					&& (addr_t)info.address + info.size > (addr_t)stackFrameInfo.return_address) {
+					useAreaInfo = true;
+					break;
+				}
+			}
+
+			printf("  (%p)  %p", stackFrameInfo.frame,
 				stackFrameInfo.return_address);
+			if (useAreaInfo) {
+				printf("  (%s + %#lx)\n", info.name,
+					(addr_t)stackFrameInfo.return_address - (addr_t)info.address);
+			} else
+				putchar('\n');
+
 			stackFrameAddress = stackFrameInfo.parent_frame;
 		}
 	}
