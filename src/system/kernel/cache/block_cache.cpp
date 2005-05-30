@@ -619,7 +619,7 @@ cache_abort_transaction(void *_cache, int32 id)
 			TRACE(("cache_abort_transaction(id = %ld): restored contents of block %Ld\n",
 				transaction->id, block->block_number));
 			memcpy(block->data, block->original, cache->block_size);
-			cache->allocator->Put(block->data);
+			cache->allocator->Put(block->original);
 			block->original = NULL;
 		}
 
