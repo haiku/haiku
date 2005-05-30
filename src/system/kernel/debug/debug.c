@@ -242,7 +242,8 @@ parse_line(char *buf, char **argv, int *argc, int max_args)
 static void
 kernel_debugger_loop(void)
 {
-	dprintf("Running on CPU %d\n", smp_get_current_cpu());
+	kprintf("Welcome to Kernel Debugging Land...\n");
+	kprintf("Running on CPU %d\n", smp_get_current_cpu());
 
 	sDebuggerOnCPU = smp_get_current_cpu();
 
@@ -494,8 +495,7 @@ panic(const char *format, ...)
 	vsnprintf(temp, sizeof(temp), format, args);
 	va_end(args);
 
-	dprintf("PANIC: %s", temp);
-	kernel_debugger(NULL);
+	kernel_debugger(temp);
 }
 
 
@@ -527,12 +527,9 @@ kernel_debugger(const char *message)
 		blue_screen_enter();
 	}
 
-	if (message) {
-		kprintf(message);
-		kprintf("\n");
-	}
+	if (message)
+		kprintf("PANIC: %s\n", message);
 
-	kprintf("Welcome to Kernel Debugging Land...\n");
 	kernel_debugger_loop();
 
 	sBlueScreenOutput = false;
