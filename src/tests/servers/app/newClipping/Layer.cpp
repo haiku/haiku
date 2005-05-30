@@ -493,7 +493,7 @@ void Layer::rebuild_visible_regions(const BRegion &invalid,
 
 	// no need to go deeper if the parent doesn't have a visible region anymore
 	// and our fullVisible region is also empty.
-	if (!parentLocalVisible.Frame().IsValid() && !fFullVisible.Frame().IsValid())
+	if (!parentLocalVisible.Frame().IsValid() && !(fFullVisible.CountRects() > 0))
 		return;
 
 	bool fullRebuild = false;
@@ -501,42 +501,22 @@ void Layer::rebuild_visible_regions(const BRegion &invalid,
 	// intersect maximum wanted region with the invalid region
 	BRegion common;
 	set_user_regions(common);
-
 	common.IntersectWith(&invalid);
+
 	// if the resulted region is not valid, this layer is not in the catchment area
 	// of the region being invalidated
-	if (!common.Frame().IsValid())
+	if (!common.CountRects() > 0)
 		return;
 
 	// now intersect with parent's visible part of the region that was/is invalidated
 	common.IntersectWith(&parentLocalVisible);
 
-	if (common.Frame().IsValid())
-	{
-		// we have something to include to our fullVisible. It may already be in
-		// there, but we'll never know.
+	// exclude the invalid region
+	fFullVisible.Exclude(&invalid);
+	fVisible.Exclude(&invalid);
 
-// TODO: further analyze the next 2 lines.
-		fFullVisible.Exclude(&invalid);
-		fVisible.Exclude(&invalid);
-
-		fFullVisible.Include(&common);
-	}
-	else
-	{
-		// this layer is in the catchment area of the region being invalidated,
-		// yet it will have no new visible area attached to it. It means
-		// this layer was overshaddowed by those above it and any visible area
-		// that it may have common with the region being invalidated, must be
-		// excluded from it's fFullVisible and fVisible regions.
-		fFullVisible.Exclude(&invalid);
-		fVisible.Exclude(&invalid);
-		// we don't return here becase we want the same thing to happen to all
-		// our children.
-
-		// Don't worry about the last line from this method, it will do nothing -
-		// common is invalid. Same goes for the last two in the 'for' statement below.
-	}
+	// put in what's really visible
+	fFullVisible.Include(&common);
 
 	// this is to allow a layer to hide some parts of itself so children
 	// won't take them.
@@ -553,8 +533,6 @@ void Layer::rebuild_visible_regions(const BRegion &invalid,
 
 		// to let children know much they can take from parent's visible region
 		common.Exclude(&lay->fFullVisible);
-		// all that a child took must be excluded from our visible region
-		fVisible.Exclude(&lay->fFullVisible);
 		// we've hidden some parts of our visible region from our children,
 		// and we must be in sysnc with this region too...
 		if (altered)
