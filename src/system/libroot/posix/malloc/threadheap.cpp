@@ -44,6 +44,13 @@ threadHeap::threadHeap(void)
 void *
 threadHeap::malloc(const size_t size)
 {
+#if MAX_INTERNAL_FRAGMENTATION == 2
+	if (size > 1063315264UL) {
+		debug_printf("malloc() of %lu bytes asked\n", size);
+		return NULL;
+	}
+#endif
+
 	const int sizeclass = sizeClass(size);
 	block *b = NULL;
 
@@ -54,7 +61,6 @@ threadHeap::malloc(const size_t size)
 	// superblock list.
 
 	superblock *sb = findAvailableSuperblock(sizeclass, b, _pHeap);
-
 	if (sb == NULL) {
 		// We don't have memory locally.
 		// Try to get more from the process heap.
