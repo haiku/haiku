@@ -548,16 +548,20 @@ status_t nv_acc_init_dma()
 		ACCW(NV10_ACC_STAT, 0xffffffff);
 		/* enable acceleration engine command FIFO */
 		ACCW(FIFO_EN, 0x00000001);
-		/* setup surface type */
+		/* setup surface type:
+		 * b1-0 = %01 = surface type is non-swizzle;
+		 * this is needed to enable 3D on NV1x (confirmed) and maybe others? */
 		ACCW(NV10_SURF_TYP, ((ACCR(NV10_SURF_TYP)) & 0x0007ff00));
-		ACCW(NV10_SURF_TYP, ((ACCR(NV10_SURF_TYP)) | 0x00020100));
+		ACCW(NV10_SURF_TYP, ((ACCR(NV10_SURF_TYP)) | 0x00020101));
 	}
 
 	if (si->ps.card_arch == NV10A)
 	{
 		/* init some function blocks */
 		ACCW(DEBUG1, 0x00118700);
-		ACCW(DEBUG2, 0x24e00810);
+		/* DEBUG2 has a big influence on 3D speed! */
+		//fixme? 3D test: was 0x24e00810, which is very slow on NV15 (confirmed)
+		ACCW(DEBUG2, 0x24f82ad9);
 		ACCW(DEBUG3, 0x55de0030);
 
 		/* copy tile setup stuff from 'source' to acc engine */
@@ -1080,16 +1084,19 @@ static void nv_init_for_3D_dma(void)
 		ACCW(WINCLIP_V_6, 0x07ff0800);
 		ACCW(WINCLIP_V_7, 0x07ff0800);
 
-		/* setup (initialize) pipe */
+		/* setup (initialize) pipe:
+		 * needed to get valid 3D rendering on (at least) NV1x cards. Without this
+		 * those cards produce rubbish instead of 3D, although the engine itself keeps
+		 * running and 2D stays OK. */
+
 		/* set eyetype to local, lightning etc. is off */
-//		ACCW(NV10_XFMOD0, 0x10000000);
+		ACCW(NV10_XFMOD0, 0x10000000);
 		/* disable all lights */
-//		ACCW(NV10_XFMOD1, 0x00000000);
+		ACCW(NV10_XFMOD1, 0x00000000);
 
 		/* note: upon writing data into the PIPEDAT register, the PIPEADR is
 		 * probably auto-incremented! */
 		/* (pipe adress = b2-16, pipe data = b0-31) */
-/*
 		ACCW(NV10_PIPEADR, 0x00006740);
 		ACCW(NV10_PIPEDAT, 0x00000000);
 		ACCW(NV10_PIPEDAT, 0x00000000);
@@ -1223,7 +1230,7 @@ static void nv_init_for_3D_dma(void)
 		ACCW(NV10_PIPEDAT, 0x00000000);
 		ACCW(NV10_PIPEDAT, 0x00000000);
 		ACCW(NV10_PIPEDAT, 0x00000000);
-*/
+
 		/* turn lightning on */
 		ACCW(NV10_XFMOD0, 0x30000000);
 		/* set light 1 to infinite type, other lights remain off */
