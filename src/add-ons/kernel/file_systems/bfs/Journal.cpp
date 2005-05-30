@@ -236,8 +236,11 @@ Journal::WriteLogEntry()
 	}
 
 	sorted_array *array = fArray.Array();
-	if (array == NULL || array->count == 0)
+	if (array == NULL || array->count == 0) {
+		// nothing has changed during this transaction
+		cache_end_transaction(fVolume->BlockCache(), fTransactionID, NULL, NULL);
 		return B_OK;
+	}
 
 	// Make sure there is enough space in the log.
 	// If that fails for whatever reason, panic!
@@ -350,8 +353,10 @@ Journal::FlushLogAndBlocks()
 status_t
 Journal::Lock(Transaction *owner)
 {
-	if (owner == fOwner)
+	if (owner == fOwner) {
+		dprintf("bfs(%ld): journal is already locked by caller\n", find_thread(NULL));
 		return B_OK;
+	}
 
 	status_t status = fLock.Lock();
 	if (status == B_OK)
@@ -376,8 +381,10 @@ Journal::Lock(Transaction *owner)
 void
 Journal::Unlock(Transaction *owner, bool success)
 {
-	if (owner != fOwner)
+	if (owner != fOwner) {
+		dprintf("bfs(%ld): journal is not owned by caller\n", find_thread(NULL));
 		return;
+	}
 
 	TransactionDone(success);
 
