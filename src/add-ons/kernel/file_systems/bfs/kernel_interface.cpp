@@ -298,9 +298,13 @@ bfs_release_vnode(void *_ns, void *_node, bool reenter)
 	// we need to take care about their preallocated blocks here
 	if (inode->NeedsTrimming()) {
 		Transaction transaction(volume, inode->BlockNumber());
-		
+
 		if (inode->TrimPreallocation(transaction) == B_OK)
 			transaction.Done();
+		else if (transaction.HasParent()) {
+			// ToDo: for now, we don't let sub-transactions fail
+			transaction.Done();
+		}
 	}
 
 	delete inode;
@@ -332,23 +336,16 @@ bfs_remove_vnode(void *_ns, void *_node, bool reenter)
 	// If the inode isn't in use anymore, we were called before
 	// bfs_unlink() returns - in this case, we can just use the
 	// transaction which has already deleted the inode.
-	Transaction localTransaction, *transaction = NULL;
+	Transaction transaction(volume, volume->ToBlock(inode->Parent()));
 
-	Journal *journal = volume->GetJournal(volume->ToBlock(inode->Parent()));
-	if (journal != NULL)
-		transaction = journal->CurrentTransaction();
-
-	if (transaction == NULL) {
-		transaction = &localTransaction;
-		localTransaction.Start(volume, inode->BlockNumber());
-	}
-
-	status_t status = inode->Free(*transaction);
+	status_t status = inode->Free(transaction);
 	if (status == B_OK) {
-		if (transaction == &localTransaction)
-			localTransaction.Done();
+		transaction.Done();
 
 		delete inode;
+	} else if (transaction.HasParent()) {
+		// ToDo: for now, we don't let sub-transactions fail
+		transaction.Done();
 	}
 
 	return status;
@@ -489,7 +486,7 @@ bfs_lookup(void *_ns, void *_directory, const char *file, vnode_id *_vnodeID, in
 		RETURN_ERROR(B_BAD_VALUE);
 
 	if ((status = tree->Find((uint8 *)file, (uint16)strlen(file), _vnodeID)) < B_OK) {
-		PRINT(("bfs_walk() could not find %Ld:\"%s\": %s\n", directory->BlockNumber(), file, strerror(status)));
+		//PRINT(("bfs_walk() could not find %Ld:\"%s\": %s\n", directory->BlockNumber(), file, strerror(status)));
 		return status;
 	}
 
@@ -1303,7 +1300,7 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 static status_t
 bfs_access(void *_ns, void *_node, int accessMode)
 {
-	FUNCTION();
+	//FUNCTION();
 	
 	if (_ns == NULL || _node == NULL)
 		return B_BAD_VALUE;

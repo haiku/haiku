@@ -1,6 +1,6 @@
 /* Journal - transaction and logging
  *
- * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef JOURNAL_H
@@ -56,7 +56,7 @@ class Journal {
 		status_t WriteLogEntry();
 		status_t LogBlocks(off_t blockNumber, const uint8 *buffer, size_t numBlocks);
 
-		Transaction *CurrentTransaction();
+		Transaction *CurrentTransaction() const { return fOwner; }
 		uint32 TransactionSize() const { return fArray.CountItems() + fArray.BlocksUsed(); }
 
 		status_t FlushLogAndBlocks();
@@ -137,12 +137,22 @@ class Transaction {
 			fJournal = NULL;
 		}
 
+		bool HasParent()
+		{
+			if (fJournal != NULL)
+				return fJournal->CurrentTransaction() == this;
+
+			return false;
+		}
+
 		status_t WriteBlocks(off_t blockNumber, const uint8 *buffer, size_t numBlocks = 1)
 		{
 			if (fJournal == NULL)
 				return B_NO_INIT;
 
 			// ToDo: implement this properly!
+			// Currently only used in BlockAllocator::StopChecking(), 
+			// so chkbfs won't work correctly
 #if 0
 			return fJournal->LogBlocks(blockNumber, buffer, numBlocks);
 #endif

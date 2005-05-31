@@ -1,6 +1,6 @@
 /* Journal - transaction and logging
  *
- * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -338,7 +338,7 @@ Journal::FlushLogAndBlocks()
 
 	// write the current log entry to disk
 
-	if (TransactionSize() != 0) {
+	if (fTransactionID != -1 && TransactionSize() != 0) {
 		status = WriteLogEntry();
 		if (status < B_OK)
 			FATAL(("writing current log entry failed: %s\n", strerror(status)));
@@ -353,20 +353,22 @@ Journal::FlushLogAndBlocks()
 status_t
 Journal::Lock(Transaction *owner)
 {
-	if (owner == fOwner) {
-		dprintf("bfs(%ld): journal is already locked by caller\n", find_thread(NULL));
-		return B_OK;
-	}
-
 	status_t status = fLock.Lock();
-	if (status == B_OK)
-		fOwner = owner;
+	if (status != B_OK)
+		return status;
 
 /*	ToDo:
 	// if the last transaction is older than 2 secs, start a new one
 	if (fTransactionsInEntry != 0 && system_time() - fTimestamp > 2000000L)
 		WriteLogEntry();
 */
+
+	if (fLock.OwnerCount() > 1) {
+		// we'll just use the current transaction again
+		return B_OK;
+	}
+
+	fOwner = owner;
 
 	fTransactionID = cache_start_transaction(fVolume->BlockCache());
 	if (fTransactionID < B_OK) {
@@ -381,34 +383,17 @@ Journal::Lock(Transaction *owner)
 void
 Journal::Unlock(Transaction *owner, bool success)
 {
-	if (owner != fOwner) {
-		dprintf("bfs(%ld): journal is not owned by caller\n", find_thread(NULL));
-		return;
+	if (fLock.OwnerCount() == 1) {
+		// we only end the transaction if we would really unlock it
+		// ToDo: what about failing transactions that do not unlock?
+		TransactionDone(success);
+
+		fTransactionID = -1;
+		fTimestamp = system_time();
+		fOwner = NULL;
 	}
 
-	TransactionDone(success);
-
-	fTransactionID = -1;
-	fTimestamp = system_time();
-	fOwner = NULL;
 	fLock.Unlock();
-}
-
-
-/** If there is a current transaction that the current thread has
- *	started, this function will give you access to it.
- */
-
-Transaction *
-Journal::CurrentTransaction()
-{
-	if (fLock.LockWithTimeout(0) != B_OK)
-		return NULL;
-
-	Transaction *owner = fOwner;
-	fLock.Unlock();
-
-	return owner;
 }
 
 
@@ -416,6 +401,7 @@ status_t
 Journal::TransactionDone(bool success)
 {
 	if (!success) {
+		fArray.MakeEmpty();
 		cache_abort_transaction(fVolume->BlockCache(), fTransactionID);
 		return B_OK;
 	}

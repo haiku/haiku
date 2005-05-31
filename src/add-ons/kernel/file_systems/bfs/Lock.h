@@ -180,6 +180,9 @@ class RecursiveLock {
 			return B_OK;
 		}
 
+		thread_id Owner() const { return fOwner; }
+		int32 OwnerCount() const { return fOwnerCount; }
+
 	private:
 		sem_id	fSemaphore;
 #ifdef USE_BENAPHORE
