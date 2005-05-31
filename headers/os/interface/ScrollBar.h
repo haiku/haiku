@@ -103,8 +103,9 @@ virtual status_t	GetSupportedSuites(BMessage *data);
 virtual status_t	Perform(perform_code d, void *arg);
 
 private:
+		class Private;
 		friend class BScrollArrowButton;
-		friend class BScrollBarPrivateData;
+		friend class Private;
 		friend status_t control_scrollbar(scroll_bar_info *info, BScrollBar *bar);		// for use within the preflet
 		friend status_t scroll_by_value(float valueByWhichToScroll, BScrollBar *bar);	// for use here within the IK
 virtual	void		_ReservedScrollBar1();
@@ -126,7 +127,7 @@ virtual	void		_ReservedScrollBar4();
 		orientation	fOrientation;
 		char		*fTargetName;
 
-		BScrollBarPrivateData *privatedata;
+		Private *fPrivateData;
 
 		uint32		_reserved[3];
 };
