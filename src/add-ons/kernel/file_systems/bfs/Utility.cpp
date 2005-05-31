@@ -1,8 +1,8 @@
 /* Utility - some helper classes
-**
-** Initial version by Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the OpenBeOS License.
-*/
+ *
+ * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ */
 
 
 #include "Utility.h"
@@ -85,8 +85,7 @@ BlockArray::BlockArray(int32 blockSize)
 
 BlockArray::~BlockArray()
 {
-	if (fArray)
-		free(fArray);
+	free(fArray);
 }
 
 
@@ -134,7 +133,8 @@ BlockArray::Remove(off_t value)
 void 
 BlockArray::MakeEmpty()
 {
-	fArray->count = 0;
+	if (fArray != NULL)
+		fArray->count = 0;
 }
 
 
