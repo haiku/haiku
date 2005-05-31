@@ -93,6 +93,7 @@ copy_environ_to_heap_if_needed(void)
 	newEnv[i] = NULL;
 		// null terminate the array
 
+	environ = newEnv;
 	sCopied = true;
 	return B_OK;
 }
