@@ -93,7 +93,7 @@ write_to_buffer(struct ring_buffer *buffer, const uint8 *data, ssize_t length,
 	ssize_t bytesWritten = length;
 	int32 position = buffer->first + buffer->in;
 
-	if (position + length < buffer->size) {
+	if (position + length <= buffer->size) {
 		// simple copy
 		if (user) {
 			if (user_memcpy(buffer->buffer + position, data, length) < B_OK)
