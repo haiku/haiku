@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2002 OpenBeOS
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -25,20 +25,19 @@
 //	Description:	Client-side class for scrolling
 //
 //------------------------------------------------------------------------------
-
 #include <Message.h>
-#include <Rect.h>
-#include <stdio.h>
-#include <string.h>
 #include <OS.h>
+#include <ScrollBar.h>
 #include <Window.h>
-#include "ScrollBar.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 //#define TEST_MODE
 
-typedef enum
-{
-	ARROW_LEFT=0,
+typedef enum {
+	ARROW_LEFT = 0,
 	ARROW_RIGHT,
 	ARROW_UP,
 	ARROW_DOWN,
@@ -62,189 +61,199 @@ typedef enum
 
 // Because the R5 version kept a lot of data on server-side, we need to kludge our way
 // into binary compatibility
-class BScrollBarPrivateData
-{
+class BScrollBar::Private {
 public:
-	BScrollBarPrivateData(void)
+	Private()
+		:
+		fEnabled(true),
+		fRepeaterThread(-1),
+		fExitRepeater(false),
+		fTracking(false),
+		fThumbInc(1),
+		fArrowDown(ARROW_NONE),
+		fButtonDown(NOARROW)		
 	{
-		thumbframe.Set(0,0,B_V_SCROLL_BAR_WIDTH,B_H_SCROLL_BAR_HEIGHT);
-		enabled=true;
-		tracking=false;
-		mousept.Set(0,0);
-		thumbinc=1.0;
-		repeaterid=-1;
-		exit_repeater=false;
-		arrowdown=ARROW_NONE;
-		buttondown=NOARROW;
+		fThumbFrame.Set(0, 0, B_V_SCROLL_BAR_WIDTH, B_H_SCROLL_BAR_HEIGHT);
+		fMousePos.Set(0,0);
 		
 		#ifdef TEST_MODE
-			sbinfo.proportional=true;
-			sbinfo.double_arrows=false;
-			sbinfo.knob=0;
-			sbinfo.min_knob_size=14;
+			fScrollBarInfo.proportional = true;
+			fScrollBarInfo.double_arrows = false;
+			fScrollBarInfo.knob = 0;
+			fScrollBarInfo.min_knob_size = 14;
 		#else
-			get_scroll_bar_info(&sbinfo);
+			get_scroll_bar_info(&fScrollBarInfo);
 		#endif
 	}
 	
-	~BScrollBarPrivateData(void)
+	~Private()
 	{
-		if(repeaterid!=-1)
-		{
-			exit_repeater=false;
-			kill_thread(repeaterid);
+		if (fRepeaterThread >= 0) {
+			status_t dummy;
+			fExitRepeater = true;
+			wait_for_thread(fRepeaterThread, &dummy);
 		}
 	}
+	
 	void DrawScrollBarButton(BScrollBar *owner, arrow_direction direction, 
-		const BPoint &offset, bool down=false);
+		const BPoint &offset, bool down = false);
+	
 	static int32 ButtonRepeaterThread(void *data);
 	
+	bool fEnabled;
 	
-	thread_id repeaterid;
-	scroll_bar_info sbinfo;
-	BRect thumbframe;
-	bool enabled;
-	bool tracking;
-	BPoint mousept;
-	float thumbinc;
-	bool exit_repeater;
-	arrow_direction arrowdown;
-	int8 buttondown;
+	// TODO: This should be a static, initialized by 
+	// _init_interface_kit() at application startup-time,
+	// like BMenu::sMenuInfo
+	scroll_bar_info fScrollBarInfo;
+	
+	thread_id fRepeaterThread;
+	bool fExitRepeater;
+	
+	BRect fThumbFrame;
+	bool fTracking;
+	BPoint fMousePos;
+	float fThumbInc;
+	
+	arrow_direction fArrowDown;
+	int8 fButtonDown;
 };
+
 
 // This thread is spawned when a button is initially pushed and repeatedly scrolls
 // the scrollbar by a little bit after a short delay
-int32 BScrollBarPrivateData::ButtonRepeaterThread(void *data)
+int32
+BScrollBar::Private::ButtonRepeaterThread(void *data)
 {
-	BScrollBar *sb=(BScrollBar *)data;
-	BRect oldframe(sb->privatedata->thumbframe);
-//	BRect update(sb->privatedata->thumbframe);
+	BScrollBar *scrollBar = static_cast<BScrollBar *>(data);
+	BRect oldframe(scrollBar->fPrivateData->fThumbFrame);
+//	BRect update(sb->fPrivateData->fThumbFrame);
 	
 	snooze(250000);
 	
-	bool exitval=false;
+	bool exitval = false;
 	status_t returnval;
 	
-	sb->Window()->Lock();
-	exitval=sb->privatedata->exit_repeater;
-	sb->Window()->Unlock();
+	scrollBar->Window()->Lock();
+	exitval = scrollBar->fPrivateData->fExitRepeater;
+	scrollBar->Window()->Unlock();
 	
-	float scrollvalue=0;
+	float scrollvalue = 0;
 
-	if(sb->privatedata->arrowdown==ARROW_LEFT || sb->privatedata->arrowdown==ARROW_UP)
-		scrollvalue=-sb->fSmallStep;
+	if (scrollBar->fPrivateData->fArrowDown == ARROW_LEFT
+		|| scrollBar->fPrivateData->fArrowDown == ARROW_UP)
+		scrollvalue = -scrollBar->fSmallStep;
+	else if (scrollBar->fPrivateData->fArrowDown != ARROW_NONE)
+		scrollvalue = scrollBar->fSmallStep;
 	else
-	if(sb->privatedata->arrowdown!=ARROW_NONE)
-		scrollvalue=sb->fSmallStep;
-	else
-		exitval=true;
+		exitval = true;
 	
-	while(!exitval)
-	{
-		oldframe=sb->privatedata->thumbframe;
+	while (!exitval) {
+		oldframe = scrollBar->fPrivateData->fThumbFrame;
 		
-		returnval = scroll_by_value(scrollvalue, sb);
+		returnval = scroll_by_value(scrollvalue, scrollBar);
 
 		snooze(50000);
 		
-		sb->Window()->Lock();
-		exitval=sb->privatedata->exit_repeater;
+		scrollBar->Window()->Lock();
+		exitval=scrollBar->fPrivateData->fExitRepeater;
 
-		if(returnval==B_OK)
-		{
-			sb->CopyBits(oldframe,sb->privatedata->thumbframe);
+		if (returnval == B_OK) {
+			scrollBar->CopyBits(oldframe,scrollBar->fPrivateData->fThumbFrame);
 
 			// TODO: Redraw the old area here
 			
-			sb->ValueChanged(sb->fValue);
+			scrollBar->ValueChanged(scrollBar->fValue);
 		}
-		sb->Window()->Unlock();
+		scrollBar->Window()->Unlock();
 	}
 
-	sb->Window()->Lock();
-	sb->privatedata->exit_repeater=false;
-	sb->privatedata->repeaterid=-1;
-	sb->Window()->Unlock();
+	scrollBar->Window()->Lock();
+	scrollBar->fPrivateData->fExitRepeater = false;
+	scrollBar->fPrivateData->fRepeaterThread = -1;
+	scrollBar->Window()->Unlock();
+	
 	return 0;
-	exit_thread(0);
 }
+
 
 BScrollBar::BScrollBar(BRect frame,const char *name,BView *target,float min,
 		float max,orientation direction)
- : BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW)
+ : BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW),
+ 	fMin(min),
+	fMax(max),
+	fSmallStep(1),
+	fLargeStep(10),
+	fValue(0),
+	fTarget(target),
+	fOrientation(direction)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	fMin=min;
-	fMax=max;
-	fOrientation=direction;
-	fValue=0;
-	fSmallStep=1.0;
-	fLargeStep=10.0;
-	fTarget=target;
-	privatedata=new BScrollBarPrivateData;
+	
+	fPrivateData = new BScrollBar::Private;
 
-	if(fTarget)
-	{
-		fTargetName=new char[strlen(fTarget->Name()+1)];
-		strcpy(fTargetName,target->Name());
-
+	if (fTarget) {
+		fTargetName = strdup(fTarget->Name());
+		
 		// TODO: theoretically, we should also set the target BView's scrollbar
 		// pointer here
 	}
 	else
 		fTargetName=NULL;
 	
-	if(direction==B_VERTICAL)
-	{
-		if(frame.Width()>B_V_SCROLL_BAR_WIDTH)
-			ResizeTo(B_V_SCROLL_BAR_WIDTH,frame.Height()+1);
+	if (direction == B_VERTICAL) {
+		if (frame.Width() > B_V_SCROLL_BAR_WIDTH)
+			ResizeTo(B_V_SCROLL_BAR_WIDTH, frame.Height() + 1);
 
-		privatedata->thumbframe.bottom=privatedata->sbinfo.min_knob_size;
-		if(privatedata->sbinfo.double_arrows)
-			privatedata->thumbframe.OffsetBy(0,(B_H_SCROLL_BAR_HEIGHT+1)*2);
+		fPrivateData->fThumbFrame.bottom = fPrivateData->fScrollBarInfo.min_knob_size;
+		if (fPrivateData->fScrollBarInfo.double_arrows)
+			fPrivateData->fThumbFrame.OffsetBy(0, (B_H_SCROLL_BAR_HEIGHT + 1) * 2);
 		else
-			privatedata->thumbframe.OffsetBy(0,B_H_SCROLL_BAR_HEIGHT+1);
-	}
-	else
-	{
-		if(frame.Height()>B_H_SCROLL_BAR_HEIGHT)
-			ResizeTo(frame.Width()+1,B_H_SCROLL_BAR_HEIGHT);
+			fPrivateData->fThumbFrame.OffsetBy(0, B_H_SCROLL_BAR_HEIGHT + 1);
+	} else {
+		if (frame.Height() > B_H_SCROLL_BAR_HEIGHT)
+			ResizeTo(frame.Width() + 1, B_H_SCROLL_BAR_HEIGHT);
 
-		privatedata->thumbframe.right=privatedata->sbinfo.min_knob_size;
-		if(privatedata->sbinfo.double_arrows)
-			privatedata->thumbframe.OffsetBy((B_V_SCROLL_BAR_WIDTH+1)*2,0);
+		fPrivateData->fThumbFrame.right = fPrivateData->fScrollBarInfo.min_knob_size;
+		if (fPrivateData->fScrollBarInfo.double_arrows)
+			fPrivateData->fThumbFrame.OffsetBy((B_V_SCROLL_BAR_WIDTH + 1) * 2, 0);
 		else
-			privatedata->thumbframe.OffsetBy(B_V_SCROLL_BAR_WIDTH+1,0);
+			fPrivateData->fThumbFrame.OffsetBy(B_V_SCROLL_BAR_WIDTH + 1, 0);
 	}
 	
 	
-	SetResizingMode( (direction==B_VERTICAL)?
+	SetResizingMode((direction == B_VERTICAL) ?
 		B_FOLLOW_TOP_BOTTOM | B_FOLLOW_RIGHT : 
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM );
 	
 }
+
 
 BScrollBar::BScrollBar(BMessage *data)
  : BView(data)
 {
 }
 
+
 BScrollBar::~BScrollBar()
 {
-	delete privatedata;
-	if(fTargetName)
-		delete fTargetName;
+	delete fPrivateData;
+	free(fTargetName);
 
 	// TODO: Disconnect from target
 }
 
-BArchivable *BScrollBar::Instantiate(BMessage *data)
+
+BArchivable *
+BScrollBar::Instantiate(BMessage *data)
 {
 	// TODO: Implement
 	return NULL;
 }
 
-status_t BScrollBar::Archive(BMessage *data, bool deep) const
+
+status_t
+BScrollBar::Archive(BMessage *data, bool deep) const
 {
 	BView::Archive(data,deep);
 	data->AddFloat("_range",fMin);
@@ -258,41 +267,53 @@ status_t BScrollBar::Archive(BMessage *data, bool deep) const
 	return B_OK;
 }
 
-void BScrollBar::AttachedToWindow()
+
+void
+BScrollBar::AttachedToWindow()
 {
 	// R5's SB contacts the server if fValue!=0. I *think* we don't need to do anything here...
 }
 
-void BScrollBar::SetValue(float value)
+
+void
+BScrollBar::SetValue(float value)
 {
-	if(value>fMax)
-		value=fMax;
-	if(value<fMin)
-		value=fMin;
+	if(value > fMax)
+		value = fMax;
+	if(value < fMin)
+		value = fMin;
 	
-	fValue=value;
-	if(Window())
-		Draw(Bounds());
+	fValue = value;
+	if (Window())
+		Invalidate();
 	
 	ValueChanged(fValue);
 }
 
-float BScrollBar::Value() const
+
+float
+BScrollBar::Value() const
 {
 	return fValue;
 }
 
-void BScrollBar::SetProportion(float value)
+
+void
+BScrollBar::SetProportion(float value)
 {
-	fProportion=value;
+	fProportion = value;
 }
 
-float BScrollBar::Proportion() const
+
+float
+BScrollBar::Proportion() const
 {
 	return fProportion;
 }
 
-void BScrollBar::ValueChanged(float newValue)
+
+void
+BScrollBar::ValueChanged(float newValue)
 {
 	// TODO: Implement
 /*
@@ -327,99 +348,116 @@ an actual BView within the scroll bar's window.
 */
 }
 
-void BScrollBar::SetRange(float min, float max)
+
+void
+BScrollBar::SetRange(float min, float max)
 {
-	fMin=min;
-	fMax=max;
+	fMin = min;
+	fMax = max;
 	
-	if(fValue>fMax)
-		fValue=fMax;
-	else
-	if(fValue<fMin)
-		fValue=fMin;
+	if (fValue > fMax)
+		fValue = fMax;
+	else if (fValue < fMin)
+		fValue = fMin;
 	
-	Draw(Bounds());
+	Invalidate();
 	
 	// Just a sort-of hack for now. ValueChanged is called, but with
 	// what value??
 	ValueChanged(fValue);
 }
 
-void BScrollBar::GetRange(float *min, float *max) const
+
+void
+BScrollBar::GetRange(float *min, float *max) const
 {
-	*min=fMin;
-	*max=fMax;
+	if (min != NULL)
+		*min = fMin;
+	if (max != NULL)
+		*max = fMax;
 }
 
-void BScrollBar::SetSteps(float smallStep, float largeStep)
+
+void
+BScrollBar::SetSteps(float smallStep, float largeStep)
 {
 	// Under R5, steps can be set only after being attached to a window, probably because
 	// the data is kept server-side. We'll just remove that limitation... :P
 	
 	// The BeBook also says that we need to specify an integer value even though the step
 	// values are floats. For the moment, we'll just make sure that they are integers
-	fSmallStep=(int32)smallStep;
-	fLargeStep=(int32)largeStep;
+	fSmallStep = (int32)smallStep;
+	fLargeStep = (int32)largeStep;
 
 	// TODO: test use of fractional values and make them work properly if they don't
 }
 
-void BScrollBar::GetSteps(float *smallStep, float *largeStep) const
+
+void
+BScrollBar::GetSteps(float *smallStep, float *largeStep) const
 {
-	*smallStep=fSmallStep;
-	*largeStep=fLargeStep;
+	if (smallStep != NULL)
+		*smallStep = fSmallStep;
+	if (largeStep)
+		*largeStep = fLargeStep;
 }
 
-void BScrollBar::SetTarget(BView *target)
+
+void
+BScrollBar::SetTarget(BView *target)
 {
-	fTarget=target;
-	if(fTargetName)
-		delete fTargetName;
-	if(fTarget)
-	{
-		fTargetName=new char[strlen(target->Name())+1];
-		strcpy(fTargetName,target->Name());
+	fTarget = target;
+	free(fTargetName);
+	
+	if (fTarget) {
+		fTargetName = strdup(target->Name());
 		
-		if(Orientation() == B_VERTICAL)
-			fTarget->fVerScroller=this;
+		if (Orientation() == B_VERTICAL)
+			fTarget->fVerScroller = this;
 		else
-			fTarget->fHorScroller=this;
-	}
-	else
-		fTargetName=NULL;
+			fTarget->fHorScroller = this;
+	} else
+		fTargetName = NULL;
 }
 
-void BScrollBar::SetTarget(const char *targetName)
+
+void
+BScrollBar::SetTarget(const char *targetName)
 {
-	if(!targetName)
+	if (!targetName)
 		return;
 	
-	if(!Window())
+	if (!Window())
 		debugger("Method requires window and doesn't have one");
 	
-	BView *tgt=Window()->FindView(targetName);
-	if(tgt)
-		SetTarget(tgt);
+	BView *target = Window()->FindView(targetName);
+	if (target)
+		SetTarget(target);
 }
 
-BView *BScrollBar::Target() const
+
+BView *
+BScrollBar::Target() const
 {
 	return fTarget;
 }
 
-orientation BScrollBar::Orientation() const
+
+orientation
+BScrollBar::Orientation() const
 {
 	return fOrientation;
 }
 
-void BScrollBar::MessageReceived(BMessage *msg)
+
+void
+BScrollBar::MessageReceived(BMessage *msg)
 {
-	switch(msg->what)
-	{
+	switch(msg->what) {
 		case B_VALUE_CHANGED:
 		{
 			int32 value;
-			if(msg->FindInt32("value",&value)==B_OK)
+			if (msg->FindInt32("value", &value) == B_OK)
 				ValueChanged(value);
 			break;
 		}
@@ -429,121 +467,109 @@ void BScrollBar::MessageReceived(BMessage *msg)
 	}
 }
 
-void BScrollBar::MouseDown(BPoint pt)
+
+void
+BScrollBar::MouseDown(BPoint pt)
 {
-	if(!(fMin==0 && fMax==0))	// if enabled
-	{
+	if (!(fMin == 0 && fMax == 0)) { // if fEnabled
+	
 		// Hit test for thumb
-		if(privatedata->thumbframe.Contains(pt))
-		{
-			privatedata->tracking=true;
-			privatedata->mousept=pt;
-			SetMouseEventMask(0,B_LOCK_WINDOW_FOCUS);
-			Draw(privatedata->thumbframe);
+		if (fPrivateData->fThumbFrame.Contains(pt)) {
+			fPrivateData->fTracking = true;
+			fPrivateData->fMousePos = pt;
+			// TODO: empty event mask ? Is this okay ?
+			SetMouseEventMask(0, B_LOCK_WINDOW_FOCUS);
+			Draw(fPrivateData->fThumbFrame);
 			return;
 		}
 		
-		BRect buttonrect(0,0,B_V_SCROLL_BAR_WIDTH,B_H_SCROLL_BAR_HEIGHT);
-		float scrollval=0;
-		status_t returnval=B_ERROR;
-		
+		BRect buttonrect(0, 0, B_V_SCROLL_BAR_WIDTH, B_H_SCROLL_BAR_HEIGHT);
+		float scrollval = 0;
+		status_t returnval = B_ERROR;
 		
 		// Hit test for arrow buttons
-		if(fOrientation==B_VERTICAL)
-		{
-			if(buttonrect.Contains(pt))
-			{
-				scrollval= -fSmallStep;
-				privatedata->arrowdown=ARROW_UP;
-				privatedata->buttondown=ARROW1;
+		if (fOrientation == B_VERTICAL) {
+			if (buttonrect.Contains(pt)) {
+				scrollval = -fSmallStep;
+				fPrivateData->fArrowDown = ARROW_UP;
+				fPrivateData->fButtonDown = ARROW1;
 				returnval = scroll_by_value(scrollval, this);
 		
-				if(returnval==B_OK)
-				{
+				if (returnval == B_OK) {
 					Draw(buttonrect);
 					ValueChanged(fValue);
 					
-					if(privatedata->repeaterid==-1)
-					{
-						privatedata->exit_repeater=false;
-						privatedata->repeaterid=spawn_thread(privatedata->ButtonRepeaterThread,
-							"scroll repeater",B_NORMAL_PRIORITY,this);
-						resume_thread(privatedata->repeaterid);
+					if (fPrivateData->fRepeaterThread == -1) {
+						fPrivateData->fExitRepeater = false;
+						fPrivateData->fRepeaterThread = spawn_thread(fPrivateData->ButtonRepeaterThread,
+							"scroll repeater", B_NORMAL_PRIORITY, this);
+						resume_thread(fPrivateData->fRepeaterThread);
 					}
 				}
+				
 				return;
 
 			}
 
-			buttonrect.OffsetTo(0,Bounds().Height() - (B_H_SCROLL_BAR_HEIGHT));
-			if(buttonrect.Contains(pt))
-			{
-				scrollval= fSmallStep;
-				privatedata->arrowdown=ARROW_DOWN;
-				privatedata->buttondown=ARROW4;
+			buttonrect.OffsetTo(0, Bounds().Height() - (B_H_SCROLL_BAR_HEIGHT));
+			if (buttonrect.Contains(pt)) {
+				scrollval = fSmallStep;
+				fPrivateData->fArrowDown = ARROW_DOWN;
+				fPrivateData->fButtonDown = ARROW4;
 				returnval = scroll_by_value(scrollval, this);
 
-				if(returnval==B_OK)
-				{
+				if (returnval == B_OK) {
 					Draw(buttonrect);
 					ValueChanged(fValue);
 					
-					if(privatedata->repeaterid==-1)
-					{
-						privatedata->exit_repeater=false;
-						privatedata->repeaterid=spawn_thread(privatedata->ButtonRepeaterThread,
-							"scroll repeater",B_NORMAL_PRIORITY,this);
-						resume_thread(privatedata->repeaterid);
+					if (fPrivateData->fRepeaterThread == -1) {
+						fPrivateData->fExitRepeater = false;
+						fPrivateData->fRepeaterThread = spawn_thread(fPrivateData->ButtonRepeaterThread,
+							"scroll repeater", B_NORMAL_PRIORITY, this);
+						resume_thread(fPrivateData->fRepeaterThread);
 					}
 				}
 				return;
 			}
 
-			if(privatedata->sbinfo.double_arrows)
-			{
-				buttonrect.OffsetTo(0,B_H_SCROLL_BAR_HEIGHT+1);
-				if(buttonrect.Contains(pt))
-				{
-					scrollval= fSmallStep;
-					privatedata->arrowdown=ARROW_DOWN;
-					privatedata->buttondown=ARROW2;
+			if (fPrivateData->fScrollBarInfo.double_arrows) {
+				buttonrect.OffsetTo(0, B_H_SCROLL_BAR_HEIGHT + 1);
+				if (buttonrect.Contains(pt)) {
+					scrollval = fSmallStep;
+					fPrivateData->fArrowDown = ARROW_DOWN;
+					fPrivateData->fButtonDown = ARROW2;
 					returnval = scroll_by_value(scrollval, this);
 			
-					if(returnval==B_OK)
-					{
+					if (returnval == B_OK) {
 						Draw(buttonrect);
 						ValueChanged(fValue);
 						
-						if(privatedata->repeaterid==-1)
-						{
-							privatedata->exit_repeater=false;
-							privatedata->repeaterid=spawn_thread(privatedata->ButtonRepeaterThread,
-								"scroll repeater",B_NORMAL_PRIORITY,this);
-							resume_thread(privatedata->repeaterid);
+						if (fPrivateData->fRepeaterThread == -1) {
+							fPrivateData->fExitRepeater = false;
+							fPrivateData->fRepeaterThread = spawn_thread(fPrivateData->ButtonRepeaterThread,
+								"scroll repeater", B_NORMAL_PRIORITY, this);
+							resume_thread(fPrivateData->fRepeaterThread);
 						}
 					}
 					return;
 				}
 
-				buttonrect.OffsetTo(0,Bounds().Height()-( (B_H_SCROLL_BAR_HEIGHT*2)+1 ));
-				if(buttonrect.Contains(pt))
-				{
-					scrollval= -fSmallStep;
-					privatedata->arrowdown=ARROW_UP;
-					privatedata->buttondown=ARROW3;
+				buttonrect.OffsetTo(0, Bounds().Height() - ((B_H_SCROLL_BAR_HEIGHT * 2) + 1));
+				if (buttonrect.Contains(pt)) {
+					scrollval = -fSmallStep;
+					fPrivateData->fArrowDown = ARROW_UP;
+					fPrivateData->fButtonDown = ARROW3;
 					returnval = scroll_by_value(scrollval, this);
 			
-					if(returnval==B_OK)
-					{
+					if (returnval == B_OK) {
 						Draw(buttonrect);
 						ValueChanged(fValue);
 						
-						if(privatedata->repeaterid==-1)
-						{
-							privatedata->exit_repeater=false;
-							privatedata->repeaterid=spawn_thread(privatedata->ButtonRepeaterThread,
-								"scroll repeater",B_NORMAL_PRIORITY,this);
-							resume_thread(privatedata->repeaterid);
+						if (fPrivateData->fRepeaterThread == -1) {
+							fPrivateData->fExitRepeater = false;
+							fPrivateData->fRepeaterThread = spawn_thread(fPrivateData->ButtonRepeaterThread,
+								"scroll repeater", B_NORMAL_PRIORITY, this);
+							resume_thread(fPrivateData->fRepeaterThread);
 						}
 					}
 					return;
@@ -553,105 +579,90 @@ void BScrollBar::MouseDown(BPoint pt)
 			
 			// TODO: add a repeater thread for large stepping and a call to it
 
-			if(pt.y<privatedata->thumbframe.top)
+			if (pt.y < fPrivateData->fThumbFrame.top)
 				scroll_by_value(-fLargeStep, this);  // do we not check the return value in these two cases like everywhere else?
 			else
 				scroll_by_value(fLargeStep, this);
-		}
-		else
-		{
-			if(buttonrect.Contains(pt))
-			{
-				scrollval= -fSmallStep;
-				privatedata->arrowdown=ARROW_LEFT;
-				privatedata->buttondown=ARROW1;
+		} else {
+			if (buttonrect.Contains(pt)) {
+				scrollval = -fSmallStep;
+				fPrivateData->fArrowDown = ARROW_LEFT;
+				fPrivateData->fButtonDown = ARROW1;
 				returnval = scroll_by_value(scrollval, this);
 		
-				if(returnval==B_OK)
-				{
+				if (returnval == B_OK) {
 					Draw(buttonrect);
 					ValueChanged(fValue);
 					
-					if(privatedata->repeaterid==-1)
-					{
-						privatedata->exit_repeater=false;
-						privatedata->repeaterid=spawn_thread(privatedata->ButtonRepeaterThread,
-							"scroll repeater",B_NORMAL_PRIORITY,this);
-						resume_thread(privatedata->repeaterid);
+					if(fPrivateData->fRepeaterThread == -1) {
+						fPrivateData->fExitRepeater = false;
+						fPrivateData->fRepeaterThread = spawn_thread(fPrivateData->ButtonRepeaterThread,
+							"scroll repeater", B_NORMAL_PRIORITY, this);
+						resume_thread(fPrivateData->fRepeaterThread);
 					}
 				}
 				return;
 			}
 			
-			buttonrect.OffsetTo(Bounds().Width() - (B_V_SCROLL_BAR_WIDTH),0);
-			if(buttonrect.Contains(pt))
-			{
-				scrollval= fSmallStep;
-				privatedata->arrowdown=ARROW_RIGHT;
-				privatedata->buttondown=ARROW4;
+			buttonrect.OffsetTo(Bounds().Width() - (B_V_SCROLL_BAR_WIDTH), 0);
+			if (buttonrect.Contains(pt)) {
+				scrollval = fSmallStep;
+				fPrivateData->fArrowDown = ARROW_RIGHT;
+				fPrivateData->fButtonDown = ARROW4;
 				returnval = scroll_by_value(scrollval, this);
 		
-				if(returnval==B_OK)
-				{
+				if (returnval == B_OK) {
 					Draw(buttonrect);
 					ValueChanged(fValue);
 					
-					if(privatedata->repeaterid==-1)
-					{
-						privatedata->exit_repeater=false;
-						privatedata->repeaterid=spawn_thread(privatedata->ButtonRepeaterThread,
-							"scroll repeater",B_NORMAL_PRIORITY,this);
-						resume_thread(privatedata->repeaterid);
+					if(fPrivateData->fRepeaterThread == -1) {
+						fPrivateData->fExitRepeater = false;
+						fPrivateData->fRepeaterThread = spawn_thread(fPrivateData->ButtonRepeaterThread,
+							"scroll repeater", B_NORMAL_PRIORITY,this);
+						resume_thread(fPrivateData->fRepeaterThread);
 					}
 				}
 				return;
 			}
 			
-			if(privatedata->sbinfo.proportional)
-			{
-				buttonrect.OffsetTo(B_V_SCROLL_BAR_WIDTH+1,0);
-				if(buttonrect.Contains(pt))
-				{
-					scrollval= fSmallStep;
-					privatedata->buttondown=ARROW2;
-					privatedata->arrowdown=ARROW_LEFT;
+			if (fPrivateData->fScrollBarInfo.proportional) {
+				buttonrect.OffsetTo(B_V_SCROLL_BAR_WIDTH + 1, 0);
+				if (buttonrect.Contains(pt)) {
+					scrollval = fSmallStep;
+					fPrivateData->fButtonDown = ARROW2;
+					fPrivateData->fArrowDown = ARROW_LEFT;
 					returnval = scroll_by_value(scrollval, this);
 					
-					if(returnval==B_OK)
-					{
+					if (returnval == B_OK) {
 						Draw(buttonrect);
 						ValueChanged(fValue);
 						
-						if(privatedata->repeaterid==-1)
-						{
-							privatedata->exit_repeater=false;
-							privatedata->repeaterid=spawn_thread(privatedata->ButtonRepeaterThread,
-								"scroll repeater",B_NORMAL_PRIORITY,this);
-							resume_thread(privatedata->repeaterid);
+						if (fPrivateData->fRepeaterThread == -1) {
+							fPrivateData->fExitRepeater = false;
+							fPrivateData->fRepeaterThread = spawn_thread(fPrivateData->ButtonRepeaterThread,
+								"scroll repeater", B_NORMAL_PRIORITY, this);
+							resume_thread(fPrivateData->fRepeaterThread);
 						}
 					}
 					return;
 				}
 				
-				buttonrect.OffsetTo(Bounds().Width()-( (B_V_SCROLL_BAR_WIDTH*2)+1 ),0);
-				if(buttonrect.Contains(pt))
-				{
-					scrollval= -fSmallStep;
-					privatedata->buttondown=ARROW3;
-					privatedata->arrowdown=ARROW_RIGHT;
+				buttonrect.OffsetTo(Bounds().Width() - ( (B_V_SCROLL_BAR_WIDTH * 2) + 1), 0);
+				if (buttonrect.Contains(pt)) {
+					scrollval = -fSmallStep;
+					fPrivateData->fButtonDown = ARROW3;
+					fPrivateData->fArrowDown = ARROW_RIGHT;
 					returnval = scroll_by_value(scrollval, this);
 				
-					if(returnval==B_OK)
-					{
+					if (returnval == B_OK) {
 						Draw(buttonrect);
 						ValueChanged(fValue);
 						
-						if(privatedata->repeaterid==-1)
-						{
-							privatedata->exit_repeater=false;
-							privatedata->repeaterid=spawn_thread(privatedata->ButtonRepeaterThread,
-								"scroll repeater",B_NORMAL_PRIORITY,this);
-							resume_thread(privatedata->repeaterid);
+						if(fPrivateData->fRepeaterThread == -1) {
+							fPrivateData->fExitRepeater = false;
+							fPrivateData->fRepeaterThread = spawn_thread(fPrivateData->ButtonRepeaterThread,
+								"scroll repeater", B_NORMAL_PRIORITY, this);
+							resume_thread(fPrivateData->fRepeaterThread);
 						}
 					}
 					return;
@@ -664,7 +675,7 @@ void BScrollBar::MouseDown(BPoint pt)
 			// TODO: add a repeater thread for large stepping and a call to it
 
 
-			if(pt.x<privatedata->thumbframe.left)
+			if (pt.x < fPrivateData->fThumbFrame.left)
 				scroll_by_value(-fLargeStep, this);  // do we not check the return value in these two cases like everywhere else?
 			else
 				scroll_by_value(fLargeStep, this);
@@ -675,119 +686,116 @@ void BScrollBar::MouseDown(BPoint pt)
 	}
 }
 
-void BScrollBar::MouseUp(BPoint pt)
+
+void
+BScrollBar::MouseUp(BPoint pt)
 {
-	privatedata->arrowdown=ARROW_NONE;\
-	privatedata->buttondown=NOARROW;
-	privatedata->exit_repeater=true;
+	fPrivateData->fArrowDown = ARROW_NONE;
+	fPrivateData->fButtonDown = NOARROW;
+	fPrivateData->fExitRepeater = true;
 	
 	// We'll be lazy here and just draw all the possible arrow regions for now...
 	// TODO: optimize
 	
-	BRect r(0,0,B_V_SCROLL_BAR_WIDTH,B_H_SCROLL_BAR_HEIGHT);
+	BRect rect(0, 0, B_V_SCROLL_BAR_WIDTH, B_H_SCROLL_BAR_HEIGHT);
 	
-	if(fOrientation==B_VERTICAL)
-	{
-		r.bottom+=B_H_SCROLL_BAR_HEIGHT+1;
-		Draw(r);
-		r.OffsetTo(0,Bounds().Height()-((B_H_SCROLL_BAR_HEIGHT*2)+1) );
-		Draw(r);
-	}
-	else
-	{
-		r.bottom+=B_V_SCROLL_BAR_WIDTH+1;
-		Draw(r);
-		r.OffsetTo(0,Bounds().Height()-((B_V_SCROLL_BAR_WIDTH*2)+1) );
-		Draw(r);
+	if (fOrientation == B_VERTICAL) {
+		rect.bottom += B_H_SCROLL_BAR_HEIGHT + 1;
+		Draw(rect);
+		rect.OffsetTo(0, Bounds().Height() - ((B_H_SCROLL_BAR_HEIGHT * 2) + 1));
+		Draw(rect);
+	} else {
+		rect.bottom += B_V_SCROLL_BAR_WIDTH + 1;
+		Draw(rect);
+		rect.OffsetTo(0, Bounds().Height() - ((B_V_SCROLL_BAR_WIDTH * 2) + 1));
+		Draw(rect);
 	}
 	
-	if(privatedata->tracking)
-	{
-		privatedata->tracking=false;
-		SetMouseEventMask(0,0);
-		Draw(privatedata->thumbframe);
+	if (fPrivateData->fTracking) {
+		fPrivateData->fTracking = false;
+		SetMouseEventMask(0, 0);
+		Draw(fPrivateData->fThumbFrame);
 	}
 }
 
-void BScrollBar::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
+
+void
+BScrollBar::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 {
-	if(!privatedata->enabled)
+	if (!fPrivateData->fEnabled)
 		return;
 	
-	if(transit==B_EXITED_VIEW || transit==B_OUTSIDE_VIEW)
-		MouseUp(privatedata->mousept);
+	if (transit == B_EXITED_VIEW || transit == B_OUTSIDE_VIEW)
+		MouseUp(fPrivateData->fMousePos);
 
-	if(privatedata->tracking)
-	{
+	if (fPrivateData->fTracking) {
 		float delta;
-		if(fOrientation==B_VERTICAL)
-		{
-			if( (pt.y>privatedata->thumbframe.bottom && fValue==fMax) || 
-				(pt.y<privatedata->thumbframe.top && fValue==fMin) )
+		if (fOrientation == B_VERTICAL) {
+			if( (pt.y > fPrivateData->fThumbFrame.bottom && fValue == fMax) || 
+				(pt.y < fPrivateData->fThumbFrame.top && fValue == fMin) )
 				return;
-			delta=pt.y-privatedata->mousept.y;
-		}
-		else
-		{
-			if( (pt.x>privatedata->thumbframe.right && fValue==fMax) || 
-				(pt.x<privatedata->thumbframe.left && fValue==fMin) )
+			delta = pt.y - fPrivateData->fMousePos.y;
+		} else {
+			if((pt.x > fPrivateData->fThumbFrame.right && fValue == fMax) || 
+				(pt.x < fPrivateData->fThumbFrame.left && fValue == fMin))
 				return;
-			delta=pt.x-privatedata->mousept.x;
+			delta = pt.x - fPrivateData->fMousePos.x;
 		}
 		scroll_by_value(delta, this);  // do we not check the return value here?
 		ValueChanged(fValue);
-		Draw(Bounds());
-		privatedata->mousept=pt;
+		Invalidate(Bounds());
+		fPrivateData->fMousePos = pt;
 	}
 }
 
-void BScrollBar::DoScroll(float delta)
+
+void
+BScrollBar::DoScroll(float delta)
 {
-	if(!fTarget)
+	if (!fTarget)
 		return;
 	
 	float scrollval;
 
-	if(delta>0)
-		scrollval=(fValue+delta<=fMax)?delta:(fMax-fValue);
+	if (delta > 0)
+		scrollval = (fValue + delta <= fMax) ? delta : (fMax-fValue);
 	else
-		scrollval=(fValue-delta>=fMin)?delta:(fValue-fMin);
+		scrollval = (fValue - delta >= fMin) ? delta : (fValue - fMin);
 
-	if(fOrientation==B_VERTICAL)
-	{
-		fTarget->ScrollBy(0,scrollval);
-		privatedata->thumbframe.OffsetBy(0,scrollval);
+	if (fOrientation == B_VERTICAL) {
+		fTarget->ScrollBy(0, scrollval);
+		fPrivateData->fThumbFrame.OffsetBy(0, scrollval);
+	} else {
+		fTarget->ScrollBy(scrollval, 0);
+		fPrivateData->fThumbFrame.OffsetBy(scrollval, 0);
 	}
-	else
-	{
-		fTarget->ScrollBy(scrollval,0);
-		privatedata->thumbframe.OffsetBy(scrollval,0);
-	}
-	fValue+=scrollval;
+	
+	fValue += scrollval;
 }
 
-void BScrollBar::DetachedFromWindow()
+
+void
+BScrollBar::DetachedFromWindow()
 {
-	fTarget=NULL;
-	delete fTargetName;
-	fTargetName=NULL;
+	fTarget = NULL;
+	free(fTargetName);
+	fTargetName = NULL;
 }
 
-void BScrollBar::Draw(BRect updateRect)
+
+void
+BScrollBar::Draw(BRect updateRect)
 {
-	rgb_color light, dark,normal,c;
-	c=ui_color(B_PANEL_BACKGROUND_COLOR);
-	if(privatedata->enabled)
-	{
-		light=tint_color(c,B_LIGHTEN_MAX_TINT);
-		dark=tint_color(c,B_DARKEN_3_TINT);
-		normal=c;
-	}
-	else
-	{
-		light=tint_color(c,B_LIGHTEN_MAX_TINT);
-		dark=tint_color(c,B_DARKEN_3_TINT);
-		normal=c;
+	rgb_color light, dark, normal, panelColor;
+	panelColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+	if (fPrivateData->fEnabled) {
+		light = tint_color(panelColor, B_LIGHTEN_MAX_TINT);
+		dark = tint_color(panelColor, B_DARKEN_3_TINT);
+		normal = panelColor;
+	} else {
+		light = tint_color(panelColor, B_LIGHTEN_MAX_TINT);
+		dark = tint_color(panelColor, B_DARKEN_3_TINT);
+		normal = panelColor;
 	}
 	
 	// Draw main area
@@ -799,97 +807,103 @@ void BScrollBar::Draw(BRect updateRect)
 	
 	// Draw arrows
 	BPoint buttonpt(0,0);
-	if(fOrientation==B_HORIZONTAL)
-	{
-		privatedata->DrawScrollBarButton(this, ARROW_LEFT, buttonpt,
-			privatedata->buttondown==ARROW1);
+	if (fOrientation == B_HORIZONTAL) {
+		fPrivateData->DrawScrollBarButton(this, ARROW_LEFT, buttonpt,
+			fPrivateData->fButtonDown == ARROW1);
 		
-		if(privatedata->sbinfo.double_arrows)
-		{
-			buttonpt.Set(B_V_SCROLL_BAR_WIDTH+1,0);
-			privatedata->DrawScrollBarButton(this, ARROW_RIGHT, buttonpt, 
-				privatedata->buttondown==ARROW2);
+		if (fPrivateData->fScrollBarInfo.double_arrows) {
+			buttonpt.Set(B_V_SCROLL_BAR_WIDTH + 1, 0);
+			fPrivateData->DrawScrollBarButton(this, ARROW_RIGHT, buttonpt, 
+				fPrivateData->fButtonDown == ARROW2);
 
-			buttonpt.Set(Bounds().Width()-( (B_V_SCROLL_BAR_WIDTH*2)+1 ),0);
-			privatedata->DrawScrollBarButton(this, ARROW_LEFT, buttonpt,
-				privatedata->buttondown==ARROW3);
+			buttonpt.Set(Bounds().Width() - ((B_V_SCROLL_BAR_WIDTH * 2) + 1), 0);
+			fPrivateData->DrawScrollBarButton(this, ARROW_LEFT, buttonpt,
+				fPrivateData->fButtonDown == ARROW3);
 		
 		}
 
-		buttonpt.Set(Bounds().Width()-(B_V_SCROLL_BAR_WIDTH),0);
-		privatedata->DrawScrollBarButton(this, ARROW_RIGHT, buttonpt,
-			privatedata->buttondown==ARROW4);
-	}
-	else
-	{
-		privatedata->DrawScrollBarButton(this, ARROW_UP, buttonpt,
-			privatedata->buttondown==ARROW1);
+		buttonpt.Set(Bounds().Width() - (B_V_SCROLL_BAR_WIDTH), 0);
+		fPrivateData->DrawScrollBarButton(this, ARROW_RIGHT, buttonpt,
+			fPrivateData->fButtonDown == ARROW4);
+	} else {
+		fPrivateData->DrawScrollBarButton(this, ARROW_UP, buttonpt,
+			fPrivateData->fButtonDown == ARROW1);
 		
-		if(privatedata->sbinfo.double_arrows)
-		{
-			buttonpt.Set(0,B_H_SCROLL_BAR_HEIGHT+1);
-			privatedata->DrawScrollBarButton(this, ARROW_DOWN, buttonpt,
-				privatedata->buttondown==ARROW2);
+		if (fPrivateData->fScrollBarInfo.double_arrows) {
+			buttonpt.Set(0,B_H_SCROLL_BAR_HEIGHT + 1);
+			fPrivateData->DrawScrollBarButton(this, ARROW_DOWN, buttonpt,
+				fPrivateData->fButtonDown == ARROW2);
 
-			buttonpt.Set(0,Bounds().Height()-( (B_H_SCROLL_BAR_HEIGHT*2)+1 ));
-			privatedata->DrawScrollBarButton(this, ARROW_UP, buttonpt,
-				privatedata->buttondown==ARROW3);
+			buttonpt.Set(0,Bounds().Height() - ((B_H_SCROLL_BAR_HEIGHT * 2) + 1));
+			fPrivateData->DrawScrollBarButton(this, ARROW_UP, buttonpt,
+				fPrivateData->fButtonDown == ARROW3);
 		
 		}
 
-		buttonpt.Set(0,Bounds().Height()-(B_H_SCROLL_BAR_HEIGHT));
-		privatedata->DrawScrollBarButton(this, ARROW_DOWN, buttonpt,
-			privatedata->buttondown==ARROW4);
+		buttonpt.Set(0,Bounds().Height() - (B_H_SCROLL_BAR_HEIGHT));
+		fPrivateData->DrawScrollBarButton(this, ARROW_DOWN, buttonpt,
+			fPrivateData->fButtonDown == ARROW4);
 	}
 	
 	// Draw scroll thumb
 	
-	if(privatedata->enabled)
-	{
-		BRect r(privatedata->thumbframe);
+	if (fPrivateData->fEnabled) {
+		BRect rect(fPrivateData->fThumbFrame);
 	
 		SetHighColor(dark);
-		StrokeRect(privatedata->thumbframe);
+		StrokeRect(fPrivateData->fThumbFrame);
 	
-		r.InsetBy(1,1);
-		SetHighColor(tint_color(c,B_DARKEN_2_TINT));
-		StrokeLine(r.LeftBottom(),r.RightBottom());
-		StrokeLine(r.RightTop(),r.RightBottom());
+		rect.InsetBy(1,1);
+		SetHighColor(tint_color(panelColor, B_DARKEN_2_TINT));
+		StrokeLine(rect.LeftBottom(), rect.RightBottom());
+		StrokeLine(rect.RightTop(), rect.RightBottom());
 	
 		SetHighColor(light);
-		StrokeLine(r.LeftTop(),r.RightTop());
-		StrokeLine(r.LeftTop(),r.LeftBottom());
+		StrokeLine(rect.LeftTop(), rect.RightTop());
+		StrokeLine(rect.LeftTop(), rect.LeftBottom());
 	
-		r.InsetBy(1,1);
-		if(privatedata->tracking)
-			SetHighColor(tint_color(normal,B_DARKEN_1_TINT));
+		rect.InsetBy(1,1);
+		if (fPrivateData->fTracking)
+			SetHighColor(tint_color(normal, B_DARKEN_1_TINT));
 		else
 			SetHighColor(normal);
-		FillRect(r);
+		
+		FillRect(rect);
 	}
 	
 	// TODO: Add the other thumb styles - dots and lines
 }
 
-void BScrollBar::FrameMoved(BPoint new_position)
+
+void
+BScrollBar::FrameMoved(BPoint new_position)
 {
 }
 
-void BScrollBar::FrameResized(float new_width, float new_height)
+
+void
+BScrollBar::FrameResized(float new_width, float new_height)
 {
 }
 
-BHandler *BScrollBar::ResolveSpecifier(BMessage *msg,int32 index,
+
+BHandler *
+BScrollBar::ResolveSpecifier(BMessage *msg,int32 index,
 		BMessage *specifier,int32 form,const char *property)
 {
+	// TODO: Implement
 	return NULL;
 }
 
-void BScrollBar::ResizeToPreferred()
+
+void
+BScrollBar::ResizeToPreferred()
 {
 }
 
-void BScrollBar::GetPreferredSize(float *width, float *height)
+
+void
+BScrollBar::GetPreferredSize(float *width, float *height)
 {
 	if (fOrientation == B_VERTICAL)
 		*width = B_V_SCROLL_BAR_WIDTH;
@@ -897,47 +911,49 @@ void BScrollBar::GetPreferredSize(float *width, float *height)
 		*height = B_H_SCROLL_BAR_HEIGHT;
 }
 
-void BScrollBar::MakeFocus(bool state)
+
+void
+BScrollBar::MakeFocus(bool state)
 {
-	if(fTarget)
+	if (fTarget)
 		fTarget->MakeFocus(state);
 }
 
-void BScrollBar::AllAttached()
+
+void
+BScrollBar::AllAttached()
 {
 }
 
-void BScrollBar::AllDetached()
+
+void
+BScrollBar::AllDetached()
 {
 }
 
-status_t BScrollBar::GetSupportedSuites(BMessage *data)
+
+status_t
+BScrollBar::GetSupportedSuites(BMessage *data)
 {
 	return B_ERROR;
 }
 
-status_t BScrollBar::Perform(perform_code d, void *arg)
+
+status_t
+BScrollBar::Perform(perform_code d, void *arg)
 {
-	return B_OK;
+	return BView::Perform(d, arg);
 }
 
-void BScrollBar::_ReservedScrollBar1()
-{
-}
 
-void BScrollBar::_ReservedScrollBar2()
-{
-}
+void BScrollBar::_ReservedScrollBar1() {}
+void BScrollBar::_ReservedScrollBar2() {}
+void BScrollBar::_ReservedScrollBar3() {}
+void BScrollBar::_ReservedScrollBar4() {}
 
-void BScrollBar::_ReservedScrollBar3()
-{
-}
 
-void BScrollBar::_ReservedScrollBar4()
-{
-}
-
-BScrollBar &BScrollBar::operator=(const BScrollBar &)
+BScrollBar &
+BScrollBar::operator=(const BScrollBar &)
 {
 	return *this;
 }
@@ -966,7 +982,7 @@ status_t scroll_by_value(float valueByWhichToScroll, BScrollBar *bar)
 				bar->fValue += valueByWhichToScroll;
 				if(bar->fTarget)
 					bar->fTarget->ScrollBy(0,valueByWhichToScroll);
-				bar->privatedata->thumbframe.OffsetBy(0,valueByWhichToScroll);
+				bar->fPrivateData->fThumbFrame.OffsetBy(0,valueByWhichToScroll);
 				bar->fValue--;
 				return B_OK;
 			}
@@ -979,7 +995,7 @@ status_t scroll_by_value(float valueByWhichToScroll, BScrollBar *bar)
 				bar->fValue += valueByWhichToScroll;
 				if(bar->fTarget)
 					bar->fTarget->ScrollBy(0,valueByWhichToScroll);
-				bar->privatedata->thumbframe.OffsetBy(0,valueByWhichToScroll);
+				bar->fPrivateData->fThumbFrame.OffsetBy(0,valueByWhichToScroll);
 				bar->fValue++;
 				return B_OK;
 			}
@@ -995,7 +1011,7 @@ status_t scroll_by_value(float valueByWhichToScroll, BScrollBar *bar)
 				bar->fValue += valueByWhichToScroll;
 				if(bar->fTarget)
 					bar->fTarget->ScrollBy(valueByWhichToScroll,0);
-				bar->privatedata->thumbframe.OffsetBy(valueByWhichToScroll,0);
+				bar->fPrivateData->fThumbFrame.OffsetBy(valueByWhichToScroll,0);
 				bar->fValue--;
 				return B_OK;
 			}
@@ -1008,7 +1024,7 @@ status_t scroll_by_value(float valueByWhichToScroll, BScrollBar *bar)
 				bar->fValue += valueByWhichToScroll;
 				if(bar->fTarget)
 					bar->fTarget->ScrollBy(valueByWhichToScroll,0);
-				bar->privatedata->thumbframe.OffsetBy(valueByWhichToScroll,0);
+				bar->fPrivateData->fThumbFrame.OffsetBy(valueByWhichToScroll,0);
 				bar->fValue++;
 				return B_OK;
 			}
@@ -1021,147 +1037,144 @@ status_t scroll_by_value(float valueByWhichToScroll, BScrollBar *bar)
 /*
 	This cheat function will allow the scrollbar prefs app to act like R5's and
 	perform other stuff without mucking around with the virtual tables.
+	// TODO: Using private friend methods for this is not nice, we should use a
+	// custom control in the pref app instead
 	
 	B_BAD_VALUE is returned when a NULL scrollbar pointer is passed to it.
 
 	The scroll_bar_info struct is read and used to re-style the given BScrollBar.
 */
-status_t control_scrollbar(scroll_bar_info *info, BScrollBar *bar)
+status_t
+control_scrollbar(scroll_bar_info *info, BScrollBar *bar)
 {
-	if(!bar || !info)
+	if (!bar || !info)
 		return B_BAD_VALUE;
 
-	if(bar->privatedata->sbinfo.double_arrows != info->double_arrows)
-	{
-		bar->privatedata->sbinfo.double_arrows = info->double_arrows;
+	if (bar->fPrivateData->fScrollBarInfo.double_arrows != info->double_arrows) {
+		bar->fPrivateData->fScrollBarInfo.double_arrows = info->double_arrows;
 		
-		int8 multiplier=(info->double_arrows)?1:-1;
+		int8 multiplier=(info->double_arrows) ? 1 : -1;
 		
-		if(bar->fOrientation==B_VERTICAL)
-			bar->privatedata->thumbframe.OffsetBy(0,multiplier*B_H_SCROLL_BAR_HEIGHT);
+		if (bar->fOrientation == B_VERTICAL)
+			bar->fPrivateData->fThumbFrame.OffsetBy(0, multiplier * B_H_SCROLL_BAR_HEIGHT);
 		else
-			bar->privatedata->thumbframe.OffsetBy(multiplier*B_V_SCROLL_BAR_WIDTH,0);
+			bar->fPrivateData->fThumbFrame.OffsetBy(multiplier * B_V_SCROLL_BAR_WIDTH, 0);
 	}
 
-	bar->privatedata->sbinfo.proportional = info->proportional;
+	bar->fPrivateData->fScrollBarInfo.proportional = info->proportional;
 
 	// TODO: Figure out how proportional relates to the size of the thumb
 		
 	// TODO: Add redraw code to reflect the changes
 
-	if(info->knob >= 0 && info->knob <= 2)
-		bar->privatedata->sbinfo.knob = info->knob;
+	if (info->knob >= 0 && info->knob <= 2)
+		bar->fPrivateData->fScrollBarInfo.knob = info->knob;
 	else
 		return B_BAD_VALUE;
 	
-	if(info->min_knob_size >= SCROLL_BAR_MINIMUM_KNOB_SIZE && info->min_knob_size <= SCROLL_BAR_MAXIMUM_KNOB_SIZE)
-		bar->privatedata->sbinfo.min_knob_size = info->min_knob_size;
+	if (info->min_knob_size >= SCROLL_BAR_MINIMUM_KNOB_SIZE && info->min_knob_size <= SCROLL_BAR_MAXIMUM_KNOB_SIZE)
+		bar->fPrivateData->fScrollBarInfo.min_knob_size = info->min_knob_size;
 	else
 		return B_BAD_VALUE;
 
 	return B_OK;
 }
 
-void BScrollBarPrivateData::DrawScrollBarButton(BScrollBar *owner, arrow_direction direction, 
+
+void
+BScrollBar::Private::DrawScrollBarButton(BScrollBar *owner, arrow_direction direction, 
 	const BPoint &offset, bool down)
 {
 	// Another hack for code size
 
-	BRect r(offset.x,offset.y,offset.x+14,offset.y+14);
+	BRect r(offset.x, offset.y, offset.x + 14,offset.y + 14);
 	
-	rgb_color c=ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color c = ui_color(B_PANEL_BACKGROUND_COLOR);
 	rgb_color light, dark, normal,arrow,arrow2;
 
-	if(down)
-	{	
-		light=tint_color(c,B_DARKEN_3_TINT);
-		arrow2=dark=tint_color(c,B_LIGHTEN_MAX_TINT);
-		normal=c;
-		arrow=tint_color(c,B_DARKEN_MAX_TINT);
-	}
-	else
-	{
-		bool use_enabled_colors=enabled;
+	if (down) {	
+		light = tint_color(c, B_DARKEN_3_TINT);
+		arrow2 = dark = tint_color(c, B_LIGHTEN_MAX_TINT);
+		normal = c;
+		arrow = tint_color(c, B_DARKEN_MAX_TINT);
+	
+	} else {
+		bool use_enabled_colors = fEnabled;
 		
 		// Add a usability perk - disable buttons if they would not do anything - 
 		// like a left arrow if the value==fMin
-		if( (direction==ARROW_LEFT || direction==ARROW_UP) && 
-					(owner->fValue==owner->fMin) )
-			use_enabled_colors=false;
-		else
-		if( (direction==ARROW_RIGHT || direction==ARROW_DOWN) && 
-					(owner->fValue==owner->fMax) )
-			use_enabled_colors=false;
+		if ((direction == ARROW_LEFT || direction == ARROW_UP) && 
+					(owner->fValue == owner->fMin) )
+			use_enabled_colors = false;
+		else if ((direction == ARROW_RIGHT || direction == ARROW_DOWN) && 
+					(owner->fValue == owner->fMax) )
+			use_enabled_colors = false;
 		
 
-		if(use_enabled_colors)
-		{
-			arrow2=light=tint_color(c,B_LIGHTEN_MAX_TINT);
-			dark=tint_color(c,B_DARKEN_3_TINT);
-			normal=c;
-			arrow=tint_color(c,B_DARKEN_MAX_TINT);
-		}
-		else
-		{
-			arrow2=light=tint_color(c,B_LIGHTEN_1_TINT);
-			dark=tint_color(c,B_DARKEN_1_TINT);
-			normal=c;
-			arrow=tint_color(c,B_DARKEN_1_TINT);
+		if (use_enabled_colors) {
+			arrow2 = light = tint_color(c, B_LIGHTEN_MAX_TINT);
+			dark = tint_color(c, B_DARKEN_3_TINT);
+			normal = c;
+			arrow = tint_color(c, B_DARKEN_MAX_TINT);
+		} else {
+			arrow2 = light = tint_color(c, B_LIGHTEN_1_TINT);
+			dark = tint_color(c, B_DARKEN_1_TINT);
+			normal = c;
+			arrow = tint_color(c, B_DARKEN_1_TINT);
 		}
 	}
 	
-	BPoint tri1,tri2,tri3;
+	BPoint tri1, tri2, tri3;
 	
-	switch(direction)
-	{
+	switch (direction) {
 		case ARROW_LEFT:
 		{
-			tri1.Set(r.left+3,(r.top+r.bottom)/2);
-			tri2.Set(r.right-3,r.top+3);
-			tri3.Set(r.right-3,r.bottom-3);
+			tri1.Set(r.left + 3, (r.top + r.bottom) /2 );
+			tri2.Set(r.right - 3, r.top + 3);
+			tri3.Set(r.right - 3, r.bottom - 3);
 			break;
 		}
 		case ARROW_RIGHT:
 		{
-			tri1.Set(r.left+3,r.bottom-3);
-			tri2.Set(r.left+3,r.top+3);
-			tri3.Set(r.right-3,(r.top+r.bottom)/2);
+			tri1.Set(r.left + 3, r.bottom - 3);
+			tri2.Set(r.left + 3, r.top + 3);
+			tri3.Set(r.right-3, (r.top + r.bottom) / 2);
 			break;
 		}
 		case ARROW_UP:
 		{
-			tri1.Set(r.left+3,r.bottom-3);
-			tri2.Set((r.left+r.right)/2,r.top+3);
-			tri3.Set(r.right-3,r.bottom-3);
+			tri1.Set(r.left + 3, r.bottom - 3);
+			tri2.Set((r.left + r.right) / 2, r.top + 3);
+			tri3.Set(r.right - 3, r.bottom - 3);
 			break;
 		}
 		default:
 		{
-			tri1.Set(r.left+3,r.top+3);
-			tri2.Set(r.right-3,r.top+3);
-			tri3.Set((r.left+r.right)/2,r.bottom-3);
+			tri1.Set(r.left + 3, r.top + 3);
+			tri2.Set(r.right - 3, r.top + 3);
+			tri3.Set((r.left + r.right) / 2, r.bottom - 3);
 			break;
 		}
 	}
 
-	r.InsetBy(1,1);
+	r.InsetBy(1, 1);
 	owner->SetHighColor(normal);
 	owner->FillRect(r);
 	
 	owner->SetHighColor(arrow);
-	owner->FillTriangle(tri1,tri2,tri3);
+	owner->FillTriangle(tri1, tri2, tri3);
 
-	r.InsetBy(-1,-1);
+	r.InsetBy(-1, -1);
 	owner->SetHighColor(dark);
-	owner->StrokeLine(r.LeftBottom(),r.RightBottom());
-	owner->StrokeLine(r.RightTop(),r.RightBottom());
-	owner->StrokeLine(tri2,tri3);
-	owner->StrokeLine(tri1,tri3);
+	owner->StrokeLine(r.LeftBottom(), r.RightBottom());
+	owner->StrokeLine(r.RightTop(), r.RightBottom());
+	owner->StrokeLine(tri2, tri3);
+	owner->StrokeLine(tri1, tri3);
 
 	owner->SetHighColor(light);
-	owner->StrokeLine(r.LeftTop(),r.RightTop());
-	owner->StrokeLine(r.LeftTop(),r.LeftBottom());
+	owner->StrokeLine(r.LeftTop(), r.RightTop());
+	owner->StrokeLine(r.LeftTop(), r.LeftBottom());
 
 	owner->SetHighColor(arrow2);
-	owner->StrokeLine(tri1,tri2);
+	owner->StrokeLine(tri1, tri2);
 }
