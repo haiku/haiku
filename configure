@@ -2,8 +2,6 @@
 #
 # configure [ --floppy <floppy location> ]
 
-target=unknown
-
 # usage
 #
 # Prints usage.
@@ -68,13 +66,16 @@ gcc_version=
 floppy=
 bochs_debug=0
 include_gpl_addons=0
-revision=`uname -r`
-case "$revision" in
-  5.1)   target=dano ;;
-  5.0.4) target=bone ;;
-  5.0*)  target=r5 ;;
-  *)     target=haiku ;;
-esac
+target=haiku
+
+# host BeOS recognition not needed anymore
+# revision=`uname -r`
+# case "$revision" in
+#  5.1)   target=dano ;;
+#  5.0.4) target=bone ;;
+#  5.0*)  target=r5 ;;
+#  *)     target=haiku ;;
+#esac
 
 # parse parameters
 #
