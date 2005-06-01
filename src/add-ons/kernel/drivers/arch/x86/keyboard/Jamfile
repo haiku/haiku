@@ -24,11 +24,3 @@ KernelLd keyboard :
 	drivers/dev/keyboard
 	; 
 
-# Link to kernel/drivers/dev/input
-{
-        local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev input ] ;
-        local instDriver = <kernel!drivers!dev!input>keyboard ;
-        MakeLocate $(instDriver) : $(dir) ;
-        RelSymLink $(instDriver) : <driver>keyboard ;
-}
-
