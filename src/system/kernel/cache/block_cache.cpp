@@ -4,7 +4,7 @@
  */
 
 
-#include "BlockAllocator.h"
+#include "block_cache_private.h"
 
 #include <KernelExport.h>
 #include <fs_cache.h>
@@ -13,7 +13,10 @@
 #include <lock.h>
 #include <util/kernel_cpp.h>
 #include <util/DoublyLinkedList.h>
+#include <util/AutoLock.h>
 #include <util/khash.h>
+#include <vm.h>
+#include <vm_page.h>
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -37,44 +40,6 @@
 #	define TRACE(x) ;
 #endif
 
-#define DEBUG_CHANGED
-
-struct cache_transaction;
-struct cached_block;
-typedef DoublyLinkedListLink<cached_block> block_link;
-
-
-struct cached_block {
-	cached_block	*next;			// next in hash
-	cached_block	*transaction_next;
-	block_link		previous_transaction_link;
-	off_t			block_number;
-	void			*data;
-	void			*original;
-#ifdef DEBUG_CHANGED
-	void			*compare;
-#endif
-	int32			ref_count;
-	int32			lock;
-	bool			is_dirty;
-	cache_transaction *transaction;
-	cache_transaction *previous_transaction;
-};
-
-struct block_cache {
-	hash_table	*hash;
-	benaphore	lock;
-	int			fd;
-	off_t		max_blocks;
-	size_t		block_size;
-	int32		next_transaction_id;
-	hash_table	*transaction_hash;
-	BlockAllocator *allocator;
-};
-
-typedef DoublyLinkedList<cached_block,
-	DoublyLinkedListMemberGetLink<cached_block,
-		&cached_block::previous_transaction_link> > block_list;
 
 struct cache_transaction {
 	cache_transaction *next;
@@ -86,52 +51,6 @@ struct cache_transaction {
 	void			*notification_data;
 	bool			open;
 };
-
-struct cache {
-	hash_table	*hash;
-	benaphore	lock;
-	off_t		max_blocks;
-	size_t		block_size;
-};
-
-static const int32 kNumCaches = 16;
-struct cache sCaches[kNumCaches];
-	// we can cache the first 16 fds (I said we were dumb, right?)
-
-
-class BenaphoreLocker {
-	public:
-		BenaphoreLocker(int fd)
-			: fBenaphore(NULL)
-		{
-			if (fd < 0 || fd >= kNumCaches)
-				return;
-
-			fBenaphore = &sCaches[fd].lock;
-			benaphore_lock(fBenaphore);
-		}
-
-		BenaphoreLocker(block_cache *cache)
-			: fBenaphore(&cache->lock)
-		{
-			benaphore_lock(fBenaphore);
-		}
-
-		~BenaphoreLocker()
-		{
-			if (fBenaphore != NULL)
-				benaphore_unlock(fBenaphore);
-		}
-
-		status_t InitCheck()
-		{
-			return fBenaphore != NULL ? B_OK : B_ERROR;
-		}
-
-	private:
-		benaphore	*fBenaphore;
-};
-
 
 static status_t write_cached_block(block_cache *cache, cached_block *block, bool deleteTransaction = true);
 
@@ -180,8 +99,9 @@ lookup_transaction(block_cache *cache, int32 id)
 //	#pragma mark - private block_cache
 
 
-static int
-cached_block_compare(void *_cacheEntry, const void *_block)
+/* static */
+int
+cached_block::Compare(void *_cacheEntry, const void *_block)
 {
 	cached_block *cacheEntry = (cached_block *)_cacheEntry;
 	const off_t *block = (const off_t *)_block;
@@ -190,8 +110,10 @@ cached_block_compare(void *_cacheEntry, const void *_block)
 }
 
 
-static uint32
-cached_block_hash(void *_cacheEntry, const void *_block, uint32 range)
+
+/* static */
+uint32
+cached_block::Hash(void *_cacheEntry, const void *_block, uint32 range)
 {
 	cached_block *cacheEntry = (cached_block *)_cacheEntry;
 	const off_t *block = (const off_t *)_block;
@@ -203,34 +125,142 @@ cached_block_hash(void *_cacheEntry, const void *_block, uint32 range)
 }
 
 
-static void
-free_cached_block(block_cache *cache, cached_block *block)
+//	#pragma mark -
+
+
+block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize)
+	:
+	hash(NULL),
+	fd(_fd),
+	max_blocks(numBlocks),
+	block_size(blockSize),
+	next_transaction_id(1),
+	transaction_hash(NULL),
+	ranges_hash(NULL),
+	free_ranges(NULL)
 {
-	cache->allocator->Put(block->data);
-	cache->allocator->Put(block->original);
+	hash = hash_init(32, 0, &cached_block::Compare, &cached_block::Hash);
+	if (hash == NULL)
+		return;
+
+	transaction_hash = hash_init(16, 0, &transaction_compare, &::transaction_hash);
+	if (transaction_hash == NULL)
+		return;
+
+	ranges_hash = hash_init(16, 0, &block_range::Compare, &block_range::Hash);
+	if (ranges_hash == NULL)
+		return;
+
+	if (benaphore_init(&lock, "block cache") < B_OK)
+		return;
+
+	chunk_size = max_c(blockSize, B_PAGE_SIZE);
+	chunks_per_range = kBlockRangeSize / chunk_size;
+	range_mask = (1UL << chunks_per_range) - 1;
+	chunk_mask = (1UL << (chunk_size / blockSize)) - 1;
+}
+
+
+block_cache::~block_cache()
+{
+	benaphore_destroy(&lock);
+
+	hash_uninit(ranges_hash);
+	hash_uninit(transaction_hash);
+	hash_uninit(hash);
+}
+
+
+status_t
+block_cache::InitCheck()
+{
+	if (lock.sem < B_OK)
+		return lock.sem;
+
+	if (hash == NULL || transaction_hash == NULL || ranges_hash == NULL)
+		return B_NO_MEMORY;
+
+	return B_OK;
+}
+
+
+block_range *
+block_cache::GetFreeRange()
+{
+	if (free_ranges != NULL)
+		return free_ranges;
+
+	// we need to allocate a new range
+	block_range *range;
+	if (block_range::NewBlockRange(this, &range) != B_OK) {
+		// ToDo: free up space in existing ranges
+		// We may also need to free ranges from other caches to get a free one
+		// (if not, an active volume might have stolen all free ranges already)
+		return NULL;
+	}
+
+	hash_insert(ranges_hash, range);
+	return range;
+}
+
+
+block_range *
+block_cache::GetRange(void *address)
+{
+	return (block_range *)hash_lookup(ranges_hash, address);
+}
+
+
+void
+block_cache::Free(void *address)
+{
+	block_range *range = GetRange(address);
+	ASSERT(range != NULL);
+	range->Free(this, address);
+}
+
+
+void *
+block_cache::Allocate()
+{
+	block_range *range = GetFreeRange();
+	if (range == NULL)
+		return NULL;
+
+	return range->Allocate(this);
+}
+
+
+void
+block_cache::FreeBlock(cached_block *block)
+{
+	block_range *range = GetRange(block->data);
+	ASSERT(range != NULL);
+	range->Free(this, block);
+
+	Free(block->original);
 #ifdef DEBUG_CHANGED
-	cache->allocator->Put(block->compare);
+	Free(block->compare);
 #endif
 
 	free(block);
 }
 
 
-static cached_block *
-new_cached_block(block_cache *cache, off_t blockNumber, bool cleared = false)
+cached_block *
+block_cache::NewBlock(off_t blockNumber)
 {
 	cached_block *block = (cached_block *)malloc(sizeof(cached_block));
 	if (block == NULL)
 		return NULL;
 
-	if (!cleared) {
-		block->data = cache->allocator->Get();
-		if (block->data == NULL) {
-			free(block);
-			return NULL;
-		}
-	} else
-		block->data = NULL;
+	block_range *range = GetFreeRange();
+	if (range == NULL) {
+		free(block);
+		return NULL;
+	}
+
+	range->Allocate(this, block);
 
 	block->block_number = blockNumber;
 	block->lock = 0;
@@ -242,7 +272,7 @@ new_cached_block(block_cache *cache, off_t blockNumber, bool cleared = false)
 	block->compare = NULL;
 #endif
 
-	hash_insert(cache->hash, block);
+	hash_insert(hash, block);
 
 	return block;
 }
@@ -301,12 +331,14 @@ put_cached_block(block_cache *cache, cached_block *block)
 		write_cached_block(cache, block);
 		panic("block_cache: supposed to be clean block was changed!\n");
 
-		cache->allocator->Put(block->compare);
+		cache->Free(block->compare);
 		block->compare = NULL;
 	}
 #endif
 
-	block->lock--;
+	if (--block->lock == 0)
+		;
+//		block->data = cache->allocator->Release(block->data);
 }
 
 
@@ -320,34 +352,41 @@ put_cached_block(block_cache *cache, off_t blockNumber)
 
 
 static cached_block *
-get_cached_block(block_cache *cache, off_t blockNumber, bool cleared = false)
+get_cached_block(block_cache *cache, off_t blockNumber, bool &allocated, bool readBlock = true)
 {
 	cached_block *block = (cached_block *)hash_lookup(cache->hash, &blockNumber);
-	bool allocated = false;
+	allocated = false;
 
 	if (block == NULL) {
 		// read block into cache
-		block = new_cached_block(cache, blockNumber, cleared);
+		block = cache->NewBlock(blockNumber);
 		if (block == NULL)
 			return NULL;
 
 		allocated = true;
-	}
-	
-	if (!allocated && block->data == NULL && !cleared) {
-		// there is no block yet, but we need one
-		block->data = cache->allocator->Get();
-		if (block->data == NULL)
-			return NULL;
+	} else {
+/*
+		if (block->lock == 0 && block->data != NULL) {
+			// see if the old block can be resurrected
+			block->data = cache->allocator->Acquire(block->data);
+		}
 
-		allocated = true;
+		if (block->data == NULL) {
+			// there is no block yet, but we need one
+			block->data = cache->allocator->Get();
+			if (block->data == NULL)
+				return NULL;
+
+			allocated = true;
+		}
+*/
 	}
 
-	if (allocated && !cleared) {
+	if (allocated && readBlock) {
 		int32 blockSize = cache->block_size;
 
 		if (read_pos(cache->fd, blockNumber * blockSize, block->data, blockSize) < blockSize) {
-			free_cached_block(cache, block);
+			cache->FreeBlock(block);
 			return NULL;
 		}
 	}
@@ -361,23 +400,17 @@ static void *
 get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off_t length,
 	int32 transactionID, bool cleared)
 {
-	BenaphoreLocker locker(cache);
+	BenaphoreLocker locker(&cache->lock);
 
 	TRACE(("get_writable_cached_block(blockNumber = %Ld, transaction = %ld)\n", blockNumber, transactionID));
 
-	cached_block *block = get_cached_block(cache, blockNumber, cleared);
+	bool allocated;
+	cached_block *block = get_cached_block(cache, blockNumber, allocated, !cleared);
 	if (block == NULL)
 		return NULL;
 
 	// if there is no transaction support, we just return the current block
 	if (transactionID == -1) {
-		if (cleared && block->data == NULL) {
-			block->data = cache->allocator->Get();
-			if (block->data == NULL) {
-				put_cached_block(cache, block);
-				return NULL;
-			}
-		}
 		if (cleared)
 			memset(block->data, 0, cache->block_size);
 
@@ -416,9 +449,9 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off
 		transaction->num_blocks++;
 	}
 
-	if (block->data != NULL && block->original == NULL) {
+	if (!(allocated && cleared) && block->original == NULL) {
 		// we already have data, so we need to save it
-		block->original = cache->allocator->Get();
+		block->original = cache->Allocate();
 		if (block->original == NULL) {
 			put_cached_block(cache, block);
 			return NULL;
@@ -427,15 +460,9 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off
 		memcpy(block->original, block->data, cache->block_size);
 	}
 
-	if (block->data == NULL && cleared) {
-		// there is no data yet, we need a clean new block
-		block->data = cache->allocator->Get();
-		if (block->data == NULL) {
-			put_cached_block(cache, block);
-			return NULL;
-		}
+	if (cleared)
 		memset(block->data, 0, cache->block_size);
-	}
+
 	block->is_dirty = true;
 
 	return block->data;
@@ -511,7 +538,7 @@ cache_start_transaction(void *_cache)
 
 	TRACE(("cache_transaction_start(): id %ld started\n", transaction->id));
 
-	BenaphoreLocker locker(cache);
+	BenaphoreLocker locker(&cache->lock);
 	hash_insert(cache->transaction_hash, transaction);
 
 	return transaction->id;
@@ -522,7 +549,7 @@ extern "C" status_t
 cache_sync_transaction(void *_cache, int32 id)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(cache);
+	BenaphoreLocker locker(&cache->lock);
 	status_t status = B_ENTRY_NOT_FOUND;
 
 	hash_iterator iterator;
@@ -552,7 +579,7 @@ extern "C" status_t
 cache_end_transaction(void *_cache, int32 id, transaction_notification_hook hook, void *data)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(cache);
+	BenaphoreLocker locker(&cache->lock);
 
 	TRACE(("cache_end_transaction(id = %ld)\n", id));
 
@@ -577,7 +604,7 @@ cache_end_transaction(void *_cache, int32 id, transaction_notification_hook hook
 		}
 
 		if (block->original != NULL) {
-			cache->allocator->Put(block->original);
+			cache->Free(block->original);
 			block->original = NULL;
 		}
 
@@ -599,7 +626,7 @@ extern "C" status_t
 cache_abort_transaction(void *_cache, int32 id)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(cache);
+	BenaphoreLocker locker(&cache->lock);
 
 	TRACE(("cache_abort_transaction(id = %ld)\n", id));
 
@@ -619,7 +646,7 @@ cache_abort_transaction(void *_cache, int32 id)
 			TRACE(("cache_abort_transaction(id = %ld): restored contents of block %Ld\n",
 				transaction->id, block->block_number));
 			memcpy(block->data, block->original, cache->block_size);
-			cache->allocator->Put(block->original);
+			cache->Free(block->original);
 			block->original = NULL;
 		}
 
@@ -660,7 +687,7 @@ cache_next_block_in_transaction(void *_cache, int32 id, uint32 *_cookie, off_t *
 	cached_block *block = (cached_block *)*_cookie;
 	block_cache *cache = (block_cache *)_cache;
 
-	BenaphoreLocker locker(cache);
+	BenaphoreLocker locker(&cache->lock);
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL)
@@ -703,9 +730,9 @@ block_cache_delete(void *_cache, bool allowWrites)
 	uint32 cookie = 0;
 	cached_block *block;
 	while ((block = (cached_block *)hash_remove_first(cache->hash, &cookie)) != NULL) {
-		free_cached_block(cache, block);
+		cache->FreeBlock(block);
 	}
-	
+
 	// free all transactions (they will all be aborted)	
 
 	cookie = 0;
@@ -714,11 +741,6 @@ block_cache_delete(void *_cache, bool allowWrites)
 		delete transaction;
 	}
 
-	hash_uninit(cache->hash);
-	hash_uninit(cache->transaction_hash);
-	BlockAllocator::PutAllocator(cache->allocator);
-	benaphore_destroy(&cache->lock);
-
 	delete cache;
 }
 
@@ -726,41 +748,16 @@ block_cache_delete(void *_cache, bool allowWrites)
 extern "C" void *
 block_cache_create(int fd, off_t numBlocks, size_t blockSize)
 {
-	block_cache *cache = new block_cache;
+	block_cache *cache = new block_cache(fd, numBlocks, blockSize);
 	if (cache == NULL)
 		return NULL;
 
-	cache->hash = hash_init(32, 0, &cached_block_compare, &cached_block_hash);
-	if (cache->hash == NULL)
-		goto err1;
-
-	cache->transaction_hash = hash_init(16, 0, &transaction_compare, &transaction_hash);
-	if (cache->transaction_hash == NULL)
-		goto err2;
-
-	cache->allocator = BlockAllocator::GetAllocator(blockSize);
-	if (cache->allocator == NULL)
-		goto err3;
-
-	if (benaphore_init(&cache->lock, "block cache") < B_OK)
-		goto err4;
-
-	cache->fd = fd;
-	cache->max_blocks = numBlocks;
-	cache->block_size = blockSize;
-	cache->next_transaction_id = 1;
+	if (cache->InitCheck() != B_OK) {
+		delete cache;
+		return NULL;
+	}
 
 	return cache;
-
-err4:
-	BlockAllocator::PutAllocator(cache->allocator);
-err3:
-	hash_uninit(cache->transaction_hash);
-err2:
-	hash_uninit(cache->hash);
-err1:
-	delete cache;
-	return NULL;
 }
 
 
@@ -772,7 +769,7 @@ block_cache_sync(void *_cache)
 	// we will sync all dirty blocks to disk that have a completed
 	// transaction or no transaction only
 
-	BenaphoreLocker locker(cache);
+	BenaphoreLocker locker(&cache->lock);
 	hash_iterator iterator;
 	hash_open(cache->hash, &iterator);
 
@@ -837,15 +834,16 @@ extern "C" const void *
 block_cache_get_etc(void *_cache, off_t blockNumber, off_t base, off_t length)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(cache);
+	BenaphoreLocker locker(&cache->lock);
+	bool allocated;
 
-	cached_block *block = get_cached_block(cache, blockNumber);
+	cached_block *block = get_cached_block(cache, blockNumber, allocated);
 	if (block == NULL)
 		return NULL;
 
 #ifdef DEBUG_CHANGED
 	if (block->compare == NULL)
-		block->compare = cache->allocator->Get();
+		block->compare = cache->Allocate();
 	if (block->compare != NULL)
 		memcpy(block->compare, block->data, cache->block_size);
 #endif
@@ -876,7 +874,7 @@ extern "C" void
 block_cache_put(void *_cache, off_t blockNumber)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(cache);
+	BenaphoreLocker locker(&cache->lock);
 
 	put_cached_block(cache, blockNumber);
 }
