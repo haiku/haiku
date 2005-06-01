@@ -292,6 +292,9 @@ AppServer::LaunchInputServer()
 		snooze(250000);
 	}
 
+	// we sleep a bit more
+	snooze(1000000);
+
 	if (fQuittingServer)
 		return;
 
