@@ -336,7 +336,7 @@ MouseInputDevice::DeviceWatcher(void *arg)
 	
 	mouse_movement movements;
 	uint32 buttons_state = 0;
-	BMessage *message;
+	BMessage *message = NULL;
 	while (dev->active) {
 		memset(&movements, 0, sizeof(movements));
 		if (ioctl(dev->fd, MS_READ, &movements) < B_OK)
@@ -352,11 +352,19 @@ MouseInputDevice::DeviceWatcher(void *arg)
 		int32 ydelta = movements.ydelta * dev->settings.accel.speed >> 15;
 
 		LOG("%s: x: %ld, y: %ld, \n", dev->device_ref.name, xdelta, ydelta);
-
-		// TODO: Here we send B_MOUSE_UP/DOWN before B_MOUSE_MOVED.
-		// This could be the cause of the bug in RootLayer.cpp:
-		// "mouse position changed in B_MOUSE_DOWN from last B_MOUSE_MOVED".
-		// Might be wiser to switch the order.
+		
+		if (movements.xdelta != 0 || movements.ydelta != 0) {
+			message = new BMessage(B_MOUSE_MOVED);
+			if (message) {
+				message->AddInt64("when", movements.timestamp);
+				message->AddInt32("buttons", movements.buttons);
+				message->AddInt32("x", xdelta);
+				message->AddInt32("y", ydelta);
+					
+				sSingletonMouseDevice->EnqueueMessage(message);
+			}
+		}
+		
 		if (buttons != 0) {
 			message = new BMessage(B_MOUSE_UP);				
 			if ((buttons & movements.buttons) > 0) {
@@ -374,19 +382,7 @@ MouseInputDevice::DeviceWatcher(void *arg)
 			sSingletonMouseDevice->EnqueueMessage(message);
 			buttons_state = movements.buttons;
 		}
-		
-		if (movements.xdelta != 0 || movements.ydelta != 0) {
-			message = new BMessage(B_MOUSE_MOVED);
-			if (message) {
-				message->AddInt64("when", movements.timestamp);
-				message->AddInt32("buttons", movements.buttons);
-				message->AddInt32("x", xdelta);
-				message->AddInt32("y", ydelta);
-					
-				sSingletonMouseDevice->EnqueueMessage(message);
-			}
-		}
-		
+				
 		if ((movements.wheel_ydelta != 0) || (movements.wheel_xdelta != 0)) {
 			message = new BMessage(B_MOUSE_WHEEL_CHANGED);
 			if (message) {
