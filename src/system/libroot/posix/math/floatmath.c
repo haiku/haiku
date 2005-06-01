@@ -41,3 +41,21 @@ float gammaf(float x) {return (float)gamma((double)x);};
 float lgammaf(float x) {return (float)lgamma((double)x);};
 float rintf(float x) {return (float)rint((double)x);};
 float scalbf(float x, float n) {return (float)scalb((double)x, (double)n);};
+
+// TODO: use optimized versions of these
+double
+modf(double x, double *y)
+{
+	int integer = (int)x;
+	*y = (double)integer;
+	return x - integer;
+}
+
+float
+modff(float x, float *y)
+{
+	double intpart = 0;
+	float result = (float)modf((double)x, &intpart);
+	*y = (float)intpart;
+	return result;
+}
