@@ -87,6 +87,8 @@ ServerBitmap::ServerBitmap(const ServerBitmap* bmp)
 */
 ServerBitmap::~ServerBitmap()
 {
+	// TODO: Maybe it would be wiser to free the buffer here,
+	// instead of do that in every subclass ?
 }
 
 /*! 
@@ -100,7 +102,7 @@ ServerBitmap::_AllocateBuffer(void)
 {
 	uint32 length = BitsLength();
 	if (length > 0) {
-		delete fBuffer;
+		delete[] fBuffer;
 		fBuffer = new uint8[length];
 	}
 }
@@ -113,7 +115,7 @@ ServerBitmap::_AllocateBuffer(void)
 void
 ServerBitmap::_FreeBuffer(void)
 {
-	delete fBuffer;
+	delete[] fBuffer;
 	fBuffer = NULL;
 }
 
