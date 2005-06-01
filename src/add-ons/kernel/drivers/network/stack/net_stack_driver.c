@@ -32,7 +32,7 @@
 #endif
 
 // Force the driver to stay loaded in memory
-#define STAY_LOADED             0	
+#define STAY_LOADED             0
 
 /*
  * Local definitions
@@ -139,7 +139,8 @@ device_hooks g_net_stack_driver_hooks =
 	NULL                	/* ->writev entry point */
 };
 
-struct core_module_info * core = NULL;
+struct core_module_info *g_core = NULL;
+uint32 g_core_reference_count = 0;
 
 #if STAY_LOADED
 int	g_stay_loaded_fd = -1;
@@ -194,20 +195,21 @@ _EXPORT status_t init_hardware(void)
 _EXPORT status_t init_driver(void)
 {
 	// only get the core module if we don't have it loaded already
-	if (!core) {
+	if (!g_core) {
 		int rv = 0;
-		rv = get_module(NET_CORE_MODULE_NAME, (module_info **) &core);
+		rv = get_module(NET_CORE_MODULE_NAME, (module_info **) &g_core);
 		if (rv < 0) {
 			TRACE((LOGID ERR "init_driver: Argh, can't load " NET_CORE_MODULE_NAME " module: %d\n", rv));
 			return rv;
 		}
 		
-		TRACE((LOGID "init_driver: built %s %s, core = %p\n", __DATE__, __TIME__, core));
+		TRACE((LOGID "init_driver: built %s %s, core = %p\n", __DATE__, __TIME__, g_core));
 		
 		// start the network stack!
-		core->start();
+		g_core->start();
 	}
 	
+	g_core_reference_count++;
 	return B_OK;
 }
 
@@ -219,14 +221,14 @@ _EXPORT status_t init_driver(void)
 _EXPORT void uninit_driver(void)
 {
 	TRACE((LOGID "uninit_driver\n"));
-
-	if (core) {
-#if STAY_LOADED
+	g_core_reference_count--;
+	
+	if (g_core && g_core_reference_count == 0) {
 		// shutdown the network stack
-		core->stop();
-#endif
+		g_core->stop();
+		
 		put_module(NET_CORE_MODULE_NAME);
-		core = NULL;
+		g_core = NULL;
 	};
 }
 
@@ -295,7 +297,7 @@ static status_t net_stack_close(void *cookie)
 	rv = B_ERROR;
 	if (nsc->socket) {
 		// if a socket was opened on this fd, close it now.
-		rv = core->socket_close(nsc->socket);
+		rv = g_core->socket_close(nsc->socket);
 		nsc->socket = NULL;
 	}
 	
@@ -345,9 +347,9 @@ static status_t net_stack_control(void *cookie, uint32 op, void *data, size_t le
 			case NET_STACK_SOCKET: {
 
 				// okay, now try to open a real socket behind this fd/net_stack_cookie pair
-				err = core->socket_init(&nsc->socket);
+				err = g_core->socket_init(&nsc->socket);
 				if (err == 0)
-					err = core->socket_create(nsc->socket, args->u.socket.family, args->u.socket.type, args->u.socket.proto);
+					err = g_core->socket_create(nsc->socket, args->u.socket.family, args->u.socket.type, args->u.socket.proto);
 				// TODO: This is where the open flags need to be addressed
 				return err;
 			}
@@ -361,24 +363,24 @@ static status_t net_stack_control(void *cookie, uint32 op, void *data, size_t le
 				return B_OK;
 			}
 			case NET_STACK_CONTROL_NET_MODULE: {
-				return core->control_net_module(args->u.control.name, args->u.control.op,
+				return g_core->control_net_module(args->u.control.name, args->u.control.op,
 					args->u.control.data, args->u.control.length);
 			}
 		};
 	} else {
 		switch (op) {
 			case NET_STACK_CONNECT:
-				return core->socket_connect(nsc->socket, (caddr_t) args->u.sockaddr.addr, args->u.sockaddr.addrlen);
+				return g_core->socket_connect(nsc->socket, (caddr_t) args->u.sockaddr.addr, args->u.sockaddr.addrlen);
 
 			case NET_STACK_SHUTDOWN:
-				return core->socket_shutdown(nsc->socket, args->u.integer);
+				return g_core->socket_shutdown(nsc->socket, args->u.integer);
 
 			case NET_STACK_BIND:
-				return core->socket_bind(nsc->socket, (caddr_t) args->u.sockaddr.addr, args->u.sockaddr.addrlen);
+				return g_core->socket_bind(nsc->socket, (caddr_t) args->u.sockaddr.addr, args->u.sockaddr.addrlen);
 	
 			case NET_STACK_LISTEN:
 				// backlog to set
-				return core->socket_listen(nsc->socket, args->u.integer);
+				return g_core->socket_listen(nsc->socket, args->u.integer);
 
 			case NET_STACK_ACCEPT: {
 				/* args->u.accept.cookie == net_stack_cookie of the already opened fd
@@ -386,7 +388,7 @@ static status_t net_stack_control(void *cookie, uint32 op, void *data, size_t le
 				 */
 				 
 				net_stack_cookie *ansc = args->u.accept.cookie;
-				return core->socket_accept(nsc->socket, &ansc->socket, (void *)args->u.accept.addr, &args->u.accept.addrlen);
+				return g_core->socket_accept(nsc->socket, &ansc->socket, (void *)args->u.accept.addr, &args->u.accept.addrlen);
 			}
 			case NET_STACK_SEND:
 				// TODO: flags gets ignored here...
@@ -400,7 +402,7 @@ static status_t net_stack_control(void *cookie, uint32 op, void *data, size_t le
 				struct msghdr * mh = (struct msghdr *) data;
 				int retsize;
 
-				err = core->socket_recv(nsc->socket, mh, (caddr_t)&mh->msg_namelen, 
+				err = g_core->socket_recv(nsc->socket, mh, (caddr_t)&mh->msg_namelen, 
 			                     &retsize);
 				if (err == 0)
 					return retsize;
@@ -410,41 +412,41 @@ static status_t net_stack_control(void *cookie, uint32 op, void *data, size_t le
 				struct msghdr * mh = (struct msghdr *) data;
 				int retsize;
 
-				err = core->socket_send(nsc->socket, mh, mh->msg_flags, 
+				err = g_core->socket_send(nsc->socket, mh, mh->msg_flags, 
 			                     &retsize);
 				if (err == 0)
 					return retsize;
 				return err;
 			}
 			case NET_STACK_SYSCTL:
-				return core->net_sysctl(args->u.sysctl.name, args->u.sysctl.namelen,
+				return g_core->net_sysctl(args->u.sysctl.name, args->u.sysctl.namelen,
 			                          args->u.sysctl.oldp, args->u.sysctl.oldlenp,
 			                          args->u.sysctl.newp, args->u.sysctl.newlen);
 		
 			case NET_STACK_GETSOCKOPT:
-				return core->socket_getsockopt(nsc->socket, args->u.sockopt.level, args->u.sockopt.option,
+				return g_core->socket_getsockopt(nsc->socket, args->u.sockopt.level, args->u.sockopt.option,
 			                      args->u.sockopt.optval, (size_t *) &args->u.sockopt.optlen);
 
 			case NET_STACK_SETSOCKOPT:
-				return core->socket_setsockopt(nsc->socket, args->u.sockopt.level, args->u.sockopt.option,
+				return g_core->socket_setsockopt(nsc->socket, args->u.sockopt.level, args->u.sockopt.option,
 			                        (const void *) args->u.sockopt.optval, args->u.sockopt.optlen);
 
 			case NET_STACK_GETSOCKNAME:
-				return core->socket_getsockname(nsc->socket, args->u.sockaddr.addr, &args->u.sockaddr.addrlen);
+				return g_core->socket_getsockname(nsc->socket, args->u.sockaddr.addr, &args->u.sockaddr.addrlen);
 	
 			case NET_STACK_GETPEERNAME:
-				return core->socket_getpeername(nsc->socket, args->u.sockaddr.addr, &args->u.sockaddr.addrlen);
+				return g_core->socket_getpeername(nsc->socket, args->u.sockaddr.addr, &args->u.sockaddr.addrlen);
 				
 			case B_SET_BLOCKING_IO: {
 				int off = false;
 				nsc->open_flags &= ~O_NONBLOCK;
-				return core->socket_ioctl(nsc->socket, FIONBIO, (caddr_t) &off);
+				return g_core->socket_ioctl(nsc->socket, FIONBIO, (caddr_t) &off);
 			}
 	
 			case B_SET_NONBLOCKING_IO: {
 				int on = true;
 				nsc->open_flags |= O_NONBLOCK;
-				return core->socket_ioctl(nsc->socket, FIONBIO, (caddr_t) &on);
+				return g_core->socket_ioctl(nsc->socket, FIONBIO, (caddr_t) &on);
 			}
 	
 			case NET_STACK_SELECT:
@@ -459,7 +461,7 @@ static status_t net_stack_control(void *cookie, uint32 op, void *data, size_t le
 			default:
 				if (nsc->socket)
 					// pass any unhandled opcode to the stack
-					return core->socket_ioctl(nsc->socket, op, data);
+					return g_core->socket_ioctl(nsc->socket, op, data);
 				return B_BAD_VALUE;
 		};
 	};
@@ -492,7 +494,7 @@ static status_t net_stack_read(void *cookie,
 	iov.iov_base = buffer;
 	iov.iov_len = *readlen;
 	
-	error = core->socket_readv(nsc->socket, &iov, &flags);
+	error = g_core->socket_readv(nsc->socket, &iov, &flags);
 	*readlen = error;
     return error;
 }
@@ -524,7 +526,7 @@ static status_t net_stack_write(void *cookie,
 #endif
 		if (*writelen >= strlen(STOP_CMD) &&
 		    strncmp(buffer, STOP_CMD, strlen(STOP_CMD)) == 0)
-				return core->stop();
+				return g_core->stop();
 
 		return B_BAD_VALUE;
 	};
@@ -532,7 +534,7 @@ static status_t net_stack_write(void *cookie,
 	iov.iov_base = (void*)buffer;
 	iov.iov_len = *writelen;
 	
-	error = core->socket_writev(nsc->socket, &iov, flags);
+	error = g_core->socket_writev(nsc->socket, &iov, flags);
 	*writelen = error;
 	return error;	
 }
@@ -580,7 +582,7 @@ static status_t net_stack_select(void *cookie, uint8 event, uint32 ref, selectsy
 	release_sem(nsc->selecters_lock);
 
 	// start (or continue) to monitor for socket event
-	return core->socket_set_event_callback(nsc->socket, on_socket_event, nsc, event);
+	return g_core->socket_set_event_callback(nsc->socket, on_socket_event, nsc, event);
 }
 
 
@@ -628,7 +630,7 @@ static status_t net_stack_deselect(void *cookie, uint8 event, selectsync *sync)
 
 	if (nsc->selecters == NULL)
 		// selecters list is empty: no need to monitor socket events anymore
-		core->socket_set_event_callback(nsc->socket, NULL, NULL, event);
+		g_core->socket_set_event_callback(nsc->socket, NULL, NULL, event);
 
 	// unlock the selecters list
 	return release_sem(nsc->selecters_lock);
