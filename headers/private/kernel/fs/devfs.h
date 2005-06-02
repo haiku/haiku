@@ -16,6 +16,8 @@
 extern "C" {
 #endif
 
+status_t devfs_add_driver(const char *path);
+
 status_t devfs_unpublish_file_device(const char *path);
 status_t devfs_publish_file_device(const char *path, const char *filePath);
 

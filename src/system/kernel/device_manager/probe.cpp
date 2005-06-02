@@ -83,6 +83,7 @@ class DirectoryIterator {
 		void SetTo(const char **paths, const char *subPath = NULL, bool recursive = false);
 
 		status_t GetNext(KPath &path, struct stat &stat);
+		const char *CurrentName() const { return fCurrentName; }
 
 		void Unset();
 		void AddPath(const char *path, const char *subPath = NULL);
@@ -92,13 +93,15 @@ class DirectoryIterator {
 		bool			fRecursive;
 		DIR				*fDirectory;
 		KPath			*fBasePath;
+		const char		*fCurrentName;
 };
 
 
 DirectoryIterator::DirectoryIterator(const char *path, const char *subPath, bool recursive)
 	:
 	fDirectory(NULL),
-	fBasePath(NULL)
+	fBasePath(NULL),
+	fCurrentName(NULL)
 {
 	SetTo(path, subPath, recursive);
 }
@@ -168,8 +171,10 @@ next_entry:
 	if (!strcmp(dirent->d_name, "..") || !strcmp(dirent->d_name, "."))
 		goto next_entry;
 
+	fCurrentName = dirent->d_name;
+
 	path.SetTo(fBasePath->Path());
-	path.Append(dirent->d_name);
+	path.Append(fCurrentName);
 
 	if (::stat(path.Path(), &stat) != 0)
 		goto next_entry;
@@ -758,124 +763,6 @@ find_node_ref_in_list(struct list *list, dev_t device, ino_t node)
 }
 
 
-static image_id
-load_driver(const char *path)
-{
-	status_t (*init_hardware)(void);
-	status_t (*init_driver)(void);
-	const char **devicePaths;
-	int32 exported = 0;
-	status_t status;
-
-	// load the module
-	image_id image = load_kernel_add_on(path);
-	if (image < 0)
-		return image;
-
-	// for prettier debug output
-	const char *name = strrchr(path, '/');
-	if (name == NULL)
-		name = path;
-	else
-		name++;
-
-	// For a valid device driver the following exports are required
-
-	uint32 *api_version;
-	if (get_image_symbol(image, "api_version", B_SYMBOL_TYPE_DATA, (void **)&api_version) != B_OK)
-		dprintf("%s: api_version missing\n", name);
-
-	device_hooks *(*find_device)(const char *);
-	const char **(*publish_devices)(void);
-	if (get_image_symbol(image, "publish_devices", B_SYMBOL_TYPE_TEXT, (void **)&publish_devices) != B_OK
-		|| get_image_symbol(image, "find_device", B_SYMBOL_TYPE_TEXT, (void **)&find_device) != B_OK) {
-		dprintf("%s: mandatory driver symbol(s) missing!\n", name);
-		status = B_BAD_VALUE;
-		goto error1;
-	}
-
-	// Init the driver
-
-	if (get_image_symbol(image, "init_hardware", B_SYMBOL_TYPE_TEXT,
-			(void **)&init_hardware) == B_OK
-		&& (status = init_hardware()) != B_OK) {
-		dprintf("%s: init_hardware() failed: %s\n", name, strerror(status));
-		status = ENXIO;
-		goto error1;
-	}
-
-	if (get_image_symbol(image, "init_driver", B_SYMBOL_TYPE_TEXT,
-			(void **)&init_driver) == B_OK
-		&& (status = init_driver()) != B_OK) {
-		dprintf("%s: init_driver() failed: %s\n", name, strerror(status));
-		status = ENXIO;
-		goto error2;
-	}
-
-	// The driver has successfully been initialized, now we can
-	// finally publish its device entries
-
-	// we keep the driver loaded if it exports at least a single interface
-	// ToDo: we could/should always unload drivers until they will be used for real
-	// ToDo: this function is probably better kept in devfs, so that it could remember
-	//	the driver stuff (and even keep it loaded if there is enough memory)
-	devicePaths = publish_devices();
-	if (devicePaths == NULL) {
-		dprintf("%s: publish_devices() returned NULL.\n", name);
-		status = ENXIO;
-		goto error3;
-	}
-
-	for (; devicePaths[0]; devicePaths++) {
-		device_hooks *hooks = find_device(devicePaths[0]);
-
-		if (hooks && devfs_publish_device(devicePaths[0], NULL, hooks) == 0)
-			exported++;
-	}
-
-	// we're all done, driver will be kept loaded (for now, see above comment)
-	if (exported > 0)
-		return image;
-
-	status = B_ERROR;	// whatever...
-
-error3:
-	{
-		status_t (*uninit_driver)(void);
-		if (get_image_symbol(image, "uninit_driver", B_SYMBOL_TYPE_TEXT,
-				(void **)&uninit_driver) == B_OK)
-			uninit_driver();
-	}
-
-error2:
-	{
-		status_t (*uninit_hardware)(void);
-		if (get_image_symbol(image, "uninit_hardware", B_SYMBOL_TYPE_TEXT,
-				(void **)&uninit_hardware) == B_OK)
-			uninit_hardware();
-	}
-error1:
-	/* If we've gotten here then the driver will be unloaded and an
-	 * error code returned.
-	 */
-	unload_kernel_add_on(image);
-	return status;
-}
-
-
-/** This is no longer part of the public kernel API, so we just export the symbol */
-
-status_t load_driver_symbols(const char *driverName);
-status_t
-load_driver_symbols(const char *driverName)
-{
-	// This will be globally done for the whole kernel via the settings file.
-	// We don't have to do anything here.
-
-	return B_OK;
-}
-
-
 /**	Iterates over the given list and tries to load all drivers and modules
  *	in that list.
  *	The list is emptied and freed during the traversal.
@@ -904,7 +791,7 @@ try_drivers(struct list &list, bool tryBusDrivers)
 				dprintf("loaded module %s\n", entry->path);
 			} else {
 				// it can still be a standard old-style driver
-				if (load_driver(entry->path) == B_OK) {
+				if (devfs_add_driver(entry->path) == B_OK) {
 					// we have a driver
 					dprintf("loaded driver %s\n", entry->path);
 				}
@@ -1365,9 +1252,13 @@ probe_for_driver_modules(const char *type)
 			// We need to make sure that drivers in ie. "audio/raw/" can
 			// be found as well - therefore, we must make sure that "audio"
 			// exists on /dev.
-			int32 length = strlen("drivers/dev/");
-			if (!strncmp(type, "drivers/dev/", length))
-				devfs_publish_directory(type + length);
+			size_t length = strlen("drivers/dev");
+			if (strncmp(type, "drivers/dev", length))
+				continue;
+
+			path.SetTo(type);
+			path.Append(iterator.CurrentName());
+			devfs_publish_directory(path.Path() + length + 1);
 			continue;
 		}
 

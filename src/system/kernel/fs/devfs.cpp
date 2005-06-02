@@ -18,16 +18,19 @@
 #include <KPath.h>
 #include <vfs.h>
 #include <debug.h>
-#include <khash.h>
-#include <malloc.h>
+#include <util/khash.h>
+#include <util/AutoLock.h>
+#include <elf.h>
 #include <lock.h>
 #include <vm.h>
-
 #include <arch/cpu.h>
+
 #include <devfs.h>
 
 #include <string.h>
+#include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
 #include <sys/stat.h>
 
 
@@ -39,28 +42,32 @@
 #endif
 
 
-struct devfs_part_map {
-	struct devfs_vnode *raw_device;
-	partition_info info;
+struct devfs_partition {
+	struct devfs_vnode	*raw_device;
+	partition_info		info;
 };
+
+struct driver_entry;
 
 struct devfs_stream {
 	mode_t type;
 	union {
 		struct stream_dir {
-			struct devfs_vnode *dir_head;
-			struct list cookies;
+			struct devfs_vnode		*dir_head;
+			struct list				cookies;
+			bool					scanned;
 		} dir;
 		struct stream_dev {
-			device_node_info *node;
-			pnp_devfs_driver_info *info;
-			device_hooks *ops;
-			struct devfs_part_map *part_map;
-			IOScheduler *scheduler;
+			device_node_info		*node;
+			pnp_devfs_driver_info	*info;
+			device_hooks			*ops;
+			struct devfs_partition	*part_map;
+			IOScheduler				*scheduler;
+			driver_entry			*driver;
 		} dev;
 		struct stream_symlink {
-			const char *path;
-			size_t length;
+			const char				*path;
+			size_t					length;
 		} symlink;
 	} u;
 };
@@ -78,13 +85,15 @@ struct devfs_vnode {
 	struct devfs_stream stream;
 };
 
+#define DEVFS_HASH_SIZE 16
+
 struct devfs {
 	mount_id	id;
-	mutex		lock;
+	recursive_lock lock;
 	int32		next_vnode_id;
-	hash_table *vnode_list_hash;
+	hash_table	*vnode_hash;
 	struct devfs_vnode *root_vnode;
-	bool		root_scanned;
+	hash_table	*driver_hash;
 };
 
 struct devfs_dir_cookie {
@@ -105,6 +114,19 @@ enum {
 	ITERATION_STATE_BEGIN	= ITERATION_STATE_DOT,
 };
 
+struct driver_entry {
+	driver_entry	*next;
+	const char		*path;
+	mount_id		device;
+	vnode_id		node;
+	time_t			last_modified;
+	image_id		image;
+};
+
+static status_t publish_device(struct devfs *fs, const char *path,
+					device_node_info *deviceNode, pnp_devfs_driver_info *info,
+					driver_entry *driver, device_hooks *ops);
+
 // The boot device, if already present
 extern dev_t gBootDevice;
 
@@ -112,11 +134,162 @@ extern dev_t gBootDevice;
 static struct devfs *sDeviceFileSystem = NULL;
 
 
-#define BOOTFS_HASH_SIZE 16
+//	#pragma mark - driver private
 
 
 static uint32
-devfs_vnode_hash_func(void *_vnode, const void *_key, uint32 range)
+driver_entry_hash(void *_driver, const void *_key, uint32 range)
+{
+	driver_entry *driver = (driver_entry *)_driver;
+	const vnode_id *key = (const vnode_id *)_key;
+
+	if (driver != NULL)
+		return driver->node % range;
+
+	return (*key) % range;
+}
+
+
+static int
+driver_entry_compare(void *_driver, const void *_key)
+{
+	driver_entry *driver = (driver_entry *)_driver;
+	const vnode_id *key = (const vnode_id *)_key;
+
+	if (driver->node == *key)
+		return 0;
+
+	return -1;
+}
+
+
+static status_t
+load_driver(driver_entry *driver)
+{
+	status_t (*init_hardware)(void);
+	status_t (*init_driver)(void);
+	const char **devicePaths;
+	int32 exported = 0;
+	status_t status;
+
+	// load the module
+	image_id image = load_kernel_add_on(driver->path);
+	if (image < 0)
+		return image;
+
+	// for prettier debug output
+	const char *name = strrchr(driver->path, '/');
+	if (name == NULL)
+		name = driver->path;
+	else
+		name++;
+
+	// For a valid device driver the following exports are required
+
+	uint32 *api_version;
+	if (get_image_symbol(image, "api_version", B_SYMBOL_TYPE_DATA, (void **)&api_version) != B_OK)
+		dprintf("%s: api_version missing\n", name);
+
+	device_hooks *(*find_device)(const char *);
+	const char **(*publish_devices)(void);
+	if (get_image_symbol(image, "publish_devices", B_SYMBOL_TYPE_TEXT, (void **)&publish_devices) != B_OK
+		|| get_image_symbol(image, "find_device", B_SYMBOL_TYPE_TEXT, (void **)&find_device) != B_OK) {
+		dprintf("%s: mandatory driver symbol(s) missing!\n", name);
+		status = B_BAD_VALUE;
+		goto error1;
+	}
+
+	// Init the driver
+
+	if (get_image_symbol(image, "init_hardware", B_SYMBOL_TYPE_TEXT,
+			(void **)&init_hardware) == B_OK
+		&& (status = init_hardware()) != B_OK) {
+		dprintf("%s: init_hardware() failed: %s\n", name, strerror(status));
+		status = ENXIO;
+		goto error1;
+	}
+
+	if (get_image_symbol(image, "init_driver", B_SYMBOL_TYPE_TEXT,
+			(void **)&init_driver) == B_OK
+		&& (status = init_driver()) != B_OK) {
+		dprintf("%s: init_driver() failed: %s\n", name, strerror(status));
+		status = ENXIO;
+		goto error2;
+	}
+
+	// The driver has successfully been initialized, now we can
+	// finally publish its device entries
+
+	// we keep the driver loaded if it exports at least a single interface
+	// ToDo: we could/should always unload drivers until they will be used for real
+	// ToDo: this function is probably better kept in devfs, so that it could remember
+	//	the driver stuff (and even keep it loaded if there is enough memory)
+	devicePaths = publish_devices();
+	if (devicePaths == NULL) {
+		dprintf("%s: publish_devices() returned NULL.\n", name);
+		status = ENXIO;
+		goto error3;
+	}
+
+	for (; devicePaths[0]; devicePaths++) {
+		device_hooks *hooks = find_device(devicePaths[0]);
+
+		if (hooks != NULL
+			&& publish_device(sDeviceFileSystem, devicePaths[0],
+					NULL, NULL, driver, hooks) == B_OK)
+			exported++;
+	}
+
+	// we're all done, driver will be kept loaded (for now, see above comment)
+	if (exported > 0) {
+		driver->image = image;
+		return B_OK;
+	}
+
+	status = B_ERROR;	// whatever...
+
+error3:
+	{
+		status_t (*uninit_driver)(void);
+		if (get_image_symbol(image, "uninit_driver", B_SYMBOL_TYPE_TEXT,
+				(void **)&uninit_driver) == B_OK)
+			uninit_driver();
+	}
+
+error2:
+	{
+		status_t (*uninit_hardware)(void);
+		if (get_image_symbol(image, "uninit_hardware", B_SYMBOL_TYPE_TEXT,
+				(void **)&uninit_hardware) == B_OK)
+			uninit_hardware();
+	}
+
+error1:
+	unload_kernel_add_on(image);
+	driver->image = status;
+
+	return status;
+}
+
+
+/** This is no longer part of the public kernel API, so we just export the symbol */
+
+status_t load_driver_symbols(const char *driverName);
+status_t
+load_driver_symbols(const char *driverName)
+{
+	// This will be globally done for the whole kernel via the settings file.
+	// We don't have to do anything here.
+
+	return B_OK;
+}
+
+
+//	#pragma mark - devfs private
+
+
+static uint32
+devfs_vnode_hash(void *_vnode, const void *_key, uint32 range)
 {
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
 	const vnode_id *key = (const vnode_id *)_key;
@@ -129,7 +302,7 @@ devfs_vnode_hash_func(void *_vnode, const void *_key, uint32 range)
 
 
 static int
-devfs_vnode_compare_func(void *_vnode, const void *_key)
+devfs_vnode_compare(void *_vnode, const void *_key)
 {
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
 	const vnode_id *key = (const vnode_id *)_key;
@@ -179,7 +352,7 @@ devfs_delete_vnode(struct devfs *fs, struct devfs_vnode *vnode, bool force_delet
 		return EPERM;
 
 	// remove it from the global hash table
-	hash_remove(fs->vnode_list_hash, vnode);
+	hash_remove(fs->vnode_hash, vnode);
 
 	if (S_ISCHR(vnode->stream.type)) {
 		// for partitions, we have to release the raw device
@@ -312,7 +485,7 @@ static status_t
 devfs_get_partition_info(struct devfs *fs, struct devfs_vnode *v, 
 	struct devfs_cookie *cookie, void *buffer, size_t length)
 {
-	struct devfs_part_map *map = v->stream.u.dev.part_map;
+	struct devfs_partition *map = v->stream.u.dev.part_map;
 
 	if (!S_ISCHR(v->stream.type) || map == NULL || length != sizeof(partition_info))
 		return B_BAD_VALUE;
@@ -340,13 +513,13 @@ add_partition(struct devfs *fs, struct devfs_vnode *device,
 		return B_BAD_VALUE;
 
 	// create partition map
-	struct devfs_part_map *map = (struct devfs_part_map *)malloc(sizeof(struct devfs_part_map));
+	struct devfs_partition *map = (struct devfs_partition *)malloc(sizeof(struct devfs_partition));
 	if (map == NULL)
 		return B_NO_MEMORY;
 
 	memcpy(&map->info, &info, sizeof(partition_info));
 
-	mutex_lock(&fs->lock);
+	RecursiveLocker locker(&fs->lock);
 
 	// you cannot change a partition once set
 	if (devfs_find_in_dir(device->parent, name)) {
@@ -375,24 +548,17 @@ add_partition(struct devfs *fs, struct devfs_vnode *device,
 	partition->stream.u.dev.part_map = map;
 	partition->stream.u.dev.scheduler = device->stream.u.dev.scheduler;
 
-	hash_insert(fs->vnode_list_hash, partition);
-
+	hash_insert(fs->vnode_hash, partition);
 	devfs_insert_in_dir(device->parent, partition);
-
-	mutex_unlock(&fs->lock);
 
 	TRACE(("SET_PARTITION: Added partition\n"));
 	return B_OK;
 
 err1:
-	mutex_unlock(&fs->lock);
-
 	free(map);
 	return status;
 
 err2:
-	mutex_unlock(&fs->lock);
-
 	put_vnode(fs->id, device->id);
 	free(map);
 	return status;
@@ -400,18 +566,18 @@ err2:
 
 
 static inline void
-translate_partition_access(devfs_part_map *map, off_t &offset, size_t &size)
+translate_partition_access(devfs_partition *partition, off_t &offset, size_t &size)
 {
 	if (offset < 0)
 		offset = 0;
 
-	if (offset > map->info.size) {
+	if (offset > partition->info.size) {
 		size = 0;
 		return;
 	}
 
-	size = min_c(size, map->info.size - offset);
-	offset += map->info.offset;
+	size = min_c(size, partition->info.size - offset);
+	offset += partition->info.offset;
 }
 
 
@@ -462,7 +628,7 @@ unpublish_node(struct devfs *fs, const char *path, int type)
 		goto err1;
 	}
 
-	mutex_lock(&fs->lock);
+	recursive_lock_lock(&fs->lock);
 
 	status = devfs_remove_from_dir(node->parent, node);
 	if (status < B_OK)
@@ -471,7 +637,7 @@ unpublish_node(struct devfs *fs, const char *path, int type)
 	status = remove_vnode(fs->id, node->id);
 
 err2:
-	mutex_unlock(&fs->lock);
+	recursive_lock_unlock(&fs->lock);
 err1:
 	put_vnode(fs->id, node->id);
 	return status;
@@ -481,7 +647,7 @@ err1:
 static status_t
 publish_directory(struct devfs *fs, const char *path)
 {
-	ASSERT_LOCKED_MUTEX(&fs->lock);
+	ASSERT_LOCKED_RECURSIVE(&fs->lock);
 
 	// copy the path over to a temp buffer so we can munge it
 	KPath tempPath(path);
@@ -498,7 +664,7 @@ publish_directory(struct devfs *fs, const char *path)
 	status_t status = B_OK;
 	int32 i = 0, last = 0;
 
-	for (;temp[last] ;) {
+	while (temp[last]) {
 		if (temp[i] == '/') {
 			temp[i] = '\0';
 			i++;
@@ -534,7 +700,7 @@ publish_directory(struct devfs *fs, const char *path)
 		vnode->stream.u.dir.dir_head = NULL;
 		list_init(&vnode->stream.u.dir.cookies);
 
-		hash_insert(sDeviceFileSystem->vnode_list_hash, vnode);
+		hash_insert(sDeviceFileSystem->vnode_hash, vnode);
 		devfs_insert_in_dir(dir, vnode);
 
 		last = i;
@@ -616,7 +782,7 @@ publish_node(struct devfs *fs, const char *path, struct devfs_vnode **_node)
 			*_node = vnode;
 		}
 
-		hash_insert(sDeviceFileSystem->vnode_list_hash, vnode);
+		hash_insert(sDeviceFileSystem->vnode_hash, vnode);
 		devfs_insert_in_dir(dir, vnode);
 
 		if (atLeaf)
@@ -633,7 +799,7 @@ out:
 
 static status_t
 publish_device(struct devfs *fs, const char *path, device_node_info *deviceNode,
-	pnp_devfs_driver_info *info, device_hooks *ops)
+	pnp_devfs_driver_info *info, driver_entry *driver, device_hooks *ops)
 {
 	TRACE(("publish_device(path = \"%s\", node = %p, info = %p, hooks = %p)\n",
 		path, deviceNode, info, ops));
@@ -662,11 +828,11 @@ publish_device(struct devfs *fs, const char *path, device_node_info *deviceNode,
 	struct devfs_vnode *node;
 	status_t status;
 
-	mutex_lock(&fs->lock);
+	RecursiveLocker locker(&fs->lock);
 
 	status = publish_node(fs, path, &node);
 	if (status != B_OK)
-		goto out;
+		return status;
 
 	// all went fine, let's initialize the node
 	node->stream.type = S_IFCHR | 0644;
@@ -677,6 +843,7 @@ publish_device(struct devfs *fs, const char *path, device_node_info *deviceNode,
 		node->stream.u.dev.info = create_new_driver_info(ops);
 
 	node->stream.u.dev.node = deviceNode;
+	node->stream.u.dev.driver = driver;
 	node->stream.u.dev.ops = ops;
 
 	// every raw disk gets an I/O scheduler object attached
@@ -684,8 +851,6 @@ publish_device(struct devfs *fs, const char *path, device_node_info *deviceNode,
 	if (isDisk && !strcmp(node->name, "raw")) 
 		node->stream.u.dev.scheduler = new IOScheduler(path, info);
 
-out:
-	mutex_unlock(&fs->lock);
 	return status;
 }
 
@@ -708,7 +873,7 @@ get_device_name(struct devfs_vnode *vnode, char *buffer, size_t size)
 	}
 
 	// construct full path name
-	
+
 	for (vnode = leaf; vnode->parent && vnode->parent != vnode; vnode = vnode->parent) {
 		size_t length = strlen(vnode->name);
 		size_t start = offset - length - 1;
@@ -724,7 +889,7 @@ get_device_name(struct devfs_vnode *vnode, char *buffer, size_t size)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - file system interface
 
 
 static status_t
@@ -751,25 +916,31 @@ devfs_mount(mount_id id, const char *devfs, uint32 flags, const char *args,
 
 	fs->id = id;
 	fs->next_vnode_id = 0;
-	fs->root_scanned = false;
 
-	err = mutex_init(&fs->lock, "devfs_mutex");
+	err = recursive_lock_init(&fs->lock, "devfs lock");
 	if (err < B_OK)
 		goto err1;
 
-	fs->vnode_list_hash = hash_init(BOOTFS_HASH_SIZE,
-		(addr_t)&vnode->all_next - (addr_t)vnode,
-		&devfs_vnode_compare_func, &devfs_vnode_hash_func);
-	if (fs->vnode_list_hash == NULL) {
+	fs->vnode_hash = hash_init(DEVFS_HASH_SIZE, offsetof(devfs_vnode, all_next),
+		//(addr_t)&vnode->all_next - (addr_t)vnode,
+		&devfs_vnode_compare, &devfs_vnode_hash);
+	if (fs->vnode_hash == NULL) {
 		err = B_NO_MEMORY;
 		goto err2;
+	}
+
+	fs->driver_hash = hash_init(DEVFS_HASH_SIZE, offsetof(driver_entry, next),
+		&driver_entry_compare, &driver_entry_hash);
+	if (fs->driver_hash == NULL) {
+		err = B_NO_MEMORY;
+		goto err3;
 	}
 
 	// create a vnode
 	vnode = devfs_create_vnode(fs, NULL, "");
 	if (vnode == NULL) {
 		err = B_NO_MEMORY;
-		goto err3;
+		goto err4;
 	}
 
 	// set it up
@@ -781,17 +952,19 @@ devfs_mount(mount_id id, const char *devfs, uint32 flags, const char *args,
 	list_init(&vnode->stream.u.dir.cookies);
 	fs->root_vnode = vnode;
 
-	hash_insert(fs->vnode_list_hash, vnode);
+	hash_insert(fs->vnode_hash, vnode);
 
 	*root_vnid = vnode->id;
 	*_fs = fs;
 	sDeviceFileSystem = fs;
 	return B_OK;
 
+err4:
+	hash_uninit(fs->driver_hash);
 err3:
-	hash_uninit(fs->vnode_list_hash);
+	hash_uninit(fs->vnode_hash);
 err2:
-	mutex_destroy(&fs->lock);
+	recursive_lock_destroy(&fs->lock);
 err1:
 	free(fs);
 err:
@@ -809,14 +982,16 @@ devfs_unmount(fs_volume _fs)
 	TRACE(("devfs_unmount: entry fs = %p\n", fs));
 
 	// delete all of the vnodes
-	hash_open(fs->vnode_list_hash, &i);
-	while ((vnode = (struct devfs_vnode *)hash_next(fs->vnode_list_hash, &i)) != NULL) {
+	hash_open(fs->vnode_hash, &i);
+	while ((vnode = (devfs_vnode *)hash_next(fs->vnode_hash, &i)) != NULL) {
 		devfs_delete_vnode(fs, vnode, true);
 	}
-	hash_close(fs->vnode_list_hash, &i, false);
+	hash_close(fs->vnode_hash, &i, false);
 
-	hash_uninit(fs->vnode_list_hash);
-	mutex_destroy(&fs->lock);
+	hash_uninit(fs->vnode_hash);
+	hash_uninit(fs->driver_hash);
+
+	recursive_lock_destroy(&fs->lock);
 	free(fs);
 
 	return 0;
@@ -845,21 +1020,32 @@ devfs_lookup(fs_volume _fs, fs_vnode _dir, const char *name, vnode_id *_id, int 
 	if (!S_ISDIR(dir->stream.type))
 		return B_NOT_A_DIRECTORY;
 
-	mutex_lock(&fs->lock);
+	recursive_lock_lock(&fs->lock);
 
-	if (!fs->root_scanned && gBootDevice >= 0) {
-		fs->root_scanned = true;
-		mutex_unlock(&fs->lock);
+	if (!dir->stream.u.dir.scanned && gBootDevice >= 0) {
+		KPath path;
+		if (path.InitCheck() != B_OK) {
+			err = B_NO_MEMORY;
+			goto err;
+		}
+		get_device_name(dir, path.LockBuffer(), path.BufferSize());
+		path.UnlockBuffer();
+		TRACE(("devfs_lookup: not yet scanned: %s\n", path.Path()));
 
-		// scan for drivers at root level on first contact
-		probe_for_device_type("");
+		recursive_lock_unlock(&fs->lock);
 
-		mutex_lock(&fs->lock);
+		// scan for drivers at this path
+		probe_for_device_type(path.Path());
+
+		recursive_lock_lock(&fs->lock);
+		dir->stream.u.dir.scanned = true;
 	}
 
 	// look it up
 	vnode = devfs_find_in_dir(dir, name);
 	if (vnode == NULL) {
+		// ToDo: with node monitoring in place, we *know* here that the file does not exist
+		//		and don't have to scan for it again.
 		// scan for drivers in the given directory (that indicates the type of the driver)
 		KPath path;
 		if (path.InitCheck() != B_OK) {
@@ -870,20 +1056,23 @@ devfs_lookup(fs_volume _fs, fs_vnode _dir, const char *name, vnode_id *_id, int 
 		get_device_name(dir, path.LockBuffer(), path.BufferSize());
 		path.UnlockBuffer();
 		path.Append(name);
-		dprintf("lookup: \"%s\"\n", path.Path());
+		//dprintf("lookup: \"%s\"\n", path.Path());
 
-		mutex_unlock(&fs->lock);
+		recursive_lock_unlock(&fs->lock);
 
 		// scan for drivers of this type
 		probe_for_device_type(path.Path());
 
-		mutex_lock(&fs->lock);
+		recursive_lock_lock(&fs->lock);
 
 		vnode = devfs_find_in_dir(dir, name);
 		if (vnode == NULL) {
 			err = B_ENTRY_NOT_FOUND;
 			goto err;
 		}
+
+		if (S_ISDIR(vnode->stream.type) && gBootDevice >= 0)
+			vnode->stream.u.dir.scanned = true;
 	}
 
 	err = get_vnode(fs->id, vnode->id, (fs_vnode *)&vdummy);
@@ -894,8 +1083,7 @@ devfs_lookup(fs_volume _fs, fs_vnode _dir, const char *name, vnode_id *_id, int 
 	*_type = vnode->stream.type;
 
 err:
-	mutex_unlock(&fs->lock);
-
+	recursive_lock_unlock(&fs->lock);
 	return err;
 }
 
@@ -920,12 +1108,12 @@ devfs_get_vnode(fs_volume _fs, vnode_id id, fs_vnode *_vnode, bool reenter)
 	TRACE(("devfs_get_vnode: asking for vnode id = %Ld, vnode = %p, r %d\n", id, _vnode, reenter));
 
 	if (!reenter)
-		mutex_lock(&fs->lock);
+		recursive_lock_lock(&fs->lock);
 
-	*_vnode = hash_lookup(fs->vnode_list_hash, &id);
+	*_vnode = hash_lookup(fs->vnode_hash, &id);
 
 	if (!reenter)
-		mutex_unlock(&fs->lock);
+		recursive_lock_unlock(&fs->lock);
 
 	TRACE(("devfs_get_vnode: looked it up at %p\n", *_vnode));
 
@@ -957,8 +1145,7 @@ devfs_remove_vnode(fs_volume _fs, fs_vnode _v, bool reenter)
 
 	TRACE(("devfs_removevnode: remove %p (%Ld), reenter %d\n", vnode, vnode->id, reenter));
 
-	if (!reenter)
-		mutex_lock(&fs->lock);
+	RecursiveLocker locker(&fs->lock);
 
 	if (vnode->dir_next) {
 		// can't remove node if it's linked to the dir
@@ -966,9 +1153,6 @@ devfs_remove_vnode(fs_volume _fs, fs_vnode _v, bool reenter)
 	}
 
 	devfs_delete_vnode(fs, vnode, false);
-
-	if (!reenter)
-		mutex_unlock(&fs->lock);
 
 	return B_OK;
 }
@@ -986,7 +1170,7 @@ devfs_create(fs_volume _fs, fs_vnode _dir, const char *name, int openMode, int p
 
 	TRACE(("devfs_create: dir %p, name \"%s\", openMode 0x%x, fs_cookie %p \n", dir, name, openMode, _cookie));
 
-	mutex_lock(&fs->lock);
+	RecursiveLocker locker(&fs->lock);
 
 	// look it up
 	vnode = devfs_find_in_dir(dir, name);
@@ -1027,7 +1211,6 @@ devfs_create(fs_volume _fs, fs_vnode _dir, const char *name, int openMode, int p
 		goto err3;
 
 	*_cookie = cookie;
-	mutex_unlock(&fs->lock);
 	return B_OK;
 
 err3:
@@ -1035,7 +1218,6 @@ err3:
 err2:
 	put_vnode(fs->id, vnode->id);
 err1:
-	mutex_unlock(&fs->lock);
 	return status;
 }
 
@@ -1229,7 +1411,7 @@ devfs_open_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie *_cookie)
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 
-	mutex_lock(&fs->lock);
+	RecursiveLocker locker(&fs->lock);
 
 	cookie->current = vnode->stream.u.dir.dir_head;
 	cookie->state = ITERATION_STATE_BEGIN;
@@ -1237,7 +1419,6 @@ devfs_open_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie *_cookie)
 	list_add_item(&vnode->stream.u.dir.cookies, cookie);
 	*_cookie = cookie;
 
-	mutex_unlock(&fs->lock);
 	return B_OK;
 }
 
@@ -1251,10 +1432,9 @@ devfs_free_dir_cookie(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie)
 
 	TRACE(("devfs_free_dir_cookie: entry vnode %p, cookie %p\n", vnode, cookie));
 
-	mutex_lock(&fs->lock);
-	list_remove_item(&vnode->stream.u.dir.cookies, cookie);
-	mutex_unlock(&fs->lock);
+	RecursiveLocker locker(&fs->lock);
 
+	list_remove_item(&vnode->stream.u.dir.cookies, cookie);
 	free(cookie);
 	return B_OK;
 }
@@ -1278,7 +1458,7 @@ devfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie,
 	if (!S_ISDIR(vnode->stream.type))
 		return B_BAD_VALUE;
 
-	mutex_lock(&fs->lock);
+	RecursiveLocker locker(&fs->lock);
 
 	switch (cookie->state) {
 		case ITERATION_STATE_DOT:
@@ -1304,31 +1484,25 @@ devfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie,
 
 	if (!childNode) {
 		*_num = 0;
-		goto err;
+		return B_OK;
 	}
 
 	dirent->d_dev = fs->id;
 	dirent->d_ino = childNode->id;
 	dirent->d_reclen = strlen(name) + sizeof(struct dirent);
 
-	if (dirent->d_reclen > bufferSize) {
-		status = ENOBUFS;
-		goto err;
-	}
+	if (dirent->d_reclen > bufferSize)
+		return ENOBUFS;
 
 	status = user_strlcpy(dirent->d_name, name,
 		bufferSize - sizeof(struct dirent));
 	if (status < B_OK)
-		goto err;
+		return status;
 
 	cookie->current = nextChildNode;
 	cookie->state = nextState;
-	status = B_OK;
 
-err:
-	mutex_unlock(&fs->lock);
-
-	return status;
+	return B_OK;
 }
 
 
@@ -1344,12 +1518,11 @@ devfs_rewind_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie)
 	if (!S_ISDIR(vnode->stream.type))
 		return B_BAD_VALUE;
 
-	mutex_lock(&fs->lock);
+	RecursiveLocker locker(&fs->lock);
 
 	cookie->current = vnode->stream.u.dir.dir_head;
 	cookie->state = ITERATION_STATE_BEGIN;
 
-	mutex_unlock(&fs->lock);
 	return B_OK;
 }
 
@@ -1547,7 +1720,7 @@ devfs_write_stat(fs_volume _fs, fs_vnode _vnode, const struct stat *stat, uint32
 	if (statMask & FS_WRITE_STAT_SIZE)
 		return B_BAD_VALUE;
 
-	mutex_lock(&fs->lock);
+	RecursiveLocker locker(&fs->lock);
 
 	if (statMask & FS_WRITE_STAT_MODE)
 		vnode->stream.type = (vnode->stream.type & ~S_IUMSK) | (stat->st_mode & S_IUMSK);
@@ -1561,8 +1734,6 @@ devfs_write_stat(fs_volume _fs, fs_vnode _vnode, const struct stat *stat, uint32
 		vnode->modification_time = stat->st_mtime;
 	if (statMask & FS_WRITE_STAT_CRTIME) 
 		vnode->creation_time = stat->st_crtime;
-
-	mutex_unlock(&fs->lock);
 
 	notify_stat_changed(fs->id, vnode->id, statMask);
 	return B_OK;
@@ -1658,7 +1829,7 @@ file_system_module_info gDeviceFileSystem = {
 };
 
 
-//	#pragma mark -
+//	#pragma mark - device node
 //	temporary hack to get it to work with the current device manager
 
 
@@ -1703,7 +1874,7 @@ pnp_devfs_register_device(device_node_handle parent)
 		goto err2;
 
 	//add_device(device);
-	status = publish_device(sDeviceFileSystem, filename, node, info, NULL);
+	status = publish_device(sDeviceFileSystem, filename, node, info, NULL, NULL);
 	if (status != B_OK)
 		goto err3;
 	//nudge();
@@ -1814,7 +1985,53 @@ driver_module_info gDeviceForDriversModule = {
 };
 
 
-//	#pragma mark -
+//	#pragma mark - kernel private API
+
+
+extern "C" status_t
+devfs_add_driver(const char *path)
+{
+	// see if we already know this driver
+
+	struct stat stat;
+	if (::stat(path, &stat) != 0)
+		return errno;
+
+	RecursiveLocker locker(&sDeviceFileSystem->lock);
+
+	driver_entry *driver = (driver_entry *)hash_lookup(
+		sDeviceFileSystem->driver_hash, &stat.st_ino);
+	if (driver != NULL) {
+		// we know this driver
+		// ToDo: test for changes here? Although node monitoring should be enough.
+		if (driver->image < B_OK)
+			return driver->image;
+
+		return B_OK;
+	}
+
+	// we don't know this driver, create a new entry for it
+
+	driver = (driver_entry *)malloc(sizeof(driver_entry));
+	if (driver == NULL)
+		return B_NO_MEMORY;
+
+	driver->path = strdup(path);
+	if (driver->path == NULL) {
+		free(driver);
+		return B_NO_MEMORY;
+	}
+
+	driver->device = stat.st_dev;
+	driver->node = stat.st_ino;
+	driver->last_modified = stat.st_mtime;
+
+	hash_insert(sDeviceFileSystem->driver_hash, driver);
+
+	// Even if loading the driver fails - its entry will stay with us
+	// so that we don't have to go through it again
+	return load_driver(driver);
+}
 
 
 extern "C" status_t
@@ -1834,20 +2051,18 @@ devfs_publish_file_device(const char *path, const char *filePath)
 	if (filePath == NULL)
 		return B_NO_MEMORY;
 
-	mutex_lock(&sDeviceFileSystem->lock);
+	RecursiveLocker locker(&sDeviceFileSystem->lock);
 
 	status = publish_node(sDeviceFileSystem, path, &node);
 	if (status != B_OK)
-		goto out;
+		return status;
 
 	// all went fine, let's initialize the node
 	node->stream.type = S_IFLNK | 0644;
 	node->stream.u.symlink.path = filePath;
 	node->stream.u.symlink.length = strlen(filePath);
 
-out:
-	mutex_unlock(&sDeviceFileSystem->lock);
-	return status;
+	return B_OK;
 }
 
 
@@ -1890,18 +2105,15 @@ devfs_publish_partition(const char *path, const partition_info *info)
 extern "C" status_t
 devfs_publish_device(const char *path, void *obsolete, device_hooks *ops)
 {
-	return publish_device(sDeviceFileSystem, path, NULL, NULL, ops);
+	return publish_device(sDeviceFileSystem, path, NULL, NULL, NULL, ops);
 }
 
 
 extern "C" status_t
 devfs_publish_directory(const char *path)
 {
-	mutex_lock(&sDeviceFileSystem->lock);
+	RecursiveLocker locker(&sDeviceFileSystem->lock);
 
-	status_t status = publish_directory(sDeviceFileSystem, path);
-
-	mutex_unlock(&sDeviceFileSystem->lock);
-	return status;
+	return publish_directory(sDeviceFileSystem, path);
 }
 
