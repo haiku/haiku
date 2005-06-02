@@ -56,7 +56,7 @@ bool WinBorder::alter_visible_for_children(BRegion &region)
 	return true;
 }
 
-void WinBorder::set_user_regions(BRegion &reg)
+void WinBorder::get_user_regions(BRegion &reg)
 {
 	if (fRebuildDecRegion)
 	{
@@ -74,6 +74,4 @@ wind->Unlock();
 	reg.IntersectWith(&screenReg);
 
 	reg.Include(&fDecRegion);
-
-//reg.PrintToStream();
 }

@@ -3,11 +3,66 @@
 #include <Window.h>
 
 #include <stdio.h>
+#include <stack.h>
 
 #include "MyView.h"
 #include "Layer.h"
 
 extern BWindow *wind;
+struct node {
+			node()
+			{
+				pointers = NULL;
+			}
+			node(const BRect& r, int32 maxPointers)
+			{
+				init(r, maxPointers);
+			}
+			~node()
+			{
+				delete [] pointers;
+			}
+
+	void	init(const BRect& r, int32 maxPointers)
+			{
+				rect = r;
+				pointers = new node*[maxPointers];
+				in_degree = 0;
+				next_pointer = 0;
+			}
+
+	void	push(node* node)
+			{
+				pointers[next_pointer] = node;
+				next_pointer++;
+			}
+	node*	top()
+			{
+				return pointers[next_pointer];
+			}
+	node*	pop()
+			{
+				node* ret = top();
+				next_pointer--;
+				return ret;
+			}
+
+	BRect	rect;
+	int32	in_degree;
+	node**	pointers;
+	int32	next_pointer;
+};
+
+bool
+is_left_of(const BRect& a, const BRect& b)
+{
+	return (a.right < b.left);
+}
+bool
+is_above(const BRect& a, const BRect& b)
+{
+	return (a.bottom < b.top);
+}
 
 MyView::MyView(BRect frame, const char *name, uint32 resizingMode, uint32 flags)
 	: BView(frame, name, resizingMode, flags)
@@ -139,22 +194,93 @@ void MyView::MessageReceived(BMessage *msg)
 	}
 }
 
-void MyView::CopyRegion(BRegion *reg, float dx, float dy)
+void MyView::CopyRegion(BRegion *region, int32 xOffset, int32 yOffset)
 {
-	// Yes... in this sandbox app, do a redraw.
-	reg->OffsetBy(dx, dy);
 wind->Lock();
-	ConstrainClippingRegion(reg);
-	PushState();
-	DrawSubTree(topLayer);
-	PopState();
-	ConstrainClippingRegion(NULL);
+		int32 count = region->CountRects();
+
+		// TODO: make this step unnecessary
+		// (by using different stack impl inside node)
+		node nodes[count];
+		for (int32 i= 0; i < count; i++) {
+			nodes[i].init(region->RectAt(i), count);
+		}
+
+		for (int32 i = 0; i < count; i++) {
+			BRect a = region->RectAt(i);
+			for (int32 k = i + 1; k < count; k++) {
+				BRect b = region->RectAt(k);
+				int cmp = 0;
+				// compare horizontally
+				if (xOffset > 0) {
+					if (is_left_of(a, b)) {
+						cmp -= 1;
+					} else if (is_left_of(b, a)) {
+						cmp += 1;
+					}
+				} else if (xOffset < 0) {
+					if (is_left_of(a, b)) {
+						cmp += 1;
+					} else if (is_left_of(b, a)) {
+						cmp -= 1;
+					}
+				}
+				// compare vertically
+				if (yOffset > 0) {
+					if (is_above(a, b)) {
+						cmp -= 1;	
+					} else if (is_above(b, a)) {
+						cmp += 1;
+					}
+				} else if (yOffset < 0) {
+					if (is_above(a, b)) {
+						cmp += 1;
+					} else if (is_above(b, a)) {
+						cmp -= 1;
+					}
+				}
+				// add appropriate node as successor
+				if (cmp > 0) {
+					nodes[i].push(&nodes[k]);
+					nodes[k].in_degree++;
+				} else if (cmp < 0) {
+					nodes[k].push(&nodes[i]);
+					nodes[i].in_degree++;
+				}
+			}
+		}
+		// put all nodes onto a stack that have an "indegree" count of zero
+		stack<node*> inDegreeZeroNodes;
+		for (int32 i = 0; i < count; i++) {
+			if (nodes[i].in_degree == 0) {
+				inDegreeZeroNodes.push(&nodes[i]);
+			}
+		}
+		// pop the rects from the stack, do the actual copy operation
+		// and decrease the "indegree" count of the other rects not
+		// currently on the stack and to which the current rect pointed
+		// to. If their "indegree" count reaches zero, put them onto the
+		// stack as well.
+
+		while (!inDegreeZeroNodes.empty()) {
+			node* n = inDegreeZeroNodes.top();
+			inDegreeZeroNodes.pop();
+
+			CopyBits(n->rect, BRect(n->rect).OffsetByCopy(xOffset, yOffset));
+
+			for (int32 k = 0; k < n->next_pointer; k++) {
+				n->pointers[k]->in_degree--;
+				if (n->pointers[k]->in_degree == 0)
+					inDegreeZeroNodes.push(n->pointers[k]);
+			}
+		}
 wind->Unlock();
 }
 
 void MyView::RequestRedraw()
 {
 	wind->Lock();
+
 	ConstrainClippingRegion(&fRedrawReg);
 	PushState();
 	DrawSubTree(topLayer);
@@ -168,17 +294,7 @@ void MyView::RequestRedraw()
 
 void MyView::Draw(BRect area)
 {
-/*
-	ConstrainClippingRegion(&fRedrawReg);
-//FillRect(Bounds());
-//Flush();
-//snooze(1000000);
-	PushState();
-	DrawSubTree(topLayer);
-	PopState();
-	ConstrainClippingRegion(NULL);
-	fRedrawReg.MakeEmpty();
-*/
+	// empty. you can trigger a redraw by clicking the middle mouse button.
 }
 
 void MyView::DrawSubTree(Layer* lay)

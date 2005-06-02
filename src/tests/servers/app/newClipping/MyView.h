@@ -16,7 +16,7 @@ public:
 	virtual void		MouseMoved(BPoint where, uint32 code, const BMessage *a_message);
 	virtual	void		MessageReceived(BMessage*);
 
-			void		CopyRegion(BRegion *reg, float dx, float dy);
+			void		CopyRegion(BRegion *region, int32 xOffset, int32 yOffset);
 			void		RequestRedraw();			
 
 			Layer*		FindLayer(Layer *lay, BPoint &where) const;

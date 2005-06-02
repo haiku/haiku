@@ -68,11 +68,12 @@ protected:
 
 private:
 	virtual	bool			alter_visible_for_children(BRegion &region);
-	virtual	void			set_user_regions(BRegion &reg);
+	virtual	void			get_user_regions(BRegion &reg);
 
 			void			clear_visible_regions();
 			void			resize_layer_frame_by(float x, float y);
-			void			resize_redraw_more_regions(BRegion &redraw);
+			void			rezize_layer_redraw_more(BRegion &reg, float dx, float dy);
+			void			rezize_layer_redraw_more(BRegion &redraw, BRegion &copy, float dx, float dy);
 
 			char			fName[50];
 			BRegion			fVisible;

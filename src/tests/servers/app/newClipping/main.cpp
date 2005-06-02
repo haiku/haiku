@@ -96,7 +96,7 @@ void clsMainWindow::test1()
 	WinBorder	*wb1 = new WinBorder(BRect(20,20,300,220), "wb1", B_FOLLOW_NONE, B_FULL_UPDATE_ON_RESIZE, c);
 	topLayer->AddLayer(wb1);
 		// same size as wb1
-	Layer	*lay1 = new Layer(BRect(0,0,280,200), "lay1", B_FOLLOW_NONE, 0, c);
+	Layer	*lay1 = new Layer(BRect(0,0,280,200), "lay1", B_FOLLOW_ALL, 0, c);
 	wb1->AddLayer(lay1);
 // ------
 	c.red = rand()/256;
@@ -119,18 +119,65 @@ void clsMainWindow::test1()
 	c.green = rand()/256;
 	c.blue = rand()/256;
 	Layer	*lay12 = new Layer(BRect(170,20,290,150), "lay12",
-			B_FOLLOW_NONE,
-			B_FULL_UPDATE_ON_RESIZE, c);
+			B_FOLLOW_LEFT | B_FOLLOW_TOP,
+//			B_FOLLOW_NONE,
+			0, c);
 	lay1->AddLayer(lay12);
 
 	c.red = rand()/256;
 	c.green = rand()/256;
 	c.blue = rand()/256;
 	Layer	*lay13 = new Layer(BRect(20,20,100,100), "lay13",
-			B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
+//			B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
+			B_FOLLOW_RIGHT | B_FOLLOW_TOP,
+//			B_FOLLOW_LEFT | B_FOLLOW_V_CENTER,
+//			B_FOLLOW_H_CENTER | B_FOLLOW_TOP,
 			0, c);
 	lay12->AddLayer(lay13);
 
+	c.red = rand()/256;
+	c.green = rand()/256;
+	c.blue = rand()/256;
+	Layer	*lay102 = new Layer(BRect(200,20,420,250), "lay102",
+			B_FOLLOW_NONE,
+			B_FULL_UPDATE_ON_RESIZE, c);
+	lay1->AddLayer(lay102);
+
+	c.red = rand()/256;
+	c.green = rand()/256;
+	c.blue = rand()/256;
+	Layer	*lay103 = new Layer(BRect(0,0,100,50), "lay103",
+			B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
+//			B_FOLLOW_LEFT | B_FOLLOW_TOP,
+			0, c);
+	lay102->AddLayer(lay103);
+
+	c.red = rand()/256;
+	c.green = rand()/256;
+	c.blue = rand()/256;
+	Layer	*lay104 = new Layer(BRect(0,51,100,130), "lay104",
+//			B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
+			B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM,
+			0, c);
+	lay102->AddLayer(lay104);
+
+	c.red = rand()/256;
+	c.green = rand()/256;
+	c.blue = rand()/256;
+	Layer	*lay106 = new Layer(BRect(0,140,100, 200), "lay104",
+//			B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
+			B_FOLLOW_RIGHT | B_FOLLOW_TOP,
+			0, c);
+	lay102->AddLayer(lay106);
+
+	c.red = rand()/256;
+	c.green = rand()/256;
+	c.blue = rand()/256;
+	Layer	*lay105 = new Layer(BRect(105,51,150,130), "lay104",
+//			B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
+			B_FOLLOW_H_CENTER | B_FOLLOW_BOTTOM,
+			0, c);
+	lay102->AddLayer(lay105);
 
 //---------
 	c.red = rand()/256;

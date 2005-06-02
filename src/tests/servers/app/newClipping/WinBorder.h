@@ -14,7 +14,7 @@ public:
 private:
 			void			set_decorator_region(BRect frame);
 	virtual	bool			alter_visible_for_children(BRegion &region);
-	virtual	void			set_user_regions(BRegion &reg);
+	virtual	void			get_user_regions(BRegion &reg);
 
 			BRegion			fDecRegion;
 			bool			fRebuildDecRegion;

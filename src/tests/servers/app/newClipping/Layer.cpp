@@ -197,7 +197,7 @@ Layer::Show()
 	{
 		BRegion invalid;
 
-		set_user_regions(invalid);
+		get_user_regions(invalid);
 
 		if (invalid.CountRects() > 0)
 			fParent->Invalidate(invalid, this);
@@ -277,26 +277,51 @@ Layer::resize_layer_frame_by(float x, float y)
 }
 
 void
-Layer::resize_redraw_more_regions(BRegion &redraw)
+Layer::rezize_layer_redraw_more(BRegion &reg, float dx, float dy)
 {
-	uint16		rm = fResizeMode & 0x0000FFFF;
+	for (Layer *lay = VirtualBottomChild();
+				lay; lay = VirtualUpperSibling())
+	{
+		uint16		rm = lay->fResizeMode & 0x0000FFFF;
 
-	if (rm & B_FOLLOW_RIGHT || rm & B_FOLLOW_H_CENTER
-		|| rm & B_FOLLOW_BOTTOM || rm & B_FOLLOW_V_CENTER
-	// TODO: these 2 don't need to be redrawn entirely. but ATM we don't have a choice
-		|| rm & B_FOLLOW_LEFT_RIGHT || rm & B_FOLLOW_TOP_BOTTOM)
-	{
-		redraw.Include(&fFullVisible);
-	}
-	else
-	{
-		for (Layer *lay = VirtualBottomChild();
-					lay; lay = VirtualUpperSibling())
-			lay->resize_redraw_more_regions(redraw);
+		if (((rm & 0x0F0F) == (uint16)B_FOLLOW_RIGHT && dx != 0) ||
+			((rm & 0x0F0F) == (uint16)B_FOLLOW_H_CENTER && dx != 0) ||
+			((rm & 0xF0F0) == (uint16)B_FOLLOW_BOTTOM && dy != 0)||
+			((rm & 0xF0F0) == (uint16)B_FOLLOW_V_CENTER && dy != 0) ||
+		// TODO: these 2 don't need to be redrawn entirely. but ATM we don't have a choice
+			(rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM)
+		{
+			reg.Include(&lay->fFullVisible);
+		}
 	}
 }
 
-void Layer::ResizeBy(float dx, float dy)
+void
+Layer::rezize_layer_redraw_more(BRegion &redraw, BRegion &copy, float dx, float dy)
+{
+	for (Layer *lay = VirtualBottomChild();
+				lay; lay = VirtualUpperSibling())
+	{
+		uint16		rm = lay->fResizeMode & 0x0000FFFF;
+
+		if ((rm & 0x0F0F) == (uint16)B_FOLLOW_RIGHT && dx != 0)
+		{
+			copy.Include(&lay->fFullVisible);
+			redraw.Include(&lay->fFullVisible);
+		}
+		else if (((rm & 0x0F0F) == (uint16)B_FOLLOW_H_CENTER && dx != 0) ||
+			((rm & 0xF0F0) == (uint16)B_FOLLOW_BOTTOM && dy != 0) ||
+			((rm & 0xF0F0) == (uint16)B_FOLLOW_V_CENTER && dy != 0) ||
+		// TODO: these 2 don't need to be redrawn entirely. but ATM we don't have a choice
+			(rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM)
+		{
+			redraw.Include(&lay->fFullVisible);
+		}
+	}
+}
+
+void
+Layer::ResizeBy(float dx, float dy)
 {
 	fFrame.Set(fFrame.left, fFrame.top, fFrame.right+dx, fFrame.bottom+dy);
 
@@ -314,9 +339,20 @@ void Layer::ResizeBy(float dx, float dy)
 		BRegion oldFullVisible(fFullVisible);
 		BRegion oldVisible(fVisible);
 
+// OPT: you can use HW acceleration for either for bottom alligned layer or
+//		for right alligned ones. investigate!
+
+		// right, center and bottom alligned layers will change their position
+		// so we need to invalidate their current visible regions
+//		BRegion redrawRightOrBottom;
+//		rezize_layer_redraw_more(redrawRightOrBottom, dx, dy);
+BRegion redrawRightOrBottom;
+BRegion copyReg;
+rezize_layer_redraw_more(redrawRightOrBottom, copyReg, dx, dy);
+
 		// we'll invalidate the old area and the new, maxmial one.
 		BRegion invalid;
-		set_user_regions(invalid);
+		get_user_regions(invalid);
 		invalid.Include(&fFullVisible);
 
 		clear_visible_regions();
@@ -335,10 +371,95 @@ void Layer::ResizeBy(float dx, float dy)
 		// 3) combine.
 		redrawReg.Include(&redrawReg2);
 
+		// for center, right and bottom alligned layers, redraw their old positions
+		redrawReg.Include(&redrawRightOrBottom);
+
+		// layers that had their frame modified must be entirely redrawn.
+		rezize_layer_redraw_more(redrawReg, dx, dy);
+
+		// add redrawReg to our RootLayer's redraw region.
+		GetRootLayer()->fRedrawReg.Include(&redrawReg);
+		// include layer's visible region in case we want a full update on resize
+		if (fFlags & B_FULL_UPDATE_ON_RESIZE && fVisible.Frame().IsValid())
+		{
+			GetRootLayer()->fRedrawReg.Include(&fVisible);
+			GetRootLayer()->fRedrawReg.Include(&oldVisible);
+		}
+copyReg.OffsetBy(dx, 0);
+copyReg.IntersectWith(&fFullVisible);
+GetRootLayer()->fRedrawReg.Exclude(&copyReg);
+copyReg.OffsetBy(-dx, 0);
+GetRootLayer()->CopyRegion(&copyReg, dx, 0);
+		// clear canvas and set invalid regions for affected WinBorders
+		GetRootLayer()->RequestRedraw(); // TODO: what if we pass (fParent, startFromTHIS, &redrawReg)?
+	}
+
+/*
+	This works well! Above I'm trying to optimize things.
+
+	if (!IsVisuallyHidden() && GetRootLayer())
+	{
+		BRegion oldFullVisible(fFullVisible);
+		BRegion oldVisible(fVisible);
+
+// OPT: you can we HW acceleration for either for bottom alligned layer or
+//		for right alligned ones. investigate!
+
+		// right, center and bottom alligned layers will change their position
+		// so we need to invalidate their current visible regions
+		BRegion redrawRightOrBottom;
+		for (Layer *lay = VirtualBottomChild();
+					lay; lay = VirtualUpperSibling())
+		{
+			uint16		rm = lay->fResizeMode & 0x0000FFFF;
+
+			if ((rm & 0x0F0F) == (uint16)B_FOLLOW_RIGHT || (rm & 0x0F0F) == (uint16)B_FOLLOW_H_CENTER
+				|| (rm & 0xF0F0) == (uint16)B_FOLLOW_BOTTOM || (rm & 0xF0F0) == (uint16)B_FOLLOW_V_CENTER
+			// TODO: these 2 don't need to be redrawn entirely. but ATM we don't have a choice
+				|| (rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM)
+			{
+				redrawRightOrBottom.Include(&lay->fFullVisible);
+			}
+		}
+
+		// we'll invalidate the old area and the new, maxmial one.
+		BRegion invalid;
+		get_user_regions(invalid);
+		invalid.Include(&fFullVisible);
+
+		clear_visible_regions();
+
+		fParent->RebuildVisibleRegions(invalid, this);
+
+		// done rebuilding regions, now redraw regions that became visible
+
+		// what's invalid, are the differences between to old and the new fullVisible region
+		// 1) in case we grow.
+		BRegion		redrawReg(fFullVisible);
+		redrawReg.Exclude(&oldFullVisible);
+		// 2) in case we shrink
+		BRegion		redrawReg2(oldFullVisible);
+		redrawReg2.Exclude(&fFullVisible);
+		// 3) combine.
+		redrawReg.Include(&redrawReg2);
+
+		// for center, right and bottom alligned layers, redraw their old positions
+		redrawReg.Include(&redrawRightOrBottom);
+
 		// layers that had their frame modified must be entirely redrawn.
 		for (Layer *lay = VirtualBottomChild();
 					lay; lay = VirtualUpperSibling())
-			lay->resize_redraw_more_regions(redrawReg);
+		{
+			uint16		rm = lay->fResizeMode & 0x0000FFFF;
+
+			if ((rm & 0x0F0F) == (uint16)B_FOLLOW_RIGHT || (rm & 0x0F0F) == (uint16)B_FOLLOW_H_CENTER
+				|| (rm & 0xF0F0) == (uint16)B_FOLLOW_BOTTOM || (rm & 0xF0F0) == (uint16)B_FOLLOW_V_CENTER
+			// TODO: these 2 don't need to be redrawn entirely. but ATM we don't have a choice
+				|| (rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM)
+			{
+				redrawReg.Include(&lay->fFullVisible);
+			}
+		}
 
 		// add redrawReg to our RootLayer's redraw region.
 		GetRootLayer()->fRedrawReg.Include(&redrawReg);
@@ -351,6 +472,7 @@ void Layer::ResizeBy(float dx, float dy)
 		// clear canvas and set invalid regions for affected WinBorders
 		GetRootLayer()->RequestRedraw(); // TODO: what if we pass (fParent, startFromTHIS, &redrawReg)?
 	}
+*/
 }
 
 void Layer::MoveBy(float dx, float dy)
@@ -370,7 +492,7 @@ void Layer::MoveBy(float dx, float dy)
 
 		// we'll invalidate the old position and the new, maxmial one.
 		BRegion invalid;
-		set_user_regions(invalid);
+		get_user_regions(invalid);
 		invalid.Include(&fFullVisible);
 
 		clear_visible_regions();
@@ -441,10 +563,10 @@ void Layer::ScrollBy(float dx, float dy)
 
 void Layer::GetWantedRegion(BRegion &reg)
 {
-	set_user_regions(reg);
+	get_user_regions(reg);
 }
 
-void Layer::set_user_regions(BRegion &reg)
+void Layer::get_user_regions(BRegion &reg)
 {
 // OPT: maybe we should have all these cached in a 'fFull' member
 
@@ -500,7 +622,7 @@ void Layer::rebuild_visible_regions(const BRegion &invalid,
 
 	// intersect maximum wanted region with the invalid region
 	BRegion common;
-	set_user_regions(common);
+	get_user_regions(common);
 	common.IntersectWith(&invalid);
 
 	// if the resulted region is not valid, this layer is not in the catchment area
