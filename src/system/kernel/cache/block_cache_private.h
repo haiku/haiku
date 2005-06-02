@@ -6,17 +6,11 @@
 #define BLOCK_CACHE_PRIVATE_H
 
 
-#include <KernelExport.h>
-#include <fs_cache.h>
-
-#include <block_cache.h>
 #include <lock.h>
-#include <util/kernel_cpp.h>
 #include <util/DoublyLinkedList.h>
-#include <util/AutoLock.h>
-#include <util/khash.h>
-#include <vm.h>
-#include <vm_page.h>
+
+struct hash_table;
+struct vm_page;
 
 
 #define DEBUG_CHANGED

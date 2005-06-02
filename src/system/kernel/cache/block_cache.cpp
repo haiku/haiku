@@ -15,8 +15,6 @@
 #include <util/DoublyLinkedList.h>
 #include <util/AutoLock.h>
 #include <util/khash.h>
-#include <vm.h>
-#include <vm_page.h>
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -24,14 +22,13 @@
 #include <errno.h>
 
 
-// ToDo: this is a naive implementation to test the API:
-//	1) it does not have any useful memory management (just uses malloc/free)
-//	2) block reading/writing is not at all optimized for speed, it will
+// ToDo: this is a naive but growing implementation to test the API:
+//	1) block reading/writing is not at all optimized for speed, it will
 //	   just read and write single blocks.
-//	3) the locking could be improved; getting a block should not need to
+//	2) the locking could be improved; getting a block should not need to
 //	   wait for blocks to be written
-//	4) dirty blocks are only written back if asked for
-//	5) blocks are never removed yet
+//	3) dirty blocks are only written back if asked for
+//	4) blocks are never removed yet
 
 #define TRACE_BLOCK_CACHE
 #ifdef TRACE_BLOCK_CACHE

@@ -7,20 +7,12 @@
 #include "block_cache_private.h"
 
 #include <KernelExport.h>
-#include <fs_cache.h>
 
-#include <lock.h>
-#include <util/kernel_cpp.h>
-#include <util/DoublyLinkedList.h>
 #include <util/AutoLock.h>
-#include <util/khash.h>
 #include <vm.h>
 #include <vm_page.h>
 
-#include <unistd.h>
-#include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 
 
 static class BlockAddressPool sBlockAddressPool;
