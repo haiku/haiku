@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-5/2005
+   Rudolf Cornelissen 10/2002-6/2005
 */
 
 #define MODULE_BIT 0x00008000
@@ -90,7 +90,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.48 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.49 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -474,6 +474,12 @@ status_t nv_general_powerup()
 		si->ps.card_type = NV20;
 		si->ps.card_arch = NV20A;
 		LOG(4,("POWERUP: Detected Nvidia Quadro DCC (NV20)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x022110de: /* Nvidia GeForce 6200 AGP (256Mb - 128bit) */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		LOG(4,("POWERUP: Detected Nvidia GeForce 6200 AGP (256Mb - 128bit) (NV44)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x025010de: /* Nvidia GeForce4 Ti 4600 */
