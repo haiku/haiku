@@ -1103,6 +1103,7 @@ static void nv_init_for_3D_dma(void)
 		/* note: upon writing data into the PIPEDAT register, the PIPEADR is
 		 * probably auto-incremented! */
 		/* (pipe adress = b2-16, pipe data = b0-31) */
+		/* note: pipe adresses IGRAPH registers? */
 		ACCW(NV10_PIPEADR, 0x00006740);
 		ACCW(NV10_PIPEDAT, 0x00000000);
 		ACCW(NV10_PIPEDAT, 0x00000000);
@@ -1262,8 +1263,9 @@ static void nv_start_dma(void)
 		/* dummy read the first adress of the framebuffer: flushes MTRR-WC buffers so
 		 * we know for sure the DMA command buffer received all data. */
 //main mem DMA buf test on pre-NV40
-//		dummy = *((uint32 *)(si->framebuffer));
-		__asm__ __volatile__ ("lock; addl $0,0(%%esp)": : :"memory"); //thomas
+		/* some CPU's support out-of-order processing (WinChip/Cyrix). Flush them. */
+		__asm__ __volatile__ ("lock; addl $0,0(%%esp)": : :"memory");
+		/* read a non-cached adress to flush the cash */
 		dummy = ACCR(STATUS);
 
 		/* actually start DMA to execute all commands now in buffer */
