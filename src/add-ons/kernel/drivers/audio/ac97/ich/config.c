@@ -1,7 +1,7 @@
 /*
  * BeOS Driver for Intel ICH AC'97 Link interface
  *
- * Copyright (c) 2002, 2003 Marcus Overhagen <marcus@overhagen.de>
+ * Copyright (c) 2002-2005 Marcus Overhagen <marcus@overhagen.de>
  *
  * All rights reserved.
  * Redistribution and use in source and binary forms, with or without modification, 
@@ -38,83 +38,79 @@
 device_config c;
 device_config *config = &c;
 
-/* 
- * search for the ICH AC97 controller, and initialize the global config 
- * XXX multiple controllers not supported
- */
+struct device_item {
+	uint16			vendor_id;
+	uint16			device_id;
+	uint8			type;
+	const char *	name;
+} device_list[] = {
+	{ 0x8086, 0x7195, TYPE_DEFAULT, "Intel 82443MX" },
+	{ 0x8086, 0x2415, TYPE_DEFAULT, "Intel 82801AA (ICH)" },
+	{ 0x8086, 0x2425, TYPE_DEFAULT, "Intel 82801AB (ICH0)" },
+	{ 0x8086, 0x2445, TYPE_DEFAULT, "Intel 82801BA (ICH2), Intel 82801BAM (ICH2-M)" },
+	{ 0x8086, 0x2485, TYPE_DEFAULT, "Intel 82801CA (ICH3-S), Intel 82801CAM (ICH3-M)" },
+	{ 0x8086, 0x24C5, TYPE_ICH4,	"Intel 82801DB (ICH4)" },
+	{ 0x8086, 0x24D5, TYPE_ICH4,	"Intel 82801EB (ICH5), Intel 82801ER (ICH5R)" },
+	{ 0x8086, 0x266E, TYPE_ICH4,	"Intel 82801FB/FR/FW/FRW (ICH6)" },
+	{ 0x8086, 0x27DE, TYPE_ICH4,	"Intel unknown (ICH7)" },
+	{ 0x8086, 0x2698, TYPE_ICH4,	"Intel unknown (ESB2)" },
+	{ 0x8086, 0x25A6, TYPE_ICH4,	"Intel unknown (ESB5)" },
+	{ 0x1039, 0x7012, TYPE_SIS7012,	"SiS SI7012" },
+	{ 0x10DE, 0x01B1, TYPE_DEFAULT,	"NVIDIA nForce (MCP)" },
+	{ 0x10DE, 0x006A, TYPE_DEFAULT, "NVIDIA nForce 2 (MCP2)" },
+	{ 0x10DE, 0x00DA, TYPE_DEFAULT,	"NVIDIA nForce 3 (MCP3)" },
+	{ 0x10DE, 0x003A, TYPE_DEFAULT,	"NVIDIA unknown (MCP04)" },
+	{ 0x10DE, 0x0059, TYPE_DEFAULT,	"NVIDIA unknown (CK804)" },
+	{ 0x10DE, 0x008A, TYPE_DEFAULT,	"NVIDIA unknown (CK8)" },
+	{ 0x10DE, 0x00EA, TYPE_DEFAULT,	"NVIDIA unknown (CK8S)" },
+	{ 0x1022, 0x746D, TYPE_DEFAULT, "AMD AMD8111" },
+	{ 0x1022, 0x7445, TYPE_DEFAULT, "AMD AMD768" },
+//	{ 0x10B9, 0x5455, TYPE_DEFAULT, "Ali 5455" }, not yet supported
+	{ },
+};
 
-status_t probe_device(void)
+
+/** 
+ * search for the ICH AC97 controller, and initialize the global config 
+ */
+status_t
+probe_device(void)
 {
 	pci_module_info *pcimodule;
 	struct pci_info info; 
 	struct pci_info *pciinfo = &info;
 	int index;
+	int i;
 	status_t result;
 	uint32 value;
 
+	// initialize whole config to 0
+	memset(config, 0, sizeof(*config));
+
+	result = B_OK;
+
 	if (get_module(B_PCI_MODULE_NAME,(module_info **)&pcimodule) < 0) {
-		PRINT(("ERROR: couldn't load pci module\n"));
+		PRINT(("ERROR: couldn't load PCI module\n"));
 		return B_ERROR; 
 	}
-
-	config->name = NULL;
-	config->nambar = 0;
-	config->nabmbar = 0;
-	config->mmbar = 0;
-	config->mbbar = 0;
-	config->irq = 0;
-	config->type = TYPE_DEFAULT;
-	config->log_mmbar = 0;
-	config->log_mbbar = 0;
-	config->area_mmbar = -1;
-	config->area_mbbar = -1;
-	config->codecoffset = 0;
 
 	for (index = 0; B_OK == pcimodule->get_nth_pci_info(index, pciinfo); index++) { 
 		LOG(("Checking PCI device, vendor 0x%04x, id 0x%04x, bus 0x%02x, dev 0x%02x, func 0x%02x, rev 0x%02x, api 0x%02x, sub 0x%02x, base 0x%02x\n",
 			pciinfo->vendor_id, pciinfo->device_id, pciinfo->bus, pciinfo->device, pciinfo->function,
 			pciinfo->revision, pciinfo->class_api, pciinfo->class_sub, pciinfo->class_base));
-
-		if (pciinfo->vendor_id == 0x8086 && pciinfo->device_id == 0x7195) {
-			config->name = "Intel 82443MX"; 
-		} else if (pciinfo->vendor_id == 0x8086 && pciinfo->device_id == 0x2415) { /* verified */
-			config->name = "Intel 82801AA (ICH)";
-		} else if (pciinfo->vendor_id == 0x8086 && pciinfo->device_id == 0x2425) { /* verified */
-			config->name = "Intel 82801AB (ICH0)";
-		} else if (pciinfo->vendor_id == 0x8086 && pciinfo->device_id == 0x2445) { /* verified */
-			config->name = "Intel 82801BA (ICH2), Intel 82801BAM (ICH2-M)";
-		} else if (pciinfo->vendor_id == 0x8086 && pciinfo->device_id == 0x2485) { /* verified */
-			config->name = "Intel 82801CA (ICH3-S), Intel 82801CAM (ICH3-M)";
-		} else if (pciinfo->vendor_id == 0x8086 && pciinfo->device_id == 0x24C5) { /* verified */
-			config->name = "Intel 82801DB (ICH4)";
-			config->type = TYPE_ICH4;
-		} else if (pciinfo->vendor_id == 0x8086 && pciinfo->device_id == 0x24D5) { /* verified */
-			config->name = "Intel 82801EB (ICH5), Intel 82801ER (ICH5R)";
-			config->type = TYPE_ICH4; // ICH5 works like ICH4
-		} else if (pciinfo->vendor_id == 0x1039 && pciinfo->device_id == 0x7012) { /* verified */
-			config->name = "SiS SI7012";
-			config->type = TYPE_SIS7012;
-		} else if (pciinfo->vendor_id == 0x10DE && pciinfo->device_id == 0x01B1) {
-			config->name = "NVIDIA nForce (MCP)";
-		} else if (pciinfo->vendor_id == 0x10DE && pciinfo->device_id == 0x006A) {
-			config->name = "NVIDIA nForce 2 (MCP2)";
-		} else if (pciinfo->vendor_id == 0x10DE && pciinfo->device_id == 0x00DA) {
-			config->name = "NVIDIA nForce 3 (MCP3)";
-		} else if (pciinfo->vendor_id == 0x1022 && pciinfo->device_id == 0x764d) {
-			config->name = "AMD AMD8111";
-		} else if (pciinfo->vendor_id == 0x1022 && pciinfo->device_id == 0x7445) {
-			config->name = "AMD AMD768";
-		} else {
-			continue;
+		for (i = 0; device_list[i].vendor_id; i++) {
+			if (device_list[i].vendor_id == pciinfo->vendor_id && device_list[i].device_id == pciinfo->device_id) {
+				config->name = device_list[i].name;
+				config->type = device_list[i].type;
+				goto probe_ok;
+			}
 		}
-		break;
 	}
-	if (config->name == NULL) {
-		LOG(("probe_device() No compatible hardware found\n"));
-		put_module(B_PCI_MODULE_NAME);
-		return B_ERROR;
-	}
+	LOG(("No compatible hardware found\n"));
+	result = B_ERROR;
+	goto probe_done;
 
+probe_ok:
 	LOG(("found %s\n",config->name));
 	LOG(("revision = %d\n",pciinfo->revision));
 
@@ -134,22 +130,9 @@ status_t probe_device(void)
 		LOG(("PCICMD = %#04x\n",value));
 		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x06, 2);
 		LOG(("PCISTS = %#04x\n",value));
-		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x10, 4);
-		LOG(("NAMBAR = %#08x\n",value));
-		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x14, 4);
-		LOG(("NABMBAR = %#08x\n",value));
-		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x18, 4);
-		LOG(("MMBAR = %#08x\n",value));
-		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x1C, 4);
-		LOG(("MBBAR = %#08x\n",value));
-		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x3c, 1);
-		LOG(("INTR_LN = %#02x\n",value));
-		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x3d, 1);
-		LOG(("INTR_PN = %#02x\n",value));
 	#endif
 
-	/*
-	 * for ICH4 enable memory mapped IO and busmaster access,
+	/* for ICH4 enable memory mapped IO and busmaster access,
 	 * for old ICHs enable programmed IO and busmaster access
 	 */
 	value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_PCICMD, 2);
@@ -163,51 +146,42 @@ status_t probe_device(void)
 		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_PCICMD, 2);
 		LOG(("PCICMD = %#04x\n",value));
 	#endif
-		
-	config->irq = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x3C, 1);
-	if (config->irq == 0xff) {
-		// always 0, not 0xff if no irq assigned
+
+	/* read memory-io and port-io bars
+	 */
+	config->nambar	= pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x10, 4);
+	config->nabmbar	= pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x14, 4);
+	config->mmbar	= pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x18, 4);
+	config->mbbar	= pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x1C, 4);
+	config->irq		= pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x3C, 1);
+
+	if (config->irq == 0 || config->irq == 0xff) {
+		PRINT(("WARNING: no interrupt configured\n"));
+		/* we can continue without an interrupt, as another 
+		 * workaround to handle this is also implemented
+		 * force irq to be 0, not 0xff if no irq assigned
+		 */
 		config->irq = 0;
 	}
-	if (config->irq == 0) {
-		LOG(("IRQ not assigned to pin %d\n", pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x3d, 1)));
-	}
-	if (config->type & TYPE_ICH4) {
-		// memory mapped access
-		config->mmbar = 0xfffffffe & pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x18, 4);
-		config->mbbar = 0xfffffffe & pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x1C, 4);
-	} else {
-		// pio access
-		config->nambar = 0xfffffffe & pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x10, 4);
-		config->nabmbar = 0xfffffffe & pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x14, 4);
-	}
 
-	LOG(("irq     = %d\n", config->irq));
-	LOG(("nambar  = %#08x\n", config->nambar));
-	LOG(("nabmbar = %#08x\n", config->nabmbar));
-	LOG(("mmbar   = %#08x\n", config->mmbar));
-	LOG(("mbbar   = %#08x\n", config->mbbar));
-
-	result = B_OK;
-
-	if (config->irq == 0) {
-		PRINT(("WARNING: no interrupt configured\n"));
-		/*
-		 * we can continue without an interrupt, as another 
-		 * workaround to handle this is also implemented
-		 */
-	}
 	/* the ICH4 uses memory mapped IO */
-	if ((config->type & TYPE_ICH4) != 0 && ((config->mmbar == 0) || (config->mbbar == 0))) {
+	if ((config->type & TYPE_ICH4) && ((config->mmbar == 0) || (config->mbbar == 0))) {
 		PRINT(("ERROR: memory mapped IO not configured\n"));
 		result = B_ERROR;
 	}
 	/* all other ICHs use programmed IO */
-	if ((config->type & TYPE_ICH4) == 0 && ((config->nambar == 0) || (config->nabmbar == 0))) {
+	if ((config->type & TYPE_ICH4) && ((config->nambar == 0) || (config->nabmbar == 0))) {
 		PRINT(("ERROR: IO space not configured\n"));
 		result = B_ERROR;
 	}
 
+	LOG(("nambar  = %#08x\n", config->nambar));
+	LOG(("nabmbar = %#08x\n", config->nabmbar));
+	LOG(("mmbar   = %#08x\n", config->mmbar));
+	LOG(("mbbar   = %#08x\n", config->mbbar));
+	LOG(("irq     = %d\n",    config->irq));
+
+probe_done:
 	put_module(B_PCI_MODULE_NAME);
 	return result;
 }
