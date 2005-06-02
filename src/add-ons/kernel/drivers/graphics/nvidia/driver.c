@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-5/2005.
+	Rudolf Cornelissen 3/2002-6/2005.
 */
 
 /* standard kernel driver stuff */
@@ -197,6 +197,7 @@ static uint16 nvidia_device_list[] = {
 	0x0201, /* Nvidia GeForce3 Ti 200 */
 	0x0202, /* Nvidia GeForce3 Ti 500 */
 	0x0203, /* Nvidia Quadro DCC */
+	0x0221, /* Nvidia GeForce 6200 AGP (256Mb - 128bit) */
 	0x0250, /* Nvidia GeForce4 Ti 4600 */
 	0x0251, /* Nvidia GeForce4 Ti 4400 */
 	0x0252, /* Nvidia GeForce4 Ti 4600 */
