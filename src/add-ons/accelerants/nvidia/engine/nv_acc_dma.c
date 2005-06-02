@@ -84,10 +84,14 @@ status_t nv_acc_init_dma()
 	snooze(1000);
 	NV_REG32(NV32_PWRUPCTRL) = 0x13111111;
 
-	/* actively reset the PGRAPH registerset (acceleration engine) */
-	for (cnt = 0x00400000; cnt < 0x00402000; cnt +=4)
+	/* don't try this on NV20 and later.. */
+	if (si->ps.card_arch < NV20A)
 	{
-		NV_REG32(cnt) = 0x00000000;
+		/* actively reset the PGRAPH registerset (acceleration engine) */
+		for (cnt = 0x00400000; cnt < 0x00402000; cnt +=4)
+		{
+			NV_REG32(cnt) = 0x00000000;
+		}
 	}
 
 	/* setup PTIMER: */
@@ -333,7 +337,7 @@ status_t nv_acc_init_dma()
 		ACCW(PR_CTX2_5, 0x00000000); /* DMA0 and DMA1 instance invalid */
 		ACCW(PR_CTX3_5, 0x00000000); /* method traps disabled */
 		/* setup set '6' ... */
-		if (si->ps.card_arch != NV04A)
+		if (si->ps.card_arch >= NV10A)
 		{
 			/* ... for cmd NV10_CONTEXT_SURFACES_ARGB_ZS */
 			ACCW(PR_CTX0_6, 0x00000093); /* NVclass $093, nv10+: little endian */
@@ -347,7 +351,7 @@ status_t nv_acc_init_dma()
 		ACCW(PR_CTX2_6, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 		ACCW(PR_CTX3_6, 0x00000000); /* method traps disabled */
 		/* setup set '7' ... */
-		if (si->ps.card_arch != NV04A)
+		if (si->ps.card_arch >= NV10A)
 		{
 			/* ... for cmd NV10_DX5_TEXTURE_TRIANGLE */
 			ACCW(PR_CTX0_7, 0x0300a094); /* NVclass $094, patchcfg ROP_AND, userclip enable,
@@ -363,7 +367,7 @@ status_t nv_acc_init_dma()
 		ACCW(PR_CTX2_7, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 		ACCW(PR_CTX3_7, 0x00000000); /* method traps disabled */
 		/* setup set '8' ... */
-		if (si->ps.card_arch != NV04A)
+		if (si->ps.card_arch >= NV10A)
 		{
 			/* ... for cmd NV10_DX6_MULTI_TEXTURE_TRIANGLE (not used) */
 			ACCW(PR_CTX0_8, 0x0300a095); /* NVclass $095, patchcfg ROP_AND, userclip enable,
@@ -385,37 +389,25 @@ status_t nv_acc_init_dma()
 		ACCW(PR_CTX2_9, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 		ACCW(PR_CTX3_9, 0x00000000); /* method traps disabled */
 		/* setup DMA set pointed at by PF_CACH1_DMAI */
-		ACCW(PR_CTX0_A, 0x00003002); /* DMA page table present and of linear type;
-									  * DMA class is $002 (b0-11);
-									  * DMA target node is NVM (non-volatile memory?)
-									  * (instead of doing PCI or AGP transfers) */
-//main mem DMA buf test on pre-NV40:
-//		ACCW(PR_CTX1_A, 0x00007fff); /* DMA limit: tablesize is 32k bytes */
-		ACCW(PR_CTX1_A, 0x000fffff); /* DMA limit: tablesize is 1M bytes */
-		ACCW(PR_CTX2_A, (((si->ps.memory_size - 1) & 0xffff8000) | 0x00000002));
-									 /* DMA access type is READ_AND_WRITE;
-									  * table is located at end of cardRAM (b12-31):
-									  * It's adress needs to be at a 4kb boundary! */
-
-		/* NVM DMA is broken on TNT1, so we use PCI-transfers back to the gfxRAM here */
-//main mem DMA buf test on pre-NV40
-		if (1)//si->ps.card_type == NV04)
+		if (si->engine.agp_mode)
 		{
-			if (si->engine.agp_mode)
-			{
-				/* DMA target node is AGP */
-				ACCW(PR_CTX0_A, 0x00033002);
-			}
-			else
-			{
-				/* DMA target node is PCI */
-				ACCW(PR_CTX0_A, 0x00023002);
-			}
-			/* point at the DMA buffer via main system memory */
-//			ACCW(PR_CTX2_A, (ACCR(PR_CTX2_A) +
-//				(((uint32)((uint8 *)(si->framebuffer_pci))) & 0xfffff000)));
-			ACCW(PR_CTX2_A, (((uint32)((uint8 *)(si->dma_buffer_pci))) | 0x00000002));
+			/* DMA page table present and of linear type;
+			 * DMA class is $002 (b0-11);
+			 * DMA target node is AGP */
+			ACCW(PR_CTX0_A, 0x00033002);
 		}
+		else
+		{
+			/* DMA page table present and of linear type;
+			 * DMA class is $002 (b0-11);
+			 * DMA target node is PCI */
+			ACCW(PR_CTX0_A, 0x00023002);
+		}
+		ACCW(PR_CTX1_A, 0x000fffff); /* DMA limit: tablesize is 1M bytes */
+		ACCW(PR_CTX2_A, (((uint32)((uint8 *)(si->dma_buffer_pci))) | 0x00000002));
+									 /* DMA access type is READ_AND_WRITE;
+									  * table is located in main system RAM (b12-31):
+									  * It's adress needs to be at a 4kb boundary! */
 
 //3D stuff:
 /*
@@ -565,8 +557,7 @@ status_t nv_acc_init_dma()
 	{
 		/* init some function blocks */
 		ACCW(DEBUG1, 0x00118700);
-		/* DEBUG2 has a big influence on 3D speed! */
-		//fixme? 3D test: was 0x24e00810, which is very slow on NV15 (confirmed)
+		/* DEBUG2 has a big influence on 3D speed for NV15 (confirmed) */
 		ACCW(DEBUG2, 0x24f82ad9);
 		ACCW(DEBUG3, 0x55de0030);
 
@@ -897,14 +888,16 @@ status_t nv_acc_init_dma()
 	si->engine.dma.put = 0;
 	/* the current first free adress in the DMA buffer is at offset 0 */
 	si->engine.dma.current = 0;
-	/* the DMA buffer can hold 8k 32-bit words (it's 32kb in size) */
+	/* the DMA buffer can hold 8k 32-bit words (it's 32kb in size),
+	 * or 256k 32-bit words (1Mb in size) dependant on architecture (for now) */
 	/* note:
 	 * one word is reserved at the end of the DMA buffer to be able to instruct the
 	 * engine to do a buffer wrap-around!
 	 * (DMA opcode 'noninc method': issue word $20000000.) */
-//main mem DMA buf test on pre-NV40
-//	si->engine.dma.max = 8192 - 1;
-	si->engine.dma.max = ((1 * 1024 * 1024) >> 2) - 1;
+	if (si->ps.card_arch < NV40A)
+		si->engine.dma.max = ((1 * 1024 * 1024) >> 2) - 1;
+	else
+		si->engine.dma.max = 8192 - 1;
 	/* note the current free space we have left in the DMA buffer */
 	si->engine.dma.free = si->engine.dma.max - si->engine.dma.current;
 
@@ -1260,13 +1253,19 @@ static void nv_start_dma(void)
 	if (si->engine.dma.current != si->engine.dma.put)
 	{
 		si->engine.dma.put = si->engine.dma.current;
-		/* dummy read the first adress of the framebuffer: flushes MTRR-WC buffers so
-		 * we know for sure the DMA command buffer received all data. */
-//main mem DMA buf test on pre-NV40
-		/* some CPU's support out-of-order processing (WinChip/Cyrix). Flush them. */
-		__asm__ __volatile__ ("lock; addl $0,0(%%esp)": : :"memory");
-		/* read a non-cached adress to flush the cash */
-		dummy = ACCR(STATUS);
+		/* flush used caches so we know for sure the DMA cmd buffer received all data. */
+		if (si->ps.card_arch < NV40A)
+		{
+			/* some CPU's support out-of-order processing (WinChip/Cyrix). Flush them. */
+			__asm__ __volatile__ ("lock; addl $0,0(%%esp)": : :"memory");
+			/* read a non-cached adress to flush the cash */
+			dummy = ACCR(STATUS);
+		}
+		else
+		{
+			dummy = *((uint32 *)(si->framebuffer));
+			/* dummy read the first adress of the framebuffer to flush MTRR-WC buffers */
+		}
 
 		/* actually start DMA to execute all commands now in buffer */
 		/* note:
