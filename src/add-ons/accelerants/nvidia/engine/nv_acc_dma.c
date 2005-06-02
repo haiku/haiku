@@ -1,7 +1,7 @@
 /* NV Acceleration functions */
 
 /* Author:
-   Rudolf Cornelissen 8/2003-5/2005.
+   Rudolf Cornelissen 8/2003-6/2005.
 
    This code was possible thanks to:
     - the Linux XFree86 NV driver,
@@ -74,7 +74,7 @@ status_t nv_acc_wait_idle_dma()
  * Engine required init. */
 status_t nv_acc_init_dma()
 {
-	uint16 cnt;
+	uint32 cnt;
 	uint32 surf_depth, cmd_depth;
 	/* reset the engine DMA stalls counter */
 	err = 0;
@@ -83,6 +83,12 @@ status_t nv_acc_init_dma()
 	NV_REG32(NV32_PWRUPCTRL) = 0x13110011;
 	snooze(1000);
 	NV_REG32(NV32_PWRUPCTRL) = 0x13111111;
+
+	/* actively reset the PGRAPH registerset (acceleration engine) */
+	for (cnt = 0x00400000; cnt < 0x00402000; cnt +=4)
+	{
+		NV_REG32(cnt) = 0x00000000;
+	}
 
 	/* setup PTIMER: */
 	//fixme? how about NV28 setup as just after coldstarting? (see nv_info.c)
