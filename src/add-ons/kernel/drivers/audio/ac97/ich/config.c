@@ -170,7 +170,7 @@ probe_ok:
 		result = B_ERROR;
 	}
 	/* all other ICHs use programmed IO */
-	if ((config->type & TYPE_ICH4) && ((config->nambar == 0) || (config->nabmbar == 0))) {
+	if (!(config->type & TYPE_ICH4) && ((config->nambar == 0) || (config->nabmbar == 0))) {
 		PRINT(("ERROR: IO space not configured\n"));
 		result = B_ERROR;
 	}
