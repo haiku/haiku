@@ -309,15 +309,7 @@ BControl::Label() const
 void
 BControl::SetValue(int32 value)
 {
-	if (fValue == value)
-		return;
-
 	fValue = value;
-
- 	if (Window()) {
-		Invalidate(Bounds());
-		Flush();
-	}
 }
 
 

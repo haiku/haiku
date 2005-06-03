@@ -98,6 +98,9 @@ virtual	void			_ReservedRadioButton1();
 virtual	void			_ReservedRadioButton2();
 
 		BRadioButton	&operator=(const BRadioButton &);
+
+		BRect			_KnobFrame() const;
+
 static	BBitmap			*sBitmaps[2][3];
 
 		bool			fOutlined;

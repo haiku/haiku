@@ -376,7 +376,10 @@ void BButton::DetachedFromWindow()
 //------------------------------------------------------------------------------
 void BButton::SetValue(int32 value)
 {
-	BControl::SetValue(value);
+	if (value != Value()) {
+		BControl::SetValue(value);
+		Invalidate();
+	}
 }
 //------------------------------------------------------------------------------
 void BButton::GetPreferredSize(float *width, float *height)

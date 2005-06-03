@@ -94,6 +94,8 @@ virtual	void		_ReservedCheckBox1();
 virtual	void		_ReservedCheckBox2();
 virtual	void		_ReservedCheckBox3();
 
+		BRect		_CheckBoxFrame() const;
+
 		BCheckBox	&operator=(const BCheckBox &);
 
 		bool		fOutlined;

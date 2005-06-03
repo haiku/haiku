@@ -73,17 +73,10 @@ void BRadioButton::Draw(BRect updateRect)
 	GetFontHeight(&fh);
 
 	// layout the rect for the dot
-	BRect rect(Bounds());
+	BRect rect = _KnobFrame();
 
 	// its size depends on the text height
 	float textHeight = floorf(fh.ascent + fh.descent + 0.5);
-	float inset = -floorf(textHeight / 2 - 2);
-
-	rect.left -= (inset - 1);
-	rect.top = floorf((rect.top + rect.bottom) / 2.0);
-	rect.bottom = rect.top;
-	rect.right = rect.left;
-	rect.InsetBy(inset, inset);
 	
 	BPoint labelPos(rect.right + floorf(textHeight / 2.0),
 					floorf((rect.top + rect.bottom + textHeight) / 2.0 - fh.descent + 0.5) + 1.0);
@@ -302,7 +295,10 @@ void BRadioButton::KeyDown(const char *bytes, int32 numBytes)
 //------------------------------------------------------------------------------
 void BRadioButton::SetValue(int32 value)
 {
-	BControl::SetValue(value);
+	if (value != Value()) {
+		BControl::SetValue(value);
+		Invalidate(_KnobFrame());
+	}
 
 	if (!value)
 		return;
@@ -477,6 +473,28 @@ BRadioButton &BRadioButton::operator=(const BRadioButton &)
 	return *this;
 }
 //------------------------------------------------------------------------------
+BRect
+BRadioButton::_KnobFrame() const
+{
+	font_height fh;
+	GetFontHeight(&fh);
+
+	// layout the rect for the dot
+	BRect rect(Bounds());
+
+	// its size depends on the text height
+	float textHeight = floorf(fh.ascent + fh.descent + 0.5);
+	float inset = -floorf(textHeight / 2 - 2);
+
+	rect.left -= (inset - 1);
+	rect.top = floorf((rect.top + rect.bottom) / 2.0);
+	rect.bottom = rect.top;
+	rect.right = rect.left;
+	rect.InsetBy(inset, inset);
+
+	return rect;
+}
+
 
 /*
  * $Log $

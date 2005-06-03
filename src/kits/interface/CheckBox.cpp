@@ -101,8 +101,7 @@ BCheckBox::Draw(BRect updateRect)
 	darken4 = tint_color(no_tint, B_DARKEN_4_TINT),
 	darkenmax = tint_color(no_tint, B_DARKEN_MAX_TINT);
 
-	BRect rect(1.0f, 3.0f, (float)ceil(3.0f + fontHeight.ascent),
-		(float)ceil(5.0f + fontHeight.ascent));
+	BRect rect = _CheckBoxFrame();
 
 	if (IsEnabled()) {
 		// Filling
@@ -350,7 +349,10 @@ BCheckBox::DetachedFromWindow()
 void
 BCheckBox::SetValue(int32 value)
 {
-	BControl::SetValue(value);
+	if (value != Value()) {
+		BControl::SetValue(value);
+		Invalidate(_CheckBoxFrame());
+	}
 }
 
 
@@ -451,4 +453,14 @@ BCheckBox &
 BCheckBox::operator=(const BCheckBox &)
 {
 	return *this;
+}
+
+// _CheckBoxFrame
+BRect
+BCheckBox::_CheckBoxFrame() const
+{
+	font_height fh;
+	GetFontHeight(&fh);
+
+	return BRect(1.0f, 3.0f, ceilf(3.0f + fh.ascent), ceilf(5.0f + fh.ascent));
 }
