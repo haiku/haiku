@@ -22,16 +22,37 @@ class TestView : public BView {
 					TestView(BRect frame, const char* name,
 							  uint32 resizeFlags, uint32 flags)
 						: BView(frame, name, resizeFlags, flags),
-						  fBitmap(new BBitmap(BRect(0, 0, kBitmapWidth - 1, kBitmapHeight -1),
-						  					  0, kBitmapFormat)),
+//						  fBitmap(new BBitmap(BRect(0, 0, kBitmapWidth - 1, kBitmapHeight -1),
+//						  					  0, kBitmapFormat)),
+						  fBitmap(new BBitmap(BRect(0, 0, 32 - 1, 8 - 1),
+						  					  0, B_CMAP8)),
+//						  fBitmap(new BBitmap(BRect(0, 0, 32 - 1, 8 - 1),
+//						  					  0, B_GRAY8)),
 						  fBitmapRect(),
 						  fTracking(TRACKING_NONE),
 						  fLastMousePos(-1.0, -1.0)
 					{
 						SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 						SetLowColor(ViewColor());
-						uint32 size = min_c((uint32)fBitmap->BitsLength(), sizeof(kBitmapBits));
-						memcpy(fBitmap->Bits(), kBitmapBits, size);
+//						uint32 size = min_c((uint32)fBitmap->BitsLength(), sizeof(kBitmapBits));
+//						memcpy(fBitmap->Bits(), kBitmapBits, size);
+						uint8* bits = (uint8*)fBitmap->Bits();
+						uint32 width = fBitmap->Bounds().IntegerWidth() + 1;
+						uint32 height = fBitmap->Bounds().IntegerHeight() + 1;
+						uint32 bpr = fBitmap->BytesPerRow();
+printf("width: %ld, height: %ld, bpr: %ld\n", width, height, bpr);
+						int32 index = 0;
+						for (uint32 y = 0; y < height; y++) {
+							uint8* h = bits;
+							for (uint32 x = 0; x < width; x++) {
+								*h = index++;
+								h++;
+							}
+							bits += bpr;
+						}
+BRect a(0.0, 10.0, 20.0, 10.0);
+BRect b(0.0, 10.0, 10.0, 30.0);
+printf("Intersects: %d\n", a.Intersects(b));
 						_ResetRect();
 					}
 
@@ -112,7 +133,7 @@ bool
 hit_test(BPoint where, BPoint p)
 {
 	BRect r(p, p);
-	r.InsetBy(-7.0, -7.0);
+	r.InsetBy(-5.0, -5.0);
 	return r.Contains(where);
 }
 
@@ -121,9 +142,9 @@ hit_test(BPoint where, BPoint a, BPoint b)
 {
 	BRect r(a, b);
 	if (a.x == b.x)
-		r.InsetBy(-7.0, 0.0);
+		r.InsetBy(-3.0, 0.0);
 	else
-		r.InsetBy(0.0, -7.0);
+		r.InsetBy(0.0, -3.0);
 	return r.Contains(where);
 }
 

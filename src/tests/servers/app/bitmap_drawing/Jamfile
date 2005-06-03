@@ -3,7 +3,7 @@ SubDir OBOS_TOP src tests servers app bitmap_drawing ;
 UseHeaders [ FDirName os app ] ;
 UseHeaders [ FDirName os interface ] ;
 
-SimpleTest BitmapDrawing :
+App BitmapDrawing :
 	main.cpp
 	;
 
