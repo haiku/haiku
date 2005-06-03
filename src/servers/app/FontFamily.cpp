@@ -72,7 +72,7 @@ FontStyle::FontStyle(const char *filepath, FT_Face face)
 	This is done because a FontStyle should be deleted only when it no longer has any
 	dependencies.
 */
-FontStyle::~FontStyle(void)
+FontStyle::~FontStyle()
 {
 	delete cachedface;
 }
@@ -81,14 +81,16 @@ FontStyle::~FontStyle(void)
 	\brief Returns the name of the style as a string
 	\return The style's name
 */
-const char *FontStyle::Name(void) const
+const char*
+FontStyle::Name() const
 {
 	return fName.String();
 }
 
-font_height FontStyle::GetHeight(const float &size)
+font_height
+FontStyle::GetHeight(const float &size) const
 {
-	font_height fh={0,0,0};
+	font_height fh = { 0, 0, 0 };
 	
 	// font units are 26.6 format, so we get REALLY big numbers if
 	// we don't do some shifting.
@@ -105,12 +107,14 @@ font_height FontStyle::GetHeight(const float &size)
 	\brief Returns the path to the style's font file 
 	\return The style's font file path
 */
-const char *FontStyle::GetPath(void)
+const char*
+FontStyle::GetPath() const
 {
 	return fPath.String();
 }
 
-int32 FontStyle::GetFlags(void) const
+int32
+FontStyle::GetFlags() const
 {
 	int32 flags=0;
 	if(IsFixedWidth())
@@ -141,7 +145,8 @@ int16 FontStyle::ConvertToUnicode(uint16 c)
 }
 */
 
-uint16 FontStyle::TranslateStyleToFace(const char *name) const
+uint16
+FontStyle::TranslateStyleToFace(const char *name) const
 {
 	if(!name)
 		return 0;
@@ -166,11 +171,11 @@ uint16 FontStyle::TranslateStyleToFace(const char *name) const
 */
 FontFamily::FontFamily(const char *namestr, const uint16 &index)
 {
-	fName=namestr;
-	fID=index;
+	fName = namestr;
+	fID = index;
 	
 	// will stay uninitialized until needed
-	fFlags=-1;
+	fFlags = -1;
 }
 
 /*!
@@ -180,21 +185,19 @@ FontFamily::FontFamily(const char *namestr, const uint16 &index)
 	its styles have no dependencies or some other really good reason, such as 
 	system shutdown.
 */
-FontFamily::~FontFamily(void)
+FontFamily::~FontFamily()
 {
-	FontStyle *style;
-	for(int32 i=0; i<fStyles.CountItems(); i++)
-	{
-		style=(FontStyle *)fStyles.RemoveItem(i);
-		delete style;
-	}
+	int32 count = fStyles.CountItems();
+	for (int32 i = 0; i < count; i++)
+		delete (FontStyle*)fStyles.ItemAt(i);
 }
 
 /*!
 	\brief Returns the name of the family
 	\return The family's name
 */
-const char *FontFamily::Name(void)
+const char*
+FontFamily::Name()
 {
 	return fName.String();
 }
@@ -204,31 +207,30 @@ const char *FontFamily::Name(void)
 	\param path full path to the style's font file
 	\param face FreeType face handle used to obtain info about the font
 */
-bool FontFamily::AddStyle(FontStyle *style)
+bool
+FontFamily::AddStyle(FontStyle *style)
 {
-	if(!style)
+	if (!style)
 		return false;
 
 	FontStyle *item;
 
 	// Don't add if it already is in the family.	
-	int32 count=fStyles.CountItems();
-	for(int32 i=0; i<count; i++)
-	{
-		item=(FontStyle *)fStyles.ItemAt(i);
-		if(item->fName==style->fName)
+	int32 count = fStyles.CountItems();
+	for(int32 i = 0; i < count; i++) {
+		item = (FontStyle*)fStyles.ItemAt(i);
+		if (item->fName == style->fName)
 			return false;
 	}
 	
 	style->family=this;
 	
-	if(fStyles.CountItems()>0)
-	{
-		item=(FontStyle *)fStyles.ItemAt(fStyles.CountItems()-1);
-		style->fID=item->fID+1;
+	if (fStyles.CountItems() > 0) {
+		item = (FontStyle*)fStyles.ItemAt(fStyles.CountItems() - 1);
+		style->fID = item->fID + 1;
+	} else {
+		style->fID = 0;
 	}
-	else
-		style->fID=0;
 	
 	fStyles.AddItem(style);
 	AddDependent();
@@ -243,7 +245,8 @@ bool FontFamily::AddStyle(FontStyle *style)
 	\brief Removes a style from the family and deletes it
 	\param style Name of the style to be removed from the family
 */
-void FontFamily::RemoveStyle(const char *style)
+void
+FontFamily::RemoveStyle(const char *style)
 {
 	int32 count=fStyles.CountItems();
 	if(!style || count<1)
@@ -272,15 +275,15 @@ void FontFamily::RemoveStyle(const char *style)
 	\brief Removes a style from the family. The caller is responsible for freeing the object
 	\param style The style to be removed from the family
 */
-void FontFamily::RemoveStyle(FontStyle *style)
+void
+FontFamily::RemoveStyle(FontStyle *style)
 {
-	if(fStyles.HasItem(style))
-	{
+	if (fStyles.HasItem(style)) {
 		fStyles.RemoveItem(style);
 		RemoveDependent();
 		
 		// force a refresh if a request for font flags is needed
-		fFlags=-1;
+		fFlags = -1;
 	}
 }
 
@@ -288,7 +291,8 @@ void FontFamily::RemoveStyle(FontStyle *style)
 	\brief Returns the number of styles in the family
 	\return The number of styles in the family
 */
-int32 FontFamily::CountStyles(void)
+int32
+FontFamily::CountStyles() const
 {
 	return fStyles.CountItems();
 }
@@ -298,18 +302,18 @@ int32 FontFamily::CountStyles(void)
 	\param style Name of the style being checked
 	\return True if it belongs, false if not
 */
-bool FontFamily::HasStyle(const char *style)
+bool
+FontFamily::HasStyle(const char *style) const
 {
-	int32 count=fStyles.CountItems();
+	int32 count = fStyles.CountItems();
 	
-	if(!style || count<1)
+	if (!style || count < 1)
 		return false;
 	
 	FontStyle *fs;
-	for(int32 i=0; i<count; i++)
-	{
-		fs=(FontStyle *)fStyles.ItemAt(i);
-		if(fs && fs->fName.Compare(style)==0)
+	for (int32 i = 0; i < count; i++) {
+		fs = (FontStyle*)fStyles.ItemAt(i);
+		if( fs && fs->fName.Compare(style) == 0)
 			return true;
 	}
 	return false;
@@ -320,7 +324,8 @@ bool FontFamily::HasStyle(const char *style)
 	\param index list index of the style to be found
 	\return name of the style or NULL if the index is not valid
 */
-FontStyle *FontFamily::GetStyle(int32 index)
+FontStyle*
+FontFamily::GetStyle(int32 index) const
 {
 	return (FontStyle*)fStyles.ItemAt(index);
 }
@@ -332,40 +337,38 @@ FontStyle *FontFamily::GetStyle(int32 index)
 	
 	The object returned belongs to the family and must not be deleted.
 */
-FontStyle *FontFamily::GetStyle(const char *style)
+FontStyle*
+FontFamily::GetStyle(const char *style) const
 {
 	int32 count=fStyles.CountItems();
-	if(!style || count<1)
+	if (!style || count < 1)
 		return NULL;
+
 	FontStyle *fs;
-	for(int32 i=0; i<count; i++)
-	{
-		fs=(FontStyle *)fStyles.ItemAt(i);
-		if(fs && fs->fName.Compare(style)==0)
+	for (int32 i = 0; i < count; i++) {
+		fs = (FontStyle*)fStyles.ItemAt(i);
+		if (fs && fs->fName.Compare(style) == 0)
 			return fs;
 	}
 	return NULL;
 }
 
-int32 FontFamily::GetFlags(void)
+int32
+FontFamily::GetFlags()
 {
-	if(fFlags==-1)
-	{
-		fFlags=0;
+	if (fFlags == -1) {
+		fFlags = 0;
 		
-		for(int32 i=0; i<fStyles.CountItems(); i++)
-		{
-			FontStyle *style=(FontStyle*)fStyles.ItemAt(i);
-			if(style)
-			{
-				if(style->IsFixedWidth())
-					fFlags|=B_IS_FIXED;
-				if(style->TunedCount()>0)
-					fFlags|=B_HAS_TUNED_FONT;
+		for (int32 i = 0; i < fStyles.CountItems(); i++) {
+			FontStyle* style = (FontStyle*)fStyles.ItemAt(i);
+			if (style) {
+				if (style->IsFixedWidth())
+					fFlags |= B_IS_FIXED;
+				if (style->TunedCount() > 0)
+					fFlags |= B_HAS_TUNED_FONT;
 			}
 		}
 	}
 	
 	return fFlags;
-	
 }

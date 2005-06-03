@@ -87,59 +87,59 @@ class FontStyle : public SharedObject
 {
 public:
 	FontStyle(const char *filepath, FT_Face face);
-	~FontStyle(void);
+	~FontStyle();
 
 /*!
 	\fn bool FontStyle::IsFixedWidth(void)
 	\brief Determines whether the font's character width is fixed
 	\return true if fixed, false if not
 */
-	bool IsFixedWidth(void) const { return is_fixedwidth; }
+	bool IsFixedWidth() const { return is_fixedwidth; }
 /*!
 	\fn bool FontStyle::IsScalable(void)
 	\brief Determines whether the font can be scaled to any size
 	\return true if scalable, false if not
 */
-	bool IsScalable(void) const { return is_scalable; }
+	bool IsScalable() const { return is_scalable; }
 /*!
 	\fn bool FontStyle::HasKerning(void)
 	\brief Determines whether the font has kerning information
 	\return true if kerning info is available, false if not
 */
-	bool HasKerning(void) const { return has_kerning; }
+	bool HasKerning() const { return has_kerning; }
 /*!
 	\fn bool FontStyle::HasTuned(void)
 	\brief Determines whether the font contains strikes
 	\return true if it has strikes included, false if not
 */
-	bool HasTuned(void) const { return has_bitmaps; }
+	bool HasTuned() const { return has_bitmaps; }
 /*!
 	\fn bool FontStyle::TunedCount(void)
 	\brief Returns the number of strikes the style contains
 	\return The number of strikes the style contains
 */
-	int32 TunedCount(void) const { return tunedcount; }
+	int32 TunedCount() const { return tunedcount; }
 /*!
 	\fn bool FontStyle::GlyphCount(void)
 	\brief Returns the number of glyphs in the style
 	\return The number of glyphs the style contains
 */
-	uint16 GlyphCount(void) const { return glyphcount; }
+	uint16 GlyphCount() const { return glyphcount; }
 /*!
 	\fn bool FontStyle::CharMapCount(void)
 	\brief Returns the number of character maps the style contains
 	\return The number of character maps the style contains
 */
 	uint16 CharMapCount(void) const { return charmapcount; }
-	const char *Name(void) const;
-	FontFamily *Family(void) const { return family; }
-	uint16 GetID(void) const { return fID; }
-	int32 GetFlags(void) const;
+	const char *Name() const;
+	FontFamily *Family() const { return family; }
+	uint16 GetID() const { return fID; }
+	int32 GetFlags() const;
 
-	uint16 GetFace(void) const { return fFace; }
+	uint16 GetFace() const { return fFace; }
 
-	const char *GetPath(void);
-	font_height GetHeight(const float &size);
+	const char *GetPath() const;
+	font_height GetHeight(const float &size) const;
 	
 	FT_Face GetFTFace() const { return fFTFace; }
 	
@@ -175,21 +175,21 @@ class FontFamily : public SharedObject
 {
 public:
 	FontFamily(const char *namestr, const uint16 &index);
-	~FontFamily(void);
-	const char *Name(void);
+	~FontFamily();
+	const char *Name();
 	
 	bool AddStyle(FontStyle *style);
 	void RemoveStyle(const char *style);
 	void RemoveStyle(FontStyle *style);
 	
-	FontStyle *GetStyle(int32 index);
-	FontStyle *GetStyle(const char *style);
+	FontStyle *GetStyle(int32 index) const;
+	FontStyle *GetStyle(const char *style) const;
 	
-	uint16 GetID(void) const { return fID; }
+	uint16 GetID() const { return fID; }
 	
-	bool HasStyle(const char *style);
-	int32 CountStyles(void);
-	int32 GetFlags(void);
+	bool HasStyle(const char *style) const;
+	int32 CountStyles() const;
+	int32 GetFlags();
 	
 protected:
 	BString fName;
