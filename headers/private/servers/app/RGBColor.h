@@ -67,8 +67,11 @@ public:
 	
 	const RGBColor & operator=(const RGBColor &col);
 	const RGBColor & operator=(const rgb_color &col);
-	bool operator==(const rgb_color &col);
-	bool operator==(const RGBColor &col);
+	bool operator==(const rgb_color &col) const;
+	bool operator==(const RGBColor &col) const;
+
+	bool IsTransparentMagic() const;
+
 protected:
 	rgb_color color32;
 

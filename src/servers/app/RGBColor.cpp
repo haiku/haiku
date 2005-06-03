@@ -338,19 +338,30 @@ void RGBColor::PrintToStream(void) const
 	\brief Overloaded comaparison
 	\return true if all color elements are exactly equal
 */
-bool RGBColor::operator==(const rgb_color &col)
+bool RGBColor::operator==(const rgb_color &col) const
 {
-	return (color32.red==col.red && color32.green==col.green
-		&& color32.blue==col.blue && color32.alpha==col.alpha)?true:false;
+	return color32.red == col.red &&
+		   color32.green == col.green &&
+		   color32.blue == col.blue &&
+		   color32.alpha == col.alpha;
 }
 
 /*!
 	\brief Overloaded comaparison
 	\return true if all color elements are exactly equal
 */
-bool RGBColor::operator==(const RGBColor &col)
+bool RGBColor::operator==(const RGBColor &col) const
 {
-	return (color32.red==col.color32.red && color32.green==col.color32.green
-		&& color32.blue==col.color32.blue 
-		&& color32.alpha==col.color32.alpha)?true:false;
+	return color32.red == col.color32.red &&
+		   color32.green == col.color32.green &&
+		   color32.blue == col.color32.blue &&
+		   color32.alpha == col.color32.alpha;
+}
+
+// IsTransparentMagic
+bool
+RGBColor::IsTransparentMagic() const
+{
+	// TODO: validate this for B_CMAP8 for example
+	return *this == B_TRANSPARENT_COLOR;
 }
