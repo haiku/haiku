@@ -64,15 +64,15 @@ using namespace std;
 	\param region The region to be zeroed.
 */
 void
-BRegion::Support::ZeroRegion(BRegion *region)
+BRegion::Support::ZeroRegion(BRegion &region)
 {
 	CALLED();
 	
-	region->count = 0;
-	region->bound.left = kMaxPositive;
-	region->bound.top = kMaxPositive;
-	region->bound.right = kMaxNegative;
-	region->bound.bottom = kMaxNegative;
+	region.count = 0;
+	region.bound.left = kMaxPositive;
+	region.bound.top = kMaxPositive;
+	region.bound.right = kMaxNegative;
+	region.bound.bottom = kMaxNegative;
 }
 
 
@@ -81,18 +81,18 @@ BRegion::Support::ZeroRegion(BRegion *region)
 	\param region The region to be cleared.
 */
 void
-BRegion::Support::ClearRegion(BRegion *region)
+BRegion::Support::ClearRegion(BRegion &region)
 {
 	CALLED();
 
 	// TODO: What is it used for ?
 	// Could be that a cleared region represents an infinite one ?
 	
-	region->count = 0;
-	region->bound.left = 0xfffffff;
-	region->bound.top = 0xfffffff;
-	region->bound.right = 0xf0000001;
-	region->bound.bottom = 0xf0000001;
+	region.count = 0;
+	region.bound.left = 0xfffffff;
+	region.bound.top = 0xfffffff;
+	region.bound.right = 0xf0000001;
+	region.bound.bottom = 0xf0000001;
 }
 
 
@@ -101,25 +101,22 @@ BRegion::Support::ClearRegion(BRegion *region)
 	\param dest The destination region.
 */
 void
-BRegion::Support::CopyRegion(BRegion *source, BRegion *dest)
+BRegion::Support::CopyRegion(const BRegion &source, BRegion &dest)
 {
 	CALLED();
-	ASSERT(source);
-	ASSERT(dest);
-	ASSERT(source != dest);
 		
 	// If there is not enough memory, allocate
-	if (dest->data_size < source->count) {
-		free(dest->data);
-		dest->data_size = source->count + 8;
-		dest->data = (clipping_rect *)malloc(dest->data_size * sizeof(clipping_rect));
+	if (dest.data_size < source.count) {
+		free(dest.data);
+		dest.data_size = source.count + 8;
+		dest.data = (clipping_rect *)malloc(dest.data_size * sizeof(clipping_rect));
 	}
 	
-	dest->count = source->count;
+	dest.count = source.count;
 	
 	// Copy rectangles and bounds.
-	memcpy(dest->data, source->data, source->count * sizeof(clipping_rect));
-	dest->bound = source->bound;
+	memcpy(dest.data, source.data, source.count * sizeof(clipping_rect));
+	dest.bound = source.bound;
 }
 
 
@@ -132,27 +129,25 @@ BRegion::Support::CopyRegion(BRegion *source, BRegion *dest)
 	cases, then it calls the appropriate specialized function.
 */
 void
-BRegion::Support::AndRegion(BRegion *first, BRegion *second, BRegion *dest)
+BRegion::Support::AndRegion(const BRegion &first, const BRegion &second,
+							BRegion &dest)
 {
 	CALLED();
-	ASSERT(first);
-	ASSERT(second);
-	ASSERT(dest);
+		
+	clipping_rect intersection = sect_rect(first.bound, second.bound);
 	
-	clipping_rect intersection = sect_rect(first->bound, second->bound);
-	
-	if (first->count == 0 || second->count == 0	|| !valid_rect(intersection))
+	if (first.count == 0 || second.count == 0 || !valid_rect(intersection))
 		ZeroRegion(dest);
 	
-	else if (first->count == 1 && second->count == 1) {
-		dest->data[0] = intersection;
-		dest->bound = intersection;
-		dest->count = 1;
+	else if (first.count == 1 && second.count == 1) {
+		dest.data[0] = intersection;
+		dest.bound = intersection;
+		dest.count = 1;
 	
-	} else if (first->count > 1 && second->count == 1)
+	} else if (first.count > 1 && second.count == 1)
 		AndRegion1ToN(second, first, dest);
 	
-	else if (first->count == 1 && second->count > 1)
+	else if (first.count == 1 && second.count > 1)
 		AndRegion1ToN(first, second, dest);
 	
 	else
@@ -169,47 +164,45 @@ BRegion::Support::AndRegion(BRegion *first, BRegion *second, BRegion *dest)
 	cases, then it calls the appropriate specialized function.
 */
 void
-BRegion::Support::OrRegion(BRegion *first, BRegion *second, BRegion *dest)
+BRegion::Support::OrRegion(const BRegion &first, const BRegion &second,
+							BRegion &dest)
 {
 	CALLED();
-	ASSERT(first);
-	ASSERT(second);
-	ASSERT(dest);
 	
-	BRegion *regionA, *regionB;		
-	
-	// A little trick, to save some work...
-	if (first->count != 0) {
-		regionA = first;
-		regionB = second;
+	// A little trick, to save some work...	
+	const BRegion *regionA;
+	const BRegion *regionB;
+	if (first.count != 0) {
+		regionA = &first;
+		regionB = &second;
 	} else {
-		regionA = second;
-		regionB = first;
+		regionA = &second;
+		regionB = &first;
 	}
 	
 	if (regionB->count == 0)
-		CopyRegion(regionA, dest);
+		CopyRegion(*regionA, dest);
 	else {
 		if (regionB->bound.top > regionA->bound.bottom)
-			AppendRegion(regionA, regionB, dest);
+			AppendRegion(*regionA, *regionB, dest);
 		
 		else if (regionA->bound.top > regionB->bound.bottom)
-			AppendRegion(regionB, regionA, dest);
+			AppendRegion(*regionB, *regionA, dest);
 		
 		else if (regionA->bound.left > regionB->bound.right)
-			OrRegionNoX(regionB, regionA, dest);
+			OrRegionNoX(*regionB, *regionA, dest);
 		
 		else if (regionB->bound.left > regionA->bound.right)
-			OrRegionNoX(regionA, regionB, dest);
+			OrRegionNoX(*regionA, *regionB, dest);
 		
 		else if (regionA->count == 1)
-			OrRegion1ToN(regionA, regionB, dest);
+			OrRegion1ToN(*regionA, *regionB, dest);
 		
 		else if (regionB->count == 1)
-			OrRegion1ToN(regionB, regionA, dest);
+			OrRegion1ToN(*regionB, *regionA, dest);
 		
 		else 
-			OrRegionComplex(regionA, regionB, dest);		
+			OrRegionComplex(*regionA, *regionB, dest);		
 	}
 }
 
@@ -223,17 +216,14 @@ BRegion::Support::OrRegion(BRegion *first, BRegion *second, BRegion *dest)
 	cases, then it calls the appropriate specialized function.
 */
 void
-BRegion::Support::SubRegion(BRegion *first, BRegion *second, BRegion *dest)
+BRegion::Support::SubRegion(const BRegion &first, const BRegion &second,
+							BRegion &dest)
 {
 	CALLED();
-	ASSERT(first);
-	ASSERT(second);
-	ASSERT(dest);
-
-	if (first->count == 0)
+	if (first.count == 0)
 		ZeroRegion(dest);
 		
-	else if (second->count == 0	|| !rects_intersect(first->bound, second->bound))
+	else if (second.count == 0 || !rects_intersect(first.bound, second.bound))
 		CopyRegion(first, dest);
 		
 	else
@@ -245,17 +235,17 @@ BRegion::Support::SubRegion(BRegion *first, BRegion *second, BRegion *dest)
 	\param region The region to be cleaned.
 */
 void
-BRegion::Support::CleanupRegion(BRegion *region)
+BRegion::Support::CleanupRegion(BRegion &region)
 {
 	CALLED();
 	
 	long oldCount;
 	
 	do {
-		oldCount = region->count;
+		oldCount = region.count;
 		CleanupRegionVertical(region);
 		CleanupRegionHorizontal(region);
-	} while (region->count < oldCount);
+	} while (region.count < oldCount);
 }
 
 
@@ -263,29 +253,29 @@ BRegion::Support::CleanupRegion(BRegion *region)
 	\param region The region to be cleaned.
 */
 void
-BRegion::Support::CleanupRegionVertical(BRegion *region)
+BRegion::Support::CleanupRegionVertical(BRegion &region)
 {
 	CALLED();
 	
 	clipping_rect testRect = { 1, 1, -1, -2 };	
 	long newCount = -1;
 		
-	for (long x = 0; x < region->count; x++) {
-		clipping_rect &rect = region->data[x];
+	for (long x = 0; x < region.count; x++) {
+		clipping_rect &rect = region.data[x];
 					
 		if (rect.left == testRect.left && rect.right == testRect.right
 				&& rect.top == testRect.bottom + 1) {
 			
 			ASSERT(newCount >= 0);
-			region->data[newCount].bottom = rect.bottom;
+			region.data[newCount].bottom = rect.bottom;
 					
 		} else {
 			newCount++;
-			region->data[newCount] = region->data[x];
-			testRect = region->data[x]; 
+			region.data[newCount] = region.data[x];
+			testRect = region.data[x]; 
 		}
 	}
-	region->count = newCount + 1;
+	region.count = newCount + 1;
 }
 
 
@@ -293,29 +283,29 @@ BRegion::Support::CleanupRegionVertical(BRegion *region)
 	\param region The region to be cleaned.
 */
 void
-BRegion::Support::CleanupRegionHorizontal(BRegion *region)
+BRegion::Support::CleanupRegionHorizontal(BRegion &region)
 {
 	CALLED();
 	
 	clipping_rect testRect = { 1, 1, -2, -1 };
 	long newCount = -1;
 
-	for (long x = 0; x < region->count; x++) {
-		clipping_rect &rect = region->data[x];
+	for (long x = 0; x < region.count; x++) {
+		clipping_rect &rect = region.data[x];
 		
 		if (rect.top == testRect.top && rect.bottom == testRect.bottom
 					&& rect.left == testRect.right + 1) {
 			
 			ASSERT(newCount >= 0);
-			region->data[newCount].right = rect.right;
+			region.data[newCount].right = rect.right;
 							
 		} else {
 			newCount++;
-			region->data[newCount] = rect;
+			region.data[newCount] = rect;
 		}				
-		testRect = region->data[newCount];
+		testRect = region.data[newCount];
 	}
-	region->count = newCount + 1;
+	region.count = newCount + 1;
 }
 
 
@@ -406,25 +396,23 @@ BRegion::Support::SortTrans(long *lptr1, long *lptr2, long count)
 	\param count Amount of additional memory to be allocated in the destination region.
 */
 void
-BRegion::Support::CopyRegionMore(BRegion *source, BRegion *dest, long count)
+BRegion::Support::CopyRegionMore(const BRegion &source, BRegion &dest,
+								long count)
 {
 	CALLED();
-	ASSERT(source);
-	ASSERT(dest);
-	ASSERT(source != dest);
 	
 	// If there is not enough memory, allocate
-	if (dest->data_size < source->count) {
-		free(dest->data);
-		dest->data_size = source->count + count;
-		dest->data = (clipping_rect *)malloc(dest->data_size * sizeof(clipping_rect));
+	if (dest.data_size < source.count) {
+		free(dest.data);
+		dest.data_size = source.count + count;
+		dest.data = (clipping_rect *)malloc(dest.data_size * sizeof(clipping_rect));
 	}
 	
-	dest->count = source->count;
+	dest.count = source.count;
 	
 	// Copy rectangles and bounds.
-	memcpy(dest->data, source->data, source->count * sizeof(clipping_rect));
-	dest->bound = source->bound;
+	memcpy(dest.data, source.data, source.count * sizeof(clipping_rect));
+	dest.bound = source.bound;
 }
 
 
@@ -436,25 +424,22 @@ BRegion::Support::CopyRegionMore(BRegion *source, BRegion *dest, long count)
 	Called by and_region() when the intersection is complex.
 */	
 void
-BRegion::Support::AndRegionComplex(BRegion *first, BRegion *second, BRegion *dest)
+BRegion::Support::AndRegionComplex(const BRegion &first, const BRegion &second,
+								BRegion &dest)
 {
-	CALLED();
-	ASSERT(first);
-	ASSERT(second);
-	ASSERT(dest);
-		
+	CALLED();	
 	ZeroRegion(dest);
 			
-	for (long f = 0; f < first->count; f++) {
-		for (long s = 0; s < second->count; s++) {
-			clipping_rect testRect = sect_rect(first->data[f], second->data[s]);
+	for (long f = 0; f < first.count; f++) {
+		for (long s = 0; s < second.count; s++) {
+			clipping_rect testRect = sect_rect(first.data[f], second.data[s]);
 			if (valid_rect(testRect))
-				dest->_AddRect(testRect);
+				dest._AddRect(testRect);
 		}
 	}
 	
-	if (dest->count > 1)
-		SortRects(dest->data, dest->count);
+	if (dest.count > 1)
+		SortRects(dest.data, dest.count);
 }
 
 
@@ -466,29 +451,26 @@ BRegion::Support::AndRegionComplex(BRegion *first, BRegion *second, BRegion *des
 	Called by and_region() when one of the two region contains just one rect.
 */	
 void
-BRegion::Support::AndRegion1ToN(BRegion *first, BRegion *second, BRegion *dest)
+BRegion::Support::AndRegion1ToN(const BRegion &first, const BRegion &second,
+							BRegion &dest)
 {
 	CALLED();
-	ASSERT(first);
-	ASSERT(second);
-	ASSERT(dest);
-	
 	// The easy case first: We already know that the regions intersect,
 	// so we check if the first region contains the second.
 	// If it's the case, the intersection is exactly the second region.
-	if (first->bound.top <= second->bound.top
-			&& first->bound.bottom >= second->bound.bottom
-			&& first->bound.left <= second->bound.left
-			&& first->bound.right >= second->bound.right)
+	if (first.bound.top <= second.bound.top
+			&& first.bound.bottom >= second.bound.bottom
+			&& first.bound.left <= second.bound.left
+			&& first.bound.right >= second.bound.right)
 		CopyRegion(second, dest);
 	else {
 	// Otherwise, we check the rect of the first region against the rects
 	// of the second, and we add their intersections to the destination region
 		ZeroRegion(dest);
-		for (long x = 0; x < second->count; x++) {
-			clipping_rect testRect = sect_rect(first->data[0], second->data[x]);
+		for (long x = 0; x < second.count; x++) {
+			clipping_rect testRect = sect_rect(first.data[0], second.data[x]);
 			if (valid_rect(testRect))
-				dest->_AddRect(testRect);
+				dest._AddRect(testRect);
 		}
 	}
 }
@@ -504,22 +486,19 @@ BRegion::Support::AndRegion1ToN(BRegion *first, BRegion *second, BRegion *dest)
 	coordinate.
 */
 void
-BRegion::Support::AppendRegion(BRegion *first, BRegion *second, BRegion *dest)
+BRegion::Support::AppendRegion(const BRegion &first, const BRegion &second,
+							BRegion &dest)
 {
 	CALLED();
-	ASSERT(first);
-	ASSERT(second);
-	ASSERT(dest);
-	
 	CopyRegion(first, dest);
-
-	for (long c = 0; c < second->count; c++)
-		dest->_AddRect(second->data[c]);	
+	for (long c = 0; c < second.count; c++)
+		dest._AddRect(second.data[c]);	
 }
 
 
 void
-BRegion::Support::ROr(long top, long bottom, BRegion *first, BRegion *second, BRegion *dest, long *indexA, long *indexB)
+BRegion::Support::ROr(long top, long bottom, const BRegion &first,
+			const BRegion &second, BRegion &dest, long *indexA, long *indexB)
 {
 	CALLED();
 	
@@ -540,7 +519,7 @@ BRegion::Support::ROr(long top, long bottom, BRegion *first, BRegion *second, BR
 	
 	// allocate arrays on the heap, if the ones one the stack are too small
 	int32 *allocatedBuffer = NULL;
-	int32 maxCount = first->count - i1 + second->count - i2;
+	int32 maxCount = first.count - i1 + second.count - i2;
 	
 	if (maxCount > kMaxPoints) {
 		RTRACE(("Stack space isn't sufficient. Allocating %ld bytes on the heap...\n",
@@ -552,33 +531,33 @@ BRegion::Support::ROr(long top, long bottom, BRegion *first, BRegion *second, BR
 	}
 
 	// Store left and right points to the appropriate array
-	for (x = i1; x < first->count; x++) {
+	for (x = i1; x < first.count; x++) {
 		
 		// Look if this rect can be used next time we are called, 
 		// thus correctly maintaining the "index" parameters.
-		if (first->data[x].bottom >= top && *indexA == -1)
+		if (first.data[x].bottom >= top && *indexA == -1)
 			*indexA = x;
 			
-		if (first->data[x].top <= top && first->data[x].bottom >= bottom) {
-			lefts[foundCount] = first->data[x].left;
-			rights[foundCount] = first->data[x].right;
+		if (first.data[x].top <= top && first.data[x].bottom >= bottom) {
+			lefts[foundCount] = first.data[x].left;
+			rights[foundCount] = first.data[x].right;
 			foundCount++;	
-		} else if (first->data[x].top > bottom)
+		} else if (first.data[x].top > bottom)
 			break;	
 	}
 	
 	if (*indexA == -1)
 		*indexA = i1;
 					
-	for (x = i2; x < second->count; x++) {
-		if (second->data[x].bottom >= top && *indexB == -1)
+	for (x = i2; x < second.count; x++) {
+		if (second.data[x].bottom >= top && *indexB == -1)
 			*indexB = x;
 		
-		if (second->data[x].top <= top && second->data[x].bottom >= bottom) {
-			lefts[foundCount] = second->data[x].left;
-			rights[foundCount] = second->data[x].right;
+		if (second.data[x].top <= top && second.data[x].bottom >= bottom) {
+			lefts[foundCount] = second.data[x].left;
+			rights[foundCount] = second.data[x].right;
 			foundCount++;
-		} else if (second->data[x].top > bottom)
+		} else if (second.data[x].top > bottom)
 			break;
 	}
 	
@@ -609,7 +588,7 @@ BRegion::Support::ROr(long top, long bottom, BRegion *first, BRegion *second, BR
 			next++;
 		}
 		
-		dest->_AddRect(rect);		
+		dest._AddRect(rect);		
 		current = next;	
 	}
 	
@@ -627,32 +606,33 @@ BRegion::Support::ROr(long top, long bottom, BRegion *first, BRegion *second, BR
 	\param dest The destination region.
 */
 void
-BRegion::Support::OrRegionComplex(BRegion *first, BRegion *second, BRegion *dest)
+BRegion::Support::OrRegionComplex(const BRegion &first, const BRegion &second,
+						BRegion &dest)
 {
 	CALLED();
 	long a = 0, b = 0;
 	
 	int32 top;
-	int32 bottom = min_c(first->bound.top, second->bound.top) - 1;
+	int32 bottom = min_c(first.bound.top, second.bound.top) - 1;
 	do {
 		long x;
 		top = bottom + 1;
 		bottom = kMaxVerticalExtent;
 		
-		for (x = a; x < first->count; x++) {
-			int32 n = first->data[x].top - 1;
+		for (x = a; x < first.count; x++) {
+			int32 n = first.data[x].top - 1;
 			if (n >= top && n < bottom)
 				bottom = n;
-			if (first->data[x].bottom >= top && first->data[x].bottom < bottom)
-				bottom = first->data[x].bottom;
+			if (first.data[x].bottom >= top && first.data[x].bottom < bottom)
+				bottom = first.data[x].bottom;
 		}	
 		
-		for (x = b; x < second->count; x++) {
-			int32 n = second->data[x].top - 1;
+		for (x = b; x < second.count; x++) {
+			int32 n = second.data[x].top - 1;
 			if (n >= top && n < bottom)
 				bottom = n;
-			if (second->data[x].bottom >= top && second->data[x].bottom < bottom)
-				bottom = second->data[x].bottom;
+			if (second.data[x].bottom >= top && second.data[x].bottom < bottom)
+				bottom = second.data[x].bottom;
 		}
 		
 		// We can stand a region which extends to kMaxVerticalExtent, not more
@@ -676,20 +656,17 @@ BRegion::Support::OrRegionComplex(BRegion *first, BRegion *second, BRegion *dest
 	one rect.
 */
 void
-BRegion::Support::OrRegion1ToN(BRegion *first, BRegion *second, BRegion *dest)
+BRegion::Support::OrRegion1ToN(const BRegion &first, const BRegion &second,
+							BRegion &dest)
 {
 	CALLED();
-	ASSERT(first);
-	ASSERT(second);
-	ASSERT(dest);
-
 	// The easy case first: if the first region contains the second,
 	// the union is exactly the first region, since its bound is the 
 	// only rectangle.
-	if (first->bound.top <= second->bound.top 
-			&& first->bound.bottom >= second->bound.bottom
-			&& first->bound.left <= second->bound.left
-			&& first->bound.right >= second->bound.right)
+	if (first.bound.top <= second.bound.top 
+			&& first.bound.bottom >= second.bound.bottom
+			&& first.bound.left <= second.bound.left
+			&& first.bound.right >= second.bound.right)
 		CopyRegion(first, dest);
 	else
 		OrRegionComplex(first, second, dest);
@@ -704,47 +681,44 @@ BRegion::Support::OrRegion1ToN(BRegion *first, BRegion *second, BRegion *dest)
 	This function is called by or_region when the two regions don't intersect.
 */
 void
-BRegion::Support::OrRegionNoX(BRegion *first, BRegion *second, BRegion *dest)
+BRegion::Support::OrRegionNoX(const BRegion &first, const BRegion &second,
+								BRegion &dest)
 {
 	CALLED();
-	ASSERT(first);
-	ASSERT(second);
-	ASSERT(dest);
-
 	ZeroRegion(dest);
 	
 	long x;
 	
-	if (first->count == 0) {
-		for (x = 0; x < second->count; x++)
-			dest->_AddRect(second->data[x]);
+	if (first.count == 0) {
+		for (x = 0; x < second.count; x++)
+			dest._AddRect(second.data[x]);
 	
-	} else if (second->count == 0) {
-		for (x = 0; x < first->count; x++)
-			dest->_AddRect(first->data[x]);
+	} else if (second.count == 0) {
+		for (x = 0; x < first.count; x++)
+			dest._AddRect(first.data[x]);
 	
 	} else {
 		long f = 0, s = 0;
 
-		while (f < first->count && s < second->count) {
+		while (f < first.count && s < second.count) {
 			
-			if (first->data[f].top < second->data[s].top) {
-				dest->_AddRect(first->data[f]);
+			if (first.data[f].top < second.data[s].top) {
+				dest._AddRect(first.data[f]);
 				f++;
 			
 			} else {
-				dest->_AddRect(second->data[s]);
+				dest._AddRect(second.data[s]);
 				s++;
 			}
 		} 		
 		
-		if (f == first->count)
-			for (; s < second->count; s++)
-				dest->_AddRect(second->data[s]);
+		if (f == first.count)
+			for (; s < second.count; s++)
+				dest._AddRect(second.data[s]);
 
-		else if (s == second->count)
-			for (; f < first->count; f++)
-				dest->_AddRect(first->data[f]);
+		else if (s == second.count)
+			for (; f < first.count; f++)
+				dest._AddRect(first.data[f]);
 	}
 }
 
@@ -756,33 +730,34 @@ BRegion::Support::OrRegionNoX(BRegion *first, BRegion *second, BRegion *dest)
 	\param dest The destination region.
 */
 void
-BRegion::Support::SubRegionComplex(BRegion *first, BRegion *second, BRegion *dest)
+BRegion::Support::SubRegionComplex(const BRegion &first, const BRegion &second,
+									BRegion &dest)
 {
 	CALLED();
 	long a = 0, b = 0;
 	
 	int32 top;
-	int32 bottom = min_c(first->bound.top, second->bound.top) - 1;
+	int32 bottom = min_c(first.bound.top, second.bound.top) - 1;
 
 	do {
 		long x;
 		top = bottom + 1;
 		bottom = kMaxVerticalExtent;
 		
-		for (x = a; x < first->count; x++) {
-			int32 n = first->data[x].top - 1;
+		for (x = a; x < first.count; x++) {
+			int32 n = first.data[x].top - 1;
 			if (n >= top && n < bottom)
 				bottom = n;
-			if (first->data[x].bottom >= top && first->data[x].bottom < bottom)
-				bottom = first->data[x].bottom;
+			if (first.data[x].bottom >= top && first.data[x].bottom < bottom)
+				bottom = first.data[x].bottom;
 		}	
 		
-		for (x = b; x < second->count; x++) {
-			int32 n = second->data[x].top - 1;
+		for (x = b; x < second.count; x++) {
+			int32 n = second.data[x].top - 1;
 			if (n >= top && n < bottom)
 				bottom = n;
-			if (second->data[x].bottom >= top && second->data[x].bottom < bottom)
-				bottom = second->data[x].bottom;
+			if (second.data[x].bottom >= top && second.data[x].bottom < bottom)
+				bottom = second.data[x].bottom;
 		}
 		
 		if (bottom >= kMaxVerticalExtent)
@@ -801,6 +776,7 @@ BRegion::Support::SubRegionComplex(BRegion *first, BRegion *second, BRegion *des
 
 	Watch out!!! We write 1 element more than count, so be sure that the passed
 	arrays have the needed space
+	// TODO: Find a better name for this function
 */
 static void
 InvertRectangles(long *lefts, long *rights, long count)
@@ -819,7 +795,8 @@ InvertRectangles(long *lefts, long *rights, long count)
 
 
 void
-BRegion::Support::RSub(long top, long bottom, BRegion *first, BRegion *second, BRegion *dest, long *indexA, long *indexB)
+BRegion::Support::RSub(long top, long bottom, const BRegion &first,
+			const BRegion &second, BRegion &dest, long *indexA, long *indexB)
 {
 	CALLED();
 	
@@ -849,8 +826,8 @@ BRegion::Support::RSub(long top, long bottom, BRegion *first, BRegion *second, B
 	int32 *allocatedBuffer = NULL;
 	
 	// The +1 is needed here, see InvertRectangles() 
-	int32 maxCountA = first->count - i1 + 1;
-	int32 maxCountB = second->count - i2 + 1;
+	int32 maxCountA = first.count - i1 + 1;
+	int32 maxCountB = second.count - i2 + 1;
 	
 	if (maxCountA + maxCountB > kMaxPoints) {
 		RTRACE(("Stack space isn't sufficient. Allocating %ld bytes on the heap...\n",
@@ -864,29 +841,29 @@ BRegion::Support::RSub(long top, long bottom, BRegion *first, BRegion *second, B
 	}
 
 	// Store left and right points to the appropriate array
-	for (x = i1; x < first->count; x++) {		
+	for (x = i1; x < first.count; x++) {		
 		// Look if this rect can be used next time we are called, 
 		// thus correctly maintaining the "index" parameters.
-		if (first->data[x].bottom >= top && *indexA == -1)
+		if (first.data[x].bottom >= top && *indexA == -1)
 			*indexA = x;
 			
-		if (first->data[x].top <= top && first->data[x].bottom >= bottom) {
-			leftsA[foundA] = first->data[x].left;
-			rightsA[foundA] = first->data[x].right;
+		if (first.data[x].top <= top && first.data[x].bottom >= bottom) {
+			leftsA[foundA] = first.data[x].left;
+			rightsA[foundA] = first.data[x].right;
 			foundA++;	
-		} else if (first->data[x].top > bottom)
+		} else if (first.data[x].top > bottom)
 			break;	
 	}
 					
-	for (x = i2; x < second->count; x++) {
-		if (second->data[x].bottom >= top && *indexB == -1)
+	for (x = i2; x < second.count; x++) {
+		if (second.data[x].bottom >= top && *indexB == -1)
 			*indexB = x;
 		
-		if (second->data[x].top <= top && second->data[x].bottom >= bottom) {
-			leftsB[foundB] = second->data[x].left;
-			rightsB[foundB] = second->data[x].right;
+		if (second.data[x].top <= top && second.data[x].bottom >= bottom) {
+			leftsB[foundB] = second.data[x].left;
+			rightsB[foundB] = second.data[x].right;
 			foundB++;
-		} else if (second->data[x].top > bottom)
+		} else if (second.data[x].top > bottom)
 			break;
 	}
 	
@@ -905,16 +882,16 @@ BRegion::Support::RSub(long top, long bottom, BRegion *first, BRegion *second, B
 	if (foundA == 0) {
 		for (x = 0; x < foundB; x++) {
 			clipping_rect rect = { leftsB[x], top, rightsB[x], bottom };
-			dest->_AddRect(rect);
+			dest._AddRect(rect);
 		}
-	} else if (foundB > 0) {
-		
+	} else if (foundB > 0) {	
 		InvertRectangles(leftsA, rightsA, foundA);
 		
 		clipping_rect A, B;
 		A.top = B.top = top;
 		A.bottom = B.bottom = bottom;
 		
+		// Note: the <= is not an error.
 		for (long f = 0; f <= foundA; f++) {
 			for (long s = 0; s < foundB; s++) {
 				A.left = leftsA[f];
@@ -923,7 +900,7 @@ BRegion::Support::RSub(long top, long bottom, BRegion *first, BRegion *second, B
 				B.left = leftsB[s];
 				B.right = rightsB[s];
 				if (rects_intersect(A, B))
-					dest->_AddRect(sect_rect(A, B));
+					dest._AddRect(sect_rect(A, B));
 			}
 		}
 	}

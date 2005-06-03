@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2003, OpenBeOS
+//	Copyright (c) 2003-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -39,15 +39,12 @@
 //	like this.
 
 
-// Standard Includes -----------------------------------------------------------
 #include <cstdlib>
 #include <cstring>
 
-// System Includes -------------------------------------------------------------
 #include <Debug.h>
 #include <Region.h>
 
-// Private Includes -------------------------------------------------------------
 #include <clipping.h>
 #include <RegionSupport.h>
 
@@ -62,7 +59,7 @@ BRegion::BRegion()
 {
 	data = (clipping_rect *)malloc(data_size * sizeof(clipping_rect));
 	
-	Support::ZeroRegion(this);
+	Support::ZeroRegion(*this);
 }
 
 
@@ -191,9 +188,8 @@ BRegion::Set(clipping_rect newBounds)
 		count = 1;
 		data[0] = newBounds;
 		bound = newBounds;
-	}
-	else
-		Support::ZeroRegion(this);	
+	} else
+		Support::ZeroRegion(*this);	
 }
 
 
@@ -303,7 +299,7 @@ BRegion::OffsetBy(int32 dh, int32 dv)
 void
 BRegion::MakeEmpty()
 {
-	Support::ZeroRegion(this);
+	Support::ZeroRegion(*this);
 }
 
 
@@ -328,8 +324,8 @@ BRegion::Include(clipping_rect rect)
 
 	region.Set(rect);
 	
-	Support::OrRegion(this, &region, &newRegion);
-	Support::CopyRegion(&newRegion, this);
+	Support::OrRegion(*this, region, newRegion);
+	Support::CopyRegion(newRegion, *this);
 }
 
 
@@ -341,8 +337,8 @@ BRegion::Include(const BRegion *region)
 {
 	BRegion newRegion;
 	
-	Support::OrRegion(this, const_cast<BRegion *>(region), &newRegion);
-	Support::CopyRegion(&newRegion, this);
+	Support::OrRegion(*this, *region, newRegion);
+	Support::CopyRegion(newRegion, *this);
 }
 
 
@@ -367,8 +363,8 @@ BRegion::Exclude(clipping_rect rect)
 	
 	region.Set(rect);
 
-	Support::SubRegion(this, &region, &newRegion);
-	Support::CopyRegion(&newRegion, this);
+	Support::SubRegion(*this, region, newRegion);
+	Support::CopyRegion(newRegion, *this);
 }
 
 
@@ -380,8 +376,8 @@ BRegion::Exclude(const BRegion *region)
 {
 	BRegion newRegion;
 	
-	Support::SubRegion(this, const_cast<BRegion *>(region), &newRegion);
-	Support::CopyRegion(&newRegion, this);
+	Support::SubRegion(*this, *region, newRegion);
+	Support::CopyRegion(newRegion, *this);
 }
 
 
@@ -393,8 +389,8 @@ BRegion::IntersectWith(const BRegion *region)
 {
 	BRegion newRegion;
 	
-	Support::AndRegion(this, const_cast<BRegion *>(region), &newRegion);
-	Support::CopyRegion(&newRegion, this);
+	Support::AndRegion(*this, *region, newRegion);
+	Support::CopyRegion(newRegion, *this);
 }
 
 
