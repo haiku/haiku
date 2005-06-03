@@ -54,6 +54,7 @@ enum thumb_style {
 
 // Globals ---------------------------------------------------------------------
 
+#define USE_OFF_SCREEN_VIEW 0
 
 // BSlider class ---------------------------------------------------------------
 class BSlider : public BControl {
@@ -190,7 +191,7 @@ private:
 
 		float				_MinPosition() const;
 		float				_MaxPosition() const;
-			
+
 //virtual	void				_ReservedSlider1();
 //virtual	void				_ReservedSlider2();
 //virtual	void				_ReservedSlider3();
@@ -207,36 +208,42 @@ virtual	void				_ReservedSlider12();
 		BSlider				&operator=(const BSlider &);
 
 		void 				_InitObject();
-									
+
 		BMessage*			fModificationMessage;
 		int32				fSnoozeAmount;
 
 		rgb_color 			fBarColor;
 		rgb_color 			fFillColor;
 		bool				fUseFillColor;
-		
+
 		char*				fMinLimitStr;
 		char*				fMaxLimitStr;
-	
+
 		int32 				fMinValue;
 		int32 				fMaxValue;
 		int32 				fKeyIncrementValue;
-		
+
 		int32 				fHashMarkCount;
 		hash_mark_location 	fHashMarks;
-	
+
+#if USE_OFF_SCREEN_VIEW
 		BBitmap*			fOffScreenBits;
 		BView*				fOffScreenView;
-		
+#endif
+
 		thumb_style			fStyle;
-		
+
 		BPoint 				fLocation;
 		BPoint				fInitialLocation;
-		
+
 		orientation			fOrientation;
 		float				fBarThickness;
-				
+
+#if USE_OFF_SCREEN_VIEW
 		uint32				_reserved[8];
+#else
+		uint32				_reserved[10];
+#endif
 };
 //------------------------------------------------------------------------------
 
