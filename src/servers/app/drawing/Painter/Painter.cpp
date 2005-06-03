@@ -179,6 +179,8 @@ Painter::SetDrawData(const DrawData* data)
 	SetPenSize(data->PenSize());
 	SetPenLocation(data->PenLocation());
 	SetFont(data->Font());
+//	fTextRenderer->SetAntialiasing(data->FontAntiAliasing());
+	fTextRenderer->SetAntialiasing(!(data->Font().Flags() & B_DISABLE_ANTIALIASING));
 //	if (data->clipReg) {
 //		ConstrainClipping(*data->clipReg);
 //	}

@@ -126,7 +126,13 @@ AGGTextRenderer::SetHinting(bool hinting)
 void
 AGGTextRenderer::SetAntialiasing(bool antialiasing)
 {
-	fAntialias = antialiasing;
+	if (fAntialias != antialiasing) {
+		fAntialias = antialiasing;
+		if (!fAntialias)
+			fRasterizer.gamma(agg::gamma_threshold(0.5));
+		else
+			fRasterizer.gamma(agg::gamma_power(1.0));
+	}
 }
 
 // Unset
@@ -209,7 +215,8 @@ AGGTextRenderer::RenderString(const char* string,
 				// by the x y location of the glyph along the base line,
 				// it is therefor yet "untransformed".
 				const agg::rect& r = glyph->bounds;
-				BRect glyphBounds(r.x1 + x, r.y1 + y, r.x2 + x, r.y2 + y);
+				BRect glyphBounds(r.x1 + x - 1, r.y1 + y - 1, r.x2 + x, r.y2 + y);
+					// NOTE: "- 1" fixes some weird problem with the bounding box
 
 				// track bounding box
 				if (glyphBounds.IsValid())
@@ -243,7 +250,7 @@ AGGTextRenderer::RenderString(const char* string,
 						glyphBounds = transform.TransformBounds(glyphBounds);
 					}
 	
-					if (true /*clippingFrame.Intersects(glyphBounds)*/) {
+					if (clippingFrame.Intersects(glyphBounds)) {
 						switch (glyph->data_type) {
 							case agg::glyph_data_mono:
 								agg::render_scanlines(fFontManager.mono_adaptor(), 
@@ -284,11 +291,7 @@ AGGTextRenderer::RenderString(const char* string,
 		//							fRasterizer.add_path(fContour);
 									fRasterizer.add_path(transformedOutline);
 								}*/
-								if (fAntialias) {
-									agg::render_scanlines(fRasterizer, fScanline, *solidRenderer);
-								} else {
-									agg::render_scanlines(fRasterizer, fScanline, *binRenderer);
-								}
+								agg::render_scanlines(fRasterizer, fScanline, *solidRenderer);
 								break;
 							}
 							default:
@@ -329,6 +332,16 @@ AGGTextRenderer::RenderString(const char* string,
 double
 AGGTextRenderer::StringWidth(const char* utf8String, uint32 length)
 {
+	// NOTE: The implementation does not take font rotation (or shear)
+	// into account. Just like on R5. Should it ever be desirable to
+	// "fix" this, simply use (before "return width;"):
+	//
+	// BPoint end(width, 0.0);
+	// fEmbeddedTransformation.Transform(&end);
+	// width = fabs(end.x);
+	//
+	// Note that shear will not have any influence on the baseline though.
+
 	double width = 0.0;
 	uint32 glyphCount;
 	if (_PrepareUnicodeBuffer(utf8String, length, &glyphCount) >= B_OK) {
@@ -362,17 +375,22 @@ AGGTextRenderer::_PrepareUnicodeBuffer(const char* utf8String,
 	int32 srcLength = length;
 	int32 dstLength = srcLength * 4;
 
-	// take care of buffer size
+	// take care of adjusting buffer size
 	if (dstLength > fUnicodeBufferSize) {
 		fUnicodeBufferSize = dstLength;
 		fUnicodeBuffer = (char*)realloc((void*)fUnicodeBuffer, fUnicodeBufferSize);
 	}
 
-	int32 state = 0;
-	status_t ret = convert_from_utf8(B_UNICODE_CONVERSION, 
-									 utf8String, &srcLength,
-									 fUnicodeBuffer, &dstLength,
-									 &state, B_SUBSTITUTE);
+	status_t ret;
+	if (!fUnicodeBuffer) {
+		ret = B_NO_MEMORY;
+	} else {
+		int32 state = 0;
+		ret = convert_from_utf8(B_UNICODE_CONVERSION, 
+								utf8String, &srcLength,
+								fUnicodeBuffer, &dstLength,
+								&state, B_SUBSTITUTE);
+	}
 
 	if (ret >= B_OK) {
 		*glyphCount = (uint32)(dstLength / 2);
