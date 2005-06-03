@@ -164,12 +164,15 @@ friend class Desktop;
 			void				MouseEventHandler(int32 code, BPortLink& link);
 			void				KeyboardEventHandler(int32 code, BPortLink& link);
 
-			Desktop				*fDesktop;
-			BMessage			*fDragMessage;
-			Layer				*fLastMouseMoved;
+			Desktop*			fDesktop;
+			BMessage*			fDragMessage;
+			Layer*				fLastMouseMoved;
+			WinBorder*			fMouseTargetWinBorder;
 			int32				fViewAction;
-			Layer				*fEventMaskLayer;
+			Layer*				fEventMaskLayer;
+
 			CursorManager		fCursorManager;
+
 			BLocker				fAllRegionsLock;
 
 			thread_id			fThreadID;
@@ -185,19 +188,20 @@ friend class Desktop;
 			float				fFrequency;
 
 			int32				fButtons;
-			BPoint				fLastMousePossition;
+			BPoint				fLastMousePosition;
 			bool				fMovingWindow;
 			bool				fResizingWindow;
 			bool				fHaveWinBorderList;
 	
 			int32				fActiveWksIndex;
 			int32				fWsCount;
-			Workspace*			fWorkspace[32];
+			Workspace**			fWorkspace;
+
+			int32				fWinBorderListLength;
 			WinBorder**			fWinBorderList2;
 			WinBorder**			fWinBorderList;
 			int32				fWinBorderCount;
 	mutable int32				fWinBorderIndex;
-			int32				fWinBorderListLength;
 
 			int32				fScreenShotIndex;
 			bool				fQuiting;

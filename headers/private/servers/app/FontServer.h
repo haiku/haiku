@@ -48,7 +48,7 @@ class FontServer
 public:
 	FontServer(void);
 	~FontServer(void);
-	void Lock(void);
+	bool Lock(void);
 	void Unlock(void);
 	
 	/*!

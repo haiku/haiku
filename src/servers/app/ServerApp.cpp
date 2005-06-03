@@ -1220,12 +1220,12 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 				replylink.Attach<float>(width);
 				replylink.Flush();
 				
-				free(string);
 			} else {
 				replylink.StartMessage(SERVER_FALSE);
 				replylink.Flush();
 			}
 			
+			free(string);
 			
 			break;
 		}
@@ -1875,6 +1875,84 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			
 			break;
 		}
+/*		case AS_GET_TRUNCATED_STRINGS:
+		{
+			// Attached data
+
+			// 1) uint16	family id
+			// 2) uint16	style id
+			// 3) float		size
+			// 4) uint8		spacing
+
+			// 5) uint32	mode	- B_TRUNCATE_END...
+			// 6) float		width	- desired width
+			// 7) int32		count	- count of attached strings
+			// 8) strings
+
+			// Returns:
+			// 1) strings - as many strings as requested, all of "width" maximum width
+
+			// font attribs
+			uint16 family;
+			uint16 style;
+			float size;
+			uint8 spacing;
+
+			msg.Read<uint16>(&family);
+			msg.Read<uint16>(&style);
+			msg.Read<float>(&size);
+			msg.Read<uint8>(&spacing);
+
+			// params
+			uint32 mode;
+			float width;
+			int32 count;
+
+			msg.Read<uint32>(&mode);
+			msg.Read<float>(&width);
+			msg.Read<int32>(&count);
+
+			char** strings = NULL;
+
+			bool success = false;
+			if (count > 0) {
+				strings = new char*[count];
+				for (int32 i = 0; i < count; i++) {
+					msg.ReadString(&strings[i]);
+				}
+				// TODO: truncate strings here
+				ServerFont font;
+				if (font.SetFamilyAndStyle(family, style) >= B_OK) {
+					font.SetSize(size);
+// TODO: implement:	font.SetSpacing(spacing);
+					success = font.GetTruncatedStrings(strings, count, width, mode);
+				}
+			}
+
+			int32 replyport;
+			msg.Read<int32>(&replyport);
+			
+			replylink.SetSendPort(replyport);
+
+			if (success) {
+				replylink.StartMessage(SERVER_TRUE);
+				for (int32 i = 0; i < count; i++) {
+					replylink.AttachString(strings[i]);
+				}
+			} else {
+				replylink.StartMessage(SERVER_FALSE);
+			}
+			replylink.Flush();
+
+			// free used resources
+			if (count > 0) {
+				for (int32 i = 0; i < count; i++)
+					free(strings[i]);
+			}
+			delete[] strings;
+
+			break;
+		}*/
 		case AS_SCREEN_GET_MODE:
 		{
 			// Attached data
@@ -1944,12 +2022,20 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			replylink.Flush();
 			break;
 		}
-		
+
 		default:
 		{
-			STRACE(("ServerApp %s received unhandled message code offset %s\n",fSignature.String(),
-				MsgCodeToBString(code).String()));
+			printf("ServerApp %s received unhandled message code offset %s\n", fSignature.String(),
+				   MsgCodeToBString(code).String());
 
+			// TODO: completely broken. The reply port seems to be unkown!
+			// It is in the data, but the position is unkown. Man, I find
+			// this comm stuff really clumsy. -Stephan)
+			// And BTW: the client is now blocking and waiting for a reply!
+			/*replylink.SetSendPort(msg.GetPort());
+			replylink.StartMessage(SERVER_FALSE);
+			replylink.Flush();
+			*/
 			break;
 		}
 	}

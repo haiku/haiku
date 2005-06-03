@@ -26,11 +26,13 @@
 //------------------------------------------------------------------------------
 #include <ByteOrder.h>
 #include <Shape.h>
+#include <String.h>
 #include <UTF8.h>
 
 #include "Angle.h"
 #include "FontServer.h"
 #include "moreUTF8.h"
+#include "truncate_string.h"
 
 #include FT_FREETYPE_H
 #include FT_OUTLINE_H
@@ -47,20 +49,22 @@
 	\param flags Style flags as defined in <Font.h>
 	\param spacing String spacing flag as defined in <Font.h>
 */
-ServerFont::ServerFont(FontStyle *style, float size, float rotation, float shear,
-	uint16 flags, uint8 spacing)
+ServerFont::ServerFont(FontStyle *style, float size,
+					   float rotation, float shear,
+					   uint16 flags, uint8 spacing)
+	: fStyle(style),
+	  fSize(size),
+	  fRotation(rotation),
+	  fShear(shear),
+	  fBounds(0, 0, 0, 0),
+	  fFlags(flags),
+	  fSpacing(spacing),
+	  fDirection(B_FONT_LEFT_TO_RIGHT),
+	  fFace(B_REGULAR_FACE),
+	  fEncoding(B_UNICODE_UTF8)
+
 {
-	fStyle=style;
-	fSize=size;
-	fRotation=rotation;
-	fShear=shear;
-	fFlags=flags;
-	fSpacing=spacing;
-	fDirection=B_FONT_LEFT_TO_RIGHT;
-	fFace=B_REGULAR_FACE;
-	fEncoding=B_UNICODE_UTF8;
-	fBounds.Set(0,0,0,0);
-	if(fStyle)
+	if (fStyle)
 		fStyle->AddDependent();
 }
 
@@ -68,18 +72,18 @@ ServerFont::ServerFont(FontStyle *style, float size, float rotation, float shear
 // constructor, that initializes without actually interfacing with
 // freetype, so that a ServerFont can be guaranteed to be "valid".
 
-ServerFont::ServerFont(void)
+ServerFont::ServerFont()
+	: fStyle(NULL),
+	  fSize(0.0),
+	  fRotation(0.0),
+	  fShear(90.0),
+	  fBounds(0, 0, 0, 0),
+	  fFlags(0),
+	  fSpacing(B_STRING_SPACING),
+	  fDirection(B_FONT_LEFT_TO_RIGHT),
+	  fFace(B_REGULAR_FACE),
+	  fEncoding(B_UNICODE_UTF8)
 {
-	fStyle=NULL;
-	fSize=0.0;
-	fRotation=0.0;
-	fShear=90.0;
-	fFlags=0;
-	fSpacing=B_STRING_SPACING;
-	fDirection=B_FONT_LEFT_TO_RIGHT;
-	fFace=B_REGULAR_FACE;
-	fEncoding=B_UNICODE_UTF8;
-	fBounds.Set(0,0,0,0);
 }
 
 /*! 
@@ -87,27 +91,27 @@ ServerFont::ServerFont(void)
 	\param font ServerFont to copy
 */
 ServerFont::ServerFont(const ServerFont &font)
+	: fStyle(font.fStyle),
+	  fSize(font.fSize),
+	  fRotation(font.fRotation),
+	  fShear(font.fShear),
+	  fBounds(0, 0, 0, 0),
+	  fFlags(font.fFlags),
+	  fSpacing(font.fSpacing),
+	  fDirection(font.fDirection),
+	  fFace(font.fFace),
+	  fEncoding(font.fEncoding)
 {
-	fStyle=font.fStyle;
-	fSize=font.fSize;
-	fRotation=font.fRotation;
-	fShear=font.fShear;
-	fFlags=font.fFlags;
-	fSpacing=font.fSpacing;
-	fDirection=font.fDirection;
-	fFace=font.fFace;
-	fEncoding=font.fEncoding;
-	fBounds.Set(0,0,0,0);
-	if(fStyle)
+	if (fStyle)
 		fStyle->AddDependent();
 }
 
 /*! 
 	\brief Removes itself as a dependency of its owning style.
 */
-ServerFont::~ServerFont(void)
+ServerFont::~ServerFont()
 {
-	if(fStyle)
+	if (fStyle)
 		fStyle->RemoveDependent();
 }
 
@@ -116,19 +120,21 @@ ServerFont::~ServerFont(void)
 	\param The font to copy from.
 	\return A copy of the specified font
 */
-ServerFont& ServerFont::operator=(const ServerFont& font){
-	fStyle		= font.fStyle;
+ServerFont&
+ServerFont::operator=(const ServerFont& font)
+{
 	fSize		= font.fSize;
 	fRotation	= font.fRotation;
 	fShear		= font.fShear;
 	fFlags		= font.fFlags;
 	fSpacing	= font.fSpacing;
-	fDirection	= B_FONT_LEFT_TO_RIGHT;
-	fFace		= B_REGULAR_FACE;
-	fEncoding	= B_UNICODE_UTF8;
-	fBounds.Set(0,0,0,0);
-	if(fStyle)
-		fStyle->AddDependent();
+	fDirection	= font.fDirection;
+	fFace		= font.fFace;
+	fEncoding	= font.fEncoding;
+	fBounds		= font.fBounds;
+
+	_SetStyle(font.fStyle);
+
 	return *this;
 }
 
@@ -136,10 +142,11 @@ ServerFont& ServerFont::operator=(const ServerFont& font){
 	\brief Returns the number of strikes in the font
 	\return The number of strikes in the font
 */
-int32 ServerFont::CountTuned(void)
+int32
+ServerFont::CountTuned()
 {
-	if(fStyle)
-		fStyle->TunedCount();
+	if (fStyle)
+		return fStyle->TunedCount();
 
 	return 0;
 }
@@ -148,42 +155,77 @@ int32 ServerFont::CountTuned(void)
 	\brief Returns the file format of the font. Currently unimplemented.
 	\return B_TRUETYPE_WINDOWS
 */
-font_file_format ServerFont::FileFormat(void)
+font_file_format
+ServerFont::FileFormat()
 {
 	// TODO: implement ServerFont::FileFormat
 	return B_TRUETYPE_WINDOWS;
 }
 
-/*! 
-	\brief Returns a BRect which encloses the entire font
-	\return A BRect which encloses the entire font
+const char*
+ServerFont::GetStyle() const
+{
+	if (fStyle)
+		return fStyle->Name();
+
+	return NULL;
+}
+
+const char*
+ServerFont::GetFamily() const
+{
+	if (fStyle)
+		return fStyle->Family()->Name();
+
+	return NULL;
+}
+
+/*!
+	\brief Sets the ServerFont instance to whatever font is specified
+	\param familyID ID number of the family to set
+	\param styleID ID number of the style to set
+	\return B_OK if successful, B_ERROR if not
 */
-BRect ServerFont::BoundingBox(void)
+status_t
+ServerFont::SetFamilyAndStyle(uint16 familyID, uint16 styleID)
 {
-	return fBounds;
+	FontStyle* style = NULL;
+
+	if (fontserver->Lock()) {
+		 style = fontserver->GetStyle(familyID, styleID);
+		fontserver->Unlock();
+	}
+
+	if (!style)
+		return B_ERROR;
+
+	_SetStyle(style);
+
+	return B_OK;
 }
 
-const char *ServerFont::GetStyle(void) const
-{
-	return fStyle->Name();
-}
-
-const char *ServerFont::GetFamily(void) const
-{
-	return fStyle->Family()->Name();
-}
-
-/*! 
-	\brief Obtains the height values for characters in the font in its current state
-	\param fh pointer to a font_height object to receive the values for the font
+/*!
+	\brief Sets the ServerFont instance to whatever font is specified
+	\param fontID the combination of family and style ID numbers
+	\return B_OK if successful, B_ERROR if not
 */
-void ServerFont::Height(font_height *fh)
+status_t
+ServerFont::SetFamilyAndStyle(uint32 fontID)
 {
-	if(!fh)
-		return;
+	uint16 style = fontID & 0xFFFF;
+	uint16 family = (fontID & 0xFFFF0000) >> 16;
 	
-	if(fStyle)
-		*fh=fStyle->GetHeight(fSize);
+	return SetFamilyAndStyle(family, style);
+}
+
+/*!
+	\brief Gets the ID values for the ServerFont instance in one shot
+	\return the combination of family and style ID numbers
+*/
+uint32
+ServerFont::GetFamilyAndStyle(void) const
+{
+	return (FamilyID() << 16) | StyleID();
 }
 
 // functions needed to convert a freetype vector graphics to a BShape
@@ -295,7 +337,7 @@ BPoint*
 ServerFont::GetEscapements(const char charArray[], int32 numChars,
 						   BPoint offsetArray[]) const
 {
-	if (!charArray || numChars <= 0 || !offsetArray)
+	if (!fStyle || !charArray || numChars <= 0 || !offsetArray)
 		return NULL;
 	
 	FT_Face face = fStyle->GetFTFace();
@@ -349,7 +391,7 @@ inline bool
 is_white_space(uint16 glyph)
 {
 	// TODO: handle them all!
-	if (glyph == ' ')
+	if (glyph == ' ' || glyph == B_TAB)
 		return true;
 	return false;
 }
@@ -359,7 +401,7 @@ bool
 ServerFont::GetEscapements(const char charArray[], int32 numChars,
 						   float widthArray[], escapement_delta delta) const
 {
-	if (!charArray || numChars <= 0)
+	if (!fStyle || !charArray || numChars <= 0)
 		return false;
 	
 	FT_Face face = fStyle->GetFTFace();
@@ -404,7 +446,7 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 float
 ServerFont::StringWidth(const char* string, int32 numBytes) const
 {
-	if (!string || numBytes <= 0)
+	if (!fStyle || !string || numBytes <= 0)
 		return 0.0;
 
 	FT_Face face = fStyle->GetFTFace();
@@ -439,55 +481,69 @@ ServerFont::StringWidth(const char* string, int32 numBytes) const
 	return width;
 }
 
-/*!
-	\brief Sets the ServerFont instance to whatever font is specified
-	\param familyID ID number of the family to set
-	\param styleID ID number of the style to set
-	\return B_OK if successful, B_ERROR if not
+/*! 
+	\brief Returns a BRect which encloses the entire font
+	\return A BRect which encloses the entire font
 */
-status_t ServerFont::SetFamilyAndStyle(const uint16 &familyID,const uint16 &styleID)
+BRect
+ServerFont::BoundingBox()
 {
-	fontserver->Lock();
-	FontStyle *sty=fontserver->GetStyle(familyID,styleID);
-	fontserver->Unlock();
-	if(!sty)
-		return B_ERROR;
-	
-	fStyle=sty;
-	return B_OK;
+	// TODO: fBounds is nowhere calculated!
+	return fBounds;
 }
 
-/*!
-	\brief Sets the ServerFont instance to whatever font is specified
-	\param fontID the combination of family and style ID numbers
-	\return B_OK if successful, B_ERROR if not
+/*! 
+	\brief Obtains the height values for characters in the font in its current state
+	\param fh pointer to a font_height object to receive the values for the font
 */
-status_t ServerFont::SetFamilyAndStyle(const uint32 &fontID)
+void
+ServerFont::Height(font_height *fh) const
 {
-	uint16 style = fontID & 0xFFFF;
-	uint16 family = (fontID & 0xFFFF0000) >> 16;
-	
-	fontserver->Lock();
-	FontStyle *sty=fontserver->GetStyle(family,style);
-	fontserver->Unlock();
-	if(!sty)
-		return B_ERROR;
-	
-	fStyle=sty;
-	return B_OK;
+	if (fh && fStyle)
+		*fh = fStyle->GetHeight(fSize);
 }
 
-/*!
-	\brief Gets the ID values for the ServerFont instance in one shot
-	\return the combination of family and style ID numbers
-*/
-uint32 ServerFont::GetFamilyAndStyle(void) const
+// TruncateString
+void
+ServerFont::TruncateString(BString* inOut, uint32 mode, float width) const
 {
-	uint32 famsty=0;
-	
-	famsty|=FamilyID() << 16;
-	famsty|=StyleID();
-	
-	return famsty;
+	if (inOut) {
+		// the width of the "…" glyph
+		float ellipsisWidth = StringWidth(B_UTF8_ELLIPSIS, 3);
+		const char* string = inOut->String();
+		int32 length = strlen(string);
+		// temporary array to hold result
+		char* result = new char[length + 3];
+		// count the individual glyphs
+		int32 numChars = UTF8CountChars(string, length);
+		// get the escapement of each glyph in font units
+		float* escapementArray = new float[numChars];
+		static escapement_delta delta = (escapement_delta){ 0.0, 0.0 };
+		GetEscapements(string, numChars, escapementArray, delta);
+
+		truncate_string(string, mode, width, result,
+						escapementArray, fSize, ellipsisWidth, length, numChars);
+
+		inOut->SetTo(result);
+
+		delete[] escapementArray;
+		delete[] result;
+	}
 }
 
+// _SetStyle
+void
+ServerFont::_SetStyle(FontStyle* style)
+{
+	if (style != fStyle) {
+		// detach from old style
+		if (fStyle)
+			fStyle->RemoveDependent();
+
+		fStyle = style;
+	
+		// attach to new style
+		if (fStyle)
+			fStyle->AddDependent();
+	}
+}

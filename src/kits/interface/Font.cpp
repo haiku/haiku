@@ -35,6 +35,7 @@
 #include <String.h>
 
 #include <moreUTF8.h>
+#include <truncate_string.h>
 
 #include <Font.h>
 
@@ -765,115 +766,69 @@ BFont::GetTunedInfo(int32 index, tuned_font_info *info) const
 	link.Read<tuned_font_info>(info);
 }
 
-
+// TruncateString
 void
 BFont::TruncateString(BString *inOut, uint32 mode, float width) const
 {
-	if(!inOut)
-		return;
-		
-	if(width<=0)
-	{
-		*inOut="";
-		return;
-	}
-	
-	int32 code;
-	BPrivate::BAppServerLink link;
-	
-	link.StartMessage(AS_GET_TRUNCATED_STRINGS);
-	
-	link.Attach<uint32>(mode);
-	link.Attach<float>(width);
-	link.Attach<int32>(1);
-	link.AttachString(inOut->String());
-	link.FlushWithReply(&code);
-	
-	if(code!=SERVER_TRUE)
-		return;
-	
-	char *string;
-	link.ReadString(&string);
-	*inOut=string;
-	free(string);
-	
+	// NOTE: Careful, we cannot directly use "inOut->String()" as result
+	// array, because the string length increases by 3 bytes in the worst case scenario.
+	const char* array[1];
+	array[0] = inOut->String();
+	GetTruncatedStrings(array, 1, mode, width, inOut);
 }
 
-
+// GetTruncatedStrings
 void
 BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings, 
 	uint32 mode, float width, BString resultArray[]) const
 {
-	if(!stringArray || numStrings<1 || !resultArray)
-		return;
+	if (stringArray && resultArray && numStrings > 0) {
+		// allocate storage, see BeBook for "+ 3"
+		char** truncatedStrings = new char*[numStrings];
+		for (int32 i = 0; i < numStrings; i++) {
+			truncatedStrings[i] = new char[strlen(stringArray[i]) + 3];
+		}
 	
-	int32 code;
-	BPrivate::BAppServerLink link;
+		GetTruncatedStrings(stringArray, numStrings, mode, width, truncatedStrings);
 	
-	link.StartMessage(AS_GET_TRUNCATED_STRINGS);
-	
-	link.Attach<uint32>(mode);
-	link.Attach<float>(width);
-	link.Attach<int32>(numStrings);
-	
-	for(int32 i=0; i<numStrings; i++)
-		link.AttachString(stringArray[i]);
-	
-	link.FlushWithReply(&code);
-	
-	if(code!=SERVER_TRUE)
-		return;
-	
-	for(int32 i=0; i<numStrings; i++)
-	{
-		char *string;
-		link.ReadString(&string);
-		resultArray[i].SetTo(string);
-		free(string);
+		// copy the strings into the BString array and free each one
+		for (int32 i = 0; i < numStrings; i++) {
+			resultArray[i].SetTo(truncatedStrings[i]);
+			delete[] truncatedStrings[i];
+		}
+		delete[] truncatedStrings;
 	}
 }
 
-
+// GetTruncatedStrings
 void
 BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings, 
 	uint32 mode, float width, char *resultArray[]) const
 {
-	if(!stringArray || numStrings<1 || !resultArray)
-		return;
-	
-	int32 code;
-	BPrivate::BAppServerLink link;
-	
-	link.StartMessage(AS_GET_TRUNCATED_STRINGS);
-	
-	link.Attach<uint32>(mode);
-	link.Attach<float>(width);
-	link.Attach<int32>(numStrings);
-	
-	for(int32 i=0; i<numStrings; i++)
-		link.AttachString(stringArray[i]);
-	
-	link.FlushWithReply(&code);
-	
-	if(code!=SERVER_TRUE)
-		return;
-	
-	// TODO: Look into a possible BPortLink::ReadIntoString() method to speed things
-	// like this up, along with the other string truncation functions
-	for(int32 i=0; i<numStrings; i++)
-	{
-		char *string;
-		link.ReadString(&string);
-		strcpy(resultArray[i],string);
-		free(string);
+	if (stringArray && numStrings > 0) {
+		// the width of the "…" glyph
+		float ellipsisWidth = StringWidth(B_UTF8_ELLIPSIS);
+		for (int32 i = 0; i < numStrings; i++) {
+			int32 length = strlen(stringArray[i]);
+			// count the individual glyphs
+			int32 numChars = UTF8CountChars(stringArray[i], length);
+			// get the escapement of each glyph in font units
+			float* escapementArray = new float[numChars];
+			GetEscapements(stringArray[i], numChars, NULL, escapementArray);
+
+			truncate_string(stringArray[i], mode, width, resultArray[i],
+							escapementArray, fSize, ellipsisWidth, length, numChars);
+
+			delete[] escapementArray;
+		}
 	}
 }
 
-
+// StringWidth
 float
 BFont::StringWidth(const char *string) const
 {
-	int32 length=strlen(string);
+	int32 length = strlen(string);
  	return StringWidth(string, length);
 }
 
@@ -881,7 +836,7 @@ BFont::StringWidth(const char *string) const
 float
 BFont::StringWidth(const char *string, int32 length) const
 {
-	if(!string || length<1)
+	if (!string || length < 1)
 		return 0.0;
 	
 	int32 code;
@@ -896,7 +851,7 @@ BFont::StringWidth(const char *string, int32 length) const
 	link.Attach<uint8>(fSpacing);
 	link.FlushWithReply(&code);
 	
-	if(code!=SERVER_TRUE)
+	if (code != SERVER_TRUE)
 		return 0.0;
 	
 	float width;

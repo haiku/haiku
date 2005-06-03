@@ -70,7 +70,7 @@ FontServer::FontServer(void)
 				&& init)
 		init=false;
 		
-	families=new BList(0);
+	families=new BList(20);
 	plain=NULL;
 	bold=NULL;
 	fixed=NULL;
@@ -86,9 +86,10 @@ FontServer::~FontServer(void)
 }
 
 //! Locks access to the font server
-void FontServer::Lock(void)
+bool
+FontServer::Lock(void)
 {
-	acquire_sem(lock);
+	return acquire_sem(lock) >= B_OK;
 }
 
 //! Unlocks access to the font server
@@ -248,15 +249,21 @@ status_t FontServer::ScanDirectory(const char *fontspath)
 
 	    if (error!=0)
 			continue;
-		
-		charmap=_GetSupportedCharmap(face);
+
+// TODO: Commenting this out makes my "Unicode glyph lookup"
+// work with our default fonts. The real fix is to select the
+// Unicode char map (if supported), and/or adjust the
+// utf8 -> glyph-index mapping everywhere to handle other
+// char maps. We could also ignore fonts that don't support
+// the Unicode lookup as a temporary "solution".
+/*		charmap=_GetSupportedCharmap(face);
 		if(!charmap)
     	{
 		    FT_Done_Face(face);
 		    continue;
     	}
 		
-		face->charmap=charmap;
+		face->charmap=charmap;*/
 
 		family=GetFamily(face->family_name);
 		

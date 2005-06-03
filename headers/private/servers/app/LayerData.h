@@ -108,10 +108,12 @@ class DrawData {
 	inline	const ServerFont&	Font() const
 									{ return fFont; }
 
+// TODO: remove (is contained in SeverFont::Flags())
 			void				SetFontAntiAliasing(bool antiAliasing);
 	inline	bool				FontAntiAliasing() const
 									{ return fFontAntiAliasing; }
 
+// TODO: remove (should be part of DisplayDriver::DrawString() as in BView)
 			void				SetEscapementDelta(escapement_delta delta);
 	inline	escapement_delta	EscapementDelta() const
 									{ return fEscapementDelta; }

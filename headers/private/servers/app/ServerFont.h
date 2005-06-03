@@ -27,9 +27,13 @@
 #ifndef SERVERFONT_H_
 #define SERVERFONT_H_
 
-#include <Rect.h>
 #include <Font.h>
+#include <Rect.h>
+
 #include "FontFamily.h"
+
+class BShape;
+class BString;
 
 class ServerFont {
  public:
@@ -47,6 +51,9 @@ class ServerFont {
 			status_t			InitCheck() const
 									{ return fStyle ? B_OK : B_NO_INIT; }
 
+
+			ServerFont			&operator=(const ServerFont& font);
+	
 
 			font_direction		Direction() const
 									{ return fDirection; }
@@ -70,11 +77,24 @@ class ServerFont {
 									{ return fStyle->GlyphCount(); }
 			int32				CountTuned();
 
+
 			font_file_format	FileFormat();
+
+			const char*			GetStyle() const;
+			const char*			GetFamily() const;
+			const char*			GetPath() const
+									{ return fStyle->GetPath(); }
 	
-			status_t			SetFamilyAndStyle(const uint16& familyID,
-												  const uint16& styleID);
-			status_t			SetFamilyAndStyle(const uint32& fontID);
+			status_t			SetFamilyAndStyle(uint16 familyID,
+												  uint16 styleID);
+			status_t			SetFamilyAndStyle(uint32 fontID);
+
+			uint16				StyleID() const
+									{ return fStyle->GetID(); }
+			uint16				FamilyID() const
+									{ return fStyle->Family()->GetID(); }
+			uint32				GetFamilyAndStyle() const;
+
 
 			void				SetDirection(const font_direction& dir)
 									{ fDirection = dir; }
@@ -109,6 +129,7 @@ class ServerFont {
 									{ return fStyle->GlyphCount(); }
 			uint16				CharMapCount() const
 									{ return fStyle->CharMapCount(); }
+
 			BShape**			GetGlyphShapes(const char charArray[],
 											   int32 numChars) const;
 
@@ -125,24 +146,17 @@ class ServerFont {
 			FT_Face				GetFTFace() const
 									{ return fStyle->GetFTFace(); };
 	
-			const char*			GetStyle() const;
-			const char*			GetFamily() const;
-			const char*			GetPath() const
-									{ return fStyle->GetPath(); }
-
-			uint16				StyleID() const
-									{ return fStyle->GetID(); }
-			uint16				FamilyID() const
-									{ return fStyle->Family()->GetID(); }
-			uint32				GetFamilyAndStyle() const;
-
 			BRect				BoundingBox();
-			void				Height(font_height* fh);
+			void				Height(font_height* fh) const;
 
-			ServerFont			&operator=(const ServerFont& font);
-	
+			void				TruncateString(BString* inOut,
+											   uint32 mode,
+											   float width) const;
+
 protected:
 	friend class FontStyle;
+			void				_SetStyle(FontStyle* style);
+
 
 			FontStyle*			fStyle;
 			edge_info			fEdges;
@@ -152,8 +166,8 @@ protected:
 			BRect				fBounds;
 			uint32				fFlags;
 			uint32				fSpacing;
-			uint16				fFace;
 			font_direction		fDirection;
+			uint16				fFace;
 			uint32				fEncoding;
 };
 

@@ -847,19 +847,13 @@ Layer::Redraw(const BRegion& reg, Layer *startFrom)
 void
 Layer::Draw(const BRect &r)
 {
-	// TODO/NOTE: this should be an empty method! the next lines are for testing only
-
 #ifdef DEBUG_LAYER
 	printf("Layer(%s)::Draw: ", GetName());
 	r.PrintToStream();
 #endif	
 
-	// TODO: don't do this if ViewColor() is B_TRANSPARENT_COLOR
-	fDriver->FillRect(r, fLayerData->ViewColor());
-//	RGBColor c(rand()%255,rand()%255,rand()%255);
-//	fDriver->FillRect(r, c);
-	
-	// empty HOOK function.
+	if (!fLayerData->ViewColor().IsTransparentMagic())
+		fDriver->FillRect(r, fLayerData->ViewColor());
 }
 
 // EmptyGlobals

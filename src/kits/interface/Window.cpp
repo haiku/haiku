@@ -1026,27 +1026,29 @@ void
 BWindow::SetSizeLimits(float minWidth, float maxWidth, 
 	float minHeight, float maxHeight)
 {
-	int32 rCode;
-
-	if (minWidth > maxWidth
-		|| minHeight > maxHeight)
+	if (minWidth > maxWidth || minHeight > maxHeight)
 		return;
 
-	Lock();
-	fLink->StartMessage(AS_SET_SIZE_LIMITS);
-	fLink->Attach<float>(fMinWindWidth);
-	fLink->Attach<float>(fMaxWindWidth);
-	fLink->Attach<float>(fMinWindHeight);
-	fLink->Attach<float>(fMaxWindHeight);
-	fLink->Flush();
-	fLink->GetNextReply(&rCode);
-	Unlock();
+	if (Lock()) {
+		fLink->StartMessage(AS_SET_SIZE_LIMITS);
+		fLink->Attach<float>(minWidth);
+		fLink->Attach<float>(maxWidth);
+		fLink->Attach<float>(minHeight);
+		fLink->Attach<float>(maxHeight);
+		fLink->Flush();
 
-	if (rCode == SERVER_TRUE) {
-		fMinWindHeight = minHeight;
-		fMinWindWidth = minWidth;
-		fMaxWindHeight = maxHeight;
-		fMaxWindWidth = maxWidth;
+		int32 rCode;
+		fLink->GetNextReply(&rCode);
+	
+		if (rCode == SERVER_TRUE) {
+			// read the values that were really enforced on
+			// the server side
+			fLink->Read<float>(&fMinWindWidth);
+			fLink->Read<float>(&fMaxWindWidth);
+			fLink->Read<float>(&fMinWindHeight);
+			fLink->Read<float>(&fMaxWindHeight);
+		}
+		Unlock();
 	}
 }
 
@@ -1055,16 +1057,18 @@ void
 BWindow::GetSizeLimits(float *minWidth, float *maxWidth, 
 	float *minHeight, float *maxHeight)
 {
-	*minHeight = fMinWindHeight;
-	*minWidth = fMinWindWidth;
-	*maxHeight = fMaxWindHeight;
-	*maxWidth = fMaxWindWidth;
+	// TODO: What about locking?!?
+	*minHeight	= fMinWindHeight;
+	*minWidth	= fMinWindWidth;
+	*maxHeight	= fMaxWindHeight;
+	*maxWidth	= fMaxWindWidth;
 }
 
 
 void
 BWindow::SetZoomLimits(float maxWidth, float maxHeight)
 {
+	// TODO: What about locking?!?
 	if (maxWidth > fMaxWindWidth)
 		maxWidth = fMaxWindWidth;
 	else
@@ -1090,6 +1094,8 @@ BWindow::Zoom(BPoint rec_position, float rec_width, float rec_height)
 void
 BWindow::Zoom()
 {
+	// TODO: broken.
+	// TODO: What about locking?!?
 	float minWidth, minHeight;
 	BScreen screen;
 
@@ -1142,6 +1148,7 @@ BWindow::ScreenChanged(BRect screen_size, color_space depth)
 void
 BWindow::SetPulseRate(bigtime_t rate)
 {
+	// TODO: What about locking?!?
 	if (rate < 0)
 		return;
 
@@ -1170,6 +1177,7 @@ BWindow::SetPulseRate(bigtime_t rate)
 bigtime_t
 BWindow::PulseRate() const
 {
+	// TODO: What about locking?!?
 	return fPulseRate;
 }
 
@@ -1192,6 +1200,7 @@ void
 BWindow::AddShortcut(uint32 key, uint32 modifiers, BMessage *msg, BHandler *target)
 {
 	// NOTE: I'm not sure if it is OK to use 'key'
+	// TODO: What about locking?!?
 
 	if (msg == NULL)
 		return;
@@ -1224,6 +1233,7 @@ BWindow::AddShortcut(uint32 key, uint32 modifiers, BMessage *msg, BHandler *targ
 void
 BWindow::RemoveShortcut(uint32 key, uint32 modifiers)
 {
+	// TODO: What about locking?!?
 	int32 index = findShortcut(key, modifiers | B_COMMAND_KEY);
 	if (index >=0) {
 		_BCmdKey *cmdKey = (_BCmdKey *)accelList.ItemAt(index);
@@ -1239,6 +1249,7 @@ BWindow::RemoveShortcut(uint32 key, uint32 modifiers)
 BButton *
 BWindow::DefaultButton() const
 {
+	// TODO: What about locking?!?
 	return fDefaultButton;
 }
 
@@ -1246,6 +1257,7 @@ BWindow::DefaultButton() const
 void
 BWindow::SetDefaultButton(BButton *button)
 {
+	// TODO: What about locking?!?
 	if (fDefaultButton == button)
 		return;
 
@@ -1268,6 +1280,7 @@ BWindow::SetDefaultButton(BButton *button)
 bool
 BWindow::NeedsUpdate() const
 {
+	// TODO: What about locking?!?
 	int32 rCode;
 
 	const_cast<BWindow *>(this)->Lock();	
@@ -1283,6 +1296,7 @@ BWindow::NeedsUpdate() const
 void
 BWindow::UpdateIfNeeded()
 {
+	// TODO: What about locking?!?
 	// works only from this thread
 	if (find_thread(NULL) != Thread())
 		return;
@@ -1317,6 +1331,7 @@ BWindow::UpdateIfNeeded()
 BView *
 BWindow::FindView(const char *viewName) const
 {
+	// TODO: What about locking?!?
 	return findView(top_view, viewName);
 }
 
@@ -1324,12 +1339,14 @@ BWindow::FindView(const char *viewName) const
 BView *
 BWindow::FindView(BPoint point) const
 {
+	// TODO: What about locking?!?
 	return findView(top_view, point);
 }
 
 
 BView *BWindow::CurrentFocus() const
 {
+	// TODO: What about locking?!?
 	return fFocus;
 }
 
@@ -1337,6 +1354,7 @@ BView *BWindow::CurrentFocus() const
 void
 BWindow::Activate(bool active)
 {
+	// TODO: What about locking?!?
 	if (IsHidden())
 		return;
 

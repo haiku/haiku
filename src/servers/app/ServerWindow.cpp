@@ -22,6 +22,7 @@
 //	File Name:		ServerWindow.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
 //					Adi Oanca <adioanca@mymail.ro>
+//					Stephan Aßmus <superstippi@gmx.de>
 //	Description:	Shadow BWindow class
 //
 //------------------------------------------------------------------------------
@@ -73,7 +74,6 @@
 #else
 #	define DTRACE(x) ;
 #endif
-
 
 //	#pragma mark -
 
@@ -230,7 +230,7 @@ ServerWindow::Minimize(bool status)
 
 //! Sends a message to the client to perform a Zoom
 void
-ServerWindow::Zoom(void)
+ServerWindow::Zoom()
 {
 	// NOTE: if you do something else, other than sending a port message, PLEASE lock
 	BMessage msg(B_ZOOM);
@@ -259,7 +259,7 @@ ServerWindow::ScreenModeChanged(const BRect frame, const color_space colorSpace)
 	\return B_OK if everything is ok, B_ERROR if something went wrong
 */
 status_t
-ServerWindow::Lock(void)
+ServerWindow::Lock()
 {
 	STRACE(("\nServerWindow %s: Lock\n", fName));
 
@@ -268,7 +268,7 @@ ServerWindow::Lock(void)
 
 //! Unlocks the window
 void
-ServerWindow::Unlock(void)
+ServerWindow::Unlock()
 {
 	STRACE(("ServerWindow %s: Unlock\n\n", fName));
 
@@ -280,7 +280,7 @@ ServerWindow::Unlock(void)
 	\return True if locked, false if not.
 */
 bool
-ServerWindow::IsLocked(void) const
+ServerWindow::IsLocked() const
 {
 	return fLocker.IsLocked();
 }
@@ -289,8 +289,7 @@ ServerWindow::IsLocked(void) const
 	\brief Sets the font state for a layer
 	\param layer The layer to set the font
 */
-inline
-void
+inline void
 ServerWindow::SetLayerFontState(Layer *layer, LinkMsgReader &link)
 {
 	STRACE(("ServerWindow %s: SetLayerFontStateMessage for layer %s\n",
@@ -301,8 +300,7 @@ ServerWindow::SetLayerFontState(Layer *layer, LinkMsgReader &link)
 }
 
 
-inline
-void
+inline void
 ServerWindow::SetLayerState(Layer *layer, LinkMsgReader &link)
 {
 	STRACE(("ServerWindow %s: SetLayerState for layer %s\n",fName,
@@ -314,8 +312,7 @@ ServerWindow::SetLayerState(Layer *layer, LinkMsgReader &link)
 }
 
 
-inline
-Layer *
+inline Layer*
 ServerWindow::CreateLayerTree(Layer *localRoot, LinkMsgReader &link)
 {
 	// NOTE: no need to check for a lock. This is a private method.
@@ -991,8 +988,11 @@ ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			link.Read<BRect>(&invalRect);
 			BRect converted(fCurrentLayer->ConvertToTop(invalRect.LeftTop()),
 							fCurrentLayer->ConvertToTop(invalRect.RightBottom()));
+			BRegion invalidRegion(converted);
+//			invalidRegion.IntersectWith(&fCurrentLayer->fVisible);
 
-			myRootLayer->GoRedraw(fWinBorder, BRegion(converted));
+			myRootLayer->GoRedraw(fWinBorder, invalidRegion);
+//			myRootLayer->RequestDraw(invalidRegion, fWinBorder);
 			break;
 		}
 		case AS_LAYER_INVAL_REGION:
@@ -1236,17 +1236,29 @@ ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			// 3) float minimum height
 			// 4) float maximum height
 			
-			float wmin,wmax,hmin,hmax;
+			float minWidth;
+			float maxWidth;
+			float minHeight;
+			float maxHeight;
 			
-			link.Read<float>(&wmin);
-			link.Read<float>(&wmax);
-			link.Read<float>(&hmin);
-			link.Read<float>(&hmax);
+			link.Read<float>(&minWidth);
+			link.Read<float>(&maxWidth);
+			link.Read<float>(&minHeight);
+			link.Read<float>(&maxHeight);
 			
-			fWinBorder->SetSizeLimits(wmin,wmax,hmin,hmax);
-			
+			fWinBorder->SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
+
+			// and now, sync the client to the limits that we were able to enforce
+			fWinBorder->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
+
 			fMsgSender->StartMessage(SERVER_TRUE);
+			fMsgSender->Attach<float>(minWidth);
+			fMsgSender->Attach<float>(maxWidth);
+			fMsgSender->Attach<float>(minHeight);
+			fMsgSender->Attach<float>(maxHeight);
+
 			fMsgSender->Flush();
+
 			break;
 		}
 		case B_MINIMIZE:
@@ -2061,7 +2073,8 @@ ServerWindow::_CopyBits(RootLayer* rootLayer, Layer* layer,
 	layer->GetDisplayDriver()->CopyRegion(&copyRegion, xOffset, yOffset);
 
 	// trigger the redraw			
-	rootLayer->GoRedraw(fWinBorder, invalidRegion);
+//	rootLayer->GoRedraw(fWinBorder, invalidRegion);
+rootLayer->RequestDraw(invalidRegion, fWinBorder);
 }
 
 

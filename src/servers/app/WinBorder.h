@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -22,6 +22,7 @@
 //	File Name:		WinBorder.h
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
 //					Adi Oanca <adioanca@mymail.ro>
+//					Stephan Aßmus <superstippi@gmx.de>
 //	Description:	Layer subclass which handles window management
 //  
 //------------------------------------------------------------------------------
@@ -36,13 +37,15 @@
 
 // these are used by window manager to properly place window.
 enum {
-	B_SYSTEM_LAST = -10L,
-	B_FLOATING_APP = 0L,
-	B_MODAL_APP = 1L,
-	B_NORMAL = 2L,
-	B_FLOATING_ALL = 3L,
-	B_MODAL_ALL = 4L,
-	B_SYSTEM_FIRST = 10L,
+	B_SYSTEM_LAST	= -10L,
+
+	B_FLOATING_APP	= 0L,
+	B_MODAL_APP		= 1L,
+	B_NORMAL		= 2L,
+	B_FLOATING_ALL	= 3L,
+	B_MODAL_ALL		= 4L,
+
+	B_SYSTEM_FIRST	= 10L,
 };
 
 class ServerWindow;
@@ -50,64 +53,66 @@ class Decorator;
 class DisplayDriver;
 class Desktop;
 
-class PointerEvent
-{
-	public:
-	int32 code;	//B_MOUSE_UP, B_MOUSE_DOWN, B_MOUSE_MOVED
-			//B_MOUSE_WHEEL_CHANGED
-	bigtime_t when;
-	BPoint where;
-	float wheel_delta_x;
-	float wheel_delta_y;
-	int32 modifiers;
-	int32 buttons;	//B_PRIMARY_MOUSE_BUTTON, B_SECONDARY_MOUSE_BUTTON
-			//B_TERTIARY_MOUSE_BUTTON
-	int32 clicks;
+class PointerEvent {
+ public:
+	int32		code;		// B_MOUSE_UP, B_MOUSE_DOWN, B_MOUSE_MOVED,
+							// B_MOUSE_WHEEL_CHANGED
+	bigtime_t	when;
+	BPoint		where;
+	float		wheel_delta_x;
+	float		wheel_delta_y;
+	int32		modifiers;
+	int32		buttons;	// B_PRIMARY_MOUSE_BUTTON, B_SECONDARY_MOUSE_BUTTON
+							// B_TERTIARY_MOUSE_BUTTON
+	int32		clicks;
 };
 
-class WinBorder : public Layer
-{
-public:
-								WinBorder(	const BRect &r,
-											const char *name,
-											const uint32 wlook,
-											const uint32 wfeel, 
-											const uint32 wflags,
-											const uint32 wwksindex,
-											ServerWindow *win,
-											DisplayDriver *driver);
-	virtual						~WinBorder(void);
+class WinBorder : public Layer {
+ public:
+								WinBorder(const BRect &r,
+										  const char *name,
+										  const uint32 wlook,
+										  const uint32 wfeel, 
+										  const uint32 wflags,
+										  const uint32 wwksindex,
+										  ServerWindow *win,
+										  DisplayDriver *driver);
+	virtual						~WinBorder();
 	
 	virtual	void				Draw(const BRect &r);
 	
 	virtual	void				MoveBy(float x, float y);
 	virtual	void				ResizeBy(float x, float y);
 
-	virtual	void				RebuildFullRegion(void);
+	virtual	void				RebuildFullRegion();
 
-			void				SetSizeLimits(	float minwidth,
-												float maxwidth,
-												float minheight,
-												float maxheight);
+			void				SetSizeLimits(float minWidth,
+											  float maxWidth,
+											  float minHeight,
+											  float maxHeight);
 
-			click_type			TellWhat(PointerEvent& evt) const;
-			void				MouseDown(click_type action);
-			void				MouseMoved(click_type action);
-			void				MouseUp(click_type action);
+			void				GetSizeLimits(float* minWidth,
+											  float* maxWidth,
+											  float* minHeight,
+											  float* maxHeight) const;
+
+			click_type			MouseDown(const PointerEvent& evt);
+			void				MouseMoved(const PointerEvent& evt);
+			void				MouseUp(const PointerEvent& evt);
 	
-			void				UpdateColors(void);
-			void				UpdateDecorator(void);
-			void				UpdateFont(void);
-			void				UpdateScreen(void);
+			void				UpdateColors();
+			void				UpdateDecorator();
+			void				UpdateFont();
+			void				UpdateScreen();
 	
-	virtual bool				HasClient(void) { return false; }
-	inline	Decorator*			GetDecorator(void) const { return fDecorator; }
+	virtual bool				HasClient() { return false; }
+	inline	Decorator*			GetDecorator() const { return fDecorator; }
 
-	inline	int32				Look(void) const { return fLook; }
-	inline	int32				Feel(void) const { return fFeel; }
+	inline	int32				Look() const { return fLook; }
+	inline	int32				Feel() const { return fFeel; }
 	inline	int32				Level() const { return fLevel; }
-	inline	uint32				WindowFlags(void) const { return fWindowFlags; }
-	inline	uint32				Workspaces(void) const { return fWorkspaces; }
+	inline	uint32				WindowFlags() const { return fWindowFlags; }
+	inline	uint32				Workspaces() const { return fWorkspaces; }
 
 			void				HighlightDecorator(const bool &active);
 	
@@ -118,10 +123,12 @@ public:
 
 			FMWList				fFMWList;
 
-protected:
+ protected:
 	friend class Layer;
 	friend class ServerWindow;
 	friend class RootLayer;
+
+			click_type			_ActionFor(const PointerEvent& evt) const;
 
 			Decorator*			fDecorator;
 			Layer*				fTopLayer;
@@ -133,10 +140,16 @@ protected:
 			int32				fMouseButtons;
 			int32				fKeyModifiers;
 			BPoint				fLastMousePosition;
+			BPoint				fResizingClickOffset;
 
 			bool				fIsClosing;
 			bool				fIsMinimizing;
 			bool				fIsZooming;
+
+			bool				fIsDragging;
+			bool				fBringToFrontOnRelease;
+
+			bool				fIsResizing;
 
 			bool				fInUpdate;
 			bool				fRequestSent;
@@ -147,10 +160,10 @@ protected:
 			int32				fWindowFlags;
 			uint32				fWorkspaces;
 
-			float				fMinWidth,
-								fMaxWidth;
-			float				fMinHeight,
-								fMaxHeight;
+			float				fMinWidth;
+			float				fMaxWidth;
+			float				fMinHeight;
+			float				fMaxHeight;
 
 			int cnt; // for debugging
 };
