@@ -945,7 +945,6 @@ BView::FrameResized(float new_width, float new_height)
 void
 BView::GetPreferredSize(float* width, float* height)
 {
-	// HOOK function
 	STRACE(("\tHOOK: BView(%s)::GetPreferredSize()\n", Name()));
 	*width				= fBounds.Width();
 	*height				= fBounds.Height();
@@ -955,10 +954,16 @@ BView::GetPreferredSize(float* width, float* height)
 void
 BView::ResizeToPreferred()
 {
-	// HOOK function
 	STRACE(("\tHOOK: BView(%s)::ResizeToPreferred()\n", Name()));
 
-	ResizeTo(fBounds.Width(), fBounds.Height()); 
+	// TODO: Test if this version of the implementation is
+	// in BView or BControl in R5.
+
+	float width;
+	float height;
+	GetPreferredSize(&width, &height);
+
+	ResizeTo(width, height); 
 }
 
 
@@ -1212,10 +1217,12 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 	owner->fLink->GetNextReply(&rCode);
 	if (rCode == SERVER_TRUE) {
 		owner->fLink->Read<BPoint>(location);
-		owner->fLink->Read((int32 *)buttons, sizeof(int32));
+		owner->fLink->Read<uint32>(buttons);
 		
 		// TODO: See above comment about coordinates
 		ConvertFromScreen(location);
+	} else {
+		buttons = 0;
 	}
 }
 
