@@ -49,19 +49,25 @@ struct devfs_partition {
 
 struct driver_entry;
 
+enum {
+	kNotScanned = 0,
+	kBootScan,
+	kNormalScan,
+};
+
 struct devfs_stream {
 	mode_t type;
 	union {
 		struct stream_dir {
 			struct devfs_vnode		*dir_head;
 			struct list				cookies;
-			bool					scanned;
+			int32					scanned;
 		} dir;
 		struct stream_dev {
 			device_node_info		*node;
 			pnp_devfs_driver_info	*info;
 			device_hooks			*ops;
-			struct devfs_partition	*part_map;
+			struct devfs_partition	*partition;
 			IOScheduler				*scheduler;
 			driver_entry			*driver;
 		} dev;
@@ -123,9 +129,12 @@ struct driver_entry {
 	image_id		image;
 };
 
+
+static void get_device_name(struct devfs_vnode *vnode, char *buffer, size_t size);
 static status_t publish_device(struct devfs *fs, const char *path,
 					device_node_info *deviceNode, pnp_devfs_driver_info *info,
 					driver_entry *driver, device_hooks *ops);
+
 
 // The boot device, if already present
 extern dev_t gBootDevice;
@@ -285,6 +294,37 @@ load_driver_symbols(const char *driverName)
 }
 
 
+static int32
+scan_mode(void)
+{
+	// We may scan every device twice:
+	//  - once before there is a boot device,
+	//  - and once when there is one
+
+	return gBootDevice >= 0 ? kNormalScan : kBootScan;
+}
+
+
+static status_t
+scan_for_drivers(devfs_vnode *dir)
+{
+	KPath path;
+	if (path.InitCheck() != B_OK)
+		return B_NO_MEMORY;
+
+	get_device_name(dir, path.LockBuffer(), path.BufferSize());
+	path.UnlockBuffer();
+
+	TRACE(("scan_for_drivers: mode %ld: %s\n", scan_mode(), path.Path()));
+
+	// scan for drivers at this path
+	probe_for_device_type(path.Path());
+
+	dir->stream.u.dir.scanned = scan_mode();
+	return B_OK;
+}
+
+
 //	#pragma mark - devfs private
 
 
@@ -356,8 +396,8 @@ devfs_delete_vnode(struct devfs *fs, struct devfs_vnode *vnode, bool force_delet
 
 	if (S_ISCHR(vnode->stream.type)) {
 		// for partitions, we have to release the raw device
-		if (vnode->stream.u.dev.part_map)
-			put_vnode(fs->id, vnode->stream.u.dev.part_map->raw_device->id);
+		if (vnode->stream.u.dev.partition)
+			put_vnode(fs->id, vnode->stream.u.dev.partition->raw_device->id);
 
 		// remove API conversion from old to new drivers
 		if (vnode->stream.u.dev.node == NULL)
@@ -388,7 +428,7 @@ update_dir_cookies(struct devfs_vnode *dir, struct devfs_vnode *vnode)
 static struct devfs_vnode *
 devfs_find_in_dir(struct devfs_vnode *dir, const char *path)
 {
-	struct devfs_vnode *v;
+	struct devfs_vnode *vnode;
 
 	if (!S_ISDIR(dir->stream.type))
 		return NULL;
@@ -398,11 +438,11 @@ devfs_find_in_dir(struct devfs_vnode *dir, const char *path)
 	if (!strcmp(path, ".."))
 		return dir->parent;
 
-	for (v = dir->stream.u.dir.dir_head; v; v = v->dir_next) {
-		TRACE(("devfs_find_in_dir: looking at entry '%s'\n", v->name));
-		if (strcmp(v->name, path) == 0) {
-			TRACE(("devfs_find_in_dir: found it at %p\n", v));
-			return v;
+	for (vnode = dir->stream.u.dir.dir_head; vnode; vnode = vnode->dir_next) {
+		//TRACE(("devfs_find_in_dir: looking at entry '%s'\n", vnode->name));
+		if (strcmp(vnode->name, path) == 0) {
+			//TRACE(("devfs_find_in_dir: found it at %p\n", vnode));
+			return vnode;
 		}
 	}
 	return NULL;
@@ -469,28 +509,16 @@ devfs_remove_from_dir(struct devfs_vnode *dir, struct devfs_vnode *removeNode)
 }
 
 
-/* XXX seems to be unused
-static bool
-devfs_is_dir_empty(struct devfs_vnode *dir)
-{
-	if (dir->stream.type != STREAM_TYPE_DIR)
-		return false;
-
-	return !dir->stream.u.dir.dir_head;
-}
-*/
-
-
 static status_t
-devfs_get_partition_info(struct devfs *fs, struct devfs_vnode *v, 
+devfs_get_partition_info(struct devfs *fs, struct devfs_vnode *vnode, 
 	struct devfs_cookie *cookie, void *buffer, size_t length)
 {
-	struct devfs_partition *map = v->stream.u.dev.part_map;
+	struct devfs_partition *partition = vnode->stream.u.dev.partition;
 
-	if (!S_ISCHR(v->stream.type) || map == NULL || length != sizeof(partition_info))
+	if (!S_ISCHR(vnode->stream.type) || partition == NULL || length != sizeof(partition_info))
 		return B_BAD_VALUE;
 
-	return user_memcpy(buffer, &map->info, sizeof(partition_info));
+	return user_memcpy(buffer, &partition->info, sizeof(partition_info));
 }
 
 
@@ -498,26 +526,26 @@ static status_t
 add_partition(struct devfs *fs, struct devfs_vnode *device,
 	const char *name, const partition_info &info)
 {
-	struct devfs_vnode *partition;
+	struct devfs_vnode *partitionNode;
 	status_t status;
 
 	if (!S_ISCHR(device->stream.type))
 		return B_BAD_VALUE;
 
 	// we don't support nested partitions
-	if (device->stream.u.dev.part_map)
+	if (device->stream.u.dev.partition)
 		return B_BAD_VALUE;
 
 	// reduce checks to a minimum - things like negative offsets could be useful
 	if (info.size < 0)
 		return B_BAD_VALUE;
 
-	// create partition map
-	struct devfs_partition *map = (struct devfs_partition *)malloc(sizeof(struct devfs_partition));
-	if (map == NULL)
+	// create partition
+	struct devfs_partition *partition = (struct devfs_partition *)malloc(sizeof(struct devfs_partition));
+	if (partition == NULL)
 		return B_NO_MEMORY;
 
-	memcpy(&map->info, &info, sizeof(partition_info));
+	memcpy(&partition->info, &info, sizeof(partition_info));
 
 	RecursiveLocker locker(&fs->lock);
 
@@ -529,38 +557,35 @@ add_partition(struct devfs *fs, struct devfs_vnode *device,
 
 	// increase reference count of raw device - 
 	// the partition device really needs it 
-	// (at least to resolve its name on GET_PARTITION_INFO)
-	status = get_vnode(fs->id, device->id, (fs_vnode *)&map->raw_device);
+	status = get_vnode(fs->id, device->id, (fs_vnode *)&partition->raw_device);
 	if (status < B_OK)
 		goto err1;
 
 	// now create the partition vnode
-	partition = devfs_create_vnode(fs, device->parent, name);
-	if (partition == NULL) {
+	partitionNode = devfs_create_vnode(fs, device->parent, name);
+	if (partitionNode == NULL) {
 		status = B_NO_MEMORY;
 		goto err2;
 	}
 
-	partition->stream.type = device->stream.type;
-	partition->stream.u.dev.node = device->stream.u.dev.node;
-	partition->stream.u.dev.info = device->stream.u.dev.info;
-	partition->stream.u.dev.ops = device->stream.u.dev.ops;
-	partition->stream.u.dev.part_map = map;
-	partition->stream.u.dev.scheduler = device->stream.u.dev.scheduler;
+	partitionNode->stream.type = device->stream.type;
+	partitionNode->stream.u.dev.node = device->stream.u.dev.node;
+	partitionNode->stream.u.dev.info = device->stream.u.dev.info;
+	partitionNode->stream.u.dev.ops = device->stream.u.dev.ops;
+	partitionNode->stream.u.dev.partition = partition;
+	partitionNode->stream.u.dev.scheduler = device->stream.u.dev.scheduler;
 
-	hash_insert(fs->vnode_hash, partition);
-	devfs_insert_in_dir(device->parent, partition);
+	hash_insert(fs->vnode_hash, partitionNode);
+	devfs_insert_in_dir(device->parent, partitionNode);
 
-	TRACE(("SET_PARTITION: Added partition\n"));
+	TRACE(("add_partition(name = %s, offset = %Ld, size = %Ld)\n",
+		name, info.offset, info.size));
 	return B_OK;
-
-err1:
-	free(map);
-	return status;
 
 err2:
 	put_vnode(fs->id, device->id);
-	free(map);
+err1:
+	free(partition);
 	return status;
 }
 
@@ -673,7 +698,7 @@ publish_directory(struct devfs *fs, const char *path)
 			continue;
 		}
 
-		TRACE(("\tpath component '%s'\n", &temp[last]));
+		//TRACE(("\tpath component '%s'\n", &temp[last]));
 
 		// we have a path component
 		vnode = devfs_find_in_dir(dir, &temp[last]);
@@ -744,7 +769,7 @@ publish_node(struct devfs *fs, const char *path, struct devfs_vnode **_node)
 			continue;
 		}
 
-		TRACE(("\tpath component '%s'\n", &temp[last]));
+		//TRACE(("\tpath component '%s'\n", &temp[last]));
 
 		// we have a path component
 		vnode = devfs_find_in_dir(dir, &temp[last]);
@@ -1013,78 +1038,57 @@ devfs_lookup(fs_volume _fs, fs_vnode _dir, const char *name, vnode_id *_id, int 
 	struct devfs *fs = (struct devfs *)_fs;
 	struct devfs_vnode *dir = (struct devfs_vnode *)_dir;
 	struct devfs_vnode *vnode, *vdummy;
-	status_t err;
+	status_t status;
 
 	TRACE(("devfs_lookup: entry dir %p, name '%s'\n", dir, name));
 
 	if (!S_ISDIR(dir->stream.type))
 		return B_NOT_A_DIRECTORY;
 
-	recursive_lock_lock(&fs->lock);
+	RecursiveLocker locker(&fs->lock);
 
-	if (!dir->stream.u.dir.scanned && gBootDevice >= 0) {
-		KPath path;
-		if (path.InitCheck() != B_OK) {
-			err = B_NO_MEMORY;
-			goto err;
-		}
-		get_device_name(dir, path.LockBuffer(), path.BufferSize());
-		path.UnlockBuffer();
-		TRACE(("devfs_lookup: not yet scanned: %s\n", path.Path()));
-
-		recursive_lock_unlock(&fs->lock);
-
-		// scan for drivers at this path
-		probe_for_device_type(path.Path());
-
-		recursive_lock_lock(&fs->lock);
-		dir->stream.u.dir.scanned = true;
-	}
+	if (dir->stream.u.dir.scanned < scan_mode())
+		scan_for_drivers(dir);
 
 	// look it up
 	vnode = devfs_find_in_dir(dir, name);
 	if (vnode == NULL) {
+#if 0
 		// ToDo: with node monitoring in place, we *know* here that the file does not exist
 		//		and don't have to scan for it again.
 		// scan for drivers in the given directory (that indicates the type of the driver)
 		KPath path;
-		if (path.InitCheck() != B_OK) {
-			err = B_NO_MEMORY;
-			goto err;
-		}
+		if (path.InitCheck() != B_OK)
+			return B_NO_MEMORY;
 
 		get_device_name(dir, path.LockBuffer(), path.BufferSize());
 		path.UnlockBuffer();
 		path.Append(name);
-		//dprintf("lookup: \"%s\"\n", path.Path());
-
-		recursive_lock_unlock(&fs->lock);
+		dprintf("lookup: \"%s\"\n", path.Path());
 
 		// scan for drivers of this type
 		probe_for_device_type(path.Path());
 
-		recursive_lock_lock(&fs->lock);
-
 		vnode = devfs_find_in_dir(dir, name);
 		if (vnode == NULL) {
-			err = B_ENTRY_NOT_FOUND;
-			goto err;
+#endif
+			return B_ENTRY_NOT_FOUND;
+#if 0
 		}
 
 		if (S_ISDIR(vnode->stream.type) && gBootDevice >= 0)
 			vnode->stream.u.dir.scanned = true;
+#endif
 	}
 
-	err = get_vnode(fs->id, vnode->id, (fs_vnode *)&vdummy);
-	if (err < 0)
-		goto err;
+	status = get_vnode(fs->id, vnode->id, (fs_vnode *)&vdummy);
+	if (status < B_OK)
+		return status;
 
 	*_id = vnode->id;
 	*_type = vnode->stream.type;
 
-err:
-	recursive_lock_unlock(&fs->lock);
-	return err;
+	return B_OK;
 }
 
 
@@ -1326,14 +1330,14 @@ devfs_read(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
 
-	TRACE(("devfs_read: vnode %p, cookie %p, pos %Ld, len %p\n",
-		vnode, cookie, pos, _length));
+	//TRACE(("devfs_read: vnode %p, cookie %p, pos %Ld, len %p\n",
+	//	vnode, cookie, pos, _length));
 
 	if (!S_ISCHR(vnode->stream.type))
 		return B_BAD_VALUE;
 
-	if (vnode->stream.u.dev.part_map)
-		translate_partition_access(vnode->stream.u.dev.part_map, pos, *_length);
+	if (vnode->stream.u.dev.partition)
+		translate_partition_access(vnode->stream.u.dev.partition, pos, *_length);
 
 	if (*_length == 0)
 		return B_OK;
@@ -1361,14 +1365,14 @@ devfs_write(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
 
-	TRACE(("devfs_write: vnode %p, cookie %p, pos %Ld, len %p\n",
-		vnode, cookie, pos, _length));
+	//TRACE(("devfs_write: vnode %p, cookie %p, pos %Ld, len %p\n",
+	//	vnode, cookie, pos, _length));
 
 	if (!S_ISCHR(vnode->stream.type))
 		return B_BAD_VALUE;
 
-	if (vnode->stream.u.dev.part_map)
-		translate_partition_access(vnode->stream.u.dev.part_map, pos, *_length);
+	if (vnode->stream.u.dev.partition)
+		translate_partition_access(vnode->stream.u.dev.partition, pos, *_length);
 
 	if (*_length == 0)
 		return B_OK;
@@ -1412,6 +1416,10 @@ devfs_open_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie *_cookie)
 		return B_NO_MEMORY;
 
 	RecursiveLocker locker(&fs->lock);
+
+	// make sure the directory has up-to-date contents
+	if (vnode->stream.u.dir.scanned < scan_mode())
+		scan_for_drivers(vnode);
 
 	cookie->current = vnode->stream.u.dir.dir_head;
 	cookie->state = ITERATION_STATE_BEGIN;
@@ -1611,7 +1619,7 @@ devfs_can_page(fs_volume _fs, fs_vnode _vnode, fs_cookie cookie)
 {
 	struct devfs_vnode *vnode = (devfs_vnode *)_vnode;
 
-	TRACE(("devfs_canpage: vnode %p\n", vnode));
+	//TRACE(("devfs_canpage: vnode %p\n", vnode));
 
 	if (!S_ISCHR(vnode->stream.type)
 		|| vnode->stream.u.dev.node == NULL
@@ -1628,15 +1636,15 @@ devfs_read_pages(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos, c
 	struct devfs_vnode *vnode = (devfs_vnode *)_vnode;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
 
-	TRACE(("devfs_read_pages: vnode %p, vecs %p, count = %lu, pos = %Ld, size = %lu\n", vnode, vecs, count, pos, *_numBytes));
+	//TRACE(("devfs_read_pages: vnode %p, vecs %p, count = %lu, pos = %Ld, size = %lu\n", vnode, vecs, count, pos, *_numBytes));
 
 	if (!S_ISCHR(vnode->stream.type)
 		|| vnode->stream.u.dev.info->read_pages == NULL
 		|| cookie == NULL)
 		return B_NOT_ALLOWED;
 
-	if (vnode->stream.u.dev.part_map)
-		translate_partition_access(vnode->stream.u.dev.part_map, pos, *_numBytes);
+	if (vnode->stream.u.dev.partition)
+		translate_partition_access(vnode->stream.u.dev.partition, pos, *_numBytes);
 
 	return vnode->stream.u.dev.info->read_pages(cookie->device_cookie, pos, vecs, count, _numBytes);
 }
@@ -1648,15 +1656,15 @@ devfs_write_pages(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos, 
 	struct devfs_vnode *vnode = (devfs_vnode *)_vnode;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
 
-	TRACE(("devfs_write_pages: vnode %p, vecs %p, count = %lu, pos = %Ld, size = %lu\n", vnode, vecs, count, pos, *_numBytes));
+	//TRACE(("devfs_write_pages: vnode %p, vecs %p, count = %lu, pos = %Ld, size = %lu\n", vnode, vecs, count, pos, *_numBytes));
 
 	if (!S_ISCHR(vnode->stream.type)
 		|| vnode->stream.u.dev.info->write_pages == NULL
 		|| cookie == NULL)
 		return B_NOT_ALLOWED;
 
-	if (vnode->stream.u.dev.part_map)
-		translate_partition_access(vnode->stream.u.dev.part_map, pos, *_numBytes);
+	if (vnode->stream.u.dev.partition)
+		translate_partition_access(vnode->stream.u.dev.partition, pos, *_numBytes);
 
 	return vnode->stream.u.dev.info->write_pages(cookie->device_cookie, pos, vecs, count, _numBytes);
 }
@@ -1689,8 +1697,8 @@ devfs_read_stat(fs_volume _fs, fs_vnode _vnode, struct stat *stat)
 		//device_geometry geometry;
 
 		// if it's a real block device, then let's report a useful size
-		if (vnode->stream.u.dev.part_map != NULL) {
-			stat->st_size = vnode->stream.u.dev.part_map->info.size;
+		if (vnode->stream.u.dev.partition != NULL) {
+			stat->st_size = vnode->stream.u.dev.partition->info.size;
 #if 0
 		} else if (vnode->stream.u.dev.info->control(cookie->device_cookie,
 					B_GET_GEOMETRY, &geometry, sizeof(struct device_geometry)) >= B_OK) {
