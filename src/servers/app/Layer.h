@@ -219,9 +219,6 @@ class Layer {
 
 			BRegion*			fClipReg;
 	
-			BRegion*			clipToPicture;
-			bool				clipToPictureInverse;
-	
 			ServerWindow*		fServerWin;
 			BString*			fName;	
 			int32				fViewToken;

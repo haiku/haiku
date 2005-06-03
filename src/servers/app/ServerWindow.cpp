@@ -46,6 +46,7 @@
 #include "ServerWindow.h"
 #include "ServerApp.h"
 #include "ServerProtocol.h"
+#include "ServerPicture.h"
 #include "WinBorder.h"
 #include "TokenHandler.h"
 #include "Utils.h"
@@ -72,42 +73,6 @@
 #else
 #	define DTRACE(x) ;
 #endif
-
-//------------------------------------------------------------------------------
-
-template<class Type> Type
-read_from_buffer(int8 **_buffer)
-{
-	Type *typedBuffer = (Type *)(*_buffer);
-	Type value = *typedBuffer;
-
-	typedBuffer++;
-	*_buffer = (int8 *)(typedBuffer);
-
-	return value;
-}
-//------------------------------------------------------------------------------
-/*
-static int8 *read_pattern_from_buffer(int8 **_buffer)
-{
-	int8 *pattern = *_buffer;
-
-	*_buffer += AS_PATTERN_SIZE;
-
-	return pattern;
-}
-*/
-//------------------------------------------------------------------------------
-template<class Type> void
-write_to_buffer(int8 **_buffer, Type value)
-{
-	Type *typedBuffer = (Type *)(*_buffer);
-
-	*typedBuffer = value;
-	typedBuffer++;
-
-	*_buffer = (int8 *)(typedBuffer);
-}
 
 
 //	#pragma mark -
@@ -917,86 +882,39 @@ ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		case AS_LAYER_CLIP_TO_PICTURE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
-
 		// TODO: you are not allowed to use Layer regions here!!!
 		// If there is no other way, then first lock RootLayer object first.
-
+			
 			// TODO: Watch out for the coordinate system in AS_LAYER_CLIP_TO_PICTURE
 			int32 pictureToken;
 			BPoint where;
+			bool inverse = false;
 			
 			link.Read<int32>(&pictureToken);
 			link.Read<BPoint>(&where);
-			
-			
-			BRegion reg;
-			bool redraw = false;
-			
-			// if we had a picture to clip to, include the FULL visible region(if any) in the area to be redrawn
-			// in other words: invalidate what ever is visible for this layer and his children.
-			if (fCurrentLayer->clipToPicture && fCurrentLayer->fFullVisible.CountRects() > 0)
-			{
-				reg.Include(&fCurrentLayer->fFullVisible);
-				redraw		= true;
-			}
-			
-			// search for a picture with the specified token.
-			ServerPicture *sp = fServerApp->FindPicture(pictureToken);
-			// TODO: Increase that picture's reference count.(~ allocate a picture)
-			if (sp == NULL)
-				break;
-
-			// we have a new picture to clip to, so rebuild our full region
-			if (fCurrentLayer->clipToPicture) {
-				fCurrentLayer->clipToPictureInverse = false;
-				fCurrentLayer->RebuildFullRegion();
-			}
-
-			// we need to rebuild the visible region, we may have a valid one.
-			if (fCurrentLayer->fParent && !fCurrentLayer->fHidden) {
-				//fCurrentLayer->fParent->RebuildChildRegions(fCurrentLayer->fFull.Frame(), fCurrentLayer);
-			} else {
-				// will this happen? Maybe...
-				//fCurrentLayer->RebuildRegions(fCurrentLayer->fFull.Frame());
-			}
-			
-			// include our full visible region in the region to be redrawn
-			if (!fCurrentLayer->fHidden && (fCurrentLayer->fFullVisible.CountRects() > 0)) {
-				reg.Include(&(fCurrentLayer->fFullVisible));
-				redraw = true;
-			}
-
-			// redraw if we previously had or if we have acquired a picture to clip to.
-			// TODO: Are you sure about triggering a redraw?
-			if (redraw)
-				myRootLayer->GoRedraw(fCurrentLayer, reg);
-
-			break;
-		}
-		case AS_LAYER_CLIP_TO_INVERSE_PICTURE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_INVERSE_PICTURE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
-			
-			// TODO: Watch out for the coordinate system in AS_LAYER_CLIP_TO_INVERSE_PICTURE
-			int32 pictureToken;
-			BPoint where;
-			
-			link.Read<int32>(&pictureToken);
-			link.Read<BPoint>(&where);
-			
-			// TODO: Increase that picture's reference count.(~ allocate a picture)
-			ServerPicture *sp = fServerApp->FindPicture(pictureToken);
-			if (sp == NULL)
-				break;
+			link.Read<bool>(&inverse);
 							
-			// if a picture has been found...
-			if (fCurrentLayer->clipToPicture)  {
-				fCurrentLayer->clipToPictureInverse = true;
-				fCurrentLayer->RebuildFullRegion();
-				//fCurrentLayer->RequestDraw(fCurrentLayer->clipToPicture->Frame());
-			}
+			// search for a picture with the specified token.
+			ServerPicture *picture = fServerApp->FindPicture(pictureToken);
+			// TODO: Increase that picture's reference count.(~ allocate a picture)
+			if (picture == NULL)
+				break;
+			
+			BRegion region;
+			// TODO: I think we also need the BView's token
+			// I think PictureToRegion would fit better into the Layer class (?)
+			if (PictureToRegion(picture, region, inverse, where) < B_OK)
+				break;
+				
+			fCurrentLayer->fLayerData->SetClippingRegion(region);
+
+			fCurrentLayer->RebuildFullRegion();
+			if (!(fCurrentLayer->IsHidden()))
+				myRootLayer->GoInvalidate(fCurrentLayer, fCurrentLayer->fFull);
+				
 			break;
 		}
+		
 		case AS_LAYER_GET_CLIP_REGION:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_CLIP_REGION: Layer: %s\n",fName, fCurrentLayer->fName->String()));
@@ -2166,3 +2084,12 @@ ServerWindow::SendMessageToClient(const BMessage* msg, int32 target, bool usePre
 	delete[] buffer;
 }
 
+
+status_t
+ServerWindow::PictureToRegion(ServerPicture *picture, BRegion &region,
+							bool inverse, BPoint where)
+{
+	fprintf(stderr, "ServerWindow::PictureToRegion() not implemented\n");
+	region.MakeEmpty();
+	return B_ERROR;
+}

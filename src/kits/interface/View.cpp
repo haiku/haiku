@@ -1948,21 +1948,7 @@ BView::TruncateString(BString *in_out, uint32 mode, float width) const
 void
 BView::ClipToPicture(BPicture *picture, BPoint where, bool sync)
 {
-	if (!picture)
-		return;
-
-	if (do_owner_check()) {
-		owner->fLink->StartMessage(AS_LAYER_CLIP_TO_PICTURE);
-		owner->fLink->Attach<int32>(picture->token);
-		owner->fLink->Attach<BPoint>(where);
-
-		if (sync)
-			owner->fLink->Flush();
-
-		fState->flags |= B_VIEW_CLIP_REGION_BIT;
-	}
-
-	fState->archivingFlags |= B_VIEW_CLIP_REGION_BIT;
+	DoPictureClip(picture, where, false, sync);
 }
 
 
@@ -1970,21 +1956,7 @@ void
 BView::ClipToInversePicture(BPicture *picture,
 	BPoint where, bool sync)
 {
-	if (!picture)
-		return;
-
-	if (do_owner_check()) {
-		owner->fLink->StartMessage(AS_LAYER_CLIP_TO_INVERSE_PICTURE);
-		owner->fLink->Attach<int32>(picture->token);
-		owner->fLink->Attach<BPoint>(where);
-
-		if (sync)
-			owner->fLink->Flush();
-
-		fState->flags |= B_VIEW_CLIP_REGION_BIT;
-	}
-
-	fState->archivingFlags |= B_VIEW_CLIP_REGION_BIT;
+	DoPictureClip(picture, where, true, sync);
 }
 
 //---------------------------------------------------------------------------
@@ -3684,6 +3656,31 @@ BView::setOwner(BWindow *theOwner)
 
 	for (BView *child = first_child; child != NULL; child = child->next_sibling)
 		child->setOwner(theOwner);
+}
+
+
+void
+BView::DoPictureClip(BPicture *picture, BPoint where,
+					bool invert, bool sync)
+{
+	if (!picture)
+		return;
+
+	if (do_owner_check()) {
+		owner->fLink->StartMessage(AS_LAYER_CLIP_TO_PICTURE);
+		owner->fLink->Attach<int32>(picture->token);
+		owner->fLink->Attach<BPoint>(where);
+		owner->fLink->Attach<bool>(invert);
+
+		// TODO: I think that "sync" means another thing here:
+		// the bebook, at least, says so.
+		if (sync)
+			owner->fLink->Flush();
+
+		fState->flags |= B_VIEW_CLIP_REGION_BIT;
+	}
+
+	fState->archivingFlags |= B_VIEW_CLIP_REGION_BIT;
 }
 
 

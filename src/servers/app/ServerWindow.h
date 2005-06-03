@@ -51,6 +51,7 @@ class WinBorder;
 class Workspace;
 class RootLayer;
 class Layer;
+class ServerPicture;
 
 #define AS_UPDATE_DECORATOR 'asud'
 #define AS_UPDATE_COLORS 'asuc'
@@ -133,7 +134,11 @@ private:
 protected:	
 	friend class WinBorder;
 	friend class Layer;
-	
+			// TODO: Move me elsewhere
+			status_t			PictureToRegion(ServerPicture *picture,
+												BRegion &,
+												bool inverse,
+												BPoint where);
 			char				fName[50];
 	
 			ServerApp*			fServerApp;

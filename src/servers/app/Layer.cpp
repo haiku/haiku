@@ -89,9 +89,6 @@ Layer::Layer(BRect frame, const char* name, int32 token,
 
 	  fClipReg		(&fVisible),
 
-	  clipToPicture	(NULL),
-	  clipToPictureInverse(false),
-
 	  fServerWin	(NULL),
 	  fName			(new BString(name ? name : B_EMPTY_STRING)),
 	  fViewToken	(token),
@@ -135,11 +132,6 @@ Layer::~Layer(void)
 	
 //	fServerWin->RemoveChild(fDriver);
 //	delete fDriver;
-	
-	if (clipToPicture) {
-		// TODO: allocate and release a ServerPicture Object.
-	}
-	delete clipToPicture;
 }
 
 /*!
@@ -468,14 +460,6 @@ Layer::RebuildFullRegion(void)
 			fFull.IntersectWith(userClipping);
 		
 	} while ((ld = ld->prevState));
-	
-	// clip to user picture region
-	if (clipToPicture) {
-		if(clipToPictureInverse)
-			fFull.Exclude( clipToPicture );
-		else
-			fFull.IntersectWith( clipToPicture );
-	}
 }
 
 // StartRebuildRegions
