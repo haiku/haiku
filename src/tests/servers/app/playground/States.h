@@ -32,8 +32,12 @@ class State {
 			void		SetFill(bool fill);
 			void		SetPenSize(float penSize);
 
-	virtual	BRect		Bounds() const;
-	virtual	void		Draw(BView* view) const = 0;
+			void		SetEditing(bool editing);
+
+			BRect		Bounds() const;
+	virtual	void		Draw(BView* view) const;
+	virtual	bool		SupportsFill() const
+							{ return true; }
 
 	static	State*		StateFor(int32 objectType,
 								 rgb_color color,
@@ -41,12 +45,26 @@ class State {
 
  protected:
 			BRect		_ValidRect() const;
+			void		_RenderDot(BView* view, BPoint where) const;
+			void		_AdjustViewState(BView* view) const;
+
+			bool		_HitTest(BPoint where, BPoint point) const;
 
 			bool		fValid;
 
-			bool		fTracking;
-			BPoint		fTrackingStart;
-			BPoint		fLastMousePos;
+			bool		fEditing;
+
+			enum {
+				TRACKING_NONE = 0,
+				TRACKING_START,
+				TRACKING_END
+			};
+
+			uint32		fTracking;
+			BPoint		fClickOffset;
+
+			BPoint		fStartPoint;
+			BPoint		fEndPoint;
 
 			rgb_color	fColor;
 			bool		fFill;

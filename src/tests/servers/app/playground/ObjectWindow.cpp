@@ -13,6 +13,7 @@
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
+#include <Slider.h>
 #include <String.h>
 #include <RadioButton.h>
 #include <TextControl.h>
@@ -40,7 +41,16 @@ enum {
 
 // constructor
 ObjectWindow::ObjectWindow(BRect frame, const char* name)
-	: BWindow(frame, name, B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
+	: BWindow(frame, name, B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+			  B_ASYNCHRONOUS_CONTROLS)
+//	: BWindow(frame, name, B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+//			  B_ASYNCHRONOUS_CONTROLS)
+//	: BWindow(frame, name, B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+//			  B_ASYNCHRONOUS_CONTROLS)
+//	: BWindow(frame, name, B_BORDERED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+//			  B_ASYNCHRONOUS_CONTROLS)
+//	: BWindow(frame, name, B_NO_BORDER_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+//			  B_ASYNCHRONOUS_CONTROLS)
 {
 	BRect b(Bounds());
 
@@ -192,9 +202,23 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 
 	// pen size text control
 	b.OffsetBy(0, radioButton->Bounds().Height() + 5.0);
-	fPenSizeTC = new BTextControl(b, "width text control", "Width", "",
-								  new BMessage(MSG_SET_PEN_SIZE));
-	controlGroup->AddChild(fPenSizeTC);
+	b.bottom = b.top + 10.0;//35;
+	fPenSizeS = new BSlider(b, "width slider", "Width",
+							NULL, 1, 100, B_TRIANGLE_THUMB);
+	fPenSizeS->SetLimitLabels("1", "100");
+	fPenSizeS->SetModificationMessage(new BMessage(MSG_SET_PEN_SIZE));
+	fPenSizeS->SetHashMarks(B_HASH_MARKS_BOTTOM);
+	fPenSizeS->SetHashMarkCount(10);
+
+	controlGroup->AddChild(fPenSizeS);
+
+	// enforce some size limits
+	float minWidth = controlGroup->Frame().Width() + 30.0;
+	float minHeight = fPenSizeS->Frame().bottom +
+					  menuBar->Bounds().Height() + 15.0;
+	float maxWidth = minWidth * 4.0;
+	float maxHeight = minHeight;
+	SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
 
 	_UpdateControls();
 }
@@ -223,9 +247,9 @@ ObjectWindow::MessageReceived(BMessage* message)
 				fObjectView->SetObjectType(type);
 				fFillCB->SetEnabled(type != OBJECT_LINE);
 				if (!fFillCB->IsEnabled())
-					fPenSizeTC->SetEnabled(true);
+					fPenSizeS->SetEnabled(true);
 				else
-					fPenSizeTC->SetEnabled(fFillCB->Value() == B_CONTROL_OFF);
+					fPenSizeS->SetEnabled(fFillCB->Value() == B_CONTROL_OFF);
 			}
 			break;
 		}
@@ -233,7 +257,7 @@ ObjectWindow::MessageReceived(BMessage* message)
 			int32 value;
 			if (message->FindInt32("be:value", &value) >= B_OK) {
 				fObjectView->SetStateFill(value);
-				fPenSizeTC->SetEnabled(value == B_CONTROL_OFF);
+				fPenSizeS->SetEnabled(value == B_CONTROL_OFF);
 			}
 			break;
 		}
@@ -254,7 +278,7 @@ ObjectWindow::MessageReceived(BMessage* message)
 			break;
 		}
 		case MSG_SET_PEN_SIZE:
-			fObjectView->SetStatePenSize(atof(fPenSizeTC->Text()));
+			fObjectView->SetStatePenSize((float)fPenSizeS->Value());
 			break;
 		default:
 			BWindow::MessageReceived(message);
@@ -273,15 +297,13 @@ ObjectWindow::_UpdateControls() const
 	fFillCB->SetEnabled(fObjectView->ObjectType() != OBJECT_LINE);
 
 	// pen size
-	char string[32];
-	sprintf(string, "%.1f", fObjectView->StatePenSize());
-	fPenSizeTC->SetText(string);
+	fPenSizeS->SetValue((int32)fObjectView->StatePenSize());
 
 	// disable penSize if fill is on
 	if (!fFillCB->IsEnabled())
-		fPenSizeTC->SetEnabled(true);
+		fPenSizeS->SetEnabled(true);
 	else
-		fPenSizeTC->SetEnabled(fFillCB->Value() == B_CONTROL_OFF);
+		fPenSizeS->SetEnabled(fFillCB->Value() == B_CONTROL_OFF);
 }
 
 // _UpdateColorControls

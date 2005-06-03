@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include <Message.h>
+#include <String.h>
 #include <Window.h>
 
 #include "States.h"
@@ -22,9 +23,8 @@ ObjectView::ObjectView(BRect frame, const char* name,
 	  fScrolling(false),
 	  fLastMousePos(0.0, 0.0)
 {
-	rgb_color bg = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_LIGHTEN_1_TINT);
-	SetViewColor(bg);
-	SetLowColor(bg);
+
+	SetLowColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_LIGHTEN_1_TINT));
 
 	BFont font;
 	GetFont(&font);
@@ -37,12 +37,15 @@ ObjectView::ObjectView(BRect frame, const char* name,
 void
 ObjectView::AttachedToWindow()
 {
+	SetViewColor(B_TRANSPARENT_COLOR);
 }
 
 // Draw
 void
 ObjectView::Draw(BRect updateRect)
 {
+	FillRect(updateRect, B_SOLID_LOW);
+
 	rgb_color noTint = ui_color(B_PANEL_BACKGROUND_COLOR);
 	rgb_color shadow = tint_color(noTint, B_DARKEN_2_TINT);
 	rgb_color light = tint_color(noTint, B_LIGHTEN_MAX_TINT);
@@ -95,16 +98,18 @@ ObjectView::MouseDown(BPoint where)
 	Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
 	fScrolling = buttons & B_SECONDARY_MOUSE_BUTTON;
 
+	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+
 	if (fScrolling) {
 		fLastMousePos = where;
 	} else {
 		if (!fState)
-			SetState(State::StateFor(fObjectType, fColor, fFill, fPenSize));
+			AddObject(State::StateFor(fObjectType, fColor, fFill, fPenSize));
 	
 		if (fState) {
-			Invalidate(fState->Bounds());
+//			Invalidate(fState->Bounds());
 			fState->MouseDown(where);
-			Invalidate(fState->Bounds());
+//			Invalidate(fState->Bounds());
 		}
 	}
 }
@@ -148,11 +153,18 @@ ObjectView::MouseMoved(BPoint where, uint32 transit,
 void
 ObjectView::SetState(State* state)
 {
-	fState = state;
-
-	if (fState) {
-		Invalidate(fState->Bounds());
-		AddObject(fState);
+	if (fState != state) {
+		if (fState) {
+			fState->SetEditing(false);
+			Invalidate(fState->Bounds());
+		}
+	
+		fState = state;
+	
+		if (fState) {
+			fState->SetEditing(true);
+			Invalidate(fState->Bounds());
+		}
 	}
 }
 
@@ -173,6 +185,8 @@ ObjectView::AddObject(State* state)
 	if (state) {
 		fStateList.AddItem((void*)state);
 		Window()->PostMessage(MSG_OBJECT_COUNT_CHANGED);
+
+		SetState(state);
 	}
 }
 

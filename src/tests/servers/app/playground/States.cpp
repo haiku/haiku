@@ -7,9 +7,10 @@
 // constructor
 State::State(rgb_color color, bool fill, float penSize)
 	: fValid(false),
-	  fTracking(false),
-	  fTrackingStart(-1.0, -1.0),
-	  fLastMousePos(-1.0, -1.0),
+	  fEditing(true),
+	  fTracking(TRACKING_NONE),
+	  fStartPoint(-1.0, -1.0),
+	  fEndPoint(-1.0, -1.0),
 	  fColor(color),
 	  fFill(fill),
 	  fPenSize(penSize)
@@ -20,23 +21,35 @@ State::State(rgb_color color, bool fill, float penSize)
 void
 State::MouseDown(BPoint where)
 {
-	fTracking = true;
-	fTrackingStart = fLastMousePos = where;
+	if (_HitTest(where, fStartPoint)) {
+		fTracking = TRACKING_START;
+		fClickOffset = fStartPoint - where;
+	} else if (_HitTest(where, fEndPoint)) {
+		fTracking = TRACKING_END;
+		fClickOffset = fEndPoint - where;
+	} else if (!fValid) {
+		fTracking = TRACKING_END;
+		fStartPoint = fEndPoint = where;
+		fClickOffset.Set(0.0, 0.0);
+	}
 }
 
 // MouseUp
 void
 State::MouseUp(BPoint where)
 {
-	fTracking = false;
+	fTracking = TRACKING_NONE;
 }
 
 // MouseMoved
 void
 State::MouseMoved(BPoint where)
 {
-	if (fTracking) {
-		fLastMousePos = where;
+	if (fTracking == TRACKING_START) {
+		fStartPoint = where + fClickOffset;
+		fValid = true;
+	} else if (fTracking == TRACKING_END) {
+		fEndPoint = where + fClickOffset;
 		fValid = true;
 	}
 }
@@ -62,29 +75,86 @@ State::SetPenSize(float penSize)
 	fPenSize = penSize;
 }
 
+// SetEditing
+void
+State::SetEditing(bool editing)
+{
+	fEditing = editing;
+}
+
 // Bounds
 BRect
 State::Bounds() const
 {
 	if (fValid) {
 		BRect r = _ValidRect();
-		if (!fFill) {
-			float inset = -ceilf(fPenSize / 2.0);
-			r.InsetBy(inset, inset);
+		float inset = -2.0; // for the dots
+		if (!SupportsFill() || !fFill) {
+			inset = min_c(inset, -ceilf(fPenSize / 2.0));
 		}
+		r.InsetBy(inset, inset);
 		return r;
 	}
 	return BRect(0.0, 0.0, -1.0, -1.0);
+}
+
+// Draw
+void
+State::Draw(BView* view) const
+{
+	if (fValid && fEditing) {
+		_RenderDot(view, fStartPoint);
+		_RenderDot(view, fEndPoint);
+	}
 }
 
 // _ValidRect
 BRect
 State::_ValidRect() const
 {
-	return BRect(min_c(fTrackingStart.x, fLastMousePos.x),
-				 min_c(fTrackingStart.y, fLastMousePos.y),
-				 max_c(fTrackingStart.x, fLastMousePos.x),
-				 max_c(fTrackingStart.y, fLastMousePos.y));
+	return BRect(min_c(fStartPoint.x, fEndPoint.x),
+				 min_c(fStartPoint.y, fEndPoint.y),
+				 max_c(fStartPoint.x, fEndPoint.x),
+				 max_c(fStartPoint.y, fEndPoint.y));
+}
+
+// _RenderDot
+void
+State::_RenderDot(BView* view, BPoint where) const
+{
+	view->SetHighColor(0, 0, 0, 255);
+	view->SetPenSize(1.0);
+	view->SetDrawingMode(B_OP_COPY);
+	BRect r(where, where);
+	r.InsetBy(-2.0, -2.0);
+	view->StrokeRect(r);
+	view->SetHighColor(255, 255, 255, 255);
+	r.InsetBy(1.0, 1.0);
+	view->FillRect(r);
+}
+
+// _AdjustViewState
+void
+State::_AdjustViewState(BView* view) const
+{
+	if (fColor.alpha < 255)
+		view->SetDrawingMode(B_OP_ALPHA);
+	else
+		view->SetDrawingMode(B_OP_OVER);
+
+	view->SetHighColor(fColor);
+
+	if (!SupportsFill() || !fFill)
+		view->SetPenSize(fPenSize);
+}
+
+// _HitTest
+bool
+State::_HitTest(BPoint where, BPoint point) const
+{
+	BRect r(point, point);
+	r.InsetBy(-8.0, -8.0);
+	return r.Contains(where);
 }
 
 // LineState
@@ -93,22 +163,17 @@ class LineState : public State {
 					LineState(rgb_color color, bool fill, float penSize)
 						: State(color, fill, penSize) {}
 
-	virtual	BRect	Bounds() const
-					{
-						if (fValid) {
-							BRect r = _ValidRect();
-							r.InsetBy(-fPenSize, -fPenSize);
-							return r;
-						}
-						return BRect(0.0, 0.0, -1.0, -1.0);
-					}
 	virtual	void	Draw(BView* view) const
 					{
 						if (fValid) {
-							view->SetHighColor(fColor);
-							view->SetPenSize(fPenSize);
-							view->StrokeLine(fTrackingStart, fLastMousePos);
+							_AdjustViewState(view);
+							view->StrokeLine(fStartPoint, fEndPoint);
 						}
+						State::Draw(view);
+					}
+	virtual	bool	SupportsFill() const
+					{
+						return false;
 					}
 };
 
@@ -121,14 +186,13 @@ class RectState : public State {
 	virtual	void	Draw(BView* view) const
 					{
 						if (fValid) {
-							view->SetHighColor(fColor);
+							_AdjustViewState(view);
 							if (fFill)
 								view->FillRect(_ValidRect());
-							else {
-								view->SetPenSize(fPenSize);
+							else
 								view->StrokeRect(_ValidRect());
-							}
 						}
+						State::Draw(view);
 					}
 };
 
@@ -141,16 +205,15 @@ class RoundRectState : public State {
 	virtual	void	Draw(BView* view) const
 					{
 						if (fValid) {
-							view->SetHighColor(fColor);
+							_AdjustViewState(view);
 							BRect r = _ValidRect();
 							float radius = min_c(r.Width() / 3.0, r.Height() / 3.0);
 							if (fFill)
 								view->FillRoundRect(r, radius, radius);
-							else {
-								view->SetPenSize(fPenSize);
+							else
 								view->StrokeRoundRect(r, radius, radius);
-							}
 						}
+						State::Draw(view);
 					}
 };
 
@@ -163,14 +226,13 @@ class EllipseState : public State {
 	virtual	void	Draw(BView* view) const
 					{
 						if (fValid) {
-							view->SetHighColor(fColor);
+							_AdjustViewState(view);
 							if (fFill)
 								view->FillEllipse(_ValidRect());
-							else {
-								view->SetPenSize(fPenSize);
+							else
 								view->StrokeEllipse(_ValidRect());
-							}
 						}
+						State::Draw(view);
 					}
 };
 
