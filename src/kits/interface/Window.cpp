@@ -65,7 +65,8 @@
 
 using BPrivate::gDefaultTokens;
 
-static property_info windowPropInfo[] = {
+static property_info
+sWindowPropInfo[] = {
 	{
 		"Feel", { B_GET_PROPERTY, B_SET_PROPERTY },
 		{ B_DIRECT_SPECIFIER }, NULL, 0, { B_INT32_TYPE } 
@@ -1945,7 +1946,7 @@ BWindow::GetSupportedSuites(BMessage *data)
 
 	status_t status = data->AddString("Suites", "suite/vnd.Be-window");
 	if (status == B_OK) {
-		BPropertyInfo propertyInfo(windowPropInfo);
+		BPropertyInfo propertyInfo(sWindowPropInfo);
 
 		status = data->AddFlat("message", &propertyInfo);
 		if (status == B_OK)
@@ -1964,7 +1965,7 @@ BWindow::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 		|| msg->what == B_WINDOW_MOVE_TO)
 		return this;
 
-	BPropertyInfo propertyInfo(windowPropInfo);
+	BPropertyInfo propertyInfo(sWindowPropInfo);
 	if (propertyInfo.FindMatch(msg, index, specifier, what, property) >= 0) {
 		if (!strcmp(property, "View")) {
 			// we will NOT pop the current specifier
@@ -2588,7 +2589,7 @@ BWindow::sendMessageUsingEventMask2(BView *view, int32 message, BPoint where)
 	BView *destView = NULL;
 
 	STRACE(("info: BWindow::sendMessageUsingEventMask2() recursing to view %s with point %f,%f.\n",
-	 	aView->Name() ? aView->Name() : "<no name>", aView->ConvertFromScreen(where).x, aView->ConvertFromScreen(where).y));
+	 	view->Name() ? view->Name() : "<no name>", view->ConvertFromScreen(where).x, view->ConvertFromScreen(where).y));
 
 	if (view->fBounds.Contains(view->ConvertFromScreen(where))) {
 		 destView = view;	//this is the lower-most view under the mouse so far
