@@ -1662,6 +1662,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 		}
 		case AS_GET_GLYPH_SHAPES:
 		{
+			FTRACE(("ServerApp %s: AS_GET_GLYPH_SHAPES\n", fSignature.String()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1729,6 +1730,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 		}
 		case AS_GET_ESCAPEMENTS:
 		{
+			FTRACE(("ServerApp %s: AS_GET_ESCAPEMENTS\n", fSignature.String()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1798,6 +1800,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 		}
 		case AS_GET_ESCAPEMENTS_AS_FLOATS:
 		{
+			FTRACE(("ServerApp %s: AS_GET_ESCAPEMENTS_AS_FLOATS\n", fSignature.String()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1955,6 +1958,8 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 		}*/
 		case AS_SCREEN_GET_MODE:
 		{
+			STRACE(("ServerApp %s: AS_SCREEN_GET_MODE\n", fSignature.String()));
+printf("ServerApp %s: AS_SCREEN_GET_MODE\n", fSignature.String());
 			// Attached data
 			// 1) int32 port to reply to
 			// 2) screen_id
@@ -1986,6 +1991,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 		}
 		case AS_SCREEN_SET_MODE:
 		{
+			STRACE(("ServerApp %s: AS_SCREEN_SET_MODE\n", fSignature.String()));
 			// Attached data
 			// 1) int32 port to reply to
 			// 2) screen_id
