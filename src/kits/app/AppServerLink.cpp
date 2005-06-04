@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2005, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -27,51 +27,47 @@
 //					unlocks the connection.
 //------------------------------------------------------------------------------
 
-// Standard Includes -----------------------------------------------------------
-
-// System Includes -------------------------------------------------------------
 #include <Application.h>
+#include <Locker.h>
 
-// Project Includes ------------------------------------------------------------
 #include <AppServerLink.h>
 
-// Local Includes --------------------------------------------------------------
 
-// Local Defines ---------------------------------------------------------------
+BLocker sLock;
+port_id sReplyPort = -1;
 
-// Globals ---------------------------------------------------------------------
 
 namespace BPrivate {
 
 BAppServerLink::BAppServerLink(void)
- : BPortLink()
 {
-	if (be_app)
-	{
-		be_app->Lock();
-		SetSendPort(be_app->fServerFrom);
-	}
-	receiver=create_port(100,"AppServerLink reply port");
-	SetReplyPort(receiver);
+	sLock.Lock();
 
+	// if there is no be_app, we can't do a whole lot, anyway
+	if (be_app)
+		SetSendPort(be_app->fServerFrom);
+
+	// There is only one global reply port, and we create it here
+	// (protected by sLock) when it's not yet there
+	if (sReplyPort < B_OK)
+		sReplyPort = create_port(100, "AppServerLink reply port");
+
+	SetReplyPort(sReplyPort);
 }
 
-//------------------------------------------------------------------------------
 
 BAppServerLink::~BAppServerLink()
 {
-	delete_port(receiver);
-	if (be_app)
-		be_app->Unlock();
+	sLock.Unlock();
 }
 
-//------------------------------------------------------------------------------
 
-status_t BAppServerLink::FlushWithReply(int32 *code)
+status_t
+BAppServerLink::FlushWithReply(int32 *code)
 {
 	status_t err;
 	
-	err = Attach<port_id>(receiver);
+	err = Attach<port_id>(sReplyPort);
 	if (err < B_OK)
 		return err;
 
@@ -83,11 +79,3 @@ status_t BAppServerLink::FlushWithReply(int32 *code)
 }
 
 }	// namespace BPrivate
-
-/*
- * $Log $
- *
- * $Id  $
- *
- */
-

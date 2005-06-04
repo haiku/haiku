@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2005, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -26,38 +26,23 @@
 //					creating one locks the app_server connection; destroying one
 //					unlocks the connection.
 //------------------------------------------------------------------------------
-
 #ifndef APPSERVERLINK_H
 #define APPSERVERLINK_H
 
-// Standard Includes -----------------------------------------------------------
 
-// System Includes -------------------------------------------------------------
-
-// Project Includes ------------------------------------------------------------
-#include <OS.h>
 #include <PortLink.h>
-
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
 
 
 namespace BPrivate {
 
-class BAppServerLink : public BPortLink
-{
-public:
-	BAppServerLink(void);
-	~BAppServerLink(void);
-	status_t FlushWithReply(int32 *code);
-private:
-	port_id receiver;
+class BAppServerLink : public BPortLink {
+	public:
+		BAppServerLink(void);
+		~BAppServerLink(void);
+
+		status_t FlushWithReply(int32 *code);
 };
 
 }	// namespace BPrivate
 
-#endif	//APPSERVERLINK_H
-
+#endif	/* APPSERVERLINK_H */
