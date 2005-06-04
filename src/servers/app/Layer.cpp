@@ -110,10 +110,13 @@ Layer::Layer(BRect frame, const char* name, int32 token,
 
 	  fRootLayer	(NULL)
 {
-	// TODO: Decorator class should have a method witch
-	// returns the minimum frame width.
-	if (!frame.IsValid())
-		fFrame.Set(0, 0, 5, 5);
+	if (!frame.IsValid()) {
+char helper[1024];
+sprintf(helper, "Layer::Layer(BRect(%.1f, %.1f, %.1f, %.1f), name: %s, token: %ld) - frame is invalid\n",
+		frame.left, frame.top, frame.right, frame.bottom, name, token);
+CRITICAL(helper);
+		fFrame.Set(0, 0, 10, 10);
+	}
 
 	if (!fDriver)
 		CRITICAL("You MUST have a valid driver to init a Layer object\n");
@@ -122,7 +125,7 @@ Layer::Layer(BRect frame, const char* name, int32 token,
 }
 
 //! Destructor frees all allocated heap space
-Layer::~Layer(void)
+Layer::~Layer()
 {
 	delete fLayerData;
 	delete fName;
@@ -146,6 +149,7 @@ void
 Layer::AddChild(Layer* layer, ServerWindow* serverWin)
 {
 	STRACE(("Layer(%s)::AddChild(%s) START\n", GetName(), layer->GetName()));
+//printf("Layer(%s)::AddChild(%s)\n", GetName(), layer->GetName());
 	
 	if (layer->fParent != NULL) {
 		printf("ERROR: AddChild(): Layer already has a parent\n");
@@ -581,7 +585,6 @@ Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint ptOf
 			// TODO: investigate combining frame event messages for efficiency
 			//SendViewResizedMsg();
 			AddToViewsWithInvalidCoords();
-
 			
 			newAction = B_LAYER_MASK_RESIZE;
 			break;
@@ -881,12 +884,17 @@ void
 Layer::Show(bool invalidate)
 {
 	STRACE(("Layer(%s)::Show()\n", GetName()));
-	if( !IsHidden() )
+	if(!IsHidden())
 		return;
 	
 	fHidden	= false;
-	
-	if(invalidate)
+
+// NOTE: I added this here and it solves the invalid region problem
+// for Windows that have been resized before they were shown. -Stephan
+RebuildFullRegion();
+SendViewCoordUpdateMsg();
+
+	if (invalidate)
 		GetRootLayer()->GoInvalidate(this, fFull);
 }
 
@@ -898,12 +906,12 @@ void
 Layer::Hide(bool invalidate)
 {
 	STRACE(("Layer(%s)::Hide()\n", GetName()));
-	if ( IsHidden() )
+	if (IsHidden())
 		return;
 	
 	fHidden	= true;
 	
-	if(invalidate)
+	if (invalidate)
 		GetRootLayer()->GoInvalidate(this, fFullVisible);
 }
 

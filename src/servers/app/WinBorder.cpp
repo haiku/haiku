@@ -413,7 +413,15 @@ WinBorder::ResizeBy(float x, float y)
 		if (fDecorator)
 			fDecorator->ResizeBy(x, y);
 	
-		resize_layer(x, y);
+		if (IsHidden()) {
+			// TODO: See large comment in MoveBy()
+			fFrame.right += x;
+			fFrame.bottom += y;
+
+			fTopLayer->resize_layer(x, y);
+		} else {
+			resize_layer(x, y);
+		}
 
 		if (Window()) {
 			// send a message to the client informing about the changed size
