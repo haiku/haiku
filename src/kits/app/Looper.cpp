@@ -84,17 +84,15 @@ port_id _get_looper_port_(const BLooper* looper);
 bool _use_preferred_target_(BMessage* msg) { return msg->fPreferred; }
 int32 _get_message_target_(BMessage* msg) { return msg->fTarget; }
 
-uint32			BLooper::sLooperID = (uint32)B_ERROR;
-team_id			BLooper::sTeamID = (team_id)B_ERROR;
+uint32 BLooper::sLooperID = (uint32)B_ERROR;
+team_id BLooper::sTeamID = (team_id)B_ERROR;
 
-enum
-{
+enum {
 	BLOOPER_PROCESS_INTERNALLY = 0,
 	BLOOPER_HANDLER_BY_INDEX
 };
 
-static property_info gLooperPropInfo[] =
-{
+static property_info gLooperPropInfo[] = {
 	{
 		"Handler",
 			{},
@@ -125,23 +123,25 @@ static property_info gLooperPropInfo[] =
 	{}
 };
 
-struct _loop_data_
-{
+struct _loop_data_ {
 	BLooper*	looper;
 	thread_id	thread;
 };
 
-//------------------------------------------------------------------------------
+
+//	#pragma mark -
+
+
 BLooper::BLooper(const char* name, int32 priority, int32 port_capacity)
 	:	BHandler(name)
 {
 	InitData(name, priority, port_capacity);
 }
-//------------------------------------------------------------------------------
+
+
 BLooper::~BLooper()
 {
-	if (fRunCalled && !fTerminating)
-	{
+	if (fRunCalled && !fTerminating) {
 		debugger("You can't call delete on a BLooper object "
 				 "once it is running.");
 	}
@@ -149,41 +149,27 @@ BLooper::~BLooper()
 	Lock();
 
 	// In case the looper thread calls Quit() fLastMessage is not deleted.
-	if (fLastMessage)
-	{
+	if (fLastMessage) {
 		delete fLastMessage;
 		fLastMessage = NULL;
 	}
 
 	// Close the message port and read and reply to the remaining messages.
 	if (fMsgPort > 0)
-	{
 		close_port(fMsgPort);
-	}
 
-	BMessage* msg;
+	BMessage *msg;
 	// Clear the queue so our call to IsMessageWaiting() below doesn't give
 	// us bogus info
-	while ((msg = fQueue->NextMessage()))
-	{
+	while ((msg = fQueue->NextMessage()) != NULL) {
 		delete msg;			// msg will automagically post generic reply
 	}
 
-	do
-	{
-		msg = ReadMessageFromPort(0);
-		if (msg)
-		{
-			delete msg;		// msg will automagically post generic reply
-		}
+	do {
+		delete ReadMessageFromPort(0);
+			// msg will automagically post generic reply
 	} while (IsMessageWaiting());
 
-// bonefish: Killing the looper thread doesn't work very well with
-// BApplication. In fact here it doesn't work too well either. When the
-// looper thread encounters a _QUIT_ message it deletes the BLooper object
-// and thus commits suicide at this point. That is, the following cleanup
-// isn't done.
-//	kill_thread(fTaskID);
 	delete fQueue;
 	delete_port(fMsgPort);
 
@@ -194,138 +180,133 @@ BLooper::~BLooper()
 	RemoveHandler(this);
 
 	// Remove all the "child" handlers
-	BHandler* child;
-	while (CountHandlers())
-	{
+	BHandler *child;
+	while (CountHandlers()) {
 		child = HandlerAt(0);
 		if (child)
-		{
 			RemoveHandler(child);
-		}
 	}
 
 	UnlockFully();
 	RemoveLooper(this);
 	delete_sem(fLockSem);
 }
-//------------------------------------------------------------------------------
-BLooper::BLooper(BMessage* data)
-	:	BHandler(data)
-{
-	int32 portCap;
-	if (data->FindInt32("_port_cap", &portCap) != B_OK)
-	{
-		portCap = B_LOOPER_PORT_DEFAULT_CAPACITY;
-	}
 
-	InitData(Name(), B_NORMAL_PRIORITY, portCap);
+
+BLooper::BLooper(BMessage *data)
+	: BHandler(data)
+{
+	int32 portCapacity;
+	if (data->FindInt32("_port_cap", &portCapacity) != B_OK
+		|| portCapacity < 0)
+		portCapacity = B_LOOPER_PORT_DEFAULT_CAPACITY;
+
+	InitData(Name(), B_NORMAL_PRIORITY, portCapacity);
 }
-//------------------------------------------------------------------------------
-BArchivable* BLooper::Instantiate(BMessage* data)
+
+
+BArchivable *
+BLooper::Instantiate(BMessage *data)
 {
 	if (validate_instantiation(data, "BLooper"))
-	{
 		return new BLooper(data);
-	}
 
 	return NULL;
 }
-//------------------------------------------------------------------------------
-status_t BLooper::Archive(BMessage* data, bool deep) const
-{
-	status_t err = BHandler::Archive(data, deep);
-	if (!err)
-	{
-		port_info info;
-		err = get_port_info(fMsgPort, &info);
-		if (!err)
-		{
-			err = data->AddInt32("_port_cap", info.capacity);
-		}
-	}
 
-	return err;
-}
-//------------------------------------------------------------------------------
-status_t BLooper::PostMessage(uint32 command)
+
+status_t
+BLooper::Archive(BMessage *data, bool deep) const
 {
-	BMessage Message(command);
-	return _PostMessage(&Message, this, NULL);
+	status_t status = BHandler::Archive(data, deep);
+	if (status < B_OK)
+		return status;
+
+	port_info info;
+	status = get_port_info(fMsgPort, &info);
+	if (status == B_OK)
+		status = data->AddInt32("_port_cap", info.capacity);
+
+	return status;
 }
-//------------------------------------------------------------------------------
-status_t BLooper::PostMessage(BMessage* message)
+
+
+status_t
+BLooper::PostMessage(uint32 command)
+{
+	BMessage message(command);
+	return _PostMessage(&message, this, NULL);
+}
+
+
+status_t
+BLooper::PostMessage(BMessage *message)
 {
 	return _PostMessage(message, this, NULL);
 }
-//------------------------------------------------------------------------------
-status_t BLooper::PostMessage(uint32 command, BHandler* handler,
-							  BHandler* reply_to)
+
+
+status_t
+BLooper::PostMessage(uint32 command, BHandler *handler,
+	BHandler *replyTo)
 {
-	BMessage Message(command);
-	return _PostMessage(&Message, handler, reply_to);
+	BMessage message(command);
+	return _PostMessage(&message, handler, replyTo);
 }
-//------------------------------------------------------------------------------
-status_t BLooper::PostMessage(BMessage* message, BHandler* handler,
-							  BHandler* reply_to)
+
+
+status_t
+BLooper::PostMessage(BMessage *message, BHandler *handler,
+	BHandler *replyTo)
 {
-	return _PostMessage(message, handler, reply_to);
+	return _PostMessage(message, handler, replyTo);
 }
-//------------------------------------------------------------------------------
-void BLooper::DispatchMessage(BMessage* message, BHandler* handler)
+
+
+void
+BLooper::DispatchMessage(BMessage *message, BHandler *handler)
 {
-PRINT(("BLooper::DispatchMessage(%.4s)\n", (char*)&message->what));
-/**
-	@note	Initially, DispatchMessage() was locking the looper, calling the
-			filtering API, determining whether to use fPreferred or not, and
-			deleting the message.  A look at the BeBook, however, reveals that
-			all this function does is handle its own B_QUIT_REQUESTED messages
-			and pass everything else to handler->MessageReceived().  Clearly the
-			rest must be happening in task_looper().  This makes a lot of sense
-			because otherwise every derived class would have to figure out when
-			to use fPreferred, handle the locking and filtering and delete the
-			message.  Even if the BeBook didn't say as much, it would make total
-			sense to hoist that functionality out of here and into task_looper().
- */
-	switch (message->what)
-	{
+	PRINT(("BLooper::DispatchMessage(%.4s)\n", (char*)&message->what));
+	/** @note
+		Initially, DispatchMessage() was locking the looper, calling the
+		filtering API, determining whether to use fPreferred or not, and
+		deleting the message.  A look at the BeBook, however, reveals that
+		all this function does is handle its own B_QUIT_REQUESTED messages
+		and pass everything else to handler->MessageReceived().  Clearly the
+		rest must be happening in task_looper().  This makes a lot of sense
+		because otherwise every derived class would have to figure out when
+		to use fPreferred, handle the locking and filtering and delete the
+		message.  Even if the BeBook didn't say as much, it would make total
+		sense to hoist that functionality out of here and into task_looper().
+	*/
+	switch (message->what) {
 		case _QUIT_:
-		{
 			// Can't call Quit() to do this, because of the slight chance
 			// another thread with have us locked between now and then.
 			fTerminating = true;
-// bonefish: Now it works straight forward: The thread running here is
-// the looper thread, so after returning from DispatchMessage() it will
-// quit the dispatching loop, and delete the object in _task0_(), directly
-// before dying. Even better, this solution is BApplication friendly as
-// Quit() doesn't delete the application object.
-// TODO: Remove this.
-//			delete this;
+
+			// After returning from DispatchMessage(), the looper will be
+			// deleted in _task0_()
 			break;
-		}
 
 		case B_QUIT_REQUESTED:
-		{
-			if (handler == this)
-			{
+			if (handler == this) {
 				do_quit_requested(message);
 				break;
 			}
-			else
-			{
-				// fall through
-			}
-		}
+
+			// fall through
 
 		default:
-		{
 			handler->MessageReceived(message);
 			break;
-		}
 	}
-PRINT(("BLooper::DispatchMessage() done\n"));
+	PRINT(("BLooper::DispatchMessage() done\n"));
 }
-//------------------------------------------------------------------------------
-void BLooper::MessageReceived(BMessage* msg)
+
+
+void
+BLooper::MessageReceived(BMessage *msg)
 {
 	// TODO: verify
 	// The BeBook says this "simply calls the inherited function. ...the BLooper
@@ -490,88 +471,73 @@ void BLooper::SetPreferredHandler(BHandler* handler)
 		fPreferred = NULL;
 	}
 }
-//------------------------------------------------------------------------------
-thread_id BLooper::Run()
+
+
+thread_id
+BLooper::Run()
 {
 	AssertLocked();
 
-	if (fRunCalled)
-	{
+	if (fRunCalled) {
 		// Not allowed to call Run() more than once
 		debugger("can't call BLooper::Run twice!");
 	}
 
 	fTaskID = spawn_thread(_task0_, Name(), fInitPriority, this);
-
-	if (fTaskID == B_NO_MORE_THREADS || fTaskID == B_NO_MEMORY)
-	{
+	if (fTaskID < B_OK)
 		return fTaskID;
-	}
 
-	if (fMsgPort == B_NO_MORE_PORTS || fMsgPort == B_BAD_VALUE)
-	{
+	if (fMsgPort < B_OK)
 		return fMsgPort;
-	}
 
 	fRunCalled = true;
 	Unlock();
+
 	status_t err = resume_thread(fTaskID);
-	if (err)
-	{
+	if (err < B_OK)
 		return err;
-	}
 
 	return fTaskID;
 }
-//------------------------------------------------------------------------------
-void BLooper::Quit()
+
+
+void
+BLooper::Quit()
 {
-PRINT(("BLooper::Quit()\n"));
-	if (!IsLocked())
-	{
-		const char* name = Name();
-		if (!name)
-		{
-			name = "no-name";
-		}
+	PRINT(("BLooper::Quit()\n"));
+
+	if (!IsLocked()) {
 		printf("ERROR - you must Lock a looper before calling Quit(), "
-			   "team=%ld, looper=%s\n", Team(), name);
+			   "team=%ld, looper=%s\n", Team(), Name() ? Name() : "unnamed");
 	}
 
 	// Try to lock
-	if (!Lock())
-	{
+	if (!Lock()) {
 		// We're toast already
 		return;
 	}
 
-PRINT(("  is locked\n"));
+	PRINT(("  is locked\n"));
 
 	if (!fRunCalled)
 	{
-PRINT(("  Run() has not been called yet\n"));
+		PRINT(("  Run() has not been called yet\n"));
 		fTerminating = true;
 		delete this;
-	} 
-	else if (find_thread(NULL) == fTaskID)
-	{
-PRINT(("  We are the looper thread\n"));
+	} else if (find_thread(NULL) == fTaskID) {
+		PRINT(("  We are the looper thread\n"));
 		fTerminating = true;
 		delete this;
 		exit_thread(0);
-	}
-	else
-	{
-PRINT(("  Run() has already been called and we are not the looper thread\n"));
+	} else {
+		PRINT(("  Run() has already been called and we are not the looper thread\n"));
+
 		// As with sem in _Lock(), we need to cache this here in case the looper
 		// disappears before we get to the wait_for_thread() below
 		thread_id tid = Thread();
 
-		// bonefish: We need to unlock here. Otherwise the looper thread can't
+		// We need to unlock here. Otherwise the looper thread can't
 		// dispatch the _QUIT_ message we're going to post.
-//		do {
-//			Unlock();
-//		} while (IsLocked());
 		UnlockFully();
 
 		// As per the BeBook, if we've been called by a thread other than
@@ -582,43 +548,33 @@ PRINT(("  Run() has already been called and we are not the looper thread\n"));
 		// I got suspicious when my test QuitRequested() wasn't getting called
 		// when Quit() was invoked from another thread.  Makes a nice proof that
 		// this is how it's handled, too.
-		status_t err;
-PRINT(("  PostMessage(_QUIT_)...\n"));
-//		err = PostMessage(_QUIT_);
 
-BMessage message(_QUIT_);
-message.AddInt32("testfield", 42);
-err = PostMessage(&message);
-PRINT(("  ... done: %lx\n", err));
-
-		// There's a possibility that PostMessage() will return B_WOULD_BLOCK
-		// because the port is full, so we'll wait a bit and re-post until
-		// we won't block.
-		while (err == B_WOULD_BLOCK)
-		{
-			// TODO: test this value; it may be too short
-			snooze(10000);
-			err = PostMessage(_QUIT_);
+		while (PostMessage(_QUIT_) == B_WOULD_BLOCK) {
+			// There's a slight chance that PostMessage() will return B_WOULD_BLOCK
+			// because the port is full, so we'll wait a bit and re-post until
+			// we won't block.
+			snooze(25000);
 		}
 
-		// Also as per the BeBook, we have to wait until the looper is done
-		// processing any remaining messages.
+		// We have to wait until the looper is done processing any remaining messages.
 		int32 temp;
-		do
-		{
-PRINT(("  wait_for_thread(%ld)...\n", tid));
-			err = wait_for_thread(tid, &temp);
-		} while (err == B_INTERRUPTED);
+		while (wait_for_thread(tid, &temp) == B_INTERRUPTED)
+			;
 	}
-PRINT(("BLooper::Quit() done\n"));
+
+	PRINT(("BLooper::Quit() done\n"));
 }
-//------------------------------------------------------------------------------
-bool BLooper::QuitRequested()
+
+
+bool
+BLooper::QuitRequested()
 {
 	return true;
 }
-//------------------------------------------------------------------------------
-bool BLooper::Lock()
+
+
+bool
+BLooper::Lock()
 {
 	// Defer to global _Lock(); see notes there
 	return _Lock(this, -1, B_INFINITE_TIMEOUT) == B_OK;
@@ -1202,24 +1158,26 @@ void BLooper::_AddMessagePriv(BMessage* msg)
 {
 	// NOTE: No, really; why the hell is this here??
 }
-//------------------------------------------------------------------------------
-status_t BLooper::_task0_(void* arg)
-{
-PRINT(("LOOPER: _task0_()\n"));
-	BLooper* obj = (BLooper*)arg;
 
-PRINT(("LOOPER: locking looper...\n"));
-	if (obj->Lock())
-	{
-PRINT(("LOOPER: looper locked\n"));
-		obj->task_looper();
-		delete obj;
+
+status_t
+BLooper::_task0_(void *arg)
+{
+	BLooper *looper = (BLooper *)arg;
+
+	PRINT(("LOOPER: _task0_()\n"));
+
+	if (looper->Lock()) {
+		PRINT(("LOOPER: looper locked\n"));
+		looper->task_looper();
+
+		delete looper;
 	}
 
-PRINT(("LOOPER: _task0_() done: thread %ld\n", find_thread(NULL)));
+	PRINT(("LOOPER: _task0_() done: thread %ld\n", find_thread(NULL)));
 	return B_OK;
 }
-//------------------------------------------------------------------------------
+
 
 void *
 BLooper::ReadRawFromPort(int32 *msgCode, bigtime_t timeout)
