@@ -24,6 +24,7 @@
 //	Description:	Class for low-overhead port-based messaging
 //  
 //------------------------------------------------------------------------------
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <new>
@@ -263,10 +264,18 @@ status_t LinkMsgSender::Flush(bigtime_t timeout)
 status_t LinkMsgSender::AttachString(const char *string)
 {
 	status_t err;
-	if (string == NULL)
-		return B_BAD_VALUE;
+	if (string == NULL) {
+// TODO: This whole comm thing is so broken.... if we're for some
+// reason attaching a NULL string, and don't do it, the receiving
+// party will still try to read a string!! The whole communication
+// will be messed up if the stream does not contain what the client
+// things it contains. This is a quick fix (but just for this
+// particular problem). -Stephan
+//		return B_BAD_VALUE;
+		string = "";
+	}
 
-	int32 len = strlen(string)+1;
+	int32 len = strlen(string) + 1;
 	err = Attach<int32>(len);
 	if (err < B_OK)
 		return err;
