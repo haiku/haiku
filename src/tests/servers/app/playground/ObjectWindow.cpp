@@ -220,6 +220,8 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 	float maxHeight = minHeight;
 	SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
 
+	ResizeTo(max_c(frame.Width(), minWidth), max_c(frame.Height(), minHeight));
+
 	_UpdateControls();
 }
 
