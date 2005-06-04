@@ -786,7 +786,7 @@ copy_from_end(const char* src, char* dst, uint32 numChars, uint32 length,
 			// ups, we definitely don't fit. go back until the ellipsis fits
 			currentWidth += ellipsisWidth;
 			// go forward again until ellipsis fits (already beyond the target)
-			for (int32 c2 = c; c2 < numChars; c2++) {
+			for (int32 c2 = c; c2 < (int32)numChars; c2++) {
 //printf(" backward: %c (%ld) (%.1f - %.1f = %.1f)\n", *dst, c2, currentWidth, escapementArray[c2] * size, currentWidth - escapementArray[c2] * size);
 				currentWidth -= escapementArray[c2] * size;
 				do {
