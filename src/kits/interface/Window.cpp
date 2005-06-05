@@ -242,6 +242,10 @@ BWindow::~BWindow()
 	// disable pulsing
 	SetPulseRate(0);
 
+	// tell app_server about our demise
+	fLink->StartMessage(AS_DELETE_WINDOW);
+	fLink->Flush();
+
 	delete fLink;
 	delete_port(receive_port);
 }
@@ -328,10 +332,6 @@ BWindow::Quit()
 
 	// ... also its children
 	//detachTopView();
-	STRACE(("Trying to stop connection...\n"));
-	// tell app_server, this window will finish execution
-	stopConnection();
-	STRACE(("Connection stopped!\n"));
 
 	if (fFlags & B_QUIT_ON_WINDOW_CLOSE)
 		be_app->PostMessage(B_QUIT_REQUESTED);
@@ -2382,16 +2382,6 @@ BWindow::BuildTopView()
   	top_view->attachView(top_view);
 
 	STRACE(("BuildTopView ended\n"));
-}
-
-
-void
-BWindow::stopConnection()
-{
-	Lock();
-	fLink->StartMessage(AS_DELETE_WINDOW);
-	fLink->Flush();
-	Unlock();
 }
 
 
