@@ -3,8 +3,8 @@
 #ifndef __REGION_SUPPORT_H
 #define __REGION_SUPPORT_H
 
-struct clipping_rect;
-class BRegion;
+#include <Region.h>
+
 class BRegion::Support {
 public:
 	static void ZeroRegion(BRegion &region);
