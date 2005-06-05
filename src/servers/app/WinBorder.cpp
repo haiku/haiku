@@ -340,6 +340,9 @@ WinBorder::Draw(const BRect &r)
 void
 WinBorder::MoveBy(float x, float y)
 {
+x = (float)int32(x);
+y = (float)int32(y);
+
 	if (x == 0.0 && y == 0.0)
 		return;
 
@@ -391,6 +394,9 @@ void
 WinBorder::ResizeBy(float x, float y)
 {
 	STRACE(("WinBorder(%s)::ResizeBy()\n", GetName()));
+
+x = (float)int32(x);
+y = (float)int32(y);
 
 	float wantWidth = fFrame.Width() + x;
 	float wantHeight = fFrame.Height() + y;

@@ -149,7 +149,6 @@ void
 Layer::AddChild(Layer* layer, ServerWindow* serverWin)
 {
 	STRACE(("Layer(%s)::AddChild(%s) START\n", GetName(), layer->GetName()));
-//printf("Layer(%s)::AddChild(%s)\n", GetName(), layer->GetName());
 	
 	if (layer->fParent != NULL) {
 		printf("ERROR: AddChild(): Layer already has a parent\n");
@@ -956,7 +955,7 @@ Layer::MoveBy(float x, float y)
 		return;
 	}
 
-	BPortLink	msg(-1, -1);
+	BPortLink msg(-1, -1);
 	msg.StartMessage(AS_ROOTLAYER_LAYER_MOVE);
 	msg.Attach<Layer*>(this);
 	msg.Attach<float>(x);
@@ -972,13 +971,12 @@ Layer::ResizeBy(float x, float y)
 {
 	STRACE(("Layer(%s)::ResizeBy() START\n", GetName()));
 	
-	if(!fParent)
-	{
+	if (!fParent) {
 		printf("ERROR: in Layer::ResizeBy()! - No parent!\n");
 		return;
 	}
 
-	BPortLink	msg(-1, -1);
+	BPortLink msg(-1, -1);
 	msg.StartMessage(AS_ROOTLAYER_LAYER_RESIZE);
 	msg.Attach<Layer*>(this);
 	msg.Attach<float>(x);

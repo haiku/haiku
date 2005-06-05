@@ -1521,10 +1521,9 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			
 			ServerBitmap* sbmp = fServerApp->FindBitmap(bitmapToken);
 			if (sbmp) {
-
 				BRect src = sbmp->Bounds();
-				BRect dst = fCurrentLayer->fParent->ConvertFromParent(fCurrentLayer->fFull.Frame());
-				dst.OffsetBy(point);
+				BRect dst = src.OffsetToCopy(point);
+				dst = fCurrentLayer->ConvertToTop(dst);
 
 				fCurrentLayer->GetDisplayDriver()->DrawBitmap(sbmp, src, dst, fCurrentLayer->fLayerData);
 			}
@@ -1543,10 +1542,9 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			
 			ServerBitmap* sbmp = fServerApp->FindBitmap(bitmapToken);
 			if (sbmp) {
-
 				BRect src = sbmp->Bounds();
-				BRect dst = fCurrentLayer->fParent->ConvertFromParent(fCurrentLayer->fFull.Frame());
-				dst.OffsetBy(point);
+				BRect dst = src.OffsetToCopy(point);
+				dst = fCurrentLayer->ConvertToTop(dst);
 
 				fCurrentLayer->GetDisplayDriver()->DrawBitmap(sbmp, src, dst, fCurrentLayer->fLayerData);
 			}
@@ -1564,10 +1562,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			
 			ServerBitmap* sbmp = fServerApp->FindBitmap(bitmapToken);
 			if (sbmp) {
-				BRect dst = fCurrentLayer->fParent->ConvertFromParent(fCurrentLayer->fFull.Frame());
-				dstRect.OffsetBy(dst.left, dst.top);
-// TODO: why is this not working:
-//				fCurrentLayer->ConvertToTop(dstRect);
+				dstRect = fCurrentLayer->ConvertToTop(dstRect);
 
 				fCurrentLayer->GetDisplayDriver()->DrawBitmap(sbmp, srcRect, dstRect, fCurrentLayer->fLayerData);
 			}
@@ -1587,10 +1582,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			
 			ServerBitmap* sbmp = fServerApp->FindBitmap(bitmapToken);
 			if (sbmp) {
-				BRect dst = fCurrentLayer->fParent->ConvertFromParent(fCurrentLayer->fFull.Frame());
-				dstRect.OffsetBy(dst.left, dst.top);
-// TODO: why is this not working:
-//				fCurrentLayer->ConvertToTop(dstRect);
+				dstRect = fCurrentLayer->ConvertToTop(dstRect);
 
 				fCurrentLayer->GetDisplayDriver()->DrawBitmap(sbmp, srcRect, dstRect, fCurrentLayer->fLayerData);
 			}
