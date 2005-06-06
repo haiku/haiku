@@ -704,6 +704,11 @@ BShelf::ReplicantDeleted(int32 index, const BMessage *archive,
 {
 }
 
+void
+_ReservedShelf1__6BShelfFv(BShelf *const, int32, const BMessage*, 
+								const BView*)
+{
+}
 
 void BShelf::_ReservedShelf2() {}
 void BShelf::_ReservedShelf3() {}
