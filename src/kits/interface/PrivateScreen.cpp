@@ -26,6 +26,7 @@
 //------------------------------------------------------------------------------
 #include <Window.h>
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "AppServerLink.h"
@@ -433,11 +434,21 @@ BPrivateScreen::BPrivateScreen()
 	fRetraceSem(-1),
 	fOwnsColorMap(false)
 {
-	// TODO: Get a pointer or a copy of the colormap from the app server
-	// if we only have one screen (one card, one monitor),
-	// it's better to get only a pointer (with BApplication::ro_offset_to_ptr() ?)
-	// otherwise every BApplication will keep a copy of the same colormap,
-	// and we would waste memory for nothing
+	// TODO: BeOS R5 here gets the colormap pointer
+	// (with BApplication::ro_offset_to_ptr() ?)
+	// which is contained in a shared area created by the server.
+	BAppServerLink link;
+	link.StartMessage(AS_SCREEN_GET_COLORMAP);
+	link.Attach<screen_id>(ID());
+	int32 reply;
+	link.FlushWithReply(&reply);
+	if (reply == SERVER_TRUE) {
+		fColorMap = (color_map *)malloc(sizeof(color_map));
+		fOwnsColorMap = true;
+		// TODO: This doesn't work. We probably run into a port
+		// capacity issue ?
+		//link.Read<color_map>(fColorMap);
+	}		
 }
 
 

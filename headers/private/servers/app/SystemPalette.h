@@ -30,7 +30,8 @@
 
 #include <GraphicsDefs.h>
 
-void GenerateSystemPalette(rgb_color *palette);
-extern const rgb_color system_palette[];
+extern void InitializeColorMap();
+extern const rgb_color *SystemPalette();
+extern const color_map *SystemColorMap();
 
 #endif

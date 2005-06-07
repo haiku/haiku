@@ -114,7 +114,7 @@ uint8 RGBColor::GetColor8() const
 {
 	if(update8)
 	{
-		color8=FindClosestColor(system_palette, color32);
+		color8=FindClosestColor(SystemPalette(), color32);
 		update8=false;
 	}
 
@@ -214,7 +214,7 @@ void RGBColor::SetColor(uint16 col16)
 void RGBColor::SetColor(uint8 col8)
 {
 	color8=col8;
-	color32=system_palette[col8];
+	color32=SystemPalette()[col8];
 	
 	update8=false;
 	update16=true;

@@ -420,8 +420,6 @@ DBG(OUT("BApplication::InitData(`%s', %p)\n", signature, _error));
 		connect_to_app_server();
 	if (fInitError == B_OK)
 		setup_server_heaps();
-	if (fInitError == B_OK)
-		get_scs();
 #endif	// RUN_WITHOUT_APP_SERVER
 
 	// init be_app and be_app_messenger
@@ -429,14 +427,7 @@ DBG(OUT("BApplication::InitData(`%s', %p)\n", signature, _error));
 		be_app = this;
 		be_app_messenger = BMessenger(NULL, this);
 	}
-
-#ifndef RUN_WITHOUT_APP_SERVER
-	// Initialize the IK after we have set be_app because of a construction of a
-	// BAppServerLink (which depends on be_app) nested inside the call to get_menu_info.
-	if (fInitError == B_OK)
-		fInitError = _init_interface_kit_();
-#endif	// RUN_WITHOUT_APP_SERVER
-
+		
 	// set the BHandler's name
 	if (fInitError == B_OK)
 		SetName(ref.name);
@@ -448,6 +439,12 @@ DBG(OUT("BApplication::InitData(`%s', %p)\n", signature, _error));
 	}
 
 #ifndef RUN_WITHOUT_APP_SERVER
+	// Initialize the IK after we have set be_app because of a construction of a
+	// BAppServerLink (which depends on be_app) nested inside the call to get_menu_info.
+	if (fInitError == B_OK)
+		get_scs();
+	if (fInitError == B_OK)
+		fInitError = _init_interface_kit_();
 	// create global system cursors
 	// ToDo: these could have a predefined server token to safe the communication!
 	B_CURSOR_SYSTEM_DEFAULT = new BCursor(B_HAND_CURSOR);

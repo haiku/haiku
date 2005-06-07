@@ -29,13 +29,12 @@
 // Local Includes --------------------------------------------------------------
 #include "SystemPalette.h"
 
-/*!
-	\var rgb_color system_palette[256]
-	\brief The global array of colors for the system palette.
-	
-	Whenever the system's color palette is referenced, this is the variable used.
-*/
-const rgb_color system_palette[] = {
+
+// TODO: BWindowScreen has a method to set the palette.
+// maybe we should have a lock to protect this variable.
+static color_map sColorMap;
+
+const static rgb_color kSystemPalette[] = {
  {   0,   0,   0, 255 }, {   8,   8,   8, 255 }, {  16,  16,  16, 255 },
  {  24,  24,  24, 255 }, {  32,  32,  32, 255 }, {  40,  40,  40, 255 },
  {  48,  48,  48, 255 }, {  56,  56,  56, 255 }, {  64,  64,  64, 255 },
@@ -124,11 +123,13 @@ const rgb_color system_palette[] = {
  { 255, 255, 255, 255 }
 };
 
+
 /*!
 	\brief Takes a palette array and places the BeOS System	palette in it.
 	\param palette 256-element rgb_color array
-*/
-void GenerateSystemPalette(rgb_color *palette)
+*//*
+void
+GenerateSystemPalette(rgb_color *palette)
 {
 	int i,j,index=0;
 	int indexvals1[]={ 255,229,204,179,154,129,105,80,55,30 },
@@ -445,4 +446,32 @@ void GenerateSystemPalette(rgb_color *palette)
 		currentcol->alpha=255;
 	}
 
+}
+*/
+static void
+FillColorMap(const rgb_color *palette, color_map *map)
+{
+	memcpy(map->color_list, palette, sizeof(map->color_list));
+	// TODO: Inversion map, etc.
+}
+
+
+void
+InitializeColorMap()
+{
+	FillColorMap(kSystemPalette, &sColorMap);
+}
+
+
+const rgb_color *
+SystemPalette()
+{
+	return sColorMap.color_list;
+}
+
+
+const color_map *
+SystemColorMap()
+{
+	return &sColorMap;
 }

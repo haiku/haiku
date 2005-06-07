@@ -56,6 +56,7 @@
 #include "ServerBitmap.h"
 #include "ServerPicture.h"
 #include "ServerConfig.h"
+#include "SystemPalette.h"
 #include "WinBorder.h"
 #include "LayerData.h"
 #include "Utils.h"
@@ -2028,7 +2029,28 @@ printf("ServerApp %s: AS_SCREEN_GET_MODE\n", fSignature.String());
 			replylink.Flush();
 			break;
 		}
-
+		
+		case AS_SCREEN_GET_COLORMAP:
+		{
+			STRACE(("ServerApp %s: AS_SCREEN_GET_COLORMAP\n", fSignature.String()));
+			
+			screen_id id;
+			msg.Read<screen_id>(&id);
+			
+			int32 replyport;
+			msg.Read<int32>(&replyport);
+			
+			replylink.SetSendPort(replyport);
+			replylink.StartMessage(SERVER_TRUE);
+			
+			// TODO: this doesn't seem to work.
+			//See also comment in BPrivateScreen::BPrivateScreen()
+			//replylink.Attach<color_map>(*SystemColorMap());
+			replylink.Flush();
+			
+			break;
+		}
+		
 		default:
 		{
 			printf("ServerApp %s received unhandled message code offset %s\n", fSignature.String(),

@@ -131,6 +131,7 @@ AS_SET_SYSFONT_FIXED,
 // Screen methods
 AS_SCREEN_GET_MODE,
 AS_SCREEN_SET_MODE,
+AS_SCREEN_GET_COLORMAP,
 
 // Global function call defs
 AS_SET_UI_COLORS,

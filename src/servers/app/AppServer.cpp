@@ -48,6 +48,7 @@
 #include "ServerCursor.h"
 #include "ServerProtocol.h"
 #include "ServerWindow.h"
+#include "SystemPalette.h"
 #include "Utils.h"
 
 #include "AppServer.h"
@@ -182,6 +183,9 @@ AppServer::AppServer(void) :
 	gDesktop = new Desktop();
 	gDesktop->Init();
 
+	// TODO: Maybe this is not the best place for this
+	InitializeColorMap();
+	
 	// Create the bitmap allocator. Object declared in BitmapManager.cpp
 	bitmapmanager = new BitmapManager();
 
