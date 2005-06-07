@@ -81,8 +81,8 @@ public:
 			// settings related methods	
 			void				GetSettings(const BMessage &msg);
 			void				GetDefaultSettings(void);
-			void				PutSettings(BMessage *msg, const int32 &index) const;
-	static	void				PutDefaultSettings(BMessage *msg, const int32 &index);
+			void				PutSettings(BMessage *msg, const uint8 &index) const;
+	static	void				PutDefaultSettings(BMessage *msg, const uint8 &index);
 	
 			// debug methods
 			void				PrintToStream(void) const;

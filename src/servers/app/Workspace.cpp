@@ -65,6 +65,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <Window.h>
+#include <TypeConstants.h>
 
 #include "Workspace.h"
 #include "Layer.h"
@@ -990,14 +991,75 @@ RGBColor Workspace::BGColor(void) const
 */
 void Workspace::GetSettings(const BMessage &msg)
 {
-	// TODO: Implement
+	BMessage container;
+	rgb_color *color;
+	ssize_t size;
+	
+	char fieldname[4];
+	sprintf(fieldname,"%d",(uint8)fID);
+	
+	// First, find the container message corresponding to the workspace's index
+	if(msg.FindMessage(fieldname,&container)!=B_OK)
+	{
+		GetDefaultSettings();
+		return;
+	}
+	
+	if(container.FindInt32("timing_pixel_clock",(int32*)&fDisplayTiming.pixel_clock)!=B_OK)
+		fDisplayTiming.pixel_clock=25175;
+	if(container.FindInt16("timing_h_display",(int16*)&fDisplayTiming.h_display)!=B_OK)
+		fDisplayTiming.h_display=640;
+	if(container.FindInt16("timing_h_sync_start",(int16*)&fDisplayTiming.h_sync_start)!=B_OK)
+		fDisplayTiming.h_sync_start=656;
+	if(container.FindInt16("timing_h_sync_end",(int16*)&fDisplayTiming.h_sync_end)!=B_OK)
+		fDisplayTiming.h_sync_end=752;
+	if(container.FindInt16("timing_h_total",(int16*)&fDisplayTiming.h_total)!=B_OK)
+		fDisplayTiming.h_total=800;
+	if(container.FindInt16("timing_v_display",(int16*)&fDisplayTiming.v_display)!=B_OK)
+		fDisplayTiming.v_display=480;
+	if(container.FindInt16("timing_v_sync_start",(int16*)&fDisplayTiming.v_sync_start)!=B_OK)
+		fDisplayTiming.v_sync_start=490;
+	if(container.FindInt16("timing_v_sync_end",(int16*)&fDisplayTiming.v_sync_end)!=B_OK)
+		fDisplayTiming.v_sync_end=492;
+	if(container.FindInt16("timing_v_total",(int16*)&fDisplayTiming.v_total)!=B_OK)
+		fDisplayTiming.v_total=525;
+	if(container.FindInt32("timing_flags",(int32*)&fDisplayTiming.flags)!=B_OK)
+		fDisplayTiming.flags=0;
+	
+	if(container.FindInt32("color_space",(int32*)&fSpace)!=B_OK)
+		fSpace=B_CMAP8;
+	
+	if(container.FindData("bgcolor",B_RGB_COLOR_TYPE,(const void **)&color,&size)==B_OK)
+		fBGColor.SetColor(*color);
+	else
+		fBGColor.SetColor(0,0,0);
+	
+	if(container.FindInt16("virtual_width",&fVirtualWidth)!=B_OK)
+		fVirtualWidth=640;
+	if(container.FindInt16("virtual_height",&fVirtualHeight)!=B_OK)
+		fVirtualHeight=480;
 }
 
 //----------------------------------------------------------------------------------
 //! Sets workspace settings to defaults
 void Workspace::GetDefaultSettings(void)
 {
-	// TODO: Implement
+	fBGColor.SetColor(0,0,0);
+	
+	fDisplayTiming.pixel_clock=25175;
+	fDisplayTiming.h_display=640;
+	fDisplayTiming.h_sync_start=656;
+	fDisplayTiming.h_sync_end=752;
+	fDisplayTiming.h_total=800;
+	fDisplayTiming.v_display=480;
+	fDisplayTiming.v_sync_start=490;
+	fDisplayTiming.v_sync_end=492;
+	fDisplayTiming.v_total=525;
+	fDisplayTiming.flags=0;
+	fSpace=B_CMAP8;
+		
+	fVirtualWidth=640;
+	fVirtualHeight=480;
 }
 
 //----------------------------------------------------------------------------------
@@ -1007,20 +1069,51 @@ void Workspace::GetDefaultSettings(void)
 	\param index The index number of the workspace in the desktop
 	
 	This function will fail if passed a NULL pointer. The settings for the workspace are 
-	saved in a BMessage
+	saved in a BMessage in a BMessage.
+	
+	The message itself is placed in a field string based on its index - "1", "2", etc.
 	
 	The format is as follows:
-	int32 "index" -> workspace index
-	display_timing "display_timing" -> fDisplayTiming (see Accelerant.h)
+	display_timing "timing_XXX" -> fDisplayTiming members (see Accelerant.h)
 	uint32 "color_space" -> color space of the workspace
 	rgb_color "bgcolor" -> background color of the workspace
 	int16 "virtual_width" -> virtual width of the workspace
 	int16 "virtual_height" -> virtual height of the workspace
-	int32 "flags" -> workspace flags	
 */
-void Workspace::PutSettings(BMessage *msg, const int32 &index) const
+void Workspace::PutSettings(BMessage *msg, const uint8 &index) const
 {
-	// TODO: Implement
+	if(!msg)
+		return;
+	
+	BMessage container;
+	rgb_color color=fBGColor.GetColor32();
+	
+	// a little longer than we need in case someone tries to pass index=255 or something
+	char fieldname[4];
+	
+	container.AddInt32("timing_pixel_clock",fDisplayTiming.pixel_clock);
+	container.AddInt16("timing_h_display",fDisplayTiming.h_display);
+	container.AddInt16("timing_h_sync_start",fDisplayTiming.h_sync_start);
+	container.AddInt16("timing_h_sync_end",fDisplayTiming.h_sync_end);
+	container.AddInt16("timing_h_total",fDisplayTiming.h_total);
+	container.AddInt16("timing_v_display",fDisplayTiming.v_display);
+	container.AddInt16("timing_v_sync_start",fDisplayTiming.v_sync_start);
+	container.AddInt16("timing_v_sync_end",fDisplayTiming.v_sync_end);
+	container.AddInt16("timing_v_total",fDisplayTiming.v_total);
+	container.AddInt32("timing_flags",fDisplayTiming.flags);
+	
+	container.AddInt32("color_space",fSpace);
+	container.AddData("bgcolor",B_RGB_COLOR_TYPE,&color,sizeof(rgb_color));
+	
+	container.AddInt16("virtual_width",fVirtualWidth);
+	container.AddInt16("virtual_height",fVirtualHeight);
+	
+	sprintf(fieldname,"%d",index);
+	
+	// Just in case...
+	msg->RemoveName(fieldname);
+	
+	msg->AddMessage(fieldname,&container);
 }
 
 //----------------------------------------------------------------------------------
@@ -1029,9 +1122,43 @@ void Workspace::PutSettings(BMessage *msg, const int32 &index) const
 	\param msg BMessage pointer to receive the settings
 	\param index The index number of the workspace in the desktop
 */
-void Workspace::PutDefaultSettings(BMessage *msg, const int32 &index)
+void Workspace::PutDefaultSettings(BMessage *msg, const uint8 &index)
 {
-	// TODO: Implement
+	if(!msg)
+		return;
+	
+	BMessage container;
+	rgb_color color={ 0,0,0,255 };
+	
+	// a little longer than we need in case someone tries to pass index=255 or something
+	char fieldname[4];
+	
+	// These default settings the same ones as found in ~/config/settings/
+	// app_server_settings on R5
+	
+	container.AddInt32("timing_pixel_clock",25175);
+	container.AddInt16("timing_h_display",640);
+	container.AddInt16("timing_h_sync_start",656);
+	container.AddInt16("timing_h_sync_end",752);
+	container.AddInt16("timing_h_total",800);
+	container.AddInt16("timing_v_display",480);
+	container.AddInt16("timing_v_sync_start",490);
+	container.AddInt16("timing_v_sync_end",492);
+	container.AddInt16("timing_v_total",525);
+	container.AddInt32("timing_flags",0);
+	
+	container.AddInt32("color_space",B_CMAP8);
+	container.AddData("bgcolor",B_RGB_COLOR_TYPE,&color,sizeof(rgb_color));
+	
+	container.AddInt16("virtual_width",640);
+	container.AddInt16("virtual_height",480);
+	
+	sprintf(fieldname,"%d",index);
+	
+	// Just in case...
+	msg->RemoveName(fieldname);
+	
+	msg->AddMessage(fieldname,&container);
 }
 
 //----------------------------------------------------------------------------------
