@@ -1,18 +1,11 @@
 SubDir OBOS_TOP src apps midiplayer ;
 
-AddResources MidiPlayer :
-	MidiPlayer.rdef
-;
-
 App MidiPlayer :
 	MidiPlayerApp.cpp 
 	MidiPlayerWindow.cpp 
 	ScopeView.cpp
 	SynthBridge.cpp
+	: libbe.so libmidi.so libmidi2.so
+	: MidiPlayer.rdef
 ;
 
-LinkSharedOSLibs MidiPlayer : 
-	be 
-	midi
-	midi2
-;
