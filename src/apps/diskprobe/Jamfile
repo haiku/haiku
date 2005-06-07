@@ -2,13 +2,17 @@ SubDir OBOS_TOP src apps diskprobe ;
 
 UsePrivateHeaders shared ;
 
-AddResources DiskProbe : DiskProbe.rdef ;
-
 if ! $(DANO_COMPATIBLE) {
 	local defines = COMPILE_FOR_R5 ;
 	defines = [ FDefines $(defines) ] ;
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) ;
+}
+
+local r5_src = strlcpy.c ;
+
+if $(HAIKU_COMPATIBLE) {
+	r5_src = ;
 }
 
 App DiskProbe :
@@ -22,6 +26,15 @@ App DiskProbe :
 	ProbeView.cpp
 	OpenWindow.cpp
 	FindWindow.cpp
+	$(r5_src)
+	: libbe.so libtracker.so libtranslation.so
+	: DiskProbe.rdef
 	;
 
-LinkSharedOSLibs DiskProbe : be tracker translation ;
+if $(HAIKU_COMPATIBLE) {
+	LinkSharedOSLibs DiskProbe : libroot.so ;
+}
+
+SEARCH on [ FGristFiles
+                strlcpy.c
+        ] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
