@@ -12,5 +12,5 @@ App Expander :
 	DirectoryFilePanel.cpp
 	ExpanderRules.cpp ;
 
-LinkSharedOSLibs Expander : be tracker ;
+LinkSharedOSLibs Expander : libbe.so libtracker.so ;
 
