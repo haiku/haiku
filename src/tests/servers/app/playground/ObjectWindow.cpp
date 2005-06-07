@@ -58,16 +58,12 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 	BMenuBar* menuBar = new BMenuBar(b, "menu bar");
 	AddChild(menuBar);
 
-	BMenu* menu = new BMenu("Menus");
+	BMenu* menu = new BMenu("File");
 	menuBar->AddItem(menu);
 
 	BMenuItem* menuItem = new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED),
-										'T');
+										'Q');
 	menu->AddItem(menuItem);
-
-	menuBar->AddItem(new BMenu("don't"));
-	menuBar->AddItem(new BMenu("work!"));
-	menuBar->AddItem(new BMenu("(yet)"));
 
 	b = Bounds();
 	b.top = menuBar->Bounds().bottom + 1;
@@ -277,10 +273,8 @@ ObjectWindow::MessageReceived(BMessage* message)
 		case MSG_CLEAR: {
 			BAlert *alert = new BAlert("Playground", "Do you really want to clear all drawing objects?", "No", "Yes");
 			if (alert->Go() == 1) {
-printf("calling make empty\n");
 				fObjectView->MakeEmpty();
 			}
-printf("done\n");
 			break;
 		}
 		case MSG_SET_PEN_SIZE:
