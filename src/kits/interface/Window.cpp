@@ -225,12 +225,7 @@ BWindow::~BWindow()
 
 	noOfItems = accelList.CountItems();
 	for (int index = noOfItems-1; index >= 0; index--) {
-		_BCmdKey *cmdKey = (_BCmdKey *)accelList.ItemAt(index);
-
-		accelList.RemoveItem(index);
-
-		delete cmdKey->message;
-		delete cmdKey;
+		delete (_BCmdKey*)accelList.ItemAt(index);
 	}
 
 	// TODO: release other dynamically-allocated objects
@@ -1185,7 +1180,8 @@ BWindow::PulseRate() const
 void
 BWindow::AddShortcut(uint32 key, uint32 modifiers, BMenuItem *item)
 {
-	AddShortcut(key, modifiers, item->Message(), this);
+	if (item->Message())
+		AddShortcut(key, modifiers, new BMessage(*item->Message()), this);
 }
 
 
@@ -1212,21 +1208,15 @@ BWindow::AddShortcut(uint32 key, uint32 modifiers, BMessage *msg, BHandler *targ
 
 	modifiers = modifiers | B_COMMAND_KEY;
 
-	_BCmdKey *cmdKey = new _BCmdKey;
-	cmdKey->key = key;
-	cmdKey->modifiers = modifiers;
-	cmdKey->message = msg;
+	_BCmdKey *cmdKey = new _BCmdKey(key, modifiers, msg);
 
-	if (target == NULL)
-		cmdKey->targetToken	= B_ANY_TOKEN;
-	else
+	if (target)
 		cmdKey->targetToken	= _get_object_token_(target);
 
 	// removes the shortcut from accelList if it exists!
 	RemoveShortcut(key, modifiers);
 
-	accelList.AddItem(cmdKey);
-
+	accelList.AddItem((void*)cmdKey);
 }
 
 
@@ -1239,8 +1229,6 @@ BWindow::RemoveShortcut(uint32 key, uint32 modifiers)
 		_BCmdKey *cmdKey = (_BCmdKey *)accelList.ItemAt(index);
 
 		accelList.RemoveItem(index);
-
-		delete cmdKey->message;
 		delete cmdKey;
 	}
 }
@@ -2125,6 +2113,9 @@ BWindow::InitData(BRect frame, const char* title, window_look look,
 	if (err == B_OK && rCode == SERVER_TRUE)
 		fLink->Read<port_id>(&send_port);
 	fLink->SetSendPort(send_port);
+
+	if (locked)
+		be_app->Unlock();
 
 	STRACE(("Server says that our send port is %ld\n", send_port));
 

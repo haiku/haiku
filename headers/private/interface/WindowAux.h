@@ -50,6 +50,20 @@ struct  _BCmdKey{
 	BMessage*	message;
 	BHandler*	target;
 	int32		targetToken;
+
+	_BCmdKey(uint32 k, uint32 mod, BMessage* m = NULL)
+		: key(k),
+		  modifiers(mod),
+		  message(m),
+		  target(NULL),
+		  targetToken(B_ANY_TOKEN)
+	{
+	}
+	~_BCmdKey()
+	{
+		delete message;
+	}
+
 };
 
 #endif // _WINDOWAUX_H
