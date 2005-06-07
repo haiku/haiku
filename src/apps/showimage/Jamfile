@@ -1,7 +1,5 @@
 SubDir OBOS_TOP src apps showimage ;
 
-AddResources ShowImage : ShowImage.rdef ;
-
 App ShowImage : ShowImageApp.cpp
 	ShowImageConstants.cpp
 	ShowImageSettings.cpp
@@ -12,7 +10,7 @@ App ShowImage : ShowImageApp.cpp
 	PrintOptionsWindow.cpp
 	Filter.cpp
 	EntryMenuItem.cpp
+	: libbe.so libtracker.so libtranslation.so
+	: ShowImage.rdef
 	;
-
-LinkSharedOSLibs ShowImage : be tracker translation ;
 
