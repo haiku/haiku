@@ -1,7 +1,5 @@
 SubDir OBOS_TOP src prefs menu ;
 
-AddResources Menu : Menu.rdef ;
-
 Preference Menu : 
 	BitmapMenuItem.cpp 
 	ColorPicker.cpp 
