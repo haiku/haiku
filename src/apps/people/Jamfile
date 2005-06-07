@@ -1,13 +1,11 @@
 SubDir OBOS_TOP src apps people ;
 
-AddResources People : People.rdef ;
-
 App People : main.cpp
 	PeopleApp.cpp
 	PeopleView.cpp
 	PeopleWindow.cpp 
 	TTextControl.cpp
+	: libbe.so libtracker.so
+	: People.rdef
 	;
-
-LinkSharedOSLibs People : be tracker ;
 
