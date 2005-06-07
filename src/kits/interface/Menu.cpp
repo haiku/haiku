@@ -116,7 +116,8 @@ sPropList[] = {
 
 
 BMenu::BMenu(const char *name, menu_layout layout)
-	:	BView(BRect(), name, 0,	B_WILL_DRAW),
+//	:	BView(BRect(), name, 0,	B_WILL_DRAW),
+	:	BView(BRect(0.0, 0.0, 5.0, 5.0), name, 0,	B_WILL_DRAW),
 		fChosenItem(NULL),
 		fPad(14.0f, 2.0f, 20.0f, 0.0f),
 		fSelected(NULL),
@@ -1191,7 +1192,7 @@ BMenu::_AddItem(BMenuItem *item, int32 index)
 		root = root->Supermenu();
 
 	if (root->Window())
-		Install(root->Window());
+		item->Install(root->Window());
 	
 	return err;
 }
