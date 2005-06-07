@@ -145,7 +145,7 @@ main(long argc, char* argv[])
 //	pass in pixelCount to maintain backward compatibility of setting
 //	the pixelcount from the command line
 TApp::TApp(int32 pixelCount)
-	:BApplication("application/x-vnd.OBOS.Magnify")
+	:BApplication("application/x-vnd.Haiku.Magnify")
 {
 	TWindow* magWindow = new TWindow(pixelCount);
 	magWindow->Show();
@@ -173,7 +173,7 @@ TApp::ReadyToRun()
 void
 TApp::AboutRequested(void)
 {
-	(new BAlert("", "Magnify!\n\n(C)2002 OBOS\n(C)1999 Be Inc.\n\nNow with even more features and recompiled for OpenBeOS.", "OK"))->Go();
+	(new BAlert("", "Magnify!\n\n(C)2002-2005 Haiku\n(C)1999 Be Inc.\n\nNow with even more features and recompiled for OpenBeOS.", "OK"))->Go();
 }
 
 //******************************************************************************
@@ -185,7 +185,7 @@ TApp::AboutRequested(void)
 const int32 kBorderSize = 10;
 
 TWindow::TWindow(int32 pixelCount)
-	: BWindow( BRect(0,0,0,0), "OBOS Magnify", B_TITLED_WINDOW,
+	: BWindow( BRect(0,0,0,0), "Magnify", B_TITLED_WINDOW,
 		B_OUTLINE_RESIZE)
 {
 	GetPrefs(pixelCount);
@@ -347,7 +347,7 @@ TWindow::QuitRequested()
 //		show info	(rgb, location)
 //		pixel count
 //		pixel size
-const char* const kAppName = "OBOS Magnify";
+const char* const kAppName = "Magnify";
 const bool kDefaultShowGrid = true;
 const bool kDefaultShowInfo = true;
 const int32 kDefaultPixelCount = 32;
