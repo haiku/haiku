@@ -49,7 +49,7 @@ Preference Devices :
 	cm_wrapper.c
 	DevicesInfo.cpp
 	ConfigurationWindow.cpp
-	: be
+	: libbe.so
 ;
 
 Includes [ FGristFiles DevicesInfo.cpp ] : [ FGristFiles isapnpids.h usbdevs.h usbdevs_data.h ] ;
