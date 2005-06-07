@@ -34,6 +34,7 @@
 #include <Screen.h>
 #include <Window.h>
 
+#include <MenuPrivate.h>
 #include <MenuWindow.h>
 
 #ifndef COMPILE_FOR_R5
@@ -117,7 +118,7 @@ sPropList[] = {
 
 BMenu::BMenu(const char *name, menu_layout layout)
 //	:	BView(BRect(), name, 0,	B_WILL_DRAW),
-	:	BView(BRect(0.0, 0.0, 5.0, 5.0), name, 0,	B_WILL_DRAW),
+	:	BView(BRect(0.0, 0.0, 5.0, 5.0), name, 0, B_WILL_DRAW),
 		fChosenItem(NULL),
 		fPad(14.0f, 2.0f, 20.0f, 0.0f),
 		fSelected(NULL),
@@ -810,12 +811,10 @@ BMenu::ResolveSpecifier(BMessage *msg, int32 index,
 status_t
 BMenu::GetSupportedSuites(BMessage *data)
 {
-	status_t err;
-
 	if (data == NULL)
 		return B_BAD_VALUE;
 
-	err = data->AddString("suites", "suite/vnd.Be-menu");
+	status_t err = data->AddString("suites", "suite/vnd.Be-menu");
 
 	if (err < B_OK)
 		return err;
@@ -1105,7 +1104,7 @@ BMenu::_track(int *action, long start)
 	BPoint location;
 	ulong buttons;
 	BMenuItem *item = NULL;
-	int localAction = 0;
+	int localAction = MENU_ACT_NONE;
 	do {
 		if (LockLooper()) {
 			GetMouse(&location, &buttons);
@@ -1120,7 +1119,7 @@ BMenu::_track(int *action, long start)
 				if (item != fSelected)
 					SelectItem(item);
 				
-				int submenuAction = 0;
+				int submenuAction = MENU_ACT_NONE;
 				BMenuItem *submenuItem = NULL;	
 				// TODO: Review this as it doesn't work very well,
 				// BMenu::_track() isn't always called when needed.
@@ -1128,7 +1127,7 @@ BMenu::_track(int *action, long start)
 					UnlockLooper();
 					
 					submenuItem = item->Submenu()->_track(&submenuAction);
-					if (submenuAction == 5) {
+					if (submenuAction == MENU_ACT_CLOSE) {
 						item = submenuItem;
 						localAction = submenuAction;
 						break;
@@ -1145,15 +1144,11 @@ BMenu::_track(int *action, long start)
 		snooze(50000);
 	} while (buttons != 0);
 	
-	// TODO: A deeper investigation of actions
-	// would be nice. Consider building an enum
-	// with the possible actions, and putting it in a
-	// private, shared header (BMenuBar needs to know about them too).
-	if (localAction == 0) {
+	if (localAction == MENU_ACT_NONE) {
 		if (buttons != 0)
-			localAction = 0;
+			localAction = MENU_ACT_NONE;
 		else 
-			localAction = 5;
+			localAction = MENU_ACT_CLOSE;
 	}
 	
 	if (action != NULL)
@@ -1258,11 +1253,13 @@ void
 BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 						  float* width, float* height)
 {
-	// TODO: Take "bestFit", "moveItems", "index" into account.
+	// TODO: Take "bestFit", "moveItems", "index" into account,
+	// Recalculate only the needed items,
+	// not the whole layout every time
 	BRect frame(0, 0, 0, 0);
 	float iWidth, iHeight;
 	BMenuItem *item = NULL;
-	
+
 	switch (fLayout) {
 		case B_ITEMS_IN_COLUMN:
 		{
@@ -1270,14 +1267,14 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 				item = ItemAt(i);			
 				if (item != NULL) {
 					item->GetContentSize(&iWidth, &iHeight);
-	
+					
 					if (item->fModifiers && item->fShortcutChar)
 						iWidth += 25.0f;
-			
+					
 					item->fBounds.left = 0.0f;
 					item->fBounds.top = frame.bottom;
 					item->fBounds.bottom = item->fBounds.top + iHeight + fPad.top + fPad.bottom;
-
+					
 					frame.right = max_c(frame.right, iWidth + fPad.left + fPad.right) + 20;
 					frame.bottom = item->fBounds.bottom + 1.0f;
 				}
@@ -1295,26 +1292,26 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 		{
 			font_height fh;
 			GetFontHeight(&fh);
-			frame = BRect(0.0f, 0.0f, 0.0f,
-				(float)ceil(fh.ascent) + (float)ceil(fh.descent) + fPad.top + fPad.bottom);
+			frame = BRect(0.0f, 0.0f, 0.0f,	
+				(float)ceil(fh.ascent) + (float)ceil(fh.descent) + fPad.top + fPad.bottom);	
 
 			for (int32 i = 0; i < fItems.CountItems(); i++) {
 				item = ItemAt(i);
 				if (item != NULL) {
 					item->GetContentSize(&iWidth, &iHeight);
-
+					
 					item->fBounds.left = frame.right;
 					item->fBounds.top = 0.0f;
 					item->fBounds.right = item->fBounds.left + iWidth + fPad.left + fPad.right;
-
-					frame.right = item->fBounds.right + 1.0f;
+					
+					frame.right = item->Frame().right + 1.0f;
 					frame.bottom = max_c(frame.bottom, iHeight + fPad.top + fPad.bottom);
 				}
 			}
 			
 			for (int32 i = 0; i < fItems.CountItems(); i++)
-				ItemAt(i)->fBounds.bottom = frame.bottom;
-
+				ItemAt(i)->fBounds.bottom = frame.bottom;			
+			
 			frame.right = (float)ceil(frame.right) + 8.0f;
 			break;
 		}
@@ -1336,7 +1333,7 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 		default:
 			break;
 	}
-	
+		
 	// This is for BMenuBar.
 	if ((ResizingMode() & B_FOLLOW_LEFT_RIGHT) == B_FOLLOW_LEFT_RIGHT) {
 		if (Parent())
@@ -1433,7 +1430,7 @@ BMenu::OverSubmenu(BMenuItem *item, BPoint loc)
 {
 	// we assume that loc is in screen coords
 	BMenu *subMenu = item->Submenu();
-	if (subMenu == NULL)
+	if (subMenu == NULL || subMenu->Window() == NULL)
 		return false;
 	
 	if (subMenu->Window()->Frame().Contains(loc))
@@ -1557,14 +1554,28 @@ BMenu::CurrentSelection() const
 bool 
 BMenu::SelectNextItem(BMenuItem *item, bool forward)
 {
-	return false;
+	BMenuItem *nextItem = NextItem(item, forward);
+	if (nextItem == NULL)
+		return false;
+	
+	SelectItem(nextItem);
+	return true;
 }
 
 
 BMenuItem *
 BMenu::NextItem(BMenuItem *item, bool forward) const
 {
-	return NULL;
+	int32 index = fItems.IndexOf(item);
+	if (forward)
+		index++;
+	else
+		index--;
+		
+	if (index < 0 || index >= fItems.CountItems())
+		return NULL;
+
+	return ItemAt(index);	
 }
 
 

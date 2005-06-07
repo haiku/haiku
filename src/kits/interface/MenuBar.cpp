@@ -33,6 +33,7 @@
 #include <Window.h>
 
 #include <AppMisc.h>
+#include <MenuPrivate.h>
 #include <TokenSpace.h>
 
 struct menubar_data
@@ -142,8 +143,7 @@ BMenuBar::Draw(BRect updateRect)
 	
 		// Restore the background color in case a menuitem
 		// was selected.
-		SetHighColor(ui_color(B_MENU_BACKGROUND_COLOR));
-		FillRect(bounds & updateRect);
+		DrawBackground(bounds & updateRect);
 			
 		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_LIGHTEN_2_TINT));
 		StrokeLine(BPoint(0.0f, bounds.bottom - 2.0f), BPoint(0.0f, 0.0f));
@@ -399,7 +399,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 	// but doesn't work well
 	BMenuItem *resultItem = NULL;
 	BWindow *window = Window();
-	int localAction;
+	int localAction = MENU_ACT_NONE;
 	bool exitLoop = false;
 	do {
 		if (window->LockWithTimeout(200000) < B_OK)
@@ -436,8 +436,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 					if (window->LockWithTimeout(200000) < B_OK)
 						break;
 						
-					// the returned action is "5" when the BMenu is closed.
-				} while (localAction != 5);
+				} while (localAction != MENU_ACT_CLOSE);
 			}
 			
 			if (window->IsLocked()) {
@@ -478,7 +477,7 @@ BMenuBar::StealFocus()
 	}
 }
 
-
+/*
 void 
 BMenuBar::RestoreFocus()
 {
@@ -495,7 +494,7 @@ BMenuBar::RestoreFocus()
 		window->Unlock();
 	}
 }
-
+*/
 
 void 
 BMenuBar::InitData(menu_layout layout)
