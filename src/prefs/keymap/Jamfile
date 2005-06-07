@@ -10,4 +10,4 @@ Preference Keymap :
 	KeymapListItem.cpp
 	Keymap.cpp
 	KeymapTextView.cpp
-	: be tracker ;
+	: libbe.so libtracker.so ;
