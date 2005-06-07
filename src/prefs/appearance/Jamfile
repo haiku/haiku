@@ -2,7 +2,6 @@ SubDir OBOS_TOP src prefs appearance ;
 
 UseFreeTypeHeaders ;
 UsePrivateHeaders app [ FDirName servers app ] ;
-AddResources Appearance : Appearance.rdef ;
 
 Preference Appearance :
 	APRMain.cpp
@@ -17,6 +16,7 @@ Preference Appearance :
 	ColorWell.cpp
 	ColorWhichItem.cpp
 	CursorWhichItem.cpp
- ;
+	: libbe.so libtracker.so libtranslation.so libappserver.so libopenbeos.so
+	: Appearance.rdef
+	;
 
-LinkSharedOSLibs Appearance : be tracker translation libappserver.so libopenbeos.so ;

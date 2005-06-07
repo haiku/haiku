@@ -4,12 +4,11 @@ if $(TARGET_PLATFORM) != haiku {
         SubDirC++Flags -fmultiple-symbol-spaces ;
 }
 
-AddResources Sounds : Sounds.rdef ;
-
 Preference Sounds : 
 	HApp.cpp 
 	HEventItem.cpp 
 	HWindow.cpp 
 	HEventList.cpp 
 	: libbe.so libmedia.so libgame.so libtracker.so
-;
+	: Sounds.rdef
+	;

@@ -1,7 +1,5 @@
 SubDir OBOS_TOP src prefs fonts ;
 
-AddResources Fonts : Fonts.rdef ;
-
 Preference Fonts :
 	ButtonView.cpp
 	CacheView.cpp
@@ -10,6 +8,8 @@ Preference Fonts :
 	FontView.cpp
 	main.cpp
 	MainWindow.cpp
-	Pref_Utils.cpp ;
+	Pref_Utils.cpp 
+	: libbe.so
+	: Fonts.rdef
+	;
 
-LinkSharedOSLibs Fonts : be ;

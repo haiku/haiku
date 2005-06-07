@@ -505,9 +505,10 @@ rule StdBinCommands
 
 rule Preference
 {
-	# Preference <name> : <sources> : <libraries> ;
+	# Preference <name> : <sources> : <libraries> : <res> ;
 	SetupIncludes ;
 	SetupObjectsDir ;
+	AddResources $(1) : $(4) ;
 	Main $(1) : $(2) ;
 	MakeLocate $(1) : $(OBOS_PREFS_DIR) ;
 	LinkSharedOSLibs $(1) : $(3) ;

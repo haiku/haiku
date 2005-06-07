@@ -2,8 +2,18 @@ SubDir OBOS_TOP src prefs screen ;
 
 SubDirC++Flags [ FDefines BEOS_R5_COMPATIBLE ] ;
 
-AddResources Screen : Screen.rdef ;
+Preference Screen : 
+	AlertView.cpp 
+	AlertWindow.cpp 
+	RefreshSlider.cpp 
+	RefreshView.cpp 
+	RefreshWindow.cpp 
+	Screen.cpp 
+	ScreenDrawView.cpp 
+	ScreenSettings.cpp 
+	ScreenWindow.cpp 
+	Utility.cpp 
+	: libbe.so
+	: Screen.rdef
+	;
 
-Preference Screen : AlertView.cpp AlertWindow.cpp RefreshSlider.cpp RefreshView.cpp RefreshWindow.cpp Screen.cpp ScreenDrawView.cpp ScreenSettings.cpp ScreenWindow.cpp Utility.cpp ;
-
-LinkSharedOSLibs Screen : be root ;

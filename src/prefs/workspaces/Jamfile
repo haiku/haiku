@@ -1,7 +1,8 @@
 SubDir OBOS_TOP src prefs workspaces ;
 
-AddResources Workspaces : Workspaces.rdef ;
+Preference Workspaces : 
+	Workspaces.cpp 
+	: libbe.so 
+	: Workspaces.rdef 
+	;
 
-Preference Workspaces : Workspaces.cpp ;
-
-LinkSharedOSLibs Workspaces : be root ;

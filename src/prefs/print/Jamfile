@@ -2,8 +2,6 @@ SubDir OBOS_TOP src prefs print ;
 
 UsePrivateHeaders interface shared print ;
 
-AddResources Printers : Printers.FileTypes.rdef ;
-
 Preference Printers :
 	AddPrinterDialog.cpp
 	Printers.cpp
@@ -11,16 +9,12 @@ Preference Printers :
 	PrinterListView.cpp
 	JobListView.cpp
 	SpoolFolder.cpp
-	Globals.cpp ;
+	Globals.cpp 
+	: libbe.so libtranslation.so libprint.a
+	: Printers.FileTypes.rdef
+	;
 
 # TODO remove dependency to libtranslation (BeUtils) 
-LinkSharedOSLibs 
-	Printers 
-	: 
-	be 
-	translation 
-	libprint.a 
-	;
 
 Package haiku-printingkit-cvs :
 	Printers :

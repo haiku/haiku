@@ -7,8 +7,6 @@ if $(TARGET_PLATFORM) != haiku {
 
 UsePrivateHeaders input ;
 
-AddResources Mouse : Mouse.rdef ;
-
 Preference Mouse : 
 	Mouse.cpp 
 	MouseSettings.cpp 
@@ -16,5 +14,6 @@ Preference Mouse :
 	MouseView.cpp 
 	SettingsView.cpp
 	: libtranslation.so libbe.so
+	: Mouse.rdef
 	;
 

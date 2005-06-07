@@ -2,6 +2,16 @@ SubDir OBOS_TOP src prefs menu ;
 
 AddResources Menu : Menu.rdef ;
 
-Preference Menu : BitmapMenuItem.cpp ColorPicker.cpp ColorWindow.cpp FontMenu.cpp FontSizeMenu.cpp MenuApp.cpp MenuBar.cpp MenuWindow.cpp ;
+Preference Menu : 
+	BitmapMenuItem.cpp 
+	ColorPicker.cpp 
+	ColorWindow.cpp 
+	FontMenu.cpp 
+	FontSizeMenu.cpp 
+	MenuApp.cpp 
+	MenuBar.cpp 
+	MenuWindow.cpp 
+	: libtranslation.so libbe.so
+	: Menu.rdef
+	;
 
-LinkSharedOSLibs Menu : translation be root ;

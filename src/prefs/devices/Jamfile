@@ -1,7 +1,5 @@
 SubDir OBOS_TOP src prefs devices ;
 
-AddResources Devices : Devices.rdef ;
-
 rule ISAPnPHeaderGen
 {
 	SetupObjectsDir ;
@@ -50,6 +48,7 @@ Preference Devices :
 	DevicesInfo.cpp
 	ConfigurationWindow.cpp
 	: libbe.so
+	: Devices.rdef
 ;
 
 Includes [ FGristFiles DevicesInfo.cpp ] : [ FGristFiles isapnpids.h usbdevs.h usbdevs_data.h ] ;
