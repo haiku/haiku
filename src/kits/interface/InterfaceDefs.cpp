@@ -786,7 +786,7 @@ copy_from_end(const char* src, char* dst, uint32 numChars, uint32 length,
 			// ups, we definitely don't fit. go back until the ellipsis fits
 			currentWidth += ellipsisWidth;
 			// go forward again until ellipsis fits (already beyond the target)
-			for (int32 c2 = c; c2 < (int32)numChars; c2++) {
+			for (uint32 c2 = c; c2 < numChars; c2++) {
 //printf(" backward: %c (%ld) (%.1f - %.1f = %.1f)\n", *dst, c2, currentWidth, escapementArray[c2] * size, currentWidth - escapementArray[c2] * size);
 				currentWidth -= escapementArray[c2] * size;
 				do {
@@ -882,6 +882,7 @@ truncate_string(const char* string,
 					// FALL THROUGH (at least do something)
 				case B_TRUNCATE_MIDDLE:
 
+					// TODO: VERY BROKEN! (will always insert "…" even if width is large enough)
 					float halfWidth = width / 2.0;
 
 					dst = copy_from_start(src, dst, numChars,
