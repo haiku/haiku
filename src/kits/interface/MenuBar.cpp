@@ -477,7 +477,7 @@ BMenuBar::StealFocus()
 	}
 }
 
-/*
+
 void 
 BMenuBar::RestoreFocus()
 {
@@ -494,7 +494,7 @@ BMenuBar::RestoreFocus()
 		window->Unlock();
 	}
 }
-*/
+
 
 void 
 BMenuBar::InitData(menu_layout layout)
