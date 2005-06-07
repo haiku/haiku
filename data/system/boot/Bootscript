@@ -71,17 +71,27 @@ fi
 # Launch servers
 
 # We must wait for the app_server and registrar to be ready
-launch $SERVERS/fake_app_server picasso
-#launch $SERVERS/app_server picasso			# launch app_server
-launch $SERVERS/registrar _roster_thread_		# launch registrar
+if [ "$SAFEMODE" != "yes" ]; then
+	launch $SERVERS/app_server picasso		# launch app_server
+else
+	launch $SERVERS/fake_app_server picasso
+fi
+
+launch $SERVERS/registrar _roster_thread_	# launch registrar
 launch $SERVERS/debug_server				# launch debug_server
 
 if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/syslog_daemon
+	# ToDo: the input_server is supposed to be started by the app_server
+	launch $SERVERS/input_server
 fi
 
-# Launch consoled (to be removed later - this starts the mini console)
-launch beos/bin/consoled
+# Launch MiniTerminal or consoled depending on $SAFEMODE
+if [ "$SAFEMODE" != "yes" ]; then
+	launch beos/apps/MiniTerminal
+else
+	launch beos/bin/consoled
+fi
 
 # Check for daily saving time
 # TODO to be launched when tracker and deskbar are launched
