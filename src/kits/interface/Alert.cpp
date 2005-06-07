@@ -27,6 +27,9 @@
 // Standard Includes -----------------------------------------------------------
 #include <string.h>
 
+// TODO: remove
+#include <stdio.h>
+
 // System Includes -------------------------------------------------------------
 #include <Invoker.h>
 #include <Looper.h>
@@ -676,7 +679,7 @@ BBitmap* BAlert::InitIcon()
 				if (rawIcon)
 				{
 					// Now build the bitmap
-					Icon = new BBitmap(BRect(0, 0, 31, 31), B_CMAP8);
+					Icon = new BBitmap(BRect(0, 0, 31, 31), 0, B_CMAP8);
 					Icon->SetBits(rawIcon, size, 0, B_CMAP8);
 				}
 			}
