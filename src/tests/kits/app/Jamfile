@@ -161,3 +161,4 @@ SubInclude OBOS_TOP src tests kits app bcursor ;
 SubInclude OBOS_TOP src tests kits app bmessenger ;
 SubInclude OBOS_TOP src tests kits app broster ;
 SubInclude OBOS_TOP src tests kits app common ;
+SubInclude OBOS_TOP src tests kits app messaging ;

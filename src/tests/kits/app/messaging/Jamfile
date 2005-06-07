@@ -1,0 +1,24 @@
+SubDir OBOS_TOP src tests kits app messaging ;
+
+UsePrivateHeaders app ;
+UsePrivateHeaders interface ;
+
+SimpleTest PortLinkTest :
+	PortLinkTest.cpp
+	PortLink.cpp
+	LinkMsgReader.cpp
+	LinkMsgSender.cpp
+
+	# PortLink accesses some private stuff directly
+	Shape.cpp
+	Region.cpp
+	RegionSupport.cpp
+
+	: be
+	;
+
+SEARCH on [ FGristFiles PortLink.cpp LinkMsgReader.cpp LinkMsgSender.cpp ]
+	= [ FDirName $(OBOS_TOP) src kits app ] ;
+
+SEARCH on [ FGristFiles Shape.cpp Region.cpp RegionSupport.cpp ]
+	= [ FDirName $(OBOS_TOP) src kits interface ] ;
