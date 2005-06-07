@@ -1,82 +1,63 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		LinkMsgSender.h
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//					Pahtz <pahtz@yahoo.com.au>
-//	Description:	Class for sending low-overhead port-based messaging
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Pahtz <pahtz@yahoo.com.au>
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
 #ifndef LINKMSGSENDER_H
 #define LINKMSGSENDER_H
 
+
 #include <OS.h>
 
-class LinkMsgSender
-{
-public:
-	LinkMsgSender(port_id sendport);
-	virtual ~LinkMsgSender(void);
 
-	status_t StartMessage(int32 code);
-	void CancelMessage(void);
-	status_t EndMessage(void);
-
-	status_t Flush(bigtime_t timeout = B_INFINITE_TIMEOUT);
+//namespace BPrivate {
 	
-	// see BPrivate::BAppServerLink which inherits from BPortLink
-	//status_t FlushWithReply(int32 *code);
+class LinkMsgSender {
+	public:
+		LinkMsgSender(port_id sendport);
+		virtual ~LinkMsgSender(void);
 
-	void SetPort(port_id port);
-	port_id	GetPort();
+		void SetPort(port_id port);
+		port_id	Port() { return fPort; }
 
-	status_t Attach(const void *data, ssize_t size);
-	status_t AttachString(const char *string);
-	template <class Type> status_t Attach(const Type& data)
-	{
-		return Attach(&data, sizeof(Type));
-	}
+		status_t StartMessage(int32 code, size_t minSize = 0);
+		void CancelMessage(void);
+		status_t EndMessage(bool needsReply = false);
 
-protected:
-	status_t FlushCompleted(ssize_t newbuffersize);
-	status_t AdjustReplyBuffer(bigtime_t timeout);
-	void ResetReplyBuffer();
-	
-	port_id	fSendPort;
+		status_t Flush(bigtime_t timeout = B_INFINITE_TIMEOUT, bool needsReply = false);
 
-	char	*fSendBuffer;
+		// see BPrivate::BAppServerLink which inherits from BPortLink
+		//status_t FlushWithReply(int32 *code);
 
-	int32	fSendPosition;	//current append position
+		status_t Attach(const void *data, size_t size);
+		status_t AttachString(const char *string);
+		template <class Type> status_t Attach(const Type& data)
+		{
+			return Attach(&data, sizeof(Type));
+		}
 
-	int32	fSendStart;	//start of current message
-	
-	int32	fSendBufferSize;
+	protected:
+		size_t SpaceLeft() const { return fBufferSize - fCurrentEnd; }
+		size_t CurrentMessageSize() const { return fCurrentEnd - fCurrentStart; }
 
-	int32	fSendCount;	//number of completed messages in buffer
+		status_t AdjustBuffer(size_t newBufferSize, char **_oldBuffer = NULL);
+		status_t FlushCompleted(size_t newBufferSize);
 
-	int32	fDataSize;	//size of data in recv buffer
-	int32	fReplySize;	//size of current reply message
-	
-	status_t fWriteError;	//Attach failed for current message
+		port_id	fPort;
+
+		char	*fBuffer;
+		size_t	fBufferSize;
+
+		uint32	fCurrentEnd;		// current append position
+		uint32	fCurrentStart;		// start of current message
+
+		status_t fCurrentStatus;
 };
 
+//}	// namespace BPrivate
 
-#endif
+#endif	/* LINKMSGSENDER_H */

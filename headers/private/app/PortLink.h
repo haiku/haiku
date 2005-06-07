@@ -1,34 +1,18 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		PortLink.h
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//					Pahtz <pahtz@yahoo.com.au>
-//	Description:	Class for low-overhead port-based messaging
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Pahtz <pahtz@yahoo.com.au>
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
 #ifndef _PORTLINK_H
 #define _PORTLINK_H
 
 #include <OS.h>
+#include <LinkMsgReader.h>
+#include <LinkMsgSender.h>
 
 /*
 	Error checking rules: (for if you don't want to check every return code)
@@ -45,48 +29,144 @@
 
 */
 
-class LinkMsgReader;
-class LinkMsgSender;
-class BPortLink
-{
-public:
-	BPortLink(port_id send = -1, port_id reply = -1);
-	virtual ~BPortLink();
+// ToDo: put this into the private namespace
+//namespace BPrivate {
 
-	status_t StartMessage(int32 code);
-	void CancelMessage();
-	status_t EndMessage();
+//class LinkMsgReader;
+//class LinkMsgSender;
 
-	status_t Flush(bigtime_t timeout = B_INFINITE_TIMEOUT);
-	
-	void SetSendPort(port_id port);
-	port_id	GetSendPort();
-	
-	void SetReplyPort(port_id port);
-	port_id	GetReplyPort();
+class BPortLink {
+	public:
+		BPortLink(port_id send = -1, port_id reply = -1);
+		virtual ~BPortLink();
 
-	status_t Attach(const void *data, ssize_t size);
-	status_t AttachString(const char *string);
-	status_t AttachRegion(const BRegion &region);
-	status_t AttachShape(BShape &shape);
-	template <class Type> status_t Attach(const Type& data)
-	{
-		return Attach(&data, sizeof(Type));
-	}
+		// send methods
 
-	status_t GetNextReply(int32 *code, bigtime_t timeout = B_INFINITE_TIMEOUT);
-	status_t Read(void *data, ssize_t size);
-	status_t ReadString(char **string);
-	status_t ReadRegion(BRegion *region);
-	status_t ReadShape(BShape *shape);
-	template <class T> status_t Read(T *data)
-	{
-		return Read(data,sizeof(T));
-	}
-	
-protected:
-	LinkMsgReader *fReader;
-	LinkMsgSender *fSender;
+		void SetSendPort(port_id port);
+		port_id	SendPort();
+
+		status_t StartMessage(int32 code, size_t minSize = 0);
+		void CancelMessage();
+		status_t EndMessage();
+
+		status_t Flush(bigtime_t timeout = B_INFINITE_TIMEOUT, bool needsReply = false);
+		status_t Attach(const void *data, ssize_t size);
+		status_t AttachString(const char *string);
+		status_t AttachRegion(const BRegion &region);
+		status_t AttachShape(BShape &shape);
+		template <class Type> status_t Attach(const Type& data);
+
+		// receive methods
+
+		void SetReplyPort(port_id port);
+		port_id	ReplyPort();
+
+		status_t GetNextReply(int32 *code, bigtime_t timeout = B_INFINITE_TIMEOUT);
+		status_t Read(void *data, ssize_t size);
+		status_t ReadString(char **string);
+		status_t ReadRegion(BRegion *region);
+		status_t ReadShape(BShape *shape);
+		template <class Type> status_t Read(Type *data);
+
+	protected:
+		LinkMsgReader *fReader;
+		LinkMsgSender *fSender;
 };
 
-#endif
+// sender inline functions
+
+inline void
+BPortLink::SetSendPort(port_id port)
+{
+	fSender->SetPort(port);
+}
+
+inline port_id
+BPortLink::SendPort()
+{
+	return fSender->Port();
+}
+
+inline status_t
+BPortLink::StartMessage(int32 code, size_t minSize)
+{
+	return fSender->StartMessage(code, minSize);
+}
+
+inline status_t
+BPortLink::EndMessage()
+{
+	return fSender->EndMessage();
+}
+
+inline void
+BPortLink::CancelMessage()
+{
+	fSender->CancelMessage();
+}
+
+inline status_t
+BPortLink::Flush(bigtime_t timeout, bool needsReply)
+{
+	return fSender->Flush(timeout, needsReply);
+}
+
+inline status_t
+BPortLink::Attach(const void *data, ssize_t size)
+{
+	return fSender->Attach(data, size);
+}
+
+inline status_t
+BPortLink::AttachString(const char *string)
+{
+	return fSender->AttachString(string);
+}
+
+template<class Type> status_t
+BPortLink::Attach(const Type &data)
+{
+	return Attach(&data, sizeof(Type));
+}
+
+// #pragma mark - receiver inline functions
+
+inline void
+BPortLink::SetReplyPort(port_id port)
+{
+	fReader->SetPort(port);
+}
+
+inline port_id
+BPortLink::ReplyPort()
+{
+	return fReader->Port();
+}
+
+inline status_t
+BPortLink::GetNextReply(int32 *code, bigtime_t timeout)
+{
+	return fReader->GetNextMessage(code, timeout);
+}
+
+inline status_t
+BPortLink::Read(void *data, ssize_t size)
+{
+	return fReader->Read(data, size);
+}
+
+inline status_t
+BPortLink::ReadString(char **string)
+{
+	return fReader->ReadString(string);
+}
+
+template <class Type> status_t
+BPortLink::Read(Type *data)
+{
+	return Read(data, sizeof(Type));
+}
+
+//}	// namespace BPrivate
+
+#endif	/* _PORTLINK_H */

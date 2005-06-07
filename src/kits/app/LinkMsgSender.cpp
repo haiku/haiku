@@ -4,7 +4,7 @@
  *
  * Authors:
  *		Pahtz <pahtz@yahoo.com.au>
- *		Axel Dörfler
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 /** Class for low-overhead port-based messaging */
@@ -30,80 +30,92 @@
 #	define STRACE(x) ;
 #endif
 
-//set Initial==Max for a fixed buffer size
-static const int32 kInitialSendBufferSize = 2048;
-static const int32 kMaxSendBufferSize = 2048;
+static const size_t kWatermark = kInitialBufferSize - 24;
+	// if a message is started after this mark, the buffer is flushed automatically
 
 
-LinkMsgSender::LinkMsgSender(port_id send)
+LinkMsgSender::LinkMsgSender(port_id port)
 	:
-	fSendPort(send), fSendBuffer(NULL), fSendPosition(0), fSendStart(0),
-	fSendBufferSize(0), fSendCount(0), fDataSize(0),
-	fReplySize(0), fWriteError(B_OK)
+	fPort(port),
+	fBuffer(NULL),
+	fBufferSize(0),
+
+	fCurrentEnd(0),
+	fCurrentStart(0),
+	fCurrentStatus(B_OK)
 {
 }
 
 
 LinkMsgSender::~LinkMsgSender()
 {
-	free(fSendBuffer);
+	free(fBuffer);
+}
+
+
+void
+LinkMsgSender::SetPort(port_id port)
+{
+	fPort = port;
 }
 
 
 status_t
-LinkMsgSender::StartMessage(int32 code)
+LinkMsgSender::StartMessage(int32 code, size_t minSize)
 {
 	// end previous message
 	if (EndMessage() < B_OK)	
 		CancelMessage();
 
-	if (fSendBufferSize == 0) {
-		fSendBuffer = (char *)malloc(kInitialSendBufferSize);
-		if (fSendBuffer == NULL) {
-			fWriteError = B_NO_MEMORY;
-			return B_NO_MEMORY;
-		}
-		fSendBufferSize = kInitialSendBufferSize;
+	if (minSize > kMaxBufferSize - sizeof(message_header))
+		return fCurrentStatus = B_BUFFER_OVERFLOW;
+
+	minSize += sizeof(message_header);
+
+	// Eventually flush buffer to make space for the new message.
+	// Note, we do not take the actual buffer size into account to not
+	// delay the time between buffer flushes too much.
+	if (fBufferSize > 0 && (minSize > SpaceLeft() || fCurrentStart >= kWatermark)) {
+		status_t status = Flush();
+		if (status < B_OK)
+			return status;
 	}
 
-	status_t err;
-	// must have space for at least size + code + flags
-	if (fSendBufferSize - fSendPosition < (int32)sizeof(message_header)) {
-		err = Flush();	// will set fSendPosition and fSendStart to 0
-		if (err < B_OK)
-			return err;
+	if (minSize > fBufferSize) {
+		if (AdjustBuffer(minSize) != B_OK)
+			return fCurrentStatus = B_NO_MEMORY;
 	}
 
-	message_header *header = (message_header *)(fSendBuffer + fSendStart);
+	message_header *header = (message_header *)(fBuffer + fCurrentStart);
 	header->size = 0;
 		// will be set later
 	header->code = code;
 	header->flags = 0;
 
-	STRACE(("info: LinkMsgSender buffered header %s [%lu %lu %lu].\n",
-		strcode(code), header->size, header->code, header->flags));
+	STRACE(("info: LinkMsgSender buffered header %s (%lx) [%lu %lu %lu].\n",
+		strcode(code), code, header->size, header->code, header->flags));
 
-	fSendPosition += sizeof(message_header);
+	fCurrentEnd += sizeof(message_header);
 	return B_OK;
 }
 
 
 status_t
-LinkMsgSender::EndMessage()
+LinkMsgSender::EndMessage(bool needsReply)
 {
-	if (fSendPosition == fSendStart || fWriteError < B_OK)
-		return fWriteError;
+	if (fCurrentEnd == fCurrentStart || fCurrentStatus < B_OK)
+		return fCurrentStatus;
 
 	// record the size of the message
-	message_header *header = (message_header *)(fSendBuffer + fSendStart);
-	header->size = fSendPosition - fSendStart;
+	message_header *header = (message_header *)(fBuffer + fCurrentStart);
+	header->size = CurrentMessageSize();
+	if (needsReply)
+		header->flags |= needsReply;
 
 	STRACE(("info: LinkMsgSender EndMessage() of size %ld.\n", header->size));
 
-	fSendCount++;	// increase the number of completed messages
-
-	fSendStart = fSendPosition;	// start of next new message
-
+	// bump to start of next message
+	fCurrentStart = fCurrentEnd;	
 	return B_OK;
 }
 
@@ -111,177 +123,161 @@ LinkMsgSender::EndMessage()
 void
 LinkMsgSender::CancelMessage()
 {
-	fSendPosition = fSendStart;
-	fWriteError = B_OK;
+	fCurrentEnd = fCurrentStart;
+	fCurrentStatus = B_OK;
 }
 
 
 status_t
-LinkMsgSender::Attach(const void *data, ssize_t size)
+LinkMsgSender::Attach(const void *data, size_t size)
 {
-	if (fWriteError < B_OK)
-		return fWriteError;
+	if (fCurrentStatus < B_OK)
+		return fCurrentStatus;
 
-	if (size <= 0) {
-		fWriteError = B_BAD_VALUE;
-		return B_BAD_VALUE;
-	}
+	if (size == 0)
+		return fCurrentStatus = B_BAD_VALUE;
 
-	if (fSendPosition == fSendStart)
+	if (fCurrentEnd == fCurrentStart)
 		return B_NO_INIT;	// need to call StartMessage() first
 
-	int32 remaining = fSendBufferSize - fSendPosition;
-	if (remaining < size) {
+	if (SpaceLeft() < size) {
 		// we have to make space for the data
 
-		int32 total = size + (fSendPosition - fSendStart);
-			// resulting size of current message
-
-		int32 newbuffersize;
-		if (total <= fSendBufferSize)
-			newbuffersize = fSendBufferSize;	// no change
-		else if (total > kMaxSendBufferSize) {
-			fWriteError = B_BAD_VALUE;
-			return B_BAD_VALUE;
-		} else if (total <= kInitialSendBufferSize)
-			newbuffersize = kInitialSendBufferSize;
-		else
-			newbuffersize = (total + B_PAGE_SIZE) - (total % B_PAGE_SIZE);
-
-		// FlushCompleted() to make space
-		status_t err;
-		err = FlushCompleted(newbuffersize);
-		if (err < B_OK) {
-			fWriteError = err;
-			return err;
-		}
+		status_t status = FlushCompleted(size + CurrentMessageSize());
+		if (status < B_OK)
+			return fCurrentStatus = status;
 	}
 
-	memcpy(fSendBuffer + fSendPosition, data, size);
-	fSendPosition += size;
-	return fWriteError;
-}
-
-
-status_t
-LinkMsgSender::FlushCompleted(ssize_t newbuffersize)
-{
-	char *buffer = NULL;
-	if (newbuffersize == fSendBufferSize)
-		buffer = fSendBuffer;	// keep existing buffer
-	else {
-		// create new larger buffer
-		buffer = (char *)malloc(newbuffersize);
-		if (buffer == NULL)
-			return B_NO_MEMORY;
-	}
-
-	int32 position = fSendPosition;
-	int32 start = fSendStart;
-	fSendPosition = fSendStart;	// trick to hide the incomplete message
-
-	status_t err;
-	err = Flush();
-	if (err < B_OK) {
-		fSendPosition = position;
-		if (buffer != fSendBuffer)
-			free(buffer);
-		return err;
-	}
-
-	// move the incomplete message to the start of the buffer
-	fSendPosition = min_c(position - start, newbuffersize);
-	memcpy(buffer, fSendBuffer + start, fSendPosition);
-
-	if (fSendBuffer != buffer) {
-		free(fSendBuffer);
-		fSendBuffer = buffer;
-		fSendBufferSize = newbuffersize;
-	}
+	memcpy(fBuffer + fCurrentEnd, data, size);
+	fCurrentEnd += size;
 
 	return B_OK;
-}
-
-
-void
-LinkMsgSender::SetPort(port_id port)
-{
-	fSendPort = port;
-}
-
-
-port_id
-LinkMsgSender::GetPort()
-{
-	return fSendPort;
-}
-
-
-status_t
-LinkMsgSender::Flush(bigtime_t timeout)
-{
-	if (fWriteError < B_OK)
-		return fWriteError;
-
-	EndMessage();
-	if (fSendCount == 0)
-		return B_OK;
-
-	STRACE(("info: LinkMsgSender Flush() waiting to send %ld messages of %ld bytes on port %ld.\n", fSendCount, fSendPosition, fSendPort));
-
-	// TODO: we only need AS_SERVER_PORTLINK when all OBOS uses LinkMsgSender
-	int32 protocol = (fSendCount > 1 ? AS_SERVER_SESSION : AS_SERVER_PORTLINK);
-
-	status_t err;
-	if (timeout != B_INFINITE_TIMEOUT) {
-		do {
-			err = write_port_etc(fSendPort, protocol, fSendBuffer,
-				fSendPosition, B_RELATIVE_TIMEOUT, timeout);
-		} while(err == B_INTERRUPTED);
-	} else {
-		do {
-			err = write_port(fSendPort, protocol, fSendBuffer, fSendPosition);
-		} while(err == B_INTERRUPTED);
-	}
-
-	if (err == B_OK) {
-		STRACE(("info: LinkMsgSender Flush() %ld messages total of %ld bytes on port %ld.\n", fSendCount, fSendPosition, fSendPort));
-		fSendPosition = 0;
-		fSendStart = 0;
-		fSendCount = 0;
-		return B_OK;
-	}
-
-	STRACE(("error info: LinkMsgSender Flush() failed for %ld bytes (%s) on port %ld.\n", fSendPosition, strerror(err), fSendPort));
-	return err;
 }
 
 
 status_t
 LinkMsgSender::AttachString(const char *string)
 {
-	status_t err;
-	if (string == NULL) {
-// TODO: This whole comm thing is so broken.... if we're for some
-// reason attaching a NULL string, and don't do it, the receiving
-// party will still try to read a string!! The whole communication
-// will be messed up if the stream does not contain what the client
-// things it contains. This is a quick fix (but just for this
-// particular problem). -Stephan
-//		return B_BAD_VALUE;
+	if (string == NULL)
 		string = "";
+
+	int32 length = strlen(string) + 1;
+	status_t status = Attach<int32>(length);
+	if (status < B_OK)
+		return status;
+
+	status = Attach(string, length);
+	if (status < B_OK)
+		fCurrentEnd -= sizeof(int32);	// rewind the transaction
+
+	return status;
+}
+
+
+status_t
+LinkMsgSender::AdjustBuffer(size_t newSize, char **_oldBuffer)
+{
+	// make sure the new size is within bounds
+	if (newSize <= kInitialBufferSize)
+		newSize = kInitialBufferSize;
+	else if (newSize > kMaxBufferSize)
+		return B_BUFFER_OVERFLOW;
+	else if (newSize > kInitialBufferSize)
+		newSize = (newSize + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+
+	char *buffer = NULL;
+	if (newSize == fBufferSize) {
+		// keep existing buffer
+		if (_oldBuffer)
+			*_oldBuffer = fBuffer;
+		return B_OK;
 	}
 
-	int32 len = strlen(string) + 1;
-	err = Attach<int32>(len);
-	if (err < B_OK)
+	// create new larger buffer
+	buffer = (char *)malloc(newSize);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
+	if (_oldBuffer)
+		*_oldBuffer = fBuffer;
+	else
+		free(fBuffer);
+
+	fBuffer = buffer;
+	fBufferSize = newSize;
+	return B_OK;
+}
+
+
+status_t
+LinkMsgSender::FlushCompleted(size_t newBufferSize)
+{
+	// we need to hide the incomplete message so that it's not flushed
+	int32 end = fCurrentEnd;
+	int32 start = fCurrentStart;
+	fCurrentEnd = fCurrentStart;
+
+	status_t status = Flush();
+	if (status < B_OK) {
+		fCurrentEnd = end;
+		return status;
+	}
+
+	char *oldBuffer = NULL;
+	status = AdjustBuffer(newBufferSize, &oldBuffer);
+	if (status != B_OK)
+		return status;
+
+	// move the incomplete message to the start of the buffer
+	fCurrentEnd = end - start;
+	if (oldBuffer != fBuffer) {
+		memcpy(fBuffer, oldBuffer + start, fCurrentEnd);
+		free(oldBuffer);
+	} else
+		memmove(fBuffer, fBuffer + start, fCurrentEnd);
+
+	return B_OK;
+}
+
+
+status_t
+LinkMsgSender::Flush(bigtime_t timeout, bool needsReply)
+{
+	if (fCurrentStatus < B_OK)
+		return fCurrentStatus;
+
+	EndMessage(needsReply);
+	if (fCurrentStart == 0)
+		return B_OK;
+
+	STRACE(("info: LinkMsgSender Flush() waiting to send messages of %ld bytes on port %ld.\n",
+		fCurrentEnd, fPort));
+
+	status_t err;
+	if (timeout != B_INFINITE_TIMEOUT) {
+		do {
+			err = write_port_etc(fPort, kLinkCode, fBuffer,
+				fCurrentEnd, B_RELATIVE_TIMEOUT, timeout);
+		} while (err == B_INTERRUPTED);
+	} else {
+		do {
+			err = write_port(fPort, kLinkCode, fBuffer, fCurrentEnd);
+		} while (err == B_INTERRUPTED);
+	}
+
+	if (err < B_OK) {
+		STRACE(("error info: LinkMsgSender Flush() failed for %ld bytes (%s) on port %ld.\n",
+			fCurrentEnd, strerror(err), fPort));
 		return err;
+	}
 
-	err = Attach(string, len);
-	if (err < B_OK)
-		fSendPosition -= sizeof(int32);	// rewind the transaction
+	STRACE(("info: LinkMsgSender Flush() messages total of %ld bytes on port %ld.\n",
+		fCurrentEnd, fPort));
 
-	return err;
+	fCurrentEnd = 0;
+	fCurrentStart = 0;
+
+	return B_OK;
 }
 
 

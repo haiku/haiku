@@ -49,7 +49,7 @@ ServerMemIO::ServerMemIO(size_t size)
 		BPrivate::BAppServerLink link;
 		link.StartMessage(AS_ACQUIRE_SERVERMEM);
 		link.Attach<size_t>(size);
-		link.Attach<port_id>(link.GetReplyPort());
+		link.Attach<port_id>(link.ReplyPort());
 		link.Flush();
 		
 		int32 code;

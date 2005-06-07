@@ -30,9 +30,6 @@ extern const char *bstrcode(int32 code);
 #	define STRACE(x) ;
 #endif
 
-static const int32 kInitialReceiveBufferSize = 2048;
-static const int32 kMaxReceiveBufferSize = 2048;
-
 
 LinkMsgReader::LinkMsgReader(port_id port)
 	:
@@ -56,13 +53,6 @@ LinkMsgReader::SetPort(port_id port)
 }
 
 
-port_id
-LinkMsgReader::GetPort()
-{
-	return fReceivePort;
-}
-
-
 status_t
 LinkMsgReader::GetNextMessage(int32 *code, bigtime_t timeout)
 {
@@ -82,7 +72,7 @@ LinkMsgReader::GetNextMessage(int32 *code, bigtime_t timeout)
 		remaining = fDataSize;
 		header = (message_header *)fRecvBuffer;
 	} else {
-		fRecvStart += fReplySize;	//start of the next message
+		fRecvStart += fReplySize;	// start of the next message
 		fRecvPosition = fRecvStart;
 		header = (message_header *)(fRecvBuffer + fRecvStart);
 	}
@@ -126,45 +116,46 @@ status_t
 LinkMsgReader::AdjustReplyBuffer(bigtime_t timeout)
 {
 	// Here we take advantage of the compiler's dead-code elimination
-	if (kInitialReceiveBufferSize == kMaxReceiveBufferSize) {
+	if (kInitialBufferSize == kMaxBufferSize) {
 		// fixed buffer size
 
 		if (fRecvBuffer != NULL)
 			return B_OK;
 
-		fRecvBuffer = (char *)malloc(kInitialReceiveBufferSize);
+		fRecvBuffer = (char *)malloc(kInitialBufferSize);
 		if (fRecvBuffer == NULL)
 			return B_NO_MEMORY;
-		fRecvBufferSize = kInitialReceiveBufferSize;
+
+		fRecvBufferSize = kInitialBufferSize;
 	} else {
 		STRACE(("info: LinkMsgReader getting port_buffer_size().\n"));
-		ssize_t buffersize;
+		ssize_t bufferSize;
 		if (timeout == B_INFINITE_TIMEOUT)
-			buffersize = port_buffer_size(fReceivePort);
+			bufferSize = port_buffer_size(fReceivePort);
 		else
-			buffersize = port_buffer_size_etc(fReceivePort, B_TIMEOUT, timeout);
-		STRACE(("info: LinkMsgReader got port_buffer_size() = %ld.\n", buffersize));
+			bufferSize = port_buffer_size_etc(fReceivePort, B_TIMEOUT, timeout);
+		STRACE(("info: LinkMsgReader got port_buffer_size() = %ld.\n", bufferSize));
 
-		if (buffersize < 0)
-			return (status_t)buffersize;
+		if (bufferSize < 0)
+			return (status_t)bufferSize;
 
 		// make sure our receive buffer is large enough
-		if (buffersize > fRecvBufferSize) {
-			if (buffersize <= kInitialReceiveBufferSize)
-				buffersize = kInitialReceiveBufferSize;
+		if (bufferSize > fRecvBufferSize) {
+			if (bufferSize <= (ssize_t)kInitialBufferSize)
+				bufferSize = (ssize_t)kInitialBufferSize;
 			else
-				buffersize = (buffersize + B_PAGE_SIZE) - (buffersize % B_PAGE_SIZE);
-			if (buffersize > kMaxReceiveBufferSize)
-				return B_ERROR;	//we can't continue
+				bufferSize = (bufferSize + B_PAGE_SIZE) - (bufferSize % B_PAGE_SIZE);
+			if (bufferSize > (ssize_t)kMaxBufferSize)
+				return B_ERROR;	// we can't continue
 
-			STRACE(("info: LinkMsgReader setting receive buffersize to %ld.\n", buffersize));
-			char *buffer = (char *)malloc(buffersize);
+			STRACE(("info: LinkMsgReader setting receive buffersize to %ld.\n", bufferSize));
+			char *buffer = (char *)malloc(bufferSize);
 			if (buffer == NULL)
 				return B_NO_MEMORY;
 
 			free(fRecvBuffer);
 			fRecvBuffer = buffer;
-			fRecvBufferSize = buffersize;
+			fRecvBufferSize = bufferSize;
 		}
 	}
 
@@ -182,34 +173,39 @@ LinkMsgReader::ReadFromPort(bigtime_t timeout)
 	if (err < B_OK)
 		return err;
 
-	int32 protocol;
-	ssize_t bytesread;	
+	int32 code;
+	ssize_t bytesRead;
+
 	STRACE(("info: LinkMsgReader reading port %ld.\n", fReceivePort));
-	if (timeout != B_INFINITE_TIMEOUT) {
-		do {
-			bytesread = read_port_etc(fReceivePort, &protocol, fRecvBuffer,
-				fRecvBufferSize, B_TIMEOUT, timeout);
-		} while(bytesread == B_INTERRUPTED);
-	} else {
-		do {
-			bytesread = read_port(fReceivePort, &protocol, fRecvBuffer, 
-				fRecvBufferSize);
-		} while(bytesread == B_INTERRUPTED);
+	while (true) {
+		if (timeout != B_INFINITE_TIMEOUT) {
+			do {
+				bytesRead = read_port_etc(fReceivePort, &code, fRecvBuffer,
+					fRecvBufferSize, B_TIMEOUT, timeout);
+			} while (bytesRead == B_INTERRUPTED);
+		} else {
+			do {
+				bytesRead = read_port(fReceivePort, &code, fRecvBuffer, 
+					fRecvBufferSize);
+			} while (bytesRead == B_INTERRUPTED);
+		}
+
+		STRACE(("info: LinkMsgReader read %ld bytes.\n", bytesRead));
+		if (bytesRead < B_OK)
+			return bytesRead;
+
+		// we just ignore incorrect messages, and don't bother our caller
+
+		if (code != kLinkCode) {
+			STRACE(("wrong port message %lx received.\n", code));
+			continue;
+		}
+
+		// port read seems to be valid
+		break;
 	}
 
-	STRACE(("info: LinkMsgReader read %ld bytes.\n", bytesread));
-	if (bytesread < B_OK)
-		return bytesread;
-
-	// TODO: we only need AS_SERVER_PORTLINK when all OBOS uses Link messages
-	if (protocol != AS_SERVER_PORTLINK && protocol != AS_SERVER_SESSION)
-		return B_ERROR;
-	if (protocol == AS_SERVER_PORTLINK && bytesread != *((int32 *)fRecvBuffer))
-		// should only be one message for PORTLINK so the size declared in the header
-		// (the first int32 in the header) should be the same as bytesread
-		return B_ERROR;
-
-	fDataSize = bytesread;
+	fDataSize = bytesRead;
 	return B_OK;
 }
 
@@ -242,33 +238,36 @@ LinkMsgReader::Read(void *data, ssize_t size)
 
 
 status_t
-LinkMsgReader::ReadString(char **string)
+LinkMsgReader::ReadString(char **_string)
 {
-	status_t err;
-	int32 len = 0;
+	int32 length = 0;
+	status_t status;
 
-	err = Read<int32>(&len);
-	if (err < B_OK)
-		return err;
+	status = Read<int32>(&length);
+	if (status < B_OK)
+		return status;
 
-	if (len) {
-		*string = (char *)malloc(len);
-		if (*string == NULL) {
-			fRecvPosition -= sizeof(int32);	//rewind the transaction
+	if (length > 0) {
+		char *string = (char *)malloc(length);
+		if (string == NULL) {
+			fRecvPosition -= sizeof(int32);	// rewind the transaction
 			return B_NO_MEMORY;
 		}
 
-		err = Read(*string, len);
-		if (err < B_OK) {
-			free(*string);
-			*string = NULL;
-			fRecvPosition -= sizeof(int32);	//rewind the transaction
-			return err;
+		status = Read(string, length);
+		if (status < B_OK) {
+			free(string);
+			fRecvPosition -= sizeof(int32);	// rewind the transaction
+			return status;
 		}
-		(*string)[len-1] = '\0';
+
+		// make sure the string is null terminated (although it already should be)
+		string[length - 1] = '\0';
+
+		*_string = string;
 		return B_OK;
 	} else {
-		fRecvPosition -= sizeof(int32);	//rewind the transaction
+		fRecvPosition -= sizeof(int32);	// rewind the transaction
 		return B_ERROR;
 	}
 }
