@@ -15,6 +15,6 @@ Preference Mouse :
 	MouseWindow.cpp
 	MouseView.cpp 
 	SettingsView.cpp
+	: libtranslation.so libbe.so
 	;
 
-LinkSharedOSLibs Mouse : libtranslation.so libbe.so ;
