@@ -1,6 +1,8 @@
 SubDir OBOS_TOP src prefs sounds ;
 
-SubDirC++Flags -fmultiple-symbol-spaces ;
+if $(TARGET_PLATFORM) != haiku {
+        SubDirC++Flags -fmultiple-symbol-spaces ;
+}
 
 AddResources Sounds : Sounds.rdef ;
 
@@ -8,6 +10,6 @@ Preference Sounds :
 	HApp.cpp 
 	HEventItem.cpp 
 	HWindow.cpp 
-	HEventList.cpp ;
-
-LinkSharedOSLibs Sounds : be libmedia.so game tracker ;
+	HEventList.cpp 
+	: libbe.so libmedia.so libgame.so libtracker.so
+;
