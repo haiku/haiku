@@ -1,10 +1,9 @@
 SubDir OBOS_TOP src prefs mouse ;
 
-if $(COMPILE_FOR_R5) {
+if $(TARGET_PLATFORM) != haiku {
         SubDirC++Flags -DCOMPILE_FOR_R5 ;
-}
-
-SubDirC++Flags -fmultiple-symbol-spaces ;
+	SubDirC++Flags -fmultiple-symbol-spaces ;
+} 
 
 UsePrivateHeaders input ;
 
@@ -18,4 +17,4 @@ Preference Mouse :
 	SettingsView.cpp
 	;
 
-LinkSharedOSLibs Mouse : translation be ;
+LinkSharedOSLibs Mouse : libtranslation.so libbe.so ;
