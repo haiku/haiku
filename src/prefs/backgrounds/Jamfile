@@ -8,7 +8,6 @@ Preference Backgrounds :
 	BackgroundImage.cpp 
 	BGMain.cpp 
 	BGView.cpp 
-	BGWindow.cpp ;
-
-LinkSharedOSLibs Backgrounds : 
-	libbe.so libtracker.so libtranslation.so ;
+	BGWindow.cpp 
+	: libbe.so libtracker.so libtranslation.so
+	;
