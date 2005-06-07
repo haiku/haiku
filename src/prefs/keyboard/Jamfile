@@ -1,6 +1,9 @@
 SubDir OBOS_TOP src prefs keyboard ;
 
-SubDirC++Flags -fmultiple-symbol-spaces ;
+if $(TARGET_PLATFORM) != haiku {
+        SubDirC++Flags -DCOMPILE_FOR_R5 ;
+        SubDirC++Flags -fmultiple-symbol-spaces ;
+}
 
 UsePrivateHeaders input ;
 
@@ -11,5 +14,5 @@ Preference Keyboard :
 	KeyboardSettings.cpp 
 	KeyboardView.cpp 
 	KeyboardWindow.cpp
-	: translation be
+	: libtranslation.so libbe.so
 	;
