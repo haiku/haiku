@@ -735,47 +735,49 @@ do_minimize_team(BRect zoomRect, team_id team, bool zoom)
 	// ToDo: implement me, needed for Deskbar!
 }
 
-// copy_from_start
+
+//	#pragma mark - truncate string
+
+
 static char*
-copy_from_start(const char* src, char* dst, uint32 numChars,
-				const float* escapementArray, float width, float ellipsisWidth, float size)
+copy_from_start(const char* source, char* dest, uint32 numChars,
+	const float* escapementArray, float width, float ellipsisWidth, float size)
 {
-//printf("copy_from_start: %.1f\n", width);
 	float currentWidth = 0.0;
-	for (uint32 c = 0; c < numChars; c++) {
-//printf("forward: %c (%ld) (%.1f + %.1f = %.1f)\n", *src, c, currentWidth, escapementArray[c] * size, currentWidth + escapementArray[c] * size);
-		currentWidth += escapementArray[c] * size;
-		if (currentWidth > width) {
-//*dst = *src;
-			// ups, we definitely don't fit. go back until the ellipsis fits
-			currentWidth += ellipsisWidth;
-			for (int32 c2 = c; c2 >= 0; c2--) {
-//printf(" backward: %c (%ld) (%.1f - %.1f = %.1f)\n", *dst, c2, currentWidth, escapementArray[c2] * size, currentWidth - escapementArray[c2] * size);
-				currentWidth -= escapementArray[c2] * size;
-				do {
-					dst--;
-				} while (IsInsideGlyph(*dst));
-				// see if we went back enough
-				if (currentWidth <= width)
-					break;
-			}
-			// dst needs to point behind the last glyph we want to use
-			dst++;
+	ellipsisWidth /= size;	// test if this is as accurate as escapementArray * size
+	width /= size;
+	uint32 lastFit = 0, c;
+
+	for (c = 0; c < numChars; c++) {
+		currentWidth += escapementArray[c];
+		if (currentWidth + ellipsisWidth <= width)
+			lastFit = c;
+
+		if (currentWidth > width)
 			break;
-		} else {
-			// copy one glyph
-			do {
-				*dst++ = *src++;
-			} while (IsInsideGlyph(*src));
-		}
 	}
-	return dst;
+
+	if (c < numChars) {
+		// string does not fit into width
+		c = lastFit + 1;
+	}
+
+	// copy string to destination
+
+	for (uint32 i = 0; i < c; i++) {
+		// copy one glyph
+		do {
+			*dest++ = *source++;
+		} while (IsInsideGlyph(*source));
+	}
+
+	return dest;
 }
 
-// copy_from_end
+
 static char*
 copy_from_end(const char* src, char* dst, uint32 numChars, uint32 length,
-			  const float* escapementArray, float width, float ellipsisWidth, float size)
+	const float* escapementArray, float width, float ellipsisWidth, float size)
 {
 	const char* originalStart = src;
 	src += length - 1;
@@ -811,95 +813,91 @@ copy_from_end(const char* src, char* dst, uint32 numChars, uint32 length,
 	return dst;
 }
 
+
 static char*
 write_ellipsis(char* dst)
 {
 	strcpy(dst, B_UTF8_ELLIPSIS);
-//strcpy(dst, "...");
 	return dst + 3;
 }
 
-// truncated_string
+
 void
-truncate_string(const char* string,
-				uint32 mode, float width, char* result,
-				const float* escapementArray, float fontSize,
-				float ellipsisWidth, int32 length, int32 numChars)
+truncate_string(const char* string, uint32 mode, float width,
+	char* result, const float* escapementArray, float fontSize,
+	float ellipsisWidth, int32 length, int32 numChars)
 {
-	if (string) {
-		// skip calculation if we don't even have enough room for that
-		if (width >= ellipsisWidth) {
+	// ToDo: that's actually not correct: the string could be smaller than ellipsisWidth
+	if (string == NULL /*|| width < ellipsisWidth*/) {
+		// we don't have room for a single glyph
+		strcpy(result, "");
+		return;
+	}
 
-			// iterate over glyphs and copy source into result string
-			// one glyph at a time as long as we have room for the "…" yet
-			char* dst = result;
-			const char* src = string;
+	// iterate over glyphs and copy source into result string
+	// one glyph at a time as long as we have room for the "…" yet
+	char* dst = result;
+	const char* src = string;
 
-			switch (mode) {
-				case B_TRUNCATE_BEGINNING: {
-
-					dst = copy_from_end(src, dst, numChars, length,
-										escapementArray, width, ellipsisWidth, fontSize);
-					// "dst" points to the position behind the last glyph that
-					// was copied.
-					int32 dist = dst - result;
-					// we didn't terminate yet
-					*dst = 0;
-					if (dist < length) {
-						// TODO: Is there a smarter way?
-						char* temp = new char[dist + 4];
-						char* t = temp;
-						// append "…"
-						t = write_ellipsis(t);
-						// shuffle arround strings so that "…" is prepended
-						strcpy(t, result);
-						strcpy(result, temp);
-						delete[] temp;
+	switch (mode) {
+		case B_TRUNCATE_BEGINNING: {
+			dst = copy_from_end(src, dst, numChars, length,
+								escapementArray, width, ellipsisWidth, fontSize);
+			// "dst" points to the position behind the last glyph that
+			// was copied.
+			int32 dist = dst - result;
+			// we didn't terminate yet
+			*dst = 0;
+			if (dist < length) {
+				// TODO: Is there a smarter way?
+				char* temp = new char[dist + 4];
+				char* t = temp;
+				// append "…"
+				t = write_ellipsis(t);
+				// shuffle arround strings so that "…" is prepended
+				strcpy(t, result);
+				strcpy(result, temp);
+				delete[] temp;
 /*						char t = result[3];
-						memmove(&result[3], result, dist + 1);
-						write_ellipsis(result);
-						result[3] = t;*/
-					}
-					break;
-				}
-
-				case B_TRUNCATE_END:
-
-					dst = copy_from_start(src, dst, numChars,
-										  escapementArray, width, ellipsisWidth, fontSize);
-					// "dst" points to the position behind the last glyph that
-					// was copied.
-					if (dst - result < length) {
-						// append "…" and terminate with 0
-						write_ellipsis(dst);
-					} else {
-						*dst = 0;
-					}
-					break;
-
-				case B_TRUNCATE_SMART:
-					// TODO: implement, though it was never implemented on R5
-					// FALL THROUGH (at least do something)
-				case B_TRUNCATE_MIDDLE:
-
-					// TODO: VERY BROKEN! (will always insert "…" even if width is large enough)
-					float halfWidth = width / 2.0;
-
-					dst = copy_from_start(src, dst, numChars,
-										  escapementArray, halfWidth, ellipsisWidth, fontSize);
-					// insert "…"
-					dst = write_ellipsis(dst);
-
-					dst = copy_from_end(src, dst, numChars, length,
-										escapementArray, halfWidth, 0.0, fontSize);
-					// terminate
-					*dst = 0;
-					break;
+				memmove(&result[3], result, dist + 1);
+				write_ellipsis(result);
+				result[3] = t;*/
 			}
-		} else {
-			// we don't have room for a single glyph
-			strcpy(result, "");
+			break;
 		}
+
+		case B_TRUNCATE_END:
+			dst = copy_from_start(src, dst, numChars, escapementArray,
+				width, ellipsisWidth, fontSize);
+
+			// "dst" points to the position behind the last glyph that
+			// was copied.
+			if (dst - result < length) {
+				// append "…" and terminate with 0
+				write_ellipsis(dst);
+			} else {
+				*dst = 0;
+			}
+			break;
+
+		case B_TRUNCATE_SMART:
+			// TODO: implement, though it was never implemented on R5
+			// FALL THROUGH (at least do something)
+		case B_TRUNCATE_MIDDLE:
+
+			// TODO: VERY BROKEN! (will always insert "…" even if width is large enough)
+			float halfWidth = width / 2.0;
+
+			dst = copy_from_start(src, dst, numChars,
+								  escapementArray, halfWidth, ellipsisWidth, fontSize);
+			// insert "…"
+			dst = write_ellipsis(dst);
+
+			dst = copy_from_end(src, dst, numChars, length,
+								escapementArray, halfWidth, 0.0, fontSize);
+			// terminate
+			*dst = 0;
+			break;
 	}
 }
 
