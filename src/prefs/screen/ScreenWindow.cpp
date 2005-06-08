@@ -107,16 +107,19 @@ set_pixel_clock(display_mode * mode, float refresh_rate)
 
 
 ScreenWindow::ScreenWindow(ScreenSettings *Settings)
-	: BWindow(Settings->WindowFrame(), "Screen", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES)
+	: BWindow(Settings->WindowFrame(), "Screen", B_TITLED_WINDOW,
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES)
 {
 	BRect frame(Bounds());
 	BScreen screen(B_MAIN_SCREEN_ID);
-	
+
 	if (!screen.IsValid())
 		;//debugger() ?
-		
+
+	fSupportedModes = NULL;
+	fTotalModes = 0;
 	screen.GetModeList(&fSupportedModes, &fTotalModes);
-	
+
 	frame.InsetBy(-1, -1);
 	fScreenView = new BBox(frame, "ScreenView");
 	fScreenDrawView = new ScreenDrawView(BRect(20.0, 16.0, 122.0, 93.0), "ScreenDrawView");	
@@ -141,31 +144,32 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 
 	BString string;
 	string << count_workspaces();
-	
+
 	BMenuItem *marked = fWorkspaceCountMenu->FindItem(string.String());
-	marked->SetMarked(true);
-			
+	if (marked != NULL)
+		marked->SetMarked(true);
+
 	fWorkspaceCountField->SetDivider(91.0);
-	
+
 	screenBox->AddChild(fScreenDrawView);	
 	screenBox->AddChild(fWorkspaceCountField);	
 	fScreenView->AddChild(screenBox);
-	
+
 	fWorkspaceMenu = new BPopUpMenu("Current Workspace", true, true);
 	fAllWorkspacesItem = new BMenuItem("All Workspaces", new BMessage(WORKSPACE_CHECK_MSG));
 	fWorkspaceMenu->AddItem(fAllWorkspacesItem);
 	fCurrentWorkspaceItem = new BMenuItem("Current Workspace", new BMessage(WORKSPACE_CHECK_MSG));
 	fCurrentWorkspaceItem->SetMarked(true);
 	fWorkspaceMenu->AddItem(fCurrentWorkspaceItem);
-	
+
 	BRect workspaceMenuRect(0.0, 0.0, 132.0, 18.0);
 	fWorkspaceField = new BMenuField(workspaceMenuRect, "WorkspaceMenu", NULL, fWorkspaceMenu, true);
-	
+
 	BRect controlsBoxRect(164.0, 7.0, 345.0, 155.0);	
 	BBox *controlsBox = new BBox(controlsBoxRect);
 	controlsBox->SetBorder(B_FANCY_BORDER);
 	controlsBox->SetLabel(fWorkspaceField);
-	
+
 	BRect ButtonRect(88.0, 114.0, 200.0, 150.0);	
 	fApplyButton = new BButton(ButtonRect, "ApplyButton", "Apply", 
 		new BMessage(BUTTON_APPLY_MSG));
@@ -182,65 +186,67 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	
 	CheckUpdateDisplayModes();
 	
-	const char * resolutionLabel = "Resolution: ";
+	const char *resolutionLabel = "Resolution: ";
 	float resolutionWidth = controlsBox->StringWidth(resolutionLabel);
 	BRect controlMenuRect(88.0-resolutionWidth, 30.0, 171.0, 48.0);	
 	fResolutionField = new BMenuField(controlMenuRect, "ResolutionMenu", resolutionLabel, fResolutionMenu, true);
-	
+
 	marked = fResolutionMenu->ItemAt(0);
-	marked->SetMarked(true);
-	
+	if (marked != NULL)
+		marked->SetMarked(true);
+
 	fResolutionField->SetDivider(resolutionWidth);
 	
 	controlsBox->AddChild(fResolutionField);
 	
-	const char * colorsLabel = "Colors: ";
+	const char *colorsLabel = "Colors: ";
 	float colorsWidth = controlsBox->StringWidth(colorsLabel);
 	controlMenuRect.Set(88.0-colorsWidth, 58.0, 171.0, 76.0);
 	fColorsField = new BMenuField(controlMenuRect, "ColorsMenu", colorsLabel, fColorsMenu, true);
 	
 	marked = fColorsMenu->ItemAt(0);
-	marked->SetMarked(true);
-	
+	if (marked != NULL)
+		marked->SetMarked(true);
+
 	fColorsField->SetDivider(colorsWidth);
 	
 	controlsBox->AddChild(fColorsField);
 	
 	fOtherRefresh = new BMenuItem("Other...", new BMessage(POP_OTHER_REFRESH_MSG));
 	fRefreshMenu->AddItem(fOtherRefresh);
-	
-	const char * refreshLabel = "Refresh Rate: ";
+
+	const char *refreshLabel = "Refresh Rate: ";
 	float refreshWidth = controlsBox->StringWidth(refreshLabel);
 	controlMenuRect.Set(88.0-refreshWidth, 86.0, 171.0, 104.0);
 	fRefreshField = new BMenuField(controlMenuRect, "RefreshMenu", refreshLabel, fRefreshMenu, true);
-	
+
 	fRefreshField->SetDivider(refreshWidth);
-	
+
 	controlsBox->AddChild(fRefreshField);
-	
+
 	fScreenView->AddChild(controlsBox);
-	
+
 	ButtonRect.Set(10.0, 167, 100.0, 200.0);
-	
+
 	fDefaultsButton = new BButton(ButtonRect, "DefaultsButton", "Defaults", 
 		new BMessage(BUTTON_DEFAULTS_MSG));
-	
+
 	fDefaultsButton->AttachedToWindow();
 	fDefaultsButton->ResizeToPreferred();
-	
+
 	fScreenView->AddChild(fDefaultsButton);
-	
+
 	ButtonRect.Set(95.0, 167, 160.0, 200.0);
-	
+
 	fRevertButton = new BButton(ButtonRect, "RevertButton", "Revert", 
 		new BMessage(BUTTON_REVERT_MSG));
-	
+
 	fRevertButton->AttachedToWindow();
 	fRevertButton->ResizeToPreferred();
 	fRevertButton->SetEnabled(false);
-	
+
 	fScreenView->AddChild(fRevertButton);
-	
+
 	SetStateByMode();
 
 	fCustomRefresh = fInitialRefreshN;
