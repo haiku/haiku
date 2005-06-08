@@ -31,73 +31,73 @@
 #include <Region.h>
 
 class DefaultDecorator: public Decorator {
- public:
-								DefaultDecorator(BRect frame,
-												 int32 look,
-												 int32 feel,
-												 int32 flags);
-	virtual						~DefaultDecorator();
+public:
+							DefaultDecorator(BRect frame,
+											 int32 look,
+											 int32 feel,
+											 int32 flags);
+	virtual					~DefaultDecorator();
 	
-	virtual	void				MoveBy(float x, float y);
-	virtual	void				MoveBy(BPoint pt);
-	virtual	void				ResizeBy(float x, float y);
-	virtual	void				ResizeBy(BPoint pt);
+	virtual	void			MoveBy(float x, float y);
+	virtual	void			MoveBy(BPoint pt);
+	virtual	void			ResizeBy(float x, float y);
+	virtual	void			ResizeBy(BPoint pt);
 
-	virtual	void				Draw(BRect r);
-	virtual	void				Draw();
+	virtual	void			Draw(BRect r);
+	virtual	void			Draw();
 
-	virtual	void				GetSizeLimits(float* minWidth, float* minHeight,
-											  float* maxWidth, float* maxHeight) const;
+	virtual	void			GetSizeLimits(float* minWidth, float* minHeight,
+										  float* maxWidth, float* maxHeight) const;
 
-	virtual	void				GetFootprint(BRegion *region);
+	virtual	void			GetFootprint(BRegion *region);
 
-	virtual	BRect				SlideTab(float dx, float dy);
-	virtual	click_type			Clicked(BPoint pt, int32 buttons,
-										int32 modifiers);
+	virtual	BRect			SlideTab(float dx, float dy);
+	virtual	click_type		Clicked(BPoint pt, int32 buttons,
+									int32 modifiers);
 
 protected:
-	virtual void				_DoLayout();
+	virtual void			_DoLayout();
 
-	virtual void				_DrawFrame(BRect r);
-	virtual void				_DrawTab(BRect r);
+	virtual void			_DrawFrame(BRect r);
+	virtual void			_DrawTab(BRect r);
 
-	virtual void				_DrawClose(BRect r);
-	virtual void				_DrawTitle(BRect r);
-	virtual void				_DrawZoom(BRect r);
+	virtual void			_DrawClose(BRect r);
+	virtual void			_DrawTitle(BRect r);
+	virtual void			_DrawZoom(BRect r);
 
-	virtual void				_SetFocus();
-	virtual void				_SetColors();
+	virtual void			_SetFocus();
+	virtual void			_SetColors();
 
 private:
-			void				_DrawBlendedRect(BRect r, bool down);
-			void				_GetButtonSizeAndOffset(const BRect& tabRect,
-														float* offset, float*size) const;
-			void				_LayoutTabItems(const BRect& tabRect);
+			void			_DrawBlendedRect(BRect r, bool down);
+			void			_GetButtonSizeAndOffset(const BRect& tabRect,
+													float* offset, float*size) const;
+			void			_LayoutTabItems(const BRect& tabRect);
 
-			RGBColor			fButtonHighColor;
-			RGBColor			fButtonLowColor;
-			RGBColor			fTextColor;
-			RGBColor			fTabColor;
-		
-			RGBColor*			fFrameColors;
+			RGBColor		fButtonHighColor;
+			RGBColor		fButtonLowColor;
+			RGBColor		fTextColor;
+			RGBColor		fTabColor;
+
+			RGBColor*		fFrameColors;
 	
 			// Individual rects for handling window frame
 			// rendering the proper way
-			BRect				fRightBorder;
-			BRect				fLeftBorder;
-			BRect				fTopBorder;
-			BRect				fBottomBorder;
+			BRect			fRightBorder;
+			BRect			fLeftBorder;
+			BRect			fTopBorder;
+			BRect			fBottomBorder;
 
-			int32				fBorderWidth;
+			int32			fBorderWidth;
 
-//			bool				fSlidingTab;
-//			uint32				fTabOffset;
-			float				fTextOffset;
+//			bool			fSlidingTab;
+//			uint32			fTabOffset;
+			float			fTextOffset;
 
-			float				fMinTabWidth;
-			float				fMaxTabWidth;
-			BString				fTruncatedTitle;
-			int32				fTruncatedTitleLength;
+			float			fMinTabWidth;
+			float			fMaxTabWidth;
+			BString			fTruncatedTitle;
+			int32			fTruncatedTitleLength;
 };
 
 #endif

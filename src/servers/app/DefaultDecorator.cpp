@@ -21,8 +21,8 @@
 //
 //	File Name:		DefaultDecorator.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Fallback decorator for the app_server
-//  
+//	Description:	Default and fallback decorator for the app_server
+//
 //------------------------------------------------------------------------------
 
 #include <stdio.h>
@@ -180,7 +180,7 @@ DefaultDecorator::GetSizeLimits(float* minWidth, float* minHeight,
 								float* maxWidth, float* maxHeight) const
 {
 	if (_tabrect.IsValid())
-		*minWidth = max_c(*minWidth, fMinTabWidth - 4.0);
+		*minWidth = max_c(*minWidth, fMinTabWidth);
 	if (_resizerect.IsValid())
 		*minHeight = max_c(*minHeight, _resizerect.Height() - fBorderWidth);
 }
@@ -298,7 +298,6 @@ DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 	// We got this far, so user is clicking on the border?
 	if (fLeftBorder.Contains(pt) || fRightBorder.Contains(pt)
 		|| fTopBorder.Contains(pt) || fBottomBorder.Contains(pt)) {
-
 		// check resize area
 		if (!(_flags & B_NOT_RESIZABLE) &&
 			(_look == B_TITLED_WINDOW_LOOK || _look == B_FLOATING_WINDOW_LOOK)) {
@@ -357,7 +356,7 @@ DefaultDecorator::_DoLayout()
 		// distance from one item of the tab bar to another.
 		// In this case the text and close/zoom rects
 		fTextOffset = (_look == B_FLOATING_WINDOW_LOOK) ? 7 : 10;
-	
+
 		font_height fh;
 		_drawdata.Font().Height(&fh);
 
@@ -385,7 +384,8 @@ DefaultDecorator::_DoLayout()
 			fMinTabWidth += offset + size;
 
 		// fMaxTabWidth contains fMinWidth + the width required for the title
-		fMaxTabWidth = _driver ? _driver->StringWidth(GetTitle(), strlen(GetTitle()), &_drawdata) : 0.0;
+		fMaxTabWidth = _driver ? _driver->StringWidth(GetTitle(), strlen(GetTitle()),
+			&_drawdata) : 0.0;
 		if (fMaxTabWidth > 0.0)
 			fMaxTabWidth += fTextOffset;
 		fMaxTabWidth += fMinTabWidth;
@@ -399,7 +399,6 @@ DefaultDecorator::_DoLayout()
 		// layout buttons and truncate text
 		_tabrect.right = _tabrect.left + tabWidth;
 		_LayoutTabItems(_tabrect);
-
 	} else {
 		// no tab
 		fMinTabWidth = 0.0;
@@ -411,17 +410,17 @@ DefaultDecorator::_DoLayout()
 
 	// calculate left/top/right/bottom borders
 	if (fBorderWidth > 0) {
-		fLeftBorder.Set(		_frame.left - fBorderWidth, _frame.top,
-							_frame.left - 1, _frame.bottom);
+		fLeftBorder.Set(_frame.left - fBorderWidth, _frame.top,
+			_frame.left - 1, _frame.bottom);
 
-		fRightBorder.Set(	_frame.right + 1, _frame.top ,
-							_frame.right + fBorderWidth, _frame.bottom);
+		fRightBorder.Set(_frame.right + 1, _frame.top ,
+			_frame.right + fBorderWidth, _frame.bottom);
 
-		fTopBorder.Set(		_frame.left - fBorderWidth, _frame.top - fBorderWidth,
-							_frame.right + fBorderWidth, _frame.top - 1);
+		fTopBorder.Set(_frame.left - fBorderWidth, _frame.top - fBorderWidth,
+			_frame.right + fBorderWidth, _frame.top - 1);
 
-		fBottomBorder.Set(	_frame.left - fBorderWidth, _frame.bottom + 1,
-							_frame.right + fBorderWidth, _frame.bottom + fBorderWidth);
+		fBottomBorder.Set(_frame.left - fBorderWidth, _frame.bottom + 1,
+			_frame.right + fBorderWidth, _frame.bottom + fBorderWidth);
 	} else {
 		// no border ... (?) useful when displaying windows that are just images
 		fLeftBorder.Set(0.0, 0.0, -1.0, -1.0);
@@ -660,16 +659,16 @@ DefaultDecorator::_DrawZoom(BRect r)
 	STRACE(("_DrawZoom(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 	// If this has been implemented, then the decorator has a Zoom button
 	// which should be drawn based on the state of the member zoomstate
-	BRect zr( r );
-	
-	zr.left		+= 3.0;
-	zr.top		+= 3.0;
-	_DrawBlendedRect( zr, GetZoom() );
-	
-	zr			= r;
-	zr.right	-= 5.0;
-	zr.bottom	-= 5.0;
-	_DrawBlendedRect( zr, GetZoom() );
+
+	BRect zr(r);
+	zr.left += 3.0;
+	zr.top += 3.0;
+	_DrawBlendedRect(zr, GetZoom());
+
+	zr = r;
+	zr.right -= 5.0;
+	zr.bottom -= 5.0;
+	_DrawBlendedRect(zr, GetZoom());
 }
 
 // _SetFocus
@@ -768,17 +767,29 @@ DefaultDecorator::_LayoutTabItems(const BRect& tabRect)
 	_GetButtonSizeAndOffset(tabRect, &offset, &size);
 
 	// calulate close rect based on the tab rectangle
-	_closerect.Set(	tabRect.left + offset, tabRect.top + offset,
-					tabRect.left + offset + size, tabRect.top + offset + size);
-					
+	if (GetFlags() & B_NOT_CLOSABLE) {
+		_closerect.Set(tabRect.left + offset, tabRect.top + offset,
+			tabRect.left + offset, tabRect.top + offset + size);
+	} else {
+		_closerect.Set(tabRect.left + offset, tabRect.top + offset,
+			tabRect.left + offset + size, tabRect.top + offset + size);
+	}
+
 	// calulate zoom rect based on the tab rectangle
-	_zoomrect.Set(  tabRect.right - offset - size, tabRect.top + offset,
-					tabRect.right - offset, tabRect.top + offset + size);
+	if (GetFlags() & B_NOT_ZOOMABLE) {
+		_zoomrect.Set(tabRect.right, tabRect.top + offset,
+			tabRect.right, tabRect.top + offset + size);
+	} else {
+		_zoomrect.Set(tabRect.right - offset - size, tabRect.top + offset,
+			tabRect.right - offset, tabRect.top + offset + size);
+	}
 
 	// calculate room for title
-	float width = (_zoomrect.left - _closerect.right) - fTextOffset * 2.0;
+	// ToDo: the +2 is there because the title often appeared
+	//	truncated for no apparent reason - OTOH the title does
+	//	also not appear perfectly in the middle
+	float width = (_zoomrect.left - _closerect.right) - fTextOffset * 2 + 2;
 	fTruncatedTitle = GetTitle();
 	_drawdata.Font().TruncateString(&fTruncatedTitle, B_TRUNCATE_END, width);
-//	_drawdata.Font().TruncateString(&fTruncatedTitle, B_TRUNCATE_BEGINNING, width);
-	fTruncatedTitleLength = strlen(fTruncatedTitle.String());
+	fTruncatedTitleLength = fTruncatedTitle.Length();
 }
