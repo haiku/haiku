@@ -63,7 +63,7 @@ static char *args[MAX_ARGS] = { NULL, };
 
 
 static debugger_command *
-find_command(char *name)
+find_command(char *name, bool partialMatch)
 {
 	debugger_command *command;
 	int length;
@@ -77,11 +77,13 @@ find_command(char *name)
 
 	// if it couldn't be found, search for a partial match
 
-	length = strlen(name);
+	if (partialMatch) {
+		length = strlen(name);
 
-	for (command = sCommands; command != NULL; command = command->next) {
-		if (strncmp(name, command->name, length) == 0)
-			return command;
+		for (command = sCommands; command != NULL; command = command->next) {
+			if (strncmp(name, command->name, length) == 0)
+				return command;
+		}
 	}
 
 	return NULL;
@@ -263,7 +265,7 @@ kernel_debugger_loop(void)
 		sDebuggerOnCPU = smp_get_current_cpu();
 
 		if (argc > 0)
-			cmd = find_command(args[0]);
+			cmd = find_command(args[0], true);
 
 		if (cmd == NULL)
 			dprintf("unknown command, enter \"help\" to get a list of all supported commands\n");
@@ -297,18 +299,29 @@ static int
 cmd_help(int argc, char **argv)
 {
 	debugger_command *command, *specified = NULL;
+	const char *start = NULL;
+	int32 startLength = 0;
 
-	if (argc > 1)
-		specified = find_command(argv[1]);
+	if (argc > 1) {
+		specified = find_command(argv[1], false);
+		if (specified == NULL) {
+			start = argv[1];
+			startLength = strlen(start);
+		}
+	}
 
 	if (specified != NULL) {
 		// only print out the help of the specified command (and all of its aliases)
 		dprintf("debugger command for \"%s\" and aliases:\n", specified->name);
-	} else
+	} else if (start != NULL)
+		dprintf("debugger commands starting with \"%s\":\n", start);
+	else
 		dprintf("debugger commands:\n");
 
 	for (command = sCommands; command != NULL; command = command->next) {
 		if (specified && command->func != specified->func)
+			continue;
+		if (start != NULL && strncmp(start, command->name, startLength))
 			continue;
 
 		dprintf(" %-20s\t\t%s\n", command->name, command->description ? command->description : "-");
