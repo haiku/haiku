@@ -48,9 +48,7 @@ Screen::Screen(DisplayDriver *driver, int32 id)
 
 Screen::~Screen(void)
 {
-//printf("~Screen( %ld )\n", fID);
-	// TODO: Who is supposed to delete the display driver? It's ours, no?
-//	delete fDDriver;
+	delete fDriver;
 }
 
 

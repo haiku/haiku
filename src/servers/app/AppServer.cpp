@@ -761,35 +761,30 @@ AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			Broadcast(AS_QUIT_APP);
 
 			// we have to wait until *all* threads have finished!
-			ServerApp	*app= NULL;
+			ServerApp *app;
 			acquire_sem(fAppListLock);
 			thread_info tinfo;
-			for(int32 i= 0; i < fAppList->CountItems(); i++)
-			{
-				app=(ServerApp*)fAppList->ItemAt(i);
-				if(!app)
+			for (int32 i = 0; i < fAppList->CountItems(); i++) {
+				app = (ServerApp*)fAppList->ItemAt(i);
+				if (!app)
 					continue;
-				
+
 				// Instead of calling wait_for_thread, we will wait a bit, check for the
 				// thread_id. We will only wait so long, because then the app is probably crashed
 				// or hung. Seeing that being the case, we'll kill its BApp team and fake the
 				// quit message
-				if(get_thread_info(app->MonitorThreadID(), &tinfo)==B_OK)
-				{
-					bool killteam=true;
-					
-					for(int32 j=0; j<5; j++)
-					{
+				if (get_thread_info(app->MonitorThreadID(), &tinfo)==B_OK) {
+					bool killteam = true;
+
+					for (int32 j = 0; j < 5; j++) {
 						snooze(500000);	// wait half a second for it to quit
-						if(get_thread_info(app->MonitorThreadID(), &tinfo)!=B_OK)
-						{
-							killteam=false;
+						if (get_thread_info(app->MonitorThreadID(), &tinfo) != B_OK) {
+							killteam = false;
 							break;
 						}
 					}
-					
-					if(killteam)
-					{
+
+					if (killteam) {
 						kill_team(app->ClientTeamID());
 						app->PostMessage(B_QUIT_REQUESTED);
 					}
@@ -804,11 +799,9 @@ AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			delete fAppList;
 			delete bitmapmanager;
 			delete fontserver;
-			make_decorator=NULL;	
-
-			exit_thread(0);
 
 			// we are now clear to exit
+			exit_thread(0);
 #endif
 			break;
 		}

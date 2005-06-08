@@ -102,8 +102,10 @@ void
 Desktop::AddDriver(DisplayDriver *driver)
 {
 	if (driver->Initialize()) {
-		// TODO: be careful of screen initialization - monitor may not support 640x480
 		Screen *screen = new Screen(driver, fScreenList.CountItems() + 1);
+			// The driver is now owned by the screen
+
+		// TODO: be careful of screen initialization - monitor may not support 640x480
 		screen->SetMode(640, 480, B_RGB32, 60.f);
 
 		fScreenList.AddItem(screen);
