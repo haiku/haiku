@@ -19,7 +19,7 @@ static char cvsid[] = "$Header: /Users/phelps/cvs/prj/RosettaMan/rman.c,v 1.154 
 
 #define VOLLIST "1:2:3:4:5:6:7:8:9:o:l:n:p"
 #define MANTITLEPRINTF "%s(%s) manual page"
-#define MANREFPRINTF "%s.%s.html"
+#define MANREFPRINTF "%s.%s"
 #define POLYGLOTMANVERSION "3.2"
 
 #include <unistd.h>
@@ -1680,7 +1680,8 @@ XML(enum command cmd) {
 		break;
 
 	   case BEGINSUBSECTION:	printf("\n<refsect2>"); break;
-	   case ENDSUBSECTION:	printf("\n</refsect2>"); break;
+	   case ENDSUBSECTION:		if (fPara) { printf("\n</para>"); fPara=0; }
+					printf("\n</refsect2>"); break;
 
 	   /* need to update this for enumerated and plain lists */
 	   case BEGINBULPAIR:	printf("<variablelist>\n"); break;
