@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2005, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -77,15 +77,17 @@ BSimpleGameSound::BSimpleGameSound(const BSimpleGameSound &other)
  	:	BGameSound(other)
 {	
 	gs_audio_format format;
-	void * data;
-	
+	void *data = NULL;
+
 	status_t error = other.Device()->Buffer(other.ID(), &format, data);
-	if (error != B_OK) SetInitError(error);
-	
+	if (error != B_OK)
+		SetInitError(error);
+
 	Init(data, 0, &format);
 	free(data);
 }
-		
+
+
 BSimpleGameSound::~BSimpleGameSound()
 {
 }
@@ -95,16 +97,16 @@ BGameSound *
 BSimpleGameSound::Clone() const
 {
 	gs_audio_format format;
-	void * data;
-	
+	void *data = NULL;
+
 	status_t error = Device()->Buffer(ID(), &format, data);
-	if (error != B_OK) return NULL;
-	
-	BSimpleGameSound * clone = new BSimpleGameSound(data, 0, &format, Device());
-	
+	if (error != B_OK)
+		return NULL;
+
+	BSimpleGameSound *clone = new BSimpleGameSound(data, 0, &format, Device());
 	free(data);
-	
-	return clone;		
+
+	return clone;
 }
 
 

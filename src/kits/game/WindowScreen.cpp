@@ -718,9 +718,11 @@ BWindowScreen::CalcFrame(int32 index, int32 space, display_mode *dmode)
 int32
 BWindowScreen::SetFullscreen(int32 enable)
 {
-	int32 result = -1, retval = -1;
+	int32 retval = -1;
 
 #ifdef COMPILE_FOR_R5
+	int32 result = -1
+
 	a_session->swrite_l(WS_SET_FULLSCREEN);
 	a_session->swrite_l(server_token);
 	a_session->swrite_l(enable);
@@ -820,9 +822,10 @@ BWindowScreen::SetActiveState(int32 state)
 		if (status == B_OK) {				
 			be_app->ShowCursor();				
 			if (activate_state) {
-				const color_map *colorMap = system_colors();
 #ifdef COMPILE_FOR_R5				
+				const color_map *colorMap = system_colors();
 				_BAppServerLink_ link;
+
 				link.fSession->swrite_l(WS_SET_PALETTE);
 				link.fSession->swrite_l(screen_index);
 				link.fSession->swrite_l(0);

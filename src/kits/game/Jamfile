@@ -32,7 +32,7 @@ SharedLibrary game :
 
 
 LinkSharedOSLibs libgame.so :
-	be libmedia.so
+	libbe.so libmedia.so
 ;
 
 MakeLocate <develop>libgame.so : $(OBOS_STLIB_DIR) ;
