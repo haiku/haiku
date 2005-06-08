@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src bin coreutils man ;
 
-Man2Docs 
+local manpages = 
 basename.1
 cat.1
 chgrp.1
@@ -92,4 +92,38 @@ whoami.1
 yes.1
 ;
 
-Includes [ FGristFiles coreutils.xml ] : [ FGristFiles basename.xml cat.xml date.xml cut.xml ] ;
+Man2Docs $(manpages) ;
+
+rule GenerateChapterXML
+{
+        local sources = $(3) ;
+	local template = [ FGristFiles $(2) ] ;
+        local target = [ FGristFiles $(1) ] ;
+
+	MakeLocate $(target) : [ FDirName $(OBOS_OBJECT_TARGET) documentation Shell_Tools ] ;
+	SEARCH on $(template) = $(SEARCH_SOURCE) ;
+
+	local xmls = [ FGristFiles $(sources:S=.xml) ] ;
+	Includes $(target) : $(xmls) ;
+	Depends files : $(target) ;
+	Depends $(target) : $(template) ;
+	XMLS on $(target) = "<xi:include xmlns:xi=\"http://www.w3.org/2001/XInclude\" href=\""$(xmls:BS)"\" />\
+" ;
+	GenerateChapterXML1 $(target) : $(template) ;
+	LocalClean clean : $(target) ;
+}
+
+actions GenerateChapterXML1
+{
+	head -5 $(2) > $(1) ;
+	cat << EOF >> $(1)
+	$(XMLS)
+	EOF
+	tail -2 $(2) >> $(1) ;
+}
+
+
+GenerateChapterXML coreutils.xml :
+	coreutils.src
+	: $(manpages) ;
+
