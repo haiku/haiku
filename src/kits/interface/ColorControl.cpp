@@ -35,6 +35,7 @@
 #include <Screen.h>
 #include <Window.h>
 #include <Errors.h>
+#include <Region.h>
 
 #define min(a,b) ((a)>(b)?(b):(a))
 #define max(a,b) ((a)>(b)?(a):(b))
@@ -59,53 +60,6 @@ BColorControl::BColorControl(BPoint leftTop, color_control_layout matrix,
 			B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE)
 {
 	InitData(matrix, cellSize, bufferedDrawing, NULL);
-
-/*	switch (matrix)
-	{
-		case B_CELLS_4x64:
-			fColumns = 4;
-			fRows = 64;
-			break;
-		case B_CELLS_8x32:
-			fColumns = 8;
-			fRows = 32;
-			break;
-		case B_CELLS_16x16:
-			fColumns = 16;
-			fRows = 16;
-			break;
-		case B_CELLS_32x8:
-			fColumns = 32;
-			fRows = 8;
-			break;
-		case B_CELLS_64x4:
-			fColumns = 64;
-			fRows = 4;
-			break;
-	}
-
-	fCellSize = cellSize;
-
-	BRect rect(0.0f, 0.0f, 196, 52);
-
-	ResizeTo(rect.Width() + 70, rect.Height());
-
-	fRedText = new BTextControl(BRect(rect.right + 1, 0.0f,
-		rect.right + 70, 15.0f), "_red", "Red:", NULL,
-		new BMessage(U_COLOR_CONTROL_RED_CHANGED_MSG));
-	AddChild(fRedText);
-
-	fGreenText = new BTextControl(BRect(rect.right + 1, 16.0f,
-		rect.right + 70, 30.0f), "_green", "Green:", NULL,
-		new BMessage(U_COLOR_CONTROL_GREEN_CHANGED_MSG));
-	AddChild(fGreenText);
-
-	fBlueText = new BTextControl(BRect(rect.right + 1, 31.0f,
-		rect.right + 70, 45), "_blue", "Blue:", NULL,
-		new BMessage(U_COLOR_CONTROL_BLUE_CHANGED_MSG));
-	AddChild(fBlueText);
-
-	fFocusedComponent = 0;*/
 }
 //------------------------------------------------------------------------------
 BColorControl::BColorControl(BMessage *archive)
@@ -278,27 +232,29 @@ void BColorControl::MouseDown(BPoint point)
 {
 	rgb_color color = ValueAsColor();
 
-	BRect rect(0.0f, 0.0f, 196, 52);
+	BRect rect(0.0f, 0.0f, fColumns * fCellSize, fRows * fCellSize);
+	float rampsize = rect.bottom / 4;
 
 	uint8 shade = (unsigned char)max(0,
 		min((point.x - 2) * 255 / (rect.Width() - 4.0f), 255));
 
-	if (point.y - 2 < 12)
+	if (point.y - 2 < rampsize)
 	{
 		color.red = color.green = color.blue = shade;
 		fFocusedComponent = 1;
 	}
-	else if (point.y - 2 < 24)
+	else if (point.y - 2 < (rampsize * 2))
 	{
 		color.red = shade;
 		fFocusedComponent = 2;
 	}
-	else if (point.y - 2 < 36)
+	else if (point.y - 2 < (rampsize * 3))
 	{
 		color.green = shade;
 		fFocusedComponent = 3;
 	}
-	else if (point.y - 2 < 48)
+//	else if (point.y - 2 < rect.bottom)
+	else
 	{
 		color.blue = shade;
 		fFocusedComponent = 4;
@@ -385,7 +341,7 @@ void BColorControl::MouseMoved(BPoint point, uint32 transit,
 	{
 		rgb_color color = ValueAsColor();
 
-		BRect rect(0.0f, 0.0f, 196, 52);
+		BRect rect(0.0f, 0.0f, fColumns * fCellSize, fRows * fCellSize);
 
 		uint8 shade = (unsigned char)max(0,
 		min((point.x - 2) * 255 / (rect.Width() - 4.0f), 255));
@@ -486,18 +442,21 @@ BColorControl &BColorControl::operator=(const BColorControl &)
 //------------------------------------------------------------------------------
 void BColorControl::LayoutView(bool calc_frame)
 {
-	// TODO calc_frame
-	BRect rect(0.0f, 0.0f, 196, 52);
+//debugger("");
+
+	BRect rect(0.0f, 0.0f, fColumns * fCellSize, (fRows * fCellSize) + 2);
+	float rampsize = rect.bottom / 4;
+	float y = (rampsize * 1.5) - 7;
+	
 	ResizeTo(rect.Width() + 70, rect.Height());
 
-	fRedText->MoveTo(196.0f, 0.0f);
-	//fRedText->ResizeTo();
+	fRedText->MoveTo(rect.right, y);
+	y += rampsize;
 
-	fGreenText->MoveTo(196.0f, 17.0f);
-	//fGreenText->ResizeTo();
+	fGreenText->MoveTo(rect.right, y);
+	y += rampsize;
 
-	fBlueText->MoveTo(196.0f, 34.0f);
-	//fBlueText->ResizeTo();
+	fBlueText->MoveTo(rect.right, y);
 }
 //------------------------------------------------------------------------------
 void BColorControl::UpdateOffscreen()
@@ -518,8 +477,12 @@ void BColorControl::UpdateOffscreen(BRect update)
 //------------------------------------------------------------------------------
 void BColorControl::DrawColorArea(BView *target, BRect update)
 {
-	BRect rect(0.0f, 0.0f, 196, 52);
-
+	BRegion reg(update);
+	
+	target->ConstrainClippingRegion(&reg);
+	
+	BRect rect(0.0f, 0.0f, fColumns * fCellSize, Bounds().bottom);
+	
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
 	lightenmax = tint_color(no_tint, B_LIGHTEN_MAX_TINT),
 	darken1 = tint_color(no_tint, B_DARKEN_1_TINT),
@@ -550,22 +513,26 @@ void BColorControl::DrawColorArea(BView *target, BRect update)
 	rgb_color blue = {0, 0, 255, 255};
 
 	rect.InsetBy(1.0f, 1.0f);
+	
+	BRect ramprect(rect);
+	float rampsize = ramprect.Height() / 4.0;
+	
+	ramprect.bottom = ramprect.top + rampsize;
+	
+	ColorRamp(BRect(), ramprect, target, white, 0, false);
+	
+	ramprect.OffsetBy(0,rampsize);
+	ColorRamp(BRect(), ramprect, target, red, 0, false);
 
-	ColorRamp(BRect(), BRect(rect.left, rect.top,
-		rect.right, rect.top + 12.0f), target, white, 0, false);
+	ramprect.OffsetBy(0,rampsize);
+	ColorRamp(BRect(), ramprect, target, green, 0, false);
 
-	ColorRamp(BRect(), BRect(rect.left, rect.top + 13.0f,
-		rect.right, rect.top + 24.0f), target, red, 0, false);
-
-	ColorRamp(BRect(), BRect(rect.left, rect.top + 25.0f,
-		rect.right, rect.top + 36.0f), target, green, 0, false);
-
-	ColorRamp(BRect(), BRect(rect.left, rect.top + 37.0f,
-		rect.right, rect.top + 48.0f), target, blue, 0, false);
+	ramprect.OffsetBy(0,rampsize);
+	ColorRamp(BRect(), ramprect, target, blue, 0, false);
 
 	// Selectors
 	rgb_color color = ValueAsColor();
-	float x, y = rect.top + 16.0f;
+	float x, y = rampsize * 1.5;
 
 	target->SetPenSize(2.0f);
 
@@ -573,26 +540,28 @@ void BColorControl::DrawColorArea(BView *target, BRect update)
 	target->SetHighColor(255, 255, 255);
 	target->StrokeEllipse(BRect(x, y, x + 4.0f, y + 4.0f));
 
-	y += 11;
+	y += rampsize;
 
 	x = rect.left + color.green * (rect.Width() - 7) / 255;
 	target->SetHighColor(255, 255, 255);
 	target->StrokeEllipse(BRect(x, y, x + 4.0f, y + 4.0f));
 
-	y += 11;
+	y += rampsize;
 
 	x = rect.left + color.blue * (rect.Width() - 7) / 255;
 	target->SetHighColor(255, 255, 255);
 	target->StrokeEllipse(BRect ( x, y, x + 4.0f, y + 4.0f));
 
 	target->SetPenSize(1.0f);
+	
+	target->ConstrainClippingRegion(NULL);
 }
 //------------------------------------------------------------------------------
 void BColorControl::ColorRamp(BRect r, BRect where, BView *target, rgb_color c,
 							  int16 flag, bool focused)
 {
 	rgb_color color = {255, 255, 255, 255};
-	float width = where.Width();
+	float width = where.Width()+1;
 
 	target->BeginLineArray(width);
 
@@ -709,12 +678,13 @@ void BColorControl::InitData(color_control_layout layout, float size,
 	{
 		BRect rect(0.0f, 0.0f,70.0f, 15.0f);
 		int32 i;
-
+		float dividerWidth = StringWidth("Green:") + 2;
+		
 		fRedText = new BTextControl(rect, "_red", "Red:", "0",
 			new BMessage('ccol'), B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			B_WILL_DRAW | B_NAVIGABLE);
 		
-		//fRedText->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
+		fRedText->SetDivider(dividerWidth);
 		
 		for (i = 0; i < 256; i++)
 			fRedText->TextView()->DisallowChar(i);
@@ -728,7 +698,7 @@ void BColorControl::InitData(color_control_layout layout, float size,
 			new BMessage('ccol'), B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			B_WILL_DRAW | B_NAVIGABLE);
 		
-		//GreenText->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
+		fGreenText->SetDivider(dividerWidth);
 		
 		for (i = 0; i < 256; i++)
 			fGreenText->TextView()->DisallowChar(i);
@@ -742,7 +712,7 @@ void BColorControl::InitData(color_control_layout layout, float size,
 			new BMessage('ccol'), B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			B_WILL_DRAW | B_NAVIGABLE);
 		
-		//fBlueText->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
+		fBlueText->SetDivider(dividerWidth);
 		
 		for (i = 0; i < 256; i++)
 			fBlueText->TextView()->DisallowChar(i);
