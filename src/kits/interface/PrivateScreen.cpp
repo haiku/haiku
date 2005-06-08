@@ -24,9 +24,10 @@
 //	Description:	BPrivateScreen is the class which does the real work
 //					for the proxy class BScreen (it interacts with the app server).
 //------------------------------------------------------------------------------
+#include <Debug.h>
+#include <Locker.h>
 #include <Window.h>
 
-#include <stdio.h>
 #include <stdlib.h>
 
 #include "AppServerLink.h"
@@ -44,10 +45,11 @@ struct screen_desc {
 };
 
 
-// Defined in Application.cpp
-namespace BPrivate {
-extern BPrivateScreen *gPrivateScreen;
-};
+static BPrivateScreen *sScreen;
+static int32 sScreenRefCount;
+
+// used to synchronize creation/deletion of the sScreen object
+static BLocker sScreenLock("screen lock");
 
 
 using namespace BPrivate;
@@ -55,30 +57,55 @@ using namespace BPrivate;
 BPrivateScreen *
 BPrivateScreen::CheckOut(BWindow *win)
 {
-	// TODO: If we start supporting multiple monitors, we
-	// should return the right screen for the passed BWindow
-	return gPrivateScreen;
+	sScreenLock.Lock();
+	
+	if (atomic_add(&sScreenRefCount, 1) == 0) {
+		// TODO: If we start supporting multiple monitors, we
+		// should return the right screen for the passed BWindow
+		ASSERT(sScreen == NULL);
+		sScreen = new BPrivateScreen();
+	}
+	
+	sScreenLock.Unlock();
+	
+	return sScreen;
 }
 
 
 BPrivateScreen *
 BPrivateScreen::CheckOut(screen_id id)
 {
-	// TODO: If we start supporting multiple monitors, we
-	// should return the right object for the given screen_id
-	return gPrivateScreen;
+	sScreenLock.Lock();
+	
+	if (atomic_add(&sScreenRefCount, 1) == 0) {
+		// TODO: If we start supporting multiple monitors, we
+		// should return the right object for the given screen_id
+		ASSERT(sScreen == NULL);
+		sScreen = new BPrivateScreen();
+	}
+	
+	sScreenLock.Unlock();
+	
+	return sScreen;
 }
 
 
 void
 BPrivateScreen::Return(BPrivateScreen *screen)
 {
-	// Not much to do here. I guess it's some legacy from pre-R5,
-	// where BScreen could not be used for long time,
-	// as they blocked the BApplication
+	sScreenLock.Lock();
+	
+	if (atomic_add(&sScreenRefCount, -1) == 1) {
+		// TODO: Check if the passed object is the same we are deleting
+		// here. Not much important for now though, since we only have one.
+		delete sScreen;
+		sScreen = NULL;
+	}
+	
+	sScreenLock.Unlock();
 }
 
-	
+
 status_t
 BPrivateScreen::SetToNext()
 {
@@ -426,7 +453,7 @@ BPrivateScreen::get_screen_desc(screen_desc *desc)
 	return status;
 }
 
-	
+
 // Private, called by BApplication::get_scs()
 BPrivateScreen::BPrivateScreen()
 	:
@@ -445,7 +472,7 @@ BPrivateScreen::BPrivateScreen()
 	if (reply == SERVER_TRUE) {
 		fColorMap = (color_map *)malloc(sizeof(color_map));
 		fOwnsColorMap = true;
-		// TODO: This doesn't work. We probably run into a port
+		// TODO: This doesn't work. We probably ran into a port
 		// capacity issue ?
 		//link.Read<color_map>(fColorMap);
 	}		

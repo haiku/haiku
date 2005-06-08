@@ -57,7 +57,6 @@
 #include <MenuWindow.h>
 #include <ObjectLocker.h>
 #include <PortLink.h>
-#include <PrivateScreen.h>
 #include <ServerProtocol.h>
 
 using namespace BPrivate;
@@ -69,12 +68,6 @@ BMessenger be_app_messenger;
 BResources *BApplication::_app_resources = NULL;
 BLocker BApplication::_app_resources_lock("_app_resources_lock");
 
-
-// Used by PrivateScreen.cpp
-// TODO: This setup won`t let us have multiple screens. Change this.
-namespace BPrivate {
-BPrivateScreen *gPrivateScreen = NULL;
-};
 
 static property_info
 sPropertyInfo[] = {
@@ -441,8 +434,6 @@ DBG(OUT("BApplication::InitData(`%s', %p)\n", signature, _error));
 #ifndef RUN_WITHOUT_APP_SERVER
 	// Initialize the IK after we have set be_app because of a construction of a
 	// BAppServerLink (which depends on be_app) nested inside the call to get_menu_info.
-	if (fInitError == B_OK)
-		get_scs();
 	if (fInitError == B_OK)
 		fInitError = _init_interface_kit_();
 	// create global system cursors
@@ -1039,13 +1030,6 @@ BApplication::EndRectTracking()
 	BPrivate::BAppServerLink link;
 	link.StartMessage(AS_END_RECT_TRACKING);
 	link.Flush();
-}
-
-
-void
-BApplication::get_scs()
-{
-	gPrivateScreen = new BPrivateScreen();
 }
 
 
