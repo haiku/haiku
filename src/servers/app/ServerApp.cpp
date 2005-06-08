@@ -652,13 +652,13 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &link)
 			// TODO; Implement AS_DOWNLOAD_PICTURE
 			
 			// What is this particular function call for, anyway?
-			STRACE(("ServerApp %s: Download Picture unimplemented\n",fSignature.String()));
+			STRACE(("ServerApp %s: Download Picture unimplemented\n", fSignature.String()));
 
 			break;
 		}
 		case AS_SET_SCREEN_MODE: 	 
 		{ 	 
-			STRACE(("ServerApp %s: Set Screen Mode\n",fSignature.String())); 	 
+			STRACE(("ServerApp %s: Set Screen Mode\n", fSignature.String())); 	 
   	 
 			// Attached data 	 
 			// 1) int32 workspace # 	 
@@ -670,10 +670,12 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &link)
 			link.Read<int32>(&index); 	 
 			link.Read<uint32>(&mode); 	 
 			link.Read<bool>(&stick); 	 
-  	 
-			RootLayer *root=gDesktop->ActiveRootLayer(); 	 
-			Workspace *workspace=root->WorkspaceAt(index); 	 
-  	 
+
+			// ToDo: is this still used at all? (since there is AS_SCREEN_SET_MODE?)
+			// ToDo: no locking?
+			RootLayer *root = gDesktop->ActiveRootLayer();
+			Workspace *workspace = root->WorkspaceAt(index);
+
 			if (!workspace) { 	 
 				// apparently out of range or something, so we do nothing. :) 	 
 				break; 	 
@@ -1772,6 +1774,34 @@ printf("ServerApp %s: AS_SCREEN_GET_MODE\n", fSignature.String());
 			//See also comment in BPrivateScreen::BPrivateScreen()
 			//fLink.Attach<color_map>(*SystemColorMap());
 			fLink.Flush();
+			break;
+		}
+
+		case AS_GET_DESKTOP_COLOR:
+		{
+			STRACE(("ServerApp %s: get desktop color\n", fSignature.String()));
+
+			int32 workspaceIndex = 0;
+			link.Read<int32>(&workspaceIndex);
+
+			// ToDo: for some reason, we currently get "1" as no. of workspace
+			workspaceIndex = 0;
+
+			// ToDo: locking is probably wrong - why the hell is there no (safe)
+			//		way to get to the workspace object directly?
+			RootLayer *root = gDesktop->ActiveRootLayer();
+			root->Lock();
+
+			Workspace *workspace = root->WorkspaceAt(workspaceIndex);
+			if (workspace != NULL) {
+				fLink.StartMessage(SERVER_TRUE);
+				//rgb_color color;
+				fLink.Attach<rgb_color>(workspace->BGColor().GetColor32());
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+
+			fLink.Flush();
+			root->Unlock();
 			break;
 		}
 

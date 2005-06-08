@@ -245,15 +245,17 @@ BPrivateScreen::ReadBitmap(BBitmap *bitmap, bool drawCursor, BRect *bound)
 rgb_color
 BPrivateScreen::DesktopColor(uint32 workspace)
 {
-	rgb_color color;
-	/*
+	rgb_color color = { 51, 102, 152, 255 };
 	BAppServerLink link;
-	PortMessage reply;
-	link.SetOpCode(AS_GET_DESKTOP_COLOR);
+
+	link.StartMessage(AS_GET_DESKTOP_COLOR);
 	link.Attach<int32>(workspace);
-	link.FlushWithReply(&reply);
-	reply.Read<rgb_color>(&color);
-	*/
+
+	int32 code;
+	if (link.FlushWithReply(&code) == B_OK
+		&& code == SERVER_TRUE)
+		link.Read<rgb_color>(&color);
+
 	return color;
 }
 
@@ -261,14 +263,13 @@ BPrivateScreen::DesktopColor(uint32 workspace)
 void
 BPrivateScreen::SetDesktopColor(rgb_color color, uint32 workspace, bool makeDefault)
 {
-	/*
 	BAppServerLink link;
-	link.SetOpCode(AS_SET_DESKTOP_COLOR);
+
+	link.StartMessage(AS_SET_DESKTOP_COLOR);
 	link.Attach<rgb_color>(color);
 	link.Attach<int32>(workspace);
 	link.Attach<bool>(makeDefault);
 	link.Flush();
-	*/
 }
 
 

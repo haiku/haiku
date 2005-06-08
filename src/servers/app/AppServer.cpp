@@ -403,7 +403,7 @@ AppServer::MainLoop(void)
 		int32 code;
 		status_t err = pmsg.GetNextMessage(code);
 		if (err < B_OK) {
-			STRACE(("MainLoop:pmsg.GetNextReply failed\n"));
+			STRACE(("MainLoop:pmsg.GetNextMessage() failed\n"));
 			continue;
 		}
 
