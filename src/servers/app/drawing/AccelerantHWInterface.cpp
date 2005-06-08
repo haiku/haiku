@@ -154,14 +154,19 @@ AccelerantHWInterface::OpenGraphicsDevice(int deviceNumber)
 	if (!directory)
 		return -1;
 
+	// ToDo: the former R5 "stub" driver is called "vesa" under Haiku; however,
+	//	we do not need to avoid this driver this way when is has been ported
+	//	to the new driver architecture - the special case here can then be
+	//	removed.
 	int count = 0;
 	struct dirent *entry;
 	int current_card_fd = -1;
 	char path[PATH_MAX];
-	while ((count < deviceNumber) && ((entry = readdir(directory)) != NULL)) {
+	while (count < deviceNumber && (entry = readdir(directory)) != NULL) {
 		if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..") ||
-			!strcmp(entry->d_name, "stub"))
+			!strcmp(entry->d_name, "stub") || !strcmp(entry->d_name, "vesa"))
 			continue;
+
 		if (current_card_fd >= 0) {
 			close(current_card_fd);
 			current_card_fd = -1;
@@ -173,10 +178,10 @@ AccelerantHWInterface::OpenGraphicsDevice(int deviceNumber)
 			count++;
 	}
 
-	// open stub if we were not able to get a "real" card
+	// Open VESA driver if we were not able to get a better one
 	if (count < deviceNumber) {
 		if (deviceNumber == 1) {
-			sprintf(path, "/dev/graphics/stub");
+			sprintf(path, "/dev/graphics/vesa");
 			current_card_fd = open(path, B_READ_WRITE);
 		} else {
 			close(current_card_fd);
