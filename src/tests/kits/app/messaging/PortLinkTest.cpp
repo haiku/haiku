@@ -5,6 +5,24 @@
 #include <string.h>
 
 
+const int32 kBufferSize = 2048;
+
+
+void
+get_next_message(BPortLink &link, int32 expectedCode)
+{
+	int32 code;
+	if (link.GetNextReply(code) != B_OK) {
+		fprintf(stderr, "get message failed!\n");
+		exit(-1);
+	}
+	if (code != expectedCode) {
+		fprintf(stderr, "code is wrong (%ld)!\n", code);
+		exit(-1);
+	}
+}
+
+
 int
 main()
 {
@@ -21,6 +39,22 @@ main()
 	sender.AttachString("");
 	sender.AttachString("Gurkensalat");
 
+	sender.StartMessage('tst3', 100000);
+	sender.Attach(&port, 100000);
+	if (sender.EndMessage() == B_OK) {
+		fprintf(stderr, "attaching huge message succeeded!\n");
+		return -1;
+	}
+
+	// force overlap
+	char test[kBufferSize + 2048];
+	sender.StartMessage('tst4');
+	sender.Attach(test, kBufferSize - 40);
+
+	// force buffer grow
+	sender.StartMessage('tst5');
+	sender.Attach(test, sizeof(test));
+
 	status_t status = sender.Flush();
 	if (status != B_OK) {
 		fprintf(stderr, "flushing messages failed: %ld, %s!\n",
@@ -28,13 +62,7 @@ main()
 		return -1;
 	}
 
-	int32 code;
-	if (receiver.GetNextReply(&code) != B_OK) {
-		fprintf(stderr, "get message failed!\n");
-		return -1;
-	}
-	if (code != 'tst1')
-		fprintf(stderr, "code is wrong (%ld)!\n", code);
+	get_next_message(receiver, 'tst1');
 
 	int32 value;
 	if (receiver.Read<int32>(&value) != B_OK) {
@@ -42,15 +70,12 @@ main()
 		return -1;
 	}
 
-	if (value != 42)
+	if (value != 42) {
 		fprintf(stderr, "value is wrong: %ld!\n", value);
-	
-	if (receiver.GetNextReply(&code) != B_OK) {
-		fprintf(stderr, "get message failed!\n");
 		return -1;
 	}
-	if (code != 'tst2')
-		fprintf(stderr, "code is wrong (%ld)!\n", code);
+
+	get_next_message(receiver, 'tst2');
 
 	for (int32 i = 0; i < 4; i++) {
 		char *string;
@@ -67,9 +92,16 @@ main()
 		free(string);
 	}
 
-	status = receiver.GetNextReply(&code, 0);
-	if (status != B_WOULD_BLOCK)
-		fprintf(stderr, "reading would not block!\n");
+	get_next_message(receiver, 'tst4');
+	get_next_message(receiver, 'tst5');
 
+	int32 code;
+	status = receiver.GetNextReply(code, 0);
+	if (status != B_WOULD_BLOCK) {
+		fprintf(stderr, "reading would not block!\n");
+		return -1;
+	}
+
+	puts("All OK!");
 	return 0;
 }

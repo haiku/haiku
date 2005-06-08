@@ -254,11 +254,13 @@ LinkMsgReader::ReadString(char **_string)
 			return B_NO_MEMORY;
 		}
 
-		status = Read(string, length);
-		if (status < B_OK) {
-			free(string);
-			fRecvPosition -= sizeof(int32);	// rewind the transaction
-			return status;
+		if (length > 0) {
+			status = Read(string, length);
+			if (status < B_OK) {
+				free(string);
+				fRecvPosition -= sizeof(int32);	// rewind the transaction
+				return status;
+			}
 		}
 
 		// make sure the string is null terminated
