@@ -1109,7 +1109,7 @@ BApplication::connect_to_app_server()
 	// 4) int32 - handler ID token of the app
 	// 5) char * - signature of the regular app
 	BPortLink link(fServerFrom, fServerTo);
-	int32 code = SERVER_FALSE;
+	int32 code;
 
 	link.StartMessage(AS_CREATE_APP);
 	link.Attach<port_id>(fServerTo);
@@ -1117,13 +1117,9 @@ BApplication::connect_to_app_server()
 	link.Attach<team_id>(Team());
 	link.Attach<int32>(_get_object_token_(this));
 	link.AttachString(fAppName);
-	link.Flush();
-	link.GetNextReply(&code);
 
-	// Reply code: SERVER_TRUE
-	// Reply data:
-	//	1) port_id server-side application port (fServerFrom value)
-	if (code == SERVER_TRUE)
+	if (link.FlushWithReply(code) == B_OK
+		&& code == SERVER_TRUE)
 		link.Read<port_id>(&fServerFrom);
 	else
 		debugger("BApplication: couldn't obtain new app_server comm port");

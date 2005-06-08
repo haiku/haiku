@@ -156,19 +156,23 @@ LinkMsgSender::Attach(const void *data, size_t size)
 
 
 status_t
-LinkMsgSender::AttachString(const char *string)
+LinkMsgSender::AttachString(const char *string, int32 length)
 {
 	if (string == NULL)
 		string = "";
 
-	int32 length = strlen(string) + 1;
+	if (length == -1)
+		length = strlen(string);
+
 	status_t status = Attach<int32>(length);
 	if (status < B_OK)
 		return status;
 
-	status = Attach(string, length);
-	if (status < B_OK)
-		fCurrentEnd -= sizeof(int32);	// rewind the transaction
+	if (length > 0) {
+		status = Attach(string, length);
+		if (status < B_OK)
+			fCurrentEnd -= sizeof(int32);	// rewind the transaction
+	}
 
 	return status;
 }

@@ -401,23 +401,19 @@ AppServer::Run(void)
 void
 AppServer::MainLoop(void)
 {
-	BPortLink pmsg(-1,fMessagePort);
-	int32 code=0;
-	status_t err=B_OK;
-	
-	while(1)
-	{
-		STRACE(("info: AppServer::MainLoop listening on port %ld.\n", fMessagePort));
-		err=pmsg.GetNextReply(&code);
+	BPortLink pmsg(-1, fMessagePort);
 
-		if(err<B_OK)
-		{
+	while (1) {
+		STRACE(("info: AppServer::MainLoop listening on port %ld.\n", fMessagePort));
+
+		int32 code;
+		status_t err = pmsg.GetNextReply(code);
+		if (err < B_OK) {
 			STRACE(("MainLoop:pmsg.GetNextReply failed\n"));
 			continue;
 		}
-		
-		switch(code)
-		{
+
+		switch (code) {
 			case B_QUIT_REQUESTED:
 			case AS_CREATE_APP:
 			case AS_DELETE_APP:

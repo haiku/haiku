@@ -87,3 +87,14 @@ BPortLink::AttachShape(BShape &shape)
 	fSender->Attach(opList, opCount * sizeof(uint32));
 	return fSender->Attach(ptList, ptCount * sizeof(BPoint));
 }
+
+
+status_t
+BPortLink::FlushWithReply(int32 &code)
+{
+	status_t status = Flush();
+	if (status < B_OK)
+		return status;
+
+	return GetNextReply(code);
+}

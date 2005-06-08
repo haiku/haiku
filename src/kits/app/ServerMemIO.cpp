@@ -39,42 +39,36 @@
 #include <ServerProtocol.h>
 #include "ServerMemIO.h"
 
+
 ServerMemIO::ServerMemIO(size_t size)
 		: fLen(0),
 		fPhys(0),
 		fPos(0)
 {
-	if(size>0)
-	{
-		BPrivate::BAppServerLink link;
-		link.StartMessage(AS_ACQUIRE_SERVERMEM);
-		link.Attach<size_t>(size);
-		link.Attach<port_id>(link.ReplyPort());
-		link.Flush();
-		
-		int32 code;
-		link.GetNextReply(&code);
-		
-		if(code==SERVER_TRUE)
-		{
-			area_info ai;
-			
-			link.Read<area_id>(&fSourceArea);
-			link.Read<size_t>(&fOffset);
-			
-			if(fSourceArea>0 && get_area_info(fSourceArea,&ai)==B_OK)
-			{
-				fPhys=size;
-				
-				fArea=clone_area("ServerMemIO area",(void**)&fBuf,B_CLONE_ADDRESS,
-						B_READ_AREA|B_WRITE_AREA,fSourceArea);
-				
-				fBuf+=fOffset;
-			}
-			else
-			{
-				debugger("PANIC: bad data or something in ServerMemIO constructor");
-			}
+	if (size == 0)
+		return;
+
+	BPrivate::BAppServerLink link;
+	link.StartMessage(AS_ACQUIRE_SERVERMEM);
+	link.Attach<size_t>(size);
+	link.Attach<port_id>(link.ReplyPort());
+
+	int32 code;
+	if (link.FlushWithReply(&code) == B_OK
+		&& code == SERVER_TRUE) {
+		area_info info;
+
+		link.Read<area_id>(&fSourceArea);
+		link.Read<size_t>(&fOffset);
+
+		if (fSourceArea >= B_OK && get_area_info(fSourceArea, &info) == B_OK) {
+			fPhys = size;
+			fArea = clone_area("ServerMemIO area", (void **)&fBuf, B_CLONE_ADDRESS,
+					B_READ_AREA|B_WRITE_AREA, fSourceArea);
+
+			fBuf += fOffset;
+		} else {
+			debugger("PANIC: bad data or something in ServerMemIO constructor");
 		}
 	}
 }

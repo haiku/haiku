@@ -192,12 +192,13 @@ RootLayer::RunThread()
 	\param data Pointer to the app_server to which the thread belongs
 	\return Throwaway value - always 0
 */
-int32 RootLayer::WorkingThread(void *data)
+int32
+RootLayer::WorkingThread(void *data)
 {
-	int32		code = 0;
-	status_t	err = B_OK;
-	RootLayer	*oneRootLayer	= (RootLayer*)data;
-	BPortLink	messageQueue(-1, oneRootLayer->fListenPort);
+	int32 code = 0;
+	status_t err = B_OK;
+	RootLayer *oneRootLayer = (RootLayer*)data;
+	BPortLink messageQueue(-1, oneRootLayer->fListenPort);
 
 	// first make sure we are actualy visible
 	oneRootLayer->Lock();
@@ -206,18 +207,16 @@ int32 RootLayer::WorkingThread(void *data)
 	oneRootLayer->Unlock();
 	
 	STRACE(("info: RootLayer(%s)::WorkingThread listening on port %ld.\n", oneRootLayer->GetName(), oneRootLayer->fListenPort));
-	for(;;)
-	{
-		err = messageQueue.GetNextReply(&code);
-		if(err < B_OK) {
+	for (;;) {
+		err = messageQueue.GetNextReply(code);
+		if (err < B_OK) {
 			STRACE(("WorkingThread: messageQueue.GetNextReply failed\n"));
 			continue;
 		}
 
 		oneRootLayer->Lock();
-		
-		switch(code)
-		{
+
+		switch (code) {
 			// We don't need to do anything with these two, so just pass them
 			// onto the active application. Eventually, we will end up passing 
 			// them onto the window which is currently under the cursor.
@@ -242,22 +241,22 @@ int32 RootLayer::WorkingThread(void *data)
 
 			case AS_ROOTLAYER_SHOW_WINBORDER:
 			{
-				WinBorder	*winBorder = NULL;
+				WinBorder *winBorder = NULL;
 				messageQueue.Read<WinBorder*>(&winBorder);
 				oneRootLayer->show_winBorder(winBorder);
 				break;
 			}
 			case AS_ROOTLAYER_HIDE_WINBORDER:
 			{
-				WinBorder	*winBorder = NULL;
+				WinBorder *winBorder = NULL;
 				messageQueue.Read<WinBorder*>(&winBorder);
 				oneRootLayer->hide_winBorder(winBorder);
 				break;
 			}
 			case AS_ROOTLAYER_DO_INVALIDATE:
 			{
-				BRegion		invalidRegion;
-				Layer		*layer = NULL;
+				BRegion invalidRegion;
+				Layer *layer = NULL;
 				messageQueue.Read<Layer*>(&layer);
 				messageQueue.ReadRegion(&invalidRegion);
 				oneRootLayer->invalidate_layer(layer, invalidRegion);
@@ -265,8 +264,8 @@ int32 RootLayer::WorkingThread(void *data)
 			}
 			case AS_ROOTLAYER_DO_REDRAW:
 			{
-				BRegion		redrawRegion;
-				Layer		*layer = NULL;
+				BRegion redrawRegion;
+				Layer *layer = NULL;
 				messageQueue.Read<Layer*>(&layer);
 				messageQueue.ReadRegion(&redrawRegion);
 				oneRootLayer->redraw_layer(layer, redrawRegion);
@@ -274,8 +273,8 @@ int32 RootLayer::WorkingThread(void *data)
 			}
 			case AS_ROOTLAYER_LAYER_MOVE:
 			{
-				Layer		*layer = NULL;
-				float		x, y;
+				Layer *layer = NULL;
+				float x, y;
 				messageQueue.Read<Layer*>(&layer);
 				messageQueue.Read<float>(&x);
 				messageQueue.Read<float>(&y);
@@ -284,8 +283,8 @@ int32 RootLayer::WorkingThread(void *data)
 			}
 			case AS_ROOTLAYER_LAYER_RESIZE:
 			{
-				Layer		*layer = NULL;
-				float		x, y;
+				Layer *layer = NULL;
+				float x, y;
 				messageQueue.Read<Layer*>(&layer);
 				messageQueue.Read<float>(&x);
 				messageQueue.Read<float>(&y);
@@ -294,8 +293,8 @@ int32 RootLayer::WorkingThread(void *data)
 			}
 			case AS_ROOTLAYER_ADD_TO_SUBSET:
 			{
-				WinBorder	*winBorder = NULL;
-				WinBorder	*toWinBorder = NULL;
+				WinBorder *winBorder = NULL;
+				WinBorder *toWinBorder = NULL;
 				messageQueue.Read<WinBorder*>(&winBorder);
 				messageQueue.Read<WinBorder*>(&toWinBorder);
 				oneRootLayer->fDesktop->AddWinBorderToSubset(winBorder, toWinBorder);
@@ -303,8 +302,8 @@ int32 RootLayer::WorkingThread(void *data)
 			}
 			case AS_ROOTLAYER_REMOVE_FROM_SUBSET:
 			{
-				WinBorder	*winBorder = NULL;
-				WinBorder	*fromWinBorder = NULL;
+				WinBorder *winBorder = NULL;
+				WinBorder *fromWinBorder = NULL;
 				messageQueue.Read<WinBorder*>(&winBorder);
 				messageQueue.Read<WinBorder*>(&fromWinBorder);
 				oneRootLayer->fDesktop->RemoveWinBorderFromSubset(winBorder, fromWinBorder);
@@ -312,8 +311,8 @@ int32 RootLayer::WorkingThread(void *data)
 			}
 			case AS_ROOTLAYER_WINBORDER_SET_WORKSPACES:
 			{
-				WinBorder	*winBorder = NULL;
-				uint32		oldWks = 0, newWks = 0;
+				WinBorder *winBorder = NULL;
+				uint32 oldWks = 0, newWks = 0;
 
 				messageQueue.Read<WinBorder*>(&winBorder);
 				messageQueue.Read<uint32>(&oldWks);
@@ -323,8 +322,8 @@ int32 RootLayer::WorkingThread(void *data)
 			}
 			case AS_ROOTLAYER_DO_CHANGE_WINBORDER_FEEL:
 			{
-				WinBorder	*winBorder = NULL;
-				int32		newFeel = 0;
+				WinBorder *winBorder = NULL;
+				int32 newFeel = 0;
 
 				messageQueue.Read<WinBorder*>(&winBorder);
 				messageQueue.Read<int32>(&newFeel);
@@ -345,9 +344,11 @@ int32 RootLayer::WorkingThread(void *data)
 	return 0;
 }
 
-void RootLayer::GoInvalidate(const Layer *layer, const BRegion &region)
+
+void
+RootLayer::GoInvalidate(const Layer *layer, const BRegion &region)
 {
-	BPortLink	msg(fListenPort, -1);
+	BPortLink msg(fListenPort, -1);
 	msg.StartMessage(AS_ROOTLAYER_DO_INVALIDATE);
 	msg.Attach<const Layer*>(layer);
 	msg.AttachRegion(region);

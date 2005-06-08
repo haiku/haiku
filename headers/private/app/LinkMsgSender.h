@@ -34,7 +34,7 @@ class LinkMsgSender {
 		//status_t FlushWithReply(int32 *code);
 
 		status_t Attach(const void *data, size_t size);
-		status_t AttachString(const char *string);
+		status_t AttachString(const char *string, int32 length = -1);
 		template <class Type> status_t Attach(const Type& data)
 		{
 			return Attach(&data, sizeof(Type));

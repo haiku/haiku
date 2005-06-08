@@ -51,7 +51,7 @@ class BPortLink {
 
 		status_t Flush(bigtime_t timeout = B_INFINITE_TIMEOUT, bool needsReply = false);
 		status_t Attach(const void *data, ssize_t size);
-		status_t AttachString(const char *string);
+		status_t AttachString(const char *string, int32 length = -1);
 		status_t AttachRegion(const BRegion &region);
 		status_t AttachShape(BShape &shape);
 		template <class Type> status_t Attach(const Type& data);
@@ -61,12 +61,16 @@ class BPortLink {
 		void SetReplyPort(port_id port);
 		port_id	ReplyPort();
 
-		status_t GetNextReply(int32 *code, bigtime_t timeout = B_INFINITE_TIMEOUT);
+		status_t GetNextReply(int32 &code, bigtime_t timeout = B_INFINITE_TIMEOUT);
 		status_t Read(void *data, ssize_t size);
 		status_t ReadString(char **string);
 		status_t ReadRegion(BRegion *region);
 		status_t ReadShape(BShape *shape);
 		template <class Type> status_t Read(Type *data);
+
+		// convenience methods
+
+		status_t FlushWithReply(int32 &code);
 
 	protected:
 		LinkMsgReader *fReader;
@@ -118,9 +122,9 @@ BPortLink::Attach(const void *data, ssize_t size)
 }
 
 inline status_t
-BPortLink::AttachString(const char *string)
+BPortLink::AttachString(const char *string, int32 length)
 {
-	return fSender->AttachString(string);
+	return fSender->AttachString(string, length);
 }
 
 template<class Type> status_t
@@ -144,7 +148,7 @@ BPortLink::ReplyPort()
 }
 
 inline status_t
-BPortLink::GetNextReply(int32 *code, bigtime_t timeout)
+BPortLink::GetNextReply(int32 &code, bigtime_t timeout)
 {
 	return fReader->GetNextMessage(code, timeout);
 }

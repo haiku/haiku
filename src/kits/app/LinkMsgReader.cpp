@@ -54,7 +54,7 @@ LinkMsgReader::SetPort(port_id port)
 
 
 status_t
-LinkMsgReader::GetNextMessage(int32 *code, bigtime_t timeout)
+LinkMsgReader::GetNextMessage(int32 &code, bigtime_t timeout)
 {
 	int32 remaining;
 
@@ -92,7 +92,7 @@ LinkMsgReader::GetNextMessage(int32 *code, bigtime_t timeout)
 		return B_ERROR;
 	}
 
-	*code = header->code;
+	code = header->code;
 	fRecvPosition += sizeof(message_header);
 
 	STRACE(("info: LinkMsgReader got header %s [%ld %ld %ld] from port %ld.\n",
@@ -247,8 +247,8 @@ LinkMsgReader::ReadString(char **_string)
 	if (status < B_OK)
 		return status;
 
-	if (length > 0) {
-		char *string = (char *)malloc(length);
+	if (length >= 0) {
+		char *string = (char *)malloc(length + 1);
 		if (string == NULL) {
 			fRecvPosition -= sizeof(int32);	// rewind the transaction
 			return B_NO_MEMORY;
@@ -261,8 +261,8 @@ LinkMsgReader::ReadString(char **_string)
 			return status;
 		}
 
-		// make sure the string is null terminated (although it already should be)
-		string[length - 1] = '\0';
+		// make sure the string is null terminated
+		string[length] = '\0';
 
 		*_string = string;
 		return B_OK;

@@ -1,31 +1,13 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Window.cpp
-//	Author:			Adrian Oanca (adioanca@mymail.ro)
-//	Description:	A BWindow object represents a window that can be displayed
-//					on the screen, and that can be the target of user events
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adrian Oanca <adioanca@cotty.iren.ro>
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
 
-// System Includes -------------------------------------------------------------
+
 #include <BeBuild.h>
 #include <InterfaceDefs.h>
 #include <PropertyInfo.h>
@@ -43,7 +25,6 @@
 #include <MessageRunner.h>
 #include <Roster.h>
 
-// Project Includes ------------------------------------------------------------
 #include <AppMisc.h>
 #include <PortLink.h>
 #include <ServerProtocol.h>
@@ -51,9 +32,9 @@
 #include <MessageUtils.h>
 #include <WindowAux.h>
 
-// Standard Includes -----------------------------------------------------------
 #include <stdio.h>
 #include <math.h>
+
 
 //#define DEBUG_WIN
 #ifdef DEBUG_WIN
@@ -65,8 +46,7 @@
 
 using BPrivate::gDefaultTokens;
 
-static property_info
-sWindowPropInfo[] = {
+static property_info sWindowPropInfo[] = {
 	{
 		"Feel", { B_GET_PROPERTY, B_SET_PROPERTY },
 		{ B_DIRECT_SPECIFIER }, NULL, 0, { B_INT32_TYPE } 
@@ -391,16 +371,16 @@ BWindow::SendBehind(const BWindow *window)
 	if (!window)
 		return B_ERROR;
 
-	int32 rCode;
-
 	Lock();
 	fLink->StartMessage(AS_SEND_BEHIND);
 	fLink->Attach<int32>(_get_object_token_(window));
-	fLink->Flush();
-	fLink->GetNextReply(&rCode);
+
+	int32 code = SERVER_FALSE;
+	fLink->FlushWithReply(code);
+
 	Unlock();
 
-	return rCode == SERVER_TRUE ? B_OK : B_ERROR;
+	return code == SERVER_TRUE ? B_OK : B_ERROR;
 }
 
 
@@ -416,12 +396,13 @@ BWindow::Flush() const
 void
 BWindow::Sync() const
 {
-	int32 rCode;
-
 	const_cast<BWindow*>(this)->Lock();
 	fLink->StartMessage(AS_SYNC);
-	fLink->Flush();
-	fLink->GetNextReply(&rCode);
+
+	// ToDo: why with reply?
+	int32 code;
+	if (fLink->FlushWithReply(code) == B_OK)
+
 	const_cast<BWindow*>(this)->Unlock();
 }
 
@@ -1030,12 +1011,10 @@ BWindow::SetSizeLimits(float minWidth, float maxWidth,
 		fLink->Attach<float>(maxWidth);
 		fLink->Attach<float>(minHeight);
 		fLink->Attach<float>(maxHeight);
-		fLink->Flush();
 
-		int32 rCode;
-		fLink->GetNextReply(&rCode);
-	
-		if (rCode == SERVER_TRUE) {
+		int32 code;
+		if (fLink->FlushWithReply(code) == B_OK
+			&& code == SERVER_TRUE) {
 			// read the values that were really enforced on
 			// the server side
 			fLink->Read<float>(&fMinWindWidth);
@@ -1269,15 +1248,16 @@ bool
 BWindow::NeedsUpdate() const
 {
 	// TODO: What about locking?!?
-	int32 rCode;
 
 	const_cast<BWindow *>(this)->Lock();	
 	fLink->StartMessage(AS_NEEDS_UPDATE);
-	fLink->Flush();
-	fLink->GetNextReply(&rCode);
+
+	int32 code = SERVER_FALSE;
+	fLink->FlushWithReply(code);
+
 	const_cast<BWindow *>(this)->Unlock();
 
-	return rCode == SERVER_TRUE;
+	return code == SERVER_TRUE;
 }
 
 
@@ -1538,17 +1518,18 @@ BWindow::AddToSubset(BWindow *window)
 		return B_BAD_VALUE;
 
 	team_id team = Team();
-	int32 rCode;
 
 	Lock();
 	fLink->StartMessage(AS_ADD_TO_SUBSET);
 	fLink->Attach<int32>(_get_object_token_(window));
 	fLink->Attach<team_id>(team);
-	fLink->Flush();
-	fLink->GetNextReply(&rCode);
+
+	int32 code = SERVER_FALSE;
+	fLink->FlushWithReply(code);
+
 	Unlock();
 
-	return rCode == SERVER_TRUE ? B_OK : B_ERROR;
+	return code == SERVER_TRUE ? B_OK : B_ERROR;
 }
 
 
@@ -1561,17 +1542,17 @@ BWindow::RemoveFromSubset(BWindow *window)
 		return B_BAD_VALUE;
 
 	team_id team = Team();
-	int32 rCode;
 
 	Lock();
 	fLink->StartMessage(AS_REM_FROM_SUBSET);
 	fLink->Attach<int32>(_get_object_token_(window));
 	fLink->Attach<team_id>(team);
-	fLink->Flush();
-	fLink->GetNextReply(&rCode);
+
+	int32 code;
+	fLink->FlushWithReply(code);
 	Unlock();
 
-	return rCode == SERVER_TRUE ? B_OK : B_ERROR;
+	return code == SERVER_TRUE ? B_OK : B_ERROR;
 }
 
 
@@ -1607,17 +1588,18 @@ BWindow::Type() const
 status_t
 BWindow::SetLook(window_look look)
 {
-	int32 rCode;
 
 	Lock();
 	fLink->StartMessage(AS_SET_LOOK);
 	fLink->Attach<int32>((int32)look);
-	fLink->Flush();
-	fLink->GetNextReply(&rCode);
+
+	int32 code = SERVER_FALSE;
+	fLink->FlushWithReply(code);
+
 	Unlock();
 
 	// ToDo: the server should probably return something more meaningful, anyway
-	if (rCode == SERVER_TRUE) {
+	if (code == SERVER_TRUE) {
 		fLook = look;
 		return B_OK;
 	}
@@ -1669,16 +1651,17 @@ BWindow::Feel() const
 status_t
 BWindow::SetFlags(uint32 flags)
 {
-	int32 rCode;
 
 	Lock();	
 	fLink->StartMessage(AS_SET_FLAGS);
 	fLink->Attach<uint32>(flags);
-	fLink->Flush();
-	fLink->GetNextReply(&rCode);
+
+	int32 code = SERVER_FALSE;
+	fLink->FlushWithReply(code);
+
 	Unlock();
 
-	if (rCode == SERVER_TRUE) {
+	if (code == SERVER_TRUE) {
 		fFlags = flags;
 		return B_OK;
 	}
@@ -1707,7 +1690,6 @@ BWindow::SetWindowAlignment(window_alignment mode,
 		return B_BAD_VALUE;
 
 	// TODO: test if hOffset = 0 and set it to 1 if true.
-	int32 rCode;
 
 	Lock();
 	fLink->StartMessage(AS_SET_ALIGNMENT);
@@ -1720,11 +1702,13 @@ BWindow::SetWindowAlignment(window_alignment mode,
 	fLink->Attach<int32>(vOffset);
 	fLink->Attach<int32>(height);
 	fLink->Attach<int32>(heightOffset);
-	fLink->Flush();
-	fLink->GetNextReply(&rCode);
+
+	int32 code = SERVER_FALSE;
+	fLink->FlushWithReply(code);
+
 	Unlock();
 
-	if (rCode == SERVER_TRUE)
+	if (code == SERVER_TRUE)
 		return B_OK;
 
 	return B_ERROR;
@@ -1736,14 +1720,12 @@ BWindow::GetWindowAlignment(window_alignment *mode,
 	int32 *h, int32 *hOffset, int32 *width, int32 *widthOffset,
 	int32 *v, int32 *vOffset, int32 *height, int32 *heightOffset) const
 {
-	int32 rCode;
-
-	const_cast<BWindow*>(this)->Lock();
+	const_cast<BWindow *>(this)->Lock();
 	fLink->StartMessage(AS_GET_ALIGNMENT);
-	fLink->Flush();
-	fLink->GetNextReply(&rCode);
 
-	if (rCode == SERVER_TRUE) {
+	int32 code = SERVER_FALSE;
+	if (fLink->FlushWithReply(code) == B_OK
+		&& code == SERVER_TRUE) {
 		fLink->Read<int32>((int32 *)mode);
 		fLink->Read<int32>(h);
 		fLink->Read<int32>(hOffset);
@@ -1752,15 +1734,14 @@ BWindow::GetWindowAlignment(window_alignment *mode,
 		fLink->Read<int32>(v);
 		fLink->Read<int32>(hOffset);
 		fLink->Read<int32>(height);
-		rCode = fLink->Read<int32>(heightOffset);
-
-		return B_NO_ERROR;
+		fLink->Read<int32>(heightOffset);
 	}
+
 	const_cast<BWindow *>(this)->Unlock();
-	
-	if(rCode!=B_OK)
+
+	if (code != SERVER_TRUE)
 		return B_ERROR;
-	
+
 	return B_OK;
 }
 
@@ -1768,14 +1749,16 @@ BWindow::GetWindowAlignment(window_alignment *mode,
 uint32
 BWindow::Workspaces() const
 {
-	uint32 workspaces;
-	int32 rCode;
+	uint32 workspaces = 0;
 
 	const_cast<BWindow *>(this)->Lock();
 	fLink->StartMessage(AS_GET_WORKSPACES);
-	fLink->Flush();
-	fLink->GetNextReply(&rCode);
-	fLink->Read<uint32>(&workspaces);
+
+	int32 code;
+	if (fLink->FlushWithReply(code) == B_OK
+		&& code == SERVER_TRUE)
+		fLink->Read<uint32>(&workspaces);
+
 	const_cast<BWindow *>(this)->Unlock();
 
 	// TODO: shouldn't we cache?
@@ -2087,14 +2070,13 @@ BWindow::InitData(BRect frame, const char* title, window_look look,
 	// HERE we are in BApplication's thread, so for locking we use be_app variable
 	// we'll lock the be_app to be sure we're the only one writing at BApplication's server port
 	bool locked = false;
-	if (!(be_app->IsLocked())) {
+	if (!be_app->IsLocked()) {
 		be_app->Lock();
 		locked = true; 
 	}
 
 	STRACE(("be_app->fServerTo is %ld\n", be_app->fServerFrom));
 
-	status_t err;
 	fLink->StartMessage(AS_CREATE_WINDOW);
 	fLink->Attach<BRect>(fFrame);
 	fLink->Attach<int32>((int32)fLook);
@@ -2105,21 +2087,21 @@ BWindow::InitData(BRect frame, const char* title, window_look look,
 	fLink->Attach<port_id>(receive_port);
 	fLink->Attach<port_id>(fMsgPort);
 	fLink->AttachString(title);
-	fLink->Flush();
 
-	send_port = -1;
-	int32 rCode = SERVER_FALSE;
-	err = fLink->GetNextReply(&rCode);
-	if (err == B_OK && rCode == SERVER_TRUE)
-		fLink->Read<port_id>(&send_port);
-	fLink->SetSendPort(send_port);
+	int32 code;
+	if (fLink->FlushWithReply(code) == B_OK
+		&& code == SERVER_TRUE
+		&& fLink->Read<port_id>(&send_port) == B_OK)
+		fLink->SetSendPort(send_port);
+	else
+		send_port = -1;
 
 	if (locked)
 		be_app->Unlock();
 
 	STRACE(("Server says that our send port is %ld\n", send_port));
 
-	STRACE(("Window locked?: %s\n", IsLocked()?"True":"False"));
+	STRACE(("Window locked?: %s\n", IsLocked() ? "True" : "False"));
 
 	// build and register top_view with app_server
 	BuildTopView();

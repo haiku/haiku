@@ -75,7 +75,7 @@ BAppServerLink::FlushWithReply(int32 *code)
 	if (err < B_OK)
 		return err;
 
-	return GetNextReply(code);
+	return GetNextReply(*code);
 }
 
 }	// namespace BPrivate

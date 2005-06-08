@@ -297,7 +297,7 @@ ServerApp::MonitorApp(void *data)
 	
 	while (!app->fQuitting) {
 		STRACE(("info: ServerApp::MonitorApp listening on port %ld.\n", app->fMessagePort));
-		err = msgqueue.GetNextMessage(&code);
+		err = msgqueue.GetNextMessage(code);
 		if (err < B_OK) {
 			STRACE(("ServerApp::MonitorApp(): GetNextMessage returned %s\n", strerror(err)));
 
