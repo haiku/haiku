@@ -1759,10 +1759,13 @@ status_t
 Inode::ShrinkStream(Transaction &transaction, off_t size)
 {
 	data_stream *data = &Node().data;
+	status_t status;
 
 	if (data->MaxDoubleIndirectRange() > size) {
-		FreeStaticStreamArray(transaction, 0, data->double_indirect, size,
+		status = FreeStaticStreamArray(transaction, 0, data->double_indirect, size,
 			data->MaxIndirectRange(), data->max_double_indirect_range);
+		if (status < B_OK)
+			return status;
 
 		if (size <= data->MaxIndirectRange()) {
 			fVolume->Free(transaction, data->double_indirect);
@@ -1792,8 +1795,10 @@ Inode::ShrinkStream(Transaction &transaction, off_t size)
 	}
 	if (data->MaxDirectRange() > size) {
 		off_t offset = 0;
-		FreeStreamArray(transaction, data->direct, NUM_DIRECT_BLOCKS, size, offset,
-			data->max_direct_range);
+		status = FreeStreamArray(transaction, data->direct, NUM_DIRECT_BLOCKS,
+			size, offset, data->max_direct_range);
+		if (status < B_OK)
+			return status;
 	}
 
 	data->size = HOST_ENDIAN_TO_BFS_INT64(size);

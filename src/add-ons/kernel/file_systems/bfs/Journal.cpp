@@ -336,6 +336,12 @@ Journal::FlushLogAndBlocks()
 	if (status != B_OK)
 		return status;
 
+	if (fLock.OwnerCount() > 1) {
+		// whoa, FlushLogAndBlocks() was called from inside a transaction
+		fLock.Unlock();
+		return B_OK;
+	}
+
 	// write the current log entry to disk
 
 	if (fTransactionID != -1 && TransactionSize() != 0) {
@@ -343,6 +349,7 @@ Journal::FlushLogAndBlocks()
 		if (status < B_OK)
 			FATAL(("writing current log entry failed: %s\n", strerror(status)));
 	}
+
 	status = fVolume->FlushDevice();
 
 	fLock.Unlock();

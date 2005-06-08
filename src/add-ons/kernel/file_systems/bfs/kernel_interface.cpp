@@ -1259,8 +1259,13 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 
 		if (needsTrimming) {
 			status = inode->TrimPreallocation(transaction);
-			if (status < B_OK)
-				FATAL(("Could not trim preallocated blocks!"));
+			if (status < B_OK) {
+				FATAL(("Could not trim preallocated blocks: inode %Ld, transaction %ld: %s!\n",
+					inode->ID(), transaction.ID(), strerror(status)));
+
+				// we still want this transaction to succeed
+				status = B_OK;
+			}
 		}
 		if (needsTrimming || inode->OldSize() != inode->Size()) {
 			index.UpdateSize(transaction, inode);
