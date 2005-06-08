@@ -1546,6 +1546,7 @@ XML(enum command cmd) {
 	char *p;
 	static int fRefEntry=0;
 	static int fRefPurpose=0;
+	static int fSynopsisFirst=0;
 	/*static char *bads => XML doesn't backslash-quote metacharacters */
 
 /*
@@ -1665,7 +1666,7 @@ XML(enum command cmd) {
 	   case BEGINSECTION:
 		if (sectheadid==NAME) printf("<refnamediv><!--\n");
 			/*printf("<RefEntry>");  -- do lotsa parsing here for RefName, RefPurpose*/
-		else if (sectheadid==SYNOPSIS) printf("<refsynopsisdiv>\n<cmdsynopsis><!--\n");
+		else if (sectheadid==SYNOPSIS) { fSynopsisFirst = 1; printf("<refsynopsisdiv>\n<cmdsynopsis><!--\n"); }
 		else printf("\n<refsect1>\n");
 		break;
 	   case ENDSECTION:
@@ -1732,7 +1733,7 @@ XML(enum command cmd) {
 		break;
 
 	   /* have to make some guess about bold and italics */
-	   case BEGINBOLD:		if (sectheadid==SYNOPSIS) printf("-->"); 
+	   case BEGINBOLD:		if (sectheadid==SYNOPSIS && fSynopsisFirst) { fSynopsisFirst = 0; printf("-->"); } 
 					printf("<command>"); break;
 	   case ENDBOLD:		printf("</command>"); break;
 	   case BEGINITALICS:	printf("<emphasis>"); break;	/* could be literal or arg */
