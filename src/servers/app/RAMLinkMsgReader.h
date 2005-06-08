@@ -39,38 +39,24 @@
 		size_t buffer size
 		[data buffer]
 */
-class RAMLinkMsgReader : public LinkMsgReader
-{
-public:
-	RAMLinkMsgReader(int8 *buffer);
-	RAMLinkMsgReader(void);
-	~RAMLinkMsgReader(void);
-	
-	void SetBuffer(int8 *buffer);
-	int8 *GetBuffer(void);
-	size_t GetBufferSize(void);
-	int32 Code(void) { return fCode; }
-	
-	status_t Read(void *data, ssize_t size);
-	status_t ReadString(char **string);
-	template <class Type> status_t Read(Type *data)
-	{
-		return Read(data, sizeof(Type));
-	}
+class RAMLinkMsgReader : public LinkMsgReader {
+	public:
+		RAMLinkMsgReader(int8 *buffer);
+		RAMLinkMsgReader(void);
+		virtual ~RAMLinkMsgReader(void);
 
-	// These should never need to be called where this class is used. However, we do
-	// need to make debugging easier for such contexts...
-	status_t GetNextMessage(int32 *code, bigtime_t timeout);
-	void SetPort(port_id port);
-	port_id GetPort(void);
-	
-protected:
-	
-	
-	int8 *fBuffer, *fAttachStart;
-	int8 *fPosition;
-	size_t fAttachSize;
-	int32 fCode;
+		void SetBuffer(int8 *buffer);
+		int8 *GetBuffer(void);
+		size_t GetBufferSize(void);
+		int32 Code(void) { return fCode; }
+
+		virtual status_t Read(void *data, ssize_t size);
+
+	protected:
+		int8 *fBuffer, *fAttachStart;
+		int8 *fPosition;
+		size_t fAttachSize;
+		int32 fCode;
 };
 
 #endif

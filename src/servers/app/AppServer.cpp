@@ -257,22 +257,16 @@ AppServer::~AppServer(void)
 int32
 AppServer::PicassoThread(void *data)
 {
-	int32		i;
-	AppServer	*appserver=(AppServer*)data;
-	ServerApp	*app;
-	for(;;)
-	{
-		i = 0;
-		acquire_sem(appserver->fAppListLock);
-		for(;;)
-		{
-			app=(ServerApp*)appserver->fAppList->ItemAt(i++);
-			if(!app)
+	for (;;) {
+		acquire_sem(sAppServer->fAppListLock);
+		for (int32 i = 0;;) {
+			ServerApp *app = (ServerApp *)sAppServer->fAppList->ItemAt(i++);
+			if (!app)
 				break;
 
 			app->PingTarget();
 		}
-		release_sem(appserver->fAppListLock);		
+		release_sem(sAppServer->fAppListLock);		
 		// we do this every other second so as not to suck *too* many CPU cycles
 		snooze(1000000);
 	}
@@ -407,7 +401,7 @@ AppServer::MainLoop(void)
 		STRACE(("info: AppServer::MainLoop listening on port %ld.\n", fMessagePort));
 
 		int32 code;
-		status_t err = pmsg.GetNextReply(code);
+		status_t err = pmsg.GetNextMessage(code);
 		if (err < B_OK) {
 			STRACE(("MainLoop:pmsg.GetNextReply failed\n"));
 			continue;
@@ -424,12 +418,12 @@ AppServer::MainLoop(void)
 			case AS_SET_DECORATOR:
 			case AS_GET_DECORATOR:
 			case AS_R5_SET_DECORATOR:
-				DispatchMessage(code,pmsg);
+				DispatchMessage(code, pmsg);
 				break;
 			default:
 			{
-				STRACE(("Server::MainLoop received unexpected code %ld(offset %ld)\n",
-						code,code-SERVER_TRUE));
+				STRACE(("Server::MainLoop received unexpected code %ld (offset %ld)\n",
+						code, code - SERVER_TRUE));
 				break;
 			}
 		}
@@ -464,19 +458,19 @@ AppServer::LoadDecorator(const char *path)
 	status_t			stat;
 	image_id			addon;
 	
-	addon= load_add_on(path);
-	if(addon < 0)
+	addon = load_add_on(path);
+	if (addon < B_OK)
 		return false;
 
 	// As of now, we do nothing with decorator versions, but the possibility exists
 	// that the API will change even though I cannot forsee any reason to do so. If
 	// we *did* do anything with decorator versions, the assignment to a global would
 	// go here.
-		
+
 	// Get the instantiation function
-	stat= get_image_symbol(addon, "instantiate_decorator", B_SYMBOL_TYPE_TEXT, (void**)&pcreatefunc);
-	if(stat != B_OK)
-	{
+	stat = get_image_symbol(addon, "instantiate_decorator",
+		B_SYMBOL_TYPE_TEXT, (void**)&pcreatefunc);
+	if (stat != B_OK) {
 		unload_add_on(addon);
 		return false;
 	}
@@ -497,33 +491,29 @@ AppServer::InitDecorators(void)
 {
 	BMessage settings;
 
-	BDirectory dir,newdir;
-	if(dir.SetTo(SERVER_SETTINGS_DIR)==B_ENTRY_NOT_FOUND)
-		create_directory(SERVER_SETTINGS_DIR,0777);
+	BDirectory dir;
+	if (dir.SetTo(SERVER_SETTINGS_DIR) == B_ENTRY_NOT_FOUND)
+		create_directory(SERVER_SETTINGS_DIR, 0777);
 
 	BString path(SERVER_SETTINGS_DIR);
-	path+="DecoratorSettings";
-	BFile file(path.String(),B_READ_ONLY);
+	path += "DecoratorSettings";
+	BFile file(path.String(), B_READ_ONLY);
 
-	if(file.InitCheck()==B_OK)
-	{
-		if(settings.Unflatten(&file)==B_OK)
-		{
-			BString itemtext;
-			if(settings.FindString("decorator",&itemtext)==B_OK)
-			{
-				path.SetTo(DECORATORS_DIR);
-				path+=itemtext;
-				if(LoadDecorator(path.String()))
-					return;
-			}
+	if (file.InitCheck() == B_OK
+		&& settings.Unflatten(&file) == B_OK) {
+		BString itemtext;
+		if (settings.FindString("decorator", &itemtext) == B_OK) {
+			path.SetTo(DECORATORS_DIR);
+			path += itemtext;
+			if (LoadDecorator(path.String()))
+				return;
 		}
 	}
 
 	// We got this far, so something must have gone wrong. We set make_decorator
 	// to NULL so that the decorator allocation routine knows to utilize the included
 	// default decorator instead of an addon.
-	make_decorator=NULL;
+	make_decorator = NULL;
 }
 
 /*!
@@ -550,25 +540,26 @@ AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			// Find the necessary data
 			team_id	clientTeamID = -1;
 			port_id	clientLooperPort = -1;
-			port_id app_port = -1;
+			port_id clientReplyPort = -1;
 			int32 htoken = B_NULL_TOKEN;
-			char *app_signature = NULL;
+			char *appSignature = NULL;
 
-			msg.Read<port_id>(&app_port);
+			msg.Read<port_id>(&clientReplyPort);
 			msg.Read<port_id>(&clientLooperPort);
 			msg.Read<team_id>(&clientTeamID);
 			msg.Read<int32>(&htoken);
-			msg.ReadString(&app_signature);
+			if (msg.ReadString(&appSignature) != B_OK)
+				break;
 
-			port_id server_listen = create_port(DEFAULT_MONITOR_PORT_SIZE, app_signature);
-			if (server_listen < B_OK) {
+			port_id serverListen = create_port(DEFAULT_MONITOR_PORT_SIZE, appSignature);
+			if (serverListen < B_OK) {
 				printf("No more ports left. Time to crash. Have a nice day! :)\n");
 				break;
 			}
-			
+
 			// we let the application own the port, so that we get aware when it's gone
-			if (set_port_owner(server_listen, clientTeamID) < B_OK) {
-				delete_port(server_listen);
+			if (set_port_owner(serverListen, clientTeamID) < B_OK) {
+				delete_port(serverListen);
 				printf("Could not transfer port ownership to client %ld!\n", clientTeamID);
 				break;
 			}
@@ -576,21 +567,21 @@ AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			// Create the ServerApp subthread for this app
 			acquire_sem(fAppListLock);
 
-			ServerApp *app = new ServerApp(app_port,server_listen, clientLooperPort,
-				clientTeamID, htoken, app_signature);
+			ServerApp *app = new ServerApp(clientReplyPort, serverListen, clientLooperPort,
+				clientTeamID, htoken, appSignature);
 
 			// add the new ServerApp to the known list of ServerApps
 			fAppList->AddItem(app);
 
 			release_sem(fAppListLock);
 
-			BPortLink replylink(app_port);
+			BPortLink replylink(clientReplyPort);
 			replylink.StartMessage(SERVER_TRUE);
-			replylink.Attach<int32>(server_listen);
+			replylink.Attach<int32>(serverListen);
 			replylink.Flush();
 
 			// This is necessary because BPortLink::ReadString allocates memory
-			free(app_signature);
+			free(appSignature);
 			break;
 		}
 		case AS_DELETE_APP:

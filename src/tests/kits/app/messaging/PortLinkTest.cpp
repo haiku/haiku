@@ -12,7 +12,7 @@ void
 get_next_message(BPortLink &link, int32 expectedCode)
 {
 	int32 code;
-	if (link.GetNextReply(code) != B_OK) {
+	if (link.GetNextMessage(code) != B_OK) {
 		fprintf(stderr, "get message failed!\n");
 		exit(-1);
 	}
@@ -96,7 +96,7 @@ main()
 	get_next_message(receiver, 'tst5');
 
 	int32 code;
-	status = receiver.GetNextReply(code, 0);
+	status = receiver.GetNextMessage(code, 0);
 	if (status != B_WOULD_BLOCK) {
 		fprintf(stderr, "reading would not block!\n");
 		return -1;

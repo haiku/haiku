@@ -34,7 +34,6 @@
 
 
 BLocker sLock;
-port_id sReplyPort = -1;
 
 
 namespace BPrivate {
@@ -44,15 +43,10 @@ BAppServerLink::BAppServerLink(void)
 	sLock.Lock();
 
 	// if there is no be_app, we can't do a whole lot, anyway
-	if (be_app)
+	if (be_app) {
 		SetSendPort(be_app->fServerFrom);
-
-	// There is only one global reply port, and we create it here
-	// (protected by sLock) when it's not yet there
-	if (sReplyPort < B_OK)
-		sReplyPort = create_port(100, "AppServerLink reply port");
-
-	SetReplyPort(sReplyPort);
+		SetReplyPort(be_app->fServerTo);
+	}
 }
 
 
@@ -65,17 +59,11 @@ BAppServerLink::~BAppServerLink()
 status_t
 BAppServerLink::FlushWithReply(int32 *code)
 {
-	status_t err;
-	
-	err = Attach<port_id>(sReplyPort);
-	if (err < B_OK)
-		return err;
+	status_t status = Flush(B_INFINITE_TIMEOUT, true);
+	if (status < B_OK)
+		return status;
 
-	err = Flush();
-	if (err < B_OK)
-		return err;
-
-	return GetNextReply(*code);
+	return GetNextMessage(*code);
 }
 
 }	// namespace BPrivate

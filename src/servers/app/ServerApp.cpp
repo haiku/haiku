@@ -1,35 +1,19 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		ServerApp.cpp
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Server-side BApplication counterpart
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Adrian Oanca <adioanca@cotty.iren.ro>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ *		Stefano Ceccherini (burton666@libero.it)
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+
+
 #include <AppDefs.h>
-#include <LinkMsgReader.h>
-#include <LinkMsgSender.h>
 #include <List.h>
 #include <String.h>
-#include <PortLink.h>
 #include <SysCursor.h>
 #include <ColorSet.h>
 #include <RGBColor.h>
@@ -88,25 +72,24 @@
 */
 ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort,
 	team_id clientTeamID, int32 handlerID, const char* signature)
-		:
-		fClientAppPort(sendport),
-		fMessagePort(rcvport),
-		fClientLooperPort(clientLooperPort),
-		fSignature(signature),
-		fMonitorThreadID(-1),
-		fClientTeamID(clientTeamID),
-		fMsgReader(new LinkMsgReader(fMessagePort)),
-		fMsgSender(new LinkMsgSender(fClientAppPort)),
-		fSWindowList(new BList()),
-		fBitmapList(new BList()),
-		fPictureList(new BList()),
-		fAppCursor(NULL),
-		fLockSem(create_sem(1, "ServerApp sem")),
-		fCursorHidden(false),
-		fIsActive(false),
-		//fHandlerToken(handlerID),
-		fSharedMem(new AreaPool),
-		fQuitting(false)
+	:
+	fClientAppPort(sendport),
+	fMessagePort(rcvport),
+	fClientLooperPort(clientLooperPort),
+	fSignature(signature),
+	fMonitorThreadID(-1),
+	fClientTeamID(clientTeamID),
+	fLink(fClientAppPort, fMessagePort),
+	fSWindowList(new BList()),
+	fBitmapList(new BList()),
+	fPictureList(new BList()),
+	fAppCursor(NULL),
+	fLockSem(create_sem(1, "ServerApp sem")),
+	fCursorHidden(false),
+	fIsActive(false),
+	//fHandlerToken(handlerID),
+	fSharedMem(new AreaPool),
+	fQuitting(false)
 {
 	if (fSignature == "")
 		fSignature = "application/x-vnd.NULL-application-signature";
@@ -137,20 +120,15 @@ ServerApp::~ServerApp(void)
 	
 	fQuitting = true;
 	
-	for (int32 i = 0; i< fBitmapList->CountItems(); i++)
+	for (int32 i = 0; i< fBitmapList->CountItems(); i++) {
 		delete static_cast<ServerBitmap *>(fBitmapList->ItemAt(i));
-	
-	fBitmapList->MakeEmpty();
+	}
 	delete fBitmapList;
 
-	for (int32 i = 0; i < fPictureList->CountItems(); i++)
+	for (int32 i = 0; i < fPictureList->CountItems(); i++) {
 		delete static_cast<ServerPicture *>(fPictureList->ItemAt(i));
-	
-	fPictureList->MakeEmpty();
+	}
 	delete fPictureList;
-
-	delete fMsgReader;
-	delete fMsgSender;
 
 	// This shouldn't be necessary -- all cursors owned by the app
 	// should be cleaned up by RemoveAppCursors	
@@ -163,7 +141,7 @@ ServerApp::~ServerApp(void)
 	gDesktop->ActiveRootLayer()->GetCursorManager().RemoveAppCursors(fClientTeamID);
 	delete_sem(fLockSem);
 	
-	STRACE(("#ServerApp %s:~ServerApp()\n",fSignature.String()));
+	STRACE(("#ServerApp %s:~ServerApp()\n", fSignature.String()));
 
 	// TODO: Is this the right place for this ?
 	// From what I've understood, this is the port created by
@@ -213,10 +191,10 @@ ServerApp::PingTarget(void)
 {
 	team_info tinfo;
 	if (get_team_info(fClientTeamID,&tinfo) == B_BAD_TEAM_ID) {
-		fMsgSender->SetPort(gAppServerPort);
-		fMsgSender->StartMessage(AS_DELETE_APP);
-		fMsgSender->Attach(&fMonitorThreadID, sizeof(thread_id));
-		fMsgSender->Flush();
+		LinkMsgSender link(gAppServerPort);
+		link.StartMessage(AS_DELETE_APP);
+		link.Attach(&fMonitorThreadID, sizeof(thread_id));
+		link.Flush();
 		return false;
 	}
 	return true;
@@ -229,7 +207,7 @@ ServerApp::PingTarget(void)
 void
 ServerApp::PostMessage(int32 code)
 {
-	BPortLink link(fMessagePort);
+	LinkMsgSender link(fMessagePort);
 	link.StartMessage(code);
 	link.Flush();
 }
@@ -243,7 +221,7 @@ ServerApp::SendMessageToClient(const BMessage *msg) const
 {
 	ssize_t size = msg->FlattenedSize();
 	char *buffer = new char[size];
-		
+
 	if (msg->Flatten(buffer, size) == B_OK)
 		write_port(fClientLooperPort, msg->what, buffer, size);
 	else
@@ -288,24 +266,24 @@ int32
 ServerApp::MonitorApp(void *data)
 {
 	// Message-dispatching loop for the ServerApp
-	
+
 	ServerApp *app = (ServerApp *)data;
-	LinkMsgReader msgqueue(app->fMessagePort);
-	
+	LinkMsgReader &reader = app->fLink.Reader();
+
 	int32 code;
 	status_t err = B_OK;
-	
+
 	while (!app->fQuitting) {
 		STRACE(("info: ServerApp::MonitorApp listening on port %ld.\n", app->fMessagePort));
-		err = msgqueue.GetNextMessage(code);
+		err = reader.GetNextMessage(code, B_INFINITE_TIMEOUT);
 		if (err < B_OK) {
 			STRACE(("ServerApp::MonitorApp(): GetNextMessage returned %s\n", strerror(err)));
 
 			// ToDo: this should kill the app, but it doesn't work
-			app->fMsgSender->SetPort(gAppServerPort);
-			app->fMsgSender->StartMessage(AS_DELETE_APP);
-			app->fMsgSender->Attach(&app->fMonitorThreadID, sizeof(thread_id));
-			app->fMsgSender->Flush();
+			LinkMsgSender link(gAppServerPort);
+			link.StartMessage(AS_DELETE_APP);
+			link.Attach(&app->fMonitorThreadID, sizeof(thread_id));
+			link.Flush();
 			break;
 		}
 
@@ -313,7 +291,7 @@ ServerApp::MonitorApp(void *data)
 			case AS_CREATE_WINDOW:
 			{
 				// Create the ServerWindow to node monitor a new OBWindow
-			
+
 				// Attached data:
 				// 2) BRect window frame
 				// 3) uint32 window look
@@ -333,16 +311,17 @@ ServerApp::MonitorApp(void *data)
 				port_id	sendPort = -1;
 				port_id looperPort = -1;
 				char *title = NULL;
-			
-				msgqueue.Read<BRect>(&frame);
-				msgqueue.Read<uint32>(&look);
-				msgqueue.Read<uint32>(&feel);
-				msgqueue.Read<uint32>(&flags);
-				msgqueue.Read<uint32>(&wkspaces);
-				msgqueue.Read<int32>(&token);
-				msgqueue.Read<port_id>(&sendPort);
-				msgqueue.Read<port_id>(&looperPort);
-				msgqueue.ReadString(&title);
+
+				reader.Read<BRect>(&frame);
+				reader.Read<uint32>(&look);
+				reader.Read<uint32>(&feel);
+				reader.Read<uint32>(&flags);
+				reader.Read<uint32>(&wkspaces);
+				reader.Read<int32>(&token);
+				reader.Read<port_id>(&sendPort);
+				reader.Read<port_id>(&looperPort);
+				if (reader.ReadString(&title) != B_OK)
+					break;
 
 				STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n",app->fSignature.String()));
 
@@ -352,10 +331,10 @@ ServerApp::MonitorApp(void *data)
 				sw->Init(frame, look, feel, flags, wkspaces);
 
 				STRACE(("\nServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
-						app->fSignature.String(),title,frame.left,frame.top,frame.right,frame.bottom));
-			
-				free(title);
+					app->fSignature.String(), title, frame.left, frame.top,
+					frame.right, frame.bottom));
 
+				free(title);
 				break;
 			}
 			case AS_QUIT_APP:
@@ -365,7 +344,8 @@ ServerApp::MonitorApp(void *data)
 				// NOT want to shut down client applications. The server can be quit o in this fashion
 				// through the driver's interface, such as closing the ViewDriver's window.
 				
-				STRACE(("ServerApp %s:Server shutdown notification received\n",app->fSignature.String()));
+				STRACE(("ServerApp %s:Server shutdown notification received\n",
+					app->fSignature.String()));
 
 				// If we are using the real, accelerated version of the
 				// DisplayDriver, we do NOT want the user to be able shut down
@@ -382,21 +362,19 @@ ServerApp::MonitorApp(void *data)
 				STRACE(("ServerApp %s: B_QUIT_REQUESTED\n",app->fSignature.String()));
 				// Our BApplication sent us this message when it quit.
 				// We need to ask the app_server to delete ourself.
-				app->fMsgSender->SetPort(gAppServerPort);
-				app->fMsgSender->StartMessage(AS_DELETE_APP);
-				app->fMsgSender->Attach(&app->fMonitorThreadID, sizeof(thread_id));
-				app->fMsgSender->Flush();
+				LinkMsgSender sender(gAppServerPort);
+				sender.StartMessage(AS_DELETE_APP);
+				sender.Attach(&app->fMonitorThreadID, sizeof(thread_id));
+				sender.Flush();
 				break;
 			}
-			default:
-			{
-				STRACE(("ServerApp %s: Got a Message to dispatch\n",app->fSignature.String()));
-				app->DispatchMessage(code, msgqueue);
-				break;
-			}
-		}
 
-	} // end for 
+			default:
+				STRACE(("ServerApp %s: Got a Message to dispatch\n", app->fSignature.String()));
+				app->DispatchMessage(code, reader);
+				break;
+		}
+	}
 
 	return 0;
 }
@@ -412,12 +390,11 @@ ServerApp::MonitorApp(void *data)
 	matter of casting and incrementing an index variable to access them.
 */
 void
-ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
+ServerApp::DispatchMessage(int32 code, LinkMsgReader &link)
 {
 	LayerData ld;
-	BPortLink replylink;
-	
-	switch(code) {
+
+	switch (code) {
 		case AS_UPDATE_COLORS:
 		{
 			// NOTE: R2: Eventually we will have windows which will notify their children of changes in 
@@ -468,9 +445,9 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			area_info ai;
 			int8 *msgpointer;
 			
-			msg.Read<area_id>(&area);
-			msg.Read<size_t>(&offset);
-			msg.Read<size_t>(&msgsize);
+			link.Read<area_id>(&area);
+			link.Read<size_t>(&offset);
+			link.Read<size_t>(&msgsize);
 			
 			// Part sanity check, part get base pointer :)
 			if (get_area_info(area, &ai) < B_OK)
@@ -499,42 +476,36 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// Attached Data:
 			// 1) size_t requested size
 			// 2) port_id reply_port
-			
+
 			size_t memsize;
-			port_id replyport;
-			
-			msg.Read<size_t>(&memsize);
-			msg.Read<port_id>(&replyport);
-			
+			link.Read<size_t>(&memsize);
+
 			// TODO: I wonder if ACQUIRE_SERVERMEM should have a minimum size requirement?
 
 			void *sharedmem = fSharedMem->GetBuffer(memsize);
-			
-			replylink.SetSendPort(replyport);
+
 			if (memsize < 1 || sharedmem == NULL) {
-				replylink.StartMessage(SERVER_FALSE);
-				replylink.Flush();
+				fLink.StartMessage(SERVER_FALSE);
+				fLink.Flush();
 				break;
 			}
 			
 			area_id owningArea = area_for(sharedmem);
-			area_info ai;
-			
-			if (owningArea == B_ERROR || get_area_info(owningArea, &ai) < B_OK)
-			{
-				replylink.StartMessage(SERVER_FALSE);
-				replylink.Flush();
+			area_info info;
+
+			if (owningArea == B_ERROR || get_area_info(owningArea, &info) < B_OK) {
+				fLink.StartMessage(SERVER_FALSE);
+				fLink.Flush();
 				break;
 			}
-			
-			int32 areaoffset = ((int32*)sharedmem) - ((int32*)ai.address);
+
+			int32 areaoffset = (addr_t)sharedmem - (addr_t)info.address;
 			STRACE(("Successfully allocated shared memory of size %ld\n",memsize));
-			
-			replylink.StartMessage(SERVER_TRUE);
-			replylink.Attach<area_id>(owningArea);
-			replylink.Attach<int32>(areaoffset);
-			replylink.Flush();
-			
+
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<area_id>(owningArea);
+			fLink.Attach<int32>(areaoffset);
+			fLink.Flush();
 			break;
 		}
 		case AS_RELEASE_SERVERMEM:
@@ -547,8 +518,8 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			area_id owningArea;
 			int32 areaoffset;
 				
-			msg.Read<area_id>(&owningArea);
-			msg.Read<int32>(&areaoffset);
+			link.Read<area_id>(&owningArea);
+			link.Read<int32>(&areaoffset);
 			
 			area_info areaInfo;
 			if (owningArea < 0 || get_area_info(owningArea, &areaInfo) != B_OK)
@@ -596,37 +567,36 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			//	3) int32 area pointer offset used to calculate fBasePtr
 			
 			// First, let's attempt to allocate the bitmap
-			port_id replyport = -1;
-			BRect r;
-			color_space cs;
-			int32 f,bpr;
-			screen_id s;
+			ServerBitmap *bitmap = NULL;
+			BRect frame;
+			color_space colorSpace;
+			int32 flags, bytesPerRow;
+			screen_id screenID;
 
-			msg.Read<BRect>(&r);
-			msg.Read<color_space>(&cs);
-			msg.Read<int32>(&f);
-			msg.Read<int32>(&bpr);
-			msg.Read<screen_id>(&s);
-			msg.Read<int32>(&replyport);
-			
-			ServerBitmap *sbmp = bitmapmanager->CreateBitmap(r, cs, f ,bpr, s);
+			link.Read<BRect>(&frame);
+			link.Read<color_space>(&colorSpace);
+			link.Read<int32>(&flags);
+			link.Read<int32>(&bytesPerRow);
+			if (link.Read<screen_id>(&screenID) == B_OK) {
+				bitmap = bitmapmanager->CreateBitmap(frame, colorSpace, flags,
+					bytesPerRow, screenID);
+			}
 
-			STRACE(("ServerApp %s: Create Bitmap (%.1f,%.1f,%.1f,%.1f)\n",
-						fSignature.String(),r.left,r.top,r.right,r.bottom));
+			STRACE(("ServerApp %s: Create Bitmap (%.1fx%.1f)\n",
+						fSignature.String(), frame.Width(), frame.Height()));
 
-			replylink.SetSendPort(replyport);
-			if(sbmp) {
-				fBitmapList->AddItem(sbmp);
-				replylink.StartMessage(SERVER_TRUE);
-				replylink.Attach<int32>(sbmp->Token());
-				replylink.Attach<int32>(sbmp->Area());
-				replylink.Attach<int32>(sbmp->AreaOffset());
+			if (bitmap) {
+				fBitmapList->AddItem(bitmap);
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach<int32>(bitmap->Token());
+				fLink.Attach<int32>(bitmap->Area());
+				fLink.Attach<int32>(bitmap->AreaOffset());
 			} else {
 				// alternatively, if something went wrong, we reply with SERVER_FALSE
-				replylink.StartMessage(SERVER_FALSE);
+				fLink.StartMessage(SERVER_FALSE);
 			}
-			replylink.Flush();
-			
+
+			fLink.Flush();
 			break;
 		}
 		case AS_DELETE_BITMAP:
@@ -640,37 +610,33 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 		
 			// Reply Code: SERVER_TRUE if successful, 
 			//				SERVER_FALSE if the buffer was already deleted or was not found
-			port_id replyport = -1;
-			int32 bmp_id;
-			
-			msg.Read<int32>(&bmp_id);
-			msg.Read<int32>(&replyport);
-			
-			ServerBitmap *sbmp=FindBitmap(bmp_id);
-			replylink.SetSendPort(replyport);
-			if(sbmp) {
-				STRACE(("ServerApp %s: Deleting Bitmap %ld\n",fSignature.String(),bmp_id));
+			int32 id;
+			link.Read<int32>(&id);
 
-				fBitmapList->RemoveItem(sbmp);
-				bitmapmanager->DeleteBitmap(sbmp);
-				replylink.StartMessage(SERVER_TRUE);
+			ServerBitmap *bitmap = FindBitmap(id);
+			if (bitmap) {
+				STRACE(("ServerApp %s: Deleting Bitmap %ld\n", fSignature.String(), id));
+
+				fBitmapList->RemoveItem(bitmap);
+				bitmapmanager->DeleteBitmap(bitmap);
+				fLink.StartMessage(SERVER_TRUE);
 			} else
-				replylink.StartMessage(SERVER_TRUE);
-			
-			replylink.Flush();	
+				fLink.StartMessage(SERVER_FALSE);
+
+			fLink.Flush();	
 			break;
 		}
 		case AS_CREATE_PICTURE:
 		{
 			// TODO: Implement AS_CREATE_PICTURE
-			STRACE(("ServerApp %s: Create Picture unimplemented\n",fSignature.String()));
+			STRACE(("ServerApp %s: Create Picture unimplemented\n", fSignature.String()));
 
 			break;
 		}
 		case AS_DELETE_PICTURE:
 		{
 			// TODO: Implement AS_DELETE_PICTURE
-			STRACE(("ServerApp %s: Delete Picture unimplemented\n",fSignature.String()));
+			STRACE(("ServerApp %s: Delete Picture unimplemented\n", fSignature.String()));
 
 			break;
 		}
@@ -701,9 +667,9 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			int32 index; 	 
 			uint32 mode; 	 
 			bool stick; 	 
-			msg.Read<int32>(&index); 	 
-			msg.Read<uint32>(&mode); 	 
-			msg.Read<bool>(&stick); 	 
+			link.Read<int32>(&index); 	 
+			link.Read<uint32>(&mode); 	 
+			link.Read<bool>(&stick); 	 
   	 
 			RootLayer *root=gDesktop->ActiveRootLayer(); 	 
 			Workspace *workspace=root->WorkspaceAt(index); 	 
@@ -726,7 +692,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			
 			// Error-checking is done in ActivateWorkspace, so this is a safe call
 			int32 workspace;
-			msg.Read<int32>(&workspace);
+			link.Read<int32>(&workspace);
 			
 			break;
 		}
@@ -764,15 +730,11 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 		}
 		case AS_QUERY_CURSOR_HIDDEN:
 		{
-			STRACE(("ServerApp %s: Received IsCursorHidden request\n",fSignature.String()));
+			STRACE(("ServerApp %s: Received IsCursorHidden request\n", fSignature.String()));
 			// Attached data
 			// 1) int32 port to reply to
-			int32 replyport;
-			msg.Read<int32>(&replyport);
-			
-			replylink.SetSendPort(replyport);
-			replylink.StartMessage(fCursorHidden ? SERVER_TRUE : SERVER_FALSE);
-			replylink.Flush();
+			fLink.StartMessage(fCursorHidden ? SERVER_TRUE : SERVER_FALSE);
+			fLink.Flush();
 			break;
 		}
 		case AS_SET_CURSOR_DATA:
@@ -781,7 +743,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// Attached data: 68 bytes of fAppCursor data
 			
 			int8 cdata[68];
-			msg.Read(cdata,68);
+			link.Read(cdata,68);
 			
 			// Because we don't want an overaccumulation of these particular
 			// cursors, we will delete them if there is an existing one. It would
@@ -809,12 +771,9 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// 3) port_id port to receive a reply. Only exists if the sync flag is true.
 			bool sync;
 			int32 ctoken = B_NULL_TOKEN;
-			port_id replyport = -1;
 			
-			msg.Read<bool>(&sync);
-			msg.Read<int32>(&ctoken);
-			if(sync)
-				msg.Read<int32>(&replyport);
+			link.Read<bool>(&sync);
+			link.Read<int32>(&ctoken);
 			
 			// although this isn't pretty, ATM we have only one RootLayer.
 			// there should be a way that this ServerApp be attached to a particular
@@ -822,14 +781,12 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			ServerCursor	*cursor;
 			if ((cursor = gDesktop->ActiveRootLayer()->GetCursorManager().FindCursor(ctoken)))
 				gDesktop->ActiveRootLayer()->GetDisplayDriver()->SetCursor(cursor);
-			
-			if(sync)
-			{
+
+			if (sync) {
 				// the application is expecting a reply, but plans to do literally nothing
 				// with the data, so we'll just reuse the cursor token variable
-				replylink.SetSendPort(replyport);
-				replylink.StartMessage(SERVER_TRUE);
-				replylink.Flush();
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Flush();
 			}
 			break;
 		}
@@ -840,38 +797,34 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// 1) 68 bytes of fAppCursor data
 			// 2) port_id reply port
 			
-			port_id replyport = -1;
-			int8 cdata[68];
+			int8 cursorData[68];
+			link.Read(cursorData, sizeof(cursorData));
 
-			msg.Read(cdata,68);
-			msg.Read<int32>(&replyport);
-
-			fAppCursor=new ServerCursor(cdata);
+			fAppCursor = new ServerCursor(cursorData);
 			fAppCursor->SetOwningTeam(fClientTeamID);
 			fAppCursor->SetAppSignature(fSignature.String());
 			// although this isn't pretty, ATM we have only one RootLayer.
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
 			gDesktop->ActiveRootLayer()->GetCursorManager().AddCursor(fAppCursor);
-			
+
 			// Synchronous message - BApplication is waiting on the cursor's ID
-			replylink.SetSendPort(replyport);
-			replylink.StartMessage(SERVER_TRUE);
-			replylink.Attach<int32>(fAppCursor->ID());
-			replylink.Flush();
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<int32>(fAppCursor->ID());
+			fLink.Flush();
 			break;
 		}
 		case AS_DELETE_BCURSOR:
 		{
-			STRACE(("ServerApp %s: Delete BCursor\n",fSignature.String()));
+			STRACE(("ServerApp %s: Delete BCursor\n", fSignature.String()));
 			// Attached data:
 			// 1) int32 token ID of the cursor to delete
 			int32 ctoken = B_NULL_TOKEN;
-			msg.Read<int32>(&ctoken);
-			
-			if(fAppCursor && fAppCursor->ID()==ctoken)
-				fAppCursor=NULL;
-			
+			link.Read<int32>(&ctoken);
+
+			if (fAppCursor && fAppCursor->ID() == ctoken)
+				fAppCursor = NULL;
+
 			// although this isn't pretty, ATM we have only one RootLayer.
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
@@ -880,111 +833,81 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 		}
 		case AS_GET_SCROLLBAR_INFO:
 		{
-			STRACE(("ServerApp %s: Get ScrollBar info\n",fSignature.String()));
-			// Attached data:
-			// 1) port_id reply port - synchronous message
+			STRACE(("ServerApp %s: Get ScrollBar info\n", fSignature.String()));
+			scroll_bar_info info = gDesktop->ScrollBarInfo();
 
-			scroll_bar_info sbi=gDesktop->ScrollBarInfo();
-
-			port_id replyport;
-			msg.Read<int32>(&replyport);
-			
-			replylink.SetSendPort(replyport);
-			replylink.StartMessage(SERVER_TRUE);
-			replylink.Attach<scroll_bar_info>(sbi);
-			replylink.Flush();
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<scroll_bar_info>(info);
+			fLink.Flush();
 			break;
 		}
 		case AS_SET_SCROLLBAR_INFO:
 		{
-			STRACE(("ServerApp %s: Set ScrollBar info\n",fSignature.String()));
+			STRACE(("ServerApp %s: Set ScrollBar info\n", fSignature.String()));
 			// Attached Data:
 			// 1) scroll_bar_info scroll bar info structure
-			scroll_bar_info sbi;
-			msg.Read<scroll_bar_info>(&sbi);
-
-			gDesktop->SetScrollBarInfo(sbi);
+			scroll_bar_info info;
+			if (link.Read<scroll_bar_info>(&info) == B_OK)
+				gDesktop->SetScrollBarInfo(info);
 			break;
 		}
 		case AS_FOCUS_FOLLOWS_MOUSE:
 		{
-			STRACE(("ServerApp %s: query Focus Follow Mouse in use\n",fSignature.String()));
-			// Attached data:
-			// 1) port_id reply port - synchronous message
+			STRACE(("ServerApp %s: query Focus Follow Mouse in use\n", fSignature.String()));
 
-			port_id replyport;
-			msg.Read<int32>(&replyport);
-
-			replylink.SetSendPort(replyport);
-			replylink.StartMessage(SERVER_TRUE);
-			replylink.Attach<bool>(gDesktop->FFMouseInUse());
-			replylink.Flush();
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<bool>(gDesktop->FFMouseInUse());
+			fLink.Flush();
 			break;
 		}
 		case AS_SET_FOCUS_FOLLOWS_MOUSE:
 		{
-			STRACE(("ServerApp %s: Set Focus Follows Mouse in use\n",fSignature.String()));
-/*			// Attached Data:
-			// 1) scroll_bar_info scroll bar info structure
-			scroll_bar_info sbi;
-			msg.Read<scroll_bar_info>(&sbi);
-
-			gDesktop->SetScrollBarInfo(sbi);*/
+			STRACE(("ServerApp %s: Set Focus Follows Mouse in use\n", fSignature.String()));
+			// ToDo: implement me!
 			break;
 		}
 		case AS_SET_MOUSE_MODE:
 		{
-			STRACE(("ServerApp %s: Set Focus Follows Mouse mode\n",fSignature.String()));
+			STRACE(("ServerApp %s: Set Focus Follows Mouse mode\n", fSignature.String()));
 			// Attached Data:
 			// 1) enum mode_mouse FFM mouse mode
 			mode_mouse mmode;
-			msg.Read<mode_mouse>(&mmode);
-
-			gDesktop->SetFFMouseMode(mmode);
+			if (link.Read<mode_mouse>(&mmode) == B_OK)
+				gDesktop->SetFFMouseMode(mmode);
 			break;
 		}
 		case AS_GET_MOUSE_MODE:
 		{
-			STRACE(("ServerApp %s: Get Focus Follows Mouse mode\n",fSignature.String()));
-			// Attached data:
-			// 1) port_id reply port - synchronous message
+			STRACE(("ServerApp %s: Get Focus Follows Mouse mode\n", fSignature.String()));
+			mode_mouse mmode = gDesktop->FFMouseMode();
 
-			mode_mouse mmode=gDesktop->FFMouseMode();
-			
-			port_id replyport = -1;
-			msg.Read<int32>(&replyport);
-			
-			replylink.SetSendPort(replyport);
-			replylink.StartMessage(SERVER_TRUE);
-			replylink.Attach<mode_mouse>(mmode);
-			replylink.Flush();
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<mode_mouse>(mmode);
+			fLink.Flush();
 			break;
 		}
 		case AS_GET_UI_COLOR:
 		{
-			STRACE(("ServerApp %s: Get UI color\n",fSignature.String()));
+			STRACE(("ServerApp %s: Get UI color\n", fSignature.String()));
 
 			RGBColor color;
 			int32 whichcolor;
-			port_id replyport = -1;
-			
-			msg.Read<int32>(&whichcolor);
-			msg.Read<port_id>(&replyport);
-			
+			link.Read<int32>(&whichcolor);
+
 			gui_colorset.Lock();
-			color=gui_colorset.AttributeToColor(whichcolor);
+			color = gui_colorset.AttributeToColor(whichcolor);
 			gui_colorset.Unlock();
-			
-			replylink.SetSendPort(replyport);
-			replylink.StartMessage(SERVER_TRUE);
-			replylink.Attach<rgb_color>(color.GetColor32());
-			replylink.Flush();
+
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<rgb_color>(color.GetColor32());
+			fLink.Flush();
 			break;
 		}
 		case AS_UPDATED_CLIENT_FONTLIST:
 		{
-			STRACE(("ServerApp %s: Acknowledged update of client-side font list\n",fSignature.String()));
-			
+			STRACE(("ServerApp %s: Acknowledged update of client-side font list\n",
+				fSignature.String()));
+
 			// received when the client-side global font list has been
 			// refreshed
 			fontserver->Lock();
@@ -994,95 +917,76 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 		}
 		case AS_QUERY_FONTS_CHANGED:
 		{
-			FTRACE(("ServerApp %s: AS_QUERY_FONTS_CHANGED unimplemented\n",fSignature.String()));
+			FTRACE(("ServerApp %s: AS_QUERY_FONTS_CHANGED unimplemented\n",
+				fSignature.String()));
 			// Attached Data:
 			// 1) bool check flag
-			// 2) port_id reply_port
-			
+
 			// if just checking, just give an answer,
 			// if not and needs updated, 
 			// sync the font list and return true else return false
+			fLink.StartMessage(SERVER_FALSE);
+			fLink.Flush();
 			break;
 		}
 		case AS_GET_FAMILY_NAME:
 		{
-			FTRACE(("ServerApp %s: AS_GET_FAMILY_NAME\n",fSignature.String()));
+			FTRACE(("ServerApp %s: AS_GET_FAMILY_NAME\n", fSignature.String()));
 			// Attached Data:
 			// 1) int32 the ID of the font family to get
-			// 2) port_id reply port
-			
+
 			// Returns:
 			// 1) font_family - name of family
 			// 2) uint32 - flags of font family (B_IS_FIXED || B_HAS_TUNED_FONT)
-			int32 famid;
-			port_id replyport;
-			
-			msg.Read<int32>(&famid);
-			msg.Read<port_id>(&replyport);
-			
-			replylink.SetSendPort(replyport);
-			
+			int32 id;
+
+			link.Read<int32>(&id);
+
 			fontserver->Lock();
-			FontFamily *ffamily=fontserver->GetFamily(famid);
-			if(ffamily)
-			{
+			FontFamily *ffamily = fontserver->GetFamily(id);
+			if (ffamily) {
 				font_family fam;
-				sprintf(fam,"%s",ffamily->Name());
-				replylink.StartMessage(SERVER_TRUE);
-				replylink.Attach(fam,sizeof(font_family));
-				replylink.Attach<int32>(ffamily->GetFlags());
-				replylink.Flush();
-			}
-			else
-			{
-				replylink.StartMessage(SERVER_FALSE);
-				replylink.Flush();
-			}
-			
+				strcpy(fam, ffamily->Name());
+				fLink.Attach(fam, sizeof(font_family));
+				fLink.Attach<int32>(ffamily->GetFlags());
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+
+			fLink.Flush();
 			fontserver->Unlock();
 			break;
 		}
 		case AS_GET_STYLE_NAME:
 		{
-			FTRACE(("ServerApp %s: AS_GET_STYLE_NAME\n",fSignature.String()));
+			FTRACE(("ServerApp %s: AS_GET_STYLE_NAME\n", fSignature.String()));
 			// Attached Data:
 			// 1) font_family The name of the font family
 			// 2) int32 ID of the style to get
-			// 3) port_id reply port
-			
+
 			// Returns:
 			// 1) font_style - name of the style
 			// 2) uint16 - appropriate face values
 			// 3) uint32 - flags of font style (B_IS_FIXED || B_HAS_TUNED_FONT)
-			
+
 			int32 styid;
-			port_id replyport;
 			font_family fam;
-			
-			msg.Read(fam,sizeof(font_family));
-			msg.Read<int32>(&styid);
-			msg.Read<port_id>(&replyport);
-			
-			replylink.SetSendPort(replyport);
-			
+
+			link.Read(fam,sizeof(font_family));
+			link.Read<int32>(&styid);
+
 			fontserver->Lock();
-			FontStyle *fstyle=fontserver->GetStyle(fam,styid);
-			if(fstyle)
-			{
+			FontStyle *fstyle = fontserver->GetStyle(fam, styid);
+			if (fstyle) {
 				font_family sty;
-				sprintf(sty,"%s",fstyle->Name());
-				replylink.StartMessage(SERVER_TRUE);
-				replylink.Attach(sty,sizeof(font_style));
-				replylink.Attach<int32>(fstyle->GetFace());
-				replylink.Attach<int32>(fstyle->GetFlags());
-				replylink.Flush();
-			}
-			else
-			{
-				replylink.StartMessage(SERVER_FALSE);
-				replylink.Flush();
-			}
-			
+				strcpy(sty, fstyle->Name());
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach(sty,sizeof(font_style));
+				fLink.Attach<int32>(fstyle->GetFace());
+				fLink.Attach<int32>(fstyle->GetFlags());
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+
+			fLink.Flush();			
 			fontserver->Unlock();
 			break;
 		}
@@ -1092,66 +996,51 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
-			// 3) port_id reply port
-			
+
 			// Returns:
 			// 1) font_family The name of the font family
 			// 2) font_style - name of the style
 			uint16 famid, styid;
-			port_id replyport;
 			font_family fam;
 			font_style sty;
-			
-			msg.Read<uint16>(&famid);
-			msg.Read<uint16>(&styid);
-			msg.Read<port_id>(&replyport);
 
-			replylink.SetSendPort(replyport);
-			
+			link.Read<uint16>(&famid);
+			link.Read<uint16>(&styid);
+
 			fontserver->Lock();
-			FontStyle *fstyle=fontserver->GetStyle(famid,styid);
-			if(fstyle)
-			{
-				sprintf(fam,"%s",fstyle->Family()->Name());
-				sprintf(sty,"%s",fstyle->Name());
-				replylink.StartMessage(SERVER_TRUE);
-				replylink.Attach(fam,sizeof(font_family));
-				replylink.Attach(sty,sizeof(font_style));
-				replylink.Flush();
-			}
-			else
-			{
-				replylink.StartMessage(SERVER_FALSE);
-				replylink.Flush();
-			}
-			
-			fontserver->Unlock();
+			FontStyle *fstyle = fontserver->GetStyle(famid, styid);
+			if (fstyle) {
+				strcpy(fam, fstyle->Family()->Name());
+				strcpy(sty, fstyle->Name());
 
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach(fam, sizeof(font_family));
+				fLink.Attach(sty, sizeof(font_style));
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+			
+			fLink.Flush();
+			fontserver->Unlock();
 			break;
 		}
 		case AS_GET_FONT_DIRECTION:
 		{
-			FTRACE(("ServerApp %s: AS_GET_FONT_DIRECTION unimplemented\n",fSignature.String()));
+			FTRACE(("ServerApp %s: AS_GET_FONT_DIRECTION unimplemented\n",
+				fSignature.String()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
-			// 3) port_id reply port
-			
+
 			// Returns:
 			// 1) font_direction direction of font
-			
+
 			// NOTE: While this may be unimplemented, we can safely return
 			// SERVER_FALSE. This will force the BFont code to default to
 			// B_LEFT_TO_RIGHT, which is what the vast majority of fonts will be.
 			// This will be fixed later.
 			int32 famid, styid;
-			port_id replyport;
-			
-			msg.Read<int32>(&famid);
-			msg.Read<int32>(&styid);
-			msg.Read<port_id>(&replyport);
-			
-			replylink.SetSendPort(replyport);
+			link.Read<int32>(&famid);
+			link.Read<int32>(&styid);
 			
 /*			fontserver->Lock();
 			FontStyle *fstyle=fontserver->GetStyle(famid,styid);
@@ -1159,14 +1048,14 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			{
 				font_direction dir=fstyle->GetDirection();
 				
-				replylink.StartMessage(SERVER_TRUE);
-				replylink.Attach<font_direction>(dir);
-				replylink.Flush();
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach<font_direction>(dir);
+				fLink.Flush();
 			}
 			else
 			{
-*/				replylink.StartMessage(SERVER_FALSE);
-				replylink.Flush();
+*/				fLink.StartMessage(SERVER_FALSE);
+				fLink.Flush();
 //			}
 			
 //			fontserver->Unlock();
@@ -1174,7 +1063,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 		}
 		case AS_GET_STRING_WIDTH:
 		{
-			FTRACE(("ServerApp %s: AS_GET_STRING_WIDTH\n",fSignature.String()));
+			FTRACE(("ServerApp %s: AS_GET_STRING_WIDTH\n", fSignature.String()));
 			// Attached Data:
 			// 1) string String to measure
 			// 2) int32 string length to measure
@@ -1182,31 +1071,26 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// 4) uint16 ID of style
 			// 5) float point size of font
 			// 6) uint8 spacing to use
-			// 7) port_id reply port
-			
+
 			// Returns:
 			// 1) float - width of the string in pixels
-			char *string=NULL;
+			char *string = NULL;
 			int32 length;
-			uint16 family,style;
-			float size,width=0;
+			uint16 family, style;
+			float size, width = 0;
 			uint8 spacing;
-			port_id replyport;
-			
-			msg.ReadString(&string);
-			msg.Read<int32>(&length);
-			msg.Read<uint16>(&family);
-			msg.Read<uint16>(&style);
-			msg.Read<float>(&size);
-			msg.Read<uint8>(&spacing);
-			msg.Read<port_id>(&replyport);
-			
-			replylink.SetSendPort(replyport);
+
+			link.ReadString(&string);
+			link.Read<int32>(&length);
+			link.Read<uint16>(&family);
+			link.Read<uint16>(&style);
+			link.Read<float>(&size);
+			link.Read<uint8>(&spacing);
 
 			ServerFont font;
 
-			if (length > 0 && font.SetFamilyAndStyle(family, style) == B_OK &&
-				size > 0 && string) {
+			if (length > 0 && font.SetFamilyAndStyle(family, style) == B_OK
+				&& size > 0 && string) {
 
 				font.SetSize(size);
 				font.SetSpacing(spacing);
@@ -1217,378 +1101,287 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 				// actually works. It is about 20 times faster!
 				//width = font.StringWidth(string, length);
 
-				replylink.StartMessage(SERVER_TRUE);
-				replylink.Attach<float>(width);
-				replylink.Flush();
-				
-			} else {
-				replylink.StartMessage(SERVER_FALSE);
-				replylink.Flush();
-			}
-			
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach<float>(width);
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+
+			fLink.Flush();
 			free(string);
-			
 			break;
 		}
 		case AS_GET_FONT_BOUNDING_BOX:
 		{
-			FTRACE(("ServerApp %s: AS_GET_BOUNDING_BOX unimplemented\n",fSignature.String()));
+			FTRACE(("ServerApp %s: AS_GET_BOUNDING_BOX unimplemented\n",
+				fSignature.String()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
-			// 3) port_id reply port
-			
+
 			// Returns:
 			// 1) BRect - box holding entire font
-			
+
+			// ToDo: implement me!
+			fLink.StartMessage(SERVER_FALSE);
+			fLink.Flush();
 			break;
 		}
 		case AS_GET_TUNED_COUNT:
 		{
-			FTRACE(("ServerApp %s: AS_GET_TUNED_COUNT\n",fSignature.String()));
+			FTRACE(("ServerApp %s: AS_GET_TUNED_COUNT\n", fSignature.String()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
-			// 3) port_id reply port
-			
+
 			// Returns:
 			// 1) int32 - number of font strikes available
 			int32 famid, styid;
-			port_id replyport;
-			
-			msg.Read<int32>(&famid);
-			msg.Read<int32>(&styid);
-			msg.Read<port_id>(&replyport);
-			
-			replylink.SetSendPort(replyport);
-			
+			link.Read<int32>(&famid);
+			link.Read<int32>(&styid);
+
 			fontserver->Lock();
-			FontStyle *fstyle=fontserver->GetStyle(famid,styid);
-			if(fstyle)
-			{
-				replylink.StartMessage(SERVER_TRUE);
-				replylink.Attach<int32>(fstyle->TunedCount());
-				replylink.Flush();
-			}
-			else
-			{
-				replylink.StartMessage(SERVER_FALSE);
-				replylink.Flush();
-			}
-			
+			FontStyle *fstyle = fontserver->GetStyle(famid, styid);
+			if (fstyle) {
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach<int32>(fstyle->TunedCount());
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+
+			fLink.Flush();
 			fontserver->Unlock();
 			break;
 		}
 		case AS_GET_TUNED_INFO:
 		{
-			FTRACE(("ServerApp %s: AS_GET_TUNED_INFO unimplmemented\n",fSignature.String()));
+			FTRACE(("ServerApp %s: AS_GET_TUNED_INFO unimplmemented\n",
+				fSignature.String()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
 			// 3) uint32 - index of the particular font strike
-			// 4) port_id reply port
-			
+
 			// Returns:
 			// 1) tuned_font_info - info on the strike specified
+			// ToDo: implement me!
+			fLink.StartMessage(SERVER_FALSE);
+			fLink.Flush();
 			break;
 		}
 		case AS_QUERY_FONT_FIXED:
 		{
-			FTRACE(("ServerApp %s: AS_QUERY_FONT_FIXED unimplmemented\n",fSignature.String()));
+			FTRACE(("ServerApp %s: AS_QUERY_FONT_FIXED unimplmemented\n",
+				fSignature.String()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
-			// 3) port_id reply port
-			
+
 			// Returns:
 			// 1) bool - font is/is not fixed
 			int32 famid, styid;
-			port_id replyport;
-			
-			msg.Read<int32>(&famid);
-			msg.Read<int32>(&styid);
-			msg.Read<port_id>(&replyport);
-			
-			replylink.SetSendPort(replyport);
-			
+			link.Read<int32>(&famid);
+			link.Read<int32>(&styid);
+
 			fontserver->Lock();
-			FontStyle *fstyle=fontserver->GetStyle(famid,styid);
-			if(fstyle)
-			{
-				replylink.StartMessage(SERVER_TRUE);
-				replylink.Attach<bool>(fstyle->IsFixedWidth());
-				replylink.Flush();
-			}
-			else
-			{
-				replylink.StartMessage(SERVER_FALSE);
-				replylink.Flush();
-			}
-			
+			FontStyle *fstyle = fontserver->GetStyle(famid, styid);
+			if (fstyle) {
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach<bool>(fstyle->IsFixedWidth());
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+
+			fLink.Flush();
 			fontserver->Unlock();
 			break;
 		}
 		case AS_SET_FAMILY_NAME:
 		{
-			FTRACE(("ServerApp %s: AS_SET_FAMILY_NAME\n",fSignature.String()));
+			FTRACE(("ServerApp %s: AS_SET_FAMILY_NAME\n", fSignature.String()));
 			// Attached Data:
 			// 1) font_family - name of font family to use
-			// 2) port_id - reply port
-			
+
 			// Returns:
 			// 1) uint16 - family ID
-			
-			port_id replyport;
+
 			font_family fam;
-			
-			msg.Read(fam,sizeof(font_family));
-			msg.Read<port_id>(&replyport);
-			
-			replylink.SetSendPort(replyport);
-			
+			link.Read(fam, sizeof(font_family));
+
 			fontserver->Lock();
-			FontFamily *ffam=fontserver->GetFamily(fam);
-			if(ffam)
-			{
-				replylink.StartMessage(SERVER_TRUE);
-				replylink.Attach<uint16>(ffam->GetID());
-				replylink.Flush();
-			}
-			else
-			{
-				replylink.StartMessage(SERVER_FALSE);
-				replylink.Flush();
-			}
+			FontFamily *ffam = fontserver->GetFamily(fam);
+			if (ffam) {
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach<uint16>(ffam->GetID());
+			} else
+				fLink.StartMessage(SERVER_FALSE);
 			
+			fLink.Flush();
 			fontserver->Unlock();
 			break;
 		}
 		case AS_SET_FAMILY_AND_STYLE:
 		{
-			FTRACE(("ServerApp %s: AS_SET_FAMILY_AND_STYLE\n",fSignature.String()));
+			FTRACE(("ServerApp %s: AS_SET_FAMILY_AND_STYLE\n",
+				fSignature.String()));
 			// Attached Data:
 			// 1) font_family - name of font family to use
 			// 2) font_style - name of style in family
-			// 3) port_id - reply port
-			
+
 			// Returns:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
-			
-			port_id replyport;
+
 			font_family fam;
 			font_style sty;
-			
-			msg.Read(fam,sizeof(font_family));
-			msg.Read(sty,sizeof(font_style));
-			msg.Read<port_id>(&replyport);
-			
-			replylink.SetSendPort(replyport);
-			
+			link.Read(fam, sizeof(font_family));
+			link.Read(sty, sizeof(font_style));
+
 			fontserver->Lock();
-			FontStyle *fstyle=fontserver->GetStyle(fam,sty);
-			if(fstyle)
-			{
-				replylink.StartMessage(SERVER_TRUE);
-				replylink.Attach<uint16>(fstyle->Family()->GetID());
-				replylink.Attach<uint16>(fstyle->GetID());
-				replylink.Flush();
-			}
-			else
-			{
-				replylink.StartMessage(SERVER_FALSE);
-				replylink.Flush();
-			}
-			
+			FontStyle *fstyle = fontserver->GetStyle(fam, sty);
+			if (fstyle) {
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach<uint16>(fstyle->Family()->GetID());
+				fLink.Attach<uint16>(fstyle->GetID());
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+
+			fLink.Flush();
 			fontserver->Unlock();
 			break;
 		}
 		case AS_SET_FAMILY_AND_STYLE_FROM_ID:
 		{
-			FTRACE(("ServerApp %s: AS_SET_FAMILY_AND_STYLE_FROM_ID\n",fSignature.String()));
+			FTRACE(("ServerApp %s: AS_SET_FAMILY_AND_STYLE_FROM_ID\n",
+				fSignature.String()));
 			// Attached Data:
 			// 1) uint16 - ID of font family to use
 			// 2) uint16 - ID of style in family
-			// 3) port_id - reply port
-			
+
 			// Returns:
 			// 1) uint16 - face of the font
-			
-			port_id replyport;
+
 			uint16 fam, sty;
-			
-			msg.Read<uint16>(&fam);
-			msg.Read<uint16>(&sty);
-			msg.Read<port_id>(&replyport);
-			
-			replylink.SetSendPort(replyport);
-			
+			link.Read<uint16>(&fam);
+			link.Read<uint16>(&sty);
+
 			ServerFont font;
-			if(font.SetFamilyAndStyle(fam,sty)==B_OK)
-			{
-				replylink.StartMessage(SERVER_TRUE);
-				replylink.Attach<uint16>(font.Face());
-				replylink.Flush();
-			}
-			else
-			{
-				replylink.StartMessage(SERVER_FALSE);
-				replylink.Flush();
-			}
-			
+			if (font.SetFamilyAndStyle(fam, sty) == B_OK) {
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach<uint16>(font.Face());
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+
+			fLink.Flush();
 			break;
 		}
 		case AS_SET_FAMILY_AND_FACE:
 		{
-			FTRACE(("ServerApp %s: AS_SET_FAMILY_AND_FACE unimplmemented\n",fSignature.String()));
+			FTRACE(("ServerApp %s: AS_SET_FAMILY_AND_FACE unimplmemented\n",
+				fSignature.String()));
 			// Attached Data:
 			// 1) font_family - name of font family to use
 			// 2) uint16 - font face
-			// 3) port_id - reply port
-			
+
 			// Returns:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
 			
 			// TODO: Check R5 for error condition behavior in SET_FAMILY_AND_FACE
+			// ToDo: implement me!
+			fLink.StartMessage(SERVER_FALSE);
+			fLink.Flush();
 			break;
 		}
 		case AS_COUNT_FONT_FAMILIES:
 		{
-			FTRACE(("ServerApp %s: AS_COUNT_FONT_FAMILIES\n",fSignature.String()));
-			// Attached Data:
-			// 1) port_id - reply port
-			
+			FTRACE(("ServerApp %s: AS_COUNT_FONT_FAMILIES\n", fSignature.String()));
 			// Returns:
 			// 1) int32 - # of font families
-			port_id replyport;
-			
-			msg.Read<port_id>(&replyport);
-			
-			replylink.SetSendPort(replyport);
+
 			fontserver->Lock();
-			replylink.StartMessage(SERVER_TRUE);
-			replylink.Attach<int32>(fontserver->CountFamilies());
-			replylink.Flush();
+
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<int32>(fontserver->CountFamilies());
+			fLink.Flush();
+
 			fontserver->Unlock();
-			
 			break;
 		}
 		case AS_COUNT_FONT_STYLES:
 		{
-			FTRACE(("ServerApp %s: AS_COUNT_FONT_STYLES\n",fSignature.String()));
+			FTRACE(("ServerApp %s: AS_COUNT_FONT_STYLES\n", fSignature.String()));
 			// Attached Data:
 			// 1) font_family - name of font family
-			// 2) port_id - reply port
-			
+
 			// Returns:
 			// 1) int32 - # of font styles
-			port_id replyport;
 			font_family fam;
-			
-			msg.Read(fam,sizeof(font_family));
-			msg.Read<port_id>(&replyport);
-			
-			replylink.SetSendPort(replyport);
-			
+			link.Read(fam,sizeof(font_family));
+
 			fontserver->Lock();
-			FontFamily *ffam=fontserver->GetFamily(fam);
-			if(ffam)
-			{
-				replylink.StartMessage(SERVER_TRUE);
-				replylink.Attach<int32>(ffam->CountStyles());
-				replylink.Flush();
-			}
-			else
-			{
-				replylink.StartMessage(SERVER_FALSE);
-				replylink.Flush();
-			}
-			
+			FontFamily *ffam = fontserver->GetFamily(fam);
+			if (ffam) {
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach<int32>(ffam->CountStyles());
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+
+			fLink.Flush();
 			fontserver->Unlock();
 			break;
 		}
 		case AS_SET_SYSFONT_PLAIN:
 		{
-			FTRACE(("ServerApp %s: AS_SET_SYSFONT_PLAIN\n",fSignature.String()));
-			// Attached Data:
-			// port_id reply port
-			
+			FTRACE(("ServerApp %s: AS_SET_SYSFONT_PLAIN\n", fSignature.String()));
 			// Returns:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
 			// 3) float - size in points
 			// 4) uint16 - face flags
 			// 5) uint32 - font flags
-			
-			port_id replyport;
-			msg.Read<port_id>(&replyport);
-			replylink.SetSendPort(replyport);
-			
+
 			fontserver->Lock();
-			ServerFont *sf=fontserver->GetSystemPlain();
-			if(sf)
-			{
-				replylink.StartMessage(SERVER_TRUE);
-				replylink.Attach<uint16>(sf->FamilyID());
-				replylink.Attach<uint16>(sf->StyleID());
-				replylink.Attach<float>(sf->Size());
-				replylink.Attach<uint16>(sf->Face());
-				replylink.Attach<uint32>(sf->Flags());
-				replylink.Flush();
-			}
-			else
-			{
-				replylink.StartMessage(SERVER_FALSE);
-				replylink.Flush();
-			}
-			
+			ServerFont *sf = fontserver->GetSystemPlain();
+			if (sf) {
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach<uint16>(sf->FamilyID());
+				fLink.Attach<uint16>(sf->StyleID());
+				fLink.Attach<float>(sf->Size());
+				fLink.Attach<uint16>(sf->Face());
+				fLink.Attach<uint32>(sf->Flags());
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+
+			fLink.Flush();
 			fontserver->Unlock();
-			
 			break;
 		}
 		case AS_GET_FONT_HEIGHT:
 		{
-			FTRACE(("ServerApp %s: AS_GET_FONT_HEIGHT\n",fSignature.String()));
+			FTRACE(("ServerApp %s: AS_GET_FONT_HEIGHT\n", fSignature.String()));
 			// Attached Data:
 			// 1) uint16 family ID
 			// 2) uint16 style ID
 			// 3) float size
-			// 4) port_id reply port
 			uint16 famid,styid;
 			float ptsize;
-			port_id replyport;
-			
-			msg.Read<uint16>(&famid);
-			msg.Read<uint16>(&styid);
-			msg.Read<float>(&ptsize);
-			msg.Read<port_id>(&replyport);
-			
-			replylink.SetSendPort(replyport);
-			
+			link.Read<uint16>(&famid);
+			link.Read<uint16>(&styid);
+			link.Read<float>(&ptsize);
+
 			fontserver->Lock();
-			FontStyle *fstyle=fontserver->GetStyle(famid,styid);
-			if(fstyle)
-			{
-				replylink.StartMessage(SERVER_TRUE);
-				replylink.Attach<font_height>(fstyle->GetHeight(ptsize));
-				replylink.Flush();
-			}
-			else
-			{
-				replylink.StartMessage(SERVER_FALSE);
-				replylink.Flush();
-			}
-			
+			FontStyle *fstyle = fontserver->GetStyle(famid, styid);
+			if (fstyle) {
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach<font_height>(fstyle->GetHeight(ptsize));
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+
+			fLink.Flush();
 			fontserver->Unlock();
 			break;
 		}
 		case AS_SET_SYSFONT_BOLD:
 		{
-			FTRACE(("ServerApp %s: AS_SET_SYSFONT_BOLD\n",fSignature.String()));
-			// Attached Data:
-			// port_id reply port
-			
+			FTRACE(("ServerApp %s: AS_SET_SYSFONT_BOLD\n", fSignature.String()));
 			// Returns:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1596,69 +1389,46 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// 4) uint16 - face flags
 			// 5) uint32 - font flags
 			
-			port_id replyport;
-			msg.Read<port_id>(&replyport);
-			replylink.SetSendPort(replyport);
-			
 			fontserver->Lock();
-			ServerFont *sf=fontserver->GetSystemBold();
-			if(sf)
-			{
-				replylink.StartMessage(SERVER_TRUE);
-				replylink.Attach<uint16>(sf->FamilyID());
-				replylink.Attach<uint16>(sf->StyleID());
-				replylink.Attach<float>(sf->Size());
-				replylink.Attach<uint16>(sf->Face());
-				replylink.Attach<uint32>(sf->Flags());
-				replylink.Flush();
-			}
-			else
-			{
-				replylink.StartMessage(SERVER_FALSE);
-				replylink.Flush();
-			}
-			
+			ServerFont *sf = fontserver->GetSystemBold();
+			if (sf) {
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach<uint16>(sf->FamilyID());
+				fLink.Attach<uint16>(sf->StyleID());
+				fLink.Attach<float>(sf->Size());
+				fLink.Attach<uint16>(sf->Face());
+				fLink.Attach<uint32>(sf->Flags());
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+
+			fLink.Flush();
 			fontserver->Unlock();
-			
 			break;
 		}
 		case AS_SET_SYSFONT_FIXED:
 		{
-			FTRACE(("ServerApp %s: AS_SET_SYSFONT_FIXED\n",fSignature.String()));
-			// Attached Data:
-			// port_id reply port
-			
+			FTRACE(("ServerApp %s: AS_SET_SYSFONT_FIXED\n", fSignature.String()));
 			// Returns:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
 			// 3) float - size in points
 			// 4) uint16 - face flags
 			// 5) uint32 - font flags
-			
-			port_id replyport;
-			msg.Read<port_id>(&replyport);
-			replylink.SetSendPort(replyport);
-			
+
 			fontserver->Lock();
-			ServerFont *sf=fontserver->GetSystemFixed();
-			if(sf)
-			{
-				replylink.StartMessage(SERVER_TRUE);
-				replylink.Attach<uint16>(sf->FamilyID());
-				replylink.Attach<uint16>(sf->StyleID());
-				replylink.Attach<float>(sf->Size());
-				replylink.Attach<uint16>(sf->Face());
-				replylink.Attach<uint32>(sf->Flags());
-				replylink.Flush();
-			}
-			else
-			{
-				replylink.StartMessage(SERVER_FALSE);
-				replylink.Flush();
-			}
-			
+			ServerFont *sf = fontserver->GetSystemFixed();
+			if (sf) {
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach<uint16>(sf->FamilyID());
+				fLink.Attach<uint16>(sf->StyleID());
+				fLink.Attach<float>(sf->Size());
+				fLink.Attach<uint16>(sf->Face());
+				fLink.Attach<uint32>(sf->Flags());
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+
+			fLink.Flush();
 			fontserver->Unlock();
-			
 			break;
 		}
 		case AS_GET_GLYPH_SHAPES:
@@ -1673,33 +1443,28 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// 6) uint32 - flags
 			// 7) int32 - numChars
 			// 8) char - chars (numChars times)
-			// 9) port_id - reply port
-			
+
 			// Returns:
 			// 1) BShape - glyph shape
 			// numChars times
-			
+
 			uint16 famid, styid;
 			uint32 flags;
 			float ptsize, shear, rotation;
 			
-			msg.Read<uint16>(&famid);
-			msg.Read<uint16>(&styid);
-			msg.Read<float>(&ptsize);
-			msg.Read<float>(&shear);
-			msg.Read<float>(&rotation);
-			msg.Read<uint32>(&flags);
+			link.Read<uint16>(&famid);
+			link.Read<uint16>(&styid);
+			link.Read<float>(&ptsize);
+			link.Read<float>(&shear);
+			link.Read<float>(&rotation);
+			link.Read<uint32>(&flags);
 			
 			int32 numChars;
-			msg.Read<int32>(&numChars);
+			link.Read<int32>(&numChars);
 			
 			char charArray[numChars];			
 			for (int32 i = 0; i < numChars; i++)
-				msg.Read<char>(&charArray[i]);
-			
-			port_id replyport;
-			msg.Read<port_id>(&replyport);
-			replylink.SetSendPort(replyport);
+				link.Read<char>(&charArray[i]);
 			
 			ServerFont font;
 			if (font.SetFamilyAndStyle(famid, styid) == B_OK) {
@@ -1710,23 +1475,19 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 				
 				BShape **shapes = font.GetGlyphShapes(charArray, numChars);
 				if (shapes) {
-					replylink.StartMessage(SERVER_TRUE);
+					fLink.StartMessage(SERVER_TRUE);
 					for (int32 i = 0; i < numChars; i++) {
-						replylink.AttachShape(*shapes[i]);
+						fLink.AttachShape(*shapes[i]);
 						delete shapes[i];
 					}
-					
-					replylink.Flush();
+
 					delete shapes;
-				} else {
-					replylink.StartMessage(SERVER_FALSE);
-					replylink.Flush();
-				}
-			} else {
-				replylink.StartMessage(SERVER_FALSE);
-				replylink.Flush();
-			}
-			
+				} else
+					fLink.StartMessage(SERVER_FALSE);
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+
+			fLink.Flush();
 			break;
 		}
 		case AS_GET_ESCAPEMENTS:
@@ -1739,40 +1500,33 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// 4) float - rotation
 			// 5) uint32 - flags
 			// 6) int32 - numChars
-			
 			// 7) char - char     -\       both
 			// 8) BPoint - offset -/ (numChars times)
-			
-			// 9) port_id - reply port
-			
+
 			// Returns:
 			// 1) BPoint - escapement
 			// numChars times
-			
+
 			uint16 famid, styid;
 			uint32 flags;
 			float ptsize, rotation;
-			
-			msg.Read<uint16>(&famid);
-			msg.Read<uint16>(&styid);
-			msg.Read<float>(&ptsize);
-			msg.Read<float>(&rotation);
-			msg.Read<uint32>(&flags);
-			
+
+			link.Read<uint16>(&famid);
+			link.Read<uint16>(&styid);
+			link.Read<float>(&ptsize);
+			link.Read<float>(&rotation);
+			link.Read<uint32>(&flags);
+
 			int32 numChars;
-			msg.Read<int32>(&numChars);
-			
+			link.Read<int32>(&numChars);
+
 			char charArray[numChars];			
 			BPoint offsetArray[numChars];
 			for (int32 i = 0; i < numChars; i++) {
-				msg.Read<char>(&charArray[i]);
-				msg.Read<BPoint>(&offsetArray[i]);
+				link.Read<char>(&charArray[i]);
+				link.Read<BPoint>(&offsetArray[i]);
 			}
-			
-			port_id replyport;
-			msg.Read<port_id>(&replyport);
-			replylink.SetSendPort(replyport);
-			
+
 			ServerFont font;
 			if (font.SetFamilyAndStyle(famid, styid) == B_OK) {
 				font.SetSize(ptsize);
@@ -1781,22 +1535,18 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 				
 				BPoint *esc = font.GetEscapements(charArray, numChars, offsetArray);
 				if (esc) {
-					replylink.StartMessage(SERVER_TRUE);
+					fLink.StartMessage(SERVER_TRUE);
 					for (int32 i = 0; i < numChars; i++) {
-						replylink.Attach<BPoint>(esc[i]);
+						fLink.Attach<BPoint>(esc[i]);
 					}
 					
-					replylink.Flush();
 					delete esc;
-				} else {
-					replylink.StartMessage(SERVER_FALSE);
-					replylink.Flush();
-				}
-			} else {
-				replylink.StartMessage(SERVER_FALSE);
-				replylink.Flush();
-			}
-			
+				} else
+					fLink.StartMessage(SERVER_FALSE);
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+
+			fLink.Flush();
 			break;
 		}
 		case AS_GET_ESCAPEMENTS_AS_FLOATS:
@@ -1816,8 +1566,6 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// 9) int32 - numBytes
 			// 10) char - the char buffer with size numBytes
 
-			// 11) port_id - reply port
-			
 			// Returns:
 			// 1) float - escapement buffer with numChar entries
 			
@@ -1825,35 +1573,31 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			uint32 flags;
 			float ptsize, rotation;
 			
-			msg.Read<uint16>(&famid);
-			msg.Read<uint16>(&styid);
-			msg.Read<float>(&ptsize);
-			msg.Read<float>(&rotation);
-			msg.Read<uint32>(&flags);
+			link.Read<uint16>(&famid);
+			link.Read<uint16>(&styid);
+			link.Read<float>(&ptsize);
+			link.Read<float>(&rotation);
+			link.Read<uint32>(&flags);
 
 			escapement_delta delta;
-			msg.Read<float>(&delta.nonspace);
-			msg.Read<float>(&delta.space);
+			link.Read<float>(&delta.nonspace);
+			link.Read<float>(&delta.space);
 			
 			int32 numChars;
-			msg.Read<int32>(&numChars);
+			link.Read<int32>(&numChars);
 
 /*			char charArray[numChars];			
 			for (int32 i = 0; i < numChars; i++) {
-				msg.Read<char>(&charArray[i]);
+				link.Read<char>(&charArray[i]);
 			}*/
 			uint32 numBytes;
-			msg.Read<uint32>(&numBytes);
+			link.Read<uint32>(&numBytes);
 
 			char* charArray = new char[numBytes];
-			msg.Read(charArray, numBytes);
+			link.Read(charArray, numBytes);
 
 			float* escapements = new float[numChars];
 			// figure out escapements
-
-			port_id replyport;
-			msg.Read<port_id>(&replyport);
-			replylink.SetSendPort(replyport);
 
 			ServerFont font;
 			bool success = false;
@@ -1863,8 +1607,8 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 				font.SetFlags(flags);
 
 				if (font.GetEscapements(charArray, numChars, escapements, delta)) {
-					replylink.StartMessage(SERVER_TRUE);
-					replylink.Attach(escapements, numChars * sizeof(float));
+					fLink.StartMessage(SERVER_TRUE);
+					fLink.Attach(escapements, numChars * sizeof(float));
 					success = true;
 				}
 			}
@@ -1873,10 +1617,9 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			delete[] escapements;
 
 			if (!success)
-				replylink.StartMessage(SERVER_FALSE);
+				fLink.StartMessage(SERVER_FALSE);
 
-			replylink.Flush();
-			
+			fLink.Flush();
 			break;
 		}
 /*		case AS_GET_TRUNCATED_STRINGS:
@@ -1902,19 +1645,19 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			float size;
 			uint8 spacing;
 
-			msg.Read<uint16>(&family);
-			msg.Read<uint16>(&style);
-			msg.Read<float>(&size);
-			msg.Read<uint8>(&spacing);
+			link.Read<uint16>(&family);
+			link.Read<uint16>(&style);
+			link.Read<float>(&size);
+			link.Read<uint8>(&spacing);
 
 			// params
 			uint32 mode;
 			float width;
 			int32 count;
 
-			msg.Read<uint32>(&mode);
-			msg.Read<float>(&width);
-			msg.Read<int32>(&count);
+			link.Read<uint32>(&mode);
+			link.Read<float>(&width);
+			link.Read<int32>(&count);
 
 			char** strings = NULL;
 
@@ -1922,7 +1665,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			if (count > 0) {
 				strings = new char*[count];
 				for (int32 i = 0; i < count; i++) {
-					msg.ReadString(&strings[i]);
+					link.ReadString(&strings[i]);
 				}
 				// TODO: truncate strings here
 				ServerFont font;
@@ -1933,20 +1676,15 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 				}
 			}
 
-			int32 replyport;
-			msg.Read<int32>(&replyport);
-			
-			replylink.SetSendPort(replyport);
-
 			if (success) {
-				replylink.StartMessage(SERVER_TRUE);
+				fLink.StartMessage(SERVER_TRUE);
 				for (int32 i = 0; i < count; i++) {
-					replylink.AttachString(strings[i]);
+					fLink.AttachString(strings[i]);
 				}
-			} else {
-				replylink.StartMessage(SERVER_FALSE);
-			}
-			replylink.Flush();
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+
+			fLink.Flush();
 
 			// free used resources
 			if (count > 0) {
@@ -1966,10 +1704,10 @@ printf("ServerApp %s: AS_SCREEN_GET_MODE\n", fSignature.String());
 			// 2) screen_id
 			// 3) workspace index
 			screen_id id;
-			msg.Read<screen_id>(&id);
+			link.Read<screen_id>(&id);
 			uint32 workspace;
-			msg.Read<uint32>(&workspace);
-			
+			link.Read<uint32>(&workspace);
+
 			// TODO: the display_mode can be different between
 			// the various screens.
 			// We have the screen_id and the workspace number, with these
@@ -1978,16 +1716,11 @@ printf("ServerApp %s: AS_SCREEN_GET_MODE\n", fSignature.String());
 			gDesktop->GetDisplayDriver()->GetMode(mode);
 			// actually this isn't still enough as different workspaces can
 			// have different display_modes
-			
-			int32 replyport;
-			msg.Read<int32>(&replyport);
-			
-			replylink.SetSendPort(replyport);
-			replylink.StartMessage(SERVER_TRUE);
-			replylink.Attach<display_mode>(mode);
-			replylink.Attach<status_t>(B_OK);
-			replylink.Flush();
-			
+
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<display_mode>(mode);
+			fLink.Attach<status_t>(B_OK);
+			fLink.Flush();
 			break;
 		}
 		case AS_SCREEN_SET_MODE:
@@ -2000,72 +1733,59 @@ printf("ServerApp %s: AS_SCREEN_GET_MODE\n", fSignature.String());
 			// 4) display_mode to set
 			// 5) 'makedefault' boolean
 			// TODO: See above: workspaces support, etc.
-		
+
 			screen_id id;
-			msg.Read<screen_id>(&id);
-			
+			link.Read<screen_id>(&id);
+
 			uint32 workspace;
-			msg.Read<uint32>(&workspace);
-			
+			link.Read<uint32>(&workspace);
+
 			display_mode mode;
-			msg.Read<display_mode>(&mode);
-			
+			link.Read<display_mode>(&mode);
+
 			bool makedefault = false;
-			msg.Read<bool>(&makedefault);
-			
+			link.Read<bool>(&makedefault);
+
 			// TODO: Adi doesn't like this: see if
 			// messaging is better.
 			gDesktop->ActiveRootLayer()->Lock();
 			// TODO: This should return something
 			gDesktop->GetDisplayDriver()->SetMode(mode);
 			gDesktop->ActiveRootLayer()->Unlock();
-		
-			int32 replyport;
-			msg.Read<int32>(&replyport);
-			
-			replylink.SetSendPort(replyport);
-			replylink.StartMessage(SERVER_TRUE);
-			replylink.Attach<status_t>(B_OK);
-			replylink.Flush();
+
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<status_t>(B_OK);
+			fLink.Flush();
 			break;
 		}
-		
+
 		case AS_SCREEN_GET_COLORMAP:
 		{
 			STRACE(("ServerApp %s: AS_SCREEN_GET_COLORMAP\n", fSignature.String()));
-			
+
 			screen_id id;
-			msg.Read<screen_id>(&id);
-			
-			int32 replyport;
-			msg.Read<int32>(&replyport);
-			
-			replylink.SetSendPort(replyport);
-			replylink.StartMessage(SERVER_TRUE);
-			
+			link.Read<screen_id>(&id);
+
+			fLink.StartMessage(SERVER_TRUE);
+
 			// TODO: this doesn't seem to work.
 			//See also comment in BPrivateScreen::BPrivateScreen()
-			//replylink.Attach<color_map>(*SystemColorMap());
-			replylink.Flush();
-			
+			//fLink.Attach<color_map>(*SystemColorMap());
+			fLink.Flush();
 			break;
 		}
-		
-		default:
-		{
-			printf("ServerApp %s received unhandled message code offset %s\n", fSignature.String(),
-				   MsgCodeToBString(code).String());
 
-			// TODO: completely broken. The reply port seems to be unkown!
-			// It is in the data, but the position is unkown. Man, I find
-			// this comm stuff really clumsy. -Stephan)
-			// And BTW: the client is now blocking and waiting for a reply!
-			/*replylink.SetSendPort(msg.GetPort());
-			replylink.StartMessage(SERVER_FALSE);
-			replylink.Flush();
-			*/
+		default:
+			printf("ServerApp %s received unhandled message code offset %s\n",
+				fSignature.String(), MsgCodeToBString(code).String());
+
+			if (link.NeedsReply()) {
+				// the client is now blocking and waiting for a reply!
+				fLink.StartMessage(SERVER_FALSE);
+				fLink.Flush();
+			} else
+				puts("message doesn't need a reply!");
 			break;
-		}
 	}
 }
 

@@ -23,7 +23,9 @@ class LinkMsgReader {
 		port_id	Port(void) { return fReceivePort; }
 
 		status_t GetNextMessage(int32 &code, bigtime_t timeout = B_INFINITE_TIMEOUT);
-		status_t Read(void *data, ssize_t size);
+		bool NeedsReply() const;
+
+		virtual status_t Read(void *data, ssize_t size);
 		status_t ReadString(char **string);
 		template <class Type> status_t Read(Type *data)
 		{

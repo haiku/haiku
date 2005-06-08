@@ -208,7 +208,7 @@ RootLayer::WorkingThread(void *data)
 	
 	STRACE(("info: RootLayer(%s)::WorkingThread listening on port %ld.\n", oneRootLayer->GetName(), oneRootLayer->fListenPort));
 	for (;;) {
-		err = messageQueue.GetNextReply(code);
+		err = messageQueue.GetNextMessage(code);
 		if (err < B_OK) {
 			STRACE(("WorkingThread: messageQueue.GetNextReply failed\n"));
 			continue;

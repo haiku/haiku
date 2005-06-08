@@ -30,6 +30,7 @@
 
 #include <OS.h>
 #include <String.h>
+#include <PortLink.h>
 
 #include "FMWList.h"
 
@@ -38,8 +39,6 @@ class BMessage;
 class BPortLink;
 class BList;
 class DisplayDriver;
-class LinkMsgReader;
-class LinkMsgSender;
 class ServerPicture;
 class ServerCursor;
 class ServerBitmap;
@@ -92,9 +91,9 @@ public:
 	
 private:
 	void DispatchMessage(int32 code, LinkMsgReader &link);
-	
+
 	static int32 MonitorApp(void *data);	
-	
+
 	// our BApplication's event port
 	port_id	fClientAppPort;	
 	// port we receive messages from our BApplication
@@ -104,15 +103,14 @@ private:
 			// as BAppServerLink/BPortlink's messages always contain the reply port
 	// To send a message to the client, write a BMessage to this port
 	port_id	fClientLooperPort;
-	
+
 	BString fSignature;
-	
+
 	thread_id fMonitorThreadID;
 	team_id fClientTeamID;
-	
-	LinkMsgReader *fMsgReader;
-	LinkMsgSender *fMsgSender;
-	
+
+	BPortLink fLink;
+
 	// TODO:
 	// - Are really Bitmaps and Pictures stored per application and not globally ?
 	// - As we reference these stuff by token, what about putting them in hash tables ?

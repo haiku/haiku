@@ -92,9 +92,9 @@ BPortLink::AttachShape(BShape &shape)
 status_t
 BPortLink::FlushWithReply(int32 &code)
 {
-	status_t status = Flush();
+	status_t status = Flush(B_INFINITE_TIMEOUT, true);
 	if (status < B_OK)
 		return status;
 
-	return GetNextReply(code);
+	return GetNextMessage(code);
 }

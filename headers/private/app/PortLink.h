@@ -61,7 +61,8 @@ class BPortLink {
 		void SetReplyPort(port_id port);
 		port_id	ReplyPort();
 
-		status_t GetNextReply(int32 &code, bigtime_t timeout = B_INFINITE_TIMEOUT);
+		status_t GetNextMessage(int32 &code, bigtime_t timeout = B_INFINITE_TIMEOUT);
+		bool NeedsReply() const;
 		status_t Read(void *data, ssize_t size);
 		status_t ReadString(char **string);
 		status_t ReadRegion(BRegion *region);
@@ -71,6 +72,8 @@ class BPortLink {
 		// convenience methods
 
 		status_t FlushWithReply(int32 &code);
+		LinkMsgReader &Reader() { return *fReader; }
+		LinkMsgSender &Sender() { return *fSender; }
 
 	protected:
 		LinkMsgReader *fReader;
@@ -148,9 +151,15 @@ BPortLink::ReplyPort()
 }
 
 inline status_t
-BPortLink::GetNextReply(int32 &code, bigtime_t timeout)
+BPortLink::GetNextMessage(int32 &code, bigtime_t timeout)
 {
 	return fReader->GetNextMessage(code, timeout);
+}
+
+inline bool
+BPortLink::NeedsReply() const
+{
+	return fReader->NeedsReply();
 }
 
 inline status_t

@@ -102,6 +102,17 @@ LinkMsgReader::GetNextMessage(int32 &code, bigtime_t timeout)
 }
 
 
+bool
+LinkMsgReader::NeedsReply() const
+{
+	if (fReplySize == 0)
+		return false;
+
+	message_header *header = (message_header *)(fRecvBuffer + fRecvStart);
+	return (header->flags & kNeedsReply) != 0;
+}
+
+
 void
 LinkMsgReader::ResetBuffer()
 {
