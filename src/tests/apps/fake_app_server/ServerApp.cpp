@@ -249,7 +249,7 @@ int32 ServerApp::MonitorApp(void *data)
 	{
 		STRACE(("info: ServerApp::MonitorApp listening on port %ld.\n", app->fMessagePort));
 //		err = msgqueue.GetNextReply(&code);
-		err = msgqueue.GetNextMessage(&code);
+		err = msgqueue.GetNextMessage(code);
 		if (err < B_OK)
 			break;
 

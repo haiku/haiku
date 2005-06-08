@@ -144,7 +144,7 @@ AppServer::MainLoop(void)
 	while(1)
 	{
 		STRACE(("info: AppServer::MainLoop listening on port %ld.\n", fMessagePort));
-		err=pmsg.GetNextReply(&code);
+		err=pmsg.GetNextReply(code);
 
 		if(err<B_OK)
 		{
