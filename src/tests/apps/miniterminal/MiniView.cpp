@@ -317,10 +317,11 @@ MiniView::ExecuteShell(void *arg)
 		dup2(view->fSlaveFD, 0);
 		dup2(view->fSlaveFD, 1);
 		dup2(view->fSlaveFD, 2);
-		
+
 		view->fShellProcess = load_image(2, argv, (const char **)environ);
 		setpgid(view->fShellProcess, 0);
-		
+		tcsetpgrp(view->fSlaveFD, view->fShellProcess);
+
 		status_t return_code;
 		wait_for_thread(view->fShellProcess, &return_code);
 		
