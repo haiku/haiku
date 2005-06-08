@@ -349,9 +349,9 @@ BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool showMenu,
 		data.useRect = specialRect != NULL;
 		if (data.useRect)
 			data.rect = *specialRect;
-			
+		
+		resume_thread(fTrackingPID);	
 		send_data(fTrackingPID, 0, &data, sizeof(data));
-		resume_thread(fTrackingPID);
 	
 	} else {
 		_set_menu_sem_(window, B_NO_MORE_SEMS);
