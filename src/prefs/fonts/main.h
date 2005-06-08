@@ -1,39 +1,17 @@
-/*! \file main.h
-    \brief Header file for the main class.
-    
-*/
-
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ */
 #ifndef MAIN_H
+#define MAIN_H
 	
-	#define MAIN_H
-	
-	#ifndef _APPLICATION_H
-	
-		#include <Application.h>
-		
-	#endif
-	
-	class FontsSettings;
-	class MainWindow;
-	/**
-	 * Main class.
-	 *
-	 * Gets everything going.
-	 */
-	class Font_pref : public BApplication{
-	
-		public:
-		
-			/**
-			 * Constructor.
-			 */
-			Font_pref();
-			~Font_pref();
-			void ReadyToRun();
-			bool QuitRequested();
-		private:
-			FontsSettings *f_settings;
-			MainWindow *window;
-	};
+#include <Application.h>
+
+class FontApp : public BApplication
+{
+public:
+	FontApp(void);
+};
 	
 #endif

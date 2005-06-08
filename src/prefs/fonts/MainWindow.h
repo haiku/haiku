@@ -1,82 +1,40 @@
-/*! \file MainWindow.h
-    \brief Header for the MainWindow class.
-    
-*/
-
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ */
 #ifndef MAIN_WINDOW_H
+#define MAIN_WINDOW_H
 
-	#define MAIN_WINDOW_H
+#include <Application.h>
+#include <Window.h>
+#include <TabView.h>
+#include <Box.h>
 
-	#ifndef _APPLICATION_H
+#include "FontView.h"
+#include "CacheView.h"
+#include "ButtonView.h"
+#include "FontsSettings.h"
 	
-		#include <Application.h>
-	
-	#endif
-	#ifndef _WINDOW_H
+class MainWindow : public BWindow
+{
+public:
+					MainWindow(void); 
+	virtual	bool	QuitRequested(void);
+	virtual	void	MessageReceived(BMessage *message);
 			
-		#include <Window.h>
-	
-	#endif
-	#ifndef _TAB_VIEW_H
+private:
 		
-		#include <TabView.h>
-		
-	#endif
-
-	#ifndef FONT_VIEW_H
+	void updateSize(FontSelectionView *theView);
+	void updateFont(FontSelectionView *theView);
+	void updateStyle(FontSelectionView *theView);
 	
-		#include "FontView.h"
-		
-	#endif
+	FontView	*fSelectorView;
+	ButtonView	*fButtonView;
+	CacheView	*fCacheView;
 	
-	#ifndef CACHE_VIEW_H
-	
-		#include "CacheView.h"
-		
-	#endif
-	
-	#ifndef BUTTON_VIEW_H
-	
-		#include "ButtonView.h"
-		
-	#endif
-		
-	#ifndef _BOX_H
-	
-		#include <Box.h>
-		
-	#endif
-	
-	class MainWindow : public BWindow{
-	
-		public:
-			
-			MainWindow(BRect frame); 
-			virtual	bool QuitRequested();
-			virtual void MessageReceived(BMessage *message);
-			
-		private:
-		
-			/**
-			 * The panel that shows the font selection views.
-			 */
-			FontView *fontPanel;
-			
-			/**
-			 * The panel that holds the default, revert and rescan buttons.
-			 */
-			ButtonView *buttonView;
-			
-			/**
-			 * The panel that holds the sliders for adjusting the cache sizes.
-			 */
-			CacheView *cachePanel;
-	
-			void updateSize(FontSelectionView *theView);
-			void updateFont(FontSelectionView *theView);
-			void updateStyle(FontSelectionView *theView);
-			
-	};
+	FontsSettings fSettings;
+};
 
 #endif
 

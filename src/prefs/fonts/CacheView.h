@@ -1,86 +1,37 @@
-/*! \file CacheView.h
- *  \brief Header file for the CacheView class.
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
  */
- 
 #ifndef CACHE_VIEW_H
+#define CACHE_VIEW_H
+	
+#include <View.h>
+#include <Box.h>
+#include <Slider.h>
+#include <Button.h>
 
-	#define CACHE_VIEW_H
+class CacheView : public BView
+{
+public:
+			CacheView(const BRect &frame, const int32 &sliderMin, 
+						const int32 &sliderMax, const int32 &printVal,
+						const int32 &screenVal);
+	void	AttachedToWindow(void);
+	void	MessageReceived(BMessage *msg);
 	
-	/*!
-	 * Message sent when the print slider is updated.
-	 */
-	#define PRINT_FCS_UPDATE_MSG 'pfum'
-	
-	/*!
-	 * Message sent when the screen slider is updated.
-	 */
-	#define SCREEN_FCS_UPDATE_MSG 'sfum'
-	
-	/*!
-	 * Message sent when the print slider is modified.
-	 */
-	#define PRINT_FCS_MODIFICATION_MSG 'pfmm'
-	
-	/*!
-	 * Message sent when the screen slider is modified.
-	 */
-	#define SCREEN_FCS_MODIFICATION_MSG 'sfmm'
-	
-	#ifndef _VIEW_H
+	void	revertToOriginal();
+	void	resetToDefaults();
+
+private:
 		
-		#include <View.h>
-	
-	#endif
-	
-	#ifndef _BOX_H
-	
-		#include <Box.h>
-		
-	#endif
-	#ifndef _SLIDER_H
-	
-		#include <Slider.h>
-	 
-	#endif
-	#ifndef _BUTTON_H
-	
-		#include <Button.h>
-		
-	#endif
-	
-	class CacheView : public BView{
-	
-		public:
+	BSlider		*fScreenSlider;
+	BSlider		*fPrintSlider;
+	BButton		*fSaveCache;
 			
-			CacheView(BRect frame, int minVal, int maxVal, int32 printCurrVal, int32 screenCurrVal);
-			void updatePrintFCS(const char* txt);
-			void updateScreenFCS(const char* txt);
-			int getPrintFCSValue();
-			int getScreenFCSValue();
-			void revertToOriginal();
-			void resetToDefaults();
-		private:
-		
-			/**
-			 * The screen cache slider.
-			 */
-			BSlider *screenFCS;
-			
-			/**
-			 * The print cache slider.
-			 */
-			BSlider *printFCS;
-			
-			/**
-			 * The original print slider value.
-			 */
-			int32 origPrintVal;
-			
-			/**
-			 * The original screen slider value.
-			 */
-			int32 origScreenVal;
-			
-	};
+	// The original slider values
+	int32		fSavedPrintValue;
+	int32 		fSavedScreenValue;
+};
 	
 #endif

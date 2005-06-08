@@ -1,84 +1,67 @@
-/*! \file FontSelectionView.cpp
-    \brief Header for the FontSelectionView class.
-    
-*/
-
-#ifndef FONT_SELECTION_VIEW_H
-	
-	#include "FontSelectionView.h"
-
-#endif
-
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ */
+#include "FontSelectionView.h"
 #include "Pref_Utils.h"
 
+#define SIZE_CHANGED_MSG 'plsz'
+#define FONT_CHANGED_MSG 'plfn'
+#define STYLE_CHANGED_MSG 'plst'
+
 // should be changed to allow larger and smaller
-#define minSizeIndex 7
-#define maxSizeIndex 12
+#define minSizeIndex 9
+#define maxSizeIndex 14
 
 // constants for labels
 const char *kPlainFont = "Plain font:";
-const char *kBoldFont = "Bold font:";
+const char *kBoldFont =	 "Bold font:";
 const char *kFixedFont = "Fixed font:";
 const char *kSize = "Size: ";
 
-/**
- * Constructor
- * @param rect The size of the view.
- * @param name The name of the view.
- * @param type The type of the view: plain, italic, etc.
- */
 FontSelectionView::FontSelectionView(BRect rect, const char *name, int type)
-	   	   : BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW)
+	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW)
 {
-	
-	switch(type){
-	
-		case PLAIN_FONT_SELECTION_VIEW:
-		
-			sprintf(typeLabel, kPlainFont);
-			origFont = be_plain_font;
-			workingFont = be_plain_font;
-			setSizeChangedMessage = PLAIN_SIZE_CHANGED_MSG;
-			setFontChangedMessage = PLAIN_FONT_CHANGED_MSG;
-			setStyleChangedMessage = PLAIN_STYLE_CHANGED_MSG;
-			
-			defaultFont = new BFont();
-			defaultFont->SetFamilyAndStyle("Swis721 BT", "Roman");
-			defaultFont->SetSize(10.0);
-			
-			break;
-			
+	switch(type)
+	{
 		case BOLD_FONT_SELECTION_VIEW:
-		
+		{
 			sprintf(typeLabel, kBoldFont);
 			origFont = be_bold_font;
 			workingFont = be_bold_font;
-			setSizeChangedMessage = BOLD_SIZE_CHANGED_MSG;
-			setFontChangedMessage = BOLD_FONT_CHANGED_MSG;
-			setStyleChangedMessage = BOLD_STYLE_CHANGED_MSG;
 			
 			defaultFont = new BFont();
 			defaultFont->SetFamilyAndStyle("Swis721 BT", "Bold");
 			defaultFont->SetSize(12.0);
 			
 			break;
-			
+		}	
 		case FIXED_FONT_SELECTION_VIEW:
-		
+		{
 			sprintf(typeLabel, kFixedFont);
 			origFont = be_fixed_font;
 			workingFont = be_fixed_font;
-			setSizeChangedMessage = FIXED_SIZE_CHANGED_MSG;
-			setFontChangedMessage = FIXED_FONT_CHANGED_MSG;
-			setStyleChangedMessage = FIXED_STYLE_CHANGED_MSG;
 			
 			defaultFont = new BFont();
 			defaultFont->SetFamilyAndStyle("Courier10 BT", "Roman");
 			defaultFont->SetSize(12.0);
 			
 			break;
+		}
+		default:
+		{
+			sprintf(typeLabel, kPlainFont);
+			origFont = be_plain_font;
+			workingFont = be_plain_font;
 			
-	}//switch
+			defaultFont = new BFont();
+			defaultFont->SetFamilyAndStyle("Swis721 BT", "Roman");
+			defaultFont->SetSize(10.0);
+			
+			break;
+		}	
+	}
 
 	float fontheight = FontHeight(false);
 	float divider = StringWidth(kFixedFont);
@@ -87,7 +70,8 @@ FontSelectionView::FontSelectionView(BRect rect, const char *name, int type)
 	fontList = new BPopUpMenu("fontList", true, true, B_ITEMS_IN_COLUMN);
 	
 	// create menus
-		// size box
+	
+	// size box
 	rect = Bounds();
 	float x = StringWidth("999") +16;
 	rect.left = rect.right -(x +StringWidth(kSize)+8.0);
@@ -95,7 +79,8 @@ FontSelectionView::FontSelectionView(BRect rect, const char *name, int type)
 	BMenuField *sizeListField = new BMenuField(rect, "fontField", kSize, sizeList, true);
 	sizeListField->SetDivider(StringWidth(kSize)+5.0);
 	sizeListField->SetAlignment(B_ALIGN_RIGHT);
-		// font menu
+	
+	// font menu
 	rect.right = rect.left;
 	rect.left = 1;
 	rect.bottom = fontheight *1.5;
@@ -130,152 +115,170 @@ FontSelectionView::FontSelectionView(BRect rect, const char *name, int type)
 		
 }
 
-/**
- * Emptys the menu so it can be rebuilt.
- * @param m The menu to empty.
- */
-void FontSelectionView::emptyMenu(BPopUpMenu *m){
+FontSelectionView::~FontSelectionView(void)
+{
+	delete defaultFont;
+}
 
-	int32 cnt;
-	int32 numItemsInMenu = m->CountItems();
-	
-	for(cnt = 0;cnt < numItemsInMenu;cnt++){
-	
-		BMenu *tmp;
-		BMenuItem *tmpI;
-		int32 cnt2;
-		int32 numItemsInSubmenu;
+void
+FontSelectionView::AttachedToWindow(void)
+{
+}
+
+void
+FontSelectionView::MessageReceived(BMessage *msg)
+{
+	switch(msg->what)
+	{
+/*		case SIZE_CHANGED_MSG: {
 		
-		tmpI = m->RemoveItem((int32) 0);
-		tmp = tmpI->Submenu();
+			updateSize(fSelectorView->plainSelectionView);
+			fButtonView->SetRevertState(true);
+			break;
+		}
+		case FONT_CHANGED_MSG: {
 		
-		if(tmp != NULL){
+			updateFont(fSelectorView->plainSelectionView);
+			fButtonView->SetRevertState(true);
+			break;
+		}
+		case STYLE_CHANGED_MSG: {
 		
-			numItemsInSubmenu = tmp->CountItems();
-			for(cnt2 = 0;cnt2 < numItemsInSubmenu;cnt2++){
-			
-				BMenuItem *tmpItem;
-				
-				tmpItem = tmp->RemoveItem((int32) 0);
-				delete tmpItem;
-				
-			}//for
+			updateStyle(fSelectorView->plainSelectionView);
+			fButtonView->SetRevertState(true);
+			break;
+		}
+		case RESCAN_FONTS_MSG: {
 		
-		}//if
+			update_font_families(false);
+			fSelectorView->emptyMenus();
+			fSelectorView->buildMenus();
+			updateFont(fSelectorView->plainSelectionView);
+			updateFont(fSelectorView->boldSelectionView);
+			updateFont(fSelectorView->fixedSelectionView);
+			break;
+		}
+		case RESET_FONTS_MSG: {
 		
-		delete tmpI;
+			fSelectorView->resetToDefaults();
+			fCacheView->resetToDefaults();
+			fButtonView->SetRevertState(true);
+			break;
+		}
+*/		default:
+			BView::MessageReceived(msg);
+	}
+}
+
+void FontSelectionView::emptyMenus(void)
+{
+	// Empty the font list
+	for(int32 i = 0; i < fontList->CountItems(); i++)
+	{
+		BMenu *menu = fontList->SubmenuAt(0L);
+		
+		// We should never have a regular menu item in the font list
+		if(!menu)
+			continue;
+		
+		for(int32 j=0; j < menu->CountItems(); j++)
+		{
+			BMenuItem *item = menu->RemoveItem(0L);
+			delete item;
+		}
+		
+		fontList->RemoveItem(menu);
+		delete menu;
+	}
 	
-	}//for
+	// empty the size list
+	for(int32 i = 0; i < sizeList->CountItems(); i++)
+	{
+		BMenuItem *item = sizeList->RemoveItem(0L);
+		delete item;
+	}
+}
 
-}//emptyMenu
-
-/**
- * Emptys both the font and the size menus.
- */
-void FontSelectionView::emptyMenus(){
-
-	//empty font menu
-	emptyMenu(fontList);
-	
-	//empty size menu
-	emptyMenu(sizeList);
-	
-}//emptyMenus
-
-/**
- * Builds the font and size menus.
- */
-void FontSelectionView::buildMenus(){
-
+void FontSelectionView::buildMenus(void)
+{
 	int32 numFamilies;
 	int counter;
 	
 	numFamilies = count_font_families(); 
-	for ( int32 i = 0; i < numFamilies; i++ ) { 
-		
+	for ( int32 i = 0; i < numFamilies; i++ )
+	{ 
 		font_family family; 
-		uint32 flags;
 		
-		if ( get_font_family(i, &family, &flags) == B_OK ) { 
+		uint32 flags;
+		int32 numStyles;
+		
+		BMenu *tmpStyleMenu;
+		bool markFamily;
+		
+		if ( get_font_family(i, &family, &flags) != B_OK ) 
+			continue;
+		
+		
+		markFamily = false;
+		
+		tmpStyleMenu = new BMenu(family);
+		tmpStyleMenu->SetRadioMode(true);
+		numStyles = count_font_styles(family); 
+		
+		for ( int32 j = 0; j < numStyles; j++ )
+		{ 
+			font_style style; 
+			BMenuItem *tmpItem;
 			
-			BMenu *tmpStyleMenu;
-			int32 numStyles;
-			bool markFamily;
+			char workingStyle[64];
+			char workingFamily[64];
 			
-			markFamily = false;
+			if (get_font_style(family, j, &style, &flags) != B_OK)
+				continue;
 			
-			tmpStyleMenu = new BMenu(family);
-			tmpStyleMenu->SetRadioMode(true);
-			numStyles = count_font_styles(family); 
-			for ( int32 j = 0; j < numStyles; j++ ) { 
-				
-				font_style style; 
-				if ( get_font_style(family, j, &style, &flags) == B_OK ) { 
-				
-					BMenuItem *tmpItem;
-					char workingStyle[64];
-					char workingFamily[64];
-					
-					workingFont.GetFamilyAndStyle(&workingFamily, &workingStyle);
-					tmpItem = new BMenuItem(style, new BMessage(setStyleChangedMessage));
-					if((strcmp(style, workingStyle) == 0) && (strcmp(family, workingFamily) == 0)){
-					
-						markFamily = true;
-						tmpItem->SetMarked(true);
-						
-					}//if
-					
-					tmpStyleMenu->AddItem(tmpItem);
-				
-				}//if
 			
-			}//for
+			workingFont.GetFamilyAndStyle(&workingFamily, &workingStyle);
+			tmpItem = new BMenuItem(style, new BMessage(STYLE_CHANGED_MSG));
 			
-			fontList->AddItem(new BMenuItem((tmpStyleMenu), new BMessage(setFontChangedMessage)));
-			
-			if(markFamily){
-				
-				tmpStyleMenu->Superitem()->SetMarked(true);
-						
-			}//if
-			
-		}//if
+			if((strcmp(style, workingStyle) == 0) && (strcmp(family, workingFamily) == 0))
+			{
+				markFamily = true;
+				tmpItem->SetMarked(true);
+			}
+			tmpStyleMenu->AddItem(tmpItem);
+		}
+		
+		fontList->AddItem(new BMenuItem((tmpStyleMenu), new BMessage(FONT_CHANGED_MSG)));
+		
+		if(markFamily)
+			tmpStyleMenu->Superitem()->SetMarked(true);
+	}
 	
-	}//for
-	
-	//build size menu
-	for(counter = minSizeIndex;counter < (maxSizeIndex + 1);counter++){
-	
+	// build size menu
+	for(counter = minSizeIndex; counter < (maxSizeIndex + 1); counter++)
+	{
 		char buf[1];
 		BMenuItem *tmp;
 		
 		sprintf(buf, "%d", counter);
-		sizeList->AddItem(tmp = new BMenuItem(buf, new BMessage(setSizeChangedMessage)));
-		if(counter == (int) workingFont.Size()){
-		
+		sizeList->AddItem(tmp = new BMenuItem(buf, new BMessage(SIZE_CHANGED_MSG)));
+		if(counter == (int) workingFont.Size())
 			tmp->SetMarked(true);
-			
-		}//if
-		
-	}//for
-	
-}//buildMenus
+	}
+}
 
 /**
  * Writes the test text in the given font.
  * @param fnt The font to write the test text in.
  */
-void FontSelectionView::SetTestTextFont(BFont *fnt){
-
+void FontSelectionView::SetTestTextFont(BFont *fnt)
+{
 	testText->SetFont(fnt, B_FONT_ALL);
 	testText->Invalidate();
-	
-}//SetTextTextFont
+}
 
-/**
- * Gets the current font.
- */
-BFont FontSelectionView::GetTestTextFont(){
+BFont FontSelectionView::GetTestTextFont()
+{
 
 	BFont rtrnFont;
 	
@@ -283,94 +286,66 @@ BFont FontSelectionView::GetTestTextFont(){
 	
 	return rtrnFont;
 
-}//SetTextTextFont
+}
 
-/**
- * Gets the selected size.
- */
-float FontSelectionView::GetSelectedSize(){
-
+float
+FontSelectionView::GetSelectedSize()
+{
 	return minSizeIndex + sizeList->IndexOf(sizeList->FindMarked());
 
-}//GetSelectedSize
+}
 
-/**
- * Gets the selected font_family.
- * @param family The selected font_family.
- */
-void FontSelectionView::GetSelectedFont(font_family *family){
-
+void FontSelectionView::GetSelectedFont(font_family *family)
+{
 	int numFamilies = count_font_families();
-	for ( int32 i = 0; i < numFamilies; i++ ) { 
-		
+	for ( int32 i = 0; i < numFamilies; i++ )
+	{ 
 		font_family fam; 
 		uint32 flags;
 		
-		if ( get_font_family(i, &fam, &flags) == B_OK ) { 
-			
-			if(strcmp(fam, fontList->FindMarked()->Label()) == 0){
-			
+		if ( get_font_family(i, &fam, &flags) == B_OK ) 
+		{ 
+			if(strcmp(fam, fontList->FindMarked()->Label()) == 0)
 				get_font_family(i, family, &flags);
-				
-			}//if
-			
-		}//if
-	
-	}//for
-	 
-}//GetSelectedFont
+		}
+	}
+}
 
-/**
- * Gets the selected style.
- * @param style The selected style.
- */
-void FontSelectionView::GetSelectedStyle(font_style *style){
-
+void FontSelectionView::GetSelectedStyle(font_style *style)
+{
 	int numFamilies = count_font_families();
 	font_family curr;
 	
 	GetSelectedFont(&curr);
 	
-	for ( int32 i = 0; i < numFamilies; i++ ) { 
-		
+	for ( int32 i = 0; i < numFamilies; i++ )
+	{ 
 		font_family fam; 
 		uint32 flags;
 		
-		if ( get_font_family(i, &fam, &flags) == B_OK ) { 
-			
-			if(strcmp(fam, curr) == 0){
-			
-				int32 numStyles = count_font_styles(fam); 
-				for ( int32 j = 0; j < numStyles; j++ ) { 
-					
-					font_style sty; 
-					if ( get_font_style(fam, j, &sty, &flags) == B_OK ) { 
-					
-						if(strcmp(sty, fontList->FindMarked()->Submenu()->FindMarked()->Label()) == 0){
-				
-							get_font_style(fam, j, style, &flags);
-							
-						}//if
-					
-					}//if
-				
-				}//for
-				
-			}//if
-			
-		}//if
-	
-	}//for
-	 
-}//GetSelectedStyle
+		if (get_font_family(i, &fam, &flags) == B_OK  && strcmp(fam, curr) == 0 )
+		{
+			int32 numStyles = count_font_styles(fam); 
+			for ( int32 j = 0; j < numStyles; j++ ) 
+			{ 
+				font_style sty; 
+				if ( get_font_style(fam, j, &sty, &flags) == B_OK )
+				{ 
+					if(strcmp(sty, fontList->FindMarked()->Submenu()->FindMarked()->Label()) == 0)
+						get_font_style(fam, j, style, &flags);
+				}
+			}
+		}
+	}
+}
 
 /**
  * If a style is selected, this function is called to update the font menu,
  * in case the selected style is from a non selected font.  It also marks the
  * selected style, and unmarks all other styles.
  */
-void FontSelectionView::UpdateFontSelectionFromStyle(){
-
+void FontSelectionView::UpdateFontSelectionFromStyle()
+{
 	int i = 0;
 	
 	for(i = 0;i < fontList->CountItems();i++){
@@ -393,38 +368,28 @@ void FontSelectionView::UpdateFontSelectionFromStyle(){
 		}//for
 		
 	}//for
-	
-}//UpdateFontSelection
+}
 
 /**
  * Updates the font menu based on the user selection.
  */
-void FontSelectionView::UpdateFontSelection(){
-
-	int i = 0;
-	
-	for(i = 0;i < fontList->CountItems();i++){
-	
-		int j = 0;
-		
-		for(j = 0;j < fontList->ItemAt(i)->Submenu()->CountItems();j++){
-		
-			if(fontList->ItemAt(i)->Submenu()->ItemAt(j)->IsMarked()){
-			
-				if(strcmp(fontList->ItemAt(i)->Label(), fontList->FindMarked()->Label()) > 0){
-			
+void FontSelectionView::UpdateFontSelection()
+{
+	for(int32 i = 0; i < fontList->CountItems();i++)
+	{
+		for(int32 j = 0;j < fontList->ItemAt(i)->Submenu()->CountItems();j++)
+		{
+			if(fontList->ItemAt(i)->Submenu()->ItemAt(j)->IsMarked())
+			{
+				if(strcmp(fontList->ItemAt(i)->Label(), fontList->FindMarked()->Label()) > 0)
+				{
 					fontList->ItemAt(i)->Submenu()->FindMarked()->SetMarked(false);
 					fontList->FindMarked()->Submenu()->ItemAt(0)->SetMarked(true);
-			
-				}//if
-			
-			}//if
-		
-		}//for
-		
-	}//for
-
-}//UpdateFontSelection
+				}
+			}
+		}
+	}
+}
 
 /**
  * Updates the font and size menus based on the given font.

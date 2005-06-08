@@ -1,16 +1,24 @@
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ */
 #ifndef FONTS_SETTINGS_H
 #define FONTS_SETTINGS_H
 
-class FontsSettings {
-	public:
-		FontsSettings(void);
-		~FontsSettings(void);
+class FontsSettings
+{
+public:
+			FontsSettings(void);
+			~FontsSettings(void);
 		
-		BPoint WindowCorner(void) const { return f_corner; }
-		void SetWindowCorner(BPoint);
-	private:
-		static const char kSettingsFile[];
-		BPoint f_corner;
+	BPoint	WindowCorner(void) const { return fCorner; }
+	void	SetWindowCorner(BPoint);
+	
+	void	SetDefaults(void);
+	
+private:
+	BPoint fCorner;
 };
 
 #endif //FONTS_SETTINGS_H
