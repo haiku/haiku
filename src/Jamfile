@@ -4,6 +4,7 @@ SubInclude OBOS_TOP src add-ons ;
 SubInclude OBOS_TOP src apps ;
 SubInclude OBOS_TOP src bin ;
 SubInclude OBOS_TOP src data ;
+SubInclude OBOS_TOP src documentation ;
 SubInclude OBOS_TOP src kits ;
 SubInclude OBOS_TOP src libs ;
 SubInclude OBOS_TOP src prefs ;

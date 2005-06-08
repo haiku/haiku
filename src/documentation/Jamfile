@@ -41,5 +41,5 @@ actions Doc2HTML1
 
 SEARCH on  <src!documentation>license.xml = [ FDirName $(OBOS_TOP) src documentation ] ;
 
-SubInclude OBOS_TOP src documentation haiku_book ;
+#SubInclude OBOS_TOP src documentation haiku_book ;
 SubInclude OBOS_TOP src documentation shell_tools ;
