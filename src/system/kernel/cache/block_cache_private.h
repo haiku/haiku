@@ -90,13 +90,13 @@ struct block_range {
 };
 
 struct block_cache {
-
 	hash_table	*hash;
 	benaphore	lock;
 	int			fd;
 	off_t		max_blocks;
 	size_t		block_size;
 	int32		next_transaction_id;
+	cache_transaction *last_transaction;
 	hash_table	*transaction_hash;
 
 	hash_table	*ranges_hash;
@@ -118,29 +118,6 @@ struct block_cache {
 	cached_block *NewBlock(off_t blockNumber);
 	void Free(void *address);
 	void *Allocate();
-};
-
-class BlockAddressPool {
-	public:
-		BlockAddressPool();
-		~BlockAddressPool();
-
-		status_t InitCheck() const { return fArea >= B_OK ? B_OK : fArea; }
-
-		size_t RangeSize() const { return kBlockRangeSize; }
-		size_t RangeShift() const { return kBlockRangeShift; }
-		addr_t BaseAddress() const { return fBase; }
-
-		addr_t Get();
-		void Put(addr_t address);
-
-	private:
-		benaphore	fLock;
-		area_id		fArea;
-		addr_t		fBase;
-		addr_t		fFirstFree;
-		int32		fNextFree;
-		int32		fFreeList[kBlockAddressSize / kBlockRangeSize];
 };
 
 

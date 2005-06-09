@@ -23,6 +23,30 @@
 #endif
 
 
+class BlockAddressPool {
+	public:
+		BlockAddressPool();
+		~BlockAddressPool();
+
+		status_t InitCheck() const { return fArea >= B_OK ? B_OK : fArea; }
+
+		size_t RangeSize() const { return kBlockRangeSize; }
+		size_t RangeShift() const { return kBlockRangeShift; }
+		addr_t BaseAddress() const { return fBase; }
+
+		addr_t Get();
+		void Put(addr_t address);
+
+	private:
+		benaphore	fLock;
+		area_id		fArea;
+		addr_t		fBase;
+		addr_t		fFirstFree;
+		int32		fNextFree;
+		int32		fFreeList[kBlockAddressSize / kBlockRangeSize];
+};
+
+
 static class BlockAddressPool sBlockAddressPool;
 
 

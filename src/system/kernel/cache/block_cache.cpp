@@ -82,6 +82,9 @@ static void
 delete_transaction(block_cache *cache, cache_transaction *transaction)
 {
 	hash_remove(cache->transaction_hash, transaction);
+	if (cache->last_transaction == transaction)
+		cache->last_transaction = NULL;
+
 	delete transaction;
 }
 
@@ -132,6 +135,7 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize)
 	max_blocks(numBlocks),
 	block_size(blockSize),
 	next_transaction_id(1),
+	last_transaction(NULL),
 	transaction_hash(NULL),
 	ranges_hash(NULL),
 	free_ranges(NULL)
@@ -522,6 +526,9 @@ cache_start_transaction(void *_cache)
 {
 	block_cache *cache = (block_cache *)_cache;
 
+	if (cache->last_transaction && cache->last_transaction->open)
+		panic("last transaction (%ld) still open!\n", cache->last_transaction->id);
+
 	cache_transaction *transaction = new cache_transaction;
 	if (transaction == NULL)
 		return B_NO_MEMORY;
@@ -532,6 +539,7 @@ cache_start_transaction(void *_cache)
 	transaction->notification_hook = NULL;
 	transaction->notification_data = NULL;
 	transaction->open = true;
+	cache->last_transaction = transaction;
 
 	TRACE(("cache_transaction_start(): id %ld started\n", transaction->id));
 
