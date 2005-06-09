@@ -1769,10 +1769,7 @@ printf("ServerApp %s: AS_SCREEN_GET_MODE\n", fSignature.String());
 			link.Read<screen_id>(&id);
 
 			fLink.StartMessage(SERVER_TRUE);
-
-			// TODO: this doesn't seem to work.
-			//See also comment in BPrivateScreen::BPrivateScreen()
-			//fLink.Attach<color_map>(*SystemColorMap());
+			fLink.Attach<color_map>(*SystemColorMap());
 			fLink.Flush();
 			break;
 		}

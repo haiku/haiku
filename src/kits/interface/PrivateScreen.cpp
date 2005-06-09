@@ -189,11 +189,9 @@ BPrivateScreen::IndexForColor(uint8 red, uint8 green, uint8 blue, uint8 alpha)
 		blue == B_TRANSPARENT_COLOR.blue && alpha == B_TRANSPARENT_COLOR.alpha)
 		return B_TRANSPARENT_8_BIT;
 
-	
+	uint8 index = ((red & 0xf8) << 7) | ((green & 0xf8) << 2) | (blue >> 3);
 	if (fColorMap)
-		return fColorMap->index_map[((red & 0xf8) << 7)
-								| ((green & 0xf8) << 2)
-								| (blue >> 3)];
+		return fColorMap->index_map[index];
 
 	return 0;
 }
@@ -473,9 +471,7 @@ BPrivateScreen::BPrivateScreen()
 	if (reply == SERVER_TRUE) {
 		fColorMap = (color_map *)malloc(sizeof(color_map));
 		fOwnsColorMap = true;
-		// TODO: This doesn't work. We probably ran into a port
-		// capacity issue ?
-		//link.Read<color_map>(fColorMap);
+		link.Read<color_map>(fColorMap);
 	}		
 }
 
