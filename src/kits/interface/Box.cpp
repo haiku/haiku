@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -24,25 +24,13 @@
 //	Description:	BBox objects group views together and draw a border
 //                  around them.
 //------------------------------------------------------------------------------
-
-// Standard Includes -----------------------------------------------------------
 #include <stdlib.h>
 #include <string.h>
 
-// System Includes -------------------------------------------------------------
 #include <Box.h>
-#include <Errors.h>
 #include <Message.h>
 
-// Project Includes ------------------------------------------------------------
 
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
 BBox::BBox(BRect frame, const char *name, uint32 resizingMode, uint32 flags,
 		   border_style border)
 	:	BView(frame, name, resizingMode, flags | B_FRAME_EVENTS),
@@ -53,12 +41,14 @@ BBox::BBox(BRect frame, const char *name, uint32 resizingMode, uint32 flags,
 
 	InitObject();
 }
-//------------------------------------------------------------------------------
+
+
 BBox::~BBox()
 {
 	ClearAnyLabel();
 }
-//------------------------------------------------------------------------------
+
+
 BBox::BBox(BMessage *archive)
 	:	BView(archive)
 {
@@ -80,16 +70,20 @@ BBox::BBox(BMessage *archive)
 	if (archive->FindBool("_lblview", &aBool) == B_OK)
 		fLabelView = ChildAt(0);
 }
-//------------------------------------------------------------------------------
-BArchivable *BBox::Instantiate(BMessage *archive)
+
+
+BArchivable *
+BBox::Instantiate(BMessage *archive)
 {
 	if (validate_instantiation(archive, "BBox"))
 		return new BBox(archive);
 	else
 		return NULL;
 }
-//------------------------------------------------------------------------------
-status_t BBox::Archive(BMessage *archive, bool deep) const
+
+
+status_t
+BBox::Archive(BMessage *archive, bool deep) const
 {
 	BView::Archive(archive, deep);
 
@@ -104,27 +98,33 @@ status_t BBox::Archive(BMessage *archive, bool deep) const
 
 	return B_OK;
 }
-//------------------------------------------------------------------------------
-void BBox::SetBorder(border_style border)
+
+
+void
+BBox::SetBorder(border_style border)
 {
 	fStyle = border;
 
-	LockLooper();
-	Invalidate();
-	UnlockLooper();
+	if (Window() != NULL && LockLooper()) {
+		Invalidate();
+		UnlockLooper();
+	}
 }
-//------------------------------------------------------------------------------
-border_style BBox::Border() const
+
+
+border_style
+BBox::Border() const
 {
 	return fStyle;
 }
-//------------------------------------------------------------------------------
-void BBox::SetLabel(const char *string)
+
+
+void
+BBox::SetLabel(const char *string)
 { 
 	ClearAnyLabel();
 
-	if (string)
-	{
+	if (string) {
 		// Update fBounds
 		fBounds = Bounds();
 		font_height fh;
@@ -138,13 +138,14 @@ void BBox::SetLabel(const char *string)
 	if (Window())
 		Invalidate();
 }
-//------------------------------------------------------------------------------
-status_t BBox::SetLabel(BView *viewLabel)
+
+
+status_t
+BBox::SetLabel(BView *viewLabel)
 {
 	ClearAnyLabel();
 
-	if (viewLabel)
-	{
+	if (viewLabel) {
 		// Update fBounds
 		fBounds = Bounds();
 
@@ -160,21 +161,26 @@ status_t BBox::SetLabel(BView *viewLabel)
 
 	return B_OK;
 }
-//------------------------------------------------------------------------------
-const char *BBox::Label() const
+
+
+const char *
+BBox::Label() const
 {
 	return fLabel;
 }
-//------------------------------------------------------------------------------
-BView *BBox::LabelView() const
+
+
+BView *
+BBox::LabelView() const
 {
 	return fLabelView;
 }
-//------------------------------------------------------------------------------
-void BBox::Draw(BRect updateRect)
+
+
+void
+BBox::Draw(BRect updateRect)
 {
-	switch (fStyle)
-	{
+	switch (fStyle) {
 		case B_FANCY_BORDER:
 			DrawFancy();
 			break;
@@ -187,8 +193,7 @@ void BBox::Draw(BRect updateRect)
 			break;
 	}
 	
-	if (fLabel)
-	{
+	if (fLabel) {
 		font_height fh;
 		GetFontHeight(&fh);
 
@@ -202,32 +207,40 @@ void BBox::Draw(BRect updateRect)
 			+ 1.0f));
 	}
 }
-//------------------------------------------------------------------------------
+
+
 void BBox::AttachedToWindow()
 {
-	if (Parent())
-	{
+	if (Parent()) {
 		SetViewColor(Parent()->ViewColor());
 		SetLowColor(Parent()->ViewColor());
 	}
 }
-//------------------------------------------------------------------------------
-void BBox::DetachedFromWindow()
+
+
+void
+BBox::DetachedFromWindow()
 {
 	BView::DetachedFromWindow();
 }
-//------------------------------------------------------------------------------
-void BBox::AllAttached()
+
+
+void
+BBox::AllAttached()
 {
 	BView::AllAttached();
 }
-//------------------------------------------------------------------------------
-void BBox::AllDetached()
+
+
+void
+BBox::AllDetached()
 {
 	BView::AllDetached();
 }
-//------------------------------------------------------------------------------
-void BBox::FrameResized(float width, float height)
+
+
+void
+BBox::FrameResized(float width, float height)
 {
 	BRect bounds(Bounds());
 
@@ -238,50 +251,68 @@ void BBox::FrameResized(float width, float height)
 
 	Invalidate();
 }
-//------------------------------------------------------------------------------
-void BBox::MessageReceived(BMessage *message)
+
+
+void
+BBox::MessageReceived(BMessage *message)
 {
 	BView::MessageReceived(message);
 }
-//------------------------------------------------------------------------------
-void BBox::MouseDown(BPoint point)
+
+
+void
+BBox::MouseDown(BPoint point)
 {
 	BView::MouseDown(point);
 }
-//------------------------------------------------------------------------------
-void BBox::MouseUp(BPoint point)
+
+
+void
+BBox::MouseUp(BPoint point)
 {
 	BView::MouseUp(point);
 }
-//------------------------------------------------------------------------------
-void BBox::WindowActivated(bool active)
+
+
+void
+BBox::WindowActivated(bool active)
 {
 	BView::WindowActivated(active);
 }
-//------------------------------------------------------------------------------
-void BBox::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
+
+
+void
+BBox::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 {
 	BView::MouseMoved(point, transit, message);
 }
-//------------------------------------------------------------------------------
-void BBox::FrameMoved(BPoint newLocation)
+
+
+void
+BBox::FrameMoved(BPoint newLocation)
 {
 	BView::FrameMoved(newLocation);
 }
-//------------------------------------------------------------------------------
-BHandler *BBox::ResolveSpecifier(BMessage *message, int32 index,
+
+
+BHandler *
+BBox::ResolveSpecifier(BMessage *message, int32 index,
 								 BMessage *specifier, int32 what,
 								 const char *property)
 {
 	return BView::ResolveSpecifier(message, index, specifier, what, property);
 }
-//------------------------------------------------------------------------------
-void BBox::ResizeToPreferred()
+
+
+void
+BBox::ResizeToPreferred()
 {
 	BView::ResizeToPreferred();
 }
-//------------------------------------------------------------------------------
-void BBox::GetPreferredSize(float *width, float *height)
+
+
+void
+BBox::GetPreferredSize(float *width, float *height)
 {
 /*	BRect rect(0,0,99,99);
 
@@ -296,31 +327,42 @@ void BBox::GetPreferredSize(float *width, float *height)
 
 	BView::GetPreferredSize(width, height);
 }
-//------------------------------------------------------------------------------
-void BBox::MakeFocus(bool focused)
+
+
+void
+BBox::MakeFocus(bool focused)
 {
 	BView::MakeFocus(focused);
 }
-//------------------------------------------------------------------------------
-status_t BBox::GetSupportedSuites(BMessage *message)
+
+
+status_t
+BBox::GetSupportedSuites(BMessage *message)
 {
 	return BView::GetSupportedSuites(message);
 }
-//------------------------------------------------------------------------------
-status_t BBox::Perform(perform_code d, void *arg)
+
+
+status_t
+BBox::Perform(perform_code d, void *arg)
 {
 	return BView::Perform(d, arg);
 }
-//------------------------------------------------------------------------------
+
+
 void BBox::_ReservedBox1() {}
 void BBox::_ReservedBox2() {}
-//------------------------------------------------------------------------------
-BBox &BBox::operator=(const BBox &)
+
+
+BBox &
+BBox::operator=(const BBox &)
 {
 	return *this;
 }
-//------------------------------------------------------------------------------
-void BBox::InitObject(BMessage *data)
+
+
+void
+BBox::InitObject(BMessage *data)
 {
 	fLabel = NULL;
 	fBounds = Bounds();
@@ -331,16 +373,18 @@ void BBox::InitObject(BMessage *data)
 	BFont font(be_bold_font);
 
 	if (!data || !data->HasString("_fname"))
-		flags = 1;
+		flags = B_FONT_FAMILY_AND_STYLE;
 
 	if (!data || !data->HasFloat("_fflt"))
-		flags |= 2;
+		flags |= B_FONT_SIZE;
 
 	if (flags != 0)
 		SetFont(&font, flags);
 }
-//------------------------------------------------------------------------------
-void BBox::DrawPlain()
+
+
+void
+BBox::DrawPlain()
 {
 	BRect r = fBounds;
 
@@ -358,8 +402,10 @@ void BBox::DrawPlain()
 				BPoint(r.right, r.top + 1.0f), shadow);
 	EndLineArray();
 }
-//------------------------------------------------------------------------------
-void BBox::DrawFancy()
+
+
+void
+BBox::DrawFancy()
 {
 	BRect r = fBounds;
 
@@ -388,26 +434,17 @@ void BBox::DrawFancy()
 				BPoint(r.right, r.top + 1.0f), shadow);
 	EndLineArray();
 }
-//------------------------------------------------------------------------------
-void BBox::ClearAnyLabel()
+
+
+void
+BBox::ClearAnyLabel()
 {
-	if (fLabel)
-	{
+	if (fLabel) {
 		free(fLabel);
 		fLabel = NULL;
-	}
-	else if (fLabelView)
-	{
+	} else if (fLabelView) {
 		fLabelView->RemoveSelf();
 		delete fLabelView;
 		fLabelView = NULL;
 	}
 }
-//------------------------------------------------------------------------------
-
-/*
- * $Log $
- *
- * $Id  $
- *
- */
