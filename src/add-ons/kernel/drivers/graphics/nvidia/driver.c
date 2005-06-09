@@ -124,8 +124,8 @@ static uint16 nvidia_device_list[] = {
 	0x004e, /* Nvidia Quadro FX 4000 */
 	0x00a0, /* Nvidia Aladdin TNT2 */
 	0x00c0,	/* Nvidia unknown FX */
-	0x00c1,	/* Nvidia unknown FX */
-	0x00c2, /* Nvidia unknown FX */
+	0x00c1, /* Nvidia GeForce FX 6800 */
+	0x00c2, /* Nvidia GeForce FX 6800LE */
 	0x00f0, /* Nvidia GeForce FX 6800 (Ultra) AGP(?) */
 	0x00f1, /* Nvidia GeForce FX 6600 GT AGP */
 	0x00f2, /* Nvidia GeForce FX 6600 GT AGP */
@@ -162,7 +162,7 @@ static uint16 nvidia_device_list[] = {
 	0x0162, /* Nvidia unknown FX */
 	0x0163, /* Nvidia unknown FX */
 	0x0164, /* Nvidia unknown FX */
-	0x0165, /* Nvidia unknown FX */
+	0x0165, /* Nvidia Quadro FX NVS 285 */
 	0x0166, /* Nvidia unknown FX Go */
 	0x0167, /* Nvidia GeForce 6200 Go */
 	0x0168, /* Nvidia GeForce 6250 Go */
@@ -197,6 +197,9 @@ static uint16 nvidia_device_list[] = {
 	0x0201, /* Nvidia GeForce3 Ti 200 */
 	0x0202, /* Nvidia GeForce3 Ti 500 */
 	0x0203, /* Nvidia Quadro DCC */
+	0x0211, /* Nvidia GeForce FX 6800 */
+	0x0212, /* Nvidia GeForce FX 6800LE */
+	0x0215, /* Nvidia GeForce FX 6800 GT */
 	0x0221, /* Nvidia GeForce 6200 AGP (256Mb - 128bit) */
 	0x0250, /* Nvidia GeForce4 Ti 4600 */
 	0x0251, /* Nvidia GeForce4 Ti 4400 */
@@ -232,7 +235,7 @@ static uint16 nvidia_device_list[] = {
 	0x0320, /* Nvidia GeForce FX 5200 */
 	0x0321, /* Nvidia GeForce FX 5200 Ultra */
 	0x0322, /* Nvidia GeForce FX 5200 */
-	0x0323, /* Nvidia GeForce FX 5200SE */
+	0x0323, /* Nvidia GeForce FX 5200LE */
 	0x0324, /* Nvidia GeForce FX 5200 Go */
 	0x0325, /* Nvidia GeForce FX 5250 Go */
 	0x0326, /* Nvidia GeForce FX 5500 */
@@ -278,7 +281,6 @@ static uint16 nvidia_device_list[] = {
 	0x014c //nv43
 	0x014d //nv43
 	0x0210
-	0x0211
 	0x021d
 	0x021e
 	0x0345
