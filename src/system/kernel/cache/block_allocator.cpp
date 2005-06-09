@@ -15,6 +15,14 @@
 #include <string.h>
 
 
+//#define TRACE_BLOCK_ALLOCATOR
+#ifdef TRACE_BLOCK_ALLOCATOR
+#	define TRACE(x)	dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
 static class BlockAddressPool sBlockAddressPool;
 
 
@@ -91,7 +99,7 @@ block_range::Compare(void *_blockRange, const void *_address)
 	addr_t address = (addr_t)_address;
 
 	return ((range->base - sBlockAddressPool.BaseAddress()) >> sBlockAddressPool.RangeShift())
-		== ((address - sBlockAddressPool.BaseAddress()) >> sBlockAddressPool.RangeShift());
+		- ((address - sBlockAddressPool.BaseAddress()) >> sBlockAddressPool.RangeShift());
 }
 
 
@@ -102,9 +110,10 @@ block_range::Hash(void *_blockRange, const void *_address, uint32 range)
 	block_range *blockRange = (block_range *)_blockRange;
 	addr_t address = (addr_t)_address;
 
-	if (blockRange != NULL)
+	if (blockRange != NULL) {
 		return ((blockRange->base - sBlockAddressPool.BaseAddress())
 			>> sBlockAddressPool.RangeShift()) % range;
+	}
 
 	return ((address - sBlockAddressPool.BaseAddress())
 		>> sBlockAddressPool.RangeShift()) % range;
@@ -121,11 +130,18 @@ block_range::NewBlockRange(block_cache *cache, block_range **_range)
 
 	block_range *range = (block_range *)malloc(sizeof(block_range)
 		+ cache->chunks_per_range * sizeof(block_chunk));
-	if (range == NULL)
+	if (range == NULL) {
+		sBlockAddressPool.Put(address);
 		return B_NO_MEMORY;
+	}
 
+	TRACE(("new block range %p, base = %p!\n", range, (void *)address));
 	memset(range, 0, sizeof(block_range) + cache->chunks_per_range * sizeof(block_chunk));
 	range->base = address;
+
+	// insert into free ranges list in cache
+	range->free_next = cache->free_ranges;
+	cache->free_ranges = range;
 
 	*_range = range;
 	return B_OK;
@@ -201,26 +217,28 @@ block_range::Free(block_cache *cache, cached_block *block)
 void *
 block_range::Allocate(block_cache *cache, block_chunk **_chunk)
 {
-	// get free chunk
+	// get free chunk in range
 	
 	uint32 chunk;
 	for (chunk = 0; chunk < cache->chunks_per_range; chunk++) {
 		if ((used_mask & (1UL << chunk)) == 0)
 			break;
 	}
-	if (chunk == cache->chunks_per_range)
+	if (chunk == cache->chunks_per_range) {
+		panic("block_range %p pretended to be free but isn't\n", this);
 		return NULL;
+	}
 
 	// get free block in chunk
 
 	uint32 numBlocks = cache->chunk_size / cache->block_size;
-	uint32 i;
-	for (i = 0; i < numBlocks; i++) {
-		if ((chunks[chunk].used_mask & (1UL << i)) == 0)
+	uint32 block;
+	for (block = 0; block < numBlocks; block++) {
+		if ((chunks[chunk].used_mask & (1UL << block)) == 0)
 			break;
 	}
-	if (i == numBlocks) {
-		panic("block_chunk %lu in range %p pretended to be free but isn't\n", i, this);
+	if (block == numBlocks) {
+		panic("block_chunk %lu in range %p pretended to be free but isn't\n", block, this);
 		return NULL;
 	}
 
@@ -260,8 +278,8 @@ block_range::Allocate(block_cache *cache, block_chunk **_chunk)
 		chunks[chunk].mapped = true;
 	}
 
-	chunks[chunk].used_mask |= 1UL << i;
-	if (chunks[chunk].used_mask == (1UL << numBlocks) - 1) {
+	chunks[chunk].used_mask |= 1UL << block;
+	if (chunks[chunk].used_mask == cache->chunk_mask) {
 		// all blocks are used in this chunk, propagate usage bit
 		used_mask |= 1UL << chunk;
 
@@ -284,10 +302,11 @@ block_range::Allocate(block_cache *cache, block_chunk **_chunk)
 			}
 		}
 	}
+	TRACE(("Allocate: used masks: chunk = %x, range = %lx\n", chunks[chunk].used_mask, used_mask));
 
 	if (_chunk)
 		*_chunk = &chunks[chunk];
-	return (void *)(base + cache->chunk_size * chunk + cache->block_size * i);
+	return (void *)(base + cache->chunk_size * chunk + cache->block_size * block);
 }
 
 
@@ -305,7 +324,9 @@ block_range::Free(block_cache *cache, void *address)
 		// chunk was full before, propagate usage bit to range
 		used_mask &= ~(1UL << chunk);
 	}
-	chunks[chunk].used_mask |= BlockIndex(cache, address);
+	chunks[chunk].used_mask &= ~(1UL << BlockIndex(cache, address));
+
+	TRACE(("Free: used masks: chunk = %x, range = %lx\n", chunks[chunk].used_mask, used_mask));
 }
 
 
