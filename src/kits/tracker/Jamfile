@@ -83,6 +83,9 @@ SharedLibrary tracker :
 	ViewState.cpp
 	VolumeWindow.cpp
 	WidgetAttributeText.cpp
+	: libbe.so libtranslation.so
 	;
 
-LinkSharedOSLibs libtracker.so : libroot.so libbe.so libtranslation.so ;
+if $(HAIKU_COMPATIBLE) {
+	LinkSharedOSLibs libtracker.so : libroot.so ;
+}
