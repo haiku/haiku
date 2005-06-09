@@ -439,6 +439,8 @@ BBox::DrawFancy()
 void
 BBox::ClearAnyLabel()
 {
+	fBounds.top = 0;
+	
 	if (fLabel) {
 		free(fLabel);
 		fLabel = NULL;
