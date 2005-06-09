@@ -400,7 +400,7 @@ void CurView::SetDefaults(void)
 	
 	link.StartMessage(AS_SET_SYSCURSOR_DEFAULTS);
 	link.Flush();
-	link.GetNextReply(&code);
+	link.GetNextMessage(code);
 
 }
 

@@ -263,8 +263,8 @@ class PreviewDriver : public DisplayDriver
 	virtual void				Unlock();
 
 	// display mode access
-	virtual void				SetMode(const display_mode &mode) {}
-	virtual	void				GetMode(display_mode *mode) {}
+	virtual status_t			SetMode(const display_mode &mode) { return B_OK; }
+	virtual	void				GetMode(display_mode &mode) {}
 			const display_mode*	DisplayMode()
 									{ return &fDisplayMode; }
 	

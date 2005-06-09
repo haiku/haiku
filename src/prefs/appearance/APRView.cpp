@@ -632,7 +632,7 @@ void APRView::LoadSettings(void)
 		
 		link.StartMessage(AS_GET_UI_COLORS);
 		link.Flush();
-		link.GetNextReply(&code);
+		link.GetNextMessage(code);
 		link.Read<ColorSet>(currentset);
 	}
 	else

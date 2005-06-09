@@ -42,7 +42,7 @@ cursor_which get_syscursor(void)
 		BPortLink link(server);
 		
 		link.StartMessage(AS_GET_SYSCURSOR);
-		link.GetNextReply(&code);
+		link.GetNextMessage(code);
 		
 		if(code==SERVER_TRUE)
 		{

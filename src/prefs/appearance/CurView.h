@@ -39,7 +39,6 @@
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <StringView.h>
-#include <FilePanel.h>
 #include <Invoker.h>
 #include <SysCursor.h>
 #include <Bitmap.h>

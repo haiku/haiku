@@ -16,7 +16,7 @@ Preference Appearance :
 	ColorWell.cpp
 	ColorWhichItem.cpp
 	CursorWhichItem.cpp
-	: libbe.so libtracker.so libtranslation.so libappserver.so libopenbeos.so
+	: libopenbeos.so libbe.so libtranslation.so libappserver.so
 	: Appearance.rdef
 	;
 
