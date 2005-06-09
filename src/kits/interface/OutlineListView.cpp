@@ -376,7 +376,7 @@ void BOutlineListView::Collapse(BListItem *item)
 	item->fExpanded = false;
 
 	uint32 level = item->fLevel, full_index = FullListIndexOf(item),
-		index = IndexOf(item) + 1, count = FullListCountItems() - full_index - 1;
+		count = FullListCountItems() - full_index - 1;
 	BListItem **items = (BListItem**)fullList.Items() + full_index + 1;
 
 	while (count-- > 0 && (*items)->fLevel > level)
