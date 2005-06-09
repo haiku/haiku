@@ -1,0 +1,19 @@
+SubDir OBOS_TOP src apps soundrecorder ;
+
+App SoundRecorder :
+	DrawingTidbits.cpp
+	FileUtils.cpp
+	RecorderApp.cpp
+	RecorderWindow.cpp
+	ScopeView.cpp
+	SoundConsumer.cpp
+	SoundListView.cpp
+	SoundUtils.cpp
+	TrackSlider.cpp
+	TransportButton.cpp
+	UpDownButton.cpp
+	VUView.cpp
+	VolumeSlider.cpp
+	: libbe.so libmedia.so libtracker.so 
+	: SoundRecorder.rdef
+;

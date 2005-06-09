@@ -14,6 +14,7 @@ SubInclude OBOS_TOP src apps people ;
 SubInclude OBOS_TOP src apps poorman ;
 SubInclude OBOS_TOP src apps pulse ;
 SubInclude OBOS_TOP src apps showimage ;
+SubInclude OBOS_TOP src apps soundrecorder ;
 SubInclude OBOS_TOP src apps stylededit ;
 SubInclude OBOS_TOP src apps terminal ;
 SubInclude OBOS_TOP src apps tracker ;
