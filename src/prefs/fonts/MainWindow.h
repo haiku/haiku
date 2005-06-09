@@ -15,7 +15,15 @@
 #include "CacheView.h"
 #include "ButtonView.h"
 #include "FontsSettings.h"
-	
+
+#define M_ENABLE_REVERT 'enrv'
+#define M_REVERT 'rvrt'
+#define M_SET_DEFAULTS 'stdf'
+
+#define M_SET_PLAIN 'stpl'
+#define M_SET_BOLD 'stbl'
+#define M_SET_FIXED 'stfx'
+
 class MainWindow : public BWindow
 {
 public:
@@ -24,16 +32,12 @@ public:
 	virtual	void	MessageReceived(BMessage *message);
 			
 private:
-		
-	void updateSize(FontSelectionView *theView);
-	void updateFont(FontSelectionView *theView);
-	void updateStyle(FontSelectionView *theView);
 	
-	FontView	*fSelectorView;
-	ButtonView	*fButtonView;
-	CacheView	*fCacheView;
+	FontView		*fSelectorView;
+	ButtonView		*fButtonView;
+	CacheView		*fCacheView;
 	
-	FontsSettings fSettings;
+	FontsSettings	fSettings;
 };
 
 #endif

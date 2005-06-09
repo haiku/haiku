@@ -15,48 +15,43 @@ FontView::FontView(BRect rect)
 	BRect rect(bounds);
 	
 	rect.bottom = rect.top + FontHeight(true) *3.5;
-	plainSelectionView = new FontSelectionView(rect, "Plain", 
+	fPlainView = new FontSelectionView(rect, "Plain", 
 												PLAIN_FONT_SELECTION_VIEW);
-	AddChild(plainSelectionView);
+	AddChild(fPlainView);
 	
 	rect.OffsetBy(0, rect.Height() + 4);
-	boldSelectionView = new FontSelectionView(rect, "Bold", 
+	fBoldView = new FontSelectionView(rect, "Bold", 
 												BOLD_FONT_SELECTION_VIEW);
-	AddChild(boldSelectionView);
+	AddChild(fBoldView);
 	
 	rect.OffsetBy(0, rect.Height() + 4);
-	fixedSelectionView = new FontSelectionView(rect, "Fixed", 
+	fFixedView = new FontSelectionView(rect, "Fixed", 
 												FIXED_FONT_SELECTION_VIEW);
-	AddChild(fixedSelectionView);
+	AddChild(fFixedView);
 }
 
 
 void
-FontView::AttachedToWindow(void)
+FontView::SetDefaults(void)
 {
+	fPlainView->SetDefaults();
+	fBoldView->SetDefaults();
+	fFixedView->SetDefaults();
 }
 
-/**
- * Calls each FontSelectionView's resetToDefaults() function to reset
- * the font and size menus to the default font.
- */
 void
-FontView::resetToDefaults()
+FontView::Revert(void)
 {
-	plainSelectionView->resetToDefaults();
-	boldSelectionView->resetToDefaults();
-	fixedSelectionView->resetToDefaults();
+	fPlainView->Revert();
+	fBoldView->Revert();
+	fFixedView->Revert();
 }
 
-/**
- * Calls each FontSelectionView's revertToOriginal() function to reset
- * the font and size menus to the original font.
- */
 void
-FontView::revertToOriginal()
+FontView::RescanFonts(void)
 {
-	plainSelectionView->revertToOriginal();
-	boldSelectionView->revertToOriginal();
-	fixedSelectionView->revertToOriginal();
+	fPlainView->RescanFonts();
+	fBoldView->RescanFonts();
+	fFixedView->RescanFonts();
 }
 

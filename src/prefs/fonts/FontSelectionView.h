@@ -13,6 +13,7 @@
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <stdio.h>
+#include <String.h>
 
 enum
 {
@@ -29,36 +30,27 @@ public:
 	void	AttachedToWindow(void);
 	void	MessageReceived(BMessage *msg);
 	
-	void	SetTestTextFont(BFont *fnt);
-	BFont	GetTestTextFont();
-	float	GetSelectedSize();
-	void	GetSelectedFont(font_family *family);
-	void	GetSelectedStyle(font_style *style);
-	void	UpdateFontSelectionFromStyle();
-	void	UpdateFontSelection();
-	void	resetToDefaults();
-	void	revertToOriginal();
-	
+	void	SetDefaults(void);
+	void	Revert(void);
+	void	RescanFonts(void);
+
 private:
-	void	buildMenus(void);
-	void	emptyMenus(void);
+	void	BuildMenus(void);
+	void	EmptyMenus(void);
+	void	NotifyFontChange(void);
 	
-	void	EmptyMenu(BPopUpMenu *m);
-	void	UpdateFontSelection(BFont *fnt);
+	BStringView		*fPreviewText;
 	
-	BStringView		*testText;
+	BPopUpMenu		*fFontMenu;
+	BPopUpMenu		*fSizeMenu;
+			
+	int				fType;
 	
-	BPopUpMenu		*fontList;
-	BPopUpMenu		*sizeList;
-			
-	int				minSizeIndex;
-	int				maxSizeIndex;
-			
-	char typeLabel[30];
-			
-	BFont origFont;
-	BFont workingFont;
-	BFont *defaultFont;
+	BFont			fSavedFont;
+	BFont			fCurrentFont;
+	BFont			fDefaultFont;
+	
+	BMenuItem		*fCurrentStyle;
 };
 	
 #endif

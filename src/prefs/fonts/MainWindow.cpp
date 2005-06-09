@@ -67,132 +67,36 @@ MainWindow::QuitRequested(void)
 void
 MainWindow::MessageReceived(BMessage *message)
 {
-	switch(message->what) {
-	
-/*		case PLAIN_SIZE_CHANGED_MSG: {
-		
-			updateSize(fSelectorView->plainSelectionView);
+	switch(message->what) 
+	{
+		case M_ENABLE_REVERT:
+		{
 			fButtonView->SetRevertState(true);
 			break;
 		}
-		case BOLD_SIZE_CHANGED_MSG: {
-		
-			updateSize(fSelectorView->boldSelectionView);
+		case M_RESCAN_FONTS:
+		{
+			fSelectorView->RescanFonts();
+			break;
+		}
+		case M_SET_DEFAULTS:
+		{
+			fSelectorView->SetDefaults();
+			fCacheView->SetDefaults();
 			fButtonView->SetRevertState(true);
 			break;
 		}
-		case FIXED_SIZE_CHANGED_MSG: {
-		
-			updateSize(fSelectorView->fixedSelectionView);
-			fButtonView->SetRevertState(true);
-			break;
-		}
-		case PLAIN_FONT_CHANGED_MSG: {
-		
-			updateFont(fSelectorView->plainSelectionView);
-			fButtonView->SetRevertState(true);
-			break;
-		}
-		case BOLD_FONT_CHANGED_MSG: {
-		
-			updateFont(fSelectorView->boldSelectionView);
-			fButtonView->SetRevertState(true);
-			break;
-		}
-		case FIXED_FONT_CHANGED_MSG: {
-		
-			updateFont(fSelectorView->fixedSelectionView);
-			fButtonView->SetRevertState(true);
-			break;
-		}
-		case PLAIN_STYLE_CHANGED_MSG: {
-		
-			updateStyle(fSelectorView->plainSelectionView);
-			fButtonView->SetRevertState(true);
-			break;
-		}
-		case BOLD_STYLE_CHANGED_MSG: {
-		
-			updateStyle(fSelectorView->boldSelectionView);
-			fButtonView->SetRevertState(true);
-			break;
-		}
-		case FIXED_STYLE_CHANGED_MSG: {
-		
-			updateStyle(fSelectorView->fixedSelectionView);
-			fButtonView->SetRevertState(true);
-			break;
-		}
-		case RESCAN_FONTS_MSG: {
-		
-			update_font_families(false);
-			fSelectorView->emptyMenus();
-			fSelectorView->buildMenus();
-			updateFont(fSelectorView->plainSelectionView);
-			updateFont(fSelectorView->boldSelectionView);
-			updateFont(fSelectorView->fixedSelectionView);
-			break;
-		}
-		case RESET_FONTS_MSG: {
-		
-			fSelectorView->resetToDefaults();
-			fCacheView->resetToDefaults();
-			fButtonView->SetRevertState(true);
-			break;
-		}
-*/		case REVERT_MSG: {
-		
-			fSelectorView->revertToOriginal();
-			fCacheView->revertToOriginal();
+		case M_REVERT:
+		{
+			fSelectorView->Revert();
+			fCacheView->Revert();
 			fButtonView->SetRevertState(false);
 			break;
 		}
-		default: {
+		default: 
+		{
 			BWindow::MessageReceived(message);
 			break;
 		}
 	}
-	
 }
-
-// Sets the size of the test text when a new size is picked.
-void
-MainWindow::updateSize(FontSelectionView *theView)
-{
-	BFont workingFont;
-	
-	workingFont = theView->GetTestTextFont();
-	workingFont.SetSize(theView->GetSelectedSize());
-	theView->SetTestTextFont(&workingFont);
-}
-
-// Updates the test text to the selected font.
-void
-MainWindow::updateFont(FontSelectionView *theView)
-{
-	BFont workingFont;
-	font_family updateTo;
-	
-	theView->UpdateFontSelection();
-	workingFont = theView->GetTestTextFont();
-	theView->GetSelectedFont(&updateTo);
-	workingFont.SetFamilyAndStyle(updateTo, NULL);
-	theView->SetTestTextFont(&workingFont);
-}
-
-// Updates the test text to the selected style.
-void
-MainWindow::updateStyle(FontSelectionView *theView)
-{
-	BFont workingFont;
-	font_style updateTo;
-	font_family update;
-	
-	theView->UpdateFontSelectionFromStyle();
-	workingFont = theView->GetTestTextFont();
-	theView->GetSelectedStyle(&updateTo);
-	theView->GetSelectedFont(&update);
-	workingFont.SetFamilyAndStyle(update, updateTo);
-	theView->SetTestTextFont(&workingFont);
-}
-

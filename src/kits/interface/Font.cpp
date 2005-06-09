@@ -107,6 +107,38 @@ _font_control_(BFont *font, int32 cmd, void *data)
 	link.Read<uint32>(&font->fFlags);
 }
 
+/*!
+	\brief Private function used to replace the R5 hack which sets a system font
+	\param which string denoting which font to set
+	\param family the new family for the system font
+	\param style the new style for the system font
+	\param size the size for the system font to have
+	
+	R5 used a global area offset table to set the system fonts in the Font
+	preferences panel. Bleah.
+*/
+void
+_set_system_font_(const char *which, font_family family, font_style style, 
+					float size)
+{
+	if(!which)
+		return;
+	
+	if( (strcmp(which,"plain")==0) ||
+		(strcmp(which,"bold")==0) ||
+		(strcmp(which,"fixed")==0) )
+	{
+		BPrivate::BAppServerLink link;
+		
+		link.StartMessage(AS_SET_SYSTEM_FONT);
+		link.AttachString(which);
+		link.AttachString(family);
+		link.AttachString(style);
+		link.Attach<float>(size);
+		link.Flush();
+	}
+}
+
 
 /*!
 	\brief Returns the number of installed font families

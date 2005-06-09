@@ -10,25 +10,19 @@
 #include <Button.h>
 
 // Message sent when the rescan button is sent.
-#define RESCAN_FONTS_MSG 'rscn'
-
-// Message sent when the reset button is sent.
-#define RESET_FONTS_MSG 'rset'
-
-// Message sent when the revert button is sent.
-#define REVERT_MSG 'rvrt'
+#define M_RESCAN_FONTS 'rscn'
 	
 class ButtonView : public BView 
 {
 public:
 			ButtonView(BRect frame);
-	bool	RevertState();
+	bool	RevertState() const;
 	void	SetRevertState(bool b);
 	void	Draw(BRect);
 	
 private:
 
-	BButton	*revertButton;
+	BButton	*fRevertButton;
 };
 	
 #endif

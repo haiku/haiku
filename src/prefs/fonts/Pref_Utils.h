@@ -4,7 +4,7 @@
 #include <Screen.h>
 #include <View.h>
 
-float FontHeight(bool full, BView* view = NULL);
-color_map* ColorMap();
+float 		FontHeight(bool full, BView* view = NULL);
+color_map*	ColorMap();
 
 #endif

@@ -20,16 +20,17 @@ public:
 	void	AttachedToWindow(void);
 	void	MessageReceived(BMessage *msg);
 	
-	void	revertToOriginal();
-	void	resetToDefaults();
+	void	Revert(void);
+	void	SetDefaults(void);
 
 private:
-		
+	void		UpdatePrintSettings(int32 value);
+	void		UpdateScreenSettings(int32 value);
+	
 	BSlider		*fScreenSlider;
 	BSlider		*fPrintSlider;
 	BButton		*fSaveCache;
 			
-	// The original slider values
 	int32		fSavedPrintValue;
 	int32 		fSavedScreenValue;
 };

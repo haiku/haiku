@@ -21,4 +21,4 @@ private:
 	BPoint fCorner;
 };
 
-#endif //FONTS_SETTINGS_H
+#endif

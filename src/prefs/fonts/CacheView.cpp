@@ -7,6 +7,7 @@
 
 #include <String.h>
 #include <stdio.h>
+#include "MainWindow.h"
 #include "Pref_Utils.h"
 
 #define PRINT_FCS_UPDATE_MSG 'pfum'
@@ -73,10 +74,13 @@ CacheView::CacheView(const BRect &frame, const int32 &sliderMin,
 	rect.right = rect.left +86.0;
 	rect.bottom = rect.top +24.0;
 	
-	// TODO: find out what 'Save Cache' does and implement
+	// TODO: figure out what to do with 'Save Cache' on R5. According to the 
+	// BeOS Bible, it allocates a block of memory to disk, which is loaded on
+	// next boot. FreeType does better than this.
 	fSaveCache = new BButton(rect, "saveCache", "Save Cache",
 										NULL, B_FOLLOW_LEFT, B_WILL_DRAW);
-	AddChild(fSaveCache);  	
+	AddChild(fSaveCache);
+	fSaveCache->SetEnabled(false);
 }
 
 void
@@ -94,38 +98,15 @@ CacheView::MessageReceived(BMessage *msg)
 	{
 		case PRINT_FCS_MODIFICATION_MSG: 
 		{
-			struct font_cache_info fontCacheInfo;
+			UpdatePrintSettings(fPrintSlider->Value());
 			
-			get_font_cache_info(B_PRINTING_FONT_CACHE|B_DEFAULT_CACHE_SETTING, 
-								&fontCacheInfo);
-			fontCacheInfo.cache_size = fPrintSlider->Value() << 10;
-			set_font_cache_info(B_PRINTING_FONT_CACHE|B_DEFAULT_CACHE_SETTING, 
-								&fontCacheInfo);
-			
-			BString str("Printing font cache size : ");
-			str << fPrintSlider->Value() << " kB";
-			fPrintSlider->SetLabel(str.String());
-			
-			// TODO: set revert state
-//			buttonView->SetRevertState(true);
+			Window()->PostMessage(M_ENABLE_REVERT);
 			break;
 		}
 		case SCREEN_FCS_MODIFICATION_MSG:
 		{
-			struct font_cache_info fontCacheInfo;
-			
-			get_font_cache_info(B_SCREEN_FONT_CACHE|B_DEFAULT_CACHE_SETTING, 
-								&fontCacheInfo);
-			fontCacheInfo.cache_size = fScreenSlider->Value() << 10;
-			set_font_cache_info(B_SCREEN_FONT_CACHE|B_DEFAULT_CACHE_SETTING, 
-								&fontCacheInfo);
-			
-			BString str("Screen font cache size : ");
-			str << fScreenSlider->Value() << " kB";
-			fScreenSlider->SetLabel(str.String());
-			
-			// TODO: set revert state
-//			buttonView->SetRevertState(true);
+			UpdateScreenSettings(fScreenSlider->Value());
+			Window()->PostMessage(M_ENABLE_REVERT);
 			break;
 		}
 		default:
@@ -136,34 +117,50 @@ CacheView::MessageReceived(BMessage *msg)
 	}
 }
 
-/**
- * Sets the sliders to their original values.
- */
-void CacheView::revertToOriginal(){
-	// TODO: fix
-/*	
-	BString label;
-	label << "Screen " << kLabel << getScreenFCSValue();
-	updateScreenFCS(label.String());
-
-	label = "Printing ";
-	label << kLabel << getPrintFCSValue();
-	updatePrintFCS(label.String());	
-*/
+void CacheView::Revert(void)
+{
+	fPrintSlider->SetValue(fSavedPrintValue);
+	fScreenSlider->SetValue(fSavedScreenValue);
+	UpdatePrintSettings(fSavedPrintValue);
+	UpdateScreenSettings(fSavedScreenValue);
 }
 
-/**
- * Sets the sliders to their default values.
- */
-void CacheView::resetToDefaults(){
-	// TODO: fix
-/*	BString label;
-	label << "Screen " << kLabel << getScreenFCSValue() << " kB";
-	updateScreenFCS(label.String());
+void CacheView::SetDefaults(void)
+{
+	fPrintSlider->SetValue(256);
+	fScreenSlider->SetValue(256);
+	UpdatePrintSettings(256);
+	UpdateScreenSettings(256);
+}
+
+void
+CacheView::UpdatePrintSettings(int32 value)
+{
+	struct font_cache_info fontCacheInfo;
 	
-	label = "Printing ";
-	label << kLabel << getPrintFCSValue() << " kB";
-	updatePrintFCS(label.String());
-*/
+	get_font_cache_info(B_PRINTING_FONT_CACHE|B_DEFAULT_CACHE_SETTING, 
+						&fontCacheInfo);
+	fontCacheInfo.cache_size = value << 10;
+	set_font_cache_info(B_PRINTING_FONT_CACHE|B_DEFAULT_CACHE_SETTING, 
+						&fontCacheInfo);
+	
+	BString str("Printing font cache size : ");
+	str << value << " kB";
+	fPrintSlider->SetLabel(str.String());
 }
 
+void
+CacheView::UpdateScreenSettings(int32 value)
+{
+	struct font_cache_info fontCacheInfo;
+	
+	get_font_cache_info(B_SCREEN_FONT_CACHE|B_DEFAULT_CACHE_SETTING, 
+						&fontCacheInfo);
+	fontCacheInfo.cache_size = value << 10;
+	set_font_cache_info(B_SCREEN_FONT_CACHE|B_DEFAULT_CACHE_SETTING, 
+						&fontCacheInfo);
+	
+	BString str("Screen font cache size : ");
+	str << value << " kB";
+	fScreenSlider->SetLabel(str.String());
+}

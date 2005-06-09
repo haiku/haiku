@@ -4,6 +4,7 @@
  *
  */
 #include "ButtonView.h"
+#include "MainWindow.h"
 
 ButtonView::ButtonView(BRect rect)
 	: BView(rect, "ButtonView", B_FOLLOW_ALL, B_WILL_DRAW)
@@ -13,24 +14,24 @@ ButtonView::ButtonView(BRect rect)
 	BRect btnRect(0, 0, 75, 25);
 	btnRect.OffsetBy(10, 8);
 	BButton *rescanButton = new BButton(btnRect, "rescanButton", "Rescan", 
-										new BMessage(RESCAN_FONTS_MSG),
+										new BMessage(M_RESCAN_FONTS),
 										B_FOLLOW_LEFT, B_WILL_DRAW);
 	AddChild(rescanButton);
 	
 	btnRect.OffsetBy(96, 0);
 	BButton *defaultsButton = new BButton(btnRect, "defaultsButton",
 											"Defaults",
-											new BMessage(RESET_FONTS_MSG),
+											new BMessage(M_SET_DEFAULTS),
 											B_FOLLOW_LEFT, B_WILL_DRAW);
 	AddChild(defaultsButton);
 				
 	btnRect.OffsetBy(85, 0);
-	revertButton = new BButton(btnRect, "revertButton", "Revert",
-								new BMessage(REVERT_MSG),
+	fRevertButton = new BButton(btnRect, "fRevertButton", "Revert",
+								new BMessage(M_REVERT),
 								B_FOLLOW_LEFT, B_WILL_DRAW);
-	AddChild(revertButton);
+	AddChild(fRevertButton);
 	
-	revertButton->SetEnabled(false);
+	fRevertButton->SetEnabled(false);
 }
 
 
@@ -55,12 +56,12 @@ ButtonView::Draw(BRect update)
 
 
 bool
-ButtonView::RevertState()
+ButtonView::RevertState(void) const
 {
-	return revertButton->IsEnabled();
+	return fRevertButton->IsEnabled();
 }
 
-void ButtonView::SetRevertState(bool b)
+void ButtonView::SetRevertState(bool value)
 {
-	revertButton->SetEnabled(b);
+	fRevertButton->SetEnabled(value);
 }

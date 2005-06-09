@@ -14,14 +14,15 @@ class FontView : public BView
 {
 public:
 			FontView(BRect frame); 
-	void	AttachedToWindow(void);
-	
-	void				resetToDefaults();
-	void				revertToOriginal();
-	
-	FontSelectionView 	*plainSelectionView;
-	FontSelectionView 	*boldSelectionView;
-	FontSelectionView 	*fixedSelectionView;
+	void	SetDefaults(void);
+	void	Revert(void);
+	void	RescanFonts(void);
+
+private:
+
+	FontSelectionView 	*fPlainView;
+	FontSelectionView 	*fBoldView;
+	FontSelectionView 	*fFixedView;
 };
 	
 #endif
