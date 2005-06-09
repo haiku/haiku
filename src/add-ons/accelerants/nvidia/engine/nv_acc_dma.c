@@ -877,7 +877,7 @@ status_t nv_acc_init_dma()
 	}
 
 	/*** init DMA command buffer info ***/
-	if (si->ps.card_arch >= NV40A) //main mem DMA buf test on pre-NV40
+	if (si->ps.card_arch >= NV40A) //main mem DMA buf on pre-NV40
 	{
 		si->dma_buffer = (void *)((char *)si->framebuffer +
 			((si->ps.memory_size - 1) & 0xffff8000));
@@ -1263,8 +1263,8 @@ static void nv_start_dma(void)
 		}
 		else
 		{
-			dummy = *((uint32 *)(si->framebuffer));
 			/* dummy read the first adress of the framebuffer to flush MTRR-WC buffers */
+			dummy = *((uint32 *)(si->framebuffer));
 		}
 
 		/* actually start DMA to execute all commands now in buffer */
