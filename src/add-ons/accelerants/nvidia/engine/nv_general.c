@@ -167,11 +167,16 @@ status_t nv_general_powerup()
 		status = nvxx_general_powerup();
 		break;
 	case 0x00c010de: /* Nvidia unknown FX */
-	case 0x00c110de: /* Nvidia unknown FX */
-	case 0x00c210de: /* Nvidia unknown FX */ //fixme? Xorg says: GeForce 6800 LE
 		si->ps.card_type = NV41;
 		si->ps.card_arch = NV40A;
 		LOG(4,("POWERUP: Detected Nvidia unknown FX (NV41)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x00c110de: /* Nvidia GeForce FX 6800 */
+	case 0x00c210de: /* Nvidia GeForce FX 6800LE */
+		si->ps.card_type = NV40;
+		si->ps.card_arch = NV40A;
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6800 (NV40)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x00f010de: /* Nvidia GeForce FX 6800 (Ultra) AGP(?) */
@@ -339,10 +344,15 @@ status_t nv_general_powerup()
 	case 0x016210de: /* Nvidia unknown FX */
 	case 0x016310de: /* Nvidia unknown FX */
 	case 0x016410de: /* Nvidia unknown FX */
-	case 0x016510de: /* Nvidia unknown FX */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
 		LOG(4,("POWERUP: Detected Nvidia unknown FX (NV44)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x016510de: /* Nvidia Quadro FX NVS 285 */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		LOG(4,("POWERUP: Detected Nvidia Quadro FX NVS 285 (NV44)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x016610de: /* Nvidia unknown FX Go */
@@ -474,6 +484,14 @@ status_t nv_general_powerup()
 		si->ps.card_type = NV20;
 		si->ps.card_arch = NV20A;
 		LOG(4,("POWERUP: Detected Nvidia Quadro DCC (NV20)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x021110de: /* Nvidia GeForce FX 6800 */
+	case 0x021210de: /* Nvidia GeForce FX 6800LE */
+	case 0x021510de: /* Nvidia GeForce FX 6800 GT */
+		si->ps.card_type = NV40;
+		si->ps.card_arch = NV40A;
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6800 (NV40)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x022110de: /* Nvidia GeForce 6200 AGP (256Mb - 128bit) */
@@ -613,7 +631,7 @@ status_t nv_general_powerup()
 	case 0x032010de: /* Nvidia GeForce FX 5200 */
 	case 0x032110de: /* Nvidia GeForce FX 5200 Ultra */
 	case 0x032210de: /* Nvidia GeForce FX 5200 */
-	case 0x032310de: /* Nvidia GeForce FX 5200SE */
+	case 0x032310de: /* Nvidia GeForce FX 5200LE */
 		si->ps.card_type = NV34;
 		si->ps.card_arch = NV30A;
 		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5200 (NV34)\n"));
