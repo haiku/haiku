@@ -56,6 +56,7 @@ public:
 
 			rgb_color			highColor;
 			rgb_color			lowColor;
+// TODO: viewColor, is NOT part of a view state! Have this as a member of BView.
 			rgb_color			viewColor;
 			
 			pattern				patt;
