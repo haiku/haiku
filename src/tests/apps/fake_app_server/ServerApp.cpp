@@ -530,7 +530,6 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 
 			break;
 		}
-		case AS_SET_SCREEN_MODE:
 		case AS_ACTIVATE_WORKSPACE:
 			break;
 		
