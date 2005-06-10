@@ -1,0 +1,28 @@
+GLTeapot Project README
+=======================
+
+This is a sample application using Be's OpenGL implementation. It uses a
+generic object viewer class, ObjectView, to view OpenGL objects created 
+using a generic OpenGL object class, GLObject. 
+ 
+Files
+=====
+
+The archive should contain the following files:
+
+README.GLTeapot		-- This file
+GLTeapot.proj		-- Metrowerks project file
+teapot.data		-- Teapot vertex data file
+Teapot.rsrc		-- Application resource file
+
+GLObject.cpp		-- Source files
+GLObject.h
+ObjectView.cpp
+ObjectView.h
+ResScroll.h
+error.cpp
+error..h
+glob.h
+teapot_main.cpp
+util.h
+
