@@ -117,7 +117,11 @@ class Layer {
 			void				Show(bool invalidate = true);
 			void				Hide(bool invalidate = true);
 			bool				IsHidden() const;
-
+			
+	// graphic state
+			void				PushState();
+			void				PopState();
+			
 	// coordinate system	
 			BRect				Bounds() const;
 			BRect				Frame() const;

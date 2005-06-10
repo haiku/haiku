@@ -69,46 +69,46 @@ enum {
 
 Layer::Layer(BRect frame, const char* name, int32 token,
 			 uint32 resize, uint32 flags, DisplayDriver* driver)
-	: fFrame(frame), // in parent coordinates
-//	  fBoundsLeftTop(0.0, 0.0),
+	: 
+	fFrame(frame), // in parent coordinates
+//	fBoundsLeftTop(0.0, 0.0),
 
-	  // Layer does not start out as a part of the tree
-	  fOwner		(NULL),
-	  fParent		(NULL),
-	  fUpperSibling	(NULL),
-	  fLowerSibling	(NULL),
-	  fTopChild		(NULL),
-	  fBottomChild	(NULL),
+	// Layer does not start out as a part of the tree
+	fOwner(NULL),
+	fParent(NULL),
+	fUpperSibling(NULL),
+	fLowerSibling(NULL),
+	fTopChild(NULL),
+	fBottomChild(NULL),
+	fCurrent(NULL),
 
-	  fCurrent		(NULL),
+	// all regions (fVisible, fFullVisible, fFull) start empty
+	fVisible(),
+	fFullVisible(),
+	fFull(),
 
-	  // all regions (fVisible, fFullVisible, fFull) start empty
-	  fVisible		(),
-	  fFullVisible	(),
-	  fFull			(),
+	fClipReg(&fVisible),
+ 
+	fServerWin(NULL),
+	fName(new BString(name)),
+	fViewToken(token),
 
-	  fClipReg		(&fVisible),
+	fFlags(flags),
+	fResizeMode(resize),
+	fEventMask(0UL),
+	fEventOptions(0UL),
+	fHidden(false),
+	fIsTopLayer(false),
 
-	  fServerWin	(NULL),
-	  fName			(new BString(name ? name : B_EMPTY_STRING)),
-	  fViewToken	(token),
+	fAdFlags(0),
+	fClassID(AS_LAYER_CLASS),
 
-	  fFlags		(flags),
-	  fResizeMode	(resize),
-	  fEventMask	(0UL),
-	  fEventOptions	(0UL),
-	  fHidden		(false),
-	  fIsTopLayer	(false),
+	fFrameAction(B_LAYER_ACTION_NONE),
 
-	  fAdFlags		(0),
-	  fClassID		(AS_LAYER_CLASS),
+	fDriver(driver),
+	fLayerData(new LayerData()),
 
-	  fFrameAction	(B_LAYER_ACTION_NONE),
-
-	  fDriver		(driver),
-	  fLayerData	(new LayerData()),
-
-	  fRootLayer	(NULL)
+	fRootLayer(NULL)
 {
 	if (!frame.IsValid()) {
 char helper[1024];
@@ -847,15 +847,15 @@ Layer::Redraw(const BRegion& reg, Layer *startFrom)
 
 // Draw
 void
-Layer::Draw(const BRect &r)
+Layer::Draw(const BRect &rect)
 {
 #ifdef DEBUG_LAYER
 	printf("Layer(%s)::Draw: ", GetName());
-	r.PrintToStream();
+	rect.PrintToStream();
 #endif	
 
 	if (!fLayerData->ViewColor().IsTransparentMagic())
-		fDriver->FillRect(r, fLayerData->ViewColor());
+		fDriver->FillRect(rect, fLayerData->ViewColor());
 }
 
 // EmptyGlobals
@@ -927,6 +927,31 @@ Layer::IsHidden(void) const
 	
 	return false;
 }
+
+
+void
+Layer::PushState()
+{
+	LayerData *data = new LayerData();
+	data->prevState = fLayerData;
+	fLayerData = data;
+}
+
+
+void
+Layer::PopState()
+{
+	if (fLayerData->prevState == NULL) {
+		fprintf(stderr, "WARNING: User called BView(%s)::PopState(), but there is NO state on stack!\n", fName->String());
+		return;
+	}
+	
+	LayerData *data = fLayerData;
+	fLayerData = fLayerData->prevState;
+	data->prevState = NULL;
+	delete data;
+}
+
 
 //! Matches the BView call of the same name
 BRect

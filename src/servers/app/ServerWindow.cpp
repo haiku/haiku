@@ -697,11 +697,8 @@ ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		case AS_LAYER_PUSH_STATE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_PUSH_STATE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
-			// TODO: refactor, put this in Layer
-			LayerData *ld = new LayerData();
-			ld->prevState = fCurrentLayer->fLayerData;
-			fCurrentLayer->fLayerData = ld;
 			
+			fCurrentLayer->PushState();
 			fCurrentLayer->RebuildFullRegion();
 			
 			break;
@@ -709,17 +706,8 @@ ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		case AS_LAYER_POP_STATE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_POP_STATE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
-			if (!(fCurrentLayer->fLayerData->prevState))
-			{
-				DTRACE(("WARNING: SW(%s): User called BView(%s)::PopState(), but there is NO state on stack!\n", fName, fCurrentLayer->fName->String()));
-				break;
-			}
-			// TODO: refactor, put this in Layer
-			LayerData *ld = fCurrentLayer->fLayerData;
-			fCurrentLayer->fLayerData = fCurrentLayer->fLayerData->prevState;
-			ld->prevState = NULL;
-			delete ld;
 			
+			fCurrentLayer->PopState();
 			fCurrentLayer->RebuildFullRegion();
 
 			break;
