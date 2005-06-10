@@ -54,6 +54,116 @@ extern "C" status_t _fini_interface_kit_();
 
 using namespace BPrivate;
 
+static status_t
+mode2parms(uint32 space, uint32 *out_space, int32 *width, int32 *height)
+{
+	status_t status = B_OK;
+	
+	switch (space) {
+		case B_8_BIT_640x480:
+			*out_space = B_CMAP8;
+			*width = 640; *height = 480;
+			break;
+		case B_8_BIT_800x600:
+			*out_space = B_CMAP8;
+			*width = 800; *height = 600;
+			break;
+		case B_8_BIT_1024x768:
+			*out_space = B_CMAP8;
+			*width = 1024; *height = 768;
+			break;
+		case B_8_BIT_1280x1024:
+			*out_space = B_CMAP8;
+			*width = 1280; *height = 1024;
+			break;
+		case B_8_BIT_1600x1200:
+			*out_space = B_CMAP8;
+			*width = 1600; *height = 1200;
+			break;
+		case B_16_BIT_640x480:
+			*out_space = B_RGB16;
+			*width = 640; *height = 480;
+			break;
+		case B_16_BIT_800x600:
+			*out_space = B_RGB16;
+			*width = 800; *height = 600;
+			break;
+		case B_16_BIT_1024x768:
+			*out_space = B_RGB16;
+			*width = 1024; *height = 768;
+			break;
+		case B_16_BIT_1280x1024:
+			*out_space = B_RGB16;
+			*width = 1280; *height = 1024;
+			break;
+		case B_16_BIT_1600x1200:
+			*out_space = B_RGB16;
+			*width = 1600; *height = 1200;
+			break;
+		case B_32_BIT_640x480:
+			*out_space = B_RGB32;
+			*width = 640; *height = 480;
+			break;
+		case B_32_BIT_800x600:
+			*out_space = B_RGB32;
+			*width = 800; *height = 600;
+			break;
+		case B_32_BIT_1024x768:
+			*out_space = B_RGB32;
+			*width = 1024; *height = 768;
+			break;
+		case B_32_BIT_1280x1024:
+			*out_space = B_RGB32;
+			*width = 1280; *height = 1024;
+			break;
+		case B_32_BIT_1600x1200:
+			*out_space = B_RGB32;
+			*width = 1600; *height = 1200;
+			break;
+    	case B_8_BIT_1152x900:
+    		*out_space = B_CMAP8;
+    		*width = 1152; *height = 900;
+    		break;
+    	case B_16_BIT_1152x900:
+    		*out_space = B_RGB16;
+    		*width = 1152; *height = 900;
+    		break;
+    	case B_32_BIT_1152x900:
+    		*out_space = B_RGB32;
+    		*width = 1152; *height = 900;
+    		break;
+		case B_15_BIT_640x480:
+			*out_space = B_RGB15;
+			*width = 640; *height = 480;
+			break;
+		case B_15_BIT_800x600:
+			*out_space = B_RGB15;
+			*width = 800; *height = 600;
+			break;
+		case B_15_BIT_1024x768:
+			*out_space = B_RGB15;
+			*width = 1024; *height = 768;
+			break;
+		case B_15_BIT_1280x1024:
+			*out_space = B_RGB15;
+			*width = 1280; *height = 1024;
+			break;
+		case B_15_BIT_1600x1200:
+			*out_space = B_RGB15;
+			*width = 1600; *height = 1200;
+			break;
+    	case B_15_BIT_1152x900:
+    		*out_space = B_RGB15;
+    		*width = 1152; *height = 900;
+    		break;
+    	default:
+    		status = B_BAD_VALUE;
+    		break;
+	}
+	
+	return status;
+}
+
 
 _IMPEXP_BE const color_map *
 system_colors()
@@ -64,18 +174,31 @@ system_colors()
 #ifndef COMPILE_FOR_R5
 
 _IMPEXP_BE status_t
-set_screen_space(int32 index, uint32 res, bool stick)
+set_screen_space(int32 index, uint32 space, bool stick)
 {
-	BAppServerLink link;
-	int32 code = SERVER_FALSE;
+	int32 width;
+	int32 height;
+	uint32 depth;
 	
-	link.StartMessage(AS_SET_SCREEN_MODE);
-	link.Attach<int32>(index);
-	link.Attach<int32>((int32)res);
-	link.Attach<bool>(stick);
-	link.FlushWithReply(&code);
-
-	return ((code==SERVER_TRUE)?B_OK:B_ERROR);
+	status_t status = mode2parms(space, &depth, &width, &height);
+	if (status < B_OK)
+		return status;
+		
+	BScreen screen(B_MAIN_SCREEN_ID);
+	display_mode mode;
+	
+	// TODO: What about refresh rate ?
+	// currently we get it from the current video mode, but
+	// this might be not so wise.
+	status = screen.GetMode(index, &mode);
+	if (status < B_OK)
+		return status;
+	
+	mode.virtual_width = width;
+	mode.virtual_height = height;
+	mode.space = depth;
+	
+	return screen.SetMode(index, &mode, stick);
 }
 
 
