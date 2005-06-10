@@ -64,6 +64,7 @@ class ServerApp;
 class RootLayer;
 class DisplayDriver;
 class LayerData;
+class ServerBitmap;
 
 class Layer {
  public:
@@ -190,6 +191,21 @@ class Layer {
 			BRegion*			ClippingRegion() const
 									{ return fClipReg; }
 
+								// automatic background blanking by app_server
+			void				SetViewColor(const RGBColor& color);
+	inline	const RGBColor&		ViewColor() const
+									{ return fViewColor; }
+
+			void				SetBackgroundBitmap(const ServerBitmap* bitmap);
+	inline	const ServerBitmap*	BackgroundBitmap() const
+									{ return fBackgroundBitmap; }
+
+								// overlay support
+								// TODO: This can't be all, what about color key?
+			void				SetOverlayBitmap(const ServerBitmap* bitmap);
+	inline	const ServerBitmap*	OverlayBitmap() const
+									{ return fOverlayBitmap; }
+
  protected:
 	friend class RootLayer;
 	friend class WinBorder;
@@ -251,6 +267,11 @@ class Layer {
 			void				SendViewCoordUpdateMsg() const;
 //			void				SendViewMovedMsg();
 //			void				SendViewResizedMsg();
+
+			RGBColor			fViewColor;
+
+	const	ServerBitmap*		fBackgroundBitmap;
+	const	ServerBitmap*		fOverlayBitmap;
 
 };
 

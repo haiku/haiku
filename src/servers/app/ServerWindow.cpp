@@ -326,6 +326,7 @@ ServerWindow::CreateLayerTree(Layer *localRoot, LinkMsgReader &link)
 	bool hidden;
 	int32 childCount;
 	char *name = NULL;
+	rgb_color viewColor;
 
 	link.Read<int32>(&token);
 	link.ReadString(&name);
@@ -335,6 +336,7 @@ ServerWindow::CreateLayerTree(Layer *localRoot, LinkMsgReader &link)
 	link.Read<uint32>(&eventOptions);
 	link.Read<uint32>(&flags);
 	link.Read<bool>(&hidden);
+	link.Read<rgb_color>(&viewColor );
 	link.Read<int32>(&childCount);
 
 	STRACE(("ServerWindow(%s)::CreateLayerTree()-> layer %s, token %ld\n", fName,name,token));
@@ -345,6 +347,7 @@ ServerWindow::CreateLayerTree(Layer *localRoot, LinkMsgReader &link)
 	free(name);
 
 	// there is no way of setting this, other than manually :-)
+	newLayer->fViewColor = viewColor;
 	newLayer->fHidden = hidden;
 	newLayer->fEventMask = eventMask;
 	newLayer->fEventOptions = eventOptions;
@@ -788,7 +791,7 @@ ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			
 			link.Read(&c, sizeof(rgb_color));
 			
-			fCurrentLayer->fLayerData->SetViewColor(RGBColor(c));
+			fCurrentLayer->SetViewColor(RGBColor(c));
 
 			// TODO: this should not trigger redraw, no?!?
 			myRootLayer->GoRedraw(fCurrentLayer, fCurrentLayer->fVisible);
@@ -802,7 +805,7 @@ ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			
 			highColor = fCurrentLayer->fLayerData->HighColor().GetColor32();
 			lowColor = fCurrentLayer->fLayerData->LowColor().GetColor32();
-			viewColor = fCurrentLayer->fLayerData->ViewColor().GetColor32();
+			viewColor = fCurrentLayer->ViewColor().GetColor32();
 			
 			fMsgSender->StartMessage(SERVER_TRUE);
 			fMsgSender->Attach(&highColor, sizeof(rgb_color));

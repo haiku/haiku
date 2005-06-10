@@ -312,9 +312,6 @@ DrawData::SetMiterLimit(float limit)
 // constructpr
 LayerData::LayerData()
 	: DrawData(),
-	  fViewColor(255, 255, 255, 255),
-	  fBackgroundBitmap(NULL),
-	  fOverlayBitmap(NULL),
 	  prevState(NULL)
 {
 }
@@ -338,41 +335,9 @@ LayerData::operator=(const LayerData& from)
 {
 	DrawData::operator=(from);
 
-	fViewColor			= from.fViewColor;
-
-	// TODO: Are we making any sense here?
-	// How is operator= being used?
-	fBackgroundBitmap	= from.fBackgroundBitmap;
-	fOverlayBitmap		= from.fOverlayBitmap;
-
 	prevState			= from.prevState;
 	
 	return *this;
-}
-
-// SetViewColor
-void
-LayerData::SetViewColor(const RGBColor& color)
-{
-	fViewColor = color;
-}
-
-// SetBackgroundBitmap
-void
-LayerData::SetBackgroundBitmap(const ServerBitmap* bitmap)
-{
-	// TODO: What about reference counting?
-	// "Release" old fBackgroundBitmap and "Aquire" new one?
-	fBackgroundBitmap = bitmap;
-}
-
-// SetOverlayBitmap
-void
-LayerData::SetOverlayBitmap(const ServerBitmap* bitmap)
-{
-	// TODO: What about reference counting?
-	// "Release" old fOverlayBitmap and "Aquire" new one?
-	fOverlayBitmap = bitmap;
 }
 
 // PrintToStream
@@ -387,7 +352,6 @@ LayerData::PrintToStream() const
 
 	printf("\t HighColor: "); fHighColor.PrintToStream();
 	printf("\t LowColor: "); fLowColor.PrintToStream();
-	printf("\t ViewColor "); fViewColor.PrintToStream();
 	printf("\t Pattern: %llu\n", fPattern.GetInt64());
 
 	printf("\t DrawMode: %lu\n", (uint32)fDrawingMode);
@@ -473,14 +437,12 @@ LayerData::ReadFromLink(LinkMsgReader& link)
 {
 	rgb_color highColor;
 	rgb_color lowColor;
-	rgb_color viewColor;
 	pattern patt;
 
 	link.Read<BPoint>(&fPenLocation);
 	link.Read<float>(&fPenSize);
 	link.Read(&highColor, sizeof(rgb_color));
 	link.Read(&lowColor, sizeof(rgb_color));
-	link.Read(&viewColor, sizeof(rgb_color));
 	link.Read(&patt, sizeof(pattern));
 	link.Read<int8>((int8*)&fDrawingMode);
 	link.Read<BPoint>(&fOrigin);
@@ -497,7 +459,6 @@ LayerData::ReadFromLink(LinkMsgReader& link)
 
 	fHighColor = highColor;
 	fLowColor = lowColor;
-	fViewColor = viewColor;
 	fPattern = patt;
 
 	// read clipping
@@ -521,7 +482,6 @@ LayerData::WriteToLink(LinkMsgSender& link) const
 {
 	rgb_color hc = fHighColor.GetColor32();
 	rgb_color lc = fLowColor.GetColor32();
-	rgb_color vc = fViewColor.GetColor32();
 	
 	// Attach font state
 	link.Attach<uint32>(fFont.GetFamilyAndStyle());
@@ -538,7 +498,6 @@ LayerData::WriteToLink(LinkMsgSender& link) const
 	link.Attach<float>(fPenSize);
 	link.Attach(&hc, sizeof(rgb_color));
 	link.Attach(&lc, sizeof(rgb_color));
-	link.Attach(&vc, sizeof(rgb_color));
 	link.Attach<uint64>(fPattern.GetInt64());
 	link.Attach<BPoint>(fOrigin);
 	link.Attach<uint8>((uint8)fDrawingMode);

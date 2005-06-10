@@ -44,8 +44,8 @@
 #include "ServerProtocol.h"
 #include "ServerWindow.h"
 #include "WinBorder.h"
-
 #include "Layer.h"
+#include "ServerBitmap.h"
 
 //#define DEBUG_LAYER
 #ifdef DEBUG_LAYER
@@ -108,7 +108,11 @@ Layer::Layer(BRect frame, const char* name, int32 token,
 	fDriver(driver),
 	fLayerData(new LayerData()),
 
-	fRootLayer(NULL)
+	fRootLayer(NULL),
+
+	fViewColor(255, 255, 255, 255),
+	fBackgroundBitmap(NULL),
+	fOverlayBitmap(NULL)
 {
 	if (!frame.IsValid()) {
 char helper[1024];
@@ -854,8 +858,8 @@ Layer::Draw(const BRect &rect)
 	rect.PrintToStream();
 #endif	
 
-	if (!fLayerData->ViewColor().IsTransparentMagic())
-		fDriver->FillRect(rect, fLayerData->ViewColor());
+	if (!ViewColor().IsTransparentMagic())
+		fDriver->FillRect(rect, ViewColor());
 }
 
 // EmptyGlobals
@@ -1505,6 +1509,32 @@ Layer::SendViewCoordUpdateMsg() const
 		fServerWin->ClientViewsWithInvalidCoords().MakeEmpty();
 	}
 }
+
+// SetViewColor
+void
+Layer::SetViewColor(const RGBColor& color)
+{
+	fViewColor = color;
+}
+
+// SetBackgroundBitmap
+void
+Layer::SetBackgroundBitmap(const ServerBitmap* bitmap)
+{
+	// TODO: What about reference counting?
+	// "Release" old fBackgroundBitmap and "Aquire" new one?
+	fBackgroundBitmap = bitmap;
+}
+
+// SetOverlayBitmap
+void
+Layer::SetOverlayBitmap(const ServerBitmap* bitmap)
+{
+	// TODO: What about reference counting?
+	// "Release" old fOverlayBitmap and "Aquire" new one?
+	fOverlayBitmap = bitmap;
+}
+
 
 /*
 //! Sends a B_VIEW_MOVED message to the client BWindow
