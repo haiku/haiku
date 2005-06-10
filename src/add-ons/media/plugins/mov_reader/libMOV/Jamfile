@@ -1,0 +1,8 @@
+SubDir OBOS_TOP src add-ons media plugins mov_reader libMOV ;
+
+StaticLibrary movreader :
+	MOVParser.cpp
+	MOVFileReader.cpp
+	MOVAtom.cpp
+	MOVTrakAtom.cpp
+;

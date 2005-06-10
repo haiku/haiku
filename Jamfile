@@ -91,6 +91,7 @@ Depends MediaKit :
 	speex
 	vorbis
 	wav_reader
+	mov_reader
 ;
 
 # Pseudo-target to build the input kit only

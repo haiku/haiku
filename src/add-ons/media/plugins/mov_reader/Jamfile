@@ -1,0 +1,15 @@
+SubDir OBOS_TOP src add-ons media plugins mov_reader ;
+
+UsePrivateHeaders media ;
+
+Addon mov_reader : media plugins :
+	mov_reader.cpp
+	:
+	false
+	:
+	libmovreader.a
+;
+
+LinkSharedOSLibs mov_reader : be libmedia.so ;
+
+SubInclude OBOS_TOP src add-ons media plugins mov_reader libMOV ;
