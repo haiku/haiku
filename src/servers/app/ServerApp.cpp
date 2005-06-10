@@ -656,35 +656,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &link)
 
 			break;
 		}
-		case AS_SET_SCREEN_MODE: 	 
-		{ 	 
-			STRACE(("ServerApp %s: Set Screen Mode\n", fSignature.String())); 	 
-  	 
-			// Attached data 	 
-			// 1) int32 workspace # 	 
-			// 2) uint32 screen mode 	 
-			// 3) bool make default 	 
-			int32 index; 	 
-			uint32 mode; 	 
-			bool stick; 	 
-			link.Read<int32>(&index); 	 
-			link.Read<uint32>(&mode); 	 
-			link.Read<bool>(&stick); 	 
-
-			// ToDo: is this still used at all? (since there is AS_SCREEN_SET_MODE?)
-			// ToDo: no locking?
-			RootLayer *root = gDesktop->ActiveRootLayer();
-			Workspace *workspace = root->WorkspaceAt(index);
-
-			if (!workspace) { 	 
-				// apparently out of range or something, so we do nothing. :) 	 
-				break; 	 
-			} 	 
-  	 
-			// TODO: Add mode-setting code to Workspace class 	 
-			//workspace->SetMode(mode,stick); 	 
-			break; 	 
-		}
+	
 		case AS_ACTIVATE_WORKSPACE:
 		{
 			STRACE(("ServerApp %s: Activate Workspace UNIMPLEMETED\n",fSignature.String()));
