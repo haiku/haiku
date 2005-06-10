@@ -139,8 +139,10 @@ void clsMainWindow::test1()
 	c.green = rand()/256;
 	c.blue = rand()/256;
 	Layer	*lay102 = new Layer(BRect(200,20,420,250), "lay102",
-			B_FOLLOW_NONE,
-			B_FULL_UPDATE_ON_RESIZE, c);
+//			B_FOLLOW_NONE,
+			B_FOLLOW_TOP_BOTTOM,
+//			B_FULL_UPDATE_ON_RESIZE, c);
+			0, c);
 	lay1->AddLayer(lay102);
 
 	c.red = rand()/256;

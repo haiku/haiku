@@ -255,10 +255,10 @@ Layer::resize_layer_frame_by(float x, float y)
 	{
 		float		dx, dy;
 
-		fFrame	= newFrame;
-
 		dx	= newFrame.Width() - fFrame.Width();
 		dy	= newFrame.Height() - fFrame.Height();
+
+		fFrame	= newFrame;
 
 		if (dx != 0.0f || dy != 0.0f)
 		{
@@ -284,12 +284,32 @@ Layer::rezize_layer_redraw_more(BRegion &reg, float dx, float dy)
 	{
 		uint16		rm = lay->fResizeMode & 0x0000FFFF;
 
+		if ((rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM)
+		{
+
+			BRect	oldBounds(lay->Bounds());
+			oldBounds.right -=dx;
+			oldBounds.bottom -=dy;
+			
+			BRegion	regZ(lay->Bounds());
+			regZ.Include(oldBounds);
+			regZ.Exclude(oldBounds&lay->Bounds());
+
+			lay->ConvertToScreen2(&regZ);
+
+			reg.IntersectWith(&lay->fFullVisible);
+
+			reg.Include(&regZ);
+
+			lay->rezize_layer_redraw_more(reg, dx, dy);
+// above OR this:
+//			reg.Include(&lay->fFullVisible);
+		}
+		else
 		if (((rm & 0x0F0F) == (uint16)B_FOLLOW_RIGHT && dx != 0) ||
 			((rm & 0x0F0F) == (uint16)B_FOLLOW_H_CENTER && dx != 0) ||
 			((rm & 0xF0F0) == (uint16)B_FOLLOW_BOTTOM && dy != 0)||
-			((rm & 0xF0F0) == (uint16)B_FOLLOW_V_CENTER && dy != 0) ||
-		// TODO: these 2 don't need to be redrawn entirely. but ATM we don't have a choice
-			(rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM)
+			((rm & 0xF0F0) == (uint16)B_FOLLOW_V_CENTER && dy != 0))
 		{
 			reg.Include(&lay->fFullVisible);
 		}
@@ -306,16 +326,19 @@ Layer::rezize_layer_redraw_more(BRegion &redraw, BRegion &copy, float dx, float 
 
 		if ((rm & 0x0F0F) == (uint16)B_FOLLOW_RIGHT && dx != 0)
 		{
-			copy.Include(&lay->fFullVisible);
+//			copy.Include(&lay->fFullVisible);
 			redraw.Include(&lay->fFullVisible);
 		}
 		else if (((rm & 0x0F0F) == (uint16)B_FOLLOW_H_CENTER && dx != 0) ||
 			((rm & 0xF0F0) == (uint16)B_FOLLOW_BOTTOM && dy != 0) ||
-			((rm & 0xF0F0) == (uint16)B_FOLLOW_V_CENTER && dy != 0) ||
-		// TODO: these 2 don't need to be redrawn entirely. but ATM we don't have a choice
-			(rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM)
+			((rm & 0xF0F0) == (uint16)B_FOLLOW_V_CENTER && dy != 0))
 		{
 			redraw.Include(&lay->fFullVisible);
+		}
+		else if ((rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM)
+		{
+			lay->rezize_layer_redraw_more(redraw, copy, dx, dy);
+//			redraw.Include(&lay->fFullVisible);
 		}
 	}
 }
@@ -338,9 +361,6 @@ Layer::ResizeBy(float dx, float dy)
 	{
 		BRegion oldFullVisible(fFullVisible);
 		BRegion oldVisible(fVisible);
-
-// OPT: you can use HW acceleration for either for bottom alligned layer or
-//		for right alligned ones. investigate!
 
 		// right, center and bottom alligned layers will change their position
 		// so we need to invalidate their current visible regions
