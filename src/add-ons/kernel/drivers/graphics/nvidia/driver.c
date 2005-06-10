@@ -128,8 +128,9 @@ static uint16 nvidia_device_list[] = {
 	0x00c2, /* Nvidia GeForce FX 6800LE */
 	0x00f0, /* Nvidia GeForce FX 6800 (Ultra) AGP(?) */
 	0x00f1, /* Nvidia GeForce FX 6600 GT AGP */
-	0x00f2, /* Nvidia GeForce FX 6600 GT AGP */
-	0x00f8,	/* Nvidia Quadro FX 3400 PCIe(?) */
+	0x00f2, /* Nvidia GeForce FX 6600 AGP */
+	0x00f3, /* Nvidia GeForce 6200 */
+	0x00f8, /* Nvidia Quadro FX 3400/4400 PCIe */
 	0x00f9,	/* Nvidia GeForce PCX 6800 PCIe */
 	0x00fa,	/* Nvidia GeForce PCX 5750 PCIe */
 	0x00fb,	/* Nvidia GeForce PCX 5900 PCIe */
