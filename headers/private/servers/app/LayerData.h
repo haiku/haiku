@@ -42,7 +42,6 @@
 class BRegion;
 class LinkMsgReader;
 class LinkMsgSender;
-class ServerBitmap;
 
 class DrawData {
  public:
@@ -172,21 +171,6 @@ class LayerData : public DrawData {
 
 			LayerData&			operator=(const LayerData &from);
 
-								// automatic background blanking by app_server
-			void				SetViewColor(const RGBColor& color);
-	inline	const RGBColor&		ViewColor() const
-									{ return fViewColor; }
-
-			void				SetBackgroundBitmap(const ServerBitmap* bitmap);
-	inline	const ServerBitmap*	BackgroundBitmap() const
-									{ return fBackgroundBitmap; }
-
-								// overlay support
-								// TODO: This can't be all, what about color key?
-			void				SetOverlayBitmap(const ServerBitmap* bitmap);
-	inline	const ServerBitmap*	OverlayBitmap() const
-									{ return fOverlayBitmap; }
-
 								// convenience functions
 	virtual	void				PrintToStream() const;
 
@@ -196,16 +180,6 @@ class LayerData : public DrawData {
 								// want to change it without knowing implications.
 			void				ReadFromLink(LinkMsgReader& link);
 			void				WriteToLink(LinkMsgSender& link) const;
-
- protected:
-
-			RGBColor			fViewColor;
-
-			// We have both because we are not going to suffer
-			// from the limitation that R5 places on us.
-			// We can have both. :)
-	const	ServerBitmap*		fBackgroundBitmap;
-	const	ServerBitmap*		fOverlayBitmap;
 
  public:
 			// used for the state stack
