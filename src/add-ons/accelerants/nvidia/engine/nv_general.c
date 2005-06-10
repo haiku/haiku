@@ -186,16 +186,22 @@ status_t nv_general_powerup()
 		status = nvxx_general_powerup();
 		break;
 	case 0x00f110de: /* Nvidia GeForce FX 6600 GT AGP */
-	case 0x00f210de: /* Nvidia GeForce FX 6600 GT AGP */
+	case 0x00f210de: /* Nvidia GeForce FX 6600 AGP */
 		si->ps.card_type = NV43;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6600 GT AGP (NV43)\n"));
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6600 (GT) AGP (NV43)\n"));
 		status = nvxx_general_powerup();
 		break;
-	case 0x00f810de: /* Nvidia Quadro FX 3400 PCIe(?) */
-		si->ps.card_type = NV35;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 3400 PCIe(?) (NV35(?))\n"));
+	case 0x00f310de: /* Nvidia GeForce 6200 */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		LOG(4,("POWERUP: Detected Nvidia GeForce 6200 (NV44)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x00f810de: /* Nvidia Quadro FX 3400/4400 PCIe */
+		si->ps.card_type = NV45;
+		si->ps.card_arch = NV40A;
+		LOG(4,("POWERUP: Detected Nvidia Quadro FX 3400 PCIe (NV45)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x00f910de: /* Nvidia GeForce PCX 6800 PCIe */
