@@ -117,7 +117,6 @@ public:
 			FMWList fWinFMWList;
 
 private:
-	friend class WinBorder;
 	
 			// methods for retrieving and creating a tree strcture of Layers.
 			Layer*				CreateLayerTree(Layer *localRoot, LinkMsgReader &link);
