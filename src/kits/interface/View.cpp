@@ -3770,15 +3770,16 @@ BView::attachView(BView *aView)
 	else
  		owner->fLink->StartMessage(AS_LAYER_CREATE);
 
-	owner->fLink->Attach<int32>( _get_object_token_( aView ) );
-	owner->fLink->AttachString( aView->Name() );
-	owner->fLink->Attach<BRect>( aView->Frame() );
-	owner->fLink->Attach<uint32>( aView->ResizingMode() );
-	owner->fLink->Attach<uint32>( aView->fEventMask );
-	owner->fLink->Attach<uint32>( aView->fEventOptions );
-	owner->fLink->Attach<uint32>( aView->Flags() );
-	owner->fLink->Attach<bool>( aView->IsHidden(aView) );
-	owner->fLink->Attach<int32>( aView->CountChildren() );
+	owner->fLink->Attach<int32>(_get_object_token_( aView ));
+	owner->fLink->AttachString(aView->Name());
+	owner->fLink->Attach<BRect>(aView->Frame());
+	owner->fLink->Attach<uint32>(aView->ResizingMode());
+	owner->fLink->Attach<uint32>(aView->fEventMask);
+	owner->fLink->Attach<uint32>(aView->fEventOptions);
+	owner->fLink->Attach<uint32>(aView->Flags());
+	owner->fLink->Attach<bool>(aView->IsHidden(aView));
+	owner->fLink->Attach<rgb_color>(aView->fState->viewColor);
+	owner->fLink->Attach<int32>(aView->CountChildren());
 	owner->fLink->Flush();
 	
 	aView->setCachedState();
@@ -3840,7 +3841,6 @@ BView::setCachedState()
 	owner->fLink->Attach<float>( fState->penSize );
 	owner->fLink->Attach<rgb_color>( fState->highColor );
 	owner->fLink->Attach<rgb_color>( fState->lowColor );
-	owner->fLink->Attach<rgb_color>( fState->viewColor );
 	owner->fLink->Attach<pattern>( fState->patt );	
 	owner->fLink->Attach<int8>( (int8)fState->drawingMode );
 	owner->fLink->Attach<BPoint>( fState->coordSysOrigin );
@@ -3939,11 +3939,6 @@ BView::initCachedState()
 	fState->lowColor.green = 255;
 	fState->lowColor.alpha = 255;
 
-	fState->viewColor.red = 255;
-	fState->viewColor.blue = 255;
-	fState->viewColor.green = 255;
-	fState->viewColor.alpha = 255;
-
 	fState->patt = B_SOLID_HIGH;
 
 	fState->drawingMode = B_OP_COPY;
@@ -4028,7 +4023,6 @@ BView::updateCachedState()
 	owner->fLink->Read<float>(&fState->penSize);	
 	owner->fLink->Read<rgb_color>(&fState->highColor);
 	owner->fLink->Read<rgb_color>(&fState->lowColor);
-	owner->fLink->Read<rgb_color>(&fState->viewColor);
 	owner->fLink->Read<pattern>(&fState->patt);
 	owner->fLink->Read<BPoint>(&fState->coordSysOrigin);
 	owner->fLink->Read<int8>((int8 *)&fState->drawingMode);
@@ -4350,6 +4344,7 @@ ViewAttr::ViewAttr(void)
 
 	SetRGBColor(&highColor,0,0,0);
 	SetRGBColor(&lowColor,255,255,255);
+// TODO: viewColor, is NOT part of a view state! Have this as a member of BView.
 	SetRGBColor(&viewColor,255,255,255);
 
 	patt = B_SOLID_HIGH;
