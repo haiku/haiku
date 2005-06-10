@@ -98,6 +98,8 @@ BPrivateScreen::Return(BPrivateScreen *screen)
 	if (atomic_add(&sScreenRefCount, -1) == 1) {
 		// TODO: Check if the passed object is the same we are deleting
 		// here. Not much important for now though, since we only have one.
+		// TODO: We could avoid these lines, and just let the object live
+		// until the death of the application.
 		delete sScreen;
 		sScreen = NULL;
 	}
@@ -453,7 +455,6 @@ BPrivateScreen::get_screen_desc(screen_desc *desc)
 }
 
 
-// Private, called by BApplication::get_scs()
 BPrivateScreen::BPrivateScreen()
 	:
 	fColorMap(NULL),
