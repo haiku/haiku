@@ -97,7 +97,11 @@ public:
 			void				SendMessageToClient(const BMessage* msg,
 													int32 target = B_NULL_TOKEN,
 													bool usePreferred = false) const;
-
+			
+			// TODO: Ouch, that's not exactly a nice name
+			inline BMessage		&ClientViewsWithInvalidCoords()
+									{ return fClientViewsWithInvalidCoords; };
+		
 			// to who we belong. who do we own. our title.
 	inline	ServerApp*			App(void) const { return fServerApp; }
 	inline	const WinBorder*	GetWinBorder(void) const { return fWinBorder; }
@@ -113,6 +117,8 @@ public:
 			FMWList fWinFMWList;
 
 private:
+	friend class WinBorder;
+	
 			// methods for retrieving and creating a tree strcture of Layers.
 			Layer*				CreateLayerTree(Layer *localRoot, LinkMsgReader &link);
 			void				SetLayerState(Layer *layer, LinkMsgReader &link);
@@ -131,9 +137,7 @@ private:
 										  BRect& dirty,
 										  int32 xOffset, int32 yOffset) const;
 
-protected:	
-	friend class WinBorder;
-	friend class Layer;
+	
 			// TODO: Move me elsewhere
 			status_t			PictureToRegion(ServerPicture *picture,
 												BRegion &,

@@ -1489,10 +1489,10 @@ void
 Layer::AddToViewsWithInvalidCoords() const
 {
 	if (fServerWin) {
-		fServerWin->fClientViewsWithInvalidCoords.AddInt32("_token", fViewToken);
-		fServerWin->fClientViewsWithInvalidCoords.AddPoint("where", fFrame.LeftTop());
-		fServerWin->fClientViewsWithInvalidCoords.AddFloat("width", fFrame.Width());
-		fServerWin->fClientViewsWithInvalidCoords.AddFloat("height", fFrame.Height());
+		fServerWin->ClientViewsWithInvalidCoords().AddInt32("_token", fViewToken);
+		fServerWin->ClientViewsWithInvalidCoords().AddPoint("where", fFrame.LeftTop());
+		fServerWin->ClientViewsWithInvalidCoords().AddFloat("width", fFrame.Width());
+		fServerWin->ClientViewsWithInvalidCoords().AddFloat("height", fFrame.Height());
 	}
 }
 
@@ -1500,9 +1500,9 @@ Layer::AddToViewsWithInvalidCoords() const
 void
 Layer::SendViewCoordUpdateMsg() const
 {
-	if (fServerWin && !fServerWin->fClientViewsWithInvalidCoords.IsEmpty()) {
-		fServerWin->SendMessageToClient(&fServerWin->fClientViewsWithInvalidCoords);
-		fServerWin->fClientViewsWithInvalidCoords.MakeEmpty();
+	if (fServerWin && !fServerWin->ClientViewsWithInvalidCoords().IsEmpty()) {
+		fServerWin->SendMessageToClient(&fServerWin->ClientViewsWithInvalidCoords());
+		fServerWin->ClientViewsWithInvalidCoords().MakeEmpty();
 	}
 }
 
