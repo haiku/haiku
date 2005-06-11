@@ -791,8 +791,13 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		}
 
 		case B_PULSE:
-			if (fPulseEnabled)
+			if (fPulseEnabled) {
 				sendPulse(top_view);
+				if (Lock()) {
+					Flush();
+					Unlock();
+				}
+			}
 			break;
 
 		case B_QUIT_REQUESTED:
