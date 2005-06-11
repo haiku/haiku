@@ -2207,8 +2207,7 @@ BWindow::task_looper()
 				}
 
 				if (!handler) {
-					handler = determine_target(msg, handler, 
-						_use_preferred_target_(fLastMessage));
+					handler = determine_target(fLastMessage, handler, false);
 					if (!handler)
 						handler = this;
 				}
