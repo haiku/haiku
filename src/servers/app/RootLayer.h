@@ -45,6 +45,13 @@ class Desktop;
 class DisplayDriver;
 class BPortLink;
 
+#ifndef DISPLAY_HAIKU_LOGO
+#define DISPLAY_HAIKU_LOGO 1
+#endif
+
+#if DISPLAY_HAIKU_LOGO
+class UtilityBitmap;
+#endif
 
 /*!
 	\class RootLayer RootLayer.h
@@ -210,6 +217,9 @@ friend class Desktop;
 	friend	class DebugInfoManager;
 			void				AddDebugInfo(const char* string);
 			BString				fDebugInfo;
+#endif
+#if DISPLAY_HAIKU_LOGO
+			UtilityBitmap*		fLogoBitmap;
 #endif
 };
 

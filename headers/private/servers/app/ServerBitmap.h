@@ -93,7 +93,7 @@ class ServerBitmap {
 	inline	int32			Height() const
 								{ return fHeight; }
 
-	inline	bool			InitCheck() const
+	inline	bool			IsValid() const
 								{ return fInitialized; }
 
 	//! Returns the identifier token for the bitmap

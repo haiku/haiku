@@ -36,20 +36,27 @@
 #include <File.h>
 #include <PortLink.h>
 
-#include "Globals.h"
-#include "RootLayer.h"
-#include "Layer.h"
-#include "Workspace.h"
-#include "ServerScreen.h"
-#include "WinBorder.h"
-#include "ServerWindow.h"
-#include "ServerApp.h"
-#include "Desktop.h"
-#include "ServerConfig.h"
-#include "FMWList.h"
-#include "DisplayDriver.h"
-#include "ServerProtocol.h"
 #include "Decorator.h"
+#include "Desktop.h"
+#include "DisplayDriver.h"
+#include "FMWList.h"
+#include "Globals.h"
+#include "Layer.h"
+#include "ServerApp.h"
+#include "ServerConfig.h"
+#include "ServerProtocol.h"
+#include "ServerScreen.h"
+#include "ServerWindow.h"
+#include "WinBorder.h"
+#include "Workspace.h"
+
+#include "RootLayer.h"
+
+#if DISPLAY_HAIKU_LOGO
+#include "ServerBitmap.h"
+#include "HaikuLogo.h"
+static const float kGoldenProportion = (sqrtf(5.0) - 1.0) / 2.0;
+#endif
 
 //#define DEBUG_ROOTLAYER
 #define APPSERVER_ROOTLAYER_SHOW_WORKSPACE_NUMBER
@@ -107,16 +114,29 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	  fWinBorderIndex(0),
 
 	  fScreenShotIndex(1),
-
-#if ON_SCREEN_DEBUGGING_INFO
-	  fQuiting(false),
-	  fDebugInfo("")
-#else
 	  fQuiting(false)
-#endif
 {
 	//NOTE: be careful about this one.
 	fRootLayer = this;
+
+// Some stuff that will go away in the future but fills some gaps right now
+#if ON_SCREEN_DEBUGGING_INFO
+	  fDebugInfo.SetTo("");
+#endif
+
+#if DISPLAY_HAIKU_LOGO
+	fLogoBitmap = new UtilityBitmap(BRect(0.0, 0.0, kLogoWidth - 1.0,
+										  kLogoHeight - 1.0),
+									kLogoFormat, 0);
+	if (fLogoBitmap->IsValid()) {
+		int32 size = min_c(sizeof(kLogoBits), fLogoBitmap->BitsLength());
+		memcpy(fLogoBitmap->Bits(), kLogoBits, size);
+	} else {
+		delete fLogoBitmap;
+		fLogoBitmap = NULL;
+	}
+#endif // DISPLAY_HAIKU_LOGO
+
 
 	// easy way to identify this class.
 	fClassID = AS_ROOTLAYER_CLASS;
@@ -175,6 +195,10 @@ RootLayer::~RootLayer()
 	free(fWinBorderList2);
 	free(fWinBorderList);
 	// RootLayer object just uses Screen objects, it is not allowed to delete them.
+
+#if DISPLAY_HAIKU_LOGO
+	delete fLogoBitmap;
+#endif
 }
 
 
@@ -2103,6 +2127,18 @@ RootLayer::Draw(const BRect &r)
 		}
 	}
 #endif // ON_SCREEN_DEBUGGING_INFO
+
+#if DISPLAY_HAIKU_LOGO
+	if (fLogoBitmap) {
+		BPoint logoPos;
+		logoPos.x = floorf(min_c(fFrame.left + fFrame.Width() * kGoldenProportion,
+								 fFrame.right - (kLogoWidth + kLogoHeight / 2.0)));
+		logoPos.y = floorf(fFrame.bottom - kLogoHeight * 1.5);
+		BRect bitmapBounds = fLogoBitmap->Bounds();
+		fDriver->DrawBitmap(fLogoBitmap, bitmapBounds,
+							bitmapBounds.OffsetToCopy(logoPos), fLayerData);
+	}
+#endif // DISPLAY_HAIKU_LOGO
 }
 
 #if ON_SCREEN_DEBUGGING_INFO

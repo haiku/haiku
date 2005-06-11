@@ -929,7 +929,7 @@ Painter::DrawBitmap(const ServerBitmap* bitmap,
 
 	BRect touched = _Clipped(viewRect);
 
-	if (bitmap && bitmap->InitCheck() && touched.IsValid()) {
+	if (bitmap && bitmap->IsValid() && touched.IsValid()) {
 		// the native bitmap coordinate system
 		BRect actualBitmapRect(bitmap->Bounds());
 
