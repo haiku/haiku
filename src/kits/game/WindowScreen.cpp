@@ -74,9 +74,9 @@ blit(int32 sx, int32 sy, int32 dx, int32 dy, int32 width, int32 height)
 	param.width = width;
 	param.height = height;
 	
-	acquire_engine_global(1, 0xff, 0, &et_global);
+	acquire_engine_global(B_2D_ACCELERATION, 0xff, NULL, &et_global);
 	blit_rect_global(et_global, &param, 1);
-	release_engine_global(et_global, 0);
+	release_engine_global(et_global, NULL);
 	return 0;
 }
 
@@ -95,7 +95,7 @@ transparent_blit(int32 sx, int32 sy, int32 dx, int32 dy,
 	param.width = width;
 	param.height = height;
 	
-	acquire_engine_global(1, 0xff, 0, &et_global);
+	acquire_engine_global(B_2D_ACCELERATION, 0xff, 0, &et_global);
 	trans_blit_rect_global(et_global, transparent_color, &param, 1);
 	release_engine_global(et_global, 0);
 	return 0;
@@ -115,9 +115,9 @@ scaled_filtered_blit(int32 sx, int32 sy, int32 sw, int32 sh, int32 dx, int32 dy,
 	param.dest_width = dw;
 	param.dest_height = dh;
 	
-	acquire_engine_global(1, 0xff, 0, &et_global);
+	acquire_engine_global(B_2D_ACCELERATION, 0xff, NULL, &et_global);
 	scaled_filtered_blit_rect_global(et_global, &param, 1);
-	release_engine_global(et_global, 0);
+	release_engine_global(et_global, NULL);
 	return 0;
 }
 
@@ -131,9 +131,9 @@ draw_rect_8(int32 sx, int32 sy, int32 sw, int32 sh, uint8 color_index)
 	param.right = sw;
 	param.bottom = sh;
 	
-	acquire_engine_global(1, 0xff, 0, &et_global);
+	acquire_engine_global(B_2D_ACCELERATION, 0xff, NULL, &et_global);
 	fill_rect_global(et_global, color_index, &param, 1);
-	release_engine_global(et_global, 0);
+	release_engine_global(et_global, NULL);
 	return 0;
 }
 
@@ -147,9 +147,9 @@ draw_rect_16(int32 sx, int32 sy, int32 sw, int32 sh, uint16 color)
 	param.right = sw;
 	param.bottom = sh;
 	
-	acquire_engine_global(1, 0xff, 0, &et_global);
+	acquire_engine_global(B_2D_ACCELERATION, 0xff, NULL, &et_global);
 	fill_rect_global(et_global, color, &param, 1);
-	release_engine_global(et_global, 0);
+	release_engine_global(et_global, NULL);
 	return 0;
 }
 
@@ -163,9 +163,9 @@ draw_rect_32(int32 sx, int32 sy, int32 sw, int32 sh, uint32 color)
 	param.right = sw;
 	param.bottom = sh;
 	
-	acquire_engine_global(1, 0xff, 0, &et_global);
+	acquire_engine_global(B_2D_ACCELERATION, 0xff, NULL, &et_global);
 	fill_rect_global(et_global, color, &param, 1);
-	release_engine_global(et_global, 0);
+	release_engine_global(et_global, NULL);
 	return 0;
 }
 
@@ -275,7 +275,6 @@ mode2parms(uint32 space, uint32 *out_space, int32 *width, int32 *height)
 
 
 // BWindowScreen public API
-
 void
 set_mouse_position(int32 x, int32 y)
 {
