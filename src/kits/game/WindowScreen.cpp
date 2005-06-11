@@ -25,7 +25,6 @@
 #endif
 
 // WindowScreen commands
-#define WS_PROPOSE_MODE			0x00000102
 #define WS_MOVE_DISPLAY			0x00000108
 #define WS_SET_FULLSCREEN 		0x00000881
 #define WS_GET_FRAMEBUFFER 		0x00000eed
@@ -277,7 +276,7 @@ mode2parms(uint32 space, uint32 *out_space, int32 *width, int32 *height)
 
 
 // BWindowScreen public API
-
+/*
 void
 set_mouse_position(int32 x, int32 y)
 {
@@ -287,7 +286,7 @@ set_mouse_position(int32 x, int32 y)
 	command.AddPoint("where", BPoint(x, y));
 	_control_input_server_(&command, &reply);
 }
-
+*/
 
 BWindowScreen::BWindowScreen(const char *title, uint32 space, status_t *error, bool debug_enable)
 	:
@@ -374,6 +373,7 @@ BWindowScreen::Disconnect()
 void
 BWindowScreen::WindowActivated(bool active)
 {
+	CALLED();
 	window_state = active;
 	if(active && lock_state == 0 && work_state)
 		SetActiveState(1);
@@ -381,9 +381,9 @@ BWindowScreen::WindowActivated(bool active)
 
 
 void
-BWindowScreen::WorkspaceActivated(int32 ws,
-								  bool state)
+BWindowScreen::WorkspaceActivated(int32 ws, bool state)
 {
+	CALLED();
 	work_state = state;
 	if (state) {
 		if (lock_state == 0 && window_state) {
@@ -504,23 +504,9 @@ BWindowScreen::SetFrameBuffer(int32 width, int32 height)
 	display_mode lowMode = highMode;
 	display_mode mode = highMode;
 
-	// equivalent to BScreen::ProposeMode()
-	// TODO: So why don't we just use it instead?
-	status_t status = B_ERROR;
-
-#ifdef COMPILE_FOR_R5
-	_BAppServerLink_ link;	
-	link.fSession->swrite_l(WS_DISPLAY_UTILS);
-	link.fSession->swrite_l(screen_index);
-	link.fSession->swrite_l(WS_PROPOSE_MODE);
-	link.fSession->swrite(sizeof(display_mode), &highMode);
-	link.fSession->swrite(sizeof(display_mode), &mode);
-	link.fSession->swrite(sizeof(display_mode), &lowMode);
-	link.fSession->sync();
-	link.fSession->sread(sizeof(status), &status);
-	link.fSession->sread(sizeof(display_mode), &mode);
-#endif
-
+	BScreen screen(this);
+	status_t status = screen.ProposeMode(&mode, &lowMode, &highMode);
+	
 	// If the mode is supported, change the workspace
 	// to that mode.
 	if (status == B_OK)
@@ -721,7 +707,7 @@ BWindowScreen::SetFullscreen(int32 enable)
 	int32 retval = -1;
 
 #ifdef COMPILE_FOR_R5
-	int32 result = -1
+	int32 result = -1;
 
 	a_session->swrite_l(WS_SET_FULLSCREEN);
 	a_session->swrite_l(server_token);
@@ -738,6 +724,8 @@ BWindowScreen::SetFullscreen(int32 enable)
 status_t
 BWindowScreen::InitData(uint32 space, uint32 attributes)
 {
+	CALLED();
+	
 	BScreen screen(this);
 	debug_state = attributes & B_ENABLE_DEBUGGER;
 	debug_list_count = 0;
@@ -784,6 +772,7 @@ BWindowScreen::InitData(uint32 space, uint32 attributes)
 status_t
 BWindowScreen::SetActiveState(int32 state)
 {
+	CALLED();
 	status_t status = B_ERROR;
 	if (state == 1) {
 		be_app->HideCursor();
@@ -843,7 +832,8 @@ BWindowScreen::SetActiveState(int32 state)
 status_t
 BWindowScreen::SetLockState(int32 state)
 {
-	if(addon_state == 1 && state == 1) {
+	CALLED();
+	if (addon_state == 1 && state == 1) {
 		m_wei();
 		fill_rect_global = NULL;
 		blit_rect_global = NULL;
@@ -903,6 +893,7 @@ BWindowScreen::SetLockState(int32 state)
 void
 BWindowScreen::GetCardInfo()
 {
+	CALLED();
 	BScreen screen(this);
 	frame_buffer_config config;
 	
@@ -927,6 +918,7 @@ BWindowScreen::GetCardInfo()
 			bits_per_pixel = 0;
 			break;
 	}
+	
 	card_info.bits_per_pixel = bits_per_pixel;
 	card_info.width = mode.virtual_width;
 	card_info.height = mode.virtual_height;
@@ -946,22 +938,27 @@ BWindowScreen::GetCardInfo()
 	screen_id id = screen.ID();
 	
 	status_t result = B_ERROR;
-
+	
 #ifdef COMPILE_FOR_R5
 	_BAppServerLink_ link;
 	link.fSession->swrite_l(WS_GET_FRAMEBUFFER);
 	link.fSession->swrite_l(id.id);
+	link.fSession->swrite_l(server_token);
 	link.fSession->sync();
 	link.fSession->sread(sizeof(result), &result);
-	link.fSession->sread(sizeof(frame_buffer_config), &config);
+	if (result == B_OK)
+		link.fSession->sread(sizeof(frame_buffer_config), &config);
 #endif
 	
-	if(result == B_OK) {
+	if (result == B_OK) {
 		card_info.id = id.id;
 		card_info.frame_buffer = config.frame_buffer;
 		card_info.bytes_per_row = config.bytes_per_row;
 	}
+	
 	memcpy(&card_info_global, &card_info, sizeof(graphics_card_info));
+	
+	CALLED();
 }
 
 
@@ -1009,6 +1006,8 @@ BWindowScreen::Resume()
 status_t
 BWindowScreen::GetModeFromSpace(uint32 space, display_mode *dmode)
 {
+	CALLED();
+	
 	uint32 out_space;
 	int32 width, height;
 	status_t ret = B_ERROR;
@@ -1033,6 +1032,7 @@ BWindowScreen::GetModeFromSpace(uint32 space, display_mode *dmode)
 status_t
 BWindowScreen::InitClone()
 {
+	CALLED();
 #ifndef COMPILE_FOR_R5
 	// TODO: Too much stuff to change, I'll just
 	return B_ERROR;
@@ -1100,6 +1100,7 @@ BWindowScreen::InitClone()
 		addon_image = -1;
 	}
 	
+	CALLED();
 	return result;
 #endif
 }
@@ -1110,7 +1111,6 @@ BWindowScreen::AssertDisplayMode(display_mode *dmode)
 {
 	status_t result = B_ERROR;
 	
-	// TODO: Why not BScreen::SetMode() ?
 #ifdef COMPILE_FOR_R5
 	_BAppServerLink_ link;
 	link.fSession->swrite_l(WS_GET_DISPLAY_MODE); // check display_mode valid command
@@ -1118,7 +1118,8 @@ BWindowScreen::AssertDisplayMode(display_mode *dmode)
 	link.fSession->swrite(sizeof(display_mode), (void *)dmode);
 	link.fSession->sync();
 	link.fSession->sread(sizeof(result), &result);
-#endif	
+#endif
+
 	// if the result is B_OK, we copy the dmode to new_space
 	if (result == B_OK) { 
 		memcpy(new_space, dmode, sizeof(display_mode));
