@@ -401,7 +401,7 @@ BWindow::Sync() const
 
 	// ToDo: why with reply?
 	int32 code;
-	if (fLink->FlushWithReply(code) == B_OK)
+	fLink->FlushWithReply(code);
 
 	const_cast<BWindow*>(this)->Unlock();
 }
@@ -793,10 +793,7 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		case B_PULSE:
 			if (fPulseEnabled) {
 				sendPulse(top_view);
-				if (Lock()) {
-					Flush();
-					Unlock();
-				}
+				Flush();
 			}
 			break;
 
