@@ -90,7 +90,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.49 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.50 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -174,9 +174,36 @@ status_t nv_general_powerup()
 		break;
 	case 0x00c110de: /* Nvidia GeForce FX 6800 */
 	case 0x00c210de: /* Nvidia GeForce FX 6800LE */
-		si->ps.card_type = NV40;
+		si->ps.card_type = NV41;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6800 (NV40)\n"));
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6800 (NV41)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x00c810de: /* Nvidia GeForce FX 6800 Go */
+	case 0x00c910de: /* Nvidia GeForce FX 6800 Ultra Go */
+		si->ps.card_type = NV41;
+		si->ps.card_arch = NV40A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6800 Go (NV41)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x00cc10de: /* Nvidia Quadro FX 1400 Go */
+		si->ps.card_type = NV41;
+		si->ps.card_arch = NV40A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia Quadro FX 1400 Go (NV41)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x00cd10de: /* Nvidia Quadro FX 3450/4000 SDI */
+		si->ps.card_type = NV41;
+		si->ps.card_arch = NV40A;
+		LOG(4,("POWERUP: Detected Nvidia Quadro FX 3450/4000 SDI (NV41)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x00ce10de: /* Nvidia Quadro FX 1400 */
+		si->ps.card_type = NV41;
+		si->ps.card_arch = NV40A;
+		LOG(4,("POWERUP: Detected Nvidia Quadro FX 1400 (NV41)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x00f010de: /* Nvidia GeForce FX 6800 (Ultra) AGP(?) */
@@ -225,7 +252,7 @@ status_t nv_general_powerup()
 	case 0x00fc10de: /* Nvidia GeForce PCX 5300 PCIe */
 		si->ps.card_type = NV34;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce PCX 5300 PCIe (NV34(?))\n"));
+		LOG(4,("POWERUP: Detected Nvidia GeForce PCX 5300 PCIe (NV34)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x00fd10de: /* Nvidia Quadro PCX PCIe */
@@ -347,12 +374,23 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia GeForce 6200 TurboCache (NV44)\n"));
 		status = nvxx_general_powerup();
 		break;
-	case 0x016210de: /* Nvidia unknown FX */
+	case 0x016210de: /* Nvidia GeForce 6200SE TurboCache */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		LOG(4,("POWERUP: Detected Nvidia GeForce 6200SE TurboCache (NV44)\n"));
+		status = nvxx_general_powerup();
+		break;
 	case 0x016310de: /* Nvidia unknown FX */
-	case 0x016410de: /* Nvidia unknown FX */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
 		LOG(4,("POWERUP: Detected Nvidia unknown FX (NV44)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x016410de: /* Nvidia GeForce FX 6200 Go */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6200 Go (NV44)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x016510de: /* Nvidia Quadro FX NVS 285 */
@@ -466,6 +504,13 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia Quadro4 (NV18)\n"));
 		status = nvxx_general_powerup();
 		break;
+	case 0x018d10de: /* Nvidia GeForce4 448 Go */
+		si->ps.card_type = NV18;
+		si->ps.card_arch = NV10A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia GeForce4 Go (NV18)\n"));
+		status = nvxx_general_powerup();
+		break;
 	case 0x01a010de: /* Nvidia GeForce2 Integrated GPU */
 		si->ps.card_type = NV11;
 		si->ps.card_arch = NV10A;
@@ -495,9 +540,9 @@ status_t nv_general_powerup()
 	case 0x021110de: /* Nvidia GeForce FX 6800 */
 	case 0x021210de: /* Nvidia GeForce FX 6800LE */
 	case 0x021510de: /* Nvidia GeForce FX 6800 GT */
-		si->ps.card_type = NV40;
+		si->ps.card_type = NV45; /* NV48 is NV45 with 512Mb */
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6800 (NV40)\n"));
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6800 (NV48)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x022110de: /* Nvidia GeForce 6200 AGP (256Mb - 128bit) */
