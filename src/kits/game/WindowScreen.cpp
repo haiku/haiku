@@ -32,7 +32,7 @@
 #define WS_GET_DRIVER_NAME 		0x00000ef5
 #define WS_DISPLAY_UTILS		0x00000ef9
 #define WS_SET_LOCK_STATE		0x00000efb
-#define WS_GET_DISPLAY_MODE 	0x00000efd
+#define WS_SET_DISPLAY_MODE 	0x00000efd
 #define WS_SWITCH_WORKSPACE 	0x00000f26
 #define WS_SET_PALETTE			0x00000f27
 
@@ -276,7 +276,7 @@ mode2parms(uint32 space, uint32 *out_space, int32 *width, int32 *height)
 
 
 // BWindowScreen public API
-/*
+
 void
 set_mouse_position(int32 x, int32 y)
 {
@@ -286,7 +286,7 @@ set_mouse_position(int32 x, int32 y)
 	command.AddPoint("where", BPoint(x, y));
 	_control_input_server_(&command, &reply);
 }
-*/
+
 
 BWindowScreen::BWindowScreen(const char *title, uint32 space, status_t *error, bool debug_enable)
 	:
@@ -1113,7 +1113,7 @@ BWindowScreen::AssertDisplayMode(display_mode *dmode)
 	
 #ifdef COMPILE_FOR_R5
 	_BAppServerLink_ link;
-	link.fSession->swrite_l(WS_GET_DISPLAY_MODE); // check display_mode valid command
+	link.fSession->swrite_l(WS_SET_DISPLAY_MODE); // check display_mode valid command
 	link.fSession->swrite_l(screen_index);
 	link.fSession->swrite(sizeof(display_mode), (void *)dmode);
 	link.fSession->sync();
