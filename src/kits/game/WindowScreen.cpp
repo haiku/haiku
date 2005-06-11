@@ -33,7 +33,6 @@
 #define WS_DISPLAY_UTILS		0x00000ef9
 #define WS_SET_LOCK_STATE		0x00000efb
 #define WS_SET_DISPLAY_MODE 	0x00000efd
-#define WS_SWITCH_WORKSPACE 	0x00000f26
 #define WS_SET_PALETTE			0x00000f27
 
 
@@ -329,14 +328,8 @@ BWindowScreen::~BWindowScreen()
 	delete_sem(activate_sem);
 	delete_sem(debug_sem);
 	
-	if (debug_state) {
-#ifdef COMPILE_FOR_R5
-		_BAppServerLink_ link;
-		link.fSession->swrite_l(WS_SWITCH_WORKSPACE);
-		link.fSession->swrite_l(debug_workspace);
-		link.fSession->sync();
-#endif
-	}
+	if (debug_state)
+		activate_workspace(debug_workspace);
 	
 	free(new_space);
 	free(old_space);
@@ -653,13 +646,8 @@ BWindowScreen::Suspend(char *label)
 		if (IsLocked())
 			Unlock();
 		
-		// Switch to debug workspace
-#ifdef COMPILE_FOR_R5
-		_BAppServerLink_ link;
-		link.fSession->swrite_l(WS_SWITCH_WORKSPACE);
-		link.fSession->swrite_l(debug_workspace);
-		link.fSession->sync();
-#endif
+		activate_workspace(debug_workspace);
+
 		// Suspend ourself
 		suspend_thread(find_thread(NULL));
 
@@ -894,16 +882,13 @@ void
 BWindowScreen::GetCardInfo()
 {
 	CALLED();
+	
 	BScreen screen(this);
-	frame_buffer_config config;
-	
 	display_mode mode;
+	if (screen.GetMode(&mode) < B_OK)
+		return;
+	
 	uint32 bits_per_pixel;
-	
-	card_info.version = 2;
-	card_info.id = 0;
-	screen.GetMode(&mode);
-	
 	switch(mode.space & 0x0fff) {
 		case B_CMAP8:
 			bits_per_pixel = 8;
@@ -919,6 +904,8 @@ BWindowScreen::GetCardInfo()
 			break;
 	}
 	
+	card_info.version = 2;
+	card_info.id = 0;
 	card_info.bits_per_pixel = bits_per_pixel;
 	card_info.width = mode.virtual_width;
 	card_info.height = mode.virtual_height;
@@ -938,6 +925,8 @@ BWindowScreen::GetCardInfo()
 	screen_id id = screen.ID();
 	
 	status_t result = B_ERROR;
+	
+	frame_buffer_config config;
 	
 #ifdef COMPILE_FOR_R5
 	_BAppServerLink_ link;
@@ -1100,7 +1089,6 @@ BWindowScreen::InitClone()
 		addon_image = -1;
 	}
 	
-	CALLED();
 	return result;
 #endif
 }
