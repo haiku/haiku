@@ -39,6 +39,17 @@ ProbeWindow::MessageReceived(BMessage *message)
 			break;
 		}
 
+		case B_CUT:
+		case B_COPY:
+		case B_PASTE:
+		case B_SELECT_ALL:
+		{
+			BView *view = CurrentFocus();
+			if (view != NULL)
+				view->MessageReceived(message);
+			break;
+		}
+
 		default:
 			BWindow::MessageReceived(message);
 	}

@@ -1252,12 +1252,9 @@ ProbeView::AttachedToWindow()
 	fRedoMenuItem->SetTarget(fDataView);
 	menu->AddSeparatorItem();
 	menu->AddItem(item = new BMenuItem("Copy", new BMessage(B_COPY), 'C', B_COMMAND_KEY));
-	item->SetTarget(fDataView);
 	menu->AddItem(fPasteMenuItem = new BMenuItem("Paste", new BMessage(B_PASTE), 'V', B_COMMAND_KEY));
-	fPasteMenuItem->SetTarget(fDataView);
 	CheckClipboard();
 	menu->AddItem(item = new BMenuItem("Select All", new BMessage(B_SELECT_ALL), 'A', B_COMMAND_KEY));
-	item->SetTarget(fDataView);
 	menu->AddSeparatorItem();
 	menu->AddItem(item = new BMenuItem("Find" B_UTF8_ELLIPSIS, new BMessage(kMsgOpenFindWindow),
 								'F', B_COMMAND_KEY));
