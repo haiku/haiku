@@ -24,7 +24,6 @@
 //	Description:	BPrivateScreen is the class which does the real work
 //					for the proxy class BScreen (it interacts with the app server).
 //------------------------------------------------------------------------------
-#include <Debug.h>
 #include <Locker.h>
 #include <Window.h>
 
@@ -46,7 +45,6 @@ struct screen_desc {
 
 
 static BPrivateScreen *sScreen;
-static int32 sScreenRefCount;
 
 // used to synchronize creation/deletion of the sScreen object
 static BLocker sScreenLock("screen lock");
@@ -59,10 +57,9 @@ BPrivateScreen::CheckOut(BWindow *win)
 {
 	sScreenLock.Lock();
 	
-	if (atomic_add(&sScreenRefCount, 1) == 0) {
+	if (sScreen == NULL) {
 		// TODO: If we start supporting multiple monitors, we
 		// should return the right screen for the passed BWindow
-		ASSERT(sScreen == NULL);
 		sScreen = new BPrivateScreen();
 	}
 	
@@ -77,10 +74,9 @@ BPrivateScreen::CheckOut(screen_id id)
 {
 	sScreenLock.Lock();
 	
-	if (atomic_add(&sScreenRefCount, 1) == 0) {
+	if (sScreen == NULL) {
 		// TODO: If we start supporting multiple monitors, we
 		// should return the right object for the given screen_id
-		ASSERT(sScreen == NULL);
 		sScreen = new BPrivateScreen();
 	}
 	
@@ -93,18 +89,9 @@ BPrivateScreen::CheckOut(screen_id id)
 void
 BPrivateScreen::Return(BPrivateScreen *screen)
 {
-	sScreenLock.Lock();
-	
-	if (atomic_add(&sScreenRefCount, -1) == 1) {
-		// TODO: Check if the passed object is the same we are deleting
-		// here. Not much important for now though, since we only have one.
-		// TODO: We could avoid these lines, and just let the object live
-		// until the death of the application.
-		delete sScreen;
-		sScreen = NULL;
-	}
-	
-	sScreenLock.Unlock();
+	// Never delete the sScreen object.
+	// system_colors() expects the colormap to be 
+	// permanently stored within libbe.
 }
 
 
