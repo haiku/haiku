@@ -440,6 +440,8 @@ DBG(OUT("BApplication::InitData(`%s', %p)\n", signature, _error));
 	// ToDo: these could have a predefined server token to safe the communication!
 	B_CURSOR_SYSTEM_DEFAULT = new BCursor(B_HAND_CURSOR);
 	B_CURSOR_I_BEAM = new BCursor(B_I_BEAM_CURSOR);
+	
+	fInitialWorkspace = current_workspace();
 #endif	// RUN_WITHOUT_APP_SERVER
 
 	// Return the error or exit, if there was an error and no error variable
