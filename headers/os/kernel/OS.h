@@ -320,8 +320,9 @@ find_thread(const char *name) {
 extern thread_id 	find_thread(const char *name);
 #endif
 
-extern status_t		send_data(thread_id thread, int32 code, const void *buffer, size_t buffer_size);
-extern status_t		receive_data(thread_id *sender, void *buffer, size_t buffer_size);
+extern status_t		send_data(thread_id thread, int32 code, const void *buffer,
+						size_t bufferSize);
+extern int32		receive_data(thread_id *sender, void *buffer, size_t bufferSize);
 extern bool			has_data(thread_id thread);
 
 extern status_t		snooze(bigtime_t amount);
@@ -330,7 +331,8 @@ extern status_t		snooze_until(bigtime_t time, int timeBase);
 
 /* system private, use macros instead */
 extern status_t		_get_thread_info(thread_id id, thread_info *info, size_t size);
-extern status_t		_get_next_thread_info(team_id team, int32 *cookie, thread_info *info, size_t size);
+extern status_t		_get_next_thread_info(team_id team, int32 *cookie,
+						thread_info *info, size_t size);
 
 #define get_thread_info(id, info) \
 			_get_thread_info((id), (info), sizeof(*(info)))

@@ -1418,7 +1418,7 @@ send_data(thread_id thread, int32 code, const void *buffer, size_t bufferSize)
 }
 
 
-static status_t
+static int32
 receive_data_etc(thread_id *_sender, void *buffer, size_t bufferSize, int32 flags)
 {
 	struct thread *thread = thread_get_current_thread();
@@ -1427,8 +1427,13 @@ receive_data_etc(thread_id *_sender, void *buffer, size_t bufferSize, int32 flag
 	int32 code;
 
 	status = acquire_sem_etc(thread->msg.read_sem, 1, flags, 0);
-	if (status < B_OK)
+	if (status < B_OK) {
+		// Actually, we're not supposed to return error codes
+		// but since the only reason this can fail is that we
+		// were killed, it's probably okay to do so (but also
+		// meaningless).
 		return status;
+	}
 
 	if (buffer != NULL && bufferSize != 0) {
 		size = min(bufferSize, thread->msg.size);
@@ -1450,7 +1455,7 @@ receive_data_etc(thread_id *_sender, void *buffer, size_t bufferSize, int32 flag
 }
 
 
-status_t
+int32
 receive_data(thread_id *sender, void *buffer, size_t bufferSize)
 {
 	return receive_data_etc(sender, buffer, bufferSize, 0);
@@ -2015,7 +2020,7 @@ _user_send_data(thread_id thread, int32 code, const void *buffer, size_t bufferS
 	if (!IS_USER_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
 
-	return send_data_etc(thread, code, buffer, bufferSize, B_CAN_INTERRUPT);
+	return send_data_etc(thread, code, buffer, bufferSize, B_KILL_CAN_INTERRUPT);
 		// supports userland buffers
 }
 
@@ -2030,7 +2035,7 @@ _user_receive_data(thread_id *_userSender, void *buffer, size_t bufferSize)
 		|| !IS_USER_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
 
-	code = receive_data_etc(&sender, buffer, bufferSize, B_CAN_INTERRUPT);
+	code = receive_data_etc(&sender, buffer, bufferSize, B_KILL_CAN_INTERRUPT);
 		// supports userland buffers
 
 	if (user_memcpy(_userSender, &sender, sizeof(thread_id)) < B_OK)

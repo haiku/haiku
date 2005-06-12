@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -170,7 +170,7 @@ send_data(thread_id thread, int32 code, const void *buffer, size_t bufferSize)
 }
 
 
-status_t
+int32
 receive_data(thread_id *_sender, void *buffer, size_t bufferSize)
 {
 	return _kern_receive_data(_sender, buffer, bufferSize);
