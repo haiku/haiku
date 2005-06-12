@@ -37,9 +37,7 @@
 #include <MenuPrivate.h>
 #include <MenuWindow.h>
 
-#ifndef COMPILE_FOR_R5
 menu_info BMenu::sMenuInfo;
-#endif
 
 class _ExtraMenuData_ {
 public:
