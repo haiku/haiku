@@ -793,7 +793,7 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		case B_PULSE:
 			if (fPulseEnabled) {
 				sendPulse(top_view);
-				Flush();
+				fLink->Flush();
 			}
 			break;
 
@@ -1897,8 +1897,7 @@ BWindow::Show()
 void
 BWindow::Hide()
 {
-	if (fShowLevel == 0)
-	{
+	if (fShowLevel == 0) {
 		Lock();
 		fLink->StartMessage(AS_HIDE_WINDOW);
 		fLink->Flush();
@@ -2040,8 +2039,6 @@ BWindow::InitData(BRect frame, const char* title, window_look look,
 	fWaitingForMenu = false;
 
 	fMinimized = false;
-
-	// TODO:  see WHERE you can use 'fMenuSem'
 
 	fMaxZoomHeight = 32768.0;
 	fMaxZoomWidth = 32768.0;
@@ -2389,10 +2386,12 @@ BWindow::setFocus(BView *focusView, bool notifyInputServer)
 	if (focusView)
 		focusView->MakeFocus(true);
 
-	// TODO: find out why do we have to notify input server.
-	if (notifyInputServer)
-	{
-		// what am I suppose to do here??
+	// TODO: Notify the input server if we are passing focus
+	// from a view which has the B_INPUT_METHOD_AWARE to a one
+	// which does not, or vice-versa
+	if (notifyInputServer) {
+		// TODO: Send a message to input server using
+		// control_input_server()
 	}
 }
 
