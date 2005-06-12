@@ -154,7 +154,6 @@ private:
 			void			InitData(const char* signature, status_t* error);
 			void			BeginRectTracking(BRect r, bool trackWhole);
 			void			EndRectTracking();
-			void			get_scs();
 			void			setup_server_heaps();
 			void*			rw_offs_to_ptr(uint32 offset);
 			void*			ro_offs_to_ptr(uint32 offset);
