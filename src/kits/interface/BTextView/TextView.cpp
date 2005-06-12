@@ -2173,9 +2173,6 @@ BTextView::Highlight(int32 startOffset, int32 endOffset)
 	SetDrawingMode(B_OP_INVERT);	
 	FillRegion(&selRegion, B_SOLID_HIGH);
 	SetDrawingMode(B_OP_COPY);
-// TODO: unnecessary in R5 - maybe we should
-// carry out drawing commands outside Draw() immediately?
-Flush();
 }
 
 
@@ -3817,9 +3814,6 @@ BTextView::DrawCaret(int32 offset)
 	caretRect.bottom = caretPoint.y + lineHeight;
 	
 	InvertRect(caretRect);
-// TODO: This call seems not necessary on R5. So we need to fix something
-// in our app_server. We should "auto-flush" eventually.
-Flush();
 }
 
 
