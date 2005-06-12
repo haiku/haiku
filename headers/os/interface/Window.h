@@ -348,8 +348,6 @@ private:
 			void		SetIsFilePanel(bool yes);
 			bool		IsFilePanel() const;
 
-			uint32		WindowLookToInteger(window_look wl);
-			uint32		WindowFeelToInteger(window_feel wf);
 			void		BuildTopView();
 			void		setFocus(BView *focusView, bool notifyIputServer = false);
 
