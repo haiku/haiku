@@ -124,335 +124,68 @@ const static rgb_color kSystemPalette[] = {
 };
 
 
-/*!
-	\brief Takes a palette array and places the BeOS System	palette in it.
-	\param palette 256-element rgb_color array
-*//*
-void
-GenerateSystemPalette(rgb_color *palette)
-{
-	int i,j,index=0;
-	int indexvals1[]={ 255,229,204,179,154,129,105,80,55,30 },
-		indexvals2[]={ 255,203,152,102,51,0 };
-		// ff, cb, 98, 66, 33
-	rgb_color *currentcol;
-	
-	// Grays 0,0,0 -> 248,248,248 by 8's	
-	for(i=0; i<=248; i+=8,index++)
-	{
-		currentcol=&(palette[index]);
-		currentcol->red=i;
-		currentcol->green=i;
-		currentcol->blue=i;
-		currentcol->alpha=255;
-	}
-	
-	// Blues, following indexvals1
-	for(i=0; i<10; i++,index++)
-	{
-		currentcol=&(palette[index]);
-		currentcol->red=0;
-		currentcol->green=0;
-		currentcol->blue=indexvals1[i];
-		currentcol->alpha=255;
-	}
+// color_distance
+/*!	\brief Returns the "distance" between two RGB colors.
 
-	// Reds, following indexvals1 - 1
-	for(i=0; i<10; i++,index++)
-	{
-		currentcol=&(palette[index]);
-		currentcol->red=indexvals1[i] - 1;
-		currentcol->green=0;
-		currentcol->blue=0;
-		currentcol->alpha=255;
-	}
+	This functions defines an metric on the RGB color space. The distance
+	between two colors is 0, if and only if the colors are equal.
 
-	// Greens, following indexvals1 - 1
-	for(i=0; i<10; i++,index++)
-	{
-		currentcol=&(palette[index]);
-		currentcol->red=0;
-		currentcol->green=indexvals1[i] - 1;
-		currentcol->blue=0;
-		currentcol->alpha=255;
-	}
-
-	currentcol+=sizeof(rgb_color);
-	currentcol->red=0;
-	currentcol->green=152;
-	currentcol->blue=51;
-	index++;
-
-	currentcol+=sizeof(rgb_color);
-	currentcol->red=255;
-	currentcol->green=255;
-	currentcol->blue=255;
-	index++;
-
-	for(j=1;j<5;j++)
-	{
-		for(i=0;i<6;i++,index++)
-		{
-			currentcol=&(palette[index]);
-			currentcol->red=indexvals2[j];
-			currentcol->green=255;
-			currentcol->blue=indexvals2[i];
-			currentcol->alpha=255;
-		}
-	}
-	
-	for(i=0;i<4;i++,index++)
-	{
-		currentcol=&(palette[index]);
-		currentcol->red=255;
-		currentcol->green=152;
-		currentcol->blue=indexvals2[i];
-		currentcol->alpha=255;
-	}
-	
-
-	currentcol+=sizeof(rgb_color);
-	currentcol->red=255;
-	currentcol->green=102;
-	currentcol->blue=51;
-	index++;
-
-	currentcol+=sizeof(rgb_color);
-	currentcol->red=255;
-	currentcol->green=102;
-	currentcol->blue=0;
-	index++;
-
-	currentcol+=sizeof(rgb_color);
-	currentcol->red=0;
-	currentcol->green=102;
-	currentcol->blue=255;
-	index++;
-
-	currentcol+=sizeof(rgb_color);
-	currentcol->red=0;
-	currentcol->green=102;
-	currentcol->blue=203;
-	index++;
-	
-	// Mostly array runs from here on out
-	for(i=0;i<6;i++,index++)
-	{
-		currentcol=&(palette[index]);
-		currentcol->red=203;
-		currentcol->green=203;
-		currentcol->blue=indexvals2[i];
-		currentcol->alpha=255;
-	}
-	for(i=0;i<6;i++,index++)
-	{
-		currentcol=&(palette[index]);
-		currentcol->red=152;
-		currentcol->green=255;
-		currentcol->blue=indexvals2[i];
-		currentcol->alpha=255;
-	}
-	for(i=0;i<6;i++,index++)
-	{
-		currentcol=&(palette[index]);
-		currentcol->red=102;
-		currentcol->green=255;
-		currentcol->blue=indexvals2[i];
-		currentcol->alpha=255;
-	}
-	for(i=0;i<6;i++,index++)
-	{
-		currentcol=&(palette[index]);
-		currentcol->red=51;
-		currentcol->green=255;
-		currentcol->blue=indexvals2[i];
-		currentcol->alpha=255;
-	}
-	for(i=0;i<6;i++,index++)
-	{
-		currentcol=&(palette[index]);
-		currentcol->red=255;
-		currentcol->green=102;
-		currentcol->blue=indexvals2[i];
-		currentcol->alpha=255;
-	}
-
-	currentcol+=sizeof(rgb_color);
-	currentcol->red=0;
-	currentcol->green=102;
-	currentcol->blue=152;
-	index++;
-
-	currentcol+=sizeof(rgb_color);
-	currentcol->red=0;
-	currentcol->green=102;
-	currentcol->blue=102;
-	index++;
-
-	// knocks out 4 assignment loops at once :)
-	for(j=1;j<5;j++)
-	{
-		for(i=0;i<6;i++,index++)
-		{
-			currentcol=&(palette[index]);
-			currentcol->red=indexvals2[j];
-			currentcol->green=152;
-			currentcol->blue=indexvals2[i];
-			currentcol->alpha=255;
-		}
-	}
-	
-	currentcol+=sizeof(rgb_color);
-	currentcol->red=230;
-	currentcol->green=134;
-	currentcol->blue=0;
-	index++;
-
-	for(i=1;i<6;i++,index++)
-	{
-		currentcol=&(palette[index]);
-		currentcol->red=255;
-		currentcol->green=51;
-		currentcol->blue=indexvals2[i];
-		currentcol->alpha=255;
-	}
-
-	currentcol+=sizeof(rgb_color);
-	currentcol->red=0;
-	currentcol->green=102;
-	currentcol->blue=51;
-	index++;
-
-	currentcol+=sizeof(rgb_color);
-	currentcol->red=0;
-	currentcol->green=102;
-	currentcol->blue=0;
-	index++;
-
-	for(j=1;j<5;j++)
-	{
-		for(i=0;i<6;i++,index++)
-		{
-			currentcol=&(palette[index]);
-			currentcol->red=indexvals2[j];
-			currentcol->green=102;
-			currentcol->blue=indexvals2[i];
-			currentcol->alpha=255;
-		}
-	}
-	
-	for(i=0;i<6;i++,index++)
-	{
-		currentcol=&(palette[index]);
-		currentcol->red=255;
-		currentcol->green=0;
-		currentcol->blue=indexvals2[i];
-		currentcol->alpha=255;
-	}
-
-	currentcol+=sizeof(rgb_color);
-	currentcol->red=255;
-	currentcol->green=175;
-	currentcol->blue=19;
-	index++;
-
-	currentcol+=sizeof(rgb_color);
-	currentcol->red=0;
-	currentcol->green=51;
-	currentcol->blue=255;
-	index++;
-
-	currentcol+=sizeof(rgb_color);
-	currentcol->red=0;
-	currentcol->green=51;
-	currentcol->blue=203;
-	index++;
-
-	for(j=1;j<5;j++)
-	{
-		for(i=0;i<6;i++,index++)
-		{
-			currentcol=&(palette[index]);
-			currentcol->red=indexvals2[j];
-			currentcol->green=51;
-			currentcol->blue=indexvals2[i];
-			currentcol->alpha=255;
-		}
-	}
-	
-	for(i=3;i>=0;i--,index++)
-	{
-		currentcol=&(palette[index]);
-		currentcol->red=255;
-		currentcol->green=203;
-		currentcol->blue=indexvals2[i];
-		currentcol->alpha=255;
-	}
-
-	for(i=2;i<6;i++,index++)
-	{
-		currentcol=&(palette[index]);
-		currentcol->red=0;
-		currentcol->green=51;
-		currentcol->blue=indexvals2[i];
-		currentcol->alpha=255;
-	}
-
-	for(i=0;i<5;i++,index++)
-	{
-		currentcol=&(palette[index]);
-		currentcol->red=203;
-		currentcol->green=0;
-		currentcol->blue=indexvals2[i];
-		currentcol->alpha=255;
-	}
-
-	currentcol+=sizeof(rgb_color);
-	currentcol->red=255;
-	currentcol->green=227;
-	currentcol->blue=70;
-	index++;
-
-	for(j=2;j<6;j++)
-	{
-		for(i=0;i<6;i++,index++)
-		{
-			currentcol=&(palette[index]);
-			currentcol->red=indexvals2[j];
-			currentcol->green=0;
-			currentcol->blue=indexvals2[i];
-			currentcol->alpha=255;
-		}
-	}
-	
-	currentcol+=sizeof(rgb_color);
-	currentcol->red=255;
-	currentcol->green=203;
-	currentcol->blue=51;
-	index++;
-
-	currentcol+=sizeof(rgb_color);
-	currentcol->red=255;
-	currentcol->green=203;
-	currentcol->blue=0;
-	index++;
-
-	for(i=5;i<=0;i--,index++)
-	{
-		currentcol=&(palette[index]);
-		currentcol->red=255;
-		currentcol->green=255;
-		currentcol->blue=indexvals2[i];
-		currentcol->alpha=255;
-	}
-
-}
+	\param red1 Red component of the first color.
+	\param green1 Green component of the first color.
+	\param blue1 Blue component of the first color.
+	\param red2 Red component of the second color.
+	\param green2 Green component of the second color.
+	\param blue2 Blue component of the second color.
+	\return The distance between the given colors.
 */
+static inline
+unsigned
+color_distance(uint8 red1, uint8 green1, uint8 blue1,
+			   uint8 red2, uint8 green2, uint8 blue2)
+{
+	// euklidian distance (its square actually)
+	int rd = (int)red1 - (int)red2;
+	int gd = (int)green1 - (int)green2;
+	int bd = (int)blue1 - (int)blue2;
+//	return rd * rd + gd * gd + bd * bd;
+
+	// distance according to psycho-visual tests
+	int rmean = ((int)red1 + (int)red2) / 2;
+	return (((512 + rmean) * rd * rd) >> 8)
+		   + 4 * gd * gd
+		   + (((767 - rmean) * bd * bd) >> 8);
+}
+
+
 static void
 FillColorMap(const rgb_color *palette, color_map *map)
 {
 	memcpy(map->color_list, palette, sizeof(map->color_list));
-	// TODO: Inversion map, etc.
+	
+	// init index map
+	for (int32 color = 0; color < 32768; color++) {
+		// get components
+		uint8 red = (color & 0x7c00) >> 7;
+		uint8 green = (color & 0x3e0) >> 2;
+		uint8 blue = (color & 0x1f) << 3;
+		red |= red >> 5;
+		green |= green >> 5;
+		blue |= blue >> 5;
+		// find closest color
+		uint8 closestIndex = 0;
+		unsigned closestDistance = UINT_MAX;
+		for (int32 i = 0; i < 256; i++) {
+			const rgb_color &c = map->color_list[i];
+			unsigned distance = color_distance(red, green, blue,
+											   c.red, c.green, c.blue);
+			if (distance < closestDistance) {
+				closestIndex = i;
+				closestDistance = distance;
+			}
+		}
+		map->index_map[color] = closestIndex;
+	}
+	// TODO: Inversion map
 }
 
 
