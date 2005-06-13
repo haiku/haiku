@@ -68,6 +68,16 @@ Media::~Media()
 	be_roster->StopWatching(BMessenger(this)); 
 }
 
+
+status_t
+Media::InitCheck()
+{
+	if (mWindow)
+		return mWindow->InitCheck();
+	return B_OK;
+}
+
+
 // Media::MessageReceived -- handles incoming messages
 void Media::MessageReceived (BMessage *message)
 {
@@ -88,7 +98,8 @@ void Media::MessageReceived (BMessage *message)
 int main(void)
 {
    Media theApp;
-   theApp.Run();
+   if (theApp.InitCheck() == B_OK)
+   	theApp.Run();
    return 0;
 }
 // end ------------------------------------------------------------------------------------------------------ //

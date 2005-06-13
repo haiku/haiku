@@ -1,5 +1,9 @@
 SubDir OBOS_TOP src prefs media ;
 
+if $(TARGET_PLATFORM) != haiku {
+	SubDirC++Flags -fmultiple-symbol-spaces ;
+}
+
 UsePrivateHeaders media ;
 
 Preference Media :
@@ -8,7 +12,7 @@ Preference Media :
 	MediaViews.cpp
 	MediaListItem.cpp
 	MediaAlert.cpp 
-	: libmedia.so be 
+	: libmedia.so be
 	: media.rdef 
 	;
 

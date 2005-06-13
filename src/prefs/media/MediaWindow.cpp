@@ -43,9 +43,17 @@ MediaWindow::MediaWindow(BRect frame)
 : BWindow (frame, "Media", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS),
 	mCurrentNode(NULL),
 	mParamWeb(NULL),
-	mAlert(NULL)
+	mAlert(NULL),
+	mInitCheck(B_OK)
 {
 	InitWindow();
+}
+
+
+status_t
+MediaWindow::InitCheck()
+{
+	return mInitCheck;
 }
 
 
@@ -80,6 +88,7 @@ MediaWindow::~MediaWindow()
 	}
 }
 
+
 void
 MediaWindow::FindNodes(media_type type, uint64 kind, BList &list)
 {
@@ -113,6 +122,7 @@ MediaWindow::FindNodes(media_type type, uint64 kind, BList &list)
 	}
 }
 
+
 MediaListItem *
 MediaWindow::FindMediaListItem(dormant_node_info *info)
 {
@@ -126,6 +136,7 @@ MediaWindow::FindMediaListItem(dormant_node_info *info)
 	return NULL;
 }
 
+
 void
 MediaWindow::AddNodes(BList &list, bool isVideo)
 {
@@ -136,8 +147,10 @@ MediaWindow::AddNodes(BList &list, bool isVideo)
 	}
 }
 
+
 // MediaWindow::InitWindow -- Initialization Commands here
-void MediaWindow::InitWindow(void)
+void 
+MediaWindow::InitWindow(void)
 {	
 	// Bitmaps
 	BRect iconRect(0,0,15,15);
@@ -200,11 +213,12 @@ void MediaWindow::InitWindow(void)
 	
 	mBar = new BarView(barRect);
 	mBox->AddChild(mBar);
-		
-	if(InitMedia(true)!=B_OK)
+	
+	mInitCheck = InitMedia(true);
+	if (mInitCheck != B_OK) {
 		PostMessage(B_QUIT_REQUESTED);
-	else {
-		if(IsHidden())
+	} else {
+		if (IsHidden())
 			Show();
 	}
 }
@@ -348,6 +362,7 @@ MediaWindow::InitMedia(bool first)
 	
 	return B_OK;
 }
+
 
 // MediaWindow::QuitRequested -- Post a message to the app to quit
 bool

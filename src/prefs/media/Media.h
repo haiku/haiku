@@ -29,6 +29,7 @@ class Media : public BApplication
     	Media();
     	~Media();
     	virtual void MessageReceived(BMessage *message);
+	status_t InitCheck();	
 	    	    
 	private:
 		MediaWindow   *mWindow;

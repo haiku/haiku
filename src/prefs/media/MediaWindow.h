@@ -36,7 +36,8 @@ class MediaWindow : public BWindow
 	    ~MediaWindow();
 	    virtual bool QuitRequested();
 	    virtual void MessageReceived(BMessage *message);
-	    virtual void FrameResized(float width, float height); 
+	    virtual void FrameResized(float width, float height);
+	    status_t InitCheck();
 	private:
 		status_t InitMedia(bool first);
 		void FindNodes(media_type type, uint64 kind, BList &list);
@@ -64,6 +65,7 @@ class MediaWindow : public BWindow
 		
 		BList					mIcons;
 		MediaAlert				*mAlert;
+		status_t				mInitCheck;
 };
 
 #endif
