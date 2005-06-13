@@ -288,10 +288,7 @@ AccelerantHWInterface::SetupDefaultHooks()
 	fAccGetTimingConstraints = (get_timing_constraints)fAccelerantHook(B_GET_TIMING_CONSTRAINTS, NULL);
 	fAccProposeDisplayMode = (propose_display_mode)fAccelerantHook(B_PROPOSE_DISPLAY_MODE, NULL);
 
-	fAccFillRect = (fill_rectangle)fAccelerantHook(B_FILL_RECTANGLE, NULL);
-	fAccInvertRect = (invert_rectangle)fAccelerantHook(B_INVERT_RECTANGLE, NULL);
-	fAccScreenBlit = (screen_to_screen_blit)fAccelerantHook(B_SCREEN_TO_SCREEN_BLIT, NULL);
-
+	// cursor
 	fAccSetCursorShape = (set_cursor_shape)fAccelerantHook(B_SET_CURSOR_SHAPE, NULL);
 	fAccMoveCursor = (move_cursor)fAccelerantHook(B_MOVE_CURSOR, NULL);
 	fAccShowCursor = (show_cursor)fAccelerantHook(B_SHOW_CURSOR, NULL);
@@ -415,6 +412,13 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 			memset(fBackBuffer->Bits(), 255, fBackBuffer->BitsLength());
 		}
 	}
+
+	// update acceleration hooks
+	fAccFillRect = (fill_rectangle)fAccelerantHook(B_FILL_RECTANGLE, (void *)&fDisplayMode);
+	fAccInvertRect = (invert_rectangle)fAccelerantHook(B_INVERT_RECTANGLE,
+		(void *)&fDisplayMode);
+	fAccScreenBlit = (screen_to_screen_blit)fAccelerantHook(B_SCREEN_TO_SCREEN_BLIT,
+		(void *)&fDisplayMode);
 
 	return B_OK;
 }
