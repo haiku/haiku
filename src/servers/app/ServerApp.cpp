@@ -1773,7 +1773,23 @@ printf("ServerApp %s: AS_SCREEN_GET_MODE\n", fSignature.String());
 			root->Unlock();
 			break;
 		}
+		
+		case AS_CURRENT_WORKSPACE:
+		{
+			STRACE(("ServerApp %s: get current workspace\n", fSignature.String()));
 
+			// TODO: See above
+			RootLayer *root = gDesktop->ActiveRootLayer();
+			root->Lock();
+			
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<int32>(root->ActiveWorkspaceIndex());
+			fLink.Flush();
+			
+			root->Unlock();
+			break;
+		}
+		
 		default:
 			printf("ServerApp %s received unhandled message code offset %s\n",
 				fSignature.String(), MsgCodeToBString(code).String());
