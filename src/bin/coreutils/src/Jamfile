@@ -126,3 +126,7 @@ BinCommand sha1sum :
 
 BinCommand vdir : 
 	ls.c ls-vdir.c : libfetish.a : $(coreutils_rsrc) ;
+
+MakeLocate groups : $(OBOS_BIN_DIR) ;
+Shell groups : groups.sh ;
+
