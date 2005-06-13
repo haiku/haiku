@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -20,19 +20,13 @@
 //	DEALINGS IN THE SOFTWARE.
 //
 //	File Name:		SystemPalette.cpp
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
+//	Authors:		DarkWyrm <bpmagic@columbus.rr.com>
+//					Stefano Ceccherini <burton666@libero.it>
 //	Description:	One global function to generate the palette which is 
 //					the default BeOS System palette and the variable to go with it	
 //  
 //------------------------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
-#include "SystemPalette.h"
-
-
-// TODO: BWindowScreen has a method to set the palette.
-// maybe we should have a lock to protect this variable.
-static color_map sColorMap;
+#include <SystemPalette.h>
 
 const static rgb_color kSystemPalette[] = {
  {   0,   0,   0, 255 }, {   8,   8,   8, 255 }, {  16,  16,  16, 255 },
@@ -124,6 +118,11 @@ const static rgb_color kSystemPalette[] = {
 };
 
 
+// TODO: BWindowScreen has a method to set the palette.
+// maybe we should have a lock to protect this variable.
+static color_map sColorMap;
+
+
 // color_distance
 /*!	\brief Returns the "distance" between two RGB colors.
 
@@ -143,17 +142,20 @@ unsigned
 color_distance(uint8 red1, uint8 green1, uint8 blue1,
 			   uint8 red2, uint8 green2, uint8 blue2)
 {
-	// euklidian distance (its square actually)
 	int rd = (int)red1 - (int)red2;
 	int gd = (int)green1 - (int)green2;
 	int bd = (int)blue1 - (int)blue2;
-//	return rd * rd + gd * gd + bd * bd;
 
 	// distance according to psycho-visual tests
 	int rmean = ((int)red1 + (int)red2) / 2;
+#if 0
 	return (((512 + rmean) * rd * rd) >> 8)
 		   + 4 * gd * gd
 		   + (((767 - rmean) * bd * bd) >> 8);
+#endif
+	return (2 + rmean / 256) * rd * rd
+			+ 4 * gd * gd
+			+ (2 + (255 - rmean) / 256) * bd * bd;
 }
 
 
@@ -192,6 +194,7 @@ InvertColor(const rgb_color &color)
 	inverted.red = 255 - color.red;
 	inverted.green = 255 - color.green;
 	inverted.blue = 255 - color.blue;
+	inverted.alpha = 255;
 	
 	return inverted;
 }
@@ -213,8 +216,7 @@ FillColorMap(const rgb_color *palette, color_map *map)
 		rgbColor.green |= rgbColor.green >> 5;
 		rgbColor.blue |= rgbColor.blue >> 5;
 		
-		uint8 closestIndex = FindClosestColor(rgbColor, palette);
-		map->index_map[color] = closestIndex;
+		map->index_map[color] = FindClosestColor(rgbColor, palette);
 	}
 	
 	// init inversion map
