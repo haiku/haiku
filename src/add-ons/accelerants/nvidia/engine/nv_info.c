@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-5/2005
+   Rudolf Cornelissen 7/2003-6/2005
 */
 
 #define MODULE_BIT 0x00002000
@@ -1916,10 +1916,10 @@ static void	setup_ram_config_nv10_up(uint8* rom)
 		/* reset first RAM adress */
 		((uint32 *)si->framebuffer)[0x00] = 0x00000000;
 		/* dummyread first RAM adress four times */
-		dummy = ((uint32 *)si->framebuffer)[0x00];
-		dummy = ((uint32 *)si->framebuffer)[0x00];
-		dummy = ((uint32 *)si->framebuffer)[0x00];
-		dummy = ((uint32 *)si->framebuffer)[0x00];
+		dummy = ((volatile uint32 *)si->framebuffer)[0x00];
+		dummy = ((volatile uint32 *)si->framebuffer)[0x00];
+		dummy = ((volatile uint32 *)si->framebuffer)[0x00];
+		dummy = ((volatile uint32 *)si->framebuffer)[0x00];
 		/* check testpattern to have survived */
 		if (((uint32 *)si->framebuffer)[(data >> 2)] == 0x4e564441) stat = B_OK;
 		cnt++;
@@ -1958,13 +1958,13 @@ static void	setup_ram_config_nv28(uint8* rom)
 		/* reset first RAM adress */
 		((uint32 *)si->framebuffer)[0x00000000] = 0x00000000;
 		/* dummyread first RAM adress four times */
-		dummy = ((uint32 *)si->framebuffer)[0x00000000];
+		dummy = ((volatile uint32 *)si->framebuffer)[0x00000000];
 		LOG(8,("INFO: (#%d) dummy1 = $%08x, ", cnt, dummy));
-		dummy = ((uint32 *)si->framebuffer)[0x00000000];
+		dummy = ((volatile uint32 *)si->framebuffer)[0x00000000];
 		LOG(8,("dummy2 = $%08x, ", dummy));
-		dummy = ((uint32 *)si->framebuffer)[0x00000000];
+		dummy = ((volatile uint32 *)si->framebuffer)[0x00000000];
 		LOG(8,("dummy3 = $%08x, ", dummy));
-		dummy = ((uint32 *)si->framebuffer)[0x00000000];
+		dummy = ((volatile uint32 *)si->framebuffer)[0x00000000];
 		LOG(8,("dummy4 = $%08x\n", dummy));
 		/* check testpattern to have survived */
 		if (((uint32 *)si->framebuffer)[0x01fc0000] == 0x4e564441) stat = B_OK;

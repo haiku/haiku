@@ -1264,7 +1264,7 @@ static void nv_start_dma(void)
 		else
 		{
 			/* dummy read the first adress of the framebuffer to flush MTRR-WC buffers */
-			dummy = *((uint32 *)(si->framebuffer));
+			dummy = *((volatile uint32 *)(si->framebuffer));
 		}
 
 		/* actually start DMA to execute all commands now in buffer */
