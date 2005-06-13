@@ -148,18 +148,13 @@ color_distance(uint8 red1, uint8 green1, uint8 blue1,
 
 	// distance according to psycho-visual tests
 	int rmean = ((int)red1 + (int)red2) / 2;
-#if 0
-	return (((512 + rmean) * rd * rd) >> 8)
-		   + 4 * gd * gd
-		   + (((767 - rmean) * bd * bd) >> 8);
-#endif
 	return (2 + rmean / 256) * rd * rd
 			+ 4 * gd * gd
 			+ (2 + (255 - rmean) / 256) * bd * bd;
 }
 
 
-static unsigned
+static uint8
 FindClosestColor(const rgb_color &color, const rgb_color *palette)
 {
 	// TODO: This isn't working 100% correctly.
@@ -173,7 +168,7 @@ FindClosestColor(const rgb_color &color, const rgb_color *palette)
 		unsigned distance = color_distance(color.red, color.green, color.blue,
 										   c.red, c.green, c.blue);
 		if (distance < closestDistance) {
-			closestIndex = i;
+			closestIndex = (uint8)i;
 			closestDistance = distance;
 		}
 	}
@@ -212,9 +207,6 @@ FillColorMap(const rgb_color *palette, color_map *map)
 		rgbColor.red = (color & 0x7c00) >> 7;
 		rgbColor.green = (color & 0x3e0) >> 2;
 		rgbColor.blue = (color & 0x1f) << 3;
-		rgbColor.red |= rgbColor.red >> 5;
-		rgbColor.green |= rgbColor.green >> 5;
-		rgbColor.blue |= rgbColor.blue >> 5;
 		
 		map->index_map[color] = FindClosestColor(rgbColor, palette);
 	}
@@ -222,8 +214,7 @@ FillColorMap(const rgb_color *palette, color_map *map)
 	// init inversion map
 	for (int32 index = 0; index < 256; index++) {
 		rgb_color inverted = InvertColor(map->color_list[index]);
-		uint8 closestIndex = FindClosestColor(inverted, palette);
-		map->inversion_map[index] = closestIndex;		
+		map->inversion_map[index] = FindClosestColor(inverted, palette);	
 	}
 }
 
