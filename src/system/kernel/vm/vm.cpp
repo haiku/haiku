@@ -17,6 +17,7 @@
 #include <vm_store_anonymous_noswap.h>
 #include <vm_store_device.h>
 #include <vm_store_null.h>
+#include <vm_low_memory.h>
 #include <file_cache.h>
 #include <memheap.h>
 #include <debug.h>
@@ -53,6 +54,7 @@
 
 #define ROUNDUP(a, b) (((a) + ((b)-1)) & ~((b)-1))
 #define ROUNDOWN(a, b) (((a) / (b)) * (b))
+
 
 extern vm_address_space *kernel_aspace;
 
@@ -2237,6 +2239,7 @@ vm_init_post_thread(kernel_args *args)
 {
 	vm_page_init_post_thread(args);
 	vm_daemon_init();
+	vm_low_memory_init();
 
 	return heap_init_post_thread(args);
 }
@@ -2590,7 +2593,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 		}
 	}
 
-	err = 0;
+	err = B_OK;
 	acquire_sem_etc(map->sem, READ_COUNT, 0, 0);
 	if (change_count != map->change_count) {
 		// something may have changed, see if the address is still valid
@@ -2603,7 +2606,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 		}
 	}
 
-	if (err == 0) {
+	if (err == B_OK) {
 		// All went fine, all there is left to do is to map the page into the address space
 
 		// If the page doesn't reside in the area's cache, we need to make sure it's
