@@ -1,5 +1,5 @@
 /* Nvidia TNT and GeForce Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/2002-9/2004 */
+/* Written by Rudolf Cornelissen 05/2002-6/2005 */
 
 #define MODULE_BIT 0x00000200
 
@@ -417,6 +417,9 @@ status_t nv_bes_init()
 		BESW(NV10_0BRICON, ((0x1000 << 16) | 0x1000));
 		BESW(NV10_0SAT, ((0x0000 << 16) | 0x1000));
 	}
+
+	/* make sure the engine is disabled. */
+	nv_release_bes();
 
 	return B_OK;
 }

@@ -10,6 +10,48 @@
 
 #define MODULE_BIT 0x00080000
 
+/* 3D command defines (needed for concurrent overlay/3D 'workaround')
+ * note:
+ * the workaround contains of two pieces:
+ * - we have to issue a 3D drawing command before overlay is activated to prevent
+ *   the acceleration engine to crash;
+ * - we have to forego FIFO assignment switching: switching while we use overlay
+ *   crashes the acceleration engine as well.
+ *
+ * Hopefully we can find the _real_ solution for this one day... */
+#define RIVA_STATE3D_05(t0, t1, t2, bb, cc) \
+{ \
+	nv_acc_cmd_dma(NV4_DX5_TEXTURE_TRIANGLE, NV4_DX5_TEXTURE_TRIANGLE_COLORKEY, 7); \
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0; /* Colorkey */ \
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = t0; /* Offset */ \
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = t1; /* Format */ \
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = t2; /* Filter */ \
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = bb; /* Blend */ \
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = cc; /* Control */ \
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0; /* FogColor */ \
+}
+
+#define RIVA_VERTEX3D_05(ii, xx, yy) \
+{ \
+	nv_acc_cmd_dma(NV4_DX5_TEXTURE_TRIANGLE, NV4_DX5_TEXTURE_TRIANGLE_TLVERTEX(ii), 8); \
+	((float *)(si->dma_buffer))[si->engine.dma.current++] = xx; /* ScreenX */ \
+	((float *)(si->dma_buffer))[si->engine.dma.current++] = yy; /* ScreenY */ \
+	((float *)(si->dma_buffer))[si->engine.dma.current++] = 0.0f; /* ScreenZ */ \
+	((float *)(si->dma_buffer))[si->engine.dma.current++] = 1.0f; /* RWH */ \
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0; /* Color */ \
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0; /* Specular */ \
+	((float *)(si->dma_buffer))[si->engine.dma.current++] = 0.0f; /* TU */ \
+	((float *)(si->dma_buffer))[si->engine.dma.current++] = 0.0f; /* TV */ \
+}
+
+#define RIVA_DRAWQUAD3D_05(v0, v1, v2, v3) \
+{ \
+	nv_acc_cmd_dma(NV4_DX5_TEXTURE_TRIANGLE, NV4_DX5_TEXTURE_TRIANGLE_TLVDRAWPRIM(0), 1); \
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = \
+		(((v3)<<20)|((v2)<<16)|((v0)<<12)|((v2)<<8)|((v1)<<4)|(v0)); /* TLVDrawPrim */ \
+}
+
+
 #include "nv_std.h"
 
 /*acceleration notes*/
@@ -860,7 +902,11 @@ status_t nv_acc_init_dma()
 	si->engine.fifo.handle[3] = NV4_SURFACE; /* NV10_CONTEXT_SURFACES_2D is identical */
 	si->engine.fifo.handle[4] = NV_IMAGE_BLIT;
 	si->engine.fifo.handle[5] = NV4_GDI_RECTANGLE_TEXT;
-	si->engine.fifo.handle[6] = NV1_RENDER_SOLID_LIN;
+//fixme: nolonger switching FIFO assignment for 3D as doing that causes trouble when
+//overlay is concurrently active!!!!
+//we can forego switching for now as we had FIFO CH6 still unused...
+//(note btw: switching has no noticable slowdown: measured 0.2% with Quake2)
+	si->engine.fifo.handle[6] = NV4_CONTEXT_SURFACES_ARGB_ZS;//NV1_RENDER_SOLID_LIN;
 	si->engine.fifo.handle[7] = NV4_DX5_TEXTURE_TRIANGLE;
 	/* preset no FIFO channels assigned to cmd's */
 	for (cnt = 0; cnt < 0x20; cnt++)
@@ -919,7 +965,7 @@ status_t nv_acc_init_dma()
 	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH1, si->engine.fifo.handle[1]);
 	/* Pattern: */
 	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH2, si->engine.fifo.handle[2]);
-	/* 2D Surface: */
+	/* 2D Surfaces: */
 	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH3, si->engine.fifo.handle[3]);
 	/* Blit: */
 	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH4, si->engine.fifo.handle[4]);
@@ -927,7 +973,7 @@ status_t nv_acc_init_dma()
 	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH5, si->engine.fifo.handle[5]);
 	if (si->ps.card_arch < NV40A)
 	{
-		/* Line: (not used or 3D only?) */
+		/* 3D surfaces: (3D related only) */
 		nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH6, si->engine.fifo.handle[6]);
 		/* Textured Triangle: (3D only) */
 		nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH7, si->engine.fifo.handle[7]);
@@ -992,6 +1038,39 @@ status_t nv_acc_init_dma()
 	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0xffffffff; /* SetColor1 */
 	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0xffffffff; /* SetPattern[0] */
 	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0xffffffff; /* SetPattern[1] */
+
+	/* concurrent overlay/3D 'workaround':
+	 * we _must_ execute a 3D command before overlay is started to prevent a hard
+	 * engine crash! Drawing a small rectangle (Z-only) containing rubbish. */
+	/* note:
+	 * 3D only works on pre-NV20 currently... */
+	if (si->ps.card_arch < NV20A)
+	{
+		/* wait for room in fifo for 3D 'workaround' cmd if needed */
+		if (nv_acc_fifofree_dma(50) != B_OK) return B_ERROR;
+
+		/* setup fake 3D surfaces: */
+		nv_acc_cmd_dma(NV4_CONTEXT_SURFACES_ARGB_ZS, NV4_CONTEXT_SURFACES_ARGB_ZS_PITCH, 3);
+		/* Set minimum pitch (granularity) required by hardware */
+		((uint32*)(si->dma_buffer))[si->engine.dma.current++] =	64 | (64 << 16); /* Pitches */
+		/* Place colorbuffer in Desktop */
+		((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 
+			((uint32)si->fbc.frame_buffer - (uint32)si->framebuffer); /* SetOffsetColor */
+		/* Place Z-buffer in Desktop */
+		((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
+			((uint32)si->fbc.frame_buffer - (uint32)si->framebuffer); /* SetOffsetZeta */
+
+		/* Set a valid 3D state (write Z-buffer only): texture is in Desktop */
+		RIVA_STATE3D_05(((uint32)si->fbc.frame_buffer - (uint32)si->framebuffer),
+			0x11221551, 0x11000000, 0x21100162, 0x41186800);
+		/* Enter a small two dimensional quad */
+		RIVA_VERTEX3D_05(0, 0, 0);
+		RIVA_VERTEX3D_05(1, 16, 0);
+		RIVA_VERTEX3D_05(2, 16, 16);
+		RIVA_VERTEX3D_05(3, 0, 16);
+		/* Render quad */
+		RIVA_DRAWQUAD3D_05(0, 1, 2, 3);
+	}
 
 	/* tell the engine to fetch and execute all (new) commands in the DMA buffer */
 	nv_start_dma();
