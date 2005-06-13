@@ -9,7 +9,7 @@
 #include <util/kernel_cpp.h>
 #include <thread.h>
 #include <file_cache.h>
-#include <fd.h>
+#include <fs/fd.h>
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -206,8 +206,9 @@ log_writer_daemon(void *arg, int /*iteration*/)
 					break;
 			}
 
-			if (write(sLogFile, line, length) != length) {
-				dprintf("log: must drop log entries!\n");
+			ssize_t written = write(sLogFile, line, length);
+			if (written != length) {
+				dprintf("log: must drop log entries: %ld, %s!\n", written, strerror(written));
 				break;
 			}
 		}
@@ -236,6 +237,8 @@ log_writer_daemon(void *arg, int /*iteration*/)
 static void
 uninit_log(void)
 {
+	TRACE(("** log uninit - \n"));
+
 	unregister_kernel_daemon(log_writer_daemon, NULL);
 
 	log_writer_daemon((void *)true, 0);
