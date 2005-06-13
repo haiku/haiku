@@ -657,17 +657,35 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &link)
 			break;
 		}
 	
+		case AS_CURRENT_WORKSPACE:
+		{
+			STRACE(("ServerApp %s: get current workspace\n", fSignature.String()));
+
+			// TODO: Locking this way is not nice
+			RootLayer *root = gDesktop->ActiveRootLayer();
+			root->Lock();
+			
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<int32>(root->ActiveWorkspaceIndex());
+			fLink.Flush();
+			
+			root->Unlock();
+			break;
+		}
+		
 		case AS_ACTIVATE_WORKSPACE:
 		{
-			STRACE(("ServerApp %s: Activate Workspace UNIMPLEMETED\n",fSignature.String()));
+			STRACE(("ServerApp %s: activate workspace\n", fSignature.String()));
 			
-			// Attached data
-			// 1) int32 workspace index
-			
-			// Error-checking is done in ActivateWorkspace, so this is a safe call
-			int32 workspace;
-			link.Read<int32>(&workspace);
-			
+			// TODO: See above
+			int32 index;
+			link.Read<int32>(&index);
+			RootLayer *root = gDesktop->ActiveRootLayer();
+			root->Lock();
+			root->SetActiveWorkspace(index);
+			root->Unlock();
+			// no reply
+		
 			break;
 		}
 		
@@ -1773,23 +1791,7 @@ printf("ServerApp %s: AS_SCREEN_GET_MODE\n", fSignature.String());
 			root->Unlock();
 			break;
 		}
-		
-		case AS_CURRENT_WORKSPACE:
-		{
-			STRACE(("ServerApp %s: get current workspace\n", fSignature.String()));
-
-			// TODO: See above
-			RootLayer *root = gDesktop->ActiveRootLayer();
-			root->Lock();
-			
-			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<int32>(root->ActiveWorkspaceIndex());
-			fLink.Flush();
-			
-			root->Unlock();
-			break;
-		}
-		
+				
 		default:
 			printf("ServerApp %s received unhandled message code offset %s\n",
 				fSignature.String(), MsgCodeToBString(code).String());

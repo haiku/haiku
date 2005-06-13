@@ -574,13 +574,12 @@ set_workspace_count(int32 count)
 _IMPEXP_BE int32
 current_workspace()
 {
-	int32 index = 1;
+	int32 index = 0;
 	
 	BAppServerLink link;
 	int32 code;
-	link.StartMessage(AS_CURRENT_WORKSPACE);
-	link.FlushWithReply(&code);
-	if(code==SERVER_TRUE)
+	link.StartMessage(AS_CURRENT_WORKSPACE);	
+	if (link.FlushWithReply(&code) == B_OK && code == SERVER_TRUE)
 		link.Read<int32>(&index);
 	
 	return index;
