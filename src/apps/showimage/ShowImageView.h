@@ -41,6 +41,8 @@
 
 // delay scaling operation, so that a sequence of zoom in/out operations works smoother
 #define DELAYED_SCALING 1
+// width of the black border stroked arround the bitmap
+#define PEN_SIZE 1.0f
 
 class ShowImageView : public BView {
 public:
@@ -195,6 +197,8 @@ private:
 	void ShowPopUpMenu(BPoint screen);
 	void SettingsSetBool(const char* name, bool value);
 	void SetIcon(bool clear, icon_size which);
+	void ToggleSlideShow();
+	void ExitFullScreen();
 	
 	BMessenger fTrackerMessenger; // of the window that this was launched from
 	entry_ref fCurrentRef; // of the image

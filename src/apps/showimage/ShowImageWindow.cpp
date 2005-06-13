@@ -302,21 +302,21 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 	pmenu = fBrowseMenu = new BMenu("Browse");
 	AddItemMenu(pmenu, "First Page", MSG_PAGE_FIRST, B_LEFT_ARROW, B_SHIFT_KEY, 'W', true);
 	AddItemMenu(pmenu, "Last Page", MSG_PAGE_LAST, B_RIGHT_ARROW, B_SHIFT_KEY, 'W', true);
-	AddItemMenu(pmenu, "Next Page", MSG_PAGE_NEXT, B_RIGHT_ARROW, 0, 'W', true);
 	AddItemMenu(pmenu, "Previous Page", MSG_PAGE_PREV, B_LEFT_ARROW, 0, 'W', true);
+	AddItemMenu(pmenu, "Next Page", MSG_PAGE_NEXT, B_RIGHT_ARROW, 0, 'W', true);
 	fGoToPageMenu = new BMenu("Go To Page");
 	fGoToPageMenu->SetRadioMode(true);
 	pmenu->AddItem(fGoToPageMenu);
 	pmenu->AddSeparatorItem();
-	AddItemMenu(pmenu, "Next File", MSG_FILE_NEXT, B_DOWN_ARROW, 0, 'W', true);
 	AddItemMenu(pmenu, "Previous File", MSG_FILE_PREV, B_UP_ARROW, 0, 'W', true);	
+	AddItemMenu(pmenu, "Next File", MSG_FILE_NEXT, B_DOWN_ARROW, 0, 'W', true);
 	pbar->AddItem(pmenu);
 
 	pmenu = new BMenu("Image");
 	AddItemMenu(pmenu, "Dither Image", MSG_DITHER_IMAGE, 0, 0, 'W', true);
 	pmenu->AddSeparatorItem();
-	AddItemMenu(pmenu, "Rotate +90°", MSG_ROTATE_90, ']', 0, 'W', true);	
 	AddItemMenu(pmenu, "Rotate -90°", MSG_ROTATE_270, '[', 0, 'W', true);
+	AddItemMenu(pmenu, "Rotate +90°", MSG_ROTATE_90, ']', 0, 'W', true);	
 	pmenu->AddSeparatorItem();
 	AddItemMenu(pmenu, "Mirror Vertical", MSG_MIRROR_VERTICAL, 0, 0, 'W', true);
 	AddItemMenu(pmenu, "Mirror Horizontal", MSG_MIRROR_HORIZONTAL, 0, 0, 'W', true);
@@ -365,9 +365,6 @@ ShowImageWindow::WindowRedimension(BBitmap *pbitmap)
 {
 	BScreen screen;
 	BRect r(pbitmap->Bounds());
-	float width, height;
-	float maxWidth, maxHeight;
-	float minW, maxW, minH, maxH;
 	const float windowBorderWidth = 5;
 	const float windowBorderHeight = 5;
 	
@@ -375,15 +372,16 @@ ShowImageWindow::WindowRedimension(BBitmap *pbitmap)
 		return; // invalid screen object
 	}
 	
-	width = r.Width() + B_V_SCROLL_BAR_WIDTH;
-	height = r.Height() + 1 + fBar->Frame().Height() + B_H_SCROLL_BAR_HEIGHT;
+	float width = r.Width() + 2 * PEN_SIZE + B_V_SCROLL_BAR_WIDTH;
+	float height = r.Height() + 2 * PEN_SIZE + 1 + fBar->Frame().Height() + B_H_SCROLL_BAR_HEIGHT;
 
 	// dimensions so that window does not reach outside of screen	
-	maxWidth = screen.Frame().Width() + 1 - windowBorderWidth - Frame().left;
-	maxHeight = screen.Frame().Height() + 1 - windowBorderHeight - Frame().top;
+	float maxWidth = screen.Frame().Width() + 1 - windowBorderWidth - Frame().left;
+	float maxHeight = screen.Frame().Height() + 1 - windowBorderHeight - Frame().top;
 	
 	// We have to check size limits manually, otherwise
 	// menu bar will be too short for small images.
+	float minW, maxW, minH, maxH;
 	GetSizeLimits(&minW, &maxW, &minH, &maxH); 
 	if (maxWidth > maxW) maxWidth = maxW;
 	if (maxHeight > maxH) maxHeight = maxH;
@@ -739,6 +737,10 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 		case MSG_FULL_SCREEN:
 			ToggleFullScreen();
 			break;
+		case MSG_EXIT_FULL_SCREEN:
+			if (fFullScreen)
+				ToggleFullScreen();
+			break;
 		case MSG_SHOW_CAPTION:
 			fShowCaption = ToggleMenuItem(pmsg->what);
 			settings = my_app->Settings();
@@ -911,7 +913,11 @@ ShowImageWindow::ToggleFullScreen()
 		frame = fWindowFrame;
 
 		SetFlags(Flags() & ~(B_NOT_RESIZABLE | B_NOT_MOVABLE));
-		fImageView->SetAlignment(B_ALIGN_LEFT, B_ALIGN_TOP);
+// NOTE: I changed this to not use left/top alignment at all, because
+// I have no idea why it would be useful. The layouting is much more
+// predictable now. -Stephan
+//		fImageView->SetAlignment(B_ALIGN_LEFT, B_ALIGN_TOP);
+		fImageView->SetAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE);
 	}
 	fImageView->SetBorder(!fFullScreen);
 	fImageView->SetShowCaption(fFullScreen && fShowCaption);
@@ -1080,5 +1086,12 @@ ShowImageWindow::Quit()
 	// tell the app to forget about this window
 	be_app->PostMessage(MSG_WINDOW_QUIT);
 	BWindow::Quit();
+}
+
+void
+ShowImageWindow::Zoom(BPoint origin, float width, float height)
+{
+	// just go into fullscreen
+	ToggleFullScreen();
 }
 

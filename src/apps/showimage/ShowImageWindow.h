@@ -63,6 +63,7 @@ public:
 	virtual void MessageReceived(BMessage *pmsg);
 	virtual bool QuitRequested();
 	virtual void Quit();
+	virtual	void Zoom(BPoint origin, float width, float height);
 	
 	status_t InitCheck();
 	ShowImageView *GetShowImageView() const { return fImageView; }

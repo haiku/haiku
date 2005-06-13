@@ -28,6 +28,8 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <new>
+
 #include <Debug.h>
 #include <Message.h>
 #include <ScrollBar.h>
@@ -68,7 +70,6 @@
 #define SHOW_IMAGE_ORIENTATION_ATTRIBUTE "ShowImage:orientation"
 #define BORDER_WIDTH 16
 #define BORDER_HEIGHT 16
-#define PEN_SIZE 1.0f
 const rgb_color kBorderColor = { 0, 0, 0, 255 };
 
 enum ShowImageView::image_orientation 
@@ -193,8 +194,8 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fShrinkToBounds = false;
 	fZoomToBounds = false;
 	fHasBorder = true;
-	fHAlignment = B_ALIGN_LEFT;
-	fVAlignment = B_ALIGN_TOP;
+	fHAlignment = B_ALIGN_CENTER;
+	fVAlignment = B_ALIGN_MIDDLE;
 	fSlideShow = false;
 	fSlideShowDelay = 3 * 10; // 3 seconds
 	fShowCaption = false;
@@ -512,6 +513,10 @@ ShowImageView::SetBorder(bool hasBorder)
 {
 	if (fHasBorder != hasBorder) {
 		fHasBorder = hasBorder;
+		if (fHasBorder)
+			SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		else
+			SetLowColor(0, 0, 0, 255);
 		FixupScrollBars();
 		Invalidate();
 	}
@@ -520,9 +525,7 @@ ShowImageView::SetBorder(bool hasBorder)
 void 
 ShowImageView::SetAlignment(alignment horizontal, vertical_alignment vertical)
 {
-	bool hasChanged;
-	hasChanged = fHAlignment != horizontal || fVAlignment != vertical;
-	if (hasChanged) {
+	if (fHAlignment != horizontal || fVAlignment != vertical) {
 		fHAlignment = horizontal;
 		fVAlignment = vertical;
 		FixupScrollBars();
@@ -539,36 +542,32 @@ ShowImageView::GetBitmap()
 void
 ShowImageView::GetName(BString *name)
 {
-	*name = "";
 	BEntry entry(&fCurrentRef);
-	if (entry.InitCheck() == B_OK) {
-		char n[B_FILE_NAME_LENGTH];
-		if (entry.GetName(n) == B_OK) {
-			name->SetTo(n);
-		}
-	}		
+	char n[B_FILE_NAME_LENGTH];
+	if (entry.InitCheck() >= B_OK && entry.GetName(n) >= B_OK) {
+		name->SetTo(n);
+	} else {
+		*name = "";
+	}
 }
 
 void
 ShowImageView::GetPath(BString *name)
 {
-	*name = "";
 	BEntry entry(&fCurrentRef);
-	if (entry.InitCheck() == B_OK) {
-		BPath path;
-		entry.GetPath(&path);
-		if (path.InitCheck() == B_OK) {
-			name->SetTo(path.Path());
-		}
-	}		
+	BPath path;
+	if (entry.InitCheck() >= B_OK && entry.GetPath(&path) >= B_OK) {
+		name->SetTo(path.Path());
+	} else {
+		*name = "";
+	}
 }
 
 void
 ShowImageView::FlushToLeftTop()
 {
 	BRect rect = AlignBitmap();
-	BPoint p(rect.left, rect.top);
-	ScrollTo(p);
+	ScrollTo(rect.LeftTop());
 }
 
 void
@@ -591,26 +590,33 @@ BRect
 ShowImageView::AlignBitmap()
 {
 	BRect rect(fBitmap->Bounds());
-	float width, height;
-	width = Bounds().Width()-2*PEN_SIZE+1;
-	height = Bounds().Height()-2*PEN_SIZE+1;
-	if (width == 0 || height == 0) return rect;
-	fShrinkOrZoomToBounds = fShrinkToBounds && 
-		(rect.Width() >= Bounds().Width() || rect.Height() >= Bounds().Height()) ||
-		fZoomToBounds && rect.Width() < Bounds().Width() && rect.Height() < Bounds().Height();
+
+	// the width/height of the bitmap (in pixels)
+	float bitmapWidth = rect.Width() + 1.0;
+	float bitmapHeight = rect.Height() + 1.0;
+
+	// the available width/height for layouting the bitmap (in pixels)
+	float width = Bounds().Width() - 2 * PEN_SIZE + 1.0;
+	float height = Bounds().Height() - 2 * PEN_SIZE + 1.0;
+
+	if (width == 0 || height == 0)
+		return rect;
+
+	fShrinkOrZoomToBounds = (fShrinkToBounds && 
+		(bitmapWidth >= width || bitmapHeight >= height)) ||
+		(fZoomToBounds && (bitmapWidth < width && bitmapHeight < height));
 	if (fShrinkOrZoomToBounds) {
-		float s;
-		s = width / (rect.Width()+1.0);
-			
-		if (s * (rect.Height()+1.0) <= height) {
-			rect.right = width-1;
-			rect.bottom = static_cast<int>(s * (rect.Height()+1.0))-1;
+		float s = width / bitmapWidth;
+
+		if (s * bitmapHeight <= height) {
+			rect.right = width - 1;
+			rect.bottom = static_cast<int>(s * bitmapHeight) - 1;
 			// center vertically
 			rect.OffsetBy(0, static_cast<int>((height - rect.Height()) / 2));
 		} else {
-			s = height / (rect.Height()+1.0);
-			rect.right = static_cast<int>(s * (rect.Width()+1.0))-1;
-			rect.bottom = height-1;
+			s = height / bitmapHeight;
+			rect.right = static_cast<int>(s * bitmapWidth) - 1;
+			rect.bottom = height - 1;
 			// center horizontally
 			rect.OffsetBy(static_cast<int>((width - rect.Width()) / 2), 0);
 		}
@@ -623,34 +629,40 @@ ShowImageView::AlignBitmap()
 			zoom = fZoom;
 		}
 		// zoom image
-		rect.right = static_cast<int>((rect.right+1.0)*zoom)-1; 
-		rect.bottom = static_cast<int>((rect.bottom+1.0)*zoom)-1;
+		rect.right = floorf(bitmapWidth * zoom) - 1; 
+		rect.bottom = floorf(bitmapHeight * zoom) - 1;
 		// align
 		switch (fHAlignment) {
 			case B_ALIGN_CENTER:
-				if (width > rect.Width()) {
-					rect.OffsetBy((width - rect.Width()) / 2.0, 0);
+				if (width > bitmapWidth) {
+					rect.OffsetBy((width - bitmapWidth) / 2.0, 0);
 					break;
 				}
 				// fall through
 			default:
 			case B_ALIGN_LEFT:
 				if (fHasBorder) {
-					rect.OffsetBy(BORDER_WIDTH, 0);
+					float border = min_c(BORDER_WIDTH, width - bitmapWidth);
+					if (border < 0)
+						border = 0;
+					rect.OffsetBy(border, 0);
 				}
 				break;
 		}
 		switch (fVAlignment) {
 			case B_ALIGN_MIDDLE:
-				if (height > rect.Height()) {
-					rect.OffsetBy(0, (height - rect.Height()) / 2.0);
+				if (height > bitmapHeight) {
+					rect.OffsetBy(0, (height - bitmapHeight) / 2.0);
 				break;
 				}
 				// fall through
 			default:
 			case B_ALIGN_TOP:
 				if (fHasBorder) {
-					rect.OffsetBy(0, BORDER_WIDTH);
+					float border = min_c(BORDER_WIDTH, height - bitmapHeight);
+					if (border < 0)
+						border = 0;
+					rect.OffsetBy(0, border);
 				}
 				break;
 		}
@@ -884,17 +896,7 @@ ShowImageView::ConstrainToImage(BPoint &point)
 void
 ShowImageView::ConstrainToImage(BRect &rect)
 {
-	BRect bounds = fBitmap->Bounds();
-	BPoint leftTop, rightBottom;
-	
-	leftTop = rect.LeftTop();
-	leftTop.ConstrainTo(bounds);
-	
-	rightBottom = rect.RightBottom();
-	rightBottom.ConstrainTo(bounds);
-
-	rect.SetLeftTop(leftTop);
-	rect.SetRightBottom(rightBottom);
+	rect = rect & fBitmap->Bounds();
 }
 
 BBitmap*
@@ -902,8 +904,11 @@ ShowImageView::CopyFromRect(BRect srcRect)
 {	
 	BRect rect(0, 0, srcRect.Width(), srcRect.Height());
 	BView view(rect, NULL, B_FOLLOW_NONE, B_WILL_DRAW);
-	BBitmap *bitmap = new BBitmap(rect, fBitmap->ColorSpace(), true);
-	if (bitmap == NULL) return NULL;
+	BBitmap *bitmap = new(nothrow) BBitmap(rect, fBitmap->ColorSpace(), true);
+	if (bitmap == NULL || !bitmap->IsValid()) {
+		delete bitmap;
+		return NULL;
+	}
 	
 	if (bitmap->Lock()) {
 		bitmap->AddChild(&view);
@@ -930,8 +935,11 @@ ShowImageView::CopySelection(uchar alpha, bool imageSize)
 		rect.bottom = floorf((rect.bottom + 1.0) * fScaleY - 1.0);
 	}
 	BView view(rect, NULL, B_FOLLOW_NONE, B_WILL_DRAW);
-	BBitmap *bitmap = new BBitmap(rect, hasAlpha ? B_RGBA32 : fBitmap->ColorSpace(), true);
-	if (bitmap == NULL) return NULL;
+	BBitmap *bitmap = new(nothrow) BBitmap(rect, hasAlpha ? B_RGBA32 : fBitmap->ColorSpace(), true);
+	if (bitmap == NULL || !bitmap->IsValid()) {
+		delete bitmap;
+		return NULL;
+	}
 	
 	if (bitmap->Lock()) {
 		bitmap->AddChild(&view);
@@ -1201,9 +1209,11 @@ void
 ShowImageView::MergeWithBitmap(BBitmap *merge, BRect selection)
 {
 	BView view(fBitmap->Bounds(), NULL, B_FOLLOW_NONE, B_WILL_DRAW);
-	BBitmap *bitmap = new BBitmap(fBitmap->Bounds(), fBitmap->ColorSpace(), true);
-	if (bitmap == NULL)
+	BBitmap *bitmap = new(nothrow) BBitmap(fBitmap->Bounds(), fBitmap->ColorSpace(), true);
+	if (bitmap == NULL || !bitmap->IsValid()) {
+		delete bitmap;
 		return;
+	}
 
 	if (bitmap->Lock()) {
 		bitmap->AddChild(&view);
@@ -1445,7 +1455,6 @@ ShowImageView::KeyDown (const char * bytes, int32 numBytes)
 			case B_RIGHT_ARROW: 
 				ScrollRestrictedBy(10, 0);
 				break;
-			case B_SPACE:
 			case B_ENTER:
 				NextFile();
 				break;
@@ -1456,12 +1465,20 @@ ShowImageView::KeyDown (const char * bytes, int32 numBytes)
 				break;
 			case B_END:
 				break;
+			case B_SPACE:
+				ToggleSlideShow();
+				break;
 			case B_ESCAPE:
-				if (fSlideShow) {
-					BMessenger msgr(Window());
-					msgr.SendMessage(MSG_SLIDE_SHOW);
-				}
+				// stop slide show
+				if (fSlideShow)
+					ToggleSlideShow();
+
+				ExitFullScreen();
+
 				ClearSelection();
+				break;
+			case B_DELETE:
+				// TODO: move image to Trash (script Tracker)
 				break;
 		}	
 	}
@@ -1603,8 +1620,8 @@ ShowImageView::FixupScrollBar(orientation o, float bitmapLength, float viewLengt
 
 	psb = ScrollBar(o);
 	if (psb) {
-		if (fHasBorder && !fShrinkOrZoomToBounds) {
-			bitmapLength += BORDER_WIDTH*2;
+		if (fHasBorder && !fShrinkOrZoomToBounds && (fHAlignment == B_ALIGN_LEFT || fVAlignment == B_ALIGN_TOP)) {
+			bitmapLength += BORDER_WIDTH * 2;
 		}
 		range = bitmapLength - viewLength;
 		if (range < 0.0) {
@@ -1625,12 +1642,12 @@ ShowImageView::FixupScrollBars()
 {
 	BRect rctview = Bounds(), rctbitmap(0, 0, 0, 0);
 	if (fBitmap) {
-		BRect rect(AlignBitmap());
-		rctbitmap.Set(0, 0, rect.Width(), rect.Height());
+		rctbitmap = AlignBitmap();
+		rctbitmap.OffsetTo(0, 0);
 	}
 	
-	FixupScrollBar(B_HORIZONTAL, rctbitmap.Width(), rctview.Width());
-	FixupScrollBar(B_VERTICAL, rctbitmap.Height(), rctview.Height());
+	FixupScrollBar(B_HORIZONTAL, rctbitmap.Width() + 2 * PEN_SIZE, rctview.Width());
+	FixupScrollBar(B_VERTICAL, rctbitmap.Height() + 2 * PEN_SIZE, rctview.Height());
 }
 
 int32
@@ -1689,9 +1706,11 @@ ShowImageView::AddWhiteRect(BRect &rect)
 {
 	// Paint white rectangle, using rect, into the background image
 	BView view(fBitmap->Bounds(), NULL, B_FOLLOW_NONE, B_WILL_DRAW);
-	BBitmap *bitmap = new BBitmap(fBitmap->Bounds(), fBitmap->ColorSpace(), true);
-	if (bitmap == NULL)
+	BBitmap *bitmap = new(nothrow) BBitmap(fBitmap->Bounds(), fBitmap->ColorSpace(), true);
+	if (bitmap == NULL || !bitmap->IsValid()) {
+		delete bitmap;
 		return;
+	}
 
 	if (bitmap->Lock()) {
 		bitmap->AddChild(&view);
@@ -1934,16 +1953,17 @@ ShowImageView::FindNextImageByDir(entry_ref *in_current, entry_ref *out_image, b
 	BList entries;
 	bool found = false;
 	int32 cur;
-	
-	if (curImage.GetParent(&parent) != B_OK)
+
+	if (curImage.GetParent(&parent) != B_OK) {
 		return false;
+	}
+
+	// insert current ref, so we can find it easily after sorting
+	entries.AddItem(in_current);
 
 	while (parent.GetNextRef(&entry) == B_OK) {
 		if (entry != *in_current) {
 			entries.AddItem(new entry_ref(entry));
-		} else {
-			// insert current ref, so we can find it easily after sorting
-			entries.AddItem(in_current);
 		}
 	}
 	
@@ -2019,9 +2039,9 @@ ShowImageView::FindNextImage(entry_ref *in_current, entry_ref *ref, bool next, b
 		
 		BMessage reply;
 		if (fTrackerMessenger.SendMessage(&request, &reply) != B_OK)
-			return false;
+			return FindNextImageByDir(in_current, ref, next, rewind);;
 		if (reply.FindRef("result", &nextRef) != B_OK)
-			return false;
+			return FindNextImageByDir(in_current, ref, next, rewind);;
 			
 		if (IsImage(&nextRef))
 			foundRef = true;
@@ -2037,11 +2057,9 @@ ShowImageView::FindNextImage(entry_ref *in_current, entry_ref *ref, bool next, b
 bool
 ShowImageView::ShowNextImage(bool next, bool rewind)
 {
-	bool found;
-	entry_ref curRef, imgRef;
-	
-	curRef = fCurrentRef;
-	found = FindNextImage(&curRef, &imgRef, next, rewind);
+	entry_ref curRef = fCurrentRef;
+	entry_ref imgRef;
+	bool found = FindNextImage(&curRef, &imgRef, next, rewind);
 	if (found) {
 		// Keep trying to load images until:
 		// 1. The image loads successfully
@@ -2305,3 +2323,19 @@ ShowImageView::SetIcon(bool clear)
 	SetIcon(clear, B_MINI_ICON);
 	SetIcon(clear, B_LARGE_ICON);
 }
+
+void
+ShowImageView::ToggleSlideShow()
+{
+	BMessenger msgr(Window());
+	msgr.SendMessage(MSG_SLIDE_SHOW);
+}
+
+void
+ShowImageView::ExitFullScreen()
+{
+	BMessenger m(Window());
+	m.SendMessage(MSG_EXIT_FULL_SCREEN);
+}
+
+
