@@ -1,3 +1,27 @@
+/*
+ * Copyright (c) 2005, David McPaul
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *
+ *  * Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *  * Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 #include <iostream.h>
 
 #include <DataIO.h>
@@ -261,22 +285,28 @@ uint64	MOVFileReader::getOffsetForFrame(uint32 stream_index, uint32 pFrameNo)
 		uint32 SampleNo = aTrakAtom->getSampleForFrame(pFrameNo);
 		// Get Chunk For Sample and the offset for the frame within that chunk
 		uint32 OffsetInChunk;
+		if (stream_index == 0) {
+			OffsetInChunk = 99;
+		}
 		uint32 ChunkNo = aTrakAtom->getChunkForSample(SampleNo, &OffsetInChunk);
 		// Get Offset For Chunk
+//		printf("Stream: %ld Frame %ld %ld <%ld/%ld> (",stream_index, pFrameNo, SampleNo, ChunkNo, OffsetInChunk);
 		uint64 OffsetNo = aTrakAtom->getOffsetForChunk(ChunkNo);
 
 //		printf("Frame %ld {%lld} <%ld/%ld> (",pFrameNo, OffsetNo, ChunkNo, OffsetInChunk);
 
-		uint32 SampleSize;
-		// Adjust the Offset for the Offset in the chunk		
-		for (uint32 i=1;i<=OffsetInChunk;i++) {
-			SampleSize = aTrakAtom->getSizeForSample(SampleNo-i);
-//			printf(" %ld ",SampleSize);
-			OffsetNo = OffsetNo + SampleSize;
+		if (ChunkNo != 0) {
+			uint32 SampleSize;
+			// Adjust the Offset for the Offset in the chunk		
+			for (uint32 i=1;i<=OffsetInChunk;i++) {
+				SampleSize = aTrakAtom->getSizeForSample(SampleNo-i);
+//				printf(" %ld ",SampleSize);
+				OffsetNo = OffsetNo + SampleSize;
+			}
+//			printf(") %lld\n",OffsetNo);
 		}
-//		printf(") %lld\n",OffsetNo);
-		
 //		printf("%ld:%ld:%ld:%lld\n",pFrameNo, SampleNo, ChunkNo, OffsetNo);
+//		printf("\n");
 		
 		return OffsetNo;
 	}

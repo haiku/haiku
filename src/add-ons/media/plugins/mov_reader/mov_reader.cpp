@@ -121,7 +121,7 @@ movReader::GetFileFormatInfo(media_file_format *mff)
 						| media_file_format::B_KNOWS_ENCODED_VIDEO
 						| media_file_format::B_KNOWS_ENCODED_AUDIO
 						| media_file_format::B_IMPERFECTLY_SEEKABLE;
-	mff->family = B_MISC_FORMAT_FAMILY;
+	mff->family = B_QUICKTIME_FORMAT_FAMILY;
 	mff->version = 100;
 	strcpy(mff->mime_type, "audio/x-mov");
 	strcpy(mff->file_extension, "mov");
