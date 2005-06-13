@@ -105,7 +105,7 @@ rule GenerateChapterXML
 
 	local xmls = [ FGristFiles $(sources:S=.xml) ] ;
 	Includes $(target) : $(xmls) ;
-	Depends files : $(target) ;
+	LocalDepends files : $(target) ;
 	Depends $(target) : $(template) ;
 	XMLS on $(target) = "<xi:include xmlns:xi=\"http://www.w3.org/2001/XInclude\" href=\""$(xmls:BS)"\" />\
 " ;
