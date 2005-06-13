@@ -35,9 +35,10 @@ struct cache_log {
 	union {
 		char	file_name[B_FILE_NAME_LENGTH];
 		struct {
-			char	**array;
-			int32	count;
-		}		args;
+			char	**args;
+			int32	arg_count;
+			team_id	parent;
+		}		launch;
 		int32	access_type;
 	};
 	bigtime_t	timestamp;
@@ -77,7 +78,15 @@ get_log_entry()
 
 	struct thread *thread = thread_get_current_thread();
 	log->team = thread->team->id;
-	strlcpy(log->team_name, thread->team->name, B_OS_NAME_LENGTH);
+
+	// cut off path from name
+	const char *leaf = strrchr(thread->team->name, '/');
+	if (leaf == NULL)
+		leaf = thread->team->name;
+	else
+		leaf++;
+
+	strlcpy(log->team_name, leaf, B_OS_NAME_LENGTH);
 
 	log->timestamp = system_time();
 
@@ -147,15 +156,38 @@ log_node_launched(size_t argCount, char * const *args)
 	log->action = 'l';
 	log->type = FDTYPE_FILE;
 
-	log->args.array = (char **)malloc(argCount * sizeof(char *));
-	log->args.count = argCount;
-	
+	log->launch.args = (char **)malloc(argCount * sizeof(char *));
+	log->launch.arg_count = argCount;
+
 	for (uint32 i = 0; i < argCount; i++) {
-		log->args.array[i] = strdup(args[i]);
+		if  (i == 0) {
+			// cut off path from parent team name
+			struct team *team = thread_get_current_thread()->team;
+			char name[B_OS_NAME_LENGTH];
+			cpu_status state;
+
+			state = disable_interrupts();
+			GRAB_TEAM_LOCK();
+
+			log->launch.parent = team->parent->id;
+			strlcpy(name, team->parent->name, B_OS_NAME_LENGTH);
+
+			RELEASE_TEAM_LOCK();
+			restore_interrupts(state);
+
+			const char *leaf = strrchr(name, '/');
+			if (leaf == NULL)
+				leaf = name;
+			else
+				leaf++;
+
+			log->launch.args[0] = strdup(leaf);
+		} else
+			log->launch.args[i] = strdup(args[i]);
 
 		// remove newlines from the arguments
 		char *newline;
-		while ((newline = strchr(log->args.array[i], '\n')) != NULL) {
+		while ((newline = strchr(log->launch.args[i], '\n')) != NULL) {
 			*newline = ' ';
 		}
 	}
@@ -172,6 +204,15 @@ log_writer_daemon(void *arg, int /*iteration*/)
 	mutex_lock(&sLock);
 
 	if (sCurrentEntry > kLogWriteThreshold || arg != NULL) {
+		off_t fileSize = 0;
+		struct stat stat;
+		if (fstat(sLogFile, &stat) == 0) {
+			// enlarge file, so that it can be written faster
+			fileSize = stat.st_size;
+			ftruncate(sLogFile, fileSize + 512 * 1024);
+		} else
+			stat.st_size = -1;
+
 		for (uint32 i = 0; i < sCurrentEntry; i++) {
 			cache_log *log = &sLogEntries[i];
 			char line[1536];
@@ -179,11 +220,12 @@ log_writer_daemon(void *arg, int /*iteration*/)
 
 			switch (log->action) {
 				case 'l':	// launch
-					length = snprintf(line, sizeof(line), "%ld: %Ld \"%s\" l ",
-								log->team, log->timestamp, log->team_name);
+					length = snprintf(line, sizeof(line), "%ld: %Ld \"%s\" l %ld \"%s\" ",
+								log->team, log->timestamp, log->team_name,
+								log->launch.parent, log->launch.args[0]);
 
-					for (int32 j = 0; j < log->args.count; j++) {
-						strlcat(line, log->args.array[j], sizeof(line));
+					for (int32 j = 1; j < log->launch.arg_count; j++) {
+						strlcat(line, log->launch.args[j], sizeof(line));
 						length = strlcat(line, " ", sizeof(line));
 					}
 
@@ -210,8 +252,13 @@ log_writer_daemon(void *arg, int /*iteration*/)
 			if (written != length) {
 				dprintf("log: must drop log entries: %ld, %s!\n", written, strerror(written));
 				break;
-			}
+			} else
+				fileSize += length;
 		}
+
+		// shrink file again to its real size
+		if (stat.st_size != -1)
+			ftruncate(sLogFile, fileSize);
 
 		// need to free any launch log items (also if writing fails)
 
@@ -220,10 +267,10 @@ log_writer_daemon(void *arg, int /*iteration*/)
 			if (log->action != 'l')
 				continue;
 
-			for (int32 j = 0; j < log->args.count; j++)
-				free(log->args.array[j]);
+			for (int32 j = 0; j < log->launch.arg_count; j++)
+				free(log->launch.args[j]);
 
-			free(log->args.array);
+			free(log->launch.args);
 		}
 
 		release_sem_etc(sLogEntrySem, sCurrentEntry, B_DO_NOT_RESCHEDULE);
