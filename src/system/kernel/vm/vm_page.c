@@ -804,14 +804,14 @@ vm_page_set_state(vm_page *page, int page_state)
 }
 
 
-addr_t
+size_t
 vm_page_num_pages(void)
 {
 	return num_pages;
 }
 
 
-addr_t
+size_t
 vm_page_num_free_pages(void)
 {
 	return page_free_queue.count + page_clear_queue.count;

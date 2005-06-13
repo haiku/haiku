@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -28,8 +28,8 @@ status_t vm_mark_page_range_inuse(addr_t startPage, addr_t length);
 status_t vm_page_set_state(vm_page *page, int state);
 
 // get some data about the number of pages in the system
-addr_t vm_page_num_pages(void);
-addr_t vm_page_num_free_pages(void);
+size_t vm_page_num_pages(void);
+size_t vm_page_num_free_pages(void);
 
 status_t vm_page_write_modified(vm_cache *cache);
 
