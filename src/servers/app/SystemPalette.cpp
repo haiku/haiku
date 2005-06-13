@@ -157,6 +157,46 @@ color_distance(uint8 red1, uint8 green1, uint8 blue1,
 }
 
 
+static unsigned
+FindClosestColor(const rgb_color &color, const rgb_color *palette)
+{
+	// TODO: This isn't working 100% correctly.
+	// At least, it doesn't map colors as beos does.
+	// Could be a bug/different behaviour in color_distance	
+	
+	uint8 closestIndex = 0;
+	unsigned closestDistance = UINT_MAX;
+	for (int32 i = 0; i < 256; i++) {
+		const rgb_color &c = palette[i];
+		unsigned distance = color_distance(color.red, color.green, color.blue,
+										   c.red, c.green, c.blue);
+		if (distance < closestDistance) {
+			closestIndex = i;
+			closestDistance = distance;
+		}
+	}
+	return closestIndex;
+}
+
+
+static inline rgb_color
+InvertColor(const rgb_color &color)
+{
+	// For some reason, Inverting (255, 255, 255) on beos
+	// results in the same color.
+	if (color.red == 255 && color.green == 255
+		&& color.blue == 255)
+		return color;
+	
+	rgb_color inverted;
+	inverted.red = 255 - color.red;
+	inverted.green = 255 - color.green;
+	inverted.blue = 255 - color.blue;
+	
+	return inverted;
+}
+
+
 static void
 FillColorMap(const rgb_color *palette, color_map *map)
 {
@@ -165,27 +205,24 @@ FillColorMap(const rgb_color *palette, color_map *map)
 	// init index map
 	for (int32 color = 0; color < 32768; color++) {
 		// get components
-		uint8 red = (color & 0x7c00) >> 7;
-		uint8 green = (color & 0x3e0) >> 2;
-		uint8 blue = (color & 0x1f) << 3;
-		red |= red >> 5;
-		green |= green >> 5;
-		blue |= blue >> 5;
-		// find closest color
-		uint8 closestIndex = 0;
-		unsigned closestDistance = UINT_MAX;
-		for (int32 i = 0; i < 256; i++) {
-			const rgb_color &c = map->color_list[i];
-			unsigned distance = color_distance(red, green, blue,
-											   c.red, c.green, c.blue);
-			if (distance < closestDistance) {
-				closestIndex = i;
-				closestDistance = distance;
-			}
-		}
+		rgb_color rgbColor;
+		rgbColor.red = (color & 0x7c00) >> 7;
+		rgbColor.green = (color & 0x3e0) >> 2;
+		rgbColor.blue = (color & 0x1f) << 3;
+		rgbColor.red |= rgbColor.red >> 5;
+		rgbColor.green |= rgbColor.green >> 5;
+		rgbColor.blue |= rgbColor.blue >> 5;
+		
+		uint8 closestIndex = FindClosestColor(rgbColor, palette);
 		map->index_map[color] = closestIndex;
 	}
-	// TODO: Inversion map
+	
+	// init inversion map
+	for (int32 index = 0; index < 256; index++) {
+		rgb_color inverted = InvertColor(map->color_list[index]);
+		uint8 closestIndex = FindClosestColor(inverted, palette);
+		map->inversion_map[index] = closestIndex;		
+	}
 }
 
 
