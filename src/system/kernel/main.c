@@ -25,6 +25,7 @@
 #include <elf.h>
 #include <cpu.h>
 #include <kdriver_settings.h>
+#include <boot_item.h>
 #include <kmodule.h>
 #include <int.h>
 #include <team.h>
@@ -100,6 +101,7 @@ _start(kernel_args *oldka, int cpu_num)
 
 		// now we can use the heap and create areas
 		TRACE(("init driver_settings\n"));
+		boot_item_init();
 		driver_settings_init(&ka);
 		debug_init_post_vm(&ka);
 		int_init_post_vm(&ka);

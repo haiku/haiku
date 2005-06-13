@@ -60,3 +60,13 @@ get_boot_item(const char *name)
 	return NULL;
 }
 
+
+status_t
+boot_item_init(void)
+{
+	new(&sItemList) ItemList;
+		// static initializers do not work in the kernel,
+		// so we have to do it here, manually
+
+	return B_OK;
+}

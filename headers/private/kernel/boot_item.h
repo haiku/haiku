@@ -12,6 +12,8 @@
 extern "C" {
 #endif
 
+extern status_t boot_item_init(void);
+
 extern status_t add_boot_item(const char *name, void *data, size_t size);
 extern void *get_boot_item(const char *name);
 
