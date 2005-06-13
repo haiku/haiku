@@ -148,9 +148,12 @@ color_distance(uint8 red1, uint8 green1, uint8 blue1,
 
 	// distance according to psycho-visual tests
 	int rmean = ((int)red1 + (int)red2) / 2;
-	return (2 + rmean / 256) * rd * rd
+	/*return (2 + rmean / 256) * rd * rd
 			+ 4 * gd * gd
-			+ (2 + (255 - rmean) / 256) * bd * bd;
+			+ (2 + (255 - rmean) / 256) * bd * bd;*/
+	return (((512 + rmean) * rd * rd) >> 8)
+			+ 4 * gd * gd
+			+ (((767 - rmean) * bd * bd) >> 8); 
 }
 
 
