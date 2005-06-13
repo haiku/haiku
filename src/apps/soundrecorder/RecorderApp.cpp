@@ -12,6 +12,7 @@
 RecorderApp::RecorderApp(const char * signature) :
 	BApplication(signature), fRecorderWin(NULL)
 {
+	fRecorderWin = new RecorderWindow();
 }
 
 RecorderApp::~RecorderApp()
@@ -19,12 +20,12 @@ RecorderApp::~RecorderApp()
 }
 
 
-void
-RecorderApp::ReadyToRun()
+status_t
+RecorderApp::InitCheck()
 {
-	BApplication::ReadyToRun();
-	fRecorderWin = new RecorderWindow();
-	fRecorderWin->Show();
+	if (fRecorderWin)
+		return fRecorderWin->InitCheck();
+	return B_OK;
 }
 
 
@@ -32,6 +33,7 @@ int
 main()
 {
 	RecorderApp app("application/x-vnd.Haiku-SoundRecorder");
-	app.Run();
+	if (app.InitCheck() == B_OK)
+		app.Run();
 	return 0;
 }

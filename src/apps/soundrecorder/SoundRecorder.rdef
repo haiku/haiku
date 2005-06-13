@@ -1,5 +1,5 @@
 
-resource app_signature "application/x-vnd.haiku.SoundRecorder";
+resource app_signature "application/x-vnd.Haiku-SoundRecorder";
 
 resource app_flags B_SINGLE_LAUNCH;
 

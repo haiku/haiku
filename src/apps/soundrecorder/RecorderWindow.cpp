@@ -101,9 +101,11 @@ RecorderWindow::RecorderWindow() :
 	BWindow(BRect(XPOS,YPOS,XPOS+MIN_WIDTH,YPOS+MIN_HEIGHT), "Sound Recorder", B_TITLED_WINDOW, 
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_V_RESIZABLE),
 		fPlayer(NULL),
+		fSoundList(NULL),
 		fPlayFile(NULL),
 		fPlayTrack(NULL),
-		fSavePanel(B_SAVE_PANEL)
+		fSavePanel(NULL),
+		fInitCheck(B_OK)
 {
 	fRoster = NULL;
 	fRecordButton = NULL;
@@ -119,12 +121,16 @@ RecorderWindow::RecorderWindow() :
 
 	CalcSizes(MIN_WIDTH, MIN_HEIGHT);
 	
-	InitWindow();
+	fInitCheck = InitWindow();
+	if (fInitCheck != B_OK) {
+		ErrorAlert("connect to media server", fInitCheck);
+		PostMessage(B_QUIT_REQUESTED);
+	} else
+		Show();
 }
 
 RecorderWindow::~RecorderWindow()
 {
-	DEATH((stderr, "RecorderWindow::~RecorderWindow()\n"));
 	//	The sound consumer and producer are Nodes; it has to be Release()d and the Roster
 	//	will reap it when it's done.
 	if (fRecordNode) {
@@ -151,6 +157,13 @@ RecorderWindow::~RecorderWindow()
 	//	Clean up currently recording file, if any.
 	fRecEntry.Remove();
 	fRecEntry.Unset();
+}
+
+
+status_t
+RecorderWindow::InitCheck()
+{
+	return fInitCheck;
 }
 
 
@@ -441,7 +454,8 @@ RecorderWindow::InitWindow()
 		popup->Superitem()->SetLabel(selected_name);
 		
 		// Make sure the save panel is happy.
-		fSavePanel.SetTarget(this);
+		fSavePanel = new BFilePanel(B_SAVE_PANEL);
+		fSavePanel->SetTarget(this);
 	}
 	catch (...) {
 		goto bad_mojo;
@@ -713,9 +727,9 @@ RecorderWindow::Save(BMessage * message)
 	pItem->Entry().GetRef(&ref);
 	
 	saveMsg.AddPointer("sound list item", pItem);
-	fSavePanel.SetSaveText(filename);
-	fSavePanel.SetMessage(&saveMsg);
-	fSavePanel.Show();
+	fSavePanel->SetSaveText(filename);
+	fSavePanel->SetMessage(&saveMsg);
+	fSavePanel->Show();
 }
 
 void
@@ -1009,6 +1023,9 @@ RecorderWindow::UpdateButtons()
 	fInputField->SetEnabled(fButtonState != btnRecording);
 }
 
+#ifndef __HAIKU__
+extern "C" status_t DecodedFormat__11BMediaTrackP12media_format(BMediaTrack *self, media_format *inout_format);
+#endif
 
 void 
 RecorderWindow::UpdatePlayFile()
@@ -1036,7 +1053,12 @@ RecorderWindow::UpdatePlayFile()
 	for (int ix=0; ix<fPlayFile->CountTracks(); ix++) {
 		BMediaTrack * track = fPlayFile->TrackAt(ix);
 		fPlayFormat.type = B_MEDIA_RAW_AUDIO;
-		if ((track->DecodedFormat(&fPlayFormat) == B_OK) && (fPlayFormat.type == B_MEDIA_RAW_AUDIO)) {
+#ifdef __HAIKU__
+		if ((track->DecodedFormat(&fPlayFormat) == B_OK) 
+#else
+		if ((DecodedFormat__11BMediaTrackP12media_format(track, &fPlayFormat) == B_OK)
+#endif
+			&& (fPlayFormat.type == B_MEDIA_RAW_AUDIO)) {
 			fPlayTrack = track;
 			break;
 		}
@@ -1096,7 +1118,7 @@ void
 RecorderWindow::ErrorAlert(const char * action, status_t err)
 {
 	char msg[300];
-	sprintf(msg, "Cannot %s: %s.\n[%lx]", action, strerror(err), (int32) err);
+	sprintf(msg, "Cannot %s: %s. [%lx]", action, strerror(err), (int32) err);
 	(new BAlert("", msg, "Stop"))->Go();
 }
 

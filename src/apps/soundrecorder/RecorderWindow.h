@@ -40,11 +40,12 @@ class BStringView;
 class RecorderWindow : public BWindow {
 public:
 		RecorderWindow();
-virtual	~RecorderWindow();
+	virtual	~RecorderWindow();
+		status_t InitCheck();
 		
 
-virtual	bool QuitRequested();
-virtual	void MessageReceived(BMessage * message);
+	virtual	bool QuitRequested();
+	virtual	void MessageReceived(BMessage * message);
 
 		enum {
 			RECORD = 'cw00',			//	command messages
@@ -123,7 +124,8 @@ private:
 		
 		media_node fAudioMixerNode;
 		
-		BFilePanel fSavePanel;
+		BFilePanel *fSavePanel;
+		status_t fInitCheck;
 
 		status_t InitWindow();
 		
