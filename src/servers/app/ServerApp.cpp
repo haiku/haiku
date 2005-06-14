@@ -878,6 +878,38 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &link)
 			fLink.Flush();
 			break;
 		}
+		case AS_GET_UI_COLORS:
+		{
+			// Client application is asking for all the system colors at once
+			// using a ColorSet object
+			
+			
+			gui_colorset.Lock();
+			
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<ColorSet>(gui_colorset);
+			fLink.Flush();
+			
+			gui_colorset.Unlock();
+			
+			break;
+		}
+		case AS_SET_UI_COLORS:
+		{
+			// Client application is asking to set all the system colors at once
+			// using a ColorSet object
+			
+			// Attached data:
+			// 1) ColorSet new colors to use
+			
+			gui_colorset.Lock();
+			link.Read<ColorSet>(&gui_colorset);
+			gui_colorset.Unlock();
+			
+			// TODO: Broadcast an AS_UPDATE_COLORS to all apps
+			
+			break;
+		}
 		case AS_GET_UI_COLOR:
 		{
 			STRACE(("ServerApp %s: Get UI color\n", fSignature.String()));
@@ -931,7 +963,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &link)
 			// 1) font_family - name of family
 			// 2) uint32 - flags of font family (B_IS_FIXED || B_HAS_TUNED_FONT)
 			int32 id;
-
+debugger("");
 			link.Read<int32>(&id);
 
 			fontserver->Lock();

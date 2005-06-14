@@ -652,20 +652,6 @@ AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			
 			break;
 		}
-		case AS_SET_UI_COLORS:
-		{
-			// Client application is asking to set all the system colors at once
-			// using a ColorSet object
-			
-			// Attached data:
-			// 1) ColorSet new colors to use
-			
-			gui_colorset.Lock();
-			msg.Read<ColorSet>(&gui_colorset);
-			gui_colorset.Unlock();
-			Broadcast(AS_UPDATE_COLORS);
-			break;
-		}
 		case AS_SET_DECORATOR:
 		{
 			// Received from an application when the user wants to set the window
