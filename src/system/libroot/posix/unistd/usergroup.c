@@ -38,7 +38,7 @@ getgid(void)
 int 
 getgroups(int groupSize, gid_t groupList[])
 {
-	return EINVAL;
+	return 0;
 }
 
 
