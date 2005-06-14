@@ -391,9 +391,11 @@ private:
 	short			fShowLevel;
 	uint32			fFlags;
 
+	uint32			_unused0[2];
 	BView			*top_view;
 	BView			*fFocus;
 	BView			*fLastMouseMovedView;
+	uint32			_unused1;
 	BMenuBar		*fKeyMenuBar;
 	BButton			*fDefaultButton;
 	BList			accelList;
@@ -421,7 +423,7 @@ private:
 	BMessageRunner	*fPulseRunner;
 	BRect			fCurrentFrame;				// not yet used
 
-	uint32			_reserved[5];	// was 8
+	uint32			_reserved[2];				// was 8
 #if !_PR3_COMPATIBLE_
 	uint32			_more_reserved[4];
 #endif
