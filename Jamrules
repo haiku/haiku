@@ -313,12 +313,11 @@ OBOS_FLOPPY = floppy.$(OBOS_ARCH) ;
 
 rule SetupIncludes
 {
-	# XXX add "opengl" later
 	local os_includes = add-ons add-ons/file_system add-ons/graphics
 						add-ons/input_server add-ons/screen_saver
 						add-ons/tracker app device drivers game interface
 						kernel media mail midi midi2 net storage support
-						translation ;
+						translation opengl ;
 
 	# Overwrite any exiting content when changing HDRS. This rule may be invoked multiple times.
 
@@ -903,7 +902,7 @@ rule MakeLocateObjects
 
 rule StaticLibrary
 {
-	# StaticLibrary <name> : <sources> [ : <target dir> ] ;
+	# StaticLibrary <name> : <sources> [ : <target dir> [ : <static libraries> ] ] ;
 	# Creates a static library from sources.
 	# <name>: Basename of the library, without leading "lib" and trailing ".a".
 	#         Grist is allowed -- it will be re-prepended after constructing
@@ -914,13 +913,17 @@ rule StaticLibrary
 	#               STATIC_LIBRARY_DIR is supplied (the literal string)
 	#               the standard directory for static libs is used, otherwise
 	#               the parameter is interpreted as directory path.
-	#
+	# <static libraries>: static libraries to include (ie: libmesa_x86.a)
+	
 	local lib = lib$(1:B)$(SUFLIB) ;
 	lib = $(lib:G=$(1:G)) ;
 	SetupIncludes ;
 	SetupObjectsDir ;
 	MakeLocateObjects $(2) ;
 	Library $(lib) : $(2) ;
+	if $(4) {
+		LibraryFromObjects $(lib) : $(4) ;
+	}
 	local targetDir = $(3) ;
 	if $(targetDir) {
 		if $(targetDir) = STATIC_LIBRARY_DIR {
