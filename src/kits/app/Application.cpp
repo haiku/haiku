@@ -1084,8 +1084,9 @@ BApplication::connect_to_app_server()
 	int32 code;
 	if (fServerLink->FlushWithReply(code) == B_OK
 		&& code == SERVER_TRUE) {
+		// We don't need to contact the main app_server anymore
+		// directly; we now talk to our server alter ego only.
 		fServerLink->Read<port_id>(&serverPort);
-		// ToDo: what are we supposed to do with this port?
 		fServerLink->SetSenderPort(serverPort);
 	} else {
 		fServerLink->SetSenderPort(-1);
