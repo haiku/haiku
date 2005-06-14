@@ -10,8 +10,12 @@
 #include <stdio.h>
 #include <string.h>
 
-typedef struct
-{
+
+#define NO_ERRORS			0
+#define ARGUMENT_MISSING	1
+#define WRONG_DIR_TYPE		2
+
+typedef struct {
 	const char *key;
 	directory_which value;
 } directoryType;
@@ -78,7 +82,9 @@ directoryType directoryTypes[] = {
 	{NULL,B_USER_DESKBAR_DIRECTORY}
 };
 
-void listDirectoryWhich(void)
+
+static void
+listDirectoryWhich(void)
 {
 	int i;
 	
@@ -87,25 +93,27 @@ void listDirectoryWhich(void)
 	}
 }
 
-bool retrieveDirValue(directoryType *list, const char *key, directory_which *value_out)
+
+static bool
+retrieveDirValue(directoryType *list, const char *key, directory_which *value_out)
 {
 	unsigned i = 0;
 	
-	while (list[i].key != NULL)
-	{
-		if (strcmp(list[i].key, key) == 0)
-		{
+	while (list[i].key != NULL) {
+		if (strcmp(list[i].key, key) == 0) {
 			*value_out = list[i].value;
 			return true;
 		}
-		
+
 		i++;
 	}
-	
+
 	return false;
 }
 
-void usageMsg()
+
+static void
+usageMsg()
 {
 	printf("usage:  /bin/finddir -l | [ -v volume ] directory_which\n");
 	printf("\t-l\t    list valid which constants to use\n");
@@ -117,11 +125,9 @@ void usageMsg()
 	printf(" see the find_directory(...) documentation in the Be Book.\n");
 }
 
-#define NO_ERRORS   0
-#define ARGUMENT_MISSING 1
-#define WRONG_DIR_TYPE  2
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	int directoryArgNr;
 	int status;
