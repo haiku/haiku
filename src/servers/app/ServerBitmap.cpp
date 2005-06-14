@@ -24,6 +24,8 @@
 //	Description:	Bitmap class used by the server
 //  
 //------------------------------------------------------------------------------
+#include <new>
+
 #include "ServerBitmap.h"
 
 /*!
@@ -66,6 +68,7 @@ ServerBitmap::ServerBitmap(const ServerBitmap* bmp)
 	  // TODO: what about fToken and fOffset ?!?
 {
 	if (bmp) {
+		fInitialized	= bmp->fInitialized;
 		fWidth			= bmp->fWidth;
 		fHeight			= bmp->fHeight;
 		fBytesPerRow	= bmp->fBytesPerRow;
@@ -103,14 +106,8 @@ ServerBitmap::_AllocateBuffer(void)
 	uint32 length = BitsLength();
 	if (length > 0) {
 		delete[] fBuffer;
-		try {
-			fBuffer = new uint8[length];
-			fInitialized = true;
-		} catch (...) {
-			// we can't do anything about it
-			fBuffer = NULL;
-			fInitialized = false;
-		}
+		fBuffer = new(nothrow) uint8[length];
+		fInitialized = fBuffer != NULL;
 	}
 }
 
@@ -124,6 +121,7 @@ ServerBitmap::_FreeBuffer(void)
 {
 	delete[] fBuffer;
 	fBuffer = NULL;
+	fInitialized = false;
 }
 
 /*!
