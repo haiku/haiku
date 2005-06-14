@@ -39,7 +39,7 @@ cursor_which get_syscursor(void)
 	if(server!=B_NAME_NOT_FOUND)
 	{
 		int32 code;
-		BPortLink link(server);
+		BPrivate::PortLink link(server);
 		
 		link.StartMessage(AS_GET_SYSCURSOR);
 		link.GetNextMessage(code);
@@ -59,7 +59,7 @@ void setcursor(cursor_which which)
 	port_id server=find_port(SERVER_PORT_NAME);
 	if(server!=B_NAME_NOT_FOUND)
 	{
-		BPortLink link(server);
+		BPrivate::PortLink link(server);
 		link.StartMessage(AS_SET_CURSOR_SYSTEM);
 		link.Flush();
 	}

@@ -1,15 +1,16 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Distributed under the terms of the MIT license.
-//
-//	File Name:		Bitmap.cpp
-//	Author:			Ingo Weinhold (bonefish@users.sf.net)
-//					DarkWyrm <bpmagic@columbus.rr.com>
-//					Stephan Aßmus <superstippi@gmx.de>
-//	Description:	BBitmap objects represent off-screen windows that
-//					contain bitmap data.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold (bonefish@users.sf.net)
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
+
+/** BBitmap objects represent off-screen windows that
+ *	contain bitmap data.
+ */
 
 #include <algorithm>
 #include <limits.h>
@@ -2219,7 +2220,7 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 				error = B_NO_MEMORY;
 		} else {
 			// Ask the server (via our owning application) to create a bitmap.
-			BPrivate::BAppServerLink link;
+			BPrivate::AppServerLink link;
 	
 			// Attach Data: 
 			// 1) BRect bounds
@@ -2245,8 +2246,8 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 			// Reply Data:
 			//		None
 			int32 code = SERVER_FALSE;
-			error = link.FlushWithReply(&code);
-			
+			error = link.FlushWithReply(code);
+
 			if (error >= B_OK) {
 				// *communication* with server successful
 				if (code == SERVER_TRUE) {
@@ -2314,7 +2315,7 @@ BBitmap::CleanUp()
 		if (fFlags & B_BITMAP_NO_SERVER_LINK) {
 			free(fBasePtr);
 		} else {
-			BPrivate::BAppServerLink link;
+			BPrivate::AppServerLink link;
 			// AS_DELETE_BITMAP:
 			// Attached Data: 
 			//	1) int32 server token
@@ -2326,7 +2327,7 @@ BBitmap::CleanUp()
 			int32 code = SERVER_FALSE;
 			link.StartMessage(AS_DELETE_BITMAP);
 			link.Attach<int32>(fServerToken);
-			link.FlushWithReply(&code);
+			link.FlushWithReply(code);
 			if (code == SERVER_FALSE) {
 				// TODO: Find out if "SERVER_FALSE if the buffer
 				// was already deleted" is true. If not, maybe we

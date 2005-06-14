@@ -36,12 +36,15 @@
 
 class AppServer;
 class BMessage;
-class BPortLink;
 class BList;
 class DisplayDriver;
 class ServerCursor;
 class ServerBitmap;
 class AreaPool;
+
+namespace BPrivate {
+	class PortLink;
+};
 
 /*!
 	\class ServerApp ServerApp.h
@@ -81,7 +84,7 @@ protected:
 	friend class AppServer;
 	friend class ServerWindow;
 	
-	void DispatchMessage(int32 code, LinkMsgReader &link);
+	void DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
 	
 	port_id	fClientAppPort,
 			fMessagePort,
@@ -94,9 +97,9 @@ protected:
 	
 	team_id fClientTeamID;
 	
-	LinkMsgReader *fMsgReader;
-	LinkMsgSender *fMsgSender;
-	
+	BPrivate::LinkReceiver *fMsgReader;
+	BPrivate::LinkSender *fMsgSender;
+
 /*	BList *fSWindowList,
 		  *fBitmapList,
 		  *fPictureList;

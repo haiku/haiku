@@ -36,12 +36,15 @@
 
 class AreaPool;
 class BMessage;
-class BPortLink;
 class BList;
 class DisplayDriver;
 class ServerPicture;
 class ServerCursor;
 class ServerBitmap;
+
+namespace BPrivate {
+	class PortLink;
+};
 
 /*!
 	\class ServerApp ServerApp.h
@@ -90,7 +93,7 @@ public:
 	FMWList fAppFMWList;
 	
 private:
-	void DispatchMessage(int32 code, LinkMsgReader &link);
+	void DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
 
 	static int32 MonitorApp(void *data);	
 
@@ -109,7 +112,7 @@ private:
 	thread_id fMonitorThreadID;
 	team_id fClientTeamID;
 
-	BPortLink fLink;
+	BPrivate::PortLink fLink;
 
 	// TODO:
 	// - Are really Bitmaps and Pictures stored per application and not globally ?
@@ -136,4 +139,4 @@ private:
 	bool fQuitting;
 };
 
-#endif
+#endif	// _SERVERAPP_H_

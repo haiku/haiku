@@ -40,8 +40,10 @@
 #include "PatternHandler.h"
 
 class BRegion;
-class LinkMsgReader;
-class LinkMsgSender;
+namespace BPrivate {
+	class LinkReceiver;
+	class LinkSender;
+};
 
 class DrawData {
  public:
@@ -174,12 +176,12 @@ class LayerData : public DrawData {
 								// convenience functions
 	virtual	void				PrintToStream() const;
 
-			void				ReadFontFromLink(LinkMsgReader& link);
+			void				ReadFontFromLink(BPrivate::LinkReceiver& link);
 								// NOTE: ReadFromLink() does not read Font state!!
 								// It was separate in ServerWindow, and I didn't
 								// want to change it without knowing implications.
-			void				ReadFromLink(LinkMsgReader& link);
-			void				WriteToLink(LinkMsgSender& link) const;
+			void				ReadFromLink(BPrivate::LinkReceiver& link);
+			void				WriteToLink(BPrivate::LinkSender& link) const;
 
  public:
 			// used for the state stack

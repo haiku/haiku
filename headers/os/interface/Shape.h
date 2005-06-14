@@ -14,6 +14,11 @@
 #include <BeBuild.h>
 #include <Archivable.h>
 
+namespace BPrivate {
+	class ServerLink;
+};
+
+
 /*----------------------------------------------------------------*/
 /*----- BShapeIterator class -------------------------------------*/
 
@@ -78,7 +83,7 @@ virtual	void			_ReservedShape4();
 		friend class	TPicture;
 		friend class	BView;
 		friend class	BFont;
-		friend class	BPortLink;
+		friend class	BPrivate::ServerLink;
 
 		void			GetData(int32 *opCount, int32 *ptCount, uint32 **opList, BPoint **ptList);
 		void			SetData(int32 opCount, int32 ptCount, uint32 *opList, BPoint *ptList);

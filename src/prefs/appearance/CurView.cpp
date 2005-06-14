@@ -395,7 +395,7 @@ void CurView::SetDefaults(void)
 	if(port==B_NAME_NOT_FOUND)
 		return;
 		
-	BPortLink link(port);
+	BPrivate::PortLink link(port);
 	int32 code;
 	
 	link.StartMessage(AS_SET_SYSCURSOR_DEFAULTS);

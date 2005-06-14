@@ -137,7 +137,7 @@ AppServer::Run(void)
 void
 AppServer::MainLoop(void)
 {
-	BPortLink pmsg(-1,fMessagePort);
+	BPrivate::PortLink pmsg(-1,fMessagePort);
 	int32 code=0;
 	status_t err=B_OK;
 	
@@ -178,7 +178,7 @@ AppServer::MainLoop(void)
 
 
 void
-AppServer::DispatchMessage(int32 code, BPortLink &msg)
+AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 {
 	switch(code)
 	{
@@ -226,12 +226,12 @@ AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			
 			release_sem(fAppListLock);
 
-			BPortLink replylink(app_port);
+			BPrivate::PortLink replylink(app_port);
 			replylink.StartMessage(SERVER_TRUE);
 			replylink.Attach<int32>(newapp->fMessagePort);
 			replylink.Flush();
 
-			// This is necessary because BPortLink::ReadString allocates memory
+			// This is necessary because BPrivate::PortLink::ReadString allocates memory
 			if(app_signature)
 				free(app_signature);
 
@@ -281,12 +281,12 @@ AppServer::DispatchMessage(int32 code, BPortLink &msg)
 #endif
 		case AS_QUERY_FONTS_CHANGED:
 		{
-			// Seeing how the client merely wants an answer, we'll skip the BPortLink
+			// Seeing how the client merely wants an answer, we'll skip the BPrivate::PortLink
 			// and all its overhead and just write the code to port.
 			port_id replyport;
 			if (msg.Read<port_id>(&replyport) < B_OK)
 				break;
-			BPortLink replylink(replyport);
+			BPrivate::PortLink replylink(replyport);
 			replylink.StartMessage(SERVER_FALSE);
 			replylink.Flush();
 			break;
@@ -300,7 +300,7 @@ AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			if(msg.Read<port_id>(&replyport)<B_OK)
 				return;
 
-			BPortLink replylink(replyport);
+			BPrivate::PortLink replylink(replyport);
 			replylink.StartMessage(AS_GET_DECORATOR);
 			replylink.AttachString("none");
 			replylink.Flush();

@@ -395,7 +395,7 @@ AppServer::Run(void)
 void
 AppServer::MainLoop(void)
 {
-	BPortLink pmsg(-1, fMessagePort);
+	BPrivate::PortLink pmsg(-1, fMessagePort);
 
 	while (1) {
 		STRACE(("info: AppServer::MainLoop listening on port %ld.\n", fMessagePort));
@@ -523,7 +523,7 @@ AppServer::InitDecorators(void)
 	
 */
 void
-AppServer::DispatchMessage(int32 code, BPortLink &msg)
+AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 {
 	switch (code) {
 		case AS_CREATE_APP:
@@ -575,7 +575,7 @@ AppServer::DispatchMessage(int32 code, BPortLink &msg)
 
 			release_sem(fAppListLock);
 
-			BPortLink replylink(clientReplyPort);
+			BPrivate::PortLink replylink(clientReplyPort);
 			replylink.StartMessage(SERVER_TRUE);
 			replylink.Attach<int32>(serverListen);
 			replylink.Flush();
@@ -605,13 +605,11 @@ AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			for (i = 0; i < appnum; i++) {
 				srvapp = (ServerApp *)fAppList->ItemAt(i);
 
-				if(srvapp != NULL && srvapp->MonitorThreadID() == srvapp_id)
-				{
-					srvapp=(ServerApp *)fAppList->RemoveItem(i);
-					if(srvapp)
-					{
+				if (srvapp != NULL && srvapp->MonitorThreadID() == srvapp_id) {
+					srvapp = (ServerApp *)fAppList->RemoveItem(i);
+					if (srvapp) {
 						delete srvapp;
-						srvapp= NULL;
+						srvapp = NULL;
 					}
 					break;	// jump out of our for() loop
 				}
@@ -646,7 +644,7 @@ AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			port_id replyport;
 			if (msg.Read<port_id>(&replyport) < B_OK)
 				break;
-			BPortLink replylink(replyport);
+			BPrivate::PortLink replylink(replyport);
 			replylink.StartMessage(needs_update ? SERVER_TRUE : SERVER_FALSE);
 			replylink.Flush();
 			
@@ -662,36 +660,31 @@ AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			
 			char *decname=NULL;
 			msg.ReadString(&decname);
-			if(decname)
-			{
-				if(strcmp(decname,"Default")!=0)
-				{
+			if (decname) {
+				if (strcmp(decname, "Default") != 0) {
 					BString decpath;
 					decpath.SetTo(DECORATORS_DIR);
-					decpath+=decname;
-					if(LoadDecorator(decpath.String()))
+					decpath += decname;
+					if (LoadDecorator(decpath.String()))
 						Broadcast(AS_UPDATE_DECORATOR);
-				}
-				else
-				{
+				} else {
 					LoadDecorator(NULL);
 					Broadcast(AS_UPDATE_DECORATOR);
 				}
 			}
 			free(decname);
-			
 			break;
 		}
 		case AS_GET_DECORATOR:
 		{
 			// Attached Data:
 			// 1) port_id reply port
-			
-			port_id replyport=-1;
-			if(msg.Read<port_id>(&replyport)<B_OK)
+
+			port_id replyport = -1;
+			if (msg.Read<port_id>(&replyport)<B_OK)
 				return;
-			
-			BPortLink replylink(replyport);
+
+			BPrivate::PortLink replylink(replyport);
 			replylink.StartMessage(AS_GET_DECORATOR);
 			replylink.AttachString(fDecoratorName.String());
 			replylink.Flush();
@@ -705,14 +698,13 @@ AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			// Attached Data:
 			// char * name of the decorator in the decorators path to use
 			
-			int32 decindex=0;
-			if(msg.Read<int32>(&decindex)<B_OK)
+			int32 decindex = 0;
+			if (msg.Read<int32>(&decindex)<B_OK)
 				break;
-			
+
 			BString decpath;
 			decpath.SetTo(DECORATORS_DIR);
-			switch(decindex)
-			{
+			switch(decindex) {
 				case 0: decpath+="BeOS"; break;
 				case 1: decpath+="AmigaOS"; break;
 				case 2: decpath+="Windows"; break;
@@ -720,7 +712,7 @@ AppServer::DispatchMessage(int32 code, BPortLink &msg)
 				default:
 					break;
 			}
-			if(LoadDecorator(decpath.String()))
+			if (LoadDecorator(decpath.String()))
 				Broadcast(AS_UPDATE_DECORATOR);
 
 			break;
@@ -805,16 +797,16 @@ AppServer::DispatchMessage(int32 code, BPortLink &msg)
 void
 AppServer::Broadcast(int32 code)
 {
-	ServerApp	*app= NULL;
-	
 	acquire_sem(fAppListLock);
-	for(int32 i= 0; i < fAppList->CountItems(); i++)
-	{
-		app=(ServerApp*)fAppList->ItemAt(i);
-		if(!app)
+
+	for (int32 i = 0; i < fAppList->CountItems(); i++) {
+		ServerApp *app = (ServerApp *)fAppList->ItemAt(i);
+
+		if (!app)
 			{ printf("PANIC in AppServer::Broadcast()\n"); continue; }
 		app->PostMessage(code);
 	}
+
 	release_sem(fAppListLock);
 }
 
@@ -829,7 +821,7 @@ AppServer::Broadcast(int32 code)
 ServerApp *
 AppServer::FindApp(const char *sig)
 {
-	if(!sig)
+	if (!sig)
 		return NULL;
 
 	ServerApp *foundapp=NULL;

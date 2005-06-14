@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -106,7 +106,7 @@ Desktop::AddDriver(DisplayDriver *driver)
 			// The driver is now owned by the screen
 
 		// TODO: be careful of screen initialization - monitor may not support 640x480
-		screen->SetMode(640, 480, B_RGB32, 60.f);
+		screen->SetMode(800, 600, B_RGB32, 60.f);
 
 		fScreenList.AddItem(screen);
 	} else {

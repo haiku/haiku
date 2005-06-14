@@ -109,14 +109,14 @@ class CardView : public BView {
 								// CardView
 			void				SetBitmap(const BBitmap* bimtap);
 
-	inline	BPortLink*			ServerLink() const
+	inline	BPrivate::PortLink*	ServerLink() const
 									{ return fServerLink; }
 
-	void                                    ForwardMessage();
+	void						ForwardMessage();
 
 private:
 			port_id			fInputPort;
-			BPortLink*			fServerLink;
+			BPrivate::PortLink*	fServerLink;
 			const BBitmap*		fBitmap;
 };
 
@@ -153,7 +153,7 @@ CardView::CardView(BRect bounds)
 	// This link for sending mouse messages to the Haiku app_server.
 	// This is only to take the place of the input_server. 
 	port_id input_port = find_port(SERVER_INPUT_PORT);
-	fServerLink = new BPortLink(input_port);
+	fServerLink = new BPrivate::PortLink(input_port);
 #else
 	fInputPort = create_port(100, "ViewInputDevice");
 #endif
@@ -329,7 +329,7 @@ CardWindow::QuitRequested()
 	port_id serverport = find_port(SERVER_PORT_NAME);
 
 	if (serverport >= 0) {
-		BPortLink link(serverport);
+		BPrivate::PortLink link(serverport);
 		link.StartMessage(B_QUIT_REQUESTED);
 		link.Flush();
 	} else

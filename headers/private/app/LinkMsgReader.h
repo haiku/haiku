@@ -12,12 +12,12 @@
 #include <OS.h>
 
 
-//namespace BPrivate {
+namespace BPrivate {
 
-class LinkMsgReader {
+class LinkReceiver {
 	public:
-		LinkMsgReader(port_id port);
-		virtual ~LinkMsgReader(void);
+		LinkReceiver(port_id port);
+		virtual ~LinkReceiver(void);
 
 		void SetPort(port_id port);
 		port_id	Port(void) { return fReceivePort; }
@@ -53,6 +53,6 @@ class LinkMsgReader {
 		status_t fReadError;	//Read failed for current message
 };
 
-//}	// namespace BPrivate
+}	// namespace BPrivate
 
-#endif
+#endif	// _LINKMSGREADER_H

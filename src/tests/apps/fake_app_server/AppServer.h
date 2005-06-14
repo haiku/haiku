@@ -14,12 +14,14 @@ class Layer;
 class BMessage;
 class ServerApp;
 class DisplayDriver;
-class BPortLink;
 class CursorManager;
 class BitmapManager;
 
-class AppServer
-{
+namespace BPrivate {
+	class PortLink;
+};
+
+class AppServer {
 public:
 	AppServer(void);
 	~AppServer(void);
@@ -29,7 +31,7 @@ public:
 	thread_id Run(void);
 	void MainLoop(void);
 	
-	void DispatchMessage(int32 code, BPortLink &link);
+	void DispatchMessage(int32 code, BPrivate::PortLink &link);
 
 private:
 	port_id	fMessagePort;

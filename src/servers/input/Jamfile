@@ -47,7 +47,7 @@ if $(TARGET_PLATFORM) != haiku {
 		SubDirC++Flags -DAPPSERVER_R5_COMM ;
 	}
 } else {
-	APPSERVER_TEST_MODE = 1 ;
+	APPSERVER_TEST_MODE = 0 ;
 }
 
 Server input_server :

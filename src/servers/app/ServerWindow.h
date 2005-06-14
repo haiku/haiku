@@ -119,14 +119,14 @@ public:
 private:
 	
 			// methods for retrieving and creating a tree strcture of Layers.
-			Layer*				CreateLayerTree(Layer *localRoot, LinkMsgReader &link);
-			void				SetLayerState(Layer *layer, LinkMsgReader &link);
-			void				SetLayerFontState(Layer *layer, LinkMsgReader &link);
+			Layer*				CreateLayerTree(Layer *localRoot, BPrivate::LinkReceiver &link);
+			void				SetLayerState(Layer *layer, BPrivate::LinkReceiver &link);
+			void				SetLayerFontState(Layer *layer, BPrivate::LinkReceiver &link);
 			void				ClientDied(bool crashed);
 
 			// message handle methods.
-			void				DispatchMessage(int32 code, LinkMsgReader &link);
-			void				DispatchGraphicsMessage(int32 code, LinkMsgReader &link);
+			void				DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
+			void				DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link);
 	static	int32				MonitorWin(void *data);
 
 			// used by CopyBits and Scrolling
@@ -153,9 +153,9 @@ private:
 			port_id				fMessagePort;
 			port_id				fClientWinPort;
 			port_id				fClientLooperPort;
-	
-			LinkMsgReader*		fMsgReader;
-			LinkMsgSender*		fMsgSender;
+
+			BPrivate::LinkReceiver*	fMsgReceiver;
+			BPrivate::LinkSender*	fMsgSender;
 
 			BMessage			fClientViewsWithInvalidCoords;
 
@@ -166,4 +166,4 @@ private:
 			Layer*				fCurrentLayer;
 };
 
-#endif
+#endif	// _SERVERWIN_H_

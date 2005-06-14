@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2005, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -28,22 +28,12 @@
 #ifndef	_VIEW_H
 #define	_VIEW_H
 
-// Standard Includes -----------------------------------------------------------
 
-// System Includes -------------------------------------------------------------
 #include <BeBuild.h>
 #include <Font.h>
 #include <Handler.h>
 #include <InterfaceDefs.h>
 #include <Rect.h>
-
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
 
 
 // view definitions ------------------------------------------------------------
@@ -675,10 +665,3 @@ inline void	BView::SetLowColor(uchar r, uchar g, uchar b, uchar a)
 //------------------------------------------------------------------------------
 
 #endif	// _VIEW_H
-
-/*
- @log
-	* added PrintToStream() method for debugging BView.
- 
- */
-

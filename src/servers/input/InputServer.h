@@ -4,7 +4,7 @@
 // This is the primary application class for the Haiku input_server.
 //
 //
-// Copyright (c) 2001-2004 Haiku Project
+// Copyright (c) 2001-2005 Haiku Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -54,8 +54,8 @@
 #include <SupportDefs.h>
 
 #define APPSERVER_PORTLINK_COMM
-//#define R5_CURSOR_COMM // define this when R5 cursor communication should be used
-// #define APPSERVER_R5_COMM // define this when R5 app_server communication should be used
+#define R5_CURSOR_COMM // define this when R5 cursor communication should be used
+//#define APPSERVER_R5_COMM // define this when R5 app_server communication should be used
 
 #define INPUTSERVER_SIGNATURE "application/x-vnd.Be-input_server"	// use this when target should replace R5 input_server
 
@@ -65,7 +65,9 @@
 #endif
 
 #ifdef APPSERVER_PORTLINK_COMM
-class BPortLink;
+namespace BPrivate {
+	class PortLink;
+};
 #endif
 
 class InputDeviceListItem
@@ -241,7 +243,7 @@ private:
 
 #ifdef 	APPSERVER_PORTLINK_COMM
 	// added this to communicate via portlink
-	BPortLink 		*fAppServerLink;
+	BPrivate::PortLink	*fAppServerLink;
 #endif
 #ifdef R5_CURSOR_COMM
 	sem_id 		fCursorSem;

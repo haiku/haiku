@@ -22,7 +22,7 @@
 
 // send_mouse_down
 void
-send_mouse_down(BPortLink* serverLink, BPoint pt,
+send_mouse_down(BPrivate::PortLink* serverLink, BPoint pt,
 				BMessage* currentMessage)
 {
 	// Attach data:
@@ -53,7 +53,7 @@ send_mouse_down(BPortLink* serverLink, BPoint pt,
 
 // send_mouse_moved
 void
-send_mouse_moved(BPortLink* serverLink, BPoint pt,
+send_mouse_moved(BPrivate::PortLink* serverLink, BPoint pt,
 				 BMessage* currentMessage)
 {
 	// Attach data:
@@ -76,7 +76,7 @@ send_mouse_moved(BPortLink* serverLink, BPoint pt,
 
 // send_mouse_up
 void
-send_mouse_up(BPortLink* serverLink, BPoint pt,
+send_mouse_up(BPrivate::PortLink* serverLink, BPoint pt,
 			  BMessage* currentMessage)
 {
 	// Attach data:
@@ -99,7 +99,7 @@ send_mouse_up(BPortLink* serverLink, BPoint pt,
 
 // handle_message
 bool
-handle_message(BPortLink* serverLink, BMessage* msg)
+handle_message(BPrivate::PortLink* serverLink, BMessage* msg)
 {
 	bool handled = true;
 	switch (msg->what)

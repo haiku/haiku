@@ -107,8 +107,8 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort
 	// fMessagePort is the port we receive messages from our BApplication
 	fMessagePort=rcvport;
 
-	fMsgReader = new LinkMsgReader(fMessagePort);
-	fMsgSender = new LinkMsgSender(fClientAppPort);
+	fMsgReader = new BPrivate::LinkReceiver(fMessagePort);
+	fMsgSender = new BPrivate::LinkSender(fClientAppPort);
 
 	fIsActive=false;
 	
@@ -186,7 +186,7 @@ ServerApp::PingTarget(void)
 */
 void ServerApp::PostMessage(int32 code)
 {
-	BPortLink link(fMessagePort);
+	BPrivate::PortLink link(fMessagePort);
 	link.StartMessage(code);
 	link.Flush();
 }
@@ -239,7 +239,7 @@ int32 ServerApp::MonitorApp(void *data)
 	// Message-dispatching loop for the ServerApp
 	
 	ServerApp *app = (ServerApp *)data;
-	LinkMsgReader msgqueue(app->fMessagePort);
+	BPrivate::LinkReceiver msgqueue(app->fMessagePort);
 	
 	bool quitting = false;
 	int32 code;
@@ -340,9 +340,9 @@ int32 ServerApp::MonitorApp(void *data)
 	All attachments are placed in the buffer via a PortLink, so it will be a 
 	matter of casting and incrementing an index variable to access them.
 */
-void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
+void ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &msg)
 {
-	BPortLink replylink;
+	BPrivate::PortLink replylink;
 	
 	switch(code)
 	{
@@ -371,7 +371,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 
 			void *sharedmem=fSharedMem->GetBuffer(memsize);
 			
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 			if(memsize<1 || sharedmem==NULL)
 			{
 				replylink.StartMessage(SERVER_FALSE);
@@ -460,7 +460,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			STRACE(("ServerApp %s: Create Bitmap (%.1f,%.1f,%.1f,%.1f)\n",
 						fSignature.String(),r.left,r.top,r.right,r.bottom));
 
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 /*			if(sbmp)
 			{
 				fBitmapList->AddItem(sbmp);
@@ -495,7 +495,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			msg.Read<int32>(&bmp_id);
 			msg.Read<int32>(&replyport);
 			
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 			replylink.StartMessage(SERVER_TRUE);
 			replylink.Flush();	
 			break;
@@ -549,7 +549,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			int32 replyport;
 			msg.Read<int32>(&replyport);
 			
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 			replylink.StartMessage(fCursorHidden ? SERVER_TRUE : SERVER_FALSE);
 			replylink.Flush();
 			break;
@@ -571,7 +571,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			msg.Read<int32>(&replyport);
 
 			// Synchronous message - BApplication is waiting on the cursor's ID
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 			replylink.StartMessage(SERVER_TRUE);
 			replylink.Attach<int32>(-1);
 			replylink.Flush();
@@ -597,7 +597,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			port_id replyport;
 			msg.Read<int32>(&replyport);
 			
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 			replylink.StartMessage(SERVER_TRUE);
 			replylink.Attach<scroll_bar_info>(sbi);
 			replylink.Flush();
@@ -621,7 +621,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			port_id replyport;
 			msg.Read<int32>(&replyport);
 
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 			replylink.StartMessage(SERVER_TRUE);
 			replylink.Attach<bool>(true);
 			replylink.Flush();
@@ -658,7 +658,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			port_id replyport = -1;
 			msg.Read<int32>(&replyport);
 
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 			replylink.StartMessage(SERVER_TRUE);
 			replylink.Attach<mode_mouse>(mmode);
 			replylink.Flush();
@@ -675,7 +675,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			msg.Read<int32>(&whichcolor);
 			msg.Read<port_id>(&replyport);
 			
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 			replylink.StartMessage(SERVER_TRUE);
 			replylink.Attach<rgb_color>(color);
 			replylink.Flush();
@@ -714,7 +714,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			msg.Read<int32>(&famid);
 			msg.Read<port_id>(&replyport);
 			
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 
 			replylink.StartMessage(SERVER_FALSE);
 			replylink.Flush();
@@ -741,7 +741,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			msg.Read<int32>(&styid);
 			msg.Read<port_id>(&replyport);
 			
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 			
 			replylink.StartMessage(SERVER_FALSE);
 			replylink.Flush();
@@ -765,7 +765,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			msg.Read<uint16>(&styid);
 			msg.Read<port_id>(&replyport);
 
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 
 			replylink.StartMessage(SERVER_FALSE);
 			replylink.Flush();
@@ -793,7 +793,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			msg.Read<int32>(&styid);
 			msg.Read<port_id>(&replyport);
 			
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 			
 /*			fontserver->Lock();
 			FontStyle *fstyle=fontserver->GetStyle(famid,styid);
@@ -843,7 +843,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			msg.Read<uint8>(&spacing);
 			msg.Read<port_id>(&replyport);
 			
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 			replylink.StartMessage(SERVER_FALSE);
 			replylink.Flush();
 			break;
@@ -878,7 +878,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			msg.Read<int32>(&styid);
 			msg.Read<port_id>(&replyport);
 			
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 			
 			replylink.StartMessage(SERVER_FALSE);
 			replylink.Flush();
@@ -914,7 +914,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			msg.Read<int32>(&styid);
 			msg.Read<port_id>(&replyport);
 			
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 			
 			replylink.StartMessage(SERVER_FALSE);
 			replylink.Flush();
@@ -936,7 +936,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			msg.Read(fam,sizeof(font_family));
 			msg.Read<port_id>(&replyport);
 			
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 			
 			replylink.StartMessage(SERVER_FALSE);
 			replylink.Flush();
@@ -962,7 +962,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			msg.Read(sty,sizeof(font_style));
 			msg.Read<port_id>(&replyport);
 			
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 			
 			replylink.StartMessage(SERVER_FALSE);
 			replylink.Flush();
@@ -986,7 +986,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			msg.Read<uint16>(&sty);
 			msg.Read<port_id>(&replyport);
 			
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 			
 			replylink.StartMessage(SERVER_FALSE);
 			replylink.Flush();
@@ -1019,7 +1019,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			
 			msg.Read<port_id>(&replyport);
 			
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 			replylink.StartMessage(SERVER_TRUE);
 			replylink.Attach<int32>(0);
 			replylink.Flush();
@@ -1040,7 +1040,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			msg.Read(fam,sizeof(font_family));
 			msg.Read<port_id>(&replyport);
 			
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 			replylink.StartMessage(SERVER_FALSE);
 			replylink.Flush();
 			break;
@@ -1060,7 +1060,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			
 			port_id replyport;
 			msg.Read<port_id>(&replyport);
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 			
 			replylink.StartMessage(SERVER_FALSE);
 			replylink.Flush();
@@ -1083,7 +1083,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			msg.Read<float>(&ptsize);
 			msg.Read<port_id>(&replyport);
 			
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 			
 			replylink.StartMessage(SERVER_FALSE);
 			replylink.Flush();
@@ -1104,7 +1104,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			
 			port_id replyport;
 			msg.Read<port_id>(&replyport);
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 			
 			replylink.StartMessage(SERVER_FALSE);
 			replylink.Flush();
@@ -1125,7 +1125,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			
 			port_id replyport;
 			msg.Read<port_id>(&replyport);
-			replylink.SetSendPort(replyport);
+			replylink.SetSenderPort(replyport);
 			
 			replylink.StartMessage(SERVER_FALSE);
 			replylink.Flush();

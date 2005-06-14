@@ -107,8 +107,8 @@ ServerWindow::ServerWindow(const char *string, ServerApp *winapp,
 	// fMessagePort is the port to which the app sends messages for the server
 	fMessagePort = create_port(30, fName);
 
-	fMsgSender = new LinkMsgSender(fClientWinPort);
-	fMsgReader = new LinkMsgReader(fMessagePort);
+	fMsgSender = new BPrivate::LinkSender(fClientWinPort);
+	fMsgReceiver = new BPrivate::LinkReceiver(fMessagePort);
 
 	// Send a reply to our window - it is expecting fMessagePort port.
 	fMsgSender->StartMessage(SERVER_TRUE);
@@ -143,7 +143,7 @@ ServerWindow::~ServerWindow(void)
 
 	delete fWinBorder;
 	delete fMsgSender;
-	delete fMsgReader;
+	delete fMsgReceiver;
 
 	STRACE(("#ServerWindow(%s) will exit NOW\n", fName));
 }
@@ -290,7 +290,7 @@ ServerWindow::IsLocked() const
 	\param layer The layer to set the font
 */
 inline void
-ServerWindow::SetLayerFontState(Layer *layer, LinkMsgReader &link)
+ServerWindow::SetLayerFontState(Layer *layer, BPrivate::LinkReceiver &link)
 {
 	STRACE(("ServerWindow %s: SetLayerFontStateMessage for layer %s\n",
 			fName, layer->fName->String()));
@@ -301,7 +301,7 @@ ServerWindow::SetLayerFontState(Layer *layer, LinkMsgReader &link)
 
 
 inline void
-ServerWindow::SetLayerState(Layer *layer, LinkMsgReader &link)
+ServerWindow::SetLayerState(Layer *layer, BPrivate::LinkReceiver &link)
 {
 	STRACE(("ServerWindow %s: SetLayerState for layer %s\n",fName,
 			 layer->fName->String()));
@@ -313,7 +313,7 @@ ServerWindow::SetLayerState(Layer *layer, LinkMsgReader &link)
 
 
 inline Layer*
-ServerWindow::CreateLayerTree(Layer *localRoot, LinkMsgReader &link)
+ServerWindow::CreateLayerTree(Layer *localRoot, BPrivate::LinkReceiver &link)
 {
 	// NOTE: no need to check for a lock. This is a private method.
 
@@ -362,7 +362,7 @@ ServerWindow::CreateLayerTree(Layer *localRoot, LinkMsgReader &link)
 
 
 void
-ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
+ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 {
 	if (fCurrentLayer == NULL && code != AS_LAYER_CREATE_ROOT) {
 		printf("ServerWindow %s received unexpected code - message offset %ld before top_view attached.\n",fName, code - SERVER_TRUE);
@@ -1087,21 +1087,19 @@ ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 
 			link.Read<int32>(&mainToken);
 			link.Read(&teamID, sizeof(team_id));
-			
+
 			wb = gDesktop->FindWinBorderByServerWindowTokenAndTeamID(mainToken, teamID);
-			if(wb)
-			{
+			if (wb) {
 				fMsgSender->StartMessage(SERVER_TRUE);
 				fMsgSender->Flush();
 
-				BPortLink	msg(-1, -1);
+				// ToDo: this is a pretty expensive and complicated way to send a message...
+				BPrivate::PortLink msg(-1, -1);
 				msg.StartMessage(AS_ROOTLAYER_ADD_TO_SUBSET);
 				msg.Attach<WinBorder*>(fWinBorder);
 				msg.Attach<WinBorder*>(wb);
 				fWinBorder->GetRootLayer()->EnqueueMessage(msg);
-			}
-			else
-			{
+			} else {
 				fMsgSender->StartMessage(SERVER_FALSE);
 				fMsgSender->Flush();
 			}
@@ -1118,19 +1116,16 @@ ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			link.Read(&teamID, sizeof(team_id));
 			
 			wb = gDesktop->FindWinBorderByServerWindowTokenAndTeamID(mainToken, teamID);
-			if(wb)
-			{
+			if (wb) {
 				fMsgSender->StartMessage(SERVER_TRUE);
 				fMsgSender->Flush();
-				
-				BPortLink	msg(-1, -1);
+
+				BPrivate::PortLink msg(-1, -1);
 				msg.StartMessage(AS_ROOTLAYER_REMOVE_FROM_SUBSET);
 				msg.Attach<WinBorder*>(fWinBorder);
 				msg.Attach<WinBorder*>(wb);
 				fWinBorder->GetRootLayer()->EnqueueMessage(msg);
-			}
-			else
-			{
+			} else {
 				fMsgSender->StartMessage(SERVER_FALSE);
 				fMsgSender->Flush();
 			}
@@ -1151,7 +1146,7 @@ ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		case AS_SET_FEEL:
 		{
 			STRACE(("ServerWindow %s: Message AS_SET_FEEL\n",fName));
-			int32		newFeel;
+			int32 newFeel;
 			link.Read<int32>(&newFeel);
 			myRootLayer->GoChangeWinBorderFeel(fWinBorder, newFeel);
 			break;
@@ -1180,10 +1175,10 @@ ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		{
 			// TODO: Implement AS_SET_WORKSPACES
 			STRACE(("ServerWindow %s: Message Set_Workspaces unimplemented\n",fName));
-			uint32		newWorkspaces;
+			uint32 newWorkspaces;
 			link.Read<uint32>(&newWorkspaces);
 
-			BPortLink	msg(-1, -1);
+			BPrivate::PortLink msg(-1, -1);
 			msg.StartMessage(AS_ROOTLAYER_WINBORDER_SET_WORKSPACES);
 			msg.Attach<WinBorder*>(fWinBorder);
 			msg.Attach<uint32>(fWinBorder->Workspaces());
@@ -1421,10 +1416,12 @@ ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			break;
 	}
 }
+
 		// -------------------- Graphics messages ----------------------------------
+
 inline
 void
-ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
+ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 {
 	fWinBorder->GetRootLayer()->Lock();
 	BRegion rreg(fCurrentLayer->fVisible);
@@ -1951,7 +1948,7 @@ int32
 ServerWindow::MonitorWin(void *data)
 {
 	ServerWindow *win = (ServerWindow *)data;
-	LinkMsgReader *ses = win->fMsgReader;
+	BPrivate::LinkReceiver *ses = win->fMsgReceiver;
 
 	bool quitting = false;
 	int32 code;

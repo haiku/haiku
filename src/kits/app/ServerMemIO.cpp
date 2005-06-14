@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku
+//	Copyright (c) 2001-2005, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -41,20 +41,20 @@
 
 
 ServerMemIO::ServerMemIO(size_t size)
-		: fLen(0),
-		fPhys(0),
-		fPos(0)
+	:
+	fLen(0),
+	fPhys(0),
+	fPos(0)
 {
 	if (size == 0)
 		return;
 
-	BPrivate::BAppServerLink link;
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_ACQUIRE_SERVERMEM);
 	link.Attach<size_t>(size);
-	link.Attach<port_id>(link.ReplyPort());
 
 	int32 code;
-	if (link.FlushWithReply(&code) == B_OK
+	if (link.FlushWithReply(code) == B_OK
 		&& code == SERVER_TRUE) {
 		area_info info;
 
@@ -77,7 +77,7 @@ ServerMemIO::ServerMemIO(size_t size)
 // Destruction
 ServerMemIO::~ServerMemIO()
 {
-	BPrivate::BAppServerLink link;
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_RELEASE_SERVERMEM);
 	link.Attach<area_id>(fSourceArea);
 	link.Attach<int32>(fOffset);
@@ -91,10 +91,9 @@ ServerMemIO::ReadAt(off_t pos, void *buffer, size_t size)
 {
 	if (buffer == NULL || pos < 0)
 		return B_BAD_VALUE;
-		
+
 	ssize_t sizeRead = 0;
-	if (pos < fLen) 
-	{
+	if (pos < fLen) {
 		sizeRead = min_c(static_cast<off_t>(size), fLen - pos);
 		memcpy(buffer, fBuf + pos, sizeRead);
 	}
@@ -108,17 +107,16 @@ ServerMemIO::WriteAt(off_t pos, const void *buffer, size_t size)
 {	
 	if (buffer == NULL || pos < 0)
 		return B_BAD_VALUE;
-		
+
 	ssize_t sizeWritten = 0;	
-	if (pos < fPhys) 
-	{
+	if (pos < fPhys) {
 		sizeWritten = min_c(static_cast<off_t>(size), fPhys - pos);
 		memcpy(fBuf + pos, buffer, sizeWritten);
 	}
-	
+
 	if (pos + sizeWritten > fLen)
 		fLen = pos + sizeWritten;
-						
+
 	return sizeWritten;
 }
 
@@ -127,8 +125,7 @@ ServerMemIO::WriteAt(off_t pos, const void *buffer, size_t size)
 off_t
 ServerMemIO::Seek(off_t position, uint32 seek_mode)
 {
-	switch (seek_mode) 
-	{
+	switch (seek_mode) {
 		case SEEK_SET:
 			fPos = position;
 			break;

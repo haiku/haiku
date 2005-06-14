@@ -35,6 +35,7 @@
 
 #include "LayerData.h"
 
+
 // constructor
 DrawData::DrawData()
 	: fOrigin(0.0, 0.0),
@@ -377,7 +378,7 @@ LayerData::PrintToStream() const
 
 // ReadFontFromLink
 void
-LayerData::ReadFontFromLink(LinkMsgReader& link)
+LayerData::ReadFontFromLink(BPrivate::LinkReceiver& link)
 {
 	uint16 mask;
 	link.Read<uint16>(&mask);
@@ -433,7 +434,7 @@ LayerData::ReadFontFromLink(LinkMsgReader& link)
 
 // ReadFromLink
 void
-LayerData::ReadFromLink(LinkMsgReader& link)
+LayerData::ReadFromLink(BPrivate::LinkReceiver& link)
 {
 	rgb_color highColor;
 	rgb_color lowColor;
@@ -478,7 +479,7 @@ LayerData::ReadFromLink(LinkMsgReader& link)
 
 // WriteToLink
 void
-LayerData::WriteToLink(LinkMsgSender& link) const
+LayerData::WriteToLink(BPrivate::LinkSender& link) const
 {
 	rgb_color hc = fHighColor.GetColor32();
 	rgb_color lc = fLowColor.GetColor32();

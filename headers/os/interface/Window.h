@@ -35,7 +35,9 @@
 #include <StorageDefs.h>
 #include <View.h>
 
-class BPortLink;
+namespace BPrivate {
+	class PortLink;
+};
 
 
 // window definitions ----------------------------------------------------------
@@ -389,13 +391,9 @@ private:
 	short			fShowLevel;
 	uint32			fFlags;
 
-	port_id			send_port;
-	port_id			receive_port;
-
 	BView			*top_view;
 	BView			*fFocus;
 	BView			*fLastMouseMovedView;
-	void			*a_session;					// unusedm was _BSession_
 	BMenuBar		*fKeyMenuBar;
 	BButton			*fDefaultButton;
 	BList			accelList;
@@ -419,11 +417,11 @@ private:
 	ViewAttr		*fCurDrawViewState;			// not yet used
 	window_feel		fFeel;
 	int32			fLastViewToken;
-	BPortLink		*fLink;
+	BPrivate::PortLink	*fLink;
 	BMessageRunner	*fPulseRunner;
 	BRect			fCurrentFrame;				// not yet used
 
-	uint32			_reserved[2];	// was 8
+	uint32			_reserved[5];	// was 8
 #if !_PR3_COMPATIBLE_
 	uint32			_more_reserved[4];
 #endif

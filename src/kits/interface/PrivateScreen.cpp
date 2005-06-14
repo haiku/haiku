@@ -158,7 +158,7 @@ BPrivateScreen::RetraceSemaphore()
 	sem_id id = B_BAD_SEM_ID;
 	// TODO: Implement
 	/*
-	BAppServerLink link;
+	BPrivate::AppServerLink link;
 	PortMessage reply;
 	link.SetOpCode(AS_GET_RETRACE_SEMAPHORE);
 	link.Attach<screen_id>(ID());
@@ -233,13 +233,13 @@ rgb_color
 BPrivateScreen::DesktopColor(uint32 workspace)
 {
 	rgb_color color = { 51, 102, 152, 255 };
-	BAppServerLink link;
+	BPrivate::AppServerLink link;
 
 	link.StartMessage(AS_GET_DESKTOP_COLOR);
 	link.Attach<int32>(workspace);
 
 	int32 code;
-	if (link.FlushWithReply(&code) == B_OK
+	if (link.FlushWithReply(code) == B_OK
 		&& code == SERVER_TRUE)
 		link.Read<rgb_color>(&color);
 
@@ -250,7 +250,7 @@ BPrivateScreen::DesktopColor(uint32 workspace)
 void
 BPrivateScreen::SetDesktopColor(rgb_color color, uint32 workspace, bool makeDefault)
 {
-	BAppServerLink link;
+	BPrivate::AppServerLink link;
 
 	link.StartMessage(AS_SET_DESKTOP_COLOR);
 	link.Attach<rgb_color>(color);
@@ -282,20 +282,19 @@ BPrivateScreen::GetMode(uint32 workspace, display_mode *mode)
 	if (mode == NULL)
 		return B_BAD_VALUE;
 		
-	BAppServerLink link;
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_SCREEN_GET_MODE);
 	link.Attach<screen_id>(ID());
 	link.Attach<uint32>(workspace);
-	
-	int32 code = SERVER_FALSE;
-	link.FlushWithReply(&code);
-	
-	if (code != SERVER_TRUE)
+
+	int32 code;
+	if (link.FlushWithReply(code) != B_OK
+		|| code != SERVER_TRUE)
 		return B_ERROR;
-	
+
 	display_mode currentMode;
 	link.Read<display_mode>(&currentMode);
-	
+
 	status_t status = B_ERROR;
 	link.Read<status_t>(&status);
 	if (status == B_OK && mode)
@@ -311,20 +310,18 @@ BPrivateScreen::SetMode(uint32 workspace, display_mode *mode, bool makeDefault)
 	if (mode == NULL)
 		return B_BAD_VALUE;
 		
-	BAppServerLink link;
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_SCREEN_SET_MODE);
 	link.Attach<screen_id>(ID());
 	link.Attach<uint32>(workspace);
 	link.Attach<display_mode>(*mode);
 	link.Attach<bool>(makeDefault);
 	
-	int32 code = SERVER_FALSE;
-	link.FlushWithReply(&code);
-	
 	status_t status = B_ERROR;
-	if (code == SERVER_TRUE)
+	int32 code;
+	if (link.FlushWithReply(code) == B_OK && code == SERVER_TRUE)
 		link.Read<status_t>(&status);
-	
+
 	return status;
 }
 
@@ -358,7 +355,7 @@ BPrivateScreen::SetDPMS(uint32 dpmsState)
 {
 	status_t status = B_ERROR;
 	/*
-	BAppServerLink link;
+	BPrivate::AppServerLink link;
 	PortMessage reply;
 	link.SetOpCode(AS_SET_DPMS);
 	link.Attach<screen_id>(ID());
@@ -376,7 +373,7 @@ BPrivateScreen::DPMSState()
 	// TODO: Implement
 	uint32 state = 0;
 	/*
-	BAppServerLink link;
+	BPrivate::AppServerLink link;
 	PortMessage reply;
 	link.SetOpCode(AS_GET_DPMS_STATE);
 	link.Attach<screen_id>(ID());
@@ -393,7 +390,7 @@ BPrivateScreen::DPMSCapabilites()
 	// TODO: Implement
 	uint32 capabilities = 0;
 	/*
-	BAppServerLink link;
+	BPrivate::AppServerLink link;
 	PortMessage reply;
 	link.SetOpCode(AS_GET_DPMS_CAPABILITIES);
 	link.Attach<screen_id>(ID());
@@ -430,7 +427,7 @@ BPrivateScreen::get_screen_desc(screen_desc *desc)
 {
 	status_t status = B_ERROR;
 	/*
-	BAppServerLink link;
+	BPrivate::AppServerLink link;
 	PortMessage reply;
 	link.SetOpCode(AS_GET_SCREEN_DESC);
 	link.Attach<screen_id>(ID());
@@ -451,12 +448,12 @@ BPrivateScreen::BPrivateScreen()
 	// TODO: BeOS R5 here gets the colormap pointer
 	// (with BApplication::ro_offset_to_ptr() ?)
 	// which is contained in a shared area created by the server.
-	BAppServerLink link;
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_SCREEN_GET_COLORMAP);
 	link.Attach<screen_id>(ID());
+
 	int32 reply;
-	link.FlushWithReply(&reply);
-	if (reply == SERVER_TRUE) {
+	if (link.FlushWithReply(reply) == B_OK && reply == SERVER_TRUE) {
 		fColorMap = (color_map *)malloc(sizeof(color_map));
 		fOwnsColorMap = true;
 		link.Read<color_map>(fColorMap);

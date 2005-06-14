@@ -201,9 +201,7 @@ BWindow::BWindow(BRect frame, color_space depth,
 BWindow::~BWindow()
 {
 	// the following lines, remove all existing shortcuts and delete accelList
-	int32 noOfItems;
-
-	noOfItems = accelList.CountItems();
+	int32 noOfItems = accelList.CountItems();
 	for (int index = noOfItems-1; index >= 0; index--) {
 		delete (_BCmdKey*)accelList.ItemAt(index);
 	}
@@ -221,8 +219,9 @@ BWindow::~BWindow()
 	fLink->StartMessage(AS_DELETE_WINDOW);
 	fLink->Flush();
 
+	delete_port(fLink->SenderPort());
+	delete_port(fLink->ReceiverPort());
 	delete fLink;
-	delete_port(receive_port);
 }
 
 
@@ -2054,8 +2053,8 @@ BWindow::InitData(BRect frame, const char* title, window_look look,
 	// Here, we will contact app_server and let him know that a window has
 	// been created
 	
-	receive_port = create_port( B_LOOPER_PORT_DEFAULT_CAPACITY ,"w_rcv_port");
-	if (receive_port < B_OK) {
+	port_id receivePort = create_port( B_LOOPER_PORT_DEFAULT_CAPACITY ,"w_rcv_port");
+	if (receivePort < B_OK) {
 		debugger("Could not create BWindow's receive port, used for interacting with the app_server!");
 		delete this;
 		return;
@@ -2064,8 +2063,8 @@ BWindow::InitData(BRect frame, const char* title, window_look look,
 	STRACE(("BWindow::InitData(): contacting app_server...\n"));
 
 	// let app_server to know that a window has been created.
-	fLink = new BPortLink(be_app->fServerFrom, receive_port);
-	
+	fLink = new BPrivate::PortLink(be_app->fServerLink->SenderPort(), receivePort);
+
 	// HERE we are in BApplication's thread, so for locking we use be_app variable
 	// we'll lock the be_app to be sure we're the only one writing at BApplication's server port
 	bool locked = false;
@@ -2074,8 +2073,6 @@ BWindow::InitData(BRect frame, const char* title, window_look look,
 		locked = true; 
 	}
 
-	STRACE(("be_app->fServerTo is %ld\n", be_app->fServerFrom));
-
 	fLink->StartMessage(AS_CREATE_WINDOW);
 	fLink->Attach<BRect>(fFrame);
 	fLink->Attach<int32>((int32)fLook);
@@ -2083,22 +2080,23 @@ BWindow::InitData(BRect frame, const char* title, window_look look,
 	fLink->Attach<uint32>(fFlags);
 	fLink->Attach<uint32>(workspace);
 	fLink->Attach<int32>(_get_object_token_(this));
-	fLink->Attach<port_id>(receive_port);
+	fLink->Attach<port_id>(receivePort);
 	fLink->Attach<port_id>(fMsgPort);
 	fLink->AttachString(title);
 
+	port_id sendPort;
 	int32 code;
 	if (fLink->FlushWithReply(code) == B_OK
 		&& code == SERVER_TRUE
-		&& fLink->Read<port_id>(&send_port) == B_OK)
-		fLink->SetSendPort(send_port);
+		&& fLink->Read<port_id>(&sendPort) == B_OK)
+		fLink->SetSenderPort(sendPort);
 	else
-		send_port = -1;
+		sendPort = -1;
 
 	if (locked)
 		be_app->Unlock();
 
-	STRACE(("Server says that our send port is %ld\n", send_port));
+	STRACE(("Server says that our send port is %ld\n", sendPort));
 
 	STRACE(("Window locked?: %s\n", IsLocked() ? "True" : "False"));
 
@@ -2137,7 +2135,7 @@ void
 BWindow::task_looper()
 {
 	STRACE(("info: BWindow::task_looper() started.\n"));
-	
+
 	//	Check that looper is locked (should be)
 	AssertLocked();
 	//	Unlock the looper
@@ -2943,25 +2941,24 @@ BWindow::PrintToStream() const
 		top_view name	= %s\
 		focus view name	= %s\
 		lastMouseMoved	= %s\
-		fLink			= %s\
+		fLink			= %p\
 		KeyMenuBar name	= %s\
 		DefaultButton	= %s\
 		# of shortcuts	= %ld",
-		Name(),
-		fTitle!=NULL? fTitle:"NULL",
+		Name(), fTitle,
 		_get_object_token_(this),		
-		fInTransaction==true? "yes":"no",
-		fActive==true? "yes":"no",
+		fInTransaction == true ? "yes" : "no",
+		fActive == true ? "yes" : "no",
 		fShowLevel,
 		fFlags,
-		send_port,
-		receive_port,
-		top_view!=NULL? top_view->Name():"NULL",
-		fFocus!=NULL? fFocus->Name():"NULL",
-		fLastMouseMovedView!=NULL? fLastMouseMovedView->Name():"NULL",
-		fLink!=NULL? "In place":"NULL",
-		fKeyMenuBar!=NULL? fKeyMenuBar->Name():"NULL",
-		fDefaultButton!=NULL? fDefaultButton->Name():"NULL",
+		fLink->SenderPort(),
+		fLink->ReceiverPort(),
+		top_view != NULL ? top_view->Name() : "NULL",
+		fFocus != NULL ? fFocus->Name() : "NULL",
+		fLastMouseMovedView != NULL ? fLastMouseMovedView->Name() : "NULL",
+		fLink,
+		fKeyMenuBar != NULL ? fKeyMenuBar->Name() : "NULL",
+		fDefaultButton != NULL ? fDefaultButton->Name() : "NULL",
 		accelList.CountItems());
 /*
 	for( int32 i=0; i<accelList.CountItems(); i++){

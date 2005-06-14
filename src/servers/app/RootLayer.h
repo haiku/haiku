@@ -43,7 +43,10 @@ class Screen;
 class WinBorder;
 class Desktop;
 class DisplayDriver;
-class BPortLink;
+
+namespace BPrivate {
+	class PortLink;
+};
 
 #ifndef DISPLAY_HAIKU_LOGO
 #define DISPLAY_HAIKU_LOGO 1
@@ -127,7 +130,7 @@ public:
 			void				Unlock() { fAllRegionsLock.Unlock(); }
 			bool				IsLocked() { return fAllRegionsLock.IsLocked(); }
 			void				RunThread();
-			status_t			EnqueueMessage(BPortLink &message);
+			status_t			EnqueueMessage(BPrivate::PortLink &message);
 			void				GoInvalidate(const Layer *layer, const BRegion &region);
 			void				GoRedraw(const Layer *layer, const BRegion &region);
 			void				GoChangeWinBorderFeel(const WinBorder *winBorder, int32 newFeel);
@@ -168,8 +171,8 @@ friend class Desktop;
 			void				show_final_scene(WinBorder *exFocus, WinBorder *exActive);
 
 			// Input related methods
-			void				MouseEventHandler(int32 code, BPortLink& link);
-			void				KeyboardEventHandler(int32 code, BPortLink& link);
+			void				MouseEventHandler(int32 code, BPrivate::PortLink& link);
+			void				KeyboardEventHandler(int32 code, BPrivate::PortLink& link);
 
 			Desktop*			fDesktop;
 			BMessage*			fDragMessage;

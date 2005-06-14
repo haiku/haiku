@@ -1,38 +1,17 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Application.cpp
-//	Author:			Erik Jaesler (erik@cgsoftware.com)
-//	Description:	BApplication class is the center of the application
-//					universe.  The global be_app and be_app_messenger 
-//					variables are defined here as well.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Erik Jaesler (erik@cgsoftware.com)
+ */
 
-// Standard Includes -----------------------------------------------------------
+
 #include <new>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-// System Includes -------------------------------------------------------------
 #include <Alert.h>
 #include <AppFileInfo.h>
 #include <Application.h>
@@ -51,7 +30,6 @@
 #include <RosterPrivate.h>
 #include <Window.h>
 
-// Project Includes ------------------------------------------------------------
 #include <AppServerLink.h>
 #include <LooperList.h>
 #include <MenuWindow.h>
@@ -69,8 +47,7 @@ BResources *BApplication::_app_resources = NULL;
 BLocker BApplication::_app_resources_lock("_app_resources_lock");
 
 
-static property_info
-sPropertyInfo[] = {
+static property_info sPropertyInfo[] = {
 	{
 		"Window",
 		{},
@@ -234,13 +211,14 @@ BApplication::~BApplication()
 
 #ifndef RUN_WITHOUT_APP_SERVER
 	// tell app_server we're quitting...
-	BPortLink link(fServerFrom);
+	BPrivate::AppServerLink link;
 	link.StartMessage(B_QUIT_REQUESTED);
 	link.Flush();
 #endif	// RUN_WITHOUT_APP_SERVER
 
-	// ToDo: since we add the port, I guess we should remove it as well? -- axeld.
-	//delete_port(fServerTo);
+	delete_port(fServerLink->SenderPort());
+	delete_port(fServerLink->ReceiverPort());
+	delete fServerLink;
 
 	// uninitialize be_app, the be_app_messenger is invalidated automatically
 	be_app = NULL;
@@ -257,12 +235,12 @@ BApplication::operator=(const BApplication &rhs)
 void
 BApplication::InitData(const char *signature, status_t *_error)
 {
-DBG(OUT("BApplication::InitData(`%s', %p)\n", signature, _error));
+	DBG(OUT("BApplication::InitData(`%s', %p)\n", signature, _error));
 	// check whether there exists already an application
 	if (be_app)
 		debugger("2 BApplication objects were created. Only one is allowed.");
 
-	fServerFrom = fServerTo = -1;
+	fServerLink = new BPrivate::PortLink(-1, -1);
 	fServerHeap = NULL;
 	fInitialWorkspace = 0;
 	fDraggedMessage = NULL;
@@ -420,7 +398,7 @@ DBG(OUT("BApplication::InitData(`%s', %p)\n", signature, _error));
 		be_app = this;
 		be_app_messenger = BMessenger(NULL, this);
 	}
-		
+
 	// set the BHandler's name
 	if (fInitError == B_OK)
 		SetName(ref.name);
@@ -433,7 +411,7 @@ DBG(OUT("BApplication::InitData(`%s', %p)\n", signature, _error));
 
 #ifndef RUN_WITHOUT_APP_SERVER
 	// Initialize the IK after we have set be_app because of a construction of a
-	// BAppServerLink (which depends on be_app) nested inside the call to get_menu_info.
+	// AppServerLink (which depends on be_app) nested inside the call to get_menu_info.
 	if (fInitError == B_OK)
 		fInitError = _init_interface_kit_();
 	// create global system cursors
@@ -660,7 +638,7 @@ BApplication::ResolveSpecifier(BMessage *msg, int32 index,
 void
 BApplication::ShowCursor()
 {
-	BPrivate::BAppServerLink link;
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_SHOW_CURSOR);
 	link.Flush();
 }
@@ -669,7 +647,7 @@ BApplication::ShowCursor()
 void
 BApplication::HideCursor()
 {
-	BPrivate::BAppServerLink link;
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_HIDE_CURSOR);
 	link.Flush();
 }
@@ -678,7 +656,7 @@ BApplication::HideCursor()
 void
 BApplication::ObscureCursor()
 {
-	BPrivate::BAppServerLink link;
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_OBSCURE_CURSOR);
 	link.Flush();
 }
@@ -687,10 +665,10 @@ BApplication::ObscureCursor()
 bool
 BApplication::IsCursorHidden() const
 {
-	BPrivate::BAppServerLink link;
+	BPrivate::AppServerLink link;
 	int32 code = SERVER_FALSE;
 	link.StartMessage(AS_QUERY_CURSOR_HIDDEN);
-	link.FlushWithReply(&code);
+	link.FlushWithReply(code);
 
 	return code == SERVER_TRUE;
 }
@@ -710,14 +688,14 @@ BApplication::SetCursor(const void *cursor)
 void
 BApplication::SetCursor(const BCursor *cursor, bool sync)
 {
-	BPrivate::BAppServerLink link;
+	BPrivate::AppServerLink link;
 	int32 code = SERVER_FALSE;
 
 	link.StartMessage(AS_SET_CURSOR_BCURSOR);
 	link.Attach<bool>(sync);
 	link.Attach<int32>(cursor->m_serverToken);
 	if (sync)
-		link.FlushWithReply(&code);
+		link.FlushWithReply(code);
 	else
 		link.Flush();
 }
@@ -1018,7 +996,7 @@ BApplication::run_task()
 void
 BApplication::BeginRectTracking(BRect rect, bool trackWhole)
 {
-	BPrivate::BAppServerLink link;
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_BEGIN_RECT_TRACKING);
 	link.Attach<BRect>(rect);
 	link.Attach<int32>(trackWhole);
@@ -1029,7 +1007,7 @@ BApplication::BeginRectTracking(BRect rect, bool trackWhole)
 void
 BApplication::EndRectTracking()
 {
-	BPrivate::BAppServerLink link;
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_END_RECT_TRACKING);
 	link.Flush();
 }
@@ -1071,20 +1049,20 @@ BApplication::global_ro_offs_to_ptr(uint32 offset)
 void
 BApplication::connect_to_app_server()
 {
-	fServerFrom = find_port(SERVER_PORT_NAME);
-	if (fServerFrom < B_OK) {
-		fInitError = fServerFrom;
+	port_id serverPort = find_port(SERVER_PORT_NAME);
+	if (serverPort < B_OK) {
+		fInitError = serverPort;
 		return;
 	}
 
 	// Create the port so that the app_server knows where to send messages
-	fServerTo = create_port(100, "a<fServerTo");
-	if (fServerTo < B_OK) {
-		fInitError = fServerTo;
+	port_id clientPort = create_port(100, "a<app_server");
+	if (clientPort < B_OK) {
+		fInitError = clientPort;
 		return;
 	}
 
-	// We can't use BAppServerLink because be_app == NULL
+	// We can't use AppServerLink because be_app == NULL
 
 	// AS_CREATE_APP:
 	//
@@ -1094,21 +1072,25 @@ BApplication::connect_to_app_server()
 	// 3) team_id - team identification field
 	// 4) int32 - handler ID token of the app
 	// 5) char * - signature of the regular app
-	BPortLink link(fServerFrom, fServerTo);
+	fServerLink->SetTo(serverPort, clientPort);
+
+	fServerLink->StartMessage(AS_CREATE_APP);
+	fServerLink->Attach<port_id>(clientPort);
+	fServerLink->Attach<port_id>(_get_looper_port_(this));
+	fServerLink->Attach<team_id>(Team());
+	fServerLink->Attach<int32>(_get_object_token_(this));
+	fServerLink->AttachString(fAppName);
+
 	int32 code;
-
-	link.StartMessage(AS_CREATE_APP);
-	link.Attach<port_id>(fServerTo);
-	link.Attach<port_id>(_get_looper_port_(this));
-	link.Attach<team_id>(Team());
-	link.Attach<int32>(_get_object_token_(this));
-	link.AttachString(fAppName);
-
-	if (link.FlushWithReply(code) == B_OK
-		&& code == SERVER_TRUE)
-		link.Read<port_id>(&fServerFrom);
-	else
+	if (fServerLink->FlushWithReply(code) == B_OK
+		&& code == SERVER_TRUE) {
+		fServerLink->Read<port_id>(&serverPort);
+		// ToDo: what are we supposed to do with this port?
+		fServerLink->SetSenderPort(serverPort);
+	} else {
+		fServerLink->SetSenderPort(-1);
 		debugger("BApplication: couldn't obtain new app_server comm port");
+	}
 }
 
 

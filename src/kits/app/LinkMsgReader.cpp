@@ -30,8 +30,9 @@ extern const char *bstrcode(int32 code);
 #	define STRACE(x) ;
 #endif
 
+namespace BPrivate {
 
-LinkMsgReader::LinkMsgReader(port_id port)
+LinkReceiver::LinkReceiver(port_id port)
 	:
 	fReceivePort(port), fRecvBuffer(NULL), fRecvPosition(0), fRecvStart(0),
 	fRecvBufferSize(0), fDataSize(0),
@@ -40,28 +41,28 @@ LinkMsgReader::LinkMsgReader(port_id port)
 }
 
 
-LinkMsgReader::~LinkMsgReader()
+LinkReceiver::~LinkReceiver()
 {
 	free(fRecvBuffer);
 }
 
 
 void
-LinkMsgReader::SetPort(port_id port)
+LinkReceiver::SetPort(port_id port)
 {
 	fReceivePort = port;
 }
 
 
 status_t
-LinkMsgReader::GetNextMessage(int32 &code, bigtime_t timeout)
+LinkReceiver::GetNextMessage(int32 &code, bigtime_t timeout)
 {
 	int32 remaining;
 
 	fReadError = B_OK;
 
 	remaining = fDataSize - (fRecvStart + fReplySize);
-	STRACE(("info: LinkMsgReader GetNextReply() reports %ld bytes remaining in buffer.\n", remaining));
+	STRACE(("info: LinkReceiver GetNextReply() reports %ld bytes remaining in buffer.\n", remaining));
 
 	// find the position of the next message header in the buffer
 	message_header *header;
@@ -80,14 +81,14 @@ LinkMsgReader::GetNextMessage(int32 &code, bigtime_t timeout)
 	// check we have a well-formed message
 	if (remaining < (int32)sizeof(message_header)) {
 		// we don't have enough data for a complete header
-		STRACE(("error info: LinkMsgReader remaining %ld bytes is less than header size.\n", remaining));
+		STRACE(("error info: LinkReceiver remaining %ld bytes is less than header size.\n", remaining));
 		ResetBuffer();
 		return B_ERROR;
 	}
 
 	fReplySize = header->size;
 	if (fReplySize > remaining || fReplySize < (int32)sizeof(message_header)) {
-		STRACE(("error info: LinkMsgReader message size of %ld bytes smaller than header size.\n", fReplySize));
+		STRACE(("error info: LinkReceiver message size of %ld bytes smaller than header size.\n", fReplySize));
 		ResetBuffer();
 		return B_ERROR;
 	}
@@ -95,7 +96,7 @@ LinkMsgReader::GetNextMessage(int32 &code, bigtime_t timeout)
 	code = header->code;
 	fRecvPosition += sizeof(message_header);
 
-	STRACE(("info: LinkMsgReader got header %s [%ld %ld %ld] from port %ld.\n",
+	STRACE(("info: LinkReceiver got header %s [%ld %ld %ld] from port %ld.\n",
 		strcode(header->code), fReplySize, header->code, header->flags, fReceivePort));
 
 	return B_OK;
@@ -103,7 +104,7 @@ LinkMsgReader::GetNextMessage(int32 &code, bigtime_t timeout)
 
 
 bool
-LinkMsgReader::NeedsReply() const
+LinkReceiver::NeedsReply() const
 {
 	if (fReplySize == 0)
 		return false;
@@ -114,7 +115,7 @@ LinkMsgReader::NeedsReply() const
 
 
 void
-LinkMsgReader::ResetBuffer()
+LinkReceiver::ResetBuffer()
 {
 	fRecvPosition = 0;
 	fRecvStart = 0;
@@ -124,7 +125,7 @@ LinkMsgReader::ResetBuffer()
 
 
 status_t
-LinkMsgReader::AdjustReplyBuffer(bigtime_t timeout)
+LinkReceiver::AdjustReplyBuffer(bigtime_t timeout)
 {
 	// Here we take advantage of the compiler's dead-code elimination
 	if (kInitialBufferSize == kMaxBufferSize) {
@@ -139,13 +140,13 @@ LinkMsgReader::AdjustReplyBuffer(bigtime_t timeout)
 
 		fRecvBufferSize = kInitialBufferSize;
 	} else {
-		STRACE(("info: LinkMsgReader getting port_buffer_size().\n"));
+		STRACE(("info: LinkReceiver getting port_buffer_size().\n"));
 		ssize_t bufferSize;
 		if (timeout == B_INFINITE_TIMEOUT)
 			bufferSize = port_buffer_size(fReceivePort);
 		else
 			bufferSize = port_buffer_size_etc(fReceivePort, B_TIMEOUT, timeout);
-		STRACE(("info: LinkMsgReader got port_buffer_size() = %ld.\n", bufferSize));
+		STRACE(("info: LinkReceiver got port_buffer_size() = %ld.\n", bufferSize));
 
 		if (bufferSize < 0)
 			return (status_t)bufferSize;
@@ -159,7 +160,7 @@ LinkMsgReader::AdjustReplyBuffer(bigtime_t timeout)
 			if (bufferSize > (ssize_t)kMaxBufferSize)
 				return B_ERROR;	// we can't continue
 
-			STRACE(("info: LinkMsgReader setting receive buffersize to %ld.\n", bufferSize));
+			STRACE(("info: LinkReceiver setting receive buffersize to %ld.\n", bufferSize));
 			char *buffer = (char *)malloc(bufferSize);
 			if (buffer == NULL)
 				return B_NO_MEMORY;
@@ -175,7 +176,7 @@ LinkMsgReader::AdjustReplyBuffer(bigtime_t timeout)
 
 
 status_t
-LinkMsgReader::ReadFromPort(bigtime_t timeout)
+LinkReceiver::ReadFromPort(bigtime_t timeout)
 {
 	// we are here so it means we finished reading the buffer contents
 	ResetBuffer();
@@ -187,7 +188,7 @@ LinkMsgReader::ReadFromPort(bigtime_t timeout)
 	int32 code;
 	ssize_t bytesRead;
 
-	STRACE(("info: LinkMsgReader reading port %ld.\n", fReceivePort));
+	STRACE(("info: LinkReceiver reading port %ld.\n", fReceivePort));
 	while (true) {
 		if (timeout != B_INFINITE_TIMEOUT) {
 			do {
@@ -201,7 +202,7 @@ LinkMsgReader::ReadFromPort(bigtime_t timeout)
 			} while (bytesRead == B_INTERRUPTED);
 		}
 
-		STRACE(("info: LinkMsgReader read %ld bytes.\n", bytesRead));
+		STRACE(("info: LinkReceiver read %ld bytes.\n", bytesRead));
 		if (bytesRead < B_OK)
 			return bytesRead;
 
@@ -222,9 +223,9 @@ LinkMsgReader::ReadFromPort(bigtime_t timeout)
 
 
 status_t
-LinkMsgReader::Read(void *data, ssize_t size)
+LinkReceiver::Read(void *data, ssize_t size)
 {
-//	STRACE(("info: LinkMsgReader Read()ing %ld bytes...\n", size));
+//	STRACE(("info: LinkReceiver Read()ing %ld bytes...\n", size));
 	if (fReadError < B_OK)
 		return fReadError;
 
@@ -249,7 +250,7 @@ LinkMsgReader::Read(void *data, ssize_t size)
 
 
 status_t
-LinkMsgReader::ReadString(char **_string)
+LinkReceiver::ReadString(char **_string)
 {
 	int32 length = 0;
 	status_t status;
@@ -285,3 +286,4 @@ LinkMsgReader::ReadString(char **_string)
 	}
 }
 
+}	// namespace BPrivate

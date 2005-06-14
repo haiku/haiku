@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -984,7 +984,7 @@ Layer::MoveBy(float x, float y)
 		return;
 	}
 
-	BPortLink msg(-1, -1);
+	BPrivate::PortLink msg(-1, -1);
 	msg.StartMessage(AS_ROOTLAYER_LAYER_MOVE);
 	msg.Attach<Layer*>(this);
 	msg.Attach<float>(x);
@@ -1005,7 +1005,7 @@ Layer::ResizeBy(float x, float y)
 		return;
 	}
 
-	BPortLink msg(-1, -1);
+	BPrivate::PortLink msg(-1, -1);
 	msg.StartMessage(AS_ROOTLAYER_LAYER_RESIZE);
 	msg.Attach<Layer*>(this);
 	msg.Attach<float>(x);

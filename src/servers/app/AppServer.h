@@ -20,9 +20,12 @@ class Layer;
 class BMessage;
 class ServerApp;
 class DisplayDriver;
-class BPortLink;
 class CursorManager;
 class BitmapManager;
+
+namespace BPrivate {
+	class PortLink;
+};
 
 /*!
 	\class AppServer AppServer.h
@@ -50,7 +53,7 @@ public:
 	bool LoadDecorator(const char *path);
 	void InitDecorators(void);
 	
-	void DispatchMessage(int32 code, BPortLink &link);
+	void DispatchMessage(int32 code, BPrivate::PortLink &link);
 	void Broadcast(int32 code);
 
 	ServerApp* FindApp(const char *sig);

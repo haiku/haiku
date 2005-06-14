@@ -190,8 +190,8 @@ bool
 ServerApp::PingTarget(void)
 {
 	team_info tinfo;
-	if (get_team_info(fClientTeamID,&tinfo) == B_BAD_TEAM_ID) {
-		LinkMsgSender link(gAppServerPort);
+	if (get_team_info(fClientTeamID, &tinfo) == B_BAD_TEAM_ID) {
+		BPrivate::LinkSender link(gAppServerPort);
 		link.StartMessage(AS_DELETE_APP);
 		link.Attach(&fMonitorThreadID, sizeof(thread_id));
 		link.Flush();
@@ -207,7 +207,7 @@ ServerApp::PingTarget(void)
 void
 ServerApp::PostMessage(int32 code)
 {
-	LinkMsgSender link(fMessagePort);
+	BPrivate::LinkSender link(fMessagePort);
 	link.StartMessage(code);
 	link.Flush();
 }
@@ -268,7 +268,7 @@ ServerApp::MonitorApp(void *data)
 	// Message-dispatching loop for the ServerApp
 
 	ServerApp *app = (ServerApp *)data;
-	LinkMsgReader &reader = app->fLink.Reader();
+	BPrivate::LinkReceiver &reader = app->fLink.Receiver();
 
 	int32 code;
 	status_t err = B_OK;
@@ -280,7 +280,7 @@ ServerApp::MonitorApp(void *data)
 			STRACE(("ServerApp::MonitorApp(): GetNextMessage returned %s\n", strerror(err)));
 
 			// ToDo: this should kill the app, but it doesn't work
-			LinkMsgSender link(gAppServerPort);
+			BPrivate::LinkSender link(gAppServerPort);
 			link.StartMessage(AS_DELETE_APP);
 			link.Attach(&app->fMonitorThreadID, sizeof(thread_id));
 			link.Flush();
@@ -362,7 +362,7 @@ ServerApp::MonitorApp(void *data)
 				STRACE(("ServerApp %s: B_QUIT_REQUESTED\n",app->fSignature.String()));
 				// Our BApplication sent us this message when it quit.
 				// We need to ask the app_server to delete ourself.
-				LinkMsgSender sender(gAppServerPort);
+				BPrivate::LinkSender sender(gAppServerPort);
 				sender.StartMessage(AS_DELETE_APP);
 				sender.Attach(&app->fMonitorThreadID, sizeof(thread_id));
 				sender.Flush();
@@ -390,7 +390,7 @@ ServerApp::MonitorApp(void *data)
 	matter of casting and incrementing an index variable to access them.
 */
 void
-ServerApp::DispatchMessage(int32 code, LinkMsgReader &link)
+ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 {
 	LayerData ld;
 
@@ -963,7 +963,6 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &link)
 			// 1) font_family - name of family
 			// 2) uint32 - flags of font family (B_IS_FIXED || B_HAS_TUNED_FONT)
 			int32 id;
-debugger("");
 			link.Read<int32>(&id);
 
 			fontserver->Lock();

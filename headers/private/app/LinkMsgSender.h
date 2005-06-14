@@ -14,12 +14,12 @@
 #include <OS.h>
 
 
-//namespace BPrivate {
+namespace BPrivate {
 	
-class LinkMsgSender {
+class LinkSender {
 	public:
-		LinkMsgSender(port_id sendport);
-		virtual ~LinkMsgSender(void);
+		LinkSender(port_id sendport);
+		virtual ~LinkSender(void);
 
 		void SetPort(port_id port);
 		port_id	Port() { return fPort; }
@@ -58,6 +58,6 @@ class LinkMsgSender {
 		status_t fCurrentStatus;
 };
 
-//}	// namespace BPrivate
+}	// namespace BPrivate
 
 #endif	/* LINKMSGSENDER_H */

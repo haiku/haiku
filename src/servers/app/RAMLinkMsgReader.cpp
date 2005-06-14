@@ -2,20 +2,16 @@
 #include <malloc.h>
 
 RAMLinkMsgReader::RAMLinkMsgReader(int8 *buffer)
- : LinkMsgReader(B_ERROR)
+	: BPrivate::LinkReceiver(-1)
 {
 	SetBuffer(buffer);
 }
 
 
 RAMLinkMsgReader::RAMLinkMsgReader(void)
- : LinkMsgReader(B_ERROR)
+	: BPrivate::LinkReceiver(-1)
 {
-	fBuffer=NULL;
-	fAttachStart=NULL;
-	fPosition=NULL;
-	fAttachSize=0;
-	fCode=B_ERROR;
+	SetBuffer(NULL);
 }
 
 
@@ -28,23 +24,22 @@ RAMLinkMsgReader::~RAMLinkMsgReader(void)
 void
 RAMLinkMsgReader::SetBuffer(int8 *buffer)
 {
-	if(!buffer)
-	{
-		fBuffer=NULL;
-		fAttachStart=NULL;
-		fPosition=NULL;
-		fAttachSize=0;
-		fCode=B_ERROR;
+	if (!buffer) {
+		fBuffer = NULL;
+		fAttachStart = NULL;
+		fPosition = NULL;
+		fAttachSize = 0;
+		fCode = B_ERROR;
 		return;
 	}
-	
-	fBuffer=buffer;
-	fPosition=fBuffer+4;
-	
-	fCode=*((int32*)fBuffer);
-	fAttachSize=*( (size_t*) fPosition);
-	fPosition+=sizeof(size_t);
-	fAttachStart=fPosition;
+
+	fBuffer = buffer;
+	fPosition = fBuffer + 4;
+
+	fCode = *((int32*)fBuffer);
+	fAttachSize = *((size_t *)fPosition);
+	fPosition += sizeof(size_t);
+	fAttachStart = fPosition;
 }
 
 

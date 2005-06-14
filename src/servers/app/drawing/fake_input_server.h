@@ -13,22 +13,24 @@
 
 #include <Point.h>
 
-class BPortLink;
+namespace BPrivate {
+	class PortLink;
+};
 class BMessage;
 
 void
-send_mouse_down(BPortLink* serverLink, BPoint pt,
+send_mouse_down(BPrivate::PortLink* serverLink, BPoint pt,
 				BMessage* currentMessage);
 
 void
-send_mouse_moved(BPortLink* serverLink, BPoint pt,
+send_mouse_moved(BPrivate::PortLink* serverLink, BPoint pt,
 				 BMessage* currentMessage);
 
 void
-send_mouse_up(BPortLink* serverLink, BPoint pt,
+send_mouse_up(BPrivate::PortLink* serverLink, BPoint pt,
 			  BMessage* currentMessage);
 
 bool
-handle_message(BPortLink* serverLink, BMessage* msg);
+handle_message(BPrivate::PortLink* serverLink, BMessage* msg);
 
 #endif	// FAKE_INPUT_SERVER_H

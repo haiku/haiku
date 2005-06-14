@@ -39,7 +39,7 @@
 		size_t buffer size
 		[data buffer]
 */
-class RAMLinkMsgReader : public LinkMsgReader {
+class RAMLinkMsgReader : public BPrivate::LinkReceiver {
 	public:
 		RAMLinkMsgReader(int8 *buffer);
 		RAMLinkMsgReader(void);

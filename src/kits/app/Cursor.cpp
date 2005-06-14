@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2004, Haiku
+//	Copyright (c) 2001-2005, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -58,13 +58,13 @@ BCursor::BCursor(const void *cursorData)
 		return;
 
 	// Send data directly to server
-	BPrivate::BAppServerLink serverlink;
-	int32 code=SERVER_FALSE;
+	BPrivate::AppServerLink serverlink;
+	int32 code = SERVER_FALSE;
 
 	serverlink.StartMessage(AS_CREATE_BCURSOR);
 	serverlink.Attach(cursorData, 68);
-	serverlink.FlushWithReply(&code);
-	if(code==SERVER_TRUE)
+	serverlink.FlushWithReply(code);
+	if (code == SERVER_TRUE)
 		serverlink.Read<int32>(&m_serverToken);
 }
 
@@ -80,7 +80,7 @@ BCursor::BCursor(BMessage *data)
 BCursor::~BCursor()
 {
 	// Notify server to deallocate server-side objects for this cursor
-	BPrivate::BAppServerLink serverlink;
+	BPrivate::AppServerLink serverlink;
 	serverlink.StartMessage(AS_DELETE_BCURSOR);
 	serverlink.Attach<int32>(m_serverToken);
 	serverlink.Flush();

@@ -209,14 +209,17 @@ get_scroll_bar_info(scroll_bar_info *info)
 	if (info == NULL)
 		return B_BAD_VALUE;
 
-	BAppServerLink link;
-	int32 code;
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_SCROLLBAR_INFO);
-	link.FlushWithReply(&code);
-	if(code==SERVER_TRUE)
+
+	int32 code;
+	if (link.FlushWithReply(code) == B_OK
+		&& code == SERVER_TRUE) {
 		link.Read<scroll_bar_info>(info);
-	
-	return ((code==SERVER_TRUE)?B_OK:B_ERROR);
+		return B_OK;
+	}
+
+	return B_ERROR;
 }
 
 
@@ -226,13 +229,17 @@ set_scroll_bar_info(scroll_bar_info *info)
 	if (info == NULL)
 		return B_BAD_VALUE;
 
-	BAppServerLink link;
+	BPrivate::AppServerLink link;
 	int32 code;
 	
 	link.StartMessage(AS_SET_SCROLLBAR_INFO);
 	link.Attach<scroll_bar_info>(*info);
-	link.FlushWithReply(&code);
-	return ((code==SERVER_TRUE)?B_OK:B_ERROR);
+	
+	if (link.FlushWithReply(code) == B_OK
+		&& code == SERVER_TRUE)
+		return B_OK;
+
+	return B_ERROR;
 }
 
 #endif // COMPILE_FOR_R5
@@ -550,14 +557,15 @@ keyboard_navigation_color()
 _IMPEXP_BE int32
 count_workspaces()
 {
-	int32 count=1;
-	
-	BAppServerLink link;
-	int32 code;
+	int32 count = 1;
+
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_COUNT_WORKSPACES);
-	link.FlushWithReply(&code);
-	if(code==SERVER_TRUE)
+
+	int32 code;
+	if (link.FlushWithReply(code) == B_OK && code == SERVER_TRUE)
 		link.Read<int32>(&count);
+
 	return count;
 }
 
@@ -565,7 +573,7 @@ count_workspaces()
 _IMPEXP_BE void
 set_workspace_count(int32 count)
 {
-	BAppServerLink link;
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_SET_WORKSPACE_COUNT);
 	link.Attach<int32>(count);
 	link.Flush();
@@ -577,12 +585,13 @@ current_workspace()
 {
 	int32 index = 0;
 	
-	BAppServerLink link;
-	int32 code;
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_CURRENT_WORKSPACE);	
-	if (link.FlushWithReply(&code) == B_OK && code == SERVER_TRUE)
+
+	int32 code;
+	if (link.FlushWithReply(code) == B_OK && code == SERVER_TRUE)
 		link.Read<int32>(&index);
-	
+
 	return index;
 }
 
@@ -590,7 +599,7 @@ current_workspace()
 _IMPEXP_BE void
 activate_workspace(int32 workspace)
 {
-	BAppServerLink link;
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_ACTIVATE_WORKSPACE);
 	link.Attach<int32>(workspace);
 	link.Flush();
@@ -601,14 +610,14 @@ _IMPEXP_BE bigtime_t
 idle_time()
 {
 	bigtime_t idletime = 0;
-	
-	BAppServerLink link;
-	int32 code;
+
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_IDLE_TIME);
-	link.FlushWithReply(&code);
-	if(code==SERVER_TRUE)
+
+	int32 code;
+	if (link.FlushWithReply(code) == B_OK && code == SERVER_TRUE)
 		link.Read<int64>(&idletime);
-	
+
 	return idletime;
 }
 
@@ -641,7 +650,7 @@ run_be_about()
 _IMPEXP_BE void
 set_focus_follows_mouse(bool follow)
 {
-	BAppServerLink link;
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_SET_FOCUS_FOLLOWS_MOUSE);
 	link.Attach<bool>(follow);
 	link.Flush();
@@ -652,13 +661,14 @@ _IMPEXP_BE bool
 focus_follows_mouse()
 {
 	bool ffm = false;
-	
-	BAppServerLink link;
-	int32 code;
+
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_FOCUS_FOLLOWS_MOUSE);
-	link.FlushWithReply(&code);
-	if(code==SERVER_TRUE)
+
+	int32 code;
+	if (link.FlushWithReply(code) == B_OK && code == SERVER_TRUE)
 		link.Read<bool>(&ffm);
+
 	return ffm;
 }
 
@@ -666,7 +676,7 @@ focus_follows_mouse()
 _IMPEXP_BE void
 set_mouse_mode(mode_mouse mode)
 {
-	BAppServerLink link;
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_SET_MOUSE_MODE);
 	link.Attach<mode_mouse>(mode);
 	link.Flush();
@@ -676,14 +686,16 @@ set_mouse_mode(mode_mouse mode)
 _IMPEXP_BE mode_mouse
 mouse_mode()
 {
+	// ToDo: what is mouse_mode? Get a default value over here now! :-)
 	mode_mouse mode;
 	
-	BAppServerLink link;
-	int32 code;
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_MOUSE_MODE);
-	link.FlushWithReply(&code);
-	if(code==SERVER_TRUE)
+
+	int32 code;
+	if (link.FlushWithReply(code) == B_OK && code == SERVER_TRUE)
 		link.Read<mode_mouse>(&mode);
+
 	return mode;
 }
 
@@ -692,14 +704,15 @@ _IMPEXP_BE rgb_color
 ui_color(color_which which)
 {
 	rgb_color color;
-	
-	BAppServerLink link;
-	int32 code;
+
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_UI_COLOR);
 	link.Attach<color_which>(which);
-	link.FlushWithReply(&code);
-	if(code==SERVER_TRUE)
+
+	int32 code;
+	if (link.FlushWithReply(code) == B_OK && code == SERVER_TRUE)
 		link.Read<rgb_color>(&color);
+
 	return color;
 }
 
@@ -794,43 +807,47 @@ _fini_interface_kit_()
 void
 __set_window_decor(int32 theme)
 {
-	BAppServerLink link;
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_R5_SET_DECORATOR);
 	link.Attach<int32>(theme);
 	link.Flush();
 }
 
+namespace BPrivate {
+
 /*!
 	\brief Private function to get the system's GUI colors as a set
 	\param colors The recipient color set
 */
-void get_system_colors(ColorSet *colors)
+void
+get_system_colors(ColorSet *colors)
 {
-	if(!colors)
+	if (!colors)
 		return;
-	
-	BAppServerLink link;
-	int32 code;
-	
+
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_UI_COLORS);
-	link.Flush();
-	link.GetNextMessage(code);
-	link.Read<ColorSet>(colors);
+
+	int32 code;
+	if (link.FlushWithReply(code) == B_OK)
+		link.Read<ColorSet>(colors);
 }
 
 /*!
 	\brief Private function to set the system's GUI colors all at once
 	\param colors The color set to use
 */
-void set_system_colors(const ColorSet &colors)
+void
+set_system_colors(const ColorSet &colors)
 {
-	BAppServerLink link;
-	
+	BPrivate::AppServerLink link;
+
 	link.StartMessage(AS_SET_UI_COLORS);
 	link.Attach<ColorSet>(colors);
 	link.Flush();
 }
 
+}	// namespace BPrivate
 
 // These methods were marked with "Danger, will Robinson!" in
 // the OpenTracker source, so we might not want to be compatible

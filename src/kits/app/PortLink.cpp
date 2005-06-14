@@ -21,33 +21,30 @@
 #include <ServerProtocol.h>
 
 
-BPortLink::BPortLink(port_id send, port_id receive)
-	:
-	fReader(new LinkMsgReader(receive)), 
-	fSender(new LinkMsgSender(send))
+namespace BPrivate {
+
+ServerLink::ServerLink()
 {
 }
 
 
-BPortLink::~BPortLink()
+ServerLink::~ServerLink()
 {
-	delete fReader;
-	delete fSender;
 }
 
 
 status_t
-BPortLink::ReadRegion(BRegion *region)
+ServerLink::ReadRegion(BRegion *region)
 {
-	fReader->Read(&region->count, sizeof(long));
-	fReader->Read(&region->bound, sizeof(clipping_rect));
+	fReceiver->Read(&region->count, sizeof(long));
+	fReceiver->Read(&region->bound, sizeof(clipping_rect));
 	region->set_size(region->count + 1);
-	return fReader->Read(region->data, region->count * sizeof(clipping_rect));
+	return fReceiver->Read(region->data, region->count * sizeof(clipping_rect));
 }
 
 
 status_t
-BPortLink::AttachRegion(const BRegion &region)
+ServerLink::AttachRegion(const BRegion &region)
 {
 	fSender->Attach(&region.count, sizeof(long));
 	fSender->Attach(&region.bound, sizeof(clipping_rect));
@@ -56,17 +53,17 @@ BPortLink::AttachRegion(const BRegion &region)
 
 
 status_t
-BPortLink::ReadShape(BShape *shape)
+ServerLink::ReadShape(BShape *shape)
 {
 	int32 opCount, ptCount;
-	fReader->Read(&opCount, sizeof(int32));
-	fReader->Read(&ptCount, sizeof(int32));
+	fReceiver->Read(&opCount, sizeof(int32));
+	fReceiver->Read(&ptCount, sizeof(int32));
 	
 	uint32 opList[opCount];
-	fReader->Read(opList, opCount * sizeof(uint32));
+	fReceiver->Read(opList, opCount * sizeof(uint32));
 	
 	BPoint ptList[ptCount];
-	fReader->Read(ptList, ptCount * sizeof(BPoint));
+	fReceiver->Read(ptList, ptCount * sizeof(BPoint));
 	
 	shape->SetData(opCount, ptCount, opList, ptList);
 	return B_OK;
@@ -74,7 +71,7 @@ BPortLink::ReadShape(BShape *shape)
 
 
 status_t
-BPortLink::AttachShape(BShape &shape)
+ServerLink::AttachShape(BShape &shape)
 {
 	int32 opCount, ptCount;
 	uint32 *opList;
@@ -90,7 +87,7 @@ BPortLink::AttachShape(BShape &shape)
 
 
 status_t
-BPortLink::FlushWithReply(int32 &code)
+ServerLink::FlushWithReply(int32 &code)
 {
 	status_t status = Flush(B_INFINITE_TIMEOUT, true);
 	if (status < B_OK)
@@ -98,3 +95,30 @@ BPortLink::FlushWithReply(int32 &code)
 
 	return GetNextMessage(code);
 }
+
+
+//	#pragma mark -
+
+
+PortLink::PortLink(port_id send, port_id receive)
+{
+	fSender = new LinkSender(send);
+	fReceiver = new LinkReceiver(receive);
+}
+
+
+PortLink::~PortLink()
+{
+	delete fReceiver;
+	delete fSender;
+}
+
+
+void
+PortLink::SetTo(port_id sender, port_id receiver)
+{
+	fSender->SetPort(sender);
+	fReceiver->SetPort(receiver);
+}
+
+}	// namespace BPrivate

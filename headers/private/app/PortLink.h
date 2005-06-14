@@ -29,21 +29,17 @@
 
 */
 
-// ToDo: put this into the private namespace
-//namespace BPrivate {
+namespace BPrivate {
 
-//class LinkMsgReader;
-//class LinkMsgSender;
-
-class BPortLink {
+class ServerLink {
 	public:
-		BPortLink(port_id send = -1, port_id reply = -1);
-		virtual ~BPortLink();
+		ServerLink();
+		virtual ~ServerLink();
 
 		// send methods
 
-		void SetSendPort(port_id port);
-		port_id	SendPort();
+		void SetSenderPort(port_id port);
+		port_id	SenderPort();
 
 		status_t StartMessage(int32 code, size_t minSize = 0);
 		void CancelMessage();
@@ -58,8 +54,8 @@ class BPortLink {
 
 		// receive methods
 
-		void SetReplyPort(port_id port);
-		port_id	ReplyPort();
+		void SetReceiverPort(port_id port);
+		port_id	ReceiverPort();
 
 		status_t GetNextMessage(int32 &code, bigtime_t timeout = B_INFINITE_TIMEOUT);
 		bool NeedsReply() const;
@@ -72,66 +68,75 @@ class BPortLink {
 		// convenience methods
 
 		status_t FlushWithReply(int32 &code);
-		LinkMsgReader &Reader() { return *fReader; }
-		LinkMsgSender &Sender() { return *fSender; }
+		LinkSender &Sender() { return *fSender; }
+		LinkReceiver &Receiver() { return *fReceiver; }
 
 	protected:
-		LinkMsgReader *fReader;
-		LinkMsgSender *fSender;
+		LinkSender *fSender;
+		LinkReceiver *fReceiver;
 };
+
+class PortLink : public ServerLink {
+	public:
+		PortLink(port_id sender = -1, port_id receiver = -1);
+		virtual ~PortLink();
+
+		void SetTo(port_id sender, port_id receiver);
+};
+
 
 // sender inline functions
 
 inline void
-BPortLink::SetSendPort(port_id port)
+ServerLink::SetSenderPort(port_id port)
 {
 	fSender->SetPort(port);
 }
 
 inline port_id
-BPortLink::SendPort()
+ServerLink::SenderPort()
 {
 	return fSender->Port();
 }
 
 inline status_t
-BPortLink::StartMessage(int32 code, size_t minSize)
+ServerLink::StartMessage(int32 code, size_t minSize)
 {
 	return fSender->StartMessage(code, minSize);
 }
 
 inline status_t
-BPortLink::EndMessage()
+ServerLink::EndMessage()
 {
 	return fSender->EndMessage();
 }
 
 inline void
-BPortLink::CancelMessage()
+ServerLink::CancelMessage()
 {
 	fSender->CancelMessage();
 }
 
 inline status_t
-BPortLink::Flush(bigtime_t timeout, bool needsReply)
+ServerLink::Flush(bigtime_t timeout, bool needsReply)
 {
 	return fSender->Flush(timeout, needsReply);
 }
 
 inline status_t
-BPortLink::Attach(const void *data, ssize_t size)
+ServerLink::Attach(const void *data, ssize_t size)
 {
 	return fSender->Attach(data, size);
 }
 
 inline status_t
-BPortLink::AttachString(const char *string, int32 length)
+ServerLink::AttachString(const char *string, int32 length)
 {
 	return fSender->AttachString(string, length);
 }
 
 template<class Type> status_t
-BPortLink::Attach(const Type &data)
+ServerLink::Attach(const Type &data)
 {
 	return Attach(&data, sizeof(Type));
 }
@@ -139,47 +144,47 @@ BPortLink::Attach(const Type &data)
 // #pragma mark - receiver inline functions
 
 inline void
-BPortLink::SetReplyPort(port_id port)
+ServerLink::SetReceiverPort(port_id port)
 {
-	fReader->SetPort(port);
+	fReceiver->SetPort(port);
 }
 
 inline port_id
-BPortLink::ReplyPort()
+ServerLink::ReceiverPort()
 {
-	return fReader->Port();
+	return fReceiver->Port();
 }
 
 inline status_t
-BPortLink::GetNextMessage(int32 &code, bigtime_t timeout)
+ServerLink::GetNextMessage(int32 &code, bigtime_t timeout)
 {
-	return fReader->GetNextMessage(code, timeout);
+	return fReceiver->GetNextMessage(code, timeout);
 }
 
 inline bool
-BPortLink::NeedsReply() const
+ServerLink::NeedsReply() const
 {
-	return fReader->NeedsReply();
+	return fReceiver->NeedsReply();
 }
 
 inline status_t
-BPortLink::Read(void *data, ssize_t size)
+ServerLink::Read(void *data, ssize_t size)
 {
-	return fReader->Read(data, size);
+	return fReceiver->Read(data, size);
 }
 
 inline status_t
-BPortLink::ReadString(char **string)
+ServerLink::ReadString(char **string)
 {
-	return fReader->ReadString(string);
+	return fReceiver->ReadString(string);
 }
 
 template <class Type> status_t
-BPortLink::Read(Type *data)
+ServerLink::Read(Type *data)
 {
 	return Read(data, sizeof(Type));
 }
 
-//}	// namespace BPrivate
+}	// namespace BPrivate
 
 #endif	/* _PORTLINK_H */

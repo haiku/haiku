@@ -45,7 +45,7 @@ set_syscursor(cursor_which which, const BCursor *cursor)
 	if (server < B_OK)
 		return;
 
-	BPortLink link(server);
+	BPrivate::PortLink link(server);
 	link.StartMessage(AS_SET_SYSCURSOR_BCURSOR);
 	link.Attach<cursor_which>(which);
 	
@@ -72,7 +72,7 @@ set_syscursor(cursor_which which, const BBitmap *bitmap)
 	if (server < B_OK)
 		return;
 
-	BPortLink link(server);
+	BPrivate::PortLink link(server);
 	link.StartMessage(AS_SET_SYSCURSOR_BBITMAP);
 	link.Attach<cursor_which>(which);
 	
@@ -94,12 +94,11 @@ get_syscursor(void)
 	port_id server = find_port(SERVER_PORT_NAME);
 	if (server >= B_OK) {
 		int32 code = SERVER_FALSE;
-		BPrivate::BAppServerLink link;
+		BPrivate::PortLink link(server);
 		cursor_which which;
 
-		link.SetSendPort(server);
 		link.StartMessage(AS_GET_SYSCURSOR);
-		link.FlushWithReply(&code);
+		link.FlushWithReply(code);
 
 		if (code == SERVER_TRUE
 			&& link.Read<cursor_which>(&which) == B_OK)
@@ -119,7 +118,7 @@ setcursor(cursor_which which)
 	if (server < B_OK)
 		return;
 
-	BPortLink link(server);
+	BPrivate::PortLink link(server);
 	link.StartMessage(AS_SET_CURSOR_SYSTEM);
 	link.Flush();
 }

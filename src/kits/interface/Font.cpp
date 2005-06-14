@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2004, Haiku
+//	Copyright (c) 2001-2005, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -75,28 +75,27 @@ _init_global_fonts()
 void
 _font_control_(BFont *font, int32 cmd, void *data)
 {
-	if(!font || (cmd!=AS_SET_SYSFONT_PLAIN && cmd!=AS_SET_SYSFONT_BOLD &&
-				cmd!=AS_SET_SYSFONT_FIXED) )
-	{
+	if (!font
+		|| (cmd != AS_SET_SYSFONT_PLAIN && cmd != AS_SET_SYSFONT_BOLD
+			&& cmd != AS_SET_SYSFONT_FIXED)) {
 		// this shouldn't ever happen, but just in case....
 		printf("DEBUG: Bad parameters in _font_control_()\n");
 		return;
 	}
-		
+
 	int32 code;
-	BPrivate::BAppServerLink link;
-	
+	BPrivate::AppServerLink link;
+
 	link.StartMessage(cmd);
-	link.FlushWithReply(&code);
-	
-	if(code!=SERVER_TRUE)
-	{
+
+	if (link.FlushWithReply(code) != B_OK
+		|| code != SERVER_TRUE) {
 		// Once again, this shouldn't ever happen, but I want to know about it
 		// if it does
 		printf("DEBUG: Couldn't initialize font in _font_control()\n");
 		return;
 	}
-	
+
 	// there really isn't that much data that we need to set for such cases -- most
 	// of them need to be set to the defaults. The stuff that can change are family,
 	// style/face, size, and height.
@@ -121,15 +120,14 @@ void
 _set_system_font_(const char *which, font_family family, font_style style, 
 					float size)
 {
-	if(!which)
+	if (!which)
 		return;
 	
-	if( (strcmp(which,"plain")==0) ||
-		(strcmp(which,"bold")==0) ||
-		(strcmp(which,"fixed")==0) )
-	{
-		BPrivate::BAppServerLink link;
-		
+	if (!strcmp(which,"plain")
+		|| !strcmp(which,"bold")
+		|| !strcmp(which,"fixed")) {
+		BPrivate::AppServerLink link;
+
 		link.StartMessage(AS_SET_SYSTEM_FONT);
 		link.AttachString(which);
 		link.AttachString(family);
@@ -149,14 +147,14 @@ int32
 count_font_families(void)
 {
 	int32 code, count;
-	BPrivate::BAppServerLink link;
-	
+	BPrivate::AppServerLink link;
+
 	link.StartMessage(AS_COUNT_FONT_FAMILIES);
-	link.FlushWithReply(&code);
-	
-	if(code!=SERVER_TRUE)
+
+	if (link.FlushWithReply(code) != B_OK
+		|| code != SERVER_TRUE)
 		return -1;
-	
+
 	link.Read<int32>(&count);
 	return count;
 }
@@ -171,14 +169,14 @@ int32
 count_font_styles(font_family name)
 {
 	int32 code, count;
-	BPrivate::BAppServerLink link;
-	
+	BPrivate::AppServerLink link;
+
 	link.StartMessage(AS_COUNT_FONT_STYLES);
-	link.FlushWithReply(&code);
-	
-	if(code!=SERVER_TRUE)
+
+	if (link.FlushWithReply(code) != B_OK
+		&& code != SERVER_TRUE)
 		return -1;
-	
+
 	link.Read<int32>(&count);
 	return count;
 }
@@ -196,24 +194,24 @@ status_t
 get_font_family(int32 index, font_family *name, uint32 *flags)
 {
 	// Fix over R5, which does not check for NULL font family names - it just crashes
-	if(!name)
+	if (!name)
 		return B_ERROR;
 
 	int32 code;
-	BPrivate::BAppServerLink link;
+	BPrivate::AppServerLink link;
 	
 	link.StartMessage(AS_GET_FAMILY_NAME);
 	link.Attach<int32>(index);
-	link.FlushWithReply(&code);
-	
-	if(code!=SERVER_TRUE)
+
+	if (link.FlushWithReply(code) != B_OK
+		|| code != SERVER_TRUE)
 		return B_ERROR;
-	
+
 	link.Read<font_family>(name);
 	
-	if(flags)
+	if (flags)
 		link.Read<uint32>(flags);
-		
+
 	return B_OK;
 }
 
@@ -234,19 +232,18 @@ get_font_style(font_family family, int32 index, font_style *name,
 		return B_ERROR;
 
 	int32 code;
-	BPrivate::BAppServerLink link;
-	
+	BPrivate::AppServerLink link;
+
 	link.StartMessage(AS_GET_STYLE_NAME);
 	link.Attach(family,sizeof(font_family));
 	link.Attach<int32>(index);
-	link.FlushWithReply(&code);
-	
-	if(code!=SERVER_TRUE)
+
+	if (link.FlushWithReply(code) != B_OK
+		|| code != SERVER_TRUE)
 		return B_ERROR;
-	
+
 	link.Read<font_style>(name);
-	if(flags)
-	{
+	if (flags) {
 		uint16 face;
 		link.Read<uint16>(&face);
 		link.Read<uint32>(flags);
@@ -275,21 +272,21 @@ get_font_style(font_family family, int32 index, font_style *name,
 		return B_ERROR;
 
 	int32 code;
-	BPrivate::BAppServerLink link;
-	
+	BPrivate::AppServerLink link;
+
 	link.StartMessage(AS_GET_STYLE_NAME);
-	link.Attach(family,sizeof(font_family));
+	link.Attach(family, sizeof(font_family));
 	link.Attach<int32>(index);
-	link.FlushWithReply(&code);
-	
-	if(code!=SERVER_TRUE)
+
+	if (link.FlushWithReply(code) != B_OK
+		|| code != SERVER_TRUE)
 		return B_ERROR;
-	
+
 	link.Read<font_style>(name);
 	link.Read<uint16>(face);
-	if(flags)
+	if (flags)
 		link.Read<uint32>(flags);
-	
+
 	return B_OK;
 }
 
@@ -305,15 +302,15 @@ update_font_families(bool check_only)
 {
 	int32 code;
 	bool value;
-	BPrivate::BAppServerLink link;
-	
+	BPrivate::AppServerLink link;
+
 	link.StartMessage(AS_QUERY_FONTS_CHANGED);
 	link.Attach<bool>(check_only);
-	link.FlushWithReply(&code);
-	
-	if(code!=SERVER_TRUE)
+
+	if (link.FlushWithReply(code) != B_OK
+		|| code != SERVER_TRUE)
 		return false;
-	
+
 	link.Read<bool>(&value);
 	return value;
 }
@@ -422,38 +419,35 @@ status_t
 BFont::SetFamilyAndStyle(const font_family family, const font_style style)
 {
 	// R5 version always returns B_OK. That's a problem...
-	if(!family)
+	if (!family)
 		return B_ERROR;
-	
+
 	int32 code;
-	BPrivate::BAppServerLink link;
-	
-	if(!style)
-	{
+	BPrivate::AppServerLink link;
+
+	if (!style) {
 		// The BeBook states that a NULL style means set only the family
 		link.StartMessage(AS_SET_FAMILY_NAME);
-		link.Attach(family,sizeof(font_family));
-		link.FlushWithReply(&code);
-		
-		if(code!=SERVER_TRUE)
+		link.Attach(family, sizeof(font_family));
+
+		if (link.FlushWithReply(code) != B_OK
+			|| code != SERVER_TRUE)
 			return B_ERROR;
-		
+
 		link.Read<uint16>(&fFamilyID);
-	}
-	else
-	{
+	} else {
 		link.StartMessage(AS_SET_FAMILY_AND_STYLE);
-		link.Attach(family,sizeof(font_family));
-		link.Attach(style,sizeof(font_style));
-		link.FlushWithReply(&code);
-		
-		if(code!=SERVER_TRUE)
+		link.Attach(family, sizeof(font_family));
+		link.Attach(style, sizeof(font_style));
+
+		if (link.FlushWithReply(code) != B_OK
+			|| code != SERVER_TRUE)
 			return B_ERROR;
-		
+
 		link.Read<uint16>(&fFamilyID);
 		link.Read<uint16>(&fStyleID);
 	}
-	
+
 	return B_OK;
 }
 
@@ -473,19 +467,19 @@ BFont::SetFamilyAndStyle(uint32 fontcode)
 	
 	uint16 family,style,face;
 	int32 code;
-	BPrivate::BAppServerLink link;
-	
+	BPrivate::AppServerLink link;
+
 	style = fontcode & 0xFFFF;
 	family = (fontcode & 0xFFFF0000) >> 16;
-	
+
 	link.StartMessage(AS_SET_FAMILY_AND_STYLE_FROM_ID);
 	link.Attach<uint16>(family);
 	link.Attach<uint16>(style);
-	link.FlushWithReply(&code);
-	
-	if(code!=SERVER_TRUE)
+
+	if (link.FlushWithReply(code) != B_OK
+		|| code != SERVER_TRUE)
 		return;
-	
+
 	link.Read<uint16>(&face);
 
 	fStyleID = style;
@@ -493,8 +487,8 @@ BFont::SetFamilyAndStyle(uint32 fontcode)
 	
 	// Mask off any references in the face to Bold/Normal/Italic and set the face
 	// value to reflect the new font style
-	fFace&=B_UNDERSCORE_FACE | B_NEGATIVE_FACE | B_OUTLINED_FACE | B_STRIKEOUT_FACE;
-	fFace|=face;
+	fFace &= B_UNDERSCORE_FACE | B_NEGATIVE_FACE | B_OUTLINED_FACE | B_STRIKEOUT_FACE;
+	fFace |= face;
 }
 
 
@@ -516,25 +510,23 @@ BFont::SetFamilyAndFace(const font_family family, uint16 face)
 			| B_STRIKEOUT_FACE | B_BOLD_FACE | B_REGULAR_FACE) != 0)
 		fFace = face;
 	
-	if(family)
-	{
+	if (family) {
 		int32 code;
-		BPrivate::BAppServerLink link;
-		
+		BPrivate::AppServerLink link;
+
 		link.StartMessage(AS_SET_FAMILY_AND_FACE);
-		link.Attach(family,sizeof(font_family));
+		link.Attach(family, sizeof(font_family));
 		link.Attach<uint16>(face);
-		link.FlushWithReply(&code);
-		
-		if(code!=SERVER_TRUE)
+
+		if (link.FlushWithReply(code) != B_OK
+			|| code != SERVER_TRUE)
 			return B_ERROR;
-		
+
 		link.Read<uint16>(&fFamilyID);
 		link.Read<uint16>(&fStyleID);
-	}
-	else
-		fFace=face;
-	
+	} else
+		fFace = face;
+
 	return B_OK;
 }
 
@@ -591,20 +583,20 @@ BFont::SetFlags(uint32 flags)
 void
 BFont::GetFamilyAndStyle(font_family *family, font_style *style) const
 {
-	if(!family || !style)
+	if (!family || !style)
 		return;
-	
+
 	int32 code;
-	BPrivate::BAppServerLink link;
-	
+	BPrivate::AppServerLink link;
+
 	link.StartMessage(AS_GET_FAMILY_AND_STYLE);
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
-	link.FlushWithReply(&code);
-		
-	if(code!=SERVER_TRUE)
+
+	if (link.FlushWithReply(code) != B_OK
+		|| code != SERVER_TRUE)
 		return;
-	
+
 	link.Read<font_family>(family);
 	link.Read<font_style>(style);
 }
@@ -671,16 +663,16 @@ font_direction
 BFont::Direction(void) const
 {
 	int32 code;
-	BPrivate::BAppServerLink link;
-	
+	BPrivate::AppServerLink link;
+
 	link.StartMessage(AS_GET_FONT_DIRECTION);
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
-	link.FlushWithReply(&code);
-	
-	if(code!=SERVER_TRUE)
+
+	if (link.FlushWithReply(code) != B_OK
+		|| code != SERVER_TRUE)
 		return B_FONT_LEFT_TO_RIGHT;
-	
+
 	font_direction fdir;
 	link.Read<font_direction>(&fdir);
 	return fdir;
@@ -691,16 +683,16 @@ bool
 BFont::IsFixed(void) const
 {
 	int32 code;
-	BPrivate::BAppServerLink link;
-	
+	BPrivate::AppServerLink link;
+
 	link.StartMessage(AS_QUERY_FONT_FIXED);
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
-	link.FlushWithReply(&code);
-	
-	if(code!=SERVER_TRUE)
+
+	if (link.FlushWithReply(code) != B_OK
+		|| code != SERVER_TRUE)
 		return false;
-	
+
 	bool fixed;
 	link.Read<bool>(&fixed);
 	return fixed;
@@ -725,16 +717,16 @@ BRect
 BFont::BoundingBox(void) const
 {
 	int32 code;
-	BPrivate::BAppServerLink link;
-	
+	BPrivate::AppServerLink link;
+
 	link.StartMessage(AS_GET_FONT_BOUNDING_BOX);
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
-	link.FlushWithReply(&code);
-	
-	if(code!=SERVER_TRUE)
-		return BRect(0,0,0,0);
-	
+
+	if (link.FlushWithReply(code) != B_OK
+		|| code != SERVER_TRUE)
+		return BRect(0, 0, 0 ,0);
+
 	BRect box;
 	link.Read<BRect>(&box);
 	return box;
@@ -761,16 +753,16 @@ int32
 BFont::CountTuned(void) const
 {
 	int32 code;
-	BPrivate::BAppServerLink link;
-	
+	BPrivate::AppServerLink link;
+
 	link.StartMessage(AS_GET_TUNED_COUNT);
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
-	link.FlushWithReply(&code);
-	
-	if(code!=SERVER_TRUE)
+
+	if (link.FlushWithReply(code) != B_OK
+		|| code != SERVER_TRUE)
 		return -1;
-	
+
 	int32 count;
 	link.Read<int32>(&count);
 	return count;
@@ -780,21 +772,21 @@ BFont::CountTuned(void) const
 void
 BFont::GetTunedInfo(int32 index, tuned_font_info *info) const
 {
-	if(!info)
+	if (!info)
 		return;
-	
+
 	int32 code;
-	BPrivate::BAppServerLink link;
-	
+	BPrivate::AppServerLink link;
+
 	link.StartMessage(AS_GET_TUNED_INFO);
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
 	link.Attach<uint32>(index);
-	link.FlushWithReply(&code);
-	
-	if(code!=SERVER_TRUE)
+
+	if (link.FlushWithReply(code) != B_OK
+		|| code != SERVER_TRUE)
 		return;
-	
+
 	link.Read<tuned_font_info>(info);
 }
 
@@ -872,8 +864,8 @@ BFont::StringWidth(const char *string, int32 length) const
 		return 0.0;
 	
 	int32 code;
-	BPrivate::BAppServerLink link;
-	
+	BPrivate::AppServerLink link;
+
 	link.StartMessage(AS_GET_STRING_WIDTH);
 	link.AttachString(string);
 	link.Attach<int32>(length);
@@ -881,11 +873,11 @@ BFont::StringWidth(const char *string, int32 length) const
 	link.Attach<uint16>(fStyleID);
 	link.Attach<float>(fSize);
 	link.Attach<uint8>(fSpacing);
-	link.FlushWithReply(&code);
-	
-	if (code != SERVER_TRUE)
+
+	if (link.FlushWithReply(code) != B_OK
+		|| code != SERVER_TRUE)
 		return 0.0;
-	
+
 	float width;
 	link.Read<float>(&width);
 	return width;
@@ -896,36 +888,32 @@ void
 BFont::GetStringWidths(const char *stringArray[], const int32 lengthArray[], 
 	int32 numStrings, float widthArray[]) const
 {
-	if(!stringArray || !lengthArray || numStrings<1 || !widthArray)
+	if (!stringArray || !lengthArray || numStrings < 1 || !widthArray)
 		return;
-	
+
 	int32 code;
-	BPrivate::BAppServerLink link;
-	
+	BPrivate::AppServerLink link;
+
 	link.StartMessage(AS_GET_STRING_WIDTHS);
-	
 	link.Attach<int32>(numStrings);
-	
-	for(int32 i=0; i<numStrings; i++)
-	{
+
+	for (int32 i = 0; i < numStrings; i++) {
 		link.AttachString(stringArray[i]);
 		link.Attach<int32>(lengthArray[i]);
 	}
-	
-	link.FlushWithReply(&code);
 
-	if(code!=SERVER_TRUE)
+	if (link.FlushWithReply(code) != B_OK
+		|| code != SERVER_TRUE)
 		return;
-	
-	for(int32 i=0; i<numStrings; i++)
-		link.Read<float>(&widthArray[i]);
+
+	link.Read(widthArray, sizeof(float) * numStrings);
 }
 
 
 void
 BFont::GetEscapements(const char charArray[], int32 numChars, float escapementArray[]) const
 {
-	GetEscapements(charArray, numChars,NULL,escapementArray);
+	GetEscapements(charArray, numChars, NULL, escapementArray);
 }
 
 
@@ -933,16 +921,15 @@ void
 BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *delta, 
 	float escapementArray[]) const
 {
-	if (!charArray ||  numChars<1 || !escapementArray)
+	if (!charArray ||  numChars < 1 || !escapementArray)
 		return;
 
 	// NOTE: The R5 implementation crashes if delta == NULL!
 
 	int32 code;
-	BPrivate::BAppServerLink link;
+	BPrivate::AppServerLink link;
 	
 	link.StartMessage(AS_GET_ESCAPEMENTS_AS_FLOATS);
-	
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
 	link.Attach<float>(fSize);
@@ -957,13 +944,10 @@ BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *
 
 	uint32 bytesInBuffer = UTF8CountBytes(charArray, numChars);
 	link.Attach<int32>(bytesInBuffer);
-
 	link.Attach(charArray, bytesInBuffer);
 
-
-	link.FlushWithReply(&code);
-
-	if (code != SERVER_TRUE)
+	if (link.FlushWithReply(code) != B_OK
+		|| code != SERVER_TRUE)
 		return;
 
 	link.Read(escapementArray, numChars * sizeof(float));
@@ -974,7 +958,7 @@ void
 BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *delta, 
 	BPoint escapementArray[]) const
 {
-	GetEscapements(charArray, numChars,delta,escapementArray,NULL);
+	GetEscapements(charArray, numChars, delta, escapementArray, NULL);
 }
 
 
@@ -982,95 +966,83 @@ void
 BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *delta, 
 	BPoint escapementArray[], BPoint offsetArray[]) const
 {
-	if(!charArray ||  numChars<1 || !escapementArray)
+	if (!charArray ||  numChars<1 || !escapementArray)
 		return;
-	
+
 	int32 code;
-	BPrivate::BAppServerLink link;
-	
+	BPrivate::AppServerLink link;
+
 	link.StartMessage(AS_GET_ESCAPEMENTS);
-	
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
 	link.Attach<float>(fSize);
 	link.Attach<float>(fRotation);
 	link.Attach<uint32>(fFlags);
-	
+
 	link.Attach<int32>(numChars);
-	
+
 	// TODO: Support UTF8 characters
-	if(offsetArray)
-	{
-		for(int32 i=0; i<numChars; i++)
-		{
+	if (offsetArray) {
+		for (int32 i = 0; i < numChars; i++) {
 			link.Attach<char>(charArray[i]);
 			link.Attach<BPoint>(offsetArray[i]);
 		}
-	}
-	else
-	{
-		BPoint dummypt(0,0);
-		
-		for(int32 i=0; i<numChars; i++)
-		{
+	} else {
+		BPoint dummypt(0, 0);
+
+		for (int32 i = 0; i < numChars; i++) {
 			link.Attach<char>(charArray[i]);
 			link.Attach<BPoint>(dummypt);
 		}
 	}
-	link.FlushWithReply(&code);
 
-	if(code!=SERVER_TRUE)
+	if (link.FlushWithReply(code) != B_OK
+		|| code != SERVER_TRUE)
 		return;
 
-	for(int32 i=0; i<numChars; i++)
-		link.Read<BPoint>(&escapementArray[i]);
+	link.Read(escapementArray, sizeof(BPoint) * numChars);
 }
 
 
 void
 BFont::GetEdges(const char charArray[], int32 numBytes, edge_info edgeArray[]) const
 {
-	if(!charArray ||  numBytes<1 || !edgeArray)
+	if (!charArray || numBytes < 1 || !edgeArray)
 		return;
-	
-	int32 code;
-	BPrivate::BAppServerLink link;
-	
-	link.StartMessage(AS_GET_EDGES);
-	
-	link.Attach<int32>(numBytes);
-	
-	for(int32 i=0; i<numBytes; i++)
-		link.Attach<char>(charArray[i]);
-	
-	link.FlushWithReply(&code);
 
-	if(code!=SERVER_TRUE)
+	int32 code;
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_GET_EDGES);
+	link.Attach<int32>(numBytes);
+	link.Attach(charArray, numBytes);
+
+	if (link.FlushWithReply(code) != B_OK
+		|| code != SERVER_TRUE)
 		return;
-	
-	for(int32 i=0; i<numBytes; i++)
-		link.Read<edge_info>(&edgeArray[i]);
+
+	link.Read(edgeArray, sizeof(edge_info) * numBytes);
 }
 
 
 void
 BFont::GetHeight(font_height *height) const
 {
-	if(height)
-	{
+	if (height) {
 		// R5's version actually contacts the server in this call. The more and more
 		// I work with this class, the more and more I can't wait for R2 to fix it. Yeesh.
 		int32 code;
-		BPrivate::BAppServerLink link;
+		BPrivate::AppServerLink link;
+
 		link.StartMessage(AS_GET_FONT_HEIGHT);
 		link.Attach<uint16>(fFamilyID);
 		link.Attach<uint16>(fStyleID);
 		link.Attach<float>(fSize);
-		link.FlushWithReply(&code);
-		
-		if(code==SERVER_FALSE)
+
+		if (link.FlushWithReply(code) != B_OK
+			|| code != SERVER_TRUE)
 			return;
-		
+
 		link.Read<font_height>(height);
 	}
 }
@@ -1088,38 +1060,30 @@ void
 BFont::GetBoundingBoxesAsString(const char charArray[], int32 numChars, font_metric_mode mode,
 	escapement_delta *delta, BRect boundingBoxArray[]) const
 {
-	if(!charArray ||  numChars<1 || !boundingBoxArray)
+	if (!charArray || numChars < 1 || !boundingBoxArray)
 		return;
-	
-	int32 code;
-	BPrivate::BAppServerLink link;
-	
-	link.StartMessage(AS_GET_BOUNDINGBOXES_CHARS);
-	
-	link.Attach<font_metric_mode>(mode);
-	
-	if(delta)
-	{
-		link.Attach<escapement_delta>(*delta);
-	}
-	else
-	{
-		escapement_delta esd={0,0};
-		link.Attach<escapement_delta>(esd);
-	}
-	
-	link.Attach<int32>(numChars);
-	
-	for(int32 i=0; i<numChars; i++)
-		link.Attach<char>(charArray[i]);
-	
-	link.FlushWithReply(&code);
 
-	if(code!=SERVER_TRUE)
+	int32 code;
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_GET_BOUNDINGBOXES_CHARS);
+	link.Attach<font_metric_mode>(mode);
+
+	if (delta) {
+		link.Attach<escapement_delta>(*delta);
+	} else {
+		escapement_delta emptyDelta = {0, 0};
+		link.Attach<escapement_delta>(emptyDelta);
+	}
+
+	link.Attach<int32>(numChars);
+	link.Attach(charArray, numChars);
+
+	if (link.FlushWithReply(code) != B_OK
+		|| code != SERVER_TRUE)
 		return;
-	
-	for(int32 i=0; i<numChars; i++)
-		link.Read<BRect>(&boundingBoxArray[i]);
+
+	link.Read(boundingBoxArray, sizeof(BRect) * numChars);
 }
 
 
@@ -1127,42 +1091,35 @@ void
 BFont::GetBoundingBoxesForStrings(const char *stringArray[], int32 numStrings,
 	font_metric_mode mode, escapement_delta deltas[], BRect boundingBoxArray[]) const
 {
-	if(!stringArray ||  numStrings<1 || !boundingBoxArray)
+	if (!stringArray || numStrings < 1 || !boundingBoxArray)
 		return;
-	
+
 	int32 code;
-	BPrivate::BAppServerLink link;
-	
+	BPrivate::AppServerLink link;
+
 	link.StartMessage(AS_GET_BOUNDINGBOXES_STRINGS);
-	
 	link.Attach<font_metric_mode>(mode);
 	link.Attach<int32>(numStrings);
-	
-	if(deltas)
-	{
-		for(int32 i=0; i<numStrings; i++)
-		{
+
+	if (deltas) {
+		for (int32 i = 0; i < numStrings; i++) {
 			link.AttachString(stringArray[i]);
 			link.Attach<escapement_delta>(deltas[i]);
 		}
-	}
-	else
-	{
-		escapement_delta esd={0,0};
-		
-		for(int32 i=0; i<numStrings; i++)
-		{
+	} else {
+		escapement_delta emptyDelta = {0, 0};
+
+		for (int32 i = 0; i < numStrings; i++) {
 			link.AttachString(stringArray[i]);
-			link.Attach<escapement_delta>(esd);
+			link.Attach<escapement_delta>(emptyDelta);
 		}
 	}
-	link.FlushWithReply(&code);
 
-	if(code!=SERVER_TRUE)
+	if (link.FlushWithReply(code) != B_OK
+		|| code != SERVER_TRUE)
 		return;
-	
-	for(int32 i=0; i<numStrings; i++)
-		link.Read<BRect>(&boundingBoxArray[i]);
+
+	link.Read(boundingBoxArray, sizeof(BRect) * numStrings);
 }
 
 
@@ -1170,14 +1127,13 @@ void
 BFont::GetGlyphShapes(const char charArray[], int32 numChars, BShape *glyphShapeArray[]) const
 {
 	// TODO: implement code specifically for passing BShapes to and from the server
-	if(!charArray ||  numChars<1 || !glyphShapeArray)
+	if (!charArray || numChars < 1 || !glyphShapeArray)
 		return;
 	
 	int32 code;
-	BPrivate::BAppServerLink link;
-	
+	BPrivate::AppServerLink link;
+
 	link.StartMessage(AS_GET_GLYPH_SHAPES);
-	
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
 	link.Attach<float>(fSize);
@@ -1186,42 +1142,35 @@ BFont::GetGlyphShapes(const char charArray[], int32 numChars, BShape *glyphShape
 	link.Attach<uint32>(fFlags);
 	
 	link.Attach<int32>(numChars);
-	for(int32 i = 0; i < numChars; i++)
-		link.Attach<char>(charArray[i]);
-	
-	link.FlushWithReply(&code);
-	
-	if(code!=SERVER_TRUE)
+	link.Attach(charArray, numChars);
+
+	if (link.FlushWithReply(code) != B_OK
+		|| code != SERVER_TRUE)
 		return;
-	
-	for(int32 i = 0; i < numChars; i++)
+
+	for (int32 i = 0; i < numChars; i++)
 		link.ReadShape(glyphShapeArray[i]);
 }
-   
+
 
 void
 BFont::GetHasGlyphs(const char charArray[], int32 numChars, bool hasArray[]) const
 {
-	if(!charArray ||  numChars<1 || !hasArray)
+	if (!charArray || numChars < 1 || !hasArray)
 		return;
 	
 	int32 code;
-	BPrivate::BAppServerLink link;
-	
-	link.StartMessage(AS_GET_HAS_GLYPHS);
-	
-	link.Attach<int32>(numChars);
-	
-	for(int32 i=0; i<numChars; i++)
-		link.Attach<char>(charArray[i]);
-	
-	link.FlushWithReply(&code);
+	BPrivate::AppServerLink link;
 
-	if(code!=SERVER_TRUE)
+	link.StartMessage(AS_GET_HAS_GLYPHS);
+	link.Attach<int32>(numChars);
+	link.Attach(charArray, numChars);
+
+	if (link.FlushWithReply(code) != B_OK
+		|| code != SERVER_TRUE)
 		return;
-	
-	for(int32 i=0; i<numChars; i++)
-		link.Read<bool>(&hasArray[i]);
+
+	link.Read(hasArray, sizeof(bool) * numChars);
 }
 
 

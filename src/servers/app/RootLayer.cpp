@@ -178,7 +178,7 @@ RootLayer::~RootLayer()
 {
 	fQuiting = true;
 
-	BPortLink msg(fListenPort, -1);
+	BPrivate::PortLink msg(fListenPort, -1);
 	msg.StartMessage(B_QUIT_REQUESTED);
 	msg.EndMessage();
 	msg.Flush();
@@ -222,7 +222,7 @@ RootLayer::WorkingThread(void *data)
 	int32 code = 0;
 	status_t err = B_OK;
 	RootLayer *oneRootLayer = (RootLayer*)data;
-	BPortLink messageQueue(-1, oneRootLayer->fListenPort);
+	BPrivate::PortLink messageQueue(-1, oneRootLayer->fListenPort);
 
 	// first make sure we are actualy visible
 	oneRootLayer->Lock();
@@ -372,7 +372,7 @@ RootLayer::WorkingThread(void *data)
 void
 RootLayer::GoInvalidate(const Layer *layer, const BRegion &region)
 {
-	BPortLink msg(fListenPort, -1);
+	BPrivate::PortLink msg(fListenPort, -1);
 	msg.StartMessage(AS_ROOTLAYER_DO_INVALIDATE);
 	msg.Attach<const Layer*>(layer);
 	msg.AttachRegion(region);
@@ -390,48 +390,62 @@ void RootLayer::invalidate_layer(Layer *layer, const BRegion &region)
 	layer->FullInvalidate(region);
 }
 
-status_t RootLayer::EnqueueMessage(BPortLink &message)
+
+status_t
+RootLayer::EnqueueMessage(BPrivate::PortLink &message)
 {
-	message.SetSendPort(fListenPort);
+	message.SetSenderPort(fListenPort);
 	message.Flush();
 	return B_OK;
 }
 
-void RootLayer::GoRedraw(const Layer *layer, const BRegion &region)
+
+void
+RootLayer::GoRedraw(const Layer *layer, const BRegion &region)
 {
-	BPortLink	msg(fListenPort, -1);
+	BPrivate::PortLink msg(fListenPort, -1);
 	msg.StartMessage(AS_ROOTLAYER_DO_REDRAW);
 	msg.Attach<const Layer*>(layer);
 	msg.AttachRegion(region);
 	msg.Flush();
 }
 
-void RootLayer::redraw_layer(Layer *layer, const BRegion &region)
+
+void
+RootLayer::redraw_layer(Layer *layer, const BRegion &region)
 {
 	// NOTE: our thread (WorkingThread) is locked here.
 
 	layer->Invalidate(region);
 }
 
-void RootLayer::GoChangeWinBorderFeel(const WinBorder *winBorder, int32 newFeel)
+
+void
+RootLayer::GoChangeWinBorderFeel(const WinBorder *winBorder, int32 newFeel)
 {
-	BPortLink	msg(fListenPort, -1);
+	BPrivate::PortLink msg(fListenPort, -1);
 	msg.StartMessage(AS_ROOTLAYER_DO_CHANGE_WINBORDER_FEEL);
 	msg.Attach<const WinBorder*>(winBorder);
 	msg.Attach<int32>(newFeel);
 	msg.Flush();
 }
 
-void RootLayer::MoveBy(float x, float y)
+
+void
+RootLayer::MoveBy(float x, float y)
 {
 }
 
-void RootLayer::ResizeBy(float x, float y)
+
+void
+RootLayer::ResizeBy(float x, float y)
 {
 	// TODO: implement
 }
 
-Layer* RootLayer::VirtualTopChild() const
+
+Layer *
+RootLayer::VirtualTopChild() const
 {
 	fWinBorderIndex	= fWinBorderCount-1;
 
@@ -914,23 +928,29 @@ void RootLayer::SaveWorkspaceData(const char *path)
 }
 
 
-void RootLayer::HideWinBorder(WinBorder* winBorder)
+void
+RootLayer::HideWinBorder(WinBorder* winBorder)
 {
-	BPortLink	msg(fListenPort, -1);
+	BPrivate::PortLink msg(fListenPort, -1);
 	msg.StartMessage(AS_ROOTLAYER_HIDE_WINBORDER);
 	msg.Attach<WinBorder*>(winBorder);
 	msg.Flush();
 }
 
-void RootLayer::ShowWinBorder(WinBorder* winBorder)
+
+void
+RootLayer::ShowWinBorder(WinBorder* winBorder)
 {
-	BPortLink	msg(fListenPort, -1);
+	BPrivate::PortLink msg(fListenPort, -1);
 	msg.StartMessage(AS_ROOTLAYER_SHOW_WINBORDER);
 	msg.Attach<WinBorder*>(winBorder);
 	msg.Flush();
 }
 
-WinBorder* RootLayer::WinBorderAt(const BPoint& pt) const{
+
+WinBorder *
+RootLayer::WinBorderAt(const BPoint& pt) const
+{
 	for (int32 i = 0; i < fWinBorderCount; i++)
 	{
 		if (fWinBorderList[i]->fFullVisible.Contains(pt))
@@ -1004,7 +1024,7 @@ RootLayer::SetScreenMode(int32 width, int32 height, uint32 colorSpace, float fre
 //				Input related methods
 //---------------------------------------------------------------------------
 inline void
-RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
+RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 {
 	switch(code) {
 		case B_MOUSE_DOWN: {
@@ -1376,7 +1396,7 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 }
 
 inline
-void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
+void RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 {
 
 	switch(code)

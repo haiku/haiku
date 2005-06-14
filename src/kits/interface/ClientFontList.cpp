@@ -77,7 +77,7 @@ ClientFontList::ClientFontList(void)
 {
 	STRACE(("ClientFontList()\n"));
 	familylist = new BList(0);
-	fontlock = create_sem(1,"fontlist_sem");
+	fontlock = create_sem(1, "fontlist_sem");
 }
 
 
@@ -105,11 +105,12 @@ ClientFontList::Update(bool checkOnly)
 	// Open the font list kept in font list
 	acquire_sem(fontlock);
 
+	// ToDo: can't we use BPrivate::AppServerLink here?
 	// We're going to ask the server whether the list has changed
 	port_id port = find_port(SERVER_PORT_NAME);
 
 	bool needsUpdate = true;
-	BPortLink link(port);
+	BPrivate::PortLink link(port);
 
 	if (port >= B_OK) {
 		link.StartMessage(AS_QUERY_FONTS_CHANGED);

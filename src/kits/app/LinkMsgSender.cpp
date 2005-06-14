@@ -33,8 +33,9 @@
 static const size_t kWatermark = kInitialBufferSize - 24;
 	// if a message is started after this mark, the buffer is flushed automatically
 
+namespace BPrivate {
 
-LinkMsgSender::LinkMsgSender(port_id port)
+LinkSender::LinkSender(port_id port)
 	:
 	fPort(port),
 	fBuffer(NULL),
@@ -47,21 +48,21 @@ LinkMsgSender::LinkMsgSender(port_id port)
 }
 
 
-LinkMsgSender::~LinkMsgSender()
+LinkSender::~LinkSender()
 {
 	free(fBuffer);
 }
 
 
 void
-LinkMsgSender::SetPort(port_id port)
+LinkSender::SetPort(port_id port)
 {
 	fPort = port;
 }
 
 
 status_t
-LinkMsgSender::StartMessage(int32 code, size_t minSize)
+LinkSender::StartMessage(int32 code, size_t minSize)
 {
 	// end previous message
 	if (EndMessage() < B_OK)	
@@ -92,7 +93,7 @@ LinkMsgSender::StartMessage(int32 code, size_t minSize)
 	header->code = code;
 	header->flags = 0;
 
-	STRACE(("info: LinkMsgSender buffered header %s (%lx) [%lu %lu %lu].\n",
+	STRACE(("info: LinkSender buffered header %s (%lx) [%lu %lu %lu].\n",
 		strcode(code), code, header->size, header->code, header->flags));
 
 	fCurrentEnd += sizeof(message_header);
@@ -101,7 +102,7 @@ LinkMsgSender::StartMessage(int32 code, size_t minSize)
 
 
 status_t
-LinkMsgSender::EndMessage(bool needsReply)
+LinkSender::EndMessage(bool needsReply)
 {
 	if (fCurrentEnd == fCurrentStart || fCurrentStatus < B_OK)
 		return fCurrentStatus;
@@ -112,7 +113,7 @@ LinkMsgSender::EndMessage(bool needsReply)
 	if (needsReply)
 		header->flags |= needsReply;
 
-	STRACE(("info: LinkMsgSender EndMessage() of size %ld.\n", header->size));
+	STRACE(("info: LinkSender EndMessage() of size %ld.\n", header->size));
 
 	// bump to start of next message
 	fCurrentStart = fCurrentEnd;	
@@ -121,7 +122,7 @@ LinkMsgSender::EndMessage(bool needsReply)
 
 
 void
-LinkMsgSender::CancelMessage()
+LinkSender::CancelMessage()
 {
 	fCurrentEnd = fCurrentStart;
 	fCurrentStatus = B_OK;
@@ -129,7 +130,7 @@ LinkMsgSender::CancelMessage()
 
 
 status_t
-LinkMsgSender::Attach(const void *data, size_t size)
+LinkSender::Attach(const void *data, size_t size)
 {
 	if (fCurrentStatus < B_OK)
 		return fCurrentStatus;
@@ -156,7 +157,7 @@ LinkMsgSender::Attach(const void *data, size_t size)
 
 
 status_t
-LinkMsgSender::AttachString(const char *string, int32 length)
+LinkSender::AttachString(const char *string, int32 length)
 {
 	if (string == NULL)
 		string = "";
@@ -179,7 +180,7 @@ LinkMsgSender::AttachString(const char *string, int32 length)
 
 
 status_t
-LinkMsgSender::AdjustBuffer(size_t newSize, char **_oldBuffer)
+LinkSender::AdjustBuffer(size_t newSize, char **_oldBuffer)
 {
 	// make sure the new size is within bounds
 	if (newSize <= kInitialBufferSize)
@@ -214,7 +215,7 @@ LinkMsgSender::AdjustBuffer(size_t newSize, char **_oldBuffer)
 
 
 status_t
-LinkMsgSender::FlushCompleted(size_t newBufferSize)
+LinkSender::FlushCompleted(size_t newBufferSize)
 {
 	// we need to hide the incomplete message so that it's not flushed
 	int32 end = fCurrentEnd;
@@ -245,7 +246,7 @@ LinkMsgSender::FlushCompleted(size_t newBufferSize)
 
 
 status_t
-LinkMsgSender::Flush(bigtime_t timeout, bool needsReply)
+LinkSender::Flush(bigtime_t timeout, bool needsReply)
 {
 	if (fCurrentStatus < B_OK)
 		return fCurrentStatus;
@@ -254,7 +255,7 @@ LinkMsgSender::Flush(bigtime_t timeout, bool needsReply)
 	if (fCurrentStart == 0)
 		return B_OK;
 
-	STRACE(("info: LinkMsgSender Flush() waiting to send messages of %ld bytes on port %ld.\n",
+	STRACE(("info: LinkSender Flush() waiting to send messages of %ld bytes on port %ld.\n",
 		fCurrentEnd, fPort));
 
 	status_t err;
@@ -270,12 +271,12 @@ LinkMsgSender::Flush(bigtime_t timeout, bool needsReply)
 	}
 
 	if (err < B_OK) {
-		STRACE(("error info: LinkMsgSender Flush() failed for %ld bytes (%s) on port %ld.\n",
+		STRACE(("error info: LinkSender Flush() failed for %ld bytes (%s) on port %ld.\n",
 			fCurrentEnd, strerror(err), fPort));
 		return err;
 	}
 
-	STRACE(("info: LinkMsgSender Flush() messages total of %ld bytes on port %ld.\n",
+	STRACE(("info: LinkSender Flush() messages total of %ld bytes on port %ld.\n",
 		fCurrentEnd, fPort));
 
 	fCurrentEnd = 0;
@@ -284,6 +285,7 @@ LinkMsgSender::Flush(bigtime_t timeout, bool needsReply)
 	return B_OK;
 }
 
+}	// namespace BPrivate
 
 //	#pragma mark -
 

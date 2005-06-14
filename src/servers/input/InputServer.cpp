@@ -184,7 +184,7 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 	port_id input_port = find_port(SERVER_INPUT_PORT);
 	if (input_port == B_NAME_NOT_FOUND)
 		PRINTERR(("input_server couldn't find app_server's input port\n"));
-	fAppServerLink = new BPortLink(input_port);
+	fAppServerLink = new BPrivate::PortLink(input_port);
 #endif 
 
 	InitKeyboardMouseStates();

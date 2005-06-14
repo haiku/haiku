@@ -627,7 +627,7 @@ void APRView::LoadSettings(void)
 	if(port!=B_NAME_NOT_FOUND)
 	{
 		STRACE(("Retrieving settings from app_server\n"));
-		BPortLink link(port);
+		BPrivate::PortLink link(port);
 		int32 code;
 		
 		link.StartMessage(AS_GET_UI_COLORS);
@@ -701,7 +701,7 @@ void APRView::NotifyServer(void)
 	if(port!=B_NAME_NOT_FOUND)
 	{
 		STRACE(("Notifying app_server\n"));
-		BPortLink link(port);
+		BPrivate::PortLink link(port);
 		
 		link.StartMessage(AS_SET_UI_COLORS);
 		link.Attach<ColorSet>(*currentset);
