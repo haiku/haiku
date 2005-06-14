@@ -16,7 +16,7 @@
 
 DataTranslationsWindow::DataTranslationsWindow()
 	: BWindow(BRect(0, 0, DTW_RIGHT, DTW_BOTTOM),
-		"DataTranslations", B_TITLED_WINDOW, B_NOT_ZOOMABLE)
+		"DataTranslations", B_TITLED_WINDOW, B_NOT_ZOOMABLE|B_NOT_RESIZABLE)
 {
 	MoveTo(dynamic_cast<DataTranslationsApplication *>(be_app)->WindowCorner());
 
@@ -163,8 +163,8 @@ void
 DataTranslationsWindow::SetupViews()
 {
 	fConfigView = NULL;
-		// This is NULL until a translator is
-		// selected from the listview
+	// This is NULL until a translator is
+	// selected from the listview
 
 	// Window box
 	BBox *mainBox = new BBox(BRect(0, 0, DTW_RIGHT, DTW_BOTTOM),
@@ -194,11 +194,11 @@ DataTranslationsWindow::SetupViews()
 		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
 	fRightBox->AddChild(button);
     
-    // Add the translator name view
+	// Add the translator name view
 	BRect tranNameRect(iconRect.right + 5, iconRect.top,
 		infoRect.left - 5, iconRect.bottom);
-    fTranNameView = new BStringView(tranNameRect, "TranName", "None",
-    	B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	fTranNameView = new BStringView(tranNameRect, "TranName", "None",
+    		B_FOLLOW_LEFT | B_FOLLOW_V_CENTER);
 	fRightBox->AddChild(fTranNameView);
     
 	// Add the translators list view
@@ -206,19 +206,19 @@ DataTranslationsWindow::SetupViews()
 		"TransList", B_SINGLE_SELECTION_LIST); 
 	fTranListView->SetSelectionMessage(new BMessage(SEL_CHANGE));
 	
-    BScrollView *scrollView = new BScrollView("scroll_trans", fTranListView,
-    	B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM, B_WILL_DRAW | B_FRAME_EVENTS,
-    	false, true, B_FANCY_BORDER);
+	BScrollView *scrollView = new BScrollView("scroll_trans", fTranListView,
+    		B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM, B_WILL_DRAW | B_FRAME_EVENTS,
+    		false, true, B_FANCY_BORDER);
 	mainBox->AddChild(scrollView);
 
-    // Populate the translators list view   
-    PopulateListView();
+	// Populate the translators list view   
+	PopulateListView();
     
 	// Set the focus
 	fTranListView->MakeFocus();
 	
 	// Select the first Translator in list
-    fTranListView->Select(0, false);    
+	fTranListView->Select(0, false);    
 }
 
 bool
@@ -246,7 +246,7 @@ DataTranslationsWindow::MessageReceived(BMessage *message)
 			if (selected < 0) {
 				// If no translator is selected, show a message explaining
 				// what the config panel is for
-				(new BAlert("yo!",
+				(new BAlert("Panel Info",
 					"Translation Settings\n\n"
 					"Use this control panel to set values that various\n"
 					"translators use when no other settings are specified\n"
@@ -271,7 +271,7 @@ DataTranslationsWindow::MessageReceived(BMessage *message)
 			strInfoMsg << "\nInfo: " << tranInfo <<
 				"\nPath: " << tranPath.Path() << "\n"; 
 				
-			(new BAlert("yo!", strInfoMsg.String(), "OK"))->Go();
+			(new BAlert("Panel Info", strInfoMsg.String(), "OK"))->Go();
 			break;
 
 		case SEL_CHANGE:

@@ -5,6 +5,7 @@
  */
  
 #include <Application.h>
+#include <Debug.h>
 #include <FindDirectory.h>
 #include <File.h>
 #include <Path.h>
@@ -54,7 +55,7 @@ DataTranslationsSettings::~DataTranslationsSettings()
 	if (file.InitCheck() == B_OK) {
 		file.Seek(-8,SEEK_END); // Skip over the first 497 bytes to just the window
 								// position.
-		fCorner.PrintToStream();
+		PRINT_OBJECT(fCorner);
 		file.Write(&fCorner, sizeof(BPoint));
 	}
 }
