@@ -20,8 +20,8 @@ static struct rld_export const *sRuntimeLinker;
 thread_id
 load_image(int32 argCount, const char **args, const char **environ)
 {
-	char starter[B_FILE_NAME_LENGTH];
-	const char **newArgs = NULL;
+	char invoker[B_FILE_NAME_LENGTH];
+	char **newArgs = NULL;
 	int32 envCount = 0;
 	thread_id thread;
 
@@ -30,26 +30,15 @@ load_image(int32 argCount, const char **args, const char **environ)
 
 	// test validity of executable + support for scripts
 	{
-		status_t status = __test_executable(args[0], starter);
+		status_t status = __test_executable(args[0], invoker);
 		if (status < B_OK)
 			return status;
 
-		if (starter[0]) {
-			int32 i;
-
-			// this is a shell script and requires special treatment
-			newArgs = malloc((argCount + 2) * sizeof(void *));
-			if (newArgs == NULL)
-				return B_NO_MEMORY;
-
-			// copy args and have "starter" as new app
-			newArgs[0] = starter;
-			for (i = 0; i < argCount; i++)
-				newArgs[i + 1] = args[i];
-			newArgs[i + 1] = NULL;
-
-			args = newArgs;
-			argCount++;
+		if (invoker[0]) {
+			status = __parse_invoke_line(invoker, &newArgs,
+				(char * const **)&args, &argCount);
+			if (status < B_OK)
+				return status;
 		}
 	}
 
@@ -118,10 +107,84 @@ clear_caches(void *address, size_t length, uint32 flags)
 //	#pragma mark -
 
 
-status_t
-__test_executable(const char *path, char *starter)
+static char *
+next_argument(char **_start, bool separate)
 {
-	return sRuntimeLinker->test_executable(path, geteuid(), getegid(), starter);
+	char *line = *_start;
+	char quote = 0;
+	int32 i;
+
+	// eliminate leading spaces
+	while (line[0] == ' ')
+		line++;
+
+	if (line[0] == '"' || line[0] == '\'') {
+		quote = line[0];
+		line++;
+	}
+
+	if (!line[0])
+		return NULL;
+
+	for (i = 0;; i++) {
+		if (line[i] == '\\' && line[i + 1] != '\0')
+			continue;
+
+		if ((!quote && line[i] == ' ') || line[i] == quote || line[i] == '\0') {
+			// argument separator!
+			if (separate)
+				line[i] = '\0';
+			*_start = &line[i + 1];
+			return line;
+		}
+	}
+
+	return NULL;
+}
+
+
+status_t
+__parse_invoke_line(char *invoker, char ***_newArgs,
+	char * const **_oldArgs, int32 *_argCount)
+{
+	int32 i, count = 0;
+	char *arg = invoker;
+	char **newArgs;
+
+	// count arguments in the line
+
+	while (next_argument(&arg, false)) {
+		count++;
+	}
+
+	// this is a shell script and requires special treatment
+	newArgs = malloc((*_argCount + count + 1) * sizeof(void *));
+	if (newArgs == NULL)
+		return B_NO_MEMORY;
+
+	// copy invoker and old arguments and to newArgs
+
+	for (i = 0; (arg = next_argument(&invoker, true)) != NULL; i++) {
+		newArgs[i] = arg;
+	}
+	for (i = 0; i < *_argCount; i++) {
+		newArgs[i + count] = (char *)(*_oldArgs)[i];
+	}
+
+	newArgs[i + count] = NULL;
+
+	*_newArgs = newArgs;
+	*_oldArgs = (char * const *)newArgs;
+	*_argCount += count;
+
+	return B_OK;
+}
+
+
+status_t
+__test_executable(const char *path, char *invoker)
+{
+	return sRuntimeLinker->test_executable(path, geteuid(), getegid(), invoker);
 }
 
 

@@ -206,7 +206,7 @@ open_executable(char *name, image_type type, const char *rpath)
  */
 
 status_t
-test_executable(const char *name, uid_t user, gid_t group, char *starter)
+test_executable(const char *name, uid_t user, gid_t group, char *invoker)
 {
 	char path[B_PATH_NAME_LENGTH];
 	char buffer[B_FILE_NAME_LENGTH];
@@ -251,18 +251,23 @@ test_executable(const char *name, uid_t user, gid_t group, char *starter)
 	if (status == B_NOT_AN_EXECUTABLE) {
 		// test for shell scripts
 		if (!strncmp(buffer, "#!", 2)) {
-			status = B_OK;
-			if (starter) {
-				char *end;
-				buffer[length - 1] = '\0';
+			char *end;
+			buffer[length - 1] = '\0';
 
-				if ((end = strchr(buffer, '\n')) != NULL)
-					end[0] = '\0';
-				strcpy(starter, buffer + 2);
-			}
+			end = strchr(buffer, '\n');
+			if (end == NULL) {
+				status = E2BIG;
+				goto out;
+			} else
+				end[0] = '\0';
+
+			if (invoker)
+				strcpy(invoker, buffer + 2);
+
+			status = B_OK;
 		}
-	} else if (status == B_OK && starter)
-		starter[0] = '\0';
+	} else if (status == B_OK && invoker)
+		invoker[0] = '\0';
 
 out:
 	_kern_close(fd);

@@ -54,7 +54,7 @@ int
 execve(const char *path, char * const args[], char * const environment[])
 {
 	int32 argCount = 0, envCount = 0;
-	char starter[B_FILE_NAME_LENGTH];
+	char invoker[B_FILE_NAME_LENGTH];
 	char **newArgs = NULL;
 
 	// count argument/environment list entries here, we don't want
@@ -72,31 +72,20 @@ execve(const char *path, char * const args[], char * const environment[])
 
 	// test validity of executable + support for scripts
 	{
-		status_t status = __test_executable(args[0], starter);
+		status_t status = __test_executable(args[0], invoker);
 		if (status < B_OK) {
 			errno = status;
 			return -1;
 		}
 
-		if (starter[0]) {
-			int32 i;
-
-			// this is a shell script and requires special treatment
-			newArgs = malloc((argCount + 2) * sizeof(void *));
-			if (newArgs == NULL) {
-				errno = B_NO_MEMORY;
+		if (invoker[0]) {
+			status = __parse_invoke_line(invoker, &newArgs, &args, &argCount);
+			if (status < B_OK) {
+				errno = status;
 				return -1;
 			}
 
-			// copy args and have "starter" as new app
-			newArgs[0] = starter;
-			for (i = 0; i < argCount; i++)
-				newArgs[i + 1] = args[i];
-			newArgs[i + 1] = NULL;
-
-			path = starter;
-			args = newArgs;
-			argCount++;
+			path = newArgs[0];
 		}
 	}
 
