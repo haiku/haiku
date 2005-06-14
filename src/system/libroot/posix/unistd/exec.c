@@ -1,16 +1,18 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <syscalls.h>
+#include <libroot_private.h>
 
 #include <unistd.h>
 #include <errno.h>
 #include <alloca.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdlib.h>
 
 
 static int
@@ -49,21 +51,53 @@ copy_arguments(va_list list, const char **args, const char *arg)
 
 
 int
-execve(const char *path, char * const argv[], char * const environment[])
+execve(const char *path, char * const args[], char * const environment[])
 {
-	int32 argc = 0, envCount = 0;
+	int32 argCount = 0, envCount = 0;
+	char starter[B_FILE_NAME_LENGTH];
+	char **newArgs = NULL;
 
 	// count argument/environment list entries here, we don't want
 	// to do this in the kernel
-	while (argv[argc] != NULL)
-		argc++;
+	while (args[argCount] != NULL)
+		argCount++;
 	while (environment[envCount] != NULL)
 		envCount++;
 
-	if (argc == 0) {
+	if (argCount == 0) {
 		// we need some more info on what to do...
 		errno = B_BAD_VALUE;
 		return -1;
+	}
+
+	// test validity of executable + support for scripts
+	{
+		status_t status = __test_executable(args[0], starter);
+		if (status < B_OK) {
+			errno = status;
+			return -1;
+		}
+
+		if (starter[0]) {
+			int32 i;
+
+			// this is a shell script and requires special treatment
+			newArgs = malloc((argCount + 2) * sizeof(void *));
+			if (newArgs == NULL) {
+				errno = B_NO_MEMORY;
+				return -1;
+			}
+
+			// copy args and have "starter" as new app
+			newArgs[0] = starter;
+			for (i = 0; i < argCount; i++)
+				newArgs[i + 1] = args[i];
+			newArgs[i + 1] = NULL;
+
+			path = starter;
+			args = newArgs;
+			argCount++;
+		}
 	}
 
 	// "argv[0]" and "path" should be identical here, but they don't have
@@ -71,9 +105,10 @@ execve(const char *path, char * const argv[], char * const environment[])
 	// don't care and pass everything to the kernel - it will have to
 	// do the right thing :)
 
-	errno = _kern_exec(path, argc, argv, envCount, environment);
+	errno = _kern_exec(path, argCount, args, envCount, environment);
 		// if this call returns, something definitely went wrong
 
+	free(newArgs);
 	return -1;
 }
 

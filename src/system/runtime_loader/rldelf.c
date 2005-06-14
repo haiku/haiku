@@ -71,9 +71,7 @@ enum {
 #define APP_OR_LIBRARY_TYPE			(IMAGE_TYPE_TO_MASK(B_APP_IMAGE) \
 									| IMAGE_TYPE_TO_MASK(B_LIBRARY_IMAGE))
 
-
-typedef
-struct elf_region_t {
+typedef struct elf_region_t {
 	area_id		id;
 	addr_t		start;
 	addr_t		size;
@@ -84,7 +82,6 @@ struct elf_region_t {
 	long		delta;
 	uint32		flags;
 } elf_region_t;
-
 
 typedef struct image_t {
 	// image identification
@@ -122,13 +119,12 @@ typedef struct image_t {
 	elf_region_t		regions[1];
 } image_t;
 
-
-typedef
-struct image_queue_t {
+typedef struct image_queue_t {
 	image_t *head;
 	image_t *tail;
 } image_queue_t;
 
+typedef void (libinit_f)(unsigned, struct uspace_program_args const *);
 
 static image_queue_t gLoadedImages = {0, 0};
 static image_queue_t gLoadingImages = {0, 0};
@@ -139,8 +135,6 @@ static uint32 gLoadedImageCount = 0;
 static sem_id rld_sem;
 static thread_id rld_sem_owner;
 static int32 rld_sem_count;
-
-static struct uspace_program_args const *gProgramArgs;
 
 
 #define STRING(image, offset) ((char *)(&(image)->strtab[(offset)]))
@@ -202,24 +196,6 @@ rld_lock()
 		rld_sem_owner = self;
 	}
 	rld_sem_count++;
-}
-
-
-char *
-getenv(const char *name)
-{
-	// ToDo: this should use the real environ pointer once available!
-	//	(or else, any updates to the search paths while the app is running are ignored)
-	char **environ = gProgramArgs->envp;
-	int32 length = strlen(name);
-	int32 i;
-
-	for (i = 0; environ[i] != NULL; i++) {
-		if (!strncmp(name, environ[i], length) && environ[i][length] == '=')
-			return environ[i] + length + 1;
-	}
-
-	return NULL;
 }
 
 
@@ -928,194 +904,6 @@ relocate_image(image_t *image)
 }
 
 
-static const char *
-search_path_for_type(image_type type)
-{
-	const char *path = NULL;
-
-	switch (type) {
-		case B_APP_IMAGE:
-			path = getenv("PATH");
-			break;
-		case B_LIBRARY_IMAGE:
-			path = getenv("LIBRARY_PATH");
-			break;
-		case B_ADD_ON_IMAGE:
-			path = getenv("ADDON_PATH");
-			break;
-
-		default:
-			return NULL;
-#if 0
-		case B_APP_IMAGE:
-			return getenv("PATH");
-		case B_LIBRARY_IMAGE:
-			return getenv("LIBRARY_PATH");
-		case B_ADD_ON_IMAGE:
-			return getenv("ADDON_PATH");
-#endif
-	}
-
-	// ToDo: for now, if the variable was not set, return default paths
-	if (path != NULL)
-		return path;
-
-	switch (type) {
-		case B_APP_IMAGE:
-			return "/boot/home/config/bin:"
-					"/bin:"
-					"/boot/apps:"
-					"/boot/preferences:"
-					"/boot/beos/apps:"
-					"/boot/beos/preferences:"
-					"/boot/develop/tools/gnupro/bin";
-
-		case B_LIBRARY_IMAGE:
-			return "%A/lib:/boot/home/config/lib:/boot/beos/system/lib";
-
-		case B_ADD_ON_IMAGE:
-			return "%A/add-ons"
-				":/boot/home/config/add-ons"
-				":/boot/beos/system/add-ons";
-
-		default:
-			return NULL;
-	}
-}
-
-
-static int
-try_open_container(const char *dir, int dirLen, const char *name, char *path,
-	int pathLen)
-{
-	int nameLen = strlen(name);
-
-	// construct the path
-	if (dirLen > 0) {
-		char *buffer = path;
-
-		if (dirLen >= 2 && strncmp(dir, "%A", 2) == 0) {
-			// Replace %A with current app folder path (of course,
-			// this must be the first part of the path)
-			// ToDo: Maybe using first image info is better suited than
-			// gProgamArgs->program_path here?
-			char *lastSlash = strrchr(gProgramArgs->program_path, '/');
-			int bytesCopied;
-
-			// copy what's left (when the application name is removed)
-			if (lastSlash != NULL) {
-				strlcpy(buffer, gProgramArgs->program_path,
-					min(pathLen, lastSlash + 1 - gProgramArgs->program_path));
-			} else
-				strlcpy(buffer, ".", pathLen);
-
-			bytesCopied = strlen(buffer);
-			buffer += bytesCopied;
-			pathLen -= bytesCopied;
-			dir += 2;
-			dirLen -= 2;
-		}
-
-		if (dirLen + 1 + nameLen >= pathLen)
-			return B_NAME_TOO_LONG;
-
-		memcpy(buffer, dir, dirLen);
-		buffer[dirLen] = '/';
-		strcpy(buffer + dirLen + 1, name);
-	} else {
-		if (nameLen >= pathLen)
-			return B_NAME_TOO_LONG;
-
-		strcpy(path + dirLen + 1, name);
-	}
-
-	TRACE(("rld.so: try_open_container(): %s\n", path));
-
-	return _kern_open(-1, path, O_RDONLY, 0);
-}
-
-
-static int
-search_container_in_path_list(const char *name, const char *pathList,
-	int pathListLen, char *pathBuffer, int pathBufferLen)
-{
-	const char *pathListEnd = pathList + pathListLen;
-
-	TRACE(("rld.so: search_container_in_path_list() %s in %.*s\n", name,
-		pathListLen, pathList));
-
-	while (pathListLen > 0) {
-		const char *pathEnd = pathList;
-		int fd;
-
-		// find the next ':' or run till the end of the string
-		while (pathEnd < pathListEnd && *pathEnd != ':')
-			pathEnd++;
-
-		fd = try_open_container(pathList, pathEnd - pathList, name, pathBuffer,
-			pathBufferLen);
-		if (fd >= 0)
-			return fd;
-
-		pathListLen = pathListEnd - pathEnd - 1;
-		pathList = pathEnd + 1;
-	}
-
-	return B_ENTRY_NOT_FOUND;
-}
-
-
-static int
-open_container(char *name, image_type type, const char *rpath)
-{
-	const char *paths;
-	char buffer[PATH_MAX];
-	int fd = -1;
-
-	if (strchr(name, '/')) {
-		// the name already contains a path, we don't have to search for it
-		return _kern_open(-1, name, O_RDONLY, 0);
-	}
-
-	// first try rpath (DT_RPATH)
-	if (rpath) {
-		// It consists of a colon-separated search path list. Optionally it
-		// follows a second search path list, separated from the first by a
-		// semicolon.
-		const char *semicolon = strchr(rpath, ';');
-		const char *firstList = (semicolon ? rpath : NULL);
-		const char *secondList = (semicolon ? semicolon + 1 : rpath);
-			// If there is no ';', we set only secondList to simplify things.
-		if (firstList) {
-			fd = search_container_in_path_list(name, firstList,
-				semicolon - firstList, buffer, sizeof(buffer));
-		}
-		if (fd < 0) {
-			fd = search_container_in_path_list(name, secondList,
-				strlen(secondList), buffer, sizeof(buffer));
-		}
-	}
-
-	// let's evaluate the system path variables to find the container
-	if (fd < 0) {
-		paths = search_path_for_type(type);
-		if (paths) {
-			fd = search_container_in_path_list(name, paths, strlen(paths),
-				buffer, sizeof(buffer));
-		}
-	}
-
-	if (fd >= 0) {
-		// we found it, copy path!
-		TRACE(("rld.so: open_container(%s): found at %s\n", name, buffer));
-		strlcpy(name, buffer, PATH_MAX);
-		return fd;
-	}
-
-	return B_ENTRY_NOT_FOUND;
-}
-
-
 static image_t *
 load_container(char const *name, image_type type, const char *rpath)
 {
@@ -1146,7 +934,7 @@ load_container(char const *name, image_type type, const char *rpath)
 	strlcpy(path, name, sizeof(path));
 
 	// Try to load explicit image path first
-	fd = open_container(path, type, rpath);
+	fd = open_executable(path, type, rpath);
 	FATAL((fd < 0), fd, "cannot open file %s\n", path);
 
 	len = _kern_read(fd, 0, &eheader, sizeof(eheader));
@@ -1546,15 +1334,24 @@ get_symbol(image_id imageID, char const *symbolName, int32 symbolType, void **_l
 
 //	#pragma mark -
 
-/*
- * init routine, just get hold of the user-space program args
- */
+
+/** Read and verify the ELF header */
+
+status_t
+elf_verify_header(void *header, int32 length)
+{
+	int32 programSize, sectionSize;
+
+	if (length < (int32)sizeof(struct Elf32_Ehdr))
+		return B_BAD_VALUE;
+
+	return parse_elf_header((struct Elf32_Ehdr *)header, &programSize, &sectionSize);
+}
+
 
 void
-rldelf_init(struct uspace_program_args const *_args)
+rldelf_init(void)
 {
-	gProgramArgs = _args;
-
 	rld_sem = create_sem(1, "rld_lock");
 	rld_sem_owner = -1;
 	rld_sem_count = 0;

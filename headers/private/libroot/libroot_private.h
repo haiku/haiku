@@ -6,9 +6,13 @@
 #define LIBROOT_PRIVATE_H
 
 
+#include <SupportDefs.h>
+
+
 struct uspace_program_args;
 struct real_time_data;
 
+status_t __test_executable(const char *path, char *starter);
 void __init_image(const struct uspace_program_args *args);
 void __init_dlfcn(const struct uspace_program_args *args);
 void __init_env(const struct uspace_program_args *args);

@@ -11,6 +11,8 @@
 #include <OS.h>
 #include <image.h>
 
+#include <stdlib.h>
+
 
 static struct rld_export const *sRuntimeLinker;
 
@@ -18,17 +20,48 @@ static struct rld_export const *sRuntimeLinker;
 thread_id
 load_image(int32 argCount, const char **args, const char **environ)
 {
+	char starter[B_FILE_NAME_LENGTH];
+	const char **newArgs = NULL;
 	int32 envCount = 0;
+	thread_id thread;
 
 	if (argCount < 1 || environ == NULL)
 		return B_BAD_VALUE;
+
+	// test validity of executable + support for scripts
+	{
+		status_t status = __test_executable(args[0], starter);
+		if (status < B_OK)
+			return status;
+
+		if (starter[0]) {
+			int32 i;
+
+			// this is a shell script and requires special treatment
+			newArgs = malloc((argCount + 2) * sizeof(void *));
+			if (newArgs == NULL)
+				return B_NO_MEMORY;
+
+			// copy args and have "starter" as new app
+			newArgs[0] = starter;
+			for (i = 0; i < argCount; i++)
+				newArgs[i + 1] = args[i];
+			newArgs[i + 1] = NULL;
+
+			args = newArgs;
+			argCount++;
+		}
+	}
 
 	// count environment variables
 	while (environ[envCount] != NULL)
 		envCount++;
 
-	return _kern_load_image(argCount, args, envCount, environ,
+	thread = _kern_load_image(argCount, args, envCount, environ,
 		B_NORMAL_PRIORITY, B_WAIT_TILL_LOADED);
+
+	free(newArgs);
+	return thread;
 }
 
 
@@ -83,6 +116,13 @@ clear_caches(void *address, size_t length, uint32 flags)
 
 
 //	#pragma mark -
+
+
+status_t
+__test_executable(const char *path, char *starter)
+{
+	return sRuntimeLinker->test_executable(path, geteuid(), getegid(), starter);
+}
 
 
 void

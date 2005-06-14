@@ -1,12 +1,17 @@
 /*
-** Copyright 2002, Manuel J. Petit. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2002, Manuel J. Petit. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 #ifndef KERNEL_USER_RUNTIME_H_
 #define KERNEL_USER_RUNTIME_H_
 
+
 #include <image.h>
 #include <OS.h>
+
 
 #define MAGIC_APP_NAME	"_APP_"
 
@@ -18,6 +23,8 @@ struct rld_export {
 		int32 symbolType, void **_location);
 	status_t (*get_nth_image_symbol)(image_id imageID, int32 num, char *symbolName,
 		int32 *nameLength, int32 *symbolType, void **_location);
+	status_t (*test_executable)(const char *path, uid_t user, gid_t group,
+		char *starter);
 };
 
 struct uspace_program_args {
@@ -33,7 +40,5 @@ struct uspace_program_args {
 	 */
 	struct rld_export *rld_export;
 };
-
-typedef void (libinit_f)(unsigned, struct uspace_program_args const *);
 
 #endif	/* KERNEL_USER_RUNTIME_H_ */

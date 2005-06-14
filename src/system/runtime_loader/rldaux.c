@@ -1,12 +1,36 @@
-/* 
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+/*
+ * Copyright 2005, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <syscalls.h>
+
+#include "rld_priv.h"
+
+
+char *
+getenv(const char *name)
+{
+	// ToDo: this should use the real environ pointer once available!
+	//	(or else, any updates to the search paths while the app is running are ignored)
+	char **environ = gProgramArgs->envp;
+	int32 length = strlen(name);
+	int32 i;
+
+	for (i = 0; environ[i] != NULL; i++) {
+		if (!strncmp(name, environ[i], length) && environ[i][length] == '=')
+			return environ[i] + length + 1;
+	}
+
+	return NULL;
+}
 
 
 int

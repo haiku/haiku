@@ -42,16 +42,24 @@ export_get_nth_image_symbol(image_id id, int32 num, char *nameBuffer, int32 *_na
 }
 
 
+static status_t
+export_test_executable(const char *path, uid_t user, gid_t group, char *starter)
+{
+	return test_executable(path, user, group, starter);
+}
+
+
 void 
-rldexport_init(struct uspace_program_args *args)
+rldexport_init(void)
 {
 	static struct rld_export exports = {
 		// dynamic loading support API
 		export_load_add_on,
 		export_unload_add_on,
 		export_get_image_symbol,
-		export_get_nth_image_symbol
+		export_get_nth_image_symbol,
+		export_test_executable
 	};
 
-	args->rld_export = &exports;
+	gProgramArgs->rld_export = &exports;
 }
