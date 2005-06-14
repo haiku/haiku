@@ -111,7 +111,8 @@ BEOS_BIN="touch sync ln listarea listattr listsem listport \
 	id env basename factor"
 
 BEOS_APPS="MiniTerminal People ShowImage Clock Pulse Playground BitmapDrawing"
-BEOS_PREFERENCES="DataTranslations Mouse Keyboard Keymap Menu ScrollBar Sounds Media FileTypes"
+BEOS_PREFERENCES="Backgrounds DataTranslations FileTypes Media Menu Mouse \
+	Keyboard Keymap Screen ScrollBar Sounds Time VirtualMemory Workspaces"
 
 BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so libmedia.so libtracker.so \
 	libtranslation.so libbind.so libnetapi.so libsocket.so libdebug.so \
