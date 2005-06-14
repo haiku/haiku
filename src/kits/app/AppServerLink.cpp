@@ -22,9 +22,9 @@
  */
 
 
-BLocker sLock;
+static BLocker sLock;
 
-#include <stdio.h>
+
 namespace BPrivate {
 
 AppServerLink::AppServerLink(void)
@@ -35,8 +35,9 @@ AppServerLink::AppServerLink(void)
 	if (be_app) {
 		fReceiver = &be_app->fServerLink->Receiver();
 		fSender = &be_app->fServerLink->Sender();
-	} else
-		puts("Noooooooooooooooooooooooooooo");
+	} else {
+		debugger("You need to have a valid app_server connection first!");
+	}
 }
 
 
