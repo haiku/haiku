@@ -22,8 +22,7 @@
 //	File Name:		SystemPalette.cpp
 //	Authors:		DarkWyrm <bpmagic@columbus.rr.com>
 //					Stefano Ceccherini <burton666@libero.it>
-//	Description:	One global function to generate the palette which is 
-//					the default BeOS System palette and the variable to go with it	
+//	Description:	Methods to initialize and get the system color_map.	
 //  
 //------------------------------------------------------------------------------
 #include <SystemPalette.h>
@@ -147,10 +146,9 @@ color_distance(uint8 red1, uint8 green1, uint8 blue1,
 	int bd = (int)blue1 - (int)blue2;
 
 	// distance according to psycho-visual tests
+	// algorithm taken from here:
+	// http://www.stud.uni-hannover.de/~michaelt/juggle/Algorithms.pdf
 	int rmean = ((int)red1 + (int)red2) / 2;
-	/*return (2 + rmean / 256) * rd * rd
-			+ 4 * gd * gd
-			+ (2 + (255 - rmean) / 256) * bd * bd;*/
 	return (((512 + rmean) * rd * rd) >> 8)
 			+ 4 * gd * gd
 			+ (((767 - rmean) * bd * bd) >> 8); 
@@ -160,10 +158,6 @@ color_distance(uint8 red1, uint8 green1, uint8 blue1,
 static uint8
 FindClosestColor(const rgb_color &color, const rgb_color *palette)
 {
-	// TODO: This isn't working 100% correctly.
-	// At least, it doesn't map colors as beos does.
-	// Could be a bug/different behaviour in color_distance	
-	
 	uint8 closestIndex = 0;
 	unsigned closestDistance = UINT_MAX;
 	for (int32 i = 0; i < 256; i++) {
@@ -222,6 +216,8 @@ FillColorMap(const rgb_color *palette, color_map *map)
 }
 
 
+/*!	\brief Initializes the system color_map.
+*/
 void
 InitializeColorMap()
 {
@@ -229,6 +225,9 @@ InitializeColorMap()
 }
 
 
+/*!	\brief Returns a pointer to the system palette.
+	\return A pointer to the system palette.
+*/
 const rgb_color *
 SystemPalette()
 {
@@ -236,6 +235,9 @@ SystemPalette()
 }
 
 
+/*!	\brief Returns a pointer to the system color_map structure.
+	\return A pointer to the system color_map.
+*/
 const color_map *
 SystemColorMap()
 {
