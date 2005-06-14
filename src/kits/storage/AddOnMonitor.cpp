@@ -26,11 +26,13 @@ AddOnMonitor::AddOnMonitor(AddOnMonitorHandler * handler)
 	status = fPulseRunner->InitCheck();
 	if (status != B_OK) {
 		fInitCheck = status;
+		fprintf(stderr, "AddOnMonitor() : bad status returned by fPulseRunner->InitCheck()\n");
 		return;
 	}
 	thread_id id = Run();
 	if (id < 0) {
 		fInitCheck = (status_t)id;
+		fprintf(stderr, "AddOnMonitor() : bad id returned by Run()\n");
 		return;
 	}
 	fInitCheck = B_OK;
