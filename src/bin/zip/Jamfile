@@ -16,7 +16,6 @@ StaticLibrary zip :
 	zipfile.c
 	trees.c
 	crctab.c
-	: : zip.rsrc
 ;
 
 BinCommand zip :

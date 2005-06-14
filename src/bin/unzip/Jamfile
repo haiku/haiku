@@ -17,7 +17,6 @@ StaticLibrary unzip :
 	zipinfo.c
 	beos.c
 	beosmain.cpp
-	: : unzip.rdef
 ;
 
 BinCommand unzip :
