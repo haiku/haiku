@@ -130,7 +130,11 @@ next_argument(char **_start, bool separate)
 		if (line[i] == '\\' && line[i + 1] != '\0')
 			continue;
 
-		if ((!quote && line[i] == ' ') || line[i] == quote || line[i] == '\0') {
+		if (line[i] == '\0') {
+			*_start = &line[i];
+			return line;
+		}
+		if ((!quote && line[i] == ' ') || line[i] == quote) {
 			// argument separator!
 			if (separate)
 				line[i] = '\0';
