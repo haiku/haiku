@@ -898,6 +898,7 @@ team_create_thread_start(void *args)
 
 	t = thread_get_current_thread();
 	team = t->team;
+	cache_node_launched(teamArgs->arg_count, teamArgs->args);
 
 	TRACE(("team_create_thread_start: entry thread %ld\n", t->id));
 
@@ -1020,7 +1021,7 @@ load_image_etc(int32 argCount, char **args, int32 envCount, char **env,
 	struct team *team, *parent;
 	const char *threadName;
 	thread_id thread;
-	int err;
+	status_t err;
 	cpu_status state;
 	struct team_arg *teamArgs;
 	struct team_loading_info loadingInfo;
@@ -1073,8 +1074,6 @@ load_image_etc(int32 argCount, char **args, int32 envCount, char **env,
 	err = vm_create_aspace(team->name, team->id, USER_BASE, USER_SIZE, false, &team->aspace);
 	if (err < B_OK)
 		goto err3;
-
-	cache_node_launched(argCount, args);
 
 	// cut the path from the main thread name
 	threadName = strrchr(args[0], '/');
@@ -1227,8 +1226,6 @@ exec_team(int32 argCount, char **args, int32 envCount, char **env)
 	sem_delete_owned_sems(team->id);
 	remove_images(team);
 	vfs_exec_io_context(team->io_context);
-
-	cache_node_launched(argCount, args);
 
 	user_debug_finish_after_exec();
 
