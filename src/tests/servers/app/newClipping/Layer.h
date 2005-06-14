@@ -73,7 +73,6 @@ private:
 			void			clear_visible_regions();
 			void			resize_layer_frame_by(float x, float y);
 			void			rezize_layer_redraw_more(BRegion &reg, float dx, float dy);
-			void			rezize_layer_redraw_more(BRegion &redraw, BRegion &copy, float dx, float dy);
 
 			char			fName[50];
 			BRegion			fVisible;

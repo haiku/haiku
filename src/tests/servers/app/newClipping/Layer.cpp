@@ -279,6 +279,9 @@ Layer::resize_layer_frame_by(float x, float y)
 void
 Layer::rezize_layer_redraw_more(BRegion &reg, float dx, float dy)
 {
+	if (dx == 0 && dy == 0)
+		return;
+
 	for (Layer *lay = VirtualBottomChild();
 				lay; lay = VirtualUpperSibling())
 	{
@@ -286,24 +289,35 @@ Layer::rezize_layer_redraw_more(BRegion &reg, float dx, float dy)
 
 		if ((rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM)
 		{
+			// NOTE: this is not exactly corect, but it works :-)
+			// Normaly we shoud've used the lay's old, required region - the one returned
+			// from get_user_region() with the old frame, and the current one. lay->Bounds()
+			// works for the moment so we leave it like this.
 
-			BRect	oldBounds(lay->Bounds());
-			oldBounds.right -=dx;
-			oldBounds.bottom -=dy;
+			// calculate the old bounds.
+			BRect	oldBounds(lay->Bounds());		
+			if ((rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT)
+				oldBounds.right -=dx;
+			if ((rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM)
+				oldBounds.bottom -=dy;
 			
+			// compute the region that became visible because we got bigger OR smaller.
 			BRegion	regZ(lay->Bounds());
 			regZ.Include(oldBounds);
 			regZ.Exclude(oldBounds&lay->Bounds());
 
 			lay->ConvertToScreen2(&regZ);
 
-			reg.IntersectWith(&lay->fFullVisible);
-
+			// intersect that with this'(not lay's) fullVisible region
+			regZ.IntersectWith(&fFullVisible);
 			reg.Include(&regZ);
 
-			lay->rezize_layer_redraw_more(reg, dx, dy);
-// above OR this:
-//			reg.Include(&lay->fFullVisible);
+			lay->rezize_layer_redraw_more(reg,
+				(rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT? dx: 0,
+				(rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM? dy: 0);
+
+			// above, OR this:
+			// reg.Include(&lay->fFullVisible);
 		}
 		else
 		if (((rm & 0x0F0F) == (uint16)B_FOLLOW_RIGHT && dx != 0) ||
@@ -315,34 +329,20 @@ Layer::rezize_layer_redraw_more(BRegion &reg, float dx, float dy)
 		}
 	}
 }
-
-void
-Layer::rezize_layer_redraw_more(BRegion &redraw, BRegion &copy, float dx, float dy)
+/*
+inline void
+Layer::resize_layer_full_update_on_resize(BRegion &reg, float dx, float dy)
 {
-	for (Layer *lay = VirtualBottomChild();
-				lay; lay = VirtualUpperSibling())
-	{
-		uint16		rm = lay->fResizeMode & 0x0000FFFF;
+	if (dx == 0 && dy == 0)
+		return;
 
-		if ((rm & 0x0F0F) == (uint16)B_FOLLOW_RIGHT && dx != 0)
-		{
-//			copy.Include(&lay->fFullVisible);
-			redraw.Include(&lay->fFullVisible);
-		}
-		else if (((rm & 0x0F0F) == (uint16)B_FOLLOW_H_CENTER && dx != 0) ||
-			((rm & 0xF0F0) == (uint16)B_FOLLOW_BOTTOM && dy != 0) ||
-			((rm & 0xF0F0) == (uint16)B_FOLLOW_V_CENTER && dy != 0))
-		{
-			redraw.Include(&lay->fFullVisible);
-		}
-		else if ((rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM)
-		{
-			lay->rezize_layer_redraw_more(redraw, copy, dx, dy);
-//			redraw.Include(&lay->fFullVisible);
-		}
-	}
+	if (flags & B_FULL_UPDATE_ON_RESIZE && fVisible.CountRects() > 0)
+		reg.Include(&fVisible);
+
+	for (Layer *lay = VirtualBottomChild(); lay; lay = VirtualUpperSibling())
+		lay->resize_layer_full_update_on_resize();
 }
-
+*/
 void
 Layer::ResizeBy(float dx, float dy)
 {
@@ -360,15 +360,12 @@ Layer::ResizeBy(float dx, float dy)
 	if (!IsVisuallyHidden() && GetRootLayer())
 	{
 		BRegion oldFullVisible(fFullVisible);
+		// this is required to invalidate the old border
 		BRegion oldVisible(fVisible);
 
-		// right, center and bottom alligned layers will change their position
-		// so we need to invalidate their current visible regions
-//		BRegion redrawRightOrBottom;
-//		rezize_layer_redraw_more(redrawRightOrBottom, dx, dy);
-BRegion redrawRightOrBottom;
-BRegion copyReg;
-rezize_layer_redraw_more(redrawRightOrBottom, copyReg, dx, dy);
+		// in case they moved, bottom, right and center aligned layers must be redrawn
+		BRegion redrawMore;
+		rezize_layer_redraw_more(redrawMore, dx, dy);
 
 		// we'll invalidate the old area and the new, maxmial one.
 		BRegion invalid;
@@ -392,7 +389,7 @@ rezize_layer_redraw_more(redrawRightOrBottom, copyReg, dx, dy);
 		redrawReg.Include(&redrawReg2);
 
 		// for center, right and bottom alligned layers, redraw their old positions
-		redrawReg.Include(&redrawRightOrBottom);
+		redrawReg.Include(&redrawMore);
 
 		// layers that had their frame modified must be entirely redrawn.
 		rezize_layer_redraw_more(redrawReg, dx, dy);
@@ -402,97 +399,13 @@ rezize_layer_redraw_more(redrawRightOrBottom, copyReg, dx, dy);
 		// include layer's visible region in case we want a full update on resize
 		if (fFlags & B_FULL_UPDATE_ON_RESIZE && fVisible.Frame().IsValid())
 		{
-			GetRootLayer()->fRedrawReg.Include(&fVisible);
-			GetRootLayer()->fRedrawReg.Include(&oldVisible);
-		}
-copyReg.OffsetBy(dx, 0);
-copyReg.IntersectWith(&fFullVisible);
-GetRootLayer()->fRedrawReg.Exclude(&copyReg);
-copyReg.OffsetBy(-dx, 0);
-GetRootLayer()->CopyRegion(&copyReg, dx, 0);
-		// clear canvas and set invalid regions for affected WinBorders
-		GetRootLayer()->RequestRedraw(); // TODO: what if we pass (fParent, startFromTHIS, &redrawReg)?
-	}
-
-/*
-	This works well! Above I'm trying to optimize things.
-
-	if (!IsVisuallyHidden() && GetRootLayer())
-	{
-		BRegion oldFullVisible(fFullVisible);
-		BRegion oldVisible(fVisible);
-
-// OPT: you can we HW acceleration for either for bottom alligned layer or
-//		for right alligned ones. investigate!
-
-		// right, center and bottom alligned layers will change their position
-		// so we need to invalidate their current visible regions
-		BRegion redrawRightOrBottom;
-		for (Layer *lay = VirtualBottomChild();
-					lay; lay = VirtualUpperSibling())
-		{
-			uint16		rm = lay->fResizeMode & 0x0000FFFF;
-
-			if ((rm & 0x0F0F) == (uint16)B_FOLLOW_RIGHT || (rm & 0x0F0F) == (uint16)B_FOLLOW_H_CENTER
-				|| (rm & 0xF0F0) == (uint16)B_FOLLOW_BOTTOM || (rm & 0xF0F0) == (uint16)B_FOLLOW_V_CENTER
-			// TODO: these 2 don't need to be redrawn entirely. but ATM we don't have a choice
-				|| (rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM)
-			{
-				redrawRightOrBottom.Include(&lay->fFullVisible);
-			}
-		}
-
-		// we'll invalidate the old area and the new, maxmial one.
-		BRegion invalid;
-		get_user_regions(invalid);
-		invalid.Include(&fFullVisible);
-
-		clear_visible_regions();
-
-		fParent->RebuildVisibleRegions(invalid, this);
-
-		// done rebuilding regions, now redraw regions that became visible
-
-		// what's invalid, are the differences between to old and the new fullVisible region
-		// 1) in case we grow.
-		BRegion		redrawReg(fFullVisible);
-		redrawReg.Exclude(&oldFullVisible);
-		// 2) in case we shrink
-		BRegion		redrawReg2(oldFullVisible);
-		redrawReg2.Exclude(&fFullVisible);
-		// 3) combine.
-		redrawReg.Include(&redrawReg2);
-
-		// for center, right and bottom alligned layers, redraw their old positions
-		redrawReg.Include(&redrawRightOrBottom);
-
-		// layers that had their frame modified must be entirely redrawn.
-		for (Layer *lay = VirtualBottomChild();
-					lay; lay = VirtualUpperSibling())
-		{
-			uint16		rm = lay->fResizeMode & 0x0000FFFF;
-
-			if ((rm & 0x0F0F) == (uint16)B_FOLLOW_RIGHT || (rm & 0x0F0F) == (uint16)B_FOLLOW_H_CENTER
-				|| (rm & 0xF0F0) == (uint16)B_FOLLOW_BOTTOM || (rm & 0xF0F0) == (uint16)B_FOLLOW_V_CENTER
-			// TODO: these 2 don't need to be redrawn entirely. but ATM we don't have a choice
-				|| (rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM)
-			{
-				redrawReg.Include(&lay->fFullVisible);
-			}
-		}
-
-		// add redrawReg to our RootLayer's redraw region.
-		GetRootLayer()->fRedrawReg.Include(&redrawReg);
-		// include layer's visible region in case we want a full update on resize
-		if (fFlags & B_FULL_UPDATE_ON_RESIZE && fVisible.Frame().IsValid())
-		{
+// TODO: fFlags & B_FULL_UPDATE_ON_RESIZE - do that for descendants.
 			GetRootLayer()->fRedrawReg.Include(&fVisible);
 			GetRootLayer()->fRedrawReg.Include(&oldVisible);
 		}
 		// clear canvas and set invalid regions for affected WinBorders
 		GetRootLayer()->RequestRedraw(); // TODO: what if we pass (fParent, startFromTHIS, &redrawReg)?
 	}
-*/
 }
 
 void Layer::MoveBy(float dx, float dy)
