@@ -3162,7 +3162,10 @@ BView::RemoveSelf()
 BView *
 BView::Parent() const
 {
-	return parent;
+	if (parent && parent->top_level_view)
+		return NULL;
+	else
+		return parent;
 }
 
 
