@@ -21,8 +21,7 @@ App Pulse : BottomPrefsView.cpp
 	PulseView.cpp
 	PulseWindow.cpp 
 	$(r5_src)	
-#	: libbe.so 
-	: libopenbeos.so
+	: libbe.so 
 	: Pulse.rdef ;
 
 if $(HAIKU_COMPATIBLE) {
