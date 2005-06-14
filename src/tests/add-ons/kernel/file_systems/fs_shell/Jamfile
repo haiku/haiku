@@ -23,7 +23,7 @@ rule BuildLibFSShell
 	C++FLAGS = [ Filter $(C++FLAGS) : -nostdinc ] ;
 
 	Objects $(2) ;
-	LibraryFromObjects $(1) : $(2:S=$(SUFOBJ)) ;
+	LibraryFromObjects $(1) : [ FGristFiles $(2:S=$(SUFOBJ)) ] ;
 
 	ObjectsDefines $(2) : _NO_INLINE_ASM ;
 
