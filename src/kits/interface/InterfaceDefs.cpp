@@ -46,6 +46,7 @@ extern "C" status_t _fini_interface_kit_();
 #include <input_globals.h>
 #include <ServerProtocol.h>
 #include <WidthBuffer.h>
+#include <ColorSet.h>	// for private system colors stuff
 
 #include <string.h>
 #include <Font.h>
@@ -796,6 +797,37 @@ __set_window_decor(int32 theme)
 	BAppServerLink link;
 	link.StartMessage(AS_R5_SET_DECORATOR);
 	link.Attach<int32>(theme);
+	link.Flush();
+}
+
+/*!
+	\brief Private function to get the system's GUI colors as a set
+	\param colors The recipient color set
+*/
+void get_system_colors(ColorSet *colors)
+{
+	if(!colors)
+		return;
+	
+	BAppServerLink link;
+	int32 code;
+	
+	link.StartMessage(AS_GET_UI_COLORS);
+	link.Flush();
+	link.GetNextMessage(code);
+	link.Read<ColorSet>(colors);
+}
+
+/*!
+	\brief Private function to set the system's GUI colors all at once
+	\param colors The color set to use
+*/
+void set_system_colors(const ColorSet &colors)
+{
+	BAppServerLink link;
+	
+	link.StartMessage(AS_SET_UI_COLORS);
+	link.Attach<ColorSet>(colors);
 	link.Flush();
 }
 
