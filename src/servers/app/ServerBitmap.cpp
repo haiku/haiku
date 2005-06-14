@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -103,7 +103,14 @@ ServerBitmap::_AllocateBuffer(void)
 	uint32 length = BitsLength();
 	if (length > 0) {
 		delete[] fBuffer;
-		fBuffer = new uint8[length];
+		try {
+			fBuffer = new uint8[length];
+			fInitialized = true;
+		} catch (...) {
+			// we can't do anything about it
+			fBuffer = NULL;
+			fInitialized = false;
+		}
 	}
 }
 
