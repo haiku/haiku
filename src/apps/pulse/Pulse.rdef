@@ -69,7 +69,7 @@ resource app_version
         internal = 0,
 
         short_info = "Pulse 1.0.0",
-        long_info = "Pulse 1.0.0 ©2004 Haiku"
+        long_info = "Pulse 1.0.0 ©2005 Haiku"
 };
 
 resource app_flags B_SINGLE_LAUNCH;

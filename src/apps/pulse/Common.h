@@ -30,7 +30,7 @@ enum {
 	ITEM_OFFSET = 27
 };
 
-#define APP_SIGNATURE				"application/x-vnd.Be-PULS"
+#define APP_SIGNATURE				"application/x-vnd.Haiku-Pulse"
 
 #define PV_NORMAL_MODE				'pvnm'
 #define PV_MINI_MODE				'pvmm'
