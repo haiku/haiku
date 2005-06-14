@@ -164,7 +164,6 @@ BGView::BGView(BRect frame, const char *name, int32 resize, int32 flags)
 		new BMessage(DEFAULT_FOLDER)));
 	fWorkspaceMenu->AddItem(menuItem = new BMenuItem("Other folder" B_UTF8_ELLIPSIS, 
 		new BMessage(OTHER_FOLDER)));
-	fWorkspaceMenu->AddSeparatorItem();
 	
 	fImageMenu = new BPopUpMenu("pick one");
 	fImageMenu->AddItem(new BGImageMenuItem("None", -1, new BMessage(NONE_IMAGE)));
@@ -254,13 +253,11 @@ BGView::AllAttached(void)
 void
 BGView::MessageReceived(BMessage *msg)
 {
-	//printf("what : %li\n", msg->what);
 	switch(msg->what)
 	{
 		case B_SIMPLE_DATA:
 		case B_REFS_RECEIVED:
 		{
-			//printf("refs received\n");
 			RefsReceived(msg);
 			break;
 		}
@@ -765,7 +762,10 @@ BGView::LoadSettings(void)
 			
 			int32 index = 0;	
 			while(fSettings.FindString("recentfolder", index, &string)==B_OK)
-			{
+			{	
+				if (index == 0)
+					fWorkspaceMenu->AddSeparatorItem();
+				
 				BPath path(string.String());
 				int32 i = AddPath(path);
 				BString s;
@@ -964,6 +964,8 @@ BGView::RefsReceived(BMessage *msg)
 				item = fWorkspaceMenu->ItemAt(index+6);
 				fLastWorkspaceIndex = index+6;
 			} else {
+				if (fWorkspaceMenu->CountItems() <= 5)
+					fWorkspaceMenu->AddSeparatorItem();
 				BString s;
 				s << "Folder: " << path.Leaf();
 				item = new BMenuItem(s.String(), new BMessage(FOLDER_SELECTED));
