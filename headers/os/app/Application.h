@@ -33,7 +33,6 @@ namespace BPrivate {
 }
 
 
-// BApplication class ----------------------------------------------------------
 class BApplication : public BLooper {
 public:
 							BApplication(const char* signature);
@@ -144,9 +143,8 @@ private:
 			bool			quit_all_windows(bool force);
 			bool			window_quit_loop(bool, bool);
 			void			do_argv(BMessage* msg);
-#ifndef FIX_FOR_4_6
 			void			SetAppCursor();
-#endif
+
 			uint32			InitialWorkspace();
 			int32			count_windows(bool incl_menus) const;
 			BWindow*		window_at(uint32 index, bool incl_menus) const;
@@ -157,28 +155,23 @@ private:
 
 			const char*		fAppName;
 			BPrivate::PortLink* fServerLink;
-//			uint32			_unused0;
-//			int32			fServerFrom;
-//			int32			fServerTo;
-#ifndef FIX_FOR_4_6
+			uint32			_unused0;
+
 			void*			fCursorData;
-#else
-			void*			_unused1;
-#endif
 			_server_heap_* 	fServerHeap;
 			bigtime_t		fPulseRate;
 			uint32			fInitialWorkspace;
 			_drag_data_*	fDraggedMessage;
 			BMessageRunner*	fPulseRunner;
 			status_t		fInitError;
-			uint32			_reserved[12];
+			uint32			_reserved[11];
 
 			bool			fReadyToRunCalled;
 };
 
-// Global Objects --------------------------------------------------------------
+// Global Objects
 
 extern _IMPEXP_BE BApplication*	be_app;
-extern _IMPEXP_BE BMessenger	be_app_messenger;
+extern _IMPEXP_BE BMessenger be_app_messenger;
 
 #endif	// _APPLICATION_H
