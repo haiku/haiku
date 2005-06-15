@@ -35,20 +35,18 @@ Layer::~Layer()
 {
 	Layer	*c = fBottom;
 	Layer	*toast;
-	while (c)
-	{
+	while (c) {
 		toast = c;
 		c = c->fUpper;
 		delete toast;
 	}
 }
 
-void Layer::ConvertToScreen2(BRect* rect) const
+void
+Layer::ConvertToScreen2(BRect* rect) const
 {
-	MyView *view = GetRootLayer();
-	if (view)
-		if (fParent)
-		{
+	if (GetRootLayer())
+		if (fParent) {
 			rect->OffsetBy(-fOrigin.x, -fOrigin.y);
 			rect->OffsetBy(fFrame.left, fFrame.top);
 
@@ -56,12 +54,11 @@ void Layer::ConvertToScreen2(BRect* rect) const
 		}
 }
 
-void Layer::ConvertToScreen2(BRegion* reg) const
+void
+Layer::ConvertToScreen2(BRegion* reg) const
 {
-	MyView *view = GetRootLayer();
-	if (view)
-		if (fParent)
-		{
+	if (GetRootLayer())
+		if (fParent) {
 			reg->OffsetBy(-fOrigin.x, -fOrigin.y);
 			reg->OffsetBy(fFrame.left, fFrame.top);
 
@@ -69,7 +66,8 @@ void Layer::ConvertToScreen2(BRegion* reg) const
 		}
 }
 
-MyView* Layer::GetRootLayer() const
+MyView*
+Layer::GetRootLayer() const // we already have
 {
 	if (fView)
 		return fView;
@@ -80,42 +78,45 @@ MyView* Layer::GetRootLayer() const
 			return NULL;
 }
 
-Layer* Layer::VirtualBottomChild() const
+Layer*
+Layer::BottomChild() const // we already have
 {
 	fCurrent = fBottom;
 	return fCurrent;
 }
 
-Layer* Layer::VirtualTopChild() const
+Layer*
+Layer::TopChild() const// we already have
 {
 	fCurrent = fTop;
 	return fCurrent;
 }
 
-Layer* Layer::VirtualUpperSibling() const
+Layer*
+Layer::UpperSibling() const// we already have
 {
 	fCurrent = fCurrent->fUpper;
 	return fCurrent;
 }
 
-Layer* Layer::VirtualLowerSibling() const
+Layer*
+Layer::LowerSibling() const// we already have
 {
 	fCurrent = fCurrent->fLower;
 	return fCurrent;
 }
 
-void Layer::AddLayer(Layer* layer)
+void
+Layer::AddLayer(Layer* layer)// we already have
 {
-	if( layer->fParent != NULL ) 
-	{
+	if( layer->fParent != NULL ) {
 		printf("ERROR: Layer already has a parent\n");
 		return;
 	}
 	
 	layer->fParent = this;
 	
-	if (!fBottom)
-	{
+	if (!fBottom) {
 		fBottom = layer;
 		fTop = layer;
 		return;
@@ -125,10 +126,10 @@ void Layer::AddLayer(Layer* layer)
 	fBottom = layer;
 }
 
-bool Layer::RemLayer(Layer* layer)
+bool
+Layer::RemLayer(Layer* layer)// we already have
 {
-	if(!layer->fParent || layer->fParent != this)
-	{
+	if(!layer->fParent || layer->fParent != this) {
 		printf("ERROR: Rem: Layer doesn't have a fParent or !=this\n");
 		return false;
 	}
@@ -150,13 +151,13 @@ bool Layer::RemLayer(Layer* layer)
 	layer->fUpper = NULL;
 	layer->fLower = NULL;
 
-	layer->clear_visible_regions();
+	layer->clear_visible_regions(); // TAKE
 
 	return true;
 }
 
 bool
-Layer::IsVisuallyHidden() const
+Layer::IsHidden() const
 {
 	if (fHidden)
 		return true;
@@ -166,7 +167,7 @@ Layer::IsVisuallyHidden() const
 		return false;
 
 	if (fParent)
-		return fParent->IsVisuallyHidden();
+		return fParent->IsHidden();
 		
 	return fHidden;
 }
@@ -176,8 +177,7 @@ Layer::Hide()
 {
 	fHidden = true;
 
-	if (fParent && !fParent->IsVisuallyHidden() && GetRootLayer())
-	{
+	if (fParent && !fParent->IsHidden() && GetRootLayer()) {
 		// save fullVisible so we know what to invalidate
 		BRegion invalid(fFullVisible);
 
@@ -193,8 +193,7 @@ Layer::Show()
 {
 	fHidden = false;
 
-	if (fParent && !fParent->IsVisuallyHidden() && GetRootLayer())
-	{
+	if (fParent && !fParent->IsHidden() && GetRootLayer()) {
 		BRegion invalid;
 
 		get_user_regions(invalid);
@@ -210,14 +209,14 @@ Layer::Invalidate(const BRegion &invalid, const Layer *startFrom)
 	BRegion		localVisible(fFullVisible);
 	localVisible.IntersectWith(&invalid);
 	rebuild_visible_regions(invalid, localVisible,
-		startFrom? startFrom: VirtualBottomChild());
+		startFrom? startFrom: BottomChild());
 
 	// add localVisible to our RootLayer's redraw region.
 	GetRootLayer()->fRedrawReg.Include(&localVisible);
 	GetRootLayer()->RequestRedraw(); // TODO: what if we pass (fParent, startFromTHIS, &redrawReg)?
 }
 
-void
+inline void
 Layer::resize_layer_frame_by(float x, float y)
 {
 	uint16		rm = fResizeMode & 0x0000FFFF;
@@ -251,8 +250,7 @@ Layer::resize_layer_frame_by(float x, float y)
 	else if ((rm & 0x00F0U) == _VIEW_CENTER_ << 4)
 		newFrame.bottom += y/2;
 
-	if (newFrame != fFrame)
-	{
+	if (newFrame != fFrame) {
 		float		dx, dy;
 
 		dx	= newFrame.Width() - fFrame.Width();
@@ -260,16 +258,12 @@ Layer::resize_layer_frame_by(float x, float y)
 
 		fFrame	= newFrame;
 
-		if (dx != 0.0f || dy != 0.0f)
-		{
+		if (dx != 0.0f || dy != 0.0f) {
 			// call hook function
 			ResizedByHook(dx, dy, true); // automatic
 
-			for (Layer *lay = VirtualBottomChild();
-						lay ; lay = VirtualUpperSibling())
-			{
+			for (Layer *lay = BottomChild(); lay; lay = UpperSibling())
 				lay->resize_layer_frame_by(dx, dy);
-			}
 		}
 		else
 			MovedByHook(dx, dy);
@@ -282,13 +276,10 @@ Layer::rezize_layer_redraw_more(BRegion &reg, float dx, float dy)
 	if (dx == 0 && dy == 0)
 		return;
 
-	for (Layer *lay = VirtualBottomChild();
-				lay; lay = VirtualUpperSibling())
-	{
+	for (Layer *lay = BottomChild(); lay; lay = UpperSibling()) {
 		uint16		rm = lay->fResizeMode & 0x0000FFFF;
 
-		if ((rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM)
-		{
+		if ((rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM) {
 			// NOTE: this is not exactly corect, but it works :-)
 			// Normaly we shoud've used the lay's old, required region - the one returned
 			// from get_user_region() with the old frame, and the current one. lay->Bounds()
@@ -336,12 +327,10 @@ Layer::resize_layer_full_update_on_resize(BRegion &reg, float dx, float dy)
 	if (dx == 0 && dy == 0)
 		return;
 
-	for (Layer *lay = VirtualBottomChild(); lay; lay = VirtualUpperSibling())
-	{
+	for (Layer *lay = BottomChild(); lay; lay = UpperSibling()) {
 		uint16		rm = lay->fResizeMode & 0x0000FFFF;		
 
-		if ((rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM)
-		{
+		if ((rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM) {
 			if (lay->fFlags & B_FULL_UPDATE_ON_RESIZE && lay->fVisible.CountRects() > 0)
 				reg.Include(&lay->fVisible);
 
@@ -358,16 +347,14 @@ Layer::ResizeBy(float dx, float dy)
 	fFrame.Set(fFrame.left, fFrame.top, fFrame.right+dx, fFrame.bottom+dy);
 
 	// resize children using their resize_mask.
-	for (Layer *lay = VirtualBottomChild();
-				lay; lay = VirtualUpperSibling())
+	for (Layer *lay = BottomChild(); lay; lay = UpperSibling())
 			lay->resize_layer_frame_by(dx, dy);
 
 	// call hook function
 	if (dx != 0.0f || dy != 0.0f)
 		ResizedByHook(dx, dy, false); // manual
 
-	if (!IsVisuallyHidden() && GetRootLayer())
-	{
+	if (!IsHidden() && GetRootLayer()) {
 		BRegion oldFullVisible(fFullVisible);
 		// this is required to invalidate the old border
 		BRegion oldVisible(fVisible);
@@ -406,8 +393,7 @@ Layer::ResizeBy(float dx, float dy)
 		// add redrawReg to our RootLayer's redraw region.
 		GetRootLayer()->fRedrawReg.Include(&redrawReg);
 		// include layer's visible region in case we want a full update on resize
-		if (fFlags & B_FULL_UPDATE_ON_RESIZE && fVisible.Frame().IsValid())
-		{
+		if (fFlags & B_FULL_UPDATE_ON_RESIZE && fVisible.Frame().IsValid()) {
 			resize_layer_full_update_on_resize(GetRootLayer()->fRedrawReg, dx, dy);
 
 			GetRootLayer()->fRedrawReg.Include(&fVisible);
@@ -429,8 +415,7 @@ void Layer::MoveBy(float dx, float dy)
 	// call hook function
 	MovedByHook(dx, dy);
 
-	if (!IsVisuallyHidden() && GetRootLayer())
-	{
+	if (!IsHidden() && GetRootLayer()) {
 		BRegion oldFullVisible(fFullVisible);
 
 		// we'll invalidate the old position and the new, maxmial one.
@@ -468,18 +453,18 @@ void Layer::MoveBy(float dx, float dy)
 	}
 }
 
-void Layer::ScrollBy(float dx, float dy)
+void
+Layer::ScrollBy(float dx, float dy)
 {
 	fOrigin.Set(fOrigin.x + dx, fOrigin.y + dy);
 
-	if (!IsVisuallyHidden() && GetRootLayer())
-	{
+	if (!IsHidden() && GetRootLayer()) {
 		// set the region to be invalidated.
 		BRegion		invalid(fFullVisible);
 
 		clear_visible_regions();
 
-		rebuild_visible_regions(invalid, invalid, VirtualBottomChild());
+		rebuild_visible_regions(invalid, invalid, BottomChild());
 
 		// for the moment we say that the whole surface needs to be redraw.
 		BRegion		redrawReg(fFullVisible);
@@ -504,15 +489,19 @@ void Layer::ScrollBy(float dx, float dy)
 		ScrolledByHook(dx, dy);
 }
 
-void Layer::GetWantedRegion(BRegion &reg)
+
+
+
+
+void
+Layer::GetWantedRegion(BRegion &reg) // TAKE?
 {
 	get_user_regions(reg);
 }
 
-void Layer::get_user_regions(BRegion &reg)
+void
+Layer::get_user_regions(BRegion &reg)
 {
-// OPT: maybe we should have all these cached in a 'fFull' member
-
 	// 1) set to frame in screen coords
 	BRect			screenFrame(Bounds());
 	ConvertToScreen2(&screenFrame);
@@ -540,16 +529,18 @@ wind->Unlock();
 */
 }
 
-void Layer::RebuildVisibleRegions(const BRegion &invalid, const Layer *startFrom)
+void
+Layer::RebuildVisibleRegions(const BRegion &invalid, const Layer *startFrom)
 {
 	BRegion		localVisible(fFullVisible);
 	localVisible.IntersectWith(&invalid);
 	rebuild_visible_regions(invalid, localVisible, startFrom);
 }
 
-void Layer::rebuild_visible_regions(const BRegion &invalid,
-									const BRegion &parentLocalVisible,
-									const Layer *startFrom)
+void
+Layer::rebuild_visible_regions(const BRegion &invalid,
+								const BRegion &parentLocalVisible,
+								const Layer *startFrom)
 {
 	// no point in continuing if this layer is hidden. starting from here, all
 	// descendants have (and will have) invalid visible regions.
@@ -588,13 +579,12 @@ void Layer::rebuild_visible_regions(const BRegion &invalid,
 	BRegion unalteredVisible(common);
 	bool altered = alter_visible_for_children(common);
 
-	for (Layer *lay = VirtualBottomChild(); lay ; lay = VirtualUpperSibling())
-	{
+	for (Layer *lay = BottomChild(); lay; lay = UpperSibling()) {
 		if (lay == startFrom)
 			fullRebuild = true;
 
 		if (fullRebuild)
-			lay->rebuild_visible_regions(invalid, common, lay->VirtualBottomChild());
+			lay->rebuild_visible_regions(invalid, common, lay->BottomChild());
 
 		// to let children know much they can take from parent's visible region
 		common.Exclude(&lay->fFullVisible);
@@ -612,31 +602,32 @@ void Layer::rebuild_visible_regions(const BRegion &invalid,
 		fVisible.Include(&common);
 }
 
-bool Layer::alter_visible_for_children(BRegion &reg)
+bool
+Layer::alter_visible_for_children(BRegion &reg)
 {
 	// Empty Hook function
 	return false;
 }
 
-void Layer::clear_visible_regions()
+void
+Layer::clear_visible_regions()
 {
 	// OPT: maybe we should uncomment these lines for performance
-//	if (fFullVisible.CountRects() <= 0)
-//		return;
+	//if (fFullVisible.CountRects() <= 0)
+	//	return;
 
 	fVisible.MakeEmpty();
 	fFullVisible.MakeEmpty();
-	for (Layer *child = VirtualBottomChild(); child;
-				child = VirtualUpperSibling())
+	for (Layer *child = BottomChild(); child; child = UpperSibling())
 		child->clear_visible_regions();
 }
 
-void Layer::PrintToStream() const
+void
+Layer::PrintToStream() const
 {
 	printf("-> %s\n", fName);
 	fVisible.PrintToStream();
 	fFullVisible.PrintToStream();
-	for (Layer *child = VirtualBottomChild(); child;
-				child = VirtualUpperSibling())
+	for (Layer *child = BottomChild(); child; child = UpperSibling())
 		child->PrintToStream();
 }

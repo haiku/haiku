@@ -22,7 +22,7 @@ public:
 			void			ResizeBy(float dx, float dy);
 			void			ScrollBy(float dx, float dy);
 
-			bool			IsVisuallyHidden() const;
+			bool			IsHidden() const;
 			void			Hide();
 			void			Show();
 
@@ -33,10 +33,10 @@ public:
 	virtual	void			ResizedByHook(float dx, float dy, bool automatic) { }
 	virtual	void			ScrolledByHook(float dx, float dy) { }
 
-			Layer*			VirtualBottomChild() const;
-			Layer*			VirtualTopChild() const;
-			Layer*			VirtualUpperSibling() const;
-			Layer*			VirtualLowerSibling() const;
+			Layer*			BottomChild() const;
+			Layer*			TopChild() const;
+			Layer*			UpperSibling() const;
+			Layer*			LowerSibling() const;
 
 			void			RebuildVisibleRegions(	const BRegion &invalid,
 													const Layer *startFrom);

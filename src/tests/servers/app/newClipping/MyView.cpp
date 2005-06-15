@@ -94,7 +94,7 @@ Layer* MyView::FindLayer(Layer *lay, BPoint &where) const
 	if (lay->Visible()->Contains(where))
 		return lay;
 	else
-		for (Layer *child = lay->VirtualBottomChild(); child; child = lay->VirtualUpperSibling())
+		for (Layer *child = lay->BottomChild(); child; child = lay->UpperSibling())
 		{
 			Layer	*found = FindLayer(child, where);
 			if (found)
@@ -302,7 +302,7 @@ void MyView::DrawSubTree(Layer* lay)
 //printf("======== %s =======\n", lay->Name());
 //	lay->Visible()->PrintToStream();
 //	lay->FullVisible()->PrintToStream();
-	for (Layer *child = lay->VirtualBottomChild(); child; child = lay->VirtualUpperSibling())
+	for (Layer *child = lay->BottomChild(); child; child = lay->UpperSibling())
 		DrawSubTree(child);
 
 	ConstrainClippingRegion(lay->Visible());
