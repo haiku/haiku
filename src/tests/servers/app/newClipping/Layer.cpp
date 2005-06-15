@@ -276,7 +276,7 @@ Layer::resize_layer_frame_by(float x, float y)
 	}
 }
 
-void
+inline void
 Layer::rezize_layer_redraw_more(BRegion &reg, float dx, float dy)
 {
 	if (dx == 0 && dy == 0)
@@ -329,20 +329,29 @@ Layer::rezize_layer_redraw_more(BRegion &reg, float dx, float dy)
 		}
 	}
 }
-/*
+
 inline void
 Layer::resize_layer_full_update_on_resize(BRegion &reg, float dx, float dy)
 {
 	if (dx == 0 && dy == 0)
 		return;
 
-	if (flags & B_FULL_UPDATE_ON_RESIZE && fVisible.CountRects() > 0)
-		reg.Include(&fVisible);
-
 	for (Layer *lay = VirtualBottomChild(); lay; lay = VirtualUpperSibling())
-		lay->resize_layer_full_update_on_resize();
+	{
+		uint16		rm = lay->fResizeMode & 0x0000FFFF;		
+
+		if ((rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM)
+		{
+			if (lay->fFlags & B_FULL_UPDATE_ON_RESIZE && lay->fVisible.CountRects() > 0)
+				reg.Include(&lay->fVisible);
+
+			lay->resize_layer_full_update_on_resize(reg,
+				(rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT? dx: 0,
+				(rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM? dy: 0);
+		}
+	}
 }
-*/
+
 void
 Layer::ResizeBy(float dx, float dy)
 {
@@ -399,7 +408,8 @@ Layer::ResizeBy(float dx, float dy)
 		// include layer's visible region in case we want a full update on resize
 		if (fFlags & B_FULL_UPDATE_ON_RESIZE && fVisible.Frame().IsValid())
 		{
-// TODO: fFlags & B_FULL_UPDATE_ON_RESIZE - do that for descendants.
+			resize_layer_full_update_on_resize(GetRootLayer()->fRedrawReg, dx, dy);
+
 			GetRootLayer()->fRedrawReg.Include(&fVisible);
 			GetRootLayer()->fRedrawReg.Include(&oldVisible);
 		}
