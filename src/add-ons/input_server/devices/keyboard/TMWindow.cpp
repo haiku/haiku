@@ -1,9 +1,9 @@
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 //
-//	Copyright (c) 2004, Haiku
+//	Copyright (c) 2004-2005, Haiku
 //
 //  This software is part of the Haiku distribution and is covered 
-//  by the Haiku license.
+//  by the MIT license.
 //
 //
 //  File:        TMWindow.cpp
@@ -13,12 +13,14 @@
 // 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
+
 #include "TMWindow.h"
 #include "TMListItem.h"
 #include "KeyboardInputDevice.h"
 #include <Message.h>
 #include <ScrollView.h>
 #include <Screen.h>
+
 
 const uint32 TM_CANCEL = 'TMca';
 const uint32 TM_FORCE_REBOOT = 'TMfr';
@@ -28,65 +30,69 @@ const uint32 TM_SELECTED_TEAM = 'TMst';
 #ifdef COMPILE_FOR_R5
 extern "C" void _kshutdown_(bool reboot);
 #else
-#include <syscalls.h>
-#define _kshutdown_(x) _kern_shutdown(x)
+#	include <syscalls.h>
+#	define _kshutdown_(x) _kern_shutdown(x)
 #endif
+
 
 TMWindow::TMWindow()
 	: BWindow(BRect(0,0,350,300), "Team Monitor", 
 		B_TITLED_WINDOW_LOOK, B_MODAL_ALL_WINDOW_FEEL, 
-		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE| B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS,
+		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS,
 		B_ALL_WORKSPACES),
-		fQuitting(false)
+	fQuitting(false)
 {
 	Lock();
 
+	// ToDo: make this font sensitive
+
 	BRect rect = Bounds();
-	
+	BFont font = be_plain_font;
+
 	fBackground = new TMBox(rect, "background", B_FOLLOW_LEFT | B_FOLLOW_TOP,
 		B_WILL_DRAW, B_NO_BORDER);
 	AddChild(fBackground);
-	
+
 	rect = Bounds();
 	rect.right -= 10;
-	rect.left = rect.right - 75;
+	rect.left = rect.right - font.StringWidth("Cancel") - 20;
 	rect.bottom -= 14;
 	rect.top = rect.bottom - 20;
-	
+
 	BButton *cancel = new BButton(rect, "cancel", "Cancel", 
 		new BMessage(TM_CANCEL), B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM);
 	fBackground->AddChild(cancel);
 	SetDefaultButton(cancel);
-	
+
 	rect.left = 10;
-	rect.right = rect.left + 83;
-	
+	rect.right = rect.left + font.StringWidth("Force Reboot") + 20;
+
 	BButton *forceReboot = new BButton(rect, "force", "Force Reboot", 
 		new BMessage(TM_FORCE_REBOOT), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
 	fBackground->AddChild(forceReboot);
-	
+
 	rect.top -= 97;
 	rect.bottom = rect.top + 20;
-	rect.right += 1;
-		
+	rect.right = rect.left + font.StringWidth("Kill Application") + 20;
+
 	fKillApp = new BButton(rect, "kill", "Kill Application", 
 		new BMessage(TM_KILL_APPLICATION), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
 	fBackground->AddChild(fKillApp);
 	fKillApp->SetEnabled(false);
-	
+
 	rect.top = rect.bottom + 10;
 	rect.bottom = rect.top + 65;
 	rect.right = rect.left + Bounds().right - 10;
 	fDescView = new TMDescView(rect);
 	fBackground->AddChild(fDescView);
-	
-	BRect	screenFrame = (BScreen(B_MAIN_SCREEN_ID).Frame());
-	BPoint 	pt;
-	pt.x = screenFrame.Width()/2 - Bounds().Width()/2;
-	pt.y = screenFrame.Height()/2 - Bounds().Height()/2;
 
-	if (screenFrame.Contains(pt))
-		MoveTo(pt);
+	BRect screenFrame = (BScreen(B_MAIN_SCREEN_ID).Frame());
+	BPoint point;
+	point.x = (screenFrame.Width() - Bounds().Width()) / 2;
+	point.y = (screenFrame.Height() - Bounds().Height()) / 2;
+
+	if (screenFrame.Contains(point))
+		MoveTo(point);
 
 	Unlock();
 }
@@ -94,16 +100,13 @@ TMWindow::TMWindow()
 
 TMWindow::~TMWindow()
 {
-
-
 }
 
 
 void
 TMWindow::MessageReceived(BMessage *msg)
 {
-	switch(msg->what)
-	{
+	switch (msg->what) {
 		case TM_FORCE_REBOOT:
 			_kshutdown_(true);
 			break;
@@ -163,25 +166,26 @@ TMWindow::Disable()
 }
 
 
+//	#pragma mark -
+
+
 TMBox::TMBox(BRect bounds, const char* name, uint32 resizeFlags,
-		uint32 flags, border_style border)
+	uint32 flags, border_style border)
 	: BBox(bounds, name, resizeFlags, flags | B_PULSE_NEEDED, border)
 {
-
 	BRect rect = Bounds();
 	rect.InsetBy(12, 11);
 	rect.right -= B_V_SCROLL_BAR_WIDTH;
 	rect.bottom = rect.top + 146;
-	
+
 	fListView = new BListView(rect, "teams", B_SINGLE_SELECTION_LIST, 
 		B_FOLLOW_ALL);
 	fListView->SetSelectionMessage(new BMessage(TM_SELECTED_TEAM));
-	
+
 	BScrollView *sv = new BScrollView("scroll_teams", fListView, 
-		B_FOLLOW_LEFT_RIGHT|B_FOLLOW_TOP_BOTTOM, 0, false, true, B_FANCY_BORDER);
-	
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP_BOTTOM, 0, false, true, B_FANCY_BORDER);
+
 	AddChild(sv);
-	
 }
 
 
@@ -192,7 +196,7 @@ TMBox::Pulse()
 	int32 cookie = 0;
 	team_info info;
 	
-	for (int32 i=0; i<fListView->CountItems(); i++) {
+	for (int32 i = 0; i < fListView->CountItems(); i++) {
 		TMListItem *item = (TMListItem*)fListView->ItemAt(i);
 		item->fFound = false;
 	}
@@ -202,7 +206,7 @@ TMBox::Pulse()
 			continue;
 	
 		bool found = false;
-		for (int32 i=0; i<fListView->CountItems(); i++) {
+		for (int32 i = 0; i < fListView->CountItems(); i++) {
 			TMListItem *item = (TMListItem*)fListView->ItemAt(i);
 			if (item->GetInfo()->team == info.team) {
 				item->fFound = true;
@@ -217,7 +221,7 @@ TMBox::Pulse()
 		}
 	}	
 
-	for (int32 i=fListView->CountItems()-1; i>=0; i--) {
+	for (int32 i = fListView->CountItems() - 1; i >= 0; i--) {
 		TMListItem *item = (TMListItem*)fListView->ItemAt(i);
 		if (!item->fFound)
 			delete fListView->RemoveItem(i);
@@ -227,12 +231,13 @@ TMBox::Pulse()
 }
 
 
+//	#pragma mark -
+
+
 TMDescView::TMDescView(BRect rect)
-	: BBox(rect, "descview", B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW, B_NO_BORDER),
+	: BBox(rect, "descview", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW, B_NO_BORDER),
 	fItem(NULL)
 {
-
-
 }
 
 
@@ -246,38 +251,37 @@ TMDescView::Draw(BRect rect)
 		SetDrawingMode(B_OP_OVER);
 		DrawBitmap(fItem->LargeIcon(), frame);
 		SetDrawingMode(B_OP_COPY);
-		
-		BFont		font = be_plain_font;
+
+		BFont font = be_plain_font;
 		font_height	finfo;
 		font.GetHeight(&finfo);
 		SetFont(&font);
 		MovePenTo(frame.right+9, frame.top - 2 + ((frame.Height() - (finfo.ascent + finfo.descent + finfo.leading)) / 4) +
-					(finfo.ascent + finfo.descent) - 1);
+			(finfo.ascent + finfo.descent) - 1);
 		DrawString(fItem->Path()->Path());
-		
+
 		if (fItem->IsSystemServer()) {
 			MovePenTo(frame.right+9, frame.top + 1 + ((frame.Height() - (finfo.ascent + finfo.descent + finfo.leading)) *3 / 4) +
 				(finfo.ascent + finfo.descent) - 1);
-			DrawString("(This team is a component of the BeOS");
+			DrawString("(This team is a system component");
 		}
 	} else {
-		BFont		font = be_plain_font;
+		BFont font = be_plain_font;
 		font_height	finfo;
 		font.GetHeight(&finfo);
 		SetFont(&font);
 		BPoint point(rect.left+4, rect.top - 9 + ((rect.Height() - (finfo.ascent + finfo.descent + finfo.leading)) / 4) +
-					(finfo.ascent + finfo.descent) - 1);
+			(finfo.ascent + finfo.descent) - 1);
 		MovePenTo(point);
-		DrawString("Select an application from the list above and click the \"Kill\" button in");
-		
+		DrawString("Select an application from the list above and click the");
+
 		point.y += 13;
 		MovePenTo(point);
-		DrawString("order to close it.");
-		
+		DrawString("\"Kill Application\" button in order to close it.");
+
 		point.y += 26;
 		MovePenTo(point);
 		DrawString("Hold CONTROL+ALT+DELETE for 4 seconds to reboot.");
-		
 	}
 }
 
