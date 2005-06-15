@@ -38,25 +38,34 @@ class TMView : public BBox {
 		virtual void AttachedToWindow();
 		virtual void Pulse();
 		virtual void MessageReceived(BMessage *msg);
+		virtual void GetPreferredSize(float *_width, float *_height);
 
 		void UpdateList();
 		BListView *ListView() { return fListView; }
 
 	private:
 		BListView *fListView;
-		BButton *fKillApp;
+		BButton *fKillButton;
 		TMDescView *fDescView;
 };
 
 class TMDescView : public BBox {
 	public:
-		TMDescView(BRect bounds);
+		TMDescView(BRect bounds, uint32 resizeMode);
+
+		virtual void Pulse();
+
 		virtual void Draw(BRect bounds);
+		virtual void GetPreferredSize(float *_width, float *_height);
 
 		void SetItem(TMListItem *item);
 		TMListItem *Item() { return fItem; }
+
 	private:
+		const char *fText[3];
 		TMListItem *fItem;
+		int32 fSeconds;
+		bool fKeysPressed;
 };
 
 class TMWindow : public BWindow {

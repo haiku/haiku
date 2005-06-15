@@ -38,7 +38,7 @@ extern "C" void _kshutdown_(bool reboot);
 
 
 TMWindow::TMWindow()
-	: BWindow(BRect(0,0,350,300), "Team Monitor", 
+	: BWindow(BRect(0, 0, 350, 300), "Team Monitor", 
 		B_TITLED_WINDOW_LOOK, B_MODAL_ALL_WINDOW_FEEL, 
 		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS,
 		B_ALL_WORKSPACES),
@@ -48,9 +48,13 @@ TMWindow::TMWindow()
 
 	// ToDo: make this font sensitive
 
-	fView = new TMView(Bounds(), "background", B_FOLLOW_LEFT | B_FOLLOW_TOP,
+	fView = new TMView(Bounds(), "background", B_FOLLOW_ALL,
 		B_WILL_DRAW, B_NO_BORDER);
 	AddChild(fView);
+
+	float width, height;
+	fView->GetPreferredSize(&width, &height);
+	ResizeTo(width, height);
 
 	BRect screenFrame = BScreen(B_MAIN_SCREEN_ID).Frame();
 	BPoint point;
@@ -122,21 +126,31 @@ TMView::TMView(BRect bounds, const char* name, uint32 resizeFlags,
 	BRect rect = bounds;
 	rect.InsetBy(12, 12);
 	rect.right -= B_V_SCROLL_BAR_WIDTH;
-	rect.bottom = rect.top + 146;
+	rect.bottom = rect.top + TMListItem::MinimalHeight() * 8 + 6;
 
 	BFont font = be_plain_font;
 
 	fListView = new BListView(rect, "teams", B_SINGLE_SELECTION_LIST, 
-		B_FOLLOW_ALL);
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	fListView->SetSelectionMessage(new BMessage(TM_SELECTED_TEAM));
 
 	BScrollView *scrollView = new BScrollView("scroll_teams", fListView, 
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP_BOTTOM, 0, false, true, B_FANCY_BORDER);
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP, 0, false, true, B_FANCY_BORDER);
 	AddChild(scrollView);
+
+	rect.left = 10;
+	rect.top = rect.bottom + 10;
+	rect.bottom = rect.top + 20;
+	rect.right = rect.left + font.StringWidth("Kill Application") + 20;
+
+	fKillButton = new BButton(rect, "kill", "Kill Application",
+		new BMessage(TM_KILL_APPLICATION), B_FOLLOW_LEFT | B_FOLLOW_TOP);
+	AddChild(fKillButton);
+	fKillButton->SetEnabled(false);
 
 	rect = bounds;
 	rect.right -= 10;
-	rect.left = rect.right - font.StringWidth("Cancel") - 20;
+	rect.left = rect.right - font.StringWidth("Cancel") - 40;
 	rect.bottom -= 14;
 	rect.top = rect.bottom - 20;
 
@@ -151,19 +165,11 @@ TMView::TMView(BRect bounds, const char* name, uint32 resizeFlags,
 		new BMessage(TM_FORCE_REBOOT), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	AddChild(forceReboot);
 
-	rect.top -= 97;
-	rect.bottom = rect.top + 20;
-	rect.right = rect.left + font.StringWidth("Kill Application") + 20;
-
-	fKillApp = new BButton(rect, "kill", "Kill Application", 
-		new BMessage(TM_KILL_APPLICATION), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-	AddChild(fKillApp);
-	fKillApp->SetEnabled(false);
-
-	rect.top = rect.bottom + 10;
-	rect.bottom = rect.top + 65;
+	rect.left += 4;
+	rect.bottom = rect.top - 8;
+	rect.top = fKillButton->Frame().bottom + 8;
 	rect.right = bounds.right - 10;
-	fDescView = new TMDescView(rect);
+	fDescView = new TMDescView(rect, B_FOLLOW_ALL);
 	AddChild(fDescView);
 }
 
@@ -176,12 +182,10 @@ TMView::AttachedToWindow()
 		cancel->SetTarget(this);
 	}
 
-	if (BButton *kill = dynamic_cast<BButton*>(FindView("kill")))
-		kill->SetTarget(this);
-
 	if (BButton *reboot = dynamic_cast<BButton*>(FindView("force")))
 		reboot->SetTarget(this);
 
+	fKillButton->SetTarget(this);
 	fListView->SetTarget(this);
 }
 
@@ -197,12 +201,11 @@ TMView::MessageReceived(BMessage *msg)
 			TMListItem *item = (TMListItem*)ListView()->ItemAt(
 				ListView()->CurrentSelection());
 			kill_team(item->GetInfo()->team);
-			fKillApp->SetEnabled(false);
 			UpdateList();
 			break;
 		}
 		case TM_SELECTED_TEAM: {
-			fKillApp->SetEnabled(fListView->CurrentSelection() >= 0);
+			fKillButton->SetEnabled(fListView->CurrentSelection() >= 0);
 			TMListItem *item = (TMListItem*)ListView()->ItemAt(
 				ListView()->CurrentSelection());
 			fDescView->SetItem(item);
@@ -264,8 +267,10 @@ TMView::UpdateList()
 	for (int32 i = fListView->CountItems() - 1; i >= 0; i--) {
 		TMListItem *item = (TMListItem*)fListView->ItemAt(i);
 		if (!item->fFound) {
-			if (item == fDescView->Item())
+			if (item == fDescView->Item()) {
 				fDescView->SetItem(NULL);
+				fKillButton->SetEnabled(false);
+			}
 
 			delete fListView->RemoveItem(i);
 			changed = true;
@@ -277,13 +282,48 @@ TMView::UpdateList()
 }
 
 
+void
+TMView::GetPreferredSize(float *_width, float *_height)
+{
+	fDescView->GetPreferredSize(_width, _height);
+
+	if (_width)
+		*_width += 28;
+
+	if (_height) {
+		*_height += fKillButton->Bounds().Height() * 2
+			+ TMListItem::MinimalHeight() * 8 + 50;
+	}
+}
+
+
 //	#pragma mark -
 
 
-TMDescView::TMDescView(BRect rect)
-	: BBox(rect, "descview", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW, B_NO_BORDER),
+TMDescView::TMDescView(BRect rect, uint32 resizeMode)
+	: BBox(rect, "descview", resizeMode, B_WILL_DRAW | B_PULSE_NEEDED, B_NO_BORDER),
 	fItem(NULL)
 {
+	SetFont(be_plain_font);
+
+	fText[0] = "Select an application from the list above and click the";
+	fText[1] = "\"Kill Application\" button in order to close it.";
+	fText[2] = "Hold CONTROL+ALT+DELETE for %ld seconds to reboot.";
+
+	fKeysPressed = false;
+	fSeconds = 4;
+}
+
+
+void
+TMDescView::Pulse()
+{
+	// ToDo: connect this mechanism with the keyboard device - it can tell us
+	//	if ctrl-alt-del is pressed
+	if (fKeysPressed) {
+		fSeconds--;
+		Invalidate();
+	}
 }
 
 
@@ -292,46 +332,80 @@ TMDescView::Draw(BRect rect)
 {
 	rect = Bounds();
 
+	font_height	fontInfo;
+	GetFontHeight(&fontInfo);
+	float height = ceil(fontInfo.ascent + fontInfo.descent + fontInfo.leading + 2);
+
 	if (fItem) {
+		// draw icon and application path
 		BRect frame(rect);
-		frame.OffsetBy(2,3);
-		frame.Set(frame.left, frame.top, frame.left+31, frame.top+31);
+		frame.Set(frame.left, frame.top, frame.left + 31, frame.top + 31);
 		SetDrawingMode(B_OP_OVER);
 		DrawBitmap(fItem->LargeIcon(), frame);
 		SetDrawingMode(B_OP_COPY);
 
-		BFont font = be_plain_font;
-		font_height	finfo;
-		font.GetHeight(&finfo);
-		SetFont(&font);
-		MovePenTo(frame.right+9, frame.top - 2 + ((frame.Height() - (finfo.ascent + finfo.descent + finfo.leading)) / 4) +
-			(finfo.ascent + finfo.descent) - 1);
+		BPoint line(frame.right + 9, frame.top + fontInfo.ascent);
+		if (!fItem->IsSystemServer())
+			line.y += (frame.Height() - height) / 2;
+		else
+			line.y += (frame.Height() - 2 * height) / 2;
+
 		BString path = fItem->Path()->Path();
-		TruncateString(&path, B_TRUNCATE_MIDDLE, rect.right - 9 - frame.right);
-		DrawString(path.String());
+		TruncateString(&path, B_TRUNCATE_MIDDLE, rect.right - line.x);
+		DrawString(path.String(), line);
 
 		if (fItem->IsSystemServer()) {
-			MovePenTo(frame.right+9, frame.top + 1 + ((frame.Height() - (finfo.ascent + finfo.descent + finfo.leading)) *3 / 4) +
-				(finfo.ascent + finfo.descent) - 1);
-			DrawString("(This team is a system component)");
+			line.y += height;
+			//SetFont(be_bold_font);
+			DrawString("(This team is a system component)", line);
+			//SetFont(be_plain_font);
 		}
 	} else {
-		BFont font = be_plain_font;
-		font_height	finfo;
-		font.GetHeight(&finfo);
-		SetFont(&font);
-		BPoint point(rect.left+4, rect.top - 9 + ((rect.Height() - (finfo.ascent + finfo.descent + finfo.leading)) / 4) +
-			(finfo.ascent + finfo.descent) - 1);
-		MovePenTo(point);
-		DrawString("Select an application from the list above and click the");
+		BPoint line(rect.left, rect.top + fontInfo.ascent);
 
-		point.y += 13;
-		MovePenTo(point);
-		DrawString("\"Kill Application\" button in order to close it.");
+		for (int32 i = 0; i < 2; i++) {
+			DrawString(fText[i], line);
+			line.y += height;
+		}
 
-		point.y += 26;
-		MovePenTo(point);
-		DrawString("Hold CONTROL+ALT+DELETE for 4 seconds to reboot.");
+		char text[256];
+		if (fSeconds >= 0)
+			snprintf(text, sizeof(text), fText[2], fSeconds);
+		else
+			strcpy(text, "Booom!");
+
+		line.y += height;
+		DrawString(text, line);
+	}
+}
+
+
+void
+TMDescView::GetPreferredSize(float *_width, float *_height)
+{
+	if (_width) {
+		float width = 0;
+		for (int32 i = 0; i < 3; i++) {
+			float stringWidth = StringWidth(fText[i]);
+			if (stringWidth > width)
+				width = stringWidth;
+		}
+
+		if (width < 330)
+			width = 330;
+
+		*_width = width;
+	}
+
+	if (_height) {
+		font_height	fontInfo;
+		GetFontHeight(&fontInfo);
+
+		float height = 4 * ceil(fontInfo.ascent + fontInfo.descent + fontInfo.leading + 2);
+		if (height < 32)
+			height = 32;
+
+		*_height = height;
 	}
 }
 

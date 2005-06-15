@@ -20,24 +20,27 @@
 #include <ListItem.h>
 #include <Path.h>
 
-class TMListItem : public BListItem 
-{
-public:
-	TMListItem(team_info &info);
-	~TMListItem();
+class TMListItem : public BListItem  {
+	public:
+		TMListItem(team_info &info);
+		~TMListItem();
 
-	virtual void DrawItem(BView *owner, BRect frame, bool complete = false);
-	virtual void Update(BView *owner, const BFont *finfo);
-	const team_info	*GetInfo();
-	
-	const BBitmap *LargeIcon() { return &fLargeIcon; };
-	const BPath *Path() { return &fPath; };
-	bool		IsSystemServer();
-	bool		fFound;
-private:
-	team_info	fInfo;
-	BBitmap		fIcon, fLargeIcon;
-	BPath		fPath;
+		virtual void DrawItem(BView *owner, BRect frame, bool complete = false);
+		virtual void Update(BView *owner, const BFont *finfo);
+
+		const team_info	*GetInfo();
+		const BBitmap *LargeIcon() { return &fLargeIcon; };
+		const BPath *Path() { return &fPath; };
+		bool IsSystemServer();
+
+		static int32 MinimalHeight();
+
+		bool		fFound;
+
+	private:
+		team_info	fInfo;
+		BBitmap		fIcon, fLargeIcon;
+		BPath		fPath;
 };
 
 

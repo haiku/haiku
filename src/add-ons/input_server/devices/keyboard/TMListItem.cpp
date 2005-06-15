@@ -13,22 +13,23 @@
 // 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-#include <string.h>
 #include <NodeInfo.h>
 #include <View.h>
+
 #include "TMListItem.h"
 
-#define kITEM_MARGIN	2
+#include <string.h>
+
+
+static const int32 kItemMargin = 2;
 
 
 TMListItem::TMListItem(team_info &tinfo) 
 	: BListItem(),
-		fInfo(tinfo),
-		fIcon(BRect(0,0,15,15), B_CMAP8),
-		fLargeIcon(BRect(0,0,31,31), B_CMAP8)
+	fInfo(tinfo),
+	fIcon(BRect(0, 0, 15, 15), B_CMAP8),
+	fLargeIcon(BRect(0, 0, 31, 31), B_CMAP8)
 {
-	SetHeight(16 + kITEM_MARGIN);
-
 	int32 cookie = 0;
 	image_info info;
 	if (get_next_image_info(tinfo.team, &cookie, &info) == B_OK) {
@@ -90,15 +91,22 @@ TMListItem::DrawItem(BView *owner, BRect frame, bool complete)
 }
 
 
-void 
-TMListItem::Update(BView *owner, const BFont *finfo)
+/*static*/
+int32
+TMListItem::MinimalHeight()
 {
-	// we need to override the update method so we can make sure are
-	// list item size doesn't change
-	BListItem::Update(owner, finfo);
-	if ((Height() < 16 + kITEM_MARGIN)) {
-		SetHeight(16 + kITEM_MARGIN);
-	}
+	return 16 + kItemMargin;
+}
+
+
+void
+TMListItem::Update(BView *owner, const BFont *font)
+{
+	// we need to override the update method so we can make sure
+	// the list item size doesn't change
+	BListItem::Update(owner, font);
+	if (Height() < MinimalHeight())
+		SetHeight(MinimalHeight());
 }
 
 
