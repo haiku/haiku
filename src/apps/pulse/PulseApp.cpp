@@ -16,9 +16,10 @@
 #include "PulseWindow.h"
 #include "DeskbarPulseView.h"
 
-#include <interface/Alert.h>
-#include <interface/Rect.h>
-#include <interface/Deskbar.h>
+#include <Alert.h>
+#include <Rect.h>
+#include <Screen.h>
+#include <Deskbar.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -118,25 +119,38 @@ PulseApp::PulseApp(int argc, char **argv)
 void
 PulseApp::BuildPulse()
 {
-	PulseWindow *pulsewindow = NULL;
-	if (prefs->window_mode == NORMAL_WINDOW_MODE) {
-		pulsewindow = new PulseWindow(prefs->normal_window_rect);
-	} else if (prefs->window_mode == MINI_WINDOW_MODE) {
-		pulsewindow = new PulseWindow(prefs->mini_window_rect);
 	// Remove this case for Deskbar add on API
-	} else if (prefs->window_mode == DESKBAR_MODE) {
-		if (LoadInDeskbar()) {
-			PostMessage(new BMessage(B_QUIT_REQUESTED));
-			return;
-		} else {
-			// If loading the replicant fails, launch the app instead
-			// This allows having the replicant and the app open simultaneously
-			prefs->window_mode = NORMAL_WINDOW_MODE;
-			pulsewindow = new PulseWindow(prefs->normal_window_rect);
-		}
-	}
 
-	pulsewindow->Show();
+	// If loading the replicant fails, launch the app instead
+	// This allows having the replicant and the app open simultaneously
+	if (prefs->window_mode == DESKBAR_MODE && LoadInDeskbar()) {
+		PostMessage(new BMessage(B_QUIT_REQUESTED));
+		return;
+	} else
+		prefs->window_mode = NORMAL_WINDOW_MODE;
+
+	PulseWindow *pulseWindow = NULL;
+
+	if (prefs->window_mode == MINI_WINDOW_MODE)
+		pulseWindow = new PulseWindow(prefs->mini_window_rect);
+	else
+		pulseWindow = new PulseWindow(prefs->normal_window_rect);
+
+	// check if the window is on screen, and move it if not
+	BRect frame = pulseWindow->Frame();
+	BRect screenFrame = BScreen().Frame();
+
+	if (frame.left > screenFrame.right)
+		pulseWindow->MoveBy(screenFrame.right - frame.right - 10, 0);
+	else if (frame.right < 0)
+		pulseWindow->MoveTo(10, frame.top);
+
+	if (frame.top > screenFrame.bottom)
+		pulseWindow->MoveBy(0, screenFrame.bottom - frame.bottom - 10);
+	else if (frame.bottom < 0)
+		pulseWindow->MoveTo(frame.left, 10);
+
+	pulseWindow->Show();
 }
 
 
@@ -169,8 +183,10 @@ LastEnabledCPU(int my_cpu)
 		return true;
 
 	for (int x = 0; x < sys_info.cpu_count; x++) {
-		if (x == my_cpu) continue;
-		if (_kget_cpu_state_(x) == 1) return false;
+		if (x == my_cpu)
+			continue;
+		if (_kget_cpu_state_(x) == 1)
+			return false;
 	}
 	return true;
 }
