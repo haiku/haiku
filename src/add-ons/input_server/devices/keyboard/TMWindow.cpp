@@ -115,6 +115,7 @@ TMWindow::MessageReceived(BMessage *msg)
 					fBackground->fListView->CurrentSelection());
 				kill_team(item->GetInfo()->team);
 				fKillApp->SetEnabled(false);
+				fDescView->SetItem(NULL);
 			}
 			break;
 		case TM_SELECTED_TEAM: {
@@ -193,18 +194,19 @@ void
 TMBox::Pulse()
 {
 	CALLED();
-	int32 cookie = 0;
-	team_info info;
-	
+	bool changed = false;
+
 	for (int32 i = 0; i < fListView->CountItems(); i++) {
 		TMListItem *item = (TMListItem*)fListView->ItemAt(i);
 		item->fFound = false;
 	}
-	
+
+	int32 cookie = 0;
+	team_info info;
 	while (get_next_team_info(&cookie, &info) == B_OK) {
 		if (info.team <=16)
 			continue;
-	
+
 		bool found = false;
 		for (int32 i = 0; i < fListView->CountItems(); i++) {
 			TMListItem *item = (TMListItem*)fListView->ItemAt(i);
@@ -213,21 +215,25 @@ TMBox::Pulse()
 				found = true;
 			}
 		}
-		
+
 		if (!found) {
 			TMListItem *item = new TMListItem(info);
 			fListView->AddItem(item, 0);
 			item->fFound = true;
+			changed = true;
 		}
 	}	
 
 	for (int32 i = fListView->CountItems() - 1; i >= 0; i--) {
 		TMListItem *item = (TMListItem*)fListView->ItemAt(i);
-		if (!item->fFound)
+		if (!item->fFound) {
 			delete fListView->RemoveItem(i);
+			changed = true;
+		}
 	}
 
-	fListView->Invalidate();
+	if (changed)
+		fListView->Invalidate();
 }
 
 
@@ -244,6 +250,9 @@ TMDescView::TMDescView(BRect rect)
 void
 TMDescView::Draw(BRect rect)
 {
+	// Accessing fItem this way is not a good idea, since it's not correctly
+	// updated - if the team goes away in the meantime, we're doomed to crash
+	// (the item could have been deleted in TMBox::Pulse())
 	if (fItem) {
 		BRect frame(rect);
 		frame.OffsetBy(2,3);
@@ -263,7 +272,7 @@ TMDescView::Draw(BRect rect)
 		if (fItem->IsSystemServer()) {
 			MovePenTo(frame.right+9, frame.top + 1 + ((frame.Height() - (finfo.ascent + finfo.descent + finfo.leading)) *3 / 4) +
 				(finfo.ascent + finfo.descent) - 1);
-			DrawString("(This team is a system component");
+			DrawString("(This team is a system component)");
 		}
 	} else {
 		BFont font = be_plain_font;
