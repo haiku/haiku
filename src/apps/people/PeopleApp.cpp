@@ -167,10 +167,14 @@ TPeopleApp::ArgvReceived(int32 argc, char **argv)
 		if (gFields[index].attribute != NULL) {
 			if (!window)
 				window = NewWindow();
-			while (*arg != ' ')
+
+			while (arg[0] && arg[0] != ' ' && arg[0] != '=')
 				arg++;
-			arg++;
-			window->SetField(index, arg);
+
+			if (arg[0]) {
+				arg++;
+				window->SetField(index, arg);
+			}
 		}
 	}
 }
