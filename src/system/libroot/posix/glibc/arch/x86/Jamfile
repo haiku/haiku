@@ -5,6 +5,17 @@ SubDirHdrs $(OBOS_TOP) src system libroot posix glibc include ;
 SubDirHdrs $(OBOS_TOP) src system libroot posix glibc stdlib ;
 SubDirHdrs $(OBOS_TOP) src system libroot posix glibc ;
 
+local originalOPTIM = $(OPTIM) ;
+if $(OPTIM) = -O0 {
+	OPTIM = -O ;
+}
+
+# filter -g we don't want here
+local originalCCFlags = $(CCFLAGS) ;
+CCFLAGS = [ Filter $(CCFLAGS) : -g ] ;
+local originalKERNEL_CCFLAGS = $(KERNEL_CCFLAGS) ;
+KERNEL_CCFLAGS = [ Filter $(KERNEL_CCFLAGS) : -g ] ;
+
 KernelMergeObject posix_gnu_arch_$(OBOS_ARCH).o :
 	add_n.S
 	addmul_1.S
@@ -25,3 +36,11 @@ KernelMergeObject posix_gnu_arch_$(OBOS_ARCH).o :
 SEARCH on [ FGristFiles
 	cmp.c divrem.c mul.c mul_n.c dbl2mpn.c
         ] = [ FDirName $(OBOS_TOP) src system libroot posix glibc arch ] ;
+
+OPTIM = $(originalOPTIM) ;
+
+# restore CCFLAGS
+CCFLAGS = $(originalCCFlags) ;
+
+# restore KERNEL_CCFLAGS 
+KERNEL_CCFLAGS = $(originalKERNEL_CCFLAGS) ;
