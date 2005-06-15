@@ -75,8 +75,8 @@ TPeopleWindow::TPeopleWindow(BRect frame, char *title, entry_ref *ref)
 	rect.OffsetTo(0, menuBar->Bounds().bottom + 1);
 	fView = new TPeopleView(rect, "PeopleView", fRef);
 
-	ResizeTo(frame.Width(), fView->Frame().bottom);
 	AddChild(fView);
+	ResizeTo(fView->Frame().right, fView->Frame().bottom);
 }
 
 

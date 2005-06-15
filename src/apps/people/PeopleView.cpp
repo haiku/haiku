@@ -28,7 +28,7 @@
 
 
 TPeopleView::TPeopleView(BRect rect, char *title, entry_ref *ref)
-		   :BView(rect, title, B_FOLLOW_ALL, B_WILL_DRAW)
+		   :BView(rect, title, B_FOLLOW_NONE, B_WILL_DRAW)
 {
 	if (ref)
 		fFile = new BFile(ref, O_RDWR);
@@ -51,15 +51,19 @@ TPeopleView::AttachedToWindow(void)
 	BRect bounds = Bounds();
 
 	BFont font = *be_plain_font;
-	int32 offset = int32(font.StringWidth(HPHONE_TEXT) + 10.5);
+	int32 offset = int32(font.StringWidth(gFields[F_HPHONE].name) + 10.5);
+	font_height fontHeight;
+	font.GetHeight(&fontHeight);
+	int32 textHeight = int32(fontHeight.ascent + fontHeight.descent
+		+ fontHeight.leading + 12.5);
 	BRect rect;
 	int32 row = 0;
 
 	for (int32 i = 0; gFields[i].attribute; i++, row++) {
 		const char *name = gFields[i].name;
 
-		rect.Set(NAME_H, NAME_V + row * 25,
-			bounds.right - NAME_H, NAME_V + (row + 1) * 25);
+		rect.Set(NAME_H, NAME_V + row * textHeight,
+			bounds.right - NAME_H, NAME_V + (row + 1) * textHeight);
 		int32 labelOffset = offset;
 
 		if (i == F_NAME)
@@ -103,7 +107,7 @@ TPeopleView::AttachedToWindow(void)
 	AddChild(field);
 
 	fField[F_NAME]->MakeFocus();
-	ResizeTo(bounds.right, rect.bottom + NAME_V);
+	ResizeTo(bounds.right, rect.bottom - 5 + NAME_V);
 }
 
 
