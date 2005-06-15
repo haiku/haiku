@@ -1,14 +1,15 @@
-//--------------------------------------------------------------------
-//	
-//	PeopleApp.cpp
-//
-//	Written by: Robert Polic
-//	
-//--------------------------------------------------------------------
 /*
-	Copyright 1999, Be Incorporated.   All Rights Reserved.
-	This file may be used under the terms of the Be Sample Code License.
-*/
+ * Copyright 2005, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Robert Polic
+ *		Axel Dörfler, axeld@pinc-software.de
+ *
+ * Copyright 1999, Be Incorporated.   All Rights Reserved.
+ * This file may be used under the terms of the Be Sample Code License.
+ */
+
 
 #include <Bitmap.h>
 #include <Directory.h>
@@ -17,14 +18,14 @@
 #include <Path.h>
 #include <FindDirectory.h>
 #include <Screen.h>
-#include <fs_index.h>
-#include <string.h>
 #include <Alert.h>
-
+#include <fs_index.h>
 
 #include "PeopleApp.h"
 #include "PeopleWindow.h"
 #include "PersonIcons.h"
+
+#include <string.h>
 
 
 struct people_field gFields[] = {
@@ -47,23 +48,17 @@ struct people_field gFields[] = {
 
 
 TPeopleApp::TPeopleApp(void)
-	: BApplication(APP_SIG)
+	: BApplication(APP_SIG),
+	fHaveWindow(false)
 {
-	const char		*str;
-	int32			index = 0;
-	BDirectory		dir;
-	BEntry			entry;
-	BMessage		msg;
-	BMessage		info;
-	BPath			path;
-
-	fHaveWindow = false;
-
 	fPosition.Set(6, TITLE_BAR_HEIGHT, 6 + WIND_WIDTH, TITLE_BAR_HEIGHT + WIND_HEIGHT);
 	BPoint pos = fPosition.LeftTop();
 
+	BPath path;
 	find_directory(B_USER_SETTINGS_DIRECTORY, &path, true);
-	dir.SetTo(path.Path());
+
+	BDirectory dir(path.Path());
+	BEntry entry;
 	if (dir.FindEntry("People_data", &entry) == B_NO_ERROR) {
 		fPrefs = new BFile(&entry, B_READ_WRITE);
 		if (fPrefs->InitCheck() == B_NO_ERROR) {
@@ -79,27 +74,29 @@ TPeopleApp::TPeopleApp(void)
 		}
 	}
 
-	// create indices on the boot volume
-	// ToDo: on other volumes as well?
+	// create indices on all volumes
 
-	BVolumeRoster roster;
+	BVolumeRoster volumeRoster;
 	BVolume volume;
-	roster.GetBootVolume(&volume);
-
-	for (int32 i = 0; gFields[i].attribute; i++) {
-		fs_create_index(volume.Device(), gFields[i].attribute, B_STRING_TYPE, 0);
+	while (volumeRoster.GetNextVolume(&volume) == B_OK) {
+		for (int32 i = 0; gFields[i].attribute; i++) {
+			fs_create_index(volume.Device(), gFields[i].attribute, B_STRING_TYPE, 0);
+		}
 	}
 
 	// install person mime type
-	
+
 	bool valid = false;
 	BMimeType mime;
 	mime.SetType(B_PERSON_MIMETYPE);
 
 	if (mime.IsInstalled()) {
+		BMessage info;
 		if (mime.GetAttrInfo(&info) == B_NO_ERROR) {
-			while (info.FindString("attr:name", index++, &str) == B_NO_ERROR) {
-				if (!strcmp(str, gFields[0].attribute)) {
+			const char *string;
+			int32 index = 0;
+			while (info.FindString("attr:name", index++, &string) == B_OK) {
+				if (!strcmp(string, gFields[0].attribute)) {
 					valid = true;
 					break;
 				}
@@ -123,18 +120,19 @@ TPeopleApp::TPeopleApp(void)
 
 		// add relevant person fields to meta-mime type
 
+		BMessage fields;
 		for (int32 i = 0; gFields[i].attribute; i++) {
-			msg.AddString("attr:public_name", gFields[i].name);
-			msg.AddString("attr:name", gFields[i].attribute);
-			msg.AddInt32("attr:type", B_STRING_TYPE);
-			msg.AddBool("attr:viewable", true);
-			msg.AddBool("attr:editable", true);
-			msg.AddInt32("attr:width", gFields[i].width);
-			msg.AddInt32("attr:alignment", B_ALIGN_LEFT);
-			msg.AddBool("attr:extra", false);
+			fields.AddString("attr:public_name", gFields[i].name);
+			fields.AddString("attr:name", gFields[i].attribute);
+			fields.AddInt32("attr:type", B_STRING_TYPE);
+			fields.AddBool("attr:viewable", true);
+			fields.AddBool("attr:editable", true);
+			fields.AddInt32("attr:width", gFields[i].width);
+			fields.AddInt32("attr:alignment", B_ALIGN_LEFT);
+			fields.AddBool("attr:extra", false);
 		}
 
-		mime.SetAttrInfo(&msg);
+		mime.SetAttrInfo(&fields);
 	}
 }
 
