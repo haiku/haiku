@@ -254,7 +254,8 @@ TMView::UpdateList()
 
 		if (!found) {
 			TMListItem *item = new TMListItem(info);
-			fListView->AddItem(item, 0);
+
+			fListView->AddItem(item, item->IsSystemServer() ? fListView->CountItems() : 0);
 			item->fFound = true;
 			changed = true;
 		}
