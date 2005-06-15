@@ -816,6 +816,111 @@ __set_window_decor(int32 theme)
 namespace BPrivate {
 
 /*!
+	\brief queries the server for the number of available decorators
+	\return the number of available decorators
+*/
+int32
+count_decorators(void)
+{
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_COUNT_DECORATORS);
+
+	int32 code;
+	int32 count = -1;
+	if (link.FlushWithReply(code) == B_OK)
+		link.Read<int32>(&count);
+	
+	return count;
+}
+
+/*!
+	\brief queries the server for the index of the current decorators
+	\return the current decorator's index
+	
+	If for some bizarre reason this function fails, it returns -1
+*/
+int32
+get_decorator(void)
+{
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_GET_DECORATOR);
+
+	int32 code;
+	int32 index = -1;
+	if (link.FlushWithReply(code) == B_OK)
+		link.Read<int32>(&index);
+	
+	return index;
+}
+
+
+/*!
+	\brief queries the server for the name of the decorator with a certain index
+	\param index The index of the decorator to get the name for
+	\param name BString to receive the name of the decorator
+	\return B_OK if successful, B_ERROR if not
+*/
+status_t
+get_decorator_name(const int32 &index, BString &name)
+{
+	BPrivate::AppServerLink link;
+	int32 code;
+	
+	link.StartMessage(AS_GET_DECORATOR_NAME);
+	link.Attach<int32>(index);
+	
+	if (link.FlushWithReply(code) == B_OK)
+	{
+		char *string;
+		if(link.ReadString(&string)==B_OK)
+		{
+			name=string;
+			delete [] string;
+			return B_OK;
+		}
+	}
+	
+	return B_ERROR;
+}
+
+/*!
+	\brief asks the server to draw a decorator preview into a BBitmap
+	\param index The index of the decorator to get the name for
+	\param bitmap BBitmap to receive the preview
+	\return B_OK if successful, B_ERROR if not.
+	
+	This is currently unimplemented.
+*/
+status_t
+get_decorator_preview(const int32 &index, BBitmap *bitmap)
+{
+	// TODO: implement get_decorator_preview
+	return B_ERROR;
+}
+
+
+/*!
+	\brief Private function which sets the window decorator for the system.
+	\param index Index of the decorator to set
+	
+	If the index is invalid, this function and the server do nothing
+*/
+status_t
+set_decorator(const int32 &index)
+{
+	if(index < 0)
+		return B_BAD_VALUE;
+	
+	BPrivate::AppServerLink link;
+	
+	link.StartMessage(AS_SET_DECORATOR);
+	link.Attach<int32>(index);
+	link.Flush();
+	
+	return B_OK;
+}
+
+/*!
 	\brief Private function to get the system's GUI colors as a set
 	\param colors The recipient color set
 */
