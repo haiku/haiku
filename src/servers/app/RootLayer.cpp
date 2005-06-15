@@ -445,7 +445,7 @@ RootLayer::ResizeBy(float x, float y)
 
 
 Layer *
-RootLayer::VirtualTopChild() const
+RootLayer::TopChild() const
 {
 	fWinBorderIndex	= fWinBorderCount-1;
 
@@ -455,7 +455,7 @@ RootLayer::VirtualTopChild() const
 	return NULL;
 }
 
-Layer* RootLayer::VirtualLowerSibling() const
+Layer* RootLayer::LowerSibling() const
 {
 	if (fWinBorderIndex < fWinBorderCount && fWinBorderIndex > 0)
 		return fWinBorderList[fWinBorderIndex--];
@@ -463,7 +463,7 @@ Layer* RootLayer::VirtualLowerSibling() const
 	return NULL;
 }
 
-Layer* RootLayer::VirtualUpperSibling() const
+Layer* RootLayer::UpperSibling() const
 {
 	if (fWinBorderIndex < fWinBorderCount && fWinBorderIndex > 0)
 		return fWinBorderList[fWinBorderIndex++];
@@ -471,7 +471,7 @@ Layer* RootLayer::VirtualUpperSibling() const
 	return NULL;
 }
 
-Layer* RootLayer::VirtualBottomChild() const
+Layer* RootLayer::BottomChild() const
 {
 	fWinBorderIndex	= 0;
 
@@ -2069,10 +2069,10 @@ RootLayer::empty_visible_regions(Layer *layer)
 	layer->fFullVisible.MakeEmpty();
 	layer->fVisible.MakeEmpty();
 
-	child	= layer->VirtualBottomChild();
+	child	= layer->BottomChild();
 	while(child) {
 		empty_visible_regions(child);
-		child = layer->VirtualUpperSibling();
+		child = layer->UpperSibling();
 	}
 }
 

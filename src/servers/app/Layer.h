@@ -85,10 +85,10 @@ class Layer {
 			Layer*				FindLayer(const int32 token);
 			Layer*				LayerAt(const BPoint &pt);
 
-	virtual	Layer*				VirtualTopChild() const;
-	virtual	Layer*				VirtualLowerSibling() const;
-	virtual	Layer*				VirtualUpperSibling() const;
-	virtual	Layer*				VirtualBottomChild() const;
+	virtual	Layer*				TopChild() const;
+	virtual	Layer*				LowerSibling() const;
+	virtual	Layer*				UpperSibling() const;
+	virtual	Layer*				BottomChild() const;
 	
 			const char*			GetName() const
 									{ return (fName) ? fName->String() : NULL; }
@@ -206,6 +206,10 @@ class Layer {
 			void				SetOverlayBitmap(const ServerBitmap* bitmap);
 	inline	const ServerBitmap*	OverlayBitmap() const
 									{ return fOverlayBitmap; }
+#ifdef NEW_CLIPPING
+			void				ConvertToScreen2(BRect* rect) const;
+			void				ConvertToScreen2(BRegion* reg) const;
+#endif
 
  protected:
 	friend class RootLayer;

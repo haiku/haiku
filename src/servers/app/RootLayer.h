@@ -74,10 +74,10 @@ public:
 	virtual	void				ResizeBy(float x, float y);
 	
 	// For the active workspaces
-	virtual	Layer*				VirtualTopChild(void) const;
-	virtual	Layer*				VirtualLowerSibling(void) const;
-	virtual	Layer*				VirtualUpperSibling(void) const;
-	virtual	Layer*				VirtualBottomChild(void) const;
+	virtual	Layer*				TopChild(void) const;
+	virtual	Layer*				LowerSibling(void) const;
+	virtual	Layer*				UpperSibling(void) const;
+	virtual	Layer*				BottomChild(void) const;
 
 			void				HideWinBorder(WinBorder* winBorder);
 			void				ShowWinBorder(WinBorder* winBorder);

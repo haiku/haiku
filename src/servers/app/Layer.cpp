@@ -338,7 +338,7 @@ Layer::RemoveSelf()
 bool
 Layer::HasChild(Layer* layer)
 {
-	for (Layer *lay = VirtualTopChild(); lay; lay = VirtualLowerSibling()) {
+	for (Layer *lay = TopChild(); lay; lay = LowerSibling()) {
 		if (lay == layer)
 			return true;
 	}
@@ -350,9 +350,9 @@ uint32
 Layer::CountChildren(void) const
 {
 	uint32 count = 0;
-	Layer *lay = VirtualTopChild();
+	Layer *lay = TopChild();
 	while (lay != NULL) {
-		lay	= VirtualLowerSibling();
+		lay	= LowerSibling();
 		count++;
 	}
 	return count;
@@ -371,13 +371,13 @@ Layer::FindLayer(const int32 token)
 	Layer* trylay;
 	
 	// Search child layers first
-	for (lay = VirtualTopChild(); lay; lay = VirtualLowerSibling()) {
+	for (lay = TopChild(); lay; lay = LowerSibling()) {
 		if (lay->fViewToken == token)
 			return lay;
 	}
 	
 	// Hmmm... not in this layer's children. Try lower descendants
-	for (lay = VirtualTopChild(); lay != NULL; lay = VirtualLowerSibling()) {
+	for (lay = TopChild(); lay != NULL; lay = LowerSibling()) {
 		trylay = lay->FindLayer(token);
 		if (trylay)
 			return trylay;
@@ -401,7 +401,7 @@ Layer::LayerAt(const BPoint &pt)
 
 	if (fFullVisible.Contains(pt)) {
 		Layer *lay = NULL;
-		for (Layer* child = VirtualBottomChild(); child; child = VirtualUpperSibling()) {
+		for (Layer* child = BottomChild(); child; child = UpperSibling()) {
 			lay = child->LayerAt(pt);
 			if (lay)
 				return lay;
@@ -411,33 +411,33 @@ Layer::LayerAt(const BPoint &pt)
 	return NULL;
 }
 
-// VirtualTopChild
+// TopChild
 Layer*
-Layer::VirtualTopChild() const
+Layer::TopChild() const
 {
 	fCurrent = fTopChild;
 	return fCurrent;
 }
 
-// VirtualLowerSibling
+// LowerSibling
 Layer*
-Layer::VirtualLowerSibling() const
+Layer::LowerSibling() const
 {
 	fCurrent = fCurrent->fLowerSibling;
 	return fCurrent;
 }
 
-// VirtualUpperSibling
+// UpperSibling
 Layer*
-Layer::VirtualUpperSibling() const
+Layer::UpperSibling() const
 {
 	fCurrent = fCurrent->fUpperSibling;
 	return fCurrent;
 }
 
-// VirtualBottomChild
+// BottomChild
 Layer*
-Layer::VirtualBottomChild() const
+Layer::BottomChild() const
 {
 	fCurrent = fBottomChild;
 	return fCurrent;
@@ -483,7 +483,7 @@ Layer::StartRebuildRegions( const BRegion& reg, Layer *target, uint32 action, BP
 	fVisible = fFullVisible;
 
 	// Rebuild regions for children...
-	for (Layer *lay = VirtualBottomChild(); lay; lay = VirtualUpperSibling()) {
+	for (Layer *lay = BottomChild(); lay; lay = UpperSibling()) {
 		if (lay == target)
 			lay->RebuildRegions(reg, action, pt, BPoint(0.0f, 0.0f));
 		else
@@ -689,7 +689,7 @@ Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint ptOf
 	}
 	
 	// Rebuild regions for children...
-	for(Layer *lay = VirtualBottomChild(); lay != NULL; lay = VirtualUpperSibling())
+	for(Layer *lay = BottomChild(); lay != NULL; lay = UpperSibling())
 		lay->RebuildRegions(reg, newAction, newPt, newOffset);
 
 	#ifdef DEBUG_LAYER_REBUILD
@@ -1263,7 +1263,7 @@ Layer::PrintTree()
 {
 	printf("\n Tree structure:\n");
 	printf("\t%s\t%s\n", GetName(), IsHidden()? "Hidden": "NOT hidden");
-	for(Layer *lay = VirtualBottomChild(); lay != NULL; lay = VirtualUpperSibling())
+	for(Layer *lay = BottomChild(); lay != NULL; lay = UpperSibling())
 		printf("\t%s\t%s\n", lay->GetName(), lay->IsHidden()? "Hidden": "NOT hidden");
 }
 
@@ -1466,7 +1466,7 @@ if (fOwner->cnt != 1)
 		}
 	}
 
-	for (Layer *lay = VirtualBottomChild(); lay != NULL; lay = VirtualUpperSibling()) {
+	for (Layer *lay = BottomChild(); lay != NULL; lay = UpperSibling()) {
 		if (lay == startFrom)
 			redraw = true;
 
@@ -1558,42 +1558,29 @@ Layer::SetOverlayBitmap(const ServerBitmap* bitmap)
 	fOverlayBitmap = bitmap;
 }
 
-
-/*
-//! Sends a B_VIEW_MOVED message to the client BWindow
+#ifdef NEW_CLIPPING
 void
-Layer::SendViewMovedMsg()
+Layer::ConvertToScreen2(BRect* rect) const
 {
-	if (fServerWin && fFlags & B_FRAME_EVENTS) {
-		BMessage msg;
-		msg.what = B_VIEW_MOVED;
-		// TODO: system_time() ?!?
-		msg.AddInt64("when", real_time_clock_usecs());
-		msg.AddInt32("_token", fViewToken);
-		msg.AddPoint("where", fFrame.LeftTop());
-		
-		fServerWin->SendMessageToClient(&msg);
-	}
+	if (GetRootLayer())
+		if (fParent) {
+			rect->OffsetBy(-fOrigin.x, -fOrigin.y);
+			rect->OffsetBy(fFrame.left, fFrame.top);
+
+			fParent->ConvertToScreen2(rect);
+		}
 }
 
-//! Sends a B_VIEW_RESIZE message to the client BWindow
 void
-Layer::SendViewResizedMsg()
+Layer::ConvertToScreen2(BRegion* reg) const
 {
-	if (fServerWin && fFlags & B_FRAME_EVENTS) {
-		BMessage msg;
-		msg.what = B_VIEW_RESIZED;
-		// TODO: system_time() ?!?
-		msg.AddInt64("when", real_time_clock_usecs());
-		msg.AddInt32("_token", fViewToken);
-		msg.AddFloat("width", fFrame.Width());
-		msg.AddFloat("height", fFrame.Height());
-		
-		// no need for that... it's here because of backward compatibility
-		msg.AddPoint("where", fFrame.LeftTop());
-		
-		fServerWin->SendMessageToClient(&msg);
-	}
+	if (GetRootLayer())
+		if (fParent) {
+			reg->OffsetBy(-fOrigin.x, -fOrigin.y);
+			reg->OffsetBy(fFrame.left, fFrame.top);
+
+			fParent->ConvertToScreen2(reg);
+		}
 }
-*/
+#endif
 
