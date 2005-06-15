@@ -5,7 +5,7 @@
 // Filter.cpp
 //
 //
-// Copyright (c) 2003 OpenBeOS Project
+// Copyright (c) 2003-2005 Haiku Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -33,6 +33,7 @@
 #include "Filter.h"
 
 extern "C" int  _kget_cpu_state_(int cpu);
+
 
 // Implementation of FilterThread
 FilterThread::FilterThread(Filter* filter, int32 i, int32 n, bool runInCurrentThread)
@@ -250,16 +251,15 @@ Filter::NumberOfActiveCPUs() const
 	system_info info;
 	get_system_info(&info);
 	count = info.cpu_count;
-	int32 CPUCount = 0;
+	int32 cpuCount = 0;
 	for (int i = 0; i < count; i ++) {
-		if (_kget_cpu_state_(i)) {
-			CPUCount ++;
-		}
+		if (_kget_cpu_state_(i))
+			cpuCount++;
 	}
-	if (CPUCount == 0) {
-		CPUCount = 1;
-	}
-	return CPUCount;
+	if (cpuCount == 0)
+		cpuCount = 1;
+
+	return cpuCount;
 }
 
 // Implementation of (bilinear) Scaler
