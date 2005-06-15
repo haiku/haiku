@@ -17,9 +17,11 @@
 #include "TMWindow.h"
 #include "TMListItem.h"
 #include "KeyboardInputDevice.h"
+
 #include <Message.h>
 #include <ScrollView.h>
 #include <Screen.h>
+#include <String.h>
 
 
 const uint32 TM_CANCEL = 'TMca';
@@ -27,7 +29,7 @@ const uint32 TM_FORCE_REBOOT = 'TMfr';
 const uint32 TM_KILL_APPLICATION = 'TMka';
 const uint32 TM_SELECTED_TEAM = 'TMst';
 
-#ifdef COMPILE_FOR_R5
+#ifndef __HAIKU__
 extern "C" void _kshutdown_(bool reboot);
 #else
 #	include <syscalls.h>
@@ -46,47 +48,11 @@ TMWindow::TMWindow()
 
 	// ToDo: make this font sensitive
 
-	BRect rect = Bounds();
-	BFont font = be_plain_font;
-
-	fBackground = new TMBox(rect, "background", B_FOLLOW_LEFT | B_FOLLOW_TOP,
+	fView = new TMView(Bounds(), "background", B_FOLLOW_LEFT | B_FOLLOW_TOP,
 		B_WILL_DRAW, B_NO_BORDER);
-	AddChild(fBackground);
+	AddChild(fView);
 
-	rect = Bounds();
-	rect.right -= 10;
-	rect.left = rect.right - font.StringWidth("Cancel") - 20;
-	rect.bottom -= 14;
-	rect.top = rect.bottom - 20;
-
-	BButton *cancel = new BButton(rect, "cancel", "Cancel", 
-		new BMessage(TM_CANCEL), B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM);
-	fBackground->AddChild(cancel);
-	SetDefaultButton(cancel);
-
-	rect.left = 10;
-	rect.right = rect.left + font.StringWidth("Force Reboot") + 20;
-
-	BButton *forceReboot = new BButton(rect, "force", "Force Reboot", 
-		new BMessage(TM_FORCE_REBOOT), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
-	fBackground->AddChild(forceReboot);
-
-	rect.top -= 97;
-	rect.bottom = rect.top + 20;
-	rect.right = rect.left + font.StringWidth("Kill Application") + 20;
-
-	fKillApp = new BButton(rect, "kill", "Kill Application", 
-		new BMessage(TM_KILL_APPLICATION), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
-	fBackground->AddChild(fKillApp);
-	fKillApp->SetEnabled(false);
-
-	rect.top = rect.bottom + 10;
-	rect.bottom = rect.top + 65;
-	rect.right = rect.left + Bounds().right - 10;
-	fDescView = new TMDescView(rect);
-	fBackground->AddChild(fDescView);
-
-	BRect screenFrame = (BScreen(B_MAIN_SCREEN_ID).Frame());
+	BRect screenFrame = BScreen(B_MAIN_SCREEN_ID).Frame();
 	BPoint point;
 	point.x = (screenFrame.Width() - Bounds().Width()) / 2;
 	point.y = (screenFrame.Height() - Bounds().Height()) / 2;
@@ -107,27 +73,6 @@ void
 TMWindow::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
-		case TM_FORCE_REBOOT:
-			_kshutdown_(true);
-			break;
-		case TM_KILL_APPLICATION: {
-				TMListItem *item = (TMListItem*)fBackground->fListView->ItemAt(
-					fBackground->fListView->CurrentSelection());
-				kill_team(item->GetInfo()->team);
-				fKillApp->SetEnabled(false);
-				fDescView->SetItem(NULL);
-			}
-			break;
-		case TM_SELECTED_TEAM: {
-				fKillApp->SetEnabled(fBackground->fListView->CurrentSelection() >= 0);
-				TMListItem *item = (TMListItem*)fBackground->fListView->ItemAt(
-					fBackground->fListView->CurrentSelection());
-				fDescView->SetItem(item);
-			}
-			break;
-		case TM_CANCEL:
-			Disable();
-			break;
 		case SYSTEM_SHUTTING_DOWN:
 			fQuitting = true;
 			break;
@@ -150,9 +95,9 @@ void
 TMWindow::Enable()
 {
 	SetPulseRate(1000000);
-	
+
 	if (IsHidden()) {
-		PostMessage(B_PULSE);
+		fView->UpdateList();
 		Show();
 	}
 }
@@ -161,7 +106,7 @@ TMWindow::Enable()
 void
 TMWindow::Disable()
 {
-	fBackground->fListView->DeselectAll();
+	fView->ListView()->DeselectAll();
 	SetPulseRate(0);
 	Hide();
 }
@@ -170,28 +115,119 @@ TMWindow::Disable()
 //	#pragma mark -
 
 
-TMBox::TMBox(BRect bounds, const char* name, uint32 resizeFlags,
+TMView::TMView(BRect bounds, const char* name, uint32 resizeFlags,
 	uint32 flags, border_style border)
 	: BBox(bounds, name, resizeFlags, flags | B_PULSE_NEEDED, border)
 {
-	BRect rect = Bounds();
-	rect.InsetBy(12, 11);
+	BRect rect = bounds;
+	rect.InsetBy(12, 12);
 	rect.right -= B_V_SCROLL_BAR_WIDTH;
 	rect.bottom = rect.top + 146;
+
+	BFont font = be_plain_font;
 
 	fListView = new BListView(rect, "teams", B_SINGLE_SELECTION_LIST, 
 		B_FOLLOW_ALL);
 	fListView->SetSelectionMessage(new BMessage(TM_SELECTED_TEAM));
 
-	BScrollView *sv = new BScrollView("scroll_teams", fListView, 
+	BScrollView *scrollView = new BScrollView("scroll_teams", fListView, 
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP_BOTTOM, 0, false, true, B_FANCY_BORDER);
+	AddChild(scrollView);
 
-	AddChild(sv);
+	rect = bounds;
+	rect.right -= 10;
+	rect.left = rect.right - font.StringWidth("Cancel") - 20;
+	rect.bottom -= 14;
+	rect.top = rect.bottom - 20;
+
+	BButton *cancel = new BButton(rect, "cancel", "Cancel", 
+		new BMessage(TM_CANCEL), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	AddChild(cancel);
+
+	rect.left = 10;
+	rect.right = rect.left + font.StringWidth("Force Reboot") + 20;
+
+	BButton *forceReboot = new BButton(rect, "force", "Force Reboot", 
+		new BMessage(TM_FORCE_REBOOT), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	AddChild(forceReboot);
+
+	rect.top -= 97;
+	rect.bottom = rect.top + 20;
+	rect.right = rect.left + font.StringWidth("Kill Application") + 20;
+
+	fKillApp = new BButton(rect, "kill", "Kill Application", 
+		new BMessage(TM_KILL_APPLICATION), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	AddChild(fKillApp);
+	fKillApp->SetEnabled(false);
+
+	rect.top = rect.bottom + 10;
+	rect.bottom = rect.top + 65;
+	rect.right = bounds.right - 10;
+	fDescView = new TMDescView(rect);
+	AddChild(fDescView);
 }
 
 
 void
-TMBox::Pulse()
+TMView::AttachedToWindow()
+{
+	if (BButton *cancel = dynamic_cast<BButton*>(FindView("cancel"))) {
+		Window()->SetDefaultButton(cancel);
+		cancel->SetTarget(this);
+	}
+
+	if (BButton *kill = dynamic_cast<BButton*>(FindView("kill")))
+		kill->SetTarget(this);
+
+	if (BButton *reboot = dynamic_cast<BButton*>(FindView("force")))
+		reboot->SetTarget(this);
+
+	fListView->SetTarget(this);
+}
+
+
+void
+TMView::MessageReceived(BMessage *msg)
+{
+	switch (msg->what) {
+		case TM_FORCE_REBOOT:
+			_kshutdown_(true);
+			break;
+		case TM_KILL_APPLICATION: {
+			TMListItem *item = (TMListItem*)ListView()->ItemAt(
+				ListView()->CurrentSelection());
+			kill_team(item->GetInfo()->team);
+			fKillApp->SetEnabled(false);
+			UpdateList();
+			break;
+		}
+		case TM_SELECTED_TEAM: {
+			fKillApp->SetEnabled(fListView->CurrentSelection() >= 0);
+			TMListItem *item = (TMListItem*)ListView()->ItemAt(
+				ListView()->CurrentSelection());
+			fDescView->SetItem(item);
+			break;
+		}
+		case TM_CANCEL:
+			Window()->PostMessage(B_QUIT_REQUESTED);
+			break;
+
+		default:
+			BBox::MessageReceived(msg);
+			break;
+	}
+}
+
+
+void
+TMView::Pulse()
+{
+	UpdateList();
+}
+
+
+void
+TMView::UpdateList()
 {
 	CALLED();
 	bool changed = false;
@@ -227,6 +263,9 @@ TMBox::Pulse()
 	for (int32 i = fListView->CountItems() - 1; i >= 0; i--) {
 		TMListItem *item = (TMListItem*)fListView->ItemAt(i);
 		if (!item->fFound) {
+			if (item == fDescView->Item())
+				fDescView->SetItem(NULL);
+
 			delete fListView->RemoveItem(i);
 			changed = true;
 		}
@@ -250,9 +289,8 @@ TMDescView::TMDescView(BRect rect)
 void
 TMDescView::Draw(BRect rect)
 {
-	// Accessing fItem this way is not a good idea, since it's not correctly
-	// updated - if the team goes away in the meantime, we're doomed to crash
-	// (the item could have been deleted in TMBox::Pulse())
+	rect = Bounds();
+
 	if (fItem) {
 		BRect frame(rect);
 		frame.OffsetBy(2,3);
@@ -267,7 +305,9 @@ TMDescView::Draw(BRect rect)
 		SetFont(&font);
 		MovePenTo(frame.right+9, frame.top - 2 + ((frame.Height() - (finfo.ascent + finfo.descent + finfo.leading)) / 4) +
 			(finfo.ascent + finfo.descent) - 1);
-		DrawString(fItem->Path()->Path());
+		BString path = fItem->Path()->Path();
+		TruncateString(&path, B_TRUNCATE_MIDDLE, rect.right - 9 - frame.right);
+		DrawString(path.String());
 
 		if (fItem->IsSystemServer()) {
 			MovePenTo(frame.right+9, frame.top + 1 + ((frame.Height() - (finfo.ascent + finfo.descent + finfo.leading)) *3 / 4) +

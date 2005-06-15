@@ -1,6 +1,6 @@
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 //
-//	Copyright (c) 2004, Haiku
+//	Copyright (c) 2004-2005, Haiku
 //
 //  This software is part of the Haiku distribution and is covered 
 //  by the Haiku license.
@@ -16,6 +16,7 @@
 #ifndef TMWINDOW_H
 #define TMWINDOW_H
 
+
 #include <Box.h>
 #include <Button.h>
 #include <ListView.h>
@@ -24,42 +25,54 @@
 #include "InputServerTypes.h"
 #include "TMListItem.h"
 
-class TMBox : public BBox {
-public:
-	TMBox(BRect bounds, const char* name=NULL, uint32 resizeFlags = B_FOLLOW_LEFT|B_FOLLOW_TOP,
-		uint32 flags = B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE_JUMP,
-		border_style border = B_FANCY_BORDER);
-	void Pulse();
-	
-	BListView *fListView;
+
+class TMDescView;
+
+class TMView : public BBox {
+	public:
+		TMView(BRect bounds, const char* name = NULL,
+			uint32 resizeFlags = B_FOLLOW_LEFT | B_FOLLOW_TOP,
+			uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
+			border_style border = B_NO_BORDER);
+
+		virtual void AttachedToWindow();
+		virtual void Pulse();
+		virtual void MessageReceived(BMessage *msg);
+
+		void UpdateList();
+		BListView *ListView() { return fListView; }
+
+	private:
+		BListView *fListView;
+		BButton *fKillApp;
+		TMDescView *fDescView;
 };
 
 class TMDescView : public BBox {
-public:
-	TMDescView(BRect bounds);
-	void Draw(BRect bounds);
-	void SetItem(TMListItem *item);
-private:
-	TMListItem *fItem;
+	public:
+		TMDescView(BRect bounds);
+		virtual void Draw(BRect bounds);
+
+		void SetItem(TMListItem *item);
+		TMListItem *Item() { return fItem; }
+	private:
+		TMListItem *fItem;
 };
 
-class TMWindow : public BWindow 
-{
-public:
-	TMWindow();
-	~TMWindow();
-	
-	void MessageReceived(BMessage *msg);
-	virtual bool QuitRequested();
-	void Enable();
-	void Disable();
-private:
-	bool fQuitting;
-	
-	BButton *fKillApp;
-	TMBox *fBackground;
-	TMDescView *fDescView;
-};
+class TMWindow : public BWindow {
+	public:
+		TMWindow();
+		virtual ~TMWindow();
 
+		virtual void MessageReceived(BMessage *msg);
+		virtual bool QuitRequested();
+		void Enable();
+		void Disable();
+
+	private:
+		bool fQuitting;
+
+		TMView *fView;
+};
 
 #endif //TMWINDOW_H
