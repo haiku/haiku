@@ -1116,24 +1116,22 @@ BMenu::_track(int *action, long start)
 			if (item != NULL) {
 				if (item != fSelected)
 					SelectItem(item);
+			}	
+			
+			int submenuAction = MENU_ACT_NONE;
+			BMenuItem *submenuItem = NULL;	
+			if (fSelected != NULL && fSelected->Submenu() != NULL) {
+				UnlockLooper();
 				
-				int submenuAction = MENU_ACT_NONE;
-				BMenuItem *submenuItem = NULL;	
-				// TODO: Review this as it doesn't work very well,
-				// BMenu::_track() isn't always called when needed.
-				if (item->Submenu() != NULL) {
-					UnlockLooper();
-					
-					submenuItem = item->Submenu()->_track(&submenuAction);
-					if (submenuAction == MENU_ACT_CLOSE) {
-						item = submenuItem;
-						localAction = submenuAction;
-						break;
-					}
-					
-					if (!LockLooper())
-						break;
+				submenuItem = fSelected->Submenu()->_track(&submenuAction);
+				if (submenuAction == MENU_ACT_CLOSE) {
+					item = submenuItem;
+					localAction = submenuAction;
+					break;
 				}
+				
+				if (!LockLooper())
+					break;
 			}
 																	
 			UnlockLooper();
