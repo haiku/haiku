@@ -28,6 +28,7 @@ TRAKAtom::TRAKAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, 
 {
 	theTKHDAtom = NULL;
 	theMDHDAtom = NULL;
+	framecount = 0;
 }
 
 TRAKAtom::~TRAKAtom()
@@ -77,6 +78,15 @@ bigtime_t	TRAKAtom::Duration(uint32 TimeScale)
 	}
 	
 	return bigtime_t(getTKHDAtom()->getDuration() * 1000000) / TimeScale;
+}
+
+void TRAKAtom::OnChildProcessingComplete()
+{
+	STTSAtom *aSTTSAtom = dynamic_cast<STTSAtom *>(GetChildAtom(uint32('stts'),0));
+
+	if (aSTTSAtom) {
+		framecount = aSTTSAtom->getSUMCounts();
+	}
 }
 
 // Is this a video track
@@ -172,6 +182,17 @@ bool	TRAKAtom::IsSyncSample(uint32 pSampleNo)
 	
 	if (aAtomBase) {
 		return (dynamic_cast<STSSAtom *>(aAtomBase))->IsSyncSample(pSampleNo);
+	}
+	
+	return false;
+}
+
+bool	TRAKAtom::IsSingleSampleSize()
+{
+	AtomBase *aAtomBase = GetChildAtom(uint32('stsz'),0);
+	
+	if (aAtomBase) {
+		return (dynamic_cast<STSZAtom *>(aAtomBase))->IsSingleSampleSize();
 	}
 	
 	return false;

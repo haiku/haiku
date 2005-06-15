@@ -461,8 +461,6 @@ movReader::GetNextChunk(void *_cookie,
 	if (!theFileReader->GetNextChunkInfo(cookie->stream, cookie->frame_pos, &start, &size, &keyframe))
 		return B_LAST_BUFFER_ERROR;
 
-	TRACE("stream %d: frame %ld start %lld Size %ld key %d\n",cookie->stream, cookie->frame_pos, start, size, keyframe);
-
 	if (cookie->buffer_size < size) {
 		delete [] cookie->buffer;
 		cookie->buffer_size = (size + 15) & ~15;
@@ -470,6 +468,7 @@ movReader::GetNextChunk(void *_cookie,
 	}
 	
 	if (cookie->audio) {
+		TRACE("Audio stream %d: frame %ld start %lld Size %ld key %d\n",cookie->stream, cookie->frame_pos, start, size, keyframe);
 		mediaHeader->start_time = (cookie->byte_pos * 1000000LL * (int64)cookie->bytes_per_sec_scale) / cookie->bytes_per_sec_rate;
 		mediaHeader->type = B_MEDIA_ENCODED_AUDIO;
 		mediaHeader->u.encoded_audio.buffer_flags = keyframe ? B_MEDIA_KEY_FRAME : 0;
@@ -484,6 +483,7 @@ movReader::GetNextChunk(void *_cookie,
 //		cookie->frame_pos += theFileReader->getNoFramesInChunk(cookie->stream,cookie->frame_pos);
 //		cookie->frame_pos += 2205;
 	} else {
+		TRACE("Video stream %d: frame %ld start %lld Size %ld key %d\n",cookie->stream, cookie->frame_pos, start, size, keyframe);
 		mediaHeader->start_time = (cookie->frame_pos * 1000000LL * (int64)cookie->frames_per_sec_scale) / cookie->frames_per_sec_rate;
 		mediaHeader->type = B_MEDIA_ENCODED_VIDEO;
 		mediaHeader->u.encoded_video.field_flags = keyframe ? B_MEDIA_KEY_FRAME : 0;

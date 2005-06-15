@@ -22,7 +22,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
- #include <stdio.h>
+#include <stdio.h>
 
 #include "MOVAtom.h"
 
@@ -69,7 +69,7 @@ void AtomBase::ProcessMetaData()
 //				- Calls ProcessMetaData on each child atom
 //				(ensures stream is correct for child via offset)
 {
-	setAtomOffset(theStream->Position());
+	setAtomOffset(getStream()->Position());
 	
 	OnProcessMetaData();
 
@@ -85,10 +85,17 @@ bool AtomBase::MoveToEnd()
 {
 	off_t NewPosition = streamOffset + atomSize;
 
-	if (theStream->Position() != NewPosition) {
-		return (theStream->Seek(NewPosition,0) > 0);
+	if (getStream()->Position() != NewPosition) {
+		return (getStream()->Seek(NewPosition,0) > 0);
 	}
 	return true;
+}
+
+uint64	AtomBase::getBytesRemaining()
+{
+	off_t EndPosition = streamOffset + atomSize;
+	
+	return (EndPosition - getStream()->Position());
 }
 
 void	AtomBase::DisplayAtoms()
@@ -117,9 +124,20 @@ bool AtomBase::IsKnown()
 
 void AtomBase::ReadArrayHeader(array_header *pHeader)
 {
-	theStream->Read(pHeader,sizeof(array_header));
+	getStream()->Read(pHeader,sizeof(array_header));
 
 	pHeader->NoEntries = B_BENDIAN_TO_HOST_INT32(pHeader->NoEntries);
+}
+
+BPositionIO *AtomBase::OnGetStream()
+{
+	// default implementation
+	return theStream;
+}
+
+BPositionIO *AtomBase::getStream()
+{
+	return OnGetStream();
 }
 
 AtomContainer::AtomContainer(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
@@ -145,17 +163,19 @@ void	AtomContainer::DisplayAtoms(uint32 pindent)
 
 void	AtomContainer::ProcessMetaData()
 {
-	setAtomOffset(theStream->Position());
+	setAtomOffset(getStream()->Position());
 	
 	OnProcessMetaData();
 
 	AtomBase *aChild;
 	while (IsEndOfAtom() == false) {
-		aChild = getAtom(theStream);
+		aChild = getAtom(getStream());
 		if (AddChild(aChild)) {
 			aChild->ProcessMetaData();
 		}
 	}
+
+	OnChildProcessingComplete();
 
 	MoveToEnd();
 }

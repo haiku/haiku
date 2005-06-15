@@ -77,6 +77,49 @@ private:
 	MVHDAtom	*theMVHDAtom;
 };
 
+// Atom class for reading the cmov atom
+class CMOVAtom : public AtomContainer {
+public:
+			CMOVAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+	virtual	~CMOVAtom();
+
+	BPositionIO *OnGetStream();
+	void	OnProcessMetaData();
+	void	OnChildProcessingComplete();
+
+	char	*OnGetAtomName();
+private:
+	BMallocIO	*theUncompressedStream;
+};
+
+// Atom class for reading the dcom atom
+class DCOMAtom : public AtomBase {
+public:
+			DCOMAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+	virtual	~DCOMAtom();
+	void	OnProcessMetaData();
+	char	*OnGetAtomName();
+	uint32	getCompressionID() {return compressionID;};
+private:
+	uint32	compressionID;
+};
+
+// Atom class for reading the cmvd atom
+class CMVDAtom : public AtomBase {
+public:
+			CMVDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+	virtual	~CMVDAtom();
+	void	OnProcessMetaData();
+	char	*OnGetAtomName();
+	uint32	getUncompressedSize() {return UncompressedSize;};
+	uint8	*getCompressedData() {return Buffer;};
+	uint32	getBufferSize() {return BufferSize;};
+private:
+	uint32	UncompressedSize;
+	uint32	BufferSize;
+	uint8	*Buffer;
+};
+
 // Atom class for reading the ftyp atom
 class FTYPAtom : public AtomBase {
 public:
@@ -190,7 +233,7 @@ public:
 	char	*OnGetAtomName();
 	
 	uint32	getSizeForSample(uint32 pSampleNo);
-	
+	bool	IsSingleSampleSize();	
 private:
 	SampleSizeHeader	theHeader;
 	SampleSizeArray		theSampleSizeArray;
@@ -224,8 +267,6 @@ public:
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
 	
-	uint32	DataFormat;
-
 	VideoDescriptionV0 getAsVideo();
 	SoundDescriptionV1 getAsAudio();
 	
@@ -299,9 +340,10 @@ public:
 	virtual	~TRAKAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
-	
+	void	OnChildProcessingComplete();
+
 	bigtime_t	Duration(uint32 TimeScale);	// Return duration of track
-	uint32		FrameCount();
+	uint32		FrameCount() {return framecount;};
 	bool		IsVideo();	// Is this a video track
 	bool		IsAudio();	// Is this a audio track
 	// GetAudioMetaData()	// If this is a audio track get the audio meta data
@@ -314,12 +356,15 @@ public:
 	uint64	getOffsetForChunk(uint32 pChunk);
 	uint32	getSizeForSample(uint32 pSample);
 	bool	IsSyncSample(uint32 pSampleNo);
-		
+	bool	IsSingleSampleSize();
+	
 	TKHDAtom	*getTKHDAtom();
 	MDHDAtom	*getMDHDAtom();
 private:
 	TKHDAtom	*theTKHDAtom;
 	MDHDAtom	*theMDHDAtom;
+	
+	uint32		framecount;
 };
 
 // Atom class for reading the media container atom
@@ -399,7 +444,7 @@ public:
 	uint32	getMediaComponentSubType();
 
 private:
-	hdlr	theHeader;	
+	hdlr	theHeader;
 };
 
 #endif

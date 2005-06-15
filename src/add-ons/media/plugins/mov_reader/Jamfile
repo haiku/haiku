@@ -8,6 +8,7 @@ Addon mov_reader : media plugins :
 	false
 	:
 	libmovreader.a
+	libz.a
 ;
 
 LinkSharedOSLibs mov_reader : be libmedia.so ;

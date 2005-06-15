@@ -28,6 +28,9 @@
 #include <SupportKit.h>
 #include <MediaFormats.h>
 
+#include <libs/zlib/zlib.h>
+//#include <zlib.h>
+
 #include "MOVParser.h"
 
 //static 
@@ -159,6 +162,18 @@ AtomBase *getAtom(BPositionIO *pStream)
 		return new FTYPAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
 	}
 
+	if (aAtomType == uint32('cmov')) {
+		return new CMOVAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
+	}
+
+	if (aAtomType == uint32('dcom')) {
+		return new DCOMAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
+	}
+
+	if (aAtomType == uint32('cmvd')) {
+		return new CMVDAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
+	}
+
 	return new AtomBase(pStream, aStreamOffset, aAtomType, aRealAtomSize);
 	
 }
@@ -180,6 +195,171 @@ void MOOVAtom::OnProcessMetaData()
 char *MOOVAtom::OnGetAtomName()
 {
 	return "Quicktime Movie";
+}
+
+CMOVAtom::CMOVAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomContainer(pStream, pstreamOffset, patomType, patomSize)
+{
+	theUncompressedStream = NULL;
+}
+
+CMOVAtom::~CMOVAtom()
+{
+}
+
+BPositionIO *CMOVAtom::OnGetStream()
+{
+	// Use the decompressed stream instead of file stream
+	if (theUncompressedStream) {
+		return theUncompressedStream;
+	}
+	
+	return theStream;
+}
+
+void CMOVAtom::OnProcessMetaData()
+{
+	BMallocIO *theUncompressedData;
+	uint8 *outBuffer;
+	CMVDAtom *aCMVDAtom = NULL;
+	uint32	compressionID = 0;
+	uint64	descBytesLeft;
+	uint32	Size;
+	
+	descBytesLeft = getAtomSize();
+	
+	// Check for Compression Type
+	while (descBytesLeft > 0) {
+		AtomBase *aAtomBase = getAtom(theStream);
+	
+		aAtomBase->OnProcessMetaData();
+		printf("%s [%Ld]\n",aAtomBase->getAtomName(),aAtomBase->getAtomSize());
+
+		if (aAtomBase->getAtomSize() > 0) {
+			descBytesLeft = descBytesLeft - aAtomBase->getAtomSize();
+		} else {
+			printf("Invalid Atom found when reading Compressed Headers\n");
+			descBytesLeft = 0;
+		}
+
+		if (dynamic_cast<DCOMAtom *>(aAtomBase)) {
+			// DCOM atom
+			compressionID = dynamic_cast<DCOMAtom *>(aAtomBase)->getCompressionID();
+			delete aAtomBase;
+		} else {
+			if (dynamic_cast<CMVDAtom *>(aAtomBase)) {
+				// CMVD atom
+				aCMVDAtom = dynamic_cast<CMVDAtom *>(aAtomBase);
+				descBytesLeft = 0;
+			}
+		}
+	}
+
+	// Decompress data
+	if (compressionID == 'zlib') {
+		Size = aCMVDAtom->getUncompressedSize();
+		
+		outBuffer = (uint8 *)(malloc(Size));
+		
+		printf("Decompressing %ld bytes to %ld bytes\n",aCMVDAtom->getBufferSize(),Size);
+		int result = uncompress(outBuffer, &Size, aCMVDAtom->getCompressedData(), aCMVDAtom->getBufferSize());
+		
+		if (result != Z_OK) {
+			printf("Failed to decompress headers uncompress returned ");
+			switch (result) {
+				case Z_MEM_ERROR:
+					printf("Lack of Memory Error\n");
+					break;
+				case Z_BUF_ERROR:
+					printf("Lack of Output buffer space Error\n");
+					break;
+				case Z_DATA_ERROR:
+					printf("Input Data is corrupt or not a compressed set Error\n");
+					break;
+			}
+		}
+
+		// Copy uncompressed data into BMAllocIO
+		theUncompressedData = new BMallocIO();
+		theUncompressedData->SetSize(Size);
+		theUncompressedData->WriteAt(0L,outBuffer,Size);
+		
+		free(outBuffer);
+		delete aCMVDAtom;
+		
+		// reset position on BMAllocIO
+		theUncompressedData->Seek(SEEK_SET,0L);
+		// Assign to Stream
+		theUncompressedStream = theUncompressedData;
+		
+		// All subsequent reads should use theUncompressedStream
+	}
+
+}
+
+void CMOVAtom::OnChildProcessingComplete()
+{
+	// revert back to file stream once all children have finished
+	if (theUncompressedStream) {
+		delete theUncompressedStream;
+	}
+	theUncompressedStream = NULL;
+}
+
+char *CMOVAtom::OnGetAtomName()
+{
+	return "Compressed Quicktime Movie";
+}
+
+DCOMAtom::DCOMAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
+{
+}
+
+DCOMAtom::~DCOMAtom()
+{
+}
+
+void DCOMAtom::OnProcessMetaData()
+{
+	theStream->Read(&compressionID,sizeof(uint32));
+
+	compressionID = B_BENDIAN_TO_HOST_INT32(compressionID);
+}
+
+char *DCOMAtom::OnGetAtomName()
+{
+	return "Decompression Atom";
+}
+
+CMVDAtom::CMVDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
+{
+	Buffer = NULL;
+	UncompressedSize = 0;
+	BufferSize = 0;
+}
+
+CMVDAtom::~CMVDAtom()
+{
+	if (Buffer) {
+		free(Buffer);
+	}
+}
+
+void CMVDAtom::OnProcessMetaData()
+{
+	theStream->Read(&UncompressedSize,sizeof(uint32));
+
+	UncompressedSize = B_BENDIAN_TO_HOST_INT32(UncompressedSize);
+
+	if (UncompressedSize > 0) {
+		BufferSize = getBytesRemaining();
+		Buffer = (uint8 *)(malloc(BufferSize));
+		theStream->Read(Buffer,BufferSize);
+	}
+}
+
+char *CMVDAtom::OnGetAtomName()
+{
+	return "Compressed Movie Data";
 }
 
 MVHDAtom::MVHDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
@@ -289,6 +469,7 @@ uint64	STTSAtom::getSUMDurations()
 
 uint32	STTSAtom::getSampleForTime(uint32 pTime)
 {
+// TODO this is too slow.  PreCalc SUMCounts when loading this.
 	uint64 SUMDurations = 0;
 
 	for (uint32 i=0;i<theHeader.NoEntries;i++) {
@@ -303,23 +484,8 @@ uint32	STTSAtom::getSampleForTime(uint32 pTime)
 
 uint32	STTSAtom::getSampleForFrame(uint32 pFrame)
 {
-// Hmm Sample is Frame really.
-
-	uint64 SUMCounts = 0;
-	uint64 SUMDurations = 0;
-
-	for (uint32 i=0;i<theHeader.NoEntries;i++) {
-		for (uint32 j=0;j<theTimeToSampleArray[i]->Count;j++) {
-			SUMCounts ++;
-			SUMDurations += theTimeToSampleArray[i]->Duration;
-//			printf("(i=%ld j=%ld) Duration %ld, Count %ld, Duration*Count %ld, SUM(Count) %lld, SUM(Duration*Count) %lld\n",i,j,theTimeToSampleArray[i]->Duration,theTimeToSampleArray[i]->Count,theTimeToSampleArray[i]->Duration * theTimeToSampleArray[i]->Count,SUMCounts, SUMDurations);
-			if (SUMCounts > pFrame) {
-				return SUMCounts-1;
-			}
-		}
-	}
-
-	return theHeader.NoEntries;
+// Hmm Sample is Frame really, this Atom is more usefull for time->sample calcs
+	return pFrame;
 }
 
 STSCAtom::STSCAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
@@ -361,12 +527,8 @@ SampleToChunk	*aSampleToChunk;
 			aSampleToChunk->TotalPrevFrames = 0;
 		}
 
-//		printf("First Chunk/Samples Per Chunk/ID %ld/%ld/%ld (%ld)\n",aSampleToChunk->FirstChunk,aSampleToChunk->SamplesPerChunk,aSampleToChunk->SampleDescriptionID,aSampleToChunk->TotalPrevFrames);
-
 		theSampleToChunkArray[i] = aSampleToChunk;
 	}
-	
-//	printf("Sample To Chunk Array contains %ld Entries\n",theHeader.NoEntries);
 }
 
 char *STSCAtom::OnGetAtomName()
@@ -387,10 +549,6 @@ uint32	STSCAtom::getChunkForSample(uint32 pSample, uint32 *pOffsetInChunk)
 
 			OffsetInChunk = (pSample - theSampleToChunkArray[i]->TotalPrevFrames) % theSampleToChunkArray[i]->SamplesPerChunk;
 			
-			if (*pOffsetInChunk == 99) {
-//				printf("%ld (%ld/%ld)\n",pSample, ChunkID, OffsetInChunk);
-			}
-
 			*pOffsetInChunk = OffsetInChunk;
 			return ChunkID;
 		}
@@ -502,6 +660,11 @@ uint32	STSZAtom::getSizeForSample(uint32 pSampleNo)
 	return theSampleSizeArray[pSampleNo]->Size;
 }
 
+bool	STSZAtom::IsSingleSampleSize()
+{
+	return (theHeader.SampleSize > 0);
+}
+
 STCOAtom::STCOAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
 {
 	theHeader.NoEntries = 0;
@@ -536,8 +699,6 @@ ChunkToOffset	*aChunkToOffset;
 		
 		aChunkToOffset->Offset = OnGetChunkOffset();
 
-//		printf("%ld : %lld\n",i,aChunkToOffset->Offset);
-
 		theChunkToOffsetArray[i] = aChunkToOffset;
 	}
 	
@@ -551,14 +712,13 @@ char *STCOAtom::OnGetAtomName()
 
 uint64	STCOAtom::getOffsetForChunk(uint32 pChunkID)
 {
-//	printf("?Chunk ID %ld / %ld\n",pChunkID,theHeader.NoEntries);
-
 	// First chunk is first array entry
 	if ((pChunkID > 0) && (pChunkID <= theHeader.NoEntries)) {
 		return theChunkToOffsetArray[pChunkID - 1]->Offset;
 	}
 	
 	printf("Bad Chunk ID %ld / %ld\n",pChunkID,theHeader.NoEntries);
+
 	// TODO Yes this will seg fault.  But I get a very bad lock up if I don't :-(
 	return theChunkToOffsetArray[pChunkID - 1]->Offset;
 //	return theChunkToOffsetArray[0]->Offset;
@@ -604,9 +764,6 @@ void STSDAtom::ReadSoundDescription()
 	
 	descBytesLeft = aSoundDescriptionV1->basefields.Size - sizeof(SampleDescBase);
 		
-	// Hmm this should be ok if each stsd describes only a single type
-	DataFormat = aSoundDescriptionV1->basefields.DataFormat;
-
 	// Read in Audio Sample Data
 	// We place into a V1 description even though it might be a V0 or earlier
 

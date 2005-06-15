@@ -87,8 +87,12 @@ public:
 	virtual	~AtomBase();
 	
 	virtual bool IsContainer() {return false;};
+
+	virtual BPositionIO *OnGetStream();
+	BPositionIO *getStream();
+
 	bool IsExtended() {return false;};
-	bool IsEndOfAtom() {return (theStream->Position() >= off_t(streamOffset + atomSize));};
+	bool IsEndOfAtom() {return (getStream()->Position() >= off_t(streamOffset + atomSize));};
 	
 	// Is this a known atom type
 	bool IsKnown();
@@ -97,6 +101,8 @@ public:
 	
 	uint64	getAtomSize() {return atomSize;};
 	uint32	getAtomType() {return atomType;};
+	
+	uint64	getBytesRemaining();
 	
 	bool	IsType(uint32 patomType) {return patomType == atomType;};
 	
@@ -159,7 +165,7 @@ public:
 
 	//	OnProcessMetaData() - Subclass override to read/set meta data
 	virtual void	OnProcessMetaData();
-
+	virtual void	OnChildProcessingComplete() {};
 };
 
 extern AtomBase *getAtom(BPositionIO *pStream);
