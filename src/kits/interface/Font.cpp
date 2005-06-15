@@ -807,14 +807,14 @@ BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings,
 	uint32 mode, float width, BString resultArray[]) const
 {
 	if (stringArray && resultArray && numStrings > 0) {
-		// allocate storage, see BeBook for "+ 3"
+		// allocate storage, see BeBook for "+ 3" (make space for ellipsis)
 		char** truncatedStrings = new char*[numStrings];
 		for (int32 i = 0; i < numStrings; i++) {
 			truncatedStrings[i] = new char[strlen(stringArray[i]) + 3];
 		}
-	
+
 		GetTruncatedStrings(stringArray, numStrings, mode, width, truncatedStrings);
-	
+
 		// copy the strings into the BString array and free each one
 		for (int32 i = 0; i < numStrings; i++) {
 			resultArray[i].SetTo(truncatedStrings[i]);
