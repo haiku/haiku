@@ -1019,8 +1019,31 @@ Layer::ResizeBy(float x, float y)
 BPoint
 Layer::BoundsOrigin() const
 {
-	// TODO: add origin from previous states
-	return fLayerData->Origin();
+	BPoint origin(0,0);
+	float scale = Scale();
+
+	LayerData *ld = fLayerData;
+	do {
+		origin += ld->Origin();
+	} while ((ld = ld->prevState));
+
+	origin.x *= scale;
+	origin.y *= scale;
+
+	return origin;
+}
+
+float
+Layer::Scale() const
+{
+	float scale = 1.0f;
+
+	LayerData *ld = fLayerData;
+	do {
+		scale += ld->Scale();
+	} while ((ld = ld->prevState));
+
+	return scale;
 }
 
 //! Converts the passed point to parent coordinates

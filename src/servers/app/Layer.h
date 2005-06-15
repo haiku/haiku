@@ -131,6 +131,7 @@ class Layer {
 	virtual	void				ResizeBy(float x, float y);
 
 			BPoint				BoundsOrigin() const; // BoundsFrameDiff()?
+			float				Scale() const;
 
 			BPoint				ConvertToParent(BPoint pt);
 			BRect				ConvertToParent(BRect rect);
