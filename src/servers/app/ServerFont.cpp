@@ -294,7 +294,7 @@ ServerFont::GetGlyphShapes(const char charArray[], int32 numChars) const
 	if (!face)
 		return NULL;
 	
-	FT_Set_Char_Size(face, 0, int32(fSize) * 64, 72, 72);
+	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
 	
 	Angle rotation(fRotation);
 	Angle shear(fShear);
@@ -344,7 +344,7 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 	if (!face)
 		return NULL;
 	
-	FT_Set_Char_Size(face, 0, int32(fSize) * 64, 72, 72);
+	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
 	
 	Angle rotation(fRotation);
 	Angle shear(fShear);
@@ -408,7 +408,7 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 	if (!face)
 		return false;
 
-	FT_Set_Char_Size(face, 0, int32(fSize) * 64, 72, 72);
+	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
 
 	// UTF8 handling...this can probably be smarter
 	// Here is what I do in the AGGTextRenderer to handle UTF8...
@@ -428,13 +428,14 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 
 		uint16* glyphIndex = (uint16*)convertedBuffer;
 		// just to be sure
-		numChars = convertedLength / sizeof(uint16);
+		numChars = min_c((uint32)numChars, convertedLength / sizeof(uint16));
 
 		for (int i = 0; i < numChars; i++) {
 			FT_Load_Char(face, glyphIndex[i], FT_LOAD_NO_BITMAP);
-//			widthArray[i] = float(face->glyph->metrics.width / 64) / fSize;
-			widthArray[i] = ((float)face->glyph->metrics.horiAdvance / 64.0) / fSize;
-			widthArray[i] += is_white_space(glyphIndex[i]) ? delta.space : delta.nonspace;
+			if (face->glyph) {
+				widthArray[i] = ((float)face->glyph->metrics.horiAdvance / 64.0) / fSize;
+				widthArray[i] += is_white_space(glyphIndex[i]) ? delta.space : delta.nonspace;
+			}
 		}
 	}
 	delete[] convertedBuffer;
