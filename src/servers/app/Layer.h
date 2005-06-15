@@ -41,6 +41,8 @@
 #include "RGBColor.h"
 #include "ServerWindow.h"
 
+//#define NEW_CLIPPING 1
+
 enum {
 	B_LAYER_NONE		= 1,
 	B_LAYER_MOVE		= 2,
@@ -207,8 +209,37 @@ class Layer {
 	inline	const ServerBitmap*	OverlayBitmap() const
 									{ return fOverlayBitmap; }
 #ifdef NEW_CLIPPING
+	virtual	void				MovedByHook(float dx, float dy) { }
+	virtual	void				ResizedByHook(float dx, float dy, bool automatic) { }
+	virtual	void				ScrolledByHook(float dx, float dy) { }
+
 			void				ConvertToScreen2(BRect* rect) const;
 			void				ConvertToScreen2(BRegion* reg) const;
+			bool				IsVisuallyHidden() const;
+ private:
+ 			void				do_Hide();
+ 			void				do_Show();
+			void				do_RebuildVisibleRegions(const BRegion &invalid,
+														const Layer *startFrom);
+			void				do_MoveBy(float dx, float dy);
+			void				do_ResizeBy(float dx, float dy);
+			void				do_ScrollBy(float dx, float dy);
+
+			void				do_Invalidate(	const BRegion &invalid,
+												const Layer *startFrom = NULL);
+
+			void			rebuild_visible_regions(const BRegion &invalid,
+													const BRegion &parentLocalVisible,
+													const Layer *startFrom);
+
+	virtual	bool			alter_visible_for_children(BRegion &region);
+	virtual	void			get_user_regions(BRegion &reg);
+
+			void			clear_visible_regions();
+			void			resize_layer_frame_by(float x, float y);
+			void			rezize_layer_redraw_more(BRegion &reg, float dx, float dy);
+			void			resize_layer_full_update_on_resize(BRegion &reg, float dx, float dy);
+
 #endif
 
  protected:

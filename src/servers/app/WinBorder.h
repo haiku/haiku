@@ -123,6 +123,21 @@ class WinBorder : public Layer {
 
 			FMWList				fFMWList;
 
+#ifdef NEW_CLIPPING
+ public:
+	virtual	void				MovedByHook(float dx, float dy);
+	virtual	void				ResizedByHook(float dx, float dy, bool automatic);
+
+ private:
+			void				set_decorator_region(BRect frame);
+	virtual	bool				alter_visible_for_children(BRegion &region);
+	virtual	void				get_user_regions(BRegion &reg);
+
+			BRegion				fDecRegion;
+			bool				fRebuildDecRegion;
+
+#endif
+
  protected:
 	friend class Layer;
 	friend class ServerWindow;
