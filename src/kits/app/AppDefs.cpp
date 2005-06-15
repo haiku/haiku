@@ -1,7 +1,7 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <AppDefs.h>
@@ -35,3 +35,23 @@ const uint8 B_I_BEAM_CURSOR[] = {
 	0xf, 0xc0, 0x7, 0x80, 0x3, 0x0, 0x3, 0x0, 0x3, 0x0, 0x3, 0x0, 0x3, 0x0, 0x3, 0x0, 
 	0x3, 0x0, 0x3, 0x0, 0x3, 0x0, 0x3, 0x0, 0x3, 0x0, 0x3, 0x0, 0x7, 0x80, 0xf, 0xc0, 
 };
+
+
+// ToDo: find a better home for these (what's wrong with libmedia.so?)
+// ToDo: implement shutdown|launch_media_server()
+
+status_t
+shutdown_media_server(bigtime_t timeout,
+	bool (*progress)(int stage, const char * message, void * cookie),
+	void * cookie)
+{
+	return B_OK;
+}
+
+
+status_t
+launch_media_server(uint32 flags)
+{
+	return B_ERROR;
+}
+
