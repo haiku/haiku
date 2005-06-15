@@ -14,33 +14,29 @@
 #include <MenuItem.h>
 #include <FilePanel.h>
 #include <NodeInfo.h>
-#include <stdio.h>
 #include <Alert.h>
 #include <Path.h>
 #include <FindDirectory.h>
 #include <Font.h>
 #include <Clipboard.h>
-#include <string.h>
 
 #include "PeopleApp.h"
 #include "PeopleView.h"
 #include "PeopleWindow.h"
 
-//====================================================================
+#include <stdio.h>
+#include <string.h>
 
-TPeopleWindow::TPeopleWindow(BRect rect, char *title, entry_ref *ref)
-			 :BWindow(rect, title, B_TITLED_WINDOW, B_NOT_RESIZABLE |
-													B_NOT_ZOOMABLE)
+
+TPeopleWindow::TPeopleWindow(BRect frame, char *title, entry_ref *ref)
+	: BWindow(frame, title, B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
+	fPanel(NULL)
 {
-	BMenu		*menu;
-	BMenuBar	*menu_bar;
-	BMenuItem	*item;
-	BRect		r;
+	BMenu* menu;
+	BMenuItem* item;
 
-	fPanel = NULL;
-
-	r.Set(0, 0, 32767, 15);
-	menu_bar = new BMenuBar(r, "");
+	BRect rect(0, 0, 32767, 15);
+	BMenuBar* menuBar = new BMenuBar(rect, "");
 	menu = new BMenu("File");
 	menu->AddItem(item = new BMenuItem("New Person", new BMessage(M_NEW), 'N'));
 	item->SetTarget(NULL, be_app);
@@ -53,7 +49,7 @@ TPeopleWindow::TPeopleWindow(BRect rect, char *title, entry_ref *ref)
 	fRevert->SetEnabled(FALSE);
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q'));
-	menu_bar->AddItem(menu);
+	menuBar->AddItem(menu);
 
 	menu = new BMenu("Edit");
 	menu->AddItem(fUndo = new BMenuItem("Undo", new BMessage(M_UNDO), 'Z'));
@@ -66,47 +62,41 @@ TPeopleWindow::TPeopleWindow(BRect rect, char *title, entry_ref *ref)
 	fPaste->SetTarget(NULL, this);
 	menu->AddItem(item = new BMenuItem("Select All", new BMessage(M_SELECT), 'A'));
 	item->SetTarget(NULL, this);
-	menu_bar->AddItem(menu);
-	AddChild(menu_bar);
+	menuBar->AddItem(menu);
+	AddChild(menuBar);
 
 	if (ref) {
 		fRef = new entry_ref(*ref);
 		SetTitle(ref->name);
-	}
-	else
+	} else
 		fRef = NULL;
 
-	r = Frame();
-	r.OffsetTo(0, menu_bar->Bounds().bottom + 1);
-	fView = new TPeopleView(r, "PeopleView", fRef);
+	rect = Frame();
+	rect.OffsetTo(0, menuBar->Bounds().bottom + 1);
+	fView = new TPeopleView(rect, "PeopleView", fRef);
 
-	ResizeBy(0, menu_bar->Bounds().bottom + 1);
-	Lock();
+	ResizeTo(frame.Width(), fView->Frame().bottom);
 	AddChild(fView);
-	Unlock();
 }
 
-//--------------------------------------------------------------------
 
 TPeopleWindow::~TPeopleWindow(void)
 {
-	if (fRef)
-		delete fRef;
-	if (fPanel)
-		delete fPanel;
+	delete fRef;
+	delete fPanel;
 }
 
-//--------------------------------------------------------------------
 
-void TPeopleWindow::MenusBeginning(void)
+void
+TPeopleWindow::MenusBeginning(void)
 {
-	bool			enabled;
+	bool enabled;
 
 	enabled = fView->CheckSave();
 	fSave->SetEnabled(enabled);
 	fRevert->SetEnabled(enabled);
 
-	fUndo->SetEnabled(FALSE);
+	fUndo->SetEnabled(false);
 	enabled = fView->TextSelected();
 	fCut->SetEnabled(enabled);
 	fCopy->SetEnabled(enabled);
@@ -118,9 +108,9 @@ void TPeopleWindow::MenusBeginning(void)
 	fView->BuildGroupMenu();
 }
 
-//--------------------------------------------------------------------
 
-void TPeopleWindow::MessageReceived(BMessage* msg)
+void
+TPeopleWindow::MessageReceived(BMessage* msg)
 {
 	char			str[256];
 	entry_ref		dir;
@@ -129,7 +119,7 @@ void TPeopleWindow::MessageReceived(BMessage* msg)
 	BFile			file;
 	BNodeInfo		*node;
 
-	switch(msg->what) {
+	switch (msg->what) {
 		case M_SAVE:
 			if (!fRef) {
 				SaveAs();
@@ -184,9 +174,9 @@ void TPeopleWindow::MessageReceived(BMessage* msg)
 	}
 }
 
-//--------------------------------------------------------------------
 
-bool TPeopleWindow::QuitRequested(void)
+bool
+TPeopleWindow::QuitRequested(void)
 {
 	int32			count = 0;
 	int32			index = 0;
@@ -203,11 +193,10 @@ bool TPeopleWindow::QuitRequested(void)
 				fView->Save();
 			else {
 				SaveAs();
-				return FALSE;
+				return false;
 			}
-		}
-		else if (result == 0)
-			return FALSE;
+		} else if (result == 0)
+			return false;
 	}
 
 	while ((window = (TPeopleWindow *)be_app->WindowAt(index++))) {
@@ -224,12 +213,12 @@ bool TPeopleWindow::QuitRequested(void)
 		}
 		be_app->PostMessage(B_QUIT_REQUESTED);
 	}
-	return TRUE;
+	return true;
 }
 
-//--------------------------------------------------------------------
 
-void TPeopleWindow::DefaultName(char *name)
+void
+TPeopleWindow::DefaultName(char *name)
 {
 	strncpy(name, fView->GetField(F_NAME), B_FILE_NAME_LENGTH);
 	while (*name) {
@@ -239,16 +228,16 @@ void TPeopleWindow::DefaultName(char *name)
 	}
 }
 
-//--------------------------------------------------------------------
 
-void TPeopleWindow::SetField(int32 index, char *text)
+void
+TPeopleWindow::SetField(int32 index, char *text)
 {
-	fView->SetField(index, text, TRUE);
+	fView->SetField(index, text, true);
 }
 
-//--------------------------------------------------------------------
 
-void TPeopleWindow::SaveAs(void)
+void
+TPeopleWindow::SaveAs(void)
 {
 	char		name[B_FILE_NAME_LENGTH];
 	BDirectory	dir;

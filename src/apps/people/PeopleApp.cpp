@@ -26,43 +26,52 @@
 #include "PeopleWindow.h"
 #include "PersonIcons.h"
 
-//====================================================================
+
+struct people_field gFields[] = {
+	{ "META:name", 120, "Contact Name" },
+	{ "META:nickname", 120, "Nickname" },
+	{ "META:company", 120, "Company" },
+	{ "META:address", 120, "Address" },
+	{ "META:city", 90, "City" },
+	{ "META:state", 50, "State" },
+	{ "META:zip", 50, "Zip" },
+	{ "META:country", 120, "Country" },
+	{ "META:hphone", 90, "Home Phone" },
+	{ "META:wphone", 90, "Work Phone" },
+	{ "META:fax", 90, "Fax" },
+	{ "META:email", 120, "E-mail" },
+	{ "META:url", 120, "URL" },
+	{ "META:group", 120, "Group" },
+	{ NULL, NULL }
+};
+
 
 TPeopleApp::TPeopleApp(void)
-		  :BApplication(APP_SIG)
+	: BApplication(APP_SIG)
 {
-	bool			valid = FALSE;
 	const char		*str;
 	int32			index = 0;
-	BBitmap			large_icon(BRect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1), B_COLOR_8_BIT);
-	BBitmap			mini_icon(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), B_COLOR_8_BIT);
 	BDirectory		dir;
 	BEntry			entry;
 	BMessage		msg;
 	BMessage		info;
-	BMimeType		mime;
 	BPath			path;
-	BPoint			pos;
-	BVolume			vol;
-	BVolumeRoster	roster;
-//	TPeopleWindow	*window;
 
-	fHaveWindow = FALSE;
+	fHaveWindow = false;
 
 	fPosition.Set(6, TITLE_BAR_HEIGHT, 6 + WIND_WIDTH, TITLE_BAR_HEIGHT + WIND_HEIGHT);
-	pos = fPosition.LeftTop();
+	BPoint pos = fPosition.LeftTop();
 
 	find_directory(B_USER_SETTINGS_DIRECTORY, &path, true);
 	dir.SetTo(path.Path());
 	if (dir.FindEntry("People_data", &entry) == B_NO_ERROR) {
-		fPrefs = new BFile(&entry, O_RDWR);
+		fPrefs = new BFile(&entry, B_READ_WRITE);
 		if (fPrefs->InitCheck() == B_NO_ERROR) {
 			fPrefs->Read(&pos, sizeof(BPoint));
 			if (BScreen(B_MAIN_SCREEN_ID).Frame().Contains(pos))
 				fPosition.OffsetTo(pos);
 		}
-	}
-	else {
+	} else {
 		fPrefs = new BFile();
 		if (dir.CreateFile("People_data", fPrefs) != B_NO_ERROR) {
 			delete fPrefs;
@@ -70,29 +79,28 @@ TPeopleApp::TPeopleApp(void)
 		}
 	}
 
-	roster.GetBootVolume(&vol);
-	fs_create_index(vol.Device(), P_NAME, B_STRING_TYPE, 0);
-	fs_create_index(vol.Device(), P_COMPANY, B_STRING_TYPE, 0);
-	fs_create_index(vol.Device(), P_ADDRESS, B_STRING_TYPE, 0);
-	fs_create_index(vol.Device(), P_CITY, B_STRING_TYPE, 0);
-	fs_create_index(vol.Device(), P_STATE, B_STRING_TYPE, 0);
-	fs_create_index(vol.Device(), P_ZIP, B_STRING_TYPE, 0);
-	fs_create_index(vol.Device(), P_COUNTRY, B_STRING_TYPE, 0);
-	fs_create_index(vol.Device(), P_HPHONE, B_STRING_TYPE, 0);
-	fs_create_index(vol.Device(), P_WPHONE, B_STRING_TYPE, 0);
-	fs_create_index(vol.Device(), P_FAX, B_STRING_TYPE, 0);
-	fs_create_index(vol.Device(), P_EMAIL, B_STRING_TYPE, 0);
-	fs_create_index(vol.Device(), P_URL, B_STRING_TYPE, 0);
-	fs_create_index(vol.Device(), P_GROUP, B_STRING_TYPE, 0);
-	fs_create_index(vol.Device(), P_NICKNAME, B_STRING_TYPE, 0);
+	// create indices on the boot volume
+	// ToDo: on other volumes as well?
+
+	BVolumeRoster roster;
+	BVolume volume;
+	roster.GetBootVolume(&volume);
+
+	for (int32 i = 0; gFields[i].attribute; i++) {
+		fs_create_index(volume.Device(), gFields[i].attribute, B_STRING_TYPE, 0);
+	}
 
 	// install person mime type
+	
+	bool valid = false;
+	BMimeType mime;
 	mime.SetType(B_PERSON_MIMETYPE);
+
 	if (mime.IsInstalled()) {
 		if (mime.GetAttrInfo(&info) == B_NO_ERROR) {
 			while (info.FindString("attr:name", index++, &str) == B_NO_ERROR) {
-				if (!strcmp(str, P_NAME)) {
-					valid = TRUE;
+				if (!strcmp(str, gFields[0].attribute)) {
+					valid = true;
 					break;
 				}
 			}
@@ -101,207 +109,67 @@ TPeopleApp::TPeopleApp(void)
 		}
 	}
 	if (!valid) {
+		BBitmap largeIcon(BRect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1), B_COLOR_8_BIT);
+		BBitmap miniIcon(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), B_COLOR_8_BIT);
+
 		mime.Install();
-		large_icon.SetBits(kLargePersonIcon, large_icon.BitsLength(), 0, B_COLOR_8_BIT);
-		mini_icon.SetBits(kSmallPersonIcon, mini_icon.BitsLength(), 0, B_COLOR_8_BIT);
+		largeIcon.SetBits(kLargePersonIcon, largeIcon.BitsLength(), 0, B_COLOR_8_BIT);
+		miniIcon.SetBits(kSmallPersonIcon, miniIcon.BitsLength(), 0, B_COLOR_8_BIT);
 		mime.SetShortDescription("Person");
 		mime.SetLongDescription("Contact information for a person.");
-		mime.SetIcon(&large_icon, B_LARGE_ICON);
-		mime.SetIcon(&mini_icon, B_MINI_ICON);
+		mime.SetIcon(&largeIcon, B_LARGE_ICON);
+		mime.SetIcon(&miniIcon, B_MINI_ICON);
 		mime.SetPreferredApp(APP_SIG);
 
 		// add relevant person fields to meta-mime type
-		msg.AddString("attr:public_name", "Contact Name"); 
-		msg.AddString("attr:name", P_NAME); 
-		msg.AddInt32("attr:type", B_STRING_TYPE); 
-		msg.AddBool("attr:viewable", true); 
-		msg.AddBool("attr:editable", true); 
-		msg.AddInt32("attr:width", 120); 
-		msg.AddInt32("attr:alignment", B_ALIGN_LEFT); 
-		msg.AddBool("attr:extra", false); 
 
-		msg.AddString("attr:public_name", "Company"); 
-		msg.AddString("attr:name", P_COMPANY); 
-		msg.AddInt32("attr:type", B_STRING_TYPE); 
-		msg.AddBool("attr:viewable", true); 
-		msg.AddBool("attr:editable", true); 
-		msg.AddInt32("attr:width", 120); 
-		msg.AddInt32("attr:alignment", B_ALIGN_LEFT); 
-		msg.AddBool("attr:extra", false); 
-
-		msg.AddString("attr:public_name", "Address"); 
-		msg.AddString("attr:name", P_ADDRESS); 
-		msg.AddInt32("attr:type", B_STRING_TYPE); 
-		msg.AddBool("attr:viewable", true); 
-		msg.AddBool("attr:editable", true); 
-		msg.AddInt32("attr:width", 120); 
-		msg.AddInt32("attr:alignment", B_ALIGN_LEFT); 
-		msg.AddBool("attr:extra", false); 
-
-		msg.AddString("attr:public_name", "City"); 
-		msg.AddString("attr:name", P_CITY); 
-		msg.AddInt32("attr:type", B_STRING_TYPE); 
-		msg.AddBool("attr:viewable", true); 
-		msg.AddBool("attr:editable", true); 
-		msg.AddInt32("attr:width", 90); 
-		msg.AddInt32("attr:alignment", B_ALIGN_LEFT); 
-		msg.AddBool("attr:extra", false); 
-
-		msg.AddString("attr:public_name", "State"); 
-		msg.AddString("attr:name", P_STATE); 
-		msg.AddInt32("attr:type", B_STRING_TYPE); 
-		msg.AddBool("attr:viewable", true); 
-		msg.AddBool("attr:editable", true); 
-		msg.AddInt32("attr:width", 50); 
-		msg.AddInt32("attr:alignment", B_ALIGN_LEFT); 
-		msg.AddBool("attr:extra", false); 
-
-		msg.AddString("attr:public_name", "Zip"); 
-		msg.AddString("attr:name", P_ZIP); 
-		msg.AddInt32("attr:type", B_STRING_TYPE); 
-		msg.AddBool("attr:viewable", true); 
-		msg.AddBool("attr:editable", true); 
-		msg.AddInt32("attr:width", 50); 
-		msg.AddInt32("attr:alignment", B_ALIGN_LEFT); 
-		msg.AddBool("attr:extra", false); 
-
-		msg.AddString("attr:public_name", "Country"); 
-		msg.AddString("attr:name", P_COUNTRY); 
-		msg.AddInt32("attr:type", B_STRING_TYPE); 
-		msg.AddBool("attr:viewable", true); 
-		msg.AddBool("attr:editable", true); 
-		msg.AddInt32("attr:width", 120); 
-		msg.AddInt32("attr:alignment", B_ALIGN_LEFT); 
-		msg.AddBool("attr:extra", false); 
-
-		msg.AddString("attr:public_name", "Home Phone"); 
-		msg.AddString("attr:name", P_HPHONE); 
-		msg.AddInt32("attr:type", B_STRING_TYPE); 
-		msg.AddBool("attr:viewable", true); 
-		msg.AddBool("attr:editable", true); 
-		msg.AddInt32("attr:width", 90); 
-		msg.AddInt32("attr:alignment", B_ALIGN_LEFT); 
-		msg.AddBool("attr:extra", false); 
-
-		msg.AddString("attr:public_name", "Work Phone"); 
-		msg.AddString("attr:name", P_WPHONE); 
-		msg.AddInt32("attr:type", B_STRING_TYPE); 
-		msg.AddBool("attr:viewable", true); 
-		msg.AddBool("attr:editable", true); 
-		msg.AddInt32("attr:width", 90); 
-		msg.AddInt32("attr:alignment", B_ALIGN_LEFT); 
-		msg.AddBool("attr:extra", false); 
-
-		msg.AddString("attr:public_name", "Fax"); 
-		msg.AddString("attr:name", P_FAX); 
-		msg.AddInt32("attr:type", B_STRING_TYPE); 
-		msg.AddBool("attr:viewable", true); 
-		msg.AddBool("attr:editable", true); 
-		msg.AddInt32("attr:width", 90); 
-		msg.AddInt32("attr:alignment", B_ALIGN_LEFT); 
-		msg.AddBool("attr:extra", false); 
-
-		msg.AddString("attr:public_name", "E-mail"); 
-		msg.AddString("attr:name", P_EMAIL); 
-		msg.AddInt32("attr:type", B_STRING_TYPE); 
-		msg.AddBool("attr:viewable", true); 
-		msg.AddBool("attr:editable", true); 
-		msg.AddInt32("attr:width", 120); 
-		msg.AddInt32("attr:alignment", B_ALIGN_LEFT); 
-		msg.AddBool("attr:extra", false); 
-
-		msg.AddString("attr:public_name", "URL"); 
-		msg.AddString("attr:name", P_URL); 
-		msg.AddInt32("attr:type", B_STRING_TYPE); 
-		msg.AddBool("attr:viewable", true); 
-		msg.AddBool("attr:editable", true); 
-		msg.AddInt32("attr:width", 120); 
-		msg.AddInt32("attr:alignment", B_ALIGN_LEFT); 
-		msg.AddBool("attr:extra", false); 
-
-		msg.AddString("attr:public_name", "Group"); 
-		msg.AddString("attr:name", P_GROUP); 
-		msg.AddInt32("attr:type", B_STRING_TYPE); 
-		msg.AddBool("attr:viewable", true); 
-		msg.AddBool("attr:editable", true); 
-		msg.AddInt32("attr:width", 120); 
-		msg.AddInt32("attr:alignment", B_ALIGN_LEFT); 
-		msg.AddBool("attr:extra", false); 
-
-		msg.AddString("attr:public_name", "Nickname"); 
-		msg.AddString("attr:name", P_NICKNAME); 
-		msg.AddInt32("attr:type", B_STRING_TYPE); 
-		msg.AddBool("attr:viewable", true); 
-		msg.AddBool("attr:editable", true); 
-		msg.AddInt32("attr:width", 120); 
-		msg.AddInt32("attr:alignment", B_ALIGN_LEFT); 
-		msg.AddBool("attr:extra", false); 
+		for (int32 i = 0; gFields[i].attribute; i++) {
+			msg.AddString("attr:public_name", gFields[i].name);
+			msg.AddString("attr:name", gFields[i].attribute);
+			msg.AddInt32("attr:type", B_STRING_TYPE);
+			msg.AddBool("attr:viewable", true);
+			msg.AddBool("attr:editable", true);
+			msg.AddInt32("attr:width", gFields[i].width);
+			msg.AddInt32("attr:alignment", B_ALIGN_LEFT);
+			msg.AddBool("attr:extra", false);
+		}
 
 		mime.SetAttrInfo(&msg);
 	}
 }
 
-//--------------------------------------------------------------------
 
 TPeopleApp::~TPeopleApp(void)
 {
-	if (fPrefs)
-		delete fPrefs;
+	delete fPrefs;
 }
 
-//--------------------------------------------------------------------
 
-void TPeopleApp::AboutRequested(void)
+void
+TPeopleApp::AboutRequested(void)
 {
 	(new BAlert("", "...by Robert Polic", "Big Deal"))->Go();
 }
 
-//--------------------------------------------------------------------
 
-void TPeopleApp::ArgvReceived(int32 argc, char **argv)
+void
+TPeopleApp::ArgvReceived(int32 argc, char **argv)
 {
-	char			*arg;
-	int32			index;
-	int32			loop;
-	TPeopleWindow	*window = NULL;
+	TPeopleWindow* window = NULL;
 
-	for (loop = 1; loop < argc; loop++) {
-		arg = argv[loop];
-		if (!strncmp(P_NAME, arg, strlen(P_NAME)))
-			index = F_NAME;
-		else if (!strncmp(P_COMPANY, arg, strlen(P_COMPANY)))
-			index = F_COMPANY;
-		else if (!strncmp(P_ADDRESS, arg, strlen(P_ADDRESS)))
-			index = F_ADDRESS;
-		else if (!strncmp(P_CITY, arg, strlen(P_CITY)))
-			index = F_CITY;
-		else if (!strncmp(P_STATE, arg, strlen(P_STATE)))
-			index = F_STATE;
-		else if (!strncmp(P_ZIP, arg, strlen(P_ZIP)))
-			index = F_ZIP;
-		else if (!strncmp(P_COUNTRY, arg, strlen(P_COUNTRY)))
-			index = F_COUNTRY;
-		else if (!strncmp(P_HPHONE, arg, strlen(P_HPHONE)))
-			index = F_HPHONE;
-		else if (!strncmp(P_WPHONE, arg, strlen(P_WPHONE)))
-			index = F_WPHONE;
-		else if (!strncmp(P_FAX, arg, strlen(P_FAX)))
-			index = F_FAX;
-		else if (!strncmp(P_EMAIL, arg, strlen(P_EMAIL)))
-			index = F_EMAIL;
-		else if (!strncmp(P_URL, arg, strlen(P_URL)))
-			index = F_URL;
-		else if (!strncmp(P_GROUP, arg, strlen(P_GROUP)))
-			index = F_GROUP;
-		else if (!strncmp(P_NICKNAME, arg, strlen(P_NICKNAME)))
-			index = F_NICKNAME;
-		else
-			index = F_END;
+	for (int32 loop = 1; loop < argc; loop++) {
+		char* arg = argv[loop];
 
-		if (index != F_END) {
+		int32 index;
+		for (index = 0; gFields[index].attribute; index++) {
+			if (!strncmp(gFields[index].attribute, arg, strlen(gFields[index].attribute)))
+				break;
+		}
+
+		if (gFields[index].attribute != NULL) {
 			if (!window)
 				window = NewWindow();
-			while(*arg != ' ')
+			while (*arg != ' ')
 				arg++;
 			arg++;
 			window->SetField(index, arg);
@@ -309,9 +177,9 @@ void TPeopleApp::ArgvReceived(int32 argc, char **argv)
 	}
 }
 
-//--------------------------------------------------------------------
 
-void TPeopleApp::MessageReceived(BMessage *msg)
+void
+TPeopleApp::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 		case M_NEW:
@@ -323,44 +191,44 @@ void TPeopleApp::MessageReceived(BMessage *msg)
 	}
 }
 
-//--------------------------------------------------------------------
 
-void TPeopleApp::RefsReceived(BMessage *msg)
+void
+TPeopleApp::RefsReceived(BMessage *message)
 {
-	int32			item = 0;
-	BFile			file;
-	entry_ref		ref;
-	TPeopleWindow	*window;
+	int32 index = 0;
 
-	while (msg->HasRef("refs", item)) {
-		msg->FindRef("refs", item++, &ref);
-		if ((window = FindWindow(ref)))
-			window->Activate(TRUE);
+	while (message->HasRef("refs", index)) {
+		entry_ref ref;
+		message->FindRef("refs", index++, &ref);
+
+		TPeopleWindow* window = FindWindow(ref);
+		if (window != NULL)
+			window->Activate(true);
 		else {
-			file.SetTo(&ref, O_RDONLY);
-			if (file.InitCheck() == B_NO_ERROR)
+			BFile file(&ref, B_READ_ONLY);
+			if (file.InitCheck() == B_OK)
 				NewWindow(&ref);
 		}
 	}
 }
 
-//--------------------------------------------------------------------
 
-void TPeopleApp::ReadyToRun(void)
+void
+TPeopleApp::ReadyToRun(void)
 {
 	if (!fHaveWindow)
 		NewWindow();
 }
 
-//--------------------------------------------------------------------
 
-TPeopleWindow* TPeopleApp::NewWindow(entry_ref *ref)
+TPeopleWindow*
+TPeopleApp::NewWindow(entry_ref *ref)
 {
-	TPeopleWindow	*window;
+	TPeopleWindow *window;
 
 	window = new TPeopleWindow(fPosition, "New Person", ref);
 	window->Show();
-	fHaveWindow = TRUE;
+	fHaveWindow = true;
 	fPosition.OffsetBy(20, 20);
 
 	if (fPosition.bottom > BScreen(B_MAIN_SCREEN_ID).Frame().bottom)
@@ -371,15 +239,15 @@ TPeopleWindow* TPeopleApp::NewWindow(entry_ref *ref)
 	return window;
 }
 
-//--------------------------------------------------------------------
 
-TPeopleWindow* TPeopleApp::FindWindow(entry_ref ref)
+TPeopleWindow*
+TPeopleApp::FindWindow(entry_ref ref)
 {
-	int32			index = 0;
-	TPeopleWindow	*window;
+	TPeopleWindow* window;
+	int32 index = 0;
 
 	while ((window = (TPeopleWindow *)WindowAt(index++))) {
-		if ((window->FindView("PeopleView")) && (window->fRef) && (*(window->fRef) == ref))
+		if (window->FindView("PeopleView") != NULL && window->fRef && *window->fRef == ref)
 			return window;
 	}
 	return NULL;
