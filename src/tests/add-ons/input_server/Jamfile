@@ -1,0 +1,15 @@
+SubDir OBOS_TOP src tests add-ons input ;
+
+SubDirHdrs $(OBOS_TOP) src add-ons input_server devices keyboard ;
+UsePrivateHeaders input ;
+
+SimpleTest TaskManagerTest :
+	TaskManagerTest.cpp
+	TMWindow.cpp
+	TMListItem.cpp
+	: be
+	;
+
+SEARCH on [ FGristFiles
+		TMWindow.cpp TMListItem.cpp
+	] = [ FDirName $(OBOS_TOP) src add-ons input_server devices keyboard ] ;
