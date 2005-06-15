@@ -1,4 +1,4 @@
-//------------------------------------------------------------------------------
+ //------------------------------------------------------------------------------
 //	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
@@ -395,13 +395,11 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 {
 	// TODO: This function is very incomplete and just partially working:
 	// For example, it doesn't respect the "sticky mode" setting.
-	// Cleanup: We shouldn't use two nested loops. This simplifies the code
-	// but doesn't work well
 	BMenuItem *resultItem = NULL;
 	BWindow *window = Window();
 	int localAction = MENU_ACT_NONE;
-	bool exitLoop = false;
 	do {
+		bigtime_t snoozeAmount = 30000;
 		if (window->LockWithTimeout(200000) < B_OK)
 			break;
 		
@@ -410,53 +408,41 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 		GetMouse(&where, &buttons);
 		
 		BMenuItem *menuItem = HitTestItems(where, B_ORIGIN); 
-		if (menuItem != NULL) {
-			SelectItem(menuItem);
-			BMenu *menu = menuItem->Submenu();
-			// TODO: Actually, this test shouldn't be needed, as
-			// all BMenuBar's BMenuItems are BMenus.
-			if (menu != NULL) {
-				if (IsStickyPrefOn())
-					menu->SetStickyMode(true);
-				do {
-					snooze(40000);
-					GetMouse(&where, &buttons);
-					
-					// If we aren't over this BMenu anymore, exit the tracking loop.
-					BMenuItem *testItem = HitTestItems(where, B_ORIGIN);
-					if (testItem != NULL && testItem != menuItem)
-						break;
-				
-					// No need to keep the window locked for the
-					// whole time, as BMenu::_track() does its own locking.
-					window->Unlock();
-					
-					resultItem = menu->_track(&localAction, startIndex);
-					
-					if (window->LockWithTimeout(200000) < B_OK)
-						break;
-						
-				} while (localAction != MENU_ACT_CLOSE);
-			}
-			
-			if (window->IsLocked()) {
-				SelectItem(NULL);
-				Invalidate();
+		if (menuItem != NULL && menuItem != fSelected) {
+			// only select the item
+			SelectItem(menuItem, -1);
+			if (menuItem->Submenu() != NULL) {
+				// open the menu
+				SelectItem(menuItem);
 			}
 		}
 		
-		if (window->IsLocked())
-			window->Unlock();
-			
-		snooze(40000);
-		if (buttons == 0)
-			exitLoop = true;
-				
-	} while (!exitLoop);
-	
-	if (action != NULL)
-		*action = static_cast<int>(localAction);
+		if (fSelected != NULL) {
+			BMenu *menu = fSelected->Submenu();
+			if (menu != NULL) {
+				window->Unlock();
+				snoozeAmount = 0;
+				resultItem = menu->_track(&localAction);
+				if (window->LockWithTimeout(200000) < B_OK)
+					break;
+			}
+		}
 		
+		window->Unlock();
+		if (buttons == 0 || localAction == MENU_ACT_CLOSE)
+			break;
+		
+		if (snoozeAmount > 0)
+			snooze(snoozeAmount);
+			
+	} while (true);
+	
+	if (fSelected != NULL) {
+		window->Lock();
+		SelectItem(NULL);
+		window->Unlock();
+	}
+	
 	if (resultItem != NULL)
 		resultItem->Invoke();
 	
