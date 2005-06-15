@@ -31,23 +31,12 @@
 #include <Application.h>
 #include <Window.h>
 #include <Message.h>
-#include <ListView.h>
-
-class APRView;
-class DecView;
-class CurView;
 
 class APRWindow : public BWindow 
 {
 public:
-	APRWindow(BRect frame); 
-	virtual	bool QuitRequested();
-	virtual void MessageReceived(BMessage *msg);
-	BListView *listview;
-	APRView *colors;
-	DecView *decorators;
-	CurView *cursors;
-	BList viewlist;
+			APRWindow(BRect frame); 
+	bool	QuitRequested(void);
 };
 
 #endif

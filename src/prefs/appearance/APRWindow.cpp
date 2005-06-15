@@ -32,107 +32,28 @@
 #include "CurView.h"
 #include "MenuView.h"
 #include "defs.h"
-#include <ScrollView.h>
-#include <ListItem.h>
+#include <TabView.h>
 
 APRWindow::APRWindow(BRect frame)
 	: BWindow(frame, "Appearance", B_TITLED_WINDOW,
 	  B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES )
 {
-	BView *topview=new BView(Bounds(),"topview",B_FOLLOW_ALL,B_WILL_DRAW);
-	topview->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(topview);
+	BTabView *tabview = new BTabView(Bounds(),"tabview");
 	
-	BRect r(10,10,110,Bounds().Height()-10);
-
-	listview=new BListView(r,"prefslist");
-	topview->AddChild(listview);
-	listview->SetSelectionMessage(new BMessage(PREFS_CHOSEN));
+	BRect r(Bounds());
+	r.bottom -= 20;
 	
-	
-	r.Set(100,100,385,445);
-	r.OffsetTo(listview->Bounds().Width()+20,0);
-	r.right=Bounds().right;
+	DecView *decview=new DecView(r,"Decorators",B_FOLLOW_ALL, B_WILL_DRAW);
+	tabview->AddTab(decview);
 
-	listview->AddItem(new BStringItem("Colors"));
-	colors=new APRView(r,"Colors",B_FOLLOW_ALL, B_WILL_DRAW);
-	topview->AddChild(colors);
-	viewlist.AddItem(colors);
-	colors->Hide();
+	APRView *colorview=new APRView(r,"Colors",B_FOLLOW_ALL, B_WILL_DRAW);
+	tabview->AddTab(colorview);
 
-	// TODO: Finish CurView
-/*	listview->AddItem(new BStringItem("Cursors"));
-	cursors=new CurView(r,"Cursors",B_FOLLOW_ALL, B_WILL_DRAW);
-	topview->AddChild(cursors);
-	viewlist.AddItem(cursors);
-	cursors->Hide();
-*/
-
-	listview->AddItem(new BStringItem("Decorators"));
-	decorators=new DecView(r,"Decorator",B_FOLLOW_ALL, B_WILL_DRAW);
-	topview->AddChild(decorators);
-	decorators->Hide();
-	viewlist.AddItem(decorators);
-	decorators->SetColors(*colors->currentset);
-
-	// This code works properly IIRC, but will remain disabled for now.
-	
-	// One of the cool things about Appearance is that eventually we will probably 
-	// integrate all appearance-related preference panels into this to reduce the number
-	// of preference applications and to make the entire preferences area more organized.
-	// This is the route that Zeta took with theirs, but ours will not be a hack -- it will
-	// be done right. B^>
-	
-	// This won't amount to much -- we won't bother with the scrollbar prefs app and just
-	// set sensible defaults. It should just be menu and fonts, so not much work, either.
-	
-//	listview->AddItem(new BStringItem("Menu"));
-//	MenuView *menuview=new MenuView(r,"Menu",B_FOLLOW_ALL, B_WILL_DRAW);
-//	topview->AddChild(menuview);
-//	viewlist.AddItem(menuview);
-//	menuview->Hide();
-
-	listview->Select(1);
+	AddChild(tabview);
 }
 
 bool APRWindow::QuitRequested()
 {
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return(true);
-}
-
-void APRWindow::MessageReceived(BMessage *msg)
-{
-	switch(msg->what)
-	{
-		case SET_UI_COLORS:
-		{
-			decorators->SetColors(*colors->currentset);
-			break;
-		}
-		case PREFS_CHOSEN:
-		{
-			int32 selectionindex=listview->CurrentSelection();
-			if(selectionindex==-1)
-				break;
-			
-			// Hide any visible preference views
-			for(int32 i=0; i<listview->CountItems(); i++)
-			{
-				BView *v=(BView*)viewlist.ItemAt(i);
-				
-				if(!v)
-					continue;
-				
-				if(!v->IsHidden())
-					v->Hide();
-			}
-			BView *visible=(BView*)viewlist.ItemAt(selectionindex);
-			visible->Show();
-			break;
-		}
-		default:
-			BWindow::MessageReceived(msg);
-			break;
-	}
 }

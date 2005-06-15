@@ -34,18 +34,19 @@
 #include <storage/Path.h>
 #include <Entry.h>
 #include <File.h>
-#include <Screen.h>	// for settings Desktop color
 #include <stdio.h>
 
-#include "APRView.h"
 #include <PortLink.h>
-#include <PortMessage.h>
+#include <InterfaceDefs.h>
+#include <ServerProtocol.h>
+
+#include "APRView.h"
 #include "defs.h"
 #include "ColorWell.h"
 #include <ColorUtils.h>
-#include <InterfaceDefs.h>
-#include <ServerProtocol.h>
 #include "ColorWhichItem.h"
+#include "ColorSet.h"
+
 #include "ServerConfig.h"
 
 //#define DEBUG_COLORSET
@@ -56,43 +57,22 @@
 #define STRACE(A) /* nothing */
 #endif
 
-//#define SAVE_COLORSET 'svcs'
-//#define DELETE_COLORSET 'dlcs'
-//#define LOAD_COLORSET 'ldcs'
 #define COLOR_DROPPED 'cldp'
+
+// Declarations for private functions in InterfaceDefs.cpp
+namespace BPrivate
+{
+	void get_system_colors(ColorSet *colors);
+	void set_system_colors(const ColorSet &colors);
+}
 
 APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags)
 	:BView(frame,name,resize,flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	currentset=new ColorSet;
-	prevset=NULL;
-	
-/*
-	// This disabled code block is being saved for a color set app
-	BMenuBar *mb=new BMenuBar(BRect(0,0,Bounds().Width(),16),"menubar");
-
-	settings_menu=new BMenu("Settings");
-	settings_menu->AddItem(new BMenuItem("Save Color Set",new BMessage(SAVE_COLORSET),'S'));
-	settings_menu->AddSeparatorItem();
-	settings_menu->AddItem(new BMenuItem("Delete Color Set",new BMessage(DELETE_COLORSET)));
-	mb->AddItem(settings_menu);
-
-	colorset_menu=LoadColorSets();
-	if(colorset_menu)
-		mb->AddItem(colorset_menu);
-	else
-	{
-		// We should *never* be here, but just in case....
-		colorset_menu=new BMenu("Color Sets");
-		mb->AddItem(colorset_menu);
-	}
-	AddChild(mb);
-*/
-
 	// Set up list of color attributes
-	BRect rect(10,10,200,175);
+	BRect rect(10,10,200,150);
 	attrlist=new BListView(rect,"AttributeList");
 	
 	scrollview=new BScrollView("ScrollView",attrlist, B_FOLLOW_LEFT |
@@ -130,14 +110,27 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 
 
 	BRect wellrect(0,0,50,50);
-	wellrect.OffsetTo(rect.right + 42,25);
+	wellrect.OffsetTo( rect.right + 42, rect.top +
+					(scrollview->Bounds().Height() - wellrect.Height())/2 );
 
 	colorwell=new ColorWell(wellrect,new BMessage(COLOR_DROPPED),true);
 	AddChild(colorwell);
-
+	
+	// Center the list and color well
+	
+	rect = scrollview->Frame();
+	rect.right = wellrect.right;
+	rect.OffsetTo( (Bounds().Width()-rect.Width())/2,rect.top);
+	
+	scrollview->MoveTo(rect.left, rect.top);
+	colorwell->MoveTo(rect.right - colorwell->Bounds().Width(), colorwell->Frame().top);
+	
 	picker=new BColorControl(BPoint(10,scrollview->Frame().bottom+20),B_CELLS_32x8,5.0,"Picker",
 		new BMessage(UPDATE_COLOR));
 	AddChild(picker);
+	
+	picker->MoveTo( (Bounds().Width() - picker->Frame().Width())/2,
+			scrollview->Frame().bottom + 20 );
 	
 	BRect cvrect;
 	
@@ -145,26 +138,26 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	cvrect.right=cvrect.left+60;
 	cvrect.bottom=cvrect.top+30;
 	
-	// 40 is 10 pixel space between buttons and other objects, such as the edge or another button
-	cvrect.OffsetTo( (Bounds().Width()-((cvrect.Width()*3)+40))/2,picker->Frame().bottom+10);
+	// 40 is a 10 pixel space between buttons and other objects, 
+	// such as the edge or another button
+	cvrect.OffsetTo( (Bounds().Width()- ((cvrect.Width()*3) + 40))/2,
+					picker->Frame().bottom+10);
 
 	defaults=new BButton(cvrect,"DefaultsButton","Defaults",
-		new BMessage(DEFAULT_SETTINGS),B_FOLLOW_LEFT |B_FOLLOW_TOP,
-		B_WILL_DRAW | B_NAVIGABLE);
+						new BMessage(DEFAULT_SETTINGS),
+						B_FOLLOW_LEFT |B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
 	AddChild(defaults);
-	defaults->SetEnabled(false);
 
 	cvrect.OffsetBy(70,0);
-	revert=new BButton(cvrect,"RevertButton","Revert",
-		new BMessage(REVERT_SETTINGS),B_FOLLOW_LEFT |B_FOLLOW_TOP,
-		B_WILL_DRAW | B_NAVIGABLE);
+	revert=new BButton(cvrect,"RevertButton","Revert", 
+						new BMessage(REVERT_SETTINGS),
+						B_FOLLOW_LEFT |B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
 	AddChild(revert);
 	revert->SetEnabled(false);
 	
 	cvrect.OffsetBy(70,0);
-	apply=new BButton(cvrect,"ApplyButton","Apply",
-		new BMessage(APPLY_SETTINGS),B_FOLLOW_LEFT |B_FOLLOW_TOP,
-		B_WILL_DRAW | B_NAVIGABLE);
+	apply=new BButton(cvrect,"ApplyButton","Apply", new BMessage(APPLY_SETTINGS),
+						B_FOLLOW_LEFT |B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
 	AddChild(apply);
 	apply->SetEnabled(false);
 
@@ -174,18 +167,14 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 
 	attribute=B_PANEL_BACKGROUND_COLOR;
 	attrstring="Panel Background";
+	
 	LoadSettings();
+	
+	// Save values for when we need to revert
+	prevset=currentset;
 }
 
-APRView::~APRView(void)
-{
-	if(currentset)
-		delete currentset;
-	if(prevset)
-		delete prevset;
-}
-
-void APRView::AllAttached(void)
+void APRView::AttachedToWindow(void)
 {
 	picker->SetTarget(this);
 	attrlist->Select(0);
@@ -195,8 +184,7 @@ void APRView::AllAttached(void)
 	revert->SetTarget(this);
 	colorwell->SetTarget(this);
 
-	BMessenger msgr(this);
-	picker->SetValue(currentset->StringToColor(attrstring.String()).GetColor32());
+	picker->SetValue(currentset.StringToColor(attrstring.String()));
 }
 
 void APRView::MessageReceived(BMessage *msg)
@@ -215,91 +203,9 @@ void APRView::MessageReceived(BMessage *msg)
 
 	switch(msg->what)
 	{
-/*
-	// More code being saved for a color set app
-
-		case DELETE_COLORSET:
-		{
-			// We can't delete the Default set
-			if(currentset->name.Compare("Default")==0)
-				break;
-			
-			// Construct the path and delete
-			BString path(COLOR_SET_DIR);
-			path+=currentset->name;
-			
-			BString printstring("Remove ");
-			printstring+=currentset->name;
-			printstring+=" from disk permenantly?";
-			BAlert *a=new BAlert("OpenBeOS",printstring.String(),"Yes", "No");
-			if(a->Go()==0)
-			{
-				int stat=remove(path.String());
-				if(stat!=0)
-				{
-					STRACE(("MSG: Delete Request - couldn't delete file %s\n",path.String()));
-				}
-				else
-				{
-					BMenuItem *item=colorset_menu->FindItem(currentset->name.String());
-					if(item!=NULL)
-					{
-						if(colorset_menu->RemoveItem(item))
-							delete item;
-					}
-				}
-			}
-			break;
-		}
-		case LOAD_COLORSET:
-		{
-			BString name;
-			if(msg->FindString("name",&name)!=B_OK)
-			{
-				STRACE(("MSG: Load Request - couldn't find file name\n"));
-				break;
-			}
-			LoadColorSet(name);
-			break;
-		}
-		case SAVE_COLORSET:
-		{
-			// Saving the Default set is rather dumb
-			if(currentset->name.Compare("Default")==0)
-				break;
-			
-			savepanel->Show();
-			break;
-		}
-		case B_SAVE_REQUESTED:
-		{
-			BString name;
-			if(msg->FindString("name",&name)!=B_OK)
-			{
-				STRACE(("MSG: Save Request - couldn't find file name\n"));
-				break;
-			}
-			if(name.ICompare("Default")==0)
-			{
-				BAlert *a=new BAlert("OpenBeOS","The name 'Default' is reserved. Please choose another.","OK");
-				a->Go();
-				savepanel->Show();
-				break;
-			}
-			SaveColorSet(name);
-			break;
-		}
-
-	// end disabled colorset code
-*/
 		case UPDATE_COLOR:
 		{
 			// Received from the color picker when its color changes
-			if(!prevset)
-			{
-				prevset=new ColorSet;
-				*prevset=*currentset;
-			}
 			
 			rgb_color col=picker->ValueAsColor();
 
@@ -307,92 +213,60 @@ void APRView::MessageReceived(BMessage *msg)
 			colorwell->Invalidate();
 			
 			// Update current attribute in the settings
-			if(currentset->SetColor(attrstring.String(),col)!=B_OK)
-			{
-				STRACE(("Couldn't set color for attribute %s\n",attrstring.String()));
-			}
+			currentset.SetColor(attrstring.String(),col);
 			
-			if(!apply->IsEnabled())
-				apply->SetEnabled(true);
-			if(!defaults->IsEnabled())
-				defaults->SetEnabled(true);
-			if(!revert->IsEnabled())
-				revert->SetEnabled(true);
+			apply->SetEnabled(true);
+			revert->SetEnabled(true);
 			
-			Window()->PostMessage(SET_UI_COLORS);
 			break;
 		}
 		case ATTRIBUTE_CHOSEN:
 		{
 			// Received when the user chooses a GUI attribute from the list
-			ColorWhichItem *whichitem=(ColorWhichItem*)attrlist->ItemAt(attrlist->CurrentSelection());
+			
+			ColorWhichItem *whichitem = (ColorWhichItem*)attrlist->ItemAt( attrlist->CurrentSelection() );
+			
 			if(!whichitem)
 				break;
+			
 			attrstring=whichitem->Text();
 			UpdateControlsFromAttr(whichitem->Text());
 			break;
 		}
 		case APPLY_SETTINGS:
 		{
-			if(prevset)
-			{
-				delete prevset;
-				prevset=NULL;
-				revert->SetEnabled(false);
-			}
-			if(currentset->name=="Default")
-				defaults->SetEnabled(false);
 			apply->SetEnabled(false);
-			SaveSettings();
-			NotifyServer();
-			break;
-		}
-		case TRY_SETTINGS:
-		{
-			// Tell server to apply settings here without saving them.
-			// Theoretically, the user can set this temporarily and keep it
-			// until the next boot.
-			NotifyServer();
+			BPrivate::set_system_colors(currentset);
+			
+			BString path(SERVER_SETTINGS_DIR);
+			path += COLOR_SETTINGS_NAME;
+			
+			SaveColorSet( path.String(), currentset);
 			break;
 		}
 		case REVERT_SETTINGS:
 		{
-			delete currentset;
 			currentset=prevset;
-			prevset=NULL;
+			UpdateControlsFromAttr(attrstring.String());
 			
-			rgb_color col=picker->ValueAsColor();
-
-			colorwell->SetColor(col);
-			colorwell->Invalidate();
-			
-			// Update current attribute in the settings
-			currentset->SetColor(attrstring.String(),col);
-			
+			// Save settings on disk if 'Apply' has been used
 			if(!apply->IsEnabled())
-				apply->SetEnabled(false);
-			if((currentset->name!="Default"))
-				defaults->SetEnabled(true);
-			else
-				defaults->SetEnabled(false);
+			{
+				BString path(SERVER_SETTINGS_DIR);
+				path += COLOR_SETTINGS_NAME;
+				SaveColorSet( path.String(), currentset);
+			}
+			apply->SetEnabled(false);
 			revert->SetEnabled(false);
 			
-			Window()->PostMessage(SET_UI_COLORS);
 			break;
 		}
 		case DEFAULT_SETTINGS:
 		{
-			if(!prevset)
-			{
-				prevset=new ColorSet;
-				*prevset=*currentset;
-				revert->SetEnabled(true);
-				apply->SetEnabled(true);
-			}
-			SetDefaults();
+			currentset.SetToDefaults();
+			apply->SetEnabled(true);
+			
 			UpdateControlsFromAttr(attrstring.String());
-			if(Window())
-				Window()->PostMessage(SET_UI_COLORS);
 			break;
 		}
 		default:
@@ -401,317 +275,18 @@ void APRView::MessageReceived(BMessage *msg)
 	}
 }
 
-/*
-
-// This section is commented out because Appearance doesn't manage color sets. That
-// task is better left to another application.
-
-BMenu *APRView::LoadColorSets(void)
-{
-	STRACE(("Loading color sets from disk\n"));
-
-	// This function populates the member menu *colorset_menu with the color
-	// set files located in the color set directory. To ensure that there are
-	// no entries pointing to invalid color sets, they are validated before
-	// a menu item is added.
-	BDirectory dir;
-	BEntry entry;
-	BPath path;
-	BString name;
-
-	BMenu *menu=new BMenu("Color Sets");
-
-	status_t dirstat=dir.SetTo(COLOR_SET_DIR);
-	if(dirstat!=B_OK)
-	{
-		// We couldn't set the directory, so more than likely it just
-		// doesn't exist. Create it and return an empty menu.
-		switch(dirstat)
-		{
-			case B_NAME_TOO_LONG:
-			{
-				BAlert *a=new BAlert("OpenBeOS","Couldn't open the folder for color sets. "
-					"You will be able to change system colors, but be unable to save them to a color set. "
-					"Please contact OpenBeOS about Appearance Preferences::APRView::"
-					"LoadColorSets::B_NAME_TOO_LONG for a bugfix", "OK",
-					 NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-				a->Go();
-				break;
-			}
-			case B_ENTRY_NOT_FOUND:
-			{
-				create_directory(COLOR_SET_DIR,0777);
-				break;
-			}
-			case B_BAD_VALUE:
-			{
-				STRACE(("APRView::LoadColorSets(): Invalid colorset folder path.\n"));
-				break;
-			}
-			case B_NO_MEMORY:
-			{
-				STRACE(("APRView::LoadColorSets(): No memory left. We're probably going to crash now. \n"));
-				break;
-			}
-			case B_BUSY:
-			{
-				STRACE(("APRView::LoadColorSets(): Busy node " COLOR_SET_DIR "\n"));
-				break;
-			}
-			case B_FILE_ERROR:
-			{
-				BAlert *a=new BAlert("OpenBeOS","Couldn't open the folder for color sets "
-					"because of a file error. Perhaps there is a file (instead of a folder) at " COLOR_SET_DIR
-					"? You will be able to change system colors, but be unable to save them to a color set. ",
-					"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-				a->Go();
-				break;
-			}
-			case B_NO_MORE_FDS:
-			{
-				BAlert *a=new BAlert("OpenBeOS","Couldn't open the folder for color sets "
-					"because there are too many open files. Please close some files and restart "
-					" this application.", "OK",
-					 NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-				a->Go();
-				if(Window())
-					Window()->PostMessage(B_QUIT_REQUESTED);
-				break;
-			}
-		}
-		
-		return menu;
-	}
-
-	int32 count=dir.CountEntries();
-
-	BMessage *msg;
-	for(int32 i=0;i<count;i++)
-	{
-		dir.GetNextEntry(&entry);
-		entry.GetPath(&path);
-		
-		name=path.Path();
-		name.Remove(0,name.FindLast('/')+1);
-
-		msg=new BMessage(LOAD_COLORSET);
-		msg->AddString("name",name);
-		menu->AddItem(new BMenuItem(name.String(),msg));
-	}
-	
-	return menu;
-}	
-*/
-
-void APRView::LoadColorSet(const BString &name)
-{
-	// Load the current GUI color settings from a color set file.
-	
-	STRACE(("LoadColorSet: %s\n",name.String()));
-	
-	BDirectory dir,newdir;
-	if(dir.SetTo(COLOR_SET_DIR)==B_ENTRY_NOT_FOUND)
-	{
-		STRACE(("Color set folder not found. Creating %s\n",COLOR_SET_DIR));
-		create_directory(COLOR_SET_DIR,0777);
-	}
-	
-	BString path(COLOR_SET_DIR);
-	path+=name.String();
-	BFile file(path.String(),B_READ_ONLY);
-	
-	if(file.InitCheck()!=B_OK)
-	{
-		STRACE(("Couldn't open file %s for read\n",path.String()));
-		return;
-	}
-	BMessage settings;
-	
-	if(settings.Unflatten(&file)!=B_OK)
-	{
-		STRACE(("Error unflattening file %s\n",name.String()));
-		return;
-	}
-	currentset->ConvertFromMessage(&settings);
-//	SetColorSetName(currentset->name.String());
-	
-	UpdateControlsFromAttr(attrstring.String());
-}
-
-/*
-// More code being saved for a color set app
-void APRView::SaveColorSet(const BString &name)
-{
-
-	// Save the current color attributes as a flattened BMessage in the 
-	// color set folder
-	BString path(COLOR_SET_DIR);
-	path+=name.String();
-
-
-	STRACE(("SaveColorSet: %s\n",path.String()));
-
-
-	BFile file(path.String(),B_READ_WRITE|B_CREATE_FILE|B_ERASE_FILE);
-
-	if(file.InitCheck()!=B_OK)
-	{
-		STRACE(("SaveColorSet: Couldn't open settings file for write\n"));
-		return;
-	}
-	
-	BMessage settings;
-	currentset->name=name;
-	currentset->ConvertToMessage(&settings);
-
-	if(settings.Flatten(&file)!=B_OK)
-	{
-		STRACE(("SaveColorSet: Couldn't flatten settings to file\n"));
-		return;
-	}
-
-	BMessage *msg=new BMessage(LOAD_COLORSET);
-	msg->AddString("name",name.String());
-
-	if(colorset_menu->AddItem(new BMenuItem(name.String(),msg))==false)
-	{
-		STRACE(("SaveColorSet: Error in adding item to menu\n"));
-	}
-	SetColorSetName(name.String());
-	
-	// If we saved the color set after Applying it, the name won't be updated on disk, so 
-	// save again to disk if this has happened.
-	if(prevset==NULL)
-		SaveSettings();
-}
-
-// More code being saved for a color set app
-void APRView::SetColorSetName(const char *name)
-{
-	if(!name)
-		return;
-	BString namestr("Color Set: ");
-	currentset->name.SetTo(name);
-	namestr+=name;
-	colorwell_label->SetText(namestr.String());
-	colorwell_label->ResizeToPreferred();
-	colorwell_label->Invalidate();
-}
-*/
-void APRView::SaveSettings(void)
-{
-	// Save the current GUI color settings to the GUI colors file in the 
-	// path specified in defs.h
-	
-	BString path(SERVER_SETTINGS_DIR);
-	path+=COLOR_SETTINGS_NAME;
-
-	STRACE(("SaveSettings: %s\n",path.String()));
-
-	BFile file(path.String(),B_READ_WRITE|B_CREATE_FILE|B_ERASE_FILE);
-	
-	BMessage settings;
-
-	currentset->ConvertToMessage(&settings);
-	settings.Flatten(&file);
-}
-
 void APRView::LoadSettings(void)
 {
 	// Load the current GUI color settings from disk. This is done instead of
 	// getting them from the server at this point for testing purposes.
-
-#ifndef RUN_WITHOUT_APP_SERVER
+	
 	// Query the server for the current settings
-	port_id port=find_port(SERVER_PORT_NAME);
-	if(port!=B_NAME_NOT_FOUND)
-	{
-		STRACE(("Retrieving settings from app_server\n"));
-		BPrivate::PortLink link(port);
-		int32 code;
+	//BPrivate::get_system_colors(&currentset);
+	
+	// TODO: remove this and enable the get_system_colors() call
+	LoadColorSet("/boot/home/config/settings/app_server/system_colors",&currentset);
 		
-		link.StartMessage(AS_GET_UI_COLORS);
-		link.Flush();
-		link.GetNextMessage(code);
-		link.Read<ColorSet>(currentset);
-	}
-	else
-	{
-#endif
-		STRACE(("Loading settings from disk\n"));
-		
-		BDirectory dir,newdir;
-		if(dir.SetTo(SERVER_SETTINGS_DIR)==B_ENTRY_NOT_FOUND)
-		{
-			STRACE(("Color set folder not found. Creating %s\n",SERVER_SETTINGS_DIR));
-			create_directory(SERVER_SETTINGS_DIR,0777);
-		}
-	
-		BString path(SERVER_SETTINGS_DIR);
-		path+=COLOR_SETTINGS_NAME;
-		BFile file(path.String(),B_READ_ONLY);
-	
-		if(file.InitCheck()!=B_OK)
-		{
-			STRACE(("Couldn't open file %s for read\n",path.String()));
-			SetDefaults();
-			SaveSettings();
-			return;
-		}
-	
-		BMessage settings;
-		if(settings.Unflatten(&file)!=B_OK)
-		{
-			STRACE(("Error unflattening SystemColors file %s\n",path.String()));
-			
-			SetDefaults();
-			SaveSettings();
-		}
-
-		currentset->ConvertFromMessage(&settings);
-
-#ifndef RUN_WITHOUT_APP_SERVER
-	}
-
-//	SetColorSetName(currentset->name.String());
-#endif
-	
 	UpdateControlsFromAttr(attrstring.String());
-	
-	if(currentset->name.Compare("Default")!=0)
-		defaults->SetEnabled(true);
-}
-
-void APRView::SetDefaults(void)
-{
-	STRACE(("Initializing color settings to defaults\n"));
-	defaults->SetEnabled(false);
-	currentset->name.SetTo("Default");
-
-	currentset->SetToDefaults();
-}
-
-void APRView::NotifyServer(void)
-{
-#ifndef RUN_WITHOUT_APP_SERVER
-	// Send a message to the app_server with the settings which we have.
-
-	port_id port=find_port(SERVER_PORT_NAME);
-	
-	if(port!=B_NAME_NOT_FOUND)
-	{
-		STRACE(("Notifying app_server\n"));
-		BPrivate::PortLink link(port);
-		
-		link.StartMessage(AS_SET_UI_COLORS);
-		link.Attach<ColorSet>(*currentset);
-		link.Flush();
-	}
-	
-	// We also need to send the message to the window so that the Decorators tab updates itself
-	if(Window())
-		Window()->PostMessage(SET_UI_COLORS);
-#endif
 }
 
 void APRView::UpdateControlsFromAttr(const char *string)
@@ -720,7 +295,7 @@ void APRView::UpdateControlsFromAttr(const char *string)
 		return;
 	STRACE(("Update color for %s\n",string));
 
-	picker->SetValue(currentset->StringToColor(string).GetColor32());
+	picker->SetValue(currentset.StringToColor(string));
 	colorwell->SetColor(picker->ValueAsColor());
 	colorwell->Invalidate();
 }

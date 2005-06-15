@@ -26,40 +26,20 @@
 //  
 //------------------------------------------------------------------------------
 #include "APRMain.h"
+#include "APRWindow.h"
 #include <stdio.h>
 #include "defs.h"
-#include "FontServer.h"
-#include "ServerConfig.h"
 
-APRApplication::APRApplication()
-  :BApplication(APPEARANCE_APP_SIGNATURE)
+APRApplication::APRApplication(void)
+  : BApplication(APPEARANCE_APP_SIGNATURE)
 {
-	fontserver=new FontServer();
-	fontserver->ScanDirectory("/boot/beos/etc/fonts/ttfonts/");
-	fontserver->ScanDirectory("/boot/beos/etc/fonts/PS-Type1/");
-	if(!fontserver->SetSystemPlain(DEFAULT_PLAIN_FONT_FAMILY,DEFAULT_PLAIN_FONT_STYLE,DEFAULT_PLAIN_FONT_SIZE))
-		printf("Couldn't set plain to %s, %s %d pt\n",DEFAULT_PLAIN_FONT_FAMILY,
-				DEFAULT_PLAIN_FONT_STYLE,DEFAULT_PLAIN_FONT_SIZE);
-	if(!fontserver->SetSystemBold(DEFAULT_BOLD_FONT_FAMILY,DEFAULT_BOLD_FONT_STYLE,DEFAULT_BOLD_FONT_SIZE))
-		printf("Couldn't set bold to %s, %s %d pt\n",DEFAULT_BOLD_FONT_FAMILY,
-				DEFAULT_BOLD_FONT_STYLE,DEFAULT_BOLD_FONT_SIZE);
-	if(!fontserver->SetSystemFixed(DEFAULT_FIXED_FONT_FAMILY,DEFAULT_FIXED_FONT_STYLE,DEFAULT_FIXED_FONT_SIZE))
-		printf("Couldn't set fixed to %s, %s %d pt\n",DEFAULT_FIXED_FONT_FAMILY,
-				DEFAULT_FIXED_FONT_STYLE,DEFAULT_FIXED_FONT_SIZE);
-	
-	BRect rect;
-
-	// This is just the size and location of the window when Show() is called	
-	rect.Set(100,100,540,410);
-	aprwin=new APRWindow(rect);
-	aprwin->Show();
+	fWindow=new APRWindow( BRect(100,100,540,410) );
+	fWindow->Show();
 }
 
 int main(int, char**)
 {	
 	APRApplication myApplication;
-
-	// This function doesn't return until the application quits
 	myApplication.Run();
 
 	return(0);

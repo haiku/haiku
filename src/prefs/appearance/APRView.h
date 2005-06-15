@@ -41,36 +41,43 @@
 #include <MenuItem.h>
 #include <StringView.h>
 #include <Invoker.h>
-#include <ColorSet.h>
+#include "ColorSet.h"
+
 class ColorWell;
 class APRWindow;
 
 class APRView : public BView
 {
 public:
-	APRView(const BRect &frame, const char *name, int32 resize, int32 flags);
-	~APRView(void);
-	void AllAttached(void);
-	void MessageReceived(BMessage *msg);
-	void SaveSettings(void);
-	void LoadSettings(void);
-	void SetDefaults(void);
-	void NotifyServer(void);
+			APRView(const BRect &frame, const char *name, int32 resize, 
+					int32 flags);
+	void	AttachedToWindow(void);
+	void	MessageReceived(BMessage *msg);
+	
+	void	LoadSettings(void);
 
 protected:
-	friend APRWindow;
-	void UpdateControlsFromAttr(const char *string);
-//	BMenu *LoadColorSets(void);
-	void LoadColorSet(const BString &name);
-	BColorControl *picker;
-	BButton *apply,*revert,*defaults;
-	BListView *attrlist;
-	color_which attribute;
-	BString attrstring;
-	BScrollView *scrollview;
-	ColorWell *colorwell;
+
+	void	UpdateControlsFromAttr(const char *string);
 	
-	ColorSet *currentset,*prevset;
+	BColorControl	*picker;
+	
+	BButton			*apply;
+	BButton			*revert;
+	BButton			*defaults;
+	
+	BListView		*attrlist;
+	
+	color_which		attribute;
+	
+	BString			attrstring;
+	
+	BScrollView		*scrollview;
+	
+	ColorWell		*colorwell;
+	
+	ColorSet		currentset;
+	ColorSet		prevset;
 };
 
 #endif

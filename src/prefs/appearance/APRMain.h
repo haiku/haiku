@@ -29,13 +29,17 @@
 #define APR_WORLD_H
 
 #include <Application.h>
-#include "APRWindow.h"
+
+class APRWindow;
 
 class APRApplication : public BApplication 
 {
 public:
-	APRApplication();
-	APRWindow *aprwin;
+	APRApplication(void);
+
+private:
+	
+	APRWindow *fWindow;
 };
 
 #endif
