@@ -35,6 +35,8 @@
 #include "ColorSet.h"
 #include "ServerConfig.h"
 
+
+
 //! Constructor which does nothing
 ColorSet::ColorSet(void)
 {
@@ -46,7 +48,6 @@ ColorSet::ColorSet(void)
 */
 ColorSet::ColorSet(const ColorSet &cs)
 {
-	name=cs.name;
 	SetColors(cs);
 }
 
@@ -57,7 +58,6 @@ ColorSet::ColorSet(const ColorSet &cs)
 */
 ColorSet & ColorSet::operator=(const ColorSet &cs)
 {
-	name=cs.name;
 	SetColors(cs);
 	return *this;
 }
@@ -106,40 +106,39 @@ void ColorSet::SetColors(const ColorSet &cs)
 //! Prints all color set elements to stdout
 void ColorSet::PrintToStream(void) const
 {
-	printf("Name: %s\n",name.String());
-	printf("panel_background "); panel_background.PrintToStream();
-	printf("panel_text "); panel_text.PrintToStream();
+	printf("panel_background "); PrintMember(panel_background);
+	printf("panel_text "); PrintMember(panel_text);
 
-	printf("document_background "); document_background.PrintToStream();
-	printf("document_text "); document_text.PrintToStream();
+	printf("document_background "); PrintMember(document_background);
+	printf("document_text "); PrintMember(document_text);
 
-	printf("control_background "); control_background.PrintToStream();
-	printf("control_text "); control_text.PrintToStream();
-	printf("control_highlight "); control_highlight.PrintToStream();
-	printf("control_border "); control_border.PrintToStream();
+	printf("control_background "); PrintMember(control_background);
+	printf("control_text "); PrintMember(control_text);
+	printf("control_highlight "); PrintMember(control_highlight);
+	printf("control_border "); PrintMember(control_border);
 
-	printf("tooltip_background "); tooltip_background.PrintToStream();
-	printf("tooltip_text "); tooltip_text.PrintToStream();
+	printf("tooltip_background "); PrintMember(tooltip_background);
+	printf("tooltip_text "); PrintMember(tooltip_text);
 
-	printf("menu_background "); menu_background.PrintToStream();
-	printf("menu_selected_background "); menu_selected_background.PrintToStream();
-	printf("menu_text "); menu_text.PrintToStream();
-	printf("menu_selected_text "); menu_selected_text.PrintToStream();
-	printf("menu_selected_border "); menu_selected_border.PrintToStream();
+	printf("menu_background "); PrintMember(menu_background);
+	printf("menu_selected_background "); PrintMember(menu_selected_background);
+	printf("menu_text "); PrintMember(menu_text);
+	printf("menu_selected_text "); PrintMember(menu_selected_text);
+	printf("menu_selected_border "); PrintMember(menu_selected_border);
 
-	printf("keyboard_navigation_base "); keyboard_navigation_base.PrintToStream();
-	printf("keyboard_navigation_pulse "); keyboard_navigation_pulse.PrintToStream();
+	printf("keyboard_navigation_base "); PrintMember(keyboard_navigation_base);
+	printf("keyboard_navigation_pulse "); PrintMember(keyboard_navigation_pulse);
 
-	printf("success "); success.PrintToStream();
-	printf("failure "); failure.PrintToStream();
-	printf("shine "); shine.PrintToStream();
-	printf("shadow "); shadow.PrintToStream();
+	printf("success "); PrintMember(success);
+	printf("failure "); PrintMember(failure);
+	printf("shine "); PrintMember(shine);
+	printf("shadow "); PrintMember(shadow);
 
-	printf("window_tab "); window_tab.PrintToStream();
-	printf("window_tab_text "); window_tab_text.PrintToStream();
+	printf("window_tab "); PrintMember(window_tab);
+	printf("window_tab_text "); PrintMember(window_tab_text);
 
-	printf("inactive_window_tab "); inactive_window_tab.PrintToStream();
-	printf("inactive_window_tab_text "); inactive_window_tab_text.PrintToStream();
+	printf("inactive_window_tab "); PrintMember(inactive_window_tab);
+	printf("inactive_window_tab_text "); PrintMember(inactive_window_tab_text);
 }
 
 /*!
@@ -151,33 +150,32 @@ void ColorSet::SetToDefaults(void)
 #ifdef DEBUG_COLORSET
 printf("Initializing color settings to defaults\n");
 #endif
-	panel_background.SetColor(216,216,216);
-	panel_text.SetColor(0,0,0);
-	document_background.SetColor(255,255,255);
-	document_text.SetColor(0,0,0);
-	control_background.SetColor(245,245,245);
-	control_text.SetColor(0,0,0);
-	control_border.SetColor(0,0,0);
-	control_highlight.SetColor(115,120,184);
-	keyboard_navigation_base.SetColor(0,0,229);
-	keyboard_navigation_pulse.SetColor(0,0,0);
-	shine.SetColor(255,255,255);
-	shadow.SetColor(0,0,0);
-	menu_background.SetColor(216,216,216);
-	menu_selected_background.SetColor(115,120,184);
-	menu_text.SetColor(0,0,0);
-	menu_selected_text.SetColor(255,255,255);
-	menu_selected_border.SetColor(0,0,0);
-	tooltip_background.SetColor(255,255,0);
-	tooltip_text.SetColor(0,0,0);
-	success.SetColor(0,255,0);
-	failure.SetColor(255,0,0);
-	window_tab.SetColor(255,203,0);
+	SetRGBColor(&panel_background,216,216,216);
+	SetRGBColor(&panel_text,0,0,0);
+	SetRGBColor(&document_background,255,255,255);
+	SetRGBColor(&document_text,0,0,0);
+	SetRGBColor(&control_background,245,245,245);
+	SetRGBColor(&control_text,0,0,0);
+	SetRGBColor(&control_border,0,0,0);
+	SetRGBColor(&control_highlight,115,120,184);
+	SetRGBColor(&keyboard_navigation_base,0,0,229);
+	SetRGBColor(&keyboard_navigation_pulse,0,0,0);
+	SetRGBColor(&shine,255,255,255);
+	SetRGBColor(&shadow,0,0,0);
+	SetRGBColor(&menu_background,216,216,216);
+	SetRGBColor(&menu_selected_background,115,120,184);
+	SetRGBColor(&menu_text,0,0,0);
+	SetRGBColor(&menu_selected_text,255,255,255);
+	SetRGBColor(&menu_selected_border,0,0,0);
+	SetRGBColor(&tooltip_background,255,255,0);
+	SetRGBColor(&tooltip_text,0,0,0);
+	SetRGBColor(&success,0,255,0);
+	SetRGBColor(&failure,255,0,0);
+	SetRGBColor(&window_tab,255,203,0);
 
-	// important, but not publically accessible GUI colors
-	window_tab_text.SetColor(0,0,0);
-	inactive_window_tab.SetColor(216,216,216);
-	inactive_window_tab_text.SetColor(80,80,80);
+	SetRGBColor(&window_tab_text,0,0,0);
+	SetRGBColor(&inactive_window_tab,216,216,216);
+	SetRGBColor(&inactive_window_tab_text,80,80,80);
 }
 
 /*!
@@ -191,59 +189,45 @@ bool ColorSet::ConvertToMessage(BMessage *msg) const
 
 	msg->MakeEmpty();
 	
-	rgb_color col;
-	
-	msg->AddString("Name",name);
-	col=panel_background.GetColor32();
-	msg->AddData("Panel Background",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=panel_text.GetColor32();
-	msg->AddData("Panel Text",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=document_background.GetColor32();
-	msg->AddData("Document Background",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=document_text.GetColor32();
-	msg->AddData("Document Text",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=control_background.GetColor32();
-	msg->AddData("Control Background",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=control_text.GetColor32();
-	msg->AddData("Control Text",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=control_highlight.GetColor32();
-	msg->AddData("Control Highlight",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=control_border.GetColor32();
-	msg->AddData("Control Border",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=tooltip_background.GetColor32();
-	msg->AddData("Tooltip Background",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=tooltip_text.GetColor32();
-	msg->AddData("Tooltip Text",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=menu_background.GetColor32();
-	msg->AddData("Menu Background",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=menu_selected_background.GetColor32();
-	msg->AddData("Selected Menu Item Background",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=keyboard_navigation_base.GetColor32();
-	msg->AddData("Keyboard Navigation Base",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=keyboard_navigation_pulse.GetColor32();
-	msg->AddData("Keyboard Navigation Pulse",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=menu_text.GetColor32();
-	msg->AddData("Menu Item Text",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=menu_selected_text.GetColor32();
-	msg->AddData("Selected Menu Item Text",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=menu_selected_border.GetColor32();
-	msg->AddData("Selected Menu Item Border",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=success.GetColor32();
-	msg->AddData("Success",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=failure.GetColor32();
-	msg->AddData("Failure",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=shine.GetColor32();
-	msg->AddData("Shine",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=shadow.GetColor32();
-	msg->AddData("Shadow",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=window_tab.GetColor32();
-	msg->AddData("Window Tab",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=window_tab_text.GetColor32();
-	msg->AddData("Window Tab Text",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=inactive_window_tab.GetColor32();
-	msg->AddData("Inactive Window Tab",(type_code)'RGBC',&col,sizeof(rgb_color));
-	col=inactive_window_tab_text.GetColor32();
-	msg->AddData("Inactive Window Tab Text",(type_code)'RGBC',&col,sizeof(rgb_color));
+	msg->AddData("Panel Background",(type_code)'RGBC',&panel_background,
+				sizeof(rgb_color) );
+	msg->AddData("Panel Text",(type_code)'RGBC',&panel_text,sizeof(rgb_color));
+	msg->AddData("Document Background",(type_code)'RGBC',&document_background,
+				sizeof(rgb_color));
+	msg->AddData("Document Text",(type_code)'RGBC',&document_text,sizeof(rgb_color));
+	msg->AddData("Control Background",(type_code)'RGBC',&control_background,
+				sizeof(rgb_color));
+	msg->AddData("Control Text",(type_code)'RGBC',&control_text,sizeof(rgb_color));
+	msg->AddData("Control Highlight",(type_code)'RGBC',&control_highlight,
+				sizeof(rgb_color));
+	msg->AddData("Control Border",(type_code)'RGBC',&control_border,sizeof(rgb_color));
+	msg->AddData("Tooltip Background",(type_code)'RGBC',&tooltip_background,
+				sizeof(rgb_color));
+	msg->AddData("Tooltip Text",(type_code)'RGBC',&tooltip_text,sizeof(rgb_color));
+	msg->AddData("Menu Background",(type_code)'RGBC',&menu_background,
+				sizeof(rgb_color));
+	msg->AddData("Selected Menu Item Background",(type_code)'RGBC',&menu_selected_background,
+				sizeof(rgb_color));
+	msg->AddData("Keyboard Navigation Base",(type_code)'RGBC',&keyboard_navigation_base,
+				sizeof(rgb_color));
+	msg->AddData("Keyboard Navigation Pulse",(type_code)'RGBC',
+				&keyboard_navigation_pulse,sizeof(rgb_color));
+	msg->AddData("Menu Item Text",(type_code)'RGBC',&menu_text,sizeof(rgb_color));
+	msg->AddData("Selected Menu Item Text",(type_code)'RGBC',&menu_selected_text,
+				sizeof(rgb_color));
+	msg->AddData("Selected Menu Item Border",(type_code)'RGBC',&menu_selected_border,
+				sizeof(rgb_color));
+	msg->AddData("Success",(type_code)'RGBC',&success,sizeof(rgb_color));
+	msg->AddData("Failure",(type_code)'RGBC',&failure,sizeof(rgb_color));
+	msg->AddData("Shine",(type_code)'RGBC',&shine,sizeof(rgb_color));
+	msg->AddData("Shadow",(type_code)'RGBC',&shadow,sizeof(rgb_color));
+	msg->AddData("Window Tab",(type_code)'RGBC',&window_tab,sizeof(rgb_color));
+	msg->AddData("Window Tab Text",(type_code)'RGBC',&window_tab_text,
+				sizeof(rgb_color));
+	msg->AddData("Inactive Window Tab",(type_code)'RGBC',&inactive_window_tab,
+				sizeof(rgb_color));
+	msg->AddData("Inactive Window Tab Text",(type_code)'RGBC',
+				&inactive_window_tab_text,sizeof(rgb_color));
 	return true;
 }
 
@@ -261,8 +245,6 @@ bool ColorSet::ConvertFromMessage(const BMessage *msg)
 	ssize_t size;
 	BString str;
 
-	if(msg->FindString("Name",&str)==B_OK)
-		name=str;
 	if(msg->FindData("Panel Background",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
 		panel_background=*col;
 	if(msg->FindData("Panel Text",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
@@ -327,7 +309,7 @@ status_t ColorSet::SetColor(const char *string, rgb_color value)
 	if(!string)
 		return B_BAD_VALUE;
 	
-	RGBColor *col=StringToMember(string);
+	rgb_color *col=StringToMember(string);
 	if(!col)
 		return B_NAME_NOT_FOUND;
 	*col=value;
@@ -339,11 +321,14 @@ status_t ColorSet::SetColor(const char *string, rgb_color value)
 	\param string name of the color to obtain
 	\return The set's color or (0,0,0,0) if not found
 */
-RGBColor ColorSet::StringToColor(const char *string)
+rgb_color ColorSet::StringToColor(const char *string)
 {
-	RGBColor *col=StringToMember(string);
+	rgb_color *col=StringToMember(string);
 	if(!col)
-		return RGBColor(0,0,0,0);
+	{
+		rgb_color c;
+		return c;
+	}
 		
 	return *col;
 }
@@ -353,7 +338,7 @@ RGBColor ColorSet::StringToColor(const char *string)
 	\param string name of the color member to obtain
 	\return An RGBColor pointer or NULL if not found
 */
-RGBColor *ColorSet::StringToMember(const char *string)
+rgb_color *ColorSet::StringToMember(const char *string)
 {
 	if(!string)
 		return NULL;
@@ -413,7 +398,7 @@ RGBColor *ColorSet::StringToMember(const char *string)
 	
 }
 
-RGBColor ColorSet::AttributeToColor(int32 which)
+rgb_color ColorSet::AttributeToColor(int32 which)
 {
 	switch(which)
 	{
@@ -549,63 +534,61 @@ RGBColor ColorSet::AttributeToColor(int32 which)
 		
 		default:
 		{
-			return RGBColor(0,0,0,0);
+			rgb_color c;
+			return c;
 			break;
 		}
 	}
 }
 
+void ColorSet::PrintMember(const rgb_color &color) const
+{
+	printf("rgb_color(%d, %d, %d, %d)", color.red,color.green,color.blue,color.alpha);
+}
+
 /*!
 	\brief Loads the saved system colors into a ColorSet
 	\param set the set to receive the system colors
-	\return true if successful, false if not
-	
-	Note that this function automatically looks for the file named in 
-	COLOR_SETTINGS_NAME in the folder SERVER_SETTINGS_DIR as defined in
-	ServerConfig.h
+	\return B_OK if successful. See BFile for other error codes
 */
-bool LoadGUIColors(ColorSet *set)
+status_t LoadColorSet(const char *path, ColorSet *set)
 {
-	BString path(SERVER_SETTINGS_DIR);
-	path+=COLOR_SETTINGS_NAME;
-	
-	BFile file(path.String(),B_READ_ONLY);
+	BFile file(path,B_READ_ONLY);
 	if(file.InitCheck()!=B_OK)
-		return false;
+		return file.InitCheck();
 	
 	BMessage msg;
-	if(msg.Unflatten(&file)!=B_OK)
-		return false;
+	
+	status_t st=msg.Unflatten(&file);
+	if(st!=B_OK)
+		return st;
 
 	set->ConvertFromMessage(&msg);
 	
-	return true;
+	return B_OK;
 }
 
 /*!
 	\brief Saves the saved system colors into a flattened BMessage
 	\param set ColorSet containing the colors to save
-	
-	Note that this function automatically looks for the file named in 
-	COLOR_SETTINGS_NAME in the folder SERVER_SETTINGS_DIR as defined in
-	ServerConfig.h. If SERVER_SETTINGS_DIR does not exist, it is created, and the same for 
-	the color settings file.
+	\return B_OK if successful. See BFile for other error codes
 */
-void SaveGUIColors(const ColorSet &set)
+status_t SaveColorSet(const char *path, const ColorSet &set)
 {
-	BEntry *entry=new BEntry(SERVER_SETTINGS_DIR);
-	if(!entry->Exists())
+	// TODO: Move this check to the app_server
+	BEntry entry(SERVER_SETTINGS_DIR);
+	if(!entry.Exists())
 		create_directory(SERVER_SETTINGS_DIR,0777);
-	delete entry;
 	
-	BString path(SERVER_SETTINGS_DIR);
-	path+=COLOR_SETTINGS_NAME;
-	BFile file(path.String(), B_READ_WRITE | B_ERASE_FILE | B_CREATE_FILE);
+	BFile file(path, B_READ_WRITE | B_ERASE_FILE | B_CREATE_FILE);
+	if(file.InitCheck()!=B_OK)
+		return file.InitCheck();
 
 	BMessage msg;
 	
 	set.ConvertToMessage(&msg);
 
 	msg.Flatten(&file);	
+	return B_OK;
 }
 

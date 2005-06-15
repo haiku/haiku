@@ -679,13 +679,13 @@ DefaultDecorator::_SetFocus()
 	// other things when a window is deactivated or activated.
 	
 	if (GetFocus()) {
-		fButtonHighColor.SetColor(tint_color(_colors->window_tab.GetColor32(),B_LIGHTEN_2_TINT));
-		fButtonLowColor.SetColor(tint_color(_colors->window_tab.GetColor32(),B_DARKEN_1_TINT));
+		fButtonHighColor.SetColor(tint_color(_colors->window_tab,B_LIGHTEN_2_TINT));
+		fButtonLowColor.SetColor(tint_color(_colors->window_tab,B_DARKEN_1_TINT));
 		fTextColor = _colors->window_tab_text;
 		fTabColor = _colors->window_tab;
 	} else {
-		fButtonHighColor.SetColor(tint_color(_colors->inactive_window_tab.GetColor32(),B_LIGHTEN_2_TINT));
-		fButtonLowColor.SetColor(tint_color(_colors->inactive_window_tab.GetColor32(),B_DARKEN_1_TINT));
+		fButtonHighColor.SetColor(tint_color(_colors->inactive_window_tab,B_LIGHTEN_2_TINT));
+		fButtonLowColor.SetColor(tint_color(_colors->inactive_window_tab,B_DARKEN_1_TINT));
 		fTextColor = _colors->inactive_window_tab_text;
 		fTabColor = _colors->inactive_window_tab;
 	}

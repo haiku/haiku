@@ -174,7 +174,7 @@ AppServer::AppServer(void) :
 
 	// Load the GUI colors here and set the global set to the values contained therein. If this
 	// is not possible, set colors to the defaults
-	if (!LoadGUIColors(&gui_colorset))
+	if (LoadColorSet(SERVER_SETTINGS_DIR COLOR_SETTINGS_NAME,&gui_colorset)!=B_OK)
 		gui_colorset.SetToDefaults();
 
 	InitDecorators();

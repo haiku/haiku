@@ -359,14 +359,14 @@ void BeDecorator::_SetFocus(void)
 	
 	if(GetFocus())
 	{
-		button_highcol.SetColor(tint_color(_colors->window_tab.GetColor32(),B_LIGHTEN_2_TINT));
-		button_lowcol.SetColor(tint_color(_colors->window_tab.GetColor32(),B_DARKEN_1_TINT));
+		button_highcol.SetColor(tint_color(_colors->window_tab,B_LIGHTEN_2_TINT));
+		button_lowcol.SetColor(tint_color(_colors->window_tab,B_DARKEN_1_TINT));
 		textcol=_colors->window_tab_text;
 	}
 	else
 	{
-		button_highcol.SetColor(tint_color(_colors->inactive_window_tab.GetColor32(),B_LIGHTEN_2_TINT));
-		button_lowcol.SetColor(tint_color(_colors->inactive_window_tab.GetColor32(),B_DARKEN_1_TINT));
+		button_highcol.SetColor(tint_color(_colors->inactive_window_tab,B_LIGHTEN_2_TINT));
+		button_lowcol.SetColor(tint_color(_colors->inactive_window_tab,B_DARKEN_1_TINT));
 		textcol=_colors->inactive_window_tab_text;
 	}
 }
