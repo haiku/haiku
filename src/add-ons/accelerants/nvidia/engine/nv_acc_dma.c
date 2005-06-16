@@ -1500,13 +1500,6 @@ static void nv_acc_set_ch_dma(uint16 ch, uint32 handle)
 	si->engine.dma.free -= 2;
 }
 
-/* fixme? (check this out..)
- * Looks like this stuff can be very much simplified and speed-up, as it seems it's not
- * nessesary to wait for the engine to become idle before re-assigning channels.
- * Because the cmd handles are actually programmed _inside_ the fifo channels, it might
- * well be that the assignment is buffered along with the commands that still have to 
- * be executed!
- * (sounds very plausible to me :) */
 void nv_acc_assert_fifo_dma(void)
 {
 	/* does every engine cmd this accelerant needs have a FIFO channel? */
@@ -1519,9 +1512,6 @@ void nv_acc_assert_fifo_dma(void)
 		!si->engine.fifo.ch_ptr[NV4_GDI_RECTANGLE_TEXT])
 	{
 		uint16 cnt;
-
-		/* no, wait until the engine is idle before re-assigning the FIFO */
-		nv_acc_wait_idle_dma();
 
 		/* free the FIFO channels we want from the currently assigned cmd's */
 		si->engine.fifo.ch_ptr[si->engine.fifo.handle[0]] = 0;
@@ -1568,6 +1558,9 @@ void nv_acc_assert_fifo_dma(void)
 		/* tell the engine to fetch and execute all (new) commands in the DMA buffer */
 		nv_start_dma();
 	}
+
+	/* the 3D add-on needs to reload the rendering state: issuing 2D cmds kills it! */
+	si->engine.reload_state_3D = true;
 }
 
 /*

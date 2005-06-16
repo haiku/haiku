@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-5/2005.
+	Rudolf Cornelissen 10/2002-6/2005.
 */
 
 #define MODULE_BIT 0x00800000
@@ -161,6 +161,8 @@ status_t INIT_ACCELERANT(int the_fd) {
 
 	/* count of issued parameters or commands */
 	si->engine.last_idle = si->engine.count = 0;
+	/* tell a 3D add-on that it should reload it's state */
+	si->engine.reload_state_3D = true;
 	INIT_BEN(si->engine.lock);
 
 	INIT_BEN(si->overlay.lock);
@@ -170,6 +172,7 @@ status_t INIT_ACCELERANT(int the_fd) {
 		si->overlay.myBuffer[cnt].buffer = NULL;
 		si->overlay.myBuffer[cnt].buffer_dma = NULL;
 	}
+
 	/* make sure overlay unit is 'marked' as being free */
 	si->overlay.myToken = NULL;	
 
