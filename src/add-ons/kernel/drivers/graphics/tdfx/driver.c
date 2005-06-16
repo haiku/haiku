@@ -28,6 +28,11 @@
 #include <video_overlay.h>
 #include <DriverInterface.h>
 
+#ifndef __HAIKU__
+#	undef B_USER_CLONEABLE_AREA
+#	define B_USER_CLONEABLE_AREA 0
+#endif
+
 #define DEBUG 1
 #if DEBUG > 0
 #define ddprintf(a)    dprintf a
@@ -349,7 +354,7 @@ static status_t map_device(device_info *di)
         (void*)iobase,
         iobase_size,
         B_ANY_KERNEL_ADDRESS,
-        B_READ_AREA | B_WRITE_AREA,
+        B_USER_CLONEABLE_AREA | B_READ_AREA | B_WRITE_AREA,
         (void **)&(si->io));
     // return the error if there was some problem 
 
@@ -375,7 +380,7 @@ static status_t map_device(device_info *di)
         (void*)iobase,
         iobase_size,
         B_ANY_KERNEL_ADDRESS,
-        B_READ_AREA | B_WRITE_AREA,
+        B_USER_CLONEABLE_AREA | B_READ_AREA | B_WRITE_AREA,
         (void **)&si->io);
     // return the error if there was some problem 
 
@@ -409,7 +414,7 @@ static status_t map_device(device_info *di)
 #else
         B_ANY_KERNEL_BLOCK_ADDRESS,
 #endif
-        B_READ_AREA + B_WRITE_AREA,
+        B_USER_CLONEABLE_AREA | B_READ_AREA | B_WRITE_AREA,
         &(si->framebuffer));
 
 #if defined(__INTEL__)
@@ -429,7 +434,7 @@ static status_t map_device(device_info *di)
 #else
             B_ANY_KERNEL_ADDRESS,
 #endif
-            B_READ_AREA + B_WRITE_AREA,
+            B_USER_CLONEABLE_AREA | B_READ_AREA | B_WRITE_AREA,
             &(si->framebuffer));
     }
 #endif
