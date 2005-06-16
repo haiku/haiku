@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002 OpenBeOS
+//	Copyright (c) 2001-2005 Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -128,16 +128,16 @@ BScrollBar::Private::ButtonRepeaterThread(void *data)
 	BScrollBar *scrollBar = static_cast<BScrollBar *>(data);
 	BRect oldframe(scrollBar->fPrivateData->fThumbFrame);
 //	BRect update(sb->fPrivateData->fThumbFrame);
-	
+
 	snooze(250000);
-	
+
 	bool exitval = false;
 	status_t returnval;
-	
+
 	scrollBar->Window()->Lock();
 	exitval = scrollBar->fPrivateData->fExitRepeater;
 	scrollBar->Window()->Unlock();
-	
+
 	float scrollvalue = 0;
 
 	if (scrollBar->fPrivateData->fArrowDown == ARROW_LEFT
@@ -150,19 +150,21 @@ BScrollBar::Private::ButtonRepeaterThread(void *data)
 	
 	while (!exitval) {
 		oldframe = scrollBar->fPrivateData->fThumbFrame;
-		
+
+		scrollBar->Window()->Lock();
 		returnval = scroll_by_value(scrollvalue, scrollBar);
+		scrollBar->Window()->Unlock();
 
 		snooze(50000);
-		
+
 		scrollBar->Window()->Lock();
-		exitval=scrollBar->fPrivateData->fExitRepeater;
+		exitval = scrollBar->fPrivateData->fExitRepeater;
 
 		if (returnval == B_OK) {
-			scrollBar->CopyBits(oldframe,scrollBar->fPrivateData->fThumbFrame);
+			scrollBar->CopyBits(oldframe, scrollBar->fPrivateData->fThumbFrame);
 
 			// TODO: Redraw the old area here
-			
+
 			scrollBar->ValueChanged(scrollBar->fValue);
 		}
 		scrollBar->Window()->Unlock();
@@ -804,7 +806,9 @@ BScrollBar::Draw(BRect updateRect)
 	
 	SetHighColor(dark);
 	StrokeRect(Bounds());
-	
+
+	SetDrawingMode(B_OP_OVER);
+
 	// Draw arrows
 	BPoint buttonpt(0,0);
 	if (fOrientation == B_HORIZONTAL) {
@@ -844,7 +848,9 @@ BScrollBar::Draw(BRect updateRect)
 		fPrivateData->DrawScrollBarButton(this, ARROW_DOWN, buttonpt,
 			fPrivateData->fButtonDown == ARROW4);
 	}
-	
+
+	SetDrawingMode(B_OP_COPY);
+
 	// Draw scroll thumb
 	
 	if (fPrivateData->fEnabled) {
@@ -1053,7 +1059,7 @@ control_scrollbar(scroll_bar_info *info, BScrollBar *bar)
 	if (bar->fPrivateData->fScrollBarInfo.double_arrows != info->double_arrows) {
 		bar->fPrivateData->fScrollBarInfo.double_arrows = info->double_arrows;
 		
-		int8 multiplier=(info->double_arrows) ? 1 : -1;
+		int8 multiplier = (info->double_arrows) ? 1 : -1;
 		
 		if (bar->fOrientation == B_VERTICAL)
 			bar->fPrivateData->fThumbFrame.OffsetBy(0, multiplier * B_H_SCROLL_BAR_HEIGHT);
