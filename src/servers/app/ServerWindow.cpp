@@ -480,7 +480,13 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				parent->AddChild(newLayer, this);
 
 			if (!newLayer->IsHidden()) {
-				myRootLayer->GoInvalidate(newLayer, newLayer->fFull);
+				myRootLayer->GoInvalidate(newLayer,
+#ifndef NEW_CLIPPING
+				newLayer->fFull
+#else
+				newLayer->Frame()
+#endif
+				);
 			}
 			break;
 		}
@@ -903,7 +909,13 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			fCurrentLayer->RebuildFullRegion();
 #endif
 			if (!(fCurrentLayer->IsHidden()))
-				myRootLayer->GoInvalidate(fCurrentLayer, fCurrentLayer->fFull);
+				myRootLayer->GoInvalidate(fCurrentLayer,
+#ifndef NEW_CLIPPING
+				fCurrentLayer->fFull
+#else
+				fCurrentLayer->Frame()
+#endif
+				);
 				
 			break;
 		}
@@ -972,7 +984,13 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			fCurrentLayer->RebuildFullRegion();
 #endif
 			if (!(fCurrentLayer->IsHidden()))
-				myRootLayer->GoInvalidate(fCurrentLayer, fCurrentLayer->fFull);
+				myRootLayer->GoInvalidate(fCurrentLayer,
+#ifndef NEW_CLIPPING
+				fCurrentLayer->fFull
+#else
+				fCurrentLayer->Frame()
+#endif
+				);
 
 			break;
 		}

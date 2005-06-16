@@ -218,7 +218,9 @@ fUpdateReg.OffsetBy(x, y);
 // has not been added to fParent apperantly. So now
 // you ask why fParent is even valid? Me too.
 		fFrame.OffsetBy(x, y);
+#ifndef NEW_CLIPPING
 		fFull.OffsetBy(x, y);
+#endif
 		fTopLayer->move_layer(x, y);
 		// ...and here we get really hacky...
 		fTopLayer->fFrame.OffsetTo(0.0, 0.0);

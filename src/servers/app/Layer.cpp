@@ -85,7 +85,9 @@ Layer::Layer(BRect frame, const char* name, int32 token,
 	// all regions (fVisible, fFullVisible, fFull) start empty
 	fVisible(),
 	fFullVisible(),
+#ifndef NEW_CLIPPING
 	fFull(),
+#endif
 
 	fClipReg(&fVisible),
  
@@ -103,7 +105,9 @@ Layer::Layer(BRect frame, const char* name, int32 token,
 	fAdFlags(0),
 	fClassID(AS_LAYER_CLASS),
 
+#ifndef NEW_CLIPPING
 	fFrameAction(B_LAYER_ACTION_NONE),
+#endif
 
 	fDriver(driver),
 	fLayerData(new LayerData()),
@@ -290,7 +294,9 @@ Layer::RemoveChild(Layer *layer)
 			// 2.2) this Layer must know if it has a ServerWindow object attached.
 			c->fServerWin = NULL;
 			// 2.3) we were removed from the main tree so clear our full region.
+#ifndef NEW_CLIPPING
 			c->fFull.MakeEmpty();
+#endif
 			// 2.4) clear fullVisible region.
 			c->fFullVisible.MakeEmpty();
 			// 2.5) we don't have a visible region anymore.
@@ -907,8 +913,10 @@ RebuildFullRegion();
 #endif
 SendViewCoordUpdateMsg();
 
+#ifndef NEW_CLIPPING
 	if (invalidate)
 		GetRootLayer()->GoInvalidate(this, fFull);
+#endif
 }
 
 /*!
@@ -1318,8 +1326,6 @@ Layer::UpdateEnd()
 void
 Layer::move_layer(float x, float y)
 {
-	fFrameAction = B_LAYER_ACTION_MOVE;
-
 /*	if (fClassID == AS_WINBORDER_CLASS) {
 		WinBorder	*wb = (WinBorder*)this;
 		wb->zUpdateReg.OffsetBy(x, y);
@@ -1328,13 +1334,17 @@ Layer::move_layer(float x, float y)
 	}*/
 	
 #ifndef NEW_CLIPPING
+	fFrameAction = B_LAYER_ACTION_MOVE;
+
 	BPoint pt(x, y);	
 	BRect rect(fFull.Frame().OffsetByCopy(pt));
 #endif
 
 if (!fParent) {
 printf("no parent in Layer::move_layer() (%s)\n", GetName());
+#ifndef NEW_CLIPPING
 fFrameAction = B_LAYER_ACTION_NONE;
+#endif
 return;
 }
 #ifndef NEW_CLIPPING
@@ -1352,26 +1362,34 @@ return;
 	
 	EmptyGlobals();
 
+#ifndef NEW_CLIPPING
 	fFrameAction = B_LAYER_ACTION_NONE;
+#endif
 }
 
 // resize_layer
 void
 Layer::resize_layer(float x, float y)
 {
+#ifndef NEW_CLIPPING
 	fFrameAction = B_LAYER_ACTION_RESIZE;
 
-#ifndef NEW_CLIPPING
 	BPoint pt(x,y);	
 #endif
 
+#ifndef NEW_CLIPPING
 	BRect rect(fFull.Frame());
+#else
+	BRect rect(Frame());
+#endif
 	rect.right += x;
 	rect.bottom += y;
 
 if (!fParent) {
 printf("no parent in Layer::resize_layer() (%s)\n", GetName());
+#ifndef NEW_CLIPPING
 fFrameAction = B_LAYER_ACTION_NONE;
+#endif
 return;
 }
 #ifndef NEW_CLIPPING
@@ -1385,7 +1403,9 @@ return;
 	
 	EmptyGlobals();
 
+#ifndef NEW_CLIPPING
 	fFrameAction = B_LAYER_ACTION_NONE;
+#endif
 }
 
 // FullInvalidate
@@ -1449,7 +1469,11 @@ Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 		// a single message to the client.
 		BRegion	updateReg(fFullVisible);
 		if (fFlags & B_FULL_UPDATE_ON_RESIZE
-			&& fFrameAction	== B_LAYER_ACTION_RESIZE) {
+#ifndef NEW_CLIPPING
+			&& fFrameAction	== B_LAYER_ACTION_RESIZE
+#endif
+		)
+		{
 			// do nothing
 		} else {
 			updateReg.IntersectWith(&reg);
@@ -1472,7 +1496,11 @@ if (fOwner->cnt != 1)
 		BRegion	updateReg(fVisible);
 		// calculate the update region
 		if (fFlags & B_FULL_UPDATE_ON_RESIZE
-			&& fFrameAction	== B_LAYER_ACTION_RESIZE) {
+#ifndef NEW_CLIPPING
+			&& fFrameAction	== B_LAYER_ACTION_RESIZE
+#endif
+		)
+		{
 			// do nothing
 		} else {
 			updateReg.IntersectWith(&reg);

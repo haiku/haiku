@@ -2102,7 +2102,13 @@ RootLayer::show_final_scene(WinBorder *exFocus, WinBorder *exActive)
 		fHaveWinBorderList = false;
 		// TODO: should it be improved by calling with region of hidden windows
 		//       plus the full regions of new windows???
-		invalidate_layer(this, fFull);
+		invalidate_layer(this,
+#ifndef NEW_CLIPPING
+		fFull
+#else
+		Frame()
+#endif
+		);
 	}
 
 	draw_window_tab(exFocus);

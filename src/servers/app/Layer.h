@@ -271,8 +271,9 @@ class Layer {
 	
 			BRegion				fVisible;
 			BRegion				fFullVisible;
+#ifndef NEW_CLIPPING
 			BRegion				fFull;
-
+#endif
 			BRegion*			fClipReg;
 	
 			ServerWindow*		fServerWin;
@@ -286,7 +287,9 @@ class Layer {
 			bool				fIsTopLayer;
 			uint16				fAdFlags;
 			int8				fClassID;
+#ifndef NEW_CLIPPING
 			int8				fFrameAction;
+#endif
 	
 			DisplayDriver*		fDriver;
 			LayerData*			fLayerData;
@@ -301,8 +304,6 @@ class Layer {
 			void				SendUpdateMsg(BRegion& reg);
 			void				AddToViewsWithInvalidCoords() const;
 			void				SendViewCoordUpdateMsg() const;
-//			void				SendViewMovedMsg();
-//			void				SendViewResizedMsg();
 
 			RGBColor			fViewColor;
 
