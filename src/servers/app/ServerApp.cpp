@@ -274,7 +274,7 @@ ServerApp::MonitorApp(void *data)
 	status_t err = B_OK;
 
 	while (!app->fQuitting) {
-//		STRACE(("info: ServerApp::MonitorApp listening on port %ld.\n", app->fMessagePort));
+		STRACE(("info: ServerApp::MonitorApp listening on port %ld.\n", app->fMessagePort));
 		err = reader.GetNextMessage(code, B_INFINITE_TIMEOUT);
 		if (err < B_OK) {
 			STRACE(("ServerApp::MonitorApp(): GetNextMessage returned %s\n", strerror(err)));
@@ -1575,7 +1575,6 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_GET_ESCAPEMENTS_AS_FLOATS:
 		{
 			FTRACE(("ServerApp %s: AS_GET_ESCAPEMENTS_AS_FLOATS\n", fSignature.String()));
-//printf("ServerApp %s: AS_GET_ESCAPEMENTS_AS_FLOATS\n", fSignature.String());
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1609,15 +1608,12 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			
 			int32 numChars;
 			link.Read<int32>(&numChars);
-//printf("  numChars: %ld\n", numChars);
 
 			uint32 numBytes;
 			link.Read<uint32>(&numBytes);
-//printf("  numBytes: %ld\n", numBytes);
 
 			char* charArray = new char[numBytes];
 			link.Read(charArray, numBytes);
-//printf("  charArray[numBytes - 1]: '%c'\n", charArray[numBytes - 1]);
 
 			float* escapements = new float[numChars];
 			// figure out escapements
@@ -1629,8 +1625,6 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				font.SetRotation(rotation);
 				font.SetFlags(flags);
 
-//if (true) {
-//memset(escapements, 0, numChars * sizeof(float));
 				if (font.GetEscapements(charArray, numChars, escapements, delta)) {
 					fLink.StartMessage(SERVER_TRUE);
 					fLink.Attach(escapements, numChars * sizeof(float));
@@ -1647,83 +1641,9 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			fLink.Flush();
 			break;
 		}
-/*		case AS_GET_TRUNCATED_STRINGS:
-		{
-			// Attached data
-
-			// 1) uint16	family id
-			// 2) uint16	style id
-			// 3) float		size
-			// 4) uint8		spacing
-
-			// 5) uint32	mode	- B_TRUNCATE_END...
-			// 6) float		width	- desired width
-			// 7) int32		count	- count of attached strings
-			// 8) strings
-
-			// Returns:
-			// 1) strings - as many strings as requested, all of "width" maximum width
-
-			// font attribs
-			uint16 family;
-			uint16 style;
-			float size;
-			uint8 spacing;
-
-			link.Read<uint16>(&family);
-			link.Read<uint16>(&style);
-			link.Read<float>(&size);
-			link.Read<uint8>(&spacing);
-
-			// params
-			uint32 mode;
-			float width;
-			int32 count;
-
-			link.Read<uint32>(&mode);
-			link.Read<float>(&width);
-			link.Read<int32>(&count);
-
-			char** strings = NULL;
-
-			bool success = false;
-			if (count > 0) {
-				strings = new char*[count];
-				for (int32 i = 0; i < count; i++) {
-					link.ReadString(&strings[i]);
-				}
-				// TODO: truncate strings here
-				ServerFont font;
-				if (font.SetFamilyAndStyle(family, style) >= B_OK) {
-					font.SetSize(size);
-// TODO: implement:	font.SetSpacing(spacing);
-					success = font.GetTruncatedStrings(strings, count, width, mode);
-				}
-			}
-
-			if (success) {
-				fLink.StartMessage(SERVER_TRUE);
-				for (int32 i = 0; i < count; i++) {
-					fLink.AttachString(strings[i]);
-				}
-			} else
-				fLink.StartMessage(SERVER_FALSE);
-
-			fLink.Flush();
-
-			// free used resources
-			if (count > 0) {
-				for (int32 i = 0; i < count; i++)
-					free(strings[i]);
-			}
-			delete[] strings;
-
-			break;
-		}*/
 		case AS_SCREEN_GET_MODE:
 		{
 			STRACE(("ServerApp %s: AS_SCREEN_GET_MODE\n", fSignature.String()));
-//printf("ServerApp %s: AS_SCREEN_GET_MODE\n", fSignature.String());
 			// Attached data
 			// 1) int32 port to reply to
 			// 2) screen_id

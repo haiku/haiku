@@ -106,11 +106,7 @@ Desktop::AddDriver(DisplayDriver *driver)
 			// The driver is now owned by the screen
 
 		// TODO: be careful of screen initialization - monitor may not support 640x480
-#if __HAIKU__
-		screen->SetMode(1400, 1050, B_RGB32, 60.f);
-#else
 		screen->SetMode(800, 600, B_RGB32, 60.f);
-#endif
 
 		fScreenList.AddItem(screen);
 	} else {
