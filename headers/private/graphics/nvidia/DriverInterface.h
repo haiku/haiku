@@ -204,7 +204,12 @@ typedef struct {
 			uint32 max;			/* command buffer's useable size in 32-bit words */
 		} dma;
 		bool agp_mode;			/* card is running in AGP mode */
-		bool reload_state_3D;	/* instruct 3D clone to reload it's rendering state */
+		struct {
+			/* number of active 3D accelerant 'clones' */
+			uint8 clones;
+			/* instruct 3D accelerants to reload their render states (a bit per clone) */
+			uint32 reload_state_3D;
+		} threeD;
 	} engine;
 
 	/* fixme:
