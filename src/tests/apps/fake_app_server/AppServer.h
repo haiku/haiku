@@ -1,5 +1,11 @@
-#ifndef	_OPENBEOS_APP_SERVER_H_
-#define	_OPENBEOS_APP_SERVER_H_
+/*
+ * Copyright (c) 2001-2005, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Author: DarkWyrm <bpmagic@columbus.rr.com>
+ */
+#ifndef	_HAIKU_APP_SERVER_H_
+#define	_HAIKU_APP_SERVER_H_
 
 #include <OS.h>
 #include <Locker.h>
@@ -21,6 +27,15 @@ namespace BPrivate {
 	class PortLink;
 };
 
+/*!
+	\class AppServer AppServer.h
+	\brief main manager object for the app_server
+	
+	File for the main app_server thread. This particular thread monitors for
+	application start and quit messages. It also starts the housekeeping threads
+	and initializes most of the server's globals.
+*/
+
 class AppServer {
 public:
 	AppServer(void);
@@ -31,18 +46,58 @@ public:
 	thread_id Run(void);
 	void MainLoop(void);
 	
+	bool LoadDecorator(const char *path);
+	void InitDecorators(void);
+	
 	void DispatchMessage(int32 code, BPrivate::PortLink &link);
+	void Broadcast(int32 code);
+
+	ServerApp* FindApp(const char *sig);
 
 private:
+	void LaunchCursorThread();
+	void LaunchInputServer();
+
+	friend	Decorator*	new_decorator(BRect rect, const char *title,
+				int32 wlook, int32 wfeel, int32 wflags, DisplayDriver *ddriver);
+
+	// global function pointer
+	create_decorator	*make_decorator;
+	
 	port_id	fMessagePort;
-	bool fQuittingServer;
+	port_id	fServerInputPort;
+	
+	image_id fDecoratorID;
+	
+	BString fDecoratorName;
+	
+	volatile bool fQuittingServer;
 	
 	BList *fAppList;
 	thread_id fPicassoThreadID;
+
+	thread_id fISThreadID;
+	thread_id fCursorThreadID;
+	sem_id fCursorSem;
+	area_id	fCursorArea;
+	uint32 *fCursorAddr;
+
+	port_id fISASPort;
+	port_id fISPort;
 	
-	sem_id 	fActiveAppLock, fAppListLock;
+	sem_id 	fActiveAppLock,
+			fAppListLock,
+			fDecoratorLock;
+	
+	DisplayDriver *fDriver;
 };
 
-extern AppServer *app_server;
+Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,
+	int32 wflags, DisplayDriver *ddriver);
 
-#endif
+extern BitmapManager *bitmapmanager;
+extern ColorSet gui_colorset;
+extern AppServer *app_server;
+extern port_id gAppServerPort;
+
+#endif	/* _HAIKU_APP_SERVER_H_ */
