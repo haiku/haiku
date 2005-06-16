@@ -115,9 +115,12 @@ class Decorator {
 
 	virtual	void				MoveBy(float x, float y);
 	virtual	void				MoveBy(BPoint pt);
-	virtual	BRect				SlideTab(float dx, float dy = 0);
 	virtual	void				ResizeBy(float x, float y);
 	virtual	void				ResizeBy(BPoint pt);
+
+	virtual	void				SetTabLocation(float location) {}
+	virtual	float				TabLocation() const
+									{ return 0.0; }
 
 	virtual	void				Draw(BRect r);
 	virtual	void				Draw();
