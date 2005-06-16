@@ -161,8 +161,10 @@ status_t INIT_ACCELERANT(int the_fd) {
 
 	/* count of issued parameters or commands */
 	si->engine.last_idle = si->engine.count = 0;
-	/* tell a 3D add-on that it should reload it's state */
-	si->engine.reload_state_3D = true;
+	/* no 3D clones are currently loaded */
+	si->engine.threeD.clones = 0;
+	/* tell all 3D add-ons that they should reload their rendering states */
+	si->engine.threeD.reload_state_3D = 0xffffffff;
 	INIT_BEN(si->engine.lock);
 
 	INIT_BEN(si->overlay.lock);

@@ -1558,9 +1558,6 @@ void nv_acc_assert_fifo_dma(void)
 		/* tell the engine to fetch and execute all (new) commands in the DMA buffer */
 		nv_start_dma();
 	}
-
-	/* the 3D add-on needs to reload the rendering state: issuing 2D cmds kills it! */
-	si->engine.reload_state_3D = true;
 }
 
 /*
@@ -1625,6 +1622,9 @@ void SCREEN_TO_SCREEN_BLIT_DMA(engine_token *et, blit_params *list, uint32 count
 		 * executed before. */
 		nv_start_dma();
 	}
+
+	/* tell all 3D add-ons that they should reload their rendering states */
+	si->engine.threeD.reload_state_3D = 0xffffffff;
 }
 
 /* rectangle fill - i.e. workspace and window background color */
@@ -1674,6 +1674,9 @@ void FILL_RECTANGLE_DMA(engine_token *et, uint32 colorIndex, fill_rect_params *l
 		 * executed before. */
 		nv_start_dma();
 	}
+
+	/* tell all 3D add-ons that they should reload their rendering states */
+	si->engine.threeD.reload_state_3D = 0xffffffff;
 }
 
 /* span fill - i.e. (selected) menuitem background color (Dano) */
@@ -1722,6 +1725,9 @@ void FILL_SPAN_DMA(engine_token *et, uint32 colorIndex, uint16 *list, uint32 cou
 		 * executed before. */
 		nv_start_dma();
 	}
+
+	/* tell all 3D add-ons that they should reload their rendering states */
+	si->engine.threeD.reload_state_3D = 0xffffffff;
 }
 
 /* rectangle invert - i.e. text cursor and text selection */
@@ -1771,4 +1777,7 @@ void INVERT_RECTANGLE_DMA(engine_token *et, fill_rect_params *list, uint32 count
 		 * executed before. */
 		nv_start_dma();
 	}
+
+	/* tell all 3D add-ons that they should reload their rendering states */
+	si->engine.threeD.reload_state_3D = 0xffffffff;
 }
