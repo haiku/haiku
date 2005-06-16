@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-5/2005.
+	Rudolf Cornelissen 10/2002-6/2005.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -204,6 +204,7 @@ typedef struct {
 			uint32 max;			/* command buffer's useable size in 32-bit words */
 		} dma;
 		bool agp_mode;			/* card is running in AGP mode */
+		bool reload_state_3D;	/* instruct 3D clone to reload it's rendering state */
 	} engine;
 
 	/* fixme:
