@@ -443,8 +443,11 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 		window->Unlock();
 	}
 	
-	if (resultItem != NULL)
+	if (resultItem != NULL) {
+		window->Lock();
 		resultItem->Invoke();
+		window->Unlock();
+	}
 	
 	return resultItem;
 }
