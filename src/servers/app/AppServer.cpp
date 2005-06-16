@@ -33,6 +33,7 @@
 #include <Path.h>
 #include <PortLink.h>
 #include <StopWatch.h>
+#include <RosterPrivate.h>
 
 #include "BitmapManager.h"
 #include "ColorSet.h"
@@ -286,12 +287,11 @@ AppServer::LaunchInputServer()
 
 	fISThreadID = B_ERROR;
 
-	while (find_thread(BPrivate::kRosterThreadName) == B_NAME_NOT_FOUND && !fQuittingServer) {
+	while (!BRoster::Private().IsMessengerValid(false) && !fQuittingServer) {
 		snooze(250000);
+		BRoster::Private::DeleteBeRoster();
+		BRoster::Private::InitBeRoster();
 	}
-
-	// we sleep a bit more
-	snooze(1000000);
 
 	if (fQuittingServer)
 		return;
