@@ -4,13 +4,14 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>nv_driver 0.51 (Rudolf)</h1></p>
+<p><h1>nv_driver 0.52 (Rudolf)</h1></p>
 <ul>
 <li>Added recognition for 10-15 more newer cards: mostly GeForce 6200, 6600 and 6800 types;
 <li>Added 3D initialisation and updated 2D/3D command setup (defines and hash) for DMA acceleration (pre-NV40 only, 3D confirmed functional on TNT1 upto/including GeForce2Ti and GeForce4MX types: MX440 and MX4000 confirmed);
 <li>Moved the DMA command buffer from graphics memory to main system memory, plus expanded it's size from 32kB to 1Mb. Buffer is mapped using MTRR-WC where available (confirmed speedups for both modifications; pre-NV40 only). Note that all TNT1 cards will be much faster with DMA acceleration now: the new mode is 'officially' working on them, while the old mode used a 'nasty' workaround;
 <li>Graphics engine is now using AGP transfers for fetching commands from the DMA buffer where available. Note that direct memory accesses are used: GART and AGP aperture (scatter-gather) are not in use. (confirmed speedup for this modification);
-<li>Concurrent overlay and 3D acceleration are now possible: no more acceleration engine hangs should occur now.
+<li>Concurrent overlay and 3D acceleration are now possible: no more acceleration engine hangs should occur now;
+<li>Added shared_info flag to inform 3D add-on that it should reload it's rendering state whenever 2D commands are executed. This makes room for further speed improvements for 3D as it can minimize reloading rendering states.
 </ul>
 <p><h1>nv_driver 0.45 (Rudolf)</h1></p>
 <ul>
