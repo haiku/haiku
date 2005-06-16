@@ -182,7 +182,7 @@ BLooper::~BLooper()
 			RemoveHandler(child);
 	}
 
-	UnlockFully();
+	Unlock();
 	RemoveLooper(this);
 	delete_sem(fLockSem);
 }
