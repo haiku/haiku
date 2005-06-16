@@ -1139,6 +1139,10 @@ BApplication::window_quit_loop(bool quitFilePanels, bool force)
 				return false;
 			}
 
+			// ToDo: QuitRequested() can be overridden by others, IOW we
+			// cannot assume the window hasn't been unlocked in the mean
+			// time and is gone by now.
+			// We probably don't want to die in that case here, do we?
 			window->Quit();
 		}
 	}
