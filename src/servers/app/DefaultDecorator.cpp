@@ -218,13 +218,6 @@ DefaultDecorator::GetFootprint(BRegion *region)
 	}
 }
 
-BRect
-DefaultDecorator::SlideTab(float dx, float dy)
-{
-	//return Decorator::SlideTab(dx,dy);
-	return _tabrect;
-}
-
 click_type
 DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 {
@@ -289,6 +282,9 @@ DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 
 	// Clicking in the tab?
 	if (_tabrect.Contains(pt)) {
+		// tab sliding in any case if either shift key is held down
+		if (modifiers & B_SHIFT_KEY)
+			return DEC_SLIDETAB;
 		// Here's part of our window management stuff
 		if (buttons == B_SECONDARY_MOUSE_BUTTON)
 			return DEC_MOVETOBACK;
@@ -353,9 +349,11 @@ DefaultDecorator::_DoLayout()
 	
 	// calculate our tab rect
 	if (hasTab) {
+		// tab is initially on the left
+		fTabOffset = 0;
 		// distance from one item of the tab bar to another.
 		// In this case the text and close/zoom rects
-		fTextOffset = (_look == B_FLOATING_WINDOW_LOOK) ? 7 : 10;
+		fTextOffset = (_look == B_FLOATING_WINDOW_LOOK) ? 12 : 20;
 
 		font_height fh;
 		_drawdata.Font().Height(&fh);

@@ -325,7 +325,7 @@ LayerData::LayerData(const LayerData &data)
 }
 
 // destructor
-LayerData::~LayerData(void)
+LayerData::~LayerData()
 {
 	delete prevState;
 }

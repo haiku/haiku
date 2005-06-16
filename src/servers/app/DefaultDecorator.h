@@ -51,7 +51,6 @@ public:
 
 	virtual	void			GetFootprint(BRegion *region);
 
-	virtual	BRect			SlideTab(float dx, float dy);
 	virtual	click_type		Clicked(BPoint pt, int32 buttons,
 									int32 modifiers);
 
@@ -90,8 +89,7 @@ private:
 
 			int32			fBorderWidth;
 
-//			bool			fSlidingTab;
-//			uint32			fTabOffset;
+			uint32			fTabOffset;
 			float			fTextOffset;
 
 			float			fMinTabWidth;

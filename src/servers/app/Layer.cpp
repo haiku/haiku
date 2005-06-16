@@ -939,7 +939,7 @@ Layer::IsHidden(void) const
 void
 Layer::PushState()
 {
-	LayerData *data = new LayerData();
+	LayerData *data = new LayerData(*fLayerData);
 	data->prevState = fLayerData;
 	fLayerData = data;
 }
@@ -1043,7 +1043,7 @@ Layer::Scale() const
 
 	LayerData *ld = fLayerData;
 	do {
-		scale += ld->Scale();
+		scale *= ld->Scale();
 	} while ((ld = ld->prevState));
 
 	return scale;

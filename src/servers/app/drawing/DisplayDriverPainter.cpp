@@ -366,12 +366,27 @@ void
 DisplayDriverPainter::InvertRect(const BRect &r)
 {
 	if (Lock()) {
-		fGraphicsCard->HideSoftwareCursor(fPainter->ClipRect(r));
+		BRect vr(min_c(r.left, r.right),
+				 min_c(r.top, r.bottom),
+				 max_c(r.left, r.right),
+				 max_c(r.top, r.bottom));
+		vr = fPainter->ClipRect(vr);
+		if (vr.IsValid()) {
+			fGraphicsCard->HideSoftwareCursor(vr);
 
-		BRect touched = fPainter->InvertRect(r);
+			// try hardware optimized version first
+			if (fAvailableHWAccleration & HW_ACC_INVERT_REGION) {
+				BRegion region(vr);
+				region.IntersectWith(fPainter->ClippingRegion());
+				fGraphicsCard->InvertRegion(region);
+			} else {		
+				fPainter->InvertRect(vr);
 
-		fGraphicsCard->Invalidate(touched);
-		fGraphicsCard->ShowSoftwareCursor();
+				fGraphicsCard->Invalidate(vr);
+			}
+
+			fGraphicsCard->ShowSoftwareCursor();
+		}
 
 		Unlock();
 	}

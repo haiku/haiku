@@ -274,7 +274,7 @@ ServerApp::MonitorApp(void *data)
 	status_t err = B_OK;
 
 	while (!app->fQuitting) {
-		STRACE(("info: ServerApp::MonitorApp listening on port %ld.\n", app->fMessagePort));
+//		STRACE(("info: ServerApp::MonitorApp listening on port %ld.\n", app->fMessagePort));
 		err = reader.GetNextMessage(code, B_INFINITE_TIMEOUT);
 		if (err < B_OK) {
 			STRACE(("ServerApp::MonitorApp(): GetNextMessage returned %s\n", strerror(err)));
@@ -1575,6 +1575,7 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_GET_ESCAPEMENTS_AS_FLOATS:
 		{
 			FTRACE(("ServerApp %s: AS_GET_ESCAPEMENTS_AS_FLOATS\n", fSignature.String()));
+//printf("ServerApp %s: AS_GET_ESCAPEMENTS_AS_FLOATS\n", fSignature.String());
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1608,16 +1609,15 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			
 			int32 numChars;
 			link.Read<int32>(&numChars);
+//printf("  numChars: %ld\n", numChars);
 
-/*			char charArray[numChars];			
-			for (int32 i = 0; i < numChars; i++) {
-				link.Read<char>(&charArray[i]);
-			}*/
 			uint32 numBytes;
 			link.Read<uint32>(&numBytes);
+//printf("  numBytes: %ld\n", numBytes);
 
 			char* charArray = new char[numBytes];
 			link.Read(charArray, numBytes);
+//printf("  charArray[numBytes - 1]: '%c'\n", charArray[numBytes - 1]);
 
 			float* escapements = new float[numChars];
 			// figure out escapements
@@ -1629,6 +1629,8 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				font.SetRotation(rotation);
 				font.SetFlags(flags);
 
+//if (true) {
+//memset(escapements, 0, numChars * sizeof(float));
 				if (font.GetEscapements(charArray, numChars, escapements, delta)) {
 					fLink.StartMessage(SERVER_TRUE);
 					fLink.Attach(escapements, numChars * sizeof(float));
@@ -1721,7 +1723,7 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_SCREEN_GET_MODE:
 		{
 			STRACE(("ServerApp %s: AS_SCREEN_GET_MODE\n", fSignature.String()));
-printf("ServerApp %s: AS_SCREEN_GET_MODE\n", fSignature.String());
+//printf("ServerApp %s: AS_SCREEN_GET_MODE\n", fSignature.String());
 			// Attached data
 			// 1) int32 port to reply to
 			// 2) screen_id

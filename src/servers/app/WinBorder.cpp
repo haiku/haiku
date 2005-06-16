@@ -104,6 +104,8 @@ WinBorder::WinBorder(const BRect &r,
 
 	  fIsResizing(false),
 
+	  fIsSlidingTab(false),
+
 	  fInUpdate(false),
 	  fRequestSent(false),
 
@@ -155,167 +157,6 @@ WinBorder::~WinBorder()
 
 	delete fTopLayer;
 	delete fDecorator;
-}
-
-//! Rebuilds the WinBorder's "fully-visible" region based on info from the decorator
-void
-WinBorder::RebuildFullRegion()
-{
-	STRACE(("WinBorder(%s)::RebuildFullRegion()\n",GetName()));
-
-	fFull.MakeEmpty();
-
-	// Winborder holds Decorator's full regions. if any...
-	if (fDecorator)
-		fDecorator->GetFootprint(&fFull);
-}
-
-/*!
-	\brief Handles B_MOUSE_DOWN events and takes appropriate actions
-	\param evt PointerEvent object containing the info from the last B_MOUSE_DOWN message
-	\param sendMessage flag to send a B_MOUSE_DOWN message to the client
-	
-	This function searches to see if the B_MOUSE_DOWN message is being sent to the window tab
-	or frame. If it is not, the message is passed on to the appropriate view in the client
-	BWindow. If the WinBorder is the target, then the proper action flag is set.
-*/
-click_type
-WinBorder::MouseDown(const PointerEvent& event)
-{
-	click_type action = _ActionFor(event);
-
-	if (fDecorator) {
-		// find out where user clicked in Decorator
-		switch(action) {
-			case DEC_CLOSE:
-				fIsClosing = true;
-				fDecorator->SetClose(true);
-				STRACE_CLICK(("===> DEC_CLOSE\n"));
-				break;
-	
-			case DEC_ZOOM:
-				fIsZooming = true;
-				fDecorator->SetZoom(true);
-				STRACE_CLICK(("===> DEC_ZOOM\n"));
-				break;
-	
-			case DEC_MINIMIZE:
-				fIsMinimizing = true;
-				fDecorator->SetMinimize(true);
-				STRACE_CLICK(("===> DEC_MINIMIZE\n"));
-				break;
-
-			case DEC_DRAG:
-				fIsDragging = true;
-				fBringToFrontOnRelease = true;
-				fLastMousePosition = event.where;
-				STRACE_CLICK(("===> DEC_DRAG\n"));
-				break;
-
-			case DEC_RESIZE:
-				fIsResizing = true;
-				fLastMousePosition = event.where;
-				fResizingClickOffset = event.where - fFrame.RightBottom();
-				STRACE_CLICK(("===> DEC_RESIZE\n"));
-				break;
-
-			default:
-				break;
-		}
-	}
-	return action;
-}
-
-/*!
-	\brief Handles B_MOUSE_MOVED events and takes appropriate actions
-	\param evt PointerEvent object containing the info from the last B_MOUSE_MOVED message
-	
-	This function doesn't do much except test continue any move/resize operations in progress 
-	or check to see if the user clicked on a tab button (close, zoom, etc.) and then moused
-	away to prevent the operation from occurring
-*/
-void
-WinBorder::MouseMoved(const PointerEvent& event)
-{
-	if (fDecorator) {
-		if (fIsZooming) {
-			fDecorator->SetZoom(_ActionFor(event) == DEC_ZOOM);
-		} else if (fIsClosing) {
-			fDecorator->SetClose(_ActionFor(event) == DEC_CLOSE);
-		} else if (fIsMinimizing) {
-			fDecorator->SetMinimize(_ActionFor(event) == DEC_MINIMIZE);
-		}
-	}
-	if (fIsDragging) {
-		// we will not come to front if we ever actually moved
-		fBringToFrontOnRelease = false;
-
-		BPoint delta = event.where - fLastMousePosition;
-		MoveBy(delta.x, delta.y);
-	}
-	if (fIsResizing) {
-		BRect frame(fFrame.LeftTop(), event.where - fResizingClickOffset);
-
-		BPoint delta = frame.RightBottom() - fFrame.RightBottom();
-		ResizeBy(delta.x, delta.y);
-	}
-	fLastMousePosition = event.where;
-}
-
-/*!
-	\brief Handles B_MOUSE_UP events and takes appropriate actions
-	\param evt PointerEvent object containing the info from the last B_MOUSE_UP message
-	
-	This function resets any state objects (is_resizing flag and such) and if resetting a 
-	button click flag, takes the appropriate action (i.e. clearing the close button flag also
-	takes steps to close the window).
-*/
-void
-WinBorder::MouseUp(const PointerEvent& event)
-{
-	if (fDecorator) {
-		click_type action = _ActionFor(event);
-
-		if (fIsZooming) {
-			fIsZooming	= false;
-			fDecorator->SetZoom(false);
-			if (action == DEC_ZOOM)
-				Window()->Zoom();
-			return;
-		}
-		if (fIsClosing) {
-			fIsClosing	= false;
-			fDecorator->SetClose(false);
-			if (action == DEC_CLOSE)
-				Window()->Quit();
-			return;
-		}
-		if (fIsMinimizing) {
-			fIsMinimizing = false;
-			fDecorator->SetMinimize(false);
-			if (action == DEC_MINIMIZE)
-				Window()->Minimize(true);
-			return;
-		}
-	}
-	if (fBringToFrontOnRelease) {
-		// TODO: We would have dragged the window if
-		// the mouse would have moved, but it didn't
-		// move -> This will bring the window to the
-		// front on R5 in FFM mode!
-	}
-	fIsDragging = false;
-	fIsResizing = false;
-	fBringToFrontOnRelease = false;
-}
-
-//! Sets the decorator focus to active or inactive colors
-void
-WinBorder::HighlightDecorator(const bool &active)
-{
-	STRACE(("Decorator->Highlight\n"));
-	if (fDecorator)
-		fDecorator->SetFocus(active);
 }
 
 //! redraws a certain section of the window border
@@ -442,6 +283,19 @@ y = (float)int32(y);
 	}
 }
 
+//! Rebuilds the WinBorder's "fully-visible" region based on info from the decorator
+void
+WinBorder::RebuildFullRegion()
+{
+	STRACE(("WinBorder(%s)::RebuildFullRegion()\n",GetName()));
+
+	fFull.MakeEmpty();
+
+	// Winborder holds Decorator's full regions. if any...
+	if (fDecorator)
+		fDecorator->GetFootprint(&fFull);
+}
+
 //! Sets the minimum and maximum sizes of the window
 void
 WinBorder::SetSizeLimits(float minWidth, float maxWidth,
@@ -469,7 +323,7 @@ WinBorder::SetSizeLimits(float minWidth, float maxWidth,
 	if (fMaxHeight < fMinHeight)
 		fMaxHeight = fMinHeight;
 
-#if 0 // On R5, Windows don't automatically resize
+#if 0 // On R5, Windows don't automatically resize (the code works though)
 	// Automatically resize the window to fit these new limits
 	// if it does not already.
 	float minWidthDiff = fMinWidth - fFrame.Width();
@@ -502,6 +356,181 @@ WinBorder::GetSizeLimits(float* minWidth, float* maxWidth,
 	*maxWidth = fMaxWidth;
 	*minHeight = fMinHeight;
 	*maxHeight = fMaxHeight;
+}
+
+/*!
+	\brief Handles B_MOUSE_DOWN events and takes appropriate actions
+	\param evt PointerEvent object containing the info from the last B_MOUSE_DOWN message
+	\param sendMessage flag to send a B_MOUSE_DOWN message to the client
+	
+	This function searches to see if the B_MOUSE_DOWN message is being sent to the window tab
+	or frame. If it is not, the message is passed on to the appropriate view in the client
+	BWindow. If the WinBorder is the target, then the proper action flag is set.
+*/
+click_type
+WinBorder::MouseDown(const PointerEvent& event)
+{
+	click_type action = _ActionFor(event);
+
+	if (fDecorator) {
+		// find out where user clicked in Decorator
+		switch(action) {
+			case DEC_CLOSE:
+				fIsClosing = true;
+				fDecorator->SetClose(true);
+				STRACE_CLICK(("===> DEC_CLOSE\n"));
+				break;
+	
+			case DEC_ZOOM:
+				fIsZooming = true;
+				fDecorator->SetZoom(true);
+				STRACE_CLICK(("===> DEC_ZOOM\n"));
+				break;
+	
+			case DEC_MINIMIZE:
+				fIsMinimizing = true;
+				fDecorator->SetMinimize(true);
+				STRACE_CLICK(("===> DEC_MINIMIZE\n"));
+				break;
+
+			case DEC_DRAG:
+				fIsDragging = true;
+				fBringToFrontOnRelease = true;
+				fLastMousePosition = event.where;
+				STRACE_CLICK(("===> DEC_DRAG\n"));
+				break;
+
+			case DEC_RESIZE:
+				fIsResizing = true;
+				fLastMousePosition = event.where;
+				fResizingClickOffset = event.where - fFrame.RightBottom();
+				STRACE_CLICK(("===> DEC_RESIZE\n"));
+				break;
+
+			case DEC_SLIDETAB:
+				fIsSlidingTab = true;
+				fLastMousePosition = event.where;
+//				fResizingClickOffset = event.where - fFrame.RightBottom();
+				STRACE_CLICK(("===> DEC_SLIDETAB\n"));
+				break;
+
+			default:
+				break;
+		}
+	}
+	return action;
+}
+
+/*!
+	\brief Handles B_MOUSE_MOVED events and takes appropriate actions
+	\param evt PointerEvent object containing the info from the last B_MOUSE_MOVED message
+	
+	This function doesn't do much except test continue any move/resize operations in progress 
+	or check to see if the user clicked on a tab button (close, zoom, etc.) and then moused
+	away to prevent the operation from occurring
+*/
+void
+WinBorder::MouseMoved(const PointerEvent& event)
+{
+	if (fDecorator) {
+		if (fIsZooming) {
+			fDecorator->SetZoom(_ActionFor(event) == DEC_ZOOM);
+		} else if (fIsClosing) {
+			fDecorator->SetClose(_ActionFor(event) == DEC_CLOSE);
+		} else if (fIsMinimizing) {
+			fDecorator->SetMinimize(_ActionFor(event) == DEC_MINIMIZE);
+		}
+	}
+	if (fIsDragging) {
+		// we will not come to front if we ever actually moved
+		fBringToFrontOnRelease = false;
+
+		BPoint delta = event.where - fLastMousePosition;
+		MoveBy(delta.x, delta.y);
+	}
+	if (fIsResizing) {
+		BRect frame(fFrame.LeftTop(), event.where - fResizingClickOffset);
+
+		BPoint delta = frame.RightBottom() - fFrame.RightBottom();
+		ResizeBy(delta.x, delta.y);
+	}
+	if (fIsSlidingTab) {
+	}
+	fLastMousePosition = event.where;
+}
+
+/*!
+	\brief Handles B_MOUSE_UP events and takes appropriate actions
+	\param evt PointerEvent object containing the info from the last B_MOUSE_UP message
+	
+	This function resets any state objects (is_resizing flag and such) and if resetting a 
+	button click flag, takes the appropriate action (i.e. clearing the close button flag also
+	takes steps to close the window).
+*/
+void
+WinBorder::MouseUp(const PointerEvent& event)
+{
+	if (fDecorator) {
+		click_type action = _ActionFor(event);
+
+		if (fIsZooming) {
+			fIsZooming	= false;
+			fDecorator->SetZoom(false);
+			if (action == DEC_ZOOM)
+				Window()->Zoom();
+			return;
+		}
+		if (fIsClosing) {
+			fIsClosing	= false;
+			fDecorator->SetClose(false);
+			if (action == DEC_CLOSE)
+				Window()->Quit();
+			return;
+		}
+		if (fIsMinimizing) {
+			fIsMinimizing = false;
+			fDecorator->SetMinimize(false);
+			if (action == DEC_MINIMIZE)
+				Window()->Minimize(true);
+			return;
+		}
+	}
+	if (fBringToFrontOnRelease) {
+		// TODO: We would have dragged the window if
+		// the mouse would have moved, but it didn't
+		// move -> This will bring the window to the
+		// front on R5 in FFM mode!
+	}
+	fIsDragging = false;
+	fIsResizing = false;
+	fIsSlidingTab = false;
+	fBringToFrontOnRelease = false;
+}
+
+// SetTabLocation
+void
+WinBorder::SetTabLocation(float location)
+{
+	if (fDecorator)
+		fDecorator->SetTabLocation(location);
+}
+
+// TabLocation
+float
+WinBorder::TabLocation() const
+{
+	if (fDecorator)
+		return fDecorator->TabLocation();
+	return 0.0;
+}
+
+//! Sets the decorator focus to active or inactive colors
+void
+WinBorder::HighlightDecorator(bool active)
+{
+	STRACE(("Decorator->Highlight\n"));
+	if (fDecorator)
+		fDecorator->SetFocus(active);
 }
 
 //! Returns true if the point is in the WinBorder's screen area

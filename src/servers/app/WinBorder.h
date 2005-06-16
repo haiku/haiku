@@ -104,7 +104,7 @@ class WinBorder : public Layer {
 			void				UpdateDecorator();
 			void				UpdateFont();
 			void				UpdateScreen();
-	
+
 	virtual bool				HasClient() { return false; }
 	inline	Decorator*			GetDecorator() const { return fDecorator; }
 
@@ -114,7 +114,11 @@ class WinBorder : public Layer {
 	inline	uint32				WindowFlags() const { return fWindowFlags; }
 	inline	uint32				Workspaces() const { return fWorkspaces; }
 
-			void				HighlightDecorator(const bool &active);
+								// 0.0 -> left .... 1.0 -> right
+			void				SetTabLocation(float location);
+			float				TabLocation() const;
+
+			void				HighlightDecorator(bool active);
 	
 			bool				HasPoint(const BPoint &pt) const;
 
@@ -165,6 +169,8 @@ class WinBorder : public Layer {
 			bool				fBringToFrontOnRelease;
 
 			bool				fIsResizing;
+
+			bool				fIsSlidingTab;
 
 			bool				fInUpdate;
 			bool				fRequestSent;

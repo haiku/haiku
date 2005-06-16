@@ -361,7 +361,7 @@ Decorator::GetFootprint(BRegion *region)
 	- \c DEC_DRAG : Moves the window to the front and prepares to move the window
 	- \c DEC_MOVETOBACK : Moves the window to the back of the stack
 	- \c DEC_MOVETOFRONT : Moves the window to the front of the stack
-	- \c DEC_SLIDETAB : Initiates tab-sliding, including calling SlideTab()
+	- \c DEC_SLIDETAB : Initiates tab-sliding
 
 	- \c DEC_RESIZE : Handle window resizing as appropriate
 	- \c DEC_RESIZE_L
@@ -416,23 +416,6 @@ void
 Decorator::MoveBy(BPoint pt)
 {
 	MoveBy(pt.x, pt.y);
-}
-
-/*!
-	\brief Moves the tab by the specified amount
-	\param dx x offset
-	\param dy y offset
-	\return The new tab rectangle.
-	
-	Slides the tab by the x or y value. This function is not required to be 
-	implemented by subclasses. Note that the tab rectangle returned does not 
-	necessarily reflect _tabrect offset by the amount given - few people want to 
-	slide a tab right off the window - that would be a Bad Thing (TM).
-*/
-BRect
-Decorator::SlideTab(float dx, float dy)
-{
-	return BRect(0, 0, 0, 0);
 }
 
 /*!
