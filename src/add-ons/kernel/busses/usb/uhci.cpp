@@ -162,8 +162,8 @@ UHCI::UHCI( pci_info *info , Stack *stack )
 		cmd = UHCI::pci_module->read_pci_config(m_pcii->bus, m_pcii->device, m_pcii->function, PCI_command, 2);
 		cmd = cmd | PCI_command_io | PCI_command_master | PCI_command_memory;
 		UHCI::pci_module->write_pci_config(m_pcii->bus, m_pcii->device, m_pcii->function, PCI_command, 2, cmd );
-		/* make sure we gain controll of the UHCI controller instead of the BIOS */
-		UHCI::pci_module->write_pci_config(m_pcii->bus, m_pcii->device, m_pcii->function, PCI_LEGSUP, 2, PCI_LEGSUP_USBPIRQDEN );
+		/* make sure we gain controll of the UHCI controller instead of the BIOS - function 2 */
+		UHCI::pci_module->write_pci_config(m_pcii->bus, m_pcii->device, 2, PCI_LEGSUP, 2, PCI_LEGSUP_USBPIRQDEN );
 	}
 	
 	//Do a host reset
@@ -275,6 +275,7 @@ UHCI::UHCI( pci_info *info , Stack *stack )
 	
 	//Install the interrupt handler
 	install_io_interrupt_handler( m_pcii->u.h0.interrupt_line , uhci_interrupt_handler , (void *)this , 0 );
+	UHCI::pci_module->write_io_16( m_reg_base + UHCI_USBSTS , 0xffff );
 	UHCI::pci_module->write_io_16( m_reg_base + UHCI_USBINTR , UHCI_USBINTR_CRC | UHCI_USBINTR_RESUME | UHCI_USBINTR_IOC | UHCI_USBINTR_SHORT );
 }
 
@@ -302,7 +303,7 @@ status_t UHCI::Start()
 		return B_ERROR;
 	}
 	
-	TRACE( "UHCI::Start() Controller is started\n" );
+	TRACE( "UHCI::Start() Controller is started. USBSTS: %u\n" , UHCI::pci_module->read_io_16( m_reg_base + UHCI_USBSTS ) );
 	return BusManager::Start();
 }
 
@@ -323,14 +324,14 @@ status_t UHCI::SubmitTransfer( Transfer *t )
 void UHCI::GlobalReset()
 {
 	UHCI::pci_module->write_io_16( m_reg_base + UHCI_USBCMD , UHCI_USBCMD_GRESET );
-	spin( 100 );
+	spin( 100000 );
 	UHCI::pci_module->write_io_16( m_reg_base + UHCI_USBCMD , 0 );
 }
 
 status_t UHCI::Reset()
 {
 	UHCI::pci_module->write_io_16( m_reg_base + UHCI_USBCMD , UHCI_USBCMD_HCRESET );
-	spin( 100 );
+	spin( 100000 );
 	if ( UHCI::pci_module->read_io_16( m_reg_base + UHCI_USBCMD ) & UHCI_USBCMD_HCRESET )
 		return B_ERROR;
 	return B_OK;
