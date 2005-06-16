@@ -1206,6 +1206,8 @@ DisplayDriverPainter::SetMode(const display_mode &mode)
 		status = fGraphicsCard->SetMode(mode);
 		if (status >= B_OK) {
 			fPainter->AttachToBuffer(fGraphicsCard->DrawingBuffer());
+			// available HW acceleration might have changed
+			fAvailableHWAccleration = fGraphicsCard->AvailableHWAcceleration();
 			status = DisplayDriver::SetMode(mode);
 		} else {
 			fprintf(stderr, "DisplayDriverPainter::SetMode() - unsupported "
