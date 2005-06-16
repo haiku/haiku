@@ -3558,7 +3558,7 @@ BView::setOwner(BWindow *theOwner)
 		if (fShelf)
 			owner->RemoveHandler(fShelf);
 	}
-	 
+
 	if (theOwner && theOwner != owner) {
 		theOwner->AddHandler(this);
 		if (fShelf)
@@ -3662,17 +3662,17 @@ BView::removeSelf()
 
 
 void
-BView::callDetachHooks(BView *aView)
+BView::callDetachHooks(BView *view)
 {
-	aView->DetachedFromWindow();
+	view->DetachedFromWindow();
 
-	BView *child = aView->first_child;	
+	BView *child = view->first_child;	
 	while (child != NULL) {
-		aView->callDetachHooks(child);
+		view->callDetachHooks(child);
 		child = child->next_sibling;
 	}
 
-	aView->AllDetached();
+	view->AllDetached();
 }
 
 
@@ -3695,9 +3695,9 @@ BView::removeFromList()
 
 
 bool
-BView::addToList(BView *aView, BView *before)
+BView::addToList(BView *view, BView *before)
 {
-	if (!aView)
+	if (!view)
 		return false;
 
 	BView *current = first_child;
@@ -3714,47 +3714,48 @@ BView::addToList(BView *aView, BView *before)
 	// we're at begining of the list, OR between two elements
 	if (current) {
 		if (current == first_child) {
-			aView->next_sibling = current;
-			current->prev_sibling = aView;
-			first_child = aView;
+			view->next_sibling = current;
+			current->prev_sibling = view;
+			first_child = view;
 		} else {
-			aView->next_sibling = current;
-			aView->prev_sibling = current->prev_sibling;
-			current->prev_sibling->next_sibling = aView;
-			current->prev_sibling = aView;
+			view->next_sibling = current;
+			view->prev_sibling = current->prev_sibling;
+			current->prev_sibling->next_sibling = view;
+			current->prev_sibling = view;
 		}
 	} else {
 		// we have reached the end of the list
 
-		// if last!=NULL then we add to the end. Otherwise, aView is the
+		// if last!=NULL then we add to the end. Otherwise, view is the
 		// first chiild in the list
 		if (last) {
-			last->next_sibling = aView;
-			aView->prev_sibling = last;
+			last->next_sibling = view;
+			view->prev_sibling = last;
 		} else
-			first_child = aView;
+			first_child = view;
 	}
 
-	aView->parent = this;
+	view->parent = this;
 	return true;
 }
 
 void
-BView::callAttachHooks(BView *aView)
+BView::callAttachHooks(BView *view)
 {
-	aView->AttachedToWindow();
+	view->AttachedToWindow();
 
-	BView *child= aView->first_child;
+	BView *child = view->first_child;
 	while (child != NULL) {
-		aView->callAttachHooks(child);
+		view->callAttachHooks(child);
 		child = child->next_sibling;
 	}
 
-	aView->AllAttached();
+	view->AllAttached();
 }
 
+
 bool
-BView::attachView(BView *aView)
+BView::attachView(BView *view)
 {
 	// LEAVE the following line commented!!!
 	//	check_lock();
@@ -3768,30 +3769,30 @@ BView::attachView(BView *aView)
 	 		are made.
 	*/
 
-	if (aView->top_level_view)
+	if (view->top_level_view)
 		owner->fLink->StartMessage(AS_LAYER_CREATE_ROOT);
 	else
  		owner->fLink->StartMessage(AS_LAYER_CREATE);
 
-	owner->fLink->Attach<int32>(_get_object_token_( aView ));
-	owner->fLink->AttachString(aView->Name());
-	owner->fLink->Attach<BRect>(aView->Frame());
-	owner->fLink->Attach<uint32>(aView->ResizingMode());
-	owner->fLink->Attach<uint32>(aView->fEventMask);
-	owner->fLink->Attach<uint32>(aView->fEventOptions);
-	owner->fLink->Attach<uint32>(aView->Flags());
-	owner->fLink->Attach<bool>(aView->IsHidden(aView));
-	owner->fLink->Attach<rgb_color>(aView->fState->viewColor);
-	owner->fLink->Attach<int32>(aView->CountChildren());
+	owner->fLink->Attach<int32>(_get_object_token_(view));
+	owner->fLink->AttachString(view->Name());
+	owner->fLink->Attach<BRect>(view->Frame());
+	owner->fLink->Attach<uint32>(view->ResizingMode());
+	owner->fLink->Attach<uint32>(view->fEventMask);
+	owner->fLink->Attach<uint32>(view->fEventOptions);
+	owner->fLink->Attach<uint32>(view->Flags());
+	owner->fLink->Attach<bool>(view->IsHidden(view));
+	owner->fLink->Attach<rgb_color>(view->fState->viewColor);
+	owner->fLink->Attach<int32>(_get_object_token_(this));
 	owner->fLink->Flush();
-	
-	aView->setCachedState();
+
+	view->setCachedState();
 
 	// we attach all its children
 
-	BView *child= aView->first_child;
+	BView *child = view->first_child;
 	while (child != NULL) {
-		aView->attachView(child);
+		view->attachView(child);
 		child = child->next_sibling;
 	}
 
@@ -3802,26 +3803,26 @@ BView::attachView(BView *aView)
 
 
 void
-BView::deleteView( BView* aView)
+BView::deleteView(BView* view)
 {
-	BView *child = aView->first_child;
+	BView *child = view->first_child;
 	while (child != NULL) {
 		BView *nextChild = child->next_sibling;
 		deleteView(child);
 		child = nextChild;
 	}
 
-	delete aView;
+	delete view;
 }
 
 
 BView *
-BView::findView(const BView *aView, const char *viewName) const
+BView::findView(const BView *view, const char *viewName) const
 {
-	if (!strcmp(viewName, aView->Name()))
-		return const_cast<BView *>(aView);
+	if (!strcmp(viewName, view->Name()))
+		return const_cast<BView *>(view);
 
-	BView *child = aView->first_child;
+	BView *child = view->first_child;
 	while (child != NULL) {
 		BView *view;
 		if ((view = findView(child, viewName)) != NULL)

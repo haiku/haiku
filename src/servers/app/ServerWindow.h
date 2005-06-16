@@ -117,9 +117,8 @@ public:
 			FMWList fWinFMWList;
 
 private:
-	
 			// methods for retrieving and creating a tree strcture of Layers.
-			Layer*				CreateLayerTree(Layer *localRoot, BPrivate::LinkReceiver &link);
+			Layer*				CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent);
 			void				SetLayerState(Layer *layer, BPrivate::LinkReceiver &link);
 			void				SetLayerFontState(Layer *layer, BPrivate::LinkReceiver &link);
 			void				ClientDied(bool crashed);

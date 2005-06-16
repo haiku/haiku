@@ -313,7 +313,7 @@ ServerWindow::SetLayerState(Layer *layer, BPrivate::LinkReceiver &link)
 
 
 inline Layer*
-ServerWindow::CreateLayerTree(Layer *localRoot, BPrivate::LinkReceiver &link)
+ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent)
 {
 	// NOTE: no need to check for a lock. This is a private method.
 
@@ -324,7 +324,7 @@ ServerWindow::CreateLayerTree(Layer *localRoot, BPrivate::LinkReceiver &link)
 	uint32 eventOptions;
 	uint32 flags;
 	bool hidden;
-	int32 childCount;
+	int32 parentToken;
 	char *name = NULL;
 	rgb_color viewColor;
 
@@ -336,10 +336,11 @@ ServerWindow::CreateLayerTree(Layer *localRoot, BPrivate::LinkReceiver &link)
 	link.Read<uint32>(&eventOptions);
 	link.Read<uint32>(&flags);
 	link.Read<bool>(&hidden);
-	link.Read<rgb_color>(&viewColor );
-	link.Read<int32>(&childCount);
+	link.Read<rgb_color>(&viewColor);
+	link.Read<int32>(&parentToken);
 
-	STRACE(("ServerWindow(%s)::CreateLayerTree()-> layer %s, token %ld\n", fName,name,token));
+	STRACE(("ServerWindow(%s)::CreateLayerTree()-> layer %s, token %ld\n",
+		fName, name, token));
 
 	Layer *newLayer = new Layer(frame, name, token, resizeMask, 
 			flags, gDesktop->GetDisplayDriver());
@@ -353,9 +354,13 @@ ServerWindow::CreateLayerTree(Layer *localRoot, BPrivate::LinkReceiver &link)
 	newLayer->fEventOptions = eventOptions;
 	newLayer->fOwner = fWinBorder;
 
-	// add the new Layer to the tree structure.
-	if (localRoot)
-		localRoot->AddChild(newLayer, NULL);
+	if (_parent) {
+		Layer *parent = fWinBorder->FindLayer(parentToken);
+		if (parent == NULL)
+			CRITICAL("View token not found!\n");
+
+		*_parent = parent;
+	}
 
 	return newLayer;
 }
@@ -364,7 +369,7 @@ ServerWindow::CreateLayerTree(Layer *localRoot, BPrivate::LinkReceiver &link)
 void
 ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 {
-	if (fCurrentLayer == NULL && code != AS_LAYER_CREATE_ROOT) {
+	if (fCurrentLayer == NULL && code != AS_LAYER_CREATE_ROOT && code != AS_LAYER_CREATE) {
 		printf("ServerWindow %s received unexpected code - message offset %ld before top_view attached.\n",fName, code - SERVER_TRUE);
 		return;
 	}
@@ -431,22 +436,19 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			int32 token;
 			
 			link.Read<int32>(&token);
-			
-//			Layer *current = FindLayer(fWinBorder->fTopLayer, token);
+
 			Layer *current = fWinBorder->FindLayer(token);
-			if(current)
-			{
+			if (current) {
 				DTRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: %s, token %ld\n", fName, current->fName->String(), token));
-			}
-			else
-			{
+			} else {
 				DTRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: layer not found, token %ld\n", fName, token));
 			}
 
 			if (current)
-				fCurrentLayer=current;
+				fCurrentLayer = current;
 			else // hope this NEVER happens! :-)
 				CRITICAL("Server PANIC: window cannot find Layer with ID\n");
+			// ToDo: if this happens, we probably want to kill the app and clean up
 			break;
 		}
 
@@ -458,9 +460,8 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// This should be the *only* place where this happens.
 			if (fCurrentLayer != NULL)
 				break;
-			
-//			fWinBorder->fTopLayer = CreateLayerTree(NULL);
-			fWinBorder->fTopLayer = CreateLayerTree(NULL, link);
+
+			fWinBorder->fTopLayer = CreateLayerTree(link, NULL);
 			fWinBorder->fTopLayer->SetAsTopLayer(true);
 			fCurrentLayer = fWinBorder->fTopLayer;
 
@@ -472,19 +473,15 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_LAYER_CREATE:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_CREATE: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
-			Layer		*newLayer;
-			
-			if (fCurrentLayer == NULL)
-				break;
 
-//			newLayer	= CreateLayerTree(NULL);
-			newLayer	= CreateLayerTree(NULL, link);
-			fCurrentLayer->AddChild(newLayer, this);
+			Layer* parent = NULL;
+			Layer* newLayer = CreateLayerTree(link, &parent);
+			if (parent != NULL)
+				parent->AddChild(newLayer, this);
 
-			if (!(newLayer->IsHidden())){
+			if (!newLayer->IsHidden()) {
 				myRootLayer->GoInvalidate(newLayer, newLayer->fFull);
 			}
-
 			break;
 		}
 		case AS_LAYER_DELETE:
@@ -512,7 +509,7 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			delete fCurrentLayer;
 
-			fCurrentLayer=parent;
+			fCurrentLayer = parent;
 			break;
 		}
 		case AS_LAYER_SET_STATE:
