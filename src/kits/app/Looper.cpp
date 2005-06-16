@@ -309,13 +309,17 @@ BLooper::MessageReceived(BMessage *msg)
 	// saying it does nothing.  Investigate.
 	BHandler::MessageReceived(msg);
 }
-//------------------------------------------------------------------------------
-BMessage* BLooper::CurrentMessage() const
+
+
+BMessage*
+BLooper::CurrentMessage() const
 {
 	return fLastMessage;
 }
-//------------------------------------------------------------------------------
-BMessage* BLooper::DetachCurrentMessage()
+
+
+BMessage*
+BLooper::DetachCurrentMessage()
 {
 	Lock();
 	BMessage* msg = fLastMessage;
@@ -324,24 +328,22 @@ BMessage* BLooper::DetachCurrentMessage()
 	Unlock();
 	return msg;
 }
-//------------------------------------------------------------------------------
-BMessageQueue* BLooper::MessageQueue() const
+
+
+BMessageQueue*
+BLooper::MessageQueue() const
 {
 	return fQueue;
 }
-//------------------------------------------------------------------------------
-bool BLooper::IsMessageWaiting() const
+
+
+bool
+BLooper::IsMessageWaiting() const
 {
-	if (!IsLocked())
-	{
-		debugger("The Looper must be locked before calling IsMsgWaiting");
-		return false;
-	}
+	AssertLocked();
 
 	if (!fQueue->IsEmpty())
-	{
 		return true;
-	}
 
 /**
 	@note:	What we're doing here differs slightly from the R5 implementation.
@@ -355,65 +357,49 @@ bool BLooper::IsMessageWaiting() const
 			where I come from. ;)
  */
 	int32 count;
-	do
-	{
+	do {
 		count = port_buffer_size_etc(fMsgPort, B_RELATIVE_TIMEOUT, 0);
 	} while (count == B_INTERRUPTED);
 
 	return count > 0;
 }
-//------------------------------------------------------------------------------
-void BLooper::AddHandler(BHandler* handler)
+
+
+void
+BLooper::AddHandler(BHandler* handler)
 {
-	if (!handler)
-	{
+	if (handler == NULL)
 		return;
-	}
 
-	if (!IsLocked())
-	{
-		debugger("Looper must be locked before calling AddHandler.");
-	}
+	AssertLocked();
 
-	if (handler->Looper() == NULL)
-	{
+	if (handler->Looper() == NULL) {
 		fHandlers.AddItem(handler);
 		handler->SetLooper(this);
 		if (handler != this)	// avoid a cycle
 			handler->SetNextHandler(this);
-		BList* Filters = handler->FilterList();
-		if (Filters)
-		{
-			for (int32 i = 0; i < Filters->CountItems(); ++i)
-			{
-				((BMessageFilter*)Filters->ItemAt(i))->SetLooper(this);
+
+		BList* filters = handler->FilterList();
+		if (filters) {
+			for (int32 i = 0; i < filters->CountItems(); ++i) {
+				((BMessageFilter*)filters->ItemAt(i))->SetLooper(this);
 			}
 		}
 	}
 }
-//------------------------------------------------------------------------------
-bool BLooper::RemoveHandler(BHandler* handler)
+
+
+bool
+BLooper::RemoveHandler(BHandler* handler)
 {
-	// R5 implementation didn't bother to check its params, thus NULL handlers
-	// will seg fault.  Bad form, you know.
-	if (!handler)
-	{
+	if (handler == NULL)
 		return false;
-	}
 
-	// Correction; testing shows the looper *does* need to be locked for this;
-	// it just doesn't use AssertLocked() for that.
-	if (!IsLocked())
-	{
-		debugger("Looper must be locked before calling RemoveHandler.");
-	}
+	AssertLocked();
 
-	if (handler->Looper() == this && fHandlers.RemoveItem(handler))
-	{
+	if (handler->Looper() == this && fHandlers.RemoveItem(handler)) {
 		if (handler == fPreferred)
-		{
 			fPreferred = NULL;
-		}
 
 		handler->SetNextHandler(NULL);
 		handler->SetLooper(NULL);
@@ -422,47 +408,48 @@ bool BLooper::RemoveHandler(BHandler* handler)
 
 	return false;
 }
-//------------------------------------------------------------------------------
-int32 BLooper::CountHandlers() const
+
+
+int32
+BLooper::CountHandlers() const
 {
 	AssertLocked();
 
 	return fHandlers.CountItems();
 }
-//------------------------------------------------------------------------------
-BHandler* BLooper::HandlerAt(int32 index) const
+
+
+BHandler*
+BLooper::HandlerAt(int32 index) const
 {
-	if (!IsLocked())
-	{
-		debugger("Looper must be locked before calling HandlerAt.");
-	}
+	AssertLocked();
 
 	return (BHandler*)fHandlers.ItemAt(index);
 }
-//------------------------------------------------------------------------------
-int32 BLooper::IndexOf(BHandler* handler) const
+
+
+int32
+BLooper::IndexOf(BHandler* handler) const
 {
-	if (!IsLocked())
-	{
-		debugger("Looper must be locked before calling IndexOf.");
-	}
+	AssertLocked();
 
 	return fHandlers.IndexOf(handler);
 }
-//------------------------------------------------------------------------------
-BHandler* BLooper::PreferredHandler() const
+
+
+BHandler*
+BLooper::PreferredHandler() const
 {
 	return fPreferred;
 }
-//------------------------------------------------------------------------------
-void BLooper::SetPreferredHandler(BHandler* handler)
+
+
+void
+BLooper::SetPreferredHandler(BHandler* handler)
 {
-	if (handler && handler->Looper() == this && IndexOf(handler) >= 0)
-	{
+	if (handler && handler->Looper() == this && IndexOf(handler) >= 0) {
 		fPreferred = handler;
-	}
-	else
-	{
+	} else {
 		fPreferred = NULL;
 	}
 }
@@ -514,8 +501,7 @@ BLooper::Quit()
 
 	PRINT(("  is locked\n"));
 
-	if (!fRunCalled)
-	{
+	if (!fRunCalled) {
 		PRINT(("  Run() has not been called yet\n"));
 		fTerminating = true;
 		delete this;
@@ -574,8 +560,10 @@ BLooper::Lock()
 	// Defer to global _Lock(); see notes there
 	return _Lock(this, -1, B_INFINITE_TIMEOUT) == B_OK;
 }
-//------------------------------------------------------------------------------
-void BLooper::Unlock()
+
+
+void
+BLooper::Unlock()
 {
 PRINT(("BLooper::Unlock()\n"));
 	//	Make sure we're locked to begin with
@@ -585,8 +573,7 @@ PRINT(("BLooper::Unlock()\n"));
 	--fOwnerCount;
 PRINT(("  fOwnerCount now: %ld\n", fOwnerCount));
 	//	Check to see if the owner still wants a lock
-	if (fOwnerCount == 0)
-	{
+	if (fOwnerCount == 0) {
 		//	Set fOwner to invalid thread_id (< 0)
 		fOwner = -1;
 
@@ -604,21 +591,21 @@ PRINT(("  fAtomicCount now: %ld\n", fAtomicCount));
 	}
 PRINT(("BLooper::Unlock() done\n"));
 }
-//------------------------------------------------------------------------------
-bool BLooper::IsLocked() const
+
+
+bool
+BLooper::IsLocked() const
 {
 	// We have to lock the list for the call to IsLooperValid().  Has the side
 	// effect of not letting the looper get deleted while we're here.
 	BObjectLocker<BLooperList> ListLock(gLooperList);
 
-	if (!ListLock.IsLocked())
-	{
+	if (!ListLock.IsLocked()) {
 		// If we can't lock the list, our semaphore is probably toast
 		return false;
 	}
 
-	if (!IsLooperValid(this))
-	{
+	if (!IsLooperValid(this)) {
 		// The looper is gone, so of course it's not locked
 		return false;
 	}
@@ -626,56 +613,71 @@ bool BLooper::IsLocked() const
 	// Got this from Jeremy's BLocker implementation
 	return find_thread(NULL) == fOwner;
 }
-//------------------------------------------------------------------------------
-status_t BLooper::LockWithTimeout(bigtime_t timeout)
+
+
+status_t
+BLooper::LockWithTimeout(bigtime_t timeout)
 {
 	return _Lock(this, -1, timeout);
 }
-//------------------------------------------------------------------------------
-thread_id BLooper::Thread() const
+
+
+thread_id
+BLooper::Thread() const
 {
 	return fTaskID;
 }
-//------------------------------------------------------------------------------
-team_id BLooper::Team() const
+
+
+team_id
+BLooper::Team() const
 {
 	return sTeamID;
 }
-//------------------------------------------------------------------------------
-BLooper* BLooper::LooperForThread(thread_id tid)
+
+
+BLooper*
+BLooper::LooperForThread(thread_id tid)
 {
 	BObjectLocker<BLooperList> ListLock(gLooperList);
 	if (ListLock.IsLocked())
-	{
 		return gLooperList.LooperForThread(tid);
-	}
 
 	return NULL;
 }
-//------------------------------------------------------------------------------
-thread_id BLooper::LockingThread() const
+
+
+thread_id
+BLooper::LockingThread() const
 {
 	return fOwner;
 }
-//------------------------------------------------------------------------------
-int32 BLooper::CountLocks() const
+
+
+int32
+BLooper::CountLocks() const
 {
 	return fOwnerCount;
 }
-//------------------------------------------------------------------------------
-int32 BLooper::CountLockRequests() const
+
+
+int32
+BLooper::CountLockRequests() const
 {
 	return fAtomicCount;
 }
-//------------------------------------------------------------------------------
-sem_id BLooper::Sem() const
+
+
+sem_id
+BLooper::Sem() const
 {
 	return fLockSem;
 }
-//------------------------------------------------------------------------------
-BHandler* BLooper::ResolveSpecifier(BMessage* msg, int32 index,
-									BMessage* specifier, int32 form,
-									const char* property)
+
+
+BHandler*
+BLooper::ResolveSpecifier(BMessage* msg, int32 index,
+	BMessage* specifier, int32 form, const char* property)
 {
 /**
 	@note	When I was first dumping the results of GetSupportedSuites() from
@@ -693,29 +695,23 @@ BHandler* BLooper::ResolveSpecifier(BMessage* msg, int32 index,
 	uint32 data;
 	status_t err = B_OK;
 	const char* errMsg = "";
-	if (PropertyInfo.FindMatch(msg, index, specifier, form, property, &data) >= 0)
-	{
-		switch (data)
-		{
+	if (PropertyInfo.FindMatch(msg, index, specifier, form, property, &data) >= 0) {
+		switch (data) {
 			case BLOOPER_PROCESS_INTERNALLY:
 				return this;
 
 			case BLOOPER_HANDLER_BY_INDEX:
 			{
 				int32 index = specifier->FindInt32("index");
-				if (form == B_REVERSE_INDEX_SPECIFIER)
-				{
+				if (form == B_REVERSE_INDEX_SPECIFIER) {
 					index = CountHandlers() - index;
 				}
 				BHandler* target = HandlerAt(index);
-				if (target)
-				{
+				if (target) {
 					// Specifier has been fully handled
 					msg->PopSpecifier();
 					return target;
-				}
-				else
-				{
+				} else {
 					err = B_BAD_INDEX;
 					errMsg = "handler index out of range";
 				}
@@ -727,11 +723,9 @@ BHandler* BLooper::ResolveSpecifier(BMessage* msg, int32 index,
 				errMsg = "Didn't understand the specifier(s)";
 				break;
 		}
-	}
-	else
-	{
+	} else {
 		return BHandler::ResolveSpecifier(msg, index, specifier, form,
-										  property);
+			property);
 	}
 
 	BMessage Reply(B_MESSAGE_NOT_UNDERSTOOD);
@@ -741,84 +735,65 @@ BHandler* BLooper::ResolveSpecifier(BMessage* msg, int32 index,
 
 	return NULL;
 }
-//------------------------------------------------------------------------------
-status_t BLooper::GetSupportedSuites(BMessage* data)
+
+
+status_t
+BLooper::GetSupportedSuites(BMessage* data)
 {
-	status_t err = B_OK;
-	
-	if (!data)
-	{
-		err = B_BAD_VALUE;
+	if (data == NULL)
+		return B_BAD_VALUE;
+
+	status_t status = data->AddString("Suites", "suite/vnd.Be-handler");
+	if (status == B_OK) {
+		BPropertyInfo PropertyInfo(gLooperPropInfo);
+		status = data->AddFlat("message", &PropertyInfo);
+		if (status == B_OK)
+			status = BHandler::GetSupportedSuites(data);
 	}
 
-	if (!err)
-	{
-		err = data->AddString("Suites", "suite/vnd.Be-handler");
-		if (!err)
-		{
-			BPropertyInfo PropertyInfo(gLooperPropInfo);
-			err = data->AddFlat("message", &PropertyInfo);
-			if (!err)
-			{
-				err = BHandler::GetSupportedSuites(data);
-			}
-		}
-	}
-
-	return err;
+	return status;
 }
-//------------------------------------------------------------------------------
-void BLooper::AddCommonFilter(BMessageFilter* filter)
+
+
+void
+BLooper::AddCommonFilter(BMessageFilter* filter)
 {
 	if (!filter)
-	{
 		return;
-	}
 
-	if (!IsLocked())
-	{
-		debugger("Owning Looper must be locked before calling AddCommonFilter");
-		return;
-	}
+	AssertLocked();
 
-	if (filter->Looper())
-	{
+	if (filter->Looper()) {
 		debugger("A MessageFilter can only be used once.");
 		return;
 	}
 
 	if (!fCommonFilters)
-	{
 		fCommonFilters = new BList(FILTER_LIST_BLOCK_SIZE);
-	}
+
 	filter->SetLooper(this);
 	fCommonFilters->AddItem(filter);
 }
-//------------------------------------------------------------------------------
-bool BLooper::RemoveCommonFilter(BMessageFilter* filter)
+
+
+bool
+BLooper::RemoveCommonFilter(BMessageFilter* filter)
 {
-	if (!IsLocked())
-	{
-		debugger("Owning Looper must be locked before calling "
-				 "RemoveCommonFilter");
-		return false;
-	}
+	AssertLocked();
 
 	if (!fCommonFilters)
-	{
 		return false;
-	}
 
 	bool result = fCommonFilters->RemoveItem(filter);
 	if (result)
-	{
 		filter->SetLooper(NULL);
-	}
 
 	return result;
 }
-//------------------------------------------------------------------------------
-void BLooper::SetCommonFilterList(BList* filters)
+
+
+void
+BLooper::SetCommonFilterList(BList* filters)
 {
 	// We have a somewhat serious problem here.  It is entirely possible in R5
 	// to assign a given list of filters to *two* BLoopers simultaneously.  This
@@ -827,32 +802,22 @@ void BLooper::SetCommonFilterList(BList* filters)
 	// has already been deleted.  In R5, this results in a general protection
 	// fault.  We fix this by checking the filter list for ownership issues.
 
-	if (!IsLocked())
-	{
-		debugger("Owning Looper must be locked before calling "
-				 "SetCommonFilterList");
-		return;
-	}
+	AssertLocked();
 
 	BMessageFilter* filter;
-	if (filters)
-	{
+	if (filters) {
 		// Check for ownership issues
-		for (int32 i = 0; i < filters->CountItems(); ++i)
-		{
+		for (int32 i = 0; i < filters->CountItems(); ++i) {
 			filter = (BMessageFilter*)filters->ItemAt(i);
-			if (filter->Looper())
-			{
+			if (filter->Looper()) {
 				debugger("A MessageFilter can only be used once.");
 				return;
 			}
 		}
 	}
-	
-	if (fCommonFilters)
-	{
-		for (int32 i = 0; i < fCommonFilters->CountItems(); ++i)
-		{
+
+	if (fCommonFilters) {
+		for (int32 i = 0; i < fCommonFilters->CountItems(); ++i) {
 			delete (BMessageFilter*)fCommonFilters->ItemAt(i);
 		}
 
@@ -862,67 +827,58 @@ void BLooper::SetCommonFilterList(BList* filters)
 
 	// Per the BeBook, we take ownership of the list
 	fCommonFilters = filters;
-	if (fCommonFilters)
-	{
-		for (int32 i = 0; i < fCommonFilters->CountItems(); ++i)
-		{
+	if (fCommonFilters) {
+		for (int32 i = 0; i < fCommonFilters->CountItems(); ++i) {
 			filter = (BMessageFilter*)fCommonFilters->ItemAt(i);
 			filter->SetLooper(this);
 		}
 	}
 }
-//------------------------------------------------------------------------------
-BList* BLooper::CommonFilterList() const
+
+
+BList*
+BLooper::CommonFilterList() const
 {
 	return fCommonFilters;
 }
-//------------------------------------------------------------------------------
-status_t BLooper::Perform(perform_code d, void* arg)
+
+
+status_t
+BLooper::Perform(perform_code d, void* arg)
 {
 	// This is sort of what we're doing for this function everywhere
 	return BHandler::Perform(d, arg);
 }
-//------------------------------------------------------------------------------
-BMessage* BLooper::MessageFromPort(bigtime_t timeout)
+
+
+BMessage*
+BLooper::MessageFromPort(bigtime_t timeout)
 {
 	return ReadMessageFromPort(timeout);
 }
-//------------------------------------------------------------------------------
-void BLooper::_ReservedLooper1()
-{
-}
-//------------------------------------------------------------------------------
-void BLooper::_ReservedLooper2()
-{
-}
-//------------------------------------------------------------------------------
-void BLooper::_ReservedLooper3()
-{
-}
-//------------------------------------------------------------------------------
-void BLooper::_ReservedLooper4()
-{
-}
-//------------------------------------------------------------------------------
-void BLooper::_ReservedLooper5()
-{
-}
-//------------------------------------------------------------------------------
-void BLooper::_ReservedLooper6()
-{
-}
-//------------------------------------------------------------------------------
+
+
+void BLooper::_ReservedLooper1() {}
+void BLooper::_ReservedLooper2() {}
+void BLooper::_ReservedLooper3() {}
+void BLooper::_ReservedLooper4() {}
+void BLooper::_ReservedLooper5() {}
+void BLooper::_ReservedLooper6() {}
+
+
 BLooper::BLooper(const BLooper&)
 {
 	// Copy construction not allowed
 }
-//------------------------------------------------------------------------------
+
+
 BLooper& BLooper::operator=(const BLooper& )
 {
 	// Looper copying not allowed
 	return *this;
 }
-//------------------------------------------------------------------------------
+
+
 BLooper::BLooper(int32 priority, port_id port, const char* name)
 {
 	// This must be a legacy constructor
@@ -1508,7 +1464,11 @@ BLooper::apply_filters(BList* list, BMessage* msg, BHandler* target)
 void
 BLooper::check_lock()
 {
-	// NOTE: any use for this?
+	// This is a cheap variant of AssertLocked()
+	// It is used in situations where it's clear that the looper is valid,
+	// ie. from handlers
+	if (fOwner == -1 || fOwner != find_thread(NULL))
+		debugger("Looper must be locked.");
 }
 
 
