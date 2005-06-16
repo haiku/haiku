@@ -1,7 +1,12 @@
 SubDir OBOS_TOP src add-ons kernel drivers misc ;
 
+UsePrivateHeaders drivers ;
+
+
 KernelAddon <driver>config : kernel drivers dev misc :
 	config.c
 	;
 
-KernelObjects config.c : -fno-pic ;
+KernelAddon <driver>poke : kernel drivers dev misc :
+	poke.c
+	;
