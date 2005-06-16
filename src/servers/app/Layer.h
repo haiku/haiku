@@ -268,9 +268,16 @@ class Layer {
 			Layer*				fBottomChild;
 	
 	mutable	Layer*				fCurrent;
-	
+
+#ifndef NEW_CLIPPING	
 			BRegion				fVisible;
 			BRegion				fFullVisible;
+#else
+ private:
+			BRegion				fVisible2;
+			BRegion				fFullVisible2;
+ protected:
+#endif
 #ifndef NEW_CLIPPING
 			BRegion				fFull;
 #endif

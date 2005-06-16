@@ -803,8 +803,9 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			fCurrentLayer->SetViewColor(RGBColor(c));
 
 			// TODO: this should not trigger redraw, no?!?
+#ifndef NEW_CLIPPING
 			myRootLayer->GoRedraw(fCurrentLayer, fCurrentLayer->fVisible);
-			
+#endif
 			break;
 		}
 		case AS_LAYER_GET_COLORS:
@@ -939,8 +940,9 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				int32 noOfRects;
 			
 				ld = fCurrentLayer->fLayerData;
+#ifndef NEW_CLIPPING
 				reg = fCurrentLayer->ConvertFromParent(&(fCurrentLayer->fVisible));
-			
+#endif
 				if (ld->ClippingRegion())
 					reg.IntersectWith(ld->ClippingRegion());
 			
@@ -1449,7 +1451,11 @@ void
 ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 {
 	fWinBorder->GetRootLayer()->Lock();
-	BRegion rreg(fCurrentLayer->fVisible);
+	BRegion rreg
+#ifndef NEW_CLIPPING
+	(fCurrentLayer->fVisible)
+#endif
+	;
 	if (fWinBorder->fInUpdate)
 		rreg.IntersectWith(&fWinBorder->yUpdateReg);
 
@@ -2055,9 +2061,12 @@ ServerWindow::_CopyBits(RootLayer* rootLayer, Layer* layer,
 	//   are triggering BView::Draw() to be called
 	//   and for these parts only.
 
+#ifndef NEW_CLIPPING
+
 	// the region that is going to be copied
 	BRegion copyRegion(src);
 	// apply the current clipping of the layer
+
 	copyRegion.IntersectWith(&layer->fVisible);
 
 	// offset the region to the destination
@@ -2080,6 +2089,8 @@ ServerWindow::_CopyBits(RootLayer* rootLayer, Layer* layer,
 	// trigger the redraw			
 //	rootLayer->GoRedraw(fWinBorder, invalidRegion);
 rootLayer->RequestDraw(invalidRegion, fWinBorder);
+
+#endif
 }
 
 

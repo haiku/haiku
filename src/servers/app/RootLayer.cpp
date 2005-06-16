@@ -955,8 +955,10 @@ RootLayer::WinBorderAt(const BPoint& pt) const
 {
 	for (int32 i = 0; i < fWinBorderCount; i++)
 	{
+#ifndef NEW_CLIPPING
 		if (fWinBorderList[i]->fFullVisible.Contains(pt))
 			return fWinBorderList[i];
+#endif
 	}
 	return NULL;
 }
@@ -1536,10 +1538,12 @@ void RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 					#ifdef APPSERVER_ROOTLAYER_SHOW_WORKSPACE_NUMBER
 					{
 						// to draw the current Workspace index on screen.
+#ifndef NEW_CLIPPING
 					BRegion	reg(fVisible);
 					fDriver->ConstrainClippingRegion(&reg);
 					Draw(reg.Frame());
 					fDriver->ConstrainClippingRegion(NULL);
+#endif
 					}
 					#endif
 
@@ -2053,10 +2057,12 @@ RootLayer::draw_window_tab(WinBorder *exFocus)
 
 		if (exFocus && focus != exFocus) {
 			// TODO: this line is a hack, decorator is drawn twice.
+#ifndef NEW_CLIPPING
 			BRegion		reg(exFocus->fVisible);
 			if (focus)
 				reg.Include(&focus->fVisible);
 			redraw_layer(this, reg);
+#endif
 		}
 	}
 }
@@ -2068,9 +2074,10 @@ RootLayer::empty_visible_regions(Layer *layer)
 	// NOTE: first 'layer' must be a WinBorder
 	Layer	*child;
 
+#ifndef NEW_CLIPPING
 	layer->fFullVisible.MakeEmpty();
 	layer->fVisible.MakeEmpty();
-
+#endif
 	child	= layer->BottomChild();
 	while(child) {
 		empty_visible_regions(child);

@@ -545,7 +545,11 @@ WinBorder::HighlightDecorator(bool active)
 bool
 WinBorder::HasPoint(const BPoint& pt) const
 {
+#ifndef NEW_CLIPPING
 	return fFullVisible.Contains(pt);
+#else
+	return NULL;
+#endif
 }
 
 // Unimplemented. Hook function for handling when system GUI colors change
@@ -643,9 +647,12 @@ WinBorder::QuietlySetFeel(int32 feel)
 click_type
 WinBorder::_ActionFor(const PointerEvent& event) const
 {
+#ifndef NEW_CLIPPING
 	if (fTopLayer->fFullVisible.Contains(event.where))
 		return DEC_NONE;
-	else if (fDecorator)
+	else
+#endif
+	if (fDecorator)
 		return fDecorator->Clicked(event.where, event.buttons, event.modifiers);
 	else
 		return DEC_NONE;
