@@ -6,10 +6,7 @@ SharedLibrary device :
 	DigitalPort.cpp
 	Joystick.cpp
 	SerialPort.cpp
-;
-
-LinkSharedOSLibs libdevice.so :
-	be
+	: libbe.so libroot.so
 ;
 
 MakeLocate <develop>libdevice.so : $(OBOS_STLIB_DIR) ;
