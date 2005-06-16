@@ -1896,8 +1896,7 @@ BWindow::Show()
 void
 BWindow::Hide()
 {
-	if (fShowLevel == 0) {
-		Lock();
+	if (fShowLevel == 0 && Lock()) {
 		fLink->StartMessage(AS_HIDE_WINDOW);
 		fLink->Flush();
 		Unlock();
@@ -2877,13 +2876,19 @@ BWindow::DoUpdate(BView *aView, BRect &area)
 
 	// ToDo: DrawAfterChildren() is not called at all!
 
-	if (aView->Flags() & B_WILL_DRAW)
+	if (aView->Flags() & B_WILL_DRAW) {
+		aView->PushState();
 		aView->Draw(area);
-	else {
-		rgb_color c = aView->HighColor();
+		aView->PopState();
+	} else {
+		// The code below is certainly not correct, because
+		// it redoes what the app_server already did
+		// Find out what happens if a view has ViewColor() = 
+		// B_TRANSPARENT_COLOR but not B_WILL_DRAW
+/*		rgb_color c = aView->HighColor();
 		aView->SetHighColor(aView->ViewColor());
 		aView->FillRect(aView->Bounds(), B_SOLID_HIGH);
-		aView->SetHighColor(c);
+		aView->SetHighColor(c);*/
 	}
 
 	BView *child = aView->first_child;
