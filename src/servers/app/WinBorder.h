@@ -21,7 +21,7 @@
 //
 //	File Name:		WinBorder.h
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//					Adi Oanca <adioanca@mymail.ro>
+//					Adi Oanca <adioanca@cotty.iren.ro>
 //					Stephan Aßmus <superstippi@gmx.de>
 //	Description:	Layer subclass which handles window management
 //  
@@ -83,9 +83,9 @@ class WinBorder : public Layer {
 	
 	virtual	void				MoveBy(float x, float y);
 	virtual	void				ResizeBy(float x, float y);
-
+#ifndef NEW_CLIPPING
 	virtual	void				RebuildFullRegion();
-
+#endif
 			void				SetSizeLimits(float minWidth,
 											  float maxWidth,
 											  float minHeight,

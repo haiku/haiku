@@ -94,7 +94,7 @@ class Layer {
 	
 			const char*			GetName() const
 									{ return (fName) ? fName->String() : NULL; }
-	
+#ifndef NEW_CLIPPING
 	virtual	void				RebuildFullRegion();
 			void				StartRebuildRegions(const BRegion& reg,
 													Layer* target,
@@ -109,7 +109,7 @@ class Layer {
 			uint32				ResizeOthers(float x, float y,
 											 BPoint coords[],
 											 BPoint* ptOffset);
-	
+#endif
 			void				Redraw(const BRegion& reg,
 									   Layer* startFrom = NULL);
 	

@@ -21,7 +21,7 @@
 //
 //	File Name:		Layer.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//					Adi Oanca <adioanca@myrealbox.com>
+//					Adi Oanca <adioanca@cotty.iren.ro>
 //					Stephan Aßmus <superstippi@gmx.de>
 //	Description:	Class used for rendering to the frame buffer. One layer per 
 //					view on screen and also for window decorators
@@ -197,8 +197,9 @@ Layer::AddChild(Layer* layer, ServerWindow* serverWin)
 		c->fServerWin=serverWin;
 		
 		// 2.3) we are attached to the main tree so build our full region.
+#ifndef NEW_CLIPPING
 		c->RebuildFullRegion();
-		
+#endif
 		// tree parsing algorithm
 		if (c->fTopChild) {
 			// go deep
@@ -447,6 +448,7 @@ Layer::BottomChild() const
 	return fCurrent;
 }
 
+#ifndef NEW_CLIPPING
 
 //! Rebuilds the layer's "completely visible" region
 void
@@ -836,6 +838,8 @@ Layer::ResizeOthers(float x, float y, BPoint coords[], BPoint *ptOffset)
 	return 0UL;
 }
 
+#endif
+
 // Redraw
 void
 Layer::Redraw(const BRegion& reg, Layer *startFrom)
@@ -898,7 +902,9 @@ Layer::Show(bool invalidate)
 
 // NOTE: I added this here and it solves the invalid region problem
 // for Windows that have been resized before they were shown. -Stephan
+#ifndef NEW_CLIPPING
 RebuildFullRegion();
+#endif
 SendViewCoordUpdateMsg();
 
 	if (invalidate)
@@ -1321,15 +1327,19 @@ Layer::move_layer(float x, float y)
 		wb->fUpdateReg.OffsetBy(x, y);
 	}*/
 	
+#ifndef NEW_CLIPPING
 	BPoint pt(x, y);	
 	BRect rect(fFull.Frame().OffsetByCopy(pt));
+#endif
 
 if (!fParent) {
 printf("no parent in Layer::move_layer() (%s)\n", GetName());
 fFrameAction = B_LAYER_ACTION_NONE;
 return;
 }
+#ifndef NEW_CLIPPING
 	fParent->StartRebuildRegions(BRegion(rect), this, B_LAYER_MOVE, pt);
+#endif
 
 	fDriver->CopyRegionList(&fRootLayer->fCopyRegList,
 							&fRootLayer->fCopyList,
@@ -1351,7 +1361,10 @@ Layer::resize_layer(float x, float y)
 {
 	fFrameAction = B_LAYER_ACTION_RESIZE;
 
+#ifndef NEW_CLIPPING
 	BPoint pt(x,y);	
+#endif
+
 	BRect rect(fFull.Frame());
 	rect.right += x;
 	rect.bottom += y;
@@ -1361,9 +1374,10 @@ printf("no parent in Layer::resize_layer() (%s)\n", GetName());
 fFrameAction = B_LAYER_ACTION_NONE;
 return;
 }
-
+#ifndef NEW_CLIPPING
 	fParent->StartRebuildRegions(BRegion(rect), this, B_LAYER_RESIZE, pt);
-	
+#endif
+
 	fDriver->CopyRegionList(&fRootLayer->fCopyRegList, &fRootLayer->fCopyList, fRootLayer->fCopyRegList.CountItems(), &fFullVisible);
 	fParent->Redraw(fRootLayer->fRedrawReg, this);
 
@@ -1392,9 +1406,11 @@ Layer::FullInvalidate(const BRegion& region)
 	printf("\n");
 #endif
 
+#ifndef NEW_CLIPPING
 	BPoint pt(0,0);
 	StartRebuildRegions(region, NULL,/* B_LAYER_INVALIDATE, pt); */B_LAYER_NONE, pt);
-	
+#endif
+
 	Redraw(fRootLayer->fRedrawReg);
 	
 	EmptyGlobals();

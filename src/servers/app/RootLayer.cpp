@@ -226,7 +226,9 @@ RootLayer::WorkingThread(void *data)
 
 	// first make sure we are actualy visible
 	oneRootLayer->Lock();
+#ifndef NEW_CLIPPING
 	oneRootLayer->RebuildFullRegion();
+#endif
 	oneRootLayer->invalidate_layer(oneRootLayer, oneRootLayer->Bounds());
 	oneRootLayer->Unlock();
 	

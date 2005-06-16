@@ -140,7 +140,9 @@ WinBorder::WinBorder(const BRect &r,
 			fDecorator->GetSizeLimits(&fMinWidth, &fMinHeight, &fMaxWidth, &fMaxHeight);
 	}
 
+#ifndef NEW_CLIPPING
 	RebuildFullRegion();
+#endif
 
 	gDesktop->AddWinBorder(this);
 
@@ -283,6 +285,8 @@ y = (float)int32(y);
 	}
 }
 
+#ifndef NEW_CLIPPING
+
 //! Rebuilds the WinBorder's "fully-visible" region based on info from the decorator
 void
 WinBorder::RebuildFullRegion()
@@ -295,6 +299,8 @@ WinBorder::RebuildFullRegion()
 	if (fDecorator)
 		fDecorator->GetFootprint(&fFull);
 }
+
+#endif
 
 //! Sets the minimum and maximum sizes of the window
 void

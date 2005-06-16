@@ -21,7 +21,7 @@
 //
 //	File Name:		ServerWindow.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//					Adi Oanca <adioanca@mymail.ro>
+//					Adi Oanca <adioanca@cotty.iren.ro>
 //					Stephan Aßmus <superstippi@gmx.de>
 //	Description:	Shadow BWindow class
 //
@@ -519,7 +519,9 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			SetLayerState(fCurrentLayer, link);
 			// TODO: should this be moved into SetLayerState?
 			// If it _always_ needs to be done afterwards, then yes!
+#ifndef NEW_CLIPPING
 			fCurrentLayer->RebuildFullRegion();
+#endif
 			break;
 		}
 		case AS_LAYER_SET_FONT_STATE:
@@ -527,7 +529,9 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
 //			SetLayerFontState(fCurrentLayer);
 			SetLayerFontState(fCurrentLayer, link);
+#ifndef NEW_CLIPPING
 			fCurrentLayer->RebuildFullRegion();
+#endif
 			break;
 		}
 		case AS_LAYER_GET_STATE:
@@ -699,8 +703,9 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			DTRACE(("ServerWindow %s: Message AS_LAYER_PUSH_STATE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			
 			fCurrentLayer->PushState();
+#ifndef NEW_CLIPPING
 			fCurrentLayer->RebuildFullRegion();
-			
+#endif
 			break;
 		}
 		case AS_LAYER_POP_STATE:
@@ -708,8 +713,9 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			DTRACE(("ServerWindow %s: Message AS_LAYER_POP_STATE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			
 			fCurrentLayer->PopState();
+#ifndef NEW_CLIPPING
 			fCurrentLayer->RebuildFullRegion();
-
+#endif
 			break;
 		}
 		case AS_LAYER_SET_SCALE:
@@ -893,7 +899,9 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				
 			fCurrentLayer->fLayerData->SetClippingRegion(region);
 
+#ifndef NEW_CLIPPING
 			fCurrentLayer->RebuildFullRegion();
+#endif
 			if (!(fCurrentLayer->IsHidden()))
 				myRootLayer->GoInvalidate(fCurrentLayer, fCurrentLayer->fFull);
 				
@@ -960,7 +968,9 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			}
 			fCurrentLayer->fLayerData->SetClippingRegion(region);
 
+#ifndef NEW_CLIPPING
 			fCurrentLayer->RebuildFullRegion();
+#endif
 			if (!(fCurrentLayer->IsHidden()))
 				myRootLayer->GoInvalidate(fCurrentLayer, fCurrentLayer->fFull);
 
