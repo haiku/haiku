@@ -896,7 +896,7 @@ BView::DrawAfterChildren(BRect r)
 
 
 void
-BView::FrameMoved(BPoint new_position)
+BView::FrameMoved(BPoint newPosition)
 {
 	// HOOK function
 	STRACE(("\tHOOK: BView(%s)::FrameMoved()\n", Name()));
@@ -904,7 +904,7 @@ BView::FrameMoved(BPoint new_position)
 
 
 void
-BView::FrameResized(float new_width, float new_height)
+BView::FrameResized(float newWidth, float newHeight)
 {
 	// HOOK function
 	STRACE(("\tHOOK: BView(%s)::FrameResized()\n", Name()));
@@ -912,11 +912,12 @@ BView::FrameResized(float new_width, float new_height)
 
 
 void
-BView::GetPreferredSize(float* width, float* height)
+BView::GetPreferredSize(float* _width, float* _height)
 {
 	STRACE(("\tHOOK: BView(%s)::GetPreferredSize()\n", Name()));
-	*width				= fBounds.Width();
-	*height				= fBounds.Height();
+
+	*_width = fBounds.Width();
+	*_height = fBounds.Height();
 }
 
 
@@ -924,9 +925,6 @@ void
 BView::ResizeToPreferred()
 {
 	STRACE(("\tHOOK: BView(%s)::ResizeToPreferred()\n", Name()));
-
-	// TODO: Test if this version of the implementation is
-	// in BView or BControl in R5.
 
 	float width;
 	float height;
@@ -3112,7 +3110,8 @@ BView::RemoveChild(BView *child)
 int32
 BView::CountChildren() const
 {
-	// ToDo: without any locking???
+	check_lock_no_pick();
+
 	uint32 count = 0;
 	BView *child = first_child;
 
@@ -3128,8 +3127,9 @@ BView::CountChildren() const
 BView *
 BView::ChildAt(int32 index) const
 {
-	BView *child = first_child;
+	check_lock_no_pick();
 
+	BView *child = first_child;
 	while (child != NULL && index-- > 0) {
 		child = child->next_sibling;
 	}
@@ -3164,8 +3164,8 @@ BView::Parent() const
 {
 	if (parent && parent->top_level_view)
 		return NULL;
-	else
-		return parent;
+
+	return parent;
 }
 
 
@@ -3211,10 +3211,6 @@ BView::MoveTo(float x, float y)
 
 	originX = x;
 	originY = y;
-// TODO: investigate R5 behaviour for unattached views
-// maybe the message is generated, but postponed until the view is added
-if (!owner && fFlags & B_FRAME_EVENTS)
-	FrameMoved(BPoint(originX, originY));
 }
 
 
@@ -3253,11 +3249,6 @@ BView::ResizeTo(float width, float height)
 
 	fBounds.right = fBounds.left + width;
 	fBounds.bottom = fBounds.top + height;
-
-	// TODO: investigate R5 behaviour for unattached views
-	// maybe the message is generated, but postponed until the view is added
-	if (!owner && fFlags & B_FRAME_EVENTS)
-		FrameResized(width, height);
 }
 
 
@@ -3493,38 +3484,38 @@ BView::InitData(BRect frame, const char *name, uint32 resizingMode, uint32 flags
 	STRACE(("BView::InitData: enter\n"));
 	
 	// initialize members		
-	fFlags				= (resizingMode & _RESIZE_MASK_) | (flags & ~_RESIZE_MASK_);
+	fFlags = (resizingMode & _RESIZE_MASK_) | (flags & ~_RESIZE_MASK_);
 
-	originX				= frame.left;
-	originY				= frame.top;
+	originX = frame.left;
+	originY = frame.top;
 
-	owner				= NULL;
-	parent				= NULL;
-	next_sibling		= NULL;
-	prev_sibling		= NULL;
-	first_child			= NULL;
+	owner = NULL;
+	parent = NULL;
+	next_sibling = NULL;
+	prev_sibling = NULL;
+	first_child = NULL;
 
-	fShowLevel			= 0;
-	top_level_view		= false;
+	fShowLevel = 0;
+	top_level_view = false;
 
-	cpicture			= NULL;
-	comm				= NULL;
+	cpicture = NULL;
+	comm = NULL;
 
-	fVerScroller		= NULL;
-	fHorScroller		= NULL;
+	fVerScroller = NULL;
+	fHorScroller = NULL;
 
-	f_is_printing		= false;
+	f_is_printing = false;
 
-	fPermanentState		= NULL;
-	fState				= new ViewAttr;
+	fPermanentState = NULL;
+	fState = new ViewAttr;
 
-	fBounds				= frame.OffsetToCopy(0.0, 0.0);
-	fShelf				= NULL;
-	pr_state			= NULL;
+	fBounds = frame.OffsetToCopy(0.0, 0.0);
+	fShelf = NULL;
+	pr_state = NULL;
 
-	fEventMask			= 0;
-	fEventOptions		= 0;
-	
+	fEventMask = 0;
+	fEventOptions = 0;
+
 	// call initialization methods.
 	initCachedState();
 }
@@ -3619,7 +3610,7 @@ BView::removeSelf()
 	# contact app_server							- HERE
 	# set a new owner = NULL						- by setOwner(NULL)
 */
- 	bool		returnValue = true;
+ 	bool returnValue = true;
 
 	if (!parent) {
 		STRACE(("BView(%s)::removeSelf()... NO parent\n", this->Name()));
@@ -3757,17 +3748,9 @@ BView::callAttachHooks(BView *view)
 bool
 BView::attachView(BView *view)
 {
-	// LEAVE the following line commented!!!
-	//	check_lock();
-
-	/*
-		INFO:
-	
-		'check_lock()' checks for a lock on the window and then, sets
-		 	BWindow::fLastViewToken to the one of the view which called check_lock(),
-		 	and sends it to the app_server to be the view for which current actions
-	 		are made.
-	*/
+	// AS_LAYER_CREATE & AS_LAYER_CREATE_ROOT do not use the
+	// current view mechanism via check_lock() - the token
+	// of the view and its parent are both send to the server.
 
 	if (view->top_level_view)
 		owner->fLink->StartMessage(AS_LAYER_CREATE_ROOT);
@@ -3840,21 +3823,21 @@ BView::setCachedState()
 {
 	setFontState(&fState->font, fState->fontFlags);
 
-	owner->fLink->StartMessage( AS_LAYER_SET_STATE );
-	owner->fLink->Attach<BPoint>( fState->penPosition );
-	owner->fLink->Attach<float>( fState->penSize );
-	owner->fLink->Attach<rgb_color>( fState->highColor );
-	owner->fLink->Attach<rgb_color>( fState->lowColor );
-	owner->fLink->Attach<pattern>( fState->patt );	
-	owner->fLink->Attach<int8>( (int8)fState->drawingMode );
-	owner->fLink->Attach<BPoint>( fState->coordSysOrigin );
-	owner->fLink->Attach<int8>( (int8)fState->lineJoin );
-	owner->fLink->Attach<int8>( (int8)fState->lineCap );
-	owner->fLink->Attach<float>( fState->miterLimit );
-	owner->fLink->Attach<int8>( (int8)fState->alphaSrcMode );
-	owner->fLink->Attach<int8>( (int8)fState->alphaFncMode );
-	owner->fLink->Attach<float>( fState->scale );
-	owner->fLink->Attach<bool>( fState->fontAliasing );
+	owner->fLink->StartMessage(AS_LAYER_SET_STATE);
+	owner->fLink->Attach<BPoint>(fState->penPosition);
+	owner->fLink->Attach<float>(fState->penSize);
+	owner->fLink->Attach<rgb_color>(fState->highColor);
+	owner->fLink->Attach<rgb_color>(fState->lowColor);
+	owner->fLink->Attach<pattern>(fState->patt);	
+	owner->fLink->Attach<int8>((int8)fState->drawingMode);
+	owner->fLink->Attach<BPoint>(fState->coordSysOrigin);
+	owner->fLink->Attach<int8>((int8)fState->lineJoin);
+	owner->fLink->Attach<int8>((int8)fState->lineCap);
+	owner->fLink->Attach<float>(fState->miterLimit);
+	owner->fLink->Attach<int8>((int8)fState->alphaSrcMode);
+	owner->fLink->Attach<int8>((int8)fState->alphaFncMode);
+	owner->fLink->Attach<float>(fState->scale);
+	owner->fLink->Attach<bool>(fState->fontAliasing);
 
 	// we send the 'local' clipping region... if we have one...
 	int32 count = fState->clippingRegion.CountRects();
@@ -4112,7 +4095,7 @@ BView::do_owner_check() const
 		return false;
 	}
 
-	owner->AssertLocked();
+	owner->check_lock();
 
 	if (owner->fLastViewToken != serverToken) {
 		STRACE(("contacting app_server... sending token: %ld\n", serverToken));
@@ -4132,19 +4115,17 @@ BView::check_lock() const
 {
 	STRACE(("BView(%s)::check_lock()...", Name() ? Name(): "NULL"));
 
-	int32 serverToken = _get_object_token_(this);
-
-	if (!owner) {
-		STRACE(("quiet1\n"));
+	if (!owner)
 		return;
-	}
 
-	owner->AssertLocked();
+	owner->check_lock();
+
+	int32 serverToken = _get_object_token_(this);
 
 	if (owner->fLastViewToken != serverToken) {
 		STRACE(("contacting app_server... sending token: %ld\n", serverToken));
-		owner->fLink->StartMessage( AS_SET_CURRENT_LAYER );
-		owner->fLink->Attach<int32>( serverToken );
+		owner->fLink->StartMessage(AS_SET_CURRENT_LAYER);
+		owner->fLink->Attach<int32>(serverToken);
 
 		owner->fLastViewToken = serverToken;
 	} else {
@@ -4157,7 +4138,7 @@ void
 BView::check_lock_no_pick() const
 {
 	if (owner)
-		owner->AssertLocked();
+		owner->check_lock();
 }
 
 
@@ -4165,7 +4146,7 @@ bool
 BView::do_owner_check_no_pick() const
 {
 	if (owner) {
-		owner->AssertLocked();
+		owner->check_lock();
 		return true;
 	} else {
 		debugger("View method requires owner and doesn't have one.");
