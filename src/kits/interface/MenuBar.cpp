@@ -411,8 +411,9 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 		if (menuItem != NULL && menuItem != fSelected) {
 			// only select the item
 			SelectItem(menuItem, -1);
-			if (menuItem->Submenu() != NULL) {
-				// open the menu
+			if (menuItem->Submenu() != NULL
+				&& menuItem->Submenu()->Window() == NULL) {
+				// open the menu if it's not opened yet
 				SelectItem(menuItem);
 			}
 		}
@@ -421,15 +422,18 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 			BMenu *menu = fSelected->Submenu();
 			if (menu != NULL) {
 				window->Unlock();
+				if (IsStickyPrefOn())
+					menu->SetStickyMode(true);
 				snoozeAmount = 0;
 				resultItem = menu->_track(&localAction);
 				if (window->LockWithTimeout(200000) < B_OK)
 					break;
 			}
 		}
-		
+						
 		window->Unlock();
-		if (buttons == 0 || localAction == MENU_ACT_CLOSE)
+		
+		if (localAction == MENU_ACT_CLOSE)
 			break;
 		
 		if (snoozeAmount > 0)
