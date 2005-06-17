@@ -80,7 +80,6 @@ ObjectView::Draw(BRect updateRect)
 	DrawString(message, p);
 
 	SetDrawingMode(B_OP_ALPHA);
-//	SetDrawingMode(B_OP_OVER);
 	for (int32 i = 0; State* state = (State*)fStateList.ItemAt(i); i++)
 		state->Draw(this);
 

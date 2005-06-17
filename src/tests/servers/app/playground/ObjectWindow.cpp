@@ -134,15 +134,51 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 	controlGroup->AddChild(radioButton);
 
 	// drawing mode
-/*	BPopUpMenu* popupMenu = new BPopUpMenu("<pick>");
+	BPopUpMenu* popupMenu = new BPopUpMenu("<pick>");
 
 	message = new BMessage(MSG_SET_DRAWING_MODE);
 	message->AddInt32("mode", B_OP_COPY);
-	popupMenu->AddItem(new BMenuItem("B_OP_COPY", message));
+	popupMenu->AddItem(new BMenuItem("Copy", message));
 
 	message = new BMessage(MSG_SET_DRAWING_MODE);
 	message->AddInt32("mode", B_OP_OVER);
-	popupMenu->AddItem(new BMenuItem("B_OP_OVER", message));
+	popupMenu->AddItem(new BMenuItem("Over", message));
+
+	message = new BMessage(MSG_SET_DRAWING_MODE);
+	message->AddInt32("mode", B_OP_INVERT);
+	popupMenu->AddItem(new BMenuItem("Invert", message));
+
+	message = new BMessage(MSG_SET_DRAWING_MODE);
+	message->AddInt32("mode", B_OP_BLEND);
+	popupMenu->AddItem(new BMenuItem("Blend", message));
+
+	message = new BMessage(MSG_SET_DRAWING_MODE);
+	message->AddInt32("mode", B_OP_SELECT);
+	popupMenu->AddItem(new BMenuItem("Select", message));
+
+	message = new BMessage(MSG_SET_DRAWING_MODE);
+	message->AddInt32("mode", B_OP_ERASE);
+	popupMenu->AddItem(new BMenuItem("Erase", message));
+
+	message = new BMessage(MSG_SET_DRAWING_MODE);
+	message->AddInt32("mode", B_OP_ADD);
+	popupMenu->AddItem(new BMenuItem("Add", message));
+
+	message = new BMessage(MSG_SET_DRAWING_MODE);
+	message->AddInt32("mode", B_OP_SUBTRACT);
+	popupMenu->AddItem(new BMenuItem("Subtract", message));
+
+	message = new BMessage(MSG_SET_DRAWING_MODE);
+	message->AddInt32("mode", B_OP_MIN);
+	popupMenu->AddItem(new BMenuItem("Min", message));
+
+	message = new BMessage(MSG_SET_DRAWING_MODE);
+	message->AddInt32("mode", B_OP_MAX);
+	popupMenu->AddItem(new BMenuItem("Max", message));
+
+	message = new BMessage(MSG_SET_DRAWING_MODE);
+	message->AddInt32("mode", B_OP_ALPHA);
+	popupMenu->AddItem(new BMenuItem("Alpha", message));
 
 	b.OffsetBy(0, radioButton->Bounds().Height() + 5.0);
 	fDrawingModeMF = new BMenuField(b, "drawing mode field", "Mode",
@@ -151,9 +187,9 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 	controlGroup->AddChild(fDrawingModeMF);
 
 	fDrawingModeMF->SetDivider(fDrawingModeMF->StringWidth(fDrawingModeMF->Label()) + 10.0);
-*/
+
 	// red text control
-	b.OffsetBy(0, radioButton->Bounds().Height() + 5.0);
+	b.OffsetBy(0, fDrawingModeMF->Bounds().Height() + 5.0);
 	fRedTC = new BTextControl(b, "red text control", "Red", "",
 							  new BMessage(MSG_SET_COLOR));
 	controlGroup->AddChild(fRedTC);
