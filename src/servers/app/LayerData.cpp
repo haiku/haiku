@@ -81,8 +81,16 @@ DrawData::~DrawData()
 DrawData&
 DrawData::operator=(const DrawData& from)
 {
-	fOrigin				= from.fOrigin;
-	fScale				= from.fScale;
+	// NOTE: This function is intended for use by the Layer
+	// state stack only.
+	// So it does not make a true copy of the DrawData, but resets
+	// fOrigin and fScale and uses the current the font size as
+	// fUnscaledFontSize.
+
+//	fOrigin				= from.fOrigin;
+//	fScale				= from.fScale;
+	fOrigin				= BPoint(0.0, 0.0);
+	fScale				= 1.0;
 
 	if (from.fClippingRegion) {
 		SetClippingRegion(*(from.fClippingRegion));
@@ -110,7 +118,11 @@ DrawData::operator=(const DrawData& from)
 	fLineJoinMode		= from.fLineJoinMode;
 	fMiterLimit			= from.fMiterLimit;
 
-	fUnscaledFontSize	= from.fUnscaledFontSize;
+//	fUnscaledFontSize	= from.fUnscaledFontSize;
+	// Since fScale is reset to 1.0, the unscaled
+	// font size is the current size of the font
+	// (which is from.fFont.Size() * from.fScale)
+	fUnscaledFontSize	= fFont.Size();
 
 	return *this;
 }

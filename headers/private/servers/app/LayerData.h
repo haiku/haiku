@@ -51,6 +51,9 @@ class DrawData {
 								DrawData(const DrawData& from);
 	virtual						~DrawData();
 
+	// NOTE: this operator will not make a 1:1 copy, it is used
+	// for the state stack and therefor origin and scale are reset
+	// to B_ORIGIN and 1.0.
 			DrawData&			operator=(const DrawData& from);
 
 								// coordinate transformation
@@ -155,13 +158,16 @@ class DrawData {
 			float				fPenSize;
 
 			ServerFont			fFont;
+// TODO: Remove, see above
 			bool				fFontAntiAliasing;
 			escapement_delta	fEscapementDelta;
+//
 
 			cap_mode			fLineCapMode;
 			join_mode			fLineJoinMode;
 			float				fMiterLimit;
-
+			// "internal", used to calculate the size
+			// of the font (again) when the scale changes
 			float				fUnscaledFontSize;
 };
 
