@@ -827,7 +827,7 @@ rule Lex
 
 rule Library
 {
-	LibraryFromObjects $(<) : [ FGristFiles $(>:S=$(SUFOBJ)) ] ;
+	LibraryFromObjects $(<) : $(>:S=$(SUFOBJ)) ;
 	Objects $(>) ;
 }
 
@@ -837,7 +837,7 @@ rule LibraryFromObjects
 
 	# Add grist to file names
 
-	_s = $(>) ;
+	_s = [ FGristFiles $(>) ] ;
 	_l = $(<:S=$(SUFLIB)) ;
 
 	# library depends on its member objects

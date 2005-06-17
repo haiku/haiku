@@ -920,9 +920,10 @@ rule StaticLibrary
 	SetupIncludes ;
 	SetupObjectsDir ;
 	MakeLocateObjects $(2) ;
-	Library $(lib) : $(2) ;
+	StaticLibraryFromObjects $(lib) : [ FGristFiles $(2:S=$(SUFOBJ)) ] ;
+	Objects $(2) ;
 	if $(4) {
-		LibraryFromObjects $(lib) : $(4) ;
+		StaticLibraryFromObjects $(lib) : $(4) ;
 	}
 	local targetDir = $(3) ;
 	if $(targetDir) {
@@ -940,6 +941,71 @@ rule StaticLibrary
 	if $(KEEPOBJS) {
 		LocalDepends lib : $(lib) ;
 	}
+}
+
+rule StaticLibraryFromObjects
+{
+	local _i _l _s ;
+
+	# Add grist to file names
+
+	_s = $(>) ;
+	_l = $(<:S=$(SUFLIB)) ;
+
+	# library depends on its member objects
+
+	if $(KEEPOBJS)
+	{
+	    LocalDepends obj : $(_s) ;
+	}
+	else
+	{
+	    LocalDepends lib : $(_l) ;
+	}
+
+	# Set LOCATE for the library and its contents.  The bound
+	# value shows up as $(NEEDLIBS) on the Link actions.
+	# For compatibility, we only do this if the library doesn't
+	# already have a path.
+
+	if ! $(_l:D)
+	{
+	    MakeLocate $(_l) $(_l)($(_s:BS)) : $(LOCATE_TARGET) ;
+	}
+
+	if $(NOARSCAN) 
+	{ 
+	    # If we can't scan the library to timestamp its contents,
+	    # we have to just make the library depend directly on the
+	    # on-disk object files.  
+
+	    Depends $(_l) : $(_s) ;
+	}
+	else
+	{
+	    # If we can scan the library, we make the library depend
+	    # on its members and each member depend on the on-disk
+	    # object file.
+
+	    Depends $(_l) : $(_l)($(_s:BS)) ;
+
+	    for _i in $(_s)
+	    {
+		Depends $(_l)($(_i:BS)) : $(_i) ;
+	    }
+	}
+
+	LocalClean clean : $(_l) ;
+
+	if $(CRELIB) { CreLib $(_l) : $(_s[1]) ; }
+
+	Archive $(_l) : $(_s) ;
+
+	if $(RANLIB) { Ranlib $(_l) ; }
+
+	# If we can't scan the library, we have to leave the .o's around.
+
+	if ! ( $(NOARSCAN) || $(NOARUPDATE) ) { RmTemps $(_l) : $(_s) ; }
 }
 
 rule R5KernelStaticLibrary
