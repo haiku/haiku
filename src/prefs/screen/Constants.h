@@ -1,7 +1,15 @@
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Rafael Romo
+ *		Stefano Ceccherini (burton666@libero.it)
+ */
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-//Messages
+// Messages
 static const uint32 WORKSPACE_CHECK_MSG = 'wchk';
 static const uint32 BUTTON_DEFAULTS_MSG = 'bdef';
 static const uint32 BUTTON_REVERT_MSG = 'brev';
@@ -23,9 +31,9 @@ static const uint32 SET_CUSTOM_REFRESH_MSG = 'scrf';
 static const uint32 DIM_COUNT_MSG = 'scrf';
 static const uint32 MAKE_INITIAL_MSG = 'mkin';
 
-//Constants
+// Constants
 static const char kAppSignature[] = "application/x-vnd.Be-SCRN";
-static const int32 gMinRefresh = 45; //This is the minimum selectable refresh
-static const int32 gMaxRefresh = 140; //This is the maximum selectable refresh
+static const int32 gMinRefresh = 45;	// This is the minimum selectable refresh
+static const int32 gMaxRefresh = 140;	// This is the maximum selectable refresh
 
-#endif //CONSTANTS_H
+#endif	/* CONSTANTS_H */

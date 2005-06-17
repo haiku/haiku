@@ -1,20 +1,34 @@
-#ifndef __ALERTWINDOW_H
-#define __ALERTWINDOW_H
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Rafael Romo
+ *		Stefano Ceccherini (burton666@libero.it)
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+#ifndef ALERT_WINDOW_H
+#define ALERT_WINDOW_H
 
-#include "AlertView.h"
 
-class AlertWindow : public BWindow
-{
-public:
-	AlertWindow(BRect frame);
-	virtual bool QuitRequested();
-	virtual void MessageReceived(BMessage *message);
+#include <Window.h>
+#include <Messenger.h>
 
-private:
-	AlertView *fAlertView;
-	BMessageRunner *fRunner;
-	BButton	*fRevertButton;
-	BButton	*fKeepButton;
+
+class BMessageRunner;
+class BButton;
+class AlertView;
+
+
+class AlertWindow : public BWindow {
+	public:
+		AlertWindow(BRect frame, BMessenger target);
+
+		virtual void MessageReceived(BMessage *message);
+
+	private:
+		BMessenger	fTarget;
+		AlertView*	fAlertView;
 };
 
-#endif
+#endif	/* ALERT_WINDOW_H */

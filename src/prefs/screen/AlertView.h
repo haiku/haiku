@@ -1,20 +1,38 @@
-#ifndef __ALERTVIEW_H
-#define __ALERTVIEW_H
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Rafael Romo
+ *		Stefano Ceccherini (burton666@libero.it)
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+#ifndef ALERT_VIEW_H
+#define ALERT_VIEW_H
+
 
 #include <String.h>
 #include <View.h>
 
-class AlertView : public BView
-{
-public:
-	AlertView(BRect frame, char *name);
-	virtual void AttachedToWindow();
-	virtual void Draw(BRect updateRect);
-	uint32 count;
-	
-private:	
-	BBitmap	*fBitmap;
-	BString	fString;
+class BBitmap;
+class BStringView;
+
+
+class AlertView : public BView {
+	public:
+		AlertView(BRect frame, char *name);
+
+		virtual void AttachedToWindow();
+		virtual void Draw(BRect updateRect);
+		virtual void Pulse();
+
+	private:
+		void UpdateCountdownView();
+		BBitmap *InitIcon();
+
+		BStringView	*fCountdownView;
+		BBitmap		*fBitmap;
+		int32		fSeconds;
 };
 
-#endif
+#endif	/* ALERT_VIEW_H */

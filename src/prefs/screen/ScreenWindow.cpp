@@ -1,3 +1,14 @@
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Rafael Romo
+ *		Stefano Ceccherini (burton666@libero.it)
+ *		Andrew Bachmann
+ */
+
+
 #include <Alert.h>
 #include <Application.h>
 #include <Box.h>
@@ -23,16 +34,17 @@
 #include "ScreenWindow.h"
 #include "Utility.h"
 
+
 static uint32
 colorspace_to_bpp(uint32 colorspace)
 {
 	switch (colorspace) {
-	case B_RGB32:	return 32;
-	case B_RGB24:	return 24;
-	case B_RGB16:	return 16;
-	case B_RGB15:	return 15;
-	case B_CMAP8:	return 8;
-	default:		return 0;
+		case B_RGB32:	return 32;
+		case B_RGB24:	return 24;
+		case B_RGB16:	return 16;
+		case B_RGB15:	return 15;
+		case B_CMAP8:	return 8;
+		default:		return 0;
 	}
 }
 
@@ -50,12 +62,12 @@ string_to_colorspace(const char* string)
 	uint32 bits = 0;
 	sscanf(string,"%ld",&bits);
 	switch (bits) {
-	case 8:		return B_CMAP8;
-	case 15:	return B_RGB15;
-	case 16:	return B_RGB16;
-	case 24:	return B_RGB24;
-	case 32:	return B_RGB32;
-	default:	return B_CMAP8; // Should return an error?
+		case 8:		return B_CMAP8;
+		case 15:	return B_RGB15;
+		case 16:	return B_RGB16;
+		case 24:	return B_RGB24;
+		case 32:	return B_RGB32;
+		default:	return B_CMAP8; // Should return an error?
 	}
 }
 
@@ -110,30 +122,29 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	: BWindow(Settings->WindowFrame(), "Screen", B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES)
 {
+	BScreen screen(this);
 	BRect frame(Bounds());
-	BScreen screen(B_MAIN_SCREEN_ID);
-
-	if (!screen.IsValid())
-		;//debugger() ?
 
 	fSupportedModes = NULL;
 	fTotalModes = 0;
 	screen.GetModeList(&fSupportedModes, &fTotalModes);
 
-	frame.InsetBy(-1, -1);
-	fScreenView = new BBox(frame, "ScreenView");
-	fScreenDrawView = new ScreenDrawView(BRect(20.0, 16.0, 122.0, 93.0), "ScreenDrawView");	
-		
-	AddChild(fScreenView);
-	
+	BView *view = new BView(frame, "ScreenView", B_FOLLOW_ALL, B_WILL_DRAW);
+	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AddChild(view);
+
 	fSettings = Settings;
-	
+
 	BRect screenBoxRect(11.0, 18.0, 153.0, 155.0);	
 	BBox *screenBox = new BBox(screenBoxRect);
 	screenBox->SetBorder(B_FANCY_BORDER);
-	
+
+	fScreenDrawView = new ScreenDrawView(BRect(20.0, 16.0, 122.0, 93.0), "ScreenDrawView");	
+	screenBox->AddChild(fScreenDrawView);
+
 	fWorkspaceCountMenu = new BPopUpMenu("", true, true);
 	fWorkspaceCountField = new BMenuField(BRect(7.0, 107.0, 135.0, 127.0), "WorkspaceCountMenu", "Workspace count:", fWorkspaceCountMenu, true);
+	screenBox->AddChild(fWorkspaceCountField);	
 
 	for (int32 count = 1; count <= 32; count++) {
 		BString workspaceCount;
@@ -151,9 +162,7 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 
 	fWorkspaceCountField->SetDivider(91.0);
 
-	screenBox->AddChild(fScreenDrawView);	
-	screenBox->AddChild(fWorkspaceCountField);	
-	fScreenView->AddChild(screenBox);
+	view->AddChild(screenBox);
 
 	fWorkspaceMenu = new BPopUpMenu("Current Workspace", true, true);
 	fAllWorkspacesItem = new BMenuItem("All Workspaces", new BMessage(WORKSPACE_CHECK_MSG));
@@ -224,7 +233,7 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 
 	controlsBox->AddChild(fRefreshField);
 
-	fScreenView->AddChild(controlsBox);
+	view->AddChild(controlsBox);
 
 	ButtonRect.Set(10.0, 167, 100.0, 200.0);
 
@@ -234,7 +243,7 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	fDefaultsButton->AttachedToWindow();
 	fDefaultsButton->ResizeToPreferred();
 
-	fScreenView->AddChild(fDefaultsButton);
+	view->AddChild(fDefaultsButton);
 
 	ButtonRect.Set(95.0, 167, 160.0, 200.0);
 
@@ -245,12 +254,13 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	fRevertButton->ResizeToPreferred();
 	fRevertButton->SetEnabled(false);
 
-	fScreenView->AddChild(fRevertButton);
+	view->AddChild(fRevertButton);
 
 	SetStateByMode();
 
 	fCustomRefresh = fInitialRefreshN;
 }
+
 
 void
 ScreenWindow::SetStateByMode()
@@ -259,11 +269,6 @@ ScreenWindow::SetStateByMode()
 	BMenuItem *marked;
 	display_mode mode;
 	BScreen screen(B_MAIN_SCREEN_ID);
-	
-	if (!screen.IsValid()) {
-		//debugger() ?
-		return;
-	}
 
 	screen.GetMode(&mode);
 	fInitialMode = mode;
@@ -271,16 +276,16 @@ ScreenWindow::SetStateByMode()
 	char str[256];
 	mode_to_string(mode,str);
 	marked = fResolutionMenu->FindItem(str);
-	if (marked) {
+	if (marked)
 		marked->SetMarked(true);
-	}
+
 	fInitialResolution = marked;
 	
 	colorspace_to_string(mode.space,str);
 	marked = fColorsMenu->FindItem(str);
-	if (marked) {
+	if (marked)
 		marked->SetMarked(true);
-	}
+
 	fInitialColors = marked;
 	
 	fInitialRefreshN = get_refresh_rate(mode);
@@ -650,17 +655,17 @@ ScreenWindow::CheckModesByResolution(const char *res)
 	}
 }
 
+
 void
 ScreenWindow::ApplyMode()
 {
 	BScreen screen(B_MAIN_SCREEN_ID);
-	
 	if (!screen.IsValid())
 		return;
-					
+
 	display_mode requested_mode;
 	screen.GetMode(&requested_mode); // start with current mode timings
-						
+
 	BString menuLabel = fResolutionMenu->FindMarked()->Label();
 	string_to_mode(menuLabel.String(),&requested_mode);
 	requested_mode.space = string_to_colorspace(fColorsMenu->FindMarked()->Label());
@@ -696,13 +701,13 @@ ScreenWindow::ApplyMode()
 		string << str;
 		mode_to_string(proposed_mode,str);
 		string << " at " << str << " instead?";
-		BAlert * BadColorsAlert = 
+		BAlert *badColorsAlert = 
 			new BAlert("BadColorsAlert", string.String(),
 			           "Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
-		int32 button = BadColorsAlert->Go();
-		if (button == 1) {
+		int32 button = badColorsAlert->Go();
+		if (button == 1)
 			return;
-		}
+
 		requested_mode = proposed_mode;
 	} else {
 		display_mode proposed_mode = requested_mode;
@@ -724,13 +729,13 @@ ScreenWindow::ApplyMode()
 		string << str;
 		mode_to_string(proposed_mode,str);
 		string << " at " << str << " instead?";
-		BAlert * BadModeAlert = 
+		BAlert *badModeAlert = 
 			new BAlert("BadModeAlert", string.String(),
 			           "Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
-		int32 button = BadModeAlert->Go();
-		if (button == 1) {
+		int32 button = badModeAlert->Go();
+		if (button == 1)
 			return;
-		}
+
 		requested_mode = proposed_mode;
 	}
 
@@ -793,8 +798,8 @@ ScreenWindow::ApplyMode()
 	rect.top = (screen.Frame().bottom / 2) - 42;
 	rect.right = rect.left + 300.0;
 	rect.bottom = rect.top + 93.0;
-	
- 	(new AlertWindow(rect))->Show();
-							
+
+ 	(new AlertWindow(rect, this))->Show();
+
 	fApplyButton->SetEnabled(false);
 }
