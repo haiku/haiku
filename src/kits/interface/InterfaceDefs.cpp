@@ -686,8 +686,8 @@ set_mouse_mode(mode_mouse mode)
 _IMPEXP_BE mode_mouse
 mouse_mode()
 {
-	// ToDo: what is mouse_mode? Get a default value over here now! :-)
-	mode_mouse mode;
+	// Gets the focus-follows-mouse style, such as normal, B_WARP_MOUSE, etc.
+	mode_mouse mode = B_NORMAL_MOUSE;
 	
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_MOUSE_MODE);
@@ -695,7 +695,7 @@ mouse_mode()
 	int32 code;
 	if (link.FlushWithReply(code) == B_OK && code == SERVER_TRUE)
 		link.Read<mode_mouse>(&mode);
-
+	
 	return mode;
 }
 
