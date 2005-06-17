@@ -1,29 +1,9 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		AppServer.cpp
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	main manager object for the app_server
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright (c) 2001-2005, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Author: DarkWyrm <bpmagic@columbus.rr.com>
+ */
 #include <Accelerant.h>
 #include <AppDefs.h>
 #include <Directory.h>
@@ -38,6 +18,7 @@
 #include "BitmapManager.h"
 #include "ColorSet.h"
 #include "CursorManager.h"
+#include "DecorManager.h"
 #include "DefaultDecorator.h"
 #include "Desktop.h"
 #include "DisplayDriver.h"
@@ -76,8 +57,7 @@ Desktop *gDesktop;
 
 port_id gAppServerPort;
 
-//! Used to access the app_server from new_decorator
-static AppServer *sAppServer = NULL;
+static AppServer *sAppServer;
 
 //! Default background color for workspaces
 //RGBColor workspace_default_color(51,102,160);
@@ -114,11 +94,8 @@ AppServer::AppServer(void) :
 
 	fAppList = new BList();
 	fQuittingServer = false;
-	make_decorator = NULL;
-
-	// We need this in order for new_decorator to be able to instantiate new decorators
 	sAppServer = this;
-
+	
 	// Create the font server and scan the proper directories.
 	fontserver = new FontServer;
 	fontserver->Lock();
@@ -178,8 +155,6 @@ AppServer::AppServer(void) :
 	if (LoadColorSet(SERVER_SETTINGS_DIR COLOR_SETTINGS_NAME,&gui_colorset)!=B_OK)
 		gui_colorset.SetToDefaults();
 
-	InitDecorators();
-
 	// Set up the Desktop
 	gDesktop = new Desktop();
 	gDesktop->Init();
@@ -196,15 +171,10 @@ AppServer::AppServer(void) :
 	// This locker is for app_server and Picasso to vy for control of the ServerApp list
 	fAppListLock = create_sem(1,"app_server_applist_sem");
 
-	// This locker is to mediate access to the make_decorator pointer
-	fDecoratorLock = create_sem(1,"app_server_decor_sem");
-
 	// Spawn our thread-monitoring thread
 	fPicassoThreadID = spawn_thread(PicassoThread, "picasso", B_NORMAL_PRIORITY, this);
 	if (fPicassoThreadID >= 0)
 		resume_thread(fPicassoThreadID);
-
-	fDecoratorName ="Default";
 
 #if 0
 	LaunchCursorThread();
@@ -431,92 +401,6 @@ AppServer::MainLoop(void)
 }
 
 /*!
-	\brief Loads the specified decorator and sets the system's decorator to it.
-	\param path Path to the decorator to load
-	\return True if successful, false if not.
-	
-	If the server cannot load the specified decorator, nothing changes. Passing a 
-	NULL string to this function sets the decorator	to the internal one.
-*/
-bool
-AppServer::LoadDecorator(const char *path)
-{
-	// Loads a window decorator based on the supplied path and forces a decorator update.
-	// If it cannot load the specified decorator, it will retain the current one and
-	// return false. Note that passing a NULL string to this function sets the decorator
-	// to the internal one.
-
-	// passing the string "Default" will set the window decorator to the app_server's
-	// internal one
-	if(!path)
-	{
-		make_decorator= NULL;
-		return true;
-	}
-	
-	create_decorator	*pcreatefunc= NULL;
-	status_t			stat;
-	image_id			addon;
-	
-	addon = load_add_on(path);
-	if (addon < B_OK)
-		return false;
-
-	// As of now, we do nothing with decorator versions, but the possibility exists
-	// that the API will change even though I cannot forsee any reason to do so. If
-	// we *did* do anything with decorator versions, the assignment to a global would
-	// go here.
-
-	// Get the instantiation function
-	stat = get_image_symbol(addon, "instantiate_decorator",
-		B_SYMBOL_TYPE_TEXT, (void**)&pcreatefunc);
-	if (stat != B_OK) {
-		unload_add_on(addon);
-		return false;
-	}
-	
-	BPath temppath(path);
-	fDecoratorName=temppath.Leaf();
-	
-	acquire_sem(fDecoratorLock);
-	make_decorator=pcreatefunc;
-	fDecoratorID=addon;
-	release_sem(fDecoratorLock);
-	return true;
-}
-
-//! Loads decorator settings on disk or the default if settings are invalid
-void
-AppServer::InitDecorators(void)
-{
-	BMessage settings;
-
-	BDirectory dir;
-	if (dir.SetTo(SERVER_SETTINGS_DIR) == B_ENTRY_NOT_FOUND)
-		create_directory(SERVER_SETTINGS_DIR, 0777);
-
-	BString path(SERVER_SETTINGS_DIR);
-	path += "DecoratorSettings";
-	BFile file(path.String(), B_READ_ONLY);
-
-	if (file.InitCheck() == B_OK
-		&& settings.Unflatten(&file) == B_OK) {
-		BString itemtext;
-		if (settings.FindString("decorator", &itemtext) == B_OK) {
-			path.SetTo(DECORATORS_DIR);
-			path += itemtext;
-			if (LoadDecorator(path.String()))
-				return;
-		}
-	}
-
-	// We got this far, so something must have gone wrong. We set make_decorator
-	// to NULL so that the decorator allocation routine knows to utilize the included
-	// default decorator instead of an addon.
-	make_decorator = NULL;
-}
-
-/*!
 	\brief Message handling function for all messages sent to the app_server
 	\param code ID of the message sent
 	\param buffer Attachment buffer for the message.
@@ -650,73 +534,6 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 			
 			break;
 		}
-		case AS_SET_DECORATOR:
-		{
-			// Received from an application when the user wants to set the window
-			// decorator to a new one
-			
-			// Attached Data:
-			// char * name of the decorator in the decorators path to use
-			
-			char *decname=NULL;
-			msg.ReadString(&decname);
-			if (decname) {
-				if (strcmp(decname, "Default") != 0) {
-					BString decpath;
-					decpath.SetTo(DECORATORS_DIR);
-					decpath += decname;
-					if (LoadDecorator(decpath.String()))
-						Broadcast(AS_UPDATE_DECORATOR);
-				} else {
-					LoadDecorator(NULL);
-					Broadcast(AS_UPDATE_DECORATOR);
-				}
-			}
-			free(decname);
-			break;
-		}
-		case AS_GET_DECORATOR:
-		{
-			// Attached Data:
-			// 1) port_id reply port
-
-			port_id replyport = -1;
-			if (msg.Read<port_id>(&replyport)<B_OK)
-				return;
-
-			BPrivate::PortLink replylink(replyport);
-			replylink.StartMessage(AS_GET_DECORATOR);
-			replylink.AttachString(fDecoratorName.String());
-			replylink.Flush();
-			break;
-		}
-		case AS_R5_SET_DECORATOR:
-		{
-			// Sort of supports Tracker's nifty Easter Egg. It was easy to do and 
-			// it's kind of neat, so why not?
-			
-			// Attached Data:
-			// char * name of the decorator in the decorators path to use
-			
-			int32 decindex = 0;
-			if (msg.Read<int32>(&decindex)<B_OK)
-				break;
-
-			BString decpath;
-			decpath.SetTo(DECORATORS_DIR);
-			switch(decindex) {
-				case 0: decpath+="BeOS"; break;
-				case 1: decpath+="AmigaOS"; break;
-				case 2: decpath+="Windows"; break;
-				case 3: decpath+="MacOS"; break;
-				default:
-					break;
-			}
-			if (LoadDecorator(decpath.String()))
-				Broadcast(AS_UPDATE_DECORATOR);
-
-			break;
-		}
 		case B_QUIT_REQUESTED:
 		{
 #if TEST_MODE
@@ -727,7 +544,7 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 			// test apps to quit. This situation will occur only when the server
 			// is compiled as a regular Be application.
 
-			Broadcast(AS_QUIT_APP);
+			BroadcastToAllApps(AS_QUIT_APP);
 
 			// we have to wait until *all* threads have finished!
 			ServerApp *app;
@@ -789,28 +606,6 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 }
 
 /*!
-	\brief Send a quick (no attachments) message to all applications
-	
-	Quite useful for notification for things like server shutdown, system 
-	color changes, etc.
-*/
-void
-AppServer::Broadcast(int32 code)
-{
-	acquire_sem(fAppListLock);
-
-	for (int32 i = 0; i < fAppList->CountItems(); i++) {
-		ServerApp *app = (ServerApp *)fAppList->ItemAt(i);
-
-		if (!app)
-			{ printf("PANIC in AppServer::Broadcast()\n"); continue; }
-		app->PostMessage(code);
-	}
-
-	release_sem(fAppListLock);
-}
-
-/*!
 	\brief Finds the application with the given signature
 	\param sig MIME signature of the application to find
 	\return the corresponding ServerApp or NULL if not found
@@ -844,40 +639,29 @@ AppServer::FindApp(const char *sig)
 	return NULL;
 }
 
+/*!
+	\brief Send a quick (no attachments) message to all applications
+	
+	Quite useful for notification for things like server shutdown, system 
+	color changes, etc.
+*/
+void
+BroadcastToAllApps(const int32 &code)
+{
+	acquire_sem(sAppServer->fAppListLock);
+
+	for (int32 i = 0; i < sAppServer->fAppList->CountItems(); i++) {
+		ServerApp *app = (ServerApp *)sAppServer->fAppList->ItemAt(i);
+
+		if (!app)
+			{ printf("PANIC in Broadcast()\n"); continue; }
+		app->PostMessage(code);
+	}
+
+	release_sem(sAppServer->fAppListLock);
+}
 
 //	#pragma mark -
-
-
-/*!
-	\brief Creates a new decorator instance
-	\param rect Frame size
-	\param title Title string for the "window"
-	\param wlook Window look type. See Window.h
-	\param wfeel Window feel type. See Window.h
-	\param wflags Window flags. See Window.h
-	
-	If a decorator has not been set, we use the default one packaged in with the app_server 
-	being that we can't do anything with a window without one.
-*/
-Decorator *
-new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,
-	int32 wflags, DisplayDriver *ddriver)
-{
-	Decorator *dec=NULL;
-
-	if (!sAppServer->make_decorator)
-		dec = new DefaultDecorator(rect, wlook, wfeel, wflags);
-	else
-		dec = sAppServer->make_decorator(rect, wlook, wfeel, wflags);
-
-	gui_colorset.Lock();
-	dec->SetDriver(ddriver);
-	dec->SetColors(gui_colorset);
-	dec->SetTitle(title);
-	gui_colorset.Unlock();
-	
-	return dec;
-}
 
 /*!
 	\brief Entry function to run the entire server

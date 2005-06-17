@@ -82,6 +82,7 @@ Server app_server :
 	Desktop.cpp
 	ServerApp.cpp
 	ServerWindow.cpp
+	DecorManager.cpp
 
 	# DisplayDriver Classes
 	$(VIEW_DRIVER_SOURCES)

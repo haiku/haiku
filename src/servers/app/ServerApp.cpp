@@ -27,7 +27,7 @@
 #include "BitmapManager.h"
 #include "BGet++.h"
 #include "CursorManager.h"
-
+#include "DecorManager.h"
 #include "Desktop.h"
 #include "DisplayDriver.h"
 #include "FontServer.h"
@@ -547,6 +547,72 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			}
 			break;
 		}
+		case AS_SET_DECORATOR:
+		{
+			// Received from an application when the user wants to set the window
+			// decorator to a new one
+			
+			// Attached Data:
+			// int32 the index of the decorator to use
+			
+			int32 index;
+			link.Read<int32>(&index);
+			if(gDecorManager.SetDecorator(index))
+				BroadcastToAllApps(AS_UPDATE_DECORATOR);
+			
+			break;
+		}
+		case AS_COUNT_DECORATORS:
+		{
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<int32>(gDecorManager.CountDecorators());
+			fLink.Flush();
+			break;
+		}
+		case AS_GET_DECORATOR:
+		{
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<int32>(gDecorManager.GetDecorator());
+			fLink.Flush();
+			break;
+		}
+		case AS_GET_DECORATOR_NAME:
+		{
+			int32 index;
+			link.Read<int32>(&index);
+			
+			BString str(gDecorManager.GetDecoratorName(index));
+			if(str.CountChars() > 0)
+			{
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.AttachString(str.String());
+			}
+			else
+				fLink.StartMessage(SERVER_FALSE);
+			
+			fLink.Flush();
+			break;
+		}
+		case AS_R5_SET_DECORATOR:
+		{
+			// Sort of supports Tracker's nifty Easter Egg. It was easy to do and 
+			// it's kind of neat, so why not?
+			
+			// Attached Data:
+			// int32 value of the decorator to use
+			// 0: BeOS
+			// 1: Amiga
+			// 2: Windows
+			// 3: MacOS
+			
+			int32 decindex = 0;
+			link.Read<int32>(&decindex);
+			
+			if(gDecorManager.SetR5Decorator(decindex))
+				BroadcastToAllApps(AS_UPDATE_DECORATOR);
+			
+			break;
+		}
 		case AS_CREATE_BITMAP:
 		{
 			STRACE(("ServerApp %s: Received BBitmap creation request\n",fSignature.String()));
@@ -650,10 +716,13 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_DOWNLOAD_PICTURE:
 		{
 			// TODO; Implement AS_DOWNLOAD_PICTURE
+			STRACE(("ServerApp %s: Download Picture unimplemented\n", fSignature.String()));
 			
 			// What is this particular function call for, anyway?
-			STRACE(("ServerApp %s: Download Picture unimplemented\n", fSignature.String()));
-
+			
+			// DW: I think originally it might have been to support 
+			// the undocumented Flatten function.
+			
 			break;
 		}
 	
@@ -906,8 +975,7 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<ColorSet>(&gui_colorset);
 			gui_colorset.Unlock();
 			
-			// TODO: Broadcast an AS_UPDATE_COLORS to all apps
-			
+			BroadcastToAllApps(AS_UPDATE_COLORS);
 			break;
 		}
 		case AS_GET_UI_COLOR:
@@ -927,6 +995,7 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_UPDATED_CLIENT_FONTLIST:
 		{
 			STRACE(("ServerApp %s: Acknowledged update of client-side font list\n",

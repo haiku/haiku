@@ -13,7 +13,7 @@
 #include <Application.h>
 #include <Window.h>
 #include <String.h>
-#include "Decorator.h"
+
 #include "ServerConfig.h"
 
 class Layer;
@@ -22,6 +22,8 @@ class ServerApp;
 class DisplayDriver;
 class CursorManager;
 class BitmapManager;
+class DecorManager;
+class ColorSet;
 
 namespace BPrivate {
 	class PortLink;
@@ -42,63 +44,47 @@ class AppServer
 #endif
 {
 public:
-	AppServer(void);
-	~AppServer(void);
+						AppServer(void);
+						~AppServer(void);
 
-	static	int32 PollerThread(void *data);
-	static	int32 PicassoThread(void *data);
-	thread_id Run(void);
-	void MainLoop(void);
+	static	int32		PollerThread(void *data);
+	static	int32		PicassoThread(void *data);
+			thread_id	Run(void);
+			void 		MainLoop(void);
 	
-	bool LoadDecorator(const char *path);
-	void InitDecorators(void);
-	
-	void DispatchMessage(int32 code, BPrivate::PortLink &link);
-	void Broadcast(int32 code);
-
-	ServerApp* FindApp(const char *sig);
+			void		DispatchMessage(int32 code, BPrivate::PortLink &link);
+			ServerApp*	FindApp(const char *sig);
 
 private:
-	void LaunchCursorThread();
-	void LaunchInputServer();
-	static int32 CursorThread(void *data);
+	friend		void			BroadcastToAllApps(const int32 &code);
+	
+				void			LaunchCursorThread();
+				void			LaunchInputServer();
+	static		int32			CursorThread(void *data);
 
-	friend	Decorator*	new_decorator(BRect rect, const char *title,
-				int32 wlook, int32 wfeel, int32 wflags, DisplayDriver *ddriver);
+				port_id			fMessagePort;
+				port_id			fServerInputPort;
+	
+	volatile	bool			fQuittingServer;
+	
+				BList			*fAppList;
+				thread_id		fPicassoThreadID;
 
-	// global function pointer
-	create_decorator	*make_decorator;
-	
-	port_id	fMessagePort;
-	port_id	fServerInputPort;
-	
-	image_id fDecoratorID;
-	
-	BString fDecoratorName;
-	
-	volatile bool fQuittingServer;
-	
-	BList *fAppList;
-	thread_id fPicassoThreadID;
+				thread_id		fISThreadID;
+				thread_id		fCursorThreadID;
+				sem_id			fCursorSem;
+				area_id			fCursorArea;
+				uint32			*fCursorAddr;
 
-	thread_id fISThreadID;
-	thread_id fCursorThreadID;
-	sem_id fCursorSem;
-	area_id	fCursorArea;
-	uint32 *fCursorAddr;
-
-	port_id fISASPort;
-	port_id fISPort;
+				port_id			fISASPort;
+				port_id			fISPort;
 	
-	sem_id 	fActiveAppLock,
-			fAppListLock,
-			fDecoratorLock;
+				sem_id			fActiveAppLock;
+				sem_id			fAppListLock;
+				sem_id			fDecoratorLock;
 	
-	DisplayDriver *fDriver;
+				DisplayDriver	*fDriver;
 };
-
-Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,
-	int32 wflags, DisplayDriver *ddriver);
 
 extern BitmapManager *bitmapmanager;
 extern ColorSet gui_colorset;
