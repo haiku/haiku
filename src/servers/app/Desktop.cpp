@@ -272,15 +272,15 @@ Desktop::AddWinBorder(WinBorder *winBorder)
 				&& wb->Feel() == feelToLookFor) {
 				// R2: RootLayer comparison is needed.
 				feel == B_NORMAL_WINDOW_FEEL ?
-					winBorder->fFMWList.AddWinBorder(wb) :
-					wb->fFMWList.AddWinBorder(winBorder);
+					winBorder->fSubWindowList.AddWinBorder(wb) :
+					wb->fSubWindowList.AddWinBorder(winBorder);
 			}
 		}
 	}
 
 	// add application's list of modal windows.
 	if (feel == B_MODAL_APP_WINDOW_FEEL) {
-		winBorder->App()->fAppFMWList.AddWinBorder(winBorder);
+		winBorder->App()->fAppSubWindowList.AddWinBorder(winBorder);
 	}
 
 	// send WinBorder to be added to workspaces
@@ -324,14 +324,14 @@ Desktop::RemoveWinBorder(WinBorder *winBorder)
 				if (wb->Feel() == B_NORMAL_WINDOW_FEEL
 					&& wb->App()->ClientTeamID() == winBorder->App()->ClientTeamID()) {
 					// R2: RootLayer comparison is needed. We'll see.
-					wb->fFMWList.RemoveItem(winBorder);
+					wb->fSubWindowList.RemoveItem(winBorder);
 				}
 			}
 		}
 
 		// remove from application's list
 		if (feel == B_MODAL_APP_WINDOW_FEEL) {
-			winBorder->App()->fAppFMWList.RemoveItem(winBorder);
+			winBorder->App()->fAppSubWindowList.RemoveItem(winBorder);
 		}
 	} else {
 		Unlock();
@@ -369,9 +369,9 @@ Desktop::AddWinBorderToSubset(WinBorder *winBorder, WinBorder *toWinBorder)
 			|| winBorder->Feel() == B_MODAL_SUBSET_WINDOW_FEEL)
 		&& toWinBorder->Feel() == B_NORMAL_WINDOW_FEEL
 		&& toWinBorder->App()->ClientTeamID() == winBorder->App()->ClientTeamID()
-		&& !toWinBorder->fFMWList.HasItem(winBorder)) {
+		&& !toWinBorder->fSubWindowList.HasItem(winBorder)) {
 		// add to normal_window's list
-		toWinBorder->fFMWList.AddWinBorder(winBorder);
+		toWinBorder->fSubWindowList.AddWinBorder(winBorder);
 	} else {
 		Unlock();
 		debugger("AddWinBorderToSubset: you must add a subset_window to a normal_window's subset with the same team_id\n");
@@ -407,7 +407,7 @@ Desktop::RemoveWinBorderFromSubset(WinBorder *winBorder, WinBorder *fromWinBorde
 
 	if (fromWinBorder->Feel() == B_NORMAL_WINDOW_FEEL) {
 		//remove from this normal_window's subset.
-		fromWinBorder->fFMWList.RemoveItem(winBorder);
+		fromWinBorder->fSubWindowList.RemoveItem(winBorder);
 	} else {
 		Unlock();
 		debugger("RemoveWinBorderFromSubset: you must remove a subset_window from a normal_window's subset\n");

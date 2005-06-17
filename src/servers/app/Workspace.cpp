@@ -73,7 +73,7 @@
 #include "ServerWindow.h"
 #include "ServerApp.h"
 #include "RGBColor.h"
-#include "FMWList.h"
+#include "SubWindowList.h"
 
 //#define DEBUG_WORKSPACE
 
@@ -369,7 +369,7 @@ STRACE(("Wks(%ld)::MoveToBack(%s) \n", fID, newLast? newLast->GetName(): "NULL")
 				return false;
 
 			// this is a modal app
-			if (newLast->App()->fAppFMWList.HasItem(newLast))
+			if (newLast->App()->fAppSubWindowList.HasItem(newLast))
 			{
 				ListData	*before;
 
@@ -405,7 +405,7 @@ STRACE(("Wks(%ld)::MoveToBack(%s) \n", fID, newLast? newLast->GetName(): "NULL")
 				while(cursor)
 				{
 					if (cursor->layerPtr->Level() == B_NORMAL && !cursor->layerPtr->IsHidden()
-						&& (indexThis = cursor->layerPtr->fFMWList.IndexOf(newLast)) >= 0)
+						&& (indexThis = cursor->layerPtr->fSubWindowList.IndexOf(newLast)) >= 0)
 						break;
 					cursor	= cursor->upperItem;
 				}
@@ -425,7 +425,7 @@ STRACE(("Wks(%ld)::MoveToBack(%s) \n", fID, newLast? newLast->GetName(): "NULL")
 					if (cursor->layerPtr->Level() == B_MODAL_APP && !cursor->layerPtr->IsHidden()
 						&& cursor->layerPtr->App()->ClientTeamID() == newLast->App()->ClientTeamID())
 					{
-						indexCursor	= mainWindowItem->layerPtr->fFMWList.IndexOf(cursor->layerPtr);
+						indexCursor	= mainWindowItem->layerPtr->fSubWindowList.IndexOf(cursor->layerPtr);
 						if (indexCursor >= 0)
 						{
 							if (indexThis < indexCursor)
@@ -518,7 +518,7 @@ STRACE(("W(%ld)::HideWinBorder(%s) \n", fID, winBorder? winBorder->GetName(): "N
 				ListData	*item = HasItem(winBorder);
 				if (item)
 				{
-					fFrontItem->layerPtr->fFMWList.AddWinBorder(winBorder);
+					fFrontItem->layerPtr->fSubWindowList.AddWinBorder(winBorder);
 
 					RemoveItem(item);
 					fPool.ReleaseMemory(item);
@@ -545,7 +545,7 @@ STRACE(("W(%ld)::HideWinBorder(%s) \n", fID, winBorder? winBorder->GetName(): "N
 				// then remove from Workspace's list.
 				if (item->layerPtr->Level() == B_MODAL_APP)
 				{
-					if(winBorder->fFMWList.HasItem(item->layerPtr))
+					if(winBorder->fSubWindowList.HasItem(item->layerPtr))
 					{
 						if(!searchFirstMainWindow(item->layerPtr))
 						{
@@ -584,7 +584,7 @@ STRACE(("W(%ld)::HideWinBorder(%s) \n", fID, winBorder? winBorder->GetName(): "N
 		case B_MODAL_APP:
 		{
 			// if a subset modal, then remove from Workspace's list.
-			if (!winBorder->App()->fAppFMWList.HasItem(winBorder))
+			if (!winBorder->App()->fAppSubWindowList.HasItem(winBorder))
 			{
 				ListData	*toast = HasItem(winBorder);
 				if (toast)
@@ -720,7 +720,7 @@ STRACE(("W(%ld)::ShowWinBorder(%s) \n", fID, winBorder? winBorder->GetName(): "N
 
 				ListData		*itemThis = NULL;
 				// remove from B_NORMAL's list.
-				if (fFrontItem->layerPtr->fFMWList.RemoveItem(winBorder))
+				if (fFrontItem->layerPtr->fSubWindowList.RemoveItem(winBorder))
 				{
 					// we need to add this window
 					itemThis	= fPool.GetCleanMemory(winBorder);
@@ -805,10 +805,10 @@ STRACE(("W(%ld)::ShowWinBorder(%s) \n", fID, winBorder? winBorder->GetName(): "N
 			// build a list of modal windows to know what windows should be placed before this one.
 			BList		tempList;
 			// APP modal
-			if (winBorder->App()->fAppFMWList.HasItem(winBorder))
+			if (winBorder->App()->fAppSubWindowList.HasItem(winBorder))
 			{
 				// take only application's modals
-				tempList.AddList(&winBorder->App()->fAppFMWList);
+				tempList.AddList(&winBorder->App()->fAppSubWindowList);
 				if (fFrontItem
 					&& fFrontItem->layerPtr->App()->ClientTeamID() == winBorder->App()->ClientTeamID())
 					userBusy = false;
@@ -820,8 +820,8 @@ STRACE(("W(%ld)::ShowWinBorder(%s) \n", fID, winBorder? winBorder->GetName(): "N
 				if (mainWindow)
 				{
 					// add both mainWindow's subset modals and application's modals
-					tempList.AddList(&mainWindow->fFMWList);
-					tempList.AddList(&winBorder->App()->fAppFMWList);
+					tempList.AddList(&mainWindow->fSubWindowList);
+					tempList.AddList(&winBorder->App()->fAppSubWindowList);
 					if (fFrontItem && fFrontItem->layerPtr == mainWindow)
 						userBusy = false;
 				}
@@ -1531,7 +1531,7 @@ WinBorder* Workspace::searchFirstMainWindow(WinBorder *wb) const
 	{
 		if (listItem->layerPtr->Level() == B_NORMAL && !listItem->layerPtr->IsHidden()
 			&& listItem->layerPtr->App()->ClientTeamID() == wb->App()->ClientTeamID()
-			&& listItem->layerPtr->fFMWList.HasItem(wb))
+			&& listItem->layerPtr->fSubWindowList.HasItem(wb))
 				return listItem->layerPtr;
 
 		listItem	= listItem->upperItem;
@@ -1548,8 +1548,8 @@ bool Workspace::windowHasVisibleModals(const WinBorder *winBorder) const
 	WinBorder	**wbList;
 
 	// check window's list
-	count		= winBorder->fFMWList.CountItems();
-	wbList		= (WinBorder**)winBorder->fFMWList.Items();
+	count		= winBorder->fSubWindowList.CountItems();
+	wbList		= (WinBorder**)winBorder->fSubWindowList.Items();
 	for(i = 0; i < count; i++)
 	{
 		if (wbList[i]->Level() == B_MODAL_APP && !wbList[i]->IsHidden())
@@ -1557,8 +1557,8 @@ bool Workspace::windowHasVisibleModals(const WinBorder *winBorder) const
 	}
 
 	// application's list only has modal windows.
-	count		= winBorder->App()->fAppFMWList.CountItems();
-	wbList		= (WinBorder**)winBorder->App()->fAppFMWList.Items();
+	count		= winBorder->App()->fAppSubWindowList.CountItems();
+	wbList		= (WinBorder**)winBorder->App()->fAppSubWindowList.Items();
 	for(i = 0; i < count; i++)
 	{
 		if (!wbList[i]->IsHidden())
@@ -1582,8 +1582,8 @@ ListData* Workspace::putModalsInFront(ListData *item)
 	HasItem(item, &revIndex);
 
 	// check window's list
-	count		= item->layerPtr->fFMWList.CountItems();
-	wbList		= (WinBorder**)item->layerPtr->fFMWList.Items();
+	count		= item->layerPtr->fSubWindowList.CountItems();
+	wbList		= (WinBorder**)item->layerPtr->fSubWindowList.Items();
 	for(i = 0; i < count; i++)
 	{
 		if (wbList[i]->Level() == B_MODAL_APP && !wbList[i]->IsHidden())
@@ -1605,8 +1605,8 @@ ListData* Workspace::putModalsInFront(ListData *item)
 	}
 
 	// application's list only has modal windows.
-	count		= item->layerPtr->App()->fAppFMWList.CountItems();
-	wbList		= (WinBorder**)item->layerPtr->App()->fAppFMWList.Items();
+	count		= item->layerPtr->App()->fAppSubWindowList.CountItems();
+	wbList		= (WinBorder**)item->layerPtr->App()->fAppSubWindowList.Items();
 	for(i = 0; i < count; i++)
 	{
 		if (!wbList[i]->IsHidden())
@@ -1641,7 +1641,7 @@ void Workspace::putFloatingInFront(ListData *item)
 	WinBorder	*wb;
 
 	i = 0;
-	while ((wb = (WinBorder*)item->layerPtr->fFMWList.ItemAt(i)))
+	while ((wb = (WinBorder*)item->layerPtr->fSubWindowList.ItemAt(i)))
 	{
 		if (wb->Level() == B_MODAL_APP)
 		{
@@ -1653,7 +1653,7 @@ void Workspace::putFloatingInFront(ListData *item)
 
 			InsertItem(newItem, before);
 
-			item->layerPtr->fFMWList.RemoveItem(i);
+			item->layerPtr->fSubWindowList.RemoveItem(i);
 		}
 		else
 			i++;		
@@ -1671,7 +1671,7 @@ void Workspace::saveFloatingWindows(ListData *itemNormal)
 	{
 		if (item->layerPtr->Level() == B_FLOATING_APP)
 		{
-			itemNormal->layerPtr->fFMWList.AddWinBorder(item->layerPtr);
+			itemNormal->layerPtr->fSubWindowList.AddWinBorder(item->layerPtr);
 
 			toast	= item;
 			item	= item->lowerItem;

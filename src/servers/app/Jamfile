@@ -71,7 +71,7 @@ SharedLibrary appserver :
 Server app_server :
 	# Misc. Sources
 	DebugInfoManager.cpp
-	FMWList.cpp
+	SubWindowList.cpp
 	PicturePlayer.cpp
 	PNGDump.cpp
 	RAMLinkMsgReader.cpp

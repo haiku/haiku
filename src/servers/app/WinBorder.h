@@ -32,7 +32,7 @@
 #include <Rect.h>
 #include <String.h>
 #include "Layer.h"
-#include "FMWList.h"
+#include "SubWindowList.h"
 #include "Decorator.h"
 
 // these are used by window manager to properly place window.
@@ -125,7 +125,7 @@ class WinBorder : public Layer {
 	inline	void				QuietlySetWorkspaces(uint32 wks) { fWorkspaces = wks; }	
 			void				QuietlySetFeel(int32 feel);	
 
-			FMWList				fFMWList;
+			SubWindowList		fSubWindowList;
 
 #ifdef NEW_CLIPPING
  public:

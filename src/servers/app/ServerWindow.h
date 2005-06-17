@@ -37,7 +37,7 @@
 #include <String.h>
 #include <Window.h>
 
-#include "FMWList.h"
+#include "SubWindowList.h"
 #include "TokenSpace.h"
 
 class BString;
@@ -113,8 +113,9 @@ public:
 
 			// server "private" - try not to use.
 	inline	int32				ClientToken(void) const { return fHandlerToken; }
-	
-			FMWList fWinFMWList;
+
+			// ToDo: public??
+			SubWindowList	fSubWindowList;
 
 private:
 			// methods for retrieving and creating a tree strcture of Layers.

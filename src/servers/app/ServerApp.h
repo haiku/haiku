@@ -32,7 +32,7 @@
 #include <String.h>
 #include <PortLink.h>
 
-#include "FMWList.h"
+#include "SubWindowList.h"
 
 class AreaPool;
 class BMessage;
@@ -90,7 +90,7 @@ public:
 
 	AreaPool *AppAreaPool() { return fSharedMem; }
 	
-	FMWList fAppFMWList;
+	SubWindowList fAppSubWindowList;
 	
 private:
 	void DispatchMessage(int32 code, BPrivate::LinkReceiver &link);

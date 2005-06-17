@@ -34,7 +34,6 @@
 
 #include "DebugInfoManager.h"
 #include "Layer.h"
-#include "FMWList.h"
 #include "CursorManager.h"
 #include "Workspace.h"
 
