@@ -373,14 +373,14 @@ class _IMPEXP_INPUT BInputServerMethod;
 
 #else	/* __cplusplus */
 
-typedef struct _IMPEXP_GL GLUnurbs GLUnurbs;
-typedef struct _IMPEXP_GL GLUquadric GLUquadric;
-typedef struct _IMPEXP_GL GLUtesselator GLUtesselator;
+//typedef struct _IMPEXP_GL GLUnurbs GLUnurbs;
+//typedef struct _IMPEXP_GL GLUquadric GLUquadric;
+//typedef struct _IMPEXP_GL GLUtesselator GLUtesselator;
 
-typedef struct _IMPEXP_GL GLUnurbs GLUnurbsObj;
-typedef struct _IMPEXP_GL GLUquadric GLUquadricObj;
-typedef struct _IMPEXP_GL GLUtesselator GLUtesselatorObj;
-typedef struct _IMPEXP_GL GLUtesselator GLUtriangulatorObj;
+//typedef struct _IMPEXP_GL GLUnurbs GLUnurbsObj;
+//typedef struct _IMPEXP_GL GLUquadric GLUquadricObj;
+//typedef struct _IMPEXP_GL GLUtesselator GLUtesselatorObj;
+//typedef struct _IMPEXP_GL GLUtesselator GLUtriangulatorObj;
 
 #endif	/* __cplusplus */
 
