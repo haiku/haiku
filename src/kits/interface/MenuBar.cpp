@@ -453,6 +453,9 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 		window->Unlock();
 	}
 	
+	if (action != NULL)
+		*action = static_cast<int32>(localAction);
+		
 	return resultItem;
 }
 
