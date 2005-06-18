@@ -141,7 +141,7 @@ BPrivateScreen::WaitForRetrace(bigtime_t timeout)
 	// Get the retrace semaphore if it's the first time 
 	// we are called. Cache the value then.
 	status_t status;
-	if (fRetraceSem == -1)
+	if (fRetraceSem < 0)
 		fRetraceSem = RetraceSemaphore();
 
 	do {
@@ -156,15 +156,15 @@ sem_id
 BPrivateScreen::RetraceSemaphore()
 {
 	sem_id id = B_BAD_SEM_ID;
-	// TODO: Implement
-	/*
+	
 	BPrivate::AppServerLink link;
-	PortMessage reply;
-	link.SetOpCode(AS_GET_RETRACE_SEMAPHORE);
+	link.StartMessage(AS_GET_RETRACE_SEMAPHORE);
 	link.Attach<screen_id>(ID());
-	link.FlushWithReply(&reply);
-	reply.Read<sem_id>(&id);
-	*/
+	int32 reply;
+	if (link.FlushWithReply(reply) == B_OK
+		&& reply == SERVER_TRUE) 
+		link.Read<sem_id>(&id);
+	
 	return id;
 }
 
@@ -269,10 +269,26 @@ BPrivateScreen::ProposeMode(display_mode *target, const display_mode *low, const
 		
 
 status_t
-BPrivateScreen::GetModeList(display_mode **mode_list, uint32 *count)
+BPrivateScreen::GetModeList(display_mode **modeList, uint32 *count)
 {
-	// TODO: Implement
-	return B_ERROR;
+	if (modeList == NULL || count == NULL)
+		return B_BAD_VALUE;
+		
+	status_t status = B_ERROR;
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_GET_MODE_LIST);
+	link.Attach<screen_id>(ID());
+	int32 reply;
+	if (link.FlushWithReply(reply) == B_OK && reply == SERVER_TRUE) {
+		link.Read<uint32>(count);
+		int32 size = *count * sizeof(display_mode);
+		*modeList = (display_mode *)malloc(size);
+		link.Read(*modeList, size);
+		// TODO: get status from app_server
+		status = B_OK;	
+	}
+	
+	return status;
 }
 
 
