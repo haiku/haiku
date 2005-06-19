@@ -186,6 +186,8 @@ public:
 	char	*OnGetAtomName();
 	
 	uint32	getChunkForSample(uint32 pSample, uint32 *pOffsetInChunk);
+	uint32	getFirstSampleInChunk(uint32 pChunkID);
+	uint32	getNoSamplesInChunk(uint32 pChunkID);
 private:
 	array_header		theHeader;
 	SampleToChunkArray	theSampleToChunkArray;
@@ -353,8 +355,10 @@ public:
 	uint32	getSampleForTime(uint32 pTime);
 	uint32	getSampleForFrame(uint32 pFrame);
 	uint32	getChunkForSample(uint32 pSample, uint32 *pOffsetInChunk);
-	uint64	getOffsetForChunk(uint32 pChunk);
+	uint64	getOffsetForChunk(uint32 pChunkID);
+	uint32	getFirstSampleInChunk(uint32 pChunkID);
 	uint32	getSizeForSample(uint32 pSample);
+	uint32	getNoSamplesInChunk(uint32 pChunkID);
 	bool	IsSyncSample(uint32 pSampleNo);
 	bool	IsSingleSampleSize();
 	

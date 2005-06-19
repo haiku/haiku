@@ -54,16 +54,19 @@ struct mov_cookie
 
 	bool		audio;
 
-	// audio only:	
-	int64		byte_pos;
+	// audio only:
+	off_t		byte_pos;
+	uint32		chunk_pos;
 	uint32		bytes_per_sec_rate;
 	uint32		bytes_per_sec_scale;
 
 	// video only:
+	uint32		line_count;
+	
+	// Common
 	uint32		frame_pos;
 	uint32		frames_per_sec_rate;
 	uint32		frames_per_sec_scale;
-	uint32		line_count;
 };
 
 
@@ -138,6 +141,7 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 	cookie->stream = streamNumber;
 	cookie->buffer = 0;
 	cookie->buffer_size = 0;
+	cookie->frame_pos = 0;
 
 	BMediaFormats formats;
 	media_format *format = &cookie->format;
@@ -188,10 +192,10 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 */		
 		cookie->audio = true;
 		cookie->byte_pos = 0;
-		cookie->frame_pos = 0;
+		cookie->chunk_pos = 1;
 
 		if (stream_header->scale && stream_header->rate && stream_header->sample_size) {
-			cookie->bytes_per_sec_rate = stream_header->rate * stream_header->sample_size;
+			cookie->bytes_per_sec_rate = stream_header->rate * stream_header->sample_size * audio_format->NoOfChannels / 8;
 			cookie->bytes_per_sec_scale = stream_header->scale;
 			cookie->frames_per_sec_rate = stream_header->rate;
 			cookie->frames_per_sec_scale = stream_header->scale;
@@ -202,9 +206,11 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 			cookie->frames_per_sec_rate = audio_format->SampleSize;
 			cookie->frames_per_sec_scale = 1;
 			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using avg_bytes_per_sec)\n", cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
-		} else if (stream_header->rate) {
-			cookie->bytes_per_sec_rate = stream_header->rate;
+		} else if (stream_header->rate && stream_header->sample_size) {
+			cookie->bytes_per_sec_rate = stream_header->rate * stream_header->sample_size * audio_format->NoOfChannels / 8;
 			cookie->bytes_per_sec_scale = 1;
+			cookie->frames_per_sec_rate = stream_header->sample_size;
+			cookie->frames_per_sec_scale = 1;
 			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using rate)\n", cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
 		} else {
 			cookie->frames_per_sec_rate = 16000;
@@ -324,7 +330,6 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		}
 		
 		cookie->audio = false;
-		cookie->frame_pos = 0;
 		cookie->line_count = theFileReader->MovMainHeader()->height;
 		
 		if (stream_header->scale && stream_header->rate) {
@@ -458,8 +463,14 @@ movReader::GetNextChunk(void *_cookie,
 	mov_cookie *cookie = (mov_cookie *)_cookie;
 
 	int64 start; uint32 size; bool keyframe;
-	if (!theFileReader->GetNextChunkInfo(cookie->stream, cookie->frame_pos, &start, &size, &keyframe))
-		return B_LAST_BUFFER_ERROR;
+	
+	if (cookie->audio) {
+		if (!theFileReader->GetNextChunkInfo(cookie->stream, cookie->chunk_pos, &start, &size, &keyframe))
+			return B_LAST_BUFFER_ERROR;
+	} else {
+		if (!theFileReader->GetNextChunkInfo(cookie->stream, cookie->frame_pos, &start, &size, &keyframe))
+			return B_LAST_BUFFER_ERROR;
+	}
 
 	if (cookie->buffer_size < size) {
 		delete [] cookie->buffer;
@@ -468,20 +479,22 @@ movReader::GetNextChunk(void *_cookie,
 	}
 	
 	if (cookie->audio) {
-		TRACE("Audio stream %d: frame %ld start %lld Size %ld key %d\n",cookie->stream, cookie->frame_pos, start, size, keyframe);
-		mediaHeader->start_time = (cookie->byte_pos * 1000000LL * (int64)cookie->bytes_per_sec_scale) / cookie->bytes_per_sec_rate;
+		TRACE("Audio stream %d: chunk %ld expected start %lld Size %ld key %d\n",cookie->stream, cookie->chunk_pos, start, size, keyframe);
 		mediaHeader->type = B_MEDIA_ENCODED_AUDIO;
 		mediaHeader->u.encoded_audio.buffer_flags = keyframe ? B_MEDIA_KEY_FRAME : 0;
+
+		// This will only work with raw audio I think.
+		mediaHeader->start_time = (cookie->byte_pos * 1000000L * cookie->bytes_per_sec_scale) / cookie->bytes_per_sec_rate;
+		TRACE("Audio - Frames in Chunk %ld / Actual Start Time %Ld using byte_pos\n",theFileReader->getNoFramesInChunk(cookie->stream,cookie->chunk_pos),mediaHeader->start_time);
 		
-		// Should be frame_pos += frames per chunk
+		// We should find the current frame position (ie first frame in chunk) then compute using fps
+		cookie->frame_pos = theFileReader->getFirstFrameInChunk(cookie->stream,cookie->chunk_pos);
+		mediaHeader->start_time = (cookie->frame_pos * 1000000LL * (int64)cookie->frames_per_sec_scale) / cookie->frames_per_sec_rate;
+		TRACE("Audio - Frames in Chunk %ld / Actual Start Time %Ld using frame_no %ld\n",theFileReader->getNoFramesInChunk(cookie->stream,cookie->chunk_pos),mediaHeader->start_time, cookie->frame_pos);
+
 		cookie->byte_pos += size;
-		if ((int64)cookie->frames_per_sec_scale > 0) {
-			cookie->frame_pos = ((mediaHeader->start_time * cookie->frames_per_sec_rate) / (int64)cookie->frames_per_sec_scale) / 1000000LL;
-		} else {
-			cookie->frame_pos = 0;
-		}
-//		cookie->frame_pos += theFileReader->getNoFramesInChunk(cookie->stream,cookie->frame_pos);
-//		cookie->frame_pos += 2205;
+		// frame_pos is chunk No for audio
+		cookie->chunk_pos++;
 	} else {
 		TRACE("Video stream %d: frame %ld start %lld Size %ld key %d\n",cookie->stream, cookie->frame_pos, start, size, keyframe);
 		mediaHeader->start_time = (cookie->frame_pos * 1000000LL * (int64)cookie->frames_per_sec_scale) / cookie->frames_per_sec_rate;
@@ -490,7 +503,7 @@ movReader::GetNextChunk(void *_cookie,
 		mediaHeader->u.encoded_video.first_active_line = 0;
 		mediaHeader->u.encoded_video.line_count = cookie->line_count;
 	
-		cookie->frame_pos += 1;
+		cookie->frame_pos++;
 	}
 	
 	TRACE("stream %d: start_time %.6f\n", cookie->stream, mediaHeader->start_time / 1000000.0);

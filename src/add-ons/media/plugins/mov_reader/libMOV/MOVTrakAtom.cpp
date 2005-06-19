@@ -154,6 +154,17 @@ uint32	TRAKAtom::getChunkForSample(uint32 pSample, uint32 *pOffsetInChunk)
 	return 0;
 }
 
+uint32	TRAKAtom::getNoSamplesInChunk(uint32 pChunkID)
+{
+	AtomBase *aAtomBase = GetChildAtom(uint32('stsc'),0);
+	
+	if (aAtomBase) {
+		return (dynamic_cast<STSCAtom *>(aAtomBase))->getNoSamplesInChunk(pChunkID);
+	}
+	
+	return 0;
+}
+
 uint32	TRAKAtom::getSizeForSample(uint32 pSample)
 {
 	AtomBase *aAtomBase = GetChildAtom(uint32('stsz'),0);
@@ -165,16 +176,28 @@ uint32	TRAKAtom::getSizeForSample(uint32 pSample)
 	return 0;
 }
 
-uint64	TRAKAtom::getOffsetForChunk(uint32 pChunk)
+uint64	TRAKAtom::getOffsetForChunk(uint32 pChunkID)
 {
 	AtomBase *aAtomBase = GetChildAtom(uint32('stco'),0);
 	
 	if (aAtomBase) {
-		return (dynamic_cast<STCOAtom *>(aAtomBase))->getOffsetForChunk(pChunk);
+		return (dynamic_cast<STCOAtom *>(aAtomBase))->getOffsetForChunk(pChunkID);
 	}
 	
 	return 0;
 }
+
+uint32	TRAKAtom::getFirstSampleInChunk(uint32 pChunkID)
+{
+	AtomBase *aAtomBase = GetChildAtom(uint32('stsc'),0);
+	
+	if (aAtomBase) {
+		return (dynamic_cast<STSCAtom *>(aAtomBase))->getFirstSampleInChunk(pChunkID);
+	}
+	
+	return 0;
+}
+
 
 bool	TRAKAtom::IsSyncSample(uint32 pSampleNo)
 {

@@ -528,12 +528,37 @@ SampleToChunk	*aSampleToChunk;
 		}
 
 		theSampleToChunkArray[i] = aSampleToChunk;
+//		printf("%ld/%ld/%ld\n",aSampleToChunk->FirstChunk,aSampleToChunk->SamplesPerChunk,aSampleToChunk->TotalPrevFrames);
 	}
 }
 
 char *STSCAtom::OnGetAtomName()
 {
 	return "Sample to Chunk Atom";
+}
+
+uint32	STSCAtom::getNoSamplesInChunk(uint32 pChunkID)
+{
+	for (uint32 i=0;i<theHeader.NoEntries;i++) {
+		if (theSampleToChunkArray[i]->FirstChunk > pChunkID) {
+			return theSampleToChunkArray[i-1]->SamplesPerChunk;
+		}
+	}
+	
+	return 0;
+}
+
+uint32	STSCAtom::getFirstSampleInChunk(uint32 pChunkID)
+{
+	for (uint32 i=0;i<theHeader.NoEntries;i++) {
+		if (theSampleToChunkArray[i]->FirstChunk > pChunkID) {
+			uint32 Diff = pChunkID - theSampleToChunkArray[i-1]->FirstChunk;
+			uint32 pSampleNo = (Diff * theSampleToChunkArray[i-1]->SamplesPerChunk) + theSampleToChunkArray[i-1]->TotalPrevFrames;
+			return pSampleNo;
+		}
+	}
+	
+	return 0;
 }
 
 uint32	STSCAtom::getChunkForSample(uint32 pSample, uint32 *pOffsetInChunk)

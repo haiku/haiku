@@ -93,6 +93,7 @@ public:
 	bool		IsAudio(uint32 stream_index);
 
 	uint32	getNoFramesInChunk(uint32 stream_index, uint32 pFrameNo);
+	uint32	getFirstFrameInChunk(uint32 stream_index, uint32 pChunkID);
 
 	uint64	getOffsetForFrame(uint32 stream_index, uint32 pFrameNo);
 	uint32	getChunkSize(uint32 stream_index, uint32 pFrameNo);
