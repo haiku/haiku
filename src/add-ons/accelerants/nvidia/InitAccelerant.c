@@ -163,8 +163,8 @@ status_t INIT_ACCELERANT(int the_fd) {
 	si->engine.last_idle = si->engine.count = 0;
 	/* no 3D clones are currently loaded */
 	si->engine.threeD.clones = 0;
-	/* tell all 3D add-ons that they should reload their rendering states */
-	si->engine.threeD.reload_state_3D = 0xffffffff;
+	/* tell 3D add-ons that they should reload their rendering states and surfaces */
+	si->engine.threeD.reload = 0xffffffff;
 	INIT_BEN(si->engine.lock);
 
 	INIT_BEN(si->overlay.lock);
@@ -195,9 +195,9 @@ status_t INIT_ACCELERANT(int the_fd) {
 	/* make sure a possible 3D add-on will block rendering and re-initialize itself.
 	 * note: update in _this_ order only */
 	/* SET_DISPLAY_MODE will reset this flag when it's done. */
-	si->mode_changing = true;
-	/* the 3D add-on will reset this flag when it's done. */
-	si->mode_changed = true;
+	si->engine.threeD.mode_changing = true;
+	/* every 3D add-on will reset this bit-flag when it's done. */
+	si->engine.threeD.newmode = 0xffffffff;
 
 	/* a winner! */
 	result = B_OK;

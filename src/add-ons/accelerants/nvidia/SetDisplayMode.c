@@ -6,7 +6,7 @@
 	Other authors:
 	Mark Watson,
 	Apsed,
-	Rudolf Cornelissen 11/2002-5/2005
+	Rudolf Cornelissen 11/2002-6/2005
 */
 
 #define MODULE_BIT 0x00200000
@@ -80,9 +80,12 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	/* make sure a possible 3D add-on will block rendering and re-initialize itself.
 	 * note: update in _this_ order only */
 	/* SET_DISPLAY_MODE will reset this flag when it's done. */
-	si->mode_changing = true;
-	/* the 3D add-on will reset this flag when it's done. */
-	si->mode_changed = true;
+	si->engine.threeD.mode_changing = true;
+	/* every 3D add-on will reset this bit-flag when it's done. */
+	si->engine.threeD.newmode = 0xffffffff;
+	/* every 3D clone needs to reclaim a slot.
+	 * note: this also cleans up reserved channels for killed 3D clones.. */
+	si->engine.threeD.clones = 0x00000000;
 
 	/* disable interrupts using the kernel driver */
 	interrupt_enable(false);
@@ -332,13 +335,13 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 
 	/* note freemem range */
 	/* first free adress follows hardcursor and workspace */
-	si->mem_low = si->fbc.bytes_per_row * si->dm.virtual_height;
-	if (si->settings.hardcursor) si->mem_low += 2048;
+	si->engine.threeD.mem_low = si->fbc.bytes_per_row * si->dm.virtual_height;
+	if (si->settings.hardcursor) si->engine.threeD.mem_low += 2048;
 	/* last free adress is end-of-ram minus max space needed for overlay bitmaps */
 	//fixme possible:
 	//if overlay buffers are allocated subtract buffersize from mem_high;
 	//only allocate overlay buffers if 3D is not in use. (block overlay during 3D)
-	si->mem_high = si->ps.memory_size - 1;
+	si->engine.threeD.mem_high = si->ps.memory_size - 1;
 	/* don't touch the DMA acceleration engine command buffer if it exists */
 	/* note:
 	 * the buffer is 32kB in size. Keep some extra distance for safety (faulty apps). */
@@ -347,7 +350,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		if (si->ps.card_arch < NV40A)
 		{
 			/* keeping 32kB distance from the DMA buffer */
-			si->mem_high -= (64 * 1024);
+			si->engine.threeD.mem_high -= (64 * 1024);
 		}
 		else
 		{
@@ -357,10 +360,10 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 			 * if you get too close to the DMA command buffer on NV40 and NV43 at
 			 * least (both confirmed), the source DMA instance will mess-up for
 			 * at least engine cmd NV_IMAGE_BLIT and NV12_IMAGE_BLIT. */
-			si->mem_high -= (512 * 1024);
+			si->engine.threeD.mem_high -= (512 * 1024);
 		}
 	}
-	si->mem_high -= (MAXBUFFERS * 1024 * 1024 * 2); /* see overlay.c file */
+	si->engine.threeD.mem_high -= (MAXBUFFERS * 1024 * 1024 * 2); /* see overlay.c file */
 
 	LOG(1,("SETMODE: booted since %f mS\n", system_time()/1000.0));
 
@@ -368,7 +371,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	interrupt_enable(true);
 
 	/* make sure a possible 3D add-on will re-initialize itself by signalling ready */
-	si->mode_changing = false;
+	si->engine.threeD.mode_changing = false;
 
 	/* optimize memory-access if needed */
 //	head1_mem_priority(colour_depth1);

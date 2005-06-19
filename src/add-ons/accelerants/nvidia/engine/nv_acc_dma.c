@@ -1623,8 +1623,8 @@ void SCREEN_TO_SCREEN_BLIT_DMA(engine_token *et, blit_params *list, uint32 count
 		nv_start_dma();
 	}
 
-	/* tell all 3D add-ons that they should reload their rendering states */
-	si->engine.threeD.reload_state_3D = 0xffffffff;
+	/* tell 3D add-ons that they should reload their rendering states and surfaces */
+	si->engine.threeD.reload = 0xffffffff;
 }
 
 /* rectangle fill - i.e. workspace and window background color */
@@ -1675,8 +1675,8 @@ void FILL_RECTANGLE_DMA(engine_token *et, uint32 colorIndex, fill_rect_params *l
 		nv_start_dma();
 	}
 
-	/* tell all 3D add-ons that they should reload their rendering states */
-	si->engine.threeD.reload_state_3D = 0xffffffff;
+	/* tell 3D add-ons that they should reload their rendering states and surfaces */
+	si->engine.threeD.reload = 0xffffffff;
 }
 
 /* span fill - i.e. (selected) menuitem background color (Dano) */
@@ -1726,8 +1726,8 @@ void FILL_SPAN_DMA(engine_token *et, uint32 colorIndex, uint16 *list, uint32 cou
 		nv_start_dma();
 	}
 
-	/* tell all 3D add-ons that they should reload their rendering states */
-	si->engine.threeD.reload_state_3D = 0xffffffff;
+	/* tell 3D add-ons that they should reload their rendering states and surfaces */
+	si->engine.threeD.reload = 0xffffffff;
 }
 
 /* rectangle invert - i.e. text cursor and text selection */
@@ -1778,6 +1778,6 @@ void INVERT_RECTANGLE_DMA(engine_token *et, fill_rect_params *list, uint32 count
 		nv_start_dma();
 	}
 
-	/* tell all 3D add-ons that they should reload their rendering states */
-	si->engine.threeD.reload_state_3D = 0xffffffff;
+	/* tell 3D add-ons that they should reload their rendering states and surfaces */
+	si->engine.threeD.reload = 0xffffffff;
 }
