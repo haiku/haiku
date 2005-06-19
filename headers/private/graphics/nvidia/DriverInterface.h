@@ -205,24 +205,15 @@ typedef struct {
 		} dma;
 		bool agp_mode;			/* card is running in AGP mode */
 		struct {
-			/* number of active 3D accelerant 'clones' */
-			uint8 clones;
-			/* instruct 3D accelerants to reload their render states (a bit per clone) */
-			uint32 reload_state_3D;
+			uint32 clones;		/* clone 'number' (mask, slot) (one bit per clone) */
+			uint32 reload;		/* reload state and surfaces (one bit per clone) */
+			uint32 newmode;		/* re-allocate all buffers (one bit per clone) */
+			//fixme: memory stuff needs to be expanded (shared texture allocation?)
+			uint32 mem_low;		/* ptr to first free mem adress: cardmem local offset */
+			uint32 mem_high;	/* ptr to last free mem adress: cardmem local offset */
+			bool mode_changing;	/* a mode-change is in progress (set/clear by 2D drv) */
 		} threeD;
 	} engine;
-
-	/* fixme:
-	 * the stuff below has to be extended and/or changed I guess:
-	 * for now only a single 3D 'clone' driver is supported. */
-	/* pointers to first and last free memory adress for 3D use: cardmem local offsets */
-	uint32 mem_low;
-	uint32 mem_high;
-	/* flag to inform 3D add-on to stop rendering (set by 2D, reset by 3D drv) */
-	bool mode_changed;
-	/* flag to inform 3D add-on a mode-change is currently in progress
-	 * (set and reset by 2D drv) */
-	bool mode_changing;
 
   /* card info - information gathered from PINS (and other sources) */
 	enum
