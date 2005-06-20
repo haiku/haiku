@@ -64,8 +64,10 @@ public:
 BMenuWindow::BMenuWindow(const char *name)
 	:
 	// The window will be resized by BMenu, so just pass a dummy rect
-	BWindow(BRect(0, 0, 0, 0), name, B_BORDERED_WINDOW_LOOK, kMenuWindowFeel,
-			B_NOT_ZOOMABLE),
+	//BWindow(BRect(0, 0, 0, 0), name, B_BORDERED_WINDOW_LOOK, kMenuWindowFeel,
+	//		B_NOT_ZOOMABLE),
+	BWindow(BRect(0, 0, 0, 0), name, B_BORDERED_WINDOW_LOOK, B_FLOATING_ALL_WINDOW_FEEL,
+			B_NOT_ZOOMABLE|B_AVOID_FRONT|B_AVOID_FOCUS),
 	fUpperScroller(NULL),
 	fLowerScroller(NULL)
 {
