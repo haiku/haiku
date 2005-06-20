@@ -37,8 +37,6 @@
 #include <MenuPrivate.h>
 #include <MenuWindow.h>
 
-menu_info BMenu::sMenuInfo;
-
 class _ExtraMenuData_ {
 public:
 	menu_tracking_hook trackingHook;
@@ -50,6 +48,9 @@ public:
 		trackingState = state;
 	};
 };
+
+
+menu_info BMenu::sMenuInfo;
 
 
 static property_info
@@ -501,8 +502,6 @@ BMenu::FindItem(uint32 command) const
 status_t 
 BMenu::SetTargetForItems(BHandler *handler)
 {
-	// TODO: Test what beos returns here in
-	// case there are no items
 	status_t status = B_OK;
 	for (int32 i = 0; i < fItems.CountItems(); i++) {
 		status = ItemAt(i)->SetTarget(handler);
@@ -517,8 +516,6 @@ BMenu::SetTargetForItems(BHandler *handler)
 status_t
 BMenu::SetTargetForItems(BMessenger messenger)
 {
-	// TODO: Test what beos returns here in
-	// case there are no items
 	status_t status = B_OK;
 	for (int32 i = 0; i < fItems.CountItems(); i++) {
 		status = ItemAt(i)->SetTarget(messenger);
