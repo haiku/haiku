@@ -1,36 +1,16 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		BufferIO.cpp
-//	Author(s):		Stefano Ceccherini (burton666@libero.it)
-//
-//	Description:	A buffered adapter for BPositionIO objects.  
-//------------------------------------------------------------------------------
+/*
+ *	Copyright (c) 2001-2005, Haiku
+ *	Distributed under the terms of the MIT license
+ *	Authors:
+ 			Stefano Ceccherini (burton666@libero.it)
+ */
+ 
+// A buffered adapter for BPositionIO objects.
 
-// Standard Includes -----------------------------------------------------------
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-// System Includes -------------------------------------------------------------
 #include <BufferIO.h>
 
 /*! \class BBufferIO
@@ -66,7 +46,7 @@ BBufferIO::BBufferIO(BPositionIO *stream, size_t buf_size, bool owns_stream)
 	// I think R5 uses new, but doesn't catch the thrown exception
 	// (if you specify a very big buffer, the application just
 	// terminates with abort).  
-	m_buffer = (char*)malloc(m_buffer_phys * sizeof(char));
+	m_buffer = (char *)malloc(m_buffer_phys * sizeof(char));
 }
 
 
@@ -108,8 +88,7 @@ BBufferIO::ReadAt(off_t pos, void *buffer, size_t size)
 						
 	// If the amount of data we want doesn't fit in the buffer, just
 	// read it directly from the disk (and don't touch the buffer).
-	if (size > m_buffer_phys)
-	{
+	if (size > m_buffer_phys) {
 		if (m_buffer_dirty)
 			Flush();
 		return m_stream->ReadAt(pos, buffer, size);
@@ -119,8 +98,8 @@ BBufferIO::ReadAt(off_t pos, void *buffer, size_t size)
 	if (size > m_buffer_used 
 		|| pos < m_buffer_start
 		|| pos > m_buffer_start + m_buffer_used
-		|| pos + size > m_buffer_start + m_buffer_used)
-	{
+		|| pos + size > m_buffer_start + m_buffer_used) {
+		
 		if (m_buffer_dirty)
 			Flush(); // If there are pending writes, do them.
 	
@@ -161,16 +140,14 @@ BBufferIO::WriteAt(off_t pos, const void *buffer, size_t size)
 	
 	// If we have cached data in the buffer, whose offset into the stream
 	// is > 0, and the buffer isn't dirty, drop the data.
-	if (!m_buffer_dirty && m_buffer_start > pos)
-	{
+	if (!m_buffer_dirty && m_buffer_start > pos) {
 		m_buffer_start = 0;
 		m_buffer_used = 0;
 	}	
 	
 	// If we want to write beyond the cached data...
 	if (pos > m_buffer_start + m_buffer_used
-		|| pos < m_buffer_start)
-	{
+		|| pos < m_buffer_start) {
 		ssize_t read;
 		off_t where = pos;
 		
@@ -179,15 +156,15 @@ BBufferIO::WriteAt(off_t pos, const void *buffer, size_t size)
 		
 		// ...cache more.
 		read = m_stream->ReadAt(where, m_buffer, m_buffer_phys);
-		if (read > 0)
-		{
+		if (read > 0) {
 			m_buffer_used = read;
 			m_buffer_start = where;
 		}
 	}
-	memcpy(m_buffer + pos - m_buffer_start, buffer, size); 	
-	m_buffer_dirty = true;
 	
+	memcpy(m_buffer + pos - m_buffer_start, buffer, size); 	
+	
+	m_buffer_dirty = true;
 	m_buffer_used = max_c((size + pos), m_buffer_used);
 	
 	return size;
