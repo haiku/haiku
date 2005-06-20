@@ -9,14 +9,16 @@
 #ifndef SCREEN_WINDOW_H
 #define SCREEN_WINDOW_H
 
+
 #include <Screen.h>
 #include <Window.h>
 
 class BBox;
 class BPopUpMenu;
 class BMenuField;
+
 class RefreshWindow;
-class ScreenDrawView;
+class MonitorView;
 class ScreenSettings;
 
 
@@ -40,7 +42,7 @@ class ScreenWindow : public BWindow {
 	
 		ScreenSettings *fSettings;
 
-		ScreenDrawView *fScreenDrawView;
+		MonitorView *fMonitorView;
 		BPopUpMenu *fWorkspaceMenu;
 		BMenuField *fWorkspaceField;
 		BPopUpMenu *fWorkspaceCountMenu;

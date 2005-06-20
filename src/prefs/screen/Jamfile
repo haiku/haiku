@@ -1,7 +1,5 @@
 SubDir OBOS_TOP src prefs screen ;
 
-SubDirC++Flags [ FDefines BEOS_R5_COMPATIBLE ] ;
-
 Preference Screen : 
 	AlertView.cpp 
 	AlertWindow.cpp 
@@ -9,11 +7,10 @@ Preference Screen :
 	RefreshView.cpp 
 	RefreshWindow.cpp 
 	Screen.cpp 
-	ScreenDrawView.cpp 
+	MonitorView.cpp 
 	ScreenSettings.cpp 
 	ScreenWindow.cpp 
 	Utility.cpp 
 	: libbe.so
 	: Screen.rdef
 	;
-

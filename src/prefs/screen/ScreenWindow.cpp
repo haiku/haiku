@@ -29,7 +29,7 @@
 #include "AlertWindow.h"
 #include "Constants.h"
 #include "RefreshWindow.h"
-#include "ScreenDrawView.h"
+#include "MonitorView.h"
 #include "ScreenSettings.h"
 #include "ScreenWindow.h"
 #include "Utility.h"
@@ -118,6 +118,9 @@ set_pixel_clock(display_mode * mode, float refresh_rate)
 }
 
 
+//	#pragma mark -
+
+
 ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	: BWindow(Settings->WindowFrame(), "Screen", B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES)
@@ -139,8 +142,9 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	BBox *screenBox = new BBox(screenBoxRect);
 	screenBox->SetBorder(B_FANCY_BORDER);
 
-	fScreenDrawView = new ScreenDrawView(BRect(20.0, 16.0, 122.0, 93.0), "ScreenDrawView");	
-	screenBox->AddChild(fScreenDrawView);
+	fMonitorView = new MonitorView(BRect(20.0, 16.0, 122.0, 93.0), "monitor",
+		screen.Frame().Width() + 1, screen.Frame().Height() + 1);
+	screenBox->AddChild(fMonitorView);
 
 	fWorkspaceCountMenu = new BPopUpMenu("", true, true);
 	fWorkspaceCountField = new BMenuField(BRect(7.0, 107.0, 135.0, 127.0), "WorkspaceCountMenu", "Workspace count:", fWorkspaceCountMenu, true);
@@ -149,14 +153,15 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	for (int32 count = 1; count <= 32; count++) {
 		BString workspaceCount;
 		workspaceCount << count;
+
+		BMessage *message = new BMessage(POP_WORKSPACE_CHANGED_MSG);
+		message->AddInt32("workspace count", count);
+
 		fWorkspaceCountMenu->AddItem(new BMenuItem(workspaceCount.String(),
-			new BMessage(POP_WORKSPACE_CHANGED_MSG)));
+			message));
 	}
 
-	BString string;
-	string << count_workspaces();
-
-	BMenuItem *marked = fWorkspaceCountMenu->FindItem(string.String());
+	BMenuItem *marked = fWorkspaceCountMenu->ItemAt(count_workspaces() - 1);
 	if (marked != NULL)
 		marked->SetMarked(true);
 
@@ -182,19 +187,19 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	BRect ButtonRect(88.0, 114.0, 200.0, 150.0);	
 	fApplyButton = new BButton(ButtonRect, "ApplyButton", "Apply", 
 		new BMessage(BUTTON_APPLY_MSG));
-	
+
 	fApplyButton->AttachedToWindow();
 	fApplyButton->ResizeToPreferred();
 	fApplyButton->SetEnabled(false);
-	
+
 	controlsBox->AddChild(fApplyButton);
-	
+
 	fResolutionMenu = new BPopUpMenu("", true, true);	
 	fColorsMenu = new BPopUpMenu("", true, true);
 	fRefreshMenu = new BPopUpMenu("", true, true);
-	
+
 	CheckUpdateDisplayModes();
-	
+
 	const char *resolutionLabel = "Resolution: ";
 	float resolutionWidth = controlsBox->StringWidth(resolutionLabel);
 	BRect controlMenuRect(88.0-resolutionWidth, 30.0, 171.0, 48.0);	
@@ -345,157 +350,139 @@ ScreenWindow::ScreenChanged(BRect frame, color_space mode)
 void
 ScreenWindow::WorkspaceActivated(int32 ws, bool state)
 {
-	PostMessage(new BMessage(UPDATE_DESKTOP_COLOR_MSG), fScreenDrawView);
+	PostMessage(new BMessage(UPDATE_DESKTOP_COLOR_MSG), fMonitorView);
 }
 
 
 void
 ScreenWindow::MessageReceived(BMessage* message)
 {
-	switch(message->what)
-	{
+	switch (message->what) {
 		case WORKSPACE_CHECK_MSG:
-		{
 			fApplyButton->SetEnabled(true);
-			
 			break;
-		}
-	
+
 		case POP_WORKSPACE_CHANGED_MSG:
 		{		
 			BMenuItem *item = fWorkspaceCountMenu->FindMarked();
-		
+
 			set_workspace_count(fWorkspaceCountMenu->IndexOf(item) + 1);
-		
 			break;
 		}
-		
+
 		case POP_RESOLUTION_MSG:
 		{
 			CheckApplyEnabled();
-			
-			BMessage newMessage(UPDATE_DESKTOP_MSG);
-			
-			const char *resolution = fResolutionMenu->FindMarked()->Label();
-			
-			//CheckModesByResolution(resolution);
-			newMessage.AddString("resolution", resolution);
-		
-			PostMessage(&newMessage, fScreenDrawView);
-			
+
+			BMessage updateMessage(*message);
+			updateMessage.what = UPDATE_DESKTOP_MSG;
+
+			PostMessage(&updateMessage, fMonitorView);
 			break;
 		}
-		
+
 		case POP_COLORS_MSG:
-		{
 			CheckApplyEnabled();		
 			break;
-		}
-		
+
 		case POP_REFRESH_MSG:
-		{
 			CheckApplyEnabled();		
 			break;
-		}
-		
+
 		case POP_OTHER_REFRESH_MSG:
 		{
 			BRect frame(Frame());
 			
 			CheckApplyEnabled();
 			int32 value = (int32)(fCustomRefresh * 10);		
-			
+
 			RefreshWindow *fRefreshWindow = new RefreshWindow(BRect((frame.left + 201.0),
 				(frame.top + 34.0), (frame.left + 509.0),
 				(frame.top + 169.0)), value);
 			fRefreshWindow->Show();
 			break;
 		}
-		
+
 		case BUTTON_DEFAULTS_MSG:
 		{
-			char str[256];
+			char string[256];
 			BMenuItem * item = 0;
 			display_mode mode;
 			mode.virtual_width = 640;
 			mode.virtual_height = 480;
-			mode_to_string(mode,str);
-			if ((item = fResolutionMenu->FindItem(str)) != NULL) {
+			mode_to_string(mode, string);
+			if ((item = fResolutionMenu->FindItem(string)) != NULL)
 				item->SetMarked(true);
-			} else {
+			else
 				fResolutionMenu->ItemAt(0)->SetMarked(true);
-			}
-			colorspace_to_string(B_CMAP8,str);
-			if ((item = fColorsMenu->FindItem(str)) != NULL) {
+
+			colorspace_to_string(B_CMAP8, string);
+			if ((item = fColorsMenu->FindItem(string)) != NULL)
 				item->SetMarked(true);
-			} else {
+			else
 				fColorsMenu->ItemAt(0)->SetMarked(true);
-			}
-			refresh_rate_to_string(60.0,str);
-			if ((item = fRefreshMenu->FindItem(str)) != NULL) {
+
+			refresh_rate_to_string(60.0, string);
+			if ((item = fRefreshMenu->FindItem(string)) != NULL)
 				item->SetMarked(true);
-			} else {
+			else
 				fRefreshMenu->ItemAt(0)->SetMarked(true);
+
+			if ((item = fResolutionMenu->FindMarked()) != NULL) {
+				BMessage updateMessage(*item->Message());
+				updateMessage.what = UPDATE_DESKTOP_MSG;
+				PostMessage(&updateMessage, fMonitorView);
 			}
-			
-			BMessage newMessage(UPDATE_DESKTOP_MSG);
-			const char *resolution = fResolutionMenu->FindMarked()->Label();
-			newMessage.AddString("resolution", resolution);
-			PostMessage(&newMessage, fScreenDrawView);
+
 			CheckApplyEnabled();
 			break;
 		}
-		
+
 		case BUTTON_REVERT_MSG:
 		case SET_INITIAL_MODE_MSG:
 		{	
 			fInitialResolution->SetMarked(true);
 			fInitialColors->SetMarked(true);
 			fInitialRefresh->SetMarked(true);
-			
+
 			CheckApplyEnabled();
-			
+
 			BMenuItem *other = fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG);
-			
+
 			if (fInitialRefresh == other) {
 				BString string;			
 				string << fInitialRefreshN;
-				
+
 				int32 point = string.FindFirst('.');
 				string.Truncate(point + 2);
-			
+
 				string << " Hz/Other...";
-			
+
 				fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG)->SetLabel(string.String());
-			
+
 				point = string.FindFirst('/');
 				string.Truncate(point);
-			
+
 				fRefreshMenu->Superitem()->SetLabel(string.String());
 			}
-			
-			BMessage newMessage(UPDATE_DESKTOP_MSG);
-			const char *resolution = fInitialResolution->Label();
-			newMessage.AddString("resolution", resolution);
-			PostMessage(&newMessage, fScreenDrawView);
-			
+
+			if (fInitialResolution != NULL) {
+				BMessage updateMessage(*fInitialResolution->Message());
+				updateMessage.what = UPDATE_DESKTOP_MSG;
+				PostMessage(&updateMessage, fMonitorView);
+			}
+
 			if (message->what == SET_INITIAL_MODE_MSG) {
-				
-				BScreen screen(B_MAIN_SCREEN_ID);
-				if (!screen.IsValid())
-					break;
-						
+				BScreen screen(this);
 				screen.SetMode(&fInitialMode, true);
 			}
 			break;
 		}
-			
+
 		case BUTTON_APPLY_MSG:
-		{	
 			ApplyMode();
 			break;
-		}
-				
+
 		case SET_CUSTOM_REFRESH_MSG:
 		{
 			message->FindFloat("refresh", &fCustomRefresh);
@@ -589,8 +576,13 @@ ScreenWindow::CheckUpdateDisplayModes()
 	for (c = 0; c < fTotalModes; c++) {
 		mode_to_string(fSupportedModes[c], mode);
 		
-		if (!fResolutionMenu->FindItem(mode))
-			fResolutionMenu->AddItem(new BMenuItem(mode, new BMessage(POP_RESOLUTION_MSG)));
+		if (!fResolutionMenu->FindItem(mode)) {
+			BMessage *message = new BMessage(POP_RESOLUTION_MSG);
+			message->AddInt32("width", fSupportedModes[c].virtual_width);
+			message->AddInt32("height", fSupportedModes[c].virtual_height);
+
+			fResolutionMenu->AddItem(new BMenuItem(mode, message));
+		}
 	}
 	
 	// Add supported colorspaces to the menu
