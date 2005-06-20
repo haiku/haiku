@@ -1026,7 +1026,7 @@ RootLayer::SetScreenMode(int32 width, int32 height, uint32 colorSpace, float fre
 //---------------------------------------------------------------------------
 //				Input related methods
 //---------------------------------------------------------------------------
-inline void
+void
 RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 {
 	switch(code) {
@@ -1398,8 +1398,9 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 	}
 }
 
-inline
-void RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
+
+void
+RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 {
 
 	switch(code)
