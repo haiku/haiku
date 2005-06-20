@@ -140,7 +140,6 @@ device_hooks g_net_stack_driver_hooks =
 };
 
 struct core_module_info *g_core = NULL;
-uint32 g_core_reference_count = 0;
 
 #if STAY_LOADED
 int	g_stay_loaded_fd = -1;
@@ -209,7 +208,6 @@ _EXPORT status_t init_driver(void)
 		g_core->start();
 	}
 	
-	g_core_reference_count++;
 	return B_OK;
 }
 
@@ -221,15 +219,14 @@ _EXPORT status_t init_driver(void)
 _EXPORT void uninit_driver(void)
 {
 	TRACE((LOGID "uninit_driver\n"));
-	g_core_reference_count--;
 	
-	if (g_core && g_core_reference_count == 0) {
+	if (g_core) {
 		// shutdown the network stack
 		g_core->stop();
 		
 		put_module(NET_CORE_MODULE_NAME);
 		g_core = NULL;
-	};
+	}
 }
 
 

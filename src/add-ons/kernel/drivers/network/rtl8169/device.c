@@ -437,7 +437,7 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 			break;
 	}		
 	if (deviceName == NULL) {
-		ERROR("invalid device name");
+		ERROR("invalid device name\n");
 		return B_ERROR;
 	}
 	
