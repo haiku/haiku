@@ -136,13 +136,11 @@ void
 BMenuBar::Draw(BRect updateRect)
 {
 	// TODO: implement additional border styles
-	if (IsEnabled()) {
-		BRect bounds(Bounds());
-			
+	if (IsEnabled()) {	
 		PushState();
-	
-		// Restore the background color in case a menuitem
-		// was selected.
+		
+		BRect bounds(Bounds());
+		// Restore the background of the previously selected menuitem
 		DrawBackground(bounds & updateRect);
 			
 		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_LIGHTEN_2_TINT));
@@ -369,17 +367,18 @@ BMenuBar::TrackTask(void *arg)
 	receive_data(&id, &data, sizeof(data));
 	
 	BMenuBar *menuBar = data.menuBar;
-	BWindow *window = menuBar->Window();
-	
 	menuBar->SetStickyMode(data.sticky);
 	
 	int32 action;
 	menuBar->Track(&action, data.menuIndex, data.showMenu);
 	
+	menuBar->fTracking = false;
+	
 	// Sends a _MENUS_DONE_ message to the BWindow.
 	// Weird: There is a _MENUS_DONE_ message but not a 
 	// _MENUS_BEGINNING_ message, in fact the MenusBeginning()
 	// hook function is called directly.
+	BWindow *window = menuBar->Window();
 	window->PostMessage(_MENUS_DONE_);
 	
 	_set_menu_sem_(window, B_BAD_SEM_ID);
@@ -441,15 +440,10 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 			
 	} while (true);
 	
-	if (fSelected != NULL) {
-		window->Lock();
+	if (window->Lock()) {
 		SelectItem(NULL);
-		window->Unlock();
-	}
-	
-	if (resultItem != NULL) {
-		window->Lock();
-		resultItem->Invoke();
+		if (resultItem != NULL)
+			resultItem->Invoke();
 		window->Unlock();
 	}
 	
@@ -490,7 +484,6 @@ BMenuBar::RestoreFocus()
 		window->Unlock();
 	}
 }
-
 
 void 
 BMenuBar::InitData(menu_layout layout)

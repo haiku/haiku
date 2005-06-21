@@ -88,12 +88,12 @@ BSeparatorItem::Draw()
 		return;
 		
 	BRect bounds = Frame();
+	rgb_color oldColor = menu->HighColor();
 	
 	menu_info menuInfo;
 	get_menu_info(&menuInfo);
 	switch (menuInfo.separator) {
 		case 0:
-			// TODO: Check if drawing is pixel perfect
 			menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
 				B_DARKEN_1_TINT));
 			menu->StrokeLine(BPoint(bounds.left + 1.0f, bounds.top + 4.0f),
@@ -102,11 +102,9 @@ BSeparatorItem::Draw()
 				B_LIGHTEN_2_TINT));
 			menu->StrokeLine(BPoint(bounds.left + 1.0f, bounds.top + 5.0f),
 				BPoint(bounds.right - 1.0f, bounds.top + 5.0f));
-			menu->SetHighColor(0, 0, 0);
 			break;
 		
 		case 1:
-			// TODO: Check if drawing is pixel perfect
 			menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
 				B_DARKEN_1_TINT));
 			menu->StrokeLine(BPoint(bounds.left + 9.0f, bounds.top + 4.0f),
@@ -115,7 +113,6 @@ BSeparatorItem::Draw()
 				B_LIGHTEN_2_TINT));
 			menu->StrokeLine(BPoint(bounds.left + 9.0f, bounds.top + 5.0f),
 				BPoint(bounds.right - 9.0f, bounds.top + 5.0f));
-			menu->SetHighColor(0, 0, 0);
 			break;
 			
 		case 2:
@@ -129,12 +126,13 @@ BSeparatorItem::Draw()
 				B_LIGHTEN_2_TINT));
 			menu->StrokeLine(BPoint(bounds.left + 11.0f, bounds.top + 6.0f),
 				BPoint(bounds.right - 11.0f, bounds.top + 6.0f));
-			menu->SetHighColor(0, 0, 0);
 			break;
 		
 		default:
 			break;
 	}
+	
+	menu->SetHighColor(oldColor);
 }
 
 
