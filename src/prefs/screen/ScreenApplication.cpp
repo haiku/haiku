@@ -10,21 +10,17 @@
  */
 
 
-#include <Application.h>
-#include <Alert.h>
-
-#include <cstdio>
-#include <cstring>
-
-#include "Constants.h"
 #include "ScreenApplication.h"
 #include "ScreenWindow.h"
 #include "ScreenSettings.h"
+#include "Constants.h"
+
+#include <Alert.h>
 
 
 ScreenApplication::ScreenApplication()
 	:	BApplication(kAppSignature),
-		fScreenWindow(new ScreenWindow(new ScreenSettings()))
+	fScreenWindow(new ScreenWindow(new ScreenSettings()))
 {
 	fScreenWindow->Show();
 }

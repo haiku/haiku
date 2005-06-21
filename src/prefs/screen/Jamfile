@@ -1,16 +1,16 @@
 SubDir OBOS_TOP src prefs screen ;
 
 Preference Screen : 
-	AlertView.cpp 
-	AlertWindow.cpp 
-	RefreshSlider.cpp 
-	RefreshView.cpp 
-	RefreshWindow.cpp 
-	Screen.cpp 
-	MonitorView.cpp 
-	ScreenSettings.cpp 
-	ScreenWindow.cpp 
-	Utility.cpp 
+	AlertView.cpp
+	AlertWindow.cpp
+	MonitorView.cpp
+	RefreshSlider.cpp
+	RefreshView.cpp
+	RefreshWindow.cpp
+	ScreenApplication.cpp
+	ScreenSettings.cpp
+	ScreenWindow.cpp
+	Utility.cpp
 	: libbe.so
 	: Screen.rdef
 	;
