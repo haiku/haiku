@@ -160,11 +160,11 @@ friend class Desktop;
 
 			bool				get_workspace_windows();
 			void 				draw_window_tab(WinBorder *exFocus);
+#ifndef NEW_CLIPPING
 			void				empty_visible_regions(Layer *layer);
-
 			void				invalidate_layer(Layer *layer, const BRegion &region);
 			void				redraw_layer(Layer *layer, const BRegion &region);
-
+#endif
 			void				winborder_activation(WinBorder* exActive);
 
 			void				show_final_scene(WinBorder *exFocus, WinBorder *exActive);

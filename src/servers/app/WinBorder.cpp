@@ -176,6 +176,8 @@ y = (float)int32(y);
 	if (fDecorator)
 		fDecorator->MoveBy(x,y);
 
+#ifndef NEW_CLIPPING
+
 // NOTE: I moved this here from Layer::move_layer()
 // Should this have any bad consequences I'm not aware of?
 zUpdateReg.OffsetBy(x, y);
@@ -199,15 +201,17 @@ fUpdateReg.OffsetBy(x, y);
 // has not been added to fParent apperantly. So now
 // you ask why fParent is even valid? Me too.
 		fFrame.OffsetBy(x, y);
-#ifndef NEW_CLIPPING
 		fFull.OffsetBy(x, y);
-#endif
 		fTopLayer->move_layer(x, y);
 		// ...and here we get really hacky...
 		fTopLayer->fFrame.OffsetTo(0.0, 0.0);
 	} else {
 		move_layer(x, y);
 	}
+
+#else
+	// implement. maybe...
+#endif
 
 	if (Window()) {
 		// dispatch a message to the client informing about the changed size
@@ -243,28 +247,34 @@ y = (float)int32(y);
 	x = wantWidth - fFrame.Width();
 	y = wantHeight - fFrame.Height();
 
-	if (x != 0.0 || y != 0.0) {
-		if (fDecorator)
-			fDecorator->ResizeBy(x, y);
-	
-		if (IsHidden()) {
-			// TODO: See large comment in MoveBy()
-			fFrame.right += x;
-			fFrame.bottom += y;
+	if (x == 0.0 && y == 0.0)
+		return;
 
-			fTopLayer->resize_layer(x, y);
-		} else {
-			resize_layer(x, y);
-		}
+	if (fDecorator)
+		fDecorator->ResizeBy(x, y);
 
-		if (Window()) {
-			// send a message to the client informing about the changed size
-			BRect frame(fTopLayer->Frame());
-			BMessage msg(B_WINDOW_RESIZED);
-			msg.AddInt32("width", frame.Width());
-			msg.AddInt32("height", frame.Height());
-			Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
-		}
+#ifndef NEW_CLIPPING	
+	if (IsHidden()) {
+		// TODO: See large comment in MoveBy()
+		fFrame.right += x;
+		fFrame.bottom += y;
+
+		fTopLayer->resize_layer(x, y);
+	} else {
+		resize_layer(x, y);
+	}
+
+#else
+	// Do? I don't think so. The new move/resize/scroll hooks should handle these
+#endif
+
+	if (Window()) {
+		// send a message to the client informing about the changed size
+		BRect frame(fTopLayer->Frame());
+		BMessage msg(B_WINDOW_RESIZED);
+		msg.AddInt32("width", frame.Width());
+		msg.AddInt32("height", frame.Height());
+		Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
 	}
 }
 
@@ -654,18 +664,11 @@ void WinBorder::set_decorator_region(BRect bounds)
 {
 	fRebuildDecRegion = false;
 
-	fDecRegion.MakeEmpty();
-	// NOTE: frame is in screen coords
-	fDecRegion.Include(BRect(bounds.left-4, bounds.top-4, bounds.right+4, bounds.top-1));
-	fDecRegion.Include(BRect(bounds.left-4, bounds.bottom+1, bounds.right+4, bounds.bottom+4));
-	fDecRegion.Include(BRect(bounds.left-4, bounds.top, bounds.left-1, bounds.bottom));
-	fDecRegion.Include(BRect(bounds.right+1, bounds.top, bounds.right+4, bounds.bottom));
-
-	// tab
-	fDecRegion.Include(BRect(bounds.left-4, bounds.top-4-10, bounds.left+bounds.Width()/2, bounds.top-4));
-
-	// resize rect
-	fDecRegion.Include(BRect(bounds.right-10, bounds.bottom-10, bounds.right, bounds.bottom));
+	if (fDecorator)
+	{
+		fDecRegion.MakeEmpty();
+		fDecorator->GetFootprint(&fDecRegion);
+	}
 }
 
 bool WinBorder::alter_visible_for_children(BRegion &region)
@@ -679,7 +682,8 @@ void WinBorder::get_user_regions(BRegion &reg)
 	if (fRebuildDecRegion)
 	{
 		set_decorator_region(Bounds());
-		ConvertToScreen2(&fDecRegion);
+		// TODO? the decorator should be in WinBorder coordinates?? It's easier not to.
+		//ConvertToScreen2(&fDecRegion);
 	}
 
 	BRect			screenFrame(Bounds());

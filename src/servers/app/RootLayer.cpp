@@ -227,8 +227,16 @@ RootLayer::WorkingThread(void *data)
 	oneRootLayer->Lock();
 #ifndef NEW_CLIPPING
 	oneRootLayer->RebuildFullRegion();
-#endif
 	oneRootLayer->invalidate_layer(oneRootLayer, oneRootLayer->Bounds());
+#else
+	oneRootLayer->rebuild_visible_regions(
+		BRegion(oneRootLayer->Bounds()),
+		BRegion(oneRootLayer->Bounds()),
+		oneRootLayer->BottomChild());
+
+	oneRootLayer->fRedrawReg.Include(oneRootLayer->Bounds());
+	oneRootLayer->RequestDraw(oneRootLayer->fRedrawReg, oneRootLayer->BottomChild());
+#endif
 	oneRootLayer->Unlock();
 	
 	STRACE(("info: RootLayer(%s)::WorkingThread listening on port %ld.\n", oneRootLayer->GetName(), oneRootLayer->fListenPort));
@@ -280,11 +288,16 @@ RootLayer::WorkingThread(void *data)
 			}
 			case AS_ROOTLAYER_DO_INVALIDATE:
 			{
+printf("Adi: new message\n");
 				BRegion invalidRegion;
 				Layer *layer = NULL;
 				messageQueue.Read<Layer*>(&layer);
 				messageQueue.ReadRegion(&invalidRegion);
+#ifndef NEW_CLIPPING
 				oneRootLayer->invalidate_layer(layer, invalidRegion);
+#else
+				layer->do_Invalidate(invalidRegion);
+#endif
 				break;
 			}
 			case AS_ROOTLAYER_DO_REDRAW:
@@ -293,7 +306,11 @@ RootLayer::WorkingThread(void *data)
 				Layer *layer = NULL;
 				messageQueue.Read<Layer*>(&layer);
 				messageQueue.ReadRegion(&redrawRegion);
+#ifndef NEW_CLIPPING
 				oneRootLayer->redraw_layer(layer, redrawRegion);
+#else
+				layer->do_Redraw(redrawRegion);
+#endif
 				break;
 			}
 			case AS_ROOTLAYER_LAYER_MOVE:
@@ -303,7 +320,11 @@ RootLayer::WorkingThread(void *data)
 				messageQueue.Read<Layer*>(&layer);
 				messageQueue.Read<float>(&x);
 				messageQueue.Read<float>(&y);
+#ifndef NEW_CLIPPING
 				layer->move_layer(x, y);
+#else
+				layer->do_MoveBy(x, y);
+#endif
 				break;
 			}
 			case AS_ROOTLAYER_LAYER_RESIZE:
@@ -313,7 +334,11 @@ RootLayer::WorkingThread(void *data)
 				messageQueue.Read<Layer*>(&layer);
 				messageQueue.Read<float>(&x);
 				messageQueue.Read<float>(&y);
+#ifndef NEW_CLIPPING
 				layer->resize_layer(x, y);
+#else
+				layer->do_ResizeBy(x, y);
+#endif
 				break;
 			}
 			case AS_ROOTLAYER_ADD_TO_SUBSET:
@@ -375,11 +400,13 @@ RootLayer::GoInvalidate(const Layer *layer, const BRegion &region)
 {
 	BPrivate::PortLink msg(fListenPort, -1);
 	msg.StartMessage(AS_ROOTLAYER_DO_INVALIDATE);
+//debugger("y");
 	msg.Attach<const Layer*>(layer);
 	msg.AttachRegion(region);
 	msg.Flush();
 }
 
+#ifndef NEW_CLIPPING
 void RootLayer::invalidate_layer(Layer *layer, const BRegion &region)
 {
 	// NOTE: our thread (WorkingThread) is locked here.
@@ -390,7 +417,7 @@ void RootLayer::invalidate_layer(Layer *layer, const BRegion &region)
 
 	layer->FullInvalidate(region);
 }
-
+#endif
 
 status_t
 RootLayer::EnqueueMessage(BPrivate::PortLink &message)
@@ -411,7 +438,7 @@ RootLayer::GoRedraw(const Layer *layer, const BRegion &region)
 	msg.Flush();
 }
 
-
+#ifndef NEW_CLIPPING
 void
 RootLayer::redraw_layer(Layer *layer, const BRegion &region)
 {
@@ -419,7 +446,7 @@ RootLayer::redraw_layer(Layer *layer, const BRegion &region)
 
 	layer->Invalidate(region);
 }
-
+#endif
 
 void
 RootLayer::GoChangeWinBorderFeel(const WinBorder *winBorder, int32 newFeel)
@@ -1921,9 +1948,10 @@ RootLayer::show_winBorder(WinBorder *winBorder)
 		if (fActiveWksIndex == i)
 			invalidate = invalid;
 	}
-
+printf("Adi 1\n");
 	if (invalidate)
 		show_final_scene(exFocus, exActive);
+printf("Adi 2\n");
 }
 
 void RootLayer::hide_winBorder(WinBorder *winBorder)
@@ -2029,7 +2057,11 @@ bool RootLayer::get_workspace_windows()
 					present = true;
 
 			if (!present)
+#ifndef NEW_CLIPPING
 				empty_visible_regions(fWinBorderList2[i]);
+#else
+				fWinBorderList2[i]->clear_visible_regions();
+#endif
 		}
 	}
 
@@ -2067,6 +2099,7 @@ RootLayer::draw_window_tab(WinBorder *exFocus)
 	}
 }
 
+#ifndef NEW_CLIPPING
 inline void
 RootLayer::empty_visible_regions(Layer *layer)
 {
@@ -2074,16 +2107,16 @@ RootLayer::empty_visible_regions(Layer *layer)
 	// NOTE: first 'layer' must be a WinBorder
 	Layer	*child;
 
-#ifndef NEW_CLIPPING
+
 	layer->fFullVisible.MakeEmpty();
 	layer->fVisible.MakeEmpty();
-#endif
 	child	= layer->BottomChild();
 	while(child) {
 		empty_visible_regions(child);
 		child = layer->UpperSibling();
 	}
 }
+#endif
 
 inline void
 RootLayer::winborder_activation(WinBorder* exActive)
@@ -2109,13 +2142,12 @@ RootLayer::show_final_scene(WinBorder *exFocus, WinBorder *exActive)
 		fHaveWinBorderList = false;
 		// TODO: should it be improved by calling with region of hidden windows
 		//       plus the full regions of new windows???
-		invalidate_layer(this,
 #ifndef NEW_CLIPPING
-		fFull
+		invalidate_layer(this, fFull);
 #else
-		Frame()
+		// TODO: hmm. Bounds()? Yes, this its OK, for the moment!!! think!
+		do_Invalidate(Bounds());
 #endif
-		);
 	}
 
 	draw_window_tab(exFocus);

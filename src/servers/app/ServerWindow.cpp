@@ -479,15 +479,14 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (parent != NULL)
 				parent->AddChild(newLayer, this);
 
-			if (!newLayer->IsHidden()) {
-				myRootLayer->GoInvalidate(newLayer,
+printf("Adi: create %s\n", fName);
+			if (!newLayer->IsHidden())
 #ifndef NEW_CLIPPING
-				newLayer->fFull
+				myRootLayer->GoInvalidate(newLayer, newLayer->fFull);
 #else
-				newLayer->Frame()
+				myRootLayer->GoInvalidate(newLayer, newLayer->Frame());
 #endif
-				);
-			}
+
 			break;
 		}
 		case AS_LAYER_DELETE:
@@ -910,13 +909,11 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			fCurrentLayer->RebuildFullRegion();
 #endif
 			if (!(fCurrentLayer->IsHidden()))
-				myRootLayer->GoInvalidate(fCurrentLayer,
 #ifndef NEW_CLIPPING
-				fCurrentLayer->fFull
+				myRootLayer->GoInvalidate(fCurrentLayer, fCurrentLayer->fFull);				
 #else
-				fCurrentLayer->Frame()
+				myRootLayer->GoInvalidate(fCurrentLayer, fCurrentLayer->Frame());
 #endif
-				);
 				
 			break;
 		}
@@ -986,13 +983,11 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			fCurrentLayer->RebuildFullRegion();
 #endif
 			if (!(fCurrentLayer->IsHidden()))
-				myRootLayer->GoInvalidate(fCurrentLayer,
 #ifndef NEW_CLIPPING
-				fCurrentLayer->fFull
+				myRootLayer->GoInvalidate(fCurrentLayer, fCurrentLayer->fFull);				
 #else
-				fCurrentLayer->Frame()
+				myRootLayer->GoInvalidate(fCurrentLayer, fCurrentLayer->Frame());
 #endif
-				);
 
 			break;
 		}

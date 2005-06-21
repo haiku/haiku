@@ -209,6 +209,9 @@ class Layer {
 	inline	const ServerBitmap*	OverlayBitmap() const
 									{ return fOverlayBitmap; }
 #ifdef NEW_CLIPPING
+	inline	const BRegion&		VisibleRegion() const { return fVisible2; }
+	inline	const BRegion&		FullVisible() const { return fFullVisible2; }
+
 	virtual	void				MovedByHook(float dx, float dy) { }
 	virtual	void				ResizedByHook(float dx, float dy, bool automatic) { }
 	virtual	void				ScrolledByHook(float dx, float dy) { }
@@ -227,6 +230,9 @@ class Layer {
 
 			void				do_Invalidate(	const BRegion &invalid,
 												const Layer *startFrom = NULL);
+
+			void				do_Redraw(	const BRegion &invalid,
+											const Layer *startFrom = NULL);
 
 			void			rebuild_visible_regions(const BRegion &invalid,
 													const BRegion &parentLocalVisible,
@@ -247,12 +253,14 @@ class Layer {
 	friend class WinBorder;
 	friend class ServerWindow;
 
+#ifndef NEW_CLIPPING
 			void				move_layer(float x, float y);
 			void				resize_layer(float x, float y);
 
 			void				FullInvalidate(const BRect& rect);
 			void				FullInvalidate(const BRegion& region);
 			void				Invalidate(const BRegion& region);
+#endif
 
 			BRect				fFrame;
 // TODO: should be removed or reused in a similar fashion
@@ -272,14 +280,13 @@ class Layer {
 #ifndef NEW_CLIPPING	
 			BRegion				fVisible;
 			BRegion				fFullVisible;
+			BRegion				fFull;
+			int8				fFrameAction;
 #else
  private:
 			BRegion				fVisible2;
 			BRegion				fFullVisible2;
  protected:
-#endif
-#ifndef NEW_CLIPPING
-			BRegion				fFull;
 #endif
 			BRegion*			fClipReg;
 	
@@ -294,9 +301,6 @@ class Layer {
 			bool				fIsTopLayer;
 			uint16				fAdFlags;
 			int8				fClassID;
-#ifndef NEW_CLIPPING
-			int8				fFrameAction;
-#endif
 	
 			DisplayDriver*		fDriver;
 			LayerData*			fLayerData;
