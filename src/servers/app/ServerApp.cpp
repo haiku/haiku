@@ -1773,6 +1773,23 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			break;
 		}
 
+		case AS_GET_MODE_LIST:
+		{
+			display_mode* modeList;
+			uint32 count;
+			if (gDesktop->GetDisplayDriver()->GetModeList(&modeList, &count) == B_OK) {
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach<uint32>(count);
+				fLink.Attach(modeList, sizeof(display_mode) * count);
+
+				delete[] modeList;
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+
+			fLink.Flush();
+			break;
+		}
+
 		case AS_SCREEN_GET_COLORMAP:
 		{
 			STRACE(("ServerApp %s: AS_SCREEN_GET_COLORMAP\n", fSignature.String()));

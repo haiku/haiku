@@ -499,14 +499,14 @@ printf("Adi: create %s\n", fName);
 			STRACE(("ServerWindow %s: AS_LAYER_DELETE(self)...\n", fName));			
 			Layer *parent;
 			parent = fCurrentLayer->fParent;
-			
+
 			// here we remove current layer from list.
 			fCurrentLayer->RemoveSelf();
 			fCurrentLayer->PruneTree();
-			
+
 			if (parent)
 				myRootLayer->GoInvalidate(parent, BRegion(fCurrentLayer->Frame()));
-			
+
 			#ifdef DEBUG_SERVERWINDOW
 			parent->PrintTree();
 			#endif
@@ -553,7 +553,6 @@ printf("Adi: create %s\n", fName);
 			fMsgSender->Attach<BRect>(fCurrentLayer->fFrame.OffsetToCopy(fCurrentLayer->BoundsOrigin()));
 
 			fMsgSender->Flush();
-
 			break;
 		}
 		case AS_LAYER_SET_MOUSE_EVENT_MASK:
@@ -567,7 +566,6 @@ printf("Adi: create %s\n", fName);
 			link.Read<uint32>(&options);
 
 			myRootLayer->SetEventMaskLayer(fCurrentLayer, mask, options);
-
 			break;
 		}
 		case AS_LAYER_MOVETO:
@@ -582,7 +580,6 @@ printf("Adi: create %s\n", fName);
 			float offsetY = y - fCurrentLayer->fFrame.top;
 
 			fCurrentLayer->MoveBy(offsetX, offsetY);
-			
 			break;
 		}
 		case AS_LAYER_RESIZETO:
@@ -599,7 +596,6 @@ printf("Adi: create %s\n", fName);
 			float deltaHeight = newHeight - fCurrentLayer->fFrame.Height();
 
 			fCurrentLayer->ResizeBy(deltaWidth, deltaHeight);
-			
 			break;
 		}
 		case AS_LAYER_GET_COORD:
@@ -612,7 +608,6 @@ printf("Adi: create %s\n", fName);
 			// convert frame to bounds
 			fMsgSender->Attach<BRect>(fCurrentLayer->fFrame.OffsetToCopy(fCurrentLayer->BoundsOrigin()));
 			fMsgSender->Flush();
-
 			break;
 		}
 		case AS_LAYER_SET_ORIGIN:
@@ -624,7 +619,6 @@ printf("Adi: create %s\n", fName);
 			link.Read<float>(&y);
 			
 			fCurrentLayer->fLayerData->SetOrigin(BPoint(x, y));
-
 			break;
 		}
 		case AS_LAYER_GET_ORIGIN:
@@ -633,14 +627,12 @@ printf("Adi: create %s\n", fName);
 			fMsgSender->StartMessage(SERVER_TRUE);
 			fMsgSender->Attach<BPoint>(fCurrentLayer->fLayerData->Origin());
 			fMsgSender->Flush();
-
 			break;
 		}
 		case AS_LAYER_RESIZE_MODE:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZE_MODE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			link.Read<uint32>(&(fCurrentLayer->fResizeMode));
-			
 			break;
 		}
 		case AS_LAYER_CURSOR:

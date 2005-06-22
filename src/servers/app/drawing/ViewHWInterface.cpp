@@ -403,19 +403,34 @@ ViewHWInterface::SetMode(const display_mode &mode)
 {
 	status_t ret = B_OK;
 	// prevent from doing the unnecessary
-	if (fBackBuffer && fFrontBuffer &&
-		fDisplayMode.virtual_width == mode.virtual_width &&
-		fDisplayMode.virtual_height == mode.virtual_height &&
-		fDisplayMode.space == mode.space) {
+	if (fBackBuffer && fFrontBuffer
+		&& fDisplayMode.virtual_width == mode.virtual_width
+		&& fDisplayMode.virtual_height == mode.virtual_height
+		&& fDisplayMode.space == mode.space)
 		return ret;
-	}
-	// TODO: check if the mode is valid even (ie complies to the modes we said we would support)
-	// or else ret = B_BAD_VALUE
 
-	// take on settings
-	fDisplayMode.virtual_width = mode.virtual_width;
-	fDisplayMode.virtual_height = mode.virtual_height;
-	fDisplayMode.space = mode.space;
+	// check if we support the mode
+
+	display_mode *modes;
+	uint32 modeCount, i;
+	if (GetModeList(&modes, &modeCount) != B_OK)
+		return B_NO_MEMORY;
+
+	for (i = 0; i < modeCount; i++) {
+		// we only care for the bare minimum
+		if (modes[i].virtual_width == mode.virtual_width
+			&& modes[i].virtual_height == mode.virtual_height
+			&& modes[i].space == mode.space) {
+			// take over settings
+			fDisplayMode = modes[i];
+			break;
+		}
+	}
+
+	delete[] modes;
+
+	if (i == modeCount)
+		return B_BAD_VALUE;
 
 	BRect frame(0.0, 0.0,
 				fDisplayMode.virtual_width - 1,
@@ -527,66 +542,49 @@ ViewHWInterface::GetDeviceInfo(accelerant_device_info *info)
 
 // GetModeList
 status_t
-ViewHWInterface::GetModeList(display_mode **modes, uint32 *count)
+ViewHWInterface::GetModeList(display_mode **_modes, uint32 *_count)
 {
 	// DEPRECATED:
 	// NOTE: Originally, I was going to figure out good timing values to be 
 	// returned in each of the modes supported, but I won't bother, being this
 	// won't be used much longer anyway. 
-	
-	*modes=new display_mode[13];
-	*count=13;
 
-	modes[0]->virtual_width=640;
-	modes[0]->virtual_width=480;
-	modes[0]->space=B_CMAP8;	
-	modes[1]->virtual_width=640;
-	modes[1]->virtual_width=480;
-	modes[1]->space=B_RGB16;
-	modes[2]->virtual_width=640;
-	modes[2]->virtual_width=480;
-	modes[2]->space=B_RGB32;
-	modes[3]->virtual_width=640;
-	modes[3]->virtual_width=480;
-	modes[3]->space=B_RGBA32;	
+	const struct resolution { int32 width, height; } resolutions[] = {
+		{640, 480}, {800, 600}, {1024, 768}, {1152, 864}, {1280, 960},
+		{1280, 1024}, {1400, 1050}, {1600, 1200}
+	};
+	uint32 resolutionCount = sizeof(resolutions) / sizeof(resolutions[0]);
+	const uint32 colors[] = {B_CMAP8, B_RGB15, B_RGB16, B_RGB32};
+	uint32 count = resolutionCount * 4;
 
-	modes[4]->virtual_width=800;
-	modes[4]->virtual_width=600;
-	modes[4]->space=B_CMAP8;
-	modes[5]->virtual_width=800;
-	modes[5]->virtual_width=600;
-	modes[5]->space=B_RGB16;	
-	modes[6]->virtual_width=800;
-	modes[6]->virtual_width=600;
-	modes[6]->space=B_RGB32;	
+	display_mode *modes = new display_mode[count];
+	if (modes == NULL)
+		return B_NO_MEMORY;
 
-	modes[7]->virtual_width=1024;
-	modes[7]->virtual_width=768;
-	modes[7]->space=B_CMAP8;;
-	modes[8]->virtual_width=1024;
-	modes[8]->virtual_width=768;
-	modes[8]->space=B_RGB16;	
-	modes[9]->virtual_width=1024;
-	modes[9]->virtual_width=768;
-	modes[9]->space=B_RGB32;	
+	*_modes = modes;
+	*_count = count;
 
-	modes[10]->virtual_width=1152;
-	modes[10]->virtual_width=864;
-	modes[10]->space=B_CMAP8;	
-	modes[11]->virtual_width=1152;
-	modes[11]->virtual_width=864;
-	modes[11]->space=B_RGB16;	
-	modes[12]->virtual_width=1152;
-	modes[12]->virtual_width=864;
-	modes[12]->space=B_RGB32;	
-	
-	for(int32 i=0; i<13; i++)
-	{
-		modes[i]->h_display_start=0;
-		modes[i]->v_display_start=0;
-		modes[i]->flags=B_PARALLEL_ACCESS;
+	int32 index = 0;
+	for (uint32 i = 0; i < resolutionCount; i++) {
+		for (uint32 c = 0; c < 4; c++) {
+			modes[index].virtual_width = resolutions[i].width;
+			modes[index].virtual_height = resolutions[i].height;
+			modes[index].space = colors[c];
+
+			modes[index].h_display_start = 0;
+			modes[index].v_display_start = 0;
+			modes[index].timing.h_display = resolutions[i].width;
+			modes[index].timing.v_display = resolutions[i].height;
+			modes[index].timing.h_total = 22000;
+			modes[index].timing.v_total = 22000;
+			modes[index].timing.pixel_clock = ((uint32)modes[index].timing.h_total
+				* modes[index].timing.v_total * 60) / 1000;
+			modes[index].flags = B_PARALLEL_ACCESS;
+
+			index++;
+		}
 	}
-	
+
 	return B_OK;
 }
 
