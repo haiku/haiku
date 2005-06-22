@@ -2866,20 +2866,22 @@ BWindow::drawAllViews(BView* aView)
 
 
 void
-BWindow::DoUpdate(BView *aView, BRect &area)
+BWindow::DoUpdate(BView *view, BRect &area)
 {
- 
 	STRACE(("info: BWindow::DoUpdate() BRect(%f,%f,%f,%f) called.\n",
 		area.left, area.top, area.right, area.bottom));
 
-	aView->check_lock();
+	// don't draw hidden views or their children
+	if (view->IsHidden(view))
+		return;
 
-	// ToDo: DrawAfterChildren() is not called at all!
+	view->check_lock();
 
-	if (aView->Flags() & B_WILL_DRAW) {
-		aView->PushState();
-		aView->Draw(area);
-		aView->PopState();
+	if (view->Flags() & B_WILL_DRAW) {
+		// ToDo: make states robust
+		view->PushState();
+		view->Draw(area);
+		view->PopState();
 	} else {
 		// The code below is certainly not correct, because
 		// it redoes what the app_server already did
@@ -2891,7 +2893,7 @@ BWindow::DoUpdate(BView *aView, BRect &area)
 		aView->SetHighColor(c);*/
 	}
 
-	BView *child = aView->first_child;
+	BView *child = view->first_child;
 	while (child) {
 		if (area.Intersects(child->Frame())) {
 			BRect newArea = area & child->Frame();
@@ -2900,6 +2902,12 @@ BWindow::DoUpdate(BView *aView, BRect &area)
 			DoUpdate(child, newArea);
 		}
 		child = child->next_sibling; 
+	}
+
+	if (view->Flags() & B_WILL_DRAW) {
+		view->PushState();
+		view->DrawAfterChildren(area);
+		view->PopState();
 	}
 }
 
