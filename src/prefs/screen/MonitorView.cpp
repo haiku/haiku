@@ -84,6 +84,8 @@ MonitorView::Draw(BRect updateRect)
 	rgb_color redColor = {228, 0, 0, 255};
 	BRect outerRect = MonitorBounds();
 
+	SetDrawingMode(B_OP_OVER);
+
 	// frame & background
 
 	SetHighColor(darkColor);
@@ -99,6 +101,8 @@ MonitorView::Draw(BRect updateRect)
 
 	SetHighColor(blackColor);
 	StrokeRoundRect(innerRect, 2.0, 2.0);
+
+	SetDrawingMode(B_OP_COPY);
 
 	// power light
 

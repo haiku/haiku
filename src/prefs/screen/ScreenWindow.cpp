@@ -371,13 +371,14 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 		}
 
 		rect.Set(15, 114, 171, 132);
-		menuField = new BMenuField(rect, "TVStandard", "Video Format:",
+		menuField = new BMenuField(rect, "tv standard", "Video Format:",
 			fTVStandardMenu, true);
 		menuField->SetDivider(73);
-		controlsBox->AddChild(menuField);
 
 		if (!tvStandardSupport || i == 0)
 			menuField->Hide();
+
+		controlsBox->AddChild(menuField);
 	}
 
 	rect.Set(10.0, 167, 100.0, 200.0);
