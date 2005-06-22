@@ -5,17 +5,21 @@
  * Authors:
  *		Rafael Romo
  *		Stefano Ceccherini (burton666@libero.it)
+ *		Thomas Kurschel
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 #ifndef SCREEN_WINDOW_H
 #define SCREEN_WINDOW_H
 
 
-#include <Screen.h>
 #include <Window.h>
+
+#include "ScreenMode.h"
 
 class BBox;
 class BPopUpMenu;
 class BMenuField;
+
 
 class RefreshWindow;
 class MonitorView;
@@ -30,48 +34,49 @@ class ScreenWindow : public BWindow {
 		virtual	bool QuitRequested();
 		virtual void MessageReceived(BMessage *message);
 		virtual void WorkspaceActivated(int32 ws, bool state);
-		virtual void FrameMoved(BPoint position);
 		virtual void ScreenChanged(BRect frame, color_space mode);
 
 	private:
-		void SetStateByMode();
 		void CheckApplyEnabled();
-		void CheckUpdateDisplayModes();
-		void CheckModesByResolution(const char*);
-		void ApplyMode();
-	
-		ScreenSettings *fSettings;
+		void CheckResolutionMenu();
+		void CheckColorMenu();
+		void CheckRefreshMenu();
 
-		MonitorView *fMonitorView;
-		BPopUpMenu *fWorkspaceMenu;
-		BMenuField *fWorkspaceField;
-		BPopUpMenu *fWorkspaceCountMenu;
-		BMenuField *fWorkspaceCountField;
-		BPopUpMenu *fResolutionMenu;
-		BMenuField *fResolutionField;
-		BPopUpMenu *fColorsMenu;
-		BMenuField *fColorsField;
-		BPopUpMenu *fRefreshMenu;
-		BMenuField *fRefreshField;
-		BMenuItem *fCurrentWorkspaceItem;
-		BMenuItem *fAllWorkspacesItem;
-		BButton	*fDefaultsButton;
-		BButton	*fApplyButton;
-		BButton	*fRevertButton;
+		void UpdateActiveMode();
+		void UpdateRefreshControl();
+		void UpdateMonitorView();
+		void UpdateControls();
 
-		BMenuItem *fInitialResolution;
-		BMenuItem *fInitialColors;
-		BMenuItem *fInitialRefresh;
-		BMenuItem *fOtherRefresh;
+		void Apply();
 
-		display_mode fInitialMode;
-		display_mode *fSupportedModes;
-		uint32 fTotalModes;
+		bool CanApply() const;
+		bool CanRevert() const;
 
-		float fMinRefresh;
-		float fMaxRefresh;
-		float fCustomRefresh;
-		float fInitialRefreshN;
+		ScreenSettings*	fSettings;
+
+		MonitorView*	fMonitorView;
+		BMenuItem*		fAllWorkspacesItem;
+
+		BPopUpMenu*		fResolutionMenu;
+		BMenuField*		fResolutionField;
+		BPopUpMenu*		fColorsMenu;
+		BMenuField*		fColorsField;
+		BPopUpMenu*		fRefreshMenu;
+		BMenuField*		fRefreshField;
+		BMenuItem*		fOtherRefresh;
+
+		BPopUpMenu*		fCombineMenu;
+		BPopUpMenu*		fSwapDisplaysMenu;
+		BPopUpMenu*		fUseLaptopPanelMenu;
+		BPopUpMenu*		fTVStandardMenu;
+
+		BButton*		fDefaultsButton;
+		BButton*		fApplyButton;
+		BButton*		fRevertButton;
+
+		ScreenMode		fScreenMode;
+		bool			fChangingAllWorkspaces;
+		screen_mode		fActive, fSelected, fOriginal;
 };
 
 #endif	/* SCREEN_WINDOW_H */

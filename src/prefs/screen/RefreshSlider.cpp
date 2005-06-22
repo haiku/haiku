@@ -1,9 +1,10 @@
-#include <Window.h>
-
-#include <cstdio>
-
 #include "RefreshSlider.h"
 #include "Constants.h"
+
+#include <Window.h>
+
+#include <stdio.h>
+
 
 RefreshSlider::RefreshSlider(BRect frame)
 	:BSlider(frame, "Screen", "Refresh Rate:", 
@@ -41,26 +42,21 @@ RefreshSlider::DrawFocusMark()
 void
 RefreshSlider::KeyDown(const char *bytes, int32 numBytes)
 {
-	switch (*bytes)
-	{
+	switch (*bytes) {
 		case B_LEFT_ARROW:
 		{
 			SetValue(Value() - 1);
-			
 			Invoke();
-			
 			break;
 		}
 		
 		case B_RIGHT_ARROW:
 		{
 			SetValue(Value() + 1);
-			
 			Invoke();
-			
 			break;
 		}
-			
+
 		default:
 			break;
 	}
@@ -73,8 +69,7 @@ RefreshSlider::UpdateText() const
 	if (fStatus) {
 		sprintf(fStatus, "%.1f Hz", (float)Value() / 10);
 		return fStatus;
-	}
-	else 
+	} else 
 		return NULL;
 }
 

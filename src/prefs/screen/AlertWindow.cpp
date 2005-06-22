@@ -13,10 +13,12 @@
 #include "Constants.h"
 
 #include <Window.h>
+#include <Screen.h>
 
 
-AlertWindow::AlertWindow(BRect frame, BMessenger target)
-	: BWindow(frame, "Revert", B_MODAL_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
+AlertWindow::AlertWindow(BMessenger target)
+	: BWindow(BRect(100.0, 100.0, 400.0, 193.0), "Revert",
+		B_MODAL_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES),
 	fTarget(target)
 {
@@ -25,6 +27,11 @@ AlertWindow::AlertWindow(BRect frame, BMessenger target)
 
 	// the view displays a decrementing counter (until the user must take action)
 	SetPulseRate(1000000);	// every second
+
+	// center window on screen
+	BScreen screen(this);
+	MoveTo((screen.Frame().Width() - Frame().Width()) / 2,
+		(screen.Frame().Height() - Frame().Height()) / 2);
 }
 
 

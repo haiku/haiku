@@ -25,6 +25,7 @@ class AlertView : public BView {
 		virtual void AttachedToWindow();
 		virtual void Draw(BRect updateRect);
 		virtual void Pulse();
+		virtual void KeyDown(const char* bytes, int32 numBytes);
 
 	private:
 		void UpdateCountdownView();

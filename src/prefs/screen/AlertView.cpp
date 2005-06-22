@@ -32,23 +32,28 @@ AlertView::AlertView(BRect frame, char *name)
 	fBitmap = InitIcon();
 
 	BStringView *stringView = new BStringView(BRect(60, 20, 400, 36), NULL,
-									"Do you wish to keep these settings?");
+		"Do you wish to keep these settings?");
 	stringView->SetFont(be_bold_font);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
 
-	fCountdownView = new BStringView(BRect(60, 37, 400, 50), "countdown", B_EMPTY_STRING);
+	fCountdownView = new BStringView(BRect(60, 37, 400, 50), "countdown",
+		B_EMPTY_STRING);
 	UpdateCountdownView();
 	fCountdownView->ResizeToPreferred();
 	AddChild(fCountdownView);
 
-	BButton *button = new BButton(BRect(215, 59, 400, 190), "KeepButton", "Keep", new BMessage(BUTTON_KEEP_MSG));
+	BButton *button = new BButton(BRect(215, 59, 400, 190), "keep", "Keep",
+		new BMessage(BUTTON_KEEP_MSG));
 	button->ResizeToPreferred();
 	AddChild(button);
 
-	button = new BButton(BRect(130, 59, 400, 199), "RevertButton", "Revert", new BMessage(BUTTON_REVERT_MSG));
+	button = new BButton(BRect(130, 59, 400, 199), "revert", "Revert",
+		new BMessage(BUTTON_REVERT_MSG));
 	button->ResizeToPreferred();
 	AddChild(button);
+
+	SetEventMask(B_KEYBOARD_EVENTS);
 }
 
 
@@ -56,6 +61,9 @@ void
 AlertView::AttachedToWindow()
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	if (BButton* button = dynamic_cast<BButton *>(FindView("keep")))
+		Window()->SetDefaultButton(button);
 }
 
 
@@ -81,6 +89,14 @@ AlertView::Pulse()
 		Window()->PostMessage(BUTTON_REVERT_MSG);
 	else
 		UpdateCountdownView();
+}
+
+
+void
+AlertView::KeyDown(const char* bytes, int32 numBytes)
+{
+	if (numBytes == 1 && bytes[0] == B_ESCAPE)
+		Window()->PostMessage(BUTTON_REVERT_MSG);
 }
 
 

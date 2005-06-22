@@ -22,7 +22,7 @@ class AlertView;
 
 class AlertWindow : public BWindow {
 	public:
-		AlertWindow(BRect frame, BMessenger target);
+		AlertWindow(BMessenger target);
 
 		virtual void MessageReceived(BMessage *message);
 

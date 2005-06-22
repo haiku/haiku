@@ -6,6 +6,8 @@
  *		Rafael Romo
  *		Stefano Ceccherini (burton666@libero.it)
  *		Andrew Bachmann
+ *		Thomas Kurschel
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 
@@ -34,87 +36,95 @@
 #include "ScreenWindow.h"
 #include "Utility.h"
 
+/* Note, this headers defines a *private* interface to the Radeon accelerant.
+ * It's a solution that works with the current BeOS interface that Haiku
+ * adopted.
+ * However, it's not a nice and clean solution. Don't use this header in any
+ * application if you can avoid it. No other driver is using this, or should
+ * be using this.
+ * It will be replaced as soon as we introduce an updated accelerant interface
+ * which may even happen before R1 hits the streets.
+ */
 
-static uint32
-colorspace_to_bpp(uint32 colorspace)
+#include "multimon.h"	// the usual: DANGER WILL, ROBINSON!
+
+
+#define USE_FIXED_REFRESH
+	// define to use fixed standard refresh rates
+	// undefine to get standard refresh rates from driver
+
+
+// list of officially supported colour spaces
+static const struct {
+	color_space	space;
+	int32		bits_per_pixel;
+	const char*	label;
+} kColorSpaces[] = {
+	{ B_CMAP8, 8, "8 Bits/Pixel, 256 Colors" },
+	{ B_RGB15, 15, "15 Bits/Pixel, 32768 Colors" },
+	{ B_RGB16, 16, "16 Bits/Pixel, 65536 Colors" },
+	{ B_RGB32, 32, "32 Bits/Pixel, 16 Million Colors" }
+};
+static const int32 kColorSpaceCount = sizeof(kColorSpaces) / sizeof(kColorSpaces[0]);
+
+// list of standard refresh rates
+static const int32 kRefreshRates[] = {56, 60, 70, 72, 75};
+static const int32 kRefreshRateCount = sizeof(kRefreshRates) / sizeof(kRefreshRates[0]);
+
+
+// list of combine modes
+static const struct {
+	combine_mode	mode;
+	const char		*name;
+} kCombineModes[] = {
+	{ kCombineDisable, "disable" },
+	{ kCombineHorizontally, "horizontally" },
+	{ kCombineVertically, "vertically" }
+};
+static const int32 kCombineModeCount = sizeof(kCombineModes) / sizeof(kCombineModes[0]);
+
+
+static BString
+tv_standard_to_string(uint32 mode)
 {
-	switch (colorspace) {
-		case B_RGB32:	return 32;
-		case B_RGB24:	return 24;
-		case B_RGB16:	return 16;
-		case B_RGB15:	return 15;
-		case B_CMAP8:	return 8;
-		default:		return 0;
+	switch (mode) {
+		case 0:		return "disabled";
+		case 1:		return "NTSC";
+		case 2:		return "NTSC Japan";
+		case 3:		return "PAL BDGHI";
+		case 4:		return "PAL M";
+		case 5:		return "PAL N";
+		case 6:		return "SECAM";
+		case 101:	return "NTSC 443";
+		case 102:	return "PAL 60";
+		case 103:	return "PAL NC";
+		default:
+		{
+			BString name;
+			name << "??? (" << mode << ")";
+
+			return name;
+		}
 	}
 }
 
 
 static void
-colorspace_to_string(uint32 colorspace, char dest[])
+resolution_to_string(screen_mode& mode, BString &string)
 {
-	sprintf(dest,"%lu Bits/Pixel",colorspace_to_bpp(colorspace));
-}
-
-
-static uint32
-string_to_colorspace(const char* string)
-{
-	uint32 bits = 0;
-	sscanf(string,"%ld",&bits);
-	switch (bits) {
-		case 8:		return B_CMAP8;
-		case 15:	return B_RGB15;
-		case 16:	return B_RGB16;
-		case 24:	return B_RGB24;
-		case 32:	return B_RGB32;
-		default:	return B_CMAP8; // Should return an error?
-	}
+	string << mode.width << " x " << mode.height;
 }
 
 
 static void
-mode_to_string(display_mode mode, char dest[])
+refresh_rate_to_string(float refresh, BString &string,
+	bool appendUnit = true, bool alwaysWithFraction = false)
 {
-	sprintf(dest, "%hu x %hu", mode.virtual_width, mode.virtual_height);
-}
+	snprintf(string.LockBuffer(32), 32, "%.*g", refresh >= 100.0 ? 4 : 3, refresh);
+	string.UnlockBuffer();
 
-
-static void
-string_to_mode(const char * source, display_mode * mode)
-{
-	sscanf(source,"%hu x %hu", &(mode->virtual_width), &(mode->virtual_height));
-}
-
-
-static void
-refresh_rate_to_string(float refresh_rate, char dest[])
-{
-	sprintf(dest, "%.1f Hz",refresh_rate);
-}
-
-
-/*
-static float
-string_to_refresh_rate(const char * source)
-{
-	float refresh_rate = 0;
-	sscanf(source,"%f Hz", &refresh_rate);
-	return refresh_rate;
-}
-*/
-
-static float
-get_refresh_rate(display_mode mode)
-{
-	return (mode.timing.pixel_clock * 1000.0) / (mode.timing.h_total * mode.timing.v_total);
-}
-
-
-static void
-set_pixel_clock(display_mode * mode, float refresh_rate)
-{
-	mode->timing.pixel_clock
-	    = (uint32)((mode->timing.h_total * mode->timing.v_total * refresh_rate) / 1000);
+	if (appendUnit)
+		string << " Hz";
 }
 
 
@@ -123,14 +133,15 @@ set_pixel_clock(display_mode * mode, float refresh_rate)
 
 ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	: BWindow(Settings->WindowFrame(), "Screen", B_TITLED_WINDOW,
-		B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES)
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES),
+	fScreenMode(this),
+	fChangingAllWorkspaces(false)
 {
 	BScreen screen(this);
 	BRect frame(Bounds());
 
-	fSupportedModes = NULL;
-	fTotalModes = 0;
-	screen.GetModeList(&fSupportedModes, &fTotalModes);
+	fScreenMode.Get(fOriginal);
+	fActive = fSelected = fOriginal;
 
 	BView *view = new BView(frame, "ScreenView", B_FOLLOW_ALL, B_WILL_DRAW);
 	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -138,17 +149,19 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 
 	fSettings = Settings;
 
+	// box on the left with workspace count and monitor view
+
 	BRect screenBoxRect(11.0, 18.0, 153.0, 155.0);	
-	BBox *screenBox = new BBox(screenBoxRect);
-	screenBox->SetBorder(B_FANCY_BORDER);
+	BBox *screenBox = new BBox(screenBoxRect, "left box");
 
 	fMonitorView = new MonitorView(BRect(20.0, 16.0, 122.0, 93.0), "monitor",
 		screen.Frame().Width() + 1, screen.Frame().Height() + 1);
 	screenBox->AddChild(fMonitorView);
 
-	fWorkspaceCountMenu = new BPopUpMenu("", true, true);
-	fWorkspaceCountField = new BMenuField(BRect(7.0, 107.0, 135.0, 127.0), "WorkspaceCountMenu", "Workspace count:", fWorkspaceCountMenu, true);
-	screenBox->AddChild(fWorkspaceCountField);	
+	BPopUpMenu *popUpMenu = new BPopUpMenu("", true, true);
+	BMenuField *menuField = new BMenuField(BRect(7.0, 107.0, 135.0, 127.0),
+		"WorkspaceCountMenu", "Workspace count:", popUpMenu, true);
+	screenBox->AddChild(menuField);
 
 	for (int32 count = 1; count <= 32; count++) {
 		BString workspaceCount;
@@ -157,199 +170,538 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 		BMessage *message = new BMessage(POP_WORKSPACE_CHANGED_MSG);
 		message->AddInt32("workspace count", count);
 
-		fWorkspaceCountMenu->AddItem(new BMenuItem(workspaceCount.String(),
+		popUpMenu->AddItem(new BMenuItem(workspaceCount.String(),
 			message));
 	}
 
-	BMenuItem *marked = fWorkspaceCountMenu->ItemAt(count_workspaces() - 1);
-	if (marked != NULL)
-		marked->SetMarked(true);
+	BMenuItem *item = popUpMenu->ItemAt(count_workspaces() - 1);
+	if (item != NULL)
+		item->SetMarked(true);
 
-	fWorkspaceCountField->SetDivider(91.0);
-
+	menuField->SetDivider(91.0);
 	view->AddChild(screenBox);
 
-	fWorkspaceMenu = new BPopUpMenu("Current Workspace", true, true);
+	// box on the right with screen resolution, etc.
+
+	popUpMenu = new BPopUpMenu("Current Workspace", true, true);
 	fAllWorkspacesItem = new BMenuItem("All Workspaces", new BMessage(WORKSPACE_CHECK_MSG));
-	fWorkspaceMenu->AddItem(fAllWorkspacesItem);
-	fCurrentWorkspaceItem = new BMenuItem("Current Workspace", new BMessage(WORKSPACE_CHECK_MSG));
-	fCurrentWorkspaceItem->SetMarked(true);
-	fWorkspaceMenu->AddItem(fCurrentWorkspaceItem);
+	popUpMenu->AddItem(fAllWorkspacesItem);
+	item = new BMenuItem("Current Workspace", new BMessage(WORKSPACE_CHECK_MSG));
+	item->SetMarked(true);
+	popUpMenu->AddItem(item);
 
-	BRect workspaceMenuRect(0.0, 0.0, 132.0, 18.0);
-	fWorkspaceField = new BMenuField(workspaceMenuRect, "WorkspaceMenu", NULL, fWorkspaceMenu, true);
+	BRect rect(0.0, 0.0, 132.0, 18.0);
+	menuField = new BMenuField(rect, "WorkspaceMenu", NULL, popUpMenu, true);
 
-	BRect controlsBoxRect(164.0, 7.0, 345.0, 155.0);	
-	BBox *controlsBox = new BBox(controlsBoxRect);
-	controlsBox->SetBorder(B_FANCY_BORDER);
-	controlsBox->SetLabel(fWorkspaceField);
+	rect.Set(164.0, 7.0, 345.0, 155.0);
+	BBox* controlsBox = new BBox(rect);
+	controlsBox->SetLabel(menuField);
 
-	BRect ButtonRect(88.0, 114.0, 200.0, 150.0);	
-	fApplyButton = new BButton(ButtonRect, "ApplyButton", "Apply", 
+	rect.Set(88.0, 114.0, 200.0, 150.0);
+	fApplyButton = new BButton(rect, "ApplyButton", "Apply", 
 		new BMessage(BUTTON_APPLY_MSG));
-
-	fApplyButton->AttachedToWindow();
 	fApplyButton->ResizeToPreferred();
 	fApplyButton->SetEnabled(false);
-
+	
 	controlsBox->AddChild(fApplyButton);
 
-	fResolutionMenu = new BPopUpMenu("", true, true);	
-	fColorsMenu = new BPopUpMenu("", true, true);
-	fRefreshMenu = new BPopUpMenu("", true, true);
+	fResolutionMenu = new BPopUpMenu("resolution", true, true);
 
-	CheckUpdateDisplayModes();
+	uint16 previousWidth = 0, previousHeight = 0;
+	for (int32 i = 0; i < fScreenMode.CountModes(); i++) {
+		screen_mode mode = fScreenMode.ModeAt(i);
 
-	const char *resolutionLabel = "Resolution: ";
-	float resolutionWidth = controlsBox->StringWidth(resolutionLabel);
-	BRect controlMenuRect(88.0-resolutionWidth, 30.0, 171.0, 48.0);	
-	fResolutionField = new BMenuField(controlMenuRect, "ResolutionMenu", resolutionLabel, fResolutionMenu, true);
+		if (mode.width == previousWidth && mode.height == previousHeight)
+			continue;
 
-	marked = fResolutionMenu->ItemAt(0);
-	if (marked != NULL)
-		marked->SetMarked(true);
+		previousWidth = mode.width;
+		previousHeight = mode.height;
 
-	fResolutionField->SetDivider(resolutionWidth);
-	
+		BMessage *message = new BMessage(POP_RESOLUTION_MSG);
+		message->AddInt32("width", mode.width);
+		message->AddInt32("height", mode.height);
+
+		BString name;
+		name << mode.width << " x " << mode.height;
+
+		fResolutionMenu->AddItem(new BMenuItem(name.String(), message));
+	}
+
+	rect.Set(33.0, 30.0, 171.0, 48.0);
+	fResolutionField = new BMenuField(rect, "ResolutionMenu", "Resolution:",
+		fResolutionMenu, true);
+	fResolutionField->SetDivider(55.0);
 	controlsBox->AddChild(fResolutionField);
-	
-	const char *colorsLabel = "Colors: ";
-	float colorsWidth = controlsBox->StringWidth(colorsLabel);
-	controlMenuRect.Set(88.0-colorsWidth, 58.0, 171.0, 76.0);
-	fColorsField = new BMenuField(controlMenuRect, "ColorsMenu", colorsLabel, fColorsMenu, true);
-	
-	marked = fColorsMenu->ItemAt(0);
-	if (marked != NULL)
-		marked->SetMarked(true);
 
-	fColorsField->SetDivider(colorsWidth);
-	
+	fColorsMenu = new BPopUpMenu("colors", true, true);
+
+	for (int32 i = 0; i < kColorSpaceCount; i++) {
+		BMessage *message = new BMessage(POP_COLORS_MSG);
+		message->AddInt32("bits_per_pixel", kColorSpaces[i].bits_per_pixel);
+		message->AddInt32("space", kColorSpaces[i].space);
+
+		fColorsMenu->AddItem(new BMenuItem(kColorSpaces[i].label, message));
+	}
+
+	rect.Set(50.0, 58.0, 171.0, 76.0);
+	fColorsField = new BMenuField(rect, "ColorsMenu", "Colors:", fColorsMenu, true);
+	fColorsField->SetDivider(38.0);
 	controlsBox->AddChild(fColorsField);
-	
-	fOtherRefresh = new BMenuItem("Other...", new BMessage(POP_OTHER_REFRESH_MSG));
+
+	fRefreshMenu = new BPopUpMenu("refresh rate", true, true);
+
+#ifdef USE_FIXED_REFRESH
+	for (int32 i = 0; i < kRefreshRateCount; ++i) {
+		BString name;
+		name << kRefreshRates[i] << " Hz";
+
+		BMessage *message = new BMessage(POP_REFRESH_MSG);
+		message->AddFloat("refresh", kRefreshRates[i]);
+
+		fRefreshMenu->AddItem(new BMenuItem(name.String(), message));
+	}
+#endif
+
+	BMessage *message = new BMessage(POP_OTHER_REFRESH_MSG);
+
+	fOtherRefresh = new BMenuItem("Other" B_UTF8_ELLIPSIS, message);
 	fRefreshMenu->AddItem(fOtherRefresh);
 
-	const char *refreshLabel = "Refresh Rate: ";
-	float refreshWidth = controlsBox->StringWidth(refreshLabel);
-	controlMenuRect.Set(88.0-refreshWidth, 86.0, 171.0, 104.0);
-	fRefreshField = new BMenuField(controlMenuRect, "RefreshMenu", refreshLabel, fRefreshMenu, true);
-
-	fRefreshField->SetDivider(refreshWidth);
-
+	rect.Set(19.0, 86.0, 171.0, 104.0);
+	fRefreshField = new BMenuField(rect, "RefreshMenu", "Refresh Rate:", fRefreshMenu, true);
+	fRefreshField->SetDivider(69.0);
 	controlsBox->AddChild(fRefreshField);
 
 	view->AddChild(controlsBox);
 
-	ButtonRect.Set(10.0, 167, 100.0, 200.0);
+	// enlarged area for multi-monitor settings
+	{
+		bool dummy;
+		uint32 dummy32;
+		bool multiMonSupport;
+		bool useLaptopPanelSupport;
+		bool tvStandardSupport;
 
-	fDefaultsButton = new BButton(ButtonRect, "DefaultsButton", "Defaults", 
+		multiMonSupport = TestMultiMonSupport(&screen) == B_OK;
+		useLaptopPanelSupport = GetUseLaptopPanel(&screen, &dummy) == B_OK;
+		tvStandardSupport = GetTVStandard(&screen, &dummy32) == B_OK;
+
+		// even if there is no support, we still create all controls
+		// to make sure we don't access NULL pointers later on
+		if (multiMonSupport) {
+			fApplyButton->MoveTo(275, 114);
+			controlsBox->ResizeTo(366, 148);		
+			ResizeTo(556, 202);
+		}
+
+		fCombineMenu = new BPopUpMenu("CombineDisplays", true, true);
+
+		for (int32 i = 0; i < kCombineModeCount; i++) {
+			message = new BMessage(POP_COMBINE_DISPLAYS_MSG);
+			message->AddInt32("mode", kCombineModes[i].mode);
+
+			fCombineMenu->AddItem(new BMenuItem(kCombineModes[i].name, message));
+		}
+
+		rect.Set(185, 30, 356, 48);
+		BMenuField* menuField = new BMenuField(rect, "CombineMenu",
+			"Combine Displays:", fCombineMenu, true);
+		menuField->SetDivider(90);
+		controlsBox->AddChild(menuField);
+
+		if (!multiMonSupport)
+			menuField->Hide();
+
+		fSwapDisplaysMenu = new BPopUpMenu("SwapDisplays", true, true);
+
+		// !order is important - we rely that boolean value == idx
+		message = new BMessage(POP_SWAP_DISPLAYS_MSG);
+		message->AddBool("swap", false);
+		fSwapDisplaysMenu->AddItem(new BMenuItem("no", message));
+
+		message = new BMessage(POP_SWAP_DISPLAYS_MSG);
+		message->AddBool("swap", true);
+		fSwapDisplaysMenu->AddItem(new BMenuItem("yes", message));
+
+		rect.Set(199, 58, 356, 76);
+		menuField = new BMenuField(rect, "SwapMenu", "Swap Displays:",
+			fSwapDisplaysMenu, true);
+		menuField->SetDivider(76);
+
+		controlsBox->AddChild(menuField);
+		if (!multiMonSupport)
+			menuField->Hide();
+
+		fUseLaptopPanelMenu = new BPopUpMenu("UseLaptopPanel", true, true);
+
+		// !order is important - we rely that boolean value == idx			
+		message = new BMessage(POP_USE_LAPTOP_PANEL_MSG);
+		message->AddBool("use", false);
+		fUseLaptopPanelMenu->AddItem(new BMenuItem("if needed", message));
+
+		message = new BMessage(POP_USE_LAPTOP_PANEL_MSG);
+		message->AddBool("use", true);
+		fUseLaptopPanelMenu->AddItem(new BMenuItem("always", message));
+
+		rect.Set(184, 86, 356, 104);
+		menuField = new BMenuField(rect, "UseLaptopPanel", "Use Laptop Panel:",
+			fUseLaptopPanelMenu, true);
+		menuField->SetDivider(91);
+
+		controlsBox->AddChild(menuField);
+		if (!useLaptopPanelSupport)
+			menuField->Hide();
+
+		fTVStandardMenu = new BPopUpMenu("TVStandard", true, true);
+
+		// arbitrary limit
+		uint32 i;
+		for (i = 0; i < 100; ++i) {
+			uint32 mode;
+
+			if (GetNthSupportedTVStandard(&screen, i, &mode) != B_OK)
+				break;
+
+			BString name = tv_standard_to_string(mode);
+
+			message = new BMessage(POP_TV_STANDARD_MSG);
+			message->AddInt32("tv_standard", mode);
+
+			fTVStandardMenu->AddItem(new BMenuItem(name.String(), message));
+		}
+
+		rect.Set(15, 114, 171, 132);
+		menuField = new BMenuField(rect, "TVStandard", "Video Format:",
+			fTVStandardMenu, true);
+		menuField->SetDivider(73);
+		controlsBox->AddChild(menuField);
+
+		if (!tvStandardSupport || i == 0)
+			menuField->Hide();
+	}
+
+	rect.Set(10.0, 167, 100.0, 200.0);
+	fDefaultsButton = new BButton(rect, "DefaultsButton", "Defaults",
 		new BMessage(BUTTON_DEFAULTS_MSG));
-
-	fDefaultsButton->AttachedToWindow();
 	fDefaultsButton->ResizeToPreferred();
-
 	view->AddChild(fDefaultsButton);
 
-	ButtonRect.Set(95.0, 167, 160.0, 200.0);
-
-	fRevertButton = new BButton(ButtonRect, "RevertButton", "Revert", 
+	rect.Set(95.0, 167, 160.0, 200.0);
+	fRevertButton = new BButton(rect, "RevertButton", "Revert",
 		new BMessage(BUTTON_REVERT_MSG));
-
-	fRevertButton->AttachedToWindow();
 	fRevertButton->ResizeToPreferred();
 	fRevertButton->SetEnabled(false);
-
 	view->AddChild(fRevertButton);
 
-	SetStateByMode();
-
-	fCustomRefresh = fInitialRefreshN;
-}
-
-
-void
-ScreenWindow::SetStateByMode()
-{	
-	BString string;
-	BMenuItem *marked;
-	display_mode mode;
-	BScreen screen(B_MAIN_SCREEN_ID);
-
-	screen.GetMode(&mode);
-	fInitialMode = mode;
-	
-	char str[256];
-	mode_to_string(mode,str);
-	marked = fResolutionMenu->FindItem(str);
-	if (marked)
-		marked->SetMarked(true);
-
-	fInitialResolution = marked;
-	
-	colorspace_to_string(mode.space,str);
-	marked = fColorsMenu->FindItem(str);
-	if (marked)
-		marked->SetMarked(true);
-
-	fInitialColors = marked;
-	
-	fInitialRefreshN = get_refresh_rate(mode);
-	refresh_rate_to_string(fInitialRefreshN,str);
-	marked = fRefreshMenu->FindItem(str);
-	
-	if (marked != NULL)	{	
-		marked->SetMarked(true);	
-		fInitialRefresh = marked;	
-	} else 	{
-		BString string(str);
-		string << "/Other...";
-	
-		fOtherRefresh->SetLabel(string.String());
-		fOtherRefresh->SetMarked(true);
-		
-		fRefreshMenu->Superitem()->SetLabel(str);
-		
-		fInitialRefresh = fOtherRefresh;
-		fCustomRefresh = fInitialRefreshN;
-	}
+	UpdateControls();
 }
 
 
 ScreenWindow::~ScreenWindow()
 {
 	delete fSettings;
-	delete[] fSupportedModes;
 }
 
 
 bool
 ScreenWindow::QuitRequested()
 {
+	fSettings->SetWindowFrame(Frame());
 	be_app->PostMessage(B_QUIT_REQUESTED);
-	
+
 	return BWindow::QuitRequested();
 }
 
 
+/**	update resolution list according to combine mode
+ *	(some resolution may not be combinable due to memory restrictions)
+ */
+
 void
-ScreenWindow::FrameMoved(BPoint position)
+ScreenWindow::CheckResolutionMenu()
+{		
+	for (int32 i = 0; i < fResolutionMenu->CountItems(); i++)
+		fResolutionMenu->ItemAt(i)->SetEnabled(false);
+
+	for (int32 i = 0; i < fScreenMode.CountModes(); i++) {
+		screen_mode mode = fScreenMode.ModeAt(i);
+		if (mode.combine != fSelected.combine)
+			continue;
+
+		BString name;
+		name << mode.width << " x " << mode.height;
+
+		BMenuItem *item = fResolutionMenu->FindItem(name.String());
+		if (item != NULL)
+			item->SetEnabled(true);
+	}
+}
+
+
+/**	update color and refresh options according to current mode
+ *	(a color space is made active if there is any mode with 
+ *	given resolution and this colour space; same applies for 
+ *	refresh rate, though "Other…" is always possible)
+ */
+
+void
+ScreenWindow::CheckColorMenu()
+{	
+	for (int32 i = 0; i < kColorSpaceCount; i++) {
+		bool supported = false;
+
+		for (int32 j = 0; j < fScreenMode.CountModes(); j++) {
+			screen_mode mode = fScreenMode.ModeAt(j);
+
+			if (fSelected.width == mode.width
+				&& fSelected.height == mode.height
+				&& kColorSpaces[i].space == mode.space
+				&& fSelected.combine == mode.combine) {
+				supported = true;
+				break;
+			}
+		}
+
+		BMenuItem* item = fColorsMenu->ItemAt(i);
+		if (item)
+			item->SetEnabled(supported);
+	}
+}
+
+
+/**	Enable/disable refresh options according to current mode.
+ *	Only needed when USE_FIXED_REFRESH is not defined.
+ */
+
+void
+ScreenWindow::CheckRefreshMenu()
+{	
+#ifndef USE_FIXED_REFRESH
+	// ToDo: does currently not compile!
+	for (int32 i = fRefreshMenu->CountItems() - 2; i >= 0; --i) {
+		delete fRefreshMenu->RemoveItem(i);
+	}
+
+	for (int32 i = 0; i < fModeListCount; ++i) {
+		if (virtualWidth == fModeList[i].virtual_width
+			&& virtualHeight == fModeList[i].virtual_height
+			&& combine == get_combine_mode(&fModeList[i])) {
+			BString name;
+			BMenuItem *item;
+
+			int32 refresh10 = get_refresh10(fModeList[i]);
+			refresh10_to_string(name, refresh10);
+
+			item = fRefreshMenu->FindItem(name.String());
+			if (item == NULL) {
+				BMessage *msg = new BMessage(POP_REFRESH_MSG);
+				msg->AddFloat("refresh", refresh);
+
+				fRefreshMenu->AddItem(new BMenuItem(name.String(), msg),
+					fRefreshMenu->CountItems() - 1);
+			}
+		}
+	}
+#endif			
+
+	// TBD: some drivers lack many refresh rates; still, they
+	// can be used by generating the mode manually
+/*
+	for( i = 0; i < sizeof( refresh_list ) / sizeof( refresh_list[0] ); ++i ) {
+		BMenuItem *item;
+		bool supported = false;
+		
+		for( j = 0; j < fModeListCount; ++j ) {
+			if( width == fModeList[j].virtual_width &&
+				height == fModeList[j].virtual_height &&
+				refresh_list[i].refresh * 10 == getModeRefresh10( &fModeList[j] ))
+			{
+				supported = true;
+				break;
+			}
+		}
+
+		item = fRefreshMenu->ItemAt( i );
+		if( item ) 
+			item->SetEnabled( supported );
+	}
+*/
+}
+
+
+/** activate appropriate menu item according to selected refresh rate */
+
+void
+ScreenWindow::UpdateRefreshControl()
 {
-	fSettings->SetWindowFrame(Frame());
+	BString string;
+	refresh_rate_to_string(fSelected.refresh, string);
+
+	BMenuItem* item = fRefreshMenu->FindItem(string.String());
+	if (item) {
+		if (!item->IsMarked())
+			item->SetMarked(true);
+		// "Other…" items only contains a refresh rate when active
+		fOtherRefresh->SetLabel("Other…");
+		return;
+	}
+
+	// this is a non-standard refresh rate
+
+	fOtherRefresh->Message()->ReplaceFloat("refresh", fSelected.refresh);
+	fOtherRefresh->SetMarked(true);
+
+	fRefreshMenu->Superitem()->SetLabel(string.String());
+
+	string.Append("/Other" B_UTF8_ELLIPSIS);
+	fOtherRefresh->SetLabel(string.String());
+}
+
+
+void
+ScreenWindow::UpdateMonitorView()
+{
+	BMessage updateMessage(UPDATE_DESKTOP_MSG);
+	updateMessage.AddInt32("width", fSelected.width);
+	updateMessage.AddInt32("height", fSelected.height);
+
+	PostMessage(&updateMessage, fMonitorView);
+}
+
+
+void
+ScreenWindow::UpdateControls()
+{
+	BMenuItem* item = fSwapDisplaysMenu->ItemAt((int32)fSelected.swap_displays);
+	if (item && !item->IsMarked())
+		item->SetMarked(true);
+	
+	item = fUseLaptopPanelMenu->ItemAt((int32)fSelected.use_laptop_panel);
+	if (item && !item->IsMarked())
+		item->SetMarked(true);
+
+	for (int32 i = 0; i < fTVStandardMenu->CountItems(); i++) {
+		item = fTVStandardMenu->ItemAt(i);
+
+		uint32 tvStandard;
+		item->Message()->FindInt32("tv_standard", (int32 *)&tvStandard);
+		if (tvStandard == fSelected.tv_standard) {
+			if (!item->IsMarked())
+				item->SetMarked(true);
+			break;
+		}
+	}
+
+	CheckResolutionMenu();
+	CheckColorMenu();
+	CheckRefreshMenu();
+
+	BString string;
+	resolution_to_string(fSelected, string);
+	item = fResolutionMenu->FindItem(string.String());
+
+	if (item != NULL) {
+		if (!item->IsMarked())
+			item->SetMarked(true);
+	} else {
+		// this is bad luck - if mode has been set via screen references, 
+		// this case cannot occur; there are three possible solutions:
+		// 1. add a new resolution to list
+		//    - we had to remove it as soon as a "valid" one is selected
+		//    - we don't know which frequencies/bit depths are supported
+		//    - as long as we haven't the GMT formula to create 
+		//      parameters for any resolution given, we cannot
+		//      really set current mode - it's just not in the list
+		// 2. choose nearest resolution
+		//    - probably a good idea, but implies coding and testing
+		// 3. choose lowest resolution
+		//    - do you really think we are so lazy? yes, we are
+		item = fResolutionMenu->ItemAt(0);
+		if (item)
+			item->SetMarked(true);
+
+		// okay - at least we set menu label to active resolution
+		fResolutionMenu->Superitem()->SetLabel(string.String());
+	}
+
+	// mark active combine mode
+	for (int32 i = 0; i < kCombineModeCount; i++) {
+		if (kCombineModes[i].mode == fSelected.combine) {
+			item = fCombineMenu->ItemAt(i);
+			if (item && !item->IsMarked())
+				item->SetMarked(true);
+			break;
+		}
+	}
+
+	item = fColorsMenu->ItemAt(0);
+
+	for (int32 i = kColorSpaceCount; i-- > 0;) {
+		if (kColorSpaces[i].space == fSelected.space) {
+			item = fColorsMenu->ItemAt(i);
+			break;
+		}
+	}
+
+	if (item && !item->IsMarked())
+		item->SetMarked(true);
+
+	string.Truncate(0);
+	string << fSelected.BitsPerPixel() << " Bits/Pixel";
+	if (string != fColorsMenu->Superitem()->Label())
+		fColorsMenu->Superitem()->SetLabel(string.String());
+
+	UpdateMonitorView();
+	UpdateRefreshControl();
+
+	CheckApplyEnabled();
+}
+
+
+/** reflect active mode in chosen settings */
+
+void
+ScreenWindow::UpdateActiveMode()
+{
+	// usually, this function gets called after a mode
+	// has been set manually; still, as the graphics driver
+	// is free to fiddle with mode passed, we better ask 
+	// what kind of mode we actually got
+	fScreenMode.Get(fActive);
+	fSelected = fActive;
+
+	UpdateControls();
 }
 
 
 void
 ScreenWindow::ScreenChanged(BRect frame, color_space mode)
 {
+	// move window on screen, if necessary
 	if (frame.right <= Frame().right
-				&& frame.bottom <= Frame().bottom)
-		MoveTo(((frame.right / 2) - 178), ((frame.right / 2) - 101));
+		&& frame.bottom <= Frame().bottom) {
+		MoveTo((frame.Width() - Frame().Width()) / 2,
+			(frame.Height() - Frame().Height()) / 2);
+	}
 }
 
 
 void
-ScreenWindow::WorkspaceActivated(int32 ws, bool state)
+ScreenWindow::WorkspaceActivated(int32 workspace, bool state)
 {
+	if (fChangingAllWorkspaces) {
+		// we're currently changing all workspaces, so there is no need
+		// to update the interface
+		return;
+	}
+
+	fScreenMode.Get(fOriginal);
+	fScreenMode.UpdateOriginalMode();
+
+	// only override current settings if they have not been changed yet
+	if (fSelected == fActive)
+		UpdateActiveMode();
+
 	PostMessage(new BMessage(UPDATE_DESKTOP_COLOR_MSG), fMonitorView);
 }
 
@@ -359,187 +711,165 @@ ScreenWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case WORKSPACE_CHECK_MSG:
-			fApplyButton->SetEnabled(true);
+			CheckApplyEnabled();
 			break;
 
 		case POP_WORKSPACE_CHANGED_MSG:
-		{		
-			BMenuItem *item = fWorkspaceCountMenu->FindMarked();
-
-			set_workspace_count(fWorkspaceCountMenu->IndexOf(item) + 1);
+		{
+			int32 index;
+			if (message->FindInt32("index", &index) == B_OK)
+				set_workspace_count(index + 1);
 			break;
 		}
 
 		case POP_RESOLUTION_MSG:
 		{
+			message->FindInt32("width", &fSelected.width);
+			message->FindInt32("height", &fSelected.height);
+
+			CheckColorMenu();
+			CheckRefreshMenu();
+
+			UpdateMonitorView();
+			UpdateRefreshControl();
+
 			CheckApplyEnabled();
-
-			BMessage updateMessage(*message);
-			updateMessage.what = UPDATE_DESKTOP_MSG;
-
-			PostMessage(&updateMessage, fMonitorView);
 			break;
 		}
 
 		case POP_COLORS_MSG:
-			CheckApplyEnabled();		
+		{
+			message->FindInt32("space", (int32 *)&fSelected.space);
+
+			BString string;
+			string << fSelected.BitsPerPixel() << " Bits/Pixel";
+			fColorsMenu->Superitem()->SetLabel(string.String());
+
+			CheckApplyEnabled();
 			break;
+		}
 
 		case POP_REFRESH_MSG:
+			message->FindFloat("refresh", &fSelected.refresh);
+			fOtherRefresh->SetLabel("Other" B_UTF8_ELLIPSIS);
+				// revert "Other…" label - it might have had a refresh rate prefix
+
 			CheckApplyEnabled();		
 			break;
 
 		case POP_OTHER_REFRESH_MSG:
 		{
-			BRect frame(Frame());
-			
-			CheckApplyEnabled();
-			int32 value = (int32)(fCustomRefresh * 10);		
+			// make sure menu shows something usefull
+			UpdateRefreshControl();
 
-			RefreshWindow *fRefreshWindow = new RefreshWindow(BRect((frame.left + 201.0),
-				(frame.top + 34.0), (frame.left + 509.0),
-				(frame.top + 169.0)), value);
+			BRect frame(Frame());
+			RefreshWindow *fRefreshWindow = new RefreshWindow(BRect(frame.left + 201.0,
+				frame.top + 34.0, frame.left + 509.0, frame.top + 169.0),
+				int32(fSelected.refresh * 10));
 			fRefreshWindow->Show();
 			break;
 		}
 
+		case SET_CUSTOM_REFRESH_MSG:
+		{
+			// user pressed "done" in "Other…" refresh dialog;
+			// select the refresh rate chosen
+			message->FindFloat("refresh", &fSelected.refresh);
+
+			UpdateRefreshControl();
+			CheckApplyEnabled();
+			break;
+		}
+
+		case POP_COMBINE_DISPLAYS_MSG:
+		{
+			// new combine mode has bee chosen
+			int32 mode;
+			if (message->FindInt32("mode", &mode) == B_OK)
+				fSelected.combine = (combine_mode)mode;
+
+			CheckResolutionMenu();
+			CheckApplyEnabled();
+			break;
+		}
+		
+		case POP_SWAP_DISPLAYS_MSG:
+			message->FindBool("swap", &fSelected.swap_displays);
+			CheckApplyEnabled();
+			break;
+
+		case POP_USE_LAPTOP_PANEL_MSG:
+			message->FindBool("use", &fSelected.use_laptop_panel);
+			CheckApplyEnabled();
+			break;
+
+		case POP_TV_STANDARD_MSG:
+			message->FindInt32("tv_standard", (int32 *)&fSelected.tv_standard);
+			CheckApplyEnabled();
+			break;
+
 		case BUTTON_DEFAULTS_MSG:
 		{
-			char string[256];
-			BMenuItem * item = 0;
-			display_mode mode;
-			mode.virtual_width = 640;
-			mode.virtual_height = 480;
-			mode_to_string(mode, string);
-			if ((item = fResolutionMenu->FindItem(string)) != NULL)
-				item->SetMarked(true);
-			else
-				fResolutionMenu->ItemAt(0)->SetMarked(true);
+			fSelected.width = 640;
+			fSelected.height = 480;
+			fSelected.space = B_CMAP8;
+			fSelected.refresh = 60.0;
+			fSelected.combine = kCombineDisable;
+			fSelected.swap_displays = false;
+			fSelected.use_laptop_panel = false;
+			fSelected.tv_standard = 0;
 
-			colorspace_to_string(B_CMAP8, string);
-			if ((item = fColorsMenu->FindItem(string)) != NULL)
-				item->SetMarked(true);
-			else
-				fColorsMenu->ItemAt(0)->SetMarked(true);
-
-			refresh_rate_to_string(60.0, string);
-			if ((item = fRefreshMenu->FindItem(string)) != NULL)
-				item->SetMarked(true);
-			else
-				fRefreshMenu->ItemAt(0)->SetMarked(true);
-
-			if ((item = fResolutionMenu->FindMarked()) != NULL) {
-				BMessage updateMessage(*item->Message());
-				updateMessage.what = UPDATE_DESKTOP_MSG;
-				PostMessage(&updateMessage, fMonitorView);
-			}
-
-			CheckApplyEnabled();
+			UpdateControls();
 			break;
 		}
 
 		case BUTTON_REVERT_MSG:
 		case SET_INITIAL_MODE_MSG:
-		{	
-			fInitialResolution->SetMarked(true);
-			fInitialColors->SetMarked(true);
-			fInitialRefresh->SetMarked(true);
-
-			CheckApplyEnabled();
-
-			BMenuItem *other = fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG);
-
-			if (fInitialRefresh == other) {
-				BString string;			
-				string << fInitialRefreshN;
-
-				int32 point = string.FindFirst('.');
-				string.Truncate(point + 2);
-
-				string << " Hz/Other...";
-
-				fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG)->SetLabel(string.String());
-
-				point = string.FindFirst('/');
-				string.Truncate(point);
-
-				fRefreshMenu->Superitem()->SetLabel(string.String());
-			}
-
-			if (fInitialResolution != NULL) {
-				BMessage updateMessage(*fInitialResolution->Message());
-				updateMessage.what = UPDATE_DESKTOP_MSG;
-				PostMessage(&updateMessage, fMonitorView);
-			}
-
-			if (message->what == SET_INITIAL_MODE_MSG) {
-				BScreen screen(this);
-				screen.SetMode(&fInitialMode, true);
-			}
+			fScreenMode.Revert();
+			UpdateActiveMode();
 			break;
-		}
 
 		case BUTTON_APPLY_MSG:
-			ApplyMode();
+			Apply();
 			break;
 
-		case SET_CUSTOM_REFRESH_MSG:
-		{
-			message->FindFloat("refresh", &fCustomRefresh);
-		
-			BMenuItem *other = fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG);	
-				
-			other->SetMarked(true);
-			
-			BString string;			
-			string << fCustomRefresh;
-			int32 point = string.FindFirst('.');
-			string.Truncate(point + 2);
-			
-			string << " Hz/Other...";
-			fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG)->SetLabel(string.String());
-			
-			point = string.FindFirst('/');
-			string.Truncate(point);
-			
-			fRefreshMenu->Superitem()->SetLabel(string.String());
-			
-			if (fCustomRefresh != fInitialRefreshN) {
-				fApplyButton->SetEnabled(true);
-				fRevertButton->SetEnabled(true);
-			}
-		
-			break;
-		}
-		
-		case MAKE_INITIAL_MSG:
-		{
-			BScreen screen(B_MAIN_SCREEN_ID);
-			if (!screen.IsValid())		
-				break;
-				
-			display_mode mode;					
-			screen.GetMode(&mode);
-			
-			if (fWorkspaceMenu->FindMarked() == fWorkspaceMenu->FindItem("All Workspaces")) {			
-			
-				int32 old = current_workspace();
-				int32 totalWorkspaces = count_workspaces();
-				fRevertButton->SetEnabled(false);
-				
-				for (int32 count = 0; count <= totalWorkspaces; count++) {
-					if (count != old) {
-						activate_workspace(count);
-						screen.SetMode(&mode, true);
-					}
+		case MAKE_INITIAL_MSG: {
+			// user pressed "keep" in confirmation box;
+			// select this mode in dialog and mark it as
+			// previous mode; if "all workspaces" is selected, 
+			// distribute mode to all workspaces 
+
+			// use the mode that has eventually been set and
+			// thus we know to be working; it can differ from 
+			// the mode selected by user due to hardware limitation
+			display_mode newMode;
+			BScreen screen(this);
+			screen.GetMode(&newMode);
+
+			if (fAllWorkspacesItem->IsMarked()) {
+				int32 originatingWorkspace;
+
+				// the original panel activates each workspace in turn;
+				// this is disguisting and there is a SetMode
+				// variant that accepts a workspace id, so let's take
+				// this one
+				originatingWorkspace = current_workspace();
+
+				// well, this "cannot be reverted" message is not
+				// entirely true - at least, you can revert it
+				// for current workspace; to not overwrite original
+				// mode during workspace switch, we use this flag
+				fChangingAllWorkspaces = true;
+
+				for (int32 i = 0; i < count_workspaces(); i++) {
+					if (i != originatingWorkspace)
+						screen.SetMode(i, &newMode, true);
 				}
-					
-				activate_workspace(old);
-						
-			} else
-				screen.SetMode(&mode, true);
-		
-			SetStateByMode();
+
+				fChangingAllWorkspaces = false;
+			}
+
+			UpdateActiveMode();
 			break;
 		}
 		
@@ -550,248 +880,50 @@ ScreenWindow::MessageReceived(BMessage* message)
 }
 
 
+bool
+ScreenWindow::CanApply() const
+{
+	if (fAllWorkspacesItem->IsMarked())
+		return true;
+
+	return fSelected != fActive;
+}
+
+
+bool
+ScreenWindow::CanRevert() const
+{
+	if (fActive != fOriginal)
+		return true;
+
+	return CanApply();
+}
+
+
 void
 ScreenWindow::CheckApplyEnabled()
 {
-	if ((fResolutionMenu->FindMarked() != fInitialResolution)
-			|| (fColorsMenu->FindMarked() != fInitialColors)
-			|| (fRefreshMenu->FindMarked() != fInitialRefresh)) {
-		fApplyButton->SetEnabled(true);
-		fRevertButton->SetEnabled(true);
-	} else {
-		fApplyButton->SetEnabled(false);
-		fRevertButton->SetEnabled(false);
-	}			
-			
+	fApplyButton->SetEnabled(CanApply());
+	fRevertButton->SetEnabled(CanRevert());
 }
 
 
 void
-ScreenWindow::CheckUpdateDisplayModes()
+ScreenWindow::Apply()
 {
-	uint32 c;
-	
-	// Add supported resolutions to the menu
-	char mode[128];
-	for (c = 0; c < fTotalModes; c++) {
-		mode_to_string(fSupportedModes[c], mode);
-		
-		if (!fResolutionMenu->FindItem(mode)) {
-			BMessage *message = new BMessage(POP_RESOLUTION_MSG);
-			message->AddInt32("width", fSupportedModes[c].virtual_width);
-			message->AddInt32("height", fSupportedModes[c].virtual_height);
+	if (fAllWorkspacesItem->IsMarked()) {
+		BAlert *workspacesAlert = new BAlert("WorkspacesAlert",
+			"Change all workspaces? This action cannot be reverted.", "Okay", "Cancel", 
+			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 
-			fResolutionMenu->AddItem(new BMenuItem(mode, message));
-		}
-	}
-	
-	// Add supported colorspaces to the menu
-	char colorSpace[128];
-	for (c = 0; c < fTotalModes; c++) {
-		colorspace_to_string(fSupportedModes[c].space, colorSpace);
-		if (!fColorsMenu->FindItem(colorSpace))
-			fColorsMenu->AddItem(new BMenuItem(colorSpace, new BMessage(POP_COLORS_MSG)));		
-	}
-
-	// Add supported refresh rates to the menu
-	float min_refresh = 120, max_refresh = 0;
-	for (c = 0; c < fTotalModes; c++) {
-		display_mode mode = fSupportedModes[c];
-		BScreen screen;
-		uint32 low_clock, high_clock;
-		screen.GetPixelClockLimits(&mode,&low_clock,&high_clock);
-		mode.timing.pixel_clock = low_clock;
-		min_refresh = min_c(min_refresh,get_refresh_rate(mode));
-		mode.timing.pixel_clock = high_clock;
-		max_refresh = max_c(max_refresh,get_refresh_rate(mode));
-	}
-	char refresh[128];
-	float refreshes[] = { 56.0, 60.0, 70.0, 75.0, 85.0, 100.0, 120.0, 140.0 } ;
-	for (uint i = 0 ; i < sizeof(refreshes)/sizeof(float) ; i++) {
-		if ((min_refresh <= refreshes[i]) && (refreshes[i] <= max_refresh)) {
-			refresh_rate_to_string(refreshes[i],refresh);
-			if (!fRefreshMenu->FindItem(refresh))
-				fRefreshMenu->AddItem(new BMenuItem(refresh, new BMessage(POP_REFRESH_MSG)));
-		}
-	}
-	fMinRefresh = min_refresh;
-	fMaxRefresh = max_refresh;
-}
-
-
-void
-ScreenWindow::CheckModesByResolution(const char *res)
-{
-	BString resolution(res);
-	
-	bool found = false;
-	uint32 c;
-	int32 width = atoi(resolution.String());
-	resolution.Remove(0, resolution.FindFirst('x') + 1);
-	int32 height = atoi(resolution.String());
-	
-	for (c = 0; c < fTotalModes; c++) {
-		if ((fSupportedModes[c].virtual_width == width) 
-			&& (fSupportedModes[c].virtual_height == height)) {
-			if (string_to_colorspace(fColorsMenu->FindMarked()->Label())
-						== fSupportedModes[c].space) {
-				found = true;
-				break;
-			}				
-		}
-	}
-	
-	if (!found) {
-		fColorsMenu->ItemAt(fColorsMenu->IndexOf(fColorsMenu->FindMarked()) - 1)->SetMarked(true);	
-		printf("not found\n");
-	}
-}
-
-
-void
-ScreenWindow::ApplyMode()
-{
-	BScreen screen(B_MAIN_SCREEN_ID);
-	if (!screen.IsValid())
-		return;
-
-	display_mode requested_mode;
-	screen.GetMode(&requested_mode); // start with current mode timings
-
-	BString menuLabel = fResolutionMenu->FindMarked()->Label();
-	string_to_mode(menuLabel.String(),&requested_mode);
-	requested_mode.space = string_to_colorspace(fColorsMenu->FindMarked()->Label());
-	requested_mode.h_display_start = 0;
-	requested_mode.v_display_start = 0;
-
-	display_mode * supported_mode = 0;
-	display_mode * mismatch_mode = 0;
-	for (uint32 c = 0; c < fTotalModes; c++) {			
-		if ((fSupportedModes[c].virtual_width == requested_mode.virtual_width)
-			&& (fSupportedModes[c].virtual_height == requested_mode.virtual_height)) {
-			if (!mismatch_mode || (colorspace_to_bpp(mismatch_mode->space)
-                                   < colorspace_to_bpp(fSupportedModes[c].space))) {
-				mismatch_mode = &fSupportedModes[c];
-            }
-			if (fSupportedModes[c].space == requested_mode.space) {
-				supported_mode = &fSupportedModes[c];
-			}
-		}
-	}
-	if (supported_mode) {
-		requested_mode = *supported_mode;
-	} else if (mismatch_mode) {
-		display_mode proposed_mode = *mismatch_mode;
-		BString string;
-		char str[256];
-		colorspace_to_string(requested_mode.space,str);
-		string << str;
-		mode_to_string(requested_mode,str);
-		string << " is not supported at " << str << ".  ";
-		string << "Use ";
-		colorspace_to_string(proposed_mode.space,str);
-		string << str;
-		mode_to_string(proposed_mode,str);
-		string << " at " << str << " instead?";
-		BAlert *badColorsAlert = 
-			new BAlert("BadColorsAlert", string.String(),
-			           "Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
-		int32 button = badColorsAlert->Go();
-		if (button == 1)
+		if (workspacesAlert->Go() == 1)
 			return;
-
-		requested_mode = proposed_mode;
-	} else {
-		display_mode proposed_mode = requested_mode;
-		if (screen.ProposeMode(&proposed_mode,&requested_mode,&requested_mode) == B_ERROR) {
-			BAlert * UnsupportedModeAlert = 
-				new BAlert("UnsupportedModeAlert", "This mode is not supported.",
-				           "Okay", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
-			UnsupportedModeAlert->Go();
-			return;
-		}
-		BString string;
-		char str[256];
-		colorspace_to_string(requested_mode.space,str);
-		string << str;
-		mode_to_string(requested_mode,str);
-		string << " is not supported at " << str << ".  ";
-		string << "Use ";
-		colorspace_to_string(proposed_mode.space,str);
-		string << str;
-		mode_to_string(proposed_mode,str);
-		string << " at " << str << " instead?";
-		BAlert *badModeAlert = 
-			new BAlert("BadModeAlert", string.String(),
-			           "Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
-		int32 button = badModeAlert->Go();
-		if (button == 1)
-			return;
-
-		requested_mode = proposed_mode;
 	}
 
-	float refresh;
-	if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG))
-		refresh = fCustomRefresh;
-	else
-		refresh = atof(fRefreshMenu->FindMarked()->Label());
-	set_pixel_clock(&requested_mode,refresh);
+	if (fScreenMode.Set(fSelected) == B_OK)
+		fActive = fSelected;
 
-	uint32 low_clock = 0, high_clock = 0;
-	screen.GetPixelClockLimits(&requested_mode,&low_clock,&high_clock);
-	if (requested_mode.timing.pixel_clock < low_clock) {
-		display_mode low_mode = requested_mode;
-		low_mode.timing.pixel_clock = low_clock;
-		BString string;
-		string << refresh << " Hz is too low.  ";
-		string << "Use " << get_refresh_rate(low_mode) << " Hz instead?";
-		BAlert * TooLowAlert = 
-		   new BAlert("TooLowAlert", string.String(),
-				      "Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		int32 button = TooLowAlert->Go();
-		if (button == 1) {
-			return;
-		}
-		requested_mode.timing.pixel_clock = low_clock;
-	}
-	if (requested_mode.timing.pixel_clock > high_clock) {
-		display_mode high_mode = requested_mode;
-		high_mode.timing.pixel_clock = high_clock;
-		BString string;
-		string << refresh << " Hz is too high.";
-		string << "Use " << get_refresh_rate(high_mode) << " Hz instead?";
-		BAlert * TooHighAlert = 
-		   new BAlert("TooHighAlert", string.String(),
-				      "Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		int32 button = TooHighAlert->Go();
-		if (button == 1) {
-			return;
-		}
-		requested_mode.timing.pixel_clock = high_clock;
-	}	
-	if (fWorkspaceMenu->FindMarked() == fWorkspaceMenu->FindItem("All Workspaces")) {			
-		BAlert *WorkspacesAlert =
-			new BAlert("WorkspacesAlert", "Change all workspaces?\nThis action cannot be reverted",
-				"Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
- 				
-		int32 button = WorkspacesAlert->Go();
-		
-		if (button == 1) {
-			PostMessage(new BMessage(BUTTON_REVERT_MSG));
-			return;
-		}
-	}
-	screen.SetMode(&requested_mode);
-
-	BRect rect(100.0, 100.0, 400.0, 193.0);
-	
-	rect.left = (screen.Frame().right / 2) - 150;
-	rect.top = (screen.Frame().bottom / 2) - 42;
-	rect.right = rect.left + 300.0;
-	rect.bottom = rect.top + 93.0;
-
- 	(new AlertWindow(rect, this))->Show();
-
-	fApplyButton->SetEnabled(false);
+	// ToDo: only show alert when this is an unknown mode
+	BWindow *window = new AlertWindow(this);
+	window->Show();
 }
