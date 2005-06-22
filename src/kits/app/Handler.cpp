@@ -144,7 +144,7 @@ using std::vector;
 using BPrivate::gDefaultTokens;
 
 
-static const char *sArchiveNameField = "_name";
+static const char *kArchiveNameField = "_name";
 
 static property_info sHandlerPropInfo[] = {
 	{
@@ -241,7 +241,7 @@ BHandler::BHandler(BMessage *data)
 	const char *name = NULL;
 
 	if (data)
-		data->FindString(sArchiveNameField, &name);
+		data->FindString(kArchiveNameField, &name);
 
 	InitData(name);
 }
@@ -264,7 +264,7 @@ BHandler::Archive(BMessage *data, bool deep) const
 	if (status < B_OK)
 		return status;
 
-	return data->AddString(sArchiveNameField, fName);
+	return data->AddString(kArchiveNameField, fName);
 }
 
 
@@ -829,6 +829,21 @@ _ObserverList::SendNotices(unsigned long what, BMessage const *message)
 		messengers[i].SendMessage(copyMsg);
 	}
 
+	// We have to send the message also to the handlers
+	// and messengers which were subscribed to ALL events,
+	// since they aren't caught by the above loops.
+	// TODO: cleanup
+	handlers = fHandlerMap[B_OBSERVER_OBSERVE_ALL];
+	for (uint32 i = 0; i < handlers.size(); ++i) {
+		BMessenger msgr(handlers[i]);
+		msgr.SendMessage(copyMsg);
+	}
+
+	messengers = fMessengerMap[B_OBSERVER_OBSERVE_ALL];
+	for (uint32 i = 0; i < messengers.size(); ++i) {
+		messengers[i].SendMessage(copyMsg);
+	}
+	
 	// Gotta make sure to clean up the annoying temporary ...
 	delete copyMsg;
 
