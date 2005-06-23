@@ -1,17 +1,3 @@
 SubDir OBOS_TOP src apps terminal ;
 
-AddResources Terminal :
-	Terminal.rdef
-	Terminal.icons.rdef
-	Terminal.version.rdef
-	;
-
-App Terminal :
-	Terminal.cpp
-	TerminalWindow.cpp
-	TerminalApp.cpp
-	;
-
-LinkSharedOSLibs Terminal : be translation tracker ;
-
 SubInclude OBOS_TOP src apps terminal MYOB ;
