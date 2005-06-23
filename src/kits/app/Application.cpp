@@ -1090,6 +1090,7 @@ BApplication::connect_to_app_server()
 		fServerLink->SetSenderPort(serverPort);
 	} else {
 		fServerLink->SetSenderPort(-1);
+		fInitError = B_ERROR;
 		debugger("BApplication: couldn't obtain new app_server comm port");
 	}
 }
