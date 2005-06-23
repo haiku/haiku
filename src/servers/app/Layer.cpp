@@ -916,8 +916,12 @@ void
 Layer::Show(bool invalidate)
 {
 	STRACE(("Layer(%s)::Show()\n", Name()));
-	if(!IsHidden())
+	if(!IsHidden()) {
+		// an ancestor may be hidden. OK, we're not visible,
+		// but we're changing our visibility state
+		fHidden	= false;
 		return;
+	}
 	
 	fHidden	= false;
 
@@ -942,9 +946,13 @@ void
 Layer::Hide(bool invalidate)
 {
 	STRACE(("Layer(%s)::Hide()\n", Name()));
-	if (IsHidden())
+	if (IsHidden()) {
+		// an ancestor may be hidden. OK, we're not visible,
+		// but we're changing our visibility state
+		fHidden	= true;		
 		return;
-	
+	}
+
 	fHidden	= true;
 #ifndef NEW_CLIPPING	
 	if (invalidate)
