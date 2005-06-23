@@ -9,5 +9,11 @@ AddResources Tracker : Tracker.rdef ;
 App Tracker :
 	main.cpp
 	;
+if ( $(TARGET_PLATFORM) = haiku ) {
 
 LinkSharedOSLibs Tracker : libbe.so libtracker.so ;
+
+} else {
+
+LinkSharedOSLibs Tracker : <boot!home!config!lib>libopenbeos.so libtracker.so ;
+}

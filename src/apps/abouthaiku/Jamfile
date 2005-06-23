@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src apps abouthaiku ;
+
+App AboutHaiku : AboutHaiku.cpp
+	: libbe.so libtranslation.so
+	: AboutHaiku.rdef
+	;
+
