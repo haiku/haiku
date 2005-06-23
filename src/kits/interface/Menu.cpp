@@ -1359,7 +1359,10 @@ BMenu::ItemLocInRect(BRect frame) const
 BRect
 BMenu::CalcFrame(BPoint where, bool *scrollOn)
 {
-	return BRect();
+	// TODO: Improve me
+	BRect frame = BScreen(MenuWindow()).Frame();	
+	frame.left += where.x + 2;
+	return frame;
 }
 
 
@@ -1664,6 +1667,13 @@ void
 BMenu::UpdateWindowViewSize(bool upWind)
 {
 	ASSERT(fCachedMenuWindow != NULL);
+	
+	// TODO: Improve this, we already resize the menu
+	// in "LayoutItems()"
+	bool scroll;
+	BRect maxFrame = CalcFrame(ScreenLocation(), &scroll);
+	float width = min_c(Frame().Width(), maxFrame.Width());
+	ResizeTo(width, Frame().Height());
 	if (fCachedMenuWindow != NULL) {
 		fCachedMenuWindow->ResizeTo(Bounds().Width() + 2, Bounds().Height() + 2);
 		fCachedMenuWindow->MoveTo(ScreenLocation());
