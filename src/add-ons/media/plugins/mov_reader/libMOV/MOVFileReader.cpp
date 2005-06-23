@@ -401,6 +401,7 @@ const 	AudioMetaData 		*MOVFileReader::AudioFormat(uint32 stream_index, size_t *
 
 				// Hmm 16bit format 32 bit FourCC.
 				theAudio.compression = aSoundDescription.basefields.DataFormat;
+//				theAudio.compression = aSoundDescription.desc.CompressionID;
 
 				theAudio.NoOfChannels = aSoundDescription.desc.NoOfChannels;
 				theAudio.SampleSize = aSoundDescription.desc.SampleSize;

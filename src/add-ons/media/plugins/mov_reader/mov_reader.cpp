@@ -126,7 +126,7 @@ movReader::GetFileFormatInfo(media_file_format *mff)
 						| media_file_format::B_IMPERFECTLY_SEEKABLE;
 	mff->family = B_QUICKTIME_FORMAT_FAMILY;
 	mff->version = 100;
-	strcpy(mff->mime_type, "audio/x-mov");
+	strcpy(mff->mime_type, "video/quicktime");
 	strcpy(mff->file_extension, "mov");
 	strcpy(mff->short_name,  "MOV");
 	strcpy(mff->pretty_name, "Quicktime (MOV) file format");
@@ -168,104 +168,116 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		cookie->frame_count = theFileReader->getAudioFrameCount();
 		cookie->duration = theFileReader->getAudioDuration();
 		
-/*		if (audio_format->compression == 0x0001) {// PCM
-			cookie->frame_count = stream_header->length / ((stream_header->sample_size + 7) / 8);
-			TRACE("frame_count %Ld (is PCM)\n", cookie->frame_count);
-		} else if (stream_header->rate) { // not PCM
-			cookie->frame_count = (stream_header->length * (int64)audio_format->SampleRate) / stream_header->rate;
-			TRACE("frame_count %Ld (using rate)\n", cookie->frame_count);
-		} else { // not PCM
-			cookie->frame_count = (stream_header->length * (int64)audio_format->SampleRate) / (stream_header->sample_size * audio_format->PacketSize);
-			TRACE("frame_count %Ld (using fallback)\n", cookie->frame_count);
-		}
-
-		if (stream_header->rate && stream_header->scale) {
-			cookie->duration = (1000000LL * (int64)stream_header->length * (int64)stream_header->scale) / stream_header->rate;
-			TRACE("duration %.6f (%Ld) (using scale & rate)\n", cookie->duration / 1E6, cookie->duration);
-		} else if (stream_header->rate) {
-			cookie->duration = (1000000LL * (int64)stream_header->length) / stream_header->rate;
-			TRACE("duration %.6f (%Ld) (using rate)\n", cookie->duration / 1E6, cookie->duration);
-		} else {
-			cookie->duration = theFileReader->Duration();
-			TRACE("duration %.6f (%Ld) (using fallback)\n", cookie->duration / 1E6, cookie->duration);
-		}
-*/		
 		cookie->audio = true;
 		cookie->byte_pos = 0;
 		cookie->chunk_pos = 1;
 
-		if (stream_header->scale && stream_header->rate && stream_header->sample_size) {
-			cookie->bytes_per_sec_rate = stream_header->rate * stream_header->sample_size * audio_format->NoOfChannels / 8;
+		if (stream_header->scale && stream_header->rate) {
+			cookie->bytes_per_sec_rate = stream_header->rate * audio_format->SampleSize * audio_format->NoOfChannels / 8;
 			cookie->bytes_per_sec_scale = stream_header->scale;
 			cookie->frames_per_sec_rate = stream_header->rate;
 			cookie->frames_per_sec_scale = stream_header->scale;
 			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using both)\n", cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
+		} else if (stream_header->rate) {
+			cookie->bytes_per_sec_rate = stream_header->rate * audio_format->SampleSize * audio_format->NoOfChannels / 8;
+			cookie->bytes_per_sec_scale = 1;
+			cookie->frames_per_sec_rate = stream_header->rate;
+			cookie->frames_per_sec_scale = 1;
+			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using rate)\n", cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
 		} else if (audio_format->PacketSize) {
 			cookie->bytes_per_sec_rate = audio_format->PacketSize;
 			cookie->bytes_per_sec_scale = 1;
-			cookie->frames_per_sec_rate = audio_format->SampleSize;
+			cookie->frames_per_sec_rate = audio_format->PacketSize * 8 / audio_format->SampleSize / audio_format->NoOfChannels;
 			cookie->frames_per_sec_scale = 1;
-			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using avg_bytes_per_sec)\n", cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
-		} else if (stream_header->rate && stream_header->sample_size) {
-			cookie->bytes_per_sec_rate = stream_header->rate * stream_header->sample_size * audio_format->NoOfChannels / 8;
-			cookie->bytes_per_sec_scale = 1;
-			cookie->frames_per_sec_rate = stream_header->sample_size;
-			cookie->frames_per_sec_scale = 1;
-			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using rate)\n", cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
+			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using PacketSize)\n", cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
 		} else {
-			cookie->frames_per_sec_rate = 16000;
-			cookie->frames_per_sec_scale = 1;
 			cookie->bytes_per_sec_rate = 128000;
 			cookie->bytes_per_sec_scale = 8;
+			cookie->frames_per_sec_rate = 16000;
+			cookie->frames_per_sec_scale = 1;
 			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using fallback)\n", cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
 		}
 
-		description.family = B_BEOS_FORMAT_FAMILY;
-		description.u.beos.format = B_BEOS_FORMAT_RAW_AUDIO;
-		if (B_OK != formats.GetFormatFor(description, format)) {
-			format->type = B_MEDIA_RAW_AUDIO;
-		}
+		if ((audio_format->compression == AUDIO_NONE) ||
+			(audio_format->compression == AUDIO_RAW) ||
+			(audio_format->compression == AUDIO_TWOS1) ||
+			(audio_format->compression == AUDIO_TWOS2)) {
+			description.family = B_BEOS_FORMAT_FAMILY;
+			description.u.beos.format = B_BEOS_FORMAT_RAW_AUDIO;
+			if (B_OK != formats.GetFormatFor(description, format)) {
+				format->type = B_MEDIA_RAW_AUDIO;
+			}
 
-		format->u.raw_audio.frame_rate = audio_format->SampleRate;
-		format->u.raw_audio.channel_count = audio_format->NoOfChannels;
+			format->u.raw_audio.frame_rate = cookie->frames_per_sec_rate / cookie->frames_per_sec_scale;
+			format->u.raw_audio.channel_count = audio_format->NoOfChannels;
 
-		format->u.raw_audio.byte_order = B_MEDIA_BIG_ENDIAN;
+			format->u.raw_audio.byte_order = B_MEDIA_BIG_ENDIAN;
 
-		if (audio_format->SampleSize <= 8)
-			format->u.raw_audio.format = B_AUDIO_FORMAT_UINT8;
-		else if (audio_format->SampleSize <= 16)
-			format->u.raw_audio.format = B_AUDIO_FORMAT_INT16;
-		else if (audio_format->SampleSize <= 24)
-			format->u.raw_audio.format = B_AUDIO_FORMAT_INT24;
-		else if (audio_format->SampleSize <= 32)
-			format->u.raw_audio.format = B_AUDIO_FORMAT_INT32;
-		else {
-			ERROR("movReader::AllocateCookie: unhandled bits per sample %d\n", audio_format->SampleSize);
-			return B_ERROR;
-		}
+			if (audio_format->SampleSize <= 8)
+				format->u.raw_audio.format = B_AUDIO_FORMAT_UINT8;
+			else if (audio_format->SampleSize <= 16)
+				format->u.raw_audio.format = B_AUDIO_FORMAT_INT16;
+			else if (audio_format->SampleSize <= 24)
+				format->u.raw_audio.format = B_AUDIO_FORMAT_INT24;
+			else if (audio_format->SampleSize <= 32)
+				format->u.raw_audio.format = B_AUDIO_FORMAT_INT32;
+			else {
+				ERROR("movReader::AllocateCookie: unhandled bits per sample %d\n", audio_format->SampleSize);
+				return B_ERROR;
+			}
 
-		format->u.raw_audio.buffer_size = stream_header->suggested_buffer_size;
+			if (audio_format->compression == AUDIO_TWOS1) {
+				if (audio_format->SampleSize <= 8) {
+					format->u.raw_audio.format = B_AUDIO_FORMAT_INT8;
+				} else if (audio_format->SampleSize <= 16) {
+					format->u.raw_audio.format = B_AUDIO_FORMAT_INT16;
+					format->u.raw_audio.byte_order = B_MEDIA_BIG_ENDIAN;
+				}
+			}
+			if (audio_format->compression == AUDIO_TWOS2) {
+				if (audio_format->SampleSize <= 8) {
+					format->u.raw_audio.format = B_AUDIO_FORMAT_INT8;
+				} else if (audio_format->SampleSize <= 16) {
+					format->u.raw_audio.format = B_AUDIO_FORMAT_INT16;
+					format->u.raw_audio.byte_order = B_MEDIA_LITTLE_ENDIAN;
+				}
+			}
 
-		switch (audio_format->compression) {
-			case AUDIO_NONE:
-			case AUDIO_RAW:
-			case AUDIO_TWOS1:
-				break;
-			case AUDIO_TWOS2:
-				format->u.raw_audio.byte_order = B_MEDIA_LITTLE_ENDIAN;
-				break;
-			case AUDIO_IMA4:
-				break;
-			case AUDIO_MS_PCM02:
-				format->u.raw_audio.format |= B_AUDIO_FORMAT_CHANNEL_ORDER_WAVE;
-				format->u.encoded_audio.bit_rate = 8 * audio_format->PacketSize;
-				format->u.encoded_audio.output.frame_rate = audio_format->SampleRate;
-				format->u.encoded_audio.output.channel_count = audio_format->NoOfChannels;
-				break;
-			case AUDIO_INTEL_PCM17:
-				break;
-			case AUDIO_MPEG3_CBR:
-				break;
+			format->u.raw_audio.buffer_size = stream_header->suggested_buffer_size;
+		} else {
+			description.family = B_QUICKTIME_FORMAT_FAMILY;
+			description.u.quicktime.codec = audio_format->compression;
+			if (B_OK != formats.GetFormatFor(description, format)) {
+				format->type = B_MEDIA_ENCODED_AUDIO;
+			}
+			
+			switch (audio_format->compression) {
+				case AUDIO_MS_PCM02:
+					TRACE("MS PCM02\n");
+					format->u.raw_audio.format |= B_AUDIO_FORMAT_CHANNEL_ORDER_WAVE;
+					format->u.encoded_audio.bit_rate = 8 * cookie->frames_per_sec_rate / cookie->frames_per_sec_scale;
+					format->u.encoded_audio.output.frame_rate = cookie->frames_per_sec_rate / cookie->frames_per_sec_scale;
+					format->u.encoded_audio.output.channel_count = audio_format->NoOfChannels;
+					break;
+				case AUDIO_INTEL_PCM17:
+					TRACE("INTEL PCM\n");
+					format->u.encoded_audio.bit_rate = 8 * cookie->frames_per_sec_rate / cookie->frames_per_sec_scale;
+					format->u.encoded_audio.output.frame_rate = cookie->frames_per_sec_rate / cookie->frames_per_sec_scale;
+					format->u.encoded_audio.output.channel_count = audio_format->NoOfChannels;
+					break;
+				case AUDIO_MPEG3_CBR:
+					TRACE("MP3\n");
+					format->u.encoded_audio.bit_rate = 8 * cookie->frames_per_sec_rate / cookie->frames_per_sec_scale;
+					format->u.encoded_audio.output.frame_rate = cookie->frames_per_sec_rate / cookie->frames_per_sec_scale;
+					format->u.encoded_audio.output.channel_count = audio_format->NoOfChannels;
+					break;
+				default:
+					TRACE("OTHER\n");
+					format->u.encoded_audio.bit_rate = 8 * cookie->frames_per_sec_rate / cookie->frames_per_sec_scale;
+					format->u.encoded_audio.output.frame_rate = cookie->frames_per_sec_rate / cookie->frames_per_sec_scale;
+					format->u.encoded_audio.output.channel_count = audio_format->NoOfChannels;
+					break;
+			}
 		}
 
 /*		if (audio_format->compression == 0x0001) {
