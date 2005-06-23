@@ -366,9 +366,7 @@ BMenuItem::DrawContent()
 	if (fBounds.Width() > labelWidth)
 		fSuper->DrawString(fLabel);
 	else {
-		// TODO: Ouch! Allocating the string every time
-		// isn't exactly cheap.
-		char *truncatedLabel = new char[strlen(fLabel) + 1];
+		char *truncatedLabel = new char[strlen(fLabel) + 4];
 		TruncateLabel(fBounds.Width(), truncatedLabel);
 		fSuper->DrawString(truncatedLabel);
 		delete[] truncatedLabel;
