@@ -1470,7 +1470,7 @@ void
 Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 {
 	STRACE(("Layer(%s)::RequestDraw()\n", Name()));
-printf("Layer(%s)::RequestDraw()\n", Name());
+//printf("Layer(%s)::RequestDraw()\n", Name());
 //if (fClassID == AS_ROOTLAYER_CLASS)
 //	debugger("z");
 	// do not redraw any child until you must

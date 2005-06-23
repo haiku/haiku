@@ -430,7 +430,7 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (parent != NULL)
 				parent->AddChild(newLayer, this);
 
-printf("Adi: create %s\n", fTitle);
+//printf("Adi: create %s\n", fTitle);
 			if (!newLayer->IsHidden())
 #ifndef NEW_CLIPPING
 				myRootLayer->GoInvalidate(newLayer, newLayer->fFull);

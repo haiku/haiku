@@ -1948,10 +1948,9 @@ RootLayer::show_winBorder(WinBorder *winBorder)
 		if (fActiveWksIndex == i)
 			invalidate = invalid;
 	}
-printf("Adi 1\n");
+
 	if (invalidate)
 		show_final_scene(exFocus, exActive);
-printf("Adi 2\n");
 }
 
 void RootLayer::hide_winBorder(WinBorder *winBorder)
