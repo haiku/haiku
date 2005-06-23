@@ -1,29 +1,14 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		ServerWindow.h
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Shadow BWindow class
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Adrian Oanca <adioanca@cotty.iren.ro>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ *		Stefano Ceccherini (burton666@libero.it)
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
 #ifndef _SERVERWIN_H_
 #define _SERVERWIN_H_
 
@@ -103,16 +88,16 @@ public:
 									{ return fClientViewsWithInvalidCoords; };
 		
 			// to who we belong. who do we own. our title.
-	inline	ServerApp*			App(void) const { return fServerApp; }
-	inline	const WinBorder*	GetWinBorder(void) const { return fWinBorder; }
-	inline	const char*			Title(void) const { return fName; }
+	inline	ServerApp*			App() const { return fServerApp; }
+	inline	const WinBorder*	GetWinBorder() const { return fWinBorder; }
+	inline	const char*			Title() const { return fName; }
 
 			// related thread/team_id(s).
-	inline	team_id				ClientTeamID(void) const { return fClientTeamID; }
-	inline	thread_id			ThreadID(void) const { return fMonitorThreadID;}
+	inline	team_id				ClientTeam() const { return fClientTeam; }
+	inline	thread_id			Thread() const { return fThread; }
 
 			// server "private" - try not to use.
-	inline	int32				ClientToken(void) const { return fHandlerToken; }
+	inline	int32				ClientToken() const { return fHandlerToken; }
 
 			// ToDo: public??
 			SubWindowList	fSubWindowList;
@@ -143,15 +128,15 @@ private:
 												bool inverse,
 												BPoint where);
 			char				fName[50];
-	
+
 			ServerApp*			fServerApp;
 			WinBorder*			fWinBorder;
-	
-			team_id				fClientTeamID;
-			thread_id			fMonitorThreadID;
-	
+
+			team_id				fClientTeam;
+			thread_id			fThread;
+
 			port_id				fMessagePort;
-			port_id				fClientWinPort;
+			port_id				fClientReplyPort;
 			port_id				fClientLooperPort;
 
 			BPrivate::LinkReceiver*	fMsgReceiver;

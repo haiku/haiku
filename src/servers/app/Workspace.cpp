@@ -369,41 +369,35 @@ STRACE(("Wks(%ld)::MoveToBack(%s) \n", fID, newLast? newLast->GetName(): "NULL")
 				return false;
 
 			// this is a modal app
-			if (newLast->App()->fAppSubWindowList.HasItem(newLast))
-			{
-				ListData	*before;
+			if (newLast->App()->fAppSubWindowList.HasItem(newLast)) {
+				ListData* before;
 
 				// remove now to properly place later
 				RemoveItem(newLastItem);
 
-				while (cursor)
-				{
+				while (cursor) {
 					if (!cursor->layerPtr->IsHidden()
 						&& cursor->layerPtr->Level() > B_SYSTEM_LAST
-						&& cursor->layerPtr->App()->ClientTeamID() == newLast->App()->ClientTeamID())
-					{
+						&& cursor->layerPtr->App()->ClientTeam() == newLast->App()->ClientTeam())
 						break;
-					}
+
 					cursor	= cursor->upperItem;
 				}
-				
+
 				if (cursor)
 					before	= cursor->lowerItem;
 				else
 					before	= fTopItem;
 
 				InsertItem(newLastItem, before);
-			}
-			// this is a modal subset
-			else
-			{
+			} else {
+				// this is a modal subset
 				// this subset modal is visible, it means its main window must be visible. search for it.
 				ListData	*mainWindowItem, *before;
 				int32		indexThis = 0, indexCursor;
 
 				// search by going deep
-				while(cursor)
-				{
+				while (cursor) {
 					if (cursor->layerPtr->Level() == B_NORMAL && !cursor->layerPtr->IsHidden()
 						&& (indexThis = cursor->layerPtr->fSubWindowList.IndexOf(newLast)) >= 0)
 						break;
@@ -416,14 +410,13 @@ STRACE(("Wks(%ld)::MoveToBack(%s) \n", fID, newLast? newLast->GetName(): "NULL")
 				RemoveItem(newLastItem);
 
 				// good. found our main window. now go up and properly place.
-				mainWindowItem	= cursor;
-				before			= cursor->lowerItem;
+				mainWindowItem = cursor;
+				before = cursor->lowerItem;
 
-				cursor		= cursor->lowerItem;
-				while(cursor)
-				{
+				cursor = cursor->lowerItem;
+				while (cursor) {
 					if (cursor->layerPtr->Level() == B_MODAL_APP && !cursor->layerPtr->IsHidden()
-						&& cursor->layerPtr->App()->ClientTeamID() == newLast->App()->ClientTeamID())
+						&& cursor->layerPtr->App()->ClientTeam() == newLast->App()->ClientTeam())
 					{
 						indexCursor	= mainWindowItem->layerPtr->fSubWindowList.IndexOf(cursor->layerPtr);
 						if (indexCursor >= 0)
@@ -810,7 +803,7 @@ STRACE(("W(%ld)::ShowWinBorder(%s) \n", fID, winBorder? winBorder->GetName(): "N
 				// take only application's modals
 				tempList.AddList(&winBorder->App()->fAppSubWindowList);
 				if (fFrontItem
-					&& fFrontItem->layerPtr->App()->ClientTeamID() == winBorder->App()->ClientTeamID())
+					&& fFrontItem->layerPtr->App()->ClientTeam() == winBorder->App()->ClientTeam())
 					userBusy = false;
 			}
 			// SUBSET modal
@@ -1217,47 +1210,46 @@ void Workspace::PrintItem(ListData *item) const
 /*
 	Insert item in the top-bottom direction.
 */
-void Workspace::InsertItem(ListData *item, ListData *before)
+void
+Workspace::InsertItem(ListData *item, ListData *before)
 {
 	// insert before one other item;
-	if(before)
-	{
-		if(before->upperItem)
-			before->upperItem->lowerItem	= item;
-		item->upperItem		= before->upperItem;
-		item->lowerItem		= before;
-		before->upperItem	= item;
+	if (before) {
+		if (before->upperItem)
+			before->upperItem->lowerItem = item;
 
-		if(fTopItem == before)
+		item->upperItem = before->upperItem;
+		item->lowerItem = before;
+		before->upperItem = item;
+
+		if (fTopItem == before)
 			fTopItem = item;
-	}
-	else
-	{
+	} else {
 		// insert item at the end.
-		item->upperItem 	= fBottomItem;
-		if(fBottomItem)
+		item->upperItem = fBottomItem;
+		if (fBottomItem)
 			fBottomItem->lowerItem = item;
 
-		fBottomItem			= item;
+		fBottomItem = item;
 
-		if(!fTopItem)
-			fTopItem		= item;
+		if (!fTopItem)
+			fTopItem = item;
 	}
 }
 
-//----------------------------------------------------------------------------------
 
-void Workspace::RemoveItem(ListData *item)
+void
+Workspace::RemoveItem(ListData *item)
 {
-	if(!item)
+	if (!item)
 		return;
 
-	if(fBottomItem == item)
+	if (fBottomItem == item)
 		fBottomItem = item->upperItem;
 	else
 		item->lowerItem->upperItem	= item->upperItem;
 	
-	if(fTopItem == item)
+	if (fTopItem == item)
 		fTopItem = item->lowerItem;
 	else
 		item->upperItem->lowerItem	= item->lowerItem;
@@ -1267,23 +1259,22 @@ void Workspace::RemoveItem(ListData *item)
 	item->upperItem	= NULL;
 	item->lowerItem	= NULL;
 	
-	if(fFocusItem == item)
+	if (fFocusItem == item)
 		fFocusItem = NULL;
 
-	if(fFrontItem == item)
+	if (fFrontItem == item)
 		fFrontItem = NULL;
 }
 
-//----------------------------------------------------------------------------------
 
-ListData *Workspace::HasItem(const ListData *item, int32 *index) const
+ListData*
+Workspace::HasItem(const ListData *item, int32 *index) const
 {
-	int32		idx = 0;
-	ListData	*itemX;
+	int32 idx = 0;
+	ListData* itemX;
 
-	for (itemX = fBottomItem; itemX != NULL; itemX = itemX->upperItem)
-	{
-		if(item == itemX)
+	for (itemX = fBottomItem; itemX != NULL; itemX = itemX->upperItem) {
+		if (item == itemX)
 			break;
 
 		idx++;
@@ -1295,16 +1286,15 @@ ListData *Workspace::HasItem(const ListData *item, int32 *index) const
 	return itemX;
 }
 
-//----------------------------------------------------------------------------------
 
-ListData* Workspace::HasItem(const WinBorder *layer, int32 *index) const
+ListData*
+Workspace::HasItem(const WinBorder *layer, int32 *index) const
 {
 	int32		idx = 0;
 	ListData	*itemX;
 
-	for (itemX = fBottomItem; itemX != NULL; itemX = itemX->upperItem)
-	{
-		if(layer == itemX->layerPtr)
+	for (itemX = fBottomItem; itemX != NULL; itemX = itemX->upperItem) {
+		if (layer == itemX->layerPtr)
 			break;
 
 		idx++;
@@ -1316,62 +1306,58 @@ ListData* Workspace::HasItem(const WinBorder *layer, int32 *index) const
 	return itemX;
 }
 
-//----------------------------------------------------------------------------------
+
 /*!
 	\brief Returns the index of the specified item starting from the back-most window.
 */
-int32 Workspace::IndexOf(const ListData *item) const
+int32
+Workspace::IndexOf(const ListData *item) const
 {
 	if (!item)
 		return -1;
 
-	int32	index = 0;
-	for (ListData *itemX = fTopItem; itemX != NULL; itemX = itemX->lowerItem)
-	{
-		if(itemX->layerPtr == item->layerPtr)
+	int32 index = 0;
+	for (ListData *itemX = fTopItem; itemX != NULL; itemX = itemX->lowerItem) {
+		if (itemX->layerPtr == item->layerPtr)
 			return index;
 		index++;
 	}
 	return -1;
 }
 
-inline
-bool Workspace::placeToBack(ListData *newLast)
-{
-	int32		level = newLast->layerPtr->Level();
-	ListData	*cursor = newLast->upperItem;
 
-	switch(level)
-	{
+inline bool
+Workspace::placeToBack(ListData *newLast)
+{
+	int32 level = newLast->layerPtr->Level();
+	ListData* cursor = newLast->upperItem;
+
+	switch (level) {
 		case B_FLOATING_ALL:
 		case B_FLOATING_APP:
 		{
-			int32	count = 0;
-			while (cursor && cursor->layerPtr->Level() == level)
-			{
+			int32 count = 0;
+			while (cursor && cursor->layerPtr->Level() == level) {
 				if (!cursor->layerPtr->IsHidden())
 					count++;
-				cursor	= cursor->upperItem;
+				cursor = cursor->upperItem;
 			}
 
 			// we're already the last floating window
 			if (count == 0)
 				return false;
-			else
-			{
-				bool	changeFocus = false;
+			else {
+				bool changeFocus = false;
 
 				if (fFocusItem == newLast)
 					changeFocus = true;
 
-				if (changeFocus)
-				{
-					ListData	*cursor = newLast->upperItem;
-					while ( cursor
-						 	&& ( cursor->layerPtr->IsHidden()
-						 		 || cursor->layerPtr->WindowFlags() & B_AVOID_FOCUS)
-						 	&& cursor->layerPtr->Level() == level)
-					{
+				if (changeFocus) {
+					ListData* cursor = newLast->upperItem;
+					while (cursor
+						&& (cursor->layerPtr->IsHidden()
+							|| cursor->layerPtr->WindowFlags() & B_AVOID_FOCUS)
+						&& cursor->layerPtr->Level() == level) {
 						cursor	= cursor->upperItem;
 					}
 
@@ -1386,24 +1372,21 @@ bool Workspace::placeToBack(ListData *newLast)
 
 				return true;
 			}
+			break;
 		}
-		break;
+
 		case B_NORMAL:
 		{
-			int32	count = 0;
-			int32	cursorLevel;
-			while(cursor)
-			{
+			int32 count = 0;
+			int32 cursorLevel;
+			while (cursor) {
 				cursorLevel	= cursor->layerPtr->Level();
 				if (cursorLevel == B_MODAL_APP)
 				 	cursorLevel = B_NORMAL;
 
-				if (cursorLevel < level)
-				{
+				if (cursorLevel < level) {
 					break;
-				}
-				else
-				{
+				} else {
 					count++;
 					cursor	= cursor->upperItem;
 				}
@@ -1412,16 +1395,15 @@ bool Workspace::placeToBack(ListData *newLast)
 			// we're already the last normal window
 			if (count == 0)
 				return false;
-			else
-			{
+			else {
 				RemoveItem(newLast);
 				InsertItem(newLast, cursor? cursor->lowerItem: fTopItem);
 				return true;
 			}
+			break;
 		}
-		break;
-
 	}
+
 	return false;
 }
 
@@ -1429,7 +1411,8 @@ bool Workspace::placeToBack(ListData *newLast)
 /*!
 	\brief Based on it's WinBorder type, places this item in front as it is possible.
 */
-void Workspace::placeInFront(ListData *item, const bool userBusy)
+void
+Workspace::placeInFront(ListData *item, const bool userBusy)
 {
 	if (!item)
 		return;
@@ -1483,11 +1466,10 @@ void Workspace::placeInFront(ListData *item, const bool userBusy)
 }
 
 
-inline
-bool Workspace::removeAndPlaceBefore(ListData *item, ListData *beforeItem)
+inline bool
+Workspace::removeAndPlaceBefore(ListData *item, ListData *beforeItem)
 {
-	if (item && item != beforeItem)
-	{
+	if (item && item != beforeItem) {
 		RemoveItem(item);
 		// insert into proper place.
 		InsertItem(item, beforeItem);
@@ -1501,40 +1483,39 @@ bool Workspace::removeAndPlaceBefore(ListData *item, ListData *beforeItem)
 			specified WinBorder in Workspace's list an remove it.
 	\resolution: private
 */
-inline
-bool Workspace::removeAndPlaceBefore(const WinBorder *wb, ListData *beforeItem)
+inline bool
+Workspace::removeAndPlaceBefore(const WinBorder *wb, ListData *beforeItem)
 {
 	return removeAndPlaceBefore(HasItem(wb), beforeItem);
 }
 
-inline
-WinBorder* Workspace::searchANormalWindow(WinBorder *wb) const
-{
-	ListData	*listItem = fBottomItem;
-	while (listItem)
-	{
-		if (listItem->layerPtr->Level() == B_NORMAL && !listItem->layerPtr->IsHidden()
-			&& listItem->layerPtr->App()->ClientTeamID() == wb->App()->ClientTeamID())
-				return listItem->layerPtr;
 
-		listItem	= listItem->upperItem;
+inline WinBorder*
+Workspace::searchANormalWindow(WinBorder *wb) const
+{
+	ListData* listItem = fBottomItem;
+	while (listItem) {
+		if (listItem->layerPtr->Level() == B_NORMAL && !listItem->layerPtr->IsHidden()
+			&& listItem->layerPtr->App()->ClientTeam() == wb->App()->ClientTeam())
+			return listItem->layerPtr;
+
+		listItem = listItem->upperItem;
 	}
 	return NULL;
 }
 
 
-inline
-WinBorder* Workspace::searchFirstMainWindow(WinBorder *wb) const
+inline WinBorder*
+Workspace::searchFirstMainWindow(WinBorder *wb) const
 {
-	ListData	*listItem = fBottomItem;
-	while (listItem)
-	{
+	ListData* listItem = fBottomItem;
+	while (listItem) {
 		if (listItem->layerPtr->Level() == B_NORMAL && !listItem->layerPtr->IsHidden()
-			&& listItem->layerPtr->App()->ClientTeamID() == wb->App()->ClientTeamID()
+			&& listItem->layerPtr->App()->ClientTeam() == wb->App()->ClientTeam()
 			&& listItem->layerPtr->fSubWindowList.HasItem(wb))
-				return listItem->layerPtr;
+			return listItem->layerPtr;
 
-		listItem	= listItem->upperItem;
+		listItem = listItem->upperItem;
 	}
 	return NULL;
 }

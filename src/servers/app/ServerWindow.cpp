@@ -1,31 +1,15 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		ServerWindow.cpp
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//					Adi Oanca <adioanca@cotty.iren.ro>
-//					Stephan Aßmus <superstippi@gmx.de>
-//	Description:	Shadow BWindow class
-//
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Adrian Oanca <adioanca@cotty.iren.ro>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ *		Stefano Ceccherini (burton666@libero.it)
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+
 
 #include <AppDefs.h>
 #include <Rect.h>
@@ -75,7 +59,6 @@
 #	define DTRACE(x) ;
 #endif
 
-//	#pragma mark -
 
 /*!
 	\brief Constructor
@@ -83,11 +66,11 @@
 	Does a lot of stuff to set up for the window - new decorator, new winborder, spawn a 
 	monitor thread.
 */
-ServerWindow::ServerWindow(const char *string, ServerApp *winapp,
-	port_id winport, port_id looperPort, int32 handlerID)
-	: fServerApp(winapp),
-	// fClientWinPort is the port to which the app awaits messages from the server
-	fClientWinPort(winport),
+ServerWindow::ServerWindow(const char *string, ServerApp *app,
+	port_id clientPort, port_id looperPort, int32 handlerID)
+	:
+	fServerApp(app),
+	fClientReplyPort(clientPort),
 	fClientLooperPort(looperPort),
 	fClientViewsWithInvalidCoords(B_VIEW_RESIZED),
 	fHandlerToken(handlerID)
@@ -100,14 +83,14 @@ ServerWindow::ServerWindow(const char *string, ServerApp *winapp,
 	} else
 		strcpy(fName, "Unnamed Window");
 
-	fClientTeamID = winapp->ClientTeamID();
+	fClientTeam = app->ClientTeam();
 	fWinBorder = NULL;
 	fCurrentLayer = NULL;
 
 	// fMessagePort is the port to which the app sends messages for the server
 	fMessagePort = create_port(30, fName);
 
-	fMsgSender = new BPrivate::LinkSender(fClientWinPort);
+	fMsgSender = new BPrivate::LinkSender(fClientReplyPort);
 	fMsgReceiver = new BPrivate::LinkReceiver(fMessagePort);
 
 	// Send a reply to our window - it is expecting fMessagePort port.
@@ -124,15 +107,15 @@ ServerWindow::Init(BRect frame, uint32 wlook,
 	uint32 wfeel, uint32 wflags, uint32 wwksindex)
 {
 	char name[60];
-	snprintf(name, sizeof(name), "%ld: %s", fClientTeamID, fName);
+	snprintf(name, sizeof(name), "%ld: %s", fClientTeam, fName);
 
 	fWinBorder = new WinBorder(frame, name, wlook, wfeel, wflags,
 		wwksindex, this, gDesktop->GetDisplayDriver());
 
 	// Spawn our message-monitoring thread
-	fMonitorThreadID = spawn_thread(MonitorWin, fName, B_NORMAL_PRIORITY, this);
-	if (fMonitorThreadID >= B_OK)
-		resume_thread(fMonitorThreadID);
+	fThread = spawn_thread(MonitorWin, fName, B_NORMAL_PRIORITY, this);
+	if (fThread >= B_OK)
+		resume_thread(fThread);
 }
 
 

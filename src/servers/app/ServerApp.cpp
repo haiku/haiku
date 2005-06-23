@@ -63,6 +63,10 @@
 #	define FTRACE(x) ;
 #endif
 
+
+static const uint32 kMsgAppQuit = 'appQ';
+
+
 /*!
 	\brief Constructor
 	\param sendport port ID for the BApplication which will receive the ServerApp's messages
@@ -70,21 +74,17 @@
 	\param fSignature NULL-terminated string which contains the BApplication's
 	MIME fSignature.
 */
-ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort,
-	team_id clientTeamID, int32 handlerID, const char* signature)
+ServerApp::ServerApp(port_id clientReplyPort, port_id clientLooperPort,
+	team_id clientTeam, int32 handlerID, const char* signature)
 	:
-	fClientAppPort(sendport),
-	fMessagePort(rcvport),
+	fLockSem(-1),
+	fClientReplyPort(clientReplyPort),
+	fMessagePort(-1),
 	fClientLooperPort(clientLooperPort),
 	fSignature(signature),
-	fMonitorThreadID(-1),
-	fClientTeamID(clientTeamID),
-	fLink(fClientAppPort, fMessagePort),
-	fSWindowList(new BList()),
-	fBitmapList(new BList()),
-	fPictureList(new BList()),
+	fThread(-1),
+	fClientTeam(clientTeam),
 	fAppCursor(NULL),
-	fLockSem(create_sem(1, "ServerApp sem")),
 	fCursorHidden(false),
 	fIsActive(false),
 	//fHandlerToken(handlerID),
@@ -92,7 +92,25 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort
 	fQuitting(false)
 {
 	if (fSignature == "")
-		fSignature = "application/x-vnd.NULL-application-signature";
+		fSignature = "application/no-signature";
+
+	fLockSem = create_sem(1, Signature());
+	if (fLockSem < B_OK)
+		return;
+
+	fMessagePort = create_port(DEFAULT_MONITOR_PORT_SIZE, Signature());
+	if (fMessagePort < B_OK)
+		return;
+
+	fLink.SetSenderPort(fClientReplyPort);
+	fLink.SetReceiverPort(fMessagePort);
+
+	// we let the application own the port, so that we get aware when it's gone
+	if (set_port_owner(fMessagePort, clientTeam) < B_OK) {
+		delete_port(fMessagePort);
+		fMessagePort = -1;
+		return;
+	}
 
 	// although this isn't pretty, ATM we have only one RootLayer.
 	// there should be a way that this ServerApp be attached to a particular
@@ -102,13 +120,11 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort
 
 	if (defaultCursor) {
 		fAppCursor = new ServerCursor(defaultCursor);
-		fAppCursor->SetOwningTeam(fClientTeamID);
+		fAppCursor->SetOwningTeam(fClientTeam);
 	}
 
-	Run();
-
 	STRACE(("ServerApp %s:\n", fSignature.String()));
-	STRACE(("\tBApp port: %ld\n", fClientAppPort));
+	STRACE(("\tBApp port: %ld\n", fClientReplyPort));
 	STRACE(("\tReceiver port: %ld\n", fMessagePort));
 }
 
@@ -117,67 +133,119 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort
 ServerApp::~ServerApp(void)
 {
 	STRACE(("*ServerApp %s:~ServerApp()\n",fSignature.String()));
-	
-	fQuitting = true;
-	
-	for (int32 i = 0; i< fBitmapList->CountItems(); i++) {
-		delete static_cast<ServerBitmap *>(fBitmapList->ItemAt(i));
-	}
-	delete fBitmapList;
 
-	for (int32 i = 0; i < fPictureList->CountItems(); i++) {
-		delete static_cast<ServerPicture *>(fPictureList->ItemAt(i));
+	if (!fQuitting)
+		CRITICAL("ServerApp: destructor called after Run()!\n");
+
+	// first, make sure our monitor thread doesn't 
+	for (int32 i = 0; i < fBitmapList.CountItems(); i++) {
+		delete static_cast<ServerBitmap *>(fBitmapList.ItemAt(i));
 	}
-	delete fPictureList;
+
+	for (int32 i = 0; i < fPictureList.CountItems(); i++) {
+		delete static_cast<ServerPicture *>(fPictureList.ItemAt(i));
+	}
 
 	// This shouldn't be necessary -- all cursors owned by the app
 	// should be cleaned up by RemoveAppCursors	
-//	if(fAppCursor)
-//		delete fAppCursor;
+//	delete fAppCursor;
 
 	// although this isn't pretty, ATM we have only one RootLayer.
 	// there should be a way that this ServerApp be attached to a particular
 	// RootLayer to know which RootLayer's cursor to modify.
-	gDesktop->ActiveRootLayer()->GetCursorManager().RemoveAppCursors(fClientTeamID);
+	gDesktop->ActiveRootLayer()->GetCursorManager().RemoveAppCursors(fClientTeam);
 	delete_sem(fLockSem);
 	
 	STRACE(("#ServerApp %s:~ServerApp()\n", fSignature.String()));
 
-	// TODO: Is this the right place for this ?
-	// From what I've understood, this is the port created by
-	// the BApplication (?), but if I delete it in there, GetNextMessage()
-	// in the MonitorApp thread never returns. Cleanup.
-	delete_port(fMessagePort);
-	
-	status_t dummyStatus;
-	wait_for_thread(fMonitorThreadID, &dummyStatus);
-	
 	delete fSharedMem;
 	
 	STRACE(("ServerApp %s::~ServerApp(): Exiting\n", fSignature.String()));
 }
+
+
+/*!
+	\brief Checks if the application was initialized correctly
+*/
+status_t
+ServerApp::InitCheck()
+{
+	if (fMessagePort < B_OK)
+		return fMessagePort;
+
+	if (fClientReplyPort < B_OK)
+		return fClientReplyPort;
+
+	if (fLockSem < B_OK)
+		return fLockSem;
+
+	return B_OK;
+}
+
 
 /*!
 	\brief Starts the ServerApp monitoring for messages
 	\return false if the application couldn't start, true if everything went OK.
 */
 bool
-ServerApp::Run(void)
+ServerApp::Run()
 {
+	fQuitting = false;
+
 	// Unlike a BApplication, a ServerApp is *supposed* to return immediately
 	// when its Run() function is called.	
-	fMonitorThreadID = spawn_thread(MonitorApp, fSignature.String(), B_NORMAL_PRIORITY, this);
-	if (fMonitorThreadID < B_OK)
+	fThread = spawn_thread(_message_thread, fSignature.String(), B_NORMAL_PRIORITY, this);
+	if (fThread < B_OK)
 		return false;
 
-	return resume_thread(fMonitorThreadID) == B_OK;
+	// Let's tell the client how to talk with us
+	fLink.StartMessage(SERVER_TRUE);
+	fLink.Attach<int32>(fMessagePort);
+	fLink.Flush();
+
+	if (resume_thread(fThread) != B_OK) {
+		fQuitting = true;
+		kill_thread(fThread);
+		fThread = -1;
+		return false;
+	}
+
+	return true;
 }
+
+
+/*!
+	\brief This quits the application and deletes it. You're not supposed
+		to call its destructor directly.
+
+	At the point you're calling this method, the application should already
+	be removed from the application list.
+*/
+void
+ServerApp::Quit()
+{
+	if (fThread < B_OK) {
+		delete this;
+		return;
+	}
+
+	// execute application deletion in the message looper thread
+
+	fQuitting = true;
+
+	BPrivate::LinkSender link(fMessagePort);
+	link.StartMessage(kMsgAppQuit);
+	link.Flush();
+
+	send_data(fThread, 'QUIT', NULL, 0);
+}
+
 
 /*!
 	\brief Pings the target app to make sure it's still working
 	\return true if target is still "alive" and false if "He's dead, Jim." 
 	"But that's impossible..."
-	
+
 	This function is called by the app_server thread to ensure that
 	the target app still exists. We do this not by sending a message
 	but by calling get_port_info. We don't want to send ping messages
@@ -187,13 +255,13 @@ ServerApp::Run(void)
 	tell the app_server to delete the respective ServerApp.
 */
 bool
-ServerApp::PingTarget(void)
+ServerApp::PingTarget()
 {
-	team_info tinfo;
-	if (get_team_info(fClientTeamID, &tinfo) == B_BAD_TEAM_ID) {
+	team_info info;
+	if (get_team_info(fClientTeam, &info) != B_OK) {
 		BPrivate::LinkSender link(gAppServerPort);
 		link.StartMessage(AS_DELETE_APP);
-		link.Attach(&fMonitorThreadID, sizeof(thread_id));
+		link.Attach(&fThread, sizeof(thread_id));
 		link.Flush();
 		return false;
 	}
@@ -260,34 +328,50 @@ ServerApp::SetAppCursor(void)
 /*!
 	\brief The thread function ServerApps use to monitor messages
 	\param data Pointer to the thread's ServerApp object
-	\return Throwaway value - always 0
 */
 int32
-ServerApp::MonitorApp(void *data)
+ServerApp::_message_thread(void *_app)
+{
+	ServerApp *app = (ServerApp *)_app;
+
+	app->_MessageLooper();
+	return 0;
+}
+
+
+/*!
+	\brief The thread function ServerApps use to monitor messages
+*/
+void
+ServerApp::_MessageLooper()
 {
 	// Message-dispatching loop for the ServerApp
 
-	ServerApp *app = (ServerApp *)data;
-	BPrivate::LinkReceiver &reader = app->fLink.Receiver();
+	BPrivate::LinkReceiver &receiver = fLink.Receiver();
 
 	int32 code;
 	status_t err = B_OK;
 
-	while (!app->fQuitting) {
-		STRACE(("info: ServerApp::MonitorApp listening on port %ld.\n", app->fMessagePort));
-		err = reader.GetNextMessage(code, B_INFINITE_TIMEOUT);
-		if (err < B_OK) {
-			STRACE(("ServerApp::MonitorApp(): GetNextMessage returned %s\n", strerror(err)));
+	while (!fQuitting) {
+		STRACE(("info: ServerApp::_MessageLooper() listening on port %ld.\n", fMessagePort));
+		err = receiver.GetNextMessage(code, B_INFINITE_TIMEOUT);
+		if (err < B_OK || code == B_QUIT_REQUESTED) {
+			STRACE(("ServerApp: application seems to be gone...\n"));
 
-			// ToDo: this should kill the app, but it doesn't work
+			// Tell the app_server to quit us
 			BPrivate::LinkSender link(gAppServerPort);
 			link.StartMessage(AS_DELETE_APP);
-			link.Attach(&app->fMonitorThreadID, sizeof(thread_id));
+			link.Attach<thread_id>(Thread());
 			link.Flush();
 			break;
 		}
 
 		switch (code) {
+			case kMsgAppQuit:
+				// we receive this from our destructor on quit
+				fQuitting = true;
+				break;
+
 			case AS_CREATE_WINDOW:
 			{
 				// Create the ServerWindow to node monitor a new OBWindow
@@ -312,22 +396,21 @@ ServerApp::MonitorApp(void *data)
 				port_id looperPort = -1;
 				char *title = NULL;
 
-				reader.Read<BRect>(&frame);
-				reader.Read<uint32>(&look);
-				reader.Read<uint32>(&feel);
-				reader.Read<uint32>(&flags);
-				reader.Read<uint32>(&wkspaces);
-				reader.Read<int32>(&token);
-				reader.Read<port_id>(&sendPort);
-				reader.Read<port_id>(&looperPort);
-				if (reader.ReadString(&title) != B_OK)
+				receiver.Read<BRect>(&frame);
+				receiver.Read<uint32>(&look);
+				receiver.Read<uint32>(&feel);
+				receiver.Read<uint32>(&flags);
+				receiver.Read<uint32>(&wkspaces);
+				receiver.Read<int32>(&token);
+				receiver.Read<port_id>(&sendPort);
+				receiver.Read<port_id>(&looperPort);
+				if (receiver.ReadString(&title) != B_OK)
 					break;
 
-				STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n",app->fSignature.String()));
+				STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n", Signature()));
 
 				// ServerWindow constructor will reply with port_id of a newly created port
-				ServerWindow *sw = NULL;
-				sw = new ServerWindow(title, app, sendPort, looperPort, token);
+				ServerWindow *sw = new ServerWindow(title, this, sendPort, looperPort, token);
 				sw->Init(frame, look, feel, flags, wkspaces);
 
 				STRACE(("\nServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
@@ -337,46 +420,38 @@ ServerApp::MonitorApp(void *data)
 				free(title);
 				break;
 			}
+
 			case AS_QUIT_APP:
 			{
 				// This message is received only when the app_server is asked to shut down in
 				// test/debug mode. Of course, if we are testing while using AccelerantDriver, we do
 				// NOT want to shut down client applications. The server can be quit o in this fashion
 				// through the driver's interface, such as closing the ViewDriver's window.
-				
-				STRACE(("ServerApp %s:Server shutdown notification received\n",
-					app->fSignature.String()));
+
+				STRACE(("ServerApp %s:Server shutdown notification received\n", Signature()));
 
 				// If we are using the real, accelerated version of the
 				// DisplayDriver, we do NOT want the user to be able shut down
 				// the server. The results would NOT be pretty
 #if TEST_MODE
 				BMessage pleaseQuit(B_QUIT_REQUESTED);
-				app->SendMessageToClient(&pleaseQuit);
+				SendMessageToClient(&pleaseQuit);
 #endif
-				break;
-			}
-			
-			case B_QUIT_REQUESTED:
-			{
-				STRACE(("ServerApp %s: B_QUIT_REQUESTED\n",app->fSignature.String()));
-				// Our BApplication sent us this message when it quit.
-				// We need to ask the app_server to delete ourself.
-				BPrivate::LinkSender sender(gAppServerPort);
-				sender.StartMessage(AS_DELETE_APP);
-				sender.Attach(&app->fMonitorThreadID, sizeof(thread_id));
-				sender.Flush();
 				break;
 			}
 
 			default:
-				STRACE(("ServerApp %s: Got a Message to dispatch\n", app->fSignature.String()));
-				app->DispatchMessage(code, reader);
+				STRACE(("ServerApp %s: Got a Message to dispatch\n", Signature()));
+				_DispatchMessage(code, receiver);
 				break;
 		}
 	}
 
-	return 0;
+	// Quit() will send us a message; we're handling the exiting procedure
+	thread_id sender;
+	receive_data(&sender, NULL, 0);
+
+	delete this;
 }
 
 
@@ -390,7 +465,7 @@ ServerApp::MonitorApp(void *data)
 	matter of casting and incrementing an index variable to access them.
 */
 void
-ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
+ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 {
 	LayerData ld;
 
@@ -404,9 +479,8 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			ServerWindow *win;
 			BMessage msg(_COLORS_UPDATED);
 			
-			for(int32 i=0; i<fSWindowList->CountItems(); i++)
-			{
-				win=(ServerWindow*)fSWindowList->ItemAt(i);
+			for(int32 i = 0; i < fWindowList.CountItems(); i++) {
+				win=(ServerWindow*)fWindowList.ItemAt(i);
 				win->GetWinBorder()->UpdateColors();
 				win->SendMessageToClient(AS_UPDATE_COLORS, msg);
 			}
@@ -444,25 +518,24 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			size_t msgsize;
 			area_info ai;
 			int8 *msgpointer;
-			
+
 			link.Read<area_id>(&area);
 			link.Read<size_t>(&offset);
 			link.Read<size_t>(&msgsize);
-			
+
 			// Part sanity check, part get base pointer :)
 			if (get_area_info(area, &ai) < B_OK)
 				break;
-			
+
 			msgpointer = (int8*)ai.address + offset;
-			
+
 			RAMLinkMsgReader mlink(msgpointer);
-			DispatchMessage(mlink.Code(), mlink);
-			
+			_DispatchMessage(mlink.Code(), mlink);
+
 			// This is a very special case in the sense that when ServerMemIO is used for this 
 			// purpose, it will be set to NOT automatically free the memory which it had 
 			// requested. This is the server's job once the message has been dispatched.
 			fSharedMem->ReleaseBuffer(msgpointer);
-			
 			break;
 		}
 		case AS_ACQUIRE_SERVERMEM:
@@ -536,14 +609,11 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			STRACE(("ServerApp %s: Received decorator update notification\n",fSignature.String()));
 
-			ServerWindow *win;
-			
-			for(int32 i = 0; i < fSWindowList->CountItems(); i++)
-			{
-				win = (ServerWindow*)fSWindowList->ItemAt(i);
-				win->Lock();
-				const_cast<WinBorder *>(win->GetWinBorder())->UpdateDecorator();
-				win->Unlock();
+			for (int32 i = 0; i < fWindowList.CountItems(); i++) {
+				ServerWindow *window = (ServerWindow*)fWindowList.ItemAt(i);
+				window->Lock();
+				const_cast<WinBorder *>(window->GetWinBorder())->UpdateDecorator();
+				window->Unlock();
 			}
 			break;
 		}
@@ -652,7 +722,7 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 						fSignature.String(), frame.Width(), frame.Height()));
 
 			if (bitmap) {
-				fBitmapList->AddItem(bitmap);
+				fBitmapList.AddItem(bitmap);
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<int32>(bitmap->Token());
 				fLink.Attach<int32>(bitmap->Area());
@@ -683,7 +753,7 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (bitmap) {
 				STRACE(("ServerApp %s: Deleting Bitmap %ld\n", fSignature.String(), id));
 
-				fBitmapList->RemoveItem(bitmap);
+				fBitmapList.RemoveItem(bitmap);
 				bitmapmanager->DeleteBitmap(bitmap);
 				fLink.StartMessage(SERVER_TRUE);
 			} else
@@ -814,7 +884,7 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				gDesktop->ActiveRootLayer()->GetCursorManager().DeleteCursor(fAppCursor->ID());
 
 			fAppCursor = new ServerCursor(cdata);
-			fAppCursor->SetOwningTeam(fClientTeamID);
+			fAppCursor->SetOwningTeam(fClientTeam);
 			fAppCursor->SetAppSignature(fSignature.String());
 			gDesktop->ActiveRootLayer()->GetCursorManager().AddCursor(fAppCursor);
 			// although this isn't pretty, ATM we have only one RootLayer.
@@ -862,7 +932,7 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read(cursorData, sizeof(cursorData));
 
 			fAppCursor = new ServerCursor(cursorData);
-			fAppCursor->SetOwningTeam(fClientTeamID);
+			fAppCursor->SetOwningTeam(fClientTeam);
 			fAppCursor->SetAppSignature(fSignature.String());
 			// although this isn't pretty, ATM we have only one RootLayer.
 			// there should be a way that this ServerApp be attached to a particular
@@ -1849,7 +1919,7 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 int32
 ServerApp::CountBitmaps() const
 {
-	return fBitmapList ? fBitmapList->CountItems() : 0;
+	return fBitmapList.CountItems();
 }
 
 
@@ -1861,13 +1931,12 @@ ServerApp::CountBitmaps() const
 ServerBitmap *
 ServerApp::FindBitmap(int32 token) const
 {
-	ServerBitmap *bitmap;
-	for (int32 i = 0; i < fBitmapList->CountItems(); i++) {
-		bitmap = static_cast<ServerBitmap *>(fBitmapList->ItemAt(i));
+	for (int32 i = 0; i < fBitmapList.CountItems(); i++) {
+		ServerBitmap *bitmap = static_cast<ServerBitmap *>(fBitmapList.ItemAt(i));
 		if (bitmap && bitmap->Token() == token)
 			return bitmap;
 	}
-	
+
 	return NULL;
 }
 
@@ -1875,16 +1944,15 @@ ServerApp::FindBitmap(int32 token) const
 int32
 ServerApp::CountPictures() const
 {
-	return fPictureList ? fPictureList->CountItems() : 0;
+	return fPictureList.CountItems();
 }
 
 
 ServerPicture *
 ServerApp::FindPicture(int32 token) const
 {
-	ServerPicture *picture;
-	for (int32 i = 0; i < fPictureList->CountItems(); i++) {
-		picture = static_cast<ServerPicture *>(fPictureList->ItemAt(i));
+	for (int32 i = 0; i < fPictureList.CountItems(); i++) {
+		ServerPicture *picture = static_cast<ServerPicture *>(fPictureList.ItemAt(i));
 		if (picture && picture->GetToken() == token)
 			return picture;
 	}
@@ -1894,15 +1962,15 @@ ServerApp::FindPicture(int32 token) const
 
 	
 team_id
-ServerApp::ClientTeamID() const
+ServerApp::ClientTeam() const
 {
-	return fClientTeamID;
+	return fClientTeam;
 }
 
 
 thread_id
-ServerApp::MonitorThreadID() const
+ServerApp::Thread() const
 {
-	return fMonitorThreadID;
+	return fThread;
 }
 

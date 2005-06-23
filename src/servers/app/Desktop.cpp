@@ -268,7 +268,7 @@ Desktop::AddWinBorder(WinBorder *winBorder)
 		for (int32 i = 0; i < count; i++) {
 			wb = (WinBorder *)fWinBorderList.ItemAt(i);
 
-			if (wb->App()->ClientTeamID() == winBorder->App()->ClientTeamID()
+			if (wb->App()->ClientTeam() == winBorder->App()->ClientTeam()
 				&& wb->Feel() == feelToLookFor) {
 				// R2: RootLayer comparison is needed.
 				feel == B_NORMAL_WINDOW_FEEL ?
@@ -322,7 +322,7 @@ Desktop::RemoveWinBorder(WinBorder *winBorder)
 				wb = (WinBorder*)fWinBorderList.ItemAt(i);
 
 				if (wb->Feel() == B_NORMAL_WINDOW_FEEL
-					&& wb->App()->ClientTeamID() == winBorder->App()->ClientTeamID()) {
+					&& wb->App()->ClientTeam() == winBorder->App()->ClientTeam()) {
 					// R2: RootLayer comparison is needed. We'll see.
 					wb->fSubWindowList.RemoveItem(winBorder);
 				}
@@ -368,7 +368,7 @@ Desktop::AddWinBorderToSubset(WinBorder *winBorder, WinBorder *toWinBorder)
 	if ((winBorder->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL
 			|| winBorder->Feel() == B_MODAL_SUBSET_WINDOW_FEEL)
 		&& toWinBorder->Feel() == B_NORMAL_WINDOW_FEEL
-		&& toWinBorder->App()->ClientTeamID() == winBorder->App()->ClientTeamID()
+		&& toWinBorder->App()->ClientTeam() == winBorder->App()->ClientTeam()
 		&& !toWinBorder->fSubWindowList.HasItem(winBorder)) {
 		// add to normal_window's list
 		toWinBorder->fSubWindowList.AddWinBorder(winBorder);
@@ -442,7 +442,7 @@ Desktop::FindWinBorderByServerWindowTokenAndTeamID(int32 token, team_id teamID)
 	Lock();
 	for (int32 i = 0; (wb = (WinBorder *)fWinBorderList.ItemAt(i)); i++) {
 		if (wb->Window()->ClientToken() == token
-			&& wb->Window()->ClientTeamID() == teamID)
+			&& wb->Window()->ClientTeam() == teamID)
 			break;
 	}
 	Unlock();

@@ -51,7 +51,8 @@ public:
 	static	int32		PicassoThread(void *data);
 			thread_id	Run(void);
 			void 		MainLoop(void);
-	
+
+			void		PostMessage(int32 code);
 			void		DispatchMessage(int32 code, BPrivate::PortLink &link);
 			ServerApp*	FindApp(const char *sig);
 
@@ -64,10 +65,10 @@ private:
 
 				port_id			fMessagePort;
 				port_id			fServerInputPort;
-	
-	volatile	bool			fQuittingServer;
-	
-				BList			*fAppList;
+
+	volatile	bool			fQuitting;
+
+				BList			fAppList;
 				thread_id		fPicassoThreadID;
 
 				thread_id		fISThreadID;

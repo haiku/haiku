@@ -2,8 +2,12 @@
  * Copyright (c) 2001-2005, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
- * Author: DarkWyrm <bpmagic@columbus.rr.com>
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
+
+
 #include <Accelerant.h>
 #include <AppDefs.h>
 #include <Directory.h>
@@ -52,6 +56,10 @@
 #	define STRACE(x) ;
 #endif
 
+
+static const uint32 kMsgShutdownServer = 'shuT';
+
+
 // Globals
 Desktop *gDesktop;
 
@@ -92,10 +100,9 @@ AppServer::AppServer(void) :
 	if (fServerInputPort == B_NO_MORE_PORTS)
 		debugger("app_server could not create input port");
 
-	fAppList = new BList();
-	fQuittingServer = false;
+	fQuitting = false;
 	sAppServer = this;
-	
+
 	// Create the font server and scan the proper directories.
 	fontserver = new FontServer;
 	fontserver->Lock();
@@ -228,19 +235,25 @@ AppServer::~AppServer(void)
 int32
 AppServer::PicassoThread(void *data)
 {
-	for (;;) {
+	while (!sAppServer->fQuitting) {
 		acquire_sem(sAppServer->fAppListLock);
 		for (int32 i = 0;;) {
-			ServerApp *app = (ServerApp *)sAppServer->fAppList->ItemAt(i++);
+			ServerApp *app = (ServerApp *)sAppServer->fAppList.ItemAt(i++);
 			if (!app)
 				break;
 
 			app->PingTarget();
 		}
-		release_sem(sAppServer->fAppListLock);		
-		// we do this every other second so as not to suck *too* many CPU cycles
+		release_sem(sAppServer->fAppListLock);
+		// we do this every second so as not to suck *too* many CPU cycles
 		snooze(1000000);
 	}
+
+	// app_server is about to quit
+	// wait some more, and then make sure it'll shutdown everything
+	snooze(2000000);
+	sAppServer->PostMessage(kMsgShutdownServer);
+
 	return 0;
 }
 
@@ -257,13 +270,13 @@ AppServer::LaunchInputServer()
 
 	fISThreadID = B_ERROR;
 
-	while (!BRoster::Private().IsMessengerValid(false) && !fQuittingServer) {
+	while (!BRoster::Private().IsMessengerValid(false) && !fQuitting) {
 		snooze(250000);
 		BRoster::Private::DeleteBeRoster();
 		BRoster::Private::InitBeRoster();
 	}
 
-	if (fQuittingServer)
+	if (fQuitting)
 		return;
 
 	// we use an area for cursor data communication with input_server
@@ -323,18 +336,15 @@ AppServer::LaunchCursorThread()
 int32
 AppServer::CursorThread(void* data)
 {
-	AppServer *app = (AppServer *)data;
+	AppServer *server = (AppServer *)data;
 
-	BPoint p;
-	
-	app->LaunchInputServer();
+	server->LaunchInputServer();
 
 	do {
-
-		while (acquire_sem(app->fCursorSem) == B_OK) {
-
-			p.y = *app->fCursorAddr & 0x7fff;
-			p.x = *app->fCursorAddr >> 15 & 0x7fff;
+		while (acquire_sem(server->fCursorSem) == B_OK) {
+			BPoint p;
+			p.y = *server->fCursorAddr & 0x7fff;
+			p.x = *server->fCursorAddr >> 15 & 0x7fff;
 
 			gDesktop->GetDisplayDriver()->MoveCursorTo(p.x, p.y);
 			STRACE(("CursorThread : %f, %f\n", p.x, p.y));
@@ -342,9 +352,22 @@ AppServer::CursorThread(void* data)
 
 		snooze(100000);
 		
-	} while (!app->fQuittingServer);
+	} while (!server->fQuitting);
 
 	return B_OK;
+}
+
+
+/*!
+	\brief Send a message to the AppServer with no attachments
+	\param code ID code of the message to post
+*/
+void
+AppServer::PostMessage(int32 code)
+{
+	BPrivate::LinkSender link(fMessagePort);
+	link.StartMessage(code);
+	link.Flush();
 }
 
 
@@ -365,38 +388,19 @@ AppServer::Run(void)
 void
 AppServer::MainLoop(void)
 {
-	BPrivate::PortLink pmsg(-1, fMessagePort);
+	BPrivate::PortLink link(-1, fMessagePort);
 
 	while (1) {
 		STRACE(("info: AppServer::MainLoop listening on port %ld.\n", fMessagePort));
 
 		int32 code;
-		status_t err = pmsg.GetNextMessage(code);
+		status_t err = link.GetNextMessage(code);
 		if (err < B_OK) {
-			STRACE(("MainLoop:pmsg.GetNextMessage() failed\n"));
+			STRACE(("MainLoop:link.GetNextMessage() failed\n"));
 			continue;
 		}
 
-		switch (code) {
-			case B_QUIT_REQUESTED:
-			case AS_CREATE_APP:
-			case AS_DELETE_APP:
-			case AS_UPDATED_CLIENT_FONTLIST:
-			case AS_QUERY_FONTS_CHANGED:
-			case AS_SET_UI_COLORS:
-			case AS_GET_UI_COLOR:
-			case AS_SET_DECORATOR:
-			case AS_GET_DECORATOR:
-			case AS_R5_SET_DECORATOR:
-				DispatchMessage(code, pmsg);
-				break;
-			default:
-			{
-				STRACE(("Server::MainLoop received unexpected code %ld (offset %ld)\n",
-						code, code - SERVER_TRUE));
-				break;
-			}
-		}
+		DispatchMessage(code, link);
 	}
 }
 
@@ -413,7 +417,7 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 		case AS_CREATE_APP:
 		{
 			// Create the ServerApp to node monitor a new BApplication
-			
+
 			// Attached data:
 			// 1) port_id - receiver port of a regular app
 			// 2) port_id - client looper port - for send messages to the client
@@ -435,39 +439,29 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 			if (msg.ReadString(&appSignature) != B_OK)
 				break;
 
-			port_id serverListen = create_port(DEFAULT_MONITOR_PORT_SIZE, appSignature);
-			if (serverListen < B_OK) {
-				printf("No more ports left. Time to crash. Have a nice day! :)\n");
-				break;
-			}
-
-			// we let the application own the port, so that we get aware when it's gone
-			if (set_port_owner(serverListen, clientTeamID) < B_OK) {
-				delete_port(serverListen);
-				printf("Could not transfer port ownership to client %ld!\n", clientTeamID);
-				break;
-			}
-
-			// Create the ServerApp subthread for this app
-			acquire_sem(fAppListLock);
-
-			ServerApp *app = new ServerApp(clientReplyPort, serverListen, clientLooperPort,
+			ServerApp *app = new ServerApp(clientReplyPort, clientLooperPort,
 				clientTeamID, htoken, appSignature);
+			if (app->InitCheck() == B_OK
+				&& app->Run()) {
+				// add the new ServerApp to the known list of ServerApps
+				acquire_sem(fAppListLock);
+				fAppList.AddItem(app);
+				release_sem(fAppListLock);
+			} else {
+				delete app;
 
-			// add the new ServerApp to the known list of ServerApps
-			fAppList->AddItem(app);
-
-			release_sem(fAppListLock);
-
-			BPrivate::PortLink replylink(clientReplyPort);
-			replylink.StartMessage(SERVER_TRUE);
-			replylink.Attach<int32>(serverListen);
-			replylink.Flush();
+				// if everything went well, ServerApp::Run() will notify
+				// the client - but since it didn't, we do it here
+				BPrivate::LinkSender reply(clientReplyPort);
+				reply.StartMessage(SERVER_FALSE);
+				reply.Flush();
+			}
 
 			// This is necessary because BPortLink::ReadString allocates memory
 			free(appSignature);
 			break;
 		}
+
 		case AS_DELETE_APP:
 		{
 			// Delete a ServerApp. Received only from the respective ServerApp when a
@@ -476,41 +470,45 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 			// Attached Data:
 			// 1) thread_id - thread ID of the ServerApp to be deleted
 
-			int32 i = 0, appnum = fAppList->CountItems();
-			ServerApp *srvapp = NULL;
-			thread_id srvapp_id = -1;
-
-			if (msg.Read<thread_id>(&srvapp_id) < B_OK)
+			thread_id thread = -1;
+			if (msg.Read<thread_id>(&thread) < B_OK)
 				break;
 
 			acquire_sem(fAppListLock);
 
 			// Run through the list of apps and nuke the proper one
-			for (i = 0; i < appnum; i++) {
-				srvapp = (ServerApp *)fAppList->ItemAt(i);
 
-				if (srvapp != NULL && srvapp->MonitorThreadID() == srvapp_id) {
-					srvapp = (ServerApp *)fAppList->RemoveItem(i);
-					if (srvapp) {
-						delete srvapp;
-						srvapp = NULL;
-					}
-					break;	// jump out of our for() loop
+			int32 count = fAppList.CountItems();
+			ServerApp *removeApp = NULL;
+
+			for (int32 i = 0; i < count; i++) {
+				ServerApp *app = (ServerApp *)fAppList.ItemAt(i);
+
+				if (app != NULL && app->Thread() == thread) {
+					fAppList.RemoveItem(i);
+					removeApp = app;
+					break;
 				}
 			}
 
 			release_sem(fAppListLock);
+
+			if (removeApp != NULL)
+				removeApp->Quit();
+
+			if (fQuitting && count <= 1)
+				PostMessage(kMsgShutdownServer);
 			break;
 		}
+
 		case AS_UPDATED_CLIENT_FONTLIST:
-		{
 			// received when the client-side global font list has been
 			// refreshed
 			fontserver->Lock();
 			fontserver->FontsUpdated();
 			fontserver->Unlock();
 			break;
-		}
+
 		case AS_QUERY_FONTS_CHANGED:
 		{
 			// Client application is asking if the font list has changed since
@@ -531,50 +529,34 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 			BPrivate::PortLink replylink(replyport);
 			replylink.StartMessage(needs_update ? SERVER_TRUE : SERVER_FALSE);
 			replylink.Flush();
-			
 			break;
 		}
-		case B_QUIT_REQUESTED:
-		{
+
 #if TEST_MODE
-			// Attached Data:
-			// none
-			
+		case B_QUIT_REQUESTED:
 			// We've been asked to quit, so (for now) broadcast to all
 			// test apps to quit. This situation will occur only when the server
 			// is compiled as a regular Be application.
 
+			fQuitting = true;
 			BroadcastToAllApps(AS_QUIT_APP);
 
-			// we have to wait until *all* threads have finished!
-			ServerApp *app;
+			// We now need to process the remaining AS_DELETE_APP messages and
+			// wait for the kMsgShutdownServer message.
+			// If an application does not quit as asked, the picasso thread
+			// will send us this message in 2-3 seconds.
+			break;
+
+		case kMsgShutdownServer:
+			// let's kill all remaining applications
+
 			acquire_sem(fAppListLock);
-			thread_info tinfo;
-			for (int32 i = 0; i < fAppList->CountItems(); i++) {
-				app = (ServerApp*)fAppList->ItemAt(i);
-				if (!app)
-					continue;
 
-				// Instead of calling wait_for_thread, we will wait a bit, check for the
-				// thread_id. We will only wait so long, because then the app is probably crashed
-				// or hung. Seeing that being the case, we'll kill its BApp team and fake the
-				// quit message
-				if (get_thread_info(app->MonitorThreadID(), &tinfo)==B_OK) {
-					bool killteam = true;
+			for (int32 i = 0; i < fAppList.CountItems(); i++) {
+				ServerApp *app = (ServerApp*)fAppList.ItemAt(i);
 
-					for (int32 j = 0; j < 5; j++) {
-						snooze(500000);	// wait half a second for it to quit
-						if (get_thread_info(app->MonitorThreadID(), &tinfo) != B_OK) {
-							killteam = false;
-							break;
-						}
-					}
-
-					if (killteam) {
-						kill_team(app->ClientTeamID());
-						app->PostMessage(B_QUIT_REQUESTED);
-					}
-				}
+				kill_thread(app->Thread());
+				kill_team(app->ClientTeam());
 			}
 
 			kill_thread(fPicassoThreadID);
@@ -582,15 +564,14 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 			release_sem(fAppListLock);
 
 			delete gDesktop;
-			delete fAppList;
 			delete bitmapmanager;
 			delete fontserver;
 
 			// we are now clear to exit
 			exit_thread(0);
-#endif
 			break;
-		}
+#endif
+
 		case AS_SET_SYSCURSOR_DEFAULTS:
 		{
 			// although this isn't pretty, ATM we only have RootLayer.
@@ -599,8 +580,10 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 			gDesktop->ActiveRootLayer()->GetCursorManager().SetDefaults();
 			break;
 		}
+
 		default:
-			// we should never get here.
+			STRACE(("Server::MainLoop received unexpected code %ld (offset %ld)\n",
+				code, code - SERVER_TRUE));
 			break;
 	}
 }
@@ -614,30 +597,30 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 	while it does its searching.
 */
 ServerApp *
-AppServer::FindApp(const char *sig)
+AppServer::FindApp(const char *signature)
 {
-	if (!sig)
+	if (!signature)
 		return NULL;
-
-	ServerApp *foundapp=NULL;
 
 	acquire_sem(fAppListLock);
 
-	for(int32 i=0; i<fAppList->CountItems();i++)
-	{
-		foundapp=(ServerApp*)fAppList->ItemAt(i);
-		if(foundapp && foundapp->Title() == sig)
-		{
-			release_sem(fAppListLock);
-			return foundapp;
+	ServerApp *foundApp = NULL;
+	for (int32 i = 0; i < fAppList.CountItems(); i++) {
+		ServerApp *app = (ServerApp*)fAppList.ItemAt(i);
+		if (app && !strcasecmp(app->Signature(), signature)) {
+			foundApp = app;
+			break;
 		}
 	}
 
 	release_sem(fAppListLock);
-	
-	// couldn't find a match
-	return NULL;
+
+	return foundApp;
 }
+
+
+//	#pragma mark -
+
 
 /*!
 	\brief Send a quick (no attachments) message to all applications
@@ -650,18 +633,19 @@ BroadcastToAllApps(const int32 &code)
 {
 	acquire_sem(sAppServer->fAppListLock);
 
-	for (int32 i = 0; i < sAppServer->fAppList->CountItems(); i++) {
-		ServerApp *app = (ServerApp *)sAppServer->fAppList->ItemAt(i);
+	for (int32 i = 0; i < sAppServer->fAppList.CountItems(); i++) {
+		ServerApp *app = (ServerApp *)sAppServer->fAppList.ItemAt(i);
 
-		if (!app)
-			{ printf("PANIC in Broadcast()\n"); continue; }
+		if (!app) {
+			printf("PANIC in Broadcast()\n");
+			continue;
+		}
 		app->PostMessage(code);
 	}
 
 	release_sem(sAppServer->fAppListLock);
 }
 
-//	#pragma mark -
 
 /*!
 	\brief Entry function to run the entire server
@@ -677,7 +661,9 @@ main(int argc, char** argv)
 		return -1;
 
 	srand(real_time_clock_usecs());
-	AppServer app_server;
-	app_server.Run();
+
+	AppServer server;
+	server.Run();
+
 	return 0;
 }

@@ -1,32 +1,17 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		ServerApp.h
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//					Adi Oanca <adioanca@myrealbox.com>
-//	Description:	Server-side BApplication counterpart
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Adrian Oanca <adioanca@cotty.iren.ro>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ *		Stefano Ceccherini (burton666@libero.it)
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
 #ifndef _SERVERAPP_H_
 #define _SERVERAPP_H_
+
 
 #include <OS.h>
 #include <String.h>
@@ -52,11 +37,14 @@ namespace BPrivate {
 */
 class ServerApp {
 public:
-	ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort,
+	ServerApp(port_id clientAppPort, port_id clientLooperPort,
 		team_id clientTeamID, int32 handlerID, const char* signature);
-	virtual	~ServerApp(void);
-	
-	bool Run(void);
+	~ServerApp();
+
+	status_t InitCheck();
+	bool Run();
+
+	void Quit();
 	/*
 	TODO: These aren't even implemented...
 	void Lock(void);
@@ -69,19 +57,19 @@ public:
 	*/
 	bool IsActive(void) const { return fIsActive; }
 	void Activate(bool value);
-	
+
 	bool PingTarget(void);
-	
+
 	void PostMessage(int32 code);
 	void SendMessageToClient( const BMessage* msg ) const;
-	
+
 	void SetAppCursor(void);
-	
-	team_id	ClientTeamID() const;
-	thread_id MonitorThreadID() const;
-	
-	const char *Title() const { return fSignature.String(); }
-	
+
+	team_id	ClientTeam() const;
+	thread_id Thread() const;
+
+	const char *Signature() const { return fSignature.String(); }
+
 	int32 CountBitmaps() const;
 	ServerBitmap *FindBitmap(int32 token) const;
 	
@@ -93,12 +81,16 @@ public:
 	SubWindowList fAppSubWindowList;
 	
 private:
-	void DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
+	void _DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
+	void _MessageLooper();
 
-	static int32 MonitorApp(void *data);	
+	static int32 _message_thread(void *data);	
+
+	// TODO: Not used.
+	sem_id fLockSem;
 
 	// our BApplication's event port
-	port_id	fClientAppPort;	
+	port_id	fClientReplyPort;	
 	// port we receive messages from our BApplication
 	port_id	fMessagePort;
 			// TODO: find out why there is both the app port and the looper port. Do 
@@ -109,23 +101,20 @@ private:
 
 	BString fSignature;
 
-	thread_id fMonitorThreadID;
-	team_id fClientTeamID;
+	thread_id fThread;
+	team_id fClientTeam;
 
 	BPrivate::PortLink fLink;
 
 	// TODO:
 	// - Are really Bitmaps and Pictures stored per application and not globally ?
 	// - As we reference these stuff by token, what about putting them in hash tables ?
-	BList *fSWindowList,
-		  *fBitmapList,
-		  *fPictureList;
-		  
+	BList fWindowList;
+	BList fBitmapList;
+	BList fPictureList;
+
 	ServerCursor *fAppCursor;
-	
-	// TODO: Not used.
-	sem_id fLockSem;
-	
+
 	bool fCursorHidden;
 	bool fIsActive;
 	
