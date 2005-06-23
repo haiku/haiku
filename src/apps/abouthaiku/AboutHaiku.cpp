@@ -99,7 +99,7 @@ AboutWindow::QuitRequested(void)
 AboutView::AboutView(const BRect &r)
  : BView(r, "aboutview", B_FOLLOW_ALL, B_WILL_DRAW | B_PULSE_NEEDED)
 {
-	fLogo=BTranslationUtils::GetBitmap("haikulogo.png");
+	fLogo=BTranslationUtils::GetBitmap('PNG ',"haikulogo.png");
 	
 	if(fLogo)
 	{
