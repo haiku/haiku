@@ -6,6 +6,8 @@
  *			Adi Oanca <adioanca@cotty.iren.ro>
  *			Stephan Aßmus <superstippi@gmx.de>
  */
+
+
 #include <Locker.h>
 #include <Region.h>
 #include <String.h>
@@ -476,21 +478,21 @@ WinBorder::MouseUp(const PointerEvent& event)
 			fIsZooming	= false;
 			fDecorator->SetZoom(false);
 			if (action == DEC_ZOOM)
-				Window()->Zoom();
+				Window()->NotifyZoom();
 			return;
 		}
 		if (fIsClosing) {
 			fIsClosing	= false;
 			fDecorator->SetClose(false);
 			if (action == DEC_CLOSE)
-				Window()->Quit();
+				Window()->NotifyQuitRequested();
 			return;
 		}
 		if (fIsMinimizing) {
 			fIsMinimizing = false;
 			fDecorator->SetMinimize(false);
 			if (action == DEC_MINIMIZE)
-				Window()->Minimize(true);
+				Window()->NotifyMinimize(true);
 			return;
 		}
 	}

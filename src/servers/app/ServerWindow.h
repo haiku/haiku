@@ -12,9 +12,9 @@
 #ifndef _SERVERWIN_H_
 #define _SERVERWIN_H_
 
+
 #include <GraphicsDefs.h>
-#include <LinkMsgReader.h>
-#include <LinkMsgSender.h>
+#include <PortLink.h>
 #include <Locker.h>
 #include <Message.h>
 #include <OS.h>
@@ -29,9 +29,9 @@ class BString;
 class BMessenger;
 class BPoint;
 class BMessage;
+
 class ServerApp;
 class Decorator;
-class BPortLink;
 class WinBorder;
 class Workspace;
 class RootLayer;
@@ -53,26 +53,28 @@ class ServerPicture;
 */
 class ServerWindow : public BLocker {
 public:
-								ServerWindow(	const char *string,
-												ServerApp *winapp,
-												port_id winport,
-												port_id looperPort,
-												int32 handlerID);
-	virtual						~ServerWindow(void);
+								ServerWindow(const char *title, ServerApp *app,
+									port_id clientPort, port_id looperPort, 
+									int32 handlerID, BRect frame, uint32 look,
+									uint32 feel, uint32 flags, uint32 workspace);
+	virtual						~ServerWindow();
 
-			void				Init(	BRect frame,
-										uint32 wlook, uint32 wfeel, uint32 wflags,
-										uint32 wwksindex);
+			status_t			InitCheck();
+			bool				Run();
+			void				Quit();
 
-			void				ReplaceDecorator(void);
-			void				Show(void);
-			void				Hide(void);
+			void				ReplaceDecorator();
+			void				Show();
+			void				Hide();
+
+			void				PostMessage(int32 code);
 
 			// methods for sending various messages to client.
-			void				Quit(void);
-			void				Minimize(bool status);
-			void				Zoom(void);
-			void				ScreenModeChanged(const BRect frame, const color_space cspace);
+			void				NotifyQuitRequested();
+			void				NotifyMinimize(bool minimize);
+			void				NotifyZoom();
+			void				NotifyScreenModeChanged(const BRect frame,
+									const color_space cspace);
 
 			// util methods.	
 			void				SendMessageToClient(const BMessage* msg,
@@ -103,12 +105,13 @@ private:
 			Layer*				CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent);
 			void				SetLayerState(Layer *layer, BPrivate::LinkReceiver &link);
 			void				SetLayerFontState(Layer *layer, BPrivate::LinkReceiver &link);
-			void				ClientDied(bool crashed);
 
-			// message handle methods.
-			void				DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
-			void				DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link);
-	static	int32				MonitorWin(void *data);
+			// message handling methods.
+			void				_DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
+			void				_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link);
+			void				_MessageLooper();
+
+	static	int32				_message_thread(void *_window);
 
 			// used by CopyBits and Scrolling
 			void				_CopyBits(RootLayer* rootLayer,
@@ -137,8 +140,7 @@ private:
 			port_id				fClientReplyPort;
 			port_id				fClientLooperPort;
 
-			BPrivate::LinkReceiver*	fMsgReceiver;
-			BPrivate::LinkSender*	fMsgSender;
+			BPrivate::PortLink	fLink;
 
 			BMessage			fClientViewsWithInvalidCoords;
 

@@ -192,14 +192,9 @@ ServerApp::Run()
 
 	// Unlike a BApplication, a ServerApp is *supposed* to return immediately
 	// when its Run() function is called.	
-	fThread = spawn_thread(_message_thread, fSignature.String(), B_NORMAL_PRIORITY, this);
+	fThread = spawn_thread(_message_thread, Signature(), B_NORMAL_PRIORITY, this);
 	if (fThread < B_OK)
 		return false;
-
-	// Let's tell the client how to talk with us
-	fLink.StartMessage(SERVER_TRUE);
-	fLink.Attach<int32>(fMessagePort);
-	fLink.Flush();
 
 	if (resume_thread(fThread) != B_OK) {
 		fQuitting = true;
@@ -207,6 +202,11 @@ ServerApp::Run()
 		fThread = -1;
 		return false;
 	}
+
+	// Let's tell the client how to talk with us
+	fLink.StartMessage(SERVER_TRUE);
+	fLink.Attach<int32>(fMessagePort);
+	fLink.Flush();
 
 	return true;
 }
@@ -230,10 +230,7 @@ ServerApp::Quit()
 	// execute application deletion in the message looper thread
 
 	fQuitting = true;
-
-	BPrivate::LinkSender link(fMessagePort);
-	link.StartMessage(kMsgAppQuit);
-	link.Flush();
+	PostMessage(kMsgAppQuit);
 
 	send_data(fThread, 'QUIT', NULL, 0);
 }
@@ -390,7 +387,7 @@ ServerApp::_MessageLooper()
 				uint32 flags;
 				uint32 workspaces;
 				int32 token = B_NULL_TOKEN;
-				port_id	sendPort = -1;
+				port_id	clientReplyPort = -1;
 				port_id looperPort = -1;
 				char *title = NULL;
 
@@ -400,27 +397,32 @@ ServerApp::_MessageLooper()
 				receiver.Read<uint32>(&flags);
 				receiver.Read<uint32>(&workspaces);
 				receiver.Read<int32>(&token);
-				receiver.Read<port_id>(&sendPort);
+				receiver.Read<port_id>(&clientReplyPort);
 				receiver.Read<port_id>(&looperPort);
 				if (receiver.ReadString(&title) != B_OK)
 					break;
 
-				STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n",
-					Signature()));
-
 				// ServerWindow constructor will reply with port_id of a newly created port
-				ServerWindow *window = new ServerWindow(title, this, sendPort, looperPort,
-					token);
-				window->Init(frame, look, feel, flags, workspaces);
-
-				if (fWindowListLock.Lock()) {
-					fWindowList.AddItem(window);
-					fWindowListLock.Unlock();
-				}
+				ServerWindow *window = new ServerWindow(title, this, clientReplyPort,
+					looperPort, token, frame, look, feel, flags, workspaces);
 
 				STRACE(("\nServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
-					app->fSignature.String(), title, frame.left, frame.top,
-					frame.right, frame.bottom));
+					fSignature(), title, frame.left, frame.top, frame.right, frame.bottom));
+				
+				if (window->InitCheck() == B_OK && window->Run()) {
+					// add the window to the list
+					if (fWindowListLock.Lock()) {
+						fWindowList.AddItem(window);
+						fWindowListLock.Unlock();
+					}
+				} else {
+					delete window;
+
+					// window creation failed, we need to notify the client
+					BPrivate::LinkSender reply(clientReplyPort);
+					reply.StartMessage(SERVER_FALSE);
+					reply.Flush();
+				}
 
 				// We don't have to free the title, as it's owned by the ServerWindow now
 				break;

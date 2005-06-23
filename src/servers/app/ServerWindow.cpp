@@ -60,6 +60,9 @@
 #endif
 
 
+static const uint32 kMsgWindowQuit = 'winQ';
+
+
 /*!
 	\brief Constructor
 	
@@ -67,72 +70,127 @@
 	monitor thread.
 */
 ServerWindow::ServerWindow(const char *title, ServerApp *app,
-	port_id clientPort, port_id looperPort, int32 handlerID)
-	: BLocker(*title ? title : "Unnamed Window"),
+	port_id clientPort, port_id looperPort, int32 handlerID,
+	BRect frame, uint32 look, uint32 feel, uint32 flags, uint32 workspace)
+	: BLocker(title && *title ? title : "Unnamed Window"),
 	fTitle(title),
 	fServerApp(app),
+	fWinBorder(NULL),
+	fClientTeam(app->ClientTeam()),
+	fMessagePort(-1),
 	fClientReplyPort(clientPort),
 	fClientLooperPort(looperPort),
 	fClientViewsWithInvalidCoords(B_VIEW_RESIZED),
-	fHandlerToken(handlerID)
+	fHandlerToken(handlerID),
+	fCurrentLayer(NULL)
 {
 	STRACE(("ServerWindow(%s)::ServerWindow()\n", title));
 
 	if (fTitle == NULL)
 		fTitle = strdup("Unnamed Window");
-
-	fClientTeam = app->ClientTeam();
-	fWinBorder = NULL;
-	fCurrentLayer = NULL;
+	if (fTitle == NULL)
+		return;
 
 	// fMessagePort is the port to which the app sends messages for the server
-	fMessagePort = create_port(30, fTitle);
+	fMessagePort = create_port(100, fTitle);
+	if (fMessagePort < B_OK)
+		return;
 
-	fMsgSender = new BPrivate::LinkSender(fClientReplyPort);
-	fMsgReceiver = new BPrivate::LinkReceiver(fMessagePort);
+	fLink.SetSenderPort(fClientReplyPort);
+	fLink.SetReceiverPort(fMessagePort);
 
-	// Send a reply to our window - it is expecting fMessagePort port.
-	fMsgSender->StartMessage(SERVER_TRUE);
-	fMsgSender->Attach<port_id>(fMessagePort);
-	fMsgSender->Flush();
+	char name[60];
+	snprintf(name, sizeof(name), "%ld: %s", fClientTeam, fTitle);
+
+	fWinBorder = new WinBorder(frame, name, look, feel, flags,
+		workspace, this, gDesktop->GetDisplayDriver());
 
 	STRACE(("ServerWindow %s Created\n", fTitle));
 }
 
 
-void
-ServerWindow::Init(BRect frame, uint32 wlook, 
-	uint32 wfeel, uint32 wflags, uint32 wwksindex)
-{
-	char name[60];
-	snprintf(name, sizeof(name), "%ld: %s", fClientTeam, fTitle);
-
-	fWinBorder = new WinBorder(frame, name, wlook, wfeel, wflags,
-		wwksindex, this, gDesktop->GetDisplayDriver());
-
-	// Spawn our message-monitoring thread
-	fThread = spawn_thread(MonitorWin, fTitle, B_NORMAL_PRIORITY, this);
-	if (fThread >= B_OK)
-		resume_thread(fThread);
-}
-
-
 //!Tears down all connections the main app_server objects, and deletes some internals.
-ServerWindow::~ServerWindow(void)
+ServerWindow::~ServerWindow()
 {
 	STRACE(("*ServerWindow (%s):~ServerWindow()\n", fTitle));
 
 	delete fWinBorder;
-	delete fMsgSender;
-	delete fMsgReceiver;
 	free(const_cast<char *>(fTitle));
 
 	STRACE(("#ServerWindow(%s) will exit NOW\n", fTitle));
 }
 
+
+status_t
+ServerWindow::InitCheck()
+{
+	if (fTitle == NULL || fWinBorder == NULL)
+		return B_NO_MEMORY;
+
+	if (fMessagePort < B_OK)
+		return fMessagePort;
+
+	return B_OK;
+}
+
+
+bool
+ServerWindow::Run()
+{
+	// Spawn our message-monitoring thread
+	fThread = spawn_thread(_message_thread, fTitle, B_NORMAL_PRIORITY, this);
+	if (fThread < B_OK)
+		return false;
+
+	if (resume_thread(fThread) != B_OK) {
+		kill_thread(fThread);
+		fThread = -1;
+		return false;
+	}
+
+	// Send a reply to our window - it is expecting fMessagePort port.
+	fLink.StartMessage(SERVER_TRUE);
+	fLink.Attach<port_id>(fMessagePort);
+	fLink.Flush();
+
+	return true;
+}
+
+
+void
+ServerWindow::Quit()
+{
+	if (fThread < B_OK) {
+		delete this;
+		return;
+	}
+
+	if (fThread == find_thread(NULL)) {
+		App()->RemoveWindow(this);
+
+		delete this;
+		exit_thread(0);
+	} else
+		PostMessage(kMsgWindowQuit);
+}
+
+
+/*!
+	\brief Send a message to the ServerWindow with no attachments
+	\param code ID code of the message to post
+*/
+void
+ServerWindow::PostMessage(int32 code)
+{
+	BPrivate::LinkSender link(fMessagePort);
+	link.StartMessage(code);
+	link.Flush();
+}
+
+
 //! Forces the window border to update its decorator
 void
-ServerWindow::ReplaceDecorator(void)
+ServerWindow::ReplaceDecorator()
 {
 	if (!IsLocked())
 		debugger("you must lock a ServerWindow object before calling ::ReplaceDecorator()\n");
@@ -141,20 +199,9 @@ ServerWindow::ReplaceDecorator(void)
 	fWinBorder->UpdateDecorator();
 }
 
-//! Requests that the ServerWindow's BWindow quit
-void
-ServerWindow::Quit(void)
-{
-	// NOTE: if you do something else, other than sending a port message, PLEASE lock
-	STRACE(("ServerWindow %s: Quit\n", fTitle));
-
-	BMessage msg(B_QUIT_REQUESTED);
-	SendMessageToClient(&msg);
-}
-
 //! Shows the window's WinBorder
 void
-ServerWindow::Show(void)
+ServerWindow::Show()
 {
 	// NOTE: if you do something else, other than sending a port message, PLEASE lock
 	STRACE(("ServerWindow %s: Show\n", Title()));
@@ -167,7 +214,7 @@ ServerWindow::Show(void)
 
 //! Hides the window's WinBorder
 void
-ServerWindow::Hide(void)
+ServerWindow::Hide()
 {
 	// NOTE: if you do something else, other than sending a port message, PLEASE lock
 	STRACE(("ServerWindow %s: Hide\n", Title()));
@@ -179,8 +226,20 @@ ServerWindow::Hide(void)
 }
 
 
+//! Requests that the ServerWindow's BWindow quit
 void
-ServerWindow::Minimize(bool status)
+ServerWindow::NotifyQuitRequested()
+{
+	// NOTE: if you do something else, other than sending a port message, PLEASE lock
+	STRACE(("ServerWindow %s: Quit\n", fTitle));
+
+	BMessage msg(B_QUIT_REQUESTED);
+	SendMessageToClient(&msg);
+}
+
+
+void
+ServerWindow::NotifyMinimize(bool minimize)
 {
 	// NOTE: if you do something else, other than sending a port message, PLEASE lock
 	// This function doesn't need much -- check to make sure that we should and
@@ -188,7 +247,7 @@ ServerWindow::Minimize(bool status)
 	// does all the heavy lifting for us. :)
 	bool sendMessages = false;
 
-	if (status) {
+	if (minimize) {
 		if (!fWinBorder->IsHidden()) {
 			Hide();
 			sendMessages = true;
@@ -201,10 +260,9 @@ ServerWindow::Minimize(bool status)
 	}
 
 	if (sendMessages) {
-		BMessage msg;
-		msg.what = B_MINIMIZE;
+		BMessage msg(B_MINIMIZE);
 		msg.AddInt64("when", real_time_clock_usecs());
-		msg.AddBool("minimize", status);
+		msg.AddBool("minimize", minimize);
 
 		SendMessageToClient(&msg);
 	}
@@ -212,7 +270,7 @@ ServerWindow::Minimize(bool status)
 
 //! Sends a message to the client to perform a Zoom
 void
-ServerWindow::Zoom()
+ServerWindow::NotifyZoom()
 {
 	// NOTE: if you do something else, other than sending a port message, PLEASE lock
 	BMessage msg(B_ZOOM);
@@ -225,7 +283,7 @@ ServerWindow::Zoom()
 	\param color_space Color space of the new screen mode
 */
 void
-ServerWindow::ScreenModeChanged(const BRect frame, const color_space colorSpace)
+ServerWindow::NotifyScreenModeChanged(const BRect frame, const color_space colorSpace)
 {
 	STRACE(("ServerWindow %s: ScreenModeChanged\n", fTitle));
 
@@ -318,7 +376,7 @@ ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent)
 
 
 void
-ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
+ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 {
 	if (fCurrentLayer == NULL && code != AS_LAYER_CREATE_ROOT && code != AS_LAYER_CREATE) {
 		printf("ServerWindow %s received unexpected code - message offset %ld before top_view attached.\n", Title(), code - SERVER_TRUE);
@@ -430,7 +488,6 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (parent != NULL)
 				parent->AddChild(newLayer, this);
 
-//printf("Adi: create %s\n", fTitle);
 			if (!newLayer->IsHidden())
 #ifndef NEW_CLIPPING
 				myRootLayer->GoInvalidate(newLayer, newLayer->fFull);
@@ -494,16 +551,16 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_STATE: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
 
-			fMsgSender->StartMessage(SERVER_TRUE);
+			fLink.StartMessage(SERVER_TRUE);
 
 			// attach state data
-			fCurrentLayer->fLayerData->WriteToLink(*fMsgSender);
+			fCurrentLayer->fLayerData->WriteToLink(fLink.Sender());
 
-			fMsgSender->Attach<float>(fCurrentLayer->fFrame.left);
-			fMsgSender->Attach<float>(fCurrentLayer->fFrame.top);
-			fMsgSender->Attach<BRect>(fCurrentLayer->fFrame.OffsetToCopy(fCurrentLayer->BoundsOrigin()));
+			fLink.Attach<float>(fCurrentLayer->fFrame.left);
+			fLink.Attach<float>(fCurrentLayer->fFrame.top);
+			fLink.Attach<BRect>(fCurrentLayer->fFrame.OffsetToCopy(fCurrentLayer->BoundsOrigin()));
 
-			fMsgSender->Flush();
+			fLink.Flush();
 			break;
 		}
 		case AS_LAYER_SET_MOUSE_EVENT_MASK:
@@ -552,13 +609,13 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_LAYER_GET_COORD:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			fMsgSender->StartMessage(SERVER_TRUE);
+			fLink.StartMessage(SERVER_TRUE);
 			// our offset in the parent -> will be originX and originY in BView
-			fMsgSender->Attach<float>(fCurrentLayer->fFrame.left);
-			fMsgSender->Attach<float>(fCurrentLayer->fFrame.top);
+			fLink.Attach<float>(fCurrentLayer->fFrame.left);
+			fLink.Attach<float>(fCurrentLayer->fFrame.top);
 			// convert frame to bounds
-			fMsgSender->Attach<BRect>(fCurrentLayer->fFrame.OffsetToCopy(fCurrentLayer->BoundsOrigin()));
-			fMsgSender->Flush();
+			fLink.Attach<BRect>(fCurrentLayer->fFrame.OffsetToCopy(fCurrentLayer->BoundsOrigin()));
+			fLink.Flush();
 			break;
 		}
 		case AS_LAYER_SET_ORIGIN:
@@ -575,9 +632,9 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_LAYER_GET_ORIGIN:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_ORIGIN: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Attach<BPoint>(fCurrentLayer->fLayerData->Origin());
-			fMsgSender->Flush();
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<BPoint>(fCurrentLayer->fLayerData->Origin());
+			fLink.Flush();
 			break;
 		}
 		case AS_LAYER_RESIZE_MODE:
@@ -638,11 +695,11 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_LAYER_GET_LINE_MODE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_LINE_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Attach<int8>((int8)(fCurrentLayer->fLayerData->LineCapMode()));
-			fMsgSender->Attach<int8>((int8)(fCurrentLayer->fLayerData->LineJoinMode()));
-			fMsgSender->Attach<float>(fCurrentLayer->fLayerData->MiterLimit());
-			fMsgSender->Flush();
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<int8>((int8)(fCurrentLayer->fLayerData->LineCapMode()));
+			fLink.Attach<int8>((int8)(fCurrentLayer->fLayerData->LineJoinMode()));
+			fLink.Attach<float>(fCurrentLayer->fLayerData->MiterLimit());
+			fLink.Flush();
 		
 			break;
 		}
@@ -690,9 +747,9 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			while ((ld = ld->prevState))
 				scale *= ld->Scale();
 			
-			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Attach<float>(scale);
-			fMsgSender->Flush();
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<float>(scale);
+			fLink.Flush();
 		
 			break;
 		}
@@ -711,9 +768,9 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_LAYER_GET_PEN_LOC:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Attach<BPoint>(fCurrentLayer->fLayerData->PenLocation());
-			fMsgSender->Flush();
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<BPoint>(fCurrentLayer->fLayerData->PenLocation());
+			fLink.Flush();
 		
 			break;
 		}
@@ -729,9 +786,9 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_LAYER_GET_PEN_SIZE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Attach<float>(fCurrentLayer->fLayerData->PenSize());
-			fMsgSender->Flush();
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<float>(fCurrentLayer->fLayerData->PenSize());
+			fLink.Flush();
 		
 			break;
 		}
@@ -759,11 +816,11 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			lowColor = fCurrentLayer->fLayerData->LowColor().GetColor32();
 			viewColor = fCurrentLayer->ViewColor().GetColor32();
 			
-			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Attach(&highColor, sizeof(rgb_color));
-			fMsgSender->Attach(&lowColor, sizeof(rgb_color));
-			fMsgSender->Attach(&viewColor, sizeof(rgb_color));
-			fMsgSender->Flush();
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach(&highColor, sizeof(rgb_color));
+			fLink.Attach(&lowColor, sizeof(rgb_color));
+			fLink.Attach(&viewColor, sizeof(rgb_color));
+			fLink.Flush();
 
 			break;
 		}
@@ -783,10 +840,10 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_LAYER_GET_BLEND_MODE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_BLEND_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Attach<int8>((int8)(fCurrentLayer->fLayerData->AlphaSrcMode()));
-			fMsgSender->Attach<int8>((int8)(fCurrentLayer->fLayerData->AlphaFncMode()));
-			fMsgSender->Flush();
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<int8>((int8)(fCurrentLayer->fLayerData->AlphaSrcMode()));
+			fLink.Attach<int8>((int8)(fCurrentLayer->fLayerData->AlphaFncMode()));
+			fLink.Flush();
 
 			break;
 		}
@@ -804,9 +861,9 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_LAYER_GET_DRAW_MODE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_DRAW_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Attach<int8>((int8)(fCurrentLayer->fLayerData->GetDrawingMode()));
-			fMsgSender->Flush();
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<int8>((int8)(fCurrentLayer->fLayerData->GetDrawingMode()));
+			fLink.Flush();
 		
 			break;
 		}
@@ -868,9 +925,9 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// if this Layer is hidden, it is clear that its visible region is void.
 			if (fCurrentLayer->IsHidden())
 			{
-				fMsgSender->StartMessage(SERVER_TRUE);
-				fMsgSender->Attach<int32>(0L);
-				fMsgSender->Flush();
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach<int32>(0L);
+				fLink.Flush();
 			}
 			else
 			{
@@ -896,11 +953,11 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				}
 			
 				noOfRects = reg.CountRects();
-				fMsgSender->StartMessage(SERVER_TRUE);
-				fMsgSender->Attach<int32>(noOfRects);
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach<int32>(noOfRects);
 
 				for(int i = 0; i < noOfRects; i++)
-					fMsgSender->Attach<BRect>(reg.RectAt(i));
+					fLink.Attach<BRect>(reg.RectAt(i));
 			}
 			break;
 		}
@@ -915,8 +972,7 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<int32>(&noOfRects);
 
 			BRegion region;
-			for(int i = 0; i < noOfRects; i++)
-			{
+			for (int i = 0; i < noOfRects; i++) {
 				link.Read<BRect>(&r);
 				region.Include(r);
 			}
@@ -1055,8 +1111,8 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			wb = gDesktop->FindWinBorderByServerWindowTokenAndTeamID(mainToken, teamID);
 			if (wb) {
-				fMsgSender->StartMessage(SERVER_TRUE);
-				fMsgSender->Flush();
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Flush();
 
 				// ToDo: this is a pretty expensive and complicated way to send a message...
 				BPrivate::PortLink msg(-1, -1);
@@ -1065,8 +1121,8 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				msg.Attach<WinBorder*>(wb);
 				fWinBorder->GetRootLayer()->EnqueueMessage(msg);
 			} else {
-				fMsgSender->StartMessage(SERVER_FALSE);
-				fMsgSender->Flush();
+				fLink.StartMessage(SERVER_FALSE);
+				fLink.Flush();
 			}
 			break;
 		}
@@ -1082,8 +1138,8 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			
 			wb = gDesktop->FindWinBorderByServerWindowTokenAndTeamID(mainToken, teamID);
 			if (wb) {
-				fMsgSender->StartMessage(SERVER_TRUE);
-				fMsgSender->Flush();
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Flush();
 
 				BPrivate::PortLink msg(-1, -1);
 				msg.StartMessage(AS_ROOTLAYER_REMOVE_FROM_SUBSET);
@@ -1091,8 +1147,8 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				msg.Attach<WinBorder*>(wb);
 				fWinBorder->GetRootLayer()->EnqueueMessage(msg);
 			} else {
-				fMsgSender->StartMessage(SERVER_FALSE);
-				fMsgSender->Flush();
+				fLink.StartMessage(SERVER_FALSE);
+				fLink.Flush();
 			}
 			break;
 		}
@@ -1131,9 +1187,9 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_GET_WORKSPACES:
 		{
 			STRACE(("ServerWindow %s: Message Get_Workspaces unimplemented\n", Title()));
-			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Attach<uint32>(fWinBorder->Workspaces());
-			fMsgSender->Flush();
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<uint32>(fWinBorder->Workspaces());
+			fLink.Flush();
 			break;
 		}
 		case AS_SET_WORKSPACES:
@@ -1202,13 +1258,13 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// and now, sync the client to the limits that we were able to enforce
 			fWinBorder->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
 
-			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Attach<float>(minWidth);
-			fMsgSender->Attach<float>(maxWidth);
-			fMsgSender->Attach<float>(minHeight);
-			fMsgSender->Attach<float>(maxHeight);
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<float>(minWidth);
+			fLink.Attach<float>(maxWidth);
+			fLink.Attach<float>(minHeight);
+			fLink.Attach<float>(maxHeight);
 
-			fMsgSender->Flush();
+			fLink.Flush();
 
 			break;
 		}
@@ -1325,24 +1381,23 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// Part sanity check, part get base pointer :)
 			if(get_area_info(area,&ai)!=B_OK)
 				break;
-			
-			msgpointer=(int8*)ai.address + offset;
-			
+
+			msgpointer = (int8*)ai.address + offset;
+
 			RAMLinkMsgReader mlink(msgpointer);
-			DispatchMessage(mlink.Code(),mlink);
-			
+			_DispatchMessage(mlink.Code(), mlink);
+
 			// This is a very special case in the sense that when ServerMemIO is used for this 
 			// purpose, it will be set to NOT automatically free the memory which it had 
 			// requested. This is the server's job once the message has been dispatched.
 			fServerApp->AppAreaPool()->ReleaseBuffer(msgpointer);
-			
 			break;
 		}
 		case AS_SYNC:
 		{
 			// TODO: AS_SYNC is a no-op for now, just to get things working
-			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Flush();
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Flush();
 			break;
 		}
 		case AS_LAYER_DRAG_IMAGE:
@@ -1363,21 +1418,21 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_GET_MOUSE_COORDS\n", fTitle));
 
-			fMsgSender->StartMessage(SERVER_TRUE);
+			fLink.StartMessage(SERVER_TRUE);
 
 			// Returns
 			// 1) BPoint mouse location
 			// 2) int32 button state
 
-			fMsgSender->Attach<BPoint>(gDesktop->GetDisplayDriver()->GetCursorPosition());
-			fMsgSender->Attach<int32>(gDesktop->ActiveRootLayer()->Buttons());
+			fLink.Attach<BPoint>(gDesktop->GetDisplayDriver()->GetCursorPosition());
+			fLink.Attach<int32>(gDesktop->ActiveRootLayer()->Buttons());
 
-			fMsgSender->Flush();
+			fLink.Flush();
 			break;
 		}
 
 		default:
-			DispatchGraphicsMessage(code, link);
+			_DispatchGraphicsMessage(code, link);
 			break;
 	}
 }
@@ -1386,7 +1441,7 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 inline
 void
-ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
+ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 {
 	fWinBorder->GetRootLayer()->Lock();
 	BRegion rreg
@@ -1907,17 +1962,28 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 }
 
 /*!
-	\brief Message-dispatching loop for the ServerWindow
-
-	MonitorWin() watches the ServerWindow's message port and dispatches as necessary
+	\brief Message-dispatching loop starter
 	\param data The thread's ServerWindow
-	\return Throwaway code. Always 0.
 */
 int32
-ServerWindow::MonitorWin(void *data)
+ServerWindow::_message_thread(void *_window)
 {
-	ServerWindow *win = (ServerWindow *)data;
-	BPrivate::LinkReceiver *ses = win->fMsgReceiver;
+	ServerWindow *window = (ServerWindow *)_window;
+
+	window->_MessageLooper();
+	return 0;
+}
+
+
+/*!
+	\brief Message-dispatching loop for the ServerWindow
+
+	Watches the ServerWindow's message port and dispatches as necessary
+*/
+void
+ServerWindow::_MessageLooper()
+{
+	BPrivate::LinkReceiver& receiver = fLink.Receiver();
 
 	bool quitting = false;
 	int32 code;
@@ -1925,21 +1991,26 @@ ServerWindow::MonitorWin(void *data)
 
 	while (!quitting) {
 		STRACE(("info: ServerWindow::MonitorWin listening on port %ld.\n",
-			win->fMessagePort));
+			fMessagePort));
 
-		err = ses->GetNextMessage(code);
-		if (err < B_OK)
-			return err;
+		err = receiver.GetNextMessage(code);
+		if (err < B_OK) {
+			// that shouldn't happen, it's our port
+			// ToDo: do something about it, anyway!
+			return;
+		}
 
-		win->Lock();
+		Lock();
 
 		switch (code) {
 			case AS_DELETE_WINDOW:
+			case kMsgWindowQuit:
 			{
 				// this means the client has been killed
 				STRACE(("ServerWindow %s received 'AS_DELETE_WINDOW' message code\n",
-					win->Title()));
+					Title()));
 
+				// ToDo: what's this?
 				//RootLayer *rootLayer = fWinBorder->GetRootLayer();
 
 				// we are preparing to delete a ServerWindow, RootLayer should be aware
@@ -1954,32 +2025,25 @@ ServerWindow::MonitorWin(void *data)
 				//}
 
 				// ServerWindow's destructor takes care of pulling this object off the desktop.
-				if (!win->fWinBorder->IsHidden())
+				if (!fWinBorder->IsHidden())
 					CRITICAL("ServerWindow: a window must be hidden before it's deleted\n");
 
-				win->App()->RemoveWindow(win);
-				delete win;
-
-				//rootLayer->Unlock();
-				exit_thread(0);
+				Quit();
+					// does not return
 				break;
 			}
 			case B_QUIT_REQUESTED:
-			{
-				STRACE(("ServerWindow %s received Quit request\n", win->Title()));
-				win->Quit();
+				STRACE(("ServerWindow %s received quit request\n", Title()));
+				NotifyQuitRequested();
 				break;
-			}
+
 			default:
-			{
-				win->DispatchMessage(code, *ses);
+				_DispatchMessage(code, receiver);
 				break;
-			}
 		}
 
-		win->Unlock();
+		Unlock();
 	}
-	return err;
 }
 
 // _CopyBits
@@ -2041,8 +2105,6 @@ ServerWindow::SendMessageToClient(const BMessage* msg, int32 target, bool usePre
 	char* buffer = new char[size];
 
 	if (msg->Flatten(buffer, size) == B_OK) {
-//		BMessage::Private::SendFlattenedMessage(buffer, size,
-//			fClientLooperPort, target, usePreferred, B_INFINITE_TIMEOUT);
 		status_t ret = BMessage::Private::SendFlattenedMessage(buffer, size,
 							fClientLooperPort, target, usePreferred, 100000);
 		if (ret < B_OK)
