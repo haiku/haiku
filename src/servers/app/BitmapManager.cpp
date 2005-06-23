@@ -24,61 +24,59 @@
 //	Description:	Handler for allocating and freeing area memory for BBitmaps 
 //					on the server side. Utilizes the BGET pool allocator.
 //------------------------------------------------------------------------------
-#include "BitmapManager.h"
-#include "ServerBitmap.h"
+
+#include <new>
 #include <stdio.h>
-#include "BGet++.h"
+#include <string.h>
+
+#include "ServerBitmap.h"
+
+#include "BitmapManager.h"
 
 //! The bitmap allocator for the server. Memory is allocated/freed by the AppServer class
-BitmapManager *bitmapmanager=NULL;
+BitmapManager *bitmapmanager = NULL;
 
 //! Number of bytes to allocate to each area used for bitmap storage
 #define BITMAP_AREA_SIZE	B_PAGE_SIZE * 2
 
 //! Sets up stuff to be ready to allocate space for bitmaps
-BitmapManager::BitmapManager(void)
-{
-	fMemPool=new AreaPool;
-	bmplist=new BList(0);
+BitmapManager::BitmapManager()
+	: fBitmapList(1024),
+	  fBitmapArea(B_ERROR),
+	  fBuffer(NULL),
+	  fTokenizer(),
+	  fLock(B_ERROR),
+	  fMemPool()
 
+{
 	// When create_area is passed the B_ANY_ADDRESS flag, the address of the area
 	// is stored in the pointer to a pointer.
-	bmparea=create_area("bitmap_area",(void**)&buffer,B_ANY_ADDRESS,BITMAP_AREA_SIZE,
-			B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
-	if(bmparea==B_BAD_VALUE ||
-	   bmparea==B_NO_MEMORY ||
-	   bmparea==B_ERROR)
-	   	printf("PANIC: BitmapManager couldn't allocate area!!\n");
+	fBitmapArea = create_area("bitmap_area", (void**)&fBuffer,
+						  B_ANY_ADDRESS, BITMAP_AREA_SIZE,
+						  B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+
+	if (fBitmapArea < B_OK)
+	   	printf("PANIC: BitmapManager couldn't allocate area: %s\n", strerror(fBitmapArea));
 	
-	lock=create_sem(1,"bmpmanager_lock");
-	if(lock<0)
-		printf("PANIC: BitmapManager couldn't allocate locking semaphore!!\n");
+	fLock = create_sem(1,"bmpmanager_fLock");
+	if (fLock < B_OK)
+		printf("PANIC: BitmapManager couldn't allocate fLocking semaphore!!\n");
 	
-	fMemPool->AddToPool(buffer,BITMAP_AREA_SIZE);
+	fMemPool.AddToPool(fBuffer, BITMAP_AREA_SIZE);
 }
 
 //! Deallocates everything associated with the manager
-BitmapManager::~BitmapManager(void)
+BitmapManager::~BitmapManager()
 {
-	if(bmplist->CountItems()>0)
-	{
-		ServerBitmap *tbmp=NULL;
-		int32 itemcount=bmplist->CountItems();
-		for(int32 i=0; i<itemcount; i++)
-		{
-			tbmp=(ServerBitmap*)bmplist->RemoveItem(0L);
-			if(tbmp)
-			{
-				fMemPool->ReleaseBuffer(tbmp->fBuffer);
-				delete tbmp;
-				tbmp=NULL;
-			}
+	int32 count = fBitmapList.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		if (ServerBitmap* bitmap = (ServerBitmap*)fBitmapList.ItemAt(i)) {
+			fMemPool.ReleaseBuffer(bitmap->fBuffer);
+			delete bitmap;
 		}
 	}
-	delete fMemPool;
-	delete bmplist;
-	delete_area(bmparea);
-	delete_sem(lock);
+	delete_area(fBitmapArea);
+	delete_sem(fLock);
 }
 
 /*!
@@ -86,58 +84,58 @@ BitmapManager::~BitmapManager(void)
 	\param bounds Size of the bitmap
 	\param space Color space of the bitmap
 	\param flags Bitmap flags as defined in Bitmap.h
-	\param bytes_per_row Number of bytes per row.
+	\param bytesPerRow Number of bytes per row.
 	\param screen Screen id of the screen associated with it. Unused.
 	\return A new ServerBitmap or NULL if unable to allocate one.
 */
-ServerBitmap * BitmapManager::CreateBitmap(BRect bounds, color_space space, int32 flags,
-	int32 bytes_per_row, screen_id screen)
+ServerBitmap*
+BitmapManager::CreateBitmap(BRect bounds, color_space space, int32 flags,
+							int32 bytesPerRow, screen_id screen)
 {
-	acquire_sem(lock);
-	ServerBitmap *bmp=new ServerBitmap(bounds, space, flags, bytes_per_row);
-	
-	// Server version of this code will also need to handle such things as
-	// bitmaps which accept child views by checking the flags.
-	uint8 *bmpbuffer=(uint8 *)fMemPool->GetBuffer(bmp->BitsLength());
+	ServerBitmap* bitmap = NULL;
+	if (acquire_sem(fLock) >= B_OK) {
+		bitmap = new(nothrow) ServerBitmap(bounds, space, flags, bytesPerRow);
 
-	if(!bmpbuffer)
-	{
-		delete bmp;
-		return NULL;
+		// Server version of this code will also need to handle such things as
+		// bitmaps which accept child views by checking the flags.
+		uint8* buffer = (uint8*)fMemPool.GetBuffer(bitmap->BitsLength());
+
+		if (buffer && fBitmapList.AddItem(bitmap)) {
+			bitmap->fArea = area_for(buffer);
+			bitmap->fBuffer = buffer;
+			bitmap->fToken = fTokenizer.GetToken();
+			bitmap->fInitialized = true;
+			
+			// calculate area offset
+			area_info ai;
+			get_area_info(bitmap->fArea, &ai);
+			bitmap->fOffset = buffer - (uint8*)ai.address;
+
+		} else {
+			// Allocation failed for buffer or bitmap list
+			fMemPool.ReleaseBuffer(buffer);
+			delete bitmap;
+			bitmap = NULL;
+		}
+
+		release_sem(fLock);
 	}
-	bmp->fArea=area_for(bmpbuffer);
-	bmp->fBuffer=bmpbuffer;
-	bmp->fToken=tokenizer.GetToken();
-	bmp->fInitialized=true;
-	
-	// calculate area offset
-	area_info ai;
-	get_area_info(bmp->fArea,&ai);
-	bmp->fOffset=bmpbuffer-(uint8*)ai.address;
-	
-	bmplist->AddItem(bmp);
-	release_sem(lock);
-	return bmp;
+	return bitmap;
 }
 
 /*!
 	\brief Deletes a ServerBitmap.
 	\param bitmap The bitmap to delete
 */
-void BitmapManager::DeleteBitmap(ServerBitmap *bitmap)
+void
+BitmapManager::DeleteBitmap(ServerBitmap *bitmap)
 {
-	acquire_sem(lock);
-	ServerBitmap *tbmp=(ServerBitmap*)bmplist->RemoveItem(bmplist->IndexOf(bitmap));
-
-	if(!tbmp)
-	{
-		release_sem(lock);
-		return;
+	if (acquire_sem(fLock) >= B_OK) {
+		if (fBitmapList.RemoveItem(bitmap)) {
+			// Server code will require a check to ensure bitmap doesn't have its own area		
+			fMemPool.ReleaseBuffer(bitmap->fBuffer);
+			delete bitmap;
+		}
+		release_sem(fLock);
 	}
-
-	// Server code will require a check to ensure bitmap doesn't have its own area		
-	fMemPool->ReleaseBuffer(tbmp->fBuffer);
-	delete tbmp;
-
-	release_sem(lock);
 }

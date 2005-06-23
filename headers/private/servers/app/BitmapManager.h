@@ -29,12 +29,13 @@
 
 #include <GraphicsDefs.h>
 #include <List.h>
-#include <Rect.h>
 #include <OS.h>
+#include <Rect.h>
+
+#include "BGet++.h"
 #include "TokenHandler.h"
 
 class ServerBitmap;
-class AreaPool;
 
 /*!
 	\class BitmapManager BitmapManager.h
@@ -43,22 +44,28 @@ class AreaPool;
 	Whenever a ServerBitmap associated with a client-side BBitmap needs to be 
 	created or destroyed, the BitmapManager needs to handle it. It takes care of 
 	all memory management related to them.
+
+	NOTE: The allocator used is not thread-safe, it is currently protected
+	by the BitmapManager lock.
 */
-class BitmapManager
-{
-public:
-	BitmapManager(void);
-	~BitmapManager(void);
-	ServerBitmap *CreateBitmap(BRect bounds, color_space space, int32 flags,
-		int32 bytes_per_row=-1, screen_id screen=B_MAIN_SCREEN_ID);
-	void DeleteBitmap(ServerBitmap *bitmap);
-protected:
-	BList *bmplist;
-	area_id bmparea;
-	int8 *buffer;
-	TokenHandler tokenizer;
-	sem_id lock;
-	AreaPool *fMemPool;
+class BitmapManager {
+ public:
+								BitmapManager();
+	virtual						~BitmapManager();
+
+			ServerBitmap*		CreateBitmap(BRect bounds,
+											 color_space space,
+											 int32 flags,
+											 int32 bytesPerRow = -1,
+											 screen_id screen = B_MAIN_SCREEN_ID);
+			void				DeleteBitmap(ServerBitmap* bitmap);
+ protected:
+			BList				fBitmapList;
+			area_id				fBitmapArea;
+			int8*				fBuffer;
+			TokenHandler		fTokenizer;
+			sem_id				fLock;
+			AreaPool			fMemPool;
 };
 
 extern BitmapManager *bitmapmanager;
