@@ -2035,6 +2035,7 @@ BWindow::InitData(BRect frame, const char* title, window_look look,
 
 	// TODO: see WHEN is this used!
 	fWaitingForMenu = false;
+	fMenuSem = -1;
 
 	fMinimized = false;
 
