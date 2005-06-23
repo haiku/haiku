@@ -141,6 +141,7 @@ private:
 			port_id				fClientLooperPort;
 
 			BPrivate::PortLink	fLink;
+			bool				fQuitting;
 
 			BMessage			fClientViewsWithInvalidCoords;
 

@@ -46,6 +46,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <syslog.h>
 
 //#define DEBUG_SERVERAPP
 
@@ -135,6 +136,48 @@ ServerApp::~ServerApp(void)
 
 	if (!fQuitting)
 		CRITICAL("ServerApp: destructor called after Run()!\n");
+
+	fWindowListLock.Lock();
+
+	// quit all server windows
+
+	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
+		ServerWindow* window = (ServerWindow*)fWindowList.ItemAt(i);
+		window->Quit();
+	}
+	int32 tries = fWindowList.CountItems() + 1;
+
+	fWindowListLock.Unlock();
+
+	// wait for the windows to quit
+	while (tries-- > 0) {
+		fWindowListLock.Lock();
+		if (fWindowList.CountItems() == 0) {
+			// we leave the list locked, doesn't matter anymore
+			break;
+		}
+
+		fWindowListLock.Unlock();
+		snooze(10000);
+	}
+
+	if (tries < 0) {
+		// This really shouldn't happen, as it shows we're buggy
+		syslog(LOG_ERR, "ServerApp %s needs to kill some server windows...\n", Signature());
+
+		// there still seem to be some windows left - kill them!
+		fWindowListLock.Lock();
+
+		for (int32 i = 0; i < fWindowList.CountItems(); i++) {
+			ServerWindow* window = (ServerWindow*)fWindowList.ItemAt(i);
+
+			kill_thread(window->Thread());
+			window->Hide();
+			delete window;
+		}
+
+		fWindowListLock.Unlock();
+	}
 
 	// first, make sure our monitor thread doesn't 
 	for (int32 i = 0; i < fBitmapList.CountItems(); i++) {

@@ -80,6 +80,7 @@ ServerWindow::ServerWindow(const char *title, ServerApp *app,
 	fMessagePort(-1),
 	fClientReplyPort(clientPort),
 	fClientLooperPort(looperPort),
+	fQuitting(false),
 	fClientViewsWithInvalidCoords(B_VIEW_RESIZED),
 	fHandlerToken(handlerID),
 	fCurrentLayer(NULL)
@@ -160,6 +161,8 @@ ServerWindow::Run()
 void
 ServerWindow::Quit()
 {
+	fQuitting = true;
+
 	if (fThread < B_OK) {
 		delete this;
 		return;
@@ -170,8 +173,10 @@ ServerWindow::Quit()
 
 		delete this;
 		exit_thread(0);
-	} else
+	} else {
+		PostMessage(AS_HIDE_WINDOW);
 		PostMessage(kMsgWindowQuit);
+	}
 }
 
 
@@ -206,7 +211,7 @@ ServerWindow::Show()
 	// NOTE: if you do something else, other than sending a port message, PLEASE lock
 	STRACE(("ServerWindow %s: Show\n", Title()));
 
-	if (!fWinBorder->IsHidden())
+	if (fQuitting || !fWinBorder->IsHidden())
 		return;
 
 	fWinBorder->GetRootLayer()->ShowWinBorder(fWinBorder);
