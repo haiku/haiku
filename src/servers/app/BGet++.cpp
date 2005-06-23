@@ -1,31 +1,14 @@
-/*------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		bget++.cpp
-//	Author:			John Walker <kelvin@fourmilab.ch>
-//					DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	public domain BGET pool allocator converted to C++
-//					Distributed with Haiku under MIT license
-//  
-//------------------------------------------------------------------------------*/
+/*
+ * Copyright 2001-2005, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+
+ * Authors: John Walker <kelvin@fourmilab.ch>
+ *			DarkWyrm <bpmagic@columbus.rr.com>
+ *			Stephan Aßmus <superstippi@gmx.de>
+ *
+ *	BGET pool allocator
+ *
+ */
 
 /*
 	This class is based on the BGET pool allocator. Original code was in standard
@@ -51,54 +34,10 @@
 //  Declare the interface, including the requested buffer size type, ssize_t.
 #include "BGet++.h"
 
-// Queue links
-struct qlinks 
-{
-	struct bfhead *flink;	// Forward link
-	struct bfhead *blink;	// Backward link
-};
-
-// Header in allocated and free buffers
-struct bhead 
-{
-	// Relative link back to previous free buffer in memory or 0 if previous 
-	// buffer is allocated.
-    ssize_t prevfree;
-    
-    // Buffer size: positive if free, negative if allocated.
-    ssize_t bsize; 
-};
-
-#define BH(p)	((struct bhead *) (p))
-
-//  Header in directly allocated buffers (by acqfcn)
-struct bdhead 
-{
-    ssize_t tsize;		// Total size, including overhead
-    struct bhead bh;	// Common header
-};
-
-#define BDH(p)	((struct bdhead *) (p))
-
-// Header in free buffers
-struct bfhead 
-{
-	// Common allocated/free header
-    struct bhead bh;
-    
-    // Links on free list
-    struct qlinks ql;
-};
-
-#define BFH(p)	((struct bfhead *) (p))
-
-static struct bfhead freelist = 
-{
-	// List of free buffers
-	{0, 0},
-	{&freelist, &freelist}
-};
-
+// some handy short cuts
+#define BH(p)	((bhead*) (p))
+#define BDH(p)	((bdhead*) (p))
+#define BFH(p)	((bfhead*) (p))
 
 //  Minimum allocation quantum:
 #define QLSize	(sizeof(struct qlinks))
@@ -110,31 +49,31 @@ static struct bfhead freelist =
 #define ESent	((ssize_t) (-(((1L << (sizeof(ssize_t) * 8 - 2)) - 1) * 2) - 2))
 
 
-MemPool::MemPool(void)
- : totalloc(0),
- 	numget(0),
- 	numrel(0),
- 	numpblk(0),
- 	numpget(0),
- 	numprel(0),
- 	numdget(0),
- 	numdrel(0),
- 	exp_incr(0),
- 	pool_len(0)
+MemPool::MemPool()
+	: fTotalAlloced(0),
+ 	  fGetCount(0),
+ 	  fReleaseCount(0),
+ 	  fNumpblk(0),
+ 	  fNumpget(0),
+ 	  fNumprel(0),
+ 	  fNumdget(0),
+ 	  fNumdrel(0),
+ 	  fExpIncr(0),
+ 	  fPoolLength(0)
 {
+	fFreeList.bh = (bhead){ 0, 0 };
+	fFreeList.ql = (qlinks){ &fFreeList, &fFreeList };
 }
 
-MemPool::~MemPool(void)
+MemPool::~MemPool()
 {
 }
 
 //  Allocate a buffer from the available space in the memory pool
-void *MemPool::GetBuffer(ssize_t requested_size, bool zero)
+void*
+MemPool::GetBuffer(ssize_t requested_size, bool zero)
 {
     ssize_t size = requested_size;
-    struct bfhead *b;
-
-    struct bfhead *best;
     void *buf;
 
 	int compactseq = 0;
@@ -154,23 +93,25 @@ void *MemPool::GetBuffer(ssize_t requested_size, bool zero)
 	// Add overhead in allocated buffer to size required.
     size += sizeof(struct bhead);     
 
+    bfhead *b;
+    bfhead *best;
     // If a compact function was provided in the call to bectl(), wrap
     // a loop around the allocation process  to  allow	compaction  to
     // intervene in case we don't find a suitable buffer in the chain.
     while (1) 
     {
-		b = freelist.ql.flink;
-		best = &freelist;
+		b = fFreeList.ql.flink;
+		best = &fFreeList;
 	
 	
 		// Scan the free list searching for the first buffer big enough
 		// to hold the requested size buffer.
 	
-		while (b != &freelist) 
+		while (b != &fFreeList) 
 		{
 		    if (b->bh.bsize >= size) 
 		    {
-				if ((best == &freelist) || (b->bh.bsize < best->bh.bsize)) 
+				if ((best == &fFreeList) || (b->bh.bsize < best->bh.bsize)) 
 				{
 				    best = b;
 				}
@@ -180,7 +121,7 @@ void *MemPool::GetBuffer(ssize_t requested_size, bool zero)
 		}
 		b = best;
 		
-		while (b != &freelist) 
+		while (b != &fFreeList) 
 		{
 		    if ((ssize_t) b->bh.bsize >= size) 
 		    {
@@ -212,8 +153,8 @@ void *MemPool::GetBuffer(ssize_t requested_size, bool zero)
 				    // Mark buffer after this one not preceded by free block.
 				    bn->prevfree = 0;
 		
-				    totalloc += size;
-				    numget++;		  // Increment number of GetBuffer() calls
+				    fTotalAlloced += size;
+				    fGetCount++;		  // Increment number of GetBuffer() calls
 					
 				    buf = (void *) ((((char *) ba) + sizeof(struct bhead)));
 				    return buf;
@@ -233,8 +174,8 @@ void *MemPool::GetBuffer(ssize_t requested_size, bool zero)
 				    b->ql.blink->ql.flink = b->ql.flink;
 				    b->ql.flink->ql.blink = b->ql.blink;
 		
-				    totalloc += b->bh.bsize;
-				    numget++;		  // Increment number of GetBuffer() calls
+				    fTotalAlloced += b->bh.bsize;
+				    fGetCount++;		  // Increment number of GetBuffer() calls
 					
 				    // Negate size to mark buffer allocated.
 				    b->bh.bsize = -(b->bh.bsize);
@@ -263,7 +204,7 @@ void *MemPool::GetBuffer(ssize_t requested_size, bool zero)
     // No buffer available with requested size free.
 
     // Don't give up yet -- look in the reserve supply.
-	if (size > (ssize_t)(exp_incr - sizeof(struct bhead))) 
+	if (size > (ssize_t)(fExpIncr - sizeof(struct bhead))) 
 	{
 	    // Request	is  too  large	to  fit in a single expansion
 	    // block.  Try to satisy it by a direct buffer acquisition.
@@ -278,13 +219,13 @@ void *MemPool::GetBuffer(ssize_t requested_size, bool zero)
 			bdh->bh.prevfree = 0;
 			bdh->tsize = size;
 	
-			totalloc += size;
+			fTotalAlloced += size;
 			
 			// Increment number of GetBuffer() calls
-			numget++;
+			fGetCount++;
 			
 			// Direct GetBuffer() call count
-			numdget++;
+			fNumdget++;
 	
 			buf =  (void *) (bdh + 1);
 			return buf;
@@ -297,9 +238,9 @@ void *MemPool::GetBuffer(ssize_t requested_size, bool zero)
 	    //	Try to obtain a new expansion block
 	    void *newpool;
 
-	    if ((newpool = AcquireMem((ssize_t) exp_incr)) != NULL) 
+	    if ((newpool = AcquireMem((ssize_t) fExpIncr)) != NULL) 
 	    {
-			AddToPool(newpool, exp_incr);
+			AddToPool(newpool, fExpIncr);
 			
 			// This can't, I say, can't get into a loop
             buf =  GetBuffer(requested_size);
@@ -346,7 +287,8 @@ void *MemPool::GetBuffer(ssize_t requested_size, bool zero)
 // Reallocate a buffer.  This is a minimal implementation, simply in terms 
 // of ReleaseBuffer()  and  GetBuffer(). It could be enhanced to allow the 
 // buffer to grow into adjacent free blocks and to avoid moving data unnecessarily.
-void *MemPool::ReallocateBuffer(void *buf, ssize_t size)
+void*
+MemPool::ReallocateBuffer(void *buf, ssize_t size)
 {
     void *nbuf;
     
@@ -386,14 +328,15 @@ void *MemPool::ReallocateBuffer(void *buf, ssize_t size)
 }
 
 //  BREL  --  Release a buffer. 
-void MemPool::ReleaseBuffer(void *buf)
+void
+MemPool::ReleaseBuffer(void *buf)
 {
     struct bfhead *b, *bn;
 
     b = BFH(((char *) buf) - sizeof(struct bhead));
 	
 	// Increment number of ReleaseBuffer() calls
-    numrel++;
+    fReleaseCount++;
 
     assert(buf != NULL);
 	
@@ -405,11 +348,11 @@ void MemPool::ReleaseBuffer(void *buf)
 		bdh = BDH(((char *) buf) - sizeof(struct bdhead));
 		assert(b->bh.prevfree == 0);
 	
-		totalloc -= bdh->tsize;
-		assert(totalloc >= 0);
+		fTotalAlloced -= bdh->tsize;
+		assert(fTotalAlloced >= 0);
 		
 		// Number of direct releases
-		numdrel++;
+		fNumdrel++;
 	
 		memset((char *) buf, 0x55, (int) (bdh->tsize - sizeof(struct bdhead)));
 	
@@ -429,8 +372,8 @@ void MemPool::ReleaseBuffer(void *buf)
     //	Back pointer in next buffer must be zero, indicating the same thing:
     assert(BH((char *) b - b->bh.bsize)->prevfree == 0);
 
-    totalloc += b->bh.bsize;
-    assert(totalloc >= 0);
+    fTotalAlloced += b->bh.bsize;
+    assert(fTotalAlloced >= 0);
 
 
     // If the back link is nonzero, the previous buffer is free. 
@@ -453,11 +396,11 @@ void MemPool::ReleaseBuffer(void *buf)
     {
 		// The previous buffer isn't allocated.  Insert this buffer on the 
 		// free list as an isolated free block.
-		assert(freelist.ql.blink->ql.flink == &freelist);
-		assert(freelist.ql.flink->ql.blink == &freelist);
-		b->ql.flink = &freelist;
-		b->ql.blink = freelist.ql.blink;
-		freelist.ql.blink = b;
+		assert(fFreeList.ql.blink->ql.flink == &fFreeList);
+		assert(fFreeList.ql.flink->ql.blink == &fFreeList);
+		b->ql.flink = &fFreeList;
+		b->ql.blink = fFreeList.ql.blink;
+		fFreeList.ql.blink = b;
 		b->ql.blink->ql.flink = b;
 		b->bh.bsize = -b->bh.bsize;
     }
@@ -497,11 +440,11 @@ void MemPool::ReleaseBuffer(void *buf)
     bn->bh.prevfree = b->bh.bsize;
 
 	// If a block-release function is defined, and this free buffer
-	// constitutes the entire block, release it.  Note that  pool_len
+	// constitutes the entire block, release it.  Note that  fPoolLength
 	// is  defined  in  such a way that the test will fail unless all
 	// pool blocks are the same size.
 
-    if (((ssize_t) b->bh.bsize) == (ssize_t)(pool_len - sizeof(struct bhead))) 
+    if (((ssize_t) b->bh.bsize) == (ssize_t)(fPoolLength - sizeof(struct bhead))) 
 	{
 		assert(b->bh.prevfree == 0);
 		assert(BH((char *) b + b->bh.bsize)->bsize == ESent);
@@ -514,38 +457,39 @@ void MemPool::ReleaseBuffer(void *buf)
 		ReleaseMem(b);
 		
 		// Nr of expansion block releases
-		numprel++;
+		fNumprel++;
 		
 		// Total number of blocks
-		numpblk--;
-		assert(numpblk == numpget - numprel);
+		fNumpblk--;
+		assert(fNumpblk == fNumpget - fNumprel);
     }
 }
 
 // Add a region of memory to the buffer pool.
-void MemPool::AddToPool(void *buf, ssize_t len)
+void
+MemPool::AddToPool(void *buf, ssize_t len)
 {
     struct bfhead *b = BFH(buf);
     struct bhead *bn;
 
     len &= ~(SizeQuant - 1);
 
-    if (pool_len == 0) 
+    if (fPoolLength == 0) 
     {
-		pool_len = len;
+		fPoolLength = len;
     }
     else
-    if (len != pool_len)
+    if (len != fPoolLength)
     {
-		pool_len = -1;
+		fPoolLength = -1;
     }
 	
 	// Number of block acquisitions
-    numpget++;
+    fNumpget++;
     
     // Number of blocks total
-    numpblk++;
-    assert(numpblk == numpget - numprel);
+    fNumpblk++;
+    assert(fNumpblk == fNumpget - fNumprel);
 
     // Since the block is initially occupied by a single free  buffer,
     // it  had	better	not  be  (much) larger than the largest buffer
@@ -558,11 +502,11 @@ void MemPool::AddToPool(void *buf, ssize_t len)
     b->bh.prevfree = 0;
 
     // Chain the new block to the free list.
-    assert(freelist.ql.blink->ql.flink == &freelist);
-    assert(freelist.ql.flink->ql.blink == &freelist);
-    b->ql.flink = &freelist;
-    b->ql.blink = freelist.ql.blink;
-    freelist.ql.blink = b;
+    assert(fFreeList.ql.blink->ql.flink == &fFreeList);
+    assert(fFreeList.ql.flink->ql.blink == &fFreeList);
+    b->ql.flink = &fFreeList;
+    b->ql.blink = fFreeList.ql.blink;
+    fFreeList.ql.blink = b;
     b->ql.blink->ql.flink = b;
 
 	// Create a dummy allocated buffer at the end of the pool.	This dummy
@@ -588,17 +532,18 @@ void MemPool::AddToPool(void *buf, ssize_t len)
 
 
 // Return buffer allocation free space statistics. 
-void MemPool::Stats(ssize_t *curalloc, ssize_t *totfree, ssize_t *maxfree,
-	 long *nget, long *nrel)
+void
+MemPool::Stats(ssize_t *curalloc, ssize_t *totfree, ssize_t *maxfree,
+			   long *nget, long *nrel)
 {
-    struct bfhead *b = freelist.ql.flink;
+    struct bfhead *b = fFreeList.ql.flink;
 
-    *nget = numget;
-    *nrel = numrel;
-    *curalloc = totalloc;
+    *nget = fGetCount;
+    *nrel = fReleaseCount;
+    *curalloc = fTotalAlloced;
     *totfree = 0;
     *maxfree = -1;
-    while (b != &freelist) 
+    while (b != &fFreeList) 
     {
 		assert(b->bh.bsize > 0);
 		*totfree += b->bh.bsize;
@@ -614,15 +559,16 @@ void MemPool::Stats(ssize_t *curalloc, ssize_t *totfree, ssize_t *maxfree,
 
 
 // Return extended statistics 
-void MemPool::ExtendedStats(ssize_t *pool_incr, long *npool, long *npget, long *nprel, 
-	long *ndget, long *ndrel)
+void
+MemPool::ExtendedStats(ssize_t *pool_incr, long *npool, long *npget, long *nprel, 
+					   long *ndget, long *ndrel)
 {
-    *pool_incr = (pool_len < 0) ? -exp_incr : exp_incr;
-    *npool = numpblk;
-    *npget = numpget;
-    *nprel = numprel;
-    *ndget = numdget;
-    *ndrel = numdrel;
+    *pool_incr = (fPoolLength < 0) ? -fExpIncr : fExpIncr;
+    *npool = fNumpblk;
+    *npget = fNumpget;
+    *nprel = fNumprel;
+    *ndget = fNumdget;
+    *ndrel = fNumdrel;
 }
 
 
@@ -630,7 +576,8 @@ void MemPool::ExtendedStats(ssize_t *pool_incr, long *npool, long *npget, long *
 // Dump the data in a buffer. This is called with the user data pointer, 
 // and backs up to the buffer header.  It will dump either a free block 
 // or an allocated one.
-void MemPool::BufferDump(void *buf)
+void
+MemPool::BufferDump(void *buf)
 {
     struct bfhead *b;
     unsigned char *bdump;
@@ -696,7 +643,8 @@ void MemPool::BufferDump(void *buf)
 // nonzero, the contents of allocated buffers are  dumped. If DUMPFREE is 
 // nonzero,  free blocks are dumped as well. If FreeWipe checking is enabled,
 // free blocks which have been clobbered will always be dumped.
-void MemPool::PoolDump(void *buf, bool dumpalloc, bool dumpfree)
+void
+MemPool::PoolDump(void *buf, bool dumpalloc, bool dumpfree)
 {
     struct bfhead *b = BFH(buf);
 
@@ -745,7 +693,8 @@ void MemPool::PoolDump(void *buf, bool dumpalloc, bool dumpfree)
 }
 
 // Validate a buffer pool.
-int MemPool::Validate(void *buf)
+int
+MemPool::Validate(void *buf)
 {
     struct bfhead *b = BFH(buf);
 
@@ -791,30 +740,34 @@ int MemPool::Validate(void *buf)
     return 1;
 }
 
-int *MemPool::CompactMem(ssize_t sizereq, int sequence)
+int*
+MemPool::CompactMem(ssize_t sizereq, int sequence)
 {
 	return NULL;
 }
 
-void *MemPool::AcquireMem(ssize_t size)
+void*
+MemPool::AcquireMem(ssize_t size)
 {
 	return malloc(size);
 }
 
-void MemPool::ReleaseMem(void *buffer)
+void
+MemPool::ReleaseMem(void *buffer)
 {
 	free(buffer);
 }
 
-AreaPool::AreaPool(void)
+AreaPool::AreaPool()
 {
 }
 
-AreaPool::~AreaPool(void)
+AreaPool::~AreaPool()
 {
 }
 
-void *AreaPool::AcquireMem(ssize_t size)
+void*
+AreaPool::AcquireMem(ssize_t size)
 {
 	long areasize=0;
 	area_id a;
@@ -842,7 +795,8 @@ void *AreaPool::AcquireMem(ssize_t size)
 	return parea;
 }
 
-void AreaPool::ReleaseMem(void *buffer)
+void
+AreaPool::ReleaseMem(void *buffer)
 {
 	area_id trash=area_for(buffer);
 
