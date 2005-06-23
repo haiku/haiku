@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2005, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -20,8 +20,10 @@
 //	DEALINGS IN THE SOFTWARE.
 //
 //	File Name:		MenuItem.cpp
-//	Author:			Marc Flerackers (mflerackers@androme.be)
+//	Authors			Marc Flerackers (mflerackers@androme.be)
 //					Bill Hayden (haydentech@users.sourceforge.net)
+//					Stefano Ceccherini (burton666@libero.it)
+//					Olivier Milla
 //	Description:	Display item for BMenu class
 //
 //------------------------------------------------------------------------------
@@ -341,7 +343,13 @@ BMenuItem::GetContentSize(float *width, float *height)
 void
 BMenuItem::TruncateLabel(float maxWidth, char *newLabel)
 {
-	// ToDo: implement me!
+	BFont font;
+	BString string(fLabel);
+	
+	font.TruncateString(&string, B_TRUNCATE_MIDDLE, maxWidth);
+	
+	string.CopyInto(newLabel, 0, string.Length());
+	newLabel[string.Length()] = '\0';
 }
 
 
@@ -350,19 +358,32 @@ BMenuItem::DrawContent()
 {
 	fSuper->MovePenBy(0, fSuper->fAscent);
 	BPoint lineStart = fSuper->PenLocation();
+
+	float labelWidth, labelHeight;
+	GetContentSize(&labelWidth, &labelHeight);		
 	
-	fSuper->DrawString(fLabel);
-	
-	// ToDo: label truncation is missing
+	// truncate if needed
+	if (fBounds.Width() > labelWidth)
+		fSuper->DrawString(fLabel);
+	else {
+		// TODO: Ouch! Allocating the string every time
+		// isn't exactly cheap.
+		char *truncatedLabel = new char[strlen(fLabel) + 1];
+		TruncateLabel(fBounds.Width(), truncatedLabel);
+		fSuper->DrawString(truncatedLabel);
+		delete[] truncatedLabel;
+	}
 	
 	if (fSuper->AreTriggersEnabled() && fTriggerIndex != -1) {
-		float escapements[128]; // TODO: this doesn't look nice
+		float escapements[fTriggerIndex + 1];
 		BFont font;
 		fSuper->GetFont(&font);
+	
 		font.GetEscapements(fLabel, fTriggerIndex + 1, escapements);
+
 		for (int32 i = 0; i < fTriggerIndex; i++)
 			lineStart.x += escapements[i] * font.Size();
-		
+
 		lineStart.x--;
 		lineStart.y++;
 		
@@ -370,7 +391,7 @@ BMenuItem::DrawContent()
 		lineEnd.x += escapements[fTriggerIndex] * font.Size();
 						
 		fSuper->StrokeLine(lineStart, lineEnd);
-	}
+	}	
 }
 
 
@@ -666,6 +687,7 @@ BMenuItem::DrawSubmenuSymbol()
 void
 BMenuItem::DrawControlChar(const char *control)
 {
+	// TODO: Implement
 }
 
 
