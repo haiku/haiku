@@ -151,7 +151,7 @@ STRACE(("~Workspace(%ld) - say bye bye\n", fID));
 */
 void Workspace::AddWinBorder(WinBorder *winBorder)
 {
-STRACE(("W(%ld)::AddWinBorder(%s)\n", fID, winBorder?winBorder->GetName():"NULL"));
+STRACE(("W(%ld)::AddWinBorder(%s)\n", fID, winBorder?winBorder->Name():"NULL"));
 	if (winBorder->Level() == B_FLOATING_APP)
 	{
 		// floating windows are automaticaly added when needed
@@ -180,7 +180,7 @@ STRACE(("W(%ld)::AddWinBorder(%s)\n", fID, winBorder?winBorder->GetName():"NULL"
 */
 void Workspace::RemoveWinBorder(WinBorder *winBorder)
 {
-STRACE(("W(%ld)::RemoveWinBorder(%s)\n", fID, winBorder?winBorder->GetName():"NULL"));
+STRACE(("W(%ld)::RemoveWinBorder(%s)\n", fID, winBorder?winBorder->Name():"NULL"));
 	ListData	*item = HasItem(winBorder);
 	if (item)
 	{
@@ -272,7 +272,7 @@ window will be shown in front.
 */
 bool Workspace::MoveToFront(WinBorder *newFront, bool doNotDisturb)
 {
-STRACE(("\nWks(%ld)::MoveToFront ~%s~ \n", fID, newFront?newFront->GetName():"NULL"));
+STRACE(("\nWks(%ld)::MoveToFront ~%s~ \n", fID, newFront?newFront->Name():"NULL"));
 	if (!newFront)
 		return false;
 
@@ -313,7 +313,7 @@ B_NORMAL window in front of which they appear.
 */
 bool Workspace::MoveToBack(WinBorder *newLast)
 {
-STRACE(("Wks(%ld)::MoveToBack(%s) \n", fID, newLast? newLast->GetName(): "NULL"));
+STRACE(("Wks(%ld)::MoveToBack(%s) \n", fID, newLast? newLast->Name(): "NULL"));
 	if (newLast->IsHidden())
 		return false;
 
@@ -478,7 +478,7 @@ chosen. Same goes for focus.
 */
 bool Workspace::HideWinBorder(WinBorder *winBorder)
 {
-STRACE(("W(%ld)::HideWinBorder(%s) \n", fID, winBorder? winBorder->GetName(): "NULL"));
+STRACE(("W(%ld)::HideWinBorder(%s) \n", fID, winBorder? winBorder->Name(): "NULL"));
 	bool	returnValue = false;
 	int32	level = winBorder->Level();
 	bool	changeFront = false;
@@ -641,7 +641,7 @@ unless a modal windows steals both.
 */
 bool Workspace::ShowWinBorder(WinBorder *winBorder, bool userBusy)
 {
-STRACE(("W(%ld)::ShowWinBorder(%s) \n", fID, winBorder? winBorder->GetName(): "NULL"));
+STRACE(("W(%ld)::ShowWinBorder(%s) \n", fID, winBorder? winBorder->Name(): "NULL"));
 	bool	returnValue = false;
 	int32	level = winBorder->Level();
 	if (level > B_SYSTEM_FIRST)
@@ -1151,7 +1151,7 @@ void Workspace::PutDefaultSettings(BMessage *msg, const uint8 &index)
 	// Just in case...
 	msg->RemoveName(fieldname);
 	
-	msg->AddMessage(fieldname,&container);
+	msg->AddMessage(fieldname, &container);
 }
 
 //----------------------------------------------------------------------------------
@@ -1162,7 +1162,7 @@ void Workspace::PrintToStream() const
 	for (ListData *item = fTopItem; item != NULL; item = item->lowerItem)
 	{
 		WinBorder		*wb = (WinBorder*)item->layerPtr;
-		printf("\tName: %s\t%s", wb->GetName(), wb->IsHidden()?"Hidden\t": "Visible\t");
+		printf("\tName: %s\t%s", wb->Name(), wb->IsHidden()?"Hidden\t": "Visible\t");
 		if(wb->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL)
 			printf("\t%s\n", "B_FLOATING_SUBSET_WINDOW_FEEL");
 		if(wb->Feel() == B_FLOATING_APP_WINDOW_FEEL)
@@ -1183,8 +1183,8 @@ void Workspace::PrintToStream() const
 			printf("\t%s\n", "B_SYSTEM_FIRST");
 			
 	}
-	printf("Focus Layer:\t%s\n", fFocusItem? fFocusItem->layerPtr->GetName(): "NULL");
-	printf("Front Layer:\t%s\n\n", fFrontItem? fFrontItem->layerPtr->GetName(): "NULL");
+	printf("Focus Layer:\t%s\n", fFocusItem? fFocusItem->layerPtr->Name(): "NULL");
+	printf("Front Layer:\t%s\n\n", fFrontItem? fFrontItem->layerPtr->Name(): "NULL");
 }
 
 //----------------------------------------------------------------------------------
@@ -1194,9 +1194,9 @@ void Workspace::PrintItem(ListData *item) const
 	printf("ListData members:\n");
 	if(item)
 	{
-		printf("WinBorder:\t%s\n", item->layerPtr? item->layerPtr->GetName(): "NULL");
-		printf("UpperItem:\t%s\n", item->upperItem? item->upperItem->layerPtr->GetName(): "NULL");
-		printf("LowerItem:\t%s\n", item->lowerItem? item->lowerItem->layerPtr->GetName(): "NULL");
+		printf("WinBorder:\t%s\n", item->layerPtr? item->layerPtr->Name(): "NULL");
+		printf("UpperItem:\t%s\n", item->upperItem? item->upperItem->layerPtr->Name(): "NULL");
+		printf("LowerItem:\t%s\n", item->lowerItem? item->lowerItem->layerPtr->Name(): "NULL");
 	}
 	else
 	{

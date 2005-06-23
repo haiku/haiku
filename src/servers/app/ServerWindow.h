@@ -51,7 +51,7 @@ class ServerPicture;
 	coordinating and linking a window's WinBorder half with its messaging half, dispatching 
 	mouse and key events from the server to its window, and other such things.
 */
-class ServerWindow {
+class ServerWindow : public BLocker {
 public:
 								ServerWindow(	const char *string,
 												ServerApp *winapp,
@@ -67,10 +67,6 @@ public:
 			void				ReplaceDecorator(void);
 			void				Show(void);
 			void				Hide(void);
-
-			status_t			Lock(void);
-			void				Unlock(void);
-			bool				IsLocked(void) const;
 
 			// methods for sending various messages to client.
 			void				Quit(void);
@@ -90,7 +86,7 @@ public:
 			// to who we belong. who do we own. our title.
 	inline	ServerApp*			App() const { return fServerApp; }
 	inline	const WinBorder*	GetWinBorder() const { return fWinBorder; }
-	inline	const char*			Title() const { return fName; }
+	inline	const char*			Title() const { return fTitle; }
 
 			// related thread/team_id(s).
 	inline	team_id				ClientTeam() const { return fClientTeam; }
@@ -127,7 +123,9 @@ private:
 												BRegion &,
 												bool inverse,
 												BPoint where);
-			char				fName[50];
+
+private:
+			const char*			fTitle;
 
 			ServerApp*			fServerApp;
 			WinBorder*			fWinBorder;
@@ -143,8 +141,6 @@ private:
 			BPrivate::LinkSender*	fMsgSender;
 
 			BMessage			fClientViewsWithInvalidCoords;
-
-			BLocker				fLocker;
 
 			int32				fHandlerToken;
 

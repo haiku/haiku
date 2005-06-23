@@ -92,8 +92,9 @@ class Layer {
 	virtual	Layer*				UpperSibling() const;
 	virtual	Layer*				BottomChild() const;
 	
-			const char*			GetName() const
-									{ return (fName) ? fName->String() : NULL; }
+			const char*			Name() const
+									{ return fName.String(); }
+
 #ifndef NEW_CLIPPING
 	virtual	void				RebuildFullRegion();
 			void				StartRebuildRegions(const BRegion& reg,
@@ -291,7 +292,7 @@ class Layer {
 			BRegion*			fClipReg;
 	
 			ServerWindow*		fServerWin;
-			BString*			fName;	
+			BString				fName;	
 			int32				fViewToken;
 			uint32				fFlags;
 			uint32				fResizeMode;

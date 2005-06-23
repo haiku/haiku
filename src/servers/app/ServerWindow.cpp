@@ -66,29 +66,27 @@
 	Does a lot of stuff to set up for the window - new decorator, new winborder, spawn a 
 	monitor thread.
 */
-ServerWindow::ServerWindow(const char *string, ServerApp *app,
+ServerWindow::ServerWindow(const char *title, ServerApp *app,
 	port_id clientPort, port_id looperPort, int32 handlerID)
-	:
+	: BLocker(*title ? title : "Unnamed Window"),
+	fTitle(title),
 	fServerApp(app),
 	fClientReplyPort(clientPort),
 	fClientLooperPort(looperPort),
 	fClientViewsWithInvalidCoords(B_VIEW_RESIZED),
 	fHandlerToken(handlerID)
 {
-	STRACE(("ServerWindow(%s)::ServerWindow()\n", string));
+	STRACE(("ServerWindow(%s)::ServerWindow()\n", title));
 
-	if (string) {
-		strncpy(fName, string, sizeof(fName) - 1);
-		fName[sizeof(fName) - 1] = '\0';
-	} else
-		strcpy(fName, "Unnamed Window");
+	if (fTitle == NULL)
+		fTitle = strdup("Unnamed Window");
 
 	fClientTeam = app->ClientTeam();
 	fWinBorder = NULL;
 	fCurrentLayer = NULL;
 
 	// fMessagePort is the port to which the app sends messages for the server
-	fMessagePort = create_port(30, fName);
+	fMessagePort = create_port(30, fTitle);
 
 	fMsgSender = new BPrivate::LinkSender(fClientReplyPort);
 	fMsgReceiver = new BPrivate::LinkReceiver(fMessagePort);
@@ -98,7 +96,7 @@ ServerWindow::ServerWindow(const char *string, ServerApp *app,
 	fMsgSender->Attach<port_id>(fMessagePort);
 	fMsgSender->Flush();
 
-	STRACE(("ServerWindow %s Created\n", fName));
+	STRACE(("ServerWindow %s Created\n", fTitle));
 }
 
 
@@ -107,13 +105,13 @@ ServerWindow::Init(BRect frame, uint32 wlook,
 	uint32 wfeel, uint32 wflags, uint32 wwksindex)
 {
 	char name[60];
-	snprintf(name, sizeof(name), "%ld: %s", fClientTeam, fName);
+	snprintf(name, sizeof(name), "%ld: %s", fClientTeam, fTitle);
 
 	fWinBorder = new WinBorder(frame, name, wlook, wfeel, wflags,
 		wwksindex, this, gDesktop->GetDisplayDriver());
 
 	// Spawn our message-monitoring thread
-	fThread = spawn_thread(MonitorWin, fName, B_NORMAL_PRIORITY, this);
+	fThread = spawn_thread(MonitorWin, fTitle, B_NORMAL_PRIORITY, this);
 	if (fThread >= B_OK)
 		resume_thread(fThread);
 }
@@ -122,13 +120,14 @@ ServerWindow::Init(BRect frame, uint32 wlook,
 //!Tears down all connections the main app_server objects, and deletes some internals.
 ServerWindow::~ServerWindow(void)
 {
-	STRACE(("*ServerWindow (%s):~ServerWindow()\n", fName));
+	STRACE(("*ServerWindow (%s):~ServerWindow()\n", fTitle));
 
 	delete fWinBorder;
 	delete fMsgSender;
 	delete fMsgReceiver;
+	free(const_cast<char *>(fTitle));
 
-	STRACE(("#ServerWindow(%s) will exit NOW\n", fName));
+	STRACE(("#ServerWindow(%s) will exit NOW\n", fTitle));
 }
 
 //! Forces the window border to update its decorator
@@ -138,7 +137,7 @@ ServerWindow::ReplaceDecorator(void)
 	if (!IsLocked())
 		debugger("you must lock a ServerWindow object before calling ::ReplaceDecorator()\n");
 
-	STRACE(("ServerWindow %s: Replace Decorator\n",fName));
+	STRACE(("ServerWindow %s: Replace Decorator\n", fTitle));
 	fWinBorder->UpdateDecorator();
 }
 
@@ -147,7 +146,7 @@ void
 ServerWindow::Quit(void)
 {
 	// NOTE: if you do something else, other than sending a port message, PLEASE lock
-	STRACE(("ServerWindow %s: Quit\n",fName));
+	STRACE(("ServerWindow %s: Quit\n", fTitle));
 
 	BMessage msg(B_QUIT_REQUESTED);
 	SendMessageToClient(&msg);
@@ -158,7 +157,7 @@ void
 ServerWindow::Show(void)
 {
 	// NOTE: if you do something else, other than sending a port message, PLEASE lock
-	STRACE(("ServerWindow %s: Show\n",fName));
+	STRACE(("ServerWindow %s: Show\n", Title()));
 
 	if (!fWinBorder->IsHidden())
 		return;
@@ -171,7 +170,7 @@ void
 ServerWindow::Hide(void)
 {
 	// NOTE: if you do something else, other than sending a port message, PLEASE lock
-	STRACE(("ServerWindow %s: Hide\n",fName));
+	STRACE(("ServerWindow %s: Hide\n", Title()));
 
 	if (fWinBorder->IsHidden())
 		return;
@@ -228,44 +227,13 @@ ServerWindow::Zoom()
 void
 ServerWindow::ScreenModeChanged(const BRect frame, const color_space colorSpace)
 {
-	STRACE(("ServerWindow %s: ScreenModeChanged\n", fName));
+	STRACE(("ServerWindow %s: ScreenModeChanged\n", fTitle));
 
 	BMessage msg(B_SCREEN_CHANGED);
 	msg.AddRect("frame", frame);
 	msg.AddInt32("mode", (int32)colorSpace);
 
 	SendMessageToClient(&msg);
-}
-
-/*!
-	\brief Locks the window
-	\return B_OK if everything is ok, B_ERROR if something went wrong
-*/
-status_t
-ServerWindow::Lock()
-{
-	STRACE(("\nServerWindow %s: Lock\n", fName));
-
-	return fLocker.Lock() ? B_OK : B_ERROR;
-}
-
-//! Unlocks the window
-void
-ServerWindow::Unlock()
-{
-	STRACE(("ServerWindow %s: Unlock\n\n", fName));
-
-	fLocker.Unlock();
-}
-
-/*!
-	\brief Determines whether or not the window is locked
-	\return True if locked, false if not.
-*/
-bool
-ServerWindow::IsLocked() const
-{
-	return fLocker.IsLocked();
 }
 
 /*!
@@ -276,7 +244,7 @@ inline void
 ServerWindow::SetLayerFontState(Layer *layer, BPrivate::LinkReceiver &link)
 {
 	STRACE(("ServerWindow %s: SetLayerFontStateMessage for layer %s\n",
-			fName, layer->fName->String()));
+			fTitle, layer->Name()));
 	// NOTE: no need to check for a lock. This is a private method.
 
 	layer->fLayerData->ReadFontFromLink(link);
@@ -286,8 +254,8 @@ ServerWindow::SetLayerFontState(Layer *layer, BPrivate::LinkReceiver &link)
 inline void
 ServerWindow::SetLayerState(Layer *layer, BPrivate::LinkReceiver &link)
 {
-	STRACE(("ServerWindow %s: SetLayerState for layer %s\n",fName,
-			 layer->fName->String()));
+	STRACE(("ServerWindow %s: SetLayerState for layer %s\n", Title(),
+			 layer->Name()));
 	// NOTE: no need to check for a lock. This is a private method.
 
 	layer->fLayerData->ReadFromLink(link);
@@ -323,7 +291,7 @@ ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent)
 	link.Read<int32>(&parentToken);
 
 	STRACE(("ServerWindow(%s)::CreateLayerTree()-> layer %s, token %ld\n",
-		fName, name, token));
+		fTitle, name, token));
 
 	Layer *newLayer = new Layer(frame, name, token, resizeMask, 
 			flags, gDesktop->GetDisplayDriver());
@@ -353,7 +321,7 @@ void
 ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 {
 	if (fCurrentLayer == NULL && code != AS_LAYER_CREATE_ROOT && code != AS_LAYER_CREATE) {
-		printf("ServerWindow %s received unexpected code - message offset %ld before top_view attached.\n",fName, code - SERVER_TRUE);
+		printf("ServerWindow %s received unexpected code - message offset %ld before top_view attached.\n", Title(), code - SERVER_TRUE);
 		return;
 	}
 
@@ -363,7 +331,7 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		//--------- BView Messages -----------------
 		case AS_LAYER_SCROLL:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SCROLL: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SCROLL: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
 			float dh;
 			float dv;
 
@@ -422,9 +390,9 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			Layer *current = fWinBorder->FindLayer(token);
 			if (current) {
-				DTRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: %s, token %ld\n", fName, current->fName->String(), token));
+				DTRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: %s, token %ld\n", fTitle, current->Name(), token));
 			} else {
-				DTRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: layer not found, token %ld\n", fName, token));
+				DTRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: layer not found, token %ld\n", fTitle, token));
 			}
 
 			if (current)
@@ -437,7 +405,7 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_LAYER_CREATE_ROOT:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_CREATE_ROOT\n", fName));
+			STRACE(("ServerWindow %s: Message AS_LAYER_CREATE_ROOT\n", fTitle));
 
 			// Start receiving top_view data -- pass NULL as the parent view.
 			// This should be the *only* place where this happens.
@@ -455,14 +423,14 @@ ServerWindow::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_LAYER_CREATE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_CREATE: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_CREATE: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
 
 			Layer* parent = NULL;
 			Layer* newLayer = CreateLayerTree(link, &parent);
 			if (parent != NULL)
 				parent->AddChild(newLayer, this);
 
-printf("Adi: create %s\n", fName);
+printf("Adi: create %s\n", fTitle);
 			if (!newLayer->IsHidden())
 #ifndef NEW_CLIPPING
 				myRootLayer->GoInvalidate(newLayer, newLayer->fFull);
@@ -479,7 +447,7 @@ printf("Adi: create %s\n", fName);
 			// layer, detach the layer itself, delete it, and invalidate the
 			// area assuming that the view was visible when removed
 
-			STRACE(("ServerWindow %s: AS_LAYER_DELETE(self)...\n", fName));			
+			STRACE(("ServerWindow %s: AS_LAYER_DELETE(self)...\n", fTitle));			
 			Layer *parent;
 			parent = fCurrentLayer->fParent;
 
@@ -493,7 +461,7 @@ printf("Adi: create %s\n", fName);
 			#ifdef DEBUG_SERVERWINDOW
 			parent->PrintTree();
 			#endif
-			STRACE(("DONE: ServerWindow %s: Message AS_DELETE_LAYER: Parent: %s Layer: %s\n", fName, parent->fName->String(), fCurrentLayer->fName->String()));
+			STRACE(("DONE: ServerWindow %s: Message AS_DELETE_LAYER: Parent: %s Layer: %s\n", fTitle, parent->Name(), fCurrentLayer->Name()));
 
 			delete fCurrentLayer;
 
@@ -502,7 +470,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_SET_STATE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_STATE: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_STATE: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
 //			SetLayerState(fCurrentLayer);
 			SetLayerState(fCurrentLayer, link);
 			// TODO: should this be moved into SetLayerState?
@@ -514,7 +482,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_SET_FONT_STATE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
 //			SetLayerFontState(fCurrentLayer);
 			SetLayerFontState(fCurrentLayer, link);
 #ifndef NEW_CLIPPING
@@ -524,7 +492,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_GET_STATE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_STATE: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_STATE: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
 
 			fMsgSender->StartMessage(SERVER_TRUE);
 
@@ -540,7 +508,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_SET_MOUSE_EVENT_MASK:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_MOUSE_EVENT_MASK: Layer name: %s\n", fName, fCurrentLayer->fName->String()));			
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_MOUSE_EVENT_MASK: Layer name: %s\n", fTitle, fCurrentLayer->Name()));			
 
 			uint32		mask;
 			uint32		options;
@@ -553,7 +521,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_MOVETO:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_MOVETO: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_MOVETO: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
 			float x, y;
 			
 			link.Read<float>(&x);
@@ -567,7 +535,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_RESIZETO:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZETO: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZETO: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
 			float newWidth, newHeight;
 			
 			link.Read<float>(&newWidth);
@@ -583,7 +551,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_GET_COORD:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			fMsgSender->StartMessage(SERVER_TRUE);
 			// our offset in the parent -> will be originX and originY in BView
 			fMsgSender->Attach<float>(fCurrentLayer->fFrame.left);
@@ -595,7 +563,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_SET_ORIGIN:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_ORIGIN: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_ORIGIN: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			float x, y;
 			
 			link.Read<float>(&x);
@@ -606,7 +574,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_GET_ORIGIN:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_ORIGIN: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_ORIGIN: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			fMsgSender->StartMessage(SERVER_TRUE);
 			fMsgSender->Attach<BPoint>(fCurrentLayer->fLayerData->Origin());
 			fMsgSender->Flush();
@@ -614,13 +582,13 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_RESIZE_MODE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZE_MODE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZE_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			link.Read<uint32>(&(fCurrentLayer->fResizeMode));
 			break;
 		}
 		case AS_LAYER_CURSOR:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: Layer: %s - NOT IMPLEMENTED\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: Layer: %s - NOT IMPLEMENTED\n", Title(), fCurrentLayer->Name()));
 			int32 token;
 
 			link.Read<int32>(&token);
@@ -634,24 +602,24 @@ printf("Adi: create %s\n", fName);
 		{
 			link.Read<uint32>(&(fCurrentLayer->fFlags));
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FLAGS: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FLAGS: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			break;
 		}
 		case AS_LAYER_HIDE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_HIDE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_HIDE: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			fCurrentLayer->Hide();
 			break;
 		}
 		case AS_LAYER_SHOW:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SHOW: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SHOW: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			fCurrentLayer->Show();
 			break;
 		}
 		case AS_LAYER_SET_LINE_MODE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_LINE_MODE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_LINE_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			int8 lineCap, lineJoin;
 			float miterLimit;
 
@@ -669,7 +637,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_GET_LINE_MODE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_LINE_MODE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_LINE_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			fMsgSender->StartMessage(SERVER_TRUE);
 			fMsgSender->Attach<int8>((int8)(fCurrentLayer->fLayerData->LineCapMode()));
 			fMsgSender->Attach<int8>((int8)(fCurrentLayer->fLayerData->LineJoinMode()));
@@ -680,7 +648,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_PUSH_STATE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_PUSH_STATE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_PUSH_STATE: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			
 			fCurrentLayer->PushState();
 #ifndef NEW_CLIPPING
@@ -690,7 +658,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_POP_STATE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_POP_STATE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_POP_STATE: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			
 			fCurrentLayer->PopState();
 #ifndef NEW_CLIPPING
@@ -700,7 +668,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_SET_SCALE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			float scale;
 			link.Read<float>(&scale);
 			// TODO: The BeBook says, if you call SetScale() it will be
@@ -710,7 +678,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_GET_SCALE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_SCALE: Layer: %s\n",fName, fCurrentLayer->fName->String()));		
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_SCALE: Layer: %s\n", Title(), fCurrentLayer->Name()));		
 			LayerData		*ld = fCurrentLayer->fLayerData;
 
 			// TODO: And here, we're taking that into account, but not above
@@ -730,7 +698,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_SET_PEN_LOC:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_LOC: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_LOC: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			float		x, y;
 			
 			link.Read<float>(&x);
@@ -742,7 +710,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_GET_PEN_LOC:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			fMsgSender->StartMessage(SERVER_TRUE);
 			fMsgSender->Attach<BPoint>(fCurrentLayer->fLayerData->PenLocation());
 			fMsgSender->Flush();
@@ -751,7 +719,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_SET_PEN_SIZE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			float penSize;
 			link.Read<float>(&penSize);
 			fCurrentLayer->fLayerData->SetPenSize(penSize);
@@ -760,7 +728,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_GET_PEN_SIZE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			fMsgSender->StartMessage(SERVER_TRUE);
 			fMsgSender->Attach<float>(fCurrentLayer->fLayerData->PenSize());
 			fMsgSender->Flush();
@@ -769,7 +737,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_SET_VIEW_COLOR:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_VIEW_COLOR: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_VIEW_COLOR: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			rgb_color c;
 			
 			link.Read(&c, sizeof(rgb_color));
@@ -784,7 +752,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_GET_COLORS:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_COLORS: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_COLORS: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			rgb_color highColor, lowColor, viewColor;
 			
 			highColor = fCurrentLayer->fLayerData->HighColor().GetColor32();
@@ -801,7 +769,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_SET_BLEND_MODE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_BLEND_MODE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_BLEND_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			int8 srcAlpha, alphaFunc;
 			
 			link.Read<int8>(&srcAlpha);
@@ -814,7 +782,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_GET_BLEND_MODE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_BLEND_MODE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_BLEND_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			fMsgSender->StartMessage(SERVER_TRUE);
 			fMsgSender->Attach<int8>((int8)(fCurrentLayer->fLayerData->AlphaSrcMode()));
 			fMsgSender->Attach<int8>((int8)(fCurrentLayer->fLayerData->AlphaFncMode()));
@@ -824,7 +792,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_SET_DRAW_MODE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_DRAW_MODE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_DRAW_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			int8 drawingMode;
 			
 			link.Read<int8>(&drawingMode);
@@ -835,7 +803,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_GET_DRAW_MODE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_DRAW_MODE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_DRAW_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			fMsgSender->StartMessage(SERVER_TRUE);
 			fMsgSender->Attach<int8>((int8)(fCurrentLayer->fLayerData->GetDrawingMode()));
 			fMsgSender->Flush();
@@ -844,7 +812,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_PRINT_ALIASING:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			bool fontAliasing;
 			link.Read<bool>(&fontAliasing);
 			fCurrentLayer->fLayerData->SetFontAntiAliasing(!fontAliasing);
@@ -853,7 +821,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_CLIP_TO_PICTURE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: Layer: %s\n", Title(), fCurrentLayer->Name()));
 		// TODO: you are not allowed to use Layer regions here!!!
 		// If there is no other way, then first lock RootLayer object first.
 			
@@ -895,7 +863,7 @@ printf("Adi: create %s\n", fName);
 		
 		case AS_LAYER_GET_CLIP_REGION:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_CLIP_REGION: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_CLIP_REGION: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			
 			// if this Layer is hidden, it is clear that its visible region is void.
 			if (fCurrentLayer->IsHidden())
@@ -938,7 +906,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_SET_CLIP_REGION:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_CLIP_REGION: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_CLIP_REGION: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			
 			// TODO: Watch out for the coordinate system in AS_LAYER_SET_CLIP_REGION
 			int32 noOfRects;
@@ -968,7 +936,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_INVAL_RECT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			
 			// TODO: handle transformation (origin and scale) prior to converting to top
 			BRect		invalRect;
@@ -985,7 +953,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_INVAL_REGION:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			
 			// TODO: handle transformation (origin and scale) prior to converting to top
 			// TODO: Handle conversion to top
@@ -1007,7 +975,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_BEGIN_UPDATE:
 		{
-			DTRACE(("ServerWindowo %s: AS_BEGIN_UPDATE\n",fName));
+			DTRACE(("ServerWindowo %s: AS_BEGIN_UPDATE\n", Title()));
 			fWinBorder->GetRootLayer()->Lock();
 			fWinBorder->UpdateStart();
 			fWinBorder->GetRootLayer()->Unlock();
@@ -1015,7 +983,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_END_UPDATE:
 		{
-			DTRACE(("ServerWindowo %s: AS_END_UPDATE\n",fName));
+			DTRACE(("ServerWindowo %s: AS_END_UPDATE\n", Title()));
 			fWinBorder->GetRootLayer()->Lock();
 			fWinBorder->UpdateEnd();
 			fWinBorder->GetRootLayer()->Unlock();
@@ -1030,54 +998,54 @@ printf("Adi: create %s\n", fName);
 			// Received when a window deletes its internal top view
 			
 			// TODO: Implement AS_LAYER_DELETE_ROOT
-			STRACE(("ServerWindow %s: Message Delete_Layer_Root unimplemented\n",fName));
+			STRACE(("ServerWindow %s: Message Delete_Layer_Root unimplemented\n", Title()));
 			break;
 		}
 		case AS_SHOW_WINDOW:
 		{
-			STRACE(("ServerWindow %s: Message AS_SHOW_WINDOW\n",fName));
+			STRACE(("ServerWindow %s: Message AS_SHOW_WINDOW\n", Title()));
 			Show();
 			break;
 		}
 		case AS_HIDE_WINDOW:
 		{
-			STRACE(("ServerWindow %s: Message AS_HIDE_WINDOW\n",fName));		
+			STRACE(("ServerWindow %s: Message AS_HIDE_WINDOW\n", Title()));		
 			Hide();
 			break;
 		}
 		case AS_SEND_BEHIND:
 		{
 			// TODO: Implement AS_SEND_BEHIND
-			STRACE(("ServerWindow %s: Message  Send_Behind unimplemented\n",fName));
+			STRACE(("ServerWindow %s: Message  Send_Behind unimplemented\n", Title()));
 			break;
 		}
 		case AS_ENABLE_UPDATES:
 		{
 			// TODO: Implement AS_ENABLE_UPDATES
-			STRACE(("ServerWindow %s: Message Enable_Updates unimplemented\n",fName));
+			STRACE(("ServerWindow %s: Message Enable_Updates unimplemented\n", Title()));
 			break;
 		}
 		case AS_DISABLE_UPDATES:
 		{
 			// TODO: Implement AS_DISABLE_UPDATES
-			STRACE(("ServerWindow %s: Message Disable_Updates unimplemented\n",fName));
+			STRACE(("ServerWindow %s: Message Disable_Updates unimplemented\n", Title()));
 			break;
 		}
 		case AS_NEEDS_UPDATE:
 		{
 			// TODO: Implement AS_NEEDS_UPDATE
-			STRACE(("ServerWindow %s: Message Needs_Update unimplemented\n",fName));
+			STRACE(("ServerWindow %s: Message Needs_Update unimplemented\n", Title()));
 			break;
 		}
 		case AS_WINDOW_TITLE:
 		{
 			// TODO: Implement AS_WINDOW_TITLE
-			STRACE(("ServerWindow %s: Message Set_Title unimplemented\n",fName));
+			STRACE(("ServerWindow %s: Message Set_Title unimplemented\n", Title()));
 			break;
 		}
 		case AS_ADD_TO_SUBSET:
 		{
-			STRACE(("ServerWindow %s: Message AS_ADD_TO_SUBSET\n",fName));
+			STRACE(("ServerWindow %s: Message AS_ADD_TO_SUBSET\n", Title()));
 			WinBorder *wb;
 			int32 mainToken;
 			team_id	teamID;
@@ -1104,7 +1072,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_REM_FROM_SUBSET:
 		{
-			STRACE(("ServerWindow %s: Message AS_REM_FROM_SUBSET\n",fName));
+			STRACE(("ServerWindow %s: Message AS_REM_FROM_SUBSET\n", Title()));
 			WinBorder *wb;
 			int32 mainToken;
 			team_id teamID;
@@ -1131,18 +1099,18 @@ printf("Adi: create %s\n", fName);
 		case AS_SET_LOOK:
 		{
 			// TODO: Implement AS_SET_LOOK
-			STRACE(("ServerWindow %s: Message Set_Look unimplemented\n",fName));
+			STRACE(("ServerWindow %s: Message Set_Look unimplemented\n", Title()));
 			break;
 		}
 		case AS_SET_FLAGS:
 		{
 			// TODO: Implement AS_SET_FLAGS
-			STRACE(("ServerWindow %s: Message Set_Flags unimplemented\n",fName));
+			STRACE(("ServerWindow %s: Message Set_Flags unimplemented\n", Title()));
 			break;
 		}
 		case AS_SET_FEEL:
 		{
-			STRACE(("ServerWindow %s: Message AS_SET_FEEL\n",fName));
+			STRACE(("ServerWindow %s: Message AS_SET_FEEL\n", Title()));
 			int32 newFeel;
 			link.Read<int32>(&newFeel);
 			myRootLayer->GoChangeWinBorderFeel(fWinBorder, newFeel);
@@ -1151,18 +1119,18 @@ printf("Adi: create %s\n", fName);
 		case AS_SET_ALIGNMENT:
 		{
 			// TODO: Implement AS_SET_ALIGNMENT
-			STRACE(("ServerWindow %s: Message Set_Alignment unimplemented\n",fName));
+			STRACE(("ServerWindow %s: Message Set_Alignment unimplemented\n", Title()));
 			break;
 		}
 		case AS_GET_ALIGNMENT:
 		{
 			// TODO: Implement AS_GET_ALIGNMENT
-			STRACE(("ServerWindow %s: Message Get_Alignment unimplemented\n",fName));
+			STRACE(("ServerWindow %s: Message Get_Alignment unimplemented\n", Title()));
 			break;
 		}
 		case AS_GET_WORKSPACES:
 		{
-			STRACE(("ServerWindow %s: Message Get_Workspaces unimplemented\n",fName));
+			STRACE(("ServerWindow %s: Message Get_Workspaces unimplemented\n", Title()));
 			fMsgSender->StartMessage(SERVER_TRUE);
 			fMsgSender->Attach<uint32>(fWinBorder->Workspaces());
 			fMsgSender->Flush();
@@ -1171,7 +1139,7 @@ printf("Adi: create %s\n", fName);
 		case AS_SET_WORKSPACES:
 		{
 			// TODO: Implement AS_SET_WORKSPACES
-			STRACE(("ServerWindow %s: Message Set_Workspaces unimplemented\n",fName));
+			STRACE(("ServerWindow %s: Message Set_Workspaces unimplemented\n", Title()));
 			uint32 newWorkspaces;
 			link.Read<uint32>(&newWorkspaces);
 
@@ -1191,7 +1159,7 @@ printf("Adi: create %s\n", fName);
 			link.Read<float>(&xResizeBy);
 			link.Read<float>(&yResizeBy);
 
-			STRACE(("ServerWindow %s: Message AS_WINDOW_RESIZE %.1f, %.1f\n",fName, xResizeBy, yResizeBy));
+			STRACE(("ServerWindow %s: Message AS_WINDOW_RESIZE %.1f, %.1f\n", Title(), xResizeBy, yResizeBy));
 			
 			fWinBorder->ResizeBy(xResizeBy, yResizeBy);
 			
@@ -1205,7 +1173,7 @@ printf("Adi: create %s\n", fName);
 			link.Read<float>(&xMoveBy);
 			link.Read<float>(&yMoveBy);
 
-			STRACE(("ServerWindow %s: Message AS_WINDOW_MOVE: %.1f, %.1f\n",fName, xMoveBy, yMoveBy));
+			STRACE(("ServerWindow %s: Message AS_WINDOW_MOVE: %.1f, %.1f\n", Title(), xMoveBy, yMoveBy));
 
 			fWinBorder->MoveBy(xMoveBy, yMoveBy);
 
@@ -1247,25 +1215,25 @@ printf("Adi: create %s\n", fName);
 		case B_MINIMIZE:
 		{
 			// TODO: Implement B_MINIMIZE
-			STRACE(("ServerWindow %s: Message Minimize unimplemented\n",fName));
+			STRACE(("ServerWindow %s: Message Minimize unimplemented\n", Title()));
 			break;
 		}
 		case B_WINDOW_ACTIVATED:
 		{
 			// TODO: Implement B_WINDOW_ACTIVATED
-			STRACE(("ServerWindow %s: Message Window_Activated unimplemented\n",fName));
+			STRACE(("ServerWindow %s: Message Window_Activated unimplemented\n", Title()));
 			break;
 		}
 		case B_ZOOM:
 		{
 			// TODO: Implement B_ZOOM
-			STRACE(("ServerWindow %s: Message Zoom unimplemented\n",fName));
+			STRACE(("ServerWindow %s: Message Zoom unimplemented\n", Title()));
 			break;
 		}
 		// Some BView drawing messages, but which don't need clipping
 		case AS_LAYER_SET_HIGH_COLOR:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_HIGH_COLOR: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_HIGH_COLOR: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			rgb_color c;
 			
 			link.Read(&c, sizeof(rgb_color));
@@ -1276,7 +1244,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_SET_LOW_COLOR:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_LOW_COLOR: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_LOW_COLOR: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			rgb_color c;
 			
 			link.Read(&c, sizeof(rgb_color));
@@ -1287,7 +1255,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_LAYER_SET_PATTERN:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PATTERN: Layer: %s\n", fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PATTERN: Layer: %s\n", fTitle, fCurrentLayer->Name()));
 			pattern pat;
 			
 			link.Read(&pat, sizeof(pattern));
@@ -1298,7 +1266,7 @@ printf("Adi: create %s\n", fName);
 		}	
 		case AS_MOVEPENTO:
 		{
-			DTRACE(("ServerWindow %s: Message AS_MOVEPENTO\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_MOVEPENTO\n", Title()));
 			
 			float x,y;
 			
@@ -1311,7 +1279,7 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_SETPENSIZE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_SETPENSIZE\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_SETPENSIZE\n", Title()));
 			float size;
 			
 			link.Read<float>(&size);
@@ -1322,20 +1290,20 @@ printf("Adi: create %s\n", fName);
 		}
 		case AS_SET_FONT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_SET_FONT\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_SET_FONT\n", Title()));
 			// TODO: Implement AS_SET_FONT?
 			// Confusing!! But it works already!
 			break;
 		}
 		case AS_SET_FONT_SIZE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_SET_FONT_SIZE\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_SET_FONT_SIZE\n", Title()));
 			// TODO: Implement AS_SET_FONT_SIZE?
 			break;
 		}
 		case AS_AREA_MESSAGE:
 		{
-			STRACE(("ServerWindow %s: Message AS_AREA_MESSAGE\n",fName));
+			STRACE(("ServerWindow %s: Message AS_AREA_MESSAGE\n", Title()));
 			// This occurs in only one kind of case: a message is too big to send over a port. This
 			// is really an edge case, so this shouldn't happen *too* often
 			
@@ -1380,20 +1348,20 @@ printf("Adi: create %s\n", fName);
 		case AS_LAYER_DRAG_IMAGE:
 		{
 			// TODO: Implement AS_LAYER_DRAG_IMAGE
-			STRACE(("ServerWindow %s: Message AS_DRAG_IMAGE unimplemented\n",fName));
-			DTRACE(("ServerWindow %s: Message AS_DRAG_IMAGE unimplemented\n",fName));
+			STRACE(("ServerWindow %s: Message AS_DRAG_IMAGE unimplemented\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_DRAG_IMAGE unimplemented\n", Title()));
 			break;
 		}
 		case AS_LAYER_DRAG_RECT:
 		{
 			// TODO: Implement AS_LAYER_DRAG_RECT
-			STRACE(("ServerWindow %s: Message AS_DRAG_RECT unimplemented\n",fName));
-			DTRACE(("ServerWindow %s: Message AS_DRAG_RECT unimplemented\n",fName));
+			STRACE(("ServerWindow %s: Message AS_DRAG_RECT unimplemented\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_DRAG_RECT unimplemented\n", Title()));
 			break;
 		}
 		case AS_LAYER_GET_MOUSE_COORDS:
 		{
-			DTRACE(("ServerWindow %s: Message AS_GET_MOUSE_COORDS\n", fName));
+			DTRACE(("ServerWindow %s: Message AS_GET_MOUSE_COORDS\n", fTitle));
 
 			fMsgSender->StartMessage(SERVER_TRUE);
 
@@ -1437,7 +1405,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 	switch (code) {
 		case AS_STROKE_LINE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE_LINE\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_STROKE_LINE\n", Title()));
 
 			float x1, y1, x2, y2;
 
@@ -1465,7 +1433,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_LAYER_INVERT_RECT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_INVERT_RECT\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_INVERT_RECT\n", Title()));
 			
 			BRect rect;
 			link.Read<BRect>(&rect);
@@ -1476,7 +1444,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_STROKE_RECT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE_RECT\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_STROKE_RECT\n", Title()));
 			
 			float left, top, right, bottom;
 			link.Read<float>(&left);
@@ -1486,22 +1454,22 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			BRect rect(left,top,right,bottom);
 			
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				gDesktop->GetDisplayDriver()->StrokeRect(fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->StrokeRect(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_FILL_RECT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_FILL_RECT\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_FILL_RECT\n", Title()));
 			
 			BRect rect;
 			link.Read<BRect>(&rect);
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				gDesktop->GetDisplayDriver()->FillRect(fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->FillRect(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
 			int32		bitmapToken;
 			BPoint 		point;
 			
@@ -1522,7 +1490,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_LAYER_DRAW_BITMAP_ASYNC_AT_POINT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_ASYNC_AT_POINT: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_ASYNC_AT_POINT: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
 			int32		bitmapToken;
 			BPoint 		point;
 			
@@ -1541,7 +1509,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
 			int32 bitmapToken;
 			BRect srcRect, dstRect;
 			
@@ -1561,7 +1529,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_LAYER_DRAW_BITMAP_ASYNC_IN_RECT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_ASYNC_IN_RECT: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_ASYNC_IN_RECT: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
 			int32 bitmapToken;
 			BRect srcRect, dstRect;
 			
@@ -1579,7 +1547,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_STROKE_ARC:
 		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE_ARC\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_STROKE_ARC\n", Title()));
 			
 			float angle, span;
 			BRect r;
@@ -1588,12 +1556,12 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&angle);
 			link.Read<float>(&span);
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				gDesktop->GetDisplayDriver()->StrokeArc(fCurrentLayer->ConvertToTop(r),angle,span,fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->StrokeArc(fCurrentLayer->ConvertToTop(r),angle,span, fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_FILL_ARC:
 		{
-			DTRACE(("ServerWindow %s: Message AS_FILL_ARC\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_FILL_ARC\n", Title()));
 			
 			float angle, span;
 			BRect r;
@@ -1602,12 +1570,12 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&angle);
 			link.Read<float>(&span);
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				gDesktop->GetDisplayDriver()->FillArc(fCurrentLayer->ConvertToTop(r),angle,span,fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->FillArc(fCurrentLayer->ConvertToTop(r),angle,span, fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_STROKE_BEZIER:
 		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE_BEZIER\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_STROKE_BEZIER\n", Title()));
 			
 			BPoint *pts;
 			int i;
@@ -1621,14 +1589,14 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 				for (i=0; i<4; i++)
 					pts[i]=fCurrentLayer->ConvertToTop(pts[i]);
 				
-				gDesktop->GetDisplayDriver()->StrokeBezier(pts,fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->StrokeBezier(pts, fCurrentLayer->fLayerData);
 			}
 			delete [] pts;
 			break;
 		}
 		case AS_FILL_BEZIER:
 		{
-			DTRACE(("ServerWindow %s: Message AS_FILL_BEZIER\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_FILL_BEZIER\n", Title()));
 			
 			BPoint *pts;
 			int i;
@@ -1642,34 +1610,34 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 				for (i=0; i<4; i++)
 					pts[i]=fCurrentLayer->ConvertToTop(pts[i]);
 				
-				gDesktop->GetDisplayDriver()->FillBezier(pts,fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->FillBezier(pts, fCurrentLayer->fLayerData);
 			}
 			delete [] pts;
 			break;
 		}
 		case AS_STROKE_ELLIPSE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE_ELLIPSE\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_STROKE_ELLIPSE\n", Title()));
 			
 			BRect rect;
 			link.Read<BRect>(&rect);
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				gDesktop->GetDisplayDriver()->StrokeEllipse(fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->StrokeEllipse(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_FILL_ELLIPSE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_FILL_ELLIPSE\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_FILL_ELLIPSE\n", Title()));
 			
 			BRect rect;
 			link.Read<BRect>(&rect);
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				gDesktop->GetDisplayDriver()->FillEllipse(fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->FillEllipse(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_STROKE_ROUNDRECT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE_ROUNDRECT\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_STROKE_ROUNDRECT\n", Title()));
 			
 			BRect rect;
 			float xrad,yrad;
@@ -1678,12 +1646,12 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&yrad);
 			
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				gDesktop->GetDisplayDriver()->StrokeRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad,fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->StrokeRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad, fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_FILL_ROUNDRECT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_FILL_ROUNDRECT\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_FILL_ROUNDRECT\n", Title()));
 			
 			BRect rect;
 			float xrad,yrad;
@@ -1692,12 +1660,12 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&yrad);
 			
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				gDesktop->GetDisplayDriver()->FillRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad,fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->FillRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad, fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_STROKE_TRIANGLE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE_TRIANGLE\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_STROKE_TRIANGLE\n", Title()));
 			
 			BPoint pts[3];
 			BRect rect;
@@ -1712,13 +1680,13 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 				for(int i=0;i<3;i++)
 					pts[i]=fCurrentLayer->ConvertToTop(pts[i]);
 				
-				gDesktop->GetDisplayDriver()->StrokeTriangle(pts,fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->StrokeTriangle(pts, fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
 			}
 			break;
 		}
 		case AS_FILL_TRIANGLE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_FILL_TRIANGLE\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_FILL_TRIANGLE\n", Title()));
 			
 			BPoint pts[3];
 			BRect rect;
@@ -1733,14 +1701,14 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 				for(int i=0;i<3;i++)
 					pts[i]=fCurrentLayer->ConvertToTop(pts[i]);
 				
-				gDesktop->GetDisplayDriver()->FillTriangle(pts,fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
+				gDesktop->GetDisplayDriver()->FillTriangle(pts, fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
 			}
 			break;
 		}
 // TODO: get rid of all this code duplication!!
 		case AS_STROKE_POLYGON:
 		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE_POLYGON\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_STROKE_POLYGON\n", Title()));
 			
 			BRect polyframe;
 			bool isclosed;
@@ -1760,14 +1728,13 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			
 			gDesktop->GetDisplayDriver()->StrokePolygon(pointlist,pointcount,polyframe,
 					fCurrentLayer->fLayerData,isclosed);
-			
+
 			delete [] pointlist;
-			
 			break;
 		}
 		case AS_FILL_POLYGON:
 		{
-			DTRACE(("ServerWindow %s: Message AS_FILL_POLYGON\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_FILL_POLYGON\n", Title()));
 			
 			BRect polyframe;
 			int32 pointcount;
@@ -1783,7 +1750,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			for(int32 i=0; i<pointcount; i++)
 				pointlist[i]=fCurrentLayer->ConvertToTop(pointlist[i]);
 			
-			gDesktop->GetDisplayDriver()->FillPolygon(pointlist,pointcount,polyframe,fCurrentLayer->fLayerData);
+			gDesktop->GetDisplayDriver()->FillPolygon(pointlist,pointcount,polyframe, fCurrentLayer->fLayerData);
 			
 			delete [] pointlist;
 			
@@ -1791,7 +1758,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_STROKE_SHAPE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE_SHAPE\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_STROKE_SHAPE\n", Title()));
 			
 			BRect shaperect;
 			int32 opcount;
@@ -1820,7 +1787,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_FILL_SHAPE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_FILL_SHAPE\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_FILL_SHAPE\n", Title()));
 			
 			BRect shaperect;
 			int32 opcount;
@@ -1850,33 +1817,34 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_FILL_REGION:
 		{
-			DTRACE(("ServerWindow %s: Message AS_FILL_REGION\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_FILL_REGION\n", Title()));
 			
-			int32 rectcount;
-			BRect *rectlist;
-			
-			link.Read<int32>(&rectcount);
-			
-			rectlist=new BRect[rectcount];
-			
-			link.Read(rectlist, sizeof(BRect)*rectcount);
-			
+			int32 count;
+			link.Read<int32>(&count);
+
+			BRect *rects = new BRect[count];
+			if (link.Read(rects, sizeof(BRect) * count) != B_OK) {
+				delete[] rects;
+				break;
+			}
+
 			// Between the client-side conversion to BRects from clipping_rects to the overhead
 			// in repeatedly calling FillRect(), this is definitely in need of optimization. At
 			// least it works for now. :)
-			for(int32 i=0; i<rectcount; i++)
-				gDesktop->GetDisplayDriver()->FillRect(fCurrentLayer->ConvertToTop(rectlist[i]),fCurrentLayer->fLayerData);
-			
-			delete [] rectlist;
-			
+			for (int32 i = 0; i < count; i++) {
+				gDesktop->GetDisplayDriver()->FillRect(fCurrentLayer->ConvertToTop(rects[i]), 
+					fCurrentLayer->fLayerData);
+			}
+
+			delete[] rects;
+
 			// TODO: create support for clipping_rect usage for faster BRegion display.
 			// Tweaks to DisplayDriver are necessary along with conversion routines in Layer
-			
 			break;
 		}
 		case AS_STROKE_LINEARRAY:
 		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE_LINEARRAY\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_STROKE_LINEARRAY\n", Title()));
 			
 			// Attached Data:
 			// 1) int32 Number of lines in the array
@@ -1908,7 +1876,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_DRAW_STRING:
 		{
-			DTRACE(("ServerWindow %s: Message AS_DRAW_STRING\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_DRAW_STRING\n", Title()));
 			char *string;
 			int32 length;
 			BPoint location;
@@ -1929,7 +1897,7 @@ ServerWindow::DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		default:
 		{
-			printf("ServerWindow %s received unexpected code - message offset %ld\n",fName, code - SERVER_TRUE);
+			printf("ServerWindow %s received unexpected code - message offset %ld\n", Title(), code - SERVER_TRUE);
 			break;
 		}
 	}
@@ -1956,8 +1924,9 @@ ServerWindow::MonitorWin(void *data)
 	status_t err = B_OK;
 
 	while (!quitting) {
-//		printf("info: ServerWindow::MonitorWin listening on port %ld.\n", win->fMessagePort);
-		code = AS_CLIENT_DEAD;
+		STRACE(("info: ServerWindow::MonitorWin listening on port %ld.\n",
+			win->fMessagePort));
+
 		err = ses->GetNextMessage(code);
 		if (err < B_OK)
 			return err;
@@ -1966,10 +1935,10 @@ ServerWindow::MonitorWin(void *data)
 
 		switch (code) {
 			case AS_DELETE_WINDOW:
-			case AS_CLIENT_DEAD:
 			{
 				// this means the client has been killed
-				STRACE(("ServerWindow %s received 'AS_CLIENT_DEAD/AS_DELETE_WINDOW' message code\n",win->Title()));
+				STRACE(("ServerWindow %s received 'AS_DELETE_WINDOW' message code\n",
+					win->Title()));
 
 				//RootLayer *rootLayer = fWinBorder->GetRootLayer();
 
@@ -1988,15 +1957,16 @@ ServerWindow::MonitorWin(void *data)
 				if (!win->fWinBorder->IsHidden())
 					CRITICAL("ServerWindow: a window must be hidden before it's deleted\n");
 
+				win->App()->RemoveWindow(win);
 				delete win;
-				//	rootLayer->Unlock();
-				
+
+				//rootLayer->Unlock();
 				exit_thread(0);
 				break;
 			}
 			case B_QUIT_REQUESTED:
 			{
-				STRACE(("ServerWindow %s received Quit request\n",win->Title()));
+				STRACE(("ServerWindow %s received Quit request\n", win->Title()));
 				win->Quit();
 				break;
 			}
@@ -2078,7 +2048,7 @@ ServerWindow::SendMessageToClient(const BMessage* msg, int32 target, bool usePre
 		if (ret < B_OK)
 			fprintf(stderr, "ServerWindow::SendMessageToClient(): %s\n", strerror(ret));
 	} else
-		printf("PANIC: ServerWindow %s: can't flatten message in 'SendMessageToClient()'\n", fName);
+		printf("PANIC: ServerWindow %s: can't flatten message in 'SendMessageToClient()'\n", fTitle);
 
 	delete[] buffer;
 }

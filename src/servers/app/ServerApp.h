@@ -43,14 +43,8 @@ public:
 
 	status_t InitCheck();
 	bool Run();
-
 	void Quit();
-	/*
-	TODO: These aren't even implemented...
-	void Lock(void);
-	void Unlock(void);
-	bool IsLocked(void);
-	*/
+
 	/*!
 		\brief Determines whether the application is the active one
 		\return true if active, false if not.
@@ -61,7 +55,7 @@ public:
 	bool PingTarget(void);
 
 	void PostMessage(int32 code);
-	void SendMessageToClient( const BMessage* msg ) const;
+	void SendMessageToClient(const BMessage* msg) const;
 
 	void SetAppCursor(void);
 
@@ -70,24 +64,23 @@ public:
 
 	const char *Signature() const { return fSignature.String(); }
 
+	void RemoveWindow(ServerWindow* window);
+
 	int32 CountBitmaps() const;
 	ServerBitmap *FindBitmap(int32 token) const;
-	
+
 	int32 CountPictures() const;
 	ServerPicture *FindPicture(int32 token) const;
 
 	AreaPool *AppAreaPool() { return fSharedMem; }
-	
+
 	SubWindowList fAppSubWindowList;
-	
+
 private:
 	void _DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
 	void _MessageLooper();
 
 	static int32 _message_thread(void *data);	
-
-	// TODO: Not used.
-	sem_id fLockSem;
 
 	// our BApplication's event port
 	port_id	fClientReplyPort;	
@@ -106,10 +99,12 @@ private:
 
 	BPrivate::PortLink fLink;
 
+	BLocker fWindowListLock;
+	BList fWindowList;
+
 	// TODO:
 	// - Are really Bitmaps and Pictures stored per application and not globally ?
 	// - As we reference these stuff by token, what about putting them in hash tables ?
-	BList fWindowList;
 	BList fBitmapList;
 	BList fPictureList;
 

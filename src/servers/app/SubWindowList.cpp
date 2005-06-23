@@ -89,7 +89,7 @@ SubWindowList::PrintToStream() const
 	for (int32 i=0; i<CountItems(); i++) {
 		wb = (WinBorder*)ItemAt(i);
 
-		printf("\t%s", wb->GetName());
+		printf("\t%s", wb->Name());
 
 		if (wb->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL)
 			printf("\t%s\n", "B_FLOATING_SUBSET_WINDOW_FEEL");

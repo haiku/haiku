@@ -14,11 +14,10 @@
 #include <AppDefs.h>
 #include <List.h>
 #include <String.h>
+#include <Autolock.h>
 #include <SysCursor.h>
 #include <ColorSet.h>
 #include <RGBColor.h>
-#include <stdio.h>
-#include <string.h>
 #include <ScrollBar.h>
 #include <Shape.h>
 #include <ServerProtocol.h>
@@ -45,10 +44,12 @@
 #include "LayerData.h"
 #include "Utils.h"
 
+#include <stdio.h>
+#include <string.h>
+
 //#define DEBUG_SERVERAPP
 
 #ifdef DEBUG_SERVERAPP
-#	include <stdio.h>
 #	define STRACE(x) printf x
 #else
 #	define STRACE(x) ;
@@ -57,7 +58,6 @@
 //#define DEBUG_SERVERAPP_FONT
 
 #ifdef DEBUG_SERVERAPP_FONT
-#	include <stdio.h>
 #	define FTRACE(x) printf x
 #else
 #	define FTRACE(x) ;
@@ -77,13 +77,13 @@ static const uint32 kMsgAppQuit = 'appQ';
 ServerApp::ServerApp(port_id clientReplyPort, port_id clientLooperPort,
 	team_id clientTeam, int32 handlerID, const char* signature)
 	:
-	fLockSem(-1),
 	fClientReplyPort(clientReplyPort),
 	fMessagePort(-1),
 	fClientLooperPort(clientLooperPort),
 	fSignature(signature),
 	fThread(-1),
 	fClientTeam(clientTeam),
+	fWindowListLock("window list"),
 	fAppCursor(NULL),
 	fCursorHidden(false),
 	fIsActive(false),
@@ -94,11 +94,10 @@ ServerApp::ServerApp(port_id clientReplyPort, port_id clientLooperPort,
 	if (fSignature == "")
 		fSignature = "application/no-signature";
 
-	fLockSem = create_sem(1, Signature());
-	if (fLockSem < B_OK)
-		return;
+	char name[B_OS_NAME_LENGTH];
+	snprintf(name, sizeof(name), "a<%s", Signature());
 
-	fMessagePort = create_port(DEFAULT_MONITOR_PORT_SIZE, Signature());
+	fMessagePort = create_port(DEFAULT_MONITOR_PORT_SIZE, name);
 	if (fMessagePort < B_OK)
 		return;
 
@@ -154,7 +153,6 @@ ServerApp::~ServerApp(void)
 	// there should be a way that this ServerApp be attached to a particular
 	// RootLayer to know which RootLayer's cursor to modify.
 	gDesktop->ActiveRootLayer()->GetCursorManager().RemoveAppCursors(fClientTeam);
-	delete_sem(fLockSem);
 	
 	STRACE(("#ServerApp %s:~ServerApp()\n", fSignature.String()));
 
@@ -176,8 +174,8 @@ ServerApp::InitCheck()
 	if (fClientReplyPort < B_OK)
 		return fClientReplyPort;
 
-	if (fLockSem < B_OK)
-		return fLockSem;
+	if (fWindowListLock.Sem() < B_OK)
+		return fWindowListLock.Sem();
 
 	return B_OK;
 }
@@ -390,7 +388,7 @@ ServerApp::_MessageLooper()
 				uint32 look;
 				uint32 feel;
 				uint32 flags;
-				uint32 wkspaces;
+				uint32 workspaces;
 				int32 token = B_NULL_TOKEN;
 				port_id	sendPort = -1;
 				port_id looperPort = -1;
@@ -400,24 +398,31 @@ ServerApp::_MessageLooper()
 				receiver.Read<uint32>(&look);
 				receiver.Read<uint32>(&feel);
 				receiver.Read<uint32>(&flags);
-				receiver.Read<uint32>(&wkspaces);
+				receiver.Read<uint32>(&workspaces);
 				receiver.Read<int32>(&token);
 				receiver.Read<port_id>(&sendPort);
 				receiver.Read<port_id>(&looperPort);
 				if (receiver.ReadString(&title) != B_OK)
 					break;
 
-				STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n", Signature()));
+				STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n",
+					Signature()));
 
 				// ServerWindow constructor will reply with port_id of a newly created port
-				ServerWindow *sw = new ServerWindow(title, this, sendPort, looperPort, token);
-				sw->Init(frame, look, feel, flags, wkspaces);
+				ServerWindow *window = new ServerWindow(title, this, sendPort, looperPort,
+					token);
+				window->Init(frame, look, feel, flags, workspaces);
+
+				if (fWindowListLock.Lock()) {
+					fWindowList.AddItem(window);
+					fWindowListLock.Unlock();
+				}
 
 				STRACE(("\nServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
 					app->fSignature.String(), title, frame.left, frame.top,
 					frame.right, frame.bottom));
 
-				free(title);
+				// We don't have to free the title, as it's owned by the ServerWindow now
 				break;
 			}
 
@@ -467,7 +472,7 @@ ServerApp::_MessageLooper()
 void
 ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 {
-	LayerData ld;
+//	LayerData ld;
 
 	switch (code) {
 		case AS_UPDATE_COLORS:
@@ -1913,6 +1918,15 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				puts("message doesn't need a reply!");
 			break;
 	}
+}
+
+
+void
+ServerApp::RemoveWindow(ServerWindow* window)
+{
+	BAutolock locker(fWindowListLock);
+
+	fWindowList.RemoveItem(window);
 }
 
 

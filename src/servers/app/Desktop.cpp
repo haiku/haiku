@@ -518,13 +518,13 @@ Desktop::PrintToStream(void)
 	printf("RootLayer List:\n=======\n");
 
 	for (int32 i = 0; i < fRootLayerList.CountItems(); i++) {
-		printf("\t%s\n", ((RootLayer*)fRootLayerList.ItemAt(i))->GetName());
+		printf("\t%s\n", ((RootLayer*)fRootLayerList.ItemAt(i))->Name());
 		((RootLayer*)fRootLayerList.ItemAt(i))->PrintToStream();
 		printf("-------\n");
 	}
 
 	printf("=======\nActive RootLayer: %s\n",
-		fActiveRootLayer ? fActiveRootLayer->GetName() : "NULL");
+		fActiveRootLayer ? fActiveRootLayer->Name() : "NULL");
 //	printf("Active WinBorder: %s\n", fActiveWinBorder? fActiveWinBorder->Name(): "NULL");
 
 	printf("Screen List:\n");

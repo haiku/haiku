@@ -239,7 +239,7 @@ RootLayer::WorkingThread(void *data)
 #endif
 	oneRootLayer->Unlock();
 	
-	STRACE(("info: RootLayer(%s)::WorkingThread listening on port %ld.\n", oneRootLayer->GetName(), oneRootLayer->fListenPort));
+	STRACE(("info: RootLayer(%s)::WorkingThread listening on port %ld.\n", oneRootLayer->Name(), oneRootLayer->fListenPort));
 	for (;;) {
 		err = messageQueue.GetNextMessage(code);
 		if (err < B_OK) {
@@ -381,7 +381,7 @@ printf("Adi: new message\n");
 				break;
 			}
 			default:
-				printf("RootLayer(%s)::WorkingThread received unexpected code %lx\n", oneRootLayer->GetName(), code);
+				printf("RootLayer(%s)::WorkingThread received unexpected code %lx\n", oneRootLayer->Name(), code);
 				break;
 		}
 
@@ -410,7 +410,7 @@ RootLayer::GoInvalidate(const Layer *layer, const BRegion &region)
 void RootLayer::invalidate_layer(Layer *layer, const BRegion &region)
 {
 	// NOTE: our thread (WorkingThread) is locked here.
-	STRACE(("RootLayer::invalidate_layer(%s)\n", layer->GetName()));
+	STRACE(("RootLayer::invalidate_layer(%s)\n", layer->Name()));
 
 	if (layer->fParent)
 		layer = layer->fParent;
@@ -641,7 +641,7 @@ void RootLayer::RemoveSubsetWinBorder(WinBorder *winBorder, WinBorder *fromWinBo
 // NOTE: This must be called by RootLayer's thread!!!!
 bool RootLayer::SetActiveWorkspace(int32 index)
 {
-	STRACE(("RootLayer(%s)::SetActiveWorkspace(%ld)\n", GetName(), index));
+	STRACE(("RootLayer(%s)::SetActiveWorkspace(%ld)\n", Name(), index));
 
 	// nice try!
 	if (index >= fWsCount || index == fActiveWksIndex || index < 0)
@@ -1900,7 +1900,7 @@ RootLayer::DragMessage(void) const
 void
 RootLayer::PrintToStream()
 {
-	printf("\nRootLayer '%s' internals:\n", GetName());
+	printf("\nRootLayer '%s' internals:\n", Name());
 	printf("Screen list:\n");
 	for(int32 i=0; i<fScreenPtrList.CountItems(); i++)
 		printf("\t%ld\n", ((Screen*)fScreenPtrList.ItemAt(i))->ScreenNumber());
