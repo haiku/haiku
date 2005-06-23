@@ -1,23 +1,6 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
+//	Copyright (c) 2001-2005, Haiku, Inc. All rights reserved.
+//  Distributed under the terms of the MIT license.
 //
 //	File Name:		DisplayDriverPainter.cpp
 //	Author:			Stephan Aßmus <superstippi@gmx.de>
@@ -28,35 +11,19 @@
 #include <algo.h>
 #include <stack.h>
 
+#include "HWInterface.h"
 #include "LayerData.h"
 #include "Painter.h"
 #include "PNGDump.h"
 #include "RenderingBuffer.h"
 
-#ifdef __HAIKU__
-#define USE_ACCELERANT 1
-#else
-#define USE_ACCELERANT 0
-#endif
-
-
-#if USE_ACCELERANT
-  #include "AccelerantHWInterface.h"
-#else
-  #include "ViewHWInterface.h"
-#endif
-
 #include "DisplayDriverPainter.h"
 
 // constructor
-DisplayDriverPainter::DisplayDriverPainter()
+DisplayDriverPainter::DisplayDriverPainter(HWInterface* hwInterface)
 	: DisplayDriver(),
 	  fPainter(new Painter()),
-#if USE_ACCELERANT
-	  fGraphicsCard(new AccelerantHWInterface()),
-#else
-	  fGraphicsCard(new ViewHWInterface()),
-#endif
+	  fGraphicsCard(hwInterface),
 	  fAvailableHWAccleration(0)
 {
 }
@@ -64,22 +31,24 @@ DisplayDriverPainter::DisplayDriverPainter()
 // destructor
 DisplayDriverPainter::~DisplayDriverPainter()
 {
-	delete fGraphicsCard;
+	delete fPainter;
 }
 
 // Initialize
-bool
+status_t
 DisplayDriverPainter::Initialize()
 {
-	status_t err = fGraphicsCard->Initialize();
-	if (err < B_OK)
-		fprintf(stderr, "HWInterface::Initialize() failed: %s\n", strerror(err));
-	if (err >= B_OK) {
-		fAvailableHWAccleration = fGraphicsCard->AvailableHWAcceleration();
-		return DisplayDriver::Initialize();
+	status_t err = B_ERROR;
+	if (WriteLock()) {
+		err = fGraphicsCard->Initialize();
+		if (err < B_OK)
+			fprintf(stderr, "HWInterface::Initialize() failed: %s\n", strerror(err));
+		if (err >= B_OK) {
+			err = DisplayDriver::Initialize();
+		}
+		WriteUnlock();
 	}
-
-	return false;
+	return err;
 }
 
 // Shutdown
@@ -87,6 +56,18 @@ void
 DisplayDriverPainter::Shutdown()
 {
 	DisplayDriver::Shutdown();
+}
+
+// Update
+void
+DisplayDriverPainter::Update()
+{
+	if (Lock()) {
+		fPainter->AttachToBuffer(fGraphicsCard->DrawingBuffer());
+		// available HW acceleration might have changed
+		fAvailableHWAccleration = fGraphicsCard->AvailableHWAcceleration();
+		Unlock();
+	}
 }
 
 // ConstrainClippingRegion
@@ -222,7 +203,10 @@ void
 DisplayDriverPainter::CopyRegion(/*const*/ BRegion* region,
 								 int32 xOffset, int32 yOffset)
 {
-	if (Lock()) {
+	// NOTE: Write locking because we might use HW acceleration.
+	// This needs to be investigated, I'm doing this because of
+	// gut feeling.
+	if (WriteLock()) {
 		fGraphicsCard->HideSoftwareCursor(region->Frame());
 
 		int32 count = region->CountRects();
@@ -329,7 +313,7 @@ DisplayDriverPainter::CopyRegion(/*const*/ BRegion* region,
 
 		fGraphicsCard->ShowSoftwareCursor();
 
-		Unlock();
+		WriteUnlock();
 	}
 }
 
@@ -349,7 +333,10 @@ void
 DisplayDriverPainter::CopyRegionList(BList* list, BList* pList,
 									 int32 rCount, BRegion* clipReg)
 {
-	if (Lock()) {
+	// NOTE: Write locking because we might use HW acceleration.
+	// This needs to be investigated, I'm doing this because of
+	// gut feeling.
+	if (WriteLock()) {
 
 		for (int32 i = 0; i < rCount; i++) {
 			BRegion* region = (BRegion*)list->ItemAt(i);
@@ -357,7 +344,7 @@ DisplayDriverPainter::CopyRegionList(BList* list, BList* pList,
 			CopyRegion(region, (int32)offset->x, (int32)offset->y);
 		}
 
-		Unlock();
+		WriteUnlock();
 	}
 }
 
@@ -365,7 +352,10 @@ DisplayDriverPainter::CopyRegionList(BList* list, BList* pList,
 void
 DisplayDriverPainter::InvertRect(const BRect &r)
 {
-	if (Lock()) {
+	// NOTE: Write locking because we might use HW acceleration.
+	// This needs to be investigated, I'm doing this because of
+	// gut feeling.
+	if (WriteLock()) {
 		BRect vr(min_c(r.left, r.right),
 				 min_c(r.top, r.bottom),
 				 max_c(r.left, r.right),
@@ -388,7 +378,7 @@ DisplayDriverPainter::InvertRect(const BRect &r)
 			fGraphicsCard->ShowSoftwareCursor();
 		}
 
-		Unlock();
+		WriteUnlock();
 	}
 }
 
@@ -499,7 +489,10 @@ DisplayDriverPainter::FillPolygon(BPoint *ptlist, int32 numpts,
 void
 DisplayDriverPainter::FillRect(const BRect& r, const RGBColor& color)
 {
-	if (Lock()) {
+	// NOTE: Write locking because we might use HW acceleration.
+	// This needs to be investigated, I'm doing this because of
+	// gut feeling.
+	if (WriteLock()) {
 		BRect vr(min_c(r.left, r.right),
 				 min_c(r.top, r.bottom),
 				 max_c(r.left, r.right),
@@ -522,7 +515,7 @@ DisplayDriverPainter::FillRect(const BRect& r, const RGBColor& color)
 			fGraphicsCard->ShowSoftwareCursor();
 		}
 
-		Unlock();
+		WriteUnlock();
 	}
 }
 
@@ -530,7 +523,10 @@ DisplayDriverPainter::FillRect(const BRect& r, const RGBColor& color)
 void
 DisplayDriverPainter::FillRect(const BRect &r, const DrawData *d)
 {
-	if (Lock()) {
+	// NOTE: Write locking because we might use HW acceleration.
+	// This needs to be investigated, I'm doing this because of
+	// gut feeling.
+	if (WriteLock()) {
 		BRect vr(min_c(r.left, r.right),
 				 min_c(r.top, r.bottom),
 				 max_c(r.left, r.right),
@@ -568,7 +564,7 @@ DisplayDriverPainter::FillRect(const BRect &r, const DrawData *d)
 			fGraphicsCard->ShowSoftwareCursor();
 		}
 
-		Unlock();
+		WriteUnlock();
 	}
 }
 
@@ -576,7 +572,10 @@ DisplayDriverPainter::FillRect(const BRect &r, const DrawData *d)
 void
 DisplayDriverPainter::FillRegion(BRegion& r, const DrawData *d)
 {
-	if (Lock()) {
+	// NOTE: Write locking because we might use HW acceleration.
+	// This needs to be investigated, I'm doing this because of
+	// gut feeling.
+	if (WriteLock()) {
 
 		fGraphicsCard->HideSoftwareCursor(fPainter->ClipRect(r.Frame()));
 
@@ -610,7 +609,7 @@ DisplayDriverPainter::FillRegion(BRegion& r, const DrawData *d)
 
 		fGraphicsCard->ShowSoftwareCursor();
 
-		Unlock();
+		WriteUnlock();
 	}
 }
 
@@ -1062,161 +1061,32 @@ DisplayDriverPainter::StringHeight(const char *string, int32 length,
 	return height;
 }
 
-// GetBoundingBoxes
-void
-DisplayDriverPainter::GetBoundingBoxes(const char *string, int32 count, 
-									   font_metric_mode mode,
-									   escapement_delta *delta,
-									   BRect *rectarray, const DrawData *d)
-{
-	// ?!? each glyph or what?
-	printf("DisplayDriverPainter::GetBoundingBoxes()\n");
-}
-
-// GetEscapements
-void
-DisplayDriverPainter::GetEscapements(const char *string, int32 charcount, 
-									 escapement_delta *delta,
-									 escapement_delta *escapements,
-									 escapement_delta *offsets,
-									 const DrawData *d)
-{
-	printf("DisplayDriverPainter::GetEscapements()\n");
-}
-
-// GetEdges
-void
-DisplayDriverPainter::GetEdges(const char *string, int32 charcount,
-							   edge_info *edgearray, const DrawData *d)
-{
-	printf("DisplayDriverPainter::GetEdges()\n");
-}
-
-// GetHasGlyphs
-void DisplayDriverPainter::GetHasGlyphs(const char *string, int32 charcount,
-										bool *hasarray)
-{
-	printf("DisplayDriverPainter::GetHasGlyphs()\n");
-}
-
-// GetTruncatedStrings
-void
-DisplayDriverPainter::GetTruncatedStrings(const char **instrings,
-										  const int32 &stringcount, 
-										  const uint32 &mode,
-										  const float &maxwidth,
-										  char **outstrings)
-{
-	printf("DisplayDriverPainter::GetTruncatedStrings()\n");
-}
-
-// HideCursor
-void
-DisplayDriverPainter::HideCursor()
-{
-	fGraphicsCard->SetCursorVisible(false);
-}
-
-// IsCursorHidden
-bool
-DisplayDriverPainter::IsCursorHidden()
-{
-	return !fGraphicsCard->IsCursorVisible();
-}
-
-// MoveCursorTo
-void
-DisplayDriverPainter::MoveCursorTo(const float &x, const float &y)
-{
-	fGraphicsCard->MoveCursorTo(x, y);
-}
-
-// ShowCursor
-void
-DisplayDriverPainter::ShowCursor()
-{
-	fGraphicsCard->SetCursorVisible(true);
-}
-
-// ObscureCursor
-void
-DisplayDriverPainter::ObscureCursor()
-{
-	// TODO: I don't think this has anything to do with the DisplayDriver
-	// implement elsewhere!!
-}
-
-// SetCursor
-void
-DisplayDriverPainter::SetCursor(ServerCursor *cursor)
-{
-	fGraphicsCard->SetCursor(cursor);
-}
-
-// GetCursorPosition
-BPoint
-DisplayDriverPainter::GetCursorPosition()
-{
-	return fGraphicsCard->GetCursorPosition();
-}
-
-// IsCursorObscured
-bool
-DisplayDriverPainter::IsCursorObscured(bool state)
-{
-	// TODO: I don't think this has anything to do with the DisplayDriver
-	// implement elsewhere!!
-	return false;
-}
-
 // Lock
 bool
-DisplayDriverPainter::Lock(bigtime_t timeout)
-{
-	bool success = false;
-	// NOTE: I'm hoping I don't change the semantics and implications of
-	// the original implementation, but I need the locker to be somewhere
-	// else in order to serialize only the access to the back buffer
-	if (timeout == B_INFINITE_TIMEOUT) {
-		success = fGraphicsCard->Lock();
-//printf("DisplayDriverPainter::Lock()\n");
-	} else {
-		success = (fGraphicsCard->LockWithTimeout(timeout) >= B_OK) ? true : false;
-//printf("DisplayDriverPainter::LockWithTimeout(): %d\n", success);
-	}
-	
-	return success;
+DisplayDriverPainter::Lock()
+{	
+	return fGraphicsCard->ReadLock();
 }
 
 // Unlock
 void
 DisplayDriverPainter::Unlock()
 {
-//printf("DisplayDriverPainter::Unlock()\n");
-	fGraphicsCard->Unlock();
+	fGraphicsCard->ReadUnlock();
 }
 
-// SetMode
-status_t
-DisplayDriverPainter::SetMode(const display_mode &mode)
+// WriteLock
+bool
+DisplayDriverPainter::WriteLock()
+{	
+	return fGraphicsCard->WriteLock();
+}
+
+// WriteUnlock
+void
+DisplayDriverPainter::WriteUnlock()
 {
-	status_t status = B_ERROR;
-
-	if (Lock()) {
-		status = fGraphicsCard->SetMode(mode);
-		if (status >= B_OK) {
-			fPainter->AttachToBuffer(fGraphicsCard->DrawingBuffer());
-			// available HW acceleration might have changed
-			fAvailableHWAccleration = fGraphicsCard->AvailableHWAcceleration();
-			status = DisplayDriver::SetMode(mode);
-		} else {
-			fprintf(stderr, "DisplayDriverPainter::SetMode() - unsupported "
-				"mode!\n");
-		}
-		Unlock();
-	}
-
-	return status;
+	fGraphicsCard->WriteUnlock();
 }
 
 // DumpToFile
@@ -1243,127 +1113,6 @@ ServerBitmap*
 DisplayDriverPainter::DumpToBitmap()
 {
 	return NULL;
-}
-
-// SetDPMSMode
-status_t
-DisplayDriverPainter::SetDPMSMode(const uint32 &state)
-{
-	status_t ret = B_ERROR;
-	if (Lock()) {
-		ret = fGraphicsCard->SetDPMSMode(state);
-		Unlock();
-	}
-	return ret;
-}
-
-// DPMSMode
-uint32
-DisplayDriverPainter::DPMSMode()
-{
-	uint32 mode = 0;
-	if (Lock()) {
-		mode = fGraphicsCard->DPMSMode();
-		Unlock();
-	}
-	return mode;
-}
-
-// DPMSCapabilities
-uint32
-DisplayDriverPainter::DPMSCapabilities()
-{
-	uint32 caps = 0;
-	if (Lock()) {
-		caps = fGraphicsCard->DPMSMode();
-		Unlock();
-	}
-	return caps;
-}
-
-// GetDeviceInfo
-status_t
-DisplayDriverPainter::GetDeviceInfo(accelerant_device_info *info)
-{
-	status_t ret = B_ERROR;
-	if (Lock()) {
-		ret = fGraphicsCard->GetDeviceInfo(info);
-		Unlock();
-	}
-	return ret;
-}
-
-// GetModeList
-status_t
-DisplayDriverPainter::GetModeList(display_mode **mode_list, uint32 *count)
-{
-	status_t ret = B_ERROR;
-	if (Lock()) {
-		ret = fGraphicsCard->GetModeList(mode_list, count);
-		Unlock();
-	}
-	return ret;
-}
-
-// GetMode
-void
-DisplayDriverPainter::GetMode(display_mode &mode)
-{
-	if (Lock()) {
-		fGraphicsCard->GetMode(&mode);
-		Unlock();
-	}
-}
-
-// GetPixelClockLimits
-status_t DisplayDriverPainter::GetPixelClockLimits(display_mode *mode,
-												   uint32 *low,
-												   uint32 *high)
-{
-	status_t ret = B_ERROR;
-	if (Lock()) {
-		ret = fGraphicsCard->GetPixelClockLimits(mode, low, high);
-		Unlock();
-	}
-	return ret;
-}
-
-// GetTimingConstraints
-status_t
-DisplayDriverPainter::GetTimingConstraints(display_timing_constraints *dtc)
-{
-	status_t ret = B_ERROR;
-	if (Lock()) {
-		ret = fGraphicsCard->GetTimingConstraints(dtc);
-		Unlock();
-	}
-	return ret;
-}
-
-// ProposeMode
-status_t
-DisplayDriverPainter::ProposeMode(display_mode *candidate,
-								  const display_mode *low,
-								  const display_mode *high)
-{
-	status_t ret = B_ERROR;
-	if (Lock()) {
-		ret = fGraphicsCard->ProposeMode(candidate, low, high);
-		Unlock();
-	}
-	return ret;
-}
-
-// WaitForRetrace
-status_t
-DisplayDriverPainter::WaitForRetrace(bigtime_t timeout)
-{
-	status_t ret = B_ERROR;
-	if (Lock()) {
-		ret = fGraphicsCard->WaitForRetrace(timeout);
-		Unlock();
-	}
-	return ret;
 }
 
 // _CopyRect

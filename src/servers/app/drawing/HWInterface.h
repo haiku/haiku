@@ -11,9 +11,10 @@
 
 #include <Accelerant.h>
 #include <GraphicsCard.h>
-#include <Locker.h>
 #include <OS.h>
 #include <Region.h>
+
+#include "MultiLocker.h"
 
 class RenderingBuffer;
 class RGBColor;
@@ -26,12 +27,13 @@ enum {
 	HW_ACC_INVERT_REGION				= 0x00000004,
 };
 
-class HWInterface : public BLocker {
+class HWInterface : public MultiLocker {
  public:
 								HWInterface(bool doubleBuffered = false);
 	virtual						~HWInterface();
 
-	virtual	status_t			Initialize() = 0;
+	// You need to WriteLock
+	virtual	status_t			Initialize();
 	virtual	status_t			Shutdown() = 0;
 
 	// screen mode stuff
@@ -52,8 +54,8 @@ class HWInterface : public BLocker {
 	virtual status_t			WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT) = 0;
 
 	virtual status_t			SetDPMSMode(const uint32 &state) = 0;
-	virtual uint32				DPMSMode() const = 0;
-	virtual uint32				DPMSCapabilities() const = 0;
+	virtual uint32				DPMSMode() = 0;
+	virtual uint32				DPMSCapabilities() = 0;
 
 	// query for available hardware accleration and perform it
 	// (Initialize() must have been called already)
@@ -67,7 +69,7 @@ class HWInterface : public BLocker {
 										   const RGBColor& color) {}
 	virtual	void				InvertRegion(/*const*/ BRegion& region) {}
 
-	// cursor handling
+	// cursor handling (these do their own Read/Write locking)
 	virtual	void				SetCursor(ServerCursor* cursor);
 	virtual	void				SetCursorVisible(bool visible);
 			bool				IsCursorVisible();
@@ -75,13 +77,14 @@ class HWInterface : public BLocker {
 											 const float& y);
 			BPoint				GetCursorPosition();
 
-	// frame buffer access
+	// frame buffer access (you need to ReadLock!)
 			RenderingBuffer*	DrawingBuffer() const;
 	virtual	RenderingBuffer*	FrontBuffer() const = 0;
 	virtual	RenderingBuffer*	BackBuffer() const = 0;
 	virtual	bool				IsDoubleBuffered() const;
 
 	// Invalidate is planned to be used for scheduling an area for updating
+	// you need to WriteLock!
 	virtual	status_t			Invalidate(const BRect& frame);
 	// while as CopyBackToFront() actually performs the operation
 			status_t			CopyBackToFront(const BRect& frame);
@@ -94,6 +97,12 @@ class HWInterface : public BLocker {
 	// then, after all drawing commands that triggered have been caried out,
 	// it shows the cursor again. This approach would have the adventage of
 	// the code not cluttering/slowing down DisplayDriverPainter.
+	// For now, we hide the cursor for any drawing operation that has
+	// a bounding box containing the cursor (in DisplayDriverPainter) so
+	// the cursor hiding is completely transparent from code using DisplayDriverPainter.
+	// ---
+	// NOTE: Investigate locking for these! The client code should already hold a
+	// ReadLock, but maybe these functions should acquire a WriteLock!
 			void				HideSoftwareCursor(const BRect& area);
 			void				HideSoftwareCursor();
 			void				ShowSoftwareCursor();

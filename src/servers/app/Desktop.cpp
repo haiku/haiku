@@ -1,36 +1,19 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
+//	Copyright (c) 2001-2005, Haiku, Inc. All rights reserved.
+//  Distributed under the terms of the MIT license.
 //
 //	File Name:		Desktop.cpp
 //	Author:			Adi Oanca <adioanca@cotty.iren.ro>
+//					Stephan Aßmus <superstippi@gmx.de>
 //	Description:	Class used to encapsulate desktop management
 //
 //------------------------------------------------------------------------------
 #include <stdio.h>
-#include <Region.h>
+
 #include <Message.h>
+#include <Region.h>
 
 #include "AppServer.h"
-#include "Desktop.h"
-#include "DisplayDriver.h"
 #include "DisplayDriverPainter.h"
 #include "Globals.h"
 #include "Layer.h"
@@ -42,6 +25,20 @@
 #include "WinBorder.h"
 #include "Workspace.h"
 
+#ifdef __HAIKU__
+#define USE_ACCELERANT 1
+#else
+#define USE_ACCELERANT 0
+#endif
+
+#if USE_ACCELERANT
+  #include "AccelerantHWInterface.h"
+#else
+  #include "ViewHWInterface.h"
+#endif
+
+#include "Desktop.h"
+
 //#define DEBUG_DESKTOP
 
 #ifdef DEBUG_DESKTOP
@@ -51,14 +48,14 @@
 #endif
 
 
-Desktop::Desktop(void)
+Desktop::Desktop()
 {
 	fActiveRootLayer = NULL;
 	fActiveScreen = NULL;
 }
 
 
-Desktop::~Desktop(void)
+Desktop::~Desktop()
 {
 	for (int32 i = 0; WinBorder *border = (WinBorder *)fWinBorderList.ItemAt(i); i++)
 		delete border;
@@ -72,9 +69,9 @@ Desktop::~Desktop(void)
 
 
 void
-Desktop::Init(void)
+Desktop::Init()
 {
-	DisplayDriver *driver = NULL;
+	HWInterface *interface = NULL;
 
 	// Eventually we will loop through drivers until
 	// one can't initialize in order to support multiple monitors.
@@ -82,8 +79,14 @@ Desktop::Init(void)
 	
 	bool initDrivers = true;
 	while (initDrivers) {
-		driver = new DisplayDriverPainter();
-		AddDriver(driver);
+
+#if USE_ACCELERANT
+		  interface = new AccelerantHWInterface();
+#else
+		  interface = new ViewHWInterface();
+#endif
+
+		_AddGraphicsCard(interface);
 		initDrivers = false;
 	}
 
@@ -99,25 +102,24 @@ Desktop::Init(void)
 
 
 void
-Desktop::AddDriver(DisplayDriver *driver)
+Desktop::_AddGraphicsCard(HWInterface* interface)
 {
-	if (driver->Initialize()) {
-		Screen *screen = new Screen(driver, fScreenList.CountItems() + 1);
-			// The driver is now owned by the screen
+	Screen *screen = new Screen(interface, fScreenList.CountItems() + 1);
+		// The interface is now owned by the screen
+
+	if (screen->Initialize() >= B_OK && fScreenList.AddItem((void*)screen)) {
 
 		// TODO: be careful of screen initialization - monitor may not support 640x480
 		screen->SetMode(800, 600, B_RGB32, 60.f);
 
-		fScreenList.AddItem(screen);
 	} else {
-		driver->Shutdown();
-		delete driver;
+		delete screen;
 	}
 }
 
 
 void
-Desktop::InitMode(void)
+Desktop::InitMode()
 {
 	// this is init mode for n-SS.
 	fActiveScreen = (Screen *)fScreenList.ItemAt(0);
@@ -221,6 +223,12 @@ inline DisplayDriver *
 Desktop::GetDisplayDriver() const
 {
 	return ScreenAt(0)->GetDisplayDriver();
+}
+
+inline HWInterface *
+Desktop::GetHWInterface() const
+{
+	return ScreenAt(0)->GetHWInterface();
 }
 
 

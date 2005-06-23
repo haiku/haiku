@@ -45,8 +45,8 @@ class ViewHWInterface : public HWInterface {
 	virtual status_t			WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT);
 
 	virtual status_t			SetDPMSMode(const uint32 &state);
-	virtual uint32				DPMSMode() const;
-	virtual uint32				DPMSCapabilities() const;
+	virtual uint32				DPMSMode();
+	virtual uint32				DPMSCapabilities();
 
 	// frame buffer access
 	virtual	RenderingBuffer*	FrontBuffer() const;

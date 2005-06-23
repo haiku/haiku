@@ -1,23 +1,6 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
+//	Copyright (c) 2001-2005, Haiku, Inc. All rights reserved
+//  Distributed under the terms of the MIT license.
 //
 //	File Name:		DisplayDriver.h
 //	Authors:		DarkWyrm <bpmagic@columbus.rr.com>
@@ -34,6 +17,7 @@
 #include <Accelerant.h>
 #include <Font.h>
 #include <Locker.h>
+#include <Point.h>
 
 class BPoint;
 class BRect;
@@ -64,56 +48,17 @@ typedef struct
 
 } LineArrayData;
 
-/*
-#ifndef HOOK_DEFINE_CURSOR
-
-#define HOOK_DEFINE_CURSOR		0
-#define HOOK_MOVE_CURSOR		1
-#define HOOK_SHOW_CURSOR		2
-#define HOOK_DRAW_LINE_8BIT		3
-#define HOOK_DRAW_LINE_16BIT	12
-#define HOOK_DRAW_LINE_32BIT	4
-#define HOOK_DRAW_RECT_8BIT		5
-#define HOOK_DRAW_RECT_16BIT	13
-#define HOOK_DRAW_RECT_32BIT	6
-#define HOOK_BLIT				7
-#define HOOK_DRAW_ARRAY_8BIT	8
-#define HOOK_DRAW_ARRAY_16BIT	14	// Not implemented in current R5 drivers
-#define HOOK_DRAW_ARRAY_32BIT	9
-#define HOOK_SYNC				10
-#define HOOK_INVERT_RECT		11
-
-#endif
-
-class DisplayDriver;
-
-typedef void (DisplayDriver::* SetPixelFuncType)(int x, int y);
-typedef void (DisplayDriver::* SetHorizontalLineFuncType)(int xstart, int xend, int y);
-typedef void (DisplayDriver::* SetVerticalLineFuncType)(int x, int ystart, int yend);
-typedef void (DisplayDriver::* SetRectangleFuncType)(int left, int top, int right, int bottom);
-*/
-
-/*!
-	\class DisplayDriver DisplayDriver.h
-	\brief Mostly abstract class which handles all graphics output for the server.
-
-	The DisplayDriver is called in order to handle all messiness associated with
-	a particular rendering context, such as the screen, and the methods to
-	handle organizing information related to it along with writing to the context
-	itself.
-	
-	While all virtual functions are technically optional, the default versions
-	do very little, so implementing them all more or less required.
-*/
-
 class DisplayDriver {
 public:
 								DisplayDriver();
 	virtual						~DisplayDriver();
 
 	// when implementing, be sure to call the inherited version
-	virtual bool				Initialize();
+	virtual status_t			Initialize();
 	virtual void				Shutdown();
+
+	// call this on mode changes!
+	virtual	void				Update() = 0;
 
 	// clipping for all drawing functions
 	virtual	void				ConstrainClippingRegion(BRegion* region) = 0;
@@ -265,81 +210,12 @@ public:
 												int32 length,
 												const DrawData *d) = 0;
 
-	virtual	void				GetBoundingBoxes(const char *string,
-												 int32 count,
-												 font_metric_mode mode, 
-												 escapement_delta *delta,
-												 BRect *rectarray,
-												 const DrawData *d) = 0;
-
-	virtual	void				GetEscapements(	const char *string,
-												int32 charcount,
-												escapement_delta *delta, 
-												escapement_delta *escapements,
-												escapement_delta *offsets,
-												const DrawData *d) = 0;
-
-	virtual	void				GetEdges(		const char *string,
-												int32 charcount,
-												edge_info *edgearray,
-												const DrawData *d) = 0;
-
-	virtual	void				GetHasGlyphs(	const char *string,
-												int32 charcount,
-												bool *hasarray) = 0;
-
-	virtual	void				GetTruncatedStrings(const char **instrings,
-													const int32 &stringcount,
-													const uint32 &mode, 
-													const float &maxwidth,
-													char **outstrings) = 0;
-	
-	virtual	void				HideCursor() = 0;
-	virtual	bool				IsCursorHidden() = 0;
-	virtual	void				MoveCursorTo(	const float &x,
-												const float &y) = 0;
-	virtual	void				ShowCursor() = 0;
-	virtual	void				ObscureCursor() = 0;
-	virtual	void				SetCursor(ServerCursor *cursor) = 0;
-	virtual	BPoint				GetCursorPosition() = 0;
-	virtual	bool				IsCursorObscured(bool state) = 0;
-	
-	
-	// Virtual methods which need to be implemented by each subclass
-
-	// These two will rarely be implemented by subclasses,
-	// but it still needs to be possible
-	virtual bool				Lock(bigtime_t timeout = B_INFINITE_TIMEOUT) = 0;
+	virtual bool				Lock() = 0;
 	virtual void				Unlock() = 0;
-
-	// display mode access
-	virtual status_t			SetMode(const display_mode &mode);
-	virtual	void				GetMode(display_mode &mode);
 
 	virtual bool				DumpToFile(const char *path) = 0;
 	virtual ServerBitmap*		DumpToBitmap() = 0;
 
-	virtual status_t			SetDPMSMode(const uint32 &state) = 0;
-	virtual uint32				DPMSMode() = 0;
-	virtual uint32				DPMSCapabilities() = 0;
-	virtual status_t			GetDeviceInfo(accelerant_device_info *info) = 0;
-
-	virtual status_t			GetModeList(display_mode **mode_list,
-											uint32 *count) = 0;
-
-	virtual status_t			GetPixelClockLimits(display_mode *mode,
-													uint32 *low,
-													uint32 *high) = 0;
-
-	virtual status_t			GetTimingConstraints(display_timing_constraints *dtc) = 0;
-	virtual status_t			ProposeMode(display_mode *candidate,
-											const display_mode *low,
-											const display_mode *high) = 0;
-
-	virtual status_t			WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT) = 0;
-
- protected:
-			display_mode		fDisplayMode;
 };
 
 #endif

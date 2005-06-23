@@ -33,15 +33,16 @@
 #include <Locker.h>
 
 #include "DebugInfoManager.h"
+#include "Desktop.h"
 #include "Layer.h"
 #include "CursorManager.h"
 #include "Workspace.h"
 
+class DisplayDriver;
+class HWInterface;
 class RGBColor;
 class Screen;
 class WinBorder;
-class Desktop;
-class DisplayDriver;
 
 namespace BPrivate {
 	class PortLink;
@@ -172,6 +173,9 @@ friend class Desktop;
 			// Input related methods
 			void				MouseEventHandler(int32 code, BPrivate::PortLink& link);
 			void				KeyboardEventHandler(int32 code, BPrivate::PortLink& link);
+
+	inline	HWInterface*		GetHWInterface() const
+									{ return fDesktop->GetHWInterface(); }
 
 			Desktop*			fDesktop;
 			BMessage*			fDragMessage;

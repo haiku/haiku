@@ -15,7 +15,7 @@
 
 // constructor
 HWInterface::HWInterface(bool doubleBuffered)
-	: BLocker("hw interface lock"),
+	: MultiLocker("hw interface lock"),
 	  fCursorAreaBackup(NULL),
 	  fSoftwareCursorHidden(false),
 	  fCursor(NULL),
@@ -35,11 +35,18 @@ HWInterface::~HWInterface()
 	delete fUpdateExecutor;
 }
 
+// Initialize
+status_t
+HWInterface::Initialize()
+{
+	return MultiLocker::InitCheck();
+}
+
 // SetCursor
 void
 HWInterface::SetCursor(ServerCursor* cursor)
 {
-	if (Lock()) {
+	if (WriteLock()) {
 		if (fCursor != cursor) {
 			BRect oldFrame = _CursorFrame();
 			delete fCursor;
@@ -55,7 +62,7 @@ HWInterface::SetCursor(ServerCursor* cursor)
 				fCursorAreaBackup = NULL;
 			Invalidate(r);
 		}
-		Unlock();
+		WriteUnlock();
 	}
 }
 
@@ -63,12 +70,12 @@ HWInterface::SetCursor(ServerCursor* cursor)
 void
 HWInterface::SetCursorVisible(bool visible)
 {
-	if (Lock()) {
+	if (WriteLock()) {
 		if (fCursorVisible != visible) {
 			fCursorVisible = visible;
 			Invalidate(_CursorFrame());
 		}
-		Unlock();
+		WriteUnlock();
 	}
 }
 
@@ -77,9 +84,9 @@ bool
 HWInterface::IsCursorVisible()
 {
 	bool visible = true;
-	if (Lock()) {
+	if (WriteLock()) {
 		visible = fCursorVisible;
-		Unlock();
+		WriteUnlock();
 	}
 	return visible;
 }
@@ -88,7 +95,7 @@ HWInterface::IsCursorVisible()
 void
 HWInterface::MoveCursorTo(const float& x, const float& y)
 {
-	if (Lock()) {
+	if (WriteLock()) {
 		BPoint p(x, y);
 		if (p != fCursorLocation) {
 			BRect oldFrame = _CursorFrame();
@@ -100,7 +107,7 @@ HWInterface::MoveCursorTo(const float& x, const float& y)
 			Invalidate(oldFrame);
 			Invalidate(_CursorFrame());
 		}
-		Unlock();
+		WriteUnlock();
 	}
 }
 
@@ -109,9 +116,9 @@ BPoint
 HWInterface::GetCursorPosition()
 {
 	BPoint location;
-	if (Lock()) {
+	if (ReadLock()) {
 		location = fCursorLocation;
-		Unlock();
+		ReadUnlock();
 	}
 	return location;
 }

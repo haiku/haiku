@@ -1,31 +1,14 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
+//	Copyright (c) 2001-2005, Haiku, Inc. All rights reserved.
+//  Distributed under the terms of the MIT license.
 //
 //	File Name:		ServerScreen.cpp
 //	Author:			Adi Oanca <adioanca@myrealbox.com>
 //					Axel Dörfler, axeld@pinc-software.de
+//					Stephan Aßmus, <superstippi@gmx.de>
 //	Description:	Handles individual screens
 //
 //------------------------------------------------------------------------------
-
 
 #include <Accelerant.h>
 #include <Point.h>
@@ -34,79 +17,121 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "CursorData.h"
+#include "DisplayDriverPainter.h"
+#include "HaikuSystemCursor.h"
+#include "HWInterface.h"
+#include "ServerCursor.h"
+
 #include "ServerScreen.h"
-#include "DisplayDriver.h"
 
 
-Screen::Screen(DisplayDriver *driver, int32 id)
-	:
-	fID(id),
-	fDriver(driver)
+Screen::Screen(HWInterface *interface, int32 id)
+	: fID(id),
+	  fDriver(interface ? new DisplayDriverPainter(interface) : NULL),
+	  fHWInterface(interface)
+{
+}
+
+Screen::Screen()
+	: fID(-1),
+	  fDriver(NULL),
+	  fHWInterface(NULL)
 {
 }
 
 
-Screen::~Screen(void)
+Screen::~Screen()
 {
+	Shutdown();
 	delete fDriver;
+	delete fHWInterface;
 }
 
 
-bool
-Screen::SupportsMode(uint16 width, uint16 height, uint32 colorspace, float frequency)
+status_t
+Screen::Initialize()
 {
-	// TODO: remove/improve
-	return true;
-	display_mode *dm = NULL;
-	uint32 count;
-
-	status_t err = fDriver->GetModeList(&dm, &count);
-	if (err < B_OK) {
-		// We've run into quite a problem here! This is a function which is a requirement
-		// for a graphics module. The best thing that we can hope for is 640x480x8 without
-		// knowing anything else. While even this seems like insanity to assume that we
-		// can support this, the only lower mode supported is 640x400, but we shouldn't even
-		// bother with such a pathetic possibility.
-		if (width == 640 && height == 480 && colorspace == B_CMAP8)
-			return true;
-
-		return false;
+	status_t ret = B_NO_INIT;
+	if (fDriver) {
+		// this will also init the graphics hardware the driver is attached to
+		ret = fDriver->Initialize();
+		if (ret >= B_OK) {
+			// take care of setting the cursor on this screen
+//			SetCursor(new ServerCursor(default_cursor_data));
+			// TODO: some temporary goofing arround
+			ServerCursor* cursor = new ServerCursor(kHaikuCursorBits,
+												    kHaikuCursorWidth,
+												    kHaikuCursorHeight,
+												    kHaikuCursorFormat);
+			// we just happen to know where the hotspot is
+			cursor->SetHotSpot(BPoint(1, 0));
+			
+			fHWInterface->SetCursor(cursor);
+		}
 	}
-
-	for (uint32 i = 0; i < count; i++) {
-		if (dm[i].virtual_width == width
-			&& dm[i].virtual_height == height
-			&& dm[i].space == colorspace)
-			return true;
-	}
-
-	free(dm);
-	return false;
-}
-
-
-bool
-Screen::SetMode(uint16 width, uint16 height, uint32 colorspace, float frequency)
-{
-	if (!SupportsMode(width, height, colorspace, frequency))
-		return false;
-
-	display_mode mode;
-	mode.virtual_width = width;
-	mode.virtual_height = height;
-	mode.space = colorspace;
-	// ToDo: frequency!
-	//	(we need to search the mode list for this)
-
-	return fDriver->SetMode(mode) >= B_OK;
+	return ret;
 }
 
 
 void
-Screen::GetMode(uint16 &width, uint16 &height, uint32 &colorspace, float &frequency) const
+Screen::Shutdown()
+{
+	if (fDriver)
+		fDriver->Shutdown();
+}
+
+
+status_t
+Screen::SetMode(display_mode mode)
+{
+	status_t ret = fHWInterface->SetMode(mode);
+
+	// the DisplayDriverPainter needs to adjust itself
+	if (ret >= B_OK)
+		fDriver->Update();
+
+	return ret;
+}
+
+
+status_t
+Screen::SetMode(uint16 width, uint16 height, uint32 colorspace,
+				float frequency)
+{
+	status_t ret = B_ERROR;
+
+	// search for a matching mode
+	display_mode mode;
+	ret = _FindMode(width, height, colorspace, frequency, &mode);
+
+	if (ret < B_OK) {
+		// Ups. Not good. Ignore the requested mode and use fallback params.
+		mode.virtual_width = 640;
+		mode.virtual_height = 480;
+		mode.space = B_CMAP8;
+	}
+
+	ret = SetMode(mode);
+
+	return ret;
+}
+
+
+void
+Screen::GetMode(display_mode* mode) const
+{
+	fHWInterface->GetMode(mode);
+}
+
+
+void
+Screen::GetMode(uint16 &width, uint16 &height, uint32 &colorspace,
+				float &frequency) const
 {
 	display_mode mode;
-	fDriver->GetMode(mode);
+
+	fHWInterface->GetMode(&mode);
 
 	width = mode.virtual_width;
 	height = mode.virtual_height;
@@ -116,9 +141,58 @@ Screen::GetMode(uint16 &width, uint16 &height, uint32 &colorspace, float &freque
 }
 
 
-int32
-Screen::ScreenNumber(void) const
+status_t
+Screen::_FindMode(uint16 width, uint16 height, uint32 colorspace,
+				 float frequency, display_mode* mode) const
 {
-	return fID;
+	display_mode* dm = NULL;
+	uint32 count;
+
+	status_t err = fHWInterface->GetModeList(&dm, &count);
+	if (err < B_OK) {
+		// We've run into quite a problem here! This is a function which is a requirement
+		// for a graphics module. The best thing that we can hope for is 640x480x8 without
+		// knowing anything else. While even this seems like insanity to assume that we
+		// can support this, the only lower mode supported is 640x400, but we shouldn't even
+		// bother with such a pathetic possibility.
+		if (width == 640 && height == 480 && colorspace == B_CMAP8)
+			return B_OK;
+
+		return err;
+	}
+
+	bool found = false;
+	for (uint32 i = 0; i < count; i++) {
+		if (dm[i].virtual_width == width
+			&& dm[i].virtual_height == height
+			&& dm[i].space == colorspace) {
+#if __HAIKU__
+			// we have found a mode with the correct width, height and format
+			// now see if the frequency matches (don't be too picky)
+			float modeFrequency = 0.0;
+			float t = dm[i].timing.h_total * dm[i].timing.v_total;
+			if (t != 0.0)
+				modeFrequency = dm[i].timing.pixel_clock * 1000.f / t;
+
+			if (int(modeFrequency/* * 10.0*/ + 0.5) == int(frequency/* * 10.0*/ + 0.5)) {
+				*mode = dm[i];
+				found = true;
+				break;
+			}
+#else
+			// Ignore frequency in test mode
+			*mode = dm[i];
+			found = true;
+			break;
+#endif // __HAIKU__
+		}
+	}
+
+	delete[] dm;
+
+	if (!found) {
+		fprintf(stderr, "mode not found (%d, %d, %f)!\n", width, height, frequency);
+	}
+	return found ? B_OK : B_ERROR;
 }
 

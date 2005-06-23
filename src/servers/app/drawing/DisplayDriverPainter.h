@@ -1,25 +1,8 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc. All rights reserved.
+//  Distributed under the terms of the MIT license.
 //
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		DisplayDriver.h
+//	File Name:		DisplayDriverPainter.h
 //	Authors:		DarkWyrm <bpmagic@columbus.rr.com>
 //					Gabe Yoder <gyoder@stny.rr.com>
 //					Stephan Aßmus <superstippi@gmx.de>
@@ -38,12 +21,14 @@ class Painter;
 
 class DisplayDriverPainter : public DisplayDriver {
 public:
-								DisplayDriverPainter();
+								DisplayDriverPainter(HWInterface* hwInterface);
 	virtual						~DisplayDriverPainter();
 
 	// when implementing, be sure to call the inherited version
-	virtual bool				Initialize();
+	virtual status_t			Initialize();
 	virtual void				Shutdown();
+
+	virtual	void				Update();
 
 	// clipping for all drawing functions, passing a NULL region
 	// will remove any clipping (drawing allowed everywhere)
@@ -196,82 +181,26 @@ public:
 												int32 length,
 												const DrawData *d);
 
-	virtual	void				GetBoundingBoxes(const char *string,
-												 int32 count,
-												 font_metric_mode mode, 
-												 escapement_delta *delta,
-												 BRect *rectarray,
-												 const DrawData *d);
-
-	virtual	void				GetEscapements(	const char *string,
-												int32 charcount,
-												escapement_delta *delta, 
-												escapement_delta *escapements,
-												escapement_delta *offsets,
-												const DrawData *d);
-
-	virtual	void				GetEdges(		const char *string,
-												int32 charcount,
-												edge_info *edgearray,
-												const DrawData *d);
-
-	virtual	void				GetHasGlyphs(	const char *string,
-												int32 charcount,
-												bool *hasarray);
-
-	virtual	void				GetTruncatedStrings(const char **instrings,
-													const int32 &stringcount,
-													const uint32 &mode, 
-													const float &maxwidth,
-													char **outstrings);
-	
-	// cursor handling		
-	virtual	void				HideCursor();
-	virtual	bool				IsCursorHidden();
-	virtual	void				MoveCursorTo(	const float &x,
-												const float &y);
-	virtual	void				ShowCursor();
-	virtual	void				ObscureCursor();
-	virtual	void				SetCursor(ServerCursor *cursor);
-			BPoint				GetCursorPosition();
-	virtual	bool				IsCursorObscured(bool state);
-	
-
-	virtual bool				Lock(bigtime_t timeout = B_INFINITE_TIMEOUT);
+	virtual bool				Lock();
 	virtual void				Unlock();
 
-	// display mode access
-	virtual status_t			SetMode(const display_mode &mode);
-	virtual void				GetMode(display_mode &mode);
+			bool				WriteLock();
+			void				WriteUnlock();
 
-	virtual bool				DumpToFile(const char *path);
+	virtual bool				DumpToFile(		const char *path);
 	virtual ServerBitmap*		DumpToBitmap();
 
-	virtual status_t			SetDPMSMode(const uint32 &state);
-	virtual uint32				DPMSMode();
-	virtual uint32				DPMSCapabilities();
-	virtual status_t			GetDeviceInfo(accelerant_device_info *info);
-
-	virtual status_t			GetModeList(display_mode **mode_list,
-											uint32 *count);
-
-	virtual status_t			GetPixelClockLimits(display_mode *mode,
-													uint32 *low,
-													uint32 *high);
-
-	virtual status_t			GetTimingConstraints(display_timing_constraints *dtc);
-	virtual status_t			ProposeMode(display_mode *candidate,
-											const display_mode *low,
-											const display_mode *high);
-
-	virtual status_t			WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT);
-
  private:
-			BRect				_CopyRect(BRect r, int32 xOffset, int32 yOffset) const;
+			BRect				_CopyRect(		BRect r,
+												int32 xOffset,
+												int32 yOffset) const;
 
-			void				_CopyRect(uint8* bits,
-										  uint32 width, uint32 height, uint32 bpr,
-										  int32 xOffset, int32 yOffset) const;
+			void				_CopyRect(		uint8* bits,
+												uint32 width,
+												uint32 height,
+												uint32 bpr,
+												int32 xOffset,
+												int32 yOffset) const;
 
 			Painter*			fPainter;
 			HWInterface*		fGraphicsCard;

@@ -10,42 +10,43 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
-
-#include <AppDefs.h>
-#include <List.h>
-#include <String.h>
-#include <Autolock.h>
-#include <SysCursor.h>
-#include <ColorSet.h>
-#include <RGBColor.h>
-#include <ScrollBar.h>
-#include <Shape.h>
-#include <ServerProtocol.h>
-
-#include "AppServer.h"
-#include "BitmapManager.h"
-#include "BGet++.h"
-#include "CursorManager.h"
-#include "DecorManager.h"
-#include "Desktop.h"
-#include "DisplayDriver.h"
-#include "FontServer.h"
-#include "RAMLinkMsgReader.h"
-#include "RootLayer.h"
-#include "ServerApp.h"
-#include "ServerScreen.h"
-#include "ServerWindow.h"
-#include "ServerCursor.h"
-#include "ServerBitmap.h"
-#include "ServerPicture.h"
-#include "ServerConfig.h"
-#include "SystemPalette.h"
-#include "WinBorder.h"
-#include "LayerData.h"
-#include "Utils.h"
-
 #include <stdio.h>
 #include <string.h>
+
+#include <AppDefs.h>
+#include <Autolock.h>
+#include <ColorSet.h>
+#include <List.h>
+#include <ScrollBar.h>
+#include <ServerProtocol.h>
+#include <Shape.h>
+#include <String.h>
+
+#include "AppServer.h"
+#include "BGet++.h"
+#include "BitmapManager.h"
+#include "CursorManager.h"
+#include "Desktop.h"
+#include "DecorManager.h"
+#include "DisplayDriver.h"
+#include "FontServer.h"
+#include "HWInterface.h"
+#include "LayerData.h"
+#include "RAMLinkMsgReader.h"
+//#include "RGBColor.h"
+#include "RootLayer.h"
+#include "ServerBitmap.h"
+#include "ServerConfig.h"
+#include "ServerCursor.h"
+#include "ServerPicture.h"
+#include "ServerScreen.h"
+#include "ServerWindow.h"
+#include "SysCursor.h"
+#include "SystemPalette.h"
+#include "Utils.h"
+#include "WinBorder.h"
+
+#include "ServerApp.h"
 #include <syslog.h>
 
 //#define DEBUG_SERVERAPP
@@ -359,7 +360,7 @@ ServerApp::SetAppCursor(void)
 	// there should be a way that this ServerApp be attached to a particular
 	// RootLayer to know which RootLayer's cursor to modify.
 	if (fAppCursor)
-		gDesktop->ActiveRootLayer()->GetDisplayDriver()->SetCursor(fAppCursor);
+		gDesktop->GetHWInterface()->SetCursor(fAppCursor);
 }
 
 
@@ -886,7 +887,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// although this isn't pretty, ATM we have only one RootLayer.
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
-			gDesktop->ActiveRootLayer()->GetDisplayDriver()->ShowCursor();
+// TODO: support nested showing/hiding
+			gDesktop->GetHWInterface()->SetCursorVisible(true);
 			fCursorHidden = false;
 			break;
 		}
@@ -896,7 +898,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// although this isn't pretty, ATM we have only one RootLayer.
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
-			gDesktop->ActiveRootLayer()->GetDisplayDriver()->HideCursor();
+// TODO: support nested showing/hiding
+			gDesktop->GetHWInterface()->SetCursorVisible(false);
 			fCursorHidden = true;
 			break;
 		}
@@ -906,7 +909,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// although this isn't pretty, ATM we have only one RootLayer.
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
-			gDesktop->ActiveRootLayer()->GetDisplayDriver()->ObscureCursor();
+//			gDesktop->GetHWInterface()->ObscureCursor();
 			break;
 		}
 		case AS_QUERY_CURSOR_HIDDEN:
@@ -940,7 +943,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// although this isn't pretty, ATM we have only one RootLayer.
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
-			gDesktop->ActiveRootLayer()->GetDisplayDriver()->SetCursor(fAppCursor);
+			gDesktop->GetHWInterface()->SetCursor(fAppCursor);
 			break;
 		}
 		case AS_SET_CURSOR_BCURSOR:
@@ -961,7 +964,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// RootLayer to know which RootLayer's cursor to modify.
 			ServerCursor	*cursor;
 			if ((cursor = gDesktop->ActiveRootLayer()->GetCursorManager().FindCursor(ctoken)))
-				gDesktop->ActiveRootLayer()->GetDisplayDriver()->SetCursor(cursor);
+				gDesktop->GetHWInterface()->SetCursor(cursor);
 
 			if (sync) {
 				// the application is expecting a reply, but plans to do literally nothing
@@ -1847,7 +1850,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// We have the screen_id and the workspace number, with these
 			// we need to find the corresponding "driver", and call getmode on it
 			display_mode mode;
-			gDesktop->GetDisplayDriver()->GetMode(mode);
+			gDesktop->ScreenAt(0)->GetMode(&mode);
 			// actually this isn't still enough as different workspaces can
 			// have different display_modes
 
@@ -1880,15 +1883,12 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			bool makedefault = false;
 			link.Read<bool>(&makedefault);
 
-			// TODO: Adi doesn't like this: see if
-			// messaging is better.
-			gDesktop->ActiveRootLayer()->Lock();
-			// TODO: This should return something
-			gDesktop->GetDisplayDriver()->SetMode(mode);
-			gDesktop->ActiveRootLayer()->Unlock();
+// TODO: lock RootLayer, set mode and tell it to update it's frame and all clipping
+// optionally put this into a message and let the root layer thread handle it.
+//			status_t ret = gDesktop->ScreenAt(0)->SetMode(mode);
 
 			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<status_t>(B_OK);
+			fLink.Attach<status_t>(ret);
 			fLink.Flush();
 			break;
 		}
@@ -1897,7 +1897,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			display_mode* modeList;
 			uint32 count;
-			if (gDesktop->GetDisplayDriver()->GetModeList(&modeList, &count) == B_OK) {
+			if (gDesktop->GetHWInterface()->GetModeList(&modeList, &count) == B_OK) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<uint32>(count);
 				fLink.Attach(modeList, sizeof(display_mode) * count);

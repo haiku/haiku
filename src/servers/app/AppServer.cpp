@@ -25,8 +25,8 @@
 #include "DecorManager.h"
 #include "DefaultDecorator.h"
 #include "Desktop.h"
-#include "DisplayDriver.h"
 #include "FontServer.h"
+#include "HWInterface.h"
 #include "RegistrarDefs.h"
 #include "RGBColor.h"
 #include "RootLayer.h"
@@ -346,7 +346,7 @@ AppServer::CursorThread(void* data)
 			p.y = *server->fCursorAddr & 0x7fff;
 			p.x = *server->fCursorAddr >> 15 & 0x7fff;
 
-			gDesktop->GetDisplayDriver()->MoveCursorTo(p.x, p.y);
+			gDesktop->GetHWInterface()->MoveCursorTo(p.x, p.y);
 			STRACE(("CursorThread : %f, %f\n", p.x, p.y));
 		}
 

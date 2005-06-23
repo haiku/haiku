@@ -376,8 +376,10 @@ ViewHWInterface::ViewHWInterface()
 // destructor
 ViewHWInterface::~ViewHWInterface()
 {
-	fWindow->Lock();
-	fWindow->Quit();
+	if (fWindow) {
+		fWindow->Lock();
+		fWindow->Quit();
+	}
 
 	delete fBackBuffer;
 	delete fFrontBuffer;
@@ -401,6 +403,8 @@ ViewHWInterface::Shutdown()
 status_t
 ViewHWInterface::SetMode(const display_mode &mode)
 {
+	AutoWriteLocker _(this);
+
 	status_t ret = B_OK;
 	// prevent from doing the unnecessary
 	if (fBackBuffer && fFrontBuffer
@@ -519,8 +523,10 @@ ViewHWInterface::SetMode(const display_mode &mode)
 void
 ViewHWInterface::GetMode(display_mode* mode)
 {
-	if (mode)
+	if (mode && ReadLock()) {
 		*mode = fDisplayMode;
+		ReadUnlock();
+	}
 }
 
 // GetDeviceInfo
@@ -529,13 +535,17 @@ ViewHWInterface::GetDeviceInfo(accelerant_device_info *info)
 {
 	// We really don't have to provide anything here because this is strictly
 	// a software-only driver, but we'll have some fun, anyway.
-	
-	info->version=100;
-	sprintf(info->name,"Haiku, Inc. ViewHWInterface");
-	sprintf(info->chipset,"Haiku, Inc. Chipset");
-	sprintf(info->serial_no,"3.14159265358979323846");
-	info->memory=134217728;	// 128 MB, not that we really have that much. :)
-	info->dac_speed=0xFFFFFFFF;	// *heh*
+	if (ReadLock()) {
+
+		info->version=100;
+		sprintf(info->name,"Haiku, Inc. ViewHWInterface");
+		sprintf(info->chipset,"Haiku, Inc. Chipset");
+		sprintf(info->serial_no,"3.14159265358979323846");
+		info->memory=134217728;	// 128 MB, not that we really have that much. :)
+		info->dac_speed=0xFFFFFFFF;	// *heh*
+
+		ReadUnlock();
+	}
 	
 	return B_OK;
 }
@@ -544,10 +554,7 @@ ViewHWInterface::GetDeviceInfo(accelerant_device_info *info)
 status_t
 ViewHWInterface::GetModeList(display_mode **_modes, uint32 *_count)
 {
-	// DEPRECATED:
-	// NOTE: Originally, I was going to figure out good timing values to be 
-	// returned in each of the modes supported, but I won't bother, being this
-	// won't be used much longer anyway. 
+	AutoReadLocker _(this);
 
 	const struct resolution { int32 width, height; } resolutions[] = {
 		{640, 480}, {800, 600}, {1024, 768}, {1152, 864}, {1280, 960},
@@ -613,20 +620,26 @@ ViewHWInterface::ProposeMode(display_mode *candidate, const display_mode *low, c
 status_t
 ViewHWInterface::SetDPMSMode(const uint32 &state)
 {
+	AutoWriteLocker _(this);
+
 	return BScreen().SetDPMS(state);
 }
 
 // DPMSMode
 uint32
-ViewHWInterface::DPMSMode() const
+ViewHWInterface::DPMSMode()
 {
+	AutoReadLocker _(this);
+
 	return BScreen().DPMSState();
 }
 
 // DPMSCapabilities
 uint32
-ViewHWInterface::DPMSCapabilities() const
+ViewHWInterface::DPMSCapabilities()
 {
+	AutoReadLocker _(this);
+
 	return BScreen().DPMSCapabilites();
 }
 

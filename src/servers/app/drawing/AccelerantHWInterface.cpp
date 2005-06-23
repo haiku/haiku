@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 //
-// Copyright 2002-2005, Haiku, Inc.
+// Copyright 2002-2005, Haiku, Inc. All rights reserved.
 // Distributed under the terms of the MIT License.
 //
 //
@@ -12,7 +12,9 @@
 //  
 //------------------------------------------------------------------------------
 
+#include <new>
 #include <stdio.h>
+#include <string.h>
 
 #include <Cursor.h>
 
@@ -24,7 +26,6 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-//#include "PortLink.h"
 #include "RGBColor.h"
 #include "ServerConfig.h"
 #include "ServerCursor.h"
@@ -50,6 +51,12 @@ extern "C" status_t _kern_frame_buffer_update(void *baseAddress,
 						int32 depth, int32 bytesPerRow);
 #endif
 
+
+bool
+operator==(const display_mode& a, const display_mode& b)
+{
+	return memcmp(&a, &b, sizeof(display_mode)) == 0;
+}
 
 // constructor
 AccelerantHWInterface::AccelerantHWInterface()
@@ -90,7 +97,7 @@ AccelerantHWInterface::AccelerantHWInterface()
 		fModeList(NULL),
 
 		fBackBuffer(NULL),
-		fFrontBuffer(new AccelerantBuffer())
+		fFrontBuffer(new(nothrow) AccelerantBuffer())
 {
 	fDisplayMode.virtual_width = 640;
 	fDisplayMode.virtual_height = 480;
@@ -107,7 +114,7 @@ AccelerantHWInterface::~AccelerantHWInterface()
 {
 	delete fBackBuffer;
 	delete fFrontBuffer;
-	delete fModeList;
+	delete[] fModeList;
 }
 
 
@@ -118,21 +125,25 @@ AccelerantHWInterface::~AccelerantHWInterface()
 status_t
 AccelerantHWInterface::Initialize()
 {
-	for (int32 i = 1; fCardFD != B_ENTRY_NOT_FOUND; i++) {
-		fCardFD = OpenGraphicsDevice(i);
-		if (fCardFD < 0) {
-			ATRACE(("Failed to open graphics device\n"));
-			continue;
+	status_t ret = HWInterface::Initialize();
+	if (ret >= B_OK) {
+		for (int32 i = 1; fCardFD != B_ENTRY_NOT_FOUND; i++) {
+			fCardFD = _OpenGraphicsDevice(i);
+			if (fCardFD < 0) {
+				ATRACE(("Failed to open graphics device\n"));
+				continue;
+			}
+	
+			if (_OpenAccelerant(fCardFD) == B_OK)
+				break;
+	
+			close(fCardFD);
+			// _OpenAccelerant() failed, try to open next graphics card
 		}
-
-		if (OpenAccelerant(fCardFD) == B_OK)
-			break;
-
-		close(fCardFD);
-		// OpenAccelerant() failed, try to open next graphics card
+	
+		return fCardFD >= 0 ? B_OK : fCardFD;
 	}
-
-	return fCardFD >= 0 ? B_OK : fCardFD;
+	return ret;
 }
 
 
@@ -148,7 +159,7 @@ AccelerantHWInterface::Initialize()
 	the first working entry.
 */
 int
-AccelerantHWInterface::OpenGraphicsDevice(int deviceNumber)
+AccelerantHWInterface::_OpenGraphicsDevice(int deviceNumber)
 {
 	DIR *directory = opendir("/dev/graphics");
 	if (!directory)
@@ -194,7 +205,7 @@ AccelerantHWInterface::OpenGraphicsDevice(int deviceNumber)
 
 
 status_t
-AccelerantHWInterface::OpenAccelerant(int device)
+AccelerantHWInterface::_OpenAccelerant(int device)
 {
 	char signature[1024];
 	if (ioctl(device, B_GET_ACCELERANT_SIGNATURE, 
@@ -248,7 +259,7 @@ AccelerantHWInterface::OpenAccelerant(int device)
 	if (fAccelerantImage < B_OK)
 		return B_ERROR;
 
-	if (SetupDefaultHooks() != B_OK) {
+	if (_SetupDefaultHooks() != B_OK) {
 		ATRACE(("cannot setup default hooks\n"));
 
 		uninit_accelerant uninitAccelerant = (uninit_accelerant)
@@ -265,7 +276,7 @@ AccelerantHWInterface::OpenAccelerant(int device)
 
 
 status_t
-AccelerantHWInterface::SetupDefaultHooks()
+AccelerantHWInterface::_SetupDefaultHooks()
 {
 	// required
 	fAccAcquireEngine = (acquire_engine)fAccelerantHook(B_ACQUIRE_ENGINE, NULL);
@@ -324,37 +335,36 @@ AccelerantHWInterface::Shutdown()
 status_t
 AccelerantHWInterface::SetMode(const display_mode &mode)
 {
+	AutoWriteLocker _(this);
 	// TODO: There are places this function can fail,
 	// maybe it needs to roll back changes in case of an
 	// error.
 
 	// prevent from doing the unnecessary
 	if (fModeCount > 0 && fBackBuffer && fFrontBuffer
-		&& fDisplayMode.virtual_width == mode.virtual_width
-		&& fDisplayMode.virtual_height == mode.virtual_height
-		&& fDisplayMode.space == mode.space) {
+		&& fDisplayMode == mode) {
 		return B_OK;
 	}
 
-	// TODO: check if the mode is valid even (ie complies to the modes we said we would support)
-	// or else ret = B_BAD_VALUE
-
 	if (fModeCount <= 0 || !fModeList) {
-		if (UpdateModeList() != B_OK || fModeCount <= 0) {
+		if (_UpdateModeList() != B_OK || fModeCount <= 0) {
 			ATRACE(("unable to update mode list\n"));
 			return B_ERROR;
 		}
 	}
 
+	// check if the mode is in our list
+	bool found = false;
 	for (int32 i = 0; i < fModeCount; i++) {
-		if (fModeList[i].virtual_width == mode.virtual_width
-			&& fModeList[i].virtual_height == mode.virtual_height
-			&& fModeList[i].space == mode.space) {
-
-			fDisplayMode = fModeList[i];
+		if (fModeList[i] == mode) {
+			found = true;
 			break;
 		}
 	}
+	if (!found)
+		return B_BAD_VALUE;
+
+	fDisplayMode = mode;
 
 	if (fAccSetDisplayMode(&fDisplayMode) != B_OK) {
 		ATRACE(("setting display mode failed\n"));
@@ -366,7 +376,7 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 
 	// update frontbuffer
 	fFrontBuffer->SetDisplayMode(fDisplayMode);
-	if (UpdateFrameBufferConfig() != B_OK)
+	if (_UpdateFrameBufferConfig() != B_OK)
 		return B_ERROR;
 
 	// Update the frame buffer used by the on-screen KDL
@@ -399,10 +409,10 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 			doubleBuffered = true;
 
 		if (doubleBuffered) {
-			fBackBuffer = new MallocBuffer(fDisplayMode.virtual_width,
-										   fDisplayMode.virtual_height);
+			fBackBuffer = new(nothrow) MallocBuffer(fDisplayMode.virtual_width,
+													fDisplayMode.virtual_height);
 
-			status_t ret = fBackBuffer->InitCheck();
+			status_t ret = fBackBuffer ? fBackBuffer->InitCheck() : B_NO_MEMORY;
 			if (ret < B_OK) {
 				delete fBackBuffer;
 				fBackBuffer = NULL;
@@ -427,19 +437,22 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 void
 AccelerantHWInterface::GetMode(display_mode *mode)
 {
-	if (mode)
+	if (mode && ReadLock()) {
 		*mode = fDisplayMode;
+		ReadUnlock();
+	}
 }
 
 
 status_t
-AccelerantHWInterface::UpdateModeList()
+AccelerantHWInterface::_UpdateModeList()
 {
 	fModeCount = fAccGetModeCount();
 	if (fModeCount <= 0)
 		return B_ERROR;
 
-	fModeList = new display_mode[fModeCount];
+	delete[] fModeList;
+	fModeList = new(nothrow) display_mode[fModeCount];
 	if (!fModeList)
 		return B_NO_MEMORY;
 
@@ -453,7 +466,7 @@ AccelerantHWInterface::UpdateModeList()
 
 
 status_t
-AccelerantHWInterface::UpdateFrameBufferConfig()
+AccelerantHWInterface::_UpdateFrameBufferConfig()
 {
 	if (fAccGetFrameBufferConfig(&fFrameBufferConfig) != B_OK) {
 		ATRACE(("unable to get frame buffer config\n"));
@@ -479,21 +492,33 @@ AccelerantHWInterface::GetDeviceInfo(accelerant_device_info *info)
 
 // GetModeList
 status_t
-AccelerantHWInterface::GetModeList(display_mode **modes, uint32 *count)
+AccelerantHWInterface::GetModeList(display_mode** modes, uint32 *count)
 {
+	AutoReadLocker _(this);
+
 	if (!count || !modes)
 		return B_BAD_VALUE;
-	
-	*modes = new display_mode[fModeCount];
-	*count = fModeCount;
-	
-	memcpy(*modes, fModeList, sizeof(display_mode) * fModeCount);
-	return B_OK;
+
+	status_t ret = fModeList ? B_OK : _UpdateModeList();	
+
+	if (ret >= B_OK) {
+		*modes = new(nothrow) display_mode[fModeCount];
+		if (*modes) {
+			*count = fModeCount;
+			memcpy(*modes, fModeList, sizeof(display_mode) * fModeCount);
+		} else {
+			*count = 0;
+			ret = B_NO_MEMORY;
+		}
+	}
+	return ret;
 }
 
 status_t
 AccelerantHWInterface::GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high)
 {
+	AutoReadLocker _(this);
+
 	if (!mode || !low || !high)
 		return B_BAD_VALUE;
 	
@@ -503,6 +528,8 @@ AccelerantHWInterface::GetPixelClockLimits(display_mode *mode, uint32 *low, uint
 status_t
 AccelerantHWInterface::GetTimingConstraints(display_timing_constraints *dtc)
 {
+	AutoReadLocker _(this);
+
 	if (!dtc)
 		return B_BAD_VALUE;
 	
@@ -515,6 +542,8 @@ AccelerantHWInterface::GetTimingConstraints(display_timing_constraints *dtc)
 status_t
 AccelerantHWInterface::ProposeMode(display_mode *candidate, const display_mode *low, const display_mode *high)
 {
+	AutoReadLocker _(this);
+
 	if (!candidate || !low || !high)
 		return B_BAD_VALUE;
 	
@@ -533,6 +562,8 @@ AccelerantHWInterface::ProposeMode(display_mode *candidate, const display_mode *
 status_t
 AccelerantHWInterface::WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT)
 {
+	AutoReadLocker _(this);
+
 	accelerant_retrace_semaphore AccelerantRetraceSemaphore = (accelerant_retrace_semaphore)fAccelerantHook(B_ACCELERANT_RETRACE_SEMAPHORE, NULL);
 	if (!AccelerantRetraceSemaphore)
 		return B_UNSUPPORTED;
@@ -548,6 +579,8 @@ AccelerantHWInterface::WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT)
 status_t
 AccelerantHWInterface::SetDPMSMode(const uint32 &state)
 {
+	AutoWriteLocker _(this);
+
 	if (!fAccSetDPMSMode)
 		return B_UNSUPPORTED;
 	
@@ -556,8 +589,10 @@ AccelerantHWInterface::SetDPMSMode(const uint32 &state)
 
 // DPMSMode
 uint32
-AccelerantHWInterface::DPMSMode() const
+AccelerantHWInterface::DPMSMode()
 {
+	AutoReadLocker _(this);
+
 	if (!fAccDPMSMode)
 		return B_UNSUPPORTED;
 	
@@ -566,8 +601,10 @@ AccelerantHWInterface::DPMSMode() const
 
 // DPMSCapabilities
 uint32
-AccelerantHWInterface::DPMSCapabilities() const
+AccelerantHWInterface::DPMSCapabilities()
 {
+	AutoReadLocker _(this);
+
 	if (!fAccDPMSCapabilities)
 		return B_UNSUPPORTED;
 	
@@ -690,37 +727,37 @@ AccelerantHWInterface::InvertRegion(/*const*/ BRegion& region)
 void
 AccelerantHWInterface::SetCursor(ServerCursor* cursor)
 {
-	if (Lock()) {
-		HWInterface::SetCursor(cursor);
+	HWInterface::SetCursor(cursor);
+//	if (WriteLock()) {
 		// TODO: implement setting the hard ware cursor
 		// NOTE: cursor should be always B_RGBA32
 		// NOTE: The HWInterface implementation should
 		// still be called, since it takes ownership of
 		// the cursor.
-		Unlock();
-	}
+//		WriteUnlock();
+//	}
 }
 
 // SetCursorVisible
 void
 AccelerantHWInterface::SetCursorVisible(bool visible)
 {
-	if (Lock()) {
-		HWInterface::SetCursorVisible(visible);
+	HWInterface::SetCursorVisible(visible);
+//	if (WriteLock()) {
 		// TODO: update graphics hardware
-		Unlock();
-	}
+//		WriteUnlock();
+//	}
 }
 
 // MoveCursorTo
 void
 AccelerantHWInterface::MoveCursorTo(const float& x, const float& y)
 {
-	if (Lock()) {
-		HWInterface::MoveCursorTo(x, y);
+	HWInterface::MoveCursorTo(x, y);
+//	if (WriteLock()) {
 		// TODO: update graphics hardware
-		Unlock();
-	}
+//		WriteUnlock();
+//	}
 }
 
 // FrontBuffer

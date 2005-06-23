@@ -45,8 +45,8 @@ virtual status_t				ProposeMode(display_mode *candidate,
 virtual status_t				WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT);
 
 virtual status_t				SetDPMSMode(const uint32 &state);
-virtual uint32					DPMSMode() const;
-virtual uint32					DPMSCapabilities() const;
+virtual uint32					DPMSMode();
+virtual uint32					DPMSCapabilities();
 
 	// query for available hardware accleration and perform it
 	virtual	uint32				AvailableHWAcceleration() const;
@@ -72,11 +72,11 @@ protected:
 virtual	void					_DrawCursor(BRect area) const;
 
 private:
-		int						OpenGraphicsDevice(int deviceNumber);
-		status_t				OpenAccelerant(int device);
-		status_t				SetupDefaultHooks();
-		status_t				UpdateModeList();
-		status_t				UpdateFrameBufferConfig();
+		int						_OpenGraphicsDevice(int deviceNumber);
+		status_t				_OpenAccelerant(int device);
+		status_t				_SetupDefaultHooks();
+		status_t				_UpdateModeList();
+		status_t				_UpdateFrameBufferConfig();
 		void					_RegionToRectParams(/*const*/ BRegion* region,
 													fill_rect_params** params,
 													uint32* count) const;

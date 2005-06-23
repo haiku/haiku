@@ -10,36 +10,34 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
-
 #include <AppDefs.h>
-#include <Rect.h>
-#include <string.h>
-#include <stdio.h>
-#include <malloc.h>
-#include <View.h>
-#include <Message.h>
 #include <GraphicsDefs.h>
+#include <Message.h>
 #include <PortLink.h>
+#include <Rect.h>
+#include <View.h>
 #include <ViewAux.h>
+
 #include "AppServer.h"
 #include "BGet++.h"
 #include "DebugInfoManager.h"
 #include "Desktop.h"
+#include "DisplayDriver.h"
+#include "HWInterface.h"
 #include "Layer.h"
+#include "MessagePrivate.h"
 #include "RAMLinkMsgReader.h"
 #include "RootLayer.h"
-#include "ServerWindow.h"
 #include "ServerApp.h"
-#include "ServerProtocol.h"
-#include "ServerPicture.h"
-#include "WinBorder.h"
-#include "TokenHandler.h"
-#include "Utils.h"
-#include "DisplayDriver.h"
 #include "ServerBitmap.h"
 #include "ServerPicture.h"
+#include "ServerProtocol.h"
+#include "TokenHandler.h"
+#include "Utils.h"
+#include "WinBorder.h"
 #include "Workspace.h"
-#include "MessagePrivate.h"
+
+#include "ServerWindow.h"
 
 //#define DEBUG_SERVERWINDOW
 //#define DEBUG_SERVERWINDOW_GRAPHICS
@@ -420,9 +418,10 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// -> it will invalidate areas previously out of screen
 			dst = dst | src;
 
+			fCurrentLayer->fLayerData->OffsetOrigin(BPoint(dh, dv));
+
 			_CopyBits(myRootLayer, fCurrentLayer, src, dst, xOffset, yOffset);
 
-			fCurrentLayer->fLayerData->OffsetOrigin(BPoint(dh, dv));
 
 			break;
 		}
@@ -451,7 +450,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			
 			link.Read<int32>(&token);
 
+myRootLayer->Lock();
 			Layer *current = fWinBorder->FindLayer(token);
+myRootLayer->Unlock();
 			if (current) {
 				DTRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: %s, token %ld\n", fTitle, current->Name(), token));
 			} else {
@@ -475,12 +476,14 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (fCurrentLayer != NULL)
 				break;
 
+myRootLayer->Lock();
 			fWinBorder->fTopLayer = CreateLayerTree(link, NULL);
 			fWinBorder->fTopLayer->SetAsTopLayer(true);
 			fCurrentLayer = fWinBorder->fTopLayer;
 
 			// connect decorator and top layer.
 			fWinBorder->AddChild(fWinBorder->fTopLayer, NULL);
+myRootLayer->Unlock();
 			break;
 		}
 
@@ -490,6 +493,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			Layer* parent = NULL;
 			Layer* newLayer = CreateLayerTree(link, &parent);
+myRootLayer->Lock();
 			if (parent != NULL)
 				parent->AddChild(newLayer, this);
 
@@ -500,6 +504,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				myRootLayer->GoInvalidate(newLayer, newLayer->Frame());
 #endif
 
+myRootLayer->Unlock();
 			break;
 		}
 		case AS_LAYER_DELETE:
@@ -514,12 +519,14 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			parent = fCurrentLayer->fParent;
 
 			// here we remove current layer from list.
+myRootLayer->Lock();
 			fCurrentLayer->RemoveSelf();
 			fCurrentLayer->PruneTree();
 
 			if (parent)
 				myRootLayer->GoInvalidate(parent, BRegion(fCurrentLayer->Frame()));
-
+myRootLayer->Unlock();
+			
 			#ifdef DEBUG_SERVERWINDOW
 			parent->PrintTree();
 			#endif
@@ -1429,7 +1436,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// 1) BPoint mouse location
 			// 2) int32 button state
 
-			fLink.Attach<BPoint>(gDesktop->GetDisplayDriver()->GetCursorPosition());
+			fLink.Attach<BPoint>(gDesktop->GetHWInterface()->GetCursorPosition());
 			fLink.Attach<int32>(gDesktop->ActiveRootLayer()->Buttons());
 
 			fLink.Flush();

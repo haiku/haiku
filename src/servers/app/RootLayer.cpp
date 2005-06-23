@@ -37,9 +37,9 @@
 #include <PortLink.h>
 
 #include "Decorator.h"
-#include "Desktop.h"
 #include "DisplayDriver.h"
 #include "Globals.h"
+#include "HWInterface.h"
 #include "Layer.h"
 #include "ServerApp.h"
 #include "ServerConfig.h"
@@ -994,7 +994,19 @@ void
 RootLayer::SetScreens(Screen *screens[], int32 rows, int32 columns)
 {
 	// NOTE: All screens *must* have the same resolution
-	fScreenPtrList.MakeEmpty();
+
+	// TODO: This function is badly named. Appearently, it
+	// adjusts the root layers frame rectangle, taking the information
+	// from the first screen in its list. However, a Screen object
+	// has actually now a different meaning. It manages access to
+	// the hardware and *owns* the HWInterface instance.
+	// This means there is going to be one Screen object per physical
+	// screen attached (unless I misunderstood how it was intended).
+	// A workspace needs to be attached to a screen
+	// and then on workspace activation, the appropriate updating
+	// needs to occur. The workspace tells its screen to configure
+	// to the workspaces mode, and then someone takes care of
+	// telling RootLayer to adjust itself and all other layers regions.
 
 	uint16 width, height;
 	uint32 colorSpace;
@@ -1021,29 +1033,28 @@ RootLayer::SetScreenMode(int32 width, int32 height, uint32 colorSpace, float fre
 {
 	if (fScreenWidth == width && fScreenHeight == height
 		&& fColorSpace == colorSpace && frequency == fFrequency)
-		return false;
+		return true;
 
-	bool accepted = true;
+	// NOTE: Currently, we have only one screen in that list.
+	// Before I changed it, this function would only accept modes
+	// that each of the (potentially multiple) screens can accept.
+	// However, I didn't really know what this gives in practice.
+	// We should re-think this when we really do support multiple monitors.
+	// For now, this function could potentially set the first couple of
+	// screens to the new mode, and fail to do so for the rest of them.
 
+	status_t ret = B_ERROR;
 	for (int i = 0; i < fScreenPtrList.CountItems(); i++) {
 		Screen *screen = static_cast<Screen *>(fScreenPtrList.ItemAt(i));
 
-		if (!(screen->SupportsMode(width, height, colorSpace, frequency)))
-			accepted = false;
-	}
-
-	if (!accepted)
-		return false;
-
-	for (int i = 0; i < fScreenPtrList.CountItems(); i++) {
-		Screen *screen = static_cast<Screen *>(fScreenPtrList.ItemAt(i));
-
-		screen->SetMode(width, height, colorSpace, frequency);
+		ret = screen->SetMode(width, height, colorSpace, frequency);
+		if (ret < B_OK)
+			break;
 	}
 
 	SetScreens(Screens(), fRows, fColumns);
 
-	return true;
+	return ret >= B_OK;
 }
 
 //---------------------------------------------------------------------------
@@ -1083,7 +1094,7 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 // mouse driver (which is ok, but we need to catch it here).
 //				CRITICAL("mouse position changed in B_MOUSE_DOWN from last B_MOUSE_MOVED\n");
 				// update on screen mouse pos
-				GetDisplayDriver()->MoveCursorTo(evt.where.x, evt.where.y);
+				GetHWInterface()->MoveCursorTo(evt.where.x, evt.where.y);
 				fLastMousePosition	= evt.where;
 			}
 			
@@ -1194,7 +1205,7 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_MOUSE_MOVED (%.1f, %.1f)!\n",
 		evt.where.x, evt.where.y, fLastMousePosition.x, fLastMousePosition.y);
 				// update on screen mouse pos
-				GetDisplayDriver()->MoveCursorTo(evt.where.x, evt.where.y);
+				GetHWInterface()->MoveCursorTo(evt.where.x, evt.where.y);
 				fLastMousePosition	= evt.where;
 			}
 
@@ -1262,7 +1273,7 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 			msg.Read<float>(&evt.where.y);
 			msg.Read<int32>(&evt.buttons);
 
-			GetDisplayDriver()->MoveCursorTo(evt.where.x, evt.where.y);
+			GetHWInterface()->MoveCursorTo(evt.where.x, evt.where.y);
 
 			fLastMousePosition = evt.where;
 

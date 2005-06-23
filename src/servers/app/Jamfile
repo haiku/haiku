@@ -72,6 +72,7 @@ Server app_server :
 	# Misc. Sources
 	DebugInfoManager.cpp
 	SubWindowList.cpp
+	MultiLocker.cpp
 	PicturePlayer.cpp
 	PNGDump.cpp
 	RAMLinkMsgReader.cpp
