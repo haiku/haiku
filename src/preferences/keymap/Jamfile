@@ -1,0 +1,13 @@
+SubDir OBOS_TOP src preferences keymap ;
+
+UsePrivateHeaders interface ;
+
+Preference Keymap :
+	KeymapApplication.cpp
+	KeymapWindow.cpp
+	KeymapListItem.cpp
+	Keymap.cpp
+	KeymapTextView.cpp
+	: libbe.so libtracker.so 
+	: Keymap.rdef
+	;

@@ -1,0 +1,8 @@
+SubDir OBOS_TOP src preferences workspaces ;
+
+Preference Workspaces : 
+	Workspaces.cpp 
+	: libbe.so 
+	: Workspaces.rdef 
+	;
+

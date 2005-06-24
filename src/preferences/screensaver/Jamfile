@@ -1,0 +1,14 @@
+SubDir OBOS_TOP src preferences screensaver ;
+
+UsePrivateHeaders screen_saver ;
+
+Preference ScreenSaver : 
+	ScreenSaverPrefsApp.cpp
+	ScreenSaverWindow.cpp
+	passwordWindow.cpp
+	PreviewView.cpp
+	MouseAreaView.cpp
+	: libtracker.so libscreensaver.so libbe.so libstdc++.r4.so
+	: ScreenSaver.rdef 
+	;
+

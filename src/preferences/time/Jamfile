@@ -1,0 +1,21 @@
+SubDir OBOS_TOP src preferences time ;
+
+Preference Time : 
+	AnalogClock.cpp 
+	BaseView.cpp 
+	Bitmaps.cpp 
+	CalendarView.cpp 
+	DateTimeEdit.cpp 
+	DateUtils.cpp 
+	SectionEdit.cpp 
+	SettingsView.cpp 
+	Time.cpp 
+	TimeSettings.cpp 
+	TimeView.cpp 
+	TimeWindow.cpp 
+	TZDisplay.cpp 
+	ZoneView.cpp 
+	: libbe.so
+	: Time.rdef
+	;
+

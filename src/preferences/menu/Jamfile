@@ -1,0 +1,15 @@
+SubDir OBOS_TOP src preferences menu ;
+
+Preference Menu : 
+	BitmapMenuItem.cpp 
+	ColorPicker.cpp 
+	ColorWindow.cpp 
+	FontMenu.cpp 
+	FontSizeMenu.cpp 
+	MenuApp.cpp 
+	MenuBar.cpp 
+	MenuWindow.cpp 
+	: libtranslation.so libbe.so
+	: Menu.rdef
+	;
+

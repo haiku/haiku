@@ -1,0 +1,18 @@
+SubDir OBOS_TOP src preferences mail ;
+
+UsePrivateHeaders mail ;
+SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
+
+Preference E-mail :
+	Account.cpp
+	CenterContainer.cpp
+	ConfigViews.cpp
+	ConfigWindow.cpp
+	main.cpp 
+	: libbe.so libmail.so
+	: e-mail.rdef
+	;
+
+Package haiku-maildaemon-cvs :
+	E-mail : 
+	boot beos preferences ;

@@ -1,0 +1,10 @@
+SubDir OBOS_TOP src preferences virtualmemory ;
+
+Preference VirtualMemory : 
+	main.cpp 
+	Pref_Utils.cpp 
+	MainWindow.cpp 
+	VMSettings.cpp 
+	: libbe.so libstdc++.r4.so
+	: VirtualMemory.rdef
+	;

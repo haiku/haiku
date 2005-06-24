@@ -1,0 +1,12 @@
+SubDir OBOS_TOP src preferences datatranslations ;
+
+Preference DataTranslations :
+	DataTranslations.cpp
+	DataTranslationsWindow.cpp
+	DataTranslationsView.cpp
+	DataTranslationsSettings.cpp
+	IconView.cpp 
+	: libbe.so libtranslation.so
+	: DataTranslations.rdef
+	;
+

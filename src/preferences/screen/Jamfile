@@ -1,0 +1,20 @@
+SubDir OBOS_TOP src preferences screen ;
+
+UsePrivateHeaders [ FDirName graphics radeon ] ;
+
+Preference Screen : 
+	AlertView.cpp
+	AlertWindow.cpp
+	MonitorView.cpp
+	multimon.cpp
+	RefreshSlider.cpp
+	RefreshView.cpp
+	RefreshWindow.cpp
+	ScreenApplication.cpp
+	ScreenMode.cpp
+	ScreenSettings.cpp
+	ScreenWindow.cpp
+	Utility.cpp
+	: libbe.so
+	: Screen.rdef
+	;

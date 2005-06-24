@@ -1,0 +1,11 @@
+SubDir OBOS_TOP src preferences filetypes ;
+
+Preference FileTypes :
+	main.cpp
+	FileTypesApp.cpp
+	FileTypesView.cpp
+	FileTypesWindow.cpp
+	: libbe.so libtracker.so
+	: FileTypes.rdef FileTypes.icons.rdef FileTypes.version.rdef
+	;
+
