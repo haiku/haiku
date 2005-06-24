@@ -386,5 +386,4 @@ mouse_device::init_check()
 mouse_device::~mouse_device()
 {
 	delete sm;
-	free(device_ref.name);
 }
