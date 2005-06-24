@@ -18,6 +18,7 @@
 #include <PortLink.h>
 
 #include "SubWindowList.h"
+#include "BGet++.h"
 
 class AreaPool;
 class BMessage;
@@ -72,7 +73,7 @@ public:
 	int32 CountPictures() const;
 	ServerPicture *FindPicture(int32 token) const;
 
-	AreaPool *AppAreaPool() { return fSharedMem; }
+	AreaPool *AppAreaPool() { return &fSharedMem; }
 
 	SubWindowList fAppSubWindowList;
 
@@ -117,9 +118,9 @@ private:
 	// Used for BMessage target specification
 	// TODO: Is it still needed ? We aren't using it.
 	//int32 fHandlerToken;
-	
-	AreaPool *fSharedMem;
-	
+
+	AreaPool fSharedMem;
+
 	bool fQuitting;
 };
 

@@ -29,23 +29,13 @@ BitmapManager *gBitmapManager = NULL;
 
 //! Sets up stuff to be ready to allocate space for bitmaps
 BitmapManager::BitmapManager()
-	: fBitmapList(1024),
-	  fBitmapArea(B_ERROR),
-	  fBuffer(NULL),
-	  fTokenizer(),
-	  fLock("BitmapManager Lock"),
-	  fMemPool()
+	:
+	fBitmapList(1024),
+	fBuffer(NULL),
+	fTokenizer(),
+	fLock("BitmapManager Lock"),
+	fMemPool("bitmap pool", BITMAP_AREA_SIZE)
 {
-	// When create_area is passed the B_ANY_ADDRESS flag, the address of the area
-	// is stored in the pointer to a pointer.
-	fBitmapArea = create_area("bitmap_area", (void**)&fBuffer,
-						  B_ANY_ADDRESS, BITMAP_AREA_SIZE,
-						  B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
-
-	if (fBitmapArea < B_OK)
-	   	printf("PANIC: BitmapManager couldn't allocate area: %s\n", strerror(fBitmapArea));
-
-	fMemPool.AddToPool(fBuffer, BITMAP_AREA_SIZE);
 }
 
 //! Deallocates everything associated with the manager
@@ -58,8 +48,6 @@ BitmapManager::~BitmapManager()
 			delete bitmap;
 		}
 	}
-
-	delete_area(fBitmapArea);
 }
 
 /*!
@@ -93,12 +81,11 @@ BitmapManager::CreateBitmap(BRect bounds, color_space space, int32 flags,
 		bitmap->fBuffer = buffer;
 		bitmap->fToken = fTokenizer.GetToken();
 		bitmap->fInitialized = true;
-		
-		// calculate area offset
-		area_info ai;
-		get_area_info(bitmap->fArea, &ai);
-		bitmap->fOffset = buffer - (uint8*)ai.address;
 
+		// calculate area offset
+		area_info info;
+		get_area_info(bitmap->fArea, &info);
+		bitmap->fOffset = buffer - (uint8*)info.address;
 	} else {
 		// Allocation failed for buffer or bitmap list
 		fMemPool.ReleaseBuffer(buffer);

@@ -91,7 +91,7 @@ ServerApp::ServerApp(port_id clientReplyPort, port_id clientLooperPort,
 	fCursorHidden(false),
 	fIsActive(false),
 	//fHandlerToken(handlerID),
-	fSharedMem(new AreaPool),
+	fSharedMem("shared memory"),
 	fQuitting(false)
 {
 	if (fSignature == "")
@@ -198,12 +198,8 @@ ServerApp::~ServerApp(void)
 	// there should be a way that this ServerApp be attached to a particular
 	// RootLayer to know which RootLayer's cursor to modify.
 	gDesktop->ActiveRootLayer()->GetCursorManager().RemoveAppCursors(fClientTeam);
-	
-	STRACE(("#ServerApp %s:~ServerApp()\n", fSignature.String()));
 
-	delete fSharedMem;
-	
-	STRACE(("ServerApp %s::~ServerApp(): Exiting\n", fSignature.String()));
+	STRACE(("ServerApp %s::~ServerApp(): Exiting\n", Signature()));
 }
 
 
@@ -587,7 +583,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// This is a very special case in the sense that when ServerMemIO is used for this 
 			// purpose, it will be set to NOT automatically free the memory which it had 
 			// requested. This is the server's job once the message has been dispatched.
-			fSharedMem->ReleaseBuffer(msgpointer);
+			fSharedMem.ReleaseBuffer(msgpointer);
 			break;
 		}
 		case AS_ACQUIRE_SERVERMEM:
@@ -607,7 +603,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			// TODO: I wonder if ACQUIRE_SERVERMEM should have a minimum size requirement?
 
-			void *sharedmem = fSharedMem->GetBuffer(memsize);
+			void *sharedmem = fSharedMem.GetBuffer(memsize);
 
 			if (memsize < 1 || sharedmem == NULL) {
 				fLink.StartMessage(SERVER_FALSE);
@@ -653,7 +649,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			STRACE(("Successfully freed shared memory\n"));
 			void *sharedmem = ((int32*)areaInfo.address) + areaoffset;
 			
-			fSharedMem->ReleaseBuffer(sharedmem);
+			fSharedMem.ReleaseBuffer(sharedmem);
 			
 			break;
 		}

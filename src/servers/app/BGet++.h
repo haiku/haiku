@@ -1,13 +1,13 @@
 /*
  * Copyright 2001-2005, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
-
- * Authors: John Walker <kelvin@fourmilab.ch>
- *			DarkWyrm <bpmagic@columbus.rr.com>
- *			Stephan Aßmus <superstippi@gmx.de>
+ *
+ * Authors:
+ *		John Walker <kelvin@fourmilab.ch>
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Stephan Aßmus <superstippi@gmx.de>
  *
  *	BGET pool allocator
- *
  */
 
 #ifndef MEM_POOL_H
@@ -93,12 +93,15 @@ class MemPool {
 };
 
 class AreaPool : public MemPool {
- public:
-								AreaPool();
-	virtual						~AreaPool();
+	public:
+						AreaPool(const char* name, size_t initialSize = 0);
+		virtual			~AreaPool();
 
-	virtual void*				AcquireMem(ssize_t size);
-	virtual void				ReleaseMem(void* buffer);
+		virtual void*	AcquireMem(ssize_t size);
+		virtual void	ReleaseMem(void* buffer);
+
+	private:
+		const char*		fName;
 };
 
 #endif

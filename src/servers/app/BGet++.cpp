@@ -468,47 +468,44 @@ MemPool::ReleaseBuffer(void *buf)
 
 // Add a region of memory to the buffer pool.
 void
-MemPool::AddToPool(void *buf, ssize_t len)
+MemPool::AddToPool(void *buffer, ssize_t length)
 {
-    struct bfhead *b = BFH(buf);
-    struct bhead *bn;
+	if (buffer == NULL || length <= 0)
+		return;
 
-    len &= ~(SizeQuant - 1);
+	length &= ~(SizeQuant - 1);
 
-    if (fPoolLength == 0) 
-    {
-		fPoolLength = len;
-    }
-    else
-    if (len != fPoolLength)
-    {
+	if (fPoolLength == 0) 
+		fPoolLength = length;
+	else if (length != fPoolLength)
 		fPoolLength = -1;
-    }
-	
+
 	// Number of block acquisitions
-    fNumpget++;
-    
-    // Number of blocks total
-    fNumpblk++;
-    assert(fNumpblk == fNumpget - fNumprel);
+	fNumpget++;
 
-    // Since the block is initially occupied by a single free  buffer,
-    // it  had	better	not  be  (much) larger than the largest buffer
-    // whose size we can store in bhead.bsize.
-    assert(len - sizeof(struct bhead) <= -((ssize_t) ESent + 1));
+	// Number of blocks total
+	fNumpblk++;
+	assert(fNumpblk == fNumpget - fNumprel);
 
-    // Clear  the  backpointer at  the start of the block to indicate that
-    // there  is  no  free  block  prior  to  this   one.    That   blocks
-    // recombination when the first block in memory is released.
-    b->bh.prevfree = 0;
+	// Since the block is initially occupied by a single free  buffer,
+	// it  had	better	not  be  (much) larger than the largest buffer
+	// whose size we can store in bhead.bsize.
+	assert(length - sizeof(struct bhead) <= -((ssize_t) ESent + 1));
 
-    // Chain the new block to the free list.
-    assert(fFreeList.ql.blink->ql.flink == &fFreeList);
-    assert(fFreeList.ql.flink->ql.blink == &fFreeList);
-    b->ql.flink = &fFreeList;
-    b->ql.blink = fFreeList.ql.blink;
-    fFreeList.ql.blink = b;
-    b->ql.blink->ql.flink = b;
+	struct bfhead *b = BFH(buffer);
+
+	// Clear  the  backpointer at  the start of the block to indicate that
+	// there  is  no  free  block  prior  to  this   one.    That   blocks
+	// recombination when the first block in memory is released.
+	b->bh.prevfree = 0;
+
+	// Chain the new block to the free list.
+	assert(fFreeList.ql.blink->ql.flink == &fFreeList);
+	assert(fFreeList.ql.flink->ql.blink == &fFreeList);
+	b->ql.flink = &fFreeList;
+	b->ql.blink = fFreeList.ql.blink;
+	fFreeList.ql.blink = b;
+	b->ql.blink->ql.flink = b;
 
 	// Create a dummy allocated buffer at the end of the pool.	This dummy
 	// buffer is seen when a buffer at the end of the pool is released and
@@ -518,14 +515,14 @@ MemPool::AddToPool(void *buf, ssize_t len)
 	// routines (this specific value is  not  counted  on  by  the  actual
 	// allocation and release functions).
 
-    len -= sizeof(struct bhead);
-    b->bh.bsize = (ssize_t) len;
+	length -= sizeof(struct bhead);
+	b->bh.bsize = length;
 
-    memset(((char *) b) + sizeof(struct bfhead), 0x55,(int) (len - sizeof(struct bfhead)));
+	memset(((char *)b) + sizeof(struct bfhead), 0x55, (int)(length - sizeof(struct bfhead)));
 
-    bn = BH(((char *) b) + len);
-    bn->prevfree = (ssize_t) len;
-    
+	struct bhead *bn = BH(((char *) b) + length);
+	bn->prevfree = length;
+
     // Definition of ESent assumes two's complement!
     assert((~0) == -1);
     bn->bsize = ESent;
@@ -765,8 +762,12 @@ MemPool::ReleaseMem(void *buffer)
 //	#pragma mark -
 
 
-AreaPool::AreaPool()
+AreaPool::AreaPool(const char* name, size_t initialSize)
+	:
+	fName(name)
 {
+	if (initialSize > 0)
+		AddToPool(AcquireMem(initialSize), initialSize);
 }
 
 
@@ -784,7 +785,7 @@ AreaPool::AcquireMem(ssize_t size)
 	// make size a multiple of B_PAGE_SIZE
 	size = (size + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 
-	area = create_area("AreaPool_area", &address, B_ANY_ADDRESS, size,
+	area = create_area(fName, &address, B_ANY_ADDRESS, size,
 		B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 
 	if (area < B_OK) {

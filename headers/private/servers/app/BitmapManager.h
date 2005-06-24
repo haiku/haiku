@@ -44,7 +44,6 @@ class BitmapManager {
 			void				DeleteBitmap(ServerBitmap* bitmap);
  protected:
 			BList				fBitmapList;
-			area_id				fBitmapArea;
 			int8*				fBuffer;
 			TokenHandler		fTokenizer;
 			BLocker				fLock;
