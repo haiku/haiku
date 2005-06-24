@@ -1,13 +1,13 @@
 /*
  * Copyright 2001-2005, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
-
- * Authors: John Walker <kelvin@fourmilab.ch>
- *			DarkWyrm <bpmagic@columbus.rr.com>
- *			Stephan Aßmus <superstippi@gmx.de>
+ *
+ * Authors:
+ *		John Walker <kelvin@fourmilab.ch>
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Stephan Aßmus <superstippi@gmx.de>
  *
  *	BGET pool allocator
- *
  */
 
 /*
@@ -64,6 +64,7 @@ MemPool::MemPool()
 	fFreeList.bh = (bhead){ 0, 0 };
 	fFreeList.ql = (qlinks){ &fFreeList, &fFreeList };
 }
+
 
 MemPool::~MemPool()
 {
@@ -572,7 +573,6 @@ MemPool::ExtendedStats(ssize_t *pool_incr, long *npool, long *npget, long *nprel
 }
 
 
-
 // Dump the data in a buffer. This is called with the user data pointer, 
 // and backs up to the buffer header.  It will dump either a free block 
 // or an allocated one.
@@ -663,8 +663,8 @@ MemPool::PoolDump(void *buf, bool dumpalloc, bool dumpfree)
 		} 
 		else 
 		{
-	            char *lerr = "";
-	
+			char *lerr = "";
+
 		    assert(bs > 0);
 		    if ((b->ql.blink->ql.flink != b) ||	(b->ql.flink->ql.blink != b)) 
 			{
@@ -740,11 +740,13 @@ MemPool::Validate(void *buf)
     return 1;
 }
 
+
 int*
 MemPool::CompactMem(ssize_t sizereq, int sequence)
 {
 	return NULL;
 }
+
 
 void*
 MemPool::AcquireMem(ssize_t size)
@@ -752,57 +754,55 @@ MemPool::AcquireMem(ssize_t size)
 	return malloc(size);
 }
 
+
 void
 MemPool::ReleaseMem(void *buffer)
 {
 	free(buffer);
 }
 
+
+//	#pragma mark -
+
+
 AreaPool::AreaPool()
 {
 }
+
 
 AreaPool::~AreaPool()
 {
 }
 
+
 void*
 AreaPool::AcquireMem(ssize_t size)
 {
-	long areasize=0;
-	area_id a;
-	int *parea;
-	
-	if(size<B_PAGE_SIZE)
-		areasize=B_PAGE_SIZE;
-	else
-	{
-		if((size % B_PAGE_SIZE)!=0)
-			areasize=((long)(size/B_PAGE_SIZE)+1)*B_PAGE_SIZE;
-		else
-			areasize=size;
-	}
-	
-	a=create_area("AreaPool_area",(void**)&parea,B_ANY_ADDRESS,areasize,
-			B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
-	
-	if(a==B_BAD_VALUE || a==B_NO_MEMORY || a==B_ERROR)
-	{
+	area_id area;
+	void* address;
+
+	// make size a multiple of B_PAGE_SIZE
+	size = (size + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+
+	area = create_area("AreaPool_area", &address, B_ANY_ADDRESS, size,
+		B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+
+	if (area < B_OK) {
 	   	printf("ERROR: AreaPool couldn't allocate area!!\n");
 	   	return NULL;
 	}
 
-	return parea;
+	return address;
 }
+
 
 void
 AreaPool::ReleaseMem(void *buffer)
 {
-	area_id trash=area_for(buffer);
-
-	if(trash==B_ERROR)
+	area_id trash = area_for(buffer);
+	if (trash < B_ERROR)
 		return;
-	
+
 	delete_area(trash);
 }
 
