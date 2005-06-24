@@ -1886,6 +1886,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 // TODO: lock RootLayer, set mode and tell it to update it's frame and all clipping
 // optionally put this into a message and let the root layer thread handle it.
 //			status_t ret = gDesktop->ScreenAt(0)->SetMode(mode);
+status_t ret = B_ERROR;
 
 			fLink.StartMessage(SERVER_TRUE);
 			fLink.Attach<status_t>(ret);
