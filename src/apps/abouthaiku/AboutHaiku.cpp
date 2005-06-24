@@ -306,6 +306,7 @@ AboutView::AboutView(const BRect &r)
 		"Oliver Ruiz Dorantes\n"
 		"Marc Flerackers\n"
 		"Erik Jaesler\n"
+		"Marcin Konicki\n"
 		"Elad Lahav\n"
 		"Santiago Lema\n"
 		"Jerome Leveque\n"
