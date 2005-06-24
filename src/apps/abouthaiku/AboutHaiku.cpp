@@ -291,6 +291,7 @@ AboutView::AboutView(const BRect &r)
 		"Rudolf Cornelissen\n"
 		"Jérôme Duval\n"
 		"Matthijs Hollemans\n"
+		"Thomas Kurschel\n"
 		"Adi Oanca\n"
 		"Niels Reedijk\n"
 		"\n");
@@ -323,8 +324,9 @@ AboutView::AboutView(const BRect &r)
 		"Jeremy Rand\n"
 		"David Reid"
 		"Daniel Reinhold\n"
-		"Thomas Roell\n"
 		"François Revol\n"
+		"Thomas Roell\n"
+		"Rafael Romo\n"
 		"Zousar Shaker\n"
 		"Daniel Switkin\n"
 		"Atsushi Takamatsu\n"
