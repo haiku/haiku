@@ -1948,6 +1948,43 @@ status_t ret = B_ERROR;
 			root->Unlock();
 			break;
 		}
+		
+		case AS_GET_ACCELERANT_INFO:
+		{
+			STRACE(("ServerApp %s: get accelerant info\n", fSignature.String()));
+			
+			// We aren't using the screen_id for now...
+			screen_id id;
+			link.Read<screen_id>(&id);
+			
+			accelerant_device_info accelerantInfo;
+			// TODO: I wonder if there should be a "desktop" lock...
+			if (gDesktop->GetHWInterface()->GetDeviceInfo(&accelerantInfo) == B_OK) {
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach<accelerant_device_info>(accelerantInfo);
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+			
+			fLink.Flush();
+			
+			break;
+		}
+		
+		case AS_GET_RETRACE_SEMAPHORE:
+		{
+			STRACE(("ServerApp %s: get retrace semaphore\n", fSignature.String()));
+			
+			// We aren't using the screen_id for now...
+			screen_id id;
+			link.Read<screen_id>(&id);
+			
+			sem_id semaphore = gDesktop->GetHWInterface()->RetraceSemaphore();
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<sem_id>(semaphore);
+			fLink.Flush();
+			
+			break;
+		}
 				
 		default:
 			printf("ServerApp %s received unhandled message code offset %s\n",

@@ -42,6 +42,7 @@ virtual status_t				ProposeMode(display_mode *candidate,
 											const display_mode *low,
 											const display_mode *high);
 
+virtual sem_id					RetraceSemaphore();
 virtual status_t				WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT);
 
 virtual status_t				SetDPMSMode(const uint32 &state);

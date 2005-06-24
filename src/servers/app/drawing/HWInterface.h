@@ -51,6 +51,7 @@ class HWInterface : public MultiLocker {
 											const display_mode *low,
 											const display_mode *high) = 0;
 
+	virtual sem_id				RetraceSemaphore() = 0;
 	virtual status_t			WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT) = 0;
 
 	virtual status_t			SetDPMSMode(const uint32 &state) = 0;

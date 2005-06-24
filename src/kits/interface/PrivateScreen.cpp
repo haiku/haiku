@@ -261,10 +261,27 @@ BPrivateScreen::SetDesktopColor(rgb_color color, uint32 workspace, bool makeDefa
 
 
 status_t
-BPrivateScreen::ProposeMode(display_mode *target, const display_mode *low, const display_mode *high)
+BPrivateScreen::ProposeMode(display_mode *target,
+				const display_mode *low, const display_mode *high)
 {
-	// TODO: Implement
-	return B_ERROR;
+	// We can't return B_BAD_VALUE here, because it's used to indicate
+	// that the mode returned is supported, but it doesn't fall
+	// within the limit (see ProposeMode() documentation) 
+	if (target == NULL || low == NULL || high == NULL)
+		return B_ERROR;
+		
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_PROPOSE_MODE);
+	link.Attach<screen_id>(ID());
+	int32 reply;
+	status_t status = B_ERROR;
+	if (link.FlushWithReply(reply) == B_OK && reply == SERVER_TRUE) {
+		link.Read<display_mode>(target);	
+		// The status is important here. See documentation 
+		link.Read<status_t>(&status);	
+	}
+	
+	return status;
 }
 		
 
@@ -345,7 +362,18 @@ BPrivateScreen::SetMode(uint32 workspace, display_mode *mode, bool makeDefault)
 status_t
 BPrivateScreen::GetDeviceInfo(accelerant_device_info *info)
 {
-	// TODO: Implement
+	if (info == NULL)
+		return B_BAD_VALUE;
+	
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_GET_ACCELERANT_INFO);
+	link.Attach<screen_id>(ID());
+	int32 code;
+	if (link.FlushWithReply(code) == B_OK && code == SERVER_TRUE) {
+		link.Read<accelerant_device_info>(info);
+		return B_OK;
+	}
+	
 	return B_ERROR;
 }
 

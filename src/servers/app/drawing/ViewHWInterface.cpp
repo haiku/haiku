@@ -643,6 +643,13 @@ ViewHWInterface::DPMSCapabilities()
 	return BScreen().DPMSCapabilites();
 }
 
+// RetraceSemaphore
+sem_id
+ViewHWInterface::RetraceSemaphore()
+{
+	return -1;
+}
+
 // WaitForRetrace
 status_t
 ViewHWInterface::WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT)
