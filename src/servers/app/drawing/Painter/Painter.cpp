@@ -89,8 +89,8 @@ Painter::Painter()
 	  fPatternHandler(new PatternHandler()),
 	  fTextRenderer(new AGGTextRenderer())
 {
-	if (fontserver && fontserver->GetSystemPlain())
-		fFont = *fontserver->GetSystemPlain();
+	if (gFontServer && gFontServer->GetSystemPlain())
+		fFont = *gFontServer->GetSystemPlain();
 	
 	_UpdateFont();
 	_UpdateLineWidth();

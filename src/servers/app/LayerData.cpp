@@ -1,31 +1,16 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		LayerData.cpp
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//					Adi Oanca <adioanca@mymail.ro>
-//					Stephan Aßmus <superstippi@gmx.de>
-//	Description:	Data classes for working with BView states and draw parameters
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Adi Oanca <adioanca@mymail.ro>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
+
+/**	Data classes for working with BView states and draw parameters */
+
+
 #include <stdio.h>
 
 #include <Region.h>
@@ -55,8 +40,8 @@ DrawData::DrawData()
 	  fLineJoinMode(B_BEVEL_JOIN),
 	  fMiterLimit(B_DEFAULT_MITER_LIMIT)
 {
-	if (fontserver && fontserver->GetSystemPlain())
-		fFont = *(fontserver->GetSystemPlain());
+	if (gFontServer && gFontServer->GetSystemPlain())
+		fFont = *(gFontServer->GetSystemPlain());
 	
 	fEscapementDelta.space = 0;
 	fEscapementDelta.nonspace = 0;
@@ -87,10 +72,10 @@ DrawData::operator=(const DrawData& from)
 	// fOrigin and fScale and uses the current the font size as
 	// fUnscaledFontSize.
 
-//	fOrigin				= from.fOrigin;
-//	fScale				= from.fScale;
-	fOrigin				= BPoint(0.0, 0.0);
-	fScale				= 1.0;
+//	fOrigin	= from.fOrigin;
+//	fScale	= from.fScale;
+	fOrigin	= BPoint(0.0, 0.0);
+	fScale	= 1.0;
 
 	if (from.fClippingRegion) {
 		SetClippingRegion(*(from.fClippingRegion));

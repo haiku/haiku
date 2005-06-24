@@ -71,7 +71,7 @@ static AppServer *sAppServer;
 //RGBColor workspace_default_color(51,102,160);
 
 //! System-wide GUI color object
-ColorSet gui_colorset;
+ColorSet gGUIColorSet;
 
 /*!
 	\brief Constructor
@@ -104,22 +104,22 @@ AppServer::AppServer(void) :
 	sAppServer = this;
 
 	// Create the font server and scan the proper directories.
-	fontserver = new FontServer;
-	fontserver->Lock();
+	gFontServer = new FontServer;
+	gFontServer->Lock();
 
 	// Used for testing purposes
 
 	// TODO: Re-enable scanning of all font directories when server is actually put to use
-	fontserver->ScanDirectory("/boot/beos/etc/fonts/ttfonts/");
-//	fontserver->ScanDirectory("/boot/beos/etc/fonts/PS-Type1/");
-//	fontserver->ScanDirectory("/boot/home/config/fonts/ttfonts/");
-//	fontserver->ScanDirectory("/boot/home/config/fonts/psfonts/");
-	fontserver->SaveList();
+	gFontServer->ScanDirectory("/boot/beos/etc/fonts/ttfonts/");
+//	gFontServer->ScanDirectory("/boot/beos/etc/fonts/PS-Type1/");
+//	gFontServer->ScanDirectory("/boot/home/config/fonts/ttfonts/");
+//	gFontServer->ScanDirectory("/boot/home/config/fonts/psfonts/");
+	gFontServer->SaveList();
 
-	if (!fontserver->SetSystemPlain(DEFAULT_PLAIN_FONT_FAMILY,
+	if (!gFontServer->SetSystemPlain(DEFAULT_PLAIN_FONT_FAMILY,
 									DEFAULT_PLAIN_FONT_STYLE,
 									DEFAULT_PLAIN_FONT_SIZE) &&
-		!fontserver->SetSystemPlain(FALLBACK_PLAIN_FONT_FAMILY,
+		!gFontServer->SetSystemPlain(FALLBACK_PLAIN_FONT_FAMILY,
 									DEFAULT_PLAIN_FONT_STYLE,
 									DEFAULT_PLAIN_FONT_SIZE)) {
 		printf("Couldn't set plain to %s (fallback: %s), %s %d pt\n",
@@ -129,10 +129,10 @@ AppServer::AppServer(void) :
 				DEFAULT_PLAIN_FONT_SIZE);
 	}
 
-	if (!fontserver->SetSystemBold(DEFAULT_BOLD_FONT_FAMILY,
+	if (!gFontServer->SetSystemBold(DEFAULT_BOLD_FONT_FAMILY,
 								   DEFAULT_BOLD_FONT_STYLE,
 								   DEFAULT_BOLD_FONT_SIZE) &&
-		!fontserver->SetSystemBold(FALLBACK_BOLD_FONT_FAMILY,
+		!gFontServer->SetSystemBold(FALLBACK_BOLD_FONT_FAMILY,
 								   DEFAULT_BOLD_FONT_STYLE,
 								   DEFAULT_BOLD_FONT_SIZE)) {
 		printf("Couldn't set bold to %s (fallback: %s), %s %d pt\n",
@@ -142,10 +142,10 @@ AppServer::AppServer(void) :
 				DEFAULT_BOLD_FONT_SIZE);
 	}
 
-	if (!fontserver->SetSystemFixed(DEFAULT_FIXED_FONT_FAMILY,
+	if (!gFontServer->SetSystemFixed(DEFAULT_FIXED_FONT_FAMILY,
 									DEFAULT_FIXED_FONT_STYLE,
 									DEFAULT_FIXED_FONT_SIZE) &&
-		!fontserver->SetSystemFixed(FALLBACK_FIXED_FONT_FAMILY,
+		!gFontServer->SetSystemFixed(FALLBACK_FIXED_FONT_FAMILY,
 									DEFAULT_FIXED_FONT_STYLE,
 									DEFAULT_FIXED_FONT_SIZE)) {
 		printf("Couldn't set fixed to %s (fallback: %s), %s %d pt\n",
@@ -155,12 +155,12 @@ AppServer::AppServer(void) :
 				DEFAULT_FIXED_FONT_SIZE);
 	}
 
-	fontserver->Unlock();
+	gFontServer->Unlock();
 
 	// Load the GUI colors here and set the global set to the values contained therein. If this
 	// is not possible, set colors to the defaults
-	if (LoadColorSet(SERVER_SETTINGS_DIR COLOR_SETTINGS_NAME,&gui_colorset)!=B_OK)
-		gui_colorset.SetToDefaults();
+	if (LoadColorSet(SERVER_SETTINGS_DIR COLOR_SETTINGS_NAME, &gGUIColorSet) != B_OK)
+		gGUIColorSet.SetToDefaults();
 
 	// Set up the Desktop
 	gDesktop = new Desktop();
@@ -170,7 +170,7 @@ AppServer::AppServer(void) :
 	InitializeColorMap();
 	
 	// Create the bitmap allocator. Object declared in BitmapManager.cpp
-	bitmapmanager = new BitmapManager();
+	gBitmapManager = new BitmapManager();
 
 	// This is necessary to mediate access between the Poller and app_server threads
 	fActiveAppLock = create_sem(1,"app_server_active_sem");
@@ -194,7 +194,7 @@ AppServer::AppServer(void) :
 	Reached only when the server is asked to shut down in Test mode. Kills all apps, shuts down the 
 	desktop, kills the housekeeping threads, etc.
 */
-AppServer::~AppServer(void)
+AppServer::~AppServer()
 {
 	debugger("We shouldn't be here! MainLoop()::B_QUIT_REQUESTED should see if we can exit the server.\n");
 /*
@@ -210,7 +210,7 @@ AppServer::~AppServer(void)
 	delete fAppList;
 	release_sem(fAppListLock);
 
-	delete bitmapmanager;
+	delete gBitmapManager;
 
 	delete gDesktop;
 
@@ -221,7 +221,7 @@ AppServer::~AppServer(void)
 	kill_thread(fCursorThreadID);
 	kill_thread(fISThreadID);
 
-	delete fontserver;
+	delete gFontServer;
 	
 	make_decorator=NULL;
 */
@@ -504,9 +504,9 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 		case AS_UPDATED_CLIENT_FONTLIST:
 			// received when the client-side global font list has been
 			// refreshed
-			fontserver->Lock();
-			fontserver->FontsUpdated();
-			fontserver->Unlock();
+			gFontServer->Lock();
+			gFontServer->FontsUpdated();
+			gFontServer->Unlock();
 			break;
 
 		case AS_QUERY_FONTS_CHANGED:
@@ -516,18 +516,18 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 
 			// Attached data:
 			// 1) port_id reply port
-			
-			fontserver->Lock();
-			bool needs_update=fontserver->FontsNeedUpdated();
-			fontserver->Unlock();
-			
+
+			gFontServer->Lock();
+			bool needsUpdate = gFontServer->FontsNeedUpdated();
+			gFontServer->Unlock();
+
 			// Seeing how the client merely wants an answer, we'll skip the BPortLink
 			// and all its overhead and just write the code to port.
 			port_id replyport;
 			if (msg.Read<port_id>(&replyport) < B_OK)
 				break;
 			BPrivate::PortLink replylink(replyport);
-			replylink.StartMessage(needs_update ? SERVER_TRUE : SERVER_FALSE);
+			replylink.StartMessage(needsUpdate ? SERVER_TRUE : SERVER_FALSE);
 			replylink.Flush();
 			break;
 		}
@@ -564,8 +564,8 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 			release_sem(fAppListLock);
 
 			delete gDesktop;
-			delete bitmapmanager;
-			delete fontserver;
+			delete gBitmapManager;
+			delete gFontServer;
 
 			// we are now clear to exit
 			exit_thread(0);

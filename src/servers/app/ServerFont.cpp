@@ -1,29 +1,12 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		ServerFont.cpp
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Shadow BFont class
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ */
+
+
 #include <ByteOrder.h>
 #include <Shape.h>
 #include <String.h>
@@ -38,6 +21,71 @@
 #include FT_OUTLINE_H
 
 #include "ServerFont.h"
+
+
+// functions needed to convert a freetype vector graphics to a BShape
+inline BPoint
+VectorToPoint(FT_Vector *vector)
+{
+	BPoint result;
+	result.x = float(int32(vector->x)) / 2097152;
+	result.y = -float(int32(vector->y)) / 2097152;
+	return result;
+}
+
+int
+MoveToFunc(FT_Vector *to, void *user)
+{
+	((BShape *)user)->MoveTo(VectorToPoint(to));
+	return 0;
+}
+
+int
+LineToFunc(FT_Vector *to, void *user)
+{
+	((BShape *)user)->LineTo(VectorToPoint(to));
+	return 0;
+}
+
+int
+ConicToFunc(FT_Vector *control, FT_Vector *to, void *user)
+{
+	BPoint controls[3];
+	
+	controls[0] = VectorToPoint(control);
+	controls[1] = VectorToPoint(to);
+	controls[2] = controls[1];
+	
+	((BShape *)user)->BezierTo(controls);
+	return 0;
+}
+
+int
+CubicToFunc(FT_Vector *control1, FT_Vector *control2, FT_Vector *to, void *user)
+{
+	BPoint controls[3];
+	
+	controls[0] = VectorToPoint(control1);
+	controls[1] = VectorToPoint(control2);
+	controls[2] = VectorToPoint(to);
+	
+	((BShape *)user)->BezierTo(controls);
+	return 0;
+}
+
+
+// is_white_space
+inline bool
+is_white_space(uint16 glyph)
+{
+	// TODO: handle them all!
+	if (glyph == ' ' || glyph == B_TAB)
+		return true;
+	return false;
+}
+
+
+//	#pragma mark -
 
 
 /*! 
@@ -191,9 +239,9 @@ ServerFont::SetFamilyAndStyle(uint16 familyID, uint16 styleID)
 {
 	FontStyle* style = NULL;
 
-	if (fontserver->Lock()) {
-		 style = fontserver->GetStyle(familyID, styleID);
-		fontserver->Unlock();
+	if (gFontServer->Lock()) {
+		 style = gFontServer->GetStyle(familyID, styleID);
+		gFontServer->Unlock();
 	}
 
 	if (!style)
@@ -228,55 +276,6 @@ ServerFont::GetFamilyAndStyle(void) const
 	return (FamilyID() << 16) | StyleID();
 }
 
-// functions needed to convert a freetype vector graphics to a BShape
-inline BPoint
-VectorToPoint(FT_Vector *vector)
-{
-	BPoint result;
-	result.x = float(int32(vector->x)) / 2097152;
-	result.y = -float(int32(vector->y)) / 2097152;
-	return result;
-}
-
-int
-MoveToFunc(FT_Vector *to, void *user)
-{
-	((BShape *)user)->MoveTo(VectorToPoint(to));
-	return 0;
-}
-
-int
-LineToFunc(FT_Vector *to, void *user)
-{
-	((BShape *)user)->LineTo(VectorToPoint(to));
-	return 0;
-}
-
-int
-ConicToFunc(FT_Vector *control, FT_Vector *to, void *user)
-{
-	BPoint controls[3];
-	
-	controls[0] = VectorToPoint(control);
-	controls[1] = VectorToPoint(to);
-	controls[2] = controls[1];
-	
-	((BShape *)user)->BezierTo(controls);
-	return 0;
-}
-
-int
-CubicToFunc(FT_Vector *control1, FT_Vector *control2, FT_Vector *to, void *user)
-{
-	BPoint controls[3];
-	
-	controls[0] = VectorToPoint(control1);
-	controls[1] = VectorToPoint(control2);
-	controls[2] = VectorToPoint(to);
-	
-	((BShape *)user)->BezierTo(controls);
-	return 0;
-}
 
 BShape **
 ServerFont::GetGlyphShapes(const char charArray[], int32 numChars) const
@@ -386,15 +385,6 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 	return escapements;
 }
 
-// is_white_space
-inline bool
-is_white_space(uint16 glyph)
-{
-	// TODO: handle them all!
-	if (glyph == ' ' || glyph == B_TAB)
-		return true;
-	return false;
-}
 
 // GetEscapements
 bool

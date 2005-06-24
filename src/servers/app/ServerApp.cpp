@@ -10,6 +10,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
+
 #include <stdio.h>
 #include <string.h>
 
@@ -765,7 +766,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<int32>(&flags);
 			link.Read<int32>(&bytesPerRow);
 			if (link.Read<screen_id>(&screenID) == B_OK) {
-				bitmap = bitmapmanager->CreateBitmap(frame, colorSpace, flags,
+				bitmap = gBitmapManager->CreateBitmap(frame, colorSpace, flags,
 					bytesPerRow, screenID);
 			}
 
@@ -805,7 +806,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				STRACE(("ServerApp %s: Deleting Bitmap %ld\n", fSignature.String(), id));
 
 				fBitmapList.RemoveItem(bitmap);
-				bitmapmanager->DeleteBitmap(bitmap);
+				gBitmapManager->DeleteBitmap(bitmap);
 				fLink.StartMessage(SERVER_TRUE);
 			} else
 				fLink.StartMessage(SERVER_FALSE);
@@ -1076,13 +1077,13 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// using a ColorSet object
 			
 			
-			gui_colorset.Lock();
+			gGUIColorSet.Lock();
 			
 			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<ColorSet>(gui_colorset);
+			fLink.Attach<ColorSet>(gGUIColorSet);
 			fLink.Flush();
 			
-			gui_colorset.Unlock();
+			gGUIColorSet.Unlock();
 			
 			break;
 		}
@@ -1090,14 +1091,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			// Client application is asking to set all the system colors at once
 			// using a ColorSet object
-			
+
 			// Attached data:
 			// 1) ColorSet new colors to use
-			
-			gui_colorset.Lock();
-			link.Read<ColorSet>(&gui_colorset);
-			gui_colorset.Unlock();
-			
+
+			gGUIColorSet.Lock();
+			link.Read<ColorSet>(&gGUIColorSet);
+			gGUIColorSet.Unlock();
+
 			BroadcastToAllApps(AS_UPDATE_COLORS);
 			break;
 		}
@@ -1106,19 +1107,19 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			STRACE(("ServerApp %s: Get UI color\n", fSignature.String()));
 
 			RGBColor color;
-			int32 whichcolor;
-			link.Read<int32>(&whichcolor);
+			int32 whichColor;
+			link.Read<int32>(&whichColor);
 
-			gui_colorset.Lock();
-			color = gui_colorset.AttributeToColor(whichcolor);
-			gui_colorset.Unlock();
+			gGUIColorSet.Lock();
+			color = gGUIColorSet.AttributeToColor(whichColor);
+			gGUIColorSet.Unlock();
 
 			fLink.StartMessage(SERVER_TRUE);
 			fLink.Attach<rgb_color>(color.GetColor32());
 			fLink.Flush();
 			break;
 		}
-		
+
 		case AS_UPDATED_CLIENT_FONTLIST:
 		{
 			STRACE(("ServerApp %s: Acknowledged update of client-side font list\n",
@@ -1126,9 +1127,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			// received when the client-side global font list has been
 			// refreshed
-			fontserver->Lock();
-			fontserver->FontsUpdated();
-			fontserver->Unlock();
+			gFontServer->Lock();
+			gFontServer->FontsUpdated();
+			gFontServer->Unlock();
 			break;
 		}
 		case AS_QUERY_FONTS_CHANGED:
@@ -1157,8 +1158,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			int32 id;
 			link.Read<int32>(&id);
 
-			fontserver->Lock();
-			FontFamily *ffamily = fontserver->GetFamily(id);
+			gFontServer->Lock();
+			FontFamily *ffamily = gFontServer->GetFamily(id);
 			if (ffamily) {
 				font_family fam;
 				strcpy(fam, ffamily->Name());
@@ -1168,7 +1169,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				fLink.StartMessage(SERVER_FALSE);
 
 			fLink.Flush();
-			fontserver->Unlock();
+			gFontServer->Unlock();
 			break;
 		}
 		case AS_GET_STYLE_NAME:
@@ -1189,8 +1190,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read(fam,sizeof(font_family));
 			link.Read<int32>(&styid);
 
-			fontserver->Lock();
-			FontStyle *fstyle = fontserver->GetStyle(fam, styid);
+			gFontServer->Lock();
+			FontStyle *fstyle = gFontServer->GetStyle(fam, styid);
 			if (fstyle) {
 				font_family sty;
 				strcpy(sty, fstyle->Name());
@@ -1202,7 +1203,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				fLink.StartMessage(SERVER_FALSE);
 
 			fLink.Flush();			
-			fontserver->Unlock();
+			gFontServer->Unlock();
 			break;
 		}
 		case AS_GET_FAMILY_AND_STYLE:
@@ -1222,8 +1223,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<uint16>(&famid);
 			link.Read<uint16>(&styid);
 
-			fontserver->Lock();
-			FontStyle *fstyle = fontserver->GetStyle(famid, styid);
+			gFontServer->Lock();
+			FontStyle *fstyle = gFontServer->GetStyle(famid, styid);
 			if (fstyle) {
 				strcpy(fam, fstyle->Family()->Name());
 				strcpy(sty, fstyle->Name());
@@ -1235,7 +1236,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				fLink.StartMessage(SERVER_FALSE);
 			
 			fLink.Flush();
-			fontserver->Unlock();
+			gFontServer->Unlock();
 			break;
 		}
 		case AS_GET_FONT_DIRECTION:
@@ -1257,8 +1258,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<int32>(&famid);
 			link.Read<int32>(&styid);
 			
-/*			fontserver->Lock();
-			FontStyle *fstyle=fontserver->GetStyle(famid,styid);
+/*			gFontServer->Lock();
+			FontStyle *fstyle=gFontServer->GetStyle(famid,styid);
 			if(fstyle)
 			{
 				font_direction dir=fstyle->GetDirection();
@@ -1273,7 +1274,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				fLink.Flush();
 //			}
 			
-//			fontserver->Unlock();
+//			gFontServer->Unlock();
 			break;
 		}
 		case AS_GET_STRING_WIDTH:
@@ -1354,8 +1355,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<int32>(&famid);
 			link.Read<int32>(&styid);
 
-			fontserver->Lock();
-			FontStyle *fstyle = fontserver->GetStyle(famid, styid);
+			gFontServer->Lock();
+			FontStyle *fstyle = gFontServer->GetStyle(famid, styid);
 			if (fstyle) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<int32>(fstyle->TunedCount());
@@ -1363,7 +1364,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				fLink.StartMessage(SERVER_FALSE);
 
 			fLink.Flush();
-			fontserver->Unlock();
+			gFontServer->Unlock();
 			break;
 		}
 		case AS_GET_TUNED_INFO:
@@ -1396,8 +1397,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<int32>(&famid);
 			link.Read<int32>(&styid);
 
-			fontserver->Lock();
-			FontStyle *fstyle = fontserver->GetStyle(famid, styid);
+			gFontServer->Lock();
+			FontStyle *fstyle = gFontServer->GetStyle(famid, styid);
 			if (fstyle) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<bool>(fstyle->IsFixedWidth());
@@ -1405,7 +1406,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				fLink.StartMessage(SERVER_FALSE);
 
 			fLink.Flush();
-			fontserver->Unlock();
+			gFontServer->Unlock();
 			break;
 		}
 		case AS_SET_FAMILY_NAME:
@@ -1420,8 +1421,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			font_family fam;
 			link.Read(fam, sizeof(font_family));
 
-			fontserver->Lock();
-			FontFamily *ffam = fontserver->GetFamily(fam);
+			gFontServer->Lock();
+			FontFamily *ffam = gFontServer->GetFamily(fam);
 			if (ffam) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<uint16>(ffam->GetID());
@@ -1429,7 +1430,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				fLink.StartMessage(SERVER_FALSE);
 			
 			fLink.Flush();
-			fontserver->Unlock();
+			gFontServer->Unlock();
 			break;
 		}
 		case AS_SET_FAMILY_AND_STYLE:
@@ -1449,8 +1450,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read(fam, sizeof(font_family));
 			link.Read(sty, sizeof(font_style));
 
-			fontserver->Lock();
-			FontStyle *fstyle = fontserver->GetStyle(fam, sty);
+			gFontServer->Lock();
+			FontStyle *fstyle = gFontServer->GetStyle(fam, sty);
 			if (fstyle) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<uint16>(fstyle->Family()->GetID());
@@ -1459,7 +1460,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				fLink.StartMessage(SERVER_FALSE);
 
 			fLink.Flush();
-			fontserver->Unlock();
+			gFontServer->Unlock();
 			break;
 		}
 		case AS_SET_FAMILY_AND_STYLE_FROM_ID:
@@ -1511,13 +1512,13 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// Returns:
 			// 1) int32 - # of font families
 
-			fontserver->Lock();
+			gFontServer->Lock();
 
 			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<int32>(fontserver->CountFamilies());
+			fLink.Attach<int32>(gFontServer->CountFamilies());
 			fLink.Flush();
 
-			fontserver->Unlock();
+			gFontServer->Unlock();
 			break;
 		}
 		case AS_COUNT_FONT_STYLES:
@@ -1531,8 +1532,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			font_family fam;
 			link.Read(fam,sizeof(font_family));
 
-			fontserver->Lock();
-			FontFamily *ffam = fontserver->GetFamily(fam);
+			gFontServer->Lock();
+			FontFamily *ffam = gFontServer->GetFamily(fam);
 			if (ffam) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<int32>(ffam->CountStyles());
@@ -1540,7 +1541,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				fLink.StartMessage(SERVER_FALSE);
 
 			fLink.Flush();
-			fontserver->Unlock();
+			gFontServer->Unlock();
 			break;
 		}
 		case AS_SET_SYSFONT_PLAIN:
@@ -1553,8 +1554,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// 4) uint16 - face flags
 			// 5) uint32 - font flags
 
-			fontserver->Lock();
-			ServerFont *sf = fontserver->GetSystemPlain();
+			gFontServer->Lock();
+			ServerFont *sf = gFontServer->GetSystemPlain();
 			if (sf) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<uint16>(sf->FamilyID());
@@ -1566,7 +1567,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				fLink.StartMessage(SERVER_FALSE);
 
 			fLink.Flush();
-			fontserver->Unlock();
+			gFontServer->Unlock();
 			break;
 		}
 		case AS_GET_FONT_HEIGHT:
@@ -1582,8 +1583,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<uint16>(&styid);
 			link.Read<float>(&ptsize);
 
-			fontserver->Lock();
-			FontStyle *fstyle = fontserver->GetStyle(famid, styid);
+			gFontServer->Lock();
+			FontStyle *fstyle = gFontServer->GetStyle(famid, styid);
 			if (fstyle) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<font_height>(fstyle->GetHeight(ptsize));
@@ -1591,7 +1592,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				fLink.StartMessage(SERVER_FALSE);
 
 			fLink.Flush();
-			fontserver->Unlock();
+			gFontServer->Unlock();
 			break;
 		}
 		case AS_SET_SYSFONT_BOLD:
@@ -1604,8 +1605,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// 4) uint16 - face flags
 			// 5) uint32 - font flags
 			
-			fontserver->Lock();
-			ServerFont *sf = fontserver->GetSystemBold();
+			gFontServer->Lock();
+			ServerFont *sf = gFontServer->GetSystemBold();
 			if (sf) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<uint16>(sf->FamilyID());
@@ -1617,7 +1618,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				fLink.StartMessage(SERVER_FALSE);
 
 			fLink.Flush();
-			fontserver->Unlock();
+			gFontServer->Unlock();
 			break;
 		}
 		case AS_SET_SYSFONT_FIXED:
@@ -1630,8 +1631,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// 4) uint16 - face flags
 			// 5) uint32 - font flags
 
-			fontserver->Lock();
-			ServerFont *sf = fontserver->GetSystemFixed();
+			gFontServer->Lock();
+			ServerFont *sf = gFontServer->GetSystemFixed();
 			if (sf) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<uint16>(sf->FamilyID());
@@ -1643,7 +1644,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				fLink.StartMessage(SERVER_FALSE);
 
 			fLink.Flush();
-			fontserver->Unlock();
+			gFontServer->Unlock();
 			break;
 		}
 		case AS_GET_GLYPH_SHAPES:

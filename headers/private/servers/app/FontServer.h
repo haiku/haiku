@@ -1,29 +1,10 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		FontServer.h
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Handles the largest part of the font subsystem
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ */
 #ifndef FONTSERVER_H_
 #define FONTSERVER_H_
 
@@ -31,6 +12,8 @@
 #include <List.h>
 #include <SupportDefs.h>
 #include <Font.h>
+#include <Locker.h>
+
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_CACHE_H
@@ -43,60 +26,59 @@ class ServerFont;
 	\class FontServer FontServer.h
 	\brief Manager for the largest part of the font subsystem
 */
-class FontServer
-{
+class FontServer : public BLocker {
 public:
 	FontServer(void);
 	~FontServer(void);
-	bool Lock(void);
-	void Unlock(void);
-	
+
 	/*!
 		\brief Determines whether the font server has started up properly
 		\return true if so, false if not.
 	*/
-	bool IsInitialized(void) { return init; }
+	bool IsInitialized(void) { return fInit; }
 	int32 CountFamilies(void);
 	int32 CountStyles(const char *family);
 	void RemoveFamily(const char *family);
 	status_t ScanDirectory(const char *path);
 	void SaveList(void);
-	
+
 	const char *GetFamilyName(uint16 id) const;
 	const char *GetStyleName(const char *family, uint16 id) const;
-	
+
 	FontStyle *GetStyle(const char *family, const char *face);
 	FontStyle *GetStyle(const char *family, uint16 id) const;
 	FontStyle *GetStyle(const uint16 &familyid, const uint16 &styleid);
 	FontFamily *GetFamily(const uint16 &familyid) const;
 	FontFamily *GetFamily(const char *name) const;
-	
+
 	ServerFont *GetSystemPlain(void);
 	ServerFont *GetSystemBold(void);
 	ServerFont *GetSystemFixed(void);
-	
+
 	bool SetSystemPlain(const char *family, const char *style, float size);
 	bool SetSystemBold(const char *family, const char *style, float size);
 	bool SetSystemFixed(const char *family, const char *style, float size);
-	
-	bool FontsNeedUpdated(void) { return need_update; }
+
+	bool FontsNeedUpdated(void) { return fNeedUpdate; }
 	/*!
 		\brief Called when the fonts list has been updated
 	*/
-	void FontsUpdated(void) { need_update=false; }
+	void FontsUpdated(void) { fNeedUpdate = false; }
+
 protected:
 	uint16 TranslateStyleToFace(const char *name) const;
 	
 	FT_CharMap _GetSupportedCharmap(const FT_Face &face);
-	bool init;
-	sem_id lock;
-	BList *families;
-	ServerFont *plain, *bold, *fixed;
-	bool need_update;
+
+private:
+	bool		fInit;
+	BList		fFamilies;
+	ServerFont	*fPlain, *fBold, *fFixed;
+	bool		fNeedUpdate;
 };
 
 extern FTC_Manager ftmanager; 
 extern FT_Library ftlib;
-extern FontServer *fontserver;
+extern FontServer *gFontServer;
 
-#endif
+#endif	/* FONTSERVER_H_ */

@@ -87,9 +87,8 @@ private:
 				DisplayDriver	*fDriver;
 };
 
-extern BitmapManager *bitmapmanager;
-extern ColorSet gui_colorset;
-extern AppServer *app_server;
+extern BitmapManager *gBitmapManager;
+extern ColorSet gGUIColorSet;
 extern port_id gAppServerPort;
 
 #endif	/* _HAIKU_APP_SERVER_H_ */
