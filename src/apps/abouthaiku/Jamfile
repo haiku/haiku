@@ -1,7 +1,13 @@
 SubDir OBOS_TOP src apps abouthaiku ;
 
-App AboutHaiku : AboutHaiku.cpp
+UsePrivateHeaders shared ;
+
+if $(TARGET_PLATFORM) = r5 {
+	SubDirC++Flags -DR5_COMPATIBLE ;
+}
+
+App AboutHaiku :
+	AboutHaiku.cpp
 	: libbe.so libtranslation.so
 	: AboutHaiku.rdef
 	;
-
