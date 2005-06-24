@@ -100,9 +100,9 @@ AboutWindow::QuitRequested()
 
 
 AboutView::AboutView(const BRect &r)
- : BView(r, "aboutview", B_FOLLOW_ALL, B_WILL_DRAW | B_PULSE_NEEDED)
+	: BView(r, "aboutview", B_FOLLOW_ALL, B_WILL_DRAW | B_PULSE_NEEDED)
 {
-	fLogo = BTranslationUtils::GetBitmap('PNG ',"haikulogo.png");
+	fLogo = BTranslationUtils::GetBitmap('PNG ', "haikulogo.png");
 	if (fLogo) {
 		fDrawPoint.x = (225-fLogo->Bounds().Width()) / 2;
 		fDrawPoint.y = 0;
@@ -125,7 +125,7 @@ AboutView::AboutView(const BRect &r)
 
 	BRect r(0, 0, 225, Bounds().bottom);
 	if (fLogo)
-		r.OffsetBy(0,fLogo->Bounds().Height());
+		r.OffsetBy(0, fLogo->Bounds().Height());
 
 	fInfoView = new BView(r, "infoview", B_FOLLOW_NONE, B_WILL_DRAW);
 	fInfoView->SetViewColor(235, 235, 235);
@@ -333,6 +333,7 @@ AboutView::AboutView(const BRect &r)
 		"Nathan Whitehorn\n"
 		"Ulrich Wimboeck\n"
 		"Gabe Yoder\n"
+		//"(and probably some more we forgot to mention (sorry!)...)\n"
 		"\n");
 
 	fCreditsView->SetFontAndColor(&font);
