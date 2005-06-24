@@ -1,3 +1,12 @@
+/*
+ * Copyright 2004-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Michael Berg <mike@agamemnon.homelinux.net>
+ */
+
+
 #include <String.h>
 #include <Window.h>
 
@@ -7,7 +16,29 @@
 
 #include <stdio.h>
 
+
 #define SEGMENT_CHANGE 'ostd'
+
+
+// ToDo: read these out of the locale
+static const char kDays[7] = { 'S', 'M', 'T', 'W', 'T', 'F', 'S' };
+
+
+static float
+FontHeight(BView* target, bool full)
+{
+	font_height finfo;		
+	target->GetFontHeight(&finfo);
+	float h = ceil(finfo.ascent) + ceil(finfo.descent);
+
+	if (full)
+		h += ceil(finfo.leading);
+	
+	return h;
+}
+
+
+//	#pragma mark -
 
 
 TDay::TDay(BRect frame, int day) 
@@ -185,7 +216,8 @@ TDay::SetTo(int day, bool selected = false)
 }
 
 
-/*=====> TCalendarView <=====*/
+//	#pragma mark -
+
 
 TCalendarView::TCalendarView(BRect frame, const char *name, 
 		uint32 resizingmode, uint32 flags)
@@ -288,33 +320,19 @@ TCalendarView::KeyDown(const char *bytes, int32 numbytes)
 }
 
 
-
 int32
 TCalendarView::IndexOf(BView *child) const
 {
 	BView *test;
-	for (int32 idx = 0; idx < CountChildren(); idx++) {
-		test = ChildAt(idx);
+	for (int32 index = 0; index < CountChildren(); index++) {
+		test = ChildAt(index);
 		if (test == child)
-			return idx;
+			return index;
 	}
+
+	return -1;
 }
 
-
-static const char days[7] = { 'S', 'M', 'T', 'W', 'T', 'F', 'S' };
-
-static float
-FontHeight(BView* target, bool full)
-{
-	font_height finfo;		
-	target->GetFontHeight(&finfo);
-	float h = ceil(finfo.ascent) + ceil(finfo.descent);
-
-	if (full)
-		h += ceil(finfo.leading);
-	
-	return h;
-}
 
 void
 TCalendarView::Draw(BRect updaterect)
@@ -331,12 +349,12 @@ TCalendarView::Draw(BRect updaterect)
 	float offset = FontHeight(this, true);
 	
 	for (int i = 0; i < 7; i++) {
-		day = days[i];
+		day = kDays[i];
 		width = be_plain_font->StringWidth(day.String());
-		drawpt.x = bounds.left +(x -width/2.0 +2);
-		drawpt.y = bounds.bottom -offset/2.0;
+		drawpt.x = bounds.left + (x - width / 2.0 + 2);
+		drawpt.y = bounds.bottom - offset / 2.0;
 		DrawString(day.String(), drawpt);	
-		bounds.OffsetBy(bounds.Width() +1, 0);
+		bounds.OffsetBy(bounds.Width() + 1, 0);
 	}
 }
 
