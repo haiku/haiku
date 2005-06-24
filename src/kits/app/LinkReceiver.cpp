@@ -156,7 +156,8 @@ LinkReceiver::AdjustReplyBuffer(bigtime_t timeout)
 			if (bufferSize <= (ssize_t)kInitialBufferSize)
 				bufferSize = (ssize_t)kInitialBufferSize;
 			else
-				bufferSize = (bufferSize + B_PAGE_SIZE) - (bufferSize % B_PAGE_SIZE);
+				bufferSize = (bufferSize + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+
 			if (bufferSize > (ssize_t)kMaxBufferSize)
 				return B_ERROR;	// we can't continue
 
