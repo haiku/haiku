@@ -288,6 +288,7 @@ RootLayer::WorkingThread(void *data)
 			}
 			case AS_ROOTLAYER_DO_INVALIDATE:
 			{
+//printf("Adi: new message\n");
 				BRegion invalidRegion;
 				Layer *layer = NULL;
 				messageQueue.Read<Layer*>(&layer);
@@ -399,7 +400,6 @@ RootLayer::GoInvalidate(const Layer *layer, const BRegion &region)
 {
 	BPrivate::PortLink msg(fListenPort, -1);
 	msg.StartMessage(AS_ROOTLAYER_DO_INVALIDATE);
-//debugger("y");
 	msg.Attach<const Layer*>(layer);
 	msg.AttachRegion(region);
 	msg.Flush();

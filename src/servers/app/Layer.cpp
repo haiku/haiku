@@ -1316,47 +1316,126 @@ Layer::PrintTree()
 		printf("\t%s\t%s\n", lay->Name(), lay->IsHidden()? "Hidden": "NOT hidden");
 }
 
-// UpdateStart
+// RequestDraw
 void
-Layer::UpdateStart()
+Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 {
-	// During updates we only want to draw what's in the update region
-	if (fClassID == AS_WINBORDER_CLASS) {
-		// NOTE: don't worry, RooLayer is locked here.
-		WinBorder	*wb = (WinBorder*)this;
+	STRACE(("Layer(%s)::RequestDraw()\n", Name()));
 
-		wb->fInUpdate = true;
-		wb->fRequestSent = false;
-		wb->yUpdateReg = wb->fUpdateReg;
-		wb->fUpdateReg.MakeEmpty();
-wb->cnt--;
-if (wb->cnt != 0)
-	CRITICAL("Layer::UpdateStart(): wb->cnt != 0 -> Not Allowed!");
-	}
-}
-
-// UpdateEnd
-void
-Layer::UpdateEnd()
-{
-	// The usual case. Drawing is permitted in the whole visible area.
-	if (fClassID == AS_WINBORDER_CLASS) {
-		WinBorder	*wb = (WinBorder*)this;
-
-		wb->yUpdateReg.MakeEmpty();
-
-		wb->fInUpdate = false;
-
-		if (wb->zUpdateReg.CountRects() > 0) {
-			BRegion		reg(wb->zUpdateReg);
-			wb->RequestDraw(reg, NULL);
-		}
-	}
-}
-
+	// do not redraw any child until you must
+	int redraw = false;
+	if (!startFrom)
+		redraw = true;
 
 #ifndef NEW_CLIPPING
+	if (HasClient() && IsTopLayer()) {
+		// calculate the minimum region/rectangle to be updated with
+		// a single message to the client.
+		BRegion	updateReg(fFullVisible);
 
+		if (fFlags & B_FULL_UPDATE_ON_RESIZE
+			&& fFrameAction	== B_LAYER_ACTION_RESIZE)
+		{
+			// do nothing
+		} else {
+			updateReg.IntersectWith(&reg);
+		}
+		if (updateReg.CountRects() > 0) {
+			fOwner->fCumulativeRegion.Include(&updateReg);			
+			if (!fOwner->InUpdate() && !fOwner->fRequestSent) {
+				fOwner->fInUpdateRegion = fOwner->fCumulativeRegion;
+fOwner->cnt++;
+if (fOwner->cnt != 1)
+	CRITICAL("Layer::RequestDraw(): fOwner->cnt != 1 -> Not Allowed!");
+				fOwner->fCumulativeRegion.MakeEmpty();
+				fOwner->fRequestSent = true;
+				SendUpdateMsg(fOwner->fInUpdateRegion);
+			}
+		}
+	}
+
+	if (fVisible.CountRects() > 0) {
+		BRegion	updateReg(fVisible);
+		// calculate the update region
+		if (fFlags & B_FULL_UPDATE_ON_RESIZE && fFrameAction == B_LAYER_ACTION_RESIZE) {
+			// do nothing
+		} else {
+			updateReg.IntersectWith(&reg);
+		}
+
+		if (updateReg.CountRects() > 0) {
+			fDriver->ConstrainClippingRegion(&updateReg);
+			Draw(updateReg.Frame());
+			fDriver->ConstrainClippingRegion(NULL);
+		}
+	}
+
+	for (Layer *lay = BottomChild(); lay != NULL; lay = UpperSibling()) {
+		if (lay == startFrom)
+			redraw = true;
+
+		if (redraw && !(lay->IsHidden())) {
+			// no need to go deeper if not even the FullVisible region intersects
+			// Update one.
+			BRegion common(lay->fFullVisible);
+			common.IntersectWith(&reg);
+			
+			if (common.CountRects() > 0)
+				lay->RequestDraw(reg, NULL);
+		}
+	}
+#else
+	if (HasClient() && IsTopLayer()) {
+		// calculate the minimum region/rectangle to be updated with
+		// a single message to the client.
+		BRegion	updateReg(fFullVisible2);
+
+		updateReg.IntersectWith(&reg);
+
+		if (updateReg.CountRects() > 0) {
+			fOwner->fCumulativeRegion.Include(&updateReg);			
+			if (!fOwner->InUpdate() && !fOwner->fRequestSent) {
+				fOwner->fInUpdateRegion = fOwner->fCumulativeRegion;
+fOwner->cnt++;
+if (fOwner->cnt != 1)
+	CRITICAL("Layer::RequestDraw(): fOwner->cnt != 1 -> Not Allowed!");
+				fOwner->fCumulativeRegion.MakeEmpty();
+				fOwner->fRequestSent = true;
+printf("Send\n");
+				SendUpdateMsg(fOwner->fInUpdateRegion);
+			}
+		}
+	}
+
+	if (fVisible2.CountRects() > 0) {
+		BRegion	updateReg(fVisible2);
+			updateReg.IntersectWith(&reg);
+
+		if (updateReg.CountRects() > 0) {
+			fDriver->ConstrainClippingRegion(&updateReg);
+			Draw(updateReg.Frame());
+			fDriver->ConstrainClippingRegion(NULL);
+		}
+	}
+
+	for (Layer *lay = BottomChild(); lay != NULL; lay = UpperSibling()) {
+		if (lay == startFrom)
+			redraw = true;
+
+		if (redraw && !(lay->IsHidden())) {
+			// no need to go deeper if not even the FullVisible region intersects
+			// Update one.
+			BRegion common(lay->fFullVisible2);
+			common.IntersectWith(&reg);
+			
+			if (common.CountRects() > 0)
+				lay->RequestDraw(reg, NULL);
+		}
+	}
+#endif
+}
+
+#ifndef NEW_CLIPPING
 
 // move_layer
 void
@@ -1364,9 +1443,9 @@ Layer::move_layer(float x, float y)
 {
 /*	if (fClassID == AS_WINBORDER_CLASS) {
 		WinBorder	*wb = (WinBorder*)this;
-		wb->zUpdateReg.OffsetBy(x, y);
-		wb->yUpdateReg.OffsetBy(x, y);
-		wb->fUpdateReg.OffsetBy(x, y);
+		wb->fCumulativeRegion.OffsetBy(x, y);
+		wb->fInUpdateRegion.OffsetBy(x, y);
+		wb->fSavedForUpdateRegion.OffsetBy(x, y);
 	}*/
 	
 	fFrameAction = B_LAYER_ACTION_MOVE;
@@ -1473,119 +1552,6 @@ Layer::Invalidate(const BRegion& region)
 
 #endif // 5 methods
 
-// RequestDraw
-void
-Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
-{
-	STRACE(("Layer(%s)::RequestDraw()\n", Name()));
-//printf("Layer(%s)::RequestDraw()\n", Name());
-//if (fClassID == AS_ROOTLAYER_CLASS)
-//	debugger("z");
-	// do not redraw any child until you must
-	int redraw = false;
-	if (!startFrom)
-		redraw = true;
-
-	if (HasClient() && IsTopLayer()) {
-		// calculate the minimum region/rectangle to be updated with
-		// a single message to the client.
-#ifndef NEW_CLIPPING
-		BRegion	updateReg(fFullVisible);
-#else
-		BRegion	updateReg(fFullVisible2);
-#endif
-
-		if (fFlags & B_FULL_UPDATE_ON_RESIZE
-#ifndef NEW_CLIPPING
-			&& fFrameAction	== B_LAYER_ACTION_RESIZE
-#endif
-		)
-		{
-			// do nothing
-		} else {
-			updateReg.IntersectWith(&reg);
-		}
-		if (updateReg.CountRects() > 0) {
-			fOwner->zUpdateReg.Include(&updateReg);			
-			if (!fOwner->fInUpdate && !fOwner->fRequestSent) {
-				fOwner->fUpdateReg = fOwner->zUpdateReg;
-fOwner->cnt++;
-if (fOwner->cnt != 1)
-	CRITICAL("Layer::RequestDraw(): fOwner->cnt != 1 -> Not Allowed!");
-				fOwner->zUpdateReg.MakeEmpty();
-				SendUpdateMsg(fOwner->fUpdateReg);
-				fOwner->fRequestSent = true;
-			}
-		}
-	}
-
-#ifndef NEW_CLIPPING
-	if (fVisible.CountRects() > 0) {
-		BRegion	updateReg(fVisible);
-		// calculate the update region
-		if (fFlags & B_FULL_UPDATE_ON_RESIZE && fFrameAction == B_LAYER_ACTION_RESIZE) {
-			// do nothing
-		} else {
-			updateReg.IntersectWith(&reg);
-		}
-
-		if (updateReg.CountRects() > 0) {
-			fDriver->ConstrainClippingRegion(&updateReg);
-			Draw(updateReg.Frame());
-			fDriver->ConstrainClippingRegion(NULL);
-		}
-	}
-
-	for (Layer *lay = BottomChild(); lay != NULL; lay = UpperSibling()) {
-		if (lay == startFrom)
-			redraw = true;
-
-		if (redraw && !(lay->IsHidden())) {
-			// no need to go deeper if not even the FullVisible region intersects
-			// Update one.
-			BRegion common(lay->fFullVisible);
-			common.IntersectWith(&reg);
-			
-			if (common.CountRects() > 0)
-				lay->RequestDraw(reg, NULL);
-		}
-	}
-#else
-	if (fVisible2.CountRects() > 0) {
-		BRegion	updateReg(fVisible2);
-		// calculate the update region
-		if (fFlags & B_FULL_UPDATE_ON_RESIZE
-// TODO: must be replaced!
-//		 && fFrameAction == B_LAYER_ACTION_RESIZE
-		) {
-			// do nothing
-		} else {
-			updateReg.IntersectWith(&reg);
-		}
-
-		if (updateReg.CountRects() > 0) {
-			fDriver->ConstrainClippingRegion(&updateReg);
-			Draw(updateReg.Frame());
-			fDriver->ConstrainClippingRegion(NULL);
-		}
-	}
-
-	for (Layer *lay = BottomChild(); lay != NULL; lay = UpperSibling()) {
-		if (lay == startFrom)
-			redraw = true;
-
-		if (redraw && !(lay->IsHidden())) {
-			// no need to go deeper if not even the FullVisible region intersects
-			// Update one.
-			BRegion common(lay->fFullVisible2);
-			common.IntersectWith(&reg);
-			
-			if (common.CountRects() > 0)
-				lay->RequestDraw(reg, NULL);
-		}
-	}
-#endif
-}
 
 /*!
 	\brief Returns the layer's ServerWindow

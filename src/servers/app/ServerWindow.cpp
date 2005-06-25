@@ -1461,8 +1461,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 	(fCurrentLayer->fVisible)
 #endif
 	;
-	if (fWinBorder->fInUpdate)
-		rreg.IntersectWith(&fWinBorder->yUpdateReg);
+	if (fWinBorder->InUpdate())
+		rreg.IntersectWith(&fWinBorder->RegionToBeUpdated());
 
 	gDesktop->GetDisplayDriver()->ConstrainClippingRegion(&rreg);
 //	rgb_color  rrr = fCurrentLayer->fLayerData->viewcolor.GetColor32();

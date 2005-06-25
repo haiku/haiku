@@ -66,6 +66,14 @@ class WinBorder : public Layer {
 #ifndef NEW_CLIPPING
 	virtual	void				RebuildFullRegion();
 #endif
+
+			void				UpdateStart();
+			void				UpdateEnd();
+	inline	bool				InUpdate() const
+									{ return fInUpdate; }
+	inline	const BRegion&		RegionToBeUpdated() const
+									{ return fInUpdateRegion; }
+
 			void				SetSizeLimits(float minWidth,
 											  float maxWidth,
 											  float minHeight,
@@ -132,9 +140,8 @@ class WinBorder : public Layer {
 			Decorator*			fDecorator;
 			Layer*				fTopLayer;
 
-			BRegion				zUpdateReg;
-			BRegion				yUpdateReg;
-			BRegion				fUpdateReg;
+			BRegion				fCumulativeRegion;
+			BRegion				fInUpdateRegion;
 
 			int32				fMouseButtons;
 			int32				fKeyModifiers;

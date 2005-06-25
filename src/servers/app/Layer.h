@@ -189,9 +189,6 @@ class Layer {
 			bool				IsTopLayer() const
 									{ return fIsTopLayer; }
 
-			void				UpdateStart();
-			void				UpdateEnd();
-
 			BRegion*			ClippingRegion() const
 									{ return fClipReg; }
 

@@ -69,9 +69,8 @@ WinBorder::WinBorder(const BRect &r,
 	  fDecorator(NULL),
 	  fTopLayer(NULL),
 
-	  zUpdateReg(),
-	  yUpdateReg(),
-	  fUpdateReg(),
+	  fCumulativeRegion(),
+	  fInUpdateRegion(),
 
 	  fMouseButtons(0),
 	  fKeyModifiers(0),
@@ -182,9 +181,8 @@ y = (float)int32(y);
 
 // NOTE: I moved this here from Layer::move_layer()
 // Should this have any bad consequences I'm not aware of?
-zUpdateReg.OffsetBy(x, y);
-yUpdateReg.OffsetBy(x, y);
-fUpdateReg.OffsetBy(x, y);
+fCumulativeRegion.OffsetBy(x, y);
+fInUpdateRegion.OffsetBy(x, y);
 
 	if (IsHidden()) {
 // TODO: This is a work around for a design issue:
@@ -277,6 +275,35 @@ y = (float)int32(y);
 		msg.AddInt32("width", frame.Width());
 		msg.AddInt32("height", frame.Height());
 		Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
+	}
+}
+
+// UpdateStart
+void
+WinBorder::UpdateStart()
+{
+	// During updates we only want to draw what's in the update region
+	fInUpdate = true;
+	fRequestSent = false;
+
+cnt--;
+if (cnt != 0)
+	CRITICAL("Layer::UpdateStart(): wb->cnt != 0 -> Not Allowed!");
+}
+
+// UpdateEnd
+void
+WinBorder::UpdateEnd()
+{
+	// The usual case. Drawing is permitted in the whole visible area.
+
+	fInUpdate = false;
+
+	fInUpdateRegion.MakeEmpty();
+
+	if (fCumulativeRegion.CountRects() > 0) {
+		BRegion		reg(fCumulativeRegion);
+		RequestDraw(reg, NULL);
 	}
 }
 
