@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2002-2004, OpenBeOS
+//	Copyright (c) 2002-2005, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -35,8 +35,7 @@ struct screen_desc;
 class BApplication;
 class BWindow;
 
-class BPrivateScreen
-{
+class BPrivateScreen {
 	// Constructor and destructor are private. Use the static methods
 	// CheckOut() and Return() instead.
 public:
@@ -51,8 +50,7 @@ public:
 	screen_id ID();
 	
 	status_t WaitForRetrace(bigtime_t timeout);
-	sem_id RetraceSemaphore();
-
+	
 	uint8 IndexForColor(uint8 red, uint8 green, uint8 blue, uint8 alpha);
 	rgb_color ColorForIndex(const uint8 index);
 	uint8 InvertIndex(uint8 index);
@@ -70,9 +68,11 @@ public:
 	status_t GetModeList(display_mode **mode_list, uint32 *count);
 	status_t GetMode(uint32 workspace, display_mode *mode);
 	status_t SetMode(uint32 workspace, display_mode *mode, bool makeDefault);
+	
 	status_t GetDeviceInfo(accelerant_device_info *info);
 	status_t GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high);
 	status_t GetTimingConstraints(display_timing_constraints *dtc);
+	
 	status_t SetDPMS(uint32 dpmsState);
 	uint32 DPMSState();
 	uint32 DPMSCapabilites();
@@ -82,13 +82,12 @@ public:
 	
 	status_t get_screen_desc(screen_desc *desc);
 	
-private:
-
-	friend class BApplication;	
-	
+private:	
 	color_map *fColorMap;
 	sem_id fRetraceSem;
 	bool fOwnsColorMap;
+
+	sem_id RetraceSemaphore();
 
 	BPrivateScreen();
 	~BPrivateScreen();
