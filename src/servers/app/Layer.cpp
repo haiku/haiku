@@ -1248,8 +1248,8 @@ Layer::PruneTree(void)
 void
 Layer::PrintToStream()
 {
-	printf("\n----------- Layer %s -----------\n", Name());
-	printf("\t Parent: %s\n", fParent ? fParent->Name() : "<no parent>");
+	printf("\n *** Layer %s:\n", Name());
+	printf("\t Parent: %s", fParent ? fParent->Name() : "<no parent>");
 
 	printf("\t us: %s\t ls: %s\n",
 		fUpperSibling ? fUpperSibling->Name() : "<none>",
@@ -1259,11 +1259,12 @@ Layer::PrintToStream()
 		fTopChild ? fTopChild->Name() : "<none>",
 		fBottomChild ? fBottomChild->Name() : "<none>");
 	
-	printf("Frame: (%f, %f, %f, %f)", fFrame.left, fFrame.top, fFrame.right, fFrame.bottom);
+	printf("Frame: (%f, %f, %f, %f)\n", fFrame.left, fFrame.top, fFrame.right, fFrame.bottom);
+	printf("LocalOrigin: (%f, %f)\n", BoundsOrigin().x, BoundsOrigin().y);
 	printf("Token: %ld\n", fViewToken);
-	printf("Hidden - direct: %s\n", fHidden?"true":"false");
+	printf("Hidden - direct: %s ", fHidden?"true":"false");
 	printf("Hidden - indirect: %s\n", IsHidden()?"true":"false");
-	printf("ResizingMode: %lx\n", fResizeMode);
+	printf("ResizingMode: %lx ", fResizeMode);
 	printf("Flags: %lx\n", fFlags);
 
 	if (fLayerData)
@@ -1401,7 +1402,6 @@ if (fOwner->cnt != 1)
 	CRITICAL("Layer::RequestDraw(): fOwner->cnt != 1 -> Not Allowed!");
 				fOwner->fCumulativeRegion.MakeEmpty();
 				fOwner->fRequestSent = true;
-printf("Send\n");
 				SendUpdateMsg(fOwner->fInUpdateRegion);
 			}
 		}
@@ -1574,8 +1574,14 @@ Layer::SendUpdateMsg(BRegion& reg)
 {
 	BMessage msg;
 	msg.what = _UPDATE_;
-	msg.AddRect("_rect", ConvertFromTop(reg.Frame()) );
-	msg.AddRect("debug_rect", reg.Frame() );
+#ifndef NEW_CLIPPING
+	msg.AddRect("_rect", ConvertFromTop(reg.Frame()));
+#else
+	BRect	rect(reg.Frame());
+	ConvertFromScreen2(&rect);
+	msg.AddRect("_rect", rect );
+#endif
+	msg.AddRect("debug_rect", reg.Frame());
 //	msg.AddInt32("_token",fViewToken);
 		
 	fOwner->Window()->SendMessageToClient(&msg);
@@ -1629,6 +1635,94 @@ Layer::SetOverlayBitmap(const ServerBitmap* bitmap)
 }
 
 #ifdef NEW_CLIPPING
+
+//! converts a point from local to parent's coordinate system 
+void
+Layer::ConvertToParent2(BPoint* pt) const
+{
+	if (fParent) {
+		BPoint origin = BoundsOrigin();
+		pt->x -= origin.x;
+		pt->y -= origin.y;
+		pt->x += fFrame.left;
+		pt->y += fFrame.top;
+	}
+}
+
+//! converts a rect from local to parent's coordinate system 
+void
+Layer::ConvertToParent2(BRect* rect) const
+{
+	if (fParent) {
+		BPoint origin = BoundsOrigin();
+		rect->OffsetBy(-origin.x, -origin.y);
+		rect->OffsetBy(fFrame.left, fFrame.top);
+	}
+}
+
+//! converts a region from local to parent's coordinate system 
+void
+Layer::ConvertToParent2(BRegion* reg) const
+{
+	if (fParent) {
+		BPoint origin = BoundsOrigin();
+		reg->OffsetBy(-origin.x, -origin.y);
+		reg->OffsetBy(fFrame.left, fFrame.top);
+	}
+}
+
+//! converts a point from parent's to local coordinate system 
+void
+Layer::ConvertFromParent2(BPoint* pt) const
+{
+	if (fParent) {
+		BPoint origin = BoundsOrigin();
+		pt->x += origin.x;
+		pt->y += origin.y;
+		pt->x -= fFrame.left;
+		pt->y -= fFrame.top;
+	}
+}
+
+//! converts a rect from parent's to local coordinate system 
+void
+Layer::ConvertFromParent2(BRect* rect) const
+{
+	if (fParent) {
+		BPoint origin = BoundsOrigin();
+		rect->OffsetBy(origin.x, origin.y);
+		rect->OffsetBy(-fFrame.left, -fFrame.top);
+	}
+}
+
+//! converts a region from parent's to local coordinate system 
+void
+Layer::ConvertFromParent2(BRegion* reg) const
+{
+	if (fParent) {
+		BPoint origin = BoundsOrigin();
+		reg->OffsetBy(origin.x, origin.y);
+		reg->OffsetBy(-fFrame.left, -fFrame.top);
+	}
+}
+
+//! converts a point from local to screen coordinate system 
+void
+Layer::ConvertToScreen2(BPoint* pt) const
+{
+	if (GetRootLayer())
+		if (fParent) {
+			BPoint origin = BoundsOrigin();
+			pt->x -= origin.x;
+			pt->y -= origin.y;
+			pt->x += fFrame.left;
+			pt->y += fFrame.top;
+
+			fParent->ConvertToScreen2(pt);
+		}
+}
+
+//! converts a rect from local to screen coordinate system 
 void
 Layer::ConvertToScreen2(BRect* rect) const
 {
@@ -1642,6 +1736,7 @@ Layer::ConvertToScreen2(BRect* rect) const
 		}
 }
 
+//! converts a region from local to screen coordinate system 
 void
 Layer::ConvertToScreen2(BRegion* reg) const
 {
@@ -1654,6 +1749,51 @@ Layer::ConvertToScreen2(BRegion* reg) const
 			fParent->ConvertToScreen2(reg);
 		}
 }
+
+//! converts a point from screen to local coordinate system 
+void
+Layer::ConvertFromScreen2(BPoint* pt) const
+{
+	if (GetRootLayer())
+		if (fParent) {
+			BPoint origin = BoundsOrigin();
+			pt->x += origin.x;
+			pt->y += origin.y;
+			pt->x -= fFrame.left;
+			pt->y -= fFrame.top;
+
+			fParent->ConvertToScreen2(pt);
+		}
+}
+
+//! converts a rect from screen to local coordinate system 
+void
+Layer::ConvertFromScreen2(BRect* rect) const
+{
+	if (GetRootLayer())
+		if (fParent) {
+			BPoint origin = BoundsOrigin();
+			rect->OffsetBy(origin.x, origin.y);
+			rect->OffsetBy(-fFrame.left, -fFrame.top);
+
+			fParent->ConvertFromScreen2(rect);
+		}
+}
+
+//! converts a region from screen to local coordinate system 
+void
+Layer::ConvertFromScreen2(BRegion* reg) const
+{
+	if (GetRootLayer())
+		if (fParent) {
+			BPoint origin = BoundsOrigin();
+			reg->OffsetBy(origin.x, origin.y);
+			reg->OffsetBy(-fFrame.left, -fFrame.top);
+
+			fParent->ConvertFromScreen2(reg);
+		}
+}
+
 
 void
 Layer::do_Hide()
@@ -1995,31 +2135,31 @@ Layer::do_ScrollBy(float dx, float dy)
 	if (dx != 0.0f || dy != 0.0f)
 		ScrolledByHook(dx, dy);
 }
+
 void
 Layer::get_user_regions(BRegion &reg)
 {
 	// 1) set to frame in screen coords
-	BRect			screenFrame(Bounds());
+	BRect screenFrame(Bounds());
 	ConvertToScreen2(&screenFrame);
 	reg.Set(screenFrame);
 
 	// 2) intersect with screen region
-	BRegion			screenReg(GetRootLayer()->Bounds());
+	BRegion screenReg(GetRootLayer()->Bounds());
 	reg.IntersectWith(&screenReg);
 
-// TODO: you MUST at some point uncomment this block!
-/*
+
 	// 3) impose user constrained regions
-	LayerData		*stackData = fLayerData;
-	while (stackData)
-	{
-		// transform in screen coords
-		BRegion		screenReg(stackData->ClippingRegion());
-		ConvertToScreen2(&screenReg);
-		reg.IntersectWith(&screenReg);
-		stackData	= stackData->prevState;
+	LayerData *stackData = fLayerData;
+	while (stackData) {
+		if (stackData->ClippingRegion()) {
+			// transform in screen coords
+			BRegion screenReg(*stackData->ClippingRegion());
+			ConvertToScreen2(&screenReg);
+			reg.IntersectWith(&screenReg);
+		}
+		stackData = stackData->prevState;
 	}
-*/
 }
 
 void

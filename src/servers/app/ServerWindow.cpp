@@ -894,7 +894,6 @@ myRootLayer->Unlock();
 		// TODO: you are not allowed to use Layer regions here!!!
 		// If there is no other way, then first lock RootLayer object first.
 			
-			// TODO: Watch out for the coordinate system in AS_LAYER_CLIP_TO_PICTURE
 			int32 pictureToken;
 			BPoint where;
 			bool inverse = false;
@@ -914,13 +913,13 @@ myRootLayer->Unlock();
 			// I think PictureToRegion would fit better into the Layer class (?)
 			if (PictureToRegion(picture, region, inverse, where) < B_OK)
 				break;
-				
+
 			fCurrentLayer->fLayerData->SetClippingRegion(region);
 
 #ifndef NEW_CLIPPING
 			fCurrentLayer->RebuildFullRegion();
 #endif
-			if (!(fCurrentLayer->IsHidden()))
+			if (!(fCurrentLayer->IsHidden()) && !fWinBorder->InUpdate())
 #ifndef NEW_CLIPPING
 				myRootLayer->GoInvalidate(fCurrentLayer, fCurrentLayer->fFull);				
 #else
@@ -949,9 +948,6 @@ myRootLayer->Unlock();
 				int32 noOfRects;
 			
 				ld = fCurrentLayer->fLayerData;
-#ifndef NEW_CLIPPING
-				reg = fCurrentLayer->ConvertFromParent(&(fCurrentLayer->fVisible));
-#endif
 				if (ld->ClippingRegion())
 					reg.IntersectWith(ld->ClippingRegion());
 			
@@ -963,7 +959,7 @@ myRootLayer->Unlock();
 					if (ld->ClippingRegion())
 						reg.IntersectWith(ld->ClippingRegion());
 				}
-			
+
 				noOfRects = reg.CountRects();
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<int32>(noOfRects);
@@ -992,11 +988,10 @@ myRootLayer->Unlock();
 
 #ifndef NEW_CLIPPING
 			fCurrentLayer->RebuildFullRegion();
-#endif
-			if (!(fCurrentLayer->IsHidden()))
-#ifndef NEW_CLIPPING
+			if (!(fCurrentLayer->IsHidden()) && !fWinBorder->InUpdate())
 				myRootLayer->GoInvalidate(fCurrentLayer, fCurrentLayer->fFull);				
 #else
+			if (!(fCurrentLayer->IsHidden()) && !fWinBorder->InUpdate())
 				myRootLayer->GoInvalidate(fCurrentLayer, fCurrentLayer->Frame());
 #endif
 
@@ -1456,11 +1451,12 @@ void
 ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 {
 	fWinBorder->GetRootLayer()->Lock();
-	BRegion rreg
 #ifndef NEW_CLIPPING
-	(fCurrentLayer->fVisible)
+	BRegion rreg(fCurrentLayer->fVisible);
+#else
+	BRegion rreg(fCurrentLayer->fVisible2);
 #endif
-	;
+
 	if (fWinBorder->InUpdate())
 		rreg.IntersectWith(&fWinBorder->RegionToBeUpdated());
 

@@ -214,8 +214,19 @@ class Layer {
 	virtual	void				ResizedByHook(float dx, float dy, bool automatic) { }
 	virtual	void				ScrolledByHook(float dx, float dy) { }
 
+			void				ConvertToParent2(BPoint* pt) const;
+			void				ConvertToParent2(BRect* rect) const;
+			void				ConvertToParent2(BRegion* reg) const;
+			void				ConvertFromParent2(BPoint* pt) const;
+			void				ConvertFromParent2(BRect* rect) const;
+			void				ConvertFromParent2(BRegion* reg) const;
+
+			void				ConvertToScreen2(BPoint* pt) const;
 			void				ConvertToScreen2(BRect* rect) const;
 			void				ConvertToScreen2(BRegion* reg) const;
+			void				ConvertFromScreen2(BPoint* pt) const;
+			void				ConvertFromScreen2(BRect* rect) const;
+			void				ConvertFromScreen2(BRegion* reg) const;
 			bool				IsVisuallyHidden() const;
  private:
  			void				do_Hide();
