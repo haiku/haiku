@@ -15,6 +15,7 @@
 #include <List.h>
 #include <Locker.h>
 #include <Menu.h>
+#include <ServerScreen.h>
 
 class BMessage;
 class BPortLink;
@@ -22,7 +23,6 @@ class DisplayDriver;
 class HWInterface;
 class Layer;
 class RootLayer;
-class Screen;
 class WinBorder;
 
 class Desktop {
@@ -37,19 +37,39 @@ class Desktop {
 			void				InitMode();
 	
 	// Methods for multiple monitors.
-			Screen*				ScreenAt(int32 index) const;
-			int32				ScreenCount() const;
-			Screen*				ActiveScreen() const;
-	
+	inline	Screen*				ScreenAt(int32 index) const
+									{ return static_cast<Screen *>(fScreenList.ItemAt(index)); }
+	inline	int32				ScreenCount() const
+									{ return fScreenList.CountItems(); }
+	inline	Screen*				ActiveScreen() const
+									{ return fActiveScreen; }
+
 			void				SetActiveRootLayerByIndex(int32 index);
 			void				SetActiveRootLayer(RootLayer* layer);
-			RootLayer*			RootLayerAt(int32 index);
-			RootLayer*			ActiveRootLayer() const;
-			int32				ActiveRootLayerIndex() const;
-			int32				CountRootLayers() const;
+	inline	RootLayer*			RootLayerAt(int32 index)
+									{ return static_cast<RootLayer *>(fRootLayerList.ItemAt(index)); }
+			RootLayer*			ActiveRootLayer() const
+									{ return fActiveRootLayer;}
+			int32				ActiveRootLayerIndex() const
+									{
+										int32 rootLayerCount = CountRootLayers();
 
-			DisplayDriver*		GetDisplayDriver() const;
-			HWInterface*		GetHWInterface() const;
+										for (int32 i = 0; i < rootLayerCount; i++) {
+											if (fActiveRootLayer == (RootLayer *)fRootLayerList.ItemAt(i))
+											return i;
+										}
+										return -1;
+									}
+
+	inline	int32				CountRootLayers() const
+									{ return fRootLayerList.CountItems(); }
+
+
+	inline	DisplayDriver*		GetDisplayDriver() const
+									{ return ScreenAt(0)->GetDisplayDriver(); }
+	inline	HWInterface*		GetHWInterface() const
+									{ return ScreenAt(0)->GetHWInterface(); }
+
 	
 	// Methods for layer(WinBorder) manipulation.
 			void				AddWinBorder(WinBorder *winBorder);

@@ -144,27 +144,6 @@ Desktop::InitMode()
 //---------------------------------------------------------------------------
 
 
-inline Screen *
-Desktop::ScreenAt(int32 index) const
-{
-	return static_cast<Screen *>(fScreenList.ItemAt(index));
-}
-
-
-inline int32
-Desktop::ScreenCount(void) const
-{
-	return fScreenList.CountItems();
-}
-
-
-inline Screen *
-Desktop::ActiveScreen(void) const
-{
-	return fActiveScreen;
-}
-
-
 inline void
 Desktop::SetActiveRootLayerByIndex(int32 listIndex)
 {
@@ -182,53 +161,6 @@ Desktop::SetActiveRootLayer(RootLayer *rootLayer)
 		return;
 
 	fActiveRootLayer = rootLayer;
-}
-
-
-RootLayer *
-Desktop::ActiveRootLayer(void) const
-{
-	return fActiveRootLayer;
-}
-
-
-inline int32
-Desktop::ActiveRootLayerIndex(void) const
-{
-	int32 rootLayerCount = CountRootLayers();
-
-	for (int32 i = 0; i < rootLayerCount; i++) {
-		if (fActiveRootLayer == (RootLayer *)fRootLayerList.ItemAt(i))
-			return i;
-	}
-	return -1;
-}
-
-
-inline RootLayer *
-Desktop::RootLayerAt(int32 index)
-{
-	return static_cast<RootLayer *>(fRootLayerList.ItemAt(index));
-}
-
-
-inline int32
-Desktop::CountRootLayers() const
-{
-	return fRootLayerList.CountItems();
-}
-
-
-inline DisplayDriver *
-Desktop::GetDisplayDriver() const
-{
-	return ScreenAt(0)->GetDisplayDriver();
-}
-
-inline HWInterface *
-Desktop::GetHWInterface() const
-{
-	return ScreenAt(0)->GetHWInterface();
 }
 
 
