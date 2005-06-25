@@ -1065,14 +1065,14 @@ DisplayDriverPainter::StringHeight(const char *string, int32 length,
 bool
 DisplayDriverPainter::Lock()
 {	
-	return fGraphicsCard->ReadLock();
+	return fGraphicsCard->WriteLock();
 }
 
 // Unlock
 void
 DisplayDriverPainter::Unlock()
 {
-	fGraphicsCard->ReadUnlock();
+	fGraphicsCard->WriteUnlock();
 }
 
 // WriteLock
