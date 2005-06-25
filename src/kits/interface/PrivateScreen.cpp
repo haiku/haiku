@@ -152,24 +152,6 @@ BPrivateScreen::WaitForRetrace(bigtime_t timeout)
 }
 
 	
-sem_id
-BPrivateScreen::RetraceSemaphore()
-{
-	sem_id id = B_BAD_SEM_ID;
-	
-	BPrivate::AppServerLink link;
-	link.StartMessage(AS_GET_RETRACE_SEMAPHORE);
-	link.Attach<screen_id>(ID());
-	int32 reply;
-	if (link.FlushWithReply(reply) == B_OK
-		&& reply == SERVER_TRUE) 
-		link.Read<sem_id>(&id);
-	
-	return id;
-}
-
-
-
 uint8
 BPrivateScreen::IndexForColor(uint8 red, uint8 green, uint8 blue, uint8 alpha)
 {
@@ -385,7 +367,22 @@ BPrivateScreen::GetDeviceInfo(accelerant_device_info *info)
 status_t
 BPrivateScreen::GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high)
 {
-	// TODO: Implement
+	if (mode == NULL || low == NULL || high == NULL)
+		return B_BAD_VALUE;
+	
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_GET_PIXEL_CLOCK_LIMITS);
+	link.Attach<screen_id>(ID());
+	link.Attach<display_mode>(*mode);
+	
+	int32 code;
+	if (link.FlushWithReply(code) == B_OK && code == SERVER_TRUE) {
+		link.Read<uint32>(low);
+		link.Read<uint32>(high);
+
+		return B_OK;
+	}
+	
 	return B_ERROR;
 }
 
@@ -393,7 +390,16 @@ BPrivateScreen::GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *hig
 status_t
 BPrivateScreen::GetTimingConstraints(display_timing_constraints *dtc)
 {
-	// TODO: Implement
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_GET_TIMING_CONSTRAINTS);
+	link.Attach<screen_id>(ID());
+	
+	int32 code;
+	if (link.FlushWithReply(code) == B_OK && code == SERVER_TRUE) {
+		link.Read<display_timing_constraints>(dtc);	
+		return B_OK;
+	}
+	
 	return B_ERROR;
 }
 
@@ -484,6 +490,24 @@ BPrivateScreen::get_screen_desc(screen_desc *desc)
 	reply.Read<status_t>(&status);
 	*/
 	return status;
+}
+
+
+// private methods
+sem_id
+BPrivateScreen::RetraceSemaphore()
+{
+	sem_id id = B_BAD_SEM_ID;
+	
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_GET_RETRACE_SEMAPHORE);
+	link.Attach<screen_id>(ID());
+	int32 reply;
+	if (link.FlushWithReply(reply) == B_OK
+		&& reply == SERVER_TRUE) 
+		link.Read<sem_id>(&id);
+	
+	return id;
 }
 
 

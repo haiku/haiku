@@ -2006,7 +2006,47 @@ status_t ret = B_ERROR;
 			
 			break;
 		}
+		
+		case AS_GET_TIMING_CONSTRAINTS:
+		{
+			STRACE(("ServerApp %s: get timing constraints\n", fSignature.String()));
+			// We aren't using the screen_id for now...
+			screen_id id;
+			link.Read<screen_id>(&id);
+			display_timing_constraints constraints;
+			if (gDesktop->GetHWInterface()->GetTimingConstraints(&constraints) == B_OK) {
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach<display_timing_constraints>(constraints);
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+			
+			fLink.Flush();
 				
+			break;
+		}
+		
+		case AS_GET_PIXEL_CLOCK_LIMITS:
+		{
+			STRACE(("ServerApp %s: get pixel clock limits\n", fSignature.String()));
+			// We aren't using the screen_id for now...
+			screen_id id;
+			link.Read<screen_id>(&id);
+			display_mode mode;
+			link.Read<display_mode>(&mode);
+			
+			uint32 low, high;
+			if (gDesktop->GetHWInterface()->GetPixelClockLimits(&mode, &low, &high) == B_OK) {
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach<uint32>(low);
+				fLink.Attach<uint32>(high);
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+			
+			fLink.Flush();
+			
+			break;
+		}
+		
 		default:
 			printf("ServerApp %s received unhandled message code offset %s\n",
 				fSignature.String(), MsgCodeToBString(code).String());
