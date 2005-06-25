@@ -1891,6 +1891,27 @@ status_t ret = B_ERROR;
 			break;
 		}
 
+		case AS_PROPOSE_MODE:
+		{
+			STRACE(("ServerApp %s: AS_PROPOSE_MODE\n", fSignature.String()));
+			screen_id id;
+			link.Read<screen_id>(&id);
+
+			display_mode target, low, high;
+			link.Read<display_mode>(&target);
+			link.Read<display_mode>(&low);
+			link.Read<display_mode>(&high);
+			status_t status = gDesktop->GetHWInterface()->ProposeMode(&target, &low, &high);
+			// TODO: We always return SERVER_TRUE and put the real
+			// error code in the message. FIX this.
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<display_mode>(target);
+			fLink.Attach<status_t>(status);
+			fLink.Flush();
+						
+			break;
+		}
+		
 		case AS_GET_MODE_LIST:
 		{
 			display_mode* modeList;

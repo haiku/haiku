@@ -273,6 +273,10 @@ BPrivateScreen::ProposeMode(display_mode *target,
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_PROPOSE_MODE);
 	link.Attach<screen_id>(ID());
+	link.Attach<display_mode>(*target);
+	link.Attach<display_mode>(*low);
+	link.Attach<display_mode>(*high);
+	
 	int32 reply;
 	status_t status = B_ERROR;
 	if (link.FlushWithReply(reply) == B_OK && reply == SERVER_TRUE) {
