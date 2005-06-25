@@ -2047,6 +2047,53 @@ status_t ret = B_ERROR;
 			break;
 		}
 		
+		case AS_SET_DPMS:
+		{
+			STRACE(("ServerApp %s: AS_SET_DPMS\n", fSignature.String()));
+			screen_id id;
+			link.Read<screen_id>(&id);
+			
+			uint32 mode;
+			link.Read<uint32>(&mode);
+			
+			if (gDesktop->GetHWInterface()->SetDPMSMode(mode) == B_OK)
+				fLink.StartMessage(SERVER_TRUE);
+			else
+				fLink.StartMessage(SERVER_FALSE);
+			
+			fLink.Flush();
+			
+			break;
+		}
+		
+		case AS_GET_DPMS_STATE:
+		{
+			STRACE(("ServerApp %s: AS_GET_DPMS_STATE\n", fSignature.String()));
+			
+			screen_id id;
+			link.Read<screen_id>(&id);
+			
+			uint32 state = gDesktop->GetHWInterface()->DPMSMode();
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<uint32>(state);
+			fLink.Flush();
+			
+			break;
+		}
+				
+		case AS_GET_DPMS_CAPABILITIES:
+		{
+			STRACE(("ServerApp %s: AS_GET_DPMS_CAPABILITIES\n", fSignature.String()));
+			screen_id id;
+			link.Read<screen_id>(&id);
+			
+			uint32 capabilities = gDesktop->GetHWInterface()->DPMSCapabilities();
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<uint32>(capabilities);
+			fLink.Flush();
+			break;
+		}
+			
 		default:
 			printf("ServerApp %s received unhandled message code offset %s\n",
 				fSignature.String(), MsgCodeToBString(code).String());

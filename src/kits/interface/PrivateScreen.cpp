@@ -390,6 +390,9 @@ BPrivateScreen::GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *hig
 status_t
 BPrivateScreen::GetTimingConstraints(display_timing_constraints *dtc)
 {
+	if (dtc == NULL)
+		return B_BAD_VALUE;
+		
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_TIMING_CONSTRAINTS);
 	link.Attach<screen_id>(ID());
@@ -407,33 +410,30 @@ BPrivateScreen::GetTimingConstraints(display_timing_constraints *dtc)
 status_t
 BPrivateScreen::SetDPMS(uint32 dpmsState)
 {
-	status_t status = B_ERROR;
-	/*
 	BPrivate::AppServerLink link;
-	PortMessage reply;
-	link.SetOpCode(AS_SET_DPMS);
+	link.StartMessage(AS_SET_DPMS);
 	link.Attach<screen_id>(ID());
 	link.Attach<uint32>(dpmsState);
-	link.FlushWithReply(&reply);
-	reply.Read<status_t>(&status);
-	*/
-	return status;
+	int32 reply;
+	if (link.FlushWithReply(reply) == B_OK && reply == SERVER_TRUE)
+		return B_OK;
+	
+	return B_ERROR;
 }
 
 
 uint32
 BPrivateScreen::DPMSState()
 {
-	// TODO: Implement
 	uint32 state = 0;
-	/*
+	
 	BPrivate::AppServerLink link;
-	PortMessage reply;
-	link.SetOpCode(AS_GET_DPMS_STATE);
+	link.StartMessage(AS_GET_DPMS_STATE);
 	link.Attach<screen_id>(ID());
-	link.FlushWithReply(&reply);
-	reply.Read<uint32>(&state);
-	*/
+	int32 reply;
+	if (link.FlushWithReply(reply) == B_OK && reply == SERVER_TRUE)
+		link.Read<uint32>(&state);
+	
 	return state;
 }
 
@@ -441,16 +441,15 @@ BPrivateScreen::DPMSState()
 uint32
 BPrivateScreen::DPMSCapabilites()
 {
-	// TODO: Implement
 	uint32 capabilities = 0;
-	/*
+	
 	BPrivate::AppServerLink link;
-	PortMessage reply;
-	link.SetOpCode(AS_GET_DPMS_CAPABILITIES);
+	link.StartMessage(AS_GET_DPMS_CAPABILITIES);
 	link.Attach<screen_id>(ID());
-	link.FlushWithReply(&reply);
-	reply.Read<uint32>(&capabilities);
-	*/
+	int32 reply;
+	if (link.FlushWithReply(reply) == B_OK && reply == SERVER_TRUE)
+		link.Read<uint32>(&capabilities);
+	
 	return capabilities;
 }
 
