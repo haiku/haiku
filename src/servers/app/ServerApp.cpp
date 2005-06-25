@@ -1935,9 +1935,14 @@ status_t ret = B_ERROR;
 
 			screen_id id;
 			link.Read<screen_id>(&id);
-
-			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<color_map>(*SystemColorMap());
+			
+			const color_map *colorMap = SystemColorMap();
+			if (colorMap != NULL) {
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach<color_map>(*colorMap);
+			} else 
+				fLink.StartMessage(SERVER_FALSE);
+			
 			fLink.Flush();
 			break;
 		}
