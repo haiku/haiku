@@ -288,7 +288,6 @@ RootLayer::WorkingThread(void *data)
 			}
 			case AS_ROOTLAYER_DO_INVALIDATE:
 			{
-printf("Adi: new message\n");
 				BRegion invalidRegion;
 				Layer *layer = NULL;
 				messageQueue.Read<Layer*>(&layer);
