@@ -1456,13 +1456,11 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 			
 			bigtime_t time;
 			int32 scancode, modifiers;
-			int8 utf[3];
+			int8 utf[3] = { 0, 0, 0 };
 			char *string = NULL;
 			int8 keystates[16];
 			int32 raw_char;
 			int32 repeatcount;
-			
-			*((int32*)utf)=0;
 			
 			msg.Read<bigtime_t>(&time);
 			msg.Read<int32>(&scancode);
@@ -1679,12 +1677,10 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 			
 			bigtime_t time;
 			int32 scancode, modifiers;
-			int8 utf[3];
+			int8 utf[3] = { 0, 0, 0 };
 			char *string = NULL;
 			int8 keystates[16];
 			int32 raw_char;
-			
-			*((int32*)utf)=0;
 			
 			msg.Read<bigtime_t>(&time);
 			msg.Read<int32>(&scancode);
