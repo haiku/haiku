@@ -345,13 +345,6 @@ AboutView::AboutView(const BRect &r)
 	fCreditsView->SetFontAndColor(be_plain_font);
 	fCreditsView->Insert("Michael Phipps (project founder)\n\n");
 
-/*
-	// TODO: Add these (somehow)
-	Brian Paul (Mesa)
-	Silicon Graphics Inc. (GLU)
-	Mark Kilgard & Be Inc. & Jam Hamby (GLUT)
-*/
-
 	font.SetSize(be_bold_font->Size() + 2);
 	font.SetFace(B_BOLD_FACE);
 	fCreditsView->SetFontAndColor(&font);
@@ -380,6 +373,40 @@ AboutView::AboutView(const BRect &r)
 	fCreditsView->SetFontAndColor(be_plain_font);
 	fCreditsView->Insert("Portions of this software are copyright (C) 1996-2002 The FreeType"
 		" Project (www.freetype.org).  All rights reserved.\n\n");
+
+	// Mesa3D (http://www.mesa3d.org) copyrights
+	font.SetFace(B_ITALIC_FACE);
+	fCreditsView->SetFontAndColor(&font);
+	fCreditsView->Insert("Mesa\n");
+	fCreditsView->SetFontAndColor(be_plain_font);
+	fCreditsView->Insert(
+		"Copyright (c) 1999-2005 Brian Paul. "
+		"All rights reserved.\n\n");
+
+	// SGI's GLU implementation copyrights
+	font.SetFace(B_ITALIC_FACE);
+	fCreditsView->SetFontAndColor(&font);
+	fCreditsView->Insert("GLU\n");
+	fCreditsView->SetFontAndColor(be_plain_font);
+	fCreditsView->Insert(
+		"Copyright (c) 1991-2000 Silicon Graphics, Inc."
+		"All rights reserved.\n\n");
+
+/*
+	// TODO: Add these (somehow)
+	Mark Kilgard & Be Inc. & Jam Hamby (GLUT)
+
+	// GLUT implementation copyrights
+	font.SetFace(B_ITALIC_FACE);
+	fCreditsView->SetFontAndColor(&font);
+	fCreditsView->Insert("GLUT\n");
+	fCreditsView->SetFontAndColor(be_plain_font);
+	fCreditsView->Insert(
+		"Copyright (c) 1991-2000 Silicon Graphics, Inc."
+		"All rights reserved.\n"
+*/
+
+
 }
 
 
