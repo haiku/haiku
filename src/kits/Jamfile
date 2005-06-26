@@ -118,3 +118,4 @@ SubInclude OBOS_TOP src kits tracker ;
 SubInclude OBOS_TOP src kits device ;
 SubInclude OBOS_TOP src kits game ;
 SubInclude OBOS_TOP src kits network ;
+SubInclude OBOS_TOP src kits opengl ;
