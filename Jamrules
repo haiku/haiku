@@ -316,8 +316,8 @@ rule SetupIncludes
 	local os_includes = add-ons add-ons/file_system add-ons/graphics
 						add-ons/input_server add-ons/screen_saver
 						add-ons/tracker app device drivers game interface
-						kernel media mail midi midi2 net storage support
-						translation opengl ;
+						kernel media mail midi midi2 net opengl storage support
+						translation ;
 
 	# Overwrite any exiting content when changing HDRS. This rule may be invoked multiple times.
 
@@ -1036,6 +1036,7 @@ rule MergeObjectFromObjects
 	MakeLocate $(1) : $(LOCATE_TARGET) ;
 	Depends $(1) : $(objects) ;
 	Depends $(1) : $(3) ;
+	LocalDepends obj : $(1) ;
 	LINK on $(1) = ld ;
 	MergeObjectFromObjects1 $(1) : $(objects) $(3) ;
 }
