@@ -99,11 +99,11 @@ TTimeWindow::InitWindow()
 	
 	f_TimeSettings = new TSettingsView(bounds);
 	if (f_BaseView->StartWatchingAll(f_TimeSettings) != B_OK)
-		printf("StartWatchingAll(TimeSettings) failed!!!");
+		printf("StartWatchingAll(TimeSettings) failed!!!\n");
 
 	f_TimeZones = new TZoneView(bounds);
 	if (f_BaseView->StartWatchingAll(f_TimeZones) != B_OK)
-		printf("TimeZones->StartWatchingAll(TimeZone) failed!!!");	
+		printf("TimeZones->StartWatchingAll(TimeZone) failed!!!\n");	
 	// add tabs
 	BTab *tab;
 	tab = new BTab();
