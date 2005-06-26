@@ -372,7 +372,7 @@ class _IMPEXP_INPUT BInputServerFilter;
 class _IMPEXP_INPUT BInputServerMethod;
 
 #else	/* __cplusplus */
-
+/*
 //typedef struct _IMPEXP_GL GLUnurbs GLUnurbs;
 //typedef struct _IMPEXP_GL GLUquadric GLUquadric;
 //typedef struct _IMPEXP_GL GLUtesselator GLUtesselator;
@@ -381,7 +381,7 @@ class _IMPEXP_INPUT BInputServerMethod;
 //typedef struct _IMPEXP_GL GLUquadric GLUquadricObj;
 //typedef struct _IMPEXP_GL GLUtesselator GLUtesselatorObj;
 //typedef struct _IMPEXP_GL GLUtesselator GLUtriangulatorObj;
-
+*/
 #endif	/* __cplusplus */
 
 #endif	/* _BE_BUILD_H */
