@@ -1,15 +1,13 @@
 SubDir OBOS_TOP src apps glteapot ;
 
-#TODO we should have our own opengl headers
-SubDirHdrs [ FDirName / boot develop headers be opengl ] ;
-
-#TODO we should have our own libGL.so
 App GLTeapot :
 	FPS.cpp
 	GLObject.cpp
 	ObjectView.cpp
 	error.cpp
 	teapot_main.cpp
-	: libbe.so GL libgame.so
+
+	: libbe.so libGL.so libgame.so
+
 	: GLTeapot.rdef
 ;
