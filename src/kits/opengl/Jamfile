@@ -1,0 +1,66 @@
+SubDir OBOS_TOP src kits opengl ;
+
+UsePrivateHeaders opengl ;
+
+SubDirCcFlags 
+	-DBEOS_THREADS 
+	-DGNU_ASSEMBLER 
+	-DUSE_X86_ASM 
+	-DUSE_MMX_ASM 
+	-DUSE_3DNOW_ASM 
+	-DUSE_SSE_ASM ;
+SubDirC++Flags 
+	-DBEOS_THREADS 
+	-DGNU_ASSEMBLER 
+	-DUSE_X86_ASM 
+	-DUSE_MMX_ASM 
+	-DUSE_3DNOW_ASM 
+	-DUSE_SSE_ASM ;
+
+# As our build system don't support <> / " " include difference, 
+# we should compile GLView *before* Mesa's include paths are added.
+# Otherwise, GLView.cpp include inderectly <image.h> but the main/image.h will be find first!
+# :-(
+
+Objects 
+	GLView.cpp 
+;
+
+# Now we could add Mesa include paths...
+
+UseHeaders [ FDirName $(SUBDIR) mesa ] ;
+UseHeaders [ FDirName $(SUBDIR) mesa main ] ;
+UseHeaders [ FDirName $(SUBDIR) mesa glapi ] ;
+UseHeaders [ FDirName $(SUBDIR) mesa math ] ;
+UseHeaders [ FDirName $(SUBDIR) mesa tnl ] ;
+UseHeaders [ FDirName $(SUBDIR) mesa shader ] ;
+UseHeaders [ FDirName $(SUBDIR) mesa swrast ] ;
+UseHeaders [ FDirName $(SUBDIR) mesa swrast_setup ] ;
+
+SharedLibrary GL :
+	GLView.o
+	GLDispatcher.cpp
+	mesa/$(OBOS_ARCH)/glapi_$(OBOS_ARCH).S
+  : 
+ 	# GLU API is included in libGL.so under BeOS R5, not a separate libglu.so library
+	<opengl>sgi-glu.o
+
+	# GLUT API is included in libGL.so under Haiku, not a separate libglut.so library
+	<opengl>glut.o 
+
+	libbe.so 
+	libgame.so		# BWindowScreen needed by BGLScreen stub class 
+	libmesa.a		# For GL API dispatching, mostly 
+;
+
+Package haiku-opengl-cvs :
+	libGL.so : 
+	boot beos system lib ;
+
+MakeLocate <develop>libGL.so : $(OBOS_STLIB_DIR) ;
+RelSymLink <develop>libGL.so : libGL.so ;
+
+SubInclude OBOS_TOP src kits opengl glu ;
+SubInclude OBOS_TOP src kits opengl glut ;
+SubInclude OBOS_TOP src kits opengl mesa ;
+

@@ -1,0 +1,21 @@
+
+
+Performance issues with EXT_point_parameters & quake2
+
+
+
+Using glPolygonMode() where the front and back modes aren't the
+same causes poor performance on 3Dfx.
+
+
+
+Broken drivers: some of the Mesa device drivers (such as BeOS, D3D,
+etc) haven't been updated for Mesa 3.3's device driver changes.
+
+
+
+glDrawRangeElements() should use vertex array locking to improve performance
+but trying to do so causes a rendering error.  Reported by Scott McMillan.
+Fixed by disabling locking in glDrawRangeElements (varray.c) but that's
+really just hiding a bug in array locking.
+

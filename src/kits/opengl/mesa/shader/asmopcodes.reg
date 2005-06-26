@@ -1,0 +1,78 @@
+/* */
+/* ARB program opcode registry */
+/* each instruction code has its own unique number */
+/* this registry exists to ensure that this relation retains */
+/* */
+
+/* GL_ARB_vertex_program */
+ABS         0x00
+ADD         0x01
+ARL         0x02
+DP3         0x03
+DP4         0x04
+DPH         0x05
+DST         0x06
+EX2         0x07
+EXP         0x08
+FLR         0x09
+FRC         0x0A
+LG2         0x0B
+LIT         0x0C
+LOG         0x0D
+MAD         0x0E
+MAX         0x0F
+MIN         0x10
+MOV         0x11
+MUL         0x12
+POW         0x13
+RCP         0x14
+RSQ         0x15
+SGE         0x16
+SLT         0x17
+SUB         0x18
+SWZ         0x19
+XPD         0x1A
+
+/* GL_ARB_fragment_program */
+ABS_SAT     0x1B
+ADD_SAT     0x1C
+CMP         0x1D
+CMP_SAT     0x1E
+COS         0x1F
+COS_SAT     0x20
+DP3_SAT     0x21
+DP4_SAT     0x22
+DPH_SAT     0x23
+DST_SAT     0x24
+EX2_SAT     0x25
+FLR_SAT     0x26
+FRC_SAT     0x27
+KIL         0x28
+LG2_SAT     0x29
+LIT_SAT     0x2A
+LRP         0x2B
+LRP_SAT     0x2C
+MAD_SAT     0x2D
+MAX_SAT     0x2E
+MIN_SAT     0x2F
+MOV_SAT     0x30
+MUL_SAT     0x31
+POW_SAT     0x32
+RCP_SAT     0x33
+RSQ_SAT     0x34
+SCS         0x35
+SCS_SAT     0x36
+SGE_SAT     0x37
+SIN         0x38
+SIN_SAT     0x39
+SLT_SAT     0x3A
+SUB_SAT     0x3B
+SWZ_SAT     0x3C
+TEX         0x3D
+TEX_SAT     0x3E
+TXB         0x3F
+TXB_SAT     0x40
+TXP         0x41
+TXP_SAT     0x42
+XPD_SAT     0x43
+

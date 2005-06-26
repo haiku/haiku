@@ -1,0 +1,567 @@
+/*
+ * Mesa 3-D graphics library
+ * Version:  6.2
+ *
+ * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * BRIAN PAUL BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+ * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+ 
+ /**
+ * \file grammar.syn
+ * syntax of .syn script - used to validate other syntax files
+ * \author Michal Krol
+ */
+ 
+.syntax grammar;
+
+/* declaration */
+.emtcode DECLARATION_END                            0
+.emtcode DECLARATION_EMITCODE                       1
+.emtcode DECLARATION_ERRORTEXT                      2
+.emtcode DECLARATION_REGBYTE                        3
+.emtcode DECLARATION_LEXER                          4
+.emtcode DECLARATION_RULE                           5
+
+/* specifier */
+.emtcode SPECIFIER_END                              0
+.emtcode SPECIFIER_AND_TAG                          1
+.emtcode SPECIFIER_OR_TAG                           2
+.emtcode SPECIFIER_CHARACTER_RANGE                  3
+.emtcode SPECIFIER_CHARACTER                        4
+.emtcode SPECIFIER_STRING                           5
+.emtcode SPECIFIER_IDENTIFIER                       6
+.emtcode SPECIFIER_TRUE                             7
+.emtcode SPECIFIER_FALSE                            8
+.emtcode SPECIFIER_DEBUG                            9
+
+/* identifier */
+.emtcode IDENTIFIER_SIMPLE                          0
+.emtcode IDENTIFIER_LOOP                            1
+
+/* error */
+.emtcode ERROR_NOT_PRESENT                          0
+.emtcode ERROR_PRESENT                              1
+
+/* emit */
+.emtcode EMIT_NULL                                  0
+.emtcode EMIT_INTEGER                               1
+.emtcode EMIT_IDENTIFIER                            2
+.emtcode EMIT_CHARACTER                             3
+.emtcode EMIT_LAST_CHARACTER                        4
+.emtcode EMIT_CURRENT_POSITION                      5
+
+.errtext INVALID_GRAMMAR                            "internal error 2001: invalid grammar script"
+.errtext SYNTAX_EXPECTED                            "internal error 2002: '.syntax' keyword expected"
+.errtext IDENTIFIER_EXPECTED                        "internal error 2003: identifier expected"
+.errtext MISSING_SEMICOLON                          "internal error 2004: missing ';'"
+.errtext INTEGER_EXPECTED                           "internal error 2005: integer value expected"
+.errtext STRING_EXPECTED                            "internal error 2006: string expected"
+
+/*
+    <grammar>                           ::= ".syntax" <identifier> ";" <declaration_list>
+*/
+grammar
+    grammar_1 .error INVALID_GRAMMAR;
+grammar_1
+    optional_space .and ".syntax" .error SYNTAX_EXPECTED .and space .and identifier .and
+    semicolon .and declaration_list .and optional_space .and '\0' .emit DECLARATION_END;
+
+/*
+    <optional_space>                    ::= <space>
+                                          | ""
+*/
+optional_space
+    space .or .true;
+
+/*
+    <space>                             ::= <single_space> <single_space>*
+*/
+space
+    single_space .and .loop single_space;
+
+/*
+    <single_space>                      ::= <white_char>
+                                          | <comment_block>
+*/
+single_space
+    white_char .or comment_block;
+
+/*
+    <white_char>                        ::= " " 
+                                          | "\t"
+                                          | "\n"
+                                          | "\r"
+*/
+white_char
+    ' ' .or '\t' .or '\n' .or '\r';
+
+/*
+    <comment_block>                     ::= "/" "*" <comment_rest>
+*/
+comment_block
+    '/' .and '*' .and comment_rest;
+
+/*
+    <comment_rest>                      ::= <comment_char_no_star>* <comment_end>
+                                          | <comment_char_no_star>* "*" <comment_rest>
+*/
+comment_rest
+    .loop comment_char_no_star .and comment_rest_1;
+comment_rest_1
+    comment_end .or comment_rest_2;
+comment_rest_2
+    '*' .and comment_rest;
+
+/*
+    <comment_char_no_star>              ::= All ASCII characters except "*" and "\0"
+*/
+comment_char_no_star
+    '\x2B'-'\xFF' .or '\x01'-'\x29';
+
+/*
+    <comment_end>                       ::= "*" "/"
+*/
+comment_end
+    '*' .and '/';
+
+/*
+    <identifier>                        ::= <identifier>
+*/
+identifier
+    identifier_ne .error IDENTIFIER_EXPECTED;
+
+/*
+    <identifier_ne>                     ::= <first_idchar> <follow_idchar>*
+*/
+identifier_ne
+    first_idchar .emit * .and .loop follow_idchar .emit * .and .true .emit '\0';
+
+/*
+    <first_idchar>                      ::= "a"-"z"
+                                          | "A"-"Z"
+                                          | "_"
+*/
+first_idchar
+    'a'-'z' .or 'A'-'Z' .or '_';
+
+/*
+    <follow_idchar>                     ::= <first_idchar>
+                                          | <digit_dec>
+*/
+follow_idchar
+    first_idchar .or digit_dec;
+
+/*
+    <digit_dec>                         ::= "0"-"9"
+*/
+digit_dec
+    '0'-'9';
+
+/*
+    <semicolon>                         ::= ";"
+*/
+semicolon
+    optional_space .and ';' .error MISSING_SEMICOLON .and optional_space;
+
+/*
+    <declaration_list>                  ::= <declaration>
+                                          | <declaration_list> <declaration>
+*/
+declaration_list
+    declaration .and .loop declaration;
+
+/*
+    <declaration>                       ::= <emitcode_definition>
+                                          | <errortext_definition>
+                                          | <lexer_definition>
+                                          | <rule_definition>
+*/
+declaration
+    emitcode_definition .emit DECLARATION_EMITCODE .or
+    errortext_definition .emit DECLARATION_ERRORTEXT .or
+    regbyte_definition .emit DECLARATION_REGBYTE .or
+    lexer_definition .emit DECLARATION_LEXER .or
+    rule_definition .emit DECLARATION_RULE;
+
+/*
+    <emitcode_definition>               ::= ".emtcode" <identifier> <integer>
+*/
+emitcode_definition
+    ".emtcode" .and space .and identifier .and space .and integer .and space_or_null;
+
+/*
+    <integer>                           ::= <integer_ne>
+*/
+integer
+    integer_ne .error INTEGER_EXPECTED;
+
+/*
+    <integer_ne>                        ::= <hex_integer>
+                                          | <dec_integer>
+*/
+integer_ne
+    hex_integer .emit 0x10 .or dec_integer .emit 10;
+
+/*
+    <hex_integer>                       :: <hex_prefix> <digit_hex> <digit_hex>*
+*/
+hex_integer
+    hex_prefix .and digit_hex .emit * .and .loop digit_hex .emit * .and .true .emit '\0';
+
+/*
+    <hex_prefix>                        ::= "0x"
+                                          | "0X"
+*/
+hex_prefix
+    '0' .and hex_prefix_1;
+hex_prefix_1
+    'x' .or 'X';
+
+/*
+    <digit_hex>                         ::= "0"-"9"
+                                          | "a"-"f"
+                                          | "A"-"F"
+*/
+digit_hex
+    '0'-'9' .or 'a'-'f' .or 'A'-'F';
+
+/*
+    <dec_integer>                       :: <digit_dec> <digit_dec>*
+*/
+dec_integer
+    digit_dec .emit * .and .loop digit_dec .emit * .and .true .emit '\0';
+
+/*
+    <space_or_null>                     ::= <space>
+                                          | "\0"
+*/
+space_or_null
+    space .or '\0';
+
+/*
+    <errortext_definition>              ::= ".errtext" <identifier> <string>
+*/
+errortext_definition
+    ".errtext" .and space .and identifier .and space .and string .and space_or_null;
+
+/*
+    <string>                            ::= <string_ne>
+*/
+string
+    string_ne .error STRING_EXPECTED;
+
+/*
+    <string_ne>                         ::= "\"" <string_char_double_quotes> "\""
+*/
+string_ne
+    '"' .and .loop string_char_double_quotes .and '"' .emit '\0';
+
+/*
+    <string_char_double_quotes>         ::= <escape_sequence>
+                                          | <string_char>
+                                          | "\'"
+*/
+string_char_double_quotes
+    escape_sequence .or string_char .emit * .or '\'' .emit *;
+
+/*
+    <string_char>                       ::= All ASCII characters except "\'", "\"", "\n", "\r",
+                                            "\0" and "\\"
+*/
+string_char
+    '\x5D'-'\xFF' .or '\x28'-'\x5B' .or '\x23'-'\x26' .or '\x0E'-'\x21' .or '\x0B'-'\x0C' .or
+    '\x01'-'\x09';
+
+/*
+    <escape_sequence>                   ::= "\\" <escape_code>
+*/
+escape_sequence
+    '\\' .emit * .and escape_code;
+
+/*
+    <escape_code>                       ::= <simple_escape_code>
+                                          | <hex_escape_code>
+                                          | <oct_escape_code>
+*/
+escape_code
+    simple_escape_code .emit * .or hex_escape_code .or oct_escape_code;
+
+/*
+    <simple_escape_code>                ::= "\'"
+                                          | "\""
+                                          | "?"
+                                          | "\\"
+                                          | "a"
+                                          | "b"
+                                          | "f"
+                                          | "n"
+                                          | "r"
+                                          | "t"
+                                          | "v"
+*/
+simple_escape_code
+    '\'' .or '"' .or '?' .or '\\' .or 'a' .or 'b' .or 'f' .or 'n' .or 'r' .or 't' .or 'v';
+
+/*
+    <hex_escape_code>                   ::= "x" <digit_hex> <digit_hex>*
+*/
+hex_escape_code
+    'x' .emit * .and digit_hex .emit * .and .loop digit_hex .emit *;
+
+/*
+    <oct_escape_code>                   ::= <digit_oct> <optional_digit_oct> <optional_digit_oct>
+*/
+oct_escape_code
+    digit_oct .emit * .and optional_digit_oct .and optional_digit_oct;
+
+/*
+    <digit_oct>                         ::= "0"-"7"
+*/
+digit_oct
+    '0'-'7';
+
+/*
+    <optional_digit_oct>                ::= <digit_oct>
+                                          | ""
+*/
+optional_digit_oct
+    digit_oct .emit * .or .true;
+
+/*
+    <regbyte_definition>                ::= ".regbyte" <identifier> <integer>
+*/
+regbyte_definition
+    ".regbyte" .and space .and identifier .and space .and integer .and space_or_null;
+
+/*
+    <lexer_definition>                  ::= ".string" <identifier> ";"
+*/
+lexer_definition
+    ".string" .and space .and identifier .and semicolon;
+
+/*
+    <rule_definition>                   ::= <identifier_ne> <definition>
+*/
+rule_definition
+    identifier_ne .and space .and definition;
+
+/*
+    <definition>                        ::= <specifier> <optional_specifiers_and_or> ";"
+*/
+definition
+    specifier .and optional_specifiers_and_or .and semicolon .emit SPECIFIER_END;
+
+/*
+    <optional_specifiers_and_or>        ::= <and_specifiers>
+                                          | <or_specifiers>
+                                          | ""
+*/
+optional_specifiers_and_or
+    and_specifiers .emit SPECIFIER_AND_TAG .or or_specifiers .emit SPECIFIER_OR_TAG .or .true;
+
+/*
+    <specifier>                         ::= <specifier_condition> <specifier_rule>
+*/
+specifier
+    specifier_condition .and optional_space .and specifier_rule;
+
+/*
+    <specifier_condition>               ::= ".if" "(" <left_operand> <operator> <right_operand> ")"
+*/
+specifier_condition
+    specifier_condition_1 .or .true;
+specifier_condition_1
+    ".if" .and optional_space .and '(' .and optional_space .and left_operand .and operator .and
+    right_operand .and optional_space .and ')';
+
+/*
+    <left_operand>                      ::= <identifier>
+*/
+left_operand
+    identifier;
+
+/*
+    <operator>                          ::= "!="
+                                          | "=="
+*/
+operator
+    operator_1 .or operator_2;
+operator_1
+    optional_space .and '!' .and '=' .and optional_space;
+operator_2
+    optional_space .and '=' .and '=' .and optional_space;
+
+/*
+    <right_operand>                     ::= <integer>
+*/
+right_operand
+    integer;
+
+/*
+    <specifier_rule>                    ::= <character_range> <optional_error> <emit>*
+                                          | <character> <optional_error> <emit>*
+                                          | <string> <optional_error> <emit>*
+                                          | ".true" <optional_error> <emit>*
+                                          | ".false" <optional_error> <emit>*
+                                          | ".debug" <optional_error> <emit>*
+                                          | <advanced_identifier> <optional_error> <emit>*
+*/
+specifier_rule
+    specifier_rule_1 .and optional_error .and .loop emit .and .true .emit EMIT_NULL;
+specifier_rule_1
+    character_range .emit SPECIFIER_CHARACTER_RANGE .or
+    character .emit SPECIFIER_CHARACTER .or
+    string_ne .emit SPECIFIER_STRING .or
+    ".true" .emit SPECIFIER_TRUE .or
+    ".false" .emit SPECIFIER_FALSE .or
+    ".debug" .emit SPECIFIER_DEBUG .or
+    advanced_identifier .emit SPECIFIER_IDENTIFIER;
+
+/*
+    <character>                         ::= "\'" <string_char_single_quotes "\'"
+*/
+character
+    '\'' .and string_char_single_quotes .and '\'' .emit '\0';
+
+/*
+    <string_char_single_quotes>         ::= <escape_sequence>
+                                          | <string_char>
+                                          | "\""
+*/
+string_char_single_quotes
+    escape_sequence .or string_char .emit * .or '"' .emit *;
+
+/*
+    <character_range>                   ::= <character> "-" <character>
+*/
+character_range
+    character .and optional_space .and '-' .and optional_space .and character;
+
+/*
+    <advanced_identifier>               ::= <optional_loop> <identifier>
+*/
+advanced_identifier
+    optional_loop .and identifier;
+
+/*
+    <optional_loop>                     ::= ".loop"
+                                          | ""
+*/
+optional_loop
+    optional_loop_1 .emit IDENTIFIER_LOOP .or .true .emit IDENTIFIER_SIMPLE;
+optional_loop_1
+    ".loop" .and space;
+
+/*
+    <optional_error>                    ::= <error>
+                                          | ""
+*/
+optional_error
+    error .emit ERROR_PRESENT .or .true .emit ERROR_NOT_PRESENT;
+
+/*
+    <error>                             :: ".error" <identifier>
+*/
+error
+    space .and ".error" .and space .and identifier;
+
+/*
+    <emit>                              ::= <emit_output>
+                                          | <emit_regbyte>
+*/
+emit
+    emit_output .or emit_regbyte;
+
+/*
+    <emit_output>                       ::= ".emit" <emit_param>
+*/
+emit_output
+    space .and ".emit" .and space .and emit_param;
+
+/*
+    <emit_param>                        ::= <integer>
+                                          | <identifier>
+                                          | <character>
+                                          | "*"
+                                          | "$"
+*/
+emit_param
+    integer_ne .emit EMIT_INTEGER .or
+    identifier_ne .emit EMIT_IDENTIFIER .or
+    character .emit EMIT_CHARACTER .or
+    '*' .emit EMIT_LAST_CHARACTER .or
+    '$' .emit EMIT_CURRENT_POSITION;
+
+/*
+    <emit_regbyte>                      ::= ".load" <identifier> <emit_param>
+*/
+emit_regbyte
+    space .and ".load" .and space .and identifier .and space .and emit_param;
+
+/*
+    <and_specifiers>                    ::= <and_specifier> <and_specifier>*
+*/
+and_specifiers
+    and_specifier .and .loop and_specifier;
+
+/*
+    <or_specifiers>                     ::= <or_specifier> <or_specifier>*
+*/
+or_specifiers
+    or_specifier .and .loop or_specifier;
+
+/*
+    <and_specifier>                     ::= ".and" <specifier>
+*/
+and_specifier
+    space .and ".and" .and space .and specifier;
+
+/*
+    <or_specifier>                      ::= ".or" <specifier>
+*/
+or_specifier
+    space .and ".or" .and space .and specifier;
+
+
+.string __string_filter;
+
+/*
+    <__string_filter>                   ::= <__first_identifier_char> <__next_identifier_char>*
+*/
+__string_filter
+    __first_identifier_char .and .loop __next_identifier_char;
+
+/*
+    <__first_identifier_char>           ::= "a"-"z"
+                                          | "A"-"Z"
+                                          | "_"
+                                          | "."
+*/
+__first_identifier_char
+    'a'-'z' .or 'A'-'Z' .or '_' .or '.';
+
+/*
+    <__next_identifier_char>            ::= "a"-"z"
+                                          | "A"-"Z"
+                                          | "_"
+                                          | "0"-"9"
+*/
+__next_identifier_char
+    'a'-'z' .or 'A'-'Z' .or '_' .or '0'-'9';
+
