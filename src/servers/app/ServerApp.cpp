@@ -1353,9 +1353,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			// Returns:
 			// 1) int32 - number of font strikes available
-			int32 famid, styid;
-			link.Read<int32>(&famid);
-			link.Read<int32>(&styid);
+			uint16 famid, styid;
+			link.Read<uint16>(&famid);
+			link.Read<uint16>(&styid);
 
 			gFontServer->Lock();
 			FontStyle *fstyle = gFontServer->GetStyle(famid, styid);
@@ -1395,9 +1395,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			// Returns:
 			// 1) bool - font is/is not fixed
-			int32 famid, styid;
-			link.Read<int32>(&famid);
-			link.Read<int32>(&styid);
+			uint16 famid, styid;
+			link.Read<uint16>(&famid);
+			link.Read<uint16>(&styid);
 
 			gFontServer->Lock();
 			FontStyle *fstyle = gFontServer->GetStyle(famid, styid);
