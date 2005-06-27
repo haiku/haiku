@@ -15,6 +15,8 @@
 #include "scsi.h"
 #include "CDEngine.h"
 
+const bigtime_t kPulseRate = 500000;
+
 PeriodicWatcher::PeriodicWatcher(int devicefd)
 	:	Notifier(),
 		devicefd(devicefd)
@@ -168,50 +170,67 @@ TimeState::UpdateState()
 	status_t media_status = B_DEV_NO_MEDIA;
 	ioctl(devicefd, B_GET_MEDIA_STATUS, &media_status, sizeof(media_status));
 	if (media_status != B_NO_ERROR)
-		return CurrentState(-1, -1);
-
+		return CurrentState(-1, -1, -1, -1);
+	
 	status_t result = ioctl(devicefd, B_SCSI_GET_POSITION, &pos);
-
+	
 	if (result != B_NO_ERROR)
-		return CurrentState(-1, -1);
-	else if ((!pos.position[1]) || (pos.position[1] >= 0x13) ||
-	   ((pos.position[1] == 0x12) && (!pos.position[6])))
-		return CurrentState(0, 0);
+		return CurrentState(-1, -1, -1, -1);
+	else 
+	if ((!pos.position[1]) || (pos.position[1] >= 0x13) ||
+		((pos.position[1] == 0x12) && (!pos.position[6])))
+	{
+		// This indicates that we have a CD, but we are stopped. We *could* simply
+		// return all 0's, but because the GUI expects valid numbers or -1's, we
+		// return -1's.
+		return CurrentState(-1, -1, -1, -1);
+	}
 	else
-		return CurrentState(pos.position[9], pos.position[10]);
+		return CurrentState(pos.position[9], pos.position[10], pos.position[13], pos.position[14]);
 }
 
 bool 
-TimeState::CurrentState(int32 minutes, int32 seconds)
+TimeState::CurrentState(int32 dmin, int32 dsec, int32 tmin, int32 tsec)
 {
-	if (minutes == oldMinutes && seconds == oldSeconds)
+	if (dmin == fDiscMinutes && dsec == fDiscSeconds)
 		return false;
-	oldMinutes = minutes;
-	oldSeconds = seconds;
+	
+	fDiscMinutes = dmin;
+	fDiscSeconds = dsec;
+	fTrackMinutes = tmin;
+	fTrackSeconds = tsec;
+	
 	return true;
 }
 
 void 
-TimeState::GetTime(int32 &minutes, int32 &seconds) const
+TimeState::GetDiscTime(int32 &minutes, int32 &seconds) const
 {
-	minutes = oldMinutes;
-	seconds = oldSeconds;
+	minutes = fDiscMinutes;
+	seconds = fDiscSeconds;
+}
+
+void 
+TimeState::GetTrackTime(int32 &minutes, int32 &seconds) const
+{
+	minutes = fTrackMinutes;
+	seconds = fTrackSeconds;
 }
 
 
 CDContentWatcher::CDContentWatcher(int devicefd)
 	:	PeriodicWatcher(devicefd),
-		cddbQuery("us.cddb.com", 888, true),
+		cddbQuery("us.freedb.org", 888, true),
 		discID(-1),
-		wasReady(false)
+		fReady(false)
 {
 }
 
 CDContentWatcher::CDContentWatcher(BMessage *message)
 	:	PeriodicWatcher(message),
-		cddbQuery("us.cddb.com", 888, true),
+		cddbQuery("us.freedb.org", 888, true),
 		discID(-1),
-		wasReady(false)
+		fReady(false)
 {
 }
 
@@ -224,21 +243,59 @@ CDContentWatcher::GetContent(BString *title, vector<BString> *tracks)
 bool 
 CDContentWatcher::UpdateState()
 {
-	bool newReady = false;
 	bool newDiscID = -1;
-	if (engine->PlayStateWatcher()->GetState() != kNoCD) {
+	
+	// Check the table of contents to see if the new one is different
+	// from the old one whenever there is a CD in the drive
+	if (engine->PlayStateWatcher()->GetState() != kNoCD) 
+	{
 		scsi_toc toc;
 		ioctl(devicefd, B_SCSI_GET_TOC, &toc);
 		newDiscID = cddbQuery.GetDiscID(&toc);
-		if (discID != newDiscID)
-			cddbQuery.SetToCD(&toc);
+		
+		if (discID == newDiscID)
+			return false;
+		
+		// We have changed CDs, so we are not ready until the CDDB lookup finishes
+		cddbQuery.SetToCD(&toc);
+		fReady=false;
+	}
+	
+	// If the CD has changed and the CDDB query is ready, we set to true so that
+	// when UpdateState returns, a notification is sent
+	bool result = ( (fReady != cddbQuery.Ready()) && (newDiscID != discID) );
+	
+	if(result)
+	{
+		fReady = true;
+		discID = newDiscID;
 	}
 
-	bool result = newReady != cddbQuery.Ready() && newDiscID != discID;
-	newReady = cddbQuery.Ready();
-	newDiscID = discID;
-
 	return result;
+}
+
+VolumeState::VolumeState(int devicefd)
+ : 	PeriodicWatcher(devicefd),
+ 	fVolume(-1)
+{
+}
+
+bool
+VolumeState::UpdateState(void)
+{
+	scsi_volume vol;
+	ioctl(devicefd, B_SCSI_GET_VOLUME, &vol);
+	if(vol.port0_volume == fVolume)
+		return false;
+	
+	fVolume = vol.port0_volume;
+	return true;
+}
+
+int32
+VolumeState::GetVolume(void) const
+{
+	return fVolume;
 }
 
 CDEngine::CDEngine(int devicefd)
@@ -318,12 +375,13 @@ void
 CDEngine::Play()
 {
 	// play the CD
-	if (playState.GetState() == kNoCD) {
+	if (playState.GetState() == kNoCD) 
+	{
 		// no CD available, bail out
 		ioctl(devicefd, B_LOAD_MEDIA, 0, 0);
 		return;
 	}
-
+	
 	scsi_play_track track;
 
 	track.start_track = 1;
@@ -332,7 +390,8 @@ CDEngine::Play()
 	track.end_index = 1;
 
 	status_t result = ioctl(devicefd, B_SCSI_PLAY_TRACK, &track);
-	if (result != B_NO_ERROR) {
+	if (result != B_NO_ERROR) 
+	{
 		PRINT(("error %s playing track\n", strerror(errno)));
 		return;
 	}
@@ -343,7 +402,8 @@ CDEngine::PlayContinue()
 {
 	// continue after a pause
 	status_t result = ioctl(devicefd, B_SCSI_RESUME_AUDIO);
-	if (result != B_NO_ERROR) {
+	if (result != B_NO_ERROR) 
+	{
 		PRINT(("error %s resuming\n", strerror(errno)));
 		return;
 	}
@@ -354,8 +414,9 @@ CDEngine::Stop()
 {
 	// stop a playing CD
 	status_t result = ioctl(devicefd, B_SCSI_STOP_AUDIO);
-	if (result != B_NO_ERROR) {
-		PRINT(("error %s stoping\n", strerror(errno)));
+	if (result != B_OK) 
+	{
+		PRINT(("error %s stopping\n", strerror(errno)));
 		return;
 	}
 }
@@ -371,9 +432,10 @@ CDEngine::Eject()
 	
 	// if door open, load the media, else eject the CD
 	status_t result = ioctl(devicefd,
-		media_status == B_DEV_DOOR_OPEN ? B_LOAD_MEDIA : B_EJECT_DEVICE);
+							media_status == B_DEV_DOOR_OPEN ? B_LOAD_MEDIA : B_EJECT_DEVICE);
 	
-	if (result != B_NO_ERROR) {
+	if (result != B_OK) 
+	{
 		PRINT(("error %s ejecting\n", strerror(errno)));
 		return;
 	}
@@ -506,12 +568,22 @@ CDEngine::SelectTrack(int32 trackNumber)
 	}
 }
 
-const bigtime_t kPulseRate = 500000;
+void
+CDEngine::SetVolume(uint8 value)
+{
+	scsi_volume vol;
+	
+	// change only port0's volume
+	vol.flags=2;
+	vol.port0_volume=value;
+	
+	ioctl(devicefd,B_SCSI_SET_VOLUME,&vol);
+}
 
 void
 CDEngine::DoPulse()
 {
-	// this is the CDEngine's hearbeat; Since it is a Notifier, it checks if
+	// this is the CDEngine's heartbeat; Since it is a Notifier, it checks if
 	// any values changed since the last hearbeat and sends notices to observers
 
 	bigtime_t time = system_time();

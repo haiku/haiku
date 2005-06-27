@@ -35,6 +35,8 @@ public:
 	virtual void AttachedToWindow();	
 	
 	virtual void Pulse();
+	
+	virtual	void FrameResized(float new_width, float new_height);
 
 	virtual void MessageReceived(BMessage *);
 
@@ -45,7 +47,11 @@ public:
 	virtual void NoticeChange(Notifier *);
 
 private:
-	void UpdateTrackInfo(void);
+	void UpdateCDInfo(void);
+	void UpdateTimeInfo(void);
+	void SetBitmap(BBitmap *bitmap);
+	
+	bool fStopOnQuit;
 	
 	CDEngine *engine;
 	
@@ -54,11 +60,16 @@ private:
 	
 	BSlider *fVolume;
 	
-	BTextControl *fCDTitle;
-	BStringView *fTrackNumber;
+	BStringView *fCDTitle;
+	BStringView *fCurrentTrack;
+	BStringView *fTrackTime;
+	BStringView *fDiscTime;
+	
+	BBox *fCDBox;
+	BBox *fTrackBox;
+	BBox *fTimeBox;
 	
 	CDState fCDState;
-	int32 fTrackCount, fCurrentTrack;
 };
 
 

@@ -80,7 +80,7 @@ resource(101, "BEOS:M:STD_ICON") #'MICN' array {
 	$"FFFFFFFFFFFF000000000EFFFFFFFFFF"
 };
 
-resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku.CDPlayer";
+resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku-CDPlayer";
 
 resource(1, "BEOS:FILE_TYPES") message;
 

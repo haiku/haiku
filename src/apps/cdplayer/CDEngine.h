@@ -98,13 +98,18 @@ public:
 		:	PeriodicWatcher(message)
 		{}
 
-	void GetTime(int32 &minutes, int32 &seconds) const;
+	void GetDiscTime(int32 &minutes, int32 &seconds) const;
+	void GetTrackTime(int32 &minutes, int32 &seconds) const;
 
 private:
 	bool UpdateState();
-	bool CurrentState(int32 minutes, int32 seconds);
-	int32 oldMinutes;
-	int32 oldSeconds;
+	bool CurrentState(int32 dmin, int32 dsec, int32 tmin, int32 tsec);
+	
+	int32 fDiscMinutes;
+	int32 fDiscSeconds;
+	
+	int32 fTrackMinutes;
+	int32 fTrackSeconds;
 };
 
 class CDContentWatcher : public PeriodicWatcher {
@@ -119,24 +124,24 @@ private:
 
 	CDDBQuery cddbQuery;
 	int32 discID;
-	bool wasReady;
+	bool fReady;
 };
 
 class VolumeState : public PeriodicWatcher {
-	// this watcher sends notices to observers that are interrested
+	// this watcher sends notices to observers that are interested
 	// about changes in the current volume
 	// currently not used yet
 public:
-	VolumeState(int devicefd)
-		:	PeriodicWatcher(devicefd)
-		{ }
+	VolumeState(int devicefd);
 	VolumeState(BMessage *message)
 		:	PeriodicWatcher(message)
 		{}
-
-	bool UpdateState() { return true; }
-	virtual void DoPulse() {}
+	bool UpdateState();
 	int32 GetVolume() const;
+
+private:
+	int32 fVolume;
+	
 };
 
 class CDEngine : public BHandler {
@@ -168,6 +173,7 @@ public:
 	void StopSkipping();
 	void SelectTrack(int32);
 	
+	void SetVolume(uint8 value);
 
 	TrackState *TrackStateWatcher()
 		{ return &trackState; }
@@ -186,6 +192,11 @@ public:
 
 	CDContentWatcher *ContentWatcher()
 		{ return &contentWatcher; }
+	
+	VolumeState *VolumeStateWatcher()
+		// to find the current location on the CD, you may call the GetVolume function
+		// VolumeState defines
+		{ return &volumeState; }
 
 	static int FindCDPlayerDevice();
 	

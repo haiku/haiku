@@ -24,6 +24,9 @@
 #include "CDButton.h"
 #include "DrawButton.h"
 #include <TranslationUtils.h>
+#include <TranslatorFormats.h>
+#include <TranslatorRoster.h>
+#include <BitmapStream.h>
 
 enum
 {
@@ -42,9 +45,15 @@ enum
 };
 
 CDButton::CDButton(BRect frame, const char *name, uint32 resizeMask, uint32 flags)
-	:	BView(frame, name, resizeMask, flags)
+	:	BView(frame, name, resizeMask, flags | B_FRAME_EVENTS)
 {
+	// This will eventually one of a few preferences - to stop playing music
+	// when the app is closed
+	fStopOnQuit = false;
+	
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	
+	// TODO: Support multiple CD drives
 	engine = new CDEngine(CDEngine::FindCDPlayerDevice());
 	
 	BuildGUI();
@@ -65,34 +74,69 @@ CDButton::CDButton(BRect frame, const char *name, uint32 resizeMask, uint32 flag
 
 CDButton::~CDButton()
 {
+	if(fStopOnQuit)
+		engine->Stop();
+	
 	delete engine;
 }
 
 void CDButton::BuildGUI(void)
 {
-	fCDTitle = new BTextControl( BRect(5,5,230,30), "CDTitle","","",new BMessage(M_SET_CD_TITLE));
-	AddChild(fCDTitle);
-	fCDTitle->SetDivider(0);
-	fCDTitle->TextView()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	BRect r(5,5,230,25);
 	
-	BBox *box = new BBox(BRect(0,0,75,20),"TrackBox");
-	box->MoveTo(fCDTitle->Frame().right + 15, 5);
-	AddChild(box);
+	// Assemble the CD Title box
+	fCDBox = new BBox(r,"TrackBox");
+	AddChild(fCDBox);
 	
-	BView *view = new BView( box->Bounds().InsetByCopy(2,2), "view",B_FOLLOW_NONE,B_WILL_DRAW);
-	view->SetViewColor(0,0,0);
-	box->AddChild(view);
+	BView *view = new BView( fCDBox->Bounds().InsetByCopy(2,2), "view",B_FOLLOW_ALL,B_WILL_DRAW);
+	view->SetViewColor(20,20,20);
+	fCDBox->AddChild(view);
 	
-	fTrackNumber = new BStringView( view->Bounds(),"TrackNumber","Track: --");
-	view->AddChild(fTrackNumber);
-	fTrackNumber->SetAlignment(B_ALIGN_CENTER);
-	fTrackNumber->SetHighColor(0,255,0);
-	fTrackNumber->SetFont(be_bold_font);
+	fCDTitle = new BStringView(view->Bounds(),"CDTitle","");
+	view->AddChild(fCDTitle);
+	fCDTitle->SetHighColor(200,200,200);
+	fCDTitle->SetFont(be_bold_font);
 	
-	fVolume = new BSlider( BRect(0,0,75,30), "VolumeSlider", "Volume", new BMessage(M_SET_VOLUME),0,100);
+	r.Set(fCDTitle->Frame().right + 15,5,Bounds().right - 5,25);
+	fTrackBox = new BBox(r,"TrackBox",B_FOLLOW_TOP);
+	AddChild(fTrackBox);
+
+	view = new BView( fTrackBox->Bounds().InsetByCopy(2,2), "view",B_FOLLOW_ALL,B_WILL_DRAW);
+	view->SetViewColor(0,34,7);
+	fTrackBox->AddChild(view);
+	
+	fCurrentTrack = new BStringView( view->Bounds(),"TrackNumber","Track:",B_FOLLOW_ALL);
+	view->AddChild(fCurrentTrack);
+	fCurrentTrack->SetHighColor(40,230,40);
+	fCurrentTrack->SetFont(be_bold_font);
+	
+	r.OffsetBy(0, r.Height() + 5);
+	fTimeBox = new BBox(r,"TimeBox",B_FOLLOW_LEFT_RIGHT);
+	AddChild(fTimeBox);
+
+	view = new BView( fTimeBox->Bounds().InsetByCopy(2,2), "view",B_FOLLOW_ALL,B_WILL_DRAW);
+	view->SetViewColor(0,7,34);
+	fTimeBox->AddChild(view);
+	
+	r = view->Bounds();
+	r.right /= 2;
+	
+	fTrackTime = new BStringView(r,"TrackTime","Track --:-- / --:--",B_FOLLOW_LEFT_RIGHT);
+	view->AddChild(fTrackTime);
+	fTrackTime->SetHighColor(120,120,255);
+	fTrackTime->SetFont(be_bold_font);
+	
+	r.right = view->Bounds().right;
+	r.left = fTrackTime->Frame().right + 1;
+	
+	fDiscTime = new BStringView(r,"DiscTime","Disc --:-- / --:--",B_FOLLOW_RIGHT);
+	view->AddChild(fDiscTime);
+	fDiscTime->SetHighColor(120,120,255);
+	fDiscTime->SetFont(be_bold_font);
+	
+	fVolume = new BSlider( BRect(0,0,75,30), "VolumeSlider", "Volume", new BMessage(M_SET_VOLUME),0,255);
 	fVolume->MoveTo(5, Bounds().bottom - 10 - fVolume->Frame().Height());
 	AddChild(fVolume);
-	fVolume->SetEnabled(false);
 	
 	fStop = new DrawButton( BRect(0,0,1,1), "Stop", BTranslationUtils::GetBitmap('PNG ',"stop_up"),
 							BTranslationUtils::GetBitmap('PNG ',"stop_down"), new BMessage(M_STOP), 
@@ -154,7 +198,7 @@ void CDButton::BuildGUI(void)
 	
 	fSave = new DrawButton( BRect(0,0,1,1), "Save", BTranslationUtils::GetBitmap('PNG ',"save_up"),
 							BTranslationUtils::GetBitmap('PNG ',"save_down"), new BMessage(M_SAVE), 
-							B_FOLLOW_BOTTOM, B_WILL_DRAW);
+							B_FOLLOW_NONE, B_WILL_DRAW);
 	fSave->ResizeToPreferred();
 	fSave->MoveTo(fEject->Frame().right + 20, Bounds().bottom - 5 - fSave->Frame().Height());
 	fSave->SetDisabled(BTranslationUtils::GetBitmap('PNG ',"save_disabled"));
@@ -164,7 +208,7 @@ void CDButton::BuildGUI(void)
 	// TODO: Shuffle and Repeat are special buttons. Implement as two-state buttons
 	fShuffle = new DrawButton( BRect(0,0,1,1), "Shuffle", BTranslationUtils::GetBitmap('PNG ',"shuffle_up"),
 							BTranslationUtils::GetBitmap('PNG ',"shuffle_down"), new BMessage(M_SHUFFLE), 
-							B_FOLLOW_BOTTOM, B_WILL_DRAW);
+							B_FOLLOW_NONE, B_WILL_DRAW);
 	fShuffle->ResizeToPreferred();
 	fShuffle->MoveTo(fSave->Frame().right + 2, Bounds().bottom - 5 - fShuffle->Frame().Height());
 	fShuffle->SetDisabled(BTranslationUtils::GetBitmap('PNG ',"shuffle_disabled"));
@@ -173,7 +217,7 @@ void CDButton::BuildGUI(void)
 	
 	fRepeat = new DrawButton( BRect(0,0,1,1), "Repeat", BTranslationUtils::GetBitmap('PNG ',"repeat_up"),
 							BTranslationUtils::GetBitmap('PNG ',"repeat_down"), new BMessage(M_REPEAT), 
-							B_FOLLOW_BOTTOM, B_WILL_DRAW);
+							B_FOLLOW_NONE, B_WILL_DRAW);
 	fRepeat->ResizeToPreferred();
 	fRepeat->MoveTo(fShuffle->Frame().right + 2, Bounds().bottom - 5 - fRepeat->Frame().Height());
 	fRepeat->SetDisabled(BTranslationUtils::GetBitmap('PNG ',"repeat_disabled"));
@@ -183,13 +227,72 @@ void CDButton::BuildGUI(void)
 
 
 void
-CDButton::MessageReceived(BMessage *message)
+CDButton::MessageReceived(BMessage *msg)
 {
-	switch (message->what) 
+	if(msg->WasDropped())
+	{
+		// We'll handle two types of drops: those from Tracker and those from ShowImage
+		if(msg->what==B_SIMPLE_DATA)
+		{
+			int32 actions;
+			if(msg->FindInt32("be:actions",&actions)==B_OK)
+			{
+				// ShowImage drop. This is a negotiated drag&drop, so send a reply
+				BMessage reply(B_COPY_TARGET), response;
+				reply.AddString("be:types","image/jpeg");
+				reply.AddString("be:types","image/png");
+				
+				msg->SendReply(&reply,&response);
+				
+				// now, we've gotten the response
+				if(response.what==B_MIME_DATA)
+				{
+					// Obtain and translate the received data
+					uint8 *imagedata;
+					ssize_t datasize;
+										
+					// Try JPEG first
+					if(response.FindData("image/jpeg",B_MIME_DATA,(const void **)&imagedata,&datasize)!=B_OK)
+					{
+						// Try PNG next and piddle out if unsuccessful
+						if(response.FindData("image/png",B_PNG_FORMAT,(const void **)&imagedata,&datasize)!=B_OK)
+							return;
+					}
+					
+					// Set up to decode into memory
+					BMemoryIO memio(imagedata,datasize);
+					BTranslatorRoster *roster=BTranslatorRoster::Default();
+					BBitmapStream bstream;
+					
+					if(roster->Translate(&memio,NULL,NULL,&bstream, B_TRANSLATOR_BITMAP)==B_OK)
+					{
+						BBitmap *bmp;
+						if(bstream.DetachBitmap(&bmp)!=B_OK)
+							return;
+						
+						SetBitmap(bmp);
+					}
+				}
+				return;
+			}
+			
+			entry_ref ref;
+			if(msg->FindRef("refs",&ref)==B_OK)
+			{
+				// Tracker drop
+				BBitmap *bmp=BTranslationUtils::GetBitmap(&ref);
+				SetBitmap(bmp);
+			}
+		}
+		return;
+	}
+	
+	switch (msg->what) 
 	{
 		case M_SET_VOLUME:
 		{
 			// TODO: Implement
+			engine->SetVolume(fVolume->Value());
 			break;
 		}
 		case M_STOP:
@@ -245,10 +348,10 @@ CDButton::MessageReceived(BMessage *message)
 		default:
 		{
 			
-			if (!Observer::HandleObservingMessages(message))
+			if (!Observer::HandleObservingMessages(msg))
 			{
 				// just support observing messages
-				BView::MessageReceived(message);
+				BView::MessageReceived(msg);
 				break;		
 			}
 		}
@@ -258,17 +361,17 @@ CDButton::MessageReceived(BMessage *message)
 void
 CDButton::NoticeChange(Notifier *notifier)
 {
-//	debugger("");
-	
 	PlayState *ps;
 	TrackState *trs;
 	TimeState *tms;
 	CDContentWatcher *ccw;
+	VolumeState *vs;
 	
 	ps = dynamic_cast<PlayState *>(notifier);
 	trs = dynamic_cast<TrackState *>(notifier);
 	tms = dynamic_cast<TimeState *>(notifier);
 	ccw = dynamic_cast<CDContentWatcher *>(notifier);
+	vs = dynamic_cast<VolumeState *>(notifier);
 	
 	if(ps)
 	{
@@ -286,6 +389,10 @@ CDButton::NoticeChange(Notifier *notifier)
 					fRewind->SetEnabled(false);
 					fSave->SetEnabled(false);
 				}
+				fCurrentTrack->SetText("Track: ");
+				fTrackTime->SetText("Track --:-- / --:--");
+				fDiscTime->SetText("Disc --:-- / --:--");
+				printf("Notification: No CD\n");
 				break;
 			}
 			case kStopped:
@@ -300,6 +407,10 @@ CDButton::NoticeChange(Notifier *notifier)
 					fRewind->SetEnabled(true);
 					fSave->SetEnabled(true);
 				}
+				fCurrentTrack->SetText("Track: ");
+				fTrackTime->SetText("Track --:-- / --:--");
+				fDiscTime->SetText("Disc --:-- / --:--");
+				printf("Notification: CD Stopped\n");
 				break;
 			}
 			case kPaused:
@@ -315,7 +426,7 @@ CDButton::NoticeChange(Notifier *notifier)
 					fRewind->SetEnabled(true);
 					fSave->SetEnabled(true);
 				}
-				UpdateTrackInfo();
+				printf("Notification: CD Paused\n");
 				break;
 			}
 			case kPlaying:
@@ -330,7 +441,7 @@ CDButton::NoticeChange(Notifier *notifier)
 					fRewind->SetEnabled(true);
 					fSave->SetEnabled(true);
 				}
-				UpdateTrackInfo();
+				printf("Notification: CD Playing\n");
 				break;
 			}
 			case kSkipping:
@@ -345,6 +456,7 @@ CDButton::NoticeChange(Notifier *notifier)
 					fRewind->SetEnabled(true);
 					fSave->SetEnabled(true);
 				}
+				printf("Notification: CD Skipping\n");
 				break;
 			}
 			default:
@@ -356,34 +468,69 @@ CDButton::NoticeChange(Notifier *notifier)
 	else
 	if(trs)
 	{
-		UpdateTrackInfo();
+		UpdateCDInfo();
+		
 		// TODO: Update track count indicator
 	}
 	else
 	if(tms)
 	{
+		UpdateTimeInfo();
 	}
 	else
 	if(ccw)
 	{
+		UpdateCDInfo();
+	}
+	else
+	if(vs)
+	{
+		fVolume->SetValue(engine->VolumeStateWatcher()->GetVolume());
 	}
 }
 
 void
-CDButton::UpdateTrackInfo(void)
+CDButton::UpdateCDInfo(void)
 {
-
-	fCurrentTrack=engine->TrackStateWatcher()->GetTrack();
-	fTrackCount=engine->TrackStateWatcher()->GetNumTracks();
+	BString CDName, currentTrackName;
+	vector<BString> trackNames;
 	
-	if(fCurrentTrack < 1)
+	int32 currentTrack = engine->TrackStateWatcher()->GetTrack();
+	engine->ContentWatcher()->GetContent(&CDName,&trackNames);
+	
+	fCDTitle->SetText(CDName.String());
+	
+	if(currentTrack > 0)
 	{
-		char string[255];
-		sprintf(string,"Track: %ld",fCurrentTrack);
-		fTrackNumber->SetText(string);
+		currentTrackName << "Track " << currentTrack << ": " << trackNames[ currentTrack - 1];
+		fCurrentTrack->SetText(currentTrackName.String());
 	}
 	else
-		fTrackNumber->SetText("Track: --");
+	{
+		fCurrentTrack->SetText("Track:");
+	}
+	
+}
+
+void
+CDButton::UpdateTimeInfo(void)
+{
+	int32 min,sec;
+	char string[1024];
+	
+	engine->TimeStateWatcher()->GetDiscTime(min,sec);
+	if(min >= 0)
+		sprintf(string,"Disc %ld:%.2ld / --:--",min,sec);
+	else
+		sprintf(string,"Disc --:-- / --:--");
+	fDiscTime->SetText(string);
+	
+	engine->TimeStateWatcher()->GetTrackTime(min,sec);
+	if(min >= 0)
+		sprintf(string,"Track %ld:%.2ld / --:--",min,sec);
+	else
+		sprintf(string,"Track --:-- / --:--");
+	fTrackTime->SetText(string);
 }
 
 void 
@@ -393,6 +540,9 @@ CDButton::AttachedToWindow()
 	engine->AttachedToLooper(Window());
 	StartObserving(engine->TrackStateWatcher());
 	StartObserving(engine->PlayStateWatcher());
+	StartObserving(engine->ContentWatcher());
+	StartObserving(engine->TimeStateWatcher());
+	StartObserving(engine->VolumeStateWatcher());
 	
 	fVolume->SetTarget(this);
 	fStop->SetTarget(this);
@@ -407,10 +557,50 @@ CDButton::AttachedToWindow()
 	fRepeat->SetTarget(this);
 }
 
+void
+CDButton::FrameResized(float new_width, float new_height)
+{
+	// We implement this method because there is no resizing mode to split the window's
+	// width into two and have a box fill each half
+	
+	// The boxes are laid out with 5 pixels between the window edge and each box.
+	// Additionally, 15 pixels of padding are between the two boxes themselves
+	
+	float half = (new_width / 2);
+	
+	fCDBox->ResizeTo( half - 7, fCDBox->Bounds().Height() );
+	
+	fTrackBox->MoveTo(half + 8, fTrackBox->Frame().top);
+	fTrackBox->ResizeTo( Bounds().right - (half + 8) - 5, fTrackBox->Bounds().Height() );
+
+	fTimeBox->MoveTo(half + 8, fTimeBox->Frame().top);
+	fTimeBox->ResizeTo( Bounds().right - (half + 8) - 5, fTimeBox->Bounds().Height() );
+	
+	fRepeat->MoveTo(new_width - fRepeat->Bounds().right - 5, fRepeat->Frame().top);
+	
+	fShuffle->MoveTo(fRepeat->Frame().left - fShuffle->Bounds().Width() - 2, fShuffle->Frame().top);
+	fSave->MoveTo(fShuffle->Frame().left - fSave->Bounds().Width() - 2, fSave->Frame().top);
+}
+
 void 
 CDButton::Pulse()
 {
 	engine->DoPulse();
+}
+
+void
+CDButton::SetBitmap(BBitmap *bitmap)
+{
+	if(!bitmap)
+	{
+		ClearViewBitmap();
+		return;
+	}
+	
+	SetViewBitmap(bitmap);
+	fVolume->SetViewBitmap(bitmap);
+	fVolume->Invalidate();
+	Invalidate();
 }
 
 class CDButtonWindow : public BWindow
@@ -421,8 +611,14 @@ public:
 };
 
 CDButtonWindow::CDButtonWindow(void)
- : BWindow(BRect (100, 100, 610, 400), "CD Player", B_TITLED_WINDOW, 0)
+ : BWindow(BRect (100, 100, 610, 200), "CD Player", B_TITLED_WINDOW, B_NOT_V_RESIZABLE)
 {
+	float wmin,wmax,hmin,hmax;
+	
+	GetSizeLimits(&wmin,&wmax,&hmin,&hmax);
+	wmin=510;
+	hmin=100;
+	SetSizeLimits(wmin,wmax,hmin,hmax);
 }
 
 bool CDButtonWindow::QuitRequested(void)
@@ -431,16 +627,23 @@ bool CDButtonWindow::QuitRequested(void)
 	return true;
 }
 
-CDButtonApplication::CDButtonApplication()
-	:	BApplication("application/x-vnd.Be-CDPlayer")
-{
-	BWindow *window = new CDButtonWindow();
-	
-	BView *button = new CDButton(window->Bounds(), "CD");
-	window->AddChild(button);
-	window->Show();
-}
+CDButtonWindow *cdbwin;
+CDButton *cdbutton;
 
+CDButtonApplication::CDButtonApplication()
+	:	BApplication("application/x-vnd.Haiku-CDPlayer")
+{
+//	BWindow *window = new CDButtonWindow();
+	
+//	BView *button = new CDButton(window->Bounds(), "CD");
+///	window->AddChild(button);
+//	window->Show();
+	cdbwin = new CDButtonWindow();
+
+	cdbutton = new CDButton(cdbwin->Bounds(), "CD");
+	cdbwin->AddChild(cdbutton);
+	cdbwin->Show();
+}
 
 int
 main(int, char **argv)
