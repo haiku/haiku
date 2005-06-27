@@ -695,7 +695,8 @@ BHandler::StopWatchingAll(BMessenger messenger)
 status_t
 BHandler::StartWatching(BHandler *handler, uint32 what)
 {
-	fObserverList ? fObserverList : fObserverList = new _ObserverList;
+	if (fObserverList == NULL)
+		fObserverList = new _ObserverList;
 	return fObserverList->StartObserving(handler, what);
 }
 
@@ -703,8 +704,7 @@ BHandler::StartWatching(BHandler *handler, uint32 what)
 status_t
 BHandler::StartWatchingAll(BHandler *handler)
 {
-	fObserverList ? fObserverList : fObserverList = new _ObserverList;
-	return fObserverList->StartObserving(handler, B_OBSERVER_OBSERVE_ALL);
+	return StartWatching(handler, B_OBSERVER_OBSERVE_ALL);
 }
 
 
@@ -734,8 +734,8 @@ BHandler::Perform(perform_code d, void *arg)
 void
 BHandler::SendNotices(uint32 what, const BMessage *msg)
 {
-	fObserverList ? fObserverList : fObserverList = new _ObserverList;
-	fObserverList->SendNotices(what, msg);
+	if (fObserverList != NULL)
+		fObserverList->SendNotices(what, msg);
 }
 
 
@@ -825,24 +825,22 @@ _ObserverList::SendNotices(unsigned long what, BMessage const *message)
 	}
 
 	vector<BMessenger> &messengers = fMessengerMap[what];
-	for (uint32 i = 0; i < messengers.size(); ++i) {
+	for (uint32 i = 0; i < messengers.size(); ++i)
 		messengers[i].SendMessage(copyMsg);
-	}
 
 	// We have to send the message also to the handlers
 	// and messengers which were subscribed to ALL events,
 	// since they aren't caught by the above loops.
 	// TODO: cleanup
-	handlers = fHandlerMap[B_OBSERVER_OBSERVE_ALL];
-	for (uint32 i = 0; i < handlers.size(); ++i) {
-		BMessenger msgr(handlers[i]);
+	vector<BHandler *> &handlersAll = fHandlerMap[B_OBSERVER_OBSERVE_ALL];
+	for (uint32 i = 0; i < handlersAll.size(); ++i) {
+		BMessenger msgr(handlersAll[i]);
 		msgr.SendMessage(copyMsg);
 	}
-
-	messengers = fMessengerMap[B_OBSERVER_OBSERVE_ALL];
-	for (uint32 i = 0; i < messengers.size(); ++i) {
+	
+	vector<BMessenger> &messengersAll = fMessengerMap[B_OBSERVER_OBSERVE_ALL];
+	for (uint32 i = 0; i < messengersAll.size(); ++i)
 		messengers[i].SendMessage(copyMsg);
-	}
 	
 	// Gotta make sure to clean up the annoying temporary ...
 	delete copyMsg;
