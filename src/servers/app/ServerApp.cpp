@@ -443,6 +443,12 @@ ServerApp::_MessageLooper()
 				if (receiver.ReadString(&title) != B_OK)
 					break;
 
+				if (!frame.IsValid()) {
+					// make sure we pass a valid rectangle to ServerWindow
+					frame.right = frame.left + 1;
+					frame.bottom = frame.top + 1;
+				}
+
 				// ServerWindow constructor will reply with port_id of a newly created port
 				ServerWindow *window = new ServerWindow(title, this, clientReplyPort,
 					looperPort, token, frame, look, feel, flags, workspaces);

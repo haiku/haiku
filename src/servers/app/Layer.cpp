@@ -126,7 +126,7 @@ char helper[1024];
 sprintf(helper, "Layer::Layer(BRect(%.1f, %.1f, %.1f, %.1f), name: %s, token: %ld) - frame is invalid\n",
 		frame.left, frame.top, frame.right, frame.bottom, name, token);
 CRITICAL(helper);
-		fFrame.Set(0, 0, 10, 10);
+		fFrame.Set(0, 0, 1, 1);
 	}
 
 	if (!fDriver)
@@ -1040,7 +1040,7 @@ void
 Layer::ResizeBy(float x, float y)
 {
 	STRACE(("Layer(%s)::ResizeBy() START\n", Name()));
-	
+
 	if (!fParent) {
 		printf("ERROR: in Layer::ResizeBy()! - No parent!\n");
 		return;

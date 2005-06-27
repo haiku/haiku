@@ -58,8 +58,11 @@ DefaultDecorator::DefaultDecorator(BRect rect, int32 wlook, int32 wfeel, int32 w
 	// Do initial decorator setup
 	_DoLayout();
 
+	// ToDo: if the decorator was created with a frame too small, it should resize itself!
+
 	STRACE(("DefaultDecorator:\n"));
-	STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom));
+	STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",
+		rect.left, rect.top, rect.right, rect.bottom));
 }
 
 DefaultDecorator::~DefaultDecorator(void)

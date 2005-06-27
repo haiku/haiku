@@ -57,7 +57,7 @@
 #	define STRACE_CLICK(x) ;
 #endif
 
-WinBorder::WinBorder(const BRect &r,
+WinBorder::WinBorder(const BRect &frame,
 					 const char *name,
 					 const uint32 wlook,
 					 const uint32 wfeel,
@@ -65,7 +65,7 @@ WinBorder::WinBorder(const BRect &r,
 					 const uint32 wwksindex,
 					 ServerWindow *win,
 					 DisplayDriver *driver)
-	: Layer(r, name, B_NULL_TOKEN, B_FOLLOW_NONE, 0UL, driver),
+	: Layer(frame, name, B_NULL_TOKEN, B_FOLLOW_NONE, 0UL, driver),
 	  fDecorator(NULL),
 	  fTopLayer(NULL),
 
@@ -116,10 +116,29 @@ WinBorder::WinBorder(const BRect &r,
 	QuietlySetFeel(wfeel);
 
 	if (fFeel != B_NO_BORDER_WINDOW_LOOK) {
-		fDecorator = gDecorManager.AllocateDecorator(r, name, fLook, fFeel, 
+		// ToDo: these should probably restricted by the decorator only, but
+		// the code there doesn't look too robust to me currently
+		fMinWidth = 20;
+		fMinHeight = 20;
+	}
+
+	if (fFrame.Width() < fMinWidth)
+		fFrame.right = fFrame.left + fMinWidth;
+	if (fFrame.Height() < fMinHeight)
+		fFrame.bottom = fFrame.top + fMinHeight;
+
+	if (fFeel != B_NO_BORDER_WINDOW_LOOK) {
+		fDecorator = gDecorManager.AllocateDecorator(frame, name, fLook, fFeel, 
 													fWindowFlags, fDriver);
-		if (fDecorator)
+		if (fDecorator) {
 			fDecorator->GetSizeLimits(&fMinWidth, &fMinHeight, &fMaxWidth, &fMaxHeight);
+
+			// we need to change our size to let the decorator fit
+			if (fMinWidth > fFrame.Width())
+				fFrame.right = fFrame.left + fMinWidth;
+			if (fMinHeight > fFrame.Height())
+				fFrame.bottom = fFrame.top + fMinHeight;
+		}
 	}
 
 #ifndef NEW_CLIPPING
@@ -130,7 +149,7 @@ WinBorder::WinBorder(const BRect &r,
 
 	STRACE(("WinBorder %s:\n", GetName()));
 	STRACE(("\tFrame: (%.1f, %.1f, %.1f, %.1f)\n", r.left, r.top, r.right, r.bottom));
-	STRACE(("\tWindow %s\n",win ? win->Title() : "NULL"));
+	STRACE(("\tWindow %s\n", win ? win->Title() : "NULL"));
 }
 
 WinBorder::~WinBorder()
