@@ -1442,7 +1442,7 @@ BWindow::SetTitle(const char *title)
 	if (title == NULL)
 		title = "";
 
-	// we will change BWindow's thread name to "w>window_title"	
+	// we will change BWindow's thread name to "w>window title"	
 
 	char threadName[B_OS_NAME_LENGTH];
 	strcpy(threadName, "w>");
@@ -1451,13 +1451,15 @@ BWindow::SetTitle(const char *title)
 #else
 	int32 length = strlen(title);
 	length = min_c(length, B_OS_NAME_LENGTH - 3);
-	threadName[B_OS_NAME_LENGTH-1] = '\0';
+	memcpy(threadName + 2, title, length);
+	threadName[length] = '\0';
 #endif
 
+	SetName(threadName);
+
 	// if the message loop has been started...
-	if (Thread() != B_ERROR )
-	{
-		SetName(threadName);
+
+	if (Thread() >= B_OK) {
 		rename_thread(Thread(), threadName);
 
 		// we notify the app_server so we can actually see the change
@@ -1466,8 +1468,7 @@ BWindow::SetTitle(const char *title)
 		fLink->AttachString(title);
 		fLink->Flush();
 		Unlock();
-	} else
-		SetName(threadName);
+	}
 }
 
 
@@ -2050,10 +2051,9 @@ BWindow::InitData(BRect frame, const char* title, window_look look,
 
 	// TODO: other initializations!
 
-	// Here, we will contact app_server and let him know that a window has
-	// been created
-	
-	port_id receivePort = create_port( B_LOOPER_PORT_DEFAULT_CAPACITY ,"w_rcv_port");
+	// Create the server-side window
+
+	port_id receivePort = create_port(B_LOOPER_PORT_DEFAULT_CAPACITY, "w_rcv_port");
 	if (receivePort < B_OK) {
 		debugger("Could not create BWindow's receive port, used for interacting with the app_server!");
 		delete this;
@@ -2097,7 +2097,6 @@ BWindow::InitData(BRect frame, const char* title, window_look look,
 		be_app->Unlock();
 
 	STRACE(("Server says that our send port is %ld\n", sendPort));
-
 	STRACE(("Window locked?: %s\n", IsLocked() ? "True" : "False"));
 
 	// build and register top_view with app_server
