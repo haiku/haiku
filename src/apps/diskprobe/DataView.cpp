@@ -1272,10 +1272,8 @@ DataView::KeyDown(const char *bytes, int32 numBytes)
 void
 DataView::SetFont(const BFont *font, uint32 properties)
 {
-#if 0
 	if (!font->IsFixed())
 		return;
-#endif
 
 	BView::SetFont(font, properties);
 
