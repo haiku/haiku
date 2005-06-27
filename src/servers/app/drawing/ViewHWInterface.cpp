@@ -26,7 +26,7 @@
 
 #include "fake_input_server.h"
 
-#include "BitmapBuffer.h"
+#include "BBitmapBuffer.h"
 #include "PortLink.h"
 #include "ServerConfig.h"
 #include "ServerCursor.h"
@@ -472,7 +472,7 @@ ViewHWInterface::SetMode(const display_mode &mode)
 			doubleBuffered = true;
 
 		BBitmap* frontBitmap = new BBitmap(frame, 0, (color_space)fDisplayMode.space);
-		fFrontBuffer = new BitmapBuffer(frontBitmap);
+		fFrontBuffer = new BBitmapBuffer(frontBitmap);
 
 		status_t err = fFrontBuffer->InitCheck();
 		if (err < B_OK) {
@@ -486,7 +486,7 @@ ViewHWInterface::SetMode(const display_mode &mode)
 			// since we override IsDoubleBuffered(), the drawing buffer
 			// is in effect also always B_RGBA32.
 			BBitmap* backBitmap = new BBitmap(frame, 0, B_RGBA32);
-			fBackBuffer = new BitmapBuffer(backBitmap);
+			fBackBuffer = new BBitmapBuffer(backBitmap);
 	
 			err = fBackBuffer->InitCheck();
 			if (err < B_OK) {

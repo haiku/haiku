@@ -24,6 +24,7 @@ if ( $(TARGET_PLATFORM) = haiku ) {
 	VIEW_DRIVER_SOURCES =
 		AccelerantBuffer.cpp
 		AccelerantHWInterface.cpp
+		BitmapBuffer.cpp
 		DisplayDriverPainter.cpp
 		HWInterface.cpp
 		MallocBuffer.cpp
@@ -32,6 +33,7 @@ if ( $(TARGET_PLATFORM) = haiku ) {
 } else {
 	VIEW_DRIVER_SOURCES =
 		fake_input_server.cpp
+		BBitmapBuffer.cpp
 		BitmapBuffer.cpp
 		AccelerantBuffer.cpp
 		AccelerantHWInterface.cpp

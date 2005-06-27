@@ -15,7 +15,7 @@
 #include "HWInterface.h"
 
 class BBitmap;
-class BitmapBuffer;
+class BBitmapBuffer;
 class CardWindow;
 class UpdateQueue;
 
@@ -57,8 +57,8 @@ class ViewHWInterface : public HWInterface {
 	virtual	status_t			Invalidate(const BRect& frame);
 
  private:
-			BitmapBuffer*		fBackBuffer;
-			BitmapBuffer*		fFrontBuffer;
+			BBitmapBuffer*		fBackBuffer;
+			BBitmapBuffer*		fFrontBuffer;
 
 			CardWindow*			fWindow;
 
