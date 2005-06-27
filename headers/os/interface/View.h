@@ -585,7 +585,6 @@ private:
 
 			void		deleteView( BView* aView);
 			bool		do_owner_check_no_pick() const;
-			BView*		findView( const BView* aView, const char* viewName ) const;
 			bool		attachView( BView *aView );
 			bool		addToList( BView *aView, BView *before = NULL);
 			bool		removeFromList();

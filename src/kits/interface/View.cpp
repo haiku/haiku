@@ -3172,7 +3172,22 @@ BView::Parent() const
 BView *
 BView::FindView(const char *name) const
 {
-	return findView(this, name);
+	if (name == NULL)
+		return NULL;
+
+	if (Name() != NULL && !strcmp(Name(), name))
+		return const_cast<BView *>(this);
+
+	BView *child = first_child;
+	while (child != NULL) {
+		BView *view = child->FindView(name);
+		if (view != NULL)
+			return view;
+
+		child = child->next_sibling; 
+	}
+
+	return NULL;
 }
 
 
@@ -3796,25 +3811,6 @@ BView::deleteView(BView* view)
 	}
 
 	delete view;
-}
-
-
-BView *
-BView::findView(const BView *view, const char *viewName) const
-{
-	if (!strcmp(viewName, view->Name()))
-		return const_cast<BView *>(view);
-
-	BView *child = view->first_child;
-	while (child != NULL) {
-		BView *view;
-		if ((view = findView(child, viewName)) != NULL)
-			return view;
-
-		child = child->next_sibling; 
-	}
-
-	return NULL;
 }
 
 
