@@ -31,7 +31,7 @@
 #define MOVE_INFO_VIEW 'mviv'
 
 
-const char *UptimeToString(void);
+static const char *UptimeToString(char string[], size_t size);
 
 
 class AboutApp : public BApplication {
@@ -235,7 +235,9 @@ AboutView::AboutView(const BRect &r)
 
 	fUptimeView = new BStringView(r, "uptimetext", "");
 	fInfoView->AddChild(fUptimeView);
-	fUptimeView->SetText(UptimeToString());
+	
+	char uptimeString[255];
+	fUptimeView->SetText(UptimeToString(uptimeString, 255));
 
 	// Begin construction of the credits view
 	r = Bounds();
@@ -442,7 +444,8 @@ AboutView::Draw(BRect update)
 void
 AboutView::Pulse(void)
 {
-	fUptimeView->SetText(UptimeToString());
+	char uptime[255];
+	fUptimeView->SetText(UptimeToString(uptime, 255));
 }
 
 
@@ -463,10 +466,9 @@ AboutView::MessageReceived(BMessage *msg)
 //	#pragma mark -
 
 
-const char *
-UptimeToString(void)
+static const char *
+UptimeToString(char string[], size_t size)
 {
-	char string[255];
 	int64 days, hours, minutes, seconds, remainder;
 	int64 systime = system_time();
 
@@ -481,7 +483,7 @@ UptimeToString(void)
 		remainder = remainder % 60000000;
 
 		seconds = remainder / 1000000;
-		sprintf(string, "%lld days, %lld hours, %lld minutes, %lld seconds",
+		snprintf(string, size, "%lld days, %lld hours, %lld minutes, %lld seconds",
 			days, hours, minutes, seconds);
 	} else if (systime > 3600000000LL) {
 		hours = systime / 3600000000LL;
@@ -491,17 +493,17 @@ UptimeToString(void)
 		remainder = remainder % 60000000;
 
 		seconds = remainder / 1000000;
-		sprintf(string, "%lld hours, %lld minutes, %lld seconds",
+		snprintf(string, size, "%lld hours, %lld minutes, %lld seconds",
 			hours, minutes, seconds);
 	} else if (systime > 60000000) {
 		minutes = systime / 60000000;
 		remainder = systime % 60000000;
 
 		seconds = remainder / 1000000;
-		sprintf(string, "%lld minutes, %lld seconds", minutes, seconds);
+		snprintf(string, size, "%lld minutes, %lld seconds", minutes, seconds);
 	} else {
 		seconds = systime / 1000000;
-		sprintf(string, "%lld seconds", seconds);
+		snprintf(string, size, "%lld seconds", seconds);
 	}
 
 	return string;
