@@ -11,3 +11,7 @@ App AboutHaiku :
 	: libbe.so libtranslation.so
 	: AboutHaiku.rdef
 	;
+
+if $(TARGET_PLATFORM) != r5 {
+	LinkSharedOSLibs AboutHaiku : libroot.so ;
+}
