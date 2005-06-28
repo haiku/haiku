@@ -137,8 +137,6 @@ BMenuBar::Draw(BRect updateRect)
 {
 	// TODO: implement additional border styles
 	if (IsEnabled()) {
-		// ToDo: this is a work-around for broken PushState()/PopState()
-//		PushState();
 		rgb_color color = HighColor();
 
 		BRect bounds(Bounds());
@@ -157,8 +155,8 @@ BMenuBar::Draw(BRect updateRect)
 		StrokeLine(BPoint(0.0f, bounds.bottom), BPoint(bounds.right, bounds.bottom));
 		StrokeLine(BPoint(bounds.right, 0.0f), BPoint(bounds.right, bounds.bottom));
 
-//		PopState();
 		SetHighColor(color);
+			// revert to previous used color (cheap PushState()/PopState())
 
 		DrawItems(updateRect);
 	} else {
