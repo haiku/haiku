@@ -42,7 +42,7 @@ static const bigtime_t kRosterSanityEventInterval = 1000000LL;
 		   error code.
 */
 Registrar::Registrar(status_t *error)
-		 : BApplication(kRegistrarSignature, error),
+		 : BServer(kRegistrarSignature, false, error),
 		   fRoster(NULL),
 		   fClipboardHandler(NULL),
 		   fMIMEManager(NULL),

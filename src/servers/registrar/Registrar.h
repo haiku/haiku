@@ -26,7 +26,7 @@
 #ifndef REGISTRAR_H
 #define REGISTRAR_H
 
-#include <Application.h>
+#include <Server.h>
 
 class ClipboardHandler;
 class DiskDeviceManager;
@@ -39,7 +39,7 @@ namespace BPrivate {
 	class TRoster;
 };
 
-class Registrar : public BApplication {
+class Registrar : public BServer {
 public:
 	Registrar(status_t *error);
 	virtual ~Registrar();
