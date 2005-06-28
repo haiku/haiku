@@ -132,15 +132,16 @@ class BShape;
 class BShelf;
 class BString;
 class BWindow;
-class ViewAttr;
-struct _view_attr_;
 struct _array_data_;
 struct _array_hdr_;
 struct overlay_restrictions;
 
-// BView class -----------------------------------------------------------------
-class BView : public BHandler {
+namespace BPrivate {
+	class ViewState;
+};
 
+
+class BView : public BHandler {
 public:
 							BView(BRect frame, const char* name,
 								  uint32 resizeMask, uint32 flags);
@@ -558,11 +559,9 @@ private:
 			void		DoShape(int32 gr, BShape* shape, pattern p);
 			void		DoPictureClip(BPicture* picture, BPoint where, bool invert,
 									  bool sync);
-			bool		removeFromList(BView* a_view);
-			bool		removeSelf();
+
 			bool		do_owner_check() const;
-			void		setOwner(BWindow* the_owner);
-			void		do_activate(int32 state);
+			void		_SetOwner(BWindow* newOwner);
 			void		check_lock() const;
 			void		check_lock_no_pick() const;
 			void		movesize(uint32 code, int32 h, int32 v);
@@ -570,42 +569,42 @@ private:
 			char		*test_area(int32 length);
 			void		removeCommArray();
 			_array_hdr_	*new_comm_array(int32 cnt);
-			BView		*RealParent() const;
 			void		SetScroller(BScrollBar* sb);
 			void		UnsetScroller(BScrollBar* sb);
 			void		RealScrollTo(BPoint);
-			void		initCachedState();
-			void		setCachedState();
-			void		updateCachedState();
-			void        setFontState(const BFont* font, uint16 mask);
 			void		fetch_font();
 			uchar		font_encoding() const;
 			BShelf*		shelf() const;
-			void		set_shelf(BShelf* );
+			void		set_shelf(BShelf* shelf);
+
+			void		_Activate(bool state);
+			void		_Pulse();
+
+			void		_UpdateStateForRemove();
+			void		_UpdatePattern(::pattern pattern);
 
 			void		deleteView( BView* aView);
 			bool		do_owner_check_no_pick() const;
 			bool		attachView( BView *aView );
-			bool		addToList( BView *aView, BView *before = NULL);
-			bool		removeFromList();
+			bool		_AddChildToList(BView* child, BView* before = NULL);
+			bool		_RemoveChildFromList(BView* child);
 			void		callAttachHooks( BView *aView );
 			void		callDetachHooks( BView *aView );
 
-				// Debugging methods
+			// Debugging methods
 			void 		PrintToStream();
 			void		PrintTree();
 
 			int32			server_token;
-			uint32			fFlags;			// used		// was: f_type
-			float			originX;		// used		// was: origin_h
-			float			originY;		// used		// was: origin_v
-			BWindow*		owner;			// used
-			BView*			parent;			// used
-			BView*			next_sibling;	// used
-			BView*			prev_sibling;	// used
-			BView*			first_child;	// used
+			uint32			fFlags;
+			BPoint			fParentOffset;
+			BWindow*		fOwner;
+			BView*			fParent;
+			BView*			fNextSibling;
+			BView*			fPreviousSibling;
+			BView*			fFirstChild;
 
-			int16 			fShowLevel;		// used
+			int16 			fShowLevel;
 			bool			top_level_view;	// used
 			bool			fNoISInteraction;
 			BPicture*		cpicture;		// used
@@ -617,50 +616,53 @@ private:
 			bool			_unused_bool0;				// was: attached;
 			bool			_unused_bool1;
 			bool			_unused_bool2;
-			ViewAttr*		fPermanentState;// used
-			ViewAttr*		fState;			// used
-			BRect			fBounds;		// used
-			BShelf*			fShelf;			// used
-			void*			pr_state;
-			uint32			fEventMask;		// used
-			uint32			fEventOptions;	// used
+			BPrivate::ViewState*	fPermanentState;	// not used
+			BPrivate::ViewState*	fState;
+			BRect			fBounds;
+			BShelf*			fShelf;
+			void*			pr_state;			// not used
+			uint32			fEventMask;
+			uint32			fEventOptions;
 			uint32			_reserved[4];
 #if !_PR3_COMPATIBLE_
 			uint32			_more_reserved[3];
 #endif
 };
-//------------------------------------------------------------------------------
 
 
 // inline definitions ----------------------------------------------------------
-inline void	BView::ScrollTo(float x, float y)
+
+inline void
+BView::ScrollTo(float x, float y)
 {
 	ScrollTo(BPoint(x, y));
 }
-//------------------------------------------------------------------------------
-inline void	BView::SetViewColor(uchar r, uchar g, uchar b, uchar a)
+
+inline void
+BView::SetViewColor(uchar r, uchar g, uchar b, uchar a)
 {
-	rgb_color	a_color;
-	a_color.red = r;		a_color.green = g;
-	a_color.blue = b;		a_color.alpha = a;
-	SetViewColor(a_color);
+	rgb_color color;
+	color.red = r;		color.green = g;
+	color.blue = b;		color.alpha = a;
+	SetViewColor(color);
 }
-//------------------------------------------------------------------------------
-inline void	BView::SetHighColor(uchar r, uchar g, uchar b, uchar a)
+
+inline void
+BView::SetHighColor(uchar r, uchar g, uchar b, uchar a)
 {
-	rgb_color	a_color;
-	a_color.red = r;		a_color.green = g;
-	a_color.blue = b;		a_color.alpha = a;
-	SetHighColor(a_color);
+	rgb_color color;
+	color.red = r;		color.green = g;
+	color.blue = b;		color.alpha = a;
+	SetHighColor(color);
 }
-//------------------------------------------------------------------------------
-inline void	BView::SetLowColor(uchar r, uchar g, uchar b, uchar a)
+
+inline void
+BView::SetLowColor(uchar r, uchar g, uchar b, uchar a)
 {
-	rgb_color	a_color;
-	a_color.red = r;		a_color.green = g;
-	a_color.blue = b;		a_color.alpha = a;
-	SetLowColor(a_color);
+	rgb_color color;
+	color.red = r;		color.green = g;
+	color.blue = b;		color.alpha = a;
+	SetLowColor(color);
 }
-//------------------------------------------------------------------------------
 
 #endif	// _VIEW_H

@@ -358,7 +358,6 @@ private:
 			// message: B_MOUSE_UP, B_MOUSE_DOWN, B_MOUSE_MOVED
 			void		sendMessageUsingEventMask(int32 message, BPoint where);
 			BView*		sendMessageUsingEventMask2(BView* aView, int32 message, BPoint where);
-			void		sendPulse(BView *view);
 			int32		findShortcut(uint32 key, uint32 modifiers);
 			bool		findHandler(BView* start, BHandler* handler);
 			BView*		findView(BView* aView, const char* viewName) const;
@@ -370,7 +369,6 @@ private:
 			BView*		findLastChild(BView *parent);
 			bool		handleKeyDown(const char key, uint32 modifiers);
 			void		handleActivation( bool active);
-			void		activateView(BView *aView, bool active);
 
 			void		drawAllViews(BView* aView);
 			void		DoUpdate(BView* aView, BRect& area);

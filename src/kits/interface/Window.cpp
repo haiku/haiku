@@ -787,7 +787,7 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 
 		case B_PULSE:
 			if (fPulseEnabled) {
-				sendPulse(top_view);
+				top_view->_Pulse();
 				fLink->Flush();
 			}
 			break;
@@ -2353,7 +2353,7 @@ BWindow::BuildTopView()
 	STRACE(("Calling setowner top_view = %p this = %p.\n", 
 		top_view, this));
 
-	top_view->setOwner(this);
+	top_view->_SetOwner(this);
 
 	//we can't use AddChild() because this is the top_view
   	top_view->attachView(top_view);
@@ -2414,20 +2414,7 @@ BWindow::handleActivation(bool active)
 
 	// recursively call hook function 'WindowActivated(bool)'
 	// for all views attached to this window.
-	activateView(top_view, active);
-}
-
-
-void
-BWindow::activateView(BView *view, bool active)
-{
-	view->WindowActivated(active);
-
-	BView *child = view->first_child;
-	while (child) {
-		activateView(child, active);
-		child = child->next_sibling;
-	}
+	top_view->_Activate(active);
 }
 
 
@@ -2585,7 +2572,7 @@ BWindow::sendMessageUsingEventMask2(BView *view, int32 message, BPoint where)
 	}
 
 	// Code for Event Masks
-	BView *child = view->first_child;
+	BView *child = view->fFirstChild;
 	while (child) {
 		// see if a BView registered for mouse events and it's not the current focus view
 		if (view != fFocus
@@ -2623,7 +2610,7 @@ BWindow::sendMessageUsingEventMask2(BView *view, int32 message, BPoint where)
 		// one of the children contains the point
 		if (target)
 			destView = target;
-		child = child->next_sibling;
+		child = child->fNextSibling;
 	}
 
 	return destView;
@@ -2679,7 +2666,7 @@ BWindow::sendMessageUsingEventMask(int32 message, BPoint where)
 			// TODO: Do research on mouse capturing -- maybe it has something to do 
 			// with this
  			if (fFocus != destView)
- 				fFocus->MouseMoved( ConvertFromScreen(where), B_OUTSIDE_VIEW, dragMessage);
+ 				fFocus->MouseMoved(ConvertFromScreen(where), B_OUTSIDE_VIEW, dragMessage);
 			break;
 		}
 	}
@@ -2690,21 +2677,6 @@ BMessage *
 BWindow::ConvertToMessage(void *raw, int32 code)
 {
 	return BLooper::ConvertToMessage(raw, code);
-}
-
-
-void
-BWindow::sendPulse(BView *view)
-{
-	BView *child = view->first_child;
-
-	while (child) {
-		if (child->Flags() & B_PULSE_NEEDED)
-			child->Pulse();
-
-		sendPulse(child);
-		child = child->next_sibling;
-	}
 }
 
 
@@ -2730,13 +2702,13 @@ BWindow::findView(BView *view, int32 token)
 	if (_get_object_token_(view) == token)
 		return view;
 
-	BView *child = view->first_child;
+	BView *child = view->fFirstChild;
 
 	while (child != NULL) {
 		if ((view = findView(child, token)) != NULL)
 			return view;
 
-		child = child->next_sibling;
+		child = child->fNextSibling;
 	}
 
 	return NULL;
@@ -2749,13 +2721,13 @@ BWindow::findView(BView *view, const char *name) const
 	if (!strcmp(name, view->Name()))
 		return view;
 
-	BView *child = view->first_child;
+	BView *child = view->fFirstChild;
 
 	while (child != NULL) {
 		if ((view = findView(child, name)) != NULL)
 			return view;
 
-		child = child->next_sibling;
+		child = child->fNextSibling;
 	}
 
 	return NULL;
@@ -2765,16 +2737,16 @@ BWindow::findView(BView *view, const char *name) const
 BView *
 BWindow::findView(BView *view, BPoint point) const
 {
-	if (view->Bounds().Contains(point) && !view->first_child)
+	if (view->Bounds().Contains(point) && !view->fFirstChild)
 		return view;
 
-	BView *child = view->first_child;
+	BView *child = view->fFirstChild;
 
 	while (child != NULL) {
 		if ((view = findView(child, point)) != NULL)
 			return view;
 
-		child = child->next_sibling;
+		child = child->fNextSibling;
 	}
 
 	return NULL;
@@ -2792,18 +2764,18 @@ BWindow::findNextView(BView *focus, uint32 flags)
 	// Ufff... this took me some time... this is the best form I've reached.
 	// This algorithm searches the tree for BViews that accept focus.
 	while (true) {
-		if (nextFocus->first_child)
-			nextFocus = nextFocus->first_child;
-		else if (nextFocus->next_sibling)
-			nextFocus = nextFocus->next_sibling;
+		if (nextFocus->fFirstChild)
+			nextFocus = nextFocus->fFirstChild;
+		else if (nextFocus->fNextSibling)
+			nextFocus = nextFocus->fNextSibling;
 		else {
-			while (!nextFocus->next_sibling && nextFocus->parent)
-				nextFocus = nextFocus->parent;
+			while (!nextFocus->fNextSibling && nextFocus->fParent)
+				nextFocus = nextFocus->fParent;
 
 			if (nextFocus == top_view)
-				nextFocus = nextFocus->first_child;
+				nextFocus = nextFocus->fFirstChild;
 			else
-				nextFocus = nextFocus->next_sibling;
+				nextFocus = nextFocus->fNextSibling;
 		}
 
 		// It means that the hole tree has been searched and there is no
@@ -2826,16 +2798,16 @@ BWindow::findPrevView(BView *focus, uint32 flags)
 		BView *view;
 		if ((view = findLastChild(prevFocus)) != NULL)
 			prevFocus = view;
-		else if (prevFocus->prev_sibling)
-			prevFocus = prevFocus->prev_sibling;
+		else if (prevFocus->fPreviousSibling)
+			prevFocus = prevFocus->fPreviousSibling;
 		else {
-			while (!prevFocus->prev_sibling && prevFocus->parent)
-				prevFocus = prevFocus->parent;
+			while (!prevFocus->fPreviousSibling && prevFocus->fParent)
+				prevFocus = prevFocus->fParent;
 
 			if (prevFocus == top_view)
 				prevFocus = findLastChild(prevFocus);
 			else
-				prevFocus = prevFocus->prev_sibling;
+				prevFocus = prevFocus->fPreviousSibling;
 		}
 
 		// It means that the hole tree has been searched and there is no
@@ -2852,12 +2824,12 @@ BWindow::findPrevView(BView *focus, uint32 flags)
 BView *
 BWindow::findLastChild(BView *parent)
 {
-	BView *last = parent->first_child;
+	BView *last = parent->fFirstChild;
 	if (last == NULL)
 		return NULL;
 
-	while (last->next_sibling)
-		last = last->next_sibling;
+	while (last->fNextSibling)
+		last = last->fNextSibling;
 
 	return last;
 }
@@ -2902,7 +2874,7 @@ BWindow::DoUpdate(BView *view, BRect &area)
 		aView->SetHighColor(c);*/
 	}
 
-	BView *child = view->first_child;
+	BView *child = view->fFirstChild;
 	while (child) {
 		if (area.Intersects(child->Frame())) {
 			BRect newArea = area & child->Frame();
@@ -2910,7 +2882,7 @@ BWindow::DoUpdate(BView *view, BRect &area)
 
 			DoUpdate(child, newArea);
 		}
-		child = child->next_sibling; 
+		child = child->fNextSibling; 
 	}
 
 	if (view->Flags() & B_WILL_DRAW) {
