@@ -171,6 +171,8 @@ WinBorder::Draw(const BRect &r)
 void
 WinBorder::MoveBy(float x, float y)
 {
+#ifndef NEW_CLIPPING
+
 x = (float)int32(x);
 y = (float)int32(y);
 
@@ -180,8 +182,6 @@ y = (float)int32(y);
 	STRACE(("WinBorder(%s)::MoveBy(%.1f, %.1f) fDecorator: %p\n", GetName(), x, y, fDecorator));
 	if (fDecorator)
 		fDecorator->MoveBy(x,y);
-
-#ifndef NEW_CLIPPING
 
 // NOTE: I moved this here from Layer::move_layer()
 // Should this have any bad consequences I'm not aware of?
@@ -213,16 +213,16 @@ fInUpdateRegion.OffsetBy(x, y);
 		move_layer(x, y);
 	}
 
-#else
-	// implement. maybe...
-#endif
-
 	if (Window()) {
 		// dispatch a message to the client informing about the changed size
 		BMessage msg(B_WINDOW_MOVED);
 		msg.AddPoint("where", fFrame.LeftTop());
 		Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
 	}
+
+#else
+	Layer::MoveBy(x, y);
+#endif
 }
 
 
@@ -234,6 +234,7 @@ WinBorder::ResizeBy(float x, float y)
 	if (!_ResizeBy(x, y))
 		return;
 
+#ifndef NEW_CLIPPING
 	if (Window()) {
 		// send a message to the client informing about the changed size
 		BMessage msg(B_WINDOW_RESIZED);
@@ -245,6 +246,7 @@ WinBorder::ResizeBy(float x, float y)
 
 		Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
 	}
+#endif
 }
 
 
@@ -252,10 +254,6 @@ WinBorder::ResizeBy(float x, float y)
 bool
 WinBorder::_ResizeBy(float x, float y)
 {
-// ToDo: remove/fix these?
-x = (float)int32(x);
-y = (float)int32(y);
-
 	float wantWidth = fFrame.Width() + x;
 	float wantHeight = fFrame.Height() + y;
 
@@ -276,10 +274,10 @@ y = (float)int32(y);
 	if (x == 0.0 && y == 0.0)
 		return false;
 
+#ifndef NEW_CLIPPING	
 	if (fDecorator)
 		fDecorator->ResizeBy(x, y);
 
-#ifndef NEW_CLIPPING	
 	if (IsHidden()) {
 		// TODO: See large comment in MoveBy()
 		fFrame.right += x;
@@ -292,7 +290,7 @@ y = (float)int32(y);
 	}
 
 #else
-	// Do? I don't think so. The new move/resize/scroll hooks should handle these
+	Layer::ResizeBy(x, y);
 #endif
 
 	return true;
@@ -396,6 +394,7 @@ WinBorder::SetSizeLimits(float minWidth, float maxWidth,
 	else if (maxHeightDiff < 0.0) // we're currently larger than maxHeight
 		yDiff = maxHeightDiff;
 
+//	Layer::ResizeBy(xDiff, yDiff);
 	ResizeBy(xDiff, yDiff);
 }
 
@@ -498,13 +497,21 @@ WinBorder::MouseMoved(const PointerEvent& event)
 		fBringToFrontOnRelease = false;
 
 		BPoint delta = event.where - fLastMousePosition;
+#ifndef NEW_CLIPPING
 		MoveBy(delta.x, delta.y);
+#else
+		do_MoveBy(delta.x, delta.y);
+#endif
 	}
 	if (fIsResizing) {
 		BRect frame(fFrame.LeftTop(), event.where - fResizingClickOffset);
 
 		BPoint delta = frame.RightBottom() - fFrame.RightBottom();
+#ifndef NEW_CLIPPING
 		ResizeBy(delta.x, delta.y);
+#else
+		do_ResizeBy(delta.x, delta.y);
+#endif
 	}
 	if (fIsSlidingTab) {
 	}
@@ -583,17 +590,6 @@ WinBorder::HighlightDecorator(bool active)
 	STRACE(("Decorator->Highlight\n"));
 	if (fDecorator)
 		fDecorator->SetFocus(active);
-}
-
-//! Returns true if the point is in the WinBorder's screen area
-bool
-WinBorder::HasPoint(const BPoint& pt) const
-{
-#ifndef NEW_CLIPPING
-	return fFullVisible.Contains(pt);
-#else
-	return NULL;
-#endif
 }
 
 // Unimplemented. Hook function for handling when system GUI colors change
@@ -695,6 +691,10 @@ WinBorder::_ActionFor(const PointerEvent& event) const
 	if (fTopLayer->fFullVisible.Contains(event.where))
 		return DEC_NONE;
 	else
+#else
+	if (fTopLayer->fFullVisible2.Contains(event.where))
+		return DEC_NONE;
+	else
 #endif
 	if (fDecorator)
 		return fDecorator->Clicked(event.where, event.buttons, event.modifiers);
@@ -705,12 +705,38 @@ WinBorder::_ActionFor(const PointerEvent& event) const
 #ifdef NEW_CLIPPING
 void WinBorder::MovedByHook(float dx, float dy)
 {
+	STRACE(("WinBorder(%s)::MovedByHook(%.1f, %.1f) fDecorator: %p\n", GetName(), x, y, fDecorator));
+
 	fDecRegion.OffsetBy(dx, dy);
+
+	if (fDecorator)
+		fDecorator->MoveBy(dx, dy);
+
+	fCumulativeRegion.OffsetBy(dx, dy);
+	fInUpdateRegion.OffsetBy(dx, dy);
+
+	// dispatch a message to the client informing about the changed size
+	BMessage msg(B_WINDOW_MOVED);
+	msg.AddInt64("when",  system_time());
+	msg.AddPoint("where", Frame().LeftTop());
+	Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
 }
 
 void WinBorder::ResizedByHook(float dx, float dy, bool automatic)
 {
+	STRACE(("WinBorder(%s)::ResizedByHook(%.1f, %.1f, %s) fDecorator: %p\n", GetName(), x, y, automatic?"true":"false", fDecorator));
 	fRebuildDecRegion = true;
+
+	if (fDecorator)
+		fDecorator->ResizeBy(dx, dy);
+
+	// send a message to the client informing about the changed size
+	BRect frame(fTopLayer->Frame());
+	BMessage msg(B_WINDOW_RESIZED);
+	msg.AddInt64("when", system_time());
+	msg.AddInt32("width", frame.IntegerWidth());
+	msg.AddInt32("height", frame.IntegerHeight());
+	Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
 }
 
 void WinBorder::set_decorator_region(BRect bounds)

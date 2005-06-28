@@ -891,6 +891,7 @@ Layer::Draw(const BRect &rect)
 		fDriver->FillRect(rect, ViewColor());
 }
 
+#ifndef NEW_CLIPPING
 // EmptyGlobals
 void
 Layer::EmptyGlobals()
@@ -907,6 +908,7 @@ Layer::EmptyGlobals()
 		delete (BPoint*)fRootLayer->fCopyList.ItemAt(i);
 	fRootLayer->fCopyList.MakeEmpty();
 }
+#endif
 
 /*!
 	\brief Shows the layer
@@ -1054,6 +1056,22 @@ Layer::ResizeBy(float x, float y)
 	GetRootLayer()->EnqueueMessage(msg);
 
 	STRACE(("Layer(%s)::ResizeBy() END\n", Name()));
+}
+
+//! scrolls the layer by the specified amount, complete with redraw
+void
+Layer::ScrollBy(float x, float y)
+{
+	STRACE(("Layer(%s)::ScrollBy() START\n", Name()));
+
+	BPrivate::PortLink msg(-1, -1);
+	msg.StartMessage(AS_ROOTLAYER_LAYER_SCROLL);
+	msg.Attach<Layer*>(this);
+	msg.Attach<float>(x);
+	msg.Attach<float>(y);
+	GetRootLayer()->EnqueueMessage(msg);
+
+	STRACE(("Layer(%s)::ScrollBy() END\n", Name()));
 }
 
 // BoundsOrigin
@@ -1835,9 +1853,9 @@ Layer::do_Invalidate(const BRegion &invalid, const Layer *startFrom)
 		startFrom? startFrom: BottomChild());
 
 	// add localVisible to our RootLayer's redraw region.
-	GetRootLayer()->fRedrawReg.Include(&localVisible);
-// TODO: ---
-	GetRootLayer()->RequestDraw(GetRootLayer()->fRedrawReg, BottomChild());
+//	GetRootLayer()->fRedrawReg.Include(&localVisible);
+	GetRootLayer()->fRedrawReg = localVisible;
+	GetRootLayer()->RequestDraw(GetRootLayer()->fRedrawReg, NULL);
 //	GetRootLayer()->RequestRedraw(); // TODO: what if we pass (fParent, startFromTHIS, &redrawReg)?
 }
 
@@ -1848,9 +1866,9 @@ Layer::do_Redraw(const BRegion &invalid, const Layer *startFrom)
 	localVisible.IntersectWith(&invalid);
 
 	// add localVisible to our RootLayer's redraw region.
-	GetRootLayer()->fRedrawReg.Include(&localVisible);
-// TODO: ---
-	GetRootLayer()->RequestDraw(GetRootLayer()->fRedrawReg, BottomChild());
+//	GetRootLayer()->fRedrawReg.Include(&localVisible);
+	GetRootLayer()->fRedrawReg = localVisible;
+	GetRootLayer()->RequestDraw(GetRootLayer()->fRedrawReg, NULL);
 //	GetRootLayer()->RequestRedraw(); // TODO: what if we pass (fParent, startFromTHIS, &redrawReg)?
 }
 
@@ -2029,7 +2047,8 @@ Layer::do_ResizeBy(float dx, float dy)
 		rezize_layer_redraw_more(redrawReg, dx, dy);
 
 		// add redrawReg to our RootLayer's redraw region.
-		GetRootLayer()->fRedrawReg.Include(&redrawReg);
+//		GetRootLayer()->fRedrawReg.Include(&redrawReg);
+		GetRootLayer()->fRedrawReg = redrawReg;
 		// include layer's visible region in case we want a full update on resize
 		if (fFlags & B_FULL_UPDATE_ON_RESIZE && fVisible2.Frame().IsValid()) {
 			resize_layer_full_update_on_resize(GetRootLayer()->fRedrawReg, dx, dy);
@@ -2038,8 +2057,7 @@ Layer::do_ResizeBy(float dx, float dy)
 			GetRootLayer()->fRedrawReg.Include(&oldVisible);
 		}
 		// clear canvas and set invalid regions for affected WinBorders
-// TODO: ---
-	GetRootLayer()->RequestDraw(GetRootLayer()->fRedrawReg, BottomChild());
+		GetRootLayer()->RequestDraw(GetRootLayer()->fRedrawReg, NULL);
 //	GetRootLayer()->RequestRedraw(); // TODO: what if we pass (fParent, startFromTHIS, &redrawReg)?
 	}
 }
@@ -2085,13 +2103,12 @@ void Layer::do_MoveBy(float dx, float dy)
 
 		// offset back and instruct the HW to do the actual copying.
 		oldFullVisible.OffsetBy(-dx, -dy);
-// TODO: uncomment!!!
-//		GetRootLayer()->CopyRegion(&oldFullVisible, dx, dy);
+		GetDisplayDriver()->CopyRegion(&oldFullVisible, dx, dy);
 
 		// add redrawReg to our RootLayer's redraw region.
-		GetRootLayer()->fRedrawReg.Include(&redrawReg);
-// TODO: ---
-	GetRootLayer()->RequestDraw(GetRootLayer()->fRedrawReg, BottomChild());
+//		GetRootLayer()->fRedrawReg.Include(&redrawReg);
+		GetRootLayer()->fRedrawReg = redrawReg;
+		GetRootLayer()->RequestDraw(GetRootLayer()->fRedrawReg, NULL);
 //	GetRootLayer()->RequestRedraw(); // TODO: what if we pass (fParent, startFromTHIS, &redrawReg)?
 	}
 }
@@ -2118,17 +2135,16 @@ Layer::do_ScrollBy(float dx, float dy)
 
 		// compute the common region. we'll use HW acc to copy this to the new location.
 		invalid.IntersectWith(&fFullVisible2);
-// TODO: uncomment!!!
-//		GetRootLayer()->CopyRegion(&invalid, -dx, -dy);
+		GetDisplayDriver()->CopyRegion(&invalid, -dx, -dy);
 
 		// common region goes back to its original location. then, by excluding
 		// it from curent fullVisible we'll obtain the region that needs to be redrawn.
 		invalid.OffsetBy(-dx, -dy);
 		redrawReg.Exclude(&invalid);
 
-		GetRootLayer()->fRedrawReg.Include(&redrawReg);
-// TODO: ---
-	GetRootLayer()->RequestDraw(GetRootLayer()->fRedrawReg, BottomChild());
+//		GetRootLayer()->fRedrawReg.Include(&redrawReg);
+		GetRootLayer()->fRedrawReg = redrawReg;
+		GetRootLayer()->RequestDraw(GetRootLayer()->fRedrawReg, NULL);
 //	GetRootLayer()->RequestRedraw(); // TODO: what if we pass (fParent, startFromTHIS, &redrawReg)?
 	}
 

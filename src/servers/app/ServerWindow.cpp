@@ -413,7 +413,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			link.Read<float>(&dh);
 			link.Read<float>(&dv);
-
+#ifndef NEW_CLIPPING
 			// scroll visually by using the CopyBits() implementation
 			// this will also take care of invalidating previously invisible
 			// areas (areas scrolled into view)
@@ -436,7 +436,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			fCurrentLayer->fLayerData->OffsetOrigin(BPoint(dh, dv));
 
 			_CopyBits(myRootLayer, fCurrentLayer, src, dst, xOffset, yOffset);
-
+#else
+			fCurrentLayer->ScrollBy(dh, dv);
+#endif
 
 			break;
 		}

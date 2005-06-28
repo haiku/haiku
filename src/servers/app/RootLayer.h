@@ -72,7 +72,10 @@ public:
 	
 	virtual	void				MoveBy(float x, float y);
 	virtual	void				ResizeBy(float x, float y);
-	
+	virtual	void				ScrollBy(float x, float y)
+								{ // not allowed
+								}
+
 	// For the active workspaces
 	virtual	Layer*				TopChild(void) const;
 	virtual	Layer*				LowerSibling(void) const;

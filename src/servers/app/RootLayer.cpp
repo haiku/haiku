@@ -341,6 +341,20 @@ RootLayer::WorkingThread(void *data)
 #endif
 				break;
 			}
+			case AS_ROOTLAYER_LAYER_SCROLL:
+			{
+				Layer *layer = NULL;
+				float x, y;
+				messageQueue.Read<Layer*>(&layer);
+				messageQueue.Read<float>(&x);
+				messageQueue.Read<float>(&y);
+#ifndef NEW_CLIPPING
+				// nothing
+#else
+				layer->do_ScrollBy(x, y);
+#endif
+				break;
+			}
 			case AS_ROOTLAYER_ADD_TO_SUBSET:
 			{
 				WinBorder *winBorder = NULL;
@@ -1417,7 +1431,6 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 						wheelmsg.AddInt64("when", evt.when);
 						wheelmsg.AddFloat("be:wheel_delta_x",evt.wheel_delta_x);
 						wheelmsg.AddFloat("be:wheel_delta_y",evt.wheel_delta_y);
-
 						fLastMouseMoved->Window()->SendMessageToClient(&wheelmsg, fLastMouseMoved->fViewToken, false);
 					}
 				} else {

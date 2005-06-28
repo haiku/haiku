@@ -63,6 +63,9 @@ class WinBorder : public Layer {
 	
 	virtual	void				MoveBy(float x, float y);
 	virtual	void				ResizeBy(float x, float y);
+	virtual	void				ScrollBy(float x, float y)
+								{ // not allowed
+								}
 #ifndef NEW_CLIPPING
 	virtual	void				RebuildFullRegion();
 #endif
@@ -108,8 +111,6 @@ class WinBorder : public Layer {
 
 			void				HighlightDecorator(bool active);
 	
-			bool				HasPoint(const BPoint &pt) const;
-
 	inline	void				QuietlySetWorkspaces(uint32 wks) { fWorkspaces = wks; }	
 			void				QuietlySetFeel(int32 feel);	
 

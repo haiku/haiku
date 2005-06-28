@@ -110,13 +110,14 @@ class Layer {
 			uint32				ResizeOthers(float x, float y,
 											 BPoint coords[],
 											 BPoint* ptOffset);
+
+			void				EmptyGlobals();
+
 #endif
 			void				Redraw(const BRegion& reg,
 									   Layer* startFrom = NULL);
 	
 	virtual	void				Draw(const BRect& r);
-	
-			void				EmptyGlobals();
 	
 			void				Show(bool invalidate = true);
 			void				Hide(bool invalidate = true);
@@ -132,6 +133,7 @@ class Layer {
 	
 	virtual	void				MoveBy(float x, float y);
 	virtual	void				ResizeBy(float x, float y);
+	virtual	void				ScrollBy(float x, float y);
 
 			BPoint				BoundsOrigin() const; // BoundsFrameDiff()?
 			float				Scale() const;
