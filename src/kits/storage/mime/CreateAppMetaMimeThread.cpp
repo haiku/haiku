@@ -38,7 +38,7 @@ CreateAppMetaMimeThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 	BMimeType mime;
 	BPath path;
 	attr_info info;
-	BBitmap miniIcon(BRect(0,0,15,15), B_CMAP8);
+	BBitmap miniIcon(BRect(0,0,15,15), B_BITMAP_NO_SERVER_LINK, B_CMAP8);
 	BNode typeNode;
 
 	if (!err)

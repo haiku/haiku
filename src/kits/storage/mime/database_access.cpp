@@ -390,7 +390,8 @@ get_icon_data(const BBitmap *icon, icon_size which, void **data, int32 *dataSize
 	if (!err) {
 		otherColorSpace = (icon->ColorSpace() != B_CMAP8);
 		if (otherColorSpace) {
-			icon8 = new(std::nothrow) BBitmap(bounds, B_CMAP8);
+			icon8 = new(std::nothrow) BBitmap(bounds, B_BITMAP_NO_SERVER_LINK,
+				B_CMAP8);
 			if (!icon8)
 				err = B_NO_MEMORY;
 			if (!err)

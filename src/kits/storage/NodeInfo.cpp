@@ -356,7 +356,7 @@ BNodeInfo::SetIcon(const BBitmap *icon, icon_size k)
 			bool otherColorSpace = (icon->ColorSpace() != B_CMAP8);
 			ssize_t written = 0;
 			if (otherColorSpace) {
-				BBitmap bitmap(bounds, B_CMAP8);
+				BBitmap bitmap(bounds, B_BITMAP_NO_SERVER_LINK, B_CMAP8);
 				error = bitmap.InitCheck();
 				if (error == B_OK)
 					error = bitmap.ImportBits(icon);

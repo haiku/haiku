@@ -906,7 +906,7 @@ BAppFileInfo::SetIconForType(const char *type, const BBitmap *icon,
 		if (icon) {
 			bool otherColorSpace = (icon->ColorSpace() != B_CMAP8);
 			if (otherColorSpace) {
-				BBitmap bitmap(bounds, B_CMAP8);
+				BBitmap bitmap(bounds, B_BITMAP_NO_SERVER_LINK, B_CMAP8);
 				error = bitmap.InitCheck();
 				if (error == B_OK)
 					error = bitmap.ImportBits(icon);
