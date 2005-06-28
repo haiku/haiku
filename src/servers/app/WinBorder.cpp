@@ -59,11 +59,11 @@
 
 WinBorder::WinBorder(const BRect &frame,
 					 const char *name,
-					 const uint32 wlook,
-					 const uint32 wfeel,
-					 const uint32 wflags,
-					 const uint32 wwksindex,
-					 ServerWindow *win,
+					 const uint32 look,
+					 const uint32 feel,
+					 const uint32 flags,
+					 const uint32 workspaces,
+					 ServerWindow *window,
 					 DisplayDriver *driver)
 	: Layer(frame, name, B_NULL_TOKEN, B_FOLLOW_NONE, 0UL, driver),
 	  fDecorator(NULL),
@@ -90,22 +90,21 @@ WinBorder::WinBorder(const BRect &frame,
 	  fInUpdate(false),
 	  fRequestSent(false),
 
-	  fLook(wlook),
-	  fFeel(-1),
+	  fLook(look),
 	  fLevel(-100),
-	  fWindowFlags(wflags),
-	  fWorkspaces(wwksindex),
+	  fWindowFlags(flags),
+	  fWorkspaces(workspaces),
 
 	  fMinWidth(1.0),
-	  fMaxWidth(10000.0),
+	  fMaxWidth(32768.0),
 	  fMinHeight(1.0),
-	  fMaxHeight(10000.0),
+	  fMaxHeight(32768.0),
 
 	  cnt(0) // for debugging
 {
 	// unlike BViews, windows start off as hidden
 	fHidden			= true;
-	fServerWin		= win;
+	fServerWin		= window;
 	fClassID		= AS_WINBORDER_CLASS;
 	fAdFlags		= fAdFlags | B_LAYER_CHILDREN_DEPENDANT;
 	fFlags			= B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE;
@@ -113,33 +112,18 @@ WinBorder::WinBorder(const BRect &frame,
 #ifdef NEW_CLIPPING
 	fRebuildDecRegion = true;
 #endif
-	QuietlySetFeel(wfeel);
-
-	if (fFeel != B_NO_BORDER_WINDOW_LOOK) {
-		// ToDo: these should probably restricted by the decorator only, but
-		// the code there doesn't look too robust to me currently
-		fMinWidth = 20;
-		fMinHeight = 20;
-	}
-
-	if (fFrame.Width() < fMinWidth)
-		fFrame.right = fFrame.left + fMinWidth;
-	if (fFrame.Height() < fMinHeight)
-		fFrame.bottom = fFrame.top + fMinHeight;
+	QuietlySetFeel(feel);
 
 	if (fFeel != B_NO_BORDER_WINDOW_LOOK) {
 		fDecorator = gDecorManager.AllocateDecorator(frame, name, fLook, fFeel, 
 													fWindowFlags, fDriver);
-		if (fDecorator) {
+		if (fDecorator)
 			fDecorator->GetSizeLimits(&fMinWidth, &fMinHeight, &fMaxWidth, &fMaxHeight);
-
-			// we need to change our size to let the decorator fit
-			if (fMinWidth > fFrame.Width())
-				fFrame.right = fFrame.left + fMinWidth;
-			if (fMinHeight > fFrame.Height())
-				fFrame.bottom = fFrame.top + fMinHeight;
-		}
 	}
+
+	// do we need to change our size to let the decorator fit?
+	// _ResizeBy() will adapt the frame for validity before resizing
+	_ResizeBy(0, 0);
 
 #ifndef NEW_CLIPPING
 	RebuildFullRegion();
@@ -149,8 +133,9 @@ WinBorder::WinBorder(const BRect &frame,
 
 	STRACE(("WinBorder %s:\n", GetName()));
 	STRACE(("\tFrame: (%.1f, %.1f, %.1f, %.1f)\n", r.left, r.top, r.right, r.bottom));
-	STRACE(("\tWindow %s\n", win ? win->Title() : "NULL"));
+	STRACE(("\tWindow %s\n", window ? window->Title() : "NULL"));
 }
+
 
 WinBorder::~WinBorder()
 {
@@ -240,12 +225,34 @@ fInUpdateRegion.OffsetBy(x, y);
 	}
 }
 
-//! Resizes the winborder with redraw
+
 void
 WinBorder::ResizeBy(float x, float y)
 {
 	STRACE(("WinBorder(%s)::ResizeBy()\n", GetName()));
 
+	if (!_ResizeBy(x, y))
+		return;
+
+	if (Window()) {
+		// send a message to the client informing about the changed size
+		BMessage msg(B_WINDOW_RESIZED);
+		msg.AddInt64("when", system_time());
+
+		BRect frame(fTopLayer->Frame());
+		msg.AddInt32("width", frame.IntegerWidth());
+		msg.AddInt32("height", frame.IntegerHeight());
+
+		Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
+	}
+}
+
+
+//! Resizes the winborder with redraw
+bool
+WinBorder::_ResizeBy(float x, float y)
+{
+// ToDo: remove/fix these?
 x = (float)int32(x);
 y = (float)int32(y);
 
@@ -267,7 +274,7 @@ y = (float)int32(y);
 	y = wantHeight - fFrame.Height();
 
 	if (x == 0.0 && y == 0.0)
-		return;
+		return false;
 
 	if (fDecorator)
 		fDecorator->ResizeBy(x, y);
@@ -278,7 +285,8 @@ y = (float)int32(y);
 		fFrame.right += x;
 		fFrame.bottom += y;
 
-		fTopLayer->resize_layer(x, y);
+		if (fTopLayer)
+			fTopLayer->resize_layer(x, y);
 	} else {
 		resize_layer(x, y);
 	}
@@ -287,18 +295,9 @@ y = (float)int32(y);
 	// Do? I don't think so. The new move/resize/scroll hooks should handle these
 #endif
 
-	if (Window()) {
-		// send a message to the client informing about the changed size
-		BMessage msg(B_WINDOW_RESIZED);
-		msg.AddInt64("when", system_time());
-
-		BRect frame(fTopLayer->Frame());
-		msg.AddInt32("width", frame.IntegerWidth());
-		msg.AddInt32("height", frame.IntegerHeight());
-
-		Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
-	}
+	return true;
 }
+
 
 // UpdateStart
 void
@@ -373,9 +372,13 @@ WinBorder::SetSizeLimits(float minWidth, float maxWidth,
 	if (fMaxHeight < fMinHeight)
 		fMaxHeight = fMinHeight;
 
-#if 0 // On R5, Windows don't automatically resize (the code works though)
 	// Automatically resize the window to fit these new limits
 	// if it does not already.
+
+	// On R5, Windows don't automatically resize, but since
+	// BWindow::ResizeTo() even honors the limits, I would guess
+	// this is a bug that we don't have to adopt
+
 	float minWidthDiff = fMinWidth - fFrame.Width();
 	float minHeightDiff = fMinHeight - fFrame.Height();
 	float maxWidthDiff = fMaxWidth - fFrame.Width();
@@ -394,7 +397,6 @@ WinBorder::SetSizeLimits(float minWidth, float maxWidth,
 		yDiff = maxHeightDiff;
 
 	ResizeBy(xDiff, yDiff);
-#endif
 }
 
 // GetSizeLimits
@@ -628,7 +630,7 @@ WinBorder::QuietlySetFeel(int32 feel)
 {
 	fFeel = feel;
 
-	switch(fFeel) {
+	switch (fFeel) {
 		case B_FLOATING_SUBSET_WINDOW_FEEL:
 		case B_FLOATING_APP_WINDOW_FEEL:
 			fLevel	= B_FLOATING_APP;

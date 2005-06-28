@@ -49,13 +49,13 @@ class PointerEvent {
 
 class WinBorder : public Layer {
  public:
-								WinBorder(const BRect &r,
+								WinBorder(const BRect &frame,
 										  const char *name,
-										  const uint32 wlook,
-										  const uint32 wfeel, 
-										  const uint32 wflags,
-										  const uint32 wwksindex,
-										  ServerWindow *win,
+										  const uint32 look,
+										  const uint32 feel, 
+										  const uint32 flags,
+										  const uint32 workspaces,
+										  ServerWindow *window,
 										  DisplayDriver *driver);
 	virtual						~WinBorder();
 	
@@ -136,6 +136,7 @@ class WinBorder : public Layer {
 	friend class RootLayer;
 
 			click_type			_ActionFor(const PointerEvent& evt) const;
+			bool				_ResizeBy(float x, float y);
 
 			Decorator*			fDecorator;
 			Layer*				fTopLayer;
