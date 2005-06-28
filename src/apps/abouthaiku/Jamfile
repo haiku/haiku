@@ -8,10 +8,6 @@ if $(TARGET_PLATFORM) = r5 {
 
 App AboutHaiku :
 	AboutHaiku.cpp
-	: libbe.so libtranslation.so
+	: libbe.so libtranslation.so libroot.so
 	: AboutHaiku.rdef
 	;
-
-if $(TARGET_PLATFORM) != r5 {
-	LinkSharedOSLibs AboutHaiku : libroot.so ;
-}
