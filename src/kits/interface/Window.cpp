@@ -611,76 +611,71 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		case B_MINIMIZE:
 		{
 			bool minimize;
-			msg->FindBool("minimize", &minimize);
-
-			Minimize(minimize);
+			if (msg->FindBool("minimize", &minimize) == B_OK)
+				Minimize(minimize);
 			break;
 		}
 
 		case B_WINDOW_RESIZED:
 		{
-			float width, height;
-			msg->FindFloat("width", &width);
-			msg->FindFloat("height", &height);
+			int32 width, height;
+			if (msg->FindInt32("width", &width) == B_OK
+				&& msg->FindInt32("height", &height) == B_OK) {
+				fFrame.right = fFrame.left + width;
+				fFrame.bottom = fFrame.top + height;
 
-			fFrame.right = fFrame.left + width;
-			fFrame.bottom = fFrame.top + height;
-
-			FrameResized(width, height);
+				FrameResized(width, height);
+			}
 			break;
 		}
 
 		case B_WINDOW_MOVED:
 		{
 			BPoint origin;
-			msg->FindPoint("where", &origin);
+			if (msg->FindPoint("where", &origin) == B_OK) {
+				fFrame.OffsetTo(origin);
 
-			fFrame.OffsetTo(origin);
-
-			FrameMoved(origin);
+				FrameMoved(origin);
+			}
 			break;
 		}
 
 		case B_WINDOW_ACTIVATED:
 		{
 			bool active;
-			msg->FindBool("active", &active);
-
-			fActive = active;
-			handleActivation(active);
+			if (msg->FindBool("active", &active) == B_OK) {
+				fActive = active;
+				handleActivation(active);
+			}
 			break;
 		}
 
 		case B_SCREEN_CHANGED:
 		{
 			BRect frame;
-			msg->FindRect("frame", &frame);
 			uint32 mode;
-			msg->FindInt32("mode", (int32 *)&mode);
-
-			ScreenChanged(frame, (color_space)mode);
+			if (msg->FindRect("frame", &frame) == B_OK
+				&& msg->FindInt32("mode", (int32 *)&mode) == B_OK)
+				ScreenChanged(frame, (color_space)mode);
 			break;
 		}
 
 		case B_WORKSPACE_ACTIVATED:
 		{
 			uint32 workspace;
-			msg->FindInt32("workspace", (int32 *)&workspace);
 			bool active;
-			msg->FindBool("active", &active);
-
-			WorkspaceActivated(workspace, active);
+			if (msg->FindInt32("workspace", (int32 *)&workspace) == B_OK
+				&& msg->FindBool("active", &active) == B_OK)
+				WorkspaceActivated(workspace, active);
 			break;
 		}
 
 		case B_WORKSPACES_CHANGED:
 		{
-			uint32 oldWorkspace;
-			msg->FindInt32("old", (int32 *)&oldWorkspace);
-			uint32 newWorkspace;
-			msg->FindInt32("new", (int32 *)&newWorkspace);
-
-			WorkspacesChanged(oldWorkspace, newWorkspace);
+			uint32 oldWorkspace, newWorkspace;
+			if (msg->FindInt32("old", (int32 *)&oldWorkspace) == B_OK
+				&& msg->FindInt32("new", (int32 *)&newWorkspace) == B_OK)
+				WorkspacesChanged(oldWorkspace, newWorkspace);
 			break;
 		}
 
