@@ -168,7 +168,7 @@ DefaultDecorator::GetSizeLimits(float* minWidth, float* minHeight,
 								float* maxWidth, float* maxHeight) const
 {
 	if (_tabrect.IsValid())
-		*minWidth = max_c(*minWidth, fMinTabWidth);
+		*minWidth = max_c(*minWidth, fMinTabWidth - 2 * fBorderWidth);
 	if (_resizerect.IsValid())
 		*minHeight = max_c(*minHeight, _resizerect.Height() - fBorderWidth);
 }
