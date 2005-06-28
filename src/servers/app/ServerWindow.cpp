@@ -600,11 +600,6 @@ myRootLayer->Unlock();
 
 			// attach state data
 			fCurrentLayer->fLayerData->WriteToLink(fLink.Sender());
-
-			fLink.Attach<float>(fCurrentLayer->fFrame.left);
-			fLink.Attach<float>(fCurrentLayer->fFrame.top);
-			fLink.Attach<BRect>(fCurrentLayer->fFrame.OffsetToCopy(fCurrentLayer->BoundsOrigin()));
-
 			fLink.Flush();
 			break;
 		}
