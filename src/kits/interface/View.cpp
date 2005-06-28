@@ -838,7 +838,7 @@ BView::IsPrinting() const
 BPoint
 BView::LeftTop() const 
 {
-	return Bounds().LeftTop();
+	return fParentOffset;
 }
 
 
