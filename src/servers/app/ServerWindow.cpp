@@ -401,6 +401,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 	}
 
 	RootLayer *myRootLayer = fWinBorder->GetRootLayer();
+	myRootLayer->Lock();
 
 	switch (code) {
 		//--------- BView Messages -----------------
@@ -1456,6 +1457,8 @@ myRootLayer->Unlock();
 			_DispatchGraphicsMessage(code, link);
 			break;
 	}
+
+	myRootLayer->Unlock();
 }
 
 		// -------------------- Graphics messages ----------------------------------
