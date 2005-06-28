@@ -41,7 +41,7 @@
 #include "RGBColor.h"
 #include "ServerWindow.h"
 
-//#define NEW_CLIPPING 1
+#define NEW_CLIPPING 1
 
 enum {
 	B_LAYER_NONE		= 1,
@@ -211,6 +211,8 @@ class Layer {
 #ifdef NEW_CLIPPING
 	inline	const BRegion&		VisibleRegion() const { return fVisible2; }
 	inline	const BRegion&		FullVisible() const { return fFullVisible2; }
+
+	virtual	void				GetWantedRegion(BRegion& reg) const;
 
 	virtual	void				MovedByHook(float dx, float dy) { }
 	virtual	void				ResizedByHook(float dx, float dy, bool automatic) { }

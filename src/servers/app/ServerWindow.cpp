@@ -514,11 +514,15 @@ myRootLayer->Lock();
 			if (parent != NULL)
 				parent->AddChild(newLayer, this);
 
-			if (!newLayer->IsHidden())
+			if (!newLayer->IsHidden() && parent)
 #ifndef NEW_CLIPPING
 				myRootLayer->GoInvalidate(newLayer, newLayer->fFull);
 #else
-				myRootLayer->GoInvalidate(newLayer, newLayer->Frame());
+			{
+				BRegion invalidRegion;
+				newLayer->GetWantedRegion(invalidRegion);
+				myRootLayer->GoInvalidate(newLayer, invalidRegion);
+			}
 #endif
 
 myRootLayer->Unlock();
@@ -532,16 +536,28 @@ myRootLayer->Unlock();
 			// area assuming that the view was visible when removed
 
 			STRACE(("ServerWindow %s: AS_LAYER_DELETE(self)...\n", fTitle));			
-			Layer *parent;
-			parent = fCurrentLayer->fParent;
+myRootLayer->Lock();
+			Layer *parent = fCurrentLayer->fParent;
+			BRegion *invalidRegion = NULL;
+
+			if (!fCurrentLayer->IsHidden() && parent) {
+#ifndef NEW_CLIPPING
+				if (fCurrentLayer->fFullVisible.CountRects() > 0)
+					invalidRegion = new BRegion(fCurrentLayer->fFullVisible);
+#else
+				if (fCurrentLayer->FullVisible().Frame().IsValid())
+					invalidRegion = new BRegion(fCurrentLayer->FullVisible());
+#endif
+			}
 
 			// here we remove current layer from list.
-myRootLayer->Lock();
 			fCurrentLayer->RemoveSelf();
 			fCurrentLayer->PruneTree();
 
-			if (parent)
-				myRootLayer->GoInvalidate(parent, BRegion(fCurrentLayer->Frame()));
+			if (invalidRegion) {
+				myRootLayer->GoInvalidate(parent, *invalidRegion);
+				delete invalidRegion;
+			}
 myRootLayer->Unlock();
 			
 			#ifdef DEBUG_SERVERWINDOW
@@ -827,13 +843,15 @@ myRootLayer->Unlock();
 			rgb_color c;
 			
 			link.Read(&c, sizeof(rgb_color));
-			
+myRootLayer->Lock();			
 			fCurrentLayer->SetViewColor(RGBColor(c));
 
-			// TODO: this should not trigger redraw, no?!?
 #ifndef NEW_CLIPPING
 			myRootLayer->GoRedraw(fCurrentLayer, fCurrentLayer->fVisible);
+#else
+			myRootLayer->GoRedraw(fCurrentLayer, fCurrentLayer->VisibleRegion());
 #endif
+myRootLayer->Unlock();
 			break;
 		}
 		case AS_LAYER_GET_COLORS:
@@ -940,7 +958,11 @@ myRootLayer->Unlock();
 #ifndef NEW_CLIPPING
 				myRootLayer->GoInvalidate(fCurrentLayer, fCurrentLayer->fFull);				
 #else
-				myRootLayer->GoInvalidate(fCurrentLayer, fCurrentLayer->Frame());
+			{
+				BRegion invalidRegion;
+				fCurrentLayer->GetWantedRegion(invalidRegion);
+				myRootLayer->GoInvalidate(fCurrentLayer, invalidRegion);
+			}
 #endif
 				
 			break;

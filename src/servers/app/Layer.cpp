@@ -88,16 +88,13 @@ Layer::Layer(BRect frame, const char* name, int32 token,
 	fFullVisible(),
 	fFull(),
 	fFrameAction(B_LAYER_ACTION_NONE),
+	fClipReg(&fVisible),
 #else
 	fVisible2(),
 	fFullVisible2(),
+	fClipReg(&fVisible2),
 #endif
 
-#ifndef NEW_CLIPPING
-	fClipReg(&fVisible),
-#else
-	fClipReg(&fVisible2),
-#endif 
 	fServerWin(NULL),
 	fName(name),
 	fViewToken(token),
@@ -927,16 +924,23 @@ Layer::Show(bool invalidate)
 	
 	fHidden	= false;
 
+	SendViewCoordUpdateMsg();
+
 // NOTE: I added this here and it solves the invalid region problem
 // for Windows that have been resized before they were shown. -Stephan
 #ifndef NEW_CLIPPING
 RebuildFullRegion();
-SendViewCoordUpdateMsg();
 
 	if (invalidate)
 		GetRootLayer()->GoInvalidate(this, fFull);
 #else
-
+	if (invalidate) {
+		// compute the region this layer wants for itself
+		BRegion	invalidRegion;
+		get_user_regions(invalidRegion);
+		if (invalidRegion.CountRects() > 0)
+			GetRootLayer()->GoInvalidate(this, invalidRegion);
+	}
 #endif
 }
 
@@ -959,6 +963,10 @@ Layer::Hide(bool invalidate)
 #ifndef NEW_CLIPPING	
 	if (invalidate)
 		GetRootLayer()->GoInvalidate(this, fFullVisible);
+#else
+	if (invalidate && fFullVisible2.CountRects() > 0) {
+		GetRootLayer()->GoInvalidate(this, fFullVisible2);
+	}
 #endif
 }
 
@@ -1653,6 +1661,14 @@ Layer::SetOverlayBitmap(const ServerBitmap* bitmap)
 }
 
 #ifdef NEW_CLIPPING
+
+void
+Layer::GetWantedRegion(BRegion& reg) const
+{
+	// this is the same as get_user_region.
+	// because get_user_region modifies nothing.
+	const_cast<Layer*>(this)->Layer::get_user_regions(reg);
+}
 
 //! converts a point from local to parent's coordinate system 
 void
