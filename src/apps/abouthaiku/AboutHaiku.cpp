@@ -203,7 +203,7 @@ AboutView::AboutView(const BRect &r)
 	r.OffsetBy(0, labelHeight);
 	r.bottom = r.top + textHeight;
 
-	sprintf(string, "%ld MB total", systemInfo.max_pages / 256);
+	sprintf(string, "%d MB total", int(systemInfo.max_pages / 256.0f + 0.5f));
 
 	stringView = new BStringView(r, "ramtext", string);
 	fInfoView->AddChild(stringView);
