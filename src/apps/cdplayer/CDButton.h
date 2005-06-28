@@ -16,47 +16,45 @@
 #include <TextControl.h>
 #include <StringView.h>
 
+#include "PlayList.h"
 #include "Observer.h"
 #include "CDEngine.h"
 
 class DrawButton;
+class TwoStateDrawButton;
 
 class CDButton : public BView, private Observer 
 {
 public:
-	CDButton(BRect frame, const char *name,	uint32 resizeMask = B_FOLLOW_ALL, 
-		uint32 flags = B_WILL_DRAW | B_NAVIGABLE | B_PULSE_NEEDED);
-		
-	virtual ~CDButton();
+						CDButton(BRect frame, const char *name,	
+								uint32 resizeMask = B_FOLLOW_ALL,
+								uint32 flags = B_WILL_DRAW | B_NAVIGABLE | 
+												B_PULSE_NEEDED);
+	virtual 			~CDButton();
 	
-	void BuildGUI(void);
+			void		BuildGUI(void);
 	
-	// misc BView overrides
-	virtual void AttachedToWindow();	
-	
-	virtual void Pulse();
-	
-	virtual	void FrameResized(float new_width, float new_height);
-
-	virtual void MessageReceived(BMessage *);
+	virtual	void		AttachedToWindow();	
+	virtual void 		Pulse();
+	virtual	void 		FrameResized(float new_width, float new_height);
+	virtual void	 	MessageReceived(BMessage *);
 
 	// observing overrides
-	virtual BHandler *RecipientHandler() const
+	virtual BHandler	*RecipientHandler() const
 		{ return (BHandler *)this; }
-
-	virtual void NoticeChange(Notifier *);
+	
+	virtual void		NoticeChange(Notifier *);
 
 private:
-	void UpdateCDInfo(void);
-	void UpdateTimeInfo(void);
-	void SetBitmap(BBitmap *bitmap);
+			void		UpdateCDInfo(void);
+			void		UpdateTimeInfo(void);
+			void		SetBitmap(BBitmap *bitmap);
 	
-	bool fStopOnQuit;
-	
-	CDEngine *engine;
+	CDEngine	*engine;
 	
 	DrawButton *fStop, *fPlay, *fNextTrack, *fPrevTrack;
 	DrawButton *fFastFwd, *fRewind, *fEject, *fSave, *fShuffle, *fRepeat;
+	
 	
 	BSlider *fVolume;
 	
@@ -70,6 +68,7 @@ private:
 	BBox *fTimeBox;
 	
 	CDState fCDState;
+	PlayList fPlaylist;
 };
 
 

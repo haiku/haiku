@@ -70,7 +70,7 @@ private:
 };
 
 class TrackState : public PeriodicWatcher {
-	// this watcher sends notices to observers that are interrested
+	// this watcher sends notices to observers that are interested
 	// about changes in the current track
 public:
 	TrackState(int devicefd);
@@ -88,7 +88,7 @@ private:
 };
 
 class TimeState : public PeriodicWatcher {
-	// this watcher sends notices to observers that are interrested
+	// this watcher sends notices to observers that are interested
 	// about changes in the current time
 public:
 	TimeState(int devicefd)

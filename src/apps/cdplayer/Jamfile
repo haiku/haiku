@@ -8,6 +8,8 @@ App CDPlayer :
 	DrawButton.cpp
 	FunctionObjectMessage.cpp
 	Observer.cpp
+	PlayList.cpp
+	TwoStateDrawButton.cpp
 	TypedList.cpp
 	;
 LinkSharedOSLibs CDPlayer : be net netapi translation ;

@@ -11,25 +11,37 @@ DrawButton::DrawButton(BRect frame, const char *name, BBitmap *up, BBitmap *down
 
 DrawButton::~DrawButton(void)
 {
+	delete fUp;
+	delete fDown;
+	delete fDisabled;
 }
 
-void DrawButton::SetBitmaps(BBitmap *up, BBitmap *down)
+void
+DrawButton::SetBitmaps(BBitmap *up, BBitmap *down)
 {
 	delete fUp;
 	delete fDown;
 	
 	fUp=up;
 	fDown=down;
+	
+	if(IsEnabled())
+		Invalidate();
 }
 
-void DrawButton::SetDisabled(BBitmap *disabled)
+void
+DrawButton::SetDisabled(BBitmap *disabled)
 {
 	delete fDisabled;
 	
 	fDisabled=disabled;
+	
+	if(!IsEnabled())
+		Invalidate();
 }
 
-void DrawButton::Draw(BRect update)
+void
+DrawButton::Draw(BRect update)
 {
 	if(!IsEnabled())
 	{
@@ -56,7 +68,8 @@ void DrawButton::Draw(BRect update)
 	}
 }
 
-void DrawButton::ResizeToPreferred(void)
+void
+DrawButton::ResizeToPreferred(void)
 {
 	if(fUp)
 		ResizeTo(fUp->Bounds().Width(),fUp->Bounds().Height());

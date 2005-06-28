@@ -23,6 +23,7 @@
 
 #include "CDButton.h"
 #include "DrawButton.h"
+#include "TwoStateDrawButton.h"
 #include <TranslationUtils.h>
 #include <TranslatorFormats.h>
 #include <TranslatorRoster.h>
@@ -47,10 +48,6 @@ enum
 CDButton::CDButton(BRect frame, const char *name, uint32 resizeMask, uint32 flags)
 	:	BView(frame, name, resizeMask, flags | B_FRAME_EVENTS)
 {
-	// This will eventually one of a few preferences - to stop playing music
-	// when the app is closed
-	fStopOnQuit = false;
-	
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
 	// TODO: Support multiple CD drives
@@ -74,8 +71,7 @@ CDButton::CDButton(BRect frame, const char *name, uint32 resizeMask, uint32 flag
 
 CDButton::~CDButton()
 {
-	if(fStopOnQuit)
-		engine->Stop();
+	engine->Stop();
 	
 	delete engine;
 }
@@ -138,89 +134,89 @@ void CDButton::BuildGUI(void)
 	fVolume->MoveTo(5, Bounds().bottom - 10 - fVolume->Frame().Height());
 	AddChild(fVolume);
 	
-	fStop = new DrawButton( BRect(0,0,1,1), "Stop", BTranslationUtils::GetBitmap('PNG ',"stop_up"),
-							BTranslationUtils::GetBitmap('PNG ',"stop_down"), new BMessage(M_STOP), 
+	fStop = new DrawButton( BRect(0,0,1,1), "Stop", BTranslationUtils::GetBitmap(B_PNG_FORMAT,"stop_up"),
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"stop_down"), new BMessage(M_STOP), 
 							B_FOLLOW_BOTTOM, B_WILL_DRAW);
 	fStop->ResizeToPreferred();
 	fStop->MoveTo(fVolume->Frame().right + 10, Bounds().bottom - 5 - fStop->Frame().Height());
-	fStop->SetDisabled(BTranslationUtils::GetBitmap('PNG ',"stop_disabled"));
+	fStop->SetDisabled(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"stop_disabled"));
 	AddChild(fStop);
 	
 	// TODO: Play is a special button. Implement as two-state buttons
-	fPlay = new DrawButton( BRect(0,0,1,1), "Play", BTranslationUtils::GetBitmap('PNG ',"play_up"),
-							BTranslationUtils::GetBitmap('PNG ',"play_down"), new BMessage(M_PLAY), 
-							B_FOLLOW_BOTTOM, B_WILL_DRAW);
+	fPlay = new DrawButton( BRect(0,0,1,1), "Play", BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_up"),
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_down"),
+							new BMessage(M_PLAY), B_FOLLOW_BOTTOM, B_WILL_DRAW);
 	fPlay->ResizeToPreferred();
 	fPlay->MoveTo(fStop->Frame().right + 2, Bounds().bottom - 5 - fPlay->Frame().Height());
-	fPlay->SetDisabled(BTranslationUtils::GetBitmap('PNG ',"play_disabled"));
+	fPlay->SetDisabled(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_disabled"));
 	AddChild(fPlay);
 	
-	fPrevTrack = new DrawButton( BRect(0,0,1,1), "PrevTrack", BTranslationUtils::GetBitmap('PNG ',"prev_up"),
-							BTranslationUtils::GetBitmap('PNG ',"prev_down"), new BMessage(M_PREV_TRACK), 
+	fPrevTrack = new DrawButton( BRect(0,0,1,1), "PrevTrack", BTranslationUtils::GetBitmap(B_PNG_FORMAT,"prev_up"),
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"prev_down"), new BMessage(M_PREV_TRACK), 
 							B_FOLLOW_BOTTOM, B_WILL_DRAW);
 	fPrevTrack->ResizeToPreferred();
 	fPrevTrack->MoveTo(fPlay->Frame().right + 10, Bounds().bottom - 5 - fPrevTrack->Frame().Height());
-	fPrevTrack->SetDisabled(BTranslationUtils::GetBitmap('PNG ',"prev_disabled"));
+	fPrevTrack->SetDisabled(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"prev_disabled"));
 	AddChild(fPrevTrack);
 	
-	fNextTrack = new DrawButton( BRect(0,0,1,1), "NextTrack", BTranslationUtils::GetBitmap('PNG ',"next_up"),
-							BTranslationUtils::GetBitmap('PNG ',"next_down"), new BMessage(M_NEXT_TRACK), 
+	fNextTrack = new DrawButton( BRect(0,0,1,1), "NextTrack", BTranslationUtils::GetBitmap(B_PNG_FORMAT,"next_up"),
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"next_down"), new BMessage(M_NEXT_TRACK), 
 							B_FOLLOW_BOTTOM, B_WILL_DRAW);
 	fNextTrack->ResizeToPreferred();
 	fNextTrack->MoveTo(fPrevTrack->Frame().right + 2, Bounds().bottom - 5 - fNextTrack->Frame().Height());
-	fNextTrack->SetDisabled(BTranslationUtils::GetBitmap('PNG ',"next_disabled"));
+	fNextTrack->SetDisabled(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"next_disabled"));
 	AddChild(fNextTrack);
 	
 	// TODO: Fast Forward and Rewind are special buttons. Implement as two-state buttons
-	fRewind = new DrawButton( BRect(0,0,1,1), "Rewind", BTranslationUtils::GetBitmap('PNG ',"rew_up"),
-							BTranslationUtils::GetBitmap('PNG ',"rew_down"), new BMessage(M_PREV_TRACK), 
+	fRewind = new DrawButton( BRect(0,0,1,1), "Rewind", BTranslationUtils::GetBitmap(B_PNG_FORMAT,"rew_up"),
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"rew_down"), new BMessage(M_PREV_TRACK), 
 							B_FOLLOW_BOTTOM, B_WILL_DRAW);
 	fRewind->ResizeToPreferred();
 	fRewind->MoveTo(fNextTrack->Frame().right + 10, Bounds().bottom - 5 - fRewind->Frame().Height());
-	fRewind->SetDisabled(BTranslationUtils::GetBitmap('PNG ',"rew_disabled"));
+	fRewind->SetDisabled(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"rew_disabled"));
 	AddChild(fRewind);
 	
-	fFastFwd = new DrawButton( BRect(0,0,1,1), "FastFwd", BTranslationUtils::GetBitmap('PNG ',"ffwd_up"),
-							BTranslationUtils::GetBitmap('PNG ',"ffwd_down"), new BMessage(M_NEXT_TRACK), 
+	fFastFwd = new DrawButton( BRect(0,0,1,1), "FastFwd", BTranslationUtils::GetBitmap(B_PNG_FORMAT,"ffwd_up"),
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"ffwd_down"), new BMessage(M_NEXT_TRACK), 
 							B_FOLLOW_BOTTOM, B_WILL_DRAW);
 	fFastFwd->ResizeToPreferred();
 	fFastFwd->MoveTo(fRewind->Frame().right + 2, Bounds().bottom - 5 - fFastFwd->Frame().Height());
-	fFastFwd->SetDisabled(BTranslationUtils::GetBitmap('PNG ',"ffwd_disabled"));
+	fFastFwd->SetDisabled(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"ffwd_disabled"));
 	AddChild(fFastFwd);
 	
-	fEject = new DrawButton( BRect(0,0,1,1), "Eject", BTranslationUtils::GetBitmap('PNG ',"eject_up"),
-							BTranslationUtils::GetBitmap('PNG ',"eject_down"), new BMessage(M_EJECT), 
+	fEject = new DrawButton( BRect(0,0,1,1), "Eject", BTranslationUtils::GetBitmap(B_PNG_FORMAT,"eject_up"),
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"eject_down"), new BMessage(M_EJECT), 
 							B_FOLLOW_BOTTOM, B_WILL_DRAW);
 	fEject->ResizeToPreferred();
 	fEject->MoveTo(fFastFwd->Frame().right + 20, Bounds().bottom - 5 - fEject->Frame().Height());
-	fEject->SetDisabled(BTranslationUtils::GetBitmap('PNG ',"eject_disabled"));
+	fEject->SetDisabled(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"eject_disabled"));
 	AddChild(fEject);
 	
-	fSave = new DrawButton( BRect(0,0,1,1), "Save", BTranslationUtils::GetBitmap('PNG ',"save_up"),
-							BTranslationUtils::GetBitmap('PNG ',"save_down"), new BMessage(M_SAVE), 
+	fSave = new DrawButton( BRect(0,0,1,1), "Save", BTranslationUtils::GetBitmap(B_PNG_FORMAT,"save_up"),
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"save_down"), new BMessage(M_SAVE), 
 							B_FOLLOW_NONE, B_WILL_DRAW);
 	fSave->ResizeToPreferred();
 	fSave->MoveTo(fEject->Frame().right + 20, Bounds().bottom - 5 - fSave->Frame().Height());
-	fSave->SetDisabled(BTranslationUtils::GetBitmap('PNG ',"save_disabled"));
+	fSave->SetDisabled(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"save_disabled"));
 	AddChild(fSave);
 	fSave->SetEnabled(false);
 	
 	// TODO: Shuffle and Repeat are special buttons. Implement as two-state buttons
-	fShuffle = new DrawButton( BRect(0,0,1,1), "Shuffle", BTranslationUtils::GetBitmap('PNG ',"shuffle_up"),
-							BTranslationUtils::GetBitmap('PNG ',"shuffle_down"), new BMessage(M_SHUFFLE), 
+	fShuffle = new DrawButton( BRect(0,0,1,1), "Shuffle", BTranslationUtils::GetBitmap(B_PNG_FORMAT,"shuffle_up"),
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"shuffle_down"), new BMessage(M_SHUFFLE), 
 							B_FOLLOW_NONE, B_WILL_DRAW);
 	fShuffle->ResizeToPreferred();
 	fShuffle->MoveTo(fSave->Frame().right + 2, Bounds().bottom - 5 - fShuffle->Frame().Height());
-	fShuffle->SetDisabled(BTranslationUtils::GetBitmap('PNG ',"shuffle_disabled"));
+	fShuffle->SetDisabled(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"shuffle_disabled"));
 	AddChild(fShuffle);
 	fShuffle->SetEnabled(false);
 	
-	fRepeat = new DrawButton( BRect(0,0,1,1), "Repeat", BTranslationUtils::GetBitmap('PNG ',"repeat_up"),
-							BTranslationUtils::GetBitmap('PNG ',"repeat_down"), new BMessage(M_REPEAT), 
+	fRepeat = new DrawButton( BRect(0,0,1,1), "Repeat", BTranslationUtils::GetBitmap(B_PNG_FORMAT,"repeat_up"),
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"repeat_down"), new BMessage(M_REPEAT), 
 							B_FOLLOW_NONE, B_WILL_DRAW);
 	fRepeat->ResizeToPreferred();
 	fRepeat->MoveTo(fShuffle->Frame().right + 2, Bounds().bottom - 5 - fRepeat->Frame().Height());
-	fRepeat->SetDisabled(BTranslationUtils::GetBitmap('PNG ',"repeat_disabled"));
+	fRepeat->SetDisabled(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"repeat_disabled"));
 	AddChild(fRepeat);
 	fRepeat->SetEnabled(false);
 }
@@ -291,17 +287,34 @@ CDButton::MessageReceived(BMessage *msg)
 	{
 		case M_SET_VOLUME:
 		{
-			// TODO: Implement
 			engine->SetVolume(fVolume->Value());
 			break;
 		}
 		case M_STOP:
 		{
+			if(engine->PlayStateWatcher()->GetState()==kPlaying)
+			{
+				fPlay->SetBitmaps(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_up"),
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_down"));
+			}
 			engine->Stop();
 			break;
 		}
 		case M_PLAY:
 		{
+			// If we are currently playing, then we will be showing
+			// the pause images and will want to switch back to the play images
+			if(engine->PlayStateWatcher()->GetState()==kPlaying)
+			{
+				fPlay->SetBitmaps(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_up"),
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_down"));
+			}
+			else
+			{
+				// Currently not playing and going to be playing, so show pause icons
+				fPlay->SetBitmaps(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"pause_up"),
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"pause_down"));
+			}
 			engine->PlayOrPause();
 			break;
 		}
@@ -468,9 +481,8 @@ CDButton::NoticeChange(Notifier *notifier)
 	else
 	if(trs)
 	{
+		// TODO: Update track count indicator once there is one
 		UpdateCDInfo();
-		
-		// TODO: Update track count indicator
 	}
 	else
 	if(tms)
@@ -611,7 +623,8 @@ public:
 };
 
 CDButtonWindow::CDButtonWindow(void)
- : BWindow(BRect (100, 100, 610, 200), "CD Player", B_TITLED_WINDOW, B_NOT_V_RESIZABLE)
+ : BWindow(BRect (100, 100, 610, 200), "CD Player", B_TITLED_WINDOW, B_NOT_V_RESIZABLE |
+   B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	float wmin,wmax,hmin,hmax;
 	
@@ -627,22 +640,13 @@ bool CDButtonWindow::QuitRequested(void)
 	return true;
 }
 
-CDButtonWindow *cdbwin;
-CDButton *cdbutton;
-
 CDButtonApplication::CDButtonApplication()
 	:	BApplication("application/x-vnd.Haiku-CDPlayer")
 {
-//	BWindow *window = new CDButtonWindow();
-	
-//	BView *button = new CDButton(window->Bounds(), "CD");
-///	window->AddChild(button);
-//	window->Show();
-	cdbwin = new CDButtonWindow();
-
-	cdbutton = new CDButton(cdbwin->Bounds(), "CD");
-	cdbwin->AddChild(cdbutton);
-	cdbwin->Show();
+	BWindow *window = new CDButtonWindow();
+	BView *button = new CDButton(window->Bounds(), "CD");
+	window->AddChild(button);
+	window->Show();
 }
 
 int
