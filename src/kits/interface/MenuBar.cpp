@@ -132,17 +132,19 @@ BMenuBar::Border() const
 }
 
 
-void 
+void
 BMenuBar::Draw(BRect updateRect)
 {
 	// TODO: implement additional border styles
-	if (IsEnabled()) {	
-		PushState();
-		
+	if (IsEnabled()) {
+		// ToDo: this is a work-around for broken PushState()/PopState()
+//		PushState();
+		rgb_color color = HighColor();
+
 		BRect bounds(Bounds());
 		// Restore the background of the previously selected menuitem
 		DrawBackground(bounds & updateRect);
-			
+
 		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_LIGHTEN_2_TINT));
 		StrokeLine(BPoint(0.0f, bounds.bottom - 2.0f), BPoint(0.0f, 0.0f));
 		StrokeLine(BPoint(bounds.right, 0.0f));
@@ -154,20 +156,20 @@ BMenuBar::Draw(BRect updateRect)
 		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 		StrokeLine(BPoint(0.0f, bounds.bottom), BPoint(bounds.right, bounds.bottom));
 		StrokeLine(BPoint(bounds.right, 0.0f), BPoint(bounds.right, bounds.bottom));
-		
-		PopState();
-				
+
+//		PopState();
+		SetHighColor(color);
+
 		DrawItems(updateRect);
-			
 	} else {
 		LayoutItems(0);
 		Sync();
 		Invalidate();
 	}
-}	
+}
 
 
-void 
+void
 BMenuBar::AttachedToWindow()
 {
 	Install(Window());
@@ -397,16 +399,17 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 	BMenuItem *resultItem = NULL;
 	BWindow *window = Window();
 	int localAction = MENU_ACT_NONE;
-	do {
+
+	while (true) {
 		bigtime_t snoozeAmount = 30000;
 		if (window->LockWithTimeout(200000) < B_OK)
 			break;
-		
+
 		BPoint where;
 		ulong buttons;
 		GetMouse(&where, &buttons);
-		
-		BMenuItem *menuItem = HitTestItems(where, B_ORIGIN); 
+
+		BMenuItem *menuItem = HitTestItems(where, B_ORIGIN);
 		if (menuItem != NULL && menuItem != fSelected) {
 			// only select the item
 			SelectItem(menuItem, -1);
@@ -416,7 +419,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 				SelectItem(menuItem);
 			}
 		}
-		
+
 		if (fSelected != NULL) {
 			BMenu *menu = fSelected->Submenu();
 			if (menu != NULL) {
@@ -429,17 +432,16 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 					break;
 			}
 		}
-						
+
 		window->Unlock();
-		
+
 		if (localAction == MENU_ACT_CLOSE)
 			break;
-		
+
 		if (snoozeAmount > 0)
 			snooze(snoozeAmount);
-			
-	} while (true);
-	
+	}
+
 	if (window->Lock()) {
 		if (fSelected != NULL)
 			SelectItem(NULL);
@@ -447,10 +449,10 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 			resultItem->Invoke();
 		window->Unlock();
 	}
-	
+
 	if (action != NULL)
 		*action = static_cast<int32>(localAction);
-		
+
 	return resultItem;
 }
 
