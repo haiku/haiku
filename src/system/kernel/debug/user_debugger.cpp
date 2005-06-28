@@ -1064,6 +1064,8 @@ write_user_memory(void *_address, const void *_buffer, int32 size,
 		}
 
 		// restrict this round of writing to the found area
+		if (toWrite > (int32)areaInfo.size)
+			toWrite = areaInfo.size;
 		if (address + toWrite > (char*)areaInfo.address + areaInfo.size)
 			toWrite = (char*)areaInfo.address + areaInfo.size - address;
 
