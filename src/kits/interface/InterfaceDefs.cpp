@@ -642,8 +642,8 @@ run_add_printer_panel()
 _IMPEXP_BE void
 run_be_about()
 {
-	// Unsure about how to implement this.
-	// TODO: Implement
+	if (be_roster != NULL)
+		be_roster->Launch("application/x-vnd.haiku-AboutHaiku");
 }
 
 
