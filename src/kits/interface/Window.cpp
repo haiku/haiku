@@ -166,12 +166,12 @@ BWindow::BWindow(BMessage* data)
 		&& data->FindFloat("_zoom", 1, &fMaxZoomHeight) == B_OK)
 		SetZoomLimits(fMaxZoomWidth, fMaxZoomHeight);
 
-	if (data->FindFloat("_sizel", 0, &fMinWindWidth) == B_OK
-		&& data->FindFloat("_sizel", 1, &fMinWindHeight) == B_OK
-		&& data->FindFloat("_sizel", 2, &fMaxWindWidth) == B_OK
-		&& data->FindFloat("_sizel", 3, &fMaxWindHeight) == B_OK)
-		SetSizeLimits(fMinWindWidth, fMaxWindWidth,
-			fMinWindHeight, fMaxWindHeight);
+	if (data->FindFloat("_sizel", 0, &fMinWidth) == B_OK
+		&& data->FindFloat("_sizel", 1, &fMinHeight) == B_OK
+		&& data->FindFloat("_sizel", 2, &fMaxWidth) == B_OK
+		&& data->FindFloat("_sizel", 3, &fMaxHeight) == B_OK)
+		SetSizeLimits(fMinWidth, fMaxWidth,
+			fMinHeight, fMaxHeight);
 
 	if (data->FindInt64("_pulse", &fPulseRate) == B_OK)
 		SetPulseRate(fPulseRate);
@@ -258,12 +258,12 @@ BWindow::Archive(BMessage* data, bool deep) const
 		data->AddFloat("_zoom", fMaxZoomHeight);
 	}
 
-	if (fMinWindWidth != 0.0 || fMinWindHeight != 0.0 
-		|| fMaxWindWidth != 32768.0 || fMaxWindHeight != 32768.0) {
-		data->AddFloat("_sizel", fMinWindWidth);
-		data->AddFloat("_sizel", fMinWindHeight);
-		data->AddFloat("_sizel", fMaxWindWidth);
-		data->AddFloat("_sizel", fMaxWindHeight);
+	if (fMinWidth != 0.0 || fMinHeight != 0.0 
+		|| fMaxWidth != 32768.0 || fMaxHeight != 32768.0) {
+		data->AddFloat("_sizel", fMinWidth);
+		data->AddFloat("_sizel", fMinHeight);
+		data->AddFloat("_sizel", fMaxWidth);
+		data->AddFloat("_sizel", fMaxHeight);
 	}
 
 	if (fPulseRate != 500000)
@@ -1013,10 +1013,10 @@ BWindow::SetSizeLimits(float minWidth, float maxWidth,
 			&& code == SERVER_TRUE) {
 			// read the values that were really enforced on
 			// the server side
-			fLink->Read<float>(&fMinWindWidth);
-			fLink->Read<float>(&fMaxWindWidth);
-			fLink->Read<float>(&fMinWindHeight);
-			fLink->Read<float>(&fMaxWindHeight);
+			fLink->Read<float>(&fMinWidth);
+			fLink->Read<float>(&fMaxWidth);
+			fLink->Read<float>(&fMinHeight);
+			fLink->Read<float>(&fMaxHeight);
 		}
 		Unlock();
 	}
@@ -1028,10 +1028,10 @@ BWindow::GetSizeLimits(float *minWidth, float *maxWidth,
 	float *minHeight, float *maxHeight)
 {
 	// TODO: What about locking?!?
-	*minHeight	= fMinWindHeight;
-	*minWidth	= fMinWindWidth;
-	*maxHeight	= fMaxWindHeight;
-	*maxWidth	= fMaxWindWidth;
+	*minHeight = fMinHeight;
+	*minWidth = fMinWidth;
+	*maxHeight = fMaxHeight;
+	*maxWidth = fMaxWidth;
 }
 
 
@@ -1039,13 +1039,13 @@ void
 BWindow::SetZoomLimits(float maxWidth, float maxHeight)
 {
 	// TODO: What about locking?!?
-	if (maxWidth > fMaxWindWidth)
-		maxWidth = fMaxWindWidth;
+	if (maxWidth > fMaxWidth)
+		maxWidth = fMaxWidth;
 	else
 		fMaxZoomWidth = maxWidth;
 
-	if (maxHeight > fMaxWindHeight)
-		maxHeight = fMaxWindHeight;
+	if (maxHeight > fMaxHeight)
+		maxHeight = fMaxHeight;
 	else
 		fMaxZoomHeight = maxHeight;
 }
@@ -1092,10 +1092,10 @@ BWindow::Zoom()
 	minWidth = fMaxZoomWidth;
 
 	// 2) the rectangle defined by SetSizeLimits()
-	if (fMaxWindHeight < minHeight)
-		minHeight = fMaxWindHeight;
-	if (fMaxWindWidth < minWidth)
-		minWidth = fMaxWindWidth;
+	if (fMaxHeight < minHeight)
+		minHeight = fMaxHeight;
+	if (fMaxWidth < minWidth)
+		minWidth = fMaxWidth;
 
 	// 3) the screen rectangle
 	if (screen.Frame().Width() < minWidth)
@@ -1832,14 +1832,14 @@ BWindow::ResizeBy(float dx, float dy)
 {
 	Lock();
 	// stay in minimum & maximum frame limits
-	if (fFrame.Width() + dx < fMinWindWidth)
-		dx = fMinWindWidth - fFrame.Width();
-	if (fFrame.Width() + dx > fMaxWindWidth)
-		dx = fMaxWindWidth - fFrame.Width();
-	if (fFrame.Height() + dy < fMinWindHeight)
-		dy = fMinWindHeight - fFrame.Height();
-	if (fFrame.Height() + dy > fMaxWindHeight)
-		dy = fMaxWindHeight - fFrame.Height();
+	if (fFrame.Width() + dx < fMinWidth)
+		dx = fMinWidth - fFrame.Width();
+	if (fFrame.Width() + dx > fMaxWidth)
+		dx = fMaxWidth - fFrame.Width();
+	if (fFrame.Height() + dy < fMinHeight)
+		dy = fMinHeight - fFrame.Height();
+	if (fFrame.Height() + dy > fMaxHeight)
+		dy = fMaxHeight - fFrame.Height();
 
 	if (dx != 0.0 || dy != 0.0) {
 		fLink->StartMessage(AS_WINDOW_RESIZE);
@@ -2037,10 +2037,10 @@ BWindow::InitData(BRect frame, const char* title, window_look look,
 
 	fMaxZoomHeight = 32768.0;
 	fMaxZoomWidth = 32768.0;
-	fMinWindHeight = 0.0;
-	fMinWindWidth = 0.0;
-	fMaxWindHeight = 32768.0;
-	fMaxWindWidth = 32768.0;
+	fMinHeight = 0.0;
+	fMinWidth = 0.0;
+	fMaxHeight = 32768.0;
+	fMaxWidth = 32768.0;
 
 	fLastViewToken = B_NULL_TOKEN;
 
@@ -2083,9 +2083,21 @@ BWindow::InitData(BRect frame, const char* title, window_look look,
 	int32 code;
 	if (fLink->FlushWithReply(code) == B_OK
 		&& code == SERVER_TRUE
-		&& fLink->Read<port_id>(&sendPort) == B_OK)
+		&& fLink->Read<port_id>(&sendPort) == B_OK) {
 		fLink->SetSenderPort(sendPort);
-	else
+
+		// read the frame size and its limits that were really
+		// enforced on the server side
+
+		fLink->Read<BRect>(&fFrame);
+		fLink->Read<float>(&fMinWidth);
+		fLink->Read<float>(&fMaxWidth);
+		fLink->Read<float>(&fMinHeight);
+		fLink->Read<float>(&fMaxHeight);
+
+		fMaxZoomWidth = fMaxWidth;
+		fMaxZoomHeight = fMaxHeight;
+	} else
 		sendPort = -1;
 
 	if (locked)
@@ -3005,10 +3017,10 @@ BWindow::PrintToStream() const
 		fMenuSem,
 		fMaxZoomHeight,
 		fMaxZoomWidth,
-		fMinWindHeight,
-		fMinWindWidth,
-		fMaxWindHeight,
-		fMaxWindWidth,
+		fMinHeight,
+		fMinWidth,
+		fMaxHeight,
+		fMaxWidth,
 		fFrame.left, fFrame.top, fFrame.right, fFrame.bottom, 
 		(int16)fLook,
 		(int16)fFeel,

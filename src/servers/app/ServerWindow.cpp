@@ -17,6 +17,7 @@
 #include <Rect.h>
 #include <View.h>
 #include <ViewAux.h>
+#include <Autolock.h>
 
 #include "AppServer.h"
 #include "BGet++.h"
@@ -136,6 +137,8 @@ ServerWindow::InitCheck()
 bool
 ServerWindow::Run()
 {
+	BAutolock locker(this);
+
 	// Spawn our message-monitoring thread
 	fThread = spawn_thread(_message_thread, fTitle, B_NORMAL_PRIORITY, this);
 	if (fThread < B_OK)
@@ -147,9 +150,20 @@ ServerWindow::Run()
 		return false;
 	}
 
-	// Send a reply to our window - it is expecting fMessagePort port.
+	// Send a reply to our window - it is expecting fMessagePort
+	// port and some other info
+
 	fLink.StartMessage(SERVER_TRUE);
 	fLink.Attach<port_id>(fMessagePort);
+
+	float minWidth, maxWidth, minHeight, maxHeight;
+	fWinBorder->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
+
+	fLink.Attach<BRect>(fWinBorder->Frame());
+	fLink.Attach<float>(minWidth);
+	fLink.Attach<float>(maxWidth);
+	fLink.Attach<float>(minHeight);
+	fLink.Attach<float>(maxHeight);
 	fLink.Flush();
 
 	return true;

@@ -410,10 +410,10 @@ private:
 	sem_id			fMenuSem;
 	float			fMaxZoomHeight;
 	float			fMaxZoomWidth;
-	float			fMinWindHeight;
-	float			fMinWindWidth;
-	float			fMaxWindHeight;
-	float			fMaxWindWidth;
+	float			fMinHeight;
+	float			fMinWidth;
+	float			fMaxHeight;
+	float			fMaxWidth;
 	BRect			fFrame;
 	window_look		fLook;
 	ViewAttr		*fCurDrawViewState;			// not yet used
