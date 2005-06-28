@@ -999,25 +999,36 @@ read_user_memory(const void *_address, void *_buffer, int32 size,
 
 	// If the region to be read crosses page boundaries, we split it up into
 	// smaller chunks.
+	status_t error = B_OK;
 	bytesRead = 0;
 	while (size > 0) {
-		int32 toRead = size;
-		if ((uint32)address % B_PAGE_SIZE + toRead > B_PAGE_SIZE)
-			toRead = B_PAGE_SIZE - (uint32)address % B_PAGE_SIZE;
-
-		status_t error = user_memcpy(buffer, address, toRead);
-
-		// If reading fails, we only fail, if we haven't read anything yet.
-		if (error != B_OK) {
-			if (bytesRead > 0)
-				return B_OK;
-			return error;
+		// check whether we're still in user address space
+		if (!IS_USER_ADDRESS(address)) {
+			error = B_BAD_ADDRESS;
+			break;
 		}
+
+		// don't cross page boundaries in a single read
+		int32 toRead = size;
+		int32 maxRead = B_PAGE_SIZE - (addr_t)address % B_PAGE_SIZE;
+		if (toRead > maxRead)
+			toRead = maxRead;
+
+		error = user_memcpy(buffer, address, toRead);
+		if (error != B_OK)
+			break;
 
 		bytesRead += toRead;
 		address += toRead;
 		buffer += toRead;
 		size -= toRead;
+	}
+
+	// If reading fails, we only fail, if we haven't read anything yet.
+	if (error != B_OK) {
+		if (bytesRead > 0)
+			return B_OK;
+		return error;
 	}
 
 	return B_OK;
@@ -1042,7 +1053,11 @@ write_user_memory(void *_address, const void *_buffer, int32 size,
 	status_t error = B_OK;
 	bytesWritten = 0;
 	while (size > 0) {
-		int32 toWrite = size;
+		// check whether we're still in user address space
+		if (!IS_USER_ADDRESS(address)) {
+			error = B_BAD_ADDRESS;
+			break;
+		}
 
 		// get the area for the address (we need to use _user_area_for(), since
 		// we're looking for a user area)
@@ -1064,10 +1079,10 @@ write_user_memory(void *_address, const void *_buffer, int32 size,
 		}
 
 		// restrict this round of writing to the found area
-		if (toWrite > (int32)areaInfo.size)
-			toWrite = areaInfo.size;
-		if (address + toWrite > (char*)areaInfo.address + areaInfo.size)
-			toWrite = (char*)areaInfo.address + areaInfo.size - address;
+		int32 toWrite = size;
+		int32 maxWrite = (char*)areaInfo.address + areaInfo.size - address;
+		if (toWrite > maxWrite)
+			toWrite = maxWrite;
 
 		// if the area is read-only, we temporarily need to make it writable
 		bool protectionChanged = false;
