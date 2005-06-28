@@ -11,3 +11,11 @@ App AboutHaiku :
 	: libbe.so libtranslation.so
 	: AboutHaiku.rdef
 	;
+
+if $(HAIKU_COMPATIBLE) {
+	LinkSharedOSLibs AboutHaiku : libroot.so ;
+}
+
+SEARCH on [ FGristFiles
+		strlcpy.c
+	] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
