@@ -112,7 +112,7 @@ BEOS_BIN="touch sync ln listarea listattr listsem listport \
 	csplit cut beep"
 
 BEOS_APPS="MiniTerminal Expander People ShowImage Clock Pulse Playground \
-	SoundRecorder BitmapDrawing Magnify DiskProbe"
+	SoundRecorder BitmapDrawing Magnify DiskProbe AboutHaiku"
 BEOS_PREFERENCES="Backgrounds DataTranslations FileTypes Media Menu Mouse \
 	Keyboard Keymap Screen ScrollBar Sounds Time VirtualMemory Workspaces"
 
