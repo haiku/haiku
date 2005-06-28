@@ -363,6 +363,7 @@ BMenuItem::DrawContent()
 	GetContentSize(&labelWidth, &labelHeight);		
 	
 	// truncate if needed
+	// TODO: Actually, this is still never triggered
 	if (fBounds.Width() > labelWidth)
 		fSuper->DrawString(fLabel);
 	else {
@@ -440,7 +441,7 @@ BMenuItem::Draw()
 void
 BMenuItem::Highlight(bool flag)
 {
-	Menu()->Draw(Frame());
+	Menu()->Invalidate(Frame());
 }
 
 
@@ -605,8 +606,7 @@ BMenuItem::Select(bool on)
 	} else if (IsEnabled()) {
 		fSelected = on;
 		Highlight(on);
-	}
-		
+	}	
 }
 
 
