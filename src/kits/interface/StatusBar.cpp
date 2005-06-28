@@ -208,7 +208,7 @@ BStatusBar::MessageReceived(BMessage *message)
 
 			message->FindFloat("delta", &delta);
 			message->FindString("text", &text);
-			message->FindString("trailing text", &trailing_text);
+			message->FindString("trailing_text", &trailing_text);
 
 			Update(delta, text, trailing_text);
 
@@ -220,7 +220,7 @@ BStatusBar::MessageReceived(BMessage *message)
 			const char *label = NULL, *trailing_label = NULL;
 
 			message->FindString("label", &label);
-			message->FindString("trailing label", &trailing_label);
+			message->FindString("trailing_label", &trailing_label);
 
 			Reset(label, trailing_label);
 
