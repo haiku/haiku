@@ -12,9 +12,6 @@
 
 class BApplication::Private {
 public:
-	static inline status_t InitGUIContext()
-		{ return be_app->_InitGUIContext(); }
-
 	static inline BPrivate::PortLink *ServerLink()
 		{ return be_app->fServerLink; }
 };

@@ -24,11 +24,11 @@ class BWindow;
 class _BSession_;
 class BResources;
 class BMessageRunner;
+class BServer;
 struct _server_heap_;
 struct _drag_data_;
 
 namespace BPrivate {
-	class AppServerLink;
 	class PortLink;
 }
 
@@ -97,6 +97,8 @@ private:
 
 	class Private;
 	friend class Private;
+
+	friend class BServer;
 
 							BApplication(const char* signature, bool initGUI,
 										 status_t* error);

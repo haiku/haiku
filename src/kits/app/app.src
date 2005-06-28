@@ -29,6 +29,7 @@ APP_KIT_SOURCE =
 	RegistrarThreadManager.cpp
 	Roster.cpp
 	RosterPrivate.cpp
+	Server.cpp
 	ServerMemIO.cpp
 	TokenSpace.cpp
 	TypeConstants.cpp
