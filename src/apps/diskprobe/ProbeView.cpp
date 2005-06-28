@@ -39,10 +39,12 @@
 #include <string.h>
 
 
-#define DRAW_SLIDER_BAR
+#ifndef __HAIKU__
+#	define DRAW_SLIDER_BAR
 	// if this is defined, the standard slider bar is replaced with
 	// one that looks exactly like the one in the original DiskProbe
 	// (even in Dano/Zeta)
+#endif
 
 static const uint32 kMsgSliderUpdate = 'slup';
 static const uint32 kMsgPositionUpdate = 'poup';
@@ -278,7 +280,7 @@ PositionSlider::PositionSlider(BRect rect, const char *name, BMessage *message,
 	Reset();
 
 #ifndef DRAW_SLIDER_BAR
-	rgb_color color =  ui_color(B_CONTROL_HIGHLIGHT_COLOR);
+	rgb_color color = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
 	UseFillColor(true, &color);
 #endif
 }
