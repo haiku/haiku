@@ -41,7 +41,7 @@
 #include "RGBColor.h"
 #include "ServerWindow.h"
 
-#define NEW_CLIPPING 1
+//#define NEW_CLIPPING 1
 
 enum {
 	B_LAYER_NONE		= 1,
@@ -208,6 +208,10 @@ class Layer {
 			void				SetOverlayBitmap(const ServerBitmap* bitmap);
 	inline	const ServerBitmap*	OverlayBitmap() const
 									{ return fOverlayBitmap; }
+
+			void				CopyBits(BRect& src, BRect& dst,
+										 int32 xOffset, int32 yOffset);
+
 #ifdef NEW_CLIPPING
 	inline	const BRegion&		VisibleRegion() const { return fVisible2; }
 	inline	const BRegion&		FullVisible() const { return fFullVisible2; }
@@ -247,19 +251,22 @@ class Layer {
 			void				do_Redraw(	const BRegion &invalid,
 											const Layer *startFrom = NULL);
 
-			void			rebuild_visible_regions(const BRegion &invalid,
+			void				rebuild_visible_regions(const BRegion &invalid,
 													const BRegion &parentLocalVisible,
 													const Layer *startFrom);
 
-	virtual	bool			alter_visible_for_children(BRegion &region);
-	virtual	void			get_user_regions(BRegion &reg);
+	virtual	bool				alter_visible_for_children(BRegion &region);
+	virtual	void				get_user_regions(BRegion &reg);
 
-			void			clear_visible_regions();
-			void			resize_layer_frame_by(float x, float y);
-			void			rezize_layer_redraw_more(BRegion &reg, float dx, float dy);
-			void			resize_layer_full_update_on_resize(BRegion &reg, float dx, float dy);
+			void				clear_visible_regions();
+			void				resize_layer_frame_by(float x, float y);
+			void				rezize_layer_redraw_more(BRegion &reg, float dx, float dy);
+			void				resize_layer_full_update_on_resize(BRegion &reg, float dx, float dy);
 
 #endif
+ private:
+			void				do_CopyBits(BRect& src, BRect& dst,
+											int32 xOffset, int32 yOffset);
 
  protected:
 	friend class RootLayer;

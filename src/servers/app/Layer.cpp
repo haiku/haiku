@@ -1660,6 +1660,91 @@ Layer::SetOverlayBitmap(const ServerBitmap* bitmap)
 	fOverlayBitmap = bitmap;
 }
 
+void
+Layer::CopyBits(BRect& src, BRect& dst, int32 xOffset, int32 yOffset) {
+
+	BPrivate::PortLink msg(-1, -1);
+	msg.StartMessage(AS_ROOTLAYER_LAYER_COPYBITS);
+	msg.Attach<Layer*>(this);	
+	msg.Attach<BRect>(src);
+	msg.Attach<BRect>(dst);
+	msg.Attach<int32>(xOffset);
+	msg.Attach<int32>(yOffset);
+	GetRootLayer()->EnqueueMessage(msg);
+}		
+
+void
+Layer::do_CopyBits(BRect& src, BRect& dst, int32 xOffset, int32 yOffset) {
+	// NOTE: The correct behaviour is this:
+	// * The region that is copied is the
+	//   src rectangle, no matter if it fits
+	//   into the dst rectangle. It is copied
+	//   by the offset dst.LeftTop() - src.LeftTop()
+	// * The dst rectangle is used for invalidation:
+	//   Any area in the dst rectangle that could
+	//   not be copied from src (because either the
+	//   src rectangle was not big enough, or because there
+	//   were parts cut off by the current layer clipping),
+	//   are triggering BView::Draw() to be called
+	//   and for these parts only.
+
+#ifndef NEW_CLIPPING
+
+	// the region that is going to be copied
+	BRegion copyRegion(src);
+	// apply the current clipping of the layer
+
+	copyRegion.IntersectWith(&fVisible);
+
+	// offset the region to the destination
+	// and apply the current clipping there as well
+	copyRegion.OffsetBy(xOffset, yOffset);
+	copyRegion.IntersectWith(&fVisible);
+
+	// the region at the destination that needs invalidation
+	GetRootLayer()->fRedrawReg.Set(dst);
+	// exclude the region drawn by the copy operation
+	GetRootLayer()->fRedrawReg.Exclude(&copyRegion);
+	// apply the current clipping as well
+	GetRootLayer()->fRedrawReg.IntersectWith(&fVisible);
+
+	// move the region back for the actual operation
+	copyRegion.OffsetBy(-xOffset, -yOffset);
+
+	GetDisplayDriver()->CopyRegion(&copyRegion, xOffset, yOffset);
+
+	// trigger the redraw			
+	GetRootLayer()->RequestDraw(GetRootLayer()->fRedrawReg, NULL);
+#else
+	// the region that is going to be copied
+	BRegion copyRegion(src);
+	// apply the current clipping of the layer
+
+	copyRegion.IntersectWith(&fVisible2);
+
+	// offset the region to the destination
+	// and apply the current clipping there as well
+	copyRegion.OffsetBy(xOffset, yOffset);
+	copyRegion.IntersectWith(&fVisible2);
+
+	// the region at the destination that needs invalidation
+	GetRootLayer()->fRedrawReg.Set(dst);
+	// exclude the region drawn by the copy operation
+	GetRootLayer()->fRedrawReg.Exclude(&copyRegion);
+	// apply the current clipping as well
+	GetRootLayer()->fRedrawReg.IntersectWith(&fVisible2);
+
+	// move the region back for the actual operation
+	copyRegion.OffsetBy(-xOffset, -yOffset);
+
+	GetDisplayDriver()->CopyRegion(&copyRegion, xOffset, yOffset);
+
+	// trigger the redraw			
+	GetRootLayer()->RequestDraw(GetRootLayer()->fRedrawReg, NULL);
+#endif
+
+}
+
 #ifdef NEW_CLIPPING
 
 void

@@ -355,6 +355,22 @@ RootLayer::WorkingThread(void *data)
 #endif
 				break;
 			}
+			case AS_ROOTLAYER_LAYER_COPYBITS:
+			{
+				Layer *layer = NULL;
+				int32 xOffset, yOffset;
+				BRect src, dst;
+				messageQueue.Read<Layer*>(&layer);
+				messageQueue.Read<BRect>(&src);
+				messageQueue.Read<BRect>(&dst);
+				messageQueue.Read<int32>(&xOffset);
+				messageQueue.Read<int32>(&yOffset);
+
+				layer->do_CopyBits(src, dst, xOffset, yOffset);
+
+				break;
+			}
+
 			case AS_ROOTLAYER_ADD_TO_SUBSET:
 			{
 				WinBorder *winBorder = NULL;

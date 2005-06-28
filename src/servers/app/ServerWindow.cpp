@@ -435,7 +435,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			fCurrentLayer->fLayerData->OffsetOrigin(BPoint(dh, dv));
 
-			_CopyBits(myRootLayer, fCurrentLayer, src, dst, xOffset, yOffset);
+			fCurrentLayer->CopyBits(src, dst, xOffset, yOffset);
 #else
 			fCurrentLayer->ScrollBy(dh, dv);
 #endif
@@ -457,7 +457,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			int32 xOffset = (int32)(dst.left - src.left);
 			int32 yOffset = (int32)(dst.top - src.top);
 
-			_CopyBits(myRootLayer, fCurrentLayer, src, dst, xOffset, yOffset);
+			fCurrentLayer->CopyBits(src, dst, xOffset, yOffset);
 
 			break;
 		}
@@ -2094,58 +2094,6 @@ ServerWindow::_MessageLooper()
 		Unlock();
 	}
 }
-
-// _CopyBits
-void
-ServerWindow::_CopyBits(RootLayer* rootLayer, Layer* layer,
-						BRect& src, BRect& dst,
-						int32 xOffset, int32 yOffset) const
-{
-	// NOTE: The correct behaviour is this:
-	// * The region that is copied is the
-	//   src rectangle, no matter if it fits
-	//   into the dst rectangle. It is copied
-	//   by the offset dst.LeftTop() - src.LeftTop()
-	// * The dst rectangle is used for invalidation:
-	//   Any area in the dst rectangle that could
-	//   not be copied from src (because either the
-	//   src rectangle was not big enough, or because there
-	//   were parts cut off by the current layer clipping),
-	//   are triggering BView::Draw() to be called
-	//   and for these parts only.
-
-#ifndef NEW_CLIPPING
-
-	// the region that is going to be copied
-	BRegion copyRegion(src);
-	// apply the current clipping of the layer
-
-	copyRegion.IntersectWith(&layer->fVisible);
-
-	// offset the region to the destination
-	// and apply the current clipping there as well
-	copyRegion.OffsetBy(xOffset, yOffset);
-	copyRegion.IntersectWith(&layer->fVisible);
-
-	// the region at the destination that needs invalidation
-	BRegion invalidRegion(dst);
-	// exclude the region drawn by the copy operation
-	invalidRegion.Exclude(&copyRegion);
-	// apply the current clipping as well
-	invalidRegion.IntersectWith(&layer->fVisible);
-
-	// move the region back for the actual operation
-	copyRegion.OffsetBy(-xOffset, -yOffset);
-
-	layer->GetDisplayDriver()->CopyRegion(&copyRegion, xOffset, yOffset);
-
-	// trigger the redraw			
-//	rootLayer->GoRedraw(fWinBorder, invalidRegion);
-rootLayer->RequestDraw(invalidRegion, fWinBorder);
-
-#endif
-}
-
 
 void
 ServerWindow::SendMessageToClient(const BMessage* msg, int32 target, bool usePreferred) const

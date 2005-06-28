@@ -113,14 +113,6 @@ private:
 
 	static	int32				_message_thread(void *_window);
 
-			// used by CopyBits and Scrolling
-			void				_CopyBits(RootLayer* rootLayer,
-										  Layer* layer,
-										  BRect& copy,
-										  BRect& dirty,
-										  int32 xOffset, int32 yOffset) const;
-
-	
 			// TODO: Move me elsewhere
 			status_t			PictureToRegion(ServerPicture *picture,
 												BRegion &,
