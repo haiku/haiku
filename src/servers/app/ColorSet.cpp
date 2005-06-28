@@ -157,7 +157,7 @@ printf("Initializing color settings to defaults\n");
 	SetRGBColor(&control_background,245,245,245);
 	SetRGBColor(&control_text,0,0,0);
 	SetRGBColor(&control_border,0,0,0);
-	SetRGBColor(&control_highlight,115,120,184);
+	SetRGBColor(&control_highlight, 102, 152, 203);
 	SetRGBColor(&keyboard_navigation_base,0,0,229);
 	SetRGBColor(&keyboard_navigation_pulse,0,0,0);
 	SetRGBColor(&shine,255,255,255);
@@ -434,12 +434,12 @@ rgb_color ColorSet::AttributeToColor(int32 which)
 		}
 		case B_CONTROL_BORDER_COLOR:
 		{
-			return control_highlight;
+			return control_border;
 			break;
 		}
 		case B_CONTROL_HIGHLIGHT_COLOR:
 		{
-			return control_border;
+			return control_highlight;
 			break;
 		}
 		case B_NAVIGATION_BASE_COLOR:
