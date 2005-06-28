@@ -621,11 +621,12 @@ myRootLayer->Unlock();
 			myRootLayer->SetEventMaskLayer(fCurrentLayer, mask, options);
 			break;
 		}
-		case AS_LAYER_MOVETO:
+		case AS_LAYER_MOVE_TO:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_MOVETO: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_MOVE_TO: Layer name: %s\n",
+				fTitle, fCurrentLayer->Name()));
+
 			float x, y;
-			
 			link.Read<float>(&x);
 			link.Read<float>(&y);
 
@@ -635,11 +636,12 @@ myRootLayer->Unlock();
 			fCurrentLayer->MoveBy(offsetX, offsetY);
 			break;
 		}
-		case AS_LAYER_RESIZETO:
+		case AS_LAYER_RESIZE_TO:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZETO: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZE_TO: Layer name: %s\n",
+				fTitle, fCurrentLayer->Name()));
+
 			float newWidth, newHeight;
-			
 			link.Read<float>(&newWidth);
 			link.Read<float>(&newHeight);
 			
@@ -854,23 +856,34 @@ myRootLayer->Lock();
 myRootLayer->Unlock();
 			break;
 		}
-		case AS_LAYER_GET_COLORS:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_COLORS: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			rgb_color highColor, lowColor, viewColor;
-			
-			highColor = fCurrentLayer->fLayerData->HighColor().GetColor32();
-			lowColor = fCurrentLayer->fLayerData->LowColor().GetColor32();
-			viewColor = fCurrentLayer->ViewColor().GetColor32();
-			
-			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach(&highColor, sizeof(rgb_color));
-			fLink.Attach(&lowColor, sizeof(rgb_color));
-			fLink.Attach(&viewColor, sizeof(rgb_color));
-			fLink.Flush();
 
+		case AS_LAYER_GET_HIGH_COLOR:
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_HIGH_COLOR: Layer: %s\n",
+				Title(), fCurrentLayer->Name()));
+
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<rgb_color>(fCurrentLayer->fLayerData->HighColor().GetColor32());
+			fLink.Flush();
 			break;
-		}
+
+		case AS_LAYER_GET_LOW_COLOR:
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_LOW_COLOR: Layer: %s\n",
+				Title(), fCurrentLayer->Name()));
+
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<rgb_color>(fCurrentLayer->fLayerData->LowColor().GetColor32());
+			fLink.Flush();
+			break;
+
+		case AS_LAYER_GET_VIEW_COLOR:
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_VIEW_COLOR: Layer: %s\n",
+				Title(), fCurrentLayer->Name()));
+
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<rgb_color>(fCurrentLayer->ViewColor().GetColor32());
+			fLink.Flush();
+			break;
+
 		case AS_LAYER_SET_BLEND_MODE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_BLEND_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));

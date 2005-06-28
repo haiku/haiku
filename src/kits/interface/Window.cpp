@@ -833,10 +833,10 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 					msg->FindFloat("height", i, &height);
 					if ((view = findView(top_view, token))) {
 						// update the views offset in parent
-						if (view->originX != frameLeftTop.x || view->originY != frameLeftTop.y) {
+						if (view->LeftTop() != frameLeftTop) {
 //printf("updating position (%.1f, %.1f): %s\n", frameLeftTop.x, frameLeftTop.y, view->Name());
-							view->originX = frameLeftTop.x;
-							view->originY = frameLeftTop.y;
+							view->fParentOffset = frameLeftTop;
+
 							// optionally call FrameMoved
 							if (view->fFlags & B_FRAME_EVENTS) {
 								STRACE(("Calling BView(%s)::FrameMoved( %.1f, %.1f )\n", view->Name(),
