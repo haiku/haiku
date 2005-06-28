@@ -95,14 +95,11 @@ public:
 private:
 	typedef BLooper _inherited;
 
-	friend class BWindow;
-	friend class BView;
-	friend class BBitmap;
-	friend class BScrollBar;
-	friend class BPrivateScreen;
-	friend class BPrivate::AppServerLink;
-	friend void _toggle_handles_(bool);
+	class Private;
+	friend class Private;
 
+							BApplication(const char* signature, bool initGUI,
+										 status_t* error);
 							BApplication(uint32 signature);
 							BApplication(const BApplication&);
 			BApplication&	operator=(const BApplication&);
@@ -120,14 +117,16 @@ private:
 								BMessage* specifier, int32 form,
 								const char* property);
 			void			run_task();
-			void			InitData(const char* signature, status_t* error);
+			void			InitData(const char* signature, bool initGUI,
+								status_t* error);
 			void			BeginRectTracking(BRect r, bool trackWhole);
 			void			EndRectTracking();
-			void			setup_server_heaps();
+			status_t		setup_server_heaps();
 			void*			rw_offs_to_ptr(uint32 offset);
 			void*			ro_offs_to_ptr(uint32 offset);
 			void*			global_ro_offs_to_ptr(uint32 offset);
-			void			connect_to_app_server();
+			status_t		_InitGUIContext();
+			status_t		connect_to_app_server();
 			void			send_drag(	BMessage* msg,
 										int32 vs_token,
 										BPoint offset,

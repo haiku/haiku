@@ -161,14 +161,22 @@ static void fill_argv_message(BMessage &message);
 BApplication::BApplication(const char *signature)
 	: BLooper(looper_name_for(signature))
 {
-	InitData(signature, NULL);
+	InitData(signature, true, NULL);
 }
 
 
 BApplication::BApplication(const char *signature, status_t *_error)
 	: BLooper(looper_name_for(signature))
 {
-	InitData(signature, _error);
+	InitData(signature, true, _error);
+}
+
+
+BApplication::BApplication(const char *signature, bool initGUI,
+		status_t *_error)
+	: BLooper(looper_name_for(signature))
+{
+	InitData(signature, initGUI, _error);
 }
 
 
@@ -180,7 +188,7 @@ BApplication::BApplication(BMessage *data)
 	const char *signature = NULL;	
 	data->FindString("mime_sig", &signature);
 
-	InitData(signature, NULL);
+	InitData(signature, true, NULL);
 
 	bigtime_t pulseRate;
 	if (data->FindInt64("_pulse", &pulseRate) == B_OK)
@@ -233,7 +241,7 @@ BApplication::operator=(const BApplication &rhs)
 
 
 void
-BApplication::InitData(const char *signature, status_t *_error)
+BApplication::InitData(const char *signature, bool initGUI, status_t *_error)
 {
 	DBG(OUT("BApplication::InitData(`%s', %p)\n", signature, _error));
 	// check whether there exists already an application
@@ -385,14 +393,6 @@ BApplication::InitData(const char *signature, status_t *_error)
 
 	// TODO: Not completely sure about the order, but this should be close.
 
-#ifndef RUN_WITHOUT_APP_SERVER
-	// An app_server connection is necessary for a lot of stuff, so get that first.
-	if (fInitError == B_OK)
-		connect_to_app_server();
-	if (fInitError == B_OK)
-		setup_server_heaps();
-#endif	// RUN_WITHOUT_APP_SERVER
-
 	// init be_app and be_app_messenger
 	if (fInitError == B_OK) {
 		be_app = this;
@@ -402,6 +402,7 @@ BApplication::InitData(const char *signature, status_t *_error)
 	// set the BHandler's name
 	if (fInitError == B_OK)
 		SetName(ref.name);
+
 	// create meta MIME
 	if (fInitError == B_OK) {
 		BPath path;
@@ -410,16 +411,9 @@ BApplication::InitData(const char *signature, status_t *_error)
 	}
 
 #ifndef RUN_WITHOUT_APP_SERVER
-	// Initialize the IK after we have set be_app because of a construction of a
-	// AppServerLink (which depends on be_app) nested inside the call to get_menu_info.
-	if (fInitError == B_OK)
-		fInitError = _init_interface_kit_();
-	// create global system cursors
-	// ToDo: these could have a predefined server token to safe the communication!
-	B_CURSOR_SYSTEM_DEFAULT = new BCursor(B_HAND_CURSOR);
-	B_CURSOR_I_BEAM = new BCursor(B_I_BEAM_CURSOR);
-	
-	fInitialWorkspace = current_workspace();
+	// app server connection and IK initialization
+	if (fInitError == B_OK && initGUI)
+		fInitError = _InitGUIContext();
 #endif	// RUN_WITHOUT_APP_SERVER
 
 	// Return the error or exit, if there was an error and no error variable
@@ -1013,7 +1007,7 @@ BApplication::EndRectTracking()
 }
 
 
-void
+status_t
 BApplication::setup_server_heaps()
 {
 	// TODO: implement?
@@ -1022,6 +1016,8 @@ BApplication::setup_server_heaps()
 	// R5 sets up a couple of areas for various tasks having to do with the
 	// app_server. Currently (7/29/04), the R1 app_server does not do this and
 	// may never do this unless a significant need is found for it. --DW
+
+	return B_OK;
 }
 
 
@@ -1046,21 +1042,46 @@ BApplication::global_ro_offs_to_ptr(uint32 offset)
 }
 
 
-void
+status_t
+BApplication::_InitGUIContext()
+{
+	// An app_server connection is necessary for a lot of stuff, so get that first.
+	status_t error = connect_to_app_server();
+	if (error != B_OK)
+		return error;
+
+	error = setup_server_heaps();
+	if (error != B_OK)
+		return error;
+
+	// Initialize the IK after we have set be_app because of a construction of a
+	// AppServerLink (which depends on be_app) nested inside the call to get_menu_info.
+	error = _init_interface_kit_();
+	if (error != B_OK)
+		return error;
+
+	// create global system cursors
+	// ToDo: these could have a predefined server token to safe the communication!
+	B_CURSOR_SYSTEM_DEFAULT = new BCursor(B_HAND_CURSOR);
+	B_CURSOR_I_BEAM = new BCursor(B_I_BEAM_CURSOR);
+	
+	fInitialWorkspace = current_workspace();
+
+	return B_OK;
+}
+
+
+status_t
 BApplication::connect_to_app_server()
 {
 	port_id serverPort = find_port(SERVER_PORT_NAME);
-	if (serverPort < B_OK) {
-		fInitError = serverPort;
-		return;
-	}
+	if (serverPort < B_OK)
+		return serverPort;
 
 	// Create the port so that the app_server knows where to send messages
 	port_id clientPort = create_port(100, "a<app_server");
-	if (clientPort < B_OK) {
-		fInitError = clientPort;
-		return;
-	}
+	if (clientPort < B_OK)
+		return clientPort;
 
 	// We can't use AppServerLink because be_app == NULL
 
@@ -1090,9 +1111,11 @@ BApplication::connect_to_app_server()
 		fServerLink->SetSenderPort(serverPort);
 	} else {
 		fServerLink->SetSenderPort(-1);
-		fInitError = B_ERROR;
 		debugger("BApplication: couldn't obtain new app_server comm port");
+		return B_ERROR;
 	}
+
+	return B_OK;
 }
 
 

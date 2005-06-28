@@ -11,6 +11,7 @@
 #include <Application.h>
 #include <Locker.h>
 
+#include <ApplicationPrivate.h>
 #include <AppServerLink.h>
 
 
@@ -33,8 +34,8 @@ AppServerLink::AppServerLink(void)
 
 	// if there is no be_app, we can't do a whole lot, anyway
 	if (be_app) {
-		fReceiver = &be_app->fServerLink->Receiver();
-		fSender = &be_app->fServerLink->Sender();
+		fReceiver = &BApplication::Private::ServerLink()->Receiver();
+		fSender = &BApplication::Private::ServerLink()->Sender();
 	} else {
 		debugger("You need to have a valid app_server connection first!");
 	}

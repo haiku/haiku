@@ -25,6 +25,7 @@
 #include <MessageRunner.h>
 #include <Roster.h>
 
+#include <ApplicationPrivate.h>
 #include <AppMisc.h>
 #include <PortLink.h>
 #include <ServerProtocol.h>
@@ -2058,7 +2059,8 @@ BWindow::InitData(BRect frame, const char* title, window_look look,
 	STRACE(("BWindow::InitData(): contacting app_server...\n"));
 
 	// let app_server to know that a window has been created.
-	fLink = new BPrivate::PortLink(be_app->fServerLink->SenderPort(), receivePort);
+	fLink = new BPrivate::PortLink(
+		BApplication::Private::ServerLink()->SenderPort(), receivePort);
 
 	// HERE we are in BApplication's thread, so for locking we use be_app variable
 	// we'll lock the be_app to be sure we're the only one writing at BApplication's server port
