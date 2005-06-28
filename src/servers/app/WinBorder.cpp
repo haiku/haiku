@@ -289,10 +289,13 @@ y = (float)int32(y);
 
 	if (Window()) {
 		// send a message to the client informing about the changed size
-		BRect frame(fTopLayer->Frame());
 		BMessage msg(B_WINDOW_RESIZED);
-		msg.AddInt32("width", frame.Width());
-		msg.AddInt32("height", frame.Height());
+		msg.AddInt64("when", system_time());
+
+		BRect frame(fTopLayer->Frame());
+		msg.AddInt32("width", frame.IntegerWidth());
+		msg.AddInt32("height", frame.IntegerHeight());
+
 		Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
 	}
 }
