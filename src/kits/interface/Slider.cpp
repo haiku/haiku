@@ -638,6 +638,10 @@ BSlider::SetValue(int32 value)
 				oldThumbFrame.left -= 2;
 		}
 
+		// While it would be enough to do this dependent on fUseFillColor,
+		// that doesn't work out if DrawBar() has been overridden by a sub class
+		oldThumbFrame.top = BarFrame().top;
+
 		_SetLocation(loc);
 
 		BControl::SetValue(value);
