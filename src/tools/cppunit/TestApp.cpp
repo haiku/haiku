@@ -1,5 +1,8 @@
 // TestApp.cpp
 
+#include <stdio.h>
+#include <string.h>
+
 #include <Autolock.h>
 
 #include <TestApp.h>
@@ -29,13 +32,21 @@ BTestHandler::Queue()
 
 // TestApp
 
+static status_t sInitError;
+
 // constructor
 _EXPORT
 BTestApp::BTestApp(const char *signature)
-	   : BApplication(signature),
+	   : BApplication(signature, &sInitError),
 		 fAppThread(B_ERROR),
 		 fHandlers()
 {
+	if (sInitError != B_OK) {
+		fprintf(stderr, "BTestApp::BTestApp(): Failed to create BApplication: "
+			"%s\n", strerror(sInitError));
+		exit(1);
+	}
+
 	CreateTestHandler();
 	Unlock();
 }
