@@ -757,9 +757,10 @@ BSlider::DrawBar()
 	lowerFrame.top++;
 	lowerFrame.left++;
 	BRect upperFrame = lowerFrame;
+	BRect thumbFrame;
 
 	if (Style() == B_BLOCK_THUMB) {
-		BRect thumbFrame = ThumbFrame();
+		thumbFrame = ThumbFrame();
 
 		if (fOrientation == B_HORIZONTAL) {
 			lowerFrame.right = thumbFrame.left;
@@ -789,7 +790,16 @@ BSlider::DrawBar()
 		view->FillRect(lowerFrame);
 	}
 
-	// ToDo: don't stroke the lines over the thumb
+	if (Style() == B_BLOCK_THUMB) {
+		// We don't want to stroke the lines over the thumb
+
+		PushState();
+
+		BRegion region;
+		GetClippingRegion(&region);
+		region.Exclude(thumbFrame);
+		ConstrainClippingRegion(&region);
+	}
 
 	view->SetHighColor(darken1);
 	view->StrokeLine(BPoint(frame.left, frame.top),
@@ -818,6 +828,9 @@ BSlider::DrawBar()
 					 BPoint(frame.left, frame.top));
 	view->StrokeLine(BPoint(frame.left + 1.0f, frame.top),
 					 BPoint(frame.right, frame.top));
+
+	if (Style() == B_BLOCK_THUMB)
+		PopState();
 }
 
 
