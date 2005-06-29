@@ -6,8 +6,8 @@ UsePrivateHeaders interface ;
 SimpleTest PortLinkTest :
 	PortLinkTest.cpp
 	PortLink.cpp
-	LinkMsgReader.cpp
-	LinkMsgSender.cpp
+	LinkReceiver.cpp
+	LinkSender.cpp
 
 	# PortLink accesses some private stuff directly
 	Shape.cpp
@@ -17,7 +17,7 @@ SimpleTest PortLinkTest :
 	: be
 	;
 
-SEARCH on [ FGristFiles PortLink.cpp LinkMsgReader.cpp LinkMsgSender.cpp ]
+SEARCH on [ FGristFiles PortLink.cpp LinkReceiver.cpp LinkSender.cpp ]
 	= [ FDirName $(OBOS_TOP) src kits app ] ;
 
 SEARCH on [ FGristFiles Shape.cpp Region.cpp RegionSupport.cpp ]

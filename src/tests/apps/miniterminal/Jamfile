@@ -10,4 +10,4 @@ App MiniTerminal :
 	Console.cpp
 	ViewBuffer.cpp ;
 
-LinkSharedOSLibs MiniTerminal : libbe.so ;
+LinkSharedOSLibs MiniTerminal : libroot.so libbe.so ;

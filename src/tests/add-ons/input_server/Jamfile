@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests add-ons input ;
+SubDir OBOS_TOP src tests add-ons input_server ;
 
 SubDirHdrs $(OBOS_TOP) src add-ons input_server devices keyboard ;
 UsePrivateHeaders input ;

@@ -9,7 +9,7 @@ const int32 kBufferSize = 2048;
 
 
 void
-get_next_message(BPortLink &link, int32 expectedCode)
+get_next_message(BPrivate::PortLink &link, int32 expectedCode)
 {
 	int32 code;
 	if (link.GetNextMessage(code) != B_OK) {
@@ -28,8 +28,8 @@ main()
 {
 	port_id port = create_port(100, "portlink");
 
-	BPortLink sender(port, -1);
-	BPortLink receiver(-1, port);
+	BPrivate::PortLink sender(port, -1);
+	BPrivate::PortLink receiver(-1, port);
 
 	sender.StartMessage('tst1');
 	sender.Attach<int32>(42);
