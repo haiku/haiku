@@ -8,9 +8,10 @@ R5KernelAddon usb_hid : kernel drivers bin :
 	devlist.c
 ;
 
-ObjectHdrs [ FGristFiles hid$(SUFOBJ) ] : [ FObjectsDir src prefs devices ] ;
+ObjectHdrs [ FGristFiles hid$(SUFOBJ) ] : [ FObjectsDir src preferences devices ] ;
 
-Includes [ FGristFiles hid.c ] : <src!prefs!devices>usbdevs.h <src!prefs!devices>usbdevs_data.h ;
+Includes hid.c :
+	<src!preferences!devices>usbdevs.h <src!prefs!devices>usbdevs_data.h ;
 
 # Link to kernel/drivers/dev/input/
 {
