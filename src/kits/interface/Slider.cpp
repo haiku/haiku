@@ -610,7 +610,10 @@ BSlider::SetValue(int32 value)
 
 		// While it would be enough to do this dependent on fUseFillColor,
 		// that doesn't work out if DrawBar() has been overridden by a sub class
-		oldThumbFrame.top = BarFrame().top;
+		if (fOrientation == B_HORIZONTAL)
+			oldThumbFrame.top = BarFrame().top;
+		else
+			oldThumbFrame.right = BarFrame().right;
 
 		_SetLocation(loc);
 
