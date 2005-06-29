@@ -1003,7 +1003,7 @@ BSlider::BarFrame() const
 			frame.right -= 8.0f;
 			frame.bottom = frame.top + fBarThickness;
 		} else {
-			frame.left = (frame.Width() - fBarThickness) / 2.0f;
+			frame.left = floor((frame.Width() - fBarThickness) / 2.0f);
 			frame.top = 12.0f + (Label() ? textHeight : 0.0f) +
 				(fMaxLimitStr ? textHeight : 0.0f);
 			frame.right = frame.left + fBarThickness;
@@ -1017,7 +1017,7 @@ BSlider::BarFrame() const
 			frame.right -= 7.0f;
 			frame.bottom = frame.top + fBarThickness;
 		} else {
-			frame.left = (frame.Width() - fBarThickness) / 2.0f;
+			frame.left = floor((frame.Width() - fBarThickness) / 2.0f);
 			frame.top = 11.0f + (Label() ? textHeight : 0.0f) +
 				(fMaxLimitStr ? textHeight : 0.0f);
 			frame.right = frame.left + fBarThickness;
@@ -1069,7 +1069,7 @@ BSlider::ThumbFrame() const
 			frame.right = frame.left + 17.0f;
 			frame.bottom = frame.top + fBarThickness + 7.0f;
 		} else {
-			frame.left = (frame.Width() - fBarThickness) / 2.0f - 4;
+			frame.left = floor((frame.Width() - fBarThickness) / 2.0f) - 4;
 			frame.top = (float)floor(Position() * (_MaxPosition() - _MinPosition()) +
 				_MinPosition()) - 8.0f;
 			frame.right = frame.left + fBarThickness + 7.0f;
@@ -1084,7 +1084,7 @@ BSlider::ThumbFrame() const
 				(MinLimitLabel() || MaxLimitLabel() ? textHeight + 4.0f : 0.0f);
 			frame.top = frame.bottom - 7.0f;
 		} else {
-			frame.left = (frame.Width() - fBarThickness) / 2.0f - 3;
+			frame.left = floor((frame.Width() - fBarThickness) / 2.0f) - 3;
 			frame.top = (float)floor(Position() * (_MaxPosition() - _MinPosition())) +
 				_MinPosition() - 6.0f;
 			frame.right = frame.left + 7;
