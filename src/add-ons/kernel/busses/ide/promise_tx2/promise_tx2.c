@@ -12,7 +12,7 @@
 #include <string.h>
 
 #include <bus/ide/ide_adapter.h>
-#include <blkman.h>
+#include <block_io.h>
 
 #define debug_level_flow 0
 #define debug_level_error 3
@@ -203,13 +203,13 @@ publish_controller(device_node_handle parent, uint16 bus_master_base, uint8 intn
 		// DMA properties
 		// some say it must be dword-aligned, others that it can be byte-aligned;
 		// stay on the safe side
-		{ BLKDEV_DMA_ALIGNMENT, B_UINT32_TYPE, { ui32: 3 }},
+		{ B_BLOCK_DEVICE_DMA_ALIGNMENT, B_UINT32_TYPE, { ui32: 3 }},
 		// one S/G block must not cross 64K boundary
-		{ BLKDEV_DMA_BOUNDARY, B_UINT32_TYPE, { ui32: 0xffff }},
+		{ B_BLOCK_DEVICE_DMA_BOUNDARY, B_UINT32_TYPE, { ui32: 0xffff }},
 		// size of S/G block is 16 bits with zero being 64K
-		{ BLKDEV_MAX_SG_BLOCK_SIZE, B_UINT32_TYPE, { ui32: 0x10000 }},
+		{ B_BLOCK_DEVICE_MAX_SG_BLOCK_SIZE, B_UINT32_TYPE, { ui32: 0x10000 }},
 		// see definition of MAX_SG_COUNT
-		{ BLKDEV_MAX_SG_BLOCKS, B_UINT32_TYPE, { ui32: IDE_ADAPTER_MAX_SG_COUNT }},
+		{ B_BLOCK_DEVICE_MAX_SG_BLOCKS, B_UINT32_TYPE, { ui32: IDE_ADAPTER_MAX_SG_COUNT }},
 
 		// private data to find controller
 		{ IDE_ADAPTER_BUS_MASTER_BASE, B_UINT16_TYPE, { ui16: bus_master_base }},
