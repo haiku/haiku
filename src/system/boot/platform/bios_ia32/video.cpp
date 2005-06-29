@@ -331,10 +331,6 @@ video_mode_menu()
 
 		menu->AddItem(item = new MenuItem(label));
 		item->SetData(mode);
-
-		// ToDo: remove this!
-		if (mode->bits_per_pixel != 8)
-			item->SetHelpText("The boot logo will currently only be rendered correctly in 8 bit modes.");
 	}
 
 	menu->AddSeparatorItem();
@@ -430,7 +426,7 @@ blit32(const uint8 *data, uint16 width, uint16 height,
 
 	for (int32 y = 0; y < height; y++) {
 		for (int32 x = 0; x < width; x++) {
-			uint8 color = data[y * width + x] * 3;
+			uint16 color = data[y * width + x] * 3;
 
 			start[x] = (palette[color + 0] << 16) | (palette[color + 1] << 8) | (palette[color + 2]);
 		}
@@ -448,12 +444,12 @@ blit24(const uint8 *data, uint16 width, uint16 height,
 
 	for (int32 y = 0; y < height; y++) {
 		for (int32 x = 0; x < width; x++) {
-			uint8 color = data[y * width + x] * 3;
+			uint16 color = data[y * width + x] * 3;
 			uint32 index = x * 3;
 
-			start[index + 0] = palette[color + 0] >> 2;
-			start[index + 1] = palette[color + 1] >> 2;
-			start[index + 2] = palette[color + 2] >> 2;
+			start[index + 0] = palette[color + 2];
+			start[index + 1] = palette[color + 1];
+			start[index + 2] = palette[color + 0];
 		}
 
 		start += gKernelArgs.frame_buffer.width * 3;
@@ -469,7 +465,7 @@ blit16(const uint8 *data, uint16 width, uint16 height,
 
 	for (int32 y = 0; y < height; y++) {
 		for (int32 x = 0; x < width; x++) {
-			uint8 color = data[y * width + x] * 3;
+			uint16 color = data[y * width + x] * 3;
 
 			start[x] = ((palette[color + 0] >> 3) << 11) | ((palette[color + 1] >> 2) << 5)
 				| ((palette[color + 2] >> 3));
@@ -488,7 +484,7 @@ blit15(const uint8 *data, uint16 width, uint16 height,
 
 	for (int32 y = 0; y < height; y++) {
 		for (int32 x = 0; x < width; x++) {
-			uint8 color = data[y * width + x] * 3;
+			uint16 color = data[y * width + x] * 3;
 
 			start[x] = ((palette[color + 0] >> 3) << 10) | ((palette[color + 1] >> 3) << 5)
 				| ((palette[color + 2] >> 3));
