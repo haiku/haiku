@@ -7,10 +7,9 @@
 #include <string.h>
 
 // This one comes from Thomas Kurschel's Open IDE bus manager.
-// "/current/src/add-ons/kernel/bus_managers/ide/ide_device_infoblock.h"
-//#include <ide_device_infoblock.h>
-// FIXME: move that header !!
-#include "../../add-ons/kernel/bus_managers/ide/ide_device_infoblock.h"
+#include <ide_device_infoblock.h>
+
+extern const char *__progname;
 
 /* why isn't that documented ? */
 #define IDE_GET_INFO 0x2710
@@ -23,10 +22,13 @@ typedef struct {
 	uint8 dma_mode;
 } _PACKED ide_status_t;
 
+
 #define kNotSupported	"not supported"
 #define kSupported		"supported"
 
-int main(int argc, char **argv)
+
+int
+main(int argc, char **argv)
 {
 	int fd;
 	ide_device_infoblock ide_info;
@@ -35,7 +37,7 @@ int main(int argc, char **argv)
 	bool removable;
 
 	if (argc < 2) {
-		fprintf(stderr, "usage: %s devicename\n", argv[0]);
+		fprintf(stderr, "usage: %s <device>\n", __progname);
 		return 1;
 	}
 
@@ -55,18 +57,13 @@ int main(int argc, char **argv)
 	printf("Firmware Version: %.8s\n", ide_info.firmware_version);
 	printf("\n");
 
- 	if (ide_info._48_bit_addresses_supported)
- 	{
+ 	if (ide_info._48_bit_addresses_supported) {
 		capacity = (float) ide_info.LBA48_total_sectors *
 					512 / (1024 * 1024 * 1024);
-	}
-	else if (ide_info.LBA_supported)
-	{
+	} else if (ide_info.LBA_supported) {
 		capacity = (float) ide_info.LBA_total_sectors *
 					512 / (1024 * 1024 * 1024);
-	}
-	else
-	{
+	} else {
 		use_GB_units = false;
 
 		capacity = (float) (ide_info.cylinders * ide_info.heads *
@@ -79,12 +76,10 @@ int main(int argc, char **argv)
 
 	printf("DMA supported: %s\n", ide_info.DMA_supported ? "yes" : "no");
 
-	if (ide_info.DMA_supported)
-	{
+	if (ide_info.DMA_supported) {
 		ide_status_t st = {0x01, 0x00, 0x00, 0x80}; /* God knows... */
 
-		if (ioctl(fd, IDE_GET_STATUS, &st, sizeof(ide_status_t *)) < 0)
-		{
+		if (ioctl(fd, IDE_GET_STATUS, &st, sizeof(ide_status_t *)) < 0) {
 			fprintf(stderr, "could not get ide status for %s\n", argv[1]);
 			return 3;
 		}

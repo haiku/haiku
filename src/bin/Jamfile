@@ -17,7 +17,6 @@ StdBinCommands
 	error.c
 	finddir.c
 	hd.c
-	ideinfo.c
 	idestatus.c
 	isvolume.cpp
 	listarea.c
@@ -117,6 +116,7 @@ SubInclude OBOS_TOP src bin flex ;
 SubInclude OBOS_TOP src bin gawk ;
 SubInclude OBOS_TOP src bin gdb ;
 SubInclude OBOS_TOP src bin grep ;
+SubInclude OBOS_TOP src bin ideinfo ;
 SubInclude OBOS_TOP src bin keymap ;
 SubInclude OBOS_TOP src bin less ;
 SubInclude OBOS_TOP src bin listdev ;
