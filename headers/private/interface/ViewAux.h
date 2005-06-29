@@ -30,13 +30,15 @@ enum {
 	B_VIEW_BLENDING_BIT			= 0x00000020,
 	B_VIEW_SCALE_BIT			= 0x00000040,
 	B_VIEW_FONT_ALIASING_BIT	= 0x00000080,
-	B_VIEW_COORD_BIT			= 0x00000100,	
+	B_VIEW_FRAME_BIT			= 0x00000100,	
 	B_VIEW_ORIGIN_BIT			= 0x00000200,	
 	B_VIEW_PEN_SIZE_BIT			= 0x00000400,
 	B_VIEW_PEN_LOCATION_BIT		= 0x00000800,
 	B_VIEW_LOW_COLOR_BIT		= 0x00008000,
 	B_VIEW_VIEW_COLOR_BIT		= 0x00010000,
 	B_VIEW_PATTERN_BIT			= 0x00020000,
+
+	B_VIEW_ALL_BITS				= 0x0003ffff,
 
 	// these used for archiving only
 	B_VIEW_RESIZE_BIT			= 0x00001000,
@@ -51,10 +53,13 @@ class ViewState {
 	public:
 		ViewState();
 
-		bool IsValid(uint32 bit) { return valid_flags & bit; }
+		inline bool IsValid(uint32 bit) const;
+		inline bool IsAllValid() const;
 
 		void UpdateServerFontState(BPrivate::PortLink &link);
 		void UpdateServerState(BPrivate::PortLink &link);
+
+		void UpdateFrom(BPrivate::PortLink &link);
 
 	public:
 		BPoint				pen_location;
@@ -94,6 +99,19 @@ class ViewState {
 		// flags used for archiving
 		uint32				archiving_flags;
 };
+
+inline bool
+ViewState::IsValid(uint32 bit) const
+{
+	return valid_flags & bit;
+}
+
+inline bool
+ViewState::IsAllValid() const
+{
+	return (valid_flags & B_VIEW_ALL_BITS & ~B_VIEW_CLIP_REGION_BIT)
+		== (B_VIEW_ALL_BITS & ~B_VIEW_CLIP_REGION_BIT);
+}
 
 }	// namespace BPrivate
 
