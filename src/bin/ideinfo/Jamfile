@@ -1,0 +1,9 @@
+SubDir OBOS_TOP src bin ideinfo ;
+
+SubDirHdrs $(OBOS_TOP) src add-ons kernel bus_managers ide ;
+
+#UsePrivateHeaders kernel ;
+
+StdBinCommands
+	ideinfo.c
+	;
