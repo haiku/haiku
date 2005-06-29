@@ -53,7 +53,7 @@ HOST_SYSTEM=$(shell uname)
 
 # BeOS (R5 only, actually, but who cares)
 ifeq ($(HOST_SYSTEM), BeOS)
-	LINKLIBS = -lnet
+#	LINKLIBS = -lnet
 endif
 
 SOURCES = \
