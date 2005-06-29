@@ -751,6 +751,8 @@ BSlider::DrawBar()
 	// exclude the block thumb from the bar filling
 
 	BRect lowerFrame = frame.InsetByCopy(1, 1);
+	lowerFrame.top++;
+	lowerFrame.left++;
 	BRect upperFrame = lowerFrame;
 
 	if (Style() == B_BLOCK_THUMB) {
@@ -765,10 +767,12 @@ BSlider::DrawBar()
 		}
 	} else if (fUseFillColor) {
 		if (fOrientation == B_HORIZONTAL) {
-			lowerFrame.right = floor(lowerFrame.left + Position() * lowerFrame.Width());
+			lowerFrame.right = floor(lowerFrame.left - 1 + Position()
+				* (lowerFrame.Width() + 1));
 			upperFrame.left = lowerFrame.right;
 		} else {
-			lowerFrame.top = floor(lowerFrame.bottom - Position() * lowerFrame.Height());
+			lowerFrame.top = floor(lowerFrame.bottom + 1 - Position()
+				* (lowerFrame.Height() + 1));
 			upperFrame.bottom = lowerFrame.top;
 		}
 	}
