@@ -101,8 +101,14 @@ SimpleTest PulseTest :
 	: be
 	;
 
+SimpleTest SliderTest :
+	SliderTest.cpp
+	Slider.cpp
+	: be
+	;
+
 SEARCH on [ FGristFiles
-		ScrollView.cpp CheckBox.cpp ChannelSlider.cpp ChannelControl.cpp
+		ScrollView.cpp CheckBox.cpp ChannelSlider.cpp ChannelControl.cpp Slider.cpp
 	] = [ FDirName $(OBOS_TOP) src kits interface ] ;
 
 SubInclude OBOS_TOP src tests kits interface bprintjob ;
