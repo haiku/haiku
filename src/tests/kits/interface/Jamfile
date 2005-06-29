@@ -101,6 +101,11 @@ SimpleTest PulseTest :
 	: be
 	;
 
+SimpleTest SliderTest_r5 :
+	SliderTest.cpp
+	: be
+	;
+
 SimpleTest SliderTest :
 	SliderTest.cpp
 	Slider.cpp

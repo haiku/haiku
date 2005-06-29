@@ -69,9 +69,10 @@ Window::Window()
 	slider = new BSlider(rect, "Slider3", "Test 3", NULL, 0, 100);
 	rgb_color color = { 200, 80, 80, 255 };
 	slider->UseFillColor(true, &color);
-	slider->SetHashMarks(B_HASH_MARKS_BOTH);
+	slider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	slider->SetHashMarkCount(11);
 	slider->SetLimitLabels("0", "100");
+	slider->SetBarThickness(12.0);
 	slider->ResizeToPreferred();
 	view->AddChild(slider);
 
@@ -86,15 +87,29 @@ Window::Window()
 	slider->ResizeToPreferred();
 	view->AddChild(slider);
 
+	downBy(rect, slider);
+	rect.right = rect.left + 100;
+	rect.bottom = rect.top + 100;
+
+	slider = new BSlider(rect, "SliderA", "Test A", NULL, 0, 100);
+	slider->SetLimitLabels("0", "100");
+	slider->UseFillColor(true, &color);
+	slider->SetHashMarks(B_HASH_MARKS_BOTH);
+	slider->SetHashMarkCount(5);
+	view->AddChild(slider);
+
 	// vertical sliders
 
-	rect.left = rect.right + 10;
+	rect.left = 270;
 	rect.right = rect.left + 30;
 	rect.top = 10;
 	rect.bottom = view->Bounds().Height() - 20;
 
 	slider = new BSlider(rect, "Slider5", "Test 5", NULL, 0, 100);
 	slider->SetOrientation(B_VERTICAL);
+	slider->SetBarThickness(12.0);
+	slider->SetHashMarks(B_HASH_MARKS_RIGHT);
+	slider->SetHashMarkCount(5);
 	slider->ResizeToPreferred();
 	view->AddChild(slider);
 
