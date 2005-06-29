@@ -674,8 +674,11 @@ BSlider::Draw(BRect updateRect)
 	BRegion background(updateRect);
 	background.Exclude(BarFrame());
 
-	// ToDo: the thumb doesn't delete its background, so we still have to do it
-	//background.Exclude(ThumbFrame());
+	// ToDo: the triangle thumb doesn't delete its background, so we still have to do it
+	// Note, this also creates a different behaviour for subclasses, depending on the
+	// thumb style - if possible this should be avoided.
+	if (Style() == B_BLOCK_THUMB)
+		background.Exclude(ThumbFrame());
 
 	if (background.Frame().IsValid())
 		OffscreenView()->FillRegion(&background, B_SOLID_LOW);
@@ -1463,6 +1466,7 @@ BSlider::_DrawBlockThumb()
 	}
 
 	// blank background for shadow
+	// ToDo: this also draws over the hash marks (though it's not *that* noticeable)
 	view->SetHighColor(no_tint);
 	view->StrokeLine(BPoint(frame.left, frame.top),
 					 BPoint(frame.left, frame.top));
