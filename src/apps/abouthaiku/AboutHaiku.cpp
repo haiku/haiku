@@ -51,6 +51,7 @@ class AboutView : public BView {
 				~AboutView(void);
 		void	AttachedToWindow(void);
 		void	Pulse(void);
+		void	FrameResized(float width, float height);
 		void	Draw(BRect update);
 		void	MessageReceived(BMessage *msg);
 		void	MouseDown(BPoint pt);
@@ -127,7 +128,7 @@ AboutView::AboutView(const BRect &r)
 	if (fLogo)
 		r.OffsetBy(0, fLogo->Bounds().Height());
 
-	fInfoView = new BView(r, "infoview", B_FOLLOW_NONE, B_WILL_DRAW);
+	fInfoView = new BView(r, "infoview", B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM, B_WILL_DRAW);
 	fInfoView->SetViewColor(235, 235, 235);
 	AddChild(fInfoView);
 
@@ -169,7 +170,7 @@ AboutView::AboutView(const BRect &r)
 	else
 		strcpy(string, "Processor:");
 
-	stringView = new BStringView(r, "cpulabel", "Processor:");
+	stringView = new BStringView(r, "cpulabel", string);
 	stringView->SetFont(be_bold_font);
 	fInfoView->AddChild(stringView);
 
@@ -186,7 +187,7 @@ AboutView::AboutView(const BRect &r)
 	r.bottom = r.top + textHeight;
 
 	if (systemInfo.cpu_clock_speed < 1000000000)
-		sprintf(string,"%.2f Mhz", systemInfo.cpu_clock_speed / 1000000.0f);
+		sprintf(string,"%d Mhz", int(systemInfo.cpu_clock_speed / 1000000.0f));
 	else
 		sprintf(string,"%.2f Ghz", systemInfo.cpu_clock_speed / 1000000000.0f);
 
@@ -245,30 +246,38 @@ AboutView::AboutView(const BRect &r)
 	r.right -= B_V_SCROLL_BAR_WIDTH;
 
 	fCreditsView = new BTextView(r, "credits",
-		r.OffsetToCopy(0, 0).InsetByCopy(5, 5), B_FOLLOW_NONE);
-	BScrollView *creditsScroller = new BScrollView("creditsScroller",
-		fCreditsView, 0, 0, false, true, B_PLAIN_BORDER);
-	AddChild(creditsScroller);
-
+		r.OffsetToCopy(0, 0).InsetByCopy(5, 5), B_FOLLOW_ALL);
+	fCreditsView->SetFlags(fCreditsView->Flags() | B_FRAME_EVENTS );
 	fCreditsView->SetStylable(true);
 	fCreditsView->MakeEditable(false);
+	fCreditsView->SetWordWrap(true);
+
+	BScrollView *creditsScroller = new BScrollView("creditsScroller",
+		fCreditsView, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS, false, true, B_PLAIN_BORDER);
+	AddChild(creditsScroller);
+
+
+	rgb_color darkgrey 		= { 100, 100, 100, 255 };
+	rgb_color haiku_green 	= {  42, 131,  36, 255 };
+	rgb_color haiku_orange 	= { 255,  69,   0, 255 };
+	rgb_color haiku_yellow  = { 255, 176,   0, 255 };
 
 	BFont font(be_bold_font);
-	font.SetSize(font.Size() + 2);
+	font.SetSize(font.Size() + 4);
 
-	fCreditsView->SetFontAndColor(&font);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_green);
 	fCreditsView->Insert("Haiku\n");
 
-	font.SetSize(be_bold_font->Size() + 1);
+	font.SetSize(be_bold_font->Size());
 	font.SetFace(B_BOLD_FACE | B_ITALIC_FACE);
 
-	fCreditsView->SetFontAndColor(be_plain_font);
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert("Copyright " B_UTF8_COPYRIGHT "2001-2005 Haiku, Inc.\n\n");
 
-	fCreditsView->SetFontAndColor(&font);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_orange);
 	fCreditsView->Insert("Team Leads:\n");
 
-	fCreditsView->SetFontAndColor(be_plain_font);
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
 		"Bruno G. Albuquerque\n"
 		"DarkWyrm\n"
@@ -282,10 +291,10 @@ AboutView::AboutView(const BRect &r)
 		"Michael Wilber\n"
 		"\n");
 
-	fCreditsView->SetFontAndColor(&font);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_orange);
 	fCreditsView->Insert("Developers:\n");
 
-	fCreditsView->SetFontAndColor(be_plain_font);
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
 		"Stephan Aßmus\n"
 		"Andrew Bachmann\n"
@@ -298,10 +307,10 @@ AboutView::AboutView(const BRect &r)
 		"Niels Reedijk\n"
 		"\n");
 
-	fCreditsView->SetFontAndColor(&font);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_orange);
 	fCreditsView->Insert("Contributors:\n");
 
-	fCreditsView->SetFontAndColor(be_plain_font);
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
 		"Bruce Cameron\n"
 		"Tyler Dauwalder\n"
@@ -328,7 +337,7 @@ AboutView::AboutView(const BRect &r)
 		"Pahtz\n"
 		"Michael Phipps\n"
 		"Jeremy Rand\n"
-		"David Reid"
+		"David Reid\n"
 		"Daniel Reinhold\n"
 		"François Revol\n"
 		"Thomas Roell\n"
@@ -341,75 +350,67 @@ AboutView::AboutView(const BRect &r)
 		"Nathan Whitehorn\n"
 		"Ulrich Wimboeck\n"
 		"Gabe Yoder\n"
-		//"(and probably some more we forgot to mention (sorry!)...)\n"
-		"\n");
+		"\n" B_UTF8_ELLIPSIS " and probably some more we forgot to mention (sorry!)"
+		"\n\n");
 
-	fCreditsView->SetFontAndColor(&font);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_orange);
 	fCreditsView->Insert("Special Thanks To:\n");
 
-	fCreditsView->SetFontAndColor(be_plain_font);
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert("Michael Phipps (project founder)\n\n");
 
-	font.SetSize(be_bold_font->Size() + 2);
+	font.SetSize(be_bold_font->Size() + 4);
 	font.SetFace(B_BOLD_FACE);
-	fCreditsView->SetFontAndColor(&font);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_green);
 	fCreditsView->Insert("\nCopyrights\n\n");
 
-	font.SetSize(be_bold_font->Size()+1);
-	font.SetFace(B_ITALIC_FACE);
+	font.SetSize(be_bold_font->Size());
+	font.SetFace(B_BOLD_FACE | B_ITALIC_FACE);
 
-	fCreditsView->SetFontAndColor(&font);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_yellow);
 	fCreditsView->Insert("AntiGrain Geometry\n");
-	fCreditsView->SetFontAndColor(be_plain_font);
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert("Copyright (C) 2002-2005 Maxim Shemanarev (McSeem)\n\n");
 
-	font.SetFace(B_ITALIC_FACE);
-	fCreditsView->SetFontAndColor(&font);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_yellow);
 	fCreditsView->Insert("PDFLib\n");
-	fCreditsView->SetFontAndColor(be_plain_font);
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
 		"Copyright (c) 1997-2005 PDFlib GmbH and Thomas Merz. "
 		"All rights reserved.\n"
 		"PDFlib and the PDFlib logo are registered trademarks of PDFlib GmbH.\n\n");
 
-	font.SetFace(B_ITALIC_FACE);
-	fCreditsView->SetFontAndColor(&font);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_yellow);
 	fCreditsView->Insert("FreeType2\n");
-	fCreditsView->SetFontAndColor(be_plain_font);
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert("Portions of this software are copyright (C) 1996-2002 The FreeType"
 		" Project (www.freetype.org).  All rights reserved.\n\n");
 
 	// Mesa3D (http://www.mesa3d.org) copyrights
-	font.SetFace(B_ITALIC_FACE);
-	fCreditsView->SetFontAndColor(&font);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_yellow);
 	fCreditsView->Insert("Mesa\n");
-	fCreditsView->SetFontAndColor(be_plain_font);
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
 		"Copyright (c) 1999-2005 Brian Paul. "
-		"All rights reserved.\n\n");
+		"Mesa3D project (www.mesa3d.org).  All rights reserved.\n\n");
 
 	// SGI's GLU implementation copyrights
-	font.SetFace(B_ITALIC_FACE);
-	fCreditsView->SetFontAndColor(&font);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_yellow);
 	fCreditsView->Insert("GLU\n");
-	fCreditsView->SetFontAndColor(be_plain_font);
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
-		"Copyright (c) 1991-2000 Silicon Graphics, Inc."
-		"All rights reserved.\n\n");
-
-/*
-	// TODO: Add these (somehow)
-	Mark Kilgard & Be Inc. & Jam Hamby (GLUT)
+		"Copyright (c) 1991-2000 Silicon Graphics, Inc. "
+		"SGI's Software FreeB license.  All rights reserved.\n\n");
 
 	// GLUT implementation copyrights
-	font.SetFace(B_ITALIC_FACE);
-	fCreditsView->SetFontAndColor(&font);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_yellow);
 	fCreditsView->Insert("GLUT\n");
-	fCreditsView->SetFontAndColor(be_plain_font);
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
-		"Copyright (c) 1991-2000 Silicon Graphics, Inc."
+		"Copyright (c) 1994-1997 Mark Kilgard. "
 		"All rights reserved.\n"
-*/
+		"Copyright (c) 1997 Be Inc.\n"
+		"Copyright (c) 1999 Jake Hamby. \n\n");
 
 
 }
@@ -433,6 +434,15 @@ AboutView::MouseDown(BPoint pt)
 	BRect r(92, 26, 105, 31);
 	if (r.Contains(pt))
 		printf("Easter Egg\n");
+}
+
+void
+AboutView::FrameResized(float width, float height)
+{
+	BRect r = fCreditsView->Bounds();
+	r.OffsetTo(B_ORIGIN);
+	r.InsetBy(3, 3);
+	fCreditsView->SetTextRect(r);
 }
 
 
@@ -475,39 +485,35 @@ UptimeToString(char string[], size_t size)
 	int64 days, hours, minutes, seconds, remainder;
 	int64 systime = system_time();
 
-	if (systime > 86400000000LL) {
-		days = systime / 86400000000LL;
-		remainder = systime % 86400000000LL;
+	days = systime / 86400000000LL;
+	remainder = systime % 86400000000LL;
 
-		hours = remainder / 3600000000LL;
-		remainder = remainder % 3600000000LL;
+	hours = remainder / 3600000000LL;
+	remainder = remainder % 3600000000LL;
 
-		minutes = remainder / 60000000;
-		remainder = remainder % 60000000;
+	minutes = remainder / 60000000;
+	remainder = remainder % 60000000;
 
-		seconds = remainder / 1000000;
-		snprintf(string, size, "%lld days, %lld hours, %lld minutes, %lld seconds",
-			days, hours, minutes, seconds);
-	} else if (systime > 3600000000LL) {
-		hours = systime / 3600000000LL;
-		remainder = systime % 3600000000LL;
+	seconds = remainder / 1000000;
 
-		minutes = remainder / 60000000;
-		remainder = remainder % 60000000;
-
-		seconds = remainder / 1000000;
-		snprintf(string, size, "%lld hours, %lld minutes, %lld seconds",
-			hours, minutes, seconds);
-	} else if (systime > 60000000) {
-		minutes = systime / 60000000;
-		remainder = systime % 60000000;
-
-		seconds = remainder / 1000000;
-		snprintf(string, size, "%lld minutes, %lld seconds", minutes, seconds);
-	} else {
-		seconds = systime / 1000000;
-		snprintf(string, size, "%lld seconds", seconds);
+	char *str = string;
+	if (days) {
+		str += snprintf(str, size, "%lld day%s",days, days > 1 ? "s" : "");
 	}
+	if (hours) {
+		str += snprintf(str, size - strlen(string), "%s%lld hour%s",
+				str != string ? ", " : "",
+				hours, hours > 1 ? "s" : "");	
+	}
+	if (minutes) {
+		str += snprintf(str, size - strlen(string), "%s%lld minute%s",
+				str != string ? ", " : "",
+				minutes, minutes > 1 ? "s" : "");	
+	}
+	// Always show second(s)...
+	str += snprintf(str, size - strlen(string), "%s%lld second%s",
+				str != string ? ", " : "",
+				seconds, seconds > 1 ? "s" : "");	
 
 	return string;
 }
