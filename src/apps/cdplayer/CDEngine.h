@@ -15,222 +15,209 @@
 
 #include <vector>
 
+#include "CDAudioDevice.h"
 #include "Observer.h"
 #include "FunctionObjectMessage.h"
 #include "CDDBSupport.h"
+#include "PlayList.h"
 
 class CDEngine;
-class PeriodicWatcher : public Notifier {
+
 // watcher sits somewhere were it can get pulses and makes sure
 // notices get sent if state changes
+class PeriodicWatcher : public Notifier 
+{
 public:
-	PeriodicWatcher(int devicefd);
-	PeriodicWatcher(BMessage *);
-	
-	virtual ~PeriodicWatcher() {}
+						PeriodicWatcher(void);
+	virtual				~PeriodicWatcher() {}
 
-	void DoPulse();
-	void UpdateNow();
-
-	void AttachedToLooper(CDEngine *engine)
-		{ this->engine = engine; }
-
-	virtual BHandler *RecipientHandler() const;
+			void		DoPulse();
+			void		UpdateNow();
+			
+			void		AttachedToLooper(CDEngine *engine)
+						{ this->engine = engine; }
+	virtual BHandler	*RecipientHandler() const;
 
 protected:
-	virtual bool UpdateState() = 0;
+	virtual	bool		UpdateState() = 0;
 
-	int devicefd;
-	CDEngine *engine;
+			CDEngine	*engine;
 };
 
-enum CDState {
-	kNoCD=0,
-	kStopped,
-	kPaused,
-	kPlaying,
-	kSkipping
-};
-
-class PlayState : public PeriodicWatcher {
-	// this watcher sends notices to observers that are interrested
-	// about play state changes
+// this watcher sends notices to observers that are interrested
+// about play state changes
+class PlayState : public PeriodicWatcher 
+{
 public:
-	PlayState(int devicefd);
-	PlayState(BMessage *message)
-		:	PeriodicWatcher(message)
-		{}
+				PlayState(CDEngine *engine);
 
-	CDState GetState() const;
+	CDState		GetState() const;
 
 private:
-	bool UpdateState();
-	bool CurrentState(CDState);
-	CDState oldState;
+	bool		UpdateState();
+	bool		CurrentState(CDState);
+	CDState		oldState;
+	
+	CDEngine	*fEngine;
 };
 
-class TrackState : public PeriodicWatcher {
-	// this watcher sends notices to observers that are interested
-	// about changes in the current track
+// this watcher sends notices to observers that are interested
+// about changes in the current track
+class TrackState : public PeriodicWatcher 
+{
 public:
-	TrackState(int devicefd);
-	TrackState(BMessage *message)
-		:	PeriodicWatcher(message)
-		{}
+			TrackState(void);
 
-	int32 GetTrack() const;
-	int32 GetNumTracks() const;
+	int32	GetTrack() const;
+	int32	GetNumTracks() const;
 
 private:
-	bool UpdateState();
-	bool CurrentState(int32);
-	int32 currentTrack;
+	bool	UpdateState();
+	bool	CurrentState(int32);
+	int32	currentTrack;
 };
 
-class TimeState : public PeriodicWatcher {
-	// this watcher sends notices to observers that are interested
-	// about changes in the current time
+// this watcher sends notices to observers that are interested
+// about changes in the current time
+class TimeState : public PeriodicWatcher 
+{
 public:
-	TimeState(int devicefd)
-		:	PeriodicWatcher(devicefd)
-		{ }
-	TimeState(BMessage *message)
-		:	PeriodicWatcher(message)
-		{}
+			TimeState(void) : PeriodicWatcher() { }
 
-	void GetDiscTime(int32 &minutes, int32 &seconds) const;
-	void GetTrackTime(int32 &minutes, int32 &seconds) const;
+	void	GetDiscTime(int32 &minutes, int32 &seconds) const;
+	void	GetTrackTime(int32 &minutes, int32 &seconds) const;
 
 private:
-	bool UpdateState();
-	bool CurrentState(int32 dmin, int32 dsec, int32 tmin, int32 tsec);
+	bool	UpdateState();
+	bool	CurrentState(int32 dmin, int32 dsec, int32 tmin, int32 tsec);
 	
-	int32 fDiscMinutes;
-	int32 fDiscSeconds;
+	int32	fDiscMinutes;
+	int32	fDiscSeconds;
 	
-	int32 fTrackMinutes;
-	int32 fTrackSeconds;
+	int32	fTrackMinutes;
+	int32	fTrackSeconds;
 };
 
-class CDContentWatcher : public PeriodicWatcher {
+class CDContentWatcher : public PeriodicWatcher 
+{
 public:
-	CDContentWatcher(int devicefd);
-	CDContentWatcher(BMessage *message);
+				CDContentWatcher(void);
 	
-	bool GetContent(BString *title, vector<BString> *tracks);
+	bool		GetContent(BString *title, vector<BString> *tracks);
 	
 private:
-	bool UpdateState();
+	bool		UpdateState();
 
-	CDDBQuery cddbQuery;
-	int32 discID;
-	bool fReady;
+	CDDBQuery	cddbQuery;
+	int32		discID;
+	bool		fReady;
 };
 
-class VolumeState : public PeriodicWatcher {
-	// this watcher sends notices to observers that are interested
-	// about changes in the current volume
-	// currently not used yet
+// this watcher sends notices to observers that are interested
+// about changes in the current volume
+// currently not used yet
+class VolumeState : public PeriodicWatcher 
+{
 public:
-	VolumeState(int devicefd);
-	VolumeState(BMessage *message)
-		:	PeriodicWatcher(message)
-		{}
-	bool UpdateState();
-	int32 GetVolume() const;
+			VolumeState(void);
+	
+	bool	UpdateState();
+	int32	GetVolume() const;
 
 private:
-	int32 fVolume;
+	int32	fVolume;
 	
 };
 
-class CDEngine : public BHandler {
-	// The CD engine defines all the different CD control calls; also,
-	// it hosts the different state watchers and helps them send notices
-	// to observers about the CD state changes
+// The CD engine defines all the different CD control calls; also,
+// it hosts the different state watchers and helps them send notices
+// to observers about the CD state changes
+class CDEngine : public BHandler 
+{
 public:
-	CDEngine(int devicefd);
-	CDEngine(BMessage *);
+					CDEngine(void);
 
-	virtual ~CDEngine();
+	virtual 		~CDEngine();
 
-	// observing supprt
-	virtual void MessageReceived(BMessage *);
-	void AttachedToLooper(BLooper *);
-	void DoPulse();
+			// observing support
+	virtual	void	MessageReceived(BMessage *);
+			void	AttachedToLooper(BLooper *);
+			void	DoPulse();
 
-	// control calls
-	void PlayOrPause();
-	void PlayContinue();
-	void Play();
-	void Pause();
-	void Stop();
-	void Eject();
-	void SkipOneForward();
-	void SkipOneBackward();
-	void StartSkippingBackward();
-	void StartSkippingForward();
-	void StopSkipping();
-	void SelectTrack(int32);
+			// control calls
+			void	Play();
+			void	Pause();
+			void 	Stop();
+			void 	Eject();
+			void 	SkipOneForward();
+			void 	SkipOneBackward();
+			void 	StartSkippingBackward();
+			void 	StartSkippingForward();
+			void 	StopSkipping();
+			void 	SelectTrack(int32);
+			
+			void 	SetVolume(uint8 value);
+			
+			void 	ToggleShuffle(void);
+			void 	ToggleRepeat(void);
 	
-	void SetVolume(uint8 value);
+			CDState	GetState(void) const { return fEngineState; }
 
+	// to find the current Track, you may call the GetTrack function
+	// TrackState defines
 	TrackState *TrackStateWatcher()
 		{ return &trackState; }
-		// to find the current Track, you may call the GetTrack function
-		// TrackState defines
 
+	// to find the current play state, you may call the GetState function
+	// PlayState defines
 	PlayState *PlayStateWatcher()
 		{ return &playState; }
-		// to find the current play state, you may call the GetState function
-		// PlayState defines
 
+	// to find the current location on the CD, you may call the GetTime function
+	// TimeState defines
 	TimeState *TimeStateWatcher()
 		{ return &timeState; }
-		// to find the current location on the CD, you may call the GetTime function
-		// TimeState defines
 
 	CDContentWatcher *ContentWatcher()
 		{ return &contentWatcher; }
 	
+	// to find the current location on the CD, you may call the GetVolume function
+	// VolumeState defines
 	VolumeState *VolumeStateWatcher()
-		// to find the current location on the CD, you may call the GetVolume function
-		// VolumeState defines
 		{ return &volumeState; }
 
-	static int FindCDPlayerDevice();
-	
 private:
-	int devicefd;
+	PlayState			playState;
+	TrackState			trackState;
+	TimeState			timeState;
+	VolumeState			volumeState;
+	CDContentWatcher 	contentWatcher;
 
-	PlayState playState;
-	TrackState trackState;
-	TimeState timeState;
-	VolumeState volumeState;
-	CDContentWatcher contentWatcher;
-
-	bigtime_t lastPulse;
+	bigtime_t 			lastPulse;
+	
+	CDState 			fEngineState;
 };
 
 
 // some function object glue
-class CDEngineFunctorFactory : public FunctorFactoryCommon {
+class CDEngineFunctorFactory : public FunctorFactoryCommon 
+{
 public:
 	static BMessage *NewFunctorMessage(void (CDEngine::*func)(),
-		CDEngine *target)
-		{
-			PlainMemberFunctionObject<void (CDEngine::*)(),
-				CDEngine> tmp(func, target);
-			return NewMessage(&tmp);
-		}
+										CDEngine *target)
+	{
+		PlainMemberFunctionObject<void (CDEngine::*)(),
+			CDEngine> tmp(func, target);
+		return NewMessage(&tmp);
+	}
 
 	static BMessage *NewFunctorMessage(void (CDEngine::*func)(ulong),
-		CDEngine *target, ulong param)
-		{
-			SingleParamMemberFunctionObject<void (CDEngine::*)(ulong),
-				CDEngine, ulong> tmp(func, target, param);
-			return NewMessage(&tmp);
-		}
+										CDEngine *target, ulong param)
+	{
+		SingleParamMemberFunctionObject<void (CDEngine::*)(ulong),
+			CDEngine, ulong> tmp(func, target, param);
+		return NewMessage(&tmp);
+	}
 };
 
 

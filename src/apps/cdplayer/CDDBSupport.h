@@ -9,14 +9,15 @@
 
 // based on Jukebox by Chip Paul
 
-class CDDBQuery {
+class CDDBQuery 
+{
 public:
 	CDDBQuery(const char *server, int32 port = 888, bool log = false);
 	void SetToSite(const char *server, int32 port);
 	void GetSites(bool (*)(const char *site, int port, const char *latitude,
 		const char *longitude, const char *description, void *state), void *);
 
-	void SetToCD(const scsi_toc *);
+	void SetToCD(const char *devicepath);
 	bool GetTitles(BString *title, vector<BString> *tracks, bigtime_t timeout);
 		// title or tracks may be NULL if you are only interrested in one, not the other
 	
@@ -39,25 +40,26 @@ private:
 	
 	static int32 LookupBinder(void *);
 
-	class Connector {
-	public:
-		Connector(CDDBQuery *client)
-			:	client(client),
-				wasConnected(client->IsConnected())
-			{
-				if (!wasConnected)
-					client->Connect();
-			}
-		
-		~Connector()
-			{
-				if (!wasConnected)
-					client->Disconnect();
-			}
+	class Connector 
+	{
+		public:
+			Connector(CDDBQuery *client)
+				:	client(client),
+					wasConnected(client->IsConnected())
+				{
+					if (!wasConnected)
+						client->Connect();
+				}
 			
-	private:
-		CDDBQuery *client;
-		bool wasConnected;
+			~Connector()
+				{
+					if (!wasConnected)
+						client->Disconnect();
+				}
+				
+		private:
+			CDDBQuery *client;
+			bool wasConnected;
 	};
 	
 	bool FindOrCreateContentFileForDisk(BFile *file, entry_ref *ref, int32 discID);
@@ -87,7 +89,8 @@ private:
 	BString discIDStr;
 
 	// cached retrieved data
-	enum State {
+	enum State 
+	{
 		kInitial,
 		kReading,
 		kDone,

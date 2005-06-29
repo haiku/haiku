@@ -4,8 +4,8 @@
 */
 // This defines the replicant button
 
-#ifndef __CD_BUTTON__
-#define __CD_BUTTON__
+#ifndef CDPLAYER_H
+#define CDPLAYER_H
 
 #include <Application.h>
 #include <View.h>
@@ -16,21 +16,20 @@
 #include <TextControl.h>
 #include <StringView.h>
 
-#include "PlayList.h"
 #include "Observer.h"
 #include "CDEngine.h"
 
 class DrawButton;
 class TwoStateDrawButton;
 
-class CDButton : public BView, private Observer 
+class CDPlayer : public BView, private Observer 
 {
 public:
-						CDButton(BRect frame, const char *name,	
+						CDPlayer(BRect frame, const char *name,	
 								uint32 resizeMask = B_FOLLOW_ALL,
 								uint32 flags = B_WILL_DRAW | B_NAVIGABLE | 
 												B_PULSE_NEEDED);
-	virtual 			~CDButton();
+	virtual 			~CDPlayer();
 	
 			void		BuildGUI(void);
 	
@@ -46,36 +45,46 @@ public:
 	virtual void		NoticeChange(Notifier *);
 
 private:
-			void		UpdateCDInfo(void);
-			void		UpdateTimeInfo(void);
-			void		SetBitmap(BBitmap *bitmap);
+			void				UpdateCDInfo(void);
+			void				UpdateTimeInfo(void);
+			void				SetBitmap(BBitmap *bitmap);
 	
-	CDEngine	*engine;
+			CDEngine			*engine;
 	
-	DrawButton *fStop, *fPlay, *fNextTrack, *fPrevTrack;
-	DrawButton *fFastFwd, *fRewind, *fEject, *fSave, *fShuffle, *fRepeat;
-	
-	
-	BSlider *fVolume;
-	
-	BStringView *fCDTitle;
-	BStringView *fCurrentTrack;
-	BStringView *fTrackTime;
-	BStringView *fDiscTime;
-	
-	BBox *fCDBox;
-	BBox *fTrackBox;
-	BBox *fTimeBox;
-	
-	CDState fCDState;
-	PlayList fPlaylist;
+			DrawButton			*fStop,
+								*fPlay,
+								*fNextTrack,
+								*fPrevTrack,
+								*fFastFwd,
+								*fRewind,
+								*fEject,
+								*fSave;
+			
+			TwoStateDrawButton	*fShuffle,
+								*fRepeat;
+			
+			BSlider				*fVolume;
+			
+			BStringView			*fCDTitle,
+								*fCurrentTrack,
+								*fTrackTime,
+								*fDiscTime;
+			
+			BBox				*fCDBox,
+								*fTrackBox,
+								*fTimeBox;
+			
+			CDState				fCDState;
+			
+			rgb_color			fStopColor;
+			rgb_color			fPlayColor;
 };
 
 
-class CDButtonApplication : public BApplication 
+class CDPlayerApplication : public BApplication 
 {
 public:
-	CDButtonApplication();
+	CDPlayerApplication();
 };
 
 

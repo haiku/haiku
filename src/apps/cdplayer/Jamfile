@@ -2,9 +2,10 @@ SubDir OBOS_TOP src apps cdplayer ;
 
 AddResources CDPlayer : CDPlayer.rdef ;
 App CDPlayer : 
-	CDButton.cpp
+	CDAudioDevice.cpp
 	CDDBSupport.cpp
 	CDEngine.cpp
+	CDPlayer.cpp
 	DrawButton.cpp
 	FunctionObjectMessage.cpp
 	Observer.cpp

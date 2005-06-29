@@ -76,18 +76,38 @@ CDDBQuery::SetToSite(const char *server, int32 port)
 }
 
 void 
-CDDBQuery::SetToCD(const scsi_toc *toc)
+CDDBQuery::SetToCD(const char *path)
 {
-	if (state == kInitial) {
-		GetDiscID(toc, discID, numTracks, discLength, frameOffsetString, discIDStr);
-	} else {
+	if(!path)
+		return;
+	
+	// Get the SCSI table of contents from the device passed to us
+	int device = open(path, O_RDONLY);
+	if(device < 0)
+		return;
+	
+	scsi_toc toc;
+	status_t result = ioctl(device, B_SCSI_GET_TOC, &toc);
+	
+	close(device);
+	
+	if(result != B_OK)
+		return;
+	
+	
+	if (state == kInitial) 
+	{
+		GetDiscID(&toc, discID, numTracks, discLength, frameOffsetString, discIDStr);
+	}
+	else
+	{
 		int32 tmpDiscID;
 		int32 tmpDiscLength;
 		int32 tmpNumTracks;
 		BString tmpFrameOffsetString;
 		BString tmpDiscIDStr;
 		
-		GetDiscID(toc, tmpDiscID, tmpNumTracks, tmpDiscLength, tmpFrameOffsetString,
+		GetDiscID(&toc, tmpDiscID, tmpNumTracks, tmpDiscLength, tmpFrameOffsetString,
 			tmpDiscIDStr);
 		
 		if (discID == tmpDiscID && discLength == tmpDiscLength && numTracks == tmpNumTracks
@@ -343,8 +363,10 @@ CDDBQuery::ReadFromServer(BDataIO *stream)
 	BString tmp;
 	ReadLine(tmp);
 	if (tmp.FindFirst("200") != 0)
+	{
+		printf("Error: %s\n",tmp.String());
 		return;
-
+	}
 	BString category;
 	GetToken(tmp.String() + 3, category);
 	if (!category.Length())
@@ -474,7 +496,7 @@ CDDBQuery::IdentifySelf()
 		strcpy(hostname, "unknown");
 	
 	BString tmp;
-	tmp << "cddb hello " << username << " " << hostname << " CDButton v1.0\n";
+	tmp << "cddb hello " << username << " " << hostname << " Haiku_CD_Player v1.0\n";
 
 	if (log)
 		printf(">%s", tmp.String());
@@ -535,7 +557,9 @@ CDDBQuery::FindOrCreateContentFileForDisk(BFile *file, entry_ref *fileRef, int32
 	return false;
 }
 
-#if 0
+/*
+
+#include "CDEngine.h"
 
 bool
 PrintSite(const char *site, int port, const char *latitude,
@@ -549,35 +573,33 @@ PrintSite(const char *site, int port, const char *latitude,
 int
 main()
 {
-	try {
-		CDDBQuery query("us.cddb.com", 888, true);
-		// query.GetSites(&PrintSite, NULL);
+		CDDBQuery query("us.freedb.org", 888, true);
 
 		int32 device = CDEngine::FindCDPlayerDevice();
-		if (!device) {
+		if (!device) 
+		{
 			printf("no device %s\n", strerror(device));
 			return 0;
 		}
-		CDEngine engine(device);
+		
 		scsi_toc toc;
-		engine.GetToc(&toc);
 
+		ioctl(device, B_SCSI_GET_TOC, &toc);
+		int32 discID = query.GetDiscID(&toc);
+		
 		query.SetToCD(&toc);
 
 		BString title;
 		vector<BString> trackTitles;
-		query.GetTitles(title, trackTitles, 10000000);
+		query.GetTitles(&title, &trackTitles, 10000000);
 		
-		printf("CD Title:%s\n", title.String());
+		printf("CD Title: %s, ID: %lx\n", title.String(), discID);
 		int32 index = 0;
 		for (vector<BString>::iterator iterator = trackTitles.begin();
 			iterator != trackTitles.end(); index++, iterator++)
-			printf("%d: %s\n", index, (*iterator).String());
+			printf("%ld: %s\n", index, (*iterator).String());
 	
-	} catch(status_t error) {
-		printf("error %s\n", strerror(error));
-	}
 	return 0;
 }
 
-#endif
+*/

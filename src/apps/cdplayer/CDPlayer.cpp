@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "CDButton.h"
+#include "CDPlayer.h"
 #include "DrawButton.h"
 #include "TwoStateDrawButton.h"
 #include <TranslationUtils.h>
@@ -45,13 +45,13 @@ enum
 	M_SET_CD_TITLE
 };
 
-CDButton::CDButton(BRect frame, const char *name, uint32 resizeMask, uint32 flags)
+CDPlayer::CDPlayer(BRect frame, const char *name, uint32 resizeMask, uint32 flags)
 	:	BView(frame, name, resizeMask, flags | B_FRAME_EVENTS)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
 	// TODO: Support multiple CD drives
-	engine = new CDEngine(CDEngine::FindCDPlayerDevice());
+	engine = new CDEngine;
 	
 	BuildGUI();
 	
@@ -66,18 +66,29 @@ CDButton::CDButton(BRect frame, const char *name, uint32 resizeMask, uint32 flag
 		fFastFwd->SetEnabled(false);
 		fRewind->SetEnabled(false);
 		fSave->SetEnabled(false);
+		
+		fCurrentTrack->SetHighColor(fStopColor);
 	}
 }
 
-CDButton::~CDButton()
+CDPlayer::~CDPlayer()
 {
 	engine->Stop();
-	
 	delete engine;
 }
 
-void CDButton::BuildGUI(void)
+void CDPlayer::BuildGUI(void)
 {
+	fStopColor.red = 80;
+	fStopColor.green = 164;
+	fStopColor.blue = 80;
+	fStopColor.alpha = 255;
+	
+	fPlayColor.red = 40;
+	fPlayColor.green = 230;
+	fPlayColor.blue = 40;
+	fPlayColor.alpha = 255;
+	
 	BRect r(5,5,230,25);
 	
 	// Assemble the CD Title box
@@ -88,7 +99,7 @@ void CDButton::BuildGUI(void)
 	view->SetViewColor(20,20,20);
 	fCDBox->AddChild(view);
 	
-	fCDTitle = new BStringView(view->Bounds(),"CDTitle","");
+	fCDTitle = new BStringView(view->Bounds(),"CDTitle","", B_FOLLOW_ALL);
 	view->AddChild(fCDTitle);
 	fCDTitle->SetHighColor(200,200,200);
 	fCDTitle->SetFont(be_bold_font);
@@ -103,7 +114,7 @@ void CDButton::BuildGUI(void)
 	
 	fCurrentTrack = new BStringView( view->Bounds(),"TrackNumber","Track:",B_FOLLOW_ALL);
 	view->AddChild(fCurrentTrack);
-	fCurrentTrack->SetHighColor(40,230,40);
+	fCurrentTrack->SetHighColor(fPlayColor);
 	fCurrentTrack->SetFont(be_bold_font);
 	
 	r.OffsetBy(0, r.Height() + 5);
@@ -142,7 +153,6 @@ void CDButton::BuildGUI(void)
 	fStop->SetDisabled(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"stop_disabled"));
 	AddChild(fStop);
 	
-	// TODO: Play is a special button. Implement as two-state buttons
 	fPlay = new DrawButton( BRect(0,0,1,1), "Play", BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_up"),
 							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_down"),
 							new BMessage(M_PLAY), B_FOLLOW_BOTTOM, B_WILL_DRAW);
@@ -201,29 +211,30 @@ void CDButton::BuildGUI(void)
 	AddChild(fSave);
 	fSave->SetEnabled(false);
 	
-	// TODO: Shuffle and Repeat are special buttons. Implement as two-state buttons
-	fShuffle = new DrawButton( BRect(0,0,1,1), "Shuffle", BTranslationUtils::GetBitmap(B_PNG_FORMAT,"shuffle_up"),
-							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"shuffle_down"), new BMessage(M_SHUFFLE), 
-							B_FOLLOW_NONE, B_WILL_DRAW);
+	fShuffle = new TwoStateDrawButton( BRect(0,0,1,1), "Shuffle", 
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"shuffle_up"),
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"shuffle_down"), 
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"shuffle_up_on"),
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"shuffle_down_on"), 
+							new BMessage(M_SHUFFLE), B_FOLLOW_NONE, B_WILL_DRAW);
 	fShuffle->ResizeToPreferred();
 	fShuffle->MoveTo(fSave->Frame().right + 2, Bounds().bottom - 5 - fShuffle->Frame().Height());
-	fShuffle->SetDisabled(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"shuffle_disabled"));
 	AddChild(fShuffle);
-	fShuffle->SetEnabled(false);
 	
-	fRepeat = new DrawButton( BRect(0,0,1,1), "Repeat", BTranslationUtils::GetBitmap(B_PNG_FORMAT,"repeat_up"),
-							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"repeat_down"), new BMessage(M_REPEAT), 
-							B_FOLLOW_NONE, B_WILL_DRAW);
+	fRepeat = new TwoStateDrawButton( BRect(0,0,1,1), "Repeat", 
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"repeat_up"),
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"repeat_down"), 
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"repeat_up_on"),
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"repeat_down_on"), 
+							new BMessage(M_REPEAT), B_FOLLOW_NONE, B_WILL_DRAW);
 	fRepeat->ResizeToPreferred();
 	fRepeat->MoveTo(fShuffle->Frame().right + 2, Bounds().bottom - 5 - fRepeat->Frame().Height());
-	fRepeat->SetDisabled(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"repeat_disabled"));
 	AddChild(fRepeat);
-	fRepeat->SetEnabled(false);
 }
 
 
 void
-CDButton::MessageReceived(BMessage *msg)
+CDPlayer::MessageReceived(BMessage *msg)
 {
 	if(msg->WasDropped())
 	{
@@ -292,7 +303,7 @@ CDButton::MessageReceived(BMessage *msg)
 		}
 		case M_STOP:
 		{
-			if(engine->PlayStateWatcher()->GetState()==kPlaying)
+			if(engine->GetState()==kPlaying)
 			{
 				fPlay->SetBitmaps(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_up"),
 							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_down"));
@@ -304,7 +315,7 @@ CDButton::MessageReceived(BMessage *msg)
 		{
 			// If we are currently playing, then we will be showing
 			// the pause images and will want to switch back to the play images
-			if(engine->PlayStateWatcher()->GetState()==kPlaying)
+			if(engine->GetState()==kPlaying)
 			{
 				fPlay->SetBitmaps(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_up"),
 							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_down"));
@@ -315,7 +326,7 @@ CDButton::MessageReceived(BMessage *msg)
 				fPlay->SetBitmaps(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"pause_up"),
 							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"pause_down"));
 			}
-			engine->PlayOrPause();
+			engine->Play();
 			break;
 		}
 		case M_NEXT_TRACK:
@@ -350,12 +361,12 @@ CDButton::MessageReceived(BMessage *msg)
 		}
 		case M_SHUFFLE:
 		{
-			// TODO: Implement
+			engine->ToggleShuffle();
 			break;
 		}
 		case M_REPEAT:
 		{
-			// TODO: Implement
+			engine->ToggleRepeat();
 			break;
 		}
 		default:
@@ -372,7 +383,7 @@ CDButton::MessageReceived(BMessage *msg)
 }
 
 void
-CDButton::NoticeChange(Notifier *notifier)
+CDPlayer::NoticeChange(Notifier *notifier)
 {
 	PlayState *ps;
 	TrackState *trs;
@@ -402,10 +413,10 @@ CDButton::NoticeChange(Notifier *notifier)
 					fRewind->SetEnabled(false);
 					fSave->SetEnabled(false);
 				}
+				fCurrentTrack->SetHighColor(fStopColor);
 				fCurrentTrack->SetText("Track: ");
 				fTrackTime->SetText("Track --:-- / --:--");
 				fDiscTime->SetText("Disc --:-- / --:--");
-				printf("Notification: No CD\n");
 				break;
 			}
 			case kStopped:
@@ -418,12 +429,14 @@ CDButton::NoticeChange(Notifier *notifier)
 					fPrevTrack->SetEnabled(true);
 					fFastFwd->SetEnabled(true);
 					fRewind->SetEnabled(true);
-					fSave->SetEnabled(true);
+					
+					// TODO: Enable when Save is implemented
+//					fSave->SetEnabled(true);
 				}
-				fCurrentTrack->SetText("Track: ");
+				fCurrentTrack->SetHighColor(fStopColor);
+				fCurrentTrack->Invalidate();
 				fTrackTime->SetText("Track --:-- / --:--");
 				fDiscTime->SetText("Disc --:-- / --:--");
-				printf("Notification: CD Stopped\n");
 				break;
 			}
 			case kPaused:
@@ -437,9 +450,11 @@ CDButton::NoticeChange(Notifier *notifier)
 					fPrevTrack->SetEnabled(true);
 					fFastFwd->SetEnabled(true);
 					fRewind->SetEnabled(true);
-					fSave->SetEnabled(true);
+					
+					// TODO: Enable when Save is implemented
+//					fSave->SetEnabled(true);
 				}
-				printf("Notification: CD Paused\n");
+				fCurrentTrack->SetHighColor(fPlayColor);
 				break;
 			}
 			case kPlaying:
@@ -452,9 +467,12 @@ CDButton::NoticeChange(Notifier *notifier)
 					fPrevTrack->SetEnabled(true);
 					fFastFwd->SetEnabled(true);
 					fRewind->SetEnabled(true);
-					fSave->SetEnabled(true);
+					
+					// TODO: Enable when Save is implemented
+//					fSave->SetEnabled(true);
 				}
-				printf("Notification: CD Playing\n");
+				fCurrentTrack->SetHighColor(fPlayColor);
+				fCurrentTrack->Invalidate();
 				break;
 			}
 			case kSkipping:
@@ -467,9 +485,11 @@ CDButton::NoticeChange(Notifier *notifier)
 					fPrevTrack->SetEnabled(true);
 					fFastFwd->SetEnabled(true);
 					fRewind->SetEnabled(true);
-					fSave->SetEnabled(true);
+					
+					// TODO: Enable when Save is implemented
+//					fSave->SetEnabled(true);
 				}
-				printf("Notification: CD Skipping\n");
+				fCurrentTrack->SetHighColor(fStopColor);
 				break;
 			}
 			default:
@@ -502,7 +522,7 @@ CDButton::NoticeChange(Notifier *notifier)
 }
 
 void
-CDButton::UpdateCDInfo(void)
+CDPlayer::UpdateCDInfo(void)
 {
 	BString CDName, currentTrackName;
 	vector<BString> trackNames;
@@ -525,7 +545,7 @@ CDButton::UpdateCDInfo(void)
 }
 
 void
-CDButton::UpdateTimeInfo(void)
+CDPlayer::UpdateTimeInfo(void)
 {
 	int32 min,sec;
 	char string[1024];
@@ -546,7 +566,7 @@ CDButton::UpdateTimeInfo(void)
 }
 
 void 
-CDButton::AttachedToWindow()
+CDPlayer::AttachedToWindow()
 {
 	// start observing
 	engine->AttachedToLooper(Window());
@@ -570,7 +590,7 @@ CDButton::AttachedToWindow()
 }
 
 void
-CDButton::FrameResized(float new_width, float new_height)
+CDPlayer::FrameResized(float new_width, float new_height)
 {
 	// We implement this method because there is no resizing mode to split the window's
 	// width into two and have a box fill each half
@@ -595,13 +615,13 @@ CDButton::FrameResized(float new_width, float new_height)
 }
 
 void 
-CDButton::Pulse()
+CDPlayer::Pulse()
 {
 	engine->DoPulse();
 }
 
 void
-CDButton::SetBitmap(BBitmap *bitmap)
+CDPlayer::SetBitmap(BBitmap *bitmap)
 {
 	if(!bitmap)
 	{
@@ -615,14 +635,14 @@ CDButton::SetBitmap(BBitmap *bitmap)
 	Invalidate();
 }
 
-class CDButtonWindow : public BWindow
+class CDPlayerWindow : public BWindow
 {
 public:
-	CDButtonWindow(void);
+	CDPlayerWindow(void);
 	bool QuitRequested(void);
 };
 
-CDButtonWindow::CDButtonWindow(void)
+CDPlayerWindow::CDPlayerWindow(void)
  : BWindow(BRect (100, 100, 610, 200), "CD Player", B_TITLED_WINDOW, B_NOT_V_RESIZABLE |
    B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
@@ -634,17 +654,17 @@ CDButtonWindow::CDButtonWindow(void)
 	SetSizeLimits(wmin,wmax,hmin,hmax);
 }
 
-bool CDButtonWindow::QuitRequested(void)
+bool CDPlayerWindow::QuitRequested(void)
 {
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
 }
 
-CDButtonApplication::CDButtonApplication()
+CDPlayerApplication::CDPlayerApplication()
 	:	BApplication("application/x-vnd.Haiku-CDPlayer")
 {
-	BWindow *window = new CDButtonWindow();
-	BView *button = new CDButton(window->Bounds(), "CD");
+	BWindow *window = new CDPlayerWindow();
+	BView *button = new CDPlayer(window->Bounds(), "CD");
 	window->AddChild(button);
 	window->Show();
 }
@@ -652,7 +672,7 @@ CDButtonApplication::CDButtonApplication()
 int
 main(int, char **argv)
 {
-	(new CDButtonApplication())->Run();
+	(new CDPlayerApplication())->Run();
 
 	return 0;
 }
