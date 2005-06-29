@@ -297,7 +297,7 @@ mp3Decoder::DecodeNextChunk()
 }
 
 bool
-mp3Decoder::IsValidStream(uint8 *buffer, int size)
+mp3Decoder::IsValidStream(const uint8 *buffer, int size)
 {
 	// check 3 consecutive frame headers to make sure
 	// that the length encoded in the header is correct,
@@ -325,9 +325,9 @@ mp3Decoder::IsValidStream(uint8 *buffer, int size)
 }
 
 int
-mp3Decoder::GetFrameLength(void *header)
+mp3Decoder::GetFrameLength(const void *header)
 {
-	uint8 *h = (uint8 *)header;
+	const uint8 *h = static_cast<const uint8 *>(header);
 
 	if (h[0] != 0xff)
 		return -1;

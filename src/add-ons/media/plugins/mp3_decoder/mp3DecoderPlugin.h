@@ -51,8 +51,8 @@ public:
 					   
 private:
 	status_t	DecodeNextChunk();
-	bool		IsValidStream(uint8 *buffer, int size);
-	int			GetFrameLength(void *header);	
+	bool		IsValidStream(const uint8 *buffer, int size);
+	int			GetFrameLength(const void *header);	
 	
 private:
 	struct mpstr	fMpgLibPrivate;
