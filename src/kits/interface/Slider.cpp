@@ -673,7 +673,10 @@ BSlider::Draw(BRect updateRect)
 	// clear out background
 	BRegion background(updateRect);
 	background.Exclude(BarFrame());
-	background.Exclude(ThumbFrame());
+
+	// ToDo: the thumb doesn't delete its background, so we still have to do it
+	//background.Exclude(ThumbFrame());
+
 	if (background.Frame().IsValid())
 		OffscreenView()->FillRegion(&background, B_SOLID_LOW);
 
@@ -744,32 +747,42 @@ BSlider::DrawBar()
 		fillColor.green	= (fFillColor.green + no_tint.green) / 2;
 		fillColor.blue	= (fFillColor.blue + no_tint.blue) / 2;
 	}
-	
-	if (fUseFillColor) {
+
+	// exclude the block thumb from the bar filling
+
+	BRect lowerFrame = frame.InsetByCopy(1, 1);
+	BRect upperFrame = lowerFrame;
+
+	if (Style() == B_BLOCK_THUMB) {
+		BRect thumbFrame = ThumbFrame();
+
 		if (fOrientation == B_HORIZONTAL) {
-			view->SetHighColor(barColor);
-			view->FillRect(BRect((float)floor(frame.left + 1 + Position() *
-				(frame.Width() - 2)), frame.top, frame.right, frame.bottom));
-
-			view->SetHighColor(fillColor);
-			view->FillRect(BRect(frame.left, frame.top,
-				(float)floor(frame.left + 1 + Position() * (frame.Width() - 2)),
-				frame.bottom));
+			lowerFrame.right = thumbFrame.left;
+			upperFrame.left = thumbFrame.right;
 		} else {
-			view->SetHighColor(barColor);
-			view->FillRect(BRect(frame.left, frame.top, frame.right,
-				(float)floor(frame.bottom - 1 - Position() * (frame.Height() - 2))));
-
-			view->SetHighColor(fillColor);
-			view->FillRect(BRect(frame.left,
-				(float)floor(frame.bottom - 1 - Position() *
-				(frame.Height() - 2)), frame.right, frame.bottom));
-
+			lowerFrame.top = thumbFrame.bottom;
+			upperFrame.bottom = thumbFrame.top;
 		}
-	} else {
-		view->SetHighColor(barColor);
-		view->FillRect(frame);
+	} else if (fUseFillColor) {
+		if (fOrientation == B_HORIZONTAL) {
+			lowerFrame.right = floor(lowerFrame.left + Position() * lowerFrame.Width());
+			upperFrame.left = lowerFrame.right;
+		} else {
+			lowerFrame.top = floor(lowerFrame.bottom - Position() * lowerFrame.Height());
+			upperFrame.bottom = lowerFrame.top;
+		}
 	}
+
+	view->SetHighColor(barColor);
+	view->FillRect(upperFrame);
+
+	if (Style() == B_BLOCK_THUMB || fUseFillColor) {
+		if (fUseFillColor)
+			view->SetHighColor(fillColor);
+		view->FillRect(lowerFrame);
+	}
+
+	// ToDo: don't stroke the lines over the thumb
 
 	view->SetHighColor(darken1);
 	view->StrokeLine(BPoint(frame.left, frame.top),
@@ -852,17 +865,6 @@ BSlider::DrawHashMarks()
 	pos = _MinPosition();
 
 	if (fHashMarks & B_HASH_MARKS_BOTTOM) {
-#if !USE_OFF_SCREEN_VIEW
-		if (Style() == B_TRIANGLE_THUMB) {
-			// ToDo: this is a temporary workaround to clean out some drawing
-			// left-overs when moving the thumb around - might flicker, so we
-			// should do it differently
-			BRect rect = frame;
-			rect.top = frame.bottom - 5;
-			FillRect(rect, B_SOLID_LOW);
-		}
-#endif
-
 		view->BeginLineArray(fHashMarkCount * 2);
 
 		if (fOrientation == B_HORIZONTAL) {
@@ -925,7 +927,6 @@ BSlider::DrawFocusMark()
 				BPoint(frame.left - 2.0f, frame.bottom));
 		}
 	}
-	
 }
 
 
