@@ -3,8 +3,8 @@ SubDir OBOS_TOP src tests add-ons input_server ;
 SubDirHdrs $(OBOS_TOP) src add-ons input_server devices keyboard ;
 UsePrivateHeaders input ;
 
-SimpleTest TaskManagerTest :
-	TaskManagerTest.cpp
+SimpleTest TeamMonitorTest :
+	TeamMonitorTest.cpp
 	TMWindow.cpp
 	TMListItem.cpp
 	: be
