@@ -1,46 +1,18 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Button.cpp
-//	Author:			Marc Flerackers (mflerackers@androme.be)
-//	Description:	BButton displays and controls a button in a window.
-//------------------------------------------------------------------------------
+/*
+ *	Copyright (c) 2001-2005, Haiku.
+ *
+ *	Authors:
+ *				Marc Flerackers (mflerackers@androme.be)
+ *				Mike Wilber
+ *				Stefano Ceccherini (burton666@libero.it)
+ *				Ivan Tonizza
+ */
 
-// Standard Includes -----------------------------------------------------------
-
-// System Includes -------------------------------------------------------------
 #include <Button.h>
 #include <Font.h>
 #include <String.h>
 #include <Window.h>
 
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
 BButton::BButton(BRect frame, const char *name, const char *label, BMessage *message,
 				  uint32 resizingMode, uint32 flags)
 	:	BControl(frame, name, label, message, resizingMode, flags |= B_WILL_DRAW),
@@ -53,27 +25,33 @@ BButton::BButton(BRect frame, const char *name, const char *label, BMessage *mes
 	if (Bounds().Height() < minHeight)
 		ResizeTo(Bounds().Width(), minHeight);
 }
-//------------------------------------------------------------------------------
+
+
 BButton::~BButton()
 {
 }
-//------------------------------------------------------------------------------
+
+
 BButton::BButton(BMessage *archive)
 	:	BControl (archive)
 {
 	if (archive->FindBool("_default", &fDrawAsDefault) != B_OK)
 		fDrawAsDefault = false;
 }
-//------------------------------------------------------------------------------
-BArchivable *BButton::Instantiate(BMessage *archive)
+
+
+BArchivable *
+BButton::Instantiate(BMessage *archive)
 {
 	if (validate_instantiation(archive, "BButton"))
 		return new BButton(archive);
 	else
 		return NULL;
 }
-//------------------------------------------------------------------------------
-status_t BButton::Archive(BMessage* archive, bool deep) const
+
+
+status_t
+BButton::Archive(BMessage* archive, bool deep) const
 {
 	status_t err = BControl::Archive(archive, deep);
 
@@ -85,8 +63,10 @@ status_t BButton::Archive(BMessage* archive, bool deep) const
 
 	return err;
 }
-//------------------------------------------------------------------------------
-void BButton::Draw(BRect updateRect)
+
+
+void
+BButton::Draw(BRect updateRect)
 {
 	font_height fh;
 	GetFontHeight(&fh);
@@ -221,26 +201,24 @@ void BButton::Draw(BRect updateRect)
 	
 }
 
-//------------------------------------------------------------------------------
-void BButton::MouseDown(BPoint point)
+
+void
+BButton::MouseDown(BPoint point)
 {
 	if (!IsEnabled())
 		return;
 
 	SetValue(B_CONTROL_ON);
 
-	if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS)
-	{
+	if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS) {
  		SetTracking(true);
  		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
- 	}
- 	else
- 	{
+ 	
+ 	} else {
 		BRect bounds = Bounds();
 		uint32 buttons;
 
-		do
-		{
+		do {
 			Window()->UpdateIfNeeded();
 			
 			snooze(40000);
@@ -257,30 +235,35 @@ void BButton::MouseDown(BPoint point)
 			Invoke();
 	}
 }
-//------------------------------------------------------------------------------
-void BButton::AttachedToWindow()
+
+
+void
+BButton::AttachedToWindow()
 {
 	BControl::AttachedToWindow();
 
 	if (IsDefault())
 		Window()->SetDefaultButton(this);
 }
-//------------------------------------------------------------------------------
-void BButton::KeyDown(const char *bytes, int32 numBytes)
+
+
+void
+BButton::KeyDown(const char *bytes, int32 numBytes)
 {
-	if (*bytes == B_ENTER || *bytes == B_SPACE)
-	{
+	if (*bytes == B_ENTER || *bytes == B_SPACE) {
 		if (!IsEnabled())
 			return;
 
 		SetValue(B_CONTROL_ON);
 		Invoke();
-	}
-	else
+	
+	} else
 		BControl::KeyDown(bytes, numBytes);
 }
-//------------------------------------------------------------------------------
-void BButton::MakeDefault(bool flag)
+
+
+void
+BButton::MakeDefault(bool flag)
 {
 	BButton *oldDefault = NULL;
 	BWindow *window = Window();
@@ -288,8 +271,7 @@ void BButton::MakeDefault(bool flag)
 	if (window)
 		oldDefault = window->DefaultButton();
 
-	if (flag)
-	{
+	if (flag) {
 		if (fDrawAsDefault && oldDefault == this)
 			return;
 
@@ -300,9 +282,7 @@ void BButton::MakeDefault(bool flag)
 
 		if (window && oldDefault != this)
 			window->SetDefaultButton(this);
-	}
-	else
-	{
+	} else {
 		if (!fDrawAsDefault)
 			return;
 
@@ -315,28 +295,38 @@ void BButton::MakeDefault(bool flag)
 			window->SetDefaultButton(NULL);
 	}
 }
-//------------------------------------------------------------------------------
-void BButton::SetLabel(const char *string)
+
+
+void
+BButton::SetLabel(const char *string)
 {
 	BControl::SetLabel(string);
 }
-//------------------------------------------------------------------------------
-bool BButton::IsDefault() const
+
+
+bool
+BButton::IsDefault() const
 {
 	return fDrawAsDefault;
 }
-//------------------------------------------------------------------------------
-void BButton::MessageReceived(BMessage *message)
+
+
+void
+BButton::MessageReceived(BMessage *message)
 {
 	BControl::MessageReceived(message);
 }
-//------------------------------------------------------------------------------
-void BButton::WindowActivated(bool active)
+
+
+void
+BButton::WindowActivated(bool active)
 {
 	BControl::WindowActivated(active);
 }
-//------------------------------------------------------------------------------
-void BButton::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
+
+
+void
+BButton::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 {
 	if (!IsTracking())
 		return;
@@ -346,8 +336,10 @@ void BButton::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 	if ((Value() == B_CONTROL_ON) != inside)
 		SetValue(inside ? B_CONTROL_ON : B_CONTROL_OFF);
 }
-//------------------------------------------------------------------------------
-void BButton::MouseUp(BPoint point)
+
+
+void
+BButton::MouseUp(BPoint point)
 {
 	if (!IsTracking())
 		return;
@@ -357,21 +349,27 @@ void BButton::MouseUp(BPoint point)
 	
 	SetTracking(false);
 }
-//------------------------------------------------------------------------------
-void BButton::DetachedFromWindow()
+
+
+void
+BButton::DetachedFromWindow()
 {
 	BControl::DetachedFromWindow();
 }
-//------------------------------------------------------------------------------
-void BButton::SetValue(int32 value)
+
+
+void
+BButton::SetValue(int32 value)
 {
 	if (value != Value()) {
 		BControl::SetValue(value);
 		Invalidate();
 	}
 }
-//------------------------------------------------------------------------------
-void BButton::GetPreferredSize(float *width, float *height)
+
+
+void
+BButton::GetPreferredSize(float *width, float *height)
 {
 	font_height fh;
 	GetFontHeight(&fh);
@@ -382,19 +380,22 @@ void BButton::GetPreferredSize(float *width, float *height)
 	if (*width < 75.0f)
 		*width = 75.0f;
 
-	if (fDrawAsDefault)
-	{
+	if (fDrawAsDefault) {
 		*width += 6.0f;
 		*height += 6.0f;
 	}
 }
-//------------------------------------------------------------------------------
-void BButton::ResizeToPreferred()
+
+
+void
+BButton::ResizeToPreferred()
 {
 	 BControl::ResizeToPreferred();
 }
-//------------------------------------------------------------------------------
-status_t BButton::Invoke(BMessage *message)
+
+
+status_t
+BButton::Invoke(BMessage *message)
 {
 	Sync();
 	snooze(50000);
@@ -405,59 +406,80 @@ status_t BButton::Invoke(BMessage *message)
 
 	return err;
 }
-//------------------------------------------------------------------------------
-void BButton::FrameMoved(BPoint newLocation)
+
+
+void
+BButton::FrameMoved(BPoint newLocation)
 {
 	BControl::FrameMoved(newLocation);
 }
-//------------------------------------------------------------------------------
-void BButton::FrameResized(float width, float height)
+
+
+void
+BButton::FrameResized(float width, float height)
 {
 	BControl::FrameResized(width, height);
 }
-//------------------------------------------------------------------------------
-void BButton::MakeFocus(bool focused)
+
+
+void
+BButton::MakeFocus(bool focused)
 {
 	BControl::MakeFocus(focused);
 }
-//------------------------------------------------------------------------------
-void BButton::AllAttached()
+
+
+void
+BButton::AllAttached()
 {
 	BControl::AllAttached();
 }
-//------------------------------------------------------------------------------
-void BButton::AllDetached()
+
+
+void
+BButton::AllDetached()
 {
 	BControl::AllDetached();
 }
-//------------------------------------------------------------------------------
-BHandler *BButton::ResolveSpecifier(BMessage *message, int32 index,
+
+
+BHandler *
+BButton::ResolveSpecifier(BMessage *message, int32 index,
 									BMessage *specifier, int32 what,
 									const char *property)
 {
 	return BControl::ResolveSpecifier(message, index, specifier, what, property);
 }
-//------------------------------------------------------------------------------
-status_t BButton::GetSupportedSuites(BMessage *message)
+
+
+status_t
+BButton::GetSupportedSuites(BMessage *message)
 {
 	return BControl::GetSupportedSuites(message);
 }
-//------------------------------------------------------------------------------
-status_t BButton::Perform(perform_code d, void *arg)
+
+
+status_t
+BButton::Perform(perform_code d, void *arg)
 {
 	return BControl::Perform(d, arg);
 }
-//------------------------------------------------------------------------------
+
+
 void BButton::_ReservedButton1() {}
 void BButton::_ReservedButton2() {}
 void BButton::_ReservedButton3() {}
-//------------------------------------------------------------------------------
-BButton &BButton::operator=(const BButton &)
+
+
+BButton &
+BButton::operator=(const BButton &)
 {
 	return *this;
 }
-//------------------------------------------------------------------------------
-BRect BButton::DrawDefault(BRect bounds, bool enabled)
+
+
+BRect
+BButton::DrawDefault(BRect bounds, bool enabled)
 {
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
 	lighten1 = tint_color(no_tint, B_LIGHTEN_1_TINT),
@@ -481,8 +503,7 @@ BRect BButton::DrawDefault(BRect bounds, bool enabled)
 		BPoint(bounds.right - 1.0f, bounds.bottom), borderColor);
 	EndLineArray();
 
-	if (enabled)
-	{
+	if (enabled) {
 		// Bevel
 		bounds.InsetBy(1.0f, 1.0f);
 		SetHighColor(darken1);
@@ -508,8 +529,10 @@ BRect BButton::DrawDefault(BRect bounds, bool enabled)
 
 	return bounds;
 }
-//------------------------------------------------------------------------------
-status_t BButton::Execute()
+
+
+status_t
+BButton::Execute()
 {
 	if (!IsEnabled())
 		return B_ERROR;
@@ -517,8 +540,10 @@ status_t BButton::Execute()
 	SetValue(B_CONTROL_ON);
 	return Invoke();
 }
-//------------------------------------------------------------------------------
-void BButton::DrawFocusLine(float x, float y, float width, bool visible)
+
+
+void
+BButton::DrawFocusLine(float x, float y, float width, bool visible)
 {
 	if (visible)
 		SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
@@ -533,10 +558,3 @@ void BButton::DrawFocusLine(float x, float y, float width, bool visible)
 	// White Line
 	StrokeLine(BPoint(x, y + 1.0f), BPoint(x + width, y + 1.0f));
 }
-//------------------------------------------------------------------------------
-/*
- * $Log $
- *
- * $Id  $
- *
- */
