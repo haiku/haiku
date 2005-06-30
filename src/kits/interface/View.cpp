@@ -2016,6 +2016,7 @@ BView::SetFont(const BFont* font, uint32 mask)
 	if (mask == B_FONT_ALL) {
 		fState->font = *font;
 	} else {
+		// ToDo: move this into a BFont method
 		if (mask & B_FONT_FAMILY_AND_STYLE)
 			fState->font.SetFamilyAndStyle(font->FamilyAndStyle());
 
@@ -2074,7 +2075,10 @@ BView::GetFontHeight(font_height *height) const
 void
 BView::SetFontSize(float size)
 {
-	fState->font.SetSize(size);
+	BFont font;
+	font.SetSize(size);
+
+	SetFont(&font, B_FONT_SIZE);
 }
 
 
