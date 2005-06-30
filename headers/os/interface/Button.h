@@ -101,6 +101,9 @@ virtual	void		_ReservedButton3();
 		BButton		&operator=(const BButton &);
 
 		BRect		DrawDefault(BRect bounds, bool enabled);
+		void 		DrawFocusLine(float x, float y, float width, 
+			bool bVisible);
+			 
 		status_t	Execute ();
 
 		float		fCachedWidth;
