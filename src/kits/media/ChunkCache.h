@@ -35,8 +35,8 @@ struct chunk_info
 {
 	chunk_info *	next;
 	void *			buffer;
-	int32			sizeUsed;
-	int32			sizeMax;
+	size_t			sizeUsed;
+	size_t			sizeMax;
 	media_header	mediaHeader;
 	status_t		err;
 };
@@ -51,8 +51,8 @@ public:
 	void			MakeEmpty();
 	bool			NeedsRefill();
 					
-	status_t		GetNextChunk(void **chunkBuffer, int32 *chunkSize, media_header *mediaHeader);
-	void			PutNextChunk(void *chunkBuffer, int32 chunkSize, const media_header &mediaHeader, status_t err);
+	status_t		GetNextChunk(const void **chunkBuffer, size_t *chunkSize, media_header *mediaHeader);
+	void			PutNextChunk(const void *chunkBuffer, size_t chunkSize, const media_header &mediaHeader, status_t err);
 	
 private:
 	enum { CHUNK_COUNT = 5 };

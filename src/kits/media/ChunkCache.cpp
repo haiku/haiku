@@ -85,7 +85,7 @@ ChunkCache::NeedsRefill()
 
 					
 status_t
-ChunkCache::GetNextChunk(void **chunkBuffer, int32 *chunkSize, media_header *mediaHeader)
+ChunkCache::GetNextChunk(const void **chunkBuffer, size_t *chunkSize, media_header *mediaHeader)
 {
 //	printf("ChunkCache::GetNextChunk: %p fEmptyChunkCount %ld, fReadyChunkCount %ld\n", fNextGet, fEmptyChunkCount, fReadyChunkCount);
 retry:
@@ -113,7 +113,7 @@ retry:
 
 
 void
-ChunkCache::PutNextChunk(void *chunkBuffer, int32 chunkSize, const media_header &mediaHeader, status_t err)
+ChunkCache::PutNextChunk(const void *chunkBuffer, size_t chunkSize, const media_header &mediaHeader, status_t err)
 {
 //	printf("ChunkCache::PutNextChunk: %p fEmptyChunkCount %ld, fReadyChunkCount %ld\n", fNextPut, fEmptyChunkCount, fReadyChunkCount);
 

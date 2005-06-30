@@ -1904,7 +1904,7 @@ static int  readMoreBlocks(MatroskaFile *mf) {
     if (++retries > 3) // don't try too hard
       goto ex;
 
-    for (;;cp) {
+    for (;;cp) {  // <-- XXX TODO FIX THIS!
       if (filepos(mf) >= mf->pSegmentTop) {
 	mf->readPosition = filepos(mf);
 	goto ex;

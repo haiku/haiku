@@ -301,7 +301,7 @@ mp3Reader::FreeCookie(void *cookie)
 
 status_t
 mp3Reader::GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
-						 media_format *format, void **infoBuffer, int32 *infoSize)
+						 media_format *format, const void **infoBuffer, size_t *infoSize)
 {
 	mp3data *data = reinterpret_cast<mp3data *>(cookie);
 
@@ -382,7 +382,7 @@ mp3Reader::Seek(void *cookie,
 
 status_t
 mp3Reader::GetNextChunk(void *cookie,
-						void **chunkBuffer, int32 *chunkSize,
+						const void **chunkBuffer, size_t *chunkSize,
 						media_header *mediaHeader)
 {
 	mp3data *data = reinterpret_cast<mp3data *>(cookie);

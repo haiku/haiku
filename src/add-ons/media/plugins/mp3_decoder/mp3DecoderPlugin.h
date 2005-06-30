@@ -37,7 +37,7 @@ public:
 	void		GetCodecInfo(media_codec_info *codecInfo);
 
 	status_t	Setup(media_format *ioEncodedFormat,
-					  const void *infoBuffer, int32 infoSize);
+					  const void *infoBuffer, size_t infoSize);
 
 	status_t	NegotiateOutputFormat(media_format *ioDecodedFormat);
 

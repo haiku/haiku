@@ -346,7 +346,7 @@ aviReader::FreeCookie(void *_cookie)
 
 status_t
 aviReader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
-						 media_format *format, void **infoBuffer, int32 *infoSize)
+						 media_format *format, const void **infoBuffer, size_t *infoSize)
 {
 	avi_cookie *cookie = (avi_cookie *)_cookie;
 
@@ -377,7 +377,7 @@ aviReader::Seek(void *cookie,
 
 status_t
 aviReader::GetNextChunk(void *_cookie,
-						void **chunkBuffer, int32 *chunkSize,
+						const void **chunkBuffer, size_t *chunkSize,
 						media_header *mediaHeader)
 {
 	avi_cookie *cookie = (avi_cookie *)_cookie;

@@ -275,11 +275,9 @@ BMediaDecoder::AttachToDecoder()
 		MediaDecoderChunkProvider(BMediaDecoder * decoder) {
 			fDecoder = decoder;
 		}
-		virtual status_t GetNextChunk(void **chunkBuffer, int32 *chunkSize,
+		virtual status_t GetNextChunk(const void **chunkBuffer, size_t *chunkSize,
 		                              media_header *mediaHeader) {
-			const void ** buffer = const_cast<const void**>(chunkBuffer);
-			size_t * size = reinterpret_cast<size_t*>(chunkSize);
-			return fDecoder->GetNextChunk(buffer,size,mediaHeader);
+			return fDecoder->GetNextChunk(chunkBuffer, chunkSize, mediaHeader);
 		}
 	} * provider = new MediaDecoderChunkProvider(this);
 	if (provider == NULL) {

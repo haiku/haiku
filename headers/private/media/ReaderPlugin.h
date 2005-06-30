@@ -27,14 +27,14 @@ public:
 	virtual	status_t	FreeCookie(void *cookie) = 0;
 	
 	virtual status_t	GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
-									  media_format *format, void **infoBuffer, int32 *infoSize) = 0;
+									  media_format *format, const void **infoBuffer, size_t *infoSize) = 0;
 
 	virtual status_t	Seek(void *cookie,
 							 uint32 seekTo,
 							 int64 *frame, bigtime_t *time) = 0;
 
 	virtual status_t	GetNextChunk(void *cookie,
-									 void **chunkBuffer, int32 *chunkSize,
+									 const void **chunkBuffer, size_t *chunkSize,
 									 media_header *mediaHeader) = 0;
 	
 	BDataIO *			Source();

@@ -122,7 +122,7 @@ mp3Decoder::GetCodecInfo(media_codec_info *info)
 
 status_t
 mp3Decoder::Setup(media_format *ioEncodedFormat,
-				  const void *infoBuffer, int32 infoSize)
+				  const void *infoBuffer, size_t infoSize)
 {
 	// decode first chunk to initialize mpeg library
 	if (B_OK != DecodeNextChunk()) {
@@ -237,8 +237,8 @@ mp3Decoder::Decode(void *buffer, int64 *frameCount,
 status_t
 mp3Decoder::DecodeNextChunk()
 {
-	void *chunkBuffer;
-	int32 chunkSize;
+	const void *chunkBuffer;
+	size_t chunkSize;
 	media_header mh;
 	int outsize;
 	int result;

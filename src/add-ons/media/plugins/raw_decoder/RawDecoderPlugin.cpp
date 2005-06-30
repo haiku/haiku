@@ -59,7 +59,7 @@ RawDecoder::GetCodecInfo(media_codec_info *info)
 
 status_t
 RawDecoder::Setup(media_format *ioEncodedFormat,
-				  const void *infoBuffer, int32 infoSize)
+				  const void *infoBuffer, size_t infoSize)
 {
 	char s[200];
 	string_for_format(*ioEncodedFormat, s, sizeof(s));
@@ -478,20 +478,20 @@ RawDecoder::Decode(void *buffer, int64 *frameCount,
 		if (fChunkSize == 0) {
 			media_header mh;
 			status_t err;
-			err = GetNextChunk((void **)&fChunkBuffer, &fChunkSize, &mh);
+			err = GetNextChunk(&fChunkBuffer, &fChunkSize, &mh);
 			if (err != B_OK || fChunkSize < fInputFrameSize) {
 				fChunkSize = 0;
 				break;
 			}
 			if (fSwapInput)
-				fSwapInput(fChunkBuffer, fChunkSize / fInputSampleSize);
+				fSwapInput(const_cast<void *>(fChunkBuffer), fChunkSize / fInputSampleSize); // XXX TODO! FIX THIS, we write to a const buffer!!!
 			fStartTime = mh.start_time;
 			continue;
 		}
 		int32 frames = min_c(fOutputBufferFrameCount - *frameCount, fChunkSize / fInputFrameSize);
 		int32 samples = frames * fInputFormat.u.raw_audio.channel_count;
 		fConvert(output_buffer, fChunkBuffer, samples);
-		fChunkBuffer += frames * fInputFrameSize;
+		fChunkBuffer = (const char *)fChunkBuffer + frames * fInputFrameSize;
 		fChunkSize -= frames * fInputFrameSize;
 		output_buffer += frames * fOutputFrameSize;
 		*frameCount += frames;

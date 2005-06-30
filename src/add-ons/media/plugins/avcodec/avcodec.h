@@ -37,8 +37,8 @@ class avCodec : public Decoder
 		
 		virtual void GetCodecInfo(media_codec_info *mci);
 		
-		virtual status_t Setup(media_format *input_format,
-							   const void *in_info, int32 in_size);
+		virtual status_t Setup(media_format *ioEncodedFormat,
+							   const void *infoBuffer, size_t infoSize);
 	   
 		virtual status_t NegotiateOutputFormat(media_format *output_format);
 		
@@ -83,9 +83,9 @@ class avCodec : public Decoder
 		float		fOutputFrameRate;
 		int			fOutputFrameSize; // sample size * channel count
 		
-		char *		fChunkBuffer;
+		const void *fChunkBuffer;
 		int32		fChunkBufferOffset;
-		int32		fChunkBufferSize;
+		size_t		fChunkBufferSize;
 
 		char *		fOutputBuffer;
 		int32		fOutputBufferOffset;

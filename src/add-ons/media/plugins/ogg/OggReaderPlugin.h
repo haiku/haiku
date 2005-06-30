@@ -30,9 +30,9 @@ public:
 
 	// delegated to OggTrack	
 	status_t	GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
-							  media_format *format, void **infoBuffer, int32 *infoSize);
+							  media_format *format, const void **infoBuffer, size_t *infoSize);
 	status_t	Seek(void *cookie, uint32 seekTo, int64 *frame, bigtime_t *time);
-	status_t	GetNextChunk(void *cookie, void **chunkBuffer, int32 *chunkSize,
+	status_t	GetNextChunk(void *cookie, const void **chunkBuffer, size_t *chunkSize,
 							 media_header *mediaHeader);
 									 
 private:

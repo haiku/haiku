@@ -139,8 +139,8 @@ MediaExtractor::CountFrames(int32 stream) const
 	int64 frameCount;
 	bigtime_t duration;
 	media_format format;
-	void *infoBuffer;
-	int32 infoSize;
+	const void *infoBuffer;
+	size_t infoSize;
 	
 	fReader->GetStreamInfo(fStreamInfo[stream].cookie, &frameCount, &duration, &format, &infoBuffer, &infoSize);
 
@@ -155,8 +155,8 @@ MediaExtractor::Duration(int32 stream) const
 	int64 frameCount;
 	bigtime_t duration;
 	media_format format;
-	void *infoBuffer;
-	int32 infoSize;
+	const void *infoBuffer;
+	size_t infoSize;
 	
 	fReader->GetStreamInfo(fStreamInfo[stream].cookie, &frameCount, &duration, &format, &infoBuffer, &infoSize);
 
@@ -187,7 +187,7 @@ MediaExtractor::Seek(int32 stream, uint32 seekTo,
 
 status_t
 MediaExtractor::GetNextChunk(int32 stream,
-							 void **chunkBuffer, int32 *chunkSize,
+							 const void **chunkBuffer, size_t *chunkSize,
 							 media_header *mediaHeader)
 {
 	if (fStreamInfo[stream].status != B_OK)
@@ -218,7 +218,7 @@ public:
 		fStream = stream;
 	}
 	
-	virtual status_t GetNextChunk(void **chunkBuffer, int32 *chunkSize,
+	virtual status_t GetNextChunk(const void **chunkBuffer, size_t *chunkSize,
 	                              media_header *mediaHeader)
 	{
 		return fExtractor->GetNextChunk(fStream, chunkBuffer, chunkSize, mediaHeader);
@@ -283,8 +283,8 @@ MediaExtractor::ExtractorThread()
 					continue;
 				if (fStreamInfo[stream].chunkCache->NeedsRefill()) {
 					media_header mediaHeader;
-					void *chunkBuffer;
-					int32 chunkSize;
+					const void *chunkBuffer;
+					size_t chunkSize;
 					status_t err;
 					err = fReader->GetNextChunk(fStreamInfo[stream].cookie, &chunkBuffer, &chunkSize, &mediaHeader);
 					fStreamInfo[stream].chunkCache->PutNextChunk(chunkBuffer, chunkSize, mediaHeader, err);

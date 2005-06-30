@@ -116,7 +116,7 @@ MusePackReader::FreeCookie(void *cookie)
 
 status_t 
 MusePackReader::GetStreamInfo(void *cookie, int64 *_frameCount, bigtime_t *_duration,
-	media_format *format, void **_infoBuffer, int32 *_infoSize)
+	media_format *format, const void **_infoBuffer, size_t *_infoSize)
 {
 	if (cookie != NULL)
 		return B_BAD_VALUE;
@@ -145,7 +145,7 @@ MusePackReader::Seek(void *cookie, uint32 seekTo, int64 *frame, bigtime_t *time)
 
 
 status_t 
-MusePackReader::GetNextChunk(void *cookie, void **chunkBuffer, int32 *chunkSize,
+MusePackReader::GetNextChunk(void *cookie, const void **chunkBuffer, size_t *chunkSize,
 	media_header *mediaHeader)
 {
 	// this one will never be called by our decoder

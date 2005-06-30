@@ -81,7 +81,7 @@ SpeexDecoder::GetCodecInfo(media_codec_info *info)
 
 status_t
 SpeexDecoder::Setup(media_format *inputFormat,
-				  const void *infoBuffer, int32 infoSize)
+				  const void *infoBuffer, size_t infoSize)
 {
 	TRACE("SpeexDecoder::Setup\n");
 	if (!format_is_compatible(speex_encoded_media_format(),*inputFormat)) {
@@ -254,8 +254,8 @@ SpeexDecoder::Decode(void *buffer, int64 *frameCount,
 	int total_samples = 0;
 	while (out_bytes_needed >= fSpeexOutputLength) {
 		// get a new packet
-		void *chunkBuffer;
-		int32 chunkSize;
+		const void *chunkBuffer;
+		size_t chunkSize;
 		media_header mh;
 		status_t status = GetNextChunk(&chunkBuffer, &chunkSize, &mh);
 		if (status == B_LAST_BUFFER_ERROR) {

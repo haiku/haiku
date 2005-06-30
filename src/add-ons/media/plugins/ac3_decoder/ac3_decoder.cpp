@@ -62,7 +62,7 @@ AC3Decoder::GetCodecInfo(media_codec_info *info)
 
 status_t
 AC3Decoder::Setup(media_format *ioEncodedFormat,
-				  const void *infoBuffer, int32 infoSize)
+				  const void *infoBuffer, size_t infoSize)
 {
 	return B_OK;
 }

@@ -30,7 +30,7 @@ MusePackDecoder::GetCodecInfo(media_codec_info *info)
 
 
 status_t 
-MusePackDecoder::Setup(media_format *ioEncodedFormat, const void *infoBuffer, int32 infoSize)
+MusePackDecoder::Setup(media_format *ioEncodedFormat, const void *infoBuffer, size_t infoSize)
 {
 	if (infoBuffer == NULL || infoSize != sizeof(MPC_decoder))
 		return B_BAD_VALUE;

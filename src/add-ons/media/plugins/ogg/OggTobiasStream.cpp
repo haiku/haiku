@@ -225,7 +225,7 @@ OggTobiasStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 
 
 status_t
-OggTobiasStream::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
+OggTobiasStream::GetNextChunk(const void **chunkBuffer, size_t *chunkSize,
                              media_header *mediaHeader)
 {
 	status_t result = GetPacket(&fChunkPacket);

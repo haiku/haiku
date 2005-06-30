@@ -332,7 +332,7 @@ mkvReader::FreeCookie(void *_cookie)
 
 status_t
 mkvReader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
-						 media_format *format, void **infoBuffer, int32 *infoSize)
+						 media_format *format, const void **infoBuffer, size_t *infoSize)
 {
 	mkv_cookie *cookie = (mkv_cookie *)_cookie;
 	*frameCount = cookie->frame_count;
@@ -385,7 +385,7 @@ mkvReader::Seek(void *_cookie,
 
 status_t
 mkvReader::GetNextChunk(void *_cookie,
-						void **chunkBuffer, int32 *chunkSize,
+						const void **chunkBuffer, size_t *chunkSize,
 						media_header *mediaHeader)
 {
 	mkv_cookie *cookie = (mkv_cookie *)_cookie;

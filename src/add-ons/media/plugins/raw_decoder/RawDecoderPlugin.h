@@ -33,7 +33,7 @@ public:
 	void		GetCodecInfo(media_codec_info *info);
 
 	status_t	Setup(media_format *ioEncodedFormat,
-					  const void *infoBuffer, int32 infoSize);
+					  const void *infoBuffer, size_t infoSize);
 					  
 	status_t	NegotiateOutputFormat(media_format *ioDecodedFormat);
 	
@@ -56,11 +56,11 @@ private:
 	int32			fOutputSampleSize;
 	int32			fOutputBufferFrameCount;
 	void 			(*fSwapInput)(void *data, int32 count);
-	void 			(*fConvert)(void *dst, void *src, int32 count);
+	void 			(*fConvert)(void *dst, const void *src, int32 count);
 	void 			(*fSwapOutput)(void *data, int32 count);
 	
-	char *			fChunkBuffer;
-	int32			fChunkSize;
+	const void *	fChunkBuffer;
+	size_t			fChunkSize;
 	
 	bigtime_t		fStartTime;
 	

@@ -74,7 +74,7 @@ VorbisDecoder::GetCodecInfo(media_codec_info *info)
 
 status_t
 VorbisDecoder::Setup(media_format *inputFormat,
-				  const void *infoBuffer, int32 infoSize)
+				  const void *infoBuffer, size_t infoSize)
 {
 	TRACE("VorbisDecoder::Setup\n");
 	if (!format_is_compatible(vorbis_encoded_media_format(),*inputFormat)) {
@@ -178,8 +178,8 @@ VorbisDecoder::Decode(void *buffer, int64 *frameCount,
 		float **pcm;
 		while ((samples = vorbis_synthesis_pcmout(&fDspState,&pcm)) == 0) {
 			// get a new packet
-			void *chunkBuffer;
-			int32 chunkSize;
+			const void *chunkBuffer;
+			size_t chunkSize;
 			media_header mh;
 			status_t status = GetNextChunk(&chunkBuffer, &chunkSize, &mh);
 			if (status == B_LAST_BUFFER_ERROR) {

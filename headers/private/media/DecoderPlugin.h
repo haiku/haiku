@@ -11,7 +11,7 @@ namespace BPrivate { namespace media {
 
 class ChunkProvider {
 public:
-	virtual status_t	GetNextChunk(void **chunkBuffer, int32 *chunkSize,
+	virtual status_t	GetNextChunk(const void **chunkBuffer, size_t *chunkSize,
 						             media_header *mediaHeader) = 0;
 };
 
@@ -24,7 +24,7 @@ public:
 	virtual void		GetCodecInfo(media_codec_info *codecInfo) = 0;
 
 						// Setup get's called with the info data from Reader::GetStreamInfo
-	virtual status_t	Setup(media_format *ioEncodedFormat, const void *infoBuffer, int32 infoSize) = 0;
+	virtual status_t	Setup(media_format *ioEncodedFormat, const void *infoBuffer, size_t infoSize) = 0;
 
 	virtual status_t	NegotiateOutputFormat(media_format *ioDecodedFormat) = 0;
 	
@@ -35,7 +35,7 @@ public:
 	virtual status_t	Decode(void *buffer, int64 *frameCount,
 							   media_header *mediaHeader, media_decode_info *info = 0) = 0;
 							   
-	status_t			GetNextChunk(void **chunkBuffer, int32 *chunkSize,
+	status_t			GetNextChunk(const void **chunkBuffer, size_t *chunkSize,
 									 media_header *mediaHeader);
 
 	void				Setup(ChunkProvider *provider);

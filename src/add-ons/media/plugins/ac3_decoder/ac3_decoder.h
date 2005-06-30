@@ -34,7 +34,7 @@ public:
 	void		GetCodecInfo(media_codec_info *info);
 
 	status_t	Setup(media_format *ioEncodedFormat,
-					  const void *infoBuffer, int32 infoSize);
+					  const void *infoBuffer, size_t infoSize);
 
 	status_t	NegotiateOutputFormat(media_format *ioDecodedFormat);
 
@@ -57,8 +57,8 @@ private:
 	void *		fInputBuffer;
 	int			fInputBufferSize;
 	
-	void *		fInputChunk;
-	int32		fInputChunkSize;
+	const void *fInputChunk;
+	size_t		fInputChunkSize;
 	int			fInputChunkOffset;
 	
 	bigtime_t	fStartTime;

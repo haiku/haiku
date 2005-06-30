@@ -416,7 +416,7 @@ movReader::FreeCookie(void *_cookie)
 
 status_t
 movReader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
-						 media_format *format, void **infoBuffer, int32 *infoSize)
+						 media_format *format, const void **infoBuffer, size_t *infoSize)
 {
 	mov_cookie *cookie = (mov_cookie *)_cookie;
 
@@ -469,7 +469,7 @@ movReader::Seek(void *cookie,
 
 status_t
 movReader::GetNextChunk(void *_cookie,
-						void **chunkBuffer, int32 *chunkSize,
+						const void **chunkBuffer, size_t *chunkSize,
 						media_header *mediaHeader)
 {
 	mov_cookie *cookie = (mov_cookie *)_cookie;

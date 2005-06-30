@@ -54,7 +54,7 @@ public:
 				RawDecoderChunkProvider(Decoder *decoder, int buffer_size, int frame_size);
 	virtual 	~RawDecoderChunkProvider();
 	
-	status_t	GetNextChunk(void **chunkBuffer, int32 *chunkSize, media_header *mediaHeader);
+	status_t	GetNextChunk(const void **chunkBuffer, size_t *chunkSize, media_header *mediaHeader);
 
 private:
 	Decoder *fDecoder;
@@ -446,14 +446,19 @@ BMediaTrack::ReadChunk(char **out_buffer,
 
 	status_t result;
 	media_header header;
+	const void *buffer;
+	size_t size;
 
 	memset(&header, 0, sizeof(header)); // always clear it first, as the reader doesn't set all fields
 
-	result = fExtractor->GetNextChunk(fStream, (void **)out_buffer, out_size, &header);
-
-	fCurTime = header.start_time;
-	if (mh)
-		*mh = header;
+	result = fExtractor->GetNextChunk(fStream, &buffer, &size, &header);
+	if (result == B_OK) {
+		*out_buffer = const_cast<char *>(static_cast<const char *>(buffer)); // yes this *is* ugly
+		*out_size  = size;
+		fCurTime = header.start_time;
+		if (mh)
+			*mh = header;
+	}
 
 	return result;
 }
@@ -822,7 +827,7 @@ RawDecoderChunkProvider::~RawDecoderChunkProvider()
 }
 
 status_t
-RawDecoderChunkProvider::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
+RawDecoderChunkProvider::GetNextChunk(const void **chunkBuffer, size_t *chunkSize,
                                       media_header *mediaHeader)
 {
 	int64 frames;

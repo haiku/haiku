@@ -290,7 +290,7 @@ OggReader::FreeCookie(void *cookie)
 
 status_t
 OggReader::GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
-						 media_format *format, void **infoBuffer, int32 *infoSize)
+						 media_format *format, const void **infoBuffer, size_t *infoSize)
 {
 	TRACE("OggReader::GetStreamInfo\n");
 	*infoBuffer = 0;
@@ -316,7 +316,7 @@ OggReader::Seek(void *cookie,
 
 status_t
 OggReader::GetNextChunk(void *cookie,
-						void **chunkBuffer, int32 *chunkSize,
+						const void **chunkBuffer, size_t *chunkSize,
 						media_header *mediaHeader)
 {
 //	TRACE("OggReader::GetNextChunk\n");

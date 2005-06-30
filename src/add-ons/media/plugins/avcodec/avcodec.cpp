@@ -97,23 +97,23 @@ avCodec::GetCodecInfo(media_codec_info *mci)
 
 
 status_t
-avCodec::Setup(media_format *input_format, const void *in_info, int32 in_size)
+avCodec::Setup(media_format *ioEncodedFormat, const void *infoBuffer, size_t infoSize)
 {
-	if (input_format->type != B_MEDIA_ENCODED_AUDIO && input_format->type != B_MEDIA_ENCODED_VIDEO)
+	if (ioEncodedFormat->type != B_MEDIA_ENCODED_AUDIO && ioEncodedFormat->type != B_MEDIA_ENCODED_VIDEO)
 		return B_ERROR;
 		
-	isAudio = (input_format->type == B_MEDIA_ENCODED_AUDIO);
+	isAudio = (ioEncodedFormat->type == B_MEDIA_ENCODED_AUDIO);
 
 	if (isAudio && !fOutputBuffer)
 		fOutputBuffer = new char[100000];
 
 #if DEBUG
 	char buffer[1024];
-	string_for_format(*input_format, buffer, sizeof(buffer));
+	string_for_format(*ioEncodedFormat, buffer, sizeof(buffer));
 	PRINT(("[%c]   input_format=%s\n", isAudio?('a'):('v'), buffer));
 	PRINT(("[%c]   in_info_size=%ld\n", isAudio?('a'):('v'), in_size));
-	PRINT(("[%c]   user_data_type=%08lx\n", isAudio?('a'):('v'), input_format->user_data_type));
-//	PRINT(("[%c]   meta_data_size=%ld\n", isAudio?('a'):('v'), input_format->meta_data_size));
+	PRINT(("[%c]   user_data_type=%08lx\n", isAudio?('a'):('v'), ioEncodedFormat->user_data_type));
+//	PRINT(("[%c]   meta_data_size=%ld\n", isAudio?('a'):('v'), ioEncodedFormat->meta_data_size));
 #endif
 
 	media_format_description descr;
@@ -121,8 +121,8 @@ avCodec::Setup(media_format *input_format, const void *in_info, int32 in_size)
 		ffcodec_index_in_table = i;
 		uint64 cid;
 		
-		if(BMediaFormats().GetCodeFor(*input_format,gCodecTable[i].family,&descr) == B_OK
-		   && gCodecTable[i].type == input_format->type)
+		if (BMediaFormats().GetCodeFor(*ioEncodedFormat, gCodecTable[i].family, &descr) == B_OK
+		    && gCodecTable[i].type == ioEncodedFormat->type)
 			{
 			PRINT(("  codec id = \"%c%c%c%c\"\n",	(descr.u.avi.codec >> 24) & 0xff,
 													(descr.u.avi.codec >> 16) & 0xff,
@@ -159,8 +159,8 @@ avCodec::Setup(media_format *input_format, const void *in_info, int32 in_size)
 				}
 				
 				if (gCodecTable[i].family == B_WAV_FORMAT_FAMILY) {
-					const wave_format_ex *wfmt_data = (const wave_format_ex *)input_format->MetaData();
-					int wfmt_size = input_format->MetaDataSize();
+					const wave_format_ex *wfmt_data = (const wave_format_ex *)ioEncodedFormat->MetaData();
+					int wfmt_size = ioEncodedFormat->MetaDataSize();
 					if (wfmt_data && wfmt_size) {
 						fBlockAlign = wfmt_data->block_align;
 						fExtraDataSize = wfmt_data->extra_size;
@@ -171,7 +171,7 @@ avCodec::Setup(media_format *input_format, const void *in_info, int32 in_size)
 					}
 				}
 
-				fInputFormat = *input_format;
+				fInputFormat = *ioEncodedFormat;
 				return B_OK;
 			}
 		}
@@ -377,7 +377,7 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 			if (fChunkBufferSize == 0) {
 				media_header chunk_mh;
 				status_t err;
-				err = GetNextChunk((void **)&fChunkBuffer, &fChunkBufferSize, &chunk_mh);
+				err = GetNextChunk(&fChunkBuffer, &fChunkBufferSize, &chunk_mh);
 				if (err != B_OK || fChunkBufferSize < 0) {
 					printf("GetNextChunk error\n");
 					fChunkBufferSize = 0;
@@ -391,7 +391,7 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 			}
 			if (fOutputBufferSize == 0) {
 				int len, out_size;
-				len = avcodec_decode_audio(ffc, (short *)fOutputBuffer, &out_size, (uint8_t *)fChunkBuffer + fChunkBufferOffset, fChunkBufferSize);
+				len = avcodec_decode_audio(ffc, (short *)fOutputBuffer, &out_size, const_cast<uint8_t *>(static_cast<const uint8_t *>(fChunkBuffer)) + fChunkBufferOffset, fChunkBufferSize);
 				if (len < 0) {
 					printf("########### audio decode error, fChunkBufferSize %ld, fChunkBufferOffset %ld\n", fChunkBufferSize, fChunkBufferOffset);
 					out_size = 0;
@@ -411,8 +411,8 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 
 		media_header chunk_mh;
 		status_t err;
-		void *data;
-		int32 size;
+		const void *data;
+		size_t size;
 
 		err = GetNextChunk(&data, &size, &chunk_mh);
 		if (err != B_OK) {

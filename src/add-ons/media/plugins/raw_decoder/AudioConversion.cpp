@@ -35,11 +35,11 @@ typedef double float64;
 class uint8_sample
 {
 public:
-	inline operator uint8() { return data; }
-	inline operator int8()  { return (int32)data - 128; }
-	inline operator int16() { return ((int32)data - 128) << 8; }
-	inline operator int32() { return ((int32)data - 128) << 24; }
-	inline operator float() { return ((int32)data - 128) * (1.0f / 127.0f); }
+	inline operator uint8() const { return data; }
+	inline operator int8()  const { return (int32)data - 128; }
+	inline operator int16() const { return ((int32)data - 128) << 8; }
+	inline operator int32() const { return ((int32)data - 128) << 24; }
+	inline operator float() const { return ((int32)data - 128) * (1.0f / 127.0f); }
 private:
 	uint8 data;
 } _PACKED;
@@ -47,11 +47,11 @@ private:
 class int8_sample
 {
 public:
-	inline operator uint8() { return (int32)data + 128; }
-	inline operator int8()  { return data; }
-	inline operator int16() { return (int16)data << 8; }
-	inline operator int32() { return (int32)data << 24; }
-	inline operator float() { return (int32)data * (1.0f / 127.0f); }
+	inline operator uint8() const { return (int32)data + 128; }
+	inline operator int8()  const { return data; }
+	inline operator int16() const { return (int16)data << 8; }
+	inline operator int32() const { return (int32)data << 24; }
+	inline operator float() const { return (int32)data * (1.0f / 127.0f); }
 private:
 	int8 data;
 } _PACKED;
@@ -59,11 +59,11 @@ private:
 class int16_sample
 {
 public:
-	inline operator uint8() { return (uint8)((int8)(data >> 8) + 128); }
-	inline operator int8()  { return (int8)(data >> 8); }
-	inline operator int16() { return data; }
-	inline operator int32() { return (int32)data << 16; }
-	inline operator float() { return data * (1.0f / 32767.0f); }
+	inline operator uint8() const { return (uint8)((int8)(data >> 8) + 128); }
+	inline operator int8()  const { return (int8)(data >> 8); }
+	inline operator int16() const { return data; }
+	inline operator int32() const { return (int32)data << 16; }
+	inline operator float() const { return data * (1.0f / 32767.0f); }
 private:
 	int16 data;
 } _PACKED;
@@ -72,21 +72,21 @@ class int24_sample
 {
 public:
 #if B_HOST_IS_LENDIAN
-	inline operator uint8() { return (int32)data[2] + 128; }
-	inline operator int8()  { return (int8)data[2]; }
-	inline operator int16() { return (int16)((uint32)data[2] << 8 | (uint32)data[1]); }
-	inline operator int32() { return (int32)((uint32)data[2] << 24 | (uint32)data[1] << 16 | (uint32)data[0] << 8); }
-	inline operator float() { return (int32)((uint32)data[2] << 16 | (uint32)data[1] << 8 | (uint32)data[0]) * (1.0f / (2147483647.0f / 256)); }
+	inline operator uint8() const { return (int32)data[2] + 128; }
+	inline operator int8()  const { return (int8)data[2]; }
+	inline operator int16() const { return (int16)((uint32)data[2] << 8 | (uint32)data[1]); }
+	inline operator int32() const { return (int32)((uint32)data[2] << 24 | (uint32)data[1] << 16 | (uint32)data[0] << 8); }
+	inline operator float() const { return (int32)((uint32)data[2] << 16 | (uint32)data[1] << 8 | (uint32)data[0]) * (1.0f / (2147483647.0f / 256)); }
 // XXX is the line above correct? long version:
-//	inline operator float() { return (int32)((uint32)data[2] << 24 | (uint32)data[1] << 16 | (uint32)data[0] << 8) * (1.0f / 2147483647.0f); }
+//	inline operator float() const { return (int32)((uint32)data[2] << 24 | (uint32)data[1] << 16 | (uint32)data[0] << 8) * (1.0f / 2147483647.0f); }
 #else
-	inline operator uint8() { return (int32)data[0] + 128; }
-	inline operator int8()  { return (int8)data[0]; }
-	inline operator int16() { return (int16)((uint32)data[0] << 8 | (uint32)data[1]); }
-	inline operator int32() { return (int32)((uint32)data[0] << 24 | (uint32)data[1] << 16 | (uint32)data[2] << 8); }
-	inline operator float() { return (int32)((uint32)data[0] << 16 | (uint32)data[1] << 8 | (uint32)data[2]) * (1.0f / (2147483647.0f / 256)); }
+	inline operator uint8() const { return (int32)data[0] + 128; }
+	inline operator int8()  const { return (int8)data[0]; }
+	inline operator int16() const { return (int16)((uint32)data[0] << 8 | (uint32)data[1]); }
+	inline operator int32() const { return (int32)((uint32)data[0] << 24 | (uint32)data[1] << 16 | (uint32)data[2] << 8); }
+	inline operator float() const { return (int32)((uint32)data[0] << 16 | (uint32)data[1] << 8 | (uint32)data[2]) * (1.0f / (2147483647.0f / 256)); }
 // XXX is the line above correct? long version:
-//	inline operator float() { return (int32)((uint32)data[0] << 24 | (uint32)data[1] << 16 | (uint32)data[2] << 8) * (1.0f / 2147483647.0f); }
+//	inline operator float() const { return (int32)((uint32)data[0] << 24 | (uint32)data[1] << 16 | (uint32)data[2] << 8) * (1.0f / 2147483647.0f); }
 #endif
 private:
 	uint8 data[3];
@@ -95,11 +95,11 @@ private:
 class int32_sample
 {
 public:
-	inline operator uint8() { return (int8)(data >> 24) + 128; }
-	inline operator int8()  { return (int8)(data >> 24); }
-	inline operator int16() { return (int16)(data >> 16); }
-	inline operator int32() { return data; }
-	inline operator float() { return data * (1.0f / 2147483647.0f); }
+	inline operator uint8() const { return (int8)(data >> 24) + 128; }
+	inline operator int8()  const { return (int8)(data >> 24); }
+	inline operator int16() const { return (int16)(data >> 16); }
+	inline operator int32() const { return data; }
+	inline operator float() const { return data * (1.0f / 2147483647.0f); }
 private:
 	int32 data;
 } _PACKED;
@@ -107,11 +107,11 @@ private:
 class float32_sample
 {
 public:
-	inline operator uint8() { int32 v = (int32)(data * 127.0f) + 128; if (v > 255) v = 255; else if (v < 0) v = 0; return v; }
-	inline operator int8()  { int32 v = (int32)(data * 127.0f); if (v > 127) v = 127; else if (v < -127) v = -127; return v; }
-	inline operator int16() { int32 v = (int32)(data * 32767.0f); if (v > 32767) v = 32767; else if (v < -32767) v = -32767; return v; }
-	inline operator int32() { float32 v; if (data < -1.0f) v = -1.0f; else if (data > 1.0f) v = 1.0f; else v = data; return (int32)(v * 2147483647.0f); }
-	inline operator float() { return data; }
+	inline operator uint8() const { int32 v = (int32)(data * 127.0f) + 128; if (v > 255) v = 255; else if (v < 0) v = 0; return v; }
+	inline operator int8()  const { int32 v = (int32)(data * 127.0f); if (v > 127) v = 127; else if (v < -127) v = -127; return v; }
+	inline operator int16() const { int32 v = (int32)(data * 32767.0f); if (v > 32767) v = 32767; else if (v < -32767) v = -32767; return v; }
+	inline operator int32() const { float32 v; if (data < -1.0f) v = -1.0f; else if (data > 1.0f) v = 1.0f; else v = data; return (int32)(v * 2147483647.0f); }
+	inline operator float() const { return data; }
 private:
 	float32 data;
 } _PACKED;
@@ -119,19 +119,19 @@ private:
 class float64_sample
 {
 public:
-	inline operator uint8() { int32 v = (int32)(data * 127.0f) + 128; if (v > 255) v = 255; else if (v < 0) v = 0; return v; }
-	inline operator int8()  { int32 v = (int32)(data * 127.0f); if (v > 127) v = 127; else if (v < -127) v = -127; return v; }
-	inline operator int16() { int32 v = (int32)(data * 32767.0f); if (v > 32767) v = 32767; else if (v < -32767) v = -32767; return v; }
-	inline operator int32() { float64 v; if (data < -1.0) v = -1.0; else if (data > 1.0) v = 1.0; else v = data; return (int32)(v * 2147483647.0f); }
-	inline operator float() { return data; }
+	inline operator uint8() const { int32 v = (int32)(data * 127.0f) + 128; if (v > 255) v = 255; else if (v < 0) v = 0; return v; }
+	inline operator int8()  const { int32 v = (int32)(data * 127.0f); if (v > 127) v = 127; else if (v < -127) v = -127; return v; }
+	inline operator int16() const { int32 v = (int32)(data * 32767.0f); if (v > 32767) v = 32767; else if (v < -32767) v = -32767; return v; }
+	inline operator int32() const { float64 v; if (data < -1.0) v = -1.0; else if (data > 1.0) v = 1.0; else v = data; return (int32)(v * 2147483647.0f); }
+	inline operator float() const { return data; }
 private:
 	float64 data;
 } _PACKED;
 
 #define CONVERT(src_type, dst_type)				\
-void src_type##_to_##dst_type (void *dst, void *src, int32 count) \
+void src_type##_to_##dst_type (void *dst, const void *src, int32 count) \
 {												\
-	register src_type##_sample *s = (src_type##_sample *) src;	\
+	register const src_type##_sample *s = (const src_type##_sample *) src;	\
 	register dst_type *d = (dst_type *) dst;	\
 	register int32 c = count >> 4;				\
 	if (!c) goto fin1;							\

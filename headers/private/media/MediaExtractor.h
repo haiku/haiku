@@ -14,8 +14,8 @@ struct stream_info
 	status_t		status;
 	void *			cookie;
 	bool			hasCookie;
-	void *			infoBuffer;
-	int32			infoBufferSize;
+	const void *	infoBuffer;
+	size_t			infoBufferSize;
 	ChunkCache *	chunkCache;
 	media_format	encodedFormat;
 };
@@ -40,7 +40,7 @@ public:
 						 int64 *frame, bigtime_t *time);
 	
 	status_t		GetNextChunk(int32 stream,
-								 void **chunkBuffer, int32 *chunkSize,
+								 const void **chunkBuffer, size_t *chunkSize,
 								 media_header *mediaHeader);
 
 	status_t		CreateDecoder(int32 stream, Decoder **decoder, media_codec_info *mci);

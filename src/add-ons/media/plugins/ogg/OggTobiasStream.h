@@ -14,7 +14,7 @@ public:
 
 	virtual	status_t	GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 						              media_format *format);
-	virtual status_t	GetNextChunk(void **chunkBuffer, int32 *chunkSize,
+	virtual status_t	GetNextChunk(const void **chunkBuffer, size_t *chunkSize,
 						              media_header *mediaHeader);
 
 	// reader push input function

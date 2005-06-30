@@ -319,7 +319,7 @@ aiffReader::FreeCookie(void *cookie)
 
 status_t
 aiffReader::GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
-						 media_format *format, void **infoBuffer, int32 *infoSize)
+						 media_format *format, const void **infoBuffer, size_t *infoSize)
 {
 	*frameCount = fFrameCount;
 	*duration = fDuration;
@@ -376,7 +376,7 @@ aiffReader::Seek(void *cookie,
 
 status_t
 aiffReader::GetNextChunk(void *cookie,
-						void **chunkBuffer, int32 *chunkSize,
+						const void **chunkBuffer, size_t *chunkSize,
 						media_header *mediaHeader)
 {
 	// XXX it might be much better to not return any start_time information for encoded formats here,

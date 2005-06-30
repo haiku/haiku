@@ -336,7 +336,7 @@ WavReader::FreeCookie(void *cookie)
 
 status_t
 WavReader::GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
-						 media_format *format, void **infoBuffer, int32 *infoSize)
+						 media_format *format, const void **infoBuffer, size_t *infoSize)
 {
 	wavdata *data = reinterpret_cast<wavdata *>(cookie);
 	
@@ -396,7 +396,7 @@ WavReader::Seek(void *cookie,
 
 status_t
 WavReader::GetNextChunk(void *cookie,
-						void **chunkBuffer, int32 *chunkSize,
+						const void **chunkBuffer, size_t *chunkSize,
 						media_header *mediaHeader)
 {
 	wavdata *data = reinterpret_cast<wavdata *>(cookie);
