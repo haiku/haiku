@@ -221,6 +221,9 @@ parse_options(int argc, char *argv[])
 		error("no input files");
 
 	for (int i = 1; i < argc; ++i) {
+		if (argv[i] == NULL)
+			continue;
+
 		if (sFirstInputFile == NULL)
 			sFirstInputFile = argv[i];
 
