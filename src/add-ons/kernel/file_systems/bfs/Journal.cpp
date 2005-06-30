@@ -14,6 +14,14 @@
 #include <errno.h>
 
 
+struct log_entry : public DoublyLinkedListLinkImpl<log_entry> {
+	uint16		start;
+	uint16		length;
+	uint32		cached_blocks;
+	Journal		*journal;
+};
+
+
 Journal::Journal(Volume *volume)
 	:
 	fVolume(volume),
@@ -189,19 +197,20 @@ Journal::blockNotify(int32 transactionID, void *arg)
 
 	// Set log_start pointer if possible...
 
-	if (logEntry == journal->fEntries.head) {
-		if (logEntry->Next() != NULL) {
-			int32 length = logEntry->next->start - logEntry->start;
+	if (logEntry == journal->fEntries.First()) {
+		log_entry *next = journal->fEntries.GetNext(logEntry);
+		if (next != NULL) {
+			int32 length = next->start - logEntry->start;
 			superBlock.log_start = (superBlock.log_start + length) % journal->fLogSize;
 		} else
 			superBlock.log_start = journal->fVolume->LogEnd();
 
 		update = true;
 	}
-	journal->fUsed -= logEntry->length;
 
 	journal->fEntriesLock.Lock();
-	logEntry->Remove();
+	journal->fUsed -= logEntry->length;
+	journal->fEntries.Remove(logEntry);
 	journal->fEntriesLock.Unlock();
 
 	free(logEntry);
@@ -214,7 +223,11 @@ Journal::blockNotify(int32 transactionID, void *arg)
 		if (superBlock.log_start == superBlock.log_end)
 			superBlock.flags = SUPER_BLOCK_DISK_CLEAN;
 
-		journal->fVolume->WriteSuperBlock();
+		status_t status = journal->fVolume->WriteSuperBlock();
+		if (status != B_OK) {
+			FATAL(("blockNotify: could not write back super block: %s\n",
+				strerror(status)));
+		}
 	}
 }
 
@@ -290,21 +303,40 @@ Journal::WriteLogEntry()
 		logPosition = (logPosition + 1) % fLogSize;
 	}
 
+	// create and add log entry
+
 	log_entry *logEntry = (log_entry *)malloc(sizeof(log_entry));
-	if (logEntry != NULL) {
-		logEntry->start = logStart;
-		logEntry->length = TransactionSize();
-		logEntry->journal = this;
-
-		fEntriesLock.Lock();
-		fEntries.Add(logEntry);
-		fEntriesLock.Unlock();
-
-		fCurrent = logEntry;
-		fUsed += logEntry->length;
+	if (logEntry == NULL) {
+		DIE(("Could not create next log entry (out of memory)\n"));
+		return B_NO_MEMORY;
 	}
 
-	cache_end_transaction(fVolume->BlockCache(), fTransactionID, blockNotify, fCurrent);
+	logEntry->start = logStart;
+	logEntry->length = TransactionSize();
+	logEntry->journal = this;
+
+	fEntriesLock.Lock();
+	fEntries.Add(logEntry);
+	fUsed += logEntry->length;
+	fEntriesLock.Unlock();
+
+	// Update the log end pointer in the super block
+
+	fVolume->SuperBlock().flags = SUPER_BLOCK_DISK_DIRTY;
+	fVolume->SuperBlock().log_end = logPosition;
+	fVolume->LogEnd() = logPosition;
+
+	status_t status = fVolume->WriteSuperBlock();
+
+	// We need to flush the drives own cache here to ensure
+	// disk consistency.
+	// If that call fails, we can't do anything about it anyway
+	ioctl(fVolume->Device(), B_FLUSH_DRIVE_CACHE);
+
+	// at this point, we can finally end the transaction - we're in
+	// a guaranteed valid state
+	cache_end_transaction(fVolume->BlockCache(), fTransactionID, blockNotify, logEntry);
+	fArray.MakeEmpty();
 
 	// If the log goes to the next round (the log is written as a
 	// circular buffer), all blocks will be flushed out which is
@@ -313,19 +345,7 @@ Journal::WriteLogEntry()
 	if (logPosition < logStart)
 		fVolume->FlushDevice();
 
-	// We need to flush the drives own cache here to ensure
-	// disk consistency.
-	// If that call fails, we can't do anything about it anyway
-	ioctl(fVolume->Device(), B_FLUSH_DRIVE_CACHE);
-
-	fArray.MakeEmpty();
-
-	// Update the log end pointer in the super block
-	fVolume->SuperBlock().flags = SUPER_BLOCK_DISK_DIRTY;
-	fVolume->SuperBlock().log_end = logPosition;
-	fVolume->LogEnd() = logPosition;
-
-	return fVolume->WriteSuperBlock();
+	return status;
 }
 
 
