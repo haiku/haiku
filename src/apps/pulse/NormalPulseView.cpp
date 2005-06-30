@@ -24,6 +24,24 @@
 #include <cpu_type.h>
 
 
+float
+max_font_size(BFont font, const char* text, float maxSize, float maxWidth)
+{
+	const float steps = 0.5f;
+
+	for (float size = maxSize; size > 4; size -= steps) {
+		font.SetSize(size);
+		if (font.StringWidth(text) <= maxWidth)
+			return size;
+	}
+
+	return 4;
+}
+
+	
+//	#pragma mark -
+
+
 NormalPulseView::NormalPulseView(BRect rect)
 	: PulseView(rect, "NormalPulseView"),
 	fHasBrandLogo(false)
@@ -40,19 +58,20 @@ NormalPulseView::NormalPulseView(BRect rect)
 	DetermineVendorAndProcessor();
 
 	// Allocate progress bars and button pointers
-	system_info sys_info;
-	get_system_info(&sys_info);
-	fProgressBars = new ProgressBar *[sys_info.cpu_count];
-	fCpuButtons = new CPUButton *[sys_info.cpu_count];
-	
+	system_info systemInfo;
+	get_system_info(&systemInfo);
+	fCpuCount = systemInfo.cpu_count;
+	fProgressBars = new ProgressBar *[fCpuCount];
+	fCpuButtons = new CPUButton *[fCpuCount];
+
 	// Set up the CPU activity bars and buttons
-	for (int x = 0; x < sys_info.cpu_count; x++) {
+	for (int x = 0; x < fCpuCount; x++) {
 		BRect r(PROGRESS_MLEFT, PROGRESS_MTOP + ITEM_OFFSET * x,
 			PROGRESS_MLEFT + ProgressBar::PROGRESS_WIDTH,
 			PROGRESS_MTOP + ITEM_OFFSET * x + ProgressBar::PROGRESS_HEIGHT);
 		fProgressBars[x] = new ProgressBar(r, "CPU Progress Bar");
 		AddChild(fProgressBars[x]);
-		
+
 		r.Set(CPUBUTTON_MLEFT, CPUBUTTON_MTOP + ITEM_OFFSET * x,
 			CPUBUTTON_MLEFT + CPUBUTTON_WIDTH,
 			CPUBUTTON_MTOP + ITEM_OFFSET * x + CPUBUTTON_HEIGHT);
@@ -60,11 +79,11 @@ NormalPulseView::NormalPulseView(BRect rect)
 		sprintf(temp, "%d", x + 1);
 		fCpuButtons[x] = new CPUButton(r, "CPUButton", temp, NULL);
 		AddChild(fCpuButtons[x]);
-		
+
 		//	If there is only 1 cpu it will be hidden below
 		//	thus, no need to add the dragger as it will still
 		//	be visible when replicants are turned on
-		if (sys_info.cpu_count > 1) {
+		if (fCpuCount > 1) {
 			BRect dragger_rect;
 			dragger_rect = r;
 			dragger_rect.top = dragger_rect.bottom;
@@ -76,11 +95,32 @@ NormalPulseView::NormalPulseView(BRect rect)
 			AddChild(dragger);
 		}
 	}
-	
-	if (sys_info.cpu_count == 1) {
+
+	if (fCpuCount == 1) {
 		fProgressBars[0]->MoveBy(-3, 12);
 		fCpuButtons[0]->Hide();
 	}
+}
+
+
+NormalPulseView::~NormalPulseView()
+{
+	delete fCpuLogo;
+	delete[] fCpuButtons;
+	delete[] fProgressBars;
+}
+
+
+void
+NormalPulseView::CalculateFontSize()
+{
+	BFont font;
+	GetFont(&font);
+
+	fProcessorFontSize = max_font_size(font, fProcessor, 11.0f, 46.0f);
+
+	if (!fHasBrandLogo)
+		fVendorFontSize = max_font_size(font, fVendor, 13.0f, 46.0f);
 }
 
 
@@ -114,17 +154,18 @@ NormalPulseView::DetermineVendorAndProcessor()
 	get_system_info(&sys_info);
 
 	// Initialize logos
-	BRect r(0, 0, 63, 62);
-	fCpuLogo = new BBitmap(r, B_COLOR_8_BIT);
+
+	fCpuLogo = new BBitmap(BRect(0, 0, 63, 62), B_COLOR_8_BIT);
+
 #if __POWERPC__
-	fCpuLogo->SetBits(Anim1, 11718, 0, B_COLOR_8_BIT);
+	fCpuLogo->SetBits(Anim1, fCpuLogo->BitsLength(), 0, B_COLOR_8_BIT);
 #endif
 #if __INTEL__
 	if ((sys_info.cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86) {
-		fCpuLogo->SetBits(IntelLogo, 11718, 0, B_COLOR_8_BIT);
+		fCpuLogo->SetBits(IntelLogo, fCpuLogo->BitsLength(), 0, B_COLOR_8_BIT);
 		fHasBrandLogo = true;
 	} else
-		fCpuLogo->SetBits(BlankLogo, 11718, 0, B_COLOR_8_BIT);
+		fCpuLogo->SetBits(BlankLogo, fCpuLogo->BitsLength(), 0, B_COLOR_8_BIT);
 #endif
 
 	get_cpu_type(fVendor, sizeof(fVendor), fProcessor, sizeof(fProcessor));
@@ -159,13 +200,14 @@ NormalPulseView::Draw(BRect rect)
 	
 	// Processor picture
 	DrawBitmap(fCpuLogo, BPoint(10, 10));
-	
+
 #if __INTEL__
-	// Do nothing in the case of Intel CPUs - they already have a logo
+	// Do nothing in the case of non-Intel CPUs - they already have a logo
 	if (!fHasBrandLogo) {
 		SetDrawingMode(B_OP_OVER);
-		SetHighColor(240,240,240);
-	
+		SetHighColor(240, 240, 240);
+		SetFontSize(fVendorFontSize);
+
 		float width = StringWidth(fVendor);
 		MovePenTo(10 + (32 - width / 2), 30);
 		DrawString(fVendor);
@@ -177,6 +219,7 @@ NormalPulseView::Draw(BRect rect)
 	sprintf(buf, "%d MHz", CalculateCPUSpeed());
 	SetDrawingMode(B_OP_OVER);
 	SetHighColor(240, 240, 240);
+	SetFontSize(fProcessorFontSize);
 
 	float width = StringWidth(fProcessor);
 	MovePenTo(10 + (32 - width / 2), 48);
@@ -197,14 +240,11 @@ NormalPulseView::Pulse()
 	if (!IsHidden()) {
 		Update();
 		if (Window()->Lock()) {
-			system_info sys_info;
-			get_system_info(&sys_info);
-		
 			// Set the value of each CPU bar
-			for (int x = 0; x < sys_info.cpu_count; x++) {
+			for (int x = 0; x < fCpuCount; x++) {
 				fProgressBars[x]->Set(max_c(0, cpu_times[x] * 100));
 			}
-			
+
 			Sync();
 			Window()->Unlock();
 		}
@@ -215,13 +255,9 @@ NormalPulseView::Pulse()
 void
 NormalPulseView::AttachedToWindow()
 {
-	// Use a smaller font on x86 to accomodate longer processor names
 	SetFont(be_bold_font);
-#if __INTEL__
-	SetFontSize(7);
-#else
-	SetFontSize(9);
-#endif
+	CalculateFontSize();
+
 	fPreviousTime = system_time();
 	
 	BMessenger messenger(Window());
@@ -254,10 +290,3 @@ NormalPulseView::UpdateColors(BMessage *message)
 	}
 }
 
-
-NormalPulseView::~NormalPulseView()
-{
-	delete fCpuLogo;
-	delete fCpuButtons;
-	delete fProgressBars;
-}

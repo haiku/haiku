@@ -19,22 +19,28 @@
 class NormalPulseView : public PulseView {
 	public:
 		NormalPulseView(BRect rect);
-		~NormalPulseView();
-		void Draw(BRect rect);
-		void Pulse();
-		void AttachedToWindow();
+		virtual ~NormalPulseView();
+
+		virtual void Draw(BRect rect);
+		virtual void Pulse();
+		virtual void AttachedToWindow();
+
 		void UpdateColors(BMessage *message);
 
 	private:
 		int CalculateCPUSpeed();
 		void DetermineVendorAndProcessor();
-		
+		void CalculateFontSize();
+
 		char fVendor[32], fProcessor[32];
 		bigtime_t fPreviousTime;
 		ProgressBar **fProgressBars;
 		CPUButton **fCpuButtons;
 		BBitmap *fCpuLogo;
+		int32 fCpuCount;
 		bool fHasBrandLogo;
+
+		float	fVendorFontSize, fProcessorFontSize;
 };
 
 #endif
