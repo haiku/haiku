@@ -28,9 +28,9 @@
 
 // System Includes -------------------------------------------------------------
 #include <Button.h>
+#include <Font.h>
+#include <String.h>
 #include <Window.h>
-#include <Errors.h>
-#include <stdio.h>
 
 // Project Includes ------------------------------------------------------------
 
@@ -90,146 +90,135 @@ void BButton::Draw(BRect updateRect)
 {
 	font_height fh;
 	GetFontHeight(&fh);
+	
+	const BRect bounds = Bounds();
+	BRect rect = bounds;
+	
+	const bool enabled = IsEnabled();
+	const bool pushed = Value() == B_CONTROL_ON;
 
-	BRect bounds(Bounds());
+	// Default indicator
+	if (IsDefault())
+		rect = DrawDefault(rect,enabled);
+	else 
+		rect.InsetBy(1.0f,1.0f);
 
-	// If the focus is changing, just redraw the focus indicator
-	if (IsFocusChanging())
-	{
-		float x = (bounds.right - StringWidth(Label())) / 2.0f;
-		float y = bounds.top + ((bounds.Height() - fh.ascent - fh.descent) / 2.0f) + fh.ascent + fh.descent + 1;
+	BRect fillArea = rect;
+	fillArea.InsetBy(3.0f,3.0f);
+
+	BString text = Label();
+	
+#if 1
+	// Label truncation	
+	BFont font;
+	GetFont(&font);
+	font.TruncateString(&text, B_TRUNCATE_END, fillArea.Width());
+#endif
+
+	// Label position
+	const float stringWidth = StringWidth(text.String()); 	
+	const float x = (bounds.right - stringWidth) / 2.0f;
+	const float labelY = bounds.top  
+		+ ((bounds.Height() - fh.ascent - fh.descent) / 2.0f) 
+		+ fh.ascent +  1.0f;	
+	const float focusLineY = labelY + fh.descent;
+
+	/* speed trick:
+	   if the focus changes but the button is not pressed then we can
+	   redraw only the focus line, 
+	   if the focus changes and the button is pressed invert the internal rect	
+	   this block takes care of all the focus changes 	
+	*/
+	if (IsFocusChanging()) {	
+		if (pushed) {
+			rect.InsetBy(2.0,2.0);
+			InvertRect(rect);
+		} else 
+			DrawFocusLine(x, focusLineY, stringWidth, IsFocus() && Window()->IsActive());
 		
-		bool bDrawFocusLine = IsFocus() && Window()->IsActive();
-		if (bDrawFocusLine)
-			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
-		else
-			SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-				B_LIGHTEN_1_TINT));
-
-		// Blue Line
-		StrokeLine(BPoint(x, y), BPoint(x + StringWidth(Label()), y));
-		if (bDrawFocusLine)		
-			SetHighColor(255, 255, 255);
-		// White Line
-		StrokeLine(BPoint(x, y + 1), BPoint(x + StringWidth(Label()), y + 1));
-
 		return;
 	}
 
-	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
-		lighten1 = tint_color(no_tint, B_LIGHTEN_1_TINT),
-		lighten2 = tint_color(no_tint, B_LIGHTEN_2_TINT),
-		lightenmax = tint_color(no_tint, B_LIGHTEN_MAX_TINT),
-		darkenmax = tint_color(no_tint, B_DARKEN_MAX_TINT);
-
-	BRect rect(bounds);
-	bool bEnabled = IsEnabled();
+	// Colors	
+	const rgb_color panelBgColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+	const rgb_color buttonBgColor=tint_color(panelBgColor, B_LIGHTEN_1_TINT);	
+	const rgb_color maxLightColor=tint_color(panelBgColor, B_LIGHTEN_MAX_TINT);	
+	const rgb_color maxShadowColor=tint_color(panelBgColor, B_DARKEN_MAX_TINT);	
+	const rgb_color darkBorderColor = tint_color(panelBgColor, 
+		enabled ? B_DARKEN_4_TINT : B_DARKEN_2_TINT);
+	const rgb_color firstBevelColor = enabled ? tint_color(panelBgColor, B_DARKEN_2_TINT) 
+		: panelBgColor;
+	const rgb_color cornerColor = IsDefault() ? firstBevelColor : panelBgColor;
 	
-	if (IsDefault())
-		rect = DrawDefault(rect, bEnabled);
-	else
-		rect.InsetBy(1,1);
-	
-	// This can be set outside draw
-	if (bEnabled)
-		SetHighColor(tint_color(no_tint, B_DARKEN_4_TINT));
-	else
-		SetHighColor(tint_color(no_tint, B_DARKEN_2_TINT));
+	// Fill the button area
+	SetHighColor(buttonBgColor);
+	FillRect(fillArea);
 
-	// Dark border
+	// external border
+	SetHighColor(darkBorderColor);
 	StrokeRect(rect);
+		
+	BeginLineArray(14);
 
-	BeginLineArray(8);
-	
 	// Corners
-	rgb_color cornerColor = no_tint;
-	if (IsDefault())
-		cornerColor = lighten1;
-	AddLine(rect.LeftBottom(), rect.LeftBottom(), cornerColor);
 	AddLine(rect.LeftTop(), rect.LeftTop(), cornerColor);
+	AddLine(rect.LeftBottom(), rect.LeftBottom(), cornerColor);
 	AddLine(rect.RightTop(), rect.RightTop(), cornerColor);
 	AddLine(rect.RightBottom(), rect.RightBottom(), cornerColor);
 
-	rect.InsetBy(1, 1);
-
-	// First bevel
-	rgb_color firstBevelColor;
-	if (bEnabled)
-		firstBevelColor = tint_color(no_tint, B_DARKEN_2_TINT);
-	else
-		firstBevelColor = no_tint;
-	AddLine(BPoint(rect.left + 1.0f, rect.bottom),
-		BPoint(rect.right, rect.bottom), firstBevelColor);
-	AddLine(BPoint(rect.right, rect.bottom - 1.0f),
-		BPoint(rect.right, rect.top + 1.0f), firstBevelColor);
-
-	AddLine(BPoint(rect.left, rect.top),
-		BPoint(rect.left, rect.bottom), lighten1);
-	AddLine(BPoint(rect.left + 1.0f, rect.top),
-		BPoint(rect.right, rect.top), lighten1);
-
-	EndLineArray();
-
-	rect.InsetBy(1, 1);
-
-	// Second bevel
-	SetHighColor(lightenmax);
-	FillRect(rect);
-
-	SetHighColor(no_tint);
-	StrokeLine(BPoint(rect.right, rect.top + 1.0f),
-		BPoint(rect.right, rect.bottom));
-	StrokeLine(BPoint(rect.left + 1.0f, rect.bottom));
+	rect.InsetBy(1.0f,1.0f);
 	
-	rect.InsetBy(1, 1);
+	// Shadow
+	AddLine(rect.LeftBottom(), rect.RightBottom(), firstBevelColor);
+	AddLine(rect.RightBottom(), rect.RightTop(), firstBevelColor);
+	// Light
+	AddLine(rect.LeftTop(), rect.LeftBottom(),buttonBgColor);
+	AddLine(rect.LeftTop(), rect.RightTop(), buttonBgColor);	
+	
+	rect.InsetBy(1.0f, 1.0f);
+	
+	// Shadow
+	AddLine(rect.LeftBottom(), rect.RightBottom(), panelBgColor);
+	AddLine(rect.RightBottom(), rect.RightTop(), panelBgColor);
+	// Light
+	AddLine(rect.LeftTop(), rect.LeftBottom(),maxLightColor);
+	AddLine(rect.LeftTop(), rect.RightTop(), maxLightColor);	
+	
+	rect.InsetBy(1.0f,1.0f);
+	
+	// Light
+	AddLine(rect.LeftTop(), rect.LeftBottom(),maxLightColor);
+	AddLine(rect.LeftTop(), rect.RightTop(), maxLightColor);	
+		
+	EndLineArray();	
 
-	// Filling
-	rect.left += 1.0f;
-	rect.top += 1.0f;
-	SetHighColor(lighten1);
-	FillRect(rect);
-
-	if (bEnabled && Value())
-	{
-		// Invert
-		rect.left -= 3;
-		rect.top -= 3;
-		rect.right += 2;
-		rect.bottom += 2;
+	// Invert if clicked
+	if (enabled && pushed) {
+		rect.InsetBy(-2.0f,-2.0f);
 		InvertRect(rect);
 	}
 
-	// Label
-	float x = (bounds.right - StringWidth(Label())) / 2.0f;
-	float y = bounds.top + ((bounds.Height() - fh.ascent - fh.descent) / 2.0f) + fh.ascent + 1;	
-
-	if (bEnabled && Value())
-	{
-		SetHighColor(lightenmax);
-		SetLowColor(darkenmax);
-	}
-	else
-	{
-		if (bEnabled)
-			SetHighColor(darkenmax);
-		else
-			SetHighColor(tint_color(no_tint, B_DISABLED_LABEL_TINT));
-		SetLowColor(lighten2);
+	// Label color
+	if (enabled) {
+		if (pushed) {
+			SetHighColor(maxLightColor);
+			SetLowColor(maxShadowColor);
+		} else {
+			SetHighColor(maxShadowColor);	
+			SetLowColor(tint_color(panelBgColor, B_LIGHTEN_2_TINT));
+		}
+	} else {
+		SetHighColor(tint_color(panelBgColor, B_DISABLED_LABEL_TINT));
+		SetLowColor(tint_color(panelBgColor, B_LIGHTEN_2_TINT));	
 	}
 
 	// Draw the label
-	DrawString(Label(), BPoint(x, y));
+	DrawString(text.String(), BPoint(x, labelY));
+
+	// Focus line
+	if (enabled && IsFocus() && Window()->IsActive() && !pushed)
+		DrawFocusLine(x,focusLineY,stringWidth,true);
 	
-	if (bEnabled && IsFocus() && Window()->IsActive())
-	{
-		// Draw focus line
-		y += fh.descent;
-		SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
-		StrokeLine(BPoint(x, y), BPoint(x + StringWidth(Label()), y));
-		SetHighColor(255, 255, 255);
-		StrokeLine(BPoint(x, y + 1), BPoint(x + StringWidth(Label()), y + 1));
-		
-	}
 }
 
 //------------------------------------------------------------------------------
@@ -503,13 +492,19 @@ BRect BButton::DrawDefault(BRect bounds, bool enabled)
 	bounds.InsetBy(1.0f, 1.0f);
 
 	// Filling
+	float inset = enabled? 2.0f : 3.0f;
 	SetHighColor(lighten1);
-	FillRect(bounds);
 
-	if (enabled)
-		bounds.InsetBy(2.0f, 2.0f);
-	else
-		bounds.InsetBy(3.0f, 3.0f);
+	FillRect(BRect(bounds.left, bounds.top, 
+		bounds.right, bounds.top+inset-1.0f));
+	FillRect(BRect(bounds.left, bounds.bottom-inset+1.0f, 
+		bounds.right, bounds.bottom));
+	FillRect(BRect(bounds.left, bounds.top+inset-1.0f,
+		bounds.left+inset-1.0f, bounds.bottom-inset+1.0f));
+	FillRect(BRect(bounds.right-inset+1.0f, bounds.top+inset-1.0f,
+		bounds.right, bounds.bottom-inset+1.0f));
+
+	bounds.InsetBy(inset,inset);
 
 	return bounds;
 }
@@ -523,7 +518,22 @@ status_t BButton::Execute()
 	return Invoke();
 }
 //------------------------------------------------------------------------------
+void BButton::DrawFocusLine(float x, float y, float width, bool visible)
+{
+	if (visible)
+		SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
+	else
+		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+			B_LIGHTEN_1_TINT));
+	// Blue Line
+	StrokeLine(BPoint(x, y), BPoint(x + width, y));
 
+	if (visible)		
+		SetHighColor(255, 255, 255);
+	// White Line
+	StrokeLine(BPoint(x, y + 1.0f), BPoint(x + width, y + 1.0f));
+}
+//------------------------------------------------------------------------------
 /*
  * $Log $
  *
