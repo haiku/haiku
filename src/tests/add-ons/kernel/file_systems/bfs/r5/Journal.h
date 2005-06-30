@@ -8,6 +8,7 @@
 
 
 #include <KernelExport.h>
+#include <util/DoublyLinkedList.h>
 
 #ifdef USER
 #	include <stdio.h>
@@ -20,13 +21,8 @@
 #include "Utility.h"
 
 
-struct log_entry : node<log_entry> {
-	uint16		start;
-	uint16		length;
-	uint32		cached_blocks;
-	Journal		*journal;
-};
-
+struct log_entry;
+typedef DoublyLinkedList<log_entry> LogEntryList;
 
 // Locking policy in BFS: if you need both, the volume lock and the
 //	journal lock, you must lock the volume first - or else you will
@@ -67,17 +63,17 @@ class Journal {
 		static void blockNotify(off_t blockNumber, size_t numBlocks, void *arg);
 		status_t TransactionDone(bool success);
 
-		Volume		*fVolume;
+		Volume			*fVolume;
 		RecursiveLock	fLock;
-		Transaction *fOwner;
-		BlockArray	fArray;
-		uint32		fLogSize, fMaxTransactionSize, fUsed;
-		int32		fTransactionsInEntry;
-		SimpleLock	fEntriesLock;
-		list<log_entry>	fEntries;
-		log_entry	*fCurrent;
-		bool		fHasChangedBlocks;
-		bigtime_t	fTimestamp;
+		Transaction 	*fOwner;
+		BlockArray		fArray;
+		uint32			fLogSize, fMaxTransactionSize, fUsed;
+		int32			fTransactionsInEntry;
+		SimpleLock		fEntriesLock;
+		LogEntryList	fEntries;
+		log_entry		*fCurrent;
+		bool			fHasChangedBlocks;
+		bigtime_t		fTimestamp;
 };
 
 
