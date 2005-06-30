@@ -411,7 +411,7 @@ for f in drivers/dev/dprintf drivers/dev/keyboard drivers/dev/null \
 		drivers/dev/net/rtl8139 drivers/dev/net/rtl8169 \
 		drivers/dev/net/sis900 drivers/dev/net/via-rhine \
 		drivers/dev/net/wb840 drivers/dev/net/net_stack_driver \
-		drivers/dev/graphics/vesa; do
+		drivers/dev/graphics/vesa drivers/dev/random; do
 	relName=$(echo $f | sed -e s@drivers/dev/@@)
 	linkName=bin/$(basename $f)
 	while [ $relName != . ]; do
