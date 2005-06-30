@@ -1185,12 +1185,18 @@ vm_clone_area(aspace_id aid, const char *name, void **address, uint32 addressSpe
 		return B_BAD_VALUE;
 	}
 
+	// ToDo: for now, B_USER_CLONEABLE is disabled, until all drivers
+	//	have been adapted. Maybe it should be part of the kernel settings,
+	//	anyway (so that old drivers can always work).
+#if 0
 	if (sourceArea->aspace == kernel_aspace && aspace != kernel_aspace
 		&& !(sourceArea->protection & B_USER_CLONEABLE_AREA)) {
 		// kernel areas must not be cloned in userland, unless explicitly
 		// declared user-cloneable upon construction
 		status = B_NOT_ALLOWED;
-	} else {
+	} else
+#endif
+	{
 		vm_cache_acquire_ref(sourceArea->cache_ref, true);
 		status = map_backing_store(aspace, sourceArea->cache_ref->cache->store, address,
 					sourceArea->cache_offset, sourceArea->size, addressSpec, sourceArea->wiring,
@@ -1938,11 +1944,9 @@ vm_area_for(aspace_id aid, addr_t address)
 static void
 unmap_and_free_physical_pages(vm_translation_map *map, addr_t start, addr_t end)
 {
-	addr_t current = start;
+	// free all physical pages in the specified range
 
-	// free all physical pages behind the specified range
-
-	while (current < end) {
+	for (addr_t current = start; current < end; current += B_PAGE_SIZE) {
 		addr_t physicalAddress;
 		uint32 flags;
 
@@ -1951,8 +1955,6 @@ unmap_and_free_physical_pages(vm_translation_map *map, addr_t start, addr_t end)
 			if (page != NULL)
 				vm_page_set_state(page, PAGE_STATE_FREE);
 		}
-
-		current += B_PAGE_SIZE;
 	}
 
 	// unmap the memory
