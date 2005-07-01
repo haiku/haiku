@@ -1137,6 +1137,7 @@ myRootLayer->Unlock();
 			Hide();
 			break;
 		}
+#if 0
 		case AS_SEND_BEHIND:
 		{
 			// TODO: Implement AS_SEND_BEHIND
@@ -1167,6 +1168,7 @@ myRootLayer->Unlock();
 			STRACE(("ServerWindow %s: Message Set_Title unimplemented\n", Title()));
 			break;
 		}
+#endif
 		case AS_ADD_TO_SUBSET:
 		{
 			STRACE(("ServerWindow %s: Message AS_ADD_TO_SUBSET\n", Title()));
@@ -1220,6 +1222,7 @@ myRootLayer->Unlock();
 			}
 			break;
 		}
+#if 0
 		case AS_SET_LOOK:
 		{
 			// TODO: Implement AS_SET_LOOK
@@ -1252,6 +1255,7 @@ myRootLayer->Unlock();
 			STRACE(("ServerWindow %s: Message Get_Alignment unimplemented\n", Title()));
 			break;
 		}
+#endif
 		case AS_GET_WORKSPACES:
 		{
 			STRACE(("ServerWindow %s: Message Get_Workspaces unimplemented\n", Title()));
@@ -1770,7 +1774,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<BRect>(&rect);
 			link.Read<float>(&xrad);
 			link.Read<float>(&yrad);
-			
+
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
 				gDesktop->GetDisplayDriver()->StrokeRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad, fCurrentLayer->fLayerData);
 			break;
@@ -1784,7 +1788,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<BRect>(&rect);
 			link.Read<float>(&xrad);
 			link.Read<float>(&yrad);
-			
+
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
 				gDesktop->GetDisplayDriver()->FillRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad, fCurrentLayer->fLayerData);
 			break;
@@ -1792,20 +1796,19 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_STROKE_TRIANGLE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE_TRIANGLE\n", Title()));
-			
+
 			BPoint pts[3];
 			BRect rect;
-			
-			for (int i=0; i<3; i++)
+
+			for (int i = 0; i < 3; i++)
 				link.Read<BPoint>(&(pts[i]));
-			
+
 			link.Read<BRect>(&rect);
-			
-			if (fCurrentLayer && fCurrentLayer->fLayerData)
-			{
-				for(int i=0;i<3;i++)
-					pts[i]=fCurrentLayer->ConvertToTop(pts[i]);
-				
+
+			if (fCurrentLayer && fCurrentLayer->fLayerData) {
+				for (int i = 0;i < 3; i++)
+					pts[i] = fCurrentLayer->ConvertToTop(pts[i]);
+
 				gDesktop->GetDisplayDriver()->StrokeTriangle(pts, fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
 			}
 			break;
@@ -1813,20 +1816,19 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_FILL_TRIANGLE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_FILL_TRIANGLE\n", Title()));
-			
+
 			BPoint pts[3];
 			BRect rect;
-			
-			for (int i=0; i<3; i++)
+
+			for (int i = 0; i < 3; i++)
 				link.Read<BPoint>(&(pts[i]));
-			
+
 			link.Read<BRect>(&rect);
-			
-			if (fCurrentLayer && fCurrentLayer->fLayerData)
-			{
-				for(int i=0;i<3;i++)
-					pts[i]=fCurrentLayer->ConvertToTop(pts[i]);
-				
+
+			if (fCurrentLayer && fCurrentLayer->fLayerData) {
+				for (int i = 0; i < 3; i++)
+					pts[i] = fCurrentLayer->ConvertToTop(pts[i]);
+
 				gDesktop->GetDisplayDriver()->FillTriangle(pts, fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
 			}
 			break;
@@ -1835,23 +1837,23 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_STROKE_POLYGON:
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE_POLYGON\n", Title()));
-			
+
 			BRect polyframe;
 			bool isclosed;
 			int32 pointcount;
 			BPoint *pointlist;
-			
+
 			link.Read<BRect>(&polyframe);
 			link.Read<bool>(&isclosed);
 			link.Read<int32>(&pointcount);
-			
-			pointlist=new BPoint[pointcount];
+
+			pointlist = new BPoint[pointcount];
 			
 			link.Read(pointlist, sizeof(BPoint)*pointcount);
 			
-			for(int32 i=0; i<pointcount; i++)
-				pointlist[i]=fCurrentLayer->ConvertToTop(pointlist[i]);
-			
+			for (int32 i = 0; i < pointcount; i++)
+				pointlist[i] = fCurrentLayer->ConvertToTop(pointlist[i]);
+
 			gDesktop->GetDisplayDriver()->StrokePolygon(pointlist,pointcount,polyframe,
 					fCurrentLayer->fLayerData,isclosed);
 
@@ -1861,25 +1863,24 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_FILL_POLYGON:
 		{
 			DTRACE(("ServerWindow %s: Message AS_FILL_POLYGON\n", Title()));
-			
+
 			BRect polyframe;
 			int32 pointcount;
 			BPoint *pointlist;
-			
+
 			link.Read<BRect>(&polyframe);
 			link.Read<int32>(&pointcount);
-			
-			pointlist=new BPoint[pointcount];
-			
-			link.Read(pointlist, sizeof(BPoint)*pointcount);
-			
-			for(int32 i=0; i<pointcount; i++)
-				pointlist[i]=fCurrentLayer->ConvertToTop(pointlist[i]);
-			
+
+			pointlist = new BPoint[pointcount];
+
+			link.Read(pointlist, sizeof(BPoint) * pointcount);
+
+			for (int32 i = 0; i < pointcount; i++)
+				pointlist[i] = fCurrentLayer->ConvertToTop(pointlist[i]);
+
 			gDesktop->GetDisplayDriver()->FillPolygon(pointlist,pointcount,polyframe, fCurrentLayer->fLayerData);
-			
+
 			delete [] pointlist;
-			
 			break;
 		}
 		case AS_STROKE_SHAPE:
@@ -1895,50 +1896,48 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<BRect>(&shaperect);
 			link.Read<int32>(&opcount);
 			link.Read<int32>(&ptcount);
-			
-			oplist=new int32[opcount];
-			ptlist=new BPoint[ptcount];
-			
-			link.Read(oplist,sizeof(int32)*opcount);
-			link.Read(ptlist,sizeof(BPoint)*ptcount);
-			
-			for(int32 i=0; i<ptcount; i++)
-				ptlist[i]=fCurrentLayer->ConvertToTop(ptlist[i]);
-			
+
+			oplist = new int32[opcount];
+			ptlist = new BPoint[ptcount];
+
+			link.Read(oplist, sizeof(int32) * opcount);
+			link.Read(ptlist, sizeof(BPoint) * ptcount);
+
+			for (int32 i = 0; i < ptcount; i++)
+				ptlist[i] = fCurrentLayer->ConvertToTop(ptlist[i]);
+
 			gDesktop->GetDisplayDriver()->StrokeShape(shaperect, opcount, oplist, ptcount, ptlist, fCurrentLayer->fLayerData);
-			delete oplist;
-			delete ptlist;
-			
+			delete[] oplist;
+			delete[] ptlist;
 			break;
 		}
 		case AS_FILL_SHAPE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_FILL_SHAPE\n", Title()));
-			
+
 			BRect shaperect;
 			int32 opcount;
 			int32 ptcount;
 			int32 *oplist;
 			BPoint *ptlist;
-			
+
 			link.Read<BRect>(&shaperect);
 			link.Read<int32>(&opcount);
 			link.Read<int32>(&ptcount);
-			
-			oplist=new int32[opcount];
-			ptlist=new BPoint[ptcount];
-			
-			link.Read(oplist,sizeof(int32)*opcount);
-			link.Read(ptlist,sizeof(BPoint)*ptcount);
-			
-			for(int32 i=0; i<ptcount; i++)
-				ptlist[i]=fCurrentLayer->ConvertToTop(ptlist[i]);
+
+			oplist = new int32[opcount];
+			ptlist = new BPoint[ptcount];
+
+			link.Read(oplist, sizeof(int32) * opcount);
+			link.Read(ptlist, sizeof(BPoint) * ptcount);
+
+			for (int32 i = 0; i < ptcount; i++)
+				ptlist[i] = fCurrentLayer->ConvertToTop(ptlist[i]);
 			
 			gDesktop->GetDisplayDriver()->FillShape(shaperect, opcount, oplist, ptcount, ptlist, fCurrentLayer->fLayerData);
 
-			delete oplist;
-			delete ptlist;
-			
+			delete[] oplist;
+			delete[] ptlist;
 			break;
 		}
 		case AS_FILL_REGION:
@@ -1979,23 +1978,21 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			int32 linecount;
 			
 			link.Read<int32>(&linecount);
-			if(linecount>0)
-			{
+			if (linecount > 0) {
 				LineArrayData linedata[linecount], *index;
-				
-				for(int32 i=0; i<linecount; i++)
-				{
-					index=&linedata[i];
-					
+
+				for (int32 i = 0; i < linecount; i++) {
+					index = &linedata[i];
+
 					link.Read<float>(&(index->pt1.x));
 					link.Read<float>(&(index->pt1.y));
 					link.Read<float>(&(index->pt2.x));
 					link.Read<float>(&(index->pt2.y));
 					link.Read<rgb_color>(&(index->color));
-					
-					index->pt1=fCurrentLayer->ConvertToTop(index->pt1);
-					index->pt2=fCurrentLayer->ConvertToTop(index->pt2);
-				}				
+
+					index->pt1 = fCurrentLayer->ConvertToTop(index->pt1);
+					index->pt2 = fCurrentLayer->ConvertToTop(index->pt2);
+				}
 				gDesktop->GetDisplayDriver()->StrokeLineArray(linecount,linedata,fCurrentLayer->fLayerData);
 			}
 			break;
@@ -2021,11 +2018,17 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			free(string);
 			break;
 		}
+
 		default:
-		{
-			printf("ServerWindow %s received unexpected code - message offset %ld\n", Title(), code - SERVER_TRUE);
+			printf("ServerWindow %s received unexpected code - message offset %ld\n",
+				Title(), code - SERVER_TRUE);
+
+			if (link.NeedsReply()) {
+				// the client is now blocking and waiting for a reply!
+				fLink.StartMessage(SERVER_FALSE);
+				fLink.Flush();
+			}
 			break;
-		}
 	}
 
 	gDesktop->GetDisplayDriver()->ConstrainClippingRegion(NULL);
