@@ -29,7 +29,8 @@ class WorkspacesLayer : public Layer {
 					const BRect& screenFrame, const BRect& windowFrame);
 
 		void _DrawWindow(const BRect& workspaceFrame,
-					const BRect& screenFrame, WinBorder* window);
+					const BRect& screenFrame, WinBorder* window,
+					BRegion& backgroundRegion);
 		void _DrawWorkspace(int32 index);
 };
 

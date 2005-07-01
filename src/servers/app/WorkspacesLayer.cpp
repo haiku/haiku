@@ -76,12 +76,12 @@ WorkspacesLayer::_WindowFrame(const BRect& workspaceFrame,
 	BRect frame = windowFrame;
 
 	float factor = workspaceFrame.Width() / screenFrame.Width();
-	frame.left *= factor;
-	frame.right *= factor;
+	frame.left = rintf(frame.left * factor);
+	frame.right = rintf(frame.right * factor);
 
 	factor = workspaceFrame.Height() / screenFrame.Height();
-	frame.top *= factor;
-	frame.bottom *= factor;
+	frame.top = rintf(frame.top * factor);
+	frame.bottom = rintf(frame.bottom * factor);
 
 	frame.OffsetBy(workspaceFrame.LeftTop());
 	return frame;
@@ -90,7 +90,8 @@ WorkspacesLayer::_WindowFrame(const BRect& workspaceFrame,
 
 void
 WorkspacesLayer::_DrawWindow(const BRect& workspaceFrame,
-	const BRect& screenFrame, WinBorder* window)
+	const BRect& screenFrame, WinBorder* window,
+	BRegion& backgroundRegion)
 {
 	BRect frame = _WindowFrame(workspaceFrame, screenFrame, window->Frame());
 	BRect tabFrame = _WindowFrame(workspaceFrame, screenFrame,
@@ -99,8 +100,18 @@ WorkspacesLayer::_DrawWindow(const BRect& workspaceFrame,
 	// ToDo: let decorator do this!
 	RGBColor yellow = window->GetDecorator()->GetColors().window_tab;
 
-	fDriver->StrokeLine(BPoint(tabFrame.left, frame.top - 1),
-		BPoint(tabFrame.right, frame.top - 1), yellow);
+	if (tabFrame.left < frame.left)
+		tabFrame.left = frame.left;
+	if (tabFrame.right >= frame.right)
+		tabFrame.right = frame.right - 1;
+
+	tabFrame.top = frame.top - 1;
+	tabFrame.bottom = frame.top - 1;
+
+	backgroundRegion.Exclude(tabFrame);
+	backgroundRegion.Exclude(frame);
+
+	fDriver->StrokeLine(tabFrame.LeftTop(), tabFrame.RightBottom(), yellow);
 
 	RGBColor gray(180, 180, 180);
 	fDriver->StrokeRect(frame, gray);
@@ -134,28 +145,35 @@ WorkspacesLayer::_DrawWorkspace(int32 index)
 	else
 		color.SetColor(51, 102, 152);
 
-	fDriver->FillRect(rect, color);
-
-	if (workspace == NULL)
-		return;
-
 	// draw windows
 
-	WinBorder* windows[256];
-	int32 count = 256;
-	if (!workspace->GetWinBorderList((void **)&windows, &count))
-		return;
+	BRegion backgroundRegion = fVisible;
+		// ToDo: would be nice to get the real update region here
 
-	uint16 width, height;
-	uint32 colorSpace;
-	float frequency;
-	gDesktop->ScreenAt(0)->GetMode(width, height, colorSpace, frequency);
+	if (workspace != NULL) {
+		WinBorder* windows[256];
+		int32 count = 256;
+		if (!workspace->GetWinBorderList((void **)&windows, &count))
+			return;
 
-	BRect screenFrame(0, 0, width - 1, height - 1);
+		uint16 width, height;
+		uint32 colorSpace;
+		float frequency;
+		gDesktop->ScreenAt(0)->GetMode(width, height, colorSpace, frequency);
+		BRect screenFrame(0, 0, width - 1, height - 1);
 
-	for (int32 i = count; i-- > 0;) {
-		_DrawWindow(rect, screenFrame, windows[i]);
+		BRegion workspaceRegion(rect);
+		backgroundRegion.IntersectWith(&workspaceRegion);
+		fDriver->ConstrainClippingRegion(&backgroundRegion);
+
+		for (int32 i = count; i-- > 0;) {
+			_DrawWindow(rect, screenFrame, windows[i], backgroundRegion);
+		}
 	}
+
+	fDriver->ConstrainClippingRegion(&backgroundRegion);
+	fDriver->FillRect(rect, color);
+	fDriver->ConstrainClippingRegion(&fVisible);
 }
 
 

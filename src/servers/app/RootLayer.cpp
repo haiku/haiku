@@ -1996,9 +1996,14 @@ RootLayer::show_winBorder(WinBorder *winBorder)
 
 	if (invalidate)
 		show_final_scene(exFocus, exActive);
+
+	if (WorkspacesLayer())
+		GoRedraw(WorkspacesLayer(), fFullVisible);
 }
 
-void RootLayer::hide_winBorder(WinBorder *winBorder)
+
+void
+RootLayer::hide_winBorder(WinBorder *winBorder)
 {
 	bool		invalidate = false;
 	bool		invalid;
@@ -2024,9 +2029,14 @@ void RootLayer::hide_winBorder(WinBorder *winBorder)
 
 	if (invalidate)
 		show_final_scene(exFocus, exActive);
+
+	if (WorkspacesLayer())
+		GoRedraw(WorkspacesLayer(), fFullVisible);
 }
 
-void RootLayer::change_winBorder_feel(WinBorder *winBorder, int32 newFeel)
+
+void
+RootLayer::change_winBorder_feel(WinBorder *winBorder, int32 newFeel)
 {
 	bool	isVisible = false;
 	bool	wasVisibleInActiveWorkspace = false;
