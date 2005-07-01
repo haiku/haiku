@@ -68,6 +68,8 @@ LinkSharedOSLibs libbe.so :
 	stdc++.r4
 ;
 
+AddResources libbe.so : libbe_version.rdef ;
+
 LinkSharedOSLibs libopenbeos.so :
 	libbeadapter.so
 	be net
