@@ -28,7 +28,7 @@
 #include <stdio.h>
 
 
-#define MOVE_INFO_VIEW 'mviv'
+#define SCROLL_CREDITS_VIEW 'mviv'
 
 
 static const char *UptimeToString(char string[], size_t size);
@@ -49,12 +49,14 @@ class AboutView : public BView {
 	public:
 				AboutView(const BRect &r);
 				~AboutView(void);
-		void	AttachedToWindow(void);
-		void	Pulse(void);
-		void	FrameResized(float width, float height);
-		void	Draw(BRect update);
-		void	MessageReceived(BMessage *msg);
-		void	MouseDown(BPoint pt);
+				
+		virtual void AttachedToWindow();
+		virtual void Pulse();
+		
+		virtual void FrameResized(float width, float height);
+		virtual void Draw(BRect update);
+		virtual void MessageReceived(BMessage *msg);
+		virtual void MouseDown(BPoint pt);
 
 	private:
 		BStringView		*fUptimeView;
@@ -64,6 +66,9 @@ class AboutView : public BView {
 		BBitmap			*fLogo;
 		
 		BPoint			fDrawPoint;
+		
+		bigtime_t		fLastActionTime;
+		BMessageRunner	*fScrollRunner;
 };
 
 
@@ -101,7 +106,9 @@ AboutWindow::QuitRequested()
 
 
 AboutView::AboutView(const BRect &r)
-	: BView(r, "aboutview", B_FOLLOW_ALL, B_WILL_DRAW | B_PULSE_NEEDED)
+	: BView(r, "aboutview", B_FOLLOW_ALL, B_WILL_DRAW | B_PULSE_NEEDED),
+	fLastActionTime(system_time()),
+	fScrollRunner(NULL)
 {
 	fLogo = BTranslationUtils::GetBitmap('PNG ', "haikulogo.png");
 	if (fLogo) {
@@ -141,6 +148,7 @@ AboutView::AboutView(const BRect &r)
 	stringView = new BStringView(r, "oslabel", "Version:");
 	stringView->SetFont(be_bold_font);
 	fInfoView->AddChild(stringView);
+	stringView->ResizeToPreferred();
 
 	r.OffsetBy(0, labelHeight);
 	r.bottom = r.top + textHeight;
@@ -160,6 +168,7 @@ AboutView::AboutView(const BRect &r)
 
 	stringView = new BStringView(r, "ostext", string);
 	fInfoView->AddChild(stringView);
+	stringView->ResizeToPreferred();
 
 	// CPU count, type and clock speed
 	r.OffsetBy(0, textHeight * 1.5);
@@ -173,6 +182,8 @@ AboutView::AboutView(const BRect &r)
 	stringView = new BStringView(r, "cpulabel", string);
 	stringView->SetFont(be_bold_font);
 	fInfoView->AddChild(stringView);
+	stringView->ResizeToPreferred();
+
 
 	BString cpuType;
 	cpuType << get_cpu_vendor_string(systemInfo.cpu_type) 
@@ -182,6 +193,7 @@ AboutView::AboutView(const BRect &r)
 	r.bottom = r.top + textHeight;
 	stringView = new BStringView(r, "cputext", cpuType.String());
 	fInfoView->AddChild(stringView);
+	stringView->ResizeToPreferred();
 
 	r.OffsetBy(0, labelHeight);
 	r.bottom = r.top + textHeight;
@@ -193,6 +205,7 @@ AboutView::AboutView(const BRect &r)
 
 	stringView = new BStringView(r, "mhztext", string);
 	fInfoView->AddChild(stringView);
+	stringView->ResizeToPreferred();
 
 	// RAM
 	r.OffsetBy(0, textHeight * 1.5);
@@ -200,6 +213,7 @@ AboutView::AboutView(const BRect &r)
 	stringView = new BStringView(r, "ramlabel", "Memory:");
 	stringView->SetFont(be_bold_font);
 	fInfoView->AddChild(stringView);
+	stringView->ResizeToPreferred();
 
 	r.OffsetBy(0, labelHeight);
 	r.bottom = r.top + textHeight;
@@ -208,6 +222,7 @@ AboutView::AboutView(const BRect &r)
 
 	stringView = new BStringView(r, "ramtext", string);
 	fInfoView->AddChild(stringView);
+	stringView->ResizeToPreferred();
 
 	// Kernel build time/date
 	r.OffsetBy(0, textHeight * 1.5);
@@ -215,6 +230,7 @@ AboutView::AboutView(const BRect &r)
 	stringView = new BStringView(r, "kernellabel", "Kernel:");
 	stringView->SetFont(be_bold_font);
 	fInfoView->AddChild(stringView);
+	stringView->ResizeToPreferred();
 
 	r.OffsetBy(0, labelHeight);
 	r.bottom = r.top + textHeight;
@@ -223,6 +239,7 @@ AboutView::AboutView(const BRect &r)
 
 	stringView = new BStringView(r, "kerneltext", string);
 	fInfoView->AddChild(stringView);
+	stringView->ResizeToPreferred();
 
 	// Uptime
 	r.OffsetBy(0, textHeight * 1.5);
@@ -230,16 +247,17 @@ AboutView::AboutView(const BRect &r)
 	stringView = new BStringView(r, "uptimelabel", "Time Running:");
 	stringView->SetFont(be_bold_font);
 	fInfoView->AddChild(stringView);
+	stringView->ResizeToPreferred();
 
 	r.OffsetBy(0, labelHeight);
 	r.bottom = r.top + textHeight;
-
+	
 	fUptimeView = new BStringView(r, "uptimetext", "");
 	fInfoView->AddChild(fUptimeView);
 	
 	char uptimeString[255];
 	fUptimeView->SetText(UptimeToString(uptimeString, 255));
-
+	
 	// Begin construction of the credits view
 	r = Bounds();
 	r.left += fInfoView->Bounds().right;
@@ -411,20 +429,21 @@ AboutView::AboutView(const BRect &r)
 		"All rights reserved.\n"
 		"Copyright (c) 1997 Be Inc.\n"
 		"Copyright (c) 1999 Jake Hamby. \n\n");
-
-
 }
 
 
 AboutView::~AboutView(void)
 {
+	delete fScrollRunner;
 }
 
 
 void
 AboutView::AttachedToWindow(void)
 {
+	BView::AttachedToWindow();
 	Window()->SetPulseRate(500000);
+	SetEventMask(B_POINTER_EVENTS);
 }
 
 
@@ -434,7 +453,14 @@ AboutView::MouseDown(BPoint pt)
 	BRect r(92, 26, 105, 31);
 	if (r.Contains(pt))
 		printf("Easter Egg\n");
+	
+	if (Bounds().Contains(pt)) {
+		fLastActionTime = system_time();
+		delete fScrollRunner;
+		fScrollRunner = NULL;
+	}
 }
+
 
 void
 AboutView::FrameResized(float width, float height)
@@ -459,6 +485,11 @@ AboutView::Pulse(void)
 {
 	char uptime[255];
 	fUptimeView->SetText(UptimeToString(uptime, 255));
+	
+	if (fScrollRunner == NULL && (system_time() > fLastActionTime + 10000000)) {
+		BMessage message(SCROLL_CREDITS_VIEW);
+		fScrollRunner = new BMessageRunner(this, &message, 300000, -1);
+	}
 }
 
 
@@ -466,12 +497,22 @@ void
 AboutView::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
-		case MOVE_INFO_VIEW:
-			fInfoView->MoveBy(0, -5);
+		case SCROLL_CREDITS_VIEW:
+		{
+			BScrollBar *scrollBar = fCreditsView->ScrollBar(B_VERTICAL);
+			if (scrollBar == NULL)
+				break;
+			float max, min;
+			scrollBar->GetRange(&min, &max);
+			if (scrollBar->Value() < max)
+				fCreditsView->ScrollBy(0, 5);
+			
 			break;
-
+		}
+		
 		default:
 			BView::MessageReceived(msg);
+			break;
 	}
 }
 
