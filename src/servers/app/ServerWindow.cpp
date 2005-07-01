@@ -38,6 +38,7 @@
 #include "Utils.h"
 #include "WinBorder.h"
 #include "Workspace.h"
+#include "WorkspacesLayer.h"
 
 #include "ServerWindow.h"
 
@@ -372,8 +373,17 @@ ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent)
 	STRACE(("ServerWindow(%s)::CreateLayerTree()-> layer %s, token %ld\n",
 		fTitle, name, token));
 
-	Layer *newLayer = new Layer(frame, name, token, resizeMask, 
+	Layer *newLayer;
+
+	if (link.Code() == AS_LAYER_CREATE_ROOT
+		&& (fWinBorder->WindowFlags() & 0x00008000) != 0) {
+		// this is a workspaces window!
+		newLayer = new WorkspacesLayer(frame, name, token, resizeMask,
 			flags, gDesktop->GetDisplayDriver());
+	} else {
+		newLayer = new Layer(frame, name, token, resizeMask, 
+			flags, gDesktop->GetDisplayDriver());
+	}
 
 	free(name);
 

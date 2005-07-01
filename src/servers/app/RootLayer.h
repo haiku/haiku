@@ -49,7 +49,7 @@ namespace BPrivate {
 };
 
 #ifndef DISPLAY_HAIKU_LOGO
-#define DISPLAY_HAIKU_LOGO 1
+#	define DISPLAY_HAIKU_LOGO 1
 #endif
 
 #if DISPLAY_HAIKU_LOGO
@@ -106,6 +106,9 @@ public:
 
 			void				ReadWorkspaceData(const char *path);
 			void				SaveWorkspaceData(const char *path);
+
+			void				SetWorkspacesLayer(Layer* layer) { fWorkspacesLayer = layer; }
+			Layer*				WorkspacesLayer() const { return fWorkspacesLayer; }
 	
 			void				SetScreens(Screen *screen[], int32 rows, int32 columns);
 			Screen**			Screens(void);
@@ -212,6 +215,7 @@ friend class Desktop;
 			int32				fActiveWksIndex;
 			int32				fWsCount;
 			Workspace**			fWorkspace;
+			Layer*				fWorkspacesLayer;
 
 			int32				fWinBorderListLength;
 			WinBorder**			fWinBorderList2;

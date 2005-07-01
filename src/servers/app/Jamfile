@@ -97,6 +97,7 @@ Server app_server :
 	ServerScreen.cpp
 	WinBorder.cpp
 	Workspace.cpp
+	WorkspacesLayer.cpp
 ;
 
 # link libraries for app_server and libappserver.so

@@ -48,6 +48,7 @@
 #include "ServerWindow.h"
 #include "WinBorder.h"
 #include "Workspace.h"
+#include "WorkspacesLayer.h"
 
 #include "RootLayer.h"
 
@@ -105,6 +106,7 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	  fActiveWksIndex(0),
 	  fWsCount(0),
 	  fWorkspace(new Workspace*[kMaxWorkspaceCount]),
+	  fWorkspacesLayer(NULL),
 
 	  fWinBorderListLength(64),
 	  fWinBorderList2((WinBorder**)malloc(fWinBorderListLength * sizeof(WinBorder*))),
@@ -696,6 +698,7 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 		for (int32 i = 0; i < ptrCount; i++) {
 			if (ptrWin[i]->Workspaces() & (0x00000001UL << index)) {
 				fWorkspace[index]->AddWinBorder(ptrWin[i]);
+
 				if (!ptrWin[i]->IsHidden())
 					fWorkspace[index]->ShowWinBorder(ptrWin[i]);
 			}
@@ -781,6 +784,9 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 
 	fHaveWinBorderList = true;
 	get_workspace_windows();
+
+	if (WorkspacesLayer() != NULL)
+		GoRedraw(WorkspacesLayer(), WorkspacesLayer()->fVisible);
 
 	// send the workspace changed message for the new workspace
 	{
@@ -1980,8 +1986,12 @@ RootLayer::show_winBorder(WinBorder *winBorder)
 			invalid = fWorkspace[i]->ShowWinBorder(winBorder);
 		}
 
-		if (fActiveWksIndex == i)
+		if (fActiveWksIndex == i) {
 			invalidate = invalid;
+
+			if (dynamic_cast<class WorkspacesLayer *>(winBorder->TopChild()) != NULL)
+				SetWorkspacesLayer(winBorder->TopChild());
+		}
 	}
 
 	if (invalidate)
@@ -2004,8 +2014,12 @@ void RootLayer::hide_winBorder(WinBorder *winBorder)
 		if (fWorkspace[i] && fWorkspace[i]->HasWinBorder(winBorder))
 			invalid = fWorkspace[i]->HideWinBorder(winBorder);
 
-		if (fActiveWksIndex == i)
+		if (fActiveWksIndex == i) {
 			invalidate = invalid;
+
+			if (dynamic_cast<class WorkspacesLayer *>(winBorder->TopChild()) != NULL)
+				SetWorkspacesLayer(NULL);
+		}
 	}
 
 	if (invalidate)
@@ -2070,10 +2084,18 @@ bool RootLayer::get_workspace_windows()
 		fWinBorderList	= (WinBorder**)realloc(fWinBorderList, fWinBorderListLength);
 		ActiveWorkspace()->GetWinBorderList((void**)fWinBorderList, &bufferSize);
 	}
-	
-	fWinBorderCount = bufferSize;
 
+	fWinBorderCount = bufferSize;
 	fWinBorderIndex	= 0;
+
+	// activate any workspaces layer in the current list
+
+	SetWorkspacesLayer(NULL);
+
+	for (int32 i = 0; i < fWinBorderCount; i++) {
+		if (dynamic_cast<class WorkspacesLayer *>(fWinBorderList[i]->TopChild()) != NULL)
+			SetWorkspacesLayer(fWinBorderList[i]->TopChild());
+	}
 
 	// to determine if there was a change in window hierarchy 
 	if (exCount != fWinBorderCount || memcmp(fWinBorderList, fWinBorderList2, fWinBorderCount) != 0)

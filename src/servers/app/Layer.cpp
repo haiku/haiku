@@ -1494,6 +1494,11 @@ return;
 
 	fParent->Redraw(fRootLayer->fRedrawReg, this);
 
+	// redraw workspaces layer
+	if (dynamic_cast<WinBorder*>(this) != NULL && fRootLayer->WorkspacesLayer() != NULL) {
+		fRootLayer->GoRedraw(fRootLayer->WorkspacesLayer(), fRootLayer->WorkspacesLayer()->fVisible);
+	}
+
 	SendViewCoordUpdateMsg();
 	
 	EmptyGlobals();
@@ -1523,8 +1528,12 @@ return;
 
 	fDriver->CopyRegionList(&fRootLayer->fCopyRegList, &fRootLayer->fCopyList, fRootLayer->fCopyRegList.CountItems(), &fFullVisible);
 
-
 	fParent->Redraw(fRootLayer->fRedrawReg, this);
+
+	// redraw workspaces layer
+	if (dynamic_cast<WinBorder*>(this) != NULL && fRootLayer->WorkspacesLayer() != NULL) {
+		fRootLayer->GoRedraw(fRootLayer->WorkspacesLayer(), fRootLayer->WorkspacesLayer()->fVisible);
+	}
 
 	SendViewCoordUpdateMsg();
 	
