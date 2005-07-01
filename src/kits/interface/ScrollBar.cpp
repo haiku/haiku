@@ -253,11 +253,15 @@ BScrollBar::BScrollBar(BMessage *archive)
 
 BScrollBar::~BScrollBar()
 {
+	if (fTarget) {
+		if (Orientation() == B_VERTICAL)
+			fTarget->fVerScroller = NULL;
+		else
+			fTarget->fHorScroller = NULL;
+	}
+	
 	delete fPrivateData;
 	free(fTargetName);
-
-	if (fTarget)
-		fTarget->UnsetScroller(this);
 }
 
 
