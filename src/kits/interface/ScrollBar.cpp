@@ -170,7 +170,7 @@ BScrollBar::Private::ButtonRepeaterThread(void *data)
 
 BScrollBar::BScrollBar(BRect frame,const char *name,BView *target,float min,
 		float max,orientation direction)
- : BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW),
+	:BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW),
  	fMin(min),
 	fMax(max),
 	fSmallStep(1),
@@ -184,15 +184,6 @@ BScrollBar::BScrollBar(BRect frame,const char *name,BView *target,float min,
 	
 	fPrivateData = new BScrollBar::Private;
 
-	/*if (fTarget) {
-		fTargetName = strdup(fTarget->Name());
-		
-		// TODO: theoretically, we should also set the target BView's scrollbar
-		// pointer here
-	}
-	else
-		fTargetName=NULL;
-	*/
 	SetTarget(target);
 	
 	if (direction == B_VERTICAL) {
@@ -265,22 +256,29 @@ BScrollBar::~BScrollBar()
 	delete fPrivateData;
 	free(fTargetName);
 
-	// TODO: Disconnect from target
+	if (fTarget)
+		fTarget->UnsetScroller(this);
 }
 
 
 BArchivable *
-BScrollBar::Instantiate(BMessage *data)
+BScrollBar::Instantiate(BMessage *archive)
 {
-	// TODO: Implement
-	return NULL;
+	if (validate_instantiation(archive, "BScrollBar"))
+		return new BScrollBar(archive);
+	else
+		return NULL;
 }
 
 
 status_t
 BScrollBar::Archive(BMessage *data, bool deep) const
 {
-	BView::Archive(data,deep);
+	status_t err = BView::Archive(data, deep);
+
+	if (err != B_OK)
+		return err;
+		
 	data->AddFloat("_range",fMin);
 	data->AddFloat("_range",fMax);
 	data->AddFloat("_steps",fSmallStep);
@@ -882,8 +880,7 @@ BHandler *
 BScrollBar::ResolveSpecifier(BMessage *msg,int32 index,
 		BMessage *specifier,int32 form,const char *property)
 {
-	// TODO: Implement
-	return NULL;
+	return BView::ResolveSpecifier(msg, index, specifier, form, property);
 }
 
 
@@ -914,19 +911,21 @@ BScrollBar::MakeFocus(bool state)
 void
 BScrollBar::AllAttached()
 {
+	BView::AllAttached();
 }
 
 
 void
 BScrollBar::AllDetached()
 {
+	BView::AllDetached();
 }
 
 
 status_t
 BScrollBar::GetSupportedSuites(BMessage *data)
 {
-	return B_ERROR;
+	return BView::GetSupportedSuites(data);
 }
 
 
