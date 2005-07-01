@@ -1162,13 +1162,21 @@ myRootLayer->Unlock();
 			STRACE(("ServerWindow %s: Message Needs_Update unimplemented\n", Title()));
 			break;
 		}
+#endif
 		case AS_WINDOW_TITLE:
 		{
 			// TODO: Implement AS_WINDOW_TITLE
-			STRACE(("ServerWindow %s: Message Set_Title unimplemented\n", Title()));
+			
+			char* newTitle;
+			if (link.ReadString(&newTitle) == B_OK) {
+				printf("ServerWindow %s: Message SetTitle(\"%s\") requested, unimplemented\n",
+					Title(), newTitle);
+
+				free(newTitle);
+			}
 			break;
 		}
-#endif
+
 		case AS_ADD_TO_SUBSET:
 		{
 			STRACE(("ServerWindow %s: Message AS_ADD_TO_SUBSET\n", Title()));
