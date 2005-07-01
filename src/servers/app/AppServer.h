@@ -68,7 +68,9 @@ private:
 
 	volatile	bool			fQuitting;
 
+				BLocker			fAppListLock;
 				BList			fAppList;
+
 				thread_id		fPicassoThreadID;
 
 				thread_id		fISThreadID;
@@ -79,11 +81,10 @@ private:
 
 				port_id			fISASPort;
 				port_id			fISPort;
-	
-				sem_id			fActiveAppLock;
-				sem_id			fAppListLock;
-				sem_id			fDecoratorLock;
-	
+
+				sem_id			fShutdownSemaphore;
+				int32			fShutdownCount;
+
 				DisplayDriver	*fDriver;
 };
 

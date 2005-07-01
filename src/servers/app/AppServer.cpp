@@ -18,6 +18,7 @@
 #include <PortLink.h>
 #include <StopWatch.h>
 #include <RosterPrivate.h>
+#include <Autolock.h>
 
 #include "BitmapManager.h"
 #include "ColorSet.h"
@@ -84,8 +85,10 @@ AppServer::AppServer(void) : BApplication (SERVER_SIGNATURE),
 #else
 AppServer::AppServer(void) : 
 #endif
+	fAppListLock("application list"),
 	fCursorSem(-1),
-	fCursorArea(-1)
+	fCursorArea(-1),
+	fShutdownSemaphore(-1)
 {
 	fMessagePort = create_port(200, SERVER_PORT_NAME);
 	if (fMessagePort == B_NO_MORE_PORTS)
@@ -172,12 +175,6 @@ AppServer::AppServer(void) :
 	// Create the bitmap allocator. Object declared in BitmapManager.cpp
 	gBitmapManager = new BitmapManager();
 
-	// This is necessary to mediate access between the Poller and app_server threads
-	fActiveAppLock = create_sem(1,"app_server_active_sem");
-
-	// This locker is for app_server and Picasso to vy for control of the ServerApp list
-	fAppListLock = create_sem(1,"app_server_applist_sem");
-
 	// Spawn our thread-monitoring thread
 	fPicassoThreadID = spawn_thread(PicassoThread, "picasso", B_NORMAL_PRIORITY, this);
 	if (fPicassoThreadID >= 0)
@@ -236,7 +233,8 @@ int32
 AppServer::PicassoThread(void *data)
 {
 	while (!sAppServer->fQuitting) {
-		acquire_sem(sAppServer->fAppListLock);
+		sAppServer->fAppListLock.Lock();
+
 		for (int32 i = 0;;) {
 			ServerApp *app = (ServerApp *)sAppServer->fAppList.ItemAt(i++);
 			if (!app)
@@ -244,7 +242,8 @@ AppServer::PicassoThread(void *data)
 
 			app->PingTarget();
 		}
-		release_sem(sAppServer->fAppListLock);
+
+		sAppServer->fAppListLock.Unlock();
 		// we do this every second so as not to suck *too* many CPU cycles
 		snooze(1000000);
 	}
@@ -444,9 +443,9 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 			if (app->InitCheck() == B_OK
 				&& app->Run()) {
 				// add the new ServerApp to the known list of ServerApps
-				acquire_sem(fAppListLock);
+				fAppListLock.Lock();
 				fAppList.AddItem(app);
-				release_sem(fAppListLock);
+				fAppListLock.Unlock();
 			} else {
 				delete app;
 
@@ -474,7 +473,7 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 			if (msg.Read<thread_id>(&thread) < B_OK)
 				break;
 
-			acquire_sem(fAppListLock);
+			fAppListLock.Lock();
 
 			// Run through the list of apps and nuke the proper one
 
@@ -491,13 +490,17 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 				}
 			}
 
-			release_sem(fAppListLock);
+			fAppListLock.Unlock();
 
 			if (removeApp != NULL)
-				removeApp->Quit();
+				removeApp->Quit(fShutdownSemaphore);
 
-			if (fQuitting && count <= 1)
+			if (fQuitting && count <= 1) {
+				// wait for the last app to die
+				acquire_sem_etc(fShutdownSemaphore, fShutdownCount, B_RELATIVE_TIMEOUT, 500000);
+
 				PostMessage(kMsgShutdownServer);
+			}
 			break;
 		}
 
@@ -538,6 +541,11 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 			// test apps to quit. This situation will occur only when the server
 			// is compiled as a regular Be application.
 
+			fAppListLock.Lock();
+			fShutdownSemaphore = create_sem(0, "app_server shutdown");
+			fShutdownCount = fAppList.CountItems();
+			fAppListLock.Unlock();
+
 			fQuitting = true;
 			BroadcastToAllApps(AS_QUIT_APP);
 
@@ -550,7 +558,7 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 		case kMsgShutdownServer:
 			// let's kill all remaining applications
 
-			acquire_sem(fAppListLock);
+			fAppListLock.Lock();
 
 			for (int32 i = 0; i < fAppList.CountItems(); i++) {
 				ServerApp *app = (ServerApp*)fAppList.ItemAt(i);
@@ -561,7 +569,7 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 
 			kill_thread(fPicassoThreadID);
 
-			release_sem(fAppListLock);
+			fAppListLock.Unlock();
 
 			delete gDesktop;
 			delete gBitmapManager;
@@ -602,20 +610,15 @@ AppServer::FindApp(const char *signature)
 	if (!signature)
 		return NULL;
 
-	acquire_sem(fAppListLock);
+	BAutolock locker(fAppListLock);
 
-	ServerApp *foundApp = NULL;
 	for (int32 i = 0; i < fAppList.CountItems(); i++) {
 		ServerApp *app = (ServerApp*)fAppList.ItemAt(i);
-		if (app && !strcasecmp(app->Signature(), signature)) {
-			foundApp = app;
-			break;
-		}
+		if (app && !strcasecmp(app->Signature(), signature))
+			return app;
 	}
 
-	release_sem(fAppListLock);
-
-	return foundApp;
+	return NULL;
 }
 
 
@@ -631,7 +634,7 @@ AppServer::FindApp(const char *signature)
 void
 BroadcastToAllApps(const int32 &code)
 {
-	acquire_sem(sAppServer->fAppListLock);
+	BAutolock locker(sAppServer->fAppListLock);
 
 	for (int32 i = 0; i < sAppServer->fAppList.CountItems(); i++) {
 		ServerApp *app = (ServerApp *)sAppServer->fAppList.ItemAt(i);
@@ -642,8 +645,6 @@ BroadcastToAllApps(const int32 &code)
 		}
 		app->PostMessage(code);
 	}
-
-	release_sem(sAppServer->fAppListLock);
 }
 
 

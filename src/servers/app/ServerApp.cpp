@@ -261,7 +261,7 @@ ServerApp::Run()
 	be removed from the application list.
 */
 void
-ServerApp::Quit()
+ServerApp::Quit(sem_id shutdownSemaphore)
 {
 	if (fThread < B_OK) {
 		delete this;
@@ -273,7 +273,7 @@ ServerApp::Quit()
 	fQuitting = true;
 	PostMessage(kMsgAppQuit);
 
-	send_data(fThread, 'QUIT', NULL, 0);
+	send_data(fThread, 'QUIT', &shutdownSemaphore, sizeof(sem_id));
 }
 
 
@@ -506,9 +506,13 @@ ServerApp::_MessageLooper()
 
 	// Quit() will send us a message; we're handling the exiting procedure
 	thread_id sender;
-	receive_data(&sender, NULL, 0);
+	sem_id shutdownSemaphore;
+	receive_data(&sender, &shutdownSemaphore, sizeof(sem_id));
 
 	delete this;
+
+	if (shutdownSemaphore >= B_OK)
+		release_sem(shutdownSemaphore);
 }
 
 

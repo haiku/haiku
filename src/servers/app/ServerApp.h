@@ -44,7 +44,7 @@ public:
 
 	status_t InitCheck();
 	bool Run();
-	void Quit();
+	void Quit(sem_id shutdownSemaphore = -1);
 
 	/*!
 		\brief Determines whether the application is the active one
