@@ -183,7 +183,7 @@ ServerApp::~ServerApp(void)
 
 	// first, make sure our monitor thread doesn't 
 	for (int32 i = 0; i < fBitmapList.CountItems(); i++) {
-		delete static_cast<ServerBitmap *>(fBitmapList.ItemAt(i));
+		gBitmapManager->DeleteBitmap(static_cast<ServerBitmap *>(fBitmapList.ItemAt(i)));
 	}
 
 	for (int32 i = 0; i < fPictureList.CountItems(); i++) {
