@@ -53,7 +53,9 @@ HOST_SYSTEM=$(shell uname)
 
 # BeOS (R5 only, actually, but who cares)
 ifeq ($(HOST_SYSTEM), BeOS)
-#	LINKLIBS = -lnet
+	ifeq ($(shell sh -c "strings /system/lib/libroot.so | grep uname"), )
+		LINKLIBS = -lnet
+	endif
 endif
 
 SOURCES = \
@@ -65,7 +67,7 @@ SOURCES = \
 	rules.c scan.c search.c timestamp.c variable.c
 
 all: $(EXENAME)
-	$(EXENAME)
+	LINKLIBS=$(LINKLIBS) $(EXENAME)
 
 $(EXENAME):
 	$(CC) $(TARGET) $(CFLAGS) $(SOURCES) $(LINKLIBS)

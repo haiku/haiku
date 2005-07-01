@@ -118,11 +118,6 @@ if $(VMS)
 	CCFLAGS += /define=VMS ;
 }
 
-# Need to link against -lnet
-if $(OS) = BEOS {
-#	LINKLIBS += -lnet ;
-}
-
 if $(OS) = BEOS {
 	DEFINES += _ZETA_USING_DEPRECATED_API_=1 ;
 }
