@@ -24,6 +24,7 @@
 #include <MessageQueue.h>
 #include <MessageRunner.h>
 #include <Roster.h>
+#include <Autolock.h>
 
 #include <ApplicationPrivate.h>
 #include <AppMisc.h>
@@ -1448,7 +1449,7 @@ BWindow::SetTitle(const char *title)
 	int32 length = strlen(title);
 	length = min_c(length, B_OS_NAME_LENGTH - 3);
 	memcpy(threadName + 2, title, length);
-	threadName[length] = '\0';
+	threadName[length + 2] = '\0';
 #endif
 
 	SetName(threadName);
@@ -1586,18 +1587,16 @@ BWindow::Type() const
 status_t
 BWindow::SetLook(window_look look)
 {
+	BAutolock locker(this);
 
-	Lock();
 	fLink->StartMessage(AS_SET_LOOK);
 	fLink->Attach<int32>((int32)look);
 
-	int32 code = SERVER_FALSE;
-	fLink->FlushWithReply(code);
-
-	Unlock();
+	int32 code;
+	status_t status = fLink->FlushWithReply(code);
 
 	// ToDo: the server should probably return something more meaningful, anyway
-	if (code == SERVER_TRUE) {
+	if (status == B_OK && code == SERVER_TRUE) {
 		fLook = look;
 		return B_OK;
 	}
