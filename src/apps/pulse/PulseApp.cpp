@@ -18,7 +18,6 @@
 
 #include <Alert.h>
 #include <Rect.h>
-#include <Screen.h>
 #include <Deskbar.h>
 
 #include <stdlib.h>
@@ -136,20 +135,7 @@ PulseApp::BuildPulse()
 	else
 		pulseWindow = new PulseWindow(prefs->normal_window_rect);
 
-	// check if the window is on screen, and move it if not
-	BRect frame = pulseWindow->Frame();
-	BRect screenFrame = BScreen().Frame();
-
-	if (frame.left > screenFrame.right)
-		pulseWindow->MoveBy(screenFrame.right - frame.right - 10, 0);
-	else if (frame.right < 0)
-		pulseWindow->MoveTo(10, frame.top);
-
-	if (frame.top > screenFrame.bottom)
-		pulseWindow->MoveBy(0, screenFrame.bottom - frame.bottom - 10);
-	else if (frame.bottom < 0)
-		pulseWindow->MoveTo(frame.left, 10);
-
+	pulseWindow->MoveOnScreen();
 	pulseWindow->Show();
 }
 

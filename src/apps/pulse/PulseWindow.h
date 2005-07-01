@@ -22,9 +22,12 @@
 class PulseWindow : public BWindow {
 	public:
 		PulseWindow(BRect rect);
-		~PulseWindow();
-		bool QuitRequested();
-		void MessageReceived(BMessage *message);
+		virtual ~PulseWindow();
+
+		virtual bool QuitRequested();
+		virtual void MessageReceived(BMessage *message);
+
+		void MoveOnScreen();
 		void SetMode(int newmode);
 
 	private:
