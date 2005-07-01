@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -147,25 +147,21 @@ void CursorManager::DeleteCursor(int32 token)
 	\brief Removes and deletes all of an application's cursors
 	\param signature Signature to which the cursors belong
 */
-void CursorManager::RemoveAppCursors(team_id team)
+void
+CursorManager::RemoveAppCursors(team_id team)
 {
 	Lock();
 	
-	int32 i=0;
-	ServerCursor *temp=(ServerCursor*)fCursorList.ItemAt(i);
-	while(temp)
-	{
-		if(temp && temp->OwningTeam()==team)
-		{
-			fCursorList.RemoveItem(i);
-			delete temp;
-		}
-		else
-		{
-			i++;
-		}
-		temp=(ServerCursor*)fCursorList.ItemAt(i);
+	ServerCursor *cursor;
+	int32 index = 0;
+	while ((cursor = (ServerCursor*)fCursorList.ItemAt(index)) != NULL) {
+		if (cursor->OwningTeam() == team) {
+			fCursorList.RemoveItem(index);
+			delete cursor;
+		} else
+			index++;
 	}
+
 	Unlock();
 }
 

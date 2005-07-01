@@ -190,10 +190,6 @@ ServerApp::~ServerApp(void)
 		delete static_cast<ServerPicture *>(fPictureList.ItemAt(i));
 	}
 
-	// This shouldn't be necessary -- all cursors owned by the app
-	// should be cleaned up by RemoveAppCursors	
-//	delete fAppCursor;
-
 	// although this isn't pretty, ATM we have only one RootLayer.
 	// there should be a way that this ServerApp be attached to a particular
 	// RootLayer to know which RootLayer's cursor to modify.
