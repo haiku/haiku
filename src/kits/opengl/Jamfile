@@ -17,9 +17,10 @@ SubDirC++Flags
 	-DUSE_3DNOW_ASM 
 	-DUSE_SSE_ASM ;
 
+# GLView.cpp includes indirectly <image.h>
 # As our build system don't support <> / " " include difference, 
 # we should compile GLView *before* Mesa's include paths are added.
-# Otherwise, GLView.cpp include inderectly <image.h> but the main/image.h will be find first!
+# Otherwise, src/kits/opengl/mesa/main/image.h will be found first!
 # :-(
 
 Objects 
@@ -41,8 +42,8 @@ SharedLibrary GL :
 	GLView.o
 	GLDispatcher.cpp
 	mesa/$(OBOS_ARCH)/glapi_$(OBOS_ARCH).S
-  : 
- 	# GLU API is included in libGL.so under BeOS R5, not a separate libglu.so library
+	: 
+	# GLU API is included in libGL.so under BeOS R5, not a separate libglu.so library
 	<opengl>sgi-glu.o
 
 	# GLUT API is included in libGL.so under Haiku, not a separate libglut.so library
@@ -63,4 +64,3 @@ RelSymLink <develop>libGL.so : libGL.so ;
 SubInclude OBOS_TOP src kits opengl glu ;
 SubInclude OBOS_TOP src kits opengl glut ;
 SubInclude OBOS_TOP src kits opengl mesa ;
-
