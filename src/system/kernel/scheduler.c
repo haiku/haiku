@@ -128,7 +128,7 @@ scheduler_remove_from_run_queue(struct thread *thread)
 static void
 context_switch(struct thread *fromThread, struct thread *toThread)
 {
-	// track kernel & user time
+	// track kernel time (user time is tracked in thread_at_kernel_entry())
 	bigtime_t now = system_time();
 	fromThread->kernel_time += now - fromThread->last_time;
 	toThread->last_time = now;

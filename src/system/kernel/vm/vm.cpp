@@ -2178,7 +2178,7 @@ vm_init(kernel_args *args)
 	for (i = 0; i < args->num_cpus; i++) {
 		char name[64];
 
-		sprintf(name, "idle thread %lu kstack", i);
+		sprintf(name, "idle thread %lu kstack", i + 1);
 		address = (void *)args->cpu_kstack[i].start;
 		create_area(name, &address, B_EXACT_ADDRESS, args->cpu_kstack[i].size,
 			B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);

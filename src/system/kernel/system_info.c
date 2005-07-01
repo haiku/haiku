@@ -30,6 +30,8 @@ const static char kKernelName[] = "kernel_" OBOS_ARCH;
 status_t
 _get_system_info(system_info *info, size_t size)
 {
+	int32 i;
+
 	if (size != sizeof(system_info))
 		return B_BAD_VALUE;
 
@@ -37,6 +39,9 @@ _get_system_info(system_info *info, size_t size)
 
 	info->boot_time = rtc_boot_time();
 	info->cpu_count = smp_get_num_cpus();
+
+	for (i = 0; i < info->cpu_count; i++)
+		info->cpu_infos[i].active_time = thread_get_active_cpu_time(i);
 
 	// ToDo: Add page_faults
 	info->max_pages = vm_page_num_pages();

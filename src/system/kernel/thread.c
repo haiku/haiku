@@ -1184,6 +1184,32 @@ spawn_kernel_thread_etc(thread_func function, const char *name, int32 priority,
 }
 
 
+bigtime_t
+thread_get_active_cpu_time(int32 cpuNum)
+{
+	bigtime_t activeTime;
+	cpu_status state;
+
+	if (cpuNum < 0 || cpuNum > B_MAX_CPU_COUNT || sIdleThreads[cpuNum] == NULL)
+		return 0;
+
+	activeTime = system_time();
+
+	// we need to grab the thread lock here, because the thread activity
+	// time is not maintained atomically (because there is no need to)
+
+	state = disable_interrupts();
+	GRAB_THREAD_LOCK();
+
+	activeTime -= sIdleThreads[cpuNum]->kernel_time;
+
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(state);
+
+	return activeTime;
+}
+
+
 int32
 thread_max_threads(void)
 {
@@ -1201,8 +1227,7 @@ thread_used_threads(void)
 status_t
 thread_init(kernel_args *args)
 {
-	struct thread *t;
-	unsigned int i;
+	uint32 i;
 
 	TRACE(("thread_init: entry\n"));
 
@@ -1229,34 +1254,38 @@ thread_init(kernel_args *args)
 	// create an idle thread for each cpu
 
 	for (i = 0; i < args->num_cpus; i++) {
+		struct thread *thread;
 		area_info info;
-		char temp[64];
+		char name[64];
 
-		sprintf(temp, "idle thread %d", i);
-		t = create_thread_struct(temp,
+		sprintf(name, "idle thread %lu", i + 1);
+		thread = create_thread_struct(name,
 			i == 0 ? team_get_kernel_team_id() : -1);
-		if (t == NULL) {
+		if (thread == NULL) {
 			panic("error creating idle thread struct\n");
-			return ENOMEM;
+			return B_NO_MEMORY;
 		}
-		t->team = team_get_kernel_team();
-		t->priority = B_IDLE_PRIORITY;
-		t->state = B_THREAD_RUNNING;
-		t->next_state = B_THREAD_READY;
-		sprintf(temp, "idle thread %d kstack", i);
-		t->kernel_stack_area = find_area(temp);
 
-		if (get_area_info(t->kernel_stack_area, &info) != B_OK)
+		thread->team = team_get_kernel_team();
+		thread->priority = B_IDLE_PRIORITY;
+		thread->state = B_THREAD_RUNNING;
+		thread->next_state = B_THREAD_READY;
+		sprintf(name, "idle thread %lu kstack", i + 1);
+		thread->kernel_stack_area = find_area(name);
+
+		if (get_area_info(thread->kernel_stack_area, &info) != B_OK)
 			panic("error finding idle kstack area\n");
 
-		t->kernel_stack_base = (addr_t)info.address;
+		thread->kernel_stack_base = (addr_t)info.address;
 
-		hash_insert(sThreadHash, t);
-		insert_thread_into_team(t->team, t);
-		sIdleThreads[i] = t;
+		hash_insert(sThreadHash, thread);
+		insert_thread_into_team(thread->team, thread);
+		sIdleThreads[i] = thread;
+
 		if (i == 0)
-			arch_thread_set_current_thread(t);
-		t->cpu = &cpu[i];
+			arch_thread_set_current_thread(thread);
+
+		thread->cpu = &cpu[i];
 	}
 	sUsedThreads = args->num_cpus;
 
@@ -1277,7 +1306,7 @@ thread_init(kernel_args *args)
 		char temp[64];
 
 		for (i = 0; i < sNumDeathStacks; i++) {
-			sprintf(temp, "death_stack%d", i);
+			sprintf(temp, "death stack %lu", i);
 			sDeathStacks[i].area = create_area(temp, (void **)&sDeathStacks[i].address,
 				B_ANY_KERNEL_ADDRESS, KERNEL_STACK_SIZE, B_FULL_LOCK,
 				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_KERNEL_STACK_AREA);
@@ -1302,9 +1331,9 @@ thread_init(kernel_args *args)
 
 
 status_t
-thread_per_cpu_init(int32 cpu_num)
+thread_per_cpu_init(int32 cpuNum)
 {
-	arch_thread_set_current_thread(sIdleThreads[cpu_num]);
+	arch_thread_set_current_thread(sIdleThreads[cpuNum]);
 	return B_OK;
 }
 

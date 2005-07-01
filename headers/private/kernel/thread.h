@@ -36,9 +36,10 @@ void thread_at_kernel_entry(void);
 void thread_at_kernel_exit(void);
 
 status_t thread_init(struct kernel_args *args);
-status_t thread_per_cpu_init(int32 cpu_num);
+status_t thread_per_cpu_init(int32 cpuNum);
 void thread_exit(void);
 
+bigtime_t thread_get_active_cpu_time(int32 cpuNum);
 int32 thread_max_threads(void);
 int32 thread_used_threads(void);
 
