@@ -24,6 +24,7 @@ class LinkReceiver {
 
 		status_t GetNextMessage(int32 &code, bigtime_t timeout = B_INFINITE_TIMEOUT);
 		bool NeedsReply() const;
+		int32 Code() const;
 
 		virtual status_t Read(void *data, ssize_t size);
 		status_t ReadString(char **string);

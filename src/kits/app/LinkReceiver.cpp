@@ -114,6 +114,17 @@ LinkReceiver::NeedsReply() const
 }
 
 
+int32
+LinkReceiver::Code() const
+{
+	if (fReplySize == 0)
+		return B_ERROR;
+
+	message_header *header = (message_header *)(fRecvBuffer + fRecvStart);
+	return header->code;
+}
+
+
 void
 LinkReceiver::ResetBuffer()
 {
