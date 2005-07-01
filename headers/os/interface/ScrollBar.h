@@ -107,7 +107,6 @@ private:
 		friend class BScrollArrowButton;
 		friend class Private;
 		friend status_t control_scrollbar(scroll_bar_info *info, BScrollBar *bar);		// for use within the preflet
-		friend status_t scroll_by_value(float valueByWhichToScroll, BScrollBar *bar);	// for use here within the IK
 virtual	void		_ReservedScrollBar1();
 virtual	void		_ReservedScrollBar2();
 virtual	void		_ReservedScrollBar3();
@@ -117,6 +116,15 @@ virtual	void		_ReservedScrollBar4();
 		void 		DoScroll(float delta);
 
 		void		InitObject(float min, float max, orientation o, BView *t);
+		
+		void		DrawButtons();
+		void		DrawArrow(BPoint pos, int32 which, bool pressed = false);
+		void		DrawButton(BRect frame, bool pressed = false); 
+		
+		bool		DoubleArrows() const;
+		
+		status_t	ScrollByValue(float value);
+
 		float		fMin;
 		float		fMax;
 		float		fSmallStep;
