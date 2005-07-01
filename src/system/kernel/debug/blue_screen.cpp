@@ -71,7 +71,7 @@ next_line(void)
 	}
 
 #if NO_CLEAR
-	sModule->fill_glyph(0, sScreen.y + 2, sScreen.columns, 1, ' ', sScreen.attr);
+	sModule->fill_glyph(0, (sScreen.y + 2) % sScreen.rows, sScreen.columns, 1, ' ', sScreen.attr);
 #endif
 	sScreen.x = 0;
 }
