@@ -10,6 +10,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
+
 #include <AppDefs.h>
 #include <GraphicsDefs.h>
 #include <Message.h>
@@ -139,8 +140,11 @@ ServerWindow::Run()
 {
 	BAutolock locker(this);
 
+	char name[B_OS_NAME_LENGTH];
+	snprintf(name, sizeof(name), "w:%s", fTitle);
+
 	// Spawn our message-monitoring thread
-	fThread = spawn_thread(_message_thread, fTitle, B_NORMAL_PRIORITY, this);
+	fThread = spawn_thread(_message_thread, name, B_NORMAL_PRIORITY, this);
 	if (fThread < B_OK)
 		return false;
 
