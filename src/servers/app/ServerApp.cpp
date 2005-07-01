@@ -125,7 +125,7 @@ ServerApp::ServerApp(port_id clientReplyPort, port_id clientLooperPort,
 		fAppCursor->SetOwningTeam(fClientTeam);
 	}
 
-	STRACE(("ServerApp %s:\n", fSignature.String()));
+	STRACE(("ServerApp %s:\n", Signature()));
 	STRACE(("\tBApp port: %ld\n", fClientReplyPort));
 	STRACE(("\tReceiver port: %ld\n", fMessagePort));
 }
@@ -134,7 +134,7 @@ ServerApp::ServerApp(port_id clientReplyPort, port_id clientLooperPort,
 //! Does all necessary teardown for application
 ServerApp::~ServerApp(void)
 {
-	STRACE(("*ServerApp %s:~ServerApp()\n",fSignature.String()));
+	STRACE(("*ServerApp %s:~ServerApp()\n", Signature()));
 
 	if (!fQuitting)
 		CRITICAL("ServerApp: destructor called after Run()!\n");
@@ -293,6 +293,9 @@ ServerApp::Quit()
 bool
 ServerApp::PingTarget()
 {
+	// ToDo: this function doesn't make any sense; if the client dies we are
+	//	aware of it anyway at this point. This would only make sense if we
+	//	actually send the team a message to see if it's still responsive.
 	team_info info;
 	if (get_team_info(fClientTeam, &info) != B_OK) {
 		BPrivate::LinkSender link(gAppServerPort);
@@ -329,7 +332,7 @@ ServerApp::SendMessageToClient(const BMessage *msg) const
 	if (msg->Flatten(buffer, size) == B_OK)
 		write_port(fClientLooperPort, msg->what, buffer, size);
 	else
-		printf("PANIC: ServerApp: '%s': can't flatten message in 'SendMessageToClient()'\n", fSignature.String());
+		printf("PANIC: ServerApp: '%s': can't flatten message in 'SendMessageToClient()'\n", Signature());
 
 	delete [] buffer;
 }
@@ -529,7 +532,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// NOTE: R2: Eventually we will have windows which will notify their children of changes in 
 			// system colors
 			
-/*			STRACE(("ServerApp %s: Received global UI color update notification\n",fSignature.String()));
+/*			STRACE(("ServerApp %s: Received global UI color update notification\n", Signature()));
 			ServerWindow *win;
 			BMessage msg(_COLORS_UPDATED);
 			
@@ -545,7 +548,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// NOTE: R2: Eventually we will have windows which will notify their children of changes in 
 			// system fonts
 			
-/*			STRACE(("ServerApp %s: Received global font update notification\n",fSignature.String()));
+/*			STRACE(("ServerApp %s: Received global font update notification\n", Signature()));
 			ServerWindow *win;
 			BMessage msg(_FONTS_UPDATED);
 			
@@ -661,7 +664,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_UPDATE_DECORATOR:
 		{
-			STRACE(("ServerApp %s: Received decorator update notification\n",fSignature.String()));
+			STRACE(("ServerApp %s: Received decorator update notification\n", Signature()));
 
 			for (int32 i = 0; i < fWindowList.CountItems(); i++) {
 				ServerWindow *window = (ServerWindow*)fWindowList.ItemAt(i);
@@ -739,7 +742,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_CREATE_BITMAP:
 		{
-			STRACE(("ServerApp %s: Received BBitmap creation request\n",fSignature.String()));
+			STRACE(("ServerApp %s: Received BBitmap creation request\n", Signature()));
 			// Allocate a bitmap for an application
 			
 			// Attached Data: 
@@ -773,7 +776,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			}
 
 			STRACE(("ServerApp %s: Create Bitmap (%.1fx%.1f)\n",
-						fSignature.String(), frame.Width(), frame.Height()));
+						Signature(), frame.Width(), frame.Height()));
 
 			if (bitmap) {
 				fBitmapList.AddItem(bitmap);
@@ -791,7 +794,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_DELETE_BITMAP:
 		{
-			STRACE(("ServerApp %s: received BBitmap delete request\n",fSignature.String()));
+			STRACE(("ServerApp %s: received BBitmap delete request\n", Signature()));
 			// Delete a bitmap's allocated memory
 
 			// Attached Data:
@@ -805,7 +808,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			ServerBitmap *bitmap = FindBitmap(id);
 			if (bitmap) {
-				STRACE(("ServerApp %s: Deleting Bitmap %ld\n", fSignature.String(), id));
+				STRACE(("ServerApp %s: Deleting Bitmap %ld\n", Signature(), id));
 
 				fBitmapList.RemoveItem(bitmap);
 				gBitmapManager->DeleteBitmap(bitmap);
@@ -816,43 +819,40 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			fLink.Flush();	
 			break;
 		}
+#if 0
 		case AS_CREATE_PICTURE:
 		{
 			// TODO: Implement AS_CREATE_PICTURE
-			STRACE(("ServerApp %s: Create Picture unimplemented\n", fSignature.String()));
-
+			STRACE(("ServerApp %s: Create Picture unimplemented\n", Signature()));
 			break;
 		}
 		case AS_DELETE_PICTURE:
 		{
 			// TODO: Implement AS_DELETE_PICTURE
-			STRACE(("ServerApp %s: Delete Picture unimplemented\n", fSignature.String()));
-
+			STRACE(("ServerApp %s: Delete Picture unimplemented\n", Signature()));
 			break;
 		}
 		case AS_CLONE_PICTURE:
 		{
 			// TODO: Implement AS_CLONE_PICTURE
-			STRACE(("ServerApp %s: Clone Picture unimplemented\n",fSignature.String()));
-
+			STRACE(("ServerApp %s: Clone Picture unimplemented\n", Signature()));
 			break;
 		}
 		case AS_DOWNLOAD_PICTURE:
 		{
 			// TODO; Implement AS_DOWNLOAD_PICTURE
-			STRACE(("ServerApp %s: Download Picture unimplemented\n", fSignature.String()));
+			STRACE(("ServerApp %s: Download Picture unimplemented\n", Signature()));
 			
 			// What is this particular function call for, anyway?
 			
 			// DW: I think originally it might have been to support 
 			// the undocumented Flatten function.
-			
 			break;
 		}
-	
+#endif
 		case AS_CURRENT_WORKSPACE:
 		{
-			STRACE(("ServerApp %s: get current workspace\n", fSignature.String()));
+			STRACE(("ServerApp %s: get current workspace\n", Signature()));
 
 			// TODO: Locking this way is not nice
 			RootLayer *root = gDesktop->ActiveRootLayer();
@@ -868,7 +868,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		
 		case AS_ACTIVATE_WORKSPACE:
 		{
-			STRACE(("ServerApp %s: activate workspace\n", fSignature.String()));
+			STRACE(("ServerApp %s: activate workspace\n", Signature()));
 			
 			// TODO: See above
 			int32 index;
@@ -886,7 +886,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		// call the CursorManager's version to allow for future expansion
 		case AS_SHOW_CURSOR:
 		{
-			STRACE(("ServerApp %s: Show Cursor\n",fSignature.String()));
+			STRACE(("ServerApp %s: Show Cursor\n", Signature()));
 			// although this isn't pretty, ATM we have only one RootLayer.
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
@@ -897,7 +897,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_HIDE_CURSOR:
 		{
-			STRACE(("ServerApp %s: Hide Cursor\n",fSignature.String()));
+			STRACE(("ServerApp %s: Hide Cursor\n", Signature()));
 			// although this isn't pretty, ATM we have only one RootLayer.
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
@@ -908,7 +908,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_OBSCURE_CURSOR:
 		{
-			STRACE(("ServerApp %s: Obscure Cursor\n",fSignature.String()));
+			STRACE(("ServerApp %s: Obscure Cursor\n", Signature()));
 			// although this isn't pretty, ATM we have only one RootLayer.
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
@@ -917,7 +917,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_QUERY_CURSOR_HIDDEN:
 		{
-			STRACE(("ServerApp %s: Received IsCursorHidden request\n", fSignature.String()));
+			STRACE(("ServerApp %s: Received IsCursorHidden request\n", Signature()));
 			// Attached data
 			// 1) int32 port to reply to
 			fLink.StartMessage(fCursorHidden ? SERVER_TRUE : SERVER_FALSE);
@@ -926,7 +926,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_SET_CURSOR_DATA:
 		{
-			STRACE(("ServerApp %s: SetCursor via cursor data\n",fSignature.String()));
+			STRACE(("ServerApp %s: SetCursor via cursor data\n", Signature()));
 			// Attached data: 68 bytes of fAppCursor data
 			
 			int8 cdata[68];
@@ -941,7 +941,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			fAppCursor = new ServerCursor(cdata);
 			fAppCursor->SetOwningTeam(fClientTeam);
-			fAppCursor->SetAppSignature(fSignature.String());
+			fAppCursor->SetAppSignature(Signature());
 			gDesktop->ActiveRootLayer()->GetCursorManager().AddCursor(fAppCursor);
 			// although this isn't pretty, ATM we have only one RootLayer.
 			// there should be a way that this ServerApp be attached to a particular
@@ -951,7 +951,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_SET_CURSOR_BCURSOR:
 		{
-			STRACE(("ServerApp %s: SetCursor via BCursor\n",fSignature.String()));
+			STRACE(("ServerApp %s: SetCursor via BCursor\n", Signature()));
 			// Attached data:
 			// 1) bool flag to send a reply
 			// 2) int32 token ID of the cursor to set
@@ -979,7 +979,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_CREATE_BCURSOR:
 		{
-			STRACE(("ServerApp %s: Create BCursor\n",fSignature.String()));
+			STRACE(("ServerApp %s: Create BCursor\n", Signature()));
 			// Attached data:
 			// 1) 68 bytes of fAppCursor data
 			// 2) port_id reply port
@@ -989,7 +989,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			fAppCursor = new ServerCursor(cursorData);
 			fAppCursor->SetOwningTeam(fClientTeam);
-			fAppCursor->SetAppSignature(fSignature.String());
+			fAppCursor->SetAppSignature(Signature());
 			// although this isn't pretty, ATM we have only one RootLayer.
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
@@ -1003,7 +1003,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_DELETE_BCURSOR:
 		{
-			STRACE(("ServerApp %s: Delete BCursor\n", fSignature.String()));
+			STRACE(("ServerApp %s: Delete BCursor\n", Signature()));
 			// Attached data:
 			// 1) int32 token ID of the cursor to delete
 			int32 ctoken = B_NULL_TOKEN;
@@ -1020,7 +1020,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_GET_SCROLLBAR_INFO:
 		{
-			STRACE(("ServerApp %s: Get ScrollBar info\n", fSignature.String()));
+			STRACE(("ServerApp %s: Get ScrollBar info\n", Signature()));
 			scroll_bar_info info = gDesktop->ScrollBarInfo();
 
 			fLink.StartMessage(SERVER_TRUE);
@@ -1030,7 +1030,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_SET_SCROLLBAR_INFO:
 		{
-			STRACE(("ServerApp %s: Set ScrollBar info\n", fSignature.String()));
+			STRACE(("ServerApp %s: Set ScrollBar info\n", Signature()));
 			// Attached Data:
 			// 1) scroll_bar_info scroll bar info structure
 			scroll_bar_info info;
@@ -1040,7 +1040,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_FOCUS_FOLLOWS_MOUSE:
 		{
-			STRACE(("ServerApp %s: query Focus Follow Mouse in use\n", fSignature.String()));
+			STRACE(("ServerApp %s: query Focus Follow Mouse in use\n", Signature()));
 
 			fLink.StartMessage(SERVER_TRUE);
 			fLink.Attach<bool>(gDesktop->FFMouseInUse());
@@ -1049,13 +1049,13 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_SET_FOCUS_FOLLOWS_MOUSE:
 		{
-			STRACE(("ServerApp %s: Set Focus Follows Mouse in use\n", fSignature.String()));
+			STRACE(("ServerApp %s: Set Focus Follows Mouse in use\n", Signature()));
 			// ToDo: implement me!
 			break;
 		}
 		case AS_SET_MOUSE_MODE:
 		{
-			STRACE(("ServerApp %s: Set Focus Follows Mouse mode\n", fSignature.String()));
+			STRACE(("ServerApp %s: Set Focus Follows Mouse mode\n", Signature()));
 			// Attached Data:
 			// 1) enum mode_mouse FFM mouse mode
 			mode_mouse mmode;
@@ -1065,7 +1065,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_GET_MOUSE_MODE:
 		{
-			STRACE(("ServerApp %s: Get Focus Follows Mouse mode\n", fSignature.String()));
+			STRACE(("ServerApp %s: Get Focus Follows Mouse mode\n", Signature()));
 			mode_mouse mmode = gDesktop->FFMouseMode();
 
 			fLink.StartMessage(SERVER_TRUE);
@@ -1106,7 +1106,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_GET_UI_COLOR:
 		{
-			STRACE(("ServerApp %s: Get UI color\n", fSignature.String()));
+			STRACE(("ServerApp %s: Get UI color\n", Signature()));
 
 			RGBColor color;
 			int32 whichColor;
@@ -1125,7 +1125,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_UPDATED_CLIENT_FONTLIST:
 		{
 			STRACE(("ServerApp %s: Acknowledged update of client-side font list\n",
-				fSignature.String()));
+				Signature()));
 
 			// received when the client-side global font list has been
 			// refreshed
@@ -1137,7 +1137,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_QUERY_FONTS_CHANGED:
 		{
 			FTRACE(("ServerApp %s: AS_QUERY_FONTS_CHANGED unimplemented\n",
-				fSignature.String()));
+				Signature()));
 			// Attached Data:
 			// 1) bool check flag
 
@@ -1150,7 +1150,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_GET_FAMILY_NAME:
 		{
-			FTRACE(("ServerApp %s: AS_GET_FAMILY_NAME\n", fSignature.String()));
+			FTRACE(("ServerApp %s: AS_GET_FAMILY_NAME\n", Signature()));
 			// Attached Data:
 			// 1) int32 the ID of the font family to get
 
@@ -1176,7 +1176,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_GET_STYLE_NAME:
 		{
-			FTRACE(("ServerApp %s: AS_GET_STYLE_NAME\n", fSignature.String()));
+			FTRACE(("ServerApp %s: AS_GET_STYLE_NAME\n", Signature()));
 			// Attached Data:
 			// 1) font_family The name of the font family
 			// 2) int32 ID of the style to get
@@ -1210,7 +1210,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_GET_FAMILY_AND_STYLE:
 		{
-			FTRACE(("ServerApp %s: AS_GET_FAMILY_AND_STYLE\n",fSignature.String()));
+			FTRACE(("ServerApp %s: AS_GET_FAMILY_AND_STYLE\n", Signature()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1244,7 +1244,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_GET_FONT_DIRECTION:
 		{
 			FTRACE(("ServerApp %s: AS_GET_FONT_DIRECTION unimplemented\n",
-				fSignature.String()));
+				Signature()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1281,7 +1281,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_GET_STRING_WIDTH:
 		{
-			FTRACE(("ServerApp %s: AS_GET_STRING_WIDTH\n", fSignature.String()));
+			FTRACE(("ServerApp %s: AS_GET_STRING_WIDTH\n", Signature()));
 			// Attached Data:
 			// 1) string String to measure
 			// 2) int32 string length to measure
@@ -1331,7 +1331,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_GET_FONT_BOUNDING_BOX:
 		{
 			FTRACE(("ServerApp %s: AS_GET_BOUNDING_BOX unimplemented\n",
-				fSignature.String()));
+				Signature()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1346,7 +1346,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_GET_TUNED_COUNT:
 		{
-			FTRACE(("ServerApp %s: AS_GET_TUNED_COUNT\n", fSignature.String()));
+			FTRACE(("ServerApp %s: AS_GET_TUNED_COUNT\n", Signature()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1372,7 +1372,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_GET_TUNED_INFO:
 		{
 			FTRACE(("ServerApp %s: AS_GET_TUNED_INFO unimplmemented\n",
-				fSignature.String()));
+				Signature()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1388,7 +1388,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_QUERY_FONT_FIXED:
 		{
 			FTRACE(("ServerApp %s: AS_QUERY_FONT_FIXED unimplmemented\n",
-				fSignature.String()));
+				Signature()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1413,7 +1413,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_SET_FAMILY_NAME:
 		{
-			FTRACE(("ServerApp %s: AS_SET_FAMILY_NAME\n", fSignature.String()));
+			FTRACE(("ServerApp %s: AS_SET_FAMILY_NAME\n", Signature()));
 			// Attached Data:
 			// 1) font_family - name of font family to use
 
@@ -1438,7 +1438,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_SET_FAMILY_AND_STYLE:
 		{
 			FTRACE(("ServerApp %s: AS_SET_FAMILY_AND_STYLE\n",
-				fSignature.String()));
+				Signature()));
 			// Attached Data:
 			// 1) font_family - name of font family to use
 			// 2) font_style - name of style in family
@@ -1468,7 +1468,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_SET_FAMILY_AND_STYLE_FROM_ID:
 		{
 			FTRACE(("ServerApp %s: AS_SET_FAMILY_AND_STYLE_FROM_ID\n",
-				fSignature.String()));
+				Signature()));
 			// Attached Data:
 			// 1) uint16 - ID of font family to use
 			// 2) uint16 - ID of style in family
@@ -1493,7 +1493,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_SET_FAMILY_AND_FACE:
 		{
 			FTRACE(("ServerApp %s: AS_SET_FAMILY_AND_FACE unimplmemented\n",
-				fSignature.String()));
+				Signature()));
 			// Attached Data:
 			// 1) font_family - name of font family to use
 			// 2) uint16 - font face
@@ -1510,7 +1510,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_COUNT_FONT_FAMILIES:
 		{
-			FTRACE(("ServerApp %s: AS_COUNT_FONT_FAMILIES\n", fSignature.String()));
+			FTRACE(("ServerApp %s: AS_COUNT_FONT_FAMILIES\n", Signature()));
 			// Returns:
 			// 1) int32 - # of font families
 
@@ -1525,7 +1525,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_COUNT_FONT_STYLES:
 		{
-			FTRACE(("ServerApp %s: AS_COUNT_FONT_STYLES\n", fSignature.String()));
+			FTRACE(("ServerApp %s: AS_COUNT_FONT_STYLES\n", Signature()));
 			// Attached Data:
 			// 1) font_family - name of font family
 
@@ -1548,7 +1548,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_SET_SYSFONT_PLAIN:
 		{
-			FTRACE(("ServerApp %s: AS_SET_SYSFONT_PLAIN\n", fSignature.String()));
+			FTRACE(("ServerApp %s: AS_SET_SYSFONT_PLAIN\n", Signature()));
 			// Returns:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1574,7 +1574,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_GET_FONT_HEIGHT:
 		{
-			FTRACE(("ServerApp %s: AS_GET_FONT_HEIGHT\n", fSignature.String()));
+			FTRACE(("ServerApp %s: AS_GET_FONT_HEIGHT\n", Signature()));
 			// Attached Data:
 			// 1) uint16 family ID
 			// 2) uint16 style ID
@@ -1599,7 +1599,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_SET_SYSFONT_BOLD:
 		{
-			FTRACE(("ServerApp %s: AS_SET_SYSFONT_BOLD\n", fSignature.String()));
+			FTRACE(("ServerApp %s: AS_SET_SYSFONT_BOLD\n", Signature()));
 			// Returns:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1625,7 +1625,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_SET_SYSFONT_FIXED:
 		{
-			FTRACE(("ServerApp %s: AS_SET_SYSFONT_FIXED\n", fSignature.String()));
+			FTRACE(("ServerApp %s: AS_SET_SYSFONT_FIXED\n", Signature()));
 			// Returns:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1651,7 +1651,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_GET_GLYPH_SHAPES:
 		{
-			FTRACE(("ServerApp %s: AS_GET_GLYPH_SHAPES\n", fSignature.String()));
+			FTRACE(("ServerApp %s: AS_GET_GLYPH_SHAPES\n", Signature()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1710,7 +1710,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_GET_ESCAPEMENTS:
 		{
-			FTRACE(("ServerApp %s: AS_GET_ESCAPEMENTS\n", fSignature.String()));
+			FTRACE(("ServerApp %s: AS_GET_ESCAPEMENTS\n", Signature()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1769,7 +1769,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_GET_ESCAPEMENTS_AS_FLOATS:
 		{
-			FTRACE(("ServerApp %s: AS_GET_ESCAPEMENTS_AS_FLOATS\n", fSignature.String()));
+			FTRACE(("ServerApp %s: AS_GET_ESCAPEMENTS_AS_FLOATS\n", Signature()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1838,7 +1838,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_SCREEN_GET_MODE:
 		{
-			STRACE(("ServerApp %s: AS_SCREEN_GET_MODE\n", fSignature.String()));
+			STRACE(("ServerApp %s: AS_SCREEN_GET_MODE\n", Signature()));
 			// Attached data
 			// 1) int32 port to reply to
 			// 2) screen_id
@@ -1865,7 +1865,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_SCREEN_SET_MODE:
 		{
-			STRACE(("ServerApp %s: AS_SCREEN_SET_MODE\n", fSignature.String()));
+			STRACE(("ServerApp %s: AS_SCREEN_SET_MODE\n", Signature()));
 			// Attached data
 			// 1) int32 port to reply to
 			// 2) screen_id
@@ -1899,7 +1899,7 @@ status_t ret = B_ERROR;
 
 		case AS_PROPOSE_MODE:
 		{
-			STRACE(("ServerApp %s: AS_PROPOSE_MODE\n", fSignature.String()));
+			STRACE(("ServerApp %s: AS_PROPOSE_MODE\n", Signature()));
 			screen_id id;
 			link.Read<screen_id>(&id);
 
@@ -1937,7 +1937,7 @@ status_t ret = B_ERROR;
 
 		case AS_SCREEN_GET_COLORMAP:
 		{
-			STRACE(("ServerApp %s: AS_SCREEN_GET_COLORMAP\n", fSignature.String()));
+			STRACE(("ServerApp %s: AS_SCREEN_GET_COLORMAP\n", Signature()));
 
 			screen_id id;
 			link.Read<screen_id>(&id);
@@ -1955,7 +1955,7 @@ status_t ret = B_ERROR;
 
 		case AS_GET_DESKTOP_COLOR:
 		{
-			STRACE(("ServerApp %s: get desktop color\n", fSignature.String()));
+			STRACE(("ServerApp %s: get desktop color\n", Signature()));
 
 			int32 workspaceIndex = 0;
 			link.Read<int32>(&workspaceIndex);
@@ -1983,7 +1983,7 @@ status_t ret = B_ERROR;
 		
 		case AS_GET_ACCELERANT_INFO:
 		{
-			STRACE(("ServerApp %s: get accelerant info\n", fSignature.String()));
+			STRACE(("ServerApp %s: get accelerant info\n", Signature()));
 			
 			// We aren't using the screen_id for now...
 			screen_id id;
@@ -2004,7 +2004,7 @@ status_t ret = B_ERROR;
 		
 		case AS_GET_RETRACE_SEMAPHORE:
 		{
-			STRACE(("ServerApp %s: get retrace semaphore\n", fSignature.String()));
+			STRACE(("ServerApp %s: get retrace semaphore\n", Signature()));
 			
 			// We aren't using the screen_id for now...
 			screen_id id;
@@ -2020,7 +2020,7 @@ status_t ret = B_ERROR;
 		
 		case AS_GET_TIMING_CONSTRAINTS:
 		{
-			STRACE(("ServerApp %s: get timing constraints\n", fSignature.String()));
+			STRACE(("ServerApp %s: get timing constraints\n", Signature()));
 			// We aren't using the screen_id for now...
 			screen_id id;
 			link.Read<screen_id>(&id);
@@ -2038,7 +2038,7 @@ status_t ret = B_ERROR;
 		
 		case AS_GET_PIXEL_CLOCK_LIMITS:
 		{
-			STRACE(("ServerApp %s: get pixel clock limits\n", fSignature.String()));
+			STRACE(("ServerApp %s: get pixel clock limits\n", Signature()));
 			// We aren't using the screen_id for now...
 			screen_id id;
 			link.Read<screen_id>(&id);
@@ -2060,7 +2060,7 @@ status_t ret = B_ERROR;
 		
 		case AS_SET_DPMS:
 		{
-			STRACE(("ServerApp %s: AS_SET_DPMS\n", fSignature.String()));
+			STRACE(("ServerApp %s: AS_SET_DPMS\n", Signature()));
 			screen_id id;
 			link.Read<screen_id>(&id);
 			
@@ -2079,7 +2079,7 @@ status_t ret = B_ERROR;
 		
 		case AS_GET_DPMS_STATE:
 		{
-			STRACE(("ServerApp %s: AS_GET_DPMS_STATE\n", fSignature.String()));
+			STRACE(("ServerApp %s: AS_GET_DPMS_STATE\n", Signature()));
 			
 			screen_id id;
 			link.Read<screen_id>(&id);
@@ -2094,7 +2094,7 @@ status_t ret = B_ERROR;
 				
 		case AS_GET_DPMS_CAPABILITIES:
 		{
-			STRACE(("ServerApp %s: AS_GET_DPMS_CAPABILITIES\n", fSignature.String()));
+			STRACE(("ServerApp %s: AS_GET_DPMS_CAPABILITIES\n", Signature()));
 			screen_id id;
 			link.Read<screen_id>(&id);
 			
@@ -2107,7 +2107,7 @@ status_t ret = B_ERROR;
 			
 		default:
 			printf("ServerApp %s received unhandled message code offset %s\n",
-				fSignature.String(), MsgCodeToBString(code).String());
+				Signature(), MsgCodeToBString(code).String());
 
 			if (link.NeedsReply()) {
 				// the client is now blocking and waiting for a reply!
