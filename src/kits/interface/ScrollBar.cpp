@@ -499,14 +499,12 @@ void
 BScrollBar::MouseDown(BPoint pt)
 {
 	if (!(fMin == 0 && fMax == 0)) { // if fEnabled
-	
 		// Hit test for thumb
 		if (fPrivateData->fThumbFrame.Contains(pt)) {
 			fPrivateData->fTracking = true;
 			fPrivateData->fMousePos = pt;
-			// TODO: empty event mask ? Is this okay ?
-			SetMouseEventMask(0, B_LOCK_WINDOW_FOCUS);
-			Draw(fPrivateData->fThumbFrame);
+			SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+			Invalidate(fPrivateData->fThumbFrame);
 			return;
 		}
 		
@@ -523,7 +521,7 @@ BScrollBar::MouseDown(BPoint pt)
 				returnval = ScrollByValue(scrollval);
 		
 				if (returnval == B_OK) {
-					Draw(buttonrect);
+					Invalidate(buttonrect);
 					ValueChanged(fValue);
 					
 					if (fPrivateData->fRepeaterThread == -1) {
@@ -546,7 +544,7 @@ BScrollBar::MouseDown(BPoint pt)
 				returnval = ScrollByValue(scrollval);
 
 				if (returnval == B_OK) {
-					Draw(buttonrect);
+					Invalidate(buttonrect);
 					ValueChanged(fValue);
 					
 					if (fPrivateData->fRepeaterThread == -1) {
@@ -568,7 +566,7 @@ BScrollBar::MouseDown(BPoint pt)
 					returnval = ScrollByValue(scrollval);
 			
 					if (returnval == B_OK) {
-						Draw(buttonrect);
+						Invalidate(buttonrect);
 						ValueChanged(fValue);
 						
 						if (fPrivateData->fRepeaterThread == -1) {
@@ -589,7 +587,7 @@ BScrollBar::MouseDown(BPoint pt)
 					returnval = ScrollByValue(scrollval);
 			
 					if (returnval == B_OK) {
-						Draw(buttonrect);
+						Invalidate(buttonrect);
 						ValueChanged(fValue);
 						
 						if (fPrivateData->fRepeaterThread == -1) {
@@ -618,7 +616,7 @@ BScrollBar::MouseDown(BPoint pt)
 				returnval = ScrollByValue(scrollval);
 		
 				if (returnval == B_OK) {
-					Draw(buttonrect);
+					Invalidate(buttonrect);
 					ValueChanged(fValue);
 					
 					if(fPrivateData->fRepeaterThread == -1) {
@@ -639,7 +637,7 @@ BScrollBar::MouseDown(BPoint pt)
 				returnval = ScrollByValue(scrollval);
 		
 				if (returnval == B_OK) {
-					Draw(buttonrect);
+					Invalidate(buttonrect);
 					ValueChanged(fValue);
 					
 					if(fPrivateData->fRepeaterThread == -1) {
@@ -661,7 +659,7 @@ BScrollBar::MouseDown(BPoint pt)
 					returnval = ScrollByValue(scrollval);
 					
 					if (returnval == B_OK) {
-						Draw(buttonrect);
+						Invalidate(buttonrect);
 						ValueChanged(fValue);
 						
 						if (fPrivateData->fRepeaterThread == -1) {
@@ -682,7 +680,7 @@ BScrollBar::MouseDown(BPoint pt)
 					returnval = ScrollByValue(scrollval);
 				
 					if (returnval == B_OK) {
-						Draw(buttonrect);
+						Invalidate(buttonrect);
 						ValueChanged(fValue);
 						
 						if(fPrivateData->fRepeaterThread == -1) {
@@ -709,7 +707,7 @@ BScrollBar::MouseDown(BPoint pt)
 
 		}
 		ValueChanged(fValue);
-		Draw(Bounds());
+		Invalidate(Bounds());
 	}
 }
 
@@ -728,20 +726,20 @@ BScrollBar::MouseUp(BPoint pt)
 	
 	if (fOrientation == B_VERTICAL) {
 		rect.bottom += B_H_SCROLL_BAR_HEIGHT + 1;
-		Draw(rect);
+		Invalidate(rect);
 		rect.OffsetTo(0, Bounds().Height() - ((B_H_SCROLL_BAR_HEIGHT * 2) + 1));
-		Draw(rect);
+		Invalidate(rect);
 	} else {
 		rect.bottom += B_V_SCROLL_BAR_WIDTH + 1;
-		Draw(rect);
+		Invalidate(rect);
 		rect.OffsetTo(0, Bounds().Height() - ((B_V_SCROLL_BAR_WIDTH * 2) + 1));
-		Draw(rect);
+		Invalidate(rect);
 	}
 	
 	if (fPrivateData->fTracking) {
 		fPrivateData->fTracking = false;
 		SetMouseEventMask(0, 0);
-		Draw(fPrivateData->fThumbFrame);
+		Invalidate(fPrivateData->fThumbFrame);
 	}
 }
 
@@ -957,7 +955,7 @@ void
 BScrollBar::DrawArrow(BPoint pos, int32 which, bool pressed)
 {
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
-			lighten2 = tint_color(no_tint, B_LIGHTEN_2_TINT),
+			lighten2 = { 255, 255, 255, 255 },
 			darken1 = tint_color(no_tint, B_DARKEN_1_TINT),
 			darken2 = tint_color(no_tint, B_DARKEN_2_TINT);
 
