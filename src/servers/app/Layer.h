@@ -94,6 +94,10 @@ class Layer {
 	
 			const char*			Name() const
 									{ return fName.String(); }
+	inline	uint32				Flags() const
+									{ return fFlags; }
+	inline	uint32				ResizeMode() const
+									{ return fResizeMode; }
 
 #ifndef NEW_CLIPPING
 	virtual	void				RebuildFullRegion();
@@ -188,7 +192,7 @@ class Layer {
 			void				SetAsTopLayer(bool option)
 									{ fIsTopLayer = option; }
 
-			bool				IsTopLayer() const
+	inline	bool				IsTopLayer() const
 									{ return fIsTopLayer; }
 
 			BRegion*			ClippingRegion() const
@@ -218,9 +222,9 @@ class Layer {
 
 	virtual	void				GetWantedRegion(BRegion& reg) const;
 
-	virtual	void				MovedByHook(float dx, float dy) { }
-	virtual	void				ResizedByHook(float dx, float dy, bool automatic) { }
-	virtual	void				ScrolledByHook(float dx, float dy) { }
+	virtual	void				MovedByHook(float dx, float dy);
+	virtual	void				ResizedByHook(float dx, float dy, bool automatic);
+	virtual	void				ScrolledByHook(float dx, float dy);
 
 			void				ConvertToParent2(BPoint* pt) const;
 			void				ConvertToParent2(BRect* rect) const;
