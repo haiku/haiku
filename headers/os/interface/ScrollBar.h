@@ -117,9 +117,9 @@ virtual	void		_ReservedScrollBar4();
 
 		void		InitObject(float min, float max, orientation o, BView *t);
 		
-		void		DrawButtons();
+		void		DrawButtons(BRect updateRect);
 		void		DrawArrow(BPoint pos, int32 which, bool pressed = false);
-		void		DrawButton(BRect frame, bool pressed = false); 
+		void		DrawButton(BRect frame, int32 arrowType, bool pressed = false); 
 		
 		bool		DoubleArrows() const;
 		

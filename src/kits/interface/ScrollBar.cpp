@@ -834,7 +834,7 @@ BScrollBar::Draw(BRect updateRect)
 
 	SetDrawingMode(B_OP_OVER);
 
-	DrawButtons();
+	DrawButtons(updateRect);
 	
 	SetDrawingMode(B_OP_COPY);
 
@@ -1137,7 +1137,7 @@ BScrollBar::DrawArrow(BPoint pos, int32 which, bool pressed)
 
 
 void
-BScrollBar::DrawButtons()
+BScrollBar::DrawButtons(BRect frame)
 {
 	const int8 &buttonDown = fPrivateData->fButtonDown;
 	
@@ -1149,24 +1149,21 @@ BScrollBar::DrawButtons()
 
 	if (fOrientation == B_HORIZONTAL) {
 		DrawButton(BRect(1.0f, 1.0f, 14.0f, bounds.bottom - 1.0f),
-			buttonDown == ARROW1);
+			B_LEFT_ARROW, buttonDown == ARROW1);
 
 		SetHighColor(darken2);
 		StrokeLine(BPoint(15.0f, 1.0f),
 			BPoint(15.0f, bounds.bottom - 1.0f));
 
-		DrawArrow(BPoint(3.0f, 3.0f), B_LEFT_ARROW);
-
 		// Second left button
 		if (DoubleArrows()) {
 			DrawButton(BRect(16.0f, 1.0f, 29.0f, bounds.bottom - 1.0f),
-				buttonDown == ARROW2);
+				B_RIGHT_ARROW, buttonDown == ARROW2);
 
 			SetHighColor(darken2);
 			StrokeLine(BPoint(30.0f, 1.0f),
 				BPoint(30.0f, bounds.bottom - 1.0f));
 
-			DrawArrow(BPoint(18.0f, 3.0f), B_RIGHT_ARROW);
 		}
 
 		// Second right button
@@ -1177,9 +1174,8 @@ BScrollBar::DrawButtons()
 
 			DrawButton(BRect(bounds.right - 29.0f, 1.0f,
 				bounds.right - 16.0f, bounds.bottom - 1.0f),
-				buttonDown == ARROW3);
+				B_LEFT_ARROW, buttonDown == ARROW3);
 
-			DrawArrow(BPoint(bounds.right - 27.0f, 3.0f), B_LEFT_ARROW);
 		}
 
 		// Right button
@@ -1189,33 +1185,25 @@ BScrollBar::DrawButtons()
 
 		DrawButton(BRect(bounds.right - 14.0f, 1.0f,
 			bounds.right - 1.0f, bounds.bottom - 1.0f),
-				buttonDown == ARROW4);
+				B_RIGHT_ARROW, buttonDown == ARROW4);
 
-		DrawArrow(BPoint(bounds.right - 12.0f, 3.0f), B_RIGHT_ARROW);
-	
 	} else if (fOrientation == B_VERTICAL) {
 		// Top button
 		DrawButton(BRect(1.0f, 1.0f, bounds.right - 1.0f, 14.0f),
-				buttonDown == ARROW1);
+				B_UP_ARROW, buttonDown == ARROW1);
 
 		SetHighColor(darken2);
 		StrokeLine(BPoint(1.0f, 15.0f),
 			BPoint(bounds.right - 1.0f, 15.0f));
 
-		DrawArrow(BPoint(3.0f, 3.0f), B_UP_ARROW,
-				buttonDown == ARROW1);
-
 		// Second top button
 		if (DoubleArrows()) {
 			DrawButton(BRect(1.0f, 16.0f, bounds.right - 1.0f, 29.0f),
-				buttonDown == ARROW2);
+				B_DOWN_ARROW, buttonDown == ARROW2);
 				
 			SetHighColor(darken2);
 			StrokeLine(BPoint(1.0f, 30.0f),
 				BPoint(bounds.right - 1.0f, 30.0f));
-
-			DrawArrow(BPoint(3.0f, 18.0f), B_DOWN_ARROW,
-				buttonDown == ARROW2);
 		}
 
 		// Second bottom button
@@ -1226,10 +1214,8 @@ BScrollBar::DrawButtons()
 
 			DrawButton(BRect(1.0f, bounds.bottom - 29.0f,
 				bounds.right - 1.0f, bounds.bottom - 16.0f),
-				buttonDown == ARROW3);
+				B_UP_ARROW, buttonDown == ARROW3);
 
-			DrawArrow(BPoint(3.0f, bounds.bottom - 27.0f), B_UP_ARROW,
-				buttonDown == ARROW3);
 		}
 
 		// bottom button
@@ -1239,16 +1225,13 @@ BScrollBar::DrawButtons()
 
 		DrawButton(BRect(1.0f, bounds.bottom - 14.0f,
 				bounds.right - 1.0f, bounds.bottom - 1.0f),
-				buttonDown == ARROW4);
-
-		DrawArrow(BPoint(3.0f, bounds.bottom - 12.0f), B_DOWN_ARROW,
-				buttonDown == ARROW4);
+				B_DOWN_ARROW, buttonDown == ARROW4);
 	}
 }
 
 
 void
-BScrollBar::DrawButton(BRect frame, bool pressed)
+BScrollBar::DrawButton(BRect frame, int32 arrowType, bool pressed)
 {
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
 		lighten2 = tint_color(no_tint, B_LIGHTEN_2_TINT),
@@ -1257,10 +1240,8 @@ BScrollBar::DrawButton(BRect frame, bool pressed)
 		darken2 = tint_color(no_tint, B_DARKEN_2_TINT);
 
 	if (fMax > 0) {
-		if (pressed) {
-			SetHighColor(128, 128, 128);
-			FillRect(frame);
-		}
+		SetHighColor(no_tint);
+		FillRect(frame);
 		
 		SetHighColor(lighten2);
 		StrokeLine(BPoint(frame.left, frame.bottom - 1.0f),
@@ -1285,6 +1266,18 @@ BScrollBar::DrawButton(BRect frame, bool pressed)
 		StrokeLine(BPoint(frame.right, frame.top + 1.0f),
 			BPoint(frame.right, frame.bottom));
 		StrokeLine(BPoint(frame.left + 1.0f, frame.bottom));
+	}
+	
+	BPoint arrowPoint = frame.LeftTop() + BPoint(2, 3);
+	DrawArrow(arrowPoint, arrowType, pressed);
+	
+	if (pressed) {
+		// TODO: This isn't cheap, but it'll do for now...
+		drawing_mode mode = DrawingMode();
+		SetDrawingMode(B_OP_ALPHA);
+		SetHighColor(128, 128, 128, 128);
+		FillRect(frame);
+		SetDrawingMode(mode);
 	}
 }
 
