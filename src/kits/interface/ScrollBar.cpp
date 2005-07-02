@@ -260,15 +260,11 @@ BScrollBar::AttachedToWindow()
 void
 BScrollBar::SetValue(float value)
 {
-	printf("%s\n", Orientation() == B_HORIZONTAL ? "horizontal" : "vertical");
-	printf("SetValue(%2f ->", value);
 	if (value > fMax)
 		value = fMax;
 	if (value < fMin)
 		value = fMin;
 	
-	printf("%2f)\n", value);
-	printf("Old value: %2f\n", fValue);
 	if (value != fValue) {
 		fValue = value;
 		ValueChanged(fValue);
@@ -300,7 +296,6 @@ BScrollBar::Proportion() const
 void
 BScrollBar::ValueChanged(float newValue)
 {
-	printf("ValueChanged(%2f)\n", newValue);
 	if (fTarget == NULL)
 		return;
 		
