@@ -1451,9 +1451,9 @@ BView::ScrollBy(float dh, float dv)
 
 	// then set the new values of the scrollbars
 	if (fHorScroller)
-		fHorScroller->SetValue(fBounds.top);
+		fHorScroller->SetValue(fBounds.left);
 	if (fVerScroller)		
-		fVerScroller->SetValue(fBounds.left);
+		fVerScroller->SetValue(fBounds.top);
 }
 
 
