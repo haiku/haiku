@@ -1523,20 +1523,23 @@ BMenu::Uninstall()
 void
 BMenu::SelectItem(BMenuItem *menuItem, uint32 showSubmenu, bool selectFirstItem)
 {
-	// TODO: make use of "selectFirstItem".
+	// TODO: make use of "selectFirstItem"
 	if (fSelected != NULL) {
 		fSelected->Select(false);
-		if (fSelected->Submenu() != NULL)
-			fSelected->Submenu()->_hide();
+		BMenu *subMenu = fSelected->Submenu();
+		if (subMenu != NULL && subMenu->Window() != NULL)
+			subMenu->_hide();
 	}
 	
 	if (menuItem != NULL)
 		menuItem->Select(true);
 		
 	fSelected = menuItem;
-	if (fSelected != NULL && showSubmenu == 0 && fSelected->Submenu() != NULL)
-		fSelected->Submenu()->_show();
-	
+	if (fSelected != NULL && showSubmenu == 0) {
+		BMenu *subMenu = fSelected->Submenu();
+		if (subMenu != NULL && subMenu->Window() == NULL)
+			subMenu->_show();
+	}
 }
 
 
