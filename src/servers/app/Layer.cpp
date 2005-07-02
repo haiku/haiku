@@ -1117,115 +1117,169 @@ Layer::Scale() const
 BPoint
 Layer::ConvertToParent(BPoint pt)
 {
+#ifndef NEW_CLIPPING
 	pt -= BoundsOrigin();
 	pt += fFrame.LeftTop();
 	return pt;
+#else
+	ConvertToParent2(&pt);
+	return pt;
+#endif
 }
 
 //! Converts the passed rectangle to parent coordinates
 BRect
 Layer::ConvertToParent(BRect rect)
 {
+#ifndef NEW_CLIPPING
 //	rect.OffsetBy(fFrame.LeftTop());
 //	return rect;
 	rect.OffsetBy(-BoundsOrigin().x, -BoundsOrigin().y);
 	rect.OffsetBy(fFrame.LeftTop());
 	return rect;
+#else
+	ConvertToParent2(&rect);
+	return rect;
+#endif
 }
 
 //! Converts the passed region to parent coordinates
 BRegion
 Layer::ConvertToParent(BRegion* reg)
 {
+#ifndef NEW_CLIPPING
 	// TODO: wouldn't it be more efficient to use the copy
 	// constructor for BRegion and then call OffsetBy()?
 	BRegion newreg;
 	for (int32 i = 0; i < reg->CountRects(); i++)
 		newreg.Include(ConvertToParent(reg->RectAt(i)));
 	return newreg;
+#else
+	BRegion newReg(*reg);
+	ConvertToParent2(&newReg);
+	return newReg;
+#endif
 }
 
 //! Converts the passed point from parent coordinates
 BPoint
 Layer::ConvertFromParent(BPoint pt)
 {
+#ifndef NEW_CLIPPING
 //	return pt - fFrame.LeftTop();
 	pt -= fFrame.LeftTop();
 	pt += BoundsOrigin();
 	return pt;
+#else
+	ConvertFromParent2(&pt);
+	return pt;
+#endif
 }
 
 //! Converts the passed rectangle from parent coordinates
 BRect
 Layer::ConvertFromParent(BRect rect)
 {
+#ifndef NEW_CLIPPING
 //	rect.OffsetBy(-fFrame.left, -fFrame.top);
 //	return rect;
 	rect.OffsetBy(-fFrame.left, -fFrame.top);
 	rect.OffsetBy(BoundsOrigin());
 	return rect;
+#else
+	ConvertFromParent2(&rect);
+	return rect;
+#endif
 }
 
 //! Converts the passed region from parent coordinates
 BRegion
 Layer::ConvertFromParent(BRegion *reg)
 {
+#ifndef NEW_CLIPPING
 	BRegion newreg;
 	for(int32 i=0; i<reg->CountRects();i++)
 		newreg.Include(ConvertFromParent(reg->RectAt(i)));
 	return newreg;
+#else
+	BRegion newReg(*reg);
+	ConvertFromParent2(&newReg);
+	return newReg;
+#endif
 }
 
 // ConvertToTop
 BPoint
 Layer::ConvertToTop(BPoint pt)
 {
+#ifndef NEW_CLIPPING
 	if (fParent) {
 //		return (fParent->ConvertToTop(pt + fFrame.LeftTop()));
 		pt = ConvertToParent(pt);
 		return fParent->ConvertToTop(pt);
 	} else
 		return pt;
+#else
+	ConvertToScreen2(&pt);
+	return pt;
+#endif
 }
 
 //! Converts the passed rectangle to screen coordinates
 BRect
 Layer::ConvertToTop(BRect rect)
 {
+#ifndef NEW_CLIPPING
 	if (fParent) {
 //		return fParent->ConvertToTop(rect.OffsetByCopy(fFrame.LeftTop()));
 		rect = ConvertToParent(rect);
 		return fParent->ConvertToTop(rect);
 	} else
 		return rect;
+#else
+	ConvertToScreen2(&rect);
+	return rect;
+#endif
 }
 
 //! Converts the passed region to screen coordinates
 BRegion
 Layer::ConvertToTop(BRegion *reg)
 {
+#ifndef NEW_CLIPPING
 	BRegion newreg;
 	for (int32 i = 0; i < reg->CountRects();i++)
 		newreg.Include(ConvertToTop(reg->RectAt(i)));
 	return newreg;
+#else
+	BRegion newReg(*reg);
+	ConvertToScreen2(&newReg);
+	return newReg;
+#endif
 }
 
 // ConvertFromTop
 BPoint
 Layer::ConvertFromTop(BPoint pt)
 {
+#ifndef NEW_CLIPPING
 	if (fParent) {
 //		return fParent->ConvertFromTop(pt-fFrame.LeftTop());
 		pt = ConvertFromParent(pt);
 		return fParent->ConvertFromTop(pt);
 	} else
 		return pt;
+#else
+	ConvertFromScreen2(&pt);
+	return pt;
+#endif
 }
 
 //! Converts the passed rectangle from screen coordinates
 BRect
 Layer::ConvertFromTop(BRect rect)
 {
+#ifndef NEW_CLIPPING
 	if (fParent) {
 //		return fParent->ConvertFromTop(rect.OffsetByCopy(-fFrame.LeftTop().x,
 //														 -fFrame.LeftTop().y));
@@ -1233,24 +1287,35 @@ Layer::ConvertFromTop(BRect rect)
 		return fParent->ConvertFromTop(rect);
 	} else
 		return rect;
+#else
+	ConvertFromScreen2(&rect);
+	return rect;
+#endif
 }
 
 //! Converts the passed region from screen coordinates
 BRegion
 Layer::ConvertFromTop(BRegion *reg)
 {
+#ifndef NEW_CLIPPING
 	BRegion newreg;
 	
 	for (int32 i = 0; i < reg->CountRects(); i++)
 		newreg.Include(ConvertFromTop(reg->RectAt(i)));
 	
 	return newreg;
+#else
+	BRegion newReg(*reg);
+	ConvertFromScreen2(&newReg);
+	return newReg;
+#endif
 }
 
 //! Recursively deletes all children of the calling layer
 void
 Layer::PruneTree(void)
 {
+
 	Layer* lay;
 	Layer* nextlay;
 	
@@ -1755,6 +1820,37 @@ Layer::do_CopyBits(BRect& src, BRect& dst, int32 xOffset, int32 yOffset) {
 }
 
 #ifdef NEW_CLIPPING
+
+void
+Layer::MovedByHook(float dx, float dy)
+{
+	if (Window() && Flags() & B_FRAME_EVENTS && !IsTopLayer()) {
+		BMessage msg(B_VIEW_MOVED);
+		msg.AddInt64("when", system_time());
+		msg.AddPoint("where", Frame().LeftTop());
+		Window()->SendMessageToClient(&msg, fViewToken, false);
+	}
+}
+
+void
+Layer::ResizedByHook(float dx, float dy, bool automatic)
+{
+	if (Window() && Flags() & B_FRAME_EVENTS && !IsTopLayer()) {
+		BMessage msg(B_VIEW_RESIZED);
+		msg.AddInt64("when", system_time());
+		msg.AddFloat("width", Frame().Width());
+		msg.AddFloat("height", Frame().Height());
+		msg.AddPoint("where", Frame().LeftTop());
+		Window()->SendMessageToClient(&msg, fViewToken, false);
+	}
+}
+
+void
+Layer::ScrolledByHook(float dx, float dy)
+{
+	// empty.
+}
+
 
 void
 Layer::GetWantedRegion(BRegion& reg) const
