@@ -100,7 +100,7 @@ public:
 		delete fScrollRunner;
 		fScrollRunner = NULL;
 	};
-	
+		
 	bool fEnabled;
 	
 	// TODO: This should be a static, initialized by 
@@ -536,9 +536,9 @@ BScrollBar::MouseDown(BPoint pt)
 				if (buttonrect.Contains(pt)) {
 					fPrivateData->fButtonDown = ARROW3;
 					fPrivateData->fArrowDown = B_RIGHT_ARROW;
-					SetValue(Value() + fSmallStep);
+					SetValue(Value() - fSmallStep);
 				
-					fPrivateData->StartMessageRunner(this, fSmallStep);
+					fPrivateData->StartMessageRunner(this, -fSmallStep);
 				
 					return;
 				}
@@ -597,18 +597,15 @@ BScrollBar::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 	if (!fPrivateData->fEnabled)
 		return;
 	
-	if (transit == B_EXITED_VIEW || transit == B_OUTSIDE_VIEW)
-		MouseUp(fPrivateData->fMousePos);
-
 	if (fPrivateData->fTracking) {
 		float delta;
 		if (fOrientation == B_VERTICAL) {
-			if( (pt.y > fPrivateData->fThumbFrame.bottom && fValue == fMax) || 
+			if ((pt.y > fPrivateData->fThumbFrame.bottom && fValue == fMax) || 
 				(pt.y < fPrivateData->fThumbFrame.top && fValue == fMin) )
 				return;
 			delta = pt.y - fPrivateData->fMousePos.y;
 		} else {
-			if((pt.x > fPrivateData->fThumbFrame.right && fValue == fMax) || 
+			if ((pt.x > fPrivateData->fThumbFrame.right && fValue == fMax) || 
 				(pt.x < fPrivateData->fThumbFrame.left && fValue == fMin))
 				return;
 			delta = pt.x - fPrivateData->fMousePos.x;
