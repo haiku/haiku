@@ -786,7 +786,11 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 	get_workspace_windows();
 
 	if (WorkspacesLayer() != NULL)
+#ifndef NEW_CLIPPING
 		GoRedraw(WorkspacesLayer(), WorkspacesLayer()->fVisible);
+#else
+		GoRedraw(WorkspacesLayer(), WorkspacesLayer()->VisibleRegion());
+#endif
 
 	// send the workspace changed message for the new workspace
 	{
@@ -1924,7 +1928,11 @@ RootLayer::show_winBorder(WinBorder *winBorder)
 		show_final_scene(exFocus, exActive);
 
 	if (WorkspacesLayer())
+#ifndef NEW_CLIPPING
 		GoRedraw(WorkspacesLayer(), fFullVisible);
+#else
+		GoRedraw(WorkspacesLayer(), FullVisible());
+#endif
 }
 
 
@@ -1957,7 +1965,11 @@ RootLayer::hide_winBorder(WinBorder *winBorder)
 		show_final_scene(exFocus, exActive);
 
 	if (WorkspacesLayer())
+#ifndef NEW_CLIPPING
 		GoRedraw(WorkspacesLayer(), fFullVisible);
+#else
+		GoRedraw(WorkspacesLayer(), FullVisible());
+#endif
 }
 
 

@@ -147,7 +147,11 @@ WorkspacesLayer::_DrawWorkspace(int32 index)
 
 	// draw windows
 
+#ifndef NEW_CLIPPING
 	BRegion backgroundRegion = fVisible;
+#else
+	BRegion backgroundRegion = VisibleRegion();
+#endif
 		// ToDo: would be nice to get the real update region here
 
 	if (workspace != NULL) {
@@ -173,7 +177,14 @@ WorkspacesLayer::_DrawWorkspace(int32 index)
 
 	fDriver->ConstrainClippingRegion(&backgroundRegion);
 	fDriver->FillRect(rect, color);
+
+	// TODO: ConstrainClippingRegion() should accept a const parameter !!
+#ifndef NEW_CLIPPING
 	fDriver->ConstrainClippingRegion(&fVisible);
+#else
+	BRegion cRegion(VisibleRegion());
+	fDriver->ConstrainClippingRegion(&cRegion);
+#endif
 }
 
 
