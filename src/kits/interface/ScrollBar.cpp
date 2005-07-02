@@ -25,7 +25,9 @@
 //	Description:	Client-side class for scrolling
 //
 //------------------------------------------------------------------------------
+#include <Debug.h>
 #include <Message.h>
+#include <MessageRunner.h>
 #include <OS.h>
 #include <ScrollBar.h>
 #include <Window.h>
@@ -58,12 +60,11 @@ public:
 	Private()
 		:
 		fEnabled(true),
-		fRepeaterThread(-1),
-		fExitRepeater(false),
 		fTracking(false),
 		fThumbInc(1),
 		fArrowDown(0),
-		fButtonDown(NOARROW)		
+		fButtonDown(NOARROW),
+		fScrollRunner(NULL)
 	{
 		fThumbFrame.Set(0, 0, B_V_SCROLL_BAR_WIDTH, B_H_SCROLL_BAR_HEIGHT);
 		fMousePos.Set(0,0);
@@ -80,14 +81,25 @@ public:
 	
 	~Private()
 	{
-		if (fRepeaterThread >= 0) {
-			status_t dummy;
-			fExitRepeater = true;
-			wait_for_thread(fRepeaterThread, &dummy);
-		}
+		StopMessageRunner();
 	}
 	
-	static int32 ButtonRepeaterThread(void *data);
+	status_t StartMessageRunner(BHandler *target, float value)
+	{
+		ASSERT(fMessageRunner == NULL);
+		
+		BMessage message(B_VALUE_CHANGED);
+		message.AddFloat("value", value);
+		fScrollRunner = new BMessageRunner(target, &message, 50000, -1);
+		
+		return fScrollRunner ? fScrollRunner->InitCheck() : B_NO_MEMORY;
+	};
+	
+	void StopMessageRunner()
+	{
+		delete fScrollRunner;
+		fScrollRunner = NULL;
+	};
 	
 	bool fEnabled;
 	
@@ -95,10 +107,7 @@ public:
 	// _init_interface_kit() at application startup-time,
 	// like BMenu::sMenuInfo
 	scroll_bar_info fScrollBarInfo;
-	
-	thread_id fRepeaterThread;
-	bool fExitRepeater;
-	
+		
 	BRect fThumbFrame;
 	bool fTracking;
 	BPoint fMousePos;
@@ -106,66 +115,9 @@ public:
 	
 	uint32 fArrowDown;
 	int8 fButtonDown;
+	
+	BMessageRunner *fScrollRunner;
 };
-
-
-// This thread is spawned when a button is initially pushed and repeatedly scrolls
-// the scrollbar by a little bit after a short delay
-int32
-BScrollBar::Private::ButtonRepeaterThread(void *data)
-{
-	BScrollBar *scrollBar = static_cast<BScrollBar *>(data);
-	BRect oldframe(scrollBar->fPrivateData->fThumbFrame);
-//	BRect update(sb->fPrivateData->fThumbFrame);
-
-	snooze(250000);
-
-	bool exitval = false;
-	status_t returnval;
-
-	scrollBar->Window()->Lock();
-	exitval = scrollBar->fPrivateData->fExitRepeater;
-	scrollBar->Window()->Unlock();
-
-	float scrollvalue = 0;
-
-	if (scrollBar->fPrivateData->fArrowDown == B_LEFT_ARROW
-		|| scrollBar->fPrivateData->fArrowDown == B_UP_ARROW)
-		scrollvalue = -scrollBar->fSmallStep;
-	else if (scrollBar->fPrivateData->fArrowDown != 0)
-		scrollvalue = scrollBar->fSmallStep;
-	else
-		exitval = true;
-	
-	while (!exitval) {
-		oldframe = scrollBar->fPrivateData->fThumbFrame;
-
-		scrollBar->Window()->Lock();
-		returnval = scrollBar->ScrollByValue(scrollvalue);
-		scrollBar->Window()->Unlock();
-
-		snooze(50000);
-
-		scrollBar->Window()->Lock();
-		exitval = scrollBar->fPrivateData->fExitRepeater;
-
-		if (returnval == B_OK) {
-			scrollBar->CopyBits(oldframe, scrollBar->fPrivateData->fThumbFrame);
-
-			// TODO: Redraw the old area here
-
-			scrollBar->ValueChanged(scrollBar->fValue);
-		}
-		scrollBar->Window()->Unlock();
-	}
-
-	scrollBar->Window()->Lock();
-	scrollBar->fPrivateData->fExitRepeater = false;
-	scrollBar->fPrivateData->fRepeaterThread = -1;
-	scrollBar->Window()->Unlock();
-	
-	return 0;
-}
 
 
 BScrollBar::BScrollBar(BRect frame,const char *name,BView *target,float min,
@@ -180,11 +132,10 @@ BScrollBar::BScrollBar(BRect frame,const char *name,BView *target,float min,
 	fTarget(NULL),
 	fOrientation(direction)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
 	fPrivateData = new BScrollBar::Private;
 
 	SetTarget(target);
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
 	if (direction == B_VERTICAL) {
 		if (frame.Width() > B_V_SCROLL_BAR_WIDTH)
@@ -247,12 +198,16 @@ BScrollBar::BScrollBar(BMessage *archive)
 	if (archive->FindFloat("_prop", &proportion) == B_OK)
 		SetProportion(proportion);
 
+	fPrivateData = new BScrollBar::Private;
+	
 	// TODO: SetTarget?
 }
 
 
 BScrollBar::~BScrollBar()
 {
+	fPrivateData->StopMessageRunner();
+	
 	if (fTarget) {
 		if (Orientation() == B_VERTICAL)
 			fTarget->fVerScroller = NULL;
@@ -305,16 +260,19 @@ BScrollBar::AttachedToWindow()
 void
 BScrollBar::SetValue(float value)
 {
-	if(value > fMax)
+	printf("%s\n", Orientation() == B_HORIZONTAL ? "horizontal" : "vertical");
+	printf("SetValue(%2f ->", value);
+	if (value > fMax)
 		value = fMax;
-	if(value < fMin)
+	if (value < fMin)
 		value = fMin;
 	
-	fValue = value;
-	if (Window())
-		Invalidate();
-	
-	ValueChanged(fValue);
+	printf("%2f)\n", value);
+	printf("Old value: %2f\n", fValue);
+	if (value != fValue) {
+		fValue = value;
+		ValueChanged(fValue);
+	}
 }
 
 
@@ -342,37 +300,24 @@ BScrollBar::Proportion() const
 void
 BScrollBar::ValueChanged(float newValue)
 {
-	// TODO: Implement
-/*
-	From the BeBook:
+	printf("ValueChanged(%2f)\n", newValue);
+	if (fTarget == NULL)
+		return;
+		
+	BPoint point = fTarget->Bounds().LeftTop();
+	if (fOrientation == B_HORIZONTAL)
+		point.x = newValue;
+	else
+		point.y = newValue;
 	
-Responds to a notification that the value of the scroll bar has changed to 
-newValue. For a horizontal scroll bar, this function interprets newValue 
-as the coordinate value that should be at the left side of the target 
-view's bounds rectangle. For a vertical scroll bar, it interprets 
-newValue as the coordinate value that should be at the top of the rectangle. 
-It calls ScrollTo() to scroll the target's contents into position, unless 
-they have already been scrolled. 
-
-ValueChanged() is called as the result both of user actions 
-(B_VALUE_CHANGED messages received from the Application Server) and of 
-programmatic ones. Programmatically, scrolling can be initiated by the 
-target view (calling ScrollTo()) or by the BScrollBar 
-(calling SetValue() or SetRange()). 
-
-In all these cases, the target view and the scroll bars need to be kept 
-in synch. This is done by a chain of function calls: ValueChanged() calls 
-ScrollTo(), which in turn calls SetValue(), which then calls 
-ValueChanged() again. It's up to ValueChanged() to get off this 
-merry-go-round, which it does by checking the target view's bounds 
-rectangle. If newValue already matches the left or top side of the 
-bounds rectangle, if forgoes calling ScrollTo(). 
-
-ValueChanged() does nothing if a target BView hasn't been set—or 
-if the target has been set by name, but the name doesn't correspond to 
-an actual BView within the scroll bar's window. 
-
-*/
+	BPoint pointDiff = point - fTarget->Bounds().LeftTop();
+				
+	if (point != fTarget->Bounds().LeftTop()) {
+		fTarget->ScrollTo(point);
+		fPrivateData->fThumbFrame.OffsetBy(pointDiff);
+		if (Window())
+			Invalidate();
+	}
 }
 
 
@@ -387,10 +332,6 @@ BScrollBar::SetRange(float min, float max)
 	else if (fValue < fMin)
 		fValue = fMin;
 	
-	Invalidate();
-	
-	// Just a sort-of hack for now. ValueChanged is called, but with
-	// what value??
 	ValueChanged(fValue);
 }
 
@@ -483,9 +424,9 @@ BScrollBar::MessageReceived(BMessage *msg)
 	switch(msg->what) {
 		case B_VALUE_CHANGED:
 		{
-			int32 value;
-			if (msg->FindInt32("value", &value) == B_OK)
-				ValueChanged(value);
+			float value;
+			if (msg->FindFloat("value", &value) == B_OK)
+				SetValue(Value() + value);
 			break;
 		}
 		default:
@@ -509,28 +450,15 @@ BScrollBar::MouseDown(BPoint pt)
 		}
 		
 		BRect buttonrect(0, 0, B_V_SCROLL_BAR_WIDTH, B_H_SCROLL_BAR_HEIGHT);
-		float scrollval = 0;
-		status_t returnval = B_ERROR;
 		
 		// Hit test for arrow buttons
 		if (fOrientation == B_VERTICAL) {
 			if (buttonrect.Contains(pt)) {
-				scrollval = -fSmallStep;
 				fPrivateData->fArrowDown = B_UP_ARROW;
 				fPrivateData->fButtonDown = ARROW1;
-				returnval = ScrollByValue(scrollval);
-		
-				if (returnval == B_OK) {
-					Invalidate(buttonrect);
-					ValueChanged(fValue);
-					
-					if (fPrivateData->fRepeaterThread == -1) {
-						fPrivateData->fExitRepeater = false;
-						fPrivateData->fRepeaterThread = spawn_thread(fPrivateData->ButtonRepeaterThread,
-							"scroll repeater", B_NORMAL_PRIORITY, this);
-						resume_thread(fPrivateData->fRepeaterThread);
-					}
-				}
+				SetValue(Value() - fSmallStep);
+				
+				fPrivateData->StartMessageRunner(this, -fSmallStep);
 				
 				return;
 
@@ -538,65 +466,32 @@ BScrollBar::MouseDown(BPoint pt)
 
 			buttonrect.OffsetTo(0, Bounds().Height() - (B_H_SCROLL_BAR_HEIGHT));
 			if (buttonrect.Contains(pt)) {
-				scrollval = fSmallStep;
 				fPrivateData->fArrowDown = B_DOWN_ARROW;
 				fPrivateData->fButtonDown = ARROW4;
-				returnval = ScrollByValue(scrollval);
-
-				if (returnval == B_OK) {
-					Invalidate(buttonrect);
-					ValueChanged(fValue);
-					
-					if (fPrivateData->fRepeaterThread == -1) {
-						fPrivateData->fExitRepeater = false;
-						fPrivateData->fRepeaterThread = spawn_thread(fPrivateData->ButtonRepeaterThread,
-							"scroll repeater", B_NORMAL_PRIORITY, this);
-						resume_thread(fPrivateData->fRepeaterThread);
-					}
-				}
+				SetValue(Value() + fSmallStep);
+				fPrivateData->StartMessageRunner(this, fSmallStep);
 				return;
 			}
 
 			if (fPrivateData->fScrollBarInfo.double_arrows) {
 				buttonrect.OffsetTo(0, B_H_SCROLL_BAR_HEIGHT + 1);
 				if (buttonrect.Contains(pt)) {
-					scrollval = fSmallStep;
 					fPrivateData->fArrowDown = B_DOWN_ARROW;
 					fPrivateData->fButtonDown = ARROW2;
-					returnval = ScrollByValue(scrollval);
-			
-					if (returnval == B_OK) {
-						Invalidate(buttonrect);
-						ValueChanged(fValue);
-						
-						if (fPrivateData->fRepeaterThread == -1) {
-							fPrivateData->fExitRepeater = false;
-							fPrivateData->fRepeaterThread = spawn_thread(fPrivateData->ButtonRepeaterThread,
-								"scroll repeater", B_NORMAL_PRIORITY, this);
-							resume_thread(fPrivateData->fRepeaterThread);
-						}
-					}
+					SetValue(Value() + fSmallStep);
+					
+					fPrivateData->StartMessageRunner(this, fSmallStep);
+				
 					return;
 				}
 
 				buttonrect.OffsetTo(0, Bounds().Height() - ((B_H_SCROLL_BAR_HEIGHT * 2) + 1));
 				if (buttonrect.Contains(pt)) {
-					scrollval = -fSmallStep;
 					fPrivateData->fArrowDown = B_UP_ARROW;
 					fPrivateData->fButtonDown = ARROW3;
-					returnval = ScrollByValue(scrollval);
-			
-					if (returnval == B_OK) {
-						Invalidate(buttonrect);
-						ValueChanged(fValue);
-						
-						if (fPrivateData->fRepeaterThread == -1) {
-							fPrivateData->fExitRepeater = false;
-							fPrivateData->fRepeaterThread = spawn_thread(fPrivateData->ButtonRepeaterThread,
-								"scroll repeater", B_NORMAL_PRIORITY, this);
-							resume_thread(fPrivateData->fRepeaterThread);
-						}
-					}
+					SetValue(Value() - fSmallStep);
+					fPrivateData->StartMessageRunner(this, -fSmallStep);
+				
 					return;
 	
 				}
@@ -605,91 +500,51 @@ BScrollBar::MouseDown(BPoint pt)
 			// TODO: add a repeater thread for large stepping and a call to it
 
 			if (pt.y < fPrivateData->fThumbFrame.top)
-				ScrollByValue(-fLargeStep);  // do we not check the return value in these two cases like everywhere else?
+				SetValue(Value() -fLargeStep);
 			else
-				ScrollByValue(fLargeStep);
+				SetValue(Value() + fLargeStep);
 		} else {
 			if (buttonrect.Contains(pt)) {
-				scrollval = -fSmallStep;
 				fPrivateData->fArrowDown = B_LEFT_ARROW;
 				fPrivateData->fButtonDown = ARROW1;
-				returnval = ScrollByValue(scrollval);
-		
-				if (returnval == B_OK) {
-					Invalidate(buttonrect);
-					ValueChanged(fValue);
-					
-					if(fPrivateData->fRepeaterThread == -1) {
-						fPrivateData->fExitRepeater = false;
-						fPrivateData->fRepeaterThread = spawn_thread(fPrivateData->ButtonRepeaterThread,
-							"scroll repeater", B_NORMAL_PRIORITY, this);
-						resume_thread(fPrivateData->fRepeaterThread);
-					}
-				}
+				SetValue(Value() - fSmallStep);
+				
+				fPrivateData->StartMessageRunner(this, -fSmallStep);
+				
 				return;
 			}
 			
 			buttonrect.OffsetTo(Bounds().Width() - (B_V_SCROLL_BAR_WIDTH), 0);
 			if (buttonrect.Contains(pt)) {
-				scrollval = fSmallStep;
 				fPrivateData->fArrowDown = B_RIGHT_ARROW;
 				fPrivateData->fButtonDown = ARROW4;
-				returnval = ScrollByValue(scrollval);
-		
-				if (returnval == B_OK) {
-					Invalidate(buttonrect);
-					ValueChanged(fValue);
-					
-					if(fPrivateData->fRepeaterThread == -1) {
-						fPrivateData->fExitRepeater = false;
-						fPrivateData->fRepeaterThread = spawn_thread(fPrivateData->ButtonRepeaterThread,
-							"scroll repeater", B_NORMAL_PRIORITY,this);
-						resume_thread(fPrivateData->fRepeaterThread);
-					}
-				}
+				SetValue(Value() + fSmallStep);
+				
+				fPrivateData->StartMessageRunner(this, fSmallStep);
+				
 				return;
 			}
 			
 			if (fPrivateData->fScrollBarInfo.proportional) {
 				buttonrect.OffsetTo(B_V_SCROLL_BAR_WIDTH + 1, 0);
 				if (buttonrect.Contains(pt)) {
-					scrollval = fSmallStep;
 					fPrivateData->fButtonDown = ARROW2;
 					fPrivateData->fArrowDown = B_LEFT_ARROW;
-					returnval = ScrollByValue(scrollval);
+					SetValue(Value() + fSmallStep);
 					
-					if (returnval == B_OK) {
-						Invalidate(buttonrect);
-						ValueChanged(fValue);
-						
-						if (fPrivateData->fRepeaterThread == -1) {
-							fPrivateData->fExitRepeater = false;
-							fPrivateData->fRepeaterThread = spawn_thread(fPrivateData->ButtonRepeaterThread,
-								"scroll repeater", B_NORMAL_PRIORITY, this);
-							resume_thread(fPrivateData->fRepeaterThread);
-						}
-					}
+					fPrivateData->StartMessageRunner(this, fSmallStep);
+				
 					return;
 				}
 				
 				buttonrect.OffsetTo(Bounds().Width() - ( (B_V_SCROLL_BAR_WIDTH * 2) + 1), 0);
 				if (buttonrect.Contains(pt)) {
-					scrollval = -fSmallStep;
 					fPrivateData->fButtonDown = ARROW3;
 					fPrivateData->fArrowDown = B_RIGHT_ARROW;
-					returnval = ScrollByValue(scrollval);
+					SetValue(Value() + fSmallStep);
 				
-					if (returnval == B_OK) {
-						Invalidate(buttonrect);
-						ValueChanged(fValue);
-						
-						if(fPrivateData->fRepeaterThread == -1) {
-							fPrivateData->fExitRepeater = false;
-							fPrivateData->fRepeaterThread = spawn_thread(fPrivateData->ButtonRepeaterThread,
-								"scroll repeater", B_NORMAL_PRIORITY, this);
-							resume_thread(fPrivateData->fRepeaterThread);
-						}
-					}
+					fPrivateData->StartMessageRunner(this, fSmallStep);
+				
 					return;
 				}
 			}
@@ -701,13 +556,10 @@ BScrollBar::MouseDown(BPoint pt)
 
 
 			if (pt.x < fPrivateData->fThumbFrame.left)
-				ScrollByValue(-fLargeStep);  // do we not check the return value in these two cases like everywhere else?
+				SetValue(Value() - fLargeStep);
 			else
-				ScrollByValue(fLargeStep);
-
+				SetValue(Value() + fLargeStep);
 		}
-		ValueChanged(fValue);
-		Invalidate(Bounds());
 	}
 }
 
@@ -715,9 +567,10 @@ BScrollBar::MouseDown(BPoint pt)
 void
 BScrollBar::MouseUp(BPoint pt)
 {
+	fPrivateData->StopMessageRunner();
+				
 	fPrivateData->fArrowDown = 0;
 	fPrivateData->fButtonDown = NOARROW;
-	fPrivateData->fExitRepeater = true;
 	
 	// We'll be lazy here and just draw all the possible arrow regions for now...
 	// TODO: optimize
@@ -738,7 +591,6 @@ BScrollBar::MouseUp(BPoint pt)
 	
 	if (fPrivateData->fTracking) {
 		fPrivateData->fTracking = false;
-		SetMouseEventMask(0, 0);
 		Invalidate(fPrivateData->fThumbFrame);
 	}
 }
@@ -766,9 +618,7 @@ BScrollBar::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 				return;
 			delta = pt.x - fPrivateData->fMousePos.x;
 		}
-		ScrollByValue(delta);  // do we not check the return value here?
-		ValueChanged(fValue);
-		Invalidate(Bounds());
+		SetValue(Value() + delta);
 		fPrivateData->fMousePos = pt;
 	}
 }
@@ -1292,66 +1142,6 @@ BScrollBar::DoubleArrows() const
 		return Bounds().Height() > 16 * 4 + fPrivateData->fScrollBarInfo.min_knob_size * 2;
 }
 
-/*
-	ScrollByValue: increment or decrement scrollbar's value by a certain amount.
-	
-	Returns B_OK if everthing went well and the caller is to redraw the scrollbar,
-			B_ERROR if the caller doesn't need to do anything, or
-			B_BAD_VALUE if data is NULL.
-*/
-status_t
-BScrollBar::ScrollByValue(float value)
-{
-	if (value == 0)
-		return B_ERROR;
-	
-	if (fOrientation == B_VERTICAL) {
-		if (value < 0) {
-			if (fValue + value >= fMin) {
-				fValue += value;
-				if (fTarget) 
-					fTarget->ScrollBy(0, value);
-				fPrivateData->fThumbFrame.OffsetBy(0, value);
-				fValue--;
-				return B_OK;
-			}
-			// fall through to return B_ERROR	
-		} else {
-			if (fValue + value <= fMax) {
-				fValue += value;
-				if (fTarget)
-					fTarget->ScrollBy(0, value);
-				fPrivateData->fThumbFrame.OffsetBy(0, value);
-				fValue++;
-				return B_OK;
-			}
-			// fall through to return B_ERROR
-		}
-	} else {
-		if (value < 0) {
-			if (fValue + value >= fMin) {
-				fValue += value;
-				if (fTarget)
-					fTarget->ScrollBy(value, 0);
-				fPrivateData->fThumbFrame.OffsetBy(value, 0);
-				fValue--;
-				return B_OK;
-			}
-			// fall through to return B_ERROR
-		} else {
-			if (fValue + value <= fMax) {
-				fValue += value;
-				if (fTarget)
-					fTarget->ScrollBy(value, 0);
-				fPrivateData->fThumbFrame.OffsetBy(value, 0);
-				fValue++;
-				return B_OK;
-			}
-			// fall through to return B_ERROR
-		}
-	}
-	return B_ERROR;
-}
 
 /*
 	This cheat function will allow the scrollbar prefs app to act like R5's and
