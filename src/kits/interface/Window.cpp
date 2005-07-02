@@ -864,56 +864,41 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			}
 			break;
 		}
-/*		case B_VIEW_MOVED:
+/*
+		case B_VIEW_MOVED:
 		{
-			// NOTE: This message only arrives if the
-			// view has flags B_FRAME_EVENTS
 			BPoint			where;
-			int32			token = B_NULL_TOKEN;
-			BView			*view;
-			
+
 			msg->FindPoint("where", &where);
-			msg->FindInt32("_token", &token);
-			msg->RemoveName("_token");
 				
-			view			= findView(top_view, token);
-			if (view)
+			// TODO: should we use dynamic_cast? isn't that a bit expensive?
+			if (target && target != this)
 			{
-				STRACE(("Calling BView(%s)::FrameMoved( %f, %f )\n", view->Name(), where.x, where.y));
-				view->FrameMoved( where );
+				STRACE(("Calling BView(%s)::FrameMoved( %f, %f )\n", target->Name(), where.x, where.y));
+				((BView*)target)->FrameMoved( where );
 			}
-			else
-				printf("***PANIC: BW: Can't find view with ID: %ld !***\n", token);
 			
 			break;
 		}	
 		case B_VIEW_RESIZED:
 		{
-			// NOTE: This message only arrives if the
-			// view has flags B_FRAME_EVENTS
 			float			newWidth,
 							newHeight;
 			BPoint			where;
-			int32			token = B_NULL_TOKEN;
-			BView			*view;
 	
 			msg->FindFloat("width", &newWidth);
 			msg->FindFloat("height", &newHeight);
 			msg->FindPoint("where", &where);
-			msg->FindInt32("_token", &token);
-			msg->RemoveName("_token");
-				
-			view			= findView(top_view, token);
-			if (view){
-				STRACE(("Calling BView(%s)::FrameResized( %f, %f )\n", view->Name(), newWidth, newHeight));
-				view->FrameResized( newWidth, newHeight );
+
+			// TODO: should we use dynamic_cast? isn't that a bit expensive?				
+			if (target && target != this){
+				STRACE(("Calling BView(%s)::FrameResized( %f, %f )\n", target->Name(), newWidth, newHeight));
+				((BView*)target)->FrameResized( newWidth, newHeight );
 			}
-			else
-				printf("***PANIC: BW: Can't find view with ID: %ld !***\n", token);
+
 			break;
 		}
 */
-
 		case _MENUS_DONE_:
 			MenusEnded();
 			break;
