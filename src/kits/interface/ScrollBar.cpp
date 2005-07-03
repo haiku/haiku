@@ -658,7 +658,7 @@ BScrollBar::Draw(BRect updateRect)
 	if (fPrivateData->fEnabled) {
 		light = tint_color(panelColor, B_LIGHTEN_MAX_TINT);
 		dark = tint_color(panelColor, B_DARKEN_3_TINT);
-		normal = panelColor;
+		normal = tint_color(panelColor, B_DARKEN_1_TINT);
 	} else {
 		light = tint_color(panelColor, B_LIGHTEN_MAX_TINT);
 		dark = tint_color(panelColor, B_DARKEN_3_TINT);
@@ -679,12 +679,11 @@ BScrollBar::Draw(BRect updateRect)
 	SetDrawingMode(B_OP_COPY);
 
 	// Draw scroll thumb
-	
 	if (fPrivateData->fEnabled) {
 		BRect rect(fPrivateData->fThumbFrame);
 	
 		SetHighColor(dark);
-		StrokeRect(fPrivateData->fThumbFrame);
+		StrokeRect(rect);
 	
 		rect.InsetBy(1,1);
 		SetHighColor(tint_color(panelColor, B_DARKEN_2_TINT));
@@ -697,9 +696,9 @@ BScrollBar::Draw(BRect updateRect)
 	
 		rect.InsetBy(1,1);
 		if (fPrivateData->fTracking)
-			SetHighColor(tint_color(normal, B_DARKEN_1_TINT));
-		else
 			SetHighColor(normal);
+		else
+			SetHighColor(panelColor);
 		
 		FillRect(rect);
 	}
@@ -731,6 +730,7 @@ BScrollBar::ResolveSpecifier(BMessage *msg,int32 index,
 void
 BScrollBar::ResizeToPreferred()
 {
+	BView::ResizeToPreferred();
 }
 
 
