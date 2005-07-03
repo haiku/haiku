@@ -222,11 +222,11 @@ BApplication::~BApplication()
 	BPrivate::AppServerLink link;
 	link.StartMessage(B_QUIT_REQUESTED);
 	link.Flush();
-#endif	// RUN_WITHOUT_APP_SERVER
 
 	delete_port(fServerLink->SenderPort());
 	delete_port(fServerLink->ReceiverPort());
 	delete fServerLink;
+#endif	// RUN_WITHOUT_APP_SERVER
 
 	// uninitialize be_app, the be_app_messenger is invalidated automatically
 	be_app = NULL;

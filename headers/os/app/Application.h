@@ -92,10 +92,11 @@ public:
 // Private or reserved ---------------------------------------------------------
 	virtual status_t		Perform(perform_code d, void* arg);
 
+	class Private;
+
 private:
 	typedef BLooper _inherited;
 
-	class Private;
 	friend class Private;
 
 	friend class BServer;
