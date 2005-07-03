@@ -45,10 +45,13 @@ enum {
 	B_REG_SUCCESS							= 'rgsu',
 	B_REG_ERROR								= 'rger',
 	B_REG_RESULT							= 'rgrz',
+
 	// general requests
 	B_REG_GET_MIME_MESSENGER				= 'rgmm',
 	B_REG_GET_CLIPBOARD_MESSENGER			= 'rgcm',
 	B_REG_GET_DISK_DEVICE_MESSENGER			= 'rgdm',
+	B_REG_SHUT_DOWN							= 'rgsh',
+
 	// roster requests
 	B_REG_ADD_APP							= 'rgaa',
 	B_REG_COMPLETE_REGISTRATION				= 'rgcr',
@@ -74,6 +77,7 @@ enum {
 	B_REG_CLEAR_RECENT_APPS					= 'rgxa',
 	B_REG_LOAD_RECENT_LISTS					= 'rglr',
 	B_REG_SAVE_RECENT_LISTS					= 'rgsr',
+
 	// MIME requests
 	B_REG_MIME_SET_PARAM					= 'rgsp',
 	B_REG_MIME_DELETE_PARAM					= 'rgdp',
@@ -89,14 +93,18 @@ enum {
 	B_REG_MIME_UPDATE_MIME_INFO				= 'rgup',
 	B_REG_MIME_CREATE_APP_META_MIME			= 'rgca',
 	B_REG_MIME_UPDATE_THREAD_FINISHED		= 'rgtf',
+
 	// message runner requests
 	B_REG_REGISTER_MESSAGE_RUNNER			= 'rgrr',
 	B_REG_UNREGISTER_MESSAGE_RUNNER			= 'rgru',
 	B_REG_SET_MESSAGE_RUNNER_PARAMS			= 'rgrx',
 	B_REG_GET_MESSAGE_RUNNER_INFO			= 'rgri',
+
 	// internal registrar messages
 	B_REG_ROSTER_SANITY_EVENT				= 'rgir',
+	B_REG_SHUTDOWN_FINISHED					= 'rgsf',
 	B_REG_ROSTER_DEVICE_RESCAN				= 'rgrs',
+
 	// clipboard handler requests
 	B_REG_ADD_CLIPBOARD						= 'rgCa',
 	B_REG_GET_CLIPBOARD_COUNT				= 'rgCc',
@@ -104,6 +112,7 @@ enum {
 	B_REG_CLIPBOARD_STOP_WATCHING			= 'rgCx',
 	B_REG_DOWNLOAD_CLIPBOARD				= 'rgCd',
 	B_REG_UPLOAD_CLIPBOARD					= 'rgCu',
+
 	// disk device request
 	B_REG_NEXT_DISK_DEVICE					= 'rgnx',
 	B_REG_GET_DISK_DEVICE					= 'rgdd',

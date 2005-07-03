@@ -41,8 +41,7 @@ const char *kRAppLooperPortName	= "rAppLooperPort";
 const char *
 get_roster_port_name()
 {
-	return (BPrivate::is_running_on_haiku()
-		? "_roster_port_" : "_obos_roster_port_");
+	return "_haiku_roster_port_";
 }
 
 }	// namespace BPrivate

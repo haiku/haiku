@@ -62,6 +62,20 @@ reply fields:
 
 -----------------------------------------------------------------------
 
+shut down
+
+target:		registrar app looper (preferred handler)
+message:	B_REG_SHUT_DOWN
+			"reboot": B_BOOL_TYPE
+reply:		standard success
+on error:	- B_NO_REPLY (fatal)
+			- standard error (fatal)
+
+message fields:
+- "reboot": If true, the system reboots instead of turning the power off.
+
+-----------------------------------------------------------------------
+
 
 Roster Requests
 ---------------

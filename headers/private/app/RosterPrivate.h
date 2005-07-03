@@ -20,6 +20,9 @@ public:
 	status_t SendTo(BMessage *message, BMessage *reply, bool mime);
 	bool IsMessengerValid(bool mime) const;
 
+	status_t ShutDown(bool reboot)
+		{ return fRoster->ShutDown(reboot); }
+
 	// needed by BApplication
 
 	status_t AddApplication(const char *mimeSig, const entry_ref *ref,

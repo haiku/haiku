@@ -1266,6 +1266,42 @@ BRoster::AddToRecentFolders(const entry_ref *folder, const char *appSig) const
 
 /*----- Private or reserved ------------------------------*/
 
+// ShutDown
+/*!	\brief Shuts down the system.
+
+	When the method succeeds, it doesn't return.
+
+	\param reboot If \c true, the system will be rebooted instead of being
+		   powered off.
+	\return
+	- \c B_SHUTTING_DOWN, when there's already a shutdown process in
+	  progress,
+	- \c B_SHUTDOWN_CANCELLED, when the user cancelled the shutdown process,
+	- another error code in case something went wrong.
+*/
+status_t
+BRoster::ShutDown(bool reboot)
+{
+	status_t error = B_OK;
+
+	// compose the request message
+	BMessage request(B_REG_SHUT_DOWN);
+	if (error == B_OK)
+		error = request.AddBool("reboot", reboot);
+
+	// send the request
+	BMessage reply;
+	if (error == B_OK)
+		error = fMess.SendMessage(&request, &reply);
+
+	// evaluate the reply
+	if (error == B_OK && reply.what != B_REG_SUCCESS)
+		reply.FindInt32("error", &error);
+
+	return error;
+}
+
+
 // AddApplication
 /*!	\brief (Pre-)Registers an application with the registrar.
 
