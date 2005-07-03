@@ -85,7 +85,7 @@ public:
 	
 	status_t StartMessageRunner(BHandler *target, float value)
 	{
-		ASSERT(fMessageRunner == NULL);
+		ASSERT(fScrollRunner == NULL);
 		
 		BMessage message(B_VALUE_CHANGED);
 		message.AddFloat("value", value);
