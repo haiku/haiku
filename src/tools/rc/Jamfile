@@ -7,14 +7,14 @@ SubDirC++Flags -Wno-sign-compare -Wno-unused ;
 StaticLibrary rdef :
 	compile.cpp decompile.cpp lexer.l parser.y rdef.cpp ;
 
-BinCommand rc :
+BuildPlatformMain rc :
 	rc.cpp
 
 	# these two are needed for R5 only
 	strlcpy.c
 	strlcat.c
-	: librdef.a libstdc++.r4.so libbe.so
-	;
+;
+LinkSharedOSLibs rc : librdef.a $(BUILD_LIBSTDC++) be ;
 
 SEARCH on [ FGristFiles
 		strlcat.c strlcpy.c

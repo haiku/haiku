@@ -92,7 +92,7 @@ else
 fi
 
 # paths of helper commands
-rc=$sourceDir/distro/${arch}.R1/beos/bin/rc
+rc=$sourceDir/objects/${arch}.R1/tools/rc/rc
 resattr=$sourceDir/objects/${arch}.R1/tools/resattr/resattr
 fsShellCommand=$sourceDir/objects/${arch}.R1/tests/add-ons/kernel/file_systems/fs_shell/fs_shell_command
 bfsShell=$sourceDir/objects/${arch}.R1/tests/add-ons/kernel/file_systems/bfs/bfs_shell/bfs_shell
