@@ -66,7 +66,6 @@ public:
 		fButtonDown(NOARROW),
 		fScrollRunner(NULL)
 	{
-		fThumbFrame.Set(0, 0, B_V_SCROLL_BAR_WIDTH, B_H_SCROLL_BAR_HEIGHT);
 		fMousePos.Set(0,0);
 		
 		//#ifdef TEST_MODE
@@ -108,7 +107,6 @@ public:
 	// like BMenu::sMenuInfo
 	scroll_bar_info fScrollBarInfo;
 		
-	BRect fThumbFrame;
 	bool fTracking;
 	BPoint fMousePos;
 	float fThumbInc;
@@ -141,22 +139,11 @@ BScrollBar::BScrollBar(BRect frame,const char *name,BView *target,float min,
 		if (frame.Width() > B_V_SCROLL_BAR_WIDTH)
 			ResizeTo(B_V_SCROLL_BAR_WIDTH, frame.Height() + 1);
 
-		fPrivateData->fThumbFrame.bottom = fPrivateData->fScrollBarInfo.min_knob_size;
-		if (fPrivateData->fScrollBarInfo.double_arrows)
-			fPrivateData->fThumbFrame.OffsetBy(0, (B_H_SCROLL_BAR_HEIGHT + 1) * 2);
-		else
-			fPrivateData->fThumbFrame.OffsetBy(0, B_H_SCROLL_BAR_HEIGHT + 1);
 	} else {
 		if (frame.Height() > B_H_SCROLL_BAR_HEIGHT)
 			ResizeTo(frame.Width() + 1, B_H_SCROLL_BAR_HEIGHT);
 
-		fPrivateData->fThumbFrame.right = fPrivateData->fScrollBarInfo.min_knob_size;
-		if (fPrivateData->fScrollBarInfo.double_arrows)
-			fPrivateData->fThumbFrame.OffsetBy((B_V_SCROLL_BAR_WIDTH + 1) * 2, 0);
-		else
-			fPrivateData->fThumbFrame.OffsetBy(B_V_SCROLL_BAR_WIDTH + 1, 0);
 	}
-	
 	
 	SetResizingMode((direction == B_VERTICAL) ?
 		B_FOLLOW_TOP_BOTTOM | B_FOLLOW_RIGHT : 
@@ -283,6 +270,7 @@ void
 BScrollBar::SetProportion(float value)
 {
 	fProportion = value;
+	Invalidate();
 }
 
 
@@ -304,12 +292,9 @@ BScrollBar::ValueChanged(float newValue)
 		point.x = newValue;
 	else
 		point.y = newValue;
-	
-	BPoint pointDiff = point - fTarget->Bounds().LeftTop();
 				
 	if (point != fTarget->Bounds().LeftTop()) {
 		fTarget->ScrollTo(point);
-		fPrivateData->fThumbFrame.OffsetBy(pointDiff);
 		if (Window())
 			Invalidate();
 	}
@@ -434,13 +419,15 @@ BScrollBar::MessageReceived(BMessage *msg)
 void
 BScrollBar::MouseDown(BPoint pt)
 {
+	BRect thumbFrame = KnobFrame();
+		
 	if (!(fMin == 0 && fMax == 0)) { // if fEnabled
 		// Hit test for thumb
-		if (fPrivateData->fThumbFrame.Contains(pt)) {
+		if (thumbFrame.Contains(pt)) {
 			fPrivateData->fTracking = true;
 			fPrivateData->fMousePos = pt;
 			SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
-			Invalidate(fPrivateData->fThumbFrame);
+			Invalidate(thumbFrame);
 			return;
 		}
 		
@@ -494,8 +481,8 @@ BScrollBar::MouseDown(BPoint pt)
 			
 			// TODO: add a repeater thread for large stepping and a call to it
 
-			if (pt.y < fPrivateData->fThumbFrame.top)
-				SetValue(Value() -fLargeStep);
+			if (pt.y < thumbFrame.top)
+				SetValue(Value() - fLargeStep);
 			else
 				SetValue(Value() + fLargeStep);
 		} else {
@@ -550,7 +537,7 @@ BScrollBar::MouseDown(BPoint pt)
 			// TODO: add a repeater thread for large stepping and a call to it
 
 
-			if (pt.x < fPrivateData->fThumbFrame.left)
+			if (pt.x < thumbFrame.left)
 				SetValue(Value() - fLargeStep);
 			else
 				SetValue(Value() + fLargeStep);
@@ -586,7 +573,7 @@ BScrollBar::MouseUp(BPoint pt)
 	
 	if (fPrivateData->fTracking) {
 		fPrivateData->fTracking = false;
-		Invalidate(fPrivateData->fThumbFrame);
+		Invalidate(KnobFrame());
 	}
 }
 
@@ -598,15 +585,16 @@ BScrollBar::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 		return;
 	
 	if (fPrivateData->fTracking) {
+		BRect thumbFrame = KnobFrame();
 		float delta;
 		if (fOrientation == B_VERTICAL) {
-			if ((pt.y > fPrivateData->fThumbFrame.bottom && fValue == fMax) || 
-				(pt.y < fPrivateData->fThumbFrame.top && fValue == fMin) )
+			if ((pt.y > thumbFrame.bottom && fValue == fMax) || 
+				(pt.y < thumbFrame.top && fValue == fMin) )
 				return;
 			delta = pt.y - fPrivateData->fMousePos.y;
 		} else {
-			if ((pt.x > fPrivateData->fThumbFrame.right && fValue == fMax) || 
-				(pt.x < fPrivateData->fThumbFrame.left && fValue == fMin))
+			if ((pt.x > thumbFrame.right && fValue == fMax) || 
+				(pt.x < thumbFrame.left && fValue == fMin))
 				return;
 			delta = pt.x - fPrivateData->fMousePos.x;
 		}
@@ -629,13 +617,11 @@ BScrollBar::DoScroll(float delta)
 	else
 		scrollval = (fValue - delta >= fMin) ? delta : (fValue - fMin);
 
-	if (fOrientation == B_VERTICAL) {
+	if (fOrientation == B_VERTICAL)
 		fTarget->ScrollBy(0, scrollval);
-		fPrivateData->fThumbFrame.OffsetBy(0, scrollval);
-	} else {
+	else
 		fTarget->ScrollBy(scrollval, 0);
-		fPrivateData->fThumbFrame.OffsetBy(scrollval, 0);
-	}
+	
 	
 	fValue += scrollval;
 }
@@ -667,7 +653,7 @@ BScrollBar::Draw(BRect updateRect)
 	
 	// Draw main area
 	SetHighColor(normal);
-	FillRect(updateRect);
+	FillRect(updateRect & BarFrame());
 	
 	SetHighColor(dark);
 	StrokeRect(Bounds());
@@ -680,8 +666,7 @@ BScrollBar::Draw(BRect updateRect)
 
 	// Draw scroll thumb
 	if (fPrivateData->fEnabled) {
-		BRect rect(fPrivateData->fThumbFrame);
-	
+		BRect rect(KnobFrame());
 		SetHighColor(dark);
 		StrokeRect(rect);
 	
@@ -1135,6 +1120,66 @@ BScrollBar::DoubleArrows() const
 }
 
 
+BRect
+BScrollBar::BarFrame() const
+{
+	BRect rect(Bounds());
+
+	if (fOrientation == B_HORIZONTAL) {
+		float modifier = B_V_SCROLL_BAR_WIDTH + 1;
+		if (DoubleArrows())
+			modifier *= 2;
+		
+		rect.left += modifier;
+		rect.right -= modifier;
+	
+	} else if (fOrientation == B_VERTICAL) {
+		float modifier = B_H_SCROLL_BAR_HEIGHT + 1;
+		if (DoubleArrows())
+			modifier *= 2;
+			
+		rect.top += modifier;
+		rect.bottom -= modifier;
+		
+	}
+
+	return rect;
+}
+
+
+BRect
+BScrollBar::KnobFrame() const
+{
+	BRect barFrame(BarFrame());
+	BRect rect(barFrame);
+
+	if (fOrientation == B_HORIZONTAL) {
+		rect.left += ValueToPosition(fValue);
+		rect.right = rect.left + fPrivateData->fScrollBarInfo.min_knob_size;
+	
+	} else if (fOrientation == B_VERTICAL) {
+		rect.top += ValueToPosition(fValue);
+		rect.bottom = rect.top + fPrivateData->fScrollBarInfo.min_knob_size;
+	}
+	
+	return rect;
+}
+
+
+float
+BScrollBar::ValueToPosition(float val) const
+{
+	return ceil(val - fMin);
+}
+
+
+float
+BScrollBar::PositionToValue(float pos) const
+{
+	return pos;
+}
+
+
 /*
 	This cheat function will allow the scrollbar prefs app to act like R5's and
 	perform other stuff without mucking around with the virtual tables.
@@ -1154,12 +1199,7 @@ control_scrollbar(scroll_bar_info *info, BScrollBar *bar)
 	if (bar->fPrivateData->fScrollBarInfo.double_arrows != info->double_arrows) {
 		bar->fPrivateData->fScrollBarInfo.double_arrows = info->double_arrows;
 		
-		int8 multiplier = (info->double_arrows) ? 1 : -1;
-		
-		if (bar->fOrientation == B_VERTICAL)
-			bar->fPrivateData->fThumbFrame.OffsetBy(0, multiplier * B_H_SCROLL_BAR_HEIGHT);
-		else
-			bar->fPrivateData->fThumbFrame.OffsetBy(multiplier * B_V_SCROLL_BAR_WIDTH, 0);
+		//int8 multiplier = (info->double_arrows) ? 1 : -1;
 	}
 
 	bar->fPrivateData->fScrollBarInfo.proportional = info->proportional;

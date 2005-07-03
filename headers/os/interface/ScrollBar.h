@@ -123,8 +123,11 @@ virtual	void		_ReservedScrollBar4();
 		
 		bool		DoubleArrows() const;
 		
-		status_t	ScrollByValue(float value);
-
+		BRect		BarFrame() const;
+		BRect		KnobFrame() const;
+		float		ValueToPosition(float val) const;
+		float 		PositionToValue(float pos) const;
+		
 		float		fMin;
 		float		fMax;
 		float		fSmallStep;
