@@ -488,7 +488,7 @@ AboutView::Pulse(void)
 	
 	if (fScrollRunner == NULL && (system_time() > fLastActionTime + 10000000)) {
 		BMessage message(SCROLL_CREDITS_VIEW);
-		fScrollRunner = new BMessageRunner(this, &message, 300000, -1);
+		//fScrollRunner = new BMessageRunner(this, &message, 300000, -1);
 	}
 }
 
