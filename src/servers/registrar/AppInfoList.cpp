@@ -56,8 +56,7 @@ AppInfoList::AppInfoList()
 AppInfoList::~AppInfoList()
 {
 	// delete all infos
-	for (int32 i = 0; RosterAppInfo *info = InfoAt(i); i++)
-		delete info;
+	MakeEmpty(true);
 }
 
 // AddInfo
@@ -90,8 +89,13 @@ AppInfoList::RemoveInfo(RosterAppInfo *info)
 /*!	\brief Removes all RosterAppInfos from the list.
 */
 void
-AppInfoList::MakeEmpty()
+AppInfoList::MakeEmpty(bool deleteInfos)
 {
+	if (deleteInfos) {
+		for (int32 i = 0; RosterAppInfo *info = InfoAt(i); i++)
+			delete info;
+	}
+
 	fInfos.MakeEmpty();
 }
 

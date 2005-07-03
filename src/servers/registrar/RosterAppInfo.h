@@ -46,6 +46,8 @@ struct RosterAppInfo : app_info {
 	RosterAppInfo();
 	void Init(thread_id thread, team_id team, port_id port, uint32 flags,
 			  const entry_ref *ref, const char *signature);
+
+	RosterAppInfo *Clone() const;
 };
 
 #endif	// ROSTER_APP_INFO_H

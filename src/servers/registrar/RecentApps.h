@@ -36,9 +36,7 @@
 #include <stdio.h>
 #include <string>
 
-namespace BPrivate {
-	class TRoster;
-}
+class TRoster;
 
 struct entry_ref;
 
@@ -56,7 +54,7 @@ public:
 	
 	static const int32 kQualifyingAppFlags = 0;
 private:
-	friend class BPrivate::TRoster;
+	friend class TRoster;
 		// For loading from disk
 
 	static status_t GetRefForApp(const char *appSig, entry_ref *result);	

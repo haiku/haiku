@@ -186,8 +186,10 @@ class MessagingService::DefaultSendCommandHandler
 			+ sizeof(messaging_command_send_message)
 			+ sizeof(messaging_target) * sendData->target_count;
 
+		DefaultMessagingTargetSet set(sendData->targets,
+			sendData->target_count);
 		MessageDeliverer::Default()->DeliverMessage(messageData,
-			sendData->message_size, sendData->targets, sendData->target_count);
+			sendData->message_size, set);
 	}
 };
 

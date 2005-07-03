@@ -11,6 +11,51 @@
 
 struct messaging_target;
 
+// MessagingTargetSet
+class MessagingTargetSet {
+public:
+	virtual ~MessagingTargetSet();
+
+	virtual bool HasNext() const = 0;
+	virtual bool Next(port_id &port, int32 &token) = 0;
+	virtual void Rewind() = 0;
+};
+
+// DefaultMessagingTargetSet
+class DefaultMessagingTargetSet : public MessagingTargetSet {
+public:
+	DefaultMessagingTargetSet(const messaging_target *targets,
+		int32 targetCount);
+	virtual ~DefaultMessagingTargetSet();
+
+	virtual bool HasNext() const;
+	virtual bool Next(port_id &port, int32 &token);
+	virtual void Rewind();
+
+private:
+	const messaging_target	*fTargets;
+	int32					fTargetCount;
+	int32					fNextIndex;
+};
+
+// SingleMessagingTargetSet
+class SingleMessagingTargetSet : public MessagingTargetSet {
+public:
+	SingleMessagingTargetSet(BMessenger target);
+	SingleMessagingTargetSet(port_id port, int32 token);
+	virtual ~SingleMessagingTargetSet();
+
+	virtual bool HasNext() const;
+	virtual bool Next(port_id &port, int32 &token);
+	virtual void Rewind();
+
+private:
+	port_id				fPort;
+	int32				fToken;
+	bool				fAtBeginning;
+};
+
+// MessageDeliverer
 class MessageDeliverer {
 private:
 	MessageDeliverer();
@@ -25,19 +70,10 @@ public:
 
 	status_t DeliverMessage(BMessage *message, BMessenger target,
 		bigtime_t timeout = B_INFINITE_TIMEOUT);
-	status_t DeliverMessage(BMessage *message, port_id port, int32 token,
+	status_t DeliverMessage(BMessage *message, MessagingTargetSet &targets,
 		bigtime_t timeout = B_INFINITE_TIMEOUT);
 	status_t DeliverMessage(const void *message, int32 messageSize,
-		BMessenger target, bigtime_t timeout = B_INFINITE_TIMEOUT);
-	status_t DeliverMessage(const void *message, int32 messageSize,
-		port_id port, int32 token, bigtime_t timeout = B_INFINITE_TIMEOUT);
-
-	status_t DeliverMessage(BMessage *message, const BMessenger *targets,
-		int32 targetCount,
-		bigtime_t timeout = B_INFINITE_TIMEOUT);
-	status_t DeliverMessage(const void *message, int32 messageSize,
-		const messaging_target *targets, int32 targetCount,
-		bigtime_t timeout = B_INFINITE_TIMEOUT);
+		MessagingTargetSet &targets, bigtime_t timeout = B_INFINITE_TIMEOUT);
 
 private:
 	class Message;

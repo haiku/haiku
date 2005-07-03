@@ -31,6 +31,123 @@ static const bigtime_t	kRetryDelay			= 100000;			// 100 ms
 static const int32		kMaxMessagesPerPort	= 10000;
 static const int32		kMaxDataPerPort		= 50 * 1024 * 1024;	// 50 MB
 
+
+// MessagingTargetSet
+
+// destructor
+MessagingTargetSet::~MessagingTargetSet()
+{
+}
+
+
+// #pragma mark -
+
+// DefaultMessagingTargetSet
+
+// constructor
+DefaultMessagingTargetSet::DefaultMessagingTargetSet(
+		const messaging_target *targets, int32 targetCount)
+	: MessagingTargetSet(),
+	  fTargets(targets),
+	  fTargetCount(targetCount),
+	  fNextIndex(0)
+{
+}
+
+// destructor
+DefaultMessagingTargetSet::~DefaultMessagingTargetSet()
+{
+}
+
+// HasNext
+bool
+DefaultMessagingTargetSet::HasNext() const
+{
+	return (fNextIndex < fTargetCount);
+}
+
+// Next
+bool
+DefaultMessagingTargetSet::Next(port_id &port, int32 &token)
+{
+	if (fNextIndex >= fTargetCount)
+		return false;
+
+	port = fTargets[fNextIndex].port;
+	token = fTargets[fNextIndex].token;
+	fNextIndex++;
+
+	return true;
+}
+
+// Rewind
+void
+DefaultMessagingTargetSet::Rewind()
+{
+	fNextIndex = 0;
+}
+
+
+// #pragma mark -
+
+// SingleMessagingTargetSet
+
+// constructor
+SingleMessagingTargetSet::SingleMessagingTargetSet(BMessenger target)
+	: MessagingTargetSet(),
+	  fAtBeginning(true)
+{
+	BMessenger::Private messengerPrivate(target);
+	fPort = messengerPrivate.Port();
+	fToken = (messengerPrivate.IsPreferredTarget()
+		? B_PREFERRED_TOKEN : messengerPrivate.Token());
+}
+
+// constructor
+SingleMessagingTargetSet::SingleMessagingTargetSet(port_id port, int32 token)
+	: MessagingTargetSet(),
+	  fPort(port),
+	  fToken(token),
+	  fAtBeginning(true)
+{
+}
+
+// destructor
+SingleMessagingTargetSet::~SingleMessagingTargetSet()
+{
+}
+
+// HasNext
+bool
+SingleMessagingTargetSet::HasNext() const
+{
+	return fAtBeginning;
+}
+
+// Next
+bool
+SingleMessagingTargetSet::Next(port_id &port, int32 &token)
+{
+	if (!fAtBeginning)
+		return false;
+
+	port = fPort;
+	token = fToken;
+	fAtBeginning = false;
+
+	return true;
+}
+
+// Rewind
+void
+SingleMessagingTargetSet::Rewind()
+{
+	fAtBeginning = true;
+}
+
+
+// #pragma mark -
+
 // Message
 /*!	\brief Encapsulates a message to be delivered.
 
@@ -457,109 +574,8 @@ status_t
 MessageDeliverer::DeliverMessage(BMessage *message, BMessenger target,
 	bigtime_t timeout)
 {
-	BMessenger::Private messengerPrivate(target);
-	return DeliverMessage(message, messengerPrivate.Port(),
-		messengerPrivate.IsPreferredTarget()
-			? B_PREFERRED_TOKEN : messengerPrivate.Token(),
-		timeout);
-}
-
-// DeliverMessage
-/*!	\brief Delivers a message to the supplied target.
-
-	The method tries to send the message right now (if there are not already
-	messages pending for the target port). If that fails due to a full target
-	port, the message is queued for later delivery.
-
-	\param message The message to be delivered.
-	\param port The port the message shall be sent to.
-	\param token The token identifying the target BHandler.
-	\param timeout If given, the message will be dropped, when it couldn't be
-		   delivered after this amount of microseconds.
-	\return
-	- \c B_OK, if sending the message succeeded or if the target port was
-	  full and the message has been queued,
-	- another error code otherwise.		
-*/
-status_t
-MessageDeliverer::DeliverMessage(BMessage *message, port_id port, int32 token,
-	bigtime_t timeout)
-{
-	if (!message)
-		return B_BAD_VALUE;
-
-	// Set the token now, so that the header contains room for it.
-	// It will be set when sending the message anyway, but if it is not set
-	// before flattening, the header will not contain room for it, and it
-	// will not possible to send the message flattened later.
-	BMessage::Private(message).SetTarget(token, (token < 0));
-
-	// flatten the message
-	BMallocIO mallocIO;
-	status_t error = message->Flatten(&mallocIO);
-	if (error != B_OK)
-		return error;
-
-	return DeliverMessage(mallocIO.Buffer(), mallocIO.BufferLength(), port,
-		token, timeout);
-}
-
-// DeliverMessage
-/*!	\brief Delivers a flattened message to the supplied target.
-
-	The method tries to send the message right now (if there are not already
-	messages pending for the target port). If that fails due to a full target
-	port, the message is queued for later delivery.
-
-	\param message The flattened message to be delivered. This may be a
-		   flattened BMessage or KMessage.
-	\param messageSize The size of the flattened message buffer.
-	\param target A BMessenger identifying the delivery target.
-	\param timeout If given, the message will be dropped, when it couldn't be
-		   delivered after this amount of microseconds.
-	\return
-	- \c B_OK, if sending the message succeeded or if the target port was
-	  full and the message has been queued,
-	- another error code otherwise.		
-*/
-status_t
-MessageDeliverer::DeliverMessage(const void *message, int32 messageSize,
-	BMessenger target, bigtime_t timeout)
-{
-	BMessenger::Private messengerPrivate(target);
-	return DeliverMessage(message, messageSize, messengerPrivate.Port(),
-		messengerPrivate.IsPreferredTarget()
-			? B_PREFERRED_TOKEN : messengerPrivate.Token(),
-		timeout);
-}
-
-// DeliverMessage
-/*!	\brief Delivers a flattened message to the supplied target.
-
-	The method tries to send the message right now (if there are not already
-	messages pending for the target port). If that fails due to a full target
-	port, the message is queued for later delivery.
-
-	\param message The flattened message to be delivered. This may be a
-		   flattened BMessage or KMessage.
-	\param messageSize The size of the flattened message buffer.
-	\param port The port the message shall be sent to.
-	\param token The token identifying the target BHandler.
-	\param timeout If given, the message will be dropped, when it couldn't be
-		   delivered after this amount of microseconds.
-	\return
-	- \c B_OK, if sending the message succeeded or if the target port was
-	  full and the message has been queued,
-	- another error code otherwise.		
-*/
-status_t
-MessageDeliverer::DeliverMessage(const void *message, int32 messageSize,
-	port_id port, int32 token, bigtime_t timeout)
-{
-	messaging_target target;
-	target.port = port;
-	target.token = token;
-	return DeliverMessage(message, messageSize, &target, 1, timeout);
+	SingleMessagingTargetSet set(target);
+	return DeliverMessage(message, set, timeout);
 }
 
 // DeliverMessage
@@ -570,8 +586,7 @@ MessageDeliverer::DeliverMessage(const void *message, int32 messageSize,
 	fails due to a full target port, the message is queued for later delivery.
 
 	\param message The message to be delivered.
-	\param targets An array of BMessengers identifying the delivery targets.
-	\param targetCount The number of delivery targets.
+	\param targets MessagingTargetSet providing the the delivery targets.
 	\param timeout If given, the message will be dropped, when it couldn't be
 		   delivered after this amount of microseconds.
 	\return
@@ -580,29 +595,13 @@ MessageDeliverer::DeliverMessage(const void *message, int32 messageSize,
 	- another error code otherwise.		
 */
 status_t
-MessageDeliverer::DeliverMessage(BMessage *message, const BMessenger *targets,
-	int32 targetCount, bigtime_t timeout)
+MessageDeliverer::DeliverMessage(BMessage *message, MessagingTargetSet &targets,
+	bigtime_t timeout)
 {
-	if (!message || targetCount < 0 || !targets)
+	if (!message)
 		return B_BAD_VALUE;
 
-	// convert the reply targets
-	messaging_target *messagingTargets
-		= new(nothrow) messaging_target[targetCount];
-	if (!messagingTargets)
-		return B_NO_MEMORY;
-	ArrayDeleter<messaging_target> _(messagingTargets);
-
-	for (int i = 0; i < targetCount; i++) {
-		BMessenger messenger(targets[i]);
-		BMessenger::Private messengerPrivate(messenger);
-		messaging_target &target = messagingTargets[i];
-		target.port = messengerPrivate.Port();
-		target.token = messengerPrivate.IsPreferredTarget()
-			? B_PREFERRED_TOKEN : messengerPrivate.Token();
-	}
-	
-	// Set a dummy token now, so that the header contains room for it.
+	// Set the token now, so that the header contains room for it.
 	// It will be set when sending the message anyway, but if it is not set
 	// before flattening, the header will not contain room for it, and it
 	// will not possible to send the message flattened later.
@@ -614,8 +613,8 @@ MessageDeliverer::DeliverMessage(BMessage *message, const BMessenger *targets,
 	if (error != B_OK)
 		return error;
 
-	return DeliverMessage(mallocIO.Buffer(), mallocIO.BufferLength(),
-		messagingTargets, targetCount, timeout);
+	return DeliverMessage(mallocIO.Buffer(), mallocIO.BufferLength(), targets,
+		timeout);
 }
 
 // DeliverMessage
@@ -628,9 +627,7 @@ MessageDeliverer::DeliverMessage(BMessage *message, const BMessenger *targets,
 	\param message The flattened message to be delivered. This may be a
 		   flattened BMessage or KMessage.
 	\param messageSize The size of the flattened message buffer.
-	\param targets An array of messaging_targets identifying the delivery
-		   targets.
-	\param targetCount The number of delivery targets.
+	\param targets MessagingTargetSet providing the the delivery targets.
 	\param timeout If given, the message will be dropped, when it couldn't be
 		   delivered after this amount of microseconds.
 	\return
@@ -640,7 +637,7 @@ MessageDeliverer::DeliverMessage(BMessage *message, const BMessenger *targets,
 */
 status_t
 MessageDeliverer::DeliverMessage(const void *messageData, int32 messageSize,
-	const messaging_target *targets, int32 targetCount, bigtime_t timeout)
+	MessagingTargetSet &targets, bigtime_t timeout)
 {
 	if (!messageData || messageSize <= 0)
 		return B_BAD_VALUE;
@@ -661,16 +658,19 @@ MessageDeliverer::DeliverMessage(const void *messageData, int32 messageSize,
 
 	// add the message to the respective target ports
 	BAutolock locker(fLock);
-	for (int32 i = 0; i < targetCount; i++) {
+	for (int32 targetIndex = 0; targets.HasNext(); targetIndex++) {
+		port_id portID;
+		int32 token;
+		targets.Next(portID, token);
+
 		// get the target port
-		TargetPort *port = _GetTargetPort(targets[i].port, true);
+		TargetPort *port = _GetTargetPort(portID, true);
 		if (!port)
 			return B_NO_MEMORY;
 
 		// try sending the message, if there are no queued messages yet
 		if (port->IsEmpty()) {
-			status_t error = _SendMessage(message, targets[i].port,
-				targets[i].token);
+			status_t error = _SendMessage(message, portID, token);
 			// if the message was delivered OK, we're done with the target
 			if (error == B_OK) {
 				_PutTargetPort(port);
@@ -680,14 +680,14 @@ MessageDeliverer::DeliverMessage(const void *messageData, int32 messageSize,
 			// if the port is not full, but an error occurred, we skip this target
 			if (error != B_WOULD_BLOCK) {
 				_PutTargetPort(port);
-				if (targetCount == 1)
+				if (targetIndex == 0 && !targets.HasNext())
 					return error;
 				continue;
 			}
 		}
 
 		// add the message
-		status_t error = port->PushMessage(message, targets[i].token);
+		status_t error = port->PushMessage(message, token);
 		_PutTargetPort(port);
 		if (error != B_OK)
 			return error;

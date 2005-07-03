@@ -46,10 +46,6 @@
 class BHandler;
 class BLooper;
 
-namespace BPrivate {
-	class TRoster;
-};
-
 // BMessenger class ------------------------------------------------------------
 class BMessenger {
 public:	

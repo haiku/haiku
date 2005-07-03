@@ -19,6 +19,7 @@
 #include "MessagingService.h"
 #include "MIMEManager.h"
 #include "Registrar.h"
+#include "ShutdownProcess.h"
 #include "TRoster.h"
 
 /*!
@@ -98,6 +99,7 @@ Registrar::MessageReceived(BMessage *message)
 			message->SendReply(&reply);
 			break;
 		}
+
 		case B_REG_GET_CLIPBOARD_MESSENGER:
 		{
 			PRINT(("B_REG_GET_CLIPBOARD_MESSENGER\n"));
@@ -107,6 +109,14 @@ Registrar::MessageReceived(BMessage *message)
 			message->SendReply(&reply);
 			break;
 		}
+
+		case B_REG_SHUT_DOWN:
+		{
+			PRINT(("B_REG_SHUT_DOWN\n"));
+
+			_HandleShutDown(message);
+		}
+
 		// roster requests
 		case B_REG_ADD_APP:
 			fRoster->HandleAddApplication(message);
@@ -180,6 +190,7 @@ Registrar::MessageReceived(BMessage *message)
 		case B_REG_SAVE_RECENT_LISTS:
 			fRoster->HandleSaveRecentLists(message);
 			break;
+
 		// message runner requests
 		case B_REG_REGISTER_MESSAGE_RUNNER:
 			fMessageRunnerManager->HandleRegisterRunner(message);
@@ -193,12 +204,22 @@ Registrar::MessageReceived(BMessage *message)
 		case B_REG_GET_MESSAGE_RUNNER_INFO:
 			fMessageRunnerManager->HandleGetRunnerInfo(message);
 			break;
+
 		// internal messages
 		case B_REG_ROSTER_SANITY_EVENT:
 			fRoster->CheckSanity();
 			fSanityEvent->SetTime(system_time() + kRosterSanityEventInterval);
 			fEventQueue->AddEvent(fSanityEvent);
 			break;
+		case B_REG_SHUTDOWN_FINISHED:
+			if (fShutdownProcess) {
+				if (fShutdownProcess->Lock()) {
+					fShutdownProcess->Quit();
+					fShutdownProcess = NULL;
+				}
+			}
+			break;
+
 		default:
 			BApplication::MessageReceived(message);
 			break;
@@ -291,6 +312,40 @@ Registrar::App()
 	return dynamic_cast<Registrar*>(be_app);
 }
 
+// _HandleShutDown
+/*!	\brief Handle a shut down request message.
+	\param request The request to be handled.
+*/
+void
+Registrar::_HandleShutDown(BMessage *request)
+{
+	status_t error = B_OK;
+
+	// check, whether we're already shutting down
+	if (fShutdownProcess)
+		error = B_SHUTTING_DOWN;
+
+	bool needsReply = true;
+	if (error == B_OK) {
+		// create a ShutdownProcess
+		fShutdownProcess = new(nothrow) ShutdownProcess(fRoster, fEventQueue);
+		if (fShutdownProcess) {
+			error = fShutdownProcess->Init(request);
+			if (error == B_OK) {
+				DetachCurrentMessage();
+				fShutdownProcess->Run();
+				needsReply = false;
+			} else {
+				delete fShutdownProcess;
+				fShutdownProcess = NULL;
+			}
+		} else
+			error = B_NO_MEMORY;
+	}
+
+	if (needsReply)
+		ShutdownProcess::SendReply(request, error);
+}
 
 // main
 /*!	\brief Creates and runs the registrar application.

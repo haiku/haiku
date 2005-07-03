@@ -24,6 +24,8 @@
 //	Description:	An extended app_info.
 //------------------------------------------------------------------------------
 
+#include <new>
+
 #include <string.h>
 
 #include "RosterAppInfo.h"
@@ -54,3 +56,14 @@ RosterAppInfo::Init(thread_id thread, team_id team, port_id port, uint32 flags,
 		this->signature[0] = '\0';
 }
 
+// Clone
+RosterAppInfo *
+RosterAppInfo::Clone() const
+{
+	RosterAppInfo *clone = new(nothrow) RosterAppInfo;
+	if (!clone)
+		return NULL;
+
+	clone->Init(thread, team, port, flags, &ref, signature);
+	return clone;
+}

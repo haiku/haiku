@@ -28,8 +28,10 @@
 #ifndef T_ROSTER_H
 #define T_ROSTER_H
 
+#include <hash_set>
 #include <map>
 
+#include <Locker.h>
 #include <SupportDefs.h>
 
 #include "AppInfoList.h"
@@ -47,9 +49,6 @@ struct IAPRRequest {
 };
 
 typedef map<team_id, IAPRRequest>	IAPRRequestMap;
-
-// For strategic reasons, as TRoster appears in the BMessenger header.
-namespace BPrivate {
 
 class TRoster {
 public:
@@ -90,6 +89,13 @@ public:
 
 	void CheckSanity();
 
+	void SetShuttingDown(bool shuttingDown);
+	status_t GetShutdownApps(AppInfoList &userApps, AppInfoList &systemApps,
+		hash_set<team_id> &vitalSystemApps);
+
+	status_t AddWatcher(Watcher *watcher);
+	void RemoveWatcher(Watcher *watcher);
+
 private:
 	// hook functions
 	void _AppAdded(RosterAppInfo *info);
@@ -106,12 +112,16 @@ private:
 	void _ReplyToIAPRRequest(BMessage *request, const RosterAppInfo *info);
 
 	void _HandleGetRecentEntries(BMessage *request);
+
+	bool _IsVitalSystemApp(RosterAppInfo *info) const;
+	bool _IsSystemApp(RosterAppInfo *info) const;
 	
 	status_t _LoadRosterSettings(const char *path = NULL);
 	status_t _SaveRosterSettings(const char *path = NULL);
 	static const char *kDefaultRosterSettingsFile;
 	
 private:
+	BLocker			fLock;
 	AppInfoList		fRegisteredApps;
 	AppInfoList		fEarlyPreRegisteredApps;
 	IAPRRequestMap	fIAPRRequests;
@@ -121,12 +131,7 @@ private:
 	RecentEntries	fRecentDocuments;
 	RecentEntries	fRecentFolders;
 	uint32			fLastToken;
+	bool			fShuttingDown;
 };
-
-};	// namespace BPrivate
-
-// Only the registrar code uses this header. No need to hide TRoster in the
-// namespace.
-using BPrivate::TRoster;
 
 #endif	// T_ROSTER_H

@@ -37,9 +37,7 @@
 #include <stdio.h>
 #include <string>
 
-namespace BPrivate {
-	class TRoster;
-}
+class TRoster;
 
 struct recent_entry {
 	recent_entry(const entry_ref *ref, const char *appSig, uint32 index);	
@@ -62,7 +60,7 @@ public:
 	status_t Print();
 	status_t Save(FILE* file, const char *description, const char *tag);
 private:
-	friend class BPrivate::TRoster;
+	friend class TRoster;
 
 	static status_t GetTypeForRef(const entry_ref *ref, char *result);
 	

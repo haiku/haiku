@@ -34,10 +34,9 @@ class EventQueue;
 class MessageEvent;
 class MessageRunnerManager;
 class MIMEManager;
+class ShutdownProcess;
 
-namespace BPrivate {
-	class TRoster;
-};
+class TRoster;
 
 class Registrar : public BServer {
 public:
@@ -53,12 +52,15 @@ public:
 	static Registrar *App();
 
 private:
-	BPrivate::TRoster		*fRoster;
+	void _HandleShutDown(BMessage *message);
+
+	TRoster					*fRoster;
 	ClipboardHandler		*fClipboardHandler;
 	MIMEManager				*fMIMEManager;
 	EventQueue				*fEventQueue;
 	MessageRunnerManager	*fMessageRunnerManager;
 	MessageEvent			*fSanityEvent;
+	ShutdownProcess			*fShutdownProcess;
 };
 
 #endif	// REGISTRAR_H

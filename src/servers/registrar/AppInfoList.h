@@ -45,13 +45,14 @@ public:
 
 	bool AddInfo(RosterAppInfo *info);
 	bool RemoveInfo(RosterAppInfo *info);
-	void MakeEmpty();
+	void MakeEmpty(bool deleteInfos = false);
 
 	RosterAppInfo *InfoFor(const char *signature) const;
 	RosterAppInfo *InfoFor(team_id team) const;
 	RosterAppInfo *InfoFor(const entry_ref *ref) const;
 	RosterAppInfo *InfoForToken(uint32 token) const;
 
+	bool IsEmpty() const		{ return (CountInfos() == 0); };
 	int32 CountInfos() const;
 
 	Iterator It();

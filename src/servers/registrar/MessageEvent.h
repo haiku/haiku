@@ -46,7 +46,7 @@ public:
 
 	virtual bool Do(EventQueue *queue);
 
-private:
+protected:
 	BMessage			fMessage;
 	BMessenger			fMessenger;
 	BHandler			*fHandler;

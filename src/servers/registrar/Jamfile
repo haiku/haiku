@@ -9,6 +9,7 @@ AddResources obos_registrar : registrar.rdef ;
 
 local registrar_sources = 
 	AppInfoList.cpp
+	AppInfoListMessagingTargetSet.cpp
 	Clipboard.cpp
 	ClipboardHandler.cpp
 	Event.cpp
@@ -27,6 +28,7 @@ local registrar_sources =
 	Registrar.cpp
 	RosterAppInfo.cpp
 	RosterSettingsCharStream.cpp
+	ShutdownProcess.cpp
 	TRoster.cpp
 	Watcher.cpp
 	WatchingService.cpp
