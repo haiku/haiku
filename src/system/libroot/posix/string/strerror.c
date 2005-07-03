@@ -168,6 +168,10 @@ error_description(int error)
 			return "Bad sniffer rule";
 		case B_NOT_A_MESSAGE:
 			return "Data is not a message";
+		case B_SHUTDOWN_CANCELLED:
+			return "System shutdown cancelled";
+		case B_SHUTTING_DOWN:
+			return "System shutting down";
 
 		// Storage Kit Errors
 
