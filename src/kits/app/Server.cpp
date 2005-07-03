@@ -9,14 +9,21 @@
 #include <Server.h>
 
 // constructor
-BServer::BServer(const char* signature, bool initGUI, status_t* error)
-	: BApplication(signature, initGUI, error)
+BServer::BServer(const char* signature, bool initGUI, status_t *error)
+	: BApplication(signature, initGUI, error),
+	  fGUIContextInitialized(false)
 {
+	fGUIContextInitialized = (initGUI && (!error || *error == B_OK));
 }
 
 // InitGUIContext
 status_t
 BServer::InitGUIContext()
 {
-	return _InitGUIContext();
+	if (fGUIContextInitialized)
+		return B_OK;
+
+	status_t error = _InitGUIContext();
+	fGUIContextInitialized = (error == B_OK);
+	return error;
 }

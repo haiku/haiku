@@ -12,9 +12,12 @@
 
 class BServer : public BApplication {
 public:
-	BServer(const char* signature, bool initGUI, status_t* error);
+	BServer(const char* signature, bool initGUI, status_t *error);
 
 	status_t InitGUIContext();
+
+private:
+	bool	fGUIContextInitialized;
 };
 
 #endif	// _SERVER_H
