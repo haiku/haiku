@@ -1,5 +1,6 @@
 SubDir OBOS_TOP src bin ;
 
+UsePrivateHeaders app ;
 UsePrivateHeaders kernel ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
