@@ -1113,8 +1113,13 @@ BMenu::_track(int *action, long start)
 			if (item != NULL) {
 				if (item != fSelected)
 					SelectItem(item);
-			}	
-			
+			} else if (fSelected != NULL) {
+				BPoint screenLocation = location;
+				ConvertToScreen(&screenLocation);
+				if (!OverSubmenu(fSelected, screenLocation))
+					SelectItem(NULL);
+			}
+					
 			int submenuAction = MENU_ACT_NONE;
 			BMenuItem *submenuItem = NULL;	
 			if (fSelected != NULL && fSelected->Submenu() != NULL) {
