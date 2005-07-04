@@ -127,6 +127,17 @@ status_t nv_acc_init_dma()
 	NV_REG32(NV32_PWRUPCTRL) = 0x13111111;
 
 	/* don't try this on NV20 and later.. */
+	/* note:
+	 * the specific register that's responsible for the speedfix on NV18 is
+	 * $00400ed8: bit 6 needs to be zero for fastest rendering (confirmed). */
+	/* note also:
+	 * on NV28 the following ranges could be reset (confirmed):
+	 * $00400000 upto/incl. $004002fc;
+	 * $00400400 upto/incl. $004017fc;
+	 * $0040180c upto/incl. $00401948;
+	 * $00401994 upto/incl. $00401a80;
+	 * $00401a94 upto/incl. $00401ffc.
+	 * The intermediate ranges hang the engine upon resetting. */
 	if (si->ps.card_arch < NV20A)
 	{
 		/* actively reset the PGRAPH registerset (acceleration engine) */
