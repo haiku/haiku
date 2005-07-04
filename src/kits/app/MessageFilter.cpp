@@ -25,20 +25,8 @@
 //					in-coming BMessages.  
 //------------------------------------------------------------------------------
 
-// Standard Includes -----------------------------------------------------------
-
-// System Includes -------------------------------------------------------------
 #include <MessageFilter.h>
 
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
 BMessageFilter::BMessageFilter(uint32 inWhat, filter_hook func)
 	:	fFiltersAny(false),
 		what(inWhat),
@@ -48,7 +36,8 @@ BMessageFilter::BMessageFilter(uint32 inWhat, filter_hook func)
 		fFilterFunction(func)
 {
 }
-//------------------------------------------------------------------------------
+
+
 BMessageFilter::BMessageFilter(message_delivery delivery, message_source source,
 							   filter_hook func)
 	:	fFiltersAny(true),
@@ -59,7 +48,8 @@ BMessageFilter::BMessageFilter(message_delivery delivery, message_source source,
 		fFilterFunction(func)
 {
 }
-//------------------------------------------------------------------------------
+
+
 BMessageFilter::BMessageFilter(message_delivery delivery, message_source source,
 							   uint32 inWhat, filter_hook func)
 	:	fFiltersAny(false),
@@ -70,23 +60,27 @@ BMessageFilter::BMessageFilter(message_delivery delivery, message_source source,
 		fFilterFunction(func)
 {
 }
-//------------------------------------------------------------------------------
+
+
 BMessageFilter::BMessageFilter(const BMessageFilter& filter)
 {
 	*this = filter;
 }
-//------------------------------------------------------------------------------
+
+
 BMessageFilter::BMessageFilter(const BMessageFilter* filter)
 {
 	*this = *filter;
 }
-//------------------------------------------------------------------------------
+
+
 BMessageFilter::~BMessageFilter()
 {
-	;
 }
-//------------------------------------------------------------------------------
-BMessageFilter& BMessageFilter::operator=(const BMessageFilter& from)
+
+
+BMessageFilter &
+BMessageFilter::operator=(const BMessageFilter& from)
 {
 	fFiltersAny			= from.FiltersAnyCommand();
 	what				= from.Command();
@@ -98,68 +92,63 @@ BMessageFilter& BMessageFilter::operator=(const BMessageFilter& from)
 
 	return *this;
 }
-//------------------------------------------------------------------------------
-filter_result BMessageFilter::Filter(BMessage* message, BHandler** target)
-{
-	if (fFilterFunction)
-	{
-		return fFilterFunction(message, target, this);
-	}
 
+
+filter_result
+BMessageFilter::Filter(BMessage* message, BHandler** target)
+{
 	return B_DISPATCH_MESSAGE;
 }
-//------------------------------------------------------------------------------
-message_delivery BMessageFilter::MessageDelivery() const
+
+
+message_delivery
+BMessageFilter::MessageDelivery() const
 {
 	return fDelivery;
 }
-//------------------------------------------------------------------------------
-message_source BMessageFilter::MessageSource() const
+
+
+message_source
+BMessageFilter::MessageSource() const
 {
 	return fSource;
 }
-//------------------------------------------------------------------------------
-uint32 BMessageFilter::Command() const
+
+
+uint32
+BMessageFilter::Command() const
 {
 	return what;
 }
-//------------------------------------------------------------------------------
-bool BMessageFilter::FiltersAnyCommand() const
+
+
+bool
+BMessageFilter::FiltersAnyCommand() const
 {
 	return fFiltersAny;
 }
-//------------------------------------------------------------------------------
-BLooper* BMessageFilter::Looper() const
+
+
+BLooper *
+BMessageFilter::Looper() const
 {
 	return fLooper;
 }
-//------------------------------------------------------------------------------
-void BMessageFilter::_ReservedMessageFilter1()
+
+
+void BMessageFilter::_ReservedMessageFilter1() {}
+void BMessageFilter::_ReservedMessageFilter2() {}
+
+
+void
+BMessageFilter::SetLooper(BLooper* owner)
 {
-	;
-}
-//------------------------------------------------------------------------------
-void BMessageFilter::_ReservedMessageFilter2()
-{
-	;
-}
-//------------------------------------------------------------------------------
-void BMessageFilter::SetLooper(BLooper* owner)
-{
-	// TODO: implement locking?
 	fLooper = owner;
 }
-//------------------------------------------------------------------------------
-filter_hook BMessageFilter::FilterFunction() const
+
+
+filter_hook
+BMessageFilter::FilterFunction() const
 {
 	return fFilterFunction;
 }
-//------------------------------------------------------------------------------
-
-/*
- * $Log $
- *
- * $Id  $
- *
- */
-
