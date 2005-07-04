@@ -856,12 +856,6 @@ BApplication::DispatchMessage(BMessage *message, BHandler *handler)
 			AboutRequested();
 			break;
 
-		case B_QUIT_REQUESTED:
-			DBG(message->PrintToStream());
-			if (QuitRequested())
-				Quit();
-			break;
-
 		case B_PULSE:
 			Pulse();
 			break;

@@ -1331,24 +1331,15 @@ BLooper::task_looper()
 void
 BLooper::do_quit_requested(BMessage *msg)
 {
-	/** @note
-			I couldn't figure out why do_quit_requested() was necessary; why not
-			just call Quit()?  Then, while writing the PostMessage() code, I
-			realized that the sender of the B_QUIT_REQUESTED message just might
-			be waiting for a reply.  A quick test, and yes, we get a reply
-			which consists of:
-				what: B_REPLY
-				"result" (bool) return of QuitRequested()
-				"thread" (int32) the looper's thread id
-
-			While Quit() could use fLastMessage, it makes more sense that
-			do_quit_requested() would handle it since it gets passed the
-			message.
-	*/
-
 	bool isQuitting = QuitRequested();
 
-	if (msg->IsSourceWaiting()) {
+	// We send a reply to the sender, when they're waiting for a reply or
+	// if the request message contains a boolean "_shutdown_" field with value
+	// true. In the latter case the message came from the registrar, asking
+	// the application to shut down.
+	bool shutdown;
+	if (msg->IsSourceWaiting()
+		|| (msg->FindBool("_shutdown_", &shutdown) == B_OK && shutdown)) {
 		BMessage ReplyMsg(B_REPLY);
 		ReplyMsg.AddBool("result", isQuitting);
 		ReplyMsg.AddInt32("thread", fTaskID);
