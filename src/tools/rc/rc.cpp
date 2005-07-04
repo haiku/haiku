@@ -43,12 +43,6 @@ static char sOutputFile[B_PATH_NAME_LENGTH] = { 0 };
 static char *sFirstInputFile = NULL;
 
 
-#ifndef __HAIKU__
-extern "C" size_t	strlcat(char *dest, const char *source, size_t length);
-extern "C" size_t	strlcpy(char *dest, const char *source, size_t length);
-#endif
-
-
 void
 warn(const char *format, ...)
 {

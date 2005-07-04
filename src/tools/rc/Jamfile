@@ -4,6 +4,10 @@ GENERATE_C++ on [ FGristFiles lexer.l parser.y ] = true ;
 
 SubDirC++Flags -Wno-sign-compare -Wno-unused ;
 
+local r5Compatibility = [ FDirName $(SUBDIR) R5Compatibility.h ] ;
+SubDirCcFlags -include $(r5Compatibility) ;
+SubDirC++Flags -include $(r5Compatibility) ;
+
 StaticLibrary rdef :
 	compile.cpp decompile.cpp lexer.l parser.y rdef.cpp ;
 
