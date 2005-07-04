@@ -412,9 +412,12 @@ BHandler::AddFilter(BMessageFilter *filter)
 	}
 #endif
 
+	if (fLooper != NULL)
+		filter->SetLooper(fLooper);
+		
 	if (!fFilters)
 		fFilters = new BList;
-
+		
 	fFilters->AddItem(filter);
 }
 
@@ -775,9 +778,14 @@ BHandler::operator=(const BHandler &)
 
 
 void
-BHandler::SetLooper(BLooper *loop)
+BHandler::SetLooper(BLooper *looper)
 {
-	fLooper = loop;
+	fLooper = looper;
+	
+	if (fFilters) {
+		for (int32 i = 0; i < fFilters->CountItems(); i++)
+			static_cast<BMessageFilter *>(fFilters->ItemAtFast(i))->SetLooper(looper);
+	}
 }
 
 

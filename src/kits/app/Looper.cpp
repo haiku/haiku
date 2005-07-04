@@ -378,13 +378,6 @@ BLooper::AddHandler(BHandler* handler)
 		handler->SetLooper(this);
 		if (handler != this)	// avoid a cycle
 			handler->SetNextHandler(this);
-
-		BList* filters = handler->FilterList();
-		if (filters) {
-			for (int32 i = 0; i < filters->CountItems(); ++i) {
-				((BMessageFilter*)filters->ItemAt(i))->SetLooper(this);
-			}
-		}
 	}
 }
 
