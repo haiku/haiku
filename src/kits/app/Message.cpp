@@ -1,43 +1,26 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Message.h
-//	Author(s):		Erik Jaesler (erik@cgsoftware.com)
-//					DarkWyrm <bpmagic@columbus.rr.com>
-//					Ingo Weinhold <bonefish@users.sf.net>
-//	Description:	BMessage class creates objects that store data and that
-//					can be processed in a message loop.  BMessage objects
-//					are also used as data containers by the archiving and
-//					the scripting mechanisms.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Erik Jaesler (erik@cgsoftware.com)
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Ingo Weinhold <bonefish@users.sf.net>
+ */
+
+/**	BMessage class creates objects that store data and that
+ *	can be processed in a message loop.  BMessage objects
+ *	are also used as data containers by the archiving and
+ *	the scripting mechanisms.
+ */
 
 // debugging
 //#define DBG(x) x
 #define DBG(x)	;
 #define PRINT(x)	DBG({ printf("[%6ld] ", find_thread(NULL)); printf x; })
 
-// Standard Includes -----------------------------------------------------------
 #include <stdio.h>
 
-// System Includes -------------------------------------------------------------
 #include <Application.h>
 #include <BlockCache.h>
 #include <ByteOrder.h>
@@ -47,9 +30,6 @@
 #include <MessengerPrivate.h>
 #include <String.h>
 
-//#include <CRTDBG.H>
-
-// Project Includes ------------------------------------------------------------
 #include <AppMisc.h>
 #include <DataBuffer.h>
 #include <KMessage.h>
@@ -57,10 +37,14 @@
 #include <MessageUtils.h>
 #include <TokenSpace.h>
 
-// Local Includes --------------------------------------------------------------
+#include "dano_message.h"
 
-// Local Defines ---------------------------------------------------------------
-#define	MSG_FIELD_VERSION		'FOB1'
+
+static const uint32 kMessageMagic = 'FOB1';
+static const uint32 kMessageMagicSwapped = '1BOF';
+
+static const uint32 kMessageMagicDano = 'FOB2';
+static const uint32 kMessageMagicDanoSwapped = '2BOF';
 
 // flags for the overall message (the bitfield is 1 byte)
 #define MSG_FLAG_BIG_ENDIAN		0x01
@@ -111,6 +95,8 @@ public:
 	Header() {}
 	Header(const BMessage &message) { ReadFrom(message); }
 
+	status_t SetMagic(uint32 magic);
+
 	status_t ReadFrom(BDataIO &stream);
 	void ReadFrom(const BMessage &message);
 	status_t WriteTo(BDataIO &stream, bool calculateCheckSum = true) const;
@@ -127,7 +113,7 @@ public:
 	void Dump() const;
 
 private:
-	int32	fMagic;
+	uint32	fMagic;
 	int32	fBodySize;
 	uint32	fWhat;
 	uint8	fFlags;
@@ -142,6 +128,24 @@ private:
 	bool	fSwapped;
 };
 
+
+status_t
+BMessage::Header::SetMagic(uint32 magic)
+{
+	if (magic == kMessageMagicSwapped) {
+		fSwapped = true;
+	} else if (magic == kMessageMagic) {
+		fSwapped = false;
+	} else {
+		// This is *not* a message
+		return B_NOT_A_MESSAGE;
+	}
+
+	fMagic = magic;
+	return B_OK;
+}
+
+
 // ReadFrom
 status_t
 BMessage::Header::ReadFrom(BDataIO &stream)
@@ -154,19 +158,6 @@ BMessage::Header::ReadFrom(BDataIO &stream)
 	int32 flattenedSize;
 
 	try {
-		// Get the message version
-		read_helper(fMagic);
-
-		fSwapped = false;
-		if (fMagic == '1BOF') {
-			fSwapped = true;
-		} else if (fMagic == 'FOB1') {
-			fSwapped = false;
-		} else {
-			// This is *not* a message
-			return B_NOT_A_MESSAGE;
-		}
-
 		read_helper.SetSwap(fSwapped);
 
 		// get the checksum
@@ -237,7 +228,7 @@ BMessage::Header::ReadFrom(BDataIO &stream)
 void
 BMessage::Header::ReadFrom(const BMessage &message)
 {
-	fMagic = MSG_FIELD_VERSION;
+	fMagic = kMessageMagic;
 
 	fBodySize = message.fBody->FlattenedSize();
 	fWhat = message.what;
@@ -909,172 +900,192 @@ status_t BMessage::Flatten(BDataIO* stream, ssize_t* size) const
 
 	return err;
 }
-//------------------------------------------------------------------------------
-status_t BMessage::Unflatten(const char* flat_buffer)
+
+
+status_t
+BMessage::Unflatten(const char* buffer)
 {
-	if (!flat_buffer)
+	if (!buffer)
 		return B_BAD_VALUE;
 
-	// check whether this is a KMessage
-	if (((KMessage::Header*)flat_buffer)->magic
-		== KMessage::kMessageHeaderMagic) {
-		return _UnflattenKMessage(flat_buffer);
+	uint32 magic = *(uint32*)buffer;
+
+	// we support several message formats - this list is ordered
+	// by importance and frequency
+
+	if (magic == kMessageMagic) {
+		// it appears to be a normal flattened BMessage
+		BMemoryIO memoryStream(buffer, ((uint32*)buffer)[2]);
+		return Unflatten(&memoryStream);
 	}
 
-	// assume it's a normal flattened BMessage
-	uint32 size = ((uint32*)flat_buffer)[2];
+	// check whether this is a KMessage
+	if (((KMessage::Header*)buffer)->magic
+		== KMessage::kMessageHeaderMagic)
+		return _UnflattenKMessage(buffer);
 
-	BMemoryIO MemIO(flat_buffer, size);
-	return Unflatten(&MemIO);
+	if (magic == kMessageMagicSwapped) {
+		// it appears to be a swapped flattened BMessage
+		uint32 size = ((uint32*)buffer)[2];
+
+		BMemoryIO memoryStream(buffer, __swap_int32(size));
+		return Unflatten(&memoryStream);
+	}
+
+	if (magic == kMessageMagicDano || magic == kMessageMagicDanoSwapped) {
+		// dano style message
+		BMemoryIO memoryStream(buffer, BPrivate::dano_message_size(buffer));
+		return Unflatten(&memoryStream);
+	}
+
+	return B_NOT_A_MESSAGE;
 }
-//------------------------------------------------------------------------------
-status_t BMessage::Unflatten(BDataIO* stream)
+
+
+status_t
+BMessage::Unflatten(BDataIO* stream)
 {
+	TReadHelper reader(stream);
 	Header header;
-	status_t err = header.ReadFrom(*stream);
+	status_t status = B_OK;
 
-if (err) {
-	printf("BMessage::Unflatten(): Reading the header failed: %lx\n", err);
-}
+	// ToDo: while reading from a stream is certainly more convenient than
+	//	from a buffer, it causes a lot of unnecessary copies, and therefore
+	//	probably shouldn't be the preferred (or only) route.
 
-	if (!err)
-	{
+	try {
+		uint32 magic;
+		reader(magic);
+
+		status = header.SetMagic(magic);
+		if (status < B_OK) {
+			// we support reading Dano messages from disk as well
+			if (magic == kMessageMagicDano)
+				return BPrivate::unflatten_dano_message(magic, *stream, *this);
+
+			return status;
+		}
+
+		status = header.ReadFrom(*stream);
+		if (status < B_OK) {
+			printf("BMessage::Unflatten(): Reading the header failed: %lx\n", status);
+			return status;
+		}
+
 		header.WriteTo(*this);
 		bool swap = header.IsSwapped();
 
-		TReadHelper reader(stream, swap);
-		int8 flags;
-		type_code type;
 		uint32 count;
 		uint32 dataLen;
 		uint8 nameLen;
 		char name[MSG_NAME_MAX_SIZE];
 		unsigned char* databuffer = NULL;
 
-		try
-		{
-			reader(flags);
-			while (flags != MSG_LAST_ENTRY)
-			{
-				reader(type);
-				// Is there more than one data item? (!flags & MSG_FLAG_SINGLE_ITEM)
-				if (flags & MSG_FLAG_SINGLE_ITEM)
-				{
-					count = 1;
-					if (flags & MSG_FLAG_MINI_DATA)
-					{
-						uint8 littleLen;
-						reader(littleLen);
-						dataLen = littleLen;
-					}
-					else
-					{
-						reader(dataLen);
-					}
+		int8 flags;
+		reader(flags);
+
+		while (flags != MSG_LAST_ENTRY) {
+			type_code type;
+			reader(type);
+
+			// Is there more than one data item?
+			if (flags & MSG_FLAG_SINGLE_ITEM) {
+				count = 1;
+				if (flags & MSG_FLAG_MINI_DATA) {
+					uint8 littleLen;
+					reader(littleLen);
+					dataLen = littleLen;
+				} else
+					reader(dataLen);
+			} else {
+				// Is there a little data?
+				if (flags & MSG_FLAG_MINI_DATA) {
+					// Get item count (1 byte)
+					uint8 littleCount;
+					reader(littleCount);
+					count = littleCount;
+
+					// Get data length (1 byte)
+					uint8 littleLen;
+					reader(littleLen);
+					dataLen = littleLen;
+				} else {
+					// Is there a lot of data?
+					// Get item count (4 bytes)
+					reader(count);
+					// Get data length (4 bytes)
+					reader(dataLen);
 				}
-				else
-				{
-					// Is there a little data? (flags & MSG_FLAG_MINI_DATA)
-					if (flags & MSG_FLAG_MINI_DATA)
-					{
-						// Get item count (1 byte)
-						uint8 littleCount;
-						reader(littleCount);
-						count = littleCount;
+			}
 
-						// Get data length (1 byte)
-						uint8 littleLen;
-						reader(littleLen);
-						dataLen = littleLen;
-					}
-					else
-					{
-					// Is there a lot of data? (!flags & MSG_FLAG_MINI_DATA)
-						// Get item count (4 bytes)
-						reader(count);
-						// Get data length (4 bytes)
-						reader(dataLen);
-					}
-				}
+			// Get the name length (1 byte)
+			reader(nameLen);
+			// Get the name (name length bytes)
+			reader(name, nameLen);
+			name[nameLen] = '\0';
 
-				// Get the name length (1 byte)
-				reader(nameLen);
-				// Get the name (name length bytes)
-				reader(name, nameLen);
-				name[nameLen] = '\0';
+			// Copy the data into a new buffer to byte align it
+			databuffer = (unsigned char*)realloc(databuffer, dataLen);
+			if (!databuffer)
+				throw B_NO_MEMORY;
+			// Get the data
+			reader(databuffer, dataLen);
 
-				// Copy the data into a new buffer to byte align it
-				databuffer = (unsigned char*)realloc(databuffer, dataLen);
-				if (!databuffer)
-					throw B_NO_MEMORY;
-				// Get the data
-				reader(databuffer, dataLen);
-
-				// Is the data fixed size? (flags & MSG_FLAG_FIXED_SIZE)
-				if (flags & MSG_FLAG_FIXED_SIZE && swap)
-				{
+			if (swap) {
+				// Is the data fixed size?
+				if ((flags & MSG_FLAG_FIXED_SIZE) != 0) {
 					// Make sure to swap the data
-					err = swap_data(type, (void*)databuffer, dataLen,
+					status = swap_data(type, (void*)databuffer, dataLen,
 									B_SWAP_ALWAYS);
-					if (err)
-						throw err;
-				}
-				// Is the data variable size? (!flags & MSG_FLAG_FIXED_SIZE)
-				else if (swap && type == B_REF_TYPE)
-				{
+					if (status < B_OK)
+						throw status;
+				} else if (type == B_REF_TYPE) {
+					// Is the data variable size?
 					// Apparently, entry_refs are the only variable-length data
 					// 	  explicitely swapped -- the dev_t and ino_t
 					//    specifically
 					byte_swap(*(entry_ref*)databuffer);
 				}
-
-				// Add each data field to the message
-				uint32 itemSize = 0;
-				if (flags & MSG_FLAG_FIXED_SIZE)
-				{
-					itemSize = dataLen / count;
-				}
-				unsigned char* dataPtr = databuffer;
-				for (uint32 i = 0; i < count; ++i)
-				{
-					// Line up for the next item
-					if (i)
-					{
-						if (flags & MSG_FLAG_FIXED_SIZE)
-						{
-							dataPtr += itemSize;
-						}
-						else
-						{
-							// Have to account for 8-byte boundary padding
-							// We add 4 because padding as calculated during
-							// flattening includes the four-byte size header
-							dataPtr += itemSize + calc_padding(itemSize + 4, 8);
-						}
-					}
-
-					if ((flags & MSG_FLAG_FIXED_SIZE) == 0)
-					{
-						itemSize = *(uint32*)dataPtr;
-						dataPtr += sizeof (uint32);
-					}
-
-					err = AddData(name, type, dataPtr, itemSize,
-								  flags & MSG_FLAG_FIXED_SIZE);
-					if (err)
-						throw err;
-				}
-
-				reader(flags);
 			}
+
+			// Add each data field to the message
+			uint32 itemSize = 0;
+			if (flags & MSG_FLAG_FIXED_SIZE)
+				itemSize = dataLen / count;
+
+			unsigned char* dataPtr = databuffer;
+
+			for (uint32 i = 0; i < count; ++i) {
+				// Line up for the next item
+				if (i) {
+					if (flags & MSG_FLAG_FIXED_SIZE) {
+						dataPtr += itemSize;
+					} else {
+						// Have to account for 8-byte boundary padding
+						// We add 4 because padding as calculated during
+						// flattening includes the four-byte size header
+						dataPtr += itemSize + calc_padding(itemSize + 4, 8);
+					}
+				}
+
+				if ((flags & MSG_FLAG_FIXED_SIZE) == 0) {
+					itemSize = *(uint32*)dataPtr;
+					dataPtr += sizeof (uint32);
+				}
+
+				status = AddData(name, type, dataPtr, itemSize,
+							  flags & MSG_FLAG_FIXED_SIZE);
+				if (status < B_OK)
+					throw status;
+			}
+
+			reader(flags);
 		}
-		catch (status_t& e)
-		{
-			err = e;
-		}
+	} catch (status_t& e) {
+		status = e;
 	}
 
-	return err;
+	return status;
 }
 //------------------------------------------------------------------------------
 status_t BMessage::AddSpecifier(const char* property)
@@ -2024,7 +2035,8 @@ BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 		// a KMessage
 		KMessage::Header *header = (KMessage::Header*)data;
 		header->targetToken = (preferred ? B_PREFERRED_TOKEN : token);
-	} else if (*(int32*)data == '1BOF' || *(int32*)data == 'FOB1') {
+	} else if (*(uint32*)data == kMessageMagic
+		|| *(uint32*)data == kMessageMagicSwapped) {
 		// get the header
 		BMemoryIO stream(data, size);
 		Header header;
