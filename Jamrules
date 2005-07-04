@@ -27,6 +27,8 @@ if ! $(INVOCATION_SUBDIR_SET) {
 
 } # vanilla Jam compatibility
 
+BUILD_PLATFORM_DEFINES = $(DEFINES) ;
+
 # The directory for build system specific files
 OBOS_BUILD_DIR = [ FDirName $(OBOS_TOP) build ] ;
 
@@ -2031,11 +2033,14 @@ rule BuildPlatformMain
 		SetupDefaultIncludes ;
 	}
 
-	# Remove `-nostdinc' from CCFLAGS and C++FLAGS.
+	# Remove `-nostdinc' from CCFLAGS and C++FLAGS. Set DEFINES back to what
+	# was originally defined for the build platform.
 	local oldCCFLAGS = $(CCFLAGS) ;
 	local oldC++FLAGS = $(C++FLAGS) ;
+	local oldDefines = $(DEFINES) ;
 	CCFLAGS = [ Filter $(CCFLAGS) : -nostdinc ] ;
 	C++FLAGS = [ Filter $(C++FLAGS) : -nostdinc ] ;
+	DEFINES = $(BUILD_PLATFORM_DEFINES) ;
 
 	Main $(1) : $(2) ;
 
@@ -2045,6 +2050,7 @@ rule BuildPlatformMain
 	# Reset CCFLAGS and C++FLAGS to original values.
 	CCFLAGS = $(oldCCFLAGS) ;
 	C++FLAGS = $(oldC++FLAGS) ;
+	DEFINES = $(oldDefines) ;
 }
 
 rule BuildPlatformTest
