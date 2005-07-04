@@ -122,15 +122,29 @@ static status_t enable(net_layer *me, bool enable)
 
 static status_t process_output(net_layer *me, net_buffer *buffer)
 {
+	ether_drivers_device *edd = me->cookie;
+	status_t status;
+	void *frame;
+	ssize_t sz;
+	
 	if (!buffer)
 		return B_ERROR;
 		
-	// TODO!
 	dprintf("%s: process_output:\n", me->name);
 	g_stack->dump_buffer(buffer);
+	
+	// write buffer content
+	frame = malloc(edd->max_frame_size);
+	if (!frame)
+		return B_NO_MEMORY;
+
+	// TODO: remove unwanted copy!!!
+	sz = g_stack->read_buffer(buffer, 0, frame, edd->max_frame_size);
+	if (sz >= 1)
+		sz = write(edd->fd, frame, sz);
 
 	g_stack->delete_buffer(buffer, false);
-	return B_OK;
+	return (sz >= 0);
 }
 
 
