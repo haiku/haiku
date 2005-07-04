@@ -1224,7 +1224,7 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *_item, bool del)
 	}	
 	
 	InvalidateLayout();
-	
+		
 	return result;
 }
 
@@ -1336,8 +1336,10 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 	if ((ResizingMode() & B_FOLLOW_LEFT_RIGHT) == B_FOLLOW_LEFT_RIGHT) {
 		if (Parent())
 			*width = Parent()->Frame().Width() + 1;
-		else
+		else if (Window())
 			*width = Window()->Frame().Width() + 1;
+		
+		// TODO: We are left without a valid width here ?!?
 		
 		*height = frame.Height();
 	} else {
