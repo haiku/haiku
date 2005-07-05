@@ -7,6 +7,10 @@
  * Distributed under the terms of the MIT License.
  */
 
+#ifdef COMPILE_FOR_R5
+#include "/boot/develop/headers/be/interface/Window.h"
+#endif
+
 #include <Application.h>
 #include <Screen.h>
 #include <WindowScreen.h>

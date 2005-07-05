@@ -4,12 +4,11 @@ UsePrivateHeaders interface ;
 UsePrivateHeaders input ;
 
 if ! $(HAIKU_COMPATIBLE) {
-	SubDirC++Flags -DCOMPILE_FOR_R5 ;
-	
-	# Hack to have DirectWindow.cpp and WindowScreen.cpp
-	# include the R5 <Window .h> header.
-	PrependObjectHdrs DirectWindow.cpp : /boot/develop/headers/be/interface ;
-	PrependObjectHdrs WindowScreen.cpp : /boot/develop/headers/be/interface ;
+	if $(DANO_COMPATIBLE) {
+		SubDirC++Flags -DCOMPILE_FOR_DANO ;
+	} else {
+		SubDirC++Flags -DCOMPILE_FOR_R5 ;
+	}
 }
 
 
@@ -31,9 +30,16 @@ SharedLibrary game :
 ;
 
 
-LinkSharedOSLibs libgame.so :
-	be libmedia.so
-;
+if $(HAIKU_COMPATIBLE) {
+	LinkSharedOSLibs libgame.so :
+		libbe.so libmedia.so
+	;
+} else {
+	LinkSharedOSLibs libgame.so :
+		be libmedia.so
+	;
+}
+
 
 MakeLocate <develop>libgame.so : $(OBOS_STLIB_DIR) ;
 RelSymLink <develop>libgame.so : libgame.so ;

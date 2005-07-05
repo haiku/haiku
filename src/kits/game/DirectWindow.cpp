@@ -7,6 +7,10 @@
  * Distributed under the terms of the MIT License.
  */
 
+#ifdef COMPILE_FOR_R5
+#include "/boot/develop/headers/be/interface/Window.h"
+#endif
+
 #include <DirectWindow.h>
 #include <clipping.h>
 
@@ -14,6 +18,12 @@
 #include <R5_AppServerLink.h>
 #include <R5_Session.h>
 #endif
+
+// Compiling for DANO/Zeta is broken as it doesn't have BRegion::set_size()
+#ifdef COMPILE_FOR_DANO
+		#warning "##### Bilding BDirectWindow for TARGET_PLATFORM=dano (DANO/Zeta) is broken #####"
+#endif
+
 
 // TODO: We'll want to move this to a private header,
 // accessible by the app server.
@@ -253,7 +263,8 @@ BDirectWindow::GetClippingRegion(BRegion *region, BPoint *origin) const
 			originX = (int32)origin->x;
 			originY = (int32)origin->y;
 		}
-		
+
+#ifndef COMPILE_FOR_DANO
 		// Since we are friend of BRegion, we can access its private members.
 		// Otherwise, we would need to call BRegion::Include(clipping_rect)
 		// for every clipping_rect in our clip_list, and that would be much
@@ -270,6 +281,8 @@ BDirectWindow::GetClippingRegion(BRegion *region, BPoint *origin) const
 			offset_rect(region->data[c], -originX, -originY);
 		}
 		
+#endif
+
 		UnlockDirect();
 
 		return B_OK;
