@@ -2030,17 +2030,23 @@ BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 	if (!data)
 		return B_BAD_VALUE;
 
+	uint32 magic = *(uint32*)data;
+
 	// prepare flattened fields
 	if (((KMessage::Header*)data)->magic == KMessage::kMessageHeaderMagic) {
 		// a KMessage
 		KMessage::Header *header = (KMessage::Header*)data;
 		header->targetToken = (preferred ? B_PREFERRED_TOKEN : token);
-	} else if (*(uint32*)data == kMessageMagic
-		|| *(uint32*)data == kMessageMagicSwapped) {
-		// get the header
-		BMemoryIO stream(data, size);
+	} else if (magic == kMessageMagic || magic == kMessageMagicSwapped) {
+		// get the header (but not the magic again)
+		BMemoryIO stream((uint32 *)data + 1, size - sizeof(uint32));
+
 		Header header;
-		status_t error = header.ReadFrom(stream);
+		status_t error = header.SetMagic(magic);
+		if (error != B_OK)
+			return error;
+
+		error = header.ReadFrom(stream);
 		if (error != B_OK)
 			return error;
 
