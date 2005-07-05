@@ -995,39 +995,34 @@ myRootLayer->Unlock();
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_CLIP_REGION: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			
 			// if this Layer is hidden, it is clear that its visible region is void.
-			if (fCurrentLayer->IsHidden())
-			{
+			if (fCurrentLayer->IsHidden()) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<int32>(0L);
-				fLink.Flush();
-			}
-			else
-			{
+			} else {
 				// TODO: Watch out for the coordinate system in AS_LAYER_GET_CLIP_REGION
-				BRegion reg;
-				LayerData *ld;
-				int32 noOfRects;
-			
-				ld = fCurrentLayer->fLayerData;
-				if (ld->ClippingRegion())
-					reg.IntersectWith(ld->ClippingRegion());
-			
+				LayerData* layerData = fCurrentLayer->fLayerData;
+				BRegion region;
+
 				// TODO: This could also be done more reliably in the Layer,
 				// when the State stack is implemented there. There should be
 				// DrawData::fCulmulatedClippingRegion...
 				// TODO: the DrawData clipping region should be in local view coords.
-				while ((ld = ld->prevState)) {
-					if (ld->ClippingRegion())
-						reg.IntersectWith(ld->ClippingRegion());
-				}
 
-				noOfRects = reg.CountRects();
+				do {
+					if (layerData->ClippingRegion())
+						region.IntersectWith(layerData->ClippingRegion());
+				} while ((layerData = layerData->prevState) != NULL);
+
+				int32 rectCount = region.CountRects();
+
 				fLink.StartMessage(SERVER_TRUE);
-				fLink.Attach<int32>(noOfRects);
+				fLink.Attach<int32>(rectCount);
 
-				for(int i = 0; i < noOfRects; i++)
-					fLink.Attach<BRect>(reg.RectAt(i));
+				for (int32 i = 0; i < rectCount; i++)
+					fLink.Attach<BRect>(region.RectAt(i));
 			}
+
+			fLink.Flush();
 			break;
 		}
 		case AS_LAYER_SET_CLIP_REGION:
