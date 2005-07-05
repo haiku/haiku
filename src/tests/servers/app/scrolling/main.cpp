@@ -22,6 +22,7 @@ class TestView : public BView {
 						  fLastMousePos(0.0, 0.0)
 					{
 						SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+						SetLowColor(ViewColor());
 					}
 
 	virtual	void	MessageReceived(BMessage* message);
