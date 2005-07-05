@@ -55,6 +55,9 @@ extern "C" status_t _fini_interface_kit_();
 
 using namespace BPrivate;
 
+menu_info *_menu_info_ptr_;
+
+
 static status_t
 mode2parms(uint32 space, uint32 *out_space, int32 *width, int32 *height)
 {
@@ -770,9 +773,10 @@ _init_interface_kit_()
 	BTextView::sWidthSem = widthSem;
 	BTextView::sWidthAtom = 0;
 	BTextView::sWidths = new _BWidthBuffer_;
-	
+
 	_init_global_fonts();
 
+	_menu_info_ptr_ = &BMenu::sMenuInfo;
 	status_t status = load_menu_settings(BMenu::sMenuInfo);
 
 	// TODO: fill the other static members
@@ -972,7 +976,6 @@ int32 *get_token_list(team_id app, int32 *count);
 void do_bring_to_front_team(BRect zoomRect, team_id app, bool zoom);
 void do_minimize_team(BRect zoomRect, team_id team, bool zoom);
 
-menu_info *_menu_info_ptr_ = NULL;
 
 void 
 do_window_action(int32 window_id, int32 action, 
