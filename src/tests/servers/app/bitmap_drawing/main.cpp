@@ -1,61 +1,47 @@
 // main.cpp
 
+#include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-#include "Application.h"
-#include "Bitmap.h"
-#include "Button.h"
-#include "Message.h"
-#include "View.h"
-#include "Window.h"
+#include <Application.h>
+#include <Bitmap.h>
+#include <Button.h>
+#include <Message.h>
+#include <MessageRunner.h>
+#include <Messenger.h>
+#include <View.h>
+#include <Window.h>
 
 #include "bitmap.h"
 
 enum {
 	MSG_RESET	= 'rset',	
+	MSG_TICK	= 'tick',
 };
 
+#define SPEED 2.0
+
+// random_number_between
+float
+random_number_between(float v1, float v2)
+{
+	if (v1 < v2)
+		return v1 + fmod(rand() / 1000.0, (v2 - v1));
+	else if (v2 < v1)
+		return v2 + fmod(rand() / 1000.0, (v1 - v2));
+	return v1;
+}
+
+// TestView
 class TestView : public BView {
 
  public:
 					TestView(BRect frame, const char* name,
-							  uint32 resizeFlags, uint32 flags)
-						: BView(frame, name, resizeFlags, flags),
-//						  fBitmap(new BBitmap(BRect(0, 0, kBitmapWidth - 1, kBitmapHeight -1),
-//						  					  0, kBitmapFormat)),
-						  fBitmap(new BBitmap(BRect(0, 0, 32 - 1, 8 - 1),
-						  					  0, B_CMAP8)),
-//						  fBitmap(new BBitmap(BRect(0, 0, 32 - 1, 8 - 1),
-//						  					  0, B_GRAY8)),
-						  fBitmapRect(),
-						  fTracking(TRACKING_NONE),
-						  fLastMousePos(-1.0, -1.0)
-					{
-						SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-						SetLowColor(ViewColor());
-//						uint32 size = min_c((uint32)fBitmap->BitsLength(), sizeof(kBitmapBits));
-//						memcpy(fBitmap->Bits(), kBitmapBits, size);
-						uint8* bits = (uint8*)fBitmap->Bits();
-						uint32 width = fBitmap->Bounds().IntegerWidth() + 1;
-						uint32 height = fBitmap->Bounds().IntegerHeight() + 1;
-						uint32 bpr = fBitmap->BytesPerRow();
-printf("width: %ld, height: %ld, bpr: %ld\n", width, height, bpr);
-						int32 index = 0;
-						for (uint32 y = 0; y < height; y++) {
-							uint8* h = bits;
-							for (uint32 x = 0; x < width; x++) {
-								*h = index++;
-								h++;
-							}
-							bits += bpr;
-						}
-BRect a(0.0, 10.0, 20.0, 10.0);
-BRect b(0.0, 10.0, 10.0, 30.0);
-printf("Intersects: %d\n", a.Intersects(b));
-						_ResetRect();
-					}
+							 uint32 resizeFlags, uint32 flags);
 
+	virtual	void	AttachedToWindow();
 	virtual	void	MessageReceived(BMessage* message);
 
 	virtual	void	Draw(BRect updateRect);
@@ -70,7 +56,20 @@ printf("Intersects: %d\n", a.Intersects(b));
 			void	_InvalidateBitmapRect(BRect r);
 			void	_DrawCross(BPoint where, rgb_color c);
 
+	struct point {
+		double x;
+		double y;
+		double direction_x;
+		double direction_y;
+	};
+
+			void	_FillBitmap(point* polygon);
+			void	_InitPolygon(const BRect& b, point* polygon) const;
+			void	_MorphPolygon(const BRect& b, point* polygon);
+
 	BBitmap*		fBitmap;
+	BView*			fOffscreenView;
+	BMessageRunner*	fTicker;
 	BRect			fBitmapRect;
 
 	enum {
@@ -91,25 +90,113 @@ printf("Intersects: %d\n", a.Intersects(b));
 
 	uint32			fTracking;
 	BPoint			fLastMousePos;
+
+	point			fPolygon[4];
 };
+
+// constructor
+TestView::TestView(BRect frame, const char* name,
+				   uint32 resizeFlags, uint32 flags)
+	: BView(frame, name, resizeFlags, flags),
+//	  fBitmap(new BBitmap(BRect(0, 0, kBitmapWidth - 1, kBitmapHeight -1), 0, kBitmapFormat)),
+//	  fBitmap(new BBitmap(BRect(0, 0, 32 - 1, 8 - 1), 0, B_CMAP8)),
+//	  fBitmap(new BBitmap(BRect(0, 0, 32 - 1, 8 - 1), 0, B_GRAY8)),
+	  fBitmap(new BBitmap(BRect(0, 0, 99, 99), B_RGB32, true)),
+//	  fBitmap(new BBitmap(BRect(0, 0, 99, 99), B_CMAP8, true)),
+//	  fBitmap(new BBitmap(BRect(0, 0, 31, 31), B_GRAY8, true)),
+	  fOffscreenView(new BView(fBitmap->Bounds(), "Offscreen view",
+							   B_FOLLOW_ALL, B_WILL_DRAW | B_SUBPIXEL_PRECISE)),
+	  fTicker(NULL),
+	  fBitmapRect(),
+	  fTracking(TRACKING_NONE),
+	  fLastMousePos(-1.0, -1.0)
+{
+	SetViewColor(B_TRANSPARENT_COLOR);
+	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+//	uint32 size = min_c((uint32)fBitmap->BitsLength(), sizeof(kBitmapBits));
+//	memcpy(fBitmap->Bits(), kBitmapBits, size);
+/*	uint8* bits = (uint8*)fBitmap->Bits();
+	uint32 width = fBitmap->Bounds().IntegerWidth() + 1;
+	uint32 height = fBitmap->Bounds().IntegerHeight() + 1;
+	uint32 bpr = fBitmap->BytesPerRow();
+printf("width: %ld, height: %ld, bpr: %ld\n", width, height, bpr);
+	int32 index = 0;
+	for (uint32 y = 0; y < height; y++) {
+		uint8* h = bits;
+		for (uint32 x = 0; x < width; x++) {
+			*h = index++;
+			h++;
+		}
+		bits += bpr;
+	}
+BRect a(0.0, 10.0, 20.0, 10.0);
+BRect b(0.0, 10.0, 10.0, 30.0);
+printf("Intersects: %d\n", a.Intersects(b));*/
+	if (fBitmap->Lock()) {
+		fBitmap->AddChild(fOffscreenView);
+		fOffscreenView->SetHighColor(255, 0, 0);
+		fBitmap->Unlock();
+	}
+
+	srand((long int)system_time());
+	_InitPolygon(fBitmap->Bounds(), fPolygon);
+
+	_ResetRect();
+}
+
+// AttachedToWindow
+void
+TestView::AttachedToWindow()
+{
+	BMessenger mess(this, Window());
+	BMessage msg(MSG_TICK);
+	fTicker = new BMessageRunner(mess, &msg, 40000LL);
+}
 
 // MessageReceived
 void
 TestView::MessageReceived(BMessage* message)
 {
-	if (message->what == MSG_RESET) {
-		BRect old = fBitmapRect;
-		_ResetRect();
-		_InvalidateBitmapRect(old | fBitmapRect);
-	} else
-		BView::MessageReceived(message);
+	switch (message->what) {
+		case MSG_RESET: {
+			BRect old = fBitmapRect;
+			_ResetRect();
+			_InvalidateBitmapRect(old | fBitmapRect);
+			break;
+		}
+		case MSG_TICK:
+			_MorphPolygon(fBitmap->Bounds(), fPolygon);
+			_FillBitmap(fPolygon);
+			Invalidate(fBitmapRect);
+			break;
+		default:
+			BView::MessageReceived(message);
+			break;
+	}
 }
 
 // Draw
 void
 TestView::Draw(BRect updateRect)
 {
-	SetDrawingMode(B_OP_COPY);
+	// background arround bitmap
+	BRect topOfBitmap(updateRect.left, updateRect.top, updateRect.right, fBitmapRect.top - 1);
+	if (topOfBitmap.IsValid())
+		FillRect(topOfBitmap, B_SOLID_LOW);
+
+	BRect leftOfBitmap(updateRect.left, fBitmapRect.top, fBitmapRect.left - 1, fBitmapRect.bottom);
+	if (leftOfBitmap.IsValid())
+		FillRect(leftOfBitmap, B_SOLID_LOW);
+
+	BRect rightOfBitmap(fBitmapRect.right + 1, fBitmapRect.top, updateRect.right, fBitmapRect.bottom);
+	if (rightOfBitmap.IsValid())
+		FillRect(rightOfBitmap, B_SOLID_LOW);
+
+	BRect bottomOfBitmap(updateRect.left, fBitmapRect.bottom + 1, updateRect.right, updateRect.bottom);
+	if (bottomOfBitmap.IsValid())
+		FillRect(bottomOfBitmap, B_SOLID_LOW);
+
+	// bitmap
 	DrawBitmap(fBitmap, fBitmap->Bounds(), fBitmapRect);
 
 	// indicate the frame to see any errors in the drawing code
@@ -129,6 +216,7 @@ TestView::Draw(BRect updateRect)
 	DrawString(message, textPos + BPoint(-1.0, -1.0));
 }
 
+// hit_test
 bool
 hit_test(BPoint where, BPoint p)
 {
@@ -137,6 +225,7 @@ hit_test(BPoint where, BPoint p)
 	return r.Contains(where);
 }
 
+// hit_test
 bool
 hit_test(BPoint where, BPoint a, BPoint b)
 {
@@ -287,6 +376,81 @@ TestView::_DrawCross(BPoint where, rgb_color c)
 	EndLineArray();
 }
 
+// _FillBitmap
+void
+TestView::_FillBitmap(point* polygon)
+{
+	if (fBitmap->Lock()) {
+		fOffscreenView->SetDrawingMode(B_OP_COPY);
+		fOffscreenView->FillRect(fOffscreenView->Bounds(), B_SOLID_LOW);
+
+		fOffscreenView->SetDrawingMode(B_OP_OVER);
+
+		fOffscreenView->StrokeLine(BPoint(polygon[0].x, polygon[0].y),
+								   BPoint(polygon[1].x, polygon[1].y));
+		fOffscreenView->StrokeLine(BPoint(polygon[1].x, polygon[1].y),
+								   BPoint(polygon[2].x, polygon[2].y));
+		fOffscreenView->StrokeLine(BPoint(polygon[2].x, polygon[2].y),
+								   BPoint(polygon[3].x, polygon[3].y));
+		fOffscreenView->StrokeLine(BPoint(polygon[3].x, polygon[3].y),
+								   BPoint(polygon[0].x, polygon[0].y));
+
+		fOffscreenView->Sync();
+		fBitmap->Unlock();
+	}
+}
+
+// _InitPolygon
+void
+TestView::_InitPolygon(const BRect& b, point* polygon) const
+{
+	polygon[0].x = b.left;
+	polygon[0].y = b.top;
+	polygon[0].direction_x = random_number_between(-SPEED, SPEED);
+	polygon[0].direction_y = random_number_between(-SPEED, SPEED);
+	polygon[1].x = b.right;
+	polygon[1].y = b.top;
+	polygon[1].direction_x = random_number_between(-SPEED, SPEED);
+	polygon[1].direction_y = random_number_between(-SPEED, SPEED);
+	polygon[2].x = b.right;
+	polygon[2].y = b.bottom;
+	polygon[2].direction_x = random_number_between(-SPEED, SPEED);
+	polygon[2].direction_y = random_number_between(-SPEED, SPEED);
+	polygon[3].x = b.left;
+	polygon[3].y = b.bottom;
+	polygon[3].direction_x = random_number_between(-SPEED, SPEED);
+	polygon[3].direction_y = random_number_between(-SPEED, SPEED);
+}
+
+// morph
+inline void
+morph(double* value, double* direction, double min, double max)
+{
+	*value += *direction;
+	if (*value < min) {
+		*value = min;
+		*direction = -*direction;
+	} else if (*value > max) {
+		*value = max;
+		*direction = -*direction;
+	}
+}
+
+// _MorphPolygon
+void
+TestView::_MorphPolygon(const BRect& b, point* polygon)
+{
+	morph(&polygon[0].x, &polygon[0].direction_x, b.left, b.right);
+	morph(&polygon[1].x, &polygon[1].direction_x, b.left, b.right);
+	morph(&polygon[2].x, &polygon[2].direction_x, b.left, b.right);
+	morph(&polygon[3].x, &polygon[3].direction_x, b.left, b.right);
+	morph(&polygon[0].y, &polygon[0].direction_y, b.top, b.bottom);
+	morph(&polygon[1].y, &polygon[1].direction_y, b.top, b.bottom);
+	morph(&polygon[2].y, &polygon[2].direction_y, b.top, b.bottom);
+	morph(&polygon[3].y, &polygon[3].direction_y, b.top, b.bottom);
+}
+
+
 // show_window
 void
 show_window(BRect frame, const char* name)
@@ -305,6 +469,7 @@ show_window(BRect frame, const char* name)
 								   B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	view->AddChild(control);
 	control->SetTarget(view);
+	control->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	window->Show();
 }
