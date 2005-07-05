@@ -298,7 +298,7 @@ TrackSlider::MouseDown(BPoint point)
 
 	UpdatePosition(point);
 	SetTracking(true);
-	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+	SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY| B_LOCK_WINDOW_FOCUS);
 }
 
 
