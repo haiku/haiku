@@ -886,29 +886,6 @@ BMenu::BMenu(BRect frame, const char *name, uint32 resizingMode, uint32 flags,
 }
 
 
-BPoint
-BMenu::ScreenLocation()
-{
-	BMenu *superMenu = Supermenu();
-	BMenuItem *superItem = Superitem();
-
-	if (superMenu == NULL && superItem == NULL) {
-		debugger("BMenu can't determine where to draw."
-			"Override BMenu::ScreenLocation() to determine location.");
-	}
-	
-	BPoint point;
-	if (superMenu->Layout() == B_ITEMS_IN_COLUMN)
-		point = superItem->Frame().RightTop();
-	else
-		point = superItem->Frame().LeftBottom() + BPoint(1.0f, 1.0f);
-	
-	superMenu->ConvertToScreen(&point);
-	
-	return point;
-}
-
-
 void
 BMenu::SetItemMargins(float left, float top, float right, float bottom)
 {
@@ -1340,7 +1317,7 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 		default:
 			break;
 	}
-		
+
 	// This is for BMenuBar.
 	if ((ResizingMode() & B_FOLLOW_LEFT_RIGHT) == B_FOLLOW_LEFT_RIGHT) {
 		if (Parent())
@@ -1359,6 +1336,7 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 BRect
 BMenu::Bump(BRect current, BPoint extent, int32 index) const
 {
+	// ToDo: what's this?
 	return BRect();
 }
 
@@ -1366,7 +1344,31 @@ BMenu::Bump(BRect current, BPoint extent, int32 index) const
 BPoint
 BMenu::ItemLocInRect(BRect frame) const
 {
+	// ToDo: what's this?
 	return BPoint();
+}
+
+
+BPoint
+BMenu::ScreenLocation()
+{
+	BMenu *superMenu = Supermenu();
+	BMenuItem *superItem = Superitem();
+
+	if (superMenu == NULL && superItem == NULL) {
+		debugger("BMenu can't determine where to draw."
+			"Override BMenu::ScreenLocation() to determine location.");
+	}
+
+	BPoint point;
+	if (superMenu->Layout() == B_ITEMS_IN_COLUMN)
+		point = superItem->Frame().RightTop() + BPoint(1.0f, 1.0f);
+	else
+		point = superItem->Frame().LeftBottom() + BPoint(1.0f, 1.0f);
+
+	superMenu->ConvertToScreen(&point);
+
+	return point;
 }
 
 
@@ -1374,8 +1376,29 @@ BRect
 BMenu::CalcFrame(BPoint where, bool *scrollOn)
 {
 	// TODO: Improve me
-	BRect frame = BScreen(MenuWindow()).Frame();	
-	frame.left += where.x + 2;
+	BRect bounds = Bounds();
+	BRect frame = bounds.OffsetToCopy(where);
+
+	BScreen screen(Window());
+	BRect screenFrame = screen.Frame();
+
+	BMenu *superMenu = Supermenu();
+	BMenuItem *superItem = Superitem();
+
+	if (superMenu->Layout() == B_ITEMS_IN_COLUMN) {
+		if (frame.right > screenFrame.right)
+			frame.OffsetBy(-superItem->Frame().Width() - frame.Width() - 2, 0);
+
+		if (frame.bottom > screenFrame.bottom)
+			frame.OffsetBy(0, screenFrame.bottom - frame.bottom);
+	} else {
+		if (frame.bottom > screenFrame.bottom)
+			frame.OffsetBy(0, -superItem->Frame().Height() - frame.Height() - 3);
+
+		if (frame.right > screenFrame.right)
+			frame.OffsetBy(screenFrame.right - frame.right, 0);
+	}
+
 	return frame;
 }
 
@@ -1688,13 +1711,12 @@ BMenu::UpdateWindowViewSize(bool upWind)
 	// TODO: Improve this, we already resize the menu
 	// in "LayoutItems()"
 	bool scroll;
-	BRect maxFrame = CalcFrame(ScreenLocation(), &scroll);
-	float width = min_c(Frame().Width(), maxFrame.Width());
-	ResizeTo(width, Frame().Height());
-	if (fCachedMenuWindow != NULL) {
-		fCachedMenuWindow->ResizeTo(Bounds().Width() + 2, Bounds().Height() + 2);
-		fCachedMenuWindow->MoveTo(ScreenLocation());
-	}
+	BRect frame = CalcFrame(ScreenLocation(), &scroll);
+	//float width = min_c(Frame().Width(), maxFrame.Width());
+	ResizeTo(frame.Width(), frame.Height());
+
+	fCachedMenuWindow->ResizeTo(Bounds().Width() + 2, Bounds().Height() + 2);
+	fCachedMenuWindow->MoveTo(frame.LeftTop());
 }
 
 
