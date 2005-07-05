@@ -23,7 +23,9 @@
 #include <TokenSpace.h>
 #include <util/DoublyLinkedList.h>
 
+#ifdef __HAIKU__
 #include <syscalls.h>
+#endif
 
 #include "AppInfoListMessagingTargetSet.h"
 #include "Debug.h"
