@@ -2209,8 +2209,8 @@ BView::DrawBitmapAsync(const BBitmap *bitmap, BRect srcRect, BRect dstRect)
 
 		fOwner->fLink->StartMessage(AS_LAYER_DRAW_BITMAP_ASYNC_IN_RECT);
 		fOwner->fLink->Attach<int32>(bitmap->get_server_token());
-		fOwner->fLink->Attach<BRect>(srcRect);
 		fOwner->fLink->Attach<BRect>(dstRect);
+		fOwner->fLink->Attach<BRect>(srcRect);
 	}
 }
 
