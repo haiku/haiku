@@ -105,6 +105,7 @@ RecorderWindow::RecorderWindow() :
 		fPlayFile(NULL),
 		fPlayTrack(NULL),
 		fPlayFrames(0),
+		fLooping(false),
 		fSavePanel(NULL),
 		fInitCheck(B_OK)
 {
@@ -113,6 +114,7 @@ RecorderWindow::RecorderWindow() :
 	fPlayButton = NULL;
 	fStopButton = NULL;
 	fSaveButton = NULL;
+	fLoopButton = NULL;
 	fLengthControl = NULL;
 	fInputField = NULL;
 	fRecordNode = 0;
@@ -310,6 +312,15 @@ RecorderWindow::InitWindow()
 			kDiskButtonBitmapsBits, kPressedDiskButtonBitmapsBits, kDisabledDiskButtonBitmapsBits, new BMessage(SAVE));
 		fSaveButton->SetResizingMode(B_FOLLOW_RIGHT | B_FOLLOW_TOP);
 		background->AddChild(fSaveButton);
+		
+		//	Button Loop
+		buttonRect = BRect(BPoint(0,0), kArrowSize);
+		buttonRect.OffsetTo(background->Bounds().RightBottom() - BPoint(23, 48));
+		fLoopButton = new DrawButton(buttonRect, "Loop", 
+			kLoopArrowBits, kArrowBits, new BMessage(LOOP));
+		fLoopButton->SetResizingMode(B_FOLLOW_RIGHT | B_FOLLOW_TOP);
+		fLoopButton->SetTarget(this);
+		background->AddChild(fLoopButton);
 		
 		buttonRect = BRect(BPoint(0,0), kSpeakerIconBitmapSize);
 		buttonRect.OffsetTo(background->Bounds().RightBottom() - BPoint(121, 17));
@@ -583,6 +594,9 @@ RecorderWindow::MessageReceived(BMessage * message)
 			fScopeView->SetLeftTime(left);
 		}
 		}
+		break;
+	case LOOP:
+		fLooping = fLoopButton->ButtonState();
 		break;
 	case B_SIMPLE_DATA:
 	case B_REFS_RECEIVED:
@@ -1226,7 +1240,12 @@ RecorderWindow::PlayFile(void * cookie, void * data, size_t size, const media_ra
 	int32 frame_size = (window->fPlayFormat.u.raw_audio.format & 0xf) *
 		window->fPlayFormat.u.raw_audio.channel_count;
 	
-	if (window->fPlayFrame < window->fPlayLimit) {
+	if ((window->fPlayFrame < window->fPlayLimit) || window->fLooping) {
+		if (window->fPlayFrame >= window->fPlayLimit) {
+			bigtime_t left = window->fTrackSlider->LeftTime();
+			window->fPlayTrack->SeekToTime(&left);
+			window->fPlayFrame = window->fPlayTrack->CurrentFrame();
+		}
 		int64 frames = 0;
 		window->fPlayTrack->ReadFrames(data, &frames);
 		window->fVUView->ComputeNextLevel(data, size/frame_size);

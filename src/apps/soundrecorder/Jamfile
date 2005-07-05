@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src apps soundrecorder ;
 
 App SoundRecorder :
+	DrawButton.cpp
 	DrawingTidbits.cpp
 	FileUtils.cpp
 	RecorderApp.cpp

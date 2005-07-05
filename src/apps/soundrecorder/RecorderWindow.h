@@ -18,6 +18,7 @@
 #include <SoundPlayer.h>
 #include <Window.h>
 
+#include "DrawButton.h"
 #include "ScopeView.h"
 #include "TransportButton.h"
 #include "TrackSlider.h"
@@ -55,6 +56,7 @@ public:
 			FORWARD,
 			SAVE,
 			VIEW_LIST,
+			LOOP,
 			INPUT_SELECTED = 'cW00',	//	control messages
 			LENGTH_CHANGED,
 			SOUND_SELECTED,
@@ -78,6 +80,7 @@ private:
 		TransportButton * fRewindButton;
 		TransportButton * fForwardButton;
 		TransportButton * fSaveButton;
+		DrawButton * fLoopButton;
 		VolumeSlider *fVolumeSlider;
 		TrackSlider *fTrackSlider;
 		UpDownButton * fUpDownButton;
@@ -122,6 +125,8 @@ private:
 		int64 fPlayLimit;
 		int64 fPlayFrame;
 		int64 fPlayFrames;
+		
+		bool fLooping;
 		
 		media_node fAudioMixerNode;
 		
