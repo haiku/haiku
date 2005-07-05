@@ -83,7 +83,7 @@ Translator JPEGTranslator :
 	$(jpeg_files)
 	;
 
-LinkSharedOSLibs JPEGTranslator : be translation ;
+LinkSharedOSLibs JPEGTranslator : libbe.so libtranslation.so ;
 
 Package haiku-translationkit-cvs :
 	JPEGTranslator :
