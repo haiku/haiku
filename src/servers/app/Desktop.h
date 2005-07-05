@@ -1,31 +1,38 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc. All rights reserved.
-//  Distributed under the terms of the MIT license.
-//
-//	File Name:		Desktop.h
-//	Author:			Adi Oanca <adioanca@cotty.iren.ro>
-//					Stephan Aßmus <superstippi@gmx.de>
-//	Description:	Class used to encapsulate desktop management
-//
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adrian Oanca <adioanca@cotty.iren.ro>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
 #ifndef _DESKTOP_H_
 #define _DESKTOP_H_
+
 
 #include <InterfaceDefs.h>
 #include <List.h>
 #include <Locker.h>
 #include <Menu.h>
-#include <ServerScreen.h>
+#include <Autolock.h>
+
+#include "ServerScreen.h"
 
 class BMessage;
-class BPortLink;
+
 class DisplayDriver;
 class HWInterface;
 class Layer;
 class RootLayer;
 class WinBorder;
 
-class Desktop {
+namespace BPrivate {
+	class LinkSender;
+};
+
+
+class Desktop : public BLocker {
  public:
 	// startup methods
 								Desktop();
@@ -64,13 +71,11 @@ class Desktop {
 	inline	int32				CountRootLayers() const
 									{ return fRootLayerList.CountItems(); }
 
-
 	inline	DisplayDriver*		GetDisplayDriver() const
 									{ return ScreenAt(0)->GetDisplayDriver(); }
 	inline	HWInterface*		GetHWInterface() const
 									{ return ScreenAt(0)->GetHWInterface(); }
 
-	
 	// Methods for layer(WinBorder) manipulation.
 			void				AddWinBorder(WinBorder *winBorder);
 			void				RemoveWinBorder(WinBorder *winBorder);
@@ -81,8 +86,9 @@ class Desktop {
 			void				RemoveWinBorderFromSubset(WinBorder *winBorder,
 														  WinBorder *fromWinBorder);
 
-			WinBorder*			FindWinBorderByServerWindowTokenAndTeamID(int32 token,
-																		  team_id teamID);
+			WinBorder*			FindWinBorderByClientToken(int32 token, team_id teamID);
+			//WinBorder*		FindWinBorderByServerToken(int32 token);
+
 	// get list of registed windows
 			const BList&		WindowList() const
 								{
@@ -91,13 +97,8 @@ class Desktop {
 									return fWinBorderList;
 								}
 
-	// locking with regards to registered windows list
-			bool				Lock()
-									{ return fWinLock.Lock(); }
-			void				Unlock()
-									{ return fWinLock.Unlock(); }
-			bool				IsLocked() const
-									{ return fWinLock.IsLocked(); }
+			void				WriteWindowList(team_id team, BPrivate::LinkSender& sender);
+			void				WriteWindowInfo(int32 serverToken, BPrivate::LinkSender& sender);
 
 	// Methods for various desktop stuff handled by the server
 			void				SetScrollBarInfo(const scroll_bar_info &info);
@@ -119,7 +120,6 @@ class Desktop {
 			void				_AddGraphicsCard(HWInterface* interface);
 
 			BList				fWinBorderList;
-			BLocker				fWinLock;
 		
 			BList				fRootLayerList;
 			RootLayer*			fActiveRootLayer;
@@ -135,4 +135,4 @@ class Desktop {
 
 extern Desktop *gDesktop;
 
-#endif // _DESKTOP_H_
+#endif	// _DESKTOP_H_

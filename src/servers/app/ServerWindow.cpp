@@ -20,6 +20,8 @@
 #include <View.h>
 #include <ViewAux.h>
 #include <Autolock.h>
+#include <TokenSpace.h>
+#include <WindowInfo.h>
 
 #include "AppServer.h"
 #include "BGet++.h"
@@ -87,6 +89,8 @@ ServerWindow::ServerWindow(const char *title, ServerApp *app,
 	fCurrentLayer(NULL)
 {
 	STRACE(("ServerWindow(%s)::ServerWindow()\n", title));
+
+	fServerToken = BPrivate::gDefaultTokens.NewToken(B_SERVER_TOKEN, this);
 }
 
 
@@ -101,6 +105,8 @@ ServerWindow::~ServerWindow()
 	delete fWinBorder;
 	
 	free(const_cast<char *>(fTitle));
+
+	BPrivate::gDefaultTokens.RemoveToken(fServerToken);
 
 	STRACE(("#ServerWindow(%s) will exit NOW\n", fTitle));
 }
@@ -316,6 +322,31 @@ ServerWindow::NotifyScreenModeChanged(const BRect frame, const color_space color
 
 	SendMessageToClient(&msg);
 }
+
+
+void
+ServerWindow::GetInfo(window_info& info)
+{
+	info.team = ClientTeam();
+	info.server_token = ServerToken();
+
+	info.thread = Thread();
+	info.client_token = ClientToken();
+	info.client_port = fClientLooperPort;
+	info.workspaces = fWinBorder->Workspaces();
+
+	info.layer = 0; // ToDo: what is this???
+	info.type = kNormalWindow;	// ToDo: do this for real
+	info.flags = fWinBorder->WindowFlags();
+	info.window_left = (int)floor(fWinBorder->Frame().left);
+	info.window_top = (int)floor(fWinBorder->Frame().top);
+	info.window_right = (int)floor(fWinBorder->Frame().right);
+	info.window_bottom = (int)floor(fWinBorder->Frame().bottom);
+
+	info.show_hide_level = fWinBorder->IsHidden() ? 1 : -1; // ???
+	info.is_mini = fWinBorder->IsHidden();
+}
+
 
 /*!
 	\brief Sets the font state for a layer
@@ -1185,15 +1216,15 @@ myRootLayer->Unlock();
 		case AS_ADD_TO_SUBSET:
 		{
 			STRACE(("ServerWindow %s: Message AS_ADD_TO_SUBSET\n", Title()));
-			WinBorder *wb;
+			WinBorder *windowBorder;
 			int32 mainToken;
 			team_id	teamID;
 
 			link.Read<int32>(&mainToken);
 			link.Read(&teamID, sizeof(team_id));
 
-			wb = gDesktop->FindWinBorderByServerWindowTokenAndTeamID(mainToken, teamID);
-			if (wb) {
+			windowBorder = gDesktop->FindWinBorderByClientToken(mainToken, teamID);
+			if (windowBorder) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Flush();
 
@@ -1201,7 +1232,7 @@ myRootLayer->Unlock();
 				BPrivate::PortLink msg(-1, -1);
 				msg.StartMessage(AS_ROOTLAYER_ADD_TO_SUBSET);
 				msg.Attach<WinBorder*>(fWinBorder);
-				msg.Attach<WinBorder*>(wb);
+				msg.Attach<WinBorder*>(windowBorder);
 				fWinBorder->GetRootLayer()->EnqueueMessage(msg);
 			} else {
 				fLink.StartMessage(SERVER_FALSE);
@@ -1212,22 +1243,22 @@ myRootLayer->Unlock();
 		case AS_REM_FROM_SUBSET:
 		{
 			STRACE(("ServerWindow %s: Message AS_REM_FROM_SUBSET\n", Title()));
-			WinBorder *wb;
+			WinBorder *windowBorder;
 			int32 mainToken;
 			team_id teamID;
 
 			link.Read<int32>(&mainToken);
 			link.Read(&teamID, sizeof(team_id));
 			
-			wb = gDesktop->FindWinBorderByServerWindowTokenAndTeamID(mainToken, teamID);
-			if (wb) {
+			windowBorder = gDesktop->FindWinBorderByClientToken(mainToken, teamID);
+			if (windowBorder) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Flush();
 
 				BPrivate::PortLink msg(-1, -1);
 				msg.StartMessage(AS_ROOTLAYER_REMOVE_FROM_SUBSET);
 				msg.Attach<WinBorder*>(fWinBorder);
-				msg.Attach<WinBorder*>(wb);
+				msg.Attach<WinBorder*>(windowBorder);
 				fWinBorder->GetRootLayer()->EnqueueMessage(msg);
 			} else {
 				fLink.StartMessage(SERVER_FALSE);

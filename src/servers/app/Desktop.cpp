@@ -1,17 +1,23 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc. All rights reserved.
-//  Distributed under the terms of the MIT license.
-//
-//	File Name:		Desktop.cpp
-//	Author:			Adi Oanca <adioanca@cotty.iren.ro>
-//					Stephan Aßmus <superstippi@gmx.de>
-//	Description:	Class used to encapsulate desktop management
-//
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adrian Oanca <adioanca@cotty.iren.ro>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+
+/**	Class used to encapsulate desktop management */
+
+
 #include <stdio.h>
 
 #include <Message.h>
 #include <Region.h>
+
+#include <WindowInfo.h>
+#include <ServerProtocol.h>
 
 #include "AppServer.h"
 #include "DisplayDriverPainter.h"
@@ -50,7 +56,6 @@
 
 Desktop::Desktop()
 	: fWinBorderList(64),
-	  fWinLock("desktop window list lock"),
 	  fRootLayerList(2),
 	  fActiveRootLayer(NULL),
 	  fScreenList(2),
@@ -402,19 +407,84 @@ Desktop::SetWinBorderFeel(WinBorder *winBorder, uint32 feel)
 
 
 WinBorder *
-Desktop::FindWinBorderByServerWindowTokenAndTeamID(int32 token, team_id teamID)
+Desktop::FindWinBorderByClientToken(int32 token, team_id teamID)
 {
-	WinBorder *wb;
+	BAutolock locker(this);
 
-	Lock();
+	WinBorder *wb;
 	for (int32 i = 0; (wb = (WinBorder *)fWinBorderList.ItemAt(i)); i++) {
 		if (wb->Window()->ClientToken() == token
 			&& wb->Window()->ClientTeam() == teamID)
-			break;
+			return wb;
 	}
-	Unlock();
 
-	return wb;
+	return NULL;
+}
+
+
+void
+Desktop::WriteWindowList(team_id team, BPrivate::LinkSender& sender)
+{
+	BAutolock locker(this);
+
+	// compute the number of windows
+
+	int32 count = 0;
+	if (team >= B_OK) {
+		for (int32 i = 0; i < fWinBorderList.CountItems(); i++) {
+			WinBorder* border = (WinBorder*)fWinBorderList.ItemAt(i);
+
+			if (border->Window()->ClientTeam() == team)
+				count++;
+		}
+	} else
+		count = fWinBorderList.CountItems();
+
+	// write list
+
+	sender.StartMessage(SERVER_TRUE);
+	sender.Attach<int32>(count);
+
+	for (int32 i = 0; i < fWinBorderList.CountItems(); i++) {
+		WinBorder* border = (WinBorder*)fWinBorderList.ItemAt(i);
+
+		if (team >= B_OK && border->Window()->ClientTeam() != team)
+			continue;
+
+		sender.Attach<int32>(border->Window()->ServerToken());
+	}
+
+	sender.Flush();
+}
+
+
+void
+Desktop::WriteWindowInfo(int32 serverToken, BPrivate::LinkSender& sender)
+{
+	BAutolock locker(this);
+	BAutolock tokenLocker(BPrivate::gDefaultTokens);
+
+	ServerWindow* window;
+	if (BPrivate::gDefaultTokens.GetToken(serverToken,
+			B_SERVER_TOKEN, (void**)&window) != B_OK) {
+		sender.StartMessage(B_ENTRY_NOT_FOUND);
+		sender.Flush();
+		return;
+	}
+
+	window_info info;
+	window->GetInfo(info);
+
+	int32 length = window->Title() ? strlen(window->Title()) : 0;
+
+	sender.StartMessage(B_OK);
+	sender.Attach<int32>(sizeof(window_info) + length + 1);
+	sender.Attach(&info, sizeof(window_info));
+	if (length > 0)
+		sender.Attach(window->Title(), length + 1);
+	else
+		sender.Attach<char>('\0');
+	sender.Flush();
 }
 
 

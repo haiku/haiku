@@ -609,6 +609,20 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 //	LayerData ld;
 
 	switch (code) {
+		case AS_GET_WINDOW_LIST:
+			team_id team;
+			link.Read<team_id>(&team);
+
+			gDesktop->WriteWindowList(team, fLink.Sender());
+			break;
+
+		case AS_GET_WINDOW_INFO:
+			int32 serverToken;
+			link.Read<int32>(&serverToken);
+
+			gDesktop->WriteWindowInfo(serverToken, fLink.Sender());
+			break;
+
 		case AS_UPDATE_COLORS:
 		{
 			// NOTE: R2: Eventually we will have windows which will notify their children of changes in 

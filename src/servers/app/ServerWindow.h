@@ -37,6 +37,7 @@ class Workspace;
 class RootLayer;
 class Layer;
 class ServerPicture;
+struct window_info;
 
 #define AS_UPDATE_DECORATOR 'asud'
 #define AS_UPDATE_COLORS 'asuc'
@@ -103,6 +104,9 @@ public:
 
 			// server "private" - try not to use.
 	inline	int32				ClientToken() const { return fHandlerToken; }
+	inline	int32				ServerToken() const { return fServerToken; }
+
+			void				GetInfo(window_info& info);
 
 			// ToDo: public??
 			SubWindowList	fSubWindowList;
@@ -144,6 +148,7 @@ private:
 
 			BMessage			fClientViewsWithInvalidCoords;
 
+			int32				fServerToken;
 			int32				fHandlerToken;
 
 			Layer*				fCurrentLayer;
