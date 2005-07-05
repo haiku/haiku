@@ -32,15 +32,15 @@
 #include "Workspace.h"
 
 #ifdef __HAIKU__
-#define USE_ACCELERANT 1
+#	define USE_ACCELERANT 1
 #else
-#define USE_ACCELERANT 0
+#	define USE_ACCELERANT 0
 #endif
 
 #if USE_ACCELERANT
-  #include "AccelerantHWInterface.h"
+#	include "AccelerantHWInterface.h"
 #else
-  #include "ViewHWInterface.h"
+#	include "ViewHWInterface.h"
 #endif
 
 #include "Desktop.h"
@@ -48,9 +48,9 @@
 //#define DEBUG_DESKTOP
 
 #ifdef DEBUG_DESKTOP
-	#define STRACE(a) printf(a)
+#	define STRACE(a) printf(a)
 #else
-	#define STRACE(a) /* nothing */
+#	define STRACE(a) /* nothing */
 #endif
 
 
@@ -136,17 +136,10 @@ Desktop::_AddGraphicsCard(HWInterface* interface)
 		// The interface is now owned by the screen
 
 	if (screen->Initialize() >= B_OK && fScreenList.AddItem((void*)screen)) {
-
 		// TODO: be careful of screen initialization - monitor may not support 640x480
-#if __HAIKU__
-		screen->SetMode(1400, 1050, B_RGB32, 60.f);
-#else
 		screen->SetMode(800, 600, B_RGB32, 60.f);
-#endif
-
-	} else {
+	} else
 		delete screen;
-	}
 }
 
 
