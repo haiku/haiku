@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <stdio.h>
 
 #include <ScrollView.h>
 #include <Message.h>
@@ -23,35 +24,58 @@ BScrollView::BScrollView(const char *name, BView *target, uint32 resizingMode,
 	fBorder(border),
 	fHighlighted(false)
 {
-	fTarget->TargetedByScrollView(this);
-	fTarget->MoveTo(B_ORIGIN);
-
-	if (border != B_NO_BORDER)
-		fTarget->MoveBy(BorderSize(border), BorderSize(border));
-
-	AddChild(fTarget);
-
-	BRect frame = fTarget->Frame();
-	if (horizontal) {
-		BRect rect = frame;
-		rect.top = rect.bottom + 1;
-		rect.bottom += B_H_SCROLL_BAR_HEIGHT + 1;
-		if (border != B_NO_BORDER || vertical)
-			rect.right++;
+	BRect targetFrame;
+	if (fTarget) {
+		// layout target and add it
+		fTarget->TargetedByScrollView(this);
+		fTarget->MoveTo(B_ORIGIN);
+	
 		if (border != B_NO_BORDER)
+			fTarget->MoveBy(BorderSize(border), BorderSize(border));
+	
+		AddChild(fTarget);
+		targetFrame = fTarget->Frame();
+	} else {
+		// no target specified
+		targetFrame = Bounds();
+		if (horizontal)
+			targetFrame.bottom -= B_H_SCROLL_BAR_HEIGHT + 1;
+		if (vertical)
+			targetFrame.right -= B_V_SCROLL_BAR_WIDTH + 1;
+		if (border == B_FANCY_BORDER) {
+			targetFrame.bottom--;
+			targetFrame.right--;
+		}
+	}
+
+	if (horizontal) {
+		BRect rect = targetFrame;
+		rect.top = rect.bottom + 1;
+		rect.bottom = rect.top + B_H_SCROLL_BAR_HEIGHT;
+		if (border != B_NO_BORDER || vertical) {
+			// extend scrollbar so that it overlaps one pixel with vertical scrollbar
+			rect.right++;
+		}
+		if (border != B_NO_BORDER) {
+			// the scrollbar draws part of the surrounding frame on the left
 			rect.left--;
+		}
 		fHorizontalScrollBar = new BScrollBar(rect, "_HSB_", fTarget, 0, 1000, B_HORIZONTAL);
 		AddChild(fHorizontalScrollBar);
 	}
 
 	if (vertical) {
-		BRect rect = frame;
+		BRect rect = targetFrame;
 		rect.left = rect.right + 1;
-		rect.right += B_V_SCROLL_BAR_WIDTH + 1;
-		if (border != B_NO_BORDER || horizontal)
+		rect.right = rect.left + B_V_SCROLL_BAR_WIDTH;
+		if (border != B_NO_BORDER || horizontal) {
+			// extend scrollbar so that it overlaps one pixel with vertical scrollbar
 			rect.bottom++;
-		if (border != B_NO_BORDER)
+		}
+		if (border != B_NO_BORDER) {
+			// the scrollbar draws part of the surrounding frame on the left
 			rect.top--;
+		}
 		fVerticalScrollBar = new BScrollBar(rect, "_VSB_", fTarget, 0, 1000, B_VERTICAL);
 		AddChild(fVerticalScrollBar);
 	}
@@ -486,7 +510,7 @@ BScrollView::GetPreferredSize(float *_width, float *_height)
 BRect
 BScrollView::CalcFrame(BView *target, bool horizontal, bool vertical, border_style border)
 {
-	BRect frame = target != NULL ? frame = target->Frame() : BRect(0, 0, 80, 80);
+	BRect frame = target != NULL ? target->Frame() : BRect(0, 0, 80, 80);
 
 	if (vertical)
 		frame.right += B_V_SCROLL_BAR_WIDTH;

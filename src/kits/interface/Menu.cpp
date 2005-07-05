@@ -1171,10 +1171,13 @@ BMenu::_AddItem(BMenuItem *item, int32 index)
 
 	item->SetSuper(this);
 
+	BWindow* window = Window();
+
 	// Make sure we update the layout in case we are already attached.
-	if (Window() && fResizeToFit) {
+	if (fResizeToFit && window && window->Lock()) {
 		LayoutItems(index);
 		Invalidate();
+		window->Unlock();
 	}
 
 	// Find the root menu window, so we can install this item.
@@ -1182,8 +1185,11 @@ BMenu::_AddItem(BMenuItem *item, int32 index)
 	while (root->Supermenu())
 		root = root->Supermenu();
 
-	if (root->Window())
-		item->Install(root->Window());
+	window = root->Window();
+	if (window && window->Lock()) {
+		item->Install(window);
+		window->Unlock();
+	}
 	
 	return true;
 }

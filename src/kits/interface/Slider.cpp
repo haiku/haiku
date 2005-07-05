@@ -680,8 +680,22 @@ BSlider::Draw(BRect updateRect)
 	if (Style() == B_BLOCK_THUMB)
 		background.Exclude(ThumbFrame());
 
-	if (background.Frame().IsValid())
-		OffscreenView()->FillRegion(&background, B_SOLID_LOW);
+
+#if USE_OFF_SCREEN_VIEW
+	if (!fOffScreenBits)
+		return;
+
+	if (fOffScreenBits->Lock()) {
+#endif
+
+		if (background.Frame().IsValid())
+			OffscreenView()->FillRegion(&background, B_SOLID_LOW);
+
+#if USE_OFF_SCREEN_VIEW
+		fOffScreenView->Sync();
+		fOffScreenBits->Unlock();
+	}
+#endif
 
 	DrawSlider();
 }
@@ -693,9 +707,6 @@ BSlider::DrawSlider()
 #if USE_OFF_SCREEN_VIEW
 	if (!fOffScreenBits)
 		return;
-#endif
-
-#if USE_OFF_SCREEN_VIEW
 	if (fOffScreenBits->Lock()) {
 #endif
 		DrawBar();
@@ -705,10 +716,10 @@ BSlider::DrawSlider()
 		DrawText();
 
 #if USE_OFF_SCREEN_VIEW
-		fOffscreenView->Sync();
-		DrawBitmap(fOffScreenBits, B_ORIGIN);
-
+		fOffScreenView->Sync();
 		fOffScreenBits->Unlock();
+
+		DrawBitmap(fOffScreenBits, B_ORIGIN);
 	}
 #endif
 }
@@ -1100,6 +1111,8 @@ BSlider::ThumbFrame() const
 		if (Orientation() == B_HORIZONTAL) {
 			frame.left = (float)floor(Position() * (_MaxPosition() - _MinPosition()) +
 				_MinPosition()) - 6;
+// TODO: seems this was removed...
+//			frame.top = 8.0f + (Label() ? textHeight + 4.0f : 0.0f);
 			frame.right = frame.left + 12.0f;
 			frame.bottom = frame.bottom - 2.0f -
 				(MinLimitLabel() || MaxLimitLabel() ? textHeight + 4.0f : 0.0f);
@@ -1586,37 +1599,40 @@ BSlider::_DrawTriangleThumb()
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
 		lighten1 = tint_color(no_tint, B_LIGHTEN_1_TINT),
 //		lighten2 = tint_color(no_tint, B_LIGHTEN_2_TINT),
-//		lightenmax = tint_color(no_tint, B_LIGHTEN_MAX_TINT),
+		lightenmax = tint_color(no_tint, B_LIGHTEN_MAX_TINT),
 //		darken1 = tint_color(no_tint, B_DARKEN_1_TINT),
 		darken2 = tint_color(no_tint, B_DARKEN_2_TINT),
-//		darken3 = tint_color(no_tint, B_DARKEN_3_TINT),
+		darken3 = tint_color(no_tint, B_DARKEN_3_TINT),
 		darkenmax = tint_color(no_tint, B_DARKEN_MAX_TINT);
 
 	view->SetDrawingMode(B_OP_OVER);
 
 	if (Orientation() == B_HORIZONTAL) {
 		view->SetHighColor(lighten1);
-		view->FillTriangle(BPoint(frame.left, frame.bottom - 2.0f),
-			BPoint(frame.left + 6.0f, frame.top),
-			BPoint(frame.right, frame.bottom - 2.0f));
-
-		view->SetHighColor(darkenmax);
-		view->StrokeLine(BPoint(frame.right, frame.bottom),
-			BPoint(frame.left, frame.bottom));
-		view->StrokeLine(BPoint(frame.right, frame.bottom - 1),
-			BPoint(frame.left + 6.0f, frame.top));
-
-		view->SetHighColor(darken2);
-		view->StrokeLine(BPoint(frame.right - 1, frame.bottom - 1),
-			BPoint(frame.left, frame.bottom - 1));
-		view->StrokeLine(BPoint(frame.left, frame.bottom - 1),
-			BPoint(frame.left + 5.0f, frame.top + 1));
+		view->FillTriangle(BPoint(frame.left + 1.0, frame.bottom - 2.0),
+						   BPoint(frame.left + 6.0, frame.top + 1.0),
+						   BPoint(frame.right - 1.0, frame.bottom - 2.0));
 
 		view->SetHighColor(no_tint);
-		view->StrokeLine(BPoint(frame.right - 2, frame.bottom - 2.0f),
-			BPoint(frame.left + 3.0f, frame.bottom - 2.0f));
-		view->StrokeLine(BPoint(frame.right - 3, frame.bottom - 3.0f),
-			BPoint(frame.left + 6.0f, frame.top + 1));
+		view->StrokeLine(BPoint(frame.right - 2.0, frame.bottom - 2.0),
+						 BPoint(frame.left + 3.0, frame.bottom - 2.0));
+
+		view->SetHighColor(darkenmax);
+		view->StrokeLine(BPoint(frame.left, frame.bottom),
+						 BPoint(frame.right, frame.bottom));
+		view->StrokeLine(BPoint(frame.right, frame.bottom - 1.0),
+						 BPoint(frame.left + 6.0, frame.top + 1.0));
+
+		view->SetHighColor(darken2);
+		view->StrokeLine(BPoint(frame.right - 1.0, frame.bottom - 1.0),
+						 BPoint(frame.left + 1.0, frame.bottom - 1.0));
+		view->SetHighColor(darken3);
+		view->StrokeLine(BPoint(frame.left, frame.bottom - 1.0),
+						 BPoint(frame.left + 5.0, frame.top + 2.0));
+
+		view->SetHighColor(lightenmax);
+		view->StrokeLine(BPoint(frame.left + 2.0, frame.bottom - 2.0),
+						 BPoint(frame.left + 6.0, frame.top + 2.0));
 	} else {
 		view->SetHighColor(lighten1);
 		view->FillTriangle(BPoint(frame.left + 1.0f, frame.top),

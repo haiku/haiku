@@ -160,7 +160,7 @@ BPrivateScreen::IndexForColor(uint8 red, uint8 green, uint8 blue, uint8 alpha)
 		blue == B_TRANSPARENT_COLOR.blue && alpha == B_TRANSPARENT_COLOR.alpha)
 		return B_TRANSPARENT_8_BIT;
 
-	uint8 index = ((red & 0xf8) << 7) | ((green & 0xf8) << 2) | (blue >> 3);
+	uint16 index = ((blue & 0xf8) << 7) | ((green & 0xf8) << 2) | (red >> 3);
 	if (fColorMap)
 		return fColorMap->index_map[index];
 

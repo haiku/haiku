@@ -5,6 +5,7 @@
  * Authors:
  *		Adrian Oanca <adioanca@cotty.iren.ro>
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Stephan Aßmus, <superstippi@gmx.de>
  */
 
 
@@ -189,14 +190,13 @@ BWindow::BWindow(BMessage* data)
 }
 
 
-BWindow::BWindow(BRect frame, color_space depth,
-				uint32 bitmapFlags, int32 rowBytes)
+BWindow::BWindow(BRect frame, int32 bitmapToken)
 		:
 		BLooper("offscreen bitmap")
 {
 	// TODO: Implement for real
 	decomposeType(B_UNTYPED_WINDOW, &fLook, &fFeel);
-	InitData(frame, "offscreen", fLook, fFeel, 0, 0);
+	InitData(frame, "offscreen", fLook, fFeel, 0, 0, bitmapToken);
 }
 
 
@@ -1418,11 +1418,11 @@ BWindow::Title() const
 void
 BWindow::SetTitle(const char *title)
 {
-	free(fTitle);
-	fTitle = strdup(title);
-
 	if (title == NULL)
 		title = "";
+
+	free(fTitle);
+	fTitle = strdup(title);
 
 	// we will change BWindow's thread name to "w>window title"	
 
@@ -1437,19 +1437,20 @@ BWindow::SetTitle(const char *title)
 	threadName[length + 2] = '\0';
 #endif
 
+	// change the handler's name
 	SetName(threadName);
 
 	// if the message loop has been started...
-
 	if (Thread() >= B_OK) {
 		rename_thread(Thread(), threadName);
 
 		// we notify the app_server so we can actually see the change
-		Lock();
-		fLink->StartMessage(AS_WINDOW_TITLE);
-		fLink->AttachString(title);
-		fLink->Flush();
-		Unlock();
+		if (Lock()) {
+			fLink->StartMessage(AS_WINDOW_TITLE);
+			fLink->AttachString(fTitle);
+			fLink->Flush();
+			Unlock();
+		}
 	}
 }
 
@@ -1964,7 +1965,7 @@ BWindow::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 
 void 
 BWindow::InitData(BRect frame, const char* title, window_look look,
-	window_feel feel, uint32 flags,	uint32 workspace)
+	window_feel feel, uint32 flags,	uint32 workspace, int32 bitmapToken)
 {
 	STRACE(("BWindow::InitData()\n"));
 
@@ -2042,10 +2043,6 @@ BWindow::InitData(BRect frame, const char* title, window_look look,
 
 	STRACE(("BWindow::InitData(): contacting app_server...\n"));
 
-	// let app_server to know that a window has been created.
-	fLink = new BPrivate::PortLink(
-		BApplication::Private::ServerLink()->SenderPort(), receivePort);
-
 	// HERE we are in BApplication's thread, so for locking we use be_app variable
 	// we'll lock the be_app to be sure we're the only one writing at BApplication's server port
 	bool locked = false;
@@ -2054,7 +2051,17 @@ BWindow::InitData(BRect frame, const char* title, window_look look,
 		locked = true; 
 	}
 
-	fLink->StartMessage(AS_CREATE_WINDOW);
+	// let app_server to know that a window has been created.
+	fLink = new BPrivate::PortLink(
+		BApplication::Private::ServerLink()->SenderPort(), receivePort);
+
+	if (bitmapToken < 0) {
+		fLink->StartMessage(AS_CREATE_WINDOW);
+	} else {
+		fLink->StartMessage(AS_CREATE_OFFSCREEN_WINDOW);
+		fLink->Attach<int32>(bitmapToken);
+	}
+
 	fLink->Attach<BRect>(fFrame);
 	fLink->Attach<int32>((int32)fLook);
 	fLink->Attach<int32>((int32)fFeel);
@@ -2850,7 +2857,7 @@ BWindow::DoUpdate(BView *view, BRect &area)
 	} else {
 		// The code below is certainly not correct, because
 		// it redoes what the app_server already did
-		// Find out what happens if a view has ViewColor() = 
+		// Find out what happens on R5 if a view has ViewColor() = 
 		// B_TRANSPARENT_COLOR but not B_WILL_DRAW
 /*		rgb_color c = aView->HighColor();
 		aView->SetHighColor(aView->ViewColor());

@@ -286,11 +286,11 @@ private:
 						BWindow(BWindow&);
 			BWindow		&operator=(BWindow&);
 
-						BWindow(BRect frame, color_space depth,
-								uint32 bitmapFlags, int32 rowBytes);
+						BWindow(BRect frame, int32 bitmapToken);
 			void		InitData(BRect frame, const char* title,
 								window_look look, window_feel feel,
-								uint32 flags, uint32 workspace);
+								uint32 flags, uint32 workspace,
+								int32 bitmapToken = -1);
 			status_t	ArchiveChildren(BMessage* data, bool deep) const;	
 			status_t	UnarchiveChildren(BMessage* data);
 			void		BitmapClose();							// to be implemented

@@ -61,6 +61,14 @@
 
 #define MAX_ATTACHMENT_SIZE 49152
 
+static inline float
+roundf(float v)
+{
+	if (v >= 0.0)
+		return floorf(v + 0.5);
+	else
+		return ceilf(v - 0.5);
+}
 
 static property_info sViewPropInfo[] = {
 	{ "Frame", { B_GET_PROPERTY, 0 },
@@ -1429,6 +1437,10 @@ BView::ScrollBar(orientation posture) const
 void
 BView::ScrollBy(float dh, float dv)
 {
+	// scrolling by fractional values is not supported, is it?
+	dh = roundf(dh);
+	dv = roundf(dv);
+
 	// no reason to process this further if no scroll is intended.
 	if (dh == 0 && dv == 0)
 		return;
@@ -1448,6 +1460,7 @@ BView::ScrollBy(float dh, float dv)
 
 	// we modify our bounds rectangle by dh/dv coord units hor/ver.
 	fBounds.OffsetBy(dh, dv);
+//	fState->coordSysOrigin += BPoint(dh, dv);
 
 	// then set the new values of the scrollbars
 	if (fHorScroller)
@@ -2141,6 +2154,13 @@ BView::GetClippingRegion(BRegion* region) const
 	if (!region)
 		return;
 
+	// TODO: I think this implementation is wrong,
+	// since on R5, you really get the currently active
+	// clipping region, overlapping windows and all.
+	// I don't think we inform the client in the app_server
+	// when the clipping changes, so that B_VIEW_CLIP_REGION_BIT
+	// is set. -Stephan
+
 	if (!fState->IsValid(B_VIEW_CLIP_REGION_BIT) && do_owner_check()) {
 		fOwner->fLink->StartMessage(AS_LAYER_GET_CLIP_REGION);
 
@@ -2181,7 +2201,6 @@ BView::ConstrainClippingRegion(BRegion* region)
 
 		// TODO: note this in the specs
 		fOwner->fLink->Attach<int32>(count);
-
 		for (int32 i = 0; i < count; i++)
 			fOwner->fLink->Attach<BRect>(region->RectAt(i));
 
@@ -3436,9 +3455,9 @@ BView::MoveTo(float x, float y)
 	if (x == fParentOffset.x && y == fParentOffset.y)
 		return;
 
-	// BeBook says we should do this. We'll do it without. So...
-	//	x = roundf(x);
-	//	y = roundf(y);
+	// BeBook says we should do this. And it makes sense.
+	x = roundf(x);
+	y = roundf(y);
 
 	if (fOwner) {
 		check_lock();
@@ -3473,9 +3492,9 @@ BView::ResizeTo(float width, float height)
 	if (width == fBounds.Width() && height == fBounds.Height())
 		return;
 
-	// BeBook says we should do this. We'll do it without. So...
-	//	width = roundf(width);
-	//	height = roundf(height);
+	// BeBook says we should do this. And it makes sense.
+	width = floorf(width + 0.5);
+	height = floorf(height + 0.5);
 
 	if (fOwner) {
 		check_lock();

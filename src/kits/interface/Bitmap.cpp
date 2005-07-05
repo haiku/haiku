@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <limits.h>
 #include <new>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <Application.h>
@@ -2299,8 +2300,13 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 	// dependent on color space.
 
 	if (fInitError == B_OK) {
-		if (flags & B_BITMAP_ACCEPTS_VIEWS)
-			fWindow = new BWindow(Bounds(), fColorSpace, flags, fBytesPerRow);
+		if (flags & B_BITMAP_ACCEPTS_VIEWS) {
+			fWindow = new BWindow(Bounds(), fServerToken);
+			// A BWindow starts life locked and is unlocked
+			// in Show(), but this window is never shown and
+			// it's message loop is never started.
+			fWindow->Unlock();
+		}
 	}
 }
 

@@ -7,7 +7,6 @@ static inline bool
 IsInsideGlyph(uchar ch)
 {
 	return (ch & 0xC0) == 0x80;
-//	return (ch & 0x80);
 }
 
 static inline uint32

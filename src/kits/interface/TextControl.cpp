@@ -195,6 +195,8 @@ BTextControl::GetAlignment(alignment *label, alignment *text) const
 void
 BTextControl::SetDivider(float dividingLine)
 {
+	dividingLine = floorf(dividingLine + 0.5);
+
 	float dx = fDivider - dividingLine;
 
 	fDivider = dividingLine;
@@ -597,7 +599,7 @@ BTextControl::InitData(const char *label, const char *initial_text,
 		SetFont(&font, flags);
 
 	if (label)
-		fDivider = bounds.Width() / 2.0f;
+		fDivider = floorf(bounds.Width() / 2.0f);
 
 	if (Flags() & B_NAVIGABLE) {
 		fSkipSetFlags = true;
@@ -608,8 +610,12 @@ BTextControl::InitData(const char *label, const char *initial_text,
 	if (data)
 		fText = static_cast<_BTextInput_ *>(FindView("_input_"));
 	else {
-		BRect frame(fDivider, bounds.top + 2.0f,
-					bounds.right - 2.0f, bounds.bottom - 2.0f);
+		BRect frame(fDivider, bounds.top,
+					bounds.right, bounds.bottom);
+		// we are stroking the frame arround the text view, which
+		// is 2 pixels wide
+		frame.InsetBy(2.0, 2.0);
+
 		BRect textRect(frame.OffsetToCopy(0.0f, 0.0f));
 		textRect.InsetBy(2.0, 2.0);
 	

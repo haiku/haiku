@@ -93,6 +93,7 @@ virtual				~_BMCMenuBar_();
 static	BArchivable	*Instantiate(BMessage *data);
 
 virtual	void		AttachedToWindow();
+virtual	void		Draw(BRect updateRect);
 virtual	void		FrameResized(float width, float height);
 virtual	void		MessageReceived(BMessage* msg);
 virtual	void		MakeFocus(bool focused = true);

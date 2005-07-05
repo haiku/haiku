@@ -25,6 +25,7 @@
 //------------------------------------------------------------------------------
 
 // Standard Includes -----------------------------------------------------------
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -55,7 +56,7 @@ BMenuField::BMenuField(BRect frame, const char *name, const char *label,
 	InitMenu(menu);
 
 	frame.OffsetTo(0.0f, 0.0f);
-	fMenuBar = new _BMCMenuBar_(BRect(frame.left + fDivider + 2.0f,
+	fMenuBar = new _BMCMenuBar_(BRect(frame.left + fDivider + 1.0,
 		frame.top + kVMargin, frame.right - 2.0f, frame.bottom - kVMargin),
 		false, this);
 
@@ -80,7 +81,7 @@ BMenuField::BMenuField(BRect frame, const char *name, const char *label,
 	fFixedSizeMB = fixed_size;
 
 	frame.OffsetTo(0.0f, 0.0f);
-	fMenuBar = new _BMCMenuBar_(BRect(frame.left + fDivider + 2.0f,
+	fMenuBar = new _BMCMenuBar_(BRect(frame.left + fDivider + 1.0,
 		frame.top + kVMargin, frame.right - 2.0f, frame.bottom - kVMargin),
 		fixed_size, this);
 
@@ -194,10 +195,8 @@ void BMenuField::Draw(BRect update)
 	if (IsFocus())
 		active = Window()->IsActive();
 
-	/*
-	SetHighColor(0, 255, 0);
-	FillRect(bounds);
-	*/
+//SetHighColor(255, 0, 0);
+//FillRect(bounds);
 
 	DrawLabel(bounds, update);
 
@@ -286,7 +285,7 @@ void BMenuField::KeyDown(const char *bytes, int32 numBytes)
 			bounds = Bounds();
 			bounds.right = fDivider;
 
-			Draw(bounds);
+			Invalidate(bounds);
 		}
 		default:
 			BView::KeyDown(bytes, numBytes);
@@ -300,8 +299,8 @@ void BMenuField::MakeFocus(bool state)
 
 	BView::MakeFocus(state);
 
-	if(Window())
-		Draw(Bounds()); // TODO: use fStringWidth
+	if (Window())
+		Invalidate(); // TODO: use fStringWidth
 }
 //------------------------------------------------------------------------------
 void BMenuField::MessageReceived(BMessage *msg)
@@ -314,7 +313,7 @@ void BMenuField::WindowActivated(bool state)
 	BView::WindowActivated(state);
 
 	if (IsFocus())
-		Draw(Bounds());
+		Invalidate();
 }
 //------------------------------------------------------------------------------
 void BMenuField::MouseUp(BPoint pt)
@@ -417,15 +416,19 @@ alignment BMenuField::Alignment() const
 	return fAlign;
 }
 //------------------------------------------------------------------------------
-void BMenuField::SetDivider(float dividing_line)
+void BMenuField::SetDivider(float divider)
 {
-	if (fDivider - dividing_line == 0.0f)
+	divider = floorf(divider + 0.5);
+
+	float dx = fDivider - divider;
+
+	if (dx == 0.0f)
 		return;
 
-	MenuBar()->MoveBy(dividing_line - fDivider, 0.0f);
-	MenuBar()->ResizeBy(fDivider - dividing_line, 0.0f);
+	fDivider = divider;
 
-	fDivider = dividing_line;
+	MenuBar()->MoveBy(-dx, 0.0f);
+	MenuBar()->ResizeBy(dx, 0.0f);
 }
 //------------------------------------------------------------------------------
 float BMenuField::Divider() const
@@ -560,14 +563,13 @@ long BMenuField::MenuTask(void *arg)
 
 	menuField->fSelected = true;
 	menuField->fTransition = true;
-	menuField->Draw(menuField->Bounds());
+	menuField->Invalidate();
 
 	menuField->UnlockLooper();
 
 	bool tracking;
 
-	do
-	{
+	do {
 		snooze(20000);
 
 		if (!menuField->LockLooper())
@@ -583,7 +585,7 @@ long BMenuField::MenuTask(void *arg)
 
 	menuField->fSelected = false;
 	menuField->fTransition = true;
-	menuField->Draw(menuField->Bounds());
+	menuField->Invalidate();
 
 	menuField->UnlockLooper();
 
