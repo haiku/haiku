@@ -36,14 +36,37 @@ struct TimeSourceTransmit // sizeof(TimeSourceTransmit) must be <= TS_AREA_SIZE
 	float drift[TS_INDEX_COUNT];
 };
 
-struct SlaveNodes
+#define SLAVE_NODES_COUNT 300
+
+// XXX TODO: storage for slave nodes uses public data members, this should be changed
+
+class SlaveNodes
 {
-	#define SLAVE_NODES_COUNT 300
-	BLocker locker;
-	int32 count;
-	media_node_id node_id[SLAVE_NODES_COUNT];
-	port_id node_port[SLAVE_NODES_COUNT];
+public:	
+					SlaveNodes();
+					~SlaveNodes();
+public:
+	BLocker *		locker;
+	int32			count;
+	media_node_id	node_id[SLAVE_NODES_COUNT];
+	port_id			node_port[SLAVE_NODES_COUNT];
 };
+
+
+SlaveNodes::SlaveNodes()
+{
+	locker = new BLocker("BTimeSource SlaveNodes");
+	count = 0;
+	memset(node_id, 0, sizeof(node_id));
+	memset(node_port, 0, sizeof(node_port));
+}
+
+
+SlaveNodes::~SlaveNodes()
+{
+	delete locker;
+}
+
 
 } }
 
@@ -57,8 +80,7 @@ BTimeSource::~BTimeSource()
 	CALLED();
 	if (fArea > 0)
 		delete_area(fArea);
-	if (fSlaveNodes)
-		free(fSlaveNodes);
+	delete fSlaveNodes;
 }
 
 /*************************************************************
@@ -206,22 +228,12 @@ BTimeSource::BTimeSource() :
 	fStarted(false),
 	fArea(-1),
 	fBuf(NULL),
-	fSlaveNodes((BPrivate::media::SlaveNodes*)malloc(sizeof(BPrivate::media::SlaveNodes))),
+	fSlaveNodes(new BPrivate::media::SlaveNodes),
 	fIsRealtime(false)
 {
 	CALLED();
 	AddNodeKind(B_TIME_SOURCE);
 //	printf("##### BTimeSource::BTimeSource() name %s, id %ld\n", Name(), ID());
-
-	if (fSlaveNodes == NULL) {
-		ERROR("BTimeSource::BTimeSource() fSlaveNodes == NULL\n");
-		return;
-	}
-
-	// initialize the slave node storage
-	fSlaveNodes->count = 0;
-	memset(&fSlaveNodes->node_id, 0, SLAVE_NODES_COUNT * sizeof(media_node_id));
-	memset(&fSlaveNodes->node_port, 0, SLAVE_NODES_COUNT * sizeof(port_id));
 
 	// This constructor is only called by real time sources that inherit
 	// BTimeSource. We create the communication area in FinishCreate(),
@@ -320,6 +332,8 @@ BTimeSource::BroadcastTimeWarp(bigtime_t at_real_time,
 							   bigtime_t new_performance_time)
 {
 	CALLED();
+	ASSERT(fSlaveNodes != NULL);
+
 	// calls BMediaNode::TimeWarp() of all slaved nodes
 	
 	TRACE("BTimeSource::BroadcastTimeWarp: at_real_time %Ld, new_performance_time %Ld\n", at_real_time, new_performance_time);
@@ -342,6 +356,8 @@ void
 BTimeSource::SendRunMode(run_mode mode)
 {
 	CALLED();
+	ASSERT(fSlaveNodes != NULL);
+
 	// send the run mode change to all slaved nodes
 
 	BAutolock lock(fSlaveNodes->locker);
@@ -470,9 +486,11 @@ BTimeSource::AddMe(BMediaNode *node)
 void
 BTimeSource::DirectAddMe(const media_node &node)
 {
-	CALLED();
 	// XXX this code has race conditions and is pretty dumb, and it
 	// XXX won't detect nodes that crash and don't remove themself.
+
+	CALLED();
+	ASSERT(fSlaveNodes != NULL);
 	BAutolock lock(fSlaveNodes->locker);
 
 	if (fSlaveNodes->count == SLAVE_NODES_COUNT) {
@@ -503,7 +521,9 @@ BTimeSource::DirectRemoveMe(const media_node &node)
 {
 	// XXX this code has race conditions and is pretty dumb, and it
 	// XXX won't detect nodes that crash and don't remove themself.
+
 	CALLED();
+	ASSERT(fSlaveNodes != NULL);
 	BAutolock lock(fSlaveNodes->locker);
 
 	if (fSlaveNodes->count == 0) {

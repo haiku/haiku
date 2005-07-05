@@ -22,8 +22,8 @@ namespace BPrivate { namespace media {
 	class BMediaRosterEx;
 	class TimeSourceObject;
 	class SystemTimeSourceObject;
+	class SlaveNodes;
 	struct TimeSourceTransmit;
-	struct SlaveNodes;
 } }
 
 
