@@ -13,4 +13,4 @@ Server media_addon_server :
 	MediaFilePlayer.cpp
 	SystemTimeSource.cpp
 ;
-LinkSharedOSLibs media_addon_server : be libmedia.so root ;
+LinkSharedOSLibs media_addon_server : be libmedia.so ;

@@ -12,7 +12,7 @@ Preference Media :
 	MediaViews.cpp
 	MediaListItem.cpp
 	MediaAlert.cpp 
-	: libmedia.so be
+	: be libmedia.so
 	: media.rdef 
 	;
 

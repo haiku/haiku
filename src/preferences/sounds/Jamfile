@@ -9,6 +9,6 @@ Preference Sounds :
 	HEventItem.cpp 
 	HWindow.cpp 
 	HEventList.cpp 
-	: libbe.so libmedia.so libgame.so libtracker.so
+	: be game tracker libmedia.so
 	: Sounds.rdef
 	;

@@ -54,6 +54,7 @@ Depends NetworkingKit :
 NotFile MediaKit ;
 Depends MediaKit :
 	libmedia.so 
+	libgame.so
 
 	# Servers
 	media_addon_server 
