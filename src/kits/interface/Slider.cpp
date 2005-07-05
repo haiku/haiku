@@ -1111,12 +1111,10 @@ BSlider::ThumbFrame() const
 		if (Orientation() == B_HORIZONTAL) {
 			frame.left = (float)floor(Position() * (_MaxPosition() - _MinPosition()) +
 				_MinPosition()) - 6;
-// TODO: seems this was removed...
-//			frame.top = 8.0f + (Label() ? textHeight + 4.0f : 0.0f);
 			frame.right = frame.left + 12.0f;
 			frame.bottom = frame.bottom - 2.0f -
 				(MinLimitLabel() || MaxLimitLabel() ? textHeight + 4.0f : 0.0f);
-			frame.top = frame.bottom - 7.0f;
+			frame.top = frame.bottom - 8.0f;
 		} else {
 			frame.left = floor((frame.Width() - fBarThickness) / 2.0f) - 3;
 			frame.top = (float)floor(Position() * (_MaxPosition() - _MinPosition())) +
