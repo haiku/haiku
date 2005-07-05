@@ -1,6 +1,10 @@
 #ifndef _APPSERVER_PROTOCOL_
 #define _APPSERVER_PROTOCOL_
 
+
+#include <SupportDefs.h>
+
+
 // Server port names. The input port is the port which is used to receive
 // input messages from the Input Server. The other is the "main" port for
 // the server and is utilized mostly by BApplication objects.
@@ -9,13 +13,18 @@
 
 enum {
 	// Used for quick replies from the app_server
-	SERVER_TRUE='_srt',
-	SERVER_FALSE,
-	AS_SERVER_BMESSAGE,
+	SERVER_TRUE = B_OK,
+	SERVER_FALSE = B_ERROR,
+
+	AS_SERVER_BMESSAGE = 1,
 	AS_SERVER_AREALINK,
 	AS_SERVER_SESSION,
 	AS_SERVER_PORTLINK,
 	AS_CLIENT_DEAD,
+
+	// Desktop definitions
+	AS_GET_WINDOW_LIST,
+	AS_GET_WINDOW_INFO,
 
 	// Application definitions
 	AS_CREATE_APP,

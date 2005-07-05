@@ -37,11 +37,8 @@
 // TODO: remove this header
 #include <stdio.h>
 
-// Private definitions not placed in public headers
-extern "C" void _init_global_fonts();
-extern "C" status_t _fini_interface_kit_();
-
 #include <AppServerLink.h>
+#include <WindowInfo.h>
 #include <InputServerTypes.h>
 #include <input_globals.h>
 #include <ServerProtocol.h>
@@ -52,6 +49,10 @@ extern "C" status_t _fini_interface_kit_();
 #include <Font.h>
 #include "moreUTF8.h"
 #include "truncate_string.h"
+
+// Private definitions not placed in public headers
+extern "C" void _init_global_fonts();
+extern "C" status_t _fini_interface_kit_();
 
 using namespace BPrivate;
 
@@ -986,18 +987,51 @@ do_window_action(int32 window_id, int32 action,
 
 
 window_info	*
-get_window_info(int32 a_token)
+get_window_info(int32 serverToken)
 {
-	// ToDo: implement me, needed for Deskbar!
-	return NULL;
+	BPrivate::AppServerLink link;
+	
+	link.StartMessage(AS_GET_WINDOW_INFO);
+	link.Attach<int32>(serverToken);
+
+	int32 code;
+	if (link.FlushWithReply(code) != B_OK || code != B_OK)
+		return NULL;
+
+	int32 size;
+	link.Read<int32>(&size);
+	
+	client_window_info* info = (client_window_info*)malloc(size);
+	if (info == NULL)
+		return NULL;
+
+	link.Read(info, size);
+	return info;
 }
 
 
 int32 *
-get_token_list(team_id app, int32 *count)
+get_token_list(team_id team, int32 *_count)
 {
-	// ToDo: implement me, needed for Deskbar!
-	return NULL;
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_GET_WINDOW_LIST);
+	link.Attach<team_id>(team);
+
+	int32 code;
+	if (link.FlushWithReply(code) != B_OK || code != B_OK)
+		return NULL;
+
+	int32 count;
+	link.Read<int32>(&count);
+
+	int32* tokens = (int32*)malloc(count * sizeof(int32));
+	if (tokens == NULL)
+		return NULL;
+
+	link.Read(tokens, count * sizeof(int32));
+	*_count = count;
+	return tokens;
 }
 
 
