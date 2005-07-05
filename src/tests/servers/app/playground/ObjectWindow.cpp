@@ -13,6 +13,8 @@
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
+#include <ScrollBar.h>
+#include <ScrollView.h>
 #include <Slider.h>
 #include <String.h>
 #include <RadioButton.h>
@@ -41,7 +43,7 @@ enum {
 
 // constructor
 ObjectWindow::ObjectWindow(BRect frame, const char* name)
-	: BWindow(frame, name, B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+	: BWindow(frame, name, B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 			  B_ASYNCHRONOUS_CONTROLS)
 //	: BWindow(frame, name, B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 //			  B_ASYNCHRONOUS_CONTROLS)
@@ -67,22 +69,36 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 
 	b = Bounds();
 	b.top = menuBar->Bounds().bottom + 1;
-	BBox* bg = new BBox(b, "bg box", B_FOLLOW_ALL, B_WILL_DRAW, B_PLAIN_BORDER);
+	b.right = ceilf((b.left + b.right) / 3.0);
+	BBox* bg = new BBox(b, "bg box", B_FOLLOW_TOP_BOTTOM, B_WILL_DRAW, B_PLAIN_BORDER);
 
 	AddChild(bg);
 	bg->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	b = bg->Bounds();
-	// object views occupies the right side of the window
-	b.Set(ceilf((b.left + b.right) / 3.0) + 3.0, b.top + 5.0, b.right - 5.0, b.bottom - 5.0);
+	// object view occupies the right side of the window
+	b.left = b.right + 1.0;
+	b.right = Bounds().right - B_V_SCROLL_BAR_WIDTH;
+	b.bottom -= B_H_SCROLL_BAR_HEIGHT;
 	fObjectView = new ObjectView(b, "object view", B_FOLLOW_ALL,
 								 B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
+	// wrap a scroll view around the object view
+	BScrollView* scrollView = new BScrollView("object scroller", fObjectView,
+											  B_FOLLOW_ALL, 0, true, true,
+											  B_NO_BORDER);
 
-	bg->AddChild(fObjectView);
+	if (BScrollBar* scrollBar = fObjectView->ScrollBar(B_VERTICAL)) {
+		scrollBar->SetRange(0.0, fObjectView->Bounds().Height());
+		scrollBar->SetProportion(0.5);
+	}
+	if (BScrollBar* scrollBar = fObjectView->ScrollBar(B_HORIZONTAL)) {
+		scrollBar->SetRange(0.0, fObjectView->Bounds().Width());
+		scrollBar->SetProportion(0.5);
+	}
+	AddChild(scrollView);
 
 	b = bg->Bounds();
 	// controls occupy the left side of the window
-	b.Set(b.left + 5.0, b.top + 5.0, ceilf((b.left + b.right) / 3.0) - 2.0, b.bottom - 5.0);
+	b.InsetBy(5.0, 5.0);
 	BBox* controlGroup = new BBox(b, "controls box", B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM,
 								  B_WILL_DRAW, B_FANCY_BORDER);
 
@@ -211,21 +227,23 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 	fAlphaTC = new BTextControl(b, "alpha text control", "Alpha", "",
 								new BMessage(MSG_SET_COLOR));
 	controlGroup->AddChild(fAlphaTC);
-/*
+
 // TODO: while this block of code works in the Haiku app_server running under R5,
 // it crashes pretty badly under Haiku. I have no idea why this happens, because
 // I was doing the same thing before at other places.
 	// divide text controls the same
+	float mWidth = fDrawingModeMF->StringWidth(fDrawingModeMF->Label());
 	float rWidth = fRedTC->StringWidth(fRedTC->Label());
 	float gWidth = fGreenTC->StringWidth(fGreenTC->Label());
 	float bWidth = fBlueTC->StringWidth(fBlueTC->Label());
 	float aWidth = fAlphaTC->StringWidth(fAlphaTC->Label());
 
-	float width = max_c(rWidth, max_c(gWidth, max_c(bWidth, aWidth))) + 10.0;
+	float width = max_c(mWidth, max_c(rWidth, max_c(gWidth, max_c(bWidth, aWidth)))) + 10.0;
+	fDrawingModeMF->SetDivider(width);
 	fRedTC->SetDivider(width);
 	fGreenTC->SetDivider(width);
 	fBlueTC->SetDivider(width);
-	fAlphaTC->SetDivider(width);*/
+	fAlphaTC->SetDivider(width);
 
 	// fill check box
 	b.OffsetBy(0, fAlphaTC->Bounds().Height() + 5.0);
@@ -316,6 +334,13 @@ ObjectWindow::MessageReceived(BMessage* message)
 		case MSG_SET_PEN_SIZE:
 			fObjectView->SetStatePenSize((float)fPenSizeS->Value());
 			break;
+		case MSG_SET_DRAWING_MODE: {
+			drawing_mode mode;
+			if (message->FindInt32("mode", (int32*)&mode) >= B_OK) {
+				fObjectView->SetStateDrawingMode(mode);
+			}
+			break;
+		}
 		default:
 			BWindow::MessageReceived(message);
 	}

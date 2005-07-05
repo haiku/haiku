@@ -5,16 +5,32 @@
 #include "States.h"
 
 // constructor
-State::State(rgb_color color, bool fill, float penSize)
+State::State()
 	: fValid(false),
 	  fEditing(true),
 	  fTracking(TRACKING_NONE),
 	  fStartPoint(-1.0, -1.0),
 	  fEndPoint(-1.0, -1.0),
-	  fColor(color),
-	  fFill(fill),
-	  fPenSize(penSize)
+	  fColor((rgb_color){ 0, 0, 0, 255 }),
+	  fDrawingMode(B_OP_COPY),
+	  fFill(true),
+	  fPenSize(1.0)
 {
+}
+
+// destructor
+State::~State()
+{
+}
+
+// Init
+void
+State::Init(rgb_color color, drawing_mode mode, bool fill, float penSize)
+{
+	fColor = color;
+	fDrawingMode = mode;
+	fFill = fill;
+	fPenSize = penSize;
 }
 
 // MouseDown
@@ -59,6 +75,13 @@ void
 State::SetColor(rgb_color color)
 {
 	fColor = color;
+}
+
+// SetDrawingMode
+void
+State::SetDrawingMode(drawing_mode mode)
+{
+	fDrawingMode = mode;
 }
 
 // SetFill
@@ -137,11 +160,7 @@ State::_RenderDot(BView* view, BPoint where) const
 void
 State::_AdjustViewState(BView* view) const
 {
-	if (fColor.alpha < 255)
-		view->SetDrawingMode(B_OP_ALPHA);
-	else
-		view->SetDrawingMode(B_OP_OVER);
-
+	view->SetDrawingMode(fDrawingMode);
 	view->SetHighColor(fColor);
 
 	if (!SupportsFill() || !fFill)
@@ -160,8 +179,8 @@ State::_HitTest(BPoint where, BPoint point) const
 // LineState
 class LineState : public State {
  public:
-					LineState(rgb_color color, bool fill, float penSize)
-						: State(color, fill, penSize) {}
+					LineState()
+						: State() {}
 
 	virtual	void	Draw(BView* view) const
 					{
@@ -180,8 +199,8 @@ class LineState : public State {
 // RectState
 class RectState : public State {
  public:
-					RectState(rgb_color color, bool fill, float penSize)
-						: State(color, fill, penSize) {}
+					RectState()
+						: State() {}
 
 	virtual	void	Draw(BView* view) const
 					{
@@ -199,8 +218,8 @@ class RectState : public State {
 // RoundRectState
 class RoundRectState : public State {
  public:
-					RoundRectState(rgb_color color, bool fill, float penSize)
-						: State(color, fill, penSize) {}
+					RoundRectState()
+						: State() {}
 
 	virtual	void	Draw(BView* view) const
 					{
@@ -220,8 +239,8 @@ class RoundRectState : public State {
 // EllipseState
 class EllipseState : public State {
  public:
-					EllipseState(rgb_color color, bool fill, float penSize)
-						: State(color, fill, penSize) {}
+					EllipseState()
+						: State() {}
 
 	virtual	void	Draw(BView* view) const
 					{
@@ -238,19 +257,28 @@ class EllipseState : public State {
 
 // StateFor
 State*
-State::StateFor(int32 objectType, rgb_color color, bool fill, float penSize)
+State::StateFor(int32 objectType, rgb_color color, drawing_mode mode,
+				bool fill, float penSize)
 {
+	State* state = NULL;
 	switch (objectType) {
 		case OBJECT_LINE:
-			return new LineState(color, fill, penSize);
+			state = new LineState();
+			break;
 		case OBJECT_RECT:
-			return new RectState(color, fill, penSize);
+			state = new RectState();
+			break;
 		case OBJECT_ROUND_RECT:
-			return new RoundRectState(color, fill, penSize);
+			state = new RoundRectState();
+			break;
 		case OBJECT_ELLIPSE:
-			return new EllipseState(color, fill, penSize);
+			state = new EllipseState();
+			break;
 		default:
-			return NULL;
+			break;
 	}
+	if (state)
+		state->Init(color, mode, fill, penSize);
+	return state;
 }
 

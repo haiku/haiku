@@ -19,40 +19,44 @@ enum {
 
 class State {
  public:
-						State(rgb_color color,
-							  bool fill, float penSize);
+							State();
+	virtual					~State();
 
-			void		MouseDown(BPoint where);
-			void		MouseUp(BPoint where);
-			void		MouseMoved(BPoint where);
-			bool		IsTracking() const
-							{ return fTracking; }
-
-			void		SetColor(rgb_color color);
-			void		SetFill(bool fill);
-			void		SetPenSize(float penSize);
-
-			void		SetEditing(bool editing);
-
-			BRect		Bounds() const;
-	virtual	void		Draw(BView* view) const;
-	virtual	bool		SupportsFill() const
-							{ return true; }
-
-	static	State*		StateFor(int32 objectType,
-								 rgb_color color,
+			void			Init(rgb_color color, drawing_mode mode,
 								 bool fill, float penSize);
 
+			void			MouseDown(BPoint where);
+			void			MouseUp(BPoint where);
+			void			MouseMoved(BPoint where);
+			bool			IsTracking() const
+								{ return fTracking; }
+
+			void			SetColor(rgb_color color);
+			void			SetDrawingMode(drawing_mode mode);
+			void			SetFill(bool fill);
+			void			SetPenSize(float penSize);
+
+			void			SetEditing(bool editing);
+
+			BRect			Bounds() const;
+	virtual	void			Draw(BView* view) const;
+	virtual	bool			SupportsFill() const
+								{ return true; }
+
+	static	State*			StateFor(int32 objectType,
+									 rgb_color color, drawing_mode mode,
+									 bool fill, float penSize);
+
  protected:
-			BRect		_ValidRect() const;
-			void		_RenderDot(BView* view, BPoint where) const;
-			void		_AdjustViewState(BView* view) const;
+			BRect			_ValidRect() const;
+			void			_RenderDot(BView* view, BPoint where) const;
+			void			_AdjustViewState(BView* view) const;
 
-			bool		_HitTest(BPoint where, BPoint point) const;
+			bool			_HitTest(BPoint where, BPoint point) const;
 
-			bool		fValid;
+			bool			fValid;
 
-			bool		fEditing;
+			bool			fEditing;
 
 			enum {
 				TRACKING_NONE = 0,
@@ -60,15 +64,16 @@ class State {
 				TRACKING_END
 			};
 
-			uint32		fTracking;
-			BPoint		fClickOffset;
+			uint32			fTracking;
+			BPoint			fClickOffset;
 
-			BPoint		fStartPoint;
-			BPoint		fEndPoint;
+			BPoint			fStartPoint;
+			BPoint			fEndPoint;
 
-			rgb_color	fColor;
-			bool		fFill;
-			float		fPenSize;
+			rgb_color		fColor;
+			drawing_mode	fDrawingMode;
+			bool			fFill;
+			float			fPenSize;
 };
 
 #endif // STATES_H

@@ -18,6 +18,7 @@ ObjectView::ObjectView(BRect frame, const char* name,
 	  fObjectType(OBJECT_LINE),
 	  fStateList(20),
 	  fColor((rgb_color){ 0, 80, 255, 100 }),
+	  fDrawingMode(B_OP_ALPHA),
 	  fFill(false),
 	  fPenSize(10.0),
 	  fScrolling(false),
@@ -67,14 +68,14 @@ ObjectView::Draw(BRect updateRect)
 
 	const char* message = "Click and drag";
 	float width = StringWidth(message);
-	BPoint p(r.left + r.Width() / 2.0 - width / 2.0,
-			 r.top + r.Height() / 2.0);
+	BPoint p(r.Width() / 2.0 - width / 2.0,
+			 r.Height() / 2.0);
 
 	DrawString(message, p);
 
 	message = "to draw an object!";
 	width = StringWidth(message);
-	p.x = r.left + r.Width() / 2.0 - width / 2.0;
+	p.x = r.Width() / 2.0 - width / 2.0;
 	p.y += 25;
 
 	DrawString(message, p);
@@ -82,11 +83,6 @@ ObjectView::Draw(BRect updateRect)
 	SetDrawingMode(B_OP_ALPHA);
 	for (int32 i = 0; State* state = (State*)fStateList.ItemAt(i); i++)
 		state->Draw(this);
-
-// TODO: this should not be necessary with proper state stack
-// (a new state is pushed before Draw() is called)
-SetPenSize(1.0);
-SetDrawingMode(B_OP_COPY);
 }
 
 // MouseDown
@@ -103,7 +99,8 @@ ObjectView::MouseDown(BPoint where)
 		fLastMousePos = where;
 	} else {
 		if (!fState)
-			AddObject(State::StateFor(fObjectType, fColor, fFill, fPenSize));
+			AddObject(State::StateFor(fObjectType, fColor, fDrawingMode,
+									  fFill, fPenSize));
 	
 		if (fState) {
 //			Invalidate(fState->Bounds());
@@ -229,6 +226,20 @@ ObjectView::SetStateColor(rgb_color color)
 	}
 }
 
+// SetStateDrawingMode
+void
+ObjectView::SetStateDrawingMode(drawing_mode mode)
+{
+	if (fDrawingMode != mode) {
+		fDrawingMode = mode;
+	
+		if (fState) {
+			fState->SetDrawingMode(fDrawingMode);
+			Invalidate(fState->Bounds());
+		}
+	}
+}
+
 // SetStateFill
 void
 ObjectView::SetStateFill(bool fill)
@@ -239,7 +250,7 @@ ObjectView::SetStateFill(bool fill)
 		if (fState) {
 			BRect before = fState->Bounds();
 	
-			fState->SetFill(fill);
+			fState->SetFill(fFill);
 	
 			BRect after = fState->Bounds();
 			BRect invalid(before | after);
@@ -258,7 +269,7 @@ ObjectView::SetStatePenSize(float penSize)
 		if (fState) {
 			BRect before = fState->Bounds();
 	
-			fState->SetPenSize(penSize);
+			fState->SetPenSize(fPenSize);
 	
 			BRect after = fState->Bounds();
 			BRect invalid(before | after);
