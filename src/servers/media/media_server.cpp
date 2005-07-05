@@ -235,7 +235,7 @@ void ServerApp::StartAddonServer()
 	if (err == B_OK)
 		return;
 	
-	(new BAlert("media_server", "Launing media_addon_server failed.\n\nmedia_server will terminate", "OK"))->Go();
+	(new BAlert("media_server", "Launching media_addon_server failed.\n\nmedia_server will terminate", "OK"))->Go();
 	exit(1);
 }
 
