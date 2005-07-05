@@ -35,6 +35,7 @@ class TestView : public BView {
 						fDestRect.InsetBy(10.0, 10.0);
 
 						SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+						SetLowColor(ViewColor());
 					}
 
 	virtual	void	MessageReceived(BMessage* message);
