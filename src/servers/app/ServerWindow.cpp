@@ -583,7 +583,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// area assuming that the view was visible when removed
 
 			STRACE(("ServerWindow %s: AS_LAYER_DELETE(self)...\n", fTitle));			
-myRootLayer->Lock();
+
 			Layer *parent = fCurrentLayer->fParent;
 			BRegion *invalidRegion = NULL;
 
