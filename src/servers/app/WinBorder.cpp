@@ -14,6 +14,7 @@
 #include <View.h>	// for mouse button defines
 
 #include <Debug.h>
+#include <WindowPrivate.h>
 #include "DebugInfoManager.h"
 
 #include "Decorator.h"
@@ -123,7 +124,17 @@ WinBorder::WinBorder(const BRect &frame,
 
 	// do we need to change our size to let the decorator fit?
 	// _ResizeBy() will adapt the frame for validity before resizing
-	_ResizeBy(0, 0);
+	if (feel == kDesktopWindowFeel) {
+		// the desktop window spans over the whole screen
+		// ToDo: this functionality should be moved somewhere else (so that it
+		//	is always used when the workspace is changed)
+		uint16 width, height;
+		uint32 colorSpace;
+		float frequency;
+		gDesktop->ActiveScreen()->GetMode(width, height, colorSpace, frequency);
+		_ResizeBy(width - frame.Width(), height - frame.Height());
+	} else
+		_ResizeBy(0, 0);
 
 #ifndef NEW_CLIPPING
 	RebuildFullRegion();
@@ -687,7 +698,7 @@ WinBorder::QuietlySetFeel(int32 feel)
 	}
 
 	// floating and modal windows must appear in every workspace where
-	// their main window is present. Thus their wksIndex will be set to
+	// their main window is present. Thus their fWorkspaces will be set to
 	// '0x0' and they will be made visible when needed.
 	switch (fFeel) {
 		case B_MODAL_APP_WINDOW_FEEL:

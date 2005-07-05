@@ -22,7 +22,7 @@ struct window_info {
 	uint32		workspaces;
 
 	int32		layer;			// whatever this is...
-    uint32	  	type;			// see below
+    uint32	  	feel;
     uint32      flags;
 	int32		window_left;
 	int32		window_top;
@@ -36,14 +36,6 @@ struct window_info {
 struct client_window_info : window_info {
 	char		name[1];
 } _PACKED;
-
-enum {
-	// taken from Deskbar
-	kNormalWindow = 0,
-	kDesktopWindow = 1024,
-	kMenuWindow = 1025,
-	kWindowScreen = 1026,
-};
 
 enum window_action {
 	B_MINIMIZE_WINDOW,

@@ -22,6 +22,7 @@
 #include <Autolock.h>
 #include <TokenSpace.h>
 #include <WindowInfo.h>
+#include <WindowPrivate.h>
 
 #include "AppServer.h"
 #include "BGet++.h"
@@ -361,7 +362,7 @@ ServerWindow::GetInfo(window_info& info)
 	info.workspaces = fWinBorder->Workspaces();
 
 	info.layer = 0; // ToDo: what is this???
-	info.type = kNormalWindow;	// ToDo: do this for real
+	info.feel = fWinBorder->Feel();
 	info.flags = fWinBorder->WindowFlags();
 	info.window_left = (int)floor(fWinBorder->Frame().left);
 	info.window_top = (int)floor(fWinBorder->Frame().top);
@@ -433,7 +434,7 @@ ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent)
 	Layer *newLayer;
 
 	if (link.Code() == AS_LAYER_CREATE_ROOT
-		&& (fWinBorder->WindowFlags() & 0x00008000) != 0) {
+		&& (fWinBorder->WindowFlags() & kWorkspacesWindowFlag) != 0) {
 		// this is a workspaces window!
 		newLayer = new WorkspacesLayer(frame, name, token, resizeMask,
 								flags, fWinBorder->GetDisplayDriver());
