@@ -499,7 +499,7 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 			break;
 		}
 		case B_BORDERED_WINDOW_LOOK: {
-			_driver->StrokeRect(r, fFrameColors[0]);
+			_driver->StrokeRect(r, fFrameColors[5]);
 			break;
 		}
 
