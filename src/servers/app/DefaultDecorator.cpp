@@ -341,7 +341,7 @@ DefaultDecorator::_DoLayout()
 		fTabOffset = 0;
 		// distance from one item of the tab bar to another.
 		// In this case the text and close/zoom rects
-		fTextOffset = (_look == B_FLOATING_WINDOW_LOOK) ? 12 : 20;
+		fTextOffset = (_look == B_FLOATING_WINDOW_LOOK) ? 10 : 18;
 
 		font_height fh;
 		_drawdata.Font().Height(&fh);

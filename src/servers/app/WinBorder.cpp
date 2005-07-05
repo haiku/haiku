@@ -129,8 +129,6 @@ WinBorder::WinBorder(const BRect &frame,
 	RebuildFullRegion();
 #endif
 
-	gDesktop->AddWinBorder(this);
-
 	STRACE(("WinBorder %s:\n", GetName()));
 	STRACE(("\tFrame: (%.1f, %.1f, %.1f, %.1f)\n", r.left, r.top, r.right, r.bottom));
 	STRACE(("\tWindow %s\n", window ? window->Title() : "NULL"));
@@ -140,8 +138,6 @@ WinBorder::WinBorder(const BRect &frame,
 WinBorder::~WinBorder()
 {
 	STRACE(("WinBorder(%s)::~WinBorder()\n",GetName()));
-
-	gDesktop->RemoveWinBorder(this);
 
 	delete fTopLayer;
 	delete fDecorator;
@@ -274,7 +270,7 @@ WinBorder::_ResizeBy(float x, float y)
 	if (x == 0.0 && y == 0.0)
 		return false;
 
-#ifndef NEW_CLIPPING	
+#ifndef NEW_CLIPPING
 	if (fDecorator)
 		fDecorator->ResizeBy(x, y);
 
@@ -296,6 +292,34 @@ WinBorder::_ResizeBy(float x, float y)
 	return true;
 }
 
+// SetName
+void
+WinBorder::SetName(const char* name)
+{
+	Layer::SetName(name);
+
+	// rebuild the clipping for the title area
+	// and redraw it.
+
+	// TODO: Adi, please have a look at this,
+	// it doesn't work yet.
+	if (fDecorator) {
+		// before the change
+		BRegion invalid(fDecorator->GetTabRect());
+
+		fDecorator->SetTitle(name);
+
+		// after the change
+		invalid.Include(fDecorator->GetTabRect());
+
+#ifndef NEW_CLIPPING
+		RebuildFullRegion();
+		fRootLayer->GoRedraw(this, invalid);
+#else
+		// TODO: ...
+#endif
+	}
+}
 
 // UpdateStart
 void
@@ -375,7 +399,9 @@ WinBorder::SetSizeLimits(float minWidth, float maxWidth,
 
 	// On R5, Windows don't automatically resize, but since
 	// BWindow::ResizeTo() even honors the limits, I would guess
-	// this is a bug that we don't have to adopt
+	// this is a bug that we don't have to adopt.
+	// Note that most current apps will do unnecessary resizing
+	// after having set the limits, but the overhead is neglible.
 
 	float minWidthDiff = fMinWidth - fFrame.Width();
 	float minHeightDiff = fMinHeight - fFrame.Height();
@@ -394,7 +420,6 @@ WinBorder::SetSizeLimits(float minWidth, float maxWidth,
 	else if (maxHeightDiff < 0.0) // we're currently larger than maxHeight
 		yDiff = maxHeightDiff;
 
-//	Layer::ResizeBy(xDiff, yDiff);
 	ResizeBy(xDiff, yDiff);
 }
 
@@ -776,3 +801,17 @@ void WinBorder::get_user_regions(BRegion &reg)
 	reg.Include(&fDecRegion);
 }
 #endif
+
+// SetTopLayer
+void
+WinBorder::SetTopLayer(Layer* layer)
+{
+	if (layer) {
+		fTopLayer = layer;
+		fTopLayer->SetAsTopLayer(true);
+	
+		// connect decorator and top layer. (?)
+		AddChild(fTopLayer, NULL);
+	}
+}
+

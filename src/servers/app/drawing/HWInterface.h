@@ -1,10 +1,9 @@
-//
-// Copyright 2005, Stephan Aßmus <superstippi@gmx.de>
+//------------------------------------------------------------------------------
+// Copyright 2005, Haiku, Inc. All rights reserved.
 // Distributed under the terms of the MIT License.
 //
-// Contains an abstract base class HWInterface that provides the
-// basic functionality for frame buffer acces in the DisplayDriverPainter
-// implementation.
+//	Author:			Stephan Aßmus, <superstippi@gmx.de>
+//------------------------------------------------------------------------------
 
 #ifndef HW_INTERFACE_H
 #define HW_INTERFACE_H

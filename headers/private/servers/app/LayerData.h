@@ -49,11 +49,11 @@ class DrawData {
  public:
 								DrawData();
 								DrawData(const DrawData& from);
+								// used for the State stack, no
+								// true 1:1 copy!
+								DrawData(const DrawData* from);
 	virtual						~DrawData();
 
-	// NOTE: this operator will not make a 1:1 copy, it is used
-	// for the state stack and therefor origin and scale are reset
-	// to B_ORIGIN and 1.0.
 			DrawData&			operator=(const DrawData& from);
 
 								// coordinate transformation
@@ -112,15 +112,10 @@ class DrawData {
 	inline	const ServerFont&	Font() const
 									{ return fFont; }
 
-// TODO: remove (is contained in SeverFont::Flags())
-			void				SetFontAntiAliasing(bool antiAliasing);
-	inline	bool				FontAntiAliasing() const
-									{ return fFontAntiAliasing; }
-
-// TODO: remove (should be part of DisplayDriver::DrawString() as in BView)
-			void				SetEscapementDelta(escapement_delta delta);
-	inline	escapement_delta	EscapementDelta() const
-									{ return fEscapementDelta; }
+// overrides aliasing flag contained in SeverFont::Flags())
+			void				SetForceFontAliasing(bool aliasing);
+	inline	bool				ForceFontAliasing() const
+									{ return fFontAliasing; }
 
 								// postscript style settings
 			void				SetLineCapMode(cap_mode mode);
@@ -139,6 +134,9 @@ class DrawData {
 	inline	BPoint				Transform(const BPoint& point) const;
 	inline	BRect				Transform(const BRect& rect) const;
 
+			void				SetSubPixelPrecise(bool precise);
+	inline	bool				SubPixelPrecise() const
+									{ return fSubPixelPrecise; }
 
  protected:
 			BPoint				fOrigin;
@@ -158,10 +156,19 @@ class DrawData {
 			float				fPenSize;
 
 			ServerFont			fFont;
-// TODO: Remove, see above
-			bool				fFontAntiAliasing;
-			escapement_delta	fEscapementDelta;
-//
+			// overrides font aliasing flag
+			bool				fFontAliasing;
+
+			// This is not part of the normal state stack.
+			// Layer will update it in PushState/PopState.
+			// A BView can have a flag "B_SUBPIXEL_PRECISE",
+			// I never knew what it does on R5, but I can use
+			// it in Painter to actually draw stuff with
+			// sub-pixel coordinates. It means
+			// StrokeLine(BPoint(10, 5), BPoint(20, 9));
+			// will look different from
+			// StrokeLine(BPoint(10.3, 5.8), BPoint(20.6, 9.5));
+			bool				fSubPixelPrecise;
 
 			cap_mode			fLineCapMode;
 			join_mode			fLineJoinMode;
@@ -174,7 +181,10 @@ class DrawData {
 class LayerData : public DrawData {
  public:
 								LayerData();
-								LayerData(const LayerData &data);
+								LayerData(const LayerData& data);
+								// this version used for the state
+								// stack, sets prevState to data too
+								LayerData(LayerData* data);
 	virtual						~LayerData();
 
 			LayerData&			operator=(const LayerData &from);

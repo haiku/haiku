@@ -332,7 +332,7 @@ MemPool::ReallocateBuffer(void *buf, ssize_t size)
 void
 MemPool::ReleaseBuffer(void *buf)
 {
-    struct bfhead *b, *bn;
+	struct bfhead *b, *bn;
 
     b = BFH(((char *) buf) - sizeof(struct bhead));
 	

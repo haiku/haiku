@@ -3,12 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifndef __HAIKU__
-  #include <Screen.h>
-#endif
-
 #include "RenderingBuffer.h"
 #include "ServerCursor.h"
+#include "SystemPalette.h"
 #include "UpdateQueue.h"
 
 #include "HWInterface.h"
@@ -176,7 +173,7 @@ HWInterface::CopyBackToFront(const BRect& frame)
 
 	// we need to mess with the area, but it is const
 	BRect area(frame);
-	BRect bufferClip(0.0, 0.0, backBuffer->Width() - 1, backBuffer->Height() - 1);
+	BRect bufferClip(backBuffer->Bounds());
 
 	if (area.IsValid() && area.Intersects(bufferClip)) {
 
@@ -213,6 +210,8 @@ HWInterface::HideSoftwareCursor(const BRect& area)
 						 fCursorAreaBackup->right,
 						 fCursorAreaBackup->bottom);
 		if (area.Intersects(backupArea)) {
+//printf("HideSoftwareCursor(BRect(%.1, %.1, %.1, %.1))\n", area.left, area.top, area.right, area.bottom);
+//backupArea.PrintToStream();
 			_RestoreCursorArea(backupArea);
 			fSoftwareCursorHidden = true;
 		}
@@ -224,6 +223,7 @@ void
 HWInterface::HideSoftwareCursor()
 {
 	if (fCursorAreaBackup && !fSoftwareCursorHidden) {
+//printf("HideSoftwareCursor()\n");
 		_RestoreCursorArea(BRect(fCursorAreaBackup->left,
 								 fCursorAreaBackup->top,
 								 fCursorAreaBackup->right,
@@ -237,6 +237,7 @@ void
 HWInterface::ShowSoftwareCursor()
 {
 	if (fCursorAreaBackup && fSoftwareCursorHidden) {
+//printf("ShowSoftwareCursor()\n");
 		_DrawCursor(_CursorFrame());
 		fSoftwareCursorHidden = false;
 	}
@@ -258,8 +259,7 @@ HWInterface::_DrawCursor(BRect area) const
 	BRect cf = _CursorFrame();
 
 	// make sure we don't copy out of bounds
-	BRect bufferClip(0.0, 0.0, backBuffer->Width() - 1, backBuffer->Height() - 1);
-	area = bufferClip & area;
+	area = backBuffer->Bounds() & area;
 
 	if (cf.IsValid() && area.Intersects(cf)) {
 		// clip to common area
@@ -545,35 +545,26 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR,
 			break;
 		}
 		case B_CMAP8: {
-// TODO: make this work on Haiku, the problem is only
-// the rgb_color->index mapping, there is an implementation
-// in Bitmap.cpp, maybe it needs to be moved to a public
-// place...
-#ifndef __HAIKU__
+			const color_map *colorMap = SystemColorMap();
 			// offset to left top pixel in dest buffer
 			dst += y * dstBPR + x;
 			int32 left = x;
+			uint16 index;
 			// copy
-			// TODO: using BScreen will not be an option in the
-			// final implementation, will it? The BBitmap implementation
-			// has a class that handles this, something so useful
-			// should be moved to a more public place.
 			// TODO: assumes BGR order again
-			BScreen screen;
 			for (; y <= bottom; y++) {
 				uint8* srcHandle = src;
 				uint8* dstHandle = dst;
 				for (x = left; x <= right; x++) {
-					*dstHandle = screen.IndexForColor(srcHandle[2],
-													  srcHandle[1],
-													  srcHandle[0]);
+					index = ((srcHandle[2] & 0xf8) << 7) | ((srcHandle[1] & 0xf8) << 2) | (srcHandle[1] >> 3);
+					*dstHandle = colorMap->index_map[index];
 					dstHandle ++;
 					srcHandle += 4;
 				}
 				dst += dstBPR;
 				src += srcBPR;
 			}
-#endif // __HAIKU__
+
 			break;
 		}
 		case B_GRAY8: {

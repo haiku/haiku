@@ -238,9 +238,8 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 				escapement_delta delta;
 				delta.nonspace = deltax;
 				delta.space = deltay;
-				fldata.SetEscapementDelta(delta);
 				
-				fdriver->DrawString(string, len, fldata.PenLocation(), &fldata);
+				fdriver->DrawString(string, len, fldata.PenLocation(), &fldata, &delta);
 				delete string;
 				break;
 			}

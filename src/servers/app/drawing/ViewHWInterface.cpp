@@ -299,8 +299,8 @@ STRACE("MSG_UPDATE\n");
 				}*/
 				BRect frame = fUpdateRegion.Frame();
 				if (frame.IsValid()) {
-//					fView->Invalidate(frame);
-					fView->Invalidate();
+					fView->Invalidate(frame);
+//					fView->Invalidate();
 				}
 				fUpdateRegion.MakeEmpty();
 				fUpdateLock.Unlock();

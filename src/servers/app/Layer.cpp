@@ -61,12 +61,6 @@
 #	define RBTRACE(x) ;
 #endif
 
-enum {
-	B_LAYER_ACTION_NONE = 0,
-	B_LAYER_ACTION_MOVE,
-	B_LAYER_ACTION_RESIZE
-};
-
 Layer::Layer(BRect frame, const char* name, int32 token,
 			 uint32 resize, uint32 flags, DisplayDriver* driver)
 	: 
@@ -129,6 +123,19 @@ CRITICAL(helper);
 	if (!fDriver)
 		CRITICAL("You MUST have a valid driver to init a Layer object\n");
 
+	// NOTE: This flag is forwarded to a LayerData setting, even
+	// though it is actually not part of a "state". However,
+	// it is an important detail of a graphics context, and we
+	// have no other means to pass this setting on to the DisplayDriver
+	// other than through the LayerData. If we ever add a flag
+	// B_ANTI_ALIASING to the view flags, it would have to be passed
+	// in the same way. Though when breaking binary compatibility,
+	// we might want to make this an actual part of a "state" (with
+	// a different API to set these).
+	// Note that the flag is also tested (updated) in Push/PopState and
+	// SetFlags().
+	fLayerData->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
+
 	STRACE(("Layer(%s) successfuly created\n", Name()));
 }
 
@@ -139,9 +146,6 @@ Layer::~Layer()
 
 	// TODO: uncomment!
 	//PruneTree();
-	
-//	fServerWin->RemoveChild(fDriver);
-//	delete fDriver;
 }
 
 /*!
@@ -210,7 +214,7 @@ Layer::AddChild(Layer* layer, ServerWindow* serverWin)
 		} else {
 			// go right or up
 			
-			if (c == stop) // out trip is over
+			if (c == stop) // our trip is over
 				break;
 				
 			if (c->fLowerSibling) {
@@ -464,6 +468,21 @@ Layer::BottomChild() const
 {
 	fCurrent = fBottomChild;
 	return fCurrent;
+}
+
+// SetName
+void
+Layer::SetName(const char* name)
+{
+	fName.SetTo(name);
+}
+
+// SetFlags
+void
+Layer::SetFlags(uint32 flags)
+{
+	fFlags = flags;
+	fLayerData->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
 }
 
 #ifndef NEW_CLIPPING
@@ -987,9 +1006,10 @@ Layer::IsHidden(void) const
 void
 Layer::PushState()
 {
-	LayerData *data = new LayerData(*fLayerData);
-	data->prevState = fLayerData;
+	LayerData *data = new LayerData(fLayerData);
 	fLayerData = data;
+
+	fLayerData->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
 }
 
 
@@ -1005,6 +1025,8 @@ Layer::PopState()
 	fLayerData = fLayerData->prevState;
 	data->prevState = NULL;
 	delete data;
+
+	fLayerData->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
 }
 
 
@@ -1761,6 +1783,12 @@ Layer::do_CopyBits(BRect& src, BRect& dst, int32 xOffset, int32 yOffset) {
 	//   were parts cut off by the current layer clipping),
 	//   are triggering BView::Draw() to be called
 	//   and for these parts only.
+
+	// TODO: having moved this into Layer broke
+	// offscreen windows (bitmaps)
+	// -> move back into ServerWindow...
+	if (!GetRootLayer())
+		return;
 
 #ifndef NEW_CLIPPING
 

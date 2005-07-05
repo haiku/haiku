@@ -83,11 +83,6 @@ class Painter {
 			void				SetPenLocation(const BPoint& location);
 			void				SetFont(const ServerFont& font);
 
-								// BView API compatibility (for easier testing)
-			void				Sync() {}
-	inline	void				MovePenTo(const BPoint& location)
-									{ SetPenLocation(location); }
-
 								// painting functions
 
 								// lines
@@ -98,7 +93,7 @@ class Painter {
 			BRect				StrokeLine(		BPoint b,
 												DrawData* context);
 
-			// return true if the line was either vertical or horizontal
+			// returns true if the line was either vertical or horizontal
 			// draws a solid one pixel wide line of color c, no blending
 			bool				StraightLine(	BPoint a,
 												BPoint b,
@@ -288,8 +283,7 @@ class Painter {
 
 	agg::line_profile_aa		fLineProfile;
 
-	// for internal coordinate rounding/transformation,
-	// does not concern rendering
+	// for internal coordinate rounding/transformation
 	bool						fSubpixelPrecise;
 
 	float						fPenSize;
@@ -306,8 +300,7 @@ class Painter {
 	ServerFont					fFont;
 	// a class handling rendering and caching of glyphs
 	// it is setup to load from a specific Freetype supported
-	// font file, it uses the FontManager to locate a file
-	// by Family and Style
+	// font file which it gets from ServerFont
 	AGGTextRenderer*			fTextRenderer;
 };
 

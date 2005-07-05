@@ -33,7 +33,6 @@ if ( $(TARGET_PLATFORM) = haiku ) {
 } else {
 	VIEW_DRIVER_SOURCES =
 		fake_input_server.cpp
-		BBitmapBuffer.cpp
 		BitmapBuffer.cpp
 		AccelerantBuffer.cpp
 		AccelerantHWInterface.cpp
@@ -90,8 +89,12 @@ Server app_server :
 	# DisplayDriver Classes
 	$(VIEW_DRIVER_SOURCES)
 
+	BBitmapBuffer.cpp
+	BitmapHWInterface.cpp
 	DefaultDecorator.cpp
 	Layer.cpp
+	OffscreenServerWindow.cpp
+	OffscreenWinBorder.cpp
 	RootLayer.cpp
 	ServerPicture.cpp
 	ServerScreen.cpp

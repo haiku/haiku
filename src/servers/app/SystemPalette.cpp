@@ -25,6 +25,8 @@
 //	Description:	Methods to initialize and get the system color_map.	
 //  
 //------------------------------------------------------------------------------
+#include <stdio.h>
+
 #include <SystemPalette.h>
 
 const static rgb_color kSystemPalette[] = {
@@ -155,7 +157,7 @@ color_distance(uint8 red1, uint8 green1, uint8 blue1,
 }
 
 
-static uint8
+static inline uint8
 FindClosestColor(const rgb_color &color, const rgb_color *palette)
 {
 	uint8 closestIndex = 0;
@@ -221,6 +223,7 @@ FillColorMap(const rgb_color *palette, color_map *map)
 void
 InitializeColorMap()
 {
+printf("InitializeColorMap()\n");
 	FillColorMap(kSystemPalette, &sColorMap);
 }
 

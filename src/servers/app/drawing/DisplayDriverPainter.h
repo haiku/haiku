@@ -16,12 +16,11 @@
 
 #include "DisplayDriver.h"
 
-class HWInterface;
 class Painter;
 
 class DisplayDriverPainter : public DisplayDriver {
 public:
-								DisplayDriverPainter(HWInterface* hwInterface);
+								DisplayDriverPainter(HWInterface* interface = NULL);
 	virtual						~DisplayDriverPainter();
 
 	// when implementing, be sure to call the inherited version
@@ -29,6 +28,8 @@ public:
 	virtual void				Shutdown();
 
 	virtual	void				Update();
+
+	virtual void				SetHWInterface(HWInterface* interface);
 
 	// clipping for all drawing functions, passing a NULL region
 	// will remove any clipping (drawing allowed everywhere)
@@ -44,14 +45,14 @@ public:
 												int32 rCount,
 												BRegion* clipReg);
 
-	virtual void				InvertRect(		const BRect &r);
+	virtual void				InvertRect(		BRect r);
 
 	virtual	void				DrawBitmap(		ServerBitmap *bitmap,
 												const BRect &source,
 												const BRect &dest,
 												const DrawData *d);
 
-	virtual	void				FillArc(		const BRect &r,
+	virtual	void				FillArc(		BRect r,
 												const float &angle,
 												const float &span,
 												const DrawData *d);
@@ -59,24 +60,24 @@ public:
 	virtual	void				FillBezier(		BPoint *pts,
 												const DrawData *d);
 
-	virtual	void				FillEllipse(	const BRect &r,
+	virtual	void				FillEllipse(	BRect r,
 												const DrawData *d);
 
 	virtual	void				FillPolygon(	BPoint *ptlist,
 												int32 numpts,
-												const BRect &bounds,
+												BRect bounds,
 												const DrawData *d);
 
-	virtual	void				FillRect(		const BRect &r,
+	virtual	void				FillRect(		BRect r,
 												const RGBColor &color);
 
-	virtual	void				FillRect(		const BRect &r,
+	virtual	void				FillRect(		BRect r,
 												const DrawData *d);
 
 	virtual	void				FillRegion(		BRegion &r,
 												const DrawData *d);
 
-	virtual	void				FillRoundRect(	const BRect &r,
+	virtual	void				FillRoundRect(	BRect r,
 												const float &xrad,
 												const float &yrad,
 												const DrawData *d);
@@ -89,10 +90,10 @@ public:
 												const DrawData *d);
 
 	virtual	void				FillTriangle(	BPoint *pts,
-												const BRect &bounds,
+												BRect bounds,
 												const DrawData *d);
 
-	virtual	void				StrokeArc(		const BRect &r,
+	virtual	void				StrokeArc(		BRect r,
 												const float &angle,
 												const float &span,
 												const DrawData *d);
@@ -100,7 +101,7 @@ public:
 	virtual	void				StrokeBezier(	BPoint *pts,
 												const DrawData *d);
 
-	virtual	void				StrokeEllipse(	const BRect &r,
+	virtual	void				StrokeEllipse(	BRect r,
 												const DrawData *d);
 
 	// this version used by Decorator
@@ -125,21 +126,21 @@ public:
 
 	virtual	void				StrokePolygon(	BPoint *ptlist,
 												int32 numpts,
-												const BRect &bounds,
+												BRect bounds,
 												const DrawData *d,
 												bool is_closed=true);
 
 	// this version used by Decorator
-	virtual	void				StrokeRect(		const BRect &r,
+	virtual	void				StrokeRect(		BRect r,
 												const RGBColor &color);
 
-	virtual	void				StrokeRect(		const BRect &r,
+	virtual	void				StrokeRect(		BRect r,
 												const DrawData *d);
 
 	virtual	void				StrokeRegion(	BRegion &r,
 												const DrawData *d);
 
-	virtual	void				StrokeRoundRect(const BRect &r,
+	virtual	void				StrokeRoundRect(BRect r,
 												const float &xrad,
 												const float &yrad,
 												const DrawData *d);
@@ -158,28 +159,31 @@ public:
 	// Font-related calls
 	
 	// DrawData is NOT const because this call updates the pen position in the passed DrawData
-	virtual	void				DrawString(		const char *string,
-												const int32 &length,
-												const BPoint &pt,
-												DrawData *d);
+	virtual	void				DrawString(		const char* string,
+												int32 length,
+												const BPoint& pt,
+												DrawData* d,
+												escapement_delta* delta = NULL);
 
-	virtual	void				DrawString(		const char *string,
+/*	virtual	void				DrawString(		const char *string,
 												const int32 &length,
 												const BPoint &pt,
 												const RGBColor &color,
-												escapement_delta *delta=NULL);
+												escapement_delta *delta=NULL);*/
 
-	virtual	float				StringWidth(	const char *string,
+	virtual	float				StringWidth(	const char* string,
 												int32 length,
-												const DrawData *d);
+												const DrawData* d,
+												escapement_delta* delta = NULL);
 
-	virtual	float				StringWidth(	const char *string,
+	virtual	float				StringWidth(	const char* string,
 												int32 length,
-												const ServerFont &font);
+												const ServerFont& font,
+												escapement_delta* delta = NULL);
 
-	virtual	float				StringHeight(	const char *string,
+	virtual	float				StringHeight(	const char* string,
 												int32 length,
-												const DrawData *d);
+												const DrawData* d);
 
 	virtual bool				Lock();
 	virtual void				Unlock();

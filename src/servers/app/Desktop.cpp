@@ -49,9 +49,32 @@
 
 
 Desktop::Desktop()
+	: fWinBorderList(64),
+	  fWinLock("desktop window list lock"),
+	  fRootLayerList(2),
+	  fActiveRootLayer(NULL),
+	  fScreenList(2),
+	  fActiveScreen(NULL),
+	  fMouseMode(B_NORMAL_MOUSE),
+	  fFFMouseMode(false)
 {
-	fActiveRootLayer = NULL;
-	fActiveScreen = NULL;
+	// init scrollbar info
+	fScrollBarInfo.proportional = true;
+	fScrollBarInfo.double_arrows = false;
+	// look of the knob (R5: (0, 1, 2), 1 = default)
+	fScrollBarInfo.knob = 1;
+	fScrollBarInfo.min_knob_size = 15;
+
+	// init menu info
+	fMenuInfo.font_size = 12.0;
+// TODO: ...
+//	fMenuInfo.f_family;
+//	fMenuInfo.f_style;
+//	fMenuInfo.background_color = gColorSet->menu_background;
+	// look of the separator (R5: (0, 1, 2), default ?)
+	fMenuInfo.separator = 0;
+	fMenuInfo.click_to_open = true;
+	fMenuInfo.triggers_always_shown = false;
 }
 
 
@@ -110,7 +133,11 @@ Desktop::_AddGraphicsCard(HWInterface* interface)
 	if (screen->Initialize() >= B_OK && fScreenList.AddItem((void*)screen)) {
 
 		// TODO: be careful of screen initialization - monitor may not support 640x480
+#if __HAIKU__
+		screen->SetMode(1400, 1050, B_RGB32, 60.f);
+#else
 		screen->SetMode(800, 600, B_RGB32, 60.f);
+#endif
 
 	} else {
 		delete screen;

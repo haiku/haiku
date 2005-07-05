@@ -35,7 +35,8 @@ DrawData::DrawData()
 	  fPenLocation(0.0, 0.0),
 	  fPenSize(1.0),
 	  fFont(),
-	  fFontAntiAliasing(true),
+	  fFontAliasing(false),
+	  fSubPixelPrecise(false),
 	  fLineCapMode(B_BUTT_CAP),
 	  fLineJoinMode(B_BEVEL_JOIN),
 	  fMiterLimit(B_DEFAULT_MITER_LIMIT)
@@ -43,9 +44,6 @@ DrawData::DrawData()
 	if (gFontServer && gFontServer->GetSystemPlain())
 		fFont = *(gFontServer->GetSystemPlain());
 	
-	fEscapementDelta.space = 0;
-	fEscapementDelta.nonspace = 0;
-
 	fUnscaledFontSize = fFont.Size();
 }
 
@@ -54,6 +52,42 @@ DrawData::DrawData(const DrawData& from)
 	: fClippingRegion(NULL)
 {
 	*this = from;
+}
+
+// copy constructor
+DrawData::DrawData(const DrawData* from)
+	: fOrigin(0.0, 0.0),
+	  fScale(1.0),
+	  fClippingRegion(NULL)
+{
+	if (from->fClippingRegion) {
+		SetClippingRegion(*(from->fClippingRegion));
+	}
+
+	fHighColor			= from->fHighColor;
+	fLowColor			= from->fLowColor;
+	fPattern			= from->fPattern;
+
+	fDrawingMode		= from->fDrawingMode;
+	fAlphaSrcMode		= from->fAlphaSrcMode;
+	fAlphaFncMode		= from->fAlphaFncMode;
+
+	fPenLocation		= from->fPenLocation;
+	fPenSize			= from->fPenSize;
+
+	fFont				= from->fFont;
+	fFontAliasing		= from->fFontAliasing;
+
+	fSubPixelPrecise	= from->fSubPixelPrecise;
+
+	fLineCapMode		= from->fLineCapMode;
+	fLineJoinMode		= from->fLineJoinMode;
+	fMiterLimit			= from->fMiterLimit;
+
+	// Since fScale is reset to 1.0, the unscaled
+	// font size is the current size of the font
+	// (which is from->fUnscaledFontSize * from->fScale)
+	fUnscaledFontSize	= fFont.Size();
 }
 
 // destructor
@@ -66,16 +100,8 @@ DrawData::~DrawData()
 DrawData&
 DrawData::operator=(const DrawData& from)
 {
-	// NOTE: This function is intended for use by the Layer
-	// state stack only.
-	// So it does not make a true copy of the DrawData, but resets
-	// fOrigin and fScale and uses the current the font size as
-	// fUnscaledFontSize.
-
-//	fOrigin	= from.fOrigin;
-//	fScale	= from.fScale;
-	fOrigin	= BPoint(0.0, 0.0);
-	fScale	= 1.0;
+	fOrigin	= from.fOrigin;
+	fScale	= from.fScale;
 
 	if (from.fClippingRegion) {
 		SetClippingRegion(*(from.fClippingRegion));
@@ -96,18 +122,15 @@ DrawData::operator=(const DrawData& from)
 	fPenSize			= from.fPenSize;
 
 	fFont				= from.fFont;
-	fFontAntiAliasing	= from.fFontAntiAliasing;
-	fEscapementDelta	= from.fEscapementDelta;
+	fFontAliasing		= from.fFontAliasing;
+
+	fSubPixelPrecise	= from.fSubPixelPrecise;
 
 	fLineCapMode		= from.fLineCapMode;
 	fLineJoinMode		= from.fLineJoinMode;
 	fMiterLimit			= from.fMiterLimit;
 
-//	fUnscaledFontSize	= from.fUnscaledFontSize;
-	// Since fScale is reset to 1.0, the unscaled
-	// font size is the current size of the font
-	// (which is from.fFont.Size() * from.fScale)
-	fUnscaledFontSize	= fFont.Size();
+	fUnscaledFontSize	= from.fUnscaledFontSize;
 
 	return *this;
 }
@@ -269,18 +292,18 @@ DrawData::SetFont(const ServerFont& font, uint32 flags)
 	}
 }
 
-// SetFontAntiAliasing
+// SetForceFontAliasing
 void
-DrawData::SetFontAntiAliasing(bool antiAliasing)
+DrawData::SetForceFontAliasing(bool aliasing)
 {
-	fFontAntiAliasing = antiAliasing;
+	fFontAliasing = aliasing;
 }
 
-// SetEscapementDelta
+// SetSubPixelPrecise
 void
-DrawData::SetEscapementDelta(escapement_delta delta)
+DrawData::SetSubPixelPrecise(bool precise)
 {
-	fEscapementDelta = delta;
+	fSubPixelPrecise = precise;
 }
 
 // SetLineCapMode
@@ -315,10 +338,18 @@ LayerData::LayerData()
 }
 
 // LayerData
-LayerData::LayerData(const LayerData &data)
+LayerData::LayerData(const LayerData& data)
+	: DrawData()
 {
 	fClippingRegion = NULL;
 	*this = data;
+}
+
+// LayerData
+LayerData::LayerData(LayerData* data)
+	: DrawData(data),
+	  prevState(data)
+{
 }
 
 // destructor
@@ -333,7 +364,7 @@ LayerData::operator=(const LayerData& from)
 {
 	DrawData::operator=(from);
 
-	prevState			= from.prevState;
+	prevState = from.prevState;
 	
 	return *this;
 }
@@ -450,10 +481,7 @@ LayerData::ReadFromLink(BPrivate::LinkReceiver& link)
 	link.Read<int8>((int8*)&fAlphaSrcMode);
 	link.Read<int8>((int8*)&fAlphaFncMode);
 	link.Read<float>(&fScale);
-	link.Read<bool>(&fFontAntiAliasing);
-
-	// TODO: ahm... which way arround?
-	fFontAntiAliasing = !fFontAntiAliasing;
+	link.Read<bool>(&fFontAliasing);
 
 	fHighColor = highColor;
 	fLowColor = lowColor;
@@ -505,7 +533,7 @@ LayerData::WriteToLink(BPrivate::LinkSender& link) const
 	link.Attach<uint8>((uint8)fAlphaSrcMode);
 	link.Attach<uint8>((uint8)fAlphaFncMode);
 	link.Attach<float>(fScale);
-	link.Attach<bool>(!fFontAntiAliasing);
+	link.Attach<bool>(fFontAliasing);
 
 	int32 clippingRectCount = fClippingRegion ? fClippingRegion->CountRects() : 0;
 	link.Attach<int32>(clippingRectCount);

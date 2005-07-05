@@ -1,11 +1,15 @@
 // BitmapBuffer.h
 
-#include <Bitmap.h>
+#include "ServerBitmap.h"
 
 #include "BitmapBuffer.h"
 
+// TODO: It should be more or less guaranteed that this object
+// is not used if InitCheck() returns an error, so the checks
+// in all thos functions should probably be removed...
+
 // constructor
-BitmapBuffer::BitmapBuffer(BBitmap* bitmap)
+BitmapBuffer::BitmapBuffer(ServerBitmap* bitmap)
 	: fBitmap(bitmap)
 {
 }
@@ -13,7 +17,7 @@ BitmapBuffer::BitmapBuffer(BBitmap* bitmap)
 // destructor
 BitmapBuffer::~BitmapBuffer()
 {
-	delete fBitmap;
+	// We don't own the ServerBitmap
 }
 
 // InitCheck
@@ -22,7 +26,7 @@ BitmapBuffer::InitCheck() const
 {
 	status_t ret = B_NO_INIT;
 	if (fBitmap)
-		ret = fBitmap->InitCheck();
+		ret = fBitmap->IsValid() ? B_OK : B_ERROR;
 	return ret;
 }
 
@@ -58,7 +62,7 @@ uint32
 BitmapBuffer::Width() const
 {
 	if (InitCheck() >= B_OK)
-		return fBitmap->Bounds().IntegerWidth() + 1;
+		return fBitmap->Width();
 	return 0;
 }
 
@@ -67,7 +71,7 @@ uint32
 BitmapBuffer::Height() const
 {
 	if (InitCheck() >= B_OK)
-		return fBitmap->Bounds().IntegerHeight() + 1;
+		return fBitmap->Height();
 	return 0;
 }
 

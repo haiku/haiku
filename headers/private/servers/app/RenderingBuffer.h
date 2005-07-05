@@ -4,6 +4,7 @@
 #define RENDERING_BUFFER_H
 
 #include <GraphicsDefs.h>
+#include <Rect.h>
 
 class RenderingBuffer {
  public:
@@ -22,6 +23,11 @@ class RenderingBuffer {
 
 	inline	uint32				BitsLength() const
 									{ return Height() * BytesPerRow(); }
+
+	inline	BRect				Bounds() const
+									{ return BRect(0.0, 0.0,
+												   Width() - 1,
+												   Height() - 1); }
 };
 
 #endif // RENDERING_BUFFER_H

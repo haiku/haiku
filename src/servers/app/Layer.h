@@ -52,6 +52,12 @@ enum {
 };
 
 enum {
+	B_LAYER_ACTION_NONE = 0,
+	B_LAYER_ACTION_MOVE,
+	B_LAYER_ACTION_RESIZE
+};
+
+enum {
 	B_LAYER_CHILDREN_DEPENDANT = 0x1000U,
 };
 
@@ -91,13 +97,17 @@ class Layer {
 	virtual	Layer*				LowerSibling() const;
 	virtual	Layer*				UpperSibling() const;
 	virtual	Layer*				BottomChild() const;
-	
-			const char*			Name() const
+
+	virtual	void				SetName(const char* name);	
+	inline	const char*			Name() const
 									{ return fName.String(); }
-	inline	uint32				Flags() const
-									{ return fFlags; }
+
 	inline	uint32				ResizeMode() const
 									{ return fResizeMode; }
+
+	virtual	void				SetFlags(uint32 flags);
+	inline	uint32				Flags() const
+									{ return fFlags; }
 
 #ifndef NEW_CLIPPING
 	virtual	void				RebuildFullRegion();
@@ -276,6 +286,8 @@ class Layer {
 	friend class RootLayer;
 	friend class WinBorder;
 	friend class ServerWindow;
+// TODO: remove, is here for debugging purposes only
+friend class OffscreenWinBorder;
 
 #ifndef NEW_CLIPPING
 			void				move_layer(float x, float y);

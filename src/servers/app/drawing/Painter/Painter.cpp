@@ -175,15 +175,18 @@ Painter::DetachFromBuffer()
 void
 Painter::SetDrawData(const DrawData* data)
 {
-	// for now...
+	// NOTE: The custom clipping in "data" is ignored, because it has already been
+	// taken into account elsewhere
+
+	// TODO: optimize "context switch" for speed...
+	// but for now...
 	SetPenSize(data->PenSize());
 	SetPenLocation(data->PenLocation());
 	SetFont(data->Font());
-//	fTextRenderer->SetAntialiasing(data->FontAntiAliasing());
-	fTextRenderer->SetAntialiasing(!(data->Font().Flags() & B_DISABLE_ANTIALIASING));
-//	if (data->clipReg) {
-//		ConstrainClipping(*data->clipReg);
-//	}
+	fTextRenderer->SetAntialiasing(!(data->ForceFontAliasing() || data->Font().Flags() & B_DISABLE_ANTIALIASING));
+
+	fSubpixelPrecise = data->SubPixelPrecise();
+
 	// any of these conditions means we need to use a different drawing
 	// mode instance
 	bool updateDrawingMode = !(data->GetPattern() == fPatternHandler->GetPattern()) ||
@@ -1481,6 +1484,12 @@ Painter::_StrokePath(VertexSource& path) const
 //		stroke.line_join(agg::round_join);
 //		stroke.line_cap(agg::butt_cap);
 		stroke.width(fPenSize);
+
+		// special case line width = 1 with square caps
+		// this has a couple of advantages and it looks
+		// like this is also the R5 behaviour.
+		if (fPenSize == 1.0)
+			stroke.line_cap(agg::square_cap);
 
 		fRasterizer->reset();
 		fRasterizer->add_path(stroke);

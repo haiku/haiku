@@ -33,8 +33,8 @@
 #include "FontServer.h"
 #include "HWInterface.h"
 #include "LayerData.h"
+#include "OffscreenServerWindow.h"
 #include "RAMLinkMsgReader.h"
-//#include "RGBColor.h"
 #include "RootLayer.h"
 #include "ServerBitmap.h"
 #include "ServerConfig.h"
@@ -165,7 +165,11 @@ ServerApp::~ServerApp(void)
 
 	if (tries < 0) {
 		// This really shouldn't happen, as it shows we're buggy
+#if __HAIKU__
 		syslog(LOG_ERR, "ServerApp %s needs to kill some server windows...\n", Signature());
+#else
+		fprintf(stderr, "ServerApp %s needs to kill some server windows...\n", Signature());
+#endif
 
 		// there still seem to be some windows left - kill them!
 		fWindowListLock.Lock();
@@ -187,7 +191,7 @@ ServerApp::~ServerApp(void)
 	}
 
 	for (int32 i = 0; i < fPictureList.CountItems(); i++) {
-		delete static_cast<ServerPicture *>(fPictureList.ItemAt(i));
+		delete (ServerPicture*)fPictureList.ItemAt(i);
 	}
 
 	// although this isn't pretty, ATM we have only one RootLayer.
@@ -409,7 +413,10 @@ ServerApp::_MessageLooper()
 
 			case AS_CREATE_WINDOW:
 			{
-				// Create the ServerWindow to node monitor a new OBWindow
+				// Create a ServerWindow
+				// NOTE/TODO: Code duplication in part to below case.
+				// Watch out, if you make changes here, you might have to do them below.
+				// Go ahead and fix if you have an idea for unification...
 
 				// Attached data:
 				// 2) BRect window frame
@@ -450,12 +457,13 @@ ServerApp::_MessageLooper()
 
 				// ServerWindow constructor will reply with port_id of a newly created port
 				ServerWindow *window = new ServerWindow(title, this, clientReplyPort,
-					looperPort, token, frame, look, feel, flags, workspaces);
+					looperPort, token);
 
 				STRACE(("\nServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
 					fSignature(), title, frame.left, frame.top, frame.right, frame.bottom));
-				
-				if (window->InitCheck() == B_OK && window->Run()) {
+
+				// NOTE: the reply to the client is handled in window->Run()				
+				if (window->Init(frame, look, feel, flags, workspaces) >= B_OK && window->Run()) {
 					// add the window to the list
 					if (fWindowListLock.Lock()) {
 						fWindowList.AddItem(window);
@@ -464,6 +472,80 @@ ServerApp::_MessageLooper()
 				} else {
 					delete window;
 
+					// window creation failed, we need to notify the client
+					BPrivate::LinkSender reply(clientReplyPort);
+					reply.StartMessage(SERVER_FALSE);
+					reply.Flush();
+				}
+
+				// We don't have to free the title, as it's owned by the ServerWindow now
+				break;
+			}
+			case AS_CREATE_OFFSCREEN_WINDOW:
+			{
+				// Create an OffscreenServerWindow
+				// NOTE/TODO: Code duplication in part to above case.
+
+				// Attached data:
+				// 2) BRect window frame
+				// 3) uint32 window look
+				// 4) uint32 window feel
+				// 5) uint32 window flags
+				// 6) uint32 workspace index
+				// 7) int32 BHandler token of the window
+				// 8) port_id window's message port
+				// 9) const char * title
+
+				BRect frame;
+				int32 bitmapToken;
+				uint32 look;
+				uint32 feel;
+				uint32 flags;
+				uint32 workspaces;
+				int32 token = B_NULL_TOKEN;
+				port_id	clientReplyPort = -1;
+				port_id looperPort = -1;
+				char *title = NULL;
+
+				receiver.Read<int32>(&bitmapToken);
+				receiver.Read<BRect>(&frame);
+				receiver.Read<uint32>(&look);
+				receiver.Read<uint32>(&feel);
+				receiver.Read<uint32>(&flags);
+				receiver.Read<uint32>(&workspaces);
+				receiver.Read<int32>(&token);
+				receiver.Read<port_id>(&clientReplyPort);
+				receiver.Read<port_id>(&looperPort);
+				if (receiver.ReadString(&title) != B_OK)
+					break;
+
+				if (!frame.IsValid()) {
+					// make sure we pass a valid rectangle to ServerWindow
+					frame.right = frame.left + 1;
+					frame.bottom = frame.top + 1;
+				}
+				ServerBitmap* bitmap = FindBitmap(bitmapToken);
+
+				bool success = false;
+
+				if (bitmap) {
+					// ServerWindow constructor will reply with port_id of a newly created port
+					OffscreenServerWindow *window = new OffscreenServerWindow(title, this, clientReplyPort,
+																			  looperPort, token, bitmap);
+					
+					// NOTE: the reply to the client is handled in window->Run()				
+					success = window->Init(frame, look, feel, flags, workspaces) >= B_OK && window->Run();
+
+					// add the window to the list
+					if (success && fWindowListLock.Lock()) {
+						success = fWindowList.AddItem(window);
+						fWindowListLock.Unlock();
+					}
+
+					if (!success)
+						delete window;
+				}
+				if (!success) {
 					// window creation failed, we need to notify the client
 					BPrivate::LinkSender reply(clientReplyPort);
 					reply.StartMessage(SERVER_FALSE);
@@ -772,14 +854,13 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<int32>(&bytesPerRow);
 			if (link.Read<screen_id>(&screenID) == B_OK) {
 				bitmap = gBitmapManager->CreateBitmap(frame, colorSpace, flags,
-					bytesPerRow, screenID);
+													  bytesPerRow, screenID);
 			}
 
 			STRACE(("ServerApp %s: Create Bitmap (%.1fx%.1f)\n",
 						Signature(), frame.Width(), frame.Height()));
 
-			if (bitmap) {
-				fBitmapList.AddItem(bitmap);
+			if (bitmap && fBitmapList.AddItem((void*)bitmap)) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<int32>(bitmap->Token());
 				fLink.Attach<int32>(bitmap->Area());
@@ -807,10 +888,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<int32>(&id);
 
 			ServerBitmap *bitmap = FindBitmap(id);
-			if (bitmap) {
+			if (bitmap && fBitmapList.RemoveItem((void*)bitmap)) {
 				STRACE(("ServerApp %s: Deleting Bitmap %ld\n", Signature(), id));
 
-				fBitmapList.RemoveItem(bitmap);
 				gBitmapManager->DeleteBitmap(bitmap);
 				fLink.StartMessage(SERVER_TRUE);
 			} else
@@ -2141,11 +2221,12 @@ ServerApp::CountBitmaps() const
 	\param token ID token of the bitmap to find
 	\return The bitmap having that ID or NULL if not found
 */
-ServerBitmap *
+ServerBitmap*
 ServerApp::FindBitmap(int32 token) const
 {
-	for (int32 i = 0; i < fBitmapList.CountItems(); i++) {
-		ServerBitmap *bitmap = static_cast<ServerBitmap *>(fBitmapList.ItemAt(i));
+	int32 count = fBitmapList.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		ServerBitmap* bitmap = (ServerBitmap*)fBitmapList.ItemAt(i);
 		if (bitmap && bitmap->Token() == token)
 			return bitmap;
 	}

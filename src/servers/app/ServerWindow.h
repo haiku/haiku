@@ -55,11 +55,12 @@ class ServerWindow : public BLocker {
 public:
 								ServerWindow(const char *title, ServerApp *app,
 									port_id clientPort, port_id looperPort, 
-									int32 handlerID, BRect frame, uint32 look,
-									uint32 feel, uint32 flags, uint32 workspace);
+									int32 handlerID);
 	virtual						~ServerWindow();
 
-			status_t			InitCheck();
+			status_t			Init(BRect frame, uint32 look,
+									 uint32 feel, uint32 flags,
+									 uint32 workspace);
 			bool				Run();
 			void				Quit();
 
@@ -77,9 +78,15 @@ public:
 									const color_space cspace);
 
 			// util methods.	
-			void				SendMessageToClient(const BMessage* msg,
+	virtual	void				SendMessageToClient(const BMessage* msg,
 													int32 target = B_NULL_TOKEN,
 													bool usePreferred = false) const;
+
+	virtual	WinBorder*			MakeWinBorder(BRect frame,
+											  const char* name,
+											  uint32 look, uint32 feel,
+											  uint32 flags, uint32 workspace);
+
 			
 			// TODO: Ouch, that's not exactly a nice name
 			inline BMessage		&ClientViewsWithInvalidCoords()

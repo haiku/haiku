@@ -1,0 +1,49 @@
+/*
+ * Copyright 2005, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
+
+#include "OffscreenWinBorder.h"
+#include "ServerBitmap.h"
+
+#include "OffscreenServerWindow.h"
+
+// constructor
+OffscreenServerWindow::OffscreenServerWindow(const char *title,
+											 ServerApp *app,
+											 port_id clientPort,
+											 port_id looperPort,
+											 int32 handlerID,
+											 ServerBitmap* bitmap)
+	: ServerWindow(title, app, clientPort, looperPort, handlerID),
+	  fBitmap(bitmap)
+{
+}
+
+// destructor
+OffscreenServerWindow::~OffscreenServerWindow()
+{
+}
+
+// SendMessageToClient
+void
+OffscreenServerWindow::SendMessageToClient(const BMessage* msg, int32 target,
+								  bool usePreferred) const
+{
+	// We're a special kind of window. The client BWindow thread is not running,
+	// so we cannot post messages to the client. In order to not mess arround
+	// with all the other code, we simply make this function virtual and
+	// don't do anything in this implementation.
+}
+
+// MakeWinBorder
+WinBorder*
+OffscreenServerWindow::MakeWinBorder(BRect frame, const char* name,
+									 uint32 look, uint32 feel, uint32 flags,
+									 uint32 workspace)
+{
+	return new OffscreenWinBorder(fBitmap, name, this);
+}

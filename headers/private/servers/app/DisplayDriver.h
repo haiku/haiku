@@ -24,6 +24,7 @@ class BRect;
 class BRegion;
 
 class DrawData;
+class HWInterface;
 class RGBColor;
 class ServerBitmap;
 class ServerCursor;
@@ -60,6 +61,8 @@ public:
 	// call this on mode changes!
 	virtual	void				Update() = 0;
 
+	virtual void				SetHWInterface(HWInterface* interface) = 0;
+
 	// clipping for all drawing functions
 	virtual	void				ConstrainClippingRegion(BRegion* region) = 0;
 
@@ -73,14 +76,14 @@ public:
 												int32 rCount,
 												BRegion* clipReg) = 0;
 
-	virtual void				InvertRect(		const BRect &r) = 0;
+	virtual void				InvertRect(		BRect r) = 0;
 
 	virtual	void				DrawBitmap(		ServerBitmap *bitmap,
 												const BRect &source,
 												const BRect &dest,
 												const DrawData *d) = 0;
 
-	virtual	void				FillArc(		const BRect &r,
+	virtual	void				FillArc(		BRect r,
 												const float &angle,
 												const float &span,
 												const DrawData *d) = 0;
@@ -88,24 +91,24 @@ public:
 	virtual	void				FillBezier(		BPoint *pts,
 												const DrawData *d) = 0;
 
-	virtual	void				FillEllipse(	const BRect &r,
+	virtual	void				FillEllipse(	BRect r,
 												const DrawData *d) = 0;
 
 	virtual	void				FillPolygon(	BPoint *ptlist,
 												int32 numpts,
-												const BRect &bounds,
+												BRect bounds,
 												const DrawData *d) = 0;
 
-	virtual	void				FillRect(		const BRect &r,
+	virtual	void				FillRect(		BRect r,
 												const RGBColor &color) = 0;
 
-	virtual	void				FillRect(		const BRect &r,
+	virtual	void				FillRect(		BRect r,
 												const DrawData *d) = 0;
 
 	virtual	void				FillRegion(		BRegion &r,
 												const DrawData *d) = 0;
 
-	virtual	void				FillRoundRect(	const BRect &r,
+	virtual	void				FillRoundRect(	BRect r,
 												const float &xrad,
 												const float &yrad,
 												const DrawData *d) = 0;
@@ -118,10 +121,10 @@ public:
 												const DrawData *d) = 0;
 
 	virtual	void				FillTriangle(	BPoint *pts,
-												const BRect &bounds,
+												BRect bounds,
 												const DrawData *d) = 0;
 
-	virtual	void				StrokeArc(		const BRect &r,
+	virtual	void				StrokeArc(		BRect r,
 												const float &angle,
 												const float &span,
 												const DrawData *d) = 0;
@@ -129,7 +132,7 @@ public:
 	virtual	void				StrokeBezier(	BPoint *pts,
 												const DrawData *d) = 0;
 
-	virtual	void				StrokeEllipse(	const BRect &r,
+	virtual	void				StrokeEllipse(	BRect r,
 												const DrawData *d) = 0;
 
 	// this version used by Decorator
@@ -154,21 +157,21 @@ public:
 
 	virtual	void				StrokePolygon(	BPoint *ptlist,
 												int32 numpts,
-												const BRect &bounds,
+												BRect bounds,
 												const DrawData *d,
 												bool is_closed=true) = 0;
 
 	// this version used by Decorator
-	virtual	void				StrokeRect(		const BRect &r,
+	virtual	void				StrokeRect(		BRect r,
 												const RGBColor &color) = 0;
 
-	virtual	void				StrokeRect(		const BRect &r,
+	virtual	void				StrokeRect(		BRect r,
 												const DrawData *d) = 0;
 
 	virtual	void				StrokeRegion(	BRegion &r,
 												const DrawData *d) = 0;
 
-	virtual	void				StrokeRoundRect(const BRect &r,
+	virtual	void				StrokeRoundRect(BRect r,
 												const float &xrad,
 												const float &yrad,
 												const DrawData *d) = 0;
@@ -187,24 +190,27 @@ public:
 	// Font-related calls
 	
 	// DrawData is NOT const because this call updates the pen position in the passed DrawData
-	virtual	void				DrawString(		const char *string,
-												const int32 &length,
-												const BPoint &pt,
-												DrawData *d) = 0;
+	virtual	void				DrawString(		const char* string,
+												int32 length,
+												const BPoint& pt,
+												DrawData* d,
+												escapement_delta *delta = NULL) = 0;
 
-	virtual	void				DrawString(		const char *string,
+/*	virtual	void				DrawString(		const char *string,
 												const int32 &length,
 												const BPoint &pt,
 												const RGBColor &color,
-												escapement_delta *delta=NULL) = 0;
+												escapement_delta *delta = NULL) = 0;*/
 
-	virtual	float				StringWidth(	const char *string,
+	virtual	float				StringWidth(	const char* string,
 												int32 length,
-												const DrawData *d) = 0;
+												const DrawData* d,
+												escapement_delta *delta = NULL) = 0;
 
-	virtual	float				StringWidth(	const char *string,
+	virtual	float				StringWidth(	const char* string,
 												int32 length,
-												const ServerFont &font) = 0;
+												const ServerFont& font,
+												escapement_delta *delta = NULL) = 0;
 
 	virtual	float				StringHeight(	const char *string,
 												int32 length,

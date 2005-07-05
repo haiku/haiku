@@ -10,6 +10,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
+#include <new>
 
 #include <AppDefs.h>
 #include <GraphicsDefs.h>
@@ -71,8 +72,7 @@ static const uint32 kMsgWindowQuit = 'winQ';
 	monitor thread.
 */
 ServerWindow::ServerWindow(const char *title, ServerApp *app,
-	port_id clientPort, port_id looperPort, int32 handlerID,
-	BRect frame, uint32 look, uint32 feel, uint32 flags, uint32 workspace)
+						   port_id clientPort, port_id looperPort, int32 handlerID)
 	: BLocker(title && *title ? title : "Unnamed Window"),
 	fTitle(title),
 	fServerApp(app),
@@ -87,27 +87,6 @@ ServerWindow::ServerWindow(const char *title, ServerApp *app,
 	fCurrentLayer(NULL)
 {
 	STRACE(("ServerWindow(%s)::ServerWindow()\n", title));
-
-	if (fTitle == NULL)
-		fTitle = strdup("Unnamed Window");
-	if (fTitle == NULL)
-		return;
-
-	// fMessagePort is the port to which the app sends messages for the server
-	fMessagePort = create_port(100, fTitle);
-	if (fMessagePort < B_OK)
-		return;
-
-	fLink.SetSenderPort(fClientReplyPort);
-	fLink.SetReceiverPort(fMessagePort);
-
-	char name[60];
-	snprintf(name, sizeof(name), "%ld: %s", fClientTeam, fTitle);
-
-	fWinBorder = new WinBorder(frame, name, look, feel, flags,
-		workspace, this, gDesktop->GetDisplayDriver());
-
-	STRACE(("ServerWindow %s Created\n", fTitle));
 }
 
 
@@ -116,7 +95,11 @@ ServerWindow::~ServerWindow()
 {
 	STRACE(("*ServerWindow (%s):~ServerWindow()\n", fTitle));
 
+	if (!fWinBorder->IsOffscreenWindow())
+		gDesktop->RemoveWinBorder(fWinBorder);
+
 	delete fWinBorder;
+	
 	free(const_cast<char *>(fTitle));
 
 	STRACE(("#ServerWindow(%s) will exit NOW\n", fTitle));
@@ -124,13 +107,31 @@ ServerWindow::~ServerWindow()
 
 
 status_t
-ServerWindow::InitCheck()
+ServerWindow::Init(BRect frame, uint32 look, uint32 feel, uint32 flags, uint32 workspace)
 {
-	if (fTitle == NULL || fWinBorder == NULL)
+	if (fTitle == NULL)
+		fTitle = strdup("Unnamed Window");
+	if (fTitle == NULL)
 		return B_NO_MEMORY;
 
+	// fMessagePort is the port to which the app sends messages for the server
+	fMessagePort = create_port(100, fTitle);
 	if (fMessagePort < B_OK)
 		return fMessagePort;
+
+	fLink.SetSenderPort(fClientReplyPort);
+	fLink.SetReceiverPort(fMessagePort);
+
+//	char name[60];
+//	snprintf(name, sizeof(name), "%ld: %s", fClientTeam, fTitle);
+
+	// We cannot call MakeWinBorder in the constructor, since it 
+	fWinBorder = MakeWinBorder(frame, fTitle, look, feel, flags, workspace);
+	if (!fWinBorder)
+		return B_NO_MEMORY;
+
+	if (!fWinBorder->IsOffscreenWindow())
+		gDesktop->AddWinBorder(fWinBorder);
 
 	return B_OK;
 }
@@ -379,7 +380,7 @@ ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent)
 		&& (fWinBorder->WindowFlags() & 0x00008000) != 0) {
 		// this is a workspaces window!
 		newLayer = new WorkspacesLayer(frame, name, token, resizeMask,
-			flags, gDesktop->GetDisplayDriver());
+								flags, fWinBorder->GetDisplayDriver());
 	} else {
 		newLayer = new Layer(frame, name, token, resizeMask, 
 			flags, gDesktop->GetDisplayDriver());
@@ -393,6 +394,16 @@ ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent)
 	newLayer->fEventMask = eventMask;
 	newLayer->fEventOptions = eventOptions;
 	newLayer->fOwner = fWinBorder;
+
+// TODO: rework the clipping stuff to remove RootLayer dependency and then
+// remove this hack:
+if (fWinBorder->IsOffscreenWindow()) {
+#ifndef NEW_CLIPPING
+	newLayer->fVisible.Set(newLayer->fFrame);
+#else
+	newLayer->fVisible2.Set(newLayer->fFrame);
+#endif
+}
 
 	if (_parent) {
 		Layer *parent = fWinBorder->FindLayer(parentToken);
@@ -415,7 +426,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 	}
 
 	RootLayer *myRootLayer = fWinBorder->GetRootLayer();
-	myRootLayer->Lock();
+	// NOTE: is NULL when fWinBorder is offscreen!
+	if (myRootLayer)
+		myRootLayer->Lock();
 
 	switch (code) {
 		//--------- BView Messages -----------------
@@ -481,9 +494,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			
 			link.Read<int32>(&token);
 
-myRootLayer->Lock();
 			Layer *current = fWinBorder->FindLayer(token);
-myRootLayer->Unlock();
 			if (current) {
 				DTRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: %s, token %ld\n", fTitle, current->Name(), token));
 			} else {
@@ -507,14 +518,8 @@ myRootLayer->Unlock();
 			if (fCurrentLayer != NULL)
 				break;
 
-myRootLayer->Lock();
-			fWinBorder->fTopLayer = CreateLayerTree(link, NULL);
-			fWinBorder->fTopLayer->SetAsTopLayer(true);
-			fCurrentLayer = fWinBorder->fTopLayer;
-
-			// connect decorator and top layer.
-			fWinBorder->AddChild(fWinBorder->fTopLayer, NULL);
-myRootLayer->Unlock();
+			fWinBorder->SetTopLayer(CreateLayerTree(link, NULL));
+			fCurrentLayer = fWinBorder->TopLayer();
 			break;
 		}
 
@@ -524,11 +529,10 @@ myRootLayer->Unlock();
 
 			Layer* parent = NULL;
 			Layer* newLayer = CreateLayerTree(link, &parent);
-myRootLayer->Lock();
 			if (parent != NULL)
 				parent->AddChild(newLayer, this);
 
-			if (!newLayer->IsHidden() && parent)
+			if (myRootLayer && !newLayer->IsHidden() && parent)
 #ifndef NEW_CLIPPING
 				myRootLayer->GoInvalidate(newLayer, newLayer->fFull);
 #else
@@ -538,8 +542,6 @@ myRootLayer->Lock();
 				myRootLayer->GoInvalidate(newLayer, invalidRegion);
 			}
 #endif
-
-myRootLayer->Unlock();
 			break;
 		}
 		case AS_LAYER_DELETE:
@@ -568,11 +570,10 @@ myRootLayer->Lock();
 			fCurrentLayer->RemoveSelf();
 			fCurrentLayer->PruneTree();
 
-			if (invalidRegion) {
+			if (invalidRegion && myRootLayer) {
 				myRootLayer->GoInvalidate(parent, *invalidRegion);
 				delete invalidRegion;
 			}
-myRootLayer->Unlock();
 			
 			#ifdef DEBUG_SERVERWINDOW
 			parent->PrintTree();
@@ -627,7 +628,8 @@ myRootLayer->Unlock();
 			link.Read<uint32>(&mask);
 			link.Read<uint32>(&options);
 
-			myRootLayer->SetEventMaskLayer(fCurrentLayer, mask, options);
+			if (myRootLayer)
+				myRootLayer->SetEventMaskLayer(fCurrentLayer, mask, options);
 			break;
 		}
 		case AS_LAYER_MOVE_TO:
@@ -713,7 +715,9 @@ myRootLayer->Unlock();
 		}
 		case AS_LAYER_SET_FLAGS:
 		{
-			link.Read<uint32>(&(fCurrentLayer->fFlags));
+			uint32 flags;
+			link.Read<uint32>(&flags);
+			fCurrentLayer->SetFlags(flags);
 			
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FLAGS: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			break;
@@ -858,7 +862,8 @@ myRootLayer->Lock();
 			fCurrentLayer->SetViewColor(RGBColor(c));
 
 #ifndef NEW_CLIPPING
-			myRootLayer->GoRedraw(fCurrentLayer, fCurrentLayer->fVisible);
+			if (myRootLayer)
+				myRootLayer->GoRedraw(fCurrentLayer, fCurrentLayer->fVisible);
 #else
 			myRootLayer->GoRedraw(fCurrentLayer, fCurrentLayer->VisibleRegion());
 #endif
@@ -941,7 +946,7 @@ myRootLayer->Unlock();
 			DTRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			bool fontAliasing;
 			link.Read<bool>(&fontAliasing);
-			fCurrentLayer->fLayerData->SetFontAntiAliasing(!fontAliasing);
+			fCurrentLayer->fLayerData->SetForceFontAliasing(fontAliasing);
 			
 			break;
 		}
@@ -976,7 +981,7 @@ myRootLayer->Unlock();
 #ifndef NEW_CLIPPING
 			fCurrentLayer->RebuildFullRegion();
 #endif
-			if (!(fCurrentLayer->IsHidden()) && !fWinBorder->InUpdate())
+			if (myRootLayer && !(fCurrentLayer->IsHidden()) && !fWinBorder->InUpdate())
 #ifndef NEW_CLIPPING
 				myRootLayer->GoInvalidate(fCurrentLayer, fCurrentLayer->fFull);				
 #else
@@ -998,15 +1003,16 @@ myRootLayer->Unlock();
 			if (fCurrentLayer->IsHidden()) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<int32>(0L);
+				fLink.Flush();
 			} else {
 				// TODO: Watch out for the coordinate system in AS_LAYER_GET_CLIP_REGION
-				LayerData* layerData = fCurrentLayer->fLayerData;
 				BRegion region;
 
 				// TODO: This could also be done more reliably in the Layer,
 				// when the State stack is implemented there. There should be
 				// DrawData::fCulmulatedClippingRegion...
 				// TODO: the DrawData clipping region should be in local view coords.
+				LayerData* layerData = fCurrentLayer->fLayerData;
 
 				do {
 					if (layerData->ClippingRegion())
@@ -1020,9 +1026,10 @@ myRootLayer->Unlock();
 
 				for (int32 i = 0; i < rectCount; i++)
 					fLink.Attach<BRect>(region.RectAt(i));
+
+				fLink.Flush();
 			}
 
-			fLink.Flush();
 			break;
 		}
 		case AS_LAYER_SET_CLIP_REGION:
@@ -1041,16 +1048,16 @@ myRootLayer->Unlock();
 				region.Include(r);
 			}
 			fCurrentLayer->fLayerData->SetClippingRegion(region);
-
+/*
 #ifndef NEW_CLIPPING
 			fCurrentLayer->RebuildFullRegion();
-			if (!(fCurrentLayer->IsHidden()) && !fWinBorder->InUpdate())
+			if (myRootLayer && !(fCurrentLayer->IsHidden()) && !fWinBorder->InUpdate())
 				myRootLayer->GoInvalidate(fCurrentLayer, fCurrentLayer->fFull);				
 #else
-			if (!(fCurrentLayer->IsHidden()) && !fWinBorder->InUpdate())
+			if (myRootLayer && !(fCurrentLayer->IsHidden()) && !fWinBorder->InUpdate())
 				myRootLayer->GoInvalidate(fCurrentLayer, fCurrentLayer->Frame());
 #endif
-
+*/
 			break;
 		}
 		case AS_LAYER_INVAL_RECT:
@@ -1061,13 +1068,17 @@ myRootLayer->Unlock();
 			BRect		invalRect;
 			
 			link.Read<BRect>(&invalRect);
-			BRect converted(fCurrentLayer->ConvertToTop(invalRect.LeftTop()),
-							fCurrentLayer->ConvertToTop(invalRect.RightBottom()));
-			BRegion invalidRegion(converted);
-//			invalidRegion.IntersectWith(&fCurrentLayer->fVisible);
 
-			myRootLayer->GoRedraw(fWinBorder, invalidRegion);
-//			myRootLayer->RequestDraw(invalidRegion, fWinBorder);
+			if (myRootLayer) {
+				BRect converted(fCurrentLayer->ConvertToTop(invalRect.LeftTop()),
+								fCurrentLayer->ConvertToTop(invalRect.RightBottom()));
+				BRegion invalidRegion(converted);
+#ifdef NEW_CLIPPING
+				invalidRegion.IntersectWith(&fCurrentLayer->fVisible2);
+#endif
+				myRootLayer->GoRedraw(fWinBorder, invalidRegion);
+//				myRootLayer->RequestDraw(invalidRegion, fWinBorder);
+			}
 			break;
 		}
 		case AS_LAYER_INVAL_REGION:
@@ -1082,30 +1093,26 @@ myRootLayer->Unlock();
 			
 			link.Read<int32>(&noOfRects);
 			
-			for(int i = 0; i < noOfRects; i++)
-			{
+			for (int i = 0; i < noOfRects; i++) {
 				link.Read<BRect>(&rect);
 				invalReg.Include(rect);
 			}
-			
-			myRootLayer->GoRedraw(fCurrentLayer, invalReg);
+
+			if (myRootLayer)
+				myRootLayer->GoRedraw(fCurrentLayer, invalReg);
 
 			break;
 		}
 		case AS_BEGIN_UPDATE:
 		{
 			DTRACE(("ServerWindowo %s: AS_BEGIN_UPDATE\n", Title()));
-			fWinBorder->GetRootLayer()->Lock();
 			fWinBorder->UpdateStart();
-			fWinBorder->GetRootLayer()->Unlock();
 			break;
 		}
 		case AS_END_UPDATE:
 		{
 			DTRACE(("ServerWindowo %s: AS_END_UPDATE\n", Title()));
-			fWinBorder->GetRootLayer()->Lock();
 			fWinBorder->UpdateEnd();
-			fWinBorder->GetRootLayer()->Unlock();
 			break;
 		}
 
@@ -1160,7 +1167,6 @@ myRootLayer->Unlock();
 #endif
 		case AS_WINDOW_TITLE:
 		{
-			// TODO: Implement AS_WINDOW_TITLE
 			
 			char* newTitle;
 			if (link.ReadString(&newTitle) == B_OK) {
@@ -1169,6 +1175,10 @@ myRootLayer->Unlock();
 
 				free(newTitle);
 			}
+			char* title;
+			link.ReadString(&title);
+			fWinBorder->SetName(title);
+			free(title);
 			break;
 		}
 
@@ -1243,7 +1253,9 @@ myRootLayer->Unlock();
 			STRACE(("ServerWindow %s: Message AS_SET_FEEL\n", Title()));
 			int32 newFeel;
 			link.Read<int32>(&newFeel);
-			myRootLayer->GoChangeWinBorderFeel(fWinBorder, newFeel);
+
+			if (myRootLayer)
+				myRootLayer->GoChangeWinBorderFeel(fWinBorder, newFeel);
 			break;
 		}
 		case AS_SET_ALIGNMENT:
@@ -1511,16 +1523,15 @@ myRootLayer->Unlock();
 			break;
 	}
 
-	myRootLayer->Unlock();
+	if (myRootLayer)
+		myRootLayer->Unlock();
 }
 
-		// -------------------- Graphics messages ----------------------------------
+// -------------------- Graphics messages ----------------------------------
 
-inline
 void
 ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 {
-	fWinBorder->GetRootLayer()->Lock();
 #ifndef NEW_CLIPPING
 	BRegion rreg(fCurrentLayer->fVisible);
 #else
@@ -1530,10 +1541,12 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 	if (fWinBorder->InUpdate())
 		rreg.IntersectWith(&fWinBorder->RegionToBeUpdated());
 
-	gDesktop->GetDisplayDriver()->ConstrainClippingRegion(&rreg);
+	DisplayDriver* driver = fWinBorder->GetDisplayDriver();
+
+	driver->ConstrainClippingRegion(&rreg);
 //	rgb_color  rrr = fCurrentLayer->fLayerData->viewcolor.GetColor32();
 //	RGBColor c(rand()%255,rand()%255,rand()%255);
-//	gDesktop->GetDisplayDriver()->FillRect(BRect(0,0,639,479), c);
+//	driver->FillRect(BRect(0,0,639,479), c);
 
 	switch (code) {
 		case AS_STROKE_LINE:
@@ -1548,11 +1561,12 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&y2);
 
 			if (fCurrentLayer && fCurrentLayer->fLayerData) {
+
 				BPoint p1(x1,y1);
 				BPoint p2(x2,y2);
-				gDesktop->GetDisplayDriver()->StrokeLine(fCurrentLayer->ConvertToTop(p1),
-														fCurrentLayer->ConvertToTop(p2),
-														fCurrentLayer->fLayerData);
+				driver->StrokeLine(fCurrentLayer->ConvertToTop(p1),
+								   fCurrentLayer->ConvertToTop(p2),
+								   fCurrentLayer->fLayerData);
 				
 				// We update the pen here because many DisplayDriver calls which do not update the
 				// pen position actually call StrokeLine
@@ -1572,7 +1586,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<BRect>(&rect);
 			
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				gDesktop->GetDisplayDriver()->InvertRect(fCurrentLayer->ConvertToTop(rect));
+				driver->InvertRect(fCurrentLayer->ConvertToTop(rect));
 			break;
 		}
 		case AS_STROKE_RECT:
@@ -1587,7 +1601,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			BRect rect(left,top,right,bottom);
 			
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				gDesktop->GetDisplayDriver()->StrokeRect(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
+				driver->StrokeRect(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_FILL_RECT:
@@ -1597,7 +1611,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			BRect rect;
 			link.Read<BRect>(&rect);
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				gDesktop->GetDisplayDriver()->FillRect(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
+				driver->FillRect(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT:
@@ -1615,7 +1629,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 				BRect dst = src.OffsetToCopy(point);
 				dst = fCurrentLayer->ConvertToTop(dst);
 
-				fCurrentLayer->GetDisplayDriver()->DrawBitmap(sbmp, src, dst, fCurrentLayer->fLayerData);
+				driver->DrawBitmap(sbmp, src, dst, fCurrentLayer->fLayerData);
 			}
 			
 			// TODO: Adi -- shouldn't AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT sync with the client?
@@ -1636,7 +1650,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 				BRect dst = src.OffsetToCopy(point);
 				dst = fCurrentLayer->ConvertToTop(dst);
 
-				fCurrentLayer->GetDisplayDriver()->DrawBitmap(sbmp, src, dst, fCurrentLayer->fLayerData);
+				driver->DrawBitmap(sbmp, src, dst, fCurrentLayer->fLayerData);
 			}
 			break;
 		}
@@ -1654,7 +1668,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (sbmp) {
 				dstRect = fCurrentLayer->ConvertToTop(dstRect);
 
-				fCurrentLayer->GetDisplayDriver()->DrawBitmap(sbmp, srcRect, dstRect, fCurrentLayer->fLayerData);
+				driver->DrawBitmap(sbmp, srcRect, dstRect, fCurrentLayer->fLayerData);
 			}
 			
 			// TODO: Adi -- shouldn't AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT sync with the client?
@@ -1674,7 +1688,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (sbmp) {
 				dstRect = fCurrentLayer->ConvertToTop(dstRect);
 
-				fCurrentLayer->GetDisplayDriver()->DrawBitmap(sbmp, srcRect, dstRect, fCurrentLayer->fLayerData);
+				driver->DrawBitmap(sbmp, srcRect, dstRect, fCurrentLayer->fLayerData);
 			}
 			break;
 		}
@@ -1689,7 +1703,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&angle);
 			link.Read<float>(&span);
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				gDesktop->GetDisplayDriver()->StrokeArc(fCurrentLayer->ConvertToTop(r),angle,span, fCurrentLayer->fLayerData);
+				driver->StrokeArc(fCurrentLayer->ConvertToTop(r),angle,span, fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_FILL_ARC:
@@ -1703,7 +1717,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&angle);
 			link.Read<float>(&span);
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				gDesktop->GetDisplayDriver()->FillArc(fCurrentLayer->ConvertToTop(r),angle,span, fCurrentLayer->fLayerData);
+				driver->FillArc(fCurrentLayer->ConvertToTop(r),angle,span, fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_STROKE_BEZIER:
@@ -1722,7 +1736,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 				for (i=0; i<4; i++)
 					pts[i]=fCurrentLayer->ConvertToTop(pts[i]);
 				
-				gDesktop->GetDisplayDriver()->StrokeBezier(pts, fCurrentLayer->fLayerData);
+				driver->StrokeBezier(pts, fCurrentLayer->fLayerData);
 			}
 			delete [] pts;
 			break;
@@ -1743,7 +1757,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 				for (i=0; i<4; i++)
 					pts[i]=fCurrentLayer->ConvertToTop(pts[i]);
 				
-				gDesktop->GetDisplayDriver()->FillBezier(pts, fCurrentLayer->fLayerData);
+				driver->FillBezier(pts, fCurrentLayer->fLayerData);
 			}
 			delete [] pts;
 			break;
@@ -1755,7 +1769,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			BRect rect;
 			link.Read<BRect>(&rect);
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				gDesktop->GetDisplayDriver()->StrokeEllipse(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
+				driver->StrokeEllipse(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_FILL_ELLIPSE:
@@ -1765,7 +1779,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			BRect rect;
 			link.Read<BRect>(&rect);
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				gDesktop->GetDisplayDriver()->FillEllipse(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
+				driver->FillEllipse(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_STROKE_ROUNDRECT:
@@ -1779,7 +1793,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&yrad);
 
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				gDesktop->GetDisplayDriver()->StrokeRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad, fCurrentLayer->fLayerData);
+				driver->StrokeRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad, fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_FILL_ROUNDRECT:
@@ -1793,7 +1807,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&yrad);
 
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				gDesktop->GetDisplayDriver()->FillRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad, fCurrentLayer->fLayerData);
+				driver->FillRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad, fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_STROKE_TRIANGLE:
@@ -1812,7 +1826,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 				for (int i = 0;i < 3; i++)
 					pts[i] = fCurrentLayer->ConvertToTop(pts[i]);
 
-				gDesktop->GetDisplayDriver()->StrokeTriangle(pts, fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
+				driver->StrokeTriangle(pts, fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
 			}
 			break;
 		}
@@ -1832,7 +1846,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 				for (int i = 0; i < 3; i++)
 					pts[i] = fCurrentLayer->ConvertToTop(pts[i]);
 
-				gDesktop->GetDisplayDriver()->FillTriangle(pts, fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
+				driver->FillTriangle(pts, fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
 			}
 			break;
 		}
@@ -1857,7 +1871,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			for (int32 i = 0; i < pointcount; i++)
 				pointlist[i] = fCurrentLayer->ConvertToTop(pointlist[i]);
 
-			gDesktop->GetDisplayDriver()->StrokePolygon(pointlist,pointcount,polyframe,
+			driver->StrokePolygon(pointlist,pointcount,polyframe,
 					fCurrentLayer->fLayerData,isclosed);
 
 			delete [] pointlist;
@@ -1881,7 +1895,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			for (int32 i = 0; i < pointcount; i++)
 				pointlist[i] = fCurrentLayer->ConvertToTop(pointlist[i]);
 
-			gDesktop->GetDisplayDriver()->FillPolygon(pointlist,pointcount,polyframe, fCurrentLayer->fLayerData);
+			driver->FillPolygon(pointlist,pointcount,polyframe, fCurrentLayer->fLayerData);
 
 			delete [] pointlist;
 			break;
@@ -1909,7 +1923,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			for (int32 i = 0; i < ptcount; i++)
 				ptlist[i] = fCurrentLayer->ConvertToTop(ptlist[i]);
 
-			gDesktop->GetDisplayDriver()->StrokeShape(shaperect, opcount, oplist, ptcount, ptlist, fCurrentLayer->fLayerData);
+			driver->StrokeShape(shaperect, opcount, oplist, ptcount, ptlist, fCurrentLayer->fLayerData);
 			delete[] oplist;
 			delete[] ptlist;
 			break;
@@ -1937,7 +1951,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			for (int32 i = 0; i < ptcount; i++)
 				ptlist[i] = fCurrentLayer->ConvertToTop(ptlist[i]);
 			
-			gDesktop->GetDisplayDriver()->FillShape(shaperect, opcount, oplist, ptcount, ptlist, fCurrentLayer->fLayerData);
+			driver->FillShape(shaperect, opcount, oplist, ptcount, ptlist, fCurrentLayer->fLayerData);
 
 			delete[] oplist;
 			delete[] ptlist;
@@ -1959,10 +1973,11 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			// Between the client-side conversion to BRects from clipping_rects to the overhead
 			// in repeatedly calling FillRect(), this is definitely in need of optimization. At
 			// least it works for now. :)
+			BRegion region;
 			for (int32 i = 0; i < count; i++) {
-				gDesktop->GetDisplayDriver()->FillRect(fCurrentLayer->ConvertToTop(rects[i]), 
-					fCurrentLayer->fLayerData);
+				region.Include(fCurrentLayer->ConvertToTop(rects[i]));
 			}
+			driver->FillRegion(region, fCurrentLayer->fLayerData);
 
 			delete[] rects;
 
@@ -1996,7 +2011,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 					index->pt1 = fCurrentLayer->ConvertToTop(index->pt1);
 					index->pt2 = fCurrentLayer->ConvertToTop(index->pt2);
 				}
-				gDesktop->GetDisplayDriver()->StrokeLineArray(linecount,linedata,fCurrentLayer->fLayerData);
+				driver->StrokeLineArray(linecount,linedata,fCurrentLayer->fLayerData);
 			}
 			break;
 		}
@@ -2014,13 +2029,22 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.ReadString(&string);
 			
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				gDesktop->GetDisplayDriver()->DrawString(string, length,
-														fCurrentLayer->ConvertToTop(location),
-														fCurrentLayer->fLayerData);
+				driver->DrawString(string, length,
+								   fCurrentLayer->ConvertToTop(location),
+								   fCurrentLayer->fLayerData);
 			
 			free(string);
 			break;
 		}
+		case AS_LAYER_BEGIN_PICTURE:
+			CRITICAL("AS_LAYER_BEGIN_PICTURE not implemented\n");
+			break;
+		case AS_LAYER_APPEND_TO_PICTURE:
+			CRITICAL("AS_LAYER_APPEND_TO_PICTURE not implemented\n");
+			break;
+		case AS_LAYER_END_PICTURE:
+			CRITICAL("AS_LAYER_END_PICTURE not implemented\n");
+			break;
 
 		default:
 			printf("ServerWindow %s received unexpected code - message offset %ld\n",
@@ -2034,8 +2058,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			break;
 	}
 
-	gDesktop->GetDisplayDriver()->ConstrainClippingRegion(NULL);
-	fWinBorder->GetRootLayer()->Unlock();
+	driver->ConstrainClippingRegion(NULL);
 }
 
 /*!
@@ -2123,6 +2146,72 @@ ServerWindow::_MessageLooper()
 	}
 }
 
+/*
+void
+ServerWindow::_CopyBits(RootLayer* rootLayer, Layer* layer,
+						BRect& src, BRect& dst,
+						int32 xOffset, int32 yOffset) const
+{
+	// NOTE: The correct behaviour is this:
+	// * The region that is copied is the
+	//   src rectangle, no matter if it fits
+	//   into the dst rectangle. It is copied
+	//   by the offset dst.LeftTop() - src.LeftTop()
+	// * The dst rectangle is used for invalidation:
+	//   Any area in the dst rectangle that could
+	//   not be copied from src (because either the
+	//   src rectangle was not big enough, or because there
+	//   were parts cut off by the current layer clipping),
+	//   are triggering BView::Draw() to be called
+	//   and for these parts only.
+
+#ifndef NEW_CLIPPING
+
+	// the region that is going to be copied
+	BRegion copyRegion(src);
+	// apply the current clipping of the layer
+
+	copyRegion.IntersectWith(&layer->fVisible);
+
+	// offset the region to the destination
+	// and apply the current clipping there as well
+	copyRegion.OffsetBy(xOffset, yOffset);
+	copyRegion.IntersectWith(&layer->fVisible);
+
+	// the region at the destination that needs invalidation
+	BRegion invalidRegion(dst);
+	// exclude the region drawn by the copy operation
+	invalidRegion.Exclude(&copyRegion);
+	// apply the current clipping as well
+	invalidRegion.IntersectWith(&layer->fVisible);
+
+	// move the region back for the actual operation
+	copyRegion.OffsetBy(-xOffset, -yOffset);
+
+	layer->GetDisplayDriver()->CopyRegion(&copyRegion, xOffset, yOffset);
+
+	// trigger the redraw			
+	if (rootLayer) {
+		// the following code solves a "concurrency" problem:
+		// since the scrolling might happen more often
+		// than redrawing, we need to keep track of the region
+		// pending for redraw that might fall into the area
+		// that is scrolled.
+		BRegion scrolledInvalid(fWinBorder->CulmulatedUpdateRegion());
+		scrolledInvalid.IntersectWith(&layer->fVisible);
+		if (scrolledInvalid.Frame().IsValid()) {
+//printf("the layer has pending updates that will be scrolled\n");
+			scrolledInvalid.OffsetBy(xOffset, yOffset);
+			invalidRegion.Include(&scrolledInvalid);
+		}
+
+		rootLayer->GoRedraw(fWinBorder, invalidRegion);
+	}
+
+#endif
+}*/
+
+
 void
 ServerWindow::SendMessageToClient(const BMessage* msg, int32 target, bool usePreferred) const
 {
@@ -2140,6 +2229,16 @@ ServerWindow::SendMessageToClient(const BMessage* msg, int32 target, bool usePre
 	delete[] buffer;
 }
 
+// MakeWinBorder
+WinBorder*
+ServerWindow::MakeWinBorder(BRect frame, const char* name,
+							uint32 look, uint32 feel, uint32 flags,
+							uint32 workspace)
+{
+	// The non-offscreen ServerWindow uses the DisplayDriver instance from the desktop.
+	return new(nothrow) WinBorder(frame, name, look, feel, flags,
+								  workspace, this, gDesktop->GetDisplayDriver());
+}
 
 status_t
 ServerWindow::PictureToRegion(ServerPicture *picture, BRegion &region,

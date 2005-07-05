@@ -66,6 +66,12 @@ class WinBorder : public Layer {
 	virtual	void				ScrollBy(float x, float y)
 								{ // not allowed
 								}
+
+	virtual	void				SetName(const char* name);
+
+	virtual	bool				IsOffscreenWindow() const
+									{ return false; }
+
 #ifndef NEW_CLIPPING
 	virtual	void				RebuildFullRegion();
 #endif
@@ -76,6 +82,8 @@ class WinBorder : public Layer {
 									{ return fInUpdate; }
 	inline	const BRegion&		RegionToBeUpdated() const
 									{ return fInUpdateRegion; }
+	inline	const BRegion&		CulmulatedUpdateRegion() const
+									{ return fCumulativeRegion; }
 
 			void				SetSizeLimits(float minWidth,
 											  float maxWidth,
@@ -131,9 +139,13 @@ class WinBorder : public Layer {
 
 #endif
 
+ public:
+	virtual	void				SetTopLayer(Layer* layer);
+	inline	Layer*				TopLayer() const
+									{ return fTopLayer; }
+
  protected:
 	friend class Layer;
-	friend class ServerWindow;
 	friend class RootLayer;
 
 			click_type			_ActionFor(const PointerEvent& evt) const;

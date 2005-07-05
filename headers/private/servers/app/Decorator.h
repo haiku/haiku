@@ -110,6 +110,7 @@ class Decorator {
 									{ return (_colors) ? *_colors : ColorSet(); }
 	
 	virtual	void				GetFootprint(BRegion *region);
+
 	virtual	click_type			Clicked(BPoint pt, int32 buttons,
 										int32 modifiers);
 

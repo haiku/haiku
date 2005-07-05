@@ -5,11 +5,11 @@
 
 #include "RenderingBuffer.h"
 
-class BBitmap;
+class ServerBitmap;
 
 class BitmapBuffer : public RenderingBuffer {
  public:
-								BitmapBuffer(BBitmap* bitmap);
+								BitmapBuffer(ServerBitmap* bitmap);
 	virtual						~BitmapBuffer();
 
 	virtual	status_t			InitCheck() const;
@@ -21,11 +21,11 @@ class BitmapBuffer : public RenderingBuffer {
 	virtual	uint32				Height() const;
 
 								// BitmapBuffer
-			const BBitmap*		Bitmap() const
+			const ServerBitmap*	Bitmap() const
 									{ return fBitmap; }
  private:
 
-			BBitmap*			fBitmap;
+			ServerBitmap*		fBitmap;
 };
 
 #endif // BITMAP_BUFFER_H
