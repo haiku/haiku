@@ -2038,8 +2038,11 @@ BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 		KMessage::Header *header = (KMessage::Header*)data;
 		header->targetToken = (preferred ? B_PREFERRED_TOKEN : token);
 	} else if (magic == kMessageMagic || magic == kMessageMagicSwapped) {
-		// get the header (but not the magic again)
-		BMemoryIO stream((uint32 *)data + 1, size - sizeof(uint32));
+		// get the header
+		BMemoryIO stream(data, size);
+
+		stream.Read(&magic, sizeof(uint32));
+			// "discard" the magic (we already know it anyway)
 
 		Header header;
 		status_t error = header.SetMagic(magic);
