@@ -456,6 +456,7 @@ BLooper::Run()
 	if (fRunCalled) {
 		// Not allowed to call Run() more than once
 		debugger("can't call BLooper::Run twice!");
+		return fTaskID;
 	}
 
 	fTaskID = spawn_thread(_task0_, Name(), fInitPriority, this);
