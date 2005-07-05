@@ -553,6 +553,10 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 			// wait for the kMsgShutdownServer message.
 			// If an application does not quit as asked, the picasso thread
 			// will send us this message in 2-3 seconds.
+
+			// if there are no apps to quit, shutdown directly
+			if (fShutdownCount == 0)
+				PostMessage(kMsgShutdownServer);
 			break;
 
 		case kMsgShutdownServer:
