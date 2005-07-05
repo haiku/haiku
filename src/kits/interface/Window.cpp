@@ -1446,7 +1446,7 @@ BWindow::SetTitle(const char *title)
 
 		// we notify the app_server so we can actually see the change
 		if (Lock()) {
-			fLink->StartMessage(AS_WINDOW_TITLE);
+			fLink->StartMessage(AS_SET_WINDOW_TITLE);
 			fLink->AttachString(fTitle);
 			fLink->Flush();
 			Unlock();

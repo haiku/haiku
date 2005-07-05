@@ -96,6 +96,8 @@ public:
 			// to who we belong. who do we own. our title.
 	inline	ServerApp*			App() const { return fServerApp; }
 	inline	const WinBorder*	GetWinBorder() const { return fWinBorder; }
+
+			void				SetTitle(const char* newTitle);
 	inline	const char*			Title() const { return fTitle; }
 
 			// related thread/team_id(s).

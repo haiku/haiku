@@ -128,9 +128,6 @@ ServerWindow::Init(BRect frame, uint32 look, uint32 feel, uint32 flags, uint32 w
 	fLink.SetSenderPort(fClientReplyPort);
 	fLink.SetReceiverPort(fMessagePort);
 
-//	char name[60];
-//	snprintf(name, sizeof(name), "%ld: %s", fClientTeam, fTitle);
-
 	// We cannot call MakeWinBorder in the constructor, since it 
 	fWinBorder = MakeWinBorder(frame, fTitle, look, feel, flags, workspace);
 	if (!fWinBorder)
@@ -149,7 +146,7 @@ ServerWindow::Run()
 	BAutolock locker(this);
 
 	char name[B_OS_NAME_LENGTH];
-	snprintf(name, sizeof(name), "w:%s", fTitle);
+	snprintf(name, sizeof(name), "w:%ld:%s", ClientTeam(), Title());
 
 	// Spawn our message-monitoring thread
 	fThread = spawn_thread(_message_thread, name, B_NORMAL_PRIORITY, this);
@@ -252,6 +249,34 @@ ServerWindow::Hide()
 		return;
 
 	fWinBorder->GetRootLayer()->HideWinBorder(fWinBorder);
+}
+
+
+void
+ServerWindow::SetTitle(const char* newTitle)
+{
+	const char* oldTitle = fTitle;
+
+	if (newTitle == NULL || !newTitle[0])
+		fTitle = strdup("Unnamed Window");
+	else
+		fTitle = strdup(newTitle);
+
+	if (fTitle == NULL) {
+		fTitle = oldTitle;
+		return;
+	}
+
+	free(const_cast<char*>(oldTitle));
+
+	if (Thread() >= B_OK) {
+		char name[B_OS_NAME_LENGTH];
+		snprintf(name, sizeof(name), "w:%ld:%s", ClientTeam(), fTitle);
+		rename_thread(Thread(), name);
+	}
+
+	if (fWinBorder != NULL)
+		fWinBorder->SetName(newTitle);
 }
 
 
@@ -1196,20 +1221,13 @@ myRootLayer->Unlock();
 			break;
 		}
 #endif
-		case AS_WINDOW_TITLE:
+		case AS_SET_WINDOW_TITLE:
 		{
-			
 			char* newTitle;
 			if (link.ReadString(&newTitle) == B_OK) {
-				printf("ServerWindow %s: Message SetTitle(\"%s\") requested, unimplemented\n",
-					Title(), newTitle);
-
+				SetTitle(newTitle);
 				free(newTitle);
 			}
-			char* title;
-			link.ReadString(&title);
-			fWinBorder->SetName(title);
-			free(title);
 			break;
 		}
 
