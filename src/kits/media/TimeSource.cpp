@@ -552,7 +552,7 @@ BTimeSource::DirectRemoveMe(const media_node &node)
 void
 BTimeSource::DirectStart(bigtime_t at)
 {
-	UNIMPLEMENTED();
+	CALLED();
 	if (fBuf)
 		atomic_or(&fBuf->isrunning, 1);
 	else
@@ -564,7 +564,7 @@ void
 BTimeSource::DirectStop(bigtime_t at,
 						bool immediate)
 {
-	UNIMPLEMENTED();
+	CALLED();
 	if (fBuf)
 		atomic_and(&fBuf->isrunning, 0);
 	else
