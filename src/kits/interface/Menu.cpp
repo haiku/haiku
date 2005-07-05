@@ -1101,43 +1101,43 @@ BMenu::_track(int *action, long start)
 	BMenuItem *item = NULL;
 	int localAction = MENU_ACT_NONE;
 	do {
-		if (LockLooper()) {
-			GetMouse(&location, &buttons);
-			if (OverSuper(location)) {
-				UnlockLooper();
+		if (!LockLooper())
+			break;
+		
+		GetMouse(&location, &buttons);
+		if (OverSuper(location)) {
+			UnlockLooper();
+			break;
+		}
+					
+		item = HitTestItems(location, B_ORIGIN);
+					
+		if (item != NULL) {
+			if (item != fSelected)
+				SelectItem(item);
+		} else if (fSelected != NULL) {
+			BPoint screenLocation = location;
+			ConvertToScreen(&screenLocation);
+			if (!OverSubmenu(fSelected, screenLocation))
+				SelectItem(NULL);
+		}
+				
+		if (fSelected != NULL && fSelected->Submenu() != NULL) {
+			UnlockLooper();
+			
+			int submenuAction = MENU_ACT_NONE;
+			BMenuItem *submenuItem = fSelected->Submenu()->_track(&submenuAction);
+			if (submenuAction == MENU_ACT_CLOSE) {
+				item = submenuItem;
+				localAction = submenuAction;
 				break;
 			}
-					
-			item = HitTestItems(location, B_ORIGIN);
-						
-			if (item != NULL) {
-				if (item != fSelected)
-					SelectItem(item);
-			} else if (fSelected != NULL) {
-				BPoint screenLocation = location;
-				ConvertToScreen(&screenLocation);
-				if (!OverSubmenu(fSelected, screenLocation))
-					SelectItem(NULL);
-			}
-					
-			int submenuAction = MENU_ACT_NONE;
-			BMenuItem *submenuItem = NULL;	
-			if (fSelected != NULL && fSelected->Submenu() != NULL) {
-				UnlockLooper();
-				
-				submenuItem = fSelected->Submenu()->_track(&submenuAction);
-				if (submenuAction == MENU_ACT_CLOSE) {
-					item = submenuItem;
-					localAction = submenuAction;
-					break;
-				}
-				
-				if (!LockLooper())
-					break;
-			}
-																	
-			UnlockLooper();
+			
+			if (!LockLooper())
+				break;
 		}
+																
+		UnlockLooper();
 		
 		snooze(50000);
 	} while (buttons != 0);
@@ -1166,10 +1166,8 @@ BMenu::_AddItem(BMenuItem *item, int32 index)
 {
 	ASSERT(item != NULL);
 	
-	bool err = fItems.AddItem(item, index);
-
-	if (!err)
-		return err;
+	if (!fItems.AddItem(item, index))
+		return false;
 
 	item->SetSuper(this);
 
@@ -1187,7 +1185,7 @@ BMenu::_AddItem(BMenuItem *item, int32 index)
 	if (root->Window())
 		item->Install(root->Window());
 	
-	return err;
+	return true;
 }
 
 
@@ -1223,7 +1221,8 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *_item, bool del)
 		}
 	}	
 	
-	InvalidateLayout();
+	if (Window() != NULL && fResizeToFit)
+		InvalidateLayout();
 		
 	return result;
 }
@@ -1251,9 +1250,13 @@ void
 BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 						  float* width, float* height)
 {
+	if (Window() == NULL && Parent() == NULL)
+		return;
+	
 	// TODO: Take "bestFit", "moveItems", "index" into account,
 	// Recalculate only the needed items,
 	// not the whole layout every time
+	
 	BRect frame(0, 0, 0, 0);
 	float iWidth, iHeight;
 	BMenuItem *item = NULL;
@@ -1336,10 +1339,8 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 	if ((ResizingMode() & B_FOLLOW_LEFT_RIGHT) == B_FOLLOW_LEFT_RIGHT) {
 		if (Parent())
 			*width = Parent()->Frame().Width() + 1;
-		else if (Window())
+		else
 			*width = Window()->Frame().Width() + 1;
-		
-		// TODO: We are left without a valid width here ?!?
 		
 		*height = frame.Height();
 	} else {
