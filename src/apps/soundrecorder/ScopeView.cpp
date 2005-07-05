@@ -12,9 +12,15 @@
 #include "DrawingTidbits.h"
 #include "ScopeView.h"
 
+//#define TRACE 1
+#ifdef TRACE
+#define TRACE(x) printf(x)
+#else
+#define TRACE(x)
+#endif
 
 ScopeView::ScopeView(BRect rect, uint32 resizeFlags)
-	: BView(rect, "vumeter", resizeFlags, B_WILL_DRAW | B_FRAME_EVENTS),
+	: BView(rect, "scope", resizeFlags, B_WILL_DRAW | B_FRAME_EVENTS),
 	fThreadId(-1),
 	fBitmap(NULL),
 	fIsRendering(false),
@@ -125,12 +131,12 @@ ScopeView::RenderLoop()
 		int32 sumCount = 0;
 		fMediaTrack->SeekToFrame(&frames);
 		
-		printf("begin computing\n");
+		TRACE("begin computing\n");
 		
 		int32 previewIndex = 0;
 		
 		while (fMediaTrack->ReadFrames(samples, &frames) == B_OK) {
-			//printf("reading block\n");
+			//TRACE("reading block\n");
 			framesIndex = 0;
 			
 			while (framesIndex < frames) {
@@ -145,7 +151,7 @@ ScopeView::RenderLoop()
 				}
 				
 				if (sumCount >= totalFrames/20000) {
-					//printf("computing block %ld, sumCount %ld\n", previewIndex, sumCount);
+					//TRACE("computing block %ld, sumCount %ld\n", previewIndex, sumCount);
 					fPreview[previewIndex++] = (int32)(sum / 2 /(totalFrames/20000) / 32767.0 * fHeight / 2 + fHeight / 2);
 					sumCount = 0;
 					sum = 0;
@@ -155,7 +161,7 @@ ScopeView::RenderLoop()
 			
 		}
 		
-		printf("finished computing\n");
+		TRACE("finished computing\n");
 		
 		/* rendering */
 		RenderBitmap();
@@ -262,7 +268,7 @@ ScopeView::RenderBitmap()
 	
 	for (int32 i = leftIndex; i<rightIndex; i++) {
 		BPoint point((i - leftIndex) * width / (rightIndex - leftIndex), fPreview[i]);
-		//printf("point x %f y %f\n", point.x, point.y);
+		//TRACE("point x %f y %f\n", point.x, point.y);
 		fBitmapView->StrokeLine(point, point);
 	}
 	

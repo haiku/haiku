@@ -104,6 +104,7 @@ RecorderWindow::RecorderWindow() :
 		fSoundList(NULL),
 		fPlayFile(NULL),
 		fPlayTrack(NULL),
+		fPlayFrames(0),
 		fSavePanel(NULL),
 		fInitCheck(B_OK)
 {
@@ -139,6 +140,14 @@ RecorderWindow::~RecorderWindow()
 	if (fPlayer) {
 		delete fPlayer;
 	}
+	
+	if (fPlayTrack && fPlayFile)
+		fPlayFile->ReleaseTrack(fPlayTrack);
+	if (fPlayFile)
+		delete fPlayFile;
+	fPlayTrack = NULL;
+	fPlayFile = NULL;
+	
 	//	Clean up items in list view.
 	if (fSoundList) {
 		fSoundList->DeselectAll();
@@ -567,7 +576,7 @@ RecorderWindow::MessageReceived(BMessage * message)
 		}
 		if (message->FindInt64("right", &right) == B_OK) {
 			if (fPlayTrack)
-				fPlayLimit = MIN(fPlayTrack->CountFrames(), (off_t)(right * fPlayFormat.u.raw_audio.frame_rate/1000000LL));
+				fPlayLimit = MIN(fPlayFrames, (off_t)(right * fPlayFormat.u.raw_audio.frame_rate/1000000LL));
 			fScopeView->SetRightTime(right);
 		}
 		if (message->FindInt64("left", &left) == B_OK) {
@@ -679,7 +688,7 @@ RecorderWindow::Play(BMessage * message)
 		return;
 	}
 	
-	fPlayLimit = MIN(fPlayTrack->CountFrames(), (off_t)(fTrackSlider->RightTime()*fPlayFormat.u.raw_audio.frame_rate/1000000LL));
+	fPlayLimit = MIN(fPlayFrames, (off_t)(fTrackSlider->RightTime()*fPlayFormat.u.raw_audio.frame_rate/1000000LL));
 	fPlayTrack->SeekToTime(fTrackSlider->MainTime());
 	fPlayFrame = fPlayTrack->CurrentFrame();
 	
@@ -1036,6 +1045,13 @@ RecorderWindow::UpdatePlayFile()
 	if (! pItem) {
 		return;
 	}
+	
+	if (fPlayTrack && fPlayFile)
+		fPlayFile->ReleaseTrack(fPlayTrack);
+	if (fPlayFile)
+		delete fPlayFile;
+	fPlayTrack = NULL;
+	fPlayFile = NULL;
 
 	status_t err;
 	BEntry& entry = pItem->Entry();
@@ -1047,9 +1063,7 @@ RecorderWindow::UpdatePlayFile()
 		delete fPlayFile;
 		return;
 	}
-	
-	ASSERT(fPlayTrack == NULL);
-	
+		
 	for (int ix=0; ix<fPlayFile->CountTracks(); ix++) {
 		BMediaTrack * track = fPlayFile->TrackAt(ix);
 		fPlayFormat.type = B_MEDIA_RAW_AUDIO;
@@ -1111,6 +1125,8 @@ RecorderWindow::UpdatePlayFile()
 	fScopeView->SetRightTime(fTrackSlider->RightTime());
 	fScopeView->SetLeftTime(fTrackSlider->LeftTime());
 	fScopeView->RenderTrack(fPlayTrack, fPlayFormat);
+	
+	fPlayFrames = fPlayTrack->CountFrames();
 }
 
 

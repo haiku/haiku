@@ -121,6 +121,7 @@ private:
 		BMediaTrack *fPlayTrack;
 		int64 fPlayLimit;
 		int64 fPlayFrame;
+		int64 fPlayFrames;
 		
 		media_node fAudioMixerNode;
 		
