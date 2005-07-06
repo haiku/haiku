@@ -2,7 +2,8 @@ SubDir OBOS_TOP src apps terminal MYOB ;
 
 AddResources Terminal : Terminal.rsrc  ;
 
-App Terminal : AboutWindow.cpp
+App Terminal : 
+	AboutWindow.cpp
 	AppearPrefView.cpp
 	CodeConv.cpp
 	CurPos.cpp
@@ -22,7 +23,12 @@ App Terminal : AboutWindow.cpp
 	UTF8WidthTbl.c
 	VTKeyTbl.c
 	VTPrsTbl.c
+	: be tracker textencoding game
+	: Terminal.rdef Terminal.icons.rdef Terminal.version.rdef
 	;
 
-LinkSharedOSLibs Terminal : be tracker textencoding game  ;
+if $(TARGET_PLATFORM) = haiku {
+        # link for Haiku
 
+        LinkSharedOSLibs Terminal : libroot.so ;
+}
