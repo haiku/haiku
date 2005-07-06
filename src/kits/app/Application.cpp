@@ -1173,10 +1173,17 @@ BApplication::quit_all_windows(bool force)
 {
 	AssertLocked();
 
-	if (window_quit_loop(false, force))
-		return true;
+	// We need to unlock here because BWindow::QuitRequested() must be
+	// allowed to lock the application - which would cause a deadlock
+	Unlock();
 
-	return window_quit_loop(true, force);
+	bool quit = window_quit_loop(false, force);
+	if (!quit)
+		quit = window_quit_loop(true, force);
+
+	Lock();
+
+	return quit;
 }
 
 
