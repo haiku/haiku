@@ -137,6 +137,7 @@ BEOS_ADD_ONS_INPUT_DEVICES="<input>keyboard <input>mouse"
 BEOS_ADD_ONS_DRIVERS_MISC="keyboard scsi_dsk scsi_cd dprintf null zero random ps2_hid \
 	<driver>tty console <driver>config"
 BEOS_ADD_ONS_DRIVERS_GRAPHICS="radeon.driver nv.driver nm.driver mga.driver vesa"
+BEOS_ADD_ONS_DRIVERS_AUDIO="ich_ac97"
 BEOS_ADD_ONS_DRIVERS_NET="ipro1000 rtl8139 rtl8169 sis900 \
 	via-rhine wb840 net_stack_driver"	# bcm440x bcm570x (only available with GPLd add-ons)
 BEOS_ADD_ONS_BUS_MANAGERS="pci isa ide scsi config_manager"
@@ -222,6 +223,7 @@ $mkdir -p beos/system/add-ons/kernel/boot
 $mkdir -p beos/system/add-ons/kernel/bus_managers
 $mkdir -p beos/system/add-ons/kernel/busses/ide
 $mkdir -p beos/system/add-ons/kernel/drivers/bin
+$mkdir -p beos/system/add-ons/kernel/drivers/dev/audio/multi
 $mkdir -p beos/system/add-ons/kernel/drivers/dev/disk/scsi
 $mkdir -p beos/system/add-ons/kernel/drivers/dev/graphics
 $mkdir -p beos/system/add-ons/kernel/drivers/dev/input
@@ -280,6 +282,9 @@ done
 
 cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/drivers/bin
 $scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/drivers/bin
+for f in $BEOS_ADD_ONS_DRIVERS_AUDIO; do
+	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/drivers/bin
+done
 for f in $BEOS_ADD_ONS_DRIVERS_GRAPHICS; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/drivers/bin
 done
@@ -411,7 +416,8 @@ for f in drivers/dev/dprintf drivers/dev/keyboard drivers/dev/null \
 		drivers/dev/net/rtl8139 drivers/dev/net/rtl8169 \
 		drivers/dev/net/sis900 drivers/dev/net/via-rhine \
 		drivers/dev/net/wb840 drivers/dev/net/net_stack_driver \
-		drivers/dev/graphics/vesa drivers/dev/random; do
+		drivers/dev/graphics/vesa drivers/dev/random \
+		drivers/dev/audio/multi/ich_ac97; do
 	relName=$(echo $f | sed -e s@drivers/dev/@@)
 	linkName=bin/$(basename $f)
 	while [ $relName != . ]; do
