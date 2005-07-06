@@ -37,8 +37,14 @@
 //	Comment out the FPRINTF part of these lines to reduce verbiage.
 //	Enabling MESSAGE will kill performance on slower machines, because it
 //	prints for each message received (including each buffer).
-#define NODE //FPRINTF
-#define MESSAGE //FPRINTF
+#define TRACE_SOUNDCONSUMER
+#ifdef TRACE_SOUNDCONSUMER
+#define NODE FPRINTF
+#define MESSAGE FPRINTF
+#else
+#define NODE(x...)
+#define MESSAGE(x...)
+#endif
 
 
 SoundConsumer::SoundConsumer(
@@ -49,8 +55,7 @@ SoundConsumer::SoundConsumer(
 	BMediaNode(name ? name : "SoundConsumer"),
 	BBufferConsumer(B_MEDIA_RAW_AUDIO)
 {
-	NODE(stderr, "SoundConsumer::SoundConsumer(%p, %p, %p, %p)\n",
-		name, recordFunc, notifyFunc, cookie);
+	NODE(stderr, "SoundConsumer::SoundConsumer(%p, %p, %p, %p)\n", name, recordFunc, notifyFunc, cookie);
 
 	if (!name) name = "SoundConsumer";
 

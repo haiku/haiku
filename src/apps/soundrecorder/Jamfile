@@ -15,6 +15,12 @@ App SoundRecorder :
 	UpDownButton.cpp
 	VUView.cpp
 	VolumeSlider.cpp
-	: libbe.so libmedia.so libtracker.so 
+	: be media tracker
 	: SoundRecorder.rdef
 ;
+
+if $(TARGET_PLATFORM) = haiku {
+	LinkSharedOSLibs SoundRecorder : libbe.so libmedia.so libtracker.so ;
+} else {
+	LinkSharedOSLibs SoundRecorder : be media tracker ;
+}
