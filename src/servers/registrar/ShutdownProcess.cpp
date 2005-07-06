@@ -47,17 +47,13 @@
 
 using namespace BPrivate;
 
-// The time span user applications have after the quit message has been
+// The time span a user application has after the quit message has been
 // delivered (more precisely: has been handed over to the MessageDeliverer).
-static const bigtime_t USER_APPS_QUIT_TIMEOUT = 5000000; // 5 s
-
-// The time span system applications have after the quit message has been
-// delivered (more precisely: has been handed over to the MessageDeliverer).
-static const bigtime_t SYSTEM_APPS_QUIT_TIMEOUT = 3000000; // 3 s
+static const bigtime_t APP_QUIT_TIMEOUT = 3000000; // 3 s
 
 // The time span non-app processes have after the HUP signal has been send
 // to them before they get a KILL signal.
-static const bigtime_t NON_APPS_QUIT_TIMEOUT = 500000; // 0.5 s
+static const bigtime_t NON_APP_QUIT_TIMEOUT = 500000; // 0.5 s
 
 
 // message what fields
@@ -89,6 +85,20 @@ enum {
 	DONE_PHASE							= 3,
 	ABORTED_PHASE						= 4,
 };
+
+
+// inverse_compare_by_registration_time
+static
+int
+inverse_compare_by_registration_time(const RosterAppInfo *info1,
+	const RosterAppInfo *info2)
+{
+	bigtime_t cmp = info1->registration_time - info2->registration_time;
+	if (cmp < 0)
+		return 1;
+	return (cmp > 0 ? -1 : 0);
+}
+
 
 // TimeoutEvent
 class ShutdownProcess::TimeoutEvent : public MessageEvent {
@@ -225,12 +235,6 @@ public:
 		rootView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		AddChild(rootView);
 
-		// app icons view
-		fAppIconsView = new(nothrow) AppIconsView(fAppInfos);
-		if (!fAppIconsView)
-			return B_NO_MEMORY;
-		rootView->AddChild(fAppIconsView);
-
 		// current app icon view
 		fCurrentAppIconView = new(nothrow) CurrentAppIconView;
 		if (!fCurrentAppIconView)
@@ -294,27 +298,26 @@ public:
 		static const int kHSpacing = 10;
 		static const int kVSpacing = 10;
 		static const int kInnerHSpacing = 5;
-		static const int kInnerVSpacing = 5;
+		static const int kInnerVSpacing = 2;
 
 		// buttons
 		fKillAppButton->ResizeToPreferred();
 		fCancelShutdownButton->ResizeToPreferred();
+		fRebootSystemButton->MakeDefault(true);
 		fRebootSystemButton->ResizeToPreferred();
 
 		BRect rect(fKillAppButton->Frame());
 		int buttonWidth = rect.IntegerWidth() + 1;
-		int buttonHeight = rect.IntegerHeight() + 1;
 
 		rect = fCancelShutdownButton->Frame();
 		if (rect.IntegerWidth() >= buttonWidth)
 			buttonWidth = rect.IntegerWidth() + 1;
 
+		int buttonHeight = fRebootSystemButton->Frame().IntegerHeight() + 1;
+
 		// text view
 		fTextView->SetText("two\nlines");
-		int textHeight = (int)fTextView->TextHeight(0, 2) + 1;
-
-		// app icons view
-		int appIconsHeight = fAppIconsView->Frame().IntegerHeight() + 1;
+		int textHeight = (int)fTextView->TextHeight(0, 1) + 1;
 
 		// current app icon view
 		int currentAppIconWidth = fCurrentAppIconView->Frame().IntegerWidth()
@@ -323,9 +326,9 @@ public:
 			+ 1;
 
 		int currentAppIconX = kHSpacing;
-		int rightPartX = currentAppIconX + currentAppIconWidth + kInnerHSpacing;
-		int appIconsY = kVSpacing;
-		int textY = appIconsY + appIconsHeight + kInnerVSpacing;
+		int rightPartX = currentAppIconX + currentAppIconWidth;
+		int textX = rightPartX + kInnerHSpacing;
+		int textY = kVSpacing;
 		int buttonsY = textY + textHeight + kInnerVSpacing;
 		int rightPartWidth = 2 * buttonWidth + kInnerHSpacing;
 		int width = rightPartX + rightPartWidth + kHSpacing;
@@ -337,13 +340,10 @@ public:
 		fCurrentAppIconView->MoveTo(currentAppIconX,
 			textY + (textHeight - currentAppIconHeight) / 2);
 
-		// app icons view
-		fAppIconsView->MoveTo(rightPartX, kVSpacing);
-		fAppIconsView->ResizeTo(rightPartWidth - 1, appIconsHeight - 1);
-
 		// text view
-		fTextView->MoveTo(rightPartX, textY);
-		fTextView->ResizeTo(rightPartWidth - 1, textHeight - 1);
+		fTextView->MoveTo(textX, textY);
+		fTextView->ResizeTo(rightPartWidth + rightPartX - textX - 1,
+			textHeight - 1);
 		fTextView->SetTextRect(fTextView->Bounds());
 
 		// buttons
@@ -395,8 +395,6 @@ public:
 			return B_NO_MEMORY;
 		}
 
-		fAppIconsView->Invalidate();
-
 		return B_OK;
 	}
 
@@ -408,8 +406,6 @@ public:
 
 		AppInfo *info = (AppInfo*)fAppInfos.RemoveItem(index);
 		delete info;
-
-		fAppIconsView->Invalidate();
 	}
 
 	void SetCurrentApp(team_id team)
@@ -445,7 +441,6 @@ public:
 
 	void SetWaitForShutdown()
 	{
-		fAppIconsView->Hide();
 		fCurrentAppIconView->Hide();
 		fKillAppButton->Hide();
 		fCancelShutdownButton->Hide();
@@ -486,94 +481,6 @@ private:
 		return (index >= 0 ? (AppInfo*)fAppInfos.ItemAt(index) : NULL);
 	}
 
-	class AppIconsView : public BView {
-	  public:
-		AppIconsView(const BList &appInfos)
-			: BView(BRect(0, 0, 100,  15), "app icons", B_FOLLOW_NONE, 
-				B_WILL_DRAW),
-			  fAppInfos(appInfos),
-			  fIconSize(16),
-			  fInnerSpacing(4),
-			  fEllipsisWidth(0)
-		{
-			SetViewColor(B_TRANSPARENT_32_BIT);
-			fBackground = ui_color(B_PANEL_BACKGROUND_COLOR);
-		}
-
-		virtual void Draw(BRect updateRect)
-		{
-			// find out, how many icons we can draw
-			BRect bounds = Bounds();
-			int width = bounds.IntegerWidth() + 1;
-			int maxIcons = (width + fInnerSpacing)
-				/ (fIconSize + fInnerSpacing);
-			int minIcons = (width - _EllipsisWidth())
-				/ (fIconSize + fInnerSpacing);
-
-			int iconsToDraw = fAppInfos.CountItems();
-			bool drawEllipsis = false;
-			if (iconsToDraw > maxIcons) {
-				iconsToDraw = minIcons;
-				drawEllipsis = true;
-			}
-
-			// set colors
-			SetLowColor(fBackground);
-			rgb_color black = { 0, 0, 0, 255 };
-			SetHighColor(black);
-
-			// draw the icons
-			int lastX = 0;
-			for (int i = 0; i < iconsToDraw; i++) {
-				int x = lastX + (i > 0 ? fInnerSpacing : 0);
-				int nextX = x + fIconSize;
-				
-				// clear background
-				FillRect(BRect(lastX, 0, nextX - 1, bounds.bottom),
-					B_SOLID_LOW);
-
-				// draw the icon
-				SetDrawingMode(B_OP_OVER);
-				AppInfo *info = (AppInfo*)fAppInfos.ItemAt(i);
-				if (info->miniIcon)
-					DrawBitmap(info->miniIcon, BPoint(x, 0));
-
-				lastX = nextX;
-			}
-
-			// clear remaining space
-			FillRect(BRect(lastX, 0, bounds.right, bounds.bottom), B_SOLID_LOW);
-
-			// draw ellipsis, if necessary
-			if (drawEllipsis) {
-				int x = lastX + fInnerSpacing;
-				int y = (fIconSize + 1) / 2;
-				DrawString(B_UTF8_ELLIPSIS, BPoint(x, y));
-			}
-		}
-
-	  private:
-		int _EllipsisWidth()
-		{
-			// init lazily
-			if (fEllipsisWidth <= 0) {
-				BFont font;
-				GetFont(&font);
-
-				fEllipsisWidth = (int)font.StringWidth(B_UTF8_ELLIPSIS);
-			}
-
-			return fEllipsisWidth;
-		}
-
-	  private:
-		const BList	&fAppInfos;
-		rgb_color	fBackground;
-		int			fIconSize;
-		int			fInnerSpacing;
-		int			fEllipsisWidth;
-	};
-
 	class CurrentAppIconView : public BView {
 	  public:
 		CurrentAppIconView()
@@ -608,7 +515,6 @@ private:
 
 private:
 	BList				fAppInfos;
-	AppIconsView		*fAppIconsView;
 	CurrentAppIconView	*fCurrentAppIconView;
 	BTextView			*fTextView;
 	BButton				*fKillAppButton;
@@ -736,7 +642,8 @@ ShutdownProcess::Init(BMessage *request)
 		RETURN_ERROR(error);
 	}
 
-	// TODO: sort the system apps by descending registration time
+	fUserApps.Sort(&inverse_compare_by_registration_time);
+	fSystemApps.Sort(&inverse_compare_by_registration_time);
 
 	// start the worker thread
 	fWorker = spawn_thread(_WorkerEntry, "shutdown worker", B_NORMAL_PRIORITY,
@@ -1257,14 +1164,11 @@ ShutdownProcess::_WorkerDoShutdown()
 
 	// phase 1: terminate the user apps
 	_SetPhase(USER_APP_TERMINATION_PHASE);
-	_QuitUserApps();
-	_ScheduleTimeoutEvent(USER_APPS_QUIT_TIMEOUT);
-	_WaitForUserApps();
-	_KillUserApps();
+	_QuitApps(fUserApps, false);
 
 	// phase 2: terminate the system apps
 	_SetPhase(SYSTEM_APP_TERMINATION_PHASE);
-	_QuitSystemApps();
+	_QuitApps(fSystemApps, true);
 
 	// phase 3: terminate the other processes
 	_SetPhase(OTHER_PROCESSES_TERMINATION_PHASE);
@@ -1307,81 +1211,17 @@ ShutdownProcess::_WorkerDoShutdown()
 	#endif
 }
 
-// _QuitUserApps
+// _QuitApps
 void
-ShutdownProcess::_QuitUserApps()
+ShutdownProcess::_QuitApps(AppInfoList &list, bool disableCancel)
 {
-	PRINT(("ShutdownProcess::_QuitUserApps()\n"));
+	PRINT(("ShutdownProcess::_QuitApps(%s)\n",
+		(disableCancel ? "system" : "user")));
 
-	_SetShutdownWindowText("Asking user applications to quit.");
+	if (disableCancel) {
+		_SetShutdownWindowCancelButtonEnabled(false);
 
-	// prepare the shutdown message
-	BMessage message;
-	_PrepareShutdownMessage(message);
-
-	// send shutdown messages to user apps
-	_LockAppLists();
-
-	AppInfoListMessagingTargetSet targetSet(fUserApps);
-
-	if (targetSet.HasNext()) {
-		PRINT(("  sending shutdown message to %ld apps\n",
-			fUserApps.CountInfos()));
-
-		status_t error = MessageDeliverer::Default()->DeliverMessage(
-			&message, targetSet);
-		if (error != B_OK) {
-			WARNING(("ShutdownProcess::_Worker(): Failed to deliver "
-				"shutdown message to all applications: %s\n",
-				strerror(error)));
-		}
-	}
-
-	_UnlockAppLists();
-
-	PRINT(("ShutdownProcess::_QuitUserApps() done\n"));
-}
-
-// _WaitForUserApps
-void
-ShutdownProcess::_WaitForUserApps()
-{
-	PRINT(("ShutdownProcess::_WaitForUserApps()\n"));
-
-	// wait for user apps
-	bool moreApps = true;
-	while (moreApps) {
-		_LockAppLists();
-		moreApps = !fUserApps.IsEmpty();
-		_UnlockAppLists();
-
-		if (moreApps) {
-			uint32 event;
-			team_id team;
-			int32 phase;
-			status_t error = _GetNextEvent(event, team, phase, true);
-			if (error != B_OK)
-				throw error;
-
-			if (event == ABORT_EVENT)
-				throw B_SHUTDOWN_CANCELLED;
-
-			if (event == TIMEOUT_EVENT)	
-				return;
-		}
-	}
-
-	PRINT(("ShutdownProcess::_WaitForUserApps() done\n"));
-}
-
-// _KillUserApps
-void
-ShutdownProcess::_KillUserApps()
-{
-	PRINT(("ShutdownProcess::_KillUserApps()\n"));
-
-	while (true) {
-		// eat events (we need to be responsive for an abort event)
+		// check one last time for abort events
 		uint32 event;
 		do {
 			team_id team;
@@ -1389,79 +1229,18 @@ ShutdownProcess::_KillUserApps()
 			status_t error = _GetNextEvent(event, team, phase, false);
 			if (error != B_OK)
 				throw error;
-
+	
 			if (event == ABORT_EVENT)
 				throw B_SHUTDOWN_CANCELLED;
-
+	
 		} while (event != NO_EVENT);
-
-		// get the first team to kill
-		_LockAppLists();
-
-		team_id team = -1;
-		AppInfoList &list = fUserApps;
-		if (!list.IsEmpty()) {
-			RosterAppInfo *info = *list.It();
-			team = info->team;
-		}
-
-		_UnlockAppLists();
-
-		if (team < 0) {
-			PRINT(("ShutdownProcess::_KillUserApps() done\n"));
-			return;
-		}
-
-		// TODO: check whether the app blocks on a modal alert
-		if (false) {
-			// ...
-		} else {
-			// it does not: kill it
-			PRINT(("  killing team %ld\n", team));
-
-			kill_team(team);
-
-			// remove the app (the roster will note eventually and send us
-			// a notification, but we want to be sure)
-			_LockAppLists();
-	
-			if (RosterAppInfo *info = list.InfoFor(team)) {
-				list.RemoveInfo(info);
-				delete info;
-			}
-	
-			_UnlockAppLists();
-		}
 	}
-}
-
-// _QuitSystemApps
-void
-ShutdownProcess::_QuitSystemApps()
-{
-	PRINT(("ShutdownProcess::_QuitSystemApps()\n"));
-
-	_SetShutdownWindowCancelButtonEnabled(false);
-
-	// check one last time for abort events
-	uint32 event;
-	do {
-		team_id team;
-		int32 phase;
-		status_t error = _GetNextEvent(event, team, phase, false);
-		if (error != B_OK)
-			throw error;
-
-		if (event == ABORT_EVENT)
-			throw B_SHUTDOWN_CANCELLED;
-
-	} while (event != NO_EVENT);
 
 	// prepare the shutdown message
 	BMessage message;
 	_PrepareShutdownMessage(message);
 
-	// now iterate through the list of system apps
+	// now iterate through the list of apps
 	while (true) {
 		// eat events
 		uint32 event;
@@ -1471,12 +1250,15 @@ ShutdownProcess::_QuitSystemApps()
 			status_t error = _GetNextEvent(event, team, phase, false);
 			if (error != B_OK)
 				throw error;
+
+			if (!disableCancel && event == ABORT_EVENT)
+				throw B_SHUTDOWN_CANCELLED;
+
 		} while (event != NO_EVENT);
 
 		// get the first app to quit
 		_LockAppLists();
 
-		AppInfoList &list = fSystemApps;
 		team_id team = -1;
 		port_id port = -1;
 		char appName[B_FILE_NAME_LENGTH];
@@ -1487,11 +1269,10 @@ ShutdownProcess::_QuitSystemApps()
 			strcpy(appName, info->ref.name);
 		}
 
-
 		_UnlockAppLists();
 
 		if (team < 0) {
-			PRINT(("ShutdownProcess::_QuitSystemApps() done\n"));
+			PRINT(("ShutdownProcess::_QuitApps() done\n"));
 			return;
 		}
 
@@ -1508,9 +1289,10 @@ ShutdownProcess::_QuitSystemApps()
 		MessageDeliverer::Default()->DeliverMessage(&message, target);
 
 		// schedule a timeout event
-		_ScheduleTimeoutEvent(SYSTEM_APPS_QUIT_TIMEOUT, team);
+		_ScheduleTimeoutEvent(APP_QUIT_TIMEOUT, team);
 
 		// wait for the app to die or for the timeout to occur
+		bool appGone = false;
 		do {
 			team_id eventTeam;
 			int32 phase;
@@ -1518,14 +1300,25 @@ ShutdownProcess::_QuitSystemApps()
 			if (error != B_OK)
 				throw error;
 
+			if ((event == SYSTEM_APP_QUIT_EVENT || event == USER_APP_QUIT_EVENT)
+				&& eventTeam == team) {
+				appGone = true;
+			}
+
 			if (event == TIMEOUT_EVENT && eventTeam == team)
 				break;
 
-			// If the app requests aborting the shutdown, we don't need to
-			// wait any longer. It has processed the request and won't quit by
-			// itself. We'll have to kill it.
-			if (event == ABORT_EVENT && eventTeam == team)
-				break;
+			if (event == ABORT_EVENT) {
+				if (disableCancel) {
+					// If the app requests aborting the shutdown, we don't need
+					// to wait any longer. It has processed the request and
+					// won't quit by itself. We'll have to kill it.
+					if (eventTeam == team)
+						break;
+				} else {
+					throw B_SHUTDOWN_CANCELLED;
+				}
+			}
 
 			BAutolock _(fWorkerLock);
 			if (!list.InfoFor(team))
@@ -1534,7 +1327,10 @@ ShutdownProcess::_QuitSystemApps()
 		} while (event != NO_EVENT);
 
 		// TODO: check whether the app blocks on a modal alert
-		if (false) {
+		if (appGone) {
+			// fine: the app finished in an orderly manner
+		} else if (false) {
+			// app blocks on a modal window
 			// ...
 		} else {
 			// it does not: kill it
@@ -1584,7 +1380,7 @@ ShutdownProcess::_QuitNonApps()
 	// give them a bit of time to terminate
 	// TODO: Instead of just waiting we could periodically check whether the
 	// processes are already gone to shorten the process.
-	snooze(NON_APPS_QUIT_TIMEOUT);
+	snooze(NON_APP_QUIT_TIMEOUT);
 
 	// iterate through the remaining teams and kill them
 	cookie = 0;

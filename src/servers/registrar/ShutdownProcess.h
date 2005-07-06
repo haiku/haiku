@@ -61,10 +61,7 @@ private:
 	status_t _Worker();
 
 	void _WorkerDoShutdown();
-	void _QuitUserApps();
-	void _WaitForUserApps();
-	void _KillUserApps();
-	void _QuitSystemApps();
+	void _QuitApps(AppInfoList &list, bool disableCancel);
 	void _QuitNonApps();
 
 private:
