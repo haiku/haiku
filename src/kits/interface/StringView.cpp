@@ -58,7 +58,7 @@ BStringView::BStringView(BMessage* data)
 {
 	const char* text;
 
-	if (data->FindInt32("_aligne",(int32&)fAlign) != B_OK) {
+	if (data->FindInt32("_align",(int32&)fAlign) != B_OK) {
 		fAlign = B_ALIGN_LEFT;
 	}
 
