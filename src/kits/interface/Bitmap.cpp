@@ -118,7 +118,7 @@ const rgb_color kSystemPalette[] = {
  {  51,   0,  51, 255 }, {  51,   0,   0, 255 }, { 255, 203,  51, 255 },
  { 255, 203,   0, 255 }, { 255, 255,   0, 255 }, { 255, 255,  51, 255 },
  { 255, 255, 102, 255 }, { 255, 255, 152, 255 }, { 255, 255, 203, 255 },
- { 255, 255, 255, 255 }
+ { 255, 255, 255, 0 } // B_TRANSPARENT_MAGIC_CMAP8
 };
 
 
@@ -288,7 +288,7 @@ public:
 	inline uint16 RGB16ColorForIndex(uint8 index) const;
 	inline uint32 RGB24ColorForIndex(uint8 index) const;
 	inline void RGB24ColorForIndex(uint8 index, uint8 &red, uint8 &green,
-								   uint8 &blue) const;
+								   uint8 &blue, uint8 &alpha) const;
 	inline uint8 GrayColorForIndex(uint8 index) const;
 
 private:
@@ -612,7 +612,7 @@ uint32
 PaletteConverter::RGB24ColorForIndex(uint8 index) const
 {
 	const rgb_color &color = fColorMap->color_list[index];
-	return (color.red << 24) | (color.green << 16) | (color.blue >> 8);
+	return (color.blue << 24) | (color.red << 8) | (color.green << 16) | color.alpha;
 }
 
 // RGB24ColorForIndex
@@ -631,12 +631,13 @@ PaletteConverter::RGB24ColorForIndex(uint8 index) const
 inline
 void
 PaletteConverter::RGB24ColorForIndex(uint8 index, uint8 &red, uint8 &green,
-									 uint8 &blue) const
+									 uint8 &blue, uint8 &alpha) const
 {
 	const rgb_color &color = fColorMap->color_list[index];
 	red = color.red;
 	green = color.green;
 	blue = color.blue;
+	alpha = color.alpha;
 }
 
 // GrayColorForIndex
@@ -1035,6 +1036,7 @@ struct rgb_color_value {
 	uint8 red;
 	uint8 green;
 	uint8 blue;
+	uint8 alpha;
 };
 
 typedef uint8 gray_color_value;
@@ -1154,7 +1156,7 @@ struct CMAP8Reader : public BaseReader<uint8> {
 	inline void Read(rgb_color_value &color)
 	{
 		converter.RGB24ColorForIndex(*BaseReader<uint8>::pixels, color.red, color.green,
-									 color.blue);
+									 color.blue, color.alpha);
 		BaseReader<uint8>::pixels++;
 	}
 
@@ -1268,7 +1270,8 @@ struct RGB32Writer : public BaseWriter<_PixelType> {
 		pixel.red = color.red;
 		pixel.green = color.green;
 		pixel.blue = color.blue;
-		pixel.alpha = 255;
+//		pixel.alpha = 255;
+pixel.alpha = color.alpha;
 		BaseWriter<_PixelType>::pixels++;
 	}
 
