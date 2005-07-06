@@ -1120,7 +1120,9 @@ rule LinkSharedOSLibs
 		}
 		if $(isfile) {
 			NEEDLIBS on $(1) = [ on $(1) return $(NEEDLIBS) ] $(i) ;
-			Depends $(1) : $(i) ;
+			if ! $(NO_LIBRARY_DEPENDENCIES) {
+				Depends $(1) : $(i) ;
+			}
 		} else {
 			LINKLIBS on $(1) = [ on $(1) return $(LINKLIBS) ] -l$(i) ;
 		}
