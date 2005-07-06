@@ -115,6 +115,7 @@ Registrar::MessageReceived(BMessage *message)
 			PRINT(("B_REG_SHUT_DOWN\n"));
 
 			_HandleShutDown(message);
+			break;
 		}
 
 		// roster requests
