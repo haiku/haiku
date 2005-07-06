@@ -290,7 +290,6 @@ RootLayer::WorkingThread(void *data)
 			}
 			case AS_ROOTLAYER_DO_INVALIDATE:
 			{
-//printf("Adi: new message\n");
 				BRegion invalidRegion;
 				Layer *layer = NULL;
 				messageQueue.Read<Layer*>(&layer);
@@ -577,7 +576,9 @@ void RootLayer::AddWinBorder(WinBorder* winBorder)
 	winBorder->fParent = this;
 }
 
-void RootLayer::RemoveWinBorder(WinBorder* winBorder)
+
+void
+RootLayer::RemoveWinBorder(WinBorder* winBorder)
 {
 	// Note: removing a subset window is also permited/performed.
 
@@ -601,7 +602,8 @@ void RootLayer::RemoveWinBorder(WinBorder* winBorder)
 	winBorder->fParent = NULL;
 }
 
-void RootLayer::AddSubsetWinBorder(WinBorder *winBorder, WinBorder *toWinBorder)
+void
+RootLayer::AddSubsetWinBorder(WinBorder *winBorder, WinBorder *toWinBorder)
 {
 	// SUBSET windows _must_ have their workspaceIndex set to 0x0
 	if (winBorder->Workspaces() != 0UL)
@@ -617,16 +619,15 @@ void RootLayer::AddSubsetWinBorder(WinBorder *winBorder, WinBorder *toWinBorder)
 		return;
 	}
 
-	bool		invalidate	= false;
-	bool		invalid;
-	WinBorder	*exFocus	= FocusWinBorder();
-	WinBorder	*exActive	= ActiveWinBorder();
+	bool invalidate	= false;
+	bool invalid;
+	WinBorder* exFocus = FocusWinBorder();
+	WinBorder* exActive = ActiveWinBorder();
 
 	// we try to add WinBorders to all workspaces. If they are not needed, nothing will be done.
 	// If they are needed, Workspace automaticaly allocates space and inserts them.
-	for (int32 i = 0; i < fWsCount; i++)
-	{
-		invalid		= false;
+	for (int32 i = 0; i < fWsCount; i++) {
+		invalid = false;
 
 		if (fWorkspace[i] && fWorkspace[i]->HasWinBorder(toWinBorder))
 			invalid = fWorkspace[i]->ShowWinBorder(winBorder, false);
@@ -639,24 +640,23 @@ void RootLayer::AddSubsetWinBorder(WinBorder *winBorder, WinBorder *toWinBorder)
 		show_final_scene(exFocus, exActive);
 }
 
-void RootLayer::RemoveSubsetWinBorder(WinBorder *winBorder, WinBorder *fromWinBorder)
+
+void
+RootLayer::RemoveSubsetWinBorder(WinBorder *winBorder, WinBorder *fromWinBorder)
 {
 	// there is no point in continuing - this subset window is not visible
 	// at least not visible from 'fromWinBorder's point of view.
 	if (winBorder->IsHidden() || fromWinBorder->IsHidden())
-	{
 		return;
-	}
 
-	bool		invalidate	= false;
-	bool		invalid;
-	WinBorder	*exFocus = FocusWinBorder();
-	WinBorder	*exActive	= ActiveWinBorder();
+	bool invalidate	= false;
+	bool invalid;
+	WinBorder* exFocus = FocusWinBorder();
+	WinBorder* exActive = ActiveWinBorder();
 
 	// we try to remove from all workspaces. If winBorder is not in there, nothing will be done.
-	for (int32 i = 0; i < fWsCount; i++)
-	{
-		invalid		= false;
+	for (int32 i = 0; i < fWsCount; i++) {
+		invalid = false;
 
 		if (fWorkspace[i] && fWorkspace[i]->HasWinBorder(fromWinBorder))
 			invalid = fWorkspace[i]->HideWinBorder(winBorder);
@@ -807,46 +807,39 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 	return true;
 }
 
-void RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldWksIndex, uint32 newWksIndex)
+
+void
+RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldWksIndex, uint32 newWksIndex)
 {
 	// you *cannot* set workspaces index for a window other than a normal one!
 	// Note: See ServerWindow class.
 	if (winBorder->Feel() != B_NORMAL_WINDOW_FEEL)
 		return;
 
-	bool		invalidate	= false;
-	bool		invalid;
-	WinBorder	*exFocus	= FocusWinBorder();
-	WinBorder	*exActive	= ActiveWinBorder();
+	bool invalidate = false;
+	bool invalid;
+	WinBorder* exFocus = FocusWinBorder();
+	WinBorder* exActive	= ActiveWinBorder();
 
-	for (int32 i = 0; i < 32; i++)
-	{
-		if (fWorkspace[i])
-		{
+	for (int32 i = 0; i < 32; i++) {
+		if (fWorkspace[i]) {
 			invalid = false;
 
 			if (fWorkspace[i]->HasWinBorder(winBorder)
-				&& !(newWksIndex & (0x00000001UL << i)))
-			{
-				if (!winBorder->IsHidden())
-				{
+				&& !(newWksIndex & (0x00000001UL << i))) {
+				if (!winBorder->IsHidden()) {
 					// a little trick to force Workspace to properly pick the next front.
 					winBorder->fHidden = true;
 					invalid = fWorkspace[i]->HideWinBorder(winBorder);
 					winBorder->fHidden = false;
 				}
 				fWorkspace[i]->RemoveWinBorder(winBorder);
-			}
-			else
-			if (newWksIndex & (0x00000001UL << i) &&
-				!(oldWksIndex & (0x00000001UL << i)))
-			{
+			} else if (newWksIndex & (0x00000001UL << i)
+				&& !(oldWksIndex & (0x00000001UL << i))) {
 				fWorkspace[i]->AddWinBorder(winBorder);
 				if (!winBorder->IsHidden())
 					invalid = fWorkspace[i]->ShowWinBorder(winBorder);
-			}
-			else
-			{
+			} else {
 				// do nothing. winBorder was, and it still is a member of this workspace
 				// OR, winBorder wasn't and it will not be in this workspace
 			}
@@ -857,13 +850,11 @@ void RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldWksIndex,
 	}
 
 // TODO: look into this...
-	if (fEventMaskLayer)
-	{
-		WinBorder	*wb	= fEventMaskLayer->fOwner?
-							fEventMaskLayer->fOwner:
-							(WinBorder*)fEventMaskLayer;
-		if (!fWorkspace[fActiveWksIndex]->HasWinBorder(wb))
-		{
+	if (fEventMaskLayer) {
+		WinBorder* wb = fEventMaskLayer->fOwner ?
+			fEventMaskLayer->fOwner : (WinBorder*)fEventMaskLayer;
+
+		if (!fWorkspace[fActiveWksIndex]->HasWinBorder(wb)) {
 /*			if (wb == fEventMaskLayer)
 			{
 				fMovingWindow	= false;
@@ -874,7 +865,7 @@ void RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldWksIndex,
 		}
 	}
 
-	BMessage	changedMsg(B_WORKSPACES_CHANGED);
+	BMessage changedMsg(B_WORKSPACES_CHANGED);
 	changedMsg.AddInt64("when", real_time_clock_usecs());
 	changedMsg.AddInt32("old", oldWksIndex);
 	changedMsg.AddInt32("new", newWksIndex);
@@ -884,6 +875,7 @@ void RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldWksIndex,
 	if (invalidate)
 		show_final_scene(exFocus, exActive);
 }
+
 
 void
 RootLayer::SetWorkspaceCount(int32 wksCount)
@@ -901,54 +893,51 @@ RootLayer::SetWorkspaceCount(int32 wksCount)
 	fWsCount = wksCount;
 }
 
-void RootLayer::ReadWorkspaceData(const char *path)
+
+void
+RootLayer::ReadWorkspaceData(const char *path)
 {
 	BMessage msg, settings;
 	BFile file(path,B_READ_ONLY);
 	char string[20];
-	
-	if(file.InitCheck()==B_OK && msg.Unflatten(&file)==B_OK)
-	{
+
+	if (file.InitCheck() == B_OK && msg.Unflatten(&file) == B_OK) {
 		int32 count;
 		
-		if(msg.FindInt32("workspace_count",&count)!=B_OK)
-			count=9;
-		
+		if (msg.FindInt32("workspace_count", &count)!=B_OK)
+			count = 9;
+
 		SetWorkspaceCount(count);
-		
-		for(int32 i=0; i<count; i++)
-		{
+
+		for (int32 i = 0; i < count; i++) {
 			Workspace *ws=(Workspace*)fWorkspace[i];
-			if(!ws)
+			if (!ws)
 				continue;
-			
+
 			sprintf(string,"workspace %ld",i);
-			
-			if(msg.FindMessage(string,&settings)==B_OK)
-			{
+
+			if (msg.FindMessage(string,&settings) == B_OK) {
 				ws->GetSettings(settings);
 				settings.MakeEmpty();
-			}
-			else
+			} else
 				ws->GetDefaultSettings();
 		}
-	}
-	else
-	{
+	} else {
 		SetWorkspaceCount(9);
-		
-		for(int32 i=0; i<9; i++)
-		{
+
+		for (int32 i = 0; i < 9; i++) {
 			Workspace *ws=(Workspace*)fWorkspace[i];
-			if(!ws)
+			if (!ws)
 				continue;
-			
+
 			ws->GetDefaultSettings();
 		}
 	}
 }
 
-void RootLayer::SaveWorkspaceData(const char *path)
+
+void
+RootLayer::SaveWorkspaceData(const char *path)
 {
 	BMessage msg,dummy;
 	BFile file(path,B_READ_WRITE | B_CREATE_FILE);
@@ -1103,12 +1092,13 @@ RootLayer::SetScreenMode(int32 width, int32 height, uint32 colorSpace, float fre
 //---------------------------------------------------------------------------
 //				Input related methods
 //---------------------------------------------------------------------------
+
 void
 RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 {
-	switch(code) {
+	switch (code) {
 		case B_MOUSE_DOWN: {
-//printf("RootLayer::MouseEventHandler(B_MOUSE_DOWN)\n");
+			//printf("RootLayer::MouseEventHandler(B_MOUSE_DOWN)\n");
 			// Attached data:
 			// 1) int64 - time of mouse click
 			// 2) float - x coordinate of mouse click
@@ -1134,7 +1124,7 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 //				CRITICAL("mouse position changed in B_MOUSE_DOWN from last B_MOUSE_MOVED\n");
 				// update on screen mouse pos
 				GetHWInterface()->MoveCursorTo(evt.where.x, evt.where.y);
-				fLastMousePosition	= evt.where;
+				fLastMousePosition = evt.where;
 			}
 			
 			// We'll need this so that GetMouse can query for which buttons
@@ -1152,15 +1142,17 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 			// we are clicking a WinBorder
 
 			WinBorder* exActive	= ActiveWinBorder();
-			WinBorder* exFocus	= FocusWinBorder();
-			WinBorder* target	= fLastMouseMoved->fOwner ? fLastMouseMoved->fOwner
-														  : (WinBorder*)fLastMouseMoved;
+			WinBorder* exFocus = FocusWinBorder();
+			WinBorder* target = fLastMouseMoved->fOwner ? fLastMouseMoved->fOwner
+														: (WinBorder*)fLastMouseMoved;
 
 			click_type action = target->MouseDown(evt);
 
+			bool invalidate = ActiveWorkspace()->SetFocus(target);
+
 			// TODO: only move to front if *not* in Focus Follows Mouse mode!
-			bool invalidate = action == DEC_MOVETOBACK ? ActiveWorkspace()->MoveToBack(target)
-													   : ActiveWorkspace()->MoveToFront(target);
+			invalidate |= action == DEC_MOVETOBACK ? ActiveWorkspace()->MoveToBack(target)
+												   : ActiveWorkspace()->MoveToFront(target);
 
 			// Performance: MoveToFront() often returns true although it shouldn't do that.
 			// This is because internaly it calls Workspace::ShowWinBorder() and this imposes
@@ -1188,8 +1180,7 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 					else if (exFocus != FocusWinBorder()
 							 && !(target->WindowFlags() & B_WILL_ACCEPT_FIRST_CLICK))
 						sendMessage = false;
-if (target->Feel() == 1024)
-	sendMessage = true;
+
 					if (sendMessage && fLastMouseMoved != target->fTopLayer) {
 						BMessage msg;
 						msg.what = B_MOUSE_DOWN;
@@ -1198,13 +1189,12 @@ if (target->Feel() == 1024)
 						msg.AddInt32("modifiers", evt.modifiers);
 						msg.AddInt32("buttons", evt.buttons);
 						msg.AddInt32("clicks", evt.clicks);
-	
+
 						target->Window()->SendMessageToClient(&msg, fLastMouseMoved->fViewToken, false);
 					}
 
-					if (fLastMouseMoved->EventMask() & B_POINTER_EVENTS) {
+					if (fLastMouseMoved->EventMask() & B_POINTER_EVENTS)
 						fEventMaskLayer = fLastMouseMoved;
-					}
 					break;
 				}
 
@@ -1216,11 +1206,10 @@ if (target->Feel() == 1024)
 					fMouseTargetWinBorder = target;
 					break;
 			}
-
 			break;
 		}
 		case B_MOUSE_UP: {
-//printf("RootLayer::MouseEventHandler(B_MOUSE_UP)\n");
+			//printf("RootLayer::MouseEventHandler(B_MOUSE_UP)\n");
 			// Attached data:
 			// 1) int64 - time of mouse click
 			// 2) float - x coordinate of mouse click
@@ -1344,18 +1333,13 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 			// fEventMaskLayer is always != this
 			if (fEventMaskLayer) {
 				if (fEventMaskLayer == target) {
-
 					if (target == fLastMouseMoved)
 						fViewAction = B_INSIDE_VIEW;
 					else
 						fViewAction = B_ENTERED_VIEW;
-
 				} else if (fEventMaskLayer == fLastMouseMoved) {
-
 					fViewAction = B_EXITED_VIEW;
-
 				} else {
-
 					fViewAction = B_OUTSIDE_VIEW;
 				}
 
@@ -1369,7 +1353,7 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 
 					fEventMaskLayer->Window()->SendMessageToClient(&movemsg, fEventMaskLayer->fViewToken, false);
 				} else {
-					winBorderUnder	= (WinBorder*)fEventMaskLayer;
+					winBorderUnder = (WinBorder*)fEventMaskLayer;
 				}
 			} else {
 				if (fLastMouseMoved != target) {
@@ -1401,7 +1385,7 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 						target->Window()->SendMessageToClient(&movemsg, target->fViewToken, false);
 					}
 				} else if (target != this) {
-					winBorderUnder	= (WinBorder*)target;
+					winBorderUnder = (WinBorder*)target;
 				}
 			}
 
@@ -1566,8 +1550,8 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 				//ServerApp *deskbar = app_server->FindApp("application/x-vnd.Be-TSKB");
 				//if(deskbar)
 				//{
-					WinBorder *exActive = ActiveWinBorder();
-					WinBorder *exFocus = FocusWinBorder();
+					WinBorder* exActive = ActiveWinBorder();
+					WinBorder* exFocus = FocusWinBorder();
 					if (ActiveWorkspace()->MoveToBack(exActive))
 						show_final_scene(exFocus, exActive);
 
@@ -1893,16 +1877,15 @@ RootLayer::PrintToStream()
 void
 RootLayer::show_winBorder(WinBorder *winBorder)
 {
-	bool		invalidate = false;
-	bool		invalid;
-	WinBorder	*exFocus = FocusWinBorder();
-	WinBorder	*exActive = ActiveWinBorder();
+	bool invalidate = false;
+	bool invalid;
+	WinBorder* exFocus = FocusWinBorder();
+	WinBorder* exActive = ActiveWinBorder();
 
 	winBorder->Show(false);
 
-	for (int32 i = 0; i < fWsCount; i++)
-	{
-		invalid		= false;
+	for (int32 i = 0; i < fWsCount; i++) {
+		invalid = false;
 
 		if (fWorkspace[i] &&
 				(fWorkspace[i]->HasWinBorder(winBorder) ||
@@ -1940,16 +1923,15 @@ RootLayer::show_winBorder(WinBorder *winBorder)
 void
 RootLayer::hide_winBorder(WinBorder *winBorder)
 {
-	bool		invalidate = false;
-	bool		invalid;
-	WinBorder	*exFocus = FocusWinBorder();
-	WinBorder	*exActive = ActiveWinBorder();
+	bool invalidate = false;
+	bool invalid;
+	WinBorder* exFocus = FocusWinBorder();
+	WinBorder* exActive = ActiveWinBorder();
 
 	winBorder->Hide(false);
 
-	for (int32 i = 0; i < fWsCount; i++)
-	{
-		invalid		= false;
+	for (int32 i = 0; i < fWsCount; i++) {
+		invalid = false;
 
 		if (fWorkspace[i] && fWorkspace[i]->HasWinBorder(winBorder))
 			invalid = fWorkspace[i]->HideWinBorder(winBorder);
@@ -1980,11 +1962,10 @@ RootLayer::change_winBorder_feel(WinBorder *winBorder, int32 newFeel)
 	bool	isVisible = false;
 	bool	wasVisibleInActiveWorkspace = false;
 
-	WinBorder	*exFocus	= FocusWinBorder();
-	WinBorder	*exActive	= ActiveWinBorder();
+	WinBorder* exFocus = FocusWinBorder();
+	WinBorder* exActive = ActiveWinBorder();
 
-	if (!winBorder->IsHidden())
-	{
+	if (!winBorder->IsHidden()) {
 		isVisible = true;
 		wasVisibleInActiveWorkspace = ActiveWorkspace()->HasWinBorder(winBorder);
 		winBorder->Hide(false);
@@ -2095,7 +2076,7 @@ RootLayer::draw_window_tab(WinBorder *exFocus)
 		if (exFocus && focus != exFocus) {
 			// TODO: this line is a hack, decorator is drawn twice.
 #ifndef NEW_CLIPPING
-			BRegion		reg(exFocus->fVisible);
+			BRegion reg(exFocus->fVisible);
 			if (focus)
 				reg.Include(&focus->fVisible);
 			redraw_layer(this, reg);
@@ -2110,13 +2091,11 @@ RootLayer::empty_visible_regions(Layer *layer)
 {
 // TODO: optimize by avoiding recursion?
 	// NOTE: first 'layer' must be a WinBorder
-	Layer	*child;
-
-
 	layer->fFullVisible.MakeEmpty();
 	layer->fVisible.MakeEmpty();
-	child	= layer->BottomChild();
-	while(child) {
+
+	Layer* child = layer->BottomChild();
+	while (child) {
 		empty_visible_regions(child);
 		child = layer->UpperSibling();
 	}
@@ -2126,18 +2105,19 @@ RootLayer::empty_visible_regions(Layer *layer)
 inline void
 RootLayer::winborder_activation(WinBorder* exActive)
 {
-	if (exActive && (FocusWinBorder() != exActive || FrontWinBorder() != exActive)) {
+	// ToDo: not sure if this is correct - do floating windows get WindowActivated() events?
+	if (exActive && FocusWinBorder() != exActive) {
 		BMessage msg(B_WINDOW_ACTIVATED);
 		msg.AddBool("active", false);
 		exActive->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
 	}
-	if (FocusWinBorder() == FrontWinBorder()
-		&& FrontWinBorder() != NULL && FrontWinBorder() != exActive) {
+	if (FocusWinBorder() && FocusWinBorder() != exActive) {
 		BMessage msg(B_WINDOW_ACTIVATED);
 		msg.AddBool("active", true);
-		FrontWinBorder()->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
+		FocusWinBorder()->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
 	}
 }
+
 
 inline void
 RootLayer::show_final_scene(WinBorder *exFocus, WinBorder *exActive)
@@ -2156,7 +2136,6 @@ RootLayer::show_final_scene(WinBorder *exFocus, WinBorder *exActive)
 	}
 
 	draw_window_tab(exFocus);
-
 	winborder_activation(exActive);
 
 // TODO: MoveEventHandler::B_MOUSE_DOWN may not need this. Investigate.
@@ -2172,6 +2151,7 @@ RootLayer::show_final_scene(WinBorder *exFocus, WinBorder *exActive)
 		fLastMouseMoved = this;
 	}
 }
+
 
 void
 RootLayer::Draw(const BRect &r)

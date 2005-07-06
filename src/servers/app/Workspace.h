@@ -47,24 +47,26 @@ struct ListData
 	ListData *lowerItem;
 };
 
-class Workspace
-{
-public:
+class Workspace {
+	public:
 								Workspace(	const int32 ID,
 											const uint32 colorspace,
 											const RGBColor& BGColor);
-								~Workspace(void);
+								~Workspace();
 
-			int32				ID(void) const { return fID; }
-	
+			int32				ID() const { return fID; }
+
 			void				AddWinBorder(WinBorder *winBorder);
 			void				RemoveWinBorder(WinBorder *winBorder);
 			bool				HasWinBorder(const WinBorder *winBorder) const;
 
-			WinBorder*			Focus(void) const;
-			WinBorder*			Front(void) const;
+			WinBorder*			Focus() const;
+			WinBorder*			Front() const;
+			WinBorder*			Active() const;
+
 			bool				GetWinBorderList(void **list, int32 *itemCount ) const;
-	
+
+			bool				SetFocus(WinBorder* newFocus);
 			bool				MoveToBack(WinBorder *newLast);
 			bool				MoveToFront(WinBorder *newFront, bool doNotDisturb = false);
 
@@ -130,16 +132,17 @@ private:
 
 			// first visible onscreen
 			ListData			*fBottomItem;
-	
+
 			// the last visible(or covered by other Layers)
 			ListData			*fTopItem;
-	
+
 			// the focus WinBorder - for keyboard events
 			ListData			*fFocusItem;
-	
+
 			// pointer for which "big" actions are intended
 			ListData			*fFrontItem;
-	
+			ListData*			fActiveItem;
+
 			// settings for each workspace -- example taken from R5's app_server_settings file
 			display_timing		fDisplayTiming;
 			int16				fVirtualWidth;

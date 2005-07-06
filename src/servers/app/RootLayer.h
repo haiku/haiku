@@ -88,14 +88,10 @@ public:
 										uint32 oldWksIndex,
 										uint32 newWksIndex);
 			WinBorder*			WinBorderAt(const BPoint& pt) const;
-	inline	WinBorder*			FocusWinBorder() const { return fWorkspace[fActiveWksIndex]->Focus(); }
-	inline	WinBorder*			FrontWinBorder() const { return fWorkspace[fActiveWksIndex]->Front(); }
-	inline	WinBorder*			ActiveWinBorder() const {
-									return (fWorkspace[fActiveWksIndex]->Focus() == 
-												fWorkspace[fActiveWksIndex]->Front()
-											&& fWorkspace[fActiveWksIndex]->Front() != NULL)?
-									fWorkspace[fActiveWksIndex]->Front(): NULL;
-								}
+
+	inline	WinBorder*			FocusWinBorder() const { return ActiveWorkspace()->Focus(); }
+	inline	WinBorder*			FrontWinBorder() const { return ActiveWorkspace()->Front(); }
+	inline	WinBorder*			ActiveWinBorder() const { return ActiveWorkspace()->Active(); }
 
 	inline	void				SetWorkspaceCount(int32 wksCount);
 	inline	int32				WorkspaceCount() const { return fWsCount; }
