@@ -1041,17 +1041,16 @@ BMenu::_show(bool selectFirstItem)
 	// Menu windows get the BMenu's handler name
 	fCachedMenuWindow = new BMenuWindow(Name());
 	fCachedMenuWindow->ChildAt(0)->AddChild(this);
-	
+
 	// We're doing this here because ConvertToScreen() needs:
 	// 1. The BView to be attached (see the above line).
 	// 2. The looper locked or not running (the Show() call below starts the looper)
 	if (fSuper != NULL)
 		fSuperbounds = fSuper->ConvertToScreen(fSuper->Bounds());
-	
+
 	UpdateWindowViewSize();
-	
 	fCachedMenuWindow->Show();
-	
+
 	return true;
 }
 
@@ -1065,7 +1064,6 @@ BMenu::_hide()
 		fCachedMenuWindow->Quit();
 		fCachedMenuWindow = NULL;
 	}
-	
 }
 
 
@@ -1220,7 +1218,7 @@ BMenu::LayoutItems(int32 index)
 	ComputeLayout(index, true, true, &width, &height);
 
 	ResizeTo(width, height);
-	
+
 	// Move the BMenu to 1, 1, if it's attached to a BMenuWindow,
 	// (that means it's a BMenu, BMenuBars are attached to regular BWindows).
 	// This is needed to be able to draw the frame around the BMenu.
@@ -1235,11 +1233,11 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 {
 	if (Window() == NULL && Parent() == NULL)
 		return;
-	
+
 	// TODO: Take "bestFit", "moveItems", "index" into account,
 	// Recalculate only the needed items,
 	// not the whole layout every time
-	
+
 	BRect frame(0, 0, 0, 0);
 	float iWidth, iHeight;
 	BMenuItem *item = NULL;
@@ -1251,19 +1249,19 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 				item = ItemAt(i);			
 				if (item != NULL) {
 					item->GetContentSize(&iWidth, &iHeight);
-					
+
 					if (item->fModifiers && item->fShortcutChar)
 						iWidth += 25.0f;
-					
+
 					item->fBounds.left = 0.0f;
 					item->fBounds.top = frame.bottom;
 					item->fBounds.bottom = item->fBounds.top + iHeight + fPad.top + fPad.bottom;
-					
+
 					frame.right = max_c(frame.right, iWidth + fPad.left + fPad.right) + 20;
 					frame.bottom = item->fBounds.bottom + 1.0f;
 				}
 			}
-			
+
 			for (int32 i = 0; i < fItems.CountItems(); i++)
 				ItemAt(i)->fBounds.right = frame.right;
 
@@ -1271,7 +1269,7 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 			frame.bottom--;
 			break;
 		}
-		
+
 		case B_ITEMS_IN_ROW:
 		{
 			font_height fh;
@@ -1283,23 +1281,23 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 				item = ItemAt(i);
 				if (item != NULL) {
 					item->GetContentSize(&iWidth, &iHeight);
-					
+
 					item->fBounds.left = frame.right;
 					item->fBounds.top = 0.0f;
 					item->fBounds.right = item->fBounds.left + iWidth + fPad.left + fPad.right;
-					
+
 					frame.right = item->Frame().right + 1.0f;
 					frame.bottom = max_c(frame.bottom, iHeight + fPad.top + fPad.bottom);
 				}
 			}
-			
+
 			for (int32 i = 0; i < fItems.CountItems(); i++)
 				ItemAt(i)->fBounds.bottom = frame.bottom;			
-			
+
 			frame.right = (float)ceil(frame.right) + 8.0f;
 			break;
 		}
-		
+
 		case B_ITEMS_IN_MATRIX:
 		{
 			for (int32 i = 0; i < CountItems(); i++) {
@@ -1313,7 +1311,7 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 			}		
 			break;
 		}
-	
+
 		default:
 			break;
 	}
@@ -1324,7 +1322,7 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 			*width = Parent()->Frame().Width() + 1;
 		else
 			*width = Window()->Frame().Width() + 1;
-		
+
 		*height = frame.Height();
 	} else {
 		*width = frame.Width();
@@ -1384,6 +1382,18 @@ BMenu::CalcFrame(BPoint where, bool *scrollOn)
 
 	BMenu *superMenu = Supermenu();
 	BMenuItem *superItem = Superitem();
+
+	if (superMenu == NULL || superItem == NULL) {
+		// just move the window on screen
+
+		if (frame.bottom > screenFrame.bottom)
+			frame.OffsetBy(0, screenFrame.bottom - frame.bottom);
+		
+		if (frame.right > screenFrame.right)
+			frame.OffsetBy(screenFrame.right - frame.right, 0);
+
+		return frame;
+	}
 
 	if (superMenu->Layout() == B_ITEMS_IN_COLUMN) {
 		if (frame.right > screenFrame.right)
