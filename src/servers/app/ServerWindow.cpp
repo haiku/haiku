@@ -104,8 +104,9 @@ ServerWindow::~ServerWindow()
 		gDesktop->RemoveWinBorder(fWinBorder);
 
 	delete fWinBorder;
-	
+
 	free(const_cast<char *>(fTitle));
+	delete_port(fMessagePort);
 
 	BPrivate::gDefaultTokens.RemoveToken(fServerToken);
 
@@ -191,6 +192,9 @@ ServerWindow::Quit()
 	}
 
 	if (fThread == find_thread(NULL)) {
+		// make sure we're hidden
+		Hide();
+
 		App()->RemoveWindow(this);
 
 		delete this;
@@ -236,7 +240,11 @@ ServerWindow::Show()
 	if (fQuitting || !fWinBorder->IsHidden())
 		return;
 
-	fWinBorder->GetRootLayer()->ShowWinBorder(fWinBorder);
+	RootLayer* rootLayer = fWinBorder->GetRootLayer();
+
+	rootLayer->Lock();
+	rootLayer->ShowWinBorder(fWinBorder);
+	rootLayer->Unlock();
 }
 
 //! Hides the window's WinBorder
@@ -249,7 +257,11 @@ ServerWindow::Hide()
 	if (fWinBorder->IsHidden())
 		return;
 
-	fWinBorder->GetRootLayer()->HideWinBorder(fWinBorder);
+	RootLayer* rootLayer = fWinBorder->GetRootLayer();
+
+	rootLayer->Lock();
+	rootLayer->HideWinBorder(fWinBorder);
+	rootLayer->Unlock();
 }
 
 
@@ -2137,20 +2149,21 @@ void
 ServerWindow::_MessageLooper()
 {
 	BPrivate::LinkReceiver& receiver = fLink.Receiver();
+	bool quitLoop = false;
 
-	bool quitting = false;
-	int32 code;
-	status_t err = B_OK;
-
-	while (!quitting) {
+	while (!quitLoop) {
 		STRACE(("info: ServerWindow::MonitorWin listening on port %ld.\n",
 			fMessagePort));
 
-		err = receiver.GetNextMessage(code);
-		if (err < B_OK) {
+		int32 code;
+		status_t status = receiver.GetNextMessage(code);
+		if (status < B_OK) {
 			// that shouldn't happen, it's our port
-			// ToDo: do something about it, anyway!
-			return;
+			printf("Someone deleted our message port!\n");
+
+			// try to let our client die happily
+			NotifyQuitRequested();
+			break;
 		}
 
 		Lock();
@@ -2158,10 +2171,11 @@ ServerWindow::_MessageLooper()
 		switch (code) {
 			case AS_DELETE_WINDOW:
 			case kMsgWindowQuit:
-			{
 				// this means the client has been killed
 				STRACE(("ServerWindow %s received 'AS_DELETE_WINDOW' message code\n",
 					Title()));
+
+				quitLoop = true;
 
 				// ToDo: what's this?
 				//RootLayer *rootLayer = fWinBorder->GetRootLayer();
@@ -2180,11 +2194,8 @@ ServerWindow::_MessageLooper()
 				// ServerWindow's destructor takes care of pulling this object off the desktop.
 				if (!fWinBorder->IsHidden())
 					CRITICAL("ServerWindow: a window must be hidden before it's deleted\n");
-
-				Quit();
-					// does not return
 				break;
-			}
+
 			case B_QUIT_REQUESTED:
 				STRACE(("ServerWindow %s received quit request\n", Title()));
 				NotifyQuitRequested();
@@ -2197,6 +2208,10 @@ ServerWindow::_MessageLooper()
 
 		Unlock();
 	}
+
+	// we were asked to quit the message loop - either on request or because of an error
+	Quit();
+		// does not return
 }
 
 /*
