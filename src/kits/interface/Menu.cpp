@@ -1257,7 +1257,7 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 					item->fBounds.top = frame.bottom;
 					item->fBounds.bottom = item->fBounds.top + iHeight + fPad.top + fPad.bottom;
 
-					frame.right = max_c(frame.right, iWidth + fPad.left + fPad.right) + 20;
+					frame.right = max_c(frame.right, iWidth + fPad.left + fPad.right + 20);
 					frame.bottom = item->fBounds.bottom + 1.0f;
 				}
 			}
@@ -1717,12 +1717,9 @@ void
 BMenu::UpdateWindowViewSize(bool upWind)
 {
 	ASSERT(fCachedMenuWindow != NULL);
-	
-	// TODO: Improve this, we already resize the menu
-	// in "LayoutItems()"
+
 	bool scroll;
 	BRect frame = CalcFrame(ScreenLocation(), &scroll);
-	//float width = min_c(Frame().Width(), maxFrame.Width());
 	ResizeTo(frame.Width(), frame.Height());
 
 	fCachedMenuWindow->ResizeTo(Bounds().Width() + 2, Bounds().Height() + 2);
