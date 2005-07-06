@@ -1815,63 +1815,76 @@ TermView::FrameResized (float width, float height)
 void 
 TermView::MessageReceived(BMessage *msg)
 {
-  entry_ref ref;
-  char *ctrl_l = "";
-
-  switch(msg->what){
-
-  case B_SIMPLE_DATA:
-    if (msg->FindRef("refs", &ref) == B_OK ){
-      this->DoFileDrop(ref);
-    } else {
-      BView::MessageReceived(msg);
-    }
-    break;
-
-  case B_MIME_DATA:
-    char *text;
-    int32 num_bytes;
-    status_t sts;
-    
-    if (msg->WasDropped()){
-      sts = msg->FindData ((const char *)"text/plain",
-		     (type_code)B_MIME_TYPE,
-		     (const void **)&text,
-		     &num_bytes);
-
-      if (sts != B_OK) break;
-      
-      /* Clipboard text doesn't attached EOF? */
-      text[num_bytes] = '\0';
-      WritePTY ((uchar *)text, num_bytes);
-      
-    }
-    break;
-    
-    
-  case B_COPY:
-    this->DoCopy();
-    break;
-    
-  case B_PASTE:
-    int32 code;
-    if (msg->FindInt32 ("index", &code) == B_OK)
-      this->DoPaste();
-    break;
-    
-  case B_SELECT_ALL:
-    this->DoSelectAll();
-    break;
-    
-  case MENU_CLEAR_ALL:
-    this->DoClearAll();
-    write (pfd, ctrl_l, 1);
-    break;
-
-  case MSGRUN_CURSOR:
-    this->BlinkCursor ();
-    break;
-
+	entry_ref ref;
+	char *ctrl_l = "";
+	
+	switch(msg->what){
+	
+		case B_SIMPLE_DATA:
+		{
+			int32 i=0;
+			if(msg->FindRef("refs", i++, &ref) == B_OK)
+			{
+				this->DoFileDrop(ref);
+				
+				while(msg->FindRef("refs", i++, &ref) == B_OK)
+					this->DoFileDrop(ref);
+			}
+			else
+			{
+				BView::MessageReceived(msg);
+			}
+			break;
+		}
+		case B_MIME_DATA:
+		{
+			char *text;
+			int32 num_bytes;
+			status_t sts;
+			
+			if (msg->WasDropped())
+			{
+				sts = msg->FindData ((const char *)"text/plain",
+									(type_code)B_MIME_TYPE,
+									(const void **)&text, &num_bytes);
+				if (sts != B_OK)
+					break;
+			
+				// Clipboard text doesn't attached EOF?
+				text[num_bytes] = '\0';
+				WritePTY ((uchar *)text, num_bytes);
+			}
+			break;
+		}	
+		case B_COPY:
+		{
+			this->DoCopy();
+			break;
+		}	
+		case B_PASTE:
+		{
+			int32 code;
+			if (msg->FindInt32 ("index", &code) == B_OK)
+				this->DoPaste();
+			break;
+		}	
+		case B_SELECT_ALL:
+		{
+			this->DoSelectAll();
+			break;
+		}	
+		case MENU_CLEAR_ALL:
+		{
+			this->DoClearAll();
+			write (pfd, ctrl_l, 1);
+			break;
+		}	
+		case MSGRUN_CURSOR:
+		{
+			this->BlinkCursor();
+			break;
+		}	
+		
 //  case B_INPUT_METHOD_EVENT:
 //    {
    //   int32 op;
@@ -1894,11 +1907,12 @@ TermView::MessageReceived(BMessage *msg)
 //	break;
     //  }
    // }
-
-  default:
-    BView::MessageReceived(msg);
-    break;
-  }
+		default:
+		{
+			BView::MessageReceived(msg);
+			break;
+		}	
+	}
 }  
 ////////////////////////////////////////////////////////////////////////////
 // DoFileDrop
@@ -1907,17 +1921,16 @@ TermView::MessageReceived(BMessage *msg)
 void 
 TermView::DoFileDrop(entry_ref &ref)
 {
-  char p[B_PATH_NAME_LENGTH * 2 + 1];
-  
-  BEntry ent(&ref); 
-  BPath path(&ent);
-
-  int num_bytes = SubstMetaChar (path.Path(), p);
-
-  WritePTY ((uchar *)p, num_bytes);
-
-  return;
-  
+	BEntry ent(&ref); 
+	BPath path(&ent);
+	BString string(path.Path());
+	
+	string.CharacterEscape(" ~`#$&*()\\|[]{};'\"<>?!",'\\');
+	string+=" ";
+	WritePTY ((const uchar *)string.String(), string.Length());
+	
+	return;
+	
 }
 ////////////////////////////////////////////////////////////////////////////
 // DoCopy()
@@ -2073,7 +2086,6 @@ TermView::SubstMetaChar (const char *p, char *q)
 void
 TermView::WritePTY (const uchar *text, int num_bytes)
 {
-
   if (gNowCoding != M_UTF8) {
     uchar *dstbuf = (uchar *)malloc (num_bytes * 3);
     num_bytes = fCodeConv->ConvertFromInternal(text, dstbuf, gNowCoding);
