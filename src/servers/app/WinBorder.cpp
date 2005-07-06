@@ -685,12 +685,19 @@ WinBorder::QuietlySetFeel(int32 feel)
 			fLevel	= B_MODAL_ALL;
 			break;
 			
+// TODO: This case is bogus, since I'm sure "feel"
+// is being represented by uint32 somewhere before
+// this function is used. And B_SYSTEM_LAST is defined -10. -Stephan
 		case B_SYSTEM_LAST:
 			fLevel	= B_SYSTEM_LAST;
 			break;
 
 		case B_SYSTEM_FIRST:
 			fLevel	= B_SYSTEM_FIRST;
+			break;
+
+		case 1024:
+			fLevel = B_SYSTEM_LAST;
 			break;
 
 		default:
