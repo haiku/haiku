@@ -191,8 +191,7 @@ BWindow::BWindow(BMessage* data)
 
 
 BWindow::BWindow(BRect frame, int32 bitmapToken)
-		:
-		BLooper("offscreen bitmap")
+	: BLooper("offscreen bitmap")
 {
 	// TODO: Implement for real
 	decomposeType(B_UNTYPED_WINDOW, &fLook, &fFeel);
@@ -221,7 +220,7 @@ BWindow::~BWindow()
 	fLink->StartMessage(AS_DELETE_WINDOW);
 	fLink->Flush();
 
-	delete_port(fLink->SenderPort());
+	// the sender port belongs to the app_server
 	delete_port(fLink->ReceiverPort());
 	delete fLink;
 }
