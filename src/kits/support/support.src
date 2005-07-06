@@ -11,6 +11,5 @@ SUPPORT_KIT_SOURCE =
 	PointerList.cpp
 	StopWatch.cpp
 	String.cpp
-	string_helper.cpp
 #	StreamIO.cpp
 ;

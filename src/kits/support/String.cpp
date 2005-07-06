@@ -36,9 +36,6 @@
 #include <Debug.h>
 #include <String.h>
 
-// Temporary Includes
-#include "string_helper.h"
-
 #define ENABLE_INLINES 0 // Set this to 1 to make some private methods inline
 
 // define proper names for case-option of _DoReplace()

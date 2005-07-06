@@ -1,7 +1,1 @@
 SubDir OBOS_TOP src kits support ;
-
-StaticLibrary haiku :
-	String.cpp
-	string_helper.cpp
-	: STATIC_LIBRARY_DIR
-	;
