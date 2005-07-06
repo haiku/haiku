@@ -65,5 +65,6 @@ RosterAppInfo::Clone() const
 		return NULL;
 
 	clone->Init(thread, team, port, flags, &ref, signature);
+	clone->registration_time = registration_time;
 	return clone;
 }
