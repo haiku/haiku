@@ -638,7 +638,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			STRACE(("DONE: ServerWindow %s: Message AS_DELETE_LAYER: Parent: %s Layer: %s\n", fTitle, parent->Name(), fCurrentLayer->Name()));
 
 			delete fCurrentLayer;
-
+// TODO: Does the client know about this change?
 			fCurrentLayer = parent;
 			break;
 		}
@@ -1082,7 +1082,7 @@ myRootLayer->Unlock();
 				fLink.Attach<int32>(rectCount);
 
 				for (int32 i = 0; i < rectCount; i++)
-					fLink.Attach<BRect>(region.RectAt(i));
+					fLink.Attach<BRect>(fCurrentLayer->ConvertFromTop(region.RectAt(i)));
 
 				fLink.Flush();
 			}
@@ -1102,9 +1102,12 @@ myRootLayer->Unlock();
 			BRegion region;
 			for (int i = 0; i < noOfRects; i++) {
 				link.Read<BRect>(&r);
-				region.Include(r);
+				region.Include(fCurrentLayer->ConvertToTop(r));
 			}
 			fCurrentLayer->fLayerData->SetClippingRegion(region);
+#ifndef NEW_CLIPPING
+			fCurrentLayer->RebuildFullRegion();
+#endif
 /*
 #ifndef NEW_CLIPPING
 			fCurrentLayer->RebuildFullRegion();
@@ -1355,7 +1358,7 @@ myRootLayer->Unlock();
 			STRACE(("ServerWindow %s: Message AS_WINDOW_RESIZE %.1f, %.1f\n", Title(), xResizeBy, yResizeBy));
 			
 			fWinBorder->ResizeBy(xResizeBy, yResizeBy);
-			
+
 			break;
 		}
 		case AS_WINDOW_MOVE:
