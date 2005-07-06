@@ -135,7 +135,7 @@ TBarMenuTitle::DrawContent()
 		menu->SetHighColor(black);
 	}
 
-	menu->SetDrawingMode(B_OP_OVER);
+	menu->SetDrawingMode(B_OP_ALPHA);
 
 	BRect dstRect(fIcon->Bounds());
 	dstRect.OffsetTo(frame.LeftTop());

@@ -143,7 +143,9 @@ TReplicantTray::AttachedToWindow()
 
 #ifdef DB_ADDONS		
 	//	load addons and rehydrate archives		
+#if !__HAIKU__
 	InitAddOnSupport();	
+#endif
 #endif
 	ResizeToPreferred();
 }

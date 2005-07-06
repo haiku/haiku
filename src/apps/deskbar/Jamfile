@@ -34,4 +34,17 @@ App Deskbar :
 	Switcher.cpp
 	;
 
-LinkSharedOSLibs Deskbar : libbe.so libtracker.so ;
+if $(TARGET_PLATFORM) = haiku {
+	# link for Haiku
+
+	LinkSharedOSLibs Deskbar :
+		libbe.so libtracker.so
+	;
+
+} else {
+	# link against build platform libs
+
+	LinkSharedOSLibs Deskbar :
+		be tracker
+	;
+}
