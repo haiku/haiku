@@ -133,6 +133,8 @@ BEOS_ADD_ONS_ACCELERANTS="radeon.accelerant nv.accelerant mga.accelerant \
 	nm.accelerant vesa.accelerant"
 BEOS_ADD_ONS_TRANSLATORS="STXTTranslator RTF-Translator PNGTranslator"
 BEOS_ADD_ONS_MEDIA="mixer.media_addon legacy.media_addon multi_audio.media_addon"
+BEOS_ADD_ONS_MEDIA_PLUGINS="aiff_reader avcodec mp3_decoder musepack raw_decoder wav_reader \
+	au_reader avi_reader mp3_reader ogg speex vorbis" # ac3_decoder theora matroska mov_reader
 BEOS_ADD_ONS_INPUT_DEVICES="<input>keyboard <input>mouse"
 BEOS_ADD_ONS_DRIVERS_MISC="keyboard scsi_dsk scsi_cd dprintf null zero random ps2_hid \
 	<driver>tty console <driver>config"
@@ -169,6 +171,7 @@ jam -j$(sysinfo -cpu | head -c 2) -q rc resattr kernel boot_loader \
 	$BEOS_ADD_ONS_ACCELERANTS \
 	$BEOS_ADD_ONS_TRANSLATORS \
 	$BEOS_ADD_ONS_MEDIA \
+	$BEOS_ADD_ONS_MEDIA_PLUGINS \
 	$BEOS_ADD_ONS_INPUT_DEVICES \
 	$BEOS_DATA_FILES \
 	bfs_shell fs_shell_command \
@@ -240,9 +243,10 @@ $mkdir -p beos/system/add-ons/kernel/network/protocols
 $mkdir -p beos/system/add-ons/kernel/partitioning_systems
 $mkdir -p beos/system/add-ons/Translators
 $mkdir -p beos/system/add-ons/accelerants
-$mkdir -p beos/system/add-ons/media
+$mkdir -p beos/system/add-ons/media/plugins
 $mkdir -p beos/system/add-ons/input_server/devices
 $mkdir -p beos/system/add-ons/input_server/filters
+$mkdir -p beos/system/add-ons/input_server/methods
 $mkdir -p beos/system/boot
 $mkdir -p beos/system/lib
 $mkdir -p beos/system/servers
@@ -448,6 +452,12 @@ cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/media
 $scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/media
 for f in $BEOS_ADD_ONS_MEDIA; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/media/
+done
+
+cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/media/plugins
+$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/media/plugins
+for f in $BEOS_ADD_ONS_MEDIA_PLUGINS; do
+	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/media/plugins/
 done
 
 cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/input_server/
