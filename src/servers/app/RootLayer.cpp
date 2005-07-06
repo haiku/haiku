@@ -1188,7 +1188,8 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 					else if (exFocus != FocusWinBorder()
 							 && !(target->WindowFlags() & B_WILL_ACCEPT_FIRST_CLICK))
 						sendMessage = false;
-	
+if (target->Feel() == 1024)
+	sendMessage = true;
 					if (sendMessage && fLastMouseMoved != target->fTopLayer) {
 						BMessage msg;
 						msg.what = B_MOUSE_DOWN;
