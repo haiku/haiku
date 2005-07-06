@@ -241,10 +241,10 @@ ServerWindow::Show()
 		return;
 
 	RootLayer* rootLayer = fWinBorder->GetRootLayer();
-
-	rootLayer->Lock();
-	rootLayer->ShowWinBorder(fWinBorder);
-	rootLayer->Unlock();
+	if (rootLayer && rootLayer->Lock()) {
+		rootLayer->ShowWinBorder(fWinBorder);
+		rootLayer->Unlock();
+	}
 }
 
 //! Hides the window's WinBorder
@@ -258,10 +258,10 @@ ServerWindow::Hide()
 		return;
 
 	RootLayer* rootLayer = fWinBorder->GetRootLayer();
-
-	rootLayer->Lock();
-	rootLayer->HideWinBorder(fWinBorder);
-	rootLayer->Unlock();
+	if (rootLayer && rootLayer->Lock()) {
+		rootLayer->HideWinBorder(fWinBorder);
+		rootLayer->Unlock();
+	}
 }
 
 
@@ -650,7 +650,6 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			STRACE(("DONE: ServerWindow %s: Message AS_DELETE_LAYER: Parent: %s Layer: %s\n", fTitle, parent->Name(), fCurrentLayer->Name()));
 
 			delete fCurrentLayer;
-// TODO: Does the client know about this change?
 			fCurrentLayer = parent;
 			break;
 		}
