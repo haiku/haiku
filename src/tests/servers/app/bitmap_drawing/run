@@ -1,7 +1,6 @@
 #!/bin/sh
 
+../../../../../tests/servers/registrar/run_haiku_registrar || exit
 ../../../../../distro/x86.R1/beos/system/servers/app_server &
-sleep 1s
-../../../../../distro/x86.R1/beos/system/servers/obos_registrar &
 sleep 1s
 ../../../../../distro/x86.R1/beos/apps/BitmapDrawing

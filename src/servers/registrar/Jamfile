@@ -38,7 +38,7 @@ local registrar_r5_sources =
 	R5Compatibility.cpp
 ;
 
-Server obos_registrar
+Server haiku_registrar
  	:
 	$(registrar_sources)
 	$(registrar_r5_sources)
