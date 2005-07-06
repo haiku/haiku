@@ -560,16 +560,23 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 			break;
 
 		case kMsgShutdownServer:
+		{
 			// let's kill all remaining applications
 
 			fAppListLock.Lock();
 
-			for (int32 i = 0; i < fAppList.CountItems(); i++) {
+			int32 count = fAppList.CountItems();
+			for (int32 i = 0; i < count; i++) {
 				ServerApp *app = (ServerApp*)fAppList.ItemAt(i);
+				team_id clientTeam = app->ClientTeam();
 
-				kill_thread(app->Thread());
-				kill_team(app->ClientTeam());
+				app->Quit();
+				kill_team(clientTeam);
 			}
+
+			// wait for the last app to die
+			if (count > 0)
+				acquire_sem_etc(fShutdownSemaphore, fShutdownCount, B_RELATIVE_TIMEOUT, 250000);
 
 			kill_thread(fPicassoThreadID);
 
@@ -580,8 +587,9 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 			delete gFontServer;
 
 			// we are now clear to exit
-			exit_thread(0);
+			exit(0);
 			break;
+		}
 #endif
 
 		case AS_SET_SYSCURSOR_DEFAULTS:
