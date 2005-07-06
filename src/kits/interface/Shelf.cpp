@@ -1,32 +1,15 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2004, Haiku
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Shelf.cpp
-//	Author:			Marc Flerackers (mflerackers@androme.be)
-//	Description:	BShelf stores replicant views that are dropped onto it
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Marc Flerackers (mflerackers@androme.be)
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
 
-// Standard Includes -----------------------------------------------------------
+/**	BShelf stores replicant views that are dropped onto it */
 
-// System Includes -------------------------------------------------------------
+
 #include <Beep.h>
 #include <Dragger.h>
 #include <Entry.h>
@@ -44,113 +27,26 @@
 
 #include <stdio.h>
 
+
+extern "C" void  _ReservedShelf1__6BShelfFv(BShelf *const, int32,
+	const BMessage*, const BView*);
+
+
 class _rep_data_ {
+	private:
+		friend class BShelf;
+
 		_rep_data_(BMessage *message, BView *view, BDragger *dragger,
-			BDragger::relation relation, unsigned long id, image_id image)
-			:
-			fMessage(message),
-			fView(view),
-			fDragger(NULL),
-			fRelation(relation),
-			fId(id),
-			fImage(image),
-			fError(B_OK),
-			fView2(NULL)
-		
-		{	
-		}
+			BDragger::relation relation, unsigned long id, image_id image);
+		_rep_data_();
 
-		_rep_data_()
-			:
-			fMessage(NULL),
-			fView(NULL),
-			fDragger(NULL),
-			fRelation(BDragger::TARGET_UNKNOWN),
-			fId(0),
-			fError(B_ERROR),
-			fView2(NULL)
-		{	
-		}
+		static _rep_data_* find(BList const *list, BMessage const *msg);
+		static _rep_data_* find(BList const *list, BView const *view, bool allowZombie);
+		static _rep_data_* find(BList const *list, unsigned long id);
 
-static	_rep_data_	*find(BList const *list, BMessage const *msg)
-		{
-			int32 i = 0;
-			_rep_data_ *item;
-			while ((item = (_rep_data_*)list->ItemAt(i++)) != NULL) {
-				if (item->fMessage == msg)
-					return item;
-			}
-
-			return NULL;
-		}
-
-static	_rep_data_	*find(BList const *list, BView const *view, bool aBool)
-		{
-			int32 i = 0;
-			_rep_data_ *item;
-			while ((item = (_rep_data_*)list->ItemAt(i++)) != NULL) {
-				if (item->fView == view)
-					return item;
-
-				if (aBool && item->fView2 == view)
-					return item;
-			}
-
-			return NULL;
-		}
-
-static	_rep_data_	*find(BList const *list, unsigned long id)
-		{
-			int32 i = 0;
-			_rep_data_ *item;
-			while ((item = (_rep_data_*)list->ItemAt(i++)) != NULL) {
-				if (item->fId == id)
-					return item;
-			}
-
-			return NULL;
-		}
-
-static	int32		index_of(BList const *list, BMessage const *msg)
-		{
-			int32 i = 0;
-			_rep_data_ *item;
-			while ((item = (_rep_data_*)list->ItemAt(i++)) != NULL) {
-				if (item->fMessage == msg)
-					return i;
-			}
-
-			return -1;
-		}
-
-static	int32		index_of(BList const *list, BView const *view, bool aBool)
-		{
-			int32 i = 0;
-			_rep_data_ *item;
-			while ((item = (_rep_data_*)list->ItemAt(i++)) != NULL) {
-				if (item->fView == view)
-					return i;
-
-				if (aBool && item->fView2 == view)
-					return i;
-			}
-
-			return -1;
-		}
-
-static	int32		index_of(BList const *list, unsigned long id)
-		{
-			int32 i = 0;
-			_rep_data_ *item;
-			while ((item = (_rep_data_*)list->ItemAt(i++)) != NULL) {
-				if (item->fId == id)
-					return i;
-			}
-
-			return -1;
-		}
-
-friend class BShelf;
+		static int32 index_of(BList const *list, BMessage const *msg);
+		static int32 index_of(BList const *list, BView const *view, bool allowZombie);
+		static int32 index_of(BList const *list, unsigned long id);
 
 		BMessage			*fMessage;
 		BView				*fView;
@@ -159,21 +55,152 @@ friend class BShelf;
 		unsigned long		fId;
 		image_id			fImage;
 		status_t			fError;
-		BView				*fView2;
+		BView				*fZombieView;
 };
 
 
 class _TContainerViewFilter_ : public BMessageFilter {
-public:
-						_TContainerViewFilter_(BShelf *shelf, BView *view);
-virtual					~_TContainerViewFilter_();
-			
+	public:
+		_TContainerViewFilter_(BShelf *shelf, BView *view);
+		virtual ~_TContainerViewFilter_();
+
 		filter_result	Filter(BMessage *msg, BHandler **handler);
 		filter_result	ObjectDropFilter(BMessage *msg, BHandler **handler);
 
+	protected:
 		BShelf	*fShelf;
 		BView	*fView;
 };
+
+
+//	#pragma mark -
+
+
+_rep_data_::_rep_data_(BMessage *message, BView *view, BDragger *dragger,
+	BDragger::relation relation, unsigned long id, image_id image)
+	:
+	fMessage(message),
+	fView(view),
+	fDragger(NULL),
+	fRelation(relation),
+	fId(id),
+	fImage(image),
+	fError(B_OK),
+	fZombieView(NULL)
+{
+}
+
+
+_rep_data_::_rep_data_()
+	:
+	fMessage(NULL),
+	fView(NULL),
+	fDragger(NULL),
+	fRelation(BDragger::TARGET_UNKNOWN),
+	fId(0),
+	fError(B_ERROR),
+	fZombieView(NULL)
+{
+}
+
+
+//static
+_rep_data_ *
+_rep_data_::find(BList const *list, BMessage const *msg)
+{
+	int32 i = 0;
+	_rep_data_ *item;
+	while ((item = (_rep_data_*)list->ItemAt(i++)) != NULL) {
+		if (item->fMessage == msg)
+			return item;
+	}
+
+	return NULL;
+}
+
+
+//static
+_rep_data_ *
+_rep_data_::find(BList const *list, BView const *view, bool allowZombie)
+{
+	int32 i = 0;
+	_rep_data_ *item;
+	while ((item = (_rep_data_*)list->ItemAt(i++)) != NULL) {
+		if (item->fView == view)
+			return item;
+
+		if (allowZombie && item->fZombieView == view)
+			return item;
+	}
+
+	return NULL;
+}
+
+
+//static
+_rep_data_ *
+_rep_data_::find(BList const *list, unsigned long id)
+{
+	int32 i = 0;
+	_rep_data_ *item;
+	while ((item = (_rep_data_*)list->ItemAt(i++)) != NULL) {
+		if (item->fId == id)
+			return item;
+	}
+
+	return NULL;
+}
+
+
+//static
+int32
+_rep_data_::index_of(BList const *list, BMessage const *msg)
+{
+	int32 i = 0;
+	_rep_data_ *item;
+	while ((item = (_rep_data_*)list->ItemAt(i++)) != NULL) {
+		if (item->fMessage == msg)
+			return i;
+	}
+
+	return -1;
+}
+
+
+//static
+int32
+_rep_data_::index_of(BList const *list, BView const *view, bool allowZombie)
+{
+	int32 i = 0;
+	_rep_data_ *item;
+	while ((item = (_rep_data_*)list->ItemAt(i++)) != NULL) {
+		if (item->fView == view)
+			return i;
+
+		if (allowZombie && item->fZombieView == view)
+			return i;
+	}
+
+	return -1;
+}
+
+
+//static
+int32
+_rep_data_::index_of(BList const *list, unsigned long id)
+{
+	int32 i = 0;
+	_rep_data_ *item;
+	while ((item = (_rep_data_*)list->ItemAt(i++)) != NULL) {
+		if (item->fId == id)
+			return i;
+	}
+
+	return -1;
+}
+
+
+//	#pragma mark -
 
 
 _TContainerViewFilter_::_TContainerViewFilter_(BShelf *shelf, BView *view)
@@ -261,7 +288,7 @@ _TContainerViewFilter_::ObjectDropFilter(BMessage *msg, BHandler **_handler)
 		}
 	
 	} else {
-		if (fShelf->RealAddReplicant(msg, &point, 0) == B_OK)
+		if (fShelf->_RealAddReplicant(msg, &point, 0) == B_OK)
 			Looper()->DetachCurrentMessage();
 	}
 
@@ -269,54 +296,61 @@ _TContainerViewFilter_::ObjectDropFilter(BMessage *msg, BHandler **_handler)
 }
 
 
-class _TReplicantViewFilter_ : public BMessageFilter {
-public:
-						_TReplicantViewFilter_(BShelf *shelf, BView *view)
-							:	BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE)
-						{
-							fShelf = shelf;
-							fView = view;
-						}
-virtual					~_TReplicantViewFilter_()
-						{
-						}
-			
-		filter_result	Filter(BMessage *, BHandler **)
-						{
-							return B_DISPATCH_MESSAGE;
-						}
+//	#pragma mark -
 
+
+class _TReplicantViewFilter_ : public BMessageFilter {
+	public:
+		_TReplicantViewFilter_(BShelf *shelf, BView *view)
+			: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE)
+		{
+			fShelf = shelf;
+			fView = view;
+		}
+
+		virtual	~_TReplicantViewFilter_()
+		{
+		}
+	
+		filter_result Filter(BMessage *, BHandler **)
+		{
+			return B_DISPATCH_MESSAGE;
+		}
+
+	protected:
 		BShelf	*fShelf;
 		BView	*fView;
 };
 
 
-// **** BShelf ****
+//	#pragma mark -
+
+
 BShelf::BShelf(BView *view, bool allow_drags, const char *shelf_type)
-	:	BHandler(shelf_type)
+	: BHandler(shelf_type)
 {
-	InitData(NULL, NULL, view, allow_drags);
+	_InitData(NULL, NULL, view, allow_drags);
 }
 
 
 BShelf::BShelf(const entry_ref *ref, BView *view, bool allow_drags,
-			   const char *shelf_type)
-	:	BHandler(shelf_type)
+	const char *shelf_type)
+	: BHandler(shelf_type)
 {
-	InitData(new BEntry(ref), NULL, view, allow_drags);
+	_InitData(new BEntry(ref), NULL, view, allow_drags);
 }
 
 
 BShelf::BShelf(BDataIO *stream, BView *view, bool allow_drags,
-			   const char *shelf_type)
-	:	BHandler(shelf_type)
+	const char *shelf_type)
+	: BHandler(shelf_type)
 {
-	InitData(NULL, stream, view, allow_drags);
+	_InitData(NULL, stream, view, allow_drags);
 }
 
 
 BShelf::BShelf(BMessage *data)
-	:	BHandler(data)
+	: BHandler(data)
 {
 	// TODO: Implement ?
 }
@@ -493,26 +527,25 @@ BShelf::SaveLocation(entry_ref *ref) const
 	if (fStream && ref) {
 		*ref = entry;
 		return fStream;
-	
-	} else if (fEntry) {
+	}
+	if (fEntry) {
 		fEntry->GetRef(&entry);
 
 		if (ref)
 			*ref = entry;
 
 		return NULL;
-	
-	} else {
-		*ref = entry;
-		return NULL;
 	}
+
+	*ref = entry;
+	return NULL;
 }
 
 
 status_t
 BShelf::AddReplicant(BMessage *data, BPoint location)
 {
-	return RealAddReplicant(data, &location, 0);
+	return _RealAddReplicant(data, &location, 0);
 }
 
 
@@ -522,33 +555,10 @@ BShelf::DeleteReplicant(BView *replicant)
 	int32 index = _rep_data_::index_of(&fReplicants, replicant, true);
 
 	_rep_data_ *item = (_rep_data_*)fReplicants.ItemAt(index);
+	if (item == NULL)
+		return B_BAD_VALUE;
 
-	if (!item)
-		return B_ERROR;
-
-	bool aBool;
-
-	item->fMessage->FindBool("", &aBool);
-
-	BView *view = item->fView;
-
-	if (!view)
-		view = item->fView2;
-
-	if (view)
-		view->RemoveSelf();
-
-	if (item->fDragger)
-		item->fDragger->RemoveSelf();
-
-	fReplicants.RemoveItem(item);
-
-	if (aBool && item->fImage >= 0)
-		unload_add_on(item->fImage);
-
-	delete item;
-
-	return B_OK;
+	return _DeleteReplicant(item);
 }
 
 
@@ -558,33 +568,10 @@ BShelf::DeleteReplicant(BMessage *data)
 	int32 index = _rep_data_::index_of(&fReplicants, data);
 
 	_rep_data_ *item = (_rep_data_*)fReplicants.ItemAt(index);
-
 	if (!item)
-		return B_ERROR;
+		return B_BAD_VALUE;
 
-	bool aBool;
-
-	item->fMessage->FindBool("", &aBool);
-
-	BView *view = item->fView;
-
-	if (!view)
-		view = item->fView2;
-
-	if (view)
-		view->RemoveSelf();
-
-	if (item->fDragger)
-		item->fDragger->RemoveSelf();
-
-	fReplicants.RemoveItem(item);
-
-	if (aBool && item->fImage >= 0)
-		unload_add_on(item->fImage);
-
-	delete item;
-
-	return B_OK;
+	return _DeleteReplicant(item);
 }
 
 
@@ -592,35 +579,10 @@ status_t
 BShelf::DeleteReplicant(int32 index)
 {
 	_rep_data_ *item = (_rep_data_*)fReplicants.ItemAt(index);
-
 	if (!item)
-		return B_ERROR;
+		return B_BAD_INDEX;
 
-	bool aBool;
-
-	item->fMessage->FindBool("", &aBool);
-
-	BView *view = item->fView;
-
-	if (!view)
-		view = item->fView2;
-
-	if (view)
-		view->RemoveSelf();
-
-	if (item->fDragger)
-		item->fDragger->RemoveSelf();
-
-	ReplicantDeleted(index, item->fMessage, item->fView);
-
-	fReplicants.RemoveItem(item);
-
-	if (aBool && item->fImage >= 0)
-		unload_add_on(item->fImage);
-
-	delete item;
-
-	return B_OK;
+	return _DeleteReplicant(item);
 }
 
 
@@ -632,27 +594,30 @@ BShelf::CountReplicants() const
 
 
 BMessage *
-BShelf::ReplicantAt(int32 index, BView **view, uint32 *uid,
-							  status_t *perr) const
+BShelf::ReplicantAt(int32 index, BView **_view, uint32 *_uniqueID,
+	status_t *_error) const
 {
-	status_t err = B_ERROR;
-	BMessage *message = NULL;
-
 	_rep_data_ *item = (_rep_data_*)fReplicants.ItemAt(index);
+	if (item == NULL) {
+		// no replicant found
+		if (_view)
+			*_view = NULL;
+		if (_uniqueID)
+			*_uniqueID = ~0UL;
+		if (_error)
+			*_error = B_BAD_INDEX;
 
-	if (item) {
-		message = item->fMessage;
-		*view = item->fView;
-		*uid = item->fId;
-		*perr = item->fError;
-	
-	} else {
-		*view = NULL;
-		*uid = 0;
-		*perr = err;
+		return NULL;
 	}
 
-	return message;
+	if (_view)
+		*_view = item->fView;
+	if (_uniqueID)
+		*_uniqueID = item->fId;
+	if (_error)
+		*_error = item->fError;
+
+	return item->fMessage;
 }
 
 
@@ -714,11 +679,9 @@ void BShelf::_ReservedShelf2() {}
 void BShelf::_ReservedShelf3() {}
 void BShelf::_ReservedShelf4() {}
 void BShelf::_ReservedShelf5() {}
-#if !_PR3_COMPATIBLE_
 void BShelf::_ReservedShelf6() {}
 void BShelf::_ReservedShelf7() {}
 void BShelf::_ReservedShelf8() {}
-#endif
 
 
 BShelf::BShelf(const BShelf&)
@@ -751,15 +714,15 @@ BShelf::_Archive(BMessage *data) const
 
 
 void
-BShelf::InitData(BEntry *entry, BDataIO *stream, BView *view,
-					  bool allow_drags)
+BShelf::_InitData(BEntry *entry, BDataIO *stream, BView *view,
+	bool allowDrags)
 {
 	fContainerView = view;
 	fStream = NULL;
 	fEntry = entry;
 	fFilter = NULL;
 	fGenCount = 1;
-	fAllowDragging = allow_drags;
+	fAllowDragging = allowDrags;
 	fDirty = true;
 	fDisplayZombies = false;
 	fAllowZombies = true;
@@ -779,20 +742,18 @@ BShelf::InitData(BEntry *entry, BDataIO *stream, BView *view,
 		BMessage archive;
 
 		if (archive.Unflatten(fStream) == B_OK) {
-			bool aBool;
+			bool allowZombies;
+			if (archive.FindBool("_zom_dsp", &allowZombies) != B_OK)
+				allowZombies = false;
 
-			if (!archive.FindBool("_zom_dsp", &aBool))
-				aBool = false;
+			SetDisplaysZombies(allowZombies);
 
-			SetDisplaysZombies(aBool);
+			if (archive.FindBool("_zom_alw", &allowZombies) != B_OK)
+				allowZombies = true;
 
-			if (!archive.FindBool("_zom_alw", &aBool))
-				aBool = true;
-
-			SetAllowsZombies(aBool);
+			SetAllowsZombies(allowZombies);
 
 			int32 genCount;
-
 			if (!archive.FindInt32("_sg_cnt", &genCount))
 				genCount = 1;
 
@@ -803,7 +764,34 @@ BShelf::InitData(BEntry *entry, BDataIO *stream, BView *view,
 
 
 status_t
-BShelf::RealAddReplicant(BMessage *data, BPoint *loc, uint32 uid)
+BShelf::_DeleteReplicant(_rep_data_* item)
+{
+	bool loadedImage;
+	item->fMessage->FindBool("", &loadedImage);
+
+	BView *view = item->fView;
+	if (view == NULL)
+		view = item->fZombieView;
+
+	if (view)
+		view->RemoveSelf();
+
+	if (item->fDragger)
+		item->fDragger->RemoveSelf();
+
+	fReplicants.RemoveItem(item);
+
+	if (loadedImage && item->fImage >= 0)
+		unload_add_on(item->fImage);
+
+	delete item;
+
+	return B_OK;
+}
+
+
+status_t
+BShelf::_RealAddReplicant(BMessage *data, BPoint *loc, uint32 uid)
 {
 	BView *replicant = NULL;
 	BDragger *dragger = NULL;
@@ -947,7 +935,7 @@ BShelf::RealAddReplicant(BMessage *data, BPoint *loc, uint32 uid)
 		image);
 
 	item->fError = B_OK;
-	item->fView2 = zombie;
+	item->fZombieView = zombie;
 
 	if (zombie)
 		zombie->SetArchive(data);
@@ -967,7 +955,7 @@ BShelf::RealAddReplicant(BMessage *data, BPoint *loc, uint32 uid)
 
 
 status_t
-BShelf::GetProperty(BMessage *msg, BMessage *reply)
+BShelf::_GetProperty(BMessage *msg, BMessage *reply)
 {
 	//TODO: Implement
 	return B_ERROR;
