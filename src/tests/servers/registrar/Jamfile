@@ -26,3 +26,15 @@ CommonUnitTest RosterShell
 
 SimpleTest message_deliverer_test : message_deliverer_test.cpp
 	: <boot!home!config!lib>libopenbeos.so ;
+
+# a shutdown working with the emulation under R5
+if $(TARGET_PLATFORM) = r5 {
+	UsePrivateHeaders app ;
+	UsePrivateHeaders kernel ;
+
+	SimpleTest <test>shutdown
+		: shutdown.cpp
+		: <boot!home!config!lib>libopenbeos.so ;
+	
+	SEARCH on [ FGristFiles shutdown.cpp ] = [ FDirName $(OBOS_TOP) src bin ] ;
+}
