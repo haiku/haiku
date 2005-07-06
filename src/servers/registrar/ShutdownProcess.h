@@ -47,6 +47,16 @@ private:
 	bool _LockAppLists();
 	void _UnlockAppLists();
 
+	void _InitShutdownWindow();
+	void _SetShowShutdownWindow(bool show);
+	void _AddShutdownWindowApps(AppInfoList &infos);
+	void _RemoveShutdownWindowApp(team_id team);
+	void _SetShutdownWindowCurrentApp(team_id team);
+	void _SetShutdownWindowText(const char *text);
+	void _SetShutdownWindowCancelButtonEnabled(bool enabled);
+	void _SetShutdownWindowKillButtonEnabled(bool enabled);
+	void _SetShutdownWindowWaitForShutdown();
+
 	static status_t _WorkerEntry(void *data);
 	status_t _Worker();
 
@@ -62,6 +72,7 @@ private:
 	class InternalEvent;
 	struct InternalEventList;
 	class QuitRequestReplyHandler;
+	class ShutdownWindow;
 
 	friend class QuitRequestReplyHandler;
 
@@ -81,6 +92,7 @@ private:
 	int32					fCurrentPhase;
 	status_t				fShutdownError;
 	bool					fHasGUI;
+	ShutdownWindow			*fWindow;
 };
 
 #endif	// SHUTDOWN_PROCESS_H
