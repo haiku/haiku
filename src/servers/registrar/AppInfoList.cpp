@@ -24,6 +24,8 @@
 //	Description:	A helper class for TRoster. A list of RosterAppInfos.
 //------------------------------------------------------------------------------
 
+#include <algorithm>
+
 #include <string.h>
 
 #include "AppInfoList.h"
@@ -179,6 +181,21 @@ AppInfoList::Iterator
 AppInfoList::It()
 {
 	return Iterator(this, 0);
+}
+
+// Sort
+/*!	\brief Sorts the infos in ascending order according to the given compare
+		   function.
+	\param cmpFunc The compare function to be used.
+*/
+void
+AppInfoList::Sort(int (*cmpFunc)(const RosterAppInfo *, const RosterAppInfo *))
+{
+	int32 count = CountInfos();
+	if (count > 1) {
+		RosterAppInfo **infos = (RosterAppInfo **)fInfos.Items();
+		sort(infos, infos + count, cmpFunc);
+	}
 }
 
 // RemoveInfo
