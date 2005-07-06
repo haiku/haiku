@@ -153,7 +153,8 @@ printf("DrawingModeOver::blend_vline()\n");
 		if (covers) {
 			// non-solid opacity
 			do {
-				if (*covers) {
+//				if (*covers) {
+if (*covers && (colors->a & 0xff)) {
 					if (*covers == 255) {
 						ASSIGN_OVER(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
 									colors->r, colors->g, colors->b);
@@ -170,8 +171,10 @@ printf("DrawingModeOver::blend_vline()\n");
 			// solid full opcacity
 			if (cover == 255) {
 				do {
+if (colors->a & 0xff) {
 					ASSIGN_OVER(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
 								colors->r, colors->g, colors->b);
+}
 					p += 4;
 					++colors;
 				} while(--len);
