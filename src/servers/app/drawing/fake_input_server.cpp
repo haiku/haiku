@@ -34,7 +34,7 @@ send_mouse_down(BPrivate::PortLink* serverLink, BPoint pt,
 	// 6) int32 - clicks
 	
 	uint32 buttons,	mod, clicks=1;
-	int64 time=(int64)real_time_clock();
+	int64 time = system_time();
 	
 	currentMessage->FindPoint("where",&pt);
 	currentMessage->FindInt32("modifiers",(int32*)&mod);	
@@ -62,7 +62,7 @@ send_mouse_moved(BPrivate::PortLink* serverLink, BPoint pt,
 	// 3) float - y coordinate of mouse click
 	// 4) int32 - buttons down
 	uint32 buttons;
-	int64 time=(int64)real_time_clock();
+	int64 time = system_time();
 
 	currentMessage->FindInt32("buttons", (int32*)&buttons);
 
@@ -85,7 +85,7 @@ send_mouse_up(BPrivate::PortLink* serverLink, BPoint pt,
 	// 3) float - y coordinate of mouse click
 	// 4) int32 - modifier keys down
 	uint32 buttons, mod = modifiers();
-	int64 time=(int64)real_time_clock();
+	int64 time = system_time();
 
 	currentMessage->FindInt32("buttons", (int32*)&buttons);
 
@@ -102,14 +102,13 @@ bool
 handle_message(BPrivate::PortLink* serverLink, BMessage* msg)
 {
 	bool handled = true;
-	switch (msg->what)
-	{
+	switch (msg->what) {
 		case B_MOUSE_WHEEL_CHANGED:
 		{
 			float x,y;
 			msg->FindFloat("be:wheel_delta_x",&x);
 			msg->FindFloat("be:wheel_delta_y",&y);
-			int64 time=real_time_clock();
+			int64 time = system_time();
 			serverLink->StartMessage(B_MOUSE_WHEEL_CHANGED);
 			serverLink->Attach(&time,sizeof(int64));
 			serverLink->Attach(x);
@@ -135,8 +134,8 @@ handle_message(BPrivate::PortLink* serverLink, BMessage* msg)
 			int8 utf8data[3];
 			BString string;
 			int8 keyarray[16];
-			
-			systime=(int64)real_time_clock();
+
+			systime = system_time();
 			msg->FindInt32("key",&scancode);
 			if(msg->FindInt32("be:key_repeat",&repeatcount)!=B_OK)
 			{
@@ -184,7 +183,7 @@ handle_message(BPrivate::PortLink* serverLink, BMessage* msg)
 			BString string;
 			int8 keyarray[16];
 
-			systime=(int64)real_time_clock();
+			systime = system_time();
 			msg->FindInt32("key",&scancode);
 			msg->FindInt32("raw_char",&asciicode);
 			msg->FindInt32("modifiers",&modifiers);
@@ -218,7 +217,7 @@ handle_message(BPrivate::PortLink* serverLink, BMessage* msg)
 			int32 scancode,modifiers;
 			int8 keyarray[16];
 
-			systime=(int64)real_time_clock();
+			systime = system_time();
 			msg->FindInt32("key",&scancode);
 			msg->FindInt32("modifiers",&modifiers);
 			for(int8 i=0;i<15;i++)
@@ -242,7 +241,7 @@ handle_message(BPrivate::PortLink* serverLink, BMessage* msg)
 			int32 scancode,modifiers;
 			int8 keyarray[16];
 
-			systime=(int64)real_time_clock();
+			systime = system_time();
 			msg->FindInt32("key",&scancode);
 			msg->FindInt32("modifiers",&modifiers);
 			for(int8 i=0;i<15;i++)
@@ -266,7 +265,7 @@ handle_message(BPrivate::PortLink* serverLink, BMessage* msg)
 			int32 scancode,modifiers,oldmodifiers;
 			int8 keyarray[16];
 
-			systime=(int64)real_time_clock();
+			systime = system_time();
 			msg->FindInt32("key",&scancode);
 			msg->FindInt32("modifiers",&modifiers);
 			msg->FindInt32("be:old_modifiers",&oldmodifiers);
