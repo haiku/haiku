@@ -1590,7 +1590,7 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 
 					int32 index = 1;
 					do {
-						sprintf(filename, "/boot/home/screen%ld.png", index);
+						sprintf(filename, "/boot/home/screen%ld.png", index++);
 						entry.SetTo(filename);
 					} while(entry.Exists());
 
