@@ -2140,6 +2140,9 @@ BWindow::task_looper()
 	//	Unlock the looper
 	Unlock();
 
+	if (IsLocked())
+		debugger("window must not be locked!");
+
 	//	loop: As long as we are not terminating.
 	while (!fTerminating) {
 		// TODO: timeout determination algo

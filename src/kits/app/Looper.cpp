@@ -1,29 +1,15 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Looper.cpp
-//	Author(s):		Erik Jaesler (erik@cgsoftware.com)
-//					DarkWyrm (bpmagic@columbus.rr.com)
-//	Description:	BLooper class spawns a thread that runs a message loop.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Erik Jaesler (erik@cgsoftware.com)
+ *		DarkWyrm (bpmagic@columbus.rr.com)
+ *		Ingo Weinhold, bonefish@@users.sf.net
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+
+/**	BLooper class spawns a thread that runs a message loop. */
 
 /**
 	@note	Although I'm implementing "by the book" for now, I would like to
@@ -31,8 +17,6 @@
 			into their own class in the BPrivate namespace.
 
 			Also considering adding the thread priority when archiving.
-
-			
  */
 
 // debugging
@@ -1210,6 +1194,9 @@ BLooper::task_looper()
 	AssertLocked();
 	//	Unlock the looper
 	Unlock();
+
+	if (IsLocked())
+		debugger("looper must not be locked!");
 
 	//	loop: As long as we are not terminating.
 	while (!fTerminating)
