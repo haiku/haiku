@@ -665,43 +665,40 @@ WinBorder::QuietlySetFeel(int32 feel)
 	switch (fFeel) {
 		case B_FLOATING_SUBSET_WINDOW_FEEL:
 		case B_FLOATING_APP_WINDOW_FEEL:
-			fLevel	= B_FLOATING_APP;
+			fLevel = B_FLOATING_APP;
 			break;
 
 		case B_MODAL_SUBSET_WINDOW_FEEL:
 		case B_MODAL_APP_WINDOW_FEEL:
-			fLevel	= B_MODAL_APP;
+			fLevel = B_MODAL_APP;
 			break;
 
 		case B_NORMAL_WINDOW_FEEL:
-			fLevel	= B_NORMAL;
+			fLevel = B_NORMAL;
 			break;
 
 		case B_FLOATING_ALL_WINDOW_FEEL:
-			fLevel	= B_FLOATING_ALL;
+			fLevel = B_FLOATING_ALL;
 			break;
 
 		case B_MODAL_ALL_WINDOW_FEEL:
-			fLevel	= B_MODAL_ALL;
+			fLevel = B_MODAL_ALL;
 			break;
 			
 // TODO: This case is bogus, since I'm sure "feel"
 // is being represented by uint32 somewhere before
 // this function is used. And B_SYSTEM_LAST is defined -10. -Stephan
 		case B_SYSTEM_LAST:
-			fLevel	= B_SYSTEM_LAST;
-			break;
-
-		case B_SYSTEM_FIRST:
-			fLevel	= B_SYSTEM_FIRST;
-			break;
-
-		case 1024:
+		case kDesktopWindowFeel:
 			fLevel = B_SYSTEM_LAST;
 			break;
 
+		case B_SYSTEM_FIRST:
+			fLevel = B_SYSTEM_FIRST;
+			break;
+
 		default:
-			fLevel	= B_NORMAL;
+			fLevel = B_NORMAL;
 	}
 
 	// floating and modal windows must appear in every workspace where
