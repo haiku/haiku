@@ -40,7 +40,7 @@ main()
 				if (get_port_info(port, &portInfo) == B_OK
 					&& portInfo.team == teamInfo.team) {
 					puts("The Haiku Registrar is already running.");
-					return 1;
+					return 0;
 				}
 			}
 		}
