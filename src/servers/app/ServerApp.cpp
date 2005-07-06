@@ -176,6 +176,7 @@ ServerApp::~ServerApp(void)
 
 		for (int32 i = 0; i < fWindowList.CountItems(); i++) {
 			ServerWindow* window = (ServerWindow*)fWindowList.ItemAt(i);
+			printf("kill window \"%s\"\n", window->Title());
 
 			kill_thread(window->Thread());
 			window->Hide();
