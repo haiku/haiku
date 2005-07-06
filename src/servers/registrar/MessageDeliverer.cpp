@@ -786,6 +786,7 @@ MessageDeliverer::_DelivererThread()
 				} else {
 					// unexpected error -- probably the port is gone
 					portError = true;
+					break;
 				}
 			}
 
