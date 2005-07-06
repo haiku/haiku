@@ -33,23 +33,19 @@
 #include <Menu.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
-#include <TextControl.h>
-#include <Beep.h>
 
 #include <stdlib.h>
 
 #include "AppearPrefView.h"
+#include "MenuUtil.h"
 #include "PrefHandler.h"
 #include "TermWindow.h"
 #include "TermConst.h"
-#include "MenuUtil.h"
-#include "TTextControl.h"
 
-#define MAX_FONT_SIZE 32
-#define MIN_FONT_SIZE 6
+BPopUpMenu *MakeFontMenu(ulong msg, const char *defaultFontName);
+BPopUpMenu *MakeSizeMenu(ulong msg, uint8 defaultSize);
 
-AppearancePrefView::AppearancePrefView (BRect frame, const char *name,
-					TermWindow *window)
+AppearancePrefView::AppearancePrefView (BRect frame, const char *name, TermWindow *window)
   :PrefView (frame, name)
 {
   	const char *color_tbl[]=
@@ -64,139 +60,181 @@ AppearancePrefView::AppearancePrefView (BRect frame, const char *name,
   	};
 
  	fTermWindow = window;
-
-	mHalfFont = new BMenuField(BRect(0,0,220,20), "halffont", "Half Size Font", MakeFontMenu(MSG_HALF_FONT_CHANGED, gTermPref->getString(PREF_HALF_FONT_FAMILY)), B_WILL_DRAW); 
-	AddChild(mHalfFont);
-	mHalfFont->SetDivider (120);
 	
-	mHalfSize = new TTextControl(BRect(220, 0, 300, 20), "halfsize", "Size", "", new BMessage(MSG_HALF_SIZE_CHANGED));
-	AddChild(mHalfSize);
-  	mHalfSize->SetText(gTermPref->getString(PREF_HALF_FONT_SIZE));
-	mHalfSize->SetDivider (50);
-
-	mFullFont = new BMenuField(BRect(0,30,220,50), "fullfont", "Full Size Font", MakeFontMenu(MSG_FULL_FONT_CHANGED, gTermPref->getString(PREF_FULL_FONT_FAMILY)), B_WILL_DRAW); 
-	AddChild(mFullFont);
-	mFullFont->SetDivider (120);
+	float fontDividerSize = StringWidth("Half Size Font") + 15.0;
+	float sizeDividerSize = StringWidth("Size") + 15.0;
+	
+	BRect r(5,5,225,25);
+	
+	BMenu *menu = MakeFontMenu(MSG_HALF_FONT_CHANGED, gTermPref->getString(PREF_HALF_FONT_FAMILY));
+	fHalfFont = new BMenuField(r, "halffont", "Half Width Font", menu, B_WILL_DRAW); 
+	AddChild(fHalfFont);
+	fHalfFont->SetDivider(fontDividerSize);
+	
+	r.OffsetBy(r.Width() + 10, 0);
+	menu = MakeSizeMenu(MSG_HALF_SIZE_CHANGED, 12);
+	fHalfFontSize = new BMenuField(r, "halfsize", "Size", menu,	B_WILL_DRAW);
+	fHalfFontSize->SetDivider(sizeDividerSize);
+	AddChild(fHalfFontSize);
+	
+	r.OffsetBy(-r.Width() - 10,r.Height() + 5); 
+	menu = MakeFontMenu(MSG_FULL_FONT_CHANGED, gTermPref->getString(PREF_FULL_FONT_FAMILY));
+	fFullFont = new BMenuField(r, "fullfont", "Full Width Font", menu, B_WILL_DRAW); 
+	AddChild(fFullFont);
+	fFullFont->SetDivider(fontDividerSize);
   
-	mFullSize = new TTextControl(BRect(220, 30, 300, 50), "fullsize", "Size", "", new BMessage(MSG_FULL_SIZE_CHANGED));
-	AddChild(mFullSize);  
-	mFullSize->SetText(gTermPref->getString(PREF_FULL_FONT_SIZE));
-	mFullSize->SetDivider (50);
+	r.OffsetBy(r.Width() + 10, 0);
+	menu = MakeSizeMenu(MSG_FULL_SIZE_CHANGED, 12);
+	fFullFontSize = new BMenuField(r, "fullsize", "Size", menu,	B_WILL_DRAW);
+	fFullFontSize->SetDivider(sizeDividerSize);
+	AddChild(fFullFontSize);  
+	
+	r.OffsetBy(-r.Width() - 10,r.Height() + 25); 
+	fColorField = new BMenuField(r, NULL, NULL, MakeMenu (MSG_COLOR_FIELD_CHANGED, color_tbl, color_tbl[0]), B_WILL_DRAW);
+	AddChild(fColorField);		
 
-	mColorField = new BMenuField(BRect(0,60,200,80), NULL, NULL, MakeMenu (MSG_COLOR_FIELD_CHANGED, color_tbl, color_tbl[0]), B_WILL_DRAW);
-	AddChild(mColorField);		
-
-  	mColorCtl = SetupBColorControl(BPoint(20, 85), B_CELLS_32x8, 6, MSG_COLOR_CHANGED);
-  	mColorCtl->SetValue(gTermPref->getRGB(PREF_TEXT_FORE_COLOR));
-
+  	fColorCtl = SetupBColorControl(BPoint(r.left, r.bottom + 10), B_CELLS_32x8, 6, 
+  									MSG_COLOR_CHANGED);
+  	fColorCtl->SetValue(gTermPref->getRGB(PREF_TEXT_FORE_COLOR));
 }
 
 void
 AppearancePrefView::Revert (void)
 {
-
-  	mHalfSize->SetText (gTermPref->getString (PREF_HALF_FONT_SIZE));
-  	mFullSize->SetText (gTermPref->getString (PREF_FULL_FONT_SIZE));
-  	mColorField->Menu()->ItemAt(0)->SetMarked (true);
-  	mColorCtl->SetValue (gTermPref->getRGB(PREF_TEXT_FORE_COLOR));
+  	fColorField->Menu()->ItemAt(0)->SetMarked (true);
+  	fColorCtl->SetValue (gTermPref->getRGB(PREF_TEXT_FORE_COLOR));
 	
-  	mHalfFont->Menu()->FindItem (gTermPref->getString(PREF_HALF_FONT_FAMILY))->SetMarked(true);
-  	mFullFont->Menu()->FindItem (gTermPref->getString(PREF_FULL_FONT_FAMILY))->SetMarked(true);
-
-  	return;
-  
-}
-
-////////////////////////////////////////////////////////////////////////////
-// SaveIfModified (void)
-//
-////////////////////////////////////////////////////////////////////////////
-void
-AppearancePrefView::SaveIfModified (void)
-{
-  	BMessenger messenger (fTermWindow);
-  
-  	if (mHalfSize->IsModified()) {
-    	gTermPref->setString (PREF_HALF_FONT_SIZE, mHalfSize->Text());
-    	messenger.SendMessage (MSG_HALF_SIZE_CHANGED);
-    	mHalfSize->ModifiedText (false);
-  	}	
-  	if (mFullSize->IsModified()) {
-    	gTermPref->setString (PREF_FULL_FONT_SIZE, mFullSize->Text());
-    	messenger.SendMessage (MSG_FULL_SIZE_CHANGED);
-    	mFullSize->ModifiedText (false);
-  	}
-  	return;
+  	fHalfFont->Menu()->FindItem (gTermPref->getString(PREF_HALF_FONT_FAMILY))->SetMarked(true);
+  	fFullFont->Menu()->FindItem (gTermPref->getString(PREF_FULL_FONT_FAMILY))->SetMarked(true);
+  	fHalfFontSize->Menu()->FindItem (gTermPref->getString(PREF_HALF_FONT_FAMILY))->SetMarked(true);
+  	fFullFontSize->Menu()->FindItem (gTermPref->getString(PREF_FULL_FONT_FAMILY))->SetMarked(true);
 }
 
 void
 AppearancePrefView::AttachedToWindow (void)
 {
-  	mHalfSize->SetTarget (this);
-  	mFullSize->SetTarget (this);
-  	mHalfFont->Menu()->SetTargetForItems(this);
-  	mFullFont->Menu()->SetTargetForItems(this);  
+  	fHalfFontSize->Menu()->SetTargetForItems(this);
+  	fFullFontSize->Menu()->SetTargetForItems(this);  
+  	
+  	fHalfFont->Menu()->SetTargetForItems(this);
+  	fFullFont->Menu()->SetTargetForItems(this);  
 
-  	mColorCtl->SetTarget (this);
-  	mColorField->Menu()->SetTargetForItems(this);
-
+  	fColorCtl->SetTarget (this);
+  	fColorField->Menu()->SetTargetForItems(this);
 }
 
 void
 AppearancePrefView::MessageReceived (BMessage *msg)
 {
   	bool modified = false;
-  	int size;
   
-  	switch (msg->what) {  
-  	case MSG_HALF_FONT_CHANGED:
-    	gTermPref->setString (PREF_HALF_FONT_FAMILY, mHalfFont->Menu()->FindMarked()->Label());
-    	modified = true;
-    break;
-      
-  	case MSG_HALF_SIZE_CHANGED:
-    	size = atoi (mHalfSize->Text());
-    	if (size > MAX_FONT_SIZE || size < MIN_FONT_SIZE) {
-     	 	mHalfSize->SetText (gTermPref->getString (PREF_HALF_FONT_SIZE));
-      		beep ();
-    	} else {
-      		gTermPref->setString (PREF_HALF_FONT_SIZE, mHalfSize->Text());
-      		modified = true;
-    	}
-   	break;
-      
-  	case MSG_FULL_FONT_CHANGED:
-    	gTermPref->setString (PREF_FULL_FONT_FAMILY, mFullFont->Menu()->FindMarked()->Label());
-    	modified = true;
-    break;
-      
- 	case MSG_FULL_SIZE_CHANGED:
-   		size = atoi (mHalfSize->Text());
-    	if (size > MAX_FONT_SIZE || size < MIN_FONT_SIZE) {
-     	mFullSize->SetText (gTermPref->getString (PREF_FULL_FONT_SIZE));
-      	beep ();
-    } else {
-      	gTermPref->setString (PREF_FULL_FONT_SIZE, mFullSize->Text());
-    }
-    	modified = true;
-    break;
-      
-  	case MSG_COLOR_CHANGED:
-    	gTermPref->setRGB(mColorField->Menu()->FindMarked()->Label(), mColorCtl->ValueAsColor());    
-    	modified = true;
-    break;
+  	switch (msg->what)
+  	{ 
+		case MSG_HALF_FONT_CHANGED:
+		{ 
+			gTermPref->setString (PREF_HALF_FONT_FAMILY, fHalfFont->Menu()->FindMarked()->Label());
+			modified = true;
+			break;
+		}
+		case MSG_HALF_SIZE_CHANGED:
+	  	{
+			gTermPref->setString (PREF_HALF_FONT_SIZE, fHalfFontSize->Menu()->FindMarked()->Label());
+			modified = true;
+			break;
+		}
+		case MSG_FULL_FONT_CHANGED:
+	  	{ 
+			gTermPref->setString (PREF_FULL_FONT_FAMILY, fFullFont->Menu()->FindMarked()->Label());
+			modified = true;
+			break;
+		}
+		case MSG_FULL_SIZE_CHANGED:
+	  	{ 
+			gTermPref->setString (PREF_FULL_FONT_SIZE, fFullFontSize->Menu()->FindMarked()->Label());
+			modified = true;
+			break;
+		}
+		case MSG_COLOR_CHANGED:
+	  	{ 
+			gTermPref->setRGB(fColorField->Menu()->FindMarked()->Label(), fColorCtl->ValueAsColor());    
+			modified = true;
+			break;
+		}
+		case MSG_COLOR_FIELD_CHANGED:
+	  	{ 
+			fColorCtl->SetValue(gTermPref->getRGB (fColorField->Menu()->FindMarked()->Label()));
+			break;
+		}
+		default:
+	  	{ 
+			PrefView::MessageReceived(msg);
+			return; // Oh !      
+		}
+	}
+	
+  	if(modified)
+  	{
+   		fTermWindow->PostMessage(msg);
+   		Window()->PostMessage(MSG_PREF_MODIFIED);
+	}
+}
 
-  	case MSG_COLOR_FIELD_CHANGED:
-    	mColorCtl->SetValue(gTermPref->getRGB (mColorField->Menu()->FindMarked()->Label()));
-    break;
-  
-  	default:
-    	PrefView::MessageReceived(msg);
-    return; // Oh !      
-  }
+BPopUpMenu *
+MakeFontMenu(ulong msg, const char *defaultFontName)
+{
+	BPopUpMenu *menu = new BPopUpMenu("");
+	int32 numFamilies = count_font_families(); 
+	
+	for ( int32 i = 0; i < numFamilies; i++ )
+	{
+		font_family family; 
+		uint32 flags; 
+		
+		if ( get_font_family(i, &family, &flags) == B_OK )
+		{ 
+			menu->AddItem(new BMenuItem(family, new BMessage(msg)));
+			if(!strcmp(defaultFontName, family))
+			{
+				BMenuItem *item=menu->ItemAt(i);
+				item->SetMarked(true);
+			}
+		}
+	}
+	
+	return menu;
+}
 
-  	if(modified){
-   		fTermWindow->PostMessage (msg);
-   		(this->Window())->PostMessage(MSG_PREF_MODIFIED);
-  }
+BPopUpMenu *
+MakeSizeMenu(ulong msg, uint8 defaultSize)
+{
+	BPopUpMenu *menu = new BPopUpMenu("size");
+	
+	BMenuItem *item;
+	
+	for(uint8 i=9; i<13; i++)
+	{
+		BString string;
+		string << i;
+		
+		item = new BMenuItem(string.String(), new BMessage(msg));
+		menu->AddItem(item);
+		
+		if(i == defaultSize)
+			item->SetMarked(true);
+			
+	}
+	
+	item = new BMenuItem("14", new BMessage(msg));
+	menu->AddItem(item);
+	
+	if(defaultSize == 14)
+		item->SetMarked(true);
+	
+	item = new BMenuItem("16", new BMessage(msg));
+	menu->AddItem(item);
+	
+	if(defaultSize == 16)
+		item->SetMarked(true);
+	
+	return menu;
 }

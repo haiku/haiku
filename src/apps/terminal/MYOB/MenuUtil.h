@@ -41,15 +41,13 @@ class BPopUpMenu;
 class BMenu;
 class PrefHandler;
   
-
-  BPopUpMenu *	MakeFontMenu(ulong msg, const char *defaultFontName);
-  BPopUpMenu *	MakeMenu(ulong msg, const char **items,
-                const char *defaultItemName);
+  BPopUpMenu *	MakeMenu(ulong msg, const char **items, 
+  						const char *defaultItemName);
   
-  int           longname2op(const char *longname);
-  const char*   op2longname(int op);
-  void          MakeEncodingMenu(BMenu *eMenu, int coding, bool flag);
-  void          LoadLocaleFile (PrefHandler *);
+  int			longname2op(const char *longname);
+  const char *	op2longname(int op);
+  void			MakeEncodingMenu(BMenu *eMenu, int coding, bool flag);
+  void			LoadLocaleFile (PrefHandler *);
 
 #ifdef __cplusplus
 }

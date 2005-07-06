@@ -38,30 +38,24 @@ class TTextControl;
 
 class AppearancePrefView : public PrefView
 {
- public:
-                AppearancePrefView(BRect r,
-				   const char *name,
-				   TermWindow *window);
+public:
+					AppearancePrefView(BRect r, const char *name, 
+										TermWindow *window);
 
-  virtual void  Revert (void);
-  virtual void  SaveIfModified (void);
-  virtual void  MessageReceived (BMessage *);
-  virtual void  AttachedToWindow (void);
+	virtual	void	Revert (void);
+	virtual void	MessageReceived (BMessage *);
+	virtual void	AttachedToWindow (void);
 
- private:
-  TTextControl  *mHalfSize;
-  TTextControl  *mFullSize;
-  BMenuField    *mHalfFont;
-  BMenuField    *mFullFont;
-
-  BMenuField    *mColorField;
-  BColorControl *mColorCtl;
-  
-  int           mSubMenu_button;
-  int           mPaste_button;
-  
-  TermWindow    *fTermWindow;
-  
+private:
+	BMenuField		*fHalfFont,
+					*fHalfFontSize,
+					*fFullFont,
+					*fFullFontSize;
+	
+	BMenuField		*fColorField;
+	BColorControl	*fColorCtl;
+	
+	TermWindow		*fTermWindow;
 };
 
 #endif //AppearancePrefView_H_INCLUDED

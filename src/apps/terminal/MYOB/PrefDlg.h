@@ -55,38 +55,29 @@ class BFilePanel;
 class PrefDlg : public BWindow
 {
 public:
-  PrefDlg(TermWindow *inWindow);
-  ~PrefDlg ();
-  
-  void          Quit();
-
+					PrefDlg(TermWindow *inWindow);
+					~PrefDlg();
+			void	Quit();
 private:
-  void		doSave (void);
-  void		doSaveAs (void);
-  void		doRevert (void);
-  void          SaveRequested(BMessage *msg);
-  
-  bool          QuitRequested ();
-  void          MessageReceived (BMessage *msg);
-
-  void          SetupContent();
-
-  BBox*         SetupBox(BRect r, const char *label, BView *parent);
-  BButton*      SetupButton(BRect r, const char *label, ulong msg,
-			    BView *parent, bool defaultButton=false);
-
-  static BRect	CenteredRect(BRect r);
-
-private:
-  TermWindow    *fTermWindow;
-  BTabView      *fTabView;
-  PrefHandler   *fPrefTemp;
-  BFilePanel    *fSavePanel;
-  BButton       *fSaveAsFileButton;
-  BButton       *fRevertButton;
-  BButton       *fSaveButton;
-  
-  bool          fDirty;
+			void	doSave (void);
+			void	doSaveAs (void);
+			void	doRevert (void);
+			void	SaveRequested(BMessage *msg);
+			
+			bool	QuitRequested();
+			void	MessageReceived (BMessage *msg);
+	
+	static	BRect	CenteredRect(BRect r);
+	
+	TermWindow		*fTermWindow;
+	PrefHandler		*fPrefTemp;
+	BFilePanel		*fSavePanel;
+	
+	BButton			*fSaveAsFileButton,
+					*fRevertButton,
+					*fSaveButton;
+	
+	bool			fDirty;
 };
 
 #endif //PREFDLG_H_INCLUDED

@@ -44,132 +44,83 @@ extern PrefHandler *gTermPref;
 
 #define LOCALE_FILE_DIR PREF_FOLDER"menu/"
 
-//////////////////////////////////////////////////////////////////////////////
-//
-//
-//////////////////////////////////////////////////////////////////////////////
-BPopUpMenu *
-MakeFontMenu(ulong msg, const char *defaultFontName)
-{
-  BPopUpMenu *menu = new BPopUpMenu("font");
-  int32 numFamilies = count_font_families(); 
-  
-  for ( int32 i = 0; i < numFamilies; i++ ) { 
-    font_family family; 
-    uint32 flags; 
-
-    if ( get_font_family(i, &family, &flags) == B_OK ) { 
-      menu->AddItem(new BMenuItem(family, new BMessage(msg)));
-      if(!strcmp(defaultFontName, family)){
-        (menu->ItemAt(i))->SetMarked(true);
-      }
-    }
-  }
-  
-  return menu;
-}
-//////////////////////////////////////////////////////////////////////////////
-//
-//
-//////////////////////////////////////////////////////////////////////////////
 BPopUpMenu *
 MakeMenu(ulong msg, const char **items, const char *defaultItemName)
 {
-  BPopUpMenu *menu = new BPopUpMenu("");
-
-  int32 i = 0;
-  while(*items) {  
-    menu->AddItem(new BMenuItem(*items, new BMessage(msg)));
-    if(!strcmp(*items, defaultItemName)){
-      (menu->ItemAt(i))->SetMarked(true);
-    }
-    items++;
-    i++;
-  }
-  
-  return menu;
+	BPopUpMenu *menu = new BPopUpMenu("");
+	
+	int32 i = 0;
+	while(*items)
+	{
+		menu->AddItem(new BMenuItem(*items, new BMessage(msg)));
+		if(!strcmp(*items, defaultItemName))
+		{
+			(menu->ItemAt(i))->SetMarked(true);
+		}
+		items++;
+		i++;
+	}
+	return menu;
 }
 
-////////////////////////////////////////////////////////////////////////////
-// 
-// 
-////////////////////////////////////////////////////////////////////////////
 int
 longname2op(const char *longname)
 {
-int op = M_UTF8;
-const etable *s = encoding_table;
-
-  for (int i = 0; s->name; s++, i++){
-    if(!strcmp(s->name, longname)) {
-      op = s->op;
-      break;
-    }
-  }
-  
-  return op;
+	int op = M_UTF8;
+	const etable *s = encoding_table;
+	
+	for (int i = 0; s->name; s++, i++)
+	{
+		if(!strcmp(s->name, longname)) 
+		{
+			op = s->op;
+			break;
+		}
+	}
+	return op;
 }
 
-////////////////////////////////////////////////////////////////////////////
-// 
-// 
-////////////////////////////////////////////////////////////////////////////
-const char*
+const char *
 op2longname(int op)
 {
-  return encoding_table[op].name;
+	return encoding_table[op].name;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-//
-//
-//////////////////////////////////////////////////////////////////////////////
 void
 MakeEncodingMenu(BMenu *eMenu, int coding, bool flag)
 {
-  const etable *e = encoding_table;
-  int i = 0;
-  while(e->name){
-    BMessage *msg = new BMessage(MENU_ENCODING);
-    msg->AddInt32("op", (int32)e->op);
-    if (flag) {
-      eMenu->AddItem(new BMenuItem(e->name, msg, e->shortcut));
-    }
-    else {
-      eMenu->AddItem(new BMenuItem(e->name, msg));
-    }
-      
-    if ( i == coding) {
-      (eMenu->ItemAt(i))->SetMarked(true);
-    }
-    e++;
-    i++;
-  }
+	const etable *e = encoding_table;
+	int i = 0;
+	while(e->name)
+	{
+		BMessage *msg = new BMessage(MENU_ENCODING);
+		msg->AddInt32("op", (int32)e->op);
+		if (flag)
+			eMenu->AddItem(new BMenuItem(e->name, msg, e->shortcut));
+		else 
+			eMenu->AddItem(new BMenuItem(e->name, msg));
+	
+		if ( i == coding) 
+		{
+			(eMenu->ItemAt(i))->SetMarked(true);
+		}
+		e++;
+		i++;
+	}
 }
 
-//////////////////////////////////////////////////////////////////////////////
-//
-//
-//////////////////////////////////////////////////////////////////////////////
 void
-LoadLocaleFile (PrefHandler *pref)
+LoadLocaleFile(PrefHandler *pref)
 {
-
-  const char *locale;
-  char buf[B_PATH_NAME_LENGTH];
-  status_t sts;
-  
-  /*
-   * Open menu localize file.
-   */
-  locale = gTermPref->getString (PREF_GUI_LANGUAGE);
-  sprintf (buf, "%s%s", LOCALE_FILE_DIR, locale);
-
-  sts = pref->OpenText (buf);
-
-  if (sts == B_ERROR)
-    pref->OpenText (LOCALE_FILE_DEFAULT);
-
-  return;
-  
+	const char *locale;
+	char buf[B_PATH_NAME_LENGTH];
+	status_t sts;
+	
+	locale = gTermPref->getString (PREF_GUI_LANGUAGE);
+	sprintf (buf, "%s%s", LOCALE_FILE_DIR, locale);
+	
+	sts = pref->OpenText (buf);
+	
+	if (sts == B_ERROR)
+		pref->OpenText (LOCALE_FILE_DEFAULT);
 }
