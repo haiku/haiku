@@ -315,14 +315,21 @@ int32 int_thread(void *data)
 status_t
 init_hardware(void)
 {
+	status_t err = ENODEV;
 	LOG_CREATE();
+
+	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci))
+		return ENOSYS;
+
 	if (B_OK == probe_device()) {
 		PRINT(("ALL YOUR BASE ARE BELONG TO US\n"));
-		return B_OK;
+		err = B_OK;
 	} else {
 		LOG(("hardware not found\n"));
-		return B_ERROR;
 	}
+	
+	put_module(B_PCI_MODULE_NAME);
+	return err;
 }
 
 
