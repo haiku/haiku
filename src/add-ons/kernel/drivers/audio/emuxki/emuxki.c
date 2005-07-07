@@ -65,7 +65,7 @@ const char ** publish_devices(void);
 device_hooks * find_device(const char *);
 
 static char pci_name[] = B_PCI_MODULE_NAME;
-static pci_module_info	*pci;
+pci_module_info	*pci;
 static char mpu401_name[] = B_MPU_401_MODULE_NAME;
 generic_mpu401_module * mpu401;
 

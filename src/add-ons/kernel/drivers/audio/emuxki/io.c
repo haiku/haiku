@@ -30,54 +30,46 @@
  */
 #include <KernelExport.h>
 #include <OS.h>
+#include <PCI.h>
 #include "io.h"
 #include "emuxkireg.h"
 
-/* 
- * from BeOS R3 KernelExport.h 
- * should be replaced by PCI bus manager functions
- */
-uint8         read_io_8(int mapped_io_addr); 
-void          write_io_8(int mapped_io_addr, uint8 value); 
-uint16        read_io_16(int mapped_io_addr); 
-void          write_io_16(int mapped_io_addr, uint16 value); 
-uint32        read_io_32(int mapped_io_addr); 
-void          write_io_32(int mapped_io_addr, uint32 value);
+extern pci_module_info *pci;
 
 uint8
 emuxki_reg_read_8(device_config *config, int regno)
 {
-	return read_io_8(config->nabmbar + regno);
+	return pci->read_io_8(config->nabmbar + regno);
 }
 
 uint16
 emuxki_reg_read_16(device_config *config, int regno)
 {
-	return read_io_16(config->nabmbar + regno);
+	return pci->read_io_16(config->nabmbar + regno);
 }
 
 uint32
 emuxki_reg_read_32(device_config *config, int regno)
 {
-	return read_io_32(config->nabmbar + regno);
+	return pci->read_io_32(config->nabmbar + regno);
 }
 
 void
 emuxki_reg_write_8(device_config *config, int regno, uint8 value)
 {
-	write_io_8(config->nabmbar + regno, value);
+	pci->write_io_8(config->nabmbar + regno, value);
 }
 
 void
 emuxki_reg_write_16(device_config *config, int regno, uint16 value)
 {
-	write_io_16(config->nabmbar + regno, value);
+	pci->write_io_16(config->nabmbar + regno, value);
 }
 
 void
 emuxki_reg_write_32(device_config *config, int regno, uint32 value)
 {
-	write_io_32(config->nabmbar + regno, value);
+	pci->write_io_32(config->nabmbar + regno, value);
 }
 
 /* Emu10k1 Low level */
@@ -96,8 +88,8 @@ emuxki_chan_read(device_config *config, uint16 chano, uint32 reg)
 		offset = (reg >> 16) & 0x1f;
 		mask = ((1 << size) - 1) << offset;
 	}
-	write_io_32(config->nabmbar + EMU_PTR, ptr);
-	ptr = (read_io_32(config->nabmbar + EMU_DATA) & mask) >> offset;
+	pci->write_io_32(config->nabmbar + EMU_PTR, ptr);
+	ptr = (pci->read_io_32(config->nabmbar + EMU_DATA) & mask) >> offset;
 	return ptr;
 }
 
@@ -118,8 +110,8 @@ emuxki_chan_write(device_config *config, uint16 chano,
 		data = ((data << offset) & mask) |
 			(emuxki_chan_read(config, chano, reg & 0xFFFF) & ~mask);
 	}
-	write_io_32(config->nabmbar + EMU_PTR, ptr);
-	write_io_32(config->nabmbar + EMU_DATA, data);
+	pci->write_io_32(config->nabmbar + EMU_PTR, ptr);
+	pci->write_io_32(config->nabmbar + EMU_DATA, data);
 }
 
 /* Microcode */
@@ -208,15 +200,15 @@ emuxki_read_gpr(device_config *config, uint32 pc)
 uint16
 emuxki_codec_read(device_config *config, int regno)
 {
-	write_io_8(config->nabmbar + EMU_AC97ADDR, regno);
-	return read_io_16(config->nabmbar + EMU_AC97DATA);
+	pci->write_io_8(config->nabmbar + EMU_AC97ADDR, regno);
+	return pci->read_io_16(config->nabmbar + EMU_AC97DATA);
 }
 
 void
 emuxki_codec_write(device_config *config, int regno, uint16 value)
 {
-	write_io_8(config->nabmbar + EMU_AC97ADDR, regno);
-	write_io_16(config->nabmbar + EMU_AC97DATA, value);
+	pci->write_io_8(config->nabmbar + EMU_AC97ADDR, regno);
+	pci->write_io_16(config->nabmbar + EMU_AC97DATA, value);
 }
 
 /* inte */
