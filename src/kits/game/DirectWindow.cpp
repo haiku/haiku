@@ -21,7 +21,7 @@
 
 // Compiling for DANO/Zeta is broken as it doesn't have BRegion::set_size()
 #ifdef COMPILE_FOR_DANO
-		#warning "##### Bilding BDirectWindow for TARGET_PLATFORM=dano (DANO/Zeta) is broken #####"
+		#warning "##### Building BDirectWindow for TARGET_PLATFORM=dano (DANO/Zeta) is broken #####"
 #endif
 
 
@@ -247,48 +247,48 @@ BDirectWindow::GetClippingRegion(BRegion *region, BPoint *origin) const
 	if (IsLocked())
 		return B_ERROR;
 	
-	if (LockDirect()) {
-		if (in_direct_connect) {
-			UnlockDirect();
-			return B_ERROR;
-		}
+	if (!LockDirect())
+		return B_ERROR;
+	
+	if (in_direct_connect) {
+		UnlockDirect();
+		return B_ERROR;
+	}
 		
-		// BPoint's coordinates are floats. We can only work
-		// with integers.
-		int32 originX, originY;
-		if (origin == NULL) {
-			originX = 0;
-			originY = 0;
-		} else {
-			originX = (int32)origin->x;
-			originY = (int32)origin->y;
-		}
+	// BPoint's coordinates are floats. We can only work
+	// with integers.
+	int32 originX, originY;
+	if (origin == NULL) {
+		originX = 0;
+		originY = 0;
+	} else {
+		originX = (int32)origin->x;
+		originY = (int32)origin->y;
+	}
 
 #ifndef COMPILE_FOR_DANO
-		// Since we are friend of BRegion, we can access its private members.
-		// Otherwise, we would need to call BRegion::Include(clipping_rect)
-		// for every clipping_rect in our clip_list, and that would be much
-		// more overkill than this.
-		region->set_size(buffer_desc->clip_list_count);
-		region->count = buffer_desc->clip_list_count;		
-		region->bound = buffer_desc->clip_bounds;
-		
-		// adjust bounds by the given origin point 
-		offset_rect(region->bound, -originX, -originY);
-		
-		for (uint32 c = 0; c < buffer_desc->clip_list_count; c++) {
-			region->data[c] = buffer_desc->clip_list[c];
-			offset_rect(region->data[c], -originX, -originY);
-		}
+	// Since we are friend of BRegion, we can access its private members.
+	// Otherwise, we would need to call BRegion::Include(clipping_rect)
+	// for every clipping_rect in our clip_list, and that would be much
+	// more overkill than this (tested ).
+	region->set_size(buffer_desc->clip_list_count);
+	region->count = buffer_desc->clip_list_count;		
+	region->bound = buffer_desc->clip_bounds;
+	
+	// adjust bounds by the given origin point 
+	offset_rect(region->bound, -originX, -originY);
+	
+	for (uint32 c = 0; c < buffer_desc->clip_list_count; c++) {
+		region->data[c] = buffer_desc->clip_list[c];
+		offset_rect(region->data[c], -originX, -originY);
+	}
 		
 #endif
 
-		UnlockDirect();
+	UnlockDirect();
 
-		return B_OK;
-	}
-	
-	return B_ERROR;
+	return B_OK;
+
 }
 
 
@@ -396,10 +396,11 @@ BDirectWindow::LockDirect() const
 #if DW_NEEDS_LOCKING
 	BDirectWindow *casted = const_cast<BDirectWindow *>(this);
 	
-	if (atomic_add(&casted->direct_lock, 1) > 0) 
+	if (atomic_add(&casted->direct_lock, 1) > 0) {
 		do {
 			status = acquire_sem(direct_sem);
 		} while (status == B_INTERRUPTED);
+	}
 		
 	if (status == B_OK) {
 		casted->direct_lock_owner = find_thread(NULL);
@@ -439,55 +440,56 @@ BDirectWindow::InitData()
 	direct_driver_token = 0;	
 	direct_driver = NULL;
 
-	if (Lock()) {		
-		struct dw_sync_data sync_data;
-		status_t status = B_ERROR;
+	if (!Lock())
+		return;
+			
+	struct dw_sync_data sync_data;
+	status_t status = B_ERROR;
 
 #ifdef COMPILE_FOR_R5
-		a_session->swrite_l(DW_GET_SYNC_DATA);
-		a_session->swrite_l(server_token);
+	a_session->swrite_l(DW_GET_SYNC_DATA);
+	a_session->swrite_l(server_token);
 		
-		Flush();
+	Flush();
 		
-		a_session->sread(sizeof(sync_data), &sync_data);
-		
-		
-		a_session->sread(sizeof(status), &status);
+	a_session->sread(sizeof(sync_data), &sync_data);
+	a_session->sread(sizeof(status), &status);
 #endif		
-		Unlock();
+	
+	Unlock();
 		
-		if (status == B_OK) {
+	if (status < B_OK)
+		return;
 		
 #if DW_NEEDS_LOCKING	
-			direct_lock = 0;
-			direct_lock_count = 0;
-			direct_lock_owner = B_ERROR;
-			direct_lock_stack = NULL;
-			direct_sem = create_sem(1, "direct sem");
-			if (direct_sem > 0)
-				dw_init_status |= DW_STATUS_SEM_CREATED;
+	direct_lock = 0;
+	direct_lock_count = 0;
+	direct_lock_owner = -1;
+	direct_lock_stack = NULL;
+	direct_sem = create_sem(1, "direct sem");
+	if (direct_sem > 0)
+		dw_init_status |= DW_STATUS_SEM_CREATED;
 #endif		
  		
-			source_clipping_area = sync_data.area;
-			disable_sem = sync_data.disableSem;
-			disable_sem_ack = sync_data.disableSemAck;
-			
-			cloned_clipping_area = clone_area("Clone direct area", (void**)&buffer_desc,
-				B_ANY_ADDRESS, B_READ_AREA, source_clipping_area);		
-			if (cloned_clipping_area > 0) {			
-				dw_init_status |= DW_STATUS_AREA_CLONED;
+	source_clipping_area = sync_data.area;
+	disable_sem = sync_data.disableSem;
+	disable_sem_ack = sync_data.disableSemAck;
+		
+	cloned_clipping_area = clone_area("Clone direct area", (void**)&buffer_desc,
+		B_ANY_ADDRESS, B_READ_AREA, source_clipping_area);		
+	
+	if (cloned_clipping_area > 0) {			
+		dw_init_status |= DW_STATUS_AREA_CLONED;
 				
-				direct_deamon_id = spawn_thread(DirectDeamonFunc, "direct deamon",
-					B_DISPLAY_PRIORITY, this);
+		direct_deamon_id = spawn_thread(DirectDeamonFunc, "direct deamon",
+				B_DISPLAY_PRIORITY, this);
 			
-				if (direct_deamon_id > 0) {
-					deamon_killer = false;
-					if (resume_thread(direct_deamon_id) == B_OK)
-						dw_init_status |= DW_STATUS_THREAD_STARTED;
-					else
-						kill_thread(direct_deamon_id);
-				}
-			}
+		if (direct_deamon_id > 0) {
+			deamon_killer = false;
+			if (resume_thread(direct_deamon_id) == B_OK)
+				dw_init_status |= DW_STATUS_THREAD_STARTED;
+			else
+				kill_thread(direct_deamon_id);
 		}
 	}
 }
