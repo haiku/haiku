@@ -1164,7 +1164,7 @@ BScrollBar::_DrawArrowButton(int32 direction, BRect r, bool down)
 	if (down && fPrivateData->fDoRepeat) {	
 		light = tint_color(c, (B_DARKEN_1_TINT + B_DARKEN_2_TINT) / 2.0);
 		arrow2 = dark = tint_color(c, B_LIGHTEN_MAX_TINT);
-		normal = c;
+		normal = tint_color(c, B_DARKEN_1_TINT);
 		arrow = tint_color(c, B_DARKEN_MAX_TINT);
 	
 	} else {
@@ -1182,7 +1182,7 @@ BScrollBar::_DrawArrowButton(int32 direction, BRect r, bool down)
 			arrow2 = light = tint_color(c, B_LIGHTEN_MAX_TINT);
 			dark = tint_color(c, (B_DARKEN_1_TINT + B_DARKEN_2_TINT) / 2.0);
 			normal = c;
-			arrow = tint_color(c, B_DARKEN_MAX_TINT);
+			arrow = tint_color(c, (B_DARKEN_MAX_TINT + B_DARKEN_4_TINT) / 2.0);
 		} else {
 			arrow2 = light = tint_color(c, B_LIGHTEN_1_TINT);
 			dark = tint_color(c, B_DARKEN_1_TINT);
@@ -1223,6 +1223,13 @@ BScrollBar::_DrawArrowButton(int32 direction, BRect r, bool down)
 			break;
 		}
 	}
+	// offset triangle if down
+	if (down && fPrivateData->fDoRepeat) {
+		BPoint offset(1.0, 1.0);
+		tri1 = tri1 + offset;
+		tri2 = tri2 + offset;
+		tri3 = tri3 + offset;
+	}
 
 	r.InsetBy(1, 1);
 	SetHighColor(normal);
@@ -1230,12 +1237,13 @@ BScrollBar::_DrawArrowButton(int32 direction, BRect r, bool down)
 	
 	SetHighColor(arrow);
 	FillTriangle(tri1, tri2, tri3);
-	SetHighColor(dark);
+
+/*	SetHighColor(dark);
 	StrokeLine(tri2, tri3);
 	StrokeLine(tri1, tri3);
 
 	SetHighColor(arrow2);
-	StrokeLine(tri1, tri2);
+	StrokeLine(tri1, tri2);*/
 
 	r.InsetBy(-1, -1);
 	BeginLineArray(4);
