@@ -253,6 +253,7 @@ $mkdir -p beos/system/lib
 $mkdir -p beos/system/servers
 $mkdir -p home/config
 $mkdir -p home/config/settings/kernel/drivers
+$mkdir -p home/Desktop
 $mkdir -p var/tmp
 $mkdir -p var/log
 
