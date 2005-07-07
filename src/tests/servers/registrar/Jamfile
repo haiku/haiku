@@ -44,3 +44,28 @@ if $(TARGET_PLATFORM) = r5 {
 	
 	SEARCH on [ FGristFiles shutdown.cpp ] = [ FDirName $(OBOS_TOP) src bin ] ;
 }
+
+# Two small test apps for testing the shutdown process.
+
+local libbe ;
+if $(TARGET_PLATFORM) = r5 {
+	libbe = libopenbeos.so ;
+} else {
+	libbe = be ;
+}
+
+SimpleTest no_shutdown_reply
+	: no_shutdown_reply.cpp
+	: $(libbe)
+;
+
+SimpleTest negative_shutdown_reply
+	: negative_shutdown_reply.cpp
+	: $(libbe)
+;
+
+SimpleTest user_shutdown_reply
+	: user_shutdown_reply.cpp
+	: $(libbe)
+;
+
