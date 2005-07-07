@@ -117,6 +117,13 @@ current_team()
 thread_id
 main_thread_for(team_id team)
 {
+#ifdef __HAIKU__
+	// Under Haiku the team ID is equal to it's main thread ID. We just get
+	// a team info to verify the existence of the team.
+	team_info info;
+	status_t error = get_team_info(team, &info);
+	return (error == B_OK ? team : error);
+#else
 	// For I can't find any trace of how to explicitly get the main thread,
 	// I assume the main thread is the one with the least thread ID.
 	thread_id thread = B_BAD_TEAM_ID;
@@ -127,6 +134,7 @@ main_thread_for(team_id team)
 			thread = info.thread;
 	}
 	return thread;
+#endif
 }
 
 // is_running_on_haiku
@@ -144,6 +152,20 @@ is_running_on_haiku()
 {
 	struct utsname info;
 	return (uname(&info) == 0 && strcmp(info.sysname, "Haiku") == 0);
+}
+
+// is_app_showing_modal_window
+/*!	\brief Returns whether the application identified by the supplied
+		   \c team_id is currently showing a modal window.
+	\param team the ID of the application in question.
+	\return \c true, if the application is showing a modal window, \c false
+			otherwise.
+*/
+bool
+is_app_showing_modal_window(team_id team)
+{
+	// TODO: Implement!
+	return true;
 }
 
 } // namespace BPrivate

@@ -43,6 +43,8 @@ thread_id main_thread_for(team_id team);
 
 bool is_running_on_haiku();
 
+bool is_app_showing_modal_window(team_id team);
+
 } // namespace BPrivate
 
 // _get_object_token_
