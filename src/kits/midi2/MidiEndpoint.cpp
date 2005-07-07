@@ -26,9 +26,9 @@
 #include "MidiRosterLooper.h"
 #include "protocol.h"
 
-//------------------------------------------------------------------------------
 
-const char* BMidiEndpoint::Name() const
+const char*
+BMidiEndpoint::Name() const
 {
 	const char* str = NULL;
 
@@ -36,8 +36,7 @@ const char* BMidiEndpoint::Name() const
 	// BString::String() can change when the string is modified,
 	// e.g. to allocate more space. That's why we lock here too.
 
-	if (LockLooper())
-	{
+	if (LockLooper()) {
 		str = name.String();
 		UnlockLooper();
 	}
@@ -45,106 +44,96 @@ const char* BMidiEndpoint::Name() const
 	return str;
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiEndpoint::SetName(const char* name_)
+void
+BMidiEndpoint::SetName(const char* newName)
 {
-	if (name_ == NULL)
-	{
+	if (newName == NULL) {
 		WARN("SetName() does not accept a NULL name");
 		return;
 	}
-	else if (IsRemote())
-	{
+	if (IsRemote()) {
 		WARN("SetName() is not allowed on remote endpoints");
 		return;
 	}
-	else if (!IsValid())
-	{
+	if (!IsValid())
 		return;
-	}
-	else if (name != name_)
-	{
-		BMessage msg;
-		msg.AddString("midi:name", name_);
 
-		if (SendChangeRequest(&msg) == B_OK)
-		{
-			if (LockLooper())
-			{
-				name.SetTo(name_);
+	if (name != newName) {
+		BMessage msg;
+		msg.AddString("midi:name", newName);
+
+		if (SendChangeRequest(&msg) == B_OK) {
+			if (LockLooper()) {
+				name.SetTo(newName);
 				UnlockLooper();
 			}
 		}
 	}
 }
 
-//------------------------------------------------------------------------------
 
-int32 BMidiEndpoint::ID() const
+int32
+BMidiEndpoint::ID() const
 {
 	return id;
 }
 
-//------------------------------------------------------------------------------
 
-bool BMidiEndpoint::IsProducer() const
+bool
+BMidiEndpoint::IsProducer() const
 {
 	return !isConsumer;
 }
 
-//------------------------------------------------------------------------------
 
-bool BMidiEndpoint::IsConsumer() const
+bool
+BMidiEndpoint::IsConsumer() const
 {
 	return isConsumer;
 }
 
-//------------------------------------------------------------------------------
 
-bool BMidiEndpoint::IsRemote() const
+bool
+BMidiEndpoint::IsRemote() const
 {
 	return !isLocal;
 }
 
-//------------------------------------------------------------------------------
 
-bool BMidiEndpoint::IsLocal() const
+bool
+BMidiEndpoint::IsLocal() const
 {
 	return isLocal;
 }
 
-//------------------------------------------------------------------------------
 
-bool BMidiEndpoint::IsPersistent() const
+bool
+BMidiEndpoint::IsPersistent() const
 {
 	return false;
 }
 
-//------------------------------------------------------------------------------
 
-bool BMidiEndpoint::IsValid() const
+bool
+BMidiEndpoint::IsValid() const
 {
 	if (IsLocal())
-	{
 		return (ID() > 0);
-	}
-	else  // remote endpoint
-	{
-		return IsRegistered();
-	}
+
+	// remote endpoint
+	return IsRegistered();
 }
 
-//------------------------------------------------------------------------------
 
-status_t BMidiEndpoint::Release()
+status_t
+BMidiEndpoint::Release()
 {
 	int32 old = atomic_add(&refCount, -1);
 
 	TRACE(("BMidiEndpoint::Release refCount is now %ld", old - 1))
 
-	if (old == 1)
-	{
+	if (old == 1) {
 		// If the reference count of a local endpoint drops to zero, 
 		// we must delete it. The destructor of BMidiLocalXXX calls
 		// BMidiRoster::DeleteLocal(), which does all the hard work.
@@ -152,57 +141,47 @@ status_t BMidiEndpoint::Release()
 		// deleted if that remote endpoint no longer exists.
 
 		if (IsLocal() || !isAlive)
-		{
 			delete this;
-		}
-	}
-	else if (old <= 0)
-	{
+	} else if (old <= 0) {
 		debugger("too many calls to Release()");
 	}
 
 	return B_OK;
 }
 
-//------------------------------------------------------------------------------
 
-status_t BMidiEndpoint::Acquire()
+status_t
+BMidiEndpoint::Acquire()
 {
-	int32 old = atomic_add(&refCount, 1);
+#ifdef DEBUG
+	int32 old = 
+#endif
+	atomic_add(&refCount, 1);
 
 	TRACE(("BMidiEndpoint::Acquire refCount is now %ld", old + 1))
 
 	return B_OK;
 }
 
-//------------------------------------------------------------------------------
 
-status_t BMidiEndpoint::SetProperties(const BMessage* properties_)
+status_t
+BMidiEndpoint::SetProperties(const BMessage* properties_)
 {
-	if (properties_ == NULL)
-	{
+	if (properties_ == NULL) {
 		WARN("SetProperties() does not accept a NULL message")
 		return B_BAD_VALUE;
-	}
-	else if (IsRemote())
-	{
+	} else if (IsRemote()) {
 		WARN("SetProperties() is not allowed on remote endpoints");
 		return B_ERROR;
-	}
-	else if (!IsValid()) 
-	{
+	} else if (!IsValid())  {
 		return B_ERROR;
-	}
-	else
-	{
+	} else {
 		BMessage msg;
 		msg.AddMessage("midi:properties", properties_);
 
 		status_t err = SendChangeRequest(&msg);
-		if (err == B_OK)
-		{
-			if (LockLooper())
-			{
+		if (err == B_OK) {
+			if (LockLooper()) {
 				*properties = *properties_;
 				UnlockLooper();
 			}
@@ -212,83 +191,66 @@ status_t BMidiEndpoint::SetProperties(const BMessage* properties_)
 	}
 }
 
-//------------------------------------------------------------------------------
 
-status_t BMidiEndpoint::GetProperties(BMessage* properties_) const
+status_t
+BMidiEndpoint::GetProperties(BMessage* _properties) const
 {
-	if (properties_ == NULL)
-	{
+	if (_properties == NULL) {
 		WARN("GetProperties() does not accept NULL properties")
 		return B_BAD_VALUE;
 	}
 
-	if (LockLooper())
-	{
-		*properties_ = *properties;
+	if (LockLooper()) {
+		*_properties = *properties;
 		UnlockLooper();
 	}
 
 	return B_OK;
 }
 
-//------------------------------------------------------------------------------
 
-status_t BMidiEndpoint::Register(void)
+status_t
+BMidiEndpoint::Register(void)
 {
-	if (IsRemote())
-	{ 
+	if (IsRemote()) { 
 		WARN("You cannot Register() remote endpoints");
 		return B_ERROR; 
 	}
-	else if (IsRegistered())
-	{ 
+	if (IsRegistered()) { 
 		WARN("This endpoint is already registered");
 		return B_OK; 
 	}
-	else if (!IsValid()) 
-	{
+	if (!IsValid()) 
 		return B_ERROR;
-	}
-	else
-	{
-		return SendRegisterRequest(true);
-	}
+
+	return SendRegisterRequest(true);
 }
 
-//------------------------------------------------------------------------------
 
-status_t BMidiEndpoint::Unregister(void)
+status_t
+BMidiEndpoint::Unregister(void)
 {
-	if (IsRemote())
-	{ 
+	if (IsRemote()) { 
 		WARN("You cannot Unregister() remote endpoints");
 		return B_ERROR; 
 	}
-	else if (!IsRegistered())
-	{ 
+	if (!IsRegistered()) { 
 		WARN("This endpoint is already unregistered");
 		return B_OK; 
 	}
-	else if (!IsValid()) 
-	{
+	if (!IsValid())
 		return B_ERROR;
-	}
-	else
-	{
-		return SendRegisterRequest(false);
-	}
+
+	return SendRegisterRequest(false);
 }
 
-//------------------------------------------------------------------------------
 
 BMidiEndpoint::BMidiEndpoint(const char* name_)
 {
 	TRACE(("BMidiEndpoint::BMidiEndpoint"))
 
 	if (name_ != NULL)
-	{
 		name.SetTo(name_);
-	}
 
 	id           = 0;
 	refCount     = 0;
@@ -299,14 +261,12 @@ BMidiEndpoint::BMidiEndpoint(const char* name_)
 	properties = new BMessage;
 }
 
-//------------------------------------------------------------------------------
 
 BMidiEndpoint::~BMidiEndpoint()
 {
 	TRACE(("BMidiEndpoint::~BMidiEndpoint (%p)", this))
 
-	if (refCount > 0)
-	{
+	if (refCount > 0) {
 		debugger(
 			"you should use Release() to dispose of endpoints; "
 			"do not \"delete\" them or allocate them on the stack!");
@@ -328,16 +288,15 @@ void BMidiEndpoint::_Reserved8() { }
 
 //------------------------------------------------------------------------------
 
-status_t BMidiEndpoint::SendRegisterRequest(bool registered)
+status_t
+BMidiEndpoint::SendRegisterRequest(bool registered)
 {
 	BMessage msg;
 	msg.AddBool("midi:registered", registered);
 
 	status_t err = SendChangeRequest(&msg);
-	if (err == B_OK) 
-	{
-		if (LockLooper())
-		{
+	if (err == B_OK)  {
+		if (LockLooper()) {
 			isRegistered = registered; 
 			UnlockLooper();
 		}
@@ -346,9 +305,9 @@ status_t BMidiEndpoint::SendRegisterRequest(bool registered)
 	return err;
 }
 
-//------------------------------------------------------------------------------
 
-status_t BMidiEndpoint::SendChangeRequest(BMessage* msg)
+status_t
+BMidiEndpoint::SendChangeRequest(BMessage* msg)
 {
 	ASSERT(msg != NULL)
 
@@ -357,20 +316,19 @@ status_t BMidiEndpoint::SendChangeRequest(BMessage* msg)
 
 	BMessage reply;
 	status_t err = BMidiRoster::MidiRoster()->SendRequest(msg, &reply);
-	if (err != B_OK) { return err; }
+	if (err != B_OK)
+		return err;
 
 	status_t res;
 	if (reply.FindInt32("midi:result", &res) == B_OK)
-	{
 		return res;
-	}
 
 	return B_ERROR;
 }
 
-//------------------------------------------------------------------------------
 
-bool BMidiEndpoint::IsRegistered() const
+bool
+BMidiEndpoint::IsRegistered() const
 {
 	// No need to protect this with a lock, because reading
 	// and writing a bool is always an atomic operation.
@@ -378,18 +336,17 @@ bool BMidiEndpoint::IsRegistered() const
 	return isRegistered;
 }
 
-//------------------------------------------------------------------------------
 
-bool BMidiEndpoint::LockLooper() const
+bool
+BMidiEndpoint::LockLooper() const
 {
 	return BMidiRoster::MidiRoster()->looper->Lock();
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiEndpoint::UnlockLooper() const
+void
+BMidiEndpoint::UnlockLooper() const
 {
 	BMidiRoster::MidiRoster()->looper->Unlock();
 }
 
-//------------------------------------------------------------------------------

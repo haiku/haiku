@@ -33,8 +33,7 @@
 
 //------------------------------------------------------------------------------
 
-struct BMidiEvent 
-{
+struct BMidiEvent {
 	BMidiEvent()
 	{
 		byte1  = 0;
@@ -59,9 +58,9 @@ struct BMidiEvent
 	int32  tempo;   // beats per minute
 };
 
-//------------------------------------------------------------------------------
 
-static int compare_events(const void* event1, const void* event2)
+static int
+compare_events(const void* event1, const void* event2)
 {
 	BMidiEvent* e1 = *((BMidiEvent**) event1);
 	BMidiEvent* e2 = *((BMidiEvent**) event2);
@@ -69,7 +68,9 @@ static int compare_events(const void* event1, const void* event2)
 	return (e1->time - e2->time);
 }
 
-//------------------------------------------------------------------------------
+
+//	#pragma mark -
+
 
 BMidiStore::BMidiStore()
 {
@@ -87,22 +88,21 @@ BMidiStore::BMidiStore()
 	instruments = new bool[128];
 }
 
-//------------------------------------------------------------------------------
 
 BMidiStore::~BMidiStore()
 {
-	for (int32 t = 0; t < events->CountItems(); ++t)
-	{
+	for (int32 t = 0; t < events->CountItems(); ++t) {
 		delete EventAt(t);
 	}
+
 	delete events;
 	delete[] instruments;
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::NoteOff(
-	uchar channel, uchar note, uchar velocity, uint32 time)
+void
+BMidiStore::NoteOff(uchar channel, uchar note, uchar velocity,
+	uint32 time)
 {
 	BMidiEvent* event = new BMidiEvent;
 	event->time  = time;
@@ -113,10 +113,10 @@ void BMidiStore::NoteOff(
 	AddEvent(event);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::NoteOn(
-	uchar channel, uchar note, uchar velocity, uint32 time)
+void
+BMidiStore::NoteOn(uchar channel, uchar note,
+	uchar velocity, uint32 time)
 {
 	BMidiEvent* event = new BMidiEvent;
 	event->time  = time;
@@ -127,10 +127,10 @@ void BMidiStore::NoteOn(
 	AddEvent(event);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::KeyPressure(
-	uchar channel, uchar note, uchar pressure, uint32 time)
+void
+BMidiStore::KeyPressure(uchar channel, uchar note,
+	uchar pressure, uint32 time)
 {
 	BMidiEvent* event = new BMidiEvent;
 	event->time  = time;
@@ -141,10 +141,10 @@ void BMidiStore::KeyPressure(
 	AddEvent(event);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::ControlChange(
-	uchar channel, uchar controlNumber, uchar controlValue, uint32 time)
+void
+BMidiStore::ControlChange(uchar channel, uchar controlNumber,
+	uchar controlValue, uint32 time)
 {
 	BMidiEvent* event = new BMidiEvent;
 	event->time  = time;
@@ -155,10 +155,10 @@ void BMidiStore::ControlChange(
 	AddEvent(event);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::ProgramChange(
-	uchar channel, uchar programNumber, uint32 time)
+void
+BMidiStore::ProgramChange(uchar channel, uchar programNumber,
+	uint32 time)
 {
 	BMidiEvent* event = new BMidiEvent;
 	event->time  = time;
@@ -168,9 +168,9 @@ void BMidiStore::ProgramChange(
 	AddEvent(event);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::ChannelPressure(uchar channel, uchar pressure, uint32 time)
+void
+BMidiStore::ChannelPressure(uchar channel, uchar pressure, uint32 time)
 {
 	BMidiEvent* event = new BMidiEvent;
 	event->time  = time;
@@ -180,9 +180,9 @@ void BMidiStore::ChannelPressure(uchar channel, uchar pressure, uint32 time)
 	AddEvent(event);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::PitchBend(uchar channel, uchar lsb, uchar msb, uint32 time)
+void
+BMidiStore::PitchBend(uchar channel, uchar lsb, uchar msb, uint32 time)
 {
 	BMidiEvent* event = new BMidiEvent;
 	event->time  = time;
@@ -193,9 +193,9 @@ void BMidiStore::PitchBend(uchar channel, uchar lsb, uchar msb, uint32 time)
 	AddEvent(event);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::SystemExclusive(void* data, size_t length, uint32 time)
+void
+BMidiStore::SystemExclusive(void* data, size_t length, uint32 time)
 {
 	BMidiEvent* event = new BMidiEvent;
 	event->time   = time;
@@ -207,10 +207,10 @@ void BMidiStore::SystemExclusive(void* data, size_t length, uint32 time)
 	AddEvent(event);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::SystemCommon(
-	uchar status, uchar data1, uchar data2, uint32 time)
+void
+BMidiStore::SystemCommon(uchar status, uchar data1,
+	uchar data2, uint32 time)
 {
 	BMidiEvent* event = new BMidiEvent;
 	event->time  = time;
@@ -221,9 +221,9 @@ void BMidiStore::SystemCommon(
 	AddEvent(event);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::SystemRealTime(uchar status, uint32 time)
+void
+BMidiStore::SystemRealTime(uchar status, uint32 time)
 {
 	BMidiEvent* event = new BMidiEvent;
 	event->time  = time;
@@ -232,9 +232,9 @@ void BMidiStore::SystemRealTime(uchar status, uint32 time)
 	AddEvent(event);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::TempoChange(int32 beatsPerMinute, uint32 time)
+void
+BMidiStore::TempoChange(int32 beatsPerMinute, uint32 time)
 {
 	BMidiEvent* event = new BMidiEvent;
 	event->time  = time;
@@ -246,49 +246,40 @@ void BMidiStore::TempoChange(int32 beatsPerMinute, uint32 time)
 	AddEvent(event);
 }
 
-//------------------------------------------------------------------------------
 
-status_t BMidiStore::Import(const entry_ref* ref)
+status_t
+BMidiStore::Import(const entry_ref* ref)
 {
 	memset(instruments, 0, 128 * sizeof(bool));
 
-	try
-	{
+	try {
 		file = new BFile(ref, B_READ_ONLY);
 		if (file->InitCheck() != B_OK)
-		{
 			throw file->InitCheck();
-		}
 
 		char fourcc[4];
 		ReadFourCC(fourcc);
 		if (strncmp(fourcc, "MThd", 4) != 0)
-		{
 			throw (status_t) B_BAD_MIDI_DATA;
-		}
 
 		if (Read32Bit() != 6)
-		{
 			throw (status_t) B_BAD_MIDI_DATA;
-		}
 
 		format = Read16Bit();
 		numTracks = Read16Bit();
 		ticksPerBeat = Read16Bit();
 
-		if (ticksPerBeat & 0x8000)  // we don't support SMPTE
-		{                           // time codes, only ticks
-			ticksPerBeat = 240;     // per quarter note
+		if (ticksPerBeat & 0x8000) {
+			// we don't support SMPTE time codes, 
+			// only ticks per quarter note
+			ticksPerBeat = 240;
 		}
 
 		currTrack = 0;
-		while (currTrack < numTracks)
-		{
+		while (currTrack < numTracks) {
 			ReadChunk(); 
 		}
-	}
-	catch (status_t e)
-	{
+	} catch (status_t e) {
 		delete file;
 		file = NULL;
 		return e;
@@ -301,17 +292,14 @@ status_t BMidiStore::Import(const entry_ref* ref)
 	return B_OK;
 }
 
-//------------------------------------------------------------------------------
 
-status_t BMidiStore::Export(const entry_ref* ref, int32 format)
+status_t
+BMidiStore::Export(const entry_ref* ref, int32 format)
 {
-	try
-	{
+	try {
 		file = new BFile(ref, B_READ_WRITE);
 		if (file->InitCheck() != B_OK)
-		{
 			throw file->InitCheck();
-		}
 
 		SortEvents(true);
 
@@ -322,9 +310,7 @@ status_t BMidiStore::Export(const entry_ref* ref, int32 format)
 		Write16Bit(ticksPerBeat);
 
 		WriteTrack();
-	}
-	catch (status_t e)
-	{
+	} catch (status_t e) {
 		delete file;
 		file = NULL;
 		return e;
@@ -335,41 +321,40 @@ status_t BMidiStore::Export(const entry_ref* ref, int32 format)
 	return B_OK;
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::SortEvents(bool force)
+void
+BMidiStore::SortEvents(bool force)
 {
-	if (force || needsSorting)
-	{
+	if (force || needsSorting) {
 		events->SortItems(compare_events);
 		needsSorting = false;
 	}
 }
 
-//------------------------------------------------------------------------------
 
-uint32 BMidiStore::CountEvents() const
+uint32
+BMidiStore::CountEvents() const
 {
 	return events->CountItems();
 }
 
-//------------------------------------------------------------------------------
 
-uint32 BMidiStore::CurrentEvent() const
+uint32
+BMidiStore::CurrentEvent() const
 {
 	return currentEvent;
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::SetCurrentEvent(uint32 eventNumber)
+void
+BMidiStore::SetCurrentEvent(uint32 eventNumber)
 {
 	currentEvent = eventNumber;
 }
 
-//------------------------------------------------------------------------------
 
-uint32 BMidiStore::DeltaOfEvent(uint32 eventNumber) const
+uint32
+BMidiStore::DeltaOfEvent(uint32 eventNumber) const
 {
 	// Even though the BeBook says that the delta is the time span between
 	// an event and the first event in the list, this doesn't appear to be
@@ -379,42 +364,40 @@ uint32 BMidiStore::DeltaOfEvent(uint32 eventNumber) const
 
 	BMidiEvent* event = EventAt(eventNumber);
 	if (event != NULL)
-	{
 		return GetEventTime(event);
-	}
 
 	return 0;
 }
 
-//------------------------------------------------------------------------------
 
-uint32 BMidiStore::EventAtDelta(uint32 time) const
+uint32
+BMidiStore::EventAtDelta(uint32 time) const
 {
-	for (int32 t = 0; t < events->CountItems(); ++t)
-	{
-		if (GetEventTime(EventAt(t)) >= time) { return t; }
+	for (int32 t = 0; t < events->CountItems(); ++t) {
+		if (GetEventTime(EventAt(t)) >= time)
+			return t;
 	}
 
 	return 0;
 }
 
-//------------------------------------------------------------------------------
 
-uint32 BMidiStore::BeginTime() const
+uint32
+BMidiStore::BeginTime() const
 {
 	return startTime;
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::SetTempo(int32 beatsPerMinute_)
+void
+BMidiStore::SetTempo(int32 beatsPerMinute_)
 {
 	beatsPerMinute = beatsPerMinute_;
 }
 
-//------------------------------------------------------------------------------
 
-int32 BMidiStore::Tempo() const
+int32
+BMidiStore::Tempo() const
 {
 	return beatsPerMinute;
 }
@@ -427,7 +410,8 @@ void BMidiStore::_ReservedMidiStore3() { }
 
 //------------------------------------------------------------------------------
 
-void BMidiStore::Run()
+void
+BMidiStore::Run()
 {
 	// This rather compilicated Run() loop is not only used by BMidiStore
 	// but also by BMidiSynthFile. The "paused", "finished", and "looping"
@@ -435,57 +419,43 @@ void BMidiStore::Run()
 
 	paused = false;
 	finished = false;
-	
-	int32 timeAdjust;
-	uint32 baseTime;
+
+	int32 timeAdjust = 0;
+	uint32 baseTime = 0;
 	bool firstEvent = true;
 	bool resetTime = false;
 
-	while (KeepRunning())
-	{
-		if (paused)
-		{
+	while (KeepRunning()) {
+		if (paused) {
 			resetTime = true;
 			snooze(100000);
 			continue;
 		}
-		
+
 		BMidiEvent* event = EventAt(currentEvent);
-		
-		if (event == NULL)  // no more events
-		{
-			if (looping)
-			{
+
+		if (event == NULL) {
+			// no more events
+			if (looping) {
 				resetTime = true;
 				currentEvent = 0;
-			}
-			else
-			{
+			} else
 				break;
-			}
 		}
 
-		if (firstEvent)
-		{
+		if (firstEvent) {
 			startTime = B_NOW;
 			baseTime = startTime;
-		}
-		else if (resetTime)
-		{
+		} else if (resetTime)
 			baseTime = B_NOW;
-		}
 
-		if (firstEvent || resetTime)
-		{		
+		if (firstEvent || resetTime) {
 			timeAdjust = baseTime - GetEventTime(event);
 			SprayEvent(event, baseTime);
 			firstEvent = false;
 			resetTime = false;
-		}
-		else
-		{
+		} else
 			SprayEvent(event, GetEventTime(event) + timeAdjust);
-		}
 
 		++currentEvent;
 	}
@@ -494,29 +464,26 @@ void BMidiStore::Run()
 	paused = false;
 
 	if (hookFunc != NULL)
-	{
 		(*hookFunc)(hookArg);
-	}
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::AddEvent(BMidiEvent* event)
+void
+BMidiStore::AddEvent(BMidiEvent* event)
 {
 	events->AddItem(event);
 	needsSorting = true;
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::SprayEvent(const BMidiEvent* event, uint32 time)
+void
+BMidiStore::SprayEvent(const BMidiEvent* event, uint32 time)
 {
 	uchar byte1 = event->byte1;
 	uchar byte2 = event->byte2;
 	uchar byte3 = event->byte3;
 
-	switch (byte1 & 0xF0)
-	{
+	switch (byte1 & 0xF0) {
 		case B_NOTE_OFF:
 			SprayNoteOff((byte1 & 0x0F) + 1, byte2, byte3, time);
 			return;
@@ -546,8 +513,7 @@ void BMidiStore::SprayEvent(const BMidiEvent* event, uint32 time)
 			return;
 
 		case 0xF0:
-			switch (byte1)
-			{
+			switch (byte1) {
 				case B_SYS_EX_START:
 					SpraySystemExclusive(event->data, event->length, time);
 					return;
@@ -570,93 +536,80 @@ void BMidiStore::SprayEvent(const BMidiEvent* event, uint32 time)
 					return;
 
 				case B_SYSTEM_RESET:
-					if ((byte2 == 0x51) && (byte3 == 0x03))
-					{
+					if (byte2 == 0x51 && byte3 == 0x03) {
 						SprayTempoChange(event->tempo, time);
 						beatsPerMinute = event->tempo;
-					}
-					else
-					{
+					} else
 						SpraySystemRealTime(byte1, time);
-					}
 					return;
 			}
 			return;
 	}
 }
 
-//------------------------------------------------------------------------------
 
-BMidiEvent* BMidiStore::EventAt(int32 index) const
+BMidiEvent*
+BMidiStore::EventAt(int32 index) const
 {
-	return (BMidiEvent*) events->ItemAt(index);
+	return (BMidiEvent*)events->ItemAt(index);
 }
 
-//------------------------------------------------------------------------------
 
-uint32 BMidiStore::GetEventTime(const BMidiEvent* event) const
+uint32
+BMidiStore::GetEventTime(const BMidiEvent* event) const
 {
 	if (event->ticks)
-	{
 		return TicksToMilliseconds(event->time);
-	}
-	else
-	{
-		return event->time;
-	}
+
+	return event->time;
 }
 
-//------------------------------------------------------------------------------
 
-uint32 BMidiStore::TicksToMilliseconds(uint32 ticks) const
+uint32
+BMidiStore::TicksToMilliseconds(uint32 ticks) const
 {
-	return ((uint64) ticks * 60000) / (beatsPerMinute * ticksPerBeat);
+	return ((uint64)ticks * 60000) / (beatsPerMinute * ticksPerBeat);
 }
 
-//------------------------------------------------------------------------------
 
-uint32 BMidiStore::MillisecondsToTicks(uint32 ms) const
+uint32
+BMidiStore::MillisecondsToTicks(uint32 ms) const
 {
-	return ((uint64) ms * beatsPerMinute * ticksPerBeat) / 60000;
+	return ((uint64)ms * beatsPerMinute * ticksPerBeat) / 60000;
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::ReadFourCC(char* fourcc)
+void
+BMidiStore::ReadFourCC(char* fourcc)
 {
 	if (file->Read(fourcc, 4) != 4)
-	{
 		throw (status_t) B_BAD_MIDI_DATA;
-	}
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::WriteFourCC(char a, char b, char c, char d)
+void
+BMidiStore::WriteFourCC(char a, char b, char c, char d)
 {
 	char fourcc[4] = { a, b, c, d };
+
 	if (file->Write(fourcc, 4) != 4)
-	{
 		throw (status_t) B_ERROR;
-	}
 }
 
-//------------------------------------------------------------------------------
 
-uint32 BMidiStore::Read32Bit()
+uint32
+BMidiStore::Read32Bit()
 {
 	uint8 buf[4];
 	if (file->Read(buf, 4) != 4)
-	{
 		throw (status_t) B_BAD_MIDI_DATA;
-	}
 
-	return (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
+	return (buf[0] << 24L) | (buf[1] << 16L) | (buf[2] << 8L) | buf[3];
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::Write32Bit(uint32 val)
+void
+BMidiStore::Write32Bit(uint32 val)
 {
 	uint8 buf[4];
 	buf[0] = (val >> 24) & 0xFF;
@@ -665,128 +618,108 @@ void BMidiStore::Write32Bit(uint32 val)
 	buf[3] =  val        & 0xFF;
 
 	if (file->Write(buf, 4) != 4)
-	{
 		throw (status_t) B_ERROR;
-	}
 }
 
-//------------------------------------------------------------------------------
 
-uint16 BMidiStore::Read16Bit()
+uint16
+BMidiStore::Read16Bit()
 {
 	uint8 buf[2];
 	if (file->Read(buf, 2) != 2)
-	{
 		throw (status_t) B_BAD_MIDI_DATA;
-	}
 
 	return (buf[0] << 8) | buf[1];
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::Write16Bit(uint16 val)
+void
+BMidiStore::Write16Bit(uint16 val)
 {
 	uint8 buf[2];
-	buf[0] = (val >>  8) & 0xFF;
-	buf[1] =  val        & 0xFF;
+	buf[0] = (val >> 8) & 0xFF;
+	buf[1] = val & 0xFF;
 
 	if (file->Write(buf, 2) != 2)
-	{
 		throw (status_t) B_ERROR;
-	}
 }
 
-//------------------------------------------------------------------------------
 
-uint8 BMidiStore::PeekByte()
+uint8
+BMidiStore::PeekByte()
 {
 	uint8 buf;
 	if (file->Read(&buf, 1) != 1)
-	{
 		throw (status_t) B_BAD_MIDI_DATA;
-	}
 
 	if (file->Seek(-1, SEEK_CUR) < 0)
-	{
 		throw (status_t) B_ERROR;
-	}
 
 	return buf;
 }
 
-//------------------------------------------------------------------------------
 
-uint8 BMidiStore::NextByte()
+uint8
+BMidiStore::NextByte()
 {
 	uint8 buf;
 	if (file->Read(&buf, 1) != 1)
-	{
 		throw (status_t) B_BAD_MIDI_DATA;
-	}
 
 	--byteCount;
 	return buf;
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::WriteByte(uint8 val)
+void
+BMidiStore::WriteByte(uint8 val)
 {
 	if (file->Write(&val, 1) != 1)
-	{
 		throw (status_t) B_ERROR;
-	}
 
 	++byteCount;
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::SkipBytes(uint32 length)
+void
+BMidiStore::SkipBytes(uint32 length)
 {
-	if (file->Seek(length, SEEK_CUR) < 0)
-	{
+	if (file->Seek(length, SEEK_CUR) < 0) {
 		throw (status_t) B_BAD_MIDI_DATA;
 	}
 
 	byteCount -= length;
 }
 
-//------------------------------------------------------------------------------
 
-uint32 BMidiStore::ReadVarLength()
+uint32
+BMidiStore::ReadVarLength()
 {
 	uint32 val;
 	uint8 byte;
 
-	if ((val = NextByte()) & 0x80)
-	{
+	if ((val = NextByte()) & 0x80) {
 		val &= 0x7F;
-		do
-		{
+		do {
 			val = (val << 7) + ((byte = NextByte()) & 0x7F);
-		}
-		while (byte & 0x80);
+		} while (byte & 0x80);
 	}
 
 	return val;
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::WriteVarLength(uint32 val)
+void
+BMidiStore::WriteVarLength(uint32 val)
 {
 	uint32 buffer = val & 0x7F;
 
-	while ((val >>= 7))
-	{
+	while ((val >>= 7) != 0) {
 		buffer <<= 8;
 		buffer |= ((val & 0x7F) | 0x80);
 	}
 
-	while (true)
-	{
+	while (true) {
 		WriteByte(buffer);
 		if (buffer & 0x80)
 			buffer >>= 8;
@@ -795,9 +728,9 @@ void BMidiStore::WriteVarLength(uint32 val)
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::ReadChunk()
+void
+BMidiStore::ReadChunk()
 {
 	char fourcc[4];
 	ReadFourCC(fourcc);
@@ -805,11 +738,8 @@ void BMidiStore::ReadChunk()
 	byteCount = Read32Bit();
 
 	if (strncmp(fourcc, "MTrk", 4) == 0)
-	{
 		ReadTrack();
-	}
-	else
-	{
+	else {
 		TRACE(("Skipping '%c%c%c%c' chunk (%lu bytes)",
 			fourcc[0], fourcc[1], fourcc[2], fourcc[3], byteCount))
 
@@ -817,9 +747,9 @@ void BMidiStore::ReadChunk()
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::ReadTrack()
+void
+BMidiStore::ReadTrack()
 {
 	uint8 status = 0;
 	uint8 data1;
@@ -828,18 +758,14 @@ void BMidiStore::ReadTrack()
 
 	totalTicks = 0;
 
-	while (byteCount > 0)
-	{
+	while (byteCount > 0) {
 		uint32 ticks = ReadVarLength();
 		totalTicks += ticks;
 
 		if (PeekByte() & 0x80)
-		{
 			status = NextByte();
-		}
 
-		switch (status & 0xF0)
-		{
+		switch (status & 0xF0) {
 			case B_NOTE_OFF:
 			case B_NOTE_ON:
 			case B_KEY_PRESSURE:
@@ -867,14 +793,11 @@ void BMidiStore::ReadTrack()
 				AddEvent(event);
 
 				if ((status & 0xF0) == B_PROGRAM_CHANGE)
-				{
 					instruments[data1] = true;
-				}
 				break;
 
 			case 0xF0:
-				switch (status)
-				{
+				switch (status) {
 					case B_SYS_EX_START:
 						ReadSystemExclusive();
 						break;
@@ -930,26 +853,25 @@ void BMidiStore::ReadTrack()
 	++currTrack;
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::ReadSystemExclusive()
+void
+BMidiStore::ReadSystemExclusive()
 {
 	// We do not import sysex's from MIDI files.
 
 	SkipBytes(ReadVarLength());
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::ReadMetaEvent()
+void
+BMidiStore::ReadMetaEvent()
 {
 	// We only import the Tempo Change meta event.
 
 	uint8 type = NextByte();	
 	uint32 length = ReadVarLength();
 
-	if ((type == 0x51) && (length == 3))
-	{
+	if (type == 0x51 && length == 3) {
 		uchar data[3];
 		data[0] = NextByte();
 		data[1] = NextByte();
@@ -964,51 +886,38 @@ void BMidiStore::ReadMetaEvent()
 		event->byte3 = 0x03;
 		event->tempo = 60000000 / val;
 		AddEvent(event);
-	}
-	else
-	{
+	} else
 		SkipBytes(length);
-	}
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::WriteTrack()
+void
+BMidiStore::WriteTrack()
 {
 	WriteFourCC('M', 'T', 'r', 'k');
 	off_t lengthPos = file->Position();
 	Write32Bit(0);
 
 	byteCount = 0;
-	uint32 oldTime;
+	uint32 oldTime = 0;
 	uint32 newTime;
 
-	for (uint32 t = 0; t < CountEvents(); ++t)
-	{
+	for (uint32 t = 0; t < CountEvents(); ++t) {
 		BMidiEvent* event = EventAt(t);
 
 		if (event->ticks)
-		{
 			newTime = event->time;
-		}
 		else
-		{
 			newTime = MillisecondsToTicks(event->time);
-		}
 
 		if (t == 0)
-		{
 			WriteVarLength(0);
-		}
 		else
-		{
 			WriteVarLength(newTime - oldTime);
-		}
 
 		oldTime = newTime;
 
-		switch (event->byte1 & 0xF0)
-		{
+		switch (event->byte1 & 0xF0) {
 			case B_NOTE_OFF:
 			case B_NOTE_ON:
 			case B_KEY_PRESSURE:
@@ -1026,8 +935,7 @@ void BMidiStore::WriteTrack()
 				break;
 
 			case 0xF0:
-				switch (event->byte1)
-				{
+				switch (event->byte1) {
 					case B_SYS_EX_START:
 						// We do not export sysex's.
 						break;
@@ -1060,7 +968,6 @@ void BMidiStore::WriteTrack()
 						break;
 				}
 				break;
-			
 		}
 	}
 
@@ -1074,14 +981,13 @@ void BMidiStore::WriteTrack()
 	file->Seek(0, SEEK_END);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiStore::WriteMetaEvent(BMidiEvent* event)
+void
+BMidiStore::WriteMetaEvent(BMidiEvent* event)
 {
 	// We only export the Tempo Change meta event.
 
-	if ((event->byte2 == 0x51) && (event->byte3 == 0x03))
-	{
+	if (event->byte2 == 0x51 && event->byte3 == 0x03) {
 		uint32 val = 60000000 / event->tempo;
 
 		WriteByte(0xFF);
@@ -1093,5 +999,3 @@ void BMidiStore::WriteMetaEvent(BMidiEvent* event)
 	}
 }
 
-
-//------------------------------------------------------------------------------
