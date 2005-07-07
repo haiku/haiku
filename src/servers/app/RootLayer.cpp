@@ -1356,7 +1356,7 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 					winBorderUnder = (WinBorder*)fEventMaskLayer;
 				}
 			} else {
-				if (fLastMouseMoved != target) {
+				if (fLastMouseMoved && fLastMouseMoved != target) {
 					fViewAction = B_EXITED_VIEW;
 					if (fLastMouseMoved->fOwner) {
 						if (fLastMouseMoved != fLastMouseMoved->fOwner->fTopLayer) {
@@ -1829,6 +1829,21 @@ RootLayer::SetEventMaskLayer(Layer *lay, uint32 mask, uint32 options)
 	Unlock();
 
 	return returnValue;
+}
+
+// LayerRemoved
+void
+RootLayer::LayerRemoved(Layer* layer)
+{
+	if (layer == fEventMaskLayer) {
+		fEventMaskLayer = NULL;
+	}
+	if (layer == fLastMouseMoved) {
+		fLastMouseMoved = NULL;
+	}
+	if (layer == fMouseTargetWinBorder) {
+		fMouseTargetWinBorder = NULL;
+	}
 }
 
 void

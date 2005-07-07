@@ -103,6 +103,13 @@ ServerWindow::~ServerWindow()
 	if (!fWinBorder->IsOffscreenWindow())
 		gDesktop->RemoveWinBorder(fWinBorder);
 
+	// just to be safe
+	RootLayer* rootLayer = fWinBorder->GetRootLayer();
+	if (rootLayer && rootLayer->Lock()) {
+		rootLayer->LayerRemoved(fWinBorder);
+		rootLayer->Unlock();
+	}
+
 	delete fWinBorder;
 
 	free(const_cast<char *>(fTitle));
@@ -639,9 +646,15 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			fCurrentLayer->RemoveSelf();
 			fCurrentLayer->PruneTree();
 
-			if (invalidRegion && myRootLayer) {
-				myRootLayer->GoInvalidate(parent, *invalidRegion);
-				delete invalidRegion;
+			if (myRootLayer) {
+
+				myRootLayer->LayerRemoved(fCurrentLayer);
+
+				// trigger update
+				if (invalidRegion) {
+					myRootLayer->GoInvalidate(parent, *invalidRegion);
+					delete invalidRegion;
+				}
 			}
 			
 			#ifdef DEBUG_SERVERWINDOW
@@ -650,6 +663,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			STRACE(("DONE: ServerWindow %s: Message AS_DELETE_LAYER: Parent: %s Layer: %s\n", fTitle, parent->Name(), fCurrentLayer->Name()));
 
 			delete fCurrentLayer;
+// TODO: It is necessary to do this, but I find it very obscure.
 			fCurrentLayer = parent;
 			break;
 		}

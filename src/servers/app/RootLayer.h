@@ -123,6 +123,8 @@ public:
 
 			bool				SetEventMaskLayer(Layer *lay, uint32 mask, uint32 options);
 
+			void				LayerRemoved(Layer* layer);
+
 	static	int32				WorkingThread(void *data);
 
 			CursorManager&		GetCursorManager() { return fCursorManager; }
