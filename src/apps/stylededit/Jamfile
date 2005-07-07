@@ -32,10 +32,3 @@ SEARCH on <src!apps!stylededit>String.cpp += [ FDirName $(OBOS_TOP) src kits sup
 SEARCH on <src!apps!stylededit>strcasestr.c += [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
 
 LinkSharedOSLibs StyledEdit : be translation tracker libtextencoding.so ;
-
-App StyledEdit† :
-	[ FGristFiles $(styled_edit_files:S=$(SUFOBJ)) ]
-	: libhaiku.a : $(styled_edit_rsrc)
-	;
-
-LinkSharedOSLibs StyledEdit† : be translation tracker libtextencoding.so ;
