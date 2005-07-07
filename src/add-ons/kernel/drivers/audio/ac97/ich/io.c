@@ -27,22 +27,13 @@
  */
 #include <KernelExport.h>
 #include <OS.h>
+#include <PCI.h>
 #include "debug.h"
 #include "io.h"
 #include "ich.h"
 #include "config.h"
 
-/* 
- * from BeOS R3 KernelExport.h 
- * should be replaced by PCI bus manager functions
- */
-uint8         read_io_8(int mapped_io_addr); 
-void          write_io_8(int mapped_io_addr, uint8 value); 
-uint16        read_io_16(int mapped_io_addr); 
-void          write_io_16(int mapped_io_addr, uint16 value); 
-uint32        read_io_32(int mapped_io_addr); 
-void          write_io_32(int mapped_io_addr, uint32 value);
-
+extern pci_module_info *pci;
 
 status_t ich_codec_wait(void);
 
@@ -54,7 +45,7 @@ ich_reg_read_8(int regno)
 	if (config->type & TYPE_ICH4) 
 		return *(uint8 *)(((char *)config->log_mbbar) + regno);
 	else
-		return read_io_8(config->nabmbar + regno);
+		return pci->read_io_8(config->nabmbar + regno);
 }
 
 uint16
@@ -65,7 +56,7 @@ ich_reg_read_16(int regno)
 	if (config->type & TYPE_ICH4) 
 		return *(uint16 *)(((char *)config->log_mbbar) + regno);
 	else
-		return read_io_16(config->nabmbar + regno);
+		return pci->read_io_16(config->nabmbar + regno);
 }
 
 uint32
@@ -76,7 +67,7 @@ ich_reg_read_32(int regno)
 	if (config->type & TYPE_ICH4) 
 		return *(uint32 *)(((char *)config->log_mbbar) + regno);
 	else
-		return read_io_32(config->nabmbar + regno);
+		return pci->read_io_32(config->nabmbar + regno);
 }
 
 void
@@ -87,7 +78,7 @@ ich_reg_write_8(int regno, uint8 value)
 	if (config->type & TYPE_ICH4) 
 		*(uint8 *)(((char *)config->log_mbbar) + regno) = value;
 	else
-		write_io_8(config->nabmbar + regno, value);
+		pci->write_io_8(config->nabmbar + regno, value);
 }
 
 void
@@ -98,7 +89,7 @@ ich_reg_write_16(int regno, uint16 value)
 	if (config->type & TYPE_ICH4) 
 		*(uint16 *)(((char *)config->log_mbbar) + regno) = value;
 	else
-		write_io_16(config->nabmbar + regno, value);
+		pci->write_io_16(config->nabmbar + regno, value);
 }
 
 void
@@ -109,7 +100,7 @@ ich_reg_write_32(int regno, uint32 value)
 	if (config->type & TYPE_ICH4) 
 		*(uint32 *)(((char *)config->log_mbbar) + regno) = value;
 	else
-		write_io_32(config->nabmbar + regno, value);
+		pci->write_io_32(config->nabmbar + regno, value);
 }
 
 status_t
@@ -140,7 +131,7 @@ ich_codec_read(int regno)
 	if (config->type & TYPE_ICH4) 
 		return *(uint16 *)(((char *)config->log_mmbar) + regno);
 	else
-		return read_io_16(config->nambar + regno);
+		return pci->read_io_16(config->nambar + regno);
 }
 
 void
@@ -158,5 +149,5 @@ ich_codec_write(int regno, uint16 value)
 	if (config->type & TYPE_ICH4) 
 		*(uint16 *)(((char *)config->log_mmbar) + regno) = value;
 	else
-		write_io_16(config->nambar + regno, value);
+		pci->write_io_16(config->nambar + regno, value);
 }

@@ -35,6 +35,8 @@
 #include "config.h"
 #include "ich.h"
 
+extern pci_module_info *pci;
+
 device_config c;
 device_config *config = &c;
 
@@ -76,7 +78,6 @@ struct device_item {
 status_t
 probe_device(void)
 {
-	pci_module_info *pcimodule;
 	struct pci_info info; 
 	struct pci_info *pciinfo = &info;
 	int index;
@@ -89,12 +90,7 @@ probe_device(void)
 
 	result = B_OK;
 
-	if (get_module(B_PCI_MODULE_NAME,(module_info **)&pcimodule) < 0) {
-		PRINT(("ERROR: couldn't load PCI module\n"));
-		return B_ERROR; 
-	}
-
-	for (index = 0; B_OK == pcimodule->get_nth_pci_info(index, pciinfo); index++) { 
+	for (index = 0; B_OK == pci->get_nth_pci_info(index, pciinfo); index++) { 
 		LOG(("Checking PCI device, vendor 0x%04x, id 0x%04x, bus 0x%02x, dev 0x%02x, func 0x%02x, rev 0x%02x, api 0x%02x, sub 0x%02x, base 0x%02x\n",
 			pciinfo->vendor_id, pciinfo->device_id, pciinfo->bus, pciinfo->device, pciinfo->function,
 			pciinfo->revision, pciinfo->class_api, pciinfo->class_sub, pciinfo->class_base));
@@ -135,12 +131,12 @@ probe_ok:
 	/* for ICH4 enable memory mapped IO and busmaster access,
 	 * for old ICHs enable programmed IO and busmaster access
 	 */
-	value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_PCICMD, 2);
+	value = pci->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_PCICMD, 2);
 	if (config->type & TYPE_ICH4)
 		value |= PCI_PCICMD_MSE | PCI_PCICMD_BME;
 	else
 		value |= PCI_PCICMD_IOS | PCI_PCICMD_BME;
-	pcimodule->write_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_PCICMD, 2, value);
+	pci->write_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_PCICMD, 2, value);
 		
 	#if DEBUG
 		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_PCICMD, 2);
@@ -149,11 +145,11 @@ probe_ok:
 
 	/* read memory-io and port-io bars
 	 */
-	config->nambar	= pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x10, 4);
-	config->nabmbar	= pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x14, 4);
-	config->mmbar	= pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x18, 4);
-	config->mbbar	= pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x1C, 4);
-	config->irq		= pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x3C, 1);
+	config->nambar	= pci->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x10, 4);
+	config->nabmbar	= pci->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x14, 4);
+	config->mmbar	= pci->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x18, 4);
+	config->mbbar	= pci->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x1C, 4);
+	config->irq		= pci->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x3C, 1);
 
 	if (config->irq == 0 || config->irq == 0xff) {
 		PRINT(("WARNING: no interrupt configured\n"));
@@ -182,6 +178,5 @@ probe_ok:
 	LOG(("irq     = %d\n",    config->irq));
 
 probe_done:
-	put_module(B_PCI_MODULE_NAME);
 	return result;
 }

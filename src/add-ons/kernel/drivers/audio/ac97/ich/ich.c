@@ -32,6 +32,7 @@
 #include <Drivers.h>
 #include <Errors.h>
 #include <OS.h>
+#include <PCI.h>
 #include <malloc.h>
 #include "debug.h"
 #include "config.h"
@@ -42,6 +43,7 @@
 #include "ac97.h"
 
 int32 			api_version = B_CUR_DRIVER_API_VERSION;
+pci_module_info *pci;
 
 volatile bool	int_thread_exit = false;
 thread_id 		int_thread_id = -1;
@@ -472,10 +474,14 @@ init_driver(void)
 	LOG(("init_driver\n"));
 	
 	ASSERT(sizeof(ich_bd) == 8);
+
+	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci))
+                return ENOSYS;
 	
 	rv = probe_device();
 	if (rv != B_OK) {
 		LOG(("No supported audio hardware found.\n"));
+		put_module(B_PCI_MODULE_NAME);
 		return B_ERROR;
 	}
 
@@ -487,6 +493,7 @@ init_driver(void)
 	rv = map_io_memory();
 	if (rv != B_OK) {
 		PRINT(("mapping of memory IO space failed\n"));
+		put_module(B_PCI_MODULE_NAME);
 		return B_ERROR;
 	}
 	
@@ -524,6 +531,7 @@ init_driver(void)
 	if (i == 20) {
 		LOG(("reset failed, ICH_REG_GLOB_CNT = 0x%08x\n", val));
 		unmap_io_memory();
+		put_module(B_PCI_MODULE_NAME);
 		return B_ERROR;
 	}
 	LOG(("reset finished after %Ld, ICH_REG_GLOB_CNT = 0x%08x\n", system_time() - start, val));
@@ -563,6 +571,7 @@ init_driver(void)
 	if (!s0cr && !s1cr && !s2cr) {
 		PRINT(("compatible chipset found, but no codec ready!\n"));
 		unmap_io_memory();
+		put_module(B_PCI_MODULE_NAME);
 		return B_ERROR;
 	}
 
@@ -622,6 +631,7 @@ init_driver(void)
 		PRINT(("couldn't allocate memory for channel descriptors!\n"));
 		chan_free_resources();
 		unmap_io_memory();
+		put_module(B_PCI_MODULE_NAME);
 		return B_ERROR;	
 	}
 
@@ -644,6 +654,7 @@ init_driver(void)
 		PRINT(("couldn't allocate memory for DMA buffers!\n"));
 		chan_free_resources();
 		unmap_io_memory();
+		put_module(B_PCI_MODULE_NAME);
 		return B_ERROR;	
 	}
 
@@ -656,6 +667,7 @@ init_driver(void)
 		PRINT(("couldn't create semaphores!\n"));
 		chan_free_resources();
 		unmap_io_memory();
+		put_module(B_PCI_MODULE_NAME);
 		return B_ERROR;	
 	}
 
@@ -786,6 +798,8 @@ uninit_driver(void)
 
 	/* the very last thing to do is unmap the io memory */
 	unmap_io_memory();
+
+	put_module(B_PCI_MODULE_NAME);
 
 	LOG(("uninit_driver() finished\n"));
 }
