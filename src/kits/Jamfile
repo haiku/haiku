@@ -82,6 +82,7 @@ SharedLibrary beadapter :
 	LibBeAdapter.cpp
 	strlcat.c
 	strlcpy.c
+	strcasestr.c
 ;
 LinkSharedOSLibs libbeadapter.so :
 	be
@@ -98,7 +99,7 @@ Includes <boot!home!config!lib>libopenbeos.so
 	: <boot!home!config!lib>libbeadapter.so ;
 
 SEARCH on [ FGristFiles
-		strlcat.c strlcpy.c
+		strlcat.c strlcpy.c strcasestr.c
 	] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
 
 SEARCH on [ FGristFiles KMessage.cpp ]
