@@ -152,6 +152,7 @@ echo "Building executables and libraries..."
 
 jam -j$(sysinfo -cpu | head -c 2) -q rc resattr kernel boot_loader \
 	rld.so kernel_fortune consoled \<bin\>route \
+	Tracker Deskbar \
 	$BEOS_BIN \
 	$BEOS_APPS \
 	$BEOS_PREFERENCES \
@@ -355,12 +356,18 @@ for f in $BEOS_APPS; do
 	$cp ${sPrefix}$f $targetDir/beos/apps/
 done
 
+
 cd $sourceDir/distro/${arch}.R1/beos/preferences
 $scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/preferences
 for f in $BEOS_PREFERENCES; do
 	$cp ${sPrefix}$f $targetDir/beos/preferences/
 done
 
+cd $sourceDir/distro/${arch}.R1/beos/system
+$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system
+for f in Deskbar Tracker; do
+	$cp ${sPrefix}$f $targetDir/beos/system/
+done
 
 # scripts and data files
 echo "Installing scripts and data files..."
