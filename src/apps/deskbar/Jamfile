@@ -34,6 +34,8 @@ App Deskbar :
 	Switcher.cpp
 	;
 
+MakeLocate Deskbar : [ FDirName $(OBOS_KERNEL_DIR) ] ;
+
 if $(TARGET_PLATFORM) = haiku {
 	# link for Haiku
 

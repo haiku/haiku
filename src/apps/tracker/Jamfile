@@ -12,3 +12,5 @@ App Tracker :
 
 LinkSharedOSLibs Tracker : libbe.so libtracker.so ;
 
+MakeLocate Tracker : [ FDirName $(OBOS_KERNEL_DIR) ] ;
+
