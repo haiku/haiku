@@ -22,14 +22,14 @@ Objects $(styled_edit_files) ;
 
 App StyledEdit :
 	[ FGristFiles $(styled_edit_files:S=$(SUFOBJ)) ]
-	# OBOS String
+	# Haiku String
 	String.cpp
-	string_helper.cpp
+	strcasestr.c
 	: : $(styled_edit_rsrc)
 	;
 
 SEARCH on <src!apps!stylededit>String.cpp += [ FDirName $(OBOS_TOP) src kits support ] ;
-SEARCH on <src!apps!stylededit>string_helper.cpp += [ FDirName $(OBOS_TOP) src kits support ] ;
+SEARCH on <src!apps!stylededit>strcasestr.c += [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
 
 LinkSharedOSLibs StyledEdit : be translation tracker libtextencoding.so ;
 
