@@ -56,7 +56,7 @@ const char ** publish_devices(void);
 device_hooks * find_device(const char *);
 
 static char pci_name[] = B_PCI_MODULE_NAME;
-static pci_module_info	*pci;
+pci_module_info	*pci;
 
 int32 num_cards;
 auvia_dev cards[NUM_CARDS];
@@ -358,7 +358,8 @@ auvia_stream_delete(auvia_stream *stream)
 
 /* Auvia interrupt */
 
-int32 auvia_int(void *arg)
+static int32 
+auvia_int(void *arg)
 {
 	auvia_dev	 *card = arg;
 	bool gotone = false;
@@ -447,14 +448,14 @@ auvia_init(auvia_dev * card)
 	uint32 pr;
 
 	pr = (*pci->read_pci_config)(card->info.bus, card->info.device, card->info.function, AUVIA_PCICONF_JUNK, 4);
-	PRINT(("AUVIA_PCICONF_JUNK before: %x\n", pr));
+	PRINT(("AUVIA_PCICONF_JUNK before: %lx\n", pr));
 	pr &= ~AUVIA_PCICONF_ENABLES;
 	pr |= AUVIA_PCICONF_ACLINKENAB | AUVIA_PCICONF_ACNOTRST | AUVIA_PCICONF_ACVSR | AUVIA_PCICONF_ACSGD;
 	pr &= ~(AUVIA_PCICONF_ACFM | AUVIA_PCICONF_ACSB);
 	(*pci->write_pci_config)(card->info.bus, card->info.device, card->info.function, AUVIA_PCICONF_JUNK, 4, pr );
 	snooze(100); 
 	pr = (*pci->read_pci_config)(card->info.bus, card->info.device, card->info.function, AUVIA_PCICONF_JUNK, 4);
-	PRINT(("AUVIA_PCICONF_JUNK after: %x\n", pr));
+	PRINT(("AUVIA_PCICONF_JUNK after: %lx\n", pr));
 
 	if(IS_8233(&card->config)) {
 		card->interrupt_mask = 
@@ -497,7 +498,7 @@ auvia_setup(auvia_dev * card)
 	if(card->info.device_id == VIATECH_8233_AC97_DEVICE_ID)
 		card->config.type |= TYPE_8233;
 	
-	PRINT(("%s deviceid = %#04x chiprev = %x model = %x enhanced at %x\n", card->name, card->info.device_id,
+	PRINT(("%s deviceid = %#04x chiprev = %x model = %x enhanced at %lx\n", card->name, card->info.device_id,
 		card->info.revision, card->info.u.h0.subsystem_id, card->config.nabmbar));
 		
 	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device, card->info.function, PCI_command, 2);
@@ -514,11 +515,11 @@ auvia_setup(auvia_dev * card)
 	ac97_init(&card->config);
 	ac97_amp_enable(&card->config, true);
 
-	PRINT(("codec vendor id      = %#08x\n",ac97_get_vendor_id(&card->config)));
+	PRINT(("codec vendor id      = %#08lx\n",ac97_get_vendor_id(&card->config)));
 	PRINT(("codec description     = %s\n",ac97_get_vendor_id_description(&card->config)));
 	PRINT(("codec 3d enhancement = %s\n",ac97_get_3d_stereo_enhancement(&card->config)));
 	
-	PRINT(("installing interrupt : %x\n", card->config.irq));
+	PRINT(("installing interrupt : %lx\n", card->config.irq));
 	install_io_interrupt_handler(card->config.irq, auvia_int, card, 0);
 		
 	/*PRINT(("codec master output = %#04x\n",auvia_codec_read(&card->config, 0x02)));

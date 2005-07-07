@@ -33,52 +33,44 @@
 #include "io.h"
 #include "auviareg.h"
 #include "debug.h"
+#include <PCI.h>
 
-/* 
- * from BeOS R3 KernelExport.h 
- * should be replaced by PCI bus manager functions
- */
-uint8         read_io_8(int mapped_io_addr); 
-void          write_io_8(int mapped_io_addr, uint8 value); 
-uint16        read_io_16(int mapped_io_addr); 
-void          write_io_16(int mapped_io_addr, uint16 value); 
-uint32        read_io_32(int mapped_io_addr); 
-void          write_io_32(int mapped_io_addr, uint32 value);
+extern pci_module_info  *pci;
 
 uint8
 auvia_reg_read_8(device_config *config, int regno)
 {
-	return read_io_8(config->nabmbar + regno);
+	return pci->read_io_8(config->nabmbar + regno);
 }
 
 uint16
 auvia_reg_read_16(device_config *config, int regno)
 {
-	return read_io_16(config->nabmbar + regno);
+	return pci->read_io_16(config->nabmbar + regno);
 }
 
 uint32
 auvia_reg_read_32(device_config *config, int regno)
 {
-	return read_io_32(config->nabmbar + regno);
+	return pci->read_io_32(config->nabmbar + regno);
 }
 
 void
 auvia_reg_write_8(device_config *config, int regno, uint8 value)
 {
-	write_io_8(config->nabmbar + regno, value);
+	pci->write_io_8(config->nabmbar + regno, value);
 }
 
 void
 auvia_reg_write_16(device_config *config, int regno, uint16 value)
 {
-	write_io_16(config->nabmbar + regno, value);
+	pci->write_io_16(config->nabmbar + regno, value);
 }
 
 void
 auvia_reg_write_32(device_config *config, int regno, uint32 value)
 {
-	write_io_32(config->nabmbar + regno, value);
+	pci->write_io_32(config->nabmbar + regno, value);
 }
 
 /* codec */
@@ -91,7 +83,7 @@ auvia_codec_waitready(device_config *config)
 	int i;
 	
 	/* poll until codec not busy */
-	for(i=0; (i<AUVIA_TIMEOUT) && (read_io_32(config->nabmbar 
+	for(i=0; (i<AUVIA_TIMEOUT) && (pci->read_io_32(config->nabmbar 
 		+ AUVIA_CODEC_CTL) & AUVIA_CODEC_BUSY) ; i++)
 		snooze(1);
 	if(i>=AUVIA_TIMEOUT) {
@@ -107,7 +99,7 @@ auvia_codec_waitvalid(device_config *config)
 	int i;
 	
 	/* poll until codec valid */
-	for(i=0; (i<AUVIA_TIMEOUT) && !(read_io_32(config->nabmbar 
+	for(i=0; (i<AUVIA_TIMEOUT) && !(pci->read_io_32(config->nabmbar 
 		+ AUVIA_CODEC_CTL) & AUVIA_CODEC_PRIVALID) ; i++)
 		snooze(1);
 	if(i>=AUVIA_TIMEOUT) {
@@ -124,7 +116,7 @@ auvia_codec_read(device_config *config, int regno)
 		PRINT(("codec busy (1)\n"));
 		return -1;
 	}
-	write_io_32(config->nabmbar + AUVIA_CODEC_CTL, 
+	pci->write_io_32(config->nabmbar + AUVIA_CODEC_CTL, 
 		AUVIA_CODEC_PRIVALID | AUVIA_CODEC_READ | AUVIA_CODEC_INDEX(regno));
 	
 	if(auvia_codec_waitready(config)!=B_OK) {
@@ -136,7 +128,7 @@ auvia_codec_read(device_config *config, int regno)
 		return -1;
 	}
 	
-	return read_io_16(config->nabmbar + AUVIA_CODEC_CTL);
+	return pci->read_io_16(config->nabmbar + AUVIA_CODEC_CTL);
 }
 
 void
@@ -146,6 +138,6 @@ auvia_codec_write(device_config *config, int regno, uint16 value)
 		PRINT(("codec busy (4)\n"));
 		return;
 	}
-	write_io_32(config->nabmbar + AUVIA_CODEC_CTL, 
+	pci->write_io_32(config->nabmbar + AUVIA_CODEC_CTL, 
 		AUVIA_CODEC_PRIVALID | AUVIA_CODEC_INDEX(regno) | value);
 }
