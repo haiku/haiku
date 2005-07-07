@@ -14,7 +14,7 @@ To build Haiku you also need Oliver Tappe's GCC 2.95.3. You can get it at BeBits
 
   http://www.bebits.com/app/4011
 
-Older versions of GCC 2.95.3 will likly not work.
+Older versions of GCC 2.95.3 will likely not work.
 
 
 Configuring
@@ -26,7 +26,7 @@ can run configure like this:
   $ ./configure --target=TARGET
 
 Where "TARGET" is the target platform for the build. Valid targets are "r5", "bone",
-"dano" and "haiku". If you omit the target it defaults to "haiku". To configure for Zeta
+"dano" and "haiku". If you omit the target it defaults to "haiku". To configure for ZETA
 use the "dano" target.
 
 The configure script generates a file named "BuildConfig" in the "build" directory.
