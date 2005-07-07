@@ -43,9 +43,6 @@
 //----------------------------------------------------------------
 //----- BScrollBar class -----------------------------------------
 
-class BScrollArrowButton;
-class BScrollBarPrivateData;
-
 class BScrollBar : public BView {
 
 public:
@@ -104,29 +101,36 @@ virtual status_t	Perform(perform_code d, void *arg);
 
 private:
 		class Private;
-		friend class BScrollArrowButton;
 		friend class Private;
+
 		friend status_t control_scrollbar(scroll_bar_info *info, BScrollBar *bar);		// for use within the preflet
+
 virtual	void		_ReservedScrollBar1();
 virtual	void		_ReservedScrollBar2();
 virtual	void		_ReservedScrollBar3();
 virtual	void		_ReservedScrollBar4();
 
 		BScrollBar	&operator=(const BScrollBar &);
-		void 		DoScroll(float delta);
 
-		void		InitObject(float min, float max, orientation o, BView *t);
+		bool		_DoubleArrows() const;
+		void		_UpdateThumbFrame();
+		float		_ValueFor(BPoint where) const;
+		int32		_ButtonFor(BPoint where) const;
+		BRect		_ButtonRectFor(int32 button) const;
+		void		_UpdateTargetValue(BPoint where);
+		void		_UpdateArrowButtons();
+		void		_DrawArrowButton(int32 direction,
+									 BRect frame, bool down);
 		
-		void		DrawButtons(BRect updateRect);
+
+/*		void		DrawButtons(BRect updateRect);
 		void		DrawArrow(BPoint pos, int32 which, bool pressed = false);
 		void		DrawButton(BRect frame, int32 arrowType, bool pressed = false); 
-		
-		bool		DoubleArrows() const;
-		
+			
 		BRect		BarFrame() const;
 		BRect		KnobFrame() const;
 		float		ValueToPosition(float val) const;
-		float 		PositionToValue(float pos) const;
+		float 		PositionToValue(float pos) const;*/
 		
 		float		fMin;
 		float		fMax;
@@ -136,9 +140,9 @@ virtual	void		_ReservedScrollBar4();
 		float		fProportion;
 		BView*		fTarget;	
 		orientation	fOrientation;
-		char		*fTargetName;
+		char*		fTargetName;
 
-		Private *fPrivateData;
+		Private*	fPrivateData;
 
 		uint32		_reserved[3];
 };

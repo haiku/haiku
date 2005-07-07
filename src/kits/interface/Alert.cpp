@@ -620,12 +620,15 @@ BAlert::InitIcon()
 	// After a bit of a search, I found the icons in app_server. =P
 	BBitmap* icon = NULL;
 	BPath path;
-	if (find_directory(B_BEOS_SERVERS_DIRECTORY, &path) == B_OK) {
+	status_t status = find_directory(B_BEOS_SERVERS_DIRECTORY, &path);
+	if (status >= B_OK) {
 		path.Append("app_server");
 		BFile file;
-		if (file.SetTo(path.Path(), B_READ_ONLY) == B_OK) {
+		status = file.SetTo(path.Path(), B_READ_ONLY);
+		if (status >= B_OK) {
 			BResources resources;
-			if (resources.SetTo(&file) == B_OK) {
+			status = resources.SetTo(&file);
+			if (status >= B_OK) {
 				// Which icon are we trying to load?
 				const char* iconName = "";	// Don't want any seg faults
 				switch (fMsgType) {
@@ -657,9 +660,17 @@ BAlert::InitIcon()
 					// Now build the bitmap
 					icon = new BBitmap(BRect(0, 0, 31, 31), 0, B_CMAP8);
 					icon->SetBits(rawIcon, size, 0, B_CMAP8);
+				} else {
+					fprintf(stderr, "BAlert::InitIcon() - Icon resource not found\n");
 				}
+			} else {
+				fprintf(stderr, "BAlert::InitIcon() - BResources init failed: %s\n", strerror(status));
 			}
+		} else {
+			fprintf(stderr, "BAlert::InitIcon() - BFile init failed: %s\n", strerror(status));
 		}
+	} else {
+		fprintf(stderr, "BAlert::InitIcon() - find_directory failed: %s\n", strerror(status));
 	}
 
 	if (!icon) {

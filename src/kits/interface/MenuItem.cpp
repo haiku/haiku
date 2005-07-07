@@ -613,6 +613,8 @@ BMenuItem::Select(bool on)
 void
 BMenuItem::DrawMarkSymbol()
 {
+	fSuper->SetDrawingMode(B_OP_OVER);
+
 	fSuper->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
 		B_DARKEN_1_TINT));
 	fSuper->StrokeLine(BPoint(fBounds.left + 6.0f, fBounds.bottom - 3.0f),
@@ -631,6 +633,8 @@ BMenuItem::DrawMarkSymbol()
 		BPoint(fBounds.left + 3.0f, fBounds.bottom - 9.0f));
 	fSuper->StrokeLine(BPoint(fBounds.left + 4.0f, fBounds.bottom - 4.0f),
 		BPoint(fBounds.left + 2.0f, fBounds.bottom - 9.0f));
+
+	fSuper->SetDrawingMode(B_OP_COPY);
 }
 
 
