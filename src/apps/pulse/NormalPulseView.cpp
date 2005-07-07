@@ -216,7 +216,11 @@ NormalPulseView::Draw(BRect rect)
 
 	// Draw processor type and speed
 	char buf[500];
-	sprintf(buf, "%d MHz", CalculateCPUSpeed());
+	int cpu_speed = CalculateCPUSpeed();
+	if (cpu_speed > 1000)
+		sprintf(buf, "%.2f Ghz", cpu_speed / 1000.0f);
+	else
+		sprintf(buf, "%d MHz", cpu_speed);
 	SetDrawingMode(B_OP_OVER);
 	SetHighColor(240, 240, 240);
 	SetFontSize(fProcessorFontSize);
