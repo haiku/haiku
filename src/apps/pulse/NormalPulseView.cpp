@@ -218,7 +218,7 @@ NormalPulseView::Draw(BRect rect)
 	char buf[500];
 	int cpu_speed = CalculateCPUSpeed();
 	if (cpu_speed > 1000)
-		sprintf(buf, "%.2f Ghz", cpu_speed / 1000.0f);
+		sprintf(buf, "%.2f GHz", cpu_speed / 1000.0f);
 	else
 		sprintf(buf, "%d MHz", cpu_speed);
 	SetDrawingMode(B_OP_OVER);

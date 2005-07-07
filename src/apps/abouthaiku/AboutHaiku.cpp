@@ -199,9 +199,9 @@ AboutView::AboutView(const BRect &r)
 	r.bottom = r.top + textHeight;
 
 	if (systemInfo.cpu_clock_speed < 1000000000)
-		sprintf(string,"%d Mhz", int(systemInfo.cpu_clock_speed / 1000000.0f));
+		sprintf(string,"%d MHz", int(systemInfo.cpu_clock_speed / 1000000.0f));
 	else
-		sprintf(string,"%.2f Ghz", systemInfo.cpu_clock_speed / 1000000000.0f);
+		sprintf(string,"%.2f GHz", systemInfo.cpu_clock_speed / 1000000000.0f);
 
 	stringView = new BStringView(r, "mhztext", string);
 	fInfoView->AddChild(stringView);
