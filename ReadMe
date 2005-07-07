@@ -1,133 +1,113 @@
-NOTE: the information in this file is tremendously outdated.
-The preferred method to build Haiku (currently only possible on a BeOS machine)
-is this (when you're in the "current" directory):
-	$ configure
-	$ makehdimage /Haiku
-
-Where /Haiku is the (mounted) partition of where you want to install Haiku on.
-If the parameter is omitted, the makehdimage currently creates a 60 MB Haiku image in this directory that you can use for Bochs, Qemu and other emulators to boot.
-You need a Jam 2.5 build from our sources, and GCC 2.95.3 to be able to build Haiku successfully.
-
-Go bug us to update this file for real!
-
-
-Building
+Setting Up
 --------
 
 The build system uses Jam/MR (http://www.perforce.com/jam/jam.html).
-A BeOS executable of Jam 2.4 is available at:
+A BeOS executable of Jam 2.5 is available at:
 
-  http://open-beos.sf.net/misc/jam.zip
+  http://haiku-os.org/downloads.php?mode=download&id=10&mirror=0
 
 Unzip the executable and copy it to /boot/home/config/bin.
 The Jam source code is also included in the source tree. You can as well cd
 into "src/tools/jam" and run "make" to obtain an executable.
 
-To build the whole source tree, launch a Terminal, cd into the openbeos root
-directory and just type:
+To build Haiku you also need Oliver Tappe's GCC 2.95.3. You can get it at BeBits:
 
-  $ ./configure
+  http://www.bebits.com/app/4011
+
+Older versions of GCC 2.95.3 will likly not work.
+
+
+Configuring
+--------
+
+Open a Terminal and change to your Haiku trunk folder. To configure the build you
+can run configure like this:
+
+  $ ./configure --target=TARGET
+
+Where "TARGET" is the target platform for the build. Valid targets are "r5", "bone",
+"dano" and "haiku". If you omit the target it defaults to "haiku". To configure for Zeta
+use the "dano" target.
+
+The configure script generates a file named "BuildConfig" in the "build" directory.
+As long as configure is not modified (!), there is no need to call it again. That is for
+re-building you only need to invoke Jam or makehdimage (see below).
+If you don't update the source tree very frequently, you may want to execute
+configure after each update just to be on the safe side.
+
+
+Building
+--------
+
+The preferred method to build Haiku (currently only possible on a BeOS machine)
+is this:
+
+  $ makehdimage /Haiku
+
+Where "/Haiku" is the (mounted) partition of where you want to install Haiku on.
+If the parameter is omitted, makehdimage currently creates a 60 MB Haiku image in
+this directory that you can use for Bochs, Qemu and other emulators to boot.
+
+To build the whole source tree for your selected target platform (to use the apps,
+drivers, add-ons, etc.) you can simply invoke Jam:
+
   $ jam
 
-The configure script generates a file named BuildConfig. As long as configure
-is not modified (!), there is no need to call it again. That is for
-re-building you only need to invoke Jam. If you don't update the source tree
-very frequently, you may want to execute configure after each update just to
-be on the safe side.
+Or to build only a specific app/driver/etc. include it as an argument:
 
-NOTE: If you have checked out the latest CVS version, it is not unlikely that
+  $ jam Pulse
+
+NOTE: If you have checked out the latest SVN revision, it is not unlikely that
 some parts of the tree won't build.
 
 
 Running
 -------
 
-If the build went fine, a file named floppy.x86 had been created in the
-target specific objects directory (objects/x86.R1 for x86 machines).
-What you want to do now, is to boot from this floppy image. Therefore you
-either write the image onto a real floppy disk and restart you computer, or
-you write it onto a "virtual floppy disk" emulated by a x86 PC emulator and
-just start this emulator.
+Generally there are two ways of running Haiku. On real hardware using a partition
+and on emulated hardware using an emulator like Bochs.
 
-1. Real Floppy
+1. On Real Hardware
 
-Put in the disk and type in the source tree's root dir:
+If you have installed Haiku to it's own partition you can include this partition in
+your bootmanager and try to boot Haiku like any other OS you have installed.
+To include a new partition in the BeOS bootmanager run this in a Terminal:
 
-  $ dd if=objects/x86.R1/floppy.x86  of=/dev/disk/floppy/raw bs=18k
+  $ bootman
 
+And follow the steps of the installer.
 
-2. Emulated Floppy (Bochs)
+2. On Emulated Hardware
 
-Type:
-
-  $ dd if=objects/x86.R1/floppy.x86  of=<floppy image> bs=18k
-
-where <floppy image> has to be replaced with the filename of the floppy
-image Bochs has been told to use (e.g. /tmp/obos.img).
-
-For both cases there is also an simpler way:
-
-  $ jam installfloppy
-
-This builds the floppy image, if it is not up to date, and writes it to a
-previously specified location. Therefore you must tell configure where this
-location is:
-
-  $ ./configure --floppy /dev/disk/floppy/raw
-
-Ananlogously for the emulated floppy.
+For emulated hardware you should build a "haiku.image" using makehdimage without
+arguments. How to setup this image depends on your emulater. A tutorial for Bochs
+on BeOS is below.
 
 
 Bochs
 -----
 
-Version 1.4 of Bochs for BeOS (BeBochs) can be downloaded from BeBits:
+Version 2.2 of Bochs for BeOS (BeBochs) can be downloaded from BeBits:
 
-  http://www.bebits.com/app/2902
+  http://www.bebits.com/app/3324
 
-The package installs to: /boot/apps/BeBochs1.4
+The package installs to: /boot/apps/BeBochs2.2
 
-You have to set up a configuration for Bochs. A relatively short and
-painless procedure follows:
+You have to set up a configuration for Bochs. You should edit the ".bochsrc" to include
+the following:
 
-Lauch a Terminal:
+ata0-master: type=disk, path="/path/to/haiku.image", cylinders=122, heads=16, spt=63
+boot: disk
 
-  $ cd /tmp
-  $ /boot/apps/BeBochs1.4/bximage
+Now you can start Bochs:
 
-Answer with "fd", RETURN (for 1.44) and "obos.img", and a floppy image
-/tmp/obos.img will be created.
-Open folder /boot/apps/BeBochs1.4 and backup .bochsrc. Open .bochsrc with
-your favorite text editor, remove the complete contents and paste the
-following instead (you may as well take the original file and insert/replace/
-keep the respective lines):
-
-romimage: file=bios/BIOS-bochs-latest, address=0xf0000
-megs: 32
-vgaromimage: bios/VGABIOS-elpin-2.40
-floppya: 1_44=/tmp/obos.img, status=inserted
-boot: a
-log: /var/log/bochs-obos.log
-panic: action=ask
-error: action=report
-info: action=report
-debug: action=ignore
-vga_update_interval: 300000
-keyboard_serial_delay: 250
-keyboard_paste_delay: 100000
-floppy_command_delay: 500
-ips: 2000000
-
-Now put the OBOS boot image onto you "virtual" floppy and start Bochs:
-
-  $ cd <OBOS sources directory>
-  $ jam installfloppy
-  $ cd /boot/apps/BeBochs1.4
+  $ cd /boot/apps/BeBochs2.2
   $ ./bochs
 
-Answer three times with RETURN and with some patience you will see OBOS
-booting.
-
+Answer with RETURN and with some patience you will see Haiku booting.
+If booting into the graphical evironment fails you can try to hit "space" at the very
+beginning of the boot process. The Haiku bootloader should then come up and you can
+select some safe mode options.
 
 
 Docbook documentation
