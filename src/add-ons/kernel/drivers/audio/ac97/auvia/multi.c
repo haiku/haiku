@@ -30,6 +30,7 @@
  */
 
 #include <OS.h>
+#include <string.h>
 #include <MediaDefs.h>
 #include "multi_audio.h"
 #include "multi.h"
@@ -661,7 +662,7 @@ auvia_get_description(auvia_dev *card, multi_description *data)
 				strncpy(data->friendly_name, FRIENDLY_NAME_8237, 32);
 				break;
 			default:
-				strncpy(data->friendly_name, FRIENDLY_NAME);
+				strncpy(data->friendly_name, FRIENDLY_NAME, 32);
 		}
 	}
 	strcpy(data->vendor_info, AUTHOR);
@@ -813,7 +814,7 @@ auvia_get_buffers(auvia_dev *card, multi_buffer_list *data)
 }
 
 
-void
+static void
 auvia_play_inth(void* inthparams)
 {
 	auvia_stream *stream = (auvia_stream *)inthparams;
@@ -834,7 +835,7 @@ auvia_play_inth(void* inthparams)
 		release_sem_etc(stream->card->buffer_ready_sem, 1, B_DO_NOT_RESCHEDULE);
 }
 
-void
+static void
 auvia_record_inth(void* inthparams)
 {
 	auvia_stream *stream = (auvia_stream *)inthparams;

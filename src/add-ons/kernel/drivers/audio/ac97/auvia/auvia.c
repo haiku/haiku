@@ -92,7 +92,7 @@ auvia_mem_delete(auvia_mem *mem)
 	free(mem);
 }
 
-void *
+static void *
 auvia_mem_alloc(auvia_dev *card, size_t size)
 {
 	auvia_mem *mem;
@@ -106,7 +106,7 @@ auvia_mem_alloc(auvia_dev *card, size_t size)
 	return mem;
 }
 
-void
+static void
 auvia_mem_free(auvia_dev *card, void *ptr)
 {
 	auvia_mem 		*mem;
@@ -441,7 +441,7 @@ make_device_names(
 }
 
 
-status_t
+static status_t
 auvia_init(auvia_dev * card)
 {
 	uint32 pr;

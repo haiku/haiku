@@ -85,7 +85,7 @@ auvia_reg_write_32(device_config *config, int regno, uint32 value)
 
 #define AUVIA_TIMEOUT 	200
 
-int
+static int
 auvia_codec_waitready(device_config *config)
 {
 	int i;
@@ -101,7 +101,7 @@ auvia_codec_waitready(device_config *config)
 	return B_OK;	
 }
 
-int
+static int
 auvia_codec_waitvalid(device_config *config)
 {
 	int i;
