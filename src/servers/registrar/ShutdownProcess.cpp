@@ -721,7 +721,7 @@ ShutdownProcess::MessageReceived(BMessage *message)
 					fUserApps.RemoveInfo(info);
 				else if ((info = fSystemApps.InfoFor(team)))
 					fSystemApps.RemoveInfo(info);
-				else if ((info = fSystemApps.InfoFor(team)))
+				else if ((info = fBackgroundApps.InfoFor(team)))
 					fBackgroundApps.RemoveInfo(info);
 				else	// not found
 					return;
