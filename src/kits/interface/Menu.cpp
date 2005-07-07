@@ -268,8 +268,21 @@ void
 BMenu::AttachedToWindow()
 {
 	BView::AttachedToWindow();
-	
-	InvalidateLayout();
+
+	bool aborted = false;
+
+	if (AddDynamicItem(B_INITIAL_ADD)) {
+		do {
+			if (!OkToProceed(NULL)) {
+				AddDynamicItem(B_ABORT);
+				aborted = true;
+				break;
+			}
+		} while (AddDynamicItem(B_PROCESSING));
+	}
+
+	if (!aborted)
+		InvalidateLayout();
 }
 
 
@@ -1140,32 +1153,44 @@ bool
 BMenu::_AddItem(BMenuItem *item, int32 index)
 {
 	ASSERT(item != NULL);
-	
-	if (!fItems.AddItem(item, index))
+
+	bool locked = LockLooper();
+
+	if (!fItems.AddItem(item, index)) {
+		if (locked)
+			UnlockLooper();
 		return false;
+	}
 
 	item->SetSuper(this);
 
-	BWindow* window = Window();
-
 	// Make sure we update the layout in case we are already attached.
-	if (fResizeToFit && window && window->Lock()) {
+	if (fResizeToFit && locked && Window() != NULL /*&& !Window()->IsHidden()*/) {
 		LayoutItems(index);
+		//UpdateWindowViewSize();
 		Invalidate();
-		window->Unlock();
 	}
 
 	// Find the root menu window, so we can install this item.
-	BMenu *root = this;
+	// ToDo: this shouldn't be necessary - the first supermenu is
+	//		already initialized to the same window
+	BMenu* root = this;
 	while (root->Supermenu())
 		root = root->Supermenu();
 
-	window = root->Window();
+	BWindow* window = root->Window();
+
+	if (locked)
+		UnlockLooper();
+
+	// if we need to install the item in another window, we don't
+	// want to keep our lock to prevent deadlocks
+
 	if (window && window->Lock()) {
 		item->Install(window);
 		window->Unlock();
 	}
-	
+
 	return true;
 }
 
@@ -1741,9 +1766,12 @@ BMenu::RedrawAfterSticky(BRect bounds)
 
 
 bool
-BMenu::OkToProceed(BMenuItem *)
+BMenu::OkToProceed(BMenuItem* item)
 {
-	return false;
+	// ToDo: test if the window could be closed again already
+
+	// ToDo: for now
+	return true;
 }
 
 
