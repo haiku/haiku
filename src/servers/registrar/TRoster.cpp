@@ -17,6 +17,7 @@
 #include <MessagePrivate.h>
 #include <MessengerPrivate.h>
 #include <Path.h>
+#include <Roster.h>	// for B_BACKGROUND_APP
 #include <ServerProtocol.h>
 #include <storage_support.h>
 
@@ -1287,7 +1288,7 @@ TRoster::SetShuttingDown(bool shuttingDown)
 */
 status_t
 TRoster::GetShutdownApps(AppInfoList &userApps, AppInfoList &systemApps,
-	hash_set<team_id> &vitalSystemApps)
+	AppInfoList &backgroundApps, hash_set<team_id> &vitalSystemApps)
 {
 	BAutolock _(fLock);
 
@@ -1317,7 +1318,10 @@ TRoster::GetShutdownApps(AppInfoList &userApps, AppInfoList &systemApps,
 		} else {
 			RosterAppInfo *clonedInfo = info->Clone();
 			if (clonedInfo) {
-				if (_IsSystemApp(info)) {
+				if (info->flags & B_BACKGROUND_APP) {
+					if (!backgroundApps.AddInfo(clonedInfo))
+						error = B_NO_MEMORY;
+				} else if (_IsSystemApp(info)) {
 					if (!systemApps.AddInfo(clonedInfo))
 						error = B_NO_MEMORY;
 				} else {

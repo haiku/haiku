@@ -87,7 +87,6 @@ Registrar::~Registrar()
 void
 Registrar::MessageReceived(BMessage *message)
 {
-//	FUNCTION_START();
 	switch (message->what) {
 		// general requests
 		case B_REG_GET_MIME_MESSENGER:
@@ -214,10 +213,9 @@ Registrar::MessageReceived(BMessage *message)
 			break;
 		case B_REG_SHUTDOWN_FINISHED:
 			if (fShutdownProcess) {
-				if (fShutdownProcess->Lock()) {
-					fShutdownProcess->Quit();
-					fShutdownProcess = NULL;
-				}
+				fShutdownProcess->PostMessage(B_QUIT_REQUESTED,
+					fShutdownProcess);
+				fShutdownProcess = NULL;
 			}
 			break;
 
@@ -225,7 +223,6 @@ Registrar::MessageReceived(BMessage *message)
 			BApplication::MessageReceived(message);
 			break;
 	}
-//	FUNCTION_END();
 }
 
 // ReadyToRun

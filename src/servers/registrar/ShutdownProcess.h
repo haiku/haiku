@@ -62,7 +62,12 @@ private:
 
 	void _WorkerDoShutdown();
 	void _QuitApps(AppInfoList &list, bool disableCancel);
+	void _QuitBackgroundApps();
+	void _WaitForBackgroundApps();
+	void _KillBackgroundApps();
 	void _QuitNonApps();
+	void _QuitBlockingApp(AppInfoList &list, team_id app, const char *appName,
+		bool cancelAllowed);
 
 private:
 	class TimeoutEvent;
@@ -81,6 +86,7 @@ private:
 	hash_set<team_id>		fVitalSystemApps;
 	AppInfoList				fSystemApps;
 	AppInfoList				fUserApps;
+	AppInfoList				fBackgroundApps;
 	TimeoutEvent			*fTimeoutEvent;
 	InternalEventList		*fInternalEvents;
 	sem_id					fInternalEventSemaphore;

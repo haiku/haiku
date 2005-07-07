@@ -15,6 +15,7 @@
 #include <unistd.h>
 
 #include <AppFileInfo.h>
+#include <AppMisc.h>
 #include <Autolock.h>
 #include <Bitmap.h>
 #include <Button.h>
@@ -47,13 +48,18 @@
 
 using namespace BPrivate;
 
-// The time span a user application has after the quit message has been
+// The time span a non-background application has after the quit message has
+// been delivered (more precisely: has been handed over to the
+// MessageDeliverer).
+static const bigtime_t kAppQuitTimeout = 3000000; // 3 s
+
+// The time span a background application has after the quit message has been
 // delivered (more precisely: has been handed over to the MessageDeliverer).
-static const bigtime_t APP_QUIT_TIMEOUT = 3000000; // 3 s
+static const bigtime_t kBackgroundAppQuitTimeout = 3000000; // 3 s
 
 // The time span non-app processes have after the HUP signal has been send
 // to them before they get a KILL signal.
-static const bigtime_t NON_APP_QUIT_TIMEOUT = 500000; // 0.5 s
+static const bigtime_t kNonAppQuitTimeout = 500000; // 0.5 s
 
 
 // message what fields
@@ -70,8 +76,7 @@ enum {
 	NO_EVENT,
 	ABORT_EVENT,
 	TIMEOUT_EVENT,
-	USER_APP_QUIT_EVENT,
-	SYSTEM_APP_QUIT_EVENT,
+	APP_QUIT_EVENT,
 	KILL_APP_EVENT,
 	REBOOT_SYSTEM_EVENT,
 };
@@ -81,9 +86,9 @@ enum {
 	INVALID_PHASE						= -1,
 	USER_APP_TERMINATION_PHASE			= 0,
 	SYSTEM_APP_TERMINATION_PHASE		= 1,
-	OTHER_PROCESSES_TERMINATION_PHASE	= 2,
-	DONE_PHASE							= 3,
-	ABORTED_PHASE						= 4,
+	BACKGROUND_APP_TERMINATION_PHASE	= 2,
+	OTHER_PROCESSES_TERMINATION_PHASE	= 3,
+	DONE_PHASE							= 4,
 };
 
 
@@ -99,6 +104,15 @@ inverse_compare_by_registration_time(const RosterAppInfo *info1,
 	return (cmp > 0 ? -1 : 0);
 }
 
+// throw_error
+/*!	\brief Used to avoid type matching problems when throwing a constant.
+*/
+static inline
+void
+throw_error(status_t error)
+{
+	throw error;
+}
 
 // TimeoutEvent
 class ShutdownProcess::TimeoutEvent : public MessageEvent {
@@ -213,7 +227,8 @@ public:
 			B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 			B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE | B_NOT_MINIMIZABLE
 				| B_NOT_ZOOMABLE | B_NOT_CLOSABLE, B_ALL_WORKSPACES),
-		  fKillAppMessage(NULL)
+		  fKillAppMessage(NULL),
+		  fCurrentApp(-1)
 	{
 	}
 
@@ -298,7 +313,7 @@ public:
 		static const int kHSpacing = 10;
 		static const int kVSpacing = 10;
 		static const int kInnerHSpacing = 5;
-		static const int kInnerVSpacing = 2;
+		static const int kInnerVSpacing = 8;
 
 		// buttons
 		fKillAppButton->ResizeToPreferred();
@@ -404,6 +419,9 @@ public:
 		if (index < 0)
 			return;
 
+		if (team == fCurrentApp)
+			SetCurrentApp(-1);
+
 		AppInfo *info = (AppInfo*)fAppInfos.RemoveItem(index);
 		delete info;
 	}
@@ -412,6 +430,7 @@ public:
 	{
 		AppInfo *info = (team >= 0 ? _AppInfoFor(team) : NULL);
 
+		fCurrentApp = team;
 		fCurrentAppIconView->SetAppInfo(info);
 
 		fKillAppMessage->ReplaceInt32("team", team);
@@ -467,6 +486,9 @@ private:
 
 	int32 _AppInfoIndexOf(team_id team)
 	{
+		if (team < 0)
+			return -1;
+
 		for (int32 i = 0; AppInfo *info = (AppInfo*)fAppInfos.ItemAt(i); i++) {
 			if (info->team == team)
 				return i;
@@ -494,11 +516,13 @@ private:
 
 		virtual void Draw(BRect updateRect)
 		{
+			SetDrawingMode(B_OP_COPY);
+			SetLowColor(fBackground);
+			FillRect(Bounds(), B_SOLID_LOW);
+
 			if (fAppInfo && fAppInfo->largeIcon) {
+				SetDrawingMode(B_OP_OVER);
 				DrawBitmap(fAppInfo->largeIcon, BPoint(0, 0));
-			} else {
-				SetLowColor(fBackground);
-				FillRect(Bounds(), B_SOLID_LOW);
 			}
 		}
 
@@ -521,6 +545,7 @@ private:
 	BButton				*fCancelShutdownButton;
 	BButton				*fRebootSystemButton;
 	BMessage			*fKillAppMessage;
+	team_id				fCurrentApp;
 };
 
 
@@ -568,6 +593,9 @@ ShutdownProcess::~ShutdownProcess()
 
 		delete fTimeoutEvent;
 	}
+
+	// remove the application quit watcher
+	fRoster->RemoveWatcher(this);
 
 	// delete the internal event semaphore
 	if (fInternalEventSemaphore >= 0)
@@ -635,7 +663,8 @@ ShutdownProcess::Init(BMessage *request)
 	}
 
 	// get a list of all applications to shut down and sort them
-	error = fRoster->GetShutdownApps(fUserApps, fSystemApps, fVitalSystemApps);
+	error = fRoster->GetShutdownApps(fUserApps, fSystemApps, fBackgroundApps,
+		fVitalSystemApps);
 	if (error != B_OK) {
 		fRoster->RemoveWatcher(this);
 		fRoster->SetShuttingDown(false);
@@ -682,26 +711,26 @@ ShutdownProcess::MessageReceived(BMessage *message)
 				team));
 
 			// remove the app info from the respective list
-			_LockAppLists();
+			int32 phase;
+			RosterAppInfo *info;
+			{
+				BAutolock _(fWorkerLock);
 
-			uint32 event;
+				info = fUserApps.InfoFor(team);
+				if (info)
+					fUserApps.RemoveInfo(info);
+				else if ((info = fSystemApps.InfoFor(team)))
+					fSystemApps.RemoveInfo(info);
+				else if ((info = fSystemApps.InfoFor(team)))
+					fBackgroundApps.RemoveInfo(info);
+				else	// not found
+					return;
 
-			RosterAppInfo *info = fUserApps.InfoFor(team);
-			if (info) {
-				fUserApps.RemoveInfo(info);
-				event = USER_APP_QUIT_EVENT;
-			} else if ((info = fSystemApps.InfoFor(team))) {
-				fSystemApps.RemoveInfo(info);
-				event = SYSTEM_APP_QUIT_EVENT;
-			} else	// not found
-				return;
-
-			int32 phase = fCurrentPhase;
-
-			_UnlockAppLists();
+				phase = fCurrentPhase;
+			}
 
 			// post the event
-			_PushEvent(event, team, phase);
+			_PushEvent(APP_QUIT_EVENT, team, phase);
 
 			delete info;
 
@@ -744,7 +773,7 @@ ShutdownProcess::MessageReceived(BMessage *message)
 			BAutolock _(fWorkerLock);
 
 			// post the event
-			_PushEvent(TIMEOUT_EVENT, -1, fCurrentPhase);
+			_PushEvent(ABORT_EVENT, -1, fCurrentPhase);
 
 			break;
 		}
@@ -816,20 +845,6 @@ ShutdownProcess::_ScheduleTimeoutEvent(bigtime_t timeout, team_id team)
 
 	// add the event
 	fEventQueue->AddEvent(fTimeoutEvent);
-}
-
-// _LockAppLists
-bool
-ShutdownProcess::_LockAppLists()
-{
-	return fWorkerLock.Lock();
-}
-
-// _UnlockAppLists
-void
-ShutdownProcess::_UnlockAppLists()
-{
-	fWorkerLock.Unlock();
 }
 
 // _SetShowShutdownWindow
@@ -1110,7 +1125,7 @@ ShutdownProcess::_GetNextEvent(uint32 &eventType, thread_id &team, int32 &phase,
 	}
 
 	// notify the window, if an app has been removed
-	if (eventType == USER_APP_QUIT_EVENT || eventType == SYSTEM_APP_QUIT_EVENT)
+	if (eventType == APP_QUIT_EVENT)
 		_RemoveShutdownWindowApp(team);
 
 	return B_OK;
@@ -1131,7 +1146,7 @@ ShutdownProcess::_Worker()
 		_WorkerDoShutdown();
 		fShutdownError = B_OK;
 	} catch (status_t error) {
-		PRINT(("ShutdownProcess::_Worker(): caught exception: %s\n",
+		PRINT(("ShutdownProcess::_Worker(): error while shutting down: %s\n",
 			strerror(error)));
 
 		fShutdownError = error;
@@ -1170,9 +1185,16 @@ ShutdownProcess::_WorkerDoShutdown()
 	_SetPhase(SYSTEM_APP_TERMINATION_PHASE);
 	_QuitApps(fSystemApps, true);
 
-	// phase 3: terminate the other processes
-	_SetPhase(OTHER_PROCESSES_TERMINATION_PHASE);
+	// phase 3: terminate the background apps
+	_SetPhase(BACKGROUND_APP_TERMINATION_PHASE);
 	_QuitNonApps();
+
+	// phase 4: terminate the other processes
+	_SetPhase(OTHER_PROCESSES_TERMINATION_PHASE);
+	_QuitBackgroundApps();
+	_ScheduleTimeoutEvent(kBackgroundAppQuitTimeout, -1);
+	_WaitForBackgroundApps();
+	_KillBackgroundApps();
 
 	// we're through: do the shutdown
 	_SetPhase(DONE_PHASE);
@@ -1228,10 +1250,14 @@ ShutdownProcess::_QuitApps(AppInfoList &list, bool disableCancel)
 			int32 phase;
 			status_t error = _GetNextEvent(event, team, phase, false);
 			if (error != B_OK)
-				throw error;
+				throw_error(error);
 	
-			if (event == ABORT_EVENT)
-				throw B_SHUTDOWN_CANCELLED;
+			if (event == ABORT_EVENT) {
+				PRINT(("ShutdownProcess::_QuitApps(): shutdown cancelled by "
+					"team %ld (-1 => user)\n", team));
+
+				throw_error(B_SHUTDOWN_CANCELLED);
+			}
 	
 		} while (event != NO_EVENT);
 	}
@@ -1249,27 +1275,30 @@ ShutdownProcess::_QuitApps(AppInfoList &list, bool disableCancel)
 			int32 phase;
 			status_t error = _GetNextEvent(event, team, phase, false);
 			if (error != B_OK)
-				throw error;
+				throw_error(error);
 
-			if (!disableCancel && event == ABORT_EVENT)
-				throw B_SHUTDOWN_CANCELLED;
+			if (!disableCancel && event == ABORT_EVENT) {
+				PRINT(("ShutdownProcess::_QuitApps(): shutdown cancelled by "
+					"team %ld (-1 => user)\n", team));
+
+				throw_error(B_SHUTDOWN_CANCELLED);
+			}
 
 		} while (event != NO_EVENT);
 
 		// get the first app to quit
-		_LockAppLists();
-
 		team_id team = -1;
 		port_id port = -1;
 		char appName[B_FILE_NAME_LENGTH];
-		if (!list.IsEmpty()) {
-			RosterAppInfo *info = *list.It();
-			team = info->team;
-			port = info->port;
-			strcpy(appName, info->ref.name);
+		{
+			BAutolock _(fWorkerLock);
+			if (!list.IsEmpty()) {
+				RosterAppInfo *info = *list.It();
+				team = info->team;
+				port = info->port;
+				strcpy(appName, info->ref.name);
+			}
 		}
-
-		_UnlockAppLists();
 
 		if (team < 0) {
 			PRINT(("ShutdownProcess::_QuitApps() done\n"));
@@ -1289,7 +1318,7 @@ ShutdownProcess::_QuitApps(AppInfoList &list, bool disableCancel)
 		MessageDeliverer::Default()->DeliverMessage(&message, target);
 
 		// schedule a timeout event
-		_ScheduleTimeoutEvent(APP_QUIT_TIMEOUT, team);
+		_ScheduleTimeoutEvent(kAppQuitTimeout, team);
 
 		// wait for the app to die or for the timeout to occur
 		bool appGone = false;
@@ -1298,9 +1327,9 @@ ShutdownProcess::_QuitApps(AppInfoList &list, bool disableCancel)
 			int32 phase;
 			status_t error = _GetNextEvent(event, eventTeam, phase, true);
 			if (error != B_OK)
-				throw error;
+				throw_error(error);
 
-			if ((event == SYSTEM_APP_QUIT_EVENT || event == USER_APP_QUIT_EVENT)
+			if ((event == APP_QUIT_EVENT)
 				&& eventTeam == team) {
 				appGone = true;
 			}
@@ -1316,7 +1345,10 @@ ShutdownProcess::_QuitApps(AppInfoList &list, bool disableCancel)
 					if (eventTeam == team)
 						break;
 				} else {
-					throw B_SHUTDOWN_CANCELLED;
+					PRINT(("ShutdownProcess::_QuitApps(): shutdown cancelled "
+						"by team %ld (-1 => user)\n", eventTeam));
+
+					throw_error(B_SHUTDOWN_CANCELLED);
 				}
 			}
 
@@ -1329,26 +1361,122 @@ ShutdownProcess::_QuitApps(AppInfoList &list, bool disableCancel)
 		// TODO: check whether the app blocks on a modal alert
 		if (appGone) {
 			// fine: the app finished in an orderly manner
-		} else if (false) {
-			// app blocks on a modal window
-			// ...
 		} else {
-			// it does not: kill it
-			PRINT(("  killing team %ld\n", team));
-
-			kill_team(team);
-
-			// remove the app (the roster will note eventually and send us
-			// a notification, but we want to be sure)
-			_LockAppLists();
-	
-			if (RosterAppInfo *info = list.InfoFor(team)) {
-				list.RemoveInfo(info);
-				delete info;
-			}
-	
-			_UnlockAppLists();
+			// the app is either blocking on a model alert or blocks for another
+			// reason
+			_QuitBlockingApp(list, team, appName, !disableCancel);
 		}
+	}
+}
+
+// _QuitBackgroundApps
+void
+ShutdownProcess::_QuitBackgroundApps()
+{
+	PRINT(("ShutdownProcess::_QuitBackgroundApps()\n"));
+
+	_SetShutdownWindowText("Asking background applications to quit.");
+
+	// prepare the shutdown message
+	BMessage message;
+	_PrepareShutdownMessage(message);
+
+	// send shutdown messages to user apps
+	BAutolock _(fWorkerLock);
+
+	AppInfoListMessagingTargetSet targetSet(fBackgroundApps);
+
+	if (targetSet.HasNext()) {
+		PRINT(("  sending shutdown message to %ld apps\n",
+			fBackgroundApps.CountInfos()));
+
+		status_t error = MessageDeliverer::Default()->DeliverMessage(
+			&message, targetSet);
+		if (error != B_OK) {
+			WARNING(("_QuitBackgroundApps::_Worker(): Failed to deliver "
+				"shutdown message to all applications: %s\n",
+				strerror(error)));
+		}
+	}
+
+	PRINT(("ShutdownProcess::_QuitBackgroundApps() done\n"));
+}
+
+// _WaitForBackgroundApps
+void
+ShutdownProcess::_WaitForBackgroundApps()
+{
+	PRINT(("ShutdownProcess::_WaitForBackgroundApps()\n"));
+
+	// wait for user apps
+	bool moreApps = true;
+	while (moreApps) {
+		{
+			BAutolock _(fWorkerLock);
+			moreApps = !fBackgroundApps.IsEmpty();
+		}
+
+		if (moreApps) {
+			uint32 event;
+			team_id team;
+			int32 phase;
+			status_t error = _GetNextEvent(event, team, phase, true);
+			if (error != B_OK)
+				throw_error(error);
+
+			if (event == ABORT_EVENT) {
+				// ignore: it's too late to abort the shutdown
+			}
+
+			if (event == TIMEOUT_EVENT)	
+				return;
+		}
+	}
+
+	PRINT(("ShutdownProcess::_WaitForBackgroundApps() done\n"));
+}
+
+// _KillBackgroundApps
+void
+ShutdownProcess::_KillBackgroundApps()
+{
+	PRINT(("ShutdownProcess::_KillBackgroundApps()\n"));
+
+	while (true) {
+		// eat events (we need to be responsive for an abort event)
+		uint32 event;
+		do {
+			team_id team;
+			int32 phase;
+			status_t error = _GetNextEvent(event, team, phase, false);
+			if (error != B_OK)
+				throw_error(error);
+
+		} while (event != NO_EVENT);
+
+		// get the first team to kill
+		team_id team = -1;
+		char appName[B_FILE_NAME_LENGTH];
+		AppInfoList &list = fBackgroundApps;
+		{
+			BAutolock _(fWorkerLock);
+
+			if (!list.IsEmpty()) {
+				RosterAppInfo *info = *list.It();
+				team = info->team;
+				strcpy(appName, info->ref.name);
+			}
+		}
+
+
+		if (team < 0) {
+			PRINT(("ShutdownProcess::_KillBackgroundApps() done\n"));
+			return;
+		}
+
+		// the app is either blocking on a model alert or blocks for another
+		// reason
+		_QuitBlockingApp(list, team, appName, false);
 	}
 }
 
@@ -1380,7 +1508,7 @@ ShutdownProcess::_QuitNonApps()
 	// give them a bit of time to terminate
 	// TODO: Instead of just waiting we could periodically check whether the
 	// processes are already gone to shorten the process.
-	snooze(NON_APP_QUIT_TIMEOUT);
+	snooze(kNonAppQuitTimeout);
 
 	// iterate through the remaining teams and kill them
 	cookie = 0;
@@ -1398,5 +1526,76 @@ ShutdownProcess::_QuitNonApps()
 	}
 
 	PRINT(("ShutdownProcess::_QuitNonApps() done\n"));
+}
+
+// _QuitBlockingApp
+void
+ShutdownProcess::_QuitBlockingApp(AppInfoList &list, team_id team,
+	const char *appName, bool cancelAllowed)
+{
+	if (BPrivate::is_app_showing_modal_window(team)) {
+		// app blocks on a modal window
+		char buffer[1024];
+		snprintf(buffer, sizeof(buffer), "The application \"%s\" might be "
+			"blocked on a modal panel.", appName);
+		_SetShutdownWindowText(buffer);
+		_SetShutdownWindowCurrentApp(team);
+		_SetShutdownWindowKillButtonEnabled(true);
+
+		// wait for something to happen
+		bool appGone = false;
+		while (true) {
+			uint32 event;
+			team_id eventTeam;
+			int32 phase;
+			status_t error = _GetNextEvent(event, eventTeam, phase, true);
+			if (error != B_OK)
+				throw_error(error);
+
+			if ((event == APP_QUIT_EVENT) && eventTeam == team) {
+				appGone = true;
+				break;
+			}
+
+			if (event == KILL_APP_EVENT && eventTeam == team)
+				break;
+
+			if (event == ABORT_EVENT) {
+				if (cancelAllowed) {
+					PRINT(("ShutdownProcess::_QuitBlockingApp(): shutdown "
+						"cancelled by team %ld (-1 => user)\n", eventTeam));
+
+					throw_error(B_SHUTDOWN_CANCELLED);
+				}
+
+				// If the app requests aborting the shutdown, we don't need
+				// to wait any longer. It has processed the request and
+				// won't quit by itself. We'll have to kill it.
+				if (eventTeam == team)
+					break;
+			}
+		}
+
+		_SetShutdownWindowKillButtonEnabled(false);
+
+		if (appGone)
+			return;
+	}
+
+	// kill the app
+	PRINT(("  killing team %ld\n", team));
+
+	kill_team(team);
+
+	// remove the app (the roster will note eventually and send us
+	// a notification, but we want to be sure)
+	{
+		BAutolock _(fWorkerLock);
+
+		if (RosterAppInfo *info = list.InfoFor(team)) {
+			list.RemoveInfo(info);
+			delete info;
+		}
+	}
 }
 
