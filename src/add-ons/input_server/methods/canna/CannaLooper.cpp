@@ -110,7 +110,11 @@ CannaLooper::Quit()
 status_t
 CannaLooper::ReadSettings( char *basepath )
 {
+#ifndef __HAIKU__ 
 	strcpy( basepath, "/boot/home/config/KanBe/" );
+#else
+	strcpy( basepath, "/etc/KanBe/" );
+#endif
 	font_family family;
 	font_style style;
 	strcpy( family, "Haru" );
