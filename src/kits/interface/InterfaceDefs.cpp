@@ -1192,13 +1192,28 @@ truncate_middle(const char* source, char* dest, uint32 numChars,
 		strcpy(dest, "");
 		return true;
 	}
+	
+	// see if the gap between left/right is smaller than the ellipsis
+
+	float totalWidth = rightWidth + leftWidth;
+
+	for (uint32 i = left; i < right; i++) {
+		totalWidth += escapementArray[i];
+		if (totalWidth > width)
+			break;
+	}
+
+	if (totalWidth <= width) {
+		// the whole string fits!
+		return false;
+	}
 
 	// The ellipsis now definitely fits, but let's
 	// see if we can add another character
 	
-	float totalWidth = ellipsisWidth + rightWidth + leftWidth;
+	totalWidth = ellipsisWidth + rightWidth + leftWidth;
 
-	if (escapementArray[left] < escapementArray[right]) {
+	if (left > numChars - right) {
 		// try right letter first
 		if (escapementArray[right] + totalWidth <= width)
 			right--;
