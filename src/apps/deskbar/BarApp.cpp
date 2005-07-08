@@ -118,11 +118,19 @@ TBarApp::TBarApp()
 	//	statusview so that all additions to the tray
 	//	follow the same path
 	fStatusViewMess = BMessenger(fBarWindow->FindView("BarView"));
+
+#ifdef __HAIKU__
+	be_roster->StartWatching(this);
+#endif
 }
 
 
 TBarApp::~TBarApp()
 {
+#ifdef __HAIKU__
+	be_roster->StartWatching(this);
+#endif
+
 	int32 teamCount = sBarTeamInfoList.CountItems();
 	for (int32 i = 0; i < teamCount; i++) {
 		BarTeamInfo *barInfo = (BarTeamInfo *)sBarTeamInfoList.ItemAt(i);
