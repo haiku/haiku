@@ -137,7 +137,7 @@ BEOS_ADD_ONS_MEDIA="mixer.media_addon legacy.media_addon multi_audio.media_addon
 BEOS_ADD_ONS_MEDIA_PLUGINS="aiff_reader avcodec mp3_decoder musepack raw_decoder \
 	wav_reader mov_reader au_reader avi_reader mp3_reader ogg speex vorbis \
 	matroska" # ac3_decoder theora
-BEOS_ADD_ONS_INPUT_DEVICES="<input>keyboard <input>mouse"
+BEOS_ADD_ONS_INPUT="<input>keyboard <input>mouse canna"
 BEOS_ADD_ONS_DRIVERS_MISC="keyboard scsi_dsk scsi_cd dprintf null zero random \
 	ps2_hid <driver>tty console <driver>config"
 BEOS_ADD_ONS_DRIVERS_GRAPHICS="radeon.driver nv.driver nm.driver mga.driver vesa"
@@ -176,7 +176,7 @@ jam -j$(sysinfo -cpu | head -c 2) -q rc resattr kernel boot_loader \
 	$BEOS_ADD_ONS_TRANSLATORS \
 	$BEOS_ADD_ONS_MEDIA \
 	$BEOS_ADD_ONS_MEDIA_PLUGINS \
-	$BEOS_ADD_ONS_INPUT_DEVICES \
+	$BEOS_ADD_ONS_INPUT \
 	$BEOS_DATA_FILES \
 	bfs_shell fs_shell_command \
 	|| { echo "*** Build failed!" 1>&2 ; exit 1; }
@@ -474,7 +474,7 @@ done
 
 cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/input_server/
 $cd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/input_server/
-for f in devices/keyboard devices/mouse; do
+for f in devices/keyboard devices/mouse methods/canna; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/input_server/$(dirname $f)/
 done
 
