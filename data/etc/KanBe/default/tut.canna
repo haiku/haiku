@@ -1,0 +1,91 @@
+;; Copyright 1993 NEC Corporation, Tokyo, Japan.
+;;
+;; Permission to use, copy, modify, distribute and sell this software
+;; and its documentation for any purpose is hereby granted without
+;; fee, provided that the above copyright notice appear in all copies
+;; and that both that copyright notice and this permission notice
+;; appear in supporting documentation, and that the name of NEC
+;; Corporation not be used in advertising or publicity pertaining to
+;; distribution of the software without specific, written prior
+;; permission.  NEC Corporation makes no representations about the
+;; suitability of this software for any purpose.  It is provided "as
+;; is" without express or implied warranty.
+;;
+;; NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+;; INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+;; NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
+;; CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
+;; USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
+;; OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
+;; PERFORMANCE OF THIS SOFTWARE. 
+
+;;  $Id: tut.canna,v 1.4 1996/10/25 05:23:01 kon Exp $
+
+; customize file for TUT-code
+;
+; 『かんな』で TUT コード入力を行うためのファイルです。
+;
+; このカスタマイズファイルを使って TUT コードで入力するには 
+; 以下のようにします。
+;
+; C-o  アルファベット入力モードと TUT コード入力モードを切替
+;      えます。
+; 大文字
+;      TUT の入力を大文字から始めると、そこからの入力は一旦
+;      日本語入力バッファに取り込まれます。日本語入力バッファ
+;      に取り込まれた文字は、かな漢字変換、カナ変換の対象と
+;      なります。日本語入力バッファに取り込まれた文字に対す
+;      る操作は基本的には『かんな』のデフォルトの操作に準じ
+;      ます。以下はその例の一部です。
+; SPC  変換(仮)。かな漢字変換します。
+; C-n  字種変換。C-n を打つと、全角カナ、半角カナ、全角ロー
+;      マ字、半角ローマ字と入力した文字を変換します。
+; C-p  C-n の逆回り変換です。
+; C-w  部首変換。入力した読みを部首名に持つ漢字の一覧を表示
+;      します。
+; C-y  入力した数字を漢字コードとする漢字に変換します。
+
+(initialize-function '(japanese-mode base-kakutei alpha-mode))
+
+(setq romkana-table "tut.cbp")
+(setq romaji-yuusen t)
+
+(use-dictionary
+ "iroha"
+ "fuzokugo"
+ "hojomwd"
+ "hojoswd"
+ :bushu "bushu"
+ :user  "user"
+ )
+
+(set-mode-display 'yomi-mode "[TUT ]")
+(set-mode-display 'zen-hira-henkan-mode "[TUT ]")
+(set-mode-display 'zen-hira-kakutei-mode "[TUT ]")
+
+(set-key 'empty-mode "\Space" 'self-insert)
+;(set-key 'henkan-nyuuryoku-mode "q" 'base-hiragana-katakana-toggle)
+
+(defun define-as-capital (x)
+  (set-key 'empty-mode x 
+           '(temporary base-hiragana base-henkan self-insert)))
+
+(setq ignore-case t)
+
+(defun define-capitals (l)
+  (cond ((atom l) nil)
+        (t
+         (define-as-capital (car l))
+         (define-capitals (cdr l)) )))
+
+(setq tut-capitals '(
+  "A"     "E"     "I"           "O"             "U"
+                "H"   "K" "M" "N"     "R" "S" "T"   "W" "Y"
+    "B" "D"   "G"                 "P"                     "Z"
+      "C"   "F"     "J"                           "V" "X"
+                        "L"         "Q"))
+
+(define-capitals tut-capitals)
+
+(setq allow-next-input t)
+(setq hex-direct t)

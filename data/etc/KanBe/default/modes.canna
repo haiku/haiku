@@ -1,0 +1,66 @@
+;; Copyright 1992 NEC Corporation, Tokyo, Japan.
+;;
+;; Permission to use, copy, modify, distribute and sell this software
+;; and its documentation for any purpose is hereby granted without
+;; fee, provided that the above copyright notice appear in all copies
+;; and that both that copyright notice and this permission notice
+;; appear in supporting documentation, and that the name of NEC
+;; Corporation not be used in advertising or publicity pertaining to
+;; distribution of the software without specific, written prior
+;; permission.  NEC Corporation makes no representations about the
+;; suitability of this software for any purpose.  It is provided "as
+;; is" without express or implied warranty.
+;;
+;; NEC CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+;; INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN 
+;; NO EVENT SHALL NEC CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR
+;; CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF 
+;; USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
+;; OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
+;; PERFORMANCE OF THIS SOFTWARE. 
+
+;;  @(#) 102.1 $Id: modes.canna,v 1.5 1994/03/03 08:04:32 kuma Exp $
+
+;; 『かんな』のデフォルトでの全てのモード表示
+
+(set-mode-display 'alpha-mode             "      ")
+(set-mode-display 'empty-mode             "[ あ ]")
+(set-mode-display 'kigou-mode             "[記号]")
+(set-mode-display 'mojishu-mode           "[字種]")
+(set-mode-display 'tankouho-mode          "[漢字]")
+(set-mode-display 'ichiran-mode           "[一覧]")
+(set-mode-display 'yes-no-mode            "[質問]")
+(set-mode-display 'on-off-mode            nil)
+(set-mode-display 'shinshuku-mode         "[文節]")
+(set-mode-display 'chikuji-yomi-mode      "[逐次]")
+(set-mode-display 'chikuji-bunsetsu-mode  "[逐次]")
+
+(set-mode-display 'henkan-nyuuryoku-mode  "[ あ ]")
+(set-mode-display 'zen-hira-henkan-mode   "[全あ]")
+(set-mode-display 'han-hira-henkan-mode   "[半あ]")
+(set-mode-display 'zen-kata-henkan-mode   "[全ア]")
+(set-mode-display 'han-kata-henkan-mode   "[半ア]")
+(set-mode-display 'zen-alpha-henkan-mode  "[全英]")
+(set-mode-display 'han-alpha-henkan-mode  "[半英]")
+(set-mode-display 'zen-hira-kakutei-mode  "<全あ>")
+(set-mode-display 'han-hira-kakutei-mode  "<半あ>")
+(set-mode-display 'zen-kata-kakutei-mode  "<全ア>")
+(set-mode-display 'han-kata-kakutei-mode  "<半ア>")
+(set-mode-display 'zen-alpha-kakutei-mode "<全英>")
+(set-mode-display 'han-alpha-kakutei-mode "<半英>")
+
+(set-mode-display 'hex-mode               "[16進]")
+(set-mode-display 'bushu-mode             "[部首]")
+
+(set-mode-display 'extend-mode            "[拡張]")
+(set-mode-display 'russian-mode           "[ ロ ]")
+(set-mode-display 'greek-mode             "[ ギ ]")
+(set-mode-display 'line-mode              "[罫線]")
+(set-mode-display 'changing-server-mode   "[変更]")
+(set-mode-display 'henkan-method-mode     "[変換]")
+(set-mode-display 'delete-dic-mode        "[削除]")
+(set-mode-display 'touroku-mode           "[登録]")
+(set-mode-display 'touroku-hinshi-mode    "[品詞]")
+(set-mode-display 'touroku-dic-mode       "[辞書]")
+(set-mode-display 'quoted-insert-mode     "[ ｑ ]")
+(set-mode-display 'mount-dic-mode         "[辞書]")
