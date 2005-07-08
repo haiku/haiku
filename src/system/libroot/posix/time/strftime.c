@@ -1,6 +1,6 @@
 #ifndef lint
 #ifndef NOID
-static char	elsieid[] = "@(#)strftime.c	7.74";
+static char	elsieid[] = "@(#)strftime.c	7.75";
 /*
 ** Based on the UCB version with the ID appearing below.
 ** This is ANSIish only when "multibyte character == plain character".
@@ -19,7 +19,7 @@ static char	elsieid[] = "@(#)strftime.c	7.74";
 ** duplicated in all such forms and that any documentation,
 ** advertising materials, and other materials related to such
 ** distribution and use acknowledge that the software was developed
-** by the University of California, Berkeley.  The name of the
+** by the University of California, Berkeley. The name of the
 ** University may not be used to endorse or promote products derived
 ** from this software without specific prior written permission.
 ** THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
@@ -91,7 +91,7 @@ static const struct lc_time_T	C_time_locale = {
 	** C99 requires this format.
 	** Previously this code used "%D %X", but we now conform to C99.
 	** Note that
-	**      "%a %b %d %H:%M:%S %Y"
+	**	"%a %b %d %H:%M:%S %Y"
 	** is used by Solaris 2.3.
 	*/
 	"%a %b %e %T %Y",
@@ -108,7 +108,8 @@ static const struct lc_time_T	C_time_locale = {
 
 static char *	_add P((const char *, char *, const char *));
 static char *	_conv P((int, const char *, char *, const char *));
-static char *	_fmt P((const char *, const struct tm *, char *, const char *, int *));
+static char *	_fmt P((const char *, const struct tm *, char *, const char *,
+			int *));
 static char *	_yconv P((int, int, int, int, char *, const char *));
 
 extern char *	tzname[];
@@ -264,7 +265,7 @@ label:
 				**		t->tm_hour % 12 : 12, 2, ' ');
 				** ...and has been changed to the below to
 				** match SunOS 4.1.1 and Arnold Robbins'
-				** strftime version 3.0.  That is, "%k" and
+				** strftime version 3.0. That is, "%k" and
 				** "%l" have been swapped.
 				** (ado, 1993-05-24)
 				*/
@@ -284,7 +285,7 @@ label:
 				**	_conv(t->tm_hour, 2, ' ');
 				** ...and has been changed to the below to
 				** match SunOS 4.1.1 and Arnold Robbin's
-				** strftime version 3.0.  That is, "%k" and
+				** strftime version 3.0. That is, "%k" and
 				** "%l" have been swapped.
 				** (ado, 1993-05-24)
 				*/
@@ -359,7 +360,7 @@ label:
 			case 'G':	/* ISO 8601 year (four digits) */
 			case 'g':	/* ISO 8601 year (two digits) */
 /*
-** From Arnold Robbins' strftime version 3.0:  "the week number of the
+** From Arnold Robbins' strftime version 3.0: "the week number of the
 ** year (the first Monday as the first day of week 1) as a decimal number
 ** (01-53)."
 ** (ado, 1993-05-24)
@@ -372,7 +373,7 @@ label:
 ** might also contain days from the previous year and the week before week
 ** 01 of a year is the last week (52 or 53) of the previous year even if
 ** it contains days from the new year. A week starts with Monday (day 1)
-** and ends with Sunday (day 7).  For example, the first week of the year
+** and ends with Sunday (day 7). For example, the first week of the year
 ** 1997 lasts from 1996-12-30 to 1997-01-05..."
 ** (ado, 1996-01-02)
 */
@@ -512,12 +513,12 @@ label:
 				/*
 				** C99 says that the UTC offset must
 				** be computed by looking only at
-				** tm_isdst.  This requirement is
+				** tm_isdst. This requirement is
 				** incorrect, since it means the code
 				** must rely on magic (in this case
 				** altzone and timezone), and the
 				** magic might not have the correct
-				** offset.  Doing things correctly is
+				** offset. Doing things correctly is
 				** tricky and requires disobeying C99;
 				** see GNU C strftime for details.
 				** For now, punt and conform to the
@@ -559,7 +560,7 @@ label:
 			case '%':
 			/*
 			** X311J/88-090 (4.12.3.5): if conversion char is
-			** undefined, behavior is undefined.  Print out the
+			** undefined, behavior is undefined. Print out the
 			** character itself as printf(3) also does.
 			*/
 			default:
@@ -682,7 +683,7 @@ _loc P((void))
 	** Slurp the locale file into the cache.
 	*/
 	namesize = strlen(name) + 1;
-	if (sizeof filename  <
+	if (sizeof filename <
 		((sizeof locale_home) + namesize + (sizeof lc_time)))
 			goto no_locale;
 	oldsun = 0;
@@ -705,7 +706,7 @@ _loc P((void))
 		goto bad_locale;
 	bufsize = namesize + st.st_size;
 	locale_buf = NULL;
-	lbuf = (lbuf == NULL) ?  malloc(bufsize) : realloc(lbuf, bufsize);
+	lbuf = (lbuf == NULL) ? malloc(bufsize) : realloc(lbuf, bufsize);
 	if (lbuf == NULL)
 		goto bad_locale;
 	(void) strcpy(lbuf, name);

@@ -5,7 +5,7 @@
 
 #ifndef lint
 #ifndef NOID
-static char	elsieid[] = "@(#)localtime.c	7.89";
+static char	elsieid[] = "@(#)localtime.c	7.95";
 #endif /* !defined NOID */
 #endif /* !defined lint */
 
@@ -20,6 +20,20 @@ static char	elsieid[] = "@(#)localtime.c	7.89";
 #include "private.h"
 #include "tzfile.h"
 #include "fcntl.h"
+#include "float.h"	/* for FLT_MAX and DBL_MAX */
+
+#ifndef TZ_ABBR_MAX_LEN
+#define TZ_ABBR_MAX_LEN	16
+#endif /* !defined TZ_ABBR_MAX_LEN */
+
+#ifndef TZ_ABBR_CHAR_SET
+#define TZ_ABBR_CHAR_SET \
+	"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 :+-._"
+#endif /* !defined TZ_ABBR_CHAR_SET */
+
+#ifndef TZ_ABBR_ERR_CHAR
+#define TZ_ABBR_ERR_CHAR	'_'
+#endif /* !defined TZ_ABBR_ERR_CHAR */
 
 /*
 ** SunOS 4.1.1 headers lack O_BINARY.
@@ -46,9 +60,9 @@ static char	elsieid[] = "@(#)localtime.c	7.89";
 **	5.	They might reference tm.TM_ZONE after calling offtime.
 ** What's best to do in the above cases is open to debate;
 ** for now, we just set things up so that in any of the five cases
-** WILDABBR is used.  Another possibility:  initialize tzname[0] to the
+** WILDABBR is used. Another possibility: initialize tzname[0] to the
 ** string "tzname[0] used before set", and similarly for the other cases.
-** And another:  initialize tzname[0] to "ERA", with an explanation in the
+** And another: initialize tzname[0] to "ERA", with an explanation in the
 ** manual page of what this "time zone abbreviation" means (doing this so
 ** that tzname[0] has the "normal" length of three characters).
 */
@@ -123,6 +137,7 @@ struct rule {
 
 static long		detzcode P((const char * codep));
 static const char *	getzname P((const char * strp));
+static const char *	getqzname P((const char * strp, const char delim));
 static const char *	getnum P((const char * strp, int * nump, int min,
 				int max));
 static const char *	getsecs P((const char * strp, long * secsp));
@@ -267,6 +282,24 @@ settzname P((void))
 
 		tzname[ttisp->tt_isdst] =
 			&sp->chars[ttisp->tt_abbrind];
+	}
+	/*
+	** Finally, scrub the abbreviations.
+	** First, replace bogus characters.
+	*/
+	for (i = 0; i < sp->charcnt; ++i)
+		if (strchr(TZ_ABBR_CHAR_SET, sp->chars[i]) == NULL)
+			sp->chars[i] = TZ_ABBR_ERR_CHAR;
+	/*
+	** Second, truncate long abbreviations.
+	*/
+	for (i = 0; i < sp->typecnt; ++i) {
+		register const struct ttinfo * const	ttisp = &sp->ttis[i];
+		register char *				cp = &sp->chars[ttisp->tt_abbrind];
+
+		if (strlen(cp) > TZ_ABBR_MAX_LEN &&
+			strcmp(cp, GRANDPARENTED) != 0)
+				*(cp + TZ_ABBR_MAX_LEN) = '\0';
 	}
 }
 
@@ -452,7 +485,7 @@ static const int	year_lengths[2] = {
 
 /*
 ** Given a pointer into a time zone string, scan until a character that is not
-** a valid character in a zone name is found.  Return a pointer to that
+** a valid character in a zone name is found. Return a pointer to that
 ** character.
 */
 
@@ -465,6 +498,27 @@ register const char *	strp;
 	while ((c = *strp) != '\0' && !is_digit(c) && c != ',' && c != '-' &&
 		c != '+')
 			++strp;
+	return strp;
+}
+
+/*
+** Given a pointer into an extended time zone string, scan until the ending
+** delimiter of the zone name is located.   Return a pointer to the delimiter.
+**
+** As with getzname above, the legal character set is actually quite
+** restricted, with other characters producing undefined results.
+** We choose not to care - allowing almost anything to be in the zone abbrev.
+*/
+
+static const char *
+getqzname(strp, delim)
+register const char *	strp;
+const char		delim;
+{
+	register char	c;
+
+	while ((c = *strp) != '\0' && c != delim)
+		++strp;
 	return strp;
 }
 
@@ -533,7 +587,7 @@ long * const		secsp;
 		*secsp += num * SECSPERMIN;
 		if (*strp == ':') {
 			++strp;
-			/* `SECSPERMIN' allows for leap seconds.  */
+			/* `SECSPERMIN' allows for leap seconds. */
 			strp = getnum(strp, &num, 0, SECSPERMIN);
 			if (strp == NULL)
 				return NULL;
@@ -572,7 +626,7 @@ long * const		offsetp;
 
 /*
 ** Given a pointer into a time zone string, extract a rule in the form
-** date[/time].  See POSIX section 8 for the format of "date" and "time".
+** date[/time]. See POSIX section 8 for the format of "date" and "time".
 ** If a valid rule is not found, return NULL.
 ** Otherwise, return a pointer to the first character not part of the rule.
 */
@@ -691,7 +745,7 @@ const long				offset;
 			dow += DAYSPERWEEK;
 
 		/*
-		** "dow" is the day-of-week of the first day of the month.  Get
+		** "dow" is the day-of-week of the first day of the month. Get
 		** the day-of-month (zero-origin) of the first "dow" day of the
 		** month.
 		*/
@@ -714,7 +768,7 @@ const long				offset;
 
 	/*
 	** "value" is the Epoch-relative time of 00:00:00 UTC on the day in
-	** question.  To get the Epoch-relative time of the specified local
+	** question. To get the Epoch-relative time of the specified local
 	** time on that day, add the transition time and the current offset
 	** from UTC.
 	*/
@@ -752,10 +806,18 @@ const int			lastditch;
 			stdlen = (sizeof sp->chars) - 1;
 		stdoffset = 0;
 	} else {
-		name = getzname(name);
-		stdlen = name - stdname;
-		if (stdlen < 3)
-			return -1;
+		if (*name == '<') {
+			name++;
+			stdname = name;
+			name = getqzname(name, '>');
+			if (*name != '>')
+				return (-1);
+			stdlen = name - stdname;
+			name++;
+		} else {
+			name = getzname(name);
+			stdlen = name - stdname;
+		}
 		if (*name == '\0')
 			return -1;
 		name = getoffset(name, &stdoffset);
@@ -766,11 +828,18 @@ const int			lastditch;
 	if (load_result != 0)
 		sp->leapcnt = 0;		/* so, we're off a little */
 	if (*name != '\0') {
-		dstname = name;
-		name = getzname(name);
-		dstlen = name - dstname;	/* length of DST zone name */
-		if (dstlen < 3)
-			return -1;
+		if (*name == '<') {
+			dstname = ++name;
+			name = getqzname(name, '>');
+			if (*name != '>')
+				return -1;
+			dstlen = name - dstname;
+			name++;
+		} else {
+			dstname = name;
+			name = getzname(name);
+			dstlen = name - dstname; /* length of DST zone name */
+		}
 		if (*name != '\0' && *name != ',' && *name != ';') {
 			name = getoffset(name, &dstoffset);
 			if (name == NULL)
@@ -1031,7 +1100,7 @@ tzset P((void))
 /*
 ** The easy way to behave "as if no library function calls" localtime
 ** is to not call it--so we drop its guts into "localsub", which can be
-** freely called.  (And no, the PANS doesn't require the above behavior--
+** freely called. (And no, the PANS doesn't require the above behavior--
 ** but it *is* desirable.)
 **
 ** The unused offset argument is for the benefit of mktime variants.
@@ -1187,7 +1256,7 @@ static int
 leaps_thru_end_of(y)
 register const int	y;
 {
-	return (y >= 0) ?  (y / 4 - y / 100 + y / 400) :
+	return (y >= 0) ? (y / 4 - y / 100 + y / 400) :
 		-(leaps_thru_end_of(-(y + 1)) + 1);
 }
 
@@ -1311,7 +1380,7 @@ register struct tm * const		tmp;
 	tmp->tm_min = (int) (rem / SECSPERMIN);
 	/*
 	** A positive leap second requires a special
-	** representation.  This uses "... ??:59:60" et seq.
+	** representation. This uses "... ??:59:60" et seq.
 	*/
 	tmp->tm_sec = (int) (rem % SECSPERMIN) + hit;
 	ip = mon_lengths[isleap(y)];
@@ -1325,13 +1394,12 @@ register struct tm * const		tmp;
 	return tmp;
 }
 
-
 /*
 ** Adapted from code provided by Robert Elz, who writes:
 **	The "best" way to do mktime I think is based on an idea of Bob
 **	Kridle's (so its said...) from a long time ago.
 **	[kridle@xinet.com as of 1996-01-16.]
-**	It does a binary search of the time_t space.  Since time_t's are
+**	It does a binary search of the time_t space. Since time_t's are
 **	just 32 bits, its a max of 32 iterations (even at 64 bits it
 **	would still be very reasonable).
 */
@@ -1481,7 +1549,7 @@ const int		do_norm_secs;
 		return WRONG;
 	yourtm.tm_year = y;
 	if (yourtm.tm_year != y)
- 		return WRONG;
+		return WRONG;
 	if (yourtm.tm_sec >= 0 && yourtm.tm_sec < SECSPERMIN)
 		saved_seconds = 0;
 	else if (y + TM_YEAR_BASE < EPOCH_YEAR) {
@@ -1802,7 +1870,7 @@ time_t	t;
 	tzset();
 	/*
 	** For a positive leap second hit, the result
-	** is not unique.  For a negative leap second
+	** is not unique. For a negative leap second
 	** hit, the corresponding time doesn't exist,
 	** so we return an adjacent second.
 	*/

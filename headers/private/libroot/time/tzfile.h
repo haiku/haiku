@@ -21,7 +21,7 @@
 
 #ifndef lint
 #ifndef NOID
-static char	tzfilehid[] = "@(#)tzfile.h	7.16";
+static char	tzfilehid[] = "@(#)tzfile.h	7.17";
 #endif /* !defined NOID */
 #endif /* !defined lint */
 
@@ -48,7 +48,7 @@ static char	tzfilehid[] = "@(#)tzfile.h	7.16";
 #define	TZ_MAGIC	"TZif"
 
 struct tzhead {
- 	char	tzh_magic[4];		/* TZ_MAGIC */
+	char	tzh_magic[4];		/* TZ_MAGIC */
 	char	tzh_reserved[16];	/* reserved for future use */
 	char	tzh_ttisgmtcnt[4];	/* coded number of trans. time flags */
 	char	tzh_ttisstdcnt[4];	/* coded number of trans. time flags */
@@ -171,27 +171,5 @@ struct tzhead {
 */
 
 #define isleap_sum(a, b)	isleap((a) % 400 + (b) % 400)
-
-#ifndef USG
-
-/*
-** Use of the underscored variants may cause problems if you move your code to
-** certain System-V-based systems; for maximum portability, use the
-** underscore-free variants.  The underscored variants are provided for
-** backward compatibility only; they may disappear from future versions of
-** this file.
-*/
-
-#define SECS_PER_MIN	SECSPERMIN
-#define MINS_PER_HOUR	MINSPERHOUR
-#define HOURS_PER_DAY	HOURSPERDAY
-#define DAYS_PER_WEEK	DAYSPERWEEK
-#define DAYS_PER_NYEAR	DAYSPERNYEAR
-#define DAYS_PER_LYEAR	DAYSPERLYEAR
-#define SECS_PER_HOUR	SECSPERHOUR
-#define SECS_PER_DAY	SECSPERDAY
-#define MONS_PER_YEAR	MONSPERYEAR
-
-#endif /* !defined USG */
 
 #endif /* !defined TZFILE_H */
