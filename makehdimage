@@ -381,6 +381,12 @@ $cp ${sPrefix}data/system/boot/Bootscript \
 	${sPrefix}data/system/boot/SetupEnvironment \
 	${sPrefix}data/system/boot/Netscript $targetDir/beos/system/boot/
 $cp ${sPrefix}data/etc/profile ${sPrefix}data/etc/termcap $targetDir/beos/etc/
+$cp -r ${sPrefix}data/etc/fonts $targetDir/beos/etc/
+if [ -e /boot/beos/etc/fonts/ttfonts/Swiss721.ttf ]; then
+	$cp ${sPrefix}/boot/beos/etc/fonts/ttfonts/Courier10Pitch.ttf $targetDir/beos/etc/fonts/ttfonts/
+	$cp ${sPrefix}/boot/beos/etc/fonts/ttfonts/Swiss721_Bold.ttf $targetDir/beos/etc/fonts/ttfonts/
+	$cp ${sPrefix}/boot/beos/etc/fonts/ttfonts/Swiss721.ttf $targetDir/beos/etc/fonts/ttfonts/
+fi
 $cp ${sPrefix}src/tests/kernel/boot_floppy/fortune/fortunes $targetDir/beos/etc/
 $cp -r ${sPrefix}distro/${arch}.R1/beos/etc $targetDir/beos/
 
@@ -502,19 +508,6 @@ $scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/obos_netw
 for f in $BEOS_NETWORK_PROTOCOLS; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/network/protocols
 done
-
-# install fonts
-
-echo "Installing fonts..."
-
-cd $sourceDir/distro/${arch}.R1/beos/etc/
-$cd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/etc/
-$cp -r ${sPrefix}fonts $targetDir/beos/etc/
-if [ -e /boot/beos/etc/fonts/ttfonts/Swiss721.ttf ]; then
-	$cp ${sPrefix}/boot/beos/etc/fonts/ttfonts/Courier10Pitch.ttf $targetDir/beos/etc/fonts/ttfonts/
-	$cp ${sPrefix}/boot/beos/etc/fonts/ttfonts/Swiss721_Bold.ttf $targetDir/beos/etc/fonts/ttfonts/
-	$cp ${sPrefix}/boot/beos/etc/fonts/ttfonts/Swiss721.ttf $targetDir/beos/etc/fonts/ttfonts/
-fi
 
 # install MIME database
 mimeDBSource=$sourceDir/src/data/beos_mime

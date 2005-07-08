@@ -1,7 +1,5 @@
 SubDir OBOS_TOP src servers app ;
 
-Depends app_server : install_fonts ;
-
 AddResources app_server : app_server.rdef ;
 
 UseLibraryHeaders agg png zlib ;
@@ -132,5 +130,4 @@ if $(TARGET_PLATFORM) = haiku {
 		libagg.a libfreetype.so textencoding ;
 }
 
-SubInclude OBOS_TOP src servers app fonts ;
 SubInclude OBOS_TOP src servers app drawing Painter ;
