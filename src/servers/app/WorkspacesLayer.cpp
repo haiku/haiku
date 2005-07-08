@@ -15,6 +15,7 @@
 #include "WinBorder.h"
 
 #include <ColorSet.h>
+#include <WindowPrivate.h>
 
 
 WorkspacesLayer::WorkspacesLayer(BRect frame, const char* name,
@@ -93,6 +94,9 @@ WorkspacesLayer::_DrawWindow(const BRect& workspaceFrame,
 	const BRect& screenFrame, WinBorder* window,
 	BRegion& backgroundRegion)
 {
+	if (window->Feel() == kDesktopWindowFeel)
+		return;
+
 	BRect frame = _WindowFrame(workspaceFrame, screenFrame, window->Frame());
 	BRect tabFrame = _WindowFrame(workspaceFrame, screenFrame,
 		window->GetDecorator()->GetTabRect());
