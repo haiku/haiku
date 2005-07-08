@@ -1913,6 +1913,9 @@ RootLayer::show_winBorder(WinBorder *winBorder)
 				winBorder->Level() == B_FLOATING_APP))
 		{
 			invalid = fWorkspace[i]->ShowWinBorder(winBorder);
+
+			// ToDo: this won't work with FFM
+			fWorkspace[i]->SetFocus(winBorder);
 		}
 
 		if (fActiveWksIndex == i) {
