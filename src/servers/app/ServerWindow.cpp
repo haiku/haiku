@@ -1088,26 +1088,13 @@ myRootLayer->Unlock();
 				fLink.Flush();
 			} else {
 				// TODO: Watch out for the coordinate system in AS_LAYER_GET_CLIP_REGION
-				BRegion region;
-
-				// TODO: This could also be done more reliably in the Layer,
-				// when the State stack is implemented there. There should be
-				// DrawData::fCulmulatedClippingRegion...
-				// TODO: the DrawData clipping region should be in local view coords.
-				LayerData* layerData = fCurrentLayer->fLayerData;
-
-				do {
-					if (layerData->ClippingRegion())
-						region.IntersectWith(layerData->ClippingRegion());
-				} while ((layerData = layerData->prevState) != NULL);
-
-				int32 rectCount = region.CountRects();
+				int32 rectCount = fCurrentLayer->fVisible.CountRects();
 
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<int32>(rectCount);
 
 				for (int32 i = 0; i < rectCount; i++)
-					fLink.Attach<BRect>(fCurrentLayer->ConvertFromTop(region.RectAt(i)));
+					fLink.Attach<BRect>(fCurrentLayer->ConvertFromTop(fCurrentLayer->fVisible.RectAt(i)));
 
 				fLink.Flush();
 			}
@@ -1129,9 +1116,14 @@ myRootLayer->Unlock();
 				link.Read<BRect>(&r);
 				region.Include(fCurrentLayer->ConvertToTop(r));
 			}
-			fCurrentLayer->fLayerData->SetClippingRegion(region);
+// TODO: Turned off user clipping for now (will probably not harm anything but performance right now)
+// We need to integrate user clipping more, in Layer::PopState, the clipping needs to be
+// restored too. "AS_LAYER_SET_CLIP_REGION" is irritating, as I think it should be
+// "AS_LAYER_CONSTRAIN_CLIP_REGION", since it means to "add" to the current clipping, not "set" it.
+//			fCurrentLayer->fLayerData->SetClippingRegion(region);
 #ifndef NEW_CLIPPING
-			fCurrentLayer->RebuildFullRegion();
+// TODO: set the clipping
+//			fCurrentLayer->fVisible.IntersectWith(&region);
 #endif
 /*
 #ifndef NEW_CLIPPING

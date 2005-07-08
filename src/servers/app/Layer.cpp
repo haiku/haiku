@@ -2404,9 +2404,12 @@ Layer::get_user_regions(BRegion &reg)
 	while (stackData) {
 		if (stackData->ClippingRegion()) {
 			// transform in screen coords
-			BRegion screenReg(*stackData->ClippingRegion());
-			ConvertToScreen2(&screenReg);
-			reg.IntersectWith(&screenReg);
+// NOTE: Already is in screen coords, but I leave this here in
+// case we change it
+//			BRegion screenReg(*stackData->ClippingRegion());
+//			ConvertToScreen2(&screenReg);
+//			reg.IntersectWith(&screenReg);
+			reg.IntersectWith(stackData->ClippingRegion());
 		}
 		stackData = stackData->prevState;
 	}
