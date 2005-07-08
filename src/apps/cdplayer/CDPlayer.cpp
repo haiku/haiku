@@ -528,20 +528,29 @@ CDPlayer::UpdateCDInfo(void)
 	vector<BString> trackNames;
 	
 	int32 currentTrack = engine->TrackStateWatcher()->GetTrack();
-	engine->ContentWatcher()->GetContent(&CDName,&trackNames);
+	if(currentTrack < 1)
+		return;
 	
-	fCDTitle->SetText(CDName.String());
+	bool trackresult =engine->ContentWatcher()->GetContent(&CDName,&trackNames);
+	
+	if(trackresult)
+		fCDTitle->SetText(CDName.String());
+	else
+		fCDTitle->SetText("Audio CD");
 	
 	if(currentTrack > 0)
 	{
-		currentTrackName << "Track " << currentTrack << ": " << trackNames[ currentTrack - 1];
+		if(trackresult)
+		{
+			currentTrackName << "Track " << currentTrack << ": " << trackNames[ currentTrack - 1];
+			fCurrentTrack->SetText(currentTrackName.String());
+			
+			return;
+		}
+		
+		currentTrackName << "Track " << currentTrack;
 		fCurrentTrack->SetText(currentTrackName.String());
 	}
-	else
-	{
-		fCurrentTrack->SetText("Track:");
-	}
-	
 }
 
 void

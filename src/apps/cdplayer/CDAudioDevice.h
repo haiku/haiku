@@ -10,7 +10,8 @@ enum CDState {
 	kStopped,
 	kPaused,
 	kPlaying,
-	kSkipping
+	kSkipping,
+	kError
 };
 
 typedef struct

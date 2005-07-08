@@ -189,7 +189,7 @@ CDContentWatcher::GetContent(BString *title, vector<BString> *tracks)
 bool 
 CDContentWatcher::UpdateState()
 {
-	bool newDiscID = -1;
+	int32 newDiscID = -1;
 	
 	// Check the table of contents to see if the new one is different
 	// from the old one whenever there is a CD in the drive
