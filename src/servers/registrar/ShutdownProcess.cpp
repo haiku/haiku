@@ -14,6 +14,7 @@
 #include <signal.h>
 #include <unistd.h>
 
+#include <Alert.h>
 #include <AppFileInfo.h>
 #include <AppMisc.h>
 #include <Autolock.h>
@@ -61,6 +62,10 @@ static const bigtime_t kBackgroundAppQuitTimeout = 3000000; // 3 s
 // to them before they get a KILL signal.
 static const bigtime_t kNonAppQuitTimeout = 500000; // 0.5 s
 
+// The time span the app that has aborted the shutdown shall be displayed in
+// the shutdown window before closing it automatically.
+static const bigtime_t kDisplayAbortingAppTimeout = 3000000; // 3 s
+
 
 // message what fields
 enum {
@@ -88,7 +93,8 @@ enum {
 	SYSTEM_APP_TERMINATION_PHASE		= 1,
 	BACKGROUND_APP_TERMINATION_PHASE	= 2,
 	OTHER_PROCESSES_TERMINATION_PHASE	= 3,
-	DONE_PHASE							= 4,
+	ABORTED_PHASE						= 4,
+	DONE_PHASE							= 5,
 };
 
 
@@ -309,6 +315,20 @@ public:
 		fRebootSystemButton->SetMessage(message);
 		fRebootSystemButton->SetTarget(target);
 
+		// aborted OK button
+		fAbortedOKButton = new(nothrow) BButton(BRect(0, 0, 10, 10),
+			"ok", "OK", NULL, B_FOLLOW_NONE);
+		if (!fAbortedOKButton)
+			return B_NO_MEMORY;
+		fAbortedOKButton->Hide();
+		rootView->AddChild(fAbortedOKButton);
+
+		message = new BMessage(MSG_CANCEL_SHUTDOWN);
+		if (!message)
+			return B_NO_MEMORY;
+		fAbortedOKButton->SetMessage(message);
+		fAbortedOKButton->SetTarget(target);
+
 		// compute the sizes
 		static const int kHSpacing = 10;
 		static const int kVSpacing = 10;
@@ -320,15 +340,19 @@ public:
 		fCancelShutdownButton->ResizeToPreferred();
 		fRebootSystemButton->MakeDefault(true);
 		fRebootSystemButton->ResizeToPreferred();
+		fAbortedOKButton->MakeDefault(true);
+		fAbortedOKButton->ResizeToPreferred();
 
 		BRect rect(fKillAppButton->Frame());
 		int buttonWidth = rect.IntegerWidth() + 1;
+		int buttonHeight = rect.IntegerHeight() + 1;
 
 		rect = fCancelShutdownButton->Frame();
 		if (rect.IntegerWidth() >= buttonWidth)
 			buttonWidth = rect.IntegerWidth() + 1;
 
-		int buttonHeight = fRebootSystemButton->Frame().IntegerHeight() + 1;
+		int defaultButtonHeight
+			= fRebootSystemButton->Frame().IntegerHeight() + 1;
 
 		// text view
 		fTextView->SetText("two\nlines");
@@ -345,9 +369,11 @@ public:
 		int textX = rightPartX + kInnerHSpacing;
 		int textY = kVSpacing;
 		int buttonsY = textY + textHeight + kInnerVSpacing;
+		int nonDefaultButtonsY = buttonsY
+			+ (defaultButtonHeight - buttonHeight) / 2;
 		int rightPartWidth = 2 * buttonWidth + kInnerHSpacing;
 		int width = rightPartX + rightPartWidth + kHSpacing;
-		int height = buttonsY + buttonHeight + kVSpacing;
+		int height = buttonsY + defaultButtonHeight + kVSpacing;
 
 		// now layout the views
 
@@ -362,16 +388,20 @@ public:
 		fTextView->SetTextRect(fTextView->Bounds());
 
 		// buttons
-		fKillAppButton->MoveTo(rightPartX, buttonsY);
+		fKillAppButton->MoveTo(rightPartX, nonDefaultButtonsY);
 		fKillAppButton->ResizeTo(buttonWidth - 1, buttonHeight - 1);
 
 		fCancelShutdownButton->MoveTo(
 			rightPartX + buttonWidth + kInnerVSpacing - 1,
-			buttonsY);
+			nonDefaultButtonsY);
 		fCancelShutdownButton->ResizeTo(buttonWidth - 1, buttonHeight - 1);
 
 		fRebootSystemButton->MoveTo(
 			(width - fRebootSystemButton->Frame().IntegerWidth()) / 2,
+			buttonsY);
+
+		fAbortedOKButton->MoveTo(
+			(width - fAbortedOKButton->Frame().IntegerWidth()) / 2,
 			buttonsY);
 
 		// set the root view and window size
@@ -463,12 +493,26 @@ public:
 		fCurrentAppIconView->Hide();
 		fKillAppButton->Hide();
 		fCancelShutdownButton->Hide();
+		fRebootSystemButton->MakeDefault(true);
 		fRebootSystemButton->Show();
 		// TODO: Temporary work-around for a Haiku bug.
 		fRebootSystemButton->Invalidate();
 
 		SetTitle("System is Shut Down");
 		fTextView->SetText("It's now safe to turn off the computer.");
+	}
+
+	void SetWaitForAbortedOK()
+	{
+		fCurrentAppIconView->Hide();
+		fKillAppButton->Hide();
+		fCancelShutdownButton->Hide();
+		fAbortedOKButton->MakeDefault(true);
+		fAbortedOKButton->Show();
+		// TODO: Temporary work-around for a Haiku bug.
+		fAbortedOKButton->Invalidate();
+
+		SetTitle("Shutdown Aborted");
 	}
 
 private:
@@ -544,6 +588,7 @@ private:
 	BButton				*fKillAppButton;
 	BButton				*fCancelShutdownButton;
 	BButton				*fRebootSystemButton;
+	BButton				*fAbortedOKButton;
 	BMessage			*fKillAppMessage;
 	team_id				fCurrentApp;
 };
@@ -567,6 +612,7 @@ ShutdownProcess::ShutdownProcess(TRoster *roster, EventQueue *eventQueue)
 	  fCurrentPhase(INVALID_PHASE),
 	  fShutdownError(B_ERROR),
 	  fHasGUI(false),
+	  fReboot(false),
 	  fWindow(NULL)
 {
 }
@@ -686,6 +732,9 @@ ShutdownProcess::Init(BMessage *request)
 	// everything went fine: now we own the request
 	fRequest = request;
 
+	if (fRequest->FindBool("reboot", &fReboot) != B_OK)
+		fReboot = false;
+
 	resume_thread(fWorker);
 
 	PRINT(("ShutdownProcess::Init() done\n"));
@@ -742,6 +791,7 @@ ShutdownProcess::MessageReceived(BMessage *message)
 			// get the phase the event is intended for
 			int32 phase = TimeoutEvent::GetMessagePhase(message);
 			team_id team = TimeoutEvent::GetMessageTeam(message);;
+PRINT(("MSG_PHASE_TIMED_OUT: phase: %ld, team: %ld\n", phase, team));
 
 			BAutolock _(fWorkerLock);
 
@@ -1021,6 +1071,17 @@ ShutdownProcess::_SetShutdownWindowWaitForShutdown()
 	}
 }
 
+// _SetShutdownWindowWaitForAbortedOK
+void
+ShutdownProcess::_SetShutdownWindowWaitForAbortedOK()
+{
+	if (fHasGUI) {
+		BAutolock _(fWindow);
+
+		fWindow->SetWaitForAbortedOK();
+	}
+}
+
 // _NegativeQuitRequestReply
 void
 ShutdownProcess::_NegativeQuitRequestReply(thread_id thread)
@@ -1047,13 +1108,8 @@ ShutdownProcess::_PrepareShutdownMessage(BMessage &message) const
 status_t
 ShutdownProcess::_ShutDown()
 {
-	// get the reboot flag
-	bool reboot;
-	if (fRequest->FindBool("reboot", &reboot) != B_OK)
-		reboot = false;
-
 	#ifdef __HAIKU__
-		return _kern_shutdown(reboot);
+		return _kern_shutdown(fReboot);
 	#else
 		// we can't do anything on R5
 		return B_ERROR;
@@ -1166,6 +1222,18 @@ ShutdownProcess::_WorkerDoShutdown()
 {
 	PRINT(("ShutdownProcess::_WorkerDoShutdown()\n"));
 
+	// ask the user to confirm the shutdown, if desired
+	bool askUser;
+	if (fHasGUI && fRequest->FindBool("confirm", &askUser) == B_OK && askUser) {
+		BAlert *alert = new BAlert("Shut Down?",
+			"Do you really want to shut down the system?",
+			"Shut Down", "Cancel", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		int32 result = alert->Go();
+
+		if (result != 0)
+			throw_error(B_SHUTDOWN_CANCELLED);
+	}
+
 	// make the shutdown window ready and show it
 	_InitShutdownWindow();
 	_SetShutdownWindowCurrentApp(-1);
@@ -1256,6 +1324,7 @@ ShutdownProcess::_QuitApps(AppInfoList &list, bool disableCancel)
 				PRINT(("ShutdownProcess::_QuitApps(): shutdown cancelled by "
 					"team %ld (-1 => user)\n", team));
 
+				_DisplayAbortingApp(team);
 				throw_error(B_SHUTDOWN_CANCELLED);
 			}
 	
@@ -1281,6 +1350,7 @@ ShutdownProcess::_QuitApps(AppInfoList &list, bool disableCancel)
 				PRINT(("ShutdownProcess::_QuitApps(): shutdown cancelled by "
 					"team %ld (-1 => user)\n", team));
 
+				_DisplayAbortingApp(team);
 				throw_error(B_SHUTDOWN_CANCELLED);
 			}
 
@@ -1348,6 +1418,7 @@ ShutdownProcess::_QuitApps(AppInfoList &list, bool disableCancel)
 					PRINT(("ShutdownProcess::_QuitApps(): shutdown cancelled "
 						"by team %ld (-1 => user)\n", eventTeam));
 
+					_DisplayAbortingApp(team);
 					throw_error(B_SHUTDOWN_CANCELLED);
 				}
 			}
@@ -1596,6 +1667,71 @@ ShutdownProcess::_QuitBlockingApp(AppInfoList &list, team_id team,
 			list.RemoveInfo(info);
 			delete info;
 		}
+	}
+}
+
+// _DisplayAbortingApp
+void
+ShutdownProcess::_DisplayAbortingApp(team_id team)
+{
+	// find the app that cancelled the shutdown
+	char appName[B_FILE_NAME_LENGTH];
+	bool foundApp = false;
+	{
+		BAutolock _(fWorkerLock);
+
+		RosterAppInfo *info = fUserApps.InfoFor(team);
+		if (!info)
+			info = fSystemApps.InfoFor(team);
+		if (!info)
+			fBackgroundApps.InfoFor(team);
+
+		if (info) {
+			foundApp = true;
+			strcpy(appName, info->ref.name);
+		}
+	}
+
+	if (!foundApp) {
+		PRINT(("ShutdownProcess::_DisplayAbortingApp(): Didn't find the app "
+			"that has cancelled the shutdown.\n"));
+		return;
+	}
+
+	// compose the text to be displayed
+	char buffer[1024];
+	snprintf(buffer, sizeof(buffer), "Application \"%s\" has aborted the shutdown "
+		"process.", appName);
+
+	// set up the window
+	_SetShutdownWindowCurrentApp(team);
+	_SetShutdownWindowText(buffer);
+	_SetShutdownWindowWaitForAbortedOK();
+
+	// schedule the timeout event
+	_SetPhase(ABORTED_PHASE);
+	_ScheduleTimeoutEvent(kDisplayAbortingAppTimeout);
+
+	// wait for the timeout or the user to press the cancel button
+	while (true) {
+		uint32 event;
+		team_id eventTeam;
+		int32 phase;
+		status_t error = _GetNextEvent(event, eventTeam, phase, true);
+		if (error != B_OK)
+			break;
+
+		// stop waiting when the timeout occurs
+		if (event == TIMEOUT_EVENT)
+			break;
+
+		// stop waiting when the user hit the cancel button 
+		if (event == ABORT_EVENT && phase == ABORTED_PHASE && eventTeam < 0)
+			break;
+
+		// also stop when the responsible app quit
+		if ((event == APP_QUIT_EVENT) && eventTeam == team)
+			break;
 	}
 }
 

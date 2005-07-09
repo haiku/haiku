@@ -56,6 +56,7 @@ private:
 	void _SetShutdownWindowCancelButtonEnabled(bool enabled);
 	void _SetShutdownWindowKillButtonEnabled(bool enabled);
 	void _SetShutdownWindowWaitForShutdown();
+	void _SetShutdownWindowWaitForAbortedOK();
 
 	static status_t _WorkerEntry(void *data);
 	status_t _Worker();
@@ -66,8 +67,9 @@ private:
 	void _WaitForBackgroundApps();
 	void _KillBackgroundApps();
 	void _QuitNonApps();
-	void _QuitBlockingApp(AppInfoList &list, team_id app, const char *appName,
+	void _QuitBlockingApp(AppInfoList &list, team_id team, const char *appName,
 		bool cancelAllowed);
+	void _DisplayAbortingApp(team_id team);
 
 private:
 	class TimeoutEvent;
@@ -95,6 +97,7 @@ private:
 	int32					fCurrentPhase;
 	status_t				fShutdownError;
 	bool					fHasGUI;
+	bool					fReboot;
 	ShutdownWindow			*fWindow;
 };
 
