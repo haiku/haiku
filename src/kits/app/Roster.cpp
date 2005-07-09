@@ -1273,6 +1273,8 @@ BRoster::AddToRecentFolders(const entry_ref *folder, const char *appSig) const
 
 	\param reboot If \c true, the system will be rebooted instead of being
 		   powered off.
+	\param confirm If \c true, the user will be asked to confirm to shut down
+		   the system.
 	\return
 	- \c B_SHUTTING_DOWN, when there's already a shutdown process in
 	  progress,
@@ -1280,7 +1282,7 @@ BRoster::AddToRecentFolders(const entry_ref *folder, const char *appSig) const
 	- another error code in case something went wrong.
 */
 status_t
-BRoster::ShutDown(bool reboot)
+BRoster::ShutDown(bool reboot, bool confirm)
 {
 	status_t error = B_OK;
 
@@ -1288,6 +1290,8 @@ BRoster::ShutDown(bool reboot)
 	BMessage request(B_REG_SHUT_DOWN);
 	if (error == B_OK)
 		error = request.AddBool("reboot", reboot);
+	if (error == B_OK)
+		error = request.AddBool("confirm", confirm);
 
 	// send the request
 	BMessage reply;

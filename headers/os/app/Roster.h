@@ -143,7 +143,7 @@ private:
 	class ArgVector;
 	friend class Private;
 
-	status_t ShutDown(bool reboot);
+	status_t ShutDown(bool reboot, bool confirm);
 
 	status_t AddApplication(const char *mimeSig, const entry_ref *ref,
 							uint32 flags, team_id team, thread_id thread,

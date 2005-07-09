@@ -13,6 +13,7 @@
 //  This program behaves identically as the BeOS R5 version, with these 
 //  added arguments:
 //  
+//  -a asks the user to confirm the shutdown
 //  -c cancels any running shutdown
 //
 //  Some code from Shard's Archiver from BeBits (was BSD/MIT too :).
@@ -81,6 +82,7 @@ usage(const char *arg0)
 	fprintf(stderr, "usage: %s [-rqca] [-d time]\n"
 		"\t-r reboot,\n"
 		"\t-q quick shutdown (don't broadcast apps),\n"
+		"\t-a ask user to confirm the shutdown (ignored when -q is given),\n"
 		"\t-c cancel a running shutdown,\n"
 		"\t-d delay shutdown by <time> seconds.\n", program);
 	exit(1);
@@ -90,6 +92,7 @@ usage(const char *arg0)
 int
 main(int argc, char **argv)
 {
+	bool askUser = false;
 	bool quick = false;
 
 	for (int32 i = 1; i < argc; i++) {
@@ -100,6 +103,9 @@ main(int argc, char **argv)
 
 			while (arg && isalpha((++arg)[0])) {
 				switch (arg[0]) {
+					case 'a':
+						askUser = true;
+						break;
 					case 'q':
 						quick = true;
 						break;
@@ -168,7 +174,7 @@ main(int argc, char **argv)
 	} else {
 		BRoster roster;
 		BRoster::Private rosterPrivate(roster);
-		status_t error = rosterPrivate.ShutDown(gReboot);
+		status_t error = rosterPrivate.ShutDown(gReboot, askUser);
 		fprintf(stderr, "Shutdown failed: %s\n", strerror(error));
 		return 2;
 	}

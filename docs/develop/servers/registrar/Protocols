@@ -73,6 +73,7 @@ on error:	- B_NO_REPLY (fatal)
 
 message fields:
 - "reboot": If true, the system reboots instead of turning the power off.
+- "confirm": If true, the user will be asked to confirm to shut down the system.
 
 -----------------------------------------------------------------------
 
