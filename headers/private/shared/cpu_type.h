@@ -1,10 +1,10 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
 /* Taken from the Pulse application, and extended.
- * It's used by Pulse and sysinfo.
+ * It's used by Pulse, AboutHaiku, and sysinfo.
  */
 
 #ifdef __cplusplus
@@ -14,6 +14,7 @@ extern "C" {
 const char *get_cpu_vendor_string(enum cpu_types type);
 const char *get_cpu_model_string(enum cpu_types type);
 void get_cpu_type(char *vendorBuffer, size_t vendorSize, char *modelBuffer, size_t modelSize);
+int32 get_rounded_cpu_speed(void);
 
 #ifdef __cplusplus
 }
@@ -202,3 +203,27 @@ get_cpu_type(char *vendorBuffer, size_t vendorSize, char *modelBuffer, size_t mo
 	strlcpy(modelBuffer, model, modelSize);
 #endif
 }
+
+
+int32
+get_rounded_cpu_speed(void)
+{
+	system_info sys_info;
+	get_system_info(&sys_info);
+
+	int target = sys_info.cpu_clock_speed / 1000000;
+	int frac = target % 100;
+	int delta = -frac;
+	int at = 0;
+	int freqs[] = { 100, 50, 25, 75, 33, 67, 20, 40, 60, 80, 10, 30, 70, 90 };
+
+	for (uint x = 0; x < sizeof(freqs) / sizeof(freqs[0]); x++) {
+		int ndelta = freqs[x] - frac;
+		if (abs(ndelta) < abs(delta)) {
+			at = freqs[x];
+			delta = ndelta;
+		}
+	}
+	return target + delta;
+}
+

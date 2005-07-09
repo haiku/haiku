@@ -207,10 +207,11 @@ AboutView::AboutView(const BRect &r)
 	r.OffsetBy(0, labelHeight);
 	r.bottom = r.top + textHeight;
 
-	if (systemInfo.cpu_clock_speed < 1000000000)
-		sprintf(string,"%d MHz", int(systemInfo.cpu_clock_speed / 1000000.0f));
+	int32 clockSpeed = get_rounded_cpu_speed();
+	if (clockSpeed < 1000000000)
+		sprintf(string,"%ld MHz", clockSpeed);
 	else
-		sprintf(string,"%.2f GHz", systemInfo.cpu_clock_speed / 1000000000.0f);
+		sprintf(string,"%.2f GHz", clockSpeed / 1000.0f);
 
 	stringView = new BStringView(r, "mhztext", string);
 	fInfoView->AddChild(stringView);

@@ -28,7 +28,6 @@ class NormalPulseView : public PulseView {
 		void UpdateColors(BMessage *message);
 
 	private:
-		int CalculateCPUSpeed();
 		void DetermineVendorAndProcessor();
 		void CalculateFontSize();
 

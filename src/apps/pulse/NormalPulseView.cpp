@@ -124,29 +124,6 @@ NormalPulseView::CalculateFontSize()
 }
 
 
-int
-NormalPulseView::CalculateCPUSpeed()
-{
-	system_info sys_info;
-	get_system_info(&sys_info);
-
-	int target = sys_info.cpu_clock_speed / 1000000;
-	int frac = target % 100;
-	int delta = -frac;
-	int at = 0;
-	int freqs[] = { 100, 50, 25, 75, 33, 67, 20, 40, 60, 80, 10, 30, 70, 90 };
-
-	for (uint x = 0; x < sizeof(freqs) / sizeof(freqs[0]); x++) {
-		int ndelta = freqs[x] - frac;
-		if (abs(ndelta) < abs(delta)) {
-			at = freqs[x];
-			delta = ndelta;
-		}
-	}
-	return target + delta;
-}
-
-
 void
 NormalPulseView::DetermineVendorAndProcessor()
 {
@@ -215,12 +192,12 @@ NormalPulseView::Draw(BRect rect)
 #endif
 
 	// Draw processor type and speed
-	char buf[500];
-	int cpu_speed = CalculateCPUSpeed();
-	if (cpu_speed > 1000 && (cpu_speed % 10) == 0)
-		sprintf(buf, "%.2f GHz", cpu_speed / 1000.0f);
+	char buffer[64];
+	int32 cpuSpeed = get_rounded_cpu_speed();
+	if (cpuSpeed > 1000 && (cpuSpeed % 10) == 0)
+		snprintf(buffer, sizeof(buffer), "%.2f GHz", cpuSpeed / 1000.0f);
 	else
-		sprintf(buf, "%d MHz", cpu_speed);
+		snprintf(buffer, sizeof(buffer), "%d MHz", cpuSpeed);
 	SetDrawingMode(B_OP_OVER);
 	SetHighColor(240, 240, 240);
 	SetFontSize(fProcessorFontSize);
@@ -229,10 +206,10 @@ NormalPulseView::Draw(BRect rect)
 	MovePenTo(10 + (32 - width / 2), 48);
 	DrawString(fProcessor);
 
-	width = StringWidth(buf);
+	width = StringWidth(buffer);
 	MovePenTo(10 + (32 - width / 2), 60);
-	DrawString(buf);
-	
+	DrawString(buffer);
+
 	PopState();
 }
 
