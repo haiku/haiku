@@ -55,6 +55,8 @@ LIBBE_SOURCE_HAIKU_ONLY =
 	$(STORAGE_KIT_SOURCE_HAIKU_ONLY)
 ;
 
+AddResources libbe.so : libbe_version.rdef ;
+
 SharedLibrary be :
 	$(LIBBE_SOURCE) $(LIBBE_SOURCE_HAIKU_ONLY)
 ;
@@ -68,7 +70,6 @@ LinkSharedOSLibs libbe.so :
 	stdc++.r4
 ;
 
-AddResources libbe.so : libbe_version.rdef ;
 
 LinkSharedOSLibs libopenbeos.so :
 	libbeadapter.so
