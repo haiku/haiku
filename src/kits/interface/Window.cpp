@@ -1211,9 +1211,10 @@ BWindow::SetDefaultButton(BButton *button)
 		return;
 
 	if (fDefaultButton != NULL) {
-		// tell old button he's no longer the default one
-		fDefaultButton->MakeDefault(false);
-		fDefaultButton->Invalidate();
+		// tell old button it's no longer the default one
+		BButton *oldDefault = fDefaultButton;
+		oldDefault->MakeDefault(false);
+		oldDefault->Invalidate();
 	}
 
 	fDefaultButton = button;
