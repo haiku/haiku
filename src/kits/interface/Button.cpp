@@ -275,10 +275,12 @@ BButton::MakeDefault(bool flag)
 		if (fDrawAsDefault && oldDefault == this)
 			return;
 
-		fDrawAsDefault = true;
+		if (!fDrawAsDefault) {
+			fDrawAsDefault = true;
 
-		ResizeBy(6.0f, 6.0f);
-		MoveBy(-3.0f, -3.0f);
+			ResizeBy(6.0f, 6.0f);
+			MoveBy(-3.0f, -3.0f);
+		}
 
 		if (window && oldDefault != this)
 			window->SetDefaultButton(this);
