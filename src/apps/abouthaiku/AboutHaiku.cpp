@@ -10,10 +10,12 @@
 #include <Application.h>
 #include <Bitmap.h>
 #include <File.h>
+#include <FindDirectory.h>
 #include <Font.h>
 #include <MessageRunner.h>
 #include <Messenger.h>
 #include <OS.h>
+#include <Path.h>
 #include <Screen.h>
 #include <ScrollView.h>
 #include <String.h>
@@ -150,20 +152,27 @@ AboutView::AboutView(const BRect &r)
 	fInfoView->AddChild(stringView);
 	stringView->ResizeToPreferred();
 
+	// we update "labelHeight" to the actual height of the string view
+	labelHeight = stringView->Bounds().Height();
+
 	r.OffsetBy(0, labelHeight);
 	r.bottom = r.top + textHeight;
 
+	strcpy(string, "Unknown");
+
 	// the version is stored in the BEOS:APP_VERSION attribute of libbe.so
-	BFile file("/boot/beos/system/lib/libbe.so", B_READ_ONLY);
-	if (file.InitCheck() == B_OK) {
+	BPath path;
+	if (find_directory(B_BEOS_LIB_DIRECTORY, &path) == B_OK) {
+		path.Append("libbe.so");
+
 		BAppFileInfo appFileInfo;
 		version_info versionInfo;
-
-		if (appFileInfo.SetTo(&file) == B_OK
-			&& appFileInfo.GetVersionInfo(&versionInfo, B_APP_VERSION_KIND) == B_OK)
+		BFile file;
+		if (file.SetTo(path.Path(), B_READ_ONLY) == B_OK
+			&& appFileInfo.SetTo(&file) == B_OK
+			&& appFileInfo.GetVersionInfo(&versionInfo, B_APP_VERSION_KIND) == B_OK
+			&& versionInfo.short_info[0] != '\0')
 			strcpy(string, versionInfo.short_info);
-		else
-			strcpy(string, "Unknown");
 	}
 
 	stringView = new BStringView(r, "ostext", string);
@@ -251,10 +260,11 @@ AboutView::AboutView(const BRect &r)
 
 	r.OffsetBy(0, labelHeight);
 	r.bottom = r.top + textHeight;
-	
+
 	fUptimeView = new BStringView(r, "uptimetext", "");
 	fInfoView->AddChild(fUptimeView);
-	
+	// string width changes, so we don't do ResizeToPreferred()
+
 	char uptimeString[255];
 	fUptimeView->SetText(UptimeToString(uptimeString, 255));
 	
