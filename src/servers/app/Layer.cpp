@@ -69,11 +69,13 @@ Layer::Layer(BRect frame, const char* name, int32 token,
 
 	// Layer does not start out as a part of the tree
 	fOwner(NULL),
+
 	fParent(NULL),
-	fUpperSibling(NULL),
-	fLowerSibling(NULL),
-	fTopChild(NULL),
-	fBottomChild(NULL),
+	fPreviousSibling(NULL),
+	fNextSibling(NULL),
+	fFirstChild(NULL),
+	fLastChild(NULL),
+
 	fCurrent(NULL),
 
 	// all regions (fVisible, fFullVisible, fFull) start empty
@@ -169,15 +171,15 @@ Layer::AddChild(Layer* layer, ServerWindow* serverWin)
 	// 1) attach layer to the tree structure
 	layer->fParent = this;
 	
-	// if we have children already, bump the current front child back one and
-	// make the new child the frontmost layer
-	if (fBottomChild) {
-		layer->fUpperSibling = fBottomChild;
-		fBottomChild->fLowerSibling	= layer;
+	// if we have children already, bump the current last child back one and
+	// make the new child the last layer
+	if (fLastChild) {
+		layer->fPreviousSibling = fLastChild;
+		fLastChild->fNextSibling = layer;
 	} else {
-		fTopChild = layer;
+		fFirstChild = layer;
 	}
-	fBottomChild = layer;
+	fLastChild = layer;
 
 	// if we have no RootLayer yet, then there is no need to set any parameters --
 	// they will be set when the RootLayer for this tree will be added
@@ -208,27 +210,27 @@ Layer::AddChild(Layer* layer, ServerWindow* serverWin)
 		c->RebuildFullRegion();
 #endif
 		// tree parsing algorithm
-		if (c->fTopChild) {
+		if (c->fFirstChild) {
 			// go deep
-			c = c->fTopChild;
+			c = c->fFirstChild;
 		} else {
 			// go right or up
 			
 			if (c == stop) // our trip is over
 				break;
 				
-			if (c->fLowerSibling) {
+			if (c->fNextSibling) {
 				// go right
-				c = c->fLowerSibling;
+				c = c->fNextSibling;
 			} else {
 				// go up
-				while (!c->fParent->fLowerSibling && c->fParent != stop)
+				while (!c->fParent->fNextSibling && c->fParent != stop)
 					c = c->fParent;
 				
 				if (c->fParent == stop) // that's enough!
 					break;
 				
-				c = c->fParent->fLowerSibling;
+				c = c->fParent->fNextSibling;
 			}
 		}
 	}
@@ -249,7 +251,7 @@ Layer::RemoveChild(Layer *layer)
 	STRACE(("Layer(%s)::RemoveChild(%s) START\n", Name(), layer->Name()));
 	
 	if (!layer->fParent) {
-		printf("ERROR: RemoveChild(): Layer doesn't have a fParent\n");
+		printf("ERROR: RemoveChild(): Layer doesn't have a parent\n");
 		return;
 	}
 	
@@ -263,21 +265,21 @@ Layer::RemoveChild(Layer *layer)
 	// Take care of fParent
 	layer->fParent = NULL;
 	
-	if (fTopChild == layer)
-		fTopChild = layer->fLowerSibling;
+	if (fFirstChild == layer)
+		fFirstChild = layer->fNextSibling;
 	
-	if (fBottomChild == layer)
-		fBottomChild = layer->fUpperSibling;
+	if (fLastChild == layer)
+		fLastChild = layer->fPreviousSibling;
 	
 	// Take care of siblings
-	if (layer->fUpperSibling != NULL)
-		layer->fUpperSibling->fLowerSibling	= layer->fLowerSibling;
+	if (layer->fPreviousSibling != NULL)
+		layer->fPreviousSibling->fNextSibling	= layer->fNextSibling;
 	
-	if (layer->fLowerSibling != NULL)
-		layer->fLowerSibling->fUpperSibling = layer->fUpperSibling;
+	if (layer->fNextSibling != NULL)
+		layer->fNextSibling->fPreviousSibling = layer->fPreviousSibling;
 	
-	layer->fUpperSibling = NULL;
-	layer->fLowerSibling = NULL;
+	layer->fPreviousSibling = NULL;
+	layer->fNextSibling = NULL;
 
 #ifdef NEW_CLIPPING
 	layer->clear_visible_regions();
@@ -307,26 +309,26 @@ Layer::RemoveChild(Layer *layer)
 		}
 
 		// tree parsing algorithm
-		if (c->fTopChild) {	
+		if (c->fFirstChild) {	
 			// go deep
-			c = c->fTopChild;
+			c = c->fFirstChild;
 		} else {	
 			// go right or up
 			if (c == stop) // out trip is over
 				break;
 
-			if (c->fLowerSibling) {
+			if (c->fNextSibling) {
 				// go right
-				c = c->fLowerSibling;
+				c = c->fNextSibling;
 			} else {
 				// go up
-				while(!c->fParent->fLowerSibling && c->fParent != stop)
+				while(!c->fParent->fNextSibling && c->fParent != stop)
 					c = c->fParent;
 				
 				if (c->fParent == stop) // that enough!
 					break;
 				
-				c = c->fParent->fLowerSibling;
+				c = c->fParent->fNextSibling;
 			}
 		}
 	}
@@ -339,21 +341,20 @@ Layer::RemoveSelf()
 {
 	// A Layer removes itself from the tree (duh)
 	if (fParent == NULL) {
-		printf("ERROR: RemoveSelf(): Layer doesn't have a fParent\n");
+		printf("ERROR: RemoveSelf(): Layer doesn't have a parent\n");
 		return;
 	}
 	fParent->RemoveChild(this);
 }
 
 /*!
-	\brief Determins if the calling layer has the passed layer as a child
-	\return true if the child is owned by the caller, false if not
+	\return true if the child is owned by this Layer, false if not
 */
 bool
 Layer::HasChild(Layer* layer)
 {
-	for (Layer *lay = TopChild(); lay; lay = LowerSibling()) {
-		if (lay == layer)
+	for (Layer* child = FirstChild(); child; child = NextChild()) {
+		if (child == layer)
 			return true;
 	}
 	return false;
@@ -361,12 +362,12 @@ Layer::HasChild(Layer* layer)
 
 //! Returns the number of children
 uint32
-Layer::CountChildren(void) const
+Layer::CountChildren() const
 {
 	uint32 count = 0;
-	Layer *lay = TopChild();
-	while (lay != NULL) {
-		lay	= LowerSibling();
+	Layer* child = FirstChild();
+	while (child != NULL) {
+		child = NextChild();
 		count++;
 	}
 	return count;
@@ -380,25 +381,20 @@ Layer::CountChildren(void) const
 Layer*
 Layer::FindLayer(const int32 token)
 {
-	// recursive search for a layer based on its view token
-	Layer* lay;
-	Layer* trylay;
+	// (recursive) search for a layer based on its view token
 	
-	// Search child layers first
-	for (lay = TopChild(); lay; lay = LowerSibling()) {
-		if (lay->fViewToken == token)
-			return lay;
+	// iterate only over direct child layers first
+	for (Layer* child = FirstChild(); child; child = NextChild()) {
+		if (child->fViewToken == token)
+			return child;
 	}
 	
-	// Hmmm... not in this layer's children. Try lower descendants
-	for (lay = TopChild(); lay != NULL; lay = LowerSibling()) {
-		trylay = lay->FindLayer(token);
-		if (trylay)
-			return trylay;
+	// try a recursive search
+	for (Layer* child = FirstChild(); child; child = NextChild()) {
+		if (Layer* layer = child->FindLayer(token))
+			return layer;
 	}
 	
-	// Well, we got this far in the function,
-	// so apparently there is no match to be found
 	return NULL;
 }
 
@@ -415,11 +411,9 @@ Layer::LayerAt(const BPoint &pt)
 		return this;
 
 	if (fFullVisible.Contains(pt)) {
-		Layer *lay = NULL;
-		for (Layer* child = BottomChild(); child; child = UpperSibling()) {
-			lay = child->LayerAt(pt);
-			if (lay)
-				return lay;
+		for (Layer* child = LastChild(); child; child = PreviousChild()) {
+			if (Layer* layer = child->LayerAt(pt))
+				return layer;
 		}
 	}
 #else
@@ -427,46 +421,44 @@ Layer::LayerAt(const BPoint &pt)
 		return this;
 
 	if (fFullVisible2.Contains(pt)) {
-		Layer *lay = NULL;
-		for (Layer* child = BottomChild(); child; child = UpperSibling()) {
-			lay = child->LayerAt(pt);
-			if (lay)
-				return lay;
+		for (Layer* child = LastChild(); child; child = PreviousChild()) {
+			if (Layer* layer = child->LayerAt(pt))
+				return layer;
 		}
 	}
 #endif	
 	return NULL;
 }
 
-// TopChild
+// FirstChild
 Layer*
-Layer::TopChild() const
+Layer::FirstChild() const
 {
-	fCurrent = fTopChild;
+	fCurrent = fFirstChild;
 	return fCurrent;
 }
 
-// LowerSibling
+// NextChild
 Layer*
-Layer::LowerSibling() const
+Layer::NextChild() const
 {
-	fCurrent = fCurrent->fLowerSibling;
+	fCurrent = fCurrent->fNextSibling;
 	return fCurrent;
 }
 
-// UpperSibling
+// PreviousChild
 Layer*
-Layer::UpperSibling() const
+Layer::PreviousChild() const
 {
-	fCurrent = fCurrent->fUpperSibling;
+	fCurrent = fCurrent->fPreviousSibling;
 	return fCurrent;
 }
 
-// BottomChild
+// LastChild
 Layer*
-Layer::BottomChild() const
+Layer::LastChild() const
 {
-	fCurrent = fBottomChild;
+	fCurrent = fLastChild;
 	return fCurrent;
 }
 
@@ -526,7 +518,7 @@ Layer::StartRebuildRegions( const BRegion& reg, Layer *target, uint32 action, BP
 	fVisible = fFullVisible;
 
 	// Rebuild regions for children...
-	for (Layer *lay = BottomChild(); lay; lay = UpperSibling()) {
+	for (Layer *lay = LastChild(); lay; lay = PreviousChild()) {
 		if (lay == target)
 			lay->RebuildRegions(reg, action, pt, BPoint(0.0f, 0.0f));
 		else
@@ -732,7 +724,7 @@ Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint ptOf
 	}
 	
 	// Rebuild regions for children...
-	for(Layer *lay = BottomChild(); lay != NULL; lay = UpperSibling())
+	for(Layer *lay = LastChild(); lay != NULL; lay = PreviousChild())
 		lay->RebuildRegions(reg, newAction, newPt, newOffset);
 
 	#ifdef DEBUG_LAYER_REBUILD
@@ -1341,15 +1333,15 @@ Layer::PruneTree(void)
 	Layer* lay;
 	Layer* nextlay;
 	
-	lay = fTopChild;
-	fTopChild = NULL;
+	lay = fFirstChild;
+	fFirstChild = NULL;
 	
 	while (lay != NULL) {
-		if (lay->fTopChild != NULL)
+		if (lay->fFirstChild != NULL)
 			lay->PruneTree();
 		
-		nextlay = lay->fLowerSibling;
-		lay->fLowerSibling = NULL;
+		nextlay = lay->fNextSibling;
+		lay->fNextSibling = NULL;
 		
 		delete lay;
 		lay = nextlay;
@@ -1365,12 +1357,12 @@ Layer::PrintToStream()
 	printf("\t Parent: %s", fParent ? fParent->Name() : "<no parent>");
 
 	printf("\t us: %s\t ls: %s\n",
-		fUpperSibling ? fUpperSibling->Name() : "<none>",
-		fLowerSibling ? fLowerSibling->Name() : "<none>");
+		fPreviousSibling ? fPreviousSibling->Name() : "<none>",
+		fNextSibling ? fNextSibling->Name() : "<none>");
 
 	printf("\t topChild: %s\t bottomChild: %s\n",
-		fTopChild ? fTopChild->Name() : "<none>",
-		fBottomChild ? fBottomChild->Name() : "<none>");
+		fFirstChild ? fFirstChild->Name() : "<none>",
+		fLastChild ? fLastChild->Name() : "<none>");
 	
 	printf("Frame: (%f, %f, %f, %f)\n", fFrame.left, fFrame.top, fFrame.right, fFrame.bottom);
 	printf("LocalOrigin: (%f, %f)\n", BoundsOrigin().x, BoundsOrigin().y);
@@ -1396,23 +1388,23 @@ Layer::PrintNode()
 	else
 		printf("Parent: NULL\n");
 
-	if (fUpperSibling)
-		printf("Upper sibling: %s (%p)\n", fUpperSibling->Name(), fUpperSibling);
+	if (fPreviousSibling)
+		printf("Upper sibling: %s (%p)\n", fPreviousSibling->Name(), fPreviousSibling);
 	else
 		printf("Upper sibling: NULL\n");
 
-	if (fLowerSibling)
-		printf("Lower sibling: %s (%p)\n", fLowerSibling->Name(), fLowerSibling);
+	if (fNextSibling)
+		printf("Lower sibling: %s (%p)\n", fNextSibling->Name(), fNextSibling);
 	else
 		printf("Lower sibling: NULL\n");
 
-	if (fTopChild)
-		printf("Top child: %s (%p)\n", fTopChild->Name(), fTopChild);
+	if (fFirstChild)
+		printf("Top child: %s (%p)\n", fFirstChild->Name(), fFirstChild);
 	else
 		printf("Top child: NULL\n");
 
-	if (fBottomChild)
-		printf("Bottom child: %s (%p)\n", fBottomChild->Name(), fBottomChild);
+	if (fLastChild)
+		printf("Bottom child: %s (%p)\n", fLastChild->Name(), fLastChild);
 	else
 		printf("Bottom child: NULL\n");
 #ifndef NEW_CLIPPING
@@ -1426,7 +1418,7 @@ Layer::PrintTree()
 {
 	printf("\n Tree structure:\n");
 	printf("\t%s\t%s\n", Name(), IsHidden()? "Hidden": "NOT hidden");
-	for(Layer *lay = BottomChild(); lay != NULL; lay = UpperSibling())
+	for(Layer *lay = LastChild(); lay != NULL; lay = PreviousChild())
 		printf("\t%s\t%s\n", lay->Name(), lay->IsHidden()? "Hidden": "NOT hidden");
 }
 
@@ -1484,7 +1476,7 @@ if (fOwner->cnt != 1)
 		}
 	}
 
-	for (Layer *lay = BottomChild(); lay != NULL; lay = UpperSibling()) {
+	for (Layer *lay = LastChild(); lay != NULL; lay = PreviousChild()) {
 		if (lay == startFrom)
 			redraw = true;
 
@@ -1531,7 +1523,7 @@ if (fOwner->cnt != 1)
 		}
 	}
 
-	for (Layer *lay = BottomChild(); lay != NULL; lay = UpperSibling()) {
+	for (Layer *lay = LastChild(); lay != NULL; lay = PreviousChild()) {
 		if (lay == startFrom)
 			redraw = true;
 
@@ -2084,7 +2076,7 @@ Layer::do_Invalidate(const BRegion &invalid, const Layer *startFrom)
 	BRegion		localVisible(fFullVisible2);
 	localVisible.IntersectWith(&invalid);
 	rebuild_visible_regions(invalid, localVisible,
-		startFrom? startFrom: BottomChild());
+		startFrom? startFrom: LastChild());
 
 	// add localVisible to our RootLayer's redraw region.
 //	GetRootLayer()->fRedrawReg.Include(&localVisible);
@@ -2152,7 +2144,7 @@ Layer::resize_layer_frame_by(float x, float y)
 			// call hook function
 			ResizedByHook(dx, dy, true); // automatic
 
-			for (Layer *lay = BottomChild(); lay; lay = UpperSibling())
+			for (Layer *lay = LastChild(); lay; lay = PreviousChild())
 				lay->resize_layer_frame_by(dx, dy);
 		}
 		else
@@ -2166,7 +2158,7 @@ Layer::rezize_layer_redraw_more(BRegion &reg, float dx, float dy)
 	if (dx == 0 && dy == 0)
 		return;
 
-	for (Layer *lay = BottomChild(); lay; lay = UpperSibling()) {
+	for (Layer *lay = LastChild(); lay; lay = PreviousChild()) {
 		uint16		rm = lay->fResizeMode & 0x0000FFFF;
 
 		if ((rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM) {
@@ -2217,7 +2209,7 @@ Layer::resize_layer_full_update_on_resize(BRegion &reg, float dx, float dy)
 	if (dx == 0 && dy == 0)
 		return;
 
-	for (Layer *lay = BottomChild(); lay; lay = UpperSibling()) {
+	for (Layer *lay = LastChild(); lay; lay = PreviousChild()) {
 		uint16		rm = lay->fResizeMode & 0x0000FFFF;		
 
 		if ((rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM) {
@@ -2237,7 +2229,7 @@ Layer::do_ResizeBy(float dx, float dy)
 	fFrame.Set(fFrame.left, fFrame.top, fFrame.right+dx, fFrame.bottom+dy);
 
 	// resize children using their resize_mask.
-	for (Layer *lay = BottomChild(); lay; lay = UpperSibling())
+	for (Layer *lay = LastChild(); lay; lay = PreviousChild())
 			lay->resize_layer_frame_by(dx, dy);
 
 	// call hook function
@@ -2359,7 +2351,7 @@ Layer::do_ScrollBy(float dx, float dy)
 
 		clear_visible_regions();
 
-		rebuild_visible_regions(invalid, invalid, BottomChild());
+		rebuild_visible_regions(invalid, invalid, LastChild());
 
 		// for the moment we say that the whole surface needs to be redraw.
 		BRegion		redrawReg(fFullVisible2);
@@ -2465,12 +2457,12 @@ Layer::rebuild_visible_regions(const BRegion &invalid,
 	BRegion unalteredVisible(common);
 	bool altered = alter_visible_for_children(common);
 
-	for (Layer *lay = BottomChild(); lay; lay = UpperSibling()) {
+	for (Layer *lay = LastChild(); lay; lay = PreviousChild()) {
 		if (lay == startFrom)
 			fullRebuild = true;
 
 		if (fullRebuild)
-			lay->rebuild_visible_regions(invalid, common, lay->BottomChild());
+			lay->rebuild_visible_regions(invalid, common, lay->LastChild());
 
 		// to let children know much they can take from parent's visible region
 		common.Exclude(&lay->fFullVisible2);
@@ -2504,7 +2496,7 @@ Layer::clear_visible_regions()
 
 	fVisible2.MakeEmpty();
 	fFullVisible2.MakeEmpty();
-	for (Layer *child = BottomChild(); child; child = UpperSibling())
+	for (Layer *child = LastChild(); child; child = PreviousChild())
 		child->clear_visible_regions();
 }
 

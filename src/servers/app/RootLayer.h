@@ -77,10 +77,10 @@ public:
 								}
 
 	// For the active workspaces
-	virtual	Layer*				TopChild(void) const;
-	virtual	Layer*				LowerSibling(void) const;
-	virtual	Layer*				UpperSibling(void) const;
-	virtual	Layer*				BottomChild(void) const;
+	virtual	Layer*				FirstChild() const;
+	virtual	Layer*				NextChild() const;
+	virtual	Layer*				PreviousChild() const;
+	virtual	Layer*				LastChild() const;
 
 			void				HideWinBorder(WinBorder* winBorder);
 			void				ShowWinBorder(WinBorder* winBorder);

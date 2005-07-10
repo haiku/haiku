@@ -86,6 +86,8 @@ class Layer {
 			void				RemoveSelf();
 			bool				HasChild(Layer* layer);
 
+			void				SetRootLayer(RootLayer* rl)
+									{ fRootLayer = rl; }
 			RootLayer*			GetRootLayer() const
 									{ return fRootLayer; }
 	
@@ -93,10 +95,10 @@ class Layer {
 			Layer*				FindLayer(const int32 token);
 			Layer*				LayerAt(const BPoint &pt);
 
-	virtual	Layer*				TopChild() const;
-	virtual	Layer*				LowerSibling() const;
-	virtual	Layer*				UpperSibling() const;
-	virtual	Layer*				BottomChild() const;
+	virtual	Layer*				FirstChild() const;
+	virtual	Layer*				NextChild() const;
+	virtual	Layer*				PreviousChild() const;
+	virtual	Layer*				LastChild() const;
 
 	virtual	void				SetName(const char* name);	
 	inline	const char*			Name() const
@@ -196,9 +198,6 @@ class Layer {
 			void				PrintTree();
 	
 	// server "private" - should not be used
-			void				SetRootLayer(RootLayer* rl)
-									{ fRootLayer = rl; }
-
 			void				SetAsTopLayer(bool option)
 									{ fIsTopLayer = option; }
 
@@ -305,11 +304,12 @@ friend class OffscreenWinBorder;
 // value.)
 //			BPoint				fBoundsLeftTop;
 			WinBorder*			fOwner;
+
 			Layer*				fParent;
-			Layer*				fUpperSibling;
-			Layer*				fLowerSibling;
-			Layer*				fTopChild;
-			Layer*				fBottomChild;
+			Layer*				fPreviousSibling;
+			Layer*				fNextSibling;
+			Layer*				fFirstChild;
+			Layer*				fLastChild;
 	
 	mutable	Layer*				fCurrent;
 

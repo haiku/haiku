@@ -234,10 +234,10 @@ RootLayer::WorkingThread(void *data)
 	oneRootLayer->rebuild_visible_regions(
 		BRegion(oneRootLayer->Bounds()),
 		BRegion(oneRootLayer->Bounds()),
-		oneRootLayer->BottomChild());
+		oneRootLayer->LastChild());
 
 	oneRootLayer->fRedrawReg.Include(oneRootLayer->Bounds());
-	oneRootLayer->RequestDraw(oneRootLayer->fRedrawReg, oneRootLayer->BottomChild());
+	oneRootLayer->RequestDraw(oneRootLayer->fRedrawReg, oneRootLayer->LastChild());
 #endif
 	oneRootLayer->Unlock();
 	
@@ -502,45 +502,53 @@ RootLayer::ResizeBy(float x, float y)
 }
 
 
-Layer *
-RootLayer::TopChild() const
+Layer*
+RootLayer::FirstChild() const
 {
-	fWinBorderIndex	= fWinBorderCount-1;
+	fWinBorderIndex	= fWinBorderCount - 1;
+
+	if (fWinBorderIndex >= 0)
+		return fWinBorderList[fWinBorderIndex];
+
+	return NULL;
+}
+
+Layer*
+RootLayer::NextChild() const
+{
+	fWinBorderIndex--;
 
 	if (fWinBorderIndex < fWinBorderCount && fWinBorderIndex >= 0)
-		return fWinBorderList[fWinBorderIndex--];
+		return fWinBorderList[fWinBorderIndex];
 
 	return NULL;
 }
 
-Layer* RootLayer::LowerSibling() const
+Layer*
+RootLayer::PreviousChild() const
 {
-	if (fWinBorderIndex < fWinBorderCount && fWinBorderIndex > 0)
-		return fWinBorderList[fWinBorderIndex--];
+	fWinBorderIndex++;
+
+	if (fWinBorderIndex < fWinBorderCount && fWinBorderIndex >= 0)
+		return fWinBorderList[fWinBorderIndex];
 
 	return NULL;
 }
 
-Layer* RootLayer::UpperSibling() const
-{
-	if (fWinBorderIndex < fWinBorderCount && fWinBorderIndex > 0)
-		return fWinBorderList[fWinBorderIndex++];
-
-	return NULL;
-}
-
-Layer* RootLayer::BottomChild() const
+Layer*
+RootLayer::LastChild() const
 {
 	fWinBorderIndex	= 0;
 
-	if (fWinBorderIndex < fWinBorderCount && fWinBorderIndex >= 0)
-		return fWinBorderList[fWinBorderIndex++];
+	if (fWinBorderIndex < fWinBorderCount)
+		return fWinBorderList[fWinBorderIndex];
 
 	return NULL;
 }
 
 
-void RootLayer::AddWinBorder(WinBorder* winBorder)
+void
+RootLayer::AddWinBorder(WinBorder* winBorder)
 {
 	if (!winBorder->IsHidden())
 	{
@@ -1116,6 +1124,8 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 			msg.Read<int32>(&evt.buttons);
 			msg.Read<int32>(&evt.clicks);
 
+			evt.where.ConstrainTo(fFrame);
+
 			if (fLastMousePosition != evt.where) {
 				// TODO: a B_MOUSE_MOVED message might have to be generated in order to
 				// correctly trigger entered/exited view transits.
@@ -1223,6 +1233,8 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 			msg.Read<float>(&evt.where.y);
 			msg.Read<int32>(&evt.modifiers);
 
+			evt.where.ConstrainTo(fFrame);
+
 			if (fLastMouseMoved == NULL) {
 				CRITICAL("RootLayer::MouseEventHandler(B_MOUSE_UP) fLastMouseMoved is null!\n");
 				break;
@@ -1295,12 +1307,14 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 			// 3) float - y coordinate of mouse click
 			// 4) int32 - buttons down
 			
-			PointerEvent evt;	
+			PointerEvent evt;
 			evt.code = B_MOUSE_MOVED;
 			msg.Read<int64>(&evt.when);
 			msg.Read<float>(&evt.where.x);
 			msg.Read<float>(&evt.where.y);
 			msg.Read<int32>(&evt.buttons);
+
+			evt.where.ConstrainTo(fFrame);
 
 			GetHWInterface()->MoveCursorTo(evt.where.x, evt.where.y);
 
@@ -1921,8 +1935,8 @@ RootLayer::show_winBorder(WinBorder *winBorder)
 		if (fActiveWksIndex == i) {
 			invalidate = invalid;
 
-			if (dynamic_cast<class WorkspacesLayer *>(winBorder->TopChild()) != NULL)
-				SetWorkspacesLayer(winBorder->TopChild());
+			if (dynamic_cast<class WorkspacesLayer *>(winBorder->FirstChild()) != NULL)
+				SetWorkspacesLayer(winBorder->FirstChild());
 		}
 	}
 
@@ -1957,7 +1971,7 @@ RootLayer::hide_winBorder(WinBorder *winBorder)
 		if (fActiveWksIndex == i) {
 			invalidate = invalid;
 
-			if (dynamic_cast<class WorkspacesLayer *>(winBorder->TopChild()) != NULL)
+			if (dynamic_cast<class WorkspacesLayer *>(winBorder->FirstChild()) != NULL)
 				SetWorkspacesLayer(NULL);
 		}
 	}
@@ -2041,8 +2055,8 @@ bool RootLayer::get_workspace_windows()
 	SetWorkspacesLayer(NULL);
 
 	for (int32 i = 0; i < fWinBorderCount; i++) {
-		if (dynamic_cast<class WorkspacesLayer *>(fWinBorderList[i]->TopChild()) != NULL)
-			SetWorkspacesLayer(fWinBorderList[i]->TopChild());
+		if (dynamic_cast<class WorkspacesLayer *>(fWinBorderList[i]->FirstChild()) != NULL)
+			SetWorkspacesLayer(fWinBorderList[i]->FirstChild());
 	}
 
 	// to determine if there was a change in window hierarchy 
@@ -2112,10 +2126,10 @@ RootLayer::empty_visible_regions(Layer *layer)
 	layer->fFullVisible.MakeEmpty();
 	layer->fVisible.MakeEmpty();
 
-	Layer* child = layer->BottomChild();
+	Layer* child = layer->LastChild();
 	while (child) {
 		empty_visible_regions(child);
-		child = layer->UpperSibling();
+		child = layer->PreviousChild();
 	}
 }
 #endif
