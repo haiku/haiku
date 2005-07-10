@@ -1,0 +1,57 @@
+# Settings file for the nv driver and accelerant
+#
+# This file should be moved to the directory
+# ~/config/settings/kernel/drivers/
+#
+
+# nv.driver parameters
+# accelerant "nv.accelerant"
+
+# nv.accelerant parameters
+usebios    true			# if true rely on bios to coldstart the card
+memory     2			# in MB, override builtin memory size detection
+hardcursor false			# if true use on-chip cursor capabilities
+#logmask   0x00000000	# nothing logged, is default
+#logmask   0x08000604	# log overlay use in full
+#logmask 	0xffffffff		# log everything
+dumprom    false        		# dump bios rom in ~/nv.rom
+switchhead false			# switch head assignment (dualhead cards only)
+force_pci	false			# block AGP mode use if true (AGP cards only)
+
+# WARNING: tweak alert! modify stuff below on your own risk...
+unhide_fw	false			# if true 'unhide' cards AGP fastwrite support on cards that hide it
+pgm_panel	true			# if false don't program DVI and laptop panel pixelclocks (refreshrates)
+#--------- that's all.
+
+
+#logmask setup info:
+#log level select:
+#logmask   0x0000000x	# lowest digit: bitmask to select logging level.
+
+#log modules select:
+#logmask   0xxxxxxxx0	# highest 7 digits: bitmask to select individual modules to log.
+
+#log modules:
+#logmask   0x00000100	# engine: agp
+#logmask   0x00000200	# engine: bes
+#logmask   0x00000400	# overlay
+#logmask   0x00000800	# engine: support
+#logmask   0x00001000	# engine: dac2
+#logmask   0x00002000	# engine: info
+#logmask   0x00004000	# engine: i2c
+#logmask   0x00008000	# engine: general
+#logmask   0x00010000	# engine: dac1
+#logmask   0x00020000	# engine: crtc2
+#logmask   0x00040000	# engine: crtc1
+#logmask   0x00080000	# engine: acc
+#logmask   0x00100000	# engine: brooktree tv
+#logmask   0x00200000	# set displaymode
+#logmask   0x00400000	# propose displaymode
+#logmask   0x00800000	# init accelerant
+#logmask   0x01000000	# get timing constraints
+#logmask   0x02000000	# get mode info
+#logmask   0x04000000	# get device info
+#logmask   0x08000000	# get accelerant hook
+#logmask   0x10000000	# engine management
+#logmask   0x20000000	# cursor
+#logmask   0x40000000	# acceleration
