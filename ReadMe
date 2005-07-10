@@ -44,7 +44,9 @@ is this:
 
   $ makehdimage /Haiku
 
-Where "/Haiku" is the (mounted) partition of where you want to install Haiku on.
+Where "/Haiku" is the mounted BFS partition where you want to install Haiku on.
+This can be any BFS partition with enough space available. Use DriveSetup to initialize
+a partition to BFS.
 If the parameter is omitted, makehdimage currently creates a 60 MB Haiku image in
 this directory that you can use for Bochs, Qemu and other emulators to boot.
 
