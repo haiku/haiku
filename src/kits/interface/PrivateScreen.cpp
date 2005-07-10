@@ -218,7 +218,7 @@ BPrivateScreen::DesktopColor(uint32 workspace)
 	BPrivate::AppServerLink link;
 
 	link.StartMessage(AS_GET_DESKTOP_COLOR);
-	link.Attach<int32>(workspace);
+	link.Attach<uint32>(workspace);
 
 	int32 code;
 	if (link.FlushWithReply(code) == B_OK

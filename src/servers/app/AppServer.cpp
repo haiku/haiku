@@ -81,9 +81,9 @@ ColorSet gGUIColorSet;
 	threads, loads user preferences for the UI and decorator, and allocates various locks.
 */
 #if TEST_MODE
-AppServer::AppServer(void) : BApplication (SERVER_SIGNATURE),
+AppServer::AppServer() : BApplication (SERVER_SIGNATURE),
 #else
-AppServer::AppServer(void) : 
+AppServer::AppServer() : 
 #endif
 	fAppListLock("application list"),
 	fCursorSem(-1),
@@ -419,7 +419,7 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 
 			// Attached data:
 			// 1) port_id - receiver port of a regular app
-			// 2) port_id - client looper port - for send messages to the client
+			// 2) port_id - client looper port - for sending messages to the client
 			// 2) team_id - app's team ID
 			// 3) int32 - handler token of the regular app
 			// 4) char * - signature of the regular app

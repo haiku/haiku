@@ -420,13 +420,14 @@ ServerApp::_MessageLooper()
 				// Go ahead and fix if you have an idea for unification...
 
 				// Attached data:
-				// 2) BRect window frame
-				// 3) uint32 window look
-				// 4) uint32 window feel
-				// 5) uint32 window flags
-				// 6) uint32 workspace index
-				// 7) int32 BHandler token of the window
-				// 8) port_id window's message port
+				// 1) BRect window frame
+				// 2) uint32 window look
+				// 3) uint32 window feel
+				// 4) uint32 window flags
+				// 5) uint32 workspace index
+				// 6) int32 BHandler token of the window
+				// 7) port_id window's reply port
+				// 8) port_id window's looper port
 				// 9) const char * title
 
 				BRect frame;
@@ -488,14 +489,16 @@ ServerApp::_MessageLooper()
 				// NOTE/TODO: Code duplication in part to above case.
 
 				// Attached data:
+				// 1) int32 bitmap token
 				// 2) BRect window frame
 				// 3) uint32 window look
 				// 4) uint32 window feel
 				// 5) uint32 window flags
 				// 6) uint32 workspace index
 				// 7) int32 BHandler token of the window
-				// 8) port_id window's message port
-				// 9) const char * title
+				// 8) port_id window's reply port
+				// 9) port_id window's looper port
+				// 10) const char * title
 
 				BRect frame;
 				int32 bitmapToken;
@@ -842,7 +845,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			STRACE(("ServerApp %s: Received BBitmap creation request\n", Signature()));
 			// Allocate a bitmap for an application
 			
-			// Attached Data: 
+			// Attached Data:
 			// 1) BRect bounds
 			// 2) color_space space
 			// 3) int32 bitmap_flags
@@ -878,7 +881,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (bitmap && fBitmapList.AddItem((void*)bitmap)) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<int32>(bitmap->Token());
-				fLink.Attach<int32>(bitmap->Area());
+				fLink.Attach<area_id>(bitmap->Area());
 				fLink.Attach<int32>(bitmap->AreaOffset());
 			} else {
 				// alternatively, if something went wrong, we reply with SERVER_FALSE
@@ -896,7 +899,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// Attached Data:
 			// 1) int32 token
 			// 2) int32 reply port
-		
+
 			// Reply Code: SERVER_TRUE if successful, 
 			//				SERVER_FALSE if the buffer was already deleted or was not found
 			int32 id;
@@ -1013,8 +1016,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_QUERY_CURSOR_HIDDEN:
 		{
 			STRACE(("ServerApp %s: Received IsCursorHidden request\n", Signature()));
-			// Attached data
-			// 1) int32 port to reply to
 			fLink.StartMessage(fCursorHidden ? SERVER_TRUE : SERVER_FALSE);
 			fLink.Flush();
 			break;
@@ -1131,6 +1132,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			scroll_bar_info info;
 			if (link.Read<scroll_bar_info>(&info) == B_OK)
 				gDesktop->SetScrollBarInfo(info);
+			
+			fLink.StartMessage(SERVER_TRUE);
+			fLink.Flush();
 			break;
 		}
 		case AS_FOCUS_FOLLOWS_MOUSE:
@@ -1145,7 +1149,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_SET_FOCUS_FOLLOWS_MOUSE:
 		{
 			STRACE(("ServerApp %s: Set Focus Follows Mouse in use\n", Signature()));
-			// ToDo: implement me!
+			bool follow;
+			if (link.Read<bool>(&follow) == B_OK)
+				gDesktop->UseFFMouse(follow);
 			break;
 		}
 		case AS_SET_MOUSE_MODE:
@@ -1172,8 +1178,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			// Client application is asking for all the system colors at once
 			// using a ColorSet object
-			
-			
 			gGUIColorSet.Lock();
 			
 			fLink.StartMessage(SERVER_TRUE);
@@ -1181,7 +1185,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			fLink.Flush();
 			
 			gGUIColorSet.Unlock();
-			
 			break;
 		}
 		case AS_SET_UI_COLORS:
@@ -1191,7 +1194,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			// Attached data:
 			// 1) ColorSet new colors to use
-
 			gGUIColorSet.Lock();
 			link.Read<ColorSet>(&gGUIColorSet);
 			gGUIColorSet.Unlock();
@@ -1239,6 +1241,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// if just checking, just give an answer,
 			// if not and needs updated, 
 			// sync the font list and return true else return false
+			// TODO: actually do the above...
 			fLink.StartMessage(SERVER_FALSE);
 			fLink.Flush();
 			break;
@@ -1259,9 +1262,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			FontFamily *ffamily = gFontServer->GetFamily(id);
 			if (ffamily) {
 				font_family fam;
-				strcpy(fam, ffamily->Name());
+				strncpy(fam, ffamily->Name(), sizeof(font_family) - 1);
+				fam[sizeof(font_family) - 1] = 0;
+				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach(fam, sizeof(font_family));
-				fLink.Attach<int32>(ffamily->GetFlags());
+				fLink.Attach<uint32>(ffamily->GetFlags());
 			} else
 				fLink.StartMessage(SERVER_FALSE);
 
@@ -1281,25 +1286,26 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// 2) uint16 - appropriate face values
 			// 3) uint32 - flags of font style (B_IS_FIXED || B_HAS_TUNED_FONT)
 
-			int32 styid;
+			int32 styleid;
 			font_family fam;
 
-			link.Read(fam,sizeof(font_family));
-			link.Read<int32>(&styid);
+			link.Read(fam, sizeof(font_family));
+			link.Read<int32>(&styleid);
 
 			gFontServer->Lock();
-			FontStyle *fstyle = gFontServer->GetStyle(fam, styid);
+			FontStyle *fstyle = gFontServer->GetStyle(fam, styleid);
 			if (fstyle) {
-				font_family sty;
-				strcpy(sty, fstyle->Name());
+				font_style style;
+				strncpy(style, fstyle->Name(), sizeof(font_style) - 1);
+				style[sizeof(font_style) - 1] = 0;
 				fLink.StartMessage(SERVER_TRUE);
-				fLink.Attach(sty,sizeof(font_style));
-				fLink.Attach<int32>(fstyle->GetFace());
-				fLink.Attach<int32>(fstyle->GetFlags());
+				fLink.Attach(style, sizeof(font_style));
+				fLink.Attach<uint32>(fstyle->GetFace());
+				fLink.Attach<uint32>(fstyle->GetFlags());
 			} else
 				fLink.StartMessage(SERVER_FALSE);
 
-			fLink.Flush();			
+			fLink.Flush();
 			gFontServer->Unlock();
 			break;
 		}
@@ -1323,8 +1329,10 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			gFontServer->Lock();
 			FontStyle *fstyle = gFontServer->GetStyle(famid, styid);
 			if (fstyle) {
-				strcpy(fam, fstyle->Family()->Name());
-				strcpy(sty, fstyle->Name());
+				strncpy(fam, fstyle->Family()->Name(), sizeof(font_family) - 1);
+				strncpy(sty, fstyle->Name(), sizeof(font_style) - 1);
+				fam[sizeof(font_family) - 1] = 0;
+				sty[sizeof(font_style) - 1] = 0;
 
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach(fam, sizeof(font_family));
@@ -1350,7 +1358,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// NOTE: While this may be unimplemented, we can safely return
 			// SERVER_FALSE. This will force the BFont code to default to
 			// B_LEFT_TO_RIGHT, which is what the vast majority of fonts will be.
-			// This will be fixed later.
+			// TODO: This will be fixed later.
 			int32 famid, styid;
 			link.Read<int32>(&famid);
 			link.Read<int32>(&styid);
@@ -1642,6 +1650,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			break;
 		}
 		case AS_SET_SYSFONT_PLAIN:
+		case AS_SET_SYSFONT_BOLD:
+		case AS_SET_SYSFONT_FIXED:
 		{
 			FTRACE(("ServerApp %s: AS_SET_SYSFONT_PLAIN\n", Signature()));
 			// Returns:
@@ -1652,7 +1662,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// 5) uint32 - font flags
 
 			gFontServer->Lock();
-			ServerFont *sf = gFontServer->GetSystemPlain();
+			ServerFont *sf = NULL;
+
+			switch (code) {
+				case AS_SET_SYSFONT_PLAIN: sf = gFontServer->GetSystemPlain(); break;
+				case AS_SET_SYSFONT_BOLD: sf = gFontServer->GetSystemBold(); break;
+				case AS_SET_SYSFONT_FIXED: sf = gFontServer->GetSystemFixed(); break;
+			}
+
 			if (sf) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<uint16>(sf->FamilyID());
@@ -1692,58 +1709,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			gFontServer->Unlock();
 			break;
 		}
-		case AS_SET_SYSFONT_BOLD:
-		{
-			FTRACE(("ServerApp %s: AS_SET_SYSFONT_BOLD\n", Signature()));
-			// Returns:
-			// 1) uint16 - family ID
-			// 2) uint16 - style ID
-			// 3) float - size in points
-			// 4) uint16 - face flags
-			// 5) uint32 - font flags
-			
-			gFontServer->Lock();
-			ServerFont *sf = gFontServer->GetSystemBold();
-			if (sf) {
-				fLink.StartMessage(SERVER_TRUE);
-				fLink.Attach<uint16>(sf->FamilyID());
-				fLink.Attach<uint16>(sf->StyleID());
-				fLink.Attach<float>(sf->Size());
-				fLink.Attach<uint16>(sf->Face());
-				fLink.Attach<uint32>(sf->Flags());
-			} else
-				fLink.StartMessage(SERVER_FALSE);
-
-			fLink.Flush();
-			gFontServer->Unlock();
-			break;
-		}
-		case AS_SET_SYSFONT_FIXED:
-		{
-			FTRACE(("ServerApp %s: AS_SET_SYSFONT_FIXED\n", Signature()));
-			// Returns:
-			// 1) uint16 - family ID
-			// 2) uint16 - style ID
-			// 3) float - size in points
-			// 4) uint16 - face flags
-			// 5) uint32 - font flags
-
-			gFontServer->Lock();
-			ServerFont *sf = gFontServer->GetSystemFixed();
-			if (sf) {
-				fLink.StartMessage(SERVER_TRUE);
-				fLink.Attach<uint16>(sf->FamilyID());
-				fLink.Attach<uint16>(sf->StyleID());
-				fLink.Attach<float>(sf->Size());
-				fLink.Attach<uint16>(sf->Face());
-				fLink.Attach<uint32>(sf->Flags());
-			} else
-				fLink.StartMessage(SERVER_FALSE);
-
-			fLink.Flush();
-			gFontServer->Unlock();
-			break;
-		}
 		case AS_GET_GLYPH_SHAPES:
 		{
 			FTRACE(("ServerApp %s: AS_GET_GLYPH_SHAPES\n", Signature()));
@@ -1776,8 +1741,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<int32>(&numChars);
 			
 			char charArray[numChars];			
-			for (int32 i = 0; i < numChars; i++)
-				link.Read<char>(&charArray[i]);
+			link.Read(&charArray, numChars);
 			
 			ServerFont font;
 			if (font.SetFamilyAndStyle(famid, styid) == B_OK) {
@@ -1935,9 +1899,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			STRACE(("ServerApp %s: AS_SCREEN_GET_MODE\n", Signature()));
 			// Attached data
-			// 1) int32 port to reply to
-			// 2) screen_id
-			// 3) workspace index
+			// 1) screen_id screen
+			// 2) uint32 workspace index
 			screen_id id;
 			link.Read<screen_id>(&id);
 			uint32 workspace;
@@ -1962,11 +1925,10 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			STRACE(("ServerApp %s: AS_SCREEN_SET_MODE\n", Signature()));
 			// Attached data
-			// 1) int32 port to reply to
-			// 2) screen_id
-			// 3) workspace index
-			// 4) display_mode to set
-			// 5) 'makedefault' boolean
+			// 1) screen_id
+			// 2) workspace index
+			// 3) display_mode to set
+			// 4) 'makedefault' boolean
 			// TODO: See above: workspaces support, etc.
 
 			screen_id id;
@@ -1984,7 +1946,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 // TODO: lock RootLayer, set mode and tell it to update it's frame and all clipping
 // optionally put this into a message and let the root layer thread handle it.
 //			status_t ret = gDesktop->ScreenAt(0)->SetMode(mode);
-status_t ret = B_ERROR;
+			status_t ret = B_ERROR;
 
 			fLink.StartMessage(SERVER_TRUE);
 			fLink.Attach<status_t>(ret);
@@ -2015,6 +1977,10 @@ status_t ret = B_ERROR;
 		
 		case AS_GET_MODE_LIST:
 		{
+			screen_id id;
+			link.Read<screen_id>(&id);
+			// TODO: use this screen id
+
 			display_mode* modeList;
 			uint32 count;
 			if (gDesktop->GetHWInterface()->GetModeList(&modeList, &count) == B_OK) {
@@ -2052,8 +2018,8 @@ status_t ret = B_ERROR;
 		{
 			STRACE(("ServerApp %s: get desktop color\n", Signature()));
 
-			int32 workspaceIndex = 0;
-			link.Read<int32>(&workspaceIndex);
+			uint32 workspaceIndex = 0;
+			link.Read<uint32>(&workspaceIndex);
 
 			// ToDo: for some reason, we currently get "1" as no. of workspace
 			workspaceIndex = 0;
@@ -2066,7 +2032,6 @@ status_t ret = B_ERROR;
 			Workspace *workspace = root->WorkspaceAt(workspaceIndex);
 			if (workspace != NULL) {
 				fLink.StartMessage(SERVER_TRUE);
-				//rgb_color color;
 				fLink.Attach<rgb_color>(workspace->BGColor().GetColor32());
 			} else
 				fLink.StartMessage(SERVER_FALSE);
@@ -2093,7 +2058,6 @@ status_t ret = B_ERROR;
 				fLink.StartMessage(SERVER_FALSE);
 			
 			fLink.Flush();
-			
 			break;
 		}
 		
@@ -2109,7 +2073,6 @@ status_t ret = B_ERROR;
 			fLink.StartMessage(SERVER_TRUE);
 			fLink.Attach<sem_id>(semaphore);
 			fLink.Flush();
-			
 			break;
 		}
 		
@@ -2119,6 +2082,7 @@ status_t ret = B_ERROR;
 			// We aren't using the screen_id for now...
 			screen_id id;
 			link.Read<screen_id>(&id);
+			
 			display_timing_constraints constraints;
 			if (gDesktop->GetHWInterface()->GetTimingConstraints(&constraints) == B_OK) {
 				fLink.StartMessage(SERVER_TRUE);
@@ -2127,7 +2091,6 @@ status_t ret = B_ERROR;
 				fLink.StartMessage(SERVER_FALSE);
 			
 			fLink.Flush();
-				
 			break;
 		}
 		
@@ -2149,7 +2112,6 @@ status_t ret = B_ERROR;
 				fLink.StartMessage(SERVER_FALSE);
 			
 			fLink.Flush();
-			
 			break;
 		}
 		
@@ -2168,7 +2130,6 @@ status_t ret = B_ERROR;
 				fLink.StartMessage(SERVER_FALSE);
 			
 			fLink.Flush();
-			
 			break;
 		}
 		
@@ -2183,7 +2144,6 @@ status_t ret = B_ERROR;
 			fLink.StartMessage(SERVER_TRUE);
 			fLink.Attach<uint32>(state);
 			fLink.Flush();
-			
 			break;
 		}
 				

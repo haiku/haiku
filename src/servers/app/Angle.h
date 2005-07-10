@@ -33,44 +33,45 @@
 	\class Angle Angle.h
 	\brief Class for speeding up trig functions. Works in degrees only.
 */
-class Angle
-{
+class Angle {
 public:
-	Angle(float angle);
-	Angle(void);
-	virtual ~Angle(void);
+						Angle(float angle);
+						Angle();
+virtual					~Angle();
 
-	void Normalize(void);
+		void			Normalize();
 
-	float Sine(void);
-	Angle InvSine(float value);
+		float			Sine(void);
+		Angle			InvSine(float value);
 
-	float Cosine(void);
-	Angle InvCosine(float value);
+		float			Cosine(void);
+		Angle			InvCosine(float value);
 
-	float Tangent(int *status=NULL);
-	Angle InvTangent(float value);
-	
-	uint8 Quadrant(void);
-	Angle Constrain180(void);
-	Angle Constrain90(void);
-	
-	void SetValue(float angle);
-	float Value(void) const;
-	Angle &operator=(const Angle &from);
-	Angle &operator=(const float &from);
-	Angle &operator=(const long &from);
-	Angle &operator=(const int &from);
-	bool operator==(const Angle &from);
-	bool operator!=(const Angle &from);
-	bool operator<(const Angle &from);
-	bool operator>(const Angle &from);
-	bool operator>=(const Angle &from);
-	bool operator<=(const Angle &from);
+		float			Tangent(int *status=NULL);
+		Angle			InvTangent(float value);
+
+		uint8			Quadrant(void);
+		Angle			Constrain180(void);
+		Angle			Constrain90(void);
+
+		void			SetValue(float angle);
+		float			Value(void) const;
+
+		Angle			&operator=(const Angle &from);
+		Angle			&operator=(const float &from);
+		Angle			&operator=(const long &from);
+		Angle			&operator=(const int &from);
+
+		bool			operator==(const Angle &from);
+		bool			operator!=(const Angle &from);
+		bool			operator<(const Angle &from);
+		bool			operator>(const Angle &from);
+		bool			operator>=(const Angle &from);
+		bool			operator<=(const Angle &from);
 
 protected:	
-	float fAngleValue;
-	void InitTrigTables(void);
+		float			fAngleValue;
+		void			InitTrigTables(void);
 };
 
 #endif

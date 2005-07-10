@@ -35,10 +35,8 @@
 #include "ColorSet.h"
 #include "ServerConfig.h"
 
-
-
 //! Constructor which does nothing
-ColorSet::ColorSet(void)
+ColorSet::ColorSet()
 {
 }
 
@@ -56,7 +54,8 @@ ColorSet::ColorSet(const ColorSet &cs)
 	\param cs Color set to copy from
 	\return The new values assigned to the color set
 */
-ColorSet & ColorSet::operator=(const ColorSet &cs)
+ColorSet &
+ColorSet::operator=(const ColorSet &cs)
 {
 	SetColors(cs);
 	return *this;
@@ -67,7 +66,8 @@ ColorSet & ColorSet::operator=(const ColorSet &cs)
 		and, yes, *IT EVEN MAKES french fries!!*
 	\param cs Color set to copy from
 */
-void ColorSet::SetColors(const ColorSet &cs)
+void
+ColorSet::SetColors(const ColorSet &cs)
 {
 	panel_background=cs.panel_background;
 	panel_text=cs.panel_text;
@@ -104,7 +104,8 @@ void ColorSet::SetColors(const ColorSet &cs)
 }
 
 //! Prints all color set elements to stdout
-void ColorSet::PrintToStream(void) const
+void
+ColorSet::PrintToStream(void) const
 {
 	printf("panel_background "); PrintMember(panel_background);
 	printf("panel_text "); PrintMember(panel_text);
@@ -145,7 +146,8 @@ void ColorSet::PrintToStream(void) const
 	\brief Assigns the default system colors to the passed ColorSet object
 	\param set The ColorSet object to set to defaults
 */
-void ColorSet::SetToDefaults(void)
+void
+ColorSet::SetToDefaults(void)
 {
 #ifdef DEBUG_COLORSET
 printf("Initializing color settings to defaults\n");
@@ -182,7 +184,8 @@ printf("Initializing color settings to defaults\n");
 	\brief Attaches the color set's members as data to the given BMessage
 	\param msg The message to receive the attributes
 */
-bool ColorSet::ConvertToMessage(BMessage *msg) const
+bool
+ColorSet::ConvertToMessage(BMessage *msg) const
 {
 	if(!msg)
 		return false;
@@ -236,7 +239,8 @@ bool ColorSet::ConvertToMessage(BMessage *msg) const
 	\param msg The message containing the data for the color set's colors
 */
 
-bool ColorSet::ConvertFromMessage(const BMessage *msg)
+bool
+ColorSet::ConvertFromMessage(const BMessage *msg)
 {
 	if(!msg)
 		return false;
@@ -304,7 +308,8 @@ bool ColorSet::ConvertFromMessage(const BMessage *msg)
 	\param string name of the color to receive the value
 	\param value An rgb_color which is the new value of the member
 */
-status_t ColorSet::SetColor(const char *string, rgb_color value)
+status_t
+ColorSet::SetColor(const char *string, rgb_color value)
 {
 	if(!string)
 		return B_BAD_VALUE;
@@ -321,7 +326,8 @@ status_t ColorSet::SetColor(const char *string, rgb_color value)
 	\param string name of the color to obtain
 	\return The set's color or (0,0,0,0) if not found
 */
-rgb_color ColorSet::StringToColor(const char *string)
+rgb_color
+ColorSet::StringToColor(const char *string)
 {
 	rgb_color *col=StringToMember(string);
 	if(!col)
@@ -338,7 +344,8 @@ rgb_color ColorSet::StringToColor(const char *string)
 	\param string name of the color member to obtain
 	\return An RGBColor pointer or NULL if not found
 */
-rgb_color *ColorSet::StringToMember(const char *string)
+rgb_color *
+ColorSet::StringToMember(const char *string)
 {
 	if(!string)
 		return NULL;
@@ -398,7 +405,8 @@ rgb_color *ColorSet::StringToMember(const char *string)
 	
 }
 
-rgb_color ColorSet::AttributeToColor(int32 which)
+rgb_color
+ColorSet::AttributeToColor(int32 which)
 {
 	switch(which)
 	{
@@ -541,7 +549,8 @@ rgb_color ColorSet::AttributeToColor(int32 which)
 	}
 }
 
-void ColorSet::PrintMember(const rgb_color &color) const
+void
+ColorSet::PrintMember(const rgb_color &color) const
 {
 	printf("rgb_color(%d, %d, %d, %d)", color.red,color.green,color.blue,color.alpha);
 }
@@ -551,7 +560,8 @@ void ColorSet::PrintMember(const rgb_color &color) const
 	\param set the set to receive the system colors
 	\return B_OK if successful. See BFile for other error codes
 */
-status_t LoadColorSet(const char *path, ColorSet *set)
+status_t
+LoadColorSet(const char *path, ColorSet *set)
 {
 	BFile file(path,B_READ_ONLY);
 	if(file.InitCheck()!=B_OK)
@@ -573,7 +583,8 @@ status_t LoadColorSet(const char *path, ColorSet *set)
 	\param set ColorSet containing the colors to save
 	\return B_OK if successful. See BFile for other error codes
 */
-status_t SaveColorSet(const char *path, const ColorSet &set)
+status_t
+SaveColorSet(const char *path, const ColorSet &set)
 {
 	// TODO: Move this check to the app_server
 	BEntry entry(SERVER_SETTINGS_DIR);
@@ -591,4 +602,3 @@ status_t SaveColorSet(const char *path, const ColorSet &set)
 	msg.Flatten(&file);	
 	return B_OK;
 }
-

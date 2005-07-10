@@ -1088,13 +1088,21 @@ myRootLayer->Unlock();
 				fLink.Flush();
 			} else {
 				// TODO: Watch out for the coordinate system in AS_LAYER_GET_CLIP_REGION
+#ifndef NEW_CLIPPING
 				int32 rectCount = fCurrentLayer->fVisible.CountRects();
+#else
+				int32 rectCount = fCurrentLayer->fVisible2.CountRects();
+#endif
 
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<int32>(rectCount);
 
 				for (int32 i = 0; i < rectCount; i++)
+#ifndef NEW_CLIPPING
 					fLink.Attach<BRect>(fCurrentLayer->ConvertFromTop(fCurrentLayer->fVisible.RectAt(i)));
+#else
+					fLink.Attach<BRect>(fCurrentLayer->ConvertFromTop(fCurrentLayer->fVisible2.RectAt(i)));
+#endif
 
 				fLink.Flush();
 			}

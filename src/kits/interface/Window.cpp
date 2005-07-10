@@ -2061,7 +2061,7 @@ BWindow::InitData(BRect frame, const char* title, window_look look,
 		locked = true; 
 	}
 
-	// let app_server to know that a window has been created.
+	// let app_server know that a window has been created.
 	fLink = new BPrivate::PortLink(
 		BApplication::Private::ServerLink()->SenderPort(), receivePort);
 
@@ -2073,8 +2073,8 @@ BWindow::InitData(BRect frame, const char* title, window_look look,
 	}
 
 	fLink->Attach<BRect>(fFrame);
-	fLink->Attach<int32>((int32)fLook);
-	fLink->Attach<int32>((int32)fFeel);
+	fLink->Attach<uint32>((uint32)fLook);
+	fLink->Attach<uint32>((uint32)fFeel);
 	fLink->Attach<uint32>(fFlags);
 	fLink->Attach<uint32>(workspace);
 	fLink->Attach<int32>(_get_object_token_(this));

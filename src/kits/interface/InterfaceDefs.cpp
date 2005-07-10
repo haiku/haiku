@@ -939,7 +939,7 @@ get_system_colors(ColorSet *colors)
 	link.StartMessage(AS_GET_UI_COLORS);
 
 	int32 code;
-	if (link.FlushWithReply(code) == B_OK)
+	if (link.FlushWithReply(code) == B_OK && code == SERVER_TRUE)
 		link.Read<ColorSet>(colors);
 }
 

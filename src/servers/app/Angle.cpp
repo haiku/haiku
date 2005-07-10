@@ -49,7 +49,7 @@ Angle::Angle(float angle)
 }
 
 //! Constructor
-Angle::Angle(void)
+Angle::Angle()
 {
 	fAngleValue=0;
 	if(tables_initialized==false)
@@ -60,7 +60,7 @@ Angle::Angle(void)
 }
 
 //! Empty destructor
-Angle::~Angle(void)
+Angle::~Angle()
 {
 }
 
@@ -116,7 +116,7 @@ Angle Angle::InvSine(float value)
 	// current sintable[i] is less than value. Pick the degree value which is closer
 	// to the passed value
 	if( (value - sintable[i]) > (sintable[i+1] - value) )
-		return (i+1);
+		return Angle(i+1);
 	
 	return Angle(i);		// value is closer to previous
 }
@@ -155,7 +155,7 @@ Angle Angle::InvCosine(float value)
 	// current costable[i] is less than value. Pick the degree value which is closer
 	// to the passed value
 	if( (value - costable[i]) < (costable[i+1] - value) )
-		return (i+1);
+		return Angle(i+1);
 
 	return Angle(i);		// value is closer to previous
 }
@@ -196,7 +196,7 @@ Angle Angle::InvTangent(float value)
 		i--;
 
 	if( (value - tantable[i]) < (tantable[i+1] - value) )
-		return (i+1);
+		return Angle(i+1);
 
 	return Angle(i);		// value is closer to previous
 }

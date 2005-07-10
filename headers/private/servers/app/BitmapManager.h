@@ -8,7 +8,6 @@
 #ifndef BITMAP_MANAGER_H_
 #define BITMAP_MANAGER_H_
 
-
 #include <GraphicsDefs.h>
 #include <List.h>
 #include <OS.h>
@@ -32,22 +31,23 @@ class ServerBitmap;
 	by the BitmapManager lock.
 */
 class BitmapManager {
- public:
-								BitmapManager();
-	virtual						~BitmapManager();
+public:
+						BitmapManager();
+virtual					~BitmapManager();
 
-			ServerBitmap*		CreateBitmap(BRect bounds,
-											 color_space space,
-											 int32 flags,
-											 int32 bytesPerRow = -1,
-											 screen_id screen = B_MAIN_SCREEN_ID);
-			void				DeleteBitmap(ServerBitmap* bitmap);
- protected:
-			BList				fBitmapList;
-			int8*				fBuffer;
-			TokenHandler		fTokenizer;
-			BLocker				fLock;
-			AreaPool			fMemPool;
+		ServerBitmap	*CreateBitmap(	BRect bounds,
+										color_space space,
+										int32 flags,
+										int32 bytesPerRow = -1,
+										screen_id screen = B_MAIN_SCREEN_ID);
+		void			DeleteBitmap(ServerBitmap* bitmap);
+
+protected:
+		BList			fBitmapList;
+		int8			*fBuffer;
+		TokenHandler	fTokenizer;
+		BLocker			fLock;
+		AreaPool		fMemPool;
 };
 
 extern BitmapManager *gBitmapManager;

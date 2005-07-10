@@ -4,6 +4,7 @@
  *
  * Author: DarkWyrm <bpmagic@columbus.rr.com>
  */
+
 #ifndef	_HAIKU_APP_SERVER_H_
 #define	_HAIKU_APP_SERVER_H_
 
@@ -16,13 +17,8 @@
 
 #include "ServerConfig.h"
 
-class Layer;
-class BMessage;
 class ServerApp;
-class DisplayDriver;
-class CursorManager;
 class BitmapManager;
-class DecorManager;
 class ColorSet;
 
 namespace BPrivate {
@@ -44,48 +40,46 @@ class AppServer
 #endif
 {
 public:
-						AppServer(void);
-						~AppServer(void);
+						AppServer();
+						~AppServer();
 
-	static	int32		PollerThread(void *data);
-	static	int32		PicassoThread(void *data);
-			thread_id	Run(void);
-			void 		MainLoop(void);
+static	int32			PollerThread(void *data);
+static	int32			PicassoThread(void *data);
+		thread_id		Run(void);
+		void 			MainLoop(void);
 
-			void		PostMessage(int32 code);
-			void		DispatchMessage(int32 code, BPrivate::PortLink &link);
-			ServerApp*	FindApp(const char *sig);
+		void			PostMessage(int32 code);
+		void			DispatchMessage(int32 code, BPrivate::PortLink &link);
+		ServerApp*		FindApp(const char *sig);
 
 private:
-	friend		void			BroadcastToAllApps(const int32 &code);
-	
-				void			LaunchCursorThread();
-				void			LaunchInputServer();
-	static		int32			CursorThread(void *data);
+friend	void			BroadcastToAllApps(const int32 &code);
 
-				port_id			fMessagePort;
-				port_id			fServerInputPort;
+		void			LaunchCursorThread();
+		void			LaunchInputServer();
+static	int32			CursorThread(void *data);
 
-	volatile	bool			fQuitting;
+		port_id			fMessagePort;
+		port_id			fServerInputPort;
 
-				BLocker			fAppListLock;
-				BList			fAppList;
+volatile bool			fQuitting;
 
-				thread_id		fPicassoThreadID;
+		BLocker			fAppListLock;
+		BList			fAppList;
 
-				thread_id		fISThreadID;
-				thread_id		fCursorThreadID;
-				sem_id			fCursorSem;
-				area_id			fCursorArea;
-				uint32			*fCursorAddr;
+		thread_id		fPicassoThreadID;
 
-				port_id			fISASPort;
-				port_id			fISPort;
+		thread_id		fISThreadID;
+		thread_id		fCursorThreadID;
+		sem_id			fCursorSem;
+		area_id			fCursorArea;
+		uint32			*fCursorAddr;
 
-				sem_id			fShutdownSemaphore;
-				int32			fShutdownCount;
+		port_id			fISASPort;
+		port_id			fISPort;
 
-				DisplayDriver	*fDriver;
+		sem_id			fShutdownSemaphore;
+		int32			fShutdownCount;
 };
 
 extern BitmapManager *gBitmapManager;

@@ -174,7 +174,7 @@ count_font_styles(font_family name)
 	link.StartMessage(AS_COUNT_FONT_STYLES);
 
 	if (link.FlushWithReply(code) != B_OK
-		&& code != SERVER_TRUE)
+		|| code != SERVER_TRUE)
 		return -1;
 
 	link.Read<int32>(&count);
@@ -186,7 +186,7 @@ count_font_styles(font_family name)
 	\brief Retrieves the family name at the specified index
 	\param index Unique font identifier code.
 	\param name font_family string to receive the name of the family
-	\param flags iF non-NULL, the values of the flags IS_FIXED and B_HAS_TUNED_FONT are returned
+	\param flags if non-NULL, the values of the flags IS_FIXED and B_HAS_TUNED_FONT are returned
 	\return B_ERROR if the index does not correspond to a font family
 */
 
@@ -209,8 +209,10 @@ get_font_family(int32 index, font_family *name, uint32 *flags)
 
 	link.Read<font_family>(name);
 	
+	uint32 value;
+	link.Read<uint32>(&value);
 	if (flags)
-		link.Read<uint32>(flags);
+		*flags = value;
 
 	return B_OK;
 }
@@ -220,7 +222,7 @@ get_font_family(int32 index, font_family *name, uint32 *flags)
 	\brief Retrieves the family name at the specified index
 	\param index Unique font identifier code.
 	\param name font_family string to receive the name of the family
-	\param flags iF non-NULL, the values of the flags IS_FIXED and B_HAS_TUNED_FONT are returned
+	\param flags if non-NULL, the values of the flags IS_FIXED and B_HAS_TUNED_FONT are returned
 	\return B_ERROR if the index does not correspond to a font style
 */
 
@@ -235,19 +237,24 @@ get_font_style(font_family family, int32 index, font_style *name,
 	BPrivate::AppServerLink link;
 
 	link.StartMessage(AS_GET_STYLE_NAME);
-	link.Attach(family,sizeof(font_family));
+	link.Attach(family, sizeof(font_family));
 	link.Attach<int32>(index);
 
 	if (link.FlushWithReply(code) != B_OK
 		|| code != SERVER_TRUE)
 		return B_ERROR;
 
-	link.Read<font_style>(name);
-	if (flags) {
-		uint16 face;
-		link.Read<uint16>(&face);
-		link.Read<uint32>(flags);
-	}
+	font_style style;
+	link.Read<font_style>(&style);
+	if (name)
+		strcpy(*name, style);
+	
+	uint32 value;
+	link.Read<uint32>(&value); // face - unused
+	link.Read<uint32>(&value); // flags
+	if (flags)
+		*flags = value;
+
 	return B_OK;
 }
 
