@@ -1,0 +1,102 @@
+<html>
+<head>
+<title>Changes</title>
+</head>
+<body>
+<p><h2>Changes done for each driverversion:</h2></p>
+<p><h1>skel_driver 0.00, (Rudolf)</h1></p>
+<ul>
+	<li>based on nVidia driver 0.30;
+	<li>Kerneldriver uses MTR-WC mapping where available;
+	<li>Accelerant uses AGP busmanager to enable AGP FW where available;
+	<li>This is all this driver really does currently.
+</ul>
+<p><h1>Still todo:</h1></p>
+<ul>
+	<li>Clean up this driver a bit;
+	<li>TVout support;
+	<li>Improve/extend various stuff when/if possible.
+</ul>
+</p>
+<hr><br>
+<strong>Welcome at the Haiku-OS skeleton graphicsdriver.</strong><br>
+<br>
+It contains a lot of non-working programming, almost all of which sits in the 'engine' folder of the accelerant. The main task to make this a working driver for any card outthere, is rewriting the engine. The code there is kept in place because in fact most of the time you only have to replace the actual card-register programming. And it's always handy to have an example of previous working code at hand when you do that: at least, that's my experience.<Br>
+<br>
+<strong>Using this driver as a starting point for development</strong><br>
+<br>
+You have to add your cardID and vendorID to both the kerneldriver (driver.c) and the accelerant (general.c). On top of that, you need to make the kerneldriver framebuffer mapping work. Probably the only thing you need to know is the correct area in which the buffer sits: probably the largest one available.<br>
+<br>
+Once you have this done in the driver, you should setup a VESA file for the resolution and depth you are going to work in (you will be developing the driver while you already work with it). Use the lowest resolution you can live with, and choose 8-bit colordepth.<br>
+Now bootup the system in vesa mode or failsafe video mode (Startup option). Select the vesa mode you will be using <strong>explicitly</strong> for <strong>all</strong> workspaces in the Screen preferences app.<br>
+<br>
+OK, you should be set now. Install the new driver and reboot... You should have a normal Vesa like screen, only you'll find you have the kerneldriver loaded, the accelerant is running, and you can set modes via the Screen prefs panel: although it will only mess-up your screen. (Luckily the app falls-back to the old mode if you don't confirm the new mode ;-).<br>
+<br>
+If your CPU supports MTRR, the kerneldriver will have activated that, and if your card is AGP and you have the busmanager installed, the accelerant will have activated that. This means you should already have optimum speed for framebuffer access: working with BeOS should be smoother already than it was before when you where using <strong>real</strong> Vesa mode (and nothing else).<br>
+<br>
+<hr>
+<br>
+OK, your first task is get to the point I am describing above. Once you have that going, it's time to really start development. Personally, I have a certain list I always run-down. My advice would be to follow it more or less, as the order of doing things has a certain logic to it, making the steps as testable as can be using this development method.<br>
+<br>
+<ul>
+<li><strong>step 1. Setup VESA mode.</strong><br>
+You can do this via the 'vesa' settings file in /boot/home/config/settings/kernel/drivers/. Make sure there are no spaces or other characters after the last character defining the colordepth of the mode, or the mode will maybe not get recognized. A mode set here will get activated after the next normal reboot. A sample vesa settings file can be found in the 'sample' folder in the before mentioned folder.
+<li><strong>step 2. Setup new driver with VESA running underneath, as described above.</strong><br>
+This is possible because the VESA mode is set somewhere during the bootprocess (around icon 2 or 3 in the splashscreen), while the real (new) driver is loaded when the splashscreen disappears. The real driver doesn't actually have to do anything, as the system is already capable of running in the VESA mode set before. The one thing we actually do, is map the framebuffer ourself instead of relying on the access via VESA/legacy space; and point the app_server at it so it uses the newly mapped buffer to write to the screen. All other functions are simply shut-off, as far as they are card-type specific. Developing the driver means we have to fill in the gaps one by one, testing the new functions as we go.<br>
+<br>
+Note: the card has to support VESA VBE2 (VESA BIOS Extensions V2) somehow or this development method won't work...
+<li><strong>step 3. Setup hardware cursor.</strong> (for BeOS and Zeta at least)<br>
+As soon as the cursor hooks are exported, the app_server will start using the driver's cursor. As long as those hooks are not exported, the app_server will generate a fake cursor itself, which I'd call a software cursor. Software cursors tend to flicker when the content displayed 'below' it gets updated. The driver's cursor is a bitmap in the graphicshardware that gets overlayed on top of the screen, so this cursor has nothing to do with the content of the desktop.<br>
+While it's hard or next to impossible to work with a driver that displays no cursor while the app_server is relying on it, you can get it going anyway. Of course, it will require some rebooting from time to time (get used to that ;-). I'd suggest first implementing the enable/disable bit for the cursor, and setting it's foreground and background color to white and black. Once activation of the cursor works you'll probably see a static (non-moving) random bitmap somewhere on the screen, measuring 32x32 or 64x64 pixels. Once you can see that, you can implement moving the cursor. As soon as that works, the driver is useable again more or less, as you can see what you point at.<br>
+As last 'item' of the cursor you need to draw the cursor's bitmap (see below on starting adress info). On modern cards this bitmap is placed somewhere in the cards graphicsmemory, and mostly needs to be on a boundary of 2K or 4K. Some older cards have specific cursor memory inside the GPU (graphics processor unit), which you then probably access in a serial way (index and data registers).<br>
+<br>
+Once the cursor works, you'll need to make sure you are telling the hardware where it can find it. By default it will probably be at cardRAM adress offset zero. Which is also where the framebuffer is placed by default mostly. This means you will see distortions in the upper few lines of the desktop as long as you place the cursor bitmap there (it's just 2K in size mostly, because 4 colors are supported in the BeOS supported mode, needing 2 bits per pixel), but the upside of this is that this is your actual confirmation the app_server is writing cursor bitmaps to graphicsRAM. So, in theory you have two choices: move the cursor bitmap, or move the Desktop. It's probably the safest bet to move the desktop (in the next step: step 3), as the visible screenbuffer can be much more precisely placed. On some cards it might not be possible however to move the desktop from adress zero, or, the cursor. It's upto you to find that out.<br>
+always keep in mind that you need to tell the location of the cursor and visible screenbuffer (Desktop) to two 'clients': the app_server AND the hardware.<br>
+<br>
+Things to consider with cursors might be these:
+<ul>
+<li>if you inform the card's GPU about the cursor's location, you do so by specifying the relative offset to the beginning of the cardRAM, not by specifying a physical adress. For informing the app_server you use the physical adress.
+<li>redrawing needs to be done during/not during vertical retrace on some hardware (otherwise you could see distortions on some hardware);
+<li>repositioning needs to be done during/not during vertical retrace on some hardware (likewise);
+<li>the bitmap's reference point can be left-top or right-bottom. You'll have to correct the coordinates the app_server relays for this sometimes;
+<li>the cursor bitmap may not be positioned below reference point 0,0 as the variables are mostly unsigned integers. If you do that anyway, the cursor will 'magically' disappear (wraparound). This problem occurs when you try to point at something at the left or top of the screen if it does: the source is the fact that cursors have a 'hot spot', indicating what exact postion in the bitmap the pointer is.
+</ul>
+<li><strong>step 4. Setup framebuffer startadress.</strong><br>
+Once you have setup the framebuffer (relative offset) startadress correctly, the 'collision' of the hardware cursor and the desktop should be gone. Mostly you specify the starting adress in 32-bit words, as opposed to byte adresses. Some hardware even has larger granularity, you'll have to see for yourself. Most hardware can support byte-adressing however, but you need to tell the lowest bits to an old 'VGA' register then (called pixelpanning or so).<br>
+You'll probably be wanting to do your best to setup byte-adressing, as this will offer smooth panning in virtual modes (MOVE_DISPLAY hook), without granularity steps taken. Byte adressing (panning) is tested in the next step (5). On the site I have for the nVidia/Matrox/Neomagic drivers you can find a small command line app called 'virtualscreen', that sets a virtual mode you request, which you can then test for this step in development, and for some other steps as well (like the next one).<br>
+<br>
+Setup a virtual screen with ONLY a large virtual height now: the width should NOT be changed (will not work yet due to missing register programming that will be added in the next step). Now move the cursor up and down so the screen starts to scroll (only possible if you have setup and activated a hardware cursor as the software cursor in the app_server does not support this feature). If you should see distortions now and then the hardware requires you to do the adress-updating during- or: not during- retrace (so synced). If syncing should be done make sure you add a timeout, as the startadress setting is also done during a SETMODE hook command, when no retraces will occur at all (screen is shut-off then!)<br>
+<br>
+Note that a screen with virtual WIDTH will use byte adressing (in 8 bit colordepth) indicating if the lower bits work OK. A screen with large virtual HEIGHT can be used to see if you got the upper bits right, or if you are missing a bit: screen wraparounds will occur then, showing you the top of the desktop while you are way below.<br>
+If you scroll the screen memory startadresses will be increased or decreased with the width of the screen, or to be exact: width the 'bytes_per_row' variable in the Be 'frame_buffer_config' struct (and nothing else!).<br>
+<br>
+Hints:<br>
+<ul>
+<li>Know that the app_server will only work correctly on virtualscreens upto and including 10000 x 10000 pixels. Beyond that things still work, but the fill_color function will only 'handle' a rectangle upto/including 10000 x 10000 pixels;
+<li>BeIDE for example cannot create windows with height beyond 2048 pixels. (it will nicely limit at that though.);
+<li>Make sure that if you cannot program for byte granularity, you adjust the steps taken in MOVE_DISPLAY and MOVE_CURSOR to reflect this, otherwise you will for instance loose the cursor from the visible part of the screen on panning sometimes. Note that both functions work with pixels, while you program in bytes: the granularity is therefore colordepth dependant;
+<li>Note that the VGA register pixelpanning probably works in bytes, but some hardware uses pixels here! You need to do some conversion in the calculations then.
+</ul>
+<li><strong>step 5. Setup framebuffer pitch.</strong><br>
+The framebuffer pitch, so the distance (in bytes, or pixels depending on hardware) between two adjacent horizontal 'lines' usually is NOT programmed in bytes (or pixels), meaning that there is a step-granularity here. The driver is required to be able to set any width anyway, so you have to program the equal, or nearest bigger possible 'value' in the hardware. The 'slopspace' that might exist now, is indicated to the app_Server via the difference in the virtual screen width and the bytes_per_row variable also mentioned in the previous step.<br>
+<br>
+Once you think you have setup the framebuffer startadress and pitch both correctly, you are adviced to actually test that by setting a large virtual-width mode, and start panning slowly and fast both. Panning slowly will tell you if you are actually byte-adressing as the movement of the screen will be smooth, and fast moving will probably point you at distortions if the hardware requires you to do the adress-updating during/not during retrace (so synced). Also see if the cursor always stays nicely onscreen, or if it dissapears (partly) sometimes: if so the MOVE_CURSOR function granularity needs to be adjusted.<br>
+<br>
+Note that panning will only work if you have a hardware cursor in the driver and it's used. The software cursor in the app_server does not support panning in modes.
+<li><strong>step 6. Setup colordepth.</strong><br>
+<li><strong>step 7. Setup colorpalette.</strong><br>
+<li><strong>step 8. Setup DPMS.</strong><br>
+<li><strong>step 9. Setup refreshrate (pixelPLL).</strong><br>
+<li><strong>step 10. Setup screentiming (CRTC, modeline).</strong><br>
+<li><strong>step 11. Setup 'enhanced mode'.</strong><br>
+<li><strong>step 12. Setup 2D acceleration.</strong><br>
+<li><strong>step 13. Setup video overlay.</strong><br>
+<li><strong>step 14. Setup card coldstart.</strong><br>
+</ul>
+<br>
+Todo: complete list..<br>
+<br>
+<a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
+<p>(Page last updated on November 8, 2004)</p>
+</body>
+</html>
