@@ -1,20 +1,20 @@
-# Settings file for the nv driver and accelerant
+# Settings file for the via driver and accelerant
 #
 # This file should be moved to the directory
 # ~/config/settings/kernel/drivers/
 #
 
-# nv.driver parameters
-# accelerant "nv.accelerant"
+# via.driver parameters
+# accelerant "via.accelerant"
 
-# nv.accelerant parameters
+# via.accelerant parameters
 usebios    true			# if true rely on bios to coldstart the card
 memory     2			# in MB, override builtin memory size detection
 hardcursor false			# if true use on-chip cursor capabilities
 #logmask   0x00000000	# nothing logged, is default
 #logmask   0x08000604	# log overlay use in full
 #logmask 	0xffffffff		# log everything
-dumprom    false        		# dump bios rom in ~/nv.rom
+dumprom    false        		# dump bios rom in ~/via.rom
 switchhead false			# switch head assignment (dualhead cards only)
 force_pci	false			# block AGP mode use if true (AGP cards only)
 
