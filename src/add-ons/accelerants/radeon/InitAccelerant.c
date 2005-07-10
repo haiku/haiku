@@ -66,6 +66,7 @@ static status_t init_common( int the_fd, bool accelerant_is_clone )
 		goto err3;
 	}
 	
+//rud:
 	if( ai->si->memory[mt_PCI].area > 0 ) {
 		ai->mapped_memory[mt_PCI].area = clone_area( "Radeon PCI GART area", 
 			(void **)&ai->mapped_memory[mt_PCI].data, B_ANY_ADDRESS,
