@@ -172,6 +172,7 @@ count_font_styles(font_family name)
 	BPrivate::AppServerLink link;
 
 	link.StartMessage(AS_COUNT_FONT_STYLES);
+	link.Attach(name, sizeof(font_family));
 
 	if (link.FlushWithReply(code) != B_OK
 		|| code != SERVER_TRUE)
