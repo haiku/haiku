@@ -1,10 +1,20 @@
 SubDir OBOS_TOP src preferences virtualmemory ;
 
+if $(TARGET_PLATFORM) = r5 {
+	DRIVER_SETTINGS = driver_settings.c ;
+}
+
 Preference VirtualMemory : 
-	main.cpp 
-	Pref_Utils.cpp 
-	MainWindow.cpp 
-	VMSettings.cpp 
-	: libbe.so libstdc++.r4.so
+	VirtualMemory.cpp
+	SettingsWindow.cpp
+	Settings.cpp
+	$(DRIVER_SETTINGS)
+
+	: libbe.so libstdc++.r4.so libroot.so
 	: VirtualMemory.rdef
 	;
+
+if $(TARGET_PLATFORM) = r5 {
+	SEARCH on [ FGristFiles driver_settings.c ] += 
+		[ FDirName $(OBOS_TOP) src system libroot os ] ;
+}
