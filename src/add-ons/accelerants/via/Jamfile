@@ -1,11 +1,11 @@
-SubDir OBOS_TOP src add-ons accelerants skeleton ;
+SubDir OBOS_TOP src add-ons accelerants via ;
 
 UsePrivateHeaders graphics ;
-UsePrivateHeaders [ FDirName graphics skeleton ] ;
+UsePrivateHeaders [ FDirName graphics via ] ;
 UseHeaders [ FDirName $(SUBDIR) engine ] ;
 
 
-Addon skel.accelerant : accelerants :
+Addon via.accelerant : accelerants :
 	Acceleration.c
 	Cursor.c
 	EngineManagement.c
@@ -17,13 +17,13 @@ Addon skel.accelerant : accelerants :
 	Overlay.c
 	ProposeDisplayMode.c
 	SetDisplayMode.c
-	: false : libskeleton_engine.a
+	: false : libvia_engine.a
 ;
 
-Package haiku-skeleton-cvs :
-	skel.accelerant : 
+Package haiku-via_gfx-cvs :
+	via.accelerant : 
 	boot home config add-ons accelerants ;
 
-Depends skel.accelerant : skel.driver ;
+Depends via.accelerant : via.driver ;
 
-SubInclude OBOS_TOP src add-ons accelerants skeleton engine ;
+SubInclude OBOS_TOP src add-ons accelerants via engine ;
