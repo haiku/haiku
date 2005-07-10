@@ -208,7 +208,7 @@ AboutView::AboutView(const BRect &r)
 	r.bottom = r.top + textHeight;
 
 	int32 clockSpeed = get_rounded_cpu_speed();
-	if (clockSpeed < 1000000000)
+	if (clockSpeed < 1000)
 		sprintf(string,"%ld MHz", clockSpeed);
 	else
 		sprintf(string,"%.2f GHz", clockSpeed / 1000.0f);
