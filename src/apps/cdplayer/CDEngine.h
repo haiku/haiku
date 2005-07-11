@@ -85,17 +85,22 @@ public:
 			TimeState(void) : PeriodicWatcher() { }
 
 	void	GetDiscTime(int32 &minutes, int32 &seconds) const;
+	void	GetTotalDiscTime(int32 &minutes, int32 &seconds) const;
+	
 	void	GetTrackTime(int32 &minutes, int32 &seconds) const;
+	void	GetTotalTrackTime(int32 &minutes, int32 &seconds) const;
 
 private:
-	bool	UpdateState();
-	bool	CurrentState(int32 dmin, int32 dsec, int32 tmin, int32 tsec);
+	bool			UpdateState();
+	bool			CurrentState(cdaudio_time tracktime, 
+								cdaudio_time totaltracktime,
+								cdaudio_time disctime,
+								cdaudio_time totaldisctime);
 	
-	int32	fDiscMinutes;
-	int32	fDiscSeconds;
-	
-	int32	fTrackMinutes;
-	int32	fTrackSeconds;
+	cdaudio_time	fDiscTime,
+					fTotalDiscTime,
+					fTrackTime,
+					fTotalTrackTime;
 };
 
 class CDContentWatcher : public PeriodicWatcher 

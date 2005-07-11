@@ -391,6 +391,60 @@ CDAudioDevice::GetTime(cdaudio_time &track, cdaudio_time &disc)
 	return true;
 }
 
+// The SCSI table of contents consists of a 4-byte header followed by 100 track
+// descriptors, which are each 8 bytes. We don't really need the first 5 bytes
+// of the track descriptor, so we'll just ignore them. All we really want is the
+// length of each track, which happen to be the last 3 bytes of the descriptor.
+struct TrackDescriptor
+{
+	int32	unused;
+	int8	unused2;
+	
+	int8	min;
+	int8	sec;
+	int8	frame;
+};
+
+bool
+CDAudioDevice::GetTimeForTrack(const int16 &index, cdaudio_time &track)
+{
+	scsi_toc toc;
+	status_t result = ioctl(fFileHandle, B_SCSI_GET_TOC, &toc);
+	
+	if (result != B_OK)
+		return false;
+	
+	int16 trackcount = toc.toc_data[3] - toc.toc_data[2] + 1;
+	
+	if(index < 1 || index > trackcount)
+		return false;
+	
+	TrackDescriptor *desc = (TrackDescriptor*)&(toc.toc_data[4]);
+	
+	track.minutes = desc[index].min - desc[index-1].min;
+	track.seconds = desc[index].sec - desc[index-1].sec;
+	
+	return true;
+}
+
+bool
+CDAudioDevice::GetTimeForDisc(cdaudio_time &disc)
+{
+	scsi_toc toc;
+	status_t result = ioctl(fFileHandle, B_SCSI_GET_TOC, &toc);
+	
+	if (result != B_OK)
+		return false;
+	
+	int16 trackcount = toc.toc_data[3] - toc.toc_data[2] + 1;
+	TrackDescriptor *desc = (TrackDescriptor*)&(toc.toc_data[4]);
+	
+	disc.minutes = desc[trackcount-1].min;
+	disc.seconds = desc[trackcount-1].sec;
+	
+	return true;
+}
+
 struct ConvertedToc 
 {
 	int32 min;

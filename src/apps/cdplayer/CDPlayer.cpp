@@ -561,14 +561,24 @@ CDPlayer::UpdateTimeInfo(void)
 	
 	engine->TimeStateWatcher()->GetDiscTime(min,sec);
 	if(min >= 0)
-		sprintf(string,"Disc %ld:%.2ld / --:--",min,sec);
+	{
+		int32 tmin,tsec;
+		engine->TimeStateWatcher()->GetTotalDiscTime(tmin,tsec);
+		
+		sprintf(string,"Disc %ld:%.2ld / %ld:%.2ld",min,sec,tmin,tsec);
+	}
 	else
 		sprintf(string,"Disc --:-- / --:--");
 	fDiscTime->SetText(string);
 	
 	engine->TimeStateWatcher()->GetTrackTime(min,sec);
 	if(min >= 0)
-		sprintf(string,"Track %ld:%.2ld / --:--",min,sec);
+	{
+		int32 tmin,tsec;
+		engine->TimeStateWatcher()->GetTotalTrackTime(tmin,tsec);
+		
+		sprintf(string,"Track %ld:%.2ld / %ld:%.2ld",min,sec,tmin,tsec);
+	}
 	else
 		sprintf(string,"Track --:-- / --:--");
 	fTrackTime->SetText(string);

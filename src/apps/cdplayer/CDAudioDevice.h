@@ -60,6 +60,8 @@ public:
 	const char *	GetDrivePath(void) const;
 	
 	bool			GetTime(cdaudio_time &track, cdaudio_time &disc);
+	bool			GetTimeForTrack(const int16 &index, cdaudio_time &track);
+	bool			GetTimeForDisc(cdaudio_time &disc);
 	int32			GetDiscID(void);
 	
 private:

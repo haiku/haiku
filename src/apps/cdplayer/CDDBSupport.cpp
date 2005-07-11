@@ -362,9 +362,18 @@ CDDBQuery::ReadFromServer(BDataIO *stream)
 
 	BString tmp;
 	ReadLine(tmp);
-	if (tmp.FindFirst("200") != 0)
+	if(tmp.FindFirst("200") != 0)
 	{
-		printf("Error: %s\n",tmp.String());
+		if(tmp.FindFirst("211") == 0)
+		{
+			while(tmp.CountChars() > 0)
+			{
+				printf("%s\n",tmp.String());
+				ReadLine(tmp);
+			}
+		}
+		else
+			printf("Error: %s\n",tmp.String());
 		return;
 	}
 	BString category;

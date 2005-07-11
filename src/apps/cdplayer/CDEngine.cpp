@@ -135,25 +135,38 @@ TimeState::UpdateState()
 	
 	if(sCDDevice.GetTime(track,disc))
 	{
-		return CurrentState(disc.minutes, disc.seconds, track.minutes, track.seconds);
+		cdaudio_time ttrack;
+		cdaudio_time tdisc;
+		int16 ctrack = sCDDevice.GetTrack();
+		
+		sCDDevice.GetTimeForDisc(tdisc);
+		sCDDevice.GetTimeForTrack(ctrack,ttrack);
+		
+		return CurrentState(track,ttrack,disc,tdisc);
 	}
 	else
 	{
-		CurrentState(-1, -1, -1, -1);
+		track.minutes = -1;
+		track.seconds = -1;
+		disc.minutes = -1;
+		disc.seconds = -1;
+		CurrentState(disc,disc,track,track);
 		return false;
 	}
 }
 
-bool 
-TimeState::CurrentState(int32 dmin, int32 dsec, int32 tmin, int32 tsec)
+bool
+TimeState::CurrentState(cdaudio_time tracktime, cdaudio_time totaltracktime,
+						cdaudio_time disctime,	cdaudio_time totaldisctime)
 {
-	if (dmin == fDiscMinutes && dsec == fDiscSeconds)
+	if (disctime.minutes == fDiscTime.minutes && disctime.seconds == fDiscTime.seconds)
 		return false;
 	
-	fDiscMinutes = dmin;
-	fDiscSeconds = dsec;
-	fTrackMinutes = tmin;
-	fTrackSeconds = tsec;
+	fDiscTime = disctime;
+	fTotalDiscTime = totaldisctime;
+	
+	fTrackTime = tracktime;
+	fTotalTrackTime = totaltracktime;
 	
 	return true;
 }
@@ -161,15 +174,29 @@ TimeState::CurrentState(int32 dmin, int32 dsec, int32 tmin, int32 tsec)
 void 
 TimeState::GetDiscTime(int32 &minutes, int32 &seconds) const
 {
-	minutes = fDiscMinutes;
-	seconds = fDiscSeconds;
+	minutes = fDiscTime.minutes;
+	seconds = fDiscTime.seconds;
+}
+
+void
+TimeState::GetTotalDiscTime(int32 &minutes, int32 &seconds) const
+{
+	minutes = fTotalDiscTime.minutes;
+	seconds = fTotalDiscTime.seconds;
 }
 
 void 
 TimeState::GetTrackTime(int32 &minutes, int32 &seconds) const
 {
-	minutes = fTrackMinutes;
-	seconds = fTrackSeconds;
+	minutes = fTrackTime.minutes;
+	seconds = fTrackTime.seconds;
+}
+
+void
+TimeState::GetTotalTrackTime(int32 &minutes, int32 &seconds) const
+{
+	minutes = fTotalTrackTime.minutes;
+	seconds = fTotalTrackTime.seconds;
 }
 
 
