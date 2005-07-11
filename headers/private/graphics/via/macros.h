@@ -737,10 +737,18 @@
 #define ENMAV_BREG_0XC6      0xC6
 //end old.
 
+//new via
+#define ENCRTC_CURSOR_MODE	0x000002d0
+#define ENCRTC_CURSOR_POS	0x000002d4
+#define ENCRTC_CURSOR_ORG	0x000002d8
+#define ENCRTC_CURSOR_BG	0x000002dc
+#define ENCRTC_CURSOR_FG	0x000002e0
+//end new.
+
 /* Macros for convenient accesses to the NV chips */
 #define ENG_REG8(r_)  ((vuint8  *)regs)[(r_)]
 #define ENG_REG16(r_) ((vuint16 *)regs)[(r_) >> 1]
-#define ENG_RG32(r_) ((vuint32 *)regs)[(r_) >> 2]
+#define ENG_REG32(r_) ((vuint32 *)regs)[(r_) >> 2]
 
 /* read and write to PCI config space */
 #define CFGR(A)   (eng_pci_access.offset=ENCFG_##A, ioctl(fd,ENG_GET_PCI, &eng_pci_access,sizeof(eng_pci_access)), eng_pci_access.value)
@@ -752,17 +760,23 @@
 #define ISARB(A)  (eng_isa_access.adress=A, ioctl(fd,ENG_ISA_IN, &eng_isa_access,sizeof(eng_isa_access)), (uint8)eng_isa_access.data)
 #define ISARW(A)  (eng_isa_access.adress=A, ioctl(fd,ENG_ISA_IN, &eng_isa_access,sizeof(eng_isa_access)), eng_isa_access.data)
 
+//new via
 /* read and write from the dac registers */
-#define DACR(A)   (ENG_RG32(ENDAC_##A))
-#define DACW(A,B) (ENG_RG32(ENDAC_##A)=B)
+#define CRTCDR(A)   (ENG_REG32(ENCRTC_##A))
+#define CRTCDW(A,B) (ENG_REG32(ENCRTC_##A)=B)
+//end new.
+
+/* read and write from the dac registers */
+#define DACR(A)   (ENG_REG32(ENDAC_##A))
+#define DACW(A,B) (ENG_REG32(ENDAC_##A)=B)
 
 /* read and write from the secondary dac registers */
-#define DAC2R(A)   (ENG_RG32(ENDAC2_##A))
-#define DAC2W(A,B) (ENG_RG32(ENDAC2_##A)=B)
+#define DAC2R(A)   (ENG_REG32(ENDAC2_##A))
+#define DAC2W(A,B) (ENG_REG32(ENDAC2_##A)=B)
 
 /* read and write from the backend scaler registers */
-#define BESR(A)   (ENG_RG32(ENBES_##A))
-#define BESW(A,B) (ENG_RG32(ENBES_##A)=B)
+#define BESR(A)   (ENG_REG32(ENBES_##A))
+#define BESW(A,B) (ENG_REG32(ENBES_##A)=B)
 
 /* read and write from CRTC indexed registers */
 #define CRTCW(A,B)(ENG_REG16(RG16_CRTCIND) = ((ENCRTCX_##A) | ((B) << 8)))
@@ -789,8 +803,8 @@
 #define GRPHR(A)  (ENG_REG8(RG8_GRPHIND) = (ENGRPHX_##A), ENG_REG8(RG8_GRPHDAT))
 
 /* read and write from the acceleration engine registers */
-#define ACCR(A)    (ENG_RG32(ENACC_##A))
-#define ACCW(A,B)  (ENG_RG32(ENACC_##A)=B)
+#define ACCR(A)    (ENG_REG32(ENACC_##A))
+#define ACCW(A,B)  (ENG_REG32(ENACC_##A)=B)
 
 //old:
 /* read and write from maven (<= G400) */
