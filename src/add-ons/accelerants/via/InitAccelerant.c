@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-7/2004.
+	Rudolf Cornelissen 10/2002-7/2005.
 */
 
 #define MODULE_BIT 0x00800000
@@ -153,8 +153,9 @@ status_t INIT_ACCELERANT(int the_fd) {
 	to the app_server later.
 	*/
 	pointer_reservation = 0;
-	/* Nvidia hardcursor needs 2kB space */
-	if (si->settings.hardcursor) pointer_reservation = 2048;
+	/* VIA hardcursor needs 4kB space */
+//rud: shutoff until adress of FB is programmed! <<<<<<<<<<
+//	if (si->settings.hardcursor) pointer_reservation = 4096;
 
 	si->fbc.frame_buffer = (void *)((char *)si->framebuffer+pointer_reservation);
 	si->fbc.frame_buffer_dma = (void *)((char *)si->framebuffer_pci+pointer_reservation);

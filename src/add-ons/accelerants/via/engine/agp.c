@@ -25,15 +25,15 @@ status_t eng_agp_setup(void)
 //	{
 //		uint32 reg;
 
-//		LOG(4, ("AGP: STRAPINFO2 contains $%08x\n", ENG_RG32(RG32_NVSTRAPINFO2)));
+//		LOG(4, ("AGP: STRAPINFO2 contains $%08x\n", ENG_REG32(RG32_NVSTRAPINFO2)));
 
 //		LOG(4, ("AGP: attempting to enable fastwrite support..\n"));
 		/* 'force' FW support */
-//		reg = (ENG_RG32(RG32_NVSTRAPINFO2) & ~0x00000800);
+//		reg = (ENG_REG32(RG32_NVSTRAPINFO2) & ~0x00000800);
 		/* enable strapinfo overwrite */
-//		ENG_RG32(RG32_NVSTRAPINFO2) = (reg | 0x80000000);
+//		ENG_REG32(RG32_NVSTRAPINFO2) = (reg | 0x80000000);
 
-//		LOG(4, ("AGP: STRAPINFO2 now contains $%08x\n", ENG_RG32(RG32_NVSTRAPINFO2)));
+//		LOG(4, ("AGP: STRAPINFO2 now contains $%08x\n", ENG_REG32(RG32_NVSTRAPINFO2)));
 //	}
 
 	/* set the magic number so the skeleton kerneldriver knows we're for real */

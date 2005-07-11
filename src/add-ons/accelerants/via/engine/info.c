@@ -311,8 +311,8 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 	//fixme?: works on at least one NV28... how about other cards?
 	if (si->ps.card_type == NV28)
 	{
-		fb_mrs2 = ENG_RG32(RG32_FB_MRS2);
-		fb_mrs1 = ENG_RG32(RG32_FB_MRS1);
+		fb_mrs2 = ENG_REG32(RG32_FB_MRS2);
+		fb_mrs1 = ENG_REG32(RG32_FB_MRS1);
 	}
 
 	/* select colormode CRTC registers base adresses */
@@ -381,8 +381,8 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 
 			/* get NV28 RAM access up and running */
 			//fixme?: works on at least one NV28... how about other cards?
-			ENG_RG32(RG32_FB_MRS2) = fb_mrs2;
-			ENG_RG32(RG32_FB_MRS1) = fb_mrs1;
+			ENG_REG32(RG32_FB_MRS2) = fb_mrs2;
+			ENG_REG32(RG32_FB_MRS1) = fb_mrs1;
 		}
 
 		/* now enable ROM shadow or the card will remain shut-off! */
@@ -448,7 +448,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 				float calced_clk;
 				uint8 m, n, p;
 				eng_dac_sys_pll_find(((float)data2), &calced_clk, &m, &n, &p, 0);
-				ENG_RG32(reg) = ((p << 16) | (n << 8) | m);
+				ENG_REG32(reg) = ((p << 16) | (n << 8) | m);
 			}
 			log_pll(reg, data2);
 			break;
@@ -470,7 +470,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			adress += 2;
 			data2 = *((uint32*)(&(rom[data])));
 			LOG(8,("cmd 'WR indirect 32bit reg' $%08x = $%08x\n", reg, data2));
-			if (exec) ENG_RG32(reg) = data2;
+			if (exec) ENG_REG32(reg) = data2;
 			break;
 		case 0x63:
 			*size -= 1;
@@ -509,8 +509,8 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			LOG(8,("cmd 'WR 32bit reg $%08x = $%08x, then = $%08x' (always done)\n",
 				reg, data, data2));
 			/* always done */
-			ENG_RG32(reg) = data;
-			ENG_RG32(reg) = data2;
+			ENG_REG32(reg) = data;
+			ENG_REG32(reg) = data2;
 			CFGW(ROMSHADOW, (CFGR(ROMSHADOW) & 0xfffffffe));
 			break;
 		case 0x69:
@@ -554,7 +554,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 
 			/* execute */
 			adress += 1;
-			data = ENG_RG32(RG32_NV4STRAPINFO);
+			data = ENG_REG32(RG32_NV4STRAPINFO);
 			and_out = *((uint8*)(&(rom[adress])));
 			adress += 1;
 			byte = *((uint8*)(&(rom[adress])));
@@ -594,10 +594,10 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 				reg, and_out, or_in));
 			if (exec)
 			{
-				data = ENG_RG32(reg);
+				data = ENG_REG32(reg);
 				data &= and_out;
 				data |= or_in;
-				ENG_RG32(reg) = data;
+				ENG_REG32(reg) = data;
 			}
 			break;
 		case 0x71:
@@ -637,7 +637,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 
 			/* execute */
 			adress += 1;
-			data = ENG_RG32(RG32_NVSTRAPINFO2);
+			data = ENG_REG32(RG32_NVSTRAPINFO2);
 			and_out = *((uint32*)(&(rom[adress])));
 			adress += 4;
 			data2 = *((uint32*)(&(rom[adress])));
@@ -691,7 +691,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			adress += 2;
 			LOG(8,("cmd 'WR 32bit reg' $%08x = $%08x (b31-16 = '0', b15-0 = data)\n",
 				reg, data));
-			if (exec) ENG_RG32(reg) = data;
+			if (exec) ENG_REG32(reg) = data;
 			break;
 		case 0x78:
 			*size -= 6;
@@ -747,7 +747,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 				float calced_clk;
 				uint8 m, n, p;
 				eng_dac_sys_pll_find((data / 100.0), &calced_clk, &m, &n, &p, 0);
-				ENG_RG32(reg) = ((p << 16) | (n << 8) | m);
+				ENG_REG32(reg) = ((p << 16) | (n << 8) | m);
 			}
 			log_pll(reg, (data / 100));
 			break;
@@ -768,7 +768,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			data = *((uint32*)(&(rom[adress])));
 			adress += 4;
 			LOG(8,("cmd 'WR 32bit reg' $%08x = $%08x\n", reg, data));
-			if (exec) ENG_RG32(reg) = data;
+			if (exec) ENG_REG32(reg) = data;
 			break;
 		default:
 			LOG(8,("unknown cmd, aborting!\n\n"));
@@ -828,9 +828,9 @@ static void	setup_ram_config(uint8* rom, uint16 ram_tab)
 	uint8 cnt;
 
 	/* set MRS = 256 */
-	ENG_RG32(RG32_PFB_DEBUG_0) &= 0xffffffef;
+	ENG_REG32(RG32_PFB_DEBUG_0) &= 0xffffffef;
 	/* read RAM config hardware(?) strap */
-	ram_cfg = ((ENG_RG32(RG32_NVSTRAPINFO2) >> 2) & 0x0000000f);
+	ram_cfg = ((ENG_REG32(RG32_NVSTRAPINFO2) >> 2) & 0x0000000f);
 	LOG(8,("INFO: ---RAM config strap is $%01x\n", ram_cfg));
 	/* use it as a pointer in a BIOS table for prerecorded RAM configurations */
 	ram_cfg = *((uint16*)(&(rom[(ram_tab + (ram_cfg * 2))])));
@@ -876,15 +876,15 @@ static void	setup_ram_config(uint8* rom, uint16 ram_tab)
 		break;
 	}
 	/* set RAM amount, width and type */
-	data = (ENG_RG32(RG32_NV4STRAPINFO) & 0xffffffc0);
-	ENG_RG32(RG32_NV4STRAPINFO) = (data | (ram_cfg & 0x0000003f));
+	data = (ENG_REG32(RG32_NV4STRAPINFO) & 0xffffffc0);
+	ENG_REG32(RG32_NV4STRAPINFO) = (data | (ram_cfg & 0x0000003f));
 	/* setup write to read delay (?) */
-	data = (ENG_RG32(RG32_PFB_CONFIG_1) & 0xff8ffffe);
+	data = (ENG_REG32(RG32_PFB_CONFIG_1) & 0xff8ffffe);
 	data |= ((ram_cfg & 0x00000700) << 12);
 	/* force update via b0 = 0... */
-	ENG_RG32(RG32_PFB_CONFIG_1) = data;
+	ENG_REG32(RG32_PFB_CONFIG_1) = data;
 	/* ... followed by b0 = 1(?) */
-	ENG_RG32(RG32_PFB_CONFIG_1) = (data | 0x00000001);
+	ENG_REG32(RG32_PFB_CONFIG_1) = (data | 0x00000001);
 
 	/* do RAM width test to confirm RAM width set to be correct */
 	/* write testpattern to first 128 bits of graphics memory... */
@@ -896,7 +896,7 @@ static void	setup_ram_config(uint8* rom, uint16 ram_tab)
 	if (((uint32 *)si->framebuffer)[3] != data)
 	{
 		LOG(8,("INFO: ---RAM width tested: width is 64bits, correcting settings.\n"));
-		ENG_RG32(RG32_NV4STRAPINFO) &= ~0x00000004;
+		ENG_REG32(RG32_NV4STRAPINFO) &= ~0x00000004;
 	}
 	else
 	{
@@ -963,11 +963,11 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			LOG(8,("INFO: (cont.) then WR result data to 32bit reg $%08x'\n", reg2));
 			if (*exec && reg2)
 			{
-				data = ENG_RG32(reg);
+				data = ENG_REG32(reg);
 				data &= and_out;
 				data >>= shift;
 				data2 = *((uint32*)(&(rom[(*adress + (data << 2))])));
-				ENG_RG32(reg2) = data2;
+				ENG_REG32(reg2) = data2;
 			}
 			*adress += size32;
 			break;
@@ -1009,7 +1009,7 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 				byte >>= byte2;
 				offset32 = (byte << 2);
 				data = *((uint32*)(&(rom[(*adress + offset32)])));
-				ENG_RG32(reg2) = data;
+				ENG_REG32(reg2) = data;
 			}
 			*adress += size32;
 			break;
@@ -1102,10 +1102,10 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 				uint8 m, n, p;
 				eng_dac_sys_pll_find((data2 / 100.0), &calced_clk, &m, &n, &p, 0);
 				/* programming the PLL needs to be done in steps! (confirmed NV28) */
-				data = ENG_RG32(reg2);
-				ENG_RG32(reg2) = ((data & 0xffff0000) | (n << 8) | m);
-				data = ENG_RG32(reg2);
-				ENG_RG32(reg2) = ((p << 16) | (n << 8) | m);
+				data = ENG_REG32(reg2);
+				ENG_REG32(reg2) = ((data & 0xffff0000) | (n << 8) | m);
+				data = ENG_REG32(reg2);
+				ENG_REG32(reg2) = ((p << 16) | (n << 8) | m);
 //fixme?
 				/* program 2nd set N and M scalers if they exist (b31=1 enables them) */
 //				if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
@@ -1178,7 +1178,7 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 				index, reg2, and_out2));
 			if (*exec)
 			{
-				data = ENG_RG32(reg);
+				data = ENG_REG32(reg);
 				if (byte2 < 0x80)
 				{
 					data >>= byte2;
@@ -1274,12 +1274,12 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 					*adress += 1;
 					data2 = *((uint8*)(&(rom[*adress])));
 					*adress += 1;
-					ENG_RG32(reg2) = data2;
-					data = ENG_RG32(reg);
+					ENG_REG32(reg2) = data2;
+					data = ENG_REG32(reg);
 					data &= and_out;
 					data |= or_in;
 					data |= or_in2;
-					ENG_RG32(reg) = data;
+					ENG_REG32(reg) = data;
 				}
 			}
 			else
@@ -1380,8 +1380,8 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			LOG(8,("cmd 'WR 32bit reg $%08x = $%08x, then = $%08x' (always done)\n",
 				reg, data, data2));
 			/* always done */
-			ENG_RG32(reg) = data;
-			ENG_RG32(reg) = data2;
+			ENG_REG32(reg) = data;
+			ENG_REG32(reg) = data2;
 			CFGW(ROMSHADOW, (CFGR(ROMSHADOW) & 0xfffffffe));
 			break;
 		case 0x69: /* identical to type1 */
@@ -1479,10 +1479,10 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 				reg, and_out, or_in));
 			if (*exec)
 			{
-				data = ENG_RG32(reg);
+				data = ENG_REG32(reg);
 				data &= and_out;
 				data |= or_in;
-				ENG_RG32(reg) = data;
+				ENG_REG32(reg) = data;
 			}
 			break;
 		case 0x6f: /* new */
@@ -1522,7 +1522,7 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 				{
 					reg2 = *((uint32*)(&(rom[(offset32 + (safe32 << 3))])));
 					data2 = *((uint32*)(&(rom[(offset32 + (safe32 << 3) + 4)])));
-					ENG_RG32(reg2) = data2;
+					ENG_REG32(reg2) = data2;
 					safe32++;
 				}
 			}
@@ -1598,7 +1598,7 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			reg = *((uint32*)(&(rom[data])));
 			and_out = *((uint32*)(&(rom[(data + 4)])));
 			data2 = *((uint32*)(&(rom[(data + 8)])));
-			data = ENG_RG32(reg);
+			data = ENG_REG32(reg);
 			data &= and_out;
 			LOG(8,("cmd 'CHK bits AND-out $%08x reg $%08x for $%08x'\n",
 				and_out, reg, data2));
@@ -1701,10 +1701,10 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 				uint8 m, n, p;
 				eng_dac_sys_pll_find((data / 100.0), &calced_clk, &m, &n, &p, 0);
 				/* programming the PLL needs to be done in steps! (confirmed NV28) */
-				data2 = ENG_RG32(reg);
-				ENG_RG32(reg) = ((data2 & 0xffff0000) | (n << 8) | m);
-				data2 = ENG_RG32(reg);
-				ENG_RG32(reg) = ((p << 16) | (n << 8) | m);
+				data2 = ENG_REG32(reg);
+				ENG_REG32(reg) = ((data2 & 0xffff0000) | (n << 8) | m);
+				data2 = ENG_REG32(reg);
+				ENG_REG32(reg) = ((p << 16) | (n << 8) | m);
 //fixme?
 				/* program 2nd set N and M scalers if they exist (b31=1 enables them) */
 //				if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
@@ -1729,7 +1729,7 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			data = *((uint32*)(&(rom[*adress])));
 			*adress += 4;
 			LOG(8,("cmd 'WR 32bit reg' $%08x = $%08x\n", reg, data));
-			if (*exec) ENG_RG32(reg) = data;
+			if (*exec) ENG_REG32(reg) = data;
 			break;
 		default:
 			LOG(8,("unknown cmd, aborting!\n\n"));
@@ -1787,7 +1787,7 @@ static void	setup_ram_config_nv10_up(uint8* rom)
 	status_t stat = B_ERROR;
 
 	/* set 'refctrl is valid' */
-	ENG_RG32(RG32_PFB_REFCTRL) = 0x80000000;
+	ENG_REG32(RG32_PFB_REFCTRL) = 0x80000000;
 
 	/* check RAM for 256bits buswidth(?) */
 	while ((cnt < 4) && (stat != B_OK))
@@ -1810,7 +1810,7 @@ static void	setup_ram_config_nv10_up(uint8* rom)
 	if (stat != B_OK)
 	{
 		LOG(8,("INFO: ---RAM test #1 done: access errors, modified setup.\n"));
-		data = ENG_RG32(RG32_PFB_CONFIG_0);
+		data = ENG_REG32(RG32_PFB_CONFIG_0);
 		if (data & 0x00000010)
 		{
 			data &= 0xffffffcf;
@@ -1820,7 +1820,7 @@ static void	setup_ram_config_nv10_up(uint8* rom)
 			data &= 0xffffffcf;
 			data |= 0x00000020;
 		}
-		ENG_RG32(RG32_PFB_CONFIG_0) = data;
+		ENG_REG32(RG32_PFB_CONFIG_0) = data;
 	}
 	else
 	{
@@ -1833,7 +1833,7 @@ static void	setup_ram_config_nv10_up(uint8* rom)
 	while ((cnt < 4) && (stat != B_OK))
 	{
 		/* read RAM size */
-		data = ENG_RG32(RG32_NV10STRAPINFO);
+		data = ENG_REG32(RG32_NV10STRAPINFO);
 		/* subtract 1MB */
 		data -= 0x00100000;
 		/* write testpattern at generated RAM adress */
@@ -1854,7 +1854,7 @@ static void	setup_ram_config_nv10_up(uint8* rom)
 	if (stat != B_OK)
 	{
 		LOG(8,("INFO: ---RAM test #2 done: access errors, modified setup.\n"));
-		ENG_RG32(RG32_PFB_CONFIG_0) &= 0xffffefff;
+		ENG_REG32(RG32_PFB_CONFIG_0) &= 0xffffefff;
 	}
 	else
 	{
@@ -1871,13 +1871,13 @@ static void	setup_ram_config_nv28(uint8* rom)
 	status_t stat = B_ERROR;
 
 	/* set 'refctrl is valid' */
-	ENG_RG32(RG32_PFB_REFCTRL) = 0x80000000;
+	ENG_REG32(RG32_PFB_REFCTRL) = 0x80000000;
 
 	/* check RAM */
 	while ((cnt < 4) && (stat != B_OK))
 	{
 		/* set bit 11: 'pulse' something into a new setting? */
-		ENG_RG32(RG32_PFB_CONFIG_0) |= 0x00000800;
+		ENG_REG32(RG32_PFB_CONFIG_0) |= 0x00000800;
 		/* write testpattern to RAM adress 127Mb */
 		((uint32 *)si->framebuffer)[0x01fc0000] = 0x4e564441;
 		/* reset first RAM adress */
@@ -1897,7 +1897,7 @@ static void	setup_ram_config_nv28(uint8* rom)
 	}
 
 	/* clear bit 11: set normal mode */
-	ENG_RG32(RG32_PFB_CONFIG_0) &= ~0x00000800;
+	ENG_REG32(RG32_PFB_CONFIG_0) &= ~0x00000800;
 
 	if (stat == B_OK)
 		LOG(8,("INFO: ---RAM test done: access was OK within %d iteration(s).\n", cnt));
@@ -2334,7 +2334,7 @@ static void detect_panels()
 
 	/* dump some panel configuration registers... */
 	LOG(2,("INFO: Dumping flatpanel registers:\n"));
-	LOG(2,("DUALHEAD_CTRL: $%08x\n", ENG_RG32(RG32_DUALHEAD_CTRL)));
+	LOG(2,("DUALHEAD_CTRL: $%08x\n", ENG_REG32(RG32_DUALHEAD_CTRL)));
 	LOG(2,("DAC1: FP_HDISPEND: %d\n", DACR(FP_HDISPEND)));
 	LOG(2,("DAC1: FP_HTOTAL: %d\n", DACR(FP_HTOTAL)));
 	LOG(2,("DAC1: FP_HCRTC: %d\n", DACR(FP_HCRTC)));
@@ -2359,8 +2359,8 @@ static void detect_panels()
 	LOG(2,("DAC1: FP_DEBUG2: $%08x\n", DACR(FP_DEBUG2)));
 	LOG(2,("DAC1: FP_DEBUG3: $%08x\n", DACR(FP_DEBUG3)));
 
-	LOG(2,("DAC1: FUNCSEL: $%08x\n", ENG_RG32(RG32_FUNCSEL)));
-	LOG(2,("DAC1: PANEL_PWR: $%08x\n", ENG_RG32(RG32_PANEL_PWR)));
+	LOG(2,("DAC1: FUNCSEL: $%08x\n", ENG_REG32(RG32_FUNCSEL)));
+	LOG(2,("DAC1: PANEL_PWR: $%08x\n", ENG_REG32(RG32_PANEL_PWR)));
 
 	if(si->ps.secondary_head)
 	{
@@ -2388,8 +2388,8 @@ static void detect_panels()
 		LOG(2,("DAC2: FP_DEBUG2: $%08x\n", DAC2R(FP_DEBUG2)));
 		LOG(2,("DAC2: FP_DEBUG3: $%08x\n", DAC2R(FP_DEBUG3)));
 
-		LOG(2,("DAC2: FUNCSEL: $%08x\n", ENG_RG32(RG32_2FUNCSEL)));
-		LOG(2,("DAC2: PANEL_PWR: $%08x\n", ENG_RG32(RG32_2PANEL_PWR)));
+		LOG(2,("DAC2: FUNCSEL: $%08x\n", ENG_REG32(RG32_2FUNCSEL)));
+		LOG(2,("DAC2: PANEL_PWR: $%08x\n", ENG_REG32(RG32_2PANEL_PWR)));
 	}
 	LOG(2,("INFO: End flatpanel registers dump.\n"));
 }
@@ -2850,7 +2850,7 @@ static void pinsnv30_arch_fake(void)
 
 static void getRAMsize_arch_nv4(void)
 {
-	uint32 strapinfo = ENG_RG32(RG32_NV4STRAPINFO);
+	uint32 strapinfo = ENG_REG32(RG32_NV4STRAPINFO);
 
 	if (strapinfo & 0x00000100)
 	{
@@ -2883,7 +2883,7 @@ static void getRAMsize_arch_nv4(void)
 
 static void getstrap_arch_nv4(void)
 {
-	uint32 strapinfo = ENG_RG32(RG32_NVSTRAPINFO2);
+	uint32 strapinfo = ENG_REG32(RG32_NVSTRAPINFO2);
 
 	/* determine PLL reference crystal frequency */
 	if (strapinfo & 0x00000040)
@@ -2898,7 +2898,7 @@ static void getstrap_arch_nv4(void)
 static void getRAMsize_arch_nv10_20_30_40(void)
 {
 	uint32 dev_manID = CFGR(DEVID);
-	uint32 strapinfo = ENG_RG32(RG32_NV10STRAPINFO);
+	uint32 strapinfo = ENG_REG32(RG32_NV10STRAPINFO);
 
 	switch (dev_manID)
 	{
@@ -2950,7 +2950,7 @@ static void getRAMsize_arch_nv10_20_30_40(void)
 static void getstrap_arch_nv10_20_30_40(void)
 {
 	uint32 dev_manID = CFGR(DEVID);
-	uint32 strapinfo = ENG_RG32(RG32_NVSTRAPINFO2);
+	uint32 strapinfo = ENG_REG32(RG32_NVSTRAPINFO2);
 
 	/* determine PLL reference crystal frequency: three types are used... */
 	if (strapinfo & 0x00000040)

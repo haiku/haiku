@@ -90,7 +90,7 @@ status_t eng_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku skeleton Accelerant 0.01 running.\n"));
+	LOG(1,("POWERUP: Haiku VIA Accelerant 0.01 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -102,7 +102,7 @@ status_t eng_general_powerup()
 	case 0x31221106: /*  */
 		si->ps.card_type = NV04;
 		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia TNT1 (NV04)\n"));
+		LOG(4,("POWERUP: Detected VIA CLE266 Unichrome\n"));
 		status = engxx_general_powerup();
 		break;
 	default:
@@ -416,7 +416,7 @@ status_t eng_general_head_select(bool cross)
 static status_t eng_general_bios_to_powergraphics()
 {
 	/* let acc engine make power off/power on cycle to start 'fresh' */
-//	ENG_RG32(RG32_PWRUPCTRL) = 0x13110011;
+//	ENG_REG32(RG32_PWRUPCTRL) = 0x13110011;
 	snooze(1000);
 
 	/* power-up all hardware function blocks */
@@ -429,7 +429,7 @@ static status_t eng_general_bios_to_powergraphics()
 	 * bit  8: PFIFO,
 	 * bit  4: PMEDIA,
 	 * bit  0: TVOUT. (> NV04A) */
-//	ENG_RG32(RG32_PWRUPCTRL) = 0x13111111;
+//	ENG_REG32(RG32_PWRUPCTRL) = 0x13111111;
 
 	/* select colormode CRTC registers base adresses */
 //	ENG_REG8(RG8_MISCW) = 0xcb;
@@ -469,8 +469,8 @@ static status_t eng_general_bios_to_powergraphics()
 		 * bit  9: TVout chip #2	(confirmed on NV18, NV25, NV28),
 		 * bit  8: TVout chip #1	(all cards),
 		 * bit  4: both I2C busses	(all cards) */
-		ENG_RG32(RG32_2FUNCSEL) &= ~0x00001000;
-		ENG_RG32(RG32_FUNCSEL) |= 0x00001000;
+		ENG_REG32(RG32_2FUNCSEL) &= ~0x00001000;
+		ENG_REG32(RG32_FUNCSEL) |= 0x00001000;
 	}
 	si->overlay.crtc = false;
 

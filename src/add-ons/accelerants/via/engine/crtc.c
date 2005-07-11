@@ -1,6 +1,6 @@
 /* CTRC functionality */
 /* Author:
-   Rudolf Cornelissen 11/2002-9/2004
+   Rudolf Cornelissen 11/2002-7/2005
 */
 
 #define MODULE_BIT 0x00040000
@@ -610,7 +610,7 @@ status_t eng_crtc_set_display_start(uint32 startadd,uint8 bpp)
 
 	/* we might have no retraces during setmode! */
 	/* wait 25mS max. for retrace to occur (refresh > 40Hz) */
-	while (((ENG_RG32(RG32_RASTER) & 0x000007ff) < si->dm.timing.v_display) &&
+	while (((ENG_REG32(RG32_RASTER) & 0x000007ff) < si->dm.timing.v_display) &&
 			(timeout < (25000/10)))
 	{
 		/* don't snooze much longer or retrace might get missed! */
@@ -646,7 +646,7 @@ status_t eng_crtc_set_display_start(uint32 startadd,uint8 bpp)
 		 * wrap-around at 16Mb boundaries!! */
 
 		/* 30bit adress in 32bit words */
-		ENG_RG32(RG32_NV10FBSTADD32) = (startadd & 0xfffffffc);
+		ENG_REG32(RG32_NV10FBSTADD32) = (startadd & 0xfffffffc);
 	}
 
 	/* set NV4/NV10 byte adress: (b0 - 1) */
@@ -662,11 +662,8 @@ status_t eng_crtc_cursor_init()
 	/* cursor bitmap will be stored at the start of the framebuffer */
 	const uint32 curadd = 0;
 
-	/* enable access to primary head */
-	set_crtc_owner(0);
-
 	/* set cursor bitmap adress ... */
-	if ((si->ps.card_arch == NV04A) || (si->ps.laptop))
+	if (0)//(si->ps.card_arch == NV04A) || (si->ps.laptop))
 	{
 		/* must be used this way on pre-NV10 and on all 'Go' cards! */
 
@@ -686,20 +683,24 @@ status_t eng_crtc_cursor_init()
 		 * This register does not exist on pre-NV10 and 'Go' cards. */
 
 		/* cursorbitmap must still start on 2Kbyte boundary: */
-		ENG_RG32(RG32_NV10CURADD32) = (curadd & 0xfffff800);
+//via
+	/* background is black */
+	CRTCDW(CURSOR_BG, 0x00000000);
+	/* foreground is white */
+	CRTCDW(CURSOR_FG, 0x00ffffff);
+	/* set cursor bitmap adress */
+	CRTCDW(CURSOR_MODE, (curadd & 0xfffffffc));
 	}
 
-	/* set cursor colour: not needed because of direct nature of cursor bitmap. */
-
-	/*clear cursor*/
+	/* clear cursor (via cursor uses 4kb) */
 	fb = (uint32 *) si->framebuffer + curadd;
-	for (i=0;i<(2048/4);i++)
+	for (i=0;i<(4096/4);i++)
 	{
 		fb[i]=0;
 	}
 
 	/* select 32x32 pixel, 16bit color cursorbitmap, no doublescan */
-	ENG_RG32(RG32_CURCONF) = 0x02000100;
+//	ENG_REG32(RG32_CURCONF) = 0x02000100;
 
 	/* activate hardware cursor */
 	eng_crtc_cursor_show();
@@ -710,12 +711,7 @@ status_t eng_crtc_cursor_init()
 status_t eng_crtc_cursor_show()
 {
 	LOG(4,("CRTC: enabling cursor\n"));
-
-	/* enable access to CRTC1 on dualhead cards */
-	set_crtc_owner(0);
-
-	/* b0 = 1 enables cursor */
-	CRTCW(CURCTL0, (CRTCR(CURCTL0) | 0x01));
+	CRTCDW(CURSOR_MODE, (CRTCDR(CURSOR_MODE) | 0x00000003));
 
 	return B_OK;
 }
@@ -723,12 +719,7 @@ status_t eng_crtc_cursor_show()
 status_t eng_crtc_cursor_hide()
 {
 	LOG(4,("CRTC: disabling cursor\n"));
-
-	/* enable access to primary head */
-	set_crtc_owner(0);
-
-	/* b0 = 0 disables cursor */
-	CRTCW(CURCTL0, (CRTCR(CURCTL0) & 0xfe));
+	CRTCDW(CURSOR_MODE, (CRTCDR(CURSOR_MODE) & 0xfffffffc));
 
 	return B_OK;
 }
@@ -736,50 +727,50 @@ status_t eng_crtc_cursor_hide()
 /*set up cursor shape*/
 status_t eng_crtc_cursor_define(uint8* andMask,uint8* xorMask)
 {
-	int x, y;
-	uint8 b;
+	int y;
+	uint8 b,s;
 	uint16 *cursor;
-	uint16 pixel;
+	uint16 data;
 
 	/* get a pointer to the cursor */
 	cursor = (uint16*) si->framebuffer;
 
 	/* draw the cursor */
-	/* (Nvidia cards have a RGB15 direct color cursor bitmap, bit #16 is transparancy) */
 	for (y = 0; y < 16; y++)
 	{
-		b = 0x80;
-		for (x = 0; x < 8; x++)
+		b = 0x01;
+		/* preset transparant */
+		data = 0x0000;
+		for (s = 0; s < 15; s += 2)
 		{
-			/* preset transparant */
-			pixel = 0x0000;
 			/* set white if requested */
-			if ((!(*andMask & b)) && (!(*xorMask & b))) pixel = 0xffff;
+			if ((!(*andMask & b)) && (!(*xorMask & b))) data |= (0x0003 << s);
 			/* set black if requested */
-			if ((!(*andMask & b)) &&   (*xorMask & b))  pixel = 0x8000;
+			if ((!(*andMask & b)) &&   (*xorMask & b))  data |= (0x0002 << s);
 			/* set invert if requested */
-			if (  (*andMask & b)  &&   (*xorMask & b))  pixel = 0x7fff;
-			/* place the pixel in the bitmap */
-			cursor[x + (y * 32)] = pixel;
-			b >>= 1;
+			if (  (*andMask & b)  &&   (*xorMask & b))  data |= (0x0001 << s);
+			b <<= 1;
 		}
+		/* place the 8 pixels in the bitmap */
+		cursor[0 + (y * 4)] = data;
 		xorMask++;
 		andMask++;
-		b = 0x80;
-		for (; x < 16; x++)
+
+		b = 0x01;
+		/* preset transparant */
+		data = 0x0000;
+		for (s = 0; s < 15; s += 2)
 		{
-			/* preset transparant */
-			pixel = 0x0000;
 			/* set white if requested */
-			if ((!(*andMask & b)) && (!(*xorMask & b))) pixel = 0xffff;
+			if ((!(*andMask & b)) && (!(*xorMask & b))) data |= (0x0003 << s);
 			/* set black if requested */
-			if ((!(*andMask & b)) &&   (*xorMask & b))  pixel = 0x8000;
+			if ((!(*andMask & b)) &&   (*xorMask & b))  data |= (0x0002 << s);
 			/* set invert if requested */
-			if (  (*andMask & b)  &&   (*xorMask & b))  pixel = 0x7fff;
-			/* place the pixel in the bitmap */
-			cursor[x + (y * 32)] = pixel;
-			b >>= 1;
+			if (  (*andMask & b)  &&   (*xorMask & b))  data |= (0x0001 << s);
+			b <<= 1;
 		}
+		/* place the 8 pixels in the bitmap */
+		cursor[1 + (y * 4)] = data;
 		xorMask++;
 		andMask++;
 	}
@@ -790,40 +781,11 @@ status_t eng_crtc_cursor_define(uint8* andMask,uint8* xorMask)
 /* position the cursor */
 status_t eng_crtc_cursor_position(uint16 x, uint16 y)
 {
-	uint16 yhigh;
-
-	/* make sure we are beyond the first line of the cursorbitmap being drawn during
-	 * updating the position to prevent distortions: no double buffering feature */
-	/* Note:
-	 * we need to return as quick as possible or some apps will exhibit lagging.. */
-
-	/* read the old cursor Y position */
-	yhigh = ((DACR(CURPOS) & 0x0fff0000) >> 16); 
-	/* make sure we will wait until we are below both the old and new Y position:
-	 * visible cursorbitmap drawing needs to be done at least... */
-	if (y > yhigh) yhigh = y;
-
-	if (yhigh < (si->dm.timing.v_display - 16))
-	{
-		/* we have vertical lines below old and new cursorposition to spare. So we
-		 * update the cursor postion 'mid-screen', but below that area. */
-		while (((uint16)(ENG_RG32(RG32_RASTER) & 0x000007ff)) < (yhigh + 16))
-		{
-			snooze(10);
-		}
-	}
-	else
-	{
-		/* no room to spare, just wait for retrace (is relatively slow) */
-		while ((ENG_RG32(RG32_RASTER) & 0x000007ff) < si->dm.timing.v_display)
-		{
-			/* don't snooze much longer or retrace might get missed! */
-			snooze(10);
-		}
-	}
-
+	/* set cursor origin, b1-7 = Y offset; b17-23 = X offset
+	 * (? linux seems non-consistent) */
+	CRTCDW(CURSOR_ORG, 0x00000000);
 	/* update cursorposition */
-	DACW(CURPOS, ((x & 0x0fff) | ((y & 0x0fff) << 16)));
+	CRTCDW(CURSOR_POS, (((x & 0x07ff) << 16) | (y & 0x07ff)));
 
 	return B_OK;
 }
