@@ -95,9 +95,9 @@ static device_hooks graphics_device_hooks = {
 	NULL
 };
 
-#define VENDOR_ID_NVIDIA	0x1106 /* Via */
+#define VENDOR_ID_VIA	0x1106 /* Via */
 
-static uint16 nvidia_device_list[] = {
+static uint16 via_device_list[] = {
 	0x3122, /*  */
 	0
 };
@@ -106,7 +106,7 @@ static struct {
 	uint16	vendor;
 	uint16	*devices;
 } SupportedDevices[] = {
-	{VENDOR_ID_NVIDIA, nvidia_device_list},
+	{VENDOR_ID_VIA, via_device_list},
 	{0x0000, NULL}
 };
 
