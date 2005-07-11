@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Header: /tmp/bonefish/open-beos/current/src/apps/bin/spamfilter.cpp,v 1.2 2004/12/07 01:14:05 nwhitehorn Exp $
+ * $Id$
  *
  * This is a BeOS program for classifying e-mail messages as spam (unwanted
  * junk mail) or as genuine mail using a Bayesian statistical approach.  There
@@ -64,11 +64,31 @@
  * rule chain can delete the message or otherwise manipulate it.
  *
  * $Log: spamfilter.cpp,v $
+ * (no longer automatic - The SVN version control system used for the Haiku
+ * project doesn't support the Log: keyword on philosophical grounds - and they
+ * assume that the file will always be in SVN, and not some other source
+ * control system, as if!).
+ *
+ * r11909 | axeld | 2005-03-18 19:09:19 -0500 (Fri, 18 Mar 2005) | 2 lines
+ * Moved bin/ directory out of apps/.
+ *
+ * r11769 | bonefish | 2005-03-17 03:30:54 -0500 (Thu, 17 Mar 2005) | 1 line
+ * Move trunk into respective module.
+ *
+ * r10362 | nwhitehorn | 2004-12-06 20:14:05 -0500 (Mon, 06 Dec 2004) | 2 lines
+ * Fixed the spam filter so it works correctly now.
+ *
+ * r9934 | nwhitehorn | 2004-11-11 21:55:05 -0500 (Thu, 11 Nov 2004) | 2 lines
+ * Added AGMS's excellent spam detection software.  Still some weirdness with
+ * the configuration interface from E-mail prefs.
+ *
  * Revision 1.2  2004/12/07 01:14:05  nwhitehorn
  * Fixed the spam filter so it works correctly now.
  *
  * Revision 1.87  2004/09/20 15:57:26  nwhitehorn
- * Mostly updated the tree to Be/Haiku style identifier naming conventions. I have a few more things to work out, mostly in mail_util.h, and then I'm proceeding to jamify the build system. Then we go into Haiku CVS.
+ * Mostly updated the tree to Be/Haiku style identifier naming conventions.  I
+ * have a few more things to work out, mostly in mail_util.h, and then I'm
+ * proceeding to jamify the build system.  Then we go into Haiku CVS.
  *
  * Revision 1.86  2003/07/26 16:47:46  agmsmith
  * Bug - wasn't allowing double classification if the user had turned on
@@ -1510,7 +1530,7 @@ ostream& PrintUsage (ostream& OutputStream)
   OutputStream << "Copyright © 2002 by Alexander G. M. Smith.  ";
   OutputStream << "Released to the public domain.\n\n";
   WrapTextToStream (OutputStream, "Compiled on " __DATE__ " at " __TIME__
-".  $Revision: 1.2 $  $Header: /tmp/bonefish/open-beos/current/src/apps/bin/spamfilter.cpp,v 1.2 2004/12/07 01:14:05 nwhitehorn Exp $");
+".  $Id$  $HeadURL$");
   OutputStream << "\n"
 "This is a program for classifying e-mail messages as spam (junk mail which\n"
 "you don't want to read) and regular genuine messages.  It can learn what's\n"
@@ -1966,7 +1986,7 @@ developed the even better chi-squared scoring method.\n\n"
 doesn't want their meat product associated with junk e-mail.\n\n"
 
 "Released to the public domain, with no warranty.\n"
-"$Revision: 1.2 $\n"
+"$Revision$\n"
 "Compiled on " __DATE__ " at " __TIME__ ".", "Done");
   if (AboutAlertPntr != NULL)
   {
@@ -3084,7 +3104,7 @@ status_t ABSApp::LoadSaveDatabase (bool DoLoad, char *ErrorMessage)
   {
     CurrentTime = time (NULL);
     if (fprintf (DatabaseFile, "%s V1 (word, age, genuine count, spam count)\t"
-    "Written by AGMSBayesianSpamServer $Revision: 1.2 $\t"
+    "Written by AGMSBayesianSpamServer $Revision$\t"
     "Compiled on " __DATE__ " at " __TIME__ "\tThis file saved on %s",
     g_DatabaseRecognitionString, ctime (&CurrentTime)) <= 0)
     {
