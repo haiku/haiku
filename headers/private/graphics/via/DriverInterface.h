@@ -18,7 +18,7 @@
 #include <OS.h>
 #include "AGP.h"
 
-#define DRIVER_PREFIX "skel"
+#define DRIVER_PREFIX "via"
 
 /*
 	Internal driver state (also for sharing info between driver and accelerant)
