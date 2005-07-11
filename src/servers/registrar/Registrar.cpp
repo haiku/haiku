@@ -49,7 +49,8 @@ Registrar::Registrar(status_t *error)
 		   fMIMEManager(NULL),
 		   fEventQueue(NULL),
 		   fMessageRunnerManager(NULL),
-		   fSanityEvent(NULL)
+		   fSanityEvent(NULL),
+		   fShutdownProcess(NULL)
 {
 	FUNCTION_START();
 }
