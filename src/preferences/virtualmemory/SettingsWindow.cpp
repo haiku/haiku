@@ -36,7 +36,7 @@ static const uint32 kMsgSwapEnabledUpdate = 'swen';
 class SizeSlider : public BSlider {
 	public:
 		SizeSlider(BRect rect, const char* name, const char* label,
-			BMessage* message, int32 min, int32 max);
+			BMessage* message, int32 min, int32 max, uint32 resizingMode);
 		virtual ~SizeSlider();
 
 		virtual char* UpdateText() const;
@@ -78,8 +78,8 @@ byte_string(int64 size)
 
 
 SizeSlider::SizeSlider(BRect rect, const char* name, const char* label,
-	BMessage* message, int32 min, int32 max)
-	: BSlider(rect, name, label, message, min, max)
+	BMessage* message, int32 min, int32 max, uint32 resizingMode)
+	: BSlider(rect, name, label, message, min, max, B_BLOCK_THUMB, resizingMode)
 {
 	rgb_color color = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
 	UseFillColor(true, &color);
@@ -107,8 +107,6 @@ SettingsWindow::SettingsWindow()
 	: BWindow(BRect(0, 0, 269, 172), "VirtualMemory", B_TITLED_WINDOW,
 			B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
 {
-//	fSettings = new Settings();
-
 	BRect rect = Bounds();
 	BView* view = new BView(rect, "background", B_FOLLOW_ALL, B_WILL_DRAW);
 	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -124,7 +122,7 @@ SettingsWindow::SettingsWindow()
 	fSwapEnabledCheckBox->ResizeToPreferred();
 
 	rect.InsetBy(10, 10);
-	BBox* box = new BBox(rect, "box");
+	BBox* box = new BBox(rect, "box", B_FOLLOW_LEFT_RIGHT);
 	box->SetLabel(fSwapEnabledCheckBox);
 	view->AddChild(box);
 
@@ -180,7 +178,8 @@ SettingsWindow::SettingsWindow()
 
 	rect.OffsetBy(0, lineHeight + 8);
 	fSizeSlider = new SizeSlider(rect, "size slider", "Requested Swap File Size:",
-		new BMessage(kMsgSliderUpdate), minSize / kMegaByte, maxSize / kMegaByte);
+		new BMessage(kMsgSliderUpdate), minSize / kMegaByte, maxSize / kMegaByte,
+		B_FOLLOW_LEFT_RIGHT);
 	fSizeSlider->SetLimitLabels("999 MB", "999 MB");
 	fSizeSlider->ResizeToPreferred();
 	box->AddChild(fSizeSlider);
@@ -210,7 +209,12 @@ SettingsWindow::SettingsWindow()
 	ResizeTo(view->Bounds().Width(), view->Bounds().Height());
 	AddChild(view);
 		// add view after resizing the window, so that the view's resizing
-		// mode is not used (we already layed out the views for the new size)
+		// mode is not used (we already layed out the views for the new height)
+
+	// if the strings don't fit on screen, we enlarge the window now - the
+	// views are already added to the window and will resize automatically
+	if (Bounds().Width() < view->StringWidth(fSizeSlider->Label()) * 2)
+		ResizeTo(view->StringWidth(fSizeSlider->Label()) * 2, Bounds().Height());
 
 	Update();
 
