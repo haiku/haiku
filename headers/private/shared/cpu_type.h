@@ -7,6 +7,8 @@
  * It's used by Pulse, AboutHaiku, and sysinfo.
  */
 
+#include <OS.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -210,13 +212,14 @@ get_rounded_cpu_speed(void)
 {
 	system_info sys_info;
 
-	int target = sys_info.cpu_clock_speed / 1000000;
-	int frac = target % 100;
-	int delta = -frac;
+	int target, frac, delta;
 	int freqs[] = { 100, 50, 25, 75, 33, 67, 20, 40, 60, 80, 10, 30, 70, 90 };
 	uint x;
 
 	get_system_info(&sys_info);
+	target = sys_info.cpu_clock_speed / 1000000;
+	frac = target % 100;
+	delta = -frac;
 
 	for (x = 0; x < sizeof(freqs) / sizeof(freqs[0]); x++) {
 		int ndelta = freqs[x] - frac;
