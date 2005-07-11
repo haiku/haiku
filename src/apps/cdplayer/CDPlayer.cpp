@@ -54,21 +54,6 @@ CDPlayer::CDPlayer(BRect frame, const char *name, uint32 resizeMask, uint32 flag
 	engine = new CDEngine;
 	
 	BuildGUI();
-	
-	fCDState = engine->PlayStateWatcher()->GetState();
-	
-	if(fCDState == kNoCD)
-	{
-		fStop->SetEnabled(false);
-		fPlay->SetEnabled(false);
-		fNextTrack->SetEnabled(false);
-		fPrevTrack->SetEnabled(false);
-		fFastFwd->SetEnabled(false);
-		fRewind->SetEnabled(false);
-		fSave->SetEnabled(false);
-		
-		fCurrentTrack->SetHighColor(fStopColor);
-	}
 }
 
 CDPlayer::~CDPlayer()
@@ -153,12 +138,17 @@ void CDPlayer::BuildGUI(void)
 	fStop->SetDisabled(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"stop_disabled"));
 	AddChild(fStop);
 	
-	fPlay = new DrawButton( BRect(0,0,1,1), "Play", BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_up"),
-							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_down"),
-							new BMessage(M_PLAY), B_FOLLOW_BOTTOM, B_WILL_DRAW);
+	fPlay = new TwoStateDrawButton( BRect(0,0,1,1), "Play", 
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_up"),
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_down"), 
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"pause_up"),
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"pause_down"), 
+							new BMessage(M_PLAY), B_FOLLOW_NONE, B_WILL_DRAW);
+
 	fPlay->ResizeToPreferred();
 	fPlay->MoveTo(fStop->Frame().right + 2, Bounds().bottom - 5 - fPlay->Frame().Height());
-	fPlay->SetDisabled(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_disabled"));
+	fPlay->SetDisabled(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_disabled"),
+						BTranslationUtils::GetBitmap(B_PNG_FORMAT,"pause_disabled"));
 	AddChild(fPlay);
 	
 	fPrevTrack = new DrawButton( BRect(0,0,1,1), "PrevTrack", BTranslationUtils::GetBitmap(B_PNG_FORMAT,"prev_up"),
@@ -236,64 +226,6 @@ void CDPlayer::BuildGUI(void)
 void
 CDPlayer::MessageReceived(BMessage *msg)
 {
-	if(msg->WasDropped())
-	{
-		// We'll handle two types of drops: those from Tracker and those from ShowImage
-		if(msg->what==B_SIMPLE_DATA)
-		{
-			int32 actions;
-			if(msg->FindInt32("be:actions",&actions)==B_OK)
-			{
-				// ShowImage drop. This is a negotiated drag&drop, so send a reply
-				BMessage reply(B_COPY_TARGET), response;
-				reply.AddString("be:types","image/jpeg");
-				reply.AddString("be:types","image/png");
-				
-				msg->SendReply(&reply,&response);
-				
-				// now, we've gotten the response
-				if(response.what==B_MIME_DATA)
-				{
-					// Obtain and translate the received data
-					uint8 *imagedata;
-					ssize_t datasize;
-										
-					// Try JPEG first
-					if(response.FindData("image/jpeg",B_MIME_DATA,(const void **)&imagedata,&datasize)!=B_OK)
-					{
-						// Try PNG next and piddle out if unsuccessful
-						if(response.FindData("image/png",B_PNG_FORMAT,(const void **)&imagedata,&datasize)!=B_OK)
-							return;
-					}
-					
-					// Set up to decode into memory
-					BMemoryIO memio(imagedata,datasize);
-					BTranslatorRoster *roster=BTranslatorRoster::Default();
-					BBitmapStream bstream;
-					
-					if(roster->Translate(&memio,NULL,NULL,&bstream, B_TRANSLATOR_BITMAP)==B_OK)
-					{
-						BBitmap *bmp;
-						if(bstream.DetachBitmap(&bmp)!=B_OK)
-							return;
-						
-						SetBitmap(bmp);
-					}
-				}
-				return;
-			}
-			
-			entry_ref ref;
-			if(msg->FindRef("refs",&ref)==B_OK)
-			{
-				// Tracker drop
-				BBitmap *bmp=BTranslationUtils::GetBitmap(&ref);
-				SetBitmap(bmp);
-			}
-		}
-		return;
-	}
-	
 	switch (msg->what) 
 	{
 		case M_SET_VOLUME:
@@ -304,10 +236,8 @@ CDPlayer::MessageReceived(BMessage *msg)
 		case M_STOP:
 		{
 			if(engine->GetState()==kPlaying)
-			{
-				fPlay->SetBitmaps(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_up"),
-							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_down"));
-			}
+				fPlay->SetState(0);
+			
 			engine->Stop();
 			break;
 		}
@@ -317,16 +247,14 @@ CDPlayer::MessageReceived(BMessage *msg)
 			// the pause images and will want to switch back to the play images
 			if(engine->GetState()==kPlaying)
 			{
-				fPlay->SetBitmaps(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_up"),
-							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_down"));
+				fPlay->SetState(0);
+				engine->Pause();
 			}
 			else
 			{
-				// Currently not playing and going to be playing, so show pause icons
-				fPlay->SetBitmaps(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"pause_up"),
-							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"pause_down"));
+				fPlay->SetState(1);
+				engine->Play();
 			}
-			engine->Play();
 			break;
 		}
 		case M_NEXT_TRACK:
@@ -339,6 +267,14 @@ CDPlayer::MessageReceived(BMessage *msg)
 			engine->SkipOneBackward();
 			break;
 		}
+		case M_EJECT:
+		{
+			engine->Eject();
+			break;
+		}
+		
+		
+		
 		case M_FFWD:
 		{
 			// TODO: Implement
@@ -349,16 +285,12 @@ CDPlayer::MessageReceived(BMessage *msg)
 			// TODO: Implement
 			break;
 		}
-		case M_EJECT:
-		{
-			engine->Eject();
-			break;
-		}
 		case M_SAVE:
 		{
 			// TODO: Implement
 			break;
 		}
+		
 		case M_SHUFFLE:
 		{
 			engine->ToggleShuffle();
@@ -369,6 +301,7 @@ CDPlayer::MessageReceived(BMessage *msg)
 			engine->ToggleRepeat();
 			break;
 		}
+		
 		default:
 		{
 			
@@ -399,104 +332,7 @@ CDPlayer::NoticeChange(Notifier *notifier)
 	
 	if(ps)
 	{
-		switch(ps->GetState())
-		{
-			case kNoCD:
-			{
-				if(fStop->IsEnabled())
-				{
-					fStop->SetEnabled(false);
-					fPlay->SetEnabled(false);
-					fNextTrack->SetEnabled(false);
-					fPrevTrack->SetEnabled(false);
-					fFastFwd->SetEnabled(false);
-					fRewind->SetEnabled(false);
-					fSave->SetEnabled(false);
-				}
-				fCurrentTrack->SetHighColor(fStopColor);
-				fCurrentTrack->SetText("Track: ");
-				fTrackTime->SetText("Track --:-- / --:--");
-				fDiscTime->SetText("Disc --:-- / --:--");
-				break;
-			}
-			case kStopped:
-			{
-				if(!fStop->IsEnabled())
-				{
-					fStop->SetEnabled(true);
-					fPlay->SetEnabled(true);
-					fNextTrack->SetEnabled(true);
-					fPrevTrack->SetEnabled(true);
-					fFastFwd->SetEnabled(true);
-					fRewind->SetEnabled(true);
-					
-					// TODO: Enable when Save is implemented
-//					fSave->SetEnabled(true);
-				}
-				fCurrentTrack->SetHighColor(fStopColor);
-				fCurrentTrack->Invalidate();
-				fTrackTime->SetText("Track --:-- / --:--");
-				fDiscTime->SetText("Disc --:-- / --:--");
-				break;
-			}
-			case kPaused:
-			{
-				// TODO: Set play button to Pause
-				if(!fStop->IsEnabled())
-				{
-					fStop->SetEnabled(true);
-					fPlay->SetEnabled(true);
-					fNextTrack->SetEnabled(true);
-					fPrevTrack->SetEnabled(true);
-					fFastFwd->SetEnabled(true);
-					fRewind->SetEnabled(true);
-					
-					// TODO: Enable when Save is implemented
-//					fSave->SetEnabled(true);
-				}
-				fCurrentTrack->SetHighColor(fPlayColor);
-				break;
-			}
-			case kPlaying:
-			{
-				if(!fStop->IsEnabled())
-				{
-					fStop->SetEnabled(true);
-					fPlay->SetEnabled(true);
-					fNextTrack->SetEnabled(true);
-					fPrevTrack->SetEnabled(true);
-					fFastFwd->SetEnabled(true);
-					fRewind->SetEnabled(true);
-					
-					// TODO: Enable when Save is implemented
-//					fSave->SetEnabled(true);
-				}
-				fCurrentTrack->SetHighColor(fPlayColor);
-				fCurrentTrack->Invalidate();
-				break;
-			}
-			case kSkipping:
-			{
-				if(!fStop->IsEnabled())
-				{
-					fStop->SetEnabled(true);
-					fPlay->SetEnabled(true);
-					fNextTrack->SetEnabled(true);
-					fPrevTrack->SetEnabled(true);
-					fFastFwd->SetEnabled(true);
-					fRewind->SetEnabled(true);
-					
-					// TODO: Enable when Save is implemented
-//					fSave->SetEnabled(true);
-				}
-				fCurrentTrack->SetHighColor(fStopColor);
-				break;
-			}
-			default:
-			{
-				break;
-			}
-		}
+		HandlePlayState();
 	}
 	else
 	if(trs)
@@ -522,32 +358,139 @@ CDPlayer::NoticeChange(Notifier *notifier)
 }
 
 void
+CDPlayer::HandlePlayState(void)
+{
+	switch(engine->PlayStateWatcher()->GetState())
+	{
+		case kNoCD:
+		{
+			if(fStop->IsEnabled())
+			{
+				fStop->SetEnabled(false);
+				fPlay->SetEnabled(false);
+				fNextTrack->SetEnabled(false);
+				fPrevTrack->SetEnabled(false);
+				fFastFwd->SetEnabled(false);
+				fRewind->SetEnabled(false);
+				fSave->SetEnabled(false);
+			}
+			fCurrentTrack->SetHighColor(fStopColor);
+			break;
+		}
+		case kStopped:
+		{
+			if(!fStop->IsEnabled())
+			{
+				fStop->SetEnabled(true);
+				fPlay->SetEnabled(true);
+				fNextTrack->SetEnabled(true);
+				fPrevTrack->SetEnabled(true);
+				fFastFwd->SetEnabled(true);
+				fRewind->SetEnabled(true);
+				
+				// TODO: Enable when Save is implemented
+//					fSave->SetEnabled(true);
+			}
+			fCurrentTrack->SetHighColor(fStopColor);
+			break;
+		}
+		case kPaused:
+		{
+			// TODO: Set play button to Pause
+			if(!fStop->IsEnabled())
+			{
+				fStop->SetEnabled(true);
+				fPlay->SetEnabled(true);
+				fNextTrack->SetEnabled(true);
+				fPrevTrack->SetEnabled(true);
+				fFastFwd->SetEnabled(true);
+				fRewind->SetEnabled(true);
+				
+				// TODO: Enable when Save is implemented
+//					fSave->SetEnabled(true);
+			}
+			fCurrentTrack->SetHighColor(fPlayColor);
+			break;
+		}
+		case kPlaying:
+		{
+			if(!fStop->IsEnabled())
+			{
+				fStop->SetEnabled(true);
+				fPlay->SetEnabled(true);
+				fNextTrack->SetEnabled(true);
+				fPrevTrack->SetEnabled(true);
+				fFastFwd->SetEnabled(true);
+				fRewind->SetEnabled(true);
+				
+				// TODO: Enable when Save is implemented
+//					fSave->SetEnabled(true);
+			}
+			fPlay->SetState(1);
+			fCurrentTrack->SetHighColor(fPlayColor);
+			fCurrentTrack->Invalidate();
+			break;
+		}
+		case kSkipping:
+		{
+			if(!fStop->IsEnabled())
+			{
+				fStop->SetEnabled(true);
+				fPlay->SetEnabled(true);
+				fNextTrack->SetEnabled(true);
+				fPrevTrack->SetEnabled(true);
+				fFastFwd->SetEnabled(true);
+				fRewind->SetEnabled(true);
+				
+				// TODO: Enable when Save is implemented
+//					fSave->SetEnabled(true);
+			}
+			fCurrentTrack->SetHighColor(fStopColor);
+			break;
+		}
+		default:
+		{
+			break;
+		}
+	}
+}
+
+void
 CDPlayer::UpdateCDInfo(void)
 {
 	BString CDName, currentTrackName;
 	vector<BString> trackNames;
 	
 	int32 currentTrack = engine->TrackStateWatcher()->GetTrack();
-	if(currentTrack < 1)
+	
+	bool trackresult = engine->ContentWatcher()->GetContent(&CDName,&trackNames);
+		
+	if(currentTrack < 0)
 		return;
 	
-	bool trackresult =engine->ContentWatcher()->GetContent(&CDName,&trackNames);
+	if(currentTrack == 0)
+		currentTrack++;
 	
 	if(trackresult)
-		fCDTitle->SetText(CDName.String());
-	else
-		fCDTitle->SetText("Audio CD");
-	
-	if(currentTrack > 0)
 	{
-		if(trackresult)
+		if(CDName.CountChars()<1)
+		{
+			// if the CD name is NULL, then it means we have no disc in the drive.
+			fCDTitle->SetText("");
+			fCurrentTrack->SetText("");
+		}
+		else
 		{
 			currentTrackName << "Track " << currentTrack << ": " << trackNames[ currentTrack - 1];
 			fCurrentTrack->SetText(currentTrackName.String());
-			
-			return;
+			fCDTitle->SetText(CDName.String());
 		}
 		
+		return;
+	}
+	else
+	{
+		fCDTitle->SetText("Audio CD");
 		currentTrackName << "Track " << currentTrack;
 		fCurrentTrack->SetText(currentTrackName.String());
 	}
@@ -587,6 +530,7 @@ CDPlayer::UpdateTimeInfo(void)
 void 
 CDPlayer::AttachedToWindow()
 {
+
 	// start observing
 	engine->AttachedToLooper(Window());
 	StartObserving(engine->TrackStateWatcher());
@@ -637,21 +581,6 @@ void
 CDPlayer::Pulse()
 {
 	engine->DoPulse();
-}
-
-void
-CDPlayer::SetBitmap(BBitmap *bitmap)
-{
-	if(!bitmap)
-	{
-		ClearViewBitmap();
-		return;
-	}
-	
-	SetViewBitmap(bitmap);
-	fVolume->SetViewBitmap(bitmap);
-	fVolume->Invalidate();
-	Invalidate();
 }
 
 class CDPlayerWindow : public BWindow

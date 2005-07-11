@@ -48,7 +48,7 @@ PeriodicWatcher::UpdateNow()
 
 
 PlayState::PlayState(CDEngine *engine)
- :	oldState(kNoCD),
+ :	oldState(kInit),
  	fEngine(engine)
 {
 }
@@ -57,7 +57,7 @@ bool
 PlayState::UpdateState(void)
 {
 	CDState state = sCDDevice.GetState();
-	if( state == kStopped && fEngine->GetState() == kPlaying)
+	if(state == kStopped && fEngine->GetState() == kPlaying)
 	{
 		// this means we have come to the end of a song, but probably not
 		// the last song in the playlist
@@ -69,6 +69,17 @@ PlayState::UpdateState(void)
 		}
 	}
 	
+/*	if(state == kPlaying && fEngine->GetState() == kStopped)
+	{
+		// This happens when the CD drive is started by R5's player
+		// or this app is started while the drive is playing. We should
+		// reset the to start at the current track and finish at the
+		// last one and send a notification.
+		sPlayList.SetTrackCount(sCDDevice.CountTracks());
+		sPlayList.SetStartingTrack(sCDDevice.GetTrack());
+		return CurrentState(kPlaying);
+	}
+*/	
 	return CurrentState(state);
 }
 
@@ -103,7 +114,16 @@ TrackState::GetTrack() const
 bool
 TrackState::UpdateState()
 {
-	return CurrentState(sPlayList.GetCurrentTrack());
+	// It's possible that the state of the cd drive was changed by outside means
+	// As a result, we want to make sure this hasn't happened. If it has, then we
+	// need to update the playlist's position.
+	
+	int16 cdTrack = sCDDevice.GetTrack();
+	
+	if(cdTrack != sPlayList.GetCurrentTrack())
+		sPlayList.SetCurrentTrack(cdTrack);
+	
+	return CurrentState(cdTrack);
 }
 
 int32 
@@ -210,6 +230,14 @@ CDContentWatcher::CDContentWatcher(void)
 bool 
 CDContentWatcher::GetContent(BString *title, vector<BString> *tracks)
 {
+	if(discID == -1)
+	{
+		title->SetTo("");
+		tracks->empty();
+		tracks->push_back("");
+		return true;
+	}
+	
 	return cddbQuery.GetTitles(title, tracks, 1000000);
 }
 
@@ -230,6 +258,16 @@ CDContentWatcher::UpdateState()
 		// We have changed CDs, so we are not ready until the CDDB lookup finishes
 		cddbQuery.SetToCD(sCDDevice.GetDrivePath());
 		fReady=false;
+	}
+	else
+	{
+		if(discID != -1)
+		{
+			discID = -1;
+			return true;
+		}
+		else
+			return false;
 	}
 	
 	// If the CD has changed and the CDDB query is ready, we set to true so that

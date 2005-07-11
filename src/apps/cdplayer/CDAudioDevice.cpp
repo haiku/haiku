@@ -421,8 +421,11 @@ CDAudioDevice::GetTimeForTrack(const int16 &index, cdaudio_time &track)
 	
 	TrackDescriptor *desc = (TrackDescriptor*)&(toc.toc_data[4]);
 	
-	track.minutes = desc[index].min - desc[index-1].min;
-	track.seconds = desc[index].sec - desc[index-1].sec;
+	int32 tracktime = (desc[index].min * 60) + desc[index].sec;
+	
+	tracktime -= (desc[index-1].min * 60) + desc[index-1].sec;
+	track.minutes = tracktime / 60;
+	track.seconds = tracktime % 60;
 	
 	return true;
 }

@@ -96,6 +96,26 @@ PlayList::SetLoop(const bool &loop)
 	fLocker.Unlock();
 }
 	
+void
+PlayList::SetCurrentTrack(const int16 &track)
+{
+	if(track < 0 || track > fTrackCount)
+		return;
+	
+	fLocker.Lock();
+		
+	for(int16 i=0; i<fTrackCount; i++)
+	{
+		if(fTrackList[i] == track)
+		{
+			fTrackIndex = i;
+			break;
+		}
+	}
+	
+	fLocker.Unlock();
+}
+
 int16
 PlayList::GetCurrentTrack(void)
 {

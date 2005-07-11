@@ -23,7 +23,9 @@ public:
 	void	SetLoop(const bool &loop);
 	bool	IsLoop(void) const { return fLoop; }
 	
+	void	SetCurrentTrack(const int16 &track);
 	int16	GetCurrentTrack(void);
+	
 	int16	GetNextTrack(void);
 	int16	GetPreviousTrack(void);
 	

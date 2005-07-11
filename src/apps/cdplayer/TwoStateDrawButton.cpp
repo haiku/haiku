@@ -80,6 +80,19 @@ void TwoStateDrawButton::MouseUp(BPoint pt)
 	Invalidate();
 }
 
+void
+TwoStateDrawButton::SetState(int32 value)
+{
+	if(fButtonState!=value)
+	{
+		if(value==0)
+			fButtonState = false;
+		else
+			fButtonState = true;
+		Invalidate();
+	}
+}
+
 void TwoStateDrawButton::Draw(BRect update)
 {
 	if(fButtonState)

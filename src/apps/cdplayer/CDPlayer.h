@@ -45,14 +45,14 @@ public:
 	virtual void		NoticeChange(Notifier *);
 
 private:
+			void				HandlePlayState(void);
 			void				UpdateCDInfo(void);
 			void				UpdateTimeInfo(void);
-			void				SetBitmap(BBitmap *bitmap);
 	
 			CDEngine			*engine;
 	
 			DrawButton			*fStop,
-								*fPlay,
+//								*fPlay,
 								*fNextTrack,
 								*fPrevTrack,
 								*fFastFwd,
@@ -61,7 +61,8 @@ private:
 								*fSave;
 			
 			TwoStateDrawButton	*fShuffle,
-								*fRepeat;
+								*fRepeat,
+								*fPlay;
 			
 			BSlider				*fVolume;
 			
