@@ -440,6 +440,14 @@ AboutView::AboutView(const BRect &r)
 		"All rights reserved.\n"
 		"Copyright (c) 1997 Be Inc.\n"
 		"Copyright (c) 1999 Jake Hamby. \n\n");
+
+	// Konatu font
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_yellow);
+	fCreditsView->Insert("Konatu font\n");
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
+	fCreditsView->Insert(
+		"Copyright (C) 2002- MASUDA mitiya.\n"
+		"MIT license. All rights reserved.\n\n");
 }
 
 
