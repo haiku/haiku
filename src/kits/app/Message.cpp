@@ -1224,14 +1224,18 @@ status_t BMessage::PopSpecifier()
 
 #define DEFINE_FUNCTIONS(TYPE, fnName, TYPESPEC)									\
 	status_t BMessage::Add ## fnName(const char* name, TYPE val)					\
-	{ return fBody->AddData<TYPE>(name, val, TYPESPEC); }							\
+	{ return AddData(name, TYPESPEC, &val, sizeof(TYPE)); }							\
 	status_t BMessage::Find ## fnName(const char* name, TYPE* p) const				\
 	{ return Find ## fnName(name, 0, p); }											\
 	status_t BMessage::Find ## fnName(const char* name, int32 index, TYPE* p) const	\
-	{																				\
-		*p = TYPE();																\
-		return fBody->FindData<TYPE>(name, index, p, TYPESPEC);						\
-	}																				\
+	{															\
+		void* ptr = NULL; ssize_t bytes = 0; status_t err = B_OK;\
+		*p = TYPE();								\
+		err = FindData(name, TYPESPEC, index, (const void**)&ptr, &bytes); \
+		if (err == B_OK) \
+			memcpy(p, ptr, sizeof(TYPE)); \
+		return err; \
+	}														\
 	status_t BMessage::Replace ## fnName(const char* name, TYPE val)				\
 	{ return Replace ## fnName(name, 0, val); }										\
 	status_t BMessage::Replace ## fnName(const char *name, int32 index, TYPE val)	\
@@ -1286,22 +1290,23 @@ DEFINE_LAZY_FIND_FUNCTION(const char*	, String)
 //------------------------------------------------------------------------------
 status_t BMessage::AddString(const char* name, const char* a_string)
 {
-	return fBody->AddData<BString>(name, a_string, B_STRING_TYPE);
+	return AddData(name, B_STRING_TYPE, a_string, strlen(a_string));
 }
 //------------------------------------------------------------------------------
 status_t BMessage::AddString(const char* name, const BString& a_string)
 {
-	return AddString(name, a_string.String());
+	return AddData(name, B_STRING_TYPE, a_string.String(), a_string.Length());
+	//return AddString(name, a_string.String());
 }
 //------------------------------------------------------------------------------
 status_t BMessage::AddPointer(const char* name, const void* ptr)
 {
-	return fBody->AddData<void*>(name, (void*)ptr, B_POINTER_TYPE);
+	return AddData(name, B_POINTER_TYPE, &ptr, sizeof(ptr));
 }
 //------------------------------------------------------------------------------
 status_t BMessage::AddMessenger(const char* name, BMessenger messenger)
 {
-	return fBody->AddData<BMessenger>(name, messenger, B_MESSENGER_TYPE);
+	return AddData(name, B_MESSENGER_TYPE, &messenger, sizeof(messenger));
 }
 //------------------------------------------------------------------------------
 status_t BMessage::AddRef(const char* name, const entry_ref* ref)
@@ -1311,8 +1316,7 @@ status_t BMessage::AddRef(const char* name, const entry_ref* ref)
 	status_t err = entry_ref_flatten(buffer, &size, ref);
 	if (!err)
 	{
-		BDataBuffer DB((void*)buffer, size);
-		err = fBody->AddData<BDataBuffer>(name, DB, B_REF_TYPE);
+		err = AddData(name, B_REF_TYPE, (void*)buffer, size);
 	}
 
 	return err;
@@ -1328,8 +1332,7 @@ status_t BMessage::AddMessage(const char* name, const BMessage* msg)
 		err = msg->Flatten(buffer, size);
 		if (!err)
 		{
-			BDataBuffer DB((void*)buffer, size);
-			err = fBody->AddData<BDataBuffer>(name, DB, B_MESSAGE_TYPE);
+			err = AddData(name, B_MESSAGE_TYPE, (void*)buffer, size);
 		}
 	}
 	else
@@ -1382,71 +1385,8 @@ status_t BMessage::AddData(const char* name, type_code type, const void* data,
 	// avoid having to specialize BMessageBody::AddData().
 	//--------------------------------------------------------------------------
 
-	// TODO: Fix this horrible hack
-	status_t err = B_OK;
-	switch (type)
-	{
-		case B_BOOL_TYPE:
-			err = AddBool(name, *(bool*)data);
-			break;
-		case B_INT8_TYPE:
-		case B_UINT8_TYPE:
-			err = AddInt8(name, *(int8*)data);
-			break;
-		case B_INT16_TYPE:
-		case B_UINT16_TYPE:
-			err = AddInt16(name, *(int16*)data);
-			break;
-		case B_INT32_TYPE:
-		case B_UINT32_TYPE:
-			err = AddInt32(name, *(int32*)data);
-			break;
-		case B_INT64_TYPE:
-		case B_UINT64_TYPE:
-			err = AddInt64(name, *(int64*)data);
-			break;
-		case B_FLOAT_TYPE:
-			err = AddFloat(name, *(float*)data);
-			break;
-		case B_DOUBLE_TYPE:
-			err = AddDouble(name, *(double*)data);
-			break;
-		case B_POINT_TYPE:
-			err = AddPoint(name, *(BPoint*)data);
-			break;
-		case B_RECT_TYPE:
-			err = AddRect(name, *(BRect*)data);
-			break;
-		case B_REF_TYPE:
-		{
-			BDataBuffer DB((void*)data, numBytes, true);
-			err = fBody->AddData<BDataBuffer>(name, DB, type);
-			break;
-		}
-		case B_MESSAGE_TYPE:
-		{
-			BDataBuffer DB((void*)data, numBytes, true);
-			err = fBody->AddData<BDataBuffer>(name, DB, type);
-			break;
-		}
-		case B_MESSENGER_TYPE:
-			err = AddMessenger(name, *(BMessenger*)data);
-			break;
-		case B_POINTER_TYPE:
-			err = AddPointer(name, *(void**)data);
-			break;
-		case B_STRING_TYPE:
-			err = AddString(name, (const char*)data);
-			break;
-		default:
-			// TODO: test
-			// Using the mythical BDataBuffer
-			BDataBuffer DB((void*)data, numBytes, true);
-			err = fBody->AddData<BDataBuffer>(name, DB, type);
-			break;
-	}
-
-	return err;
+	BDataBuffer DB((void*)data, numBytes, true);
+	return fBody->AddData<BDataBuffer>(name, DB, type);
 }
 //------------------------------------------------------------------------------
 status_t BMessage::RemoveData(const char* name, int32 index)
@@ -1501,8 +1441,8 @@ status_t BMessage::FindPointer(const char* name, void** ptr) const
 //------------------------------------------------------------------------------
 status_t BMessage::FindPointer(const char* name, int32 index, void** ptr) const
 {
-	*ptr = NULL;
-	return fBody->FindData<void*>(name, index, ptr, B_POINTER_TYPE);
+	ssize_t size = 0;
+	return FindData(name, B_POINTER_TYPE, index, (const void**)ptr, &size);
 }
 //------------------------------------------------------------------------------
 status_t BMessage::FindMessenger(const char* name, BMessenger* m) const
@@ -1512,7 +1452,12 @@ status_t BMessage::FindMessenger(const char* name, BMessenger* m) const
 //------------------------------------------------------------------------------
 status_t BMessage::FindMessenger(const char* name, int32 index, BMessenger* m) const
 {
-	return fBody->FindData<BMessenger>(name, index, m, B_MESSENGER_TYPE);
+	void* data = NULL; 
+	ssize_t size = 0; 
+	status_t err = FindData(name, B_MESSENGER_TYPE, index, (const void **)&data, &size);
+	if (err == B_OK)
+		memcpy(m, data, sizeof(BMessenger));
+	return err;
 }
 //------------------------------------------------------------------------------
 status_t BMessage::FindRef(const char* name, entry_ref* ref) const
@@ -1525,11 +1470,8 @@ status_t BMessage::FindRef(const char* name, int32 index, entry_ref* ref) const
 	void* data = NULL;
 	ssize_t size = 0;
 	status_t err = FindData(name, B_REF_TYPE, index, (const void**)&data, &size);
-	if (!err)
-	{
+	if (err == B_OK)
 		err = entry_ref_unflatten(ref, (char*)data, size);
-	}
-
 	return err;
 }
 //------------------------------------------------------------------------------
@@ -1542,8 +1484,7 @@ status_t BMessage::FindMessage(const char* name, int32 index, BMessage* msg) con
 {
 	void* data = NULL;
 	ssize_t size = 0;
-	status_t err = FindData(name, B_MESSAGE_TYPE, index,
-							(const void**)&data, &size);
+	status_t err = FindData(name, B_MESSAGE_TYPE, index, (const void**)&data, &size);
 	if (!err)
 	{
 		err = msg->Unflatten((const char*)data);
@@ -1560,14 +1501,13 @@ status_t BMessage::FindFlat(const char* name, BFlattenable* obj) const
 status_t BMessage::FindFlat(const char* name, int32 index,
 							BFlattenable* obj) const
 {
-	const void* data;
-	ssize_t numBytes;
-	status_t err = FindData(name, obj->TypeCode(), index, &data, &numBytes);
+	void* data = NULL;
+	ssize_t numBytes = 0;
+	status_t err = FindData(name, obj->TypeCode(), index, (const void**)&data, &numBytes);
 	if (!err)
 	{
 		err = obj->Unflatten(obj->TypeCode(), data, numBytes);
 	}
-
 	return err;
 }
 //------------------------------------------------------------------------------
@@ -1592,10 +1532,9 @@ status_t BMessage::ReplaceString(const char* name, const char* string)
 	return ReplaceString(name, 0, string);
 }
 //------------------------------------------------------------------------------
-status_t BMessage::ReplaceString(const char* name, int32 index,
-								 const char* string)
+status_t BMessage::ReplaceString(const char* name, int32 index, const char* string)
 {
-	return fBody->ReplaceData<BString>(name, index, string, B_STRING_TYPE);
+	return ReplaceData(name, B_STRING_TYPE, index, string, strlen(string));
 }
 //------------------------------------------------------------------------------
 status_t BMessage::ReplaceString(const char* name, const BString& string)
@@ -1605,7 +1544,7 @@ status_t BMessage::ReplaceString(const char* name, const BString& string)
 //------------------------------------------------------------------------------
 status_t BMessage::ReplaceString(const char* name, int32 index, const BString& string)
 {
-	return fBody->ReplaceData<BString>(name, index, string, B_STRING_TYPE);
+	return ReplaceData(name, B_STRING_TYPE, index, string.String(), string.Length());
 }
 //------------------------------------------------------------------------------
 status_t BMessage::ReplacePointer(const char* name, const void* ptr)
@@ -1613,22 +1552,19 @@ status_t BMessage::ReplacePointer(const char* name, const void* ptr)
 	return ReplacePointer(name, 0, ptr);
 }
 //------------------------------------------------------------------------------
-status_t BMessage::ReplacePointer(const char* name, int32 index,
-								  const void* ptr)
+status_t BMessage::ReplacePointer(const char* name, int32 index, const void* ptr)
 {
-	return fBody->ReplaceData<void*>(name, index, (void*)ptr, B_POINTER_TYPE);
+	return ReplaceData(name, B_POINTER_TYPE, index, &ptr, sizeof(ptr));
 }
 //------------------------------------------------------------------------------
 status_t BMessage::ReplaceMessenger(const char* name, BMessenger messenger)
 {
-	// Don't want to copy the BMessenger
-	return fBody->ReplaceData<BMessenger>(name, 0, messenger, B_MESSENGER_TYPE);
+	return ReplaceData(name, B_MESSENGER_TYPE, 0, &messenger, sizeof(BMessenger));
 }
 //------------------------------------------------------------------------------
-status_t BMessage::ReplaceMessenger(const char* name, int32 index,
-									BMessenger msngr)
+status_t BMessage::ReplaceMessenger(const char* name, int32 index, BMessenger messenger)
 {
-	return fBody->ReplaceData<BMessenger>(name, index, msngr, B_MESSENGER_TYPE);
+	return ReplaceData(name, B_MESSENGER_TYPE, index, &messenger, sizeof(BMessenger));
 }
 //------------------------------------------------------------------------------
 status_t BMessage::ReplaceRef(const char* name, const entry_ref* ref)
@@ -1645,8 +1581,7 @@ status_t BMessage::ReplaceRef(const char* name, int32 index, const entry_ref* re
 	status_t err = entry_ref_flatten(buffer, &size, ref);
 	if (!err)
 	{
-		BDataBuffer DB((void*)buffer, size);
-		err = fBody->ReplaceData<BDataBuffer>(name, index, DB, B_REF_TYPE);
+		err = ReplaceData(name, B_REF_TYPE, index, (void*)buffer, size);
 	}
 
 	return err;
@@ -1668,9 +1603,7 @@ status_t BMessage::ReplaceMessage(const char* name, int32 index,
 		err = msg->Flatten(buffer, size);
 		if (!err)
 		{
-			BDataBuffer DB((void*)buffer, size);
-			err = fBody->ReplaceData<BDataBuffer>(name, index, DB,
-												  B_MESSAGE_TYPE);
+			err = ReplaceData(name, B_MESSAGE_TYPE, index, (void*)buffer, size);
 		}
 	}
 	else
@@ -1714,62 +1647,8 @@ status_t BMessage::ReplaceData(const char* name, type_code type,
 status_t BMessage::ReplaceData(const char* name, type_code type, int32 index,
 							   const void* data, ssize_t data_size)
 {
-	// TODO: Fix this horrible hack
-	status_t err = B_OK;
-	switch (type)
-	{
-		case B_BOOL_TYPE:
-			err = ReplaceBool(name, index, *(bool*)data);
-			break;
-		case B_INT8_TYPE:
-		case B_UINT8_TYPE:
-			err = ReplaceInt8(name, index, *(int8*)data);
-			break;
-		case B_INT16_TYPE:
-		case B_UINT16_TYPE:
-			err = ReplaceInt16(name, index, *(int16*)data);
-			break;
-		case B_INT32_TYPE:
-		case B_UINT32_TYPE:
-			err = ReplaceInt32(name, index, *(int32*)data);
-			break;
-		case B_INT64_TYPE:
-		case B_UINT64_TYPE:
-			err = ReplaceInt64(name, index, *(int64*)data);
-			break;
-		case B_FLOAT_TYPE:
-			err = ReplaceFloat(name, index, *(float*)data);
-			break;
-		case B_DOUBLE_TYPE:
-			err = ReplaceDouble(name, index, *(double*)data);
-			break;
-		case B_POINT_TYPE:
-			err = ReplacePoint(name, index, *(BPoint*)data);
-			break;
-		case B_RECT_TYPE:
-			err = ReplaceRect(name, index, *(BRect*)data);
-			break;
-		case B_REF_TYPE:
-			err = ReplaceRef(name, index, (entry_ref*)data);
-			break;
-		case B_MESSAGE_TYPE:
-			err = ReplaceMessage(name, index, (BMessage*)data);
-			break;
-		case B_MESSENGER_TYPE:
-			err = ReplaceMessenger(name, index, *(BMessenger*)data);
-			break;
-		case B_POINTER_TYPE:
-			err = ReplacePointer(name, index, (void**)data);
-			break;
-		default:
-			// TODO: test
-			// Using the mythical BDataBuffer
-			BDataBuffer DB((void*)data, data_size, true);
-			err = fBody->ReplaceData<BDataBuffer>(name, index, DB, type);
-			break;
-	}
-
-	return err;
+	BDataBuffer DB((void*)data, data_size, true);
+	return fBody->ReplaceData<BDataBuffer>(name, index, DB, type);
 }
 //------------------------------------------------------------------------------
 void* BMessage::operator new(size_t size)
