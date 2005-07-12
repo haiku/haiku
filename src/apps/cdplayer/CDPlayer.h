@@ -21,6 +21,7 @@
 #include "TrackMenu.h"
 
 class DrawButton;
+class DoubleShotDrawButton;
 class TwoStateDrawButton;
 
 class CDPlayer : public BView, private Observer 
@@ -40,8 +41,7 @@ public:
 	virtual void	 	MessageReceived(BMessage *);
 
 	// observing overrides
-	virtual BHandler	*RecipientHandler() const
-		{ return (BHandler *)this; }
+	virtual BHandler	*RecipientHandler() const { return (BHandler *)this; }
 	
 	virtual void		NoticeChange(Notifier *);
 
@@ -54,13 +54,14 @@ private:
 			CDEngine			*engine;
 	
 			DrawButton			*fStop,
-//								*fPlay,
 								*fNextTrack,
 								*fPrevTrack,
-								*fFastFwd,
-								*fRewind,
 								*fEject,
 								*fSave;
+								
+			DoubleShotDrawButton
+								*fFastFwd,
+								*fRewind;
 			
 			TwoStateDrawButton	*fShuffle,
 								*fRepeat,

@@ -6,6 +6,7 @@ App CDPlayer :
 	CDDBSupport.cpp
 	CDEngine.cpp
 	CDPlayer.cpp
+	DoubleShotDrawButton.cpp
 	DrawButton.cpp
 	FunctionObjectMessage.cpp
 	Observer.cpp

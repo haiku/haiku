@@ -12,16 +12,16 @@
 class DrawButton : public BButton
 {
 public:
-			DrawButton(BRect frame, const char *name, BBitmap *up, 
+					DrawButton(BRect frame, const char *name, BBitmap *up, 
 						BBitmap *down,BMessage *msg, int32 resize,
 						int32 flags);
-			~DrawButton(void);
+	virtual			~DrawButton(void);
 	
-	void	Draw(BRect update);
+			void	Draw(BRect update);
 
-	void 	SetBitmaps(BBitmap *up, BBitmap *down);
-	void 	ResizeToPreferred(void);
-	void 	SetDisabled(BBitmap *disabled);
+			void 	SetBitmaps(BBitmap *up, BBitmap *down);
+			void 	ResizeToPreferred(void);
+			void 	SetDisabled(BBitmap *disabled);
 	
 private:
 	

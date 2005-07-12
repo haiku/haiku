@@ -23,6 +23,7 @@
 
 #include "CDPlayer.h"
 #include "DrawButton.h"
+#include "DoubleShotDrawButton.h"
 #include "TwoStateDrawButton.h"
 #include <TranslationUtils.h>
 #include <TranslatorFormats.h>
@@ -177,24 +178,23 @@ void CDPlayer::BuildGUI(void)
 	fNextTrack->SetDisabled(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"next_disabled"));
 	AddChild(fNextTrack);
 	
-	// TODO: Fast Forward and Rewind are special buttons. Implement as two-state buttons
-	fRewind = new DrawButton( BRect(0,0,1,1), "Rewind", BTranslationUtils::GetBitmap(B_PNG_FORMAT,"rew_up"),
-							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"rew_down"), new BMessage(M_PREV_TRACK), 
-							B_FOLLOW_BOTTOM, B_WILL_DRAW);
+	fRewind = new DoubleShotDrawButton( BRect(0,0,1,1), "Rewind", 
+										BTranslationUtils::GetBitmap(B_PNG_FORMAT,"rew_up"),
+										BTranslationUtils::GetBitmap(B_PNG_FORMAT,"rew_down"),
+										new BMessage(M_REWIND), B_FOLLOW_BOTTOM, B_WILL_DRAW);
 	fRewind->ResizeToPreferred();
 	fRewind->MoveTo(fNextTrack->Frame().right + 10, Bounds().bottom - 5 - fRewind->Frame().Height());
 	fRewind->SetDisabled(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"rew_disabled"));
 	AddChild(fRewind);
-	fRewind->SetEnabled(false);
 	
-	fFastFwd = new DrawButton( BRect(0,0,1,1), "FastFwd", BTranslationUtils::GetBitmap(B_PNG_FORMAT,"ffwd_up"),
-							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"ffwd_down"), new BMessage(M_NEXT_TRACK), 
-							B_FOLLOW_BOTTOM, B_WILL_DRAW);
+	fFastFwd = new DoubleShotDrawButton( BRect(0,0,1,1), "FastFwd", 
+										BTranslationUtils::GetBitmap(B_PNG_FORMAT,"ffwd_up"),
+										BTranslationUtils::GetBitmap(B_PNG_FORMAT,"ffwd_down"),
+										new BMessage(M_FFWD), B_FOLLOW_BOTTOM, B_WILL_DRAW);
 	fFastFwd->ResizeToPreferred();
 	fFastFwd->MoveTo(fRewind->Frame().right + 2, Bounds().bottom - 5 - fFastFwd->Frame().Height());
 	fFastFwd->SetDisabled(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"ffwd_disabled"));
 	AddChild(fFastFwd);
-	fFastFwd->SetEnabled(false);
 	
 	fEject = new DrawButton( BRect(0,0,1,1), "Eject", BTranslationUtils::GetBitmap(B_PNG_FORMAT,"eject_up"),
 							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"eject_down"), new BMessage(M_EJECT), 
@@ -295,11 +295,19 @@ CDPlayer::MessageReceived(BMessage *msg)
 		case M_FFWD:
 		{
 			// TODO: Implement
+			if(fFastFwd->Value() == B_CONTROL_ON)
+				engine->StartSkippingForward();
+			else
+				engine->StopSkipping();
 			break;
 		}
 		case M_REWIND:
 		{
 			// TODO: Implement
+			if(fRewind->Value() == B_CONTROL_ON)
+				engine->StartSkippingBackward();
+			else
+				engine->StopSkipping();
 			break;
 		}
 		case M_SAVE:
@@ -437,8 +445,7 @@ CDPlayer::AdjustButtonStates(void)
 			fPlay->SetEnabled(false);
 			fNextTrack->SetEnabled(false);
 			fPrevTrack->SetEnabled(false);
-			fFastFwd->SetEnabled(false);
-			fRewind->SetEnabled(false);
+			
 			fSave->SetEnabled(false);
 			break;
 		}
@@ -449,9 +456,6 @@ CDPlayer::AdjustButtonStates(void)
 			fNextTrack->SetEnabled(true);
 			fPrevTrack->SetEnabled(true);
 			
-			fFastFwd->SetEnabled(false);
-			fRewind->SetEnabled(false);
-			
 			// TODO: Enable when Save is implemented
 //			fSave->SetEnabled(true);
 
@@ -460,9 +464,6 @@ CDPlayer::AdjustButtonStates(void)
 		}
 		case kPaused:
 		{
-			// We can only pause when everything is enabled, so this is all we should do.
-			fFastFwd->SetEnabled(false);
-			fRewind->SetEnabled(false);
 			fPlay->SetState(0);
 			break;
 		}
@@ -472,9 +473,6 @@ CDPlayer::AdjustButtonStates(void)
 			fPlay->SetEnabled(true);
 			fNextTrack->SetEnabled(true);
 			fPrevTrack->SetEnabled(true);
-			
-			fFastFwd->SetEnabled(true);
-			fRewind->SetEnabled(true);
 			
 			// TODO: Enable when Save is implemented
 //			fSave->SetEnabled(true);
@@ -629,8 +627,8 @@ public:
 };
 
 CDPlayerWindow::CDPlayerWindow(void)
- : BWindow(BRect (100, 100, 610, 200), "CD Player", B_TITLED_WINDOW, B_NOT_V_RESIZABLE |
-   B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
+ :	BWindow(BRect (100, 100, 610, 200), "CD Player", B_TITLED_WINDOW, B_NOT_V_RESIZABLE |
+	B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	float wmin,wmax,hmin,hmax;
 	
