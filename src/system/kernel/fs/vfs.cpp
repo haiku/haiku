@@ -3041,7 +3041,7 @@ file_create_entry_ref(mount_id mountID, vnode_id directoryID, const char *name, 
 
 
 static int
-file_create(char *path, int openMode, int perms, bool kernel)
+file_create(int fd, char *path, int openMode, int perms, bool kernel)
 {
 	char name[B_FILE_NAME_LENGTH];
 	struct vnode *directory;
@@ -3050,7 +3050,7 @@ file_create(char *path, int openMode, int perms, bool kernel)
 	FUNCTION(("file_create: path '%s', omode %x, perms %d, kernel %d\n", path, openMode, perms, kernel));
 
 	// get directory to put the new file in	
-	status = path_to_dir_vnode(path, &directory, name, kernel);
+	status = fd_and_path_to_dir_vnode(fd, path, &directory, name, kernel);
 	if (status < 0)
 		return status;
 
@@ -5187,7 +5187,7 @@ _kern_open(int fd, const char *path, int openMode, int perms)
 		return B_NO_MEMORY;
 
 	if (openMode & O_CREAT)
-		return file_create(pathBuffer.LockBuffer(), openMode, perms, true);
+		return file_create(fd, pathBuffer.LockBuffer(), openMode, perms, true);
 
 	return file_open(fd, pathBuffer.LockBuffer(), openMode, true);
 }
@@ -5965,7 +5965,7 @@ _user_open(int fd, const char *userPath, int openMode, int perms)
 		return status;
 
 	if (openMode & O_CREAT)
-		return file_create(path, openMode, perms, false);
+		return file_create(fd, path, openMode, perms, false);
 
 	return file_open(fd, path, openMode, false);
 }
