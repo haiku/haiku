@@ -38,7 +38,7 @@
 CursorManager *cursormanager;
 
 //! Initializes the CursorManager
-CursorManager::CursorManager(void)
+CursorManager::CursorManager()
 {
 	// Error code for AddCursor
 	fTokenizer.ExcludeValue(B_ERROR);
@@ -83,7 +83,7 @@ CursorManager::CursorManager(void)
 }
 
 //! Does all the teardown
-CursorManager::~CursorManager(void)
+CursorManager::~CursorManager()
 {
 	ServerCursor *temp;
 	for(int32 i=0; i<fCursorList.CountItems();i++)
@@ -336,7 +336,7 @@ cursor_which CursorManager::GetCursorWhich(void)
 	
 	A word of warning: once a cursor has been assigned to the system, the
 	system will take ownership of the cursor and deleting the cursor
-	will have not effect on the system.
+	will have no effect on the system.
 */
 void CursorManager::ChangeCursor(cursor_which which, int32 token)
 {

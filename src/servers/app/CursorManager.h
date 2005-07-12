@@ -43,36 +43,35 @@ class ServerCursor;
 	any BeOS platform. It also provides tokens for BCursors and frees all
 	of an application's cursors whenever an application closes.
 */
-class CursorManager : public BLocker
-{
+class CursorManager : public BLocker {
 public:
-	CursorManager(void);
-	~CursorManager(void);
-	int32 AddCursor(ServerCursor *sc);
-	void DeleteCursor(int32 token);
-	void RemoveAppCursors(team_id team);
-	void SetCursorSet(const char *path);
-	ServerCursor *GetCursor(cursor_which which);
-	cursor_which GetCursorWhich(void);
-	void ChangeCursor(cursor_which which, int32 token);
-	void SetDefaults(void);
-	ServerCursor *FindCursor(int32 token);
+						CursorManager();
+						~CursorManager();
+		int32			AddCursor(ServerCursor *sc);
+		void			DeleteCursor(int32 token);
+		void			RemoveAppCursors(team_id team);
+		void			SetCursorSet(const char *path);
+		ServerCursor	*GetCursor(cursor_which which);
+		cursor_which	GetCursorWhich(void);
+		void			ChangeCursor(cursor_which which, int32 token);
+		void			SetDefaults(void);
+		ServerCursor	*FindCursor(int32 token);
 
 private:
-	BList fCursorList;
-	TokenHandler fTokenizer;
+		BList			fCursorList;
+		TokenHandler	fTokenizer;
 
-	// System cursor members
-	ServerCursor 	*fDefaultCursor,
-					*fTextCursor,
-					*fMoveCursor,
-					*fDragCursor,
-					*fResizeCursor,
-					*fNWSECursor,
-					*fNESWCursor,
-					*fNSCursor,
-					*fEWCursor;
-	cursor_which fCurrentWhich;
+		// System cursor members
+		ServerCursor	*fDefaultCursor,
+						*fTextCursor,
+						*fMoveCursor,
+						*fDragCursor,
+						*fResizeCursor,
+						*fNWSECursor,
+						*fNESWCursor,
+						*fNSCursor,
+						*fEWCursor;
+		cursor_which	fCurrentWhich;
 };
 
 extern CursorManager *cursormanager;

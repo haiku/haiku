@@ -26,21 +26,21 @@
 #endif // ON_SCREEN_DEBUGGING_INFO
 
 class DebugInfoManager {
- public:
-	virtual						~DebugInfoManager();
+public:
+virtual						~DebugInfoManager();
 
-	static	DebugInfoManager*	Default();
-			void				AddInfo(const char* string);
+static	DebugInfoManager	*Default();
+		void				AddInfo(const char* string);
 
- private:
-								DebugInfoManager();
-	static	DebugInfoManager*	sDefaultInstance;
+private:
+							DebugInfoManager();
+static	DebugInfoManager	*sDefaultInstance;
 
 #if ON_SCREEN_DEBUGGING_INFO
-	friend	class	RootLayer;
-			void				SetRootLayer(RootLayer* layer);
+friend	class RootLayer;
+		void				SetRootLayer(RootLayer* layer);
 
-			RootLayer*			fRootLayer;
+		RootLayer			*fRootLayer;
 #endif // ON_SCREEN_DEBUGGING_INFO
 };
 
