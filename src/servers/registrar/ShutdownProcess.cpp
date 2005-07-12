@@ -621,10 +621,8 @@ ShutdownProcess::ShutdownProcess(TRoster *roster, EventQueue *eventQueue)
 ShutdownProcess::~ShutdownProcess()
 {
 	// terminate the GUI
-	if (fHasGUI) {
-		fWindow->Lock();
+	if (fHasGUI && fWindow && fWindow->Lock())
 		fWindow->Quit();
-	}
 
 	// remove and delete the quit request reply handler
 	if (fQuitRequestReplyHandler) {
@@ -1109,7 +1107,7 @@ status_t
 ShutdownProcess::_ShutDown()
 {
 	#ifdef __HAIKU__
-		return _kern_shutdown(fReboot);
+		RETURN_ERROR(_kern_shutdown(fReboot));
 	#else
 		// we can't do anything on R5
 		return B_ERROR;
@@ -1225,9 +1223,13 @@ ShutdownProcess::_WorkerDoShutdown()
 	// ask the user to confirm the shutdown, if desired
 	bool askUser;
 	if (fHasGUI && fRequest->FindBool("confirm", &askUser) == B_OK && askUser) {
-		BAlert *alert = new BAlert("Shut Down?",
-			"Do you really want to shut down the system?",
-			"Shut Down", "Cancel", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		const char *title = (fReboot ? "Reboot?" : "Shut Down?");
+		const char *text = (fReboot
+			? "Do you really want to reboot the system?"
+			: "Do you really want to shut down the system?");
+		const char *buttonText = (fReboot ? "Reboot" : "Shut Down");
+		BAlert *alert = new BAlert(title, text, buttonText, "Cancel", NULL,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		int32 result = alert->Go();
 
 		if (result != 0)
@@ -1266,6 +1268,7 @@ ShutdownProcess::_WorkerDoShutdown()
 
 	// we're through: do the shutdown
 	_SetPhase(DONE_PHASE);
+	_SetShutdownWindowWaitForShutdown();
 	_ShutDown();
 
 	PRINT(("  _kern_shutdown() failed\n"));
@@ -1273,8 +1276,6 @@ ShutdownProcess::_WorkerDoShutdown()
 	// shutdown failed: This can happen for power off mode -- reboot should
 	// always work.
 	if (fHasGUI) {
-		_SetShutdownWindowWaitForShutdown();
-
 		// wait for the reboot event
 		uint32 event;
 		do {

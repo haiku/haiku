@@ -1294,28 +1294,40 @@ TRoster::GetShutdownApps(AppInfoList &userApps, AppInfoList &systemApps,
 
 	status_t error = B_OK;
 
-	// add ourself to the vital system apps and try to find the app server
+	// get the vital system apps:
+	// * ourself
+	// * app server
+	// * input server
+	// * debug server
 	if (error == B_OK) {
 		// ourself
 		vitalSystemApps.insert(be_app->Team());
 
-		// the app server
+		// app server
 		port_id appServerPort = find_port(SERVER_PORT_NAME);
 		port_info portInfo;
 		if (appServerPort >= 0
 			&& get_port_info(appServerPort, &portInfo) == B_OK) {
 			vitalSystemApps.insert(portInfo.team);
 		}
+
+		// input server
+		RosterAppInfo *info
+			= fRegisteredApps.InfoFor("application/x-vnd.Be-input_server");
+		if (info)
+			vitalSystemApps.insert(info->team);
+
+		// debug server
+		info = fRegisteredApps.InfoFor("application/x-vnd.haiku-debug-server");
+		if (info)
+			vitalSystemApps.insert(info->team);
 	}
 
+	// populate the other groups
 	for (AppInfoList::Iterator it(fRegisteredApps.It());
 		 RosterAppInfo *info = *it;
 		 ++it) {
-		if (vitalSystemApps.find(info->team) != vitalSystemApps.end()) {
-			// must be us or the app server
-		} else if (_IsVitalSystemApp(info)) {
-			vitalSystemApps.insert(info->team);
-		} else {
+		if (vitalSystemApps.find(info->team) == vitalSystemApps.end()) {
 			RosterAppInfo *clonedInfo = info->Clone();
 			if (clonedInfo) {
 				if (info->flags & B_BACKGROUND_APP) {
@@ -1643,21 +1655,6 @@ TRoster::_HandleGetRecentEntries(BMessage *request)
 
 	FUNCTION_END();
 } 
-
-// _IsVitalSystemApp
-bool
-TRoster::_IsVitalSystemApp(RosterAppInfo *info) const
-{
-	BPath path;
-	status_t error = path.SetTo(&info->ref);
-	if (error != B_OK)
-		return false;
-
-	int len = strlen(path.Path());
-	int prefixLen = strlen(kVitalSystemAppPathPrefix);
-	return (len > prefixLen
-		&& strncmp(path.Path(), kVitalSystemAppPathPrefix, prefixLen) == 0);
-}
 
 // _IsSystemApp
 bool

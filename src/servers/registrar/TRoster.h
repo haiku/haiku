@@ -113,7 +113,6 @@ private:
 
 	void _HandleGetRecentEntries(BMessage *request);
 
-	bool _IsVitalSystemApp(RosterAppInfo *info) const;
 	bool _IsSystemApp(RosterAppInfo *info) const;
 	
 	status_t _LoadRosterSettings(const char *path = NULL);
