@@ -29,6 +29,9 @@ public:
 	int16	GetNextTrack(void);
 	int16	GetPreviousTrack(void);
 	
+	int16	GetFirstTrack(void);
+	int16	GetLastTrack(void);
+	
 private:
 	void	Randomize(void);
 	void	Unrandomize(void);

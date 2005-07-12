@@ -83,6 +83,8 @@ PlayList::SetShuffle(const bool &random)
 	else
 		Unrandomize();
 	
+	fRandom = random;
+	
 	fLocker.Unlock();
 }
 
@@ -181,6 +183,41 @@ PlayList::GetPreviousTrack(void)
 		fTrackIndex--;
 	
 	int16 value = fTrackList[fTrackIndex];
+	fLocker.Unlock();
+	return value;
+}
+
+int16
+PlayList::GetLastTrack(void)
+{
+	fLocker.Lock();
+	
+	if(fTrackCount < 1)
+	{
+		fLocker.Unlock();
+		return -1;
+	}
+	
+	fTrackIndex = fTrackCount - 1;
+	int16 value = fTrackList[fTrackIndex];
+	fLocker.Unlock();
+	return value;
+}
+
+int16
+PlayList::GetFirstTrack(void)
+{
+	fLocker.Lock();
+	
+	if(fTrackCount < 1)
+	{
+		fLocker.Unlock();
+		return -1;
+	}
+	
+	fTrackIndex = 0;
+	int16 value = fTrackList[fTrackIndex];
+	
 	fLocker.Unlock();
 	return value;
 }

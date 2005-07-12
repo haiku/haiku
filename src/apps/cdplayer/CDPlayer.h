@@ -48,6 +48,7 @@ private:
 			void				HandlePlayState(void);
 			void				UpdateCDInfo(void);
 			void				UpdateTimeInfo(void);
+			void				AdjustButtonStates(void);
 	
 			CDEngine			*engine;
 	

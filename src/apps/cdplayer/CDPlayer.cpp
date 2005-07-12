@@ -175,6 +175,7 @@ void CDPlayer::BuildGUI(void)
 	fRewind->MoveTo(fNextTrack->Frame().right + 10, Bounds().bottom - 5 - fRewind->Frame().Height());
 	fRewind->SetDisabled(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"rew_disabled"));
 	AddChild(fRewind);
+	fRewind->SetEnabled(false);
 	
 	fFastFwd = new DrawButton( BRect(0,0,1,1), "FastFwd", BTranslationUtils::GetBitmap(B_PNG_FORMAT,"ffwd_up"),
 							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"ffwd_down"), new BMessage(M_NEXT_TRACK), 
@@ -183,6 +184,7 @@ void CDPlayer::BuildGUI(void)
 	fFastFwd->MoveTo(fRewind->Frame().right + 2, Bounds().bottom - 5 - fFastFwd->Frame().Height());
 	fFastFwd->SetDisabled(BTranslationUtils::GetBitmap(B_PNG_FORMAT,"ffwd_disabled"));
 	AddChild(fFastFwd);
+	fFastFwd->SetEnabled(false);
 	
 	fEject = new DrawButton( BRect(0,0,1,1), "Eject", BTranslationUtils::GetBitmap(B_PNG_FORMAT,"eject_up"),
 							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"eject_down"), new BMessage(M_EJECT), 
@@ -364,90 +366,104 @@ CDPlayer::HandlePlayState(void)
 	{
 		case kNoCD:
 		{
-			if(fStop->IsEnabled())
-			{
-				fStop->SetEnabled(false);
-				fPlay->SetEnabled(false);
-				fNextTrack->SetEnabled(false);
-				fPrevTrack->SetEnabled(false);
-				fFastFwd->SetEnabled(false);
-				fRewind->SetEnabled(false);
-				fSave->SetEnabled(false);
-			}
+			AdjustButtonStates();
 			fCurrentTrack->SetHighColor(fStopColor);
+			fCurrentTrack->Invalidate();
 			break;
 		}
 		case kStopped:
 		{
-			if(!fStop->IsEnabled())
-			{
-				fStop->SetEnabled(true);
-				fPlay->SetEnabled(true);
-				fNextTrack->SetEnabled(true);
-				fPrevTrack->SetEnabled(true);
-				fFastFwd->SetEnabled(true);
-				fRewind->SetEnabled(true);
-				
-				// TODO: Enable when Save is implemented
-//					fSave->SetEnabled(true);
-			}
+			AdjustButtonStates();
 			fCurrentTrack->SetHighColor(fStopColor);
+			fCurrentTrack->Invalidate();
 			break;
 		}
 		case kPaused:
 		{
-			// TODO: Set play button to Pause
-			if(!fStop->IsEnabled())
-			{
-				fStop->SetEnabled(true);
-				fPlay->SetEnabled(true);
-				fNextTrack->SetEnabled(true);
-				fPrevTrack->SetEnabled(true);
-				fFastFwd->SetEnabled(true);
-				fRewind->SetEnabled(true);
-				
-				// TODO: Enable when Save is implemented
-//					fSave->SetEnabled(true);
-			}
+			AdjustButtonStates();
 			fCurrentTrack->SetHighColor(fPlayColor);
 			break;
 		}
 		case kPlaying:
 		{
-			if(!fStop->IsEnabled())
-			{
-				fStop->SetEnabled(true);
-				fPlay->SetEnabled(true);
-				fNextTrack->SetEnabled(true);
-				fPrevTrack->SetEnabled(true);
-				fFastFwd->SetEnabled(true);
-				fRewind->SetEnabled(true);
-				
-				// TODO: Enable when Save is implemented
-//					fSave->SetEnabled(true);
-			}
-			fPlay->SetState(1);
+			AdjustButtonStates();
 			fCurrentTrack->SetHighColor(fPlayColor);
 			fCurrentTrack->Invalidate();
 			break;
 		}
 		case kSkipping:
 		{
-			if(!fStop->IsEnabled())
-			{
-				fStop->SetEnabled(true);
-				fPlay->SetEnabled(true);
-				fNextTrack->SetEnabled(true);
-				fPrevTrack->SetEnabled(true);
-				fFastFwd->SetEnabled(true);
-				fRewind->SetEnabled(true);
-				
-				// TODO: Enable when Save is implemented
-//					fSave->SetEnabled(true);
-			}
+			AdjustButtonStates();
 			fCurrentTrack->SetHighColor(fStopColor);
 			break;
 		}
+		default:
+		{
+			break;
+		}
+	}
+}
+
+void
+CDPlayer::AdjustButtonStates(void)
+{
+	CDState state = engine->GetState();
+	
+	switch(state)
+	{
+		case kNoCD:
+		{
+			// Everything needs to be disabled when there is no CD
+			fStop->SetEnabled(false);
+			fPlay->SetEnabled(false);
+			fNextTrack->SetEnabled(false);
+			fPrevTrack->SetEnabled(false);
+			fFastFwd->SetEnabled(false);
+			fRewind->SetEnabled(false);
+			fSave->SetEnabled(false);
+			break;
+		}
+		case kStopped:
+		{
+			fStop->SetEnabled(true);
+			fPlay->SetEnabled(true);
+			fNextTrack->SetEnabled(true);
+			fPrevTrack->SetEnabled(true);
+			
+			fFastFwd->SetEnabled(false);
+			fRewind->SetEnabled(false);
+			
+			// TODO: Enable when Save is implemented
+//			fSave->SetEnabled(true);
+
+			fPlay->SetState(0);
+			break;
+		}
+		case kPaused:
+		{
+			// We can only pause when everything is enabled, so this is all we should do.
+			fFastFwd->SetEnabled(false);
+			fRewind->SetEnabled(false);
+			fPlay->SetState(0);
+			break;
+		}
+		case kPlaying:
+		{
+			fStop->SetEnabled(true);
+			fPlay->SetEnabled(true);
+			fNextTrack->SetEnabled(true);
+			fPrevTrack->SetEnabled(true);
+			
+			fFastFwd->SetEnabled(true);
+			fRewind->SetEnabled(true);
+			
+			// TODO: Enable when Save is implemented
+//			fSave->SetEnabled(true);
+			
+			fPlay->SetState(1);
+			break;
+		}
+		case kSkipping:
 		default:
 		{
 			break;

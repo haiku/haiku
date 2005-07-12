@@ -442,8 +442,8 @@ CDAudioDevice::GetTimeForDisc(cdaudio_time &disc)
 	int16 trackcount = toc.toc_data[3] - toc.toc_data[2] + 1;
 	TrackDescriptor *desc = (TrackDescriptor*)&(toc.toc_data[4]);
 	
-	disc.minutes = desc[trackcount-1].min;
-	disc.seconds = desc[trackcount-1].sec;
+	disc.minutes = desc[trackcount].min;
+	disc.seconds = desc[trackcount].sec;
 	
 	return true;
 }

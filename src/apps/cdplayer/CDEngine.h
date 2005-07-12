@@ -40,7 +40,6 @@ public:
 
 protected:
 	virtual	bool		UpdateState() = 0;
-
 			CDEngine	*engine;
 };
 
@@ -70,7 +69,7 @@ public:
 
 	int32	GetTrack() const;
 	int32	GetNumTracks() const;
-
+	
 private:
 	bool	UpdateState();
 	bool	CurrentState(int32);
@@ -126,10 +125,10 @@ class VolumeState : public PeriodicWatcher
 public:
 			VolumeState(void);
 	
-	bool	UpdateState();
 	int32	GetVolume() const;
 
 private:
+	bool	UpdateState();
 	int32	fVolume;
 	
 };

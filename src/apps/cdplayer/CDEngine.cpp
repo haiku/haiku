@@ -36,14 +36,15 @@ void
 PeriodicWatcher::DoPulse()
 {
 	// control the period here
-	if (UpdateState())
+	if(UpdateState())
 		Notify();
 }
 
 void 
 PeriodicWatcher::UpdateNow()
 {
-	UpdateState();
+	if(UpdateState())
+		Notify();
 }
 
 
@@ -68,6 +69,7 @@ PlayState::UpdateState(void)
 			return CurrentState(kPlaying);
 		}
 	}
+	
 	
 /*	if(state == kPlaying && fEngine->GetState() == kStopped)
 	{
@@ -118,11 +120,18 @@ TrackState::UpdateState()
 	// As a result, we want to make sure this hasn't happened. If it has, then we
 	// need to update the playlist's position.
 	
-	int16 cdTrack = sCDDevice.GetTrack();
+	int16 cdTrack;
 	
-	if(cdTrack != sPlayList.GetCurrentTrack())
-		sPlayList.SetCurrentTrack(cdTrack);
-	
+	if(sCDDevice.GetState() == kPlaying)
+	{
+		cdTrack = sCDDevice.GetTrack();
+		if(cdTrack != sPlayList.GetCurrentTrack())
+			sPlayList.SetCurrentTrack(cdTrack);
+		return CurrentState(cdTrack);
+	}
+
+	// If we're not playing, just monitor the current track in the playlist
+	cdTrack = sPlayList.GetCurrentTrack();
 	return CurrentState(cdTrack);
 }
 
@@ -170,8 +179,7 @@ TimeState::UpdateState()
 		track.seconds = -1;
 		disc.minutes = -1;
 		disc.seconds = -1;
-		CurrentState(disc,disc,track,track);
-		return false;
+		return CurrentState(disc,disc,track,track);
 	}
 }
 
@@ -373,31 +381,56 @@ void
 CDEngine::SkipOneForward()
 {
 	int16 track = sPlayList.GetNextTrack();
+	
 	if(track <= 0)
-		return;
+	{
+		// force a "wrap around" when possible. This makes it
+		// possible for the user to be able to, for example, jump
+		// back to the first track from the last one with 1 button push
+		track = sPlayList.GetFirstTrack();
+		
+		if(track <= 0)
+			return;
+	}
 	
 	CDState state = sCDDevice.GetState();
 	if(state == kPlaying)
 		sCDDevice.Play(track);
 	
-//	if(state == kPaused)
-//		sCDDevice.Pause();
+	if(state == kPaused)
+	{
+		sCDDevice.Play(track);
+		sCDDevice.Pause();
+	}
+	trackState.UpdateNow();
 }
 
 void 
 CDEngine::SkipOneBackward()
 {
 	int16 track = sPlayList.GetPreviousTrack();
+
 	if(track <= 0)
-		return;
+	{
+		// force a "wrap around" when possible. This way the user
+		// can search backwards to get to a later track
+		track = sPlayList.GetLastTrack();
+		
+		if(track <= 0)
+			return;
+	}
 	
 	CDState state = sCDDevice.GetState();
 	
 	if(state == kPlaying)
 		sCDDevice.Play(track);
 	
-//	if(state == kPaused)
-//		sCDDevice.Pause();
+	if(state == kPaused)
+	{
+		sCDDevice.Play(track);
+		sCDDevice.Pause();
+	}
+	trackState.UpdateNow();
 }
 
 void 
