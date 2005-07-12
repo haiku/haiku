@@ -6,7 +6,7 @@
 	Other authors:
 	Mark Watson,
 	Apsed,
-	Rudolf Cornelissen 11/2002-4/2004
+	Rudolf Cornelissen 11/2002-7/2005
 */
 
 #define MODULE_BIT 0x00200000
@@ -294,7 +294,7 @@ status = B_OK;
 //		head1_set_display_pitch();
 
 		/* tell the card what memory to display */
-//		head1_set_display_start(startadd,colour_depth1);
+		head1_set_display_start(startadd,colour_depth1);
 
 		/* set the timing */
 //		head1_set_timing(target);
@@ -396,14 +396,14 @@ status_t MOVE_DISPLAY(uint16 h_display_start, uint16 v_display_start) {
 	{
 		case DUALHEAD_ON:
 		case DUALHEAD_SWITCH:
-//			head1_set_display_start(startadd,colour_depth);
+			head1_set_display_start(startadd,colour_depth);
 //			head2_set_display_start(startadd_right,colour_depth);
 			break;
 		case DUALHEAD_OFF:
-//			head1_set_display_start(startadd,colour_depth);
+			head1_set_display_start(startadd,colour_depth);
 			break;
 		case DUALHEAD_CLONE:
-//			head1_set_display_start(startadd,colour_depth);
+			head1_set_display_start(startadd,colour_depth);
 //			head2_set_display_start(startadd,colour_depth);
 			break;
 	}

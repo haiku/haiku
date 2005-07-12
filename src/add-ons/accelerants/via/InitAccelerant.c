@@ -154,8 +154,7 @@ status_t INIT_ACCELERANT(int the_fd) {
 	*/
 	pointer_reservation = 0;
 	/* VIA hardcursor needs 4kB space */
-//rud: shutoff until adress of FB is programmed! <<<<<<<<<<
-//	if (si->settings.hardcursor) pointer_reservation = 4096;
+	if (si->settings.hardcursor) pointer_reservation = 4096;
 
 	si->fbc.frame_buffer = (void *)((char *)si->framebuffer+pointer_reservation);
 	si->fbc.frame_buffer_dma = (void *)((char *)si->framebuffer_pci+pointer_reservation);

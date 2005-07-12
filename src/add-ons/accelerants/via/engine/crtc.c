@@ -599,7 +599,7 @@ status_t eng_crtc_set_display_pitch()
 
 status_t eng_crtc_set_display_start(uint32 startadd,uint8 bpp) 
 {
-	uint8 temp;
+//	uint8 temp;
 	uint32 timeout = 0;
 
 	LOG(4,("CRTC: setting card RAM to be displayed bpp %d\n", bpp));
@@ -610,47 +610,42 @@ status_t eng_crtc_set_display_start(uint32 startadd,uint8 bpp)
 
 	/* we might have no retraces during setmode! */
 	/* wait 25mS max. for retrace to occur (refresh > 40Hz) */
-	while (((ENG_REG32(RG32_RASTER) & 0x000007ff) < si->dm.timing.v_display) &&
-			(timeout < (25000/10)))
+//	while (((ENG_REG32(RG32_RASTER) & 0x000007ff) < si->dm.timing.v_display) &&
+//			(timeout < (25000/10)))
+	if (0)
 	{
 		/* don't snooze much longer or retrace might get missed! */
 		snooze(10);
 		timeout++;
 	}
 
-	/* enable access to primary head */
-	set_crtc_owner(0);
+/*
+linux:
+   vgaHWGetIOBase(hwp);
+        vgaIOBase = hwp->IOBase; //3d0 (rud)
+        vgaCRIndex = vgaIOBase + 4;
 
-	if (si->ps.card_arch == NV04A)
-	{
-		/* upto 32Mb RAM adressing: must be used this way on pre-NV10! */
+define VGAOUT16(addr, val) MMIO_OUT16(pVia->MapBase+0x8000, addr, val)
 
-		/* set standard registers */
-		/* (NVidia: startadress in 32bit words (b2 - b17) */
-		CRTCW(FBSTADDL, ((startadd & 0x000003fc) >> 2));
-		CRTCW(FBSTADDH, ((startadd & 0x0003fc00) >> 10));
+      Base = Base >> 1;
+        VGAOUT16(vgaCRIndex, (Base & 0x00ff00) | 0x0c);
+        VGAOUT16(vgaCRIndex, ((Base & 0x00ff) << 8) | 0x0d);
+        VGAOUT16(vgaCRIndex, ((Base & 0xff0000) >> 8) | 0x34);
+*/
+ 
+	/* VIA: upto 32Mb RAM can be adressed */
 
-		/* set extended registers */
-		/* NV4 extended bits: (b18-22) */
-		temp = (CRTCR(REPAINT0) & 0xe0);
-		CRTCW(REPAINT0, (temp | ((startadd & 0x007c0000) >> 18)));
-		/* NV4 extended bits: (b23-24) */
-		temp = (CRTCR(HEB) & 0x9f);
-		CRTCW(HEB, (temp | ((startadd & 0x01800000) >> 18)));
-	}
-	else
-	{
-		/* upto 4Gb RAM adressing: must be used on NV10 and later! */
-		/* NOTE:
-		 * While this register also exists on pre-NV10 cards, it will
-		 * wrap-around at 16Mb boundaries!! */
+	/* set standard registers */
+	/* (VIA: startadress in 16bit words (b1 - b16) */
+	CRTCW(FBSTADDL, ((startadd & 0x000001fe) >> 1));
+	CRTCW(FBSTADDH, ((startadd & 0x0001fe00) >> 9));
+	/* set extended bits: (b17-24) */
+	CRTCW(FBSTADDE, ((startadd & 0x01fe0000) >> 17));
 
-		/* 30bit adress in 32bit words */
-		ENG_REG32(RG32_NV10FBSTADD32) = (startadd & 0xfffffffc);
-	}
+//fixme: findout if VIA supports pixelpanning...
 
 	/* set NV4/NV10 byte adress: (b0 - 1) */
-	ATBW(HORPIXPAN, ((startadd & 0x00000003) << 1));
+//	ATBW(HORPIXPAN, ((startadd & 0x00000003) << 1));
 
 	return B_OK;
 }
@@ -662,45 +657,20 @@ status_t eng_crtc_cursor_init()
 	/* cursor bitmap will be stored at the start of the framebuffer */
 	const uint32 curadd = 0;
 
-	/* set cursor bitmap adress ... */
-	if (0)//(si->ps.card_arch == NV04A) || (si->ps.laptop))
-	{
-		/* must be used this way on pre-NV10 and on all 'Go' cards! */
-
-		/* cursorbitmap must start on 2Kbyte boundary: */
-		/* set adress bit11-16, and set 'no doublescan' (registerbit 1 = 0) */
-		CRTCW(CURCTL0, ((curadd & 0x0001f800) >> 9));
-		/* set adress bit17-23, and set graphics mode cursor(?) (registerbit 7 = 1) */
-		CRTCW(CURCTL1, (((curadd & 0x00fe0000) >> 17) | 0x80));
-		/* set adress bit24-31 */
-		CRTCW(CURCTL2, ((curadd & 0xff000000) >> 24));
-	}
-	else
-	{
-		/* upto 4Gb RAM adressing:
-		 * can be used on NV10 and later (except for 'Go' cards)! */
-		/* NOTE:
-		 * This register does not exist on pre-NV10 and 'Go' cards. */
-
-		/* cursorbitmap must still start on 2Kbyte boundary: */
-//via
-	/* background is black */
-	CRTCDW(CURSOR_BG, 0x00000000);
-	/* foreground is white */
-	CRTCDW(CURSOR_FG, 0x00ffffff);
+	/* background is white */
+	CRTCDW(CURSOR_BG, 0xffffffff);
+	/* foreground is black */
+	CRTCDW(CURSOR_FG, 0x00000000);
 	/* set cursor bitmap adress */
 	CRTCDW(CURSOR_MODE, (curadd & 0xfffffffc));
-	}
 
-	/* clear cursor (via cursor uses 4kb) */
+	/* clear cursor (via cursor uses 4kb max) */
 	fb = (uint32 *) si->framebuffer + curadd;
-	for (i=0;i<(4096/4);i++)
+	for (i = 0; i < (4096/4); i += 2)
 	{
-		fb[i]=0;
+		fb[i + 0] = 0x00000000;
+		fb[i + 1] = 0xffffffff;
 	}
-
-	/* select 32x32 pixel, 16bit color cursorbitmap, no doublescan */
-//	ENG_REG32(RG32_CURCONF) = 0x02000100;
 
 	/* activate hardware cursor */
 	eng_crtc_cursor_show();
@@ -711,6 +681,8 @@ status_t eng_crtc_cursor_init()
 status_t eng_crtc_cursor_show()
 {
 	LOG(4,("CRTC: enabling cursor\n"));
+	/* b1 = 0 shows a 64x64 pixel map, b1 = 1 shows a 32x32 pixel map;
+	 * b0 = 0 disables the cursor, b0 = 1 enables the cursor. */
 	CRTCDW(CURSOR_MODE, (CRTCDR(CURSOR_MODE) | 0x00000003));
 
 	return B_OK;
@@ -728,54 +700,34 @@ status_t eng_crtc_cursor_hide()
 status_t eng_crtc_cursor_define(uint8* andMask,uint8* xorMask)
 {
 	int y;
-	uint8 b,s;
-	uint16 *cursor;
-	uint16 data;
+	uint8 *cursor;
 
 	/* get a pointer to the cursor */
-	cursor = (uint16*) si->framebuffer;
+	cursor = (uint8*) si->framebuffer;
 
-	/* draw the cursor */
+	/* pixmap is 4 bytes per row, two rows form pixeldata for one pixel in height */
 	for (y = 0; y < 16; y++)
 	{
-		b = 0x01;
-		/* preset transparant */
-		data = 0x0000;
-		for (s = 0; s < 15; s += 2)
-		{
-			/* set white if requested */
-			if ((!(*andMask & b)) && (!(*xorMask & b))) data |= (0x0003 << s);
-			/* set black if requested */
-			if ((!(*andMask & b)) &&   (*xorMask & b))  data |= (0x0002 << s);
-			/* set invert if requested */
-			if (  (*andMask & b)  &&   (*xorMask & b))  data |= (0x0001 << s);
-			b <<= 1;
-		}
-		/* place the 8 pixels in the bitmap */
-		cursor[0 + (y * 4)] = data;
-		xorMask++;
-		andMask++;
-
-		b = 0x01;
-		/* preset transparant */
-		data = 0x0000;
-		for (s = 0; s < 15; s += 2)
-		{
-			/* set white if requested */
-			if ((!(*andMask & b)) && (!(*xorMask & b))) data |= (0x0003 << s);
-			/* set black if requested */
-			if ((!(*andMask & b)) &&   (*xorMask & b))  data |= (0x0002 << s);
-			/* set invert if requested */
-			if (  (*andMask & b)  &&   (*xorMask & b))  data |= (0x0001 << s);
-			b <<= 1;
-		}
-		/* place the 8 pixels in the bitmap */
-		cursor[1 + (y * 4)] = data;
-		xorMask++;
-		andMask++;
+		cursor[0 + (y * 8)] = *xorMask++;
+		cursor[1 + (y * 8)] = *xorMask++;
+		cursor[4 + (y * 8)] = *andMask++;
+		cursor[5 + (y * 8)] = *andMask++;
 	}
 
 	return B_OK;
+//
+	for (y = 0; y < 1; y++)//hele hoogte invert
+	{
+		cursor[0 + (y*4)] = 0xff;//linker helft invert
+		cursor[0 + (1*4)] = 0xff;//rechter helft invert
+//invert = %11
+//black = %00
+
+//		cursor[0  + (y * 4)] = *xorMask++;
+//		cursor[32 + (y * 4)] = *xorMask++;
+//		cursor[64 + (y * 4)] = *xorMask++;
+//		cursor[96 + (y * 4)] = *xorMask++;
+	}
 }
 
 /* position the cursor */

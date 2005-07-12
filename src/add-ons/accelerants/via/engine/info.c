@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-10/2004
+   Rudolf Cornelissen 7/2003-7/2005
 */
 
 #define MODULE_BIT 0x00002000
@@ -2403,7 +2403,7 @@ static void setup_output_matrix()
 	si->ps.crtc2_prim = false;
 
 	/* setup output devices and heads */
-	if (si->ps.secondary_head)
+	if (0)//si->ps.secondary_head)
 	{
 		if (si->ps.card_type != NV11)
 		{
