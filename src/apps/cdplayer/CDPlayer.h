@@ -18,6 +18,7 @@
 
 #include "Observer.h"
 #include "CDEngine.h"
+#include "TrackMenu.h"
 
 class DrawButton;
 class TwoStateDrawButton;
@@ -75,6 +76,8 @@ private:
 			BBox				*fCDBox,
 								*fTrackBox,
 								*fTimeBox;
+								
+			TrackMenu			*fTrackMenu;
 			
 			CDState				fCDState;
 			

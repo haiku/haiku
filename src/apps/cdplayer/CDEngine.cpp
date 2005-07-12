@@ -454,7 +454,10 @@ CDEngine::StopSkipping()
 void 
 CDEngine::SelectTrack(int32 trackNumber)
 {
-	sCDDevice.Play(trackNumber);
+	sPlayList.SetCurrentTrack(trackNumber);
+	if(playState.GetState() == kPlaying)
+		sCDDevice.Play(trackNumber);
+	trackState.UpdateNow();
 }
 
 void

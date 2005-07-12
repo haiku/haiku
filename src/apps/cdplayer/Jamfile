@@ -10,6 +10,7 @@ App CDPlayer :
 	FunctionObjectMessage.cpp
 	Observer.cpp
 	PlayList.cpp
+	TrackMenu.cpp
 	TwoStateDrawButton.cpp
 	TypedList.cpp
 	;

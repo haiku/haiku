@@ -33,6 +33,7 @@ enum
 {
 	M_STOP='mstp',
 	M_PLAY,
+	M_SELECT_TRACK,
 	M_NEXT_TRACK,
 	M_PREV_TRACK,
 	M_FFWD,
@@ -74,7 +75,12 @@ void CDPlayer::BuildGUI(void)
 	fPlayColor.blue = 40;
 	fPlayColor.alpha = 255;
 	
-	BRect r(5,5,230,25);
+	BRect r;
+	r.left = 5;
+	r.top = 5;
+	r.right = (Bounds().Width()/2) - 7;
+	r.bottom = 25;
+	
 	
 	// Assemble the CD Title box
 	fCDBox = new BBox(r,"TrackBox");
@@ -88,6 +94,10 @@ void CDPlayer::BuildGUI(void)
 	view->AddChild(fCDTitle);
 	fCDTitle->SetHighColor(200,200,200);
 	fCDTitle->SetFont(be_bold_font);
+	
+	r.OffsetBy(0, r.Height() + 5);
+	fTrackMenu = new TrackMenu(r, "TrackMenu", new BMessage(M_SELECT_TRACK));
+	AddChild(fTrackMenu);
 	
 	r.Set(fCDTitle->Frame().right + 15,5,Bounds().right - 5,25);
 	fTrackBox = new BBox(r,"TrackBox",B_FOLLOW_TOP);
@@ -105,7 +115,7 @@ void CDPlayer::BuildGUI(void)
 	r.OffsetBy(0, r.Height() + 5);
 	fTimeBox = new BBox(r,"TimeBox",B_FOLLOW_LEFT_RIGHT);
 	AddChild(fTimeBox);
-
+	
 	view = new BView( fTimeBox->Bounds().InsetByCopy(2,2), "view",B_FOLLOW_ALL,B_WILL_DRAW);
 	view->SetViewColor(0,7,34);
 	fTimeBox->AddChild(view);
@@ -259,6 +269,11 @@ CDPlayer::MessageReceived(BMessage *msg)
 			}
 			break;
 		}
+		case M_SELECT_TRACK:
+		{
+			engine->SelectTrack(fTrackMenu->Value()+1);
+			break;
+		}
 		case M_NEXT_TRACK:
 		{
 			engine->SkipOneForward();
@@ -339,7 +354,11 @@ CDPlayer::NoticeChange(Notifier *notifier)
 	else
 	if(trs)
 	{
-		// TODO: Update track count indicator once there is one
+		if(fTrackMenu->CountItems() != engine->TrackStateWatcher()->GetNumTracks())
+			fTrackMenu->SetItemCount(engine->TrackStateWatcher()->GetNumTracks());
+		
+		fTrackMenu->SetValue(engine->TrackStateWatcher()->GetTrack()-1);
+		
 		UpdateCDInfo();
 	}
 	else
@@ -566,6 +585,7 @@ CDPlayer::AttachedToWindow()
 	fSave->SetTarget(this);
 	fShuffle->SetTarget(this);
 	fRepeat->SetTarget(this);
+	fTrackMenu->SetTarget(this);
 }
 
 void
@@ -580,6 +600,8 @@ CDPlayer::FrameResized(float new_width, float new_height)
 	float half = (new_width / 2);
 	
 	fCDBox->ResizeTo( half - 7, fCDBox->Bounds().Height() );
+	fTrackMenu->ResizeTo( half - 7, fTrackMenu->Bounds().Height() );
+	fTrackMenu->Invalidate();
 	
 	fTrackBox->MoveTo(half + 8, fTrackBox->Frame().top);
 	fTrackBox->ResizeTo( Bounds().right - (half + 8) - 5, fTrackBox->Bounds().Height() );
