@@ -245,18 +245,6 @@ status_t BMessageBody::Flatten(BDataIO* stream) const
 	return err;
 }
 //------------------------------------------------------------------------------
-status_t BMessageBody::Unflatten(const char* flat_buffer)
-{
-	// TODO: implement
-	return B_ERROR;
-}
-//------------------------------------------------------------------------------
-status_t BMessageBody::Unflatten(BDataIO* stream)
-{
-	// TODO: implement
-	return B_ERROR;
-}
-//------------------------------------------------------------------------------
 status_t BMessageBody::AddData(const char* name, type_code type,
 							   const void* data, ssize_t numBytes,
 							   bool is_fixed_size, int32 /* count */)

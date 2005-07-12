@@ -81,8 +81,6 @@ public:
 // Flattening data
 		ssize_t		FlattenedSize() const;
 		status_t	Flatten(BDataIO *stream) const;
-		status_t	Unflatten(const char *flat_buffer);
-		status_t	Unflatten(BDataIO *stream);
 
 // Removing data
 		status_t	RemoveData(const char *name, int32 index = 0);
