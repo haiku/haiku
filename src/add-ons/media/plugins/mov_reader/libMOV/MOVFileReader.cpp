@@ -519,13 +519,17 @@ uint32	MOVFileReader::getChunkSize(uint32 stream_index, uint32 pFrameNo)
 			// Get first sample in chunk
 			uint32 SampleNo = aTrakAtom->getFirstSampleInChunk(ChunkNo);
 
-			// Add up all sample sizes in chunk			
 			uint32 ChunkSize = 0;
-			for (uint32 i=0;i<aTrakAtom->getNoSamplesInChunk(ChunkNo);i++) {
-				ChunkSize += aTrakAtom->getSizeForSample(SampleNo);
-				SampleNo++;
+			if (aTrakAtom->IsSingleSampleSize()) {
+				ChunkSize = aTrakAtom->getNoSamplesInChunk(ChunkNo) * aTrakAtom->getSizeForSample(SampleNo);
+			} else {
+				// Add up all sample sizes in chunk			
+				for (uint32 i=0;i<aTrakAtom->getNoSamplesInChunk(ChunkNo);i++) {
+					ChunkSize += aTrakAtom->getSizeForSample(SampleNo);
+					SampleNo++;
+				}
 			}
-
+			
 			return ChunkSize;
 		}
 		
@@ -557,7 +561,6 @@ bool	MOVFileReader::IsKeyFrame(uint32 stream_index, uint32 pFrameNo)
 
 bool	MOVFileReader::GetNextChunkInfo(uint32 stream_index, uint32 pFrameNo, off_t *start, uint32 *size, bool *keyframe)
 {
-
 	*start = getOffsetForFrame(stream_index, pFrameNo);
 	*size = getChunkSize(stream_index, pFrameNo);
 	

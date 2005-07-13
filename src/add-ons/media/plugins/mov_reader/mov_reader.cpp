@@ -26,6 +26,7 @@
 #include <string.h>
 #include <malloc.h>
 #include <DataIO.h>
+#include <StopWatch.h>
 #include <ByteOrder.h>
 #include <InterfaceDefs.h>
 #include <MediaFormats.h>
@@ -369,7 +370,7 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		
 		TRACE("frame_count %Ld\n", cookie->frame_count);
 		TRACE("duration %.6f (%Ld)\n", cookie->duration / 1E6, cookie->duration);
-		TRACE("compression %s\n", &video_format->compression);
+		TRACE("compression %s\n", (char *)(&video_format->compression));
 
 		description.family = B_QUICKTIME_FORMAT_FAMILY;
 		if (stream_header->fourcc_handler == 'ekaf' || stream_header->fourcc_handler == 0) // 'fake' or 0 fourcc => used compression id
@@ -482,7 +483,7 @@ movReader::GetNextChunk(void *_cookie,
 	mov_cookie *cookie = (mov_cookie *)_cookie;
 
 	int64 start; uint32 size; bool keyframe;
-	
+
 	if (cookie->audio) {
 		if (!theFileReader->GetNextChunkInfo(cookie->stream, cookie->chunk_pos, &start, &size, &keyframe))
 			return B_LAST_BUFFER_ERROR;
@@ -503,7 +504,7 @@ movReader::GetNextChunk(void *_cookie,
 		mediaHeader->u.encoded_audio.buffer_flags = keyframe ? B_MEDIA_KEY_FRAME : 0;
 
 		// This will only work with raw audio I think.
-		mediaHeader->start_time = (cookie->byte_pos * 1000000L * cookie->bytes_per_sec_scale) / cookie->bytes_per_sec_rate;
+		mediaHeader->start_time = (cookie->byte_pos * 1000000LL * cookie->bytes_per_sec_scale) / cookie->bytes_per_sec_rate;
 		TRACE("Audio - Frames in Chunk %ld / Actual Start Time %Ld using byte_pos\n",theFileReader->getNoFramesInChunk(cookie->stream,cookie->chunk_pos),mediaHeader->start_time);
 		
 		// We should find the current frame position (ie first frame in chunk) then compute using fps
