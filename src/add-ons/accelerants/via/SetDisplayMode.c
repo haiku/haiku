@@ -204,7 +204,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 			si->interlaced_tv_mode = true;
 */
 		/*set the display(s) pitches*/
-//		head1_set_display_pitch ();
+		head1_set_display_pitch ();
 		//fixme: seperate for real dualhead modes:
 		//we need a secondary si->fbc!
 //		head2_set_display_pitch ();
@@ -217,11 +217,11 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		{
 		case DUALHEAD_ON:
 		case DUALHEAD_SWITCH:
-//			head1_set_display_start(startadd,colour_depth1);
+			head1_set_display_start(startadd,colour_depth1);
 //			head2_set_display_start(startadd_right,colour_depth2);
 			break;
 		case DUALHEAD_CLONE:
-//			head1_set_display_start(startadd,colour_depth1);
+			head1_set_display_start(startadd,colour_depth1);
 //			head2_set_display_start(startadd,colour_depth2);
 			break;
 		}
@@ -291,7 +291,7 @@ status = B_OK;
 //		head1_mode(colour_mode,1.0);
 
 		/* set the display pitch */
-//		head1_set_display_pitch();
+		head1_set_display_pitch();
 
 		/* tell the card what memory to display */
 		head1_set_display_start(startadd,colour_depth1);

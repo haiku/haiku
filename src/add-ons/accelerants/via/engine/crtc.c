@@ -578,21 +578,19 @@ status_t eng_crtc_dpms_fetch(bool *display, bool *h, bool *v)
 
 status_t eng_crtc_set_display_pitch() 
 {
-	uint32 offset;
+	uint16 offset;
 
 	LOG(4,("CRTC: setting card pitch (offset between lines)\n"));
 
 	/* figure out offset value hardware needs */
-	offset = si->fbc.bytes_per_row / 8;
+	offset = si->fbc.bytes_per_row >> 3;
 
 	LOG(2,("CRTC: offset register set to: $%04x\n", offset));
 
-	/* enable access to primary head */
-	set_crtc_owner(0);
-
 	/* program the card */
+	// fixme: lowbyte register may not be programmed with value 0xff. Prevent that...
 	CRTCW(PITCHL, (offset & 0x00ff));
-	CRTCW(REPAINT0, ((CRTCR(REPAINT0) & 0x1f) | ((offset & 0x0700) >> 3)));
+	//fixme: there is a high-byte register somewhere that needs to be pgm'd!!!
 
 	return B_OK;
 }
