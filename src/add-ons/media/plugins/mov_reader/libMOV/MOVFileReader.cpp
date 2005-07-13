@@ -125,7 +125,7 @@ uint32 MOVFileReader::getMovieTimeScale()
 
 bigtime_t	MOVFileReader::getMovieDuration()
 {
-	return ((bigtime_t(getMVHDAtom()->getDuration()) * 1000000) / getMovieTimeScale());
+	return ((bigtime_t(getMVHDAtom()->getDuration()) * 1000000L) / getMovieTimeScale());
 }
 
 uint32	MOVFileReader::getStreamCount()
@@ -134,33 +134,27 @@ uint32	MOVFileReader::getStreamCount()
 	return (CountChildAtoms(uint32('trak')));
 }
 
-bigtime_t	MOVFileReader::getVideoDuration()
+bigtime_t	MOVFileReader::getVideoDuration(uint32 stream_index)
 {
 AtomBase *aAtomBase;
-uint32 TimeScale = getMovieTimeScale();
 
-	for (uint32 i=0;i<getStreamCount();i++) {
-		aAtomBase = GetChildAtom(uint32('trak'),i);
+	aAtomBase = GetChildAtom(uint32('trak'),stream_index);
 	
-		if ((aAtomBase) && (dynamic_cast<TRAKAtom *>(aAtomBase)->IsVideo())) {
-			return (dynamic_cast<TRAKAtom *>(aAtomBase)->Duration(TimeScale));
-		}
+	if ((aAtomBase) && (dynamic_cast<TRAKAtom *>(aAtomBase)->IsVideo())) {
+		return (dynamic_cast<TRAKAtom *>(aAtomBase)->Duration(1));
 	}
 	
 	return 0;
 }
 
-bigtime_t	MOVFileReader::getAudioDuration()
+bigtime_t	MOVFileReader::getAudioDuration(uint32 stream_index)
 {
 AtomBase *aAtomBase;
-uint32 TimeScale = getMovieTimeScale();
 
-	for (uint32 i=0;i<getStreamCount();i++) {
-		aAtomBase = GetChildAtom(uint32('trak'),i);
+	aAtomBase = GetChildAtom(uint32('trak'),stream_index);
 	
-		if ((aAtomBase) && (dynamic_cast<TRAKAtom *>(aAtomBase)->IsAudio())) {
-			return (dynamic_cast<TRAKAtom *>(aAtomBase)->Duration(TimeScale));
-		}
+	if ((aAtomBase) && (dynamic_cast<TRAKAtom *>(aAtomBase)->IsAudio())) {
+		return (dynamic_cast<TRAKAtom *>(aAtomBase)->Duration(1));
 	}
 	
 	return 0;
@@ -168,39 +162,59 @@ uint32 TimeScale = getMovieTimeScale();
 
 bigtime_t	MOVFileReader::getMaxDuration()
 {
-	return MAX(getVideoDuration(),getAudioDuration());
+AtomBase *aAtomBase;
+int32	video_index,audio_index;
+	video_index = -1;
+	audio_index = -1;
+
+	// find the active video and audio tracks
+	for (uint32 i=0;i<getStreamCount();i++) {
+		aAtomBase = GetChildAtom(uint32('trak'),i);
+		
+		if ((aAtomBase) && (dynamic_cast<TRAKAtom *>(aAtomBase)->IsActive())) {
+			if (dynamic_cast<TRAKAtom *>(aAtomBase)->IsAudio()) {
+				audio_index = int32(i);
+			}
+			if (dynamic_cast<TRAKAtom *>(aAtomBase)->IsVideo()) {
+				video_index = int32(i);
+			}
+		}
+	}
+
+	if ((video_index >= 0) && (audio_index >= 0)) {
+		return MAX(getVideoDuration(video_index),getAudioDuration(audio_index));
+	}
+	if ((video_index < 0) && (audio_index >= 0)) {
+		return getAudioDuration(audio_index);
+	}
+	if ((video_index >= 0) && (audio_index < 0)) {
+		return getVideoDuration(video_index);
+	}
+	
+	return 0;
 }
 
-uint32	MOVFileReader::getVideoFrameCount()
+uint32	MOVFileReader::getVideoFrameCount(uint32 stream_index)
 {
 AtomBase *aAtomBase;
 
-	for (uint32 i=0;i<getStreamCount();i++) {
-		aAtomBase = GetChildAtom(uint32('trak'),i);
+	aAtomBase = GetChildAtom(uint32('trak'),stream_index);
 	
-		if ((aAtomBase) && (dynamic_cast<TRAKAtom *>(aAtomBase)->IsVideo())) {
+	if ((aAtomBase) && (dynamic_cast<TRAKAtom *>(aAtomBase)->IsVideo())) {
 
-			return dynamic_cast<TRAKAtom *>(aAtomBase)->FrameCount();
-		}
+		return dynamic_cast<TRAKAtom *>(aAtomBase)->FrameCount();
 	}
 	
 	return 1;
 }
 
-uint32	MOVFileReader::getAudioFrameCount()
+uint32	MOVFileReader::getAudioFrameCount(uint32 stream_index)
 {
-
-AtomBase *aAtomBase;
-
-	for (uint32 i=0;i<getStreamCount();i++) {
-		aAtomBase = GetChildAtom(uint32('trak'),i);
-	
-		if ((aAtomBase) && (dynamic_cast<TRAKAtom *>(aAtomBase)->IsAudio())) {
-			return uint32(((getAudioDuration() * AudioFormat(i)->SampleRate) / 1000000L) + 0.5);
-		}
+	if (IsAudio(stream_index)) {
+		return uint32(((getAudioDuration(stream_index) * AudioFormat(stream_index)->SampleRate) / 1000000L) + 0.5);
 	}
 	
-	return 1;
+	return 0;
 }
 
 bool	MOVFileReader::IsVideo(uint32 stream_index)
@@ -357,7 +371,7 @@ const 	mov_main_header		*MOVFileReader::MovMainHeader()
 	theMainHeader.initial_frames = 0;
 
 	while (	videoStream < theMainHeader.streams ) {
-		if (IsVideo(videoStream)) {
+		if (IsVideo(videoStream) && IsActive(videoStream)) {
 			break;
 		}
 		videoStream++;
@@ -372,7 +386,7 @@ const 	mov_main_header		*MOVFileReader::MovMainHeader()
 	} else {
 		theMainHeader.width = VideoFormat(videoStream)->width;
 		theMainHeader.height = VideoFormat(videoStream)->height;
-		theMainHeader.total_frames = getVideoFrameCount();
+		theMainHeader.total_frames = getVideoFrameCount(videoStream);
 		theMainHeader.suggested_buffer_size = theMainHeader.width * theMainHeader.height * VideoFormat(videoStream)->bit_count / 8;
 		theMainHeader.micro_sec_per_frame = uint32(1000000.0 / VideoFormat(videoStream)->FrameRate);
 	}
@@ -454,7 +468,7 @@ const 	VideoMetaData	*MOVFileReader::VideoFormat(uint32 stream_index)
 				if (aAtomBase) {
 					STTSAtom *aSTTSAtom = dynamic_cast<STTSAtom *>(aAtomBase);
 
-					theVideo.FrameRate = ((aSTTSAtom->getSUMCounts() * 1000000.0L) / getVideoDuration());
+					theVideo.FrameRate = ((aSTTSAtom->getSUMCounts() * 1000000.0L) / aTrakAtom->Duration(1));
 			
 					return &theVideo;
 				}
@@ -469,17 +483,21 @@ const 	mov_stream_header	*MOVFileReader::StreamFormat(uint32 stream_index)
 {
 	// Fill In a Stream Header
 	theStreamHeader.length = 0;
+	
+	if (IsActive(stream_index) == false) {
+		return NULL;
+	}
 
 	if (IsVideo(stream_index)) {
-		theStreamHeader.rate = uint32(1000000*VideoFormat(stream_index)->FrameRate);
-		theStreamHeader.scale = 1000000;
-		theStreamHeader.length = getVideoFrameCount();
+		theStreamHeader.rate = uint32(1000000L*VideoFormat(stream_index)->FrameRate);
+		theStreamHeader.scale = 1000000L;
+		theStreamHeader.length = getVideoFrameCount(stream_index);
 	}
 	
 	if (IsAudio(stream_index)) {
 		theStreamHeader.rate = uint32(AudioFormat(stream_index)->SampleRate);
 		theStreamHeader.scale = 1;
-		theStreamHeader.length = getAudioFrameCount();
+		theStreamHeader.length = getAudioFrameCount(stream_index);
 		theStreamHeader.sample_size = AudioFormat(stream_index)->SampleSize;
 		theStreamHeader.suggested_buffer_size =	theStreamHeader.rate * theStreamHeader.sample_size;
 	}
@@ -548,6 +566,17 @@ bool	MOVFileReader::GetNextChunkInfo(uint32 stream_index, uint32 pFrameNo, off_t
 	}
 
 	return ((*start > 0) && (*size > 0) && !(IsEndOfFile(*start)));
+}
+
+bool	MOVFileReader::IsActive(uint32 stream_index)
+{
+	AtomBase *aAtomBase = GetChildAtom(uint32('trak'),stream_index);
+	if (aAtomBase) {
+		TRAKAtom *aTrakAtom = dynamic_cast<TRAKAtom *>(aAtomBase);
+		return aTrakAtom->IsActive();
+	}
+	
+	return false;
 }
 
 /* static */

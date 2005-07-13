@@ -146,11 +146,17 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 	BMediaFormats formats;
 	media_format *format = &cookie->format;
 	media_format_description description;
+
+	if (theFileReader->IsActive(cookie->stream) == false) {
+		ERROR("movReader::AllocateCookie: stream %d is not active\n", cookie->stream);
+		delete cookie;
+		return B_ERROR;
+	}
 	
 	const mov_stream_header *stream_header;
 	stream_header = theFileReader->StreamFormat(cookie->stream);
 	if (!stream_header) {
-		ERROR("movReader::GetStreamInfo: stream %d has no header\n", cookie->stream);
+		ERROR("movReader::AllocateCookie: stream %d has no header\n", cookie->stream);
 		delete cookie;
 		return B_ERROR;
 	}
@@ -160,13 +166,13 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 	if (theFileReader->IsAudio(cookie->stream)) {
 		const AudioMetaData *audio_format = theFileReader->AudioFormat(cookie->stream);
 		if (!audio_format) {
-			ERROR("movReader::GetStreamInfo: audio stream %d has no format\n", cookie->stream);
+			ERROR("movReader::AllocateCookie: audio stream %d has no format\n", cookie->stream);
 			delete cookie;
 			return B_ERROR;
 		}
 
-		cookie->frame_count = theFileReader->getAudioFrameCount();
-		cookie->duration = theFileReader->getAudioDuration();
+		cookie->frame_count = theFileReader->getAudioFrameCount(cookie->stream);
+		cookie->duration = theFileReader->getAudioDuration(cookie->stream);
 		
 		cookie->audio = true;
 		cookie->byte_pos = 0;
@@ -336,7 +342,7 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 	if (theFileReader->IsVideo(cookie->stream)) {
 		const VideoMetaData *video_format = theFileReader->VideoFormat(cookie->stream);
 		if (!video_format) {
-			ERROR("movReader::GetStreamInfo: video stream %d has no format\n", cookie->stream);
+			ERROR("movReader::AllocateCookie: video stream %d has no format\n", cookie->stream);
 			delete cookie;
 			return B_ERROR;
 		}
@@ -363,6 +369,7 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		
 		TRACE("frame_count %Ld\n", cookie->frame_count);
 		TRACE("duration %.6f (%Ld)\n", cookie->duration / 1E6, cookie->duration);
+		TRACE("compression %s\n", &video_format->compression);
 
 		description.family = B_QUICKTIME_FORMAT_FAMILY;
 		if (stream_header->fourcc_handler == 'ekaf' || stream_header->fourcc_handler == 0) // 'fake' or 0 fourcc => used compression id

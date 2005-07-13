@@ -267,13 +267,13 @@ void CMOVAtom::OnProcessMetaData()
 			printf("Failed to decompress headers uncompress returned ");
 			switch (result) {
 				case Z_MEM_ERROR:
-					printf("Lack of Memory Error\n");
+					DEBUGGER("Lack of Memory Error\n");
 					break;
 				case Z_BUF_ERROR:
-					printf("Lack of Output buffer space Error\n");
+					DEBUGGER("Lack of Output buffer space Error\n");
 					break;
 				case Z_DATA_ERROR:
-					printf("Input Data is corrupt or not a compressed set Error\n");
+					DEBUGGER("Input Data is corrupt or not a compressed set Error\n");
 					break;
 			}
 		}
@@ -387,6 +387,7 @@ void MVHDAtom::OnProcessMetaData()
 	theHeader.SelectionDuration = B_BENDIAN_TO_HOST_INT32(theHeader.SelectionDuration);
 	theHeader.CurrentTime = B_BENDIAN_TO_HOST_INT32(theHeader.CurrentTime);
 	theHeader.NextTrackID = B_BENDIAN_TO_HOST_INT32(theHeader.NextTrackID);
+	
 }
 
 char *MVHDAtom::OnGetAtomName()
@@ -410,6 +411,8 @@ AtomBase *aAtomBase;
 STTSAtom::STTSAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
 {
 	theHeader.NoEntries = 0;
+	SUMDurations = 0;
+	SUMCounts = 0;
 }
 
 STTSAtom::~STTSAtom()
@@ -434,6 +437,8 @@ TimeToSample	*aTimeToSample;
 		aTimeToSample->Duration = B_BENDIAN_TO_HOST_INT32(aTimeToSample->Duration);
 
 		theTimeToSampleArray[i] = aTimeToSample;
+		SUMDurations += (theTimeToSampleArray[i]->Duration * theTimeToSampleArray[i]->Count);
+		SUMCounts += theTimeToSampleArray[i]->Count;
 	}
 }
 
@@ -442,39 +447,14 @@ char *STTSAtom::OnGetAtomName()
 	return "Time to Sample Atom";
 }
 
-uint64	STTSAtom::getSUMCounts()
-{
-	uint64 SUMCounts = 0;
-	uint64 SUMDurations = 0;
-	
-	for (uint32 i=0;i<theHeader.NoEntries;i++) {
-		SUMDurations += (theTimeToSampleArray[i]->Duration * theTimeToSampleArray[i]->Count);
-		SUMCounts += theTimeToSampleArray[i]->Count;
-	}
-	
-	return SUMCounts;
-}
-
-uint64	STTSAtom::getSUMDurations()
-{
-// this Duration is not scaled to timescale
-	uint64 SUMDurations = 0;
-	
-	for (uint32 i=0;i<theHeader.NoEntries;i++) {
-		SUMDurations += (theTimeToSampleArray[i]->Duration * theTimeToSampleArray[i]->Count);
-	}
-	
-	return SUMDurations;
-}
-
 uint32	STTSAtom::getSampleForTime(uint32 pTime)
 {
-// TODO this is too slow.  PreCalc SUMCounts when loading this.
-	uint64 SUMDurations = 0;
+// TODO this is too slow.  PreCalc when loading this?
+	uint64 Duration = 0;
 
 	for (uint32 i=0;i<theHeader.NoEntries;i++) {
-		SUMDurations += (theTimeToSampleArray[i]->Duration * theTimeToSampleArray[i]->Count);
-		if (SUMDurations > pTime) {
+		Duration += (theTimeToSampleArray[i]->Duration * theTimeToSampleArray[i]->Count);
+		if (Duration > pTime) {
 			return i;
 		}
 	}
@@ -528,7 +508,6 @@ SampleToChunk	*aSampleToChunk;
 		}
 
 		theSampleToChunkArray[i] = aSampleToChunk;
-//		printf("%ld/%ld/%ld\n",aSampleToChunk->FirstChunk,aSampleToChunk->SamplesPerChunk,aSampleToChunk->TotalPrevFrames);
 	}
 }
 
@@ -727,7 +706,7 @@ ChunkToOffset	*aChunkToOffset;
 		theChunkToOffsetArray[i] = aChunkToOffset;
 	}
 	
-	printf("Chunk to Offset Array has %ld entries\n",theHeader.NoEntries);
+	PRINT(("Chunk to Offset Array has %ld entries\n",theHeader.NoEntries));
 }
 
 char *STCOAtom::OnGetAtomName()
@@ -742,11 +721,10 @@ uint64	STCOAtom::getOffsetForChunk(uint32 pChunkID)
 		return theChunkToOffsetArray[pChunkID - 1]->Offset;
 	}
 	
-	printf("Bad Chunk ID %ld / %ld\n",pChunkID,theHeader.NoEntries);
+	DEBUGGER(("Bad Chunk ID %ld / %ld\n",pChunkID,theHeader.NoEntries));
 
-	// TODO Yes this will seg fault.  But I get a very bad lock up if I don't :-(
-	return theChunkToOffsetArray[pChunkID - 1]->Offset;
-//	return theChunkToOffsetArray[0]->Offset;
+	TRESPASS();
+	return theChunkToOffsetArray[0]->Offset;
 }
 
 STSDAtom::STSDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
@@ -843,7 +821,7 @@ void STSDAtom::ReadSoundDescription()
 		if (aAtomBase->getAtomSize() > 0) {
 			descBytesLeft = descBytesLeft - aAtomBase->getAtomSize();
 		} else {
-			printf("Invalid Atom found when reading Sound Description\n");
+			DEBUGGER("Invalid Atom found when reading Sound Description\n");
 			descBytesLeft = 0;
 		}
 				
@@ -855,7 +833,7 @@ void STSDAtom::ReadSoundDescription()
 
 	theStream->Seek(descBytesLeft,0);
 
-	printf("Size:Format=%ld:%ld %ld\n",aSoundDescriptionV1->basefields.Size,aSoundDescriptionV1->basefields.DataFormat,descBytesLeft);
+	PRINT(("Size:Format=%ld:%ld %ld\n",aSoundDescriptionV1->basefields.Size,aSoundDescriptionV1->basefields.DataFormat,descBytesLeft));
 }
 
 void STSDAtom::ReadVideoDescription()
@@ -896,7 +874,7 @@ void STSDAtom::ReadVideoDescription()
 	// We seem to have read 2 bytes too many???
 	theStream->Seek(descBytesLeft,0);
 
-	printf("Size:Format=%ld:%ld %ld\n",aVideoDescription->basefields.Size,aVideoDescription->basefields.DataFormat,descBytesLeft);
+	PRINT(("Size:Format=%ld:%ld %ld\n",aVideoDescription->basefields.Size,aVideoDescription->basefields.DataFormat,descBytesLeft));
 }
 
 void STSDAtom::OnProcessMetaData()
@@ -1157,17 +1135,45 @@ TKHDAtom::~TKHDAtom()
 
 void TKHDAtom::OnProcessMetaData()
 {
-	theStream->Read(&theHeader,sizeof(tkhd));
+	theStream->Read(&Version,sizeof(uint8));
+	
+	if (Version == 0) {
+		tkhdV0 aHeaderV0;
+		theStream->Read(&aHeaderV0,sizeof(tkhdV0));
 
-	theHeader.CreationTime = B_BENDIAN_TO_HOST_INT32(theHeader.CreationTime);
-	theHeader.ModificationTime = B_BENDIAN_TO_HOST_INT32(theHeader.ModificationTime);
-	theHeader.TrackID = B_BENDIAN_TO_HOST_INT32(theHeader.TrackID);
-	theHeader.Duration = B_BENDIAN_TO_HOST_INT32(theHeader.Duration);
-	theHeader.Layer = B_BENDIAN_TO_HOST_INT16(theHeader.Layer);
-	theHeader.AlternateGroup = B_BENDIAN_TO_HOST_INT16(theHeader.AlternateGroup);
-	theHeader.Volume = B_BENDIAN_TO_HOST_INT16(theHeader.Volume);
-	theHeader.TrackWidth = B_BENDIAN_TO_HOST_INT32(theHeader.TrackWidth);
-	theHeader.TrackHeight = B_BENDIAN_TO_HOST_INT32(theHeader.TrackHeight);
+		theHeader.Flags1 = aHeaderV0.Flags1;
+		theHeader.Flags2 = aHeaderV0.Flags2;
+		theHeader.Flags3 = aHeaderV0.Flags3;
+		
+		for (uint32 i=0;i<36;i++) {
+			theHeader.MatrixStructure[i] =  aHeaderV0.MatrixStructure[i];
+		}
+
+		// upconvert to V1 header
+		theHeader.CreationTime = B_BENDIAN_TO_HOST_INT32(aHeaderV0.CreationTime);
+		theHeader.ModificationTime = B_BENDIAN_TO_HOST_INT32(aHeaderV0.ModificationTime);
+		theHeader.TrackID = B_BENDIAN_TO_HOST_INT32(aHeaderV0.TrackID);
+		theHeader.Duration = B_BENDIAN_TO_HOST_INT32(aHeaderV0.Duration);
+		theHeader.Layer = B_BENDIAN_TO_HOST_INT16(aHeaderV0.Layer);
+		theHeader.AlternateGroup = B_BENDIAN_TO_HOST_INT16(aHeaderV0.AlternateGroup);
+		theHeader.Volume = B_BENDIAN_TO_HOST_INT16(aHeaderV0.Volume);
+		theHeader.TrackWidth = B_BENDIAN_TO_HOST_INT32(aHeaderV0.TrackWidth);
+		theHeader.TrackHeight = B_BENDIAN_TO_HOST_INT32(aHeaderV0.TrackHeight);
+
+	} else {
+		theStream->Read(&theHeader,sizeof(tkhdV1));
+
+		theHeader.CreationTime = B_BENDIAN_TO_HOST_INT64(theHeader.CreationTime);
+		theHeader.ModificationTime = B_BENDIAN_TO_HOST_INT64(theHeader.ModificationTime);
+		theHeader.TrackID = B_BENDIAN_TO_HOST_INT32(theHeader.TrackID);
+		theHeader.Duration = B_BENDIAN_TO_HOST_INT32(theHeader.Duration);
+		theHeader.Layer = B_BENDIAN_TO_HOST_INT16(theHeader.Layer);
+		theHeader.AlternateGroup = B_BENDIAN_TO_HOST_INT16(theHeader.AlternateGroup);
+		theHeader.Volume = B_BENDIAN_TO_HOST_INT16(theHeader.Volume);
+		theHeader.TrackWidth = B_BENDIAN_TO_HOST_INT32(theHeader.TrackWidth);
+		theHeader.TrackHeight = B_BENDIAN_TO_HOST_INT32(theHeader.TrackHeight);
+	}
+
 }
 
 char *TKHDAtom::OnGetAtomName()
@@ -1232,7 +1238,7 @@ char *MDHDAtom::OnGetAtomName()
 
 bigtime_t	MDHDAtom::getDuration() 
 {
-	return (bigtime_t(theHeader.Duration) * 1000000) / (theHeader.TimeScale);
+	return bigtime_t((uint64(theHeader.Duration) * 1000000L) / theHeader.TimeScale);
 }
 
 uint32		MDHDAtom::getTimeScale()

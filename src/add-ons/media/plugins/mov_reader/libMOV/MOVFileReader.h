@@ -72,20 +72,20 @@ public:
 	// How many tracks in file
 	uint32		getStreamCount();
 	
-	// Duration defined 
+	// Duration defined by the movie header
 	bigtime_t	getMovieDuration();
 	
-	// The first video track duration
-	bigtime_t	getVideoDuration();
-	// the first audio track duration
-	bigtime_t	getAudioDuration();
-	// the max of the audio or video durations
+	// The first video track duration indexed by stream_index
+	bigtime_t	getVideoDuration(uint32 stream_index);
+	// the first audio track duration indexed by stream_index
+	bigtime_t	getAudioDuration(uint32 stream_index);
+	// the max of all active audio or video durations
 	bigtime_t	getMaxDuration();
 
-	// The no of frames in the first video track
-	uint32		getVideoFrameCount();
-	// The no of frames in the first audio track
-	uint32		getAudioFrameCount();
+	// The no of frames in the video track indexed by stream_index
+	uint32		getVideoFrameCount(uint32 stream_index);
+	// The no of frames in the audio track indexed by stream_index
+	uint32		getAudioFrameCount(uint32 stream_index);
 
 	// Is stream (track) a video track
 	bool		IsVideo(uint32 stream_index);
@@ -101,6 +101,8 @@ public:
 
 	status_t	ParseFile();
 	BPositionIO *Source() {return theStream;};
+
+	bool	IsActive(uint32 stream_index);
 
 	bool	GetNextChunkInfo(uint32 stream_index, uint32 pFrameNo, off_t *start, uint32 *size, bool *keyframe);
 	

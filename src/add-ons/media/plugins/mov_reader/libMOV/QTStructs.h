@@ -179,13 +179,31 @@ struct mvhd {
 	uint32	NextTrackID;
 };
 
-struct tkhd {
-	uint8	Version;
+struct tkhdV0 {
 	uint8	Flags1;
 	uint8	Flags2;
 	uint8	Flags3;
 	uint32	CreationTime;
 	uint32	ModificationTime;
+	uint32	TrackID;
+	uint32	Reserved1;
+	uint32	Duration;
+	uint64	Reserved2;
+	uint16	Layer;
+	uint16	AlternateGroup;
+	uint16	Volume;
+	uint16	Reserved3;
+	uint8	MatrixStructure[36];
+	uint32	TrackWidth;
+	uint32	TrackHeight;	
+};
+
+struct tkhdV1 {
+	uint8	Flags1;
+	uint8	Flags2;
+	uint8	Flags3;
+	uint64	CreationTime;
+	uint64	ModificationTime;
 	uint32	TrackID;
 	uint32	Reserved1;
 	uint32	Duration;

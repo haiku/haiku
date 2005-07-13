@@ -168,13 +168,15 @@ public:
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
 	
-	uint64	getSUMCounts();
-	uint64	getSUMDurations();
+	uint64	getSUMCounts() {return SUMCounts;};
+	uint64	getSUMDurations() {return SUMDurations;};
 	uint32	getSampleForTime(uint32 pTime);
 	uint32	getSampleForFrame(uint32 pFrame);
 private:
 	array_header		theHeader;
 	TimeToSampleArray	theTimeToSampleArray;
+	uint64	SUMDurations;
+	uint64	SUMCounts;
 };
 
 // Atom class for reading the sample to chunk atom
@@ -292,9 +294,19 @@ public:
 	char	*OnGetAtomName();
 
 	uint32	getDuration() {return theHeader.Duration;};		// duration is in the scale of the media
-
+	
+	// Flags3 should contain the following
+	// 0x001 Track enabled
+	// 0x002 Track in Movie
+	// 0x004 Track in Preview
+	// 0x008 Track in Poster
+	// It seems active tracks have all 4 flags set?
+	
+	bool	IsActive() {return (theHeader.Flags3 == 0x0f);};
+	
 private:
-	tkhd	theHeader;
+	tkhdV1	theHeader;
+	uint8	Version;
 	
 };
 
@@ -361,6 +373,7 @@ public:
 	uint32	getNoSamplesInChunk(uint32 pChunkID);
 	bool	IsSyncSample(uint32 pSampleNo);
 	bool	IsSingleSampleSize();
+	bool	IsActive();
 	
 	TKHDAtom	*getTKHDAtom();
 	MDHDAtom	*getMDHDAtom();

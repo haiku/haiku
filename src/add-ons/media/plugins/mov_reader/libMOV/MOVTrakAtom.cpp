@@ -77,7 +77,7 @@ bigtime_t	TRAKAtom::Duration(uint32 TimeScale)
 		return getMDHDAtom()->getDuration();
 	}
 	
-	return bigtime_t(getTKHDAtom()->getDuration() * 1000000) / TimeScale;
+	return bigtime_t(getTKHDAtom()->getDuration() * 1000000L) / TimeScale;
 }
 
 void TRAKAtom::OnChildProcessingComplete()
@@ -219,6 +219,11 @@ bool	TRAKAtom::IsSingleSampleSize()
 	}
 	
 	return false;
+}
+
+bool	TRAKAtom::IsActive()
+{
+	return getTKHDAtom()->IsActive();
 }
 
 // GetAudioMetaData()	// If this is a audio track get the audio meta data
