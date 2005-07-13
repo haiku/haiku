@@ -24,6 +24,7 @@
 //	Description:	BPrivateScreen is the class which does the real work
 //					for the proxy class BScreen (it interacts with the app server).
 //------------------------------------------------------------------------------
+#include <Bitmap.h>
 #include <Locker.h>
 #include <Window.h>
 
@@ -198,6 +199,9 @@ BPrivateScreen::ColorMap()
 status_t
 BPrivateScreen::GetBitmap(BBitmap **bitmap, bool drawCursor, BRect *bound)
 {
+	if (bitmap == NULL)
+		return B_BAD_VALUE;
+	
 	// TODO: Implement
 	return B_ERROR;
 }
@@ -206,8 +210,26 @@ BPrivateScreen::GetBitmap(BBitmap **bitmap, bool drawCursor, BRect *bound)
 status_t
 BPrivateScreen::ReadBitmap(BBitmap *bitmap, bool drawCursor, BRect *bound)
 {
-	// TODO: Implement
-	return B_ERROR;
+	if (bitmap == NULL)
+		return B_BAD_VALUE;
+	
+	BRect rect;
+	if (bound != NULL)
+		rect = *bound;
+	else
+		rect = Frame();
+		
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_READ_BITMAP);
+	link.Attach<int32>(bitmap->get_server_token());
+	link.Attach<bool>(drawCursor);
+	link.Attach<BRect>(rect);
+	
+	int32 code;
+	if (link.FlushWithReply(code) < B_OK || code != SERVER_TRUE)
+		return B_ERROR;
+	
+	return B_OK;
 }
 
 		

@@ -16,6 +16,7 @@
 #include <InterfaceDefs.h>
 #include <Rect.h>
 
+class BPrivateScreen;
 class BWindow;
 
 enum {
@@ -92,7 +93,8 @@ public:
 private:
 	friend class BView;
 	friend class BApplication;
-	friend void _get_screen_bitmap_(BBitmap *, BRect, bool);
+	friend class BPrivateScreen;
+	//friend void _get_screen_bitmap_(BBitmap *, BRect, bool);
 
 	virtual void _ReservedBitmap1();
 	virtual void _ReservedBitmap2();

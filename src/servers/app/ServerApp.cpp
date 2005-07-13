@@ -2159,6 +2159,30 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			fLink.Flush();
 			break;
 		}
+		
+		case AS_READ_BITMAP:
+		{
+			STRACE(("ServerApp %s: AS_READ_BITMAP\n", Signature()));
+			int32 bitmapToken;
+			link.Read<int32>(&bitmapToken);
+			
+			bool drawCursor = true;
+			link.Read<bool>(&drawCursor);
+			
+			BRect bounds;
+			link.Read<BRect>(&bounds);
+			
+			ServerBitmap *bitmap = FindBitmap(bitmapToken);
+			if (bitmap != NULL) {
+				fLink.StartMessage(SERVER_TRUE);
+				// TODO: Implement for real
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+			
+			fLink.Flush();
+			
+			break;
+		}
 			
 		default:
 			printf("ServerApp %s received unhandled message code offset %s\n",
