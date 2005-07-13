@@ -868,3 +868,9 @@ file_cache_write(void *_cacheRef, off_t offset, const void *buffer, size_t *_siz
 }
 
 
+extern "C" status_t
+file_cache_invalidate_file_map(void *_cacheRef, off_t offset, off_t size)
+{
+	// ToDo: implement me as soon as file maps (extents) are cached
+	return B_OK;
+}
