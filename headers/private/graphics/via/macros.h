@@ -564,12 +564,13 @@
 //new via
 #define ENCRTCX_FBSTADDH	0x0c
 #define ENCRTCX_FBSTADDL	0x0d
+#define ENCRTCX_PITCHL		0x13
+/* VIA specific registers: */
 #define ENCRTCX_FBSTADDE	0x34
 //end via
 #define ENCRTCX_VSYNCS		0x10
 #define ENCRTCX_VSYNCE		0x11
 #define ENCRTCX_VDISPE		0x12
-#define ENCRTCX_PITCHL		0x13
 #define ENCRTCX_VBLANKS		0x15
 #define ENCRTCX_VBLANKE		0x16
 #define ENCRTCX_MODECTL		0x17
