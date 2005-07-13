@@ -229,6 +229,8 @@ extern ssize_t		_kern_read_port_etc(port_id port, int32 *msgCode, void *msgBuffe
 extern status_t		_kern_set_port_owner(port_id port, team_id team);
 extern status_t		_kern_write_port_etc(port_id port, int32 msgCode, const void *msgBuffer,
 						size_t bufferSize, uint32 flags, bigtime_t timeout);
+extern status_t		_kern_writev_port_etc(port_id id, int32 msgCode, const iovec *msgVecs,
+						size_t vecCount, size_t bufferSize, uint32 flags, bigtime_t timeout);
 
 // debug support functions
 extern void			_kern_debugger(const char *message);

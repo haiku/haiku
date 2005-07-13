@@ -19,6 +19,7 @@
 #include <arch/int.h>
 #include <cbuf.h>
 
+#include <iovec.h>
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -964,13 +965,26 @@ read_port_etc(port_id id, int32 *_msgCode, void *msgBuffer, size_t bufferSize,
 status_t
 write_port(port_id id, int32 msgCode, const void *msgBuffer, size_t bufferSize)
 {
-	return write_port_etc(id, msgCode, msgBuffer, bufferSize, 0, 0);
+	iovec vec = { (void *)msgBuffer, bufferSize };
+
+	return writev_port_etc(id, msgCode, &vec, 1, bufferSize, 0, 0);
 }
 
 
 status_t
 write_port_etc(port_id id, int32 msgCode, const void *msgBuffer,
 	size_t bufferSize, uint32 flags, bigtime_t timeout)
+{
+	iovec vec = { (void *)msgBuffer, bufferSize };
+
+	return writev_port_etc(id, msgCode, &vec, 1, bufferSize, flags, timeout);
+}
+
+
+status_t
+writev_port_etc(port_id id, int32 msgCode, const iovec *msgVecs,
+	size_t vecCount, size_t bufferSize, uint32 flags,
+	bigtime_t timeout)
 {
 	cpu_status state;
 	sem_id cachedSem;
@@ -988,7 +1002,7 @@ write_port_etc(port_id id, int32 msgCode, const void *msgBuffer,
 	slot = id % sMaxPorts;
 
 	if (bufferSize > PORT_MAX_MESSAGE_SIZE)
-		return EINVAL;
+		return B_BAD_VALUE;
 
 	state = disable_interrupts();
 	GRAB_PORT_LOCK(sPorts[slot]);
@@ -1028,14 +1042,37 @@ write_port_etc(port_id id, int32 msgCode, const void *msgBuffer,
 		return B_NO_MEMORY;
 
 	if (bufferSize > 0) {
+		uint32 i;
 		if (userCopy) {
 			// copy from user memory
-			if ((status = cbuf_user_memcpy_to_chain(msg->buffer_chain, 0, msgBuffer, bufferSize)) < B_OK)
-				return status;
+			for (i = 0; i < vecCount; i++) {
+				size_t bytes = msgVecs[i].iov_len;
+				if (bytes > bufferSize)
+					bytes = bufferSize;
+
+				if ((status = cbuf_user_memcpy_to_chain(msg->buffer_chain,
+						0, msgVecs[i].iov_base, bytes)) < B_OK)
+					return status;
+
+				bufferSize -= bytes;
+				if (bufferSize == 0)
+					break;
+			}
 		} else {
 			// copy from kernel memory
-			if ((status = cbuf_memcpy_to_chain(msg->buffer_chain, 0, msgBuffer, bufferSize)) < 0)
-				return status;
+			for (i = 0; i < vecCount; i++) {
+				size_t bytes = msgVecs[i].iov_len;
+				if (bytes > bufferSize)
+					bytes = bufferSize;
+
+				if ((status = cbuf_memcpy_to_chain(msg->buffer_chain,
+						0, msgVecs[i].iov_base, bytes)) < 0)
+					return status;
+
+				bufferSize -= bytes;
+				if (bufferSize == 0)
+					break;
+			}
 		}
 	}
 
@@ -1246,12 +1283,43 @@ status_t
 _user_write_port_etc(port_id port, int32 messageCode, const void *userBuffer,
 	size_t bufferSize, uint32 flags, bigtime_t timeout)
 {
+	iovec vec = { (void *)userBuffer, bufferSize };
+
 	if (userBuffer == NULL && bufferSize != 0)
 		return B_BAD_VALUE;
 	if (userBuffer != NULL && !IS_USER_ADDRESS(userBuffer))
 		return B_BAD_ADDRESS;
 
-	return write_port_etc(port, messageCode, userBuffer, bufferSize, 
+	return writev_port_etc(port, messageCode, &vec, 1, bufferSize, 
 				flags | PORT_FLAG_USE_USER_MEMCPY | B_CAN_INTERRUPT, timeout);
 }
 
+
+status_t
+_user_writev_port_etc(port_id port, int32 messageCode, const iovec *userVecs,
+	size_t vecCount, size_t bufferSize, uint32 flags, bigtime_t timeout)
+{
+	iovec *vecs = NULL;
+	status_t status;
+
+	if (userVecs == NULL && bufferSize != 0)
+		return B_BAD_VALUE;
+	if (userVecs != NULL && !IS_USER_ADDRESS(userVecs))
+		return B_BAD_ADDRESS;
+
+	if (userVecs && vecCount != 0) {
+		vecs = malloc(sizeof(iovec) * vecCount);
+		if (vecs == NULL)
+			return B_NO_MEMORY;
+
+		if (user_memcpy(vecs, userVecs, sizeof(iovec) * vecCount) < B_OK) {
+			free(vecs);
+			return B_BAD_ADDRESS;
+		}
+	}
+	status = writev_port_etc(port, messageCode, vecs, vecCount, bufferSize, 
+				flags | PORT_FLAG_USE_USER_MEMCPY | B_CAN_INTERRUPT, timeout);
+
+	free(vecs);
+	return status;
+}
