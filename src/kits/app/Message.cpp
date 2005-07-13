@@ -1230,6 +1230,7 @@ status_t BMessage::PopSpecifier()
 	status_t BMessage::Find ## fnName(const char* name, int32 index, TYPE* p) const	\
 	{															\
 		void* ptr = NULL; ssize_t bytes = 0; status_t err = B_OK;\
+		*p = TYPE(); 	\
 		err = FindData(name, TYPESPEC, index, (const void**)&ptr, &bytes); \
 		if (err == B_OK) \
 			memcpy(p, ptr, sizeof(TYPE)); \
@@ -1480,10 +1481,12 @@ status_t
 BMessage::FindMessenger(const char* name, int32 index, BMessenger* m) const
 {
 	void* data = NULL; 
-	ssize_t size = 0; 
+	ssize_t size = 0;
 	status_t err = FindData(name, B_MESSENGER_TYPE, index, (const void **)&data, &size);
 	if (err == B_OK)
 		memcpy(m, data, sizeof(BMessenger));
+	else
+		*m = BMessenger();
 	return err;
 }
 
@@ -1503,6 +1506,8 @@ BMessage::FindRef(const char* name, int32 index, entry_ref* ref) const
 	status_t err = FindData(name, B_REF_TYPE, index, (const void**)&data, &size);
 	if (err == B_OK)
 		err = entry_ref_unflatten(ref, (char*)data, size);
+	else
+		*ref = entry_ref();
 	return err;
 }
 
@@ -1521,10 +1526,9 @@ BMessage::FindMessage(const char* name, int32 index, BMessage* msg) const
 	ssize_t size = 0;
 	status_t err = FindData(name, B_MESSAGE_TYPE, index, (const void**)&data, &size);
 	if (!err)
-	{
 		err = msg->Unflatten((const char*)data);
-	}
-
+	else
+		*msg = BMessage();
 	return err;
 }
 
@@ -1543,9 +1547,7 @@ BMessage::FindFlat(const char* name, int32 index, BFlattenable* obj) const
 	ssize_t numBytes = 0;
 	status_t err = FindData(name, obj->TypeCode(), index, (const void**)&data, &numBytes);
 	if (!err)
-	{
 		err = obj->Unflatten(obj->TypeCode(), data, numBytes);
-	}
 	return err;
 }
 
