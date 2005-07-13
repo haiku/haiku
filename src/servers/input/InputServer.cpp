@@ -803,13 +803,13 @@ InputServer::HandleSetMousePosition(BMessage *message, BMessage *outbound)
 		case B_UNMAPPED_KEY_DOWN:
 		case B_UNMAPPED_KEY_UP:
 		case B_MODIFIERS_CHANGED: {
-			ssize_t size;
-			uint8 *data;
+			ssize_t size = 0;
+			uint8 *data = NULL;
 			outbound->FindInt32("modifiers", (int32*)&fKey_info.modifiers);
 			if ((outbound->FindData("states", B_UINT8_TYPE, (const void**)&data, &size) == B_OK) 
-				&& (size == (ssize_t)sizeof(fKey_info.key_states)))
+				&& (size == (ssize_t)sizeof(fKey_info.key_states))) {
 				memcpy(fKey_info.key_states, data, size);
-				
+			}
 		}
    		default:
 			break;
@@ -1212,9 +1212,10 @@ InputServer::DispatchEvent(BMessage *message)
 		case B_MOUSE_MOVED:{
 			uint32 buttons;
 			BPoint pt;
+			int64 time;
     			message->FindPoint("where",&pt);
-    			int64 time=(int64)real_time_clock();
-    			fAppServerLink->StartMessage(B_MOUSE_MOVED);
+			message->FindInt64("when", &time);
+			fAppServerLink->StartMessage(B_MOUSE_MOVED);
     			fAppServerLink->Attach(&time,sizeof(int64));
     			fAppServerLink->Attach(&pt.x,sizeof(float));
 				fAppServerLink->Attach(&pt.y,sizeof(float));
@@ -1228,7 +1229,8 @@ InputServer::DispatchEvent(BMessage *message)
 
 			BPoint pt;
 			int32 buttons,clicks,mod;
-			int64 time=(int64)real_time_clock();
+			int64 time;
+			message->FindInt64("when", &time);
 			
 			if(message->FindPoint("where",&pt)!=B_OK ||
 					message->FindInt32("modifiers",&mod)!=B_OK ||
@@ -1249,7 +1251,8 @@ InputServer::DispatchEvent(BMessage *message)
     	case B_MOUSE_UP:{
 			BPoint pt;
 			int32 mod;
-			int64 time=(int64)real_time_clock();
+			int64 time;
+			message->FindInt64("when", &time);
 
 			if(message->FindPoint("where",&pt)!=B_OK ||
 					message->FindInt32("modifiers",&mod)!=B_OK)
@@ -1267,7 +1270,8 @@ InputServer::DispatchEvent(BMessage *message)
 			float x,y;
 			message->FindFloat("be:wheel_delta_x",&x);
 			message->FindFloat("be:wheel_delta_y",&y);
-			int64 time=real_time_clock();
+			bigtime_t time;
+			message->FindInt64("when", &time);
 			
 			fAppServerLink->StartMessage(B_MOUSE_WHEEL_CHANGED);
 			fAppServerLink->Attach(&time,sizeof(int64));
@@ -1277,13 +1281,13 @@ InputServer::DispatchEvent(BMessage *message)
 			break;
     		}
 		case B_KEY_DOWN:{
-			bigtime_t systime;
+			bigtime_t time;
 			int32 scancode, asciicode,repeatcount,modifiers;
 			int8 utf8data[3];
 			BString string;
-			int8 keyarray[16];
+			uint8 keyarray[16];
 
-			systime=(int64)real_time_clock();
+			message->FindInt64("when", &time);
 			message->FindInt32("key",&scancode);
 			message->FindInt32("be:key_repeat",&repeatcount);
 			message->FindInt32("modifiers",&modifiers);
@@ -1292,10 +1296,14 @@ InputServer::DispatchEvent(BMessage *message)
 			message->FindInt8("byte",1,utf8data+1);
 			message->FindInt8("byte",2,utf8data+2);
 			message->FindString("bytes",&string);
-			for(int8 i=0;i<15;i++)
-				message->FindInt8("states",i,&keyarray[i]);
+			uint8 *data = NULL;
+			ssize_t size = 0;
+			if ((message->FindData("states", B_UINT8_TYPE, (const void**)&data, &size) == B_OK)
+				&& (size == (ssize_t)sizeof(keyarray))) {
+				memcpy(keyarray, data, size);
+			}
 			fAppServerLink->StartMessage(B_KEY_DOWN);
-			fAppServerLink->Attach(&systime,sizeof(bigtime_t));
+			fAppServerLink->Attach(&time,sizeof(bigtime_t));
 			fAppServerLink->Attach(scancode);
 			fAppServerLink->Attach(asciicode);
 			fAppServerLink->Attach(repeatcount);
@@ -1307,13 +1315,13 @@ InputServer::DispatchEvent(BMessage *message)
 			break;
 		}
 		case B_KEY_UP:{
-			bigtime_t systime;
+			bigtime_t time;
 			int32 scancode, asciicode,modifiers;
 			int8 utf8data[3];
 			BString string;
-			int8 keyarray[16];
+			uint8 keyarray[16];
 
-			systime=(int64)real_time_clock();
+			message->FindInt64("when", &time);
 			message->FindInt32("key",&scancode);
 			message->FindInt32("raw_char",&asciicode);
 			message->FindInt32("modifiers",&modifiers);
@@ -1321,10 +1329,15 @@ InputServer::DispatchEvent(BMessage *message)
 			message->FindInt8("byte",1,utf8data+1);
 			message->FindInt8("byte",2,utf8data+2);
 			message->FindString("bytes",&string);
-			for(int8 i=0;i<15;i++)
-				message->FindInt8("states",i,&keyarray[i]);
+			uint8 *data = NULL;
+			ssize_t size = 0;
+			if ((message->FindData("states", B_UINT8_TYPE, (const void**)&data, &size) == B_OK)
+				&& (size == (ssize_t)sizeof(keyarray))) {
+				memcpy(keyarray, data, size);
+			}
+
 			fAppServerLink->StartMessage(B_KEY_UP);
-			fAppServerLink->Attach(&systime,sizeof(bigtime_t));
+			fAppServerLink->Attach(&time,sizeof(bigtime_t));
 			fAppServerLink->Attach(scancode);
 			fAppServerLink->Attach(asciicode);
 			fAppServerLink->Attach(modifiers);
@@ -1335,17 +1348,17 @@ InputServer::DispatchEvent(BMessage *message)
 			break;
 		}
 		case B_UNMAPPED_KEY_DOWN:{
-			bigtime_t systime;
+			bigtime_t time;
 			int32 scancode,modifiers;
 			int8 keyarray[16];
 
-			systime=(int64)real_time_clock();
+			message->FindInt64("when", &time);
 			message->FindInt32("key",&scancode);
 			message->FindInt32("modifiers",&modifiers);
 			for(int8 i=0;i<15;i++)
 				message->FindInt8("states",i,&keyarray[i]);
 			fAppServerLink->StartMessage(B_UNMAPPED_KEY_DOWN);
-			fAppServerLink->Attach(&systime,sizeof(bigtime_t));
+			fAppServerLink->Attach(&time,sizeof(bigtime_t));
 			fAppServerLink->Attach(scancode);
 			fAppServerLink->Attach(modifiers);
 			fAppServerLink->Attach(keyarray,sizeof(int8)*16);
@@ -1353,17 +1366,17 @@ InputServer::DispatchEvent(BMessage *message)
 			break;
 		}
 		case B_UNMAPPED_KEY_UP:{
-			bigtime_t systime;
+			bigtime_t time;
 			int32 scancode,modifiers;
 			int8 keyarray[16];
 
-			systime=(int64)real_time_clock();
+			message->FindInt64("when", &time);
 			message->FindInt32("key",&scancode);
 			message->FindInt32("modifiers",&modifiers);
 			for(int8 i=0;i<15;i++)
 				message->FindInt8("states",i,&keyarray[i]);
 			fAppServerLink->StartMessage(B_UNMAPPED_KEY_UP);
-			fAppServerLink->Attach(&systime,sizeof(bigtime_t));
+			fAppServerLink->Attach(&time,sizeof(bigtime_t));
 			fAppServerLink->Attach(scancode);
 			fAppServerLink->Attach(modifiers);
 			fAppServerLink->Attach(keyarray,sizeof(int8)*16);
@@ -1371,18 +1384,18 @@ InputServer::DispatchEvent(BMessage *message)
 			break;
 		}
 		case B_MODIFIERS_CHANGED:{
-			bigtime_t systime;
+			bigtime_t time;
 			int32 scancode,modifiers,oldmodifiers;
 			int8 keyarray[16];
 
-			systime=(int64)real_time_clock();
+			message->FindInt64("when", &time);
 			message->FindInt32("key",&scancode);
 			message->FindInt32("modifiers",&modifiers);
 			message->FindInt32("be:old_modifiers",&oldmodifiers);
 			for(int8 i=0;i<15;i++)
 				message->FindInt8("states",i,&keyarray[i]);
 			fAppServerLink->StartMessage(B_MODIFIERS_CHANGED);
-			fAppServerLink->Attach(&systime,sizeof(bigtime_t));
+			fAppServerLink->Attach(&time,sizeof(bigtime_t));
 			fAppServerLink->Attach(scancode);
 			fAppServerLink->Attach(modifiers);
 			fAppServerLink->Attach(oldmodifiers);
@@ -1526,13 +1539,16 @@ InputServer::FilterEvents(BList *eventsToFilter)
 bool 
 InputServer::SanitizeEvents(BList *events)
 {
+	CALLED();
 	int32 index = 0;
 	BMessage *event;
 	while (NULL != (event = (BMessage*)events->ItemAt(index) ) ) {
 		switch (event->what) {
 			case B_KEY_DOWN:
+			case B_UNMAPPED_KEY_DOWN:
 				// we scan for Alt+Space key down events which means we change to next input method
 				// Note : Shift+Alt+Space key allows to change to the previous input method
+
 				if ((fKey_info.modifiers & B_COMMAND_KEY) 
 					&& (fKey_info.key_states[KEY_Spacebar >> 3] & (1 << (7 - (KEY_Spacebar % 8))))) {
 					SetNextMethod(!fKey_info.modifiers & B_SHIFT_KEY);
