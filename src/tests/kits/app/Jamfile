@@ -151,6 +151,15 @@ CommonTestLib libappteststub.so
 	:
 ;
 
+SimpleTest DanoMessageTest :
+	DanoMessageTest.cpp
+	dano_message.cpp
+	: be ;
+
+SEARCH on [ FGristFiles
+		dano_message.cpp
+	] = [ FDirName $(OBOS_TOP) src kits app ] ;
+
 SubInclude OBOS_TOP src tests kits app bapplication ;
 SubInclude OBOS_TOP src tests kits app bclipboard ;
 SubInclude OBOS_TOP src tests kits app bcursor ;
