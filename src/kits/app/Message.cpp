@@ -1230,7 +1230,6 @@ status_t BMessage::PopSpecifier()
 	status_t BMessage::Find ## fnName(const char* name, int32 index, TYPE* p) const	\
 	{															\
 		void* ptr = NULL; ssize_t bytes = 0; status_t err = B_OK;\
-		*p = TYPE();								\
 		err = FindData(name, TYPESPEC, index, (const void**)&ptr, &bytes); \
 		if (err == B_OK) \
 			memcpy(p, ptr, sizeof(TYPE)); \
@@ -1239,7 +1238,7 @@ status_t BMessage::PopSpecifier()
 	status_t BMessage::Replace ## fnName(const char* name, TYPE val)				\
 	{ return Replace ## fnName(name, 0, val); }										\
 	status_t BMessage::Replace ## fnName(const char *name, int32 index, TYPE val)	\
-	{  return fBody->ReplaceData<TYPE>(name, index, val, TYPESPEC); }				\
+	{ return ReplaceData(name, TYPESPEC, index, &val, sizeof(TYPE)); }				\
 	bool BMessage::Has ## fnName(const char* name, int32 n) const					\
 	{ return fBody->HasData(name, TYPESPEC, n); }
 
@@ -1288,86 +1287,93 @@ DEFINE_LAZY_FIND_FUNCTION(const char*	, String)
 #undef DEFINE_LAZY_FIND_FUNCTION
 
 //------------------------------------------------------------------------------
-status_t BMessage::AddString(const char* name, const char* a_string)
+status_t 
+BMessage::AddString(const char* name, const char* a_string)
 {
-	return AddData(name, B_STRING_TYPE, a_string, strlen(a_string));
+	return AddData(name, B_STRING_TYPE, a_string, strlen(a_string)+1);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::AddString(const char* name, const BString& a_string)
+
+
+status_t 
+BMessage::AddString(const char* name, const BString& a_string)
 {
-	return AddData(name, B_STRING_TYPE, a_string.String(), a_string.Length());
-	//return AddString(name, a_string.String());
+	return AddData(name, B_STRING_TYPE, a_string.String(), a_string.Length()+1);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::AddPointer(const char* name, const void* ptr)
+
+
+status_t 
+BMessage::AddPointer(const char* name, const void* ptr)
 {
 	return AddData(name, B_POINTER_TYPE, &ptr, sizeof(ptr));
 }
-//------------------------------------------------------------------------------
-status_t BMessage::AddMessenger(const char* name, BMessenger messenger)
+
+
+status_t 
+BMessage::AddMessenger(const char* name, BMessenger messenger)
 {
 	return AddData(name, B_MESSENGER_TYPE, &messenger, sizeof(messenger));
 }
-//------------------------------------------------------------------------------
-status_t BMessage::AddRef(const char* name, const entry_ref* ref)
+
+
+status_t
+BMessage::AddRef(const char* name, const entry_ref* ref)
 {
 	char* buffer = new(nothrow) char[sizeof (entry_ref) + B_PATH_NAME_LENGTH];
 	size_t size;
 	status_t err = entry_ref_flatten(buffer, &size, ref);
-	if (!err)
-	{
-		err = AddData(name, B_REF_TYPE, (void*)buffer, size);
+	if (!err) {
+		BDataBuffer databuffer((void*)buffer, size);
+		err = fBody->AddData<BDataBuffer>(name, databuffer, B_REF_TYPE);
 	}
 
 	return err;
 }
-//------------------------------------------------------------------------------
-status_t BMessage::AddMessage(const char* name, const BMessage* msg)
+
+
+status_t 
+BMessage::AddMessage(const char* name, const BMessage* msg)
 {
 	status_t err = B_OK;
 	ssize_t size = msg->FlattenedSize();
 	char* buffer = new(nothrow) char[size];
-	if (buffer)
-	{
+	if (buffer) {
 		err = msg->Flatten(buffer, size);
-		if (!err)
-		{
-			err = AddData(name, B_MESSAGE_TYPE, (void*)buffer, size);
+		if (!err) {
+			BDataBuffer databuffer((void*)buffer, size);
+			err = fBody->AddData<BDataBuffer>(name, databuffer, B_MESSAGE_TYPE);
 		}
-	}
-	else
-	{
+	} else {
 		err = B_NO_MEMORY;
 	}
 
 	return err;
 }
-//------------------------------------------------------------------------------
-status_t BMessage::AddFlat(const char* name, BFlattenable* obj, int32 count)
+
+
+status_t 
+BMessage::AddFlat(const char* name, BFlattenable* obj, int32 count)
 {
 	status_t err = B_OK;
 	ssize_t size = obj->FlattenedSize();
 	char* buffer = new(nothrow) char[size];
-	if (buffer)
-	{
+	if (buffer) {
 		err = obj->Flatten((void*)buffer, size);
-		if (!err)
-		{
+		if (!err) {
 			err = AddData(name, obj->TypeCode(), (void*)buffer, size,
 						  obj->IsFixedSize(), count);
 		}
 		delete[] buffer;
-	}
-	else
-	{
+	} else {
 		err = B_NO_MEMORY;
 	}
 
 	return err;
 }
-//------------------------------------------------------------------------------
-status_t BMessage::AddData(const char* name, type_code type, const void* data,
-						   ssize_t numBytes, bool is_fixed_size, int32 /*count*/)
+
+
+status_t 
+BMessage::AddData(const char* name, type_code type, const void* data,
+				   ssize_t numBytes, bool is_fixed_size, int32 /*count*/)
 {
 /**
 	@note	Because we're using vectors for our item storage, the count param
@@ -1385,44 +1391,57 @@ status_t BMessage::AddData(const char* name, type_code type, const void* data,
 	// avoid having to specialize BMessageBody::AddData().
 	//--------------------------------------------------------------------------
 
-	BDataBuffer DB((void*)data, numBytes, true);
-	return fBody->AddData<BDataBuffer>(name, DB, type);
+	BDataBuffer buffer((void*)data, numBytes, true);
+	return fBody->AddData<BDataBuffer>(name, buffer, type);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::RemoveData(const char* name, int32 index)
+
+
+status_t 
+BMessage::RemoveData(const char* name, int32 index)
 {
 	return fReadOnly ? B_ERROR : fBody->RemoveData(name, index);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::RemoveName(const char* name)
+
+
+status_t 
+BMessage::RemoveName(const char* name)
 {
 	return fReadOnly ? B_ERROR : fBody->RemoveName(name);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::MakeEmpty()
+
+
+status_t 
+BMessage::MakeEmpty()
 {
 	return fReadOnly ? B_ERROR : fBody->MakeEmpty();
 }
-//------------------------------------------------------------------------------
-status_t BMessage::FindString(const char* name, const char** str) const
+
+
+status_t 
+BMessage::FindString(const char* name, const char** str) const
 {
 	return FindString(name, 0, str);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::FindString(const char* name, int32 index,
-							  const char** str) const
+
+
+status_t 
+BMessage::FindString(const char* name, int32 index, const char** str) const
 {
 	ssize_t bytes;
 	return FindData(name, B_STRING_TYPE, index,
 					(const void**)str, &bytes);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::FindString(const char* name, BString* str) const
+
+
+status_t 
+BMessage::FindString(const char* name, BString* str) const
 {
 	return FindString(name, 0, str);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::FindString(const char* name, int32 index, BString* str) const
+
+
+status_t 
+BMessage::FindString(const char* name, int32 index, BString* str) const
 {
 	const char* cstr;
 	status_t err = FindString(name, index, &cstr);
@@ -1433,24 +1452,32 @@ status_t BMessage::FindString(const char* name, int32 index, BString* str) const
 
 	return err;
 }
-//------------------------------------------------------------------------------
-status_t BMessage::FindPointer(const char* name, void** ptr) const
+
+
+status_t 
+BMessage::FindPointer(const char* name, void** ptr) const
 {
 	return FindPointer(name, 0, ptr);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::FindPointer(const char* name, int32 index, void** ptr) const
+
+
+status_t 
+BMessage::FindPointer(const char* name, int32 index, void** ptr) const
 {
 	ssize_t size = 0;
 	return FindData(name, B_POINTER_TYPE, index, (const void**)ptr, &size);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::FindMessenger(const char* name, BMessenger* m) const
+
+
+status_t 
+BMessage::FindMessenger(const char* name, BMessenger* m) const
 {
 	return FindMessenger(name, 0, m);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::FindMessenger(const char* name, int32 index, BMessenger* m) const
+
+
+status_t 
+BMessage::FindMessenger(const char* name, int32 index, BMessenger* m) const
 {
 	void* data = NULL; 
 	ssize_t size = 0; 
@@ -1459,13 +1486,17 @@ status_t BMessage::FindMessenger(const char* name, int32 index, BMessenger* m) c
 		memcpy(m, data, sizeof(BMessenger));
 	return err;
 }
-//------------------------------------------------------------------------------
-status_t BMessage::FindRef(const char* name, entry_ref* ref) const
+
+
+status_t 
+BMessage::FindRef(const char* name, entry_ref* ref) const
 {
 	return FindRef(name, 0, ref);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::FindRef(const char* name, int32 index, entry_ref* ref) const
+
+
+status_t 
+BMessage::FindRef(const char* name, int32 index, entry_ref* ref) const
 {
 	void* data = NULL;
 	ssize_t size = 0;
@@ -1474,13 +1505,17 @@ status_t BMessage::FindRef(const char* name, int32 index, entry_ref* ref) const
 		err = entry_ref_unflatten(ref, (char*)data, size);
 	return err;
 }
-//------------------------------------------------------------------------------
-status_t BMessage::FindMessage(const char* name, BMessage* msg) const
+
+
+status_t 
+BMessage::FindMessage(const char* name, BMessage* msg) const
 {
 	return FindMessage(name, 0, msg);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::FindMessage(const char* name, int32 index, BMessage* msg) const
+
+
+status_t 
+BMessage::FindMessage(const char* name, int32 index, BMessage* msg) const
 {
 	void* data = NULL;
 	ssize_t size = 0;
@@ -1492,14 +1527,17 @@ status_t BMessage::FindMessage(const char* name, int32 index, BMessage* msg) con
 
 	return err;
 }
-//------------------------------------------------------------------------------
-status_t BMessage::FindFlat(const char* name, BFlattenable* obj) const
+
+
+status_t 
+BMessage::FindFlat(const char* name, BFlattenable* obj) const
 {
 	return FindFlat(name, 0, obj);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::FindFlat(const char* name, int32 index,
-							BFlattenable* obj) const
+
+
+status_t 
+BMessage::FindFlat(const char* name, int32 index, BFlattenable* obj) const
 {
 	void* data = NULL;
 	ssize_t numBytes = 0;
@@ -1510,148 +1548,172 @@ status_t BMessage::FindFlat(const char* name, int32 index,
 	}
 	return err;
 }
-//------------------------------------------------------------------------------
-status_t BMessage::FindData(const char* name, type_code type, const void** data,
-							ssize_t* numBytes) const
+
+
+status_t 
+BMessage::FindData(const char* name, type_code type, const void** data,
+			ssize_t* numBytes) const
 {
 	return FindData(name, type, 0, data, numBytes);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::FindData(const char* name, type_code type, int32 index,
-							const void** data, ssize_t* numBytes) const
-{
-	status_t err = B_OK;
-	// Oh, the humanity!
-	err = fBody->FindData(name, type, index, data, numBytes);
 
-	return err;
+
+status_t 
+BMessage::FindData(const char* name, type_code type, int32 index, 
+			const void** data, ssize_t* numBytes) const
+{
+	return fBody->FindData(name, type, index, data, numBytes);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::ReplaceString(const char* name, const char* string)
+
+
+status_t 
+BMessage::ReplaceString(const char* name, const char* string)
 {
 	return ReplaceString(name, 0, string);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::ReplaceString(const char* name, int32 index, const char* string)
+
+
+status_t 
+BMessage::ReplaceString(const char* name, int32 index, const char* string)
 {
-	return ReplaceData(name, B_STRING_TYPE, index, string, strlen(string));
+	return ReplaceData(name, B_STRING_TYPE, index, string, strlen(string)+1);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::ReplaceString(const char* name, const BString& string)
+
+
+status_t 
+BMessage::ReplaceString(const char* name, const BString& string)
 {
 	return ReplaceString(name, 0, string);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::ReplaceString(const char* name, int32 index, const BString& string)
+
+
+status_t 
+BMessage::ReplaceString(const char* name, int32 index, const BString& string)
 {
-	return ReplaceData(name, B_STRING_TYPE, index, string.String(), string.Length());
+	return ReplaceData(name, B_STRING_TYPE, index, string.String(), string.Length()+1);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::ReplacePointer(const char* name, const void* ptr)
+
+
+status_t 
+BMessage::ReplacePointer(const char* name, const void* ptr)
 {
 	return ReplacePointer(name, 0, ptr);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::ReplacePointer(const char* name, int32 index, const void* ptr)
+
+
+status_t 
+BMessage::ReplacePointer(const char* name, int32 index, const void* ptr)
 {
 	return ReplaceData(name, B_POINTER_TYPE, index, &ptr, sizeof(ptr));
 }
-//------------------------------------------------------------------------------
+
+
 status_t BMessage::ReplaceMessenger(const char* name, BMessenger messenger)
 {
 	return ReplaceData(name, B_MESSENGER_TYPE, 0, &messenger, sizeof(BMessenger));
 }
-//------------------------------------------------------------------------------
-status_t BMessage::ReplaceMessenger(const char* name, int32 index, BMessenger messenger)
+
+
+status_t 
+BMessage::ReplaceMessenger(const char* name, int32 index, BMessenger messenger)
 {
 	return ReplaceData(name, B_MESSENGER_TYPE, index, &messenger, sizeof(BMessenger));
 }
-//------------------------------------------------------------------------------
-status_t BMessage::ReplaceRef(const char* name, const entry_ref* ref)
+
+
+status_t 
+BMessage::ReplaceRef(const char* name, const entry_ref* ref)
 {
 	return ReplaceRef(name, 0, ref);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::ReplaceRef(const char* name, int32 index, const entry_ref* ref)
+
+
+status_t 
+BMessage::ReplaceRef(const char* name, int32 index, const entry_ref* ref)
 {
-	// TODO: test
-	// Use voidref's theoretical BDataBuffer
 	char* buffer = new(nothrow) char[sizeof (entry_ref) + B_PATH_NAME_LENGTH];
 	size_t size;
 	status_t err = entry_ref_flatten(buffer, &size, ref);
-	if (!err)
-	{
-		err = ReplaceData(name, B_REF_TYPE, index, (void*)buffer, size);
+	if (!err) {
+		BDataBuffer databuffer((void*)buffer, size);
+		err = fBody->ReplaceData<BDataBuffer>(name, index, databuffer, B_REF_TYPE);
 	}
 
 	return err;
 }
-//------------------------------------------------------------------------------
-status_t BMessage::ReplaceMessage(const char* name, const BMessage* msg)
+
+
+status_t 
+BMessage::ReplaceMessage(const char* name, const BMessage* msg)
 {
 	return ReplaceMessage(name, 0, msg);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::ReplaceMessage(const char* name, int32 index,
-								  const BMessage* msg)
+
+
+status_t 
+BMessage::ReplaceMessage(const char* name, int32 index, const BMessage* msg)
 {
 	status_t err = B_OK;
 	ssize_t size = msg->FlattenedSize();
 	char* buffer = new(nothrow) char[size];
-	if (buffer)
-	{
+	if (buffer) {
 		err = msg->Flatten(buffer, size);
-		if (!err)
-		{
-			err = ReplaceData(name, B_MESSAGE_TYPE, index, (void*)buffer, size);
+		if (!err) {
+			BDataBuffer databuffer((void*)buffer, size);
+			err = fBody->ReplaceData<BDataBuffer>(name, index, databuffer, B_MESSAGE_TYPE);
 		}
-	}
-	else
-	{
+	} else {
 		err = B_NO_MEMORY;
 	}
 
 	return err;
 }
-//------------------------------------------------------------------------------
-status_t BMessage::ReplaceFlat(const char* name, BFlattenable* obj)
+
+
+status_t 
+BMessage::ReplaceFlat(const char* name, BFlattenable* obj)
 {
 	return ReplaceFlat(name, 0, obj);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::ReplaceFlat(const char* name, int32 index, BFlattenable* obj)
+
+
+status_t 
+BMessage::ReplaceFlat(const char* name, int32 index, BFlattenable* obj)
 {
-	// TODO: test
 	status_t err = B_OK;
 	ssize_t size = obj->FlattenedSize();
 	char* buffer = new(nothrow) char[size];
-	if (buffer)
-	{
+	if (buffer) {
 		err = obj->Flatten(buffer, size);
-		if (!err)
-		{
+		if (!err) {
 			err = ReplaceData(name, obj->TypeCode(), index, (void*)buffer, size);
 		}
 		delete[] buffer;
+	} else {
+		err = B_NO_MEMORY;
 	}
 
 	return err;
 }
-//------------------------------------------------------------------------------
-status_t BMessage::ReplaceData(const char* name, type_code type,
-							   const void* data, ssize_t data_size)
+
+
+status_t 
+BMessage::ReplaceData(const char* name, type_code type, const void* data, ssize_t data_size)
 {
 	return ReplaceData(name, type, 0, data, data_size);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::ReplaceData(const char* name, type_code type, int32 index,
-							   const void* data, ssize_t data_size)
+
+
+status_t
+BMessage::ReplaceData(const char* name, type_code type, int32 index, const void* data, ssize_t data_size)
 {
-	BDataBuffer DB((void*)data, data_size, true);
-	return fBody->ReplaceData<BDataBuffer>(name, index, DB, type);
+	BDataBuffer databuffer((void*)data, data_size, true);
+	return fBody->ReplaceData<BDataBuffer>(name, index, databuffer, type);
 }
-//------------------------------------------------------------------------------
-void* BMessage::operator new(size_t size)
+
+
+void* 
+BMessage::operator new(size_t size)
 {
 	if (!sMsgCache)
 	{
