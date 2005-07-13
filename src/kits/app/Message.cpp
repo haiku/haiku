@@ -1288,24 +1288,26 @@ DEFINE_LAZY_FIND_FUNCTION(const char*	, String)
 #undef DEFINE_LAZY_FIND_FUNCTION
 
 //------------------------------------------------------------------------------
+
+
 status_t 
-BMessage::AddString(const char* name, const char* a_string)
+BMessage::AddString(const char* name, const char* string)
 {
-	return AddData(name, B_STRING_TYPE, a_string, strlen(a_string)+1);
+	return AddData(name, B_STRING_TYPE, string, strlen(string) + 1);
 }
 
 
 status_t 
-BMessage::AddString(const char* name, const BString& a_string)
+BMessage::AddString(const char* name, const BString& string)
 {
-	return AddData(name, B_STRING_TYPE, a_string.String(), a_string.Length()+1);
+	return AddData(name, B_STRING_TYPE, string.String(), string.Length() + 1);
 }
 
 
 status_t 
-BMessage::AddPointer(const char* name, const void* ptr)
+BMessage::AddPointer(const char* name, const void* pointer)
 {
-	return AddData(name, B_POINTER_TYPE, &ptr, sizeof(ptr));
+	return AddData(name, B_POINTER_TYPE, &pointer, sizeof(pointer));
 }
 
 
@@ -1319,13 +1321,20 @@ BMessage::AddMessenger(const char* name, BMessenger messenger)
 status_t
 BMessage::AddRef(const char* name, const entry_ref* ref)
 {
-	char* buffer = new(nothrow) char[sizeof (entry_ref) + B_PATH_NAME_LENGTH];
+	char* buffer = new(nothrow) char[sizeof(entry_ref) + B_PATH_NAME_LENGTH];
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
 	size_t size;
 	status_t err = entry_ref_flatten(buffer, &size, ref);
-	if (!err) {
+	if (err >= B_OK) {
 		BDataBuffer databuffer((void*)buffer, size);
 		err = fBody->AddData<BDataBuffer>(name, databuffer, B_REF_TYPE);
-	}
+			// ToDo: even if the code looks like it, test this for real
+			// if AddData() fails here, the buffer is freed automatically
+			// as part of the BDataBuffer destruction
+	} else
+		delete[] buffer;
 
 	return err;
 }
@@ -1334,39 +1343,40 @@ BMessage::AddRef(const char* name, const entry_ref* ref)
 status_t 
 BMessage::AddMessage(const char* name, const BMessage* msg)
 {
-	status_t err = B_OK;
 	ssize_t size = msg->FlattenedSize();
 	char* buffer = new(nothrow) char[size];
-	if (buffer) {
-		err = msg->Flatten(buffer, size);
-		if (!err) {
-			BDataBuffer databuffer((void*)buffer, size);
-			err = fBody->AddData<BDataBuffer>(name, databuffer, B_MESSAGE_TYPE);
-		}
-	} else {
-		err = B_NO_MEMORY;
-	}
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
+	status_t err = msg->Flatten(buffer, size);
+	if (err >= B_OK) {
+		BDataBuffer dataBuffer((void*)buffer, size);
+		err = fBody->AddData<BDataBuffer>(name, dataBuffer, B_MESSAGE_TYPE);
+			// if AddData() fails here, the buffer is freed automatically
+			// as part of the BDataBuffer destruction
+	} else
+		delete[] buffer;
 
 	return err;
 }
 
 
 status_t 
-BMessage::AddFlat(const char* name, BFlattenable* obj, int32 count)
+BMessage::AddFlat(const char* name, BFlattenable* object, int32 count)
 {
-	status_t err = B_OK;
-	ssize_t size = obj->FlattenedSize();
+	ssize_t size = object->FlattenedSize();
 	char* buffer = new(nothrow) char[size];
-	if (buffer) {
-		err = obj->Flatten((void*)buffer, size);
-		if (!err) {
-			err = AddData(name, obj->TypeCode(), (void*)buffer, size,
-						  obj->IsFixedSize(), count);
-		}
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
+	status_t err = object->Flatten((void*)buffer, size);
+	if (err >= B_OK) {
+		BDataBuffer dataBuffer((void*)buffer, size);
+		err = fBody->AddData<BDataBuffer>(name, dataBuffer, object->TypeCode());
+			// if AddData() fails here, the buffer is freed automatically
+			// as part of the BDataBuffer destruction
+	} else
 		delete[] buffer;
-	} else {
-		err = B_NO_MEMORY;
-	}
 
 	return err;
 }
@@ -1376,21 +1386,17 @@ status_t
 BMessage::AddData(const char* name, type_code type, const void* data,
 				   ssize_t numBytes, bool is_fixed_size, int32 /*count*/)
 {
-/**
-	@note	Because we're using vectors for our item storage, the count param
+	/** @note	
+			Because we're using vectors for our item storage, the count param
 			is no longer useful to us:  dynamically adding more items is not
 			really a performance issue, so pre-allocating space for objects
 			gives us no real advantage.
- */
+	 */
 
 	// TODO: test
 	// In particular, we want to see what happens if is_fixed_size == true and
 	// the user attempts to add something bigger or smaller.  We may need to
 	// enforce the size thing.
-	//--------------------------------------------------------------------------
-	// voidref suggests creating a BDataBuffer type which we can use here to
-	// avoid having to specialize BMessageBody::AddData().
-	//--------------------------------------------------------------------------
 
 	BDataBuffer buffer((void*)data, numBytes, true);
 	return fBody->AddData<BDataBuffer>(name, buffer, type);
@@ -1419,39 +1425,39 @@ BMessage::MakeEmpty()
 
 
 status_t 
-BMessage::FindString(const char* name, const char** str) const
+BMessage::FindString(const char* name, const char** string) const
 {
-	return FindString(name, 0, str);
+	return FindString(name, 0, string);
 }
 
 
 status_t 
-BMessage::FindString(const char* name, int32 index, const char** str) const
+BMessage::FindString(const char* name, int32 index,
+	const char** string) const
 {
 	ssize_t bytes;
 	return FindData(name, B_STRING_TYPE, index,
-					(const void**)str, &bytes);
+		(const void**)string, &bytes);
 }
 
 
 status_t 
-BMessage::FindString(const char* name, BString* str) const
+BMessage::FindString(const char* name, BString* string) const
 {
-	return FindString(name, 0, str);
+	return FindString(name, 0, string);
 }
 
 
 status_t 
-BMessage::FindString(const char* name, int32 index, BString* str) const
+BMessage::FindString(const char* name, int32 index, BString* string) const
 {
 	const char* cstr;
 	status_t err = FindString(name, index, &cstr);
-	if (!err)
-	{
-		*str = cstr;
-	}
+	if (err < B_OK)
+		return err;
 
-	return err;
+	*string = cstr;
+	return B_OK;
 }
 
 
