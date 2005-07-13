@@ -1640,12 +1640,16 @@ status_t
 BMessage::ReplaceRef(const char* name, int32 index, const entry_ref* ref)
 {
 	char* buffer = new(nothrow) char[sizeof (entry_ref) + B_PATH_NAME_LENGTH];
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
 	size_t size;
 	status_t err = entry_ref_flatten(buffer, &size, ref);
-	if (!err) {
-		BDataBuffer databuffer((void*)buffer, size);
-		err = fBody->ReplaceData<BDataBuffer>(name, index, databuffer, B_REF_TYPE);
-	}
+	if (err >= B_OK) {
+		BDataBuffer dataBuffer((void*)buffer, size);
+		err = fBody->ReplaceData<BDataBuffer>(name, index, dataBuffer, B_REF_TYPE);
+	} else
+		delete[] buffer;
 
 	return err;
 }
@@ -1661,59 +1665,59 @@ BMessage::ReplaceMessage(const char* name, const BMessage* msg)
 status_t 
 BMessage::ReplaceMessage(const char* name, int32 index, const BMessage* msg)
 {
-	status_t err = B_OK;
 	ssize_t size = msg->FlattenedSize();
 	char* buffer = new(nothrow) char[size];
-	if (buffer) {
-		err = msg->Flatten(buffer, size);
-		if (!err) {
-			BDataBuffer databuffer((void*)buffer, size);
-			err = fBody->ReplaceData<BDataBuffer>(name, index, databuffer, B_MESSAGE_TYPE);
-		}
-	} else {
-		err = B_NO_MEMORY;
-	}
+	if (buffer == NULL)
+		return B_NO_MEMORY;
 
-	return err;
-}
-
-
-status_t 
-BMessage::ReplaceFlat(const char* name, BFlattenable* obj)
-{
-	return ReplaceFlat(name, 0, obj);
-}
-
-
-status_t 
-BMessage::ReplaceFlat(const char* name, int32 index, BFlattenable* obj)
-{
-	status_t err = B_OK;
-	ssize_t size = obj->FlattenedSize();
-	char* buffer = new(nothrow) char[size];
-	if (buffer) {
-		err = obj->Flatten(buffer, size);
-		if (!err) {
-			err = ReplaceData(name, obj->TypeCode(), index, (void*)buffer, size);
-		}
+	status_t err = msg->Flatten(buffer, size);
+	if (err >= B_OK) {
+		BDataBuffer dataBuffer((void*)buffer, size);
+		err = fBody->ReplaceData<BDataBuffer>(name, index, dataBuffer, B_MESSAGE_TYPE);
+	} else
 		delete[] buffer;
-	} else {
-		err = B_NO_MEMORY;
-	}
 
 	return err;
 }
 
 
 status_t 
-BMessage::ReplaceData(const char* name, type_code type, const void* data, ssize_t data_size)
+BMessage::ReplaceFlat(const char* name, BFlattenable* object)
+{
+	return ReplaceFlat(name, 0, object);
+}
+
+
+status_t 
+BMessage::ReplaceFlat(const char* name, int32 index, BFlattenable* object)
+{
+	ssize_t size = object->FlattenedSize();
+	char* buffer = new(nothrow) char[size];
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
+	status_t err = object->Flatten(buffer, size);
+	if (err >= B_OK) {
+		BDataBuffer dataBuffer((void*)buffer, size);
+		err = fBody->ReplaceData<BDataBuffer>(name, index, dataBuffer, object->TypeCode());
+	} else
+		delete[] buffer;
+
+	return err;
+}
+
+
+status_t 
+BMessage::ReplaceData(const char* name, type_code type,
+	const void* data, ssize_t data_size)
 {
 	return ReplaceData(name, type, 0, data, data_size);
 }
 
 
 status_t
-BMessage::ReplaceData(const char* name, type_code type, int32 index, const void* data, ssize_t data_size)
+BMessage::ReplaceData(const char* name, type_code type, int32 index,
+	const void* data, ssize_t data_size)
 {
 	BDataBuffer databuffer((void*)data, data_size, true);
 	return fBody->ReplaceData<BDataBuffer>(name, index, databuffer, type);
@@ -1724,45 +1728,58 @@ void*
 BMessage::operator new(size_t size)
 {
 	if (!sMsgCache)
-	{
 		sMsgCache = new BBlockCache(10, size, B_OBJECT_CACHE);
-	}
+
 	return sMsgCache->Get(size);
 }
-//------------------------------------------------------------------------------
-void* BMessage::operator new(size_t, void* p)
+
+
+void*
+BMessage::operator new(size_t, void* p)
 {
 	return p;
 }
-//------------------------------------------------------------------------------
-void BMessage::operator delete(void* ptr, size_t size)
+
+
+void
+BMessage::operator delete(void* ptr, size_t size)
 {
 	sMsgCache->Save(ptr, size);
 }
-//------------------------------------------------------------------------------
-bool BMessage::HasFlat(const char* name, const BFlattenable* flat) const
+
+
+bool
+BMessage::HasFlat(const char* name, const BFlattenable* flat) const
 {
 	return HasFlat(name, 0, flat);
 }
-//------------------------------------------------------------------------------
-bool BMessage::HasFlat(const char* name, int32 n, const BFlattenable* flat) const
+
+
+bool
+BMessage::HasFlat(const char* name, int32 n, const BFlattenable* flat) const
 {
 	return fBody->HasData(name, flat->TypeCode(), n);
 }
-//------------------------------------------------------------------------------
-bool BMessage::HasData(const char* name, type_code t, int32 n) const
+
+
+bool
+BMessage::HasData(const char* name, type_code t, int32 n) const
 {
 	return fBody->HasData(name, t, n);
 }
-//------------------------------------------------------------------------------
-BRect BMessage::FindRect(const char* name, int32 n) const
+
+
+BRect
+BMessage::FindRect(const char* name, int32 n) const
 {
 	BRect r(0, 0, -1, -1);
 	FindRect(name, n, &r);
 	return r;
 }
-//------------------------------------------------------------------------------
-BPoint BMessage::FindPoint(const char* name, int32 n) const
+
+
+BPoint
+BMessage::FindPoint(const char* name, int32 n) const
 {
 	BPoint p(0, 0);
 	FindPoint(name, n, &p);
@@ -1777,8 +1794,10 @@ BMessage::real_flatten(char* result, ssize_t size) const
 	return real_flatten(&stream);
 
 }
-//------------------------------------------------------------------------------
-status_t BMessage::real_flatten(BDataIO* stream) const
+
+
+status_t
+BMessage::real_flatten(BDataIO* stream) const
 {
 	Header header(*this);
 
@@ -1789,22 +1808,23 @@ status_t BMessage::real_flatten(BDataIO* stream) const
 
 	return err;
 }
-//------------------------------------------------------------------------------
-char* BMessage::stack_flatten(char* stack_ptr, ssize_t stack_size,
-							  bool /*incl_reply*/, ssize_t* size) const
+
+
+char*
+BMessage::stack_flatten(char* stack_ptr, ssize_t stack_size,
+	bool /*incl_reply*/, ssize_t* size) const
 {
 	const ssize_t calcd_size = calc_hdr_size(0) + fBody->FlattenedSize();
 	char* new_ptr = NULL;
-	if (calcd_size > stack_size)
-	{
+	if (calcd_size > stack_size) {
 		stack_ptr = new char[calcd_size];
 		new_ptr = stack_ptr;
 	}
+
 	real_flatten(stack_ptr, calcd_size);
 	if (size)
-	{
 		*size = calcd_size;
-	}
+
 	return new_ptr;
 }
 
@@ -1829,14 +1849,11 @@ BMessage::calc_hdr_size(uchar flags) const
 	ssize_t size = min_hdr_size();
 
 	if (fTarget != B_NULL_TOKEN)
-	{
 		size += sizeof (fTarget);
-	}
 
-	if (fReplyTo.port >= 0 &&
-		fReplyTo.target != B_NULL_TOKEN &&
-		fReplyTo.team >= 0)
-	{
+	if (fReplyTo.port >= 0
+		&& fReplyTo.target != B_NULL_TOKEN
+		&& fReplyTo.team >= 0) {
 		size += sizeof (fReplyTo.port);
 		size += sizeof (fReplyTo.target);
 		size += sizeof (fReplyTo.team);
@@ -1846,19 +1863,23 @@ BMessage::calc_hdr_size(uchar flags) const
 
 	return size;
 }
-//------------------------------------------------------------------------------
-status_t BMessage::_send_(port_id port, int32 token, bool preferred,
-						  bigtime_t timeout, bool reply_required,
-						  BMessenger& reply_to) const
+
+
+status_t
+BMessage::_send_(port_id port, int32 token, bool preferred,
+	bigtime_t timeout, bool reply_required,
+	BMessenger& reply_to) const
 {
-PRINT(("BMessage::_send_(port: %ld, token: %ld, preferred: %d): "
-"what: %lx (%.4s)\n", port, token, preferred, what, (char*)&what));
+	PRINT(("BMessage::_send_(port: %ld, token: %ld, preferred: %d): "
+		"what: %lx (%.4s)\n", port, token, preferred, what, (char*)&what));
+
 	bool oldPreferred = fPreferred;
 	int32 oldTarget = fTarget;
 	reply_to_info oldReplyTo = fReplyTo;
 
 	if (!reply_to.IsValid()) {
-		BMessenger::Private(reply_to).SetTo(fReplyTo.team, fReplyTo.port, fReplyTo.target, fReplyTo.preferred);
+		BMessenger::Private(reply_to).SetTo(fReplyTo.team,
+			fReplyTo.port, fReplyTo.target, fReplyTo.preferred);
 		if (!reply_to.IsValid())
 			reply_to = be_app_messenger;
 	}
@@ -1879,43 +1900,37 @@ PRINT(("BMessage::_send_(port: %ld, token: %ld, preferred: %d): "
 	char* p = stack_flatten(tmp, sizeof(tmp), true /* include reply */, &size);
 	char* pMem = p ? p : tmp;
 	status_t err;
-	do
-	{
+	do {
 		err = write_port_etc(port, 'pjpp', pMem, size, B_RELATIVE_TIMEOUT, timeout);
 	} while (err == B_INTERRUPTED);
 	if (p)
-	{
 		delete[] p;
-	}
+
 	self->fPreferred     = oldPreferred;
 	self->fTarget        = oldTarget;
 	self->fReplyRequired = false;	// To this copy, no reply is required.
 									// Only relevant when forwarding anyway.
 	self->fReplyTo       = oldReplyTo;
 
-PRINT(("BMessage::_send_() done: %lx\n", err));
+	PRINT(("BMessage::_send_() done: %lx\n", err));
 	return err;
 }
-//------------------------------------------------------------------------------
-status_t BMessage::send_message(port_id port, team_id port_owner, int32 token,
-								bool preferred, BMessage* reply,
-								bigtime_t send_timeout,
-								bigtime_t reply_timeout) const
+
+
+status_t
+BMessage::send_message(port_id port, team_id port_owner, int32 token,
+	bool preferred, BMessage* reply, bigtime_t send_timeout,
+	bigtime_t reply_timeout) const
 {
 	const int32 cached_reply_port = sGetCachedReplyPort();
 	port_id reply_port;
 	status_t err;
-	if (cached_reply_port == -1)
-	{
+	if (cached_reply_port == -1) {
 		// All the cached reply ports are in use; create a new one
 		reply_port = create_port(1 /* for one message */, "tmp_reply_port");
 		if (reply_port < 0)
-		{
 			return reply_port;
-		}
-	}
-	else
-	{
+	} else {
 		assert(cached_reply_port < sNumReplyPorts);
 		reply_port = sReplyPorts[cached_reply_port];
 	}
@@ -1943,20 +1958,17 @@ status_t BMessage::send_message(port_id port, team_id port_owner, int32 token,
 		err = _send_(port, token, preferred, send_timeout, true, messenger);
 	}
 	if (err)
-	{
 		goto error;
-	}
+
 	int32 code;
 	err = handle_reply(reply_port, &code, reply_timeout, reply);
-	if (err && cached_reply_port >= 0)
-	{
+	if (err && cached_reply_port >= 0) {
 		delete_port(reply_port);
 		sReplyPorts[cached_reply_port] = create_port(1, "tmp_rport");
 	}
 
 error:
-	if (cached_reply_port >= 0)
-	{
+	if (cached_reply_port >= 0) {
 		// Reclaim ownership of cached port
 		set_port_owner(reply_port, team);
 		// Flag as available
@@ -2094,54 +2106,49 @@ BMessage::sGetCachedReplyPort()
 
 	return index;
 }
-//------------------------------------------------------------------------------
-static status_t handle_reply(port_id   reply_port,
-                             int32*    pCode,
-                             bigtime_t timeout,
-                             BMessage* reply)
+
+
+static status_t
+handle_reply(port_id reply_port, int32* pCode,
+	bigtime_t timeout, BMessage* reply)
 {
-PRINT(("handle_reply(port: %ld)\n", reply_port));
+	PRINT(("handle_reply(port: %ld)\n", reply_port));
+
 	status_t err;
-	do
-	{
+	do {
 		err = port_buffer_size_etc(reply_port, 8, timeout);
 	} while (err == B_INTERRUPTED);
-	if (err < 0)
-	{
+
+	if (err < 0) {
 		PRINT(("handle_reply() error 1: %lx\n", err));
 		return err;
 	}
+
 	// The API lied. It really isn't an error code, but the message size...
 	char* pAllocd = NULL;
 	char* pMem    = NULL;
 	char tmp[0x800];
 	if (err < 0x800)
-	{
 		pMem = tmp;
-	}
-	else
-	{
+	else {
 		pAllocd = new char[err];
 		pMem = pAllocd;
 	}
-	do
-	{
+
+	do {
 		err = read_port(reply_port, pCode, pMem, err);
 	} while (err == B_INTERRUPTED);
 
-	if (err < 0)
-	{
+	if (err < 0) {
 		PRINT(("handle_reply() error 2: %lx\n", err));
 		return err;
 	}
 
-	if (*pCode == 'PUSH')
-	{
+	if (*pCode == 'PUSH') {
 		PRINT(("handle_reply() error 3: %x\n", B_ERROR));
 		return B_ERROR;
 	}
-	if (*pCode != 'pjpp')
-	{
+	if (*pCode != 'pjpp') {
 		PRINT(("handle_reply() error 4: port message code not 'pjpp' but "
 			"'%lx'\n", *pCode));
 		return B_ERROR;
@@ -2152,10 +2159,9 @@ PRINT(("handle_reply(port: %ld)\n", reply_port));
 	// There seems to be a bug in the original Be implementation.
 	// It never free'd pAllocd !
 	if (pAllocd)
-	{
 		delete[] pAllocd;
-	}
-PRINT(("handle_reply() done: %lx\n", err));
+
+	PRINT(("handle_reply() done: %lx\n", err));
 	return err;
 }
 
