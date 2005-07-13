@@ -430,7 +430,7 @@ _user_readv(int fd, off_t pos, const iovec *userVecs, size_t count)
 		bytesRead = B_BAD_VALUE;
 
 	put_fd(descriptor);
-	return bytesRead;
+	status = bytesRead;
 
 err:
 	free(vecs);
@@ -523,7 +523,7 @@ _user_writev(int fd, off_t pos, const iovec *userVecs, size_t count)
 		bytesWritten = B_BAD_VALUE;
 
 	put_fd(descriptor);
-	return bytesWritten;
+	status = bytesWritten;
 
 err:
 	free(vecs);
