@@ -227,7 +227,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		}
 
 		/* set the timing */
-//		head1_set_timing(target);
+		head1_set_timing(target);
 		/* we do not need to setup CRTC2 here for a head that's in TVout mode */
 //		if (!(target2.flags & TV_BITS))	result = head2_set_timing(target2);
 
@@ -297,7 +297,7 @@ status = B_OK;
 		head1_set_display_start(startadd,colour_depth1);
 
 		/* set the timing */
-//		head1_set_timing(target);
+		head1_set_timing(target);
 
 		//fixme: shut-off the videoPLL if it exists...
 	}

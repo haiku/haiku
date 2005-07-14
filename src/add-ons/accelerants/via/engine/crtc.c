@@ -119,7 +119,7 @@ status_t eng_crtc_set_timing(display_mode target)
 	 *   wide horizontal stripes. This can be observed earliest on fullscreen overlay,
 	 *   and if it gets worse, also normal desktop output will suffer. The stripes
 	 *   are mainly visible at the left of the screen, over the entire screen height. */
-	if (si->ps.tmds1_active)
+	if (0)//si->ps.tmds1_active)
 	{
 		LOG(2,("CRTC: DFP active: tuning modeline\n"));
 
@@ -193,9 +193,6 @@ status_t eng_crtc_set_timing(display_mode target)
 	/* prevent memory adress counter from being reset (linecomp may not occur) */
 	linecomp = target.timing.v_display;
 
-	/* enable access to primary head */
-	set_crtc_owner(0);
-
 	/* Note for laptop and DVI flatpanels:
 	 * CRTC timing has a seperate set of registers from flatpanel timing.
 	 * The flatpanel timing registers have scaling registers that are used to match
@@ -239,16 +236,16 @@ status_t eng_crtc_set_timing(display_mode target)
 
 		/* horizontal extended regs */
 		//fixme: we reset bit4. is this correct??
-		CRTCW(HEB, (CRTCR(HEB) & 0xe0) |
+/*		CRTCW(HEB, (CRTCR(HEB) & 0xe0) |
 			(
 		 	((htotal & 0x100) >> (8 - 0)) |
 			((hdisp_e & 0x100) >> (8 - 1)) |
 			((hblnk_s & 0x100) >> (8 - 2)) |
 			((hsync_s & 0x100) >> (8 - 3))
 			));
-
+*/
 		/* (mostly) vertical extended regs */
-		CRTCW(LSR,
+/*		CRTCW(LSR,
 			(
 		 	((vtotal & 0x400) >> (10 - 0)) |
 			((vdisp_e & 0x400) >> (10 - 1)) |
@@ -258,8 +255,9 @@ status_t eng_crtc_set_timing(display_mode target)
 			//fixme: we still miss one linecomp bit!?! is this it??
 			//| ((linecomp & 0x400) >> 3)	
 			));
-
+*/
 		/* more vertical extended regs (on GeForce cards only) */
+/*
 		if (si->ps.card_arch >= NV10A)
 		{ 
 			CRTCW(EXTRA,
@@ -271,12 +269,12 @@ status_t eng_crtc_set_timing(display_mode target)
 				//fixme: do we miss another linecomp bit!?!
 				));
 		}
-
+*/
 		/* setup 'large screen' mode */
-		if (target.timing.h_display >= 1280)
-			CRTCW(REPAINT1, (CRTCR(REPAINT1) & 0xfb));
-		else
-			CRTCW(REPAINT1, (CRTCR(REPAINT1) | 0x04));
+//		if (target.timing.h_display >= 1280)
+//			CRTCW(REPAINT1, (CRTCR(REPAINT1) & 0xfb));
+//		else
+//			CRTCW(REPAINT1, (CRTCR(REPAINT1) | 0x04));
 
 		/* setup HSYNC & VSYNC polarity */
 		LOG(2,("CRTC: sync polarity: "));
@@ -308,14 +306,14 @@ status_t eng_crtc_set_timing(display_mode target)
 
 	/* always disable interlaced operation */
 	/* (interlace is supported on upto and including NV10, NV15, and NV30 and up) */
-	CRTCW(INTERLACE, 0xff);
+//	CRTCW(INTERLACE, 0xff);
 
 	/* disable CRTC slaved mode unless a panel is in use */
 	// fixme: this kills TVout when it was in use...
-	if (!si->ps.tmds1_active) CRTCW(PIXEL, (CRTCR(PIXEL) & 0x7f));
+//	if (!si->ps.tmds1_active) CRTCW(PIXEL, (CRTCR(PIXEL) & 0x7f));
 
 	/* setup flatpanel if connected and active */
-	if (si->ps.tmds1_active)
+	if (0)//si->ps.tmds1_active)
 	{
 		uint32 iscale_x, iscale_y;
 
