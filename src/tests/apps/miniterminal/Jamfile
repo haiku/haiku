@@ -4,10 +4,15 @@ UseHeaders [ FDirName $(OBOS_TOP) src tests apps miniterminal ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src apps terminal MYOB ] ;
 
 App MiniTerminal :
-	MiniApp.cpp
-	MiniWin.cpp
-	MiniView.cpp 
+	Arguments.cpp
 	Console.cpp
+	MiniApp.cpp
+	MiniView.cpp 
+	MiniWin.cpp
 	ViewBuffer.cpp ;
 
-LinkSharedOSLibs MiniTerminal : libroot.so libbe.so ;
+if $(TARGET_PLATFORM) = haiku {
+	LinkSharedOSLibs MiniTerminal : libroot.so libbe.so ;
+} else {
+	LinkSharedOSLibs MiniTerminal : libroot.so libopenbeos.so ;
+}

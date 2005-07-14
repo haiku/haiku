@@ -5,13 +5,15 @@
  * Distributed under the Haiku License.
  */
 
-#include "MiniWin.h"
+#include "Arguments.h"
 #include "MiniView.h"
+#include "MiniWin.h"
 
-MiniWin::MiniWin(BRect bounds)
-	:	BWindow(bounds, "MiniTerminal", B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE)
+MiniWin::MiniWin(const Arguments &args)
+	:	BWindow(args.Bounds(), "MiniTerminal", B_TITLED_WINDOW,
+			B_QUIT_ON_WINDOW_CLOSE)
 {
-	fView = new MiniView(bounds.OffsetToSelf(0, 0));
+	fView = new MiniView(args);
 	AddChild(fView);
 	fView->MakeFocus();
 }

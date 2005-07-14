@@ -3,11 +3,12 @@
 
 #include <Window.h>
 
+class Arguments;
 class MiniView;
 
 class MiniWin : public BWindow {
 public:
-							MiniWin(BRect bounds);
+							MiniWin(const Arguments &args);
 virtual						~MiniWin();
 
 		MiniView			*View();

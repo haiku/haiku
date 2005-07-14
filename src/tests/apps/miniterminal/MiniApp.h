@@ -3,11 +3,12 @@
 
 #include <Application.h>
 
+class Arguments;
 class MiniWin;
 
 class MiniApp : public BApplication {
 public:
-							MiniApp(BRect bounds);
+							MiniApp(const Arguments &args);
 virtual						~MiniApp();
 
 virtual	void				ReadyToRun();

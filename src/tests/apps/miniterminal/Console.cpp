@@ -17,7 +17,8 @@
 #include <stdio.h>
 
 Console::Console(ViewBuffer *output)
-	:	fOutput(output)
+	:	fState(CONSOLE_STATE_NORMAL),
+		fOutput(output)
 {
 	fOutput->GetSize(&fColumns, &fLines);
 	fOutput->SetResizeCallback(&ResizeCallback, this);

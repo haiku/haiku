@@ -17,6 +17,7 @@
 #include <OS.h>
 #include <image.h>
 #include <Message.h>
+#include <Window.h>
 
 #include <termios.h>
 #include <unistd.h>
@@ -26,8 +27,9 @@
 #include <stdlib.h>
 #include <signal.h>
 
-#include "MiniView.h"
+#include "Arguments.h"
 #include "Console.h"
+#include "MiniView.h"
 
 #include "VTkeymap.h"
 
@@ -65,8 +67,9 @@ Setenv(const char *var, const char *value)
 	environ [++envindex] = NULL;
 }
 
-MiniView::MiniView(BRect frame)
-	:	ViewBuffer(frame)
+MiniView::MiniView(const Arguments &args)
+	:	ViewBuffer(args.Bounds().OffsetToCopy(0, 0)),
+		fArguments(args)
 {
 	// we need a message filter so that we get B_TAB keydowns
 	AddFilter(new BMessageFilter(B_KEY_DOWN, &MiniView::MessageFilter));
@@ -91,11 +94,6 @@ MiniView::Start()
 	
 	// we're a session leader
 	setsid();
-	
-	// move our stdin and stdout to the console
-	dup2(fSlaveFD, 0);
-	dup2(fSlaveFD, 1);
-	dup2(fSlaveFD, 2);
 	
 	if (SpawnThreads() != B_OK)
 		TRACE(("error in SpawnThreads\n"));
@@ -269,12 +267,12 @@ MiniView::SpawnThreads()
 	fConsoleWriter = spawn_thread(&MiniView::ConsoleWriter, "console writer", B_URGENT_DISPLAY_PRIORITY, this);
 	if (fConsoleWriter < 0)
 		return B_ERROR;
-	TRACE(("console writer thread is: %d\n", fConsoleWriter));
+	TRACE(("console writer thread is: %ld\n", fConsoleWriter));
 	
 	fShellExecutor = spawn_thread(&MiniView::ExecuteShell, "shell process", B_URGENT_DISPLAY_PRIORITY, this);
 	if (fShellExecutor < 0)
 		return B_ERROR;
-	TRACE(("shell process thread is: %d\n", fShellProcess));
+	TRACE(("shell executor thread is: %ld\n", fShellExecutor));
 	
 	resume_thread(fConsoleWriter);
 	resume_thread(fShellExecutor);
@@ -305,11 +303,10 @@ MiniView::ExecuteShell(void *arg)
 	MiniView *view = (MiniView *)arg;
 	
 	for (;;) {
-		const char *argv[3];
-		argv[0] = "/bin/sh";
-		argv[1] = "--login";
-		argv[2] = NULL;
-		
+		int argc;
+		const char *const *argv;
+		view->fArguments.GetShellArguments(argc, argv);
+
 		int saved_stdin = dup(0);
 		int saved_stdout = dup(1);
 		int saved_stderr = dup(2);
@@ -318,19 +315,25 @@ MiniView::ExecuteShell(void *arg)
 		dup2(view->fSlaveFD, 1);
 		dup2(view->fSlaveFD, 2);
 
-		view->fShellProcess = load_image(2, argv, (const char **)environ);
+		view->fShellProcess = load_image(argc, (const char **)argv,
+			(const char **)environ);
 		setpgid(view->fShellProcess, 0);
 		tcsetpgrp(view->fSlaveFD, view->fShellProcess);
 
-		status_t return_code;
-		wait_for_thread(view->fShellProcess, &return_code);
-		
 		dup2(saved_stdin, 0);
 		dup2(saved_stdout, 1);
 		dup2(saved_stderr, 2);
 		close(saved_stdin);
 		close(saved_stdout);
 		close(saved_stderr);
+
+		status_t return_code;
+		wait_for_thread(view->fShellProcess, &return_code);
+		
+		if (!view->fArguments.StandardShell()) {
+			view->Window()->PostMessage(B_QUIT_REQUESTED);
+			break;
+		}
 	}
 	
 	return B_OK;

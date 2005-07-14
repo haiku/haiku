@@ -6,9 +6,11 @@
 #include "ViewBuffer.h"
 #include "Console.h"
 
+class Arguments;
+
 class MiniView : public ViewBuffer {
 public:
-							MiniView(BRect frame);
+							MiniView(const Arguments &args);
 virtual						~MiniView();
 
 		void				Start();
@@ -23,6 +25,7 @@ static	int32				ConsoleWriter(void *arg);
 static	int32				ExecuteShell(void *arg);
 static	filter_result		MessageFilter(BMessage *message, BHandler **target, BMessageFilter *filter);
 
+		const Arguments		&fArguments;
 		Console				*fConsole;
 		int					fMasterFD;
 		int					fSlaveFD;
