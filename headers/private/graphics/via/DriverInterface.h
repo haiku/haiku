@@ -173,8 +173,9 @@ typedef struct {
 
   /* card info - information gathered from PINS (and other sources) */
 	enum
-	{	// card_type in order of date of NV chip design
-		NV04 = 0,
+	{	// card_type in order of date of VIA chip design
+		CLE266 = 0,
+		NV04,
 		NV05,
 		NV05M64,
 		NV06,
@@ -201,8 +202,9 @@ typedef struct {
 		NV45
 	};
 	enum
-	{	// card_arch in order of date of NV chip design
-		NV04A = 0,
+	{	// card_arch in order of date of VIA chip design
+		UNI_PRO = 0,
+		NV04A,
 		NV10A,
 		NV20A,
 		NV30A,

@@ -414,9 +414,6 @@
 #define RG8_MISCW 			0x000c03c2
 #define RG8_MISCR 			0x000c03cc
 #define RG8_VSE2			0x000c03c3
-#define RG8_SEQIND			0x000c03c4
-#define RG16_SEQIND			0x000c03c4
-#define RG8_SEQDAT			0x000c03c5
 #define RG8_GRPHIND			0x000c03ce
 #define RG16_GRPHIND		0x000c03ce
 #define RG8_GRPHDAT			0x000c03cf
@@ -445,6 +442,9 @@
 #define RG8_ATTRDATW		0x006013c0
 #define RG8_ATTRDATR		0x006013c1
 //new via
+#define RG8_SEQIND			0x000083c4
+#define RG16_SEQIND			0x000083c4
+#define RG8_SEQDAT			0x000083c5
 #define RG8_CRTCIND			0x000083d4
 #define RG16_CRTCIND		0x000083d4
 #define RG8_CRTCDAT			0x000083d5
@@ -548,7 +548,8 @@
 #define ENDAC2_FP_DEBUG2	0x00682888
 #define ENDAC2_FP_DEBUG3	0x0068288c
 
-/* Nvidia CRTC indexed registers */
+//new via
+/* VIA CRTC indexed registers */
 /* VGA standard registers: */
 #define ENCRTCX_HTOTAL		0x00
 #define ENCRTCX_HDISPE		0x01
@@ -561,13 +562,9 @@
 #define ENCRTCX_PRROWSCN	0x08
 #define ENCRTCX_MAXSCLIN	0x09
 #define ENCRTCX_VGACURCTRL	0x0a
-//new via
 #define ENCRTCX_FBSTADDH	0x0c
 #define ENCRTCX_FBSTADDL	0x0d
 #define ENCRTCX_PITCHL		0x13
-/* VIA specific registers: */
-#define ENCRTCX_FBSTADDE	0x34
-//end via
 #define ENCRTCX_VSYNCS		0x10
 #define ENCRTCX_VSYNCE		0x11
 #define ENCRTCX_VDISPE		0x12
@@ -575,6 +572,14 @@
 #define ENCRTCX_VBLANKE		0x16
 #define ENCRTCX_MODECTL		0x17
 #define ENCRTCX_LINECOMP	0x18
+/* VIA specific registers: */
+#define ENCRTCX_0x32		0x32
+#define ENCRTCX_0x33		0x33
+#define ENCRTCX_FBSTADDE	0x34
+#define ENCRTCX_0x35		0x35
+#define ENCRTCX_0x36		0x36 //b6,7 = DPMS, 00 = on, 11=off
+#define ENCRTCX_0x3b		0x3b //TVtype jumper: b1=1 = PAL, else NTSC
+//end via
 /* Nvidia specific registers: */
 #define ENCRTCX_REPAINT0	0x19
 #define ENCRTCX_REPAINT1	0x1a
@@ -607,11 +612,44 @@
 #define ENATBX_HORPIXPAN	0x13
 #define ENATBX_COLSEL		0x14
 
-/* Nvidia SEQUENCER indexed registers */
+//new via
+/* VIA SEQUENCER indexed registers */
 /* VGA standard registers: */
 #define ENSEQX_RESET		0x00
 #define ENSEQX_CLKMODE		0x01
 #define ENSEQX_MEMMODE		0x04
+/* VIA specific registers: */
+#define ENSEQX_LOCK			0x10
+#define ENSEQX_0x14			0x14
+#define ENSEQX_0x15			0x15
+#define ENSEQX_0x16			0x16 //Mclk PLL
+#define ENSEQX_0x17			0x17 //Mclk PLL
+#define ENSEQX_0x18			0x18 //Mclk PLL
+#define ENSEQX_0x19			0x19
+#define ENSEQX_0x1a			0x1a
+#define ENSEQX_0x1b			0x1b
+#define ENSEQX_0x1c			0x1c
+#define ENSEQX_0x1d			0x1d
+#define ENSEQX_0x1e			0x1e
+#define ENSEQX_0x1f			0x1f
+#define ENSEQX_0x22			0x22
+#define ENSEQX_0x23			0x23
+#define ENSEQX_0x24			0x24
+#define ENSEQX_0x25			0x25
+#define ENSEQX_0x26			0x26 // ddc
+#define ENSEQX_0x27			0x27
+#define ENSEQX_0x28			0x28
+#define ENSEQX_0x29			0x29
+#define ENSEQX_0x2a			0x2a
+#define ENSEQX_0x2b			0x2b
+#define ENSEQX_0x2e			0x2e
+#define ENSEQX_MSIZE_CLE266	0x34
+#define ENSEQX_MSIZE_OTHER	0x39
+#define ENSEQX_0x44			0x44
+#define ENSEQX_0x45			0x45
+#define ENSEQX_0x46			0x46
+#define ENSEQX_0x47			0x47
+//end new via.
 
 /* Nvidia GRAPHICS indexed registers */
 /* VGA standard registers: */
