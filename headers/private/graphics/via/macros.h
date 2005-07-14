@@ -411,8 +411,6 @@
 /* PCI direct registers */
 #define RG32_PWRUPCTRL		0x00000200
 #define RG32_DUALHEAD_CTRL	0x000010f0//verify!!!
-#define RG8_MISCW 			0x000c03c2
-#define RG8_MISCR 			0x000c03cc
 #define RG8_VSE2			0x000c03c3
 #define RG8_GRPHIND			0x000c03ce
 #define RG16_GRPHIND		0x000c03ce
@@ -442,6 +440,8 @@
 #define RG8_ATTRDATW		0x006013c0
 #define RG8_ATTRDATR		0x006013c1
 //new via
+#define RG8_MISCW 			0x000083c2
+#define RG8_MISCR 			0x000083cc
 #define RG8_SEQIND			0x000083c4
 #define RG16_SEQIND			0x000083c4
 #define RG8_SEQDAT			0x000083c5
