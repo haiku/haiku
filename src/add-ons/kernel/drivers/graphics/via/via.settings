@@ -9,7 +9,7 @@
 
 # via.accelerant parameters
 usebios    true			# if true rely on bios to coldstart the card
-memory     2			# in MB, override builtin memory size detection
+#memory     2			# in MB, override builtin memory size detection
 hardcursor true			# if true use on-chip cursor capabilities
 #logmask   0x00000000	# nothing logged, is default
 #logmask   0x08000604	# log overlay use in full
