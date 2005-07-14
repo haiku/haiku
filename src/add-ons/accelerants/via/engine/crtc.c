@@ -591,6 +591,33 @@ status_t eng_crtc_set_display_pitch()
 	// fixme: lowbyte register may not be programmed with value 0xff. Prevent that...
 	CRTCW(PITCHL, (offset & 0x00ff));
 	//fixme: there is a high-byte register somewhere that needs to be pgm'd!!!
+	if (offset & 0x0100)
+	{
+//		SEQW(0x1c, ((SEQR(0x1c) | 0x80)));
+;
+	}
+	else
+	{
+//		SEQW(0x1c, ((SEQR(0x1c) & 0x7f)));
+;
+	}
+
+//	LOG(2,("CRTC: $32=$%02x, $33=$%02x, $35=$%02x, $36=$%02x\n",
+//		(CRTCR(0x32)), (CRTCR(0x33)), (CRTCR(0x35)), (CRTCR(0x36))));
+//	LOG(2,("SEQ: $14=$%02x, $15=$%02x, $16=$%02x, $17=$%02x\n",
+//		(SEQR(0x14)), (SEQR(0x15)), (SEQR(0x16)), (SEQR(0x17))));
+//	LOG(2,("SEQ: $18=$%02x, $19=$%02x, $1a=$%02x, $1b=$%02x\n",
+//		(SEQR(0x18)), (SEQR(0x19)), (SEQR(0x1a)), (SEQR(0x1b))));
+//	LOG(2,("SEQ: $1c=$%02x, $1d=$%02x, $1e=$%02x, $1f=$%02x\n",
+//		(SEQR(0x1c)), (SEQR(0x1d)), (SEQR(0x1e)), (SEQR(0x1f))));
+//	LOG(2,("SEQ: $22=$%02x, $23=$%02x, $24=$%02x, $25=$%02x\n",
+//		(SEQR(0x22)), (SEQR(0x23)), (SEQR(0x24)), (SEQR(0x25))));
+//	LOG(2,("SEQ: $26=$%02x, $27=$%02x, $28=$%02x, $29=$%02x\n",
+//		(SEQR(0x26)), (SEQR(0x27)), (SEQR(0x28)), (SEQR(0x29))));
+//	LOG(2,("SEQ: $2a=$%02x, $2b=$%02x, $2e=$%02x\n",
+//		(SEQR(0x2a)), (SEQR(0x2b)), (SEQR(0x2e))));
+//	LOG(2,("SEQ: $44=$%02x, $45=$%02x, $46=$%02x, $47=$%02x\n",
+//		(SEQR(0x44)), (SEQR(0x45)), (SEQR(0x46)), (SEQR(0x47))));
 
 	return B_OK;
 }

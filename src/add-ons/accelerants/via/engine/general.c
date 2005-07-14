@@ -90,7 +90,7 @@ status_t eng_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku VIA Accelerant 0.01 running.\n"));
+	LOG(1,("POWERUP: Haiku VIA Accelerant 0.02 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -99,10 +99,10 @@ status_t eng_general_powerup()
 	switch(CFGR(DEVID))
 	{
 	/* Vendor Via */
-	case 0x31221106: /*  */
-		si->ps.card_type = NV04;
-		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected VIA CLE266 Unichrome\n"));
+	case 0x31221106: /* CLE266 chipset */
+		si->ps.card_type = CLE266;
+		si->ps.card_arch = UNI_PRO;
+		LOG(4,("POWERUP: Detected VIA CLE266 Unichrome Pro\n"));
 		status = engxx_general_powerup();
 		break;
 	default:
@@ -434,11 +434,12 @@ static status_t eng_general_bios_to_powergraphics()
 	/* select colormode CRTC registers base adresses */
 //	ENG_REG8(RG8_MISCW) = 0xcb;
 
-	/* enable access to primary head */
-//	set_crtc_owner(0);
-	/* unlock head's registers for R/W access */
-//	CRTCW(LOCK, 0x57);
-//	CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
+//via
+	/* unlock (extended) registers for R/W access */
+	SEQW(LOCK, 0x01);
+	CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
+//end via.
+
 //	if (si->ps.secondary_head)
 	if (0)
 	{
