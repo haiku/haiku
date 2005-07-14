@@ -1471,8 +1471,14 @@ BMessage::FindPointer(const char* name, void** ptr) const
 status_t 
 BMessage::FindPointer(const char* name, int32 index, void** ptr) const
 {
+	void** data = NULL;
 	ssize_t size = 0;
-	return FindData(name, B_POINTER_TYPE, index, (const void**)ptr, &size);
+	status_t err = FindData(name, B_POINTER_TYPE, index, (const void**)&data, &size);
+	if (err == B_OK)
+		*ptr = *data;
+	else
+		*ptr = NULL;
+	return err;
 }
 
 
