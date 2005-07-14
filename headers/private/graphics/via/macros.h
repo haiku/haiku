@@ -573,6 +573,15 @@
 #define ENCRTCX_MODECTL		0x17
 #define ENCRTCX_LINECOMP	0x18
 /* VIA specific registers: */
+//testing:
+#define ENCRTCX_0x19		0x19
+#define ENCRTCX_0x1a		0x1a
+#define ENCRTCX_0x1b		0x1b
+#define ENCRTCX_0x1c		0x1c
+#define ENCRTCX_0x1d		0x1d
+#define ENCRTCX_0x1e		0x1e
+#define ENCRTCX_0x1f		0x1f
+//end testing.
 #define ENCRTCX_0x32		0x32
 #define ENCRTCX_0x33		0x33
 #define ENCRTCX_FBSTADDE	0x34
