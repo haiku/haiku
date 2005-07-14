@@ -76,6 +76,7 @@ CommonTestLib libapptest.so
 		MessageDestructTest.cpp
 		MessageOpAssignTest.cpp
 		MessageEasyFindTest.cpp
+		MessageSpeedTest.cpp
 
 		# BMessageQueue
 		MessageQueueTest.cpp

@@ -21,6 +21,7 @@
 #include "MessageMessengerItemTest.h"
 #include "MessagePointerItemTest.h"
 #include "MessageFlattenableItemTest.h"
+#include "MessageSpeedTest.h"
 
 Test* MessageTestSuite()
 {
@@ -46,6 +47,7 @@ Test* MessageTestSuite()
 	tests->addTest(TMessageMessengerItemTest::Suite());
 	tests->addTest(TMessagePointerItemTest::Suite());
 	tests->addTest(TMessageFlattenableItemTest::Suite());
+	tests->addTest(TMessageSpeedTest::Suite());
 
 	return tests;
 }
