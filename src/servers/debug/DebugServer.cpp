@@ -11,25 +11,60 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <Application.h>
-#include <Invoker.h>
+#include <Alert.h>
+#include <AppMisc.h>
+#include <AutoDeleter.h>
+#include <Autolock.h>
 #include <debug_support.h>
+#include <Entry.h>
+#include <Invoker.h>
+#include <Server.h>
 
 #include <util/DoublyLinkedList.h>
 
-#define USE_BE_APPLICATION 0
-	// define this if the debug server should be a standard BApplication
+#define USE_GUI true
+	// define to false if the debug server shouldn't use GUI (i.e. an alert)
+
+//#define TRACE_DEBUG_SERVER
+#ifdef TRACE_DEBUG_SERVER
+#	define TRACE(x) printf x
+#else
+#	define TRACE(x) ;
+#endif
+
 
 static const char *kSignature = "application/x-vnd.haiku-debug-server";
 
-// message what codes
-enum {
-	DEBUG_MESSAGE	= 'dbgm',
-	ALERT_MESSAGE	= 'alrt',
-};
+// paths to the apps used for debugging
+static const char *kConsoledPath	= "/bin/consoled";
+static const char *kTerminalPath	= "/boot/beos/apps/MiniTerminal";
+static const char *kGDBPath			= "/bin/gdb";
 
-class DebugServer;
-class TeamDebugHandler;
+
+// KillTeam
+static void
+KillTeam(team_id team, const char *appName = NULL)
+{
+	// get a team info to verify the team still lives
+	team_info info;
+	if (!appName) {
+		status_t error = get_team_info(team, &info);
+		if (error != B_OK) {
+			printf("debug_server: KillTeam(): Error getting info for team %ld: "
+				"%s\n", team, strerror(error));
+			info.args[0] = '\0';
+		}
+
+		appName = info.args;
+	}
+
+	printf("debug_server: Killing team %ld (%s)\n", team, appName);
+
+	kill_team(team);
+}
+
+
+// #pragma mark -
 
 // DebugMessage
 class DebugMessage : public DoublyLinkedListLinkImpl<DebugMessage> {
@@ -51,68 +86,176 @@ private:
 
 typedef DoublyLinkedList<DebugMessage>	DebugMessageList;
 
-// ThreadDebugHandler
-class ThreadDebugHandler : public BHandler {
-public:
-	ThreadDebugHandler(TeamDebugHandler *teamHandler, thread_id thread);
-	~ThreadDebugHandler();
-
-	thread_id Thread() const;
-
-	bool HandleMessage(DebugMessage *message);
-
-	virtual void MessageReceived(BMessage *message);
-
-private:
-	TeamDebugHandler	*fTeamHandler;
-	thread_id			fThread;
-	BInvoker			*fInvoker;
-};
-
 
 // TeamDebugHandler
-class TeamDebugHandler {
+class TeamDebugHandler : public BLocker {
 public:
-	TeamDebugHandler(DebugServer *debugServer, team_id team);
+	TeamDebugHandler(team_id team);
 	~TeamDebugHandler();
+
+	status_t Init(port_id nubPort);
 
 	team_id Team() const;
 
-	bool HandleMessage(DebugMessage *message);
-
-	void EnterDebugger();
-	void KillTeam();
+	status_t PushMessage(DebugMessage *message);
 
 private:
-	void _ContinueThread(thread_id thread);
-	void _DeleteThreadHandler(ThreadDebugHandler *handler);
+	status_t _PopMessage(DebugMessage *&message);
+
+	thread_id _EnterDebugger();
+	void _KillTeam();
+
+	bool _HandleMessage(DebugMessage *message);
+
+	status_t _InitGUI();
+
+	static status_t _HandlerThreadEntry(void *data);
+	status_t _HandlerThread();
+
+	bool _ExecutableNameEquals(const char *name) const;
+	bool _IsAppServer() const;
+	bool _IsInputServer() const;
+	bool _IsRegistrar() const;
+	bool _IsGUIServer() const;
+
+	static team_id _FindTeam(const char *name);
+	static bool _AreGUIServersAlive();
 
 private:
-	typedef map<team_id, ThreadDebugHandler*>	ThreadDebugHandlerMap;
-
-	DebugServer				*fDebugServer;
+	DebugMessageList		fMessages;
+	sem_id					fMessageCountSem;
 	team_id					fTeam;
-	port_id					fNubPort;
-	ThreadDebugHandlerMap	fThreadDebugHandlers;
+	team_info				fTeamInfo;
+	char					fExecutablePath[B_PATH_NAME_LENGTH];
+	thread_id				fHandlerThread;
+	debug_context			fDebugContext;
 };
 
+
+// TeamDebugHandlerRoster
+class TeamDebugHandlerRoster : public BLocker {
+private:
+	TeamDebugHandlerRoster()
+		: BLocker("team debug handler roster")
+	{
+	}
+
+public:
+	static TeamDebugHandlerRoster *CreateDefault()
+	{
+		if (!sRoster)
+			sRoster = new(nothrow) TeamDebugHandlerRoster;
+
+		return sRoster;
+	}
+
+	static TeamDebugHandlerRoster *Default()
+	{
+		return sRoster;
+	}
+
+	bool AddHandler(TeamDebugHandler *handler)
+	{
+		if (!handler)
+			return false;
+
+		BAutolock _(this);
+
+		fHandlers[handler->Team()] = handler;
+
+		return true;
+	}
+
+	TeamDebugHandler *RemoveHandler(team_id team)
+	{
+		BAutolock _(this);
+
+		TeamDebugHandler *handler = NULL;
+
+		TeamDebugHandlerMap::iterator it = fHandlers.find(team);
+		if (it != fHandlers.end()) {
+			handler = it->second;
+			fHandlers.erase(it);
+		}
+
+		return handler;
+	}
+
+	TeamDebugHandler *HandlerFor(team_id team)
+	{
+		BAutolock _(this);
+
+		TeamDebugHandler *handler = NULL;
+
+		TeamDebugHandlerMap::iterator it = fHandlers.find(team);
+		if (it != fHandlers.end())
+			handler = it->second;
+
+		return handler;
+	}
+
+	status_t DispatchMessage(DebugMessage *message)
+	{
+		if (!message)
+			return B_BAD_VALUE;
+
+		ObjectDeleter<DebugMessage> messageDeleter(message);
+
+		team_id team = message->Data().origin.team;
+
+		// get the responsible team debug handler
+		BAutolock _(this);
+
+		TeamDebugHandler *handler = HandlerFor(team);
+		if (!handler) {
+			// no handler yet, we need to create one
+			handler = new(nothrow) TeamDebugHandler(team);
+			if (!handler) {
+				KillTeam(team);
+				return B_NO_MEMORY;
+			}
+
+			status_t error = handler->Init(message->Data().origin.nub_port);
+			if (error != B_OK) {
+				delete handler;
+				KillTeam(team);
+				return error;
+			}
+
+			if (!AddHandler(handler)) {
+				delete handler;
+				KillTeam(team);
+				return B_NO_MEMORY;
+			}
+		}
+
+		// hand over the message to it
+		handler->PushMessage(message);
+		messageDeleter.Detach();
+
+		return B_OK;
+	}
+
+private:
+	typedef map<team_id, TeamDebugHandler*>	TeamDebugHandlerMap;
+
+	static TeamDebugHandlerRoster	*sRoster;
+
+	TeamDebugHandlerMap				fHandlers;
+};
+
+TeamDebugHandlerRoster *TeamDebugHandlerRoster::sRoster = NULL;
+
+
 // DebugServer
-class DebugServer 
-#if USE_BE_APPLICATION
-	: public BApplication
-#else
-	: public BLooper 
-#endif
+class DebugServer : public BServer
 {
 public:
 	DebugServer(status_t &error);
 
 	status_t Init();
 
-	virtual void MessageReceived(BMessage *message);
-
-	void EnterDebugger(TeamDebugHandler *handler);
-	void KillTeam(TeamDebugHandler *handler);
+	virtual bool QuitRequested();
 
 private:
 	static status_t _ListenerEntry(void *data);
@@ -126,46 +269,238 @@ private:
 	port_id				fListenerPort;
 	thread_id			fListener;
 	bool				fTerminating;
-
-	TeamDebugHandlerMap	fTeamDebugHandlers;
-	DebugMessageList	fDebugMessages;
 };
 
 
 // #pragma mark -
 
 // constructor
-ThreadDebugHandler::ThreadDebugHandler(TeamDebugHandler *teamHandler,
-	thread_id thread)
-	: fTeamHandler(teamHandler),
-	  fThread(thread),
-	  fInvoker(NULL)
+TeamDebugHandler::TeamDebugHandler(team_id team)
+	: BLocker("team debug handler"),
+	  fMessages(),
+	  fMessageCountSem(-1),
+	  fTeam(team),
+	  fHandlerThread(-1)
 {
+	fDebugContext.nub_port = -1;
+	fDebugContext.reply_port = -1;
+
+	fExecutablePath[0] = '\0';
 }
 
 // destructor
-ThreadDebugHandler::~ThreadDebugHandler()
+TeamDebugHandler::~TeamDebugHandler()
 {
-	delete fInvoker;
+	// delete the message count semaphore and wait for the thread to die
+	if (fMessageCountSem >= 0)
+		delete_sem(fMessageCountSem);
+
+	if (fHandlerThread >= 0 && find_thread(NULL) != fHandlerThread) {
+		status_t result;
+		wait_for_thread(fHandlerThread, &result);
+	}
+
+	// destroy debug context
+	if (fDebugContext.nub_port >= 0)
+		destroy_debug_context(&fDebugContext);
+
+	// delete the remaining messages
+	while (DebugMessage *message = fMessages.Head()) {
+		fMessages.Remove(message);
+		delete message;
+	}
 }
 
-// Thread
+// Init
+status_t
+TeamDebugHandler::Init(port_id nubPort)
+{
+	// get the team info for the team
+	status_t error = get_team_info(fTeam, &fTeamInfo);
+	if (error != B_OK) {
+		printf("debug_server: TeamDebugHandler::Init(): Failed to get info "
+			"for team %ld: %s\n", fTeam, strerror(error));
+		return error;
+	}
+
+	// get the executable path
+	error = BPrivate::get_app_path(fTeam, fExecutablePath);
+	if (error != B_OK) {
+		printf("debug_server: TeamDebugHandler::Init(): Failed to get "
+			"executable path of team %ld: %s\n", fTeam, strerror(error));
+
+		fExecutablePath[0] = '\0';
+	}
+
+	// init a debug context for the handler
+	error = init_debug_context(&fDebugContext, nubPort);
+	if (error != B_OK) {
+		printf("debug_server: TeamDebugHandler::Init(): Failed to init "
+			"debug context for team %ld, port %ld: %s\n", fTeam, nubPort,
+			strerror(error));
+		return error;
+	}
+
+	// create the message count semaphore
+	char name[B_OS_NAME_LENGTH];
+	snprintf(name, sizeof(name), "team %ld message count", fTeam);
+	fMessageCountSem = create_sem(0, name);
+	if (fMessageCountSem < 0) {
+		printf("debug_server: TeamDebugHandler::Init(): Failed to create "
+			"message count semaphore: %s\n", strerror(fMessageCountSem));
+		return fMessageCountSem;
+	}
+
+	// spawn the handler thread
+	snprintf(name, sizeof(name), "team %ld handler", fTeam);
+	fHandlerThread = spawn_thread(&_HandlerThreadEntry, name, B_NORMAL_PRIORITY,
+		this);
+	if (fHandlerThread < 0) {
+		printf("debug_server: TeamDebugHandler::Init(): Failed to spawn "
+			"handler thread: %s\n", strerror(fHandlerThread));
+		return fHandlerThread;
+	}
+
+	resume_thread(fHandlerThread);
+
+	return B_OK;
+}
+
+// Team
+team_id
+TeamDebugHandler::Team() const
+{
+	return fTeam;
+}
+
+// PushMessage
+status_t
+TeamDebugHandler::PushMessage(DebugMessage *message)
+{
+	BAutolock _(this);
+
+	fMessages.Add(message);
+	release_sem(fMessageCountSem);
+
+	return B_OK;
+}
+
+// _PopMessage
+status_t
+TeamDebugHandler::_PopMessage(DebugMessage *&message)
+{
+	// acquire the semaphore
+	status_t error;
+	do {
+		error = acquire_sem(fMessageCountSem);
+	} while (error == B_INTERRUPTED);
+
+	if (error != B_OK)
+		return error;
+
+	// get the message
+	BAutolock _(this);
+
+	message = fMessages.Head();
+	fMessages.Remove(message);
+
+	return B_OK;
+}
+
+// _EnterDebugger
+
 thread_id
-ThreadDebugHandler::Thread() const
+TeamDebugHandler::_EnterDebugger()
 {
-	return fThread;
+	TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): team %ld\n",
+		fTeam));
+
+	bool debugInConsoled = _IsAppServer();
+
+	if (debugInConsoled) {
+		TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): team %ld is "
+			"the app server. Killing input_server...\n", fTeam));
+
+		// kill the input server
+		team_id isTeam = _FindTeam("input_server");
+		if (isTeam >= 0) {
+			printf("debug_server: preparing for debugging the app server: "
+				"killing the input server\n");
+			kill_team(isTeam);
+		}
+	}
+
+	// prepare a debugger handover
+	TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): preparing "
+		"debugger handover for team %ld...\n", fTeam));
+
+	status_t error = send_debug_message(&fDebugContext,
+		B_DEBUG_MESSAGE_PREPARE_HANDOVER, NULL, 0, NULL, 0);
+	if (error != B_OK) {
+		printf("debug_server: Failed to prepare debugger handover: %s\n",
+			strerror(error));
+		return error;
+	}
+
+	// prepare the argument vector
+	char teamString[32];
+	snprintf(teamString, sizeof(teamString), "%ld", fTeam);
+
+	const char *terminal = (debugInConsoled ? kConsoledPath : kTerminalPath);
+
+	const char *argv[] = {
+		terminal, kGDBPath, fExecutablePath, teamString, NULL
+	};
+	int argc = 4;
+
+	// start the terminal
+	TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): starting  "
+		"terminal (debugger) for team %ld...\n", fTeam));
+
+	thread_id thread = load_image(argc, argv, (const char**)environ);
+	if (thread < 0) {
+		printf("debug_server: Failed to start consoled + gdb: %s\n",
+			strerror(thread));
+		return thread;
+	}
+	resume_thread(thread);
+
+	TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): debugger started "
+		"for team %ld: thread: %ld\n", fTeam, thread));
+
+	return thread;
 }
 
-// HandleMessage
-bool
-ThreadDebugHandler::HandleMessage(DebugMessage *message)
+// _KillTeam
+void
+TeamDebugHandler::_KillTeam()
 {
-	if (!fInvoker)
-		fInvoker = new BInvoker(new BMessage(ALERT_MESSAGE), this);
+	KillTeam(fTeam, fTeamInfo.args);
+}
+
+// _HandleMessage
+bool
+TeamDebugHandler::_HandleMessage(DebugMessage *message)
+{
+	// This method is called only for the first message the debugger gets for
+	// a team. That means only a few messages are actually possible, while
+	// others wouldn't trigger the debugger in the first place. So we deal with
+	// all of them the same way, by popping up an alert.
+	TRACE(("debug_server: TeamDebugHandler::_HandleMessage(): team %ld, code: "
+		"%ld\n", fTeam, (int32)message->Code()));
+
+	thread_id thread = message->Data().origin.thread;
 
 	// get some user-readable message
 	char buffer[512];
 	switch (message->Code()) {
+		case B_DEBUGGER_MESSAGE_TEAM_DELETED:
+			// This shouldn't happen.
+			printf("debug_server: Got a spurious "
+				"B_DEBUGGER_MESSAGE_TEAM_DELETED message for team %ld\n",
+				fTeam);
+			return true;
+
 		case B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED:
 			get_debug_exception_string(
 				message->Data().exception_occurred.exception, buffer,
@@ -177,17 +512,11 @@ ThreadDebugHandler::HandleMessage(DebugMessage *message)
 			// get the debugger() message
 			void *messageAddress = message->Data().debugger_call.message;
 			char messageBuffer[128];
-			debug_context context;
-			status_t error = init_debug_context(&context,
-				message->Data().origin.nub_port);
-			if (error == B_OK) {
-				ssize_t bytesRead = debug_read_string(&context, messageAddress,
-					messageBuffer, sizeof(messageBuffer));
-				if (bytesRead < 0)
-					error = bytesRead;
-
-				destroy_debug_context(&context);
-			}
+			status_t error = B_OK;
+			ssize_t bytesRead = debug_read_string(&fDebugContext,
+				messageAddress, messageBuffer, sizeof(messageBuffer));
+			if (bytesRead < 0)
+				error = bytesRead;
 
 			if (error == B_OK) {
 				sprintf(buffer, "Debugger call: `%s'", messageBuffer);
@@ -199,18 +528,12 @@ ThreadDebugHandler::HandleMessage(DebugMessage *message)
 			break;
 		}
 
-		case B_DEBUGGER_MESSAGE_THREAD_DEBUGGED:
-		case B_DEBUGGER_MESSAGE_BREAKPOINT_HIT:
-		case B_DEBUGGER_MESSAGE_WATCHPOINT_HIT:
-		case B_DEBUGGER_MESSAGE_SINGLE_STEP:
 		default:
 			get_debug_message_string(message->Code(), buffer, sizeof(buffer));
 			break;
 	}
 
-	// TODO: This would be the point to pop up an asynchronous alert.
-	// We just print the error and send a message to ourselves.
-	printf("debug_server: Thread %ld entered the debugger: %s\n", fThread,
+	printf("debug_server: Thread %ld entered the debugger: %s\n", thread,
 		buffer);
 
 // TODO: Temporary solution. Remove when attaching gdb is working.
@@ -218,14 +541,8 @@ ThreadDebugHandler::HandleMessage(DebugMessage *message)
 	// print a stacktrace
 	void *ip = NULL;
 	void *stackFrameAddress = NULL;
-	debug_context context;
-	status_t error = init_debug_context(&context,
-		message->Data().origin.nub_port);
-	
-	if (error == B_OK) {
-		error = debug_get_instruction_pointer(&context,
-			message->Data().origin.thread, &ip, &stackFrameAddress);
-	}
+	status_t error = debug_get_instruction_pointer(&fDebugContext, thread, &ip,
+		&stackFrameAddress);
 
 	if (error == B_OK) {
 		printf("stack trace, current PC %p:\n", ip);
@@ -233,19 +550,21 @@ ThreadDebugHandler::HandleMessage(DebugMessage *message)
 		for (int32 i = 0; i < 50; i++) {
 			debug_stack_frame_info stackFrameInfo;
 
-			error = debug_get_stack_frame(&context, stackFrameAddress,
+			error = debug_get_stack_frame(&fDebugContext, stackFrameAddress,
 				&stackFrameInfo);
 			if (error < B_OK || stackFrameInfo.parent_frame == NULL)
 				break;
 
 			// find area containing the IP
-			team_id team = fTeamHandler->Team();
+			team_id team = fTeam;
 			bool useAreaInfo = false;
 			area_info info;
 			int32 cookie = 0;
 			while (get_next_area_info(team, &cookie, &info) == B_OK) {
-				if ((addr_t)info.address <= (addr_t)stackFrameInfo.return_address
-					&& (addr_t)info.address + info.size > (addr_t)stackFrameInfo.return_address) {
+				if ((addr_t)info.address
+						<= (addr_t)stackFrameInfo.return_address
+					&& (addr_t)info.address + info.size
+						> (addr_t)stackFrameInfo.return_address) {
 					useAreaInfo = true;
 					break;
 				}
@@ -255,7 +574,8 @@ ThreadDebugHandler::HandleMessage(DebugMessage *message)
 				stackFrameInfo.return_address);
 			if (useAreaInfo) {
 				printf("  (%s + %#lx)\n", info.name,
-					(addr_t)stackFrameInfo.return_address - (addr_t)info.address);
+					(addr_t)stackFrameInfo.return_address
+						- (addr_t)info.address);
 			} else
 				putchar('\n');
 
@@ -264,165 +584,199 @@ ThreadDebugHandler::HandleMessage(DebugMessage *message)
 	}
 #endif
 
-	BMessage alertMessage(*fInvoker->Message());
-	alertMessage.AddInt32("which", 1);
-	fInvoker->Invoke(&alertMessage);
+	bool kill = true;
 
-	return false;
-}
+	// ask the user whether to debug or kill the team
+	if (_IsGUIServer()) {
+		// App or input server. If it's the app server, we'll try to debug it.
+		kill = !(_IsAppServer() && strlen(fExecutablePath) > 0);
 
-// MessageReceived
-void
-ThreadDebugHandler::MessageReceived(BMessage *message)
-{
-	if (message->what == ALERT_MESSAGE) {
-printf("debug_server: ALERT_MESSAGE received for thread %ld\n", fThread);
-		int32 which;
-		if (message->FindInt32("which", &which) != B_OK)
-			which = 1;
+	} else if (USE_GUI && _AreGUIServersAlive() && _InitGUI() == B_OK) {
+		// normal app
+		char buffer[1024];
+		snprintf(buffer, sizeof(buffer), "The application:\n\n      %s\n\n"
+			"has encountered an error which prevents it from continuing. Haiku "
+			"will terminate the application and clean up.", fTeamInfo.args);
 
-		if (which == 0)
-			fTeamHandler->EnterDebugger();
-		else
-			fTeamHandler->KillTeam();
+		if (strlen(fExecutablePath) > 0) {
+			// we have a usable path, so we can debug the team
+			BAlert *alert = new BAlert(NULL, buffer, "Debug", "OK", NULL,
+				B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			int32 result = alert->Go();
+			kill = (result == 1);
+		} else {
+			// no usable path
+			BAlert *alert = new BAlert(NULL, buffer, "OK", NULL, NULL,
+				B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alert->Go();
+		}
 	}
+
+	return kill;
 }
 
-
-// #pragma mark -
-
-// constructor
-TeamDebugHandler::TeamDebugHandler(DebugServer *debugServer, team_id team)
-	: fDebugServer(debugServer),
-	  fTeam(team),
-	  fNubPort(-1),
-	  fThreadDebugHandlers()
+// _InitGUI
+status_t
+TeamDebugHandler::_InitGUI()
 {
+	DebugServer *app = dynamic_cast<DebugServer*>(be_app);
+	BAutolock _(app);
+	return app->InitGUIContext();
 }
 
-// destructor
-TeamDebugHandler::~TeamDebugHandler()
+// _HandlerThreadEntry
+status_t
+TeamDebugHandler::_HandlerThreadEntry(void *data)
 {
-	// delete all thread debug handlers.
-	for (ThreadDebugHandlerMap::iterator it = fThreadDebugHandlers.begin();
-		 it != fThreadDebugHandlers.end();
-		 it = fThreadDebugHandlers.begin()) {
-		_DeleteThreadHandler(it->second);
+	return ((TeamDebugHandler*)data)->_HandlerThread();
+}
+
+// _HandlerThread
+status_t
+TeamDebugHandler::_HandlerThread()
+{
+	TRACE(("debug_server: TeamDebugHandler::_HandlerThread(): team %ld\n",
+		fTeam));
+
+	// get initial message
+	TRACE(("debug_server: TeamDebugHandler::_HandlerThread(): team %ld: "
+		"getting message...\n", fTeam));
+
+	DebugMessage *message;
+	status_t error = _PopMessage(message);
+	bool kill;
+	if (error == B_OK) {
+		// handle the message
+		kill = _HandleMessage(message);
+		delete message;
+	} else {
+		printf("TeamDebugHandler::_HandlerThread(): Failed to pop initial "
+			"message: %s", strerror(error));
+		kill = true;
 	}
+
+	// kill the team or hand it over to the debugger
+	thread_id debuggerThread;
+	if (kill) {
+		// The team shall be killed. Since that is also the handling in case
+		// an error occurs while handing over the team to the debugger, we do
+		// nothing here.
+	} else if ((debuggerThread = _EnterDebugger()) >= 0) {
+		// wait for the "handed over" or a "team deleted" message
+		bool terminate = false;
+		do {
+			error = _PopMessage(message);
+			if (error != B_OK) {
+				printf("TeamDebugHandler::_HandlerThread(): Failed to pop "
+					"message: %s", strerror(error));
+				kill = true;
+				break;
+			}
+	
+			if (message->Code() == B_DEBUGGER_MESSAGE_HANDED_OVER) {
+				// The team has successfully been handed over to the debugger.
+				// Nothing to do.
+				terminate = true;
+			} else if (message->Code() == B_DEBUGGER_MESSAGE_TEAM_DELETED) {
+				// The team died. Nothing to do.
+				terminate = true;
+			} else {
+				// Some message we can ignore. The debugger will take care of
+				// it.
+
+				// check whether the debugger thread still lives
+				thread_info threadInfo;
+				if (get_thread_info(debuggerThread, &threadInfo) != B_OK) {
+					// the debugger is gone
+					printf("debug_server: The debugger for team %ld seems to "
+						"be gone.", fTeam);
+
+					kill = true;
+					terminate = true;
+				}
+			}
+	
+			delete message;
+	
+		} while (!terminate);
+	} else
+		kill = true;
+
+	if (kill) {
+		// kill the team
+		_KillTeam();
+
+		// remove this handler from the roster and delete it
+		TeamDebugHandlerRoster::Default()->RemoveHandler(fTeam);
+
+		delete this;
+	}
+
+	return B_OK;
 }
 
-// Team
-team_id
-TeamDebugHandler::Team() const
-{
-	return fTeam;
-}
-
-// HandleMessage
+// _ExecutableNameEquals
 bool
-TeamDebugHandler::HandleMessage(DebugMessage *message)
+TeamDebugHandler::_ExecutableNameEquals(const char *name) const
 {
-	thread_id thread = message->Data().origin.thread;
-
-	switch (message->Code()) {
-		case B_DEBUGGER_MESSAGE_THREAD_DEBUGGED:
-		case B_DEBUGGER_MESSAGE_DEBUGGER_CALL:
-		case B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED:
-		case B_DEBUGGER_MESSAGE_BREAKPOINT_HIT:
-		case B_DEBUGGER_MESSAGE_WATCHPOINT_HIT:
-		case B_DEBUGGER_MESSAGE_SINGLE_STEP:
-		{
-			fNubPort = message->Data().origin.nub_port;
-
-			// create a thread debug handler
-			ThreadDebugHandler *handler
-				= new ThreadDebugHandler(this, thread);
-			fThreadDebugHandlers[thread] = handler;
-			fDebugServer->AddHandler(handler);
-
-			// let the handler deal with the message
-			if (handler->HandleMessage(message))
-				_DeleteThreadHandler(handler);
-
-			break;
-		}
-
-		case B_DEBUGGER_MESSAGE_TEAM_DELETED:
-			return true;
-
-		case B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED:
-			// A signal doesn't usually trigger the debugger.
-			// Just let the thread continue and see what happens next.
-		case B_DEBUGGER_MESSAGE_PRE_SYSCALL:
-		case B_DEBUGGER_MESSAGE_POST_SYSCALL:
-		case B_DEBUGGER_MESSAGE_TEAM_CREATED:
-		case B_DEBUGGER_MESSAGE_THREAD_CREATED:
-		case B_DEBUGGER_MESSAGE_THREAD_DELETED:
-		case B_DEBUGGER_MESSAGE_IMAGE_CREATED:
-		case B_DEBUGGER_MESSAGE_IMAGE_DELETED:
-			fNubPort = message->Data().origin.nub_port;
-			_ContinueThread(thread);
-			break;
-	}
-
-	return fThreadDebugHandlers.empty();
+	const char *lastSlash = strrchr(fExecutablePath, '/');
+	const char *executableName = (lastSlash ? lastSlash + 1 : fExecutablePath);
+	return (strcmp(executableName, name) == 0);
 }
 
-// EnterDebugger
-void
-TeamDebugHandler::EnterDebugger()
+// _IsAppServer
+bool
+TeamDebugHandler::_IsAppServer() const
 {
-	fDebugServer->EnterDebugger(this);
+	return _ExecutableNameEquals("app_server");
 }
 
-// KillTeam
-void
-TeamDebugHandler::KillTeam()
+// _IsInputServer
+bool
+TeamDebugHandler::_IsInputServer() const
 {
-	fDebugServer->KillTeam(this);
+	return _ExecutableNameEquals("input_server");
 }
 
-// _ContinueThread
-void
-TeamDebugHandler::_ContinueThread(thread_id thread)
+// _IsRegistrar
+bool
+TeamDebugHandler::_IsRegistrar() const
 {
-	debug_nub_continue_thread message;
-	message.thread = thread;
-	message.handle_event = B_THREAD_DEBUG_HANDLE_EVENT;
-	message.single_step = false;
+	return _ExecutableNameEquals("registrar");
+}
 
-	while (true) {
-		status_t error = write_port(fNubPort, B_DEBUG_MESSAGE_CONTINUE_THREAD,
-			&message, sizeof(message));
-		if (error == B_OK)
-			return;
+// _IsGUIServer
+bool
+TeamDebugHandler::_IsGUIServer() const
+{
+	// app or input server
+	return (_IsAppServer() || _IsInputServer() || _IsRegistrar());
+}
 
-		if (error != B_INTERRUPTED) {
-			fprintf(stderr, "debug_server: Failed to run thread %ld: %s\n",
-				thread, strerror(error));
-			return;
+// _FindTeam
+team_id
+TeamDebugHandler::_FindTeam(const char *name)
+{
+	// Iterate through all teams and check their executable name.
+	int32 cookie = 0;
+	team_info teamInfo;
+	while (get_next_team_info(&cookie, &teamInfo) == B_OK) {
+		entry_ref ref;
+		if (BPrivate::get_app_ref(teamInfo.team, &ref) == B_OK) {
+			if (strcmp(ref.name, name) == 0)
+				return teamInfo.team;
 		}
 	}
+
+	return B_ENTRY_NOT_FOUND;
 }
 
-// _DeleteThreadHandler
-void
-TeamDebugHandler::_DeleteThreadHandler(ThreadDebugHandler *handler)
+// _AreGUIServersAlive
+bool
+TeamDebugHandler::_AreGUIServersAlive()
 {
-	if (!handler)
-		return;
-
-	// remove handler from the map
-	thread_id thread = handler->Thread();
-	ThreadDebugHandlerMap::iterator it = fThreadDebugHandlers.find(thread);
-	if (it != fThreadDebugHandlers.end())
-		fThreadDebugHandlers.erase(it);
-
-	// remove handler from the debug server
-	if (handler->Looper())
-		handler->Looper()->RemoveHandler(handler);
-
-	delete handler;
+	return (_FindTeam("app_server") >= 0 && _FindTeam("input_server") >= 0
+		&& _FindTeam("registrar"));
 }
 
 
@@ -430,20 +784,11 @@ TeamDebugHandler::_DeleteThreadHandler(ThreadDebugHandler *handler)
 
 // constructor
 DebugServer::DebugServer(status_t &error)
-#if USE_BE_APPLICATION
-	: BApplication(kSignature, &error),
-#else
-	: BLooper(kSignature),
-#endif
+	: BServer(kSignature, false, &error),
 	  fListenerPort(-1),
 	  fListener(-1),
-	  fTerminating(false),
-	  fTeamDebugHandlers(),
-	  fDebugMessages()
+	  fTerminating(false)
 {
-#if !USE_BE_APPLICATION
-	error = B_OK;
-#endif
 }
 
 // Init
@@ -472,65 +817,12 @@ DebugServer::Init()
 	return B_OK;
 }
 
-// MessageReceived
-void
-DebugServer::MessageReceived(BMessage *message)
+// QuitRequested
+bool
+DebugServer::QuitRequested()
 {
-	if (message->what == DEBUG_MESSAGE) {
-		// get the next debug message
-		if (DebugMessage *message = fDebugMessages.Head()) {
-			fDebugMessages.Remove(message);
-
-			// get the responsible team debug handler
-			team_id team = message->Data().origin.team;
-			TeamDebugHandlerMap::iterator it
-				= fTeamDebugHandlers.find(team);
-			TeamDebugHandler *handler;
-			if (it == fTeamDebugHandlers.end()) {
-				handler = new TeamDebugHandler(this, team);
-				fTeamDebugHandlers[team] = handler;
-			} else
-				handler = it->second;
-
-			// let the handler deal with the message
-			if (handler->HandleMessage(message))
-				_DeleteTeamDebugHandler(handler);
-
-			delete message;
-		}
-	} else {
-#if USE_BE_APPLICATION
-		BApplication::MessageReceived(message);
-#else
-		BLooper::MessageReceived(message);
-#endif
-	}
-}
-
-// EnterDebugger
-void
-DebugServer::EnterDebugger(TeamDebugHandler *handler)
-{
-	// TODO: Start gdb and hand over the team.
-	KillTeam(handler);
-}
-
-// KillTeam
-void
-DebugServer::KillTeam(TeamDebugHandler *handler)
-{
-	team_id team = handler->Team();
-	team_info info;
-	get_team_info(team, &info);
-
-	fprintf(stderr, "debug_server: Killing team %ld (%s)\n", team, info.args);
-
-	kill_team(team);
-
-	_DeleteTeamDebugHandler(handler);
-
-	// TODO: We should actually iterate through the debug message list and
-	// remove all messages for the team.
+	// Never give up, never surrender. ;-)
+	return false;
 }
 
 // _ListenerEntry
@@ -559,34 +851,16 @@ DebugServer::_Listener()
 				"%s\n", strerror(bytesRead));
 			exit(1);
 		}
+TRACE(("debug_server: Got debug message: team: %ld, code: %ld\n",
+message->Data().origin.team, code));
 
 		message->SetCode((debug_debugger_message)code);
 
-		// queue the message and send notify the app
-		Lock();
-		fDebugMessages.Add(message);
-		Unlock();
-
-		PostMessage(DEBUG_MESSAGE);
+		// dispatch the message
+		TeamDebugHandlerRoster::Default()->DispatchMessage(message);
 	}
 
 	return B_OK;
-}
-
-// _DeleteTeamDebugHandler
-void
-DebugServer::_DeleteTeamDebugHandler(TeamDebugHandler *handler)
-{
-	if (!handler)
-		return;
-
-	// remove handler from the map
-	team_id team = handler->Team();
-	TeamDebugHandlerMap::iterator it = fTeamDebugHandlers.find(team);
-	if (it != fTeamDebugHandlers.end())
-		fTeamDebugHandlers.erase(it);
-	
-	delete handler;
 }
 
 
@@ -608,6 +882,13 @@ main()
 	dup2(console, STDERR_FILENO);
 	close(console);
 
+	// create the team debug handler roster
+	if (!TeamDebugHandlerRoster::CreateDefault()) {
+		fprintf(stderr, "debug_server: Failed to create team debug handler "
+			"roster.\n");
+		exit(1);
+	}
+
 	// create application
 	DebugServer server(error);
 	if (error != B_OK) {
@@ -615,6 +896,7 @@ main()
 			strerror(error));
 		exit(1);
 	}
+
 	// init application
 	error = server.Init();
 	if (error != B_OK) {
@@ -625,8 +907,5 @@ main()
 
 	server.Run();
 
-#if !USE_BE_APPLICATION
-	wait_for_thread(server.Thread(), NULL);
-#endif
 	return 0;
 }
