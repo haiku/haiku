@@ -90,7 +90,7 @@ status_t eng_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku VIA Accelerant 0.02 running.\n"));
+	LOG(1,("POWERUP: Haiku VIA Accelerant 0.03 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -99,10 +99,40 @@ status_t eng_general_powerup()
 	switch(CFGR(DEVID))
 	{
 	/* Vendor Via */
-	case 0x31221106: /* CLE266 chipset */
-		si->ps.card_type = CLE266;
-		si->ps.card_arch = UNI_PRO;
-		LOG(4,("POWERUP: Detected VIA CLE266 Unichrome Pro\n"));
+	case 0x30221106:
+		si->ps.card_type = CLE3022;
+		si->ps.card_arch = CLE266;
+		LOG(4,("POWERUP: Detected VIA CLE266 Unichrome Pro (CLE3022)\n"));
+		status = engxx_general_powerup();
+		break;
+	case 0x31221106:
+		si->ps.card_type = CLE3122;
+		si->ps.card_arch = CLE266;
+		LOG(4,("POWERUP: Detected VIA CLE266 Unichrome Pro (CLE3122)\n"));
+		status = engxx_general_powerup();
+		break;
+	case 0x32041106:
+		si->ps.card_type = VT3204;
+		si->ps.card_arch = K8M800;
+		LOG(4,("POWERUP: Detected VIA K8M800 Unichrome Pro (VT3204)\n"));
+		status = engxx_general_powerup();
+		break;
+	case 0x32051106:
+		si->ps.card_type = VT3205;
+		si->ps.card_arch = KM400;
+		LOG(4,("POWERUP: Detected VIA KM400 Unichrome (VT3205)\n"));
+		status = engxx_general_powerup();
+		break;
+	case 0x72041106:
+		si->ps.card_type = VT7204;
+		si->ps.card_arch = K8M800;
+		LOG(4,("POWERUP: Detected VIA K8M800 Unichrome Pro (VT7204)\n"));
+		status = engxx_general_powerup();
+		break;
+	case 0x72051106:
+		si->ps.card_type = VT7205;
+		si->ps.card_arch = KM400;
+		LOG(4,("POWERUP: Detected VIA KM400 Unichrome (VT7205)\n"));
 		status = engxx_general_powerup();
 		break;
 	default:

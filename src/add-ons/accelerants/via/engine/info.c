@@ -937,7 +937,7 @@ static void getRAMsize(void)
 {
 	uint8 ram_size = 0;
 
-	if (si->ps.card_type == CLE266)
+	if (si->ps.card_arch == CLE266)
 	{
 		ram_size = SEQR(MSIZE_CLE266);
 	}
