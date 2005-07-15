@@ -113,7 +113,7 @@ BEOS_BIN="touch sync ln listarea listattr listsem listport \
 
 BEOS_APPS="MiniTerminal Expander People ShowImage Clock Pulse Playground \
 	SoundRecorder BitmapDrawing Magnify DiskProbe AboutHaiku StyledEdit"
-BEOS_PREFERENCES="Backgrounds DataTranslations FileTypes Media Menu Mouse \
+BEOS_PREFERENCES="Backgrounds DataTranslations FileTypes Fonts Media Menu Mouse \
 	Keyboard Keymap Screen ScrollBar Sounds Time VirtualMemory Workspaces"
 
 BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so libmedia.so libtracker.so \
