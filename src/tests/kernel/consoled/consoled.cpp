@@ -7,15 +7,16 @@
  */
 
 
-#include <OS.h>
 #include <image.h>
+#include <OS.h>
 
-#include <termios.h>
-#include <unistd.h>
+#include <ctype.h>
 #include <dirent.h>
-#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <termios.h>
+#include <unistd.h>
 
 
 //#define USE_INPUT_SERVER
@@ -291,7 +292,7 @@ start_process(int argc, const char **argv, struct console *con)
 
 
 int
-main(void)
+main(int argc, char **argv)
 {
 	int err;
 
@@ -309,18 +310,38 @@ main(void)
 	dup2(gConsole.tty_slave_fd, 1);
 	dup2(gConsole.tty_slave_fd, 2);
 
-	for (;;) {
-		pid_t shell_process;
+	if (argc > 1) {
+		// a command was given: we run it only once
+
+		// get the command argument vector
+		int commandArgc = argc - 1;
+		const char **commandArgv = new const char*[commandArgc + 1];
+		for (int i = 0; i < commandArgc; i++)
+			commandArgv[i] = argv[i + 1];
+
+		commandArgv[commandArgc] = NULL;
+
+		// start the process
+		pid_t process;
 		status_t returnCode;
-		const char *argv[3];
 
-		argv[0] = "/bin/sh";
-		argv[1] = "--login";
-		shell_process = start_process(2, argv, &gConsole);
+		process = start_process(commandArgc, commandArgv, &gConsole);
 
-		wait_for_thread(shell_process, &returnCode);
+		wait_for_thread(process, &returnCode);
 
-		puts("Restart shell");
+	} else {
+		// no command given: start a shell in an endless loop
+		for (;;) {
+			pid_t shellProcess;
+			status_t returnCode;
+			const char *shellArgv[] = { "/bin/sh", "--login", NULL };
+
+			shellProcess = start_process(2, shellArgv, &gConsole);
+	
+			wait_for_thread(shellProcess, &returnCode);
+	
+			puts("Restart shell");
+		}
 	}
 
 	acquire_sem(gConsole.wait_sem);
