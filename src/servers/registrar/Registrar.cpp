@@ -362,7 +362,7 @@ main()
 	status_t error;
 	Registrar *app = new Registrar(&error);
 	if (error != B_OK) {
-		fprintf(stderr, "Failed to create the BApplication: %s\n",
+		fprintf(stderr, "REG: Failed to create the BApplication: %s\n",
 			strerror(error));
 		return 1;
 	}
