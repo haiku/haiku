@@ -584,6 +584,7 @@ status_t eng_general_validate_pic_size (display_mode *target, uint32 *bytes_per_
 	uint8 depth = 8;
 
 	/* determine pixel multiple based on 2D/3D engine constraints */
+//via fixme.
 	switch (si->ps.card_arch)
 	{
 	default:
@@ -600,19 +601,23 @@ status_t eng_general_validate_pic_size (display_mode *target, uint32 *bytes_per_
 				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
 				return B_ERROR;
 		}
-		/* NV31 (confirmed GeForceFX 5600) has NV20A granularity!
-		 * So let it fall through... */
-		if (si->ps.card_type != NV31) break;
-	case NV20A:
-		/* confirmed for:
-		 * GeForce4 Ti4200 */
+		break;
+	}
+
+//via ok:
+	/* determine pixel multiple based on CRTC memory pitch constraints.
+	 * (Note: Don't mix this up with CRTC timing contraints! Those are
+	 *        multiples of 8 for horizontal, 1 for vertical timing.) */
+	switch (si->ps.card_type)
+	{
+	default:
 		switch (target->space)
 		{
-			case B_CMAP8: acc_mask = 0x3f; depth =  8; break;
-			case B_RGB15: acc_mask = 0x1f; depth = 16; break;
-			case B_RGB16: acc_mask = 0x1f; depth = 16; break;
-			case B_RGB24: acc_mask = 0x3f; depth = 24; break;
-			case B_RGB32: acc_mask = 0x0f; depth = 32; break;
+			case B_CMAP8: crtc_mask = 0x07; break;
+			case B_RGB15: crtc_mask = 0x03; break;
+			case B_RGB16: crtc_mask = 0x03; break;
+			case B_RGB24: crtc_mask = 0x07; break;
+			case B_RGB32: crtc_mask = 0x01; break;
 			default:
 				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
 				return B_ERROR;
@@ -620,58 +625,8 @@ status_t eng_general_validate_pic_size (display_mode *target, uint32 *bytes_per_
 		break;
 	}
 
-	/* determine pixel multiple based on CRTC memory pitch constraints:
-	 * -> all NV cards have same granularity constraints on CRTC1 and CRTC2,
-	 *    provided that the CRTC1 and CRTC2 BUFFER register b2 = 0;
-	 *
-	 * (Note: Don't mix this up with CRTC timing contraints! Those are
-	 *        multiples of 8 for horizontal, 1 for vertical timing.) */
-	switch (si->ps.card_type)
-	{
-	default:
-//	case NV04:
-		/* confirmed for:
-		 * TNT1 always;
-		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForce4 Ti4200,
-		 * GeForceFX 5200: if the CRTC1 (and CRTC2) BUFFER register b2 = 0 */
-		/* NOTE:
-		 * Unfortunately older cards have a hardware fault that prevents use.
-		 * We need doubled granularity on those to prevent the single top line
-		 * from shifting to the left!
-		 * This is confirmed for TNT2, GeForce2 MX200, GeForce2 MX400.
-		 * Confirmed OK are:
-		 * GeForce4 MX440, GeForce4 Ti4200, GeForceFX 5200. */
-		switch (target->space)
-		{
-			case B_CMAP8: crtc_mask = 0x0f; break; /* 0x07 */
-			case B_RGB15: crtc_mask = 0x07; break; /* 0x03 */
-			case B_RGB16: crtc_mask = 0x07; break; /* 0x03 */
-			case B_RGB24: crtc_mask = 0x0f; break; /* 0x07 */
-			case B_RGB32: crtc_mask = 0x03; break; /* 0x01 */
-			default:
-				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
-				return B_ERROR;
-		}
-		break;
-//	default:
-		/* confirmed for:
-		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForce4 Ti4200,
-		 * GeForceFX 5200: if the CRTC1 (and CRTC2) BUFFER register b2 = 1 */
-/*		switch (target->space)
-		{
-			case B_CMAP8: crtc_mask = 0x1f; break;
-			case B_RGB15: crtc_mask = 0x0f; break;
-			case B_RGB16: crtc_mask = 0x0f; break;
-			case B_RGB24: crtc_mask = 0x1f; break;
-			case B_RGB32: crtc_mask = 0x07; break;
-			default:
-				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
-				return B_ERROR;
-		}
-		break;
-*/	}
-
 	/* set virtual_width limit for accelerated modes */
+//via fixme:
 	switch (si->ps.card_arch)
 	{
 	case NV04A:
@@ -723,51 +678,24 @@ status_t eng_general_validate_pic_size (display_mode *target, uint32 *bytes_per_
 		break;
 	}
 
+//via ok:
 	/* set virtual_width limit for unaccelerated modes */
 	switch (si->ps.card_type)
 	{
 	default:
-//	case NV04:
-		/* confirmed for:
-		 * TNT1 always;
-		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForce4 Ti4200,
-		 * GeForceFX 5200: if the CRTC1 (and CRTC2) BUFFER register b2 = 0 */
-		/* NOTE:
-		 * Unfortunately older cards have a hardware fault that prevents use.
-		 * We need doubled granularity on those to prevent the single top line
-		 * from shifting to the left!
-		 * This is confirmed for TNT2, GeForce2 MX200, GeForce2 MX400.
-		 * Confirmed OK are:
-		 * GeForce4 MX440, GeForce4 Ti4200, GeForceFX 5200. */
 		switch(target->space)
 		{
-			case B_CMAP8: max_crtc_width = 16368; break; /* 16376 */
-			case B_RGB15: max_crtc_width =  8184; break; /*  8188 */
-			case B_RGB16: max_crtc_width =  8184; break; /*  8188 */
-			case B_RGB24: max_crtc_width =  5456; break; /*  5456 */
-			case B_RGB32: max_crtc_width =  4092; break; /*  4094 */
+			case B_CMAP8: max_crtc_width = 16376; break;
+			case B_RGB15: max_crtc_width =  8188; break;
+			case B_RGB16: max_crtc_width =  8188; break;
+			case B_RGB24: max_crtc_width =  5456; break;
+			case B_RGB32: max_crtc_width =  4094; break;
 			default:
 				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
 				return B_ERROR;
 		}
 		break;
-//	default:
-		/* confirmed for:
-		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForce4 Ti4200,
-		 * GeForceFX 5200: if the CRTC1 (and CRTC2) BUFFER register b2 = 1 */
-/*		switch(target->space)
-		{
-			case B_CMAP8: max_crtc_width = 16352; break;
-			case B_RGB15: max_crtc_width =  8176; break;
-			case B_RGB16: max_crtc_width =  8176; break;
-			case B_RGB24: max_crtc_width =  5440; break;
-			case B_RGB32: max_crtc_width =  4088; break;
-			default:
-				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
-				return B_ERROR;
-		}
-		break;
-*/	}
+	}
 
 	/* check for acc capability, and adjust mode to adhere to hardware constraints */
 	if (max_acc_width <= max_crtc_width)
@@ -807,7 +735,9 @@ status_t eng_general_validate_pic_size (display_mode *target, uint32 *bytes_per_
 	else /* max_acc_width > max_crtc_width */
 	{
 		/* check if we can setup this mode with acceleration */
-		*acc_mode = true;
+//		*acc_mode = true;
+//blocking acc totally:
+*acc_mode = false;
 		/* (we already know virtual_width will be no problem) */
 		/* virtual_height */
 		/* (NV cards can even do more than this(?)...

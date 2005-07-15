@@ -586,20 +586,10 @@ status_t eng_crtc_set_display_pitch()
 	LOG(2,("CRTC: offset register set to: $%04x\n", offset));
 
 	/* program the card */
-	// fixme: lowbyte register may not be programmed with value 0xff. Prevent that...
 	CRTCW(PITCHL, (offset & 0x00ff));
-	//fixme: there is a high-byte register somewhere that needs to be pgm'd!!!
-	if (offset & 0x0100)
-	{
-//		SEQW(0x1c, ((SEQR(0x1c) | 0x80)));
-;
-	}
-	else
-	{
-//		SEQW(0x1c, ((SEQR(0x1c) & 0x7f)));
-;
-	}
+	CRTCW(PITCHH, (((CRTCR(PITCHH)) & 0x1f) | ((offset & 0x0700) >> 3)));
 
+//test stuff:
 //	LOG(2,("CRTC: $32=$%02x, $33=$%02x, $35=$%02x, $36=$%02x\n",
 //		(CRTCR(0x32)), (CRTCR(0x33)), (CRTCR(0x35)), (CRTCR(0x36))));
 //	LOG(2,("SEQ: $14=$%02x, $15=$%02x, $16=$%02x, $17=$%02x\n",
