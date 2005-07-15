@@ -35,7 +35,9 @@ struct entry_ref;
 
 namespace BPrivate {
 
+status_t get_app_path(team_id team, char *buffer);
 status_t get_app_path(char *buffer);
+status_t get_app_ref(team_id team, entry_ref *ref, bool traverse = true);
 status_t get_app_ref(entry_ref *ref, bool traverse = true);
 
 team_id current_team();

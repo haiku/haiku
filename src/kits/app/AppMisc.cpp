@@ -35,6 +35,39 @@
 namespace BPrivate {
 
 // get_app_path
+/*!	\brief Returns the path to an application's executable.
+	\param team The application's team ID.
+	\param buffer A pointer to a pre-allocated character array of at least
+		   size B_PATH_NAME_LENGTH to be filled in by this function.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a buffer.
+	- another error code
+*/
+status_t
+get_app_path(team_id team, char *buffer)
+{
+	// The only way to get the path to the application's executable seems to
+	// be to get an image_info of its image, which also contains a path.
+	// Several images may belong to the team (libraries, add-ons), but only
+	// the one in question should be typed B_APP_IMAGE.
+	if (!buffer)
+		return B_BAD_VALUE;
+
+	image_info info;
+	int32 cookie = 0;
+
+	while (get_next_image_info(team, &cookie, &info) == B_OK) {
+		if (info.type == B_APP_IMAGE) {
+			strlcpy(buffer, info.name, B_PATH_NAME_LENGTH - 1);
+			return B_OK;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+// get_app_path
 /*!	\brief Returns the path to the application's executable.
 	\param buffer A pointer to a pre-allocated character array of at least
 		   size B_PATH_NAME_LENGTH to be filled in by this function.
@@ -46,30 +79,39 @@ namespace BPrivate {
 status_t
 get_app_path(char *buffer)
 {
-	// The only way to get the path to the application's executable seems to
-	// be to get an image_info of its image, which also contains a path.
-	// Several images may belong to the team (libraries, add-ons), but only
-	// the one in question should be typed B_APP_IMAGE.
-	status_t error = (buffer ? B_OK : B_BAD_VALUE);
-	image_info info;
-	int32 cookie = 0;
-	bool found = false;
+	return get_app_path(B_CURRENT_TEAM, buffer);
+}
+
+// get_app_ref
+/*!	\brief Returns an entry_ref referring to an application's executable.
+	\param team The application's team ID.
+	\param ref A pointer to a pre-allocated entry_ref to be initialized
+		   to an entry_ref referring to the application's executable.
+	\param traverse If \c true, the function traverses symbolic links.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a ref.
+	- another error code
+*/
+status_t
+get_app_ref(team_id team, entry_ref *ref, bool traverse)
+{
+	status_t error = (ref ? B_OK : B_BAD_VALUE);
+	char appFilePath[B_PATH_NAME_LENGTH];
+
+	if (error == B_OK)
+		error = get_app_path(team, appFilePath);
+
 	if (error == B_OK) {
-		while (!found && get_next_image_info(0, &cookie, &info) == B_OK) {
-			if (info.type == B_APP_IMAGE) {
-				strncpy(buffer, info.name, B_PATH_NAME_LENGTH - 1);
-				buffer[B_PATH_NAME_LENGTH - 1] = 0;
-				found = true;
-			}
-		}
+		BEntry entry(appFilePath, traverse);
+		error = entry.GetRef(ref);
 	}
-	if (error == B_OK && !found)
-		error = B_ENTRY_NOT_FOUND;
+
 	return error;
 }
 
 // get_app_ref
-/*!	\brief Returns an entry_ref referring to the application's exectable.
+/*!	\brief Returns an entry_ref referring to the application's executable.
 	\param ref A pointer to a pre-allocated entry_ref to be initialized
 		   to an entry_ref referring to the application's executable.
 	\param traverse If \c true, the function traverses symbolic links.
@@ -81,15 +123,7 @@ get_app_path(char *buffer)
 status_t
 get_app_ref(entry_ref *ref, bool traverse)
 {
-	status_t error = (ref ? B_OK : B_BAD_VALUE);
-	char appFilePath[B_PATH_NAME_LENGTH];
-	if (error == B_OK)
-		error = get_app_path(appFilePath);
-	if (error == B_OK) {
-		BEntry entry(appFilePath, traverse);
-		error = entry.GetRef(ref);
-	}
-	return error;
+	return get_app_ref(B_CURRENT_TEAM, ref, traverse);
 }
 
 // current_team
