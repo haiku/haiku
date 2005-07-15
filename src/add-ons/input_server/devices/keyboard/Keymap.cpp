@@ -227,7 +227,9 @@ Keymap::IsDeadSecondKey(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey)
 		case B_CONTROL_KEY: offset = fKeys.control_map[keyCode]; break;
 		default: offset = fKeys.normal_map[keyCode]; break;
 	}
-	
+
+	if (offset <= 0)
+		return false;	
 	uint32 numBytes = fChars[offset];
 	
 	if (!numBytes)
@@ -298,7 +300,9 @@ Keymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey, char** c
 		case B_CONTROL_KEY: offset = fKeys.control_map[keyCode]; break;
 		default: offset = fKeys.normal_map[keyCode]; break;
 	}
-	
+
+	if (offset <= 0)
+		return;	
 	// here we get the char size
 	*numBytes = fChars[offset];
 	
