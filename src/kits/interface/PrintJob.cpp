@@ -1,37 +1,23 @@
 /*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ 				I.R. Adema
+ 				Stefano Ceccherini (burton666@libero.it)
+ */
 
-BPrintJob code.
-
-Main functionality is the creation of the spool file. The print_server
-will take it from there.
-
-Copyright (c) 2001 OpenBeOS. Written by I.R. Adema.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-*/
-
+#include <Entry.h>
+#include <File.h>
+#include <FindDirectory.h>
 #include <Messenger.h>
+#include <Path.h>
 #include <PrintJob.h>
+#include <View.h>
 
 #include <pr_server.h>
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -60,7 +46,8 @@ BPrintJob::BPrintJob(const char *job_name)
 	default_setup_msg(NULL),
 	m_curPageHeader(NULL)
 {
-	print_job_name = strdup(job_name);
+	if (job_name != NULL)
+		print_job_name = strdup(job_name);
 }
 
 
@@ -73,18 +60,50 @@ BPrintJob::~BPrintJob()
 void
 BPrintJob::BeginJob()
 {
+	// TODO: this should be improved:
+	// - Take system printers into account
+	// - handle the case where the path doesn't exist
+	// - more
+	BPath path;
+	status_t status = find_directory(B_USER_PRINTERS_DIRECTORY, &path);
+	if (status < B_OK)
+		return;
+	
+	char *printer = GetCurrentPrinterName();
+	if (printer == NULL)
+		return;
+		
+	path.Append(printer);
+	free(printer);
+	
+	char mangledName[B_FILE_NAME_LENGTH];
+	MangleName(mangledName);
+	
+	path.Append(mangledName);
+	
+	if (path.InitCheck() < B_OK)
+		return;
+	
+	stop_the_show = 0;
+	
+	strncpy(spool_file_name, path.Path(), sizeof(spool_file_name));
+	spoolFile = new BFile(spool_file_name, B_READ_WRITE|B_CREATE_FILE);
+	
+	AddSetupSpec();
 }
 
 
 void
 BPrintJob::CommitJob()
 {
+	// TODO: Implement
 }
 
 
 status_t
 BPrintJob::ConfigJob()
 {
+	// TODO: Implement
     return B_OK;
 }
 
@@ -92,8 +111,9 @@ BPrintJob::ConfigJob()
 void
 BPrintJob::CancelJob()
 {
-	// TODO: For real
 	stop_the_show = 1;
+	BEntry(spool_file_name).Remove();
+	delete spoolFile;
 }
 
 
@@ -107,6 +127,7 @@ BPrintJob::ConfigPage()
 void
 BPrintJob::SpoolPage()
 {
+	NewPage();
 }
 
 
@@ -121,6 +142,12 @@ BPrintJob::CanContinue()
 void
 BPrintJob::DrawView(BView *view, BRect rect, BPoint where)
 {
+	// TODO: Finish me
+	if (view != NULL) {
+		view->f_is_printing = true;
+		view->Draw(rect);
+		view->f_is_printing = false;
+	}
 }
 
 
@@ -263,13 +290,16 @@ BPrintJob::RecurseView(BView *view, BPoint origin,
 void
 BPrintJob::MangleName(char *filename)
 {
+	char sysTime[10];
+	snprintf(sysTime, sizeof(sysTime), "@%lld", system_time() / 1000);
+	strncpy(filename, print_job_name, B_FILE_NAME_LENGTH - sizeof(sysTime));
+	strcat(filename, sysTime);
 }
 
 
 void
 BPrintJob::HandlePageSetup(BMessage *setup)
 {
-
 }
 
 
@@ -292,6 +322,8 @@ BPrintJob::HandlePrintSetup(BMessage *message)
 void
 BPrintJob::NewPage()
 {
+	// TODO: this function could be removed, and its functionality moved
+	// to SpoolPage()
 }
 
 
@@ -304,6 +336,8 @@ BPrintJob::EndLastPage()
 void
 BPrintJob::AddSetupSpec()
 {
+	if (setup_msg != NULL && spoolFile != NULL)
+		setup_msg->Flatten(spoolFile);
 }
 
 
@@ -345,10 +379,7 @@ BPrintJob::LoadDefaultSettings()
     if (reply->HasRect(PSRV_FIELD_PRINTABLE_RECT))
     	reply->FindRect(PSRV_FIELD_PRINTABLE_RECT, &usable_size);
     
-    // Should never happen, but anyway...
-    if (default_setup_msg != NULL)
-    	delete default_setup_msg;
-    	
+    delete default_setup_msg;  	
     default_setup_msg = reply;
 }
 
