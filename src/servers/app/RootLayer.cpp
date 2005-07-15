@@ -88,15 +88,6 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	  fThreadID(B_ERROR),
 	  fListenPort(-1),
 
-	  fScreenPtrList(32),
-	  fRows(0),
-	  fColumns(0),
-
-	  fScreenWidth(0),
-	  fScreenHeight(0),
-	  fColorSpace(B_RGB32),
-	  fFrequency(60.0),
-
 	  fButtons(0),
 	  fLastMousePosition(0.0, 0.0),
 //	  fMovingWindow(false),
@@ -172,6 +163,8 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 #if ON_SCREEN_DEBUGGING_INFO
 	DebugInfoManager::Default()->SetRootLayer(this);
 #endif
+
+	fFrame = desktop->VirtualScreen().Frame();
 }
 
 
@@ -1026,73 +1019,6 @@ RootLayer::WinBorderAt(const BPoint& pt) const
 }
 
 
-void
-RootLayer::SetScreens(Screen *screens[], int32 rows, int32 columns)
-{
-	// NOTE: All screens *must* have the same resolution
-
-	// TODO: This function is badly named. Appearently, it
-	// adjusts the root layers frame rectangle, taking the information
-	// from the first screen in its list. However, a Screen object
-	// has actually now a different meaning. It manages access to
-	// the hardware and *owns* the HWInterface instance.
-	// This means there is going to be one Screen object per physical
-	// screen attached (unless I misunderstood how it was intended).
-	// A workspace needs to be attached to a screen
-	// and then on workspace activation, the appropriate updating
-	// needs to occur. The workspace tells its screen to configure
-	// to the workspaces mode, and then someone takes care of
-	// telling RootLayer to adjust itself and all other layers regions.
-
-	uint16 width, height;
-	uint32 colorSpace;
-	float frequency;
-	screens[0]->GetMode(width, height, colorSpace, frequency);
-
-	fFrame.Set(0, 0, width * columns - 1, height * rows - 1);
-	fRows = rows;
-	fColumns = columns;
-	fScreenWidth = width;
-	fScreenHeight = height;
-}
-
-
-Screen **
-RootLayer::Screens()
-{
-	return (Screen**)fScreenPtrList.Items();
-}
-
-
-bool
-RootLayer::SetScreenMode(int32 width, int32 height, uint32 colorSpace, float frequency)
-{
-	if (fScreenWidth == width && fScreenHeight == height
-		&& fColorSpace == colorSpace && frequency == fFrequency)
-		return true;
-
-	// NOTE: Currently, we have only one screen in that list.
-	// Before I changed it, this function would only accept modes
-	// that each of the (potentially multiple) screens can accept.
-	// However, I didn't really know what this gives in practice.
-	// We should re-think this when we really do support multiple monitors.
-	// For now, this function could potentially set the first couple of
-	// screens to the new mode, and fail to do so for the rest of them.
-
-	status_t ret = B_ERROR;
-	for (int i = 0; i < fScreenPtrList.CountItems(); i++) {
-		Screen *screen = static_cast<Screen *>(fScreenPtrList.ItemAt(i));
-
-		ret = screen->SetMode(width, height, colorSpace, frequency);
-		if (ret < B_OK)
-			break;
-	}
-
-	SetScreens(Screens(), fRows, fColumns);
-
-	return ret >= B_OK;
-}
-
 //---------------------------------------------------------------------------
 //				Workspace related methods
 //---------------------------------------------------------------------------
@@ -1825,17 +1751,14 @@ RootLayer::SetEventMaskLayer(Layer *lay, uint32 mask, uint32 options)
 	if (!lay)
 		return false;
 
-	bool	returnValue = true;
+	bool returnValue = true;
 
 	Lock();
 
-	if (fEventMaskLayer && fEventMaskLayer != lay)
-	{
+	if (fEventMaskLayer && fEventMaskLayer != lay) {
 		fprintf(stderr, "WARNING: fEventMaskLayer already set and different than the required one!\n");
 		returnValue = false;
-	}
-	else
-	{
+	} else {
 		fEventMaskLayer = lay;
 		// TODO: use this mask and options!
 	}
@@ -1849,22 +1772,21 @@ RootLayer::SetEventMaskLayer(Layer *lay, uint32 mask, uint32 options)
 void
 RootLayer::LayerRemoved(Layer* layer)
 {
-	if (layer == fEventMaskLayer) {
+	if (layer == fEventMaskLayer)
 		fEventMaskLayer = NULL;
-	}
-	if (layer == fLastMouseMoved) {
+
+	if (layer == fLastMouseMoved)
 		fLastMouseMoved = NULL;
-	}
-	if (layer == fMouseTargetWinBorder) {
+
+	if (layer == fMouseTargetWinBorder)
 		fMouseTargetWinBorder = NULL;
-	}
 }
+
 
 void
 RootLayer::SetDragMessage(BMessage* msg)
 {
-	if (fDragMessage)
-	{
+	if (fDragMessage) {
 		delete fDragMessage;
 		fDragMessage = NULL;
 	}
@@ -1880,26 +1802,6 @@ RootLayer::DragMessage(void) const
 	return fDragMessage;
 }
 
-// DEBUG methods
-
-void
-RootLayer::PrintToStream()
-{
-	printf("\nRootLayer '%s' internals:\n", Name());
-	printf("Screen list:\n");
-	for(int32 i=0; i<fScreenPtrList.CountItems(); i++)
-		printf("\t%ld\n", ((Screen*)fScreenPtrList.ItemAt(i))->ScreenNumber());
-
-	printf("Screen rows: %ld\nScreen columns: %ld\n", fRows, fColumns);
-	printf("Resolution for all Screens: %ldx%ldx%ld\n", fScreenWidth, fScreenHeight, fColorSpace);
-	printf("Workspace list:\n");
-	for(int32 i=0; i<fWsCount; i++)
-	{
-		printf("\t~~~Workspace: %ld\n", ((Workspace*)fWorkspace[i])->ID());
-		((Workspace*)fWorkspace[i])->PrintToStream();
-		printf("~~~~~~~~\n");
-	}
-}
 
 // PRIVATE methods
 

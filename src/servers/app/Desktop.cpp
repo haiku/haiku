@@ -56,9 +56,6 @@
 
 Desktop::Desktop()
 	: fWinBorderList(64),
-	  fRootLayerList(2),
-	  fActiveRootLayer(NULL),
-	  fScreenList(2),
 	  fActiveScreen(NULL),
 	  fMouseMode(B_NORMAL_MOUSE),
 	  fFFMouseMode(false)
@@ -88,104 +85,24 @@ Desktop::~Desktop()
 	for (int32 i = 0; WinBorder *border = (WinBorder *)fWinBorderList.ItemAt(i); i++)
 		delete border;
 
-	for (int32 i = 0; RootLayer *rootLayer = (RootLayer *)fRootLayerList.ItemAt(i); i++)
-		delete rootLayer;
-
-	for (int32 i = 0; Screen *screen = (Screen *)fScreenList.ItemAt(i); i++)
-		delete screen;
+	delete fRootLayer;
 }
 
 
 void
 Desktop::Init()
 {
-	HWInterface *interface = NULL;
+	fVirtualScreen.RestoreConfiguration(*this);
 
-	// Eventually we will loop through drivers until
-	// one can't initialize in order to support multiple monitors.
-	// For now, we'll just load one and be done with it.
-	
-	bool initDrivers = true;
-	while (initDrivers) {
+	// TODO: temporary workaround, fActiveScreen will be removed
+	fActiveScreen = fVirtualScreen.ScreenAt(0);
 
-#if USE_ACCELERANT
-		  interface = new AccelerantHWInterface();
-#else
-		  interface = new ViewHWInterface();
-#endif
+	// TODO: add user identity to the name
+	char name[32];
+	sprintf(name, "RootLayer %d", 1);
 
-		_AddGraphicsCard(interface);
-		initDrivers = false;
-	}
-
-	if (fScreenList.CountItems() < 1) {
-		delete this;
-		return;
-	}
-
-	InitMode();
-
-	SetActiveRootLayerByIndex(0);
-}
-
-
-void
-Desktop::_AddGraphicsCard(HWInterface* interface)
-{
-	Screen *screen = new Screen(interface, fScreenList.CountItems() + 1);
-		// The interface is now owned by the screen
-
-	if (screen->Initialize() >= B_OK && fScreenList.AddItem((void*)screen)) {
-		// TODO: be careful of screen initialization - monitor may not support 640x480
-		screen->SetMode(800, 600, B_RGB32, 60.f);
-	} else
-		delete screen;
-}
-
-
-void
-Desktop::InitMode()
-{
-	// this is init mode for n-SS.
-	fActiveScreen = (Screen *)fScreenList.ItemAt(0);
-
-	for (int32 i = 0; i < fScreenList.CountItems(); i++) {
-		Screen *screen = (Screen *)fScreenList.ItemAt(i);
-
-		char name[32];
-		sprintf(name, "RootLayer %ld", i + 1);
-
-		RootLayer *rootLayer = new RootLayer(name, 4, this, GetDisplayDriver());
-		rootLayer->SetScreens(&screen, 1, 1);
-		rootLayer->RunThread();
-
-		fRootLayerList.AddItem(rootLayer);
-	}
-}
-
-
-//---------------------------------------------------------------------------
-//					Methods for multiple monitors.
-//---------------------------------------------------------------------------
-
-
-inline void
-Desktop::SetActiveRootLayerByIndex(int32 listIndex)
-{
-	RootLayer *rootLayer = RootLayerAt(listIndex);
-
-	if (rootLayer != NULL)
-		SetActiveRootLayer(rootLayer);
-}
-
-
-inline void
-Desktop::SetActiveRootLayer(RootLayer *rootLayer)
-{
-	if (fActiveRootLayer == rootLayer)
-		return;
-
-	fActiveRootLayer = rootLayer;
+	fRootLayer = new RootLayer(name, 4, this, GetDisplayDriver());
+	fRootLayer->RunThread();
 }
 
 
@@ -541,29 +458,3 @@ Desktop::FFMouseMode(void) const
 	return fMouseMode;
 }
 
-
-void
-Desktop::PrintToStream(void)
-{
-	printf("RootLayer List:\n=======\n");
-
-	for (int32 i = 0; i < fRootLayerList.CountItems(); i++) {
-		printf("\t%s\n", ((RootLayer*)fRootLayerList.ItemAt(i))->Name());
-		((RootLayer*)fRootLayerList.ItemAt(i))->PrintToStream();
-		printf("-------\n");
-	}
-
-	printf("=======\nActive RootLayer: %s\n",
-		fActiveRootLayer ? fActiveRootLayer->Name() : "NULL");
-//	printf("Active WinBorder: %s\n", fActiveWinBorder? fActiveWinBorder->Name(): "NULL");
-
-	printf("Screen List:\n");
-	for (int32 i = 0; i < fScreenList.CountItems(); i++)
-		printf("\t%ld\n", ((Screen*)fScreenList.ItemAt(i))->ScreenNumber());
-}
-
-
-void
-Desktop::PrintVisibleInRootLayerNo(int32 no)
-{
-}

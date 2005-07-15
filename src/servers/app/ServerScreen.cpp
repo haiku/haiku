@@ -130,7 +130,6 @@ Screen::GetMode(uint16 &width, uint16 &height, uint32 &colorspace,
 				float &frequency) const
 {
 	display_mode mode;
-
 	fHWInterface->GetMode(&mode);
 
 	width = mode.virtual_width;
@@ -138,6 +137,16 @@ Screen::GetMode(uint16 &width, uint16 &height, uint32 &colorspace,
 	colorspace = mode.space;
 	frequency = mode.timing.pixel_clock * 1000.f
 		/ (mode.timing.h_total * mode.timing.v_total);
+}
+
+
+BRect
+Screen::Frame() const
+{
+	display_mode mode;
+	fHWInterface->GetMode(&mode);
+
+	return BRect(0, 0, mode.virtual_width - 1, mode.virtual_height - 1);	
 }
 
 

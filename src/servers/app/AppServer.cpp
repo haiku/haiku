@@ -31,6 +31,7 @@
 #include "RegistrarDefs.h"
 #include "RGBColor.h"
 #include "RootLayer.h"
+#include "ScreenManager.h"
 #include "ServerApp.h"
 #include "ServerCursor.h"
 #include "ServerProtocol.h"
@@ -164,6 +165,8 @@ AppServer::AppServer() :
 	// is not possible, set colors to the defaults
 	if (LoadColorSet(SERVER_SETTINGS_DIR COLOR_SETTINGS_NAME, &gGUIColorSet) != B_OK)
 		gGUIColorSet.SetToDefaults();
+
+	gScreenManager = new ScreenManager();
 
 	// Set up the Desktop
 	gDesktop = new Desktop();

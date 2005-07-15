@@ -40,7 +40,8 @@ class Screen {
 										uint16 &height,
 										uint32 &colorspace,
 										float &frequency) const;
-		
+			BRect				Frame() const;
+
 	inline	int32				ScreenNumber() const
 									{ return fID; }
 

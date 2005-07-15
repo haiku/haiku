@@ -3,7 +3,8 @@ SubDir OBOS_TOP src servers app ;
 AddResources app_server : app_server.rdef ;
 
 UseLibraryHeaders agg png zlib ;
-UsePrivateHeaders app interface [ FDirName servers app ] ;
+UsePrivateHeaders app interface shared [ FDirName servers app ] ;
+
 UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter drawing_modes ] ;
@@ -83,10 +84,12 @@ Server app_server :
 	ServerApp.cpp
 	ServerWindow.cpp
 	DecorManager.cpp
+	ScreenManager.cpp
 
 	# DisplayDriver Classes
 	$(VIEW_DRIVER_SOURCES)
 
+	VirtualScreen.cpp
 	BBitmapBuffer.cpp
 	BitmapHWInterface.cpp
 	DefaultDecorator.cpp

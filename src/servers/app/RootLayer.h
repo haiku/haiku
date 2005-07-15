@@ -106,12 +106,6 @@ public:
 			void				SetWorkspacesLayer(Layer* layer) { fWorkspacesLayer = layer; }
 			Layer*				WorkspacesLayer() const { return fWorkspacesLayer; }
 	
-			void				SetScreens(Screen *screen[], int32 rows, int32 columns);
-			Screen**			Screens(void);
-			bool				SetScreenMode(int32 width, int32 height, uint32 colorspace, float frequency);
-			int32				ScreenRows(void) const { return fRows; }
-			int32				ScreenColumns(void) const { return fColumns; }
-
 			void				SetBGColor(const RGBColor &col);
 			RGBColor			BGColor(void) const;
 	
@@ -141,8 +135,6 @@ public:
 
 	virtual	void				Draw(const BRect &r);
 
-			// Debug methods
-			void				PrintToStream(void);
 			thread_id			LockingThread() { return fAllRegionsLock.LockingThread(); }
 	
 			BRegion				fRedrawReg;
@@ -194,15 +186,6 @@ friend class Desktop;
 
 			thread_id			fThreadID;
 			port_id				fListenPort;
-
-			BList				fScreenPtrList;
-			int32				fRows;
-			int32				fColumns;
-
-			int32				fScreenWidth;
-			int32				fScreenHeight;
-			uint32				fColorSpace;
-			float				fFrequency;
 
 			int32				fButtons;
 			BPoint				fLastMousePosition;

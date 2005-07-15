@@ -11,13 +11,16 @@
 #define _DESKTOP_H_
 
 
+#include "ScreenManager.h"
+#include "ServerScreen.h"
+#include "VirtualScreen.h"
+
 #include <InterfaceDefs.h>
 #include <List.h>
 #include <Locker.h>
 #include <Menu.h>
 #include <Autolock.h>
 
-#include "ServerScreen.h"
 
 class BMessage;
 
@@ -32,7 +35,7 @@ namespace BPrivate {
 };
 
 
-class Desktop : public BLocker {
+class Desktop : public BLocker, public ScreenOwner {
  public:
 	// startup methods
 								Desktop();
@@ -40,41 +43,22 @@ class Desktop : public BLocker {
 
 			void				Init();
 
-	// 1-BigScreen or n-SmallScreens
-			void				InitMode();
-	
 	// Methods for multiple monitors.
 	inline	Screen*				ScreenAt(int32 index) const
-									{ return static_cast<Screen *>(fScreenList.ItemAt(index)); }
-	inline	int32				ScreenCount() const
-									{ return fScreenList.CountItems(); }
+									{ return fActiveScreen; }
 	inline	Screen*				ActiveScreen() const
 									{ return fActiveScreen; }
+	inline	RootLayer*			ActiveRootLayer() const { return fRootLayer; }
 
-			void				SetActiveRootLayerByIndex(int32 index);
-			void				SetActiveRootLayer(RootLayer* layer);
-	inline	RootLayer*			RootLayerAt(int32 index)
-									{ return static_cast<RootLayer *>(fRootLayerList.ItemAt(index)); }
-			RootLayer*			ActiveRootLayer() const
-									{ return fActiveRootLayer;}
-			int32				ActiveRootLayerIndex() const
-									{
-										int32 rootLayerCount = CountRootLayers();
+	virtual void				ScreenRemoved(Screen* screen) {}
+	virtual void				ScreenAdded(Screen* screen) {}
+	virtual bool				ReleaseScreen(Screen* screen) { return false; }
 
-										for (int32 i = 0; i < rootLayerCount; i++) {
-											if (fActiveRootLayer == (RootLayer *)fRootLayerList.ItemAt(i))
-											return i;
-										}
-										return -1;
-									}
-
-	inline	int32				CountRootLayers() const
-									{ return fRootLayerList.CountItems(); }
-
+	const	::VirtualScreen&	VirtualScreen() const { return fVirtualScreen; }
 	inline	DisplayDriver*		GetDisplayDriver() const
-									{ return ScreenAt(0)->GetDisplayDriver(); }
+									{ return fVirtualScreen.DisplayDriver(); }
 	inline	HWInterface*		GetHWInterface() const
-									{ return ScreenAt(0)->GetHWInterface(); }
+									{ return fVirtualScreen.HWInterface(); }
 
 	// Methods for layer(WinBorder) manipulation.
 			void				AddWinBorder(WinBorder *winBorder);
@@ -112,21 +96,13 @@ class Desktop : public BLocker {
 			void				SetFFMouseMode(const mode_mouse &value);
 			mode_mouse			FFMouseMode() const;
 	
-	// Debugging methods
-			void				PrintToStream();
-			void				PrintVisibleInRootLayerNo(int32 no);
-	
  private:
-			void				_AddGraphicsCard(HWInterface* interface);
-
+			::VirtualScreen		fVirtualScreen;
 			BList				fWinBorderList;
-		
-			BList				fRootLayerList;
-			RootLayer*			fActiveRootLayer;
-		
-			BList				fScreenList;
+
+			RootLayer*			fRootLayer;
 			Screen*				fActiveScreen;
-			
+
 			scroll_bar_info		fScrollBarInfo;
 			menu_info			fMenuInfo;
 			mode_mouse			fMouseMode;
