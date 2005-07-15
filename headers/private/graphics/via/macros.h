@@ -585,7 +585,7 @@
 #define ENCRTCX_0x32		0x32
 #define ENCRTCX_0x33		0x33
 #define ENCRTCX_FBSTADDE	0x34
-#define ENCRTCX_0x35		0x35
+#define ENCRTCX_PITCHH		0x35
 #define ENCRTCX_0x36		0x36 //b6,7 = DPMS, 00 = on, 11=off
 #define ENCRTCX_0x3b		0x3b //TVtype jumper: b1=1 = PAL, else NTSC
 //end via
@@ -656,8 +656,8 @@
 #define ENSEQX_MSIZE_OTHER	0x39
 #define ENSEQX_0x44			0x44
 #define ENSEQX_0x45			0x45
-#define ENSEQX_0x46			0x46
-#define ENSEQX_0x47			0x47
+#define ENSEQX_0x46			0x46 //Vclk msb
+#define ENSEQX_0x47			0x47 //Vclk lsb
 //end new via.
 
 /* Nvidia GRAPHICS indexed registers */
