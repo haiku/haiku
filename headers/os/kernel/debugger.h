@@ -153,6 +153,9 @@ typedef enum {
 	B_DEBUGGER_MESSAGE_THREAD_DELETED,		// a thread has been deleted
 	B_DEBUGGER_MESSAGE_IMAGE_CREATED,		// an image has been created
 	B_DEBUGGER_MESSAGE_IMAGE_DELETED,		// an image has been deleted
+
+	B_DEBUGGER_MESSAGE_HANDED_OVER,			// the debugged team has been
+											// handed over to another debugger
 } debug_debugger_message;
 
 
@@ -327,9 +330,7 @@ typedef struct {
 
 // B_DEBUG_MESSAGE_PREPARE_HANDOVER
 
-typedef struct {
-	status_t	error;			// B_OK, if the everything went fine
-} debug_nub_prepare_handover_reply;
+// no parameters, no reply
 
 // union of all messages structures sent to the debug nub thread
 typedef union {
@@ -480,6 +481,15 @@ typedef struct {
 	image_info		info;			// info for the image
 } debug_image_deleted;
 
+// B_DEBUGGER_MESSAGE_HANDED_OVER
+
+typedef struct {
+	debug_origin	origin;			// thread is < 0, team is the deleted team
+									// (asynchronous message)
+	team_id			debugger;		// the new debugger
+	port_id			debugger_port;	// the port the new debugger uses
+} debug_handed_over;
+
 // union of all messages structures sent to the debugger
 typedef union {
 	debug_thread_debugged			thread_debugged;
@@ -497,6 +507,7 @@ typedef union {
 	debug_thread_deleted			thread_deleted;
 	debug_image_created				image_created;
 	debug_image_deleted				image_deleted;
+	debug_handed_over				handed_over;
 
 	debug_origin					origin;	// for convenience (no real message)
 } debug_debugger_message_data;

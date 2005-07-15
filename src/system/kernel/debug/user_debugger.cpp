@@ -1214,7 +1214,6 @@ debug_nub_thread(void *)
 			debug_nub_set_watchpoint_reply		set_watchpoint;
 			debug_nub_get_signal_masks_reply	get_signal_masks;
 			debug_nub_get_signal_handler_reply	get_signal_handler;
-			debug_nub_prepare_handover_reply	prepare_handover;
 		} reply;
 		int32 replySize = 0;
 		port_id replyPort = -1;
@@ -1731,13 +1730,8 @@ debug_nub_thread(void *)
 					release_sem(writeLock);
 				} else {
 					// We probably got a SIGKILL. If so, we will terminate when
-					// sending the reply fails.
+					// reading the next message fails.
 				}	
-
-				// prepare the reply
-				reply.prepare_handover.error = result;
-				replySize = sizeof(reply.prepare_handover);
-				sendReply = true;
 
 				break;
 			}
@@ -1760,6 +1754,9 @@ debug_nub_thread(void *)
 			if (error != B_OK) {
 				// The debugger port is either not longer existing or we got
 				// interrupted by a kill signal. In either case we terminate.
+				TRACE(("nub thread %ld: failed to send reply to port %ld: %s\n",
+					nubThread->id, replyPort, strerror(error)));
+
 				nub_thread_cleanup(nubThread);
 				return error;
 			}
@@ -1843,6 +1840,7 @@ install_team_debugger(team_id teamID, port_id debuggerPort, bool useDefault,
 	bool done = false;
 	port_id result = B_ERROR;
 	bool handOver = false;
+	port_id oldDebuggerPort = -1;
 	port_id nubPort = -1;
 
 	cpu_status state = disable_interrupts();
@@ -1871,6 +1869,7 @@ install_team_debugger(team_id teamID, port_id debuggerPort, bool useDefault,
 				atomic_and(& team->debug_info.flags,
 					~B_TEAM_DEBUG_DEBUGGER_HANDOVER);
 
+				oldDebuggerPort = team->debug_info.debugger_port;
 				result = nubPort = team->debug_info.nub_port;
 
 				// set the new debugger
@@ -1901,6 +1900,22 @@ install_team_debugger(team_id teamID, port_id debuggerPort, bool useDefault,
 		// notify the nub thread
 		kill_interruptable_write_port(nubPort, B_DEBUG_MESSAGE_HANDED_OVER,
 			NULL, 0);
+
+		// notify the old debugger
+		debug_handed_over notification;
+		notification.origin.thread = -1;
+		notification.origin.team = teamID;
+		notification.origin.nub_port = nubPort;
+		notification.debugger = debuggerTeam;
+		notification.debugger_port = debuggerPort;
+
+		error = write_port_etc(oldDebuggerPort,
+			B_DEBUGGER_MESSAGE_HANDED_OVER, &notification,
+			sizeof(notification), B_RELATIVE_TIMEOUT, 0);
+		if (error != B_OK) {
+			TRACE(("install_team_debugger(): Failed to send message to old "
+				"debugger: %s\n", strerror(error)));
+		}
 
 		TRACE(("install_team_debugger() done: handed over to debugger: team: "
 			"%ld, port: %ld\n", debuggerTeam, debuggerPort));
