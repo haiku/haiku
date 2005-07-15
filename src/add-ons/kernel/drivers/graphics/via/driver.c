@@ -98,7 +98,12 @@ static device_hooks graphics_device_hooks = {
 #define VENDOR_ID_VIA	0x1106 /* Via */
 
 static uint16 via_device_list[] = {
-	0x3122, /*  */
+	0x3022, /* CLE266 Unichrome Pro (CLE3022) */
+	0x3122, /* CLE266 Unichrome Pro (CLE3122) */
+	0x3204, /* K8M800 Unichrome Pro (VT3204) */
+	0x3205, /* KM400 Unichrome (VT3205) */
+	0x7204, /* K8M800 Unichrome Pro (VT7204) */
+	0x7205, /* KM400 Unichrome (VT7205) */
 	0
 };
 
