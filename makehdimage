@@ -112,7 +112,7 @@ BEOS_BIN="touch sync ln listarea listattr listsem listport \
 	csplit cut beep"
 
 BEOS_APPS="MiniTerminal Expander People ShowImage Clock Pulse Playground \
-	SoundRecorder BitmapDrawing Magnify DiskProbe AboutHaiku"
+	SoundRecorder BitmapDrawing Magnify DiskProbe AboutHaiku StyledEdit"
 BEOS_PREFERENCES="Backgrounds DataTranslations FileTypes Media Menu Mouse \
 	Keyboard Keymap Screen ScrollBar Sounds Time VirtualMemory Workspaces"
 
@@ -180,7 +180,6 @@ jam -j$(sysinfo -cpu | head -c 2) -q rc resattr kernel boot_loader \
 	$BEOS_DATA_FILES \
 	bfs_shell fs_shell_command \
 	|| { echo "*** Build failed!" 1>&2 ; exit 1; }
-
 
 # map the shell commands
 if [ $alreadyMounted ]; then
@@ -382,6 +381,7 @@ $cp ${sPrefix}data/system/boot/Bootscript \
 	${sPrefix}data/system/boot/Netscript $targetDir/beos/system/boot/
 $cp ${sPrefix}data/etc/profile ${sPrefix}data/etc/termcap $targetDir/beos/etc/
 $cp -r ${sPrefix}data/etc/fonts $targetDir/beos/etc/
+#$cp -r ${sPrefix}data/etc/KanBe $targetDir/beos/etc/
 if [ -e /boot/beos/etc/fonts/ttfonts/Swiss721.ttf ]; then
 	$cp ${sPrefix}/boot/beos/etc/fonts/ttfonts/Courier10Pitch.ttf $targetDir/beos/etc/fonts/ttfonts/
 	$cp ${sPrefix}/boot/beos/etc/fonts/ttfonts/Swiss721_Bold.ttf $targetDir/beos/etc/fonts/ttfonts/
