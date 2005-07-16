@@ -21,6 +21,7 @@
 #include <vm_types.h>
 #include <arch/cpu.h>
 #include <sem.h>
+#include <runtime_loader.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -71,58 +72,6 @@ enum {
 #define APP_OR_LIBRARY_TYPE			(IMAGE_TYPE_TO_MASK(B_APP_IMAGE) \
 									| IMAGE_TYPE_TO_MASK(B_LIBRARY_IMAGE))
 
-typedef struct elf_region_t {
-	area_id		id;
-	addr_t		start;
-	addr_t		size;
-	addr_t		vmstart;
-	addr_t		vmsize;
-	addr_t		fdstart;
-	addr_t		fdsize;
-	long		delta;
-	uint32		flags;
-} elf_region_t;
-
-typedef struct image_t {
-	// image identification
-	char				path[B_OS_NAME_LENGTH];
-	char				name[B_OS_NAME_LENGTH];
-	image_id			id;
-	image_type			type;
-
-	struct image_t		*next;
-	struct image_t		*prev;
-	int32				ref_count;
-	uint32				flags;
-
-	addr_t 				entry_point;
-	addr_t				init_routine;
-	addr_t				term_routine;
-	addr_t 				dynamic_ptr; 	// pointer to the dynamic section
-
-	// pointer to symbol participation data structures
-	uint32				*symhash;
-	struct Elf32_Sym	*syms;
-	char				*strtab;
-	struct Elf32_Rel	*rel;
-	int					rel_len;
-	struct Elf32_Rela	*rela;
-	int					rela_len;
-	struct Elf32_Rel	*pltrel;
-	int					pltrel_len;
-
-	uint32				num_needed;
-	struct image_t		**needed;
-
-	// describes the text and data regions
-	uint32				num_regions;
-	elf_region_t		regions[1];
-} image_t;
-
-typedef struct image_queue_t {
-	image_t *head;
-	image_t *tail;
-} image_queue_t;
 
 typedef void (libinit_f)(unsigned, struct uspace_program_args const *);
 
@@ -135,14 +84,6 @@ static uint32 gLoadedImageCount = 0;
 static sem_id rld_sem;
 static thread_id rld_sem_owner;
 static int32 rld_sem_count;
-
-
-#define STRING(image, offset) ((char *)(&(image)->strtab[(offset)]))
-#define SYMNAME(image, sym) STRING(image, (sym)->st_name)
-#define SYMBOL(image, num) ((struct Elf32_Sym *)&(image)->syms[num])
-#define HASHTABSIZE(image) ((image)->symhash[0])
-#define HASHBUCKETS(image) ((unsigned int *)&(image)->symhash[2])
-#define HASHCHAINS(image) ((unsigned int *)&(image)->symhash[2+HASHTABSIZE(image)])
 
 
 #ifdef TRACE_RLD
@@ -1355,4 +1296,19 @@ rldelf_init(void)
 	rld_sem = create_sem(1, "rld_lock");
 	rld_sem_owner = -1;
 	rld_sem_count = 0;
+
+	// create the debug area
+	{
+		int32 size = (sizeof(runtime_loader_debug_area) + B_PAGE_SIZE - 1)
+			/ B_PAGE_SIZE * B_PAGE_SIZE;
+	
+		runtime_loader_debug_area *area;
+		area_id areaID = _kern_create_area(RUNTIME_LOADER_DEBUG_AREA_NAME,
+			(void **)&area, B_ANY_ADDRESS, size, B_NO_LOCK,
+			B_READ_AREA | B_WRITE_AREA);
+
+		FATAL((areaID < 0), areaID, "Failed to create debug area.\n");
+
+		area->loaded_images = &gLoadedImages;
+	}
 }

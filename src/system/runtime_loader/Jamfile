@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src system runtime_loader ;
 
+UsePrivateHeaders runtime_loader ;
+
 KernelObjects 
 	rld.c
 	rldexport.c
