@@ -13,12 +13,14 @@ extern "C" {
 #endif
 
 typedef struct debug_context {
+	team_id	team;
 	port_id	nub_port;
 	port_id	reply_port;
 } debug_context;
 
 
-status_t init_debug_context(debug_context *context, port_id nubPort);
+status_t init_debug_context(debug_context *context, team_id team,
+	port_id nubPort);
 void destroy_debug_context(debug_context *context);
 
 status_t send_debug_message(debug_context *context, int32 messageCode,
@@ -48,6 +50,21 @@ status_t debug_get_instruction_pointer(debug_context *context, thread_id thread,
 			void **ip, void **stackFrameAddress);
 status_t debug_get_stack_frame(debug_context *context,
 			void *stackFrameAddress, debug_stack_frame_info *stackFrameInfo);
+
+
+// symbol lookup support
+
+typedef struct debug_symbol_lookup_context debug_symbol_lookup_context;
+
+status_t debug_create_symbol_lookup_context(debug_context *debugContext,
+			debug_symbol_lookup_context **lookupContext);
+void debug_delete_symbol_lookup_context(
+			debug_symbol_lookup_context *lookupContext);
+
+status_t debug_lookup_symbol_address(debug_symbol_lookup_context *lookupContext,
+			const void *address, void **baseAddress, char *symbolName,
+			int32 symbolNameSize, char *imageName, int32 imageNameSize,
+			bool *exactMatch);
 
 
 #ifdef __cplusplus

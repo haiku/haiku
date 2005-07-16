@@ -3,21 +3,30 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <new>
 
 #include <string.h>
 
+#include <AutoDeleter.h>
 #include <debug_support.h>
 
 #include "arch_debug_support.h"
+#include "SymbolLookup.h"
+
+struct debug_symbol_lookup_context {
+	debug_context	context;
+	SymbolLookup	*lookup;
+};
 
 
 // init_debug_context
 status_t
-init_debug_context(debug_context *context, port_id nubPort)
+init_debug_context(debug_context *context, team_id team, port_id nubPort)
 {
-	if (!context || nubPort < 0)
+	if (!context || team < 0 || nubPort < 0)
 		return B_BAD_VALUE;
 
+	context->team = team;
 	context->nub_port = nubPort;
 
 	// create the reply port
@@ -183,7 +192,7 @@ debug_read_string(debug_context *context, const void *_address, char *buffer,
 	return sumRead;
 }
 
-
+// debug_get_cpu_state
 status_t
 debug_get_cpu_state(debug_context *context, thread_id thread,
 	debug_debugger_message *messageCode, debug_cpu_state *cpuState)
@@ -214,6 +223,9 @@ debug_get_cpu_state(debug_context *context, thread_id thread,
 }
 
 
+// #pragma mark -
+
+// debug_get_instruction_pointer
 status_t
 debug_get_instruction_pointer(debug_context *context, thread_id thread,
 	void **ip, void **stackFrameAddress)
@@ -225,7 +237,7 @@ debug_get_instruction_pointer(debug_context *context, thread_id thread,
 		stackFrameAddress);
 }
 
-
+// debug_get_stack_frame
 status_t
 debug_get_stack_frame(debug_context *context, void *stackFrameAddress,
 	debug_stack_frame_info *stackFrameInfo)
@@ -235,4 +247,101 @@ debug_get_stack_frame(debug_context *context, void *stackFrameAddress,
 
 	return arch_debug_get_stack_frame(context, stackFrameAddress,
 		stackFrameInfo);
+}
+
+
+// #pragma mark -
+
+// debug_create_symbol_lookup_context
+status_t
+debug_create_symbol_lookup_context(debug_context *debugContext,
+	debug_symbol_lookup_context **_lookupContext)
+{
+	if (!debugContext || !_lookupContext)
+		return B_BAD_VALUE;
+
+	// create the lookup context
+	debug_symbol_lookup_context *lookupContext
+		= new(nothrow) debug_symbol_lookup_context;
+	lookupContext->context = *debugContext;
+	ObjectDeleter<debug_symbol_lookup_context> contextDeleter(lookupContext);
+
+	// create and init symbol lookup
+	SymbolLookup *lookup = new(nothrow) SymbolLookup(debugContext->team);
+	if (!lookup)
+		return B_NO_MEMORY;
+
+	status_t error = lookup->Init();
+	if (error != B_OK) {
+		delete lookup;
+		return error;
+	}
+
+	// everything went fine: return the result
+	lookupContext->lookup = lookup;
+	*_lookupContext = lookupContext;
+	contextDeleter.Detach();
+
+	return B_OK;
+}
+
+// debug_delete_symbol_lookup_context
+void
+debug_delete_symbol_lookup_context(debug_symbol_lookup_context *lookupContext)
+{
+	if (lookupContext) {
+		delete lookupContext->lookup;
+		delete lookupContext;
+	}
+}
+
+// debug_lookup_symbol_address
+status_t
+debug_lookup_symbol_address(debug_symbol_lookup_context *lookupContext,
+	const void *address, void **baseAddress, char *symbolName,
+	int32 symbolNameSize, char *imageName, int32 imageNameSize,
+	bool *exactMatch)
+{
+	if (!lookupContext || !lookupContext->lookup)
+		return B_BAD_VALUE;
+	SymbolLookup *lookup = lookupContext->lookup;
+
+	// find the symbol
+	addr_t _baseAddress;
+	const char *_symbolName;
+	const char *_imageName;
+	try {
+		status_t error = lookup->LookupSymbolAddress((addr_t)address, &_baseAddress,
+			&_symbolName, &_imageName, exactMatch);
+		if (error != B_OK)
+			return error;
+	} catch (BPrivate::Exception exception) {
+		return exception.Error();
+	}
+
+	// translate/copy the results
+	if (baseAddress)
+		*baseAddress = (void*)_baseAddress;
+
+	if (symbolName && symbolNameSize > 0) {
+		// _symbolName is a remote address: We read the string from the
+		// remote memory. The reason for not using the cloned area is that
+		// we don't trust that the data therein is valid (i.e. null-terminated)
+		// and thus strlcpy() could segfault when hitting the cloned area end.
+		if (_symbolName) {
+			ssize_t sizeRead = debug_read_string(&lookupContext->context,
+				_symbolName, symbolName, symbolNameSize);
+			if (sizeRead < 0)
+				return sizeRead;
+		} else
+			symbolName[0] = '\0';
+	}
+
+	if (imageName) {
+		if (imageNameSize > B_OS_NAME_LENGTH)
+			imageNameSize = B_OS_NAME_LENGTH;
+		strlcpy(imageName, _imageName, imageNameSize);
+	}
+
+	return B_OK;
 }

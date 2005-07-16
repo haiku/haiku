@@ -107,6 +107,10 @@ private:
 
 	bool _HandleMessage(DebugMessage *message);
 
+	void _LookupSymbolAddress(debug_symbol_lookup_context *lookupContext,
+		const void *address, char *buffer, int32 bufferSize);
+	void _PrintStackTrace(thread_id thread);
+
 	status_t _InitGUI();
 
 	static status_t _HandlerThreadEntry(void *data);
@@ -333,7 +337,7 @@ TeamDebugHandler::Init(port_id nubPort)
 	}
 
 	// init a debug context for the handler
-	error = init_debug_context(&fDebugContext, nubPort);
+	error = init_debug_context(&fDebugContext, fTeam, nubPort);
 	if (error != B_OK) {
 		printf("debug_server: TeamDebugHandler::Init(): Failed to init "
 			"debug context for team %ld, port %ld: %s\n", fTeam, nubPort,
@@ -536,53 +540,7 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 	printf("debug_server: Thread %ld entered the debugger: %s\n", thread,
 		buffer);
 
-// TODO: Temporary solution. Remove when attaching gdb is working.
-#if 1
-	// print a stacktrace
-	void *ip = NULL;
-	void *stackFrameAddress = NULL;
-	status_t error = debug_get_instruction_pointer(&fDebugContext, thread, &ip,
-		&stackFrameAddress);
-
-	if (error == B_OK) {
-		printf("stack trace, current PC %p:\n", ip);
-
-		for (int32 i = 0; i < 50; i++) {
-			debug_stack_frame_info stackFrameInfo;
-
-			error = debug_get_stack_frame(&fDebugContext, stackFrameAddress,
-				&stackFrameInfo);
-			if (error < B_OK || stackFrameInfo.parent_frame == NULL)
-				break;
-
-			// find area containing the IP
-			team_id team = fTeam;
-			bool useAreaInfo = false;
-			area_info info;
-			int32 cookie = 0;
-			while (get_next_area_info(team, &cookie, &info) == B_OK) {
-				if ((addr_t)info.address
-						<= (addr_t)stackFrameInfo.return_address
-					&& (addr_t)info.address + info.size
-						> (addr_t)stackFrameInfo.return_address) {
-					useAreaInfo = true;
-					break;
-				}
-			}
-
-			printf("  (%p)  %p", stackFrameInfo.frame,
-				stackFrameInfo.return_address);
-			if (useAreaInfo) {
-				printf("  (%s + %#lx)\n", info.name,
-					(addr_t)stackFrameInfo.return_address
-						- (addr_t)info.address);
-			} else
-				putchar('\n');
-
-			stackFrameAddress = stackFrameInfo.parent_frame;
-		}
-	}
-#endif
+	_PrintStackTrace(thread);
 
 	bool kill = true;
 
@@ -613,6 +571,111 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 	}
 
 	return kill;
+}
+
+// _LookupSymbolAddress
+void
+TeamDebugHandler::_LookupSymbolAddress(
+	debug_symbol_lookup_context *lookupContext, const void *address,
+	char *buffer, int32 bufferSize)
+{
+	// lookup the symbol
+	void *baseAddress;
+	char symbolName[1024];
+	char imageName[B_OS_NAME_LENGTH];
+	bool exactMatch;
+	bool lookupSucceeded = false;
+	if (lookupContext) {
+		status_t error = debug_lookup_symbol_address(lookupContext, address,
+			&baseAddress, symbolName, sizeof(symbolName), imageName,
+			sizeof(imageName), &exactMatch);
+		lookupSucceeded = (error == B_OK);
+	}
+
+	if (lookupSucceeded) {
+		// we were able to look something up
+		if (strlen(symbolName) > 0) {
+			// we even got a symbol
+			snprintf(buffer, bufferSize, "%s + %#lx%s", symbolName,
+				(addr_t)address - (addr_t)baseAddress,
+				(exactMatch ? "" : " (closest symbol)"));
+
+		} else {
+			// no symbol: image relative address
+			snprintf(buffer, bufferSize, "(%s + %#lx)", symbolName,
+				(addr_t)address - (addr_t)baseAddress);
+		}
+
+	} else {
+		// lookup failed: find area containing the IP
+		bool useAreaInfo = false;
+		area_info info;
+		int32 cookie = 0;
+		while (get_next_area_info(fTeam, &cookie, &info) == B_OK) {
+			if ((addr_t)info.address <= (addr_t)address
+				&& (addr_t)info.address + info.size > (addr_t)address) {
+				useAreaInfo = true;
+				break;
+			}
+		}
+
+		if (useAreaInfo) {
+			snprintf(buffer, bufferSize, "(%s + %#lx)", info.name,
+				(addr_t)address - (addr_t)info.address);
+		} else if (bufferSize > 0)
+			buffer[0] = '\0';
+	}
+}
+
+// _PrintStackTrace
+void
+TeamDebugHandler::_PrintStackTrace(thread_id thread)
+{
+	// print a stacktrace
+	void *ip = NULL;
+	void *stackFrameAddress = NULL;
+	status_t error = debug_get_instruction_pointer(&fDebugContext, thread, &ip,
+		&stackFrameAddress);
+
+	if (error == B_OK) {
+		// create a symbol lookup context
+		debug_symbol_lookup_context *lookupContext = NULL;
+		error = debug_create_symbol_lookup_context(&fDebugContext,
+			&lookupContext);
+		if (error != B_OK) {
+			printf("debug_server: Failed to create symbol lookup context: %s\n",
+				strerror(error));
+		}
+
+		// lookup the IP
+		char symbolBuffer[2048];
+		_LookupSymbolAddress(lookupContext, ip, symbolBuffer,
+			sizeof(symbolBuffer) - 1);
+
+		printf("stack trace, current PC %p  %s:\n", ip, symbolBuffer);
+
+		for (int32 i = 0; i < 50; i++) {
+			debug_stack_frame_info stackFrameInfo;
+
+			error = debug_get_stack_frame(&fDebugContext, stackFrameAddress,
+				&stackFrameInfo);
+			if (error < B_OK || stackFrameInfo.parent_frame == NULL)
+				break;
+
+			// lookup the return address
+			_LookupSymbolAddress(lookupContext, stackFrameInfo.return_address,
+				symbolBuffer, sizeof(symbolBuffer) - 1);
+
+			printf("  (%p)  %p  %s\n", stackFrameInfo.frame,
+				stackFrameInfo.return_address, symbolBuffer);
+
+			stackFrameAddress = stackFrameInfo.parent_frame;
+		}
+
+		// delete the symbol lookup context
+		if (lookupContext)
+			debug_delete_symbol_lookup_context(lookupContext);
+	}
 }
 
 // _InitGUI

@@ -1,6 +1,9 @@
 SubDir OBOS_TOP src kits debug ;
 
+UseArchHeaders $(OBOS_ARCH) ;
 UsePrivateHeaders debug ;
+UsePrivateHeaders kernel ;
+UsePrivateHeaders runtime_loader ;
 UsePrivateHeaders shared ;
 SubDirHdrs [ FDirName $(SUBDIR) arch ] ;
 
@@ -8,7 +11,9 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) arch $(OBOS_ARCH) ] ;
 
 SharedLibrary debug :
 	debug_support.cpp
+	SymbolLookup.cpp
 
+	# architecture specific
 	arch_debug_support.cpp
 ;
 
