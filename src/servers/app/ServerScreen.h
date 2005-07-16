@@ -57,6 +57,11 @@ class Screen {
 										  float frequency,
 										  display_mode* mode) const;
 
+			int32				_FindMode(const display_mode* modeList,
+										  uint32 count, uint16 width, uint16 height, uint32 colorspace,
+										  float frequency,
+										  bool ignoreFrequency = false) const;
+
 			int32				fID;
 			DisplayDriver*		fDriver;
 			HWInterface*		fHWInterface;

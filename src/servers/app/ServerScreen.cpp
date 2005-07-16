@@ -110,9 +110,11 @@ Screen::SetMode(uint16 width, uint16 height, uint32 colorspace,
 		mode.virtual_width = 640;
 		mode.virtual_height = 480;
 		mode.space = B_CMAP8;
+		ret = _FindMode(width, height, colorspace, frequency, &mode);
 	}
 
-	ret = SetMode(mode);
+	if (ret >= B_OK)
+		ret = SetMode(mode);
 
 	return ret;
 }
@@ -152,13 +154,13 @@ Screen::Frame() const
 
 status_t
 Screen::_FindMode(uint16 width, uint16 height, uint32 colorspace,
-				 float frequency, display_mode* mode) const
+				  float frequency, display_mode* mode) const
 {
 	display_mode* dm = NULL;
 	uint32 count;
 
 	status_t err = fHWInterface->GetModeList(&dm, &count);
-	if (err < B_OK) {
+	if (err < B_OK || count <= 0) {
 		// We've run into quite a problem here! This is a function which is a requirement
 		// for a graphics module. The best thing that we can hope for is 640x480x8 without
 		// knowing anything else. While even this seems like insanity to assume that we
@@ -170,38 +172,61 @@ Screen::_FindMode(uint16 width, uint16 height, uint32 colorspace,
 		return err;
 	}
 
-	bool found = false;
-	for (uint32 i = 0; i < count; i++) {
-		if (dm[i].virtual_width == width
-			&& dm[i].virtual_height == height
-			&& dm[i].space == colorspace) {
 #if __HAIKU__
-			// we have found a mode with the correct width, height and format
-			// now see if the frequency matches (don't be too picky)
-			float modeFrequency = 0.0;
-			float t = dm[i].timing.h_total * dm[i].timing.v_total;
-			if (t != 0.0)
-				modeFrequency = dm[i].timing.pixel_clock * 1000.f / t;
-
-			if (int(modeFrequency/* * 10.0*/ + 0.5) == int(frequency/* * 10.0*/ + 0.5)) {
-				*mode = dm[i];
-				found = true;
-				break;
-			}
+	int32 index = _FindMode(dm, count, width, height, colorspace, frequency);
+	if (index < 0) {
+		fprintf(stderr, "mode not found (%d, %d, %f) -> ignoring frequency and using B_CMAP8!\n", width, height, frequency);
+		index = _FindMode(dm, count, width, height, B_CMAP8, frequency, true);
+	}
 #else
-			// Ignore frequency in test mode
-			*mode = dm[i];
-			found = true;
-			break;
-#endif // __HAIKU__
-		}
+	// Ignore frequency in test mode
+	int32 index = _FindMode(dm, count, width, height, colorspace, frequency, true);
+#endif
+
+	if (index < 0) {
+		fprintf(stderr, "mode not found (%d, %d, %f) -> using first mode from list!\n", width, height, frequency);
+		// fallback to first mode from list - TODO: ?!?
+		// NOTE: count > 0 is checked above
+		*mode = dm[0];	
+	} else {
+		*mode = dm[index];	
 	}
 
 	delete[] dm;
 
-	if (!found) {
-		fprintf(stderr, "mode not found (%d, %d, %f)!\n", width, height, frequency);
+	return B_OK;
+}
+
+// _FindMode
+int32
+Screen::_FindMode(const display_mode* dm, uint32 count,
+				  uint16 width, uint16 height, uint32 colorspace,
+				  float frequency, bool ignoreFrequency) const
+{
+	int32 index = -1;
+	for (uint32 i = 0; i < count; i++) {
+		if (dm[i].virtual_width == width
+			&& dm[i].virtual_height == height
+			&& dm[i].space == colorspace) {
+			if (!ignoreFrequency) {
+				// we have found a mode with the correct width, height and format
+				// now see if the frequency matches (don't be too picky)
+				float modeFrequency = 0.0;
+				float t = dm[i].timing.h_total * dm[i].timing.v_total;
+				if (t != 0.0)
+					modeFrequency = dm[i].timing.pixel_clock * 1000.f / t;
+	
+				if (int(modeFrequency/* * 10.0*/ + 0.5) == int(frequency/* * 10.0*/ + 0.5)) {
+					index = i;
+					break;
+				}
+			} else {
+				// ignore frequency
+				index = i;
+				break;
+			}
+		}
 	}
-	return found ? B_OK : B_ERROR;
+	return index;
 }
 
