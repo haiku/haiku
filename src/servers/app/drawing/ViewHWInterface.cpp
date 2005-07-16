@@ -11,6 +11,7 @@
 //  
 //------------------------------------------------------------------------------
 
+#include <new>
 #include <stdio.h>
 
 #include <Bitmap.h>
@@ -564,7 +565,7 @@ ViewHWInterface::GetModeList(display_mode **_modes, uint32 *_count)
 	const uint32 colors[] = {B_CMAP8, B_RGB15, B_RGB16, B_RGB32};
 	uint32 count = resolutionCount * 4;
 
-	display_mode *modes = new display_mode[count];
+	display_mode *modes = new(nothrow) display_mode[count];
 	if (modes == NULL)
 		return B_NO_MEMORY;
 
@@ -591,6 +592,13 @@ ViewHWInterface::GetModeList(display_mode **_modes, uint32 *_count)
 			index++;
 		}
 	}
+/*	display_mode *modes = new(nothrow) display_mode[1];
+	modes[0].virtual_width = 640;
+	modes[0].virtual_height = 480;
+	modes[0].space = B_CMAP8;
+
+	*_modes = modes;
+	*_count = 1;*/
 
 	return B_OK;
 }
