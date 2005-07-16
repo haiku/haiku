@@ -32,6 +32,7 @@ static const int32 kDefaultAccelerationFactor = 65536;
 
 MouseSettings::MouseSettings()
 {
+	Defaults();
 	RetrieveSettings();
 
 #ifdef DEBUG
