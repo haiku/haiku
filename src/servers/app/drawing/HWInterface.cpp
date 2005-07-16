@@ -14,7 +14,6 @@
 HWInterface::HWInterface(bool doubleBuffered)
 	: MultiLocker("hw interface lock"),
 	  fCursorAreaBackup(NULL),
-	  fSoftwareCursorHidden(false),
 	  fCursor(NULL),
 	  fCursorVisible(true),
 	  fCursorLocation(0, 0),
@@ -98,7 +97,8 @@ HWInterface::MoveCursorTo(const float& x, const float& y)
 			BRect oldFrame = _CursorFrame();
 			fCursorLocation = p;
 			if (fCursorAreaBackup) {
-				_RestoreCursorArea(oldFrame);
+				// means we have a software cursor which we need to draw
+				_RestoreCursorArea();
 				_DrawCursor(_CursorFrame());
 			}
 			Invalidate(oldFrame);
@@ -204,16 +204,15 @@ HWInterface::CopyBackToFront(const BRect& frame)
 void
 HWInterface::HideSoftwareCursor(const BRect& area)
 {
-	if (fCursorAreaBackup && !fSoftwareCursorHidden) {
+	if (fCursorAreaBackup && !fCursorAreaBackup->cursor_hidden) {
 		BRect backupArea(fCursorAreaBackup->left,
 						 fCursorAreaBackup->top,
 						 fCursorAreaBackup->right,
 						 fCursorAreaBackup->bottom);
 		if (area.Intersects(backupArea)) {
-//printf("HideSoftwareCursor(BRect(%.1, %.1, %.1, %.1))\n", area.left, area.top, area.right, area.bottom);
+//printf("HideSoftwareCursor(BRect(%.1f, %.1f, %.1f, %.1f))\n", area.left, area.top, area.right, area.bottom);
 //backupArea.PrintToStream();
-			_RestoreCursorArea(backupArea);
-			fSoftwareCursorHidden = true;
+			_RestoreCursorArea();
 		}
 	}
 }
@@ -222,24 +221,17 @@ HWInterface::HideSoftwareCursor(const BRect& area)
 void
 HWInterface::HideSoftwareCursor()
 {
-	if (fCursorAreaBackup && !fSoftwareCursorHidden) {
 //printf("HideSoftwareCursor()\n");
-		_RestoreCursorArea(BRect(fCursorAreaBackup->left,
-								 fCursorAreaBackup->top,
-								 fCursorAreaBackup->right,
-								 fCursorAreaBackup->bottom));
-		fSoftwareCursorHidden = true;
-	}
+	_RestoreCursorArea();
 }
 
 // ShowSoftwareCursor
 void
 HWInterface::ShowSoftwareCursor()
 {
-	if (fCursorAreaBackup && fSoftwareCursorHidden) {
+	if (fCursorAreaBackup && fCursorAreaBackup->cursor_hidden) {
 //printf("ShowSoftwareCursor()\n");
 		_DrawCursor(_CursorFrame());
-		fSoftwareCursorHidden = false;
 	}
 }
 
@@ -295,6 +287,8 @@ HWInterface::_DrawCursor(BRect area) const
 		uint8* dst = buffer;
 
 		if (fCursorAreaBackup) {
+//printf("backup: BRect(%ld, %ld, %ld, %ld)\n", left, top, right, bottom);
+			fCursorAreaBackup->cursor_hidden = false;
 			// remember which area the backup contains
 			fCursorAreaBackup->left = left;
 			fCursorAreaBackup->top = top;
@@ -478,7 +472,8 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR,
 					dst += dstBPR;
 					src += srcBPR;
 				}
-			}
+			} else
+printf("nothing to copy\n");
 			break;
 		}
 		// NOTE: on R5, B_RGB24 bitmaps are not supported by DrawBitmap()
@@ -609,27 +604,18 @@ HWInterface::_CursorFrame() const
 
 // _RestoreCursorArea
 void
-HWInterface::_RestoreCursorArea(const BRect& area) const
+HWInterface::_RestoreCursorArea() const
 {
-	if (fCursorAreaBackup) {
+	if (fCursorAreaBackup && !fCursorAreaBackup->cursor_hidden) {
+//printf("restore\n");
+		_CopyToFront(fCursorAreaBackup->buffer,
+					 fCursorAreaBackup->bpr,
+					 fCursorAreaBackup->left,
+					 fCursorAreaBackup->top,
+					 fCursorAreaBackup->right,
+					 fCursorAreaBackup->bottom);
 
-		// clip backup area against "area"
-		int32 left = max_c((int32)area.left, fCursorAreaBackup->left);
-		int32 top = max_c((int32)area.top, fCursorAreaBackup->top);
-		int32 right = min_c((int32)area.right, fCursorAreaBackup->right);
-		int32 bottom = min_c((int32)area.bottom, fCursorAreaBackup->bottom);
-
-		if (left <= right && top <= bottom) {
-
-			uint8* src = fCursorAreaBackup->buffer;
-			if (fCursorAreaBackup->left < left)
-				src += (left - fCursorAreaBackup->left) * 4;
-			if (fCursorAreaBackup->top < top)
-				src += (top - fCursorAreaBackup->top) * fCursorAreaBackup->bpr;
-
-			_CopyToFront(src, fCursorAreaBackup->bpr,
-						 left, top, right, bottom);
-		}
+		fCursorAreaBackup->cursor_hidden = true;
 	}
 }
 

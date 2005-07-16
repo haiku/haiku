@@ -117,7 +117,7 @@ class HWInterface : public MultiLocker {
 											 int32 right, int32 bottom) const;
 
 			BRect				_CursorFrame() const;
-			void				_RestoreCursorArea(const BRect& frame) const;
+			void				_RestoreCursorArea() const;
 
 			// If we draw the cursor somewhere in the drawing buffer,
 			// we need to backup its contents before drawing, so that
@@ -135,6 +135,7 @@ class HWInterface : public MultiLocker {
 									top = 0;
 									right = -1;
 									bottom = -1;
+									cursor_hidden = true;
 								}
 								~buffer_clip()
 								{
@@ -146,10 +147,10 @@ class HWInterface : public MultiLocker {
 				int32			right;
 				int32			bottom;
 				int32			bpr;
+				bool			cursor_hidden;
 			};
 
 			buffer_clip*		fCursorAreaBackup;
-			bool				fSoftwareCursorHidden;
 
 			ServerCursor*		fCursor;
 			bool				fCursorVisible;
