@@ -3,12 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-// TODO: While debugging only. Remove when implementation is done.
-#ifdef DEBUG
-#undef DEBUG
-#endif
-#define DEBUG 1
-
 #include <new>
 
 #include <signal.h>
@@ -1106,6 +1100,8 @@ ShutdownProcess::_PrepareShutdownMessage(BMessage &message) const
 status_t
 ShutdownProcess::_ShutDown()
 {
+	PRINT(("Invoking _kern_shutdown(%d)\n", fReboot));
+
 	#ifdef __HAIKU__
 		RETURN_ERROR(_kern_shutdown(fReboot));
 	#else
@@ -1430,7 +1426,6 @@ ShutdownProcess::_QuitApps(AppInfoList &list, bool disableCancel)
 
 		} while (event != NO_EVENT);
 
-		// TODO: check whether the app blocks on a modal alert
 		if (appGone) {
 			// fine: the app finished in an orderly manner
 		} else {
