@@ -356,7 +356,7 @@ static status_t map_device(device_info *di)
 
  	/*work out which version of BeOS is running*/
  	get_system_info(&sysinfo);
- 	if (sysinfo.kernel_build_date[0]=='J')/*FIXME - better ID version*/
+ 	if (0)//sysinfo.kernel_build_date[0]=='J')/*FIXME - better ID version*/
  	{
  		si->use_clone_bugfix = 1;
  	}
