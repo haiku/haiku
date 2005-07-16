@@ -1840,6 +1840,7 @@ install_team_debugger(team_id teamID, port_id debuggerPort, bool useDefault,
 	bool done = false;
 	port_id result = B_ERROR;
 	bool handOver = false;
+	bool releaseDebugInfoLock = true;
 	port_id oldDebuggerPort = -1;
 	port_id nubPort = -1;
 
@@ -1877,8 +1878,20 @@ install_team_debugger(team_id teamID, port_id debuggerPort, bool useDefault,
 					debuggerPort, nubPort, team->debug_info.nub_thread,
 					team->debug_info.debugger_write_lock);
 
+				releaseDebugInfoLock = false;
 				handOver = true;
 				done = true;
+
+				// finally set the new port owner
+				if (set_port_owner(nubPort, debuggerTeam) != B_OK) {
+					// The old debugger must just have died. Just proceed as
+					// if there was no debugger installed. We may still be too
+					// early, in which case we'll fail, but this race condition
+					// should be unbelievably rare and relatively harmless.
+					handOver = false;
+					done = false;
+				}
+
 			} else {
 				// there's already a debugger installed
 				error = (dontFail ? B_OK : B_BAD_VALUE);
@@ -1887,8 +1900,8 @@ install_team_debugger(team_id teamID, port_id debuggerPort, bool useDefault,
 			}
 		}
 
-		// in case of a handover the lock is already released
-		if (!handOver)
+		// in case of a handover the lock has already been released
+		if (releaseDebugInfoLock)
 			RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
 	} else
 		error = B_BAD_TEAM_ID;
