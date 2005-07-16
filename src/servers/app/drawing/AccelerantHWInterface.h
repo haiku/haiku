@@ -66,8 +66,9 @@ virtual	void					MoveCursorTo(const float& x,
 											 const float& y);
 
 	// frame buffer access
-virtual	RenderingBuffer			*FrontBuffer() const;
-virtual	RenderingBuffer			*BackBuffer() const;
+virtual	RenderingBuffer*		FrontBuffer() const;
+virtual	RenderingBuffer*		BackBuffer() const;
+virtual	bool					IsDoubleBuffered() const;
 
 protected:
 virtual	void					_DrawCursor(BRect area) const;

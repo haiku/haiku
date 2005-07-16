@@ -791,6 +791,16 @@ AccelerantHWInterface::BackBuffer() const
 	return fBackBuffer;
 }
 
+// IsDoubleBuffered
+bool
+AccelerantHWInterface::IsDoubleBuffered() const
+{
+	if (fModeList)
+		return fBackBuffer != NULL;
+
+	return HWInterface::IsDoubleBuffered();
+}
+
 // _DrawCursor
 void
 AccelerantHWInterface::_DrawCursor(BRect area) const
