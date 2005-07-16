@@ -1702,9 +1702,12 @@ kill_team(team_id id)
 	GRAB_TEAM_LOCK();
 
 	team = team_get_team_struct_locked(id);
-	if (team != NULL)
-		tid = team->main_thread->id;
-	else
+	if (team != NULL) {
+		if (team == kernel_team)
+			retval = B_NOT_ALLOWED;
+		else
+			tid = team->main_thread->id;
+	} else
 		retval = B_BAD_THREAD_ID;
 
 	RELEASE_TEAM_LOCK();
