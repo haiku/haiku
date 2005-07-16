@@ -223,7 +223,6 @@ FillColorMap(const rgb_color *palette, color_map *map)
 void
 InitializeColorMap()
 {
-printf("InitializeColorMap()\n");
 	FillColorMap(kSystemPalette, &sColorMap);
 }
 
