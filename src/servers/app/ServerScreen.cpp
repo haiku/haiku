@@ -106,11 +106,10 @@ Screen::SetMode(uint16 width, uint16 height, uint32 colorspace,
 	ret = _FindMode(width, height, colorspace, frequency, &mode);
 
 	if (ret < B_OK) {
+		// TODO: Move fallback elsewhere, this function should simply
+		// fail if requested to set unsupported mode.
 		// Ups. Not good. Ignore the requested mode and use fallback params.
-		mode.virtual_width = 640;
-		mode.virtual_height = 480;
-		mode.space = B_CMAP8;
-		ret = _FindMode(width, height, colorspace, frequency, &mode);
+		ret = _FindMode(640, 480, B_CMAP8, 60.0, &mode);
 	}
 
 	if (ret >= B_OK)
