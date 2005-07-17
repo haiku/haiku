@@ -114,7 +114,7 @@ ScreenManager::ReleaseScreens(ScreenList& list)
 	for (int32 i = 0; i < fScreenList.CountItems(); i++) {
 		screen_item *item = fScreenList.ItemAt(i);
 
-		for (int32 j = 0; j < list.CountItems(); i++) {
+		for (int32 j = 0; j < list.CountItems(); j++) {
 			Screen* screen = list.ItemAt(j);
 
 			if (item->screen == screen)
