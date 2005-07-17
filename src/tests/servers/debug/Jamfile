@@ -1,0 +1,3 @@
+SubDir OBOS_TOP src tests servers debug ;
+
+SimpleTest crashing_app : crashing_app.cpp : libroot.so ;
