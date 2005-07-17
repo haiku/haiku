@@ -3,13 +3,16 @@ SubDir OBOS_TOP src tests apps miniterminal ;
 UseHeaders [ FDirName $(OBOS_TOP) src tests apps miniterminal ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src apps terminal MYOB ] ;
 
+AddResources MiniTerminal : MiniTerminal.rdef ;
+
 App MiniTerminal :
 	Arguments.cpp
 	Console.cpp
 	MiniApp.cpp
 	MiniView.cpp 
 	MiniWin.cpp
-	ViewBuffer.cpp ;
+	ViewBuffer.cpp
+	;
 
 if $(TARGET_PLATFORM) = haiku {
 	LinkSharedOSLibs MiniTerminal : libroot.so libbe.so ;
