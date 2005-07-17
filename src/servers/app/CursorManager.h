@@ -28,9 +28,8 @@
 #define CURSORMANAGER_H_
 
 #include <List.h>
-#include <OS.h>
-#include <SysCursor.h>
 #include <Locker.h>
+#include "SysCursor.h"
 #include "TokenHandler.h"
 
 class ServerCursor;
@@ -52,9 +51,9 @@ public:
 		void			RemoveAppCursors(team_id team);
 		void			SetCursorSet(const char *path);
 		ServerCursor	*GetCursor(cursor_which which);
-		cursor_which	GetCursorWhich(void);
+		cursor_which	GetCursorWhich();
 		void			ChangeCursor(cursor_which which, int32 token);
-		void			SetDefaults(void);
+		void			SetDefaults();
 		ServerCursor	*FindCursor(int32 token);
 
 private:
@@ -73,7 +72,5 @@ private:
 						*fEWCursor;
 		cursor_which	fCurrentWhich;
 };
-
-extern CursorManager *cursormanager;
 
 #endif

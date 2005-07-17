@@ -24,18 +24,12 @@
 //	Description:	Handles the system's cursor infrastructure
 //  
 //------------------------------------------------------------------------------
-#include "CursorManager.h"
-#include "ServerCursor.h"
-#include "CursorData.h"
-#include "ServerScreen.h"
-#include "ServerConfig.h"
-#include <Errors.h>
 #include <Directory.h>
 #include <String.h>
-#include <string.h>
-
-//! The global cursor manager object. Allocated and freed by AppServer class
-CursorManager *cursormanager;
+#include "CursorData.h"
+#include "CursorManager.h"
+#include "ServerCursor.h"
+#include "ServerConfig.h"
 
 //! Initializes the CursorManager
 CursorManager::CursorManager()
@@ -44,80 +38,73 @@ CursorManager::CursorManager()
 	fTokenizer.ExcludeValue(B_ERROR);
 
 	// Set system cursors to "unassigned"
-	ServerCursor *cdefault=new ServerCursor(default_cursor_data);
-	AddCursor(cdefault);
-	fDefaultCursor=cdefault;
-	
-	ServerCursor *ctext=new ServerCursor(default_text_data);
-	AddCursor(ctext);
-	fTextCursor=ctext;
+	fDefaultCursor = new ServerCursor(default_cursor_data);
+	AddCursor(fDefaultCursor);
 
-	ServerCursor *cmove=new ServerCursor(default_move_data);
-	AddCursor(cmove);
-	fMoveCursor=cmove;
+	fTextCursor = new ServerCursor(default_text_data);
+	AddCursor(fTextCursor);
 
-	ServerCursor *cdrag=new ServerCursor(default_drag_data);
-	AddCursor(cdrag);
-	fDragCursor=cdrag;
+	fMoveCursor = new ServerCursor(default_move_data);
+	AddCursor(fMoveCursor);
 
-	ServerCursor *cresize=new ServerCursor(default_resize_data);
-	AddCursor(cresize);
-	fResizeCursor=cresize;
+	fDragCursor = new ServerCursor(default_drag_data);
+	AddCursor(fDragCursor);
 
-	ServerCursor *cresizenwse=new ServerCursor(default_resize_nwse_data);
-	AddCursor(cresizenwse);
-	fNWSECursor=cresizenwse;
+	fResizeCursor = new ServerCursor(default_resize_data);
+	AddCursor(fResizeCursor);
 
-	ServerCursor *cresizenesw=new ServerCursor(default_resize_nesw_data);
-	AddCursor(cresizenesw);
-	fNESWCursor=cresizenesw;
+	fNWSECursor = new ServerCursor(default_resize_nwse_data);
+	AddCursor(fNWSECursor);
 
-	ServerCursor *cresizens=new ServerCursor(default_resize_ns_data);
-	AddCursor(cresizens);
-	fNSCursor=cresizens;
+	fNESWCursor = new ServerCursor(default_resize_nesw_data);
+	AddCursor(fNESWCursor);
 
-	ServerCursor *cresizeew=new ServerCursor(default_resize_ew_data);
-	AddCursor(cresizeew);
-	fEWCursor=cresizeew;
+	fNSCursor = new ServerCursor(default_resize_ns_data);
+	AddCursor(fNSCursor);
 
+	fEWCursor = new ServerCursor(default_resize_ew_data);
+	AddCursor(fEWCursor);
 }
+
 
 //! Does all the teardown
 CursorManager::~CursorManager()
 {
-	ServerCursor *temp;
-	for(int32 i=0; i<fCursorList.CountItems();i++)
-	{
-		temp=(ServerCursor*)fCursorList.ItemAt(i);
-		if(temp)
-			delete temp;
+	for (int32 i = 0; i < fCursorList.CountItems(); i++) {
+		ServerCursor *cursor = (ServerCursor *)fCursorList.ItemAt(i);
+		if (cursor)
+			delete cursor;
 	}
-	
+
 	// Note that it is not necessary to remove and delete the system
-	// cursors. These cursors are kept in the list with a NULL application
+	// cursors. These cursors are kept in the list with a empty application
 	// signature so they cannot be removed very easily except via
 	// SetCursor(cursor_which). At shutdown, they are removed with the 
 	// above loop.
 }
+
 
 /*!
 	\brief Registers a cursor with the manager.
 	\param sc ServerCursor object to register
 	\return The token assigned to the cursor or B_ERROR if sc is NULL
 */
-int32 CursorManager::AddCursor(ServerCursor *sc)
+int32
+CursorManager::AddCursor(ServerCursor *cursor)
 {
-	if(!sc)
+	if (!cursor)
 		return B_ERROR;
-	
+
 	Lock();
-	fCursorList.AddItem(sc);
-	int32 value=fTokenizer.GetToken();
-	sc->fToken=value;
+
+	fCursorList.AddItem(cursor);
+	int32 token = fTokenizer.GetToken();
+	cursor->fToken = token;
+
 	Unlock();
-	
-	return value;
+	return token;
 }
+
 
 /*!
 	\brief Removes a cursor from the internal list and deletes it
@@ -125,23 +112,24 @@ int32 CursorManager::AddCursor(ServerCursor *sc)
 	
 	If the cursor is not found, this call does nothing
 */
-void CursorManager::DeleteCursor(int32 token)
+void
+CursorManager::DeleteCursor(int32 token)
 {
 	Lock();
 
-	ServerCursor *temp;
-	for(int32 i=0; i<fCursorList.CountItems();i++)
-	{
-		temp=(ServerCursor*)fCursorList.ItemAt(i);
-		if(temp && temp->fToken==token)
-		{
+	for (int32 i = 0; i < fCursorList.CountItems(); i++) {
+		ServerCursor *cursor = (ServerCursor *)fCursorList.ItemAt(i);
+
+		if (cursor && cursor->fToken == token) {
 			fCursorList.RemoveItem(i);
-			delete temp;
+			delete cursor;
 			break;
 		}
 	}
+
 	Unlock();
 }
+
 
 /*!
 	\brief Removes and deletes all of an application's cursors
@@ -151,10 +139,13 @@ void
 CursorManager::RemoveAppCursors(team_id team)
 {
 	Lock();
-	
-	ServerCursor *cursor;
+
 	int32 index = 0;
-	while ((cursor = (ServerCursor*)fCursorList.ItemAt(index)) != NULL) {
+	while (index < fCursorList.CountItems()) {
+		ServerCursor *cursor = (ServerCursor *)fCursorList.ItemAt(index);
+		if (!cursor)
+			break;
+
 		if (cursor->OwningTeam() == team) {
 			fCursorList.RemoveItem(index);
 			delete cursor;
@@ -165,88 +156,84 @@ CursorManager::RemoveAppCursors(team_id team)
 	Unlock();
 }
 
+
 /*!
 	\brief Sets all the cursors from a specified CursorSet
 	\param path Path to the cursor set
 	
-	All cursors in the set will be assigned. If the set does not specify a cursor for a
-	particular cursor specifier, it will remain unchanged. This function will fail if passed
-	a NULL path, an invalid path, or the path to a non-CursorSet file.
+	All cursors in the set will be assigned. If the set does not specify a
+	cursor for a particular cursor specifier, it will remain unchanged.
+	This function will fail if passed a NULL path, an invalid path, or the
+	path to a non-CursorSet file.
 */
-void CursorManager::SetCursorSet(const char *path)
+void
+CursorManager::SetCursorSet(const char *path)
 {
 	Lock();
-	CursorSet cs(NULL);
-	
-	if(!path || cs.Load(path)!=B_OK)
+	CursorSet cursorSet(NULL);
+
+	if (!path || cursorSet.Load(path) != B_OK)
 		return;
-	ServerCursor *csr;
-	
-	if(cs.FindCursor(B_CURSOR_DEFAULT,&csr)==B_OK)
-	{
-		if(fDefaultCursor)
+
+	ServerCursor *cursor = NULL;
+
+	if (cursorSet.FindCursor(B_CURSOR_DEFAULT, &cursor) == B_OK) {
+		if (fDefaultCursor)
 			delete fDefaultCursor;
-		fDefaultCursor=csr;
+		fDefaultCursor = cursor;
 	}
-	
-	if(cs.FindCursor(B_CURSOR_TEXT,&csr)==B_OK)
-	{
-		if(fTextCursor)
+
+	if (cursorSet.FindCursor(B_CURSOR_TEXT, &cursor) == B_OK) {
+		if (fTextCursor)
 			delete fTextCursor;
-		fTextCursor=csr;
+		fTextCursor = cursor;
 	}
-	
-	if(cs.FindCursor(B_CURSOR_MOVE,&csr)==B_OK)
-	{
-		if(fMoveCursor)
+
+	if (cursorSet.FindCursor(B_CURSOR_MOVE, &cursor) == B_OK) {
+		if (fMoveCursor)
 			delete fMoveCursor;
-		fMoveCursor=csr;
+		fMoveCursor = cursor;
 	}
-	
-	if(cs.FindCursor(B_CURSOR_DRAG,&csr)==B_OK)
-	{
-		if(fDragCursor)
+
+	if (cursorSet.FindCursor(B_CURSOR_DRAG, &cursor) == B_OK) {
+		if (fDragCursor)
 			delete fDragCursor;
-		fDragCursor=csr;
+		fDragCursor = cursor;
 	}
-	
-	if(cs.FindCursor(B_CURSOR_RESIZE,&csr)==B_OK)
-	{
-		if(fResizeCursor)
+
+	if (cursorSet.FindCursor(B_CURSOR_RESIZE, &cursor) == B_OK) {
+		if (fResizeCursor)
 			delete fResizeCursor;
-		fResizeCursor=csr;
+		fResizeCursor = cursor;
 	}
-	
-	if(cs.FindCursor(B_CURSOR_RESIZE_NWSE,&csr)==B_OK)
-	{
-		if(fNWSECursor)
+
+	if (cursorSet.FindCursor(B_CURSOR_RESIZE_NWSE, &cursor) == B_OK) {
+		if (fNWSECursor)
 			delete fNWSECursor;
-		fNWSECursor=csr;
+		fNWSECursor = cursor;
 	}
-	
-	if(cs.FindCursor(B_CURSOR_RESIZE_NESW,&csr)==B_OK)
-	{
-		if(fNESWCursor)
+
+	if (cursorSet.FindCursor(B_CURSOR_RESIZE_NESW, &cursor) == B_OK) {
+		if (fNESWCursor)
 			delete fNESWCursor;
-		fNESWCursor=csr;
+		fNESWCursor = cursor;
 	}
-	
-	if(cs.FindCursor(B_CURSOR_RESIZE_NS,&csr)==B_OK)
-	{
-		if(fNSCursor)
+
+	if (cursorSet.FindCursor(B_CURSOR_RESIZE_NS, &cursor) == B_OK) {
+		if (fNSCursor)
 			delete fNSCursor;
-		fNSCursor=csr;
+		fNSCursor = cursor;
 	}
-	
-	if(cs.FindCursor(B_CURSOR_RESIZE_EW,&csr)==B_OK)
-	{
-		if(fEWCursor)
+
+	if (cursorSet.FindCursor(B_CURSOR_RESIZE_EW, &cursor) == B_OK) {
+		if (fEWCursor)
 			delete fEWCursor;
-		fEWCursor=csr;
+		fEWCursor = cursor;
 	}
+
 	Unlock();
-	
 }
+
 
 /*!
 	\brief Acquire the cursor which is used for a particular system cursor
@@ -254,80 +241,75 @@ void CursorManager::SetCursorSet(const char *path)
 	\return Pointer to the particular cursor used or NULL if which is 
 	invalid or the cursor has not been assigned
 */
-ServerCursor *CursorManager::GetCursor(cursor_which which)
+ServerCursor *
+CursorManager::GetCursor(cursor_which which)
 {
-	ServerCursor *temp=NULL;
-	
+	ServerCursor *cursor = NULL;
 	Lock();
-	
-	switch(which)
-	{
+
+	switch (which) {
 		case B_CURSOR_DEFAULT:
-		{
-			temp=fDefaultCursor;
+			cursor = fDefaultCursor;
 			break;
-		}
+
 		case B_CURSOR_TEXT:
-		{
-			temp=fTextCursor;
+			cursor = fTextCursor;
 			break;
-		}
+
 		case B_CURSOR_MOVE:
-		{
-			temp=fMoveCursor;
+			cursor = fMoveCursor;
 			break;
-		}
+
 		case B_CURSOR_DRAG:
-		{
-			temp=fDragCursor;
+			cursor = fDragCursor;
 			break;
-		}
+
 		case B_CURSOR_RESIZE:
-		{
-			temp=fResizeCursor;
+			cursor = fResizeCursor;
 			break;
-		}
+
 		case B_CURSOR_RESIZE_NWSE:
-		{
-			temp=fNWSECursor;
+			cursor = fNWSECursor;
 			break;
-		}
+
 		case B_CURSOR_RESIZE_NESW:
-		{
-			temp=fNESWCursor;
+			cursor = fNESWCursor;
 			break;
-		}
+
 		case B_CURSOR_RESIZE_NS:
-		{
-			temp=fNSCursor;
+			cursor = fNSCursor;
 			break;
-		}
+
 		case B_CURSOR_RESIZE_EW:
-		{
-			temp=fEWCursor;
+			cursor = fEWCursor;
 			break;
-		}
+
 		default:
 			break;
 	}
-	
+
 	Unlock();
-	return temp;
+	return cursor;
 }
+
 
 /*!
 	\brief Gets the current system cursor value
 	\return The current cursor value or CURSOR_OTHER if some non-system cursor
 */
-cursor_which CursorManager::GetCursorWhich(void)
+cursor_which
+CursorManager::GetCursorWhich()
 {
-	cursor_which temp;
-	
 	Lock();
-	temp=fCurrentWhich;
+
+	// ToDo: Where is fCurrentWhich set?
+	cursor_which which;
+	which = fCurrentWhich;
+
 	Unlock();
-	return temp;
+	return which;
 }
+
 
 /*!
 	\brief Sets the specified system cursor to the a particular cursor
@@ -338,34 +320,28 @@ cursor_which CursorManager::GetCursorWhich(void)
 	system will take ownership of the cursor and deleting the cursor
 	will have no effect on the system.
 */
-void CursorManager::ChangeCursor(cursor_which which, int32 token)
+void
+CursorManager::ChangeCursor(cursor_which which, int32 token)
 {
 	Lock();
 
 	// Find the cursor, based on the token
-	ServerCursor *cursor=FindCursor(token);
-	
+	ServerCursor *cursor = FindCursor(token);
+
 	// Did we find a cursor with this token?
-	if(!cursor)
-	{
+	if (!cursor) {
 		Unlock();
 		return;
 	}
 
 	// Do the assignment
-	switch(which)
-	{
+	switch (which) {
 		case B_CURSOR_DEFAULT:
 		{
-			if(fDefaultCursor)
+			if (fDefaultCursor)
 				delete fDefaultCursor;
 
-			fDefaultCursor=cursor;
-
-			if(cursor->GetAppSignature())
-				cursor->SetAppSignature("");
-
-			fCursorList.RemoveItem(cursor);
+			fDefaultCursor = cursor;
 			break;
 		}
 		case B_CURSOR_TEXT:
@@ -373,11 +349,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 			if(fTextCursor)
 				delete fTextCursor;
 
-			fTextCursor=cursor;
-
-			if(cursor->GetAppSignature())
-				cursor->SetAppSignature("");
-			fCursorList.RemoveItem(cursor);
+			fTextCursor = cursor;
 			break;
 		}
 		case B_CURSOR_MOVE:
@@ -385,11 +357,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 			if(fMoveCursor)
 				delete fMoveCursor;
 
-			fMoveCursor=cursor;
-
-			if(cursor->GetAppSignature())
-				cursor->SetAppSignature("");
-			fCursorList.RemoveItem(cursor);
+			fMoveCursor = cursor;
 			break;
 		}
 		case B_CURSOR_DRAG:
@@ -397,11 +365,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 			if(fDragCursor)
 				delete fDragCursor;
 
-			fDragCursor=cursor;
-
-			if(cursor->GetAppSignature())
-				cursor->SetAppSignature("");
-			fCursorList.RemoveItem(cursor);
+			fDragCursor = cursor;
 			break;
 		}
 		case B_CURSOR_RESIZE:
@@ -409,11 +373,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 			if(fResizeCursor)
 				delete fResizeCursor;
 
-			fResizeCursor=cursor;
-
-			if(cursor->GetAppSignature())
-				cursor->SetAppSignature("");
-			fCursorList.RemoveItem(cursor);
+			fResizeCursor = cursor;
 			break;
 		}
 		case B_CURSOR_RESIZE_NWSE:
@@ -421,11 +381,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 			if(fNWSECursor)
 				delete fNWSECursor;
 
-			fNWSECursor=cursor;
-
-			if(cursor->GetAppSignature())
-				cursor->SetAppSignature("");
-			fCursorList.RemoveItem(cursor);
+			fNWSECursor = cursor;
 			break;
 		}
 		case B_CURSOR_RESIZE_NESW:
@@ -433,11 +389,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 			if(fNESWCursor)
 				delete fNESWCursor;
 
-			fNESWCursor=cursor;
-
-			if(cursor->GetAppSignature())
-				cursor->SetAppSignature("");
-			fCursorList.RemoveItem(cursor);
+			fNESWCursor = cursor;
 			break;
 		}
 		case B_CURSOR_RESIZE_NS:
@@ -445,11 +397,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 			if(fNSCursor)
 				delete fNSCursor;
 
-			fNSCursor=cursor;
-
-			if(cursor->GetAppSignature())
-				cursor->SetAppSignature("");
-			fCursorList.RemoveItem(cursor);
+			fNSCursor = cursor;
 			break;
 		}
 		case B_CURSOR_RESIZE_EW:
@@ -457,61 +405,64 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 			if(fEWCursor)
 				delete fEWCursor;
 
-			fEWCursor=cursor;
-
-			if(cursor->GetAppSignature())
-				cursor->SetAppSignature("");
-			fCursorList.RemoveItem(cursor);
+			fEWCursor = cursor;
 			break;
 		}
 		default:
-			break;
+			Unlock();
+			return;
 	}
-	
+
+	if (cursor->GetAppSignature())
+		cursor->SetAppSignature("");
+
+	fCursorList.RemoveItem(cursor);
 	Unlock();
 }
+
 
 /*!
 	\brief Internal function which finds the cursor with a particular ID
 	\param token ID of the cursor to find
 	\return The cursor or NULL if not found
 */
-ServerCursor *CursorManager::FindCursor(int32 token)
+ServerCursor *
+CursorManager::FindCursor(int32 token)
 {
-	ServerCursor *temp;
-	for(int32 i=0; i<fCursorList.CountItems();i++)
-	{
-		temp=(ServerCursor*)fCursorList.ItemAt(i);
-		if(temp && temp->fToken==token)
-			return temp;
+	for (int32 i = 0; i < fCursorList.CountItems(); i++) {
+		ServerCursor *cursor = (ServerCursor *)fCursorList.ItemAt(i);
+		if (cursor && cursor->fToken == token)
+			return cursor;
 	}
+
 	return NULL;
 }
 
+
 //! Sets the cursors to the defaults and saves them to CURSOR_SETTINGS_DIR/"d
-void CursorManager::SetDefaults(void)
+void
+CursorManager::SetDefaults()
 {
 	Lock();
-	CursorSet cs("Default");
-	cs.AddCursor(B_CURSOR_DEFAULT,default_cursor_data);
-	cs.AddCursor(B_CURSOR_TEXT,default_text_data);
-	cs.AddCursor(B_CURSOR_MOVE,default_move_data);
-	cs.AddCursor(B_CURSOR_DRAG,default_drag_data);
-	cs.AddCursor(B_CURSOR_RESIZE,default_resize_data);
-	cs.AddCursor(B_CURSOR_RESIZE_NWSE,default_resize_nwse_data);
-	cs.AddCursor(B_CURSOR_RESIZE_NESW,default_resize_nesw_data);
-	cs.AddCursor(B_CURSOR_RESIZE_NS,default_resize_ns_data);
-	cs.AddCursor(B_CURSOR_RESIZE_EW,default_resize_ew_data);
+	CursorSet cursorSet("Default");
+	cursorSet.AddCursor(B_CURSOR_DEFAULT, default_cursor_data);
+	cursorSet.AddCursor(B_CURSOR_TEXT, default_text_data);
+	cursorSet.AddCursor(B_CURSOR_MOVE, default_move_data);
+	cursorSet.AddCursor(B_CURSOR_DRAG, default_drag_data);
+	cursorSet.AddCursor(B_CURSOR_RESIZE, default_resize_data);
+	cursorSet.AddCursor(B_CURSOR_RESIZE_NWSE, default_resize_nwse_data);
+	cursorSet.AddCursor(B_CURSOR_RESIZE_NESW, default_resize_nesw_data);
+	cursorSet.AddCursor(B_CURSOR_RESIZE_NS, default_resize_ns_data);
+	cursorSet.AddCursor(B_CURSOR_RESIZE_EW, default_resize_ew_data);
 
 	BDirectory dir;
-	if(dir.SetTo(CURSOR_SET_DIR)==B_ENTRY_NOT_FOUND)
-		create_directory(CURSOR_SET_DIR,0777);
-	
+	if (dir.SetTo(CURSOR_SET_DIR) == B_ENTRY_NOT_FOUND)
+		create_directory(CURSOR_SET_DIR, 0777);
+
 	BString string(CURSOR_SET_DIR);
-	string+="Default";
-	cs.Save(string.String(),B_CREATE_FILE | B_FAIL_IF_EXISTS);
-	
+	string += "Default";
+	cursorSet.Save(string.String(), B_CREATE_FILE | B_FAIL_IF_EXISTS);
+
 	SetCursorSet(string.String());
 	Unlock();
 }
-
