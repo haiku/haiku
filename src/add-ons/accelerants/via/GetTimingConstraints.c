@@ -1,6 +1,6 @@
 /*
 	Author:
-	Rudolf Cornelissen 7/2004
+	Rudolf Cornelissen 7/2005
 */
 
 #define MODULE_BIT 0x01000000
@@ -12,7 +12,7 @@ status_t GET_TIMING_CONSTRAINTS(display_timing_constraints * dtc)
 {
 	LOG(4, ("GET_TIMING_CONSTRAINTS: returning info\n"));
 
-	/* specs are identical for all nVidia cards */
+	/* specs are identical for all VIA cards */
 	dtc->h_res = 8;
 	dtc->h_sync_min = 8;
 	dtc->h_sync_max = 248;

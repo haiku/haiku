@@ -21,7 +21,7 @@ status_t eng_crtc_validate_timing(
 	*ht   &= 0xfff8;
 
 	/* confine to required number of bits, taking logic into account */
-	if (*hd_e > ((0x01ff - 2) << 3)) *hd_e = ((0x01ff - 2) << 3);
+	if (*hd_e > ((0x00ff - 2) << 3)) *hd_e = ((0x00ff - 2) << 3);
 	if (*hs_s > ((0x01ff - 1) << 3)) *hs_s = ((0x01ff - 1) << 3);
 	if (*hs_e > ( 0x01ff      << 3)) *hs_e = ( 0x01ff      << 3);
 	if (*ht   > ((0x01ff + 5) << 3)) *ht   = ((0x01ff + 5) << 3);
@@ -29,14 +29,9 @@ status_t eng_crtc_validate_timing(
 	/* NOTE: keep horizontal timing at multiples of 8! */
 	/* confine to a reasonable width */
 	if (*hd_e < 640) *hd_e = 640;
-	if (si->ps.card_type > NV04)
-	{
-		if (*hd_e > 2048) *hd_e = 2048;
-	}
-	else
-	{
-		if (*hd_e > 1920) *hd_e = 1920;
-	}
+	/* assuming all VIA unichrome cards to have same max. constraint.. */
+	//fixme: checkout correct max...
+	if (*hd_e > 1600) *hd_e = 1600;
 
 	/* if hor. total does not leave room for a sensible sync pulse, increase it! */
 	if (*ht < (*hd_e + 80)) *ht = (*hd_e + 80);
@@ -54,7 +49,6 @@ status_t eng_crtc_validate_timing(
 
 /*vertical*/
 	/* confine to required number of bits, taking logic into account */
-	//fixme if needed: on GeForce cards there are 12 instead of 11 bits...
 	if (*vd_e > (0x7ff - 2)) *vd_e = (0x7ff - 2);
 	if (*vs_s > (0x7ff - 1)) *vs_s = (0x7ff - 1);
 	if (*vs_e >  0x7ff     ) *vs_e =  0x7ff     ;
@@ -62,14 +56,9 @@ status_t eng_crtc_validate_timing(
 
 	/* confine to a reasonable height */
 	if (*vd_e < 480) *vd_e = 480;
-	if (si->ps.card_type > NV04)
-	{
-		if (*vd_e > 1536) *vd_e = 1536;
-	}
-	else
-	{
-		if (*vd_e > 1440) *vd_e = 1440;
-	}
+	/* assuming all VIA unichrome cards to have same max. constraint.. */
+	//fixme: checkout correct max...
+	if (*vd_e > 1200) *vd_e = 1200;
 
 	/*if vertical total does not leave room for a sync pulse, increase it!*/
 	if (*vt < (*vd_e + 3)) *vt = (*vd_e + 3);
@@ -190,8 +179,9 @@ status_t eng_crtc_set_timing(display_mode target)
 	vsync_s = target.timing.v_sync_start;//-1;
 	vsync_e = target.timing.v_sync_end;//-1;
 
-	/* prevent memory adress counter from being reset (linecomp may not occur) */
-	linecomp = target.timing.v_display;
+	/* prevent memory adress counter from being reset (linecomp may not occur).
+	 * set all bits, otherwise distortion stripes may appear onscreen (VIA) */
+	linecomp = 0xffff;
 
 	/* Note for laptop and DVI flatpanels:
 	 * CRTC timing has a seperate set of registers from flatpanel timing.
@@ -223,10 +213,10 @@ status_t eng_crtc_set_timing(display_mode target)
 			((vtotal & 0x100) >> (8 - 0)) | ((vtotal & 0x200) >> (9 - 5)) |
 			((vdisp_e & 0x100) >> (8 - 1)) | ((vdisp_e & 0x200) >> (9 - 6)) |
 			((vsync_s & 0x100) >> (8 - 2)) | ((vsync_s & 0x200) >> (9 - 7)) |
-			((vblnk_s & 0x100) >> (8 - 3)) | ((linecomp & 0x100) >> (8 - 4))
+			((vblnk_s & 0x100) >> (8 - 3)) | ((linecomp & 0x0100) >> (8 - 4))
 		));
 		CRTCW(PRROWSCN, 0x00); /* not used */
-		CRTCW(MAXSCLIN, (((vblnk_s & 0x200) >> (9 - 5)) | ((linecomp & 0x200) >> (9 - 6))));
+		CRTCW(MAXSCLIN, (((vblnk_s & 0x200) >> (9 - 5)) | ((linecomp & 0x0200) >> (9 - 6))));
 		CRTCW(VSYNCS, (vsync_s & 0xff));
 		CRTCW(VSYNCE, ((CRTCR(VSYNCE) & 0xf0) | (vsync_e & 0x0f)));
 		CRTCW(VDISPE, (vdisp_e & 0xff));
@@ -235,46 +225,23 @@ status_t eng_crtc_set_timing(display_mode target)
 		CRTCW(LINECOMP, (linecomp & 0xff));
 
 		/* horizontal extended regs */
-		//fixme: we reset bit4. is this correct??
-/*		CRTCW(HEB, (CRTCR(HEB) & 0xe0) |
+		CRTCW(HTIMEXT1, (CRTCR(HTIMEXT1) & 0xc8) |
 			(
-		 	((htotal & 0x100) >> (8 - 0)) |
-			((hdisp_e & 0x100) >> (8 - 1)) |
-			((hblnk_s & 0x100) >> (8 - 2)) |
-			((hsync_s & 0x100) >> (8 - 3))
+		 	((linecomp & 0x1c00) >> (10 - 0)) |
+			((hblnk_e & 0x040) >> (6 - 5)) |
+			((hsync_s & 0x100) >> (8 - 4))
 			));
-*/
-		/* (mostly) vertical extended regs */
-/*		CRTCW(LSR,
+		CRTCW(HTIMEXT2, (CRTCR(HTIMEXT2) & 0xf7) | ((htotal & 0x100) >> (8 - 3)));
+
+		/* vertical extended regs */
+		CRTCW(VTIMEXT_PIT, (CRTCR(VTIMEXT_PIT) & 0xe0) |
 			(
 		 	((vtotal & 0x400) >> (10 - 0)) |
-			((vdisp_e & 0x400) >> (10 - 1)) |
-			((vsync_s & 0x400) >> (10 - 2)) |
+			((vsync_s & 0x400) >> (10 - 1)) |
+			((vdisp_e & 0x400) >> (10 - 2)) |
 			((vblnk_s & 0x400) >> (10 - 3)) |
-			((hblnk_e & 0x040) >> (6 - 4))
-			//fixme: we still miss one linecomp bit!?! is this it??
-			//| ((linecomp & 0x400) >> 3)	
+			((linecomp & 0x2000) >> (13 - 4))
 			));
-*/
-		/* more vertical extended regs (on GeForce cards only) */
-/*
-		if (si->ps.card_arch >= NV10A)
-		{ 
-			CRTCW(EXTRA,
-				(
-			 	((vtotal & 0x800) >> (11 - 0)) |
-				((vdisp_e & 0x800) >> (11 - 2)) |
-				((vsync_s & 0x800) >> (11 - 4)) |
-				((vblnk_s & 0x800) >> (11 - 6))
-				//fixme: do we miss another linecomp bit!?!
-				));
-		}
-*/
-		/* setup 'large screen' mode */
-//		if (target.timing.h_display >= 1280)
-//			CRTCW(REPAINT1, (CRTCR(REPAINT1) & 0xfb));
-//		else
-//			CRTCW(REPAINT1, (CRTCR(REPAINT1) | 0x04));
 
 		/* setup HSYNC & VSYNC polarity */
 		LOG(2,("CRTC: sync polarity: "));
@@ -587,7 +554,7 @@ status_t eng_crtc_set_display_pitch()
 
 	/* program the card */
 	CRTCW(PITCHL, (offset & 0x00ff));
-	CRTCW(PITCHH, (((CRTCR(PITCHH)) & 0x1f) | ((offset & 0x0700) >> 3)));
+	CRTCW(VTIMEXT_PIT, (((CRTCR(VTIMEXT_PIT)) & 0x1f) | ((offset & 0x0700) >> 3)));
 
 //test stuff:
 //	LOG(2,("CRTC: $32=$%02x, $33=$%02x, $35=$%02x, $36=$%02x\n",
