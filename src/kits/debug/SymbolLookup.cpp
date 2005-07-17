@@ -179,6 +179,13 @@ status_t
 SymbolLookup::LookupSymbolAddress(addr_t address, addr_t *_baseAddress,
 	const char **_symbolName, const char **_imageName, bool *_exactMatch)
 {
+	// Note, that this function doesn't find all symbols that we would like
+	// to find. E.g. static functions do not appear in the symbol table
+	// as function symbols, but each one seems to be a separate section.
+	// Therefore, to get completely satisfying results, we would need to scan
+	// the shared object's section headers, if we don't find the a matching
+	// symbol.
+
 	TRACE(("SymbolLookup::LookupSymbolAddress(%p)\n", (void*)address));
 
 	// get the image for the address
@@ -205,10 +212,19 @@ SymbolLookup::LookupSymbolAddress(addr_t address, addr_t *_baseAddress,
 		for (int32 j = Read(hashBuckets[i]);
 			 j != STN_UNDEF;
 			 j = Read(hashChains[j])) {
+
 			const struct Elf32_Sym *symbol = &Read(image->syms[j]);
 
-			// skip invalid symbols
-			if (symbol->st_value == 0
+			// The symbol table contains not only symbols referring to functions
+			// and data symbols within the shared object, but also referenced
+			// symbols of other shared objects, as well as section and file
+			// references. We ignore everything but function and data symbols
+			// that have an st_value != 0 (0 seems to be an indication for a
+			// symbol defined elsewhere -- couldn't verify that in the specs
+			// though).
+			if ((ELF32_ST_TYPE(symbol->st_info) != STT_FUNC
+					&& ELF32_ST_TYPE(symbol->st_info) != STT_OBJECT)
+				|| symbol->st_value == 0
 				|| symbol->st_value + symbol->st_size + textRegion->delta
 					> textRegion->vmstart + textRegion->size) {
 				continue;
