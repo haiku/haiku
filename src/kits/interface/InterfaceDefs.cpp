@@ -654,26 +654,15 @@ run_be_about()
 _IMPEXP_BE void
 set_focus_follows_mouse(bool follow)
 {
-	BPrivate::AppServerLink link;
-	link.StartMessage(AS_SET_FOCUS_FOLLOWS_MOUSE);
-	link.Attach<bool>(follow);
-	link.Flush();
+	// obviously deprecated API
+	set_mouse_mode(B_WARP_MOUSE);
 }
 
 
 _IMPEXP_BE bool
 focus_follows_mouse()
 {
-	bool ffm = false;
-
-	BPrivate::AppServerLink link;
-	link.StartMessage(AS_FOCUS_FOLLOWS_MOUSE);
-
-	int32 code;
-	if (link.FlushWithReply(code) == B_OK && code == SERVER_TRUE)
-		link.Read<bool>(&ffm);
-
-	return ffm;
+	return mouse_mode() != B_NORMAL_MOUSE;
 }
 
 
@@ -754,6 +743,9 @@ load_menu_settings(menu_info &into)
 	// TODO: Load settings from the settings file,
 	// and only if it fails, fallback to the defaults
 
+	// TODO: shouldn't the server handle the details? It could broadcast
+	//	change messages to the applications, which could also relayout
+	//	there menus and menu bars then (as soon as we have a layout management)
 	into.font_size = be_plain_font->Size();
 	be_plain_font->GetFamilyAndStyle(&into.f_family, &into.f_style);
 	into.background_color = ui_color(B_MENU_BACKGROUND_COLOR);
