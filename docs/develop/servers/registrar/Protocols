@@ -66,7 +66,9 @@ shut down
 
 target:		registrar app looper (preferred handler)
 message:	B_REG_SHUT_DOWN
-			"reboot": B_BOOL_TYPE
+			"reboot":			B_BOOL_TYPE
+			"confirm":			B_BOOL_TYPE
+			"synchronously":	B_BOOL_TYPE
 reply:		standard success
 on error:	- B_NO_REPLY (fatal)
 			- standard error (fatal)
@@ -74,6 +76,9 @@ on error:	- B_NO_REPLY (fatal)
 message fields:
 - "reboot": If true, the system reboots instead of turning the power off.
 - "confirm": If true, the user will be asked to confirm to shut down the system.
+- "synchronously": If true, the request sender gets a reply only, if the
+				   shutdown process fails. Otherwise the reply will be sent
+				   right before asking the user for confirmation (if desired).
 
 -----------------------------------------------------------------------
 

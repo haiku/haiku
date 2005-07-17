@@ -607,6 +607,7 @@ ShutdownProcess::ShutdownProcess(TRoster *roster, EventQueue *eventQueue)
 	  fShutdownError(B_ERROR),
 	  fHasGUI(false),
 	  fReboot(false),
+	  fRequestReplySent(false),
 	  fWindow(NULL)
 {
 }
@@ -656,7 +657,7 @@ ShutdownProcess::~ShutdownProcess()
 	}
 
 	// send a reply to the request and delete it
-	SendReply(fRequest, fShutdownError);
+	_SendReply(fShutdownError);
 	delete fRequest;
 }
 
@@ -853,6 +854,16 @@ ShutdownProcess::SendReply(BMessage *request, status_t error)
 		BMessage reply(B_REG_ERROR);
 		reply.AddInt32("error", error);
 		request->SendReply(&reply);
+	}
+}
+
+// _SendReply
+void
+ShutdownProcess::_SendReply(status_t error)
+{
+	if (!fRequestReplySent) {
+		SendReply(fRequest, error);
+		fRequestReplySent = true;
 	}
 }
 
@@ -1215,6 +1226,15 @@ void
 ShutdownProcess::_WorkerDoShutdown()
 {
 	PRINT(("ShutdownProcess::_WorkerDoShutdown()\n"));
+
+	// If we are here, the shutdown process has been initiated successfully,
+	// that is, if an asynchronous BRoster::Shutdown() was requested, we
+	// notify the caller at this point.
+	bool synchronously;
+	if (fRequest->FindBool("synchronously", &synchronously) == B_OK
+		&& !synchronously) {
+		_SendReply(B_OK);
+	}
 
 	// ask the user to confirm the shutdown, if desired
 	bool askUser;

@@ -32,6 +32,8 @@ public:
 	static void SendReply(BMessage *request, status_t error);
 
 private:
+	void _SendReply(status_t error);
+
 	void _NegativeQuitRequestReply(thread_id thread);
 
 	void _PrepareShutdownMessage(BMessage &message) const;
@@ -98,6 +100,7 @@ private:
 	status_t				fShutdownError;
 	bool					fHasGUI;
 	bool					fReboot;
+	bool					fRequestReplySent;
 	ShutdownWindow			*fWindow;
 };
 

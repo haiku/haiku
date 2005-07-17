@@ -20,8 +20,8 @@ public:
 	status_t SendTo(BMessage *message, BMessage *reply, bool mime);
 	bool IsMessengerValid(bool mime) const;
 
-	status_t ShutDown(bool reboot, bool confirm)
-		{ return fRoster->ShutDown(reboot, confirm); }
+	status_t ShutDown(bool reboot, bool confirm, bool synchronous)
+		{ return fRoster->ShutDown(reboot, confirm, synchronous); }
 
 	// needed by BApplication
 

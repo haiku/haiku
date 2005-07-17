@@ -462,20 +462,17 @@ TBarApp::MessageReceived(BMessage *message)
 			break;
 
 #if __HAIKU__
-		case CMD_REBOOT_SYSTEM:
 		case CMD_SUSPEND_SYSTEM:
+			break;
+
+		case CMD_REBOOT_SYSTEM:
 		case CMD_SHUTDOWN_SYSTEM: {
-			// TODO: Deskbar cannot quit because BRoster::Private::Shutdown() is synchronous,
-			// so we launch a thread which does the shutdown, this should be reworked so
-			// that we can simply send a message to the roster and be done with it
-			void* cookie = message->what == CMD_SHUTDOWN_SYSTEM ? NULL : (void*)1;
-			thread_id thread = spawn_thread(_shutdown, "shutdown thread", B_NORMAL_PRIORITY, cookie);
-			if (thread >= B_OK) {
-				status_t ret = resume_thread(thread);
-				if (ret < B_OK)
-					fprintf(stderr, "error resuming shutdown thread: %s\n", strerror(ret));
-			} else
-				fprintf(stderr, "error spawning shutdown thread: %s\n", strerror(thread));
+			bool reboot = (message->what == CMD_REBOOT_SYSTEM);
+			BRoster roster;
+			BRoster::Private rosterPrivate(roster);
+			status_t error = rosterPrivate.ShutDown(reboot, true, false);
+			if (error != B_OK)
+				fprintf(stderr, "Shutdown failed: %s\n", strerror(error));
 
 			break;
 		}
@@ -666,19 +663,6 @@ TBarApp::ShowConfigWindow()
 			fSettings.recentFoldersCount);
 	}
 }
-
-#if __HAIKU__
-// _shutdown
-int32
-TBarApp::_shutdown(void* cookie)
-{
-	BRoster roster;
-	BRoster::Private rosterPrivate(roster);
-	status_t error = rosterPrivate.ShutDown(cookie != NULL, false);
-	fprintf(stderr, "Shutdown failed: %s\n", strerror(error));
-	return 0;
-}
-#endif // __HAIKU__
 
 
 //	#pragma mark -

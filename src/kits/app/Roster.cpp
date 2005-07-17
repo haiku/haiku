@@ -1269,12 +1269,15 @@ BRoster::AddToRecentFolders(const entry_ref *folder, const char *appSig) const
 // ShutDown
 /*!	\brief Shuts down the system.
 
-	When the method succeeds, it doesn't return.
+	When \c synchronous is \c true and the method succeeds, it doesn't return.
 
 	\param reboot If \c true, the system will be rebooted instead of being
 		   powered off.
 	\param confirm If \c true, the user will be asked to confirm to shut down
 		   the system.
+	\param synchronous If \c false, the method will return as soon as the
+		   shutdown process has been initiated successfully (or an error
+		   occurred). Otherwise the method doesn't return, if successfully.
 	\return
 	- \c B_SHUTTING_DOWN, when there's already a shutdown process in
 	  progress,
@@ -1282,7 +1285,7 @@ BRoster::AddToRecentFolders(const entry_ref *folder, const char *appSig) const
 	- another error code in case something went wrong.
 */
 status_t
-BRoster::ShutDown(bool reboot, bool confirm)
+BRoster::ShutDown(bool reboot, bool confirm, bool synchronous)
 {
 	status_t error = B_OK;
 
@@ -1292,6 +1295,8 @@ BRoster::ShutDown(bool reboot, bool confirm)
 		error = request.AddBool("reboot", reboot);
 	if (error == B_OK)
 		error = request.AddBool("confirm", confirm);
+	if (error == B_OK)
+		error = request.AddBool("synchronous", synchronous);
 
 	// send the request
 	BMessage reply;

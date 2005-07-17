@@ -174,7 +174,7 @@ main(int argc, char **argv)
 	} else {
 		BRoster roster;
 		BRoster::Private rosterPrivate(roster);
-		status_t error = rosterPrivate.ShutDown(gReboot, askUser);
+		status_t error = rosterPrivate.ShutDown(gReboot, askUser, true);
 		fprintf(stderr, "Shutdown failed: %s\n", strerror(error));
 		return 2;
 	}
