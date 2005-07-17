@@ -31,7 +31,6 @@
 #include <stdio.h>
 #include <signal.h>
 #include <sys/wait.h>
-#include <bsd_mem.h>
 #include <stdlib.h>
 #include <malloc.h>
 
@@ -624,7 +623,7 @@ argmatch (char **argv, int argc, char *sstr, char *lstr,
 	*skipptr += 1;
       return 1;
     }
-  arglen = (valptr != NULL && (p = index (arg, '=')) != NULL
+  arglen = (valptr != NULL && (p = strchr(arg, '=')) != NULL
 	    ? p - arg : strlen (arg));
   if (lstr == 0 || arglen < minlen || strncmp (arg, lstr, arglen) != 0)
     return 0;
@@ -715,8 +714,8 @@ sort_args (int argc, char **argv)
 	  if (argv[from][1] == '-')
 	    {
 	      match = -1;
-	      thislen = strlen (argv[from]);
-	      equals = index (argv[from], '=');
+	      thislen = strlen(argv[from]);
+	      equals = strchr(argv[from], '=');
 	      if (equals != 0)
 		thislen = equals - argv[from];
 
@@ -797,9 +796,9 @@ sort_args (int argc, char **argv)
   while (to < argc)
     newargv[to++] = 0;
 
-  bcopy (newargv, argv, sizeof (char *) * argc);
+  memcpy(argv, newargv, sizeof (char *) * argc);
 
-  free (options);
-  free (newargv);
-  free (priority);
+  free(options);
+  free(newargv);
+  free(priority);
 }
