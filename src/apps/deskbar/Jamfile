@@ -1,5 +1,6 @@
 SubDir OBOS_TOP src apps deskbar ;
 
+UsePrivateHeaders app ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders tracker ;
 SubDirHdrs $(OBOS_TOP) src kits tracker ;

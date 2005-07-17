@@ -47,6 +47,10 @@ All rights reserved.
 #include <Path.h>
 #include <Roster.h>
 
+#if __HAIKU__
+#	include <RosterPrivate.h>
+#endif
+
 #include "FavoritesConfig.h"
 
 #include "icons.h"
@@ -457,6 +461,26 @@ TBarApp::MessageReceived(BMessage *message)
 			fSwitcherMess.SendMessage(message);
 			break;
 
+#if __HAIKU__
+		case CMD_REBOOT_SYSTEM:
+		case CMD_SUSPEND_SYSTEM:
+		case CMD_SHUTDOWN_SYSTEM: {
+			// TODO: Deskbar cannot quit because BRoster::Private::Shutdown() is synchronous,
+			// so we launch a thread which does the shutdown, this should be reworked so
+			// that we can simply send a message to the roster and be done with it
+			void* cookie = message->what == CMD_SHUTDOWN_SYSTEM ? NULL : (void*)1;
+			thread_id thread = spawn_thread(_shutdown, "shutdown thread", B_NORMAL_PRIORITY, cookie);
+			if (thread >= B_OK) {
+				status_t ret = resume_thread(thread);
+				if (ret < B_OK)
+					fprintf(stderr, "error resuming shutdown thread: %s\n", strerror(ret));
+			} else
+				fprintf(stderr, "error spawning shutdown thread: %s\n", strerror(thread));
+
+			break;
+		}
+#endif // __HAIKU__
+
 		default:
 			BApplication::MessageReceived(message);		
 			break;
@@ -642,6 +666,19 @@ TBarApp::ShowConfigWindow()
 			fSettings.recentFoldersCount);
 	}
 }
+
+#if __HAIKU__
+// _shutdown
+int32
+TBarApp::_shutdown(void* cookie)
+{
+	BRoster roster;
+	BRoster::Private rosterPrivate(roster);
+	status_t error = rosterPrivate.ShutDown(cookie != NULL, false);
+	fprintf(stderr, "Shutdown failed: %s\n", strerror(error));
+	return 0;
+}
+#endif // __HAIKU__
 
 
 //	#pragma mark -

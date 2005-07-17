@@ -48,11 +48,6 @@ All rights reserved.
 #include "StatusView.h"
 #include "IconMenuItem.h"
 
-// from roster_private.h
-const uint32 CMD_SHUTDOWN_SYSTEM = 301;
-const uint32 CMD_REBOOT_SYSTEM = 302;
-const uint32 CMD_SUSPEND_SYSTEM = 304;
-
 #define ROSTER_SIG "application/x-vnd.Be-ROST"
 
 #ifdef B_BEOS_VERSION_5
@@ -455,7 +450,11 @@ TBeMenu::ResetTargets()
 				case CMD_SUSPEND_SYSTEM:
 				case CMD_SHUTDOWN_SYSTEM:
 					// restart/shutdown
+#if __HAIKU__
+					item->SetTarget(be_app);
+#else
 					item->SetTarget(BMessenger(ROSTER_SIG));
+#endif
 					break;
 			}
 		}

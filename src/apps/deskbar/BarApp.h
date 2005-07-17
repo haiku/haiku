@@ -46,7 +46,6 @@ All rights reserved.
 #define _FLOATER_W_TYPE_ 4
 #define _STD_W_TYPE_ 0
 
-
 class BarTeamInfo {
 public:
 	BarTeamInfo(BList *teams, uint32 flags, char *sig, BBitmap *icon,
@@ -76,6 +75,11 @@ const uint32 msg_trackerFirst = 'TkFt';
 const uint32 msg_sortRunningApps = 'SAps';
 const uint32 msg_superExpando = 'SprE';
 const uint32 msg_expandNewTeams = 'ExTm';
+
+// from roster_private.h
+const uint32 CMD_SHUTDOWN_SYSTEM = 301;
+const uint32 CMD_REBOOT_SYSTEM = 302;
+const uint32 CMD_SUSPEND_SYSTEM = 304;
 
 /* --------------------------------------------- */
 
@@ -153,6 +157,10 @@ private:
 	void SaveSettings();
 	
 	void ShowConfigWindow();
+
+#if __HAIKU__
+	static int32 _shutdown(void* cookie);
+#endif
 
 	TBarWindow *fBarWindow;
 	BMessenger fSwitcherMess;
