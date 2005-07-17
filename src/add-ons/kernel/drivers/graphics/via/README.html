@@ -2,36 +2,43 @@
 <head>
 	<meta http-equiv="Content-Type"	content="text/html; charset=iso-8859-1">
 	<meta name="GENERATOR" content="The DarkSite">
-	<title>Readme for Haiku skeleton graphics driver</title>
+	<title>Readme for Haiku VIA unichrome (pro) graphics driver</title>
 </head>
 <body>
-<h2 align="center">Haiku skeleton graphics driver</h2></align><br><br>
+<h2 align="center">Haiku VIA unichrome (pro) graphics driver</h2></align><br><br>
 <hr>
 <h3><strong>NOTE PLEASE:</strong><br>
 You use this software at your own risk! Although I don't expect it to damage your PC, videocard or Monitor, I cannot guarantee this!</h3>
 <hr>
-<h2>Supported cards (as far as is known):</h2>
+<h2>Supported chipsets (as far as is known):</h2>
 <ul>
-	<li>None.
+<li>KM400 Unichrome (VT3205)
+<li>KM400 Unichrome (VT7205)
+<li>CLE266 Unichrome Pro (CLE3022)
+<li>CLE266 Unichrome Pro (CLE3122)
+<li>K8M800 Unichrome Pro (VT3204)
+<li>K8M800 Unichrome Pro (VT7204)
 </ul>
 <br>
 <hr>
 <h2>Features:</h2>
 <ul>
-	<li>None.
+	<li>Hardware cursor support;
+	<li>Autodetects assigned RAM amount preset in system BIOS;
+	<li>Partial support for modeswitching (sets resolution but not yet refresh or colorspace, supports virtualscreens).
 </ul>
 <strong>Known limitations:</strong> 
 <ul>
-	<li>Everything you can think of.
+	<li>A lot. But hey, already beats VESA mode ;-)
 </ul>
 <br>
 <hr>
 <h2>Installation:</h2>
 <br>
 In contrary to what I have said before you don't need to de-install official Be drivers for this driver to work correctly. This driver will install in the user part of the BeOS, so not in the system part where the official drivers are.<br>
-BeOS first checks (during boot) if there are 'user-addons' that should be loaded for a device. If not, it loads it's own drivers (if any). You can select which driver should be loaded by hitting the spacebar as soon as the BeOS 'icons' screen appears. If you select <strong>disable user addons</strong> the system will load it's own drivers. If you don't do anything, the system will load the Haiku skeleton graphics driver.<br>
+BeOS first checks (during boot) if there are 'user-addons' that should be loaded for a device. If not, it loads it's own drivers (if any). You can select which driver should be loaded by hitting the spacebar as soon as the BeOS 'icons' screen appears. If you select <strong>disable user addons</strong> the system will load it's own drivers. If you don't do anything, the system will load the Haiku VIA unichrome (pro) graphics driver.<br>
 <br>
-<strong>Note:</strong> This might turn out to be handy if you run into trouble upon testing the driver, or if you are 'tweaking' the skel.settings file...<br>
+<strong>Note:</strong> This might turn out to be handy if you run into trouble upon testing the driver, or if you are 'tweaking' the via.settings file...<br>
 <br><br>
 <strong>actual INSTALLATION:</strong><br>
 <br>
@@ -47,24 +54,24 @@ Unzip the zip file that contains the driver to the root folder. Now reboot and y
 <br>
 Currently there's no uninstall script included. Just do it manually:<br>
 <br>
-Delete the <strong>skel.accelerant</strong> file in <strong>home/config/add-ons/accelerants/</strong><br>
-Delete the <strong>skel.driver</strong> file in <strong>home/config/add-ons/kernel/drivers/bin/</strong><br>
-Delete the <strong>skel.settings</strong> file in <strong>home/config/settings/kernel/drivers/</strong><br>
-Delete the <strong>skel.driver shortcut</strong> in <strong>home/config/add-ons/kernel/drivers/dev/graphics/</strong> which pointed to the file <strong>skel.driver</strong>.<br>
+Delete the <strong>via.accelerant</strong> file in <strong>home/config/add-ons/accelerants/</strong><br>
+Delete the <strong>via.driver</strong> file in <strong>home/config/add-ons/kernel/drivers/bin/</strong><br>
+Delete the <strong>via.settings</strong> file in <strong>home/config/settings/kernel/drivers/</strong><br>
+Delete the <strong>via.driver shortcut</strong> in <strong>home/config/add-ons/kernel/drivers/dev/graphics/</strong> which pointed to the file <strong>via.driver</strong>.<br>
 <br>
 You have to reboot in order to apply the original configuration.<br>
 <br>
 <br>
 <hr>
 <a name="settings"></a><h2>Settings:</h2><br>
-Please read this information carefully *before* installing and using the Haiku skeleton graphics driver. It might spare you some trouble afterwards..<br>
-<p>The driver uses a file named <strong>skel.settings</strong> to determine how to use your card. After installation this file will be located at <strong>home/config/settings/kernel/drivers/</strong>. How you should setup this file depends on what you want to do with the driver. While it has a 'failsave' default configuration, you might be able to do better than that... Anyway, read the nifty details below.<br>
+Please read this information carefully *before* installing and using the Haiku VIA unichrome (pro) graphics driver. It might spare you some trouble afterwards..<br>
+<p>The driver uses a file named <strong>via.settings</strong> to determine how to use your card. After installation this file will be located at <strong>home/config/settings/kernel/drivers/</strong>. How you should setup this file depends on what you want to do with the driver. While it has a 'failsave' default configuration, you might be able to do better than that... Anyway, read the nifty details below.<br>
 <br>
 <strong>Note:</strong> The driver only reads this file during it's initialisation. This means that you have to reboot in order to let changes take effect.<br>
 <br>
 <br>
 <br>
-<strong>skel.settings driver configuration:</strong><br>
+<strong>via.settings driver configuration:</strong><br>
 <ul>
 	<li><strong>usebios:</strong><br>
 The name of this item may be somewhat misleading, it might be changed in the future. It actually tells the driver if it should coldstart the card or not. The driver will rely on the VGA BIOS to have coldstarted the card before BeOS booted if you specify 'true'.<br>
@@ -87,7 +94,7 @@ This option is disabled by default (preceded by a '#').<br>
 		A software cursor 'flickers' a bit sometimes because it has to be redrawn constantly. So <strong>hardcursor true</strong> is the preferred setting. For DirectWindow windowed mode functionality you need to use this setting also (Chart demo app for instance).
 	</ul>
 <li><strong>logmask:</strong> (set to minimal by default)<br>
-The logmask option is very handy to track down trouble in the driver. You should only enable this if you are doing so, otherwise keep it turned off because it slows down your system. (All lines have a '#' preceding 'logmask' by default.) Logging creates a logfile called <strong>skel.accelerant.0.log</strong> in your <strong>~ (home)</strong> folder. A second logfile may get created depending on how the driver is used (on cloning; for BWindowScreen for example). The second file is called <strong>skel.accelerant.1.log</strong>, and it will also be in your home folder.<br>
+The logmask option is very handy to track down trouble in the driver. You should only enable this if you are doing so, otherwise keep it turned off because it slows down your system. (All lines have a '#' preceding 'logmask' by default.) Logging creates a logfile called <strong>via.accelerant.0.log</strong> in your <strong>~ (home)</strong> folder. A second logfile may get created depending on how the driver is used (on cloning; for BWindowScreen for example). The second file is called <strong>via.accelerant.1.log</strong>, and it will also be in your home folder.<br>
 <strong>Note:</strong>
 <ul>
 <li>You may only enable *one* logmask-line. The value you place after it (hexadecimal 32bit) determines what will be logged. The first 7 digits determine the part of the driver that will be logging, the last single digit determines the level of logging (like 'all messages', or only 'error messages').
@@ -98,7 +105,7 @@ Dumprom is another 'tool' for bug-tracking purposes.
 		<li><strong>false:</strong> (default setting)<br>
 		Keep it set to <strong>dumprom false</strong>, unless you want the driver to dump the contents of your VGA BIOS ROM in a file.
 		<li><strong>true:</strong><br>
-		<strong>dumprom true</strong> lets the driver dump a copy of your VGA BIOS in a file called <strong>skel.rom</strong> in your <strong>~ (home)</strong> folder.
+		<strong>dumprom true</strong> lets the driver dump a copy of your VGA BIOS in a file called <strong>via.rom</strong> in your <strong>~ (home)</strong> folder.
 	</ul>
 <li><strong>switchhead:</strong><br>
 The driver always autodetects which output should be used as primary one, but you can let the driver 'invert' the outcome of that detection with this option (only for dualhead cards).
@@ -145,6 +152,6 @@ With the <strong>pgm_panel true</strong> setting, the driver will fix your panel
 <hr>
 <br>
 <a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on November 4, 2004)</p>
+<p>(Page last updated on July 17, 2005)</p>
 </body>
 </html>
