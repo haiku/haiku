@@ -1299,9 +1299,8 @@ rldelf_init(void)
 
 	// create the debug area
 	{
-		int32 size = (sizeof(runtime_loader_debug_area) + B_PAGE_SIZE - 1)
-			/ B_PAGE_SIZE * B_PAGE_SIZE;
-	
+		int32 size = TO_PAGE_SIZE(sizeof(runtime_loader_debug_area));
+
 		runtime_loader_debug_area *area;
 		area_id areaID = _kern_create_area(RUNTIME_LOADER_DEBUG_AREA_NAME,
 			(void **)&area, B_ANY_ADDRESS, size, B_NO_LOCK,
