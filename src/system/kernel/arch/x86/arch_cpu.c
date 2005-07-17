@@ -288,6 +288,8 @@ status_t
 arch_cpu_shutdown(bool _reboot)
 {
 	// ToDo: support real shutdown
+	if (!_reboot)
+		return B_NOT_SUPPORTED;
 
 	// try to reset the system using the keyboard controller
 	out8(0xfe, 0x64);
