@@ -1,5 +1,7 @@
 /* registers definitions and macros for access to them */
 
+/* documentation can be found at http://unichrome.sourceforge.net/ */
+
 /* PCI_config_space */
 #define ENCFG_DEVID		0x00
 #define ENCFG_DEVCTRL	0x04
@@ -573,21 +575,12 @@
 #define ENCRTCX_MODECTL		0x17
 #define ENCRTCX_LINECOMP	0x18
 /* VIA specific registers: */
-//testing:
-#define ENCRTCX_0x19		0x19
-#define ENCRTCX_0x1a		0x1a
-#define ENCRTCX_0x1b		0x1b
-#define ENCRTCX_0x1c		0x1c
-#define ENCRTCX_0x1d		0x1d
-#define ENCRTCX_0x1e		0x1e
-#define ENCRTCX_0x1f		0x1f
-//end testing.
 #define ENCRTCX_0x32		0x32
-#define ENCRTCX_0x33		0x33
+#define ENCRTCX_HTIMEXT1	0x33
 #define ENCRTCX_FBSTADDE	0x34
-#define ENCRTCX_PITCHH		0x35
-#define ENCRTCX_0x36		0x36 //b6,7 = DPMS, 00 = on, 11=off
-#define ENCRTCX_0x3b		0x3b //TVtype jumper: b1=1 = PAL, else NTSC
+#define ENCRTCX_VTIMEXT_PIT	0x35
+#define ENCRTCX_HTIMEXT2	0x36 //b6,7 = DPMS, 00 = on, 11=off (4H,5V?)
+#define ENCRTCX_TVTYPE		0x3b //TVtype jumper: b1=1 = PAL, else NTSC
 //end via
 /* Nvidia specific registers: */
 #define ENCRTCX_REPAINT0	0x19
