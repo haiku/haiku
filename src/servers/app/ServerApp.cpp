@@ -1117,7 +1117,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_GET_SCROLLBAR_INFO:
 		{
 			STRACE(("ServerApp %s: Get ScrollBar info\n", Signature()));
-			scroll_bar_info info = gDesktop->ScrollBarInfo();
+			scroll_bar_info info;
+			DesktopSettings settings(gDesktop);
+			settings.GetScrollBarInfo(info);
 
 			fLink.StartMessage(SERVER_TRUE);
 			fLink.Attach<scroll_bar_info>(info);
@@ -1130,50 +1132,67 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// Attached Data:
 			// 1) scroll_bar_info scroll bar info structure
 			scroll_bar_info info;
-			if (link.Read<scroll_bar_info>(&info) == B_OK)
-				gDesktop->SetScrollBarInfo(info);
-			
-			fLink.StartMessage(SERVER_TRUE);
-			fLink.Flush();
-			break;
-		}
-		case AS_FOCUS_FOLLOWS_MOUSE:
-		{
-			STRACE(("ServerApp %s: query Focus Follow Mouse in use\n", Signature()));
+			if (link.Read<scroll_bar_info>(&info) == B_OK) {
+				DesktopSettings settings(gDesktop);
+				settings.SetScrollBarInfo(info);
+			}
 
 			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<bool>(gDesktop->FFMouseInUse());
 			fLink.Flush();
 			break;
 		}
-		case AS_SET_FOCUS_FOLLOWS_MOUSE:
+
+		case AS_GET_MENU_INFO:
 		{
-			STRACE(("ServerApp %s: Set Focus Follows Mouse in use\n", Signature()));
-			bool follow;
-			if (link.Read<bool>(&follow) == B_OK)
-				gDesktop->UseFFMouse(follow);
+			STRACE(("ServerApp %s: Get menu info\n", Signature()));
+			menu_info info;
+			DesktopSettings settings(gDesktop);
+			settings.GetMenuInfo(info);
+
+			fLink.StartMessage(B_OK);
+			fLink.Attach<menu_info>(info);
+			fLink.Flush();
 			break;
 		}
+		case AS_SET_MENU_INFO:
+		{
+			STRACE(("ServerApp %s: Set menu info\n", Signature()));
+			menu_info info;
+			if (link.Read<menu_info>(&info) == B_OK) {
+				DesktopSettings settings(gDesktop);
+				settings.SetMenuInfo(info);
+					// TODO: SetMenuInfo() should do some validity check, so
+					//	that the answer we're giving can actually be useful
+			}
+
+			fLink.StartMessage(B_OK);
+			fLink.Flush();
+			break;
+		}
+
 		case AS_SET_MOUSE_MODE:
 		{
 			STRACE(("ServerApp %s: Set Focus Follows Mouse mode\n", Signature()));
 			// Attached Data:
 			// 1) enum mode_mouse FFM mouse mode
-			mode_mouse mmode;
-			if (link.Read<mode_mouse>(&mmode) == B_OK)
-				gDesktop->SetFFMouseMode(mmode);
+			mode_mouse mouseMode;
+			if (link.Read<mode_mouse>(&mouseMode) == B_OK) {
+				DesktopSettings settings(gDesktop);
+				settings.SetMouseMode(mouseMode);
+			}
 			break;
 		}
 		case AS_GET_MOUSE_MODE:
 		{
 			STRACE(("ServerApp %s: Get Focus Follows Mouse mode\n", Signature()));
-			mode_mouse mmode = gDesktop->FFMouseMode();
+			DesktopSettings settings(gDesktop);
 
 			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<mode_mouse>(mmode);
+			fLink.Attach<mode_mouse>(settings.MouseMode());
 			fLink.Flush();
 			break;
 		}
+
 		case AS_GET_UI_COLORS:
 		{
 			// Client application is asking for all the system colors at once

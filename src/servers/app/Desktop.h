@@ -14,6 +14,7 @@
 #include "ScreenManager.h"
 #include "ServerScreen.h"
 #include "VirtualScreen.h"
+#include "DesktopSettings.h"
 
 #include <InterfaceDefs.h>
 #include <List.h>
@@ -84,29 +85,15 @@ class Desktop : public BLocker, public ScreenOwner {
 			void				WriteWindowList(team_id team, BPrivate::LinkSender& sender);
 			void				WriteWindowInfo(int32 serverToken, BPrivate::LinkSender& sender);
 
-	// Methods for various desktop stuff handled by the server
-			void				SetScrollBarInfo(const scroll_bar_info &info);
-			scroll_bar_info		ScrollBarInfo() const;
-	
-			void				SetMenuInfo(const menu_info &info);
-			menu_info			MenuInfo() const;
-	
-			void				UseFFMouse(const bool &useffm);
-			bool				FFMouseInUse() const;
-			void				SetFFMouseMode(const mode_mouse &value);
-			mode_mouse			FFMouseMode() const;
-	
  private:
+			friend class DesktopSettings;
+
 			::VirtualScreen		fVirtualScreen;
+			DesktopSettings::Private* fSettings;
 			BList				fWinBorderList;
 
 			RootLayer*			fRootLayer;
 			Screen*				fActiveScreen;
-
-			scroll_bar_info		fScrollBarInfo;
-			menu_info			fMenuInfo;
-			mode_mouse			fMouseMode;
-			bool				fFFMouseMode;
 };
 
 extern Desktop *gDesktop;

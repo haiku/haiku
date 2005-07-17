@@ -30,6 +30,8 @@
 #include "ServerWindow.h"
 #include "WinBorder.h"
 #include "Workspace.h"
+#include "DesktopSettingsPrivate.h"
+
 
 #ifdef __HAIKU__
 #	define USE_ACCELERANT 1
@@ -55,28 +57,11 @@
 
 
 Desktop::Desktop()
-	: fWinBorderList(64),
-	  fActiveScreen(NULL),
-	  fMouseMode(B_NORMAL_MOUSE),
-	  fFFMouseMode(false)
+	:
+	fSettings(new DesktopSettings::Private()),
+	fWinBorderList(64),
+	fActiveScreen(NULL)
 {
-	// init scrollbar info
-	fScrollBarInfo.proportional = true;
-	fScrollBarInfo.double_arrows = false;
-	// look of the knob (R5: (0, 1, 2), 1 = default)
-	fScrollBarInfo.knob = 1;
-	fScrollBarInfo.min_knob_size = 15;
-
-	// init menu info
-	fMenuInfo.font_size = 12.0;
-// TODO: ...
-//	fMenuInfo.f_family;
-//	fMenuInfo.f_style;
-//	fMenuInfo.background_color = gColorSet->menu_background;
-	// look of the separator (R5: (0, 1, 2), default ?)
-	fMenuInfo.separator = 0;
-	fMenuInfo.click_to_open = true;
-	fMenuInfo.triggers_always_shown = false;
 }
 
 
@@ -86,13 +71,14 @@ Desktop::~Desktop()
 		delete border;
 
 	delete fRootLayer;
+	delete fSettings;
 }
 
 
 void
 Desktop::Init()
 {
-	fVirtualScreen.RestoreConfiguration(*this);
+	fVirtualScreen.RestoreConfiguration(*this, fSettings->WorkspacesMessage(0));
 
 	// TODO: temporary workaround, fActiveScreen will be removed
 	fActiveScreen = fVirtualScreen.ScreenAt(0);
@@ -395,66 +381,5 @@ Desktop::WriteWindowInfo(int32 serverToken, BPrivate::LinkSender& sender)
 	else
 		sender.Attach<char>('\0');
 	sender.Flush();
-}
-
-
-//---------------------------------------------------------------------------
-//				Methods for various desktop stuff handled by the server
-//---------------------------------------------------------------------------
-
-
-void
-Desktop::SetScrollBarInfo(const scroll_bar_info &info)
-{
-	fScrollBarInfo = info;
-}
-
-
-scroll_bar_info
-Desktop::ScrollBarInfo(void) const
-{
-	return fScrollBarInfo;
-}
-
-
-void
-Desktop::SetMenuInfo(const menu_info &info)
-{
-	fMenuInfo = info;
-}
-
-
-menu_info
-Desktop::MenuInfo(void) const
-{
-	return fMenuInfo;
-}
-
-
-void
-Desktop::UseFFMouse(const bool &useffm)
-{
-	fFFMouseMode = useffm;
-}
-
-
-bool
-Desktop::FFMouseInUse(void) const
-{
-	return fFFMouseMode;
-}
-
-
-void
-Desktop::SetFFMouseMode(const mode_mouse &value)
-{
-	fMouseMode = value;
-}
-
-
-mode_mouse
-Desktop::FFMouseMode(void) const
-{
-	return fMouseMode;
 }
 

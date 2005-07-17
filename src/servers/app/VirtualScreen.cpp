@@ -27,14 +27,38 @@ VirtualScreen::VirtualScreen()
 
 VirtualScreen::~VirtualScreen()
 {
+	_Reset();
+}
+
+
+void
+VirtualScreen::_Reset()
+{
+	ScreenList list;
+	for (int32 i = 0; i < fScreenList.CountItems(); i++) {
+		screen_item* item = fScreenList.ItemAt(i);
+
+		list.AddItem(item->screen);
+	}
+
+	gScreenManager->ReleaseScreens(list);
+	fScreenList.MakeEmpty();
+	fSettings.MakeEmpty();
+
+	fFrame.Set(0, 0, 0, 0);
+	fDisplayDriver = NULL;
+	fHWInterface = NULL;
 }
 
 
 status_t
-VirtualScreen::RestoreConfiguration(Desktop& desktop)
+VirtualScreen::RestoreConfiguration(Desktop& desktop, const BMessage* settings)
 {
-	// Copy current Desktop settings
-	//fSettings = desktop.Settings();
+	_Reset();
+
+	// Copy current Desktop workspace settings
+	if (settings)
+		fSettings = *settings;
 
 	ScreenList list;
 	status_t status = gScreenManager->AcquireScreens(&desktop, NULL, 0, false, list);

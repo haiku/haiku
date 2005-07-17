@@ -78,13 +78,16 @@ Server app_server :
 	RAMLinkMsgReader.cpp
 
 	# Manager Classes
-	AppServer.cpp
 	CursorManager.cpp
-	Desktop.cpp
-	ServerApp.cpp
-	ServerWindow.cpp
 	DecorManager.cpp
 	ScreenManager.cpp
+
+	AppServer.cpp
+	Desktop.cpp
+	DesktopSettings.cpp
+
+	ServerApp.cpp
+	ServerWindow.cpp
 
 	# DisplayDriver Classes
 	$(VIEW_DRIVER_SOURCES)
