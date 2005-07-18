@@ -47,26 +47,32 @@ int32 translatorVersion = 0x130;
 translation_format inputFormats[] = { 
 	{ GIF_TYPE, B_TRANSLATOR_BITMAP, 0.8, 0.8, "image/gif", "GIF image" }, 
 	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.3, 0.3, "image/x-be-bitmap", "Be Bitmap image" }, 
-	{ 0, 0, 0, 0, 0, 0 }
+	{ 0 }
 };
 
 translation_format outputFormats[] = { 
 	{ GIF_TYPE, B_TRANSLATOR_BITMAP, 0.8, 0.8, "image/gif", "GIF image" }, 
 	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.3, 0.3, "image/x-be-bitmap", "Be Bitmap image" }, 
-	{ 0, 0, 0, 0, 0, 0 }
+	{ 0 }
 };
 
+
 /* Build a pretty view for DataTranslations */
-status_t MakeConfig(BMessage *ioExtension, BView **outView, BRect *outExtent) {
+status_t
+MakeConfig(BMessage *ioExtension, BView **outView, BRect *outExtent)
+{
 	outExtent->Set(0, 0, 239, 239);
 	GIFView *gifview = new GIFView(*outExtent, "TranslatorView");
 	*outView = gifview;
 	return B_OK;
 }
 
+
 /* Look at first few bytes in stream to determine type - throw it back
    if it is not a GIF or a BBitmap that we understand */
-bool DetermineType(BPositionIO *source, bool *is_gif) {
+bool
+DetermineType(BPositionIO *source, bool *is_gif)
+{
 	unsigned char header[7];
 	*is_gif = true;
 	if (source->Read(header, 6) != 6) return false;
@@ -87,13 +93,17 @@ bool DetermineType(BPositionIO *source, bool *is_gif) {
 	return true;
 }
 
+
 /* Dump data from stream into a BBitmap */
-status_t GetBitmap(BPositionIO *in, BBitmap **out) {
+status_t
+GetBitmap(BPositionIO *in, BBitmap **out)
+{
 	TranslatorBitmap header;
 	
 	status_t err = in->Read(&header, sizeof(header));
-	if (err != sizeof(header)) return B_IO_ERROR;
-	
+	if (err != sizeof(header))
+		return B_IO_ERROR;
+
 	header.magic = B_BENDIAN_TO_HOST_INT32(header.magic);
 	header.bounds.left = B_BENDIAN_TO_HOST_FLOAT(header.bounds.left);
 	header.bounds.top = B_BENDIAN_TO_HOST_FLOAT(header.bounds.top);
@@ -116,9 +126,12 @@ status_t GetBitmap(BPositionIO *in, BBitmap **out) {
 	else return B_IO_ERROR;
 }	
 
+
 /* Required Identify function - may need to read entire header, not sure */
-status_t Identify(BPositionIO *inSource, const translation_format *inFormat, 
-		BMessage *ioExtension, translator_info *outInfo, uint32 outType) {
+status_t
+Identify(BPositionIO *inSource, const translation_format *inFormat, 
+	BMessage *ioExtension, translator_info *outInfo, uint32 outType)
+{
 
 	const char *debug_text = getenv("GIF_TRANSLATOR_DEBUG");
 	if ((debug_text != NULL) && (atoi(debug_text) != 0)) debug = true;
@@ -149,10 +162,13 @@ status_t Identify(BPositionIO *inSource, const translation_format *inFormat,
 	return B_OK;
 }
 
+
 /* Main required function - assumes that an incoming GIF must be translated
    to a BBitmap, and vice versa - this could be improved */
-status_t Translate(BPositionIO *inSource, const translator_info *inInfo, 
-		BMessage *ioExtension, uint32 outType, BPositionIO *outDestination) {
+status_t
+Translate(BPositionIO *inSource, const translator_info *inInfo, 
+	BMessage *ioExtension, uint32 outType, BPositionIO *outDestination)
+{
 
 	const char *debug_text = getenv("GIF_TRANSLATOR_DEBUG");
 	if ((debug_text != NULL) && (atoi(debug_text) != 0)) debug = true;
@@ -200,13 +216,19 @@ status_t Translate(BPositionIO *inSource, const translator_info *inInfo,
 	return B_OK;
 }
 
-GIFTranslator::GIFTranslator() : BApplication("application/x-vnd.Jules-GIFTranslator") {
+
+GIFTranslator::GIFTranslator()
+	: BApplication("application/x-vnd.Jules-GIFTranslator")
+{
 	BRect rect(100, 100, 339, 339);
 	gifwindow = new GIFWindow(rect, "GIF Settings");
 	gifwindow->Show();
 }
 
-int main() {
+
+int
+main()
+{
 	GIFTranslator myapp;
 	myapp.Run();
 	return 0;
