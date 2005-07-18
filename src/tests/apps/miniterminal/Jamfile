@@ -1,7 +1,7 @@
 SubDir OBOS_TOP src tests apps miniterminal ;
 
 UseHeaders [ FDirName $(OBOS_TOP) src tests apps miniterminal ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src apps terminal MYOB ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src apps terminal ] ;
 
 AddResources MiniTerminal : MiniTerminal.rdef ;
 
