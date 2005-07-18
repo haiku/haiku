@@ -49,6 +49,7 @@ SharedLibrary appserver :
 	BitmapManager.cpp
 	ColorSet.cpp
 	CursorData.cpp
+	CursorSet.cpp
 	Decorator.cpp
 	FontFamily.cpp
 	IPoint.cpp
@@ -58,7 +59,6 @@ SharedLibrary appserver :
 	ServerCursor.cpp
 	ServerFont.cpp
 	FontServer.cpp
-	SysCursor.cpp
 	SystemPalette.cpp
 	TokenHandler.cpp
 	Utils.cpp

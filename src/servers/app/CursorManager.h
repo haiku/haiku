@@ -29,7 +29,7 @@
 
 #include <List.h>
 #include <Locker.h>
-#include "SysCursor.h"
+#include "CursorSet.h"
 #include "TokenHandler.h"
 
 class ServerCursor;

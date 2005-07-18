@@ -89,6 +89,11 @@ Desktop::Init()
 
 	fRootLayer = new RootLayer(name, 4, this, GetDisplayDriver());
 	fRootLayer->RunThread();
+
+	// take care of setting the default cursor
+	ServerCursor *cursor = fRootLayer->GetCursorManager().GetCursor(B_CURSOR_DEFAULT);
+	if (cursor)
+		fVirtualScreen.HWInterface()->SetCursor(cursor);
 }
 
 

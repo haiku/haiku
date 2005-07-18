@@ -17,11 +17,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "CursorData.h"
 #include "DisplayDriverPainter.h"
-#include "HaikuSystemCursor.h"
 #include "HWInterface.h"
-#include "ServerCursor.h"
 
 #include "ServerScreen.h"
 
@@ -56,19 +53,6 @@ Screen::Initialize()
 	if (fDriver) {
 		// this will also init the graphics hardware the driver is attached to
 		ret = fDriver->Initialize();
-		if (ret >= B_OK) {
-			// take care of setting the cursor on this screen
-//			SetCursor(new ServerCursor(default_cursor_data));
-			// TODO: some temporary goofing arround
-			ServerCursor* cursor = new ServerCursor(kHaikuCursorBits,
-												    kHaikuCursorWidth,
-												    kHaikuCursorHeight,
-												    kHaikuCursorFormat);
-			// we just happen to know where the hotspot is
-			cursor->SetHotSpot(BPoint(1, 0));
-			
-			fHWInterface->SetCursor(cursor);
-		}
 	}
 	return ret;
 }

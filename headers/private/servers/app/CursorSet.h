@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2005, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -19,13 +19,13 @@
 //	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //	DEALINGS IN THE SOFTWARE.
 //
-//	File Name:		SysCursor.h
+//	File Name:		CursorSet.h
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Private file encapsulating OBOS system cursor API
+//	Description:	Private file encapsulating of the Haiku system cursor API
 //  
 //------------------------------------------------------------------------------
-#ifndef SYSCURSOR_H_
-#define SYSCURSOR_H_
+#ifndef CURSORSET_H_
+#define CURSORSET_H_
 
 #include <Bitmap.h>
 #include <Cursor.h>
@@ -49,33 +49,24 @@ typedef enum
 
 class ServerCursor;
 
-void set_syscursor(cursor_which which, const BCursor *cursor);
-void set_syscursor(cursor_which which, const BBitmap *bitmap);
-
-cursor_which get_syscursor(void);
-
-void setcursor(cursor_which which);
-
 const char *CursorWhichToString(cursor_which which);
 BBitmap *CursorDataToBitmap(int8 *data);
 
 /*!
 	\brief Class to manage system cursor sets
 */
-class CursorSet : public BMessage
-{
+class CursorSet : public BMessage {
 public:
-	CursorSet(const char *name);
-	status_t Save(const char *path,int32 saveflags=0);
-	status_t Load(const char *path);
-	status_t AddCursor(cursor_which which,const BBitmap *cursor, const BPoint &hotspot);
-	status_t AddCursor(cursor_which which, int8 *data);
-	void RemoveCursor(cursor_which which);
-	status_t FindCursor(cursor_which which, BBitmap **cursor, BPoint *hotspot);
-	status_t FindCursor(cursor_which which, ServerCursor **cursor);
-	void SetName(const char *name);
-	const char *GetName(void);
+						CursorSet(const char *name);
+		status_t		Save(const char *path,int32 saveflags=0);
+		status_t		Load(const char *path);
+		status_t		AddCursor(cursor_which which,const BBitmap *cursor, const BPoint &hotspot);
+		status_t		AddCursor(cursor_which which, int8 *data);
+		void			RemoveCursor(cursor_which which);
+		status_t		FindCursor(cursor_which which, BBitmap **cursor, BPoint *hotspot);
+		status_t		FindCursor(cursor_which which, ServerCursor **cursor);
+		void			SetName(const char *name);
+		const char		*GetName(void);
 };
-
 
 #endif

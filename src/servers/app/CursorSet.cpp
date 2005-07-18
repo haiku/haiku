@@ -19,7 +19,7 @@
 //	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //	DEALINGS IN THE SOFTWARE.
 //
-//	File Name:		SysCursor.cpp
+//	File Name:		CursorSet.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
 //	Description:	Private file encapsulating OBOS system cursor API
 //  
@@ -30,13 +30,13 @@
 #include <OS.h>
 #include <String.h>
 #include <File.h>
-#include "SysCursor.h"
+#include "CursorSet.h"
 #include "ServerCursor.h"
 
 /*!
-	\brief Sets a system cursor
-	\param which System cursor specifier defined in SysCursor.h
-	\param cursor The new cursor
+   \brief Sets a system cursor
+   \param which System cursor specifier defined in CursorSet.h
+   \param cursor The new cursor
 */
 void
 set_syscursor(cursor_which which, const BCursor *cursor)
@@ -48,7 +48,7 @@ set_syscursor(cursor_which which, const BCursor *cursor)
 	BPrivate::PortLink link(server);
 	link.StartMessage(AS_SET_SYSCURSOR_BCURSOR);
 	link.Attach<cursor_which>(which);
-	
+
 	// The easy (and clean) way for us to access the cursor's token
 	// would be to make it a friend function of the BCursor class. One problem:
 	// we couldn't build this under R5. For R1, we'll use a hack which we can
@@ -62,7 +62,7 @@ set_syscursor(cursor_which which, const BCursor *cursor)
 
 /*!
 	\brief Sets a system cursor
-	\param which System cursor specifier defined in SysCursor.h
+	\param which System cursor specifier defined in CursorSet.h
 	\param bitmap BBitmap to represent the new cursor. Size should be 48x48 or less.
 */
 void
@@ -75,7 +75,7 @@ set_syscursor(cursor_which which, const BBitmap *bitmap)
 	BPrivate::PortLink link(server);
 	link.StartMessage(AS_SET_SYSCURSOR_BBITMAP);
 	link.Attach<cursor_which>(which);
-	
+
 	// Just like the BCursor version, we will use a hack until R1.
 	int32 *hack=(int32*)bitmap;
 	hack+=(sizeof(int32)*4)+sizeof(color_space)+sizeof(BRect);
@@ -86,7 +86,7 @@ set_syscursor(cursor_which which, const BBitmap *bitmap)
 
 /*!
 	\brief Returns the cursor specifier currently shown
-	\return Returns B_CURSOR_OTHER if an application-set cursor. Otherwise, see SysCursor.h
+	\return Returns B_CURSOR_OTHER if an application-set cursor. Otherwise, see CursorSet.h
 */
 cursor_which
 get_syscursor(void)
@@ -106,25 +106,6 @@ get_syscursor(void)
 	}
 	return B_CURSOR_INVALID;
 }
-
-/*!
-	\brief Changes the application cursor to the specified cursor
-	\param which System cursor specifier defined in SysCursor.h
-*/
-void
-setcursor(cursor_which which)
-{
-	port_id server = find_port(SERVER_PORT_NAME);
-	if (server < B_OK)
-		return;
-
-	BPrivate::PortLink link(server);
-	link.StartMessage(AS_SET_CURSOR_SYSTEM);
-	link.Flush();
-}
-
-
-//	#pragma mark -
 
 
 /*!
@@ -184,7 +165,7 @@ CursorSet::Load(const char *path)
 
 /*!
 	\brief Adds the cursor to the set and replaces any existing entry for the given specifier
-	\param which System cursor specifier defined in SysCursor.h
+	\param which System cursor specifier defined in CursorSet.h
 	\param cursor BBitmap to represent the new cursor. Size should be 48x48 or less.
 	\param hotspot The recipient of the hotspot for the cursor
 	\return B_BAD_VALUE if cursor is NULL, otherwise B_OK
@@ -216,7 +197,7 @@ CursorSet::AddCursor(cursor_which which, const BBitmap *cursor, const BPoint &ho
 
 /*!
 	\brief Adds the cursor to the set and replaces any existing entry for the given specifier
-	\param which System cursor specifier defined in SysCursor.h
+	\param which System cursor specifier defined in CursorSet.h
 	\param data R5 cursor data pointer
 	\return B_BAD_VALUE if data is NULL, otherwise B_OK
 	
@@ -242,7 +223,7 @@ CursorSet::AddCursor(cursor_which which, int8 *data)
 
 /*!
 	\brief Removes the data associated with the specifier from the cursor set
-	\param which System cursor specifier defined in SysCursor.h
+	\param which System cursor specifier defined in CursorSet.h
 */
 void
 CursorSet::RemoveCursor(cursor_which which)
@@ -252,7 +233,7 @@ CursorSet::RemoveCursor(cursor_which which)
 
 /*!
 	\brief Retrieves a cursor from the set.
-	\param which System cursor specifier defined in SysCursor.h
+	\param which System cursor specifier defined in CursorSet.h
 	\param cursor Bitmap** to receive a newly-allocated BBitmap containing the appropriate data
 	\param hotspot The recipient of the hotspot for the cursor
 	\return
@@ -301,7 +282,7 @@ CursorSet::FindCursor(cursor_which which, BBitmap **cursor, BPoint *hotspot)
 
 /*!
 	\brief Retrieves a cursor from the set.
-	\param which System cursor specifier defined in SysCursor.h
+	\param which System cursor specifier defined in CursorSet.h
 	\param cursor ServerCursor** to receive a newly-allocated ServerCursor containing the appropriate data
 	\return
 	- \c B_OK: Success
@@ -376,7 +357,7 @@ CursorSet::SetName(const char *name)
 
 /*!
 	\brief Returns a string for the specified cursor attribute
-	\param which System cursor specifier defined in SysCursor.h
+	\param which System cursor specifier defined in CursorSet.h
 	\return Name for the cursor specifier
 */
 const char *

@@ -16,8 +16,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <Cursor.h>
-
 #include "Bitmap.h"
 #include "BitmapBuffer.h"
 #include "BBitmapBuffer.h"

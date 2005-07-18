@@ -14,7 +14,6 @@
 #include <AppDefs.h>
 #include <List.h>
 #include <String.h>
-#include <SysCursor.h>
 #include <ColorSet.h>
 #include <RGBColor.h>
 #include <stdio.h>

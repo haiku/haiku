@@ -30,6 +30,7 @@
 #include "CursorManager.h"
 #include "ServerCursor.h"
 #include "ServerConfig.h"
+#include "HaikuSystemCursor.h"
 
 //! Initializes the CursorManager
 CursorManager::CursorManager()
@@ -38,8 +39,16 @@ CursorManager::CursorManager()
 	fTokenizer.ExcludeValue(B_ERROR);
 
 	// Set system cursors to "unassigned"
+	// ToDo: decide about default cursor
+#if 1
+	fDefaultCursor = new ServerCursor(kHaikuCursorBits, kHaikuCursorWidth,
+		kHaikuCursorHeight, kHaikuCursorFormat);
+	// we just happen to know where the hotspot is
+	fDefaultCursor->SetHotSpot(BPoint(1, 0));
+#else
 	fDefaultCursor = new ServerCursor(default_cursor_data);
 	AddCursor(fDefaultCursor);
+#endif
 
 	fTextCursor = new ServerCursor(default_text_data);
 	AddCursor(fTextCursor);
