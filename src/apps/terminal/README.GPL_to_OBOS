@@ -7,12 +7,6 @@ package as it was originally released on April 2, 2000 (version 2.3) is
 preserved in this directory in the original form that I obtained from
 bebits.
 
-To simplify integration I have performed some code reorganization and
-the initial check-in is not the same as the version 2.3 which is saved
-in the muterm-2.3.zip.  As such, please do not remove the muterm-2.3.zip
-as it is an important checkpoint.  (and also stands as a thank-you to
-Kazuho Okui and Takashi Murai)
-
 Andrew Bachmann
 
 ------------------------------------------------------------------------
