@@ -1,7 +1,7 @@
 SubDir OBOS_TOP src tests kernel consoled ;
 
 UsePrivateHeaders kernel ;
-UseHeaders [ FDirName $(OBOS_TOP) src apps terminal MYOB ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src apps terminal ] ;
 
 App consoled :
 	consoled.cpp
