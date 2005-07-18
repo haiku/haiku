@@ -423,27 +423,41 @@ status_t eng_crtc_depth(int mode)
 	uint8 genctrl = 0;
 
 	/* set VCLK scaling */
+	/* genctrl bit use:
+		b7:	 ?
+		b6:	 ?
+		b5:	 ?
+		b4:  %0 = 15-bit color in 2 bytes/pixel mode;
+			 %1 = 16-bit color in 2 bytes/pixel mode.
+		b3-2:%00 = 1 byte /pixel;
+			 %01 = 2 bytes/pixel;
+			 %10 = 3 bytes/pixel; (assumed)
+			 %11 = 4 bytes/pixel.
+		b1:	 %0 = 4 bits/pixel;
+			 %1 = b3-2 scheme above.
+		b0:  ?
+	 */
 	switch(mode)
 	{
 	case BPP8:
-		/* bits unknown (yet): 'direct mode' */
+		/* indexed mode */
 		genctrl = 0x22; //%0010 0010
 		break;
 	case BPP15:
-		/* bits unknown (yet): 'indirect mode' (via colorpalette?) */
-		genctrl = 0xb6; //%1011 0110
+		/* direct mode */
+		genctrl = 0xa6; //%1010 0110
 		break;
 	case BPP16:
-		/* bits unknown (yet): 'indirect mode' (via colorpalette?) */
+		/* direct mode */
 		genctrl = 0xb6; //%1011 0110
 		break;
 	case BPP24:
-		/* bits unknown (yet): 'indirect mode' (via colorpalette?) */
-		//fixme: unknown what to set yet..
-		genctrl = 0x00;
+		/* direct mode */
+		//fixme: complete guess..
+		genctrl = 0x0a; //%0000 1010
 		break;
 	case BPP32:
-		/* bits unknown (yet): 'indirect mode' (via colorpalette?) */
+		/* direct mode */
 		genctrl = 0xae; //%1010 1110
 		break;
 	}

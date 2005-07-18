@@ -154,22 +154,22 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		{
 		case B_CMAP8:
 			colour_depth1 =  8;
-//			head1_mode(BPP8, 1.0);
+			head1_mode(BPP8, 1.0);
 			head1_depth(BPP8);
 			break;
 		case B_RGB15_LITTLE:
 			colour_depth1 = 16;
-//			head1_mode(BPP15, 1.0);
+			head1_mode(BPP15, 1.0);
 			head1_depth(BPP15);
 			break;
 		case B_RGB16_LITTLE:
 			colour_depth1 = 16;
-//			head1_mode(BPP16, 1.0);
+			head1_mode(BPP16, 1.0);
 			head1_depth(BPP16);
 			break;
 		case B_RGB32_LITTLE:
 			colour_depth1 = 32;
-//			head1_mode(BPP32, 1.0);
+			head1_mode(BPP32, 1.0);
 			head1_depth(BPP32);
 			break;
 		}
@@ -288,7 +288,7 @@ status = B_OK;
 		/* first set the colordepth */
 		head1_depth(colour_mode);
 		/* then(!) program the PAL (<8bit colordepth does not support 8bit PAL) */
-//		head1_mode(colour_mode,1.0);
+		head1_mode(colour_mode,1.0);
 
 		/* set the display pitch */
 		head1_set_display_pitch();
@@ -432,8 +432,8 @@ void SET_INDEXED_COLORS(uint count, uint8 first, uint8 *color_data, uint32 flags
 		b[i]=*color_data++;
 		i++;	
 	}
-//	head1_palette(r,g,b);
-	if (si->dm.flags & DUALHEAD_BITS) head2_palette(r,g,b);
+	head1_palette(r,g,b);
+//	if (si->dm.flags & DUALHEAD_BITS) head2_palette(r,g,b);
 }
 
 /* Put the display into one of the Display Power Management modes. */

@@ -90,7 +90,7 @@ status_t eng_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku VIA Accelerant 0.03 running.\n"));
+	LOG(1,("POWERUP: Haiku VIA Accelerant 0.04 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;

@@ -1,6 +1,6 @@
 /* program the DAC */
 /* Author:
-   Rudolf Cornelissen 12/2003-10/2004
+   Rudolf Cornelissen 12/2003-7/2005
 */
 
 #define MODULE_BIT 0x00010000
@@ -66,6 +66,9 @@ status_t eng_dac_mode(int mode,float brightness)
 	uint8 *r,*g,*b;
 	int i, ri;
 
+	/* 8-bit mode uses the palette differently */
+	if (mode == BPP8) return B_ERROR;
+
 	/*set colour arrays to point to space reserved in shared info*/
 	r = si->color_data;
 	g = r + 256;
@@ -94,9 +97,14 @@ status_t eng_dac_mode(int mode,float brightness)
 status_t eng_dac_palette(uint8 r[256],uint8 g[256],uint8 b[256])
 {
 	int i;
-
 	LOG(4,("DAC: setting palette\n"));
 
+	/* enable primary head palette access */
+	SEQW(MMIO_EN, ((SEQR(MMIO_EN)) & 0xfe));
+	/* ??? */
+	SEQW(0x1b, ((SEQR(0x1b)) | 0x20));
+	/* disable gamma correction HW mode */
+	SEQW(FIFOWM, ((SEQR(FIFOWM)) & 0x7f));
 	/* select first PAL adress before starting programming */
 	ENG_REG8(RG8_PALINDW) = 0x00;
 
@@ -104,9 +112,9 @@ status_t eng_dac_palette(uint8 r[256],uint8 g[256],uint8 b[256])
 	for (i = 0; i < 256; i++)
 	{
 		/* the 6 implemented bits are on b0-b5 of the bus */
-		ENG_REG8(RG8_PALDATA) = r[i];
-		ENG_REG8(RG8_PALDATA) = g[i];
-		ENG_REG8(RG8_PALDATA) = b[i];
+		ENG_REG8(RG8_PALDATA) = (r[i] >> 2);
+		ENG_REG8(RG8_PALDATA) = (g[i] >> 2);
+		ENG_REG8(RG8_PALDATA) = (b[i] >> 2);
 	}
 	if (ENG_REG8(RG8_PALINDW) != 0x00)
 	{
@@ -121,10 +129,11 @@ if (1)
 	ENG_REG8(RG8_PALINDR) = 0x00;
 	for (i = 0; i < 256; i++)
 	{
-		R = ENG_REG8(RG8_PALDATA);
-		G = ENG_REG8(RG8_PALDATA);
-		B = ENG_REG8(RG8_PALDATA);
-		if ((r[i] != R) || (g[i] != G) || (b[i] != B)) 
+		R = (ENG_REG8(RG8_PALDATA) << 2);
+		G = (ENG_REG8(RG8_PALDATA) << 2);
+		B = (ENG_REG8(RG8_PALDATA) << 2);
+		/* only compare the most significant 6 bits */
+		if (((r[i] & 0xfc) != R) || ((g[i] & 0xfc) != G) || ((b[i] & 0xfc) != B)) 
 			LOG(1,("DAC palette %d: w %x %x %x, r %x %x %x\n", i, r[i], g[i], b[i], R, G, B)); // apsed
 	}
  }
