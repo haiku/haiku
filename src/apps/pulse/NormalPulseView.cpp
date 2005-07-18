@@ -197,7 +197,7 @@ NormalPulseView::Draw(BRect rect)
 	if (cpuSpeed > 1000 && (cpuSpeed % 10) == 0)
 		snprintf(buffer, sizeof(buffer), "%.2f GHz", cpuSpeed / 1000.0f);
 	else
-		snprintf(buffer, sizeof(buffer), "%d MHz", cpuSpeed);
+		snprintf(buffer, sizeof(buffer), "%ld MHz", cpuSpeed);
 	SetDrawingMode(B_OP_OVER);
 	SetHighColor(240, 240, 240);
 	SetFontSize(fProcessorFontSize);
