@@ -476,10 +476,12 @@
 
 /* DAC direct registers (standard VGA palette RAM registers) */
 /* primary head */
-#define RG8_PALMASK			0x006813c6
-#define RG8_PALINDR			0x006813c7
-#define RG8_PALINDW			0x006813c8
-#define RG8_PALDATA			0x006813c9
+//via new:
+#define RG8_PALMASK			0x000083c6
+#define RG8_PALINDR			0x000083c7
+#define RG8_PALINDW			0x000083c8
+#define RG8_PALDATA			0x000083c9
+//end via new.
 /* secondary head */
 #define RG8_PAL2MASK		0x006833c6
 #define RG8_PAL2INDR		0x006833c7
@@ -624,11 +626,11 @@
 #define ENSEQX_LOCK			0x10
 #define ENSEQX_0x14			0x14
 #define ENSEQX_COLDEPTH		0x15
-#define ENSEQX_0x16			0x16 //Mclk PLL
-#define ENSEQX_FIFODEPTH	0x17 //Mclk PLL
-#define ENSEQX_0x18			0x18 //Mclk PLL
+#define ENSEQX_FIFOWM		0x16
+#define ENSEQX_FIFODEPTH	0x17
+#define ENSEQX_0x18			0x18
 #define ENSEQX_0x19			0x19
-#define ENSEQX_0x1a			0x1a
+#define ENSEQX_MMIO_EN		0x1a
 #define ENSEQX_0x1b			0x1b
 #define ENSEQX_FETCHCNTLO	0x1c
 #define ENSEQX_FETCHCNTHI	0x1d
