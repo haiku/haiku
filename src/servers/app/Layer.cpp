@@ -406,6 +406,7 @@ Layer::FindLayer(const int32 token)
 Layer*
 Layer::LayerAt(const BPoint &pt)
 {
+	//printf("%p:%s:LayerAt(x = %g, y = %g)\n", this, Name(), pt.x, pt.y);
 #ifndef NEW_CLIPPING
 	if (fVisible.Contains(pt))
 		return this;

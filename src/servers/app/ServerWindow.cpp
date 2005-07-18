@@ -98,17 +98,10 @@ ServerWindow::ServerWindow(const char *title, ServerApp *app,
 //!Tears down all connections the main app_server objects, and deletes some internals.
 ServerWindow::~ServerWindow()
 {
-	STRACE(("*ServerWindow (%s):~ServerWindow()\n", fTitle));
+	STRACE(("*ServerWindow(%s@%p):~ServerWindow()\n", fTitle, this));
 
 	if (!fWinBorder->IsOffscreenWindow())
 		gDesktop->RemoveWinBorder(fWinBorder);
-
-	// just to be safe
-	RootLayer* rootLayer = fWinBorder->GetRootLayer();
-	if (rootLayer && rootLayer->Lock()) {
-		rootLayer->LayerRemoved(fWinBorder);
-		rootLayer->Unlock();
-	}
 
 	delete fWinBorder;
 
@@ -117,7 +110,7 @@ ServerWindow::~ServerWindow()
 
 	BPrivate::gDefaultTokens.RemoveToken(fServerToken);
 
-	STRACE(("#ServerWindow(%s) will exit NOW\n", fTitle));
+	STRACE(("#ServerWindow(%p) will exit NOW\n", this));
 }
 
 
@@ -2165,8 +2158,8 @@ ServerWindow::_MessageLooper()
 	bool quitLoop = false;
 
 	while (!quitLoop) {
-		STRACE(("info: ServerWindow::MonitorWin listening on port %ld.\n",
-			fMessagePort));
+		//STRACE(("info: ServerWindow::MonitorWin listening on port %ld.\n",
+		//	fMessagePort));
 
 		int32 code;
 		status_t status = receiver.GetNextMessage(code);

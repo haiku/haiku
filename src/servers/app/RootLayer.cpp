@@ -592,16 +592,20 @@ RootLayer::RemoveWinBorder(WinBorder* winBorder)
 	// security measure: in case of windows whose workspace count is 0(current workspace),
 	// we don't know the exact workspaces to remove it from. And how all modal and floating
 	// windows have 0 as a workspace index, this action is fully justified.
-	for (int32 i = 0; i < fWsCount; i++)
+	for (int32 i = 0; i < fWsCount; i++) {
 		if (fWorkspace[i])
 			fWorkspace[i]->RemoveWinBorder(winBorder);
+	}
 
 	// we _DO_NOT_ need to invalidate here. At this point our WinBorder is hidden!
+
+	LayerRemoved(winBorder);
 
 	// set some internals
 	winBorder->SetRootLayer(NULL);
 	winBorder->fParent = NULL;
 }
+
 
 void
 RootLayer::AddSubsetWinBorder(WinBorder *winBorder, WinBorder *toWinBorder)
