@@ -40,7 +40,7 @@
 #include <MenuItem.h>
 #include <StringView.h>
 #include <Invoker.h>
-#include <SysCursor.h>
+#include <CursorSet.h>
 #include <Bitmap.h>
 #include <Box.h>
 #include <Invoker.h>
