@@ -65,7 +65,6 @@ const uint32 MENU_PRINT         = 'Mpnt';
 const uint32 MENU_FIND_STRING   = 'Mfnd';
 const uint32 MENU_FIND_AGAIN    = 'Mfag';
 const uint32 MENU_SHOW_COLOR	= 'Mcol';
-const uint32 MENU_SHOW_ABOUT	= 'MSab';
 
 const uint32 M_GET_DEVICE_NUM	= 'Mgdn';
 
