@@ -545,7 +545,7 @@ RootLayer::AddWinBorder(WinBorder* winBorder)
 {
 	if (!winBorder->IsHidden())
 	{
-		CRITICAL("RootLayer::RemoveWinBorder - winBorder must be hidden\n");
+		CRITICAL("RootLayer::AddWinBorder - winBorder must be hidden\n");
 		return;
 	}
 
@@ -1936,20 +1936,20 @@ RootLayer::change_winBorder_feel(WinBorder *winBorder, int32 newFeel)
 
 bool RootLayer::get_workspace_windows()
 {
-	int32	bufferSize = fWinBorderListLength;
-	int32	exCount = fWinBorderCount;
-	bool	present;
-	bool	newMemory = false;
-	bool	aChange = false;
+	int32 bufferSize = fWinBorderListLength;
+	int32 exCount = fWinBorderCount;
+	bool present;
+	bool newMemory = false;
+	bool aChange = false;
 
 	memcpy(fWinBorderList2, fWinBorderList, fWinBorderCount * sizeof(WinBorder*));
 
 	if (!(ActiveWorkspace()->GetWinBorderList((void**)fWinBorderList, &bufferSize)))
 	{
-		newMemory		= true;
+		newMemory = true;
 		// grow by a factor of 8.
 		fWinBorderListLength = (bufferSize / 8 + 1) * 8;
-		fWinBorderList	= (WinBorder**)realloc(fWinBorderList, fWinBorderListLength);
+		fWinBorderList	= (WinBorder**)realloc(fWinBorderList, fWinBorderListLength * sizeof(WinBorder*));
 		ActiveWorkspace()->GetWinBorderList((void**)fWinBorderList, &bufferSize);
 	}
 
@@ -1966,7 +1966,7 @@ bool RootLayer::get_workspace_windows()
 	}
 
 	// to determine if there was a change in window hierarchy 
-	if (exCount != fWinBorderCount || memcmp(fWinBorderList, fWinBorderList2, fWinBorderCount) != 0)
+	if (exCount != fWinBorderCount || memcmp(fWinBorderList, fWinBorderList2, fWinBorderCount * sizeof(WinBorder*)) != 0)
 		aChange = true;
 
 	if (aChange)
@@ -1991,7 +1991,7 @@ bool RootLayer::get_workspace_windows()
 
 	// enlarge 2nd buffer also
 	if (newMemory)
-		fWinBorderList2	= (WinBorder**)realloc(fWinBorderList2, fWinBorderListLength);
+		fWinBorderList2	= (WinBorder**)realloc(fWinBorderList2, fWinBorderListLength * sizeof(WinBorder*));
 
 //for (int32 i = 0; i < fWinBorderCount; i++)
 //{
