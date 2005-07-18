@@ -998,7 +998,9 @@ BWindow::SetSizeLimits(float minWidth, float maxWidth,
 		if (fLink->FlushWithReply(code) == B_OK
 			&& code == SERVER_TRUE) {
 			// read the values that were really enforced on
-			// the server side
+			// the server side (the window frame could have
+			// been changed, too)
+			fLink->Read<BRect>(&fFrame);
 			fLink->Read<float>(&fMinWidth);
 			fLink->Read<float>(&fMaxWidth);
 			fLink->Read<float>(&fMinHeight);

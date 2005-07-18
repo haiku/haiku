@@ -1376,7 +1376,6 @@ myRootLayer->Unlock();
 			STRACE(("ServerWindow %s: Message AS_WINDOW_RESIZE %.1f, %.1f\n", Title(), xResizeBy, yResizeBy));
 			
 			fWinBorder->ResizeBy(xResizeBy, yResizeBy);
-
 			break;
 		}
 		case AS_WINDOW_MOVE:
@@ -1390,7 +1389,6 @@ myRootLayer->Unlock();
 			STRACE(("ServerWindow %s: Message AS_WINDOW_MOVE: %.1f, %.1f\n", Title(), xMoveBy, yMoveBy));
 
 			fWinBorder->MoveBy(xMoveBy, yMoveBy);
-
 			break;
 		}
 		case AS_SET_SIZE_LIMITS:
@@ -1417,13 +1415,13 @@ myRootLayer->Unlock();
 			fWinBorder->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
 
 			fLink.StartMessage(SERVER_TRUE);
+			fLink.Attach<BRect>(fWinBorder->Frame());
 			fLink.Attach<float>(minWidth);
 			fLink.Attach<float>(maxWidth);
 			fLink.Attach<float>(minHeight);
 			fLink.Attach<float>(maxHeight);
 
 			fLink.Flush();
-
 			break;
 		}
 		case B_MINIMIZE:
