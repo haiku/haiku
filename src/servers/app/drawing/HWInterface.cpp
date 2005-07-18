@@ -551,7 +551,7 @@ printf("nothing to copy\n");
 				uint8* srcHandle = src;
 				uint8* dstHandle = dst;
 				for (x = left; x <= right; x++) {
-					index = ((srcHandle[2] & 0xf8) << 7) | ((srcHandle[1] & 0xf8) << 2) | (srcHandle[1] >> 3);
+					index = ((srcHandle[2] & 0xf8) << 7) | ((srcHandle[1] & 0xf8) << 2) | (srcHandle[0] >> 3);
 					*dstHandle = colorMap->index_map[index];
 					dstHandle ++;
 					srcHandle += 4;
