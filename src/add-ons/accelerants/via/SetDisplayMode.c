@@ -155,22 +155,22 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		case B_CMAP8:
 			colour_depth1 =  8;
 //			head1_mode(BPP8, 1.0);
-//			head1_depth(BPP8);
+			head1_depth(BPP8);
 			break;
 		case B_RGB15_LITTLE:
 			colour_depth1 = 16;
 //			head1_mode(BPP15, 1.0);
-//			head1_depth(BPP15);
+			head1_depth(BPP15);
 			break;
 		case B_RGB16_LITTLE:
 			colour_depth1 = 16;
 //			head1_mode(BPP16, 1.0);
-//			head1_depth(BPP16);
+			head1_depth(BPP16);
 			break;
 		case B_RGB32_LITTLE:
 			colour_depth1 = 32;
 //			head1_mode(BPP32, 1.0);
-//			head1_depth(BPP32);
+			head1_depth(BPP32);
 			break;
 		}
 		/*set the colour depth for CRTC2 and DAC2 */
@@ -286,7 +286,7 @@ status = B_OK;
 
 		/* set the colour depth for CRTC1 and the DAC */
 		/* first set the colordepth */
-//		head1_depth(colour_mode);
+		head1_depth(colour_mode);
 		/* then(!) program the PAL (<8bit colordepth does not support 8bit PAL) */
 //		head1_mode(colour_mode,1.0);
 

@@ -80,6 +80,7 @@ status_t eng_crtc_validate_timing(
 /*set a mode line - inputs are in pixels*/
 status_t eng_crtc_set_timing(display_mode target)
 {
+	uint16 fifolimit = 0;
 	uint8 temp;
 
 	uint32 htotal;		/*total horizontal total VCLKs*/
@@ -269,6 +270,29 @@ status_t eng_crtc_set_timing(display_mode target)
 		ENG_REG8(RG8_MISCW) = temp;
 
 		LOG(2,(", MISC reg readback: $%02x\n", ENG_REG8(RG8_MISCR)));
+
+		/* setup CRTC FIFO depth, method 'extrapolated' from VBE BIOS behaviour */
+		switch (target.space)
+		{
+		case B_CMAP8:
+			fifolimit = 0x0001;
+			break;
+		case B_RGB15_LITTLE:
+		case B_RGB16_LITTLE:
+			fifolimit = 0x0002;
+			break;
+		case B_RGB24_LITTLE:
+			fifolimit = 0x0003;
+			break;
+		case B_RGB32_LITTLE:
+			fifolimit = 0x0004;
+			break;
+		}
+		fifolimit *= target.timing.h_display;
+		fifolimit >>= 4;
+		fifolimit += 4;
+		SEQW(FETCHCNTLO, (fifolimit & 0x00fe));
+		SEQW(FETCHCNTHI, (((SEQR(FETCHCNTHI)) & 0xfc) | ((fifolimit & 0x0300) >> 8)));
 	}
 
 	/* always disable interlaced operation */
@@ -396,43 +420,35 @@ status_t eng_crtc_set_timing(display_mode target)
 
 status_t eng_crtc_depth(int mode)
 {
-	uint8 viddelay = 0;
-	uint32 genctrl = 0;
+	uint8 genctrl = 0;
 
 	/* set VCLK scaling */
 	switch(mode)
 	{
 	case BPP8:
-		viddelay = 0x01;
-		/* genctrl b4 & b5 reset: 'direct mode' */
-		genctrl = 0x00101100;
+		/* bits unknown (yet): 'direct mode' */
+		genctrl = 0x22; //%0010 0010
 		break;
 	case BPP15:
-		viddelay = 0x02;
-		/* genctrl b4 & b5 set: 'indirect mode' (via colorpalette) */
-		genctrl = 0x00100130;
+		/* bits unknown (yet): 'indirect mode' (via colorpalette?) */
+		genctrl = 0xb6; //%1011 0110
 		break;
 	case BPP16:
-		viddelay = 0x02;
-		/* genctrl b4 & b5 set: 'indirect mode' (via colorpalette) */
-		genctrl = 0x00101130;
+		/* bits unknown (yet): 'indirect mode' (via colorpalette?) */
+		genctrl = 0xb6; //%1011 0110
 		break;
 	case BPP24:
-		viddelay = 0x03;
-		/* genctrl b4 & b5 set: 'indirect mode' (via colorpalette) */
-		genctrl = 0x00100130;
+		/* bits unknown (yet): 'indirect mode' (via colorpalette?) */
+		//fixme: unknown what to set yet..
+		genctrl = 0x00;
 		break;
 	case BPP32:
-		viddelay = 0x03;
-		/* genctrl b4 & b5 set: 'indirect mode' (via colorpalette) */
-		genctrl = 0x00101130;
+		/* bits unknown (yet): 'indirect mode' (via colorpalette?) */
+		genctrl = 0xae; //%1010 1110
 		break;
 	}
-	/* enable access to primary head */
-	set_crtc_owner(0);
-
-	CRTCW(PIXEL, ((CRTCR(PIXEL) & 0xfc) | viddelay));
-	DACW(GENCTRL, genctrl);
+	/* setup bytes per pixel, and direct/indirect mode */
+	SEQW(COLDEPTH, genctrl);
 
 	return B_OK;
 }
