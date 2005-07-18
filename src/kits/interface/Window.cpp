@@ -1835,18 +1835,7 @@ BWindow::ResizeBy(float dx, float dy)
 		fLink->Attach<float>(dy);
 		fLink->Flush();
 
-/*		int32 code;
-		if (fLink->FlushWithReply(code) == B_OK
-			&& code == SERVER_TRUE) {
-			fLink->Read<float>(&dx);
-			fLink->Read<float>(&dy);
-
-			fFrame.SetRightBottom(fFrame.LeftTop() + BPoint(dx, dy));
-			top_view->ResizeTo(dx, dy);
-		}*/
-
 		fFrame.SetRightBottom(fFrame.RightBottom() + BPoint(dx, dy));
-		top_view->ResizeBy(dx, dy);
 	}
 	Unlock();
 }
