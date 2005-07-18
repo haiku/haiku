@@ -584,7 +584,7 @@ Workspace::HideWinBorder(WinBorder *winBorder)
 		case B_MODAL_APP:
 		{
 			// if a subset modal, then remove from Workspace's list.
-			if (!winBorder->App()->fAppSubWindowList.HasItem(winBorder)) {
+			if (winBorder->App()->fAppSubWindowList.HasItem(winBorder)) {
 				ListData* toast = HasItem(winBorder);
 				if (toast) {
 					RemoveItem(toast);
