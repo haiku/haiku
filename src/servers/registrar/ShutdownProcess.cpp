@@ -1244,11 +1244,11 @@ ShutdownProcess::_WorkerDoShutdown()
 			? "Do you really want to reboot the system?"
 			: "Do you really want to shut down the system?");
 		const char *buttonText = (fReboot ? "Reboot" : "Shut Down");
-		BAlert *alert = new BAlert(title, text, buttonText, "Cancel", NULL,
+		BAlert *alert = new BAlert(title, text, "Cancel", buttonText, NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		int32 result = alert->Go();
 
-		if (result != 0)
+		if (result != 1)
 			throw_error(B_SHUTDOWN_CANCELLED);
 	}
 
