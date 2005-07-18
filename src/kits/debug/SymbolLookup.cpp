@@ -181,10 +181,11 @@ SymbolLookup::LookupSymbolAddress(addr_t address, addr_t *_baseAddress,
 {
 	// Note, that this function doesn't find all symbols that we would like
 	// to find. E.g. static functions do not appear in the symbol table
-	// as function symbols, but each one seems to be a separate section.
-	// Therefore, to get completely satisfying results, we would need to scan
-	// the shared object's section headers, if we don't find the a matching
-	// symbol.
+	// as function symbols, but as sections without name and size. The .symtab
+	// section together with the .strtab section, which apparently differ from
+	// the tables referred to by the .dynamic section, also contain proper names
+	// and sizes for those symbols. Therefore, to get completely satisfying
+	// results, we would need to read those tables from the shared object.
 
 	TRACE(("SymbolLookup::LookupSymbolAddress(%p)\n", (void*)address));
 
