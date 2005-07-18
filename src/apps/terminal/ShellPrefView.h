@@ -1,63 +1,39 @@
 /*
- * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
- * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
+ * Copyright (c) 2003-2004 Kian Duffy <myob@users.sourceforge.net>
+ * Copyright (c) 1998,99 Kazuho Okui and Takashi Murai. 
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files or portions
- * thereof (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject
- * to the following conditions:
- *
- *  * Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- *  * Redistributions in binary form must reproduce the above copyright notice
- *    in the  binary, as well as this list of conditions and the following
- *    disclaimer in the documentation and/or other materials provided with
- *    the distribution.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
+ * Distributed unter the terms of the MIT license.
  */
+#ifndef SHELLPREFVIEW_H
+#define SHELLPREFVIEW_H_
 
-#ifndef ShellPrefView__H_INCLUDED
-#define ShellPrefView__H_INCLUDED
 
 #include "PrefView.h"
+
 
 class TermWindow;
 class TTextControl;
 
-class ShellPrefView : public PrefView
-{
- public:
-                ShellPrefView (BRect r, const char *name, TermWindow *window);
+class ShellPrefView : public PrefView {
+	public:
+		ShellPrefView(BRect frame, const char* name, TermWindow* window);
 
-  virtual void  SaveIfModified (void);
+		virtual void AttachedToWindow();
+		virtual void MessageReceived(BMessage* message);
 
-  void          Revert (void);
-  void          SetControlLabels (PrefHandler &Labels);
+		void Revert();
+		void SetControlLabels(PrefHandler& Labels);
 
-  void          AttachedToWindow (void);
-  void          MessageReceived (BMessage *);
+		virtual void SaveIfModified();
 
- private:
-  TTextControl  *mCols;
-  TTextControl  *mRows;
+	private:
+		TTextControl*	mCols;
+		TTextControl*	mRows;
 
-  TTextControl  *mShell;
-  TTextControl  *mHistory;
+		TTextControl*	mShell;
+		TTextControl*	mHistory;
 
-  TermWindow 	*fTermWindow;
-  
+		TermWindow*		fTermWindow;
 };
 
-#endif //ShellPrefView_H_INCLUDED
+#endif	// SHELLPREFVIEW_H

@@ -1,7 +1,6 @@
 SubDir OBOS_TOP src apps terminal ;
 
 App Terminal : 
-	AboutWindow.cpp
 	AppearPrefView.cpp
 	CodeConv.cpp
 	CurPos.cpp
