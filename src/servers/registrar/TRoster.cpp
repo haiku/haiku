@@ -678,7 +678,7 @@ TRoster::HandleGetAppList(BMessage *request)
 		for (AppInfoList::Iterator it(fRegisteredApps.It());
 			 RosterAppInfo *info = *it;
 			 ++it) {
-			if (!signature || !strcmp(signature, info->signature))
+			if (!signature || !strcasecmp(signature, info->signature))
 				reply.AddInt32("teams", info->team);
 		}
 		request->SendReply(&reply);

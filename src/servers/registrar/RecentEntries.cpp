@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2005, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -199,7 +199,7 @@ RecentEntries::Get(int32 maxCount, const char *fileTypes[], int32 fileTypesCount
 					char type[B_MIME_TYPE_LENGTH];
 					if (GetTypeForRef(&(*item)->ref, type) == B_OK) {
 						for (int i = 0; i < fileTypesCount; i++) {						
-							if (strcmp(type, fileTypes[i]) == 0) {
+							if (strcasecmp(type, fileTypes[i]) == 0) {
 								match = true;
 								break;
 							}					

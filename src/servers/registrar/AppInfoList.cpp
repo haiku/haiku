@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2005, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -250,7 +250,7 @@ AppInfoList::IndexOf(const char *signature) const
 {
 	if (signature) {
 		for (int32 i = 0; RosterAppInfo *info = InfoAt(i); i++) {
-			if (!strcmp(info->signature, signature))
+			if (!strcasecmp(info->signature, signature))
 				return i;
 		}
 	}
