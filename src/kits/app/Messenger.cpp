@@ -1,5 +1,5 @@
  //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2005, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -546,7 +546,7 @@ BMessenger::InitData(const char *signature, team_id team, status_t *result)
 		// a team ID is given
 		error = be_roster->GetRunningAppInfo(team, &info);
 		// Compare the returned signature with the supplied one.
-		if (error == B_OK && signature && strcmp(signature, info.signature))
+		if (error == B_OK && signature && strcasecmp(signature, info.signature))
 			error = B_MISMATCHED_VALUES;
 	}
 	// check whether the app flags say B_ARGV_ONLY

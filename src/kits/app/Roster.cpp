@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2005, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -1903,7 +1903,7 @@ BRoster::resolve_app(const char *inType, entry_ref *ref,
 		char signature[B_MIME_TYPE_LENGTH];
 		if (appFileInfo.SetTo(&appFile) == B_OK
 			&& appFileInfo.GetSignature(signature) == B_OK) {
-			if (!strcmp(appMeta.Type(), signature))
+			if (!strcasecmp(appMeta.Type(), signature))
 				appMeta.SetAppHint(&_appRef);
 			else {
 				appMeta.SetAppHint(NULL);
