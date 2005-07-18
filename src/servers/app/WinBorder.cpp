@@ -140,15 +140,16 @@ WinBorder::WinBorder(const BRect &frame,
 	RebuildFullRegion();
 #endif
 
-	STRACE(("WinBorder %s:\n", GetName()));
-	STRACE(("\tFrame: (%.1f, %.1f, %.1f, %.1f)\n", r.left, r.top, r.right, r.bottom));
+	STRACE(("WinBorder %p, %s:\n", this, Name()));
+	STRACE(("\tFrame: (%.1f, %.1f, %.1f, %.1f)\n", fFrame.left, fFrame.top,
+		fFrame.right, fFrame.bottom));
 	STRACE(("\tWindow %s\n", window ? window->Title() : "NULL"));
 }
 
 
 WinBorder::~WinBorder()
 {
-	STRACE(("WinBorder(%s)::~WinBorder()\n",GetName()));
+	STRACE(("WinBorder(%s)::~WinBorder()\n", Name()));
 
 	delete fTopLayer;
 	delete fDecorator;
@@ -159,7 +160,7 @@ void
 WinBorder::Draw(const BRect &r)
 {
 	#ifdef DEBUG_WINBORDER
-	printf("WinBorder(%s)::Draw() : ", GetName());
+	printf("WinBorder(%s)::Draw() : ", Name());
 	r.PrintToStream();
 	#endif
 	
@@ -186,7 +187,7 @@ y = (float)int32(y);
 	if (x == 0.0 && y == 0.0)
 		return;
 
-	STRACE(("WinBorder(%s)::MoveBy(%.1f, %.1f) fDecorator: %p\n", GetName(), x, y, fDecorator));
+	STRACE(("WinBorder(%s)::MoveBy(%.1f, %.1f) fDecorator: %p\n", Name(), x, y, fDecorator));
 	if (fDecorator)
 		fDecorator->MoveBy(x,y);
 
@@ -236,7 +237,7 @@ fInUpdateRegion.OffsetBy(x, y);
 void
 WinBorder::ResizeBy(float x, float y)
 {
-	STRACE(("WinBorder(%s)::ResizeBy()\n", GetName()));
+	STRACE(("WinBorder(%s)::ResizeBy()\n", Name()));
 
 	if (!_ResizeBy(x, y))
 		return;
@@ -295,7 +296,6 @@ WinBorder::_ResizeBy(float x, float y)
 	} else {
 		resize_layer(x, y);
 	}
-
 #else
 	Layer::ResizeBy(x, y);
 #endif
@@ -367,7 +367,7 @@ WinBorder::UpdateEnd()
 void
 WinBorder::RebuildFullRegion()
 {
-	STRACE(("WinBorder(%s)::RebuildFullRegion()\n",GetName()));
+	STRACE(("WinBorder(%s)::RebuildFullRegion()\n", Name()));
 
 	fFull.MakeEmpty();
 
@@ -632,28 +632,28 @@ WinBorder::HighlightDecorator(bool active)
 void
 WinBorder::UpdateColors()
 {
-	STRACE(("WinBorder %s: UpdateColors unimplemented\n",GetName()));
+	STRACE(("WinBorder %s: UpdateColors unimplemented\n", Name()));
 }
 
 // Unimplemented. Hook function for handling when the system decorator changes
 void
 WinBorder::UpdateDecorator()
 {
-	STRACE(("WinBorder %s: UpdateDecorator unimplemented\n",GetName()));
+	STRACE(("WinBorder %s: UpdateDecorator unimplemented\n", Name()));
 }
 
 // Unimplemented. Hook function for handling when a system font changes
 void
 WinBorder::UpdateFont()
 {
-	STRACE(("WinBorder %s: UpdateFont unimplemented\n",GetName()));
+	STRACE(("WinBorder %s: UpdateFont unimplemented\n", Name()));
 }
 
 // Unimplemented. Hook function for handling when the screen resolution changes
 void
 WinBorder::UpdateScreen()
 {
-	STRACE(("WinBorder %s: UpdateScreen unimplemented\n",GetName()));
+	STRACE(("WinBorder %s: UpdateScreen unimplemented\n", Name()));
 }
 
 // QuietlySetFeel
@@ -745,7 +745,7 @@ WinBorder::_ActionFor(const PointerEvent& event) const
 #ifdef NEW_CLIPPING
 void WinBorder::MovedByHook(float dx, float dy)
 {
-	STRACE(("WinBorder(%s)::MovedByHook(%.1f, %.1f) fDecorator: %p\n", GetName(), x, y, fDecorator));
+	STRACE(("WinBorder(%s)::MovedByHook(%.1f, %.1f) fDecorator: %p\n", Name(), x, y, fDecorator));
 
 	fDecRegion.OffsetBy(dx, dy);
 
@@ -764,7 +764,7 @@ void WinBorder::MovedByHook(float dx, float dy)
 
 void WinBorder::ResizedByHook(float dx, float dy, bool automatic)
 {
-	STRACE(("WinBorder(%s)::ResizedByHook(%.1f, %.1f, %s) fDecorator: %p\n", GetName(), x, y, automatic?"true":"false", fDecorator));
+	STRACE(("WinBorder(%s)::ResizedByHook(%.1f, %.1f, %s) fDecorator: %p\n", Name(), x, y, automatic?"true":"false", fDecorator));
 	fRebuildDecRegion = true;
 
 	if (fDecorator)
