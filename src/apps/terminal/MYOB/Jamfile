@@ -23,7 +23,7 @@ App Terminal :
 	UTF8WidthTbl.c
 	VTKeyTbl.c
 	VTPrsTbl.c
-	: be tracker textencoding game
+	: libopenbeos.so libtracker.so libtextencoding.so #libgame.so
 	: Terminal.rdef Terminal.icons.rdef Terminal.version.rdef
 	;
 

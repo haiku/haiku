@@ -620,7 +620,8 @@ TermWindow::TermWinActivate (void)
   
   if (focus_follows_mouse()) {
     BPoint aMouseLoc = this->Frame().LeftTop();
-    set_mouse_position(int32(aMouseLoc.x + 16), int32(aMouseLoc.y + 2));
+    // ToDo: deactivated for now
+    //set_mouse_position(int32(aMouseLoc.x + 16), int32(aMouseLoc.y + 2));
     be_app->SetCursor(B_HAND_CURSOR);
   }
 }
