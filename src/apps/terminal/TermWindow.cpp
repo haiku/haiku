@@ -61,7 +61,7 @@
 #include "MenuUtil.h"
 #include "spawn.h"
 #include "ColorWindow.h"
-#include "AboutWindow.h"
+
 
 // Global Preference Handler
 extern PrefHandler *gTermPref;
@@ -239,10 +239,8 @@ TermWindow::MenusBeginning(void)
   (fEncodingmenu->FindItem(op2longname(gNowCoding)))->SetMarked(true);
   BWindow::MenusBeginning();
 }
-////////////////////////////////////////////////////////////////////////////
-// SetupMenu(void)
-//  Makes Menu Bar.
-////////////////////////////////////////////////////////////////////////////
+
+
 void
 TermWindow::SetupMenu(void)
 {
@@ -260,10 +258,10 @@ TermWindow::SetupMenu(void)
   fFilemenu->AddItem(new BMenuItem("Switch Terminals", new BMessage(MENU_SWITCH_TERM),'G'));
   fFilemenu->AddItem(new BMenuItem("Start New Terminal", new BMessage(MENU_NEW_TREM), 'N'));
   fFilemenu->AddSeparatorItem();
-  fFilemenu->AddItem(new BMenuItem("About Terminal...", new BMessage(MENU_SHOW_ABOUT)));
-  fFilemenu->AddSeparatorItem();
   fFilemenu->AddItem(new BMenuItem("Page Setup...", new BMessage(MENU_PAGE_SETUP)));
   fFilemenu->AddItem(new BMenuItem("Print", new BMessage(MENU_PRINT),'P'));
+  fFilemenu->AddSeparatorItem();
+  fFilemenu->AddItem(new BMenuItem("About Terminal...", new BMessage(B_ABOUT_REQUESTED)));
   fFilemenu->AddSeparatorItem();
   fFilemenu->AddItem(new BMenuItem("Quit", new BMessage(MENU_FILE_QUIT), 'Q'));
   fMenubar->AddItem(fFilemenu);
@@ -323,17 +321,11 @@ TermWindow::SetupMenu(void)
   fHelpmenu->AddSeparatorItem();
   fHelpmenu->AddItem(new BMenuItem("Preferences", new BMessage(MENU_PREF_OPEN)));
   fMenubar->AddItem(fHelpmenu);
- 
-
-  
-
 
   AddChild(fMenubar);
 }
-////////////////////////////////////////////////////////////////////////////
-// MessageReceived (BMessage *)
-//  Dispatch Mesasge.
-////////////////////////////////////////////////////////////////////////////
+
+
 void
 TermWindow::MessageReceived(BMessage *message)
 {
@@ -342,8 +334,7 @@ TermWindow::MessageReceived(BMessage *message)
   BFont halfFont;
   BFont fullFont;
   
-  
-  switch(message->what) {
+  switch (message->what) {
 
   case MENU_SWITCH_TERM:
     be_app->PostMessage(MENU_SWITCH_TERM);
@@ -360,11 +351,7 @@ TermWindow::MessageReceived(BMessage *message)
       fPrefWindow->Activate();
     } 
     break;
- 	
-	case MENU_SHOW_ABOUT:
-	aboutRequested();
-	break;
-	   
+
   case MSG_PREF_CLOSED:
     fPrefWindow = NULL;
     break;
@@ -528,6 +515,10 @@ TermWindow::MessageReceived(BMessage *message)
     fTermView->UpdateSIGWINCH ();
     break;
 
+	case B_ABOUT_REQUESTED:
+		be_app->PostMessage(B_ABOUT_REQUESTED);
+		break;
+
   default:
     BWindow::MessageReceived(message);
     break;
@@ -553,14 +544,9 @@ TermWindow::WindowActivated (bool )
 //	colW->Show();
 //	}
 
+
 void
-TermWindow::aboutRequested() {
-	aboutWindow *aboutW=new aboutWindow("About");
-	aboutW->Show();
-	}
-	
-void
-TermWindow::Quit (void)
+TermWindow::Quit(void)
 {
   delete fTermParse;
   delete fCodeConv;
@@ -568,12 +554,10 @@ TermWindow::Quit (void)
     be_app->PostMessage (B_QUIT_REQUESTED, be_app);
   BWindow::Quit ();
 }
-////////////////////////////////////////////////////////////////////////////
-// QuitRequested (void)
-//
-////////////////////////////////////////////////////////////////////////////
+
+
 bool
-TermWindow::QuitRequested (void)
+TermWindow::QuitRequested(void)
 {
   
   return true;

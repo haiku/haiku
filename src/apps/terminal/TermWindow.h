@@ -63,7 +63,6 @@ private:
   void		InitWindow (void);
   void		SetupMenu (void);
 //  void		colRequested (void);
-  void 		aboutRequested (void);
   void		MessageReceived (BMessage *message);
   void		WindowActivated (bool);
   int		GetTimeZone (void);

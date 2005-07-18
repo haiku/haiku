@@ -45,16 +45,17 @@ class AboutDlg;
 class TermApp : public BApplication
 {
 public:
-               TermApp (void);
-               ~TermApp (void);
+               TermApp();
+               ~TermApp();
 
 private:
   /*
    * Hook functions
    */
-  void          ReadyToRun (void);
-  void          Quit (void);
-  void          MessageReceived (BMessage* msg);
+  void          ReadyToRun();
+  void          Quit();
+  void			AboutRequested();
+  void          MessageReceived(BMessage* msg);
   void          RefsReceived(BMessage *message);
   void          ArgvReceived(int32 argc, char **argv);
 

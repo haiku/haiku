@@ -1,32 +1,10 @@
 /*
- * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
- * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
+ * Copyright (c) 2003-2004 Kian Duffy <myob@users.sourceforge.net>
+ * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files or portions
- * thereof (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject
- * to the following conditions:
- *
- *  * Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- *  * Redistributions in binary form must reproduce the above copyright notice
- *    in the  binary, as well as this list of conditions and the following
- *    disclaimer in the documentation and/or other materials provided with
- *    the distribution.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
+ * Distributed unter the terms of the MIT license.
  */
+
 
 #include <stdio.h>
 #include <signal.h>
@@ -40,6 +18,7 @@
 #include <Alert.h>
 #include <Screen.h>
 #include <String.h>
+#include <TextView.h>
 
 #include "TermApp.h"
 #include "TermWindow.h"
@@ -47,6 +26,7 @@
 #include "spawn.h"
 #include "PrefHandler.h"
 #include "CodeConv.h"
+
 
 extern PrefHandler *gTermPref;		/* Preference temporary */
 extern char gWindowName[];
@@ -97,10 +77,8 @@ TermApp::TermApp (void)
   gTermPref = new PrefHandler();
 
 }
-////////////////////////////////////////////////////////////////////////////
-//
-//
-////////////////////////////////////////////////////////////////////////////
+
+
 TermApp::~TermApp (void)
 {
   /* delete (gTermPref); */
@@ -108,10 +86,6 @@ TermApp::~TermApp (void)
 }
 
 
-////////////////////////////////////////////////////////////////////////////
-//
-//
-////////////////////////////////////////////////////////////////////////////
 void
 TermApp::ReadyToRun (void)
 {
@@ -156,10 +130,8 @@ TermApp::ReadyToRun (void)
 
   MakeTermWindow (fTermFrame);
 }
-////////////////////////////////////////////////////////////////////////////
-//
-//
-////////////////////////////////////////////////////////////////////////////
+
+
 void
 TermApp::Quit (void)
 {
@@ -174,12 +146,31 @@ TermApp::Quit (void)
 
   BApplication::Quit();
 }
-////////////////////////////////////////////////////////////////////////////
-// MessageReceived
-// Dispatches message.
-////////////////////////////////////////////////////////////////////////////
+
+
 void
-TermApp::MessageReceived (BMessage* msg)
+TermApp::AboutRequested()
+{
+	BAlert *alert = new BAlert("about", "Terminal\n"
+		"\twritten by Kazuho Okui and Takashi Murai\n"
+		"\tupdated by Kian Duffy and others\n\n"
+		"\tCopyright 2005, Haiku.\n", "Ok");
+	BTextView *view = alert->TextView();
+	BFont font;
+
+	view->SetStylable(true);
+
+	view->GetFont(&font);
+	font.SetSize(18);
+	font.SetFace(B_BOLD_FACE); 			
+	view->SetFontAndColor(0, 8, &font);
+
+	alert->Go();
+}
+
+
+void
+TermApp::MessageReceived(BMessage* msg)
 {
   switch(msg->what) {
   case MENU_NEW_TREM:
