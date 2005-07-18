@@ -239,7 +239,9 @@ TBeMenu::AddStandardBeMenuItems()
 	bool dragging=false;
 	if (fBarView)
 		dragging = fBarView->Dragging();
-
+#ifdef __HAIKU__
+	BMenuItem* item = new BMenuItem("About Haiku", new BMessage(kShowSplash));
+#else
 #ifdef __HAIKU__
 	BMenuItem* item = new BMenuItem("About Haiku", new BMessage(kShowSplash));
 #else

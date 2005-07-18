@@ -204,7 +204,7 @@ AboutView::AboutView(const BRect &r)
 	fInfoView->AddChild(stringView);
 	stringView->ResizeToPreferred();
 
-	r.OffsetBy(0, labelHeight);
+	r.OffsetBy(0, textHeight);
 	r.bottom = r.top + textHeight;
 
 	int32 clockSpeed = get_rounded_cpu_speed();

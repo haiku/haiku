@@ -173,7 +173,7 @@ TApp::ReadyToRun()
 void
 TApp::AboutRequested(void)
 {
-	(new BAlert("", "Magnify!\n\n(C)2002-2005 Haiku\n(C)1999 Be Inc.\n\nNow with even more features and recompiled for OpenBeOS.", "OK"))->Go();
+	(new BAlert("", "Magnify!\n\n(C)2002-2005 Haiku\n(C)1999 Be Inc.\n\nNow with even more features and recompiled for Haiku.", "OK"))->Go();
 }
 
 //******************************************************************************
