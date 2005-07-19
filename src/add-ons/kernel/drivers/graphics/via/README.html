@@ -24,13 +24,18 @@ You use this software at your own risk! Although I don't expect it to damage you
 <h2>Features:</h2>
 <ul>
 	<li>Hardware cursor support;
-	<li>Autodetects assigned RAM amount preset in system BIOS;
-	<li>Partial support for modeswitching (sets resolution and colorspace but not yet refresh, supports virtualscreens).
+	<li>DPMS support;
+	<li>Basic AGP mode support on AGP cards, using the new (seperate) Haiku AGP busmanager;
+	<li>Partial support for modeswitching (sets resolution and colorspace but not yet refresh, supports virtualscreens);
+	<li>Partial BWindowScreen support (used for hardware pageflipping, scrolling/panning and acceleration in applications/games).
 </ul>
 <strong>Known limitations:</strong> 
 <ul>
-	<li>A lot. But hey, already beats VESA mode ;-)<br>
-Although you still need to have VESA mode enabled for this driver to work(!).
+	<li>No 2D or 3D acceleration;
+	<li>No video overlay support;
+	<li>Only works on analog connected screens;
+	<li>No refreshrate programming yet;
+	<li>VESA 2.0 mode needs to be enabled alongside the driver or it won't work yet: VESA resolution must match Screenprefs panel setting (colordepth isn't important though).
 </ul>
 <br>
 <hr>
@@ -153,6 +158,6 @@ With the <strong>pgm_panel true</strong> setting, the driver will fix your panel
 <hr>
 <br>
 <a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on July 18, 2005)</p>
+<p>(Page last updated on July 19, 2005)</p>
 </body>
 </html>
