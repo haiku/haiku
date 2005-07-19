@@ -60,10 +60,13 @@ init_driver(void)
 {
     open_count = 0;
 
-	if (get_module(B_ISA_MODULE_NAME, (module_info**) &isa) < B_OK)
+	if (get_module(B_ISA_MODULE_NAME, (module_info**)&isa) < B_OK)
 		return ENOSYS;
-	if (get_module(B_PCI_MODULE_NAME, (module_info**) &pci) < B_OK)
+
+	if (get_module(B_PCI_MODULE_NAME, (module_info**)&pci) < B_OK) {
+		put_module(B_ISA_MODULE_NAME);
 		return ENOSYS;
+	}
 
     return B_OK;
 }
@@ -72,8 +75,8 @@ init_driver(void)
 void
 uninit_driver(void)
 {
-	if (isa) put_module(B_ISA_MODULE_NAME);
-	if (pci) put_module(B_PCI_MODULE_NAME);
+	put_module(B_ISA_MODULE_NAME);
+	put_module(B_PCI_MODULE_NAME);
 }
 
 
@@ -131,9 +134,9 @@ poke_control(void* cookie, uint32 op, void* arg, size_t length)
 		case POKE_PORT_READ:
 		{
     		status_t result;
-			port_io_args* ioctl = (port_io_args*) arg;
-		    if (ioctl->signature != POKE_SIGNATURE)
-		    	return B_BAD_VALUE;
+			port_io_args* ioctl = (port_io_args*)arg;
+			if (ioctl->signature != POKE_SIGNATURE)
+				return B_BAD_VALUE;
 
 			result = B_OK;
 			switch (ioctl->size) {
@@ -156,21 +159,21 @@ poke_control(void* cookie, uint32 op, void* arg, size_t length)
 		case POKE_PORT_WRITE:
 		{
     		status_t result;
-			port_io_args* ioctl = (port_io_args*) arg;
-		    if (ioctl->signature != POKE_SIGNATURE)
-		    	return B_BAD_VALUE;
+			port_io_args* ioctl = (port_io_args*)arg;
+			if (ioctl->signature != POKE_SIGNATURE)
+				return B_BAD_VALUE;
 
 			result = B_OK;
 			switch (ioctl->size) {
 				case 1:
 					isa->write_io_8(ioctl->port, ioctl->value);
-				break;
+					break;
 				case 2:
 					isa->write_io_16(ioctl->port, ioctl->value);
-				break;
+					break;
 				case 4:
-					isa->write_io_16(ioctl->port, ioctl->value);
-				break;
+					isa->write_io_32(ioctl->port, ioctl->value);
+					break;
 				default:
 					result = B_BAD_VALUE;
 			}
@@ -180,9 +183,9 @@ poke_control(void* cookie, uint32 op, void* arg, size_t length)
 
 		case POKE_PORT_INDEXED_READ:
 		{
-			port_io_args* ioctl = (port_io_args*) arg;
-		    if (ioctl->signature != POKE_SIGNATURE)
-		    	return B_BAD_VALUE;
+			port_io_args* ioctl = (port_io_args*)arg;
+			if (ioctl->signature != POKE_SIGNATURE)
+				return B_BAD_VALUE;
 
 			isa->write_io_8(ioctl->port, ioctl->size);
 			ioctl->value = isa->read_io_8(ioctl->port + 1);
@@ -191,9 +194,9 @@ poke_control(void* cookie, uint32 op, void* arg, size_t length)
 
 		case POKE_PORT_INDEXED_WRITE:
 		{
-			port_io_args* ioctl = (port_io_args*) arg;
-		    if (ioctl->signature != POKE_SIGNATURE)
-		    	return B_BAD_VALUE;
+			port_io_args* ioctl = (port_io_args*)arg;
+			if (ioctl->signature != POKE_SIGNATURE)
+				return B_BAD_VALUE;
 
 			isa->write_io_8(ioctl->port, ioctl->size);
 			isa->write_io_8(ioctl->port + 1, ioctl->value);
@@ -202,32 +205,31 @@ poke_control(void* cookie, uint32 op, void* arg, size_t length)
 
 		case POKE_PCI_READ_CONFIG:
 		{
-			pci_io_args* ioctl = (pci_io_args*) arg;
-		    if (ioctl->signature != POKE_SIGNATURE)
-		    	return B_BAD_VALUE;
+			pci_io_args* ioctl = (pci_io_args*)arg;
+			if (ioctl->signature != POKE_SIGNATURE)
+				return B_BAD_VALUE;
 			
 			ioctl->value = pci->read_pci_config(ioctl->bus, ioctl->device,
-												ioctl->function, ioctl->offset,
-												ioctl->size);
+				ioctl->function, ioctl->offset, ioctl->size);
 			return B_OK;
 		}
 
 		case POKE_PCI_WRITE_CONFIG:
 		{
-			pci_io_args* ioctl = (pci_io_args*) arg;
-		    if (ioctl->signature != POKE_SIGNATURE)
-		    	return B_BAD_VALUE;
+			pci_io_args* ioctl = (pci_io_args*)arg;
+			if (ioctl->signature != POKE_SIGNATURE)
+				return B_BAD_VALUE;
 
 			pci->write_pci_config(ioctl->bus, ioctl->device, ioctl->function,
-								ioctl->offset, ioctl->size, ioctl->value);
+				ioctl->offset, ioctl->size, ioctl->value);
 			return B_OK;
 		}
 
 		case POKE_GET_NTH_PCI_INFO:
 		{
-		    pci_info_args* ioctl = (pci_info_args*) arg;
-		    if (ioctl->signature != POKE_SIGNATURE)
-		    	return B_BAD_VALUE;
+		    pci_info_args* ioctl = (pci_info_args*)arg;
+			if (ioctl->signature != POKE_SIGNATURE)
+				return B_BAD_VALUE;
 
 			ioctl->status = pci->get_nth_pci_info(ioctl->index, ioctl->info);
 			return B_OK;
@@ -235,12 +237,12 @@ poke_control(void* cookie, uint32 op, void* arg, size_t length)
 
 		case POKE_GET_PHYSICAL_ADDRESS:
 		{
-			mem_map_args* ioctl = (mem_map_args*) arg;
+			mem_map_args* ioctl = (mem_map_args*)arg;
 			physical_entry table;
 			status_t result;
 
-		    if (ioctl->signature != POKE_SIGNATURE)
-		    	return B_BAD_VALUE;
+			if (ioctl->signature != POKE_SIGNATURE)
+				return B_BAD_VALUE;
 
 			result = get_memory_map(ioctl->address, ioctl->size, &table, 1);
 			ioctl->physical_address = table.address;
@@ -250,44 +252,41 @@ poke_control(void* cookie, uint32 op, void* arg, size_t length)
 
 		case POKE_MAP_MEMORY:
 		{
-			mem_map_args* ioctl = (mem_map_args*) arg;
-		    if (ioctl->signature != POKE_SIGNATURE)
-		    	return B_BAD_VALUE;
+			mem_map_args* ioctl = (mem_map_args*)arg;
+			if (ioctl->signature != POKE_SIGNATURE)
+				return B_BAD_VALUE;
 
 			ioctl->area = map_physical_memory(ioctl->name,
-											ioctl->physical_address,
-											ioctl->size,
-											ioctl->flags,
-											ioctl->protection,
-											(void**) &ioctl->address);
+				ioctl->physical_address, ioctl->size, ioctl->flags,
+				ioctl->protection, (void**)&ioctl->address);
 			return ioctl->area;
 		}
 
 		case POKE_UNMAP_MEMORY:
 		{
-			mem_map_args* ioctl = (mem_map_args*) arg;
-		    if (ioctl->signature != POKE_SIGNATURE)
-		    	return B_BAD_VALUE;
+			mem_map_args* ioctl = (mem_map_args*)arg;
+			if (ioctl->signature != POKE_SIGNATURE)
+				return B_BAD_VALUE;
 
 			return delete_area(ioctl->area);
 		}
-    }
+	}
 
-    return B_BAD_VALUE;
+	return B_BAD_VALUE;
 }
 
 
 status_t
-poke_read(void* cookie, off_t position, void* buffer, size_t* num_bytes)
+poke_read(void* cookie, off_t position, void* buffer, size_t* numBytes)
 {
-	*num_bytes = 0;
-    return B_NOT_ALLOWED;
+	*numBytes = 0;
+	return B_NOT_ALLOWED;
 }
 
 
 status_t
-poke_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
+poke_write(void* cookie, off_t position, const void* buffer, size_t* numBytes)
 {
-	*num_bytes = 0;
-    return B_NOT_ALLOWED;
+	*numBytes = 0;
+	return B_NOT_ALLOWED;
 }

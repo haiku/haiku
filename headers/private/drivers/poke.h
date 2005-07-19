@@ -41,7 +41,7 @@ typedef struct {
 	uint32	signature;
 	uint16	port;
 	uint8	size;		// == index for POKE_PORT_INDEXED_*
-	uint16	value;
+	uint32	value;
 } port_io_args;
 
 
