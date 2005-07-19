@@ -767,7 +767,8 @@ vm_create_anonymous_area(aspace_id aid, const char *name, void **address,
 	size = PAGE_ALIGN(size);
 
 	if (wiring == B_CONTIGUOUS) {
-		// we try to allocate the page run here upfront as this may easily fail for obvious reasons
+		// we try to allocate the page run here upfront as this may easily
+		// fail for obvious reasons
 		page = vm_page_allocate_page_run(PAGE_STATE_CLEAR, size / B_PAGE_SIZE);
 		if (page == NULL) {
 			vm_put_aspace(aspace);
@@ -1292,6 +1293,9 @@ _vm_put_area(vm_area *area, bool aspaceLocked)
 	vm_address_space *aspace;
 	bool removeit = false;
 
+	//TRACE(("_vm_put_area(area = %p, aspaceLocked = %s)\n",
+	//	area, aspaceLocked ? "yes" : "no"));
+
 	// we should never get here, but if we do, we can handle it
 	if (area->id == RESERVED_AREA_ID)
 		return false;
@@ -1389,6 +1393,8 @@ vm_copy_on_write_area(vm_area *area)
 	upperCacheRef->cache = upperCache;
 
 	// we need to manually alter the ref_count
+	// ToDo: investigate a bit deeper if this is really correct
+	// (doesn't look like it, but it works)
 	lowerCacheRef->ref_count = upperCacheRef->ref_count;
 	upperCacheRef->ref_count = 1;
 
@@ -1400,10 +1406,11 @@ vm_copy_on_write_area(vm_area *area)
 
 	map = &area->aspace->translation_map;
 	map->ops->lock(map);
-	map->ops->unmap(map, area->base, area->base + area->size - 1);
+	map->ops->unmap(map, area->base, area->base - 1 + area->size);
 
 	for (page = lowerCache->page_list; page; page = page->cache_next) {
-		map->ops->map(map, area->base + page->offset, page->ppn * B_PAGE_SIZE, protection);
+		map->ops->map(map, area->base + (page->offset - area->cache_offset),
+			page->ppn * B_PAGE_SIZE, protection);
 	}
 
 	map->ops->unlock(map);
@@ -1429,9 +1436,14 @@ vm_copy_area(aspace_id addressSpaceID, const char *name, void **_address, uint32
 	vm_cache_ref *cacheRef;
 	vm_area *target, *source;
 	status_t status;
+	bool writableCopy = (protection & (B_KERNEL_WRITE_AREA | B_WRITE_AREA)) != 0;
 
-	if ((protection & B_KERNEL_PROTECTION) == 0)
-		protection |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
+	if ((protection & B_KERNEL_PROTECTION) == 0) {
+		// set the same protection for the kernel as for userland
+		protection |= B_KERNEL_READ_AREA;
+		if (writableCopy)
+			protection |= B_KERNEL_WRITE_AREA;
+	}
 
 	if ((source = vm_get_area(sourceID)) == NULL)
 		return B_BAD_VALUE;
@@ -1448,7 +1460,7 @@ vm_copy_area(aspace_id addressSpaceID, const char *name, void **_address, uint32
 
 	status = map_backing_store(addressSpace, cacheRef->cache->store, _address,
 		source->cache_offset, source->size, addressSpec, source->wiring, protection,
-		protection & (B_KERNEL_WRITE_AREA | B_WRITE_AREA) ? REGION_PRIVATE_MAP : REGION_NO_PRIVATE_MAP,
+		writableCopy ? REGION_PRIVATE_MAP : REGION_NO_PRIVATE_MAP,
 		&target, name);
 
 	if (status < B_OK)
@@ -1456,8 +1468,11 @@ vm_copy_area(aspace_id addressSpaceID, const char *name, void **_address, uint32
 
 	// If the source area is writable, we need to move it one layer up as well
 
-	if ((source->protection & (B_KERNEL_WRITE_AREA | B_WRITE_AREA)) != 0)
-		vm_copy_on_write_area(source);
+	if ((source->protection & (B_KERNEL_WRITE_AREA | B_WRITE_AREA)) != 0) {
+		// ToDo: do something more useful if this fails!
+		if (vm_copy_on_write_area(source) < B_OK)
+			panic("vm_copy_on_write_area() failed!\n");
+	}
 
 	// we want to return the ID of the newly created area
 	status = target->id;
