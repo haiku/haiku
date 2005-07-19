@@ -130,20 +130,29 @@ NormalPulseView::DetermineVendorAndProcessor()
 	system_info sys_info;
 	get_system_info(&sys_info);
 
-	// Initialize logos
+	// Initialize logo
 
 	fCpuLogo = new BBitmap(BRect(0, 0, 63, 62), B_COLOR_8_BIT);
+	unsigned char *logo = BlankLogo;
 
 #if __POWERPC__
-	fCpuLogo->SetBits(Anim1, fCpuLogo->BitsLength(), 0, B_COLOR_8_BIT);
+	logo = PowerPCLogo;
 #endif
 #if __INTEL__
-	if ((sys_info.cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86) {
-		fCpuLogo->SetBits(IntelLogo, fCpuLogo->BitsLength(), 0, B_COLOR_8_BIT);
-		fHasBrandLogo = true;
-	} else
-		fCpuLogo->SetBits(BlankLogo, fCpuLogo->BitsLength(), 0, B_COLOR_8_BIT);
+	
+	switch (sys_info.cpu_type & B_CPU_x86_VENDOR_MASK) {
+	case B_CPU_INTEL_x86:
+		logo = IntelLogo;
+		break;
+		
+	case B_CPU_AMD_x86:
+		logo = AmdLogo;
+		break;
+	};
 #endif
+
+	fCpuLogo->SetBits(logo, fCpuLogo->BitsLength(), 0, B_COLOR_8_BIT);
+	fHasBrandLogo = (logo != BlankLogo);
 
 	get_cpu_type(fVendor, sizeof(fVendor), fProcessor, sizeof(fProcessor));
 }
