@@ -722,11 +722,13 @@ put_death_stack_and_reschedule(uint32 index)
 
 	disable_interrupts();
 	GRAB_THREAD_LOCK();
-
 	sDeathStackBitmap &= ~(1 << index);
+	RELEASE_THREAD_LOCK();
 
 	release_sem_etc(sDeathStackSem, 1, B_DO_NOT_RESCHEDULE);
+		// we must not have acquired the thread lock when releasing a semaphore
 
+	GRAB_THREAD_LOCK();
 	scheduler_reschedule();
 		// requires thread lock to be held
 }
