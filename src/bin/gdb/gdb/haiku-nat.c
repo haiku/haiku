@@ -744,6 +744,8 @@ haiku_child_attach (char *args, int from_tty)
 	if (threadID <= 0)
 		error("The given thread-id %ld is invalid.", threadID);
 
+// TODO: When attaching to a crashed team, the crashed thread is continued!
+// Don't know yet where that happens, but it needs to be fixed! 
 	haiku_init_child_debugging(threadID, true);
 
 	while (1) {
