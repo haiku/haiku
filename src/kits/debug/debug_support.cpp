@@ -44,6 +44,10 @@ destroy_debug_context(debug_context *context)
 	if (context) {
 		if (context->reply_port >= 0)
 			delete_port(context->reply_port);
+
+		context->team = -1;
+		context->nub_port = -1;
+		context->reply_port = -1;
 	}
 }
 
