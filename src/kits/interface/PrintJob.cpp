@@ -7,12 +7,16 @@
  				Stefano Ceccherini (burton666@libero.it)
  */
 
+#include <Alert.h>
+#include <Application.h>
+#include <Debug.h>
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <Messenger.h>
 #include <Path.h>
 #include <PrintJob.h>
+#include <Roster.h>
 #include <View.h>
 
 #include <pr_server.h>
@@ -46,6 +50,7 @@ BPrintJob::BPrintJob(const char *job_name)
 	default_setup_msg(NULL),
 	m_curPageHeader(NULL)
 {
+	memset(&current_header, 0, sizeof(current_header));
 	if (job_name != NULL)
 		print_job_name = strdup(job_name);
 }
@@ -85,6 +90,7 @@ BPrintJob::BeginJob()
 		return;
 	
 	stop_the_show = 0;
+	page_number = 0;
 	
 	strncpy(spool_file_name, path.Path(), sizeof(spool_file_name));
 	spoolFile = new BFile(spool_file_name, B_READ_WRITE|B_CREATE_FILE);
@@ -96,7 +102,47 @@ BPrintJob::BeginJob()
 void
 BPrintJob::CommitJob()
 {
-	// TODO: Implement
+	if (page_number <= 0) {
+		BAlert *alert = new BAlert("Alert", "No Pages to print!", "Okay");
+		alert->Go();
+		CancelJob();
+		return;
+	}
+		
+	EnsureValidMessenger();
+	BMessage *message = new BMessage(PSRV_GET_ACTIVE_PRINTER);
+    BMessage *reply = new BMessage;
+    
+    const char *printerName = NULL;
+    if (sPrintServer->SendMessage(message, reply) < B_OK ||
+    	reply->FindString("printer_name", &printerName) < B_OK) {
+    	// TODO: Show an alert
+    	delete message;
+   		delete reply;
+    	return;
+    }	
+    
+    delete message;
+    delete reply;
+    
+    app_info appInfo;
+    be_app->GetAppInfo(&appInfo);
+    
+    spoolFile->WriteAttr("_spool/Page Count", B_INT32_TYPE, 0, &page_number, sizeof(int32));    
+    spoolFile->WriteAttr("_spool/Description", B_STRING_TYPE, 0, print_job_name, strlen(print_job_name) + 1); 
+    spoolFile->WriteAttr("_spool/Printer", B_STRING_TYPE, 0, printerName, strlen(printerName) + 1);    
+	spoolFile->WriteAttr("_spool/Status", B_STRING_TYPE, 0, "waiting", strlen("waiting") + 1);    
+	spoolFile->WriteAttr("_spool/MimeType", B_STRING_TYPE, 0, appInfo.signature, strlen(appInfo.signature) + 1);
+	
+	message = new BMessage(PSRV_PRINT_SPOOLED_JOB);
+	reply = new BMessage;
+	
+	message->AddString("JobName", print_job_name);
+	message->AddString("Spool File", spool_file_name);
+	sPrintServer->SendMessage(message, reply);
+		
+	delete message;
+	delete reply;
 }
 
 
@@ -142,11 +188,17 @@ BPrintJob::CanContinue()
 void
 BPrintJob::DrawView(BView *view, BRect rect, BPoint where)
 {
-	// TODO: Finish me
-	if (view != NULL) {
-		view->f_is_printing = true;
-		view->Draw(rect);
-		view->f_is_printing = false;
+	if (view == NULL)
+		return;
+	
+	// TODO: Finish me	
+	if (view->LockLooper()) {
+		BPicture *picture = new BPicture;
+		RecurseView(view, where, picture, rect);
+		AddPicture(picture, &rect, where);
+		
+		view->UnlockLooper();
+		delete picture;
 	}
 }
 
@@ -284,6 +336,15 @@ void
 BPrintJob::RecurseView(BView *view, BPoint origin,
                        BPicture *picture, BRect rect)
 {
+	ASSERT(picture != NULL);
+	
+	view->AppendToPicture(picture);
+	view->f_is_printing = true;
+	view->Draw(rect);
+	view->f_is_printing = false;
+	view->EndPicture();
+	
+	// TODO: call recursively on every view's children.
 }
 
 
@@ -324,6 +385,8 @@ BPrintJob::NewPage()
 {
 	// TODO: this function could be removed, and its functionality moved
 	// to SpoolPage()
+	// TODO: Implement for real
+	page_number++;
 }
 
 
@@ -344,6 +407,13 @@ BPrintJob::AddSetupSpec()
 void
 BPrintJob::AddPicture(BPicture *picture, BRect *rect, BPoint where)
 {
+	ASSERT(picture != NULL);
+	ASSERT(spoolFile != NULL);
+	ASSERT(rect != NULL);
+	
+	spoolFile->Write(&where, sizeof(where));
+	spoolFile->Write(rect, sizeof(*rect));
+	picture->Flatten(spoolFile);
 }
 
 
