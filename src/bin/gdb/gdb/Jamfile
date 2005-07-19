@@ -9,6 +9,7 @@ SubDirHdrs [ FDirName $(OBOS_TOP) src bin gawk intl ] ;
 	# Use gawk's libintl for the time being.
 	# TODO: Put a current version of intl ot src/libs and build a static lib
 	# all interested apps can link against.
+UsePrivateHeaders debug ;
 
 SubDirCcFlags -DHAVE_CONFIG_H -DLOCALEDIR=\\\"/boot/beos/etc/locale\\\"
 	-DMI_OUT=1 ;
@@ -260,6 +261,7 @@ BinCommand gdb : gdb.c :
 	libtermcap.a
 
 	libroot.so
+	libdebug.so
 	libbind.so
 	libsocket.so
 ;

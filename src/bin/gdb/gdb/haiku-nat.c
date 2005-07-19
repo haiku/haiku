@@ -26,6 +26,8 @@
 #include <image.h>
 #include <OS.h>
 
+#include <debug_support.h>
+
 #include "defs.h"	// include this first -- otherwise "command.h" will choke
 #include "command.h"
 #include "gdbcore.h"
@@ -91,8 +93,7 @@ typedef struct extended_image_info {
 typedef struct team_debug_info {
 	team_id				team;
 	port_id				debugger_port;
-	port_id				nub_port;
-	port_id				reply_port;
+	debug_context		context;
 	thread_debug_info	*threads;
 	extended_image_info	*images;
 	debug_event_list	events;
@@ -190,6 +191,8 @@ haiku_find_thread(team_debug_info *teamDebugInfo, thread_id threadID)
 static thread_debug_info *
 haiku_add_thread(team_debug_info *teamDebugInfo, thread_id threadID)
 {
+	struct thread_info *gdbThreadInfo;
+
 	// find the thread first
 	thread_debug_info *threadDebugInfo
 		=  haiku_find_thread(teamDebugInfo, threadID);
@@ -208,6 +211,19 @@ haiku_add_thread(team_debug_info *teamDebugInfo, thread_id threadID)
 	threadDebugInfo->last_event = NULL;
 	teamDebugInfo->threads = threadDebugInfo;
 
+	// add it to gdb's thread DB
+	gdbThreadInfo = add_thread(ptid_build(teamDebugInfo->team, 0, threadID));
+
+	// Note: In theory we could spare us the whole thread list management, since
+	// gdb's thread DB is doing exactly the same. We could put our data as
+	// thread_info::private. The only catch is that when the thread_info is
+	// freed, xfree() is invoked on the private data directly, but there's no
+	// callback invoked before that would allow us to do cleanup (e.g. free
+	// last_event).
+
+	TRACE(("haiku_add_thread(): team %ld thread %ld added: "
+		"gdb thread info: %p\n", teamDebugInfo->team, threadID, gdbThreadInfo));
+
 	return threadDebugInfo;
 }
 
@@ -223,6 +239,10 @@ haiku_remove_thread(team_debug_info *teamDebugInfo, thread_id threadID)
 			if (foundInfo->last_event)
 				xfree(foundInfo->last_event);
 			xfree(foundInfo);
+
+			// remove it from gdb's thread DB
+			delete_thread(ptid_build(teamDebugInfo->team, 0, threadID));
+
 			return;
 		}
 	}
@@ -234,6 +254,9 @@ haiku_init_thread_list(team_debug_info *teamDebugInfo)
 {
 	thread_info threadInfo;
 	int32 cookie = 0;
+
+	// init gdb's thread DB
+	init_thread_list();
 
 	while (get_next_thread_info(teamDebugInfo->team, &cookie, &threadInfo)
 		== B_OK) {
@@ -250,6 +273,9 @@ haiku_cleanup_thread_list(team_debug_info *teamDebugInfo)
 		teamDebugInfo->threads = thread->next;
 		xfree(thread);
 	}	
+
+	// clear gdb's thread DB
+	init_thread_list();
 }
 
 
@@ -371,11 +397,9 @@ haiku_get_next_image_info(int lastID)
 static void
 haiku_cleanup_team_debug_info()
 {
+	destroy_debug_context(&sTeamDebugInfo.context);
 	delete_port(sTeamDebugInfo.debugger_port);
-	delete_port(sTeamDebugInfo.reply_port);
 	sTeamDebugInfo.debugger_port = -1;
-	sTeamDebugInfo.reply_port = -1;
-	sTeamDebugInfo.nub_port = -1;
 	sTeamDebugInfo.team = -1;
 	
 	haiku_cleanup_thread_list(&sTeamDebugInfo);
@@ -387,29 +411,8 @@ static status_t
 haiku_send_debugger_message(team_debug_info *teamDebugInfo, int32 messageCode,
 	const void *message, int32 messageSize, void *reply, int32 replySize)
 {
-	// send message
-	while (true) {
-		status_t result = write_port(teamDebugInfo->nub_port, messageCode,
-			message, messageSize);
-		if (result == B_OK)
-			break;
-		if (result != B_INTERRUPTED)
-			return result;
-	}
-
-	if (!reply)
-		return B_OK;
-
-	// read reply
-	while (true) {
-		int32 code;
-		ssize_t bytesRead = read_port(teamDebugInfo->reply_port, &code,
-			reply, replySize);
-		if (bytesRead > 0)
-			return B_OK;
-		if (bytesRead != B_INTERRUPTED)
-			return bytesRead;
-	}
+	return send_debug_message(&teamDebugInfo->context, messageCode,
+		message, messageSize, reply, replySize);
 }
 
 
@@ -418,6 +421,7 @@ haiku_init_child_debugging (thread_id threadID, bool debugThread)
 {
 	thread_info threadInfo;
 	status_t result;
+	port_id nubPort;
 
 	// get a thread info
 	result = get_thread_info(threadID, &threadInfo);
@@ -427,8 +431,8 @@ haiku_init_child_debugging (thread_id threadID, bool debugThread)
 	// init our team debug structure
 	sTeamDebugInfo.team = threadInfo.team;
 	sTeamDebugInfo.debugger_port = -1;
-	sTeamDebugInfo.nub_port = -1;
-	sTeamDebugInfo.reply_port = -1;
+	sTeamDebugInfo.context.nub_port = -1;
+	sTeamDebugInfo.context.reply_port = -1;
 	sTeamDebugInfo.threads = NULL;
 	sTeamDebugInfo.events.head = NULL;
 	sTeamDebugInfo.events.tail = NULL;
@@ -440,19 +444,20 @@ haiku_init_child_debugging (thread_id threadID, bool debugThread)
 			strerror(sTeamDebugInfo.debugger_port));
 	}
 
-	// create a reply port
-	sTeamDebugInfo.reply_port = create_port(10, "gdb debug reply");
-	if (sTeamDebugInfo.reply_port < 0) {
-		error("Failed to create reply port: %s",
-			strerror(sTeamDebugInfo.reply_port));
+	// install ourselves as the team debugger
+	nubPort = install_team_debugger(sTeamDebugInfo.team,
+		sTeamDebugInfo.debugger_port);
+	if (nubPort < 0) {
+		error("Failed to install ourselves as debugger for team %ld: %s",
+			sTeamDebugInfo.team, strerror(nubPort));
 	}
 
-	// install ourselves as the team debugger
-	sTeamDebugInfo.nub_port = install_team_debugger(sTeamDebugInfo.team,
-		sTeamDebugInfo.debugger_port);
-	if (sTeamDebugInfo.nub_port < 0) {
-		error("Failed to install ourselves as debugger for team %ld: %s",
-			sTeamDebugInfo.team, strerror(sTeamDebugInfo.nub_port));
+	// init the debug context
+	result = init_debug_context(&sTeamDebugInfo.context, sTeamDebugInfo.team,
+		nubPort);
+	if (result != B_OK) {
+		error("Failed to init debug context for team %ld: %s\n",
+			sTeamDebugInfo.team, strerror(result));
 	}
 
 	// start debugging the thread
@@ -476,13 +481,12 @@ haiku_init_child_debugging (thread_id threadID, bool debugThread)
 			B_DEBUG_MESSAGE_SET_TEAM_FLAGS, &message, sizeof(message), NULL, 0);
 	}
 
-	haiku_init_thread_list(&sTeamDebugInfo);
-	haiku_init_image_list(&sTeamDebugInfo);
 
 	// the fun can start: push the target and init the rest
 	push_target(sHaikuTarget);
 
-	init_thread_list ();
+	haiku_init_thread_list(&sTeamDebugInfo);
+	haiku_init_image_list(&sTeamDebugInfo);
 
 	disable_breakpoints_in_shlibs (1);
 
@@ -525,7 +529,7 @@ haiku_get_cpu_state(team_debug_info *teamDebugInfo,
 	thread_id threadID = ptid_get_tid(inferior_ptid);
 	debug_nub_get_cpu_state message;
 
-	message.reply_port = teamDebugInfo->reply_port;
+	message.reply_port = teamDebugInfo->context.reply_port;
 	message.thread = threadID;
 
 	err = haiku_send_debugger_message(teamDebugInfo,
@@ -744,20 +748,9 @@ haiku_child_attach (char *args, int from_tty)
 	if (threadID <= 0)
 		error("The given thread-id %ld is invalid.", threadID);
 
-// TODO: When attaching to a crashed team, the crashed thread is continued!
-// Don't know yet where that happens, but it needs to be fixed! 
 	haiku_init_child_debugging(threadID, true);
 
-	while (1) {
-		stop_after_trap = 1;
-		wait_for_inferior ();
-// TODO: Catch deadly events, so that we won't block here.
-//		if (debugThread && stop_signal != TARGET_SIGNAL_TRAP)
-//			resume (0, stop_signal);
-//		else
-		break;
-	}
-	stop_after_trap = 0;
+	TRACE(("haiku_child_attach() done\n"));
 }
 
 
@@ -927,8 +920,8 @@ haiku_child_resume (ptid_t ptid, int step, enum target_signal sig)
 
 
 static ptid_t
-haiku_child_wait_internal (ptid_t ptid, struct target_waitstatus *ourstatus,
-	bool *ignore)
+haiku_child_wait_internal (team_debug_info *teamDebugInfo, ptid_t ptid,
+	struct target_waitstatus *ourstatus, bool *ignore)
 {
 	team_id teamID = ptid_get_pid(ptid);
 	team_id threadID = ptid_get_tid(ptid);
@@ -945,7 +938,7 @@ haiku_child_wait_internal (ptid_t ptid, struct target_waitstatus *ourstatus,
 	// if we're waiting for any thread, search the thread list for already
 	// stopped threads (needed for reprocessing events)
 	if (threadID < 0) {
-		for (thread = sTeamDebugInfo.threads; thread; thread = thread->next) {
+		for (thread = teamDebugInfo->threads; thread; thread = thread->next) {
 			if (thread->stopped) {
 				threadID = thread->thread;
 				break;
@@ -955,7 +948,7 @@ haiku_child_wait_internal (ptid_t ptid, struct target_waitstatus *ourstatus,
 
 	// check, if the thread exists and is already stopped
 	if (threadID >= 0
-		&& (thread = haiku_find_thread(&sTeamDebugInfo, threadID)) != NULL
+		&& (thread = haiku_find_thread(teamDebugInfo, threadID)) != NULL
 		&& thread->stopped) {
 		// remove the event that stopped the thread from the thread (we will
 		// add it again, if it shall not be ignored)
@@ -969,22 +962,22 @@ haiku_child_wait_internal (ptid_t ptid, struct target_waitstatus *ourstatus,
 	} else {
 		// prepare closure for finding interesting events
 		thread_event_closure threadEventClosure;
-		threadEventClosure.context = &sTeamDebugInfo;
+		threadEventClosure.context = teamDebugInfo;
 		threadEventClosure.thread = threadID;
 		threadEventClosure.event = NULL;
 
 		// find the first interesting queued event
 		threadEventClosure.event = haiku_find_next_debug_event(
-			&sTeamDebugInfo.events, haiku_thread_event_predicate,
+			&teamDebugInfo->events, haiku_thread_event_predicate,
 			&threadEventClosure);
 
 		// read all events pending on the port
-		haiku_read_pending_debug_events(&sTeamDebugInfo,
+		haiku_read_pending_debug_events(teamDebugInfo,
 			(threadEventClosure.event == NULL), haiku_thread_event_predicate,
 			&threadEventClosure);
 
 		// get the event of interest
-		event = haiku_remove_debug_event(&sTeamDebugInfo.events,
+		event = haiku_remove_debug_event(&teamDebugInfo->events,
 			threadEventClosure.event);
 
 		if (!event) {
@@ -998,7 +991,7 @@ haiku_child_wait_internal (ptid_t ptid, struct target_waitstatus *ourstatus,
 			event->data.origin.nub_port));
 	}
 
-	if (event->data.origin.team != sTeamDebugInfo.team) {
+	if (event->data.origin.team != teamDebugInfo->team) {
 		// Spurious debug message. Doesn't concern our team. Ignore.
 		xfree(event);
 		return retval;
@@ -1010,7 +1003,23 @@ haiku_child_wait_internal (ptid_t ptid, struct target_waitstatus *ourstatus,
 
 	switch (event->message) {
 		case B_DEBUGGER_MESSAGE_DEBUGGER_CALL:
-			// TODO: Print the debugger message.
+		{
+			// print the debugger message
+			char debuggerMessage[1024];
+			ssize_t bytesRead = debug_read_string(&teamDebugInfo->context,
+				event->data.debugger_call.message, debuggerMessage,
+				sizeof(debuggerMessage));
+			if (bytesRead > 0) {
+				printf_unfiltered ("Thread %ld called debugger(): %s\n",
+					event->data.origin.thread, debuggerMessage);
+			} else {
+				printf_unfiltered ("Thread %ld called debugger(), but failed"
+					"to get the debugger message.\n",
+					event->data.origin.thread);
+			}
+
+			// fall through...
+		}
 		case B_DEBUGGER_MESSAGE_THREAD_DEBUGGED:
 		case B_DEBUGGER_MESSAGE_BREAKPOINT_HIT:
 		case B_DEBUGGER_MESSAGE_WATCHPOINT_HIT:
@@ -1039,12 +1048,20 @@ haiku_child_wait_internal (ptid_t ptid, struct target_waitstatus *ourstatus,
 			break;
 
 		case B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED:
-			// TODO: Print the exception message.
+		{
+			// print the exception message
+			char exception[1024];
+			get_debug_exception_string(event->data.exception_occurred.exception,
+				exception, sizeof(exception));
+			printf_unfiltered ("Thread %ld caused an exception: %s\n",
+				event->data.origin.thread, exception);
+
 			pendingSignal = event->data.exception_occurred.signal;
 			pendingSignalStatus = SIGNAL_WILL_ARRIVE;
 			ourstatus->kind = TARGET_WAITKIND_STOPPED;
 			ourstatus->value.sig = haiku_to_target_signal(pendingSignal);
 			break;
+		}
 
 		case B_DEBUGGER_MESSAGE_TEAM_CREATED:
 			// ignore
@@ -1059,14 +1076,14 @@ haiku_child_wait_internal (ptid_t ptid, struct target_waitstatus *ourstatus,
 
 		case B_DEBUGGER_MESSAGE_THREAD_CREATED:
 			// internal bookkeeping only
-			haiku_add_thread(&sTeamDebugInfo,
+			haiku_add_thread(teamDebugInfo,
 				event->data.thread_created.new_thread);
 			*ignore = true;
 			break;
 
 		case B_DEBUGGER_MESSAGE_THREAD_DELETED:
 			// internal bookkeeping
-			haiku_remove_thread(&sTeamDebugInfo,
+			haiku_remove_thread(teamDebugInfo,
 				event->data.thread_deleted.origin.thread);
 			*ignore = true;
 
@@ -1076,10 +1093,10 @@ haiku_child_wait_internal (ptid_t ptid, struct target_waitstatus *ourstatus,
 		case B_DEBUGGER_MESSAGE_IMAGE_CREATED:
 			if (reprocessEvent < 0) {
 				// first time we see the event: update our image list
-//				haiku_add_image(&sTeamDebugInfo,
+//				haiku_add_image(teamDebugInfo,
 //					&event->data.image_created.info);
-haiku_cleanup_image_list(&sTeamDebugInfo);
-haiku_init_image_list(&sTeamDebugInfo);
+haiku_cleanup_image_list(teamDebugInfo);
+haiku_init_image_list(teamDebugInfo);
 // TODO: We don't get events when images have been removed in preparation of
 // an exec*() yet.
 			}
@@ -1137,7 +1154,7 @@ TRACE(("haiku_child_wait_internal(): B_APP_IMAGE created, reprocess -> exec\n"))
 			break;
 
 		case B_DEBUGGER_MESSAGE_IMAGE_DELETED:
-			haiku_remove_image(&sTeamDebugInfo,
+			haiku_remove_image(teamDebugInfo,
 				event->data.image_created.info.id);
 
 			// send TARGET_WAITKIND_LOADED here too, it causes the shared
@@ -1154,7 +1171,7 @@ TRACE(("haiku_child_wait_internal(): B_APP_IMAGE created, reprocess -> exec\n"))
 
 	// make the event the thread's last event or delete it
 	if (!*ignore && event->data.origin.thread >= 0) {
-		struct thread_debug_info *thread = haiku_find_thread(&sTeamDebugInfo,
+		struct thread_debug_info *thread = haiku_find_thread(teamDebugInfo,
 			event->data.origin.thread);
 		if (thread->last_event)
 			xfree(thread->last_event);
@@ -1169,7 +1186,7 @@ TRACE(("haiku_child_wait_internal(): B_APP_IMAGE created, reprocess -> exec\n"))
 
 		// continue the thread
 		if (event->data.origin.thread >= 0) {
-			haiku_continue_thread(&sTeamDebugInfo, event->data.origin.thread,
+			haiku_continue_thread(teamDebugInfo, event->data.origin.thread,
 				B_THREAD_DEBUG_HANDLE_EVENT, false);
 		}
 
@@ -1192,7 +1209,8 @@ haiku_child_wait (ptid_t ptid, struct target_waitstatus *ourstatus)
 		haiku_pid_to_str(ptid), ourstatus));
 
 	do {
-		retval = haiku_child_wait_internal(ptid, ourstatus, &ignore);
+		retval = haiku_child_wait_internal(&sTeamDebugInfo, ptid, ourstatus,
+			&ignore);
 	} while (ignore);
 
 	TRACE(("haiku_child_wait() done: `%s'\n", haiku_pid_to_str(retval)));
@@ -1269,7 +1287,7 @@ haiku_child_deprecated_xfer_memory (CORE_ADDR memaddr, char *myaddr, int len,
 		if (len > B_MAX_READ_WRITE_MEMORY_SIZE)
 			len = B_MAX_READ_WRITE_MEMORY_SIZE;
 
-		message.reply_port = sTeamDebugInfo.reply_port;
+		message.reply_port = sTeamDebugInfo.context.reply_port;
 		message.address = (void*)memaddr;
 		message.size = len;
 		memcpy(message.data, myaddr, len);
@@ -1288,22 +1306,9 @@ TRACE(("haiku_child_deprecated_xfer_memory(): -> %ld\n", reply.size));
 		return reply.size;
 	} else {
 		// read
-		debug_nub_read_memory message;
-		debug_nub_read_memory_reply reply;
-		status_t err;
-
-		message.reply_port = sTeamDebugInfo.reply_port;
-		message.address = (void*)memaddr;
-		message.size = len;
-
-		err = haiku_send_debugger_message(&sTeamDebugInfo,
-			B_DEBUG_MESSAGE_READ_MEMORY, &message, sizeof(message), &reply,
-			sizeof(reply));
-		if (err != B_OK || reply.error != B_OK)
-			return 0;
-
-		memcpy(myaddr, reply.data, reply.size);
-		return reply.size;
+		ssize_t bytesRead = debug_read_memory_partial(&sTeamDebugInfo.context,
+			(const void *)memaddr, myaddr, len);
+		return (bytesRead < 0 ? 0 : bytesRead);
 	}
 
 	return -1;
