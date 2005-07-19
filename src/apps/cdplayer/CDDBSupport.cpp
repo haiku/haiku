@@ -24,7 +24,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 // #pragma mark -
 // some glue
 
@@ -349,10 +348,7 @@ CDDBQuery::ReadFromServer(BDataIO *stream)
 	// Format the query
 	BString query;
 	query << "cddb query " << discIDStr << ' ' << numTracks << ' ' 
-		// Add frame offsets
-		<< frameOffsetString << ' '
-		// Finish it off with the total CD length.
-		<< discLength << '\n';
+			<< frameOffsetString << ' ' << discLength << '\n';
 	
 	if (log)
 		printf(">%s", query.String());
@@ -362,30 +358,56 @@ CDDBQuery::ReadFromServer(BDataIO *stream)
 
 	BString tmp;
 	ReadLine(tmp);
+	
+	BString category;
+	BString queryDiscID(discIDStr);
+	
 	if(tmp.FindFirst("200") != 0)
 	{
 		if(tmp.FindFirst("211") == 0)
 		{
-			while(tmp.CountChars() > 0)
-			{
-				printf("%s\n",tmp.String());
-				ReadLine(tmp);
-			}
+			// A 211 means that the query was not exact. To make sure that we don't
+			// have a problem with this in the future, we will choose the first entry that
+			// the server returns. This may or may not be wise, but in my experience, the first
+			// one has been the right one.
+			
+			ReadLine(tmp);
+			
+			// Get the category from the what the server returned
+			GetToken(tmp.String(), category);
+			
+			// Now we will get the disc ID for the CD. We will need this when we query for
+			// the track name list. If we send the track name query with the real discID, nothing
+			// will be returned. However, if we send the one from the entry, we'll get the names
+			// and we can take these names attach them to the disc that we have.
+			GetToken(tmp.String() + category.CountChars(),queryDiscID);
+			
+			// This is to suck up any more search results that the server sends us.
+			BString throwaway;
+			ReadLine(throwaway);
+			while(throwaway.ByteAt(0) != '.')
+				ReadLine(throwaway);
 		}
 		else
+		{
 			printf("Error: %s\n",tmp.String());
-		return;
+			return;
+		}
 	}
-	BString category;
-	GetToken(tmp.String() + 3, category);
+	else
+	{
+		GetToken(tmp.String() + 3, category);
+	}
+	
 	if (!category.Length())
 		category = "misc";
 
 	query = "";
-	query << "cddb read " << category << ' ' << discIDStr << '\n' ;
+	query << "cddb read " << category << ' ' << queryDiscID << '\n' ;
 	ThrowIfNotSize( socket.Send(query.String(), query.Length()) );
 
-	for (;;) {
+	for (;;) 
+	{
 		BString tmp;
 		ReadLine(tmp);
 		tmp += '\n';
@@ -547,8 +569,8 @@ CDDBQuery::FindOrCreateContentFileForDisk(BFile *file, entry_ref *fileRef, int32
 	}
 
 	BPath path;
-	ThrowOnError( find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) );
-	path.Append("CDContentFiles");
+	ThrowOnError( find_directory(B_USER_DIRECTORY, &path, true) );
+	path.Append("cd");
 	ThrowOnError( create_directory(path.Path(), 0755) );
 	
 	BDirectory dir(path.Path());

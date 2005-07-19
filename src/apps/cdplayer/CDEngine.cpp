@@ -138,7 +138,7 @@ TrackState::UpdateState()
 int32 
 TrackState::GetNumTracks() const
 {
-	return sCDDevice.CountTracks();
+	return sCDDevice.CountTracks()+1;
 }
 
 bool

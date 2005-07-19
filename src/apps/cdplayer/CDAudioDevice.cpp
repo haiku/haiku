@@ -331,11 +331,15 @@ int32 CDAudioDevice::FindDrives(const char *path)
 			// ignore floppy -- it is not silent
 			if(strcmp(e.name, "floppy") == 0)
 				continue;
+			else
+			if(strcmp(e.name, "ata") == 0)
+				continue;
 			
-			int32 count = FindDrives(name);
+			// Note that if we check for the count here, we could
+			// just search for one drive. However, we want to find *all* drives
+			// that are available, so we keep searching even if we've found one
+			FindDrives(name);
 			
-			if(count > 0)
-				return count;
 		} 
 		else 
 		{
