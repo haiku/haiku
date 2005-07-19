@@ -581,7 +581,7 @@
 #define ENCRTCX_HTIMEXT1	0x33
 #define ENCRTCX_FBSTADDE	0x34
 #define ENCRTCX_VTIMEXT_PIT	0x35
-#define ENCRTCX_HTIMEXT2	0x36 //b6,7 = DPMS, 00 = on, 11=off (4H,5V?)
+#define ENCRTCX_HTIMEXT2	0x36
 #define ENCRTCX_TVTYPE		0x3b //TVtype jumper: b1=1 = PAL, else NTSC
 //end via
 /* Nvidia specific registers: */
