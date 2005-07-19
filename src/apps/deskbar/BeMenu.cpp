@@ -242,9 +242,6 @@ TBeMenu::AddStandardBeMenuItems()
 #ifdef __HAIKU__
 	BMenuItem* item = new BMenuItem("About Haiku", new BMessage(kShowSplash));
 #else
-#ifdef __HAIKU__
-	BMenuItem* item = new BMenuItem("About Haiku", new BMessage(kShowSplash));
-#else
 	BMenuItem* item = new BMenuItem("About BeOS", new BMessage(kShowSplash));
 #endif
 	item->SetEnabled(!dragging);
