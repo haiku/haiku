@@ -1786,6 +1786,34 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			fLink.Flush();
 			break;
 		}
+		case AS_GET_HAS_GLYPHS:
+		{
+			FTRACE(("ServerApp %s: AS_GET_HAS_GLYPHS\n", Signature()));
+			// Attached Data:
+			// 1) uint16 - family ID
+			// 2) uint16 - style ID
+			// 3) int32 - numChars
+			// 4) char - chars (numChars times)
+			
+			uint16 famid, styid;
+			link.Read<uint16>(&famid);
+			link.Read<uint16>(&styid);
+			int32 numChars;
+			link.Read<int32>(&numChars);
+			char charArray[numChars];
+			link.Read(&charArray, numChars);
+			
+			ServerFont font;
+			if (font.SetFamilyAndStyle(famid, styid) == B_OK) {
+				bool hasArray[numChars];
+				font.GetHasGlyphs(charArray, numChars, hasArray);
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach(hasArray, sizeof(hasArray));
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+			fLink.Flush();
+			break;
+		}
 		case AS_GET_ESCAPEMENTS:
 		{
 			FTRACE(("ServerApp %s: AS_GET_ESCAPEMENTS\n", Signature()));

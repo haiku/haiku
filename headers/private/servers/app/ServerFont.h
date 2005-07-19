@@ -133,6 +133,9 @@ class ServerFont {
 			BShape**			GetGlyphShapes(const char charArray[],
 											   int32 numChars) const;
 
+			void				GetHasGlyphs(const char charArray[], 
+										int32 numChars, bool hasArray[]) const;
+
 			BPoint*				GetEscapements(const char charArray[],
 											   int32 numChars,
 											   BPoint offsetArray[]) const;

@@ -1171,6 +1171,8 @@ BFont::GetHasGlyphs(const char charArray[], int32 numChars, bool hasArray[]) con
 	BPrivate::AppServerLink link;
 
 	link.StartMessage(AS_GET_HAS_GLYPHS);
+	link.Attach<uint16>(fFamilyID);
+	link.Attach<uint16>(fStyleID);
 	link.Attach<int32>(numChars);
 	link.Attach(charArray, numChars);
 

@@ -322,6 +322,7 @@ ServerFont::GetGlyphShapes(const char charArray[], int32 numChars) const
 	for (int i = 0; i < numChars; i++) {
 		shapes[i] = new BShape();
 		shapes[i]->Clear();
+		// TODO : this is wrong (the nth char isn't charArray[i])
 		FT_Load_Char(face, charArray[i], FT_LOAD_NO_BITMAP);
 		FT_Outline outline = face->glyph->outline;
 		FT_Outline_Decompose(&outline, &funcs, shapes[i]);
@@ -330,6 +331,21 @@ ServerFont::GetGlyphShapes(const char charArray[], int32 numChars) const
 	
 	return shapes;
 }
+
+
+void
+ServerFont::GetHasGlyphs(const char charArray[], int32 numChars, bool hasArray[]) const
+{
+	if (!fStyle || !charArray || numChars <= 0 || !hasArray)
+		return;
+
+	// TODO : implement for real
+
+	for (int i = 0; i < numChars; i++) {
+		hasArray[i] = true;
+	}	
+}
+
 
 // GetEscapements
 BPoint*
@@ -374,6 +390,7 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 	// TODO: handle UTF8... see below!!
 	BPoint *escapements = (BPoint *)malloc(sizeof(BPoint) * numChars);
 	for (int i = 0; i < numChars; i++) {
+		// TODO : this is wrong (the nth char isn't charArray[i])
 		FT_Load_Char(face, charArray[i], FT_LOAD_NO_BITMAP);
 //		escapements[i].x = float(face->glyph->metrics.width / 64) / fSize;
 //		escapements[i].y = 0;
