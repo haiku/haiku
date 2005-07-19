@@ -24,8 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// #pragma mark -
-// some glue
+const int kTerminatingSignal = SIGINT; // SIGCONT;
 
 template <class InitCheckable>
 void
@@ -53,15 +52,13 @@ ThrowIfNotSize(ssize_t size)
 }
 
 
-// #pragma mark -
-
 CDDBQuery::CDDBQuery(const char *server, int32 port, bool log)
-	:	log(log),
-		serverName(server),
-		port(port),
-		connected(false),
-		discID(-1),
-		state(kInitial)
+	:	fLog(log),
+		fServerName(server),
+		fPort(port),
+		fConnected(false),
+		fDiscID(-1),
+		fState(kInitial)
 {
 }
 
@@ -69,9 +66,9 @@ void
 CDDBQuery::SetToSite(const char *server, int32 port)
 {
 	Disconnect();
-	serverName = server;
-	port = port;
-	state = kInitial;
+	fServerName = server;
+	fPort = port;
+	fState = kInitial;
 }
 
 void 
@@ -94,9 +91,9 @@ CDDBQuery::SetToCD(const char *path)
 		return;
 	
 	
-	if (state == kInitial) 
+	if (fState == kInitial) 
 	{
-		GetDiscID(&toc, discID, numTracks, discLength, frameOffsetString, discIDStr);
+		GetDiscID(&toc, fDiscID, fTrackCount, fDiscLength, fFrameOffsetString, fDiscIDStr);
 	}
 	else
 	{
@@ -109,32 +106,28 @@ CDDBQuery::SetToCD(const char *path)
 		GetDiscID(&toc, tmpDiscID, tmpNumTracks, tmpDiscLength, tmpFrameOffsetString,
 			tmpDiscIDStr);
 		
-		if (discID == tmpDiscID && discLength == tmpDiscLength && numTracks == tmpNumTracks
-			&& frameOffsetString == frameOffsetString)
+		if (fDiscID == tmpDiscID && fDiscLength == tmpDiscLength && fTrackCount == tmpNumTracks
+			&& tmpFrameOffsetString == fFrameOffsetString)
 			return;
 
-		discID = tmpDiscID;
-		discLength = tmpDiscLength;
-		numTracks = tmpNumTracks;
-		frameOffsetString = tmpFrameOffsetString;
-		discIDStr = tmpDiscIDStr;
+		fDiscID = tmpDiscID;
+		fDiscLength = tmpDiscLength;
+		fTrackCount = tmpNumTracks;
+		fFrameOffsetString = tmpFrameOffsetString;
+		fDiscIDStr = tmpDiscIDStr;
 	}
-	
-	// ToDo:
-	// add interrupting here
 	
 	result = B_OK;
-	state = kReading;
-	thread = spawn_thread(&CDDBQuery::LookupBinder, "CDDBLookup", B_NORMAL_PRIORITY, this);
-	if (thread >= 0)
-		resume_thread(thread);
+	fState = kReading;
+	fThread = spawn_thread(&CDDBQuery::LookupBinder, "CDDBLookup", B_NORMAL_PRIORITY, this);
+	
+	if (fThread >= 0)
+		resume_thread(fThread);
 	else {
-		state = kError;
-		result = thread;
+		fState = kError;
+		result = fThread;
 	}
 }
-
-const int kTerminatingSignal = SIGINT; // SIGCONT;
 
 static void
 DoNothing(int)
@@ -150,10 +143,12 @@ CDDBQuery::LookupBinder(void *castToThis)
 	entry_ref ref;
 	bool newFile = false;
 
-	try {
+	try 
+	{
 		signal(kTerminatingSignal, DoNothing);
 	
-		if (!query->FindOrCreateContentFileForDisk(&file, &ref, query->discID)) {
+		if (!query->FindOrCreateContentFileForDisk(&file, &ref, query->fDiscID)) 
+		{
 			// new content file, read it in from the server
 			Connector connection(query);
 			query->ReadFromServer(&file);
@@ -162,14 +157,16 @@ CDDBQuery::LookupBinder(void *castToThis)
 		}
 		query->ParseResult(&file);
 	
-		query->state = kDone;
-		query->thread = -1;
-		query->result = B_OK;
+		query->fState = kDone;
+		query->fThread = -1;
+		query->fResult = B_OK;
 		
-		if (newFile) {
-			BString newTitle(query->title);
+		if (newFile) 
+		{
+			BString newTitle(query->fTitle);
 			int32 length = newTitle.Length();
-			for (int32 index = 0; index < length; index++) {
+			for (int32 index = 0; index < length; index++) 
+			{
 				if (newTitle[index] == '/' || newTitle[index] == ':')
 					newTitle[index] = '-';
 			}
@@ -179,9 +176,11 @@ CDDBQuery::LookupBinder(void *castToThis)
 			entry.Rename(newTitle.String(), false);
 		}
 
-	} catch (status_t error) {
-		query->state = kError;
-		query->result = error;
+	}
+	catch (status_t error) 
+	{
+		query->fState = kError;
+		query->fResult = error;
 	
 		// the cached file is messed up, remove it
 		BEntry entry(&ref);
@@ -211,23 +210,21 @@ void
 CDDBQuery::GetSites(bool (*eachFunc)(const char *site, int port, const char *latitude,
 		const char *longitude, const char *description, void *state), void *passThru)
 {
-	// ToDo:
-	// add interrupting here
-
 	Connector connection(this);
 	BString tmp;
 	
 	tmp = "sites\n";
-	if (log)
+	if (fLog)
 		printf(">%s", tmp.String());
 
-	ThrowIfNotSize( socket.Send(tmp.String(), tmp.Length()) );
+	ThrowIfNotSize( fSocket.Send(tmp.String(), tmp.Length()) );
 	ReadLine(tmp);
 
 	if (tmp.FindFirst("210") == -1)
 		throw (status_t)B_ERROR;
 
-	for (;;) {
+	for (;;) 
+	{
 		BString site;
 		int32 sitePort;
 		BString latitude;
@@ -257,19 +254,20 @@ bool
 CDDBQuery::GetTitles(BString *resultingTitle, vector<BString> *tracks, bigtime_t timeout)
 {
 	bigtime_t deadline = system_time() + timeout;
-	while (state == kReading) {
+	while (fState == kReading) 
+	{
 		snooze(50000);
 		if (system_time() > deadline)
 			break;
 	}
-	if (state != kDone)
+	if (fState != kDone)
 		return false;
 
 	if (resultingTitle)
-		*resultingTitle = title;
+		*resultingTitle = fTitle;
 	
 	if (tracks)
-		*tracks = trackNames;
+		*tracks = fTrackNames;
 	return true;
 }
 
@@ -285,7 +283,8 @@ cddb_sum(int n)
 	return ret;
 }
 
-struct ConvertedToc {
+struct ConvertedToc 
+{
 	int32 min;
 	int32 sec;
 	int32 frame;
@@ -308,12 +307,13 @@ CDDBQuery::GetDiscID(const scsi_toc *toc)
 
 void 
 CDDBQuery::GetDiscID(const scsi_toc *toc, int32 &id, int32 &numTracks,
-	int32 &length, BString &frameOffsetsString, BString &discIDString)
+					int32 &length, BString &frameOffsetsString, BString &discIDString)
 {
 	ConvertedToc tocData[100];
 
 	// figure out the disc ID
-	for (int index = 0; index < 100; index++) {
+	for (int index = 0; index < 100; index++) 
+	{
 		tocData[index].min = toc->toc_data[9 + 8*index];
 		tocData[index].sec = toc->toc_data[10 + 8*index];
 		tocData[index].frame = toc->toc_data[11 + 8*index];
@@ -322,11 +322,13 @@ CDDBQuery::GetDiscID(const scsi_toc *toc, int32 &id, int32 &numTracks,
 	
 	int32 sum1 = 0;
 	int32 sum2 = 0;
-	for (int index = 0; index < numTracks; index++) {
+	for (int index = 0; index < numTracks; index++) 
+	{
 		sum1 += cddb_sum((tocData[index].min * 60) + tocData[index].sec);
+		
 		// the following is probably running over too far
-		sum2 +=	(tocData[index + 1].min * 60 + tocData[index + 1].sec) -
-			(tocData[index].min * 60 + tocData[index].sec);
+		sum2 +=	(tocData[index + 1].min * 60 + tocData[index + 1].sec) 
+				- (tocData[index].min * 60 + tocData[index].sec);
 	}
 	id = ((sum1 % 0xff) << 24) + (sum2 << 8) + numTracks;
 	discIDString = "";
@@ -347,20 +349,20 @@ CDDBQuery::ReadFromServer(BDataIO *stream)
 {
 	// Format the query
 	BString query;
-	query << "cddb query " << discIDStr << ' ' << numTracks << ' ' 
-			<< frameOffsetString << ' ' << discLength << '\n';
+	query << "cddb query " << fDiscIDStr << ' ' << fTrackCount << ' ' 
+		<< fFrameOffsetString << ' ' << fDiscLength << '\n';
 	
-	if (log)
+	if (fLog)
 		printf(">%s", query.String());
 
 	// Send it off.
-	ThrowIfNotSize( socket.Send(query.String(), query.Length()) );
+	ThrowIfNotSize( fSocket.Send(query.String(), query.Length()) );
 
 	BString tmp;
 	ReadLine(tmp);
 	
 	BString category;
-	BString queryDiscID(discIDStr);
+	BString queryDiscID(fDiscIDStr);
 	
 	if(tmp.FindFirst("200") != 0)
 	{
@@ -404,7 +406,7 @@ CDDBQuery::ReadFromServer(BDataIO *stream)
 
 	query = "";
 	query << "cddb read " << category << ' ' << queryDiscID << '\n' ;
-	ThrowIfNotSize( socket.Send(query.String(), query.Length()) );
+	ThrowIfNotSize( fSocket.Send(query.String(), query.Length()) );
 
 	for (;;) 
 	{
@@ -415,15 +417,16 @@ CDDBQuery::ReadFromServer(BDataIO *stream)
 		if (tmp == "." || tmp == ".\n")
 			break;
 	}
-	state = kDone;
+	fState = kDone;
 }
 
 void 
 CDDBQuery::ParseResult(BDataIO *source)
 {
-	title = "";
-	trackNames.clear();
-	for (;;) {
+	fTitle = "";
+	fTrackNames.clear();
+	for (;;) 
+	{
 		BString tmp;
 		ReadLine(source, tmp);
 		if (tmp == ".")
@@ -433,27 +436,30 @@ CDDBQuery::ParseResult(BDataIO *source)
 			throw (status_t)B_ERROR;
 		
 		if (tmp.FindFirst("DTITLE=") == 0)
-			title = tmp.String() + sizeof("DTITLE");
-		else if (tmp.FindFirst("TTITLE") == 0) {
+			fTitle = tmp.String() + sizeof("DTITLE");
+		else
+		if (tmp.FindFirst("TTITLE") == 0) 
+		{
 			int32 afterIndex = tmp.FindFirst('=');
-			if (afterIndex > 0) {
+			if (afterIndex > 0) 
+			{
 				BString trackName(tmp.String() + afterIndex + 1);
-				trackNames.push_back(trackName);
+				fTrackNames.push_back(trackName);
 			}
 		}
 	}
-	state = kDone;
+	fState = kDone;
 }
 
 
 void
 CDDBQuery::Connect()
 {
-	BNetAddress address(serverName.String(), port);
+	BNetAddress address(fServerName.String(), fPort);
 	InitCheck(&address);
 
-	ThrowOnError( socket.Connect(address) );
-	connected = true;
+	ThrowOnError( fSocket.Connect(address) );
+	fConnected = true;
 
 	BString tmp;
 	ReadLine(tmp);
@@ -463,14 +469,14 @@ CDDBQuery::Connect()
 bool 
 CDDBQuery::IsConnected() const
 {
-	return connected;
+	return fConnected;
 }
 
 void 
 CDDBQuery::Disconnect()
 {
-	socket.Close();
-	connected = false;
+	fSocket.Close();
+	fConnected = false;
 }
 
 void 
@@ -478,15 +484,16 @@ CDDBQuery::ReadLine(BString &buffer)
 {
 	buffer = "";
 	char ch;
-	for (;;) {
-		if (socket.Receive(&ch, 1) <= 0)
+	for (;;) 
+	{
+		if (fSocket.Receive(&ch, 1) <= 0)
 			break;
 		if (ch >= ' ')
 			buffer += ch;
 		if (ch == '\n')
 			break;
 	}
-	if (log)
+	if (fLog)
 		printf("<%s\n", buffer.String());
 }
 
@@ -499,16 +506,20 @@ CDDBQuery::ReadLine(BDataIO *stream, BString &buffer)
 
 	buffer = "";
 	char ch;
-	for (;;) {
+	for (;;) 
+	{
 		ssize_t result = stream->Read(&ch, 1);
 
+		// check for read error
 		if (result < 0)
-			// read error
 			throw (status_t)result;
+		
 		if (result == 0)
 			break;
+		
 		if (ch >= ' ')
 			buffer += ch;
+		
 		if (ch == '\n')
 			break;
 	}
@@ -529,9 +540,9 @@ CDDBQuery::IdentifySelf()
 	BString tmp;
 	tmp << "cddb hello " << username << " " << hostname << " Haiku_CD_Player v1.0\n";
 
-	if (log)
+	if (fLog)
 		printf(">%s", tmp.String());
-	ThrowIfNotSize( socket.Send(tmp.String(), tmp.Length()) );
+	ThrowIfNotSize( fSocket.Send(tmp.String(), tmp.Length()) );
 	
 	ReadLine(tmp);
 }
@@ -546,9 +557,10 @@ CDDBQuery::FindOrCreateContentFileForDisk(BFile *file, entry_ref *fileRef, int32
 	BVolumeRoster roster;
 	BVolume volume;
 	roster.Rewind();
-	while (roster.GetNextVolume(&volume) == B_OK) {
-		if (volume.IsReadOnly() || !volume.IsPersistent()
-			|| !volume.KnowsAttr() || !volume.KnowsQuery())
+	while (roster.GetNextVolume(&volume) == B_OK) 
+	{
+		if (volume.IsReadOnly() || !volume.IsPersistent() || !volume.KnowsAttr()
+			|| !volume.KnowsQuery())
 			continue;
 		
 		// make sure the volume we are looking at is indexed right
@@ -560,7 +572,8 @@ CDDBQuery::FindOrCreateContentFileForDisk(BFile *file, entry_ref *fileRef, int32
 		if (query.Fetch() != B_OK)
 			continue;
 		
-		while (query.GetNextRef(&ref) == B_OK) {
+		while (query.GetNextRef(&ref) == B_OK) 
+		{
 			// we have one already, return 
 			file->SetTo(&ref, O_RDONLY);
 			*fileRef = ref;
@@ -575,8 +588,10 @@ CDDBQuery::FindOrCreateContentFileForDisk(BFile *file, entry_ref *fileRef, int32
 	
 	BDirectory dir(path.Path());
 	BString name("CDContent");
-	for (int32 index = 0; ;index++) {
-		if (dir.CreateFile(name.String(), file, true) != B_FILE_EXISTS) {
+	for (int32 index = 0; ;index++) 
+	{
+		if (dir.CreateFile(name.String(), file, true) != B_FILE_EXISTS) 
+		{
 			BEntry entry(&dir, name.String());
 			entry.GetRef(fileRef);
 			file->WriteAttr("cddb:discID", B_INT32_TYPE, 0, &discID, sizeof(int32));
