@@ -137,44 +137,18 @@ get_unrelocated_text_address(struct so_list *so)
 }
 
 
-// #pragma mark -
-
 static void
-haiku_relocate_section_addresses (struct so_list *so, struct section_table *sec)
-{
-	CORE_ADDR unrelocatedAddress = get_unrelocated_text_address(so);
-	long relocation = so->lm_info->text_address - unrelocatedAddress;
-
-	sec->addr += relocation;
-	sec->endaddr += relocation;
-}
-
-
-static void
-haiku_free_so (struct so_list *so)
-{
-	xfree (so->lm_info);
-}
-
-
-static void
-haiku_clear_solib (void)
-{
-}
-
-
-static void
-haiku_solib_create_inferior_hook (void)
+relocate_main_executable (void)
 {
 	haiku_image_info *appImageInfo = haiku_get_app_image();
 
-	TRACE(("haiku_solib_create_inferior_hook()\n"));
+	TRACE(("relocate_main_executable()\n"));
 
-TRACE(("haiku_solib_create_inferior_hook(): symfile_objfile: %p\n",
+TRACE(("relocate_main_executable(): symfile_objfile: %p\n",
 symfile_objfile));
-TRACE(("haiku_solib_create_inferior_hook(): symfile_objfile->obfd: %p\n",
+TRACE(("relocate_main_executable(): symfile_objfile->obfd: %p\n",
 symfile_objfile->obfd));
-TRACE(("haiku_solib_create_inferior_hook(): app image: %p\n", appImageInfo));
+TRACE(("relocate_main_executable(): app image: %p\n", appImageInfo));
 
 	// Relocate the executable here.
 	if (symfile_objfile && symfile_objfile->obfd && appImageInfo) {
@@ -182,7 +156,7 @@ TRACE(("haiku_solib_create_inferior_hook(): app image: %p\n", appImageInfo));
 		CORE_ADDR displacement = (CORE_ADDR)appImageInfo->text_address
 			- unrelocatedAddress;
 
-TRACE(("haiku_solib_create_inferior_hook(): image text address: %p, "
+TRACE(("relocate_main_executable(): image text address: %p, "
 "unrelocated address: %p\n", (void*)appImageInfo->text_address,
 (void*)unrelocatedAddress));
 
@@ -211,6 +185,41 @@ TRACE(("haiku_solib_create_inferior_hook(): image text address: %p, "
 			do_cleanups (old_chain);
 		}
 	}
+}
+
+
+// #pragma mark -
+
+static void
+haiku_relocate_section_addresses (struct so_list *so, struct section_table *sec)
+{
+	CORE_ADDR unrelocatedAddress = get_unrelocated_text_address(so);
+	long relocation = so->lm_info->text_address - unrelocatedAddress;
+
+//	TRACE(("haiku_relocate_section_addresses()\n"));
+
+	sec->addr += relocation;
+	sec->endaddr += relocation;
+}
+
+
+static void
+haiku_free_so (struct so_list *so)
+{
+	xfree (so->lm_info);
+}
+
+
+static void
+haiku_clear_solib (void)
+{
+}
+
+
+static void
+haiku_solib_create_inferior_hook (void)
+{
+	relocate_main_executable();
 }
 
 
@@ -250,6 +259,11 @@ haiku_current_sos (void)
 		// here.
 		if (image->is_app_image) {
 			free_so (object);
+
+			// Others don't do that, but it helps a lot to relocate the
+			// executable here. Otherwise, when attaching gdb to a running
+			// process it would never be done.
+			relocate_main_executable();
 		} else {
 			strncpy (object->so_name, image->path, SO_NAME_MAX_PATH_SIZE);
 			object->so_name[SO_NAME_MAX_PATH_SIZE - 1] = '\0';
@@ -272,6 +286,8 @@ haiku_current_sos (void)
 static int
 haiku_open_symbol_file_object (void *from_ttyp)
 {
+	// Note: I have never seen this function being called. The Sun OS
+	// implementation is a no-op.
 	haiku_image_info *appImage = haiku_get_app_image();
 
 	TRACE(("haiku_open_symbol_file_object(%p)\n", from_ttyp));
