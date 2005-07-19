@@ -473,9 +473,6 @@ status_t eng_crtc_dpms(bool display, bool h, bool v)
 
 	LOG(4,("CRTC: setting DPMS: "));
 
-	/* enable access to primary head */
-	set_crtc_owner(0);
-
 	/* start synchronous reset: required before turning screen off! */
 	SEQW(RESET, 0x01);
 
@@ -529,22 +526,22 @@ status_t eng_crtc_dpms(bool display, bool h, bool v)
 
 	if (h)
 	{
-		CRTCW(REPAINT1, (CRTCR(REPAINT1) & 0x7f));
+		CRTCW(HTIMEXT2, (CRTCR(HTIMEXT2) & 0xef));
 		LOG(4,("hsync enabled, "));
 	}
 	else
 	{
-		CRTCW(REPAINT1, (CRTCR(REPAINT1) | 0x80));
+		CRTCW(HTIMEXT2, (CRTCR(HTIMEXT2) | 0x10));
 		LOG(4,("hsync disabled, "));
 	}
 	if (v)
 	{
-		CRTCW(REPAINT1, (CRTCR(REPAINT1) & 0xbf));
+		CRTCW(HTIMEXT2, (CRTCR(HTIMEXT2) & 0xdf));
 		LOG(4,("vsync enabled\n"));
 	}
 	else
 	{
-		CRTCW(REPAINT1, (CRTCR(REPAINT1) | 0x40));
+		CRTCW(HTIMEXT2, (CRTCR(HTIMEXT2) | 0x20));
 		LOG(4,("vsync disabled\n"));
 	}
 
@@ -553,12 +550,9 @@ status_t eng_crtc_dpms(bool display, bool h, bool v)
 
 status_t eng_crtc_dpms_fetch(bool *display, bool *h, bool *v)
 {
-	/* enable access to primary head */
-	set_crtc_owner(0);
-
 	*display = !(SEQR(CLKMODE) & 0x20);
-	*h = !(CRTCR(REPAINT1) & 0x80);
-	*v = !(CRTCR(REPAINT1) & 0x40);
+	*h = !(CRTCR(HTIMEXT2) & 0x10);
+	*v = !(CRTCR(HTIMEXT2) & 0x20);
 
 	LOG(4,("CTRC: fetched DPMS state: "));
 	if (*display) LOG(4,("display on, "));

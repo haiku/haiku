@@ -90,7 +90,7 @@ status_t eng_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku VIA Accelerant 0.04 running.\n"));
+	LOG(1,("POWERUP: Haiku VIA Accelerant 0.05 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -481,8 +481,8 @@ static status_t eng_general_bios_to_powergraphics()
 	}
 
 	/* turn off both displays and the hardcursors (also disables transfers) */
-//	head1_dpms(false, false, false);
-//	head1_cursor_hide();
+	head1_dpms(false, false, false);
+	head1_cursor_hide();
 //	if (si->ps.secondary_head)
 	if (0)
 	{
@@ -594,7 +594,7 @@ static status_t eng_general_bios_to_powergraphics()
 	eng_agp_setup();
 
 	/* turn screen one on */
-//	head1_dpms(true, true, true);
+	head1_dpms(true, true, true);
 
 	return B_OK;
 }
