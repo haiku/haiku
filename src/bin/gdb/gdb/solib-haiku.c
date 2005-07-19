@@ -147,7 +147,7 @@ relocate_main_executable (void)
 TRACE(("relocate_main_executable(): symfile_objfile: %p\n",
 symfile_objfile));
 TRACE(("relocate_main_executable(): symfile_objfile->obfd: %p\n",
-symfile_objfile->obfd));
+(symfile_objfile ? symfile_objfile->obfd : NULL)));
 TRACE(("relocate_main_executable(): app image: %p\n", appImageInfo));
 
 	// Relocate the executable here.
