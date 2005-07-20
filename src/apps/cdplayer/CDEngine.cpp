@@ -58,20 +58,28 @@ bool
 PlayState::UpdateState(void)
 {
 	CDState state = sCDDevice.GetState();
-	if(state == kStopped && fEngine->GetState() == kPlaying)
+	if(state == kStopped)
 	{
-		// this means we have come to the end of a song, but probably not
-		// the last song in the playlist
-		int16 next = sPlayList.GetNextTrack();
-		if(next > 0)
+		if(fEngine->GetState() == kPlaying)
 		{
-			sCDDevice.Play(next);
+			// this means we have come to the end of a song, but probably not
+			// the last song in the playlist
+			int16 next = sPlayList.GetNextTrack();
+			if(next > 0)
+			{
+				sCDDevice.Play(next);
+				return CurrentState(kPlaying);
+			}
+		}
+		else
+		{
+			sPlayList.SetTrackCount(sCDDevice.CountTracks());
+			sPlayList.SetStartingTrack(sCDDevice.GetTrack());
 			return CurrentState(kPlaying);
 		}
 	}
 	
-	
-/*	if(state == kPlaying && fEngine->GetState() == kStopped)
+	if(state == kPlaying && fEngine->GetState() == kStopped)
 	{
 		// This happens when the CD drive is started by R5's player
 		// or this app is started while the drive is playing. We should
@@ -81,7 +89,7 @@ PlayState::UpdateState(void)
 		sPlayList.SetStartingTrack(sCDDevice.GetTrack());
 		return CurrentState(kPlaying);
 	}
-*/	
+	
 	return CurrentState(state);
 }
 
@@ -120,33 +128,35 @@ TrackState::UpdateState()
 	// As a result, we want to make sure this hasn't happened. If it has, then we
 	// need to update the playlist's position.
 	
-	int16 cdTrack;
+	int16 cdTrack, count;
 	
 	if(sCDDevice.GetState() == kPlaying)
 	{
 		cdTrack = sCDDevice.GetTrack();
 		if(cdTrack != sPlayList.GetCurrentTrack())
 			sPlayList.SetCurrentTrack(cdTrack);
-		return CurrentState(cdTrack);
+		return CurrentState(cdTrack, trackCount);
 	}
 
 	// If we're not playing, just monitor the current track in the playlist
 	cdTrack = sPlayList.GetCurrentTrack();
-	return CurrentState(cdTrack);
+	count = sCDDevice.CountTracks();
+	return CurrentState(cdTrack,count);
 }
 
 int32 
 TrackState::GetNumTracks() const
 {
-	return sCDDevice.CountTracks()+1;
+	return sCDDevice.CountTracks();
 }
 
 bool
-TrackState::CurrentState(int32 track)
+TrackState::CurrentState(int32 track, int32 count)
 {
-	if (track != currentTrack) 
+	if( (track != currentTrack) || (count != trackCount) )
 	{
 		currentTrack = track;
+		trackCount = count;
 		return true;
 	}
 	return false;

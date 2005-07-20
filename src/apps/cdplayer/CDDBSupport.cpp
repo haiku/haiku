@@ -12,6 +12,7 @@
 #include <File.h>
 #include <FindDirectory.h>
 #include <NetAddress.h>
+#include <fs_attr.h>
 #include <Path.h>
 #include <Query.h>
 #include <Volume.h>
@@ -23,8 +24,23 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdlib.h>
 
 const int kTerminatingSignal = SIGINT; // SIGCONT;
+
+// The SCSI table of contents consists of a 4-byte header followed by 100 track
+// descriptors, which are each 8 bytes. We don't really need the first 5 bytes
+// of the track descriptor, so we'll just ignore them. All we really want is the
+// length of each track, which happen to be the last 3 bytes of the descriptor.
+typedef struct TrackRecord
+{
+	int8	unused[5];
+	
+	int8	min;
+	int8	sec;
+	int8	frame;
+};
+
 
 template <class InitCheckable>
 void
@@ -57,8 +73,8 @@ CDDBQuery::CDDBQuery(const char *server, int32 port, bool log)
 		fServerName(server),
 		fPort(port),
 		fConnected(false),
-		fDiscID(-1),
-		fState(kInitial)
+		fState(kInitial),
+		fDiscID(-1)
 {
 }
 
@@ -90,40 +106,40 @@ CDDBQuery::SetToCD(const char *path)
 	if(result != B_OK)
 		return;
 	
-	
+	// Calculate the disc's CDDB ID
 	if (fState == kInitial) 
 	{
-		GetDiscID(&toc, fDiscID, fTrackCount, fDiscLength, fFrameOffsetString, fDiscIDStr);
+		fDiscID = GetDiscID(&toc);
+		fTrackCount = GetTrackCount(&toc);
+		
+		cdaudio_time time = GetDiscTime(&toc);
+		fDiscLength = (time.minutes * 60) + time.seconds;
+		fFrameOffsetString = OffsetsToString(&toc);
+		GetTrackTimes(&toc, fTrackTimes);
 	}
 	else
 	{
-		int32 tmpDiscID;
-		int32 tmpDiscLength;
-		int32 tmpNumTracks;
-		BString tmpFrameOffsetString;
-		BString tmpDiscIDStr;
+		int32 discID = GetDiscID(&toc);
 		
-		GetDiscID(&toc, tmpDiscID, tmpNumTracks, tmpDiscLength, tmpFrameOffsetString,
-			tmpDiscIDStr);
-		
-		if (fDiscID == tmpDiscID && fDiscLength == tmpDiscLength && fTrackCount == tmpNumTracks
-			&& tmpFrameOffsetString == fFrameOffsetString)
+		if (fDiscID == discID);
 			return;
-
-		fDiscID = tmpDiscID;
-		fDiscLength = tmpDiscLength;
-		fTrackCount = tmpNumTracks;
-		fFrameOffsetString = tmpFrameOffsetString;
-		fDiscIDStr = tmpDiscIDStr;
+		
+		fTrackCount = GetTrackCount(&toc);
+		
+		cdaudio_time time = GetDiscTime(&toc);
+		fDiscLength = (time.minutes * 60) + time.seconds;
+		fFrameOffsetString = OffsetsToString(&toc);
+		GetTrackTimes(&toc, fTrackTimes);
 	}
 	
 	result = B_OK;
 	fState = kReading;
-	fThread = spawn_thread(&CDDBQuery::LookupBinder, "CDDBLookup", B_NORMAL_PRIORITY, this);
+	fThread = spawn_thread(&CDDBQuery::QueryThread, "CDDBLookup", B_NORMAL_PRIORITY, this);
 	
 	if (fThread >= 0)
 		resume_thread(fThread);
-	else {
+	else 
+	{
 		fState = kError;
 		result = fThread;
 	}
@@ -133,65 +149,6 @@ static void
 DoNothing(int)
 {
 }
-
-int32 
-CDDBQuery::LookupBinder(void *castToThis)
-{
-	CDDBQuery *query = (CDDBQuery *)castToThis;
-
-	BFile file;
-	entry_ref ref;
-	bool newFile = false;
-
-	try 
-	{
-		signal(kTerminatingSignal, DoNothing);
-	
-		if (!query->FindOrCreateContentFileForDisk(&file, &ref, query->fDiscID)) 
-		{
-			// new content file, read it in from the server
-			Connector connection(query);
-			query->ReadFromServer(&file);
-			file.Seek(0, SEEK_SET);
-			newFile = true;
-		}
-		query->ParseResult(&file);
-	
-		query->fState = kDone;
-		query->fThread = -1;
-		query->fResult = B_OK;
-		
-		if (newFile) 
-		{
-			BString newTitle(query->fTitle);
-			int32 length = newTitle.Length();
-			for (int32 index = 0; index < length; index++) 
-			{
-				if (newTitle[index] == '/' || newTitle[index] == ':')
-					newTitle[index] = '-';
-			}
-			
-			file.Sync();
-			BEntry entry(&ref);
-			entry.Rename(newTitle.String(), false);
-		}
-
-	}
-	catch (status_t error) 
-	{
-		query->fState = kError;
-		query->fResult = error;
-	
-		// the cached file is messed up, remove it
-		BEntry entry(&ref);
-		BPath path;
-		entry.GetPath(&path);
-		printf("removing bad CD content file %s\n", path.Path());
-		entry.Remove();
-	}
-	return 0;
-}
-
 
 const char * 
 CDDBQuery::GetToken(const char *stream, BString &result)
@@ -283,42 +240,13 @@ cddb_sum(int n)
 	return ret;
 }
 
-struct ConvertedToc 
-{
-	int32 min;
-	int32 sec;
-	int32 frame;
-};
-
 int32 
 CDDBQuery::GetDiscID(const scsi_toc *toc)
 {
-	int32 tmpDiscID;
-	int32 tmpDiscLength;
-	int32 tmpNumTracks;
-	BString tmpFrameOffsetString;
-	BString tmpDiscIDStr;
-	
-	GetDiscID(toc, tmpDiscID, tmpNumTracks, tmpDiscLength, tmpFrameOffsetString,
-		tmpDiscIDStr);
-	
-	return tmpDiscID;
-}
+	// The SCSI TOC data has a 4-byte header and then each track record starts
+	TrackRecord *tocData = (TrackRecord*)&(toc->toc_data[4]);
 
-void 
-CDDBQuery::GetDiscID(const scsi_toc *toc, int32 &id, int32 &numTracks,
-					int32 &length, BString &frameOffsetsString, BString &discIDString)
-{
-	ConvertedToc tocData[100];
-
-	// figure out the disc ID
-	for (int index = 0; index < 100; index++) 
-	{
-		tocData[index].min = toc->toc_data[9 + 8*index];
-		tocData[index].sec = toc->toc_data[10 + 8*index];
-		tocData[index].frame = toc->toc_data[11 + 8*index];
-	}
-	numTracks = toc->toc_data[3] - toc->toc_data[2] + 1;
+	int32 numTracks = toc->toc_data[3] - toc->toc_data[2] + 1;
 	
 	int32 sum1 = 0;
 	int32 sum2 = 0;
@@ -330,39 +258,87 @@ CDDBQuery::GetDiscID(const scsi_toc *toc, int32 &id, int32 &numTracks,
 		sum2 +=	(tocData[index + 1].min * 60 + tocData[index + 1].sec) 
 				- (tocData[index].min * 60 + tocData[index].sec);
 	}
-	id = ((sum1 % 0xff) << 24) + (sum2 << 8) + numTracks;
-	discIDString = "";
+	int32 discID = ((sum1 % 0xff) << 24) + (sum2 << 8) + numTracks;
 	
-	sprintf(discIDString.LockBuffer(10), "%08lx", id);
-	discIDString.UnlockBuffer();
+	return discID;
+}
 
-	// compute the total length of the CD.
-	length = tocData[numTracks].min * 60 + tocData[numTracks].sec;
+BString
+CDDBQuery::OffsetsToString(const scsi_toc *toc)
+{
+	TrackRecord *tocData = (TrackRecord*)&(toc->toc_data[4]);
 	
-	for (int index = 0; index < numTracks; index++) 
-		frameOffsetsString << tocData[index].min * 4500 + tocData[index].sec * 75
+	int32 numTracks = toc->toc_data[3] - toc->toc_data[2] + 1;
+	
+	BString string;
+	for (int index = 0; index < numTracks; index++)
+	{
+		string << tocData[index].min * 4500 + tocData[index].sec * 75
 			+ tocData[index].frame << ' ';
+	}
+	
+	return string;
+}
+
+
+int32
+CDDBQuery::GetTrackCount(const scsi_toc *toc)
+{
+	return toc->toc_data[3] - toc->toc_data[2] + 1;
+}
+
+cdaudio_time
+CDDBQuery::GetDiscTime(const scsi_toc *toc)
+{
+	int16 trackcount = toc->toc_data[3] - toc->toc_data[2] + 1;
+	TrackRecord *desc = (TrackRecord*)&(toc->toc_data[4]);
+	
+	cdaudio_time disc;
+	disc.minutes = desc[trackcount].min;
+	disc.seconds = desc[trackcount].sec;
+	
+	return disc;
 }
 
 void
-CDDBQuery::ReadFromServer(BDataIO *stream)
+CDDBQuery::GetTrackTimes(const scsi_toc *toc, vector<cdaudio_time> &times)
 {
-	// Format the query
+	TrackRecord *tocData = (TrackRecord*)&(toc->toc_data[4]);
+	int16 trackCount = toc->toc_data[3] - toc->toc_data[2] + 1;
+	
+	for (int index = 0; index < trackCount; index++)
+	{
+		cdaudio_time cdtime;
+		cdtime.minutes = tocData[index].min;
+		cdtime.seconds = tocData[index].sec;
+		times.push_back(cdtime);
+	}
+}
+
+void
+CDDBQuery::ReadFromServer(BString &data)
+{
+	// This function queries the given CDDB server for the existence of the disc's data and
+	// saves the data to file once obtained.
+	
+	// Query for the existence of the disc in the database
+	char idString[10];
+	sprintf(idString, "%08lx", fDiscID);
+	
 	BString query;
-	query << "cddb query " << fDiscIDStr << ' ' << fTrackCount << ' ' 
+	query << "cddb query " << idString << ' ' << fTrackCount << ' ' 
 		<< fFrameOffsetString << ' ' << fDiscLength << '\n';
 	
 	if (fLog)
 		printf(">%s", query.String());
 
-	// Send it off.
 	ThrowIfNotSize( fSocket.Send(query.String(), query.Length()) );
 
 	BString tmp;
 	ReadLine(tmp);
 	
 	BString category;
-	BString queryDiscID(fDiscIDStr);
+	BString queryDiscID(idString);
 	
 	if(tmp.FindFirst("200") != 0)
 	{
@@ -404,53 +380,21 @@ CDDBQuery::ReadFromServer(BDataIO *stream)
 	if (!category.Length())
 		category = "misc";
 
+	// Query for the disc's data - artist, album, tracks, etc.
 	query = "";
 	query << "cddb read " << category << ' ' << queryDiscID << '\n' ;
 	ThrowIfNotSize( fSocket.Send(query.String(), query.Length()) );
-
-	for (;;) 
+	
+	while(true)
 	{
-		BString tmp;
 		ReadLine(tmp);
-		tmp += '\n';
-		ThrowIfNotSize( stream->Write(tmp.String(), tmp.Length()) );
+		
 		if (tmp == "." || tmp == ".\n")
 			break;
-	}
-	fState = kDone;
-}
-
-void 
-CDDBQuery::ParseResult(BDataIO *source)
-{
-	fTitle = "";
-	fTrackNames.clear();
-	for (;;) 
-	{
-		BString tmp;
-		ReadLine(source, tmp);
-		if (tmp == ".")
-			break;
-			
-		if (tmp == "")
-			throw (status_t)B_ERROR;
 		
-		if (tmp.FindFirst("DTITLE=") == 0)
-			fTitle = tmp.String() + sizeof("DTITLE");
-		else
-		if (tmp.FindFirst("TTITLE") == 0) 
-		{
-			int32 afterIndex = tmp.FindFirst('=');
-			if (afterIndex > 0) 
-			{
-				BString trackName(tmp.String() + afterIndex + 1);
-				fTrackNames.push_back(trackName);
-			}
-		}
+		data << tmp << '\n';
 	}
-	fState = kDone;
 }
-
 
 void
 CDDBQuery::Connect()
@@ -498,35 +442,6 @@ CDDBQuery::ReadLine(BString &buffer)
 }
 
 void 
-CDDBQuery::ReadLine(BDataIO *stream, BString &buffer)
-{
-	// this is super-lame, should use better buffering
-	// ToDo:
-	// redo using LockBuffer, growing the buffer by 2k and reading into it
-
-	buffer = "";
-	char ch;
-	for (;;) 
-	{
-		ssize_t result = stream->Read(&ch, 1);
-
-		// check for read error
-		if (result < 0)
-			throw (status_t)result;
-		
-		if (result == 0)
-			break;
-		
-		if (ch >= ' ')
-			buffer += ch;
-		
-		if (ch == '\n')
-			break;
-	}
-}
-
-
-void 
 CDDBQuery::IdentifySelf()
 {
 	char username[256];
@@ -548,10 +463,14 @@ CDDBQuery::IdentifySelf()
 }
 
 bool 
-CDDBQuery::FindOrCreateContentFileForDisk(BFile *file, entry_ref *fileRef, int32 discID)
+CDDBQuery::OpenContentFile(const int32 &discID)
 {
+	// Makes sure that the lookup has a valid file to work with for the CD content.
+	// Returns true if there is an existing file, false if a lookup is required.
+	
+	BFile file;
 	BString predicate;
-	predicate << "cddb:discID == " << discID;
+	predicate << "CD:key == " << discID;
 	entry_ref ref;
 		
 	BVolumeRoster roster;
@@ -564,7 +483,7 @@ CDDBQuery::FindOrCreateContentFileForDisk(BFile *file, entry_ref *fileRef, int32
 			continue;
 		
 		// make sure the volume we are looking at is indexed right
-		fs_create_index(volume.Device(), "cddb:discID", B_INT32_TYPE, 0);
+		fs_create_index(volume.Device(), "CD:key", B_INT32_TYPE, 0);
 
 		BQuery query;
 		query.SetVolume(&volume);
@@ -572,33 +491,210 @@ CDDBQuery::FindOrCreateContentFileForDisk(BFile *file, entry_ref *fileRef, int32
 		if (query.Fetch() != B_OK)
 			continue;
 		
-		while (query.GetNextRef(&ref) == B_OK) 
+		if(query.GetNextRef(&ref) == B_OK) 
 		{
-			// we have one already, return 
-			file->SetTo(&ref, O_RDONLY);
-			*fileRef = ref;
+			file.SetTo(&ref, B_READ_ONLY);
+			break;
+		}
+	}
+	
+	if(file.InitCheck() == B_NO_INIT)
+		return false;
+	
+	// Getting this far means that we have a file. Now we parse the data in it and assign it
+	// to the appropriate members of the object
+	attr_info info;
+	
+	if(file.GetAttrInfo("CD:tracks",&info)==B_OK && info.size > 0)
+	{
+		char trackdata[info.size+2];
+		
+		if(file.ReadAttr("CD:tracks",B_STRING_TYPE,0,trackdata,info.size)>0)
+		{
+			trackdata[info.size] = 0;
+			BString tmp = GetLineFromString(trackdata);
+			char *index;
+			
+			fArtist = tmp;
+			fArtist.Truncate(fArtist.FindFirst(" - "));
+			
+			fTitle = strchr(tmp.String(),'-') + 2;
+			
+			index = strchr(trackdata,'\n') + 1;
+			while(*index)
+			{
+				tmp = GetLineFromString(index);
+				
+				fTrackNames.push_back(tmp);
+				index = strchr(index,'\n') + 1;
+			}
+			
 			return true;
 		}
 	}
-
-	BPath path;
-	ThrowOnError( find_directory(B_USER_DIRECTORY, &path, true) );
-	path.Append("cd");
-	ThrowOnError( create_directory(path.Path(), 0755) );
 	
-	BDirectory dir(path.Path());
-	BString name("CDContent");
-	for (int32 index = 0; ;index++) 
-	{
-		if (dir.CreateFile(name.String(), file, true) != B_FILE_EXISTS) 
-		{
-			BEntry entry(&dir, name.String());
-			entry.GetRef(fileRef);
-			file->WriteAttr("cddb:discID", B_INT32_TYPE, 0, &discID, sizeof(int32));
-			break;
-		}
-		name = "CDContent";
-		name << index;
-	}
+	// If we got this far, it means the file is corrupted, so nuke it and get a new one
+	BEntry entry(&ref);
+	entry.Remove();
 	return false;
+}
+
+int32 
+CDDBQuery::QueryThread(void *owner)
+{
+	CDDBQuery *query = (CDDBQuery *)owner;
+	
+	try 
+	{
+		signal(kTerminatingSignal, DoNothing);
+	
+		if(!query->OpenContentFile(query->fDiscID)) 
+		{
+			// new content file, read it in from the server
+			Connector connection(query);
+			BString data;
+			query->ReadFromServer(data);
+			query->ParseData(data);
+			query->WriteFile();
+		}
+	
+		query->fState = kDone;
+		query->fThread = -1;
+		query->fResult = B_OK;
+	}
+	catch (status_t error) 
+	{
+		query->fState = kError;
+		query->fResult = error;
+	}
+	
+	return 0;
+}
+
+void
+CDDBQuery::WriteFile(void)
+{
+	BPath path;
+	if(find_directory(B_USER_DIRECTORY, &path, true)!=B_OK)
+		return;
+	
+	path.Append("cd");
+	create_directory(path.Path(), 0755);
+	
+	BString filename(path.Path());
+	filename << "/" << fArtist << " - " << fTitle;
+	
+	BFile file(filename.String(), B_READ_WRITE | B_CREATE_FILE | B_FAIL_IF_EXISTS);
+	if(file.InitCheck() != B_OK)
+		return;
+	
+	BString entry;
+	char timestring[10];
+	
+	sprintf(timestring,"%.2ld:%.2ld",fDiscLength / 60, fDiscLength % 60);
+	
+	entry << fArtist << " - " << fTitle << "\t" << timestring << "\n";
+	file.Write(entry.String(),entry.Length());
+	
+	BString tracksattr(fArtist);
+	tracksattr << " - " << fTitle << "\n";
+	
+	for(int32 i=0; i<fTrackCount; i++)
+	{
+		entry = fTrackNames[i];
+		
+		sprintf(timestring,"%.2ld:%.2ld",fTrackTimes[i].minutes, fTrackTimes[i].seconds);
+		
+		entry << "\t" << timestring << "\n";
+		file.Write(entry.String(),entry.Length());
+		
+		tracksattr << fTrackNames[i] << "\n";
+	}
+	
+	file.WriteAttr("CD:key", B_INT32_TYPE, 0, &fDiscID, sizeof(int32));
+	file.WriteAttr("CD:tracks", B_STRING_TYPE, 0, tracksattr.String(), tracksattr.Length());
+}
+
+void
+CDDBQuery::ParseData(const BString &data)
+{
+	// TODO: This function is dog slow, but it works. Optimize.
+	
+	// Ideally, the search should be done sequentially using GetLineFromString() and strchr().
+	// Order: genre(category), frame offsets, disc length, artist/album, track titles
+	fTitle = "";
+	fTrackNames.clear();
+	
+	int32 pos;
+	
+	pos = data.FindFirst("DTITLE=");
+	if(pos > 0)
+	{
+		fTitle = fArtist = GetLineFromString(data.String() + sizeof("DTITLE") + pos);
+		
+		pos = fArtist.FindFirst(" / ");
+		if(pos > 0)
+			fArtist.Truncate(pos);
+		
+		fTitle = fTitle.String() + pos + sizeof(" / ") - 1;
+	}
+	
+	
+	fCategory = GetLineFromString(data.String() + 4);
+	pos = fCategory.FindFirst(" ");
+	if(pos > 0)
+		fCategory.Truncate(pos);
+	
+	
+	pos = data.FindFirst("Disc length: ");
+	if(pos > 0)
+	{
+		BString discLengthString = GetLineFromString(data.String() + pos);
+		pos = discLengthString.FindFirst(" seconds");
+		if(pos > 0)
+		{
+			discLengthString.Truncate(pos);
+		
+			discLengthString = discLengthString.String() + sizeof("Disc length:");
+			fDiscLength = atoi(discLengthString.String());
+		}
+		else
+			fDiscLength = -1;
+	}
+
+	pos = data.FindFirst("TTITLE0=");
+	if(pos > 0)
+	{
+		int32 trackCount=0;
+		BString searchString="TTITLE0=";
+		
+		while(pos > 0)
+		{
+			BString trackName = data.String() + pos + searchString.Length();
+			trackName.Truncate(trackName.FindFirst("\n"));
+			fTrackNames.push_back(trackName);
+			
+			trackCount++;
+			searchString = "TTITLE";
+			searchString << trackCount << "=";
+			pos = data.FindFirst(searchString.String(),pos);
+		}
+		fTrackCount = trackCount;
+	}
+}
+
+BString
+CDDBQuery::GetLineFromString(const char *string)
+{
+	if(!string)
+		return NULL;
+	
+	BString out(string);
+	
+	int32 linefeed = out.FindFirst("\n");
+	
+	if(linefeed > 0)
+		out.Truncate(linefeed);
+	
+	return out;
 }

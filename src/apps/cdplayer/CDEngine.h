@@ -72,8 +72,9 @@ public:
 	
 private:
 	bool	UpdateState();
-	bool	CurrentState(int32);
+	bool	CurrentState(int32,int32);
 	int32	currentTrack;
+	int32	trackCount;
 };
 
 // this watcher sends notices to observers that are interested

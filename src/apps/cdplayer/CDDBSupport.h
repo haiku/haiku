@@ -5,37 +5,40 @@
 #include <String.h>
 #include <scsi.h>
 #include <vector>
-
+#include "CDAudioDevice.h"
 
 // based on Jukebox by Chip Paul
 
 class CDDBQuery 
 {
 public:
-					CDDBQuery(const char *server, int32 port = 888, bool log = false);
-			void	SetToSite(const char *server, int32 port);
-			void	GetSites(bool (*)(const char *site, int port, const char *latitude,
-									  const char *longitude, const char *description, 
-									  void *state), void *);
+							CDDBQuery(const char *server, int32 port = 888, 
+									  bool log = false);
+			void			SetToSite(const char *server, int32 port);
+			void			GetSites(bool (*)(const char *site, int port, 
+									 const char *latitude, const char *longitude,
+									 const char *description, void *state), void *);
 
-			void	SetToCD(const char *devicepath);
-			bool	GetTitles(BString *title, vector<BString> *tracks, 
-							  bigtime_t timeout);
+			void			SetToCD(const char *devicepath);
+			bool			GetTitles(BString *title, vector<BString> *tracks, 
+							  		  bigtime_t timeout);
 	
-			bool	Ready() const { return fState == kDone; }
-			int32	CurrentDiscID() const	{ return fDiscID; }
+			bool			Ready() const { return fState == kDone; }
+			int32			CurrentDiscID() const	{ return fDiscID; }
 
-	static	int32	GetDiscID(const scsi_toc *);
-
-private:
-	static	void	GetDiscID(const scsi_toc *, int32 &id, int32 &numTracks, 
-							  int32 &length, BString &tmpFrameOffsetString,
-							  BString &discIDString);
-			void	Connect();
-			void	Disconnect();
-			bool	IsConnected() const;
+	static	int32			GetDiscID(const scsi_toc *);
+	static	int32			GetTrackCount(const scsi_toc *);
+	static	cdaudio_time	GetDiscTime(const scsi_toc *);
+	static	void			GetTrackTimes(const scsi_toc *, vector<cdaudio_time> &times);
+	static	BString			OffsetsToString(const scsi_toc *);
 	
-	static	int32	LookupBinder(void *);
+// TODO: make private again once finished with testing
+//private:
+			void					Connect();
+			void					Disconnect();
+			bool					IsConnected() const;
+	
+	static	int32	QueryThread(void *);
 
 	class Connector 
 	{
@@ -70,39 +73,43 @@ private:
 		kError
 	};
 	
-			bool			FindOrCreateContentFileForDisk(BFile *file, entry_ref *ref,
-														   int32 discID);
+			bool					OpenContentFile(const int32 &discID);
 	
-			void			ReadFromServer(BDataIO *);
-			void			ParseResult(BDataIO *);
+			void					ReadFromServer(BString &data);
+			void					ParseData(const BString &data);
+			void					WriteFile(void);
+			
+			BString					GetLineFromString(const char *string);
+			void					ReadLine(BString &);
+			void					IdentifySelf();
 
-			void			ReadLine(BString &);
-	static	void			ReadLine(BDataIO *, BString &);
-			void			IdentifySelf();
-
-			const char *	GetToken(const char *, BString &);
+			const char *			GetToken(const char *, BString &);
 	
-			bool			fLog;
+			bool					fLog;
 	
-			// connection description
-			BString			fServerName;
-			BNetEndpoint	fSocket;
-			int32			fPort;
-			bool			fConnected;
+			// state data
+			BString					fServerName;
+			BNetEndpoint			fSocket;
+			int32					fPort;
+			bool					fConnected;
 			
-			// disc identification
-			int32			fDiscID;
-			int32			fDiscLength;
-			int32			fTrackCount;
-			BString			fFrameOffsetString;
-			BString			fDiscIDStr;
+			thread_id				fThread;
+			State					fState;
+			status_t				fResult;
 			
-			thread_id		fThread;
-			State			fState;
-			BString			fTitle;
-			vector<BString>	fTrackNames;
-			status_t		fResult;
+			// disc information
+			BString					fArtist;
+			BString					fTitle;
+			BString					fCategory;
 			
+			int32					fDiscID;
+			int32					fDiscLength;
+			
+			vector<BString>			fTrackNames;
+			int32					fTrackCount;
+			
+			BString					fFrameOffsetString;
+			vector<cdaudio_time>	fTrackTimes;
 };
 
 #endif
