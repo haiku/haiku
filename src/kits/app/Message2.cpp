@@ -37,7 +37,7 @@
 #include <MessageUtils.h>
 #include <TokenSpace.h>
 
-#include "MessageBody.h"
+#include "MessageBody2.h"
 
 #include "dano_message.h"
 

@@ -12,7 +12,7 @@
 #define _MESSAGE_BODY_H_
 
 #include <List.h>
-#include "MessageField.h"
+#include "MessageField2.h"
 
 enum {
 	B_FLATTENABLE_TYPE = 'FLAT'
