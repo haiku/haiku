@@ -17,11 +17,18 @@ namespace BPrivate {
 
 BMessageBody::BMessageBody()
 {
+	fFieldTableSize = 1;
+	fFieldTable = new BMessageField *[fFieldTableSize];
+	HashClear();
 }
 
 
 BMessageBody::BMessageBody(const BMessageBody &other)
 {
+	fFieldTableSize = 1;
+	fFieldTable = new BMessageField *[fFieldTableSize];
+	HashClear();
+
 	*this = other;
 }
 
@@ -29,6 +36,7 @@ BMessageBody::BMessageBody(const BMessageBody &other)
 BMessageBody::~BMessageBody()
 {
 	MakeEmpty();
+	delete fFieldTable;
 }
 
 
@@ -37,10 +45,12 @@ BMessageBody::operator=(const BMessageBody &other)
 {
 	if (this != &other) {
 		MakeEmpty();
-		for (int32 index = 0; index < other.fFields.CountItems(); index++) {
-			BMessageField *otherField = (BMessageField *)other.fFields.ItemAt(index);
+
+		for (int32 index = 0; index < other.fFieldList.CountItems(); index++) {
+			BMessageField *otherField = (BMessageField *)other.fFieldList.ItemAt(index);
 			BMessageField *newField = new BMessageField(*otherField);
-			fFields.AddItem((void *)newField);
+			fFieldList.AddItem((void *)newField);
+			HashInsert(newField);
 		}
 	}
 
@@ -53,12 +63,12 @@ BMessageBody::GetInfo(type_code typeRequested, int32 which, char **name,
 	type_code *typeReturned, int32 *count) const
 {
 	int32 index = 0;
-	int32 fieldCount = fFields.CountItems();
+	int32 fieldCount = fFieldList.CountItems();
 	BMessageField *field = NULL;
 	bool found = false;
 
 	for (int32 fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++) {
-		field = (BMessageField *)fFields.ItemAt(fieldIndex);
+		field = (BMessageField *)fFieldList.ItemAt(fieldIndex);
 
 		if (typeRequested == B_ANY_TYPE || field->Type() == typeRequested) {
 			if (index == which) {
@@ -140,13 +150,12 @@ BMessageBody::GetInfo(const char *name, type_code *typeFound, bool *fixedSize) c
 int32
 BMessageBody::CountNames(type_code type) const
 {
-	if (type == B_ANY_TYPE) {
-		return fFields.CountItems();
-	}
+	if (type == B_ANY_TYPE)
+		return fFieldList.CountItems();
 
 	int32 count = 0;
-	for (int32 index = 0; index < fFields.CountItems(); index++) {
-		BMessageField *field = (BMessageField *)fFields.ItemAt(index);
+	for (int32 index = 0; index < fFieldList.CountItems(); index++) {
+		BMessageField *field = (BMessageField *)fFieldList.ItemAt(index);
 		if (field->Type() == type)
 			count++;
 	}
@@ -158,15 +167,15 @@ BMessageBody::CountNames(type_code type) const
 bool
 BMessageBody::IsEmpty() const
 {
-	return fFields.CountItems() == 0;
+	return fFieldList.CountItems() == 0;
 }
 
 
 void
 BMessageBody::PrintToStream() const
 {
-	for (int32 index = 0; index < fFields.CountItems(); index++) {
-		BMessageField *field = (BMessageField *)fFields.ItemAt(index);
+	for (int32 index = 0; index < fFieldList.CountItems(); index++) {
+		BMessageField *field = (BMessageField *)fFieldList.ItemAt(index);
 		field->PrintToStream();
 		printf("\n");
 	}
@@ -183,6 +192,7 @@ BMessageBody::Rename(const char *oldName, const char *newName)
 		return B_NAME_NOT_FOUND;
 
 	field->SetName(newName);
+	HashInsert(HashRemove(oldName));
 	return B_OK;
 }
 
@@ -192,8 +202,8 @@ BMessageBody::FlattenedSize() const
 {
 	ssize_t size = 1; // for MSG_LAST_ENTRY
 
-	for (int32 index = 0; index < fFields.CountItems(); index++) {
-		BMessageField *field = (BMessageField *)fFields.ItemAt(index);
+	for (int32 index = 0; index < fFieldList.CountItems(); index++) {
+		BMessageField *field = (BMessageField *)fFieldList.ItemAt(index);
 		size += field->TotalSize();
 		size += field->NameLength();
 
@@ -229,8 +239,8 @@ BMessageBody::Flatten(BDataIO *stream) const
 {
 	status_t error = B_OK;
 
-	for (int32 index = 0; index < fFields.CountItems(); index++) {
-		BMessageField *field = (BMessageField *)fFields.ItemAt(index);
+	for (int32 index = 0; index < fFieldList.CountItems(); index++) {
+		BMessageField *field = (BMessageField *)fFieldList.ItemAt(index);
 	
 		uint8 flags = field->Flags();
 		stream->Write(&flags, sizeof(flags));
@@ -321,7 +331,8 @@ BMessageBody::AddData(const char *name, BMallocIO *buffer, type_code type)
 		// add a new field if it's not yet present
 		BMessageField *newField = new BMessageField(name, type);
 		newField->AddItem(buffer);
-		fFields.AddItem(newField);
+		fFieldList.AddItem(newField);
+		HashInsert(newField);
 	} else {
 		// add to the existing field otherwise
 		foundField->AddItem(buffer);
@@ -384,7 +395,8 @@ BMessageBody::RemoveName(const char *name)
 	BMessageField *field = FindData(name, B_ANY_TYPE, error);
 
 	if (field) {
-		fFields.RemoveItem(field);
+		fFieldList.RemoveItem(field);
+		HashRemove(name);
 		delete field;
 	}
 
@@ -395,12 +407,13 @@ BMessageBody::RemoveName(const char *name)
 status_t
 BMessageBody::MakeEmpty()
 {
-	for (int32 index = 0; index < fFields.CountItems(); index++) {
-		BMessageField *field = (BMessageField *)fFields.ItemAt(index);
+	for (int32 index = 0; index < fFieldList.CountItems(); index++) {
+		BMessageField *field = (BMessageField *)fFieldList.ItemAt(index);
 		delete field;
 	}
 
-	fFields.MakeEmpty();
+	fFieldList.MakeEmpty();
+	HashClear();
 	return B_OK;
 }
 
@@ -455,22 +468,94 @@ BMessageBody::FindData(const char *name, type_code type, status_t &error) const
 		return NULL;
 	}
 
-	for (int32 index = 0; index < fFields.CountItems(); index++) {
-		BMessageField *field = (BMessageField *)fFields.ItemAt(index);
-
-		if (strcmp(name, field->Name()) == 0) {
-			if (type != B_ANY_TYPE && field->Type() != type) {
-				error = B_BAD_TYPE;
-				return NULL;
-			}
-
-			error = B_OK;
-			return field;
+	BMessageField *field = HashLookup(name);
+	if (field) {
+		if (type != B_ANY_TYPE && field->Type() != type) {
+			error = B_BAD_TYPE;
+			return NULL;
 		}
+
+		error = B_OK;
+		return field;
 	}
 
 	error = B_NAME_NOT_FOUND;
 	return NULL;
+}
+
+
+void
+BMessageBody::HashInsert(BMessageField *field)
+{
+	uint32 index = HashString(field->Name()) % fFieldTableSize;
+	field->SetNext(fFieldTable[index]);
+	fFieldTable[index] = field;
+}
+
+
+BMessageField *
+BMessageBody::HashLookup(const char *name) const
+{
+	uint32 index = HashString(name) % fFieldTableSize;
+	BMessageField *result = fFieldTable[index];
+
+	while (result) {
+		if (strcmp(result->Name(), name) == 0)
+			return result;
+
+		result = result->Next();
+	}
+
+	return NULL;
+}
+
+
+BMessageField *
+BMessageBody::HashRemove(const char *name)
+{
+	uint32 index = HashString(name) % fFieldTableSize;
+	BMessageField *result = fFieldTable[index];
+	BMessageField *last = NULL;
+
+	while (result) {
+		if (strcmp(result->Name(), name) == 0) {
+			if (last)
+				last->SetNext(result->Next());
+			else
+				fFieldTable[index] = result->Next();
+
+			return result;
+		}
+
+		last = result;
+		result = result->Next();
+	}
+
+	return NULL;
+}
+
+
+void
+BMessageBody::HashClear()
+{
+	if (fFieldTable)
+		memset(fFieldTable, 0, fFieldTableSize * sizeof(BMessageField *));
+}
+
+
+uint32
+BMessageBody::HashString(const char *string) const
+{
+	char ch;
+	uint32 result = 0;
+
+	while ((ch = *string++) != 0) {
+		result = (result << 7) ^ (result >> 24);
+		result ^= ch;
+	}
+
+	result ^= result << 12;
+	return result;
 }
 
 } // namespace BPrivate

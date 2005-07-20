@@ -27,8 +27,12 @@ namespace BPrivate {
 
 class BMessageField {
 public:
+							BMessageField();
 							BMessageField(const char *name, type_code type);
+							BMessageField(const BMessageField &other);
 							~BMessageField();
+
+		BMessageField		&operator=(const BMessageField &other);
 
 		uint8				Flags();
 
@@ -45,10 +49,16 @@ public:
 		size_t				SizeAt(int32 index) const;
 		const void			*BufferAt(int32 index) const;
 
+		void				MakeEmpty();
+
 		bool				IsFixedSize() const { return fFixedSize; };
 		size_t				TotalSize() const { return fTotalSize; };
 
 		void				PrintToStream() const;
+
+		// hash table support
+		void				SetNext(BMessageField *next) { fNext = next; };
+		BMessageField		*Next() const { return fNext; };
 
 private:
 		bool				IsFixedSize(type_code type);
@@ -58,6 +68,8 @@ private:
 		BList				fItems;
 		bool				fFixedSize;
 		size_t				fTotalSize;
+
+		BMessageField		*fNext;
 };
 
 } // namespace BPrivate

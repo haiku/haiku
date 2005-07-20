@@ -59,11 +59,20 @@ public:
 
 		void				PrintToStream() const;
 
+		// hash table support
+		void				HashInsert(BMessageField *field);
+		BMessageField		*HashLookup(const char *name) const;
+		BMessageField		*HashRemove(const char *name);
+		uint32				HashString(const char *string) const;
+		void				HashClear();
+
 private:
 		BMessageField		*FindData(const char *name, type_code type,
 								 status_t &error) const;
 
-		BList				fFields;
+		BList				fFieldList;
+		BMessageField		**fFieldTable;
+		int32				fFieldTableSize;
 };
 
 } // namespace BPrivate

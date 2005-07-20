@@ -6,22 +6,67 @@
  *		Michael Lotz <mmlr@mlotz.ch>
  */
 
+#include <stdio.h>
 #include <DataIO.h>
 #include <TypeConstants.h>
 #include "MessageField2.h"
 
 namespace BPrivate {
 
+BMessageField::BMessageField()
+	:	fType(0),
+		fTotalSize(0),
+		fNext(NULL)
+{
+}
+
+
 BMessageField::BMessageField(const char *name, type_code type)
 	:	fType(type),
-		fTotalSize(0)
+		fTotalSize(0),
+		fNext(NULL)
 {
 	SetName(name);
 	fFixedSize = IsFixedSize(type);
 }
 
 
+BMessageField::BMessageField(const BMessageField &other)
+{
+	*this = other;
+}
+
+
 BMessageField::~BMessageField()
+{
+	MakeEmpty();
+}
+
+
+BMessageField &
+BMessageField::operator=(const BMessageField &other)
+{
+	if (this != &other) {
+		MakeEmpty();
+
+		fType = other.fType;
+		fName = other.fName;
+		fNext = NULL;
+
+		for (int32 index = 0; index < other.fItems.CountItems(); index++) {
+			BMallocIO *otherBuffer = (BMallocIO *)other.fItems.ItemAt(index);
+			BMallocIO *newBuffer = new BMallocIO;
+			newBuffer->Write(otherBuffer->Buffer(), otherBuffer->BufferLength());
+			fItems.AddItem((void *)newBuffer);
+		}
+	}
+
+	return *this;
+}
+
+
+void
+BMessageField::MakeEmpty()
 {
 	for (int32 index = 0; index < fItems.CountItems(); index++) {
 		BMallocIO *item = (BMallocIO *)fItems.ItemAt(index);
@@ -86,7 +131,7 @@ BMessageField::ReplaceItem(int32 index, BMallocIO *item, bool deleteOld)
 void
 BMessageField::RemoveItem(int32 index, bool deleteIt)
 {
-	BMallocIO *item = (BMallocIO *)fItems.ItemAt(index);
+	BMallocIO *item = (BMallocIO *)fItems.RemoveItem(index);
 
 	fTotalSize -= item->BufferLength();
 	if (deleteIt)

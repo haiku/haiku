@@ -438,7 +438,8 @@ void BMessage::_ReservedMessage3() {}
 
 //------------------------------------------------------------------------------
 BMessage::BMessage()
-	:	what(0), fBody(NULL)
+	:	what(0),
+		fBody(NULL)
 {
 	init_data();
 }
@@ -535,7 +536,7 @@ void BMessage::init_data()
 	}
 	else
 	{
-		fBody = new BPrivate::BMessageBody;
+		fBody = new BPrivate::BMessageBody();
 	}
 }
 //------------------------------------------------------------------------------
@@ -594,7 +595,7 @@ bool BMessage::IsReply() const
 //------------------------------------------------------------------------------
 void BMessage::PrintToStream() const
 {
-	printf("\nBMessage: what =  (0x%lX or %ld)\n", what, what);
+	printf("\nBMessage: what = '%c%c%c%c' (0x%lX or %ld)\n", (what >> 24 & 0xff), (what >> 16 & 0xff), (what >> 8 & 0xff), (what & 0xff), what, what);
 	fBody->PrintToStream();
 }
 //------------------------------------------------------------------------------
