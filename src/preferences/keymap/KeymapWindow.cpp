@@ -1319,7 +1319,7 @@ MapView::MessageReceived(BMessage *msg)
 			const uint8 *states;
 			ssize_t size;
 			
-			if ((msg->FindData("states", 'UBYT', (const void **)&states, &size)!=B_OK)
+			if ((msg->FindData("states", B_UINT8_TYPE, (const void **)&states, &size)!=B_OK)
 				|| (msg->FindInt32("modifiers", (int32 *)&info.modifiers)!=B_OK))
 				break;
 				
