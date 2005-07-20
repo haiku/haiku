@@ -8,7 +8,7 @@
 
 #include <DataIO.h>
 #include <TypeConstants.h>
-#include "MessageField.h"
+#include "MessageField2.h"
 
 namespace BPrivate {
 

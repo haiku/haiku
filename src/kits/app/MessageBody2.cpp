@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <DataIO.h>
 #include <TypeConstants.h>
-#include <MessageBody.h>
+#include "MessageBody2.h"
 
 namespace BPrivate {
 
@@ -252,7 +252,6 @@ BMessageBody::Flatten(BDataIO *stream) const
 
 		// overall data size
 		size_t size = field->TotalSize();
-		printf("totalsize: %ld\n", size);
 		if (!isFixed) {
 			// add bytes for holding each items size
 			size += count * sizeof(size_t);

@@ -33,11 +33,11 @@
 #include <String.h>
 
 #include <AppMisc.h>
-#include <DataBuffer.h>
 #include <KMessage.h>
-#include <MessageBody.h>
 #include <MessageUtils.h>
 #include <TokenSpace.h>
+
+#include "MessageBody.h"
 
 #include "dano_message.h"
 
@@ -958,10 +958,8 @@ BMessage::Unflatten(BDataIO* stream)
 		uint32 magic;
 		reader(magic);
 
-printf("read magic\n");
 		status = header.SetMagic(magic);
 		if (status < B_OK) {
-			printf("magic failed: %x (kMessageMagic: %x; kMessageMagicDano: %x;)\n", magic, kMessageMagic, kMessageMagicDano);
 			// we support reading Dano messages from disk as well
 			if (magic == kMessageMagicDano)
 				return BPrivate::unflatten_dano_message(magic, *stream, *this);
@@ -969,7 +967,6 @@ printf("read magic\n");
 			return status;
 		}
 
-printf("here\n");
 		status = header.ReadFrom(*stream);
 		if (status < B_OK) {
 			printf("BMessage::Unflatten(): Reading the header failed: %lx\n", status);
@@ -987,7 +984,6 @@ printf("here\n");
 
 		int8 flags;
 		reader(flags);
-printf("flags: %x\n", flags);
 		while (flags != MSG_LAST_ENTRY) {
 			type_code type;
 			reader(type);
@@ -1022,7 +1018,6 @@ printf("flags: %x\n", flags);
 				}
 			}
 
-			printf("count: %ld; dataLen: %ld\n", count, dataLen);
 			// Get the name length (1 byte)
 			reader(nameLen);
 			// Get the name (name length bytes)
