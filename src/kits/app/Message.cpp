@@ -1622,7 +1622,8 @@ BMessage::ReplacePointer(const char* name, int32 index, const void* ptr)
 }
 
 
-status_t BMessage::ReplaceMessenger(const char* name, BMessenger messenger)
+status_t 
+BMessage::ReplaceMessenger(const char* name, BMessenger messenger)
 {
 	return ReplaceData(name, B_MESSENGER_TYPE, 0, &messenger, sizeof(BMessenger));
 }
@@ -2171,9 +2172,9 @@ handle_reply(port_id reply_port, int32* pCode,
 	return err;
 }
 
+
 // convert_message
-static
-status_t
+static status_t
 convert_message(const KMessage *fromMessage, BMessage *toMessage)
 {
 	if (!fromMessage || !toMessage)
@@ -2220,8 +2221,8 @@ convert_message(const KMessage *fromMessage, BMessage *toMessage)
 	return B_OK;
 }
 
-static
-ssize_t
+
+static ssize_t
 min_hdr_size()
 {
 	ssize_t size = 0;
