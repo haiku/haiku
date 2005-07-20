@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <DataIO.h>
+#include <MessageUtils.h>
 #include <TypeConstants.h>
 #include "MessageField2.h"
 
@@ -16,6 +17,7 @@ namespace BPrivate {
 BMessageField::BMessageField()
 	:	fType(0),
 		fTotalSize(0),
+		fTotalPadding(0),
 		fNext(NULL)
 {
 }
@@ -24,6 +26,7 @@ BMessageField::BMessageField()
 BMessageField::BMessageField(const char *name, type_code type)
 	:	fType(type),
 		fTotalSize(0),
+		fTotalPadding(0),
 		fNext(NULL)
 {
 	SetName(name);
@@ -49,8 +52,11 @@ BMessageField::operator=(const BMessageField &other)
 	if (this != &other) {
 		MakeEmpty();
 
-		fType = other.fType;
 		fName = other.fName;
+		fType = other.fType;
+		fFixedSize = other.fFixedSize;
+		fTotalSize = other.fTotalSize;
+		fTotalPadding = other.fTotalPadding;
 		fNext = NULL;
 
 		for (int32 index = 0; index < other.fItems.CountItems(); index++) {
@@ -85,7 +91,7 @@ BMessageField::Flags()
 	if (fItems.CountItems() == 1)
 		flags |= MSG_FLAG_SINGLE_ITEM;
 
-	if (fTotalSize < 255)
+	if (fTotalSize + fTotalPadding < 255)
 		flags |= MSG_FLAG_MINI_DATA;
 
 	if (fFixedSize)
@@ -111,6 +117,7 @@ BMessageField::AddItem(BMallocIO *item)
 {
 	fItems.AddItem((void *)item);
 	fTotalSize += item->BufferLength();
+	fTotalPadding += calc_padding(item->BufferLength() + 4, 8);
 }
 
 
@@ -119,9 +126,11 @@ BMessageField::ReplaceItem(int32 index, BMallocIO *item, bool deleteOld)
 {
 	BMallocIO *oldItem = (BMallocIO *)fItems.ItemAt(index);
 	fTotalSize -= oldItem->BufferLength();
+	fTotalPadding -= calc_padding(oldItem->BufferLength() + 4, 8);
 
 	fItems.ReplaceItem(index, item);
 	fTotalSize += item->BufferLength();
+	fTotalPadding += calc_padding(item->BufferLength() + 4, 8);
 
 	if (deleteOld)
 		delete oldItem;
@@ -134,6 +143,7 @@ BMessageField::RemoveItem(int32 index, bool deleteIt)
 	BMallocIO *item = (BMallocIO *)fItems.RemoveItem(index);
 
 	fTotalSize -= item->BufferLength();
+	fTotalPadding -= calc_padding(item->BufferLength() + 4, 8);
 	if (deleteIt)
 		delete item;
 }

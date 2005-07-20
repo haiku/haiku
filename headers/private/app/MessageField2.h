@@ -53,6 +53,7 @@ public:
 
 		bool				IsFixedSize() const { return fFixedSize; };
 		size_t				TotalSize() const { return fTotalSize; };
+		size_t				TotalPadding() const { return fTotalPadding; };
 
 		void				PrintToStream() const;
 
@@ -68,6 +69,7 @@ private:
 		BList				fItems;
 		bool				fFixedSize;
 		size_t				fTotalSize;
+		size_t				fTotalPadding;
 
 		BMessageField		*fNext;
 };

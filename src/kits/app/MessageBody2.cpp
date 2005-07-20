@@ -10,25 +10,23 @@
 
 #include <stdio.h>
 #include <DataIO.h>
+#include <MessageUtils.h>
 #include <TypeConstants.h>
 #include "MessageBody2.h"
 
 namespace BPrivate {
 
+static int64 sPadding[2] = { 0, 0 };
+
 BMessageBody::BMessageBody()
 {
-	fFieldTableSize = 1;
-	fFieldTable = new BMessageField *[fFieldTableSize];
-	HashClear();
+	InitCommon();
 }
 
 
 BMessageBody::BMessageBody(const BMessageBody &other)
 {
-	fFieldTableSize = 1;
-	fFieldTable = new BMessageField *[fFieldTableSize];
-	HashClear();
-
+	InitCommon();
 	*this = other;
 }
 
@@ -55,6 +53,16 @@ BMessageBody::operator=(const BMessageBody &other)
 	}
 
 	return *this;
+}
+
+
+status_t
+BMessageBody::InitCommon()
+{
+	fFieldTableSize = 100;
+	fFieldTable = new BMessageField *[fFieldTableSize];
+	HashClear();
+	return B_OK;
 }
 
 
@@ -204,12 +212,10 @@ BMessageBody::FlattenedSize() const
 
 	for (int32 index = 0; index < fFieldList.CountItems(); index++) {
 		BMessageField *field = (BMessageField *)fFieldList.ItemAt(index);
-		size += field->TotalSize();
-		size += field->NameLength();
 
-		// ToDo: too expensive?
 		uint8 flags = field->Flags();
 		size += sizeof(flags);
+		size += sizeof(type_code);
 
 		// count information
 		if (!(flags & MSG_FLAG_SINGLE_ITEM)) {
@@ -225,9 +231,16 @@ BMessageBody::FlattenedSize() const
 		else
 			size += sizeof(size_t);
 
+		// name length byte and name length
+		size += 1 + field->NameLength();
+
 		// individual sizes
-		if (!(flags & MSG_FLAG_FIXED_SIZE))
+		if (!(flags & MSG_FLAG_FIXED_SIZE)) {
 			size += field->CountItems() * sizeof(size_t);
+			size += field->TotalPadding();
+		}
+
+		size += field->TotalSize();
 	}
 
 	return size;
@@ -241,7 +254,7 @@ BMessageBody::Flatten(BDataIO *stream) const
 
 	for (int32 index = 0; index < fFieldList.CountItems(); index++) {
 		BMessageField *field = (BMessageField *)fFieldList.ItemAt(index);
-	
+
 		uint8 flags = field->Flags();
 		stream->Write(&flags, sizeof(flags));
 
@@ -265,7 +278,7 @@ BMessageBody::Flatten(BDataIO *stream) const
 		if (!isFixed) {
 			// add bytes for holding each items size
 			size += count * sizeof(size_t);
-			// ToDo: add padding here
+			size += field->TotalPadding();
 		}
 
 		if (flags & MSG_FLAG_MINI_DATA) {
@@ -294,12 +307,15 @@ BMessageBody::Flatten(BDataIO *stream) const
 			}
 
 			error = stream->Write(field->BufferAt(dataIndex), size);
-			// ToDo: add padding here too
+
+			if (!isFixed)
+				error = stream->Write(sPadding, calc_padding(size + 4, 8));
 		}
 	}
 
 	if (error >= B_OK) {
-		error = stream->Write('\0', 1);	// MSG_LAST_ENTRY
+		uint8 lastEntry = 0;
+		error = stream->Write(&lastEntry, sizeof(lastEntry));
 	}
 
 	if (error >= B_OK)
@@ -538,8 +554,7 @@ BMessageBody::HashRemove(const char *name)
 void
 BMessageBody::HashClear()
 {
-	if (fFieldTable)
-		memset(fFieldTable, 0, fFieldTableSize * sizeof(BMessageField *));
+	memset(fFieldTable, 0, fFieldTableSize * sizeof(BMessageField *));
 }
 
 

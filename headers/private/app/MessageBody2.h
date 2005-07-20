@@ -67,6 +67,7 @@ public:
 		void				HashClear();
 
 private:
+		status_t			InitCommon();
 		BMessageField		*FindData(const char *name, type_code type,
 								 status_t &error) const;
 
