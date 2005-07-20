@@ -294,9 +294,10 @@ BStringItem::DrawItem(BView *owner, BRect frame, bool complete)
 	rgb_color lowColor = owner->LowColor();
 
 	if (IsSelected() || complete) {
-		if (IsSelected())
+		if (IsSelected()) {
 			owner->SetHighColor(tint_color(lowColor, B_DARKEN_2_TINT));
-		else
+			owner->SetLowColor(owner->HighColor());
+		} else
 			owner->SetHighColor(lowColor);
 
 		owner->FillRect(frame);
