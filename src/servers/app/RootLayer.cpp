@@ -238,7 +238,7 @@ RootLayer::WorkingThread(void *data)
 	for (;;) {
 		err = messageQueue.GetNextMessage(code);
 		if (err < B_OK) {
-			STRACE(("WorkingThread: messageQueue.GetNextReply failed\n"));
+			STRACE(("WorkingThread: messageQueue.GetNextMessage() failed: %s\n", strerror(err)));
 			continue;
 		}
 
