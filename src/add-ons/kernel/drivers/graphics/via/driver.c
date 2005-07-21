@@ -859,14 +859,14 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 		/* PRIVATE ioctl from here on */
 		case ENG_GET_PRIVATE_DATA: {
 			eng_get_private_data *gpd = (eng_get_private_data *)buf;
-			if (gpd->magic == SKEL_PRIVATE_DATA_MAGIC) {
+			if (gpd->magic == VIA_PRIVATE_DATA_MAGIC) {
 				gpd->shared_info_area = di->shared_area;
 				result = B_OK;
 			}
 		} break;
 		case ENG_GET_PCI: {
 			eng_get_set_pci *gsp = (eng_get_set_pci *)buf;
-			if (gsp->magic == SKEL_PRIVATE_DATA_MAGIC) {
+			if (gsp->magic == VIA_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
 				gsp->value = get_pci(gsp->offset, gsp->size);
 				result = B_OK;
@@ -874,7 +874,7 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 		} break;
 		case ENG_SET_PCI: {
 			eng_get_set_pci *gsp = (eng_get_set_pci *)buf;
-			if (gsp->magic == SKEL_PRIVATE_DATA_MAGIC) {
+			if (gsp->magic == VIA_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
 				set_pci(gsp->offset, gsp->size, gsp->value);
 				result = B_OK;
@@ -882,14 +882,14 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 		} break;
 		case ENG_DEVICE_NAME: { // apsed
 			eng_device_name *dn = (eng_device_name *)buf;
-			if (dn->magic == SKEL_PRIVATE_DATA_MAGIC) {
+			if (dn->magic == VIA_PRIVATE_DATA_MAGIC) {
 				strcpy(dn->name, di->name);
 				result = B_OK;
 			}
 		} break;
 		case ENG_RUN_INTERRUPTS: {
 			eng_set_bool_state *ri = (eng_set_bool_state *)buf;
-			if (ri->magic == SKEL_PRIVATE_DATA_MAGIC) {
+			if (ri->magic == VIA_PRIVATE_DATA_MAGIC) {
 				vuint32 *regs = di->regs;
 				if (ri->do_it) {
 					enable_vbi(regs);
@@ -901,7 +901,7 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 		} break;
 		case ENG_GET_NTH_AGP_INFO: {
 			eng_nth_agp_info *nai = (eng_nth_agp_info *)buf;
-			if (nai->magic == SKEL_PRIVATE_DATA_MAGIC) {
+			if (nai->magic == VIA_PRIVATE_DATA_MAGIC) {
 				nai->exist = false;
 				nai->agp_bus = false;
 				if (agp_bus) {
@@ -915,7 +915,7 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 		} break;
 		case ENG_ENABLE_AGP: {
 			eng_cmd_agp *nca = (eng_cmd_agp *)buf;
-			if (nca->magic == SKEL_PRIVATE_DATA_MAGIC) {
+			if (nca->magic == VIA_PRIVATE_DATA_MAGIC) {
 				if (agp_bus) {
 					nca->agp_bus = true;
 					(*agp_bus->enable_agp)(&(nca->cmd));
@@ -928,7 +928,7 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 		} break;
 		case ENG_ISA_OUT: {
 			eng_in_out_isa *io_isa = (eng_in_out_isa *)buf;
-			if (io_isa->magic == SKEL_PRIVATE_DATA_MAGIC) {
+			if (io_isa->magic == VIA_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
 
 				/* lock the driver:
@@ -957,7 +957,7 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 		} break;
 		case ENG_ISA_IN: {
 			eng_in_out_isa *io_isa = (eng_in_out_isa *)buf;
-			if (io_isa->magic == SKEL_PRIVATE_DATA_MAGIC) {
+			if (io_isa->magic == VIA_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
 
 				/* lock the driver:
