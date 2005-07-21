@@ -55,6 +55,12 @@ static void no_printf( const char *useless , ... ) {};
 #define TRACE TRACE
 #endif
 
+typedef struct supported_device {
+	uint16 vendor_id;
+	uint16 device_id;
+	char * name;
+} supported_device_t;
+
 /* ----------
 	global data
 ----- */
@@ -62,6 +68,22 @@ static pci_info *m_devices[RTL_MAX_CARDS];
 static pci_module_info *m_pcimodule = 0;	//To call methods of pci
 static char *rtl8139_names[RTL_MAX_CARDS +1];
 static int32 m_openmask = 0;					//Is the thing already opened?
+
+static supported_device_t m_supported_devices[] = {
+	{ 0x10ec, 0x8139, "RealTek RTL8139 Fast Ethernet" },
+	{ 0x10ec, 0x8129, "RealTek RTL8129 Fast Ethernet" },
+	{ 0x10ec, 0x8138, "RealTek RTL8139B PCI/CardBus" },
+	{ 0x1113, 0x1211, "SMC1211TX EZCard 10/100 or Accton MPX5030 (RealTek RTL8139)" },
+	{ 0x1186, 0x1300, "D-Link DFE-538TX (RealTek RTL8139)" },
+	{ 0x1186, 0x1301, "D-Link DFE-530TX+ (RealTek RTL8139C)" },
+	{ 0x1186, 0x1340, "D-Link DFE-690TXD CardBus (RealTek RTL8139C)" },
+	{ 0x018a, 0x0106, "LevelOne FPC-0106Tx (RealTek RTL8139)" },
+	{ 0x021b, 0x8139, "Compaq HNE-300 (RealTek RTL8139c)" },
+	{ 0x13d1, 0xab06, "Edimax EP-4103DL CardBus (RealTek RTL8139c)" },
+	{ 0x02ac, 0x1012, "Siemens 1012v2 CardBus (RealTek RTL8139c)" },
+	{ 0x1432, 0x9130, "Siemens 1020 PCI NIC (RealTek RTL8139c)" },
+	{ 0, 0, NULL } /* End of list */
+};
 
 
 int32 api_version = B_CUR_DRIVER_API_VERSION; //Procedure
@@ -196,20 +218,24 @@ init_driver (void)
 	item = (pci_info *)malloc(sizeof(pci_info));
 	for ( i = found = 0 ; m_pcimodule->get_nth_pci_info(i, item) == B_OK ; i++ )
 	{
-		// Vendorid = 0x10ec and device_id = 0x8139
-		if ( ( item->vendor_id == 0x10ec ) && ( item->device_id == 0x8139 ) )
-		{
-			//Also done in etherpci sample code
-			if ((item->u.h0.interrupt_line == 0) || (item->u.h0.interrupt_line == 0xFF)) 
+		supported_device_t *supported;
+		
+		for (supported  = m_supported_devices; supported->name; supported++) {
+			if ( (item->vendor_id == supported->vendor_id) && 
+			     (item->device_id == supported->device_id) )
 			{
-				TRACE( "rtl8139_nielx init_driver(): found with invalid IRQ - check IRQ assignement\n");
-				i++; //next
-				continue;
+				//Also done in etherpci sample code
+				if ((item->u.h0.interrupt_line == 0) || (item->u.h0.interrupt_line == 0xFF)) 
+				{
+					TRACE( "rtl8139_nielx init_driver(): found %s with invalid IRQ - check IRQ assignement\n", supported->name);
+					continue;
+				}
+				
+				TRACE("rtl8139_nielx init_driver(): found %s at IRQ %u \n", supported->name, item->u.h0.interrupt_line);
+				m_devices[found] = item;
+				item = (pci_info *)malloc(sizeof(pci_info));
+				found++;
 			}
-			TRACE("rtl8139_nielx init_driver(): found at IRQ %u \n", item->u.h0.interrupt_line);
-			m_devices[found] = item;
-			item = (pci_info *)malloc(sizeof(pci_info));
-			found++;
 		}
 	}
 	
