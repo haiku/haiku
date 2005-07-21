@@ -878,6 +878,22 @@ load_container(char const *name, image_type type, const char *rpath)
 	fd = open_executable(path, type, rpath);
 	FATAL((fd < 0), fd, "cannot open file %s\n", path);
 
+	// If the path is not absolute, we prepend the CWD to make it one.
+	if (path[0] != '/') {
+		char relativePath[PATH_MAX];
+		strcpy(relativePath, path);
+
+		// get the CWD
+		status = _kern_getcwd(path, sizeof(path));
+		FATAL((status != B_OK), status, "_kern_getcwd() failed\n");
+
+		if (strlcat(path, "/", sizeof(path)) >= sizeof(path)
+			|| strlcat(path, relativePath, sizeof(path)) >= sizeof(path)) {
+			FATAL(true, B_NAME_TOO_LONG, "Absolute path of image %s is too "
+				"long!\n", relativePath);
+		}
+	}
+
 	len = _kern_read(fd, 0, &eheader, sizeof(eheader));
 	FATAL((len != sizeof(eheader)), B_BAD_DATA,
 		"troubles reading ELF header\n");
