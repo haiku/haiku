@@ -36,8 +36,8 @@ status_t eng_agp_setup(void)
 //		LOG(4, ("AGP: STRAPINFO2 now contains $%08x\n", ENG_REG32(RG32_NVSTRAPINFO2)));
 //	}
 
-	/* set the magic number so the skeleton kerneldriver knows we're for real */
-	nca.magic = nai.magic = SKEL_PRIVATE_DATA_MAGIC;
+	/* set the magic number so the via kerneldriver knows we're for real */
+	nca.magic = nai.magic = VIA_PRIVATE_DATA_MAGIC;
 
 	/* contact driver and get a pointer to the registers and shared data */
 	for (index = 0; index < 8; index++)
@@ -105,7 +105,7 @@ status_t eng_agp_setup(void)
 	if (si->settings.force_pci)
 	{
 		/* set PCI mode if specified by user in skel.settings */
-		LOG(4,("AGP: forcing PCI mode (specified in skel.settings)\n"));
+		LOG(4,("AGP: forcing PCI mode (specified in via.settings)\n"));
 
 		/* let the AGP busmanager setup PCI mode.
 		 * (the AGP speed scheme is of no consequence now) */

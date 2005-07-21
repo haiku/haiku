@@ -25,7 +25,7 @@ static status_t init_common(int the_fd) {
 	/* memorize the file descriptor */
 	fd = the_fd;
 	/* set the magic number so the driver knows we're for real */
-	gpd.magic = SKEL_PRIVATE_DATA_MAGIC;
+	gpd.magic = VIA_PRIVATE_DATA_MAGIC;
 	/* contact driver and get a pointer to the registers and shared data */
 	result = ioctl(fd, ENG_GET_PRIVATE_DATA, &gpd, sizeof(gpd));
 	if (result != B_OK) goto error0;
@@ -224,7 +224,7 @@ void GET_ACCELERANT_CLONE_INFO(void *data) {
 	status_t result;
 
 	/* call the kernel driver to get the device name */	
-	dn.magic = SKEL_PRIVATE_DATA_MAGIC;
+	dn.magic = VIA_PRIVATE_DATA_MAGIC;
 	/* store the returned info directly into the passed buffer */
 	dn.name = (char *)data;
 	result = ioctl(fd, ENG_DEVICE_NAME, &dn, sizeof(dn));

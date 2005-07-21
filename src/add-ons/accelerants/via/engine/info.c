@@ -695,13 +695,14 @@ void get_panel_modes(display_mode *p1, display_mode *p2, bool *pan1, bool *pan2)
 
 static void pins_cle266_fake(void)
 {
+	si->ps.f_ref = 14.31818;
 	/* we have a standard PLL */
 	si->ps.ext_pll = false;
 	/* carefull not to take to high limits, and high should be >= 2x low. */
 	si->ps.max_system_vco = 230;
 	si->ps.min_system_vco = 20;
-	si->ps.max_pixel_vco = 230;
-	si->ps.min_pixel_vco = 20;
+	si->ps.max_pixel_vco = 400; /* VESA BIOS uses upto 433Mhz */
+	si->ps.min_pixel_vco = 50; /* VESA BIOS uses downto 53.2Mhz */
 	si->ps.max_video_vco = 0;
 	si->ps.min_video_vco = 0;
 	si->ps.max_dac1_clock = 230;

@@ -22,7 +22,7 @@ static void interrupt_enable(bool flag) {
 	eng_set_bool_state sbs;
 
 	/* set the magic number so the driver knows we're for real */
-	sbs.magic = SKEL_PRIVATE_DATA_MAGIC;
+	sbs.magic = VIA_PRIVATE_DATA_MAGIC;
 	sbs.do_it = flag;
 	/* contact driver and get a pointer to the registers and shared data */
 	result = ioctl(fd, ENG_RUN_INTERRUPTS, &sbs, sizeof(sbs));
@@ -138,8 +138,8 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 
 		/* set the pixel clock PLL(s) */
 		LOG(8,("SETMODE: target clock %dkHz\n",target.timing.pixel_clock));
-//		if (head1_set_pix_pll(target) == B_ERROR)
-//			LOG(8,("SETMODE: error setting pixel clock (internal DAC)\n"));
+		if (head1_set_pix_pll(target) == B_ERROR)
+			LOG(8,("SETMODE: error setting pixel clock (internal DAC)\n"));
 
 		/* we do not need to set the pixelclock here for a head that's in TVout mode */
 //		if (!(target2.flags & TV_BITS))
@@ -278,8 +278,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		}
 
 		/* set the pixel clock PLL */
-//		status = head1_set_pix_pll(target);
-status = B_OK;
+		status = head1_set_pix_pll(target);
 
 		if (status==B_ERROR)
 			LOG(8,("CRTC: error setting pixel clock (internal DAC)\n"));

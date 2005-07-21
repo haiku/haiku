@@ -7,7 +7,7 @@
 
 #include "std.h"
 
-static status_t nv4_nv10_nv20_dac_pix_pll_find(
+static status_t cle266_km400_dac_pix_pll_find(
 	display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test);
 
 /* see if an analog VGA monitor is connected to connector #1 */
@@ -155,16 +155,16 @@ status_t eng_dac_set_pix_pll(display_mode target)
 	 * note:
 	 * this assumes the cards BIOS correctly programmed the panel (is likely) */
 	//fixme: when VESA DDC EDID stuff is implemented, this option can be deleted...
-	if (si->ps.tmds1_active && !si->settings.pgm_panel)
+	if (0)//si->ps.tmds1_active && !si->settings.pgm_panel)
 	{
-		LOG(4,("DAC: Not programming DFP refresh (specified in skel.settings)\n"));
+		LOG(4,("DAC: Not programming DFP refresh (specified in via.settings)\n"));
 		return B_OK;
 	}
 
 	/* fix a DVI or laptop flatpanel to 60Hz refresh! */
 	/* Note:
 	 * The pixelclock drives the flatpanel modeline, not the CRTC modeline. */
-	if (si->ps.tmds1_active)
+	if (0)//si->ps.tmds1_active)
 	{
 		LOG(4,("DAC: Fixing DFP refresh to 60Hz!\n"));
 
@@ -187,13 +187,16 @@ status_t eng_dac_set_pix_pll(display_mode target)
 //	DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0x0C)|0x01);  /*select the PIXPLL*/
 
 	/* program new frequency */
-	DACW(PIXPLLC, ((p << 16) | (n << 8) | m));
-
-	/* program 2nd set N and M scalers if they exist (b31=1 enables them) */
-	if (si->ps.ext_pll) DACW(PIXPLLC2, 0x80000401);
+//fixme: add K8M800 programming and calcs!! (these differ, plus extended) <<<<<
+	if (si->ps.card_arch != K8M800)
+	{
+		/* fixme: b7 is a lock-indicator or a filter select: to be determined! */
+		SEQW(PPLL_N_CLE, (n & 0x7f));
+		SEQW(PPLL_MP_CLE, ((m & 0x3f) | ((p & 0x03) << 6)));
+	}
 
 	/* Wait for the PIXPLL frequency to lock until timeout occurs */
-//fixme: do NV cards have a LOCK indication bit??
+//fixme: do VIA cards have a LOCK indication bit??
 /*	while((!(DXIR(PIXPLLSTAT)&0x40)) & (time <= 2000))
 	{
 		time++;
@@ -220,13 +223,13 @@ status_t eng_dac_pix_pll_find
 	(display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test)
 {
 	switch (si->ps.card_type) {
-		default:   return nv4_nv10_nv20_dac_pix_pll_find(target, calc_pclk, m_result, n_result, p_result, test);
+		default:   return cle266_km400_dac_pix_pll_find(target, calc_pclk, m_result, n_result, p_result, test);
 	}
 	return B_ERROR;
 }
 
 /* find nearest valid pixel PLL setting */
-static status_t nv4_nv10_nv20_dac_pix_pll_find(
+static status_t cle266_km400_dac_pix_pll_find(
 	display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test)
 {
 	int m = 0, n = 0, p = 0/*, m_max*/;
@@ -253,7 +256,7 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 		break;
 	}
 */
-	LOG(4,("DAC: NV4/NV10/NV20 restrictions apply\n"));
+	LOG(4,("DAC: CLE266/KM400 restrictions apply\n"));
 
 	/* determine the max. pixelclock for the current videomode */
 	switch (target.space)
@@ -282,11 +285,11 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 
 	/* Make sure the requested pixelclock is within the PLL's operational limits */
 	/* lower limit is min_pixel_vco divided by highest postscaler-factor */
-	if (req_pclk < (si->ps.min_pixel_vco / 16.0))
+	if (req_pclk < (si->ps.min_pixel_vco / 8.0))
 	{
 		LOG(4,("DAC: clamping pixclock: requested %fMHz, set to %fMHz\n",
-										req_pclk, (float)(si->ps.min_pixel_vco / 16.0)));
-		req_pclk = (si->ps.min_pixel_vco / 16.0);
+										req_pclk, (float)(si->ps.min_pixel_vco / 8.0)));
+		req_pclk = (si->ps.min_pixel_vco / 8.0);
 	}
 	/* upper limit is given by pins in combination with current active mode */
 	if (req_pclk > max_pclk)
@@ -297,7 +300,7 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 	}
 
 	/* iterate through all valid PLL postscaler settings */
-	for (p=0x01; p < 0x20; p = p<<1)
+	for (p = 0x01; p < 0x10; p = p << 1)
 	{
 		/* calculate the needed VCO frequency for this postscaler setting */
 		f_vco = req_pclk * p;
@@ -305,37 +308,22 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 		/* check if this is within range of the VCO specs */
 		if ((f_vco >= si->ps.min_pixel_vco) && (f_vco <= si->ps.max_pixel_vco))
 		{
-			/* FX5600 and FX5700 tweak for 2nd set N and M scalers */
-			if (si->ps.ext_pll) f_vco /= 4;
-
 			/* iterate trough all valid reference-frequency postscaler settings */
-			for (m = 7; m <= 14; m++)
+			for (m = 1; m <= 63; m++)
 			{
 				/* check if phase-discriminator will be within operational limits */
-				//fixme: PLL calcs will be resetup/splitup/updated...
-				if (si->ps.card_type == NV36)
-				{
-					if (((si->ps.f_ref / m) < 3.2) || ((si->ps.f_ref / m) > 6.4)) continue;
-				}
-				else
-				{
-					if (((si->ps.f_ref / m) < 1.0) || ((si->ps.f_ref / m) > 2.0)) continue;
-				}
+				/* (range as used by VESA BIOS on CLE266, verified.) */
+				if (((si->ps.f_ref / m) < 2.0) || ((si->ps.f_ref / m) > 3.6)) continue;
 
 				/* calculate VCO postscaler setting for current setup.. */
 				n = (int)(((f_vco * m) / si->ps.f_ref) + 0.5);
 
 				/* ..and check for validity */
-				if ((n < 1) || (n > 255))	continue;
+				/* (checked VESA BIOS on CLE266, b7 is NOT part of divider.) */
+				if ((n < 1) || (n > 127)) continue;
 
 				/* find error in frequency this setting gives */
-				if (si->ps.ext_pll)
-				{
-					/* FX5600 and FX5700 tweak for 2nd set N and M scalers */
-					error = fabs((req_pclk / 4) - (((si->ps.f_ref / m) * n) / p));
-				}
-				else
-					error = fabs(req_pclk - (((si->ps.f_ref / m) * n) / p));
+				error = fabs(req_pclk - (((si->ps.f_ref / m) * n) / p));
 
 				/* note the setting if best yet */
 				if (error < error_best)
@@ -356,8 +344,6 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 
 	/* log the VCO frequency found */
 	f_vco = ((si->ps.f_ref / m) * n);
-	/* FX5600 and FX5700 tweak for 2nd set N and M scalers */
-	if (si->ps.ext_pll) f_vco *= 4;
 
 	LOG(2,("DAC: pix VCO frequency found %fMhz\n", f_vco));
 
@@ -378,9 +364,6 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 		break;
 	case 8:
 		p = 0x03;
-		break;
-	case 16:
-		p = 0x04;
 		break;
 	}
 	*p_result = p;
