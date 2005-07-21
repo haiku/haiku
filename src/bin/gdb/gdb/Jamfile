@@ -283,7 +283,7 @@ rule GDBCopyConfigFiles
 	local sources = $(1:G=$(SOURCE_GRIST:E)!config) ;
 
 	local source ;
-	for source in $(1) {
+	for source in $(sources) {
 		local target = [ FGristFiles $(source) ] ;
 		File $(target) : $(source) ;
 		SEARCH on $(source) = [ FDirName $(SUBDIR) config-$(OBOS_ARCH) ] ;
