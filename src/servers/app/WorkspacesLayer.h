@@ -30,8 +30,10 @@ class WorkspacesLayer : public Layer {
 
 		void _DrawWindow(const BRect& workspaceFrame,
 					const BRect& screenFrame, WinBorder* window,
-					BRegion& backgroundRegion);
+					BRegion& backgroundRegion, bool active);
 		void _DrawWorkspace(int32 index);
+
+		void _DarkenColor(RGBColor& color) const;
 };
 
 #endif	// WORKSPACES_LAYER_H

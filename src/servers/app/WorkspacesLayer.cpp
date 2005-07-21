@@ -92,7 +92,7 @@ WorkspacesLayer::_WindowFrame(const BRect& workspaceFrame,
 void
 WorkspacesLayer::_DrawWindow(const BRect& workspaceFrame,
 	const BRect& screenFrame, WinBorder* window,
-	BRegion& backgroundRegion)
+	BRegion& backgroundRegion, bool active)
 {
 	if (window->Feel() == kDesktopWindowFeel)
 		return;
@@ -103,6 +103,14 @@ WorkspacesLayer::_DrawWindow(const BRect& workspaceFrame,
 
 	// ToDo: let decorator do this!
 	RGBColor yellow = window->GetDecorator()->GetColors().window_tab;
+	RGBColor gray(180, 180, 180);
+	RGBColor white(255, 255, 255);
+
+	if (!active) {
+		_DarkenColor(yellow);
+		_DarkenColor(gray);
+		_DarkenColor(white);
+	}
 
 	if (tabFrame.left < frame.left)
 		tabFrame.left = frame.left;
@@ -117,10 +125,8 @@ WorkspacesLayer::_DrawWindow(const BRect& workspaceFrame,
 
 	fDriver->StrokeLine(tabFrame.LeftTop(), tabFrame.RightBottom(), yellow);
 
-	RGBColor gray(180, 180, 180);
 	fDriver->StrokeRect(frame, gray);
 
-	RGBColor white(255, 255, 255);
 	frame.InsetBy(1, 1);
 	fDriver->FillRect(frame, white);
 }
@@ -132,7 +138,8 @@ WorkspacesLayer::_DrawWorkspace(int32 index)
 	BRect rect = _WorkspaceAt(index);
 
 	Workspace* workspace = GetRootLayer()->WorkspaceAt(index);
-	if (workspace == GetRootLayer()->ActiveWorkspace()) {
+	bool active = workspace == GetRootLayer()->ActiveWorkspace();
+	if (active) {
 		// draw active frame
 		RGBColor black(0, 0, 0);
 		fDriver->StrokeRect(rect, black);
@@ -148,6 +155,10 @@ WorkspacesLayer::_DrawWorkspace(int32 index)
 		color = workspace->BGColor();
 	else
 		color.SetColor(51, 102, 152);
+
+	if (!active) {
+		_DarkenColor(color);
+	}
 
 	// draw windows
 
@@ -175,7 +186,7 @@ WorkspacesLayer::_DrawWorkspace(int32 index)
 		fDriver->ConstrainClippingRegion(&backgroundRegion);
 
 		for (int32 i = count; i-- > 0;) {
-			_DrawWindow(rect, screenFrame, windows[i], backgroundRegion);
+			_DrawWindow(rect, screenFrame, windows[i], backgroundRegion, active);
 		}
 	}
 
@@ -189,6 +200,13 @@ WorkspacesLayer::_DrawWorkspace(int32 index)
 	BRegion cRegion(VisibleRegion());
 	fDriver->ConstrainClippingRegion(&cRegion);
 #endif
+}
+
+
+void
+WorkspacesLayer::_DarkenColor(RGBColor& color) const
+{
+	color = tint_color(color.GetColor32(), B_DARKEN_2_TINT);
 }
 
 
