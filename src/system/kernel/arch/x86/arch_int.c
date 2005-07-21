@@ -8,24 +8,24 @@
 
 #include <vm.h>
 #include <int.h>
-#include <thread.h>
-#include <smp.h>
-#include <vm_priv.h>
 #include <ksyscalls.h>
+#include <smp.h>
+#include <team.h>
+#include <thread.h>
+#include <vm_priv.h>
 
 #include <arch/cpu.h>
 #include <arch/int.h>
-#include <arch/faults.h>
-#include <arch/vm.h>
 #include <arch/smp.h>
 #include <arch/user_debugger.h>
+#include <arch/vm.h>
 
-#include <arch/x86/faults.h>
 #include <arch/x86/descriptors.h>
 
 #include "interrupts.h"
 
 #include <string.h>
+#include <stdio.h>
 
 
 //#define TRACE_ARCH_INT
@@ -67,7 +67,7 @@
 #define PIC_SLAVE_INT_BASE		0x28
 #define PIC_NUM_INTS			0x0f
 
-const char *kInterruptNames[] = {
+static const char *kInterruptNames[] = {
 	/*  0 */ "Divide Error Exception",
 	/*  1 */ "Debug Exception",
 	/*  2 */ "NMI Interrupt",
@@ -89,6 +89,7 @@ const char *kInterruptNames[] = {
 	/* 18 */ "Machine-Check Exception",
 	/* 19 */ "SIMD Floating-Point Exception",
 };
+static const int kInterruptNameCount = 20;
 
 #define MAX_ARGS 16
 
@@ -284,6 +285,45 @@ arch_int_are_interrupts_enabled(void)
 }
 
 
+static const char *
+exception_name(int number, char *buffer, int32 bufferSize)
+{
+	if (number >= 0 && number < kInterruptNameCount)
+		return kInterruptNames[number];
+
+	snprintf(buffer, bufferSize, "exception %d", number);
+	return buffer;
+}
+
+
+static void
+fatal_exception(struct iframe *frame)
+{
+	char name[32];
+	panic("Fatal exception \"%s\" occurred! Error code: 0x%x\n",
+		exception_name(frame->vector, name, sizeof(name)), frame->error_code);
+}
+
+
+static void
+unexpected_exception(struct iframe *frame, debug_exception_type type,
+	int signal)
+{
+	if (frame->cs == USER_CODE_SEG) {
+		enable_interrupts();
+
+		if (user_debug_exception_occurred(type, signal))
+			send_signal(team_get_current_team_id(), signal);
+	} else {
+		char name[32];
+		panic("Unexpected exception \"%s\" occurred in kernel mode! "
+			"Error code: 0x%x\n",
+			exception_name(frame->vector, name, sizeof(name)),
+			frame->error_code);
+	}
+}
+
+
 /* keep the compiler happy, this function must be called only from assembly */
 void i386_handle_trap(struct iframe frame);
 
@@ -307,19 +347,65 @@ i386_handle_trap(struct iframe frame)
 //		dprintf("i386_handle_trap: vector 0x%x, ip 0x%x, cpu %d\n", frame.vector, frame.eip, smp_get_current_cpu());
 
 	switch (frame.vector) {
-		case 1:
+
+		// fatal exceptions
+
+		case 2:		// NMI Interrupt
+		case 7:		// Device Not Available Exception (#NM)
+		case 9:		// Coprocessor Segment Overrun
+		case 10:	// Invalid TSS Exception (#TS)
+		case 11: 	// Segment Not Present (#NP)
+		case 12: 	// Stack Fault Exception (#SS)
+		case 18: 	// Machine-Check Exception (#MC)
+			fatal_exception(&frame);
+			break;
+
+		case 8:		// Double Fault Exception (#DF)
+		{
+			struct tss *tss = x86_get_main_tss();
+			
+			frame.cs = tss->cs;
+			frame.eip = tss->eip;
+			frame.esp = tss->esp;
+			frame.flags = tss->eflags;
+			
+			panic("double fault! errorcode = 0x%x\n", frame.error_code);
+
+			break;
+		}
+
+		// exceptions we can handle
+		// (most of them only when occurring in userland)
+
+		case 0:		// Divide Error Exception (#DE)
+			unexpected_exception(&frame, B_DIVIDE_ERROR, SIGFPE);
+			break;
+
+		case 1:		// Debug Exception (#DB)
 			ret = i386_handle_debug_exception(&frame);
 			break;
-		case 3:
+
+		case 3:		// Breakpoint Exception (#BP)
 			ret = i386_handle_breakpoint_exception(&frame);
 			break;
-		case 8:		// double fault
-			ret = i386_double_fault(&frame);
+
+		case 4:		// Overflow Exception (#OF)
+			unexpected_exception(&frame, B_OVERFLOW_EXCEPTION, SIGTRAP);
 			break;
-		case 13:	// general protection fault
-			ret = i386_general_protection_fault(frame.error_code);
+
+		case 5:		// BOUND Range Exceeded Exception (#BR)
+			unexpected_exception(&frame, B_BOUNDS_CHECK_EXCEPTION, SIGTRAP);
 			break;
-		case 14:	// page fault
+
+		case 6:		// Invalid Opcode Exception (#UD)
+			unexpected_exception(&frame, B_INVALID_OPCODE_EXCEPTION, SIGILL);
+			break;
+
+		case 13: 	// General Protection Exception (#GP)
+			unexpected_exception(&frame, B_GENERAL_PROTECTION_FAULT, SIGKILL);
+			break;
+
+		case 14: 	// Page-Fault Exception (#PF)
 		{
 			unsigned int cr2;
 			addr_t newip;
@@ -346,6 +432,18 @@ i386_handle_trap(struct iframe frame)
 			}
 			break;
 		}
+
+		case 16: 	// x87 FPU Floating-Point Error (#MF)
+			unexpected_exception(&frame, B_FLOATING_POINT_EXCEPTION, SIGFPE);
+			break;
+
+		case 17: 	// Alignment Check Exception (#AC)
+			unexpected_exception(&frame, B_ALIGNMENT_EXCEPTION, SIGTRAP);
+			break;
+
+		case 19: 	// SIMD Floating-Point Exception (#XF)
+			unexpected_exception(&frame, B_FLOATING_POINT_EXCEPTION, SIGFPE);
+			break;
 
 		case 99:	// syscall
 		{
@@ -393,8 +491,11 @@ i386_handle_trap(struct iframe frame)
 
 				ret = int_io_interrupt_handler(frame.vector - ARCH_INTERRUPT_BASE);
 			} else {
-				panic("i386_handle_trap: unhandled trap 0x%x (%s) at ip 0x%x, thread 0x%x!\n",
-					frame.vector, kInterruptNames[frame.vector], frame.eip, thread ? thread->id : -1);
+				char name[32];
+				panic("i386_handle_trap: unhandled trap 0x%x (%s) at ip 0x%x, "
+					"thread 0x%x!\n", frame.vector,
+					exception_name(frame.vector, name, sizeof(name)), frame.eip,
+					thread ? thread->id : -1);
 				ret = B_HANDLED_INTERRUPT;
 			}
 			break;

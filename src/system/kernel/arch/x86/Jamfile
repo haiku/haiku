@@ -8,7 +8,6 @@ KernelStaticLibrary libx86 :
 	arch_debug.c
 	arch_debug_console.c
 	arch_elf.c
-	arch_faults.c
 	arch_int.c
 #	arch_selector.c
 	arch_real_time_clock.c

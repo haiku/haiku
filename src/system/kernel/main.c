@@ -13,7 +13,6 @@
 
 #include <boot/kernel_args.h>
 #include <debug.h>
-#include <arch/faults.h>
 #include <ksyscalls.h>
 #include <vm.h>
 #include <timer.h>
@@ -109,8 +108,6 @@ _start(kernel_args *oldka, int cpu_num)
 		TRACE(("init system info\n"));
 		system_info_init(&ka);
 
-		TRACE(("init faults\n"));
-		faults_init(&ka);
 		TRACE(("init SMP\n"));
 		smp_init(&ka);
 		TRACE(("init timer\n"));
