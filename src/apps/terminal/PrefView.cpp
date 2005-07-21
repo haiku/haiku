@@ -86,21 +86,23 @@ PrefView::CanApply ()
 }
 
 void
-PrefView::MessageReceived (BMessage *msg)
+PrefView::MessageReceived(BMessage* msg)
 {
-  TTextControl *textctl;
+	BControl *control;
 
-  switch (msg->what) {
-  case MSG_TEXT_MODIFIED:
-    if (msg->FindPointer ("source", (void**)&textctl) == B_OK) {
-      textctl->ModifiedText (true);
-    }
-    break;
+ 	switch (msg->what) {
+		case MSG_TEXT_MODIFIED: {
+			TTextControl* textControl;
+			if (msg->FindPointer("source", (void**)&control) >= B_OK
+				&& (textControl = dynamic_cast<TTextControl*>(control))) {
+				textControl->ModifiedText(true);
+			}
+			break;
+		}
 
-  default:
-    BView::MessageReceived (msg);
-  }
-  
+		default:
+			BView::MessageReceived(msg);
+	}
 }
 
 
