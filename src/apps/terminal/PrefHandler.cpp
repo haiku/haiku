@@ -224,12 +224,16 @@ PrefHandler::getRGB(const char *key)
 {
   int r, g, b;
   rgb_color col;
-  const char *s = mPrefContainer.FindString(key);
-  sscanf(s, "%d, %d, %d", &r, &g, &b);
+  if (const char *s = mPrefContainer.FindString(key)) {
+    sscanf(s, "%d, %d, %d", &r, &g, &b);
+  } else {
+  	fprintf(stderr, "PrefHandler::getRGB(%s) - key not found\n", key);
+  	r = g = b = 0;
+  }
   col.red = r;
   col.green = g;
   col.blue = b;
-  col.alpha = 0;
+  col.alpha = 255;
   return col;
 }
 /////////////////////////////////////////////////////////////////////////////
