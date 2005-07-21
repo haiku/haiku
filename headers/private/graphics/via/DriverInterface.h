@@ -38,7 +38,7 @@ typedef struct {
 #define	DELETE_BEN(x)	delete_sem(x.sem);
 
 
-#define SKEL_PRIVATE_DATA_MAGIC	0x0009 /* a private driver rev, of sorts */
+#define VIA_PRIVATE_DATA_MAGIC	0x0009 /* a private driver rev, of sorts */
 
 /*dualhead extensions to flags*/
 #define DUALHEAD_OFF (0<<6)
