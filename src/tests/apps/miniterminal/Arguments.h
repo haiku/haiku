@@ -16,6 +16,7 @@ public:
 	void Parse(int argc, const char *const *argv);
 
 	BRect Bounds() const		{ return fBounds; }
+	const char *Title() const	{ return fTitle; }
 	bool StandardShell() const	{ return fStandardShell; }
 	void GetShellArguments(int &argc, const char *const *&argv) const;
 
@@ -26,6 +27,7 @@ private:
 	bool		fStandardShell;
 	int			fShellArgumentCount;
 	const char	**fShellArguments;
+	const char	*fTitle;
 };
 
 

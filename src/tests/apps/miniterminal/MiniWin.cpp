@@ -10,7 +10,7 @@
 #include "MiniWin.h"
 
 MiniWin::MiniWin(const Arguments &args)
-	:	BWindow(args.Bounds(), "MiniTerminal", B_TITLED_WINDOW,
+	:	BWindow(args.Bounds(), args.Title(), B_TITLED_WINDOW,
 			B_QUIT_ON_WINDOW_CLOSE)
 {
 	fView = new MiniView(args);

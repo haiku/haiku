@@ -21,7 +21,8 @@ static const char *kUsage =
 	"  -h, --help           - print this info text\n"
 	"  -l <x> <y>           - open the terminal window at location (<x>, <y>)\n"
 	"  -s <width> <height>  - open the terminal window with width <width> and\n"
-	"                         height <height>)\n";
+	"                         height <height>)\n"
+	"  -t <title>           - set the terminal window title to <title>\n";
 
 // application name
 const char *kAppName = __progname;
@@ -43,7 +44,8 @@ Arguments::Arguments()
 	: fBounds(50, 50, 630, 435),
 	  fStandardShell(true),
 	  fShellArgumentCount(0),
-	  fShellArguments(NULL)
+	  fShellArguments(NULL),
+	  fTitle("MiniTerminal")
 {
 	const char *argv[] = { "/bin/sh", "--login" };
 
@@ -90,6 +92,13 @@ Arguments::Parse(int argc, const char *const *argv)
 
 				fBounds.right = fBounds.left + width;
 				fBounds.bottom = fBounds.top + height;
+
+			} else if (strcmp(arg, "-t") == 0) {
+				// title
+				if (argi >= argc)
+					print_usage_and_exit(true);
+
+				fTitle = argv[argi++];
 
 			} else {
 				// illegal option
