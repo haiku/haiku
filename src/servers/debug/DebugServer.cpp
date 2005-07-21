@@ -122,6 +122,7 @@ private:
 	bool _IsRegistrar() const;
 	bool _IsGUIServer() const;
 
+	static const char *_LastPathComponent(const char *path);
 	static team_id _FindTeam(const char *name);
 	static bool _AreGUIServersAlive();
 
@@ -452,10 +453,23 @@ TeamDebugHandler::_EnterDebugger()
 
 	const char *terminal = (debugInConsoled ? kConsoledPath : kTerminalPath);
 
-	const char *argv[] = {
-		terminal, kGDBPath, fExecutablePath, teamString, NULL
-	};
-	int argc = 4;
+	const char *argv[16];
+	int argc = 0;
+
+	argv[argc++] = terminal;
+
+	if (!debugInConsoled) {
+		char windowTitle[64];
+		snprintf(windowTitle, sizeof(windowTitle), "Debug of Team %ld: %s",
+			fTeam, _LastPathComponent(fExecutablePath));
+		argv[argc++] = "-t";
+		argv[argc++] = windowTitle;
+	}
+
+	argv[argc++] = kGDBPath;
+	argv[argc++] = fExecutablePath;
+	argv[argc++] = teamString;
+	argv[argc] = NULL;
 
 	// start the terminal
 	TRACE(("debug_server: TeamDebugHandler::_EnterDebugger(): starting  "
@@ -782,9 +796,7 @@ TeamDebugHandler::_HandlerThread()
 bool
 TeamDebugHandler::_ExecutableNameEquals(const char *name) const
 {
-	const char *lastSlash = strrchr(fExecutablePath, '/');
-	const char *executableName = (lastSlash ? lastSlash + 1 : fExecutablePath);
-	return (strcmp(executableName, name) == 0);
+	return (strcmp(_LastPathComponent(fExecutablePath), name) == 0);
 }
 
 // _IsAppServer
@@ -814,6 +826,14 @@ TeamDebugHandler::_IsGUIServer() const
 {
 	// app or input server
 	return (_IsAppServer() || _IsInputServer() || _IsRegistrar());
+}
+
+// _LastPathComponent
+const char *
+TeamDebugHandler::_LastPathComponent(const char *path)
+{
+	const char *lastSlash = strrchr(path, '/');
+	return (lastSlash ? lastSlash + 1 : path);
 }
 
 // _FindTeam
