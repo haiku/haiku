@@ -57,11 +57,12 @@ crash_segv2()
 	strcmp(str, "Test");
 }
 
-static void
+static int
 crash_div()
 {
 	int i = 0;
 	i = 1 / i;
+	return i;
 }
 
 static void
