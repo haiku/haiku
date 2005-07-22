@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -289,6 +289,19 @@ ReplaceChange::Merge(DataChange *_change)
 	ReplaceChange *change = dynamic_cast<ReplaceChange *>(_change);
 	if (change == NULL)
 		return false;
+
+	if (change->fOffset + change->fSize == fOffset + fSize && change->fSize == 1) {
+		// this is a special case - the new change changed the last byte of
+		// the old change: we do this since the same byte is changed twice
+		// in hex mode editing.
+		fNewData[fSize - 1] = change->fNewData[0];
+#ifdef TRACE_DATA_EDITOR
+		printf("Merge one byte %p (offset = %Ld, size = %lu):\n", this, fOffset, fSize);
+		dump_block(fOldData, fSize, "old:");
+		dump_block(fNewData, fSize, "new:");
+#endif
+		return true;
+	}
 
 	// are the changes adjacent?
 
@@ -721,9 +734,6 @@ DataEditor::Save()
 void
 DataEditor::RemoveRedos()
 {
-	if (fLastChange == NULL)
-		return;
-
 	int32 start = fChanges.IndexOf(fLastChange) + 1;
 
 	for (int32 i = fChanges.CountItems(); i-- > start; ) {
