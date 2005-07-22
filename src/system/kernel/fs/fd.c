@@ -357,6 +357,10 @@ _user_read(int fd, off_t pos, void *buffer, size_t length)
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (!descriptor)
 		return B_FILE_ERROR;
+	if ((descriptor->open_mode & O_RWMASK) == O_WRONLY) {
+		put_fd(descriptor);
+		return B_FILE_ERROR;
+	}
 
 	if (pos == -1)
 		pos = descriptor->pos;
@@ -392,19 +396,23 @@ _user_readv(int fd, off_t pos, const iovec *userVecs, size_t count)
 	if (!IS_USER_ADDRESS(userVecs))
 		return B_BAD_ADDRESS;
 
+	descriptor = get_fd(get_current_io_context(false), fd);
+	if (!descriptor)
+		return B_FILE_ERROR;
+	if ((descriptor->open_mode & O_RWMASK) == O_WRONLY) {
+		status = B_FILE_ERROR;
+		goto err1;
+	}
+
 	vecs = malloc(sizeof(iovec) * count);
-	if (vecs == NULL)
-		return B_NO_MEMORY;
+	if (vecs == NULL) {
+		status = B_NO_MEMORY;
+		goto err1;
+	}
 
 	if (user_memcpy(vecs, userVecs, sizeof(iovec) * count) < B_OK) {
 		status = B_BAD_ADDRESS;
-		goto err;
-	}
-
-	descriptor = get_fd(get_current_io_context(false), fd);
-	if (!descriptor) {
-		status = B_FILE_ERROR;
-		goto err;
+		goto err2;
 	}
 
 	if (pos == -1)
@@ -429,11 +437,12 @@ _user_readv(int fd, off_t pos, const iovec *userVecs, size_t count)
 	} else
 		bytesRead = B_BAD_VALUE;
 
-	put_fd(descriptor);
 	status = bytesRead;
 
-err:
+err2:
 	free(vecs);
+err1:
+	put_fd(descriptor);
 	return status;
 }
 
@@ -450,6 +459,10 @@ _user_write(int fd, off_t pos, const void *buffer, size_t length)
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (!descriptor)
 		return B_FILE_ERROR;
+	if ((descriptor->open_mode & O_RWMASK) == O_RDONLY) {
+		put_fd(descriptor);
+		return B_FILE_ERROR;
+	}
 
 	if (pos == -1)
 		pos = descriptor->pos;
@@ -485,19 +498,23 @@ _user_writev(int fd, off_t pos, const iovec *userVecs, size_t count)
 	if (!IS_USER_ADDRESS(userVecs))
 		return B_BAD_ADDRESS;
 
+	descriptor = get_fd(get_current_io_context(false), fd);
+	if (!descriptor)
+		return B_FILE_ERROR;
+	if ((descriptor->open_mode & O_RWMASK) == O_RDONLY) {
+		status = B_FILE_ERROR;
+		goto err1;
+	}
+
 	vecs = malloc(sizeof(iovec) * count);
-	if (vecs == NULL)
-		return B_NO_MEMORY;
+	if (vecs == NULL) {
+		status = B_NO_MEMORY;
+		goto err1;
+	}
 
 	if (user_memcpy(vecs, userVecs, sizeof(iovec) * count) < B_OK) {
 		status = B_BAD_ADDRESS;
-		goto err;
-	}
-
-	descriptor = get_fd(get_current_io_context(false), fd);
-	if (!descriptor) {
-		status = B_FILE_ERROR;
-		goto err;
+		goto err2;
 	}
 
 	if (pos == -1)
@@ -522,11 +539,12 @@ _user_writev(int fd, off_t pos, const iovec *userVecs, size_t count)
 	} else
 		bytesWritten = B_BAD_VALUE;
 
-	put_fd(descriptor);
 	status = bytesWritten;
 
-err:
+err2:
 	free(vecs);
+err1:
+	put_fd(descriptor);
 	return status;
 }
 
@@ -661,6 +679,10 @@ _kern_read(int fd, off_t pos, void *buffer, size_t length)
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (!descriptor)
 		return B_FILE_ERROR;
+	if ((descriptor->open_mode & O_RWMASK) == O_WRONLY) {
+		put_fd(descriptor);
+		return B_FILE_ERROR;
+	}
 
 	if (pos == -1)
 		pos = descriptor->pos;
@@ -694,6 +716,10 @@ _kern_readv(int fd, off_t pos, const iovec *vecs, size_t count)
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (!descriptor)
 		return B_FILE_ERROR;
+	if ((descriptor->open_mode & O_RWMASK) == O_WRONLY) {
+		put_fd(descriptor);
+		return B_FILE_ERROR;
+	}
 
 	if (pos == -1)
 		pos = descriptor->pos;
@@ -731,6 +757,10 @@ _kern_write(int fd, off_t pos, const void *buffer, size_t length)
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
+	if ((descriptor->open_mode & O_RWMASK) == O_RDONLY) {
+		put_fd(descriptor);
+		return B_FILE_ERROR;
+	}
 
 	if (pos == -1)
 		pos = descriptor->pos;
@@ -764,6 +794,10 @@ _kern_writev(int fd, off_t pos, const iovec *vecs, size_t count)
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (!descriptor)
 		return B_FILE_ERROR;
+	if ((descriptor->open_mode & O_RWMASK) == O_RDONLY) {
+		put_fd(descriptor);
+		return B_FILE_ERROR;
+	}
 
 	if (pos == -1)
 		pos = descriptor->pos;
