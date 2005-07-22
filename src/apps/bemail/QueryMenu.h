@@ -38,10 +38,14 @@ All rights reserved.
 #include <Locker.h>
 #include <PopUpMenu.h>
 
+#include <vector>
+
 class BLooper;
 class BQuery;
 class BVolume;
 class QHandler;
+
+typedef vector<BQuery *> query_t;
 
 class QueryMenu : public BPopUpMenu {
 	friend QHandler;
@@ -70,7 +74,8 @@ class QueryMenu : public BPopUpMenu {
 		int32 QueryThread(void);
 	
 		BLocker fQueryLock;
-		BQuery *fQuery;
+//		BQuery *fQuery;
+		query_t fQueries;
 		QHandler *fQueryHandler;
 		bool fCancelQuery;
 		bool fPopUp;

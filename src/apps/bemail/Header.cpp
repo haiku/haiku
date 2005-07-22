@@ -49,6 +49,7 @@ All rights reserved.
 #include <StringView.h>
 #include <E-mail.h>
 #include <String.h>
+#include <PopUpMenu.h>
 #include <fs_index.h>
 #include <fs_info.h>
 #include <map>
@@ -76,6 +77,7 @@ extern uint32 gDefaultChain;
 const char	*kDateLabel = "Date:";
 const uint32 kMsgFrom = 'hFrm';
 const uint32 kMsgEncoding = 'encd';
+const uint32 kMsgAddressChosen = 'acsn';
 
 
 class QPopupMenu : public QueryMenu {
@@ -718,7 +720,8 @@ THeaderView::LoadMessage(BEmailMessage *mail)
 
 TTextControl::TTextControl(BRect rect, char *label, BMessage *msg, 
 	bool incoming, bool resending, int32 resizingMode)
-	:	BComboBox(rect, "happy", label, msg, resizingMode)
+	:	BComboBox(rect, "happy", label, msg, resizingMode),
+	fRefDropMenu(NULL)
 	//:BTextControl(rect, "happy", label, "", msg, resizingMode)
 {
 	strcpy(fLabel, label);
@@ -750,75 +753,123 @@ void
 TTextControl::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
-		case B_SIMPLE_DATA:
-			if (!fIncoming || fResending) {
-				BMessage message(REFS_RECEIVED);
-				bool enclosure = false;
-				BString addressList;
-					// Batch up the addresses to be added, since we can only
-					// insert a few times before deadlocking since inserting
-					// sends a notification message to the window BLooper,
-					// which is busy doing this insert.  BeOS message queues
-					// are annoyingly limited in their design.
+		case B_SIMPLE_DATA: {
+			if ((fIncoming == true) && (fResending == false)) return;
+			
+			int32 buttons = -1;
+			BPoint point;
 
-				entry_ref ref;
-				for (int32 index = 0;msg->FindRef("refs", index, &ref) == B_OK; index++) {
-					BFile file(&ref, B_READ_ONLY);
-					if (file.InitCheck() == B_NO_ERROR) {
-						BNodeInfo node(&file);
-						char type[B_FILE_NAME_LENGTH];
-						node.GetType(type);
+			if (msg->FindInt32("buttons", &buttons) != B_OK) {
+				buttons = B_PRIMARY_MOUSE_BUTTON;
+			};
+			if (buttons != B_PRIMARY_MOUSE_BUTTON) {
+				if (msg->FindPoint("_drop_point_", &point) != B_OK) return;
+			};
+		
+			BMessage message(REFS_RECEIVED);
+			bool enclosure = false;
+			BString addressList;
+				// Batch up the addresses to be added, since we can only
+				// insert a few times before deadlocking since inserting
+				// sends a notification message to the window BLooper,
+				// which is busy doing this insert.  BeOS message queues
+				// are annoyingly limited in their design.
 
-						if (fCommand != SUBJECT_FIELD &&
-							!strcmp(type,"application/x-person")) {
-							// add person's E-mail address to the To: field
+			entry_ref ref;
+			for (int32 index = 0;msg->FindRef("refs", index, &ref) == B_OK; index++) {
+				BFile file(&ref, B_READ_ONLY);
+				if (file.InitCheck() == B_NO_ERROR) {
+					BNodeInfo info(&file);
+					char type[B_FILE_NAME_LENGTH];
+					info.GetType(type);
 
-							const char *attr;
+					if (fCommand != SUBJECT_FIELD &&
+						!strcmp(type,"application/x-person")) {
+						// add person's E-mail address to the To: field
+
+						BString attr = "";
+						if (buttons == B_PRIMARY_MOUSE_BUTTON) {
+						
 							if (msg->FindString("attr", &attr) < B_OK)
 								attr = "META:email"; // If not META:email3 etc.
-
-							BString email;
-							ReadAttrString(&file,attr,&email);
-
-							/* we got something... */
-							if (email.Length() > 0) {
-								/* see if we can get a username as well */
-								BString name;
-								ReadAttrString(&file,"META:name",&name);
-
-								BString	address;
-								/* if we have no Name, just use the email address */
-								if (name.Length() == 0)
-									address = email;
-								else {
-									/* otherwise, pretty-format it */
-									address << "\"" << name << "\" <" << email << ">";
-								}
-								if (addressList.Length() > 0)
-									addressList << ", ";
-								addressList << address;
-							}
 						} else {
-							enclosure = true;
-							message.AddRef("refs", &ref);
+							BNode node(&ref);
+							node.RewindAttrs();
+
+							char buffer[B_ATTR_NAME_LENGTH];
+
+							if (fRefDropMenu) delete fRefDropMenu;
+							fRefDropMenu = new BPopUpMenu("RecipientMenu");
+							
+							while (node.GetNextAttrName(buffer) == B_OK) {
+								if (strstr(buffer, "email") <= 0) continue;
+								attr = buffer;
+
+								BString address;
+								ReadAttrString(&node, buffer, &address);
+								if (address.Length() <= 0) continue;
+
+								BMessage *itemMsg = new BMessage(kMsgAddressChosen);
+								itemMsg->AddString("address", address.String());
+								itemMsg->AddRef("ref", &ref);
+
+								BMenuItem *item = new BMenuItem(address.String(),
+									itemMsg);
+								fRefDropMenu->AddItem(item);
+							};
+							
+							if (fRefDropMenu->CountItems() > 1) {
+								fRefDropMenu->SetTargetForItems(this);
+								fRefDropMenu->Go(point, true, true, true);
+								return;
+							} else {
+								delete fRefDropMenu;
+								fRefDropMenu = NULL;
+							};
+						};
+
+						BString email;
+						ReadAttrString(&file,attr.String(),&email);
+
+						/* we got something... */
+						if (email.Length() > 0) {
+							/* see if we can get a username as well */
+							BString name;
+							ReadAttrString(&file,"META:name",&name);
+
+							BString	address;
+							/* if we have no Name, just use the email address */
+							if (name.Length() == 0)
+								address = email;
+							else {
+								/* otherwise, pretty-format it */
+								address << "\"" << name << "\" <" << email << ">";
+							}
+							if (addressList.Length() > 0)
+								addressList << ", ";
+							addressList << address;
 						}
+					} else {
+						enclosure = true;
+						message.AddRef("refs", &ref);
 					}
 				}
-
-				if (addressList.Length() > 0) {
-					BTextView *textView = TextView();
-					int end = textView->TextLength();
-					if (end != 0) {
-						textView->Select(end, end);
-						textView->Insert(", ");
-					}
-					textView->Insert(addressList.String());
-				}
-
-				if (enclosure)
-					Window()->PostMessage(&message, Window());
 			}
+
+			if (addressList.Length() > 0) {
+				BTextView *textView = TextView();
+				int end = textView->TextLength();
+				if (end != 0) {
+					textView->Select(end, end);
+					textView->Insert(", ");
+				}
+				textView->Insert(addressList.String());
+			}
+
+			if (enclosure) Window()->PostMessage(&message, Window());
+
 			break;
+		};
 
 		case M_SELECT:
 		{
@@ -827,6 +878,37 @@ TTextControl::MessageReceived(BMessage *msg)
 				textView->Select(0, textView->TextLength());
 			break;
 		}
+
+		case kMsgAddressChosen: {
+			BString display;
+			BString address;
+			entry_ref ref;
+			
+			if (msg->FindString("address", &address) != B_OK) return;
+			if (msg->FindRef("ref", &ref) != B_OK) return;
+			
+			if (address.Length() > 0) {
+				BString name;
+				BNode node(&ref);
+
+				display = address;
+
+				ReadAttrString(&node, "META:name", &name);
+				if (name.Length() > 0) {
+					display = "";
+					display << "\"" << name << "\" <" << address << ">";
+				};
+
+				BTextView *textView = TextView();
+				int end = textView->TextLength();
+				if (end != 0) {
+					textView->Select(end, end);
+					textView->Insert(", ");
+				};
+				textView->Insert(display.String());
+
+			};
+		} break;
 
 		default:
 			// BTextControl::MessageReceived(msg);

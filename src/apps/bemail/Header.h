@@ -143,6 +143,7 @@ class TTextControl : public BComboBox
 		bool fIncoming;
 		bool fResending;
 		char fLabel[100];
+		BPopUpMenu *fRefDropMenu;
 		int32 fCommand;
 };
 

@@ -106,9 +106,9 @@ QueryMenu::QueryMenu(const char *title, bool popUp, bool radioMode, bool autoRen
 	fQueryLooper->AddHandler(fQueryHandler);
 	fQueryLooper->Unlock();
 
-	BMessenger mercury(fQueryHandler, fQueryLooper);
-	fQuery = new BQuery();
-	fQuery->SetTarget(mercury);
+//	BMessenger mercury(fQueryHandler, fQueryLooper);
+//	fQuery = new BQuery();
+//	fQuery->SetTarget(mercury);
 }
 
 
@@ -116,7 +116,12 @@ QueryMenu::~QueryMenu(void)
 {
 	fCancelQuery = true;
 	fQueryLock.Lock();
-	delete fQuery;
+
+	int32 queries = fQueries.size();
+	for (int i = 0; i < queries; i++) {
+		fQueries[i]->Clear();
+		delete fQueries[i];
+	};
 	fQueryLock.Unlock();
 	
 	fQueryLooper->Lock();
@@ -160,22 +165,52 @@ void QueryMenu::DoQueryMessage(BMessage *msg)
 
 status_t QueryMenu::SetPredicate(const char *expr, BVolume *volume)
 {
-	status_t status;
+//	status_t status;
+
+	if (volume == NULL) {
+		BVolumeRoster roster;
+		BVolume volume;
+		BMessenger mercury(fQueryHandler, fQueryLooper);
+
+		roster.Rewind();
+		while (roster.GetNextVolume(&volume) == B_NO_ERROR) {
+			if ((volume.KnowsQuery() == true) && (volume.KnowsAttr() == true) &&
+				(volume.KnowsMime() == true)) {
+				
+				BQuery *query = new BQuery();
+				if (query->SetVolume(&volume) != B_OK) {
+					delete query;
+					continue;
+				};
+				if (query->SetPredicate(expr) != B_OK) {
+					delete query;
+					continue;
+				};
+				if (query->SetTarget(mercury) != B_OK) {
+					delete query;
+					continue;
+				};
+				
+				fQueries.push_back(query);
+			};
+		};
+	} else {
+	};
 
 	// Set the volume
-	if (volume == NULL)
-	{
-		BVolume bootVolume;
-		BVolumeRoster().GetBootVolume(&bootVolume);
-
-		if ( (status = fQuery->SetVolume(&bootVolume)) != B_OK)
-			return status;
-	}
-	else if ((status = fQuery->SetVolume(volume)) != B_OK)
-		return status;
-	
-	if ((status = fQuery->SetPredicate(expr)) < B_OK)
-		return status;
+//	if (volume == NULL)
+//	{
+//		BVolume bootVolume;
+//		BVolumeRoster().GetBootVolume(&bootVolume);
+//
+//		if ( (status = fQuery->SetVolume(&bootVolume)) != B_OK)
+//			return status;
+//	}
+//	else if ((status = fQuery->SetVolume(volume)) != B_OK)
+//		return status;
+//	
+//	if ((status = fQuery->SetPredicate(expr)) < B_OK)
+//		return status;
 
 	// Force query thread to exit if still running
 	fCancelQuery = true;
@@ -219,17 +254,22 @@ int32 QueryMenu::QueryThread()
 
 	// Begin resolving query
 	fCancelQuery = false;
-	fQuery->Fetch();
-
-	// Build Menu
-	entry_ref ref;
-	node_ref node;
-	while (fQuery->GetNextRef(&ref) == B_OK && !fCancelQuery)
-	{
-		BEntry entry(&ref);
-		entry.GetNodeRef(&node);
-		EntryCreated(ref, node.node);
-	}
+	int32 queries = fQueries.size();
+	for (int i = 0; i < queries; i++) {
+		BQuery *query = fQueries[i];
+	
+		query->Fetch();
+	
+		// Build Menu
+		entry_ref ref;
+		node_ref node;
+		while (query->GetNextRef(&ref) == B_OK && !fCancelQuery)
+		{
+			BEntry entry(&ref);
+			entry.GetNodeRef(&node);
+			EntryCreated(ref, node.node);
+		}
+	};
 
 	// Remove the group separator if there are no groups or no items without groups
 	BMenuItem *item;
@@ -272,8 +312,9 @@ void QueryMenu::EntryCreated(const entry_ref &ref, ino_t node)
 	msg->AddRef("refs", &ref);
 	msg->AddInt64("node", node);
 	item = new BMenuItem(ref.name, msg);
-	if (fTargetHandler)
+	if (fTargetHandler) {
 		item->SetTarget(fTargetHandler);
+	};
 	AddItem(item);
 }
 
