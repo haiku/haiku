@@ -19,7 +19,7 @@ resource app_version
 	internal = 3,
 
 	short_info = "DiskProbe",
-	long_info = "DiskProbe 1.0.0 ©2004 Haiku"
+	long_info = "DiskProbe 1.0.0 ©2004-2005 Haiku"
 };
 
 resource(101, "BEOS:L:STD_ICON") #'ICON' array
