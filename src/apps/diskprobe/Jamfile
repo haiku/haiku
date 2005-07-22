@@ -9,12 +9,6 @@ if ! $(DANO_COMPATIBLE) {
 	SubDirC++Flags $(defines) ;
 }
 
-local r5_src = strlcpy.c ;
-
-if $(HAIKU_COMPATIBLE) {
-	r5_src = ;
-}
-
 App DiskProbe :
 	DiskProbe.cpp
 	DataEditor.cpp
@@ -26,7 +20,6 @@ App DiskProbe :
 	ProbeView.cpp
 	OpenWindow.cpp
 	FindWindow.cpp
-	$(r5_src)
 	: libbe.so libtracker.so libtranslation.so
 	: DiskProbe.rdef
 	;
@@ -34,7 +27,3 @@ App DiskProbe :
 if $(HAIKU_COMPATIBLE) {
 	LinkSharedOSLibs DiskProbe : libroot.so ;
 }
-
-SEARCH on [ FGristFiles
-                strlcpy.c
-        ] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
