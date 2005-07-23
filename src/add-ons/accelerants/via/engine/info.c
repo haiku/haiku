@@ -78,40 +78,16 @@ void set_specs(void)
 	LOG(8,("INFO: setting up card specifications\n"));
 
 	/* set failsave speeds */
-	switch (si->ps.card_type)
+	switch (si->ps.card_arch)
 	{
 	case CLE266:
-		pins_cle266_fake();
-		break;
-	case NV05:
-	case NV05M64:
-		pinsnv5_nv5m64_fake();
-		break;
-	case NV06:
-		pinsnv6_fake();
-		break;
 	default:
-		switch (si->ps.card_arch)
-		{
-		case NV10A:
-			pinsnv10_arch_fake();
-			break;
-		case NV20A:
-			pinsnv20_arch_fake();
-			break;
-		case NV30A:
-		case NV40A:
-			pinsnv30_arch_fake();
-			break;
-		default:
-			/* 'failsafe' values... */
-			pinsnv10_arch_fake();
-			break;
-		}
+		pins_cle266_fake();
 		break;
 	}
 
 	/* detect reference crystal frequency and dualhead */
+/*
 	switch (si->ps.card_arch)
 	{
 	case NV04A:
@@ -121,6 +97,7 @@ void set_specs(void)
 		getstrap_arch_nv10_20_30_40();
 		break;
 	}
+*/
 }
 
 /* this routine presumes the card was coldstarted by the card's BIOS for panel stuff */
