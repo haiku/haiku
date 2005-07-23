@@ -13,12 +13,12 @@
 #define _SERVERAPP_H_
 
 
-#include <OS.h>
-#include <String.h>
-#include <PortLink.h>
-
+#include "MessageLooper.h"
 #include "SubWindowList.h"
 #include "BGet++.h"
+
+#include <String.h>
+
 
 class AreaPool;
 class BMessage;
@@ -36,92 +36,76 @@ namespace BPrivate {
 	\class ServerApp ServerApp.h
 	\brief Counterpart to BApplication within the app_server
 */
-class ServerApp {
-public:
-	ServerApp(port_id clientAppPort, port_id clientLooperPort,
-		team_id clientTeamID, int32 handlerID, const char* signature);
-	~ServerApp();
+class ServerApp : public MessageLooper {
+	public:
+		ServerApp(port_id clientAppPort, port_id clientLooperPort,
+			team_id clientTeamID, int32 handlerID,
+			const char* signature);
+		virtual ~ServerApp();
 
-	status_t InitCheck();
-	bool Run();
-	void Quit(sem_id shutdownSemaphore = -1);
+		status_t InitCheck();
+		virtual bool Run();
+		void Quit(sem_id shutdownSemaphore = -1);
 
-	/*!
-		\brief Determines whether the application is the active one
-		\return true if active, false if not.
-	*/
-	bool IsActive(void) const { return fIsActive; }
-	void Activate(bool value);
+		/*!
+			\brief Determines whether the application is the active one
+			\return true if active, false if not.
+		*/
+		bool IsActive(void) const { return fIsActive; }
+		void Activate(bool value);
 
-	bool PingTarget(void);
+		void SendMessageToClient(const BMessage* msg) const;
 
-	void PostMessage(int32 code);
-	void SendMessageToClient(const BMessage* msg) const;
+		void SetAppCursor(void);
 
-	void SetAppCursor(void);
+		team_id	ClientTeam() const;
+		const char *Signature() const { return fSignature.String(); }
 
-	team_id	ClientTeam() const;
-	thread_id Thread() const;
+		void RemoveWindow(ServerWindow* window);
 
-	const char *Signature() const { return fSignature.String(); }
+		int32 CountBitmaps() const;
+		ServerBitmap *FindBitmap(int32 token) const;
 
-	void RemoveWindow(ServerWindow* window);
+		int32 CountPictures() const;
+		ServerPicture *FindPicture(int32 token) const;
 
-	int32 CountBitmaps() const;
-	ServerBitmap *FindBitmap(int32 token) const;
+		AreaPool *AppAreaPool() { return &fSharedMem; }
 
-	int32 CountPictures() const;
-	ServerPicture *FindPicture(int32 token) const;
+		// ToDo: public?
+		SubWindowList fAppSubWindowList;
 
-	AreaPool *AppAreaPool() { return &fSharedMem; }
+	private:
+		virtual void _DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
+		virtual void _MessageLooper();
+		virtual void _GetLooperName(char* name, size_t size);
+		virtual port_id _MessagePort() const { return fMessagePort; }
 
-	SubWindowList fAppSubWindowList;
+		port_id	fMessagePort;
+		port_id	fClientReplyPort;	
+			// our BApplication's event port
 
-private:
-	void _DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
-	void _MessageLooper();
+		port_id	fClientLooperPort;
+		int32 fClientToken;
+			// To send a BMessage to the client (port + token)
 
-	static int32 _message_thread(void *data);	
+		BString fSignature;
+		team_id fClientTeam;
 
-	// our BApplication's event port
-	port_id	fClientReplyPort;	
-	// port we receive messages from our BApplication
-	port_id	fMessagePort;
-			// TODO: find out why there is both the app port and the looper port. Do 
-			// we really need both? Actually, we aren't using any of these ports,
-			// as BAppServerLink/BPortlink's messages always contain the reply port
-	// To send a message to the client, write a BMessage to this port
-	port_id	fClientLooperPort;
+		BLocker fWindowListLock;
+		BList fWindowList;
 
-	BString fSignature;
+		// TODO:
+		// - Are really Bitmaps and Pictures stored per application and not globally ?
+		// - As we reference these stuff by token, what about putting them in hash tables ?
+		BList fBitmapList;
+		BList fPictureList;
 
-	thread_id fThread;
-	team_id fClientTeam;
+		ServerCursor *fAppCursor;
+		bool fCursorHidden;
 
-	BPrivate::PortLink fLink;
+		bool fIsActive;
 
-	BLocker fWindowListLock;
-	BList fWindowList;
-
-	// TODO:
-	// - Are really Bitmaps and Pictures stored per application and not globally ?
-	// - As we reference these stuff by token, what about putting them in hash tables ?
-	BList fBitmapList;
-	BList fPictureList;
-
-	ServerCursor *fAppCursor;
-
-	bool fCursorHidden;
-	bool fIsActive;
-	
-	// token ID of the BApplication's BHandler object.
-	// Used for BMessage target specification
-	// TODO: Is it still needed ? We aren't using it.
-	//int32 fHandlerToken;
-
-	AreaPool fSharedMem;
-
-	bool fQuitting;
+		AreaPool fSharedMem;
 };
 
 #endif	// _SERVERAPP_H_

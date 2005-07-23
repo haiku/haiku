@@ -22,6 +22,7 @@
 #include <String.h>
 #include <Window.h>
 
+#include "MessageLooper.h"
 #include "SubWindowList.h"
 #include "TokenSpace.h"
 
@@ -52,7 +53,7 @@ struct window_info;
 	coordinating and linking a window's WinBorder half with its messaging half, dispatching 
 	mouse and key events from the server to its window, and other such things.
 */
-class ServerWindow : public BLocker {
+class ServerWindow : public MessageLooper {
 public:
 								ServerWindow(const char *title, ServerApp *app,
 									port_id clientPort, port_id looperPort, 
@@ -62,14 +63,12 @@ public:
 			status_t			Init(BRect frame, uint32 look,
 									 uint32 feel, uint32 flags,
 									 uint32 workspace);
-			bool				Run();
-			void				Quit();
+	virtual bool				Run();
+	virtual void				Quit();
 
 			void				ReplaceDecorator();
 			void				Show();
 			void				Hide();
-
-			void				PostMessage(int32 code);
 
 			// methods for sending various messages to client.
 			void				NotifyQuitRequested();
@@ -102,7 +101,6 @@ public:
 
 			// related thread/team_id(s).
 	inline	team_id				ClientTeam() const { return fClientTeam; }
-	inline	thread_id			Thread() const { return fThread; }
 
 			// server "private" - try not to use.
 	inline	int32				ClientToken() const { return fHandlerToken; }
@@ -123,8 +121,8 @@ private:
 			void				_DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
 			void				_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link);
 			void				_MessageLooper();
-
-	static	int32				_message_thread(void *_window);
+			virtual void		_GetLooperName(char* name, size_t size);
+			virtual port_id		_MessagePort() const { return fMessagePort; }
 
 			// TODO: Move me elsewhere
 			status_t			PictureToRegion(ServerPicture *picture,
@@ -139,14 +137,10 @@ private:
 			WinBorder*			fWinBorder;
 
 			team_id				fClientTeam;
-			thread_id			fThread;
 
 			port_id				fMessagePort;
 			port_id				fClientReplyPort;
 			port_id				fClientLooperPort;
-
-			BPrivate::PortLink	fLink;
-			bool				fQuitting;
 
 			BMessage			fClientViewsWithInvalidCoords;
 

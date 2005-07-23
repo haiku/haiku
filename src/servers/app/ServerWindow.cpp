@@ -76,7 +76,7 @@ static const uint32 kMsgWindowQuit = 'winQ';
 */
 ServerWindow::ServerWindow(const char *title, ServerApp *app,
 						   port_id clientPort, port_id looperPort, int32 handlerID)
-	: BLocker(title && *title ? title : "Unnamed Window"),
+	: MessageLooper(title && *title ? title : "Unnamed Window"),
 	fTitle(title),
 	fServerApp(app),
 	fWinBorder(NULL),
@@ -84,7 +84,6 @@ ServerWindow::ServerWindow(const char *title, ServerApp *app,
 	fMessagePort(-1),
 	fClientReplyPort(clientPort),
 	fClientLooperPort(looperPort),
-	fQuitting(false),
 	fClientViewsWithInvalidCoords(B_VIEW_RESIZED),
 	fHandlerToken(handlerID),
 	fCurrentLayer(NULL)
@@ -145,21 +144,8 @@ ServerWindow::Init(BRect frame, uint32 look, uint32 feel, uint32 flags, uint32 w
 bool
 ServerWindow::Run()
 {
-	BAutolock locker(this);
-
-	char name[B_OS_NAME_LENGTH];
-	snprintf(name, sizeof(name), "w:%ld:%s", ClientTeam(), Title());
-
-	// Spawn our message-monitoring thread
-	fThread = spawn_thread(_message_thread, name, B_NORMAL_PRIORITY, this);
-	if (fThread < B_OK)
+	if (!MessageLooper::Run())
 		return false;
-
-	if (resume_thread(fThread) != B_OK) {
-		kill_thread(fThread);
-		fThread = -1;
-		return false;
-	}
 
 	// Send a reply to our window - it is expecting fMessagePort
 	// port and some other info
@@ -206,16 +192,10 @@ ServerWindow::Quit()
 }
 
 
-/*!
-	\brief Send a message to the ServerWindow with no attachments
-	\param code ID code of the message to post
-*/
 void
-ServerWindow::PostMessage(int32 code)
+ServerWindow::_GetLooperName(char* name, size_t length)
 {
-	BPrivate::LinkSender link(fMessagePort);
-	link.StartMessage(code);
-	link.Flush();
+	snprintf(name, length, "w:%ld:%s", ClientTeam(), Title());
 }
 
 
@@ -2128,19 +2108,6 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 	}
 
 	driver->ConstrainClippingRegion(NULL);
-}
-
-/*!
-	\brief Message-dispatching loop starter
-	\param data The thread's ServerWindow
-*/
-int32
-ServerWindow::_message_thread(void *_window)
-{
-	ServerWindow *window = (ServerWindow *)_window;
-
-	window->_MessageLooper();
-	return 0;
 }
 
 

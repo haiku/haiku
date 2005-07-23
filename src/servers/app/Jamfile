@@ -76,6 +76,7 @@ Server app_server :
 	PicturePlayer.cpp
 	PNGDump.cpp
 	RAMLinkMsgReader.cpp
+	MessageLooper.cpp
 
 	# Manager Classes
 	CursorManager.cpp

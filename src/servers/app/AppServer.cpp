@@ -236,6 +236,9 @@ int32
 AppServer::PicassoThread(void *data)
 {
 	while (!sAppServer->fQuitting) {
+		// TODO: we don't need to do this anymore - dead apps are
+		//	detected automatically
+#if 0
 		sAppServer->fAppListLock.Lock();
 
 		for (int32 i = 0;;) {
@@ -247,6 +250,7 @@ AppServer::PicassoThread(void *data)
 		}
 
 		sAppServer->fAppListLock.Unlock();
+#endif
 		// we do this every second so as not to suck *too* many CPU cycles
 		snooze(1000000);
 	}

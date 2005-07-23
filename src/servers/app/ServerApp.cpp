@@ -79,20 +79,18 @@ static const uint32 kMsgAppQuit = 'appQ';
 */
 ServerApp::ServerApp(port_id clientReplyPort, port_id clientLooperPort,
 	team_id clientTeam, int32 handlerID, const char* signature)
-	:
-	fClientReplyPort(clientReplyPort),
+	: MessageLooper("application"),
 	fMessagePort(-1),
+	fClientReplyPort(clientReplyPort),
 	fClientLooperPort(clientLooperPort),
+	fClientToken(handlerID),
 	fSignature(signature),
-	fThread(-1),
 	fClientTeam(clientTeam),
 	fWindowListLock("window list"),
 	fAppCursor(NULL),
 	fCursorHidden(false),
 	fIsActive(false),
-	//fHandlerToken(handlerID),
-	fSharedMem("shared memory"),
-	fQuitting(false)
+	fSharedMem("shared memory")
 {
 	if (fSignature == "")
 		fSignature = "application/no-signature";
@@ -230,20 +228,8 @@ ServerApp::InitCheck()
 bool
 ServerApp::Run()
 {
-	fQuitting = false;
-
-	// Unlike a BApplication, a ServerApp is *supposed* to return immediately
-	// when its Run() function is called.	
-	fThread = spawn_thread(_message_thread, Signature(), B_NORMAL_PRIORITY, this);
-	if (fThread < B_OK)
+	if (!MessageLooper::Run())
 		return false;
-
-	if (resume_thread(fThread) != B_OK) {
-		fQuitting = true;
-		kill_thread(fThread);
-		fThread = -1;
-		return false;
-	}
 
 	// Let's tell the client how to talk with us
 	fLink.StartMessage(SERVER_TRUE);
@@ -279,48 +265,6 @@ ServerApp::Quit(sem_id shutdownSemaphore)
 
 
 /*!
-	\brief Pings the target app to make sure it's still working
-	\return true if target is still "alive" and false if "He's dead, Jim." 
-	"But that's impossible..."
-
-	This function is called by the app_server thread to ensure that
-	the target app still exists. We do this not by sending a message
-	but by calling get_port_info. We don't want to send ping messages
-	just because the app might simply be hung. If this is the case, it
-	should be up to the user to kill it. If the app has been killed, its
-	ports will be invalid. Thus, if get_port_info returns an error, we
-	tell the app_server to delete the respective ServerApp.
-*/
-bool
-ServerApp::PingTarget()
-{
-	// ToDo: this function doesn't make any sense; if the client dies we are
-	//	aware of it anyway at this point. This would only make sense if we
-	//	actually send the team a message to see if it's still responsive.
-	team_info info;
-	if (get_team_info(fClientTeam, &info) != B_OK) {
-		BPrivate::LinkSender link(gAppServerPort);
-		link.StartMessage(AS_DELETE_APP);
-		link.Attach(&fThread, sizeof(thread_id));
-		link.Flush();
-		return false;
-	}
-	return true;
-}
-
-/*!
-	\brief Send a message to the ServerApp with no attachments
-	\param code ID code of the message to post
-*/
-void
-ServerApp::PostMessage(int32 code)
-{
-	BPrivate::LinkSender link(fMessagePort);
-	link.StartMessage(code);
-	link.Flush();
-}
-
-/*!
 	\brief Send a message to the ServerApp's BApplication
 	\param msg The message to send
 */
@@ -337,6 +281,7 @@ ServerApp::SendMessageToClient(const BMessage *msg) const
 
 	delete [] buffer;
 }
+
 
 /*!
 	\brief Sets the ServerApp's active status
@@ -365,17 +310,15 @@ ServerApp::SetAppCursor(void)
 }
 
 
-/*!
-	\brief The thread function ServerApps use to monitor messages
-	\param data Pointer to the thread's ServerApp object
-*/
-int32
-ServerApp::_message_thread(void *_app)
+void
+ServerApp::_GetLooperName(char* name, size_t length)
 {
-	ServerApp *app = (ServerApp *)_app;
-
-	app->_MessageLooper();
-	return 0;
+#ifdef __HAIKU__
+	strlcpy(name, Signature(), length);
+#else
+	strncpy(name, Signature(), length);
+	name[length - 1] = '\0';
+#endif
 }
 
 
@@ -2305,12 +2248,5 @@ team_id
 ServerApp::ClientTeam() const
 {
 	return fClientTeam;
-}
-
-
-thread_id
-ServerApp::Thread() const
-{
-	return fThread;
 }
 
