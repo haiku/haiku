@@ -183,16 +183,20 @@ status_t eng_dac_set_pix_pll(display_mode target)
 	}
 
 	/*reprogram (disable,select,wait for stability,enable)*/
-//	DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0x0F)|0x04);  /*disable the PIXPLL*/
-//	DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0x0C)|0x01);  /*select the PIXPLL*/
 
 	/* program new frequency */
-//fixme: add K8M800 programming and calcs!! (these differ, plus extended) <<<<<
 	if (si->ps.card_arch != K8M800)
 	{
 		/* fixme: b7 is a lock-indicator or a filter select: to be determined! */
 		SEQW(PPLL_N_CLE, (n & 0x7f));
 		SEQW(PPLL_MP_CLE, ((m & 0x3f) | ((p & 0x03) << 6)));
+	}
+	else
+	{
+		/* fixme: preliminary, still needs to be confirmed */
+		SEQW(PPLL_N_OTH, (n & 0x7f));
+		SEQW(PPLL_M_OTH, (m & 0x3f));
+		SEQW(PPLL_P_OTH, (p & 0x03));
 	}
 
 	/* Wait for the PIXPLL frequency to lock until timeout occurs */
@@ -222,6 +226,7 @@ status_t eng_dac_set_pix_pll(display_mode target)
 status_t eng_dac_pix_pll_find
 	(display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test)
 {
+	//fixme: add K8M800 calcs if needed..
 	switch (si->ps.card_type) {
 		default:   return cle266_km400_dac_pix_pll_find(target, calc_pclk, m_result, n_result, p_result, test);
 	}
