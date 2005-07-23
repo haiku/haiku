@@ -1,0 +1,16 @@
+SubDir OBOS_TOP src add-ons media plugins mp4_reader ;
+
+UsePrivateHeaders media ;
+
+Addon mp4_reader : media plugins :
+	mp4_reader.cpp
+	:
+	false
+	:
+	libmp4reader.a
+	libz.a
+;
+
+LinkSharedOSLibs mp4_reader : be libmedia.so ;
+
+SubInclude OBOS_TOP src add-ons media plugins mp4_reader libMP4 ;

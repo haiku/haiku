@@ -1,0 +1,8 @@
+SubDir OBOS_TOP src add-ons media plugins mp4_reader libMP4 ;
+
+StaticLibrary mp4reader :
+	MP4Parser.cpp
+	MP4FileReader.cpp
+	MP4Atom.cpp
+	MP4TrakAtom.cpp
+;

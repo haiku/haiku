@@ -1,0 +1,8 @@
+Quicktime Reader TODO
+1.  Correct known issues
+2.  Performance improvements by precalculating some meta data
+
+KNOWN ISSUES
+Edits lists are ignored the track is played start to finish regardless of edit lists
+MP3 sound tracks create a noise at irregular intervals (too little data supplied to decoder?)
+IMA4 sound tracks repeat (no idea)

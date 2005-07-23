@@ -17,6 +17,7 @@ SubInclude OBOS_TOP src add-ons media plugins avcodec ;
 SubInclude OBOS_TOP src add-ons media plugins vorbis ;
 SubInclude OBOS_TOP src add-ons media plugins speex ;
 SubInclude OBOS_TOP src add-ons media plugins mov_reader ;
+SubInclude OBOS_TOP src add-ons media plugins mp4_reader ;
 
 # The following add-ons are GPL licensed, and can only be used with
 # software whose license is GPL compatible. To include these GPL
