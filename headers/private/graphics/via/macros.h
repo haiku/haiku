@@ -651,6 +651,9 @@
 #define ENSEQX_MSIZE_OTHER	0x39
 #define ENSEQX_0x44			0x44
 #define ENSEQX_0x45			0x45
+#define ENSEQX_PPLL_P_OTH	0x44
+#define ENSEQX_PPLL_M_OTH	0x45
+#define ENSEQX_PPLL_N_OTH	0x46
 #define ENSEQX_PPLL_MP_CLE	0x46
 #define ENSEQX_PPLL_N_CLE	0x47
 //end new via.
