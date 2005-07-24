@@ -557,6 +557,8 @@ ViewHWInterface::GetModeList(display_mode **_modes, uint32 *_count)
 {
 	AutoReadLocker _(this);
 
+#if 1
+	// setup a whole bunch of different modes
 	const struct resolution { int32 width, height; } resolutions[] = {
 		{640, 480}, {800, 600}, {1024, 768}, {1152, 864}, {1280, 960},
 		{1280, 1024}, {1400, 1050}, {1600, 1200}
@@ -592,13 +594,17 @@ ViewHWInterface::GetModeList(display_mode **_modes, uint32 *_count)
 			index++;
 		}
 	}
-/*	display_mode *modes = new(nothrow) display_mode[1];
+#else
+	// support only a single mode, useful
+	// for testing a specific mode
+	display_mode *modes = new(nothrow) display_mode[1];
 	modes[0].virtual_width = 640;
 	modes[0].virtual_height = 480;
 	modes[0].space = B_CMAP8;
 
 	*_modes = modes;
-	*_count = 1;*/
+	*_count = 1;
+#endif
 
 	return B_OK;
 }
