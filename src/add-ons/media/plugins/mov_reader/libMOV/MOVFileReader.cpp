@@ -39,6 +39,7 @@ MOVFileReader::MOVFileReader(BPositionIO *pStream)
 	// Find Size of Stream, need to rethink this for non seekable streams
 	theStream->Seek(0,SEEK_END);
 	StreamSize = theStream->Position();
+	
 	theStream->Seek(0,SEEK_SET);
 	TotalChildren = 0;
 	
@@ -49,6 +50,19 @@ MOVFileReader::~MOVFileReader()
 {
 	theStream = NULL;
 	theMVHDAtom = NULL;
+}
+
+bool MOVFileReader::IsEndOfData(off_t pPosition)
+{
+AtomBase	*aAtomBase;
+
+	aAtomBase = GetChildAtom(uint32('mdat'),0);
+	if (aAtomBase) {
+		MDATAtom *aMdatAtom = dynamic_cast<MDATAtom *>(aAtomBase);
+		return pPosition >= aMdatAtom->getEOF();
+	}
+	
+	return true;
 }
 
 bool MOVFileReader::IsEndOfFile(off_t pPosition)
@@ -332,6 +346,28 @@ uint64	MOVFileReader::getOffsetForFrame(uint32 stream_index, uint32 pFrameNo)
 	return 0;
 }
 
+void	MOVFileReader::BuildSuperIndex()
+{
+AtomBase *aAtomBase;
+
+	for (uint32 stream=0;stream<getStreamCount();stream++) {
+		aAtomBase = GetChildAtom(uint32('trak'),stream);
+		if (aAtomBase) {
+			TRAKAtom *aTrakAtom = dynamic_cast<TRAKAtom *>(aAtomBase);
+			for (uint32 chunkid=1;chunkid<=aTrakAtom->getTotalChunks();chunkid++) {
+				theChunkSuperIndex.AddChunkIndex(stream,chunkid,aTrakAtom->getOffsetForChunk(chunkid));
+			}
+		}
+	}
+	
+	// Add end of file to index
+	aAtomBase = GetChildAtom(uint32('mdat'),0);
+	if (aAtomBase) {
+		MDATAtom *aMdatAtom = dynamic_cast<MDATAtom *>(aAtomBase);
+		theChunkSuperIndex.AddChunkIndex(0,0,aMdatAtom->getEOF());
+	}
+}
+
 status_t	MOVFileReader::ParseFile()
 {
 	AtomBase *aChild;
@@ -346,6 +382,8 @@ status_t	MOVFileReader::ParseFile()
 	for (uint32 i=0;i<TotalChildren;i++) {
 		atomChildren[i]->DisplayAtoms();
 	}
+	
+	BuildSuperIndex();
 	
 	return B_OK;
 }
@@ -514,21 +552,28 @@ uint32	MOVFileReader::getChunkSize(uint32 stream_index, uint32 pFrameNo)
 		if (IsAudio(stream_index)) {
 
 			// We read audio in chunk by chunk so chunk size is chunk size
-			uint32 ChunkNo = pFrameNo;
-			
+			uint32	ChunkNo 	= pFrameNo;
+			off_t	Chunk_Start = aTrakAtom->getOffsetForChunk(ChunkNo);
+			uint32	ChunkSize 	= ChunkSize = theChunkSuperIndex.getChunkSize(stream_index,ChunkNo,Chunk_Start);			
+			uint32	NoSamples	= aTrakAtom->getNoSamplesInChunk(ChunkNo);
+			uint32	TotalSampleSize = 0;
+
 			// Get first sample in chunk
 			uint32 SampleNo = aTrakAtom->getFirstSampleInChunk(ChunkNo);
 
-			uint32 ChunkSize = 0;
 			if (aTrakAtom->IsSingleSampleSize()) {
-				ChunkSize = aTrakAtom->getNoSamplesInChunk(ChunkNo) * aTrakAtom->getSizeForSample(SampleNo);
+				TotalSampleSize = NoSamples * aTrakAtom->getSizeForSample(SampleNo);
 			} else {
 				// Add up all sample sizes in chunk			
-				for (uint32 i=0;i<aTrakAtom->getNoSamplesInChunk(ChunkNo);i++) {
-					ChunkSize += aTrakAtom->getSizeForSample(SampleNo);
+				for (uint32 i=0;i<NoSamples;i++) {
+					TotalSampleSize += aTrakAtom->getSizeForSample(SampleNo);
 					SampleNo++;
 				}
 			}
+			
+			TotalSampleSize = TotalSampleSize * aTrakAtom->getBytesPerSample();
+			
+//			printf("[%ld] start %lld, size %ld NoSamples %ld TotalSampleSize %ld\n",ChunkNo,Chunk_Start,ChunkSize,NoSamples,TotalSampleSize);
 			
 			return ChunkSize;
 		}
@@ -568,7 +613,7 @@ bool	MOVFileReader::GetNextChunkInfo(uint32 stream_index, uint32 pFrameNo, off_t
 		*keyframe = IsKeyFrame(stream_index, pFrameNo);
 	}
 
-	return ((*start > 0) && (*size > 0) && !(IsEndOfFile(*start)));
+	return ((*start > 0) && (*size > 0) && !(IsEndOfFile(*start + *size)) && !(IsEndOfData(*start + *size)));
 }
 
 bool	MOVFileReader::IsActive(uint32 stream_index)

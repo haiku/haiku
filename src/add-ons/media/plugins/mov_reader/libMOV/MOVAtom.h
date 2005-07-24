@@ -101,6 +101,8 @@ public:
 	
 	uint64	getAtomSize() {return atomSize;};
 	uint32	getAtomType() {return atomType;};
+	off_t	getAtomOffset() {return atomOffset;};
+	off_t	getStreamOffset() {return streamOffset;};
 	
 	uint64	getBytesRemaining();
 	

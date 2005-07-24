@@ -4,5 +4,5 @@ Quicktime Reader TODO
 
 KNOWN ISSUES
 Edits lists are ignored the track is played start to finish regardless of edit lists
-MP3 sound tracks create a noise at irregular intervals (too little data supplied to decoder?)
-IMA4 sound tracks repeat (no idea)
+IMA4 sound tracks stop too early
+Seeking will not work for compressed audio

@@ -516,11 +516,12 @@ uint32	STSCAtom::getNoSamplesInChunk(uint32 pChunkID)
 {
 	for (uint32 i=0;i<theHeader.NoEntries;i++) {
 		if (theSampleToChunkArray[i]->FirstChunk > pChunkID) {
+//			printf("Chunk %ld contains %ld samples\n",pChunkID, theSampleToChunkArray[i-1]->SamplesPerChunk);
 			return theSampleToChunkArray[i-1]->SamplesPerChunk;
 		}
 	}
 	
-	return 0;
+	return theSampleToChunkArray[theHeader.NoEntries-1]->SamplesPerChunk;
 }
 
 uint32	STSCAtom::getFirstSampleInChunk(uint32 pChunkID)
@@ -646,6 +647,7 @@ SampleSize	*aSampleSize;
 
 char *STSZAtom::OnGetAtomName()
 {
+	printf("%ld ",theHeader.SampleSize);
 	return "Sample Size Atom";
 }
 
@@ -720,7 +722,7 @@ uint64	STCOAtom::getOffsetForChunk(uint32 pChunkID)
 	DEBUGGER(("Bad Chunk ID %ld / %ld\n",pChunkID,theHeader.NoEntries));
 
 	TRESPASS();
-	return theChunkToOffsetArray[0]->Offset;
+	return -1LL;
 }
 
 STSDAtom::STSDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
@@ -779,6 +781,7 @@ void STSDAtom::ReadSoundDescription()
 	aSoundDescriptionV1->desc.SampleRate = B_BENDIAN_TO_HOST_INT32(aSoundDescriptionV1->desc.SampleRate);
 
 	if (aSoundDescriptionV1->desc.Version == 1) {
+		printf("V1 Sound\n");
 		theStream->Read(&(aSoundDescriptionV1->samplesPerPacket),4);
 		theStream->Read(&(aSoundDescriptionV1->bytesPerPacket),4);
 		theStream->Read(&(aSoundDescriptionV1->bytesPerFrame),4);
@@ -791,11 +794,17 @@ void STSDAtom::ReadSoundDescription()
 				
 		descBytesLeft = descBytesLeft - 16;
 	} else {
+		printf("V0 Sound\n");
 		// Calculate?
-		aSoundDescriptionV1->samplesPerPacket = 0;
-		aSoundDescriptionV1->bytesPerPacket = 0;
-		aSoundDescriptionV1->bytesPerFrame = 0;
-		aSoundDescriptionV1->bytesPerSample = 0;
+		aSoundDescriptionV1->bytesPerSample = aSoundDescriptionV1->desc.SampleSize / 8;
+		if (aSoundDescriptionV1->basefields.DataFormat == 'ima4') {
+			printf("IMA4\n");
+			aSoundDescriptionV1->bytesPerFrame = aSoundDescriptionV1->desc.NoOfChannels * 64 / 34;
+		} else {
+			aSoundDescriptionV1->bytesPerFrame = aSoundDescriptionV1->desc.NoOfChannels * aSoundDescriptionV1->bytesPerSample;
+		}
+		aSoundDescriptionV1->bytesPerPacket = aSoundDescriptionV1->desc.PacketSize;
+		aSoundDescriptionV1->samplesPerPacket = aSoundDescriptionV1->desc.PacketSize / aSoundDescriptionV1->bytesPerFrame;
 	}
 
 	// 0 means we dont have one
@@ -1041,6 +1050,11 @@ void MDATAtom::OnProcessMetaData()
 char *MDATAtom::OnGetAtomName()
 {
 	return "Media Data Atom";
+}
+
+off_t	MDATAtom::getEOF()
+{
+	return getStreamOffset() + getAtomSize();
 }
 
 MINFAtom::MINFAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomContainer(pStream, pstreamOffset, patomType, patomSize)

@@ -194,6 +194,7 @@ public:
 	char	*OnGetAtomName();
 	
 	uint64	getOffsetForChunk(uint32 pChunkID);
+	uint32	getTotalChunks() {return theHeader.NoEntries;};
 
 protected:
 	// Read a single chunk offset from Stream
@@ -250,7 +251,7 @@ public:
 	virtual	~MDATAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
-	
+	off_t	getEOF();
 };
 
 // Atom class for reading the sdst atom
@@ -361,9 +362,13 @@ public:
 	uint32	getFirstSampleInChunk(uint32 pChunkID);
 	uint32	getSizeForSample(uint32 pSample);
 	uint32	getNoSamplesInChunk(uint32 pChunkID);
+	uint32	getTotalChunks();
+	
 	bool	IsSyncSample(uint32 pSampleNo);
 	bool	IsSingleSampleSize();
 	bool	IsActive();
+	
+	uint32	getBytesPerSample();
 	
 	TKHDAtom	*getTKHDAtom();
 	MDHDAtom	*getMDHDAtom();
@@ -372,6 +377,7 @@ private:
 	MDHDAtom	*theMDHDAtom;
 	
 	uint32		framecount;
+	uint32		bytespersample;
 };
 
 // Atom class for reading the media container atom

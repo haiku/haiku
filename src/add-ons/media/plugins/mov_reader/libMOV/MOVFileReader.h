@@ -31,6 +31,7 @@
 #include <SupportDefs.h>
 
 #include "MOVParser.h"
+#include "ChunkSuperIndex.h"
 
 // QT MOV file reader (and maybe MP4 as well)
 class MOVFileReader {
@@ -56,6 +57,10 @@ private:
 	
 	MVHDAtom	*theMVHDAtom;
 
+	ChunkSuperIndex	theChunkSuperIndex;
+	
+	void	BuildSuperIndex();
+
 public:
 			MOVFileReader(BPositionIO *pStream);
 	virtual	~MOVFileReader();
@@ -65,6 +70,7 @@ public:
 
 	bool	IsEndOfFile(off_t pPosition);
 	bool	IsEndOfFile();
+	bool	IsEndOfData(off_t pPosition);
 	
 	// Is this a quicktime file
 	static bool	IsSupported(BPositionIO *source);

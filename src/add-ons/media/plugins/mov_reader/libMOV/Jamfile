@@ -5,4 +5,5 @@ StaticLibrary movreader :
 	MOVFileReader.cpp
 	MOVAtom.cpp
 	MOVTrakAtom.cpp
+	ChunkSuperIndex.cpp
 ;
