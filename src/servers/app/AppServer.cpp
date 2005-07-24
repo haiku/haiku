@@ -69,9 +69,6 @@ port_id gAppServerPort;
 
 static AppServer *sAppServer;
 
-//! Default background color for workspaces
-//RGBColor workspace_default_color(51,102,160);
-
 //! System-wide GUI color object
 ColorSet gGUIColorSet;
 
@@ -168,16 +165,17 @@ AppServer::AppServer() :
 
 	gScreenManager = new ScreenManager();
 
-	// Set up the Desktop
-	gDesktop = new Desktop();
-	gDesktop->Init();
-	gDesktop->Run();
-
-	// TODO: Maybe this is not the best place for this
+	// the system palette needs to be initialized before the desktop,
+	// since it is used there already
 	InitializeColorMap();
 	
 	// Create the bitmap allocator. Object declared in BitmapManager.cpp
 	gBitmapManager = new BitmapManager();
+
+	// Set up the Desktop
+	gDesktop = new Desktop();
+	gDesktop->Init();
+	gDesktop->Run();
 
 	// Spawn our thread-monitoring thread
 	fPicassoThreadID = spawn_thread(PicassoThread, "picasso", B_NORMAL_PRIORITY, this);
