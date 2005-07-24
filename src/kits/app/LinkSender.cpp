@@ -305,6 +305,7 @@ static const char *kASCodeNames[] = {
 	"AS_CREATE_APP",
 	"AS_DELETE_APP",
 	"AS_QUIT_APP",
+	"AS_ACTIVATE_APP",
 	"AS_SET_SERVER_PORT",
 	"AS_CREATE_WINDOW",
 	"AS_DELETE_WINDOW",

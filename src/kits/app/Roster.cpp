@@ -47,10 +47,12 @@
 #include <NodeInfo.h>
 #include <OS.h>
 #include <Path.h>
+#include <PortLink.h>
 #include <Query.h>
 #include <RegistrarDefs.h>
 #include <Roster.h>
 #include <RosterPrivate.h>
+#include <ServerProtocol.h>
 #include <Volume.h>
 
 using namespace std;
@@ -756,7 +758,53 @@ BRoster::StopWatching(BMessenger target) const
 status_t
 BRoster::ActivateApp(team_id team) const
 {
-	return B_ERROR;	// not implemented
+	// get the app server port
+	port_id port = find_port(SERVER_PORT_NAME);
+	if (port < B_OK)
+		return port;
+
+	// create a reply port
+	struct ReplyPort {
+		ReplyPort()
+			: port(create_port(1, "activate app reply"))
+		{
+		}
+
+		~ReplyPort()
+		{
+			if (port >= 0)
+				delete_port(port);
+		}
+
+		port_id port;
+
+	} replyPort;
+
+	if (replyPort.port < 0)
+		return replyPort.port;
+
+	BPrivate::PortLink link(port, replyPort.port);
+
+	// prepare the message
+	status_t error = link.StartMessage(AS_ACTIVATE_APP);
+	if (error != B_OK)
+		return error;
+
+	error = link.Attach(replyPort.port);
+	if (error != B_OK)
+		return error;
+
+	error = link.Attach(team);
+	if (error != B_OK)
+		return error;
+
+	// send it
+	int32 code;
+	error = link.FlushWithReply(code);
+	if (error != B_OK)
+		return error;
+
+	return code;
 }
 
 // Launch
@@ -1788,36 +1836,6 @@ DBG(OUT("  resume thread: %s (%lx)\n", strerror(error), error));
 		*appTeam = (error == B_OK ? team : -1);
 DBG(OUT("BRoster::xLaunchAppPrivate() done: %s (%lx)\n", strerror(error), error));
 	return error;
-}
-
-// UpdateActiveApp
-/*!	\brief Tells the registrar that a certain team is active now.
-
-	It doesn't matter, if the application is already active. In that case,
-	the registrar does nothing. Otherwise, the previously active application
-	is notified, that it is no longer active now, the now active application
-	is notified, that it is active now, and all watchers are notified, too.
-
-	\param team The app's team ID.
-	\return \c true, if everything went fine, \c false, if an error occured
-			(the team ID is unknown or an communication error occured).
-*/
-bool
-BRoster::UpdateActiveApp(team_id team) const
-{
-	status_t error = (team >= 0 ? (status_t)B_OK : (status_t)B_BAD_TEAM_ID);
-	// compose the request message
-	BMessage request(B_REG_ACTIVATE_APP);
-	if (error == B_OK)
-		error = request.AddInt32("team", team);
-	// send the request
-	BMessage reply;
-	if (error == B_OK)
-		error = fMess.SendMessage(&request, &reply);
-	// evaluate the reply
-	if (error == B_OK && reply.what != B_REG_SUCCESS)
-		reply.FindInt32("error", &error);
-	return (error == B_OK);
 }
 
 // SetAppFlags

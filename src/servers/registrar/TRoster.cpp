@@ -703,10 +703,12 @@ TRoster::HandleActivateApp(BMessage *request)
 	BAutolock _(fLock);
 
 	status_t error = B_OK;
+
 	// get the parameters
 	team_id team;
 	if (request->FindInt32("team", &team) != B_OK)
 		error = B_BAD_VALUE;
+
 	// activate the app
 	if (error == B_OK) {
 		if (RosterAppInfo *info = fRegisteredApps.InfoFor(team))
@@ -714,14 +716,17 @@ TRoster::HandleActivateApp(BMessage *request)
 		else
 			error = B_BAD_TEAM_ID;
 	}
+
 	// reply to the request
-	if (error == B_OK) {
-		BMessage reply(B_REG_SUCCESS);
-		request->SendReply(&reply);
-	} else {
-		BMessage reply(B_REG_ERROR);
-		reply.AddInt32("error", error);
-		request->SendReply(&reply);
+	if (request->IsSourceWaiting()) {
+		if (error == B_OK) {
+			BMessage reply(B_REG_SUCCESS);
+			request->SendReply(&reply);
+		} else {
+			BMessage reply(B_REG_ERROR);
+			reply.AddInt32("error", error);
+			request->SendReply(&reply);
+		}
 	}
 
 	FUNCTION_END();
@@ -1193,7 +1198,7 @@ TRoster::RemoveApp(RosterAppInfo *info)
 // ActivateApp
 /*!	\brief Activates the application identified by \a info.
 
-	The currently activate application is deactivated and the one whose
+	The currently active application is deactivated and the one whose
 	info is supplied is activated. \a info may be \c NULL, which only
 	deactivates the currently active application.
 

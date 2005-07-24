@@ -607,6 +607,38 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 			break;
 		}
 
+		case AS_ACTIVATE_APP:
+		{
+			// Someone is requesting to activation of a certain app.
+
+			// Attached data:
+			// 1) port_id reply port
+			// 2) team_id team
+
+			status_t error = B_OK;
+
+			// get the parameters
+			port_id replyPort;
+			team_id team;
+			if (msg.Read(&replyPort) < B_OK
+				|| msg.Read(&team) < B_OK) {
+				error = B_ERROR;
+			}
+
+			// activate one of the app's windows.
+			if (error == B_OK) {
+				// TODO: ...
+				error = B_BAD_TEAM_ID;
+			}
+
+			// send the reply
+			BPrivate::PortLink replyLink(replyPort);
+			replyLink.StartMessage(error);
+			replyLink.Flush();
+
+			break;
+		}
+
 		default:
 			STRACE(("Server::MainLoop received unexpected code %ld (offset %ld)\n",
 				code, code - SERVER_TRUE));

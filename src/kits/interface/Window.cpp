@@ -2400,11 +2400,6 @@ BWindow::setFocus(BView *focusView, bool notifyInputServer)
 void
 BWindow::handleActivation(bool active)
 {
-	if (active) {
-		// TODO: talk to Ingo to make BWindow a friend for BRoster	
-		// be_roster->UpdateActiveApp( be_app->Team() );
-	}
-
 	WindowActivated(active);
 
 	// recursively call hook function 'WindowActivated(bool)'
