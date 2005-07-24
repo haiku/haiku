@@ -55,6 +55,23 @@ MessageLooper::Run()
 void
 MessageLooper::Quit()
 {
+	fQuitting = true;
+	_PrepareQuit();
+
+	if (fThread < B_OK) {
+		// thread has not been started yet
+		delete this;
+		return;
+	}
+
+	if (fThread == find_thread(NULL)) {
+		// called from our message looper
+		delete this;
+		exit_thread(0);
+	} else {
+		// called from a different thread
+		PostMessage(kMsgQuitLooper);
+	}
 }
 
 
@@ -68,6 +85,13 @@ MessageLooper::PostMessage(int32 code)
 	BPrivate::LinkSender link(_MessagePort());
 	link.StartMessage(code);
 	link.Flush();
+}
+
+
+void
+MessageLooper::_PrepareQuit()
+{
+	// to be implemented by subclasses
 }
 
 

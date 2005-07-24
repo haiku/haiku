@@ -26,6 +26,7 @@ class MessageLooper : public BLocker {
 		thread_id		Thread() const { return fThread; }
 
 	private:
+		virtual void	_PrepareQuit();
 		virtual void	_GetLooperName(char* name, size_t length);
 		virtual void	_DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
 		virtual void	_MessageLooper();
@@ -38,5 +39,7 @@ class MessageLooper : public BLocker {
 		BPrivate::PortLink fLink;
 		bool			fQuitting;
 };
+
+static const uint32 kMsgQuitLooper = 'quit';
 
 #endif	/* MESSAGE_LOOPER_H */

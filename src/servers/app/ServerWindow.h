@@ -44,15 +44,6 @@ struct window_info;
 #define AS_UPDATE_COLORS 'asuc'
 #define AS_UPDATE_FONTS 'asuf'
 
-/*!
-	\class ServerWindow ServerWindow.h
-	\brief Shadow BWindow class
-	
-	A ServerWindow handles all the intraserver tasks required of it by its BWindow. There are 
-	too many tasks to list as being done by them, but they include handling View transactions, 
-	coordinating and linking a window's WinBorder half with its messaging half, dispatching 
-	mouse and key events from the server to its window, and other such things.
-*/
 class ServerWindow : public MessageLooper {
 public:
 								ServerWindow(const char *title, ServerApp *app,
@@ -64,7 +55,6 @@ public:
 									 uint32 feel, uint32 flags,
 									 uint32 workspace);
 	virtual bool				Run();
-	virtual void				Quit();
 
 			void				ReplaceDecorator();
 			void				Show();
@@ -121,8 +111,9 @@ private:
 			void				_DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
 			void				_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link);
 			void				_MessageLooper();
-			virtual void		_GetLooperName(char* name, size_t size);
-			virtual port_id		_MessagePort() const { return fMessagePort; }
+	virtual void				_PrepareQuit();
+	virtual void				_GetLooperName(char* name, size_t size);
+	virtual port_id				_MessagePort() const { return fMessagePort; }
 
 			// TODO: Move me elsewhere
 			status_t			PictureToRegion(ServerPicture *picture,

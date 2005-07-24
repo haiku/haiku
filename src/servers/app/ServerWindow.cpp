@@ -10,6 +10,16 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
+/*!
+	\class ServerWindow
+	\brief Shadow BWindow class
+
+	A ServerWindow handles all the intraserver tasks required of it by its BWindow. There are 
+	too many tasks to list as being done by them, but they include handling View transactions, 
+	coordinating and linking a window's WinBorder half with its messaging half, dispatching 
+	mouse and key events from the server to its window, and other such things.
+*/
+
 #include <new>
 
 #include <AppDefs.h>
@@ -63,9 +73,6 @@
 #else
 #	define DTRACE(x) ;
 #endif
-
-
-static const uint32 kMsgWindowQuit = 'winQ';
 
 
 /*!
@@ -168,27 +175,15 @@ ServerWindow::Run()
 
 
 void
-ServerWindow::Quit()
+ServerWindow::_PrepareQuit()
 {
-	fQuitting = true;
-
-	if (fThread < B_OK) {
-		delete this;
-		return;
-	}
-
 	if (fThread == find_thread(NULL)) {
 		// make sure we're hidden
 		Hide();
 
 		App()->RemoveWindow(this);
-
-		delete this;
-		exit_thread(0);
-	} else {
+	} else if (fThread >= B_OK)
 		PostMessage(AS_HIDE_WINDOW);
-		PostMessage(kMsgWindowQuit);
-	}
 }
 
 
@@ -2141,7 +2136,7 @@ ServerWindow::_MessageLooper()
 
 		switch (code) {
 			case AS_DELETE_WINDOW:
-			case kMsgWindowQuit:
+			case kMsgQuitLooper:
 				// this means the client has been killed
 				STRACE(("ServerWindow %s received 'AS_DELETE_WINDOW' message code\n",
 					Title()));
