@@ -171,6 +171,7 @@ AppServer::AppServer() :
 	// Set up the Desktop
 	gDesktop = new Desktop();
 	gDesktop->Init();
+	gDesktop->Run();
 
 	// TODO: Maybe this is not the best place for this
 	InitializeColorMap();

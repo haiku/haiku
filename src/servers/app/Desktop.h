@@ -15,6 +15,7 @@
 #include "ServerScreen.h"
 #include "VirtualScreen.h"
 #include "DesktopSettings.h"
+#include "MessageLooper.h"
 
 #include <InterfaceDefs.h>
 #include <List.h>
@@ -36,7 +37,7 @@ namespace BPrivate {
 };
 
 
-class Desktop : public BLocker, public ScreenOwner {
+class Desktop : public MessageLooper, public ScreenOwner {
  public:
 	// startup methods
 								Desktop();
@@ -86,10 +87,15 @@ class Desktop : public BLocker, public ScreenOwner {
 			void				WriteWindowInfo(int32 serverToken, BPrivate::LinkSender& sender);
 
  private:
+	virtual void				_GetLooperName(char* name, size_t size);
+	virtual port_id				_MessagePort() const { return fMessagePort; }
+
+ private:
 			friend class DesktopSettings;
 
 			::VirtualScreen		fVirtualScreen;
 			DesktopSettings::Private* fSettings;
+			port_id				fMessagePort;
 			BList				fWinBorderList;
 
 			RootLayer*			fRootLayer;

@@ -57,11 +57,18 @@
 
 
 Desktop::Desktop()
-	:
+	: MessageLooper("desktop"),
 	fSettings(new DesktopSettings::Private()),
 	fWinBorderList(64),
 	fActiveScreen(NULL)
 {
+	// TODO: use user name
+	char name[B_OS_NAME_LENGTH];
+	snprintf(name, sizeof(name), "d:%s", "baron");
+
+	fMessagePort = create_port(DEFAULT_MONITOR_PORT_SIZE, name);
+	if (fMessagePort < B_OK)
+		return;
 }
 
 
@@ -72,6 +79,8 @@ Desktop::~Desktop()
 
 	delete fRootLayer;
 	delete fSettings;
+
+	delete_port(fMessagePort);
 }
 
 
@@ -94,6 +103,13 @@ Desktop::Init()
 	ServerCursor *cursor = fRootLayer->GetCursorManager().GetCursor(B_CURSOR_DEFAULT);
 	if (cursor)
 		fVirtualScreen.HWInterface()->SetCursor(cursor);
+}
+
+
+void
+Desktop::_GetLooperName(char* name, size_t length)
+{
+	snprintf(name, length, "d:%d:%s", /*id*/0, /*name*/"baron");
 }
 
 
