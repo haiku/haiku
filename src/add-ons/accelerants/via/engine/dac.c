@@ -111,10 +111,9 @@ status_t eng_dac_palette(uint8 r[256],uint8 g[256],uint8 b[256])
 	/* loop through all 256 to program DAC */
 	for (i = 0; i < 256; i++)
 	{
-		/* the 6 implemented bits are on b0-b5 of the bus */
-		ENG_REG8(RG8_PALDATA) = (r[i] >> 2);
-		ENG_REG8(RG8_PALDATA) = (g[i] >> 2);
-		ENG_REG8(RG8_PALDATA) = (b[i] >> 2);
+		ENG_REG8(RG8_PALDATA) = r[i];
+		ENG_REG8(RG8_PALDATA) = g[i];
+		ENG_REG8(RG8_PALDATA) = b[i];
 	}
 	if (ENG_REG8(RG8_PALINDW) != 0x00)
 	{
@@ -129,11 +128,11 @@ if (1)
 	ENG_REG8(RG8_PALINDR) = 0x00;
 	for (i = 0; i < 256; i++)
 	{
-		R = (ENG_REG8(RG8_PALDATA) << 2);
-		G = (ENG_REG8(RG8_PALDATA) << 2);
-		B = (ENG_REG8(RG8_PALDATA) << 2);
+		R = ENG_REG8(RG8_PALDATA);
+		G = ENG_REG8(RG8_PALDATA);
+		B = ENG_REG8(RG8_PALDATA);
 		/* only compare the most significant 6 bits */
-		if (((r[i] & 0xfc) != R) || ((g[i] & 0xfc) != G) || ((b[i] & 0xfc) != B)) 
+		if ((r[i] != R) || (g[i] != G) || (b[i] != B)) 
 			LOG(1,("DAC palette %d: w %x %x %x, r %x %x %x\n", i, r[i], g[i], b[i], R, G, B)); // apsed
 	}
  }

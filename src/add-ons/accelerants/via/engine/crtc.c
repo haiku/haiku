@@ -424,8 +424,11 @@ status_t eng_crtc_depth(int mode)
 
 	/* set VCLK scaling */
 	/* genctrl bit use:
-		b7:	 PAL assignment stuff (color-lookup (0) versus gamma (1))?
-			 %1 = very dark image (tested 8-bit mode)
+		b7:	 %0 = PAL is 6-bit wide (on b0-5)
+			 %1 = PAL is 8-bit wide
+			Note:
+				3123Ax chips only support 6-bits. If we support that chip,
+				update PAL programming!
 		b6:	 ?
 		b5:	 %0 = distortions (stripes) only (tested 8-bit mode)
 			 %1 = OK
@@ -443,7 +446,7 @@ status_t eng_crtc_depth(int mode)
 	{
 	case BPP8:
 		/* indexed mode */
-		genctrl = 0x22; //%0010 0010
+		genctrl = 0xa2; //%1010 0010
 		break;
 	case BPP15:
 		/* direct mode */
