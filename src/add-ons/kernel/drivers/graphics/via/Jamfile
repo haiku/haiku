@@ -10,7 +10,7 @@ R5KernelAddon via.driver : kernel drivers bin :
 Package haiku-via_gfx-cvs :
 	README.html UPDATE.html ;
 Package haiku-via_gfx-cvs :
-	skel.driver : 
+	via.driver : 
 	boot home config add-ons kernel drivers bin ;
 Package haiku-via_gfx-cvs :
 	<kernel!drivers!dev!graphics>via.driver :
