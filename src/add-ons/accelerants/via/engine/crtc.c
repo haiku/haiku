@@ -424,9 +424,11 @@ status_t eng_crtc_depth(int mode)
 
 	/* set VCLK scaling */
 	/* genctrl bit use:
-		b7:	 ?
+		b7:	 PAL assignment stuff (color-lookup (0) versus gamma (1))?
+			 %1 = very dark image (tested 8-bit mode)
 		b6:	 ?
-		b5:	 ?
+		b5:	 %0 = distortions (stripes) only (tested 8-bit mode)
+			 %1 = OK
 		b4:  %0 = 15-bit color in 2 bytes/pixel mode;
 			 %1 = 16-bit color in 2 bytes/pixel mode.
 		b3-2:%00 = 1 byte /pixel;
@@ -453,8 +455,8 @@ status_t eng_crtc_depth(int mode)
 		break;
 	case BPP24:
 		/* direct mode */
-		//fixme: complete guess..
-		genctrl = 0x0a; //%0000 1010
+		//fixme? this is a guess..
+		genctrl = 0xaa; //%1010 1010
 		break;
 	case BPP32:
 		/* direct mode */
