@@ -1,27 +1,20 @@
 SubDir OBOS_TOP src tests servers registrar ;
 
+local libbe ;
+if $(TARGET_PLATFORM) = r5 {
+	libbe = libopenbeos.so ;
+} else {
+	libbe = be ;
+}
+
 SimpleTest RegistrarTest1
 	: RegistrarTest1.cpp
 	: <boot!home!config!lib>libopenbeos.so be
 ;
 
-# RosterShell isn't really a unit test, but using CommonUnitTest we can
-# easily build a R5 version as well, which is quite useful. We'll have to
-# change it back, when we start dealing with (OBOS) roster internals (if
-# ever).
-
-#SimpleTest RosterShell
-#	: RosterShell.cpp
-#	: <boot!home!config!lib>libopenbeos.so
-#	  be stdc++.r4
-#;
-
-CommonUnitTest RosterShell
+SimpleTest RosterShell
 	: RosterShell.cpp
-	: servers registrar
-	: <boot!home!config!lib>libopenbeos.so be stdc++.r4
-	: be stdc++.r4
-	: app
+	: $(libbe) stdc++.r4
 ;
 
 SimpleTest message_deliverer_test : message_deliverer_test.cpp
@@ -46,13 +39,6 @@ if $(TARGET_PLATFORM) = r5 {
 }
 
 # Two small test apps for testing the shutdown process.
-
-local libbe ;
-if $(TARGET_PLATFORM) = r5 {
-	libbe = libopenbeos.so ;
-} else {
-	libbe = be ;
-}
 
 SimpleTest no_shutdown_reply
 	: no_shutdown_reply.cpp
