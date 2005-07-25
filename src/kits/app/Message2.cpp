@@ -22,38 +22,33 @@
 #include <stdio.h>
 #include <ctype.h>
 
+#include <Message2.h>
 #include <Application.h>
 #include <BlockCache.h>
 #include <ByteOrder.h>
 #include <DataIO.h>
 #include <Errors.h>
-#include <Message.h>
 #include <Messenger.h>
 #include <MessengerPrivate.h>
 #include <String.h>
 
 #include <AppMisc.h>
 #include <KMessage.h>
-#include <MessageUtils.h>
+#include <MessageUtils2.h>
 #include <TokenSpace.h>
 
 #include "MessageBody2.h"
-
+#include "MessageField2.h"
 #include "dano_message.h"
-
-static const uint32 kMessageMagic = 'FOB1';
-static const uint32 kMessageMagicSwapped = '1BOF';
-
-static const uint32 kMessageMagicDano = 'FOB2';
-static const uint32 kMessageMagicDanoSwapped = '2BOF';
 
 // flags for the overall message (the bitfield is 1 byte)
 #define MSG_FLAG_BIG_ENDIAN		0x01
 #define MSG_FLAG_INCL_TARGET	0x02
 #define MSG_FLAG_INCL_REPLY		0x04
 #define MSG_FLAG_SCRIPT_MSG		0x08
-// These are for future improvement
+
 #if 0
+// These are for future improvement
 #define MSG_FLAG_USE_PREFERRED	0x10
 #define MSG_FLAG_REPLY_WANTED	0x20
 #define MSG_FLAG_REPLY_DONE		0x40
@@ -65,79 +60,74 @@ static const uint32 kMessageMagicDanoSwapped = '2BOF';
 #define MSG_HEADER_MAX_SIZE		38
 #define MSG_NAME_MAX_SIZE		256
 
-// Globals ---------------------------------------------------------------------
-
 using namespace BPrivate;
+
+static const uint32 kMessageMagic = 'FOB1';
+static const uint32 kMessageMagicSwapped = '1BOF';
+static const uint32 kMessageMagicDano = 'FOB2';
+static const uint32 kMessageMagicDanoSwapped = '2BOF';
 
 const char* B_SPECIFIER_ENTRY = "specifiers";
 const char* B_PROPERTY_ENTRY = "property";
 const char* B_PROPERTY_NAME_ENTRY = "name";
 
-BBlockCache* BMessage::sMsgCache = NULL;
+BBlockCache *BMessage::sMsgCache = NULL;
 port_id BMessage::sReplyPorts[sNumReplyPorts];
 long BMessage::sReplyPortInUse[sNumReplyPorts];
 
+static status_t		handle_reply(port_id replyPort, int32 *pCode,
+						bigtime_t timeout, BMessage *reply);
+static status_t		convert_message(const KMessage *fromMessage,
+						BMessage *toMessage);
+static ssize_t		min_hdr_size();
 
-static status_t handle_reply(port_id   reply_port,
-                             int32*    pCode,
-                             bigtime_t timeout,
-                             BMessage* reply);
-
-static status_t convert_message(const KMessage *fromMessage,
-	BMessage *toMessage);
-
-static ssize_t min_hdr_size();
-
-
-// #pragma mark -
 
 class BMessage::Header {
 public:
-	Header() {}
-	Header(const BMessage &message) { ReadFrom(message); }
+					Header() {};
+					Header(const BMessage &message) { ReadFrom(message); };
 
-	status_t SetMagic(uint32 magic);
+		status_t	SetMagic(uint32 magic);
 
-	status_t ReadFrom(BDataIO &stream);
-	void ReadFrom(const BMessage &message);
-	status_t WriteTo(BDataIO &stream, bool calculateCheckSum = true) const;
-	void WriteTo(BMessage &message) const;
+		status_t	ReadFrom(BDataIO &stream);
+		void		ReadFrom(const BMessage &message);
+		status_t	WriteTo(BDataIO &stream, bool calculateCheckSum = true) const;
+		void		WriteTo(BMessage &message) const;
 
-	uint32	CalculateCheckSum() const;
-	uint32	CalculateHeaderSize() const;
+		uint32		CalculateCheckSum() const;
+		uint32		CalculateHeaderSize() const;
 
-	bool IsSwapped() const { return fSwapped; }
+		bool		IsSwapped() const { return fSwapped; };
+		bool		HasTarget() const { return (fFlags & MSG_FLAG_INCL_TARGET); };
+		void		SetTarget(int32 token, bool preferred);
 
-	bool HasTarget() const { return (fFlags & MSG_FLAG_INCL_TARGET); }
-	void SetTarget(int32 token, bool preferred);
-
-	void Dump() const;
+		void		Dump() const;
 
 private:
-	uint32	fMagic;
-	int32	fBodySize;
-	uint32	fWhat;
-	uint8	fFlags;
-	int32	fTargetToken;
-	port_id	fReplyPort;
-	int32	fReplyToken;
-	team_id	fReplyTeam;
-	bool	fPreferredTarget;
-	bool	fReplyRequired;
-	bool	fReplyDone;
-	bool	fIsReply;
-	bool	fSwapped;
+		uint32		fMagic;
+		int32		fBodySize;
+		uint32		fWhat;
+		uint8		fFlags;
+		int32		fTargetToken;
+		port_id		fReplyPort;
+		int32		fReplyToken;
+		team_id		fReplyTeam;
+		bool		fPreferredTarget;
+		bool		fReplyRequired;
+		bool		fReplyDone;
+		bool		fIsReply;
+		bool		fSwapped;
 };
 
 
 status_t
 BMessage::Header::SetMagic(uint32 magic)
 {
-	if (magic == kMessageMagicSwapped) {
+	if (magic == kMessageMagicSwapped)
 		fSwapped = true;
-	} else if (magic == kMessageMagic) {
+	else if (magic == kMessageMagic)
 		fSwapped = false;
-	} else {
+	else {
 		// This is *not* a message
 		return B_NOT_A_MESSAGE;
 	}
@@ -147,7 +137,6 @@ BMessage::Header::SetMagic(uint32 magic)
 }
 
 
-// ReadFrom
 status_t
 BMessage::Header::ReadFrom(BDataIO &stream)
 {
@@ -165,23 +154,26 @@ BMessage::Header::ReadFrom(BDataIO &stream)
 		read_helper(checkSum);
 		// get the size
 		read_helper(flattenedSize);
-		checksum_helper.Cache(flattenedSize);
-		// Get the what
+		// get the what
 		read_helper(fWhat);
-		checksum_helper.Cache(fWhat);
-		// Get the flags
+		// get the flags
 		read_helper(fFlags);
+
+		checksum_helper.Cache(flattenedSize);
+		checksum_helper.Cache(fWhat);
 		checksum_helper.Cache(fFlags);
 
 		if (fFlags & MSG_FLAG_BIG_ENDIAN) {
-			// TODO: ???
-			// Isn't this already indicated by the byte order of the message version?
+			// TODO: isn't this already indicated by the byte order of the
+			//	message version?
 		}
+
 		if (fFlags & MSG_FLAG_INCL_TARGET) {
 			// Get the target data
 			read_helper(fTargetToken);
 			checksum_helper.Cache(fTargetToken);
 		}
+
 		if (fFlags & MSG_FLAG_INCL_REPLY) {
 			// Get the reply port
 			read_helper(fReplyPort);
@@ -191,19 +183,19 @@ BMessage::Header::ReadFrom(BDataIO &stream)
 			checksum_helper.Cache(fReplyToken);
 			checksum_helper.Cache(fReplyTeam);
 
-			// Get the "big flags"
+			// get the "big flags"
 			uint8 bigFlags;
-			// Get the preferred flag
+			// get the preferred flag
 			read_helper(bigFlags);
 			checksum_helper.Cache(bigFlags);
 			fPreferredTarget = bigFlags;
 
-			// Get the reply requirement flag
+			// get the reply requirement flag
 			read_helper(bigFlags);
 			checksum_helper.Cache(bigFlags);
 			fReplyRequired = bigFlags;
 
-			// Get the reply done flag
+			// get the reply done flag
 			read_helper(bigFlags);
 			checksum_helper.Cache(bigFlags);
 			fReplyDone = bigFlags;
@@ -213,8 +205,8 @@ BMessage::Header::ReadFrom(BDataIO &stream)
 			checksum_helper.Cache(bigFlags);
 			fIsReply = bigFlags;
 		}
-	} catch (status_t& e) {
-		return e;
+	} catch (status_t &error) {
+		return error;
 	}
 
 	fBodySize = flattenedSize - CalculateHeaderSize();
@@ -225,7 +217,7 @@ BMessage::Header::ReadFrom(BDataIO &stream)
 	return B_OK;
 }
 
-// ReadFrom
+
 void
 BMessage::Header::ReadFrom(const BMessage &message)
 {
@@ -239,13 +231,16 @@ BMessage::Header::ReadFrom(const BMessage &message)
 #endif
 	if (message.HasSpecifiers())
 		fFlags |= MSG_FLAG_SCRIPT_MSG;
+
 	if (message.fTarget != B_NULL_TOKEN)
 		fFlags |= MSG_FLAG_INCL_TARGET;
+
 	if (message.fReplyTo.port >= 0 &&
 		message.fReplyTo.target != B_NULL_TOKEN &&
 		message.fReplyTo.team >= 0) {
 		fFlags |= MSG_FLAG_INCL_REPLY;
 	}
+
 	fTargetToken = message.fTarget;
 	fReplyPort = message.fReplyTo.port;
 	fReplyToken = message.fReplyTo.target;
@@ -256,100 +251,78 @@ BMessage::Header::ReadFrom(const BMessage &message)
 	fIsReply = message.fIsReply;
 }
 
-// WriteTo
+
 status_t
 BMessage::Header::WriteTo(BDataIO &stream, bool calculateCheckSum) const
 {
-	status_t err = B_OK;
-	int32 data;
+	try {
+		// write the version of the binary data format
+		int32 data = fMagic;
+		write_helper(&stream, (const void *)&data, sizeof(data));
 
-	// Write the version of the binary data format
-	data = fMagic;
-	write_helper(&stream, (const void*)&data, sizeof (data), err);
-	if (!err) {
 		// compute checksum
 		data = (calculateCheckSum ? CalculateCheckSum() : 0);
-		write_helper(&stream, (const void*)&data, sizeof (data), err);
-	}
-	if (!err) {
-		// Write the flattened size of the entire message
+		write_helper(&stream, (const void *)&data, sizeof(data));
+
+		// write the flattened size of the entire message
 		data = CalculateHeaderSize() + fBodySize;
-		write_helper(&stream, (const void*)&data, sizeof (data), err);
-	}
-	if (!err) {
-		// Write the 'what' member
-		write_helper(&stream, (const void*)&fWhat, sizeof (fWhat), err);
-	}
-	if (!err) {
-		// Write the header flags
-		write_helper(&stream, (const void*)&fFlags, sizeof (fFlags), err);
-	}
+		write_helper(&stream, (const void *)&data, sizeof(data));
 
-	// Write targeting info if necessary
-	if (!err && (fFlags & MSG_FLAG_INCL_TARGET)) {
-		data = fPreferredTarget ? B_PREFERRED_TOKEN : fTargetToken;
-		write_helper(&stream, (const void*)&data, sizeof (data), err);
-	}
+		// write the 'what' member
+		write_helper(&stream, (const void *)&fWhat, sizeof(fWhat));
 
-	// Write reply info if necessary
-	if (!err && (fFlags & MSG_FLAG_INCL_REPLY)) {
-		write_helper(&stream, (const void*)&fReplyPort, sizeof(fReplyPort),
-			err);
-		if (!err) {
-			write_helper(&stream, (const void*)&fReplyToken,
-						 sizeof(fReplyToken), err);
-		}
-		if (!err) {
-			write_helper(&stream, (const void*)&fReplyTeam,
-						 sizeof(fReplyTeam), err);
+		// write the header flags
+		write_helper(&stream, (const void *)&fFlags, sizeof(fFlags));
+
+		// write targeting info if necessary
+		if (fFlags & MSG_FLAG_INCL_TARGET) {
+			data = fPreferredTarget ? B_PREFERRED_TOKEN : fTargetToken;
+			write_helper(&stream, (const void *)&data, sizeof(data));
 		}
 
-		uint8 bigFlags;
-		if (!err) {
+		// write reply info if necessary
+		if (fFlags & MSG_FLAG_INCL_REPLY) {
+			write_helper(&stream, (const void *)&fReplyPort, sizeof(fReplyPort));
+			write_helper(&stream, (const void *)&fReplyToken, sizeof(fReplyToken));
+			write_helper(&stream, (const void *)&fReplyTeam, sizeof(fReplyTeam));
+
+			uint8 bigFlags;
 			bigFlags = fPreferredTarget ? 1 : 0;
-			write_helper(&stream, (const void*)&bigFlags, sizeof(bigFlags),
-				err);
-		}
-		if (!err)
-		{
+			write_helper(&stream, (const void *)&bigFlags, sizeof(bigFlags));
+
 			bigFlags = fReplyRequired ? 1 : 0;
-			write_helper(&stream, (const void*)&bigFlags, sizeof(bigFlags),
-				err);
-		}
-		if (!err)
-		{
+			write_helper(&stream, (const void *)&bigFlags, sizeof(bigFlags));
+
 			bigFlags = fReplyDone ? 1 : 0;
-			write_helper(&stream, (const void*)&bigFlags, sizeof(bigFlags),
-				err);
-		}
-		if (!err)
-		{
+			write_helper(&stream, (const void *)&bigFlags, sizeof(bigFlags));
+
 			bigFlags = fIsReply ? 1 : 0;
-			write_helper(&stream, (const void*)&bigFlags, sizeof(bigFlags),
-				err);
+			write_helper(&stream, (const void *)&bigFlags, sizeof(bigFlags));
 		}
+	} catch (status_t &error) {
+		return error;
 	}
 
-	return err;
+	return B_OK;
 }
 
-// WriteTo
+
 void
 BMessage::Header::WriteTo(BMessage &message) const
 {
-	// Make way for the new data
+	// make way for the new data
 	message.MakeEmpty();
-
 	message.what = fWhat;
 
 	message.fHasSpecifiers = fFlags & MSG_FLAG_SCRIPT_MSG;
 
 	if (fFlags & MSG_FLAG_INCL_TARGET) {
-		// Get the target data
+		// get the target data
 		message.fTarget = fTargetToken;
 	}
+
 	if (fFlags & MSG_FLAG_INCL_REPLY) {
-		// Get the reply port
+		// get the reply port
 		message.fReplyTo.port = fReplyPort;
 		message.fReplyTo.target = fReplyToken;
 		message.fReplyTo.team = fReplyTeam;
@@ -366,30 +339,30 @@ BMessage::Header::WriteTo(BMessage &message) const
 	}
 }
 
-// CalculateCheckSum
+
 uint32
 BMessage::Header::CalculateCheckSum() const
 {
-	uchar buffer[MSG_HEADER_MAX_SIZE];
+	uint8 buffer[MSG_HEADER_MAX_SIZE];
 	BMemoryIO stream(buffer, sizeof(buffer));
 	WriteTo(stream, false);
 	int32 size = stream.Position();
 	return _checksum_(buffer + 8, size - 8);
 }
 
-// CalculateHeaderSize
+
 uint32
 BMessage::Header::CalculateHeaderSize() const
 {
 	ssize_t size = min_hdr_size();
 
 	if (fTargetToken != B_NULL_TOKEN)
-		size += sizeof (fTargetToken);
+		size += sizeof(fTargetToken);
 
 	if (fReplyPort >= 0 && fReplyToken != B_NULL_TOKEN && fReplyTeam >= 0) {
-		size += sizeof (fReplyPort);
-		size += sizeof (fReplyToken);
-		size += sizeof (fReplyTeam);
+		size += sizeof(fReplyPort);
+		size += sizeof(fReplyToken);
+		size += sizeof(fReplyTeam);
 
 		size += 4;	// For the "big" flags
 	}
@@ -397,11 +370,12 @@ BMessage::Header::CalculateHeaderSize() const
 	return size;
 }
 
-// SetTarget
+
 void
 BMessage::Header::SetTarget(int32 token, bool preferred)
 {
 	fTargetToken = token;
+
 	if (fTargetToken == B_NULL_TOKEN)
 		fFlags &= ~MSG_FLAG_INCL_TARGET;
 	else
@@ -410,7 +384,7 @@ BMessage::Header::SetTarget(int32 token, bool preferred)
 	fPreferredTarget = preferred;
 }
 
-// Dump
+
 void
 BMessage::Header::Dump() const
 {
@@ -430,51 +404,55 @@ BMessage::Header::Dump() const
 	printf("  swapped:          %d\n", fSwapped);
 }
 
-// #pragma mark -
 
 void BMessage::_ReservedMessage1() {}
 void BMessage::_ReservedMessage2() {}
 void BMessage::_ReservedMessage3() {}
 
-//------------------------------------------------------------------------------
+
 BMessage::BMessage()
-	:	what(0),
-		fBody(NULL)
-{
-	init_data();
-}
-//------------------------------------------------------------------------------
-BMessage::BMessage(uint32 w)
 	:	fBody(NULL)
 {
 	init_data();
-	what = w;
 }
-//------------------------------------------------------------------------------
-BMessage::BMessage(const BMessage& a_message)
+
+
+BMessage::BMessage(uint32 _what)
 	:	fBody(NULL)
 {
 	init_data();
-	*this = a_message;
+	what = _what;
 }
-//------------------------------------------------------------------------------
-BMessage::BMessage(BMessage *a_message)
+
+
+BMessage::BMessage(const BMessage &other)
 	:	fBody(NULL)
 {
 	init_data();
-	*this = *a_message;
+	*this = other;
 }
-//------------------------------------------------------------------------------
+
+
+BMessage::BMessage(BMessage *other)
+	:	fBody(NULL)
+{
+	init_data();
+	*this = *other;
+}
+
+
 BMessage::~BMessage()
 {
-	if (IsSourceWaiting())
-	{
+	if (IsSourceWaiting()) {
 		SendReply(B_NO_REPLY);
 	}
+
 	delete fBody;
 }
-//------------------------------------------------------------------------------
-BMessage& BMessage::operator=(const BMessage& msg)
+
+
+BMessage &
+BMessage::operator=(const BMessage &msg)
 {
 	what = msg.what;
 
@@ -503,8 +481,10 @@ BMessage& BMessage::operator=(const BMessage& msg)
 	*fBody = *(msg.fBody);
 	return *this;
 }
-//------------------------------------------------------------------------------
-void BMessage::init_data()
+
+
+void
+BMessage::init_data()
 {
 	what = 0;
 
@@ -531,43 +511,50 @@ void BMessage::init_data()
 	fHasSpecifiers = false;
 
 	if (fBody)
-	{
 		fBody->MakeEmpty();
-	}
 	else
-	{
 		fBody = new BPrivate::BMessageBody();
-	}
 }
-//------------------------------------------------------------------------------
-status_t BMessage::GetInfo(type_code typeRequested, int32 which, char** name,
-						   type_code* typeReturned, int32* count) const
+
+
+status_t
+BMessage::GetInfo(type_code typeRequested, int32 which, char **name,
+	type_code *typeReturned, int32 *count) const
 {
 	return fBody->GetInfo(typeRequested, which, name, typeReturned, count);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::GetInfo(const char* name, type_code* type, int32* c) const
+
+
+status_t
+BMessage::GetInfo(const char *name, type_code *type, int32 *count) const
 {
-	return fBody->GetInfo(name, type, c);
+	return fBody->GetInfo(name, type, count);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::GetInfo(const char* name, type_code* type,
-						   bool* fixed_size) const
+
+
+status_t
+BMessage::GetInfo(const char *name, type_code *type, bool *fixed_size) const
 {
 	return fBody->GetInfo(name, type, fixed_size);
 }
-//------------------------------------------------------------------------------
-int32 BMessage::CountNames(type_code type) const
+
+
+int32
+BMessage::CountNames(type_code type) const
 {
 	return fBody->CountNames(type);
 }
-//------------------------------------------------------------------------------
-bool BMessage::IsEmpty() const
+
+
+bool
+BMessage::IsEmpty() const
 {
 	return fBody->IsEmpty();
 }
-//------------------------------------------------------------------------------
-bool BMessage::IsSystem() const
+
+
+bool
+BMessage::IsSystem() const
 {
 	char a = char(what >> 24);
 	char b = char(what >> 16);
@@ -581,48 +568,62 @@ bool BMessage::IsSystem() const
 	//		characters limited to uppercase letters and the underbar
 	// Between that and what's in AppDefs.h, this algo seems like a safe bet:
 	if (a == '_' && isupper(b) && isupper(c) && isupper(d))
-	{
 		return true;
-	}
 
 	return false;
 }
-//------------------------------------------------------------------------------
-bool BMessage::IsReply() const
+
+
+bool
+BMessage::IsReply() const
 {
 	return fIsReply;
 }
-//------------------------------------------------------------------------------
-void BMessage::PrintToStream() const
+
+
+void
+BMessage::PrintToStream() const
 {
-	printf("\nBMessage: what = '%c%c%c%c' (0x%lX or %ld)\n", (what >> 24 & 0xff), (what >> 16 & 0xff), (what >> 8 & 0xff), (what & 0xff), what, what);
+	printf("\nBMessage: what = '%c%c%c%c' (0x%lX or %ld)\n",
+		(uint8)(what >> 24), (uint8)(what >> 16), (uint8)(what >> 8),
+		(uint8)what, what, what);
+
 	fBody->PrintToStream();
 }
-//------------------------------------------------------------------------------
-status_t BMessage::Rename(const char* old_entry, const char* new_entry)
+
+
+status_t
+BMessage::Rename(const char *old_entry, const char *new_entry)
 {
 	return fBody->Rename(old_entry, new_entry);
 }
-//------------------------------------------------------------------------------
-bool BMessage::WasDelivered() const
+
+
+bool
+BMessage::WasDelivered() const
 {
 	return fWasDelivered;
 }
-//------------------------------------------------------------------------------
-bool BMessage::IsSourceWaiting() const
+
+
+bool
+BMessage::IsSourceWaiting() const
 {
 	return fReplyRequired && !fReplyDone;
 }
-//------------------------------------------------------------------------------
-bool BMessage::IsSourceRemote() const
+
+
+bool
+BMessage::IsSourceRemote() const
 {
 	return WasDelivered() && fReplyTo.team != BPrivate::current_team();
 }
-//------------------------------------------------------------------------------
-BMessenger BMessage::ReturnAddress() const
+
+
+BMessenger
+BMessage::ReturnAddress() const
 {
-	if (WasDelivered())
-	{
+	if (WasDelivered()) {
 		BMessenger messenger;
 		BMessenger::Private(messenger).SetTo(fReplyTo.team, fReplyTo.port,
 			fReplyTo.target, fReplyTo.preferred);
@@ -631,16 +632,17 @@ BMessenger BMessage::ReturnAddress() const
 
 	return BMessenger();
 }
-//------------------------------------------------------------------------------
-const BMessage* BMessage::Previous() const
+
+
+const BMessage *
+BMessage::Previous() const
 {
 	// TODO: test
 	// In particular, look to see if the "_previous_" field is used in R5
-	if (!fOriginal)
-	{
-		BMessage* fOriginal = new BMessage;
-		if (FindMessage("_previous_", fOriginal) != B_OK)
-		{
+	if (!fOriginal) {
+		BMessage *fOriginal = new BMessage;
+
+		if (FindMessage("_previous_", fOriginal) != B_OK) {
 			delete fOriginal;
 			fOriginal = NULL;
 		}
@@ -648,288 +650,182 @@ const BMessage* BMessage::Previous() const
 
 	return fOriginal;
 }
-//------------------------------------------------------------------------------
-bool BMessage::WasDropped() const
+
+
+bool
+BMessage::WasDropped() const
 {
 	return fReadOnly;
 }
-//------------------------------------------------------------------------------
-BPoint BMessage::DropPoint(BPoint* offset) const
+
+
+BPoint
+BMessage::DropPoint(BPoint *offset) const
 {
 	// TODO: Where do we get this stuff???
 	if (offset)
-	{
 		*offset = FindPoint("_drop_offset_");
-	}
+
 	return FindPoint("_drop_point_");
-}
-//------------------------------------------------------------------------------
-status_t BMessage::SendReply(uint32 command, BHandler* reply_to)
-{
-	BMessage msg(command);
-	return SendReply(&msg, reply_to);
-}
-//------------------------------------------------------------------------------
-status_t BMessage::SendReply(BMessage* the_reply, BHandler* reply_to,
-							 bigtime_t timeout)
-{
-	BMessenger messenger(reply_to);
-	return SendReply(the_reply, messenger, timeout);
-}
-//------------------------------------------------------------------------------
-#if 0
-template<class Sender>
-status_t SendReplyHelper(BMessage* the_message, BMessage* the_reply,
-						 Sender& the_sender)
-{
-	BMessenger messenger(the_message->fReplyTo.team, the_message->fReplyTo.port,
-						 the_message->fReplyTo.target,
-						 the_message->fReplyTo.preferred);
-	if (the_message->fReplyRequired)
-	{
-		if (the_message->fReplyDone)
-		{
-			return B_DUPLICATE_REPLY;
-		}
-		the_message->fReplyDone = true;
-		the_reply->fIsReply = true;
-		status_t err = the_sender.Send(messenger, the_reply);
-		the_reply->fIsReply = false;
-		if (err)
-		{
-			if (set_port_owner(messenger.fPort, messenger.fTeam) == B_BAD_TEAM_ID)
-			{
-				delete_port(messenger.fPort);
-			}
-		}
-		return err;
-	}
-	// no reply required
-	if (!the_message->fWasDelivered)
-	{
-		return B_BAD_REPLY;
-	}
-
-#if 0
-	char tmp[0x800];
-	ssize_t size;
-	char* p = stack_flatten(tmp, sizeof(tmp), true /* include reply */, &size);
-	the_reply->AddData("_previous_", B_RAW_TYPE, p ? p : tmp, &size);
-	if (p)
-	{
-		free(p);
-	}
-#endif
-	the_reply->AddMessage("_previous_", the_message);
-	the_reply->fIsReply = true;
-	status_t err = the_sender.Send(messenger, the_reply);
-	the_reply->fIsReply = false;
-	the_reply->RemoveName("_previous_");
-	return err;
-};
-#endif
-//------------------------------------------------------------------------------
-#if 0
-struct Sender1
-{
-	BMessenger& reply_to;
-	bigtime_t timeout;
-
-	Sender1(BMessenger& m, bigtime_t t) : reply_to(m), timeout(t) {;}
-
-	status_t Send(BMessenger& messenger, BMessage* the_reply)
-	{
-		return messenger.SendMessage(the_reply, reply_to, timeout);
-	}
-};
-status_t BMessage::SendReply(BMessage* the_reply, BMessenger reply_to,
-							 bigtime_t timeout)
-{
-	Sender1 mySender(reply_to, timeout);
-	return SendReplyHelper(this, the_reply, mySender);
-}
-#endif
-status_t BMessage::SendReply(BMessage* the_reply, BMessenger reply_to,
-							 bigtime_t timeout)
-{
-	// TODO: test
-	BMessenger messenger;
-	
-	BMessenger::Private messengerPrivate(messenger);
-	messengerPrivate.SetTo(fReplyTo.team, fReplyTo.port, fReplyTo.target,
-		fReplyTo.preferred);
-	if (fReplyRequired)
-	{
-		if (fReplyDone)
-		{
-			return B_DUPLICATE_REPLY;
-		}
-		fReplyDone = true;
-		the_reply->fIsReply = true;
-		status_t err = messenger.SendMessage(the_reply, reply_to, timeout);
-		the_reply->fIsReply = false;
-		if (err)
-		{
-			if (set_port_owner(messengerPrivate.Port(),
-				messengerPrivate.Team()) == B_BAD_TEAM_ID) {
-				delete_port(messengerPrivate.Port());
-			}
-		}
-		return err;
-	}
-	// no reply required
-	if (!fWasDelivered)
-	{
-		return B_BAD_REPLY;
-	}
-
-	the_reply->AddMessage("_previous_", this);
-	the_reply->fIsReply = true;
-	status_t err = messenger.SendMessage(the_reply, reply_to, timeout);
-	the_reply->fIsReply = false;
-	the_reply->RemoveName("_previous_");
-	return err;
-}
-//------------------------------------------------------------------------------
-status_t BMessage::SendReply(uint32 command, BMessage* reply_to_reply)
-{
-	BMessage msg(command);
-	return SendReply(&msg, reply_to_reply);
-}
-//------------------------------------------------------------------------------
-#if 0
-struct Sender2
-{
-	BMessage* reply_to_reply;
-	bigtime_t send_timeout;
-	bigtime_t reply_timeout;
-
-	Sender2(BMessage* m, bigtime_t t1, bigtime_t t2)
-		:	reply_to_reply(m), send_timeout(t1), reply_timeout(t2) {;}
-
-	status_t Send(BMessenger& messenger, BMessage* the_reply)
-	{
-		return messenger.SendMessage(the_reply, reply_to_reply,
-									 send_timeout, reply_timeout);
-	}
-};
-status_t BMessage::SendReply(BMessage* the_reply, BMessage* reply_to_reply,
-							 bigtime_t send_timeout, bigtime_t reply_timeout)
-{
-	Sender2 mySender(reply_to_reply, send_timeout, reply_timeout);
-	return SendReplyHelper(this, the_reply, mySender);
-}
-#endif
-status_t BMessage::SendReply(BMessage* the_reply, BMessage* reply_to_reply,
-							 bigtime_t send_timeout, bigtime_t reply_timeout)
-{
-	// TODO: test
-	BMessenger messenger;
-	BMessenger::Private messengerPrivate(messenger);
-	messengerPrivate.SetTo(fReplyTo.team, fReplyTo.port, fReplyTo.target,
-		fReplyTo.preferred);
-	if (fReplyRequired)
-	{
-		if (fReplyDone)
-		{
-			return B_DUPLICATE_REPLY;
-		}
-		fReplyDone = true;
-		the_reply->fIsReply = true;
-		status_t err = messenger.SendMessage(the_reply, reply_to_reply,
-											 send_timeout, reply_timeout);
-		the_reply->fIsReply = false;
-		if (err)
-		{
-			if (set_port_owner(messengerPrivate.Port(),
-				messengerPrivate.Team()) == B_BAD_TEAM_ID) {
-				delete_port(messengerPrivate.Port());
-			}
-		}
-		return err;
-	}
-	// no reply required
-	if (!fWasDelivered)
-	{
-		return B_BAD_REPLY;
-	}
-
-	the_reply->AddMessage("_previous_", this);
-	the_reply->fIsReply = true;
-	status_t err = messenger.SendMessage(the_reply, reply_to_reply,
-										 send_timeout, reply_timeout);
-	the_reply->fIsReply = false;
-	the_reply->RemoveName("_previous_");
-	return err;
-}
-//------------------------------------------------------------------------------
-ssize_t BMessage::FlattenedSize() const
-{
-	return calc_hdr_size(0) + fBody->FlattenedSize();
-}
-//------------------------------------------------------------------------------
-status_t BMessage::Flatten(char* buffer, ssize_t size) const
-{
-	return real_flatten(buffer, size);
-}
-//------------------------------------------------------------------------------
-status_t BMessage::Flatten(BDataIO* stream, ssize_t* size) const
-{
-	status_t err = B_OK;
-	ssize_t len = FlattenedSize();
-	char* buffer = new(nothrow) char[len];
-	if (buffer)
-	{
-		err = Flatten(buffer, len);
-		if (!err)
-		{
-			// size is an optional parameter, don't crash on NULL
-			if (size != NULL)
-			{
-				*size = len;
-			}
-			err = stream->Write(buffer, len);
-			if (err > B_OK)
-				err = B_OK;
-		}
-
-		delete[] buffer;
-	}
-	else
-	{
-		err = B_NO_MEMORY;
-	}
-
-	return err;
 }
 
 
 status_t
-BMessage::Unflatten(const char* buffer)
+BMessage::SendReply(uint32 command, BHandler *reply_to)
+{
+	BMessage msg(command);
+	return SendReply(&msg, reply_to);
+}
+
+
+status_t
+BMessage::SendReply(BMessage *the_reply, BHandler *reply_to, bigtime_t timeout)
+{
+	BMessenger messenger(reply_to);
+	return SendReply(the_reply, messenger, timeout);
+}
+
+
+status_t
+BMessage::SendReply(BMessage *the_reply, BMessenger reply_to, bigtime_t timeout)
+{
+	// TODO: test
+	BMessenger messenger;
+	BMessenger::Private messengerPrivate(messenger);
+	messengerPrivate.SetTo(fReplyTo.team, fReplyTo.port, fReplyTo.target,
+		fReplyTo.preferred);
+
+	if (fReplyRequired) {
+		if (fReplyDone)
+			return B_DUPLICATE_REPLY;
+
+		fReplyDone = true;
+		the_reply->fIsReply = true;
+		status_t error = messenger.SendMessage(the_reply, reply_to, timeout);
+		the_reply->fIsReply = false;
+
+		if (error) {
+			if (set_port_owner(messengerPrivate.Port(),
+				messengerPrivate.Team()) == B_BAD_TEAM_ID) {
+				delete_port(messengerPrivate.Port());
+			}
+		}
+
+		return error;
+	}
+
+	// no reply required
+	if (!fWasDelivered)
+		return B_BAD_REPLY;
+
+	the_reply->AddMessage("_previous_", this);
+	the_reply->fIsReply = true;
+
+	status_t error = messenger.SendMessage(the_reply, reply_to, timeout);
+	the_reply->fIsReply = false;
+	the_reply->RemoveName("_previous_");
+
+	return error;
+}
+
+
+status_t
+BMessage::SendReply(uint32 command, BMessage *reply_to_reply)
+{
+	BMessage msg(command);
+	return SendReply(&msg, reply_to_reply);
+}
+
+
+status_t
+BMessage::SendReply(BMessage *the_reply, BMessage *reply_to_reply,
+	bigtime_t send_timeout, bigtime_t reply_timeout)
+{
+	// TODO: test
+	BMessenger messenger;
+	BMessenger::Private messengerPrivate(messenger);
+	messengerPrivate.SetTo(fReplyTo.team, fReplyTo.port, fReplyTo.target,
+		fReplyTo.preferred);
+
+	if (fReplyRequired) {
+		if (fReplyDone)
+			return B_DUPLICATE_REPLY;
+
+		fReplyDone = true;
+		the_reply->fIsReply = true;
+		status_t error = messenger.SendMessage(the_reply, reply_to_reply,
+			send_timeout, reply_timeout);
+		the_reply->fIsReply = false;
+
+		if (error) {
+			if (set_port_owner(messengerPrivate.Port(),
+				messengerPrivate.Team()) == B_BAD_TEAM_ID) {
+				delete_port(messengerPrivate.Port());
+			}
+		}
+
+		return error;
+	}
+
+	// no reply required
+	if (!fWasDelivered)
+		return B_BAD_REPLY;
+
+	the_reply->AddMessage("_previous_", this);
+	the_reply->fIsReply = true;
+	status_t error = messenger.SendMessage(the_reply, reply_to_reply,
+		send_timeout, reply_timeout);
+	the_reply->fIsReply = false;
+	the_reply->RemoveName("_previous_");
+	return error;
+}
+
+
+ssize_t
+BMessage::FlattenedSize() const
+{
+	return calc_hdr_size(0) + fBody->FlattenedSize();
+}
+
+
+status_t
+BMessage::Flatten(char *buffer, ssize_t size) const
+{
+	return real_flatten(buffer, size);
+}
+
+
+status_t
+BMessage::Flatten(BDataIO *stream, ssize_t *size) const
+{
+	return real_flatten(stream, size);
+}
+
+
+status_t
+BMessage::Unflatten(const char *buffer)
 {
 	if (!buffer)
 		return B_BAD_VALUE;
 
-	uint32 magic = *(uint32*)buffer;
+	uint32 magic = *(uint32 *)buffer;
 
 	// we support several message formats - this list is ordered
 	// by importance and frequency
 
 	if (magic == kMessageMagic) {
 		// it appears to be a normal flattened BMessage
-		BMemoryIO memoryStream(buffer, ((uint32*)buffer)[2]);
+		BMemoryIO memoryStream(buffer, ((uint32 *)buffer)[2]);
 		return Unflatten(&memoryStream);
 	}
 
 	// check whether this is a KMessage
-	if (((KMessage::Header*)buffer)->magic
-		== KMessage::kMessageHeaderMagic)
+	if (((KMessage::Header *)buffer)->magic == KMessage::kMessageHeaderMagic)
 		return _UnflattenKMessage(buffer);
 
 	if (magic == kMessageMagicSwapped) {
 		// it appears to be a swapped flattened BMessage
-		uint32 size = ((uint32*)buffer)[2];
-
+		uint32 size = ((uint32 *)buffer)[2];
 		BMemoryIO memoryStream(buffer, __swap_int32(size));
 		return Unflatten(&memoryStream);
 	}
@@ -945,7 +841,7 @@ BMessage::Unflatten(const char* buffer)
 
 
 status_t
-BMessage::Unflatten(BDataIO* stream)
+BMessage::Unflatten(BDataIO *stream)
 {
 	TReadHelper reader(stream);
 	Header header;
@@ -975,208 +871,119 @@ BMessage::Unflatten(BDataIO* stream)
 		}
 
 		header.WriteTo(*this);
-		bool swap = header.IsSwapped();
 
-		uint32 count;
-		uint32 dataLen;
-		uint8 nameLen;
-		char name[MSG_NAME_MAX_SIZE];
-		unsigned char* databuffer = NULL;
+		status = fBody->Unflatten(stream);
+		if (status < B_OK)
+			return status;
 
-		int8 flags;
-		reader(flags);
-		while (flags != MSG_LAST_ENTRY) {
-			type_code type;
-			reader(type);
-
-			// Is there more than one data item?
-			if (flags & MSG_FLAG_SINGLE_ITEM) {
-				count = 1;
-				if (flags & MSG_FLAG_MINI_DATA) {
-					uint8 littleLen;
-					reader(littleLen);
-					dataLen = littleLen;
-				} else
-					reader(dataLen);
-			} else {
-				// Is there a little data?
-				if (flags & MSG_FLAG_MINI_DATA) {
-					// Get item count (1 byte)
-					uint8 littleCount;
-					reader(littleCount);
-					count = littleCount;
-
-					// Get data length (1 byte)
-					uint8 littleLen;
-					reader(littleLen);
-					dataLen = littleLen;
-				} else {
-					// Is there a lot of data?
-					// Get item count (4 bytes)
-					reader(count);
-					// Get data length (4 bytes)
-					reader(dataLen);
-				}
-			}
-
-			// Get the name length (1 byte)
-			reader(nameLen);
-			// Get the name (name length bytes)
-			reader(name, nameLen);
-			name[nameLen] = '\0';
-
-			// Copy the data into a new buffer to byte align it
-			databuffer = (unsigned char*)realloc(databuffer, dataLen);
-			if (!databuffer)
-				throw B_NO_MEMORY;
-			// Get the data
-			reader(databuffer, dataLen);
-
-			if (swap) {
-				// Is the data fixed size?
-				if ((flags & MSG_FLAG_FIXED_SIZE) != 0) {
-					// Make sure to swap the data
-					status = swap_data(type, (void*)databuffer, dataLen,
-									B_SWAP_ALWAYS);
-					if (status < B_OK)
-						throw status;
-				} else if (type == B_REF_TYPE) {
-					// Is the data variable size?
-					// Apparently, entry_refs are the only variable-length data
-					// 	  explicitely swapped -- the dev_t and ino_t
-					//    specifically
-					byte_swap(*(entry_ref*)databuffer);
-				}
-			}
-
-			// Add each data field to the message
-			uint32 itemSize = 0;
-			if (flags & MSG_FLAG_FIXED_SIZE)
-				itemSize = dataLen / count;
-
-			unsigned char* dataPtr = databuffer;
-
-			for (uint32 i = 0; i < count; ++i) {
-				// Line up for the next item
-				if (i) {
-					if (flags & MSG_FLAG_FIXED_SIZE) {
-						dataPtr += itemSize;
-					} else {
-						// Have to account for 8-byte boundary padding
-						// We add 4 because padding as calculated during
-						// flattening includes the four-byte size header
-						dataPtr += itemSize + calc_padding(itemSize + 4, 8);
-					}
-				}
-
-				if ((flags & MSG_FLAG_FIXED_SIZE) == 0) {
-					itemSize = *(uint32*)dataPtr;
-					dataPtr += sizeof (uint32);
-				}
-
-				status = AddData(name, type, dataPtr, itemSize,
-							  flags & MSG_FLAG_FIXED_SIZE);
-				if (status < B_OK)
-					throw status;
-			}
-
-			reader(flags);
-		}
-	} catch (status_t& e) {
-		status = e;
+	} catch (status_t &error) {
+		status = error;
 	}
 
 	return status;
 }
-//------------------------------------------------------------------------------
-status_t BMessage::AddSpecifier(const char* property)
+
+
+status_t
+BMessage::AddSpecifier(const char *property)
 {
 	BMessage message(B_DIRECT_SPECIFIER);
-	status_t err = message.AddString(B_PROPERTY_ENTRY, property);
-	if (err)
-		return err;
+	status_t error = message.AddString(B_PROPERTY_ENTRY, property);
+	if (error)
+		return error;
 
 	return AddSpecifier(&message);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::AddSpecifier(const char* property, int32 index)
+
+
+status_t
+BMessage::AddSpecifier(const char *property, int32 index)
 {
 	BMessage message(B_INDEX_SPECIFIER);
-	status_t err = message.AddString(B_PROPERTY_ENTRY, property);
-	if (err)
-		return err;
+	status_t error = message.AddString(B_PROPERTY_ENTRY, property);
+	if (error)
+		return error;
 
-	err = message.AddInt32("index", index);
-	if (err)
-		return err;
+	error = message.AddInt32("index", index);
+	if (error)
+		return error;
 
 	return AddSpecifier(&message);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::AddSpecifier(const char* property, int32 index, int32 range)
+
+
+status_t
+BMessage::AddSpecifier(const char *property, int32 index, int32 range)
 {
 	if (range < 0)
 		return B_BAD_VALUE;
 
 	BMessage message(B_RANGE_SPECIFIER);
-	status_t err = message.AddString(B_PROPERTY_ENTRY, property);
-	if (err)
-		return err;
+	status_t error = message.AddString(B_PROPERTY_ENTRY, property);
+	if (error)
+		return error;
 
-	err = message.AddInt32("index", index);
-	if (err)
-		return err;
+	error = message.AddInt32("index", index);
+	if (error)
+		return error;
 
-	err = message.AddInt32("range", range);
-	if (err)
-		return err;
+	error = message.AddInt32("range", range);
+	if (error)
+		return error;
 
 	return AddSpecifier(&message);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::AddSpecifier(const char* property, const char* name)
+
+
+status_t
+BMessage::AddSpecifier(const char *property, const char *name)
 {
 	BMessage message(B_NAME_SPECIFIER);
-	status_t err = message.AddString(B_PROPERTY_ENTRY, property);
-	if (err)
-		return err;
+	status_t error = message.AddString(B_PROPERTY_ENTRY, property);
+	if (error)
+		return error;
 
-	err = message.AddString(B_PROPERTY_NAME_ENTRY, name);
-	if (err)
-		return err;
+	error = message.AddString(B_PROPERTY_NAME_ENTRY, name);
+	if (error)
+		return error;
 
 	return AddSpecifier(&message);
 }
-//------------------------------------------------------------------------------
-status_t BMessage::AddSpecifier(const BMessage* specifier)
+
+
+status_t
+BMessage::AddSpecifier(const BMessage *specifier)
 {
-	status_t err = AddMessage(B_SPECIFIER_ENTRY, specifier);
-	if (!err)
-	{
-		++fCurSpecifier;
+	status_t error = AddMessage(B_SPECIFIER_ENTRY, specifier);
+	if (!error) {
+		fCurSpecifier++;
 		fHasSpecifiers = true;
 	}
-	return err;
+
+	return error;
 }
-//------------------------------------------------------------------------------
-status_t BMessage::SetCurrentSpecifier(int32 index)
+
+
+status_t
+BMessage::SetCurrentSpecifier(int32 index)
 {
-	type_code	type;
-	int32		count;
-	status_t	err = GetInfo(B_SPECIFIER_ENTRY, &type, &count);
-	if (err)
-		return err;
+	type_code type;
+	int32 count;
+	status_t error = GetInfo(B_SPECIFIER_ENTRY, &type, &count);
+	if (error)
+		return error;
 
 	if (index < 0 || index >= count)
 		return B_BAD_INDEX;
 
 	fCurSpecifier = index;
-
 	return B_OK;
 }
-//------------------------------------------------------------------------------
-status_t BMessage::GetCurrentSpecifier(int32* index, BMessage* specifier,
-									   int32* what, const char** property) const
+
+
+status_t
+BMessage::GetCurrentSpecifier(int32 *index, BMessage *specifier, int32 *what,
+	const char **property) const
 {
 	if (fCurSpecifier == -1 || !WasDelivered())
 		return B_BAD_SCRIPT_SYNTAX;
@@ -1184,16 +991,14 @@ status_t BMessage::GetCurrentSpecifier(int32* index, BMessage* specifier,
 	if (index)
 		*index = fCurSpecifier;
 
-	if (specifier)
-	{
+	if (specifier) {
 		if (FindMessage(B_SPECIFIER_ENTRY, fCurSpecifier, specifier))
 			return B_BAD_SCRIPT_SYNTAX;
 
 		if (what)
 			*what = specifier->what;
 
-		if (property)
-		{
+		if (property) {
 			if (specifier->FindString(B_PROPERTY_ENTRY, property))
 				return B_BAD_SCRIPT_SYNTAX;
 		}
@@ -1201,119 +1006,144 @@ status_t BMessage::GetCurrentSpecifier(int32* index, BMessage* specifier,
 
 	return B_OK;
 }
-//------------------------------------------------------------------------------
-bool BMessage::HasSpecifiers() const
+
+
+bool
+BMessage::HasSpecifiers() const
 {
 	return fHasSpecifiers;
 }
-//------------------------------------------------------------------------------
-status_t BMessage::PopSpecifier()
-{
-	if (fCurSpecifier < 0 || !WasDelivered())
-	{
-		return B_BAD_VALUE;
-	}
-
-	--fCurSpecifier;
-	return B_OK;
-}
-//------------------------------------------------------------------------------
-//	return fBody->AddData<TYPE>(name, val, TYPESPEC);
-//	return fBody->FindData<TYPE>(name, index, val, TYPESPEC);
-//	return fBody->ReplaceData<TYPE>(name, index, val, TYPESPEC);
-//	return fBody->HasData(name, TYPESPEC, n);
-
-#define DEFINE_FUNCTIONS(TYPE, fnName, TYPESPEC)									\
-	status_t BMessage::Add ## fnName(const char* name, TYPE val)					\
-	{ return AddData(name, TYPESPEC, &val, sizeof(TYPE)); }							\
-	status_t BMessage::Find ## fnName(const char* name, TYPE* p) const				\
-	{ return Find ## fnName(name, 0, p); }											\
-	status_t BMessage::Find ## fnName(const char* name, int32 index, TYPE* p) const	\
-	{															\
-		void* ptr = NULL; ssize_t bytes = 0; status_t err = B_OK;\
-		*p = TYPE(); 	\
-		err = FindData(name, TYPESPEC, index, (const void**)&ptr, &bytes); \
-		if (err == B_OK) \
-			memcpy(p, ptr, sizeof(TYPE)); \
-		return err; \
-	}														\
-	status_t BMessage::Replace ## fnName(const char* name, TYPE val)				\
-	{ return Replace ## fnName(name, 0, val); }										\
-	status_t BMessage::Replace ## fnName(const char *name, int32 index, TYPE val)	\
-	{ return ReplaceData(name, TYPESPEC, index, &val, sizeof(TYPE)); }				\
-	bool BMessage::Has ## fnName(const char* name, int32 n) const					\
-	{ return fBody->HasData(name, TYPESPEC, n); }
-
-DEFINE_FUNCTIONS(int8  , Int8  , B_INT8_TYPE)
-DEFINE_FUNCTIONS(int16 , Int16 , B_INT16_TYPE)
-DEFINE_FUNCTIONS(int32 , Int32 , B_INT32_TYPE)
-DEFINE_FUNCTIONS(int64 , Int64 , B_INT64_TYPE)
-DEFINE_FUNCTIONS(BPoint, Point , B_POINT_TYPE)
-DEFINE_FUNCTIONS(BRect , Rect  , B_RECT_TYPE)
-DEFINE_FUNCTIONS(float , Float , B_FLOAT_TYPE)
-DEFINE_FUNCTIONS(double, Double, B_DOUBLE_TYPE)
-DEFINE_FUNCTIONS(bool  , Bool  , B_BOOL_TYPE)
-
-#undef DEFINE_FUNCTIONS
-
-
-#define DEFINE_HAS_FUNCTION(fnName, TYPESPEC)						\
-	bool BMessage::Has ## fnName(const char* name, int32 n) const	\
-	{ return HasData(name, TYPESPEC, n); }
-
-DEFINE_HAS_FUNCTION(Message  , B_MESSAGE_TYPE)
-DEFINE_HAS_FUNCTION(String   , B_STRING_TYPE)
-DEFINE_HAS_FUNCTION(Pointer  , B_POINTER_TYPE)
-DEFINE_HAS_FUNCTION(Messenger, B_MESSENGER_TYPE)
-DEFINE_HAS_FUNCTION(Ref      , B_REF_TYPE)
-
-#undef DEFINE_HAS_FUNCTION
-
-#define DEFINE_LAZY_FIND_FUNCTION(TYPE, fnName)						\
-	TYPE BMessage::Find ## fnName(const char* name, int32 n) const	\
-	{																\
-		TYPE i = 0;													\
-		Find ## fnName(name, n, &i);								\
-		return i;													\
-	}
-
-DEFINE_LAZY_FIND_FUNCTION(int8			, Int8)
-DEFINE_LAZY_FIND_FUNCTION(int16			, Int16)
-DEFINE_LAZY_FIND_FUNCTION(int32			, Int32)
-DEFINE_LAZY_FIND_FUNCTION(int64			, Int64)
-DEFINE_LAZY_FIND_FUNCTION(float			, Float)
-DEFINE_LAZY_FIND_FUNCTION(double		, Double)
-DEFINE_LAZY_FIND_FUNCTION(bool			, Bool)
-DEFINE_LAZY_FIND_FUNCTION(const char*	, String)
-
-#undef DEFINE_LAZY_FIND_FUNCTION
-
-//------------------------------------------------------------------------------
 
 
 status_t
-BMessage::AddString(const char* name, const char* string)
+BMessage::PopSpecifier()
+{
+	if (fCurSpecifier < 0 || !WasDelivered())
+		return B_BAD_VALUE;
+
+	fCurSpecifier--;
+	return B_OK;
+}
+
+
+#define DEFINE_FUNCTIONS(TYPE, fnName, TYPESPEC)							\
+status_t																	\
+BMessage::Add ## fnName(const char *name, TYPE val)							\
+{																			\
+	return AddData(name, TYPESPEC, &val, sizeof(TYPE));						\
+}																			\
+																			\
+status_t																	\
+BMessage::Find ## fnName(const char *name, TYPE *p) const					\
+{																			\
+	return Find ## fnName(name, 0, p);										\
+}																			\
+																			\
+status_t																	\
+BMessage::Find ## fnName(const char *name, int32 index, TYPE *p) const		\
+{																			\
+	void *ptr = NULL;														\
+	ssize_t bytes = 0;														\
+	status_t error = B_OK;													\
+																			\
+	*p = TYPE();															\
+	error = FindData(name, TYPESPEC, index, (const void**)&ptr, &bytes);	\
+																			\
+	if (error == B_OK)														\
+		memcpy(p, ptr, sizeof(TYPE));										\
+																			\
+	return error;															\
+}																			\
+																			\
+status_t																	\
+BMessage::Replace ## fnName(const char* name, TYPE val)						\
+{																			\
+	return Replace ## fnName(name, 0, val);									\
+}																			\
+																			\
+status_t																	\
+BMessage::Replace ## fnName(const char *name, int32 index, TYPE val)		\
+{																			\
+	return ReplaceData(name, TYPESPEC, index, &val, sizeof(TYPE));			\
+}																			\
+																			\
+bool																		\
+BMessage::Has ## fnName(const char *name, int32 n) const					\
+{																			\
+	return fBody->HasData(name, TYPESPEC, n);								\
+}
+
+DEFINE_FUNCTIONS(int8, Int8, B_INT8_TYPE);
+DEFINE_FUNCTIONS(int16, Int16, B_INT16_TYPE);
+DEFINE_FUNCTIONS(int32, Int32, B_INT32_TYPE);
+DEFINE_FUNCTIONS(int64, Int64, B_INT64_TYPE);
+DEFINE_FUNCTIONS(BPoint, Point, B_POINT_TYPE);
+DEFINE_FUNCTIONS(BRect, Rect, B_RECT_TYPE);
+DEFINE_FUNCTIONS(float, Float, B_FLOAT_TYPE);
+DEFINE_FUNCTIONS(double, Double, B_DOUBLE_TYPE);
+DEFINE_FUNCTIONS(bool, Bool, B_BOOL_TYPE);
+
+#undef DEFINE_FUNCTIONS
+
+#define DEFINE_HAS_FUNCTION(fnName, TYPESPEC)								\
+bool																		\
+BMessage::Has ## fnName(const char* name, int32 n) const					\
+{																			\
+	return HasData(name, TYPESPEC, n);										\
+}
+
+DEFINE_HAS_FUNCTION(Message, B_MESSAGE_TYPE);
+DEFINE_HAS_FUNCTION(String, B_STRING_TYPE);
+DEFINE_HAS_FUNCTION(Pointer, B_POINTER_TYPE);
+DEFINE_HAS_FUNCTION(Messenger, B_MESSENGER_TYPE);
+DEFINE_HAS_FUNCTION(Ref, B_REF_TYPE);
+
+#undef DEFINE_HAS_FUNCTION
+
+#define DEFINE_LAZY_FIND_FUNCTION(TYPE, fnName)								\
+TYPE																		\
+BMessage::Find ## fnName(const char* name, int32 n) const					\
+{																			\
+	TYPE i = 0;																\
+	Find ## fnName(name, n, &i);											\
+	return i;																\
+}
+
+DEFINE_LAZY_FIND_FUNCTION(int8, Int8);
+DEFINE_LAZY_FIND_FUNCTION(int16, Int16);
+DEFINE_LAZY_FIND_FUNCTION(int32, Int32);
+DEFINE_LAZY_FIND_FUNCTION(int64, Int64);
+DEFINE_LAZY_FIND_FUNCTION(float, Float);
+DEFINE_LAZY_FIND_FUNCTION(double, Double);
+DEFINE_LAZY_FIND_FUNCTION(bool, Bool);
+DEFINE_LAZY_FIND_FUNCTION(const char *, String);
+
+#undef DEFINE_LAZY_FIND_FUNCTION
+
+
+status_t
+BMessage::AddString(const char *name, const char *string)
 {
 	return AddData(name, B_STRING_TYPE, string, strlen(string) + 1);
 }
 
 
 status_t
-BMessage::AddString(const char* name, const BString& string)
+BMessage::AddString(const char* name, const BString &string)
 {
 	return AddData(name, B_STRING_TYPE, string.String(), string.Length() + 1);
 }
 
 
 status_t
-BMessage::AddPointer(const char* name, const void* pointer)
+BMessage::AddPointer(const char *name, const void *pointer)
 {
 	return AddData(name, B_POINTER_TYPE, &pointer, sizeof(pointer));
 }
 
 
 status_t
-BMessage::AddMessenger(const char* name, BMessenger messenger)
+BMessage::AddMessenger(const char *name, BMessenger messenger)
 {
 	return AddData(name, B_MESSENGER_TYPE, &messenger, sizeof(messenger));
 }
@@ -1339,7 +1169,7 @@ BMessage::AddRef(const char* name, const entry_ref* ref)
 }
 
 
-status_t 
+status_t
 BMessage::AddMessage(const char *name, const BMessage *msg)
 {
 	BMallocIO *buffer = new BMallocIO();
@@ -1355,7 +1185,7 @@ BMessage::AddMessage(const char *name, const BMessage *msg)
 }
 
 
-status_t 
+status_t
 BMessage::AddFlat(const char *name, BFlattenable *object, int32 count)
 {
 	ssize_t size = object->FlattenedSize();
@@ -1373,9 +1203,9 @@ BMessage::AddFlat(const char *name, BFlattenable *object, int32 count)
 }
 
 
-status_t 
-BMessage::AddData(const char* name, type_code type, const void* data,
-				   ssize_t numBytes, bool is_fixed_size, int32 /*count*/)
+status_t
+BMessage::AddData(const char *name, type_code type, const void *data,
+	ssize_t numBytes, bool is_fixed_size, int32 /*count*/)
 {
 	// TODO: test
 	// In particular, we want to see what happens if is_fixed_size == true and
@@ -1393,37 +1223,36 @@ BMessage::AddData(const char* name, type_code type, const void* data,
 }
 
 
-status_t 
-BMessage::RemoveData(const char* name, int32 index)
+status_t
+BMessage::RemoveData(const char *name, int32 index)
 {
 	return fReadOnly ? B_ERROR : fBody->RemoveData(name, index);
 }
 
 
-status_t 
-BMessage::RemoveName(const char* name)
+status_t
+BMessage::RemoveName(const char *name)
 {
 	return fReadOnly ? B_ERROR : fBody->RemoveName(name);
 }
 
 
-status_t 
+status_t
 BMessage::MakeEmpty()
 {
 	return fReadOnly ? B_ERROR : fBody->MakeEmpty();
 }
 
 
-status_t 
-BMessage::FindString(const char* name, const char** string) const
+status_t
+BMessage::FindString(const char *name, const char **string) const
 {
 	return FindString(name, 0, string);
 }
 
 
-status_t 
-BMessage::FindString(const char* name, int32 index,
-	const char** string) const
+status_t
+BMessage::FindString(const char *name, int32 index, const char **string) const
 {
 	ssize_t bytes;
 	return FindData(name, B_STRING_TYPE, index,
@@ -1431,17 +1260,17 @@ BMessage::FindString(const char* name, int32 index,
 }
 
 
-status_t 
-BMessage::FindString(const char* name, BString* string) const
+status_t
+BMessage::FindString(const char *name, BString *string) const
 {
 	return FindString(name, 0, string);
 }
 
 
-status_t 
-BMessage::FindString(const char* name, int32 index, BString* string) const
+status_t
+BMessage::FindString(const char *name, int32 index, BString *string) const
 {
-	const char* cstr;
+	const char *cstr;
 	status_t err = FindString(name, index, &cstr);
 	if (err < B_OK)
 		return err;
@@ -1451,190 +1280,218 @@ BMessage::FindString(const char* name, int32 index, BString* string) const
 }
 
 
-status_t 
-BMessage::FindPointer(const char* name, void** ptr) const
+status_t
+BMessage::FindPointer(const char *name, void **ptr) const
 {
 	return FindPointer(name, 0, ptr);
 }
 
 
-status_t 
-BMessage::FindPointer(const char* name, int32 index, void** ptr) const
+status_t
+BMessage::FindPointer(const char *name, int32 index, void **ptr) const
 {
-	void** data = NULL;
+	void **data = NULL;
 	ssize_t size = 0;
-	status_t err = FindData(name, B_POINTER_TYPE, index, (const void**)&data, &size);
-	if (err == B_OK)
+	status_t error = FindData(name, B_POINTER_TYPE, index, (const void  **)&data, &size);
+
+	if (error == B_OK)
 		*ptr = *data;
 	else
 		*ptr = NULL;
-	return err;
+
+	return error;
 }
 
 
-status_t 
-BMessage::FindMessenger(const char* name, BMessenger* m) const
+status_t
+BMessage::FindMessenger(const char *name, BMessenger *m) const
 {
 	return FindMessenger(name, 0, m);
 }
 
 
-status_t 
-BMessage::FindMessenger(const char* name, int32 index, BMessenger* m) const
+status_t
+BMessage::FindMessenger(const char *name, int32 index, BMessenger *m) const
 {
-	void* data = NULL; 
+	void *data = NULL; 
 	ssize_t size = 0;
-	status_t err = FindData(name, B_MESSENGER_TYPE, index, (const void **)&data, &size);
-	if (err == B_OK)
+	status_t error = FindData(name, B_MESSENGER_TYPE, index, (const void **)&data, &size);
+
+	if (error == B_OK)
 		memcpy(m, data, sizeof(BMessenger));
 	else
 		*m = BMessenger();
-	return err;
+
+	return error;
 }
 
 
-status_t 
-BMessage::FindRef(const char* name, entry_ref* ref) const
+status_t
+BMessage::FindRef(const char *name, entry_ref *ref) const
 {
 	return FindRef(name, 0, ref);
 }
 
 
-status_t 
-BMessage::FindRef(const char* name, int32 index, entry_ref* ref) const
+status_t
+BMessage::FindRef(const char *name, int32 index, entry_ref *ref) const
 {
-	void* data = NULL;
+	void *data = NULL;
 	ssize_t size = 0;
-	status_t err = FindData(name, B_REF_TYPE, index, (const void**)&data, &size);
-	if (err == B_OK)
-		err = entry_ref_unflatten(ref, (char*)data, size);
+	status_t error = FindData(name, B_REF_TYPE, index, (const void **)&data, &size);
+
+	if (error == B_OK)
+		error = entry_ref_unflatten(ref, (char *)data, size);
 	else
 		*ref = entry_ref();
-	return err;
+
+	return error;
 }
 
 
-status_t 
-BMessage::FindMessage(const char* name, BMessage* msg) const
+status_t
+BMessage::FindMessage(const char *name, BMessage *msg) const
 {
 	return FindMessage(name, 0, msg);
 }
 
 
-status_t 
-BMessage::FindMessage(const char* name, int32 index, BMessage* msg) const
+status_t
+BMessage::FindMessage(const char *name, int32 index, BMessage *msg) const
 {
-	void* data = NULL;
+	void *data = NULL;
 	ssize_t size = 0;
-	status_t err = FindData(name, B_MESSAGE_TYPE, index, (const void**)&data, &size);
-	if (!err)
-		err = msg->Unflatten((const char*)data);
+	status_t error = FindData(name, B_MESSAGE_TYPE, index, (const void **)&data, &size);
+
+	if (!error)
+		error = msg->Unflatten((const char*)data);
 	else
 		*msg = BMessage();
-	return err;
+
+	return error;
 }
 
 
-status_t 
-BMessage::FindFlat(const char* name, BFlattenable* obj) const
+status_t
+BMessage::FindFlat(const char *name, BFlattenable *obj) const
 {
 	return FindFlat(name, 0, obj);
 }
 
 
-status_t 
-BMessage::FindFlat(const char* name, int32 index, BFlattenable* obj) const
+status_t
+BMessage::FindFlat(const char *name, int32 index, BFlattenable *obj) const
 {
-	void* data = NULL;
+	void *data = NULL;
 	ssize_t numBytes = 0;
-	status_t err = FindData(name, obj->TypeCode(), index, (const void**)&data, &numBytes);
-	if (!err)
-		err = obj->Unflatten(obj->TypeCode(), data, numBytes);
-	return err;
+	status_t error = FindData(name, obj->TypeCode(), index, (const void **)&data, &numBytes);
+
+	if (!error)
+		error = obj->Unflatten(obj->TypeCode(), data, numBytes);
+
+	return error;
 }
 
 
-status_t 
-BMessage::FindData(const char* name, type_code type, const void** data,
-			ssize_t* numBytes) const
+status_t
+BMessage::FindData(const char *name, type_code type, const void **data,
+	ssize_t *numBytes) const
 {
-	return FindData(name, type, 0, data, numBytes);
+	return fBody->FindData(name, type, 0, data, numBytes);
 }
 
 
-status_t 
-BMessage::FindData(const char* name, type_code type, int32 index, 
-			const void** data, ssize_t* numBytes) const
+status_t
+BMessage::FindData(const char *name, type_code type, int32 index, 
+	const void **data, ssize_t *numBytes) const
 {
 	return fBody->FindData(name, type, index, data, numBytes);
 }
 
 
-status_t 
-BMessage::ReplaceString(const char* name, const char* string)
+BRect
+BMessage::FindRect(const char *name, int32 n) const
+{
+	BRect r(0, 0, -1, -1);
+	FindRect(name, n, &r);
+	return r;
+}
+
+
+BPoint
+BMessage::FindPoint(const char *name, int32 n) const
+{
+	BPoint p(0, 0);
+	FindPoint(name, n, &p);
+	return p;
+}
+
+
+status_t
+BMessage::ReplaceString(const char *name, const char *string)
 {
 	return ReplaceString(name, 0, string);
 }
 
 
-status_t 
-BMessage::ReplaceString(const char* name, int32 index, const char* string)
+status_t
+BMessage::ReplaceString(const char *name, int32 index, const char *string)
 {
 	return ReplaceData(name, B_STRING_TYPE, index, string, strlen(string)+1);
 }
 
 
-status_t 
-BMessage::ReplaceString(const char* name, const BString& string)
+status_t
+BMessage::ReplaceString(const char *name, const BString &string)
 {
 	return ReplaceString(name, 0, string);
 }
 
 
-status_t 
-BMessage::ReplaceString(const char* name, int32 index, const BString& string)
+status_t
+BMessage::ReplaceString(const char *name, int32 index, const BString &string)
 {
 	return ReplaceData(name, B_STRING_TYPE, index, string.String(), string.Length()+1);
 }
 
 
-status_t 
-BMessage::ReplacePointer(const char* name, const void* ptr)
+status_t
+BMessage::ReplacePointer(const char *name, const void *ptr)
 {
 	return ReplacePointer(name, 0, ptr);
 }
 
 
-status_t 
-BMessage::ReplacePointer(const char* name, int32 index, const void* ptr)
+status_t
+BMessage::ReplacePointer(const char *name, int32 index, const void *ptr)
 {
 	return ReplaceData(name, B_POINTER_TYPE, index, &ptr, sizeof(ptr));
 }
 
 
-status_t 
-BMessage::ReplaceMessenger(const char* name, BMessenger messenger)
+status_t
+BMessage::ReplaceMessenger(const char *name, BMessenger messenger)
 {
 	return ReplaceData(name, B_MESSENGER_TYPE, 0, &messenger, sizeof(BMessenger));
 }
 
 
-status_t 
-BMessage::ReplaceMessenger(const char* name, int32 index, BMessenger messenger)
+status_t
+BMessage::ReplaceMessenger(const char *name, int32 index, BMessenger messenger)
 {
 	return ReplaceData(name, B_MESSENGER_TYPE, index, &messenger, sizeof(BMessenger));
 }
 
 
-status_t 
-BMessage::ReplaceRef(const char* name, const entry_ref* ref)
+status_t
+BMessage::ReplaceRef(const char *name, const entry_ref *ref)
 {
 	return ReplaceRef(name, 0, ref);
 }
 
 
-status_t 
-BMessage::ReplaceRef(const char* name, int32 index, const entry_ref* ref)
+status_t
+BMessage::ReplaceRef(const char *name, int32 index, const entry_ref *ref)
 {
 	BMallocIO *buffer = new BMallocIO();
 	buffer->SetSize(sizeof(entry_ref) + B_PATH_NAME_LENGTH);
@@ -1653,15 +1510,15 @@ BMessage::ReplaceRef(const char* name, int32 index, const entry_ref* ref)
 }
 
 
-status_t 
-BMessage::ReplaceMessage(const char* name, const BMessage* msg)
+status_t
+BMessage::ReplaceMessage(const char *name, const BMessage *msg)
 {
 	return ReplaceMessage(name, 0, msg);
 }
 
 
-status_t 
-BMessage::ReplaceMessage(const char* name, int32 index, const BMessage* msg)
+status_t
+BMessage::ReplaceMessage(const char *name, int32 index, const BMessage *msg)
 {
 	BMallocIO *buffer = new BMallocIO();
 	status_t error = msg->Flatten(buffer);
@@ -1676,15 +1533,15 @@ BMessage::ReplaceMessage(const char* name, int32 index, const BMessage* msg)
 }
 
 
-status_t 
-BMessage::ReplaceFlat(const char* name, BFlattenable* object)
+status_t
+BMessage::ReplaceFlat(const char *name, BFlattenable *object)
 {
 	return ReplaceFlat(name, 0, object);
 }
 
 
-status_t 
-BMessage::ReplaceFlat(const char* name, int32 index, BFlattenable* object)
+status_t
+BMessage::ReplaceFlat(const char *name, int32 index, BFlattenable *object)
 {
 	ssize_t size = object->FlattenedSize();
 	BMallocIO *buffer = new BMallocIO();
@@ -1701,17 +1558,17 @@ BMessage::ReplaceFlat(const char* name, int32 index, BFlattenable* object)
 }
 
 
-status_t 
-BMessage::ReplaceData(const char* name, type_code type,
-	const void* data, ssize_t data_size)
+status_t
+BMessage::ReplaceData(const char *name, type_code type, const void *data,
+	ssize_t data_size)
 {
 	return ReplaceData(name, type, 0, data, data_size);
 }
 
 
 status_t
-BMessage::ReplaceData(const char* name, type_code type, int32 index,
-	const void* data, ssize_t data_size)
+BMessage::ReplaceData(const char *name, type_code type, int32 index,
+	const void *data, ssize_t data_size)
 {
 	BMallocIO *buffer = new BMallocIO();
 	buffer->Write(data, data_size);
@@ -1724,7 +1581,28 @@ BMessage::ReplaceData(const char* name, type_code type, int32 index,
 }
 
 
-void* 
+bool
+BMessage::HasFlat(const char *name, const BFlattenable *flat) const
+{
+	return HasFlat(name, 0, flat);
+}
+
+
+bool
+BMessage::HasFlat(const char *name, int32 n, const BFlattenable *flat) const
+{
+	return fBody->HasData(name, flat->TypeCode(), n);
+}
+
+
+bool
+BMessage::HasData(const char *name, type_code t, int32 n) const
+{
+	return fBody->HasData(name, t, n);
+}
+
+
+void *
 BMessage::operator new(size_t size)
 {
 	if (!sMsgCache)
@@ -1734,87 +1612,47 @@ BMessage::operator new(size_t size)
 }
 
 
-void*
-BMessage::operator new(size_t, void* p)
+void *
+BMessage::operator new(size_t, void *p)
 {
 	return p;
 }
 
 
 void
-BMessage::operator delete(void* ptr, size_t size)
+BMessage::operator delete(void *ptr, size_t size)
 {
 	sMsgCache->Save(ptr, size);
 }
 
 
-bool
-BMessage::HasFlat(const char* name, const BFlattenable* flat) const
-{
-	return HasFlat(name, 0, flat);
-}
-
-
-bool
-BMessage::HasFlat(const char* name, int32 n, const BFlattenable* flat) const
-{
-	return fBody->HasData(name, flat->TypeCode(), n);
-}
-
-
-bool
-BMessage::HasData(const char* name, type_code t, int32 n) const
-{
-	return fBody->HasData(name, t, n);
-}
-
-
-BRect
-BMessage::FindRect(const char* name, int32 n) const
-{
-	BRect r(0, 0, -1, -1);
-	FindRect(name, n, &r);
-	return r;
-}
-
-
-BPoint
-BMessage::FindPoint(const char* name, int32 n) const
-{
-	BPoint p(0, 0);
-	FindPoint(name, n, &p);
-	return p;
-}
-
-
 status_t
-BMessage::real_flatten(char* result, ssize_t size) const
+BMessage::real_flatten(char *result, ssize_t size) const
 {
 	BMemoryIO stream((void*)result, size);
-	return real_flatten(&stream);
+	return real_flatten(&stream, NULL);
 }
 
 
 status_t
-BMessage::real_flatten(BDataIO* stream) const
+BMessage::real_flatten(BDataIO *stream, ssize_t *size) const
 {
 	Header header(*this);
 
-	status_t err = header.WriteTo(*stream);
+	status_t error = header.WriteTo(*stream);
+	if (!error)
+		error = fBody->Flatten(stream);
 
-	if (!err)
-		err = fBody->Flatten(stream);
-
-	return err;
+	return error;
 }
 
 
-char*
-BMessage::stack_flatten(char* stack_ptr, ssize_t stack_size,
-	bool /*incl_reply*/, ssize_t* size) const
+char *
+BMessage::stack_flatten(char *stack_ptr, ssize_t stack_size,
+	bool /*incl_reply*/, ssize_t *size) const
 {
 	const ssize_t calcd_size = calc_hdr_size(0) + fBody->FlattenedSize();
-	char* new_ptr = NULL;
+	char *new_ptr = NULL;
 	if (calcd_size > stack_size) {
 		stack_ptr = new char[calcd_size];
 		new_ptr = stack_ptr;
@@ -1865,12 +1703,11 @@ BMessage::calc_hdr_size(uchar flags) const
 
 
 status_t
-BMessage::_send_(port_id port, int32 token, bool preferred,
-	bigtime_t timeout, bool reply_required,
-	BMessenger& reply_to) const
+BMessage::_send_(port_id port, int32 token, bool preferred, bigtime_t timeout,
+	bool reply_required, BMessenger &reply_to) const
 {
 	PRINT(("BMessage::_send_(port: %ld, token: %ld, preferred: %d): "
-		"what: %lx (%.4s)\n", port, token, preferred, what, (char*)&what));
+		"what: %lx (%.4s)\n", port, token, preferred, what, (char *)&what));
 
 	bool oldPreferred = fPreferred;
 	int32 oldTarget = fTarget;
@@ -1883,47 +1720,50 @@ BMessage::_send_(port_id port, int32 token, bool preferred,
 			reply_to = be_app_messenger;
 	}
 
-	BMessage* self = const_cast<BMessage*>(this);
+	BMessage *self = const_cast<BMessage *>(this);
 	BMessenger::Private replyToPrivate(reply_to);
-	self->fPreferred         = preferred;
-	self->fTarget            = token;
-	self->fReplyRequired     = reply_required;
-	self->fReplyTo.team      = replyToPrivate.Team();
-	self->fReplyTo.port      = replyToPrivate.Port();
-	self->fReplyTo.target    = (replyToPrivate.IsPreferredTarget()
-								? B_PREFERRED_TOKEN : replyToPrivate.Token());
+	self->fPreferred = preferred;
+	self->fTarget = token;
+	self->fReplyRequired = reply_required;
+	self->fReplyTo.team = replyToPrivate.Team();
+	self->fReplyTo.port = replyToPrivate.Port();
+	self->fReplyTo.target = (replyToPrivate.IsPreferredTarget()
+							? B_PREFERRED_TOKEN : replyToPrivate.Token());
 	self->fReplyTo.preferred = replyToPrivate.IsPreferredTarget();
 
 	char tmp[0x800];
 	ssize_t size;
-	char* p = stack_flatten(tmp, sizeof(tmp), true /* include reply */, &size);
-	char* pMem = p ? p : tmp;
-	status_t err;
+	char *p = stack_flatten(tmp, sizeof(tmp), true /* include reply */, &size);
+	char *pMem = p ? p : tmp;
+	status_t error;
+
 	do {
-		err = write_port_etc(port, 'pjpp', pMem, size, B_RELATIVE_TIMEOUT, timeout);
-	} while (err == B_INTERRUPTED);
+		error = write_port_etc(port, 'pjpp', pMem, size, B_RELATIVE_TIMEOUT, timeout);
+	} while (error == B_INTERRUPTED);
+
 	if (p)
 		delete[] p;
 
-	self->fPreferred     = oldPreferred;
-	self->fTarget        = oldTarget;
+	self->fPreferred = oldPreferred;
+	self->fTarget = oldTarget;
 	self->fReplyRequired = false;	// To this copy, no reply is required.
 									// Only relevant when forwarding anyway.
-	self->fReplyTo       = oldReplyTo;
+	self->fReplyTo = oldReplyTo;
 
-	PRINT(("BMessage::_send_() done: %lx\n", err));
-	return err;
+	PRINT(("BMessage::_send_() done: %lx\n", error));
+	return error;
 }
 
 
 status_t
 BMessage::send_message(port_id port, team_id port_owner, int32 token,
-	bool preferred, BMessage* reply, bigtime_t send_timeout,
+	bool preferred, BMessage *reply, bigtime_t send_timeout,
 	bigtime_t reply_timeout) const
 {
 	const int32 cached_reply_port = sGetCachedReplyPort();
 	port_id reply_port;
-	status_t err;
+	status_t error;
+
 	if (cached_reply_port == -1) {
 		// All the cached reply ports are in use; create a new one
 		reply_port = create_port(1 /* for one message */, "tmp_reply_port");
@@ -1939,29 +1779,30 @@ BMessage::send_message(port_id port, team_id port_owner, int32 token,
 		team = be_app->Team();
 	else {
 		port_info pi;
-		err = get_port_info(reply_port, &pi);
-		if (err)
+		error = get_port_info(reply_port, &pi);
+		if (error)
 			goto error;
 
 		team = pi.team;
 	}
 
-	err = set_port_owner(reply_port, port_owner);
-	if (err)
+	error = set_port_owner(reply_port, port_owner);
+	if (error)
 		goto error;
 
 	{
 		BMessenger messenger;
 		BMessenger::Private(messenger).SetTo(team, reply_port,
 			B_PREFERRED_TOKEN, false);
-		err = _send_(port, token, preferred, send_timeout, true, messenger);
+		error = _send_(port, token, preferred, send_timeout, true, messenger);
 	}
-	if (err)
+
+	if (error)
 		goto error;
 
 	int32 code;
-	err = handle_reply(reply_port, &code, reply_timeout, reply);
-	if (err && cached_reply_port >= 0) {
+	error = handle_reply(reply_port, &code, reply_timeout, reply);
+	if (error && cached_reply_port >= 0) {
 		delete_port(reply_port);
 		sReplyPorts[cached_reply_port] = create_port(1, "tmp_rport");
 	}
@@ -1972,10 +1813,11 @@ error:
 		set_port_owner(reply_port, team);
 		// Flag as available
 		atomic_add(&sReplyPortInUse[cached_reply_port], -1);
-		return err;
+		return error;
 	}
+
 	delete_port(reply_port);
-	return err;
+	return error;
 }
 
 
@@ -1990,7 +1832,7 @@ BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 	if (!data)
 		return B_BAD_VALUE;
 
-	uint32 magic = *(uint32*)data;
+	uint32 magic = *(uint32 *)data;
 
 	// prepare flattened fields
 	if (((KMessage::Header*)data)->magic == KMessage::kMessageHeaderMagic) {
@@ -2006,11 +1848,11 @@ BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 
 		Header header;
 		status_t error = header.SetMagic(magic);
-		if (error != B_OK)
+		if (error < B_OK)
 			return error;
 
 		error = header.ReadFrom(stream);
-		if (error != B_OK)
+		if (error < B_OK)
 			return error;
 
 		if (!header.HasTarget()) {
@@ -2035,9 +1877,8 @@ BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 		error = header.WriteTo(stream);
 		if (error != B_OK)
 			return error;
-	} else {
+	} else
 		return B_NOT_A_MESSAGE;
-	}
 
 	// send the message
 	status_t error;
@@ -2087,17 +1928,13 @@ int32
 BMessage::sGetCachedReplyPort()
 {
 	int index = -1;
-	for (int32 i = 0; i < sNumReplyPorts; i++)
-	{
+	for (int32 i = 0; i < sNumReplyPorts; i++) {
 		int32 old = atomic_add(&(sReplyPortInUse[i]), 1);
-		if (old == 0)
-		{
+		if (old == 0) {
 			// This entry is free
 			index = i;
 			break;
-		}
-		else
-		{
+		} else {
 			// This entry is being used.
 			atomic_add(&(sReplyPortInUse[i]), -1);
 		}
@@ -2108,60 +1945,62 @@ BMessage::sGetCachedReplyPort()
 
 
 static status_t
-handle_reply(port_id reply_port, int32* pCode,
-	bigtime_t timeout, BMessage* reply)
+handle_reply(port_id reply_port, int32 *pCode, bigtime_t timeout,
+	BMessage *reply)
 {
 	PRINT(("handle_reply(port: %ld)\n", reply_port));
 
-	status_t err;
+	status_t error;
 	do {
-		err = port_buffer_size_etc(reply_port, 8, timeout);
-	} while (err == B_INTERRUPTED);
+		error = port_buffer_size_etc(reply_port, 8, timeout);
+	} while (error == B_INTERRUPTED);
 
-	if (err < 0) {
+	if (error < B_OK) {
 		PRINT(("handle_reply() error 1: %lx\n", err));
-		return err;
+		return error;
 	}
 
 	// The API lied. It really isn't an error code, but the message size...
-	char* pAllocd = NULL;
-	char* pMem    = NULL;
+	char *pAllocd = NULL;
+	char *pMem = NULL;
 	char tmp[0x800];
-	if (err < 0x800)
+
+	if (error < 0x800)
 		pMem = tmp;
 	else {
-		pAllocd = new char[err];
+		pAllocd = new char[error];
 		pMem = pAllocd;
 	}
 
 	do {
-		err = read_port(reply_port, pCode, pMem, err);
-	} while (err == B_INTERRUPTED);
+		error = read_port(reply_port, pCode, pMem, error);
+	} while (error == B_INTERRUPTED);
 
-	if (err < 0) {
-		PRINT(("handle_reply() error 2: %lx\n", err));
-		return err;
+	if (error < 0) {
+		PRINT(("handle_reply() error 2: %lx\n", error));
+		return error;
 	}
 
 	if (*pCode == 'PUSH') {
 		PRINT(("handle_reply() error 3: %x\n", B_ERROR));
 		return B_ERROR;
 	}
+
 	if (*pCode != 'pjpp') {
 		PRINT(("handle_reply() error 4: port message code not 'pjpp' but "
 			"'%lx'\n", *pCode));
 		return B_ERROR;
 	}
 
-	err = reply->Unflatten(pMem);
+	error = reply->Unflatten(pMem);
 
 	// There seems to be a bug in the original Be implementation.
 	// It never free'd pAllocd !
 	if (pAllocd)
 		delete[] pAllocd;
 
-	PRINT(("handle_reply() done: %lx\n", err));
-	return err;
+	PRINT(("handle_reply() done: %lx\n", error));
+	return error;
 }
 
 

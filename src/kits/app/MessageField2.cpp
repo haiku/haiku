@@ -16,10 +16,12 @@ namespace BPrivate {
 
 BMessageField::BMessageField()
 	:	fType(0),
+		fFixedSize(false),
 		fTotalSize(0),
 		fTotalPadding(0),
 		fNext(NULL)
 {
+	SetName("");
 }
 
 

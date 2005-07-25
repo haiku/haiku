@@ -41,6 +41,7 @@ public:
 
 		ssize_t				FlattenedSize() const;
 		status_t			Flatten(BDataIO *stream) const;
+		status_t			Unflatten(BDataIO *stream);
 
 		status_t			AddData(const char *name, BMallocIO *buffer,
 								type_code type);
@@ -68,8 +69,10 @@ public:
 
 private:
 		status_t			InitCommon();
+		BMessageField		*AddField(const char *name, type_code type,
+								status_t &error);
 		BMessageField		*FindData(const char *name, type_code type,
-								 status_t &error) const;
+								status_t &error) const;
 
 		BList				fFieldList;
 		BMessageField		**fFieldTable;

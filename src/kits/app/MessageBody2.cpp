@@ -214,8 +214,7 @@ BMessageBody::FlattenedSize() const
 		BMessageField *field = (BMessageField *)fFieldList.ItemAt(index);
 
 		uint8 flags = field->Flags();
-		size += sizeof(flags);
-		size += sizeof(type_code);
+		size += sizeof(flags) + sizeof(type_code);
 
 		// count information
 		if (!(flags & MSG_FLAG_SINGLE_ITEM)) {
@@ -326,6 +325,110 @@ BMessageBody::Flatten(BDataIO *stream) const
 
 
 status_t
+BMessageBody::Unflatten(BDataIO *stream)
+{
+	if (!IsEmpty())
+		MakeEmpty();
+
+	try {
+		TReadHelper reader(stream);
+		char name[255];
+
+		uint8 flags;
+		reader(flags);
+
+		while (flags != MSG_LAST_ENTRY) {
+			type_code type;
+			reader(type);
+
+			int32 itemCount;
+			int32 dataLength;
+			uint8 littleData;
+			if (flags & MSG_FLAG_SINGLE_ITEM) {
+				itemCount = 1;
+
+				if (flags & MSG_FLAG_MINI_DATA) {
+					reader(littleData);
+					dataLength = littleData;
+				} else
+					reader(dataLength);
+			} else {
+				if (flags & MSG_FLAG_MINI_DATA) {
+					reader(littleData);
+					itemCount = littleData;
+
+					reader(littleData);
+					dataLength = littleData;
+				} else {
+					reader(itemCount);
+					reader(dataLength);
+				}
+			}
+
+			// get the name length (1 byte) and name
+			uint8 nameLength;
+			reader(nameLength);
+			reader(name, nameLength);
+			name[nameLength] = '\0';
+
+#if 0
+			// ToDo: Add these swapping capabilities again
+			if (swap) {
+				// Is the data fixed size?
+				if ((flags & MSG_FLAG_FIXED_SIZE) != 0) {
+					// Make sure to swap the data
+					status = swap_data(type, (void*)databuffer, dataLen,
+									B_SWAP_ALWAYS);
+					if (status < B_OK)
+						throw status;
+				} else if (type == B_REF_TYPE) {
+					// Is the data variable size?
+					// Apparently, entry_refs are the only variable-length data
+					// explicitely swapped -- the dev_t and ino_t specifically
+					byte_swap(*(entry_ref*)databuffer);
+				}
+			}
+#endif
+			status_t error = B_ERROR;
+			BMessageField *field = AddField(name, type, error);
+			if (error < B_OK)
+				return error;
+
+			if (flags & MSG_FLAG_FIXED_SIZE) {
+				int32 itemSize = dataLength / itemCount;
+
+				for (int32 index = 0; index < itemCount; index++) {
+					BMallocIO *buffer = new BMallocIO();
+					buffer->SetSize(itemSize);
+					reader((char *)buffer->Buffer(), itemSize);
+					field->AddItem(buffer);
+				}
+			} else {
+				char padding[8];
+				ssize_t dataLength;
+
+				for (int32 index = 0; index < itemCount; index++) {
+					BMallocIO *buffer = new BMallocIO();
+					reader(dataLength);
+					buffer->SetSize(dataLength);
+
+					reader((char *)buffer->Buffer(), dataLength);
+					reader(padding, calc_padding(dataLength + 4, 8));
+					field->AddItem(buffer);
+				}
+			}
+
+			reader(flags);
+		}
+	} catch (status_t &error) {
+		return error;
+	}
+
+	return B_OK;
+}
+
+
+status_t
 BMessageBody::AddData(const char *name, BMallocIO *buffer, type_code type)
 {
 	status_t error = B_OK;
@@ -355,6 +458,29 @@ BMessageBody::AddData(const char *name, BMallocIO *buffer, type_code type)
 	}
 
 	return error;
+}
+
+
+BMessageField *
+BMessageBody::AddField(const char *name, type_code type, status_t &error)
+{
+	BMessageField *foundField = FindData(name, type, error);
+
+	if (foundField) {
+		error = B_OK;
+		return foundField;
+	}
+
+	if (!foundField && error == B_NAME_NOT_FOUND) {
+		// add a new field if it's not yet present
+		BMessageField *newField = new BMessageField(name, type);
+		fFieldList.AddItem(newField);
+		HashInsert(newField);
+		error = B_OK;
+		return newField;
+	}
+
+	return NULL;
 }
 
 
