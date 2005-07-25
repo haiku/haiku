@@ -24,6 +24,8 @@ class MessageLooper : public BLocker {
 
 		void			PostMessage(int32 code);
 		thread_id		Thread() const { return fThread; }
+		bool			IsQuitting() const { return fQuitting; }
+
 		virtual port_id	MessagePort() const = 0;
 
 	private:
@@ -32,6 +34,7 @@ class MessageLooper : public BLocker {
 		virtual void	_DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
 		virtual void	_MessageLooper();
 
+	protected:
 		static int32	_message_thread(void *_looper);
 
 	protected:

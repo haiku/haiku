@@ -75,28 +75,28 @@ ColorSet gGUIColorSet;
 	This loads the default fonts, allocates all the major global variables, spawns the main housekeeping
 	threads, loads user preferences for the UI and decorator, and allocates various locks.
 */
+AppServer::AppServer()
+	: MessageLooper("app_server"),
 #if TEST_MODE
-AppServer::AppServer() : BApplication (SERVER_SIGNATURE),
-#else
-AppServer::AppServer() : 
+	BApplication(SERVER_SIGNATURE),
 #endif
 	fCursorSem(-1),
 	fCursorArea(-1)
 {
-	fMessagePort = create_port(200, SERVER_PORT_NAME);
-	if (fMessagePort == B_NO_MORE_PORTS)
+	fMessagePort = create_port(DEFAULT_MONITOR_PORT_SIZE, SERVER_PORT_NAME);
+	if (fMessagePort < B_OK)
 		debugger("app_server could not create message port");
 
+	fLink.SetReceiverPort(fMessagePort);
 	gAppServerPort = fMessagePort;
 
 	// Create the input port. The input_server will send it's messages here.
 	// TODO: If we want multiple user support we would need an individual
 	// port for each user and do the following for each RootLayer.
 	fServerInputPort = create_port(200, SERVER_INPUT_PORT);
-	if (fServerInputPort == B_NO_MORE_PORTS)
+	if (fServerInputPort < B_OK)
 		debugger("app_server could not create input port");
 
-	fQuitting = false;
 	sAppServer = this;
 
 	// Create the font server and scan the proper directories.
@@ -173,11 +173,6 @@ AppServer::AppServer() :
 	gDesktop->Init();
 	gDesktop->Run();
 
-	// Spawn our thread-monitoring thread
-	fPicassoThreadID = spawn_thread(PicassoThread, "picasso", B_NORMAL_PRIORITY, this);
-	if (fPicassoThreadID >= 0)
-		resume_thread(fPicassoThreadID);
-
 #if 0
 	LaunchCursorThread();
 #endif
@@ -185,72 +180,16 @@ AppServer::AppServer() :
 
 /*!
 	\brief Destructor
-	
-	Reached only when the server is asked to shut down in Test mode. Kills all apps, shuts down the 
-	desktop, kills the housekeeping threads, etc.
+	Reached only when the server is asked to shut down in Test mode.
 */
 AppServer::~AppServer()
 {
-	debugger("We shouldn't be here! MainLoop()::B_QUIT_REQUESTED should see if we can exit the server.\n");
-/*
-	ServerApp *tempapp;
-	int32 i;
-	acquire_sem(fAppListLock);
-	for(i=0;i<fAppList->CountItems();i++)
-	{
-		tempapp=(ServerApp *)fAppList->ItemAt(i);
-		if(tempapp!=NULL)
-			delete tempapp;
-	}
-	delete fAppList;
-	release_sem(fAppListLock);
-
 	delete gBitmapManager;
 
-	delete gDesktop;
-
-	// If these threads are still running, kill them - after this, if exit_poller
-	// is deleted, who knows what will happen... These things will just return an
-	// error and fail if the threads have already exited.
-	kill_thread(fPicassoThreadID);
-	kill_thread(fCursorThreadID);
-	kill_thread(fISThreadID);
+	gScreenManager->Lock();
+	gScreenManager->Quit();
 
 	delete gFontServer;
-	
-	make_decorator=NULL;
-*/
-}
-
-/*!
-	\brief Thread function for watching for dead apps
-	\param data Pointer to the app_server to which the thread belongs
-	\return Throwaway value - always 0
-*/
-int32
-AppServer::PicassoThread(void *data)
-{
-	while (!sAppServer->fQuitting) {
-		// TODO: we don't need to do this anymore - dead apps are
-		//	detected automatically
-#if 0
-		sAppServer->fAppListLock.Lock();
-
-		for (int32 i = 0;;) {
-			ServerApp *app = (ServerApp *)sAppServer->fAppList.ItemAt(i++);
-			if (!app)
-				break;
-
-			app->PingTarget();
-		}
-
-		sAppServer->fAppListLock.Unlock();
-#endif
-		// we do this every second so as not to suck *too* many CPU cycles
-		snooze(1000000);
-	}
-
-	return 0;
 }
 
 
@@ -347,58 +286,22 @@ AppServer::CursorThread(void* data)
 		}
 
 		snooze(100000);
-		
-	} while (!server->fQuitting);
+	} while (!server->IsQuitting());
 
 	return B_OK;
 }
 
 
 /*!
-	\brief Send a message to the AppServer with no attachments
-	\param code ID code of the message to post
-*/
-void
-AppServer::PostMessage(int32 code)
-{
-	BPrivate::LinkSender link(fMessagePort);
-	link.StartMessage(code);
-	link.Flush();
-}
-
-
-/*!
 	\brief The call that starts it all...
-	\return Always 0
 */
-thread_id
-AppServer::Run(void)
-{
-	MainLoop();
-	kill_thread(fPicassoThreadID);
-	return 0;
-}
-
-
-//! Main message-monitoring loop for the regular message port - no input messages!
 void
-AppServer::MainLoop(void)
+AppServer::RunLooper()
 {
-	BPrivate::PortLink link(-1, fMessagePort);
-
-	while (1) {
-		STRACE(("info: AppServer::MainLoop listening on port %ld.\n", fMessagePort));
-
-		int32 code;
-		status_t err = link.GetNextMessage(code);
-		if (err < B_OK) {
-			STRACE(("MainLoop:link.GetNextMessage() failed\n"));
-			continue;
-		}
-
-		DispatchMessage(code, link);
-	}
+	rename_thread(find_thread(NULL), "picasso");
+	_message_thread((void *)this);
 }
+
 
 /*!
 	\brief Message handling function for all messages sent to the app_server
@@ -407,7 +310,7 @@ AppServer::MainLoop(void)
 	
 */
 void
-AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
+AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 {
 	switch (code) {
 		case AS_GET_DESKTOP:
@@ -448,18 +351,21 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 
 			// Seeing how the client merely wants an answer, we'll skip the BPortLink
 			// and all its overhead and just write the code to port.
-			port_id replyport;
-			if (msg.Read<port_id>(&replyport) < B_OK)
+			port_id replyPort;
+			if (msg.Read<port_id>(&replyPort) < B_OK)
 				break;
-			BPrivate::PortLink replylink(replyport);
-			replylink.StartMessage(needsUpdate ? SERVER_TRUE : SERVER_FALSE);
-			replylink.Flush();
+
+			BPrivate::PortLink reply(replyPort);
+			reply.StartMessage(needsUpdate ? SERVER_TRUE : SERVER_FALSE);
+			reply.Flush();
 			break;
 		}
 
 #if TEST_MODE
 		case B_QUIT_REQUESTED:
 		{
+			thread_id thread = gDesktop->Thread();
+
 			// We've been asked to quit, so (for now) broadcast to all
 			// test apps to quit. This situation will occur only when the server
 			// is compiled as a regular Be application.
@@ -469,15 +375,10 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 
 			// we just wait for the desktop to kill itself
 			status_t status;
-			wait_for_thread(gDesktop->Thread(), &status);
+			wait_for_thread(thread, &status);
 
-			kill_thread(fPicassoThreadID);
-
-			delete gDesktop;
-			delete gBitmapManager;
-			// TODO: deleting the font server results in an endless loop somewhere
-			//	down in FreeType code - smells like memory corruption
-			//delete gFontServer;
+			kill_thread(fCursorThreadID);
+			delete this;
 
 			// we are now clear to exit
 			exit(0);
@@ -551,8 +452,8 @@ main(int argc, char** argv)
 
 	srand(real_time_clock_usecs());
 
-	AppServer server;
-	server.Run();
+	AppServer* server = new AppServer;
+	server->RunLooper();
 
 	return 0;
 }

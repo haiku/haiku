@@ -16,6 +16,7 @@
 #include <String.h>
 
 #include "ServerConfig.h"
+#include "MessageLooper.h"
 
 class ServerApp;
 class BitmapManager;
@@ -34,34 +35,30 @@ namespace BPrivate {
 	and initializes most of the server's globals.
 */
 
-class AppServer
+class AppServer :
+	public MessageLooper 
 #if TEST_MODE
-	: public BApplication
+	, public BApplication
 #endif
 {
-public:
-						AppServer();
-						~AppServer();
+	public:
+		AppServer();
+		virtual ~AppServer();
 
-static	int32			PollerThread(void *data);
-static	int32			PicassoThread(void *data);
-		thread_id		Run(void);
-		void 			MainLoop(void);
+		void			RunLooper();
+		virtual port_id	MessagePort() const { return fMessagePort; }
 
-		void			PostMessage(int32 code);
-		void			DispatchMessage(int32 code, BPrivate::PortLink &link);
-
-private:
+	private:
+		virtual void	_DispatchMessage(int32 code, BPrivate::LinkReceiver& link);
 		void			LaunchCursorThread();
 		void			LaunchInputServer();
-static	int32			CursorThread(void *data);
 
+//		static	int32	PollerThread(void *data);
+		static	int32	CursorThread(void *data);
+
+	private:
 		port_id			fMessagePort;
 		port_id			fServerInputPort;
-
-volatile bool			fQuitting;
-
-		thread_id		fPicassoThreadID;
 
 		thread_id		fISThreadID;
 		thread_id		fCursorThreadID;
