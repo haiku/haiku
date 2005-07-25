@@ -1,4 +1,4 @@
-/* Copyright (c) 2003-2004 
+/* Copyright (c) 2003-2005 
  * Stefano Ceccherini <burton666@libero.it>. All rights reserved.
  * This file is released under the MIT license
  */
@@ -19,7 +19,7 @@
 extern char * gDevNameList[];
 extern pci_info *gDevList[];
 
-static int32 gOpenMask = 0;
+static int32 sOpenMask = 0;
 
 static status_t
 wb840_open(const char *name, uint32 flags, void** cookie)
@@ -42,14 +42,14 @@ wb840_open(const char *name, uint32 flags, void** cookie)
 		return EINVAL;
 	}
 	
-	/* There can be only one access at time */
+	// There can be only one access at time
 	mask = 1L << i;
-	if (atomic_or(&gOpenMask, mask) & mask)
+	if (atomic_or(&sOpenMask, mask) & mask)
 		return B_BUSY;
 	
-	/* Allocate a wb_device structure */
+	// Allocate a wb_device structure
 	if (!(data = (wb_device *)malloc(sizeof(wb_device)))) {
-		gOpenMask &= ~(1L << i);
+		sOpenMask &= ~(1L << i);
 		return B_NO_MEMORY;
 	}
 	
@@ -109,7 +109,6 @@ wb840_open(const char *name, uint32 flags, void** cookie)
 	}
 	
 	wb_enable_interrupts(data);	
-	wb_set_rx_filter(data);
 	
 	WB_SETBIT(data->reg_base + WB_NETCFG, WB_NETCFG_RX_ON);
 	write32(data->reg_base + WB_RXSTART, 0xFFFFFFFF);
@@ -126,7 +125,7 @@ err1:
 	wb_delete_semaphores(data);
 	
 err:			
-	gOpenMask &= ~(1L << i);
+	sOpenMask &= ~(1L << i);
 	
 	free(data);	
 	LOG(("wb840: Open Failed\n"));
@@ -154,7 +153,8 @@ wb840_read(void* cookie, off_t position, void *buf, size_t* num_bytes)
 		return B_ERROR;
 	}
 	
-	if ((status = acquire_sem_etc(device->rxSem, 1, B_CAN_INTERRUPT | blockFlag, 0)) < B_OK) {
+	status = acquire_sem_etc(device->rxSem, 1, B_CAN_INTERRUPT | blockFlag, 0);
+	if (status < B_OK) {
 		atomic_and(&device->rxLock, 0);
 		*num_bytes = 0;
 		return status;
@@ -224,7 +224,8 @@ wb840_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 	current = device->txCurrent;
 
 	// block until a free tx descriptor is available
-	if ((status = acquire_sem_etc(device->txSem, 1, B_TIMEOUT, ETHER_TRANSMIT_TIMEOUT)) < B_OK) {
+	status = acquire_sem_etc(device->txSem, 1, B_TIMEOUT, ETHER_TRANSMIT_TIMEOUT);
+	if (status < B_OK) {
 		write32(device->reg_base + WB_TXSTART, 0xFFFFFFFF);
 		LOG(("write: acquiring sem failed: %ld, %s\n", status, strerror(status)));
 		atomic_add(&device->txLock, -1);
@@ -245,9 +246,9 @@ wb840_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 	memcpy((void *)device->txBuffer[current], buffer, frameSize);
 	device->txCurrent = (current + 1) & WB_TX_CNT_MASK;
 	LOG((DEVICE_NAME ": %d bytes written\n", frameSize));
+	
 	{
-		cpu_status former;
-		former = disable_interrupts();
+		cpu_status former = disable_interrupts();
 		acquire_spinlock(&device->txSpinlock);
 		
 		device->txDescriptor[current].wb_ctl = WB_TXCTL_TLINK | frameSize;
@@ -289,23 +290,23 @@ wb840_control (void *cookie, uint32 op, void *arg, size_t len)
 			LOG(("ETHER_NON_BLOCK\n"));
 			data->blockFlag = *(int32 *)arg ? B_TIMEOUT : 0;
 			return B_OK;
-
+		
+		case ETHER_GETFRAMESIZE:
+			LOG(("ETHER_GETFRAMESIZE\n"));
+			*(uint32 *)arg = WB_MAX_FRAMELEN;
+			return B_OK;
+			
 		case ETHER_ADDMULTI:
 			LOG(("ETHER_ADDMULTI\n"));
 			break;
 		
 		case ETHER_REMMULTI:
 			LOG(("ETHER_REMMULTI\n"));
-			return B_OK;
+			break;
 		
 		case ETHER_SETPROMISC:
 			LOG(("ETHER_SETPROMISC\n"));
-			return B_OK;
-		
-		case ETHER_GETFRAMESIZE:
-			LOG(("ETHER_GETFRAMESIZE\n"));
-			*(uint32*)arg = WB_MAX_FRAMELEN;
-			return B_OK;
+			break;
 			
 		default:
 			LOG(("Invalid command\n"));
@@ -343,11 +344,11 @@ wb840_close(void* cookie)
 static status_t
 wb840_free(void* cookie)
 {
-	wb_device *device = (wb_device*)cookie;
+	wb_device *device = (wb_device *)cookie;
 	
 	LOG((DEVICE_NAME ": free()\n"));
 	
-	gOpenMask &= ~(1L << device->devId);
+	sOpenMask &= ~(1L << device->devId);
 	
 	wb_delete_rings(device);
 	free(device->firstPHY);

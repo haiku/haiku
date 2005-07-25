@@ -48,6 +48,7 @@ init_driver (void)
 	int index = 0;
 	int card_found = 0;
 	char devName[64];
+	status_t status;
 
 	LOG((DEVICE_NAME ": init_driver\n"));
 	
@@ -55,10 +56,15 @@ init_driver (void)
 	set_dprintf_enabled(true);
 #endif
 	
-	if (get_module(B_PCI_MODULE_NAME, (module_info **)&gPci) < B_OK)
-		return B_ERROR;
+	status = get_module(B_PCI_MODULE_NAME, (module_info **)&gPci);
+	if (status < B_OK)
+		return status;
 	
 	item = (pci_info *)malloc(sizeof(pci_info));
+	if (item == NULL) {
+		put_module(B_PCI_MODULE_NAME);
+		return B_NO_MEMORY;
+	}
 	
 	while (gPci->get_nth_pci_info(index, item) == B_OK) {
 		if (probe(item)) {			

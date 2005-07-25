@@ -19,7 +19,7 @@
 #define ROUND_TO_PAGE_SIZE(x) (((x) + (B_PAGE_SIZE) - 1) & ~((B_PAGE_SIZE) - 1))
 
 // MII chip info table
-#define PHY_ID0_DAVICOM_DM9101 	0x0181
+#define PHY_ID0_DAVICOM_DM9101	0x0181
 #define PHY_ID1_DAVICOM_DM9101	0xb800
 #define	MII_HOME	0x0001
 #define MII_LAN		0x0002
@@ -191,6 +191,8 @@ wb_init(wb_device *device)
 	// Disable early TX/RX interrupt, as we can't take advantage
 	// from them, at least for now.
 	WB_CLRBIT(device->reg_base + WB_NETCFG, (WB_NETCFG_TX_EARLY_ON|WB_NETCFG_RX_EARLY_ON));
+	
+	wb_set_rx_filter(device);
 }
 
 
@@ -381,7 +383,7 @@ wb_interrupt(void *arg)
 	int32 retval = B_UNHANDLED_INTERRUPT;
 	uint32 status;
 	
-	//TODO: Handle others interrupts
+	// TODO: Handle other interrupts
 		
 	acquire_spinlock(&device->intLock);
 	
