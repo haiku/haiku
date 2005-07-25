@@ -111,7 +111,7 @@ BEOS_BIN="touch sync ln listarea listattr listsem listport \
 	id env basename factor tty dstcheck comm modifiers version \
 	csplit cut beep"
 
-BEOS_APPS="MiniTerminal Expander People ShowImage Clock Pulse Playground \
+BEOS_APPS="MiniTerminal Terminal Expander People ShowImage Clock Pulse Playground \
 	SoundRecorder BitmapDrawing Magnify DiskProbe AboutHaiku StyledEdit"
 BEOS_PREFERENCES="Backgrounds DataTranslations FileTypes Fonts Media Menu Mouse \
 	Keyboard Keymap Screen ScrollBar Sounds Time VirtualMemory Workspaces"
