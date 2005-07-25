@@ -130,9 +130,9 @@ wb_mii_readreg(wb_device *device, wb_mii_frame *frame)
 	/* Check for ack */
 	SIO_CLR(WB_SIO_MII_CLK);
 	MII_DELAY(device);
+	ack = read32(device->reg_base + WB_SIO) & WB_SIO_MII_DATAOUT;
 	SIO_SET(WB_SIO_MII_CLK);
 	MII_DELAY(device);
-	ack = read32(device->reg_base + WB_SIO) & WB_SIO_MII_DATAOUT;
 	SIO_CLR(WB_SIO_MII_CLK);
 	MII_DELAY(device);
 	SIO_SET(WB_SIO_MII_CLK);

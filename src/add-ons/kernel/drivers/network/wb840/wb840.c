@@ -1,4 +1,4 @@
-/* Copyright (c) 2003-2004 
+/* Copyright (c) 2003-2005
  * Stefano Ceccherini <burton666@libero.it>. All rights reserved.
  * This file is released under the MIT license
  */
@@ -293,9 +293,7 @@ wb_set_rx_filter(wb_device *device)
 {
 	// TODO: Basically we just config the filter to accept broadcasts
 	// packets. We'll need also to configure it to multicast.
-	int32 rxFilter = read32(device->reg_base + WB_NETCFG);
-
-	write32(device->reg_base + WB_NETCFG, rxFilter | WB_NETCFG_RX_BROAD);
+	WB_SETBIT(device->reg_base + WB_NETCFG, WB_NETCFG_RX_BROAD);
 }
 
 
