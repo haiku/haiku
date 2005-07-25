@@ -44,6 +44,9 @@ class Desktop : public MessageLooper, public ScreenOwner {
 	virtual						~Desktop();
 
 			void				Init();
+	virtual port_id				MessagePort() const { return fMessagePort; }
+
+			void				BroadcastToAllApps(int32 code);
 
 	// Methods for multiple monitors.
 	inline	Screen*				ScreenAt(int32 index) const
@@ -88,7 +91,8 @@ class Desktop : public MessageLooper, public ScreenOwner {
 
  private:
 	virtual void				_GetLooperName(char* name, size_t size);
-	virtual port_id				_MessagePort() const { return fMessagePort; }
+	virtual void				_PrepareQuit();
+	virtual void				_DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
 
  private:
 			friend class DesktopSettings;
@@ -96,6 +100,13 @@ class Desktop : public MessageLooper, public ScreenOwner {
 			::VirtualScreen		fVirtualScreen;
 			DesktopSettings::Private* fSettings;
 			port_id				fMessagePort;
+
+			BLocker				fAppListLock;
+			BList				fAppList;
+
+			sem_id				fShutdownSemaphore;
+			int32				fShutdownCount;
+
 			BList				fWinBorderList;
 
 			RootLayer*			fRootLayer;

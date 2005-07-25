@@ -59,9 +59,6 @@
 #endif
 
 
-static const uint32 kMsgShutdownServer = 'shuT';
-
-
 // Globals
 Desktop *gDesktop;
 
@@ -83,10 +80,8 @@ AppServer::AppServer() : BApplication (SERVER_SIGNATURE),
 #else
 AppServer::AppServer() : 
 #endif
-	fAppListLock("application list"),
 	fCursorSem(-1),
-	fCursorArea(-1),
-	fShutdownSemaphore(-1)
+	fCursorArea(-1)
 {
 	fMessagePort = create_port(200, SERVER_PORT_NAME);
 	if (fMessagePort == B_NO_MORE_PORTS)
@@ -164,6 +159,7 @@ AppServer::AppServer() :
 		gGUIColorSet.SetToDefaults();
 
 	gScreenManager = new ScreenManager();
+	gScreenManager->Run();
 
 	// the system palette needs to be initialized before the desktop,
 	// since it is used there already
@@ -253,11 +249,6 @@ AppServer::PicassoThread(void *data)
 		// we do this every second so as not to suck *too* many CPU cycles
 		snooze(1000000);
 	}
-
-	// app_server is about to quit
-	// wait some more, and then make sure it'll shutdown everything
-	snooze(2000000);
-	sAppServer->PostMessage(kMsgShutdownServer);
 
 	return 0;
 }
@@ -419,94 +410,19 @@ void
 AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 {
 	switch (code) {
-		case AS_CREATE_APP:
+		case AS_GET_DESKTOP:
 		{
-			// Create the ServerApp to node monitor a new BApplication
-
-			// Attached data:
-			// 1) port_id - receiver port of a regular app
-			// 2) port_id - client looper port - for sending messages to the client
-			// 2) team_id - app's team ID
-			// 3) int32 - handler token of the regular app
-			// 4) char * - signature of the regular app
-
-			// Find the necessary data
-			team_id	clientTeamID = -1;
-			port_id	clientLooperPort = -1;
-			port_id clientReplyPort = -1;
-			int32 htoken = B_NULL_TOKEN;
-			char *appSignature = NULL;
-
-			msg.Read<port_id>(&clientReplyPort);
-			msg.Read<port_id>(&clientLooperPort);
-			msg.Read<team_id>(&clientTeamID);
-			msg.Read<int32>(&htoken);
-			if (msg.ReadString(&appSignature) != B_OK)
+			port_id replyPort;
+			if (msg.Read<port_id>(&replyPort) < B_OK)
 				break;
 
-			ServerApp *app = new ServerApp(clientReplyPort, clientLooperPort,
-				clientTeamID, htoken, appSignature);
-			if (app->InitCheck() == B_OK
-				&& app->Run()) {
-				// add the new ServerApp to the known list of ServerApps
-				fAppListLock.Lock();
-				fAppList.AddItem(app);
-				fAppListLock.Unlock();
-			} else {
-				delete app;
+			int32 userID;
+			msg.Read<int32>(&userID);
 
-				// if everything went well, ServerApp::Run() will notify
-				// the client - but since it didn't, we do it here
-				BPrivate::LinkSender reply(clientReplyPort);
-				reply.StartMessage(SERVER_FALSE);
-				reply.Flush();
-			}
-
-			// This is necessary because BPortLink::ReadString allocates memory
-			free(appSignature);
-			break;
-		}
-
-		case AS_DELETE_APP:
-		{
-			// Delete a ServerApp. Received only from the respective ServerApp when a
-			// BApplication asks it to quit.
-
-			// Attached Data:
-			// 1) thread_id - thread ID of the ServerApp to be deleted
-
-			thread_id thread = -1;
-			if (msg.Read<thread_id>(&thread) < B_OK)
-				break;
-
-			fAppListLock.Lock();
-
-			// Run through the list of apps and nuke the proper one
-
-			int32 count = fAppList.CountItems();
-			ServerApp *removeApp = NULL;
-
-			for (int32 i = 0; i < count; i++) {
-				ServerApp *app = (ServerApp *)fAppList.ItemAt(i);
-
-				if (app != NULL && app->Thread() == thread) {
-					fAppList.RemoveItem(i);
-					removeApp = app;
-					break;
-				}
-			}
-
-			fAppListLock.Unlock();
-
-			if (removeApp != NULL)
-				removeApp->Quit(fShutdownSemaphore);
-
-			if (fQuitting && count <= 1) {
-				// wait for the last app to die
-				acquire_sem_etc(fShutdownSemaphore, fShutdownCount, B_RELATIVE_TIMEOUT, 500000);
-
-				PostMessage(kMsgShutdownServer);
-			}
+			BPrivate::LinkSender reply(replyPort);
+			reply.StartMessage(B_OK);
+			reply.Attach<port_id>(gDesktop->MessagePort());
+			reply.Flush();
 			break;
 		}
 
@@ -543,54 +459,25 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 
 #if TEST_MODE
 		case B_QUIT_REQUESTED:
+		{
 			// We've been asked to quit, so (for now) broadcast to all
 			// test apps to quit. This situation will occur only when the server
 			// is compiled as a regular Be application.
 
-			fAppListLock.Lock();
-			fShutdownSemaphore = create_sem(0, "app_server shutdown");
-			fShutdownCount = fAppList.CountItems();
-			fAppListLock.Unlock();
-
+			gDesktop->PostMessage(B_QUIT_REQUESTED);
 			fQuitting = true;
-			BroadcastToAllApps(AS_QUIT_APP);
 
-			// We now need to process the remaining AS_DELETE_APP messages and
-			// wait for the kMsgShutdownServer message.
-			// If an application does not quit as asked, the picasso thread
-			// will send us this message in 2-3 seconds.
-
-			// if there are no apps to quit, shutdown directly
-			if (fShutdownCount == 0)
-				PostMessage(kMsgShutdownServer);
-			break;
-
-		case kMsgShutdownServer:
-		{
-			// let's kill all remaining applications
-
-			fAppListLock.Lock();
-
-			int32 count = fAppList.CountItems();
-			for (int32 i = 0; i < count; i++) {
-				ServerApp *app = (ServerApp*)fAppList.ItemAt(i);
-				team_id clientTeam = app->ClientTeam();
-
-				app->Quit();
-				kill_team(clientTeam);
-			}
-
-			// wait for the last app to die
-			if (count > 0)
-				acquire_sem_etc(fShutdownSemaphore, fShutdownCount, B_RELATIVE_TIMEOUT, 250000);
+			// we just wait for the desktop to kill itself
+			status_t status;
+			wait_for_thread(gDesktop->Thread(), &status);
 
 			kill_thread(fPicassoThreadID);
 
-			fAppListLock.Unlock();
-
 			delete gDesktop;
 			delete gBitmapManager;
-			delete gFontServer;
+			// TODO: deleting the font server results in an endless loop somewhere
+			//	down in FreeType code - smells like memory corruption
+			//delete gFontServer;
 
 			// we are now clear to exit
 			exit(0);
@@ -635,7 +522,6 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 			BPrivate::PortLink replyLink(replyPort);
 			replyLink.StartMessage(error);
 			replyLink.Flush();
-
 			break;
 		}
 
@@ -646,56 +532,8 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 	}
 }
 
-/*!
-	\brief Finds the application with the given signature
-	\param sig MIME signature of the application to find
-	\return the corresponding ServerApp or NULL if not found
-	
-	This call should be made only when necessary because it locks the app list 
-	while it does its searching.
-*/
-ServerApp *
-AppServer::FindApp(const char *signature)
-{
-	if (!signature)
-		return NULL;
-
-	BAutolock locker(fAppListLock);
-
-	for (int32 i = 0; i < fAppList.CountItems(); i++) {
-		ServerApp *app = (ServerApp*)fAppList.ItemAt(i);
-		if (app && !strcasecmp(app->Signature(), signature))
-			return app;
-	}
-
-	return NULL;
-}
-
 
 //	#pragma mark -
-
-
-/*!
-	\brief Send a quick (no attachments) message to all applications
-	
-	Quite useful for notification for things like server shutdown, system 
-	color changes, etc.
-*/
-void
-BroadcastToAllApps(const int32 &code)
-{
-	BAutolock locker(sAppServer->fAppListLock);
-
-	for (int32 i = 0; i < sAppServer->fAppList.CountItems(); i++) {
-		ServerApp *app = (ServerApp *)sAppServer->fAppList.ItemAt(i);
-
-		if (!app) {
-			printf("PANIC in Broadcast()\n");
-			continue;
-		}
-		app->PostMessage(code);
-	}
-}
 
 
 /*!

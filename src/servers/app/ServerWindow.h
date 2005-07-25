@@ -55,6 +55,7 @@ public:
 									 uint32 feel, uint32 flags,
 									 uint32 workspace);
 	virtual bool				Run();
+	virtual port_id				MessagePort() const { return fMessagePort; }
 
 			void				ReplaceDecorator();
 			void				Show();
@@ -113,7 +114,6 @@ private:
 			void				_MessageLooper();
 	virtual void				_PrepareQuit();
 	virtual void				_GetLooperName(char* name, size_t size);
-	virtual port_id				_MessagePort() const { return fMessagePort; }
 
 			// TODO: Move me elsewhere
 			status_t			PictureToRegion(ServerPicture *picture,

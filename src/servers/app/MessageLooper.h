@@ -24,13 +24,13 @@ class MessageLooper : public BLocker {
 
 		void			PostMessage(int32 code);
 		thread_id		Thread() const { return fThread; }
+		virtual port_id	MessagePort() const = 0;
 
 	private:
 		virtual void	_PrepareQuit();
 		virtual void	_GetLooperName(char* name, size_t length);
 		virtual void	_DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
 		virtual void	_MessageLooper();
-		virtual port_id	_MessagePort() const = 0;
 
 		static int32	_message_thread(void *_looper);
 
@@ -40,6 +40,6 @@ class MessageLooper : public BLocker {
 		bool			fQuitting;
 };
 
-static const uint32 kMsgQuitLooper = 'quit';
+static const int32 kMsgQuitLooper = 'quit';
 
 #endif	/* MESSAGE_LOOPER_H */

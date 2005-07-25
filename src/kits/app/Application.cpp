@@ -1078,6 +1078,21 @@ BApplication::connect_to_app_server()
 		return clientPort;
 
 	// We can't use AppServerLink because be_app == NULL
+	fServerLink->SetTo(serverPort, clientPort);
+
+	fServerLink->StartMessage(AS_GET_DESKTOP);
+	fServerLink->Attach<port_id>(clientPort);
+	fServerLink->Attach<int32>(getuid());
+
+	int32 code;
+	if (fServerLink->FlushWithReply(code) != B_OK || code != B_OK) {
+		fServerLink->SetSenderPort(-1);
+		return B_ERROR;
+	}
+
+	// we talk to the desktop to create our application
+	fServerLink->Read<port_id>(&serverPort);
+	fServerLink->SetSenderPort(serverPort);
 
 	// AS_CREATE_APP:
 	//
@@ -1087,7 +1102,6 @@ BApplication::connect_to_app_server()
 	// 3) team_id - team identification field
 	// 4) int32 - handler ID token of the app
 	// 5) char * - signature of the regular app
-	fServerLink->SetTo(serverPort, clientPort);
 
 	fServerLink->StartMessage(AS_CREATE_APP);
 	fServerLink->Attach<port_id>(clientPort);
@@ -1096,9 +1110,8 @@ BApplication::connect_to_app_server()
 	fServerLink->Attach<int32>(_get_object_token_(this));
 	fServerLink->AttachString(fAppName);
 
-	int32 code;
 	if (fServerLink->FlushWithReply(code) == B_OK
-		&& code == SERVER_TRUE) {
+		&& code == B_OK) {
 		// We don't need to contact the main app_server anymore
 		// directly; we now talk to our server alter ego only.
 		fServerLink->Read<port_id>(&serverPort);

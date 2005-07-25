@@ -27,25 +27,24 @@ class DisplayDriver;
 class ServerPicture;
 class ServerCursor;
 class ServerBitmap;
+class Desktop;
 
 namespace BPrivate {
 	class PortLink;
 };
 
-/*!
-	\class ServerApp ServerApp.h
-	\brief Counterpart to BApplication within the app_server
-*/
 class ServerApp : public MessageLooper {
 	public:
-		ServerApp(port_id clientAppPort, port_id clientLooperPort,
-			team_id clientTeamID, int32 handlerID,
-			const char* signature);
+		ServerApp(Desktop* desktop, port_id clientAppPort,
+			port_id clientLooperPort, team_id clientTeamID,
+			int32 handlerID, const char* signature);
 		virtual ~ServerApp();
 
 		status_t InitCheck();
-		virtual bool Run();
 		void Quit(sem_id shutdownSemaphore = -1);
+
+		virtual bool Run();
+		virtual port_id MessagePort() const { return fMessagePort; }
 
 		/*!
 			\brief Determines whether the application is the active one
@@ -78,7 +77,6 @@ class ServerApp : public MessageLooper {
 		virtual void _DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
 		virtual void _MessageLooper();
 		virtual void _GetLooperName(char* name, size_t size);
-		virtual port_id _MessagePort() const { return fMessagePort; }
 
 		port_id	fMessagePort;
 		port_id	fClientReplyPort;	
@@ -88,6 +86,7 @@ class ServerApp : public MessageLooper {
 		int32 fClientToken;
 			// To send a BMessage to the client (port + token)
 
+		Desktop* fDesktop;
 		BString fSignature;
 		team_id fClientTeam;
 

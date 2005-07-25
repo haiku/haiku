@@ -10,6 +10,7 @@
 #include "MessageLooper.h"
 
 #include <Autolock.h>
+#include <stdio.h>
 
 
 MessageLooper::MessageLooper(const char* name)
@@ -82,7 +83,7 @@ MessageLooper::Quit()
 void
 MessageLooper::PostMessage(int32 code)
 {
-	BPrivate::LinkSender link(_MessagePort());
+	BPrivate::LinkSender link(MessagePort());
 	link.StartMessage(code);
 	link.Flush();
 }
@@ -111,6 +112,26 @@ MessageLooper::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 void
 MessageLooper::_MessageLooper()
 {
+	BPrivate::LinkReceiver& receiver = fLink.Receiver();
+
+	while (true) {
+		int32 code;
+		status_t status = receiver.GetNextMessage(code);
+		if (status < B_OK) {
+			// that shouldn't happen, it's our port
+			printf("Someone deleted our message port!\n");
+			break;
+		}
+
+		Lock();
+
+		if (code == kMsgQuitLooper) {
+			Quit();
+		} else
+			_DispatchMessage(code, receiver);
+
+		Unlock();
+	}
 }
 
 

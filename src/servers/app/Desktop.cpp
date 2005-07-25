@@ -59,6 +59,8 @@
 Desktop::Desktop()
 	: MessageLooper("desktop"),
 	fSettings(new DesktopSettings::Private()),
+	fAppListLock("application list"),
+	fShutdownSemaphore(-1),
 	fWinBorderList(64),
 	fActiveScreen(NULL)
 {
@@ -69,6 +71,8 @@ Desktop::Desktop()
 	fMessagePort = create_port(DEFAULT_MONITOR_PORT_SIZE, name);
 	if (fMessagePort < B_OK)
 		return;
+
+	fLink.SetReceiverPort(fMessagePort);
 }
 
 
@@ -110,6 +114,183 @@ void
 Desktop::_GetLooperName(char* name, size_t length)
 {
 	snprintf(name, length, "d:%d:%s", /*id*/0, /*name*/"baron");
+}
+
+
+void
+Desktop::_PrepareQuit()
+{
+	// let's kill all remaining applications
+
+	fAppListLock.Lock();
+
+	int32 count = fAppList.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		ServerApp *app = (ServerApp*)fAppList.ItemAt(i);
+		team_id clientTeam = app->ClientTeam();
+
+		app->Quit();
+		kill_team(clientTeam);
+	}
+
+	// wait for the last app to die
+	if (count > 0)
+		acquire_sem_etc(fShutdownSemaphore, fShutdownCount, B_RELATIVE_TIMEOUT, 250000);
+
+	fAppListLock.Unlock();
+}
+
+
+void
+Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
+{
+	switch (code) {
+		case AS_CREATE_APP:
+		{
+			// Create the ServerApp to node monitor a new BApplication
+
+			// Attached data:
+			// 1) port_id - receiver port of a regular app
+			// 2) port_id - client looper port - for sending messages to the client
+			// 2) team_id - app's team ID
+			// 3) int32 - handler token of the regular app
+			// 4) char * - signature of the regular app
+
+			// Find the necessary data
+			team_id	clientTeamID = -1;
+			port_id	clientLooperPort = -1;
+			port_id clientReplyPort = -1;
+			int32 htoken = B_NULL_TOKEN;
+			char *appSignature = NULL;
+
+			link.Read<port_id>(&clientReplyPort);
+			link.Read<port_id>(&clientLooperPort);
+			link.Read<team_id>(&clientTeamID);
+			link.Read<int32>(&htoken);
+			if (link.ReadString(&appSignature) != B_OK)
+				break;
+
+			ServerApp *app = new ServerApp(this, clientReplyPort,
+				clientLooperPort, clientTeamID, htoken, appSignature);
+			if (app->InitCheck() == B_OK
+				&& app->Run()) {
+				// add the new ServerApp to the known list of ServerApps
+				fAppListLock.Lock();
+				fAppList.AddItem(app);
+				fAppListLock.Unlock();
+			} else {
+				delete app;
+
+				// if everything went well, ServerApp::Run() will notify
+				// the client - but since it didn't, we do it here
+				BPrivate::LinkSender reply(clientReplyPort);
+				reply.StartMessage(SERVER_FALSE);
+				reply.Flush();
+			}
+
+			// This is necessary because BPortLink::ReadString allocates memory
+			free(appSignature);
+			break;
+		}
+
+		case AS_DELETE_APP:
+		{
+			// Delete a ServerApp. Received only from the respective ServerApp when a
+			// BApplication asks it to quit.
+
+			// Attached Data:
+			// 1) thread_id - thread ID of the ServerApp to be deleted
+
+			thread_id thread = -1;
+			if (link.Read<thread_id>(&thread) < B_OK)
+				break;
+
+			fAppListLock.Lock();
+
+			// Run through the list of apps and nuke the proper one
+
+			int32 count = fAppList.CountItems();
+			ServerApp *removeApp = NULL;
+
+			for (int32 i = 0; i < count; i++) {
+				ServerApp *app = (ServerApp *)fAppList.ItemAt(i);
+
+				if (app != NULL && app->Thread() == thread) {
+					fAppList.RemoveItem(i);
+					removeApp = app;
+					break;
+				}
+			}
+
+			fAppListLock.Unlock();
+
+			if (removeApp != NULL)
+				removeApp->Quit(fShutdownSemaphore);
+
+			if (fQuitting && count <= 1) {
+				// wait for the last app to die
+				acquire_sem_etc(fShutdownSemaphore, fShutdownCount, B_RELATIVE_TIMEOUT, 500000);
+				PostMessage(kMsgQuitLooper);
+			}
+			break;
+		}
+
+		case B_QUIT_REQUESTED:
+			// We've been asked to quit, so (for now) broadcast to all
+			// test apps to quit. This situation will occur only when the server
+			// is compiled as a regular Be application.
+
+			fAppListLock.Lock();
+			fShutdownSemaphore = create_sem(0, "desktop shutdown");
+			fShutdownCount = fAppList.CountItems();
+			fAppListLock.Unlock();
+
+			fQuitting = true;
+			BroadcastToAllApps(AS_QUIT_APP);
+
+			// We now need to process the remaining AS_DELETE_APP messages and
+			// wait for the kMsgShutdownServer message.
+			// If an application does not quit as asked, the picasso thread
+			// will send us this message in 2-3 seconds.
+
+			// if there are no apps to quit, shutdown directly
+			if (fShutdownCount == 0)
+				PostMessage(kMsgQuitLooper);
+			break;
+
+		default:
+			printf("Desktop %d:%s received unexpected code %ld\n", 0, "baron", code);
+
+			if (link.NeedsReply()) {
+				// the client is now blocking and waiting for a reply!
+				fLink.StartMessage(B_ERROR);
+				fLink.Flush();
+			}
+			break;
+	}
+}
+
+
+/*!
+	\brief Send a quick (no attachments) message to all applications
+	
+	Quite useful for notification for things like server shutdown, system 
+	color changes, etc.
+*/
+void
+Desktop::BroadcastToAllApps(int32 code)
+{
+	BAutolock locker(fAppListLock);
+
+	for (int32 i = 0; i < fAppList.CountItems(); i++) {
+		ServerApp *app = (ServerApp *)fAppList.ItemAt(i);
+
+		if (!app) {
+			printf("PANIC in Broadcast()\n");
+			continue;
+		}
+		app->PostMessage(code);
+	}
 }
 
 

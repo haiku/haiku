@@ -10,6 +10,10 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
+/*!
+	\class ServerApp ServerApp.h
+	\brief Counterpart to BApplication within the app_server
+*/
 
 #include <stdio.h>
 #include <string.h>
@@ -77,13 +81,15 @@ static const uint32 kMsgAppQuit = 'appQ';
 	\param fSignature NULL-terminated string which contains the BApplication's
 	MIME fSignature.
 */
-ServerApp::ServerApp(port_id clientReplyPort, port_id clientLooperPort,
-	team_id clientTeam, int32 handlerID, const char* signature)
+ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
+	port_id clientLooperPort, team_id clientTeam, int32 handlerID,
+	const char* signature)
 	: MessageLooper("application"),
 	fMessagePort(-1),
 	fClientReplyPort(clientReplyPort),
 	fClientLooperPort(clientLooperPort),
 	fClientToken(handlerID),
+	fDesktop(desktop),
 	fSignature(signature),
 	fClientTeam(clientTeam),
 	fWindowListLock("window list"),
@@ -116,7 +122,7 @@ ServerApp::ServerApp(port_id clientReplyPort, port_id clientLooperPort,
 	// there should be a way that this ServerApp be attached to a particular
 	// RootLayer to know which RootLayer's cursor to modify.
 	ServerCursor *defaultCursor = 
-		gDesktop->ActiveRootLayer()->GetCursorManager().GetCursor(B_CURSOR_DEFAULT);
+		fDesktop->ActiveRootLayer()->GetCursorManager().GetCursor(B_CURSOR_DEFAULT);
 
 	if (defaultCursor) {
 		fAppCursor = new ServerCursor(defaultCursor);
@@ -196,7 +202,7 @@ ServerApp::~ServerApp(void)
 	// although this isn't pretty, ATM we have only one RootLayer.
 	// there should be a way that this ServerApp be attached to a particular
 	// RootLayer to know which RootLayer's cursor to modify.
-	gDesktop->ActiveRootLayer()->GetCursorManager().RemoveAppCursors(fClientTeam);
+	fDesktop->ActiveRootLayer()->GetCursorManager().RemoveAppCursors(fClientTeam);
 
 	STRACE(("ServerApp %s::~ServerApp(): Exiting\n", Signature()));
 }
@@ -306,7 +312,7 @@ ServerApp::SetAppCursor(void)
 	// there should be a way that this ServerApp be attached to a particular
 	// RootLayer to know which RootLayer's cursor to modify.
 	if (fAppCursor)
-		gDesktop->GetHWInterface()->SetCursor(fAppCursor);
+		fDesktop->GetHWInterface()->SetCursor(fAppCursor);
 }
 
 
@@ -341,8 +347,8 @@ ServerApp::_MessageLooper()
 		if (err < B_OK || code == B_QUIT_REQUESTED) {
 			STRACE(("ServerApp: application seems to be gone...\n"));
 
-			// Tell the app_server to quit us
-			BPrivate::LinkSender link(gAppServerPort);
+			// Tell desktop to quit us
+			BPrivate::LinkSender link(fDesktop->MessagePort());
 			link.StartMessage(AS_DELETE_APP);
 			link.Attach<thread_id>(Thread());
 			link.Flush();
@@ -560,14 +566,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			team_id team;
 			link.Read<team_id>(&team);
 
-			gDesktop->WriteWindowList(team, fLink.Sender());
+			fDesktop->WriteWindowList(team, fLink.Sender());
 			break;
 
 		case AS_GET_WINDOW_INFO:
 			int32 serverToken;
 			link.Read<int32>(&serverToken);
 
-			gDesktop->WriteWindowInfo(serverToken, fLink.Sender());
+			fDesktop->WriteWindowInfo(serverToken, fLink.Sender());
 			break;
 
 		case AS_UPDATE_COLORS:
@@ -721,15 +727,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			// Received from an application when the user wants to set the window
 			// decorator to a new one
-			
+
 			// Attached Data:
 			// int32 the index of the decorator to use
-			
+
 			int32 index;
 			link.Read<int32>(&index);
-			if(gDecorManager.SetDecorator(index))
-				BroadcastToAllApps(AS_UPDATE_DECORATOR);
-			
+			if (gDecorManager.SetDecorator(index))
+				fDesktop->BroadcastToAllApps(AS_UPDATE_DECORATOR);
 			break;
 		}
 		case AS_COUNT_DECORATORS:
@@ -750,9 +755,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			int32 index;
 			link.Read<int32>(&index);
-			
+
 			BString str(gDecorManager.GetDecoratorName(index));
-			if(str.CountChars() > 0)
+			if (str.CountChars() > 0)
 			{
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.AttachString(str.String());
@@ -767,19 +772,19 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			// Sort of supports Tracker's nifty Easter Egg. It was easy to do and 
 			// it's kind of neat, so why not?
-			
+
 			// Attached Data:
 			// int32 value of the decorator to use
 			// 0: BeOS
 			// 1: Amiga
 			// 2: Windows
 			// 3: MacOS
-			
+
 			int32 decindex = 0;
 			link.Read<int32>(&decindex);
-			
-			if(gDecorManager.SetR5Decorator(decindex))
-				BroadcastToAllApps(AS_UPDATE_DECORATOR);
+
+			if (gDecorManager.SetR5Decorator(decindex))
+				fDesktop->BroadcastToAllApps(AS_UPDATE_DECORATOR);
 			
 			break;
 		}
@@ -896,7 +901,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			STRACE(("ServerApp %s: get current workspace\n", Signature()));
 
 			// TODO: Locking this way is not nice
-			RootLayer *root = gDesktop->ActiveRootLayer();
+			RootLayer *root = fDesktop->ActiveRootLayer();
 			root->Lock();
 			
 			fLink.StartMessage(SERVER_TRUE);
@@ -914,7 +919,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// TODO: See above
 			int32 index;
 			link.Read<int32>(&index);
-			RootLayer *root = gDesktop->ActiveRootLayer();
+			RootLayer *root = fDesktop->ActiveRootLayer();
 			root->Lock();
 			root->SetActiveWorkspace(index);
 			root->Unlock();
@@ -932,7 +937,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
 // TODO: support nested showing/hiding
-			gDesktop->GetHWInterface()->SetCursorVisible(true);
+			fDesktop->GetHWInterface()->SetCursorVisible(true);
 			fCursorHidden = false;
 			break;
 		}
@@ -943,7 +948,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
 // TODO: support nested showing/hiding
-			gDesktop->GetHWInterface()->SetCursorVisible(false);
+			fDesktop->GetHWInterface()->SetCursorVisible(false);
 			fCursorHidden = true;
 			break;
 		}
@@ -953,7 +958,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// although this isn't pretty, ATM we have only one RootLayer.
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
-//			gDesktop->GetHWInterface()->ObscureCursor();
+//			fDesktop->GetHWInterface()->ObscureCursor();
 			break;
 		}
 		case AS_QUERY_CURSOR_HIDDEN:
@@ -976,16 +981,16 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// otherwise be easy to crash the server by calling SetCursor a
 			// sufficient number of times
 			if(fAppCursor)
-				gDesktop->ActiveRootLayer()->GetCursorManager().DeleteCursor(fAppCursor->ID());
+				fDesktop->ActiveRootLayer()->GetCursorManager().DeleteCursor(fAppCursor->ID());
 
 			fAppCursor = new ServerCursor(cdata);
 			fAppCursor->SetOwningTeam(fClientTeam);
 			fAppCursor->SetAppSignature(Signature());
-			gDesktop->ActiveRootLayer()->GetCursorManager().AddCursor(fAppCursor);
+			fDesktop->ActiveRootLayer()->GetCursorManager().AddCursor(fAppCursor);
 			// although this isn't pretty, ATM we have only one RootLayer.
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
-			gDesktop->GetHWInterface()->SetCursor(fAppCursor);
+			fDesktop->GetHWInterface()->SetCursor(fAppCursor);
 			break;
 		}
 		case AS_SET_CURSOR_BCURSOR:
@@ -1005,8 +1010,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
 			ServerCursor	*cursor;
-			if ((cursor = gDesktop->ActiveRootLayer()->GetCursorManager().FindCursor(ctoken)))
-				gDesktop->GetHWInterface()->SetCursor(cursor);
+			if ((cursor = fDesktop->ActiveRootLayer()->GetCursorManager().FindCursor(ctoken)))
+				fDesktop->GetHWInterface()->SetCursor(cursor);
 
 			if (sync) {
 				// the application is expecting a reply, but plans to do literally nothing
@@ -1032,7 +1037,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// although this isn't pretty, ATM we have only one RootLayer.
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
-			gDesktop->ActiveRootLayer()->GetCursorManager().AddCursor(fAppCursor);
+			fDesktop->ActiveRootLayer()->GetCursorManager().AddCursor(fAppCursor);
 
 			// Synchronous message - BApplication is waiting on the cursor's ID
 			fLink.StartMessage(SERVER_TRUE);
@@ -1054,14 +1059,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// although this isn't pretty, ATM we have only one RootLayer.
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
-			gDesktop->ActiveRootLayer()->GetCursorManager().DeleteCursor(ctoken);
+			fDesktop->ActiveRootLayer()->GetCursorManager().DeleteCursor(ctoken);
 			break;
 		}
 		case AS_GET_SCROLLBAR_INFO:
 		{
 			STRACE(("ServerApp %s: Get ScrollBar info\n", Signature()));
 			scroll_bar_info info;
-			DesktopSettings settings(gDesktop);
+			DesktopSettings settings(fDesktop);
 			settings.GetScrollBarInfo(info);
 
 			fLink.StartMessage(SERVER_TRUE);
@@ -1076,7 +1081,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// 1) scroll_bar_info scroll bar info structure
 			scroll_bar_info info;
 			if (link.Read<scroll_bar_info>(&info) == B_OK) {
-				DesktopSettings settings(gDesktop);
+				DesktopSettings settings(fDesktop);
 				settings.SetScrollBarInfo(info);
 			}
 
@@ -1089,7 +1094,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			STRACE(("ServerApp %s: Get menu info\n", Signature()));
 			menu_info info;
-			DesktopSettings settings(gDesktop);
+			DesktopSettings settings(fDesktop);
 			settings.GetMenuInfo(info);
 
 			fLink.StartMessage(B_OK);
@@ -1102,7 +1107,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			STRACE(("ServerApp %s: Set menu info\n", Signature()));
 			menu_info info;
 			if (link.Read<menu_info>(&info) == B_OK) {
-				DesktopSettings settings(gDesktop);
+				DesktopSettings settings(fDesktop);
 				settings.SetMenuInfo(info);
 					// TODO: SetMenuInfo() should do some validity check, so
 					//	that the answer we're giving can actually be useful
@@ -1120,7 +1125,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// 1) enum mode_mouse FFM mouse mode
 			mode_mouse mouseMode;
 			if (link.Read<mode_mouse>(&mouseMode) == B_OK) {
-				DesktopSettings settings(gDesktop);
+				DesktopSettings settings(fDesktop);
 				settings.SetMouseMode(mouseMode);
 			}
 			break;
@@ -1128,7 +1133,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_GET_MOUSE_MODE:
 		{
 			STRACE(("ServerApp %s: Get Focus Follows Mouse mode\n", Signature()));
-			DesktopSettings settings(gDesktop);
+			DesktopSettings settings(fDesktop);
 
 			fLink.StartMessage(SERVER_TRUE);
 			fLink.Attach<mode_mouse>(settings.MouseMode());
@@ -1160,7 +1165,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<ColorSet>(&gGUIColorSet);
 			gGUIColorSet.Unlock();
 
-			BroadcastToAllApps(AS_UPDATE_COLORS);
+			fDesktop->BroadcastToAllApps(AS_UPDATE_COLORS);
 			break;
 		}
 		case AS_GET_UI_COLOR:
@@ -1378,7 +1383,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				font.SetSize(size);
 				font.SetSpacing(spacing);
 
-				width = gDesktop->GetDisplayDriver()->StringWidth(string, length, font);
+				width = fDesktop->GetDisplayDriver()->StringWidth(string, length, font);
 				// NOTE: The line below will return the exact same thing. However,
 				// the line above uses the AGG rendering backend, for which glyph caching
 				// actually works. It is about 20 times faster!
@@ -1901,7 +1906,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// We have the screen_id and the workspace number, with these
 			// we need to find the corresponding "driver", and call getmode on it
 			display_mode mode;
-			gDesktop->ScreenAt(0)->GetMode(&mode);
+			fDesktop->ScreenAt(0)->GetMode(&mode);
 			// actually this isn't still enough as different workspaces can
 			// have different display_modes
 
@@ -1935,7 +1940,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 // TODO: lock RootLayer, set mode and tell it to update it's frame and all clipping
 // optionally put this into a message and let the root layer thread handle it.
-//			status_t ret = gDesktop->ScreenAt(0)->SetMode(mode);
+//			status_t ret = fDesktop->ScreenAt(0)->SetMode(mode);
 			status_t ret = B_ERROR;
 
 			fLink.StartMessage(SERVER_TRUE);
@@ -1954,7 +1959,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<display_mode>(&target);
 			link.Read<display_mode>(&low);
 			link.Read<display_mode>(&high);
-			status_t status = gDesktop->GetHWInterface()->ProposeMode(&target, &low, &high);
+			status_t status = fDesktop->GetHWInterface()->ProposeMode(&target, &low, &high);
 			// TODO: We always return SERVER_TRUE and put the real
 			// error code in the message. FIX this.
 			fLink.StartMessage(SERVER_TRUE);
@@ -1973,7 +1978,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			display_mode* modeList;
 			uint32 count;
-			if (gDesktop->GetHWInterface()->GetModeList(&modeList, &count) == B_OK) {
+			if (fDesktop->GetHWInterface()->GetModeList(&modeList, &count) == B_OK) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<uint32>(count);
 				fLink.Attach(modeList, sizeof(display_mode) * count);
@@ -2016,7 +2021,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			// ToDo: locking is probably wrong - why the hell is there no (safe)
 			//		way to get to the workspace object directly?
-			RootLayer *root = gDesktop->ActiveRootLayer();
+			RootLayer *root = fDesktop->ActiveRootLayer();
 			root->Lock();
 
 			Workspace *workspace = root->WorkspaceAt(workspaceIndex);
@@ -2041,7 +2046,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			
 			accelerant_device_info accelerantInfo;
 			// TODO: I wonder if there should be a "desktop" lock...
-			if (gDesktop->GetHWInterface()->GetDeviceInfo(&accelerantInfo) == B_OK) {
+			if (fDesktop->GetHWInterface()->GetDeviceInfo(&accelerantInfo) == B_OK) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<accelerant_device_info>(accelerantInfo);
 			} else
@@ -2059,7 +2064,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			screen_id id;
 			link.Read<screen_id>(&id);
 			
-			sem_id semaphore = gDesktop->GetHWInterface()->RetraceSemaphore();
+			sem_id semaphore = fDesktop->GetHWInterface()->RetraceSemaphore();
 			fLink.StartMessage(SERVER_TRUE);
 			fLink.Attach<sem_id>(semaphore);
 			fLink.Flush();
@@ -2074,7 +2079,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<screen_id>(&id);
 			
 			display_timing_constraints constraints;
-			if (gDesktop->GetHWInterface()->GetTimingConstraints(&constraints) == B_OK) {
+			if (fDesktop->GetHWInterface()->GetTimingConstraints(&constraints) == B_OK) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<display_timing_constraints>(constraints);
 			} else
@@ -2094,7 +2099,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<display_mode>(&mode);
 			
 			uint32 low, high;
-			if (gDesktop->GetHWInterface()->GetPixelClockLimits(&mode, &low, &high) == B_OK) {
+			if (fDesktop->GetHWInterface()->GetPixelClockLimits(&mode, &low, &high) == B_OK) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<uint32>(low);
 				fLink.Attach<uint32>(high);
@@ -2114,7 +2119,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			uint32 mode;
 			link.Read<uint32>(&mode);
 			
-			if (gDesktop->GetHWInterface()->SetDPMSMode(mode) == B_OK)
+			if (fDesktop->GetHWInterface()->SetDPMSMode(mode) == B_OK)
 				fLink.StartMessage(SERVER_TRUE);
 			else
 				fLink.StartMessage(SERVER_FALSE);
@@ -2130,7 +2135,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			screen_id id;
 			link.Read<screen_id>(&id);
 			
-			uint32 state = gDesktop->GetHWInterface()->DPMSMode();
+			uint32 state = fDesktop->GetHWInterface()->DPMSMode();
 			fLink.StartMessage(SERVER_TRUE);
 			fLink.Attach<uint32>(state);
 			fLink.Flush();
@@ -2143,7 +2148,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			screen_id id;
 			link.Read<screen_id>(&id);
 			
-			uint32 capabilities = gDesktop->GetHWInterface()->DPMSCapabilities();
+			uint32 capabilities = fDesktop->GetHWInterface()->DPMSCapabilities();
 			fLink.StartMessage(SERVER_TRUE);
 			fLink.Attach<uint32>(capabilities);
 			fLink.Flush();

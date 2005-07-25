@@ -50,11 +50,8 @@ static	int32			PicassoThread(void *data);
 
 		void			PostMessage(int32 code);
 		void			DispatchMessage(int32 code, BPrivate::PortLink &link);
-		ServerApp*		FindApp(const char *sig);
 
 private:
-friend	void			BroadcastToAllApps(const int32 &code);
-
 		void			LaunchCursorThread();
 		void			LaunchInputServer();
 static	int32			CursorThread(void *data);
@@ -63,9 +60,6 @@ static	int32			CursorThread(void *data);
 		port_id			fServerInputPort;
 
 volatile bool			fQuitting;
-
-		BLocker			fAppListLock;
-		BList			fAppList;
 
 		thread_id		fPicassoThreadID;
 
@@ -77,9 +71,6 @@ volatile bool			fQuitting;
 
 		port_id			fISASPort;
 		port_id			fISPort;
-
-		sem_id			fShutdownSemaphore;
-		int32			fShutdownCount;
 };
 
 extern BitmapManager *gBitmapManager;
