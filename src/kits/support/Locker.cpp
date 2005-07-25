@@ -1,31 +1,12 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Locker.cpp
-//	Author(s):		Erik Jaesler <erik@cgsoftware.com>
-//					
-//	Description:	Semaphore-type class for thread safety
-//					
-//
-//------------------------------------------------------------------------------
+/*
+ * Copyright (c) 2001-2005, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Author:	Erik Jaesler <erik@cgsoftware.com>
+ */
+
+/**	Semaphore-type class for thread safety */
+
 
 #include <OS.h>
 #include <Locker.h>
@@ -67,7 +48,7 @@
 
 BLocker::BLocker()
 {
-	InitLocker("some BLocker", true);
+	InitLocker(NULL, true);
 }
 
 
@@ -77,16 +58,15 @@ BLocker::BLocker(const char *name)
 }
 
 
-BLocker::BLocker(bool benaphore_style)
+BLocker::BLocker(bool benaphoreStyle)
 {
-	InitLocker("some BLocker", benaphore_style);
+	InitLocker(NULL, benaphoreStyle);
 }
 
 
-BLocker::BLocker(const char *name,
-                 bool benaphore_style)
+BLocker::BLocker(const char *name, bool benaphoreStyle)
 {
-	InitLocker(name, benaphore_style);
+	InitLocker(name, benaphoreStyle);
 }
 
 
@@ -95,11 +75,10 @@ BLocker::BLocker(const char *name,
 //	now.  In Be's headers, its called "for_IPC".  DO NOT USE THIS
 //	CONSTRUCTOR!
 //
-BLocker::BLocker(const char *name,
-                 bool benaphore_style,
-                 bool)
+BLocker::BLocker(const char *name, bool benaphoreStyle,
+	bool)
 {
-	InitLocker(name, benaphore_style);
+	InitLocker(name, benaphoreStyle);
 }
 
 
@@ -117,8 +96,7 @@ bool
 BLocker::Lock(void)
 {
 	status_t result;
-
-    return (AcquireLock(B_INFINITE_TIMEOUT, &result));
+    return AcquireLock(B_INFINITE_TIMEOUT, &result);
 }
 
 
@@ -138,27 +116,24 @@ BLocker::Unlock(void)
 {
 	// If the thread currently holds the lockdecrement
 	if (IsLocked()) {
-	
 		// Decrement the number of outstanding locks this thread holds
 		// on this BLocker.
 		fRecursiveCount--;
-		
+
 		// If the recursive count is now at 0, that means the BLocker has
 		// been released by the thread.
 		if (fRecursiveCount == 0) {
-		
 			// The BLocker is no longer owned by any thread.
 			fLockOwner = B_ERROR;
-		
+
     		// Decrement the benaphore count and store the undecremented
     		// value in oldBenaphoreCount.
 			int32 oldBenaphoreCount = atomic_add(&fBenaphoreCount, -1);
-			
+
 			// If the oldBenaphoreCount is greater than 1, then there is
 			// at lease one thread waiting for the lock in the case of a
 			// benaphore.
    		    if (oldBenaphoreCount > 1) {
- 				
  				// Since there are threads waiting for the lock, it must
  				// be released.  Note, the old benaphore count will always be
  				// greater than 1 for a semaphore so the release is always done.
@@ -182,7 +157,7 @@ BLocker::IsLocked(void) const
 	// This member returns true if the calling thread holds the lock.
 	// The easiest way to determine this is to compare the result of
 	// find_thread() to the fLockOwner.
-    return (find_thread(NULL) == fLockOwner);
+    return find_thread(NULL) == fLockOwner;
 }
 
 
@@ -208,9 +183,11 @@ BLocker::Sem(void) const
 
 
 void
-BLocker::InitLocker(const char *name,
-                  bool benaphore)
+BLocker::InitLocker(const char *name, bool benaphore)
 {
+	if (name == NULL)
+		name = "some BLocker";
+
 	if (benaphore) {
 		// Because this is a benaphore, initialize the benaphore count and
 		// create the semaphore.  Because this is a benaphore, the semaphore
@@ -225,7 +202,7 @@ BLocker::InitLocker(const char *name,
 		fBenaphoreCount = 1;
 		fSemaphoreID = create_sem(1, name);
 	}
-	
+
 	// The lock is currently not acquired so there is no owner.
 	fLockOwner = B_ERROR;
 	
@@ -239,74 +216,73 @@ BLocker::AcquireLock(bigtime_t timeout, status_t *error)
 {
 	// By default, return no error.
 	status_t status = B_OK;
-		
+
 	// Only try to acquire the lock if the thread doesn't already own it.
-    if (!IsLocked()) {
-	
-   		// Increment the benaphore count and test to see if it was already greater
-   		// than 0.  If it is greater than 0, then some thread already has the
-   		// benaphore or the style is a semaphore.  Either way, we need to acquire
-   		// the semaphore in this case.
-   		int32 oldBenaphoreCount = atomic_add(&fBenaphoreCount, 1);
-  		if (oldBenaphoreCount > 0) {
+	if (!IsLocked()) {
+		// Increment the benaphore count and test to see if it was already greater
+		// than 0.  If it is greater than 0, then some thread already has the
+		// benaphore or the style is a semaphore.  Either way, we need to acquire
+		// the semaphore in this case.
+		int32 oldBenaphoreCount = atomic_add(&fBenaphoreCount, 1);
+		if (oldBenaphoreCount > 0) {
 			do {
-   				status = acquire_sem_etc(fSemaphoreID, 1, B_RELATIVE_TIMEOUT,
-   									 timeout);
+				status = acquire_sem_etc(fSemaphoreID, 1, B_RELATIVE_TIMEOUT,
+					timeout);
 			} while (status == B_INTERRUPTED);
+
 			// Note, if the lock here does time out, the benaphore count
-   			// is not decremented.  By doing this, the benaphore count will
-   			// never go back to zero.  This means that the locking essentially
-   			// changes to semaphore style if this was a benaphore.
-   			//
-   			// Doing the decrement of the benaphore count when the acquisition
-   			// fails is a risky thing to do.  If you decrement the counter at
-   			// the same time the thread which holds the benaphore does an
-   			// Unlock(), there is serious risk of a race condition.
-   			//
-   			// If the Unlock() sees a positive count and releases the semaphore
-   			// and then the timed out thread decrements the count to 0, there
-   			// is no one to take the semaphore.  The next two threads will be
-   			// able to acquire the benaphore at the same time!  The first will
-   			// increment the counter and acquire the lock.  The second will
-   			// acquire the semaphore and therefore the lock.  Not good.
-   			//
-   			// This has been discussed on the becodetalk mailing list and
-   			// Trey from Be had this to say:
-   			//
-   			// I looked at the LockWithTimeout() code, and it does not have
-   			// _this_ (ie the race condition) problem.  It circumvents it by
-   			// NOT doing the atomic_add(&count, -1) if the semaphore
-   			// acquisition fails.  This means that if a
-   			// BLocker::LockWithTimeout() times out, all other Lock*() attempts
-   			// turn into guaranteed semaphore grabs, _with_ the overhead of a
-   			// (now) useless atomic_add().
-   			//
-   			// Given Trey's comments, it looks like Be took the same approach
-   			// I did.  The output of CountLockRequests() of Be's implementation
-   			// confirms Trey's comments also.
-   			//
-   			// Finally some thoughts for the future with this code:
-   			//   - If 2^31 timeouts occur on a 32-bit machine (ie today),
-   			//     the benaphore count will wrap to a negative number.  This
-   			//     would have unknown consequences on the ability of the BLocker
-   			//     to continue to function.
-   			//
-    	}
-    }
-    
-    // If the lock has successfully been acquired.	
-   	if (status == B_OK) {
-   		
-   		// Set the lock owner to this thread and increment the recursive count
-   		// by one.  The recursive count is incremented because one more Unlock()
-   		// is now required to release the lock (ie, 0 => 1, 1 => 2 etc).
-   		fLockOwner = find_thread(NULL);
-    	fRecursiveCount++;
-    }
-   	
+			// is not decremented.  By doing this, the benaphore count will
+			// never go back to zero.  This means that the locking essentially
+			// changes to semaphore style if this was a benaphore.
+			//
+			// Doing the decrement of the benaphore count when the acquisition
+			// fails is a risky thing to do.  If you decrement the counter at
+			// the same time the thread which holds the benaphore does an
+			// Unlock(), there is serious risk of a race condition.
+			//
+			// If the Unlock() sees a positive count and releases the semaphore
+			// and then the timed out thread decrements the count to 0, there
+			// is no one to take the semaphore.  The next two threads will be
+			// able to acquire the benaphore at the same time!  The first will
+			// increment the counter and acquire the lock.  The second will
+			// acquire the semaphore and therefore the lock.  Not good.
+			//
+			// This has been discussed on the becodetalk mailing list and
+			// Trey from Be had this to say:
+			//
+			// I looked at the LockWithTimeout() code, and it does not have
+			// _this_ (ie the race condition) problem.  It circumvents it by
+			// NOT doing the atomic_add(&count, -1) if the semaphore
+			// acquisition fails.  This means that if a
+			// BLocker::LockWithTimeout() times out, all other Lock*() attempts
+			// turn into guaranteed semaphore grabs, _with_ the overhead of a
+			// (now) useless atomic_add().
+			//
+			// Given Trey's comments, it looks like Be took the same approach
+			// I did.  The output of CountLockRequests() of Be's implementation
+			// confirms Trey's comments also.
+			//
+			// Finally some thoughts for the future with this code:
+			//   - If 2^31 timeouts occur on a 32-bit machine (ie today),
+			//     the benaphore count will wrap to a negative number.  This
+			//     would have unknown consequences on the ability of the BLocker
+			//     to continue to function.
+			//
+		}
+	}
+
+	// If the lock has successfully been acquired.	
+	if (status == B_OK) {
+		// Set the lock owner to this thread and increment the recursive count
+		// by one.  The recursive count is incremented because one more Unlock()
+		// is now required to release the lock (ie, 0 => 1, 1 => 2 etc).
+		fLockOwner = find_thread(NULL);
+		fRecursiveCount++;
+	}
+
 	if (error != NULL)
 		*error = status;
 
-   	// Return true if the lock has been acquired.
-    return (status == B_OK);
+	// Return true if the lock has been acquired.
+	return (status == B_OK);
 }
