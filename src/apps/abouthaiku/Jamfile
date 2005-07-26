@@ -11,3 +11,5 @@ App AboutHaiku :
 	: libbe.so libtranslation.so libroot.so
 	: AboutHaiku.rdef
 	;
+
+Includes [ FGristFiles AboutHaiku.rdef ] : [ FGristFiles haikulogo.png ] ;
