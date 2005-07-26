@@ -90,7 +90,7 @@ status_t eng_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku VIA Accelerant 0.06 running.\n"));
+	LOG(1,("POWERUP: Haiku VIA Accelerant 0.07 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -450,41 +450,20 @@ static status_t eng_general_bios_to_powergraphics()
 	snooze(1000);
 
 	/* power-up all hardware function blocks */
-	/* bit 28: OVERLAY ENGINE (BES),
-	 * bit 25: CRTC2, (> NV04A)
-	 * bit 24: CRTC1,
-	 * bit 20: framebuffer,
-	 * bit 16: PPMI,
-	 * bit 12: PGRAPH,
-	 * bit  8: PFIFO,
-	 * bit  4: PMEDIA,
-	 * bit  0: TVOUT. (> NV04A) */
 //	ENG_REG32(RG32_PWRUPCTRL) = 0x13111111;
 
-	/* select colormode CRTC registers base adresses */
-//	ENG_REG8(RG8_MISCW) = 0xcb;
+	/* select colormode CRTC registers base adresses,
+	 * and select pixelclock source D (custom VIA programmable PLL) */
+	ENG_REG8(RG8_MISCW) = 0xcf;
 
-//via
 	/* unlock (extended) registers for R/W access */
 	SEQW(LOCK, 0x01);
 	CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
-//end via.
-
-//	if (si->ps.secondary_head)
-	if (0)
-	{
-		/* enable access to secondary head */
-		set_crtc_owner(1);
-		/* unlock head's registers for R/W access */
-		CRTC2W(LOCK, 0x57);
-		CRTC2W(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
-	}
 
 	/* turn off both displays and the hardcursors (also disables transfers) */
 	head1_dpms(false, false, false);
 	head1_cursor_hide();
-//	if (si->ps.secondary_head)
-	if (0)
+	if (si->ps.secondary_head)
 	{
 //		head2_dpms(false, false, false);
 //		head2_cursor_hide();
@@ -505,87 +484,41 @@ static status_t eng_general_bios_to_powergraphics()
 	}
 	si->overlay.crtc = false;
 
-	/* enable 'enhanced' mode on primary head: */
-	/* enable access to primary head */
-//	set_crtc_owner(0);
-	/* note: 'BUFFER' is a non-standard register in behaviour(!) on most
-	 * NV11's like the GeForce2 MX200, while the MX400 and non-NV11 cards
-	 * behave normally.
-	 * Also readback is not nessesarily what was written before!
-	 *
-	 * Double-write action needed on those strange NV11 cards: */
-	/* RESET: don't doublebuffer CRTC access: set programmed values immediately... */
-//	CRTCW(BUFFER, 0xff);
-	/* ... and use fine pitched CRTC granularity on > NV4 cards (b2 = 0) */
-	/* note: this has no effect on possible bandwidth issues. */
-//	CRTCW(BUFFER, 0xfb);
-	/* select VGA mode (old VGA register) */
-//	CRTCW(MODECTL, 0xc3);
-	/* select graphics mode (old VGA register) */
-//	SEQW(MEMMODE, 0x0e);
-	/* select 8 dots character clocks (old VGA register) */
-//	SEQW(CLKMODE, 0x21);
-	/* select VGA mode (old VGA register) */
-//	GRPHW(MODE, 0x00);
-	/* select graphics mode (old VGA register) */
-//	GRPHW(MISC, 0x01);
-	/* select graphics mode (old VGA register) */
-//	ATBW(MODECTL, 0x01);
-	/* enable 'enhanced mode', enable Vsync & Hsync,
-	 * set DAC palette to 8-bit width, disable large screen */
-//	CRTCW(REPAINT1, 0x04);
-
-	/* enable 'enhanced' mode on secondary head: */
-//	if (si->ps.secondary_head)
-	if (0)
-	{
-		/* enable access to secondary head */
-		set_crtc_owner(1);
-		/* select colormode CRTC2 registers base adresses */
-		ENG_REG8(RG8_MISCW) = 0xcb;
-		/* note: 'BUFFER' is a non-standard register in behaviour(!) on most
-		 * NV11's like the GeForce2 MX200, while the MX400 and non-NV11 cards
-		 * behave normally.
-		 * Also readback is not nessesarily what was written before!
-		 *
-		 * Double-write action needed on those strange NV11 cards: */
-		/* RESET: don't doublebuffer CRTC2 access: set programmed values immediately... */
-		CRTC2W(BUFFER, 0xff);
-		/* ... and use fine pitched CRTC granularity on > NV4 cards (b2 = 0) */
-		/* note: this has no effect on possible bandwidth issues. */
-		CRTC2W(BUFFER, 0xfb);
-		/* select VGA mode (old VGA register) */
-		CRTC2W(MODECTL, 0xc3);
-		/* select graphics mode (old VGA register) */
-		SEQW(MEMMODE, 0x0e);
-		/* select 8 dots character clocks (old VGA register) */
-		SEQW(CLKMODE, 0x21);
-		/* select VGA mode (old VGA register) */
-		GRPHW(MODE, 0x00);
-		/* select graphics mode (old VGA register) */
-		GRPHW(MISC, 0x01);
-		/* select graphics mode (old VGA register) */
-		ATB2W(MODECTL, 0x01);
-		/* enable 'enhanced mode', enable Vsync & Hsync,
-		 * set DAC palette to 8-bit width, disable large screen */
-		CRTC2W(REPAINT1, 0x04);
-	}
-
-	/* enable palettes */
-//	DACW(GENCTRL, 0x00100100);
-//	if (si->ps.secondary_head) DAC2W(GENCTRL, 0x00100100);
-
-	/* enable programmable PLLs */
-//	DACW(PLLSEL, 0x10000700);
-//	if (si->ps.secondary_head) DACW(PLLSEL, (DACR(PLLSEL) | 0x20000800));
-
-	/* turn on DAC and make sure detection testsignal routing is disabled
-	 * (b16 = disable DAC,
-	 *  b12 = enable testsignal output */
-//	DACW(TSTCTRL, (DACR(TSTCTRL) & 0xfffeefff));
-	/* turn on DAC2 if it exists
-	 * (NOTE: testsignal function block resides in DAC1 only (!)) */
-//	if (si->ps.secondary_head) DAC2W(TSTCTRL, (DAC2R(TSTCTRL) & 0xfffeefff));
+	/* set card to 'enhanced' mode: (only VGA standard registers used here) */
+	/* (keep) card enabled, set plain normal memory usage, no old VGA 'tricks' ... */
+	CRTCW(MODECTL, 0xc3);
+	/* ... plain sequential memory use, more than 64Kb RAM installed,
+	 * switch to graphics mode ... */
+	SEQW(MEMMODE, 0x0e);
+	/* ... disable bitplane tweaking ... */
+	GRPHW(ENSETRESET, 0x00);
+	/* ... no logical function tweaking with display data, no data rotation ... */
+	GRPHW(DATAROTATE, 0x00);
+	/* ... reset read map select to plane 0 ... */
+	GRPHW(READMAPSEL, 0x00);
+	/* ... set standard mode ... */
+	GRPHW(MODE, 0x00);
+	/* ... ISA framebuffer mapping is 64Kb window, switch to graphics mode (again),
+	 * select standard adressing ... */
+	GRPHW(MISC, 0x05);
+	/* ... disable bit masking ... */
+	GRPHW(BITMASK, 0xff);
+	/* ... attributes are in color, switch to graphics mode (again) ... */
+	ATBW(MODECTL, 0x01);
+	/* ... set overscan color to black ... */
+	ATBW(OSCANCOLOR, 0x00);
+	/* ... enable all color planes ... */
+	ATBW(COLPLANE_EN, 0x0f);
+	/* ... reset horizontal pixelpanning ... */
+	ATBW(HORPIXPAN, 0x00);
+	/* ...  reset colorpalette groupselect bits ... */
+	ATBW(COLSEL, 0x00);
+	/* ... do unknown standard VGA register ... */
+	ATBW(0x16, 0x01);
+	/* ... and enable all four byteplanes. */
+	SEQW(MAPMASK, 0x0f);
+	/* setup sequencer clocking mode */
+	SEQW(CLKMODE, 0x21);
 
 	/* setup AGP:
 	 * Note:
