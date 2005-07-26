@@ -4,12 +4,12 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>via_driver (SVN 0.06, Rudolf)</h1></p>
+<p><h1>via_driver (SVN 0.07, Rudolf)</h1></p>
 <ul>
 	<li>Initial setup based on nVidia driver 0.30;
 	<li>Kerneldriver uses MTR-WC mapping where available;
 	<li>Accelerant uses AGP busmanager to enable AGP FW where available;
-	<li>Added functional hardware cursor, although it's not 100% perfect (yet);
+	<li>Added hardware cursor;
 	<li>Added RAM size autodetection, as preset by the system BIOS;
 	<li>Added support for virtualscreens (CRTC startadress and memory pitch programming);
 	<li>Added CRTC1 timing programming and updated constraints, including GET_TIMING_CONSTRAINTS hook;
@@ -17,17 +17,19 @@
 	<li>Added CRTC FIFO fetch limit programming (seems specific to VIA);
 	<li>Added colorpalette programming;
 	<li>Added DPMS support;
-	<li>Added primary head pixelPLL programming (refreshrate is now set).
+	<li>Added primary head pixelPLL programming (refreshrate is now set);
+	<li>Added switch to 'enhanced mode' making the driver independant from a preset VESA mode.
 </ul>
 <p><h1>Still todo:</h1></p>
 <ul>
-	<li>Extended mode enable programming (to become independant of VESA);
-	<li>A lot more (like acceleration and overlay engines).
+	<li>Video overlay;
+	<li>2D acceleration;
+	<li>And yet more could be done.
 </ul>
 </p>
 <hr><br>
 <br>
 <a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on July 23, 2005)</p>
+<p>(Page last updated on July 26, 2005)</p>
 </body>
 </html>
