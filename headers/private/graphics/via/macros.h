@@ -414,9 +414,6 @@
 #define RG32_PWRUPCTRL		0x00000200
 #define RG32_DUALHEAD_CTRL	0x000010f0//verify!!!
 #define RG8_VSE2			0x000c03c3
-#define RG8_GRPHIND			0x000c03ce
-#define RG16_GRPHIND		0x000c03ce
-#define RG8_GRPHDAT			0x000c03cf
 
 /* bootstrap info registers */
 #define RG32_NV4STRAPINFO	0x00100000
@@ -437,21 +434,24 @@
 #define RG32_MEMPLL2		0x00680574 /* NV31, NV36 only */
 #define RG32_CONFIG         0x00600804
 
-/* primary head */
-#define RG8_ATTRINDW		0x006013c0
-#define RG8_ATTRDATW		0x006013c0
-#define RG8_ATTRDATR		0x006013c1
 //new via
+/* primary head */
+#define RG8_ATTRINDW		0x000083c0
+#define RG8_ATTRDATW		0x000083c0
+#define RG8_ATTRDATR		0x000083c1
 #define RG8_MISCW 			0x000083c2
 #define RG8_MISCR 			0x000083cc
 #define RG8_SEQIND			0x000083c4
 #define RG16_SEQIND			0x000083c4
 #define RG8_SEQDAT			0x000083c5
+#define RG8_GRPHIND			0x000083ce
+#define RG16_GRPHIND		0x000083ce
+#define RG8_GRPHDAT			0x000083cf
 #define RG8_CRTCIND			0x000083d4
 #define RG16_CRTCIND		0x000083d4
 #define RG8_CRTCDAT			0x000083d5
+#define RG8_INSTAT1			0x000083da
 //end via.
-#define RG8_INSTAT1			0x006013da
 #define RG32_NV10FBSTADD32	0x00600800
 #define RG32_RASTER			0x00600808
 #define RG32_NV10CURADD32	0x0060080c
@@ -608,19 +608,21 @@
 #define ENCRTCX_0x59		0x59
 #define ENCRTCX_0x9f		0x9f
 
-/* Nvidia ATTRIBUTE indexed registers */
+//new via:
+/* VIA ATTRIBUTE indexed registers */
 /* VGA standard registers: */
 #define ENATBX_MODECTL		0x10
 #define ENATBX_OSCANCOLOR	0x11
 #define ENATBX_COLPLANE_EN	0x12
 #define ENATBX_HORPIXPAN	0x13
 #define ENATBX_COLSEL		0x14
+#define ENATBX_0x16			0x16
 
-//new via
 /* VIA SEQUENCER indexed registers */
 /* VGA standard registers: */
 #define ENSEQX_RESET		0x00
 #define ENSEQX_CLKMODE		0x01
+#define ENSEQX_MAPMASK		0x02
 #define ENSEQX_MEMMODE		0x04
 /* VIA specific registers: */
 #define ENSEQX_LOCK			0x10
@@ -656,9 +658,8 @@
 #define ENSEQX_PPLL_N_OTH	0x46
 #define ENSEQX_PPLL_MP_CLE	0x46
 #define ENSEQX_PPLL_N_CLE	0x47
-//end new via.
 
-/* Nvidia GRAPHICS indexed registers */
+/* VIA GRAPHICS indexed registers */
 /* VGA standard registers: */
 #define ENGRPHX_ENSETRESET	0x01
 #define ENGRPHX_DATAROTATE	0x03
@@ -666,6 +667,7 @@
 #define ENGRPHX_MODE		0x05
 #define ENGRPHX_MISC		0x06
 #define ENGRPHX_BITMASK		0x08
+//end via new.
 
 /* Nvidia BES (Back End Scaler) registers (< NV10, including NV03, so RIVA128(ZX)) */
 #define ENBES_NV04_INTE		0x00680140
