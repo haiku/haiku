@@ -1,3 +1,11 @@
+/*
+ * Copyright 2003, Michael Phipps. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+#ifndef PREVIEWVIEW_H
+#define PREVIEWVIEW_H
+
 #include <View.h>
 #include <Box.h>
 #include <ScreenSaverThread.h>
@@ -12,7 +20,7 @@ public:
 	~PreviewView();
 	void Draw(BRect update); 
 	void SetScreenSaver(BString name);
-	BScreenSaver *ScreenSaver(void) {return fSaver;}	
+	BScreenSaver *ScreenSaver() {return fSaver;}	
 private:	
 	BScreenSaver* fSaver;
 	BView *fConfigView;
@@ -22,3 +30,4 @@ private:
 	
 }; // end class PreviewView
 
+#endif // PREVIEWVIEW_H

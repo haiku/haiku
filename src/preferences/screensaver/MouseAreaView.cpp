@@ -1,9 +1,22 @@
+/*
+ * Copyright 2003, Michael Phipps. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
 #include "MouseAreaView.h"
 #include "Constants.h"
 #include <Rect.h>
 #include <Point.h>
 #include <Shape.h>
 #include <stdio.h>
+
+MouseAreaView::MouseAreaView(BRect frame, const char *name) 
+	: BView (frame,name,B_FOLLOW_NONE,B_WILL_DRAW)
+{
+	SetViewColor(216,216,216);
+	fCurrentDirection = NONE;
+}
+
 
 void 
 MouseAreaView::Draw(BRect update) 
@@ -72,11 +85,13 @@ MouseAreaView::DrawArrow(void)
 		SetHighColor(kBlack);
 		FillShape(&arrow,B_SOLID_HIGH);
 	} else {
+		PushState();
 		BRect area(getArrowSize(fScreenArea,true));
 		SetHighColor(kRed);
 		SetPenSize(2);
 		StrokeEllipse(area);
 		StrokeLine(BPoint(area.right,area.top),BPoint(area.left,area.bottom));
+		PopState();
 	}
 }
 

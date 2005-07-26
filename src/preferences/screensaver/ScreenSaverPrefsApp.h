@@ -1,18 +1,19 @@
+/*
+ * Copyright 2003, Michael Phipps. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
 #ifndef _ScreenSaverPrefsApp_H
 #define _ScreenSaverPrefsApp_H
 #include "ScreenSaverWindow.h"
 
-extern const char *APP_SIG;
-
-class ScreenSaverPrefsApp: public BApplication {
-private:
-  ScreenSaverWin *m_MainForm;
+class ScreenSaverPrefsApp : public BApplication 
+{
 public:
-  ScreenSaverPrefsApp(void);
-  virtual ~ScreenSaverPrefsApp(void);
-  virtual void MessageReceived(BMessage *);
-  virtual void RefsReceived(BMessage *);
-
+	ScreenSaverPrefsApp();
+	virtual void RefsReceived(BMessage *);
+private:
+	ScreenSaverWin *fScreenSaverWin;
 };
 
 #endif // _ScreenSaverPrefsApp_H

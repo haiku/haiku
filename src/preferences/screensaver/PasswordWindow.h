@@ -1,3 +1,10 @@
+/*
+ * Copyright 2003, Michael Phipps. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef PASSWORDWINDOW_H
+#define PASSWORDWINDOW_H
+
 #include "Window.h"
 #include "CheckBox.h"
 #include "String.h"
@@ -6,12 +13,12 @@
 #include "Button.h"
 #include "Constants.h"
 
-class pwWindow : public BWindow
+class PasswordWindow : public BWindow
 {
 	public:
-		pwWindow (void) : BWindow(BRect(100,100,380,250),"",B_MODAL_WINDOW_LOOK,B_MODAL_APP_WINDOW_FEEL,B_NOT_RESIZABLE) {setup();}
-		void setup(void);
-		void update(void);
+		PasswordWindow();
+		void Setup();
+		void Update();
 		virtual void MessageReceived(BMessage *message);
 
 	private:
@@ -23,4 +30,6 @@ class pwWindow : public BWindow
 		bool fUseNetPassword;
 
 };
+
+#endif // PASSWORDWINDOW_H
 

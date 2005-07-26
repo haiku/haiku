@@ -1,4 +1,8 @@
-#include "ScreenSaverWindow.h"
+/*
+ * Copyright 2003, Michael Phipps. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
 #include <ListView.h>
 #include <Application.h>
 #include <Button.h>
@@ -14,10 +18,32 @@
 #include <Slider.h>
 #include <StringView.h>
 #include <ScreenSaver.h>
-#include "MouseAreaView.h"
-#include "PreviewView.h"
 #include <Roster.h>
 #include <stdio.h>
+
+#include "ScreenSaverWindow.h"
+#include "MouseAreaView.h"
+#include "PreviewView.h"
+
+static const char *kTimes[]={"30 seconds", "1 minute",             "1 minute 30 seconds",
+                                                        "2 minutes",  "2 minutes 30 seconds", "3 minutes",
+                                                        "4 minutes",  "5 minutes",            "6 minutes",
+                                                        "7 minutes",  "8 minutes",            "9 minutes",
+                                                        "10 minutes", "15 minutes",           "20 minutes",
+                                                        "25 minutes", "30 minutes",           "40 minutes",
+                                                        "50 minutes", "1 hour",               "1 hour 30 minutes",
+                                                        "2 hours",    "2 hours 30 minutes",   "3 hours",
+                                                        "4 hours",    "5 hours"};
+
+static const int kTimeInSeconds[]={     30,    60,   90,
+                                                                        120,   150,  180,
+                                                                        240,   300,  360,
+                                                                        420,   480,  540,
+                                                                        600,   900,  1200,
+                                                                        1500,  1800, 2400,
+                                                                        3000,  3600, 5400,
+                                                                        7200,  9000, 10800,
+                                                                        14400, 18000};
 
 const int32 zero=0;
 
@@ -41,6 +67,41 @@ struct SSListItem {
 	BString fileName;
 	BString displayName;	
 };
+
+
+ScreenSaverWin::ScreenSaverWin() 
+	: BWindow(BRect(50,50,500,385),"OBOS Screen Saver Preferences",
+		B_TITLED_WINDOW,B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE) ,
+	fFadeState(0),fNoFadeState(0),
+	fSampleView(NULL),
+	fTab1(NULL),fTab2(NULL),
+	fTabView(NULL), fModuleSettingsBox(NULL),
+	fPreviewDisplay(NULL), fListView1(NULL),
+	fAddonList(NULL), fSelectedAddonFileName(NULL),
+	fCurrentAddon(NULL), fTestButton(NULL),
+	fAddButton(NULL), fEnableScreenSaverBox(NULL),
+	fPasswordSlider(NULL), fTurnOffSlider(NULL),
+	fRunSlider(NULL), fStringView1(NULL),
+	fEnableCheckbox(NULL), fPasswordCheckbox(NULL),
+	fTurnOffScreenCheckBox(NULL),
+	fTurnOffMinutes(NULL), fRunMinutes(NULL),
+	fPasswordMinutes(NULL), fPasswordButton(NULL),
+	fFadeNowString(NULL),
+	fFadeNowString2(NULL),
+	fDontFadeString(NULL), fDontFadeString2(NULL),
+	fFadeNow(NULL),fFadeNever(NULL),
+	fPwWin(NULL),
+	fPwMessenger(NULL), fFilePanel(NULL) ,
+	fSettingsArea(NULL) 
+{
+	SetupForm();
+}
+
+
+ScreenSaverWin::~ScreenSaverWin()
+{
+}
+
 
 void 
 ScreenSaverWin::SaverSelected(void) 
@@ -88,10 +149,10 @@ ScreenSaverWin::MessageReceived(BMessage *msg)
 			fFilePanel->Show();
 			break;
 		case kUpdatelist:
-			populateScreenSaverList();
+			PopulateScreenSaverList();
 			break;
   	}
-	updateStatus(); // This could get called sometimes when it doesn't need to. Shouldn't hurt
+	UpdateStatus(); // This could get called sometimes when it doesn't need to. Shouldn't hurt
 	BWindow::MessageReceived(msg);
 }
 
@@ -99,14 +160,14 @@ ScreenSaverWin::MessageReceived(BMessage *msg)
 bool 
 ScreenSaverWin::QuitRequested() 
 {
-	updateStatus();
+	UpdateStatus();
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return(true);
 }       
 
 
 void 
-ScreenSaverWin::updateStatus(void) 
+ScreenSaverWin::UpdateStatus(void) 
 {
 	DisableUpdates();
 	// Policy - enable and disable controls as per checkboxes, etc
@@ -141,23 +202,21 @@ ScreenSaverWin::updateStatus(void)
 // TODO - Tell the password window to update its stuff
 	BMessage ssState;
 	if ((fPreviewDisplay->ScreenSaver()) && (fPreviewDisplay->ScreenSaver()->SaveState(&ssState)==B_OK))
-		fPrefs.SetState(&ssState);
+		fPrefs.SetState(fPrefs.ModuleName(), &ssState);
 	fPrefs.SaveSettings();
 };
 
 
 void 
-ScreenSaverWin::SetupForm(void) 
+ScreenSaverWin::SetupForm() 
 {
 	fFilePanel=new BFilePanel();
 
-	BRect r;
-	BView *background;
+	BRect r = Bounds();
 	BTab *tab;
-	r = Bounds();
 	
 // Create a background view
-	background=new BView(r,"background",B_FOLLOW_NONE,0);
+	BView *background = new BView(r,"background",B_FOLLOW_NONE,0);
 	background->SetViewColor(216,216,216,0);
 	AddChild(background);
 
@@ -182,16 +241,16 @@ ScreenSaverWin::SetupForm(void)
 	background->AddChild(fTabView);
 
 // Create the controls inside the tabs
-	setupTab2();
-	setupTab1();
+	SetupTab2();
+	SetupTab1();
 
 // Create the password editing window
-	fPwWin=new pwWindow;
-	fPwMessenger=new BMessenger (NULL,fPwWin);
+	fPwWin = new PasswordWindow();
+	fPwMessenger = new BMessenger(NULL,fPwWin);
 	fPwWin->Run();
 
 	MoveTo(fPrefs.WindowFrame().left,fPrefs.WindowFrame().top);
-	ResizeTo(fPrefs.WindowFrame().right-fPrefs.WindowFrame().left,fPrefs.WindowFrame().bottom-fPrefs.WindowFrame().top);
+	//ResizeTo(fPrefs.WindowFrame().right-fPrefs.WindowFrame().left,fPrefs.WindowFrame().bottom-fPrefs.WindowFrame().top);
 	fTabView->Select(fPrefs.WindowTab());
 	fEnableCheckbox->SetValue(fPrefs.TimeFlags());
 	fRunSlider->SetValue(secondsToSlider(fPrefs.BlankTime()));
@@ -210,7 +269,7 @@ ScreenSaverWin::SetupForm(void)
 				fListView1->ScrollToSelection();
 			}
 		}
-	updateStatus();
+	UpdateStatus();
 } 
 
 
@@ -272,7 +331,7 @@ addScreenSaversToList (directory_which dir, BList *list)
 
 // sorting function for SSListItems
 int 
-compareSSListItems(const void* left, const void* right) 
+ScreenSaverWin::CompareSSListItems(const void* left, const void* right) 
 {
 	SSListItem* leftItem  = *(SSListItem **)left;
 	SSListItem* rightItem = *(SSListItem **)right;
@@ -282,7 +341,7 @@ compareSSListItems(const void* left, const void* right)
 
 
 void 
-ScreenSaverWin::populateScreenSaverList(void) 
+ScreenSaverWin::PopulateScreenSaverList(void) 
 {
 	if (!fAddonList)
 		fAddonList = new BList;
@@ -296,7 +355,7 @@ ScreenSaverWin::populateScreenSaverList(void)
   	fAddonList->AddItem(tempListItem); 
 	addScreenSaversToList( B_BEOS_ADDONS_DIRECTORY, fAddonList );
 	addScreenSaversToList( B_USER_ADDONS_DIRECTORY, fAddonList );
-	fAddonList->SortItems(compareSSListItems);
+	fAddonList->SortItems(CompareSSListItems);
   
 // Add the strings in the BList to a BListView
  	fListView1->DeselectAll(); 
@@ -313,7 +372,7 @@ ScreenSaverWin::populateScreenSaverList(void)
 
 // Create the controls for the first tab
 void 
-ScreenSaverWin::setupTab1(void) 
+ScreenSaverWin::SetupTab1() 
 {
 	int columns[4]={15,150,180,430};
 	int rows[6]={15,120,135,255,263,280};
@@ -341,13 +400,13 @@ ScreenSaverWin::setupTab1(void)
 	fAddButton->SetLabel("Add...");
 
 	fTab1->AddChild(fPreviewDisplay = new PreviewView(BRect(columns[0]+5,rows[0],columns[1],rows[1]),"preview",&fPrefs));
- 	populateScreenSaverList(); 
+ 	PopulateScreenSaverList(); 
 } 
 
 
 // Create the controls for the second tab
 void 
-ScreenSaverWin::setupTab2(void) 
+ScreenSaverWin::SetupTab2() 
 {
 	font_height stdFontHt;
 	be_plain_font->GetHeight(&stdFontHt);  

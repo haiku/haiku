@@ -1,60 +1,64 @@
-#ifndef SCREEN_SAVER_THREAD_H
-#include "ScreenSaverThread.h"
-#endif
-#include "Screen.h"
-#include "ScreenSaver.h"
-#include "ScreenSaverPrefs.h"
-#include "FindDirectory.h"
+#include <Screen.h>
+#include <ScreenSaver.h>
+#include <FindDirectory.h>
 #include <stdio.h>
+#include "ScreenSaverThread.h"
+#include "ScreenSaverPrefs.h"
 
 int32 
-threadFunc(void *data) 
+ScreenSaverThread::ThreadFunc(void *data) 
 {
 	ScreenSaverThread *ss=(ScreenSaverThread *)data;
-	ss->thread();
+	ss->Thread();
 	return B_OK;
 }
 
 
-ScreenSaverThread::ScreenSaverThread(BWindow *wnd, BView *vw, ScreenSaverPrefs *p) : 
-		saver(NULL),win(wnd),view(vw), pref(p), frame(0),snoozeCount(0),addon_image(0) 
+ScreenSaverThread::ScreenSaverThread(BWindow *wnd, BView *vw, ScreenSaverPrefs *p) 
+	:	fSaver(NULL),
+		fWin(wnd),
+		fView(vw), 
+		fPref(p),
+		fFrame(0),
+		fSnoozeCount(0),
+		fAddonImage(0) 
 {
-	dwin=reinterpret_cast<BDirectWindow *>(wnd);
+	fDWin = dynamic_cast<BDirectWindow *>(wnd);
 }
 
 
 void 
-ScreenSaverThread::quit(void) 
+ScreenSaverThread::Quit() 
 {
-	saver->StopSaver();
-	if (win)
-		win->Hide();
+	fSaver->StopSaver();
+	if (fWin)
+		fWin->Hide();
 }
 
 
 void 
-ScreenSaverThread::thread() 
+ScreenSaverThread::Thread() 
 {
-	win->Lock();
-	view->SetViewColor(0,0,0);
-	view->SetLowColor(0,0,0);
-	saver->StartSaver(view,false);
-	win->Unlock();
+	fWin->Lock();
+	fView->SetViewColor(0,0,0);
+	fView->SetLowColor(0,0,0);
+	fSaver->StartSaver(fView,false);
+	fWin->Unlock();
 	while (1) {
-		snooze(saver->TickSize());
-		if (snoozeCount) { // If we are sleeping, do nothing
-			snoozeCount--;
+		snooze(fSaver->TickSize());
+		if (fSnoozeCount) { // If we are sleeping, do nothing
+			fSnoozeCount--;
 			return;
-		} else if (saver->LoopOnCount() && (frame>=saver->LoopOnCount())) { // Time to nap
-			frame=0;
-			snoozeCount=saver->LoopOffCount();
+		} else if (fSaver->LoopOnCount() && (fFrame >= fSaver->LoopOnCount())) { // Time to nap
+			fFrame = 0;
+			fSnoozeCount = fSaver->LoopOffCount();
 		} else {
-	   		win->Lock();
-			if (dwin) 
-				saver->DirectDraw(frame);
-	    	saver->Draw(view,frame);
-	    	win->Unlock();
-			frame++;
+	   		fWin->Lock();
+			if (fDWin) 
+				fSaver->DirectDraw(fFrame);
+	    	fSaver->Draw(fView,fFrame);
+	    	fWin->Unlock();
+			fFrame++;
 		}
 	}
 }
@@ -64,50 +68,50 @@ BScreenSaver *
 ScreenSaverThread::LoadAddOn() 
 {
 	BScreenSaver *(*instantiate)(BMessage *, image_id );
-	if (addon_image) { // This is a new set of preferences. Free up what we did have 
-		unload_add_on(addon_image);
+	if (fAddonImage) { // This is a new set of preferences. Free up what we did have 
+		unload_add_on(fAddonImage);
 	}
 	char temp[B_PATH_NAME_LENGTH]; 
 	if (B_OK==find_directory(B_BEOS_ADDONS_DIRECTORY,NULL,false,temp,B_PATH_NAME_LENGTH)) { 
-		sprintf (temp,"%s/Screen Savers/%s",temp,pref->ModuleName());
-		addon_image = load_add_on(temp);
+		sprintf (temp,"%s/Screen Savers/%s", temp, fPref->ModuleName());
+		fAddonImage = load_add_on(temp);
 	}
-	if (addon_image<0)  {
+	if (fAddonImage<0)  {
 		//printf ("Unable to open add-on: %s\n",temp);
-		sprintf (temp,"%s/Screen Savers/%s",temp,pref->ModuleName());
+		sprintf (temp,"%s/Screen Savers/%s", temp, fPref->ModuleName());
 		if (B_OK==find_directory(B_COMMON_ADDONS_DIRECTORY,NULL,false,temp,B_PATH_NAME_LENGTH)) { 
-			sprintf (temp,"%s/Screen Savers/%s",temp,pref->ModuleName());
-			addon_image = load_add_on(temp);
+			sprintf (temp,"%s/Screen Savers/%s", temp, fPref->ModuleName());
+			fAddonImage = load_add_on(temp);
 		}
 	}
-	if (addon_image<0)  {
+	if (fAddonImage<0)  {
 		//printf ("Unable to open add-on: %s\n",temp);
 		if (B_OK==find_directory(B_USER_ADDONS_DIRECTORY,NULL,false,temp,B_PATH_NAME_LENGTH)) { 
-			sprintf (temp,"%s/Screen Savers/%s",temp,pref->ModuleName());
-			addon_image = load_add_on(temp);
+			sprintf (temp,"%s/Screen Savers/%s", temp, fPref->ModuleName());
+			fAddonImage = load_add_on(temp);
 		}
 	}
-	if (addon_image<0) {
+	if (fAddonImage<0) {
 		printf ("Unable to open add-on: %s\n",temp);
-		printf ("add on image = %ld!\n",addon_image);
+		printf ("add on image = %ld!\n", fAddonImage);
 		return NULL;
 	} else {
 		// Look for the one C function that should exist.
 		status_t retVal;
-		if (B_OK != (retVal=get_image_symbol(addon_image, "instantiate_screen_saver", B_SYMBOL_TYPE_TEXT,(void **) &instantiate))) {
+		if (B_OK != (retVal=get_image_symbol(fAddonImage, "instantiate_screen_saver", B_SYMBOL_TYPE_TEXT,(void **) &instantiate))) {
 			printf ("Unable to find the instantiator\n");
 			printf ("Error = %ld\n",retVal);
 			return NULL;
 		} else
-			saver=instantiate(pref->GetState(pref->ModuleName()),addon_image);
-		if (B_OK!=saver->InitCheck()) {
+			fSaver = instantiate(fPref->GetState(fPref->ModuleName()), fAddonImage);
+		if (B_OK != fSaver->InitCheck()) {
 			printf ("InitCheck() Failed!\n");
-			unload_add_on(addon_image);
-			delete saver;
-			saver=NULL;
+			unload_add_on(fAddonImage);
+			delete fSaver;
+			fSaver = NULL;
 			return NULL;
 		}
 	}
-	return saver;
+	return fSaver;
 }
 

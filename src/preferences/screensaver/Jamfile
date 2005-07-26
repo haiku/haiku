@@ -5,10 +5,14 @@ UsePrivateHeaders screen_saver ;
 Preference ScreenSaver : 
 	ScreenSaverPrefsApp.cpp
 	ScreenSaverWindow.cpp
-	passwordWindow.cpp
+	PasswordWindow.cpp
 	PreviewView.cpp
 	MouseAreaView.cpp
+	ScreenSaver.cpp
 	: libtracker.so libscreensaver.so libbe.so libstdc++.r4.so
 	: ScreenSaver.rdef 
 	;
 
+SEARCH on [ FGristFiles
+                ScreenSaver.cpp
+        ] = [ FDirName $(OBOS_TOP) src kits screensaver ] ;

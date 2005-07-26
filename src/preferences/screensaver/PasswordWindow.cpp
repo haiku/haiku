@@ -1,10 +1,23 @@
-#include "passwordWindow.h"
+/*
+ * Copyright 2003, Michael Phipps. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+#include "PasswordWindow.h"
 #include <stdio.h>
-#include "RadioButton.h"
-#include "Alert.h"
+#include <RadioButton.h>
+#include <Alert.h>
+
+
+PasswordWindow::PasswordWindow() 
+	: BWindow(BRect(100,100,380,250),"",B_MODAL_WINDOW_LOOK,B_MODAL_APP_WINDOW_FEEL,B_NOT_RESIZABLE) 
+{
+	Setup();
+}
+
 
 void 
-pwWindow::setup(void) 
+PasswordWindow::Setup() 
 {
 	BView *owner=new BView(Bounds(),"ownerView",B_FOLLOW_NONE,B_WILL_DRAW);
 	owner->SetViewColor(216,216,216);
@@ -33,11 +46,12 @@ pwWindow::setup(void)
 	owner->AddChild(fDone);
 	owner->AddChild(fCancel);
 	fDone->MakeDefault(true);
-	update();
+	Update();
 }
 
+
 void 
-pwWindow::update(void) 
+PasswordWindow::Update() 
 {
 	fUseNetPassword=(fUseCustom->Value()>0);
 	fConfirm->SetEnabled(fUseNetPassword);
@@ -46,10 +60,10 @@ pwWindow::update(void)
 
 
 void 
-pwWindow::MessageReceived(BMessage *message) 
+PasswordWindow::MessageReceived(BMessage *message) 
 {
-  switch(message->what) {
-    case kDone_clicked:
+	switch(message->what) {
+		case kDone_clicked:
 		if (fUseCustom->Value())
 			if (strcmp(fPassword->Text(),fConfirm->Text())) {
 				BAlert *alert=new BAlert("noMatch","Passwords don't match. Try again.","OK");
@@ -64,13 +78,13 @@ pwWindow::MessageReceived(BMessage *message)
 			Hide();
 			}
 		break;
-    case kCancel_clicked:
+	case kCancel_clicked:
 		fPassword->SetText("");
 		fConfirm->SetText("");
 		Hide();
 		break;
 	case kButton_changed:
-		update();
+		Update();
 		break;
 	case kShow:
 		Show();
@@ -90,8 +104,8 @@ pwWindow::MessageReceived(BMessage *message)
 		}
 		break;
 	}
-    default:
-      	BWindow::MessageReceived(message);
-      	break;
+	default:
+	BWindow::MessageReceived(message);
+	break;
   }
 }

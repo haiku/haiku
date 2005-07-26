@@ -1,5 +1,5 @@
 
-resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.OBOS.ScreenSaver";
+resource app_signature "application/x-vnd.haiku.ScreenSaver";
 
 resource(1, "BEOS:FILE_TYPES") message;
 

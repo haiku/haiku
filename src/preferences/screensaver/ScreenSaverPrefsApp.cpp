@@ -1,3 +1,8 @@
+/*
+ * Copyright 2003, Michael Phipps. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
 #include <Application.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -6,17 +11,12 @@
 
 #include "ScreenSaverPrefsApp.h"
 
-const char *APP_SIG = "application/x-vnd.OBOS.ScreenSaver";
+const char *APP_SIG = "application/x-vnd.haiku.ScreenSaver";
 
-ScreenSaverPrefsApp::~ScreenSaverPrefsApp(void) 
+ScreenSaverPrefsApp::ScreenSaverPrefsApp() : BApplication(APP_SIG) 
 {
-}
-
-
-ScreenSaverPrefsApp::ScreenSaverPrefsApp(void) : BApplication(APP_SIG) 
-{
-  	m_MainForm = new ScreenSaverWin();
-  	m_MainForm->Show();
+  	fScreenSaverWin = new ScreenSaverWin();
+  	fScreenSaverWin->Show();
 }
 
 
@@ -33,19 +33,7 @@ ScreenSaverPrefsApp::RefsReceived(BMessage *msg)
 	char temp[2*B_PATH_NAME_LENGTH];
 	sprintf (temp,"cp %s '/boot/home/config/add-ons/Screen Savers/'\n",p.Path());
 	system(temp);
-	m_MainForm->PostMessage(new BMessage(kUpdatelist));
-}
-
-
-void ScreenSaverPrefsApp::MessageReceived(BMessage *message) 
-{
-	switch(message->what) {
-		case B_READY_TO_RUN: 
-			break;
-		default: {
-			BApplication::MessageReceived(message);
-		}
-	}
+	fScreenSaverWin->PostMessage(kUpdatelist);
 }
 
 

@@ -1,3 +1,8 @@
+/*
+ * Copyright 2003, Michael Phipps. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
 #include "PreviewView.h"
 #include "Constants.h"
 #include <Rect.h>
@@ -26,8 +31,12 @@ scale2(int x1, int x2, int y1, int y2,BRect area)
 
 
 PreviewView::PreviewView(BRect frame, const char *name,ScreenSaverPrefs *prefp)
-: BView (frame,name,B_FOLLOW_NONE,B_WILL_DRAW),
-  fSaver (NULL),fConfigView(NULL),fSst(NULL),fThreadID(-1),fPrefPtr(prefp) 
+	: BView (frame,name,B_FOLLOW_NONE,B_WILL_DRAW),
+  	fSaver(NULL),
+	fConfigView(NULL),
+	fSst(NULL),
+	fThreadID(-1),
+	fPrefPtr(prefp) 
 {
 	SetViewColor(216,216,216);
 } 
@@ -45,7 +54,7 @@ PreviewView::SetScreenSaver(BString name)
 {
 	if (fThreadID>=0) {
 		kill_thread(fThreadID);
-		fThreadID=-1;
+		fThreadID = -1;
 	}
 	if (fSst)
 		delete fSst;
@@ -54,14 +63,14 @@ PreviewView::SetScreenSaver(BString name)
 		delete fConfigView;
 	}
 
-	fConfigView=new BView(scale2(1,8,1,2,Bounds()),"previewArea",B_FOLLOW_NONE,B_WILL_DRAW);
+	fConfigView = new BView(scale2(1,8,1,2,Bounds()),"previewArea",B_FOLLOW_NONE,B_WILL_DRAW);
 	fConfigView->SetViewColor(0,0,0);
 	AddChild(fConfigView);
 
-	fSst=new ScreenSaverThread(Window(),fConfigView,fPrefPtr);
-	fSaver=fSst->LoadAddOn();
+	fSst = new ScreenSaverThread(Window(),fConfigView,fPrefPtr);
+	fSaver = fSst->LoadAddOn();
 	if (fSaver) {
-		fThreadID=spawn_thread(threadFunc,"ScreenSaverRenderer",0,fSst);
+		fThreadID = spawn_thread(ScreenSaverThread::ThreadFunc, "ScreenSaverRenderer", B_LOW_PRIORITY, fSst);
 		resume_thread(fThreadID); 
 	}
 	
@@ -82,7 +91,7 @@ PreviewView::Draw(BRect update)
 	SetHighColor(kBlack);
 
 	SetHighColor(184,184,184);
-	BRect outerShape=scale2(2,7,2,6,Bounds());
+	BRect outerShape = scale2(2,7,2,6,Bounds());
 	outerShape.InsetBy(1,1);
 	FillRoundRect(outerShape,4,4);// Outer shape
 
