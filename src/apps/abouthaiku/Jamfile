@@ -13,3 +13,5 @@ App AboutHaiku :
 	;
 
 Includes [ FGristFiles AboutHaiku.rdef ] : [ FGristFiles haikulogo.png ] ;
+SEARCH on [ FGristFiles haikulogo.png ] = [ FDirName $(OBOS_TOP) src apps abouthaiku ] ;
+
