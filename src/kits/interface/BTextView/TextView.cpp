@@ -463,8 +463,6 @@ BTextView::MouseDown(BPoint where)
 		currentMessage->FindInt32("modifiers", &modifiers);
 	bool shiftDown = modifiers & B_SHIFT_KEY;
 
-	// TODO: Asynchronous mouse tracking
-
 	// should we initiate a drag?
 	if (fSelStart != fSelEnd && !shiftDown) {
 		BPoint loc;
@@ -504,6 +502,9 @@ BTextView::MouseDown(BPoint where)
 			// double click
 			fClickCount = 2;
 			fClickTime = system_time();
+			int32 start, end;
+			FindWord(fClickOffset, &start, &end);
+			Select(start, end);
 		}
 	} else {
 		// new click
@@ -521,9 +522,6 @@ BTextView::MouseDown(BPoint where)
 	if (!fSelectable)
 		return;
 
-	// TODO: Honor window flags and skip this
-	// implementation even if we don't have an alternative
-	// asynchronous version, yet.
 	if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS) {
 		SetMouseEventMask(B_POINTER_EVENTS | B_KEYBOARD_EVENTS,
 				B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
@@ -3901,13 +3899,7 @@ BTextView::PerformMouseMoved(BPoint where, uint32 code)
 	int32 start = 0, end = 0;
 	int32 offset = OffsetAt(where);
 	
-	int32 clickCount = 1;
-
-#if 0
-	Window()->CurrentMessage()->FindInt32("clicks", &clickCount);
-#endif
-
-	switch (clickCount) {
+	switch (fClickCount) {
 		case 1:
 			start = min_c(offset, fClickOffset);
 			end = max_c(offset, fClickOffset);
@@ -3915,6 +3907,8 @@ BTextView::PerformMouseMoved(BPoint where, uint32 code)
 		
 		case 2:
 			FindWord(offset, &start, &end);
+			start = min_c(start, fClickOffset);
+			end = max_c(end, fClickOffset);
 			break;
 		
 		case 3:
