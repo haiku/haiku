@@ -651,6 +651,7 @@
 #define ENSEQX_0x2e			0x2e
 #define ENSEQX_MSIZE_CLE266	0x34
 #define ENSEQX_MSIZE_OTHER	0x39
+#define ENSEQX_PLL_RESET	0x40
 #define ENSEQX_0x44			0x44
 #define ENSEQX_0x45			0x45
 #define ENSEQX_PPLL_P_OTH	0x44
