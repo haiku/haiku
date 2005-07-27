@@ -30,9 +30,9 @@ class GLDispatcher
 		uint32					TableSize();
 		
 		const _glapi_proc 		operator[](const char *function_name);
+		const char *			operator[](uint32 offset);
 	
-		const char *			FunctionName(uint32 offset);
-		uint32					FunctionOffset(const char *function_name);
+		uint32					OffsetOf(const char *function_name);
 };
 
 // Inlines methods
@@ -72,15 +72,15 @@ inline const _glapi_proc GLDispatcher::operator[](const char *function_name)
 }
 
 
-inline const char * GLDispatcher::FunctionName(uint32 offset)
+inline const char * GLDispatcher::operator[](uint32 offset)
 {
 	return _glapi_get_proc_name((GLuint) offset);
 }
 
 
-inline uint32 GLDispatcher::FunctionOffset(const char *function_name)
+inline uint32 GLDispatcher::OffsetOf(const char *function_name)
 {
-	return (uint32) _glapi_get_proc_offset;
+	return (uint32) _glapi_get_proc_offset(function_name);
 }
 
 
