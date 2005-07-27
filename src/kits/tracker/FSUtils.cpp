@@ -124,6 +124,12 @@ bool DirectoryMatches(const BEntry *, const char *additionalPath, directory_whic
 
 status_t empty_trash(void *);
 
+#ifdef __HAIKU__
+	#define OS_NAME	"Haiku"
+#else
+	#define OS_NAME "BeOS"
+#endif
+
 
 const char *kDeleteConfirmationStr = "Are you sure you want to delete the selected "
 	"item(s)? This operation cannot be reverted.";
@@ -461,15 +467,15 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *action,
 
 	if (DirectoryMatches(entry, B_BEOS_DIRECTORY))
 		warning = "If you %s the beos folder, you won't be able to "
-			"boot BeOS! Are you sure you want to do this? To %s the folder "
+			"boot " OS_NAME "! Are you sure you want to do this? To %s the folder "
 			"anyway, hold down the Shift key and click \"Do it\".";
 	else if (DirectoryMatchesOrContains(entry, B_BEOS_SYSTEM_DIRECTORY))
 		warning = "If you %s the system folder or its contents, you "
-			"won't be able to boot BeOS! Are you sure you want to do this? "
+			"won't be able to boot " OS_NAME "! Are you sure you want to do this? "
 			"To %s the system folder or its contents anyway, hold down "
 			"the Shift key and click \"Do it\".";
 	else if (DirectoryMatches(entry, B_USER_DIRECTORY)) {
-		warning = "If you %s the home folder, BeOS may not "
+		warning = "If you %s the home folder, " OS_NAME " may not "
 			"behave properly! Are you sure you want to do this? "
 			"To %s the home anyway, click \"Do it\".";
 		requireOverride = false;
@@ -478,18 +484,18 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *action,
 		
 		if (DirectoryMatchesOrContains(entry, "beos_mime", B_USER_SETTINGS_DIRECTORY)
 			|| DirectoryMatchesOrContains(entry, "beos_mime", B_COMMON_SETTINGS_DIRECTORY)) {
-			warning = "If you %s the mime settings, BeOS may not "
+			warning = "If you %s the mime settings, " OS_NAME " may not "
 				"behave properly! Are you sure you want to do this? "
 				"To %s the mime settings anyway, click \"Do it\".";
 			requireOverride = false;
 		} else if (DirectoryMatches(entry, B_USER_CONFIG_DIRECTORY)) {
-			warning = "If you %s the config folder, BeOS may not "
+			warning = "If you %s the config folder, " OS_NAME " may not "
 				"behave properly! Are you sure you want to do this? "
 				"To %s the config folder anyway, click \"Do it\".";
 			requireOverride = false;
 		} else if (DirectoryMatches(entry, B_USER_SETTINGS_DIRECTORY)
 			|| DirectoryMatches(entry, B_COMMON_SETTINGS_DIRECTORY)) {
-			warning = "If you %s the settings folder, BeOS may not "
+			warning = "If you %s the settings folder, " OS_NAME " may not "
 				"behave properly! Are you sure you want to do this? "
 				"To %s the settings folder anyway, click \"Do it\".";
 			requireOverride = false;
