@@ -9,4 +9,5 @@ SubInclude OBOS_TOP src tests kits net ;
 SubInclude OBOS_TOP src tests kits storage ;
 SubInclude OBOS_TOP src tests kits support ;
 SubInclude OBOS_TOP src tests kits translation ;
+SubInclude OBOS_TOP src tests kits opengl ;
 

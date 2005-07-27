@@ -1,0 +1,6 @@
+SubDir OBOS_TOP src tests kits opengl glinfo ;
+
+SimpleTest GLInfo :
+	GLInfo.cpp
+	: be libGL.so
+;

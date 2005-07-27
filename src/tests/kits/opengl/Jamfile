@@ -1,0 +1,3 @@
+SubDir OBOS_TOP src tests kits opengl ;
+
+SubInclude OBOS_TOP src tests kits opengl glinfo ;
