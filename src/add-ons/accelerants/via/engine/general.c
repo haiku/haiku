@@ -90,7 +90,7 @@ status_t eng_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku VIA Accelerant 0.07 running.\n"));
+	LOG(1,("POWERUP: Haiku VIA Accelerant 0.08 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -519,6 +519,11 @@ static status_t eng_general_bios_to_powergraphics()
 	SEQW(MAPMASK, 0x0f);
 	/* setup sequencer clocking mode */
 	SEQW(CLKMODE, 0x21);
+
+	/* reset primary pixelPLL */
+	SEQW(PLL_RESET, ((SEQR(PLL_RESET)) | 0x02));
+	snooze(1000);
+	SEQW(PLL_RESET, ((SEQR(PLL_RESET)) & ~0x02));
 
 	/* setup AGP:
 	 * Note:
