@@ -2,13 +2,12 @@ SubDir OBOS_TOP src apps pulse ;
 
 UsePrivateHeaders shared ;
 
-local r5_src = strlcpy.c ;
+if $(TARGET_PLATFORM) = r5 {
+	SubDirC++Flags -DR5_COMPATIBLE ;
+}
 
-if $(HAIKU_COMPATIBLE) {
-	r5_src = ;
-} 
-
-App Pulse : BottomPrefsView.cpp
+App Pulse : 
+	BottomPrefsView.cpp
 	ConfigView.cpp
 	CPUButton.cpp
 	DeskbarPulseView.cpp
@@ -20,15 +19,11 @@ App Pulse : BottomPrefsView.cpp
 	PulseApp.cpp
 	PulseView.cpp
 	PulseWindow.cpp 
-	$(r5_src)	
-	: libbe.so 
-	: Pulse.rdef ;
+
+	: libbe.so  
+	: Pulse.rdef 
+;
 
 if $(HAIKU_COMPATIBLE) {
 	LinkSharedOSLibs Pulse : libroot.so ;
 }
-
-SEARCH on [ FGristFiles
-                strlcpy.c
-        ] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
-
