@@ -17,7 +17,7 @@
 
 // define the PANIC macro
 #ifndef PANIC
-#	if USER
+#	ifndef _KERNEL_MODE
 #		define PANIC(str)	debugger(str)
 #	else
 #		define PANIC(str)	panic(str)
@@ -422,7 +422,7 @@ KMessage::SendTo(port_id targetPort, int32 targetToken, KMessage* reply,
 	if (reply) {
 		// get our team
 		team_id ourTeam = B_SYSTEM_TEAM;
-		#if USER
+		#ifndef _KERNEL_MODE
 			if (targetTeam != B_SYSTEM_TEAM) {
 				thread_info threadInfo;
 				error = get_thread_info(find_thread(NULL), &threadInfo);
