@@ -114,4 +114,12 @@ Depends InputKit :
 	Mouse	
 ;
 
+# Pseudo-target to build the OpenGL kit only
+NotFile OpenGLKit ;
+Depends OpenGLKit :
+	libGL.so
+	GLTeapot
+	GLInfo
+;
+
 SubInclude OBOS_TOP src ;
