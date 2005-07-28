@@ -312,6 +312,11 @@ enum {
 	AS_LAYER_SET_PATTERN,
 	AS_SET_CURRENT_LAYER,
 
+	// BDirectWindow codes
+	AS_DW_GET_SYNC_DATA,
+	AS_DW_SUPPORTS_WINDOW_MODE,
+	AS_DW_SET_FULLSCREEN,
+	
 	// TODO: Move these elsewhere. They don't need to 
 	// be shared with libbe
 	// app_server internal communication

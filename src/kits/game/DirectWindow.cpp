@@ -17,6 +17,9 @@
 #ifdef COMPILE_FOR_R5
 #include <R5_AppServerLink.h>
 #include <R5_Session.h>
+#define DW_GET_SYNC_DATA		0x880
+#define DW_SET_FULLSCREEN		0x881
+#define DW_SUPPORTS_WINDOW_MODE 0xF2C
 #endif
 
 // Compiling for DANO/Zeta is broken as it doesn't have BRegion::set_size()
@@ -24,6 +27,10 @@
 		#warning "##### Building BDirectWindow for TARGET_PLATFORM=dano (DANO/Zeta) is broken #####"
 #endif
 
+#ifdef __HAIKU__
+#include <AppServerLink.h>
+#include <ServerProtocol.h>
+#endif
 
 // TODO: We'll want to move this to a private header,
 // accessible by the app server.
@@ -33,13 +40,6 @@ struct dw_sync_data
 	sem_id disableSem;
 	sem_id disableSemAck;
 };
-
-
-// TODO: These commands are used by the BeOS R5 app_server.
-// Change this when our app_server supports BDirectWindow
-#define DW_GET_SYNC_DATA		0x880
-#define DW_SET_FULLSCREEN		0x881
-#define DW_SUPPORTS_WINDOW_MODE 0xF2C
 
 
 // We don't need this kind of locking, since the directDeamonFunc 
@@ -307,13 +307,23 @@ BDirectWindow::SetFullScreen(bool enable)
 		status_t fullScreen;
 		a_session->sread(sizeof(status_t), &fullScreen);	
 		a_session->sread(sizeof(status_t), &status);
+		full_screen_enable = enable;
+#endif
+#ifdef __HAIKU__
+
+		fLink->StartMessage(AS_DW_SET_FULLSCREEN);
+		fLink->Attach<int32>(server_token); // useless ?
+		fLink->Attach<bool>(enable);
+		
+		int32 code;
+		if (fLink->FlushWithReply(code) == B_OK
+			&& code == SERVER_TRUE) {
+			status = B_OK;
+			full_screen_enable = enable;
+		}
 #endif
 		Unlock();
-
-		// TODO: Revisit this when we move to our app_server
-		// Currently the full screen/window status is set
-		// even if something goes wrong
-		full_screen_enable = enable;
+		
 	}
 	return status;
 }
@@ -329,17 +339,27 @@ BDirectWindow::IsFullScreen() const
 bool
 BDirectWindow::SupportsWindowMode(screen_id id)
 {
-	int32 result = 0;
-
 #ifdef COMPILE_FOR_R5
+	int32 result = 0;
 	_BAppServerLink_ link;
 	link.fSession->swrite_l(DW_SUPPORTS_WINDOW_MODE);
 	link.fSession->swrite_l(id.id);
 	link.fSession->sync();
 	link.fSession->sread(sizeof(result), &result);
+	return result & true;
 #endif
 
-	return result & true;
+#ifdef __HAIKU__
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_DW_SUPPORTS_WINDOW_MODE);
+	link.Attach<screen_id>(id);
+	int32 reply;
+	if (link.FlushWithReply(reply) == B_OK
+		&& reply == SERVER_TRUE)
+		return true;
+#endif
+
+	return false;
 }
 
 
@@ -454,7 +474,19 @@ BDirectWindow::InitData()
 		
 	a_session->sread(sizeof(sync_data), &sync_data);
 	a_session->sread(sizeof(status), &status);
-#endif		
+#endif	
+	
+#ifdef __HAIKU__
+	fLink->StartMessage(AS_DW_GET_SYNC_DATA);
+	fLink->Attach<int32>(server_token);
+	
+	int32 reply;
+	if (fLink->FlushWithReply(reply) == B_OK
+		&& reply == SERVER_TRUE) {
+		fLink->Read<dw_sync_data>(&sync_data);
+		status = B_OK;
+	}
+#endif
 	
 	Unlock();
 		

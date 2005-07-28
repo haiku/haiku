@@ -1,5 +1,6 @@
 SubDir OBOS_TOP src kits game ;
 
+UsePrivateHeaders app ;
 UsePrivateHeaders interface ;
 UsePrivateHeaders input ;
 
