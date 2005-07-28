@@ -13,6 +13,12 @@ UseFreeTypeHeaders ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) drawing ] ;
 
+HWINTERFACE_SOURCES = 
+	BBitmapBuffer.cpp
+	HWInterface.cpp
+	MultiLocker.cpp
+;
+
 if ( $(TARGET_PLATFORM) = haiku ) {
 	# This overrides the definitions in private/servers/app/ServerConfig.h
 	defines = [ FDefines TEST_MODE=0 ] ;
@@ -20,27 +26,23 @@ if ( $(TARGET_PLATFORM) = haiku ) {
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) ;
 	
-	VIEW_DRIVER_SOURCES =
-		AccelerantBuffer.cpp
-		AccelerantHWInterface.cpp
-		BitmapBuffer.cpp
-		DisplayDriverPainter.cpp
-		HWInterface.cpp
-		MallocBuffer.cpp
-		UpdateQueue.cpp
-		;
 } else {
-	VIEW_DRIVER_SOURCES =
+	SharedLibrary hwinterface :
+		$(HWINTERFACE_SOURCES)
+	;
+	
+	LINKFLAGS on libhwinterfaceimpl.so ?= $(LINKFLAGS) ;
+	LINKFLAGS on libhwinterfaceimpl.so += -lbe ;
+	
+	SharedLibrary hwinterfaceimpl :
 		fake_input_server.cpp
-		BitmapBuffer.cpp
-		AccelerantBuffer.cpp
-		AccelerantHWInterface.cpp
-		DisplayDriverPainter.cpp
-		HWInterface.cpp
-		MallocBuffer.cpp
-		UpdateQueue.cpp
 		ViewHWInterface.cpp
-		;
+		: libopenbeos.so libhwinterface.so
+	;
+
+	# make this empty, because it is already in the hwinterfaceimpl lib
+	# and therefore does not need to be included in app_server anymore
+	HWINTERFACE_SOURCES = ;
 }
 
 SharedLibrary appserver :
@@ -72,7 +74,6 @@ Server app_server :
 	# Misc. Sources
 	DebugInfoManager.cpp
 	SubWindowList.cpp
-	MultiLocker.cpp
 	PicturePlayer.cpp
 	PNGDump.cpp
 	RAMLinkMsgReader.cpp
@@ -91,10 +92,16 @@ Server app_server :
 	ServerWindow.cpp
 
 	# DisplayDriver Classes
-	$(VIEW_DRIVER_SOURCES)
+	AccelerantBuffer.cpp
+	AccelerantHWInterface.cpp
+	BitmapBuffer.cpp
+	DisplayDriverPainter.cpp
+	MallocBuffer.cpp
+	UpdateQueue.cpp
+	# this will be empty when compiling for R5
+	$(HWINTERFACE_SOURCES)
 
 	VirtualScreen.cpp
-	BBitmapBuffer.cpp
 	BitmapHWInterface.cpp
 	DefaultDecorator.cpp
 	Layer.cpp
@@ -124,17 +131,18 @@ if $(TARGET_PLATFORM) = haiku {
 } else {
 	# link as test application under R5
 
-	LINKFLAGS on app_server ?= $(LINKFLAGS) ;
-	LINKFLAGS on app_server += -lbe ;
+	LinkSharedOSLibs libhwinterface.so :
+		libappserver.so libopenbeos.so ;
 
 	LinkSharedOSLibs libappserver.so :
-		root be <boot!home!config!lib>libopenbeos.so
-		textencoding libfreetype.so ;
+		<boot!home!config!lib>libopenbeos.so
+		libtextencoding.so libfreetype.so ;
 
 	LinkSharedOSLibs app_server :
-		root be game translation libz.so libpng.so libappserver.so
+		libz.so libpng.so libappserver.so
 		libpainter.a <boot!home!config!lib>libopenbeos.so 
-		libagg.a libfreetype.so textencoding ;
+		libhwinterface.so libhwinterfaceimpl.so
+		libagg.a libfreetype.so libtextencoding.so ;
 }
 
 SubInclude OBOS_TOP src servers app drawing Painter ;

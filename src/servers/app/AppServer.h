@@ -14,7 +14,6 @@
 #include <Application.h>
 #include <Window.h>
 #include <String.h>
-
 #include "ServerConfig.h"
 #include "MessageLooper.h"
 
@@ -35,12 +34,7 @@ namespace BPrivate {
 	and initializes most of the server's globals.
 */
 
-class AppServer :
-	public MessageLooper 
-#if TEST_MODE
-	, public BApplication
-#endif
-{
+class AppServer : public MessageLooper  {
 	public:
 		AppServer();
 		virtual ~AppServer();

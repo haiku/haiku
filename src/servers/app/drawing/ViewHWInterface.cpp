@@ -14,6 +14,7 @@
 #include <new>
 #include <stdio.h>
 
+#include <Application.h>
 #include <Bitmap.h>
 #include <Cursor.h>
 #include <Locker.h>
@@ -91,6 +92,18 @@ string_for_color_space(color_space format)
 	}
 	return name;
 }
+
+// run_app_thread
+static int32
+run_app_thread(void* cookie)
+{
+	if (BApplication* app = (BApplication*)cookie) {
+		app->Lock();
+		app->Run();
+	}
+	return 0;
+}
+
 
 //#define INPUTSERVER_TEST_MODE 1
 
@@ -384,6 +397,8 @@ ViewHWInterface::~ViewHWInterface()
 
 	delete fBackBuffer;
 	delete fFrontBuffer;
+
+	delete be_app;
 }
 
 // Initialize
@@ -443,6 +458,23 @@ ViewHWInterface::SetMode(const display_mode &mode)
 
 	// create the window if we don't have one already
 	if (!fWindow) {
+		// if the window has not been created yet, the BApplication
+		// has not been created either, but we need one to display
+		// a real BWindow in the test environment.
+		// be_app->Run() needs to be called in another thread
+		BApplication* app = new BApplication("application/x-vnd.haiku-app-server");
+		app->Unlock();
+
+		thread_id appThread = spawn_thread(run_app_thread, "app thread",
+										   B_NORMAL_PRIORITY, app);
+		if (appThread >= B_OK)
+			ret = resume_thread(appThread);
+		else
+			ret = appThread;
+
+		if (ret < B_OK)
+			return ret;
+		
 		fWindow = new CardWindow(frame.OffsetToCopy(BPoint(50.0, 50.0)));
 
 		// fire up the window thread but don't show it on screen yet

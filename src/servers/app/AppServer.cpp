@@ -33,6 +33,7 @@
 #include "RootLayer.h"
 #include "ScreenManager.h"
 #include "ServerApp.h"
+#include "ServerConfig.h"
 #include "ServerCursor.h"
 #include "ServerProtocol.h"
 #include "ServerWindow.h"
@@ -77,9 +78,6 @@ ColorSet gGUIColorSet;
 */
 AppServer::AppServer()
 	: MessageLooper("app_server"),
-#if TEST_MODE
-	BApplication(SERVER_SIGNATURE),
-#endif
 	fCursorSem(-1),
 	fCursorArea(-1)
 {
