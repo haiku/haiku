@@ -75,7 +75,7 @@ rgb_color gTermColorTable[16] = {
   {255, 255, 255, 0},
 };
 
-extern PrefHandler *gTermPref;	/* Gloval Preference Handler */
+extern PrefHandler *gTermPref;	/* Global Preference Handler */
 
 /***************************************************************************
  *
