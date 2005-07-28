@@ -36,6 +36,7 @@ UsePrivateHeaders kernel ;	# for syscalls.h
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;	# KMessage.h
 UsePrivateHeaders input ;
+UsePrivateHeaders syslog_daemon ;
 
 # Add subsubdirs to the SEARCH_SOURCE.
 SEARCH_SOURCE += [ FDirName $(SUBDIR) interface BTextView ] ;
@@ -63,7 +64,10 @@ SharedLibrary be :
 
 SharedLibraryFromObjects openbeos :
 	$(LIBBE_SOURCE:S=.o)
+	[ FGristFiles syslog.o ]
 ;
+
+Objects	syslog.cpp ;
 
 LinkSharedOSLibs libbe.so :
 	libroot.so	# make sure it links against our libroot.so
@@ -73,7 +77,7 @@ LinkSharedOSLibs libbe.so :
 
 LinkSharedOSLibs libopenbeos.so :
 	libbeadapter.so
-	be net
+	net
 	stdc++.r4
 ;
 
@@ -102,6 +106,9 @@ Includes <boot!home!config!lib>libopenbeos.so
 SEARCH on [ FGristFiles
 		strlcat.c strlcpy.c strcasestr.c
 	] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
+
+SEARCH on [ FGristFiles syslog.cpp ]
+	= [ FDirName $(OBOS_TOP) src system libroot posix ] ;
 
 SEARCH on [ FGristFiles KMessage.cpp ]
 	= [ FDirName $(OBOS_TOP) src system kernel messaging ] ;
