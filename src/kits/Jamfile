@@ -1,9 +1,5 @@
 SubDir OBOS_TOP src kits ;
 
-# define USER for KMessage.cpp
-SubDirCcFlags [ FDefines USER=1 ] ;
-SubDirC++Flags [ FDefines USER=1 ] ;
-
 # If defined allows to run applications without the registrar
 # -- for development only, of course.
 if $(RUN_WITHOUT_REGISTRAR) {
