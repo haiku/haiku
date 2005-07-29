@@ -13,37 +13,12 @@ UseFreeTypeHeaders ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) drawing ] ;
 
-HWINTERFACE_SOURCES = 
-	BBitmapBuffer.cpp
-	HWInterface.cpp
-	MultiLocker.cpp
-;
+# This overrides the definitions in private/servers/app/ServerConfig.h
+local defines = [ FDefines TEST_MODE=0 ] ;
 
-if ( $(TARGET_PLATFORM) = haiku ) {
-	# This overrides the definitions in private/servers/app/ServerConfig.h
-	defines = [ FDefines TEST_MODE=0 ] ;
+SubDirCcFlags $(defines) ;
+SubDirC++Flags $(defines) ;
 
-	SubDirCcFlags $(defines) ;
-	SubDirC++Flags $(defines) ;
-	
-} else {
-	SharedLibrary hwinterface :
-		$(HWINTERFACE_SOURCES)
-	;
-	
-	LINKFLAGS on libhwinterfaceimpl.so ?= $(LINKFLAGS) ;
-	LINKFLAGS on libhwinterfaceimpl.so += -lbe ;
-	
-	SharedLibrary hwinterfaceimpl :
-		fake_input_server.cpp
-		ViewHWInterface.cpp
-		: libopenbeos.so libhwinterface.so
-	;
-
-	# make this empty, because it is already in the hwinterfaceimpl lib
-	# and therefore does not need to be included in app_server anymore
-	HWINTERFACE_SOURCES = ;
-}
 
 SharedLibrary appserver :
 	Angle.cpp
@@ -68,6 +43,9 @@ SharedLibrary appserver :
 	# drawing
 	PatternHandler.cpp
 	DisplayDriver.cpp
+
+	# libraries
+	: libroot.so libbe.so libfreetype.so libtextencoding.so
 ;
 
 Server app_server :
@@ -98,8 +76,10 @@ Server app_server :
 	DisplayDriverPainter.cpp
 	MallocBuffer.cpp
 	UpdateQueue.cpp
-	# this will be empty when compiling for R5
-	$(HWINTERFACE_SOURCES)
+
+	BBitmapBuffer.cpp
+	HWInterface.cpp
+	MultiLocker.cpp
 
 	VirtualScreen.cpp
 	BitmapHWInterface.cpp
@@ -113,36 +93,12 @@ Server app_server :
 	WinBorder.cpp
 	Workspace.cpp
 	WorkspacesLayer.cpp
+
+	# libraries
+	:
+	libroot.so libtranslation.so libz.so libpng.so libbe.so
+	libappserver.so libpainter.a libagg.a libfreetype.so
+	libtextencoding.so
 ;
-
-# link libraries for app_server and libappserver.so
-
-if $(TARGET_PLATFORM) = haiku {
-	# link for Haiku
-
-	LinkSharedOSLibs libappserver.so :
-		libroot.so libbe.so libfreetype.so libtextencoding.so ;
-
-	LinkSharedOSLibs app_server :
-		libroot.so libtranslation.so libz.so libpng.so libbe.so
-		libappserver.so libpainter.a libagg.a libfreetype.so
-		libtextencoding.so ;
-
-} else {
-	# link as test application under R5
-
-	LinkSharedOSLibs libhwinterface.so :
-		libappserver.so libopenbeos.so ;
-
-	LinkSharedOSLibs libappserver.so :
-		<boot!home!config!lib>libopenbeos.so
-		libtextencoding.so libfreetype.so ;
-
-	LinkSharedOSLibs app_server :
-		libz.so libpng.so libappserver.so
-		libpainter.a <boot!home!config!lib>libopenbeos.so 
-		libhwinterface.so libhwinterfaceimpl.so
-		libagg.a libfreetype.so libtextencoding.so ;
-}
 
 SubInclude OBOS_TOP src servers app drawing Painter ;

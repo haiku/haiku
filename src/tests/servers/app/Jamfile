@@ -1,5 +1,127 @@
 SubDir OBOS_TOP src tests servers app ;
 
+UseLibraryHeaders agg png zlib ;
+UsePrivateHeaders app interface shared [ FDirName servers app ] ;
+
+local appServerDir = [ FDirName $(OBOS_TOP) src servers app ] ;
+
+UseHeaders [ FDirName $(appServerDir) drawing ] ;
+UseHeaders [ FDirName $(appServerDir) drawing Painter ] ;
+UseHeaders [ FDirName $(appServerDir) drawing Painter drawing_modes ] ;
+UseHeaders [ FDirName $(appServerDir) drawing Painter font_support ] ;
+UseFreeTypeHeaders ;
+
+SEARCH_SOURCE += $(appServerDir) [ FDirName $(appServerDir) drawing ] ;
+
+# No need to define any of those targets, when building for haiku
+if $(TARGET_PLATFORM) != haiku {
+
+SharedLibrary hwinterface :
+	BBitmapBuffer.cpp
+	HWInterface.cpp
+	MultiLocker.cpp
+
+	: libhaikuappserver.so libopenbeos.so
+;
+
+
+# The reason for this is that libhwinterfaceimpl.so needs to link against
+# libbe *first*, but simply adding it to the library list would add it to
+# LINKLIBS which is always appended after NEEDLIBS in the command line.
+LINKFLAGS on libhwinterfaceimpl.so ?= $(LINKFLAGS) ;
+LINKFLAGS on libhwinterfaceimpl.so += -lbe ;
+
+SharedLibrary hwinterfaceimpl :
+	fake_input_server.cpp
+	ViewHWInterface.cpp
+
+	: libopenbeos.so libhwinterface.so
+;
+
+SharedLibrary haikuappserver :
+	Angle.cpp
+	BGet++.cpp
+	BitmapManager.cpp
+	ColorSet.cpp
+	CursorData.cpp
+	CursorSet.cpp
+	Decorator.cpp
+	FontFamily.cpp
+	IPoint.cpp
+	LayerData.cpp
+	RGBColor.cpp
+	ServerBitmap.cpp
+	ServerCursor.cpp
+	ServerFont.cpp
+	FontServer.cpp
+	SystemPalette.cpp
+	TokenHandler.cpp
+	Utils.cpp
+
+	# drawing
+	PatternHandler.cpp
+	DisplayDriver.cpp
+
+	# libraries
+	:
+	<boot!home!config!lib>libopenbeos.so
+	libtextencoding.so libfreetype.so
+;
+
+AddResources haiku_app_server : app_server.rdef ;
+
+Server haiku_app_server :
+	# Misc. Sources
+	DebugInfoManager.cpp
+	SubWindowList.cpp
+	PicturePlayer.cpp
+	PNGDump.cpp
+	RAMLinkMsgReader.cpp
+	MessageLooper.cpp
+
+	# Manager Classes
+	CursorManager.cpp
+	DecorManager.cpp
+	ScreenManager.cpp
+
+	AppServer.cpp
+	Desktop.cpp
+	DesktopSettings.cpp
+
+	ServerApp.cpp
+	ServerWindow.cpp
+
+	# DisplayDriver Classes
+	AccelerantBuffer.cpp
+	AccelerantHWInterface.cpp
+	BitmapBuffer.cpp
+	DisplayDriverPainter.cpp
+	MallocBuffer.cpp
+	UpdateQueue.cpp
+
+	VirtualScreen.cpp
+	BitmapHWInterface.cpp
+	DefaultDecorator.cpp
+	Layer.cpp
+	OffscreenServerWindow.cpp
+	OffscreenWinBorder.cpp
+	RootLayer.cpp
+	ServerPicture.cpp
+	ServerScreen.cpp
+	WinBorder.cpp
+	Workspace.cpp
+	WorkspacesLayer.cpp
+
+	# libraries
+	:
+	libz.so libpng.so libhaikuappserver.so
+	libpainter.a <boot!home!config!lib>libopenbeos.so 
+	libhwinterface.so libhwinterfaceimpl.so
+	libagg.a libfreetype.so libtextencoding.so
+;
+
+} # if $(TARGET_PLATFORM) != haiku
+
 SubInclude OBOS_TOP src tests servers app bitmap_drawing ;
 SubInclude OBOS_TOP src tests servers app copy_bits ;
 SubInclude OBOS_TOP src tests servers app painter ;
