@@ -115,9 +115,6 @@ void
 ScreenSaverWin::MessageReceived(BMessage *msg) 
 {
 	switch(msg->what) {
-		case kPasswordCheckbox:
-			fPasswordSlider->SetEnabled(fPasswordCheckbox->Value()==B_CONTROL_ON);
-			break;
 		case kRunSliderChanged:
 			fRunSlider->SetLabel(kTimes[fRunSlider->Value()]);
 			if (fRunSlider->Value()>fPasswordSlider->Value()) {
@@ -136,6 +133,10 @@ ScreenSaverWin::MessageReceived(BMessage *msg)
 				fRunSlider->SetValue(fPasswordSlider->Value());
 				fRunSlider->SetLabel(kTimes[fRunSlider->Value()]);
 			}
+			break;
+		case kPasswordCheckbox:
+		case kEnableScreenSaverChanged:
+			UpdateStatus();
 			break;
 		case kPwbutton: 
 			fPwMessenger->SendMessage(kShow);
@@ -272,7 +273,6 @@ ScreenSaverWin::SetupForm()
 	int32 count = fListView1->CountItems();
 	for (int32 i=0; i<count; i++) {
 		ScreenSaverItem *item = dynamic_cast<ScreenSaverItem*>(fListView1->ItemAt(i));
-		printf("modulename %s-%s\n", fPrefs.ModuleName(), item->Text());
 		if ((strcmp(fPrefs.ModuleName(), item->Text()) == 0) 
 			|| (strcmp(fPrefs.ModuleName(),"") == 0 && strcmp(item->Text(), "Blackness") ==0)) {
 			fListView1->Select(i);
@@ -408,7 +408,7 @@ ScreenSaverWin::SetupTab2()
 	fTab2->AddChild( fEnableScreenSaverBox = new BBox(BRect(8,6,436,280),"EnableScreenSaverBox"));
 	commonLookAndFeel(fEnableScreenSaverBox,false,false);
 
-	fEnableCheckbox = new BCheckBox(BRect(0,0,90,stringHeight),"EnableCheckBox","Enable Screen Saver", new BMessage (kTab2_chg));
+	fEnableCheckbox = new BCheckBox(BRect(0,0,90,stringHeight),"EnableCheckBox","Enable Screen Saver", new BMessage(kEnableScreenSaverChanged));
 	fEnableScreenSaverBox->SetLabel(fEnableCheckbox);
 	fEnableScreenSaverBox->SetBorder(B_FANCY_BORDER);
 

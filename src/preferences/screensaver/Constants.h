@@ -60,6 +60,7 @@ const int32 kPasswordCheckbox = 'PWCB';
 const int32 kRunSliderChanged = 'RSCG';
 const int32 kPasswordSliderChanged = 'PWCG';
 const int32 kTurnOffSliderChanged = 'TUCG';
+const int32 kEnableScreenSaverChanged = 'ESCH';
 
 const rgb_color kBlack      = {0,0,0,0};
 const rgb_color kDarkGrey   = {150,150,150,0};
