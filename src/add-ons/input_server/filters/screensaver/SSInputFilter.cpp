@@ -1,96 +1,183 @@
-#include "OS.h"
-#include "Roster.h"
-#include "Screen.h"
-#include "Application.h"
+/*
+ * Copyright 2003, Michael Phipps. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+#include <NodeMonitor.h>
+#include <OS.h>
+#include <Roster.h>
+#include <Screen.h>
+#include <Application.h>
 #include "SSInputFilter.h"
+
+#include <Debug.h>
+#define CALLED() SERIAL_PRINT(("%s\n", __PRETTY_FUNCTION__))
+
+#define SCREEN_BLANKER_SIG "application/x-vnd.Be.screenblanker"
 
 extern "C" _EXPORT BInputServerFilter* instantiate_input_filter();
 
-SSISFilter *fltr=NULL;
-
 BInputServerFilter* instantiate_input_filter() {  // required C func to build the IS Filter
-	return (fltr=new SSISFilter()); 
+	return (new SSInputFilter()); 
 }
 
-int32 threadFunc (void *data) {
-	while (1) {
-		snooze(fltr->getSnoozeTime()*1000000); // snoozeTime is in microseconds
-		fltr->CheckTime();
+
+SSController::SSController(SSInputFilter *filter)
+	: BLooper("screensaver controller", B_LOW_PRIORITY),
+	fFilter(filter)
+{
+	CALLED();
+}
+
+
+void
+SSController::MessageReceived(BMessage *msg)
+{
+	CALLED();
+	SERIAL_PRINT(("what %lx\n", msg->what));
+	switch (msg->what) {
+		case B_NODE_MONITOR:
+			fFilter->ReloadSettings();
+			break;
+		case SS_CHECK_TIME:
+			fFilter->CheckTime();
+			break;
+		case B_SOME_APP_LAUNCHED:
+		{
+			const char *signature;
+			if (msg->FindString("be:signature", &signature)==B_OK 
+				&& strcmp(signature, SCREEN_BLANKER_SIG)==0)
+				fFilter->SetEnabled();
+			SERIAL_PRINT(("mime_sig %s\n", signature));
+			break;
+		}
+		default:
+			BHandler::MessageReceived(msg);
 	}
-	return B_OK; // Should never get here...
 }
 
-SSISFilter::SSISFilter() : current(NONE),enabled(false),frameNum(0) {
-	pref.LoadSettings();	
-	blank=pref.GetBlankCorner();
-	keep=pref.GetNeverBlankCorner();
-	blankTime=snoozeTime=pref.BlankTime();
-	watcher=spawn_thread(threadFunc,"ScreenSaverWatcher",0,NULL);	
-	resume_thread(watcher);
+
+SSInputFilter::SSInputFilter() 
+	: fCurrent(NONE),
+		fEnabled(false),
+		fFrameNum(0),
+		fRunner(NULL) {
+	CALLED();
+	fSSController = new SSController(this);
+	fSSController->Run();
+
+	ReloadSettings();
+	BEntry entry(fPref.GetPath().Path());
+	entry.GetNodeRef(&fPrefNodeRef);
+	watch_node(&fPrefNodeRef, B_WATCH_ALL, NULL, fSSController);
+	be_roster->StartWatching(fSSController, B_REQUEST_LAUNCHED);
 }
 
-void SSISFilter::Invoke(void) {
-	if ((current==keep) || enabled)
+
+SSInputFilter::~SSInputFilter() {
+	delete fRunner;
+	watch_node(&fPrefNodeRef, B_STOP_WATCHING, NULL);
+	be_roster->StopWatching(fSSController);
+	delete fSSController;
+}
+
+
+void 
+SSInputFilter::Invoke() 
+{
+	CALLED();
+	if ((fKeep!=NONE && fCurrent == fKeep) || fEnabled || fPref.TimeFlags()!=1)
 		return; // If mouse is in this corner, never invoke.
-	be_roster->Launch("application/x-vnd.OBOS-ScreenSaverApp");
-	enabled=true;
+	SERIAL_PRINT(("we run screenblanker\n"));
+	if (be_roster->Launch("application/x-vnd.Be.screenblanker")==B_OK)
+		fEnabled = true;
 }
 
-void SSISFilter::Banish(void) {
-	BMessenger ssApp ("application/x-vnd.OBOS-ScreenSaverApp",-1,NULL); // Don't care if it fails
-	ssApp.SendMessage('MOO1');
-	enabled=false;
+
+void 
+SSInputFilter::ReloadSettings()
+{
+	CALLED();
+	fPref.LoadSettings();
+	fBlank = fPref.GetBlankCorner();
+	fKeep = fPref.GetNeverBlankCorner();
+	fBlankTime = fSnoozeTime = fPref.BlankTime();
+	CheckTime();
+	delete fRunner;
+	fRunner = new BMessageRunner(BMessenger(NULL, fSSController), new BMessage(SS_CHECK_TIME), fSnoozeTime, -1);
 }
 
-void SSISFilter::CheckTime(void) {
-	if ((rtc=real_time_clock())>=lastEventTime+blankTime)  
+
+void 
+SSInputFilter::Banish() 
+{
+	CALLED();
+	if (!fEnabled)
+		return;
+	BMessenger ssApp (SCREEN_BLANKER_SIG,-1,NULL); // Don't care if it fails
+	ssApp.SendMessage(B_QUIT_REQUESTED);
+	fEnabled = false;
+}
+
+
+void 
+SSInputFilter::CheckTime() {
+	CALLED();
+	fRtc = system_time();
+	if (fRtc >= fLastEventTime + fBlankTime)  
 		Invoke();
 	// If the screen saver is on OR it was time to come on but it didn't (corner), snooze for blankTime
 	// Otherwise, there was an event in the middle of the last snooze, so snooze for the remainder
-	snoozeTime=(enabled || (lastEventTime+blankTime<=rtc))?blankTime:lastEventTime+blankTime-rtc;
+	if (fEnabled || (fLastEventTime+fBlankTime<=fRtc))
+		fSnoozeTime = fBlankTime;
+	else
+		fSnoozeTime = fLastEventTime + fBlankTime - fRtc;
 }
 
 
-void SSISFilter::UpdateRectangles(void) {
-	BScreen screen;
-	BRect frame=screen.Frame();
-
-	topLeft.Set(frame.left,frame.top,frame.left+CORNER_SIZE,frame.top+CORNER_SIZE);
-	topRight.Set(frame.right-CORNER_SIZE,frame.top,frame.right,frame.top+CORNER_SIZE);
-	bottomLeft.Set(frame.left,frame.bottom-CORNER_SIZE,frame.left+CORNER_SIZE,frame.bottom);
-	bottomRight.Set(frame.right-CORNER_SIZE,frame.bottom-CORNER_SIZE,frame.right,frame.bottom);
+void 
+SSInputFilter::UpdateRectangles() {
+	CALLED();
+	BRect frame = BScreen().Frame();
+	fTopLeft.Set(frame.left,frame.top,frame.left+CORNER_SIZE,frame.top+CORNER_SIZE);
+	fTopRight.Set(frame.right-CORNER_SIZE,frame.top,frame.right,frame.top+CORNER_SIZE);
+	fBottomLeft.Set(frame.left,frame.bottom-CORNER_SIZE,frame.left+CORNER_SIZE,frame.bottom);
+	fBottomRight.Set(frame.right-CORNER_SIZE,frame.bottom-CORNER_SIZE,frame.right,frame.bottom);
 }
 
-void SSISFilter::Cornered(arrowDirection pos) {
-	current=pos;
-	if (pos==blank)
+
+void 
+SSInputFilter::Cornered(arrowDirection pos) {
+	//CALLED();
+	fCurrent = pos;
+	if (fBlank != NONE && pos == fBlank)
 		Invoke();
 }
 
-filter_result SSISFilter::Filter(BMessage *msg,BList *outList) {
-	lastEventTime=real_time_clock();
+
+filter_result 
+SSInputFilter::Filter(BMessage *msg,BList *outList) {
+	fLastEventTime = system_time();
 	if (msg->what==B_MOUSE_MOVED) {
 		BPoint pos;
 		msg->FindPoint("where",&pos);
-		if ((frameNum++ % 32)==0) // Every so many frames, update
+		if ((fFrameNum++ % 32)==0) // Every so many frames, update
 			UpdateRectangles();
-		if (topLeft.Contains(pos)) 
+		if (fTopLeft.Contains(pos)) 
 			Cornered(UPLEFT);
-		else if (topRight.Contains(pos)) 
+		else if (fTopRight.Contains(pos)) 
 			Cornered(UPRIGHT);
-		else if (bottomLeft.Contains(pos)) 
+		else if (fBottomLeft.Contains(pos)) 
 			Cornered(DOWNLEFT);
-		else if (bottomRight.Contains(pos)) 
+		else if (fBottomRight.Contains(pos)) 
 			Cornered(DOWNRIGHT);
 		else {
 			Cornered(NONE);
 			Banish();
-			}
 		}
-	else 
+	} else 
 		Banish();
+
+	return B_DISPATCH_MESSAGE;
 }
 
-SSISFilter::~SSISFilter() {
-	;
-}

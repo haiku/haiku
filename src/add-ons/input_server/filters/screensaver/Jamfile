@@ -2,7 +2,8 @@ SubDir OBOS_TOP src add-ons input_server filters screensaver ;
 
 UsePrivateHeaders screen_saver ;
 
-Addon screen_saver : input_server/filters : SSInputFilter.cpp ;
+Addon screen_saver : input_server/filters : 
+	SSInputFilter.cpp 
+	: false 
+	: be libscreensaver.so <nogrist>input_server ;
 
-LinkSharedOSLibs screen_saver
-	: be libscreensaver.so /system/servers/input_server ;

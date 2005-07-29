@@ -1,37 +1,59 @@
-#include "InputServerFilter.h"
-#include "Rect.h"
-#include "Region.h"
-#include "Messenger.h"
-#include "MessageFilter.h"
-#include "MessageRunner.h"
+/*
+ * Copyright 2003, Michael Phipps. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+#include <InputServerFilter.h>
+#include <Rect.h>
+#include <Region.h>
+#include <Messenger.h>
+#include <MessageFilter.h>
+#include <MessageRunner.h>
+#include <Node.h>
 #include "ScreenSaverPrefs.h"
 
-const int CORNER_SIZE=10;
-const int timeUp='TMUP';
+const int CORNER_SIZE = 10;
+const int32 SS_CHECK_TIME = 'SSCT';
 
-int32 threadFunc(void *);
+class SSInputFilter;
 
-class SSISFilter: public BInputServerFilter
+class SSController : public BLooper
 {
 public:
-	SSISFilter();
-	virtual ~SSISFilter();
-	virtual filter_result Filter(BMessage *msg, BList *outList);
-	void CheckTime(void);
-	uint32 getSnoozeTime(void) {return snoozeTime;}
+        SSController(SSInputFilter *filter);
+        void MessageReceived(BMessage *msg);
 private:
-	uint32 lastEventTime,blankTime,snoozeTime,rtc;
-	arrowDirection blank, keep, current; 
-	bool enabled;
-	BRect topLeft,topRight,bottomLeft,bottomRight;
-	ScreenSaverPrefs pref;
-	thread_id watcher;
-	char frameNum; // Used so that we don't update the screen coord's so often
-				// Ideally, we would get a message when the screen changes. R5 doesn't do this.
+        SSInputFilter* fFilter;
+};
 
-	void UpdateRectangles(void);
+class SSInputFilter : public BInputServerFilter
+{
+public:
+	SSInputFilter();
+	virtual ~SSInputFilter();
+	virtual filter_result Filter(BMessage *msg, BList *outList);
+	void CheckTime();
+	uint32 GetSnoozeTime(void) {return fSnoozeTime;}
+	void ReloadSettings();
+	void SetEnabled() { fEnabled = true; }
+private:
+	//static int32 ThreadFunc(void *);
+	bigtime_t fLastEventTime, fBlankTime, fSnoozeTime, fRtc;
+	arrowDirection fBlank, fKeep, fCurrent; 
+	bool fEnabled;
+	BRect fTopLeft, fTopRight, fBottomLeft, fBottomRight;
+	ScreenSaverPrefs fPref;
+	//thread_id fWatcher;
+	uint32 fFrameNum; // Used so that we don't update the screen coord's so often
+				// Ideally, we would get a message when the screen changes. R5 doesn't do this.
+	SSController *fSSController;
+	node_ref fPrefNodeRef;
+	//sem_id fSnoozeSem;
+	BMessageRunner *fRunner;
+
+	void UpdateRectangles();
 	void Cornered(arrowDirection pos);
-	void Invoke(void);
-	void Banish(void);
+	void Invoke();
+	void Banish();
 };
 
