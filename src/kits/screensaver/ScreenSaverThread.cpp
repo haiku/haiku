@@ -107,8 +107,11 @@ ScreenSaverThread::LoadAddOn()
 			printf ("Unable to find the instantiator\n");
 			printf ("Error = %ld\n",retVal);
 			return NULL;
-		} else
-			fSaver = instantiate(fPref->GetState(fPref->ModuleName()), fAddonImage);
+		} else {
+			BMessage state;
+			fPref->GetState(fPref->ModuleName(), &state);
+			fSaver = instantiate(&state, fAddonImage);
+		}
 		if (B_OK != fSaver->InitCheck()) {
 			printf ("InitCheck() Failed!\n");
 			unload_add_on(fAddonImage);

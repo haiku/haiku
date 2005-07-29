@@ -148,9 +148,8 @@ ScreenSaverWin::MessageReceived(BMessage *msg)
 			break;
 		case kTest_btn:
 		{
-			BMessage *settings = fPrefs.GetSettings();
-			be_roster->Launch("application/x-vnd.haiku-ScreenSaverApp", settings);
-			delete settings;
+			BMessage &settings = fPrefs.GetSettings();
+			be_roster->Launch("application/x-vnd.haiku-ScreenSaverApp", &settings);
 			break;
 		}
 		case kAdd_btn:

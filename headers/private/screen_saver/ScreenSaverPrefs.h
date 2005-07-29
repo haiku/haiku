@@ -39,7 +39,7 @@ public:
 	const char *Password() { return fPassword.String(); }
 	bool IsNetworkPassword() {return fIsNetworkPassword;}
 	const char *ModuleName() {return fModuleName.String();}
-	BMessage *GetState(const char *name);
+	status_t GetState(const char *name, BMessage *stateMsg);
 
 	void SetWindowFrame(const BRect &fr) { fWindowFrame = fr;}
 	void SetWindowTab(int32 tab) { fWindowTab = tab;}
@@ -54,9 +54,9 @@ public:
 	void SetPasswordTime(bigtime_t pt) {fPasswordTime = pt;}
 	void SetPassword(char *pw) {fPassword = pw;} // Can not set network password from here.
 	void SetModuleName(const char *mn) {fModuleName = mn;}
-	void SetState(const char *name,BMessage *in);
+	void SetState(const char *name, BMessage *stateMsg);
 	void SaveSettings();
-	BMessage * GetSettings();
+	BMessage & GetSettings();
 private:
 	BRect fWindowFrame;
 	int32 fWindowTab;
@@ -75,7 +75,7 @@ private:
 
 	bool fIsNetworkPassword;
 
-	BMessage stateMsg, currentMessage;
+	BMessage fSettings;
 	BPath ssPath,networkPath;
 };
 

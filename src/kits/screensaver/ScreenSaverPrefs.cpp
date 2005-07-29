@@ -3,13 +3,13 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include <StorageDefs.h>
-#include <FindDirectory.h>
 #include <File.h>
+#include <FindDirectory.h>
 #include <Path.h>
-#include <string.h> // Posix string functions
-#include <String.h> // BString def
+#include <StorageDefs.h>
+#include <String.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "ScreenSaverPrefs.h"
 
@@ -30,33 +30,32 @@ ScreenSaverPrefs::LoadSettings()
 {
 	BFile ssSettings(ssPath.Path(),B_READ_ONLY);
 	if (B_OK==ssSettings.InitCheck()) { // File exists. Unflatten the message and call the settings parser.
-		BMessage settings;
-		if (settings.Unflatten(&ssSettings)!=B_OK)
+		if (fSettings.Unflatten(&ssSettings)!=B_OK)
 			return false;
 
-		settings.PrintToStream();
+		fSettings.PrintToStream();
 		
-		settings.FindRect("windowframe", &fWindowFrame);
-		settings.FindInt32("windowtab", &fWindowTab);
-		settings.FindInt32("timeflags", &fTimeFlags);
+		fSettings.FindRect("windowframe", &fWindowFrame);
+		fSettings.FindInt32("windowtab", &fWindowTab);
+		fSettings.FindInt32("timeflags", &fTimeFlags);
 
 		int32 blank_time, standByTime, suspendTime, offTime, passwordTime;
-		if (settings.FindInt32("timefade", &blank_time) == B_OK)
+		if (fSettings.FindInt32("timefade", &blank_time) == B_OK)
 			fBlankTime = blank_time * 1000000;
-		if (settings.FindInt32("timestandby", &standByTime) == B_OK)
+		if (fSettings.FindInt32("timestandby", &standByTime) == B_OK)
 			fStandByTime = standByTime * 1000000;
-		if (settings.FindInt32("timesuspend", &suspendTime) == B_OK)
+		if (fSettings.FindInt32("timesuspend", &suspendTime) == B_OK)
 			fSuspendTime = suspendTime * 1000000;
-		if (settings.FindInt32("timeoff", &offTime) == B_OK)
+		if (fSettings.FindInt32("timeoff", &offTime) == B_OK)
 			fOffTime = offTime * 1000000;
-		settings.FindInt32("cornernow", (int32*)&fBlankCorner);
-		settings.FindInt32("cornernever", (int32*)&fNeverBlankCorner);
-		settings.FindBool("lockenable", &fLockEnabled);
-		if (settings.FindInt32("lockdelay", &passwordTime) == B_OK)
+		fSettings.FindInt32("cornernow", (int32*)&fBlankCorner);
+		fSettings.FindInt32("cornernever", (int32*)&fNeverBlankCorner);
+		fSettings.FindBool("lockenable", &fLockEnabled);
+		if (fSettings.FindInt32("lockdelay", &passwordTime) == B_OK)
 			fPasswordTime = passwordTime * 1000000;
-		settings.FindString("lockpassword", &fPassword);
-		settings.FindString("lockmethod", &fLockMethod);
-		settings.FindString("modulename", &fModuleName);
+		fSettings.FindString("lockpassword", &fPassword);
+		fSettings.FindString("lockmethod", &fLockMethod);
+		fSettings.FindString("modulename", &fModuleName);
 		
 		if (IsNetworkPassword()) {
 			FILE *networkFile=NULL;
@@ -95,56 +94,68 @@ ScreenSaverPrefs::Defaults()
 }
 
 
-BMessage *
+BMessage &
 ScreenSaverPrefs::GetSettings()
 {
-	BMessage *msg = new BMessage();
-	msg->AddRect("windowframe", fWindowFrame);
-	msg->AddInt32("windowtab", fWindowTab);
-	msg->AddInt32("timeflags", fTimeFlags);
-	msg->AddInt32("timefade", fBlankTime/1000000);
-	msg->AddInt32("timestandby", fStandByTime/1000000);
-	msg->AddInt32("timesuspend", fSuspendTime/1000000);
-	msg->AddInt32("timeoff", fOffTime/1000000);
-	msg->AddInt32("cornernow", fBlankCorner);
-	msg->AddInt32("cornernever", fNeverBlankCorner);
-	msg->AddBool("lockenable", fLockEnabled);
-	msg->AddInt32("lockdelay", fPasswordTime/1000000);
-	msg->AddString("lockpassword", fPassword);
-	msg->AddString("lockmethod", fLockMethod);
-	msg->AddString("modulename", fModuleName);
+	fSettings.RemoveName("windowframe");
+	fSettings.RemoveName("windowtab");
+	fSettings.RemoveName("timeflags");
+	fSettings.RemoveName("timefade");
+	fSettings.RemoveName("timestandby");
+	fSettings.RemoveName("timesuspend");
+	fSettings.RemoveName("timeoff");
+	fSettings.RemoveName("cornernow");
+	fSettings.RemoveName("cornernever");
+	fSettings.RemoveName("lockenable");
+	fSettings.RemoveName("lockdelay");
+	fSettings.RemoveName("lockpassword");
+	fSettings.RemoveName("lockmethod");
+	fSettings.RemoveName("modulename");
+	fSettings.AddRect("windowframe", fWindowFrame);
+	fSettings.AddInt32("windowtab", fWindowTab);
+	fSettings.AddInt32("timeflags", fTimeFlags);
+	fSettings.AddInt32("timefade", fBlankTime/1000000);
+	fSettings.AddInt32("timestandby", fStandByTime/1000000);
+	fSettings.AddInt32("timesuspend", fSuspendTime/1000000);
+	fSettings.AddInt32("timeoff", fOffTime/1000000);
+	fSettings.AddInt32("cornernow", fBlankCorner);
+	fSettings.AddInt32("cornernever", fNeverBlankCorner);
+	fSettings.AddBool("lockenable", fLockEnabled);
+	fSettings.AddInt32("lockdelay", fPasswordTime/1000000);
+	fSettings.AddString("lockpassword", fPassword);
+	fSettings.AddString("lockmethod", fLockMethod);
+	fSettings.AddString("modulename", fModuleName);
 	
-	return msg;
+	return fSettings;
 }
 
 
-BMessage *
-ScreenSaverPrefs::GetState(const char *name) 
+status_t
+ScreenSaverPrefs::GetState(const char *name, BMessage *stateMsg) 
 {
-	BString stateMsgName("modulesettings_");
-	stateMsgName+=name;
-	currentMessage.FindMessage(stateMsgName.String(),&stateMsg);	
-	return &stateMsg;
+	BString stateName("modulesettings_");
+	stateName += name;
+	return fSettings.FindMessage(stateName.String(), stateMsg);	
 }
 
 
 void
-ScreenSaverPrefs::SetState(const char *name,BMessage *msg) 
+ScreenSaverPrefs::SetState(const char *name, BMessage *stateMsg) 
 {
-	BString stateMsgName("modulesettings_");
-	stateMsgName+=name;
-	if (B_NAME_NOT_FOUND == currentMessage.ReplaceMessage(stateMsgName.String(),msg))
-		currentMessage.AddMessage(stateMsgName.String(),msg);
+	BString stateName("modulesettings_");
+	stateName += name;
+	fSettings.RemoveName(stateName.String());
+	fSettings.AddMessage(stateName.String(), stateMsg);
 }
 
 
 void 
 ScreenSaverPrefs::SaveSettings() 
 {
-  	BMessage *settings = GetSettings();
-	settings->PrintToStream();
+  	BMessage &settings = GetSettings();
+	settings.PrintToStream();
 	BFile file(ssPath.Path(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
-	if ((file.InitCheck()!=B_OK) || (settings->Flatten(&file)!=B_OK))
+	if ((file.InitCheck()!=B_OK) || (settings.Flatten(&file)!=B_OK))
 		fprintf(stderr, "Problem while saving screensaver preferences file!\n");
-	delete settings;
 }
+
