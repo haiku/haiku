@@ -49,11 +49,6 @@ static const int32 kTimeInUnits[]={     30,    60,   90,
                                                                         7200,  9000, 10800,
                                                                         14400, 18000};
 
-const int32 PASSWORD_CHECKBOX = 'psCB';
-
-void drawPositionalMonitor(BView *view,BRect areaToDrawIn,int state);
-BView *drawSampleMonitor(BView *view, BRect area);
-
 int32
 UnitsToSlider(bigtime_t val) 
 {
@@ -267,7 +262,6 @@ ScreenSaverWin::SetupForm()
 	fPwWin->Run();
 
 	MoveTo(fPrefs.WindowFrame().left,fPrefs.WindowFrame().top);
-	//ResizeTo(fPrefs.WindowFrame().right-fPrefs.WindowFrame().left,fPrefs.WindowFrame().bottom-fPrefs.WindowFrame().top);
 	fTabView->Select(fPrefs.WindowTab());
 	fEnableCheckbox->SetValue(fPrefs.TimeFlags());
 	fRunSlider->SetValue(UnitsToSlider(fPrefs.BlankTime()));

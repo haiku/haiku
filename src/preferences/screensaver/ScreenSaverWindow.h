@@ -6,7 +6,6 @@
 #ifndef _ScreenSaverWindow_H
 #define _ScreenSaverWindow_H
 #include <FilePanel.h>
-#include <Picture.h>
 #include "PasswordWindow.h"
 #include "ScreenSaverPrefs.h"
 
@@ -62,7 +61,6 @@ private:
 	BStringView *fFadeNowString2;
 	BStringView *fDontFadeString;
 	BStringView *fDontFadeString2;
-	BPicture fSamplePicture;
 	MouseAreaView *fFadeNow,*fFadeNever;
 	PasswordWindow *fPwWin;
 	BMessenger *fPwMessenger;
