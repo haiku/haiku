@@ -43,19 +43,23 @@ scale3(int x, int y,BRect area,bool invertX,bool invertY)
 
 
 
-const int kTab1_chg       ='TAB1';
-const int kTab2_chg       ='TAB2';
-const int kPwbutton       ='PWBT';
-const int kDone_clicked   ='DONE';
-const int kCancel_clicked ='CNCL';
-const int kButton_changed ='BTNC';
-const int kShow           ='SHOW';
-const int kPopulate       ='POPU';
-const int kUtilize        ='UTIL';
-const int kSaver_sel      ='SSEL';
-const int kTest_btn       ='TEST';
-const int kAdd_btn        ='ADD ';
-const int kUpdatelist     ='UPDL';
+const int32 kTab1_chg       ='TAB1';
+const int32 kTab2_chg       ='TAB2';
+const int32 kPwbutton       ='PWBT';
+const int32 kDone_clicked   ='DONE';
+const int32 kCancel_clicked ='CNCL';
+const int32 kButton_changed ='BTNC';
+const int32 kShow           ='SHOW';
+const int32 kPopulate       ='POPU';
+const int32 kUtilize        ='UTIL';
+const int32 kSaver_sel      ='SSEL';
+const int32 kTest_btn       ='TEST';
+const int32 kAdd_btn        ='ADD ';
+const int32 kUpdatelist     ='UPDL';
+const int32 kPasswordCheckbox = 'PWCB';
+const int32 kRunSliderChanged = 'RSCG';
+const int32 kPasswordSliderChanged = 'PWCG';
+const int32 kTurnOffSliderChanged = 'TUCG';
 
 const rgb_color kBlack      = {0,0,0,0};
 const rgb_color kDarkGrey   = {150,150,150,0};

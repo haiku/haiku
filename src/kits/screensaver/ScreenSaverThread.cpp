@@ -1,3 +1,8 @@
+/*
+ * Copyright 2003, Michael Phipps. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
 #include <Screen.h>
 #include <ScreenSaver.h>
 #include <FindDirectory.h>

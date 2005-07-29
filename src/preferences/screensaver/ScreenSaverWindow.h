@@ -29,7 +29,7 @@ private:
 	void UpdateStatus();
 	void SaverSelected();
 
-	static int CompareSSListItems(const void* left, const void* right);
+	static int CompareScreenSaverItems(const void* left, const void* right);
 
 	ScreenSaverPrefs fPrefs;
 	int fFadeState,fNoFadeState;
@@ -41,7 +41,6 @@ private:
 
 	PreviewView *fPreviewDisplay;
 	BListView *fListView1;
-	BList *fAddonList;
 	BString fSelectedAddonFileName;
 	image_id fCurrentAddon;
   

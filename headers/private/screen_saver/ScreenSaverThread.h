@@ -1,3 +1,8 @@
+/*
+ * Copyright 2003, Michael Phipps. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
 #ifndef SCREEN_SAVER_THREAD_H
 #define SCREEN_SAVER_THREAD_H
 #include <SupportDefs.h>

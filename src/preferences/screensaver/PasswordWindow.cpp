@@ -5,14 +5,22 @@
 
 #include "PasswordWindow.h"
 #include <stdio.h>
-#include <RadioButton.h>
 #include <Alert.h>
+#include <RadioButton.h>
+#include <Screen.h>
 
 
 PasswordWindow::PasswordWindow() 
 	: BWindow(BRect(100,100,380,250),"",B_MODAL_WINDOW_LOOK,B_MODAL_APP_WINDOW_FEEL,B_NOT_RESIZABLE) 
 {
 	Setup();
+	BRect screenFrame = BScreen(B_MAIN_SCREEN_ID).Frame();
+	BPoint point;
+	point.x = (screenFrame.Width() - Bounds().Width()) / 2;
+	point.y = (screenFrame.Height() - Bounds().Height()) / 2;
+
+	if (screenFrame.Contains(point))
+		MoveTo(point);
 }
 
 
@@ -105,7 +113,7 @@ PasswordWindow::MessageReceived(BMessage *message)
 		break;
 	}
 	default:
-	BWindow::MessageReceived(message);
+		BWindow::MessageReceived(message);
 	break;
   }
 }

@@ -22,8 +22,12 @@
 #include <stdio.h>
 
 #include "ScreenSaverWindow.h"
+#include "ScreenSaverItem.h"
 #include "MouseAreaView.h"
 #include "PreviewView.h"
+
+#include <Debug.h>
+#define CALLED() PRINT(("%s\n", __PRETTY_FUNCTION__))
 
 static const char *kTimes[]={"30 seconds", "1 minute",             "1 minute 30 seconds",
                                                         "2 minutes",  "2 minutes 30 seconds", "3 minutes",
@@ -35,7 +39,7 @@ static const char *kTimes[]={"30 seconds", "1 minute",             "1 minute 30 
                                                         "2 hours",    "2 hours 30 minutes",   "3 hours",
                                                         "4 hours",    "5 hours"};
 
-static const int kTimeInSeconds[]={     30,    60,   90,
+static const int32 kTimeInUnits[]={     30,    60,   90,
                                                                         120,   150,  180,
                                                                         240,   300,  360,
                                                                         420,   480,  540,
@@ -45,53 +49,35 @@ static const int kTimeInSeconds[]={     30,    60,   90,
                                                                         7200,  9000, 10800,
                                                                         14400, 18000};
 
-const int32 zero=0;
+const int32 PASSWORD_CHECKBOX = 'psCB';
 
 void drawPositionalMonitor(BView *view,BRect areaToDrawIn,int state);
 BView *drawSampleMonitor(BView *view, BRect area);
 
-
-int 
-secondsToSlider(int val) 
+int32
+UnitsToSlider(bigtime_t val) 
 {
-	int count=sizeof(kTimeInSeconds)/sizeof(int);
-	for (int t=0;t<count;t++)
-		if (kTimeInSeconds[t]==val)
-				return t;
+	int count = sizeof(kTimeInUnits)/sizeof(int);
+	for (int t=0; t<count; t++)
+		if (kTimeInUnits[t]*1000000LL == val)
+			return t;
 	return -1;
 }
 
 
-
-struct SSListItem {
-	BString fileName;
-	BString displayName;	
-};
-
-
 ScreenSaverWin::ScreenSaverWin() 
-	: BWindow(BRect(50,50,500,385),"OBOS Screen Saver Preferences",
+	: BWindow(BRect(50,50,496,375),"OBOS Screen Saver",
 		B_TITLED_WINDOW,B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE) ,
 	fFadeState(0),fNoFadeState(0),
-	fSampleView(NULL),
-	fTab1(NULL),fTab2(NULL),
-	fTabView(NULL), fModuleSettingsBox(NULL),
-	fPreviewDisplay(NULL), fListView1(NULL),
-	fAddonList(NULL), fSelectedAddonFileName(NULL),
+	fSelectedAddonFileName(NULL),
 	fCurrentAddon(NULL), fTestButton(NULL),
-	fAddButton(NULL), fEnableScreenSaverBox(NULL),
-	fPasswordSlider(NULL), fTurnOffSlider(NULL),
-	fRunSlider(NULL), fStringView1(NULL),
-	fEnableCheckbox(NULL), fPasswordCheckbox(NULL),
-	fTurnOffScreenCheckBox(NULL),
 	fTurnOffMinutes(NULL), fRunMinutes(NULL),
 	fPasswordMinutes(NULL), fPasswordButton(NULL),
 	fFadeNowString(NULL),
 	fFadeNowString2(NULL),
 	fDontFadeString(NULL), fDontFadeString2(NULL),
 	fFadeNow(NULL),fFadeNever(NULL),
-	fPwWin(NULL),
-	fPwMessenger(NULL), fFilePanel(NULL) ,
+	fPwMessenger(NULL),
 	fSettingsArea(NULL) 
 {
 	SetupForm();
@@ -104,22 +90,23 @@ ScreenSaverWin::~ScreenSaverWin()
 
 
 void 
-ScreenSaverWin::SaverSelected(void) 
+ScreenSaverWin::SaverSelected() 
 {
+	CALLED();
+	UpdateStatus();
 	if (fListView1->CurrentSelection()>=0) {
-		SSListItem* listItem;
 		if (fPreviewDisplay->ScreenSaver())
 			fPreviewDisplay->ScreenSaver()->StopConfig();
-	   	listItem = reinterpret_cast<SSListItem*>(fAddonList->ItemAt(fListView1->CurrentSelection()));
-		BString settingsMsgName(listItem->fileName);
+	   	ScreenSaverItem* item = reinterpret_cast<ScreenSaverItem*>(fListView1->ItemAt(fListView1->CurrentSelection()));
+		BString settingsMsgName(item->Path());
 		fPreviewDisplay->SetScreenSaver(settingsMsgName);
 		if (fSettingsArea) {
 			fModuleSettingsBox->RemoveChild(fSettingsArea);
 			delete fSettingsArea;
 		}
-		BRect bnds=fModuleSettingsBox->Bounds();
+		BRect bnds = fModuleSettingsBox->Bounds();
 		bnds.InsetBy(5,10);
-		fSettingsArea=new BView(bnds,"settingsArea",B_FOLLOW_NONE,B_WILL_DRAW);
+		fSettingsArea = new BView(bnds,"settingsArea",B_FOLLOW_NONE,B_WILL_DRAW);
 		fSettingsArea->SetViewColor(216,216,216);
 		fModuleSettingsBox->AddChild(fSettingsArea);
 			
@@ -133,9 +120,31 @@ void
 ScreenSaverWin::MessageReceived(BMessage *msg) 
 {
 	switch(msg->what) {
+		case kPasswordCheckbox:
+			fPasswordSlider->SetEnabled(fPasswordCheckbox->Value()==B_CONTROL_ON);
+			break;
+		case kRunSliderChanged:
+			fRunSlider->SetLabel(kTimes[fRunSlider->Value()]);
+			if (fRunSlider->Value()>fPasswordSlider->Value()) {
+				fTurnOffSlider->SetValue(fRunSlider->Value());
+				fTurnOffSlider->SetLabel(kTimes[fTurnOffSlider->Value()]);
+				fPasswordSlider->SetValue(fRunSlider->Value());
+				fPasswordSlider->SetLabel(kTimes[fPasswordSlider->Value()]);
+			}
+			break;
+		case kTurnOffSliderChanged:
+			fTurnOffSlider->SetLabel(kTimes[fTurnOffSlider->Value()]);
+			break;
+		case kPasswordSliderChanged:
+			fPasswordSlider->SetLabel(kTimes[fPasswordSlider->Value()]);
+			if (fPasswordSlider->Value()<fRunSlider->Value()) {
+				fRunSlider->SetValue(fPasswordSlider->Value());
+				fRunSlider->SetLabel(kTimes[fRunSlider->Value()]);
+			}
+			break;
 		case kPwbutton: 
 			fPwMessenger->SendMessage(kShow);
-      		break;
+      			break;
 		case B_QUIT_REQUESTED:
 			be_app->PostMessage(B_QUIT_REQUESTED);
 			break;
@@ -143,8 +152,12 @@ ScreenSaverWin::MessageReceived(BMessage *msg)
 			SaverSelected();
 			break;
 		case kTest_btn:
-			be_roster->Launch("application/x-vnd.OBOS-ScreenSaverApp",fPrefs.GetSettings());
+		{
+			BMessage *settings = fPrefs.GetSettings();
+			be_roster->Launch("application/x-vnd.haiku-ScreenSaverApp", settings);
+			delete settings;
 			break;
+		}
 		case kAdd_btn:
 			fFilePanel->Show();
 			break;
@@ -152,7 +165,6 @@ ScreenSaverWin::MessageReceived(BMessage *msg)
 			PopulateScreenSaverList();
 			break;
   	}
-	UpdateStatus(); // This could get called sometimes when it doesn't need to. Shouldn't hurt
 	BWindow::MessageReceived(msg);
 }
 
@@ -161,6 +173,7 @@ bool
 ScreenSaverWin::QuitRequested() 
 {
 	UpdateStatus();
+	fPrefs.SaveSettings();
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return(true);
 }       
@@ -188,22 +201,24 @@ ScreenSaverWin::UpdateStatus(void)
 	fPrefs.SetWindowFrame(Frame());	
 	fPrefs.SetWindowTab(fTabView->Selection());
 	fPrefs.SetTimeFlags(fEnableCheckbox->Value());
-	fPrefs.SetBlankTime(kTimeInSeconds[fRunSlider->Value()]);
-	fPrefs.SetOffTime(kTimeInSeconds[fTurnOffSlider->Value()]);
-	fPrefs.SetSuspendTime(kTimeInSeconds[fTurnOffSlider->Value()]);
-	fPrefs.SetStandbyTime(kTimeInSeconds[fTurnOffSlider->Value()]);
+	fPrefs.SetBlankTime(1000000LL* kTimeInUnits[fRunSlider->Value()]);
+	fPrefs.SetOffTime(1000000LL* kTimeInUnits[fTurnOffSlider->Value()]);
+	fPrefs.SetSuspendTime(1000000LL* kTimeInUnits[fTurnOffSlider->Value()]);
+	fPrefs.SetStandbyTime(1000000LL* kTimeInUnits[fTurnOffSlider->Value()]);
 	fPrefs.SetBlankCorner(fFadeNow->getDirection());
 	fPrefs.SetNeverBlankCorner(fFadeNever->getDirection());
 	fPrefs.SetLockEnable(fPasswordCheckbox->Value());
-	fPrefs.SetPasswordTime(kTimeInSeconds[fPasswordSlider->Value()]);
-	int selection=fListView1->CurrentSelection(0);
-	if (selection>=0)
-		fPrefs.SetModuleName(((BStringItem *)(fListView1->ItemAt(selection)))->Text());
+	fPrefs.SetPasswordTime(1000000LL* kTimeInUnits[fPasswordSlider->Value()]);
+	int selection = fListView1->CurrentSelection();
+	if (selection >= 0) {
+		fPrefs.SetModuleName(((ScreenSaverItem *)(fListView1->ItemAt(selection)))->Text());
+		if (strcmp(fPrefs.ModuleName(), "Blackness") == 0)
+			fPrefs.SetModuleName("");
+	}
 // TODO - Tell the password window to update its stuff
 	BMessage ssState;
 	if ((fPreviewDisplay->ScreenSaver()) && (fPreviewDisplay->ScreenSaver()->SaveState(&ssState)==B_OK))
 		fPrefs.SetState(fPrefs.ModuleName(), &ssState);
-	fPrefs.SaveSettings();
 };
 
 
@@ -221,7 +236,7 @@ ScreenSaverWin::SetupForm()
 	AddChild(background);
 
 // Add the tab view to the background
-	r.InsetBy(0,3);
+	r.top += 4;
 	fTabView = new BTabView(r, "tab_view");
 	fTabView->SetViewColor(216,216,216,0);
 	r = fTabView->Bounds();
@@ -232,11 +247,13 @@ ScreenSaverWin::SetupForm()
 	fPrefs.LoadSettings();
 
 	tab = new BTab();
-	fTabView->AddTab(fTab2=new BView(r,"Fade",B_FOLLOW_NONE,0), tab);
+	fTab2 = new BView(r,"Fade",B_FOLLOW_NONE,0);
+	fTabView->AddTab(fTab2, tab);
 	tab->SetLabel("Fade");
 
 	tab = new BTab();
-	fTabView->AddTab(fTab1=new BView(r,"Modules",B_FOLLOW_NONE,0), tab);
+	fTab1 = new BView(r,"Modules",B_FOLLOW_NONE,0);
+	fTabView->AddTab(fTab1, tab);
 	tab->SetLabel("Modules");
 	background->AddChild(fTabView);
 
@@ -253,22 +270,24 @@ ScreenSaverWin::SetupForm()
 	//ResizeTo(fPrefs.WindowFrame().right-fPrefs.WindowFrame().left,fPrefs.WindowFrame().bottom-fPrefs.WindowFrame().top);
 	fTabView->Select(fPrefs.WindowTab());
 	fEnableCheckbox->SetValue(fPrefs.TimeFlags());
-	fRunSlider->SetValue(secondsToSlider(fPrefs.BlankTime()));
-	fTurnOffSlider->SetValue(secondsToSlider(fPrefs.OffTime()));
+	fRunSlider->SetValue(UnitsToSlider(fPrefs.BlankTime()));
+	fTurnOffSlider->SetValue(UnitsToSlider(fPrefs.OffTime()));
 	fFadeNow->setDirection(fPrefs.GetBlankCorner());
 	fFadeNever->setDirection(fPrefs.GetNeverBlankCorner());
 	fPasswordCheckbox->SetValue(fPrefs.LockEnable());
-	fPasswordSlider->SetValue(secondsToSlider(fPrefs.PasswordTime()));
-	const BStringItem **ptr = (const BStringItem **)(fListView1->Items());
-	long count=fListView1->CountItems();
-	if (fPrefs.ModuleName() && ptr) 	
-		for ( long i = 0; i < count; i++ ) {
-			if (BString(fPrefs.ModuleName())==((*ptr++)->Text())) {
-				fListView1->Select(count=i); // Clever bit here - intentional assignment.
-				SaverSelected();
-				fListView1->ScrollToSelection();
-			}
+	fPasswordSlider->SetValue(UnitsToSlider(fPrefs.PasswordTime()));
+	int32 count = fListView1->CountItems();
+	for (int32 i=0; i<count; i++) {
+		ScreenSaverItem *item = dynamic_cast<ScreenSaverItem*>(fListView1->ItemAt(i));
+		printf("modulename %s-%s\n", fPrefs.ModuleName(), item->Text());
+		if ((strcmp(fPrefs.ModuleName(), item->Text()) == 0) 
+			|| (strcmp(fPrefs.ModuleName(),"") == 0 && strcmp(item->Text(), "Blackness") ==0)) {
+			fListView1->Select(i);
+			SaverSelected();
+			fListView1->ScrollToSelection();
+			break;
 		}
+	}
 	UpdateStatus();
 } 
 
@@ -304,69 +323,49 @@ commonLookAndFeel(BView *widget,bool isSlider,bool isControl)
 
 // Iterate over a directory, adding the directories files to the list
 void 
-addScreenSaversToList (directory_which dir, BList *list) 
+addScreenSaversToList (directory_which dir, BListView *list) 
 {
 	BPath path;
 	find_directory(dir,&path);
 	path.Append("Screen Savers",true);
   
-	const char* pathName = path.Path();
-  
-	BDirectory ssDir(pathName);
+	BDirectory ssDir(path.Path());
 	BEntry thisSS;
 	char thisName[B_FILE_NAME_LENGTH];
 
 	while (B_OK==ssDir.GetNextEntry(&thisSS,true)) {
 		thisSS.GetName(thisName);
-		SSListItem* tempListItem = new SSListItem;
-		tempListItem->fileName = pathName;
-		tempListItem->fileName += "/";
-		tempListItem->fileName += thisName;
-		tempListItem->displayName = thisName;
-	
-		list->AddItem(tempListItem); 
+		BString pathname = path.Path();
+		pathname += "/";
+		pathname += thisName;
+		list->AddItem(new ScreenSaverItem(thisName, pathname.String())); 
 	}
 }
 
 
-// sorting function for SSListItems
+// sorting function for ScreenSaverItems
 int 
-ScreenSaverWin::CompareSSListItems(const void* left, const void* right) 
+ScreenSaverWin::CompareScreenSaverItems(const void* left, const void* right) 
 {
-	SSListItem* leftItem  = *(SSListItem **)left;
-	SSListItem* rightItem = *(SSListItem **)right;
+	ScreenSaverItem* leftItem  = *(ScreenSaverItem **)left;
+	ScreenSaverItem* rightItem = *(ScreenSaverItem **)right;
   
-	return leftItem->displayName.Compare(rightItem->displayName);
+	return strcmp(leftItem->Text(),rightItem->Text());
 }
 
 
 void 
 ScreenSaverWin::PopulateScreenSaverList(void) 
 {
-	if (!fAddonList)
-		fAddonList = new BList;
-	else 
-		for (void *i=fAddonList->RemoveItem(zero);i;i=fAddonList->RemoveItem(zero)) 
-			delete ((SSListItem *)i);
-
-	SSListItem* tempListItem = new SSListItem;
-	tempListItem->fileName = "";
-	tempListItem->displayName = "Blackness";
-  	fAddonList->AddItem(tempListItem); 
-	addScreenSaversToList( B_BEOS_ADDONS_DIRECTORY, fAddonList );
-	addScreenSaversToList( B_USER_ADDONS_DIRECTORY, fAddonList );
-	fAddonList->SortItems(CompareSSListItems);
-  
-// Add the strings in the BList to a BListView
  	fListView1->DeselectAll(); 
-	for (void *i=fListView1->RemoveItem(zero);i;i=fListView1->RemoveItem(zero)) 
-		delete ((BStringItem *)i);
+	while (void *i=fListView1->RemoveItem((int32)0))
+		delete ((ScreenSaverItem *)i);
 
-	int numItems = fAddonList->CountItems();
-	for( int i = 0; i < numItems; ++i ) {
-		SSListItem* item = (SSListItem*)(fAddonList->ItemAt(i));
-		fListView1->AddItem( new BStringItem(item->displayName.String()) );
-	}
+	fListView1->AddItem(new ScreenSaverItem("Blackness", ""));
+	addScreenSaversToList(B_BEOS_ADDONS_DIRECTORY, fListView1);
+        addScreenSaversToList(B_USER_ADDONS_DIRECTORY, fListView1);
+
+	fListView1->SortItems(CompareScreenSaverItems);
 }
 
 
@@ -413,7 +412,7 @@ ScreenSaverWin::SetupTab2()
 	int stringHeight=(int)(stdFontHt.ascent+stdFontHt.descent),sliderHeight=30;
 	int topEdge;
 	{rgb_color clr = {216,216,216,255}; fTab2->SetViewColor(clr);}
-	fTab2->AddChild( fEnableScreenSaverBox = new BBox(BRect(11,13,437,280),"EnableScreenSaverBox"));
+	fTab2->AddChild( fEnableScreenSaverBox = new BBox(BRect(8,6,436,280),"EnableScreenSaverBox"));
 	commonLookAndFeel(fEnableScreenSaverBox,false,false);
 
 	fEnableCheckbox = new BCheckBox(BRect(0,0,90,stringHeight),"EnableCheckBox","Enable Screen Saver", new BMessage (kTab2_chg));
@@ -427,8 +426,8 @@ ScreenSaverWin::SetupTab2()
 	fStringView1->SetText("Run module");
 	fStringView1->SetAlignment(B_ALIGN_LEFT);
 
-	fEnableScreenSaverBox->AddChild( fRunSlider = new BSlider(BRect(132,topEdge,415,topEdge+sliderHeight),"RunSlider","minutes", new BMessage(kTab2_chg), 0, 25));
-	fRunSlider->SetModificationMessage(new BMessage(kTab2_chg));
+	fEnableScreenSaverBox->AddChild( fRunSlider = new BSlider(BRect(132,topEdge,415,topEdge+sliderHeight),"RunSlider","minutes", new BMessage(kRunSliderChanged), 0, 25));
+	fRunSlider->SetModificationMessage(new BMessage(kRunSliderChanged));
 	commonLookAndFeel(fRunSlider,true,true);
 	float w,h;
 	fRunSlider->GetPreferredSize(&w,&h);
@@ -441,18 +440,18 @@ ScreenSaverWin::SetupTab2()
 	fTurnOffScreenCheckBox->SetLabel("Turn off screen");
 	fTurnOffScreenCheckBox->SetResizingMode(B_FOLLOW_NONE);
 
-	fEnableScreenSaverBox->AddChild( fTurnOffSlider = new BSlider(BRect(132,topEdge,415,topEdge+sliderHeight),"TurnOffSlider","", new BMessage(kTab2_chg), 0, 25));
-	fTurnOffSlider->SetModificationMessage(new BMessage(kTab2_chg));
+	fEnableScreenSaverBox->AddChild( fTurnOffSlider = new BSlider(BRect(132,topEdge,415,topEdge+sliderHeight),"TurnOffSlider","", new BMessage(kTurnOffSliderChanged), 0, 25));
+	fTurnOffSlider->SetModificationMessage(new BMessage(kTurnOffSliderChanged));
 	commonLookAndFeel(fTurnOffSlider,true,true);
 
 	// Password
 	topEdge+=sliderHeight;
-	fEnableScreenSaverBox->AddChild( fPasswordCheckbox = new BCheckBox(BRect(9,topEdge,108,topEdge+stringHeight),"PasswordCheckbox","Password lock",  new BMessage (kTab2_chg)));
+	fEnableScreenSaverBox->AddChild( fPasswordCheckbox = new BCheckBox(BRect(9,topEdge,108,topEdge+stringHeight),"PasswordCheckbox","Password lock",  new BMessage (kPasswordCheckbox)));
 	commonLookAndFeel(fPasswordCheckbox,false,true);
 	fPasswordCheckbox->SetLabel("Password lock");
 
-	fEnableScreenSaverBox->AddChild( fPasswordSlider = new BSlider(BRect(132,topEdge,415,topEdge+sliderHeight),"PasswordSlider","", new BMessage(kTab2_chg), 0, 25));
-	fPasswordSlider->SetModificationMessage(new BMessage(kTab2_chg));
+	fEnableScreenSaverBox->AddChild( fPasswordSlider = new BSlider(BRect(132,topEdge,415,topEdge+sliderHeight),"PasswordSlider","", new BMessage(kPasswordSliderChanged), 0, 25));
+	fPasswordSlider->SetModificationMessage(new BMessage(kPasswordSliderChanged));
 	commonLookAndFeel(fPasswordSlider,true,true);
 
 	topEdge+=sliderHeight;
