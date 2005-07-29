@@ -154,7 +154,7 @@ TermApp::AboutRequested()
 	BAlert *alert = new BAlert("about", "Terminal\n"
 		"\twritten by Kazuho Okui and Takashi Murai\n"
 		"\tupdated by Kian Duffy and others\n\n"
-		"\tCopyright 2005, Haiku.\n", "Ok");
+		"\tCopyright " B_UTF8_COPYRIGHT "2003-2005, Haiku.\n", "Ok");
 	BTextView *view = alert->TextView();
 	BFont font;
 
