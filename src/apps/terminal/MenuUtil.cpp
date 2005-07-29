@@ -42,26 +42,26 @@
 
 extern PrefHandler *gTermPref;
 
-#define LOCALE_FILE_DIR PREF_FOLDER"menu/"
+//#define LOCALE_FILE_DIR PREF_FOLDER"menu/"
+
 
 BPopUpMenu *
 MakeMenu(ulong msg, const char **items, const char *defaultItemName)
 {
 	BPopUpMenu *menu = new BPopUpMenu("");
-	
+
 	int32 i = 0;
-	while(*items)
-	{
+	while (*items) {
 		menu->AddItem(new BMenuItem(*items, new BMessage(msg)));
-		if(!strcmp(*items, defaultItemName))
-		{
-			(menu->ItemAt(i))->SetMarked(true);
-		}
+		if (!strcmp(*items, defaultItemName))
+			menu->ItemAt(i)->SetMarked(true);
+
 		items++;
 		i++;
 	}
 	return menu;
 }
+
 
 int
 longname2op(const char *longname)
@@ -69,10 +69,8 @@ longname2op(const char *longname)
 	int op = M_UTF8;
 	const etable *s = encoding_table;
 	
-	for (int i = 0; s->name; s++, i++)
-	{
-		if(!strcmp(s->name, longname)) 
-		{
+	for (int i = 0; s->name; s++, i++) {
+		if (!strcmp(s->name, longname)) {
 			op = s->op;
 			break;
 		}
@@ -80,47 +78,47 @@ longname2op(const char *longname)
 	return op;
 }
 
+
 const char *
 op2longname(int op)
 {
 	return encoding_table[op].name;
 }
 
+
 void
 MakeEncodingMenu(BMenu *eMenu, int coding, bool flag)
 {
 	const etable *e = encoding_table;
 	int i = 0;
-	while(e->name)
-	{
+	while (e->name) {
 		BMessage *msg = new BMessage(MENU_ENCODING);
 		msg->AddInt32("op", (int32)e->op);
 		if (flag)
 			eMenu->AddItem(new BMenuItem(e->name, msg, e->shortcut));
 		else 
 			eMenu->AddItem(new BMenuItem(e->name, msg));
-	
-		if ( i == coding) 
-		{
-			(eMenu->ItemAt(i))->SetMarked(true);
-		}
+
+		if (i == coding)
+			eMenu->ItemAt(i)->SetMarked(true);
+
 		e++;
 		i++;
 	}
 }
 
+
 void
 LoadLocaleFile(PrefHandler *pref)
 {
+	char name[B_PATH_NAME_LENGTH];
 	const char *locale;
-	char buf[B_PATH_NAME_LENGTH];
-	status_t sts;
-	
-	locale = gTermPref->getString (PREF_GUI_LANGUAGE);
-	sprintf (buf, "%s%s", LOCALE_FILE_DIR, locale);
-	
-	sts = pref->OpenText (buf);
-	
-	if (sts == B_ERROR)
-		pref->OpenText (LOCALE_FILE_DEFAULT);
+
+	locale = gTermPref->getString(PREF_GUI_LANGUAGE);
+	// TODO: this effectively disables any locale support - which is okay for now
+	sprintf(name, "%s%s", /*LOCALE_FILE_DIR*/"", locale);
+
+	//if (pref->OpenText(name) < B_OK)
+	//	pref->OpenText(LOCALE_FILE_DEFAULT);
 }
+

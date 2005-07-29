@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
- * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
+ * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files or portions
@@ -147,9 +147,6 @@ enum {
 ////////////////////////////////////////////////////////////////////////////
 // Preference Folder and setting path
 ////////////////////////////////////////////////////////////////////////////
-#define PREF_FOLDER  "/boot/home/config/settings/MuTerminal/"
-const char * const TERM_PREF = PREF_FOLDER "setting.mp";
-const char * const LOCALE_FILE_DEFAULT = PREF_FOLDER "menu/en";
 
 const int32 DEFAULT = -1;
 

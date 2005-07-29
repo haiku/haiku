@@ -158,40 +158,44 @@ PrefDlg::SaveRequested(BMessage *msg)
 {
 	entry_ref dirref;
 	const char *filename;
-	
+
 	msg->FindRef("directory", &dirref);
 	msg->FindString("name", &filename);
-	
+
 	BDirectory dir(&dirref);
 	BPath path(&dir, filename);
-	 
-	gTermPref->SaveAsText (path.Path(), PREFFILE_MIMETYPE, TERM_SIGNATURE);
+
+	gTermPref->SaveAsText(path.Path(), PREFFILE_MIMETYPE, TERM_SIGNATURE);
 }
 
+
 void
-PrefDlg::doSave (void)
+PrefDlg::doSave()
 {
 	delete fPrefTemp;
-	fPrefTemp = new PrefHandler (gTermPref);
-	
-	gTermPref->SaveAsText (TERM_PREF, PREFFILE_MIMETYPE);
-	
-	fDirty = false;
+	fPrefTemp = new PrefHandler(gTermPref);
+
+	BPath path;
+	if (PrefHandler::GetDefaultPath(path) == B_OK) {
+		gTermPref->SaveAsText(path.Path(), PREFFILE_MIMETYPE);
+		fDirty = false;
+	}
 }
 
+
 void
-PrefDlg::doRevert (void)
+PrefDlg::doRevert()
 {
 	BMessenger messenger (fTermWindow);
-	
+
 	delete gTermPref;
-	gTermPref = new PrefHandler (fPrefTemp);
-	
-	messenger.SendMessage (MSG_HALF_FONT_CHANGED);
-	messenger.SendMessage (MSG_COLOR_CHANGED);
-	messenger.SendMessage (MSG_ROWS_CHANGED);
-	messenger.SendMessage (MSG_INPUT_METHOD_CHANGED);
-	
+	gTermPref = new PrefHandler(fPrefTemp);
+
+	messenger.SendMessage(MSG_HALF_FONT_CHANGED);
+	messenger.SendMessage(MSG_COLOR_CHANGED);
+	messenger.SendMessage(MSG_ROWS_CHANGED);
+	messenger.SendMessage(MSG_INPUT_METHOD_CHANGED);
+
 	fDirty = false;
 }
 

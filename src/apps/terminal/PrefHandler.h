@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
- * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
+ * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files or portions
@@ -41,31 +41,30 @@
 #define TP_FONT_NAME_SZ 128
 
 struct termprefs {
-        uint32 magic;
-        uint32 version;
-        float x;
-        float y;
-        uint32 cols;
-        uint32 rows;
-        uint32 tab_width;
-        uint32 font_size;
-        char font[TP_FONT_NAME_SZ]; // "Family/Style"
-        uint32 cursor_blink_rate; // blinktime in µs = 1000000
-        uint32 refresh_rate; // ??? = 0
-        rgb_color bg;
-        rgb_color fg;
-        rgb_color curbg;
-        rgb_color curfg;
-        rgb_color selbg;
-        rgb_color selfg;
-        char encoding; // index in the menu (0 = UTF-8)
-        char unknown[3];
+	uint32 magic;
+	uint32 version;
+	float x;
+	float y;
+	uint32 cols;
+	uint32 rows;
+	uint32 tab_width;
+	uint32 font_size;
+	char font[TP_FONT_NAME_SZ]; // "Family/Style"
+	uint32 cursor_blink_rate; // blinktime in µs = 1000000
+	uint32 refresh_rate; // ??? = 0
+	rgb_color bg;
+	rgb_color fg;
+	rgb_color curbg;
+	rgb_color curfg;
+	rgb_color selbg;
+	rgb_color selfg;
+	char encoding; // index in the menu (0 = UTF-8)
+	char unknown[3];
 };
 
-struct prefDefaults
-{
-  const char *key;
-  char *item;
+struct prefDefaults {
+	const char *key;
+	char *item;
 };
 
 #define PREF_TRUE "true"
@@ -74,42 +73,40 @@ struct prefDefaults
 class BMessage;
 class BEntry;
 
-class PrefHandler{
-public:
-  PrefHandler();
-  PrefHandler(const PrefHandler* p);
+class PrefHandler {
+	public:
+		PrefHandler(const PrefHandler* p);
+		PrefHandler();
+		~PrefHandler();
 
-  ~PrefHandler();
+		status_t    Open(const char *name, const prefDefaults *defaults = NULL);
+		status_t    OpenText(const char *path, const prefDefaults *defaults = NULL);
+		status_t    Save(const char *name);
+		void        SaveAsText(const char *path, const char *minmtype = NULL,
+						const char *signature = NULL);
 
-  status_t    Open(const char *name, const prefDefaults *defaults = NULL);
-  status_t    OpenText(const char *path, const prefDefaults *defaults = NULL);
-  status_t    Save(const char *name);
-  void        SaveAsText(const char *path, const char *minmtype = NULL,
-			 const char *signature = NULL);
+		int32       getInt32(const char *key);
+		float       getFloat(const char *key);
+		const char* getString(const char *key);
+		bool        getBool(const char *key);
+		rgb_color   getRGB(const char *key);
 
-  int32       getInt32(const char *key);
-  float       getFloat(const char *key);
-  const char* getString(const char *key);
-  bool        getBool(const char *key);
-  rgb_color   getRGB(const char *key);
+		void        setInt32(const char *key, int32 data);
+		void        setFloat(const char *key, float data);
+		void        setString(const char *key, const char *data);
+		void        setBool(const char *key, bool data);
+		void        setRGB(const char *key, const rgb_color data);
 
-  void        setInt32(const char *key, int32 data);
-  void        setFloat(const char *key, float data);
-  void        setString(const char *key, const char *data);
-  void        setBool(const char *key, bool data);
-  void        setRGB(const char *key, const rgb_color data);
+		bool        IsEmpty() const;
 
-  bool        IsEmpty() const;
+		static status_t GetDefaultPath(BPath& path);
 
-private:
-  status_t    loadFromFile(BEntry *ent);
-  status_t    loadFromDefault(const prefDefaults* defaluts = NULL);
-  status_t    loadFromTextFile(const char * path);
+	private:
+		status_t    loadFromFile(BEntry *ent);
+		status_t    loadFromDefault(const prefDefaults* defaluts = NULL);
+		status_t    loadFromTextFile(const char * path);
 
-
-  BMessage    mPrefContainer;
-
-
+		BMessage    fContainer;
 };
 
-#endif //PREFHANDLER_H_INCLUDED
+#endif // PREFHANDLER_H_INCLUDED

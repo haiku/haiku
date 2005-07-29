@@ -26,286 +26,296 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- *
  */
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
+
+#include "Coding.h"
+#include "PrefHandler.h"
+#include "TermConst.h"
 
 #include <GraphicsDefs.h>
 #include <Message.h>
 #include <File.h>
 #include <Entry.h>
 #include <NodeInfo.h>
+#include <Directory.h>
+#include <FindDirectory.h>
+#include <Path.h>
 
-#include "Coding.h"
-#include "PrefHandler.h"
-#include "TermConst.h"
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
  * Startup preference settings.
    */
 const prefDefaults  termDefaults[] ={
-  { PREF_COLS,			"80" },
-  { PREF_ROWS,			"25" },
+	{ PREF_COLS,				"80" },
+	{ PREF_ROWS,				"25" },
 
-  { PREF_HALF_FONT_FAMILY,	"Courier10 BT" },
-  { PREF_HALF_FONT_SIZE,	"12" },
-  { PREF_FULL_FONT_FAMILY,	"Haru Tohaba" },
-  { PREF_FULL_FONT_SIZE,	"12" },
+	{ PREF_HALF_FONT_FAMILY,	"Courier10 BT" },
+	{ PREF_HALF_FONT_SIZE,		"12" },
+	{ PREF_FULL_FONT_FAMILY,	"Haru Tohaba" },
+	{ PREF_FULL_FONT_SIZE,		"12" },
 
-  { PREF_TEXT_FORE_COLOR,	"  0,   0,   0" },
-  { PREF_TEXT_BACK_COLOR,	"255, 255, 255" },
-  { PREF_SELECT_FORE_COLOR,	"255, 255, 255" },
-  { PREF_SELECT_BACK_COLOR,	"  0,   0,   0" },
-  { PREF_CURSOR_FORE_COLOR,	"255, 255, 255" },
-  { PREF_CURSOR_BACK_COLOR,	"  0,   0,   0" },
+	{ PREF_TEXT_FORE_COLOR,		"  0,   0,   0" },
+	{ PREF_TEXT_BACK_COLOR,		"255, 255, 255" },
+	{ PREF_SELECT_FORE_COLOR,	"255, 255, 255" },
+	{ PREF_SELECT_BACK_COLOR,	"  0,   0,   0" },
+	{ PREF_CURSOR_FORE_COLOR,	"255, 255, 255" },
+	{ PREF_CURSOR_BACK_COLOR,	"  0,   0,   0" },
 
-  { PREF_IM_FORE_COLOR,		"  0,   0,   0" },
-  { PREF_IM_BACK_COLOR,		"152, 203, 255" },
-  { PREF_IM_SELECT_COLOR,	"255, 152, 152" },
+	{ PREF_IM_FORE_COLOR,		"  0,   0,   0" },
+	{ PREF_IM_BACK_COLOR,		"152, 203, 255" },
+	{ PREF_IM_SELECT_COLOR,		"255, 152, 152" },
 
-  { PREF_SHELL,			"/bin/sh -login" },
-  { PREF_HISTORY_SIZE,		"500" },
+	{ PREF_SHELL,				"/bin/sh -login" },
+	{ PREF_HISTORY_SIZE,		"500" },
 
-  { PREF_TEXT_ENCODING,		"UTF-8" },
+	{ PREF_TEXT_ENCODING,		"UTF-8" },
 
-  { PREF_SELECT_MBUTTON,	"Button 1"},
-  { PREF_PASTE_MBUTTON,		"Button 2"},
-  { PREF_SUBMENU_MBUTTON,	"Button 3"},
-  { PREF_MOUSE_IMAGE,		"Hand cursor"},
-  { PREF_DRAGN_COPY,		"0"},
+	{ PREF_SELECT_MBUTTON,		"Button 1"},
+	{ PREF_PASTE_MBUTTON,		"Button 2"},
+	{ PREF_SUBMENU_MBUTTON,		"Button 3"},
+	{ PREF_MOUSE_IMAGE,			"Hand cursor"},
+	{ PREF_DRAGN_COPY,			"0"},
 
-  { PREF_GUI_LANGUAGE,		"English"},
-  { PREF_IM_AWARE,		"0"},
-  { NULL, NULL},
+	{ PREF_GUI_LANGUAGE,		"English"},
+	{ PREF_IM_AWARE,			"0"},
+	{ NULL, NULL},
 };
 
-/////////////////////////////////////////////////////////////////////////////
-//
-//
-/////////////////////////////////////////////////////////////////////////////
+
 PrefHandler::PrefHandler()
 {
-  mPrefContainer.what = 'Pref';
-  OpenText(TERM_PREF, termDefaults);
+	fContainer.what = 'Pref';
+
+	BPath path;
+	GetDefaultPath(path);
+	OpenText(path.Path(), termDefaults);
 }
-/////////////////////////////////////////////////////////////////////////////
-//
-//
-/////////////////////////////////////////////////////////////////////////////
+
+
 PrefHandler::PrefHandler(const PrefHandler* p)
 {
-  mPrefContainer = p->mPrefContainer;
+	fContainer = p->fContainer;
 }
-/////////////////////////////////////////////////////////////////////////////
-//
-//
-/////////////////////////////////////////////////////////////////////////////
+
+
 PrefHandler::~PrefHandler()
 {
 }
-/////////////////////////////////////////////////////////////////////////////
-//
-//
-/////////////////////////////////////////////////////////////////////////////
+
+
+/* static */
+status_t
+PrefHandler::GetDefaultPath(BPath& path)
+{
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK)
+		return B_ERROR;
+
+	// TODO: maybe just "Terminal"? (but this collides with the R5 Terminal settings file)
+	path.Append("HaikuTerminal");
+	path.Append("settings");
+
+	return B_OK;
+}
+
+
 status_t
 PrefHandler::Open(const char *path, const prefDefaults *defaults)
 {
-  BEntry ent(path);
-  if(ent.Exists()){
-    return loadFromFile(&ent);
-  }else{
-    return loadFromDefault(defaults);
-  }
+	BEntry entry(path);
+	if (entry.Exists())
+		return loadFromFile(&entry);
+
+	return loadFromDefault(defaults);
 }
-/////////////////////////////////////////////////////////////////////////////
-//
-//
-/////////////////////////////////////////////////////////////////////////////
+
+
 status_t
-PrefHandler::OpenText(const char *path,  const prefDefaults *defaults)
+PrefHandler::OpenText(const char *path, const prefDefaults *defaults)
 {
-  BEntry ent(path);
-  if(ent.Exists()){
-    return loadFromTextFile(path);
-  }else{
-    return loadFromDefault(defaults);
-  }
+	BEntry entry(path);
+	if (entry.Exists())
+		return loadFromTextFile(path);
+
+	return loadFromDefault(defaults);
 }
-/////////////////////////////////////////////////////////////////////////////
-//
-//
-/////////////////////////////////////////////////////////////////////////////
+
+
 status_t
 PrefHandler::Save(const char *path)
 {
-  status_t sts;
-  BFile file(path, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
-  sts = mPrefContainer.Flatten(&file);
-  return sts;
+	// make sure the target path exists
+	BPath directoryPath(path);
+	if (directoryPath.GetParent(&directoryPath) == B_OK)
+		create_directory(directoryPath.Path(), 0755);
+
+	BFile file(path, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	return fContainer.Flatten(&file);
 }
-/////////////////////////////////////////////////////////////////////////////
-//
-//
-/////////////////////////////////////////////////////////////////////////////
+
+
 void
 PrefHandler::SaveAsText(const char *path, const char *mimetype,
-			const char *signature)
+	const char *signature)
 {
-  BFile file(path, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
-  type_code type;
-  char *key;
-  char buf[256];
-  
-  for (int32 i = 0; mPrefContainer.GetInfo(B_STRING_TYPE, i, &key, &type) == B_OK; i++){  
-    int len = sprintf(buf, "\"%s\" , \"%s\"\n", key, this->getString(key));
-    file.Write(buf, len);
-  }
-  
-  if(mimetype != NULL){
-    BNodeInfo info(&file);
-    info.SetType(mimetype);
-    info.SetPreferredApp (signature);
-  }  
-  
+	// make sure the target path exists
+	BPath directoryPath(path);
+	if (directoryPath.GetParent(&directoryPath) == B_OK)
+		create_directory(directoryPath.Path(), 0755);
+
+	BFile file(path, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	char buffer[512];
+	type_code type;
+	char *key;
+
+	for (int32 i = 0; fContainer.GetInfo(B_STRING_TYPE, i, &key, &type) == B_OK; i++) {
+		int len = snprintf(buffer, sizeof(buffer), "\"%s\" , \"%s\"\n", key, getString(key));
+		file.Write(buffer, len);
+	}
+
+	if (mimetype != NULL){
+		BNodeInfo info(&file);
+		info.SetType(mimetype);
+		info.SetPreferredApp(signature);
+	}
 }
-/////////////////////////////////////////////////////////////////////////////
-//
-//
-/////////////////////////////////////////////////////////////////////////////
+
+
 int32 
 PrefHandler::getInt32(const char *key)
 {
-  return atoi(mPrefContainer.FindString(key));
+	const char *value = fContainer.FindString(key);
+	if (value == NULL)
+		return 0;
+
+	return atoi(value);
 }
-/////////////////////////////////////////////////////////////////////////////
-//
-//
-/////////////////////////////////////////////////////////////////////////////
+
+
 float 
 PrefHandler::getFloat(const char *key)
 {
-  return atof(mPrefContainer.FindString(key));
+	const char *value = fContainer.FindString(key);
+	if (value == NULL)
+		return 0;
+
+	return atof(value);
 }
-/////////////////////////////////////////////////////////////////////////////
-//
-//
-/////////////////////////////////////////////////////////////////////////////
+
+
 const char* 
 PrefHandler::getString(const char *key)
 {
-  const char *buf;
+	const char *buffer;
+	if (fContainer.FindString(key, &buffer) != B_OK)
+		buffer = "Error!";
 
-  if (mPrefContainer.FindString(key, &buf) != B_OK)
-    buf = "Error!";
-
-  //printf("%x GET %s: %s\n", this, key, buf);
-  return buf;
+	//printf("%x GET %s: %s\n", this, key, buf);
+	return buffer;
 }
-/////////////////////////////////////////////////////////////////////////////
-//
-//
-/////////////////////////////////////////////////////////////////////////////
+
+
 bool
 PrefHandler::getBool(const char *key)
 {
-  const char *s = mPrefContainer.FindString(key);
-  if (!strcmp(s, PREF_TRUE)) return true;
-  return false;
+	const char *value = fContainer.FindString(key);
+	if (value == NULL)
+		return false;
+
+	return !strcmp(value, PREF_TRUE);
 }
-/////////////////////////////////////////////////////////////////////////////
-// getRGB
-// Returns RGB data from given key. 
-/////////////////////////////////////////////////////////////////////////////
+
+
+/** Returns RGB data from given key. */
+
 rgb_color
 PrefHandler::getRGB(const char *key)
 {
-  int r, g, b;
-  rgb_color col;
-  if (const char *s = mPrefContainer.FindString(key)) {
-    sscanf(s, "%d, %d, %d", &r, &g, &b);
-  } else {
-  	fprintf(stderr, "PrefHandler::getRGB(%s) - key not found\n", key);
-  	r = g = b = 0;
-  }
-  col.red = r;
-  col.green = g;
-  col.blue = b;
-  col.alpha = 255;
-  return col;
+	rgb_color col;
+	int r, g, b;
+
+	if (const char *s = fContainer.FindString(key)) {
+		sscanf(s, "%d, %d, %d", &r, &g, &b);
+	} else {
+		fprintf(stderr, "PrefHandler::getRGB(%s) - key not found\n", key);
+		r = g = b = 0;
+	}
+
+	col.red = r;
+	col.green = g;
+	col.blue = b;
+	col.alpha = 255;
+	return col;
 }
-/////////////////////////////////////////////////////////////////////////////
-// setInt32
-// Setting Int32 data with key.
-/////////////////////////////////////////////////////////////////////////////
+
+
+/** Setting Int32 data with key. */
+
 void
 PrefHandler::setInt32(const char *key, int32 data)
 {
-  char buf[20];
-  sprintf(buf, "%d", (int)data);
-  this->setString(key, buf);
+	char buffer[32];
+	snprintf(buffer, sizeof(buffer), "%d", (int)data);
+	setString(key, buffer);
 }
-/////////////////////////////////////////////////////////////////////////////
-// setFloat
-// Setting Float data with key
-/////////////////////////////////////////////////////////////////////////////
+
+
+/** Setting Float data with key */
+
 void
 PrefHandler::setFloat(const char *key, float data)
 {
-  char buf[20];
-  sprintf(buf, "%g", data);
-  this->setString(key, buf);
+	char buffer[32];
+	snprintf(buffer, sizeof(buffer), "%g", data);
+	setString(key, buffer);
 }
-/////////////////////////////////////////////////////////////////////////////
-// setBool
-// Setting Bool data with key
-/////////////////////////////////////////////////////////////////////////////
+
+
+/** Setting Bool data with key */
+
 void
 PrefHandler::setBool(const char *key, bool data)
 {
-  if(data){
-    this->setString(key, PREF_TRUE);
-  }else{
-    this->setString(key, PREF_FALSE);
-  }
+	if (data)
+		setString(key, PREF_TRUE);
+	else
+		setString(key, PREF_FALSE);
 }
-/////////////////////////////////////////////////////////////////////////////
-// this->setString
-// Setting CString data with key
-/////////////////////////////////////////////////////////////////////////////
+
+
+/** Setting CString data with key */
+
 void
 PrefHandler::setString(const char *key, const char *data)
 {
-  //printf("%x SET %s: %s\n", this, key, data);
-  mPrefContainer.RemoveName(key);
-  mPrefContainer.AddString(key, data);
+	//printf("%x SET %s: %s\n", this, key, data);
+	fContainer.RemoveName(key);
+	fContainer.AddString(key, data);
 }
-/////////////////////////////////////////////////////////////////////////////
-// setRGB
-// Setting RGB data with key
-/////////////////////////////////////////////////////////////////////////////
+
+
+/** Setting RGB data with key */
+
 void
 PrefHandler::setRGB(const char *key, const rgb_color data)
 {
-  char buf[20];
-  sprintf(buf, "%d, %d, %d", data.red, data.green, data.blue);
-  this->setString(key, buf);
+	char buffer[32];
+	snprintf(buffer, sizeof(buffer), "%d, %d, %d", data.red, data.green, data.blue);
+	setString(key, buffer);
 }
-/////////////////////////////////////////////////////////////////////////////
-// IsEmpty
-// Check any peference stored or not.
-/////////////////////////////////////////////////////////////////////////////
+
+
+/** Check any peference stored or not. */
+
 bool
 PrefHandler::IsEmpty() const
 {
-  return mPrefContainer.IsEmpty();
+	return fContainer.IsEmpty();
 }
-/////////////////////////////////////////////////////////////////////////////
-//
-//
-/////////////////////////////////////////////////////////////////////////////
+
 
 status_t
 PrefHandler::loadFromFile(BEntry *ent)
@@ -314,8 +324,8 @@ PrefHandler::loadFromFile(BEntry *ent)
   // save the settings. (Who cares about compatibility in this case anyway?)
 
   BFile file (ent, B_READ_ONLY);
-  //mPrefContainer.MakeEmpty();
-  //mPrefContainer.Unflatten(&file);
+  //fContainer.MakeEmpty();
+  //fContainer.Unflatten(&file);
   off_t size;
   if (file.GetSize(&size) != B_OK || size != sizeof(struct termprefs))
     return B_ERROR;
