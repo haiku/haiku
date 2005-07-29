@@ -154,19 +154,19 @@ copy(const char *from, const char *to)
 		return errno;
 	}
 
-	struct stat toStat;
+	struct my_stat toStat;
 	status_t status = sys_rstat(1, -1, toPath, &toStat, 1);
 		// will be evaluated later
 
 	if (S_ISDIR(fromStat.st_mode)) {
-		if (S_ISREG(toStat.st_mode)) {
+		if (S_ISREG(toStat.mode)) {
 			fprintf(stderr, "Target \"%s\" is not a directory\n.", to);
 			return B_NOT_A_DIRECTORY;
 		}
 
 		return copy_dir(from, toPath);
 	} else if (status == B_OK) {
-		if (S_ISREG(toStat.st_mode)) {
+		if (S_ISREG(toStat.mode)) {
 			// overwrite target file
 			return copy_file(from, fromStat, toPath);
 		} else {
@@ -284,8 +284,12 @@ main(int argc, char **argv)
 			break;
 	}
 
-    if (sys_unmount(1, -1, "/myfs") != 0) {
-        printf("could not un-mount /myfs\n");
+	sys_sync();
+
+	sys_chdir(1, -1, "/");
+	status_t status = sys_unmount(1, -1, "/myfs");
+    if (status != B_OK) {
+        printf("could not un-mount /myfs: %s\n", fs_strerror(status));
         return 5;
     }
 

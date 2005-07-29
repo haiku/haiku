@@ -27,7 +27,7 @@ UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
 
 BinCommand copy_to_bfs_image :
 	copy_to_bfs_image.cpp rootfs.c initfs.c kernel.c cache.c sl.c stub.c
-	sysdep.c hexdump.c argv.c
+	sysdep.c hexdump.c argv.c errors.cpp
 
 	Volume.cpp BPlusTree.cpp Inode.cpp Index.cpp Query.cpp Journal.cpp
 	BlockAllocator.cpp kernel_interface_r5.cpp Utility.cpp BufferPool.cpp
@@ -53,5 +53,5 @@ SEARCH on [ FGristFiles
 	] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
 
 SEARCH on [ FGristFiles
-		rootfs.c initfs.c kernel.c cache.c sl.c stub.c sysdep.c hexdump.c argv.c
+		rootfs.c initfs.c kernel.c cache.c sl.c stub.c sysdep.c hexdump.c argv.c errors.cpp
 	] = [ FDirName $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ] ;
