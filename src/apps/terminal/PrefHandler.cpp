@@ -114,9 +114,12 @@ PrefHandler::GetDefaultPath(BPath& path)
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK)
 		return B_ERROR;
 
-	// TODO: maybe just "Terminal"? (but this collides with the R5 Terminal settings file)
+#ifdef __HAIKU__
+	path.Append("Terminal");
+#else
 	path.Append("HaikuTerminal");
-	path.Append("settings");
+#endif
+	//path.Append("settings");
 
 	return B_OK;
 }
@@ -148,9 +151,12 @@ status_t
 PrefHandler::Save(const char *path)
 {
 	// make sure the target path exists
+#if 0
+	// TODO: currently not needed as we're reusing the standard directory
 	BPath directoryPath(path);
 	if (directoryPath.GetParent(&directoryPath) == B_OK)
 		create_directory(directoryPath.Path(), 0755);
+#endif
 
 	BFile file(path, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 	return fContainer.Flatten(&file);
@@ -162,9 +168,11 @@ PrefHandler::SaveAsText(const char *path, const char *mimetype,
 	const char *signature)
 {
 	// make sure the target path exists
+#if 0
 	BPath directoryPath(path);
 	if (directoryPath.GetParent(&directoryPath) == B_OK)
 		create_directory(directoryPath.Path(), 0755);
+#endif
 
 	BFile file(path, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 	char buffer[512];
