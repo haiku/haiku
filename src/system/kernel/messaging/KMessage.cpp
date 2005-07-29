@@ -17,10 +17,10 @@
 
 // define the PANIC macro
 #ifndef PANIC
-#	ifndef _KERNEL_MODE
-#		define PANIC(str)	debugger(str)
-#	else
+#	ifdef _KERNEL_MODE
 #		define PANIC(str)	panic(str)
+#	else
+#		define PANIC(str)	debugger(str)
 #	endif
 #endif
 
