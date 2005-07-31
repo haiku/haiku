@@ -7,18 +7,18 @@
  */
 
 #include <stdio.h>
-#include <DataIO.h>
-#include <MessageUtils.h>
 #include <TypeConstants.h>
 #include "MessageField2.h"
+#include "SimpleMallocIO.h"
 
 namespace BPrivate {
+
+#define ROUND_TO_8(x) (fFixedSize ? x : (x + 11) & ~7)
 
 BMessageField::BMessageField()
 	:	fType(0),
 		fFixedSize(false),
 		fTotalSize(0),
-		fTotalPadding(0),
 		fNext(NULL)
 {
 	SetName("");
@@ -28,7 +28,6 @@ BMessageField::BMessageField()
 BMessageField::BMessageField(const char *name, type_code type)
 	:	fType(type),
 		fTotalSize(0),
-		fTotalPadding(0),
 		fNext(NULL)
 {
 	SetName(name);
@@ -58,13 +57,12 @@ BMessageField::operator=(const BMessageField &other)
 		fType = other.fType;
 		fFixedSize = other.fFixedSize;
 		fTotalSize = other.fTotalSize;
-		fTotalPadding = other.fTotalPadding;
 		fNext = NULL;
 
 		for (int32 index = 0; index < other.fItems.CountItems(); index++) {
-			BMallocIO *otherBuffer = (BMallocIO *)other.fItems.ItemAt(index);
-			BMallocIO *newBuffer = new BMallocIO;
-			newBuffer->Write(otherBuffer->Buffer(), otherBuffer->BufferLength());
+			BSimpleMallocIO *otherBuffer = (BSimpleMallocIO *)other.fItems.ItemAt(index);
+			BSimpleMallocIO *newBuffer = new BSimpleMallocIO(otherBuffer->BufferLength());
+			newBuffer->Write(otherBuffer->Buffer());
 			fItems.AddItem((void *)newBuffer);
 		}
 	}
@@ -77,7 +75,7 @@ void
 BMessageField::MakeEmpty()
 {
 	for (int32 index = 0; index < fItems.CountItems(); index++) {
-		BMallocIO *item = (BMallocIO *)fItems.ItemAt(index);
+		BSimpleMallocIO *item = (BSimpleMallocIO *)fItems.ItemAt(index);
 		delete item;
 	}
 
@@ -89,11 +87,11 @@ uint8
 BMessageField::Flags()
 {
 	uint8 flags = MSG_FLAG_VALID;
-	
+
 	if (fItems.CountItems() == 1)
 		flags |= MSG_FLAG_SINGLE_ITEM;
 
-	if (fTotalSize + fTotalPadding < 255)
+	if (fTotalSize < 255)
 		flags |= MSG_FLAG_MINI_DATA;
 
 	if (fFixedSize)
@@ -115,46 +113,39 @@ BMessageField::SetName(const char *name)
 
 
 void
-BMessageField::AddItem(BMallocIO *item)
+BMessageField::AddItem(BSimpleMallocIO *item)
 {
 	fItems.AddItem((void *)item);
-	fTotalSize += item->BufferLength();
-	fTotalPadding += calc_padding(item->BufferLength() + 4, 8);
+	fTotalSize += ROUND_TO_8(item->BufferLength());
 }
 
 
 void
-BMessageField::ReplaceItem(int32 index, BMallocIO *item, bool deleteOld)
+BMessageField::ReplaceItem(int32 index, BSimpleMallocIO *item)
 {
-	BMallocIO *oldItem = (BMallocIO *)fItems.ItemAt(index);
-	fTotalSize -= oldItem->BufferLength();
-	fTotalPadding -= calc_padding(oldItem->BufferLength() + 4, 8);
-
+	BSimpleMallocIO *oldItem = (BSimpleMallocIO *)fItems.ItemAt(index);
 	fItems.ReplaceItem(index, item);
-	fTotalSize += item->BufferLength();
-	fTotalPadding += calc_padding(item->BufferLength() + 4, 8);
 
-	if (deleteOld)
-		delete oldItem;
+	fTotalSize -= ROUND_TO_8(oldItem->BufferLength());
+	fTotalSize += ROUND_TO_8(item->BufferLength());
+
+	delete oldItem;
 }
 
 
 void
-BMessageField::RemoveItem(int32 index, bool deleteIt)
+BMessageField::RemoveItem(int32 index)
 {
-	BMallocIO *item = (BMallocIO *)fItems.RemoveItem(index);
-
-	fTotalSize -= item->BufferLength();
-	fTotalPadding -= calc_padding(item->BufferLength() + 4, 8);
-	if (deleteIt)
-		delete item;
+	BSimpleMallocIO *item = (BSimpleMallocIO *)fItems.RemoveItem(index);
+	fTotalSize -= ROUND_TO_8(item->BufferLength());
+	delete item;
 }
 
 
 size_t
 BMessageField::SizeAt(int32 index) const
 {
-	BMallocIO *buffer = (BMallocIO *)fItems.ItemAt(index);
+	BSimpleMallocIO *buffer = (BSimpleMallocIO *)fItems.ItemAt(index);
 
 	if (buffer)
 		return buffer->BufferLength();
@@ -166,7 +157,7 @@ BMessageField::SizeAt(int32 index) const
 const void *
 BMessageField::BufferAt(int32 index) const
 {
-	BMallocIO *buffer = (BMallocIO *)fItems.ItemAt(index);
+	BSimpleMallocIO *buffer = (BSimpleMallocIO *)fItems.ItemAt(index);
 
 	if (buffer)
 		return buffer->Buffer();

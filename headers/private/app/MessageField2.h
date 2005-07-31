@@ -25,6 +25,8 @@
 
 namespace BPrivate {
 
+class BSimpleMallocIO;
+
 class BMessageField {
 public:
 							BMessageField();
@@ -41,10 +43,9 @@ public:
 		uint8				NameLength() const { return fName.Length(); };
 		type_code			Type() const { return fType; };
 
-		void				AddItem(BMallocIO *item);
-		void				ReplaceItem(int32 index, BMallocIO *item,
-								bool deleteOld = true);
-		void				RemoveItem(int32 index, bool deleteIt = true);
+		void				AddItem(BSimpleMallocIO *item);
+		void				ReplaceItem(int32 index, BSimpleMallocIO *item);
+		void				RemoveItem(int32 index);
 		int32				CountItems() const { return fItems.CountItems(); };
 		size_t				SizeAt(int32 index) const;
 		const void			*BufferAt(int32 index) const;

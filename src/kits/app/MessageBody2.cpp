@@ -9,14 +9,17 @@
 /* BMessageBody handles data storage and retrieval for BMessage. */
 
 #include <stdio.h>
-#include <DataIO.h>
-#include <MessageUtils.h>
 #include <TypeConstants.h>
 #include "MessageBody2.h"
+#include "MessageUtils2.h"
+#include "SimpleMallocIO.h"
 
 namespace BPrivate {
 
 static int64 sPadding[2] = { 0, 0 };
+static uint8 sPadLengths[8] = { 4, 3, 2, 1, 0, 7, 6, 5 };
+
+#define CALC_PADDING_8(x) sPadLengths[x % 8]
 
 BMessageBody::BMessageBody()
 {
@@ -59,6 +62,7 @@ BMessageBody::operator=(const BMessageBody &other)
 status_t
 BMessageBody::InitCommon()
 {
+	fFlattenedSize = -1;
 	fFieldTableSize = 100;
 	fFieldTable = new BMessageField *[fFieldTableSize];
 	HashClear();
@@ -201,6 +205,7 @@ BMessageBody::Rename(const char *oldName, const char *newName)
 
 	field->SetName(newName);
 	HashInsert(HashRemove(oldName));
+	fFlattenedSize = -1;
 	return B_OK;
 }
 
@@ -208,6 +213,9 @@ BMessageBody::Rename(const char *oldName, const char *newName)
 ssize_t
 BMessageBody::FlattenedSize() const
 {
+	if (fFlattenedSize > 0)
+		return fFlattenedSize;
+
 	ssize_t size = 1; // for MSG_LAST_ENTRY
 
 	for (int32 index = 0; index < fFieldList.CountItems(); index++) {
@@ -233,15 +241,12 @@ BMessageBody::FlattenedSize() const
 		// name length byte and name length
 		size += 1 + field->NameLength();
 
-		// individual sizes
-		if (!(flags & MSG_FLAG_FIXED_SIZE)) {
-			size += field->CountItems() * sizeof(size_t);
-			size += field->TotalPadding();
-		}
-
 		size += field->TotalSize();
 	}
 
+	// cache the value for next time.
+	// changing the body will reset this.
+	fFlattenedSize = size;
 	return size;
 }
 
@@ -249,8 +254,6 @@ BMessageBody::FlattenedSize() const
 status_t
 BMessageBody::Flatten(BDataIO *stream) const
 {
-	status_t error = B_OK;
-
 	for (int32 index = 0; index < fFieldList.CountItems(); index++) {
 		BMessageField *field = (BMessageField *)fFieldList.ItemAt(index);
 
@@ -270,16 +273,8 @@ BMessageBody::Flatten(BDataIO *stream) const
 				stream->Write(&count, sizeof(count));
 		}
 
-		bool isFixed = flags & MSG_FLAG_FIXED_SIZE;
-
-		// overall data size
+		// overall data size (includes padding for non fixed size fields)
 		size_t size = field->TotalSize();
-		if (!isFixed) {
-			// add bytes for holding each items size
-			size += count * sizeof(size_t);
-			size += field->TotalPadding();
-		}
-
 		if (flags & MSG_FLAG_MINI_DATA) {
 			uint8 miniSize = (uint8)size;
 			stream->Write(&miniSize, sizeof(miniSize));
@@ -293,32 +288,29 @@ BMessageBody::Flatten(BDataIO *stream) const
 		// name
 		stream->Write(field->Name(), nameLength);
 
-		// if we have a fixed size we initialize size once here
-		if (isFixed)
-			size = field->SizeAt(0);
-
 		// data items
-		for (int32 dataIndex = 0; dataIndex < count; dataIndex++) {
-			if (!isFixed) {
-				// set the size for each item
+		if (flags & MSG_FLAG_FIXED_SIZE) {
+			size = field->SizeAt(0);
+			for (int32 dataIndex = 0; dataIndex < count; dataIndex++)
+				stream->Write(field->BufferAt(dataIndex), size);
+		} else {
+			for (int32 dataIndex = 0; dataIndex < count; dataIndex++) {
 				size = field->SizeAt(dataIndex);
 				stream->Write(&size, sizeof(size));
+
+				stream->Write(field->BufferAt(dataIndex), size);
+				size_t error = stream->Write(sPadding, CALC_PADDING_8(size));
 			}
-
-			error = stream->Write(field->BufferAt(dataIndex), size);
-
-			if (!isFixed)
-				error = stream->Write(sPadding, calc_padding(size + 4, 8));
 		}
 	}
 
-	if (error >= B_OK) {
-		uint8 lastEntry = 0;
-		error = stream->Write(&lastEntry, sizeof(lastEntry));
-	}
+	uint8 lastEntry = 0;
+	size_t error = stream->Write(&lastEntry, sizeof(lastEntry));
 
-	if (error >= B_OK)
+	if (error > B_OK)
 		return B_OK;
+	else if (error == 0)
+		return B_ERROR;
 
 	return error;
 }
@@ -344,6 +336,7 @@ BMessageBody::Unflatten(BDataIO *stream)
 			int32 itemCount;
 			int32 dataLength;
 			uint8 littleData;
+
 			if (flags & MSG_FLAG_SINGLE_ITEM) {
 				itemCount = 1;
 
@@ -398,9 +391,8 @@ BMessageBody::Unflatten(BDataIO *stream)
 				int32 itemSize = dataLength / itemCount;
 
 				for (int32 index = 0; index < itemCount; index++) {
-					BMallocIO *buffer = new BMallocIO();
-					buffer->SetSize(itemSize);
-					reader((char *)buffer->Buffer(), itemSize);
+					BSimpleMallocIO *buffer = new BSimpleMallocIO(itemSize);
+					reader(buffer->Buffer(), itemSize);
 					field->AddItem(buffer);
 				}
 			} else {
@@ -408,12 +400,10 @@ BMessageBody::Unflatten(BDataIO *stream)
 				ssize_t dataLength;
 
 				for (int32 index = 0; index < itemCount; index++) {
-					BMallocIO *buffer = new BMallocIO();
 					reader(dataLength);
-					buffer->SetSize(dataLength);
-
-					reader((char *)buffer->Buffer(), dataLength);
-					reader(padding, calc_padding(dataLength + 4, 8));
+					BSimpleMallocIO *buffer = new BSimpleMallocIO(dataLength);
+					reader(buffer->Buffer(), dataLength);
+					reader(padding, CALC_PADDING_8(dataLength));
 					field->AddItem(buffer);
 				}
 			}
@@ -429,7 +419,7 @@ BMessageBody::Unflatten(BDataIO *stream)
 
 
 status_t
-BMessageBody::AddData(const char *name, BMallocIO *buffer, type_code type)
+BMessageBody::AddData(const char *name, BSimpleMallocIO *buffer, type_code type)
 {
 	status_t error = B_OK;
 	BMessageField *foundField = FindData(name, type, error);
@@ -457,6 +447,7 @@ BMessageBody::AddData(const char *name, BMallocIO *buffer, type_code type)
 		foundField->AddItem(buffer);
 	}
 
+	fFlattenedSize = -1;
 	return error;
 }
 
@@ -485,7 +476,7 @@ BMessageBody::AddField(const char *name, type_code type, status_t &error)
 
 
 status_t
-BMessageBody::ReplaceData(const char *name, int32 index, BMallocIO *buffer,
+BMessageBody::ReplaceData(const char *name, int32 index, BSimpleMallocIO *buffer,
 	type_code type)
 {
 	if (type == B_ANY_TYPE)
@@ -501,6 +492,7 @@ BMessageBody::ReplaceData(const char *name, int32 index, BMallocIO *buffer,
 		return B_ERROR;
 
 	field->ReplaceItem(index, buffer);
+	fFlattenedSize = -1;
 	return error;
 }
 
@@ -508,9 +500,8 @@ BMessageBody::ReplaceData(const char *name, int32 index, BMallocIO *buffer,
 status_t
 BMessageBody::RemoveData(const char *name, int32 index)
 {
-	if (index < 0) {
+	if (index < 0)
 		return B_BAD_VALUE;
-	}
 
 	status_t error = B_OK;
 	BMessageField *field = FindData(name, B_ANY_TYPE, error);
@@ -518,10 +509,10 @@ BMessageBody::RemoveData(const char *name, int32 index)
 	if (field) {
 		if (index < field->CountItems()) {
 			field->RemoveItem(index);
+			fFlattenedSize = -1;
 
-			if (field->CountItems() == 0) {
+			if (field->CountItems() == 0)
 				RemoveName(name);
-			}
 		} else
 			error = B_BAD_INDEX;
 	}
@@ -538,6 +529,7 @@ BMessageBody::RemoveName(const char *name)
 
 	if (field) {
 		fFieldList.RemoveItem(field);
+		fFlattenedSize = -1;
 		HashRemove(name);
 		delete field;
 	}
@@ -555,6 +547,7 @@ BMessageBody::MakeEmpty()
 	}
 
 	fFieldList.MakeEmpty();
+	fFlattenedSize = -1;
 	HashClear();
 	return B_OK;
 }

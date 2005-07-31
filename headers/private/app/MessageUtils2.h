@@ -116,15 +116,14 @@ public:
 								if (fError < B_OK)
 									throw fError;
 
-								if (IsSwapping()) {
+								if (IsSwapping())
 									byte_swap(data);
-								}
 							}
 
 		template<class T>
 		inline void			operator()(T data, size_t len)
 							{
-								fError = fStream->Read((void*)data, len);
+								fError = fStream->Read((void *)data, len);
 								if (fError < B_OK)
 									throw fError;
 							}

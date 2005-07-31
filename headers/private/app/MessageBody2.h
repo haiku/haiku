@@ -43,7 +43,7 @@ public:
 		status_t			Flatten(BDataIO *stream) const;
 		status_t			Unflatten(BDataIO *stream);
 
-		status_t			AddData(const char *name, BMallocIO *buffer,
+		status_t			AddData(const char *name, BSimpleMallocIO *buffer,
 								type_code type);
 		status_t			RemoveData(const char *name, int32 index = 0);
 
@@ -52,7 +52,7 @@ public:
 								int32 index, const void **data,
 								ssize_t *numBytes) const;
 		status_t			ReplaceData(const char *name, int32 index,
-								BMallocIO *buffer, type_code type);
+								BSimpleMallocIO *buffer, type_code type);
 
 		status_t			Rename(const char *oldName, const char *newName);
 		status_t			RemoveName(const char *name);
@@ -77,6 +77,8 @@ private:
 		BList				fFieldList;
 		BMessageField		**fFieldTable;
 		int32				fFieldTableSize;
+
+mutable	ssize_t				fFlattenedSize;
 };
 
 } // namespace BPrivate

@@ -34,11 +34,12 @@
 
 #include <AppMisc.h>
 #include <KMessage.h>
-#include <MessageUtils2.h>
 #include <TokenSpace.h>
 
 #include "MessageBody2.h"
 #include "MessageField2.h"
+#include "MessageUtils2.h"
+#include "SimpleMallocIO.h"
 #include "dano_message.h"
 
 // flags for the overall message (the bitfield is 1 byte)
@@ -873,9 +874,6 @@ BMessage::Unflatten(BDataIO *stream)
 		header.WriteTo(*this);
 
 		status = fBody->Unflatten(stream);
-		if (status < B_OK)
-			return status;
-
 	} catch (status_t &error) {
 		status = error;
 	}
@@ -1152,11 +1150,9 @@ BMessage::AddMessenger(const char *name, BMessenger messenger)
 status_t
 BMessage::AddRef(const char* name, const entry_ref* ref)
 {
-	BMallocIO *buffer = new BMallocIO();
-	buffer->SetSize(sizeof(entry_ref) + B_PATH_NAME_LENGTH);
-
-	size_t size;
-	status_t error = entry_ref_flatten((char *)buffer->Buffer(), &size, ref);
+	size_t size = sizeof(entry_ref) + B_PATH_NAME_LENGTH;
+	BSimpleMallocIO *buffer = new BSimpleMallocIO(size);
+	status_t error = entry_ref_flatten(buffer->Buffer(), &size, ref);
 	buffer->SetSize(size);
 
 	if (error >= B_OK)
@@ -1172,8 +1168,9 @@ BMessage::AddRef(const char* name, const entry_ref* ref)
 status_t
 BMessage::AddMessage(const char *name, const BMessage *msg)
 {
-	BMallocIO *buffer = new BMallocIO();
-	status_t error = msg->Flatten(buffer);
+	size_t size = msg->FlattenedSize();
+	BSimpleMallocIO *buffer = new BSimpleMallocIO(size);
+	status_t error = msg->Flatten(buffer->Buffer(), size);
 
 	if (error >= B_OK)
 		error = fBody->AddData(name, buffer, B_MESSAGE_TYPE);
@@ -1189,10 +1186,9 @@ status_t
 BMessage::AddFlat(const char *name, BFlattenable *object, int32 count)
 {
 	ssize_t size = object->FlattenedSize();
-	BMallocIO *buffer = new BMallocIO();
-	buffer->SetSize(size);
+	BSimpleMallocIO *buffer = new BSimpleMallocIO(size);
+	status_t error = object->Flatten(buffer->Buffer(), size);
 
-	status_t error = object->Flatten((void *)buffer->Buffer(), size);
 	if (error >= B_OK)
 		error = fBody->AddData(name, buffer, object->TypeCode());
 
@@ -1212,8 +1208,8 @@ BMessage::AddData(const char *name, type_code type, const void *data,
 	// the user attempts to add something bigger or smaller.  We may need to
 	// enforce the size thing.
 
-	BMallocIO *buffer = new BMallocIO();
-	buffer->Write(data, numBytes);
+	BSimpleMallocIO *buffer = new BSimpleMallocIO(numBytes);
+	buffer->Write(data);
 	status_t error = fBody->AddData(name, buffer, type);
 
 	if (error < B_OK)
@@ -1364,7 +1360,7 @@ BMessage::FindMessage(const char *name, int32 index, BMessage *msg) const
 	status_t error = FindData(name, B_MESSAGE_TYPE, index, (const void **)&data, &size);
 
 	if (!error)
-		error = msg->Unflatten((const char*)data);
+		error = msg->Unflatten((const char *)data);
 	else
 		*msg = BMessage();
 
@@ -1493,11 +1489,9 @@ BMessage::ReplaceRef(const char *name, const entry_ref *ref)
 status_t
 BMessage::ReplaceRef(const char *name, int32 index, const entry_ref *ref)
 {
-	BMallocIO *buffer = new BMallocIO();
-	buffer->SetSize(sizeof(entry_ref) + B_PATH_NAME_LENGTH);
-
-	size_t size;
-	status_t error = entry_ref_flatten((char *)buffer->Buffer(), &size, ref);
+	size_t size = sizeof(entry_ref) + B_PATH_NAME_LENGTH;
+	BSimpleMallocIO *buffer = new BSimpleMallocIO(size);
+	status_t error = entry_ref_flatten(buffer->Buffer(), &size, ref);
 	buffer->SetSize(size);
 
 	if (error >= B_OK)
@@ -1520,8 +1514,9 @@ BMessage::ReplaceMessage(const char *name, const BMessage *msg)
 status_t
 BMessage::ReplaceMessage(const char *name, int32 index, const BMessage *msg)
 {
-	BMallocIO *buffer = new BMallocIO();
-	status_t error = msg->Flatten(buffer);
+	size_t size = msg->FlattenedSize();
+	BSimpleMallocIO *buffer = new BSimpleMallocIO(size);
+	status_t error = msg->Flatten(buffer->Buffer(), size);
 
 	if (error >= B_OK)
 		error = fBody->ReplaceData(name, index, buffer, B_MESSAGE_TYPE);
@@ -1544,10 +1539,9 @@ status_t
 BMessage::ReplaceFlat(const char *name, int32 index, BFlattenable *object)
 {
 	ssize_t size = object->FlattenedSize();
-	BMallocIO *buffer = new BMallocIO();
-	buffer->SetSize(size);
+	BSimpleMallocIO *buffer = new BSimpleMallocIO(size);
+	status_t error = object->Flatten(buffer->Buffer(), size);
 
-	status_t error = object->Flatten((void *)buffer->Buffer(), size);
 	if (error >= B_OK)
 		error = fBody->ReplaceData(name, index, buffer, object->TypeCode());
 
@@ -1570,8 +1564,8 @@ status_t
 BMessage::ReplaceData(const char *name, type_code type, int32 index,
 	const void *data, ssize_t data_size)
 {
-	BMallocIO *buffer = new BMallocIO();
-	buffer->Write(data, data_size);
+	BSimpleMallocIO *buffer = new BSimpleMallocIO(data_size);
+	buffer->Write(data);
 	status_t error = fBody->ReplaceData(name, index, buffer, type);
 
 	if (error < B_OK)
@@ -1629,7 +1623,7 @@ BMessage::operator delete(void *ptr, size_t size)
 status_t
 BMessage::real_flatten(char *result, ssize_t size) const
 {
-	BMemoryIO stream((void*)result, size);
+	BMemoryIO stream((void *)result, size);
 	return real_flatten(&stream, NULL);
 }
 
@@ -1640,8 +1634,11 @@ BMessage::real_flatten(BDataIO *stream, ssize_t *size) const
 	Header header(*this);
 
 	status_t error = header.WriteTo(*stream);
-	if (!error)
+	if (error >= B_OK)
 		error = fBody->Flatten(stream);
+
+	if (size)
+		*size = FlattenedSize();
 
 	return error;
 }
@@ -1686,14 +1683,14 @@ BMessage::calc_hdr_size(uchar flags) const
 	ssize_t size = min_hdr_size();
 
 	if (fTarget != B_NULL_TOKEN)
-		size += sizeof (fTarget);
+		size += sizeof(fTarget);
 
 	if (fReplyTo.port >= 0
 		&& fReplyTo.target != B_NULL_TOKEN
 		&& fReplyTo.team >= 0) {
-		size += sizeof (fReplyTo.port);
-		size += sizeof (fReplyTo.target);
-		size += sizeof (fReplyTo.team);
+		size += sizeof(fReplyTo.port);
+		size += sizeof(fReplyTo.target);
+		size += sizeof(fReplyTo.team);
 
 		size += 4;	// For the "big" flags
 	}
