@@ -42,7 +42,8 @@ extern void cache_node_opened(void *vnode, int32 fdType, vm_cache_ref *cache,
 extern void cache_node_closed(void *vnode, int32 fdType, vm_cache_ref *cache,
 				mount_id mountID, vnode_id vnodeID);
 extern void cache_node_launched(size_t argCount, char * const *args);
-extern void cache_prefetch(mount_id mountID, vnode_id vnodeID);
+extern void cache_prefetch_vnode(void *vnode, off_t offset, size_t size);
+extern void cache_prefetch(mount_id mountID, vnode_id vnodeID, off_t offset, size_t size);
 extern status_t file_cache_init(void);
 
 extern vm_store *vm_create_vnode_store(void *vnode);

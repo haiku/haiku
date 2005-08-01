@@ -611,21 +611,9 @@ file_cache_control(const char *subsystem, uint32 function, void *buffer, size_t 
 
 
 extern "C" void
-cache_prefetch(mount_id mountID, vnode_id vnodeID)
+cache_prefetch_vnode(void *vnode, off_t offset, size_t size)
 {
 	vm_cache_ref *cache;
-	void *vnode;
-
-	// ToDo: schedule prefetch
-	// ToDo: maybe get 1) access type (random/sequential), 2) file vecs which blocks to prefetch
-	//	for now, we just prefetch the first 64 kB
-
-	TRACE(("cache_prefetch(vnode %ld:%Ld)\n", mountID, vnodeID));
-
-	// get the vnode for the object, this also grabs a ref to it
-	if (vfs_get_vnode(mountID, vnodeID, &vnode) != B_OK)
-		return;
-
 	if (vfs_get_vnode_cache(vnode, &cache) != B_OK) {
 		vfs_vnode_release_ref(vnode);
 		return;
@@ -634,17 +622,20 @@ cache_prefetch(mount_id mountID, vnode_id vnodeID)
 	file_cache_ref *ref = (struct file_cache_ref *)((vnode_store *)cache->cache->store)->file_cache_ref;
 	off_t fileSize = cache->cache->virtual_size;
 
-	size_t size = 65536;
 	if (size > fileSize)
 		size = fileSize;
 
+	// we never fetch more than 4 MB at once
+	if (size > 4 * 1024 * 1024)
+		size = 4 * 1024 * 1024;
+
 	size_t bytesLeft = size, lastLeft = size;
-	off_t lastOffset = 0;
+	off_t lastOffset = offset;
 	size_t lastSize = 0;
 
 	mutex_lock(&cache->lock);
 
-	for (off_t offset = 0; bytesLeft > 0; offset += B_PAGE_SIZE) {
+	for (; bytesLeft > 0; offset += B_PAGE_SIZE) {
 		// check if this page is already in memory
 		addr_t virtualAddress;
 	restart:
@@ -677,6 +668,23 @@ cache_prefetch(mount_id mountID, vnode_id vnodeID)
 
 out:
 	mutex_unlock(&cache->lock);
+}
+
+
+extern "C" void
+cache_prefetch(mount_id mountID, vnode_id vnodeID, off_t offset, size_t size)
+{
+	void *vnode;
+
+	// ToDo: schedule prefetch
+
+	TRACE(("cache_prefetch(vnode %ld:%Ld)\n", mountID, vnodeID));
+
+	// get the vnode for the object, this also grabs a ref to it
+	if (vfs_get_vnode(mountID, vnodeID, &vnode) != B_OK)
+		return;
+
+	cache_prefetch_vnode(vnode, offset, size);
 	vfs_vnode_release_ref(vnode);
 }
 
