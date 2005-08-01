@@ -13,8 +13,6 @@
 #include <Debug.h>
 #define CALLED() SERIAL_PRINT(("%s\n", __PRETTY_FUNCTION__))
 
-#define SCREEN_BLANKER_SIG "application/x-vnd.Be.screenblanker"
-
 extern "C" _EXPORT BInputServerFilter* instantiate_input_filter();
 
 BInputServerFilter* instantiate_input_filter() {  // required C func to build the IS Filter

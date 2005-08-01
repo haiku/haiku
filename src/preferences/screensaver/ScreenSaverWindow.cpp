@@ -60,6 +60,37 @@ UnitsToSlider(bigtime_t val)
 }
 
 
+class ModulesTab : public BTab
+{
+public:
+	ModulesTab(ScreenSaverWin *win, BView *view = NULL);
+	virtual ~ModulesTab();
+	virtual void Select(BView *view);
+private:
+	ScreenSaverWin *fWin;
+};
+
+
+ModulesTab::ModulesTab(ScreenSaverWin *win, BView *view = NULL)
+	: BTab(view),
+	fWin(win)
+{
+
+}
+
+ModulesTab::~ModulesTab()
+{
+}
+
+
+void
+ModulesTab::Select(BView *view)
+{
+	BTab::Select(view);
+	fWin->SelectCurrentModule();
+}
+
+
 ScreenSaverWin::ScreenSaverWin() 
 	: BWindow(BRect(50,50,496,375),"OBOS Screen Saver",
 		B_TITLED_WINDOW,B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE) ,
@@ -150,7 +181,7 @@ ScreenSaverWin::MessageReceived(BMessage *msg)
 		case kTest_btn:
 		{
 			BMessage &settings = fPrefs.GetSettings();
-			be_roster->Launch("application/x-vnd.haiku-ScreenSaverApp", &settings);
+			be_roster->Launch(SCREEN_BLANKER_SIG, &settings);
 			break;
 		}
 		case kAdd_btn:
@@ -246,7 +277,7 @@ ScreenSaverWin::SetupForm()
 	fTabView->AddTab(fTab2, tab);
 	tab->SetLabel("Fade");
 
-	tab = new BTab();
+	tab = new ModulesTab(this);
 	fTab1 = new BView(r,"Modules",B_FOLLOW_NONE,0);
 	fTabView->AddTab(fTab1, tab);
 	tab->SetLabel("Modules");
@@ -270,19 +301,26 @@ ScreenSaverWin::SetupForm()
 	fFadeNever->setDirection(fPrefs.GetNeverBlankCorner());
 	fPasswordCheckbox->SetValue(fPrefs.LockEnable());
 	fPasswordSlider->SetValue(UnitsToSlider(fPrefs.PasswordTime()));
-	int32 count = fListView1->CountItems();
-	for (int32 i=0; i<count; i++) {
-		ScreenSaverItem *item = dynamic_cast<ScreenSaverItem*>(fListView1->ItemAt(i));
-		if ((strcmp(fPrefs.ModuleName(), item->Text()) == 0) 
-			|| (strcmp(fPrefs.ModuleName(),"") == 0 && strcmp(item->Text(), "Blackness") ==0)) {
-			fListView1->Select(i);
-			SaverSelected();
-			fListView1->ScrollToSelection();
-			break;
-		}
-	}
+	SelectCurrentModule();
 	UpdateStatus();
 } 
+
+
+void
+ScreenSaverWin::SelectCurrentModule()
+{
+	int32 count = fListView1->CountItems();
+        for (int32 i=0; i<count; i++) {
+                ScreenSaverItem *item = dynamic_cast<ScreenSaverItem*>(fListView1->ItemAt(i));
+                if ((strcmp(fPrefs.ModuleName(), item->Text()) == 0)
+                        || (strcmp(fPrefs.ModuleName(),"") == 0 && strcmp(item->Text(), "Blackness") ==0)) {
+                        fListView1->Select(i);
+                        SaverSelected();
+                        fListView1->ScrollToSelection();
+                        break;
+                }
+        }
+}
 
 
 // Set the common Look and Feel stuff for a given control

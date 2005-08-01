@@ -20,7 +20,7 @@ public:
 	void PopulateScreenSaverList();
 	void LoadSettings();
 	virtual ~ScreenSaverWin();
-
+	void SelectCurrentModule();
 private:
 	void SetupForm();
 	void SetupTab1();

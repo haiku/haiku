@@ -15,10 +15,10 @@
 
 ScreenSaverPrefs::ScreenSaverPrefs() 
 {
-  	find_directory(B_USER_SETTINGS_DIRECTORY,&ssPath);
-  	find_directory(B_USER_SETTINGS_DIRECTORY,&networkPath);
-  	ssPath.Append("ScreenSaver_settings",true);
-  	networkPath.Append("network",true);
+  	find_directory(B_USER_SETTINGS_DIRECTORY,&fSSPath);
+  	find_directory(B_USER_SETTINGS_DIRECTORY,&fNetworkPath);
+  	fSSPath.Append("ScreenSaver_settings",true);
+  	fNetworkPath.Append("network",true);
 
 	Defaults();
 }
@@ -28,7 +28,7 @@ ScreenSaverPrefs::ScreenSaverPrefs()
 bool 
 ScreenSaverPrefs::LoadSettings() 
 {
-	BFile ssSettings(ssPath.Path(),B_READ_ONLY);
+	BFile ssSettings(fSSPath.Path(),B_READ_ONLY);
 	if (B_OK==ssSettings.InitCheck()) { // File exists. Unflatten the message and call the settings parser.
 		if (fSettings.Unflatten(&ssSettings)!=B_OK)
 			return false;
@@ -61,7 +61,7 @@ ScreenSaverPrefs::LoadSettings()
 			FILE *networkFile=NULL;
 			char buffer[512],*start;
 			// This ugly piece opens the networking file and reads the password, if it exists.
-			if ((networkFile=fopen(networkPath.Path(),"r")))
+			if ((networkFile=fopen(fNetworkPath.Path(),"r")))
 			while (buffer==fgets(buffer,512,networkFile))
 				if ((start=strstr(buffer,"PASSWORD ="))) {
 					char password[12];
@@ -154,7 +154,7 @@ ScreenSaverPrefs::SaveSettings()
 {
   	BMessage &settings = GetSettings();
 	settings.PrintToStream();
-	BFile file(ssPath.Path(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+	BFile file(fSSPath.Path(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 	if ((file.InitCheck()!=B_OK) || (settings.Flatten(&file)!=B_OK))
 		fprintf(stderr, "Problem while saving screensaver preferences file!\n");
 }

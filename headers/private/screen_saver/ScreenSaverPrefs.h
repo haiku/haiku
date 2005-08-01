@@ -18,12 +18,15 @@ enum arrowDirection {
 	CENTER
 };
 
+#define SCREEN_BLANKER_SIG "application/x-vnd.Be.screenblanker"
+
 class ScreenSaverPrefs 
 {
 public:
 	ScreenSaverPrefs();
 	bool LoadSettings();
 	void Defaults();
+	BPath & GetPath() { return fSSPath;}
 
 	BRect WindowFrame() {return fWindowFrame;}
 	int32 WindowTab() {return fWindowTab;}
@@ -76,7 +79,7 @@ private:
 	bool fIsNetworkPassword;
 
 	BMessage fSettings;
-	BPath ssPath,networkPath;
+	BPath fSSPath, fNetworkPath;
 };
 
 

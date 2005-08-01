@@ -46,6 +46,7 @@ PreviewView::~PreviewView()
 {
 	if (fThreadID>=0)
 		kill_thread(fThreadID);
+	delete fSst;
 } 
 
 
