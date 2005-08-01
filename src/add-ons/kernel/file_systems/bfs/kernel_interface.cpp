@@ -264,6 +264,10 @@ bfs_read_vnode(void *_ns, vnode_id id, void **_node, bool reenter)
 
 	CachedBlock cached(volume, id);
 	bfs_inode *node = (bfs_inode *)cached.Block();
+	if (node == NULL) {
+		FATAL(("could not read inode: %Ld\n", id));
+		return B_IO_ERROR;
+	}
 
 	status_t status = node->InitCheck(volume);
 	if (status < B_OK) {
