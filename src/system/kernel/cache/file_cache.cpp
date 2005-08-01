@@ -33,15 +33,124 @@
 #define MAX_IO_VECS			64	// 256 kB
 #define MAX_FILE_IO_VECS	32
 
+#define CACHED_FILE_EXTENTS	2
+	// must be smaller than MAX_FILE_IO_VECS
+	// ToDo: find out how much of these are typically used
+
+struct file_extent {
+	off_t			offset;
+	file_io_vec		disk;
+};
+
+struct file_map {
+	file_map();
+	~file_map();
+
+	file_extent *operator[](uint32 index);
+	file_extent *ExtentAt(uint32 index);
+	status_t Add(file_io_vec *vecs, size_t vecCount);
+	void Free();
+
+	union {
+		file_extent	direct[CACHED_FILE_EXTENTS];
+		file_extent	*array;
+	};
+	size_t			count;
+};
+
 struct file_cache_ref {
 	vm_cache_ref	*cache;
 	void			*vnode;
 	void			*device;
 	void			*cookie;
+	file_map		map;
 };
 
 
 static struct cache_module_info *sCacheModule;
+
+
+file_map::file_map()
+{
+	array = NULL;
+	count = 0;
+}
+
+
+file_map::~file_map()
+{
+	Free();
+}
+
+
+file_extent *
+file_map::operator[](uint32 index)
+{
+	return ExtentAt(index);
+}
+
+
+file_extent *
+file_map::ExtentAt(uint32 index)
+{
+	if (index >= count)
+		return NULL;
+
+	if (count > CACHED_FILE_EXTENTS)
+		return &array[index];
+
+	return &direct[index];
+}
+
+
+status_t
+file_map::Add(file_io_vec *vecs, size_t vecCount)
+{
+	off_t offset = 0;
+
+	if (vecCount <= CACHED_FILE_EXTENTS && count == 0) {
+		// just use the reserved area in the file_cache_ref structure
+	} else {
+		file_extent *newMap = (file_extent *)realloc(array,
+			(count + vecCount) * sizeof(file_extent));
+		if (newMap == NULL)
+			return B_NO_MEMORY;
+
+		array = newMap;
+
+		if (count != 0) {
+			file_extent *extent = ExtentAt(count - 1);
+			offset = extent->offset + extent->disk.length;
+		}
+	}
+
+	count += vecCount;
+
+	for (uint32 i = 0; i < vecCount; i++) {
+		file_extent *extent = ExtentAt(i);
+
+		extent->offset = offset;
+		extent->disk = vecs[i];
+
+		offset += extent->disk.length;
+	}
+
+	return B_OK;
+}
+
+
+void
+file_map::Free()
+{
+	if (count > CACHED_FILE_EXTENTS)
+		free(array);
+
+	array = NULL;
+	count = 0;
+}
+
+
+//	#pragma mark -
 
 
 static void
@@ -60,6 +169,103 @@ add_to_iovec(iovec *vecs, int32 &index, int32 max, addr_t address, size_t size)
 }
 
 
+static file_extent *
+find_file_extent(file_cache_ref *ref, off_t offset, uint32 *_index)
+{
+	// ToDo: do binary search
+
+	for (uint32 index = 0; index < ref->map.count; index++) {
+		file_extent *extent = ref->map[index];
+
+		if (extent->offset <= offset
+			&& extent->offset + extent->disk.length >= offset) {
+			if (_index)
+				*_index = index;
+			return extent;
+		}
+	}
+
+	return NULL;
+}
+
+
+static status_t
+get_file_map(file_cache_ref *ref, off_t offset, size_t size,
+	file_io_vec *vecs, size_t *_count)
+{
+	size_t maxVecs = *_count;
+
+	if (ref->map.count == 0) {
+		// we don't yet have the map of this file, so let's grab it
+		// (ordered by offset, so that we can do a binary search on them)
+		size_t vecCount = maxVecs;
+		status_t status;
+		off_t mapOffset = 0;
+
+		while (true) {
+			status = vfs_get_file_map(ref->vnode, mapOffset, ~0UL, vecs, &vecCount);
+			if (status < B_OK && status != B_BUFFER_OVERFLOW)
+				return status;
+
+			ref->map.Add(vecs, vecCount);
+
+			if (status != B_BUFFER_OVERFLOW)
+				break;
+
+			// when we are here, the map has been stored in the array, and
+			// the array size was still too small to cover the whole file
+			file_io_vec *last = &vecs[vecCount - 1];
+			mapOffset += last->length;
+			vecCount = maxVecs;
+		}
+	}
+
+	// We now have cached the map of this file, we now need to
+	// translate it for the requested access.
+
+	uint32 index;
+	file_extent *fileExtent = find_file_extent(ref, offset, &index);
+	if (fileExtent == NULL) {
+		// access outside file bounds? But that's not our problem
+		*_count = 0;
+		return B_OK;
+	}
+
+	vecs[0].offset = fileExtent->disk.offset + offset;
+	vecs[0].length = fileExtent->disk.length - offset;
+
+	if (vecs[0].length >= size || index >= ref->map.count - 1) {
+		*_count = 1;
+		return B_OK;
+	}
+
+	// copy the rest of the vecs
+
+	size -= vecs[0].length;
+
+	for (index = 1; index < ref->map.count;) {
+		// ToDo: this needs to be tested!
+		fileExtent++;
+
+		vecs[index] = fileExtent->disk;
+		index++;
+
+		if (index >= maxVecs) {
+			*_count = index;
+			return B_BUFFER_OVERFLOW;
+		}
+
+		if (size <= fileExtent->disk.length)
+			break;
+
+		size -= fileExtent->disk.length;
+	}
+
+	*_count = index;
+	return B_OK;
+}
+
+
 static status_t
 pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 	size_t *_numBytes, bool doWrite)
@@ -72,8 +278,7 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 	size_t fileVecCount = MAX_FILE_IO_VECS;
 	size_t numBytes = *_numBytes;
 
-	// ToDo: these must be cacheable (must for the swap file, great for all other)
-	status_t status = vfs_get_file_map(ref->vnode, offset, numBytes, fileVecs, &fileVecCount);
+	status_t status = get_file_map(ref, offset, numBytes, fileVecs, &fileVecCount);
 	if (status < B_OK)
 		return status;
 
@@ -810,6 +1015,9 @@ file_cache_set_size(void *_cacheRef, off_t size)
 	if (ref == NULL)
 		return B_OK;
 
+	file_cache_invalidate_file_map(_cacheRef, 0, size);
+		// ToDo: make this better (we would only need to extend or shrink the map)
+
 	mutex_lock(&ref->cache->lock);
 	status_t status = vm_cache_resize(ref->cache, size);
 	mutex_unlock(&ref->cache->lock);
@@ -879,6 +1087,11 @@ file_cache_write(void *_cacheRef, off_t offset, const void *buffer, size_t *_siz
 extern "C" status_t
 file_cache_invalidate_file_map(void *_cacheRef, off_t offset, off_t size)
 {
-	// ToDo: implement me as soon as file maps (extents) are cached
+	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
+
+	// ToDo: honour offset/size parameters
+
+	TRACE(("file_cache_invalidate_file_map(offset = %Ld, size = %Ld)\n", offset, size));
+	ref->map.Free();
 	return B_OK;
 }
