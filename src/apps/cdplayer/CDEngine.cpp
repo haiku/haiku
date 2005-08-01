@@ -458,7 +458,7 @@ void
 CDEngine::SelectTrack(int32 trackNumber)
 {
 	sPlayList.SetCurrentTrack(trackNumber);
-	if(playState.GetState() == kPlaying)
+	if(GetState() == kPlaying)
 		gCDDevice.Play(trackNumber);
 	trackState.UpdateNow();
 }

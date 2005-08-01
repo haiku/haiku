@@ -316,7 +316,7 @@ CDDBQuery::GetTrackTimes(const scsi_toc *toc, vector<cdaudio_time> &times)
 	TrackRecord *tocData = (TrackRecord*)&(toc->toc_data[4]);
 	int16 trackCount = toc->toc_data[3] - toc->toc_data[2] + 1;
 	
-	for (int index = 0; index < trackCount; index++)
+	for (int index = 0; index < trackCount+1; index++)
 	{
 		cdaudio_time cdtime;
 		cdtime.minutes = tocData[index].min;
@@ -613,7 +613,8 @@ CDDBQuery::WriteFile(void)
 	{
 		entry = fTrackNames[i];
 		
-		sprintf(timestring,"%.2ld:%.2ld",fTrackTimes[i].minutes, fTrackTimes[i].seconds);
+		sprintf(timestring,"%.2ld:%.2ld",fTrackTimes[i+1].minutes-fTrackTimes[i].minutes,
+				fTrackTimes[i].seconds);
 		
 		entry << "\t" << timestring << "\n";
 		file.Write(entry.String(),entry.Length());
