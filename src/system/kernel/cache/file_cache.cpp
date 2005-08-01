@@ -615,7 +615,7 @@ cache_prefetch_vnode(void *vnode, off_t offset, size_t size)
 {
 	vm_cache_ref *cache;
 	if (vfs_get_vnode_cache(vnode, &cache) != B_OK) {
-		vfs_vnode_release_ref(vnode);
+		vfs_put_vnode(vnode);
 		return;
 	}
 
@@ -685,7 +685,7 @@ cache_prefetch(mount_id mountID, vnode_id vnodeID, off_t offset, size_t size)
 		return;
 
 	cache_prefetch_vnode(vnode, offset, size);
-	vfs_vnode_release_ref(vnode);
+	vfs_put_vnode(vnode);
 }
 
 
@@ -776,9 +776,9 @@ file_cache_create(mount_id mountID, vnode_id vnodeID, off_t size, int fd)
 	return ref;
 
 err3:
-	vfs_vnode_release_ref(ref->vnode);
+	vfs_put_vnode(ref->vnode);
 err2:
-	vfs_vnode_release_ref(ref->device);
+	vfs_put_vnode(ref->device);
 err1:
 	delete ref;
 	return NULL;
@@ -795,7 +795,7 @@ file_cache_delete(void *_cacheRef)
 
 	TRACE(("file_cache_delete(ref = %p)\n", ref));
 
-	vfs_vnode_release_ref(ref->device);
+	vfs_put_vnode(ref->device);
 	delete ref;
 }
 

@@ -1118,7 +1118,7 @@ _vm_map_file(aspace_id aid, const char *name, void **_address, uint32 addressSpe
 	return area->id;
 
 err2:
-	vfs_vnode_release_ref(vnode);
+	vfs_put_vnode(vnode);
 err1:
 	vm_put_aspace(aspace);
 	return status;

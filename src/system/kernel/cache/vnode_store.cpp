@@ -81,7 +81,7 @@ static void
 store_acquire_ref(struct vm_store *_store)
 {
 	vnode_store *store = (vnode_store *)_store;
-	vfs_vnode_acquire_ref(store->vnode);
+	vfs_acquire_vnode(store->vnode);
 }
 
 
@@ -89,7 +89,7 @@ static void
 store_release_ref(struct vm_store *_store)
 {
 	vnode_store *store = (vnode_store *)_store;
-	vfs_vnode_release_ref(store->vnode);
+	vfs_put_vnode(store->vnode);
 }
 
 
@@ -113,7 +113,7 @@ vm_create_vnode_store(void *vnode)
 {
 	vnode_store *store = (vnode_store *)malloc(sizeof(struct vnode_store));
 	if (store == NULL) {
-		vfs_vnode_release_ref(vnode);
+		vfs_put_vnode(vnode);
 		return NULL;
 	}
 

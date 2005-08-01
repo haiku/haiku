@@ -2112,19 +2112,14 @@ unremove_vnode(mount_id mountID, vnode_id vnodeID)
 //	Functions the VFS exports for other parts of the kernel
 
 
-void
-vfs_vnode_acquire_ref(void *vnode)
-{
-	FUNCTION(("vfs_vnode_acquire_ref: vnode 0x%p\n", vnode));
-	inc_vnode_ref_count((struct vnode *)vnode);
-}
-
+/** Acquires another reference to the vnode that has to be released
+ *	by calling vfs_put_vnode().
+ */
 
 void
-vfs_vnode_release_ref(void *vnode)
+vfs_acquire_vnode(void *_vnode)
 {
-	FUNCTION(("vfs_vnode_release_ref: vnode 0x%p\n", vnode));
-	dec_vnode_ref_count((struct vnode *)vnode, false);
+	inc_vnode_ref_count((struct vnode *)_vnode);
 }
 
 
