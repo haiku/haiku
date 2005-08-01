@@ -2405,13 +2405,10 @@ vfs_normalize_path(const char *path, char *buffer, size_t bufferSize,
 }
 
 
-int
-vfs_put_vnode_ptr(void *_vnode)
+extern "C" void
+vfs_put_vnode(void *_vnode)
 {
-	struct vnode *vnode = (struct vnode *)_vnode;
-
-	put_vnode(vnode);
-	return 0;
+	put_vnode((struct vnode *)_vnode);
 }
 
 

@@ -667,7 +667,7 @@ unload_elf_image(struct elf_image_info *image)
 	delete_area(image->data_region.id);
 
 	if (image->vnode)
-		vfs_put_vnode_ptr(image->vnode);
+		vfs_put_vnode(image->vnode);
 
 	unregister_elf_image(image);
 
@@ -1405,7 +1405,7 @@ error:
 	mutex_unlock(&sImageLoadMutex);
 error0:
 	if (vnode)
-		vfs_put_vnode_ptr(vnode);
+		vfs_put_vnode(vnode);
 	_kern_close(fd);
 
 	return err;

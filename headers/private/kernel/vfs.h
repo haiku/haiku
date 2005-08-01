@@ -69,7 +69,7 @@ int vfs_get_vnode_from_fd(int fd, bool kernel, void **vnode);
 status_t vfs_get_vnode_from_path(const char *path, bool kernel, void **vnode);
 status_t vfs_get_vnode(mount_id mountID, vnode_id vnodeID, void **_vnode);
 status_t vfs_lookup_vnode(mount_id mountID, vnode_id vnodeID, void **_vnode);
-int vfs_put_vnode_ptr(void *vnode);
+void vfs_put_vnode(void *vnode);
 void vfs_vnode_acquire_ref(void *vnode);
 void vfs_vnode_release_ref(void *vnode);
 status_t vfs_get_cookie_from_fd(int fd, void **_cookie);
