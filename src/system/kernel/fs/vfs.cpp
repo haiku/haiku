@@ -222,10 +222,10 @@ static status_t common_read_stat(struct file_descriptor *, struct stat *);
 static status_t common_write_stat(struct file_descriptor *, const struct stat *, int statMask);
 
 static status_t vnode_path_to_vnode(struct vnode *vnode, char *path,
-	bool traverseLeafLink, int count, struct vnode **_vnode, int *_type);
+	bool traverseLeafLink, int count, struct vnode **_vnode, vnode_id *_parentID, int *_type);
 static status_t dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize);
 static status_t fd_and_path_to_vnode(int fd, char *path, bool traverseLeafLink,
-	struct vnode **_vnode, bool kernel);
+	struct vnode **_vnode, vnode_id *_parentID, bool kernel);
 static void inc_vnode_ref_count(struct vnode *vnode);
 static status_t dec_vnode_ref_count(struct vnode *vnode, bool reenter);
 static inline void put_vnode(struct vnode *vnode);
@@ -1316,7 +1316,7 @@ entry_ref_to_vnode(mount_id mountID, vnode_id directoryID, const char *name, str
 	if (status < 0)
 		return status;
 
-	return vnode_path_to_vnode(directory, clonedName, false, 0, _vnode, NULL);
+	return vnode_path_to_vnode(directory, clonedName, false, 0, _vnode, NULL, NULL);
 }
 
 
@@ -1328,9 +1328,10 @@ entry_ref_to_vnode(mount_id mountID, vnode_id directoryID, const char *name, str
 
 static status_t
 vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
-	int count, struct vnode **_vnode, int *_type)
+	int count, struct vnode **_vnode, vnode_id *_parentID, int *_type)
 {
 	status_t status = 0;
+	vnode_id lastParentID = -1;
 	int type = 0;
 
 	FUNCTION(("vnode_path_to_vnode(vnode = %p, path = %s)\n", vnode, path));
@@ -1397,7 +1398,8 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 		if (!nextVnode) {
 			// pretty screwed up here - the file system found the vnode, but the hash
 			// lookup failed, so our internal structures are messed up
-			panic("path_to_vnode: could not lookup vnode (mountid 0x%lx vnid 0x%Lx)\n", vnode->device, vnodeID);
+			panic("vnode_path_to_vnode: could not lookup vnode (mountid 0x%lx vnid 0x%Lx)\n",
+				vnode->device, vnodeID);
 			put_vnode(vnode);
 			return B_ENTRY_NOT_FOUND;
 		}
@@ -1451,7 +1453,8 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 				// balance the next recursion - we will decrement the ref_count
 				// of the vnode, no matter if we succeeded or not
 
-			status = vnode_path_to_vnode(vnode, path, traverseLeafLink, count + 1, &nextVnode, _type);
+			status = vnode_path_to_vnode(vnode, path, traverseLeafLink, count + 1,
+				&nextVnode, &lastParentID, _type);
 
 			free(buffer);
 
@@ -1459,7 +1462,8 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 				put_vnode(vnode);
 				return status;
 			}
-		}
+		} else
+			lastParentID = vnode->id;
 
 		// decrease the ref count on the old dir we just looked up into
 		put_vnode(vnode);
@@ -1478,13 +1482,16 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 	*_vnode = vnode;
 	if (_type)
 		*_type = type;
+	if (_parentID)
+		*_parentID = lastParentID;
 
 	return B_OK;
 }
 
 
 static status_t
-path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode, bool kernel)
+path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode,
+	vnode_id *_parentID, bool kernel)
 {
 	struct vnode *start;
 
@@ -1513,7 +1520,7 @@ path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode, bool kernel)
 		mutex_unlock(&context->io_mutex);
 	}
 
-	return vnode_path_to_vnode(start, path, traverseLink, 0, _vnode, NULL);
+	return vnode_path_to_vnode(start, path, traverseLink, 0, _vnode, _parentID, NULL);
 }
 
 
@@ -1529,7 +1536,7 @@ path_to_dir_vnode(char *path, struct vnode **_vnode, char *filename, bool kernel
 	if (status != B_OK)
 		return status;
 
-	return path_to_vnode(path, true, _vnode, kernel);
+	return path_to_vnode(path, true, _vnode, NULL, kernel);
 }
 
 
@@ -1571,7 +1578,7 @@ fd_and_path_to_dir_vnode(int fd, char *path, struct vnode **_vnode,
 	if (status != B_OK)
 		return status;
 
-	return fd_and_path_to_vnode(fd, path, true, _vnode, kernel);
+	return fd_and_path_to_vnode(fd, path, true, _vnode, NULL, kernel);
 }
 
 
@@ -1883,32 +1890,34 @@ get_vnode_from_fd(int fd, bool kernel)
  */
 
 static status_t
-fd_and_path_to_vnode(int fd, char *path, bool traverseLeafLink, struct vnode **_vnode, bool kernel)
+fd_and_path_to_vnode(int fd, char *path, bool traverseLeafLink,
+	struct vnode **_vnode, vnode_id *_parentID, bool kernel)
 {
 	if (fd < 0 && !path)
 		return B_BAD_VALUE;
 
-	status_t status;
-	struct vnode *vnode = NULL;
 	if (fd < 0 || (path != NULL && path[0] == '/')) {
 		// no FD or absolute path
-		status = path_to_vnode(path, traverseLeafLink, &vnode, kernel);
-	} else {
-		// FD only, or FD + relative path
-		vnode = get_vnode_from_fd(fd, kernel);
-		if (!vnode)
-			return B_FILE_ERROR;
-
-		if (path != NULL) {
-			status = vnode_path_to_vnode(vnode, path, traverseLeafLink, 0,
-				&vnode, NULL);
-		} else
-			status = B_OK;
+		return path_to_vnode(path, traverseLeafLink, _vnode, _parentID, kernel);
 	}
 
-	if (status == B_OK)
-		*_vnode = vnode;
-	return status;
+	// FD only, or FD + relative path
+	struct vnode *vnode = get_vnode_from_fd(fd, kernel);
+	if (!vnode)
+		return B_FILE_ERROR;
+
+	if (path != NULL) {
+		return vnode_path_to_vnode(vnode, path, traverseLeafLink, 0,
+			_vnode, _parentID, NULL);
+	}
+
+	// there is no relative path to take into account
+
+	*_vnode = vnode;
+	if (_parentID)
+		*_parentID = -1;
+
+	return B_OK;
 }
 
 
@@ -2164,7 +2173,7 @@ vfs_get_vnode_from_path(const char *path, bool kernel, void **_vnode)
 
 	strlcpy(buffer, path, sizeof(buffer));
 
-	status = path_to_vnode(buffer, true, &vnode, kernel);
+	status = path_to_vnode(buffer, true, &vnode, NULL, kernel);
 	if (status < B_OK)
 		return status;
 
@@ -2214,7 +2223,7 @@ vfs_get_fs_node_from_path(mount_id mountID, const char *path, bool kernel, void 
 	PRINT(("vfs_get_fs_node_from_path(mountID = %ld, path = \"%s\", kernel %d)\n", mountID, path, kernel));
 
 	strlcpy(buffer, path, sizeof(buffer));
-	status = path_to_vnode(buffer, true, &vnode, kernel);
+	status = path_to_vnode(buffer, true, &vnode, NULL, kernel);
 	if (status < B_OK)
 		return status;
 
@@ -2249,7 +2258,7 @@ vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuff
 	if (bufferSize == 0 || strlcpy(pathBuffer, basePath, bufferSize) >= bufferSize)
 		return B_BUFFER_OVERFLOW;
 
-	status = path_to_vnode(pathBuffer, true, &dir, true);
+	status = path_to_vnode(pathBuffer, true, &dir, NULL, true);
 	if (status < B_OK)
 		return status;
 
@@ -2281,7 +2290,7 @@ vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuff
 		path[length] = '\0';
 		moduleName = nextPath;
 
-		status = vnode_path_to_vnode(dir, path, true, 0, &file, &type);
+		status = vnode_path_to_vnode(dir, path, true, 0, &file, NULL, &type);
 		if (status < B_OK)
 			goto err;
 
@@ -2367,7 +2376,7 @@ vfs_normalize_path(const char *path, char *buffer, size_t bufferSize,
 	// vnode and ignore the leaf later
 	bool isDir = (strcmp(leaf, ".") == 0 || strcmp(leaf, "..") == 0);
 	if (isDir)
-		error = vnode_path_to_vnode(dirNode, leaf, false, 0, &dirNode, NULL);
+		error = vnode_path_to_vnode(dirNode, leaf, false, 0, &dirNode, NULL, NULL);
 	if (error != B_OK) {
 		PRINT(("vfs_normalize_path(): failed to get dir vnode for \".\" or \"..\": %s\n", strerror(error)));
 		return error;
@@ -3097,7 +3106,8 @@ file_open(int fd, char *path, int openMode, bool kernel)
 
 	// get the vnode matching the vnode + path combination
 	struct vnode *vnode = NULL;
-	status = fd_and_path_to_vnode(fd, path, traverse, &vnode, kernel);
+	vnode_id parentID;
+	status = fd_and_path_to_vnode(fd, path, traverse, &vnode, &parentID, kernel);
 	if (status != B_OK)
 		return status;
 
@@ -3107,7 +3117,9 @@ file_open(int fd, char *path, int openMode, bool kernel)
 	if (status < B_OK)
 		put_vnode(vnode);
 
-	cache_node_opened(vnode, FDTYPE_FILE, vnode->cache, vnode->device, -1, vnode->id, NULL);
+	cache_node_opened(vnode, FDTYPE_FILE, vnode->cache,
+		vnode->device, parentID, vnode->id, NULL);
+
 	return status;
 }
 
@@ -3329,7 +3341,8 @@ dir_open(int fd, char *path, bool kernel)
 
 	// get the vnode matching the vnode + path combination
 	struct vnode *vnode = NULL;
-	status = fd_and_path_to_vnode(fd, path, true, &vnode, kernel);
+	vnode_id parentID;
+	status = fd_and_path_to_vnode(fd, path, true, &vnode, &parentID, kernel);
 	if (status != B_OK)
 		return status;
 
@@ -3338,7 +3351,7 @@ dir_open(int fd, char *path, bool kernel)
 	if (status < B_OK)
 		put_vnode(vnode);
 
-	cache_node_opened(vnode, FDTYPE_DIR, vnode->cache, vnode->device, -1, vnode->id, NULL);
+	cache_node_opened(vnode, FDTYPE_DIR, vnode->cache, vnode->device, parentID, vnode->id, NULL);
 	return status;
 }
 
@@ -3394,7 +3407,7 @@ fix_dirent(struct vnode *parent, struct dirent *entry)
 
 		struct vnode *vnode;
 		status_t status = vnode_path_to_vnode(parent, "..", false, 0, &vnode,
-			NULL);
+			NULL, NULL);
 
 		if (status == B_OK) {
 			entry->d_dev = vnode->device;
@@ -3635,7 +3648,7 @@ common_read_link(int fd, char *path, char *buffer, size_t *_bufferSize,
 	struct vnode *vnode;
 	int status;
 
-	status = fd_and_path_to_vnode(fd, path, false, &vnode, kernel);
+	status = fd_and_path_to_vnode(fd, path, false, &vnode, NULL, kernel);
 	if (status < B_OK)
 		return status;
 
@@ -3656,7 +3669,7 @@ common_write_link(char *path, char *toPath, bool kernel)
 	struct vnode *vnode;
 	int status;
 
-	status = path_to_vnode(path, false, &vnode, kernel);
+	status = path_to_vnode(path, false, &vnode, NULL, kernel);
 	if (status < B_OK)
 		return status;
 
@@ -3711,7 +3724,7 @@ common_create_link(char *path, char *toPath, bool kernel)
 	if (status < B_OK)
 		return status;
 
-	status = path_to_vnode(toPath, true, &vnode, kernel);
+	status = path_to_vnode(toPath, true, &vnode, NULL, kernel);
 	if (status < B_OK)
 		goto err;
 
@@ -3764,7 +3777,7 @@ common_access(char *path, int mode, bool kernel)
 	struct vnode *vnode;
 	int status;
 
-	status = path_to_vnode(path, true, &vnode, kernel);
+	status = path_to_vnode(path, true, &vnode, NULL, kernel);
 	if (status < B_OK)
 		return status;
 
@@ -3858,7 +3871,7 @@ common_path_read_stat(int fd, char *path, bool traverseLeafLink,
 
 	FUNCTION(("common_path_read_stat: fd: %d, path '%s', stat %p,\n", fd, path, stat));
 
-	status = fd_and_path_to_vnode(fd, path, traverseLeafLink, &vnode, kernel);
+	status = fd_and_path_to_vnode(fd, path, traverseLeafLink, &vnode, NULL, kernel);
 	if (status < 0)
 		return status;
 
@@ -3884,7 +3897,7 @@ common_path_write_stat(int fd, char *path, bool traverseLeafLink,
 
 	FUNCTION(("common_write_stat: fd: %d, path '%s', stat %p, stat_mask %d, kernel %d\n", fd, path, stat, statMask, kernel));
 
-	status = fd_and_path_to_vnode(fd, path, traverseLeafLink, &vnode, kernel);
+	status = fd_and_path_to_vnode(fd, path, traverseLeafLink, &vnode, NULL, kernel);
 	if (status < 0)
 		return status;
 
@@ -3907,7 +3920,7 @@ attr_dir_open(int fd, char *path, bool kernel)
 
 	FUNCTION(("attr_dir_open(fd = %d, path = '%s', kernel = %d)\n", fd, path, kernel));
 
-	status = fd_and_path_to_vnode(fd, path, true, &vnode, kernel);
+	status = fd_and_path_to_vnode(fd, path, true, &vnode, NULL, kernel);
 	if (status < B_OK)
 		return status;
 
@@ -4701,7 +4714,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 
 		mount->covers_vnode = NULL; // this is the root mount
 	} else {
-		err = path_to_vnode(path, true, &covered_vnode, kernel);
+		err = path_to_vnode(path, true, &covered_vnode, NULL, kernel);
 		if (err < 0)
 			goto err5;
 
@@ -4793,7 +4806,7 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 
 	FUNCTION(("vfs_unmount: entry. path = '%s', kernel %d\n", path, kernel));
 
-	err = path_to_vnode(path, true, &vnode, kernel);
+	err = path_to_vnode(path, true, &vnode, NULL, kernel);
 	if (err < 0)
 		return B_ENTRY_NOT_FOUND;
 
@@ -5049,7 +5062,7 @@ set_cwd(int fd, char *path, bool kernel)
 	FUNCTION(("set_cwd: path = \'%s\'\n", path));
 
 	// Get vnode for passed path, and bail if it failed
-	rc = fd_and_path_to_vnode(fd, path, true, &vnode, kernel);
+	rc = fd_and_path_to_vnode(fd, path, true, &vnode, NULL, kernel);
 	if (rc < 0)
 		return rc;
 
