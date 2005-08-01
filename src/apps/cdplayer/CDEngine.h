@@ -115,7 +115,6 @@ private:
 
 	CDDBQuery	cddbQuery;
 	int32		discID;
-	bool		fReady;
 };
 
 // this watcher sends notices to observers that are interested
@@ -225,5 +224,6 @@ public:
 	}
 };
 
+extern CDAudioDevice gCDDevice;
 
 #endif

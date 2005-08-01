@@ -357,6 +357,7 @@ CDPlayer::NoticeChange(Notifier *notifier)
 	
 	if(ps)
 	{
+		AdjustButtonStates();
 		HandlePlayState();
 	}
 	else
@@ -393,34 +394,29 @@ CDPlayer::HandlePlayState(void)
 	{
 		case kNoCD:
 		{
-			AdjustButtonStates();
 			fCurrentTrack->SetHighColor(fStopColor);
 			fCurrentTrack->Invalidate();
 			break;
 		}
 		case kStopped:
 		{
-			AdjustButtonStates();
 			fCurrentTrack->SetHighColor(fStopColor);
 			fCurrentTrack->Invalidate();
 			break;
 		}
 		case kPaused:
 		{
-			AdjustButtonStates();
 			fCurrentTrack->SetHighColor(fPlayColor);
 			break;
 		}
 		case kPlaying:
 		{
-			AdjustButtonStates();
 			fCurrentTrack->SetHighColor(fPlayColor);
 			fCurrentTrack->Invalidate();
 			break;
 		}
 		case kSkipping:
 		{
-			AdjustButtonStates();
 			fCurrentTrack->SetHighColor(fStopColor);
 			break;
 		}
@@ -434,58 +430,33 @@ CDPlayer::HandlePlayState(void)
 void
 CDPlayer::AdjustButtonStates(void)
 {
-	CDState state = engine->GetState();
+	CDState state = gCDDevice.GetState();
 	
-	switch(state)
+	if(state==kNoCD)
 	{
-		case kNoCD:
-		{
-			// Everything needs to be disabled when there is no CD
-			fStop->SetEnabled(false);
-			fPlay->SetEnabled(false);
-			fNextTrack->SetEnabled(false);
-			fPrevTrack->SetEnabled(false);
-			
-			fSave->SetEnabled(false);
-			break;
-		}
-		case kStopped:
-		{
-			fStop->SetEnabled(true);
-			fPlay->SetEnabled(true);
-			fNextTrack->SetEnabled(true);
-			fPrevTrack->SetEnabled(true);
-			
-			// TODO: Enable when Save is implemented
-//			fSave->SetEnabled(true);
-
-			fPlay->SetState(0);
-			break;
-		}
-		case kPaused:
-		{
-			fPlay->SetState(0);
-			break;
-		}
-		case kPlaying:
-		{
-			fStop->SetEnabled(true);
-			fPlay->SetEnabled(true);
-			fNextTrack->SetEnabled(true);
-			fPrevTrack->SetEnabled(true);
-			
-			// TODO: Enable when Save is implemented
-//			fSave->SetEnabled(true);
-			
-			fPlay->SetState(1);
-			break;
-		}
-		case kSkipping:
-		default:
-		{
-			break;
-		}
+		// Everything needs to be disabled when there is no CD
+		fStop->SetEnabled(false);
+		fPlay->SetEnabled(false);
+		fNextTrack->SetEnabled(false);
+		fPrevTrack->SetEnabled(false);
+		
+		fSave->SetEnabled(false);
 	}
+	else
+	{
+		fStop->SetEnabled(true);
+		fPlay->SetEnabled(true);
+		fNextTrack->SetEnabled(true);
+		fPrevTrack->SetEnabled(true);
+		
+		// TODO: Enable when Save is implemented
+//		fSave->SetEnabled(true);
+	}
+	
+	if(state==kPlaying)
+		fPlay->SetState(1);
+	else
+		fPlay->SetState(0);
 }
 
 void
@@ -628,7 +599,7 @@ public:
 
 CDPlayerWindow::CDPlayerWindow(void)
  :	BWindow(BRect (100, 100, 610, 200), "CD Player", B_TITLED_WINDOW, B_NOT_V_RESIZABLE |
-	B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
+	B_NOT_ZOOMABLE)
 {
 	float wmin,wmax,hmin,hmax;
 	

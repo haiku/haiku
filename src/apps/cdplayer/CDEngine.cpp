@@ -17,7 +17,7 @@
 #include "PlayList.h"
 
 static PlayList sPlayList;
-static CDAudioDevice sCDDevice;
+CDAudioDevice gCDDevice;
 
 const bigtime_t kPulseRate = 500000;
 
@@ -57,7 +57,7 @@ PlayState::PlayState(CDEngine *engine)
 bool
 PlayState::UpdateState(void)
 {
-	CDState state = sCDDevice.GetState();
+	CDState state = gCDDevice.GetState();
 	if(state == kStopped)
 	{
 		if(fEngine->GetState() == kPlaying)
@@ -67,14 +67,14 @@ PlayState::UpdateState(void)
 			int16 next = sPlayList.GetNextTrack();
 			if(next > 0)
 			{
-				sCDDevice.Play(next);
+				gCDDevice.Play(next);
 				return CurrentState(kPlaying);
 			}
 		}
 		else
 		{
-			sPlayList.SetTrackCount(sCDDevice.CountTracks());
-			sPlayList.SetStartingTrack(sCDDevice.GetTrack());
+			sPlayList.SetTrackCount(gCDDevice.CountTracks());
+			sPlayList.SetStartingTrack(gCDDevice.GetTrack());
 			return CurrentState(kPlaying);
 		}
 	}
@@ -85,8 +85,8 @@ PlayState::UpdateState(void)
 		// or this app is started while the drive is playing. We should
 		// reset the to start at the current track and finish at the
 		// last one and send a notification.
-		sPlayList.SetTrackCount(sCDDevice.CountTracks());
-		sPlayList.SetStartingTrack(sCDDevice.GetTrack());
+		sPlayList.SetTrackCount(gCDDevice.CountTracks());
+		sPlayList.SetStartingTrack(gCDDevice.GetTrack());
 		return CurrentState(kPlaying);
 	}
 	
@@ -130,9 +130,9 @@ TrackState::UpdateState()
 	
 	int16 cdTrack, count;
 	
-	if(sCDDevice.GetState() == kPlaying)
+	if(gCDDevice.GetState() == kPlaying)
 	{
-		cdTrack = sCDDevice.GetTrack();
+		cdTrack = gCDDevice.GetTrack();
 		if(cdTrack != sPlayList.GetCurrentTrack())
 			sPlayList.SetCurrentTrack(cdTrack);
 		return CurrentState(cdTrack, trackCount);
@@ -140,14 +140,14 @@ TrackState::UpdateState()
 
 	// If we're not playing, just monitor the current track in the playlist
 	cdTrack = sPlayList.GetCurrentTrack();
-	count = sCDDevice.CountTracks();
+	count = gCDDevice.CountTracks();
 	return CurrentState(cdTrack,count);
 }
 
 int32 
 TrackState::GetNumTracks() const
 {
-	return sCDDevice.CountTracks();
+	return gCDDevice.CountTracks();
 }
 
 bool
@@ -172,14 +172,14 @@ TimeState::UpdateState()
 	cdaudio_time track;
 	cdaudio_time disc;
 	
-	if(sCDDevice.GetTime(track,disc))
+	if(gCDDevice.GetTime(track,disc))
 	{
 		cdaudio_time ttrack;
 		cdaudio_time tdisc;
-		int16 ctrack = sCDDevice.GetTrack();
+		int16 ctrack = gCDDevice.GetTrack();
 		
-		sCDDevice.GetTimeForDisc(tdisc);
-		sCDDevice.GetTimeForTrack(ctrack,ttrack);
+		gCDDevice.GetTimeForDisc(tdisc);
+		gCDDevice.GetTimeForTrack(ctrack,ttrack);
 		
 		return CurrentState(track,ttrack,disc,tdisc);
 	}
@@ -240,8 +240,7 @@ TimeState::GetTotalTrackTime(int32 &minutes, int32 &seconds) const
 
 CDContentWatcher::CDContentWatcher(void)
 	:	cddbQuery("us.freedb.org", 888, true),
-		discID(-1),
-		fReady(false)
+		discID(-1)
 {
 }
 
@@ -264,20 +263,7 @@ CDContentWatcher::UpdateState()
 {
 	int32 newDiscID = -1;
 	
-	// Check the table of contents to see if the new one is different
-	// from the old one whenever there is a CD in the drive
-	if (engine->PlayStateWatcher()->GetState() != kNoCD) 
-	{
-		newDiscID = sCDDevice.GetDiscID();
-		
-		if (discID == newDiscID)
-			return false;
-		
-		// We have changed CDs, so we are not ready until the CDDB lookup finishes
-		cddbQuery.SetToCD(sCDDevice.GetDrivePath());
-		fReady=false;
-	}
-	else
+	if (engine->PlayStateWatcher()->GetState() == kNoCD) 
 	{
 		if(discID != -1)
 		{
@@ -288,17 +274,24 @@ CDContentWatcher::UpdateState()
 			return false;
 	}
 	
-	// If the CD has changed and the CDDB query is ready, we set to true so that
-	// when UpdateState returns, a notification is sent
-	bool result = ( (fReady != cddbQuery.Ready()) && (newDiscID != discID) );
+	// Check the table of contents to see if the new one is different
+	// from the old one whenever there is a CD in the drive
+	newDiscID = gCDDevice.GetDiscID();
 	
-	if(result)
+	if (discID == newDiscID)
+		return false;
+	
+	// We have changed CDs, so we are not ready until the CDDB lookup finishes
+	cddbQuery.SetToCD(gCDDevice.GetDrivePath());
+	
+	// Notify when the query is ready
+	if(cddbQuery.Ready())
 	{
-		fReady = true;
 		discID = newDiscID;
+		return true;
 	}
-
-	return result;
+	
+	return false;
 }
 
 VolumeState::VolumeState(void)
@@ -309,7 +302,7 @@ VolumeState::VolumeState(void)
 bool
 VolumeState::UpdateState(void)
 {
-	uint8 volume = sCDDevice.GetVolume();
+	uint8 volume = gCDDevice.GetVolume();
 	if(fVolume == volume)
 		return false;
 	
@@ -328,7 +321,7 @@ CDEngine::CDEngine(void)
 		playState(this),
 		fEngineState(kStopped)
 {
-	sPlayList.SetTrackCount(sCDDevice.CountTracks());
+	sPlayList.SetTrackCount(gCDDevice.CountTracks());
 }
 
 CDEngine::~CDEngine()
@@ -349,8 +342,8 @@ CDEngine::AttachedToLooper(BLooper *looper)
 void 
 CDEngine::Pause()
 {
-	sCDDevice.Pause();
-	fEngineState = sCDDevice.GetState();
+	gCDDevice.Pause();
+	fEngineState = gCDDevice.GetState();
 }
 
 void 
@@ -358,8 +351,8 @@ CDEngine::Play()
 {
 	if(fEngineState == kPaused)
 	{
-		sCDDevice.Resume();
-		fEngineState = sCDDevice.GetState();
+		gCDDevice.Resume();
+		fEngineState = gCDDevice.GetState();
 	}
 	else
 	if(fEngineState == kPlaying)
@@ -368,8 +361,8 @@ CDEngine::Play()
 	}
 	else
 	{
-		sCDDevice.Play(sPlayList.GetCurrentTrack());
-		fEngineState = sCDDevice.GetState();
+		gCDDevice.Play(sPlayList.GetCurrentTrack());
+		fEngineState = gCDDevice.GetState();
 	}
 }
 
@@ -377,14 +370,14 @@ void
 CDEngine::Stop()
 {
 	fEngineState = kStopped;
-	sCDDevice.Stop();
+	gCDDevice.Stop();
 }
 
 void 
 CDEngine::Eject()
 {
-	sCDDevice.Eject();
-	fEngineState = sCDDevice.GetState();
+	gCDDevice.Eject();
+	fEngineState = gCDDevice.GetState();
 }
 
 void 
@@ -403,14 +396,14 @@ CDEngine::SkipOneForward()
 			return;
 	}
 	
-	CDState state = sCDDevice.GetState();
+	CDState state = gCDDevice.GetState();
 	if(state == kPlaying)
-		sCDDevice.Play(track);
+		gCDDevice.Play(track);
 	
 	if(state == kPaused)
 	{
-		sCDDevice.Play(track);
-		sCDDevice.Pause();
+		gCDDevice.Play(track);
+		gCDDevice.Pause();
 	}
 	trackState.UpdateNow();
 }
@@ -430,15 +423,15 @@ CDEngine::SkipOneBackward()
 			return;
 	}
 	
-	CDState state = sCDDevice.GetState();
+	CDState state = gCDDevice.GetState();
 	
 	if(state == kPlaying)
-		sCDDevice.Play(track);
+		gCDDevice.Play(track);
 	
 	if(state == kPaused)
 	{
-		sCDDevice.Play(track);
-		sCDDevice.Pause();
+		gCDDevice.Play(track);
+		gCDDevice.Pause();
 	}
 	trackState.UpdateNow();
 }
@@ -446,19 +439,19 @@ CDEngine::SkipOneBackward()
 void 
 CDEngine::StartSkippingBackward()
 {
-	sCDDevice.StartRewind();
+	gCDDevice.StartRewind();
 }
 
 void 
 CDEngine::StartSkippingForward()
 {
-	sCDDevice.StartFastFwd();
+	gCDDevice.StartFastFwd();
 }
 
 void 
 CDEngine::StopSkipping()
 {
-	sCDDevice.StopFastFwd();
+	gCDDevice.StopFastFwd();
 }
 
 void 
@@ -466,14 +459,14 @@ CDEngine::SelectTrack(int32 trackNumber)
 {
 	sPlayList.SetCurrentTrack(trackNumber);
 	if(playState.GetState() == kPlaying)
-		sCDDevice.Play(trackNumber);
+		gCDDevice.Play(trackNumber);
 	trackState.UpdateNow();
 }
 
 void
 CDEngine::SetVolume(uint8 value)
 {
-	sCDDevice.SetVolume(value);
+	gCDDevice.SetVolume(value);
 }
 
 void
@@ -485,12 +478,12 @@ CDEngine::ToggleShuffle(void)
 		int16 track = sPlayList.GetCurrentTrack();
 		sPlayList.SetShuffle(false);
 		sPlayList.SetStartingTrack(track);
-		sPlayList.SetTrackCount(sCDDevice.CountTracks());
+		sPlayList.SetTrackCount(gCDDevice.CountTracks());
 	}
 	else
 	{
 		// Not shuffled, so we will play the entire CD and randomly pick
-		sPlayList.SetTrackCount(sCDDevice.CountTracks());
+		sPlayList.SetTrackCount(gCDDevice.CountTracks());
 		sPlayList.SetShuffle(true);
 	}
 }

@@ -14,12 +14,18 @@ class CDDBQuery
 public:
 							CDDBQuery(const char *server, int32 port = 888, 
 									  bool log = false);
+							~CDDBQuery(void); 
 			void			SetToSite(const char *server, int32 port);
 			void			GetSites(bool (*)(const char *site, int port, 
 									 const char *latitude, const char *longitude,
 									 const char *description, void *state), void *);
 
 			void			SetToCD(const char *devicepath);
+			
+			const char *	GetArtist(void) { return fArtist.String(); }
+			const char *	GetAlbum(void) { return fTitle.String(); }
+			const char *	GetGenre(void) { return fCategory.String(); }
+			
 			bool			GetTitles(BString *title, vector<BString> *tracks, 
 							  		  bigtime_t timeout);
 	
@@ -32,8 +38,7 @@ public:
 	static	void			GetTrackTimes(const scsi_toc *, vector<cdaudio_time> &times);
 	static	BString			OffsetsToString(const scsi_toc *);
 	
-// TODO: make private again once finished with testing
-//private:
+private:
 			void					Connect();
 			void					Disconnect();
 			bool					IsConnected() const;

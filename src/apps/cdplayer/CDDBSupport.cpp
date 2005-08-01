@@ -78,6 +78,11 @@ CDDBQuery::CDDBQuery(const char *server, int32 port, bool log)
 {
 }
 
+CDDBQuery::~CDDBQuery(void)
+{
+	kill_thread(fThread);
+}
+
 void 
 CDDBQuery::SetToSite(const char *server, int32 port)
 {
@@ -121,9 +126,10 @@ CDDBQuery::SetToCD(const char *path)
 	{
 		int32 discID = GetDiscID(&toc);
 		
-		if (fDiscID == discID);
+		if (fDiscID == discID)
 			return;
 		
+		fDiscID = discID;
 		fTrackCount = GetTrackCount(&toc);
 		
 		cdaudio_time time = GetDiscTime(&toc);
@@ -221,7 +227,11 @@ CDDBQuery::GetTitles(BString *resultingTitle, vector<BString> *tracks, bigtime_t
 		return false;
 
 	if (resultingTitle)
-		*resultingTitle = fTitle;
+	{
+		*resultingTitle = fArtist;
+		resultingTitle->Append(" / ");
+		resultingTitle->Append(fTitle);
+	}
 	
 	if (tracks)
 		*tracks = fTrackNames;
@@ -515,6 +525,7 @@ CDDBQuery::OpenContentFile(const int32 &discID)
 			BString tmp = GetLineFromString(trackdata);
 			char *index;
 			
+			fTrackNames.clear();
 			fArtist = tmp;
 			fArtist.Truncate(fArtist.FindFirst(" - "));
 			
@@ -567,7 +578,6 @@ CDDBQuery::QueryThread(void *owner)
 		query->fState = kError;
 		query->fResult = error;
 	}
-	
 	return 0;
 }
 
