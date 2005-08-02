@@ -499,39 +499,39 @@ static struct thread *last_thread_dumped = NULL;
 static void
 _dump_thread_info(struct thread *t)
 {
-	dprintf("THREAD: %p\n", t);
-	dprintf("id:                 0x%lx\n", t->id);
-	dprintf("name:               \"%s\"\n", t->name);
-	dprintf("all_next:           %p\nteam_next:          %p\nq_next:             %p\n",
+	kprintf("THREAD: %p\n", t);
+	kprintf("id:                 0x%lx\n", t->id);
+	kprintf("name:               \"%s\"\n", t->name);
+	kprintf("all_next:           %p\nteam_next:          %p\nq_next:             %p\n",
 		t->all_next, t->team_next, t->queue_next);
-	dprintf("priority:           %ld\n", t->priority);
-	dprintf("state:              %s\n", state_to_text(t, t->state));
-	dprintf("next_state:         %s\n", state_to_text(t, t->next_state));
-	dprintf("cpu:                %p ", t->cpu);
+	kprintf("priority:           %ld\n", t->priority);
+	kprintf("state:              %s\n", state_to_text(t, t->state));
+	kprintf("next_state:         %s\n", state_to_text(t, t->next_state));
+	kprintf("cpu:                %p ", t->cpu);
 	if (t->cpu)
-		dprintf("(%d)\n", t->cpu->info.cpu_num);
+		kprintf("(%d)\n", t->cpu->info.cpu_num);
 	else
-		dprintf("\n");
-	dprintf("sig_pending:        0x%lx\n", t->sig_pending);
-	dprintf("in_kernel:          %d\n", t->in_kernel);
-	dprintf("  sem.blocking:     0x%lx\n", t->sem.blocking);
-	dprintf("  sem.count:        0x%lx\n", t->sem.count);
-	dprintf("  sem.acquire_status: 0x%lx\n", t->sem.acquire_status);
-	dprintf("  sem.flags:        0x%lx\n", t->sem.flags);
-	dprintf("fault_handler:      %p\n", (void *)t->fault_handler);
-	dprintf("args:               %p %p\n", t->args1, t->args2);
-	dprintf("entry:              %p\n", (void *)t->entry);
-	dprintf("team:               %p, \"%s\"\n", t->team, t->team->name);
-	dprintf("exit.sem:           0x%lx\n", t->exit.sem);
-	dprintf("kernel_stack_area:  0x%lx\n", t->kernel_stack_area);
-	dprintf("kernel_stack_base:  %p\n", (void *)t->kernel_stack_base);
-	dprintf("user_stack_area:    0x%lx\n", t->user_stack_area);
-	dprintf("user_stack_base:    %p\n", (void *)t->user_stack_base);
-	dprintf("user_local_storage: %p\n", (void *)t->user_local_storage);
-	dprintf("kernel_errno:       %d\n", t->kernel_errno);
-	dprintf("kernel_time:        %Ld\n", t->kernel_time);
-	dprintf("user_time:          %Ld\n", t->user_time);
-	dprintf("architecture dependant section:\n");
+		kprintf("\n");
+	kprintf("sig_pending:        0x%lx\n", t->sig_pending);
+	kprintf("in_kernel:          %d\n", t->in_kernel);
+	kprintf("  sem.blocking:     0x%lx\n", t->sem.blocking);
+	kprintf("  sem.count:        0x%lx\n", t->sem.count);
+	kprintf("  sem.acquire_status: 0x%lx\n", t->sem.acquire_status);
+	kprintf("  sem.flags:        0x%lx\n", t->sem.flags);
+	kprintf("fault_handler:      %p\n", (void *)t->fault_handler);
+	kprintf("args:               %p %p\n", t->args1, t->args2);
+	kprintf("entry:              %p\n", (void *)t->entry);
+	kprintf("team:               %p, \"%s\"\n", t->team, t->team->name);
+	kprintf("exit.sem:           0x%lx\n", t->exit.sem);
+	kprintf("kernel_stack_area:  0x%lx\n", t->kernel_stack_area);
+	kprintf("kernel_stack_base:  %p\n", (void *)t->kernel_stack_base);
+	kprintf("user_stack_area:    0x%lx\n", t->user_stack_area);
+	kprintf("user_stack_base:    %p\n", (void *)t->user_stack_base);
+	kprintf("user_local_storage: %p\n", (void *)t->user_local_storage);
+	kprintf("kernel_errno:       %d\n", t->kernel_errno);
+	kprintf("kernel_time:        %Ld\n", t->kernel_time);
+	kprintf("user_time:          %Ld\n", t->user_time);
+	kprintf("architecture dependant section:\n");
 	arch_thread_dump_info(&t->arch_info);
 
 	last_thread_dumped = t;
@@ -547,7 +547,7 @@ dump_thread_info(int argc, char **argv)
 	struct hash_iterator i;
 
 	if (argc > 2) {
-		dprintf("usage: thread [id/name]\n");
+		kprintf("usage: thread [id/name]\n");
 		return 0;
 	}
 
@@ -582,26 +582,37 @@ dump_thread_list(int argc, char **argv)
 {
 	struct thread *t;
 	struct hash_iterator i;
+	int32 requiredState = 0;
 
-	dprintf("thread         id  state       sem cpu  stack       name\n");
+	if (!strcmp(argv[0], "ready"))
+		requiredState = B_THREAD_READY;
+	else if (!strcmp(argv[0], "running"))
+		requiredState = B_THREAD_RUNNING;
+	else if (!strcmp(argv[0], "waiting"))
+		requiredState = B_THREAD_WAITING;
+
+	kprintf("thread         id  state       sem cpu  stack       name\n");
 
 	hash_open(sThreadHash, &i);
 	while ((t = hash_next(sThreadHash, &i)) != NULL) {
-		dprintf("%p %6lx  %-9s", t, t->id, state_to_text(t, t->state));
+		if (requiredState && t->state != requiredState)
+			continue;
+
+		kprintf("%p %6lx  %-9s", t, t->id, state_to_text(t, t->state));
 
 		// does it block on a semaphore?
 		if (t->state == B_THREAD_WAITING)
-			dprintf("%6lx  ", t->sem.blocking);
+			kprintf("%6lx  ", t->sem.blocking);
 		else
-			dprintf("     -  ");
+			kprintf("     -  ");
 
 		// on which CPU does it run?
 		if (t->cpu)
-			dprintf("%2d", t->cpu->info.cpu_num);
+			kprintf("%2d", t->cpu->info.cpu_num);
 		else
-			dprintf(" -");
+			kprintf(" -");
 
-		dprintf("  %p  %s\n", (void *)t->kernel_stack_base, t->name != NULL ? t->name : "<NULL>");
+		kprintf("  %p  %s\n", (void *)t->kernel_stack_base, t->name != NULL ? t->name : "<NULL>");
 	}
 	hash_close(sThreadHash, &i, false);
 	return 0;
@@ -614,15 +625,15 @@ dump_next_thread_in_q(int argc, char **argv)
 	struct thread *t = last_thread_dumped;
 
 	if (t == NULL) {
-		dprintf("no thread previously dumped. Examine a thread first.\n");
+		kprintf("no thread previously dumped. Examine a thread first.\n");
 		return 0;
 	}
 
-	dprintf("next thread in queue after thread @ %p\n", t);
+	kprintf("next thread in queue after thread @ %p\n", t);
 	if (t->queue_next != NULL)
 		_dump_thread_info(t->queue_next);
 	else
-		dprintf("NULL\n");
+		kprintf("NULL\n");
 
 	return 0;
 }
@@ -634,15 +645,15 @@ dump_next_thread_in_all_list(int argc, char **argv)
 	struct thread *t = last_thread_dumped;
 
 	if (t == NULL) {
-		dprintf("no thread previously dumped. Examine a thread first.\n");
+		kprintf("no thread previously dumped. Examine a thread first.\n");
 		return 0;
 	}
 
-	dprintf("next thread in global list after thread @ %p\n", t);
+	kprintf("next thread in global list after thread @ %p\n", t);
 	if (t->all_next != NULL)
 		_dump_thread_info(t->all_next);
 	else
-		dprintf("NULL\n");
+		kprintf("NULL\n");
 
 	return 0;
 }
@@ -654,15 +665,15 @@ dump_next_thread_in_team(int argc, char **argv)
 	struct thread *t = last_thread_dumped;
 
 	if (t == NULL) {
-		dprintf("no thread previously dumped. Examine a thread first.\n");
+		kprintf("no thread previously dumped. Examine a thread first.\n");
 		return 0;
 	}
 
-	dprintf("next thread in team after thread @ %p\n", t);
+	kprintf("next thread in team after thread @ %p\n", t);
 	if (t->team_next != NULL)
 		_dump_thread_info(t->team_next);
 	else
-		dprintf("NULL\n");
+		kprintf("NULL\n");
 
 	return 0;
 }
@@ -1323,6 +1334,9 @@ thread_init(kernel_args *args)
 
 	// set up some debugger commands
 	add_debugger_command("threads", &dump_thread_list, "list all threads");
+	add_debugger_command("ready", &dump_thread_list, "list all ready threads");
+	add_debugger_command("running", &dump_thread_list, "list all running threads");
+	add_debugger_command("waiting", &dump_thread_list, "list all waiting threads");
 	add_debugger_command("thread", &dump_thread_info, "list info about a particular thread");
 	add_debugger_command("next_q", &dump_next_thread_in_q, "dump the next thread in the queue of last thread viewed");
 	add_debugger_command("next_all", &dump_next_thread_in_all_list, "dump the next thread in the global list of the last thread viewed");
