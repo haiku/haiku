@@ -57,21 +57,21 @@ parse_nibble(int input)
 static void
 gdb_ack(void)
 {
-	debug_putchar('+');
+	arch_debug_serial_putchar('+');
 }
 
 
 static void
 gdb_nak(void)
 {
-	debug_putchar('-');
+	arch_debug_serial_putchar('-');
 }
 
 
 static void
 gdb_resend_reply(void)
 {
-	debug_puts(reply);
+	arch_debug_serial_puts(reply);
 }
 
 

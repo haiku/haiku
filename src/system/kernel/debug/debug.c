@@ -90,11 +90,31 @@ find_command(char *name, bool partialMatch)
 }
 
 
+static void
+kputchar(char c)
+{
+	if (sSerialDebugEnabled)
+		arch_debug_serial_putchar(c);
+	if (sBlueScreenOutput)
+		blue_screen_putchar(c);
+}
+
+
+static void
+kputs(const char *s)
+{
+	if (sSerialDebugEnabled)
+		arch_debug_serial_puts(s);
+	if (sBlueScreenOutput)
+		blue_screen_puts(s);
+}
+
+
 static int
 read_line(char *buf, int max_len)
 {
 	char c;
-	int ptr = 0;
+	int position = 0;
 	bool done = false;
 	int cur_history_spot = cur_line;
 
@@ -110,16 +130,16 @@ read_line(char *buf, int max_len)
 		switch (c) {
 			case '\n':
 			case '\r':
-				buf[ptr++] = '\0';
-				debug_putchar('\n');
+				buf[position++] = '\0';
+				kputchar('\n');
 				done = true;
 				break;
 			case 8: // backspace
-				if (ptr > 0) {
-					debug_puts("\x1b[1D"); // move to the left one
-					debug_putchar(' ');
-					debug_puts("\x1b[1D"); // move to the left one
-					ptr--;
+				if (position > 0) {
+					kputs("\x1b[1D"); // move to the left one
+					kputchar(' ');
+					kputs("\x1b[1D"); // move to the left one
+					position--;
 				}
 				break;
 			case 27: // escape sequence
@@ -127,15 +147,15 @@ read_line(char *buf, int max_len)
 				c = readChar();
 				switch (c) {
 					case 67: // right arrow acts like space
-						buf[ptr++] = ' ';
-						debug_putchar(' ');
+						buf[position++] = ' ';
+						kputchar(' ');
 						break;
 					case 68: // left arrow acts like backspace
-						if (ptr > 0) {
-							debug_puts("\x1b[1D"); // move to the left one
-							debug_putchar(' ');
-							debug_puts("\x1b[1D"); // move to the left one
-							ptr--;
+						if (position > 0) {
+							kputs("\x1b[1D"); // move to the left one
+							kputchar(' ');
+							kputs("\x1b[1D"); // move to the left one
+							position--;
 						}
 						break;
 					case 65: // up arrow
@@ -154,7 +174,7 @@ read_line(char *buf, int max_len)
 							// down arrow
 							if (cur_history_spot != cur_line) {
 								history_line = cur_history_spot + 1;
-								if(history_line >= HISTORY_SIZE)
+								if (history_line >= HISTORY_SIZE)
 									history_line = 0;
 							} else
 								break; // nothing to do here
@@ -163,12 +183,12 @@ read_line(char *buf, int max_len)
 //						dprintf("2c %d h %d ch %d\n", cur_line, history_line, cur_history_spot);
 
 						// swap the current line with something from the history
-						if (ptr > 0)
-							dprintf("\x1b[%dD", ptr); // move to beginning of line
+						if (position > 0)
+							kprintf("\x1b[%dD", position); // move to beginning of line
 
 						strcpy(buf, line_buf[history_line]);
-						ptr = strlen(buf);
-						dprintf("%s\x1b[K", buf); // print the line and clear the rest
+						position = strlen(buf);
+						kprintf("%s\x1b[K", buf); // print the line and clear the rest
 						cur_history_spot = history_line;
 						break;
 					}
@@ -184,26 +204,27 @@ read_line(char *buf, int max_len)
 					 * If we get a $ at the beginning of the line
 					 * we assume we are talking with GDB
 					 */
-					if (ptr == 0) {
+					if (position == 0) {
 						strcpy(buf, "gdb");
-						ptr = 4;
+						position = 4;
 						done = true;
 						break;
 					} 
 				}
 				/* supposed to fall through */
 			default:
-				buf[ptr++] = c;
-				debug_putchar(c);
+				buf[position++] = c;
+				kputchar(c);
 		}
-		if (ptr >= max_len - 2) {
-			buf[ptr++] = '\0';
-			debug_puts("\n");
+		if (position >= max_len - 2) {
+			buf[position++] = '\0';
+			kputchar('\n');
 			done = true;
 			break;
 		}
 	}
-	return ptr;
+
+	return position;
 }
 
 
@@ -253,7 +274,7 @@ kernel_debugger_loop(void)
 		struct debugger_command *cmd = NULL;
 		int argc;
 
-		dprintf("kdebug> ");
+		kprintf("kdebug> ");
 		read_line(line_buf[cur_line], LINE_BUF_SIZE);
 		parse_line(line_buf[cur_line], args, &argc, MAX_ARGS);
 
@@ -268,7 +289,7 @@ kernel_debugger_loop(void)
 			cmd = find_command(args[0], true);
 
 		if (cmd == NULL)
-			dprintf("unknown command, enter \"help\" to get a list of all supported commands\n");
+			kprintf("unknown command, enter \"help\" to get a list of all supported commands\n");
 		else {
 			int rc = cmd->func(argc, args);
 
@@ -312,11 +333,11 @@ cmd_help(int argc, char **argv)
 
 	if (specified != NULL) {
 		// only print out the help of the specified command (and all of its aliases)
-		dprintf("debugger command for \"%s\" and aliases:\n", specified->name);
+		kprintf("debugger command for \"%s\" and aliases:\n", specified->name);
 	} else if (start != NULL)
-		dprintf("debugger commands starting with \"%s\":\n", start);
+		kprintf("debugger commands starting with \"%s\":\n", start);
 	else
-		dprintf("debugger commands:\n");
+		kprintf("debugger commands:\n");
 
 	for (command = sCommands; command != NULL; command = command->next) {
 		if (specified && command->func != specified->func)
@@ -324,7 +345,7 @@ cmd_help(int argc, char **argv)
 		if (start != NULL && strncmp(start, command->name, startLength))
 			continue;
 
-		dprintf(" %-20s\t\t%s\n", command->name, command->description ? command->description : "-");
+		kprintf(" %-20s\t\t%s\n", command->name, command->description ? command->description : "-");
 	}
 
 	return 0;
@@ -338,35 +359,16 @@ cmd_continue(int argc, char **argv)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - private kernel API
 
 
 void
-debug_putchar(char c)
+debug_puts(const char *string)
 {
 	cpu_status state = disable_interrupts();
 	acquire_spinlock(&sSpinlock);
 
-	if (sSerialDebugEnabled)
-		arch_debug_serial_putchar(c);
-	if (sBlueScreenOutput)
-		blue_screen_putchar(c);
-
-	release_spinlock(&sSpinlock);
-	restore_interrupts(state);
-}
-
-
-void
-debug_puts(const char *s)
-{
-	cpu_status state = disable_interrupts();
-	acquire_spinlock(&sSpinlock);
-
-	if (sSerialDebugEnabled)
-		arch_debug_serial_puts(s);
-	if (sBlueScreenOutput)
-		blue_screen_puts(s);
+	kputs(string);
 
 	release_spinlock(&sSpinlock);
 	restore_interrupts(state);
@@ -421,8 +423,7 @@ debug_init_post_vm(kernel_args *args)
 }
 
 
-//	#pragma mark -
-//	public API
+//	#pragma mark - public API
 
 
 int
@@ -593,7 +594,7 @@ dprintf(const char *format, ...)
 
 
 /**	Similar to dprintf() but thought to be used in the kernel
- *	debugger only.
+ *	debugger only (it doesn't lock).
  */
 
 void
@@ -607,7 +608,8 @@ kprintf(const char *format, ...)
 	vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE, format, args);
 	va_end(args);
 
-	arch_debug_serial_puts(sOutputBuffer);
+	if (sSerialDebugEnabled)
+		arch_debug_serial_puts(sOutputBuffer);
 	if (sBlueScreenOutput)
 		blue_screen_puts(sOutputBuffer);
 }

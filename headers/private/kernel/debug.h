@@ -31,7 +31,6 @@ extern "C" {
 extern status_t debug_init(struct kernel_args *args);
 extern status_t	debug_init_post_vm(struct kernel_args *args);
 extern void debug_early_boot_message(const char *string);
-extern void debug_putchar(char c);
 extern void debug_puts(const char *s);
 
 extern void _user_debug_output(const char *userString);
