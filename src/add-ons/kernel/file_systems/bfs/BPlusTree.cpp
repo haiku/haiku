@@ -589,14 +589,14 @@ BPlusTree::CompareKeys(const void *key1, int keyLength1, const void *key2, int k
 
 
 status_t
-BPlusTree::FindKey(bplustree_node *node, const uint8 *key, uint16 keyLength, uint16 *index,
-	off_t *next)
+BPlusTree::FindKey(bplustree_node *node, const uint8 *key, uint16 keyLength,
+	uint16 *_index, off_t *_next)
 {
 	if (node->all_key_count == 0) {
-		if (index)
-			*index = 0;
-		if (next)
-			*next = node->OverflowLink();
+		if (_index)
+			*_index = 0;
+		if (_next)
+			*_next = node->OverflowLink();
 		return B_ENTRY_NOT_FOUND;
 	}
 
@@ -622,21 +622,21 @@ BPlusTree::FindKey(bplustree_node *node, const uint8 *key, uint16 keyLength, uin
 		} else if (cmp > 0) {
 			saveIndex = first = i + 1;
 		} else {
-			if (index)
-				*index = i;
-			if (next)
-				*next = BFS_ENDIAN_TO_HOST_INT64(values[i]);
+			if (_index)
+				*_index = i;
+			if (_next)
+				*_next = BFS_ENDIAN_TO_HOST_INT64(values[i]);
 			return B_OK;
 		}
 	}
 
-	if (index)
-		*index = saveIndex;
-	if (next) {
+	if (_index)
+		*_index = saveIndex;
+	if (_next) {
 		if (saveIndex == node->NumKeys())
-			*next = node->OverflowLink();
+			*_next = node->OverflowLink();
 		else
-			*next = BFS_ENDIAN_TO_HOST_INT64(values[saveIndex]);
+			*_next = BFS_ENDIAN_TO_HOST_INT64(values[saveIndex]);
 	}
 	return B_ENTRY_NOT_FOUND;
 }
@@ -668,7 +668,7 @@ BPlusTree::SeekDown(Stack<node_and_key> &stack, const uint8 *key, uint16 keyLeng
 
 		off_t nextOffset;
 		status_t status = FindKey(node, key, keyLength, &nodeAndKey.keyIndex, &nextOffset);
-		
+
 		if (status == B_ENTRY_NOT_FOUND && nextOffset == nodeAndKey.nodeOffset)
 			RETURN_ERROR(B_ERROR);
 
@@ -677,7 +677,9 @@ BPlusTree::SeekDown(Stack<node_and_key> &stack, const uint8 *key, uint16 keyLeng
 
 		nodeAndKey.nodeOffset = nextOffset;
 	}
-	RETURN_ERROR(B_ERROR);
+
+	FATAL(("BPlusTree::SeekDown() could not open node %Ld\n", nodeAndKey.nodeOffset));
+	return B_ERROR;
 }
 
 
