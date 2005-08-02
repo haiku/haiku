@@ -66,7 +66,7 @@ interrupts_enabled(void)
 status_t
 int_init(kernel_args *args)
 {
-	dprintf("init_int_handlers: entry\n");
+	TRACE(("init_int_handlers: entry\n"));
 
 	return arch_int_init(args);
 }
