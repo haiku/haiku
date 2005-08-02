@@ -182,6 +182,10 @@ AtomBase *getAtom(BPositionIO *pStream)
 		return new CMVDAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
 	}
 
+	if (aAtomType == uint32('esds')) {
+		return new ESDSAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
+	}
+
 	return new AtomBase(pStream, aStreamOffset, aAtomType, aRealAtomSize);
 	
 }
@@ -693,7 +697,7 @@ void STSZAtom::OnProcessMetaData()
 	theStream->Read(&SampleSize,sizeof(uint32));
 	theStream->Read(&SampleCount,sizeof(uint32));
 
-	SampleSize = B_BENDIAN_TO_HOST_INT32(SampleCount);
+	SampleSize = B_BENDIAN_TO_HOST_INT32(SampleSize);
 	SampleCount = B_BENDIAN_TO_HOST_INT32(SampleCount);
 	
 	// If the sample size is constant there is no array and NoEntries seems to contain bad values
@@ -885,16 +889,55 @@ uint64	STCOAtom::getOffsetForChunk(uint32 pChunkID)
 	DEBUGGER(("Bad Chunk ID %ld / %ld\n",pChunkID,theHeader.NoEntries));
 
 	TRESPASS();
-	return theChunkToOffsetArray[0]->Offset;
+	return -1LL;
+}
+
+ESDSAtom::ESDSAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
+{
+	theVOL = NULL;
+}
+
+ESDSAtom::~ESDSAtom()
+{
+	if (theVOL) {
+		free(theVOL);
+	}
+}
+
+void ESDSAtom::OnProcessMetaData()
+{
+	theVOL = (uint8 *)(malloc(getBytesRemaining()));
+	theStream->Read(theVOL,getBytesRemaining());
+}
+
+uint8 *ESDSAtom::getVOL()
+{
+	return theVOL;
+}
+
+char *ESDSAtom::OnGetAtomName()
+{
+	return "Extended Sample Description Atom";
 }
 
 STSDAtom::STSDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : FullAtom(pStream, pstreamOffset, patomType, patomSize)
 {
 	theHeader.NoEntries = 0;
+	theAudioDescription.theVOL = NULL;
+	theVideoDescription.theVOL = NULL;
 }
 
 STSDAtom::~STSDAtom()
 {
+	if (theAudioDescription.theVOL) {
+		free(theAudioDescription.theVOL);
+		theAudioDescription.theVOL = NULL;
+	}
+	
+	if (theVideoDescription.theVOL) {
+		free(theVideoDescription.theVOL);
+		theVideoDescription.theVOL = NULL;
+	}
 }
 
 uint32	STSDAtom::getMediaHandlerType()
@@ -902,18 +945,48 @@ uint32	STSDAtom::getMediaHandlerType()
 	return dynamic_cast<STBLAtom *>(getParent())->getMediaHandlerType();
 }
 
+void STSDAtom::ReadESDS(uint8 **VOL, size_t *VOLSize)
+{
+	// Check for a esds and if it exists read it into the VOL buffer
+	// MPEG-4 video/audio use the esds to store the VOL (STUPID COMMITTEE IDEA)
+	
+	// First make sure we have a esds
+	if (getBytesRemaining() > 0) {
+		// Well something is there so read it as an atom
+		AtomBase *aAtomBase = getAtom(theStream);
+	
+		aAtomBase->ProcessMetaData();
+		printf("%s [%Ld]\n",aAtomBase->getAtomName(),aAtomBase->getAtomSize());
+
+		if (dynamic_cast<ESDSAtom *>(aAtomBase)) {
+			// ESDS atom good
+			*VOLSize = aAtomBase->getDataSize();
+			*VOL = (uint8 *)(malloc(*VOLSize));
+			memcpy(*VOL,dynamic_cast<ESDSAtom *>(aAtomBase)->getVOL(),*VOLSize);
+
+			delete aAtomBase;
+		} else {
+			// Unknown atom bad
+			delete aAtomBase;
+		}
+	}
+}
+
 void STSDAtom::ReadSoundDescription()
 {
-	theStream->Read(&theAudioDescription.theAudioSampleEntry,sizeof(AudioSampleEntry));
+	theStream->Read(&theAudioDescription.theAudioSampleEntry,AudioSampleEntrySize);
 
 	theAudioDescription.theAudioSampleEntry.ChannelCount = B_BENDIAN_TO_HOST_INT16(theAudioDescription.theAudioSampleEntry.ChannelCount);
 	theAudioDescription.theAudioSampleEntry.SampleSize = B_BENDIAN_TO_HOST_INT16(theAudioDescription.theAudioSampleEntry.SampleSize);
 	theAudioDescription.theAudioSampleEntry.SampleRate = B_BENDIAN_TO_HOST_INT32(theAudioDescription.theAudioSampleEntry.SampleRate);
+
+	ReadESDS(&theAudioDescription.theVOL,&theAudioDescription.VOLSize);
 }
 
 void STSDAtom::ReadVideoDescription()
 {
-	theStream->Read(&theVideoDescription.theVideoSampleEntry,sizeof(VideoSampleEntry));
+	// Hmm VideoSampleEntry is 70 bytes but the struct is 72 bytes stupid padding
+	theStream->Read(&theVideoDescription.theVideoSampleEntry,VideoSampleEntrySize);
 
 	theVideoDescription.theVideoSampleEntry.Width = B_BENDIAN_TO_HOST_INT16(theVideoDescription.theVideoSampleEntry.Width);
 	theVideoDescription.theVideoSampleEntry.Height = B_BENDIAN_TO_HOST_INT16(theVideoDescription.theVideoSampleEntry.Height);
@@ -924,10 +997,12 @@ void STSDAtom::ReadVideoDescription()
 	
 	// convert from pascal string (first bytes size) to C string (null terminated)
 	uint8 size = (uint8)(theVideoDescription.theVideoSampleEntry.CompressorName[0]);
-	memcpy(&theVideoDescription.theVideoSampleEntry.CompressorName[0],&theVideoDescription.theVideoSampleEntry.CompressorName[1],size);
-	theVideoDescription.theVideoSampleEntry.CompressorName[size] = '\0';
+	if (size > 0) {
+		memcpy(&theVideoDescription.theVideoSampleEntry.CompressorName[0],&theVideoDescription.theVideoSampleEntry.CompressorName[1],size);
+		theVideoDescription.theVideoSampleEntry.CompressorName[size] = '\0';
+	}
 	
-	printf("Compressor Name %s\n",theVideoDescription.theVideoSampleEntry.CompressorName);
+	ReadESDS(&theVideoDescription.theVOL,&theVideoDescription.VOLSize);
 }
 
 void STSDAtom::OnProcessMetaData()
@@ -1119,7 +1194,13 @@ void MDATAtom::OnProcessMetaData()
 
 char *MDATAtom::OnGetAtomName()
 {
+	printf("Offset %lld, Size %lld ",getStreamOffset(),getAtomSize());
 	return "Media Data Atom";
+}
+
+off_t	MDATAtom::getEOF()
+{
+	return getStreamOffset() + getAtomSize();
 }
 
 MINFAtom::MINFAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomContainer(pStream, pstreamOffset, patomType, patomSize)

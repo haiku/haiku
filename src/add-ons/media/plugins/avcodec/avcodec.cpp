@@ -263,6 +263,11 @@ avCodec::NegotiateOutputFormat(media_format *inout_format)
 		ffc->width = fOutputVideoFormat.display.line_width;
 		ffc->height = fOutputVideoFormat.display.line_count;
 		ffc->frame_rate = (int)(fOutputVideoFormat.field_rate * ffc->frame_rate_base);
+		
+		if (fInputFormat.MetaDataSize() > 0) {
+			ffc->extradata = (void *)fInputFormat.MetaData();
+			ffc->extradata_size = fInputFormat.MetaDataSize();
+		}
 
 		printf("#### requested video format 0x%x\n", inout_format->u.raw_video.display.format);
 

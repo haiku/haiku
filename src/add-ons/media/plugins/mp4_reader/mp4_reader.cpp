@@ -339,15 +339,17 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 		format->user_data_type = B_CODEC_TYPE_INFO;
 		*(uint32 *)format->user_data = audio_format->compression; format->user_data[4] = 0;
 		
-		// put the Audio struct, including extra data, into the format meta data.
-		size_t size;
-		const void *data = theFileReader->AudioFormat(cookie->stream, &size);
+		// Set the VOL
+		size_t size = audio_format->VOLSize;
+		const void *data = audio_format->theVOL;
 		format->SetMetaData(data, size);
 
 #ifdef TRACE_MP4_READER
-		uint8 *p = 18 + (uint8 *)data;
-		TRACE("extra_data: %ld: %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
-			size - 18, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9]);
+		if (data) {
+			uint8 *p = (uint8 *)data;
+			TRACE("extra_data: %ld: %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
+				size , p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9]);
+		}
 #endif
 	
 		return B_OK;
@@ -403,6 +405,7 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 			
 		format->user_data_type = B_CODEC_TYPE_INFO;
 		*(uint32 *)format->user_data = description.u.quicktime.codec; format->user_data[4] = 0;
+		
 		format->u.encoded_video.max_bit_rate = 8 * theFileReader->MovMainHeader()->max_bytes_per_sec;
 		format->u.encoded_video.avg_bit_rate = format->u.encoded_video.max_bit_rate / 2; // XXX fix this
 		format->u.encoded_video.output.field_rate = cookie->frames_per_sec_rate / (float)cookie->frames_per_sec_scale;
@@ -422,6 +425,19 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 		
 		TRACE("max_bit_rate %.3f\n", format->u.encoded_video.max_bit_rate);
 		TRACE("field_rate   %.3f\n", format->u.encoded_video.output.field_rate);
+
+		// Set the VOL
+		size_t size = video_format->VOLSize;
+		const void *data = video_format->theVOL;
+		format->SetMetaData(data, size);
+
+#ifdef TRACE_MP4_READER
+		if (data) {
+			uint8 *p = (uint8 *)data;
+			TRACE("extra_data: %ld: %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
+				size, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9]);
+		}
+#endif
 
 		return B_OK;
 	}

@@ -5,4 +5,5 @@ StaticLibrary mp4reader :
 	MP4FileReader.cpp
 	MP4Atom.cpp
 	MP4TrakAtom.cpp
+	ChunkSuperIndex.cpp
 ;

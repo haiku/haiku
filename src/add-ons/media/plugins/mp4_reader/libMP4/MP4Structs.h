@@ -79,7 +79,10 @@ struct VideoMetaData
 	uint32 image_size;
 	uint32 HorizontalResolution;
 	uint32 VerticalResolution;
+	uint32 FrameCount;
 	float FrameRate;
+	uint8 *theVOL;
+	size_t VOLSize;
 };
 
 struct AudioMetaData
@@ -89,6 +92,8 @@ struct AudioMetaData
 	uint16 SampleSize;		// bits per sample
 	float SampleRate;		// Samples per second (OR Frames per second)
 	uint32 PacketSize;		// (Sample Rate * NoOfchannels * SampleSize)/8 = bytes per second
+	uint8 *theVOL;
+	size_t VOLSize;
 };
 
 struct TimeToSample {
@@ -225,6 +230,8 @@ struct SampleEntry {
 	uint16	DataReference;
 };
 
+#define SampleEntrySize sizeof(SampleEntry)
+
 struct AudioSampleEntry {
 	uint32	Reserved[2];
 	uint16	ChannelCount;
@@ -234,9 +241,13 @@ struct AudioSampleEntry {
 	uint32	SampleRate;		// 16.16
 };
 
+#define AudioSampleEntrySize sizeof(AudioSampleEntry)
+
 struct AudioDescription {
 	AudioSampleEntry	theAudioSampleEntry;
 	uint32				codecid;
+	uint8				*theVOL;
+	size_t				VOLSize;
 };
 
 struct VideoSampleEntry {
@@ -254,7 +265,11 @@ struct VideoSampleEntry {
 	uint16	pre_defined3;
 };
 
+#define VideoSampleEntrySize 70
+
 struct VideoDescription {
 	VideoSampleEntry	theVideoSampleEntry;
 	uint32				codecid;
+	uint8				*theVOL;
+	size_t				VOLSize;
 };

@@ -235,7 +235,7 @@ AtomBase *aAtomBase;
 		return bytespersample;
 	}
 	
-	// calculate bytes per frame and cache it
+	// calculate bytes per sample and cache it
 	
 	if (IsAudio()) {
 		// only used by Audio

@@ -218,6 +218,7 @@ public:
 	char	*OnGetAtomName();
 	
 	uint64	getOffsetForChunk(uint32 pChunkID);
+	uint32	getTotalChunks() {return theHeader.NoEntries;};
 
 protected:
 	// Read a single chunk offset from Stream
@@ -294,7 +295,19 @@ public:
 	virtual	~MDATAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
+	off_t	getEOF();
+};
+
+class ESDSAtom : public AtomBase {
+public:
+			ESDSAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+	virtual	~ESDSAtom();
+	void	OnProcessMetaData();
+	char	*OnGetAtomName();
 	
+	uint8	*getVOL();
+private:
+	uint8	*theVOL;
 };
 
 // Atom class for reading the sdst atom
@@ -311,11 +324,13 @@ public:
 private:
 	uint32	getMediaHandlerType();
 
+	void	ReadESDS(uint8 **VOL, size_t *VOLSize);
 	void	ReadSoundDescription();
 	void	ReadVideoDescription();
 
+	
 	uint32	codecid;
-
+	
 	array_header		theHeader;
 	SampleEntry			theSampleEntry;
 	AudioDescription	theAudioDescription;
@@ -410,10 +425,14 @@ public:
 	uint32	getFirstSampleInChunk(uint32 pChunkID);
 	uint32	getSizeForSample(uint32 pSample);
 	uint32	getNoSamplesInChunk(uint32 pChunkID);
+	uint32	getTotalChunks();
+	
 	bool	IsSyncSample(uint32 pSampleNo);
 	bool	IsSingleSampleSize();
 	bool	IsActive();
 	
+	uint32	getBytesPerSample();
+
 	TKHDAtom	*getTKHDAtom();
 	MDHDAtom	*getMDHDAtom();
 private:
@@ -421,6 +440,7 @@ private:
 	MDHDAtom	*theMDHDAtom;
 	
 	uint32		framecount;
+	uint32		bytespersample;
 };
 
 // Atom class for reading the media container atom

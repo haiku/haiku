@@ -29,6 +29,7 @@ TRAKAtom::TRAKAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, 
 	theTKHDAtom = NULL;
 	theMDHDAtom = NULL;
 	framecount = 0;
+	bytespersample = 0;
 }
 
 TRAKAtom::~TRAKAtom()
@@ -224,6 +225,42 @@ bool	TRAKAtom::IsSingleSampleSize()
 bool	TRAKAtom::IsActive()
 {
 	return getTKHDAtom()->IsActive();
+}
+
+uint32	TRAKAtom::getBytesPerSample()
+{
+AtomBase *aAtomBase;
+
+	if (bytespersample > 0) {
+		return bytespersample;
+	}
+	
+	// calculate bytes per sample and cache it
+	
+	if (IsAudio()) {
+		// only used by Audio
+		aAtomBase = GetChildAtom(uint32('stsd'),0);
+		if (aAtomBase) {
+			STSDAtom *aSTSDAtom = dynamic_cast<STSDAtom *>(aAtomBase);
+
+			AudioDescription aAudioDescription = aSTSDAtom->getAsAudio();
+
+			bytespersample = aAudioDescription.theAudioSampleEntry.SampleSize / 8;
+		}
+	}
+	
+	return bytespersample;	
+}
+
+uint32	TRAKAtom::getTotalChunks()
+{
+	AtomBase *aAtomBase = GetChildAtom(uint32('stco'),0);
+	
+	if (aAtomBase) {
+		return (dynamic_cast<STCOAtom *>(aAtomBase))->getTotalChunks();
+	}
+	
+	return 0;
 }
 
 // GetAudioMetaData()	// If this is a audio track get the audio meta data

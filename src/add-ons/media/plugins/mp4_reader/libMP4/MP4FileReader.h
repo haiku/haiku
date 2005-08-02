@@ -31,6 +31,7 @@
 #include <SupportDefs.h>
 
 #include "MP4Parser.h"
+#include "ChunkSuperIndex.h"
 
 // MP4 file reader 
 class MP4FileReader {
@@ -56,6 +57,10 @@ private:
 	
 	MVHDAtom	*theMVHDAtom;
 
+	ChunkSuperIndex	theChunkSuperIndex;
+	
+	void	BuildSuperIndex();
+
 public:
 			MP4FileReader(BPositionIO *pStream);
 	virtual	~MP4FileReader();
@@ -65,6 +70,7 @@ public:
 
 	bool	IsEndOfFile(off_t pPosition);
 	bool	IsEndOfFile();
+	bool	IsEndOfData(off_t pPosition);
 	
 	// Is this a quicktime file
 	static bool	IsSupported(BPositionIO *source);
