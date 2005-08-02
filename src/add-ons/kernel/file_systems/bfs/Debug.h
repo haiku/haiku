@@ -69,8 +69,9 @@
 	#define ASSERT(x) { if (!(x)) DEBUGGER(("bfs: assert failed: " #x "\n")); }
 #else
 	#define PRINT(x) ;
-	#define REPORT_ERROR(status) ;
-	#define RETURN_ERROR(status) return status;
+	#define REPORT_ERROR(status) \
+		__out("bfs: %s:%d: %s\n", __FUNCTION__, __LINE__, strerror(status));
+	#define RETURN_ERROR(err) { status_t _status = err; if (_status < B_OK) REPORT_ERROR(_status); return _status;}
 	#define FATAL(x) { __out("bfs: "); __out x; sync(); panic("BFS!\n"); }
 	#define INFORM(x) { __out("bfs: "); __out x; }
 	#define FUNCTION() ;
