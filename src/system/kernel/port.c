@@ -222,7 +222,7 @@ dump_port_list(int argc, char **argv)
 
 	for (i = 0; i < sMaxPorts; i++) {
 		if (sPorts[i].id >= 0)
-			dprintf("%p\tid: 0x%lx\t\tname: '%s'\n", &sPorts[i], sPorts[i].id, sPorts[i].name);
+			kprintf("%p\tid: 0x%lx\t\tname: '%s'\n", &sPorts[i], sPorts[i].id, sPorts[i].name);
 	}
 	return 0;
 }
@@ -233,15 +233,15 @@ _dump_port_info(struct port_entry *port)
 {
 	int32 count;
 
-	dprintf("PORT: %p\n", port);
-	dprintf(" name:            \"%s\"\n", port->name);
-	dprintf(" owner:           %#lx\n", port->owner);
-	dprintf(" capacity:        %ld\n", port->capacity);
+	kprintf("PORT: %p\n", port);
+	kprintf(" name:            \"%s\"\n", port->name);
+	kprintf(" owner:           %#lx\n", port->owner);
+	kprintf(" capacity:        %ld\n", port->capacity);
  	get_sem_count(port->read_sem, &count);
- 	dprintf(" read sem count:  %ld\n", count);
+ 	kprintf(" read sem count:  %ld\n", count);
  	get_sem_count(port->write_sem, &count);
-	dprintf(" write sem count: %ld\n", count);
-	dprintf(" total count:     %ld\n", port->total_count);
+	kprintf(" write sem count: %ld\n", count);
+	kprintf(" total count:     %ld\n", port->total_count);
 }
 
 
@@ -251,7 +251,7 @@ dump_port_info(int argc, char **argv)
 	int i;
 
 	if (argc < 2) {
-		dprintf("usage: port [id|name|address]\n");
+		kprintf("usage: port [id|name|address]\n");
 		return 0;
 	}
 
@@ -267,7 +267,7 @@ dump_port_info(int argc, char **argv)
 		} else {
 			unsigned slot = num % sMaxPorts;
 			if (sPorts[slot].id != (int)num) {
-				dprintf("port 0x%lx doesn't exist!\n", num);
+				kprintf("port 0x%lx doesn't exist!\n", num);
 				return 0;
 			}
 			_dump_port_info(&sPorts[slot]);

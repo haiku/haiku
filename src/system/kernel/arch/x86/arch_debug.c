@@ -64,28 +64,28 @@ stack_trace(int argc, char **argv)
 		else
 			frameStack = &gBootFrameStack;
 	} else {
-		dprintf("not supported\n");
+		kprintf("not supported\n");
 		return 0;
 	}
 
 	for (i = 0; i < frameStack->index; i++) {
-		dprintf("iframe %p (end = %p)\n",
+		kprintf("iframe %p (end = %p)\n",
 			frameStack->frames[i], frameStack->frames[i] + 1);
 	}
 
 	// We don't have a thread pointer early in the boot process
 	if (thread != NULL) {
-		dprintf("stack trace for thread 0x%lx \"%s\"\n", thread->id, thread->name);
+		kprintf("stack trace for thread 0x%lx \"%s\"\n", thread->id, thread->name);
 
-		dprintf("    kernel stack: %p to %p\n", 
+		kprintf("    kernel stack: %p to %p\n", 
 			(void *)thread->kernel_stack_base, (void *)(thread->kernel_stack_base + KERNEL_STACK_SIZE));
 		if (thread->user_stack_base != 0) {
-			dprintf("      user stack: %p to %p\n", (void *)thread->user_stack_base,
+			kprintf("      user stack: %p to %p\n", (void *)thread->user_stack_base,
 				(void *)(thread->user_stack_base + thread->user_stack_size));
 		}
 	}
 
-	dprintf("frame            caller     <image>:function + offset\n");
+	kprintf("frame            caller     <image>:function + offset\n");
 
 	read_ebp(ebp);
 	for (;;) {
@@ -101,18 +101,18 @@ stack_trace(int argc, char **argv)
 		if (isIFrame) {
 			struct iframe *frame = (struct iframe *)(ebp + 8);
 
-			dprintf("iframe at %p\n", frame);
-			dprintf(" eax 0x%-9x    ebx 0x%-9x     ecx 0x%-9x  edx 0x%x\n",
+			kprintf("iframe at %p\n", frame);
+			kprintf(" eax 0x%-9x    ebx 0x%-9x     ecx 0x%-9x  edx 0x%x\n",
 				frame->eax, frame->ebx, frame->ecx, frame->edx);
-			dprintf(" esi 0x%-9x    edi 0x%-9x     ebp 0x%-9x  esp 0x%x\n",
+			kprintf(" esi 0x%-9x    edi 0x%-9x     ebp 0x%-9x  esp 0x%x\n",
 				frame->esi, frame->edi, frame->ebp, frame->esp);
-			dprintf(" eip 0x%-9x eflags 0x%-9x", frame->eip, frame->flags);
+			kprintf(" eip 0x%-9x eflags 0x%-9x", frame->eip, frame->flags);
 			if ((frame->error_code & 0x4) != 0) {
 				// from user space
-				dprintf("user esp 0x%x", frame->user_esp);
+				kprintf("user esp 0x%x", frame->user_esp);
 			}
-			dprintf("\n");
-			dprintf(" vector: 0x%x, error code: 0x%x\n", frame->vector, frame->error_code);
+			kprintf("\n");
+			kprintf(" vector: 0x%x, error code: 0x%x\n", frame->vector, frame->error_code);
  			ebp = frame->ebp;
 		} else {
 			addr_t eip = ((struct stack_frame *)ebp)->return_address;
@@ -128,20 +128,20 @@ stack_trace(int argc, char **argv)
 			if (elf_lookup_symbol_address(eip, &baseAddress, &symbol,
 					&image, &exactMatch) == B_OK) {
 				if (symbol != NULL) {
-					dprintf("%08lx (+%4ld) %08lx   <%s>:%s + 0x%04lx%s\n", ebp, diff, eip,
+					kprintf("%08lx (+%4ld) %08lx   <%s>:%s + 0x%04lx%s\n", ebp, diff, eip,
 						image, symbol, eip - baseAddress, exactMatch ? "" : " (nearest)");
 				} else {
-					dprintf("%08lx (+%4ld) %08lx   <%s@%p>:unknown + 0x%04lx\n", ebp, diff, eip,
+					kprintf("%08lx (+%4ld) %08lx   <%s@%p>:unknown + 0x%04lx\n", ebp, diff, eip,
 						image, (void *)baseAddress, eip - baseAddress);
 				}
 			} else
-				dprintf("%08lx   %08lx\n", ebp, eip);
+				kprintf("%08lx   %08lx\n", ebp, eip);
 
 			ebp = nextEbp;
 		}
 
 		if (already_visited(previousLocations, &last, &num, ebp)) {
-			dprintf("circular stack frame: %p!\n", (void *)ebp);
+			kprintf("circular stack frame: %p!\n", (void *)ebp);
 			break;
 		}
 		if (ebp == 0)

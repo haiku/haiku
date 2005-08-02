@@ -148,17 +148,17 @@ dump_address_info(int argc, char **argv)
 	addr_t address, baseAddress;
 
 	if (argc < 2) {
-		dprintf("not enough arguments\n");
+		kprintf("not enough arguments\n");
 		return 0;
 	}
 
 	address = strtoul(argv[1], NULL, 16);
 
 	if (elf_lookup_symbol_address(address, &baseAddress, &symbol, &imageName, &exactMatch) == B_OK) {
-		dprintf("%p = %s + 0x%lx (%s)%s\n", (void *)address, symbol, address - baseAddress,
+		kprintf("%p = %s + 0x%lx (%s)%s\n", (void *)address, symbol, address - baseAddress,
 			imageName, exactMatch ? "" : " (nearest)");
 	} else
-		dprintf("There is no image loaded at this address!\n");
+		kprintf("There is no image loaded at this address!\n");
 
 	return 0;
 }
@@ -281,11 +281,11 @@ dump_symbols(int argc, char **argv)
 				hash_close(sImagesHash, &iterator, false);
 	
 				if (image == NULL)
-					dprintf("No image covers 0x%lx in the kernel!\n", num);
+					kprintf("No image covers 0x%lx in the kernel!\n", num);
 			} else {
 				image = hash_lookup(sImagesHash, (void *)num);
 				if (image == NULL)
-					dprintf("image 0x%lx doesn't exist in the kernel!\n", num);
+					kprintf("image 0x%lx doesn't exist in the kernel!\n", num);
 			}
 		} else {
 			// look for image by name
@@ -297,10 +297,10 @@ dump_symbols(int argc, char **argv)
 			hash_close(sImagesHash, &iterator, false);
 
 			if (image == NULL)
-				dprintf("No image \"%s\" found in kernel!\n", argv[1]);
+				kprintf("No image \"%s\" found in kernel!\n", argv[1]);
 		}
 	} else {
-		dprintf("usage: %s image_name/image_id/address_in_image\n", argv[0]);
+		kprintf("usage: %s image_name/image_id/address_in_image\n", argv[0]);
 		return 0;
 	}
 
@@ -309,7 +309,7 @@ dump_symbols(int argc, char **argv)
 
 	// dump symbols
 
-	dprintf("Symbols of image %ld \"%s\":\nAddress  Type       Size Name\n", image->id, image->name);
+	kprintf("Symbols of image %ld \"%s\":\nAddress  Type       Size Name\n", image->id, image->name);
 
 	if (image->num_debug_symbols > 0) {
 		// search extended debug symbol table (contains static symbols)
@@ -320,7 +320,7 @@ dump_symbols(int argc, char **argv)
 				|| symbol->st_size >= image->text_region.size + image->data_region.size)
 				continue;
 
-			dprintf("%08lx %s/%s %5ld %s\n", symbol->st_value + image->text_region.delta,
+			kprintf("%08lx %s/%s %5ld %s\n", symbol->st_value + image->text_region.delta,
 				get_symbol_type_string(symbol), get_symbol_bind_string(symbol), symbol->st_size,
 				image->debug_string_table + symbol->st_name);
 		}
@@ -336,7 +336,7 @@ dump_symbols(int argc, char **argv)
 					|| symbol->st_size >= image->text_region.size + image->data_region.size)
 					continue;
 
-				dprintf("%08lx %s/%s %5ld %s\n", symbol->st_value + image->text_region.delta,
+				kprintf("%08lx %s/%s %5ld %s\n", symbol->st_value + image->text_region.delta,
 					get_symbol_type_string(symbol), get_symbol_bind_string(symbol),
 					symbol->st_size, SYMNAME(image, symbol));
 			}
@@ -350,34 +350,34 @@ dump_symbols(int argc, char **argv)
 static void
 dump_elf_region(struct elf_region *region, const char *name)
 {
-	dprintf("   %s.id 0x%lx\n", name, region->id);
-	dprintf("   %s.start 0x%lx\n", name, region->start);
-	dprintf("   %s.size 0x%lx\n", name, region->size);
-	dprintf("   %s.delta %ld\n", name, region->delta);
+	kprintf("   %s.id 0x%lx\n", name, region->id);
+	kprintf("   %s.start 0x%lx\n", name, region->start);
+	kprintf("   %s.size 0x%lx\n", name, region->size);
+	kprintf("   %s.delta %ld\n", name, region->delta);
 }
 
 
 static void
 dump_image_info(struct elf_image_info *image)
 {
-	dprintf("elf_image_info at %p:\n", image);
-	dprintf(" next %p\n", image->next);
-	dprintf(" id 0x%lx\n", image->id);
+	kprintf("elf_image_info at %p:\n", image);
+	kprintf(" next %p\n", image->next);
+	kprintf(" id 0x%lx\n", image->id);
 	dump_elf_region(&image->text_region, "text");
 	dump_elf_region(&image->data_region, "data");
-	dprintf(" dynamic_ptr 0x%lx\n", image->dynamic_ptr);
-	dprintf(" needed %p\n", image->needed);
-	dprintf(" symhash %p\n", image->symhash);
-	dprintf(" syms %p\n", image->syms);
-	dprintf(" strtab %p\n", image->strtab);
-	dprintf(" rel %p\n", image->rel);
-	dprintf(" rel_len 0x%x\n", image->rel_len);
-	dprintf(" rela %p\n", image->rela);
-	dprintf(" rela_len 0x%x\n", image->rela_len);
-	dprintf(" pltrel %p\n", image->pltrel);
-	dprintf(" pltrel_len 0x%x\n", image->pltrel_len);
+	kprintf(" dynamic_ptr 0x%lx\n", image->dynamic_ptr);
+	kprintf(" needed %p\n", image->needed);
+	kprintf(" symhash %p\n", image->symhash);
+	kprintf(" syms %p\n", image->syms);
+	kprintf(" strtab %p\n", image->strtab);
+	kprintf(" rel %p\n", image->rel);
+	kprintf(" rel_len 0x%x\n", image->rel_len);
+	kprintf(" rela %p\n", image->rela);
+	kprintf(" rela_len 0x%x\n", image->rela_len);
+	kprintf(" pltrel %p\n", image->pltrel);
+	kprintf(" pltrel_len 0x%x\n", image->pltrel_len);
 	
-	dprintf(" debug_symbols %p (%ld)\n", image->debug_symbols, image->num_debug_symbols);
+	kprintf(" debug_symbols %p (%ld)\n", image->debug_symbols, image->num_debug_symbols);
 }
 
 
@@ -397,19 +397,19 @@ dump_image(int argc, char **argv)
 		} else {
 			image = hash_lookup(sImagesHash, (void *)num);
 			if (image == NULL)
-				dprintf("image 0x%lx doesn't exist in the kernel!\n", num);
+				kprintf("image 0x%lx doesn't exist in the kernel!\n", num);
 			else
 				dump_image_info(image);
 		}
 		return 0;
 	}
 
-	dprintf("loaded kernel images:\n");
+	kprintf("loaded kernel images:\n");
 
 	hash_open(sImagesHash, &iterator);
 
 	while ((image = hash_next(sImagesHash, &iterator)) != NULL) {
-		dprintf("%p (%ld) %s\n", image, image->id, image->name);
+		kprintf("%p (%ld) %s\n", image, image->id, image->name);
 	}
 
 	hash_close(sImagesHash, &iterator, false);
@@ -423,14 +423,14 @@ static
 void dump_symbol(struct elf_image_info *image, struct Elf32_Sym *sym)
 {
 
-	dprintf("symbol at %p, in image %p\n", sym, image);
+	kprintf("symbol at %p, in image %p\n", sym, image);
 
-	dprintf(" name index %d, '%s'\n", sym->st_name, SYMNAME(image, sym));
-	dprintf(" st_value 0x%x\n", sym->st_value);
-	dprintf(" st_size %d\n", sym->st_size);
-	dprintf(" st_info 0x%x\n", sym->st_info);
-	dprintf(" st_other 0x%x\n", sym->st_other);
-	dprintf(" st_shndx %d\n", sym->st_shndx);
+	kprintf(" name index %d, '%s'\n", sym->st_name, SYMNAME(image, sym));
+	kprintf(" st_value 0x%x\n", sym->st_value);
+	kprintf(" st_size %d\n", sym->st_size);
+	kprintf(" st_info 0x%x\n", sym->st_info);
+	kprintf(" st_other 0x%x\n", sym->st_other);
+	kprintf(" st_shndx %d\n", sym->st_shndx);
 }
 #endif
 

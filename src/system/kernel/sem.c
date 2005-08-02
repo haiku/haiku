@@ -86,7 +86,7 @@ dump_sem_list(int argc, char **argv)
 
 	for (i = 0; i < sMaxSems; i++) {
 		if (sSems[i].id >= 0)
-			dprintf("%p\tid: 0x%lx\t\tname: '%s'\n", &sSems[i], sSems[i].id,
+			kprintf("%p\tid: 0x%lx\t\tname: '%s'\n", &sSems[i], sSems[i].id,
 					sSems[i].u.used.name);
 	}
 	return 0;
@@ -96,17 +96,17 @@ dump_sem_list(int argc, char **argv)
 static void
 dump_sem(struct sem_entry *sem)
 {
-	dprintf("SEM:     %p\n", sem);
-	dprintf("id:      %ld\n", sem->id);
+	kprintf("SEM:     %p\n", sem);
+	kprintf("id:      %ld\n", sem->id);
 	if (sem->id >= 0) {
-		dprintf("name:    '%s'\n", sem->u.used.name);
-		dprintf("owner:   0x%lx\n", sem->u.used.owner);
-		dprintf("count:   0x%x\n", sem->u.used.count);
-		dprintf("queue:   head %p tail %p\n", sem->u.used.queue.head,
+		kprintf("name:    '%s'\n", sem->u.used.name);
+		kprintf("owner:   0x%lx\n", sem->u.used.owner);
+		kprintf("count:   0x%x\n", sem->u.used.count);
+		kprintf("queue:   head %p tail %p\n", sem->u.used.queue.head,
 				sem->u.used.queue.tail);
 	} else {
-		dprintf("next:    %p\n", sem->u.unused.next);
-		dprintf("next_id: %ld\n", sem->u.unused.next_id);
+		kprintf("next:    %p\n", sem->u.unused.next);
+		kprintf("next_id: %ld\n", sem->u.unused.next_id);
 	}
 }
 
@@ -117,7 +117,7 @@ dump_sem_info(int argc, char **argv)
 	int i;
 
 	if (argc < 2) {
-		dprintf("sem: not enough arguments\n");
+		kprintf("sem: not enough arguments\n");
 		return 0;
 	}
 
@@ -132,7 +132,7 @@ dump_sem_info(int argc, char **argv)
 		} else {
 			unsigned slot = num % sMaxSems;
 			if (sSems[slot].id != (int)num) {
-				dprintf("sem 0x%lx doesn't exist!\n", num);
+				kprintf("sem 0x%lx doesn't exist!\n", num);
 				return 0;
 			}
 			dump_sem(&sSems[slot]);
