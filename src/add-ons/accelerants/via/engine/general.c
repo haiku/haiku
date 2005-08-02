@@ -90,7 +90,7 @@ status_t eng_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku VIA Accelerant 0.08 running.\n"));
+	LOG(1,("POWERUP: Haiku VIA Accelerant 0.09 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -103,6 +103,13 @@ status_t eng_general_powerup()
 		si->ps.card_type = CLE3022;
 		si->ps.card_arch = CLE266;
 		LOG(4,("POWERUP: Detected VIA CLE266 Unichrome Pro (CLE3022)\n"));
+		status = engxx_general_powerup();
+		break;
+	case 0x31081106:
+		//fixme: card_type unknown..
+		si->ps.card_type = VT3204;
+		si->ps.card_arch = K8M800;
+		LOG(4,("POWERUP: Detected VIA K8M800 Unichrome Pro (unknown chiptype)\n"));
 		status = engxx_general_powerup();
 		break;
 	case 0x31221106:
@@ -445,6 +452,8 @@ status_t eng_general_head_select(bool cross)
  * Should work from VGA BIOS POST init state. */
 static status_t eng_general_bios_to_powergraphics()
 {
+	display_mode dummy;
+
 	/* let acc engine make power off/power on cycle to start 'fresh' */
 //	ENG_REG32(RG32_PWRUPCTRL) = 0x13110011;
 	snooze(1000);
@@ -453,8 +462,8 @@ static status_t eng_general_bios_to_powergraphics()
 //	ENG_REG32(RG32_PWRUPCTRL) = 0x13111111;
 
 	/* select colormode CRTC registers base adresses,
-	 * and select pixelclock source D (custom VIA programmable PLL) */
-	ENG_REG8(RG8_MISCW) = 0xcf;
+	 * but don't touch the current selected pixelclock source yet */
+	ENG_REG8(RG8_MISCW) = (((ENG_REG8(RG8_MISCR)) & 0x0c) | 0xc3);
 
 	/* unlock (extended) registers for R/W access */
 	SEQW(LOCK, 0x01);
@@ -520,10 +529,22 @@ static status_t eng_general_bios_to_powergraphics()
 	/* setup sequencer clocking mode */
 	SEQW(CLKMODE, 0x21);
 
+	/* playing it safe (I hope): */
 	/* reset primary pixelPLL */
 	SEQW(PLL_RESET, ((SEQR(PLL_RESET)) | 0x02));
 	snooze(1000);
 	SEQW(PLL_RESET, ((SEQR(PLL_RESET)) & ~0x02));
+	/* set some valid pixelclock PLL speed (using 40Mhz) */
+	dummy.timing.pixel_clock = 40000;
+	head1_set_pix_pll(dummy);
+	/* reset primary pixelPLL */
+	SEQW(PLL_RESET, ((SEQR(PLL_RESET)) | 0x02));
+	snooze(1000);
+	SEQW(PLL_RESET, ((SEQR(PLL_RESET)) & ~0x02));
+
+	/* now select pixelclock source D (the above custom VIA programmable PLL) */
+	snooze(1000);
+	ENG_REG8(RG8_MISCW) = 0xcf;
 
 	/* setup AGP:
 	 * Note:
