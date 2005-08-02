@@ -641,7 +641,8 @@ create_new_vnode(struct vnode **_vnode, mount_id mountID, vnode_id vnodeID)
 }
 
 
-/**	Frees the vnode and all resources it has acquired.
+/**	Frees the vnode and all resources it has acquired, and removes
+ *	it from the vnode hash as well as from its mount structure.
  *	Will also make sure that any cache modifications are written back.
  */
 
@@ -663,6 +664,12 @@ free_vnode(struct vnode *vnode, bool reenter)
 		else
 			FS_CALL(vnode, put_vnode)(vnode->mount->cookie, vnode->private_node, reenter);
 	}
+
+	// The file system has removed the resources of the vnode now, so we can
+	// make it available again (and remove the busy vnode from the hash)
+	mutex_lock(&sVnodeMutex);
+	hash_remove(sVnodeTable, vnode);
+	mutex_unlock(&sVnodeMutex);
 
 	// if we have a vm_cache attached, remove it
 	if (vnode->cache)
@@ -709,7 +716,6 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 		// Just insert the vnode into an unused list if we don't need
 		// to delete it
 		if (vnode->remove) {
-			hash_remove(sVnodeTable, vnode);
 			vnode->busy = true;
 			freeNode = true;
 		} else {
@@ -718,7 +724,6 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 				// there are too many unused vnodes so we free the oldest one
 				// ToDo: evaluate this mechanism
 				vnode = (struct vnode *)list_remove_head_item(&sUnusedVnodeList);
-				hash_remove(sVnodeTable, vnode);
 				vnode->busy = true;
 				freeNode = true;
 				sUnusedVnodes--;
@@ -1981,7 +1986,8 @@ get_new_fd(int type, struct fs_mount *mount, struct vnode *vnode,
 extern "C" status_t
 new_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode)
 {
-	FUNCTION(("new_vnode()\n"));
+	FUNCTION(("new_vnode(mountID = %ld, vnodeID = %Ld, node = %p)\n",
+		mountID, vnodeID, privateNode));
 
 	if (privateNode == NULL)
 		return B_BAD_VALUE;
@@ -2074,6 +2080,7 @@ extern "C" status_t
 remove_vnode(mount_id mountID, vnode_id vnodeID)
 {
 	struct vnode *vnode;
+	bool remove = false;
 
 	mutex_lock(&sVnodeMutex);
 
@@ -2081,13 +2088,20 @@ remove_vnode(mount_id mountID, vnode_id vnodeID)
 	if (vnode != NULL) {
 		vnode->remove = true;
 		if (vnode->unpublished) {
-			// if the vnode hasn't been published yet, we delete it here
-			atomic_add(&vnode->ref_count, -1);
-			free_vnode(vnode, true);
+			// prepare the vnode for deletion
+			vnode->busy = true;
+			remove = true;
 		}
 	}
 
 	mutex_unlock(&sVnodeMutex);
+	
+	if (remove) {
+		// if the vnode hasn't been published yet, we delete it here
+		atomic_add(&vnode->ref_count, -1);
+		free_vnode(vnode, true);
+	}
+
 	return B_OK;
 }
 
@@ -2771,7 +2785,7 @@ vfs_bootstrap_file_systems(void)
 	if (status < B_OK) {
 		// this is no fatal exception at this point, as we may mount
 		// a real on disk file system later
-		dprintf("error mounting bootfs\n");
+		dprintf("Can't mount bootfs (will try disk file system later)\n");
 	}
 
 	// create some standard links on the rootfs
@@ -4866,7 +4880,6 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 
 	while ((vnode = (struct vnode *)list_get_next_item(&mount->vnodes, vnode)) != NULL) {
 		vnode->busy = true;
-		hash_remove(sVnodeTable, vnode);
 	}
 
 	mutex_unlock(&sVnodeMutex);
@@ -4877,7 +4890,7 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 	// Free all vnodes associated with this mount.
 	// They will be removed from the mount list by free_vnode(), so
 	// we don't have to do this.
-	while ((vnode = (struct vnode *)list_get_next_item(&mount->vnodes, NULL)) != NULL) {
+	while ((vnode = (struct vnode *)list_get_first_item(&mount->vnodes)) != NULL) {
 		free_vnode(vnode, false);
 	}
 
