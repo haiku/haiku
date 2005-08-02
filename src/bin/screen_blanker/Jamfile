@@ -1,0 +1,11 @@
+SubDir OBOS_TOP src bin screen_blanker ;
+
+UsePrivateHeaders screen_saver ;
+
+BinCommand screen_blanker :
+	ScreenSaverApp.cpp
+	SSAwindow.cpp
+	pwWindow.cpp
+	: be game libscreensaver.so
+;
+

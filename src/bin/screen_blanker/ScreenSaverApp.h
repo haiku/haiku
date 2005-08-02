@@ -1,9 +1,12 @@
-#ifndef SCREEN_SAVER_H
-#define SCREEN_SAVER_H
+/*
+ * Copyright 2003, Michael Phipps. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
-#ifndef _APPLICATION_H
+#ifndef SCREEN_SAVER_APP_H
+#define SCREEN_SAVER_APP_H
+
 #include <Application.h>
-#endif
 #include "SSAwindow.h"
 #include "ScreenSaverPrefs.h"
 #include "ScreenSaverThread.h"
@@ -13,23 +16,23 @@ class ScreenSaverApp : public BApplication
 {
 public:
 	ScreenSaverApp();
-	bool LoadAddOn(void);
-	void ReadyToRun(void);
-//	bool QuitRequested(void);
-//	void Quit(void);
+	bool LoadAddOn();
+	void ReadyToRun();
+//	bool QuitRequested();
+//	void Quit();
 	virtual void MessageReceived(BMessage *message);
-	void ShowPW(void);
+	void ShowPW();
 private:
 	ScreenSaverPrefs fPref;
 	SSAwindow *fWin;
 	BScreenSaver *fSaver;
 	ScreenSaverThread *fThrd;
-	pwWindow *fPww;
+	PasswordWindow *fPww;
 
 	thread_id fThreadID;
 	uint32 fBlankTime;
 
-	void shutdown(void);
+	void Shutdown();
 };
 
-#endif //SCREEN_SAVER_H
+#endif //SCREEN_SAVER_APP_H
