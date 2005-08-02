@@ -9,6 +9,8 @@
  */
 
 
+#include "ps2.h"
+
 #include <KernelExport.h>
 #include <driver_settings.h>
 #include <int.h>
@@ -100,26 +102,43 @@ arch_debug_blue_screen_getchar(void)
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 	};	
+	enum keycodes {
+		LSHIFT = 42,
+		RSHIFT = 54,
+	};
 	static bool shift = false;
 	static uint8 last = 0;
 	uint8 key, ascii = 0;
 
-	do {
-		while ((key = in8(0x60)) == last)
-			;
-		last = key;
+	while (true) {
+		uint8 status = in8(PS2_PORT_CTRL);
+
+		if ((status & PS2_STATUS_OUTPUT_BUFFER_FULL) == 0) {
+			// no data in keyboard buffer
+			spin(200);
+			continue;
+		}
+
+		spin(200);
+		key = in8(PS2_PORT_DATA);
+
+		if (status & PS2_STATUS_MOUSE_DATA) {
+			// we read mouse data, ignore it
+			continue;
+		}
+
 		if (key & 0x80) {
-			if (key == (0x80 + 42) || key == (54 + 0x80))
+			// key up
+			if (key == (0x80 | LSHIFT) || key == (0x80 | RSHIFT))
 				shift = false;
 		} else {
-			if (key == 42 || key == 54)
+			// key down
+			if (key == LSHIFT || key == RSHIFT)
 				shift = true;
 			else
-				ascii = shift ? shifted_keymap[key] : unshifted_keymap[key];
+				return shift ? shifted_keymap[key] : unshifted_keymap[key];
 		}
-	} while (!ascii);
-
-	return ascii;
+	}
 }
 
 

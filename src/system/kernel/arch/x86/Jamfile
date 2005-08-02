@@ -1,7 +1,8 @@
 SubDir OBOS_TOP src system kernel arch x86 ;
 
-# for syscall_numbers.h
 SubDirHdrs [ FObjectsDir src system kernel ] ;
+	# for syscall_numbers.h
+SubDirHdrs $(OBOS_TOP) src add-ons kernel drivers input ps2_hid ;
 
 KernelStaticLibrary libx86 :
 	arch_cpu.c
