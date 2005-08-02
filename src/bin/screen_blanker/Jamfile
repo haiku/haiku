@@ -5,7 +5,11 @@ UsePrivateHeaders screen_saver ;
 BinCommand screen_blanker :
 	ScreenSaverApp.cpp
 	SSAwindow.cpp
-	pwWindow.cpp
+	PasswordWindow.cpp
+	ScreenSaver.cpp
 	: be game libscreensaver.so
 ;
 
+SEARCH on [ FGristFiles
+		ScreenSaver.cpp
+	] = [ FDirName $(OBOS_TOP) src kits screensaver ] ;

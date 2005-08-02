@@ -10,6 +10,8 @@
 #include <TextControl.h>
 #include <Button.h>
 
+const int32 UNLOCK_MESSAGE = 'ULMS';
+
 class PasswordWindow : public BWindow
 {
 	public:

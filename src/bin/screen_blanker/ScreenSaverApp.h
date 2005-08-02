@@ -10,7 +10,7 @@
 #include "SSAwindow.h"
 #include "ScreenSaverPrefs.h"
 #include "ScreenSaverThread.h"
-#include "pwWindow.h"
+#include "PasswordWindow.h"
 
 class ScreenSaverApp : public BApplication 
 {

@@ -5,7 +5,7 @@
 
 #include <Application.h>
 #include <Screen.h>
-#include "pwWindow.h"
+#include "PasswordWindow.h"
 
 
 void 
@@ -21,7 +21,7 @@ PasswordWindow::Setup()
 	BRect bounds(fBgd->Bounds());	
 	bounds.InsetBy(5,5);
 	
-	fCustomBox=new BBox(bounds,"custBeBox",B_FOLLOW_NONE);
+	fCustomBox = new BBox(bounds,"custBeBox",B_FOLLOW_NONE);
 	fCustomBox->SetLabel("Unlock screen saver");
 	fBgd->AddChild(fCustomBox);
 
@@ -29,7 +29,7 @@ PasswordWindow::Setup()
 	fPassword->SetDivider(100);
 	fCustomBox->AddChild(fPassword);
 
-	fUnlock=new BButton(BRect(160,70,255,85),"fUnlock","Unlock",new BMessage ('DONE'),B_FOLLOW_NONE);
+	fUnlock = new BButton(BRect(160,70,255,85), "fUnlock", "Unlock", new BMessage(UNLOCK_MESSAGE), B_FOLLOW_NONE);
 	fUnlock->SetTarget(NULL,be_app);
 	fCustomBox->AddChild(fUnlock);
 	fUnlock->MakeDefault(true);

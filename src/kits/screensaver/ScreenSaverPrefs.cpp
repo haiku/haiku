@@ -69,8 +69,9 @@ ScreenSaverPrefs::LoadSettings()
 					fPassword = password;
                                 }
         	}
-	}
-	return false;
+		return true;
+	} else
+		return false;
 }
 
 

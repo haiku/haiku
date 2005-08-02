@@ -14,7 +14,7 @@
 #include <string.h>
 #include <Beep.h>
 
-#include <ScreenSaverApp.h>
+#include "ScreenSaverApp.h"
 
 
 // Start the server application. Set pulse to fire once per second.
@@ -28,7 +28,7 @@ int main(int, char**)
 
 // Construct the server app. Doesn't do much, at this point.
 ScreenSaverApp::ScreenSaverApp()
-	: BApplication("application/x-vnd.OBOS-ScreenSaverApp"),
+	: BApplication(SCREEN_BLANKER_SIG),
 	fWin(NULL) 
 {
 	fBlankTime = system_time();
@@ -77,30 +77,30 @@ ScreenSaverApp::ShowPW(void)
 void 
 ScreenSaverApp::MessageReceived(BMessage *message) 
 {
-  switch(message->what) {
-    case 'DONE':
-		if (strcmp(fPww->GetPassword(),fPref.Password())) {
-			beep();
-			fPww->Hide();
-			fWin->SetFullScreen(true);
-			if (fThreadID)
-				resume_thread(fThreadID);
-			}
-			else  {
-				printf ("Quitting!\n");
-				Shutdown();
-			}
-		break;
-    case 'MOO1':
-		if (real_time_clock()-fBlankTime>fPref.PasswordTime())
-			ShowPW();
-		else 
+	switch(message->what) {
+		case UNLOCK_MESSAGE:
+			if (strcmp(fPww->GetPassword(),fPref.Password())) {
+				beep();
+				fPww->Hide();
+				fWin->SetFullScreen(true);
+				if (fThreadID)
+					resume_thread(fThreadID);
+				}
+				else  {
+					printf ("Quitting!\n");
+					Shutdown();
+				}
+			break;
+    		case 'MOO1':
+			if (real_time_clock()-fBlankTime>fPref.PasswordTime())
+				ShowPW();
+			else 
 			Shutdown();
-		break;
-    default:
-      	BApplication::MessageReceived(message);
-      	break;
-  }
+			break;
+		default:
+			BApplication::MessageReceived(message);
+ 			break;
+	}
 }
 
 
