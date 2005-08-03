@@ -1,0 +1,522 @@
+/*
+ * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+/** This module memorizes all opened files for a certain session. A session
+ *	can be the start of an application or the boot process.
+ *	When a session is started, it will prefetch all files from an earlier
+ *	session in order to speed up the launching or booting process.
+ */
+
+
+#include "launch_speedup.h"
+
+#include <KernelExport.h>
+
+#include <util/kernel_cpp.h>
+#include <util/khash.h>
+#include <util/AutoLock.h>
+#include <thread.h>
+#include <team.h>
+#include <file_cache.h>
+#include <fs/fd.h>
+#include <fs/KPath.h>
+#include <generic_syscall.h>
+#include <Node.h>
+
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <errno.h>
+
+
+// ToDo: combine the last 3-5 sessions to their intersection
+// ToDo: maybe ignore sessions if the node count is < 3 (without system libs)
+
+#define TRACE_CACHE_MODULE
+#ifdef TRACE_CACHE_MODULE
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
+struct data_part {
+	off_t		offset;
+	off_t		size;
+};
+
+struct node {
+	struct node	*next;
+	node_ref	ref;
+	int32		ref_count;
+	bigtime_t	timestamp;
+	data_part	parts[5];
+	size_t		part_count;
+};
+
+class Session {
+	public:
+		Session(team_id team, const char *name, mount_id device,
+			vnode_id node, int32 seconds = 60);
+		~Session();
+
+		status_t InitCheck();
+		team_id Team() const { return fTeam; }
+		const char *Name() const { return fName; }
+		bool IsActive() const { return fActiveUntil >= system_time(); }
+
+		void AddNode(mount_id device, vnode_id node);
+		void RemoveNode(mount_id device, vnode_id node);
+
+		void Lock() { mutex_lock(&fLock); }
+		void Unlock() { mutex_unlock(&fLock); }
+
+		static uint32 NextOffset() { return offsetof(Session, fNext); }
+
+	private:
+		struct node *_FindNode(mount_id device, vnode_id node);
+
+		Session		*fNext;
+		char		fName[B_OS_NAME_LENGTH];
+		mutex		fLock;
+		hash_table	*fNodeHash;
+		team_id		fTeam;
+		node_ref	fNodeRef;
+		bigtime_t	fActiveUntil;
+};
+
+class SessionGetter {
+	public:
+		SessionGetter(team_id team, Session **_session);
+		~SessionGetter();
+
+		status_t New(const char *name, mount_id device, vnode_id node,
+					Session **_session);
+
+	private:
+		Session	*fSession;
+};
+
+static Session *sMainSession;
+static hash_table *sTeamHash;
+static mutex sLock;
+
+
+node_ref::node_ref()
+{
+	// part of libbe.so
+}
+
+
+static int
+node_compare(void *_node, const void *_key)
+{
+	struct node *node = (struct node *)_node;
+	const struct node_ref *key = (node_ref *)_key;
+
+	if (node->ref.device == key->device && node->ref.node == key->node)
+		return 0;
+
+	return -1;
+}
+
+
+static uint32
+node_hash(void *_node, const void *_key, uint32 range)
+{
+	struct node *node = (struct node *)_node;
+	const struct node_ref *key = (node_ref *)_key;
+
+#define VHASH(mountid, vnodeid) (((uint32)((vnodeid) >> 32) + (uint32)(vnodeid)) ^ (uint32)(mountid))
+
+	if (node != NULL)
+		return (VHASH(node->ref.device, node->ref.node) % range);
+
+	return (VHASH(key->device, key->node) % range);
+
+#undef VHASH
+}
+
+
+static int
+team_compare(void *_session, const void *_key)
+{
+	Session *session = (Session *)_session;
+	const team_id *team = (const team_id *)_key;
+
+	if (session->Team() == *team)
+		return 0;
+
+	return -1;
+}
+
+
+static uint32
+team_hash(void *_session, const void *_key, uint32 range)
+{
+	Session *session = (Session *)_session;
+	const team_id *team = (const team_id *)_key;
+
+	if (session != NULL)
+		return session->Team() % range;
+
+	return *team % range;
+}
+
+
+static void
+stop_session(Session *session)
+{
+	if (session == NULL)
+		return;
+
+	TRACE(("stop_session(%s)\n", session->Name()));
+
+	session->Lock();
+
+	MutexLocker locker(&sLock);
+
+	if (session->Team() >= B_OK)
+		hash_remove(sTeamHash, session);
+
+	delete session;
+}
+
+
+static Session *
+start_session(team_id team, mount_id device, vnode_id node, const char *name)
+{
+	MutexLocker locker(&sLock);
+
+	Session *session = new Session(team, name, device, node);
+	if (session == NULL)
+		return NULL;
+
+	if (session->InitCheck() != B_OK) {
+		delete session;
+		return NULL;
+	}
+
+	if (team >= B_OK)
+		hash_insert(sTeamHash, session);
+
+	session->Lock();
+	return session;
+}
+
+
+static void
+team_gone(team_id team, void *_session)
+{
+	Session *session = (Session *)_session;
+	stop_session(session);
+}
+
+
+//	#pragma mark -
+
+
+Session::Session(team_id team, const char *name, mount_id device,
+	vnode_id node, int32 seconds)
+	:
+	fTeam(team)
+{
+	if (name != NULL) {
+		size_t length = strlen(name) + 1;
+		if (length > B_OS_NAME_LENGTH)
+			name += length - B_OS_NAME_LENGTH;
+	
+		strlcpy(fName, name, B_OS_NAME_LENGTH);
+	} else
+		fName[0] = '\0';
+
+	mutex_init(&fLock, "launch speedup session");
+	fNodeHash = hash_init(64, 0, &node_compare, &node_hash);
+	fActiveUntil = system_time() + seconds * 1000000LL;
+
+	fNodeRef.device = device;
+	fNodeRef.node = node;
+
+	TRACE(("start session %ld:%Ld \"%s\", system_time: %Ld, active until: %Ld\n",
+		device, node, Name(), system_time(), fActiveUntil));
+}
+
+
+Session::~Session()
+{
+	mutex_destroy(&fLock);
+
+	// free all nodes
+	uint32 cookie = 0;
+	struct node *node;
+	while ((node = (struct node *)hash_remove_first(fNodeHash, &cookie)) != NULL) {
+		TRACE(("  node %ld:%Ld\n", node->ref.device, node->ref.node));
+		free(node);
+	}
+
+	hash_uninit(fNodeHash);
+}
+
+
+status_t
+Session::InitCheck()
+{
+	if (fLock.sem < B_OK)
+		return fLock.sem;
+
+	if (fNodeHash == NULL)
+		return B_NO_MEMORY;
+
+	if (Team() >= B_OK && start_watching_team(Team(), team_gone, this) != B_OK)
+		return B_NO_MEMORY;
+
+	return B_OK;
+}
+
+
+node *
+Session::_FindNode(mount_id device, vnode_id node)
+{
+	node_ref key;
+	key.device = device;
+	key.node = node;
+
+	return (struct node *)hash_lookup(fNodeHash, &key);
+}
+
+
+void
+Session::AddNode(mount_id device, vnode_id id)
+{
+	struct node *node = _FindNode(device, id);
+	if (node != NULL) {
+		node->ref_count++;
+		return;
+	}
+
+	node = new ::node;
+	if (node == NULL)
+		return;
+
+	node->ref.device = device;
+	node->ref.node = id;
+	node->timestamp = system_time();
+
+	hash_insert(fNodeHash, node);
+}
+
+
+void
+Session::RemoveNode(mount_id device, vnode_id id)
+{
+	struct node *node = _FindNode(device, id);
+	if (node != NULL && --node->ref_count <= 0)
+		hash_remove(fNodeHash, node);
+}
+
+
+//	#pragma mark -
+
+
+SessionGetter::SessionGetter(team_id team, Session **_session)
+{
+	MutexLocker locker(&sLock);
+
+	if (sMainSession != NULL)
+		fSession = sMainSession;
+	else
+		fSession = (Session *)hash_lookup(sTeamHash, &team);
+
+	if (fSession != NULL)
+		fSession->Lock();
+
+	*_session = fSession;
+}
+
+
+SessionGetter::~SessionGetter()
+{
+	if (fSession != NULL)
+		fSession->Unlock();
+}
+
+
+status_t
+SessionGetter::New(const char *name, mount_id device, vnode_id node,
+	Session **_session)
+{
+	struct thread *thread = thread_get_current_thread();
+	fSession = start_session(thread->team->id, device, node, name);
+
+	if (fSession != NULL) {
+		*_session = fSession;
+		return B_OK;
+	}
+
+	return B_ERROR;
+}
+
+
+//	#pragma mark -
+
+
+static void
+node_opened(void *vnode, int32 fdType, mount_id device, vnode_id parent,
+	vnode_id node, const char *name, off_t size)
+{
+	Session *session;
+	SessionGetter getter(team_get_current_team_id(), &session);
+
+	if (session == NULL) {
+		char buffer[B_FILE_NAME_LENGTH];
+		if (name == NULL
+			&& vfs_get_vnode_name(vnode, buffer, sizeof(buffer)) == B_OK)
+			name = buffer;
+
+		// create new session for this team
+		getter.New(name, device, node, &session);
+	}
+
+	if (session == NULL || !session->IsActive()) {
+		if (session != NULL && sMainSession != NULL) {
+			// ToDo: this opens a race condition with the "stop session" syscall
+			stop_session(sMainSession);
+			sMainSession = NULL;
+		}
+		return;
+	}
+
+	session->AddNode(device, node);
+}
+
+
+static void
+node_closed(void *vnode, int32 fdType, mount_id device, vnode_id node, int32 accessType)
+{
+	Session *session;
+	SessionGetter getter(team_get_current_team_id(), &session);
+
+	if (session == NULL)
+		return;
+
+	if (accessType == FILE_CACHE_NO_IO)
+		session->RemoveNode(device, node);
+}
+
+
+static status_t
+launch_speedup_control(const char *subsystem, uint32 function,
+	void *buffer, size_t bufferSize)
+{
+	switch (function) {
+		case LAUNCH_SPEEDUP_START_SESSION:
+		{
+			char name[B_OS_NAME_LENGTH];
+			if (!IS_USER_ADDRESS(buffer)
+				|| user_strlcpy(name, (const char *)buffer, B_OS_NAME_LENGTH) < B_OK)
+				return B_BAD_ADDRESS;
+
+			sMainSession = start_session(-1, -1, -1, name);
+			sMainSession->Unlock();
+			return B_OK;
+		}
+
+		case LAUNCH_SPEEDUP_STOP_SESSION:
+		{
+			char name[B_OS_NAME_LENGTH];
+			if (!IS_USER_ADDRESS(buffer)
+				|| user_strlcpy(name, (const char *)buffer, B_OS_NAME_LENGTH) < B_OK)
+				return B_BAD_ADDRESS;
+
+			// ToDo: this check is not thread-safe
+			if (sMainSession == NULL || strcmp(sMainSession->Name(), name))
+				return B_BAD_VALUE;
+
+			stop_session(sMainSession);
+			sMainSession = NULL;
+			return B_OK;
+		}
+	}
+
+	return B_BAD_VALUE;
+}
+
+
+static void
+uninit()
+{
+	unregister_generic_syscall(LAUNCH_SPEEDUP_SYSCALLS, 1);
+	hash_uninit(sTeamHash);
+	mutex_destroy(&sLock);
+}
+
+
+static status_t
+init()
+{
+	sTeamHash = hash_init(64, Session::NextOffset(), &team_compare, &team_hash);
+	if (sTeamHash == NULL)
+		return B_NO_MEMORY;
+
+	status_t status;
+
+	if (mutex_init(&sLock, "launch speedup") < B_OK) {
+		status = sLock.sem;
+		goto err1;
+	}
+
+	// register kernel syscalls
+	if (register_generic_syscall(LAUNCH_SPEEDUP_SYSCALLS,
+			launch_speedup_control, 1, 0) != B_OK) {
+		status = B_ERROR;
+		goto err2;
+	}
+
+	sMainSession = start_session(-1, -1, -1, "system boot");
+	sMainSession->Unlock();
+	return B_OK;
+
+err1:
+	hash_uninit(sTeamHash);
+err2:
+	mutex_destroy(&sLock);
+	return status;
+}
+
+
+static status_t
+std_ops(int32 op, ...)
+{
+	switch (op) {
+		case B_MODULE_INIT:
+			return init();
+
+		case B_MODULE_UNINIT:
+			uninit();
+			return B_OK;
+
+		default:
+			return B_ERROR;
+	}
+}
+
+
+static struct cache_module_info sLaunchSpeedupModule = {
+	{
+		CACHE_MODULES_NAME "/launch_speedup/v1",
+		0,
+		std_ops,
+	},
+	node_opened,
+	node_closed,
+	NULL,
+};
+
+
+module_info *modules[] = {
+	(module_info *)&sLaunchSpeedupModule,
+	NULL
+};

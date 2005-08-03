@@ -8,3 +8,6 @@ KernelAddon log : kernel file_cache :
 	log.cpp
 	;
 
+KernelAddon launch_speedup : kernel file_cache :
+	launch_speedup.cpp
+	;
