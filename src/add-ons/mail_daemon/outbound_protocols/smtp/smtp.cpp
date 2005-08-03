@@ -926,10 +926,13 @@ SMTPProtocol::ReceiveResponse(BString &out)
 	BString searchStr = "";
 	
 	struct timeval tv;
+	struct timeval nulltv;
 	struct fd_set fds; 
 
 	tv.tv_sec = long(timeout / 1e6); 
 	tv.tv_usec = long(timeout-(tv.tv_sec * 1e6)); 
+	nulltv.tv_sec = 0L;
+	nulltv.tv_usec = 0L;
 	
 	/* Initialize (clear) the socket mask. */ 
 	FD_ZERO(&fds);
@@ -969,6 +972,16 @@ SMTPProtocol::ReceiveResponse(BString &out)
 
 			len += r;
 			out.Append(buf, r);
+
+			// is there anything else to read ? (smtp.1und1.de sends the 250-AUTH line in a 2nd part)
+#ifdef USESSL
+			if ((use_ssl) && (SSL_pending(ssl)))
+				continue;
+			else
+#endif
+				result = select(32, &fds, NULL, NULL, &nulltv);
+			if (result > 0)
+				continue;
 			
 			if (strstr(buf, CRLF) && (out.FindFirst(searchStr) != B_ERROR))
 				break;
