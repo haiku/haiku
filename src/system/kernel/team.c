@@ -709,11 +709,11 @@ error1:
 static void
 delete_team_struct(struct team *team)
 {
-	struct death_entry *death = NULL;
+	struct death_entry *death;
 
 	delete_sem(team->dead_children.sem);
 
-	while ((death = list_get_next_item(&team->dead_children.list, death)) != NULL)
+	while ((death = list_remove_head_item(&team->dead_children.list)) != NULL)
 		free(death);
 
 	free(team);
@@ -846,8 +846,8 @@ team_delete_team(struct team *team)
 		}
 	}
 
-	// ToDo: what about the dead_children.sem? shouldn't we call delete_team_struct() here?
-	free(team);
+	// ToDo: should our death_entries be moved one level up?
+	delete_team_struct(team);
 
 	// notify the debugger, that the team is gone
 	user_debug_team_deleted(teamID, debuggerPort);
@@ -1532,6 +1532,11 @@ get_team_death_entry(struct team *team, thread_id child, struct death_entry *dea
 	return child > 0 ? B_BAD_THREAD_ID : B_WOULD_BLOCK;
 }
 
+
+/**	Gets the next pending death entry, if any. Also fills in \a _waitSem
+ *	to the semaphore the caller have to wait for for other death entries.
+ *	Must be called with the team lock held.
+ */
 
 static status_t
 get_death_entry(struct team *team, pid_t child, struct death_entry *death,
