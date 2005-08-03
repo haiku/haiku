@@ -689,6 +689,7 @@ create_team_struct(const char *name, bool kernel)
 		goto error1;
 
 	list_init(&team->image_list);
+	list_init(&team->watcher_list);
 
 	clear_team_debug_info(&team->debug_info, true);
 
@@ -761,10 +762,10 @@ team_delete_team(struct team *team)
 		sem_id deathSem;
 		int32 threadCount;
 
-		sprintf(death_sem_name, "team %ld death sem", team->id);
+		sprintf(death_sem_name, "team %ld death sem", teamID);
 		deathSem = create_sem(0, death_sem_name);
 		if (deathSem < 0)
-			panic("thread_exit: cannot init death sem for team %ld\n", team->id);
+			panic("thread_exit: cannot init death sem for team %ld\n", teamID);
 
 		state = disable_interrupts();
 		GRAB_TEAM_LOCK();
@@ -828,11 +829,24 @@ team_delete_team(struct team *team)
 	// free team resources
 
 	vm_delete_aspace(team->aspace);
-	delete_owned_ports(team->id);
-	sem_delete_owned_sems(team->id);
+	delete_owned_ports(teamID);
+	sem_delete_owned_sems(teamID);
 	remove_images(team);
 	vfs_free_io_context(team->io_context);
 
+	// notify team watchers
+
+	{
+		// we're not reachable from anyone anymore at this point, so we
+		// can safely access the list without any locking
+		struct team_watcher *watcher;
+		while ((watcher = list_remove_head_item(&team->watcher_list)) != NULL) {
+			watcher->hook(teamID, watcher->data);
+			free(watcher);
+		}
+	}
+
+	// ToDo: what about the dead_children.sem? shouldn't we call delete_team_struct() here?
 	free(team);
 
 	// notify the debugger, that the team is gone
@@ -1631,6 +1645,84 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 err:
 	unregister_wait_for_any(team, child);
 	return status;
+}
+
+
+/** Adds a hook to the team that is called as soon as this
+ *	team goes away.
+ *	This call might get public in the future.
+ */
+
+status_t
+start_watching_team(team_id teamID, void (*hook)(team_id, void *), void *data)
+{
+	struct team_watcher *watcher;
+	struct team *team;
+	cpu_status state;
+
+	if (hook == NULL || teamID < B_OK)
+		return B_BAD_VALUE;
+
+	watcher = malloc(sizeof(struct team_watcher));
+	if (watcher == NULL)
+		return B_NO_MEMORY;
+
+	// find team and add watcher
+
+	state = disable_interrupts();
+	GRAB_TEAM_LOCK();
+
+	team = team_get_team_struct_locked(teamID);
+	if (team != NULL)
+		list_add_item(&team->watcher_list, watcher);
+
+	RELEASE_TEAM_LOCK();
+	restore_interrupts(state);
+
+	if (team == NULL) {
+		free(watcher);
+		return B_BAD_TEAM_ID;
+	}
+
+	return B_OK;
+}
+	
+	
+status_t
+stop_watching_team(team_id teamID, void (*hook)(team_id, void *), void *data)
+{
+	struct team_watcher *watcher = NULL;
+	struct team *team;
+	cpu_status state;
+
+	if (hook == NULL || teamID < B_OK)
+		return B_BAD_VALUE;
+
+	// find team and remove watcher (if present)
+
+	state = disable_interrupts();
+	GRAB_TEAM_LOCK();
+
+	team = team_get_team_struct_locked(teamID);
+	if (team != NULL) {
+		// search for watcher
+		while ((watcher = list_get_next_item(&team->watcher_list, watcher)) != NULL) {
+			if (watcher->hook == hook && watcher->data == data) {
+				// got it!
+				list_remove_item(&team->watcher_list, watcher);
+				break;
+			}
+		}
+	}
+
+	RELEASE_TEAM_LOCK();
+	restore_interrupts(state);
+
+	if (watcher == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	free(watcher);
+	return B_OK;
 }
 
 

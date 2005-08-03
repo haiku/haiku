@@ -78,6 +78,12 @@ struct team_loading_info {
 	bool			done;		// set when loading is done/aborted
 };
 
+struct team_watcher {
+	struct list_link	link;
+	void				(*hook)(team_id team, void *data);
+	void				*data;
+};
+
 #define MAX_DEAD_CHILDREN	32
 	// this is a soft limit for the number of dead entries in a team
 
@@ -111,6 +117,7 @@ struct team {
 	struct thread	*thread_list;
 	struct team_loading_info *loading_info;
 	struct list		image_list;
+	struct list		watcher_list;
 	struct arch_team arch_info;
 
 	struct team_debug_info debug_info;

@@ -32,6 +32,9 @@ struct team *team_get_team_struct_locked(team_id id);
 int32 team_max_teams(void);
 int32 team_used_teams(void);
 
+status_t start_watching_team(team_id team, void (*hook)(team_id, void *), void *data);
+status_t stop_watching_team(team_id team, void (*hook)(team_id, void *), void *data);
+
 // used in syscalls.c
 thread_id _user_load_image(int32 argCount, const char **args, int32 envCount,
 				const char **envp, int32 priority, uint32 flags);
