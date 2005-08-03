@@ -1672,6 +1672,9 @@ start_watching_team(team_id teamID, void (*hook)(team_id, void *), void *data)
 	if (watcher == NULL)
 		return B_NO_MEMORY;
 
+	watcher->hook = hook;
+	watcher->data = data;
+
 	// find team and add watcher
 
 	state = disable_interrupts();
