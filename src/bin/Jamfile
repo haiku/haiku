@@ -4,9 +4,11 @@ UsePrivateHeaders app ;
 UsePrivateHeaders kernel ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
+SubDirHdrs $(OBOS_TOP) src add-ons kernel file_cache ;
 
 # standard commands that don't need any additional library
 StdBinCommands
+	boot_process_done.cpp
 	catattr.cpp
 	chop.c
 	clear.c
