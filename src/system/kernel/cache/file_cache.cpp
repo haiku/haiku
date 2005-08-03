@@ -898,7 +898,7 @@ extern "C" void
 cache_node_opened(void *vnode, int32 fdType, vm_cache_ref *cache, mount_id mountID,
 	vnode_id parentID, vnode_id vnodeID, const char *name)
 {
-	if (sCacheModule == NULL)
+	if (sCacheModule == NULL || sCacheModule->node_opened == NULL)
 		return;
 
 	off_t size = -1;
@@ -916,7 +916,7 @@ extern "C" void
 cache_node_closed(void *vnode, int32 fdType, vm_cache_ref *cache,
 	mount_id mountID, vnode_id vnodeID)
 {
-	if (sCacheModule == NULL)
+	if (sCacheModule == NULL || sCacheModule->node_closed == NULL)
 		return;
 
 	int32 accessType = 0;
@@ -931,7 +931,7 @@ cache_node_closed(void *vnode, int32 fdType, vm_cache_ref *cache,
 extern "C" void 
 cache_node_launched(size_t argCount, char * const *args)
 {
-	if (sCacheModule == NULL)
+	if (sCacheModule == NULL || sCacheModule->node_launched == NULL)
 		return;
 
 	sCacheModule->node_launched(argCount, args);
@@ -939,10 +939,22 @@ cache_node_launched(size_t argCount, char * const *args)
 
 
 extern "C" status_t
-file_cache_init(void)
+file_cache_init_post_boot_device(void)
 {
 	// ToDo: get cache module out of driver settings
 
+	if (get_module("file_cache/launch_speedup/v1", (module_info **)&sCacheModule) == B_OK) {
+		dprintf("** opened launch speedup\n");
+	} else
+		dprintf("** could not open launch speedup!\n");
+
+	return B_OK;
+}
+
+
+extern "C" status_t
+file_cache_init(void)
+{
 	register_generic_syscall(CACHE_SYSCALLS, file_cache_control, 1, 0);
 	return B_OK;
 }

@@ -2867,6 +2867,7 @@ vfs_mount_boot_file_system(kernel_args *args)
 		_kern_create_symlink(-1, path, "/boot", 0);
 	}
 
+	file_cache_init_post_boot_device();
 	return B_OK;
 }
 
