@@ -369,14 +369,14 @@ set_vt100_attributes(struct console_desc *console, int32 *args, int32 argCount)
 
 static bool
 process_vt100_command(struct console_desc *console, const char c,
-	bool seen_bracket, int32 *args, int32 argCount)
+	bool seenBracket, int32 *args, int32 argCount)
 {
 	bool ret = true;
 
-	//dprintf("process_vt100_command: c '%c', argCount %ld, arg[0] %ld, arg[1] %ld, seen_bracket %d\n",
-	//	c, argCount, args[0], args[1], seen_bracket);
+	//dprintf("process_vt100_command: c '%c', argCount %ld, arg[0] %ld, arg[1] %ld, seenBracket %d\n",
+	//	c, argCount, args[0], args[1], seenBracket);
 
-	if (seen_bracket) {
+	if (seenBracket) {
 		switch(c) {
 			case 'H': /* set cursor position */
 			case 'f': {
@@ -616,7 +616,7 @@ _console_write(struct console_desc *console, const void *buf, size_t len)
 						process_vt100_command(console, *c, true, console->args, console->arg_count + 1);
 						console->state = CONSOLE_STATE_NORMAL;
 				}
-			}
+		}
 	}
 
 	return pos;
