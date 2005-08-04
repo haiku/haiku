@@ -358,6 +358,22 @@ void
 AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 {
 	switch (code) {
+		case AS_GET_DESKTOP:
+		{
+			port_id replyPort;
+			if (msg.Read<port_id>(&replyPort) < B_OK)
+				break;
+
+			int32 userID;
+			msg.Read<int32>(&userID);
+
+			BPrivate::LinkSender reply(replyPort);
+			reply.StartMessage(B_OK);
+			reply.Attach<port_id>(fMessagePort);
+			reply.Flush();
+			break;
+		}
+
 		case AS_CREATE_APP:
 		{
 			// Create the ServerApp to node monitor a new BApplication
