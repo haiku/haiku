@@ -751,6 +751,7 @@ team_delete_team(struct team *team)
 {
 	team_id teamID = team->id;
 	port_id debuggerPort = -1;
+	cpu_status state;
 
 	if (team->num_threads > 0) {
 		// there are other threads still in this team,
@@ -758,7 +759,6 @@ team_delete_team(struct team *team)
 		// ToDo: this can be optimized. There's got to be a better solution.
 		struct thread *temp_thread;
 		char death_sem_name[B_OS_NAME_LENGTH];
-		cpu_status state;
 		sem_id deathSem;
 		int32 threadCount;
 
@@ -795,29 +795,6 @@ team_delete_team(struct team *team)
 			temp_thread = next;
 		}
 
-		// If someone is waiting for this team to be loaded, but it dies
-		// unexpectedly before being done, we need to notify the waiting
-		// thread now.
-		if (team->loading_info) {
-			// there's indeed someone waiting
-			struct team_loading_info *loadingInfo = team->loading_info;
-			team->loading_info = NULL;
-
-			loadingInfo->result = B_ERROR;
-			loadingInfo->done = true;
-
-			GRAB_THREAD_LOCK();
-
-			// wake up the waiting thread
-			if (loadingInfo->thread->state == B_THREAD_SUSPENDED) {
-				loadingInfo->thread->state = B_THREAD_READY;
-				loadingInfo->thread->next_state = B_THREAD_READY;
-				scheduler_enqueue_in_run_queue(loadingInfo->thread);
-			}
-
-			RELEASE_THREAD_LOCK();
-		}
-
 		RELEASE_TEAM_LOCK();
 		restore_interrupts(state);
 
@@ -825,6 +802,36 @@ team_delete_team(struct team *team)
 		acquire_sem_etc(team->death_sem, threadCount, 0, 0);
 		delete_sem(team->death_sem);
 	}
+
+	// If someone is waiting for this team to be loaded, but it dies
+	// unexpectedly before being done, we need to notify the waiting
+	// thread now.
+
+	state = disable_interrupts();
+	GRAB_TEAM_LOCK();
+
+	if (team->loading_info) {
+		// there's indeed someone waiting
+		struct team_loading_info *loadingInfo = team->loading_info;
+		team->loading_info = NULL;
+
+		loadingInfo->result = B_ERROR;
+		loadingInfo->done = true;
+
+		GRAB_THREAD_LOCK();
+
+		// wake up the waiting thread
+		if (loadingInfo->thread->state == B_THREAD_SUSPENDED) {
+			loadingInfo->thread->state = B_THREAD_READY;
+			loadingInfo->thread->next_state = B_THREAD_READY;
+			scheduler_enqueue_in_run_queue(loadingInfo->thread);
+		}
+
+		RELEASE_THREAD_LOCK();
+	}
+
+	RELEASE_TEAM_LOCK();
+	restore_interrupts(state);
 
 	// free team resources
 
@@ -1120,7 +1127,7 @@ load_image_etc(int32 argCount, char **args, int32 envCount, char **env,
 			}
 
 			// Now suspend ourselves until loading is finished.
-			// We will be woken either be the thread, when it finished or
+			// We will be woken either by the thread, when it finished or
 			// aborted loading, or when the team is going to die (e.g. is
 			// killed). In either case the one setting `loadingInfo.done' is
 			// responsible for removing the info from the team structure.
