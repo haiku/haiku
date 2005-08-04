@@ -7,6 +7,9 @@
  *	can be the start of an application or the boot process.
  *	When a session is started, it will prefetch all files from an earlier
  *	session in order to speed up the launching or booting process.
+ *
+ *	Note: this module is using private kernel API and is definitely not
+ *		meant to be an example on how to write modules.
  */
 
 
@@ -20,8 +23,8 @@
 #include <thread.h>
 #include <team.h>
 #include <file_cache.h>
-#include <fs/fd.h>
-#include <fs/KPath.h>
+//#include <fs/fd.h>
+//#include <fs/KPath.h>
 #include <generic_syscall.h>
 #include <Node.h>
 
@@ -30,6 +33,9 @@
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
+#include <ctype.h>
+
+extern dev_t gBootDevice;
 
 
 // ToDo: combine the last 3-5 sessions to their intersection
@@ -42,6 +48,8 @@
 #	define TRACE(x) ;
 #endif
 
+#define VNODE_HASH(mountid, vnodeid) (((uint32)((vnodeid) >> 32) \
+	+ (uint32)(vnodeid)) ^ (uint32)(mountid))
 
 struct data_part {
 	off_t		offset;
@@ -60,13 +68,18 @@ struct node {
 class Session {
 	public:
 		Session(team_id team, const char *name, mount_id device,
-			vnode_id node, int32 seconds = 60);
+			vnode_id node, int32 seconds);
+		Session(const char *name);
 		~Session();
 
 		status_t InitCheck();
 		team_id Team() const { return fTeam; }
 		const char *Name() const { return fName; }
+		const node_ref &NodeRef() const { return fNodeRef; }
 		bool IsActive() const { return fActiveUntil >= system_time(); }
+		bool IsClosing() const { return fClosing; }
+		bool IsMainSession() const;
+		bool IsWorthSaving() const;
 
 		void AddNode(mount_id device, vnode_id node);
 		void RemoveNode(mount_id device, vnode_id node);
@@ -74,6 +87,10 @@ class Session {
 		void Lock() { mutex_lock(&fLock); }
 		void Unlock() { mutex_unlock(&fLock); }
 
+		status_t LoadFromDirectory(int fd);
+		status_t Save();
+
+		Session *&Next() { return fNext; }
 		static uint32 NextOffset() { return offsetof(Session, fNext); }
 
 	private:
@@ -83,9 +100,13 @@ class Session {
 		char		fName[B_OS_NAME_LENGTH];
 		mutex		fLock;
 		hash_table	*fNodeHash;
+		struct node	*fNodes;
+		int32		fNodeCount;
 		team_id		fTeam;
 		node_ref	fNodeRef;
 		bigtime_t	fActiveUntil;
+		bigtime_t	fTimestamp;
+		bool		fClosing;
 };
 
 class SessionGetter {
@@ -95,6 +116,7 @@ class SessionGetter {
 
 		status_t New(const char *name, mount_id device, vnode_id node,
 					Session **_session);
+		void Stop();
 
 	private:
 		Session	*fSession;
@@ -102,7 +124,10 @@ class SessionGetter {
 
 static Session *sMainSession;
 static hash_table *sTeamHash;
-static mutex sLock;
+static hash_table *sPrefetchHash;
+static Session *sMainPrefetchSessions;
+	// singly-linked list
+static recursive_lock sLock;
 
 
 node_ref::node_ref()
@@ -130,14 +155,37 @@ node_hash(void *_node, const void *_key, uint32 range)
 	struct node *node = (struct node *)_node;
 	const struct node_ref *key = (node_ref *)_key;
 
-#define VHASH(mountid, vnodeid) (((uint32)((vnodeid) >> 32) + (uint32)(vnodeid)) ^ (uint32)(mountid))
-
 	if (node != NULL)
-		return (VHASH(node->ref.device, node->ref.node) % range);
+		return VNODE_HASH(node->ref.device, node->ref.node) % range;
 
-	return (VHASH(key->device, key->node) % range);
+	return VNODE_HASH(key->device, key->node) % range;
+}
 
-#undef VHASH
+
+static int
+prefetch_compare(void *_session, const void *_key)
+{
+	Session *session = (Session *)_session;
+	const struct node_ref *key = (node_ref *)_key;
+
+	if (session->NodeRef().device == key->device
+		&& session->NodeRef().node == key->node)
+		return 0;
+
+	return -1;
+}
+
+
+static uint32
+prefetch_hash(void *_session, const void *_key, uint32 range)
+{
+	Session *session = (Session *)_session;
+	const struct node_ref *key = (node_ref *)_key;
+
+	if (session != NULL)
+		return VNODE_HASH(session->NodeRef().device, session->NodeRef().node) % range;
+
+	return VNODE_HASH(key->device, key->node) % range;
 }
 
 
@@ -175,23 +223,30 @@ stop_session(Session *session)
 
 	TRACE(("stop_session(%s)\n", session->Name()));
 
-	session->Lock();
+	if (session->IsWorthSaving())
+		session->Save();
 
-	MutexLocker locker(&sLock);
+	{
+		RecursiveLocker locker(&sLock);
 
-	if (session->Team() >= B_OK)
-		hash_remove(sTeamHash, session);
+		if (session->Team() >= B_OK)
+			hash_remove(sTeamHash, session);
+
+		if (session == sMainSession)
+			sMainSession = NULL;
+	}
 
 	delete session;
 }
 
 
 static Session *
-start_session(team_id team, mount_id device, vnode_id node, const char *name)
+start_session(team_id team, mount_id device, vnode_id node, const char *name,
+	int32 seconds = 30)
 {
-	MutexLocker locker(&sLock);
+	RecursiveLocker locker(&sLock);
 
-	Session *session = new Session(team, name, device, node);
+	Session *session = new Session(team, name, device, node, seconds);
 	if (session == NULL)
 		return NULL;
 
@@ -212,7 +267,41 @@ static void
 team_gone(team_id team, void *_session)
 {
 	Session *session = (Session *)_session;
+
+	session->Lock();
 	stop_session(session);
+}
+
+
+static void
+load_prefetch_data()
+{
+	DIR *dir = opendir("/etc/launch_cache");
+	if (dir == NULL)
+		return;
+
+	struct dirent *dirent;
+	while ((dirent = readdir(dir)) != NULL) {
+		if (dirent->d_name[0] == '.')
+			continue;
+
+		Session *session = new Session(dirent->d_name);
+		dprintf("%s\n", dirent->d_name);
+
+		if (session->LoadFromDirectory(dir->fd) != B_OK) {
+			delete session;
+			continue;
+		}
+
+		if (session->IsMainSession()) {
+			session->Next() = sMainPrefetchSessions;
+			sMainPrefetchSessions = session;
+		} else {
+			hash_insert(sPrefetchHash, session);
+		}
+	}
+
+	closedir(dir);
 }
 
 
@@ -222,7 +311,10 @@ team_gone(team_id team, void *_session)
 Session::Session(team_id team, const char *name, mount_id device,
 	vnode_id node, int32 seconds)
 	:
-	fTeam(team)
+	fNodes(NULL),
+	fNodeCount(0),
+	fTeam(team),
+	fClosing(false)
 {
 	if (name != NULL) {
 		size_t length = strlen(name) + 1;
@@ -236,6 +328,7 @@ Session::Session(team_id team, const char *name, mount_id device,
 	mutex_init(&fLock, "launch speedup session");
 	fNodeHash = hash_init(64, 0, &node_compare, &node_hash);
 	fActiveUntil = system_time() + seconds * 1000000LL;
+	fTimestamp = system_time();
 
 	fNodeRef.device = device;
 	fNodeRef.node = node;
@@ -245,19 +338,53 @@ Session::Session(team_id team, const char *name, mount_id device,
 }
 
 
+Session::Session(const char *name)
+	:
+	fNodeHash(NULL),
+	fNodes(NULL),
+	fClosing(false)
+{
+	fTeam = -1;
+	fNodeRef.device = -1;
+	fNodeRef.node = -1;
+
+	if (isdigit(name[0])) {
+		// parse node ref
+		char *end;
+		fNodeRef.device = strtol(name, &end, 0);
+		if (end != NULL)
+			fNodeRef.node = strtoull(end + 1, NULL, 0);
+	}
+
+	strlcpy(fName, name, B_OS_NAME_LENGTH);
+}
+
+
 Session::~Session()
 {
 	mutex_destroy(&fLock);
 
 	// free all nodes
-	uint32 cookie = 0;
-	struct node *node;
-	while ((node = (struct node *)hash_remove_first(fNodeHash, &cookie)) != NULL) {
-		TRACE(("  node %ld:%Ld\n", node->ref.device, node->ref.node));
-		free(node);
-	}
 
-	hash_uninit(fNodeHash);
+	if (fNodeHash) {
+		// ... from the hash
+		uint32 cookie = 0;
+		struct node *node;
+		while ((node = (struct node *)hash_remove_first(fNodeHash, &cookie)) != NULL) {
+			//TRACE(("  node %ld:%Ld\n", node->ref.device, node->ref.node));
+			free(node);
+		}
+	
+		hash_uninit(fNodeHash);
+	} else {
+		// ... from the list
+		struct node *node = fNodes, *next = NULL;
+
+		for (; node != NULL; node = next) {
+			next = node->next;
+			free(node);
+		}
+	}
 }
 
 
@@ -306,6 +433,7 @@ Session::AddNode(mount_id device, vnode_id id)
 	node->timestamp = system_time();
 
 	hash_insert(fNodeHash, node);
+	fNodeCount++;
 }
 
 
@@ -313,8 +441,88 @@ void
 Session::RemoveNode(mount_id device, vnode_id id)
 {
 	struct node *node = _FindNode(device, id);
-	if (node != NULL && --node->ref_count <= 0)
+	if (node != NULL && --node->ref_count <= 0) {
 		hash_remove(fNodeHash, node);
+		fNodeCount--;
+	}
+}
+
+
+status_t
+Session::LoadFromDirectory(int fd)
+{
+	return B_ERROR;
+}
+
+
+status_t
+Session::Save()
+{
+	fClosing = true;
+
+	char name[B_OS_NAME_LENGTH + 25];
+	if (!IsMainSession()) {
+		snprintf(name, sizeof(name), "/etc/launch_cache/%ld:%Ld %s",
+			fNodeRef.device, fNodeRef.node, Name());
+	} else
+		snprintf(name, sizeof(name), "/etc/launch_cache/%s", Name());
+
+	int fd = open(name, O_CREAT | O_TRUNC | O_WRONLY, 0644);
+	if (fd < B_OK)
+		return errno;
+
+	status_t status = B_OK;
+	off_t fileSize = 0;
+
+	// ToDo: order nodes by timestamp... (should improve launch speed)
+	// ToDo: test which parts of a file have been read (and save that as well)
+
+	// enlarge file, so that it can be written faster
+	ftruncate(fd, 512 * 1024);
+
+	struct hash_iterator iterator;
+	struct node *node;
+
+	hash_open(fNodeHash, &iterator);
+	while ((node = (struct node *)hash_next(fNodeHash, &iterator)) != NULL) {
+		snprintf(name, sizeof(name), "%ld:%Ld\n", node->ref.device, node->ref.node);
+
+		ssize_t bytesWritten = write(fd, name, strlen(name));
+		if (bytesWritten < B_OK) {
+			status = bytesWritten;
+			break;
+		}
+
+		fileSize += bytesWritten;
+	}
+
+	hash_close(fNodeHash, &iterator, false);
+
+	ftruncate(fd, fileSize);
+	close(fd);
+
+	return status;
+}
+
+
+bool
+Session::IsWorthSaving() const
+{
+	// ToDo: sort out entries with only very few nodes, and those that load
+	//	instantly, anyway
+	if (fNodeCount < 5 || system_time() - fTimestamp < 400000) {
+		// sort anything out that opens less than 5 files, or needs less
+		// than 0.4 seconds to load an run
+		return false;
+	}
+	return true;
+}
+
+
+bool
+Session::IsMainSession() const
+{
+	return fNodeRef.node == -1;
 }
 
 
@@ -323,15 +531,19 @@ Session::RemoveNode(mount_id device, vnode_id id)
 
 SessionGetter::SessionGetter(team_id team, Session **_session)
 {
-	MutexLocker locker(&sLock);
+	RecursiveLocker locker(&sLock);
 
 	if (sMainSession != NULL)
 		fSession = sMainSession;
 	else
 		fSession = (Session *)hash_lookup(sTeamHash, &team);
 
-	if (fSession != NULL)
-		fSession->Lock();
+	if (fSession != NULL) {
+		if (!fSession->IsClosing())
+			fSession->Lock();
+		else
+			fSession = NULL;
+	}
 
 	*_session = fSession;
 }
@@ -360,6 +572,16 @@ SessionGetter::New(const char *name, mount_id device, vnode_id node,
 }
 
 
+void
+SessionGetter::Stop()
+{
+	if (fSession == sMainSession)
+		sMainSession = NULL;
+
+	stop_session(fSession);
+	fSession = NULL;
+}
+
 //	#pragma mark -
 
 
@@ -367,6 +589,12 @@ static void
 node_opened(void *vnode, int32 fdType, mount_id device, vnode_id parent,
 	vnode_id node, const char *name, off_t size)
 {
+	if (device < gBootDevice) {
+		// we ignore any access to rootfs, pipefs, and devfs
+		// ToDo: if we can ever move the boot device on the fly, this will break
+		return;
+	}
+
 	Session *session;
 	SessionGetter getter(team_get_current_team_id(), &session);
 
@@ -381,10 +609,9 @@ node_opened(void *vnode, int32 fdType, mount_id device, vnode_id parent,
 	}
 
 	if (session == NULL || !session->IsActive()) {
-		if (session != NULL && sMainSession != NULL) {
+		if (sMainSession != NULL) {
 			// ToDo: this opens a race condition with the "stop session" syscall
-			stop_session(sMainSession);
-			sMainSession = NULL;
+			getter.Stop();
 		}
 		return;
 	}
@@ -419,7 +646,10 @@ launch_speedup_control(const char *subsystem, uint32 function,
 				|| user_strlcpy(name, (const char *)buffer, B_OS_NAME_LENGTH) < B_OK)
 				return B_BAD_ADDRESS;
 
-			sMainSession = start_session(-1, -1, -1, name);
+			if (isdigit(name[0]) || name[0] == '.')
+				return B_BAD_VALUE;
+
+			sMainSession = start_session(-1, -1, -1, name, 60);
 			sMainSession->Unlock();
 			return B_OK;
 		}
@@ -435,6 +665,7 @@ launch_speedup_control(const char *subsystem, uint32 function,
 			if (sMainSession == NULL || strcmp(sMainSession->Name(), name))
 				return B_BAD_VALUE;
 
+			sMainSession->Lock();
 			stop_session(sMainSession);
 			sMainSession = NULL;
 			return B_OK;
@@ -449,8 +680,13 @@ static void
 uninit()
 {
 	unregister_generic_syscall(LAUNCH_SPEEDUP_SYSCALLS, 1);
+
+	recursive_lock_lock(&sLock);
+
+	// ToDo: free sessions from hash tables
 	hash_uninit(sTeamHash);
-	mutex_destroy(&sLock);
+	hash_uninit(sPrefetchHash);
+	recursive_lock_destroy(&sLock);
 }
 
 
@@ -463,26 +699,41 @@ init()
 
 	status_t status;
 
-	if (mutex_init(&sLock, "launch speedup") < B_OK) {
-		status = sLock.sem;
+	sPrefetchHash = hash_init(64, Session::NextOffset(), &prefetch_compare, &prefetch_hash);
+	if (sPrefetchHash == NULL) {
+		status = B_NO_MEMORY;
 		goto err1;
+	}
+
+	if (recursive_lock_init(&sLock, "launch speedup") < B_OK) {
+		status = sLock.sem;
+		goto err2;
 	}
 
 	// register kernel syscalls
 	if (register_generic_syscall(LAUNCH_SPEEDUP_SYSCALLS,
 			launch_speedup_control, 1, 0) != B_OK) {
 		status = B_ERROR;
-		goto err2;
+		goto err3;
 	}
+
+	// read in prefetch knowledge base
+
+	mkdir("/etc/launch_cache", 0755);
+	load_prefetch_data();
+
+	// start boot session
 
 	sMainSession = start_session(-1, -1, -1, "system boot");
 	sMainSession->Unlock();
 	return B_OK;
 
+err3:
+	recursive_lock_destroy(&sLock);
+err2:
+	hash_uninit(sPrefetchHash);
 err1:
 	hash_uninit(sTeamHash);
-err2:
-	mutex_destroy(&sLock);
 	return status;
 }
 
