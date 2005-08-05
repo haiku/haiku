@@ -74,10 +74,6 @@ MergeObject <libbe>storage_diskdevice_kit.o :
 # The adapter library we need (Storage Kit).
 #
 
-SEARCH on [ FGristFiles
-		strlcat.c strlcpy.c strcasestr.c
-	] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
-
 SharedLibrary beadapter :
 	LibBeAdapter.cpp
 	strlcat.c
@@ -87,5 +83,6 @@ SharedLibrary beadapter :
 	: be
 ;
 
-
-
+SEARCH on [ FGristFiles
+		strlcat.c strlcpy.c strcasestr.c
+	] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
