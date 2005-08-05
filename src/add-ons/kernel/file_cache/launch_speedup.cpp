@@ -16,6 +16,7 @@
 #include "launch_speedup.h"
 
 #include <KernelExport.h>
+#include <Node.h>
 
 #include <util/kernel_cpp.h>
 #include <util/khash.h>
@@ -23,10 +24,8 @@
 #include <thread.h>
 #include <team.h>
 #include <file_cache.h>
-//#include <fs/fd.h>
-//#include <fs/KPath.h>
 #include <generic_syscall.h>
-#include <Node.h>
+#include <syscalls.h>
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -89,6 +88,7 @@ class Session {
 
 		status_t LoadFromDirectory(int fd);
 		status_t Save();
+		void Prefetch();
 
 		Session *&Next() { return fNext; }
 		static uint32 NextOffset() { return offsetof(Session, fNext); }
@@ -255,6 +255,28 @@ start_session(team_id team, mount_id device, vnode_id node, const char *name,
 		return NULL;
 	}
 
+	// let's see if there is a prefetch session for this session
+	
+	Session *prefetchSession;
+	if (session->IsMainSession()) {
+		// search for session by name
+		for (prefetchSession = sMainPrefetchSessions;
+				prefetchSession != NULL;
+				prefetchSession = prefetchSession->Next()) {
+			if (!strcmp(prefetchSession->Name(), name)) {
+				// found session!
+				break;
+			}
+		}
+	} else {
+		// ToDo: search for session by device/node ID
+		prefetchSession = NULL;
+	}
+	if (prefetchSession != NULL) {
+		TRACE(("found prefetch session %s\n", prefetchSession->Name()));
+		prefetchSession->Prefetch();
+	}
+
 	if (team >= B_OK)
 		hash_insert(sTeamHash, session);
 
@@ -273,6 +295,38 @@ team_gone(team_id team, void *_session)
 }
 
 
+static bool
+parse_node_ref(const char *string, node_ref &ref, const char **_end = NULL)
+{
+	// parse node ref
+	char *end;
+	ref.device = strtol(string, &end, 0);
+	if (end == NULL || ref.device == 0)
+		return false;
+
+	ref.node = strtoull(end + 1, &end, 0);
+
+	if (_end)
+		*_end = end;
+	return true;
+}
+
+
+static struct node *
+new_node(mount_id device, vnode_id id)
+{
+	struct node *node = new ::node;
+	if (node == NULL)
+		return NULL;
+
+	node->ref.device = device;
+	node->ref.node = id;
+	node->timestamp = system_time();
+
+	return node;
+}
+
+
 static void
 load_prefetch_data()
 {
@@ -286,7 +340,6 @@ load_prefetch_data()
 			continue;
 
 		Session *session = new Session(dirent->d_name);
-		dprintf("%s\n", dirent->d_name);
 
 		if (session->LoadFromDirectory(dir->fd) != B_OK) {
 			delete session;
@@ -348,13 +401,8 @@ Session::Session(const char *name)
 	fNodeRef.device = -1;
 	fNodeRef.node = -1;
 
-	if (isdigit(name[0])) {
-		// parse node ref
-		char *end;
-		fNodeRef.device = strtol(name, &end, 0);
-		if (end != NULL)
-			fNodeRef.node = strtoull(end + 1, NULL, 0);
-	}
+	if (isdigit(name[0]))
+		parse_node_ref(name, fNodeRef);
 
 	strlcpy(fName, name, B_OS_NAME_LENGTH);
 }
@@ -374,7 +422,7 @@ Session::~Session()
 			//TRACE(("  node %ld:%Ld\n", node->ref.device, node->ref.node));
 			free(node);
 		}
-	
+
 		hash_uninit(fNodeHash);
 	} else {
 		// ... from the list
@@ -424,13 +472,9 @@ Session::AddNode(mount_id device, vnode_id id)
 		return;
 	}
 
-	node = new ::node;
+	node = new_node(device, id);
 	if (node == NULL)
 		return;
-
-	node->ref.device = device;
-	node->ref.node = id;
-	node->timestamp = system_time();
 
 	hash_insert(fNodeHash, node);
 	fNodeCount++;
@@ -448,10 +492,67 @@ Session::RemoveNode(mount_id device, vnode_id id)
 }
 
 
-status_t
-Session::LoadFromDirectory(int fd)
+void
+Session::Prefetch()
 {
-	return B_ERROR;
+	if (fNodes == NULL || fNodeHash != NULL)
+		return;
+
+	for (struct node *node = fNodes; node != NULL; node = node->next) {
+		cache_prefetch(node->ref.device, node->ref.node, 0, ~0UL);
+	}
+}
+
+
+status_t
+Session::LoadFromDirectory(int directoryFD)
+{
+	TRACE(("load session %s\n", Name()));
+
+	int fd = _kern_open(directoryFD, Name(), O_RDONLY, 0);
+	if (fd < B_OK)
+		return fd;
+
+	struct stat stat;
+	if (fstat(fd, &stat) != 0) {
+		close(fd);
+		return errno;
+	}
+
+	if (stat.st_size > 32768) {
+		// for safety reasons
+		// ToDo: make a bit larger later
+		close(fd);
+		return B_BAD_DATA;
+	}
+
+	char *buffer = (char *)malloc(stat.st_size);
+	if (buffer == NULL) {
+		close(fd);
+		return B_NO_MEMORY;
+	}
+
+	if (read(fd, buffer, stat.st_size) < stat.st_size) {
+		free(buffer);
+		close(fd);
+		return B_ERROR;
+	}
+
+	const char *line = buffer;
+	node_ref nodeRef;
+	while (parse_node_ref(line, nodeRef, &line)) {
+		struct node *node = new_node(nodeRef.device, nodeRef.node);
+		if (node != NULL) {
+			// note: this reverses the order of the nodes in the file
+			node->next = fNodes;
+			fNodes = node;
+		}
+		line++;
+	}
+
+	free(buffer);
+	close(fd);
+	return B_OK;
 }
 
 
