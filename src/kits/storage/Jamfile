@@ -1,33 +1,91 @@
 SubDir OBOS_TOP src kits storage ;
 
-UsePrivateHeaders $(DOT) ;
+UsePrivateHeaders shared app kernel storage ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
-UsePrivateHeaders kernel ;
-UsePrivateHeaders shared ;
-UsePrivateHeaders storage ;
 
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kits storage ] ;
+MergeObject <libbe>storage_kit.o :
+	AppFileInfo.cpp
+	Directory.cpp
+	Entry.cpp
+	EntryList.cpp
+	File.cpp
+	FindDirectory.cpp
+	Mime.cpp
+	MimeType.cpp
+	Node.cpp
+	NodeInfo.cpp
+	NodeMonitor.cpp
+	OffsetFile.cpp
+	Path.cpp
+	Query.cpp
+	QueryPredicate.cpp
+	ResourceFile.cpp
+	ResourceItem.cpp
+	Resources.cpp
+	ResourcesContainer.cpp
+	ResourceStrings.cpp
+	Statable.cpp
+	SymLink.cpp
+	Volume.cpp
+	VolumeRoster.cpp
+	storage_support.cpp
+
+	mime/AssociatedTypes.cpp
+	mime/CreateAppMetaMimeThread.cpp
+	mime/Database.cpp
+	mime/InstalledTypes.cpp
+	mime/MimeUpdateThread.cpp
+	mime/SnifferRules.cpp
+	mime/Supertype.cpp
+	mime/SupportingApps.cpp
+	mime/UpdateMimeInfoThread.cpp
+	mime/database_access.cpp
+	mime/database_support.cpp
+
+	sniffer/CharStream.cpp
+	sniffer/Err.cpp				
+	sniffer/DisjList.cpp		
+	sniffer/Pattern.cpp			
+	sniffer/PatternList.cpp		
+	sniffer/Parser.cpp			
+	sniffer/Range.cpp			
+	sniffer/RPattern.cpp		
+	sniffer/RPatternList.cpp	
+	sniffer/Rule.cpp			
+;
 
 # We need to keep the DiskDevice API out of libopenbeos as long as the
 # Interface Kit is not fully functional (at least the part we are using).
-# So, we build a separate library.
-#
-SharedLibrary diskdevice
-	: #AddOnImage.cpp
-	  DiskDevice.cpp
-	  DiskDeviceJob.cpp
-#	  DiskDeviceList.cpp
-	  DiskDevicePrivate.cpp
-	  DiskDeviceRoster.cpp
-	  DiskDeviceTypes.cpp
-	  DiskDeviceVisitor.cpp
-#	  DiskScannerAddOn.cpp
-	  DiskSystem.cpp
-	  Partition.cpp
-#	  PartitioningDialog.cpp
-	  PartitioningInfo.cpp
+# So, we build it separately.
 
-	: <boot!home!config!lib>libdisk_device_manager.so be
+MergeObject <libbe>storage_diskdevice_kit.o :
+	DiskDevice.cpp
+	DiskDeviceJob.cpp
+	DiskDeviceList.cpp
+	DiskDevicePrivate.cpp
+	DiskDeviceRoster.cpp
+	DiskDeviceTypes.cpp
+	DiskDeviceVisitor.cpp
+	DiskSystem.cpp
+	Partition.cpp
+	PartitioningInfo.cpp 
 ;
-AbsSymLink <boot!home!config!lib>libdiskdevice.so : libdiskdevice.so
-	: /boot/home/config/lib : false ;
+
+# The adapter library we need (Storage Kit).
+#
+
+SEARCH on [ FGristFiles
+		strlcat.c strlcpy.c strcasestr.c
+	] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
+
+SharedLibrary beadapter :
+	LibBeAdapter.cpp
+	strlcat.c
+	strlcpy.c
+	strcasestr.c
+
+	: be
+;
+
+
+

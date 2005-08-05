@@ -1,5 +1,24 @@
 SubDir OBOS_TOP src kits support ;
 
+UsePrivateHeaders shared app ;
+
+MergeObject <libbe>support_kit.o :
+	Archivable.cpp
+	Beep.cpp
+	BlockCache.cpp
+	ByteOrder.cpp
+	DataBuffer.cpp
+	DataIO.cpp
+	BufferIO.cpp
+	Flattenable.cpp
+	List.cpp
+	Locker.cpp
+	PointerList.cpp
+	StopWatch.cpp
+	String.cpp
+#	StreamIO.cpp
+;
+
 StaticLibrary haiku :
 	String.cpp
 	strcasestr.c

@@ -1,16 +1,109 @@
 SubDir OBOS_TOP src kits interface ;
 
-#SubInclude OBOS_TOP src kits interface prefs ;
+# If defined allows to run applications without the registrar
+# -- for development only, of course.
+if $(RUN_WITHOUT_REGISTRAR) {
+	local defines = [ FDefines RUN_WITHOUT_REGISTRAR ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+}
 
-UsePrivateHeaders interface ;
+# If defined allows to run applications without the app server
+# -- needed until the app server runs on our kernel.
+RUN_WITHOUT_APP_SERVER ?= 0 ;
+if $(RUN_WITHOUT_APP_SERVER) != 0 {
+	local defines = [ FDefines RUN_WITHOUT_APP_SERVER ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+}
 
 if ! $(HAIKU_COMPATIBLE) {
-	SubDirC++Flags -DCOMPILE_FOR_R5 ;
+	local defines = [ FDefines COMPILE_FOR_R5 ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
 }
+
+UsePrivateHeaders shared app interface input [ FDirName servers app ] ;
+
+MergeObject <libbe>interface_kit.o :
+	Alert.cpp
+	Bitmap.cpp
+	BMCPrivate.cpp
+	Box.cpp
+	Button.cpp
+	ChannelControl.cpp
+	ChannelSlider.cpp
+	CheckBox.cpp
+	ClientFontList.cpp
+	ColorUtils.cc
+	ColorControl.cpp
+	Control.cpp
+	Deskbar.cpp
+	Dragger.cpp
+	Font.cpp
+	GraphicsDefs.cpp
+	Input.cpp
+	InterfaceDefs.cpp
+	ListItem.cpp
+	ListView.cpp
+	Menu.cpp
+	MenuBar.cpp
+	MenuField.cpp
+	MenuItem.cpp
+	MenuWindow.cpp
+	OptionControl.cpp
+	OptionPopUp.cpp
+	OutlineListView.cpp
+	Picture.cpp
+	PictureButton.cpp
+	Point.cpp
+	Polygon.cpp
+	PopUpMenu.cpp
+	PrintJob.cpp
+	PrivateScreen.cpp
+	RadioButton.cpp
+	Rect.cpp
+	Region.cpp
+	RegionSupport.cpp
+	Screen.cpp
+	ScrollBar.cpp
+	ScrollView.cpp
+	SeparatorItem.cpp
+	Shape.cpp
+	Shelf.cpp
+	Slider.cpp
+	StatusBar.cpp
+	StringView.cpp
+	TabView.cpp
+	TextControl.cpp
+	TextInput.cpp
+	TPicture.cpp
+	View.cpp
+	Window.cpp
+	ZombieReplicantView.cpp
+
+	# BTextView
+	BTextView/InlineInput.cpp
+	BTextView/LineBuffer.cpp
+	BTextView/StyleBuffer.cpp
+	BTextView/TextGapBuffer.cpp
+	BTextView/TextView.cpp
+	BTextView/UndoBuffer.cpp
+	BTextView/WidthBuffer.cpp
+;
 
 StaticLibrary haiku :
 	ScrollView.cpp
-	: STATIC_LIBRARY_DIR
-	;
 
-SubInclude OBOS_TOP src kits interface BTextView ;
+	# BTextView
+	BTextView/InlineInput.cpp
+	BTextView/LineBuffer.cpp
+	BTextView/StyleBuffer.cpp
+	BTextView/TextGapBuffer.cpp
+	BTextView/TextView.cpp
+	BTextView/UndoBuffer.cpp
+	BTextView/WidthBuffer.cpp
+
+	: STATIC_LIBRARY_DIR
+;
+

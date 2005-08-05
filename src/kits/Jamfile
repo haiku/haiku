@@ -17,81 +17,54 @@ if $(RUN_WITHOUT_APP_SERVER) != 0 {
 	SubDirC++Flags $(defines) ;
 }
 
-# Collect libopenbeos.so sources.
-subdirs = app interface support storage ;
-for subdir in $(subdirs) {
-	local dir = [ FDirName $(SUBDIR) $(subdir) ] ;
-	local file = $(subdir:S=.src) ;
-	include $(file:D=$(dir)) ;
-	UsePrivateHeaders $(subdir) ;
-	SEARCH_SOURCE += $(dir) ;
-}
+UsePrivateHeaders [ FDirName kernel util ] ;  # For KMessage.h
+UsePrivateHeaders syslog_daemon ;             # For syslog.cpp
 
-UsePrivateHeaders shared app [ FDirName servers app ] ;
-UsePrivateHeaders kernel ;	# for syscalls.h
-UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
-UsePrivateHeaders [ FDirName kernel util ] ;	# KMessage.h
-UsePrivateHeaders input ;
-UsePrivateHeaders syslog_daemon ;
+SEARCH on [ FGristFiles KMessage.cpp ]
+	= [ FDirName $(OBOS_TOP) src system kernel messaging ] ;
 
-# Add subsubdirs to the SEARCH_SOURCE.
-SEARCH_SOURCE += [ FDirName $(SUBDIR) interface BTextView ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) storage mime ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) storage sniffer ] ;
-
-LIBBE_SOURCE = 
-	$(APP_KIT_SOURCE)
-	$(INTERFACE_KIT_SOURCE)
-	$(SUPPORT_KIT_SOURCE)
-	$(STORAGE_KIT_SOURCE)
-
-	KMessage.cpp
-;
-
-LIBBE_SOURCE_HAIKU_ONLY =
-	$(STORAGE_KIT_SOURCE_HAIKU_ONLY)
-;
+# Build our libbe.so
 
 AddResources libbe.so : libbe_version.rdef ;
 
 SharedLibrary be :
-	$(LIBBE_SOURCE) $(LIBBE_SOURCE_HAIKU_ONLY)
-;
+	KMessage.cpp
+	: 
+	<libbe>app_kit.o
+	<libbe>interface_kit.o
+	<libbe>storage_kit.o
+	<libbe>storage_diskdevice_kit.o
+	<libbe>support_kit.o
 
-SharedLibraryFromObjects openbeos :
-	$(LIBBE_SOURCE:S=.o)
-	[ FGristFiles syslog.o ]
-;
-
-Objects	syslog.cpp ;
-
-LinkSharedOSLibs libbe.so :
 	libroot.so	# make sure it links against our libroot.so
 	stdc++.r4
 ;
 
+MakeLocate <develop>libbe.so : $(OBOS_STLIB_DIR) ;
+RelSymLink <develop>libbe.so : libbe.so ;
 
-LinkSharedOSLibs libopenbeos.so :
+# Build libopenbeos.so
+
+SEARCH on [ FGristFiles syslog.cpp ]
+	= [ FDirName $(OBOS_TOP) src system libroot posix ] ;
+
+SharedLibrary openbeos :
+	syslog.cpp
+	:
+	<libbe>app_kit.o
+	<libbe>interface_kit.o
+	<libbe>storage_kit.o
+	<libbe>support_kit.o
+
 	libbeadapter.so
 	net
 	stdc++.r4
 ;
 
-# The adapter library we need (Storage Kit).
-#
-SharedLibrary beadapter :
-	LibBeAdapter.cpp
-	strlcat.c
-	strlcpy.c
-	strcasestr.c
-;
-LinkSharedOSLibs libbeadapter.so :
-	be
-;
-
 # Note: If you want to use /boot/home/config/lib/libopenbeos.so in another
 # rule, use the identifier <boot!home!config!lib>libopenbeos.so, otherwise
 # libopenbeos.so.
+
 LOCATE on <boot!home!config!lib>libopenbeos.so
 		  <boot!home!config!lib>libbeadapter.so = /boot/home/config/lib ;
 File <boot!home!config!lib>libopenbeos.so : libopenbeos.so ;
@@ -99,30 +72,20 @@ File <boot!home!config!lib>libbeadapter.so : libbeadapter.so ;
 Includes <boot!home!config!lib>libopenbeos.so
 	: <boot!home!config!lib>libbeadapter.so ;
 
-SEARCH on [ FGristFiles
-		strlcat.c strlcpy.c strcasestr.c
-	] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
-
-SEARCH on [ FGristFiles syslog.cpp ]
-	= [ FDirName $(OBOS_TOP) src system libroot posix ] ;
-
-SEARCH on [ FGristFiles KMessage.cpp ]
-	= [ FDirName $(OBOS_TOP) src system kernel messaging ] ;
-
 SubInclude OBOS_TOP src kits app ;
 SubInclude OBOS_TOP src kits debug ;
+SubInclude OBOS_TOP src kits device ;
+SubInclude OBOS_TOP src kits game ;
 SubInclude OBOS_TOP src kits interface ;
 SubInclude OBOS_TOP src kits mail ;
 SubInclude OBOS_TOP src kits media ;
 SubInclude OBOS_TOP src kits midi ;
 SubInclude OBOS_TOP src kits midi2 ;
-SubInclude OBOS_TOP src kits screensaver ;
-#SubInclude OBOS_TOP src kits storage ;
-SubInclude OBOS_TOP src kits support ;
-SubInclude OBOS_TOP src kits textencoding ;
-SubInclude OBOS_TOP src kits translation ;
-SubInclude OBOS_TOP src kits tracker ;
-SubInclude OBOS_TOP src kits device ;
-SubInclude OBOS_TOP src kits game ;
 SubInclude OBOS_TOP src kits network ;
 SubInclude OBOS_TOP src kits opengl ;
+SubInclude OBOS_TOP src kits screensaver ;
+SubInclude OBOS_TOP src kits storage ;
+SubInclude OBOS_TOP src kits support ;
+SubInclude OBOS_TOP src kits textencoding ;
+SubInclude OBOS_TOP src kits tracker ;
+SubInclude OBOS_TOP src kits translation ;

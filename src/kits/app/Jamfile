@@ -1,4 +1,59 @@
 SubDir OBOS_TOP src kits app ;
 
+# If defined allows to run applications without the registrar
+# -- for development only, of course.
+if $(RUN_WITHOUT_REGISTRAR) {
+	local defines = [ FDefines RUN_WITHOUT_REGISTRAR ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+}
 
-UsePrivateHeaders interface ;
+# If defined allows to run applications without the app server
+# -- needed until the app server runs on our kernel.
+RUN_WITHOUT_APP_SERVER ?= 0 ;
+if $(RUN_WITHOUT_APP_SERVER) != 0 {
+	local defines = [ FDefines RUN_WITHOUT_APP_SERVER ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+}
+
+UsePrivateHeaders shared app interface ;
+UsePrivateHeaders [ FDirName kernel util ] ;   # For KMessage.h
+
+MergeObject <libbe>app_kit.o :
+	AppDefs.cpp
+	Application.cpp
+	AppMisc.cpp
+	AppServerLink.cpp
+	AreaLink.cpp
+	Cursor.cpp
+	Clipboard.cpp
+	dano_message.cpp
+	Handler.cpp
+	InitTerminateLibBe.cpp
+	Invoker.cpp
+	LinkReceiver.cpp
+	LinkSender.cpp
+	Looper.cpp
+	LooperList.cpp
+	Message.cpp
+	MessageBody.cpp
+	MessageField.cpp
+	MessageFilter.cpp
+	MessageQueue.cpp
+	MessageRunner.cpp
+	Messenger.cpp
+	MessageUtils.cpp
+	PropertyInfo.cpp
+	PortLink.cpp
+	RegistrarDefs.cpp
+	RegistrarThread.cpp
+	RegistrarThreadManager.cpp
+	Roster.cpp
+	RosterPrivate.cpp
+	Server.cpp
+	ServerMemIO.cpp
+	TokenSpace.cpp
+	TypeConstants.cpp 
+;
+
