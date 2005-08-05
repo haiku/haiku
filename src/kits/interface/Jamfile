@@ -91,19 +91,3 @@ MergeObject <libbe>interface_kit.o :
 	BTextView/UndoBuffer.cpp
 	BTextView/WidthBuffer.cpp
 ;
-
-StaticLibrary haiku :
-	ScrollView.cpp
-
-	# BTextView
-	BTextView/InlineInput.cpp
-	BTextView/LineBuffer.cpp
-	BTextView/StyleBuffer.cpp
-	BTextView/TextGapBuffer.cpp
-	BTextView/TextView.cpp
-	BTextView/UndoBuffer.cpp
-	BTextView/WidthBuffer.cpp
-
-	: STATIC_LIBRARY_DIR
-;
-

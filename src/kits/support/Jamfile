@@ -18,11 +18,3 @@ MergeObject <libbe>support_kit.o :
 	String.cpp
 #	StreamIO.cpp
 ;
-
-StaticLibrary haiku :
-	String.cpp
-	strcasestr.c
-	: STATIC_LIBRARY_DIR
-	;
-
-SEARCH on <src!kits!support>strcasestr.c = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
