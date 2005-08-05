@@ -20,9 +20,6 @@ if $(RUN_WITHOUT_APP_SERVER) != 0 {
 UsePrivateHeaders [ FDirName kernel util ] ;  # For KMessage.h
 UsePrivateHeaders syslog_daemon ;             # For syslog.cpp
 
-SEARCH on [ FGristFiles KMessage.cpp ]
-	= [ FDirName $(OBOS_TOP) src system kernel messaging ] ;
-
 # Build our libbe.so
 
 AddResources libbe.so : libbe_version.rdef ;
@@ -45,10 +42,8 @@ RelSymLink <develop>libbe.so : libbe.so ;
 
 # Build libopenbeos.so
 
-SEARCH on [ FGristFiles syslog.cpp ]
-	= [ FDirName $(OBOS_TOP) src system libroot posix ] ;
-
 SharedLibrary openbeos :
+	KMessage.cpp
 	syslog.cpp
 	:
 	<libbe>app_kit.o
@@ -60,6 +55,12 @@ SharedLibrary openbeos :
 	net
 	stdc++.r4
 ;
+
+SEARCH on [ FGristFiles KMessage.cpp ]
+	= [ FDirName $(OBOS_TOP) src system kernel messaging ] ;
+
+SEARCH on [ FGristFiles syslog.cpp ]
+	= [ FDirName $(OBOS_TOP) src system libroot posix ] ;
 
 # Note: If you want to use /boot/home/config/lib/libopenbeos.so in another
 # rule, use the identifier <boot!home!config!lib>libopenbeos.so, otherwise
