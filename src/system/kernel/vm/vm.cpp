@@ -1099,7 +1099,7 @@ _vm_map_file(aspace_id aid, const char *name, void **_address, uint32 addressSpe
 	if (status < B_OK)
 		goto err1;
 
-	status = vfs_get_vnode_cache(vnode, &cacheRef);
+	status = vfs_get_vnode_cache(vnode, &cacheRef, false);
 	if (status < B_OK)
 		goto err2;
 

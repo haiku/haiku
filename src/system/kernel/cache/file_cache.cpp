@@ -487,6 +487,10 @@ read_into_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, s
 	TRACE(("read_from_cache: ref = %p, offset = %Ld, size = %lu, buffer = %p, bufferSize = %lu\n",
 		ref, offset, size, (void *)buffer, bufferSize));
 
+	// do we have to read in anything at all?
+	if (size == 0)
+		return B_OK;
+
 	// make sure "offset" is page aligned - but also remember the page offset
 	int32 pageOffset = offset & (B_PAGE_SIZE - 1);
 	size = PAGE_ALIGN(size + pageOffset);
@@ -497,7 +501,8 @@ read_into_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, s
 		if (chunkSize > (MAX_IO_VECS * B_PAGE_SIZE))
 			chunkSize = MAX_IO_VECS * B_PAGE_SIZE;
 
-		status_t status = read_chunk_into_cache(ref, offset, chunkSize, pageOffset, buffer, bufferSize);
+		status_t status = read_chunk_into_cache(ref, offset, chunkSize, pageOffset,
+								buffer, bufferSize);
 		if (status != B_OK)
 			return status;
 
@@ -819,10 +824,8 @@ extern "C" void
 cache_prefetch_vnode(void *vnode, off_t offset, size_t size)
 {
 	vm_cache_ref *cache;
-	if (vfs_get_vnode_cache(vnode, &cache) != B_OK) {
-		vfs_put_vnode(vnode);
+	if (vfs_get_vnode_cache(vnode, &cache, false) != B_OK)
 		return;
-	}
 
 	file_cache_ref *ref = (struct file_cache_ref *)((vnode_store *)cache->cache->store)->file_cache_ref;
 	off_t fileSize = cache->cache->virtual_size;
@@ -985,7 +988,7 @@ file_cache_create(mount_id mountID, vnode_id vnodeID, off_t size, int fd)
 	if (vfs_lookup_vnode(mountID, vnodeID, &ref->vnode) != B_OK)
 		goto err2;
 
-	if (vfs_get_vnode_cache(ref->vnode, &ref->cache) != B_OK)
+	if (vfs_get_vnode_cache(ref->vnode, &ref->cache, true) != B_OK)
 		goto err3;
 
 	ref->cache->cache->virtual_size = size;

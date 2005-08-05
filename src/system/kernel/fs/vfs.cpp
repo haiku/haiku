@@ -2458,7 +2458,7 @@ vfs_write_pages(void *_vnode, void *cookie, off_t pos, const iovec *vecs, size_t
 
 
 extern "C" status_t
-vfs_get_vnode_cache(void *_vnode, vm_cache_ref **_cache)
+vfs_get_vnode_cache(void *_vnode, vm_cache_ref **_cache, bool allocate)
 {
 	struct vnode *vnode = (struct vnode *)_vnode;
 
@@ -2470,9 +2470,14 @@ vfs_get_vnode_cache(void *_vnode, vm_cache_ref **_cache)
 	mutex_lock(&sVnodeMutex);
 
 	status_t status = B_OK;
+
 	// The cache could have been created in the meantime
-	if (vnode->cache == NULL)
-		status = vm_create_vnode_cache(vnode, &vnode->cache);
+	if (vnode->cache == NULL) {
+		if (allocate)
+			status = vm_create_vnode_cache(vnode, &vnode->cache);
+		else
+			status = B_BAD_VALUE;
+	}
 
 	if (status == B_OK)
 		*_cache = vnode->cache;
