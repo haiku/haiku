@@ -833,14 +833,6 @@ team_delete_team(struct team *team)
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 
-	// free team resources
-
-	vm_delete_aspace(team->aspace);
-	delete_owned_ports(teamID);
-	sem_delete_owned_sems(teamID);
-	remove_images(team);
-	vfs_free_io_context(team->io_context);
-
 	// notify team watchers
 
 	{
@@ -852,6 +844,14 @@ team_delete_team(struct team *team)
 			free(watcher);
 		}
 	}
+
+	// free team resources
+
+	vm_delete_aspace(team->aspace);
+	delete_owned_ports(teamID);
+	sem_delete_owned_sems(teamID);
+	remove_images(team);
+	vfs_free_io_context(team->io_context);
 
 	// ToDo: should our death_entries be moved one level up?
 	delete_team_struct(team);
