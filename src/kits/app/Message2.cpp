@@ -39,7 +39,6 @@
 #include "MessageBody2.h"
 #include "MessageField2.h"
 #include "MessageUtils2.h"
-#include "SimpleMallocIO.h"
 #include "dano_message.h"
 
 // flags for the overall message (the bitfield is 1 byte)
@@ -82,6 +81,22 @@ static status_t		convert_message(const KMessage *fromMessage,
 						BMessage *toMessage);
 static ssize_t		min_hdr_size();
 
+typedef struct message_header_s {
+	int32		checkSum;
+	int32		flattenedSize;
+	uint32		what;
+	uint8		flags;
+} __attribute__((__packed__)) MessageHeader;
+
+typedef struct reply_data_s {
+	port_id		replyPort;
+	int32		replyToken;
+	team_id		replyTeam;
+	bool		preferredTarget;
+	bool		replyRequired;
+	bool		replyDone;
+	bool		isReply;
+} __attribute__((__packed__)) ReplyData;
 
 class BMessage::Header {
 public:
@@ -1028,7 +1043,7 @@ BMessage::PopSpecifier()
 status_t																	\
 BMessage::Add ## fnName(const char *name, TYPE val)							\
 {																			\
-	return AddData(name, TYPESPEC, &val, sizeof(TYPE));						\
+	return AddData(name, TYPESPEC, &val, sizeof(TYPE), true);				\
 }																			\
 																			\
 status_t																	\
@@ -1122,44 +1137,46 @@ DEFINE_LAZY_FIND_FUNCTION(const char *, String);
 status_t
 BMessage::AddString(const char *name, const char *string)
 {
-	return AddData(name, B_STRING_TYPE, string, strlen(string) + 1);
+	return AddData(name, B_STRING_TYPE, string, strlen(string) + 1, false);
 }
 
 
 status_t
 BMessage::AddString(const char* name, const BString &string)
 {
-	return AddData(name, B_STRING_TYPE, string.String(), string.Length() + 1);
+	return AddData(name, B_STRING_TYPE, string.String(), string.Length() + 1, false);
 }
 
 
 status_t
 BMessage::AddPointer(const char *name, const void *pointer)
 {
-	return AddData(name, B_POINTER_TYPE, &pointer, sizeof(pointer));
+	return AddData(name, B_POINTER_TYPE, &pointer, sizeof(pointer), true);
 }
 
 
 status_t
 BMessage::AddMessenger(const char *name, BMessenger messenger)
 {
-	return AddData(name, B_MESSENGER_TYPE, &messenger, sizeof(messenger));
+	return AddData(name, B_MESSENGER_TYPE, &messenger, sizeof(messenger), true);
 }
 
 
 status_t
-BMessage::AddRef(const char* name, const entry_ref* ref)
+BMessage::AddRef(const char *name, const entry_ref *ref)
 {
 	size_t size = sizeof(entry_ref) + B_PATH_NAME_LENGTH;
-	BSimpleMallocIO *buffer = new BSimpleMallocIO(size);
-	status_t error = entry_ref_flatten(buffer->Buffer(), &size, ref);
-	buffer->SetSize(size);
-
-	if (error >= B_OK)
-		error = fBody->AddData(name, buffer, B_REF_TYPE);
+	char flatRef[size];
+	status_t error = entry_ref_flatten(flatRef, &size, ref);
 
 	if (error < B_OK)
-		delete buffer;
+		return error;
+
+	void *buffer;
+	error = fBody->AddData(name, B_REF_TYPE, size, &buffer, false);
+
+	if (error >= B_OK)
+		memcpy(buffer, flatRef, size);
 
 	return error;
 }
@@ -1169,16 +1186,14 @@ status_t
 BMessage::AddMessage(const char *name, const BMessage *msg)
 {
 	size_t size = msg->FlattenedSize();
-	BSimpleMallocIO *buffer = new BSimpleMallocIO(size);
-	status_t error = msg->Flatten(buffer->Buffer(), size);
 
-	if (error >= B_OK)
-		error = fBody->AddData(name, buffer, B_MESSAGE_TYPE);
+	void *buffer;
+	status_t error = fBody->AddData(name, B_MESSAGE_TYPE, size, &buffer, false);
 
 	if (error < B_OK)
-		delete buffer;
+		return error;
 
-	return error;
+	return msg->Flatten((char *)buffer, size);
 }
 
 
@@ -1186,36 +1201,29 @@ status_t
 BMessage::AddFlat(const char *name, BFlattenable *object, int32 count)
 {
 	ssize_t size = object->FlattenedSize();
-	BSimpleMallocIO *buffer = new BSimpleMallocIO(size);
-	status_t error = object->Flatten(buffer->Buffer(), size);
 
-	if (error >= B_OK)
-		error = fBody->AddData(name, buffer, object->TypeCode());
+	void *buffer;
+	status_t error = fBody->AddData(name, object->TypeCode(), size, &buffer, false);
 
 	if (error < B_OK)
-		delete buffer;
+		return error;
 
-	return error;
+	return object->Flatten(buffer, size);
 }
 
 
 status_t
 BMessage::AddData(const char *name, type_code type, const void *data,
-	ssize_t numBytes, bool is_fixed_size, int32 /*count*/)
+	ssize_t numBytes, bool is_fixed_size, int32 count)
 {
-	// TODO: test
-	// In particular, we want to see what happens if is_fixed_size == true and
-	// the user attempts to add something bigger or smaller.  We may need to
-	// enforce the size thing.
-
-	BSimpleMallocIO *buffer = new BSimpleMallocIO(numBytes);
-	buffer->Write(data);
-	status_t error = fBody->AddData(name, buffer, type);
+	void *buffer;
+	status_t error = fBody->AddData(name, type, numBytes, &buffer, is_fixed_size, count);
 
 	if (error < B_OK)
-		delete buffer;
+		return error;
 
-	return error;
+	memcpy(buffer, data, numBytes);
+	return B_OK;
 }
 
 
@@ -1490,17 +1498,20 @@ status_t
 BMessage::ReplaceRef(const char *name, int32 index, const entry_ref *ref)
 {
 	size_t size = sizeof(entry_ref) + B_PATH_NAME_LENGTH;
-	BSimpleMallocIO *buffer = new BSimpleMallocIO(size);
-	status_t error = entry_ref_flatten(buffer->Buffer(), &size, ref);
-	buffer->SetSize(size);
-
-	if (error >= B_OK)
-		error = fBody->ReplaceData(name, index, buffer, B_REF_TYPE);
+	char flatRef[size];
+	status_t error = entry_ref_flatten(flatRef, &size, ref);
 
 	if (error < B_OK)
-		delete buffer;
+		return error;
 
-	return error;
+	void *buffer;
+	error = fBody->ReplaceData(name, B_REF_TYPE, index, size, &buffer);
+
+	if (error < B_OK)
+		return error;
+
+	memcpy(buffer, flatRef, size);
+	return B_OK;
 }
 
 
@@ -1515,16 +1526,14 @@ status_t
 BMessage::ReplaceMessage(const char *name, int32 index, const BMessage *msg)
 {
 	size_t size = msg->FlattenedSize();
-	BSimpleMallocIO *buffer = new BSimpleMallocIO(size);
-	status_t error = msg->Flatten(buffer->Buffer(), size);
 
-	if (error >= B_OK)
-		error = fBody->ReplaceData(name, index, buffer, B_MESSAGE_TYPE);
+	void *buffer;
+	status_t error = fBody->ReplaceData(name, B_MESSAGE_TYPE, index, size, &buffer);
 
 	if (error < B_OK)
-		delete buffer;
+		return error;
 
-	return error;
+	return msg->Flatten((char *)buffer, size);
 }
 
 
@@ -1539,16 +1548,14 @@ status_t
 BMessage::ReplaceFlat(const char *name, int32 index, BFlattenable *object)
 {
 	ssize_t size = object->FlattenedSize();
-	BSimpleMallocIO *buffer = new BSimpleMallocIO(size);
-	status_t error = object->Flatten(buffer->Buffer(), size);
 
-	if (error >= B_OK)
-		error = fBody->ReplaceData(name, index, buffer, object->TypeCode());
+	void *buffer;
+	status_t error = fBody->ReplaceData(name, object->TypeCode(), index, size, &buffer);
 
 	if (error < B_OK)
-		delete buffer;
+		return error;
 
-	return error;
+	return object->Flatten(buffer, size);
 }
 
 
@@ -1564,14 +1571,14 @@ status_t
 BMessage::ReplaceData(const char *name, type_code type, int32 index,
 	const void *data, ssize_t data_size)
 {
-	BSimpleMallocIO *buffer = new BSimpleMallocIO(data_size);
-	buffer->Write(data);
-	status_t error = fBody->ReplaceData(name, index, buffer, type);
+	void *buffer;
+	status_t error = fBody->ReplaceData(name, type, index, data_size, &buffer);
 
 	if (error < B_OK)
-		delete buffer;
+		return error;
 
-	return error;
+	memcpy(buffer, data, data_size);
+	return B_OK;
 }
 
 

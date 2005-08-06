@@ -11,8 +11,8 @@
 #ifndef _MESSAGE_FIELD_H_
 #define _MESSAGE_FIELD_H_
 
+#include <DataIO.h>
 #include <List.h>
-#include <String.h>
 #include <SupportDefs.h>
 
 #define MSG_FLAG_VALID			0x01
@@ -25,36 +25,47 @@
 
 namespace BPrivate {
 
-class BSimpleMallocIO;
+typedef struct field_header_s {
+	uint8		flags;
+	type_code	type;
+	int32		count;
+	ssize_t		dataSize;
+	uint8		nameLength;
+	char		name[255];
+} __attribute__((__packed__)) FieldHeader;
 
 class BMessageField {
 public:
 							BMessageField();
 							BMessageField(const char *name, type_code type);
+							BMessageField(uint8 flags, BDataIO *stream);
 							BMessageField(const BMessageField &other);
 							~BMessageField();
 
 		BMessageField		&operator=(const BMessageField &other);
 
-		uint8				Flags();
+		void				Flatten(BDataIO *stream);
+		void				Unflatten(uint8 flags, BDataIO *stream);
+
+		uint8				Flags() { return fHeader.flags; };
 
 		void				SetName(const char *name);
-		const char			*Name() const { return fName.String(); };
-		uint8				NameLength() const { return fName.Length(); };
-		type_code			Type() const { return fType; };
+		const char			*Name() const { return fHeader.name; };
+		uint8				NameLength() const { return fHeader.nameLength; };
+		type_code			Type() const { return fHeader.type; };
 
-		void				AddItem(BSimpleMallocIO *item);
-		void				ReplaceItem(int32 index, BSimpleMallocIO *item);
+		void				*AddItem(size_t length);
+		void				*ReplaceItem(int32 index, size_t newLength);
 		void				RemoveItem(int32 index);
-		int32				CountItems() const { return fItems.CountItems(); };
-		size_t				SizeAt(int32 index) const;
-		const void			*BufferAt(int32 index) const;
+		int32				CountItems() const { return fHeader.count; };
+
+		const void			*BufferAt(int32 index, ssize_t *size) const;
 
 		void				MakeEmpty();
 
-		bool				IsFixedSize() const { return fFixedSize; };
-		size_t				TotalSize() const { return fTotalSize; };
-		size_t				TotalPadding() const { return fTotalPadding; };
+		status_t			SetFixedSize(int32 itemSize, int32 count);
+		bool				IsFixedSize() const { return fHeader.flags & MSG_FLAG_FIXED_SIZE; };
+		size_t				TotalSize() const { return fHeader.dataSize; };
 
 		void				PrintToStream() const;
 
@@ -63,15 +74,20 @@ public:
 		BMessageField		*Next() const { return fNext; };
 
 private:
-		bool				IsFixedSize(type_code type);
+		void				ResetHeader(const char *name, type_code type);
+		void				FlatResize(int32 offset, size_t oldLength,
+								size_t newLength);
 
-		BString				fName;
-		type_code			fType;
-		BList				fItems;
-		bool				fFixedSize;
-		size_t				fTotalSize;
-		size_t				fTotalPadding;
+		FieldHeader			fHeader;
+mutable	BMallocIO			fFlatBuffer;
 
+		// fixed size items
+		int32				fItemSize;
+
+		// variable sized items
+		BList				*fOffsets;
+
+		// hash table support
 		BMessageField		*fNext;
 };
 

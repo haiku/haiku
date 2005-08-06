@@ -43,16 +43,17 @@ public:
 		status_t			Flatten(BDataIO *stream) const;
 		status_t			Unflatten(BDataIO *stream);
 
-		status_t			AddData(const char *name, BSimpleMallocIO *buffer,
-								type_code type);
+		status_t			AddData(const char *name, type_code type,
+								size_t length, void **buffer,
+								bool fixedSize = false, int32 count = 1);
 		status_t			RemoveData(const char *name, int32 index = 0);
 
 		bool				HasData(const char *name, type_code t, int32 n) const;
 		status_t			FindData(const char *name, type_code type,
 								int32 index, const void **data,
 								ssize_t *numBytes) const;
-		status_t			ReplaceData(const char *name, int32 index,
-								BSimpleMallocIO *buffer, type_code type);
+		status_t			ReplaceData(const char *name, type_code type,
+								int32 index, size_t length, void **buffer);
 
 		status_t			Rename(const char *oldName, const char *newName);
 		status_t			RemoveName(const char *name);

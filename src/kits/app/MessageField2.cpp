@@ -7,35 +7,52 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <TypeConstants.h>
 #include "MessageField2.h"
-#include "SimpleMallocIO.h"
+#include "MessageUtils2.h"
 
 namespace BPrivate {
 
-#define ROUND_TO_8(x) (fFixedSize ? x : (x + 11) & ~7)
+inline int32
+round_to_8(int32 length)
+{
+	// already includes the + 4 for size_t length field
+	return (length + 11) & ~7;
+}
+
 
 BMessageField::BMessageField()
-	:	fType(0),
-		fFixedSize(false),
-		fTotalSize(0),
+	:	fItemSize(0),
+		fOffsets(NULL),
 		fNext(NULL)
 {
-	SetName("");
+	ResetHeader("", 0);
 }
 
 
 BMessageField::BMessageField(const char *name, type_code type)
-	:	fType(type),
-		fTotalSize(0),
+	:	fItemSize(0),
+		fOffsets(NULL),
 		fNext(NULL)
 {
-	SetName(name);
-	fFixedSize = IsFixedSize(type);
+	ResetHeader(name, type);
+}
+
+
+BMessageField::BMessageField(uint8 flags, BDataIO *stream)
+	:	fItemSize(0),
+		fOffsets(NULL),
+		fNext(NULL)
+{
+	Unflatten(flags, stream);
 }
 
 
 BMessageField::BMessageField(const BMessageField &other)
+	:	fItemSize(0),
+		fOffsets(NULL),
+		fNext(NULL)
 {
 	*this = other;
 }
@@ -52,18 +69,20 @@ BMessageField::operator=(const BMessageField &other)
 {
 	if (this != &other) {
 		MakeEmpty();
-
-		fName = other.fName;
-		fType = other.fType;
-		fFixedSize = other.fFixedSize;
-		fTotalSize = other.fTotalSize;
 		fNext = NULL;
 
-		for (int32 index = 0; index < other.fItems.CountItems(); index++) {
-			BSimpleMallocIO *otherBuffer = (BSimpleMallocIO *)other.fItems.ItemAt(index);
-			BSimpleMallocIO *newBuffer = new BSimpleMallocIO(otherBuffer->BufferLength());
-			newBuffer->Write(otherBuffer->Buffer());
-			fItems.AddItem((void *)newBuffer);
+		memcpy(&fHeader, &other.fHeader, sizeof(FieldHeader));
+
+		fFlatBuffer.Write(other.fFlatBuffer.Buffer(), other.fFlatBuffer.BufferLength());
+
+		if (other.fOffsets) {
+			int32 count = other.fOffsets->CountItems();
+			fOffsets = new BList(count);
+
+			for (int32 index = 0; index < count; index++)
+				fOffsets->AddItem(other.fOffsets->ItemAt(index));
+		} else {
+			fItemSize = other.fItemSize;
 		}
 	}
 
@@ -72,97 +91,218 @@ BMessageField::operator=(const BMessageField &other)
 
 
 void
-BMessageField::MakeEmpty()
+BMessageField::Flatten(BDataIO *stream)
 {
-	for (int32 index = 0; index < fItems.CountItems(); index++) {
-		BSimpleMallocIO *item = (BSimpleMallocIO *)fItems.ItemAt(index);
-		delete item;
-	}
+	// write flat header including name
+	stream->Write(&fHeader, sizeof(fHeader) - sizeof(fHeader.name) + fHeader.nameLength);
 
-	fItems.MakeEmpty();
+	// write flat data
+	stream->Write(fFlatBuffer.Buffer(), fHeader.dataSize);
 }
 
 
-uint8
-BMessageField::Flags()
+void
+BMessageField::Unflatten(uint8 flags, BDataIO *stream)
 {
-	uint8 flags = MSG_FLAG_VALID;
+	TReadHelper reader(stream);
 
-	if (fItems.CountItems() == 1)
-		flags |= MSG_FLAG_SINGLE_ITEM;
+	// read the header
+	if (flags == MSG_FLAG_VALID
+		|| flags == MSG_FLAG_VALID | MSG_FLAG_FIXED_SIZE) {
+		// we can read the header as flat data
+		fHeader.flags = flags;
+		stream->Read(&fHeader.type, sizeof(fHeader) - sizeof(fHeader.flags) - sizeof(fHeader.name));
+		stream->Read(&fHeader.name, fHeader.nameLength);
+		fItemSize = fHeader.dataSize / fHeader.count;
+	} else {
+		// we have to disassemble the header
+		type_code type;
+		reader(type);
+		ResetHeader("", type);
 
-	if (fTotalSize < 255)
-		flags |= MSG_FLAG_MINI_DATA;
+		if (flags & MSG_FLAG_SINGLE_ITEM) {
+			fHeader.count = 1;
 
-	if (fFixedSize)
-		flags |= MSG_FLAG_FIXED_SIZE;
+			if (flags & MSG_FLAG_MINI_DATA) {
+				uint8 littleData;
+				reader(littleData);
+				fHeader.dataSize = littleData;
+			} else
+				reader(fHeader.dataSize);
+		} else {
+			if (flags & MSG_FLAG_MINI_DATA) {
+				uint8 littleData;
+				reader(littleData);
+				fHeader.count = littleData;
 
-	return flags;
+				reader(littleData);
+				fHeader.dataSize = littleData;
+			} else {
+				reader(fHeader.count);
+				reader(fHeader.dataSize);
+			}
+		}
+
+		reader(fHeader.nameLength);
+		reader(fHeader.name, fHeader.nameLength);
+	}
+
+	// now read the data
+	fFlatBuffer.SetSize(fHeader.dataSize);
+	stream->Read((void *)fFlatBuffer.Buffer(), fHeader.dataSize);
+
+	// ToDo: enable swapping
+	// swap the data if necessary
+	if (false) {
+		// is the data fixed size?
+		if (flags & MSG_FLAG_FIXED_SIZE) {
+			// make sure to swap the data
+			status_t status = swap_data(fHeader.type,
+				(void *)fFlatBuffer.Buffer(), fHeader.dataSize, B_SWAP_ALWAYS);
+			if (status < B_OK)
+				throw status;
+		} else if (fHeader.type == B_REF_TYPE) {
+			// apparently, entry_refs are the only variable-length data
+			// explicitely swapped -- the dev_t and ino_t specifically
+			// ToDo: this looks broken
+			byte_swap(*(entry_ref *)fFlatBuffer.Buffer());
+		}
+	}
+}
+
+
+void
+BMessageField::ResetHeader(const char *name, type_code type)
+{
+	memset(&fHeader, 0, sizeof(fHeader));
+	fHeader.flags |= MSG_FLAG_VALID;
+	fHeader.type = type;
+	SetName(name);
+}
+
+
+void
+BMessageField::MakeEmpty()
+{
+	fFlatBuffer.SetSize(0);
+
+	if (fOffsets)
+		fOffsets->MakeEmpty();
+
+	fHeader.dataSize = 0;
+	fHeader.count = 0;
+}
+
+
+status_t
+BMessageField::SetFixedSize(int32 itemSize, int32 /*count*/)
+{
+	// ToDo: use count here to preallocate the buffer
+	if (fHeader.count > 0 && itemSize != fItemSize) {
+		debugger("not allowed\n");
+		return B_BAD_VALUE;
+	}
+
+	fItemSize = itemSize;
+	fHeader.flags |= MSG_FLAG_FIXED_SIZE;
+	return B_OK;
 }
 
 
 void
 BMessageField::SetName(const char *name)
 {
-	fName = name;
-
-	// the name length field is only 1 byte long
-	// ToDo: change this? (BC problem)
-	fName.Truncate(255 - 1);
+	fHeader.nameLength = min_c(strlen(name), 254);
+	memcpy(fHeader.name, name, fHeader.nameLength);
 }
 
 
-void
-BMessageField::AddItem(BSimpleMallocIO *item)
+void *
+BMessageField::AddItem(size_t length)
 {
-	fItems.AddItem((void *)item);
-	fTotalSize += ROUND_TO_8(item->BufferLength());
+	fHeader.count++;
+
+	int32 offset = fFlatBuffer.BufferLength();
+	if (fHeader.flags & MSG_FLAG_FIXED_SIZE) {
+		fHeader.dataSize += length;
+		fFlatBuffer.SetSize(offset + length);
+		return (char *)fFlatBuffer.Buffer() + offset;
+	}
+
+	if (!fOffsets)
+		fOffsets = new BList();
+
+	fOffsets->AddItem((void *)offset);
+
+	size_t newLength = round_to_8(length);
+	fHeader.dataSize += newLength;
+	FlatResize(offset, 0, newLength);
+	fFlatBuffer.WriteAt(offset, &length, sizeof(length));
+	return (char *)fFlatBuffer.Buffer() + offset + sizeof(newLength);
 }
 
 
-void
-BMessageField::ReplaceItem(int32 index, BSimpleMallocIO *item)
+void *
+BMessageField::ReplaceItem(int32 index, size_t newLength)
 {
-	BSimpleMallocIO *oldItem = (BSimpleMallocIO *)fItems.ItemAt(index);
-	fItems.ReplaceItem(index, item);
+	if (fHeader.flags & MSG_FLAG_FIXED_SIZE)
+		return (char *)fFlatBuffer.Buffer() + (index * fItemSize);
 
-	fTotalSize -= ROUND_TO_8(oldItem->BufferLength());
-	fTotalSize += ROUND_TO_8(item->BufferLength());
+	int32 offset = (int32)fOffsets->ItemAt(index);
 
-	delete oldItem;
+	size_t oldLength;
+	fFlatBuffer.ReadAt(offset, &oldLength, sizeof(oldLength));
+	fFlatBuffer.WriteAt(offset, &newLength, sizeof(newLength));
+
+	oldLength = round_to_8(oldLength);
+	newLength = round_to_8(newLength);
+
+	if (oldLength == newLength)
+		return (char *)fFlatBuffer.Buffer() + offset + sizeof(newLength);
+
+	FlatResize(offset, oldLength, newLength);
+	fHeader.dataSize += newLength - oldLength;
+
+	return (char *)fFlatBuffer.Buffer() + offset + sizeof(newLength);
 }
 
 
 void
 BMessageField::RemoveItem(int32 index)
 {
-	BSimpleMallocIO *item = (BSimpleMallocIO *)fItems.RemoveItem(index);
-	fTotalSize -= ROUND_TO_8(item->BufferLength());
-	delete item;
-}
+	fHeader.count--;
 
+	if (fHeader.flags & MSG_FLAG_FIXED_SIZE) {
+		FlatResize(index * fItemSize, fItemSize, 0);
+		fHeader.dataSize -= fItemSize;
+		return;
+	}
 
-size_t
-BMessageField::SizeAt(int32 index) const
-{
-	BSimpleMallocIO *buffer = (BSimpleMallocIO *)fItems.ItemAt(index);
+	size_t oldLength;
+	int32 offset = (int32)fOffsets->ItemAt(index);
+	fFlatBuffer.ReadAt(offset, &oldLength, sizeof(oldLength));
+	oldLength = round_to_8(oldLength);
 
-	if (buffer)
-		return buffer->BufferLength();
-
-	return 0;
+	FlatResize(offset, oldLength, 0);
+	fHeader.dataSize -= oldLength;
 }
 
 
 const void *
-BMessageField::BufferAt(int32 index) const
+BMessageField::BufferAt(int32 index, ssize_t *size) const
 {
-	BSimpleMallocIO *buffer = (BSimpleMallocIO *)fItems.ItemAt(index);
+	if (fHeader.flags & MSG_FLAG_FIXED_SIZE) {
+		if (size)
+			*size = fItemSize;
 
-	if (buffer)
-		return buffer->Buffer();
+		return (char *)fFlatBuffer.Buffer() + (index * fItemSize);
+	}
 
-	return NULL;
+	int32 offset = (int32)fOffsets->ItemAt(index);
+	if (size)
+		fFlatBuffer.ReadAt(offset, size, sizeof(ssize_t));
+
+	return (char *)fFlatBuffer.Buffer() + offset + sizeof(ssize_t);
 }
 
 
@@ -173,53 +313,36 @@ BMessageField::PrintToStream() const
 }
 
 
-bool
-BMessageField::IsFixedSize(type_code type)
+void
+BMessageField::FlatResize(int32 offset, size_t oldLength, size_t newLength)
 {
-	switch (type) {
-		case B_ANY_TYPE:
-		case B_MESSAGE_TYPE:
-		case B_MIME_TYPE:
-		case B_OBJECT_TYPE:
-		case B_RAW_TYPE:
-		case B_STRING_TYPE:
-		case B_ASCII_TYPE: return false;
+	ssize_t change = newLength - oldLength;
+	ssize_t bufferLength = fFlatBuffer.BufferLength();
 
-		case B_BOOL_TYPE:
-		case B_CHAR_TYPE:
-		case B_COLOR_8_BIT_TYPE:
-		case B_DOUBLE_TYPE:
-		case B_FLOAT_TYPE:
-		case B_GRAYSCALE_8_BIT_TYPE:
-		case B_INT64_TYPE:
-		case B_INT32_TYPE:
-		case B_INT16_TYPE:
-		case B_INT8_TYPE:
-		case B_MESSENGER_TYPE: // ToDo: test
-		case B_MONOCHROME_1_BIT_TYPE:
-		case B_OFF_T_TYPE:
-		case B_PATTERN_TYPE:
-		case B_POINTER_TYPE:
-		case B_POINT_TYPE:
-		case B_RECT_TYPE:
-		case B_REF_TYPE: // ToDo: test
-		case B_RGB_32_BIT_TYPE:
-		case B_RGB_COLOR_TYPE:
-		case B_SIZE_T_TYPE:
-		case B_SSIZE_T_TYPE:
-		case B_TIME_TYPE:
-		case B_UINT64_TYPE:
-		case B_UINT32_TYPE:
-		case B_UINT16_TYPE:
-		case B_UINT8_TYPE: return true;
+	if (change > 0)
+		fFlatBuffer.SetSize(bufferLength + change);
 
-		// ToDo: test
-		case B_MEDIA_PARAMETER_TYPE:
-		case B_MEDIA_PARAMETER_WEB_TYPE:
-		case B_MEDIA_PARAMETER_GROUP_TYPE: return false;
+	if (offset == bufferLength) {
+		// the easy case for adds
+		return;
 	}
 
-	return false;
+	ssize_t length = bufferLength - offset - oldLength;
+	if (length > 0) {
+		uint8 *location = (uint8 *)fFlatBuffer.Buffer() + offset;
+		memmove(location + newLength, location + oldLength, length);
+	}
+
+	if (change < 0)
+		fFlatBuffer.SetSize(bufferLength + change);
+
+	for (int32 index = fOffsets->CountItems() - 1; index >= 0; index--) {
+		int32 oldOffset = (int32)fOffsets->ItemAt(index);
+		if (oldOffset <= offset)
+			break;
+
+		fOffsets->ReplaceItem(index, (void *)(offset + change));
+	}
 }
 
 } // namespace BPrivate
