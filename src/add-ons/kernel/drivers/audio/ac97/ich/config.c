@@ -151,6 +151,11 @@ probe_ok:
 	config->mbbar	= pci->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x1C, 4);
 	config->irq		= pci->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x3C, 1);
 
+	config->nambar  &= PCI_address_io_mask;
+	config->nabmbar &= PCI_address_io_mask;
+	config->mmbar   &= PCI_address_memory_32_mask;
+	config->mbbar   &= PCI_address_memory_32_mask;       
+
 	if (config->irq == 0 || config->irq == 0xff) {
 		PRINT(("WARNING: no interrupt configured\n"));
 		/* we can continue without an interrupt, as another 
@@ -171,10 +176,10 @@ probe_ok:
 		result = B_ERROR;
 	}
 
-	LOG(("nambar  = %#08x\n", config->nambar));
-	LOG(("nabmbar = %#08x\n", config->nabmbar));
-	LOG(("mmbar   = %#08x\n", config->mmbar));
-	LOG(("mbbar   = %#08x\n", config->mbbar));
+	LOG(("nambar  = 0x%08x\n", config->nambar));
+	LOG(("nabmbar = 0x%08x\n", config->nabmbar));
+	LOG(("mmbar   = 0x%08x\n", config->mmbar));
+	LOG(("mbbar   = 0x%08x\n", config->mbbar));
 	LOG(("irq     = %d\n",    config->irq));
 
 probe_done:
