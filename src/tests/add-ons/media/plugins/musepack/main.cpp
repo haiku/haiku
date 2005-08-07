@@ -173,7 +173,7 @@ namespace media {
 
 status_t
 MediaExtractor::GetNextChunk(int32 stream,
-	void **chunkBuffer, int32 *chunkSize,
+	const void **chunkBuffer, size_t *chunkSize,
 	media_header *mediaHeader)
 {
 	return B_ERROR;

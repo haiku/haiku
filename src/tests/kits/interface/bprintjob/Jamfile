@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src tests kits interface bprintjob ;
 
+UsePrivateHeaders interface ;
+
 SimpleTest print_test
 	: PrintTestApp.cpp
 	  PrintTestWindow.cpp

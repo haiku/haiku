@@ -3,6 +3,7 @@ SubDir OBOS_TOP src tests servers input prefs ;
 UsePrivateHeaders interface ;
 UsePrivateHeaders app ;
 UsePrivateHeaders input ;
+UsePrivateHeaders [ FDirName servers app ] ;
 
 AddResources KeymapTest : Keymap.rdef ;
 

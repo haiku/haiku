@@ -17,6 +17,20 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) broster ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) broster testapps ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) common ] ;
 
+CommonTestLib libmessagetest.so
+	: MessageTestAddon.cpp
+		MessageTest.cpp
+		MessageConstructTest.cpp
+		MessageDestructTest.cpp
+		MessageOpAssignTest.cpp
+		MessageEasyFindTest.cpp
+		MessageSpeedTest.cpp
+	: <boot!home!config!lib>libopenbeos.so stdc++.r4
+	: be stdc++.r4
+	: 
+	: app
+;
+
 CommonTestLib libapptest.so
 	: AppKitTestAddon.cpp
 
