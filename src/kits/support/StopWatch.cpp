@@ -46,7 +46,7 @@ BStopWatch::BStopWatch(const char *name, bool silent)
 BStopWatch::~BStopWatch()
 {
 	if (!fSilent){
-		printf("StopWatch \"%s\": %d usecs.", fName, (int)ElapsedTime());
+		printf("StopWatch \"%s\": %d usecs.\n", fName, (int)ElapsedTime());
 	
 		if (fLap) {
 			for (int i = 1; i <= fLap; i++){
