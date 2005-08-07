@@ -1,560 +1,360 @@
-//------------------------------------------------------------------------------
-//	TMessageSpeedTest.cpp
-//  Written on 04 - 13 - 2005 by Olivier Milla (methedras at online dot fr)
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Michael Lotz <mmlr@mlotz.ch>
+ *		Olivier Milla <methedras at online dot fr>
+ */
 
-// Standard Includes -----------------------------------------------------------
 #include <iostream>
 #include <time.h>
 
-// System Includes -------------------------------------------------------------
 #include <Entry.h>
 #include <File.h>
 #include <Message.h>
 #include <String.h>
 
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
 #include "MessageSpeedTest.h"
 
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-void TMessageSpeedTest::MessageSpeedTestCreate5Int32()
-{
-	BMessage message;
-	
-	bigtime_t length = 0;
-	
-	for (int32 i=0; i<5; i++){
-		bigtime_t stamp = real_time_clock_usecs();
-		message.AddInt32("data",i);
-		length += (real_time_clock_usecs() - stamp);	
+//#define LOG_TO_FILE
+#ifdef LOG_TO_FILE
+#define LOG(function, time)													\
+	{																		\
+		FILE *logfile = fopen("/boot/home/Desktop/messagespeed.log", "a");	\
+		fprintf(logfile, "%s:\t%lld\n", function, time);						\
+		fclose(logfile);													\
 	}
-	cout << "TMessageSpeedTest::Time to add 5 int32 in a message = " 
-		 << length << "usec" << endl;	
-}
-//------------------------------------------------------------------------------
-void TMessageSpeedTest::MessageSpeedTestLookup5Int32()
-{
-	srand(time(NULL));
-	
-	BMessage message;
-	
-	for (int32 i=0; i<5; i++){
-		BString string;
-		string << i;
-		message.AddInt32(string.String(),i);
-	}
-	BString search;
-	search << rand()%5;
-	const char *string = search.String();
-	int32 res;
-	
-	bigtime_t stamp = real_time_clock_usecs();
-	message.FindInt32(string,&res);
-	bigtime_t length = real_time_clock_usecs() - stamp;	
-	cout << "TMessageSpeedTest::Time to find a data in a message containing 5 datas = " 
-		 << length << "usec" << endl;
-}
-//------------------------------------------------------------------------------
-void TMessageSpeedTest::MessageSpeedTestLookup50Int32()
-{
-	srand(time(NULL));
-	
-	BMessage message;
-	
-	for (int32 i=0; i<50; i++){
-		BString string;
-		string << i;
-		message.AddInt32(string.String(),i);
-	}
-	BString search;
-	search << rand()%50;
-	const char *string = search.String();
-	int32 res;
-	
-	bigtime_t stamp = real_time_clock_usecs();
-	message.FindInt32(string,&res);
-	bigtime_t length = real_time_clock_usecs() - stamp;	
-	cout << "TMessageSpeedTest::Time to find a data in a message containing 50 datas = " 
-		 << length << "usec" << endl;
-}
-//------------------------------------------------------------------------------
-void TMessageSpeedTest::MessageSpeedTestLookup500Int32()
-{
-	srand(time(NULL));
-	
-	BMessage message;
-	
-	for (int32 i=0; i<500; i++){
-		BString string;
-		string << i;
-		message.AddInt32(string.String(),i);
-	}
-	BString search;
-	search << rand()%500;
-	const char *string = search.String();
-	int32 res;
-	
-	bigtime_t stamp = real_time_clock_usecs();
-	message.FindInt32(string,&res);
-	bigtime_t length = real_time_clock_usecs() - stamp;	
-	cout << "TMessageSpeedTest::Time to find a data in a message containing 500 datas = " 
-		 << length << "usec" << endl;
-}
-//------------------------------------------------------------------------------
-void TMessageSpeedTest::MessageSpeedTestLookup5000Int32()
-{
-	srand(time(NULL));
-	
-	BMessage message;
-	
-	for (int32 i=0; i<5000; i++){
-		BString string;
-		string << i;
-		message.AddInt32(string.String(),i);
-	}
-	BString search;
-	search << rand()%5000;
-	const char *string = search.String();
-	int32 res;
-	
-	bigtime_t stamp = real_time_clock_usecs();
-	message.FindInt32(string,&res);
-	bigtime_t length = real_time_clock_usecs() - stamp;	
-	cout << "TMessageSpeedTest::Time to find a data in a message containing 5000 datas = " 
-		 << length << "usec" << endl;
-}
-//------------------------------------------------------------------------------
-void TMessageSpeedTest::MessageSpeedTestRead500Int32()
-{
-	srand(time(NULL));
-	
-	BMessage message;
-	
-	for (int32 i=0; i<500; i++)
-		message.AddInt32("data",i);
+#else
+#define LOG(function, time) /* empty */
+#endif
 
-	int32 res;	
-	bigtime_t length = 0;
-	for (int32 i=0; i<500; i++){
-		bigtime_t stamp = real_time_clock_usecs();	
-		message.FindInt32("data",i,&res);
-		length += (real_time_clock_usecs() - stamp);	
-	}
-	cout << "TMessageSpeedTest::Time to retrieve 500 Int32 out of a message = " 
-		 << length << "usec. Giving " << length/500 << "usec per retrieve" << endl;
-}
-//------------------------------------------------------------------------------
-void TMessageSpeedTest::MessageSpeedTestFlatten5Int32()
-{
-	BMessage message;
-	
-	for (int32 i=0; i<5; i++)
-		message.AddInt32("data",i);
 
-	BEntry entry("/tmp/bmessagetest");
-	BFile file(&entry,B_READ_WRITE|B_CREATE_FILE);
-	bigtime_t stamp = real_time_clock_usecs();
-	message.Flatten(&file);
-	bigtime_t length = real_time_clock_usecs() - stamp;
-	cout << "TMessageSpeedTest::Time to flatten a message containing 5 Int32 = " 
-		 << length << "usec. Giving " << length/5 << "usec per data" << endl;
-	
-	//delete the file
-	file.Unset();
-	entry.Remove();
+#define MESSAGE_SPEED_TEST_CREATE(count, type, typeName, createValue)		\
+void																		\
+TMessageSpeedTest::MessageSpeedTestCreate##count##type()					\
+{																			\
+	BMessage message;														\
+	bigtime_t length = 0;													\
+																			\
+	for (int32 i = 0; i < count; i++) {										\
+		createValue;														\
+		bigtime_t stamp = real_time_clock_usecs();							\
+		message.Add##type("data", value);									\
+		length += (real_time_clock_usecs() - stamp);						\
+	}																		\
+																			\
+	cout << "Time to add " << count << " " << typeName						\
+		<< " in a message = " << length << "usec" << endl;					\
+	LOG(__PRETTY_FUNCTION__, length);										\
 }
 
-//------------------------------------------------------------------------------
-void TMessageSpeedTest::MessageSpeedTestFlatten50Int32()
-{
-	BMessage message;
-	
-	for (int32 i=0; i<50; i++)
-		message.AddInt32("data",i);
+MESSAGE_SPEED_TEST_CREATE(5, Int32, "int32", int32 value = i);
+MESSAGE_SPEED_TEST_CREATE(50, Int32, "int32", int32 value = i);
+MESSAGE_SPEED_TEST_CREATE(500, Int32, "int32", int32 value = i);
+MESSAGE_SPEED_TEST_CREATE(5000, Int32, "int32", int32 value = i);
 
-	BEntry entry("/tmp/bmessagetest");
-	BFile file(&entry,B_READ_WRITE|B_CREATE_FILE);
-	bigtime_t stamp = real_time_clock_usecs();
-	message.Flatten(&file);
-	bigtime_t length = real_time_clock_usecs() - stamp;
-	cout << "TMessageSpeedTest::Time to flatten a message containing 50 Int32 = " 
-		 << length << "usec. Giving " << length/50 << "usec per data" << endl;
-	
-	//delete the file
-	file.Unset();
-	entry.Remove();
+MESSAGE_SPEED_TEST_CREATE(5, String, "BString", BString value = "item"; value << i);
+MESSAGE_SPEED_TEST_CREATE(50, String, "BString", BString value = "item"; value << i);
+MESSAGE_SPEED_TEST_CREATE(500, String, "BString", BString value = "item"; value << i);
+MESSAGE_SPEED_TEST_CREATE(5000, String, "BString", BString value = "item"; value << i);
+
+#undef MESSAGE_SPEED_TEST_CREATE
+
+
+#define MESSAGE_SPEED_TEST_LOOKUP(count, type)								\
+void																		\
+TMessageSpeedTest::MessageSpeedTestLookup##count##type()					\
+{																			\
+	srand(time(NULL));														\
+	BMessage message;														\
+																			\
+	for (int32 i = 0; i < 5; i++) {											\
+		BString string;														\
+		string << i;														\
+		message.AddInt32(string.String(), i);								\
+	}																		\
+																			\
+	BString search;															\
+	search << rand() % count;												\
+	const char *string = search.String();									\
+	int32 res;																\
+																			\
+	bigtime_t stamp = real_time_clock_usecs();								\
+	message.FindInt32(string, &res);										\
+	bigtime_t length = real_time_clock_usecs() - stamp;						\
+	cout << "Time to find a data in a message containing " << count			\
+		<< " items = " << length << "usec" << endl;							\
+	LOG(__PRETTY_FUNCTION__, length);										\
 }
-//------------------------------------------------------------------------------
-void TMessageSpeedTest::MessageSpeedTestFlatten500Int32()
-{
-	BMessage message;
-	
-	for (int32 i=0; i<500; i++)
-		message.AddInt32("data",i);
 
-	BEntry entry("/tmp/bmessagetest");
-	BFile file(&entry,B_READ_WRITE|B_CREATE_FILE);
-	bigtime_t stamp = real_time_clock_usecs();
-	message.Flatten(&file);
-	bigtime_t length = real_time_clock_usecs() - stamp;
-	cout << "TMessageSpeedTest::Time to flatten a message containing 500 Int32 = " 
-		 << length << "usec. Giving " << length/500 << "usec per data" << endl;
-	
-	//delete the file
-	file.Unset();
-	entry.Remove();
+MESSAGE_SPEED_TEST_LOOKUP(5, Int32);
+MESSAGE_SPEED_TEST_LOOKUP(50, Int32);
+MESSAGE_SPEED_TEST_LOOKUP(500, Int32);
+MESSAGE_SPEED_TEST_LOOKUP(5000, Int32);
+
+#undef MESSAGE_SPEED_TEST_LOOKUP
+
+
+#define MESSAGE_SPEED_TEST_READ(count, type, typeName, createValue, declareValue)	\
+void																		\
+TMessageSpeedTest::MessageSpeedTestRead##count##type()						\
+{																			\
+	srand(time(NULL));														\
+	BMessage message;														\
+																			\
+	for (int32 i = 0; i < count; i++) {										\
+		createValue;														\
+		message.Add##type("data", value);									\
+	}																		\
+																			\
+	declareValue;															\
+	bigtime_t length = 0;													\
+	for (int32 i = 0; i < count; i++) {										\
+		bigtime_t stamp = real_time_clock_usecs();							\
+		message.Find##type("data", i, &value);								\
+		length += (real_time_clock_usecs() - stamp);						\
+	}																		\
+																			\
+	cout << "Time to retrieve " << count << " " << typeName					\
+		<< "out of a message = " << length << "usec. Giving "				\
+		<< length / count << "usec per retrieve." << endl;					\
+	LOG(__PRETTY_FUNCTION__, length);										\
 }
-//------------------------------------------------------------------------------
-void TMessageSpeedTest::MessageSpeedTestFlatten5000Int32()
-{
-	BMessage message;
-	
-	for (int32 i=0; i<5000; i++)
-		message.AddInt32("data",i);
 
-	BEntry entry("/tmp/bmessagetest");
-	BFile file(&entry,B_READ_WRITE|B_CREATE_FILE);
-	bigtime_t stamp = real_time_clock_usecs();
-	message.Flatten(&file);
-	bigtime_t length = real_time_clock_usecs() - stamp;
-	cout << "TMessageSpeedTest::Time to flatten a message containing 5000 Int32 = " 
-		 << length << "usec. Giving " << length/5000 << "usec per data" << endl;
-	
-	//delete the file
-	file.Unset();
-	entry.Remove();
+MESSAGE_SPEED_TEST_READ(5, Int32, "int32", int32 value = i, int32 value);
+MESSAGE_SPEED_TEST_READ(50, Int32, "int32", int32 value = i, int32 value);
+MESSAGE_SPEED_TEST_READ(500, Int32, "int32", int32 value = i, int32 value);
+MESSAGE_SPEED_TEST_READ(5000, Int32, "int32", int32 value = i, int32 value);
+
+MESSAGE_SPEED_TEST_READ(5, String, "BString", BString value = "item"; value << i, BString value);
+MESSAGE_SPEED_TEST_READ(50, String, "BString", BString value = "item"; value << i, BString value);
+MESSAGE_SPEED_TEST_READ(500, String, "BString", BString value = "item"; value << i, BString value);
+MESSAGE_SPEED_TEST_READ(5000, String, "BString", BString value = "item"; value << i, BString value);
+
+#undef MESSAGE_SPEED_TEST_READ
+
+
+#define MESSAGE_SPEED_TEST_FLATTEN(count, type, typeName, createValue)		\
+void																		\
+TMessageSpeedTest::MessageSpeedTestFlatten##count##type()					\
+{																			\
+	BMessage message;														\
+																			\
+	for (int32 i = 0; i < count; i++) { 									\
+		createValue;														\
+		message.Add##type("data", value);									\
+	}																		\
+																			\
+	BString name = "/tmp/MessageSpeedTestFlatten";							\
+	name << count << typeName;												\
+	BEntry entry(name.String());											\
+	BFile file(&entry, B_READ_WRITE | B_CREATE_FILE);						\
+																			\
+	bigtime_t stamp = real_time_clock_usecs();								\
+	message.Flatten(&file);													\
+	bigtime_t length = real_time_clock_usecs() - stamp;						\
+																			\
+	cout << "Time to flatten a message containing " << count << " "			\
+		<< typeName << " = " << length << "usec. Giving " << length / count	\
+		<< "usec per item." << endl;										\
+	LOG(__PRETTY_FUNCTION__, length);										\
 }
-//------------------------------------------------------------------------------
-void TMessageSpeedTest::MessageSpeedTestFlatten5IndividualInt32()
-{
-	BMessage message;
-	
-	for (int32 i=0; i<5; i++) {
-		BString name = "data";
-		name << i;
-		message.AddInt32(name.String(),i);
-	}
 
-	BEntry entry("/tmp/bmessagetest");
-	BFile file(&entry,B_READ_WRITE|B_CREATE_FILE);
-	bigtime_t stamp = real_time_clock_usecs();
-	message.Flatten(&file);
-	bigtime_t length = real_time_clock_usecs() - stamp;
-	cout << "TMessageSpeedTest::Time to flatten a message containing 5 individual Int32 fields = " 
-		 << length << "usec. Giving " << length/5 << "usec per data" << endl;
-	
-	//delete the file
-	file.Unset();
-	entry.Remove();
+MESSAGE_SPEED_TEST_FLATTEN(5, Int32, "int32", int32 value = i);
+MESSAGE_SPEED_TEST_FLATTEN(50, Int32, "int32", int32 value = i);
+MESSAGE_SPEED_TEST_FLATTEN(500, Int32, "int32", int32 value = i);
+MESSAGE_SPEED_TEST_FLATTEN(5000, Int32, "int32", int32 value = i);
+
+MESSAGE_SPEED_TEST_FLATTEN(5, String, "BString", BString value = "item"; value << i);
+MESSAGE_SPEED_TEST_FLATTEN(50, String, "BString", BString value = "item"; value << i);
+MESSAGE_SPEED_TEST_FLATTEN(500, String, "BString", BString value = "item"; value << i);
+MESSAGE_SPEED_TEST_FLATTEN(5000, String, "BString", BString value = "item"; value << i);
+
+#undef MESSAGE_SPEED_TEST_FLATTEN
+
+
+#define MESSAGE_SPEED_TEST_FLATTEN_INDIVIDUAL(count, type, typeName, createValue)	\
+void																		\
+TMessageSpeedTest::MessageSpeedTestFlattenIndividual##count##type()			\
+{																			\
+	BMessage message;														\
+																			\
+	for (int32 i = 0; i < count; i++) {										\
+		createValue;														\
+		BString name = "data";												\
+		name << i;															\
+		message.Add##type(name.String(), value);							\
+	}																		\
+																			\
+	BString name = "/tmp/MessageSpeedTestFlattenIndividual";				\
+	name << count << typeName;												\
+	BEntry entry(name.String());											\
+	BFile file(&entry, B_READ_WRITE | B_CREATE_FILE);						\
+																			\
+	bigtime_t stamp = real_time_clock_usecs();								\
+	message.Flatten(&file);													\
+	bigtime_t length = real_time_clock_usecs() - stamp;						\
+																			\
+	cout << "Time to flatten a message containing " << count				\
+		<< " individual " << typeName << " fields = " << length				\
+		<< "usec. Giving " << length / count << "usec per item." << endl;	\
+	LOG(__PRETTY_FUNCTION__, length);										\
 }
-//------------------------------------------------------------------------------
-void TMessageSpeedTest::MessageSpeedTestFlatten50IndividualInt32()
-{
-	BMessage message;
-	
-	for (int32 i=0; i<50; i++) {
-		BString name = "data";
-		name << i;
-		message.AddInt32(name.String(),i);
-	}
 
-	BEntry entry("/tmp/bmessagetest");
-	BFile file(&entry,B_READ_WRITE|B_CREATE_FILE);
-	bigtime_t stamp = real_time_clock_usecs();
-	message.Flatten(&file);
-	bigtime_t length = real_time_clock_usecs() - stamp;
-	cout << "TMessageSpeedTest::Time to flatten a message containing 50 individual Int32 fields = " 
-		 << length << "usec. Giving " << length/50 << "usec per data" << endl;
-	
-	//delete the file
-	file.Unset();
-	entry.Remove();
+MESSAGE_SPEED_TEST_FLATTEN_INDIVIDUAL(5, Int32, "int32", int32 value = i);
+MESSAGE_SPEED_TEST_FLATTEN_INDIVIDUAL(50, Int32, "int32", int32 value = i);
+MESSAGE_SPEED_TEST_FLATTEN_INDIVIDUAL(500, Int32, "int32", int32 value = i);
+MESSAGE_SPEED_TEST_FLATTEN_INDIVIDUAL(5000, Int32, "int32", int32 value = i);
+
+MESSAGE_SPEED_TEST_FLATTEN_INDIVIDUAL(5, String, "BString", BString value = "item"; value << i);
+MESSAGE_SPEED_TEST_FLATTEN_INDIVIDUAL(50, String, "BString", BString value = "item"; value << i);
+MESSAGE_SPEED_TEST_FLATTEN_INDIVIDUAL(500, String, "BString", BString value = "item"; value << i);
+MESSAGE_SPEED_TEST_FLATTEN_INDIVIDUAL(5000, String, "BString", BString value = "item"; value << i);
+
+#undef MESSAGE_SPEED_TEST_FLATTEN_INDIVIDUAL
+
+
+#define MESSAGE_SPEED_TEST_UNFLATTEN(count, type, typeName)					\
+void																		\
+TMessageSpeedTest::MessageSpeedTestUnflatten##count##type()					\
+{																			\
+	BString name = "/tmp/MessageSpeedTestFlatten";							\
+	name << count << typeName;												\
+	BEntry entry(name.String());											\
+	BFile file(&entry, B_READ_ONLY);										\
+																			\
+	BMessage rebuilt;														\
+	bigtime_t stamp = real_time_clock_usecs();								\
+	rebuilt.Unflatten(&file);												\
+	bigtime_t length = real_time_clock_usecs() - stamp;						\
+																			\
+	cout << "Time to unflatten a message containing " << count << " "		\
+		<< typeName	<< " = " << length << "usec. Giving " << length / count	\
+		<< "usec per item." << endl;										\
+	LOG(__PRETTY_FUNCTION__, length);										\
+																			\
+	file.Unset();															\
+	entry.Remove();															\
 }
-//------------------------------------------------------------------------------
-void TMessageSpeedTest::MessageSpeedTestFlatten500IndividualInt32()
-{
-	BMessage message;
-	
-	for (int32 i=0; i<500; i++) {
-		BString name = "data";
-		name << i;
-		message.AddInt32(name.String(),i);
-	}
 
-	BEntry entry("/tmp/bmessagetest");
-	BFile file(&entry,B_READ_WRITE|B_CREATE_FILE);
-	bigtime_t stamp = real_time_clock_usecs();
-	message.Flatten(&file);
-	bigtime_t length = real_time_clock_usecs() - stamp;
-	cout << "TMessageSpeedTest::Time to flatten a message containing 500 individual Int32 fields = " 
-		 << length << "usec. Giving " << length/500 << "usec per data" << endl;
-	
-	//delete the file
-	file.Unset();
-	entry.Remove();
+MESSAGE_SPEED_TEST_UNFLATTEN(5, Int32, "int32");
+MESSAGE_SPEED_TEST_UNFLATTEN(50, Int32, "int32");
+MESSAGE_SPEED_TEST_UNFLATTEN(500, Int32, "int32");
+MESSAGE_SPEED_TEST_UNFLATTEN(5000, Int32, "int32");
+
+MESSAGE_SPEED_TEST_UNFLATTEN(5, String, "BString");
+MESSAGE_SPEED_TEST_UNFLATTEN(50, String, "BString");
+MESSAGE_SPEED_TEST_UNFLATTEN(500, String, "BString");
+MESSAGE_SPEED_TEST_UNFLATTEN(5000, String, "BString");
+
+#undef MESSAGE_SPEED_TEST_UNFLATTEN
+
+
+#define MESSAGE_SPEED_TEST_UNFLATTEN_INDIVIDUAL(count, type, typeName)		\
+void																		\
+TMessageSpeedTest::MessageSpeedTestUnflattenIndividual##count##type()		\
+{																			\
+	BString name = "/tmp/MessageSpeedTestFlattenIndividual";				\
+	name << count << typeName;												\
+	BEntry entry(name.String());											\
+	BFile file(&entry, B_READ_ONLY);										\
+																			\
+	BMessage rebuilt;														\
+	bigtime_t stamp = real_time_clock_usecs();								\
+	rebuilt.Unflatten(&file);												\
+	bigtime_t length = real_time_clock_usecs() - stamp;						\
+																			\
+	cout << "Time to unflatten a message containing " << " individual "		\
+		<< typeName << " fields = " << length << "usec. Giving "			\
+		<< length / count << "usec per item." << endl;						\
+	LOG(__PRETTY_FUNCTION__, length);										\
+																			\
+	file.Unset();															\
+	entry.Remove();															\
 }
-//------------------------------------------------------------------------------
-void TMessageSpeedTest::MessageSpeedTestFlatten5000IndividualInt32()
-{
-	BMessage message;
-	
-	for (int32 i=0; i<5000; i++) {
-		BString name = "data";
-		name << i;
-		message.AddInt32(name.String(),i);
-	}
 
-	BEntry entry("/tmp/bmessagetest");
-	BFile file(&entry,B_READ_WRITE|B_CREATE_FILE);
-	bigtime_t stamp = real_time_clock_usecs();
-	message.Flatten(&file);
-	bigtime_t length = real_time_clock_usecs() - stamp;
-	cout << "TMessageSpeedTest::Time to flatten a message containing 5000 individual Int32 fields = " 
-		 << length << "usec. Giving " << length/5000 << "usec per data" << endl;
-	
-	//delete the file
-	file.Unset();
-	entry.Remove();
-}
-//------------------------------------------------------------------------------
-void TMessageSpeedTest::MessageSpeedTestUnflatten5Int32()
-{
-	BMessage message;
-	
-	for (int32 i=0; i<5; i++)
-		message.AddInt32("data",i);
+MESSAGE_SPEED_TEST_UNFLATTEN_INDIVIDUAL(5, Int32, "int32");
+MESSAGE_SPEED_TEST_UNFLATTEN_INDIVIDUAL(50, Int32, "int32");
+MESSAGE_SPEED_TEST_UNFLATTEN_INDIVIDUAL(500, Int32, "int32");
+MESSAGE_SPEED_TEST_UNFLATTEN_INDIVIDUAL(5000, Int32, "int32");
 
-	BEntry entry("/tmp/bmessagetest");
-	BFile file(&entry,B_READ_WRITE|B_CREATE_FILE);
-	message.Flatten(&file);
+MESSAGE_SPEED_TEST_UNFLATTEN_INDIVIDUAL(5, String, "BString");
+MESSAGE_SPEED_TEST_UNFLATTEN_INDIVIDUAL(50, String, "BString");
+MESSAGE_SPEED_TEST_UNFLATTEN_INDIVIDUAL(500, String, "BString");
+MESSAGE_SPEED_TEST_UNFLATTEN_INDIVIDUAL(5000, String, "BString");
 
-	BMessage rebuilt;
-	bigtime_t stamp = real_time_clock_usecs();
-	rebuilt.Unflatten(&file);
-	bigtime_t length = real_time_clock_usecs() - stamp;
-	cout << "TMessageSpeedTest::Time to unflatten a message containing 5 Int32 = " 
-		 << length << "usec. Giving " << length/5 << "usec per data" << endl;
-	
-	//delete the file
-	file.Unset();
-	entry.Remove();
-}
-//------------------------------------------------------------------------------
-void TMessageSpeedTest::MessageSpeedTestUnflatten50Int32()
-{
-	BMessage message;
-	
-	for (int32 i=0; i<50; i++)
-		message.AddInt32("data",i);
+#undef MESSAGE_SPEED_TEST_UNFLATTEN_INDIVIDUAL
 
-	BEntry entry("/tmp/bmessagetest");
-	BFile file(&entry,B_READ_WRITE|B_CREATE_FILE);
-	message.Flatten(&file);
 
-	BMessage rebuilt;
-	bigtime_t stamp = real_time_clock_usecs();
-	rebuilt.Unflatten(&file);
-	bigtime_t length = real_time_clock_usecs() - stamp;
-	cout << "TMessageSpeedTest::Time to unflatten a message containing 50 Int32 = " 
-		 << length << "usec. Giving " << length/50 << "usec per data" << endl;
-	
-	//delete the file
-	file.Unset();
-	entry.Remove();
-}
-//------------------------------------------------------------------------------
-void TMessageSpeedTest::MessageSpeedTestUnflatten500Int32()
-{
-	BMessage message;
-	
-	for (int32 i=0; i<500; i++)
-		message.AddInt32("data",i);
-
-	BEntry entry("/tmp/bmessagetest");
-	BFile file(&entry,B_READ_WRITE|B_CREATE_FILE);
-	message.Flatten(&file);
-
-	BMessage rebuilt;
-	bigtime_t stamp = real_time_clock_usecs();
-	rebuilt.Unflatten(&file);
-	bigtime_t length = real_time_clock_usecs() - stamp;
-	cout << "TMessageSpeedTest::Time to unflatten a message containing 500 Int32 = " 
-		 << length << "usec. Giving " << length/500 << "usec per data" << endl;
-	
-	//delete the file
-	file.Unset();
-	entry.Remove();
-}
-//------------------------------------------------------------------------------
-void TMessageSpeedTest::MessageSpeedTestUnflatten5000Int32()
-{
-	BMessage message;
-	
-	for (int32 i=0; i<5000; i++)
-		message.AddInt32("data",i);
-
-	BEntry entry("/tmp/bmessagetest");
-	BFile file(&entry,B_READ_WRITE|B_CREATE_FILE);
-	message.Flatten(&file);
-
-	BMessage rebuilt;
-	bigtime_t stamp = real_time_clock_usecs();
-	rebuilt.Unflatten(&file);
-	bigtime_t length = real_time_clock_usecs() - stamp;
-	cout << "TMessageSpeedTest::Time to unflatten a message containing 5000 Int32 = " 
-		 << length << "usec. Giving " << length/5000 << "usec per data" << endl;
-	
-	//delete the file
-	file.Unset();
-	entry.Remove();
-}
-//------------------------------------------------------------------------------
-void TMessageSpeedTest::MessageSpeedTestUnflatten5IndividualInt32()
-{
-	BMessage message;
-	
-	for (int32 i=0; i<5; i++) {
-		BString name = "data";
-		name << i;
-		message.AddInt32(name.String(),i);
-	}
-
-	BEntry entry("/tmp/bmessagetest");
-	BFile file(&entry,B_READ_WRITE|B_CREATE_FILE);
-	message.Flatten(&file);
-
-	BMessage rebuilt;
-	bigtime_t stamp = real_time_clock_usecs();
-	rebuilt.Unflatten(&file);
-	bigtime_t length = real_time_clock_usecs() - stamp;
-	cout << "TMessageSpeedTest::Time to unflatten a message containing 5 individual Int32 fields = " 
-		 << length << "usec. Giving " << length/50 << "usec per data" << endl;
-	
-	//delete the file
-	file.Unset();
-	entry.Remove();
-}
-//------------------------------------------------------------------------------
-void TMessageSpeedTest::MessageSpeedTestUnflatten50IndividualInt32()
-{
-	BMessage message;
-	
-	for (int32 i=0; i<50; i++) {
-		BString name = "data";
-		name << i;
-		message.AddInt32(name.String(),i);
-	}
-
-	BEntry entry("/tmp/bmessagetest");
-	BFile file(&entry,B_READ_WRITE|B_CREATE_FILE);
-	message.Flatten(&file);
-
-	BMessage rebuilt;
-	bigtime_t stamp = real_time_clock_usecs();
-	rebuilt.Unflatten(&file);
-	bigtime_t length = real_time_clock_usecs() - stamp;
-	cout << "TMessageSpeedTest::Time to unflatten a message containing 50 individual Int32 fields = " 
-		 << length << "usec. Giving " << length/50 << "usec per data" << endl;
-	
-	//delete the file
-	file.Unset();
-	entry.Remove();
-}
-//------------------------------------------------------------------------------
-void TMessageSpeedTest::MessageSpeedTestUnflatten500IndividualInt32()
-{
-	BMessage message;
-	
-	for (int32 i=0; i<500; i++) {
-		BString name = "data";
-		name << i;
-		message.AddInt32(name.String(),i);
-	}
-
-	BEntry entry("/tmp/bmessagetest");
-	BFile file(&entry,B_READ_WRITE|B_CREATE_FILE);
-	message.Flatten(&file);
-
-	BMessage rebuilt;
-	bigtime_t stamp = real_time_clock_usecs();
-	rebuilt.Unflatten(&file);
-	bigtime_t length = real_time_clock_usecs() - stamp;
-	cout << "TMessageSpeedTest::Time to unflatten a message containing 500 individual Int32 fields = " 
-		 << length << "usec. Giving " << length/500 << "usec per data" << endl;
-	
-	//delete the file
-	file.Unset();
-	entry.Remove();
-}
-//------------------------------------------------------------------------------
-void TMessageSpeedTest::MessageSpeedTestUnflatten5000IndividualInt32()
-{
-	BMessage message;
-	
-	for (int32 i=0; i<5000; i++) {
-		BString name = "data";
-		name << i;
-		message.AddInt32(name.String(),i);
-	}
-
-	BEntry entry("/tmp/bmessagetest");
-	BFile file(&entry,B_READ_WRITE|B_CREATE_FILE);
-	message.Flatten(&file);
-
-	BMessage rebuilt;
-	bigtime_t stamp = real_time_clock_usecs();
-	rebuilt.Unflatten(&file);
-	bigtime_t length = real_time_clock_usecs() - stamp;
-	cout << "TMessageSpeedTest::Time to unflatten a message containing 5000 individual Int32 fields = " 
-		 << length << "usec. Giving " << length/5000 << "usec per data" << endl;
-	
-	//delete the file
-	file.Unset();
-	entry.Remove();
-}
-//------------------------------------------------------------------------------
 TestSuite* TMessageSpeedTest::Suite()
 {
 	TestSuite* suite = new TestSuite("BMessage::Test of Performance");
 
 	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestCreate5Int32);
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestCreate50Int32);
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestCreate500Int32);
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestCreate5000Int32);
+
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestCreate5String);
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestCreate50String);
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestCreate500String);
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestCreate5000String);
+
 	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestLookup5Int32);
 	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestLookup50Int32);
 	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestLookup500Int32);
 	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestLookup5000Int32);
+
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestRead5Int32);	
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestRead50Int32);	
 	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestRead500Int32);	
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestRead5000Int32);	
+
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestRead5String);	
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestRead50String);	
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestRead500String);	
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestRead5000String);	
+
 	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestFlatten5Int32);	
 	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestFlatten50Int32);	
 	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestFlatten500Int32);	
 	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestFlatten5000Int32);	
-	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestFlatten5IndividualInt32);	
-	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestFlatten50IndividualInt32);	
-	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestFlatten500IndividualInt32);	
-	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestFlatten5000IndividualInt32);	
+
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestFlatten5String);	
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestFlatten50String);	
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestFlatten500String);	
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestFlatten5000String);	
+
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestFlattenIndividual5Int32);	
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestFlattenIndividual50Int32);	
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestFlattenIndividual500Int32);	
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestFlattenIndividual5000Int32);	
+
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestFlattenIndividual5String);	
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestFlattenIndividual50String);	
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestFlattenIndividual500String);	
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestFlattenIndividual5000String);	
+
 	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestUnflatten5Int32);	
 	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestUnflatten50Int32);	
 	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestUnflatten500Int32);	
 	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestUnflatten5000Int32);	
-	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestUnflatten5IndividualInt32);	
-	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestUnflatten50IndividualInt32);	
-	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestUnflatten500IndividualInt32);	
-	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestUnflatten5000IndividualInt32);	
+
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestUnflatten5String);	
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestUnflatten50String);	
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestUnflatten500String);	
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestUnflatten5000String);	
+
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestUnflattenIndividual5Int32);	
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestUnflattenIndividual50Int32);	
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestUnflattenIndividual500Int32);	
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestUnflattenIndividual5000Int32);	
+
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestUnflattenIndividual5String);	
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestUnflattenIndividual50String);	
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestUnflattenIndividual500String);	
+	ADD_TEST4(BMessage, suite, TMessageSpeedTest, MessageSpeedTestUnflattenIndividual5000String);	
 
 	return suite;
 }
-//------------------------------------------------------------------------------
-
-
-/*
- * $Log $
- *
- * $Id  $
- *
- */
-
