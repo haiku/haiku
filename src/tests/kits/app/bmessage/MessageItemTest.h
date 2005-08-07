@@ -512,7 +512,7 @@ MessageItemTest10()
 	ssize_t size;
 	status_t err = FuncPolicy::FindData(msg, NULL, TypeCode, 0, 
 										(const void**)&pout, &size);
-	CPPUNIT_ASSERT(err = B_BAD_VALUE);
+	CPPUNIT_ASSERT(err == B_BAD_VALUE);
 }
 //------------------------------------------------------------------------------
 template
