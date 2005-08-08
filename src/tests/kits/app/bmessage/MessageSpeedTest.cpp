@@ -17,7 +17,7 @@
 
 #include "MessageSpeedTest.h"
 
-//#define LOG_TO_FILE
+#define LOG_TO_FILE
 #ifdef LOG_TO_FILE
 #define LOG(function, time)													\
 	{																		\
@@ -117,7 +117,7 @@ TMessageSpeedTest::MessageSpeedTestRead##count##type()						\
 	}																		\
 																			\
 	cout << "Time to retrieve " << count << " " << typeName					\
-		<< "out of a message = " << length << "usec. Giving "				\
+		<< " out of a message = " << length << "usec. Giving "				\
 		<< length / count << "usec per retrieve." << endl;					\
 	LOG(__PRETTY_FUNCTION__, length);										\
 }
@@ -146,14 +146,16 @@ TMessageSpeedTest::MessageSpeedTestFlatten##count##type()					\
 		message.Add##type("data", value);									\
 	}																		\
 																			\
+	BMallocIO buffer;														\
+	bigtime_t stamp = real_time_clock_usecs();								\
+	message.Flatten(&buffer);												\
+	bigtime_t length = real_time_clock_usecs() - stamp;						\
+																			\
 	BString name = "/tmp/MessageSpeedTestFlatten";							\
 	name << count << typeName;												\
 	BEntry entry(name.String());											\
 	BFile file(&entry, B_READ_WRITE | B_CREATE_FILE);						\
-																			\
-	bigtime_t stamp = real_time_clock_usecs();								\
-	message.Flatten(&file);													\
-	bigtime_t length = real_time_clock_usecs() - stamp;						\
+	file.Write(buffer.Buffer(), buffer.BufferLength());						\
 																			\
 	cout << "Time to flatten a message containing " << count << " "			\
 		<< typeName << " = " << length << "usec. Giving " << length / count	\
@@ -187,14 +189,16 @@ TMessageSpeedTest::MessageSpeedTestFlattenIndividual##count##type()			\
 		message.Add##type(name.String(), value);							\
 	}																		\
 																			\
+	BMallocIO buffer;														\
+	bigtime_t stamp = real_time_clock_usecs();								\
+	message.Flatten(&buffer);												\
+	bigtime_t length = real_time_clock_usecs() - stamp;						\
+																			\
 	BString name = "/tmp/MessageSpeedTestFlattenIndividual";				\
 	name << count << typeName;												\
 	BEntry entry(name.String());											\
 	BFile file(&entry, B_READ_WRITE | B_CREATE_FILE);						\
-																			\
-	bigtime_t stamp = real_time_clock_usecs();								\
-	message.Flatten(&file);													\
-	bigtime_t length = real_time_clock_usecs() - stamp;						\
+	file.Write(buffer.Buffer(), buffer.BufferLength());						\
 																			\
 	cout << "Time to flatten a message containing " << count				\
 		<< " individual " << typeName << " fields = " << length				\
@@ -224,9 +228,15 @@ TMessageSpeedTest::MessageSpeedTestUnflatten##count##type()					\
 	BEntry entry(name.String());											\
 	BFile file(&entry, B_READ_ONLY);										\
 																			\
+	off_t size = 0;															\
+	file.GetSize(&size);													\
+	char *buffer = (char *)malloc(size);									\
+	file.Read(buffer, size);												\
+	BMemoryIO stream(buffer, size);											\
+																			\
 	BMessage rebuilt;														\
 	bigtime_t stamp = real_time_clock_usecs();								\
-	rebuilt.Unflatten(&file);												\
+	rebuilt.Unflatten(&stream);												\
 	bigtime_t length = real_time_clock_usecs() - stamp;						\
 																			\
 	cout << "Time to unflatten a message containing " << count << " "		\
@@ -260,14 +270,20 @@ TMessageSpeedTest::MessageSpeedTestUnflattenIndividual##count##type()		\
 	BEntry entry(name.String());											\
 	BFile file(&entry, B_READ_ONLY);										\
 																			\
+	off_t size = 0;															\
+	file.GetSize(&size);													\
+	char *buffer = (char *)malloc(size);									\
+	file.Read(buffer, size);												\
+	BMemoryIO stream(buffer, size);											\
+																			\
 	BMessage rebuilt;														\
 	bigtime_t stamp = real_time_clock_usecs();								\
-	rebuilt.Unflatten(&file);												\
+	rebuilt.Unflatten(&stream);												\
 	bigtime_t length = real_time_clock_usecs() - stamp;						\
 																			\
-	cout << "Time to unflatten a message containing " << " individual "		\
-		<< typeName << " fields = " << length << "usec. Giving "			\
-		<< length / count << "usec per item." << endl;						\
+	cout << "Time to unflatten a message containing " << count				\
+		<< " individual " << typeName << " fields = " << length				\
+		<< "usec. Giving " << length / count << "usec per item." << endl;	\
 	LOG(__PRETTY_FUNCTION__, length);										\
 																			\
 	file.Unset();															\
