@@ -14,6 +14,7 @@
 #include <List.h>
 #include <String.h>
 #include <SupportDefs.h>
+#include "MessageBody3.h"
 
 // we only support those
 #define MSG_FLAG_VALID			0x01
@@ -56,27 +57,24 @@ struct item_info_s {
 typedef field_header_s FieldHeader;
 typedef item_info_s ItemInfo;
 
-class BMessageBody;
-
 class BMessageField {
 public:
 								BMessageField(BMessageBody *parent,
 									int32 offset, const char *name,
 									type_code type);
 
+		// only use this constructor to unflatten
 								BMessageField(BMessageBody *parent);
-								~BMessageField();
-
 		int32					Unflatten(int32 offset);
 
-		uint8					Flags() const { return fHeader->flags; };
+		uint8					Flags() const { return Header()->flags; };
 		status_t				SetFixedSize(int32 itemSize);
-		bool					FixedSize() const { return fHeader->flags & MSG_FLAG_FIXED_SIZE; };
+		bool					FixedSize() const { return fFixedSize; };
 
 		void					SetName(const char *newName);
 		const char				*Name() const;
-		uint8					NameLength() const { return fHeader->nameLength; };
-		type_code				Type() const { return fHeader->type; };
+		uint8					NameLength() const { return Header()->nameLength; };
+		type_code				Type() const { return Header()->type; };
 
 		void					AddItem(const void *item, ssize_t length);
 		uint8					*AddItem(ssize_t length);
@@ -88,11 +86,11 @@ public:
 		void					*ItemAt(int32 index, ssize_t *size);
 
 		void					RemoveItem(int32 index);
-		int32					CountItems() const { return fHeader->count; };
+		int32					CountItems() const { return Header()->count; };
 
 		void					PrintToStream() const;
 
-		void					SetOffset(int32 offset);
+		void					SetOffset(int32 offset) { fOffset = offset; };
 		int32					Offset() const { return fOffset; };
 
 		// always do MakeEmpty -> RemoveSelf -> delete
@@ -104,12 +102,13 @@ public:
 		BMessageField			*Next() const { return fNext; };
 
 private:
-		bool					IsFixedSize(type_code type);
+inline	FieldHeader				*Header() const { return (FieldHeader *)(fParent->FlatBuffer() + fOffset); };
 
 		BMessageBody			*fParent;
 		int32					fOffset;
-		FieldHeader				*fHeader;
+		int32					fDataOffset;
 
+		bool					fFixedSize;
 		int32					fItemSize;
 		BList					fItemInfos;
 

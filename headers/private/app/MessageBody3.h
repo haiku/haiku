@@ -12,13 +12,14 @@
 #define _MESSAGE_BODY_H_
 
 #include <List.h>
-#include "MessageField3.h"
 
 enum {
 	B_FLATTENABLE_TYPE = 'FLAT'
 };
 
 namespace BPrivate {
+
+class BMessageField;
 
 class BMessageBody {
 public:
@@ -68,7 +69,7 @@ public:
 		void				PrintToStream() const;
 
 		// flat buffer management
-		uint8				*FlatBuffer() const { return (uint8 *)fFlatBuffer.Buffer(); };
+inline	uint8				*FlatBuffer() const { return (uint8 *)fFlatBuffer.Buffer(); };
 		uint8				*FlatInsert(int32 offset, ssize_t oldLength,
 								ssize_t newLength);
 

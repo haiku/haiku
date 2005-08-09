@@ -593,9 +593,10 @@ BMessage::IsReply() const
 void
 BMessage::PrintToStream() const
 {
-	printf("\nBMessage: what = '%c%c%c%c' (0x%lX or %ld)\n",
-		(uint8)(what >> 24), (uint8)(what >> 16), (uint8)(what >> 8),
-		(uint8)what, what, what);
+	printf("\nBMessage: what = ");
+	printf("%c%c%c%c", (uint8)(what >> 24), (uint8)(what >> 16),
+		(uint8)(what >> 8), (uint8)what);
+	printf(" (0x%lX or %ld)\n", what, what);
 
 	fBody->PrintToStream();
 }
@@ -1053,7 +1054,8 @@ BMessage::Find ## fnName(const char *name, int32 index, TYPE *p) const		\
 	status_t error = B_OK;													\
 																			\
 	*p = TYPE();															\
-	error = fBody->FindData(name, TYPESPEC, index, (const void **)&ptr, &bytes);	\
+	error = fBody->FindData(name, TYPESPEC, index, (const void **)&ptr,		\
+		&bytes);															\
 																			\
 	if (error == B_OK)														\
 		memcpy(p, ptr, sizeof(TYPE));										\

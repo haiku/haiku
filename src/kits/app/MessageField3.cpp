@@ -14,7 +14,7 @@
 
 namespace BPrivate {
 
-#define DATA_OFFSET (fOffset + sizeof(FieldHeader) + fHeader->nameLength)
+#define DATA_OFFSET (fOffset + fDataOffset)
 
 inline int32
 round_to_8(int32 length)
@@ -28,18 +28,22 @@ BMessageField::BMessageField(BMessageBody *parent, int32 offset,
 	const char *name, type_code type)
 	:	fParent(parent),
 		fOffset(offset),
-		fItemSize(0)
+		fDataOffset(0),
+		fFixedSize(false),
+		fItemSize(0),
+		fItemInfos(5),
+		fNext(NULL)
 {
 	// insert space needed for the header
 	fParent->FlatInsert(fOffset, 0, sizeof(FieldHeader));
 
-	// create and fill header
-	fHeader = (FieldHeader *)(fParent->FlatBuffer() + fOffset);
-	fHeader->type = type;
-	fHeader->flags = MSG_FLAG_VALID;
-	fHeader->count = 0;
-	fHeader->dataSize = 0;
-	fHeader->nameLength = 0;
+	// fill the header
+	FieldHeader *header = Header();
+	header->type = type;
+	header->flags = MSG_FLAG_VALID;
+	header->count = 0;
+	header->dataSize = 0;
+	header->nameLength = 0;
 
 	SetName(name);
 }
@@ -48,13 +52,11 @@ BMessageField::BMessageField(BMessageBody *parent, int32 offset,
 BMessageField::BMessageField(BMessageBody *parent)
 	:	fParent(parent),
 		fOffset(0),
-		fHeader(NULL),
-		fItemSize(0)
-{
-}
-
-
-BMessageField::~BMessageField()
+		fDataOffset(0),
+		fFixedSize(false),
+		fItemSize(0),
+		fItemInfos(5),
+		fNext(NULL)
 {
 }
 
@@ -65,18 +67,23 @@ BMessageField::Unflatten(int32 _offset)
 	fOffset = _offset;
 
 	// field is already present, just tap into it
-	fHeader = (FieldHeader *)(fParent->FlatBuffer() + fOffset);
+	FieldHeader *header = Header();
+	fDataOffset = sizeof(FieldHeader) + header->nameLength;
+	fFixedSize = header->flags & MSG_FLAG_FIXED_SIZE;
 
-	if (fHeader->flags & MSG_FLAG_FIXED_SIZE) {
-		if (fHeader->count > 0)
-			fItemSize = fHeader->dataSize / fHeader->count;
-		return sizeof(FieldHeader) + fHeader->nameLength + fHeader->count * fItemSize;
+	if (header->nameLength == 0)
+		return 0;
+
+	if (fFixedSize) {
+		if (header->count > 0)
+			fItemSize = header->dataSize / header->count;
+		return fDataOffset + header->count * fItemSize;
 	}
 
 	// create the item info list
 	int32 offset = 0;
 	uint8 *location = fParent->FlatBuffer() + DATA_OFFSET;
-	for (int32 index = 0; index < fHeader->count; index++) {
+	for (int32 index = 0; index < header->count; index++) {
 		ItemInfo *info = new ItemInfo(offset);
 		info->length = *(size_t *)location;
 		info->paddedLength = round_to_8(info->length);
@@ -86,25 +93,22 @@ BMessageField::Unflatten(int32 _offset)
 		location += info->paddedLength;
 	}
 
-	return sizeof(FieldHeader) + fHeader->nameLength + offset;
-}
-
-
-void
-BMessageField::SetOffset(int32 offset)
-{
-	fOffset = offset;
-	fHeader = (FieldHeader *)(fParent->FlatBuffer() + fOffset);
+	return fDataOffset + offset;
 }
 
 
 void
 BMessageField::SetName(const char *newName)
 {
+	FieldHeader *header = Header();
+
 	int32 newLength = min_c(strlen(newName), 254) + 1;
-	char *buffer = (char *)fParent->FlatInsert(fOffset + sizeof(FieldHeader), fHeader->nameLength, newLength);
-	strcpy(buffer, newName);
-	fHeader->nameLength = newLength;
+	char *buffer = (char *)fParent->FlatInsert(fOffset + sizeof(FieldHeader), header->nameLength, newLength);
+	strncpy(buffer, newName, newLength);
+	buffer[newLength] = 0;
+
+	header->nameLength = newLength;
+	fDataOffset = sizeof(FieldHeader) + newLength;
 }
 
 
@@ -118,12 +122,13 @@ BMessageField::Name() const
 status_t
 BMessageField::SetFixedSize(int32 itemSize)
 {
-	if ((fItemSize > 0 && fItemSize != itemSize)
-		|| fItemInfos.CountItems() > 0)
+	if (fItemInfos.CountItems() > 0
+		&& (fItemSize > 0 && fItemSize != itemSize))
 		return B_BAD_VALUE;
 
 	fItemSize = itemSize;
-	fHeader->flags |= MSG_FLAG_FIXED_SIZE;
+	Header()->flags |= MSG_FLAG_FIXED_SIZE;
+	fFixedSize = true;
 	return B_OK;
 }
 
@@ -138,16 +143,18 @@ BMessageField::AddItem(const void *item, ssize_t length)
 uint8 *
 BMessageField::AddItem(ssize_t length)
 {
-	if (fHeader->flags & MSG_FLAG_FIXED_SIZE) {
-		int32 offset = DATA_OFFSET + (fHeader->count * fItemSize);
-		fHeader->dataSize += fItemSize;
-		fHeader->count++;
+	FieldHeader *header = Header();
+
+	if (fFixedSize) {
+		int32 offset = DATA_OFFSET + (header->count * fItemSize);
+		header->dataSize += fItemSize;
+		header->count++;
 		return fParent->FlatInsert(offset, 0, fItemSize);
 	}
 
 	int32 newOffset = 0;
-	if (fHeader->count > 0) {
-		ItemInfo *info = (ItemInfo *)fItemInfos.ItemAt(fHeader->count - 1);
+	if (header->count > 0) {
+		ItemInfo *info = (ItemInfo *)fItemInfos.ItemAt(header->count - 1);
 		newOffset = info->offset + info->paddedLength;
 	}
 
@@ -155,8 +162,8 @@ BMessageField::AddItem(ssize_t length)
 	newInfo->paddedLength = round_to_8(length);
 
 	fItemInfos.AddItem(newInfo);
-	fHeader->dataSize += newInfo->paddedLength;
-	fHeader->count++;
+	header->dataSize += newInfo->paddedLength;
+	header->count++;
 
 	uint8 *result = fParent->FlatInsert(DATA_OFFSET + newInfo->offset, 0, newInfo->paddedLength);
 	*(int32 *)result = length;
@@ -174,7 +181,7 @@ BMessageField::ReplaceItem(int32 index, const void *newItem, ssize_t length)
 uint8 *
 BMessageField::ReplaceItem(int32 index, ssize_t length)
 {
-	if (fHeader->flags & MSG_FLAG_FIXED_SIZE)
+	if (fFixedSize)
 		return fParent->FlatBuffer() + DATA_OFFSET + (index * fItemSize);
 
 	ItemInfo *info = (ItemInfo *)fItemInfos.ItemAt(index);
@@ -187,10 +194,11 @@ BMessageField::ReplaceItem(int32 index, ssize_t length)
 		return result + sizeof(int32);
 	}
 
+	FieldHeader *header = Header();
 	int32 change = newLength - info->paddedLength;
-	for (int32 i = index + 1; i < fHeader->count; i++)
+	for (int32 i = index + 1; i < header->count; i++)
 		((ItemInfo *)fItemInfos.ItemAt(i))->offset += change;
-	fHeader->dataSize += change;
+	header->dataSize += change;
 
 	int32 oldLength = info->paddedLength;
 	info->length = length;
@@ -205,7 +213,7 @@ BMessageField::ReplaceItem(int32 index, ssize_t length)
 void *
 BMessageField::ItemAt(int32 index, ssize_t *size)
 {
-	if (fHeader->flags & MSG_FLAG_FIXED_SIZE) {
+	if (fFixedSize) {
 		if (size)
 			*size = fItemSize;
 
@@ -224,21 +232,23 @@ BMessageField::ItemAt(int32 index, ssize_t *size)
 void
 BMessageField::RemoveItem(int32 index)
 {
-	if (fHeader->flags & MSG_FLAG_FIXED_SIZE) {
+	FieldHeader *header = Header();
+
+	if (fFixedSize) {
 		fParent->FlatInsert(DATA_OFFSET + (index * fItemSize), fItemSize, 0);
-		fHeader->dataSize -= fItemSize;
-		fHeader->count--;
+		header->dataSize -= fItemSize;
+		header->count--;
 		return;
 	}
 
 	ItemInfo *info = (ItemInfo *)fItemInfos.RemoveItem(index);
 
-	for (int32 i = index; i < fHeader->count; i++)
+	for (int32 i = index; i < header->count; i++)
 		((ItemInfo *)fItemInfos.ItemAt(i))->offset -= info->paddedLength;
 
 	fParent->FlatInsert(DATA_OFFSET + info->offset, info->paddedLength, 0);
-	fHeader->dataSize -= info->paddedLength;
-	fHeader->count--;
+	header->dataSize -= info->paddedLength;
+	header->count--;
 	delete info;
 }
 
@@ -246,7 +256,8 @@ BMessageField::RemoveItem(int32 index)
 void
 BMessageField::PrintToStream() const
 {
-	printf("\tname: \"%s\"; items: %ld; dataSize: %ld; flags: %02x;", Name(), fHeader->count, fHeader->dataSize, fHeader->flags);
+	FieldHeader *header = Header();
+	printf("\tname: \"%s\"; items: %ld; dataSize: %ld; flags: %02x; offset: %ld", Name(), header->count, header->dataSize, header->flags, fOffset);
 	// ToDo: implement for real
 }
 
@@ -264,10 +275,10 @@ BMessageField::MakeEmpty()
 void
 BMessageField::RemoveSelf()
 {
-	// remove ourselfs from the flat buffer
-	fParent->FlatInsert(fOffset, sizeof(FieldHeader) + fHeader->nameLength + fHeader->dataSize, 0);
+	// remove ourself from the flat buffer
+	FieldHeader *header = Header();
+	fParent->FlatInsert(fOffset, fDataOffset + header->dataSize, 0);
 	fOffset = 0;
-	fHeader = NULL;
 }
 
 } // namespace BPrivate

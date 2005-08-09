@@ -12,6 +12,7 @@
 #include <DataIO.h>
 #include <TypeConstants.h>
 #include "MessageBody3.h"
+#include "MessageField3.h"
 #include "MessageUtils3.h"
 
 namespace BPrivate {
@@ -237,10 +238,9 @@ BMessageBody::Unflatten(BDataIO *stream, int32 length)
 
 	int32 offset = 0;
 	uint8 *location = (uint8 *)fFlatBuffer.Buffer();
-	while (offset < length && *location & MSG_FLAG_VALID) {
+	while (offset < error && *location & MSG_FLAG_VALID) {
 		BMessageField *field = new BMessageField(this);
 		int32 fieldLength = field->Unflatten(offset);
-		//PrintToStream();
 
 		if (fieldLength <= 0) {
 			field->MakeEmpty();
