@@ -2421,6 +2421,26 @@ vfs_put_vnode(void *_vnode)
 }
 
 
+extern "C" status_t
+vfs_get_cwd(mount_id *_mountID, vnode_id *_vnodeID)
+{
+	// Get current working directory from io context
+	struct io_context *context = get_current_io_context(false);
+	status_t status = B_OK;
+
+	mutex_lock(&context->io_mutex);
+
+	if (context->cwd != NULL) {
+		*_mountID = context->cwd->device;
+		*_vnodeID = context->cwd->id;
+	} else
+		status = B_ERROR;
+
+	mutex_unlock(&context->io_mutex);
+	return status;
+}
+
+
 extern "C" bool
 vfs_can_page(void *_vnode, void *cookie)
 {
@@ -3658,7 +3678,7 @@ common_read_link(int fd, char *path, char *buffer, size_t *_bufferSize,
 	bool kernel)
 {
 	struct vnode *vnode;
-	int status;
+	status_t status;
 
 	status = fd_and_path_to_vnode(fd, path, false, &vnode, NULL, kernel);
 	if (status < B_OK)
@@ -3679,7 +3699,7 @@ static status_t
 common_write_link(char *path, char *toPath, bool kernel)
 {
 	struct vnode *vnode;
-	int status;
+	status_t status;
 
 	status = path_to_vnode(path, false, &vnode, NULL, kernel);
 	if (status < B_OK)
@@ -3703,7 +3723,7 @@ common_create_symlink(int fd, char *path, const char *toPath, int mode,
 	// path validity checks have to be in the calling function!
 	char name[B_FILE_NAME_LENGTH];
 	struct vnode *vnode;
-	int status;
+	status_t status;
 
 	FUNCTION(("common_create_symlink(fd = %d, path = %s, toPath = %s, mode = %d, kernel = %d)\n", fd, path, toPath, mode, kernel));
 
@@ -3728,7 +3748,7 @@ common_create_link(char *path, char *toPath, bool kernel)
 	// path validity checks have to be in the calling function!
 	char name[B_FILE_NAME_LENGTH];
 	struct vnode *directory, *vnode;
-	int status;
+	status_t status;
 
 	FUNCTION(("common_create_link(path = %s, toPath = %s, kernel = %d)\n", path, toPath, kernel));
 
@@ -3764,7 +3784,7 @@ common_unlink(int fd, char *path, bool kernel)
 {
 	char filename[B_FILE_NAME_LENGTH];
 	struct vnode *vnode;
-	int status;
+	status_t status;
 
 	FUNCTION(("common_unlink: fd: %d, path '%s', kernel %d\n", fd, path, kernel));
 
@@ -3787,7 +3807,7 @@ static status_t
 common_access(char *path, int mode, bool kernel)
 {
 	struct vnode *vnode;
-	int status;
+	status_t status;
 
 	status = path_to_vnode(path, true, &vnode, NULL, kernel);
 	if (status < B_OK)
@@ -3810,7 +3830,7 @@ common_rename(int fd, char *path, int newFD, char *newPath, bool kernel)
 	struct vnode *fromVnode, *toVnode;
 	char fromName[B_FILE_NAME_LENGTH];
 	char toName[B_FILE_NAME_LENGTH];
-	int status;
+	status_t status;
 
 	FUNCTION(("common_rename(fd = %d, path = %s, newFD = %d, newPath = %s, kernel = %d)\n", fd, path, newFD, newPath, kernel));
 
@@ -3905,7 +3925,7 @@ common_path_write_stat(int fd, char *path, bool traverseLeafLink,
 	const struct stat *stat, int statMask, bool kernel)
 {
 	struct vnode *vnode;
-	int status;
+	status_t status;
 
 	FUNCTION(("common_write_stat: fd: %d, path '%s', stat %p, stat_mask %d, kernel %d\n", fd, path, stat, statMask, kernel));
 
@@ -4202,7 +4222,7 @@ attr_remove(int fd, const char *name, bool kernel)
 {
 	struct file_descriptor *descriptor;
 	struct vnode *vnode;
-	int status;
+	status_t status;
 
 	if (name == NULL || *name == '\0')
 		return B_BAD_VALUE;
@@ -4229,7 +4249,7 @@ attr_rename(int fromfd, const char *fromName, int tofd, const char *toName, bool
 {
 	struct file_descriptor *fromDescriptor, *toDescriptor;
 	struct vnode *fromVnode, *toVnode;
-	int status;
+	status_t status;
 
 	if (fromName == NULL || *fromName == '\0' || toName == NULL || *toName == '\0')
 		return B_BAD_VALUE;
@@ -5045,7 +5065,7 @@ get_cwd(char *buffer, size_t size, bool kernel)
 {
 	// Get current working directory from io context
 	struct io_context *context = get_current_io_context(kernel);
-	int status;
+	status_t status;
 
 	FUNCTION(("vfs_get_cwd: buf %p, size %ld\n", buffer, size));
 
@@ -5068,22 +5088,22 @@ set_cwd(int fd, char *path, bool kernel)
 	struct vnode *vnode = NULL;
 	struct vnode *oldDirectory;
 	struct stat stat;
-	int rc;
+	status_t status;
 
 	FUNCTION(("set_cwd: path = \'%s\'\n", path));
 
 	// Get vnode for passed path, and bail if it failed
-	rc = fd_and_path_to_vnode(fd, path, true, &vnode, NULL, kernel);
-	if (rc < 0)
-		return rc;
+	status = fd_and_path_to_vnode(fd, path, true, &vnode, NULL, kernel);
+	if (status < 0)
+		return status;
 
-	rc = FS_CALL(vnode, read_stat)(vnode->mount->cookie, vnode->private_node, &stat);
-	if (rc < 0)
+	status = FS_CALL(vnode, read_stat)(vnode->mount->cookie, vnode->private_node, &stat);
+	if (status < 0)
 		goto err;
 
 	if (!S_ISDIR(stat.st_mode)) {
 		// nope, can't cwd to here
-		rc = B_NOT_A_DIRECTORY;
+		status = B_NOT_A_DIRECTORY;
 		goto err;
 	}
 
@@ -5104,7 +5124,7 @@ set_cwd(int fd, char *path, bool kernel)
 
 err:
 	put_vnode(vnode);
-	return rc;
+	return status;
 }
 
 
@@ -5895,7 +5915,7 @@ _user_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
 {
 	char path[B_PATH_NAME_LENGTH + 1];
 	struct vnode *vnode;
-	int status;
+	status_t status;
 
 	if (!IS_USER_ADDRESS(userPath))
 		return B_BAD_ADDRESS;
@@ -6157,7 +6177,7 @@ status_t
 _user_remove_dir(const char *userPath)
 {
 	char path[B_PATH_NAME_LENGTH + 1];
-	int status;
+	status_t status;
 
 	if (!IS_USER_ADDRESS(userPath))
 		return B_BAD_ADDRESS;
@@ -6176,7 +6196,7 @@ _user_read_link(int fd, const char *userPath, char *userBuffer, size_t *userBuff
 	char path[B_PATH_NAME_LENGTH + 1];
 	char buffer[B_PATH_NAME_LENGTH];
 	size_t bufferSize;
-	int status;
+	status_t status;
 
 	if (!IS_USER_ADDRESS(userBuffer) || !IS_USER_ADDRESS(userBufferSize)
 		|| user_memcpy(&bufferSize, userBufferSize, sizeof(size_t)) < B_OK)
@@ -6216,8 +6236,8 @@ _user_write_link(const char *userPath, const char *userToPath)
 {
 	char path[B_PATH_NAME_LENGTH + 1];
 	char toPath[B_PATH_NAME_LENGTH + 1];
-	int status;
-	
+	status_t status;
+
 	if (!IS_USER_ADDRESS(userPath)
 		|| !IS_USER_ADDRESS(userToPath))
 		return B_BAD_ADDRESS;
@@ -6297,7 +6317,7 @@ status_t
 _user_unlink(int fd, const char *userPath)
 {
 	char path[B_PATH_NAME_LENGTH + 1];
-	int status;
+	status_t status;
 
 	if (!IS_USER_ADDRESS(userPath))
 		return B_BAD_ADDRESS;
@@ -6316,7 +6336,7 @@ _user_rename(int oldFD, const char *userOldPath, int newFD,
 {
 	char oldPath[B_PATH_NAME_LENGTH + 1];
 	char newPath[B_PATH_NAME_LENGTH + 1];
-	int status;
+	status_t status;
 
 	if (!IS_USER_ADDRESS(userOldPath) || !IS_USER_ADDRESS(userNewPath))
 		return B_BAD_ADDRESS;
@@ -6337,7 +6357,7 @@ status_t
 _user_access(const char *userPath, int mode)
 {
 	char path[B_PATH_NAME_LENGTH + 1];
-	int status;
+	status_t status;
 
 	if (!IS_USER_ADDRESS(userPath))
 		return B_BAD_ADDRESS;
@@ -6355,7 +6375,7 @@ _user_read_stat(int fd, const char *userPath, bool traverseLink,
 	struct stat *userStat, size_t statSize)
 {
 	struct stat stat;
-	int status;
+	status_t status;
 
 	if (statSize > sizeof(struct stat))
 		return B_BAD_VALUE;
@@ -6579,7 +6599,7 @@ status_t
 _user_getcwd(char *userBuffer, size_t size)
 {
 	char buffer[B_PATH_NAME_LENGTH];
-	int status;
+	status_t status;
 
 	PRINT(("user_getcwd: buf %p, %ld\n", userBuffer, size));
 
