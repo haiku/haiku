@@ -294,7 +294,6 @@ CDPlayer::MessageReceived(BMessage *msg)
 		
 		case M_FFWD:
 		{
-			// TODO: Implement
 			if(fFastFwd->Value() == B_CONTROL_ON)
 				engine->StartSkippingForward();
 			else
@@ -303,7 +302,6 @@ CDPlayer::MessageReceived(BMessage *msg)
 		}
 		case M_REWIND:
 		{
-			// TODO: Implement
 			if(fRewind->Value() == B_CONTROL_ON)
 				engine->StartSkippingBackward();
 			else
@@ -319,11 +317,30 @@ CDPlayer::MessageReceived(BMessage *msg)
 		case M_SHUFFLE:
 		{
 			engine->ToggleShuffle();
+			
+			if(engine->IsShuffled() && fShuffle->GetState()==0)
+			{
+				fShuffle->SetState(1);
+			}
+			else
+			{
+				if(fShuffle->GetState()==1)
+				fShuffle->SetState(0);
+			}
 			break;
 		}
 		case M_REPEAT:
 		{
 			engine->ToggleRepeat();
+			if(engine->IsRepeated() && fRepeat->GetState()==0)
+			{
+				fRepeat->SetState(1);
+			}
+			else
+			{
+				if(fRepeat->GetState()==1)
+				fRepeat->SetState(0);
+			}
 			break;
 		}
 		
@@ -363,6 +380,7 @@ CDPlayer::NoticeChange(Notifier *notifier)
 	else
 	if(trs)
 	{
+
 		if(fTrackMenu->CountItems() != engine->TrackStateWatcher()->GetNumTracks())
 			fTrackMenu->SetItemCount(engine->TrackStateWatcher()->GetNumTracks());
 		

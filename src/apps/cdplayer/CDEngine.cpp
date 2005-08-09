@@ -73,9 +73,19 @@ PlayState::UpdateState(void)
 		}
 		else
 		{
-			sPlayList.SetTrackCount(gCDDevice.CountTracks());
-			sPlayList.SetStartingTrack(gCDDevice.GetTrack());
-			return CurrentState(kPlaying);
+			int16 count = gCDDevice.CountTracks();
+			if(count != sPlayList.TrackCount())
+				sPlayList.SetTrackCount(count);
+			
+			// TODO: Is this correct?
+			
+			/*
+			int16 start = gCDDevice.GetTrack();
+			if(start != sPlayList.StartingTrack())
+				sPlayList.SetStartingTrack(start);
+			*/
+			
+			return CurrentState(kStopped);
 		}
 	}
 	
@@ -127,7 +137,6 @@ TrackState::UpdateState()
 	// It's possible that the state of the cd drive was changed by outside means
 	// As a result, we want to make sure this hasn't happened. If it has, then we
 	// need to update the playlist's position.
-	
 	int16 cdTrack, count;
 	
 	if(gCDDevice.GetState() == kPlaying)
@@ -239,7 +248,7 @@ TimeState::GetTotalTrackTime(int32 &minutes, int32 &seconds) const
 
 
 CDContentWatcher::CDContentWatcher(void)
-	:	cddbQuery("us.freedb.org", 888, true),
+	:	cddbQuery("us.freedb.org", 888),
 		discID(-1)
 {
 }
@@ -488,6 +497,12 @@ CDEngine::ToggleShuffle(void)
 	}
 }
 
+bool
+CDEngine::IsShuffled(void)
+{
+	return sPlayList.IsShuffled();
+}
+
 void
 CDEngine::ToggleRepeat(void)
 {
@@ -497,6 +512,11 @@ CDEngine::ToggleRepeat(void)
 		sPlayList.SetLoop(true);
 }
 
+bool
+CDEngine::IsRepeated(void)
+{
+	return sPlayList.IsLoop();
+}
 
 void
 CDEngine::DoPulse()

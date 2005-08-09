@@ -163,8 +163,11 @@ public:
 			void 	SetVolume(uint8 value);
 			
 			void 	ToggleShuffle(void);
+			bool	IsShuffled(void);
+			
 			void 	ToggleRepeat(void);
-	
+			bool	IsRepeated(void);
+			
 			CDState	GetState(void) const { return fEngineState; }
 
 	// to find the current Track, you may call the GetTrack function

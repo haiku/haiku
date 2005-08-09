@@ -3,6 +3,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define DEBUG_PLAYLIST
+
+#ifdef DEBUG_PLAYLIST
+#include <stdio.h>
+#define STRACE(x) printf x
+#else
+#define STRACE(x) /* nothing */
+#endif
+
 PlayList::PlayList(int16 count, int16 start)
  : 	fTrackCount(count),
  	fTrackIndex(0),
@@ -10,6 +19,8 @@ PlayList::PlayList(int16 count, int16 start)
  	fRandom(false),
  	fLoop(false)
 {
+	STRACE(("PlayList(count=%d,start=%d)\n",count,start));
+	
 	srand(real_time_clock_usecs());
 	
 	if(fTrackCount < 0)
@@ -25,6 +36,7 @@ PlayList::PlayList(int16 count, int16 start)
 		fStartingTrack = 1;
 	
 	memset(fTrackList,-1,500);
+	
 	Unrandomize();
 }
 
@@ -32,6 +44,8 @@ void
 PlayList::SetTrackCount(const int16 &count)
 {
 	fLocker.Lock();
+	
+	STRACE(("PlayList::SetTrackCount(%d)\n",count));
 	
 	if(count < 0)
 		fTrackCount = 0;
@@ -52,6 +66,8 @@ PlayList::SetStartingTrack(const int16 &start)
 {
 	fLocker.Lock();
 	
+	STRACE(("PlayList::SetStartingTrack(%d)\n",start));
+	
 	if(start >= TrackCount())
 		fStartingTrack = TrackCount() - 1;
 	else
@@ -66,6 +82,7 @@ PlayList::SetStartingTrack(const int16 &start)
 void
 PlayList::Rewind(void)
 {
+	STRACE(("PlayList::Rewind()\n"));
 	fLocker.Lock();
 	
 	fTrackIndex = 0;
@@ -76,6 +93,7 @@ PlayList::Rewind(void)
 void
 PlayList::SetShuffle(const bool &random)
 {
+	STRACE(("PlayList::SetShuffle(%s)\n",random ? "random" : "sequential"));
 	fLocker.Lock();
 	
 	if(random)
@@ -91,6 +109,7 @@ PlayList::SetShuffle(const bool &random)
 void
 PlayList::SetLoop(const bool &loop)
 {
+	STRACE(("PlayList::SetLoop(%s)\n",loop ? "loop" : "non-loop"));
 	fLocker.Lock();
 	
 	fLoop = loop;
@@ -101,6 +120,8 @@ PlayList::SetLoop(const bool &loop)
 void
 PlayList::SetCurrentTrack(const int16 &track)
 {
+	STRACE(("PlayList::SetCurrentTrack(%d)\n",track));
+	
 	if(track < 0 || track > fTrackCount)
 		return;
 	
@@ -124,6 +145,7 @@ PlayList::GetCurrentTrack(void)
 	fLocker.Lock();
 	
 	int16 value = fTrackList[fTrackIndex];
+	STRACE(("PlayList::GetCurrentTrack()=%d\n",value));
 	
 	fLocker.Unlock();
 	return value;
@@ -137,6 +159,7 @@ PlayList::GetNextTrack(void)
 	if(fTrackCount < 1)
 	{
 		fLocker.Unlock();
+		STRACE(("PlayList::GetNextTrack()=-1 (no tracks)\n"));
 		return -1;
 	}
 	
@@ -147,6 +170,7 @@ PlayList::GetNextTrack(void)
 		else
 		{
 			fLocker.Unlock();
+			STRACE(("PlayList::GetNextTrack()=-1 (track index out of range)\n"));
 			return -1;
 		}
 	}
@@ -154,6 +178,8 @@ PlayList::GetNextTrack(void)
 		fTrackIndex++;
 	
 	int16 value = fTrackList[fTrackIndex];
+	STRACE(("PlayList::GetNextTrack()=%d\n",value));
+	
 	fLocker.Unlock();
 	return value;
 }
@@ -166,6 +192,7 @@ PlayList::GetPreviousTrack(void)
 	if(fTrackCount < 1)
 	{
 		fLocker.Unlock();
+		STRACE(("PlayList::GetPreviousTrack()=-1 (no tracks)\n"));
 		return -1;
 	}
 	
@@ -176,6 +203,7 @@ PlayList::GetPreviousTrack(void)
 		else
 		{
 			fLocker.Unlock();
+			STRACE(("PlayList::GetPreviousTrack()=-1 (track index out of range)\n"));
 			return -1;
 		}
 	}
@@ -183,6 +211,7 @@ PlayList::GetPreviousTrack(void)
 		fTrackIndex--;
 	
 	int16 value = fTrackList[fTrackIndex];
+	STRACE(("PlayList::GetPreviousTrack()=%d\n",value));
 	fLocker.Unlock();
 	return value;
 }
@@ -195,11 +224,13 @@ PlayList::GetLastTrack(void)
 	if(fTrackCount < 1)
 	{
 		fLocker.Unlock();
+		STRACE(("PlayList::GetLastTrack()=-1 (no tracks)\n"));
 		return -1;
 	}
 	
 	fTrackIndex = fTrackCount - 1;
 	int16 value = fTrackList[fTrackIndex];
+	STRACE(("PlayList::GetLastTrack()=%d\n",value));
 	fLocker.Unlock();
 	return value;
 }
@@ -212,12 +243,13 @@ PlayList::GetFirstTrack(void)
 	if(fTrackCount < 1)
 	{
 		fLocker.Unlock();
+		STRACE(("PlayList::GetFirstTrack()=-1 (no tracks)\n"));
 		return -1;
 	}
 	
 	fTrackIndex = 0;
 	int16 value = fTrackList[fTrackIndex];
-	
+	STRACE(("PlayList::GetFirstTrack()=%d\n",value));
 	fLocker.Unlock();
 	return value;
 }
@@ -225,6 +257,8 @@ PlayList::GetFirstTrack(void)
 void
 PlayList::Randomize(void)
 {
+	STRACE(("PlayList::Randomize()\n"));
+	
 	// Reinitialize the count
 	for(int16 i=fStartingTrack; i<=fTrackCount; i++)
 		fTrackList[i - fStartingTrack] = i;
@@ -249,11 +283,17 @@ PlayList::Randomize(void)
 		fTrackList[first] = fTrackList[second];
 		fTrackList[second] = temp;
 	}
+	
+	#ifdef DEBUG_PLAYLIST
+		for(int16 i=fStartingTrack; i<=fTrackCount; i++)
+			printf("\tSlot %d: track %d\n",i,fTrackList[i]);
+	#endif
 }
 
 void
 PlayList::Unrandomize(void)
 {
+	STRACE(("PlayList::Unrandomize()\n"));
 	for(int16 i=fStartingTrack; i<=fTrackCount; i++)
 		fTrackList[i - fStartingTrack] = i;
 }

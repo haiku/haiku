@@ -12,8 +12,7 @@
 class CDDBQuery 
 {
 public:
-							CDDBQuery(const char *server, int32 port = 888, 
-									  bool log = false);
+							CDDBQuery(const char *server, int32 port = 888);
 							~CDDBQuery(void); 
 			void			SetToSite(const char *server, int32 port);
 			void			GetSites(bool (*)(const char *site, int port, 
@@ -80,7 +79,7 @@ private:
 	
 			bool					OpenContentFile(const int32 &discID);
 	
-			void					ReadFromServer(BString &data);
+			status_t				ReadFromServer(BString &data);
 			void					ParseData(const BString &data);
 			void					WriteFile(void);
 			
@@ -89,8 +88,6 @@ private:
 			void					IdentifySelf();
 
 			const char *			GetToken(const char *, BString &);
-	
-			bool					fLog;
 	
 			// state data
 			BString					fServerName;

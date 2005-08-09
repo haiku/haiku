@@ -26,6 +26,14 @@
 #include <stdlib.h>
 #include <stdlib.h>
 
+//#define DEBUG_CDDB
+
+#ifdef DEBUG_CDDB
+#define STRACE(x) printf x
+#else
+#define STRACE(x) /* nothing */
+#endif
+
 const int kTerminatingSignal = SIGINT; // SIGCONT;
 
 // The SCSI table of contents consists of a 4-byte header followed by 100 track
@@ -68,9 +76,8 @@ ThrowIfNotSize(ssize_t size)
 }
 
 
-CDDBQuery::CDDBQuery(const char *server, int32 port, bool log)
-	:	fLog(log),
-		fServerName(server),
+CDDBQuery::CDDBQuery(const char *server, int32 port)
+	:	fServerName(server),
 		fPort(port),
 		fConnected(false),
 		fState(kInitial),
@@ -177,8 +184,7 @@ CDDBQuery::GetSites(bool (*eachFunc)(const char *site, int port, const char *lat
 	BString tmp;
 	
 	tmp = "sites\n";
-	if (fLog)
-		printf(">%s", tmp.String());
+	STRACE((">%s", tmp.String()));
 
 	ThrowIfNotSize( fSocket.Send(tmp.String(), tmp.Length()) );
 	ReadLine(tmp);
@@ -325,7 +331,7 @@ CDDBQuery::GetTrackTimes(const scsi_toc *toc, vector<cdaudio_time> &times)
 	}
 }
 
-void
+status_t
 CDDBQuery::ReadFromServer(BString &data)
 {
 	// This function queries the given CDDB server for the existence of the disc's data and
@@ -339,8 +345,7 @@ CDDBQuery::ReadFromServer(BString &data)
 	query << "cddb query " << idString << ' ' << fTrackCount << ' ' 
 		<< fFrameOffsetString << ' ' << fDiscLength << '\n';
 	
-	if (fLog)
-		printf(">%s", query.String());
+	STRACE((">%s", query.String()));
 
 	ThrowIfNotSize( fSocket.Send(query.String(), query.Length()) );
 
@@ -378,8 +383,10 @@ CDDBQuery::ReadFromServer(BString &data)
 		}
 		else
 		{
-			printf("Error: %s\n",tmp.String());
-			return;
+			// We get here for any time the CDDB server does not recognize the CD, amongst other things
+			STRACE(("CDDB lookup error: %s\n",tmp.String()));
+			fCategory = "misc";
+			return B_NAME_NOT_FOUND;
 		}
 	}
 	else
@@ -404,6 +411,8 @@ CDDBQuery::ReadFromServer(BString &data)
 		
 		data << tmp << '\n';
 	}
+	
+	return B_OK;
 }
 
 void
@@ -447,8 +456,7 @@ CDDBQuery::ReadLine(BString &buffer)
 		if (ch == '\n')
 			break;
 	}
-	if (fLog)
-		printf("<%s\n", buffer.String());
+	STRACE(("<%s\n", buffer.String()));
 }
 
 void 
@@ -465,8 +473,7 @@ CDDBQuery::IdentifySelf()
 	BString tmp;
 	tmp << "cddb hello " << username << " " << hostname << " Haiku_CD_Player v1.0\n";
 
-	if (fLog)
-		printf(">%s", tmp.String());
+	STRACE((">%s", tmp.String()));
 	ThrowIfNotSize( fSocket.Send(tmp.String(), tmp.Length()) );
 	
 	ReadLine(tmp);
@@ -564,6 +571,7 @@ CDDBQuery::QueryThread(void *owner)
 			// new content file, read it in from the server
 			Connector connection(query);
 			BString data;
+			
 			query->ReadFromServer(data);
 			query->ParseData(data);
 			query->WriteFile();
@@ -593,6 +601,9 @@ CDDBQuery::WriteFile(void)
 	
 	BString filename(path.Path());
 	filename << "/" << fArtist << " - " << fTitle;
+	
+	if(filename.Compare("Artist")==0)
+		filename << "." << fDiscID;
 	
 	BFile file(filename.String(), B_READ_WRITE | B_CREATE_FILE | B_FAIL_IF_EXISTS);
 	if(file.InitCheck() != B_OK)
@@ -629,12 +640,34 @@ CDDBQuery::WriteFile(void)
 void
 CDDBQuery::ParseData(const BString &data)
 {
+	fTitle = "";
+	fTrackNames.clear();
+	
+	if(data.CountChars()<1)
+	{
+		// This case occurs when the CDDB lookup fails. On these occasions, we need to generate
+		// the file ourselves. This is actually pretty easy.
+		fArtist = "Artist";
+		fTitle = "Audio CD";
+		fCategory = "misc";
+		
+		for(int32 i=0; i<fTrackCount; i++)
+		{
+			BString trackname("Track ");
+			
+			if(i<9)
+				trackname << "0";
+			
+			trackname << i+1;
+			fTrackNames.push_back(trackname.String());
+		}
+		
+	}
+	
 	// TODO: This function is dog slow, but it works. Optimize.
 	
 	// Ideally, the search should be done sequentially using GetLineFromString() and strchr().
 	// Order: genre(category), frame offsets, disc length, artist/album, track titles
-	fTitle = "";
-	fTrackNames.clear();
 	
 	int32 pos;
 	
