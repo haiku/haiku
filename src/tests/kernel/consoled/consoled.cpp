@@ -180,12 +180,12 @@ start_console(struct console *con)
 	if (con->wait_sem < 0)
 		return -1;
 
-	con->console_fd = open("/dev/console", 0);
+	con->console_fd = open("/dev/console", O_WRONLY);
 	if (con->console_fd < 0)
 		return -2;
 
 #ifndef USE_INPUT_SERVER
-	con->keyboard_fd = open("/dev/keyboard", 0);
+	con->keyboard_fd = open("/dev/keyboard", O_RDONLY);
 	if (con->keyboard_fd < 0)
 		return -3;
 #endif
