@@ -22,7 +22,7 @@
 #define LOG(function, time)													\
 	{																		\
 		FILE *logfile = fopen("/boot/home/Desktop/messagespeed.log", "a");	\
-		fprintf(logfile, "%s:\t%lld\n", function, time);						\
+		fprintf(logfile, "%s:\t%lld\n", function, time);					\
 		fclose(logfile);													\
 	}
 #else
@@ -69,7 +69,7 @@ TMessageSpeedTest::MessageSpeedTestLookup##count##type()					\
 	srand(time(NULL));														\
 	BMessage message;														\
 																			\
-	for (int32 i = 0; i < 5; i++) {											\
+	for (int32 i = 0; i < count; i++) {										\
 		BString string;														\
 		string << i;														\
 		message.AddInt32(string.String(), i);								\
