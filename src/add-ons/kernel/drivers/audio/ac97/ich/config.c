@@ -112,19 +112,19 @@ probe_ok:
 
 	#if DEBUG
 		LOG(("bus = %d, device = %d, function = %d\n", pciinfo->bus, pciinfo->device, pciinfo->function));
-		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_vendor_id, 2);
+		value = pci->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_vendor_id, 2);
 		LOG(("vendor id = 0x%04x\n",value));
-		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_device_id, 2);
+		value = pci->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_device_id, 2);
 		LOG(("device id = 0x%04x\n",value));
-		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_revision, 1);
+		value = pci->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_revision, 1);
 		LOG(("revision = 0x%02x\n",value));
-		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_subsystem_vendor_id, 2);
+		value = pci->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_subsystem_vendor_id, 2);
 		LOG(("subsystem vendor = 0x%04x\n",value));
-		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_subsystem_id, 2);
+		value = pci->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_subsystem_id, 2);
 		LOG(("subsystem device = 0x%04x\n",value));
-		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x04, 2);
+		value = pci->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x04, 2);
 		LOG(("PCICMD = %#04x\n",value));
-		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x06, 2);
+		value = pci->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x06, 2);
 		LOG(("PCISTS = %#04x\n",value));
 	#endif
 
@@ -139,7 +139,7 @@ probe_ok:
 	pci->write_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_PCICMD, 2, value);
 		
 	#if DEBUG
-		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_PCICMD, 2);
+		value = pci->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_PCICMD, 2);
 		LOG(("PCICMD = %#04x\n",value));
 	#endif
 
