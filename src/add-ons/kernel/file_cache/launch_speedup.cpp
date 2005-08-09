@@ -86,6 +86,9 @@ class Session {
 		void Lock() { mutex_lock(&fLock); }
 		void Unlock() { mutex_unlock(&fLock); }
 
+		status_t StartWatchingTeam();
+		void StopWatchingTeam();
+
 		status_t LoadFromDirectory(int fd);
 		status_t Save();
 		void Prefetch();
@@ -107,6 +110,7 @@ class Session {
 		bigtime_t	fActiveUntil;
 		bigtime_t	fTimestamp;
 		bool		fClosing;
+		bool		fIsWatchingTeam;
 };
 
 class SessionGetter {
@@ -250,7 +254,7 @@ start_session(team_id team, mount_id device, vnode_id node, const char *name,
 	if (session == NULL)
 		return NULL;
 
-	if (session->InitCheck() != B_OK) {
+	if (session->InitCheck() != B_OK || session->StartWatchingTeam() != B_OK) {
 		delete session;
 		return NULL;
 	}
@@ -367,7 +371,8 @@ Session::Session(team_id team, const char *name, mount_id device,
 	fNodes(NULL),
 	fNodeCount(0),
 	fTeam(team),
-	fClosing(false)
+	fClosing(false),
+	fIsWatchingTeam(false)
 {
 	if (name != NULL) {
 		size_t length = strlen(name) + 1;
@@ -395,7 +400,8 @@ Session::Session(const char *name)
 	:
 	fNodeHash(NULL),
 	fNodes(NULL),
-	fClosing(false)
+	fClosing(false),
+	fIsWatchingTeam(false)
 {
 	fTeam = -1;
 	fNodeRef.device = -1;
@@ -433,6 +439,8 @@ Session::~Session()
 			free(node);
 		}
 	}
+
+	StopWatchingTeam();
 }
 
 
@@ -443,9 +451,6 @@ Session::InitCheck()
 		return fLock.sem;
 
 	if (fNodeHash == NULL)
-		return B_NO_MEMORY;
-
-	if (Team() >= B_OK && start_watching_team(Team(), team_gone, this) != B_OK)
 		return B_NO_MEMORY;
 
 	return B_OK;
@@ -489,6 +494,28 @@ Session::RemoveNode(mount_id device, vnode_id id)
 		hash_remove(fNodeHash, node);
 		fNodeCount--;
 	}
+}
+
+
+status_t
+Session::StartWatchingTeam()
+{
+	if (Team() < B_OK)
+		return B_OK;
+
+	status_t status = start_watching_team(Team(), team_gone, this);
+	if (status == B_OK)
+		fIsWatchingTeam = true;
+
+	return status;
+}
+
+
+void
+Session::StopWatchingTeam()
+{
+	if (fIsWatchingTeam)
+		stop_watching_team(Team(), team_gone, this);
 }
 
 
@@ -784,7 +811,26 @@ uninit()
 
 	recursive_lock_lock(&sLock);
 
-	// ToDo: free sessions from hash tables
+	// free all sessions from the hashes
+
+	uint32 cookie = 0;
+	Session *session;
+	while ((session = (Session *)hash_remove_first(sTeamHash, &cookie)) != NULL) {
+		delete session;
+	}
+	cookie = 0;
+	while ((session = (Session *)hash_remove_first(sPrefetchHash, &cookie)) != NULL) {
+		delete session;
+	}
+
+	// free all sessions from the main prefetch list
+
+	for (session = sMainPrefetchSessions; session != NULL; ) {
+		sMainPrefetchSessions = session->Next();
+		delete session;
+		session = sMainPrefetchSessions;
+	}
+
 	hash_uninit(sTeamHash);
 	hash_uninit(sPrefetchHash);
 	recursive_lock_destroy(&sLock);
