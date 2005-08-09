@@ -48,6 +48,24 @@ already_visited(uint32 *visited, int32 *_last, int32 *_num, uint32 ebp)
 }
 
 
+static status_t
+get_next_frame(addr_t ebp, addr_t *_next, addr_t *_eip)
+{
+	// set fault handler, so that we can safely access user stacks
+	thread_get_current_thread()->fault_handler = (addr_t)&&error;
+
+	*_eip = ((struct stack_frame *)ebp)->return_address;
+	*_next = (addr_t)((struct stack_frame *)ebp)->previous;
+
+	thread_get_current_thread()->fault_handler = NULL;
+	return B_OK;
+
+error:
+	thread_get_current_thread()->fault_handler = NULL;
+	return B_BAD_ADDRESS;
+}
+
+
 static int
 stack_trace(int argc, char **argv)
 {
@@ -88,6 +106,7 @@ stack_trace(int argc, char **argv)
 	kprintf("frame            caller     <image>:function + offset\n");
 
 	read_ebp(ebp);
+
 	for (;;) {
 		bool isIFrame = false;
 		// see if the ebp matches the iframe
@@ -115,15 +134,24 @@ stack_trace(int argc, char **argv)
 			kprintf(" vector: 0x%x, error code: 0x%x\n", frame->vector, frame->error_code);
  			ebp = frame->ebp;
 		} else {
-			addr_t eip = ((struct stack_frame *)ebp)->return_address;
+			addr_t eip, nextEbp, diff;
 			const char *symbol, *image;
-			addr_t nextEbp = (addr_t)((struct stack_frame *)ebp)->previous;
 			addr_t baseAddress;
 			bool exactMatch;
-			addr_t diff = nextEbp - ebp;
+
+			if (get_next_frame(ebp, &nextEbp, &eip) != B_OK) {
+				kprintf("%08lx -- read fault\n", ebp);
+				break;
+			}
 
 			if (eip == 0 || ebp == 0)
 				break;
+
+			diff = nextEbp - ebp;
+
+			// kernel space/user space switch
+			if (diff & 0x80000000)
+				diff = 0;
 
 			if (elf_lookup_symbol_address(eip, &baseAddress, &symbol,
 					&image, &exactMatch) == B_OK) {
