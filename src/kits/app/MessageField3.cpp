@@ -71,9 +71,6 @@ BMessageField::Unflatten(int32 _offset)
 	fDataOffset = sizeof(FieldHeader) + header->nameLength;
 	fFixedSize = header->flags & MSG_FLAG_FIXED_SIZE;
 
-	if (header->nameLength == 0)
-		return 0;
-
 	if (fFixedSize) {
 		if (header->count > 0)
 			fItemSize = header->dataSize / header->count;
@@ -100,14 +97,14 @@ BMessageField::Unflatten(int32 _offset)
 void
 BMessageField::SetName(const char *newName)
 {
-	FieldHeader *header = Header();
+	int32 newLength = min_c(strlen(newName), B_FIELD_NAME_LENGTH - 1) + 1;
+	char *buffer = (char *)fParent->FlatInsert(fOffset + sizeof(FieldHeader),
+		Header()->nameLength, newLength);
 
-	int32 newLength = min_c(strlen(newName), 254) + 1;
-	char *buffer = (char *)fParent->FlatInsert(fOffset + sizeof(FieldHeader), header->nameLength, newLength);
-	strncpy(buffer, newName, newLength);
-	buffer[newLength] = 0;
+	strncpy(buffer, newName, newLength - 1);
+	buffer[newLength - 1] = 0;
 
-	header->nameLength = newLength;
+	Header()->nameLength = newLength;
 	fDataOffset = sizeof(FieldHeader) + newLength;
 }
 
@@ -235,9 +232,9 @@ BMessageField::RemoveItem(int32 index)
 	FieldHeader *header = Header();
 
 	if (fFixedSize) {
-		fParent->FlatInsert(DATA_OFFSET + (index * fItemSize), fItemSize, 0);
-		header->dataSize -= fItemSize;
 		header->count--;
+		header->dataSize -= fItemSize;
+		fParent->FlatInsert(DATA_OFFSET + (index * fItemSize), fItemSize, 0);
 		return;
 	}
 
@@ -246,9 +243,9 @@ BMessageField::RemoveItem(int32 index)
 	for (int32 i = index; i < header->count; i++)
 		((ItemInfo *)fItemInfos.ItemAt(i))->offset -= info->paddedLength;
 
-	fParent->FlatInsert(DATA_OFFSET + info->offset, info->paddedLength, 0);
-	header->dataSize -= info->paddedLength;
 	header->count--;
+	header->dataSize -= info->paddedLength;
+	fParent->FlatInsert(DATA_OFFSET + info->offset, info->paddedLength, 0);
 	delete info;
 }
 
@@ -276,8 +273,8 @@ void
 BMessageField::RemoveSelf()
 {
 	// remove ourself from the flat buffer
-	FieldHeader *header = Header();
-	fParent->FlatInsert(fOffset, fDataOffset + header->dataSize, 0);
+	int32 dataSize = Header()->dataSize;
+	fParent->FlatInsert(fOffset, fDataOffset + dataSize, 0);
 	fOffset = 0;
 }
 

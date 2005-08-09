@@ -69,9 +69,10 @@ public:
 		void				PrintToStream() const;
 
 		// flat buffer management
-inline	uint8				*FlatBuffer() const { return (uint8 *)fFlatBuffer.Buffer(); };
+inline	uint8				*FlatBuffer() const { return fFlatBuffer; };
 		uint8				*FlatInsert(int32 offset, ssize_t oldLength,
 								ssize_t newLength);
+		void				FlatResize(int32 newSize);
 
 		// hash table support
 		void				HashInsert(BMessageField *field);
@@ -91,7 +92,10 @@ private:
 		BMessageField		**fFieldTable;
 		int32				fFieldTableSize;
 
-		BMallocIO			fFlatBuffer;
+		uint8				*fFlatBuffer;
+		int32				fFlatLength;
+		int32				fFlatAllocated;
+		int32				fBlockSize;
 };
 
 } // namespace BPrivate

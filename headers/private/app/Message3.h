@@ -68,7 +68,7 @@ enum
 	B_ID_SPECIFIER,
 
 	B_SPECIFIERS_END = 128
-	// app-defined specifiers start at B_SPECIFIERS_END+1
+	// app-defined specifiers start at B_SPECIFIERS_END + 1
 };
 
 namespace BPrivate {
@@ -279,174 +279,88 @@ virtual				~BMessage();
 		float		FindFloat(const char *, int32 n = 0) const;
 		double		FindDouble(const char *, int32 n = 0) const;
 
-		class Private;
+		class	Private;
 
 private:
-		class Header;
+		class	Header;
 
-friend class	BMessageQueue;
-friend class	BMessenger;
-friend class	BApplication;
-friend class	Header;
-friend class	Private;
+friend	class	BMessageQueue;
+friend	class	BMessenger;
+friend	class	BApplication;
+friend	class	Header;
+friend	class	Private;
 
-friend inline	void		_set_message_target_(BMessage *, int32, bool);
-friend inline	void		_set_message_reply_(BMessage *, BMessenger);
-friend inline	int32		_get_message_target_(BMessage *);
-friend inline	bool		_use_preferred_target_(BMessage *);
+friend inline	void			_set_message_target_(BMessage *, int32, bool);
+friend inline	void			_set_message_reply_(BMessage *, BMessenger);
+friend inline	int32			_get_message_target_(BMessage *);
+friend inline	bool			_use_preferred_target_(BMessage *);
 
-					// deprecated
-					BMessage(BMessage *a_message);
+								// deprecated
+								BMessage(BMessage *a_message);
 					
-virtual	void		_ReservedMessage1();
-virtual	void		_ReservedMessage2();
-virtual	void		_ReservedMessage3();
+virtual	void					_ReservedMessage1();
+virtual	void					_ReservedMessage2();
+virtual	void					_ReservedMessage3();
 
-		void		init_data();
-		status_t	flatten_target_info(BDataIO *stream,
-										ssize_t size,
-										uchar flags) const;
-		status_t	real_flatten(char *result, ssize_t size) const;
-		status_t	real_flatten(BDataIO *stream, ssize_t *size) const;
-		char		*stack_flatten(char *stack_ptr,
-									ssize_t stack_size,
-									bool incl_reply,
+		void					init_data();
+		status_t				real_flatten(char *result, ssize_t size) const;
+		status_t				real_flatten(BDataIO *stream, ssize_t *size) const;
+		char					*stack_flatten(char *stack_ptr,
+									ssize_t stack_size, bool incl_reply,
 									ssize_t *size = NULL) const;
 
-		status_t	_UnflattenKMessage(const char *buffer);
+		status_t				_UnflattenKMessage(const char *buffer);
 
-		ssize_t		calc_size(uchar flags) const;
-		ssize_t		calc_hdr_size(uchar flags) const;
-		status_t	nfind_data(	const char *name,
-								type_code type,
-								int32 index,
-								const void **data,
-								ssize_t *data_size) const;
-		status_t	copy_data(	const char *name,
-								type_code type,
-								int32 index,
-								void *data,
-								ssize_t data_size) const;
+		ssize_t					calc_hdr_size() const;
 
-		status_t	_send_(port_id port,
-							int32 token,
-							bool preferred,
-							bigtime_t timeout,
-							bool reply_required,
-							BMessenger &reply_to) const;
-		status_t	send_message(port_id port,
-								team_id port_owner,
-								int32 token,
-								bool preferred,
-								BMessage *reply,
-								bigtime_t send_timeout,
-								bigtime_t reply_timeout) const;
-static	status_t	_SendFlattenedMessage(void *data, int32 size,
-						port_id port, int32 token, bool preferred,
-						bigtime_t timeout);
+		status_t				_send_(port_id port, int32 token,
+									bool preferred, bigtime_t timeout,
+									bool reply_required,
+									BMessenger &reply_to) const;
+		status_t				send_message(port_id port, team_id port_owner,
+											int32 token, bool preferred,
+											BMessage *reply,
+											bigtime_t send_timeout,
+											bigtime_t reply_timeout) const;
 
-static	void		_StaticInit();
-static	void		_StaticCleanup();
-static	void		_StaticCacheCleanup();
+static	status_t				_SendFlattenedMessage(void *data, int32 size,
+									port_id port, int32 token, bool preferred,
+									bigtime_t timeout);
 
-		enum		{ sNumReplyPorts = 3 };
-static	port_id		sReplyPorts[sNumReplyPorts];
-static	long		sReplyPortInUse[sNumReplyPorts];
-static	int32		sGetCachedReplyPort();
+static	void					_StaticInit();
+static	void					_StaticCleanup();
+static	void					_StaticCacheCleanup();
 
-static	BBlockCache	*sMsgCache;
+		enum					{ sNumReplyPorts = 3 };
+static	port_id					sReplyPorts[sNumReplyPorts];
+static	long					sReplyPortInUse[sNumReplyPorts];
+static	int32					sGetCachedReplyPort();
 
-		struct dyn_array {
-			int32		fLogicalBytes;
-			int32		fPhysicalBytes;
-			int32		fChunkSize;		
-			int32		fCount;
-			int32		fEntryHdrSize;	
-		};
+static	BBlockCache				*sMsgCache;
 
-		struct entry_hdr  : public dyn_array {
-			entry_hdr	*fNext;
-			uint32		fType;
-			uchar		fNameLength;	
-			char		fName[1];
-		};
+		BMessage				*fUnused1;
+		int32					fTarget;	
+		BMessage				*fOriginal;
+		uint32					fUnused2;
+		int32					fCurSpecifier;
+		uint32					fReserved[4];
 
-		struct var_chunk {
-			int32	fDataSize;				
-			char	fData[1];
-		};
-
-		entry_hdr 	*entry_find(const char *name, uint32 type,status_t *result=NULL) const;
-		void 		entry_remove(entry_hdr *entry);
-		
-		void		*da_create(int32 header_size, int32 chunk_size,
-								bool fixed, int32 nchunks);
-		status_t	da_add_data(dyn_array **da, const void *data, int32 size);
-		void		*da_find_data(dyn_array *da, int32 index,
-									int32 *size = NULL) const;
-		status_t	da_delete_data(dyn_array **pda, int32 index);
-		status_t	da_replace_data(dyn_array **pda, int32 index,
-									const void *data, int32 dsize);
-		int32		da_calc_size(int32 hdr_size, int32 chunksize,
-								bool is_fixed, int32 nchunks) const;
-		void		*da_grow(dyn_array **pda, int32 increase);
-		void		da_dump(dyn_array *da);
-
-		int32		da_chunk_hdr_size() const
-						{ return sizeof(int32); }
-		int32		da_chunk_size(var_chunk *v) const
-						{ return (v->fDataSize + da_chunk_hdr_size() + 7) & ~7; }
-		var_chunk	*da_first_chunk(dyn_array *da) const
-						{ return (var_chunk *) da_start_of_data(da); }
-		var_chunk	*da_next_chunk(var_chunk *v) const
-						{ return (var_chunk *) (((char*) v) + da_chunk_size(v)); }
-		var_chunk	*da_chunk_ptr(void *data) const
-						{ return (var_chunk*) (((char *) data) - da_chunk_hdr_size()); }
-
-		int32		da_pad_8(int32 val) const
-						{ return (val + 7) & ~7; }
-		int32		da_total_size(dyn_array *da) const
-						{ return (int32)sizeof(dyn_array) + da->fEntryHdrSize +
-											da->fPhysicalBytes; }
-		int32		da_total_logical_size(dyn_array *da) const
-						{ return (int32)sizeof(dyn_array) + da->fEntryHdrSize +
-											da->fLogicalBytes; }
-		char		*da_start_of_data(dyn_array *da) const
-						{ return ((char *) da) + (sizeof(dyn_array) +
-											da->fEntryHdrSize); }
-		bool		da_is_mini_data(dyn_array *da) const
-						{ return ((da->fLogicalBytes <= (int32) UCHAR_MAX) &&
-											(da->fCount <= (int32) UCHAR_MAX));}
-		void		da_swap_var_sized(dyn_array *da);
-		void		da_swap_fixed_sized(dyn_array *da);
-
-		BMessage			*link;
-		int32				fTarget;	
-		BMessage			*fOriginal;
-		uint32				fChangeCount;
-		int32				fCurSpecifier;
-		uint32				fPtrOffset;
-
-		// ejaesler: Stealing one for my whacky BMessageBody l33tness
-		uint32				_reserved[2];
-		BPrivate::BMessageBody*	fBody;
-
-		BMessage::entry_hdr	*fEntries;
+		BPrivate::BMessageBody	*fBody;
 
 		struct reply_to_info {
-			port_id				port;
-			int32				target;
-			team_id				team;
-			bool				preferred;
-		} fReplyTo;
+			port_id port;
+			int32 target;
+			team_id team;
+			bool preferred;
+		}						fReplyTo;
 
-		bool				fPreferred;
-		bool				fReplyRequired;
-		bool				fReplyDone;
-		bool				fIsReply;
-		bool				fWasDelivered;
-		bool				fReadOnly;
-		bool				fHasSpecifiers;	
+		bool					fPreferred;
+		bool					fReplyRequired;
+		bool					fReplyDone;
+		bool					fIsReply;
+		bool					fWasDelivered;
+		bool					fReadOnly;
+		bool					fHasSpecifiers;	
 };
 
 //------------------------------------------------------------------------------

@@ -9,6 +9,7 @@
 /* BMessageBody handles data storage and retrieval for BMessage. */
 
 #include <stdio.h>
+#include <malloc.h>
 #include <DataIO.h>
 #include <TypeConstants.h>
 #include "MessageBody3.h"
@@ -16,6 +17,18 @@
 #include "MessageUtils3.h"
 
 namespace BPrivate {
+
+void
+dump_raw(uint8 *data, int32 length)
+{
+	int32 index = 0;
+	while (index < length) {
+		for (int32 line = 0; line < 40 && index < length; line++, index++)
+			printf("%02x ", data[index]);
+		printf("\n");
+	}
+}
+
 
 BMessageBody::BMessageBody()
 {
@@ -42,9 +55,8 @@ BMessageBody::operator=(const BMessageBody &other)
 {
 	if (this != &other) {
 		MakeEmpty();
-		// the flat buffer has no last entry flag included
-		BMemoryIO memoryIO(other.FlatBuffer(), other.FlattenedSize() - 1);
-		Unflatten(&memoryIO, other.FlattenedSize() - 1);
+		BMemoryIO memoryIO(other.fFlatBuffer, other.fFlatLength);
+		Unflatten(&memoryIO, other.fFlatLength);
 	}
 
 	return *this;
@@ -54,6 +66,13 @@ BMessageBody::operator=(const BMessageBody &other)
 status_t
 BMessageBody::InitCommon()
 {
+	// use an avarage field size for each block
+	fBlockSize = sizeof(FieldHeader) + 50;
+	fFlatBuffer = (uint8 *)malloc(fBlockSize);
+	fFlatAllocated = fBlockSize;
+	fFlatLength = 0;
+
+	// init hash table
 	fFieldTableSize = 100;
 	fFieldTable = new BMessageField *[fFieldTableSize];
 	HashClear();
@@ -203,14 +222,14 @@ ssize_t
 BMessageBody::FlattenedSize() const
 {
 	// one more for the last entry flag
-	return fFlatBuffer.BufferLength() + 1;
+	return fFlatLength + 1;
 }
 
 
 status_t
 BMessageBody::Flatten(BDataIO *stream) const
 {
-	stream->Write(fFlatBuffer.Buffer(), fFlatBuffer.BufferLength());
+	stream->Write(fFlatBuffer, fFlatLength);
 
 	uint8 lastField = MSG_LAST_ENTRY;
 	status_t error = stream->Write(&lastField, sizeof(lastField));
@@ -230,14 +249,14 @@ BMessageBody::Unflatten(BDataIO *stream, int32 length)
 	if (length <= 0)
 		return B_OK;
 
-	fFlatBuffer.SetSize(length);
-	status_t error = stream->Read((void *)fFlatBuffer.Buffer(), length);
+	FlatResize(length);
+	status_t error = stream->Read(fFlatBuffer, length);
 
 	if (error < B_OK)
 		return B_ERROR;
 
 	int32 offset = 0;
-	uint8 *location = (uint8 *)fFlatBuffer.Buffer();
+	uint8 *location = fFlatBuffer;
 	while (offset < error && *location & MSG_FLAG_VALID) {
 		BMessageField *field = new BMessageField(this);
 		int32 fieldLength = field->Unflatten(offset);
@@ -257,7 +276,7 @@ BMessageBody::Unflatten(BDataIO *stream, int32 length)
 	}
 
 	// set the buffer to the actual size
-	fFlatBuffer.SetSize(offset);
+	FlatResize(offset);
 	return B_OK;
 }
 
@@ -324,8 +343,7 @@ BMessageBody::AddData(const char *name, type_code type, status_t &error)
 		return foundField;
 
 	// add a new field if it's not yet present
-	BMessageField *newField = new BMessageField(this,
-		fFlatBuffer.BufferLength(), name, type);
+	BMessageField *newField = new BMessageField(this, fFlatLength, name, type);
 
 	fFieldList.AddItem(newField);
 	HashInsert(newField);
@@ -430,7 +448,12 @@ BMessageBody::MakeEmpty()
 	}
 
 	fFieldList.MakeEmpty();
-	fFlatBuffer.SetSize(0);
+
+	free(fFlatBuffer);
+	fFlatBuffer = NULL;
+	fFlatLength = 0;
+	fFlatAllocated = 0;
+
 	HashClear();
 	return B_OK;
 }
@@ -502,6 +525,21 @@ BMessageBody::FindData(const char *name, type_code type, status_t &error) const
 }
 
 
+void
+BMessageBody::FlatResize(int32 newSize)
+{
+	int32 newLength = (newSize + fBlockSize - 1) / fBlockSize * fBlockSize;
+	if (newLength != fFlatAllocated) {
+		fFlatBuffer = (uint8 *)realloc(fFlatBuffer, newLength);
+		if (newLength > fFlatAllocated)
+			memset(fFlatBuffer + fFlatAllocated, 0, newLength - fFlatAllocated);
+		fFlatAllocated = newLength;
+	}
+
+	fFlatLength = newSize;
+}
+
+
 uint8 *
 BMessageBody::FlatInsert(int32 offset, ssize_t oldLength, ssize_t newLength)
 {
@@ -509,10 +547,10 @@ BMessageBody::FlatInsert(int32 offset, ssize_t oldLength, ssize_t newLength)
 		return FlatBuffer() + offset;
 
 	ssize_t change = newLength - oldLength;
-	ssize_t bufferLength = fFlatBuffer.BufferLength();
+	ssize_t bufferLength = fFlatLength;
 
 	if (change > 0) {
-		fFlatBuffer.SetSize(bufferLength + change);
+		FlatResize(bufferLength + change);
 
 		// usual case for adds
 		if (offset == bufferLength)
@@ -526,7 +564,7 @@ BMessageBody::FlatInsert(int32 offset, ssize_t oldLength, ssize_t newLength)
 	}
 
 	if (change < 0)
-		fFlatBuffer.SetSize(bufferLength + change);
+		FlatResize(bufferLength + change);
 
 	for (int32 index = fFieldList.CountItems() - 1; index >= 0; index--) {
 		BMessageField *field = (BMessageField *)fFieldList.ItemAt(index);

@@ -465,14 +465,9 @@ BMessage::operator=(const BMessage &msg)
 {
 	what = msg.what;
 
-	link = msg.link;
 	fTarget = msg.fTarget;
 	fOriginal = msg.fOriginal;
-	fChangeCount = msg.fChangeCount;
 	fCurSpecifier = msg.fCurSpecifier;
-	fPtrOffset = msg.fPtrOffset;
-
-	fEntries = msg.fEntries;
 
 	fReplyTo.port = msg.fReplyTo.port;
 	fReplyTo.target = msg.fReplyTo.target;
@@ -497,14 +492,9 @@ BMessage::init_data()
 {
 	what = 0;
 
-	link = NULL;
 	fTarget = B_NULL_TOKEN;
 	fOriginal = NULL;
-	fChangeCount = 0;
 	fCurSpecifier = -1;
-	fPtrOffset = 0;
-
-	fEntries = NULL;
 
 	fReplyTo.port = -1;
 	fReplyTo.target = B_NULL_TOKEN;
@@ -593,7 +583,7 @@ BMessage::IsReply() const
 void
 BMessage::PrintToStream() const
 {
-	printf("\nBMessage: what = ");
+	printf("BMessage: what = ");
 	printf("%c%c%c%c", (uint8)(what >> 24), (uint8)(what >> 16),
 		(uint8)(what >> 8), (uint8)what);
 	printf(" (0x%lX or %ld)\n", what, what);
@@ -794,7 +784,7 @@ BMessage::SendReply(BMessage *the_reply, BMessage *reply_to_reply,
 ssize_t
 BMessage::FlattenedSize() const
 {
-	return calc_hdr_size(0) + fBody->FlattenedSize();
+	return calc_hdr_size() + fBody->FlattenedSize();
 }
 
 
@@ -1627,7 +1617,7 @@ char *
 BMessage::stack_flatten(char *stack_ptr, ssize_t stack_size,
 	bool /*incl_reply*/, ssize_t *size) const
 {
-	const ssize_t calcd_size = calc_hdr_size(0) + fBody->FlattenedSize();
+	const ssize_t calcd_size = calc_hdr_size() + fBody->FlattenedSize();
 	char *new_ptr = NULL;
 	if (calcd_size > stack_size) {
 		stack_ptr = new char[calcd_size];
@@ -1657,7 +1647,7 @@ BMessage::_UnflattenKMessage(const char *buffer)
 
 
 ssize_t
-BMessage::calc_hdr_size(uchar flags) const
+BMessage::calc_hdr_size() const
 {
 	ssize_t size = min_hdr_size();
 
