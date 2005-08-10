@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src add-ons screen_savers haiku ;
 
-ScreenSaver Haiku :
-	ScreenSaver.cpp ;
+Addon Haiku : "Screen Savers" :
+	ScreenSaver.cpp : false
+	: libbe.so libscreensaver.so ;
 
-LinkSharedOSLibs Haiku : be screensaver ;
