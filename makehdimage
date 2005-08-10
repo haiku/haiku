@@ -70,7 +70,7 @@ else
 	imagePath=$1
 fi
 
-imageSize=60
+imageSize=80
 	# Bochs parameters:
 	# 40 MB: cylinders=82, heads=16, spt=63
 	# 60 MB: cylinders=122, heads=16, spt=63
@@ -109,17 +109,17 @@ BEOS_BIN="touch sync ln listarea listattr listsem listport \
 	strace rmdir error ifconfig ping traceroute arp pppconfig \
 	ppp_up gdb tail head zip unzip mountvolume top finddir groups \
 	id env basename factor tty dstcheck comm modifiers version \
-	csplit cut beep"
+	csplit cut beep screen_blanker"
 
 BEOS_APPS="MiniTerminal Terminal Expander People ShowImage Clock Pulse Playground \
 	SoundRecorder BitmapDrawing Magnify DiskProbe AboutHaiku StyledEdit"
 BEOS_PREFERENCES="Backgrounds DataTranslations FileTypes Fonts Media Menu Mouse \
-	Keyboard Keymap Screen ScrollBar Sounds Time VirtualMemory Workspaces"
+	Keyboard Keymap Screen ScrollBar Sounds Time VirtualMemory Workspaces ScreenSaver"
 
 BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so libmedia.so libtracker.so \
 	libtranslation.so libbind.so libnetapi.so libsocket.so libdebug.so \
 	libtextencoding.so libz.so libfreetype.so libpng.so libappserver.so \
-	libdevice.so libgame.so"
+	libdevice.so libgame.so libscreensaver.so"
 
 BEOS_SYSTEM_SERVERS="registrar debug_server syslog_daemon media_server \
 	media_addon_server input_server app_server fake_app_server"
@@ -137,7 +137,8 @@ BEOS_ADD_ONS_MEDIA="mixer.media_addon legacy.media_addon multi_audio.media_addon
 BEOS_ADD_ONS_MEDIA_PLUGINS="aiff_reader avcodec mp3_decoder musepack raw_decoder \
 	wav_reader mov_reader au_reader avi_reader mp3_reader ogg speex vorbis \
 	matroska" # ac3_decoder theora
-BEOS_ADD_ONS_INPUT="<input>keyboard <input>mouse canna"
+BEOS_ADD_ONS_INPUT="<input>keyboard <input>mouse canna screen_saver"
+BEOS_ADD_ONS_SCREENSAVERS="Haiku"
 BEOS_ADD_ONS_DRIVERS_MISC="keyboard scsi_dsk scsi_cd dprintf null zero random \
 	ps2_hid <driver>tty console <driver>config"
 BEOS_ADD_ONS_DRIVERS_GRAPHICS="radeon.driver nv.driver nm.driver mga.driver vesa"
@@ -177,6 +178,7 @@ jam -j$(sysinfo -cpu | head -c 2) -q rc resattr kernel boot_loader \
 	$BEOS_ADD_ONS_MEDIA \
 	$BEOS_ADD_ONS_MEDIA_PLUGINS \
 	$BEOS_ADD_ONS_INPUT \
+	$BEOS_ADD_ONS_SCREENSAVERS \
 	$BEOS_DATA_FILES \
 	bfs_shell fs_shell_command \
 	|| { echo "*** Build failed!" 1>&2 ; exit 1; }
@@ -250,6 +252,7 @@ $mkdir -p beos/system/add-ons/media/plugins
 $mkdir -p beos/system/add-ons/input_server/devices
 $mkdir -p beos/system/add-ons/input_server/filters
 $mkdir -p beos/system/add-ons/input_server/methods
+$mkdir -p beos/system/add-ons/Screen\\\ Savers
 $mkdir -p beos/system/boot
 $mkdir -p beos/system/lib
 $mkdir -p beos/system/servers
@@ -387,6 +390,7 @@ if [ -e /boot/beos/etc/fonts/ttfonts/Swiss721.ttf ]; then
 	$cp ${sPrefix}/boot/beos/etc/fonts/ttfonts/Swiss721_Bold.ttf $targetDir/beos/etc/fonts/ttfonts/
 	$cp ${sPrefix}/boot/beos/etc/fonts/ttfonts/Swiss721.ttf $targetDir/beos/etc/fonts/ttfonts/
 fi
+#$cp -r ${sPrefix}data/etc/KanBe $targetDir/beos/etc/
 $cp ${sPrefix}src/tests/kernel/boot_floppy/fortune/fortunes $targetDir/beos/etc/
 $cp -r ${sPrefix}distro/${arch}.R1/beos/etc $targetDir/beos/
 
@@ -480,7 +484,7 @@ done
 
 cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/input_server/
 $cd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/input_server/
-for f in devices/keyboard devices/mouse methods/canna; do
+for f in devices/keyboard devices/mouse filters/screen_saver methods/canna; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/input_server/$(dirname $f)/
 done
 
@@ -507,6 +511,12 @@ cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/obos_network/protocol
 $scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/obos_network/protocols
 for f in $BEOS_NETWORK_PROTOCOLS; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/network/protocols
+done
+
+cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/Screen\ Savers
+$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/Screen\\\ Savers
+for f in $BEOS_ADD_ONS_SCREENSAVERS; do
+	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/Screen\\\ Savers
 done
 
 # install MIME database
