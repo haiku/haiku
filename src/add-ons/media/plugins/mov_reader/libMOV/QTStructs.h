@@ -131,7 +131,7 @@ struct SampleToChunk {
 	uint32	FirstChunk;
 	uint32	SamplesPerChunk;
 	uint32	SampleDescriptionID;
-	uint32	TotalPrevFrames;
+	uint32	TotalPrevSamples;
 };
 
 // Note standard is 32bits offsets but later is 64
@@ -153,8 +153,8 @@ struct SampleSizeHeader {
 	uint32	NoEntries;
 };
 
-struct SampleSize {
-	uint32	Size;
+struct SampleSizeEntry {
+	uint32	EntrySize;
 };
 
 struct mvhd {
@@ -277,6 +277,8 @@ struct SampleDescBase {
 	uint16	DataReference;
 };
 
+#define SampleDescBaseSize 16
+
 struct SoundDescription {
 	uint16	Version;
 	uint16	Revision;
@@ -287,6 +289,8 @@ struct SoundDescription {
 	uint16	PacketSize;
 	uint32	SampleRate;
 };
+
+#define SoundDescriptionSize 20
 
 struct SoundDescriptionV0 {
 	SampleDescBase	basefields;
@@ -321,6 +325,8 @@ struct VideoDescription {
 	uint16	ColourTableID;
 	// Optional atoms follow
 };
+
+#define VideoDescriptionSize 70
 
 struct VideoDescriptionV0 {
 	SampleDescBase	basefields;

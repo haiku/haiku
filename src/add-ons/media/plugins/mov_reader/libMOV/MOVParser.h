@@ -47,8 +47,8 @@ typedef ChunkToOffset* ChunkToOffsetPtr;
 typedef std::map<uint32, ChunkToOffsetPtr, std::less<uint32> > ChunkToOffsetArray;
 typedef SyncSample* SyncSamplePtr;
 typedef std::map<uint32, SyncSamplePtr, std::less<uint32> > SyncSampleArray;
-typedef SampleSize* SampleSizePtr;
-typedef std::map<uint32, SampleSizePtr, std::less<uint32> > SampleSizeArray;
+typedef SampleSizeEntry* SampleSizeEntryPtr;
+typedef std::map<uint32, SampleSizeEntryPtr, std::less<uint32> > SampleSizeArray;
 
 // Atom class for reading the movie header atom
 class MVHDAtom : public AtomBase {

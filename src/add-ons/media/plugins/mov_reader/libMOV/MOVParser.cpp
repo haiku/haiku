@@ -28,8 +28,11 @@
 #include <SupportKit.h>
 #include <MediaFormats.h>
 
+#ifdef __HAIKU__
 #include <libs/zlib/zlib.h>
-//#include <zlib.h>
+#else
+#include <zlib.h>
+#endif
 
 #include "MOVParser.h"
 
@@ -316,9 +319,7 @@ DCOMAtom::~DCOMAtom()
 
 void DCOMAtom::OnProcessMetaData()
 {
-	theStream->Read(&compressionID,sizeof(uint32));
-
-	compressionID = B_BENDIAN_TO_HOST_INT32(compressionID);
+	Read(&compressionID);
 }
 
 char *DCOMAtom::OnGetAtomName()
@@ -342,14 +343,12 @@ CMVDAtom::~CMVDAtom()
 
 void CMVDAtom::OnProcessMetaData()
 {
-	theStream->Read(&UncompressedSize,sizeof(uint32));
-
-	UncompressedSize = B_BENDIAN_TO_HOST_INT32(UncompressedSize);
+	Read(&UncompressedSize);
 
 	if (UncompressedSize > 0) {
 		BufferSize = getBytesRemaining();
 		Buffer = (uint8 *)(malloc(BufferSize));
-		theStream->Read(Buffer,BufferSize);
+		Read(Buffer,BufferSize);
 	}
 }
 
@@ -368,22 +367,19 @@ MVHDAtom::~MVHDAtom()
 
 void MVHDAtom::OnProcessMetaData()
 {
-	theStream->Read(&theHeader,sizeof(mvhd));
-
-	theHeader.CreationTime = B_BENDIAN_TO_HOST_INT32(theHeader.CreationTime);
-	theHeader.ModificationTime = B_BENDIAN_TO_HOST_INT32(theHeader.ModificationTime);
-	theHeader.TimeScale = B_BENDIAN_TO_HOST_INT32(theHeader.TimeScale);
-	theHeader.Duration = B_BENDIAN_TO_HOST_INT32(theHeader.Duration);
-	theHeader.PreferredRate = B_BENDIAN_TO_HOST_INT32(theHeader.PreferredRate);
-	theHeader.PreferredVolume = B_BENDIAN_TO_HOST_INT16(theHeader.PreferredVolume);
-	theHeader.PreviewTime = B_BENDIAN_TO_HOST_INT32(theHeader.PreviewTime);
-	theHeader.PreviewDuration = B_BENDIAN_TO_HOST_INT32(theHeader.PreviewDuration);
-	theHeader.PosterTime = B_BENDIAN_TO_HOST_INT32(theHeader.PosterTime);
-	theHeader.SelectionTime = B_BENDIAN_TO_HOST_INT32(theHeader.SelectionTime);
-	theHeader.SelectionDuration = B_BENDIAN_TO_HOST_INT32(theHeader.SelectionDuration);
-	theHeader.CurrentTime = B_BENDIAN_TO_HOST_INT32(theHeader.CurrentTime);
-	theHeader.NextTrackID = B_BENDIAN_TO_HOST_INT32(theHeader.NextTrackID);
-	
+	Read(&theHeader.CreationTime);
+	Read(&theHeader.ModificationTime);
+	Read(&theHeader.TimeScale);
+	Read(&theHeader.Duration);
+	Read(&theHeader.PreferredRate);
+	Read(&theHeader.PreferredVolume);
+	Read(&theHeader.PreviewTime);
+	Read(&theHeader.PreviewDuration);
+	Read(&theHeader.PosterTime);
+	Read(&theHeader.SelectionTime);
+	Read(&theHeader.SelectionDuration);
+	Read(&theHeader.CurrentTime);
+	Read(&theHeader.NextTrackID);	
 }
 
 char *MVHDAtom::OnGetAtomName()
@@ -428,9 +424,8 @@ TimeToSample	*aTimeToSample;
 	for (uint32 i=0;i<theHeader.NoEntries;i++) {
 		aTimeToSample = new TimeToSample;
 		
-		theStream->Read(aTimeToSample,sizeof(TimeToSample));
-		aTimeToSample->Count = B_BENDIAN_TO_HOST_INT32(aTimeToSample->Count);
-		aTimeToSample->Duration = B_BENDIAN_TO_HOST_INT32(aTimeToSample->Duration);
+		Read(&aTimeToSample->Count);
+		Read(&aTimeToSample->Duration);
 
 		theTimeToSampleArray[i] = aTimeToSample;
 		SUMDurations += (theTimeToSampleArray[i]->Duration * theTimeToSampleArray[i]->Count);
@@ -483,24 +478,20 @@ SampleToChunk	*aSampleToChunk;
 
 	ReadArrayHeader(&theHeader);
 	
-	uint32	TotalPrevFrames = 0;
+	uint32	TotalPrevSamples = 0;
 
 	for (uint32 i=0;i<theHeader.NoEntries;i++) {
 		aSampleToChunk = new SampleToChunk;
 		
-		theStream->Read(&aSampleToChunk->FirstChunk,sizeof(uint32));
-		theStream->Read(&aSampleToChunk->SamplesPerChunk,sizeof(uint32));
-		theStream->Read(&aSampleToChunk->SampleDescriptionID,sizeof(uint32));
-		
-		aSampleToChunk->FirstChunk = B_BENDIAN_TO_HOST_INT32(aSampleToChunk->FirstChunk);
-		aSampleToChunk->SamplesPerChunk = B_BENDIAN_TO_HOST_INT32(aSampleToChunk->SamplesPerChunk);
-		aSampleToChunk->SampleDescriptionID = B_BENDIAN_TO_HOST_INT32(aSampleToChunk->SampleDescriptionID);
+		Read(&aSampleToChunk->FirstChunk);
+		Read(&aSampleToChunk->SamplesPerChunk);
+		Read(&aSampleToChunk->SampleDescriptionID);
 		
 		if (i > 0) {
-			TotalPrevFrames = TotalPrevFrames + (aSampleToChunk->FirstChunk - theSampleToChunkArray[i-1]->FirstChunk) * theSampleToChunkArray[i-1]->SamplesPerChunk;
-			aSampleToChunk->TotalPrevFrames = TotalPrevFrames;
+			TotalPrevSamples = TotalPrevSamples + (aSampleToChunk->FirstChunk - theSampleToChunkArray[i-1]->FirstChunk) * theSampleToChunkArray[i-1]->SamplesPerChunk;
+			aSampleToChunk->TotalPrevSamples = TotalPrevSamples;
 		} else {
-			aSampleToChunk->TotalPrevFrames = 0;
+			aSampleToChunk->TotalPrevSamples = 0;
 		}
 
 		theSampleToChunkArray[i] = aSampleToChunk;
@@ -516,7 +507,6 @@ uint32	STSCAtom::getNoSamplesInChunk(uint32 pChunkID)
 {
 	for (uint32 i=0;i<theHeader.NoEntries;i++) {
 		if (theSampleToChunkArray[i]->FirstChunk > pChunkID) {
-//			printf("Chunk %ld contains %ld samples\n",pChunkID, theSampleToChunkArray[i-1]->SamplesPerChunk);
 			return theSampleToChunkArray[i-1]->SamplesPerChunk;
 		}
 	}
@@ -526,15 +516,17 @@ uint32	STSCAtom::getNoSamplesInChunk(uint32 pChunkID)
 
 uint32	STSCAtom::getFirstSampleInChunk(uint32 pChunkID)
 {
+uint32 Diff;
+
 	for (uint32 i=0;i<theHeader.NoEntries;i++) {
 		if (theSampleToChunkArray[i]->FirstChunk > pChunkID) {
-			uint32 Diff = pChunkID - theSampleToChunkArray[i-1]->FirstChunk;
-			uint32 pSampleNo = (Diff * theSampleToChunkArray[i-1]->SamplesPerChunk) + theSampleToChunkArray[i-1]->TotalPrevFrames;
-			return pSampleNo;
+			Diff = pChunkID - theSampleToChunkArray[i-1]->FirstChunk;
+			return ((Diff * theSampleToChunkArray[i-1]->SamplesPerChunk) + theSampleToChunkArray[i-1]->TotalPrevSamples);
 		}
 	}
 	
-	return 0;
+	Diff = pChunkID - theSampleToChunkArray[theHeader.NoEntries-1]->FirstChunk;
+	return ((Diff * theSampleToChunkArray[theHeader.NoEntries-1]->SamplesPerChunk) + theSampleToChunkArray[theHeader.NoEntries-1]->TotalPrevSamples);
 }
 
 uint32	STSCAtom::getChunkForSample(uint32 pSample, uint32 *pOffsetInChunk)
@@ -543,12 +535,12 @@ uint32	STSCAtom::getChunkForSample(uint32 pSample, uint32 *pOffsetInChunk)
 	uint32 OffsetInChunk = 0;
 
 	for (int32 i=theHeader.NoEntries-1;i>=0;i--) {
-		if (pSample >= theSampleToChunkArray[i]->TotalPrevFrames) {
+		if (pSample >= theSampleToChunkArray[i]->TotalPrevSamples) {
 			// Found chunk now calculate offset
-			ChunkID = (pSample - theSampleToChunkArray[i]->TotalPrevFrames) / theSampleToChunkArray[i]->SamplesPerChunk;
+			ChunkID = (pSample - theSampleToChunkArray[i]->TotalPrevSamples) / theSampleToChunkArray[i]->SamplesPerChunk;
 			ChunkID += theSampleToChunkArray[i]->FirstChunk;
 
-			OffsetInChunk = (pSample - theSampleToChunkArray[i]->TotalPrevFrames) % theSampleToChunkArray[i]->SamplesPerChunk;
+			OffsetInChunk = (pSample - theSampleToChunkArray[i]->TotalPrevSamples) % theSampleToChunkArray[i]->SamplesPerChunk;
 			
 			*pOffsetInChunk = OffsetInChunk;
 			return ChunkID;
@@ -581,9 +573,7 @@ SyncSample	*aSyncSample;
 	for (uint32 i=0;i<theHeader.NoEntries;i++) {
 		aSyncSample = new SyncSample;
 		
-		theStream->Read(aSyncSample,sizeof(SyncSample));
-		aSyncSample->SyncSampleNo = B_BENDIAN_TO_HOST_INT32(aSyncSample->SyncSampleNo);
-
+		Read(&aSyncSample->SyncSampleNo);
 		theSyncSampleArray[i] = aSyncSample;
 	}
 }
@@ -624,22 +614,22 @@ STSZAtom::~STSZAtom()
 
 void STSZAtom::OnProcessMetaData()
 {
-SampleSize	*aSampleSize;
+SampleSizeEntry	*aSampleSize;
 
 	// Just to make things difficult this is not quite a standard array header
-	theStream->Read(&theHeader,sizeof(SampleSizeHeader));
-
-	theHeader.SampleSize = B_BENDIAN_TO_HOST_INT32(theHeader.SampleSize);
-	theHeader.NoEntries = B_BENDIAN_TO_HOST_INT32(theHeader.NoEntries);
+	Read(&theHeader.Version);
+	Read(&theHeader.Flags1);
+	Read(&theHeader.Flags2);
+	Read(&theHeader.Flags3);
+	Read(&theHeader.SampleSize);
+	Read(&theHeader.NoEntries);
 	
 	// If the sample size is constant there is no array and NoEntries seems to contain bad values
 	if (theHeader.SampleSize == 0) {
 		for (uint32 i=0;i<theHeader.NoEntries;i++) {
-			aSampleSize = new SampleSize;
+			aSampleSize = new SampleSizeEntry;
 		
-			theStream->Read(aSampleSize,sizeof(SampleSize));
-			aSampleSize->Size = B_BENDIAN_TO_HOST_INT32(aSampleSize->Size);
-	
+			Read(&aSampleSize->EntrySize);
 			theSampleSizeArray[i] = aSampleSize;
 		}
 	}
@@ -659,7 +649,7 @@ uint32	STSZAtom::getSizeForSample(uint32 pSampleNo)
 	}
 	
 	// Sample Array indexed by SampleNo
-	return theSampleSizeArray[pSampleNo]->Size;
+	return theSampleSizeArray[pSampleNo]->EntrySize;
 }
 
 bool	STSZAtom::IsSingleSampleSize()
@@ -684,10 +674,10 @@ uint64 STCOAtom::OnGetChunkOffset()
 {
 	uint32 Offset;
 
-	theStream->Read(&Offset,sizeof(uint32));
+	Read(&Offset);
 
 	// Upconvert to uint64	
-	return uint64(B_BENDIAN_TO_HOST_INT32(Offset));
+	return uint64(Offset);
 }
 
 void STCOAtom::OnProcessMetaData()
@@ -722,7 +712,7 @@ uint64	STCOAtom::getOffsetForChunk(uint32 pChunkID)
 	DEBUGGER(("Bad Chunk ID %ld / %ld\n",pChunkID,theHeader.NoEntries));
 
 	TRESPASS();
-	return -1LL;
+	return 0LL;
 }
 
 STSDAtom::STSDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
@@ -752,53 +742,38 @@ uint32	STSDAtom::getMediaComponentSubType()
 
 void STSDAtom::ReadSoundDescription()
 {
-	uint32 descBytesLeft;
+	uint64 descBytesLeft;
 
 	SoundDescriptionV1 *aSoundDescriptionV1;
 			
 	aSoundDescriptionV1 = new SoundDescriptionV1;
-	theStream->Read(&aSoundDescriptionV1->basefields,sizeof(SampleDescBase));
+	Read(&aSoundDescriptionV1->basefields.Size);
+	Read(&aSoundDescriptionV1->basefields.DataFormat);
+	Read(aSoundDescriptionV1->basefields.Reserved,6);
+	Read(&aSoundDescriptionV1->basefields.DataReference);
 
-	aSoundDescriptionV1->basefields.Size = B_BENDIAN_TO_HOST_INT32(aSoundDescriptionV1->basefields.Size);
-	aSoundDescriptionV1->basefields.DataFormat = B_BENDIAN_TO_HOST_INT32(aSoundDescriptionV1->basefields.DataFormat);
-	aSoundDescriptionV1->basefields.DataReference = B_BENDIAN_TO_HOST_INT16(aSoundDescriptionV1->basefields.DataReference);
-	
-	descBytesLeft = aSoundDescriptionV1->basefields.Size - sizeof(SampleDescBase);
-		
 	// Read in Audio Sample Data
 	// We place into a V1 description even though it might be a V0 or earlier
 
-	theStream->Read(&aSoundDescriptionV1->desc,sizeof(SoundDescription));
-	descBytesLeft = descBytesLeft - sizeof(SoundDescription);
-			
-	aSoundDescriptionV1->desc.Version = B_BENDIAN_TO_HOST_INT16(aSoundDescriptionV1->desc.Version);
-	aSoundDescriptionV1->desc.Revision = B_BENDIAN_TO_HOST_INT16(aSoundDescriptionV1->desc.Revision);
-	aSoundDescriptionV1->desc.Vendor = B_BENDIAN_TO_HOST_INT32(aSoundDescriptionV1->desc.Vendor);
-	aSoundDescriptionV1->desc.NoOfChannels = B_BENDIAN_TO_HOST_INT16(aSoundDescriptionV1->desc.NoOfChannels);
-	aSoundDescriptionV1->desc.SampleSize = B_BENDIAN_TO_HOST_INT16(aSoundDescriptionV1->desc.SampleSize);
-	aSoundDescriptionV1->desc.CompressionID = B_BENDIAN_TO_HOST_INT16(aSoundDescriptionV1->desc.CompressionID);
-	aSoundDescriptionV1->desc.PacketSize = B_BENDIAN_TO_HOST_INT16(aSoundDescriptionV1->desc.PacketSize);
-	aSoundDescriptionV1->desc.SampleRate = B_BENDIAN_TO_HOST_INT32(aSoundDescriptionV1->desc.SampleRate);
+	Read(&aSoundDescriptionV1->desc.Version);
+	Read(&aSoundDescriptionV1->desc.Revision);
+	Read(&aSoundDescriptionV1->desc.Vendor);
+	Read(&aSoundDescriptionV1->desc.NoOfChannels);
+	Read(&aSoundDescriptionV1->desc.SampleSize);
+	Read(&aSoundDescriptionV1->desc.CompressionID);
+	Read(&aSoundDescriptionV1->desc.PacketSize);
+	Read(&aSoundDescriptionV1->desc.SampleRate);
 
 	if (aSoundDescriptionV1->desc.Version == 1) {
-		printf("V1 Sound\n");
-		theStream->Read(&(aSoundDescriptionV1->samplesPerPacket),4);
-		theStream->Read(&(aSoundDescriptionV1->bytesPerPacket),4);
-		theStream->Read(&(aSoundDescriptionV1->bytesPerFrame),4);
-		theStream->Read(&(aSoundDescriptionV1->bytesPerSample),4);
-				
-		aSoundDescriptionV1->samplesPerPacket = B_BENDIAN_TO_HOST_INT32(aSoundDescriptionV1->samplesPerPacket);
-		aSoundDescriptionV1->bytesPerPacket = B_BENDIAN_TO_HOST_INT32(aSoundDescriptionV1->bytesPerPacket);
-		aSoundDescriptionV1->bytesPerFrame = B_BENDIAN_TO_HOST_INT32(aSoundDescriptionV1->bytesPerFrame);
-		aSoundDescriptionV1->bytesPerSample = B_BENDIAN_TO_HOST_INT32(aSoundDescriptionV1->bytesPerSample);
-				
-		descBytesLeft = descBytesLeft - 16;
+		Read(&(aSoundDescriptionV1->samplesPerPacket));
+		Read(&(aSoundDescriptionV1->bytesPerPacket));
+		Read(&(aSoundDescriptionV1->bytesPerFrame));
+		Read(&(aSoundDescriptionV1->bytesPerSample));
+	
 	} else {
-		printf("V0 Sound\n");
 		// Calculate?
 		aSoundDescriptionV1->bytesPerSample = aSoundDescriptionV1->desc.SampleSize / 8;
 		if (aSoundDescriptionV1->basefields.DataFormat == 'ima4') {
-			printf("IMA4\n");
 			aSoundDescriptionV1->bytesPerFrame = aSoundDescriptionV1->desc.NoOfChannels * 64 / 34;
 		} else {
 			aSoundDescriptionV1->bytesPerFrame = aSoundDescriptionV1->desc.NoOfChannels * aSoundDescriptionV1->bytesPerSample;
@@ -809,6 +784,8 @@ void STSDAtom::ReadSoundDescription()
 
 	// 0 means we dont have one
 	aSoundDescriptionV1->theWaveFormat.format_tag = 0;
+
+	descBytesLeft = getBytesRemaining();
 
 	while (descBytesLeft > 0) {
 
@@ -836,50 +813,40 @@ void STSDAtom::ReadSoundDescription()
 			
 	theAudioDescArray[0] = aSoundDescriptionV1;
 
-	theStream->Seek(descBytesLeft,0);
-
-	PRINT(("Size:Format=%ld:%ld %ld\n",aSoundDescriptionV1->basefields.Size,aSoundDescriptionV1->basefields.DataFormat,descBytesLeft));
+	PRINT(("Size:Format=%ld:%ld %Ld\n",aSoundDescriptionV1->basefields.Size,aSoundDescriptionV1->basefields.DataFormat,descBytesLeft));
 }
 
 void STSDAtom::ReadVideoDescription()
 {
 	// read in Video Sample Data
-	uint32 descBytesLeft;
 	VideoDescriptionV0 *aVideoDescription;
 				
 	aVideoDescription = new VideoDescriptionV0;
 
-	theStream->Read(&aVideoDescription->basefields,sizeof(SampleDescBase));
-	aVideoDescription->basefields.Size = B_BENDIAN_TO_HOST_INT32(aVideoDescription->basefields.Size);
-	aVideoDescription->basefields.DataFormat = B_BENDIAN_TO_HOST_INT32(aVideoDescription->basefields.DataFormat);
-	aVideoDescription->basefields.DataReference = B_BENDIAN_TO_HOST_INT16(aVideoDescription->basefields.DataReference);
+	Read(&aVideoDescription->basefields.Size);
+	Read(&aVideoDescription->basefields.DataFormat);
+	Read(aVideoDescription->basefields.Reserved,6);
+	Read(&aVideoDescription->basefields.DataReference);
 		
-	descBytesLeft = aVideoDescription->basefields.Size - sizeof(SampleDescBase);
-
-	theStream->Read(&(aVideoDescription->desc),sizeof(VideoDescription));
-				
-	aVideoDescription->desc.Version = B_BENDIAN_TO_HOST_INT16(aVideoDescription->desc.Version);
-	aVideoDescription->desc.Vendor = B_BENDIAN_TO_HOST_INT32(aVideoDescription->desc.Vendor);
-	aVideoDescription->desc.TemporaralQuality = B_BENDIAN_TO_HOST_INT32(aVideoDescription->desc.TemporaralQuality);
-	aVideoDescription->desc.SpacialQuality = B_BENDIAN_TO_HOST_INT32(aVideoDescription->desc.SpacialQuality);
-	aVideoDescription->desc.Width = B_BENDIAN_TO_HOST_INT16(aVideoDescription->desc.Width);
-	aVideoDescription->desc.Height = B_BENDIAN_TO_HOST_INT16(aVideoDescription->desc.Height);
-	aVideoDescription->desc.HorizontalResolution = B_BENDIAN_TO_HOST_INT32(aVideoDescription->desc.HorizontalResolution);
-	aVideoDescription->desc.VerticalResolution = B_BENDIAN_TO_HOST_INT32(aVideoDescription->desc.VerticalResolution);
-	aVideoDescription->desc.DataSize = B_BENDIAN_TO_HOST_INT32(aVideoDescription->desc.DataSize);
-	// This framecount never seems to be right
-	aVideoDescription->desc.FrameCount = B_BENDIAN_TO_HOST_INT16(aVideoDescription->desc.FrameCount);
-	aVideoDescription->desc.Depth = B_BENDIAN_TO_HOST_INT16(aVideoDescription->desc.Depth);
-	aVideoDescription->desc.ColourTableID = B_BENDIAN_TO_HOST_INT16(aVideoDescription->desc.ColourTableID);
-				
-	descBytesLeft = descBytesLeft - sizeof(VideoDescription);
+	Read(&aVideoDescription->desc.Version);
+	Read(&aVideoDescription->desc.Revision);
+	Read(&aVideoDescription->desc.Vendor);
+	Read(&aVideoDescription->desc.TemporaralQuality);
+	Read(&aVideoDescription->desc.SpacialQuality);
+	Read(&aVideoDescription->desc.Width);
+	Read(&aVideoDescription->desc.Height);
+	Read(&aVideoDescription->desc.HorizontalResolution);
+	Read(&aVideoDescription->desc.VerticalResolution);
+	Read(&aVideoDescription->desc.DataSize);
+	// FrameCount is actually No of Frames per Sample which is usually 1
+	Read(&aVideoDescription->desc.FrameCount);
+	Read(aVideoDescription->desc.CompressorName,32);
+	Read(&aVideoDescription->desc.Depth);
+	Read(&aVideoDescription->desc.ColourTableID);
 
 	theVideoDescArray[0] = aVideoDescription;
 
-	// We seem to have read 2 bytes too many???
-	theStream->Seek(descBytesLeft,0);
-
-	PRINT(("Size:Format=%ld:%ld %ld\n",aVideoDescription->basefields.Size,aVideoDescription->basefields.DataFormat,descBytesLeft));
+	PRINT(("Size:Format=%ld:%ld %Ld\n",aVideoDescription->basefields.Size,aVideoDescription->basefields.DataFormat,getBytesRemaining()));
 }
 
 void STSDAtom::OnProcessMetaData()
@@ -898,9 +865,12 @@ void STSDAtom::OnProcessMetaData()
 			default:
 				// Skip
 				SampleDescBase	aSampleDescBase;
-				theStream->Read(&aSampleDescBase,sizeof(SampleDescBase));
-				aSampleDescBase.Size = B_BENDIAN_TO_HOST_INT32(aSampleDescBase.Size);
-				theStream->Seek(aSampleDescBase.Size - sizeof(SampleDescBase),0);
+				Read(&aSampleDescBase.Size);
+				Read(&aSampleDescBase.DataFormat);
+				Read(aSampleDescBase.Reserved,6);
+				Read(&aSampleDescBase.DataReference);
+
+				theStream->Seek(aSampleDescBase.Size - SampleDescBaseSize, 0);
 				break;
 		}
 	}
@@ -934,7 +904,13 @@ WAVEAtom::~WAVEAtom()
 void WAVEAtom::OnProcessMetaData()
 {
 	// This should be in LITTLE ENDIAN DATA
-	theStream->Read(&theWaveFormat,sizeof(wave_format_ex));
+	theStream->Read(&theWaveFormat.format_tag,sizeof(uint16));
+	theStream->Read(&theWaveFormat.channels,sizeof(uint16));
+	theStream->Read(&theWaveFormat.frames_per_sec,sizeof(uint32));
+	theStream->Read(&theWaveFormat.avg_bytes_per_sec,sizeof(uint32));
+	theStream->Read(&theWaveFormat.block_align,sizeof(uint16));
+	theStream->Read(&theWaveFormat.bits_per_sample,sizeof(uint16));
+	theStream->Read(&theWaveFormat.extra_size,sizeof(uint16));
 
 	theWaveFormat.format_tag = B_LENDIAN_TO_HOST_INT16(theWaveFormat.format_tag);
 	theWaveFormat.channels = B_LENDIAN_TO_HOST_INT16(theWaveFormat.channels);
@@ -1128,43 +1104,69 @@ TKHDAtom::~TKHDAtom()
 
 void TKHDAtom::OnProcessMetaData()
 {
-	theStream->Read(&Version,sizeof(uint8));
+	Read(&Version);
 	
 	if (Version == 0) {
+		// Read into V0 header and convert to V1 Header
 		tkhdV0 aHeaderV0;
-		theStream->Read(&aHeaderV0,sizeof(tkhdV0));
+		
+		Read(&aHeaderV0.Flags1);
+		Read(&aHeaderV0.Flags2);
+		Read(&aHeaderV0.Flags3);
+		Read(&aHeaderV0.CreationTime);
+		Read(&aHeaderV0.ModificationTime);
+		Read(&aHeaderV0.TrackID);
+		Read(&aHeaderV0.Reserved1);
+		Read(&aHeaderV0.Duration);
+		Read(&aHeaderV0.Reserved2);
+		Read(&aHeaderV0.Layer);
+		Read(&aHeaderV0.AlternateGroup);
+		Read(&aHeaderV0.Volume);
+		Read(&aHeaderV0.Reserved3);
+		Read(aHeaderV0.MatrixStructure,36);
+		Read(&aHeaderV0.TrackWidth);
+		Read(&aHeaderV0.TrackHeight);
 
 		theHeader.Flags1 = aHeaderV0.Flags1;
 		theHeader.Flags2 = aHeaderV0.Flags2;
 		theHeader.Flags3 = aHeaderV0.Flags3;
+		theHeader.Reserved1 = aHeaderV0.Reserved1;
+		theHeader.Reserved2 = aHeaderV0.Reserved2;
+		theHeader.Reserved3 = aHeaderV0.Reserved3;
 		
 		for (uint32 i=0;i<36;i++) {
 			theHeader.MatrixStructure[i] =  aHeaderV0.MatrixStructure[i];
 		}
 
 		// upconvert to V1 header
-		theHeader.CreationTime = B_BENDIAN_TO_HOST_INT32(aHeaderV0.CreationTime);
-		theHeader.ModificationTime = B_BENDIAN_TO_HOST_INT32(aHeaderV0.ModificationTime);
-		theHeader.TrackID = B_BENDIAN_TO_HOST_INT32(aHeaderV0.TrackID);
-		theHeader.Duration = B_BENDIAN_TO_HOST_INT32(aHeaderV0.Duration);
-		theHeader.Layer = B_BENDIAN_TO_HOST_INT16(aHeaderV0.Layer);
-		theHeader.AlternateGroup = B_BENDIAN_TO_HOST_INT16(aHeaderV0.AlternateGroup);
-		theHeader.Volume = B_BENDIAN_TO_HOST_INT16(aHeaderV0.Volume);
-		theHeader.TrackWidth = B_BENDIAN_TO_HOST_INT32(aHeaderV0.TrackWidth);
-		theHeader.TrackHeight = B_BENDIAN_TO_HOST_INT32(aHeaderV0.TrackHeight);
+		theHeader.CreationTime = uint64(aHeaderV0.CreationTime);
+		theHeader.ModificationTime = uint64(aHeaderV0.ModificationTime);
+		theHeader.TrackID = aHeaderV0.TrackID;
+		theHeader.Duration = aHeaderV0.Duration;
+		theHeader.Layer = aHeaderV0.Layer;
+		theHeader.AlternateGroup = aHeaderV0.AlternateGroup;
+		theHeader.Volume = aHeaderV0.Volume;
+		theHeader.TrackWidth = aHeaderV0.TrackWidth;
+		theHeader.TrackHeight = aHeaderV0.TrackHeight;
 
 	} else {
-		theStream->Read(&theHeader,sizeof(tkhdV1));
-
-		theHeader.CreationTime = B_BENDIAN_TO_HOST_INT64(theHeader.CreationTime);
-		theHeader.ModificationTime = B_BENDIAN_TO_HOST_INT64(theHeader.ModificationTime);
-		theHeader.TrackID = B_BENDIAN_TO_HOST_INT32(theHeader.TrackID);
-		theHeader.Duration = B_BENDIAN_TO_HOST_INT32(theHeader.Duration);
-		theHeader.Layer = B_BENDIAN_TO_HOST_INT16(theHeader.Layer);
-		theHeader.AlternateGroup = B_BENDIAN_TO_HOST_INT16(theHeader.AlternateGroup);
-		theHeader.Volume = B_BENDIAN_TO_HOST_INT16(theHeader.Volume);
-		theHeader.TrackWidth = B_BENDIAN_TO_HOST_INT32(theHeader.TrackWidth);
-		theHeader.TrackHeight = B_BENDIAN_TO_HOST_INT32(theHeader.TrackHeight);
+		// Read direct into V1 Header
+		Read(&theHeader.Flags1);
+		Read(&theHeader.Flags2);
+		Read(&theHeader.Flags3);
+		Read(&theHeader.CreationTime);
+		Read(&theHeader.ModificationTime);
+		Read(&theHeader.TrackID);
+		Read(&theHeader.Reserved1);
+		Read(&theHeader.Duration);
+		Read(&theHeader.Reserved2);
+		Read(&theHeader.Layer);
+		Read(&theHeader.AlternateGroup);
+		Read(&theHeader.Volume);
+		Read(&theHeader.Reserved3);
+		Read(theHeader.MatrixStructure,36);
+		Read(&theHeader.TrackWidth);
+		Read(&theHeader.TrackHeight);
 	}
 
 }
@@ -1214,14 +1216,16 @@ MDHDAtom::~MDHDAtom()
 
 void MDHDAtom::OnProcessMetaData()
 {
-	theStream->Read(&theHeader,sizeof(mdhd));
-	
-	theHeader.CreationTime = B_BENDIAN_TO_HOST_INT32(theHeader.CreationTime);
-	theHeader.ModificationTime = B_BENDIAN_TO_HOST_INT32(theHeader.ModificationTime);
-	theHeader.TimeScale = B_BENDIAN_TO_HOST_INT32(theHeader.TimeScale);
-	theHeader.Duration = B_BENDIAN_TO_HOST_INT32(theHeader.Duration);
-	theHeader.Language = B_BENDIAN_TO_HOST_INT16(theHeader.Language);
-	theHeader.Quality = B_BENDIAN_TO_HOST_INT16(theHeader.Quality);
+	Read(&theHeader.Version);
+	Read(&theHeader.Flags1);
+	Read(&theHeader.Flags2);
+	Read(&theHeader.Flags3);
+	Read(&theHeader.CreationTime);
+	Read(&theHeader.ModificationTime);
+	Read(&theHeader.TimeScale);
+	Read(&theHeader.Duration);
+	Read(&theHeader.Language);
+	Read(&theHeader.Quality);
 }
 
 char *MDHDAtom::OnGetAtomName()
@@ -1249,12 +1253,15 @@ HDLRAtom::~HDLRAtom()
 
 void HDLRAtom::OnProcessMetaData()
 {
-	theStream->Read(&theHeader,sizeof(hdlr));
-	theHeader.ComponentType = B_BENDIAN_TO_HOST_INT32(theHeader.ComponentType);
-	theHeader.ComponentSubType = B_BENDIAN_TO_HOST_INT32(theHeader.ComponentSubType);
-	theHeader.ComponentManufacturer = B_BENDIAN_TO_HOST_INT32(theHeader.ComponentManufacturer);
-	theHeader.ComponentFlags = B_BENDIAN_TO_HOST_INT32(theHeader.ComponentFlags);
-	theHeader.ComponentFlagsMask = B_BENDIAN_TO_HOST_INT32(theHeader.ComponentFlagsMask);
+	Read(&theHeader.Version);
+	Read(&theHeader.Flags1);
+	Read(&theHeader.Flags2);
+	Read(&theHeader.Flags3);
+	Read(&theHeader.ComponentType);
+	Read(&theHeader.ComponentSubType);
+	Read(&theHeader.ComponentManufacturer);
+	Read(&theHeader.ComponentFlags);
+	Read(&theHeader.ComponentFlagsMask);
 	
 	// Read Array of Strings?
 }
@@ -1290,7 +1297,14 @@ VMHDAtom::~VMHDAtom()
 void VMHDAtom::OnProcessMetaData()
 {
 	vmhd aHeader;
-	theStream->Read(&aHeader,sizeof(vmhd));
+	Read(&aHeader.Version);
+	Read(&aHeader.Flags1);
+	Read(&aHeader.Flags2);
+	Read(&aHeader.Flags3);
+	Read(&aHeader.GraphicsMode);
+	Read(&aHeader.OpColourRed);
+	Read(&aHeader.OpColourGreen);
+	Read(&aHeader.OpColourBlue);
 }
 
 char *VMHDAtom::OnGetAtomName()
@@ -1309,7 +1323,12 @@ SMHDAtom::~SMHDAtom()
 void SMHDAtom::OnProcessMetaData()
 {
 	smhd aHeader;
-	theStream->Read(&aHeader,sizeof(smhd));
+	Read(&aHeader.Version);
+	Read(&aHeader.Flags1);
+	Read(&aHeader.Flags2);
+	Read(&aHeader.Flags3);
+	Read(&aHeader.Balance);
+	Read(&aHeader.Reserved);
 }
 
 char *SMHDAtom::OnGetAtomName()

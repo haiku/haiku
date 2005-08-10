@@ -554,26 +554,7 @@ uint32	MOVFileReader::getChunkSize(uint32 stream_index, uint32 pFrameNo)
 			// We read audio in chunk by chunk so chunk size is chunk size
 			uint32	ChunkNo 	= pFrameNo;
 			off_t	Chunk_Start = aTrakAtom->getOffsetForChunk(ChunkNo);
-			uint32	ChunkSize 	= ChunkSize = theChunkSuperIndex.getChunkSize(stream_index,ChunkNo,Chunk_Start);			
-			uint32	NoSamples	= aTrakAtom->getNoSamplesInChunk(ChunkNo);
-			uint32	TotalSampleSize = 0;
-
-			// Get first sample in chunk
-			uint32 SampleNo = aTrakAtom->getFirstSampleInChunk(ChunkNo);
-
-			if (aTrakAtom->IsSingleSampleSize()) {
-				TotalSampleSize = NoSamples * aTrakAtom->getSizeForSample(SampleNo);
-			} else {
-				// Add up all sample sizes in chunk			
-				for (uint32 i=0;i<NoSamples;i++) {
-					TotalSampleSize += aTrakAtom->getSizeForSample(SampleNo);
-					SampleNo++;
-				}
-			}
-			
-			TotalSampleSize = TotalSampleSize * aTrakAtom->getBytesPerSample();
-			
-//			printf("[%ld] start %lld, size %ld NoSamples %ld TotalSampleSize %ld\n",ChunkNo,Chunk_Start,ChunkSize,NoSamples,TotalSampleSize);
+			uint32	ChunkSize 	= ChunkSize = theChunkSuperIndex.getChunkSize(stream_index,ChunkNo,Chunk_Start);
 			
 			return ChunkSize;
 		}

@@ -124,9 +124,11 @@ bool AtomBase::IsKnown()
 
 void AtomBase::ReadArrayHeader(array_header *pHeader)
 {
-	getStream()->Read(pHeader,sizeof(array_header));
-
-	pHeader->NoEntries = B_BENDIAN_TO_HOST_INT32(pHeader->NoEntries);
+	Read(&pHeader->Version);
+	Read(&pHeader->Flags1);
+	Read(&pHeader->Flags2);
+	Read(&pHeader->Flags3);
+	Read(&pHeader->NoEntries);
 }
 
 BPositionIO *AtomBase::OnGetStream()
@@ -138,6 +140,66 @@ BPositionIO *AtomBase::OnGetStream()
 BPositionIO *AtomBase::getStream()
 {
 	return OnGetStream();
+}
+
+void	AtomBase::Read(uint64	*value)
+{
+	uint32	bytes_read;
+	
+	bytes_read = getStream()->Read(value,sizeof(uint64));
+	
+	// Assert((bytes_read == sizeof(uint64),"Read Error");
+	
+	*value = B_BENDIAN_TO_HOST_INT64(*value);
+}
+
+void	AtomBase::Read(uint32	*value)
+{
+	uint32	bytes_read;
+	
+	bytes_read = getStream()->Read(value,sizeof(uint32));
+	
+	// Assert((bytes_read == sizeof(uint32),"Read Error");
+	
+	*value = B_BENDIAN_TO_HOST_INT32(*value);
+}
+
+void	AtomBase::Read(uint16	*value)
+{
+	uint32	bytes_read;
+	
+	bytes_read = getStream()->Read(value,sizeof(uint16));
+	
+	// Assert((bytes_read == sizeof(uint16),"Read Error");
+	
+	*value = B_BENDIAN_TO_HOST_INT16(*value);
+}
+
+void	AtomBase::Read(uint8	*value)
+{
+	uint32	bytes_read;
+	
+	bytes_read = getStream()->Read(value,sizeof(uint8));
+	
+	// Assert((bytes_read == sizeof(uint8),"Read Error");
+}
+
+void	AtomBase::Read(char	*value, uint32 maxread)
+{
+	uint32	bytes_read;
+	
+	bytes_read = getStream()->Read(value,maxread);
+
+	// Assert((bytes_read == maxread,"Read Error");
+}
+
+void	AtomBase::Read(uint8 *value, uint32 maxread)
+{
+	uint32	bytes_read;
+	
+	bytes_read = getStream()->Read(value,maxread);
+
+	// Assert((bytes_read == maxread,"Read Error");
 }
 
 AtomContainer::AtomContainer(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)

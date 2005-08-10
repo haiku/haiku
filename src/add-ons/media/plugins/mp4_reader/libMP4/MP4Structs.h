@@ -110,7 +110,7 @@ struct SampleToChunk {
 	uint32	FirstChunk;
 	uint32	SamplesPerChunk;
 	uint32	SampleDescriptionID;
-	uint32	TotalPrevFrames;
+	uint32	TotalPrevSamples;
 };
 
 // Note standard is 32bits offsets but later is 64

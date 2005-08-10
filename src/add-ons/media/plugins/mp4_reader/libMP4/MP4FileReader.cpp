@@ -554,23 +554,6 @@ uint32	MP4FileReader::getChunkSize(uint32 stream_index, uint32 pFrameNo)
 			uint32	ChunkNo 	= pFrameNo;
 			off_t	Chunk_Start = aTrakAtom->getOffsetForChunk(ChunkNo);
 			uint32	ChunkSize 	= theChunkSuperIndex.getChunkSize(stream_index,ChunkNo,Chunk_Start);
-			uint32	NoSamples	= aTrakAtom->getNoSamplesInChunk(ChunkNo);
-			uint32	TotalSampleSize = 0;
-
-			// Get first sample in chunk
-			uint32 SampleNo = aTrakAtom->getFirstSampleInChunk(ChunkNo);
-
-			if (aTrakAtom->IsSingleSampleSize()) {
-				TotalSampleSize = NoSamples * aTrakAtom->getSizeForSample(SampleNo);
-			} else {
-				// Add up all sample sizes in chunk			
-				for (uint32 i=0;i<NoSamples;i++) {
-					TotalSampleSize += aTrakAtom->getSizeForSample(SampleNo);
-					SampleNo++;
-				}
-			}
-			
-			TotalSampleSize = TotalSampleSize * aTrakAtom->getBytesPerSample();
 			
 			return ChunkSize;
 		}
@@ -610,6 +593,7 @@ bool	MP4FileReader::GetNextChunkInfo(uint32 stream_index, uint32 pFrameNo, off_t
 		*keyframe = IsKeyFrame(stream_index, pFrameNo);
 	}
 
+	// TODO need a better method for detecting End of Data Note ChunkSize of 0 seems to be it.
 	return ((*start > 0) && (*size > 0) && !(IsEndOfFile(*start + *size)) && !(IsEndOfData(*start + *size)));
 }
 

@@ -134,6 +134,14 @@ public:
 	
 	void	setParent(AtomBase *pParent) {parentAtom = pParent;};
 	AtomBase *getParent() { return parentAtom;};
+
+	void	Read(uint64	*value);
+	void	Read(uint32	*value);
+	void	Read(int32	*value);
+	void	Read(uint16	*value);
+	void	Read(uint8	*value);
+	void	Read(char	*value, uint32 maxread);
+	void	Read(uint8	*value, uint32 maxread);
 };
 
 class FullAtom : public AtomBase {
