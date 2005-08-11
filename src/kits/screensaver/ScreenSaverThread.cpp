@@ -72,6 +72,9 @@ ScreenSaverThread::Thread()
 BScreenSaver *
 ScreenSaverThread::LoadAddOn() 
 {
+	if (strcmp("", fPref->ModuleName()) == 0)
+		return NULL;
+
 	BScreenSaver *(*instantiate)(BMessage *, image_id );
 	if (fAddonImage) { // This is a new set of preferences. Free up what we did have 
 		unload_add_on(fAddonImage);
