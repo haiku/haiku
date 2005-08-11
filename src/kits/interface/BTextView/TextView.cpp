@@ -119,12 +119,10 @@ public:
 };
 
 
-#ifndef COMPILE_FOR_R5
 // Initialized/finalized by init/fini_interface_kit
 _BWidthBuffer_* BTextView::sWidths = NULL;
 sem_id BTextView::sWidthSem = B_BAD_SEM_ID; 
 int32 BTextView::sWidthAtom = 0;
-#endif
 
 const static rgb_color kBlackColor = { 0, 0, 0, 255 };
 const static rgb_color kBlueInputColor = { 152, 203, 255, 255 };			

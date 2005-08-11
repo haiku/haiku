@@ -176,8 +176,6 @@ system_colors()
 	return BScreen(B_MAIN_SCREEN_ID).ColorMap();
 }
 
-#ifndef COMPILE_FOR_R5
-
 _IMPEXP_BE status_t
 set_screen_space(int32 index, uint32 space, bool stick)
 {
@@ -245,8 +243,6 @@ set_scroll_bar_info(scroll_bar_info *info)
 
 	return B_ERROR;
 }
-
-#endif // COMPILE_FOR_R5
 
 _IMPEXP_BE status_t
 get_mouse_type(int32 *type)
@@ -555,8 +551,6 @@ keyboard_navigation_color()
 	return ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 }
 
-
-#ifndef COMPILE_FOR_R5
 
 _IMPEXP_BE int32
 count_workspaces()
@@ -1312,5 +1306,3 @@ truncate_string(const char* string, uint32 mode, float width,
 	}
 }
 
-
-#endif // !COMPILE_FOR_R5
