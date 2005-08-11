@@ -156,11 +156,11 @@ if $(OS) = BEOS {
 	# path where it should be located. Not nice, but good enough for the moment.
 	actions CompileResources
 	{
-		if [ -f ../../../distro/x86.R1/beos/bin/rc ]; then
-			../../../distro/x86.R1/beos/bin/rc -o "$(1)" "$(2)"
+		if [ -f ../../../objects/x86.R1/tools/rc/rc ]; then
+			../../../objects/x86.R1/tools/rc/rc -o "$(1)" "$(2)"
 		else
 			echo "Error: Couldn't find rc, the resources compiler. It should "
-			echo "Error: be located in distro/x86.R1/beos/bin and can be made"
+			echo "Error: be located in objects/x86.R1/tools/rc/ and can be made"
 			echo "Error: by invoking \`jam rc'. You can also build the"
 			echo "Error: StatCacheServer without resources by running"
 			echo "Error:   NO_STAT_CACHE_SERVER_RESOURCES=1 jam"
