@@ -74,6 +74,7 @@ imageSize=80
 	# Bochs parameters:
 	# 40 MB: cylinders=82, heads=16, spt=63
 	# 60 MB: cylinders=122, heads=16, spt=63
+	# 80 MB: cylinders=164, heads=16, spt=63
 	# 100 MB: cylinders=204, heads=16, spt=63
 
 # the architecture; ToDo: set correctly (using uname?)
@@ -252,7 +253,7 @@ $mkdir -p beos/system/add-ons/media/plugins
 $mkdir -p beos/system/add-ons/input_server/devices
 $mkdir -p beos/system/add-ons/input_server/filters
 $mkdir -p beos/system/add-ons/input_server/methods
-$mkdir -p beos/system/add-ons/Screen\\\ Savers
+$mkdir -p beos/system/add-ons/Screen\ Savers
 $mkdir -p beos/system/boot
 $mkdir -p beos/system/lib
 $mkdir -p beos/system/servers
@@ -514,9 +515,9 @@ for f in $BEOS_NETWORK_PROTOCOLS; do
 done
 
 cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/Screen\ Savers
-$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/Screen\\\ Savers
+$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/Screen\ Savers
 for f in $BEOS_ADD_ONS_SCREENSAVERS; do
-	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/Screen\\\ Savers
+	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/Screen\ Savers
 done
 
 # install MIME database
