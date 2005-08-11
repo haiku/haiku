@@ -34,7 +34,7 @@ prepare_command_string(const char *const *argv, int argc, char *buffer,
 			add_char(buffer, bufferSize, ' ');
 
 		while (*arg) {
-			if (strchr("", *arg))
+			if (strchr(" ", *arg))
 				add_char(buffer, bufferSize, '\\');
 			add_char(buffer, bufferSize, *arg);
 			arg++;
