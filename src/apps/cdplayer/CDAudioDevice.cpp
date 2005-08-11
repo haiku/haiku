@@ -16,7 +16,8 @@
 CDAudioDevice::CDAudioDevice(void)
 {
 	FindDrives("/dev/disk");
-	SetDrive(0);
+	if(CountDrives()>0)
+		SetDrive(0);
 }
 
 CDAudioDevice::~CDAudioDevice(void)

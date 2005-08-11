@@ -56,6 +56,16 @@ CDPlayer::CDPlayer(BRect frame, const char *name, uint32 resizeMask, uint32 flag
 	engine = new CDEngine;
 	
 	BuildGUI();
+	
+	CDAudioDevice cd;
+	if(cd.CountDrives()<1)
+	{
+		BAlert *alert = new BAlert("CDPlayer","It appears that there are no CD drives on your"
+									"computer or there is no system software to support one."
+									" Sorry.","OK");
+		alert->Go();
+		be_app->PostMessage(B_QUIT_REQUESTED);
+	}
 }
 
 CDPlayer::~CDPlayer()
