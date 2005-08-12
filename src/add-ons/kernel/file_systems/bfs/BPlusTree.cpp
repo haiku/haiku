@@ -250,8 +250,11 @@ CachedNode::Free(Transaction &transaction, off_t offset)
 	// the tree and file size by one node
 	off_t lastOffset = header->MaximumSize() - fTree->fNodeSize;
 	if (offset == lastOffset) {
+		status_t status = fTree->fStream->SetFileSize(transaction, lastOffset);
+		if (status < B_OK)
+			return status;
+
 		header->maximum_size = HOST_ENDIAN_TO_BFS_INT64(lastOffset);
-		return fTree->fStream->SetFileSize(transaction, lastOffset);
 	}
 
 	// add the node to the free nodes list
@@ -308,6 +311,9 @@ CachedNode::Allocate(Transaction &transaction, bplustree_node **_node, off_t *_o
 		*_node = fNode;
 		return B_OK;
 	}
+
+	// revert header size to old value
+	header->maximum_size = HOST_ENDIAN_TO_BFS_INT64(header->MaximumSize() - fTree->fNodeSize);
 	RETURN_ERROR(B_ERROR);
 }
 
@@ -425,11 +431,14 @@ BPlusTree::SetTo(Inode *stream)
 	fHeader = fCachedHeader.SetToHeader();
 	if (fHeader == NULL)
 		RETURN_ERROR(fStatus = B_NO_INIT);
-	
+
 	// is header valid?
 
+	if (fHeader->MaximumSize() != stream->Size()) {
+		FATAL(("B+tree header size doesn't fit file size!\n"));
+		fHeader->maximum_size = HOST_ENDIAN_TO_BFS_INT64(stream->Size());
+	}
 	if (fHeader->Magic() != BPLUSTREE_MAGIC
-		|| fHeader->MaximumSize() != stream->Size()
 		|| (fHeader->RootNode() % fHeader->NodeSize()) != 0
 		|| !fHeader->IsValidLink(fHeader->RootNode())
 		|| !fHeader->IsValidLink(fHeader->FreeNode()))
@@ -442,7 +451,7 @@ BPlusTree::SetTo(Inode *stream)
 						   S_ULONG_LONG_INDEX, S_FLOAT_INDEX, S_DOUBLE_INDEX};
 		uint32 mode = stream->Mode() & (S_STR_INDEX | S_INT_INDEX | S_UINT_INDEX | S_LONG_LONG_INDEX
 						   | S_ULONG_LONG_INDEX | S_FLOAT_INDEX | S_DOUBLE_INDEX);
-	
+
 		if (fHeader->DataType() > BPLUSTREE_DOUBLE_TYPE
 			|| (stream->Mode() & S_INDEX_DIR) && toMode[fHeader->DataType()] != mode
 			|| !stream->IsContainer()) {
@@ -1239,8 +1248,8 @@ BPlusTree::Insert(Transaction &transaction, const uint8 *key, uint16 keyLength, 
 			if (SplitNode(node, nodeAndKey.nodeOffset, other, otherOffset,
 					&nodeAndKey.keyIndex, keyBuffer, &keyLength, &value) < B_OK) {
 				// free root node & other node here
-				cachedNewRoot.Free(transaction, newRoot);
 				cachedOther.Free(transaction, otherOffset);					
+				cachedNewRoot.Free(transaction, newRoot);
 
 				RETURN_ERROR(B_ERROR);
 			}
