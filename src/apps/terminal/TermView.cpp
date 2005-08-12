@@ -1512,7 +1512,10 @@ TermView::MessageReceived(BMessage *msg)
 				DoFileDrop(ref);
 				
 				while(msg->FindRef("refs", i++, &ref) == B_OK)
+				{
+					WritePTY((const uchar*)" ",1);
 					DoFileDrop(ref);
+				}
 			}
 			else
 			{
@@ -1608,7 +1611,6 @@ TermView::DoFileDrop(entry_ref &ref)
 	BString string(path.Path());
 	
 	string.CharacterEscape(" ~`#$&*()\\|[]{};'\"<>?!",'\\');
-	string+=" ";
 	WritePTY((const uchar *)string.String(), string.Length());
 }
 

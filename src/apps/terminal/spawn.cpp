@@ -56,6 +56,7 @@ extern PrefHandler *gTermPref;
 #define SHELL_COMMAND "/bin/sh -login"
 extern char **environ;
 
+// TODO: This is *definitely* not a helpful error message
 char spawn_alert_msg [] = \
 "alert --stop " \
 "'Haiku Terminal Error!!\n\
@@ -96,7 +97,7 @@ setenv(const char *var, const char *value, bool overwrite)
 
 
 /*
- * reapchild. Child process is out there, let's catch its terminaltion.
+ * reapchild. Child process is out there, let's catch its termination.
  */
 
 
