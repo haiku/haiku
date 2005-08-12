@@ -443,6 +443,12 @@ bfs_get_file_map(fs_volume _fs, fs_vnode _node, off_t offset, size_t size,
 		// are we already done?
 		if (size <= vecs[index].length
 			|| offset >= inode->Size()) {
+			if (offset > inode->Size()) {
+				// make sure the extent ends with the last official file
+				// block (without taking any preallocations into account)
+				vecs[index].length = (inode->Size() - fileOffset + volume->BlockSize() - 1)
+					& ~(volume->BlockSize() - 1);
+			}
 			*_count = index + 1;
 			return B_OK;
 		}
