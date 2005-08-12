@@ -139,7 +139,10 @@ write_page(vm_page *page)
 
 	TRACE(("write_page(page = %p): offset = %Ld\n", page, page->offset));
 
-	vm_get_physical_page(page->ppn * B_PAGE_SIZE, (addr_t *)&vecs[0].iov_base, PHYSICAL_PAGE_CAN_WAIT);
+	status = vm_get_physical_page(page->ppn * B_PAGE_SIZE,
+		(addr_t *)&vecs[0].iov_base, PHYSICAL_PAGE_CAN_WAIT);
+	if (status < B_OK)
+		panic("could not map page!");
 	vecs->iov_len = B_PAGE_SIZE;
 
 	status = store->ops->write(store, page->offset, vecs, 1, &length);
