@@ -181,6 +181,19 @@ FontServer::GetFamily(const char* name) const
 	return NULL;
 }
 
+//! Scans the four default system font folders
+void
+FontServer::ScanSystemFolders(void)
+{
+	ScanDirectory("/boot/beos/etc/fonts/ttfonts/");
+	
+	// We don't scan these in test mode to help shave off some startup time
+#if !TEST_MODE
+	ScanDirectory("/boot/beos/etc/fonts/PS-Type1/");
+	ScanDirectory("/boot/home/config/fonts/ttfonts/");
+	ScanDirectory("/boot/home/config/fonts/psfonts/");
+#endif
+}
 
 /*!
 	\brief Scan a folder for all valid fonts

@@ -100,14 +100,7 @@ AppServer::AppServer()
 	// Create the font server and scan the proper directories.
 	gFontServer = new FontServer;
 	gFontServer->Lock();
-
-	// Used for testing purposes
-
-	// TODO: Re-enable scanning of all font directories when server is actually put to use
-	gFontServer->ScanDirectory("/boot/beos/etc/fonts/ttfonts/");
-//	gFontServer->ScanDirectory("/boot/beos/etc/fonts/PS-Type1/");
-//	gFontServer->ScanDirectory("/boot/home/config/fonts/ttfonts/");
-//	gFontServer->ScanDirectory("/boot/home/config/fonts/psfonts/");
+	gFontServer->ScanSystemFolders();
 	gFontServer->SaveList();
 
 	if (!gFontServer->SetSystemPlain(DEFAULT_PLAIN_FONT_FAMILY,
@@ -326,14 +319,6 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 			reply.Flush();
 			break;
 		}
-
-		case AS_UPDATED_CLIENT_FONTLIST:
-			// received when the client-side global font list has been
-			// refreshed
-			gFontServer->Lock();
-			gFontServer->FontsUpdated();
-			gFontServer->Unlock();
-			break;
 
 		case AS_QUERY_FONTS_CHANGED:
 		{

@@ -1200,17 +1200,38 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_QUERY_FONTS_CHANGED:
 		{
-			FTRACE(("ServerApp %s: AS_QUERY_FONTS_CHANGED unimplemented\n",
-				Signature()));
+			FTRACE(("ServerApp %s: AS_QUERY_FONTS_CHANGED\n",Signature()));
+			
 			// Attached Data:
 			// 1) bool check flag
-
-			// if just checking, just give an answer,
-			// if not and needs updated, 
-			// sync the font list and return true else return false
-			// TODO: actually do the above...
-			fLink.StartMessage(SERVER_FALSE);
-			fLink.Flush();
+			bool checkonly;
+			link.Read<bool>(&checkonly);
+			
+			gFontServer->Lock();
+			bool needsUpdate = gFontServer->FontsNeedUpdated();
+			gFontServer->Unlock();
+			
+			if(checkonly)
+			{
+				fLink.StartMessage(needsUpdate ? SERVER_TRUE : SERVER_FALSE);
+				fLink.Flush();
+			}
+			else
+			{
+				if(needsUpdate)
+				{
+					gFontServer->Lock();
+					gFontServer->ScanSystemFolders();
+					gFontServer->Unlock();
+					fLink.StartMessage(SERVER_TRUE);
+					fLink.Flush();
+				}
+				else
+				{
+					fLink.StartMessage(SERVER_FALSE);
+					fLink.Flush();
+				}
+			}
 			break;
 		}
 		case AS_GET_FAMILY_NAME:

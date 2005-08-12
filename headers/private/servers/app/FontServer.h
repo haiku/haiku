@@ -39,6 +39,7 @@ public:
 	int32 CountFamilies(void);
 	int32 CountStyles(const char *family);
 	void RemoveFamily(const char *family);
+	void ScanSystemFolders(void);
 	status_t ScanDirectory(const char *path);
 	void SaveList(void);
 
