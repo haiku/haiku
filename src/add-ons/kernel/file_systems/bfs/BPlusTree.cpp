@@ -3,7 +3,7 @@
  * Roughly based on 'btlib' written by Marcus J. Ranum - it shares
  * no code but achieves binary compatibility with the on disk format.
  *
- * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -25,21 +25,31 @@
 #ifdef DEBUG
 class NodeChecker {
 	public:
-		NodeChecker(bplustree_node *node, int32 nodeSize)
+		NodeChecker(bplustree_node *node, int32 nodeSize, const char *text)
 			:
 			fNode(node),
-			fSize(nodeSize)
+			fSize(nodeSize),
+			fText(text)
 		{
+			Check("integrity check failed on construction.");
 		}
 
 		~NodeChecker()
 		{
-			fNode->CheckIntegrity(fSize);
+			Check("integrity check failed on destruction.");
+		}
+
+		void
+		Check(const char *message)
+		{
+			if (fNode->CheckIntegrity(fSize) < B_OK)
+				dprintf("%s: %s\n", fText, message);
 		}
 
 	private:
-		bplustree_node *fNode;
-		int32	fSize;
+		bplustree_node	*fNode;
+		int32			fSize;
+		const char		*fText;
 };
 #endif
 
@@ -592,6 +602,10 @@ status_t
 BPlusTree::FindKey(bplustree_node *node, const uint8 *key, uint16 keyLength,
 	uint16 *_index, off_t *_next)
 {
+#ifdef DEBUG
+		NodeChecker checker(node, fNodeSize, "find");
+#endif
+
 	if (node->all_key_count == 0) {
 		if (_index)
 			*_index = 0;
@@ -1166,7 +1180,7 @@ BPlusTree::Insert(Transaction &transaction, const uint8 *key, uint16 keyLength, 
 	CachedNode cached(this);
 	while (stack.Pop(&nodeAndKey) && (node = cached.SetTo(nodeAndKey.nodeOffset)) != NULL) {
 #ifdef DEBUG
-		NodeChecker checker(node, fNodeSize);
+		NodeChecker checker(node, fNodeSize, "insert");
 #endif
 		if (node->IsLeaf()) {
 			// first round, check for duplicate entries
@@ -1230,6 +1244,10 @@ BPlusTree::Insert(Transaction &transaction, const uint8 *key, uint16 keyLength, 
 
 				RETURN_ERROR(B_ERROR);
 			}
+#ifdef DEBUG
+			checker.Check("insert split");
+			NodeChecker otherChecker(other, fNodeSize, "insert split other");
+#endif
 
 			UpdateIterators(nodeAndKey.nodeOffset, otherOffset, nodeAndKey.keyIndex,
 				node->NumKeys(), 1);
@@ -1518,7 +1536,7 @@ BPlusTree::Remove(Transaction &transaction, const uint8 *key, uint16 keyLength, 
 	CachedNode cached(this);
 	while (stack.Pop(&nodeAndKey) && (node = cached.SetTo(nodeAndKey.nodeOffset)) != NULL) {
 #ifdef DEBUG
-		NodeChecker checker(node, fNodeSize);
+		NodeChecker checker(node, fNodeSize, "remove");
 #endif
 		if (node->IsLeaf()) {
 			// first round, check for duplicate entries
@@ -2088,7 +2106,7 @@ bplustree_node::FragmentsUsed(uint32 nodeSize)
 
 
 #ifdef DEBUG
-void 
+status_t
 bplustree_node::CheckIntegrity(uint32 nodeSize)
 {
 	if (NumKeys() > nodeSize || AllKeyLength() > nodeSize)
@@ -2098,9 +2116,18 @@ bplustree_node::CheckIntegrity(uint32 nodeSize)
 		uint16 length;
 		uint8 *key = KeyAt(i, &length);
 		if (key + length + sizeof(off_t) + sizeof(uint16) > (uint8 *)this + nodeSize
-			|| length > BPLUSTREE_MAX_KEY_LENGTH)
+			|| length > BPLUSTREE_MAX_KEY_LENGTH) {
+			dprintf("node %p, key %ld\n", this, i);
 			DEBUGGER(("invalid node: keys corrupted"));
+			return B_BAD_DATA;
+		}
+		if (Values()[i] == -1) {
+			dprintf("node %p, value %ld: %Ld\n", this, i, Values()[i]);
+			DEBUGGER(("invalid node: values corrupted"));
+			return B_BAD_DATA;
+		}
 	}
+	return B_OK;
 }
 #endif
 

@@ -3,7 +3,7 @@
  * Roughly based on 'btlib' written by Marcus J. Ranum - it shares
  * no code but achieves binary compatibility with the on disk format.
  *
- * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef B_PLUS_TREE_H
@@ -98,7 +98,7 @@ struct bplustree_node {
 	static inline uint32 FragmentIndex(off_t link);
 
 #ifdef DEBUG
-	void CheckIntegrity(uint32 nodeSize);
+	status_t CheckIntegrity(uint32 nodeSize);
 #endif
 } _PACKED;
 
