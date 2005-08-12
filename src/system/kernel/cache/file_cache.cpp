@@ -162,6 +162,9 @@ add_to_iovec(iovec *vecs, int32 &index, int32 max, addr_t address, size_t size)
 		return;
 	}
 
+	if (index == max)
+		panic("no more space for iovecs!");
+
 	// we need to start a new iovec
 	vecs[index].iov_base = (void *)address;
 	vecs[index].iov_len = size;
@@ -178,7 +181,7 @@ find_file_extent(file_cache_ref *ref, off_t offset, uint32 *_index)
 		file_extent *extent = ref->map[index];
 
 		if (extent->offset <= offset
-			&& extent->offset + extent->disk.length >= offset) {
+			&& extent->offset + extent->disk.length > offset) {
 			if (_index)
 				*_index = index;
 			return extent;
@@ -232,7 +235,7 @@ get_file_map(file_cache_ref *ref, off_t offset, size_t size,
 	}
 
 	vecs[0].offset = fileExtent->disk.offset + offset;
-	vecs[0].length = fileExtent->disk.length - offset;
+	vecs[0].length = fileExtent->disk.length - (offset - fileExtent->offset);
 
 	if (vecs[0].length >= size || index >= ref->map.count - 1) {
 		*_count = 1;
@@ -421,12 +424,16 @@ read_chunk_into_cache(file_cache_ref *ref, off_t offset, size_t size,
 	// allocate pages for the cache and mark them busy
 	for (size_t pos = 0; pos < size; pos += B_PAGE_SIZE) {
 		vm_page *page = pages[pageIndex++] = vm_page_allocate_page(PAGE_STATE_FREE);
+		if (page == NULL)
+			panic("no more pages!");
+
 		page->state = PAGE_STATE_BUSY;
 
 		vm_cache_insert_page(cache, page, offset + pos);
 
 		addr_t virtualAddress;
-		vm_get_physical_page(page->ppn * B_PAGE_SIZE, &virtualAddress, PHYSICAL_PAGE_CAN_WAIT);
+		if (vm_get_physical_page(page->ppn * B_PAGE_SIZE, &virtualAddress, PHYSICAL_PAGE_CAN_WAIT) < B_OK)
+			panic("could not get physical page");
 
 		add_to_iovec(vecs, vecCount, MAX_IO_VECS, virtualAddress, B_PAGE_SIZE);
 		// ToDo: check if the array is large enough!
