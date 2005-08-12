@@ -87,12 +87,7 @@ static int32 rld_sem_count;
 
 
 #ifdef TRACE_RLD
-
-#define	FATAL(x,err,y...) \
-	if (x) { \
-		dprintf("rld.so: " y); \
-		_kern_loading_app_failed(err); \
-	}
+#	define FATAL(x...) dprintf("runtime_loader: " x);
 
 void
 dprintf(const char *format, ...)
@@ -108,13 +103,7 @@ dprintf(const char *format, ...)
 	va_end(list);
 }
 #else
-
-#define	FATAL(x,err,y...) \
-	if (x) { \
-		printf("rld.so: " y); \
-		_kern_loading_app_failed(err); \
-	}
-
+#	define FATAL(x...) printf("runtime_loader: " x);
 #endif
 
 
@@ -267,12 +256,12 @@ parse_elf_header(struct Elf32_Ehdr *eheader, int32 *_pheaderSize, int32 *_sheade
 }
 
 
-static int
+static int32
 count_regions(char const *buff, int phnum, int phentsize)
 {
-	int i;
-	int retval = 0;
 	struct Elf32_Phdr *pheaders;
+	int32 count = 0;
+	int i;
 
 	for (i = 0; i < phnum; i++) {
 		pheaders = (struct Elf32_Phdr *)(buff + i * phentsize);
@@ -282,13 +271,13 @@ count_regions(char const *buff, int phnum, int phentsize)
 				/* NOP header */
 				break;
 			case PT_LOAD:
-				retval += 1;
+				count += 1;
 				if (pheaders->p_memsz != pheaders->p_filesz) {
 					addr_t A = TO_PAGE_SIZE(pheaders->p_vaddr + pheaders->p_memsz);
 					addr_t B = TO_PAGE_SIZE(pheaders->p_vaddr + pheaders->p_filesz);
 
 					if (A != B)
-						retval += 1;
+						count += 1;
 				}
 				break;
 			case PT_DYNAMIC:
@@ -307,13 +296,12 @@ count_regions(char const *buff, int phnum, int phentsize)
 				/* we don't use it */
 				break;
 			default:
-				FATAL(true, B_BAD_DATA, "unhandled pheader type 0x%lx\n",
-					pheaders[i].p_type);
-				break;
+				FATAL("unhandled pheader type 0x%lx\n", pheaders[i].p_type);
+				return B_BAD_DATA;
 		}
 	}
 
-	return retval;
+	return count;
 }
 
 
@@ -353,22 +341,32 @@ create_image(const char *name, const char *path, int num_regions)
 
 
 static void
-delete_image(image_t *image)
+delete_image_struct(image_t *image)
 {
+#ifdef DEBUG
 	size_t size = sizeof(image_t) + (image->num_regions - 1) * sizeof(elf_region_t);
-
-	_kern_unregister_image(image->id);
-		// registered in load_container()
-
 	memset(image->needed, 0xa5, sizeof(image->needed[0]) * image->num_needed);
+#endif
 	rldfree(image->needed);
 
+#ifdef DEBUG
 	memset(image, 0xa5, size);
+#endif
 	rldfree(image);
 }
 
 
 static void
+delete_image(image_t *image)
+{
+	_kern_unregister_image(image->id);
+		// registered in load_container()
+
+	delete_image_struct(image);
+}
+
+
+static status_t
 parse_program_headers(image_t *image, char *buff, int phnum, int phentsize)
 {
 	struct Elf32_Phdr *pheader;
@@ -460,11 +458,12 @@ parse_program_headers(image_t *image, char *buff, int phnum, int phentsize)
 				/* we don't use it */
 				break;
 			default:
-				FATAL(true, B_BAD_DATA, "unhandled pheader type 0x%lx\n",
-					pheader[i].p_type);
-				break;
+				FATAL("unhandled pheader type 0x%lx\n", pheader[i].p_type);
+				return B_BAD_DATA;
 		}
 	}
+
+	return B_OK;
 }
 
 
@@ -502,8 +501,9 @@ remap_images(void)
 			if ((image->regions[i].flags & RFLAG_RW) == 0
 				&& (image->regions[i].flags & RFLAG_REMAPPED) == 0) {
 				// we only need to do this once, so we remember those we've already mapped
-				_kern_set_area_protection(image->regions[i].id, B_READ_AREA | B_EXECUTE_AREA);
-				image->regions[i].flags |= RFLAG_REMAPPED;
+				if (_kern_set_area_protection(image->regions[i].id,
+						B_READ_AREA | B_EXECUTE_AREA) == B_OK)
+					image->regions[i].flags |= RFLAG_REMAPPED;
 			}
 		}
 	}
@@ -834,31 +834,32 @@ register_image(image_t *image, int fd, const char *path)
 }
 
 
-static void
+static status_t
 relocate_image(image_t *image)
 {
 	status_t status = arch_relocate_image(image);
-
-	FATAL(status < B_OK, status, "troubles relocating\n");
+	if (status < B_OK) {
+		FATAL("troubles relocating\n");
+		return status;
+	}
 
 	_kern_image_relocated(image->id);
+	return B_OK;
 }
 
 
-static image_t *
-load_container(char const *name, image_type type, const char *rpath)
+static status_t
+load_container(char const *name, image_type type, const char *rpath, image_t **_image)
 {
 	int32 pheaderSize, sheaderSize;
 	char path[PATH_MAX];
-	int fd;
-	int len;
+	ssize_t length;
 	char ph_buff[4096];
-	int num_regions;
-	bool map_success;
-	bool dynamic_success;
+	int32 numRegions;
 	image_t *found;
 	image_t *image;
 	status_t status;
+	int fd;
 
 	struct Elf32_Ehdr eheader;
 
@@ -868,7 +869,8 @@ load_container(char const *name, image_type type, const char *rpath)
 		found = find_image(name, APP_OR_LIBRARY_TYPE);
 		if (found) {
 			atomic_add(&found->ref_count, 1);
-			return found;
+			*_image = found;
+			return B_OK;
 		}
 	}
 
@@ -876,7 +878,10 @@ load_container(char const *name, image_type type, const char *rpath)
 
 	// Try to load explicit image path first
 	fd = open_executable(path, type, rpath);
-	FATAL((fd < 0), fd, "cannot open file %s\n", path);
+	if (fd < 0) {
+		FATAL("cannot open file %s\n", path);
+		return fd;
+	}
 
 	// If the path is not absolute, we prepend the CWD to make it one.
 	if (path[0] != '/') {
@@ -885,47 +890,82 @@ load_container(char const *name, image_type type, const char *rpath)
 
 		// get the CWD
 		status = _kern_getcwd(path, sizeof(path));
-		FATAL((status != B_OK), status, "_kern_getcwd() failed\n");
+		if (status < B_OK) {
+			FATAL("_kern_getcwd() failed\n");
+			goto err1;
+		}
 
 		if (strlcat(path, "/", sizeof(path)) >= sizeof(path)
 			|| strlcat(path, relativePath, sizeof(path)) >= sizeof(path)) {
-			FATAL(true, B_NAME_TOO_LONG, "Absolute path of image %s is too "
+			status = B_NAME_TOO_LONG;
+			FATAL("Absolute path of image %s is too "
 				"long!\n", relativePath);
+			goto err1;
 		}
 	}
 
-	len = _kern_read(fd, 0, &eheader, sizeof(eheader));
-	FATAL((len != sizeof(eheader)), B_BAD_DATA,
-		"troubles reading ELF header\n");
+	length = _kern_read(fd, 0, &eheader, sizeof(eheader));
+	if (length != sizeof(eheader)) {
+		status = B_NOT_AN_EXECUTABLE;
+		FATAL("troubles reading ELF header\n");
+		goto err1;
+	}
 
 	status = parse_elf_header(&eheader, &pheaderSize, &sheaderSize);
-	FATAL((status < B_OK), status, "incorrect ELF header\n");
+	if (status < B_OK) {
+		FATAL("incorrect ELF header\n");
+		goto err1;
+	}
 
 	// ToDo: what to do about this restriction??
-	FATAL((pheaderSize > (int)sizeof(ph_buff)), B_UNSUPPORTED,
-		"cannot handle Program headers bigger than %lu\n",
-		(long unsigned)sizeof(ph_buff));
+	if (pheaderSize > (int)sizeof(ph_buff)) {
+		FATAL("cannot handle Program headers bigger than %lu\n", sizeof(ph_buff));
+		status = B_UNSUPPORTED;
+		goto err1;
+	}
 
-	len = _kern_read(fd, eheader.e_phoff, ph_buff, pheaderSize);
-	FATAL((len != pheaderSize), B_BAD_DATA,
-		"troubles reading Program headers\n");
+	length = _kern_read(fd, eheader.e_phoff, ph_buff, pheaderSize);
+	if (length != pheaderSize) {
+		FATAL("troubles reading Program headers\n");
+		status = B_BAD_DATA;
+		goto err1;
+	}
 
-	num_regions = count_regions(ph_buff, eheader.e_phnum, eheader.e_phentsize);
-	FATAL((num_regions <= 0), B_BAD_DATA,
-		"troubles parsing Program headers, num_regions= %d\n", num_regions);
+	numRegions = count_regions(ph_buff, eheader.e_phnum, eheader.e_phentsize);
+	if (numRegions <= 0) {
+		FATAL("troubles parsing Program headers, numRegions = %ld\n", numRegions);
+		status = B_BAD_DATA;
+		goto err1;
+	}
 
-	image = create_image(name, path, num_regions);
-	FATAL((!image), B_NO_MEMORY, "failed to allocate image_t control block\n");
+	image = create_image(name, path, numRegions);
+	if (image == NULL) {
+		FATAL("failed to allocate image_t object\n");
+		status = B_NO_MEMORY;
+		goto err1;
+	}
 
-	parse_program_headers(image, ph_buff, eheader.e_phnum, eheader.e_phentsize);
-	FATAL(!assert_dynamic_loadable(image), B_UNSUPPORTED,
-		"dynamic segment must be loadable (implementation restriction)\n");
+	status = parse_program_headers(image, ph_buff, eheader.e_phnum, eheader.e_phentsize);
+	if (status < B_OK)
+		goto err2;
 
-	map_success = map_image(fd, path, image, type == B_APP_IMAGE);
-	FATAL(!map_success, B_ERROR, "troubles reading image\n");
+	if (!assert_dynamic_loadable(image)) {
+		FATAL("dynamic segment must be loadable (implementation restriction)\n");
+		status = B_UNSUPPORTED;
+		goto err2;
+	}
 
-	dynamic_success = parse_dynamic_segment(image);
-	FATAL(!dynamic_success, B_BAD_DATA, "troubles handling dynamic section\n");
+	if (!map_image(fd, path, image, type == B_APP_IMAGE)) {
+		FATAL("troubles reading image\n");
+		status = B_ERROR;
+		goto err2;
+	}
+
+	if (!parse_dynamic_segment(image)) {
+		FATAL("troubles handling dynamic section\n");
+		status = B_BAD_DATA;
+		goto err3;
+	}
 
 	image->entry_point = eheader.e_entry + image->regions[0].delta;
 	image->type = type;
@@ -935,7 +975,16 @@ load_container(char const *name, image_type type, const char *rpath)
 
 	enqueue_image(&gLoadedImages, image);
 
-	return image;
+	*_image = image;
+	return B_OK;
+
+err3:
+	unmap_image(image);
+err2:
+	delete_image_struct(image);
+err1:
+	_kern_close(fd);
+	return status;
 }
 
 
@@ -954,31 +1003,38 @@ find_dt_rpath(image_t *image)
 }
 
 
-static void
+static status_t
 load_dependencies(image_t *image)
 {
 	struct Elf32_Dyn *d = (struct Elf32_Dyn *)image->dynamic_ptr;
-	int needed_offset;
+	int neededOffset;
+	status_t status;
 	uint32 i, j;
 	const char *rpath;
 
 	if (!d || (image->flags & RFLAG_DEPENDENCIES_LOADED))
-		return;
+		return B_OK;
 
 	image->flags |= RFLAG_DEPENDENCIES_LOADED;
 
 	rpath = find_dt_rpath(image);
 
 	image->needed = rldalloc(image->num_needed * sizeof(image_t *));
-	FATAL((!image->needed), B_NO_MEMORY, "failed to allocate needed struct\n");
+	if (image->needed == NULL) {
+		FATAL("failed to allocate needed struct\n");
+		return B_NO_MEMORY;
+	}
 	memset(image->needed, 0, image->num_needed * sizeof(image_t *));
 
 	for (i = 0, j = 0; d[i].d_tag != DT_NULL; i++) {
 		switch (d[i].d_tag) {
 			case DT_NEEDED:
-				needed_offset = d[i].d_un.d_val;
-				image->needed[j] = load_container(STRING(image, needed_offset),
-					B_LIBRARY_IMAGE, rpath);
+				neededOffset = d[i].d_un.d_val;
+				status = load_container(STRING(image, neededOffset),
+					B_LIBRARY_IMAGE, rpath, &image->needed[j]);
+				if (status < B_OK)
+					return status;
+
 				j += 1;
 				break;
 
@@ -990,10 +1046,12 @@ load_dependencies(image_t *image)
 		}
 	}
 
-	FATAL((j != image->num_needed), B_ERROR,
-		"Internal error at load_dependencies()");
+	if (j != image->num_needed) {
+		FATAL("Internal error at load_dependencies()");
+		return B_ERROR;
+	}
 
-	return;
+	return B_OK;
 }
 
 
@@ -1015,13 +1073,16 @@ topological_sort(image_t *image, uint32 slot, image_t **initList,
 }
 
 
-static unsigned
+static uint32
 get_sorted_image_list(image_t *image, image_t ***_list, uint32 sortFlag)
 {
 	image_t **list;
 
 	list = rldalloc(gLoadedImageCount * sizeof(image_t *));
-	FATAL((!list), B_NO_MEMORY, "memory shortage in get_sorted_image_list()");
+	if (list == NULL) {
+		FATAL("memory shortage in get_sorted_image_list()");
+		return 0; // B_NO_MEMORY
+	}
 	memset(list, 0, gLoadedImageCount * sizeof(image_t *));
 
 	*_list = list;
@@ -1029,30 +1090,34 @@ get_sorted_image_list(image_t *image, image_t ***_list, uint32 sortFlag)
 }
 
 
-static void
+static status_t
 relocate_dependencies(image_t *image)
 {
-	unsigned i;
-	unsigned count;
+	uint32 count, i;
 	image_t **list;
 
 	count = get_sorted_image_list(image, &list, RFLAG_RELOCATED);
 
-	for (i = 0; i < count; i++)
-		relocate_image(list[i]);
+	for (i = 0; i < count; i++) {
+		status_t status = relocate_image(list[i]);
+		if (status < B_OK)
+			return status;
+	}
 
 	rldfree(list);
+	return B_OK;
 }
 
 
 static void
 init_dependencies(image_t *image, bool initHead)
 {
-	unsigned i;
-	unsigned count;
 	image_t **initList;
+	uint32 count, i;
 
 	count = get_sorted_image_list(image, &initList, RFLAG_INITIALIZED);
+	if (count == 0)
+		return;
 
 	if (!initHead) {
 		// this removes the "calling" image
@@ -1098,6 +1163,7 @@ put_image(image_t *image)
 image_id
 load_program(char const *path, void **_entry)
 {
+	status_t status;
 	image_t *image;
 	image_t *iter;
 
@@ -1106,13 +1172,22 @@ load_program(char const *path, void **_entry)
 
 	TRACE(("rld: load %s\n", path));
 
-	image = load_container(path, B_APP_IMAGE, NULL);
-
-	for (iter = gLoadedImages.head; iter; iter = iter->next) {
-		load_dependencies(iter);
+	status = load_container(path, B_APP_IMAGE, NULL, &image);
+	if (status < B_OK) {
+		_kern_loading_app_failed(status);
+		rld_unlock();
+		return status;
 	}
 
-	relocate_dependencies(image);
+	for (iter = gLoadedImages.head; iter; iter = iter->next) {
+		status = load_dependencies(iter);
+		if (status < B_OK)
+			goto err;
+	}
+
+	status = relocate_dependencies(image);
+	if (status < B_OK)
+		goto err;
 
 	init_dependencies(gLoadedImages.head, true);
 	remap_images();
@@ -1122,6 +1197,12 @@ load_program(char const *path, void **_entry)
 
 	rld_unlock();
 	return image->id;
+
+err:
+	_kern_loading_app_failed(status);
+	delete_image(image);
+	rld_unlock();
+	return status;
 }
 
 
@@ -1131,6 +1212,7 @@ load_library(char const *path, uint32 flags, bool addOn)
 	image_t *image = NULL;
 	image_t *iter;
 	image_type type = (addOn ? B_ADD_ON_IMAGE : B_LIBRARY_IMAGE);
+	status_t status;
 
 	// ToDo: implement flags
 	(void)flags;
@@ -1149,19 +1231,32 @@ load_library(char const *path, uint32 flags, bool addOn)
 		}
 	}
 
-	image = load_container(path, type, NULL);
-
-	for (iter = gLoadedImages.head; iter; iter = iter->next) {
-		load_dependencies(iter);
+	status = load_container(path, type, NULL, &image);
+	if (status < B_OK) {
+		rld_unlock();
+		return status;
 	}
 
-	relocate_dependencies(image);
+	for (iter = gLoadedImages.head; iter; iter = iter->next) {
+		status = load_dependencies(iter);
+		if (status < B_OK)
+			goto err;
+	}
+
+	status = relocate_dependencies(image);
+	if (status < B_OK)
+		goto err;
 
 	remap_images();
 	init_dependencies(image, true);
 
 	rld_unlock();
 	return image->id;
+
+err:
+	delete_image(image);
+	rld_unlock();
+	return status;
 }
 
 
@@ -1321,8 +1416,10 @@ rldelf_init(void)
 		area_id areaID = _kern_create_area(RUNTIME_LOADER_DEBUG_AREA_NAME,
 			(void **)&area, B_ANY_ADDRESS, size, B_NO_LOCK,
 			B_READ_AREA | B_WRITE_AREA);
-
-		FATAL((areaID < 0), areaID, "Failed to create debug area.\n");
+		if (areaID < B_OK) {
+			FATAL("Failed to create debug area.\n");
+			_kern_loading_app_failed(areaID);
+		}
 
 		area->loaded_images = &gLoadedImages;
 	}
