@@ -507,6 +507,15 @@ BFile::get_fd() const
 	return fFd;
 }
 
+// close_fd
+/*!	Overrides BNode::close_fd() solely for R5 binary compatibility.
+*/
+void
+BFile::close_fd()
+{
+	BNode::close_fd();
+}
+
 
 #ifdef USE_OPENBEOS_NAMESPACE
 };		// namespace OpenBeOS

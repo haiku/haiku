@@ -72,6 +72,7 @@ private:
 
 private:
 	int get_fd() const;
+	virtual void close_fd();
 
 private:
 	//! The file's open mode.
