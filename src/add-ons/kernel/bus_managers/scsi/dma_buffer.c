@@ -29,7 +29,8 @@
 #include <string.h>
 
 
-// check whether S/G list of request is supported DMA controller
+/**	check whether S/G list of request is supported DMA controller */
+
 static bool
 is_sg_list_dma_safe(scsi_ccb *request) 
 {
@@ -40,10 +41,10 @@ is_sg_list_dma_safe(scsi_ccb *request)
 	uint32 alignment = bus->dma_params.alignment;
 	uint32 max_sg_block_size = bus->dma_params.max_sg_block_size;
 	uint32 cur_idx;
-	
+
 	// not too many S/G list entries
-	if( sg_count > bus->dma_params.max_sg_blocks ) {
-		SHOW_FLOW0( 0, "S/G-list too long" );
+	if (sg_count > bus->dma_params.max_sg_blocks) {
+		SHOW_FLOW0(1, "S/G-list too long");
 		return false;
 	}
 		
@@ -52,41 +53,41 @@ is_sg_list_dma_safe(scsi_ccb *request)
 		return true;
 
 	// argh - controller is a bit picky, so make sure he likes us
-	for( cur_idx = sg_count; cur_idx >= 1; --cur_idx, ++sg_list ) {
+	for (cur_idx = sg_count; cur_idx >= 1; --cur_idx, ++sg_list) {
 		addr_t max_len;
 
 		// calculate space upto next dma boundary crossing and
 		// verify that it isn't crossed
 		max_len = (dma_boundary + 1) - 
 			((addr_t)sg_list->address & dma_boundary);
-			
-		if( max_len < sg_list->size ) {
-			SHOW_FLOW( 0, "S/G-entry crosses DMA boundary @0x%x", 
+
+		if (max_len < sg_list->size) {
+			SHOW_FLOW(0, "S/G-entry crosses DMA boundary @0x%x", 
 				(int)sg_list->address + (int)max_len);
 			return false;
 		}
-		
+
 		// check both begin and end of entry for alignment
-		if( ((addr_t)sg_list->address & alignment) != 0 ) {
-			SHOW_FLOW( 0, "S/G-entry has bad alignment @0x%x",
-				(int)sg_list->address );
+		if (((addr_t)sg_list->address & alignment) != 0) {
+			SHOW_FLOW(0, "S/G-entry has bad alignment @0x%x",
+				(int)sg_list->address);
 			return false;
 		}
-		
-		if( (((addr_t)sg_list->address + sg_list->size) & alignment) != 0 ) {
-			SHOW_FLOW( 0, "end of S/G-entry has bad alignment @0x%x",
-				(int)sg_list->address + (int)sg_list->size );
+
+		if ((((addr_t)sg_list->address + sg_list->size) & alignment) != 0) {
+			SHOW_FLOW(0, "end of S/G-entry has bad alignment @0x%x",
+				(int)sg_list->address + (int)sg_list->size);
 			return false;
 		}
-		
+
 		// verify entry size
-		if( sg_list->size > max_sg_block_size ) {
-			SHOW_FLOW( 0, "S/G-entry is too long (%d/%d bytes)",
-				(int)sg_list->size, (int)max_sg_block_size );
+		if (sg_list->size > max_sg_block_size) {
+			SHOW_FLOW(0, "S/G-entry is too long (%d/%d bytes)",
+				(int)sg_list->size, (int)max_sg_block_size);
 			return false;
 		}
 	}
-	
+
 	return true;
 }
 
@@ -101,7 +102,7 @@ scsi_copy_dma_buffer(scsi_ccb *request, uint32 size, bool to_buffer)
 	uint32 num_vecs = buffer->sg_cnt_orig;
 	char *buffer_data = buffer->address;
 
-	SHOW_FLOW(0, "to_buffer=%d, %d bytes", to_buffer, (int)size);
+	SHOW_FLOW(1, "to_buffer=%d, %d bytes", to_buffer, (int)size);
 
 	// survive even if controller returned invalid data size
 	size = min(size, request->data_len);
@@ -109,53 +110,56 @@ scsi_copy_dma_buffer(scsi_ccb *request, uint32 size, bool to_buffer)
 	// we have to use S/G list to original data; the DMA buffer
 	// was allocated in kernel and is thus visible even if the thread
 	// was changed
-	for( ; size > 0 && num_vecs > 0; ++sg_list, --num_vecs ) {
+	for (; size > 0 && num_vecs > 0; ++sg_list, --num_vecs) {
 		size_t bytes;
 		void *virt_addr;
 		
 		bytes = min( size, sg_list->size );
 
-		if( map_mainmemory( (addr_t)sg_list->address, &virt_addr ) != B_OK ) 
+		if (map_mainmemory((addr_t)sg_list->address, &virt_addr) != B_OK)
 			return false;
-				
-		if( to_buffer )
-			memcpy( buffer_data, virt_addr, bytes );
+
+		if (to_buffer)
+			memcpy(buffer_data, virt_addr, bytes);
 		else
-			memcpy( virt_addr, buffer_data, bytes );
-		
-		unmap_mainmemory( virt_addr );
-		
+			memcpy(virt_addr, buffer_data, bytes);
+
+		unmap_mainmemory(virt_addr);
+
 		buffer_data += bytes;
 	}
-		
+	
 	return true;
 }
 
 
-// get log2
-static int log2( uint32 x )
+static int
+log2(uint32 x)
 {
 	int y;
-	
-	for( y = 31; y >= 0; --y )
-		if( x == ((uint32)1 << y) )
+
+	for (y = 31; y >= 0; --y) {
+		if (x == ((uint32)1 << y))
 			break;
-			
+	}
+
 	return y;
 }
 
-static void scsi_free_dma_buffer( dma_buffer *buffer )
-{
-	if( buffer->area > 0 ) {
-		SHOW_FLOW0( 0, "Destroying buffer" );
 
-		delete_area( buffer->area );
+static void
+scsi_free_dma_buffer(dma_buffer *buffer)
+{
+	if (buffer->area > 0) {
+		SHOW_FLOW0(1, "Destroying buffer");
+
+		delete_area(buffer->area);
 		buffer->area = 0;
 		buffer->size = 0;
 	}
-	
-	if( buffer->sg_list_area > 0 ) {
-		delete_area( buffer->sg_list_area );
+
+	if (buffer->sg_list_area > 0) {
+		delete_area(buffer->sg_list_area);
 		buffer->sg_list_area = 0;
 	}
 }
@@ -180,38 +184,36 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 	
 	// calculate worst case number of S/G entries, i.e. if they are non-continuous;
 	// there is a controller limit and a limit by our own S/G manager to check
-	if( size / B_PAGE_SIZE > dma_params->max_sg_blocks || 
-		size / B_PAGE_SIZE > MAX_TEMP_SG_FRAGMENTS ) 
-	{
+	if (size / B_PAGE_SIZE > dma_params->max_sg_blocks
+		|| size / B_PAGE_SIZE > MAX_TEMP_SG_FRAGMENTS) {
 		uint32 boundary = dma_params->dma_boundary;
 		uchar *dma_buffer_address_unaligned;
-		
-		// alright - a contiguous buffer is required to keep S/G table short
-		SHOW_INFO( 0, "need to setup contiguous DMA buffer of size %d", 
-			(int)size );
 
+		// alright - a contiguous buffer is required to keep S/G table short
+		SHOW_INFO(1, "need to setup contiguous DMA buffer of size %d", 
+			(int)size);
 
 		// verify that we don't get problems with dma boundary
 		if (boundary != ~0UL) {
-			if( size > boundary + 1 ) {
-				SHOW_ERROR( 2, "data is longer then maximum DMA transfer len (%d/%d bytes)", 
-					(int)size, (int)boundary + 1 );
+			if (size > boundary + 1) {
+				SHOW_ERROR(2, "data is longer then maximum DMA transfer len (%d/%d bytes)", 
+					(int)size, (int)boundary + 1);
 				return false;
 			}
-		
+
 			// round up to next power of two and allocate a buffer double the 
 			// needed size so we can cut out an area that doesn't cross 
 			// dma boundary
 			size = (1 << log2( size )) * 2;
 		}
-		
-		buffer->area = create_area( "DMA buffer", 
+
+		buffer->area = create_area("DMA buffer", 
 			(void **)&dma_buffer_address_unaligned, 
 			B_ANY_KERNEL_ADDRESS, size,
 			B_FULL_LOCK | B_CONTIGUOUS, 0 );
-		if( buffer->area < 0 ) {
-			SHOW_ERROR( 2, "Cannot create contignous DMA buffer of %d bytes", 
-				(int)size );
+		if (buffer->area < 0) {
+			SHOW_ERROR(2, "Cannot create contignous DMA buffer of %d bytes", 
+				(int)size);
 			return false;
 		}
 
@@ -221,7 +223,7 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 			// boundary case: cut out piece aligned on "size"
 			buffer->address = (uchar *)(
 				((addr_t)dma_buffer_address_unaligned + size - 1) & ~(size - 1));
-		
+
 			// determine how many bytes are available until next DMA boundary
 			next_boundary = (uchar *)(((addr_t)buffer->address + boundary - 1) &
 				~(boundary - 1));
@@ -242,9 +244,9 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 			(void **)&buffer->address, 
 			B_ANY_KERNEL_ADDRESS, size,
 			B_FULL_LOCK, 0 );
-		if( buffer->area < 0 ) {
-			SHOW_ERROR( 2, "Cannot create DMA buffer of %d bytes", 
-				(int)size );
+		if (buffer->area < 0) {
+			SHOW_ERROR(2, "Cannot create DMA buffer of %d bytes", 
+				(int)size);
 			return false;
 		}
 		
@@ -257,15 +259,15 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 	// create_area has page-granularity
 	sg_list_size = (sg_list_size + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 	
-	buffer->sg_list_area = create_area( "DMA buffer S/G table",
+	buffer->sg_list_area = create_area("DMA buffer S/G table",
 		(void **)&buffer->sg_list,
 		B_ANY_KERNEL_ADDRESS, sg_list_size,
-		B_FULL_LOCK, 0 );
-	if( buffer->sg_list_area < 0 ) {
+		B_FULL_LOCK, 0);
+	if (buffer->sg_list_area < 0) {
 		SHOW_ERROR( 2, "Cannot craete DMA buffer S/G list of %d bytes",
 			(int)sg_list_size );
-			
-		delete_area( buffer->area );
+
+		delete_area(buffer->area);
 		buffer->area = 0;
 		return false;
 	}
@@ -286,88 +288,99 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 			&mapped_len );
 			
 		if( res != B_OK || mapped_len != buffer->size ) {
-			SHOW_ERROR( 0, "Error creating S/G list for DMA buffer (%s; wanted %d, got %d bytes)",
-				strerror( res ), (int)mapped_len, (int)buffer->size );
+			SHOW_ERROR(0, "Error creating S/G list for DMA buffer (%s; wanted %d, got %d bytes)",
+				strerror(res), (int)mapped_len, (int)buffer->size);
 		}
 	}
-	
+
 	return true;
 }
 
-static void scsi_free_dma_buffer_sg_orig( dma_buffer *buffer )
+
+static void
+scsi_free_dma_buffer_sg_orig(dma_buffer *buffer)
 {
-	if( buffer->sg_orig > 0 ) {
-		delete_area( buffer->sg_orig );
+	if (buffer->sg_orig > 0) {
+		delete_area(buffer->sg_orig);
 		buffer->sg_orig = 0;
 		buffer->sg_cnt_max_orig = 0;
 	}
 }
 
 
-// allocate S/G list to original data
-static bool scsi_alloc_dma_buffer_sg_orig( dma_buffer *buffer, int size )
+/** allocate S/G list to original data */
+
+static bool
+scsi_alloc_dma_buffer_sg_orig(dma_buffer *buffer, int size)
 {
 	// free old list first	
-	scsi_free_dma_buffer_sg_orig( buffer );
-	
-	size = (size * sizeof( physical_entry ) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
-	
-	buffer->sg_orig = create_area( "S/G to original data", 
+	scsi_free_dma_buffer_sg_orig(buffer);
+
+	size = (size * sizeof(physical_entry) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+
+	buffer->sg_orig = create_area("S/G to original data", 
 		(void **)&buffer->sg_list_orig, 
 		B_ANY_KERNEL_ADDRESS, size,
-		B_NO_LOCK, 0 );
-	if( buffer->sg_orig < 0 ) {
-		SHOW_ERROR( 2, "Cannot S/G list buffer to original data of %d bytes", 
-			(int)size );
+		B_NO_LOCK, 0);
+	if (buffer->sg_orig < 0) {
+		SHOW_ERROR(2, "Cannot S/G list buffer to original data of %d bytes", 
+			(int)size);
 		return false;
 	}
-	
-	buffer->sg_cnt_max_orig = size / sizeof( physical_entry );
-	
-	SHOW_INFO( 3, "Got up to %d S/G entries to original data",
-		(int)buffer->sg_cnt_max_orig );
+
+	buffer->sg_cnt_max_orig = size / sizeof(physical_entry);
+
+	SHOW_INFO(3, "Got up to %d S/G entries to original data",
+		(int)buffer->sg_cnt_max_orig);
 
 	return true;
 }
 
 
-// helper: dump S/G table
-static void dump_sg_table( const physical_entry *sg_list,
-	uint32 sg_list_count )
+/** helper: dump S/G table */
+
+static void
+dump_sg_table(const physical_entry *sg_list,
+	uint32 sg_list_count)
 {
 	uint32 cur_idx;
-	
-	SHOW_FLOW( 0, "count=%d", (int)sg_list_count );
-	
-	for( cur_idx = sg_list_count; cur_idx >= 1; --cur_idx, ++sg_list ) {
-		SHOW_FLOW( 0, "addr=%x, size=%d", (int)sg_list->address,
-			(int)sg_list->size );
+
+	SHOW_FLOW(1, "count=%d", (int)sg_list_count);
+
+	for (cur_idx = sg_list_count; cur_idx >= 1; --cur_idx, ++sg_list) {
+		SHOW_FLOW(1, "addr=%x, size=%d", (int)sg_list->address,
+			(int)sg_list->size);
 	}
 }
 
 
-// compose S/G list to original data of request
-static bool scsi_dma_buffer_compose_sg_orig( dma_buffer *buffer, scsi_ccb *request )
+/**	compose S/G list to original data of request */
+
+static bool
+scsi_dma_buffer_compose_sg_orig(dma_buffer *buffer, scsi_ccb *request)
 {
 	// enlarge buffer is required
-	if( buffer->sg_cnt_max_orig < request->sg_cnt ) {
-		if( !scsi_alloc_dma_buffer_sg_orig( buffer, request->sg_cnt ))
+	if (buffer->sg_cnt_max_orig < request->sg_cnt) {
+		if (!scsi_alloc_dma_buffer_sg_orig(buffer, request->sg_cnt))
 			return false;
 	}
-	
-	SHOW_FLOW0( 0, "copy S/G list" );
-	
-	memcpy( buffer->sg_list_orig, request->sg_list, 
-		request->sg_cnt * sizeof( physical_entry ));
-		
+
+	SHOW_FLOW0(1, "copy S/G list");
+
+	memcpy(buffer->sg_list_orig, request->sg_list, 
+		request->sg_cnt * sizeof(physical_entry));
+
 	buffer->sg_cnt_orig = request->sg_cnt;
 	return true;		
 }
 
 
-// init DMA buffer and copy data to it if required
-// note: S/G list of request must already be setup
-bool scsi_get_dma_buffer( scsi_ccb *request )
+/**	init DMA buffer and copy data to it if required
+ *	note: S/G list of request must already be setup
+ */
+
+bool
+scsi_get_dma_buffer(scsi_ccb *request)
 {
 	scsi_device_info *device = request->device;
 	dma_buffer *buffer;
@@ -377,47 +390,45 @@ bool scsi_get_dma_buffer( scsi_ccb *request )
 	// perhaps we have luck and no buffering is needed
 	if( is_sg_list_dma_safe( request ))		
 		return true;
-		
-	SHOW_FLOW0( 0, "Buffer is not DMA safe" );
-	
-	dump_sg_table( request->sg_list, request->sg_cnt );
+
+	SHOW_FLOW0(1, "Buffer is not DMA safe" );
+
+	dump_sg_table(request->sg_list, request->sg_cnt);
 
 	// only one buffer at a time	
-	acquire_sem( device->dma_buffer_owner );
-	
+	acquire_sem(device->dma_buffer_owner);
+
 	// make sure, clean-up daemon doesn't bother us
-	ACQUIRE_BEN( &device->dma_buffer_lock );
-	
+	ACQUIRE_BEN(&device->dma_buffer_lock);
+
 	// there is only one buffer, so no further management
 	buffer = &device->dma_buffer;
 	
 	buffer->inuse = true;	
 	
-	RELEASE_BEN( &device->dma_buffer_lock );
-	
+	RELEASE_BEN(&device->dma_buffer_lock);
+
 	// memorize buffer for cleanup
 	request->dma_buffer = buffer;
-	
+
 	// enlarge buffer if too small
-	if( buffer->size < request->data_len ) {
-		if( !scsi_alloc_dma_buffer( buffer, &device->bus->dma_params, 
-			request->data_len ))
-		{
+	if (buffer->size < request->data_len) {
+		if (!scsi_alloc_dma_buffer(buffer, &device->bus->dma_params,
+				request->data_len))
 			goto err;
-		}
 	}
 
 	// create S/G to original data (necessary for copying from-buffer on end
 	// of request, but also used during copying to-buffer in a second because
 	// of lazyness)
-	scsi_dma_buffer_compose_sg_orig( &device->dma_buffer, request );
+	scsi_dma_buffer_compose_sg_orig(&device->dma_buffer, request);
 
-	// copy data to buffer	
-	if( (request->flags & SCSI_DIR_MASK) == SCSI_DIR_OUT ) {
-		if( !scsi_copy_dma_buffer( request, request->data_len, true ))
+	// copy data to buffer
+	if ((request->flags & SCSI_DIR_MASK) == SCSI_DIR_OUT) {
+		if (!scsi_copy_dma_buffer( request, request->data_len, true))
 			goto err;
 	}
-	
+
 	// replace data address, so noone notices that a buffer is used
 	buffer->orig_data = request->data;
 	buffer->orig_sg_list = request->sg_list;
@@ -426,44 +437,46 @@ bool scsi_get_dma_buffer( scsi_ccb *request )
 	request->data = buffer->address;
 	request->sg_list = buffer->sg_list;
 	request->sg_cnt = buffer->sg_cnt;
-	
-	SHOW_INFO( 0, "bytes: %d", (int)request->data_len );
 
-	SHOW_INFO0( 3, "we can start now" );
-	
+	SHOW_INFO(1, "bytes: %d", (int)request->data_len);
+	SHOW_INFO0(3, "we can start now");
+
 	request->buffered = true;
 	return true;
 
 err:
-	SHOW_INFO0( 3, "error setting up DMA buffer" );
-	
-	ACQUIRE_BEN( &device->dma_buffer_lock );
-	
+	SHOW_INFO0(3, "error setting up DMA buffer");
+
+	ACQUIRE_BEN(&device->dma_buffer_lock);
+
 	// some of this is probably not required, but I'm paranoid
 	buffer->inuse = false;
 
-	RELEASE_BEN( &device->dma_buffer_lock );
-	release_sem( device->dma_buffer_owner );
+	RELEASE_BEN(&device->dma_buffer_lock);
+	release_sem(device->dma_buffer_owner);
 
 	return false;	
 }
 
 
-// copy data back and release DMA buffer;
-// you must have called cleanup_tmp_sg before
-void scsi_release_dma_buffer( scsi_ccb *request )
+/**	copy data back and release DMA buffer;
+ *	you must have called cleanup_tmp_sg before
+ */
+
+void
+scsi_release_dma_buffer(scsi_ccb *request)
 {
 	scsi_device_info *device = request->device;
 	dma_buffer *buffer = request->dma_buffer;
 	
-	SHOW_FLOW( 0, "Buffering finished, %x, %x", 
+	SHOW_FLOW(1, "Buffering finished, %x, %x", 
 		request->subsys_status & SCSI_SUBSYS_STATUS_MASK,
-		(int)(request->flags & SCSI_DIR_MASK) );
+		(int)(request->flags & SCSI_DIR_MASK));
 
 	// copy data from buffer if required and if operation succeeded
-	if( (request->subsys_status & SCSI_SUBSYS_STATUS_MASK) == SCSI_REQ_CMP &&
-		(request->flags & SCSI_DIR_MASK) == SCSI_DIR_IN )
-		scsi_copy_dma_buffer( request, request->data_len - request->data_resid, false );
+	if ((request->subsys_status & SCSI_SUBSYS_STATUS_MASK) == SCSI_REQ_CMP
+		&& (request->flags & SCSI_DIR_MASK) == SCSI_DIR_IN)
+		scsi_copy_dma_buffer(request, request->data_len - request->data_resid, false );
 		
 	// restore request	
 	request->data = buffer->orig_data;
@@ -471,46 +484,51 @@ void scsi_release_dma_buffer( scsi_ccb *request )
 	request->sg_cnt = buffer->orig_sg_cnt;
 	
 	// free buffer
-	ACQUIRE_BEN( &device->dma_buffer_lock );
+	ACQUIRE_BEN(&device->dma_buffer_lock);
 
 	buffer->last_use = system_time();
 	buffer->inuse = false;
-	
-	RELEASE_BEN( &device->dma_buffer_lock );
-	
-	release_sem( device->dma_buffer_owner );
-	
+
+	RELEASE_BEN(&device->dma_buffer_lock);
+
+	release_sem(device->dma_buffer_owner);
+
 	request->buffered = false;
 }
 
 
-// dameon that deletes DMA buffer if not used for some time
-void scsi_dma_buffer_daemon( void *dev, int counter )
+/** dameon that deletes DMA buffer if not used for some time */
+
+void
+scsi_dma_buffer_daemon(void *dev, int counter)
 {
 	scsi_device_info *device = dev;
 	dma_buffer *buffer;
 
-	ACQUIRE_BEN( &device->dma_buffer_lock );
+	ACQUIRE_BEN(&device->dma_buffer_lock);
 
 	buffer = &device->dma_buffer;
 
-	if( !buffer->inuse &&
-		buffer->last_use - system_time() > SCSI_DMA_BUFFER_CLEANUP_DELAY ) 
-	{
-		scsi_free_dma_buffer( buffer );
-		scsi_free_dma_buffer_sg_orig( buffer );		
+	if (!buffer->inuse
+		&& buffer->last_use - system_time() > SCSI_DMA_BUFFER_CLEANUP_DELAY) {
+		scsi_free_dma_buffer(buffer);
+		scsi_free_dma_buffer_sg_orig(buffer);
 	}
-	
-	RELEASE_BEN( &device->dma_buffer_lock );
+
+	RELEASE_BEN(&device->dma_buffer_lock);
 }
 
-void scsi_dma_buffer_free( dma_buffer *buffer )
+
+void
+scsi_dma_buffer_free(dma_buffer *buffer)
 {
-	scsi_free_dma_buffer( buffer );
-	scsi_free_dma_buffer_sg_orig( buffer );
+	scsi_free_dma_buffer(buffer);
+	scsi_free_dma_buffer_sg_orig(buffer);
 }
 
-void scsi_dma_buffer_init( dma_buffer *buffer )
+
+void
+scsi_dma_buffer_init(dma_buffer *buffer)
 {
 	buffer->area = 0;
 	buffer->size = 0;
