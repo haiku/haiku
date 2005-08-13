@@ -99,6 +99,18 @@ StdBinCommands
 	: be libmail.so
 	;
 
+# Oddball standard commands that have a resource file or something else
+# unusual, but aren't complex enough to have their own subdirectory.
+StdBinCommands
+	bemailtombox.cpp
+	: be
+	: bemailtombox.rdef
+	;
+Package haiku-maildaemon-cvs :
+	bemailtombox :
+	boot home config bin ;
+
+# Finally (must come after all the compile related rules), all the subdirectories that are worth compiling.
 SubInclude OBOS_TOP src bin addattr ;
 SubInclude OBOS_TOP src bin bash ;
 SubInclude OBOS_TOP src bin bc ;

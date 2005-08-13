@@ -229,7 +229,7 @@ void AGMSBayesianSpamFilterConfig::AttachedToWindow ()
 	// Add the box displaying the genuine cutoff ratio, on a line by itself.
 
 	tempStringPntr = "Genuine below and uncertain above:";
-	sprintf (numberString, "%06.4f", (double) fGenuineCutoffRatio);
+	sprintf (numberString, "%08.6f", (double) fGenuineCutoffRatio);
 	fGenuineCutoffRatioTextBoxPntr = new BTextControl (
 		tempRect,
 		"genuinecutoffratio",
