@@ -234,8 +234,9 @@ get_file_map(file_cache_ref *ref, off_t offset, size_t size,
 		return B_OK;
 	}
 
+	offset -= fileExtent->offset;
 	vecs[0].offset = fileExtent->disk.offset + offset;
-	vecs[0].length = fileExtent->disk.length - (offset - fileExtent->offset);
+	vecs[0].length = fileExtent->disk.length - offset;
 
 	if (vecs[0].length >= size || index >= ref->map.count - 1) {
 		*_count = 1;
@@ -247,7 +248,6 @@ get_file_map(file_cache_ref *ref, off_t offset, size_t size,
 	size -= vecs[0].length;
 
 	for (index = 1; index < ref->map.count;) {
-		// ToDo: this needs to be tested!
 		fileExtent++;
 
 		vecs[index] = fileExtent->disk;
@@ -288,7 +288,7 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 	// ToDo: handle array overflow gracefully!
 
 #ifdef TRACE_FILE_CACHE
-	dprintf("got %lu file vecs:\n", fileVecCount);
+	dprintf("got %lu file vecs for %Ld:%lu:\n", fileVecCount, offset, numBytes);
 	for (size_t i = 0; i < fileVecCount; i++)
 		dprintf("[%lu] offset = %Ld, size = %Ld\n", i, fileVecs[i].offset, fileVecs[i].length);
 #endif
