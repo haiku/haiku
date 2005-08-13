@@ -43,7 +43,8 @@ else
 # Reset the relevant parts of the MIME database
         setmime -remove application/x-vnd.Be-POST; mimeset /system/servers/mail_daemon
         setmime -remove application/x-vnd.Be-MAIL; mimeset /boot/beos/apps/BeMail
-        mimeset ~/config/bin/spamdbm
+        setmime -remove application/x-vnd.agmsmith.AGMSBayesianSpamServer
+        setmime -remove application/x-vnd.agmsmith.spamdbm ; mimeset ~/config/bin/spamdbm
         setmime -set text/x-email -preferredApp /boot/beos/apps/BeMail -preferredAppSig application/x-vnd.Be-MAIL
         setmime -set text/x-vnd.be-maildraft -preferredApp /boot/beos/apps/BeMail -preferredAppSig application/x-vnd.Be-MAIL
         setmime -set text/x-partial-email -preferredApp /boot/beos/system/servers/mail_daemon -preferredAppSig application/x-vnd.Be-POST
