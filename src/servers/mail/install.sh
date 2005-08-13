@@ -9,10 +9,10 @@ Choose 'Backup' if you wish to keep your old mail_daemon, E-mail preferences app
 if [[ $RETURN = Purge ]]
 then
 	# note: we don't remove libmail.so, because it doesn't matter here, and there may be symlinks and things
-	query -a 'BEOS:APP_SIG == "application/x-vnd.Be-POST" || BEOS:APP_SIG == "application/x-vnd.Be-mprf" || BEOS:APP_SIG == "application/x-vnd.Be-MAIL" || BEOS:APP_SIG == "application/x-vnd.agmsmith.AGMSBayesianSpamServer"' | grep -v "`/bin/pwd`" | xargs rm -f
+	query -a 'BEOS:APP_SIG == "application/x-vnd.Be-POST" || BEOS:APP_SIG == "application/x-vnd.Be-mprf" || BEOS:APP_SIG == "application/x-vnd.Be-MAIL" || BEOS:APP_SIG == "application/x-vnd.agmsmith.spamdbm" || BEOS:APP_SIG == "application/x-vnd.agmsmith.AGMSBayesianSpamServer"' | grep -v "`/bin/pwd`" | xargs rm -f
 elif [[ $RETURN = Backup ]]
 then
-	query -a 'BEOS:APP_SIG == "application/x-vnd.Be-POST" || BEOS:APP_SIG == "application/x-vnd.Be-mprf" || BEOS:APP_SIG == "application/x-vnd.Be-MAIL" || BEOS:APP_SIG == "application/x-vnd.agmsmith.AGMSBayesianSpamServer" || name == libmail.so' | grep -v "`/bin/pwd`" | xargs zip -ym /boot/home/maildaemon.zip
+	query -a 'BEOS:APP_SIG == "application/x-vnd.Be-POST" || BEOS:APP_SIG == "application/x-vnd.Be-mprf" || BEOS:APP_SIG == "application/x-vnd.Be-MAIL" || BEOS:APP_SIG == "application/x-vnd.agmsmith.spamdbm" || BEOS:APP_SIG == "application/x-vnd.agmsmith.AGMSBayesianSpamServer" || name == libmail.so' | grep -v "`/bin/pwd`" | xargs zip -ym /boot/home/maildaemon.zip
 else
 	alert "No backup will be done.  That means it's up to YOU to purge all of your old mail_daemons and ensure that the new version is the only version."
 	exit -1
@@ -22,6 +22,8 @@ if [ -n "$TTY" ]
 then
     quit "application/x-vnd.Be-POST"
     quit "application/x-vnd.Be-TSKB"
+    quit "application/x-vnd.agmsmith.AGMSBayesianSpamServer"
+    quit "application/x-vnd.agmsmith.spamdbm"
     unzip -d / install.zip
     /boot/beos/system/Deskbar > /dev/null &
 else
@@ -30,6 +32,8 @@ else
     then
         quit "application/x-vnd.Be-POST"
         quit "application/x-vnd.Be-TSKB"
+        quit "application/x-vnd.agmsmith.AGMSBayesianSpamServer"
+        quit "application/x-vnd.agmsmith.spamdbm"
 
         rm /boot/home/config/add-ons/mail_daemon/inbound_filters/AGMSBayesianSpamFilter
         rm /boot/home/config/lib/libtextencoding.so
@@ -39,7 +43,7 @@ else
 # Reset the relevant parts of the MIME database
         setmime -remove application/x-vnd.Be-POST; mimeset /system/servers/mail_daemon
         setmime -remove application/x-vnd.Be-MAIL; mimeset /boot/beos/apps/BeMail
-        mimeset ~/config/bin/AGMSBayesianSpamServer
+        mimeset ~/config/bin/spamdbm
         setmime -set text/x-email -preferredApp /boot/beos/apps/BeMail -preferredAppSig application/x-vnd.Be-MAIL
         setmime -set text/x-vnd.be-maildraft -preferredApp /boot/beos/apps/BeMail -preferredAppSig application/x-vnd.Be-MAIL
         setmime -set text/x-partial-email -preferredApp /boot/beos/system/servers/mail_daemon -preferredAppSig application/x-vnd.Be-POST
@@ -63,6 +67,9 @@ if test ! -e ~/config/lib/libssl.so && test -e ~/config/lib/libssl.so.0.9.7; the
 	ln -s ~/config/lib/libssl.so.0.9.7 ~/config/lib/libssl.so
 	ln -s ~/config/lib/libcrypto.so.0.9.7 ~/config/lib/libcrypto.so
 fi
+
+# Set up the spam database manager file types and sound file names, make spam indices.
+spamdbm InstallThings
 
 # Launch prefs if this is a new install of MDR
 if test !  -e "/boot/home/config/settings/Mail/chains";	then

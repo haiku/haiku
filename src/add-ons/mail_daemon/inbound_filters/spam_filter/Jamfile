@@ -15,5 +15,5 @@ Package haiku-maildaemon-cvs :
 	boot home config add-ons mail_daemon inbound_filters ;
 
 Package haiku-maildaemon-cvs :
-	spamfilter : 
+	spamdbm : 
 	boot home config bin ;

@@ -111,7 +111,7 @@ const char *kRedoStrings[] = {
 // Spam related globals.
 static bool			 gShowSpamGUI = true;
 static BMessenger	 gMessengerToSpamServer;
-static const char	*kSpamServerSignature = "application/x-vnd.agmsmith.AGMSBayesianSpamServer";
+static const char	*kSpamServerSignature = "application/x-vnd.agmsmith.spamdbm";
 
 static const char *kDraftPath = "mail/draft";
 static const char *kDraftType = "text/x-vnd.Be-MailDraft";
@@ -3628,7 +3628,7 @@ TMailWindow::TrainMessageAs(const char *CommandWord)
 				directory_which places[] = {B_COMMON_BIN_DIRECTORY,B_BEOS_BIN_DIRECTORY};
 				for (int32 i = 0; i < 2; i++) {
 					find_directory(places[i],&path);
-					path.Append("spamfilter");
+					path.Append("spamdbm");
 					if (!BEntry(path.Path()).Exists())
 						continue;
 					get_ref_for_path(path.Path(),&ref);

@@ -69,6 +69,21 @@
  * assume that the file will always be in SVN, and not some other source
  * control system, as if!).
  *
+ * r13951 | agmsmith | 2005-08-13 11:40:01 -0400 (Sat, 13 Aug 2005) | 2 lines
+ * Had to do the file rename as a separate operation due to SVN limitations.
+ *
+ * r13950 | agmsmith | 2005-08-13 11:38:44 -0400 (Sat, 13 Aug 2005) | 3 lines
+ * Oops, "spamdb" is already used for a Unix package.  And spamdatabase is
+ * already reserved by a domain name squatter.  Use "spamdbm" instead.
+ *
+ * r13949 | agmsmith | 2005-08-13 11:17:52 -0400 (Sat, 13 Aug 2005) | 3 lines
+ * Renamed spamfilter to be the more meaningful spamdb (spam database) and
+ * moved it into its own source directory in preparation for adding resources.
+ *
+ * r13628 | agmsmith | 2005-07-10 20:11:29 -0400 (Sun, 10 Jul 2005) | 3 lines
+ * Updated keyword expansion to use SVN keywords.  Also seeing if svn is
+ * working well enough for me to update files from BeOS R5.
+ *
  * r11909 | axeld | 2005-03-18 19:09:19 -0500 (Fri, 18 Mar 2005) | 2 lines
  * Moved bin/ directory out of apps/.
  *
@@ -483,30 +498,30 @@ static float g_PopUpMenuHeight;       /* Again for pop-up menus. */
 static float g_TextBoxHeight;         /* Ditto for editable text controls. */
 
 static const char *g_ABSAppSignature =
-  "application/x-vnd.agmsmith.AGMSBayesianSpamServer";
+  "application/x-vnd.agmsmith.spamdbm";
 
 static const char *g_ABSDatabaseFileMIMEType =
   "text/x-vnd.agmsmith.spam_probability_database";
 
 static const char *g_DefaultDatabaseFileName =
-  "AGMSBayesianSpam Database";
+  "SpamDBM Database";
 
 static const char *g_DatabaseRecognitionString =
   "Spam Database File";
 
 static const char *g_AttributeNameClassification = "MAIL:classification";
 static const char *g_AttributeNameSpamRatio = "MAIL:ratio_spam";
-static const char *g_BeepGenuine = "AGMSBayes-Genuine";
-static const char *g_BeepSpam = "AGMSBayes-Spam";
-static const char *g_BeepUncertain = "AGMSBayes-Uncertain";
+static const char *g_BeepGenuine = "SpamFilter-Genuine";
+static const char *g_BeepSpam = "SpamFilter-Spam";
+static const char *g_BeepUncertain = "SpamFilter-Uncertain";
 static const char *g_ClassifiedSpam = "Spam";
 static const char *g_ClassifiedGenuine = "Genuine";
 static const char *g_DataName = "data";
 static const char *g_ResultName = "result";
 
-static const char *g_SettingsDirectoryName = "AGMSBayesianSpam";
-static const char *g_SettingsFileName = "AGMSBayesianSpamServer Settings";
-static const uint32 g_SettingsWhatCode = 'ABSS';
+static const char *g_SettingsDirectoryName = "Mail";
+static const char *g_SettingsFileName = "SpamDBM Settings";
+static const uint32 g_SettingsWhatCode = 'SDBM';
 static const char *g_BackupSuffix = ".backup %d";
 static const int g_MaxBackups = 10; /* Numbered from 0 to g_MaxBackups - 1. */
 static const size_t g_MaxWordLength = 50; /* Words longer than this aren't. */
@@ -606,7 +621,7 @@ static struct property_info g_ScriptingPropertyList [] =
   {g_PropertyNames[PN_DATABASE_FILE], {B_GET_PROPERTY, 0},
     {B_DIRECT_SPECIFIER, 0}, "Get the pathname of the current database file.  "
     "The default name is something like B_USER_SETTINGS_DIRECTORY / "
-    "AGMSBayesianSpam / AGMSBayesianSpamServer Database", PN_DATABASE_FILE,
+    "Mail / SpamDBM Database", PN_DATABASE_FILE,
     {}, {}, {}},
   {g_PropertyNames[PN_DATABASE_FILE], {B_SET_PROPERTY, 0},
     {B_DIRECT_SPECIFIER, 0}, "Change the pathname of the database file to "
@@ -1416,7 +1431,7 @@ static void DisplayErrorMessage (
   char ErrorBuffer [PATH_MAX + 1500];
 
   if (TitleString == NULL)
-    TitleString = "AGMSBayesianSpamServer Error Message";
+    TitleString = "SpamDBM Error Message";
 
   if (MessageString == NULL)
   {
@@ -1526,7 +1541,7 @@ ostream& PrintUsage (ostream& OutputStream)
 {
   struct property_info *PropInfoPntr;
 
-  OutputStream << "\nAGMSBayesianSpamServer - A Spam Database Server\n";
+  OutputStream << "\nSpamDBM - A Spam Database Manager\n";
   OutputStream << "Copyright © 2002 by Alexander G. M. Smith.  ";
   OutputStream << "Released to the public domain.\n\n";
   WrapTextToStream (OutputStream, "Compiled on " __DATE__ " at " __TIME__
@@ -1964,7 +1979,7 @@ void ABSApp::AboutRequested ()
   BAlert *AboutAlertPntr;
 
   AboutAlertPntr = new BAlert ("About",
-"AGMSBayesianSpamServer\n\n"
+"SpamDBM - Spam Database Manager\n\n"
 
 "This is a BeOS program for classifying e-mail messages as spam (unwanted \
 junk mail) or as genuine mail using a Bayesian statistical approach.  There \
@@ -2754,15 +2769,14 @@ status_t ABSApp::EvaluateString (
 
 
 /* Tell other programs about the scripting commands we support.  Try this
-command: "hey application/x-vnd.agmsmith.AGMSBayesianSpamServer getsuites" to
+command: "hey application/x-vnd.agmsmith.spamdbm getsuites" to
 see it in action (this program has to be already running for it to work). */
 
 status_t ABSApp::GetSupportedSuites (BMessage *MessagePntr)
 {
   BPropertyInfo TempPropInfo (g_ScriptingPropertyList);
 
-  MessagePntr->AddString ("suites",
-    "suite/x-vnd.agmsmith.AGMSBayesianSpamServer");
+  MessagePntr->AddString ("suites", "suite/x-vnd.agmsmith.spamdbm");
   MessagePntr->AddFlat ("messages", &TempPropInfo);
   return BApplication::GetSupportedSuites (MessagePntr);
 }
@@ -3104,7 +3118,7 @@ status_t ABSApp::LoadSaveDatabase (bool DoLoad, char *ErrorMessage)
   {
     CurrentTime = time (NULL);
     if (fprintf (DatabaseFile, "%s V1 (word, age, genuine count, spam count)\t"
-    "Written by AGMSBayesianSpamServer $Revision$\t"
+    "Written by SpamDBM $Revision$\t"
     "Compiled on " __DATE__ " at " __TIME__ "\tThis file saved on %s",
     g_DatabaseRecognitionString, ctime (&CurrentTime)) <= 0)
     {
@@ -4131,7 +4145,7 @@ void ABSApp::Pulse ()
   }
   else if (g_QuitCountdown > 0)
   {
-    cerr << "AGMSBayesianSpamServer quitting in " << g_QuitCountdown << ".\n";
+    cerr << "SpamDBM quitting in " << g_QuitCountdown << ".\n";
     g_QuitCountdown--;
   }
 }
@@ -7308,6 +7322,6 @@ int main (int argc, char**)
     snooze (100000); /* Let the CommanderLooper thread run so it quits. */
   }
 
-  cerr << "AGMSBayesianSpamServer shutting down..." << endl;
+  cerr << "SpamDBM shutting down..." << endl;
   return 0; /* And implicitly destroys MyApp, which writes out the database. */
 }

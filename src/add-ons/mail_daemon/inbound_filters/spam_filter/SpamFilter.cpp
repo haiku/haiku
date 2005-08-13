@@ -1,20 +1,26 @@
 /******************************************************************************
- * AGMSBayesianSpamFilter - Uses Bayesian statistics to evaluate the spaminess
- * of a message.  The evaluation is done by a separate server, this add-on just
- * gets the text and uses scripting commands to get an evaluation from the
- * server.  If the server isn't running, it will be found and started up.  Once
- * the evaluation has been received, it is added to the message as an attribute
- * and optionally as an addition to the subject.  Some other add-on later in
- * the pipeline will use the attribute to delete the message or move it to some
+ * $Id$
+ *
+ * SpamFilter - Uses Bayesian statistics to evaluate the spaminess of a
+ * message.  The evaluation is done by a separate server, this add-on just gets
+ * the text and uses scripting commands to get an evaluation from the server.
+ * If the server isn't running, it will be found and started up.  Once the
+ * evaluation has been received, it is added to the message as an attribute and
+ * optionally as an addition to the subject.  Some other add-on later in the
+ * pipeline will use the attribute to delete the message or move it to some
  * other folder.
  *
  * Public Domain 2002, by Alexander G. M. Smith, no warranty.
  *
- * $Log: SpamFilter.cpp,v $
- * Revision 1.2  2004/11/12 02:55:05  nwhitehorn
- * Added AGMS's excellent spam detection software. Still some weirdness with the configuration interface from E-mail prefs.
+ * $Log: SpamFilter.cpp,v $ (SVN doesn't support log messages so manually done)
+ * r11769 | bonefish | 2005-03-17 03:30:54 -0500 (Thu, 17 Mar 2005) | 1 line
+ * Move trunk into respective module.
  *
- * Revision 1.1  2004/10/30 22:23:26  brunoga
+ * r9934 | nwhitehorn | 2004-11-11 21:55:05 -0500 (Thu, 11 Nov 2004) | 2 lines
+ * Added AGMS's excellent spam detection software.  Still some weirdness with
+ * the configuration interface from E-mail prefs.
+ *
+ * r9669 | brunoga | 2004-10-30 18:23:26 -0400 (Sat, 30 Oct 2004) | 2 lines
  * AGMS Spam Filter.
  *
  * Revision 1.19  2004/09/20 15:57:30  nwhitehorn
@@ -115,13 +121,12 @@
 
 #include "SpamFilter.h"
 
-// The names match the ones set up by AGMSBayesianSpamServer for sound effects.
-static const char *kAGMSBayesBeepGenuineName = "AGMSBayes-Genuine";
-static const char *kAGMSBayesBeepSpamName = "AGMSBayes-Spam";
-static const char *kAGMSBayesBeepUncertainName = "AGMSBayes-Uncertain";
+// The names match the ones set up by spamdbm for sound effects.
+static const char *kAGMSBayesBeepGenuineName = "SpamFilter-Genuine";
+static const char *kAGMSBayesBeepSpamName = "SpamFilter-Spam";
+static const char *kAGMSBayesBeepUncertainName = "SpamFilter-Uncertain";
 
-static const char *kServerSignature =
-	"application/x-vnd.agmsmith.AGMSBayesianSpamServer";
+static const char *kServerSignature = "application/x-vnd.agmsmith.spamdbm";
 
 
 AGMSBayesianSpamFilter::AGMSBayesianSpamFilter (BMessage *settings)
@@ -170,7 +175,7 @@ AGMSBayesianSpamFilter::InitCheck (BString* out_message)
 {
 	if (out_message != NULL)
 		out_message->SetTo (
-			"AGMSBayesianSpamFilter::InitCheck is never called!");
+			"SpamFilter::InitCheck is never called!");
 	return B_OK;
 }
 
@@ -231,7 +236,7 @@ AGMSBayesianSpamFilter::ProcessMailMessage (
 				directory_which places[] = {B_COMMON_BIN_DIRECTORY,B_BEOS_BIN_DIRECTORY};
 				for (int32 i = 0; i < 2; i++) {
 					find_directory(places[i],&path);
-					path.Append("spamfilter");
+					path.Append("spamdbm");
 					if (!BEntry(path.Path()).Exists())
 						continue;
 					get_ref_for_path(path.Path(),&ref);
@@ -451,7 +456,7 @@ AGMSBayesianSpamFilter::ProcessMailMessage (
 
 ErrorExit:
 	fprintf (stderr, "Error exit from "
-		"AGMSBayesianSpamFilter::ProcessMailMessage, code maybe %ld (%s).\n",
+		"SpamFilter::ProcessMailMessage, code maybe %ld (%s).\n",
 		errorCode, strerror (errorCode));
 	delete [] stringBuffer;
 	return B_OK; // Not MD_ERROR so the message doesn't get left on server.

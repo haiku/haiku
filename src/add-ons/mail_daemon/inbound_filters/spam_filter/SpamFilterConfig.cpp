@@ -1,18 +1,24 @@
 /******************************************************************************
- * AGMSBayesianSpamFilter's configuration view.  Lets the user change various
- * settings related to the add-on, but not the server.
+ * $Id$
  *
- * $Log: SpamFilterConfig.cpp,v $
- * Revision 1.4  2004/12/07 01:14:05  nwhitehorn
+ * SpamFilter's configuration view.  Lets the user change various settings
+ * related to the add-on, but not the spamdbm server.
+ *
+ * $Log: SpamFilter.cpp,v $ (SVN doesn't support log messages so manually done)
+ * r11769 | bonefish | 2005-03-17 03:30:54 -0500 (Thu, 17 Mar 2005) | 1 line
+ * Move trunk into respective module.
+ *
+ * r10362 | nwhitehorn | 2004-12-06 20:14:05 -0500 (Mon, 06 Dec 2004) | 2 lines
  * Fixed the spam filter so it works correctly now.
  *
- * Revision 1.3  2004/11/21 08:38:07  shatty
+ * r10097 | shatty | 2004-11-21 03:38:07 -0500 (Sun, 21 Nov 2004) | 2 lines
  * remove unused variables
  *
- * Revision 1.2  2004/11/12 02:55:05  nwhitehorn
- * Added AGMS's excellent spam detection software. Still some weirdness with the configuration interface from E-mail prefs.
+ * r9934 | nwhitehorn | 2004-11-11 21:55:05 -0500 (Thu, 11 Nov 2004) | 2 lines
+ * Added AGMS's excellent spam detection software.  Still some weirdness with
+ * the configuration interface from E-mail prefs.
  *
- * Revision 1.1  2004/10/30 22:23:26  brunoga
+ * r9669 | brunoga | 2004-10-30 18:23:26 -0400 (Sat, 30 Oct 2004) | 2 lines
  * AGMS Spam Filter.
  *
  * Revision 1.9  2004/09/20 15:57:30  nwhitehorn
@@ -87,8 +93,7 @@
 #include <MailAddon.h>
 #include <FileConfigView.h>
 
-static const char *kServerSignature =
-	"application/x-vnd.agmsmith.AGMSBayesianSpamServer";
+static const char *kServerSignature = "application/x-vnd.agmsmith.spamdbm";
 
 class AGMSBayesianSpamFilterConfig : public BView {
 	public:
@@ -124,7 +129,7 @@ class AGMSBayesianSpamFilterConfig : public BView {
 
 
 AGMSBayesianSpamFilterConfig::AGMSBayesianSpamFilterConfig (BMessage *settings)
-	:	BView (BRect (0,0,260,130), "agmsbayesianspamfilter_config",
+	:	BView (BRect (0,0,260,130), "spamfilter_config",
 			B_FOLLOW_LEFT | B_FOLLOW_TOP, 0),
 		fAddSpamToSubject (false),
 		fAddSpamToSubjectCheckBoxPntr (NULL),
@@ -276,7 +281,7 @@ void AGMSBayesianSpamFilterConfig::AttachedToWindow ()
 	fQuitServerWhenFinishedCheckBoxPntr = new BCheckBox (
 		tempRect,
 		"quitWhenFinished",
-		"Close AGMSBayesianSpamServer when Finished.",
+		"Close SpamDBM when Finished.",
 		new BMessage (kQuitWhenFinishedPressed));
 	AddChild (fQuitServerWhenFinishedCheckBoxPntr);
 	fQuitServerWhenFinishedCheckBoxPntr->ResizeToPreferred ();
@@ -375,7 +380,7 @@ AGMSBayesianSpamFilterConfig::ShowSpamServerConfigurationWindow () {
 				directory_which places[] = {B_COMMON_BIN_DIRECTORY,B_BEOS_BIN_DIRECTORY};
 				for (int32 i = 0; i < 2; i++) {
 					find_directory(places[i],&path);
-					path.Append("spamfilter");
+					path.Append("spamdbm");
 					if (!BEntry(path.Path()).Exists())
 						continue;
 					get_ref_for_path(path.Path(),&ref);
@@ -408,8 +413,8 @@ AGMSBayesianSpamFilterConfig::ShowSpamServerConfigurationWindow () {
 
 ErrorExit:
 	(new BAlert ("SpamFilterConfig Error", "Sorry, unable to launch the "
-		"AGMSBayesianSpamServer program to let you edit the server "
-		"settings.", "Close"))->Go ();
+		"spamdbm program to let you edit the server settings.",
+		"Close"))->Go ();
 	return;
 }
 

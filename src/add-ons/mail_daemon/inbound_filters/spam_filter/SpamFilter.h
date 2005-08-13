@@ -1,19 +1,24 @@
 #ifndef AGMS_BAYESIAN_SPAM_FILTER_H
 #define AGMS_BAYESIAN_SPAM_FILTER_H
 /******************************************************************************
- * AGMSBayesianSpamFilter - Uses Bayesian statistics to evaluate the spaminess
- * of a message.  The evaluation is done by a separate server, this add-on just
- * gets the text and uses scripting commands to get an evaluation from the
- * server.  If the server isn't running, it will be found and started up.  Once
- * the evaluation has been received, it is added to the message as an attribute
- * and optionally as an addition to the subject.  Some other add-on later in
- * the pipeline will use the attribute to delete the message or move it to some
+ * $Id$
+ *
+ * SpamFilter - Uses Bayesian statistics to evaluate the spaminess of a
+ * message.  The evaluation is done by a separate server, this add-on just gets
+ * the text and uses scripting commands to get an evaluation from the server.
+ * If the server isn't running, it will be found and started up.  Once the
+ * evaluation has been received, it is added to the message as an attribute and
+ * optionally as an addition to the subject.  Some other add-on later in the
+ * pipeline will use the attribute to delete the message or move it to some
  * other folder.
  *
  * Public Domain 2002, by Alexander G. M. Smith, no warranty.
  *
- * $Log: SpamFilter.h,v $
- * Revision 1.1  2004/10/30 22:23:26  brunoga
+ * $Log: SpamFilter.cpp,v $ (SVN doesn't support log messages so manually done)
+ * r11769 | bonefish | 2005-03-17 03:30:54 -0500 (Thu, 17 Mar 2005) | 1 line
+ * Move trunk into respective module.
+ *
+ * r9669 | brunoga | 2004-10-30 18:23:26 -0400 (Sat, 30 Oct 2004) | 2 lines
  * AGMS Spam Filter.
  *
  * Revision 1.8  2004/09/20 15:57:30  nwhitehorn
