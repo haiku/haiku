@@ -1,6 +1,6 @@
 /* Resources for the spamdbm program, mostly icons and
    file type associations that make it work properly.
-   $Id: $ */
+   $Id$ */
 
 resource app_flags B_SINGLE_LAUNCH;
 
@@ -11,8 +11,8 @@ resource app_version {
 	minor  = 0,
 	variety = B_APPV_FINAL,
 	internal = 1,
-	short_info = "SpamDBM $Rev: $",
-	long_info = "SpamDBM - a spam analysis database manager for Haiku.  $Id: $"
+	short_info = "SpamDBM $Rev$",
+	long_info = "SpamDBM - a spam analysis database manager for Haiku.  $Id$"
 };
 
 resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.agmsmith.spamdbm";
