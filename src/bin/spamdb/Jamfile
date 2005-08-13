@@ -1,0 +1,6 @@
+SubDir OBOS_TOP src bin spamdb ;
+
+StdBinCommands
+	spamdb.cpp
+	: be tracker stdc++.r4 libmail.so
+	;

@@ -99,12 +99,6 @@ StdBinCommands
 	: be libmail.so
 	;
 
-# standard commands that need libbe.so, libmail.so, libtracker.so
-StdBinCommands
-	spamfilter.cpp
-	: be tracker stdc++.r4 libmail.so
-	;
-
 SubInclude OBOS_TOP src bin addattr ;
 SubInclude OBOS_TOP src bin bash ;
 SubInclude OBOS_TOP src bin bc ;
@@ -133,6 +127,7 @@ SubInclude OBOS_TOP src bin rmd160 ;
 SubInclude OBOS_TOP src bin screen_blanker ;
 SubInclude OBOS_TOP src bin sed ;
 SubInclude OBOS_TOP src bin sharutils ;
+SubInclude OBOS_TOP src bin spamdb ;
 SubInclude OBOS_TOP src bin strace ;
 SubInclude OBOS_TOP src bin vim ;
 SubInclude OBOS_TOP src bin zic ;
