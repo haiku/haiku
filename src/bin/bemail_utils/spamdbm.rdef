@@ -7,7 +7,6 @@ resource app_flags B_SINGLE_LAUNCH;
 resource app_signature "application/x-vnd.agmsmith.spamdbm";
 
 resource app_version {
-
 	major  = 3,
 	middle = 0,
 	minor  = 0,

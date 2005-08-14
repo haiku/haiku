@@ -63,11 +63,13 @@
  * gets the rating back from the server, and then the rest of the mail system
  * rule chain can delete the message or otherwise manipulate it.
  *
- * $Log: spamfilter.cpp,v $
- * (no longer automatic - The SVN version control system used for the Haiku
- * project doesn't support the Log: keyword on philosophical grounds - and they
- * assume that the file will always be in SVN, and not some other source
- * control system, as if!).
+ * $Log: spamfilter.cpp,v $ (now manually updated due to SVN)
+ * r13959 | agmsmith | 2005-08-13 22:05:27 -0400 (Sat, 13 Aug 2005) | 2 lines
+ * Rename the directory before doing anything else, otherwise svn dies badly.
+ *
+ * r13952 | agmsmith | 2005-08-13 15:31:42 -0400 (Sat, 13 Aug 2005) | 3 lines
+ * Added the resources and file type associations, changed the application
+ * signature and otherwise made the spam detection system work properly again.
  *
  * r13951 | agmsmith | 2005-08-13 11:40:01 -0400 (Sat, 13 Aug 2005) | 2 lines
  * Had to do the file rename as a separate operation due to SVN limitations.

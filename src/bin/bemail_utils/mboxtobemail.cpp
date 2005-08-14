@@ -19,6 +19,16 @@
  * from the version history pages on BeBits) if you don't want to install MDR.
  *
  * $Log: MailboxToBeMail.cpp,v $ (manually updated now that SVN is used)
+ * r13960 | agmsmith | 2005-08-13 22:10:49 -0400 (Sat, 13 Aug 2005) | 3 lines
+ * More file movement for the BeMail utilities...  Content updates later to
+ * avoid confusing svn.
+ *
+ * r13955 | agmsmith | 2005-08-13 19:43:41 -0400 (Sat, 13 Aug 2005) | 5 lines
+ * Half way through adding some more BeMail related utilities - they use
+ * libmail.so which isn't backwards compatibile so they need recompiling for
+ * Haiku - thus better to include them here.  Also want spam levels of 1E-6 to
+ * be visible for genuine messages.
+ *
  * Revision 1.9  2003/12/31 00:37:46  agmsmith
  * Use the MDR date parsing routine rather than parsedate, so it
  * can handle newer date formats.
@@ -66,7 +76,8 @@
 #include <errno.h>
 
 /* MDR headers (get the MDR source and add the MDR include/public and
-include/numail directories to the project path settings). */
+include/numail directories to the project path settings).  Or just use
+the Haiku build process which is already set up to include the right ones. */
 
 #include <MailMessage.h>
 #include <mail_util.h>
@@ -392,7 +403,7 @@ status_t SaveMessage (BString &MessageText)
   BString                  HeaderValues [STD_HDR_MAX];
   int                      i;
   int                      Length;
-  Zoidberg::Mail::Message  MailMessage;
+  BEmailMessage            MailMessage;
   BFile                    OutputFile;
   char                     TempString [80];
   struct tm                TimeFields;
@@ -442,12 +453,12 @@ status_t SaveMessage (BString &MessageText)
   }
 
   HeaderValues[STD_HDR_THREAD] = HeaderValues[STD_HDR_SUBJECT];
-  Zoidberg::Mail::SubjectToThread (HeaderValues[STD_HDR_THREAD]);
+  SubjectToThread (HeaderValues[STD_HDR_THREAD]);
   if (HeaderValues[STD_HDR_THREAD].Length() <= 0)
     HeaderValues[STD_HDR_THREAD] = "No Subject";
 
   HeaderValues[STD_HDR_NAME] = HeaderValues[STD_HDR_FROM];
-  Zoidberg::Mail::extract_address_name (HeaderValues[STD_HDR_NAME]);
+  extract_address_name (HeaderValues[STD_HDR_NAME]);
 
   // Generate a file name for the incoming message.
 
@@ -459,7 +470,7 @@ status_t SaveMessage (BString &MessageText)
   // sorting by file name will give all the messages with the same subject in
   // order of date.
 
-  DateInSeconds = Zoidberg::Mail::
+  DateInSeconds =
     ParseDateWithTimeZone (HeaderValues[STD_HDR_DATE].String());
   if (DateInSeconds == -1)
     DateInSeconds = 0; /* Set it to the earliest time if date isn't known. */
@@ -552,7 +563,7 @@ int main (int argc, char** argv)
   bool         HaveOldMessage = false;
   int          MessagesDoneCount = 0;
   BString      MessageText;
-  BApplication MyApp ("application/x-vnd.agmsmith.MailboxFileToBeMail");
+  BApplication MyApp ("application/x-vnd.agmsmith.mboxtobemail");
   int          NextArgIndex;
   char         OutputDirectoryPathName [B_PATH_NAME_LENGTH];
   status_t     ReturnCode = -1;
@@ -574,9 +585,10 @@ int main (int argc, char** argv)
     printf ("separator text line at the top of each message, the default\n");
     printf ("is to lose it.\n\n");
     printf ("Usage:\n\n");
-    printf ("MailboxFileToBeMail [-s] InputFile [OutputDirectory]\n\n");
+    printf ("mboxtobemail [-s] InputFile [OutputDirectory]\n\n");
     printf ("Public domain, by Alexander G. M. Smith.\n");
-    printf ("$Header: /CommonBe/agmsmith/Programming/MailboxFileToBeMail/RCS/MailboxToBeMail.cpp,v 1.9 2003/12/31 00:37:46 agmsmith Exp $\n");
+    printf ("$Id$\n");
+    printf ("$HeadURL$\n");
     return -10;
   }
 

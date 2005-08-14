@@ -8,7 +8,17 @@
  * reduced.  The resulting text is written to standard output.  Command line
  * driven.
  *
- * $Log: BeMailToMBox.cpp,v $
+ * $Log: BeMailToMBox.cpp,v $ (now manually updated)
+ * r13960 | agmsmith | 2005-08-13 22:10:49 -0400 (Sat, 13 Aug 2005) | 3 lines
+ * More file movement for the BeMail utilities...  Content updates later to
+ * avoid confusing svn.
+ *
+ * r13955 | agmsmith | 2005-08-13 19:43:41 -0400 (Sat, 13 Aug 2005) | 5 lines
+ * Half way through adding some more BeMail related utilities - they use
+ * libmail.so which isn't backwards compatibile so they need recompiling for
+ * Haiku - thus better to include them here.  Also want spam levels of 1E-6 to
+ * be visible for genuine messages.
+ *
  * Revision 1.1  2002/02/24 18:16:46  agmsmith
  * Initial revision
  */
@@ -369,7 +379,7 @@ int main (int argc, char** argv)
   status_t     ErrorCode;
   char         InputPathName [B_PATH_NAME_LENGTH];
   int          MessagesDoneCount = 0;
-  BApplication MyApp ("application/x-vnd.agmsmith.BeMailToMBox");
+  BApplication MyApp ("application/x-vnd.agmsmith.bemailtombox");
   const char  *StringPntr;
   char         TempString [1024 + 256];
 
@@ -383,7 +393,7 @@ int main (int argc, char** argv)
     printf ("bemailtombox InputDirectory >OutputFile\n\n");
     printf ("Public domain, by Alexander G. M. Smith.\n");
     printf ("$Id:$\n");
-    printf ("$HeadURL: $\n");
+    printf ("$HeadURL$\n");
     return -10;
   }
 

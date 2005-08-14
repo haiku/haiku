@@ -1,7 +1,30 @@
 SubDir OBOS_TOP src bin bemail_utils ;
 
+UsePrivateHeaders mail ;
+
+StdBinCommands
+	bemailtombox.cpp
+	: be
+	: bemailtombox.rdef
+	;
+Package haiku-maildaemon-cvs :
+	bemailtombox :
+	boot home config bin ;
+
+StdBinCommands
+	mboxtobemail.cpp
+	: be libmail.so
+	: mboxtobemail.rdef
+	;
+Package haiku-maildaemon-cvs :
+	mboxtobemail :
+	boot home config bin ;
+
 StdBinCommands
 	spamdbm.cpp
 	: be tracker stdc++.r4 libmail.so
 	: spamdbm.rdef
 	;
+Package haiku-maildaemon-cvs :
+	spamdbm : 
+	boot home config bin ;
