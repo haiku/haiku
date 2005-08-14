@@ -389,7 +389,12 @@ TermApp::MakeTermWindow(BRect &frame)
 void
 TermApp::RunNewTerm(void)
 {
-	be_roster->Launch(TERM_SIGNATURE);
+	app_info info;
+	be_app->GetAppInfo(&info);
+	
+	// try launching two different ways to work around possible problems
+	if(be_roster->Launch(&(info.ref))!=B_OK)
+		be_roster->Launch(TERM_SIGNATURE);
 }
 
 void
