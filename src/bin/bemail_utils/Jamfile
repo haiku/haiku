@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src bin spamdbm ;
+SubDir OBOS_TOP src bin bemail_utils ;
 
 StdBinCommands
 	spamdbm.cpp
