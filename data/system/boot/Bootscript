@@ -89,7 +89,7 @@ fi
 
 # Launch MiniTerminal or consoled depending on $SAFEMODE
 if [ "$SAFEMODE" != "yes" ]; then
-	launch beos/apps/MiniTerminal
+	launch beos/apps/Terminal
 else
 	launch beos/bin/consoled
 fi
