@@ -13,7 +13,3 @@ LinkSharedOSLibs Spam\ Filter :
 Package haiku-maildaemon-cvs :
 	Spam\ Filter : 
 	boot home config add-ons mail_daemon inbound_filters ;
-
-Package haiku-maildaemon-cvs :
-	spamdbm : 
-	boot home config bin ;
