@@ -785,7 +785,6 @@ TMailApp::CheckForSpamFilterExistence()
 		for (addonNameIndex = 0; B_OK == settingsMessage.FindString (
 			"filter_addons", addonNameIndex, &addonNamePntr);
 			addonNameIndex++) {
-			printf("%s\n", addonNamePntr);
 			if (strstr (addonNamePntr, "Spam Filter") != NULL) {
 				gShowSpamGUI = true; // Found it!
 				return;
