@@ -129,3 +129,4 @@ SubInclude OBOS_TOP src tests servers app playground ;
 SubInclude OBOS_TOP src tests servers app resize_limits ;
 SubInclude OBOS_TOP src tests servers app scrolling ;
 SubInclude OBOS_TOP src tests servers app textview ;
+SubInclude OBOS_TOP src tests servers app regularapps ;

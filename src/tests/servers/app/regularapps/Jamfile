@@ -1,0 +1,21 @@
+SubDir OBOS_TOP src tests servers app regularapps ;
+
+local clockDir = [ FDirName $(OBOS_TOP) src apps clock ] ;
+
+UseHeaders [ FDirName $(clockDir) ] ;
+
+SEARCH_SOURCE += $(clockDir) [ FDirName $(clockDir) ] ;
+
+# No need to define any of those targets, when building for haiku
+if $(TARGET_PLATFORM) != haiku {
+
+SimpleTest TestApp_Clock :
+	cl_view.cpp
+	cl_wind.cpp 
+	clock.cpp
+	: libopenbeos.so
+	: Clock.rdef
+	;
+
+
+} # if $(TARGET_PLATFORM) != haiku
