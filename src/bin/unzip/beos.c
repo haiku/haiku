@@ -817,9 +817,8 @@ void close_outfile(__G)    /* GRR: change to return PK-style warning level */
 
         fclose(G.outfile);                      /* close "data" file... */
         G.outfile = fopen(G.filename, FOPR);    /* ...and reopen for reading */
-        if (!linktarget || fread(linktarget, 1, ucsize, G.outfile) !=
-                           (int)ucsize)
-        {
+        if (!linktarget
+        	|| fread(linktarget, 1, ucsize, G.outfile) != (size_t)ucsize) {
             Info(slide, 0x201, ((char *)slide,
               "warning:  symbolic link (%s) failed\n", FnFilter1(G.filename)));
             if (linktarget)
@@ -1164,7 +1163,7 @@ static int set_file_attrs( const char *name,
     return retval;
 }
 
-static void setBeOSexfield( const char *path, uch *extra_field )
+static void setBeOSexfield(const char *path, uch *extra_field)
 {
     uch *ptr       = extra_field;
     ush  id        = 0;
@@ -1174,9 +1173,8 @@ static void setBeOSexfield( const char *path, uch *extra_field )
     uch *attrbuff  = NULL;
     int retval;
 
-    if( extra_field == NULL ) {
+    if (extra_field == NULL)
         return;
-    }
 
     /* Collect the data from the extra field buffer. */
     id        = makeword( ptr );    ptr += 2;   /* we don't use this... */
@@ -1185,20 +1183,20 @@ static void setBeOSexfield( const char *path, uch *extra_field )
     flags     = *ptr;               ptr++;
 
     /* Do a little sanity checking. */
-    if( flags & EB_BE_FL_BADBITS ) {
+    if (flags & EB_BE_FL_BADBITS) {
         /* corrupted or unsupported */
         Info(slide, 0x201, ((char *)slide,
              "Unsupported flags set for this BeOS extra field, skipping.\n"));
         return;
     }
-    if( size <= EB_BEOS_HLEN ) {
+    if (size <= EB_BEOS_HLEN) {
         /* corrupted, unsupported, or truncated */
         Info(slide, 0x201, ((char *)slide,
              "BeOS extra field is %d bytes, should be at least %d.\n", size,
              EB_BEOS_HLEN));
         return;
     }
-    if( full_size < ( size - EB_BEOS_HLEN ) ) {
+    if (full_size < (uint32)(size - EB_BEOS_HLEN)) {
         /* possible old archive? will this screw up on valid archives? */
         Info(slide, 0x201, ((char *)slide,
              "Skipping attributes: BeOS extra field is %d bytes, "
@@ -1207,22 +1205,21 @@ static void setBeOSexfield( const char *path, uch *extra_field )
     }
 
     /* Find the BeOS file attribute data. */
-    if( flags & EB_BE_FL_UNCMPR ) {
+    if (flags & EB_BE_FL_UNCMPR) {
         /* Uncompressed data */
         attrbuff = ptr;
     } else {
         /* Compressed data */
-        attrbuff = (uch *)malloc( full_size );
-        if( attrbuff == NULL ) {
+        attrbuff = (uch *)malloc(full_size);
+        if (attrbuff == NULL) {
             /* No memory to uncompress attributes */
             Info(slide, 0x201, ((char *)slide,
                  "Can't allocate memory to uncompress file attributes.\n"));
             return;
         }
 
-        retval = memextract( __G__ attrbuff, full_size,
-                             ptr, size - EB_BEOS_HLEN );
-        if( retval != PK_OK ) {
+        retval = memextract(__G__ attrbuff, full_size, ptr, size - EB_BEOS_HLEN);
+        if (retval != PK_OK) {
             /* error uncompressing attributes */
             Info(slide, 0x201, ((char *)slide,
                  "Error uncompressing file attributes.\n"));
@@ -1232,24 +1229,21 @@ static void setBeOSexfield( const char *path, uch *extra_field )
             /* corrupt, we should _not_ attempt to restore the attrs  */
             /* for this file... there's no way to detect what attrs   */
             /* are good and which are bad.                            */
-            free( attrbuff );
+            free(attrbuff);
             return;
         }
     }
 
     /* Now attempt to set the file attributes on the extracted file. */
-    retval = set_file_attrs( path, attrbuff, (off_t)full_size );
-    if( retval != EOK ) {
+    retval = set_file_attrs(path, attrbuff, (off_t)full_size);
+    if (retval != EOK) {
         Info(slide, 0x201, ((char *)slide,
              "Error writing file attributes.\n"));
     }
 
     /* Clean up, if necessary */
-    if( attrbuff != ptr ) {
-        free( attrbuff );
-    }
-
-    return;
+    if (attrbuff != ptr)
+        free(attrbuff);
 }
 
 #ifdef BEOS_USE_PRINTEXFIELD
