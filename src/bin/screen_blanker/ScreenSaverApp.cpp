@@ -39,17 +39,20 @@ ScreenSaverApp::ScreenSaverApp()
 void 
 ScreenSaverApp::ReadyToRun() 
 {
-	if (!fPref.LoadSettings()) 
+	if (!fPref.LoadSettings()) {
+		fprintf(stderr, "could not load settings\n");
 		exit(1);
-	else {	// If everything works OK, create a BDirectWindow and start the render thread.
+	} else { // If everything works OK, create a BDirectWindow and start the render thread.
 		BScreen theScreen(B_MAIN_SCREEN_ID);
 		fWin = new SSAwindow(theScreen.Frame());
 		fPww = new PasswordWindow();
 		fThrd = new ScreenSaverThread(fWin ,fWin->fView, &fPref);
 
 		fSaver = fThrd->LoadAddOn();
-		if (!fSaver)
+		if (!fSaver) {
+			fprintf(stderr, "could not load the screensaver addon\n");
 			exit(1);
+		}
 		fWin->SetSaver(fSaver);
 		fWin->SetFullScreen(true);
 		fWin->Show();

@@ -8,6 +8,7 @@ BinCommand screen_blanker :
 	PasswordWindow.cpp
 	ScreenSaver.cpp
 	: be game libscreensaver.so
+	: screen_blanker.rdef
 ;
 
 SEARCH on [ FGristFiles
