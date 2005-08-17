@@ -29,6 +29,7 @@ PasswordWindow::Setup()
 	fPassword->TextView()->HideTyping(true);
 	fPassword->SetDivider(100);
 	fCustomBox->AddChild(fPassword);
+	fPassword->MakeFocus(true);
 
 	fUnlock = new BButton(BRect(160,70,255,85), "fUnlock", "Unlock", new BMessage(UNLOCK_MESSAGE), B_FOLLOW_NONE);
 	fUnlock->SetTarget(NULL, be_app);
