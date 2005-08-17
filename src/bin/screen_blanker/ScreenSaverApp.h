@@ -18,8 +18,7 @@ public:
 	ScreenSaverApp();
 	bool LoadAddOn();
 	void ReadyToRun();
-//	bool QuitRequested();
-//	void Quit();
+	virtual bool QuitRequested();
 	virtual void MessageReceived(BMessage *message);
 	void ShowPW();
 private:

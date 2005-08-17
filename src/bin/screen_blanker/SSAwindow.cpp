@@ -21,12 +21,11 @@ SSAwindow::SSAwindow(BRect frame)
 SSAwindow::~SSAwindow() 
 {
 	Hide();
-//	Sync();
 }
 
 
 bool 
-SSAwindow::QuitRequested(void) 
+SSAwindow::QuitRequested() 
 {
 	return true;
 }

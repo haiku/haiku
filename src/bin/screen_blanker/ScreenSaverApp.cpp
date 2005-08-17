@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <Debug.h>
 #include <stdio.h>
 #include <Screen.h>
 #include <image.h>
@@ -36,7 +37,7 @@ ScreenSaverApp::ScreenSaverApp()
 
 
 void 
-ScreenSaverApp::ReadyToRun(void) 
+ScreenSaverApp::ReadyToRun() 
 {
 	if (!fPref.LoadSettings()) 
 		exit(1);
@@ -44,7 +45,7 @@ ScreenSaverApp::ReadyToRun(void)
 		BScreen theScreen(B_MAIN_SCREEN_ID);
 		fWin = new SSAwindow(theScreen.Frame());
 		fPww = new PasswordWindow();
-		fThrd = new ScreenSaverThread(fWin,fWin->fView,&fPref);
+		fThrd = new ScreenSaverThread(fWin ,fWin->fView, &fPref);
 
 		fSaver = fThrd->LoadAddOn();
 		if (!fSaver)
@@ -52,7 +53,7 @@ ScreenSaverApp::ReadyToRun(void)
 		fWin->SetSaver(fSaver);
 		fWin->SetFullScreen(true);
 		fWin->Show();
-		fThreadID = spawn_thread(ScreenSaverThread::ThreadFunc,"ScreenSaverRenderer",0,fThrd);
+		fThreadID = spawn_thread(ScreenSaverThread::ThreadFunc,"ScreenSaverRenderer", B_LOW_PRIORITY,fThrd);
 		resume_thread(fThreadID);
 		HideCursor();
 	}
@@ -60,7 +61,7 @@ ScreenSaverApp::ReadyToRun(void)
 
 
 void 
-ScreenSaverApp::ShowPW(void) 
+ScreenSaverApp::ShowPW() 
 {
 	fWin->Lock();
 	suspend_thread(fThreadID);
@@ -79,7 +80,10 @@ ScreenSaverApp::MessageReceived(BMessage *message)
 {
 	switch(message->what) {
 		case UNLOCK_MESSAGE:
-			if (strcmp(fPww->GetPassword(),fPref.Password())) {
+		{
+			char salt[3] = "";
+			strncpy(salt, fPref.Password(), 2);
+			if (strcmp(crypt(fPww->GetPassword(), salt),fPref.Password())) {
 				beep();
 				fPww->Hide();
 				fWin->SetFullScreen(true);
@@ -87,20 +91,27 @@ ScreenSaverApp::MessageReceived(BMessage *message)
 					resume_thread(fThreadID);
 				}
 				else  {
-					printf ("Quitting!\n");
+					PRINT(("Quitting!\n"));
 					Shutdown();
 				}
 			break;
-    		case 'MOO1':
-			if (real_time_clock()-fBlankTime>fPref.PasswordTime())
-				ShowPW();
-			else 
-			Shutdown();
-			break;
+		}
 		default:
 			BApplication::MessageReceived(message);
  			break;
 	}
+}
+
+
+bool 
+ScreenSaverApp::QuitRequested()
+{
+	if (system_time()-fBlankTime>fPref.PasswordTime()) {
+		ShowPW();
+		return false;
+	} else
+		Shutdown();
+	return BApplication::QuitRequested();
 }
 
 
