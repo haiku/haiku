@@ -52,6 +52,8 @@
 #	define FUNCTION(x) ;
 #endif
 
+#define ADD_DEBUGGER_COMMANDS
+
 #define MAX_SYM_LINKS SYMLINKS_MAX
 
 const static uint32 kMaxUnusedVnodes = 8192;
@@ -1978,6 +1980,217 @@ get_new_fd(int type, struct fs_mount *mount, struct vnode *vnode,
 	return fd;
 }
 
+#ifdef ADD_DEBUGGER_COMMANDS
+
+
+static void
+_dump_advisory_locking(advisory_locking *locking)
+{
+	if (locking == NULL)
+		return;
+
+	kprintf("   lock:        %ld", locking->lock);
+	kprintf("   wait_sem:    %ld", locking->wait_sem);
+
+	struct advisory_lock *lock = NULL;
+	int32 index = 0;
+	while ((lock = (advisory_lock *)list_get_next_item(&locking->locks, lock)) != NULL) {
+		kprintf("   [%2ld] team:   %ld\n", index, lock->team);
+		kprintf("        offset: %Ld\n", lock->offset);
+		kprintf("        length: %Ld\n", lock->length);
+		kprintf("        shared? %s\n", lock->shared ? "yes" : "no");
+	}
+}
+
+
+static void
+_dump_mount(struct fs_mount *mount)
+{
+	kprintf("MOUNT: %p\n", mount);
+	kprintf(" id:            %ld\n", mount->id);
+	kprintf(" device_name:   %s\n", mount->device_name);
+	kprintf(" fs_name:       %s\n", mount->fs_name);
+	kprintf(" cookie:        %p\n", mount->cookie);
+	kprintf(" root_vnode:    %p\n", mount->root_vnode);
+	kprintf(" covers_vnode:  %p\n", mount->covers_vnode);
+	kprintf(" partition:     %p\n", mount->partition);
+	kprintf(" lock:          %ld\n", mount->rlock.sem);
+	kprintf(" flags:        %s%s\n", mount->unmounting ? " unmounting" : "",
+		mount->owns_file_device ? " owns_file_device" : "");
+}
+
+
+static void
+_dump_vnode(struct vnode *vnode)
+{
+	kprintf("VNODE: %p\n", vnode);
+	kprintf(" device:        %ld\n", vnode->device);
+	kprintf(" id:            %Ld\n", vnode->id);
+	kprintf(" ref_count:     %ld\n", vnode->ref_count);
+	kprintf(" private_node:  %p\n", vnode->private_node);
+	kprintf(" mount:         %p\n", vnode->mount);
+	kprintf(" covered_by:    %p\n", vnode->covered_by);
+	kprintf(" cache_ref:     %p\n", vnode->cache);
+	kprintf(" flags:         %s%s%s\n", vnode->remove ? "r" : "-",
+		vnode->busy ? "b" : "-", vnode->unpublished ? "u" : "-");
+	kprintf(" advisory_lock: %p\n", vnode->advisory_locking);
+
+	_dump_advisory_locking(vnode->advisory_locking);
+}
+
+
+static int
+dump_mount(int argc, char **argv)
+{
+	if (argc != 2) {
+		kprintf("usage: mount [id/address]\n");
+		return 0;
+	}
+
+	struct fs_mount *mount = NULL;
+
+	// if the argument looks like a hex number, treat it as such
+	if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
+		mount = (fs_mount *)strtoul(argv[1], NULL, 16);
+		if (IS_USER_ADDRESS(mount)) {
+			kprintf("invalid fs_mount address\n");
+			return 0;
+		}
+	} else {
+		mount_id id = atoll(argv[1]);
+		mount = (fs_mount *)hash_lookup(sMountsTable, (void *)&id);
+		if (mount == NULL) {
+			kprintf("fs_mount not found\n");
+			return 0;
+		}
+	}
+
+	_dump_mount(mount);
+	return 0;
+}
+
+
+static int
+dump_mounts(int argc, char **argv)
+{
+	struct hash_iterator iterator;
+	struct fs_mount *mount;
+
+	kprintf("address     id root       covers     fs_name\n");
+
+	hash_open(sMountsTable, &iterator);
+	while ((mount = (struct fs_mount *)hash_next(sMountsTable, &iterator)) != NULL) {
+		kprintf("%p%4ld %p %p %s\n", mount, mount->id, mount->root_vnode,
+			mount->covers_vnode, mount->fs_name);
+	}
+
+	hash_close(sMountsTable, &iterator, false);
+	return 0;
+}
+
+
+static int
+dump_vnode(int argc, char **argv)
+{
+	if (argc < 2) {
+		kprintf("usage: vnode [id/device id/address]\n");
+		return 0;
+	}
+
+	struct vnode *vnode = NULL;
+
+	// if the argument looks like a hex number, treat it as such
+	if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
+		vnode = (struct vnode *)strtoul(argv[1], NULL, 16);
+		if (IS_USER_ADDRESS(vnode)) {
+			kprintf("invalid vnode address\n");
+			return 0;
+		}
+		_dump_vnode(vnode);
+		return 0;
+	}
+
+	struct hash_iterator iterator;
+	mount_id device = -1;
+	vnode_id id;
+	if (argc > 2) {
+		device = atoi(argv[1]);
+		id = atoll(argv[2]);
+	} else
+		id = atoll(argv[1]);
+
+	hash_open(sVnodeTable, &iterator);
+	while ((vnode = (struct vnode *)hash_next(sVnodeTable, &iterator)) != NULL) {
+		if (vnode->id != id || device != -1 && vnode->device != device)
+			continue;
+
+		_dump_vnode(vnode);
+	}
+
+	hash_close(sVnodeTable, &iterator, false);
+	return 0;
+}
+
+
+static int
+dump_vnodes(int argc, char **argv)
+{
+	// restrict dumped nodes to a certain device if requested
+	mount_id device = -1;
+	if (argc > 1)
+		device = atoi(argv[1]);
+
+	struct hash_iterator iterator;
+	struct vnode *vnode;
+
+	kprintf("address    dev     inode  ref cache      locking    flags\n");
+
+	hash_open(sVnodeTable, &iterator);
+	while ((vnode = (struct vnode *)hash_next(sVnodeTable, &iterator)) != NULL) {
+		if (device != -1 && vnode->device != device)
+			continue;
+
+		kprintf("%p%4ld%10Ld%5ld %p %p %s%s%s\n", vnode, vnode->device, vnode->id,
+			vnode->ref_count, vnode->cache, vnode->advisory_locking,
+			vnode->remove ? "r" : "-", vnode->busy ? "b" : "-",
+			vnode->unpublished ? "u" : "-");
+	}
+
+	hash_close(sVnodeTable, &iterator, false);
+	return 0;
+}
+
+
+static int
+dump_vnode_caches(int argc, char **argv)
+{
+	struct hash_iterator iterator;
+	struct vnode *vnode;
+
+	kprintf("address    dev     inode cache          size   pages\n");
+
+	hash_open(sVnodeTable, &iterator);
+	while ((vnode = (struct vnode *)hash_next(sVnodeTable, &iterator)) != NULL) {
+		if (vnode->cache == NULL)
+			continue;
+
+		// count pages in cache
+		size_t numPages = 0;
+		for (struct vm_page *page = vnode->cache->cache->page_list;
+				page != NULL; page = page->cache_next) {
+			numPages++;
+		}
+
+		kprintf("%p%4ld%10Ld %p %8Ld%8ld\n", vnode, vnode->device, vnode->id, vnode->cache,
+			(vnode->cache->cache->virtual_size + B_PAGE_SIZE - 1) / B_PAGE_SIZE, numPages);
+	}
+
+	hash_close(sVnodeTable, &iterator, false);
+	return 0;
+}
+
+#endif	// ADD_DEBUGGER_COMMANDS
+
 
 //	#pragma mark -
 //	Public VFS API
@@ -2930,6 +3143,15 @@ vfs_init(kernel_args *args)
 
 	if (block_cache_init() != B_OK)
 		return B_ERROR;
+
+#ifdef ADD_DEBUGGER_COMMANDS
+	// add some debugger commands
+	add_debugger_command("vnode", &dump_vnode, "info about the specified vnode");
+	add_debugger_command("vnodes", &dump_vnodes, "list all vnodes (from the specified device)");
+	add_debugger_command("vnode_caches", &dump_vnode_caches, "list all vnode caches");
+	add_debugger_command("mount", &dump_mount, "info about the specified fs_mount");
+	add_debugger_command("mounts", &dump_mounts, "list all fs_mounts");
+#endif
 
 	return file_cache_init();
 }
