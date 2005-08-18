@@ -114,6 +114,7 @@ dump_sem(struct sem_entry *sem)
 static int
 dump_sem_info(int argc, char **argv)
 {
+	bool found = false;
 	addr_t num;
 	int32 i;
 
@@ -143,11 +144,12 @@ dump_sem_info(int argc, char **argv)
 		if (sSems[i].u.used.name != NULL
 			&& strcmp(argv[1], sSems[i].u.used.name) == 0) {
 			dump_sem(&sSems[i]);
-			return 0;
+			found = true;
 		}
 	}
 
-	kprintf("sem \"%s\" doesn't exist!\n", argv[1]);
+	if (!found)
+		kprintf("sem \"%s\" doesn't exist!\n", argv[1]);
 	return 0;
 }
 
