@@ -96,7 +96,7 @@ dump_sem_list(int argc, char **argv)
 static void
 dump_sem(struct sem_entry *sem)
 {
-	kprintf("SEM:     %p\n", sem);
+	kprintf("SEM: %p\n", sem);
 	kprintf("id:      %ld\n", sem->id);
 	if (sem->id >= 0) {
 		kprintf("name:    '%s'\n", sem->u.used.name);
@@ -114,30 +114,28 @@ dump_sem(struct sem_entry *sem)
 static int
 dump_sem_info(int argc, char **argv)
 {
-	int i;
+	addr_t num;
+	int32 i;
 
 	if (argc < 2) {
 		kprintf("sem: not enough arguments\n");
 		return 0;
 	}
 
-	// if the argument looks like a hex number, treat it as such
-	if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
-		unsigned long num = strtoul(argv[1], NULL, 16);
+	num = strtoul(argv[1], NULL, 0);
 
-		if (num > KERNEL_BASE && num <= (KERNEL_BASE + (KERNEL_SIZE - 1))) {
-			// XXX semi-hack
-			dump_sem((struct sem_entry *)num);
-			return 0;
-		} else {
-			unsigned slot = num % sMaxSems;
-			if (sSems[slot].id != (int)num) {
-				kprintf("sem 0x%lx doesn't exist!\n", num);
-				return 0;
-			}
-			dump_sem(&sSems[slot]);
+	if (!IS_USER_ADDRESS(num)) {
+		dump_sem((struct sem_entry *)num);
+		return 0;
+	} else if (num > 0) {
+		uint32 slot = num % sMaxSems;
+		if (sSems[slot].id != (int)num) {
+			kprintf("sem 0x%lx (%ld) doesn't exist!\n", num, num);
 			return 0;
 		}
+
+		dump_sem(&sSems[slot]);
+		return 0;
 	}
 
 	// walk through the sem list, trying to match name
@@ -148,6 +146,8 @@ dump_sem_info(int argc, char **argv)
 			return 0;
 		}
 	}
+
+	kprintf("sem \"%s\" doesn't exist!\n", argv[1]);
 	return 0;
 }
 
