@@ -546,6 +546,9 @@ write_chunk_to_cache(file_cache_ref *ref, off_t offset, size_t size,
 
 	// allocate pages for the cache and mark them busy
 	for (size_t pos = 0; pos < size; pos += B_PAGE_SIZE) {
+		// ToDo: if space is becoming tight, and this cache is already grown
+		//	big - shouldn't we better steal the pages directly in that case?
+		//	(a working set like approach for the file cache)
 		vm_page *page = pages[pageIndex++] = vm_page_allocate_page(PAGE_STATE_FREE);
 		page->state = PAGE_STATE_BUSY;
 
@@ -982,6 +985,16 @@ file_cache_create(mount_id mountID, vnode_id vnodeID, off_t size, int fd)
 	file_cache_ref *ref = new file_cache_ref;
 	if (ref == NULL)
 		return NULL;
+
+	// ToDo: delay vm_cache/vm_cache_ref creation until data is
+	//	requested/written for the first time? Listing lots of
+	//	files in Tracker (and elsewhere) could be slowed down.
+	//	Since the file_cache_ref itself doesn't have a lock,
+	//	we would need to "rent" one during construction, possibly
+	//	the vnode lock, maybe a dedicated one.
+	//	As there shouldn't be too much contention, we could also
+	//	use atomic_test_and_set(), and free the resources again
+	//	when that fails...
 
 	// get the vnode of the underlying device
 	if (vfs_get_vnode_from_fd(fd, true, &ref->device) != B_OK)
