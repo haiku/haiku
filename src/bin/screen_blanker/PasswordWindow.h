@@ -20,6 +20,7 @@ class PasswordWindow : public BWindow
 				B_ALL_WORKSPACES), fDie(false) { Setup(); }
 		void Setup(void);
 		const char *GetPassword(void) {return fPassword->Text();}
+		void SetPassword(const char* text) { Lock(); fPassword->SetText(text); Unlock(); }
 
 		bool fDie;
 	private:

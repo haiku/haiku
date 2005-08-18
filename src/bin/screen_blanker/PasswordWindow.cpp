@@ -5,6 +5,7 @@
 
 #include <Application.h>
 #include <Screen.h>
+#include <StringView.h>
 #include "PasswordWindow.h"
 
 
@@ -22,10 +23,11 @@ PasswordWindow::Setup()
 	bounds.InsetBy(5,5);
 	
 	fCustomBox = new BBox(bounds, "custBeBox", B_FOLLOW_NONE);
-	fCustomBox->SetLabel("Unlock screen saver");
+	BStringView *label = new BStringView(BRect(0,0,60,15), "labelView", "Unlock screen saver");
+	fCustomBox->SetLabel(label);
 	fBgd->AddChild(fCustomBox);
 
-	fPassword = new BTextControl(BRect(10,28,255,47),"pwdCntrl","Enter password:", NULL, B_FOLLOW_NONE);
+	fPassword = new BTextControl(BRect(10,28,260,47),"pwdCntrl","Enter password:", NULL, B_FOLLOW_NONE);
 	fPassword->TextView()->HideTyping(true);
 	fPassword->SetDivider(100);
 	fCustomBox->AddChild(fPassword);

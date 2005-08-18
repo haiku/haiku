@@ -86,17 +86,13 @@ ScreenSaverApp::MessageReceived(BMessage *message)
 		{
 			char salt[3] = "";
 			strncpy(salt, fPref.Password(), 2);
-			if (strcmp(crypt(fPww->GetPassword(), salt),fPref.Password())) {
+			if (strcmp(crypt(fPww->GetPassword(), salt),fPref.Password()) != 0) {
 				beep();
-				fPww->Hide();
-				fWin->SetFullScreen(true);
-				if (fThreadID)
-					resume_thread(fThreadID);
-				}
-				else  {
-					PRINT(("Quitting!\n"));
-					Shutdown();
-				}
+				fPww->SetPassword("");
+			} else  {
+				PRINT(("Quitting!\n"));
+				Shutdown();
+			}
 			break;
 		}
 		default:
@@ -109,7 +105,7 @@ ScreenSaverApp::MessageReceived(BMessage *message)
 bool 
 ScreenSaverApp::QuitRequested()
 {
-	if (system_time()-fBlankTime>fPref.PasswordTime()) {
+	if (system_time()-fBlankTime > fPref.PasswordTime()) {
 		ShowPW();
 		return false;
 	} else
