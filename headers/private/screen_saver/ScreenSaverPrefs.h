@@ -18,7 +18,7 @@ enum arrowDirection {
 	CENTER
 };
 
-#define SCREEN_BLANKER_SIG "application/x-vnd.Be.screenblanker"
+#define SCREEN_BLANKER_SIG "application/x-vnd.Haiku.screenblanker"
 
 class ScreenSaverPrefs 
 {
