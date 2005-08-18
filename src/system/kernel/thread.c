@@ -543,7 +543,7 @@ dump_thread_info(int argc, char **argv)
 {
 	const char *name = NULL;
 	struct thread *t;
-	int id = -1;
+	int32 id = -1;
 	struct hash_iterator i;
 	bool found = false;
 
