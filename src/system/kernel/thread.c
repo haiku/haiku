@@ -545,6 +545,7 @@ dump_thread_info(int argc, char **argv)
 	struct thread *t;
 	int id = -1;
 	struct hash_iterator i;
+	bool found = false;
 
 	if (argc > 2) {
 		kprintf("usage: thread [id/name]\n");
@@ -556,12 +557,7 @@ dump_thread_info(int argc, char **argv)
 		id = thread_get_current_thread()->id;
 	} else {
 		name = argv[1];
-
-		// if the argument looks like a hex number, treat it as such
-		if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x')
-			id = strtoul(argv[1], NULL, 16);
-		else
-			id = atoi(argv[1]);
+		id = strtoul(argv[1], NULL, 0);
 	}
 
 	// walk through the thread list, trying to match name or id
@@ -569,10 +565,14 @@ dump_thread_info(int argc, char **argv)
 	while ((t = hash_next(sThreadHash, &i)) != NULL) {
 		if ((name != NULL && !strcmp(name, t->name)) || t->id == id) {
 			_dump_thread_info(t);
+			found = true;
 			break;
 		}
 	}
 	hash_close(sThreadHash, &i, false);
+
+	if (!found)
+		kprintf("thread \"%s\" (%ld) doesn't exist!\n", argv[1], id);
 	return 0;
 }
 
