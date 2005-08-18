@@ -1,5 +1,6 @@
 /*
  * Copyright 2003, Michael Phipps. All rights reserved.
+ * Copyright 2005, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 

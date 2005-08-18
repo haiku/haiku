@@ -1,8 +1,10 @@
 /*
  * Copyright 2003, Michael Phipps. All rights reserved.
+ * Copyright 2005, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
+#include <Debug.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <Path.h>
@@ -33,7 +35,7 @@ ScreenSaverPrefs::LoadSettings()
 		if (fSettings.Unflatten(&ssSettings)!=B_OK)
 			return false;
 
-		fSettings.PrintToStream();
+		PRINT_OBJECT(fSettings);
 		
 		fSettings.FindRect("windowframe", &fWindowFrame);
 		fSettings.FindInt32("windowtab", &fWindowTab);
@@ -41,18 +43,18 @@ ScreenSaverPrefs::LoadSettings()
 
 		int32 blank_time, standByTime, suspendTime, offTime, passwordTime;
 		if (fSettings.FindInt32("timefade", &blank_time) == B_OK)
-			fBlankTime = blank_time * 1000000;
+			fBlankTime = blank_time * 1000000LL;
 		if (fSettings.FindInt32("timestandby", &standByTime) == B_OK)
-			fStandByTime = standByTime * 1000000;
+			fStandByTime = standByTime * 1000000LL;
 		if (fSettings.FindInt32("timesuspend", &suspendTime) == B_OK)
-			fSuspendTime = suspendTime * 1000000;
+			fSuspendTime = suspendTime * 1000000LL;
 		if (fSettings.FindInt32("timeoff", &offTime) == B_OK)
-			fOffTime = offTime * 1000000;
+			fOffTime = offTime * 1000000LL;
 		fSettings.FindInt32("cornernow", (int32*)&fBlankCorner);
 		fSettings.FindInt32("cornernever", (int32*)&fNeverBlankCorner);
 		fSettings.FindBool("lockenable", &fLockEnabled);
 		if (fSettings.FindInt32("lockdelay", &passwordTime) == B_OK)
-			fPasswordTime = passwordTime * 1000000;
+			fPasswordTime = passwordTime * 1000000LL;
 		fSettings.FindString("lockpassword", &fPassword);
 		fSettings.FindString("lockmethod", &fLockMethod);
 		fSettings.FindString("modulename", &fModuleName);
@@ -81,14 +83,14 @@ ScreenSaverPrefs::Defaults()
 	fWindowFrame = BRect(96.5, 77.0, 542.5, 402);
 	fWindowTab = 0;
 	fTimeFlags = 0;
-	fBlankTime = 120;
-	fStandByTime = 120;
-	fSuspendTime = 120;
-	fOffTime = 120;
+	fBlankTime = 120*1000000LL;
+	fStandByTime = 120*1000000LL;
+	fSuspendTime = 120*1000000LL;
+	fOffTime = 120*1000000LL;
 	fBlankCorner = NONE;
 	fNeverBlankCorner = NONE;
 	fLockEnabled = false;
-	fPasswordTime = 120;
+	fPasswordTime = 120*1000000LL;
 	fPassword = "";
 	fLockMethod = "custom";
 	fModuleName = "";

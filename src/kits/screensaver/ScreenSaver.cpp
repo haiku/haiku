@@ -1,5 +1,9 @@
+/*
+ * Copyright 2003, Michael Phipps. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
 #include "ScreenSaver.h"
-#include <stdio.h>
 
 BScreenSaver::BScreenSaver(BMessage *archive,
                            image_id) : ticksize(50000),looponcount(0),loopoffcount(0) 
