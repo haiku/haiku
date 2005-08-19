@@ -10,7 +10,6 @@
 #include <Path.h>
 #include <StorageDefs.h>
 #include <String.h>
-#include <stdio.h>
 #include <string.h>
 
 #include "ScreenSaverPrefs.h"
@@ -156,7 +155,7 @@ void
 ScreenSaverPrefs::SaveSettings() 
 {
   	BMessage &settings = GetSettings();
-	settings.PrintToStream();
+	PRINT_OBJECT(settings);
 	BFile file(fSSPath.Path(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 	if ((file.InitCheck()!=B_OK) || (settings.Flatten(&file)!=B_OK))
 		fprintf(stderr, "Problem while saving screensaver preferences file!\n");
