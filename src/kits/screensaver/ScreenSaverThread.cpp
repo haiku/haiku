@@ -36,7 +36,8 @@ ScreenSaverThread::ScreenSaverThread(BWindow *wnd, BView *vw, ScreenSaverPrefs *
 void 
 ScreenSaverThread::Quit() 
 {
-	fSaver->StopSaver();
+	if (fSaver)
+		fSaver->StopSaver();
 	if (fWin)
 		fWin->Hide();
 }
@@ -48,7 +49,8 @@ ScreenSaverThread::Thread()
 	fWin->Lock();
 	fView->SetViewColor(0,0,0);
 	fView->SetLowColor(0,0,0);
-	fSaver->StartSaver(fView,false);
+	if (fSaver)
+		fSaver->StartSaver(fView,false);
 	fWin->Unlock();
 	while (1) {
 		snooze(fSaver->TickSize());
