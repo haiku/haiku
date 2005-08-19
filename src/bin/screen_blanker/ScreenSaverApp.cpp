@@ -33,6 +33,7 @@ int main(int, char**)
 ScreenSaverApp::ScreenSaverApp()
 	: BApplication(SCREEN_BLANKER_SIG),
 	fWin(NULL),
+	fThreadID(-1),
 	fRunner(NULL)
 {
 	fBlankTime = system_time();
@@ -52,15 +53,15 @@ ScreenSaverApp::ReadyToRun()
 		fThrd = new ScreenSaverThread(fWin ,fWin->fView, &fPref);
 
 		fSaver = fThrd->LoadAddOn();
-		if (!fSaver) {
+		if (fSaver) {
+			fWin->SetSaver(fSaver);
+			fThreadID = spawn_thread(ScreenSaverThread::ThreadFunc,"ScreenSaverRenderer", B_LOW_PRIORITY,fThrd);
+			resume_thread(fThreadID);
+		} else {
 			fprintf(stderr, "could not load the screensaver addon\n");
-			exit(1);
 		}
-		fWin->SetSaver(fSaver);
 		fWin->SetFullScreen(true);
 		fWin->Show();
-		fThreadID = spawn_thread(ScreenSaverThread::ThreadFunc,"ScreenSaverRenderer", B_LOW_PRIORITY,fThrd);
-		resume_thread(fThreadID);
 		HideCursor();
 	}
 }
@@ -70,7 +71,8 @@ void
 ScreenSaverApp::ShowPW() 
 {
 	fWin->Lock();
-	suspend_thread(fThreadID);
+	if (fThreadID > -1)
+		suspend_thread(fThreadID);
 	if (B_OK==fWin->SetFullScreen(false)) {
 		fWin->Sync();
 		ShowCursor();
@@ -114,7 +116,8 @@ ScreenSaverApp::MessageReceived(BMessage *message)
 				HideCursor();
 				fPww->Hide();
 			}
-			resume_thread(fThreadID);
+			if (fThreadID > -1)
+				resume_thread(fThreadID);
 			fWin->Unlock();
 		default:
 			BApplication::MessageReceived(message);
@@ -140,7 +143,7 @@ ScreenSaverApp::Shutdown(void)
 {
 	if (fWin)
 		fWin->Hide();
-	if (fThreadID)
+	if (fThreadID > -1)
 		kill_thread(fThreadID);
 	if (fThrd)
 		delete fThrd;

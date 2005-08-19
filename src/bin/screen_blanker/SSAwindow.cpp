@@ -14,6 +14,7 @@ SSAwindow::SSAwindow(BRect frame)
 {
 	frame.OffsetTo(0,0);
 	fView = new BView(frame,"ScreenSaver View",B_FOLLOW_ALL,B_WILL_DRAW);
+	fView->SetViewColor(0,0,0);
 	AddChild(fView);
 }
 
