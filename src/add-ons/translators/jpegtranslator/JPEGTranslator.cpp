@@ -924,10 +924,7 @@ Compress(BPositionIO *in, BPositionIO *out)
 		}
 		default:
 		{
-			if (be_app)
-				(new BAlert("Wrong type", "Color space not implemented.", "Quit"))->Go();
-			else
-				fprintf(stderr, "Wrong type: Color space not implemented.\n");
+			fprintf(stderr, "Wrong type: Color space not implemented.\n");
 			return B_ERROR;
 		}
 	}
@@ -1059,10 +1056,7 @@ Decompress(BPositionIO *in, BPositionIO *out)
 		switch (cinfo.out_color_space)
 		{
 			case JCS_UNKNOWN:		/* error/unspecified */
-				if (be_app)
-					(new BAlert("From Type", "Jpeg uses unknown color type", "Quit"))->Go();
-				else
-					fprintf(stderr, "From Type: Jpeg uses unknown color type\n");
+				fprintf(stderr, "From Type: Jpeg uses unknown color type\n");
 				break;
 			case JCS_GRAYSCALE:		/* monochrome */
 				// Check if user wants to read only as RGB32 or not
@@ -1094,10 +1088,7 @@ Decompress(BPositionIO *in, BPositionIO *out)
 					converter = convert_from_CMYK_to_32;
 				break;
 			default:
-				if (be_app)
-					(new BAlert("From Type", "Jpeg uses hmm... i don't know really :(", "Quit"))->Go();
-				else
-					fprintf(stderr, "From Type: Jpeg uses hmm... i don't know really :(\n");
+				fprintf(stderr, "From Type: Jpeg uses hmm... i don't know really :(\n");
 				break;
 		}
 	}
