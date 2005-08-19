@@ -125,7 +125,7 @@ dump_sem_info(int argc, char **argv)
 
 	num = strtoul(argv[1], NULL, 0);
 
-	if (!IS_USER_ADDRESS(num)) {
+	if (IS_KERNEL_ADDRESS(num)) {
 		dump_sem((struct sem_entry *)num);
 		return 0;
 	} else if (num > 0) {
