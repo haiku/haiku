@@ -17,7 +17,7 @@
 
 #include "ScreenSaverApp.h"
 
-const int32 RESUME_SAVER = 'RSSV';
+const static int32 RESUME_SAVER = 'RSSV';
 
 
 // Start the server application. Set pulse to fire once per second.
@@ -106,6 +106,7 @@ ScreenSaverApp::MessageReceived(BMessage *message)
 			fWin->Lock();
 			if (B_OK==fWin->SetFullScreen(true)) {
 				HideCursor();
+				fPww->Hide();
 			}
 			resume_thread(fThreadID);
 			fWin->Unlock();

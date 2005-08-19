@@ -10,7 +10,7 @@
 #include <TextControl.h>
 #include <Button.h>
 
-const int32 UNLOCK_MESSAGE = 'ULMS';
+const static int32 UNLOCK_MESSAGE = 'ULMS';
 
 class PasswordWindow : public BWindow
 {
@@ -18,9 +18,10 @@ class PasswordWindow : public BWindow
 		PasswordWindow() : BWindow(BRect(100,100,400,230),"pwView",B_NO_BORDER_WINDOW_LOOK, B_FLOATING_ALL_WINDOW_FEEL  ,
 				B_NOT_MOVABLE | B_NOT_CLOSABLE |B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS ,
 				B_ALL_WORKSPACES), fDie(false) { Setup(); }
+
 		void Setup(void);
 		const char *GetPassword(void) {return fPassword->Text();}
-		void SetPassword(const char* text) { Lock(); fPassword->SetText(text); Unlock(); }
+		void SetPassword(const char* text) { Lock(); fPassword->SetText(text); fPassword->MakeFocus(true); Unlock(); }
 
 		bool fDie;
 	private:
