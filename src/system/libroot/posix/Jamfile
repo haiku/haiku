@@ -21,6 +21,7 @@ KernelMergeObject posix_main.o :
 
 SubInclude OBOS_TOP src system libroot posix arch ;
 
+SubInclude OBOS_TOP src system libroot posix crypt ;
 SubInclude OBOS_TOP src system libroot posix locale ;
 SubInclude OBOS_TOP src system libroot posix malloc ;
 SubInclude OBOS_TOP src system libroot posix math ;
