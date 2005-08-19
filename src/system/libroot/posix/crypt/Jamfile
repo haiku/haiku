@@ -1,0 +1,17 @@
+SubDir OBOS_TOP src system libroot posix crypt ;
+
+# filter warnings we don't want here
+local originalCCFlags = $(CCFLAGS) ;
+CCFLAGS = [ Filter $(CCFLAGS) : -Wall -Wmissing-prototypes -Wsign-compare ] ;
+local originalKERNEL_CCFlags = $(KERNEL_CCFLAGS) ;
+KERNEL_CCFLAGS = [ Filter $(KERNEL_CCFLAGS) : -Wall -Wmissing-prototypes -Wsign-compare ] ;
+
+KernelMergeObject posix_crypt.o :
+	crypt.c
+	crypt_util.c
+	: -fPIC -DPIC
+	;
+
+# restore CCFLAGS KERNEL_CCFLAGS
+CCFLAGS = $(originalCCFlags) ;
+KERNEL_CCFLAGS = $(originalKERNEL_CCFlags) ;

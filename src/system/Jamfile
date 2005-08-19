@@ -134,6 +134,7 @@ KernelLd libroot.so :
 	os_arch_$(OBOS_ARCH).o
 
 	posix_arch_$(OBOS_ARCH).o
+	posix_crypt.o
 	posix_locale.o
 	posix_main.o
 	posix_malloc.o
