@@ -35,20 +35,17 @@ public:
 	void CheckTime();
 	uint32 GetSnoozeTime(void) {return fSnoozeTime;}
 	void ReloadSettings();
-	void SetEnabled() { fEnabled = true; }
+	void SetEnabled(bool enabled) { fEnabled = enabled; }
 private:
-	//static int32 ThreadFunc(void *);
 	bigtime_t fLastEventTime, fBlankTime, fSnoozeTime, fRtc;
 	arrowDirection fBlank, fKeep, fCurrent; 
 	bool fEnabled;
 	BRect fTopLeft, fTopRight, fBottomLeft, fBottomRight;
 	ScreenSaverPrefs fPref;
-	//thread_id fWatcher;
 	uint32 fFrameNum; // Used so that we don't update the screen coord's so often
 				// Ideally, we would get a message when the screen changes. R5 doesn't do this.
 	SSController *fSSController;
 	node_ref fPrefNodeRef;
-	//sem_id fSnoozeSem;
 	BMessageRunner *fRunner;
 
 	void UpdateRectangles();

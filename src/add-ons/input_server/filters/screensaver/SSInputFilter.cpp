@@ -41,22 +41,28 @@ SSController::MessageReceived(BMessage *msg)
 			fFilter->CheckTime();
 			break;
 		case B_SOME_APP_LAUNCHED:
+		case B_SOME_APP_QUIT:
 		{
 			const char *signature;
 			if (msg->FindString("be:signature", &signature)==B_OK 
-				&& strcmp(signature, SCREEN_BLANKER_SIG)==0)
-				fFilter->SetEnabled();
+				&& strcasecmp(signature, SCREEN_BLANKER_SIG)==0) {
+				fFilter->SetEnabled(msg->what == B_SOME_APP_LAUNCHED);
+			}
 			SERIAL_PRINT(("mime_sig %s\n", signature));
 			break;
 		}
 		default:
-			BHandler::MessageReceived(msg);
+			BLooper::MessageReceived(msg);
 	}
 }
 
 
 SSInputFilter::SSInputFilter() 
-	: fCurrent(NONE),
+	: fLastEventTime(0),
+		fBlankTime(0),
+		fSnoozeTime(0),
+		fRtc(0),
+		fCurrent(NONE),
 		fEnabled(false),
 		fFrameNum(0),
 		fRunner(NULL) {
@@ -68,7 +74,7 @@ SSInputFilter::SSInputFilter()
 	BEntry entry(fPref.GetPath().Path());
 	entry.GetNodeRef(&fPrefNodeRef);
 	watch_node(&fPrefNodeRef, B_WATCH_ALL, NULL, fSSController);
-	be_roster->StartWatching(fSSController, B_REQUEST_LAUNCHED);
+	be_roster->StartWatching(fSSController);
 }
 
 
@@ -87,8 +93,7 @@ SSInputFilter::Invoke()
 	if ((fKeep!=NONE && fCurrent == fKeep) || fEnabled || fPref.TimeFlags()!=1)
 		return; // If mouse is in this corner, never invoke.
 	SERIAL_PRINT(("we run screenblanker\n"));
-	if (be_roster->Launch("application/x-vnd.Be.screenblanker")==B_OK)
-		fEnabled = true;
+	be_roster->Launch(SCREEN_BLANKER_SIG);
 }
 
 
@@ -96,13 +101,18 @@ void
 SSInputFilter::ReloadSettings()
 {
 	CALLED();
-	fPref.LoadSettings();
+	if (!fPref.LoadSettings()) {
+		SERIAL_PRINT(("preferences loading failed: going to defaults\n"));
+	}
 	fBlank = fPref.GetBlankCorner();
 	fKeep = fPref.GetNeverBlankCorner();
 	fBlankTime = fSnoozeTime = fPref.BlankTime();
 	CheckTime();
 	delete fRunner;
 	fRunner = new BMessageRunner(BMessenger(NULL, fSSController), new BMessage(SS_CHECK_TIME), fSnoozeTime, -1);
+	if (fRunner->InitCheck() != B_OK) {
+		SERIAL_PRINT(("fRunner init failed\n"));
+	}
 }
 
 
@@ -114,7 +124,6 @@ SSInputFilter::Banish()
 		return;
 	BMessenger ssApp (SCREEN_BLANKER_SIG,-1,NULL); // Don't care if it fails
 	ssApp.SendMessage(B_QUIT_REQUESTED);
-	fEnabled = false;
 }
 
 
