@@ -17,6 +17,8 @@
 
 #include "ScreenSaverApp.h"
 
+const int32 RESUME_SAVER = 'RSSV';
+
 
 // Start the server application. Set pulse to fire once per second.
 // Run until the application quits.
@@ -30,7 +32,8 @@ int main(int, char**)
 // Construct the server app. Doesn't do much, at this point.
 ScreenSaverApp::ScreenSaverApp()
 	: BApplication(SCREEN_BLANKER_SIG),
-	fWin(NULL) 
+	fWin(NULL),
+	fRunner(NULL)
 {
 	fBlankTime = system_time();
 }
@@ -75,6 +78,8 @@ ScreenSaverApp::ShowPW()
 		fPww->Sync();
 	}
 	fWin->Unlock();
+	delete fRunner;
+	fRunner = new BMessageRunner(BMessenger(this), new BMessage(RESUME_SAVER), fPref.BlankTime(), 1);
 }
 
 
@@ -89,12 +94,21 @@ ScreenSaverApp::MessageReceived(BMessage *message)
 			if (strcmp(crypt(fPww->GetPassword(), salt),fPref.Password()) != 0) {
 				beep();
 				fPww->SetPassword("");
+				delete fRunner;
+				fRunner = new BMessageRunner(BMessenger(this), new BMessage(RESUME_SAVER), fPref.BlankTime(), 1);
 			} else  {
 				PRINT(("Quitting!\n"));
 				Shutdown();
 			}
 			break;
 		}
+		case RESUME_SAVER:
+			fWin->Lock();
+			if (B_OK==fWin->SetFullScreen(true)) {
+				HideCursor();
+			}
+			resume_thread(fThreadID);
+			fWin->Unlock();
 		default:
 			BApplication::MessageReceived(message);
  			break;

@@ -7,6 +7,7 @@
 #define SCREEN_SAVER_APP_H
 
 #include <Application.h>
+#include <MessageRunner.h>
 #include "SSAwindow.h"
 #include "ScreenSaverPrefs.h"
 #include "ScreenSaverThread.h"
@@ -30,6 +31,7 @@ private:
 
 	thread_id fThreadID;
 	uint32 fBlankTime;
+	BMessageRunner *fRunner;
 
 	void Shutdown();
 };
