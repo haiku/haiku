@@ -7,7 +7,7 @@
 //
 //
 //  File:        eject.c
-//  Author:      François Revol (mmu_man@users.sf.net)
+//  Author:      FranÃ§ois Revol (mmu_man@users.sf.net)
 //  Description: ejects physical media from a drive.
 //               This version also loads a media and can query for the status.
 //
@@ -18,14 +18,21 @@
 #include <string.h>
 #include <unistd.h>
 #include <Drivers.h>
+#include <device/scsi.h>
 
 static int usage(char *prog)
 {
-	printf("usage: eject [-q|-l|-s] /dev/disk/.../raw\n");
+	printf("usage: eject [-q|-l|-s|-b|-u] /dev/disk/.../raw\n");
+//	printf("usage: eject [-q|-l|-s|-b|-u] [scsi|ide|/dev/disk/.../raw]\n");
 	printf("	eject the device, or:\n");
 	printf("	-l: load it (close the tray)\n");
 	printf("	-q: query for media status\n");
 	printf("	-s: swap tray position (close/eject)\n");
+	printf("	-b: block (lock) tray position (prevent close/eject)\n");
+	printf("	-u: unblock (unlock) tray position (allow close/eject)\n");
+//	printf("	scsi: act on all scsi devices\n");
+//	printf("	ide:  act on all ide devices\n");
+//	printf("	acts on all scsi and ide devices and floppy by default\n");
 	return 0;
 }
 
@@ -56,10 +63,10 @@ int main(int argc, char **argv)
 	}
 	if (device == NULL)
 		return do_eject(operation, "/dev/disk/floppy/raw");
-	return 0;
 }
 static int do_eject(char operation, char *device)
 {
+	bool bval;
 	int fd;
 	status_t devstatus;
 	fd = open(device, O_RDONLY);
@@ -71,19 +78,33 @@ static int do_eject(char operation, char *device)
 	case 'h':
 		return usage("eject");
 	case 'e':
-		if (ioctl(fd, B_EJECT_DEVICE) < 0) {
+		if (ioctl(fd, B_EJECT_DEVICE, NULL, 0) < 0) {
 			perror(device);
 			return 1;
 		}
 		break;
 	case 'l':
-		if (ioctl(fd, B_LOAD_MEDIA) < 0) {
+		if (ioctl(fd, B_LOAD_MEDIA, NULL, 0) < 0) {
+			perror(device);
+			return 1;
+		}
+		break;
+	case 'b':
+		bval = true;
+		if (ioctl(fd, B_SCSI_PREVENT_ALLOW, &bval, sizeof(bval)) < 0) {
+			perror(device);
+			return 1;
+		}
+		break;
+	case 'u':
+		bval = false;
+		if (ioctl(fd, B_SCSI_PREVENT_ALLOW, &bval, sizeof(bval)) < 0) {
 			perror(device);
 			return 1;
 		}
 		break;
 	case 'q':
-		if (ioctl(fd, B_GET_MEDIA_STATUS, &devstatus) < 0) {
+		if (ioctl(fd, B_GET_MEDIA_STATUS, &devstatus, sizeof(devstatus)) < 0) {
 			perror(device);
 			return 1;
 		}
@@ -96,20 +117,20 @@ static int do_eject(char operation, char *device)
 		}
 		break;
 	case 's':
-		if (ioctl(fd, B_GET_MEDIA_STATUS, &devstatus) < 0) {
+		if (ioctl(fd, B_GET_MEDIA_STATUS, &devstatus, sizeof(devstatus)) < 0) {
 			perror(device);
 			return 1;
 		}
 		switch (devstatus) {
 		case B_NO_ERROR:
 		case B_DEV_NO_MEDIA:
-			if (ioctl(fd, B_EJECT_DEVICE) < 0) {
+			if (ioctl(fd, B_EJECT_DEVICE, NULL, 0) < 0) {
 				perror(device);
 				return 1;
 			}
 			break;
 		case B_DEV_DOOR_OPEN:
-			if (ioctl(fd, B_LOAD_MEDIA) < 0) {
+			if (ioctl(fd, B_LOAD_MEDIA, NULL, 0) < 0) {
 				perror(device);
 				return 1;
 			}
