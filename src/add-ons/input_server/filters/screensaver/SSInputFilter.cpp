@@ -122,7 +122,8 @@ SSInputFilter::Banish()
 	CALLED();
 	if (!fEnabled)
 		return;
-	BMessenger ssApp (SCREEN_BLANKER_SIG,-1,NULL); // Don't care if it fails
+	SERIAL_PRINT(("we quit screenblanker\n"));
+	BMessenger ssApp(SCREEN_BLANKER_SIG,-1,NULL); // Don't care if it fails
 	ssApp.SendMessage(B_QUIT_REQUESTED);
 }
 
