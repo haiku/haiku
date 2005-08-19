@@ -113,6 +113,7 @@ typedef struct
 #define TD_STATUS_ACTIVE   ( 1 << 23 )
 #define TD_TOKEN_DATA1     ( 1 << 19 )
 #define TD_TOKEN_NULL      (0x7FF << 21 ) 
+#define TD_TOKEN_DEVADDR_SHIFT 8
 #define TD_DEPTH_FIRST     0x4
 #define TD_TERMINATE       0x1
 

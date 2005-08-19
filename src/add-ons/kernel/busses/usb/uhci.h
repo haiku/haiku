@@ -57,7 +57,7 @@ private:
 	
 	//Frame list memory
 	area_id		m_framearea;
-	addr_t 		*m_framelist[1024];	//The frame list struct
+	addr_t 		m_framelist[1024];	//The frame list struct
 	addr_t		m_framelist_phy;	//The physical pointer to the frame list
 	
 	// Virtual frame

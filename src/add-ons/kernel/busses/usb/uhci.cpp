@@ -193,6 +193,27 @@ UHCI::UHCI( pci_info *info , Stack *stack )
 	}
 	
 	/*
+	According tot the *BSD usb sources, there needs to be a stray transfer
+	descriptor in order to get some chipset to work nicely (PIIX or something
+	like that).
+	*/
+	uhci_td *straytd;
+	if ( m_stack->AllocateChunk( (void **)&(straytd) , &phy , 32 ) != B_OK )
+	{
+		dprintf( "USB UHCI::UHCI() Failed to allocate a stray transfer descriptor\n" );
+		delete_area( m_framearea );
+		m_initok = false;
+		return;
+	}
+	straytd->link_phy = TD_TERMINATE;
+	straytd->this_phy = reinterpret_cast<addr_t>(phy);
+	straytd->link_log = 0;
+	straytd->buffer_log = 0;
+	straytd->status = 0;
+	straytd->token = TD_TOKEN_NULL | 0x7f << TD_TOKEN_DEVADDR_SHIFT | 0x69;
+	straytd->buffer_phy = 0;
+		
+	/*
 	Set up the virtual structure. I stole this idea from the linux usb stack,
 	the idea is that for every interrupt interval there is a queue head. These
 	things all link together and eventually point to the control and bulk 
@@ -224,7 +245,8 @@ UHCI::UHCI( pci_info *info , Stack *stack )
 		}
 	}
 	// Make sure the qh_terminate terminates
-	m_qh_virtual[11]->link_phy = QH_TERMINATE;
+	m_qh_virtual[11]->link_phy = straytd->this_phy;
+	m_qh_virtual[11]->link_log = straytd;
 		
 	//Insert the queues in the frame list. The linux developers mentioned
 	// in a comment that they used some magic to distribute the elements all
@@ -232,7 +254,7 @@ UHCI::UHCI( pci_info *info , Stack *stack )
 	// (or do I know how I should do that), instead, I just take the frame
 	// number and determine where it should begin
 	
-/*	//NOTE, in c++ this is butt-ugly. We have a addr_t *array (because with
+	//NOTE, in c++ this is butt-ugly. We have a addr_t *array (because with
 	//an addr_t *array we can apply pointer arithmetic), uhci_qh *pointers
 	//that need to be put through the logical | to make sure the pointer is
 	//invalid for the hc. The result of that needs to be converted into a
@@ -241,29 +263,25 @@ UHCI::UHCI( pci_info *info , Stack *stack )
 	{
 		int frame = i+1;
 		if ( ( frame % 256 ) == 0 )
-			m_framelist[i] = reinterpret_cast<addr_t*>( reinterpret_cast<addr_t>(m_qh_interrupt_256) | FRAMELIST_NEXT_IS_QH );
+			m_framelist[i] = m_qh_interrupt_256->this_phy | FRAMELIST_NEXT_IS_QH;
 		else if ( ( frame % 128 ) == 0 )
-			m_framelist[i] = reinterpret_cast<addr_t*>( reinterpret_cast<addr_t>(m_qh_interrupt_128) | FRAMELIST_NEXT_IS_QH );
+			m_framelist[i] = m_qh_interrupt_128->this_phy | FRAMELIST_NEXT_IS_QH;
 		else if ( ( frame % 64 ) == 0 )
-			m_framelist[i] = reinterpret_cast<addr_t*>( reinterpret_cast<addr_t>(m_qh_interrupt_64) | FRAMELIST_NEXT_IS_QH );
+			m_framelist[i] = m_qh_interrupt_64->this_phy | FRAMELIST_NEXT_IS_QH;
 		else if ( ( frame % 32 ) == 0 )
-			m_framelist[i] = reinterpret_cast<addr_t*>( reinterpret_cast<addr_t>(m_qh_interrupt_32) | FRAMELIST_NEXT_IS_QH );
+			m_framelist[i] = m_qh_interrupt_32->this_phy | FRAMELIST_NEXT_IS_QH;
 		else if ( ( frame % 16 ) == 0 )
-			m_framelist[i] = reinterpret_cast<addr_t*>( reinterpret_cast<addr_t>(m_qh_interrupt_16) | FRAMELIST_NEXT_IS_QH );
+			m_framelist[i] = m_qh_interrupt_16->this_phy | FRAMELIST_NEXT_IS_QH;
 		else if ( ( frame % 8 ) == 0 )
-			m_framelist[i] = reinterpret_cast<addr_t*>( reinterpret_cast<addr_t>(m_qh_interrupt_8) | FRAMELIST_NEXT_IS_QH );
+			m_framelist[i] = m_qh_interrupt_8->this_phy | FRAMELIST_NEXT_IS_QH;
 		else if ( ( frame % 4 ) == 0 )
-			m_framelist[i] = reinterpret_cast<addr_t*>( reinterpret_cast<addr_t>(m_qh_interrupt_4) | FRAMELIST_NEXT_IS_QH );
+			m_framelist[i] = m_qh_interrupt_4->this_phy | FRAMELIST_NEXT_IS_QH;
 		else if ( ( frame % 2 ) == 0 )
-			m_framelist[i] = reinterpret_cast<addr_t*>( reinterpret_cast<addr_t>(m_qh_interrupt_2) | FRAMELIST_NEXT_IS_QH );
+			m_framelist[i] = m_qh_interrupt_2->this_phy | FRAMELIST_NEXT_IS_QH;
 		else
-			m_framelist[i] = reinterpret_cast<addr_t*>( reinterpret_cast<addr_t>(m_qh_interrupt_1) | FRAMELIST_NEXT_IS_QH );
+			m_framelist[i] = m_qh_interrupt_1->this_phy | FRAMELIST_NEXT_IS_QH;
 	}
-*/
 
-	for ( int i = 0 ; i < 1024 ; i++ )
-		m_framelist[i] = reinterpret_cast<addr_t*>( reinterpret_cast<addr_t>(m_qh_control) | FRAMELIST_NEXT_IS_QH );
-	
 	//Set base pointer
 	UHCI::pci_module->write_io_32( m_reg_base + UHCI_FRBASEADD , (int32)(m_framelist_phy) );	
 	UHCI::pci_module->write_io_16( m_reg_base + UHCI_FRNUM , 0 );
@@ -286,10 +304,13 @@ status_t UHCI::Start()
 	UHCI::pci_module->write_io_16( m_reg_base + UHCI_USBCMD , UHCI_USBCMD_RS );
 
 	bool running = false;
+	uint16 status = 0;
 	for ( int i = 0 ; i <= 10 ; i++ )
 	{
-		if ( ( UHCI::pci_module->read_io_16( m_reg_base + UHCI_USBSTS ) & UHCI_USBSTS_HCHALT ) == 0 )
-			snooze( 1 );
+		status = UHCI::pci_module->read_io_16( m_reg_base + UHCI_USBSTS );
+		dprintf( "UHCI::Start() current loop %u, status %u\n" , i , status );
+		if ( status & UHCI_USBSTS_HCHALT )
+			snooze( 1000 );
 		else
 		{
 			running = true;
@@ -303,7 +324,7 @@ status_t UHCI::Start()
 		return B_ERROR;
 	}
 	
-	TRACE( "UHCI::Start() Controller is started. USBSTS: %u\n" , UHCI::pci_module->read_io_16( m_reg_base + UHCI_USBSTS ) );
+	TRACE( "UHCI::Start() Controller is started. USBSTS: %u curframe: %u \n" , UHCI::pci_module->read_io_16( m_reg_base + UHCI_USBSTS ) , UHCI::pci_module->read_io_16( m_reg_base + UHCI_FRNUM ) );
 	return BusManager::Start();
 }
 
@@ -324,14 +345,14 @@ status_t UHCI::SubmitTransfer( Transfer *t )
 void UHCI::GlobalReset()
 {
 	UHCI::pci_module->write_io_16( m_reg_base + UHCI_USBCMD , UHCI_USBCMD_GRESET );
-	spin( 100000 );
+	snooze( 100000 );
 	UHCI::pci_module->write_io_16( m_reg_base + UHCI_USBCMD , 0 );
 }
 
 status_t UHCI::Reset()
 {
 	UHCI::pci_module->write_io_16( m_reg_base + UHCI_USBCMD , UHCI_USBCMD_HCRESET );
-	spin( 100000 );
+	snooze( 100000 );
 	if ( UHCI::pci_module->read_io_16( m_reg_base + UHCI_USBCMD ) & UHCI_USBCMD_HCRESET )
 		return B_ERROR;
 	return B_OK;
