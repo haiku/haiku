@@ -80,6 +80,9 @@ ScreenSaverApp::ShowPW()
 	fWin->Unlock();
 	delete fRunner;
 	fRunner = new BMessageRunner(BMessenger(this), new BMessage(RESUME_SAVER), fPref.BlankTime(), 1);
+	if (fRunner->InitCheck() != B_OK) {
+		fprintf(stderr, "fRunner init failed\n");
+	}
 }
 
 
@@ -96,6 +99,9 @@ ScreenSaverApp::MessageReceived(BMessage *message)
 				fPww->SetPassword("");
 				delete fRunner;
 				fRunner = new BMessageRunner(BMessenger(this), new BMessage(RESUME_SAVER), fPref.BlankTime(), 1);
+				if (fRunner->InitCheck()!=B_OK) {
+					fprintf(stderr, "fRunner init failed\n");
+				}
 			} else  {
 				PRINT(("Quitting!\n"));
 				Shutdown();
