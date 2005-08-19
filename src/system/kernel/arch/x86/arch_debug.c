@@ -15,6 +15,8 @@
 #include <arch/debug.h>
 #include <arch_cpu.h>
 
+#include <stdlib.h>
+
 
 struct stack_frame {
 	struct stack_frame	*previous;
@@ -77,21 +79,30 @@ stack_trace(int argc, char **argv)
 
 	if (argc < 2) {
 		thread = thread_get_current_thread();
-		if (thread != NULL)
-			frameStack = &thread->arch_info.iframes;
-		else
-			frameStack = &gBootFrameStack;
+		read_ebp(ebp);
 	} else {
-		kprintf("not supported\n");
-		return 0;
+		thread_id id = strtoul(argv[1], NULL, 0);
+		thread = thread_get_thread_struct_locked(id);
+		if (thread == NULL) {
+			kprintf("could not find thread %ld\n", id);
+			return 0;
+		}
+
+		// read %ebp from the thread's stack stored by a pushad
+		ebp = thread->arch_info.current_stack.esp[2];
 	}
+
+	// We don't have a thread pointer early in the boot process
+	if (thread != NULL)
+		frameStack = &thread->arch_info.iframes;
+	else
+		frameStack = &gBootFrameStack;
 
 	for (i = 0; i < frameStack->index; i++) {
 		kprintf("iframe %p (end = %p)\n",
 			frameStack->frames[i], frameStack->frames[i] + 1);
 	}
 
-	// We don't have a thread pointer early in the boot process
 	if (thread != NULL) {
 		kprintf("stack trace for thread 0x%lx \"%s\"\n", thread->id, thread->name);
 
@@ -104,8 +115,6 @@ stack_trace(int argc, char **argv)
 	}
 
 	kprintf("frame            caller     <image>:function + offset\n");
-
-	read_ebp(ebp);
 
 	for (;;) {
 		bool isIFrame = false;
