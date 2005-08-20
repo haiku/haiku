@@ -591,7 +591,7 @@ write_chunk_to_cache(file_cache_ref *ref, off_t offset, size_t size,
 			panic("pages_io() failed!\n");
 	}
 
-	addr_t lastPageOffset = (pageOffset + bufferSize) & ~(B_PAGE_SIZE - 1);
+	addr_t lastPageOffset = (pageOffset + bufferSize) & (B_PAGE_SIZE - 1);
 	if (lastPageOffset != 0) {
 		// get the last page in the I/O vectors
 		addr_t last = (addr_t)vecs[vecCount - 1].iov_base
