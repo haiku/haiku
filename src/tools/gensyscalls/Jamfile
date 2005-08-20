@@ -48,7 +48,7 @@ MakeLocate <syscalls>syscall_numbers.h : [ FObjectsDir src system kernel ] ;
 MakeLocate <syscalls>syscall_table.h : [ FObjectsDir src system kernel ] ;
 MakeLocate <syscalls>strace_syscalls.h : [ FObjectsDir src bin strace ] ;
 
-Depends <dir>objects/x86.R1/kernel/core : <dir>objects/x86.R1/kernel ;
+Depends <dir>objects/$(OBOS_TARGET)/kernel/core : <dir>objects/$(OBOS_TARGET)/kernel ;
 
 rule GenSyscallsFile {
 	Depends $(1) : gensyscalls ;
