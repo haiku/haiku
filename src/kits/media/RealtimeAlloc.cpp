@@ -4,8 +4,6 @@
  *  DESCR: 
  ***********************************************************************/
 
-#define NDEBUG
-
 #include <SupportDefs.h>
 #include <RealtimeAlloc.h>
 #include <malloc.h>
