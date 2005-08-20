@@ -15,6 +15,7 @@ KernelStaticLibraryObjects librld.a :
 	<src!system!libroot!os>syscalls.o
 	<src!system!libroot!os>sem.o
 	<src!system!libroot!os!arch!$(OBOS_ARCH)>atomic.o
+	<src!system!libroot!os!arch!$(OBOS_ARCH)>thread.o
 
 	<src!system!libroot!posix>errno.o
 

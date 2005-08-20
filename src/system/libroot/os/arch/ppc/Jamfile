@@ -5,6 +5,7 @@ KernelMergeObject os_arch_$(OBOS_ARCH).o :
 	<$(SOURCE_GRIST)>byteorder.S
 #	<$(SOURCE_GRIST)>systeminfo.c
 	<$(SOURCE_GRIST)>system_time.S
+	<$(SOURCE_GRIST)>thread.c
 	<$(SOURCE_GRIST)>tls.c
 	:
 	-fPIC -DPIC

@@ -70,13 +70,6 @@ suspend_thread(thread_id thread)
 }
 
 
-thread_id
-find_thread(const char *name)
-{
-	return _kern_find_thread(name);
-}
-
-
 status_t
 rename_thread(thread_id thread, const char *name)
 {

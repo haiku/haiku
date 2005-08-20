@@ -8,8 +8,24 @@
 #include "syscalls.h"
 
 
+thread_id
+find_thread(const char *name)
+{
+	// BeOS R5 applications also use this trick as find_thread was available
+	// in BeOS R5 OS.h as inline function. Do not change storage of thread id.
+	if (!name) {
+		thread_id thread;
+		__asm__ __volatile__ ( 
+			"movl	%%fs:4, %%eax \n\t"
+			: "=a" (thread));
+		return thread;
+	}
+	return _kern_find_thread(name);
+}
+
+
 // see OS.h from BeOS R5 for the reason why we need this
-// (it's referenced there in the same way we reference _kern_find_thread())
+// there find_thread (see above) is provided as inline function
 extern thread_id _kfind_thread_(const char *name);
 
 

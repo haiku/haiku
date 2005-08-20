@@ -296,29 +296,7 @@ extern void			exit_thread(status_t status);
 extern status_t		wait_for_thread (thread_id thread, status_t *threadReturnValue);
 extern status_t		on_exit_thread(void (*callback)(void *), void *data);
 
-#if __INTEL__ && !_KERNEL_MODE && !_NO_INLINE_ASM
-static inline thread_id
-find_thread(const char *name) {
-#	ifndef __HAIKU__
-/* ToDo: this can be removed once we don't need BeOS compatibility of our source files */
-#		define _kern_find_thread _kfind_thread_
-#	endif
-	extern thread_id _kern_find_thread(const char *name);
-	if (!name) {
-		thread_id thread;
-		__asm__ __volatile__ ( 
-			"movl	%%fs:4, %%eax \n\t"
-			: "=a" (thread));
-		return thread;
-	}
-	return _kern_find_thread(name);
-#	ifndef __HAIKU__
-#		undef _kern_find_thread
-#	endif
-}
-#else
 extern thread_id 	find_thread(const char *name);
-#endif
 
 extern status_t		send_data(thread_id thread, int32 code, const void *buffer,
 						size_t bufferSize);
