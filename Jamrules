@@ -138,7 +138,6 @@ if $(BONE_COMPATIBLE) {
 # Cross compiling can come later
 
 TARGET_CPU ?= $(OSPLAT:L) ;
-OBOS_VERSION ?= R1 ;
 
 switch $(TARGET_CPU) {
 	case ppc :
@@ -163,11 +162,23 @@ switch $(TARGET_CPU) {
 		Exit "Currently unsupported build platform:" $(TARGET_CPU) ;
 }
 
+# We might later want to introduce debug levels or handle the whole issue
+# differently. For now there's only on or off.
+#
+DEBUG ?= 0 ;
+if $(DEBUG) != 0 {
+	OPTIM ?= -O0 ;
+	TARGET_DEBUG ?= debug_$(DEBUG) ;
+} else {
+	OPTIM ?= -O2 ;
+	TARGET_DEBUG ?= release ;
+}
+
 # set target specific variables
 {
 	#Echo "Building for" $(TARGET_CPU) ;
 
-	OBOS_TARGET ?= $(TARGET_CPU).$(OBOS_VERSION) ;
+	OBOS_TARGET ?= $(TARGET_CPU).$(TARGET_DEBUG).$(TARGET_PLATFORM) ;
 	OBOS_TARGET_TYPE ?= "application/x-vnd.Be-elfexecutable" ;
 	OBOS_ARCH ?= $(TARGET_CPU) ;
 	OBOS_TARGET_DEFINE ?= "ARCH_"$(TARGET_CPU) ;
@@ -204,23 +215,24 @@ KERNEL_C++FLAGS += -DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) -D_KERNEL_MODE ;
 if $(GCC_VERSION[1]) >= 3 {
 	KERNEL_C++FLAGS += -fno-use-cxa-atexit ;
 }
-
 DEBUG_FLAGS ?= -g ;
-
-# We might later want to introduce debug levels or handle the whole issue
-# differently. For now there's only on or off.
-#
-DEBUG ?= 0 ;
 if $(DEBUG) != 0 {
-	OPTIM ?= -O0 ;
 	CCFLAGS += $(DEBUG_FLAGS) [ FDefines DEBUG=$(DEBUG) ] ;
 	C++FLAGS += $(DEBUG_FLAGS) [ FDefines DEBUG=$(DEBUG) ] ;
 	KERNEL_CCFLAGS += $(DEBUG_FLAGS) [ FDefines DEBUG=$(DEBUG) ] ;
 	KERNEL_C++FLAGS += $(DEBUG_FLAGS) [ FDefines DEBUG=$(DEBUG) ] ;
 	LINKFLAGS += $(DEBUG_FLAGS) ;
-} else {
-	OPTIM ?= -O2 ;
 }
+
+# define NDEBUG to a non-zero value to suppress asserts
+NDEBUG ?= 0 ;
+if $(NDEBUG) != 0 {
+	CCFLAGS += [ FDefines NDEBUG=$(NDEBUG) ] ;
+	C++FLAGS += [ FDefines NDEBUG=$(NDEBUG) ] ;
+	KERNEL_CCFLAGS += [ FDefines NDEBUG=$(NDEBUG) ] ;
+	KERNEL_C++FLAGS += [ FDefines NDEBUG=$(NDEBUG) ] ;
+}
+
 #
 # To disable for the tests OPTIM and DEBUG are overridden, set the environment
 # variable NO_TEST_DEBUG.
@@ -383,6 +395,11 @@ rule MakeLocate
 	    Depends $(<) : $(>[1]:G=dir) ;
 	    MkDir $(>[1]:G=dir) ;
 	}
+}
+
+actions MkDir1
+{
+	$(MKDIR) "$(<)"
 }
 
 rule Object
