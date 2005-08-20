@@ -28,11 +28,11 @@
 //#define TRACE_SEM
 #ifdef TRACE_SEM
 #	define TRACE(x) dprintf x
-#	define TRACE_BLOCK(x) dprintf x
 #else
 #	define TRACE(x) ;
-#	define TRACE_BLOCK(x) ;
 #endif
+
+//#define DEBUG_LAST_ACQUIRER
 
 struct sem_entry {
 	sem_id		id;
@@ -44,6 +44,9 @@ struct sem_entry {
 			struct thread_queue queue;
 			char				*name;
 			team_id				owner;	// if set to -1, means owned by a port
+#ifdef DEBUG_LAST_ACQUIRER
+			thread_id			last_acquirer;
+#endif
 		} used;
 
 		// when slot unused
@@ -54,7 +57,7 @@ struct sem_entry {
 	} u;
 };
 
-// Todo: Compute based on the amount of available memory.
+// ToDo: Compute based on the amount of available memory.
 static int32 sMaxSems = 4096;
 static int32 sUsedSems = 0;
 
@@ -104,6 +107,9 @@ dump_sem(struct sem_entry *sem)
 		kprintf("count:   0x%x\n", sem->u.used.count);
 		kprintf("queue:   head %p tail %p\n", sem->u.used.queue.head,
 				sem->u.used.queue.tail);
+#ifdef DEBUG_LAST_ACQUIRER
+		kprintf("last acquired by: 0x%lx\n", sem->u.used.last_acquirer);
+#endif
 	} else {
 		kprintf("next:    %p\n", sem->u.unused.next);
 		kprintf("next_id: %ld\n", sem->u.unused.next_id);
@@ -434,7 +440,7 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 	int slot = id % sMaxSems;
 	int state;
 	status_t status = B_OK;
-	
+
 	if (sSemsActive == false)
 		return B_NO_MORE_SEMS;
 
@@ -461,7 +467,8 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 	//	doesn't have any use outside the kernel
 	if ((flags & B_CHECK_PERMISSION) != 0
 		&& sSems[slot].u.used.owner == team_get_kernel_team_id()) {
-		dprintf("thread %ld tried to acquire kernel semaphore.\n", thread_get_current_thread()->id);
+		dprintf("thread %ld tried to acquire kernel semaphore.\n",
+			thread_get_current_thread_id());
 		status = B_NOT_ALLOWED;
 		goto err;
 	}
@@ -479,8 +486,8 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 		timer timeout_timer; // stick it on the stack, since we may be blocking here
 		struct sem_timeout_args args;
 
-		TRACE_BLOCK(("acquire_sem_etc(id = %ld): block name = %s, thread = %p,"
-					 " name = %s\n", id, sSems[slot].u.used.name, thread, thread->name));
+		TRACE(("acquire_sem_etc(id = %ld): block name = %s, thread = %p,"
+			" name = %s\n", id, sSems[slot].u.used.name, thread, thread->name));
 
 		// do a quick check to see if the thread has any pending signals
 		// this should catch most of the cases where the thread had a signal
@@ -558,12 +565,21 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 			}
 		}
 
+#ifdef DEBUG_LAST_ACQUIRER
+		if (thread->sem.acquire_status >= B_OK)
+			sSems[slot].u.used.last_acquirer = thread_get_current_thread_id();
+#endif
+
 		restore_interrupts(state);
 
-		TRACE_BLOCK(("acquire_sem_etc(id = %ld): exit block name = %s, "
-					 "thread = %p (%s)\n", id, sSems[slot].u.used.name, thread,
-					 thread->name));
+		TRACE(("acquire_sem_etc(id = %ld): exit block name = %s, "
+			"thread = %p (%s)\n", id, sSems[slot].u.used.name, thread,
+			thread->name));
 		return thread->sem.acquire_status;
+	} else {
+#ifdef DEBUG_LAST_ACQUIRER
+		sSems[slot].u.used.last_acquirer = thread_get_current_thread_id();
+#endif
 	}
 
 err:
