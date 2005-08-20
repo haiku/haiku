@@ -18,7 +18,9 @@ extern "C" {
 	rtm_pool * _rtm_pool; 
 };
 
-status_t rtm_create_pool(rtm_pool ** out_pool, size_t total_size, const char * name)
+
+status_t
+rtm_create_pool(rtm_pool ** out_pool, size_t total_size, const char * name)
 {
 	BROKEN();
 	*out_pool = (rtm_pool *) 0x55557777;
@@ -28,14 +30,18 @@ status_t rtm_create_pool(rtm_pool ** out_pool, size_t total_size, const char * n
 	return B_OK;
 }
 
-status_t rtm_delete_pool(rtm_pool * pool)
+
+status_t
+rtm_delete_pool(rtm_pool * pool)
 {
 	BROKEN();
 	TRACE("  pool = %p\n", pool);
 	return B_OK;
 }
 
-void * rtm_alloc(rtm_pool * pool, size_t size)
+
+void *
+rtm_alloc(rtm_pool * pool, size_t size)
 {
 	BROKEN();
 	TRACE("  pool = %p\n", pool);
@@ -45,7 +51,9 @@ void * rtm_alloc(rtm_pool * pool, size_t size)
 	return p;
 }
 
-status_t rtm_free(void * data)
+
+status_t
+rtm_free(void * data)
 {
 	BROKEN();
 	TRACE("  ptr = %p\n", data);
@@ -53,7 +61,9 @@ status_t rtm_free(void * data)
 	return B_OK;
 }
 
-status_t rtm_realloc(void ** data, size_t new_size)
+
+status_t
+rtm_realloc(void ** data, size_t new_size)
 {
 	BROKEN();
 	TRACE("  ptr = %p\n", *data);
@@ -66,21 +76,27 @@ status_t rtm_realloc(void ** data, size_t new_size)
 		return B_ERROR;
 }
 
-status_t rtm_size_for(void * data)
+
+status_t
+rtm_size_for(void * data)
 {
 	UNIMPLEMENTED();
 	TRACE("  ptr = %p\n", data);
 	return 0;
 }
 
-status_t rtm_phys_size_for(void * data)
+
+status_t
+rtm_phys_size_for(void * data)
 {
 	UNIMPLEMENTED();
 	TRACE("  ptr = %p\n", data);
 	return 0;
 }
 
-rtm_pool * rtm_default_pool()
+
+rtm_pool *
+rtm_default_pool()
 {
 	BROKEN();
 	/* Return the default pool, or NULL if not yet initialized */
@@ -115,7 +131,8 @@ and might be a Flags field
   
 */
 
-status_t rtm_create_pool_etc(rtm_pool ** out_pool, size_t total_size, const char * name, int32 param4, int32 param5, ...)
+status_t
+rtm_create_pool_etc(rtm_pool ** out_pool, size_t total_size, const char * name, int32 param4, int32 param5, ...)
 {
 	BROKEN();
 	*out_pool = (rtm_pool *) 0x44448888;
@@ -128,7 +145,8 @@ status_t rtm_create_pool_etc(rtm_pool ** out_pool, size_t total_size, const char
 }
 
 
-void rtm_get_pool(rtm_pool *pool,void *data,int32 param3, int32 param4, ...)
+void
+rtm_get_pool(rtm_pool *pool,void *data,int32 param3, int32 param4, ...)
 {
 	UNIMPLEMENTED();
 	TRACE("  pool = %p\n", pool);
