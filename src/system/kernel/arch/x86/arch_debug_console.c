@@ -101,14 +101,28 @@ arch_debug_blue_screen_getchar(void)
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-	};	
+	};
 	enum keycodes {
-		LSHIFT = 42,
-		RSHIFT = 54,
+		LSHIFT			= 42,
+		RSHIFT			= 54,
+		CURSOR_LEFT		= 75,
+		CURSOR_RIGHT	= 77,
+		CURSOR_UP		= 72,
+		CURSOR_DOWN		= 80,
 	};
 	static bool shift = false;
-	static uint8 last = 0;
+	static uint8 special = 0;
 	uint8 key, ascii = 0;
+
+	if (special & 0x80) {
+		special &= ~0x80;
+		return '[';
+	}
+	if (special != 0) {
+		key = special;
+		special = 0;
+		return key;
+	}
 
 	while (true) {
 		uint8 status = in8(PS2_PORT_CTRL);
@@ -133,10 +147,29 @@ arch_debug_blue_screen_getchar(void)
 				shift = false;
 		} else {
 			// key down
-			if (key == LSHIFT || key == RSHIFT)
-				shift = true;
-			else
-				return shift ? shifted_keymap[key] : unshifted_keymap[key];
+			switch (key) {
+				case LSHIFT:
+				case RSHIFT:
+					shift = true;
+					break;
+
+				// start escape sequence for cursor movement
+				case CURSOR_UP:
+					special = 0x80 | 'A';
+					return '\x1b';
+				case CURSOR_DOWN:
+					special = 0x80 | 'B';
+					return '\x1b';
+				case CURSOR_RIGHT:
+					special = 0x80 | 'C';
+					return '\x1b';
+				case CURSOR_LEFT:
+					special = 0x80 | 'D';
+					return '\x1b';
+
+				default:
+					return shift ? shifted_keymap[key] : unshifted_keymap[key];
+			}
 		}
 	}
 }
