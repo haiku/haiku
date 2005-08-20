@@ -128,6 +128,7 @@ if $(OS) = BEOS {
 
 Main 		jam : jam.c jambase.c ;
 LinkLibraries 	jam : libjam.a ;
+LINKLIBS on jam += -lnet ;
 GenFile 	jambase.c : mkjambase Jambase ;
 
 Library         libjam.a :
@@ -156,11 +157,27 @@ if $(OS) = BEOS {
 	# path where it should be located. Not nice, but good enough for the moment.
 	actions CompileResources
 	{
-		if [ -f ../../../objects/x86.R1/tools/rc/rc ]; then
-			../../../objects/x86.R1/tools/rc/rc -o "$(1)" "$(2)"
+		RC=
+		for arch in x86 ppc
+		do
+			for plat in r5 bone dano haiku
+			do
+				for version in release debug_1 debug_2
+				do
+					PATH=../../../objects/${arch}.${version}.${plat}/tools/rc/rc
+					if [ -f $PATH ]
+					then
+						RC=$PATH
+						break 3
+					fi
+				done
+			done
+		done
+		if [ -f $RC ]; then
+			$RC -o "$(1)" "$(2)"
 		else
 			echo "Error: Couldn't find rc, the resources compiler. It should "
-			echo "Error: be located in objects/x86.R1/tools/rc/ and can be made"
+			echo "Error: be located in objects/<arch>.<version>.<plat>/tools/rc/ and can be made"
 			echo "Error: by invoking \`jam rc'. You can also build the"
 			echo "Error: StatCacheServer without resources by running"
 			echo "Error:   NO_STAT_CACHE_SERVER_RESOURCES=1 jam"
