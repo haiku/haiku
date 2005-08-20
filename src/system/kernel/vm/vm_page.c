@@ -187,7 +187,10 @@ vm_page_write_modified(vm_cache *cache)
 
 		// got modified page, let's write it back
 
+		mutex_unlock(&cache->ref->lock);
 		status = write_page(page);
+		mutex_lock(&cache->ref->lock);
+
 		if (status == B_OK) {
 			vm_area *area;
 

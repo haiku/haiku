@@ -201,26 +201,36 @@ get_file_map(file_cache_ref *ref, off_t offset, size_t size,
 	if (ref->map.count == 0) {
 		// we don't yet have the map of this file, so let's grab it
 		// (ordered by offset, so that we can do a binary search on them)
-		size_t vecCount = maxVecs;
-		status_t status;
-		off_t mapOffset = 0;
 
-		while (true) {
-			status = vfs_get_file_map(ref->vnode, mapOffset, ~0UL, vecs, &vecCount);
-			if (status < B_OK && status != B_BUFFER_OVERFLOW)
-				return status;
+		mutex_lock(&ref->cache->lock);
 
-			ref->map.Add(vecs, vecCount);
+		// the file map could have been requested in the mean time
+		if (ref->map.count == 0) {
+			size_t vecCount = maxVecs;
+			status_t status;
+			off_t mapOffset = 0;
+	
+			while (true) {
+				status = vfs_get_file_map(ref->vnode, mapOffset, ~0UL, vecs, &vecCount);
+				if (status < B_OK && status != B_BUFFER_OVERFLOW) {
+					mutex_unlock(&ref->cache->lock);
+					return status;
+				}
 
-			if (status != B_BUFFER_OVERFLOW)
-				break;
+				ref->map.Add(vecs, vecCount);
 
-			// when we are here, the map has been stored in the array, and
-			// the array size was still too small to cover the whole file
-			file_io_vec *last = &vecs[vecCount - 1];
-			mapOffset += last->length;
-			vecCount = maxVecs;
+				if (status != B_BUFFER_OVERFLOW)
+					break;
+
+				// when we are here, the map has been stored in the array, and
+				// the array size was still too small to cover the whole file
+				file_io_vec *last = &vecs[vecCount - 1];
+				mapOffset += last->length;
+				vecCount = maxVecs;
+			}
 		}
+
+		mutex_unlock(&ref->cache->lock);
 	}
 
 	// We now have cached the map of this file, we now need to
@@ -540,9 +550,12 @@ write_chunk_to_cache(file_cache_ref *ref, off_t offset, size_t size,
 {
 	iovec vecs[MAX_IO_VECS];
 	int32 vecCount = 0;
-
 	vm_page *pages[MAX_IO_VECS];
 	int32 pageIndex = 0;
+	status_t status = B_OK;
+
+	// ToDo: this should be settable somewhere
+	bool writeThrough = false;
 
 	// allocate pages for the cache and mark them busy
 	for (size_t pos = 0; pos < size; pos += B_PAGE_SIZE) {
@@ -555,49 +568,78 @@ write_chunk_to_cache(file_cache_ref *ref, off_t offset, size_t size,
 		vm_cache_insert_page(ref->cache, page, offset + pos);
 
 		addr_t virtualAddress;
-		vm_get_physical_page(page->ppn * B_PAGE_SIZE, &virtualAddress, PHYSICAL_PAGE_CAN_WAIT);
+		vm_get_physical_page(page->ppn * B_PAGE_SIZE, &virtualAddress,
+			PHYSICAL_PAGE_CAN_WAIT);
 
 		add_to_iovec(vecs, vecCount, MAX_IO_VECS, virtualAddress, B_PAGE_SIZE);
 		// ToDo: check if the array is large enough!
+	}
 
-		size_t bytes = min_c(bufferSize, size_t(B_PAGE_SIZE - pageOffset));
-		if (bytes != B_PAGE_SIZE) {
-			// This is only a partial write, so we have to read the rest of the page
-			// from the file to have consistent data in the cache
+	mutex_unlock(&ref->cache->lock);
+
+	// copy contents (and read in partially written pages first)
+
+	if (pageOffset != 0) {
+		// This is only a partial write, so we have to read the rest of the page
+		// from the file to have consistent data in the cache
+		iovec readVec = { vecs[0].iov_base, B_PAGE_SIZE };
+		size_t bytesRead = B_PAGE_SIZE;
+
+		status = pages_io(ref, offset, &readVec, 1, &bytesRead, false);
+		// ToDo: handle errors for real!
+		if (status < B_OK)
+			panic("pages_io() failed!\n");
+	}
+
+	addr_t lastPageOffset = (pageOffset + bufferSize) & ~(B_PAGE_SIZE - 1);
+	if (lastPageOffset != 0) {
+		// get the last page in the I/O vectors
+		addr_t last = (addr_t)vecs[vecCount - 1].iov_base
+			+ vecs[vecCount - 1].iov_len - B_PAGE_SIZE;
+
+		if (offset + pageOffset + bufferSize == ref->cache->cache->virtual_size) {
+			// the space in the page after this write action needs to be cleaned
+			memset((void *)(last + lastPageOffset), 0, B_PAGE_SIZE - lastPageOffset);
+		} else if (vecCount > 1) {
+			// the end of this write does not happen on a page boundary, so we
+			// need to fetch the last page before we can update it
+			iovec readVec = { (void *)last, B_PAGE_SIZE };
 			size_t bytesRead = B_PAGE_SIZE;
-			iovec readVec = { (void *)virtualAddress, B_PAGE_SIZE };
 
-			// ToDo: when calling pages_io(), unlocking the cache_ref would be
-			//	a great idea. But we can't do this in this loop, so the whole
-			//	thing should be changed so that pages_io() and the copy stuff
-			//	below can be called without holding the lock
-			pages_io(ref, offset + pos, &readVec, 1, &bytesRead, false);
-			// ToDo: handle errors!
+			status = pages_io(ref, offset + size - B_PAGE_SIZE, &readVec, 1,
+				&bytesRead, false);
+			// ToDo: handle errors for real!
+			if (status < B_OK)
+				panic("pages_io() failed!\n");
 		}
+	}
 
-		// copy data from user buffer if necessary
-		if (bufferSize != 0) {
-			user_memcpy((void *)(virtualAddress + pageOffset), (void *)buffer, bytes);
-			buffer += bytes;
-			bufferSize -= bytes;
+	for (int32 i = 0; i < vecCount; i++) {
+		addr_t base = (addr_t)vecs[i].iov_base;
+		size_t bytes = min_c(bufferSize, size_t(vecs[i].iov_len - pageOffset));
 
-			vm_page_set_state(page, PAGE_STATE_MODIFIED);
-		}
+		// copy data from user buffer
+		user_memcpy((void *)(base + pageOffset), (void *)buffer, bytes);
 
+		bufferSize -= bytes;
+		if (bufferSize == 0)
+			break;
+
+		buffer += bytes;
 		pageOffset = 0;
 	}
 
-	// ToDo: we only have to write the pages back immediately if write-back mode
-	//	is disabled, which is not possible right now
-#if 0
-	// write cached pages back to the file if we were asked to do that
-	status_t status = readwrite_pages(ref, offset, vecs, vecCount, &size, true);
-	if (status < B_OK) {
-		// ToDo: remove allocated pages...
-		panic("file_cache: remove allocated pages! write pages failed: %s\n", strerror(status));
-		return status;
+	if (writeThrough) {
+		// write cached pages back to the file if we were asked to do that
+		status_t status = pages_io(ref, offset, vecs, vecCount, &size, true);
+		if (status < B_OK) {
+			// ToDo: remove allocated pages, ...?
+			panic("file_cache: remove allocated pages! write pages failed: %s\n",
+				strerror(status));
+		}
 	}
-#endif
+
+	mutex_lock(&ref->cache->lock);
 
 	// unmap the pages again
 
@@ -610,11 +652,13 @@ write_chunk_to_cache(file_cache_ref *ref, off_t offset, size_t size,
 
 	// make the pages accessible in the cache
 	for (int32 i = pageIndex; i-- > 0;) {
-		if (pages[i]->state == PAGE_STATE_BUSY)
+		if (writeThrough)
 			pages[i]->state = PAGE_STATE_ACTIVE;
+		else
+			vm_page_set_state(pages[i], PAGE_STATE_MODIFIED);
 	}
 
-	return B_OK;
+	return status;
 }
 
 
@@ -1127,6 +1171,8 @@ file_cache_invalidate_file_map(void *_cacheRef, off_t offset, off_t size)
 	// ToDo: honour offset/size parameters
 
 	TRACE(("file_cache_invalidate_file_map(offset = %Ld, size = %Ld)\n", offset, size));
+	mutex_lock(&ref->cache->lock);
 	ref->map.Free();
+	mutex_unlock(&ref->cache->lock);
 	return B_OK;
 }
