@@ -1,0 +1,30 @@
+SubDir OBOS_TOP src add-ons kernel drivers audio ac97 auich ;
+
+R5KernelAddon auich : kernel drivers bin :
+	ac97.c
+	debug.c
+	auich.c
+	io.c
+	multi.c
+	util.c
+;
+
+# Link to kernel/drivers/dev/audio/multi
+{
+	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev audio multi ] ;
+	local instDriver = <kernel!drivers!dev!audio!multi>auich ;
+	MakeLocate $(instDriver) : $(dir) ;
+	RelSymLink $(instDriver) : auich ;
+}
+
+Package haiku-auich-cvs
+	:
+	auich
+	:
+	boot home config add-ons kernel drivers bin ;
+
+Package haiku-auich-cvs
+	:
+	<kernel!drivers!dev!audio!multi>auich
+	:
+	boot home config add-ons kernel drivers dev audio multi ;
