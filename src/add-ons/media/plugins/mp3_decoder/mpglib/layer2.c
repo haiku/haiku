@@ -264,6 +264,11 @@ int do_layer2(struct mpstr *mp, struct frame *fr,unsigned char *pcm_sample,int *
   fr->jsbound = (fr->mode == MPG_MD_JOINT_STEREO) ?
      (fr->mode_ext<<2)+4 : fr->II_sblimit;
 
+  if (fr->jsbound > fr->II_sblimit) {
+    fprintf(stderr, "libmpg123 layer2: Truncating stereo boundary to sideband limit.\n");
+    fr->jsbound=fr->II_sblimit;
+  }
+
   if(stereo == 1 || single == 3)
     single = 0;
 
