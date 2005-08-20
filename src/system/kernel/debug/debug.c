@@ -50,13 +50,13 @@ static struct debugger_command *sCommands;
 #define OUTPUT_BUFFER_SIZE 1024
 static char sOutputBuffer[OUTPUT_BUFFER_SIZE];
 
-#define LINE_BUF_SIZE 1024
+#define LINE_BUFFER_SIZE 1024
 #define MAX_ARGS 16
 #define HISTORY_SIZE 16
 
-static char line_buf[HISTORY_SIZE][LINE_BUF_SIZE] = { "", };
-static char sParseLine[LINE_BUF_SIZE] = "";
-static int cur_line = 0;
+static char sLineBuffer[HISTORY_SIZE][LINE_BUFFER_SIZE] = { "", };
+static char sParseLine[LINE_BUFFER_SIZE] = "";
+static int32 sCurrentLine = 0;
 static char *args[MAX_ARGS] = { NULL, };
 
 #define distance(a, b) ((a) < (b) ? (b) - (a) : (a) - (b))
@@ -79,6 +79,8 @@ find_command(char *name, bool partialMatch)
 
 	if (partialMatch) {
 		length = strlen(name);
+		if (length == 0)
+			return NULL;
 
 		for (command = sCommands; command != NULL; command = command->next) {
 			if (strncmp(name, command->name, length) == 0)
@@ -111,12 +113,12 @@ kputs(const char *s)
 
 
 static int
-read_line(char *buf, int max_len)
+read_line(char *buffer, int32 maxLength)
 {
-	char c;
-	int position = 0;
+	int32 currentHistoryLine = sCurrentLine;
+	int32 position = 0;
 	bool done = false;
-	int cur_history_spot = cur_line;
+	char c;
 
 	char (*readChar)(void);
 	if (sBlueScreenEnabled)
@@ -130,7 +132,7 @@ read_line(char *buf, int max_len)
 		switch (c) {
 			case '\n':
 			case '\r':
-				buf[position++] = '\0';
+				buffer[position++] = '\0';
 				kputchar('\n');
 				done = true;
 				break;
@@ -143,14 +145,18 @@ read_line(char *buf, int max_len)
 				}
 				break;
 			case 27: // escape sequence
-				c = readChar(); // should be '['
+				c = readChar();
+				if (c != '[') {
+					// ignore broken escape sequence
+					break;
+				}
 				c = readChar();
 				switch (c) {
-					case 67: // right arrow acts like space
-						buf[position++] = ' ';
+					case 'C': // right arrow acts like space
+						buffer[position++] = ' ';
 						kputchar(' ');
 						break;
-					case 68: // left arrow acts like backspace
+					case 'D': // left arrow acts like backspace
 						if (position > 0) {
 							kputs("\x1b[1D"); // move to the left one
 							kputchar(' ');
@@ -158,38 +164,39 @@ read_line(char *buf, int max_len)
 							position--;
 						}
 						break;
-					case 65: // up arrow
-					case 66: // down arrow
+					case 'A': // up arrow
+					case 'B': // down arrow
 					{
-						int history_line = 0;
-
-//						dprintf("1c %d h %d ch %d\n", cur_line, history_line, cur_history_spot);
+						int32 historyLine = 0;
 
 						if (c == 65) {
 							// up arrow
-							history_line = cur_history_spot - 1;
-							if (history_line < 0)
-								history_line = HISTORY_SIZE - 1;
+							historyLine = currentHistoryLine - 1;
+							if (historyLine < 0)
+								historyLine = HISTORY_SIZE - 1;
 						} else {
 							// down arrow
-							if (cur_history_spot != cur_line) {
-								history_line = cur_history_spot + 1;
-								if (history_line >= HISTORY_SIZE)
-									history_line = 0;
-							} else
-								break; // nothing to do here
+							if (currentHistoryLine == sCurrentLine)
+								break;
+
+							historyLine = currentHistoryLine + 1;
+							if (historyLine >= HISTORY_SIZE)
+								historyLine = 0;
 						}
 
-//						dprintf("2c %d h %d ch %d\n", cur_line, history_line, cur_history_spot);
+						// clear the history again if we're in the current line again
+						// (the buffer we get just is the current line buffer)
+						if (historyLine == sCurrentLine)
+							sLineBuffer[historyLine][0] = '\0';
 
 						// swap the current line with something from the history
 						if (position > 0)
-							kprintf("\x1b[%dD", position); // move to beginning of line
+							kprintf("\x1b[%ldD", position); // move to beginning of line
 
-						strcpy(buf, line_buf[history_line]);
-						position = strlen(buf);
-						kprintf("%s\x1b[K", buf); // print the line and clear the rest
-						cur_history_spot = history_line;
+						strcpy(buffer, sLineBuffer[historyLine]);
+						position = strlen(buffer);
+						kprintf("%s\x1b[K", buffer); // print the line and clear the rest
+						currentHistoryLine = historyLine;
 						break;
 					}
 					default:
@@ -205,7 +212,7 @@ read_line(char *buf, int max_len)
 					 * we assume we are talking with GDB
 					 */
 					if (position == 0) {
-						strcpy(buf, "gdb");
+						strcpy(buffer, "gdb");
 						position = 4;
 						done = true;
 						break;
@@ -213,11 +220,11 @@ read_line(char *buf, int max_len)
 				}
 				/* supposed to fall through */
 			default:
-				buf[position++] = c;
+				buffer[position++] = c;
 				kputchar(c);
 		}
-		if (position >= max_len - 2) {
-			buf[position++] = '\0';
+		if (position >= maxLength - 2) {
+			buffer[position++] = '\0';
 			kputchar('\n');
 			done = true;
 			break;
@@ -275,8 +282,8 @@ kernel_debugger_loop(void)
 		int argc;
 
 		kprintf("kdebug> ");
-		read_line(line_buf[cur_line], LINE_BUF_SIZE);
-		parse_line(line_buf[cur_line], args, &argc, MAX_ARGS);
+		read_line(sLineBuffer[sCurrentLine], LINE_BUFFER_SIZE);
+		parse_line(sLineBuffer[sCurrentLine], args, &argc, MAX_ARGS);
 
 		// We support calling last executed command again if
 		// B_KDEDUG_CONT was returned last time, so cmd != NULL
@@ -300,9 +307,8 @@ kernel_debugger_loop(void)
 				cmd = NULL;		// forget last command executed...
 		}
 
-		cur_line++;
-		if (cur_line >= HISTORY_SIZE)
-			cur_line = 0;
+		if (++sCurrentLine >= HISTORY_SIZE)
+			sCurrentLine = 0;
 	}
 }
 
