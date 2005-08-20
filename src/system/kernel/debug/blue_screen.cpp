@@ -31,6 +31,12 @@ typedef enum {
 	CONSOLE_STATE_PARSING_ARG,
 } console_state;
 
+typedef enum {
+	LINE_ERASE_WHOLE,
+	LINE_ERASE_LEFT,
+	LINE_ERASE_RIGHT
+} erase_line_mode;
+
 struct screen_info {
 	int32	columns;
 	int32	rows;
@@ -104,6 +110,25 @@ next_line(void)
 	sModule->fill_glyph(0, (sScreen.y + 2) % sScreen.rows, sScreen.columns, 1, ' ', sScreen.attr);
 #endif
 	sScreen.x = 0;
+}
+
+
+static void
+erase_line(erase_line_mode mode)
+{
+	switch (mode) {
+		case LINE_ERASE_WHOLE:
+			sModule->fill_glyph(0, sScreen.y, sScreen.columns, 1, ' ', sScreen.attr);
+			break;
+		case LINE_ERASE_LEFT:
+			sModule->fill_glyph(0, sScreen.y, sScreen.x + 1, 1, ' ', sScreen.attr);
+			break;
+		case LINE_ERASE_RIGHT:
+			sModule->fill_glyph(sScreen.x, sScreen.y, sScreen.columns - sScreen.x,
+				1, ' ', sScreen.attr);
+			break;
+//		default:
+	}
 }
 
 
@@ -288,17 +313,19 @@ process_vt100_command(const char c, bool seenBracket, int32 *args, int32 argCoun
 				}
 				break;
 			}
+#endif
 			case 'K':
 				if (argCount == 0 || args[0] == 0) {
 					// erase to end of line
-					erase_line(console, LINE_ERASE_RIGHT);
+					erase_line(LINE_ERASE_RIGHT);
 				} else if (argCount > 0) {
 					if (args[0] == 1)
-						erase_line(console, LINE_ERASE_LEFT);
+						erase_line(LINE_ERASE_LEFT);
 					else if (args[0] == 2)
-						erase_line(console, LINE_ERASE_WHOLE);
+						erase_line(LINE_ERASE_WHOLE);
 				}
 				break;
+#if 0
 			case 'J':
 				if (argCount == 0 || args[0] == 0) {
 					// erase to end of screen
