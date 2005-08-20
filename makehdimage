@@ -79,6 +79,7 @@ imageSize=80
 
 # the architecture; ToDo: set correctly (using uname?)
 arch=x86
+type=release
 
 # build everything needed
 previousDir=`pwd`
@@ -93,10 +94,10 @@ else
 fi
 
 # paths of helper commands
-rc=$sourceDir/objects/${arch}.R1/tools/rc/rc
-resattr=$sourceDir/objects/${arch}.R1/tools/resattr/resattr
-fsShellCommand=$sourceDir/objects/${arch}.R1/tests/add-ons/kernel/file_systems/fs_shell/fs_shell_command
-bfsShell=$sourceDir/objects/${arch}.R1/tests/add-ons/kernel/file_systems/bfs/bfs_shell/bfs_shell
+rc=$sourceDir/objects/${arch}.${type}.haiku/tools/rc/rc
+resattr=$sourceDir/objects/${arch}.${type}.haiku/tools/resattr/resattr
+fsShellCommand=$sourceDir/objects/${arch}.${type}.haiku/tests/add-ons/kernel/file_systems/fs_shell/fs_shell_command
+bfsShell=$sourceDir/objects/${arch}.${type}.haiku/tests/add-ons/kernel/file_systems/bfs/bfs_shell/bfs_shell
 
 export TARGET_PLATFORM=haiku
 
@@ -267,8 +268,8 @@ $mkdir -p var/log
 
 echo "Installing kernel modules..."
 
-cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel
-$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel
+cd $sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/kernel
+$scd ${sPrefix}$sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/kernel
 
 for f in $BEOS_ADD_ONS_BUS_MANAGERS; do
 	$cp ${sPrefix}bus_managers/$f $targetDir/beos/system/add-ons/kernel/bus_managers/$f
@@ -285,16 +286,16 @@ for f in drivers/dev/disk/scsi/scsi_dsk drivers/dev/disk/scsi/scsi_cd; do
 	$cp ${sPrefix}$name $targetDir/beos/system/add-ons/kernel/$name
 done
 
-cd $sourceDir/objects/${arch}.R1/add-ons/kernel
-$scd ${sPrefix}$sourceDir/objects/${arch}.R1/add-ons/kernel
+cd $sourceDir/objects/${arch}.${type}.haiku/add-ons/kernel
+$scd ${sPrefix}$sourceDir/objects/${arch}.${type}.haiku/add-ons/kernel
 
 # drivers
 for f in drivers/arch/${arch}/keyboard/keyboard; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/drivers/bin
 done
 
-cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/drivers/bin
-$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/drivers/bin
+cd $sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/kernel/drivers/bin
+$scd ${sPrefix}$sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/kernel/drivers/bin
 for f in $BEOS_ADD_ONS_DRIVERS_AUDIO; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/drivers/bin
 done
@@ -308,8 +309,8 @@ for f in ps2_hid; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/drivers/bin
 done
 
-cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/drivers/dev
-$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/drivers/dev
+cd $sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/kernel/drivers/dev
+$scd ${sPrefix}$sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/kernel/drivers/dev
 for f in misc/config console tty random dprintf null zero; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/drivers/bin
 done
@@ -317,26 +318,26 @@ done
 
 # kernel
 echo "Installing kernel..."
-$cp ${sPrefix}$sourceDir/objects/${arch}.R1/system/kernel_${arch} $targetDir/beos/system/
+$cp ${sPrefix}$sourceDir/objects/${arch}.${type}.haiku/system/kernel_${arch} $targetDir/beos/system/
 
 
 # libs
 echo "Installing libraries..."
-cd $sourceDir/distro/${arch}.R1/beos/system/lib
-$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/lib
+cd $sourceDir/distro/${arch}.${type}.haiku/beos/system/lib
+$scd ${sPrefix}$sourceDir/distro/${arch}.${type}.haiku/beos/system/lib
 for f in $BEOS_SYSTEM_LIB; do
 	$cp ${sPrefix}$f $targetDir/beos/system/lib/
 done
 
-cd $sourceDir/objects/${arch}.R1/system/
-$scd ${sPrefix}$sourceDir/objects/${arch}.R1/system/
+cd $sourceDir/objects/${arch}.${type}.haiku/system/
+$scd ${sPrefix}$sourceDir/objects/${arch}.${type}.haiku/system/
 $cp ${sPrefix}runtime_loader/rld.so ${sPrefix}libroot.so $targetDir/beos/system/lib/
 
 
 # servers
 echo "Installing servers..."
-cd $sourceDir/distro/${arch}.R1/beos/system/servers
-$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/servers
+cd $sourceDir/distro/${arch}.${type}.haiku/beos/system/servers
+$scd ${sPrefix}$sourceDir/distro/${arch}.${type}.haiku/beos/system/servers
 for f in $BEOS_SYSTEM_SERVERS; do
 	$cp ${sPrefix}$f $targetDir/beos/system/servers/
 done
@@ -345,33 +346,33 @@ done
 # apps
 echo "Installing apps..."
 
-cd $sourceDir/objects/${arch}.R1/tests/kernel/boot_floppy
-$scd ${sPrefix}$sourceDir/objects/${arch}.R1/tests/kernel/boot_floppy
+cd $sourceDir/objects/${arch}.${type}.haiku/tests/kernel/boot_floppy
+$scd ${sPrefix}$sourceDir/objects/${arch}.${type}.haiku/tests/kernel/boot_floppy
 for f in fortune; do
 	$cp ${sPrefix}kernel_$f $targetDir/beos/bin/$f
 done
 
-cd $sourceDir/distro/${arch}.R1/beos/bin
-$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/bin
+cd $sourceDir/distro/${arch}.${type}.haiku/beos/bin
+$scd ${sPrefix}$sourceDir/distro/${arch}.${type}.haiku/beos/bin
 for f in ../apps/consoled $BEOS_BIN route; do
 	$cp ${sPrefix}$f $targetDir/beos/bin/
 done
 
-cd $sourceDir/distro/${arch}.R1/beos/apps
-$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/apps
+cd $sourceDir/distro/${arch}.${type}.haiku/beos/apps
+$scd ${sPrefix}$sourceDir/distro/${arch}.${type}.haiku/beos/apps
 for f in $BEOS_APPS; do
 	$cp ${sPrefix}$f $targetDir/beos/apps/
 done
 
 
-cd $sourceDir/distro/${arch}.R1/beos/preferences
-$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/preferences
+cd $sourceDir/distro/${arch}.${type}.haiku/beos/preferences
+$scd ${sPrefix}$sourceDir/distro/${arch}.${type}.haiku/beos/preferences
 for f in $BEOS_PREFERENCES; do
 	$cp ${sPrefix}$f $targetDir/beos/preferences/
 done
 
-cd $sourceDir/distro/${arch}.R1/beos/system
-$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system
+cd $sourceDir/distro/${arch}.${type}.haiku/beos/system
+$scd ${sPrefix}$sourceDir/distro/${arch}.${type}.haiku/beos/system
 for f in Deskbar Tracker; do
 	$cp ${sPrefix}$f $targetDir/beos/system/
 done
@@ -393,7 +394,7 @@ if [ -e /boot/beos/etc/fonts/ttfonts/Swiss721.ttf ]; then
 fi
 #$cp -r ${sPrefix}data/etc/KanBe $targetDir/beos/etc/
 $cp ${sPrefix}src/tests/kernel/boot_floppy/fortune/fortunes $targetDir/beos/etc/
-$cp -r ${sPrefix}distro/${arch}.R1/beos/etc $targetDir/beos/
+$cp -r ${sPrefix}distro/${arch}.${type}.haiku/beos/etc $targetDir/beos/
 
 $cp ${sPrefix}data/settings/kernel/drivers/kernel \
 	$targetDir/home/config/settings/kernel/drivers/
@@ -404,17 +405,17 @@ fi
 
 $ln -sf /boot/beos/etc/timezones/Europe/Paris \
 	$targetDir/home/config/settings/timezone
-$cp ${sPrefix}distro/${arch}.R1/beos/etc/Keymap/US-International \
+$cp ${sPrefix}distro/${arch}.${type}.haiku/beos/etc/Keymap/US-International \
 	$targetDir/home/config/settings/Key_map
 
 
 # boot loader
 echo "Installing boot loader..."
-cd $sourceDir/objects/${arch}.R1/system/
+cd $sourceDir/objects/${arch}.${type}.haiku/system/
 rm -f zbeos
 objcopy -O binary boot_loader zbeos
 $cd $targetDir/beos/system
-$cp ${sPrefix}$sourceDir/objects/${arch}.R1/system/zbeos .
+$cp ${sPrefix}$sourceDir/objects/${arch}.${type}.haiku/system/zbeos .
 
 
 # boot module links
@@ -459,63 +460,63 @@ done
 # add-ons
 echo "Copying add-ons..."
 
-cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/accelerants
-$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/accelerants
+cd $sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/accelerants
+$scd ${sPrefix}$sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/accelerants
 for f in $BEOS_ADD_ONS_ACCELERANTS; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/accelerants/
 done
 
-cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/Translators
-$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/Translators
+cd $sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/Translators
+$scd ${sPrefix}$sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/Translators
 for f in $BEOS_ADD_ONS_TRANSLATORS; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/Translators/
 done
 
-cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/media
-$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/media
+cd $sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/media
+$scd ${sPrefix}$sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/media
 for f in $BEOS_ADD_ONS_MEDIA; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/media/
 done
 
-cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/media/plugins
-$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/media/plugins
+cd $sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/media/plugins
+$scd ${sPrefix}$sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/media/plugins
 for f in $BEOS_ADD_ONS_MEDIA_PLUGINS; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/media/plugins/
 done
 
-cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/input_server/
-$cd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/input_server/
+cd $sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/input_server/
+$cd ${sPrefix}$sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/input_server/
 for f in devices/keyboard devices/mouse filters/screen_saver methods/canna; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/input_server/$(dirname $f)/
 done
 
 # network add-ons
-cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/obos_network
-$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/obos_network
+cd $sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/kernel/obos_network
+$scd ${sPrefix}$sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/kernel/obos_network
 for f in $BEOS_NETWORK_CORE; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/network
 done
 
-cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/obos_network/interfaces
-$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/obos_network/interfaces
+cd $sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/kernel/obos_network/interfaces
+$scd ${sPrefix}$sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/kernel/obos_network/interfaces
 for f in $BEOS_NETWORK_INTERFACES; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/network/interfaces
 done
 
-cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/obos_network/ppp
-$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/obos_network/ppp
+cd $sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/kernel/obos_network/ppp
+$scd ${sPrefix}$sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/kernel/obos_network/ppp
 for f in $BEOS_NETWORK_PPP; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/network/ppp
 done
 
-cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/obos_network/protocols
-$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/obos_network/protocols
+cd $sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/kernel/obos_network/protocols
+$scd ${sPrefix}$sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/kernel/obos_network/protocols
 for f in $BEOS_NETWORK_PROTOCOLS; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/network/protocols
 done
 
-cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/Screen\ Savers
-$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/Screen\ Savers
+cd $sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/Screen\ Savers
+$scd ${sPrefix}$sourceDir/distro/${arch}.${type}.haiku/beos/system/add-ons/Screen\ Savers
 for f in $BEOS_ADD_ONS_SCREENSAVERS; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/Screen\ Savers
 done
