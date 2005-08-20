@@ -182,17 +182,17 @@ KernelLd fork_test :
 
 KernelConfigSection drivers/dev/tty
 	: elf32
-	: $(OBOS_TOP)/distro/$(OBOS_ARCH).R1/beos/system/add-ons/kernel/drivers/dev/tty
+	: $(OBOS_TOP)/distro/$(OBOS_TARGET)/beos/system/add-ons/kernel/drivers/dev/tty
 	;
 
 KernelConfigSection drivers/dev/console
 	: elf32
-	: $(OBOS_TOP)/distro/$(OBOS_ARCH).R1/beos/system/add-ons/kernel/drivers/dev/console
+	: $(OBOS_TOP)/distro/$(OBOS_TARGET)/beos/system/add-ons/kernel/drivers/dev/console
 	;
 
 KernelConfigSection addons/kernel/console/vga_text
 	: elf32
-	: $(OBOS_TOP)/distro/$(OBOS_ARCH).R1/beos/system/add-ons/kernel/console/vga_text
+	: $(OBOS_TOP)/distro/$(OBOS_TARGET)/beos/system/add-ons/kernel/console/vga_text
 	;
 
 KernelLd kernel_ps :
