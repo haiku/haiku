@@ -60,12 +60,22 @@ if [ $# \> 0 ]; then
 	fi
 fi
 
+# the architecture; ToDo: set correctly (using uname?)
+arch=x86
+
+if [ "$DEBUG" \> 0 ]; then
+	type=debug_$DEBUG
+else
+	type=release
+fi
+date=`date +%Y-%m-%d.%H:%M`
+
 # disk image path, size in MB
 if [ -d "$1" ]; then
 	alreadyMounted=true
 	targetDir=$1
 elif [ "$1" == "" ]; then
-	imagePath=$sourceDir/haiku.image
+	imagePath=$sourceDir/haiku.${arch}.${type}.${date}.image
 else
 	imagePath=$1
 fi
@@ -76,10 +86,6 @@ imageSize=80
 	# 60 MB: cylinders=122, heads=16, spt=63
 	# 80 MB: cylinders=164, heads=16, spt=63
 	# 100 MB: cylinders=204, heads=16, spt=63
-
-# the architecture; ToDo: set correctly (using uname?)
-arch=x86
-type=release
 
 # build everything needed
 previousDir=`pwd`
