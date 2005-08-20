@@ -4,7 +4,6 @@
  *  DESCR: used by BMediaEventLooper
  ***********************************************************************/
 
-#define NDEBUG
 #include <TimedEventQueue.h>
 #include <string.h>
 #include "TimedEventQueuePrivate.h"

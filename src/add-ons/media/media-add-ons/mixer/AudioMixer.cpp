@@ -1686,9 +1686,7 @@ AudioMixer::UpdateParameterWeb()
 	group->MakeNullParameter(PARAM_ETC(1002), B_MEDIA_RAW_AUDIO, "Haiku audio mixer", B_GENERIC);
 	group->MakeNullParameter(PARAM_ETC(1003), B_MEDIA_RAW_AUDIO, "Version: " VERSION_STRING , B_GENERIC);
 	group->MakeNullParameter(PARAM_ETC(1004), B_MEDIA_RAW_AUDIO, "Build: " BUILD_STRING
-		#if DEBUG == 0
-			", optimization disabled"
-		#elif DEBUG > 0
+		#if DEBUG
 			", debugging enabled"
 		#endif
 		, B_GENERIC);
