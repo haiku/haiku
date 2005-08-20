@@ -583,19 +583,29 @@ dump_thread_list(int argc, char **argv)
 	struct thread *t;
 	struct hash_iterator i;
 	int32 requiredState = 0;
+	sem_id sem = -1;
 
 	if (!strcmp(argv[0], "ready"))
 		requiredState = B_THREAD_READY;
 	else if (!strcmp(argv[0], "running"))
 		requiredState = B_THREAD_RUNNING;
-	else if (!strcmp(argv[0], "waiting"))
+	else if (!strcmp(argv[0], "waiting")) {
 		requiredState = B_THREAD_WAITING;
+
+		if (argc > 1) {
+			sem = strtoul(argv[1], NULL, 0);
+			if (sem == 0)
+				kprintf("ignoring invalid semaphore argument.\n");
+		}
+	}
 
 	kprintf("thread         id  state       sem cpu  stack       name\n");
 
 	hash_open(sThreadHash, &i);
 	while ((t = hash_next(sThreadHash, &i)) != NULL) {
 		if (requiredState && t->state != requiredState)
+			continue;
+		if (sem > 0 && t->sem.blocking != sem)
 			continue;
 
 		kprintf("%p %6lx  %-9s", t, t->id, state_to_text(t, t->state));
@@ -1336,7 +1346,7 @@ thread_init(kernel_args *args)
 	add_debugger_command("threads", &dump_thread_list, "list all threads");
 	add_debugger_command("ready", &dump_thread_list, "list all ready threads");
 	add_debugger_command("running", &dump_thread_list, "list all running threads");
-	add_debugger_command("waiting", &dump_thread_list, "list all waiting threads");
+	add_debugger_command("waiting", &dump_thread_list, "list all waiting threads (optionally for a specific semaphore)");
 	add_debugger_command("thread", &dump_thread_info, "list info about a particular thread");
 	add_debugger_command("next_q", &dump_next_thread_in_q, "dump the next thread in the queue of last thread viewed");
 	add_debugger_command("next_all", &dump_next_thread_in_all_list, "dump the next thread in the global list of the last thread viewed");
