@@ -945,13 +945,6 @@ cbuf_init(void)
 	cbuf *buffer;
 	int i;
 
-/*
-	sFreeBufferList = NULL;
-	sFreeBufferNoBlockList = NULL;
-	sNoBlockSpinlock = 0;
-	sLowlevelSpinlock = 0;
-*/
-
 	// add the debug command
 	add_debugger_command("cbuf_freelist", &dbg_dump_cbuf_freelists, "Dumps the cbuf free lists");
 
@@ -979,16 +972,6 @@ cbuf_init(void)
 	// initialize the bitmap
 	for (i = 0; i < CBUF_BITMAP_SIZE / 8; i++)
 		sBitmap[i] = 0;
-
-	buffer = allocate_cbuf_mem(ALLOCATE_CHUNK);
-	if (buffer == NULL)
-		return B_NO_MEMORY;
-	cbuf_free_chain_noblock(buffer);
-
-	buffer = allocate_cbuf_mem(ALLOCATE_CHUNK);
-	if (buffer == NULL)
-		return B_NO_MEMORY;
-	cbuf_free_chain(buffer);
 
 	return B_OK;
 }
