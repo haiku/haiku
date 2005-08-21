@@ -23,6 +23,13 @@
   #pragma alloca
 #endif
 
+
+/********************************************/
+/* Remove this to enable debugging in regex */
+#undef DEBUG
+/********************************************/
+
+
 #undef	_GNU_SOURCE
 #define _GNU_SOURCE
 
