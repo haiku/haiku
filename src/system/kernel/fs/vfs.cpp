@@ -5154,8 +5154,11 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 	// release the file system
 	put_file_system(mount->fs);
 
-	// dereference the partition
+	// dereference the partition and mark it unmounted
 	if (partition) {
+		partition->SetVolumeID(-1);
+		partition->SetMountCookie(NULL);
+
 		if (mount->owns_file_device)
 			KDiskDeviceManager::Default()->DeleteFileDevice(partition->ID());
 		partition->Unregister();
