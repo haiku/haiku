@@ -111,7 +111,7 @@ avCodec::Setup(media_format *ioEncodedFormat, const void *infoBuffer, size_t inf
 	char buffer[1024];
 	string_for_format(*ioEncodedFormat, buffer, sizeof(buffer));
 	PRINT(("[%c]   input_format=%s\n", isAudio?('a'):('v'), buffer));
-	PRINT(("[%c]   in_info_size=%ld\n", isAudio?('a'):('v'), in_size));
+	PRINT(("[%c]   infoSize=%ld\n", isAudio?('a'):('v'), infoSize));
 	PRINT(("[%c]   user_data_type=%08lx\n", isAudio?('a'):('v'), ioEncodedFormat->user_data_type));
 //	PRINT(("[%c]   meta_data_size=%ld\n", isAudio?('a'):('v'), ioEncodedFormat->meta_data_size));
 #endif
