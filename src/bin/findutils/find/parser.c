@@ -142,7 +142,7 @@ static boolean insert_num P_((char *argv[], int *arg_ptr, PFB pred));
 static FILE *open_output_file P_((char *path));
 
 #ifdef DEBUG
-char *find_pred_name _P((PFB pred_func));
+char *find_pred_name(PFB pred_func);
 #endif /* DEBUG */
 
 struct parser_table
