@@ -20,6 +20,7 @@
 #include <debug.h>
 #include <thread.h>
 #include <team.h>
+#include <vm_page.h>
 #include <boot/kernel_args.h>
 
 #include <string.h>
@@ -57,8 +58,9 @@ struct sem_entry {
 	} u;
 };
 
-// ToDo: Compute based on the amount of available memory.
+static const int32 kMaxSemaphores = 65536;
 static int32 sMaxSems = 4096;
+	// Final value is computed based on the amount of available memory
 static int32 sUsedSems = 0;
 
 static struct sem_entry *sSems = NULL;
@@ -204,9 +206,18 @@ sem_init(kernel_args *args)
 
 	TRACE(("sem_init: entry\n"));
 
+	// compute maximal number of semaphores depending on the available memory
+	// 128 MB -> 16384 semaphores, 448 kB fixed array size
+	// 256 MB -> 32768, 896 kB
+	// 512 MB and more -> 1.75 MB
+	i = vm_page_num_pages() / 2;
+	while (sMaxSems < i && sMaxSems < kMaxSemaphores)
+		sMaxSems <<= 1;
+
 	// create and initialize semaphore table
 	area = create_area("sem_table", (void **)&sSems, B_ANY_KERNEL_ADDRESS,
-		sizeof(struct sem_entry) * sMaxSems, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		sizeof(struct sem_entry) * sMaxSems, B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (area < 0)
 		panic("unable to allocate semaphore table!\n");
 
