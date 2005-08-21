@@ -62,7 +62,8 @@ Desktop::Desktop()
 	fAppListLock("application list"),
 	fShutdownSemaphore(-1),
 	fWinBorderList(64),
-	fActiveScreen(NULL)
+	fActiveScreen(NULL),
+	fCursorManager()
 {
 	// TODO: use user name
 	char name[B_OS_NAME_LENGTH];
@@ -104,7 +105,7 @@ Desktop::Init()
 	fRootLayer->RunThread();
 
 	// take care of setting the default cursor
-	ServerCursor *cursor = fRootLayer->GetCursorManager().GetCursor(B_CURSOR_DEFAULT);
+	ServerCursor *cursor = fCursorManager.GetCursor(B_CURSOR_DEFAULT);
 	if (cursor)
 		fVirtualScreen.HWInterface()->SetCursor(cursor);
 }

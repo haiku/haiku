@@ -118,11 +118,8 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 		return;
 	}
 
-	// although this isn't pretty, ATM we have only one RootLayer.
-	// there should be a way that this ServerApp be attached to a particular
-	// RootLayer to know which RootLayer's cursor to modify.
 	ServerCursor *defaultCursor = 
-		fDesktop->ActiveRootLayer()->GetCursorManager().GetCursor(B_CURSOR_DEFAULT);
+		fDesktop->GetCursorManager().GetCursor(B_CURSOR_DEFAULT);
 
 	if (defaultCursor) {
 		fAppCursor = new ServerCursor(defaultCursor);
@@ -199,10 +196,7 @@ ServerApp::~ServerApp(void)
 		delete (ServerPicture*)fPictureList.ItemAt(i);
 	}
 
-	// although this isn't pretty, ATM we have only one RootLayer.
-	// there should be a way that this ServerApp be attached to a particular
-	// RootLayer to know which RootLayer's cursor to modify.
-	fDesktop->ActiveRootLayer()->GetCursorManager().RemoveAppCursors(fClientTeam);
+	fDesktop->GetCursorManager().RemoveAppCursors(fClientTeam);
 
 	STRACE(("ServerApp %s::~ServerApp(): Exiting\n", Signature()));
 }
@@ -308,9 +302,6 @@ ServerApp::Activate(bool value)
 void
 ServerApp::SetAppCursor(void)
 {
-	// although this isn't pretty, ATM we have only one RootLayer.
-	// there should be a way that this ServerApp be attached to a particular
-	// RootLayer to know which RootLayer's cursor to modify.
 	if (fAppCursor)
 		fDesktop->GetHWInterface()->SetCursor(fAppCursor);
 }
@@ -928,15 +919,10 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			break;
 		}
 		
-		// Theoretically, we could just call the driver directly, but we will
-		// call the CursorManager's version to allow for future expansion
 		case AS_SHOW_CURSOR:
 		{
 			STRACE(("ServerApp %s: Show Cursor\n", Signature()));
-			// although this isn't pretty, ATM we have only one RootLayer.
-			// there should be a way that this ServerApp be attached to a particular
-			// RootLayer to know which RootLayer's cursor to modify.
-// TODO: support nested showing/hiding
+			// TODO: support nested showing/hiding
 			fDesktop->GetHWInterface()->SetCursorVisible(true);
 			fCursorHidden = false;
 			break;
@@ -944,10 +930,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_HIDE_CURSOR:
 		{
 			STRACE(("ServerApp %s: Hide Cursor\n", Signature()));
-			// although this isn't pretty, ATM we have only one RootLayer.
-			// there should be a way that this ServerApp be attached to a particular
-			// RootLayer to know which RootLayer's cursor to modify.
-// TODO: support nested showing/hiding
+			// TODO: support nested showing/hiding
 			fDesktop->GetHWInterface()->SetCursorVisible(false);
 			fCursorHidden = true;
 			break;
@@ -955,10 +938,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_OBSCURE_CURSOR:
 		{
 			STRACE(("ServerApp %s: Obscure Cursor\n", Signature()));
-			// although this isn't pretty, ATM we have only one RootLayer.
-			// there should be a way that this ServerApp be attached to a particular
-			// RootLayer to know which RootLayer's cursor to modify.
-//			fDesktop->GetHWInterface()->ObscureCursor();
+			// ToDo: Enable ObscureCursor
+			//fDesktop->GetHWInterface()->ObscureCursor();
 			break;
 		}
 		case AS_QUERY_CURSOR_HIDDEN:
@@ -981,15 +962,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// otherwise be easy to crash the server by calling SetCursor a
 			// sufficient number of times
 			if(fAppCursor)
-				fDesktop->ActiveRootLayer()->GetCursorManager().DeleteCursor(fAppCursor->ID());
+				fDesktop->GetCursorManager().DeleteCursor(fAppCursor->ID());
 
 			fAppCursor = new ServerCursor(cdata);
 			fAppCursor->SetOwningTeam(fClientTeam);
 			fAppCursor->SetAppSignature(Signature());
-			fDesktop->ActiveRootLayer()->GetCursorManager().AddCursor(fAppCursor);
-			// although this isn't pretty, ATM we have only one RootLayer.
-			// there should be a way that this ServerApp be attached to a particular
-			// RootLayer to know which RootLayer's cursor to modify.
+
+			// ToDo: These two should probably both be done in Desktop directly
+			fDesktop->GetCursorManager().AddCursor(fAppCursor);
 			fDesktop->GetHWInterface()->SetCursor(fAppCursor);
 			break;
 		}
@@ -1005,12 +985,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			
 			link.Read<bool>(&sync);
 			link.Read<int32>(&ctoken);
-			
-			// although this isn't pretty, ATM we have only one RootLayer.
-			// there should be a way that this ServerApp be attached to a particular
-			// RootLayer to know which RootLayer's cursor to modify.
-			ServerCursor	*cursor;
-			if ((cursor = fDesktop->ActiveRootLayer()->GetCursorManager().FindCursor(ctoken)))
+
+			ServerCursor *cursor = fDesktop->GetCursorManager().FindCursor(ctoken);
+			if (cursor)
 				fDesktop->GetHWInterface()->SetCursor(cursor);
 
 			if (sync) {
@@ -1031,13 +1008,17 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			int8 cursorData[68];
 			link.Read(cursorData, sizeof(cursorData));
 
+			// Because we don't want an overaccumulation of these particular
+			// cursors, we will delete them if there is an existing one. It would
+			// otherwise be easy to crash the server by calling CreateCursor a
+			// sufficient number of times
+			if (fAppCursor)
+				fDesktop->GetCursorManager().DeleteCursor(fAppCursor->ID());
+
 			fAppCursor = new ServerCursor(cursorData);
 			fAppCursor->SetOwningTeam(fClientTeam);
 			fAppCursor->SetAppSignature(Signature());
-			// although this isn't pretty, ATM we have only one RootLayer.
-			// there should be a way that this ServerApp be attached to a particular
-			// RootLayer to know which RootLayer's cursor to modify.
-			fDesktop->ActiveRootLayer()->GetCursorManager().AddCursor(fAppCursor);
+			fDesktop->GetCursorManager().AddCursor(fAppCursor);
 
 			// Synchronous message - BApplication is waiting on the cursor's ID
 			fLink.StartMessage(SERVER_TRUE);
@@ -1056,10 +1037,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (fAppCursor && fAppCursor->ID() == ctoken)
 				fAppCursor = NULL;
 
-			// although this isn't pretty, ATM we have only one RootLayer.
-			// there should be a way that this ServerApp be attached to a particular
-			// RootLayer to know which RootLayer's cursor to modify.
-			fDesktop->ActiveRootLayer()->GetCursorManager().DeleteCursor(ctoken);
+			fDesktop->GetCursorManager().DeleteCursor(ctoken);
 			break;
 		}
 		case AS_GET_SCROLLBAR_INFO:

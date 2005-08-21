@@ -35,7 +35,6 @@
 #include "DebugInfoManager.h"
 #include "Desktop.h"
 #include "Layer.h"
-#include "CursorManager.h"
 #include "Workspace.h"
 
 class DisplayDriver;
@@ -121,8 +120,6 @@ public:
 
 	static	int32				WorkingThread(void *data);
 
-			CursorManager&		GetCursorManager() { return fCursorManager; }
-
 			// Other methods
 			bool				Lock() { return fAllRegionsLock.Lock(); }
 			void				Unlock() { fAllRegionsLock.Unlock(); }
@@ -179,8 +176,6 @@ friend class Desktop;
 			WinBorder*			fMouseTargetWinBorder;
 			int32				fViewAction;
 			Layer*				fEventMaskLayer;
-
-			CursorManager		fCursorManager;
 
 			BLocker				fAllRegionsLock;
 

@@ -81,8 +81,6 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	  fViewAction(B_ENTERED_VIEW),
 	  fEventMaskLayer(NULL),
 
-	  fCursorManager(),
-
 	  fAllRegionsLock("root layer region lock"),
 
 	  fThreadID(B_ERROR),

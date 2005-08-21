@@ -371,10 +371,7 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 
 		case AS_SET_SYSCURSOR_DEFAULTS:
 		{
-			// although this isn't pretty, ATM we only have RootLayer.
-			// this messages should be handled somewhere into a RootLayer
-			// specific area - this set is intended for a RootLayer.
-			gDesktop->ActiveRootLayer()->GetCursorManager().SetDefaults();
+			gDesktop->GetCursorManager().SetDefaults();
 			break;
 		}
 

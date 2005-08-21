@@ -10,7 +10,7 @@
 #ifndef _DESKTOP_H_
 #define _DESKTOP_H_
 
-
+#include "CursorManager.h"
 #include "ScreenManager.h"
 #include "ServerScreen.h"
 #include "VirtualScreen.h"
@@ -54,6 +54,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 	inline	Screen*				ActiveScreen() const
 									{ return fActiveScreen; }
 	inline	RootLayer*			ActiveRootLayer() const { return fRootLayer; }
+	inline	CursorManager&		GetCursorManager() { return fCursorManager; }
 
 	virtual void				ScreenRemoved(Screen* screen) {}
 	virtual void				ScreenAdded(Screen* screen) {}
@@ -111,6 +112,8 @@ class Desktop : public MessageLooper, public ScreenOwner {
 
 			RootLayer*			fRootLayer;
 			Screen*				fActiveScreen;
+			
+			CursorManager		fCursorManager;
 };
 
 extern Desktop *gDesktop;
