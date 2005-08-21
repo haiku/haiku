@@ -7,4 +7,6 @@ UseFreeTypeHeaders ;
 
 FT2_Library  $(FT2_LIB) : ftgzip.c ;
 
+ObjectCcFlags ftgzip.c : -UDEBUG ;
+
 # end of src/pcf Jamfile
