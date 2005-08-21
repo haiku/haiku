@@ -255,6 +255,7 @@ CachedNode::Free(Transaction &transaction, off_t offset)
 			return status;
 
 		header->maximum_size = HOST_ENDIAN_TO_BFS_INT64(lastOffset);
+		return B_OK;
 	}
 
 	// add the node to the free nodes list
