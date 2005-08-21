@@ -940,7 +940,7 @@ vm_map_physical_memory(aspace_id aid, const char *name, void **_address,
 	vm_cache_ref *cache_ref;
 	vm_store *store;
 	addr_t map_offset;
-	int err;
+	status_t status;
 	vm_address_space *aspace = vm_get_aspace_by_id(aid);
 
 	TRACE(("vm_map_physical_memory(aspace = %ld, \"%s\", virtual = %p, spec = %ld,"
@@ -975,11 +975,20 @@ vm_map_physical_memory(aspace_id aid, const char *name, void **_address,
 	cache->scan_skip = 1;
 
 	vm_cache_acquire_ref(cache_ref, true);
-	err = map_backing_store(aspace, store, _address, 0, size, addressSpec, 0, protection, REGION_NO_PRIVATE_MAP, &area, name);
+	status = map_backing_store(aspace, store, _address, 0, size, addressSpec, 0, protection, REGION_NO_PRIVATE_MAP, &area, name);
 	vm_cache_release_ref(cache_ref);
+
+	if (status >= B_OK) {
+		// make sure our area is mapped in completely
+		// (even if that makes the fault routine pretty much useless)
+		for (addr_t offset = 0; offset < size; offset += B_PAGE_SIZE) {
+			store->ops->fault(store, aspace, offset);
+		}
+	}
+
 	vm_put_aspace(aspace);
-	if (err < 0)
-		return err;
+	if (status < B_OK)
+		return status;
 
 	// modify the pointer returned to be offset back into the new area
 	// the same way the physical address in was offset
@@ -1619,15 +1628,14 @@ vm_get_page_mapping(aspace_id aid, addr_t vaddr, addr_t *paddr)
 static int
 display_mem(int argc, char **argv)
 {
-	int item_size;
-	int display_width;
-	int num = 1;
+	int32 displayWidth;
+	int32 itemSize;
+	int32 num = 1;
 	addr_t address;
-	int i;
-	int j;
+	int i, j;
 
 	if (argc < 2) {
-		dprintf("usage: dw/ds/db <address> [num]\n"
+		kprintf("usage: dw/ds/db <address> [num]\n"
 			"\tdw - 4 bytes\n"
 			"\tds - 2 bytes\n"
 			"\tdb - 1 byte\n");
@@ -1643,56 +1651,67 @@ display_mem(int argc, char **argv)
 
 	// build the format string
 	if (strcmp(argv[0], "db") == 0) {
-		item_size = 1;
-		display_width = 16;
+		itemSize = 1;
+		displayWidth = 16;
 	} else if (strcmp(argv[0], "ds") == 0) {
-		item_size = 2;
-		display_width = 8;
+		itemSize = 2;
+		displayWidth = 8;
 	} else if (strcmp(argv[0], "dw") == 0) {
-		item_size = 4;
-		display_width = 4;
+		itemSize = 4;
+		displayWidth = 4;
 	} else {
-		dprintf("display_mem called in an invalid way!\n");
+		kprintf("display_mem called in an invalid way!\n");
 		return 0;
 	}
 
-	dprintf("[0x%lx] '", address);
-	for (j = 0; j < min_c(display_width, num) * item_size; j++) {
-		char c = *((char *)address + j);
-		if (!isalnum(c)) {
-			c = '.';
-		}
-		dprintf("%c", c);
-	}
-	dprintf("'");
 	for (i = 0; i < num; i++) {
-		if ((i % display_width) == 0 && i != 0) {
-			dprintf("\n[0x%lx] '", address + i * item_size);
-			for (j = 0; j < min_c(display_width, (num-i)) * item_size; j++) {
-				char c = *((char *)address + i * item_size + j);
-				if (!isalnum(c)) {
-					c = '.';
+		uint32 value;
+
+		if ((i % displayWidth) == 0) {
+			int32 displayed = min_c(displayWidth, (num-i)) * itemSize;
+			if (i != 0)
+				kprintf("\n");
+
+			kprintf("[0x%lx]  ", address + i * itemSize);
+
+			for (j = 0; j < displayed; j++) {
+				char c;
+				if (user_memcpy(&c, (char *)address + i * itemSize + j, 1) != B_OK) {
+					displayed = j;
+					break;
 				}
-				dprintf("%c", c);
+				if (!isalnum(c))
+					c = '.';
+
+				kprintf("%c", c);
 			}
-			dprintf("'");
+			if (num > displayWidth) {
+				// make sure the spacing in the last line is correct
+				for (j = displayed; j < displayWidth * itemSize; j++)
+					kprintf(" ");
+			}
+			kprintf("  ");
 		}
 
-		switch (item_size) {
+		if (user_memcpy(&value, (uint8 *)address + i * itemSize, itemSize) != B_OK) {
+			kprintf("read fault");
+			break;
+		}
+
+		switch (itemSize) {
 			case 1:
-				dprintf(" 0x%02x", *((uint8 *)address + i));
+				kprintf(" 0x%02x", *(uint8 *)&value);
 				break;
 			case 2:
-				dprintf(" 0x%04x", *((uint16 *)address + i));
+				kprintf(" 0x%04x", *(uint16 *)&value);
 				break;
 			case 4:
-				dprintf(" 0x%08lx", *((uint32 *)address + i));
+				kprintf(" 0x%08lx", *(uint32 *)&value);
 				break;
-			default:
-				dprintf("huh?\n");
 		}
 	}
-	dprintf("\n");
+
+	kprintf("\n");
 	return 0;
 }
 
@@ -1705,30 +1724,30 @@ dump_cache_ref(int argc, char **argv)
 	vm_cache_ref *cache_ref;
 
 	if (argc < 2) {
-		dprintf("cache_ref: not enough arguments\n");
+		kprintf("cache_ref: not enough arguments\n");
 		return 0;
 	}
 	if (strlen(argv[1]) < 2 || argv[1][0] != '0' || argv[1][1] != 'x') {
-		dprintf("cache_ref: invalid argument, pass address\n");
+		kprintf("cache_ref: invalid argument, pass address\n");
 		return 0;
 	}
 
 	address = atoul(argv[1]);
 	cache_ref = (vm_cache_ref *)address;
 
-	dprintf("cache_ref at %p:\n", cache_ref);
-	dprintf("cache: %p\n", cache_ref->cache);
-	dprintf("lock.holder: %ld\n", cache_ref->lock.holder);
-	dprintf("lock.sem: 0x%lx\n", cache_ref->lock.sem);
-	dprintf("areas:\n");
+	kprintf("cache_ref at %p:\n", cache_ref);
+	kprintf("cache: %p\n", cache_ref->cache);
+	kprintf("lock.holder: %ld\n", cache_ref->lock.holder);
+	kprintf("lock.sem: 0x%lx\n", cache_ref->lock.sem);
+	kprintf("areas:\n");
 	for (area = cache_ref->areas; area != NULL; area = area->cache_next) {
-		dprintf(" area 0x%lx: ", area->id);
-		dprintf("base_addr = 0x%lx ", area->base);
-		dprintf("size = 0x%lx ", area->size);
-		dprintf("name = '%s' ", area->name);
-		dprintf("protection = 0x%lx\n", area->protection);
+		kprintf(" area 0x%lx: ", area->id);
+		kprintf("base_addr = 0x%lx ", area->base);
+		kprintf("size = 0x%lx ", area->size);
+		kprintf("name = '%s' ", area->name);
+		kprintf("protection = 0x%lx\n", area->protection);
 	}
-	dprintf("ref_count: %ld\n", cache_ref->ref_count);
+	kprintf("ref_count: %ld\n", cache_ref->ref_count);
 	return 0;
 }
 
@@ -1767,37 +1786,35 @@ dump_cache(int argc, char **argv)
 	vm_page *page;
 
 	if (argc < 2) {
-		dprintf("cache: not enough arguments\n");
+		kprintf("cache: not enough arguments\n");
 		return 0;
 	}
 	if (strlen(argv[1]) < 2 || argv[1][0] != '0' || argv[1][1] != 'x') {
-		dprintf("cache: invalid argument, pass address\n");
+		kprintf("cache: invalid argument, pass address\n");
 		return 0;
 	}
 
 	address = atoul(argv[1]);
 	cache = (vm_cache *)address;
 
-	dprintf("cache at %p:\n", cache);
-	dprintf("cache_ref: %p\n", cache->ref);
-	dprintf("source: %p\n", cache->source);
-	dprintf("store: %p\n", cache->store);
-	// XXX 64-bit
-	dprintf("virtual_size: 0x%Lx\n", cache->virtual_size);
-	dprintf("temporary: %ld\n", cache->temporary);
-	dprintf("scan_skip: %ld\n", cache->scan_skip);
-	dprintf("page_list:\n");
+	kprintf("cache at %p:\n", cache);
+	kprintf("cache_ref: %p\n", cache->ref);
+	kprintf("source: %p\n", cache->source);
+	kprintf("store: %p\n", cache->store);
+	kprintf("virtual_size: 0x%Lx\n", cache->virtual_size);
+	kprintf("temporary: %ld\n", cache->temporary);
+	kprintf("scan_skip: %ld\n", cache->scan_skip);
+	kprintf("page_list:\n");
 	for (page = cache->page_list; page != NULL; page = page->cache_next) {
-		// XXX offset is 64-bit
 		if (page->type == PAGE_TYPE_PHYSICAL) {
-			dprintf(" %p ppn 0x%lx offset 0x%Lx type %ld state %ld (%s) ref_count %ld\n",
+			kprintf(" %p ppn 0x%lx offset 0x%Lx type %ld state %ld (%s) ref_count %ld\n",
 				page, page->ppn, page->offset, page->type, page->state, 
 				page_state_to_text(page->state), page->ref_count);
 		} else if(page->type == PAGE_TYPE_DUMMY) {
-			dprintf(" %p DUMMY PAGE state %ld (%s)\n", 
+			kprintf(" %p DUMMY PAGE state %ld (%s)\n", 
 				page, page->state, page_state_to_text(page->state));
 		} else
-			dprintf(" %p UNKNOWN PAGE type %ld\n", page, page->type);
+			kprintf(" %p UNKNOWN PAGE type %ld\n", page, page->type);
 	}
 	return 0;
 }
@@ -1806,56 +1823,51 @@ dump_cache(int argc, char **argv)
 static void
 _dump_area(vm_area *area)
 {
-	dprintf("dump of area at %p:\n", area);
-	dprintf("name: '%s'\n", area->name);
-	dprintf("id: 0x%lx\n", area->id);
-	dprintf("base: 0x%lx\n", area->base);
-	dprintf("size: 0x%lx\n", area->size);
-	dprintf("protection: 0x%lx\n", area->protection);
-	dprintf("wiring: 0x%lx\n", area->wiring);
-	dprintf("ref_count: %ld\n", area->ref_count);
-	dprintf("cache_ref: %p\n", area->cache_ref);
-	// XXX 64-bit
-	dprintf("cache_offset: 0x%Lx\n", area->cache_offset);
-	dprintf("cache_next: %p\n", area->cache_next);
-	dprintf("cache_prev: %p\n", area->cache_prev);
+	kprintf("dump of area at %p:\n", area);
+	kprintf("name: '%s'\n", area->name);
+	kprintf("id: 0x%lx\n", area->id);
+	kprintf("base: 0x%lx\n", area->base);
+	kprintf("size: 0x%lx\n", area->size);
+	kprintf("protection: 0x%lx\n", area->protection);
+	kprintf("wiring: 0x%lx\n", area->wiring);
+	kprintf("ref_count: %ld\n", area->ref_count);
+	kprintf("cache_ref: %p\n", area->cache_ref);
+	kprintf("cache_offset: 0x%Lx\n", area->cache_offset);
+	kprintf("cache_next: %p\n", area->cache_next);
+	kprintf("cache_prev: %p\n", area->cache_prev);
 }
 
 
 static int
 dump_area(int argc, char **argv)
 {
-//	int i;
+	bool found = false;
 	vm_area *area;
+	addr_t num;
 
 	if (argc < 2) {
-		dprintf("area: not enough arguments\n");
+		kprintf("usage: area <id|address|name>\n");
 		return 0;
 	}
 
-	// if the argument looks like a hex number, treat it as such
-	if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
-		uint32 num = strtoul(argv[1], NULL, 16);
-		area_id id = num;
+	num = strtoul(argv[1], NULL, 0);
 
-		area = (vm_area *)hash_lookup(sAreaHash, &id);
-		if (area == NULL) {
-			dprintf("invalid area id\n");
-		} else {
+	// walk through the area list, looking for the arguments as a name
+	struct hash_iterator iter;
+
+	hash_open(sAreaHash, &iter);
+	while ((area = (vm_area *)hash_next(sAreaHash, &iter)) != NULL) {
+		if ((area->name != NULL && !strcmp(argv[1], area->name))
+			|| num != 0
+				&& ((addr_t)area->id == num
+					|| area->base <= num && area->base + area->size > num)) {
 			_dump_area(area);
-		}
-		return 0;
-	} else {
-		// walk through the area list, looking for the arguments as a name
-		struct hash_iterator iter;
-
-		hash_open(sAreaHash, &iter);
-		while ((area = (vm_area *)hash_next(sAreaHash, &iter)) != NULL) {
-			if (area->name != NULL && strcmp(argv[1], area->name) == 0) {
-				_dump_area(area);
-			}
+			found = true;
 		}
 	}
+
+	if (!found)
+		kprintf("could not find area %s (%ld)\n", argv[1], num);
 	return 0;
 }
 
@@ -1866,11 +1878,11 @@ dump_area_list(int argc, char **argv)
 	vm_area *area;
 	struct hash_iterator iter;
 
-	dprintf("addr\t      id  base\t\tsize\t\tprotect\tlock\tname\n");
+	kprintf("addr\t      id  base\t\tsize\t\tprotect\tlock\tname\n");
 
 	hash_open(sAreaHash, &iter);
 	while ((area = (vm_area *)hash_next(sAreaHash, &iter)) != NULL) {
-		dprintf("%p %5lx  %p\t%p\t%ld\t%ld\t%s\n", area, area->id, (void *)area->base,
+		kprintf("%p %5lx  %p\t%p\t%ld\t%ld\t%s\n", area, area->id, (void *)area->base,
 			(void *)area->size, area->protection, area->wiring, area->name);
 	}
 	hash_close(sAreaHash, &iter, false);
