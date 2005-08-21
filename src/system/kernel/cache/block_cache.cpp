@@ -215,6 +215,9 @@ block_cache::GetRange(void *address)
 void
 block_cache::Free(void *address)
 {
+	if (address == NULL)
+		return;
+
 	block_range *range = GetRange(address);
 	ASSERT(range != NULL);
 	range->Free(this, address);
