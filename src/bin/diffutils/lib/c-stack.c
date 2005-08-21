@@ -200,8 +200,8 @@ c_stack_action (void (*action) (int, siginfo_t *, void *))
   return sigaction (SIGSEGV, &act, 0);
 #endif
 }
-
-#if DEBUG
+
+#if 0
 
 #include <stdio.h>
 
@@ -225,8 +225,8 @@ main (int argc, char **argv)
   return recurse ("\1");
 }
 
-#endif /* DEBUG */
-
+#endif
+
 /*
 Local Variables:
 compile-command: "gcc -D_GNU_SOURCE -DDEBUG \
