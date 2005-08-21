@@ -380,6 +380,9 @@ Volume::Mount(const char *deviceName, uint32 flags)
 status_t
 Volume::Unmount()
 {
+	// Unlike in BeOS, we need to put the reference to our root node ourselves
+	put_vnode(fID, ToVnode(Root()));
+
 	// This will also flush the log & all blocks to disk
 	delete fJournal;
 	fJournal = NULL;

@@ -978,6 +978,7 @@ devfs_mount(mount_id id, const char *devfs, uint32 flags, const char *args,
 	fs->root_vnode = vnode;
 
 	hash_insert(fs->vnode_hash, vnode);
+	publish_vnode(id, vnode->id, vnode);
 
 	*root_vnid = vnode->id;
 	*_fs = fs;
@@ -1005,6 +1006,9 @@ devfs_unmount(fs_volume _fs)
 	struct hash_iterator i;
 
 	TRACE(("devfs_unmount: entry fs = %p\n", fs));
+
+	// release the reference to the root
+	put_vnode(fs->id, fs->root_vnode->id);
 
 	// delete all of the vnodes
 	hash_open(fs->vnode_hash, &i);

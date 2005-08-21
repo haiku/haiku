@@ -4804,9 +4804,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 	const char *args, bool kernel)
 {
 	struct fs_mount *mount;
-	struct vnode *covered_vnode = NULL;
-	vnode_id root_id;
-	int err = 0;
+	status_t status = 0;
 
 	FUNCTION(("fs_mount: entry. path = '%s', fs_name = '%s'\n", path, fsName));
 
@@ -4843,9 +4841,9 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 	if (!(flags & B_MOUNT_VIRTUAL_DEVICE) && device) {
 		// normalize the device path
 		KPath normalizedDevice;
-		err = normalizedDevice.SetTo(device, true);
-		if (err != B_OK)
-			return err;
+		status = normalizedDevice.SetTo(device, true);
+		if (status != B_OK)
+			return status;
 
 		// get a corresponding partition from the DDM
 		partition = ddm->RegisterPartition(normalizedDevice.Path(), true);
@@ -4923,7 +4921,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 
 	mount->fs_name = get_file_system_name(fsName);
 	if (mount->fs_name == NULL) {
-		err = B_NO_MEMORY;
+		status = B_NO_MEMORY;
 		goto err1;
 	}
 
@@ -4932,12 +4930,12 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 
 	mount->fs = get_file_system(fsName);
 	if (mount->fs == NULL) {
-		err = ENODEV;
+		status = ENODEV;
 		goto err3;
 	}
 
-	err = recursive_lock_init(&mount->rlock, "mount rlock");
-	if (err < B_OK)
+	status = recursive_lock_init(&mount->rlock, "mount rlock");
+	if (status < B_OK)
 		goto err4;
 
 	mount->id = sNextMountID++;
@@ -4945,66 +4943,68 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 	mount->unmounting = false;
 	mount->owns_file_device = false;
 
-	mutex_lock(&sMountMutex);
-
 	// insert mount struct into list before we call fs mount()
+	mutex_lock(&sMountMutex);
 	hash_insert(sMountsTable, mount);
-
 	mutex_unlock(&sMountMutex);
+
+	vnode_id rootID;
 
 	if (!sRoot) {
 		// we haven't mounted anything yet
 		if (strcmp(path, "/") != 0) {
-			err = B_ERROR;
+			status = B_ERROR;
 			goto err5;
 		}
 
-		err = FS_MOUNT_CALL(mount, mount)(mount->id, device, flags, args, &mount->cookie, &root_id);
-		if (err < 0) {
+		status = FS_MOUNT_CALL(mount, mount)(mount->id, device, flags, args, &mount->cookie, &rootID);
+		if (status < 0) {
 			// ToDo: why should we hide the error code from the file system here?
-			//err = ERR_VFS_GENERAL;
+			//status = ERR_VFS_GENERAL;
 			goto err5;
 		}
 
 		mount->covers_vnode = NULL; // this is the root mount
 	} else {
-		err = path_to_vnode(path, true, &covered_vnode, NULL, kernel);
-		if (err < 0)
+		struct vnode *coveredVnode;
+		status = path_to_vnode(path, true, &coveredVnode, NULL, kernel);
+		if (status < B_OK)
 			goto err5;
-
-		if (!covered_vnode) {
-			err = B_ERROR;
-			goto err5;
-		}
 
 		// make sure covered_vnode is a DIR
 		struct stat coveredNodeStat;
-		err = FS_CALL(covered_vnode, read_stat)(covered_vnode->mount->cookie,
-			covered_vnode->private_node, &coveredNodeStat);
-		if (err < 0)
+		status = FS_CALL(coveredVnode, read_stat)(coveredVnode->mount->cookie,
+			coveredVnode->private_node, &coveredNodeStat);
+		if (status < B_OK)
 			goto err5;
 
 		if (!S_ISDIR(coveredNodeStat.st_mode)) {
-			err = B_NOT_A_DIRECTORY;
+			status = B_NOT_A_DIRECTORY;
 			goto err5;
 		}
 
-		if (covered_vnode->mount->root_vnode == covered_vnode) {
-			err = B_BUSY;
+		if (coveredVnode->mount->root_vnode == coveredVnode) {
+			// this is already a mount point
+			status = B_BUSY;
 			goto err5;
 		}
 
-		mount->covers_vnode = covered_vnode;
+		mount->covers_vnode = coveredVnode;
 
 		// mount it
-		err = FS_MOUNT_CALL(mount, mount)(mount->id, device, flags, args, &mount->cookie, &root_id);
-		if (err < 0)
+		status = FS_MOUNT_CALL(mount, mount)(mount->id, device, flags, args, &mount->cookie, &rootID);
+		if (status < B_OK)
 			goto err6;
 	}
 
-	err = get_vnode(mount->id, root_id, &mount->root_vnode, 0);
-	if (err < 0)
+	// the root node is supposed to be owned by the file system - it must
+	// exist at this point
+	mount->root_vnode = lookup_vnode(mount->id, rootID);
+	if (mount->root_vnode == NULL || mount->root_vnode->ref_count != 1) {
+		panic("fs_mount: file system does not own its root node!\n");
+		status = B_ERROR;
 		goto err7;
+	}
 
 	// No race here, since fs_mount() is the only function changing
 	// covers_vnode (and holds sMountOpLock at that time).
@@ -5047,7 +5047,7 @@ err3:
 err1:
 	free(mount);
 
-	return err;
+	return status;
 }
 
 
@@ -5103,7 +5103,7 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 	mutex_lock(&sVnodeMutex);
 
 	// simplify the loop below: we decrement the root vnode ref_count
-	// by the known number of references: one for the fs_mount, one
+	// by the known number of references: one for the file system, one
 	// from the path_to_vnode() call above
 	mount->root_vnode->ref_count -= 2;
 

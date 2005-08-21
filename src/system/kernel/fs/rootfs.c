@@ -336,6 +336,7 @@ rootfs_mount(mount_id id, const char *device, uint32 flags, const char *args,
 
 	fs->root_vnode = vnode;
 	hash_insert(fs->vnode_list_hash, vnode);
+	publish_vnode(id, vnode->id, vnode);
 
 	*root_vnid = vnode->id;
 	*_fs = fs;
@@ -362,7 +363,7 @@ rootfs_unmount(fs_volume _fs)
 
 	TRACE(("rootfs_unmount: entry fs = %p\n", fs));
 
-	// put_vnode on the root to release the ref to it
+	// release the reference to the root
 	put_vnode(fs->id, fs->root_vnode->id);
 
 	// delete all of the vnodes
