@@ -386,22 +386,6 @@ rule SetupDefaultIncludes
 # Things Jam needs in order to work :)
 #-------------------------------------------------------------------------------
 
-# TODO: back-ported from jam 2.5: remove when not longer needed
-rule MakeLocate
-{
-	if $(>)
-	{
-	    LOCATE on $(<) = $(>) ;
-	    Depends $(<) : $(>[1]:G=dir) ;
-	    MkDir $(>[1]:G=dir) ;
-	}
-}
-
-actions MkDir1
-{
-	$(MKDIR) "$(<)"
-}
-
 rule Object
 {
 	# This is basically the original Jambase 2.4 Object rule stripped by
