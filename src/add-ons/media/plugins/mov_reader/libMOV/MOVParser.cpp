@@ -173,6 +173,10 @@ AtomBase *getAtom(BPositionIO *pStream)
 		return new CMVDAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
 	}
 
+	if (aAtomType == uint32('esds')) {
+		return new ESDSAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
+	}
+
 	return new AtomBase(pStream, aStreamOffset, aAtomType, aRealAtomSize);
 	
 }
@@ -718,6 +722,34 @@ uint64	STCOAtom::getOffsetForChunk(uint32 pChunkID)
 	return 0LL;
 }
 
+ESDSAtom::ESDSAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
+{
+	theVOL = NULL;
+}
+
+ESDSAtom::~ESDSAtom()
+{
+	if (theVOL) {
+		free(theVOL);
+	}
+}
+
+void ESDSAtom::OnProcessMetaData()
+{
+	theVOL = (uint8 *)(malloc(getBytesRemaining()));
+	Read(theVOL,getBytesRemaining());
+}
+
+uint8 *ESDSAtom::getVOL()
+{
+	return theVOL;
+}
+
+char *ESDSAtom::OnGetAtomName()
+{
+	return "Extended Sample Description Atom";
+}
+
 STSDAtom::STSDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
 {
 	theHeader.NoEntries = 0;
@@ -727,11 +759,21 @@ STSDAtom::~STSDAtom()
 {
 	if (getMediaComponentSubType() == 'soun') {
 		for (uint32 i=0;i<theHeader.NoEntries;i++) {
+			if (theAudioDescArray[i]->theVOL) {
+				free(theAudioDescArray[i]->theVOL);
+				theAudioDescArray[i]->theVOL = NULL;
+			}
+	
 			delete theAudioDescArray[i];
 			theAudioDescArray[i] = NULL;
 		}
 	} else if (getMediaComponentSubType() == 'vide') {
 		for (uint32 i=0;i<theHeader.NoEntries;i++) {
+			if (theVideoDescArray[i]->theVOL) {
+				free(theVideoDescArray[i]->theVOL);
+				theVideoDescArray[i]->theVOL = NULL;
+			}
+
 			delete theVideoDescArray[i];
 			theVideoDescArray[i] = NULL;
 		}
@@ -754,6 +796,9 @@ void STSDAtom::ReadSoundDescription()
 	Read(&aSoundDescriptionV1->basefields.DataFormat);
 	Read(aSoundDescriptionV1->basefields.Reserved,6);
 	Read(&aSoundDescriptionV1->basefields.DataReference);
+
+	aSoundDescriptionV1->VOLSize = 0;
+	aSoundDescriptionV1->theVOL = NULL;
 
 	// Read in Audio Sample Data
 	// We place into a V1 description even though it might be a V0 or earlier
@@ -802,7 +847,14 @@ void STSDAtom::ReadSoundDescription()
 			// WAVE atom
 			aSoundDescriptionV1->theWaveFormat = dynamic_cast<WAVEAtom *>(aAtomBase)->getWaveFormat();
 		}
-				
+
+		if (dynamic_cast<ESDSAtom *>(aAtomBase)) {
+			// ESDS atom good
+			aSoundDescriptionV1->VOLSize = aAtomBase->getDataSize();
+			aSoundDescriptionV1->theVOL = (uint8 *)(malloc(aSoundDescriptionV1->VOLSize));
+			memcpy(aSoundDescriptionV1->theVOL,dynamic_cast<ESDSAtom *>(aAtomBase)->getVOL(),aSoundDescriptionV1->VOLSize);
+		}
+		
 		if (aAtomBase->getAtomSize() > 0) {
 			descBytesLeft = descBytesLeft - aAtomBase->getAtomSize();
 		} else {
@@ -811,7 +863,6 @@ void STSDAtom::ReadSoundDescription()
 		}
 				
 		delete aAtomBase;
-				
 	}
 			
 	theAudioDescArray[0] = aSoundDescriptionV1;
@@ -821,6 +872,8 @@ void STSDAtom::ReadSoundDescription()
 
 void STSDAtom::ReadVideoDescription()
 {
+	uint64 descBytesLeft;
+
 	// read in Video Sample Data
 	VideoDescriptionV0 *aVideoDescription;
 				
@@ -830,7 +883,7 @@ void STSDAtom::ReadVideoDescription()
 	Read(&aVideoDescription->basefields.DataFormat);
 	Read(aVideoDescription->basefields.Reserved,6);
 	Read(&aVideoDescription->basefields.DataReference);
-		
+	
 	Read(&aVideoDescription->desc.Version);
 	Read(&aVideoDescription->desc.Revision);
 	Read(&aVideoDescription->desc.Vendor);
@@ -847,7 +900,37 @@ void STSDAtom::ReadVideoDescription()
 	Read(&aVideoDescription->desc.Depth);
 	Read(&aVideoDescription->desc.ColourTableID);
 
+	aVideoDescription->VOLSize = 0;
+	aVideoDescription->theVOL = NULL;
+
 	theVideoDescArray[0] = aVideoDescription;
+
+	descBytesLeft = getBytesRemaining();
+	
+	// May be a VOL
+	// If not then seek back to where we are as it may be a complete new video description
+	
+	if (descBytesLeft > 0) {
+
+		off_t pos = theStream->Position();
+		// More extended atoms
+		AtomBase *aAtomBase = getAtom(theStream);
+				
+		aAtomBase->OnProcessMetaData();
+		printf("%s\n",aAtomBase->getAtomName());
+
+		if (dynamic_cast<ESDSAtom *>(aAtomBase)) {
+			// ESDS atom good
+			aVideoDescription->VOLSize = aAtomBase->getDataSize();
+			aVideoDescription->theVOL = (uint8 *)(malloc(aVideoDescription->VOLSize));
+			memcpy(aVideoDescription->theVOL,dynamic_cast<ESDSAtom *>(aAtomBase)->getVOL(),aVideoDescription->VOLSize);
+		} else {
+			// Seek Back
+			theStream->Seek(pos,SEEK_SET);
+		}
+		
+		delete aAtomBase;
+	}
 
 	PRINT(("Size:Format=%ld:%ld %Ld\n",aVideoDescription->basefields.Size,aVideoDescription->basefields.DataFormat,getBytesRemaining()));
 }
@@ -872,8 +955,10 @@ void STSDAtom::OnProcessMetaData()
 				Read(&aSampleDescBase.DataFormat);
 				Read(aSampleDescBase.Reserved,6);
 				Read(&aSampleDescBase.DataReference);
+				
+				printf("%c%c%c%c\n",char(aSampleDescBase.DataFormat>>24),char(aSampleDescBase.DataFormat>>16),char(aSampleDescBase.DataFormat>>8),char(aSampleDescBase.DataFormat));
 
-				theStream->Seek(aSampleDescBase.Size - SampleDescBaseSize, 0);
+				theStream->Seek(aSampleDescBase.Size - SampleDescBaseSize, SEEK_CUR);
 				break;
 		}
 	}

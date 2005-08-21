@@ -104,6 +104,8 @@ public:
 	off_t	getAtomOffset() {return atomOffset;};
 	off_t	getStreamOffset() {return streamOffset;};
 	
+	uint64	getDataSize() {return atomSize - 8;};
+
 	uint64	getBytesRemaining();
 	
 	bool	IsType(uint32 patomType) {return patomType == atomType;};

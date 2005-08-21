@@ -459,6 +459,9 @@ const 	AudioMetaData 		*MOVFileReader::AudioFormat(uint32 stream_index, size_t *
 				theAudio.SampleSize = aSoundDescription.desc.SampleSize;
 				theAudio.SampleRate = aSoundDescription.desc.SampleRate / 65536;	// Convert from fixed point decimal to float
 				theAudio.PacketSize = uint32((theAudio.SampleRate * theAudio.NoOfChannels * theAudio.SampleSize) / 8);
+
+				theAudio.theVOL = aSoundDescription.theVOL;
+				theAudio.VOLSize = aSoundDescription.VOLSize;
 			
 //			// Do we have a wave structure
 //			if ((aSoundDescription.samplesPerPacket == 0) && (aSoundDescription.theWaveFormat.format_tag != 0)) {
@@ -501,6 +504,9 @@ const 	VideoMetaData	*MOVFileReader::VideoFormat(uint32 stream_index)
 				theVideo.image_size = aVideoDescriptionV0.desc.Height * aVideoDescriptionV0.desc.Width;
 				theVideo.HorizontalResolution = aVideoDescriptionV0.desc.HorizontalResolution;
 				theVideo.VerticalResolution = aVideoDescriptionV0.desc.VerticalResolution;
+
+				theVideo.theVOL = aVideoDescriptionV0.theVOL;
+				theVideo.VOLSize = aVideoDescriptionV0.VOLSize;
 
 				aAtomBase = aTrakAtom->GetChildAtom(uint32('stts'),0);
 				if (aAtomBase) {

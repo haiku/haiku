@@ -86,7 +86,7 @@ bool AtomBase::MoveToEnd()
 	off_t NewPosition = streamOffset + atomSize;
 
 	if (getStream()->Position() != NewPosition) {
-		return (getStream()->Seek(NewPosition,0) > 0);
+		return (getStream()->Seek(NewPosition,SEEK_SET) > 0);
 	}
 	return true;
 }

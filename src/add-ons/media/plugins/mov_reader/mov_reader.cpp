@@ -402,6 +402,14 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		TRACE("max_bit_rate %.3f\n", format->u.encoded_video.max_bit_rate);
 		TRACE("field_rate   %.3f\n", format->u.encoded_video.output.field_rate);
 
+		// Set the VOL
+		if (video_format->VOLSize > 0) {
+			TRACE("VOL SIZE  %ld\n", video_format->VOLSize);
+			size_t size = video_format->VOLSize;
+			const void *data = video_format->theVOL;
+			format->SetMetaData(data, size);
+		}
+
 		return B_OK;
 	}
 

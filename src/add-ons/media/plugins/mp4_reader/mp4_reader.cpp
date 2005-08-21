@@ -427,17 +427,19 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 		TRACE("field_rate   %.3f\n", format->u.encoded_video.output.field_rate);
 
 		// Set the VOL
-		size_t size = video_format->VOLSize;
-		const void *data = video_format->theVOL;
-		format->SetMetaData(data, size);
+		if (video_format->VOLSize > 0) {
+			size_t size = video_format->VOLSize;
+			const void *data = video_format->theVOL;
+			format->SetMetaData(data, size);
 
 #ifdef TRACE_MP4_READER
-		if (data) {
-			uint8 *p = (uint8 *)data;
-			TRACE("extra_data: %ld: %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
-				size, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9]);
-		}
+			if (data) {
+				uint8 *p = (uint8 *)data;
+				TRACE("extra_data: %ld: %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
+					size, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9]);
+			}
 #endif
+		}
 
 		return B_OK;
 	}

@@ -92,6 +92,8 @@ struct VideoMetaData
 	uint32 HorizontalResolution;
 	uint32 VerticalResolution;
 	float FrameRate;
+	uint8	*theVOL;
+	size_t VOLSize;
 };
 
 struct AudioMetaData
@@ -101,6 +103,8 @@ struct AudioMetaData
 	uint16 SampleSize;		// bits per sample
 	float SampleRate;		// Samples per second (OR Frames per second)
 	uint32 PacketSize;		// (Sample Rate * NoOfchannels * SampleSize)/8 = bytes per second
+	uint8 *theVOL;
+	size_t VOLSize;
 };
 
 struct wave_format_ex
@@ -306,6 +310,8 @@ struct SoundDescriptionV1 {
 	uint32	bytesPerSample;
 	// These are optional data from atoms that follow
 	wave_format_ex theWaveFormat;		// wave atom is a copy of wave_format_ex
+	uint8 *theVOL;
+	size_t VOLSize;
 };
 
 struct VideoDescription {
@@ -331,4 +337,6 @@ struct VideoDescription {
 struct VideoDescriptionV0 {
 	SampleDescBase	basefields;
 	VideoDescription desc;
+	uint8	*theVOL;
+	size_t VOLSize;
 };

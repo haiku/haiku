@@ -254,6 +254,18 @@ public:
 	off_t	getEOF();
 };
 
+class ESDSAtom : public AtomBase {
+public:
+			ESDSAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+	virtual	~ESDSAtom();
+	void	OnProcessMetaData();
+	char	*OnGetAtomName();
+	
+	uint8	*getVOL();
+private:
+	uint8	*theVOL;
+};
+
 // Atom class for reading the sdst atom
 class STSDAtom : public AtomBase {
 public:
@@ -293,7 +305,7 @@ public:
 	// 0x008 Track in Poster
 	// It seems active tracks have all 4 flags set?
 	
-	bool	IsActive() {return (theHeader.Flags3 == 0x0f);};
+	bool	IsActive() {return ((theHeader.Flags3 == 0x0f) || (theHeader.Flags3 == 0x03));};
 	
 private:
 	tkhdV1	theHeader;
