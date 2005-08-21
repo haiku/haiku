@@ -396,16 +396,24 @@ mp3DecoderPlugin::GetSupportedFormats(media_format ** formats, size_t * count)
 		B_MPEG_2_5_AUDIO_LAYER_2,
 		B_MPEG_2_5_AUDIO_LAYER_3,
 	};
-	const size_t numIDs = 2 + sizeof(ids) / sizeof(mpeg_id);
-
+	const size_t otherIDs = 6;
+	const size_t numIDs = otherIDs + sizeof(ids) / sizeof(mpeg_id);
 	media_format_description descriptions[numIDs];
 	descriptions[0].family = B_WAV_FORMAT_FAMILY;
 	descriptions[0].u.wav.codec = 0x0050;
 	descriptions[1].family = B_WAV_FORMAT_FAMILY;
 	descriptions[1].u.wav.codec = 0x0055;
-	for (size_t i = 2; i < numIDs; i++) {
+	descriptions[2].family = B_QUICKTIME_FORMAT_FAMILY;
+	descriptions[2].u.quicktime.codec = '.mp3';
+	descriptions[3].family = B_QUICKTIME_FORMAT_FAMILY;
+	descriptions[3].u.quicktime.codec = '3pm.';
+	descriptions[4].family = B_AVI_FORMAT_FAMILY;
+	descriptions[4].u.avi.codec = '.mp3';
+	descriptions[5].family = B_AVI_FORMAT_FAMILY;
+	descriptions[5].u.avi.codec = '3pm.';
+	for (size_t i = otherIDs; i < numIDs; i++) {
 		descriptions[i].family = B_MPEG_FORMAT_FAMILY;
-		descriptions[i].u.mpeg.id = ids[i-2];
+		descriptions[i].u.mpeg.id = ids[i-otherIDs];
 	}
 
 	media_format format;
