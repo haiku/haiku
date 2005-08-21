@@ -43,7 +43,7 @@ static bool sSyslogOutputEnabled = false;
 static bool sBlueScreenEnabled = false;
 static bool sBlueScreenOutput = false;
 static spinlock sSpinlock = 0;
-static int sDebuggerOnCPU = -1;
+static int32 sDebuggerOnCPU = -1;
 
 static struct debugger_command *sCommands;
 
@@ -272,10 +272,10 @@ parse_line(char *buf, char **argv, int *argc, int max_args)
 static void
 kernel_debugger_loop(void)
 {
-	kprintf("Welcome to Kernel Debugging Land...\n");
-	kprintf("Running on CPU %d\n", smp_get_current_cpu());
-
 	sDebuggerOnCPU = smp_get_current_cpu();
+
+	kprintf("Welcome to Kernel Debugging Land...\n");
+	kprintf("Running on CPU %ld\n", sDebuggerOnCPU);
 
 	for (;;) {
 		struct debugger_command *cmd = NULL;
@@ -310,6 +310,8 @@ kernel_debugger_loop(void)
 		if (++sCurrentLine >= HISTORY_SIZE)
 			sCurrentLine = 0;
 	}
+
+	sDebuggerOnCPU = -1;
 }
 
 
@@ -366,6 +368,13 @@ cmd_continue(int argc, char **argv)
 
 
 //	#pragma mark - private kernel API
+
+
+bool
+debug_debugger_running(void)
+{
+	return sDebuggerOnCPU != -1;
+}
 
 
 void
@@ -529,11 +538,6 @@ kernel_debugger(const char *message)
 
 	state = disable_interrupts();
 
-	// XXX by setting kernel_startup = true, we disable
-	// XXX the interrupt check in semaphore code etc.
-	// XXX should be renamed?
-	kernel_startup = true;
-
 	if (sDebuggerOnCPU != smp_get_current_cpu()) {
 		// halt all of the other cpus
 
@@ -553,7 +557,6 @@ kernel_debugger(const char *message)
 	kernel_debugger_loop();
 
 	sBlueScreenOutput = false;
-	kernel_startup = false;
 	restore_interrupts(state);
 
 	// ToDo: in case we change dbg_register_file - don't we want to restore it?

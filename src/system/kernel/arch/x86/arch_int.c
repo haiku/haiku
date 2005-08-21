@@ -407,19 +407,21 @@ i386_handle_trap(struct iframe frame)
 
 		case 14: 	// Page-Fault Exception (#PF)
 		{
+			bool disabledInterrupts = /*kernel_startup ||*/ debug_debugger_running();
 			unsigned int cr2;
 			addr_t newip;
 
 			asm("movl %%cr2, %0" : "=r" (cr2));
 
-			if ((frame.flags & 0x200) == 0 && !kernel_startup) {
+			if ((frame.flags & 0x200) == 0 && !disabledInterrupts) {
 				// if the interrupts were disabled, and we are not running the kernel startup
 				// the page fault was not allowed to happen and we must panic
 				panic("page fault, but interrupts were disabled. Touching address %p from eip %p\n", (void *)cr2, (void *)frame.eip);
 			} else if (thread != NULL && thread->page_faults_allowed < 1)
 				panic("page fault not allowed at this place. Touching address %p from eip %p\n", (void *)cr2, (void *)frame.eip);
 
-			enable_interrupts();
+			if (!disabledInterrupts)
+				enable_interrupts();
 
 			ret = vm_page_fault(cr2, frame.eip,
 				(frame.error_code & 0x2) != 0,	// write access
