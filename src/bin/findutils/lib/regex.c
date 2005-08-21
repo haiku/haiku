@@ -24,6 +24,13 @@
   #pragma alloca
 #endif
 
+
+/********************************************/
+/* Remove this to enable debugging in regex */
+#undef DEBUG
+/********************************************/
+
+
 #define _GNU_SOURCE
 
 #ifdef HAVE_CONFIG_H
