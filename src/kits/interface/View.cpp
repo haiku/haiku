@@ -1050,7 +1050,7 @@ BView::Window() const
 void
 BView::AttachedToWindow()
 {
-	// HOOK function
+	// Hook function
 	STRACE(("\tHOOK: BView(%s)::AttachedToWindow()\n", Name()));
 }
 
@@ -1058,7 +1058,7 @@ BView::AttachedToWindow()
 void
 BView::AllAttached()
 {
-	// HOOK function
+	// Hook function
 	STRACE(("\tHOOK: BView(%s)::AllAttached()\n", Name()));
 }
 
@@ -1066,7 +1066,7 @@ BView::AllAttached()
 void
 BView::DetachedFromWindow()
 {
-	// HOOK function
+	// Hook function
 	STRACE(("\tHOOK: BView(%s)::DetachedFromWindow()\n", Name()));
 }
 
@@ -1074,7 +1074,7 @@ BView::DetachedFromWindow()
 void
 BView::AllDetached()
 {
-	// HOOK function
+	// Hook function
 	STRACE(("\tHOOK: BView(%s)::AllDetached()\n", Name()));
 }
 
@@ -1082,7 +1082,7 @@ BView::AllDetached()
 void
 BView::Draw(BRect updateRect)
 {
-	// HOOK function
+	// Hook function
 	STRACE(("\tHOOK: BView(%s)::Draw()\n", Name()));
 }
 
@@ -1098,7 +1098,7 @@ BView::DrawAfterChildren(BRect r)
 void
 BView::FrameMoved(BPoint newPosition)
 {
-	// HOOK function
+	// Hook function
 	STRACE(("\tHOOK: BView(%s)::FrameMoved()\n", Name()));
 }
 
@@ -1106,7 +1106,7 @@ BView::FrameMoved(BPoint newPosition)
 void
 BView::FrameResized(float newWidth, float newHeight)
 {
-	// HOOK function
+	// Hook function
 	STRACE(("\tHOOK: BView(%s)::FrameResized()\n", Name()));
 }
 
@@ -1137,18 +1137,18 @@ BView::ResizeToPreferred()
 void
 BView::KeyDown(const char* bytes, int32 numBytes)
 {
-	// HOOK function
+	// Hook function
 	STRACE(("\tHOOK: BView(%s)::KeyDown()\n", Name()));
-	if (numBytes > 0 && bytes[0] == B_TAB) {
-		// TODO: handle tab navigation here instead of in BWindow
-	}
+
+	if (Window())
+		Window()->_KeyboardNavigation();
 }
 
 
 void
 BView::KeyUp(const char* bytes, int32 numBytes)
 {
-	// HOOK function
+	// Hook function
 	STRACE(("\tHOOK: BView(%s)::KeyUp()\n", Name()));
 }
 
@@ -1156,7 +1156,7 @@ BView::KeyUp(const char* bytes, int32 numBytes)
 void
 BView::MouseDown(BPoint where)
 {
-	// HOOK function
+	// Hook function
 	STRACE(("\tHOOK: BView(%s)::MouseDown()\n", Name()));
 }
 
@@ -1164,7 +1164,7 @@ BView::MouseDown(BPoint where)
 void
 BView::MouseUp(BPoint where)
 {
-	// HOOK function
+	// Hook function
 	STRACE(("\tHOOK: BView(%s)::MouseUp()\n", Name()));
 }
 
@@ -1172,7 +1172,7 @@ BView::MouseUp(BPoint where)
 void
 BView::MouseMoved(BPoint where, uint32 code, const BMessage* a_message)
 {
-	// HOOK function
+	// Hook function
 	STRACE(("\tHOOK: BView(%s)::MouseMoved()\n", Name()));
 }
 
@@ -1180,7 +1180,7 @@ BView::MouseMoved(BPoint where, uint32 code, const BMessage* a_message)
 void
 BView::Pulse()
 {
-	// HOOK function
+	// Hook function
 	STRACE(("\tHOOK: BView(%s)::Pulse()\n", Name()));
 }
 
@@ -1188,7 +1188,7 @@ BView::Pulse()
 void
 BView::TargetedByScrollView(BScrollView* scroll_view)
 {
-	// HOOK function
+	// Hook function
 	STRACE(("\tHOOK: BView(%s)::TargetedByScrollView()\n", Name()));
 }
 
@@ -1196,7 +1196,7 @@ BView::TargetedByScrollView(BScrollView* scroll_view)
 void
 BView::WindowActivated(bool state)
 {
-	// HOOK function
+	// Hook function
 	STRACE(("\tHOOK: BView(%s)::WindowActivated()\n", Name()));
 }
 

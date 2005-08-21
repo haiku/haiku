@@ -353,8 +353,6 @@ private:
 			void		BuildTopView();
 			void		setFocus(BView *focusView, bool notifyIputServer = false);
 
-			bool		handleKeyDown(uint32 key, uint32 modifiers);
-
 			// message: B_MOUSE_UP, B_MOUSE_DOWN, B_MOUSE_MOVED
 			void		sendMessageUsingEventMask(int32 message, BPoint where);
 			BView*		sendMessageUsingEventMask2(BView* aView, int32 message, BPoint where);
@@ -363,15 +361,16 @@ private:
 			BView*		findView(BView* aView, const char* viewName) const;
 			BView*		findView(BView* aView, BPoint point) const;
 			BView*		findView(BView* aView, int32 token);
-
-			BView*		findNextView(BView *focus, uint32 flags);
-			BView*		findPrevView(BView *focus, uint32 flags);
 			BView*		findLastChild(BView *parent);
-			bool		handleKeyDown(const char key, uint32 modifiers);
-			void		handleActivation( bool active);
 
-			void		drawAllViews(BView* aView);
-			void		DoUpdate(BView* aView, BRect& area);
+			BView*		_FindNextNavigable(BView *focus, uint32 flags);
+			BView*		_FindPreviousNavigable(BView *focus, uint32 flags);
+			bool		_HandleKeyDown(char key, uint32 modifiers);
+			void		_KeyboardNavigation();
+			void		handleActivation(bool active);
+
+			void		drawAllViews(BView* view);
+			void		DoUpdate(BView* view, BRect& area);
 
 			// Debug
 			void		PrintToStream() const;

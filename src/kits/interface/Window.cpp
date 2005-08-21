@@ -690,7 +690,7 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			msg->FindString("bytes", &string);
 
 // TODO: USE target !!!!
-			if (!handleKeyDown(string[0], (uint32)modifiers)) {
+			if (!_HandleKeyDown(string[0], (uint32)modifiers)) {
 				if (fFocus)
 					fFocus->KeyDown(string, strlen(string));
 				else
@@ -702,7 +702,7 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		case B_KEY_UP:
 		{
 			const char *string = NULL;
-			msg->FindString( "bytes", &string);
+			msg->FindString("bytes", &string);
 
 // TODO: USE target !!!!
 			if (fFocus)
@@ -2456,7 +2456,7 @@ BWindow::determine_target(BMessage *msg, BHandler *target, bool pref)
 
 
 bool
-BWindow::handleKeyDown(const char key, uint32 modifiers)
+BWindow::_HandleKeyDown(char key, uint32 modifiers)
 {
 	// TODO: ask people if using 'raw_char' is OK ?
 
@@ -2476,23 +2476,10 @@ BWindow::handleKeyDown(const char key, uint32 modifiers)
 		return true;
 	}
 
-	// Keyboard navigation through views!!!!
-	// TODO: Not correct, only Option-Tab should be handled here.
-	if (key == B_TAB) {
-		BView *nextFocus;
-
-		if (modifiers & B_CONTROL_KEY & B_SHIFT_KEY)
-			nextFocus = findPrevView(fFocus, B_NAVIGABLE_JUMP);
-		else if (modifiers & B_CONTROL_KEY)
-			nextFocus = findNextView(fFocus, B_NAVIGABLE_JUMP);
-		else if (modifiers & B_SHIFT_KEY)
-			nextFocus = findPrevView(fFocus, B_NAVIGABLE);
-		else
-			nextFocus = findNextView(fFocus, B_NAVIGABLE);
-
-		if (nextFocus && nextFocus != fFocus)
-			setFocus(nextFocus, false);
-
+	// Keyboard navigation through views
+	// (B_OPTION_KEY makes BTextViews and friends navigable, even in editing mode)
+	if (key == B_TAB && (modifiers & (B_COMMAND_KEY | B_OPTION_KEY)) != 0) {
+		_KeyboardNavigation();
 		return true;
 	}
 
@@ -2546,6 +2533,34 @@ BWindow::handleKeyDown(const char key, uint32 modifiers)
 
 	return false;
 }
+
+
+void
+BWindow::_KeyboardNavigation()
+{
+	BMessage *message = CurrentMessage();
+	if (message == NULL)
+		return;
+
+	const char *bytes;
+	uint32 modifiers;
+	if (message->FindString("bytes", &bytes) != B_OK
+		|| bytes[0] != B_TAB)
+		return;
+
+	message->FindInt32("modifiers", (int32*)&modifiers);
+
+	BView *nextFocus;
+	int32 jumpGroups = modifiers & B_CONTROL_KEY ? B_NAVIGABLE_JUMP : B_NAVIGABLE;
+	if (modifiers & B_SHIFT_KEY)
+		nextFocus = _FindPreviousNavigable(fFocus, jumpGroups);
+	else
+		nextFocus = _FindNextNavigable(fFocus, jumpGroups);
+
+	if (nextFocus && nextFocus != fFocus)
+		setFocus(nextFocus, false);
+}
+
 
 BView *
 BWindow::sendMessageUsingEventMask2(BView *view, int32 message, BPoint where)
@@ -2744,15 +2759,14 @@ BWindow::findView(BView *view, BPoint point) const
 
 
 BView *
-BWindow::findNextView(BView *focus, uint32 flags)
+BWindow::_FindNextNavigable(BView *focus, uint32 flags)
 {
 	if (focus == NULL)
 		focus = top_view;
 
 	BView *nextFocus = focus;
 
-	// Ufff... this took me some time... this is the best form I've reached.
-	// This algorithm searches the tree for BViews that accept focus.
+	// Search the tree for views that accept focus
 	while (true) {
 		if (nextFocus->fFirstChild)
 			nextFocus = nextFocus->fFirstChild;
@@ -2780,10 +2794,11 @@ BWindow::findNextView(BView *focus, uint32 flags)
 
 
 BView *
-BWindow::findPrevView(BView *focus, uint32 flags)
+BWindow::_FindPreviousNavigable(BView *focus, uint32 flags)
 {
 	BView *prevFocus = focus;
 
+	// Search the tree for views that accept focus
 	while (true) {
 		BView *view;
 		if ((view = findLastChild(prevFocus)) != NULL)
