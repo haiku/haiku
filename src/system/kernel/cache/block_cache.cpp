@@ -30,7 +30,7 @@
 //	3) dirty blocks are only written back if asked for
 //	4) blocks are never removed yet
 
-#define TRACE_BLOCK_CACHE
+//#define TRACE_BLOCK_CACHE
 #ifdef TRACE_BLOCK_CACHE
 #	define TRACE(x)	dprintf x
 #else
