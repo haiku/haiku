@@ -101,6 +101,10 @@ get_palette_entry(uint8 index)
 static void
 render_glyph(int32 x, int32 y, uint8 glyph, uint8 attr)
 {
+	// we're ASCII only
+	if (glyph > 127)
+		glyph = 127;
+
 	if (sConsole.depth >= 8) {
 		uint8 *base = (uint8 *)(sConsole.frame_buffer + sConsole.bytes_per_row * y * CHAR_HEIGHT
 			+ x * CHAR_WIDTH * sConsole.bytes_per_pixel);
