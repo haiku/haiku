@@ -46,6 +46,8 @@ float scalbf(float x, float n) {return (float)scalb((double)x, (double)n);};
 double
 modf(double x, double *y)
 {
+	// TODO: this truncates to int precision and is broken!
+	// this should be implemented arch dependent!
 	int integer = (int)x;
 	*y = (double)integer;
 	return x - integer;
@@ -54,8 +56,39 @@ modf(double x, double *y)
 float
 modff(float x, float *y)
 {
+	// TODO: this truncates to int precision and is broken!
+	// this should be implemented arch dependent!
 	double intpart = 0;
 	float result = (float)modf((double)x, &intpart);
 	*y = (float)intpart;
 	return result;
+}
+
+
+int
+__signbitf(float value)
+{
+	// TODO: this is broken on most non x86 machines
+	// this should be implemented arch dependent!
+	union { float v; int i; } u = { v: value };
+	return u.i < 0;
+}
+
+int
+__signbit(double value)
+{
+	// TODO: this is broken on most non x86 machines
+	// this should be implemented arch dependent!
+	union { double v; int i[2]; } u = { v: value };
+	return u.i[1] < 0;
+}
+
+
+int
+__signbitl(long double value)
+{
+	// TODO: this is broken on most non x86 machines
+	// this should be implemented arch dependent!
+	union { long double v; int i[2]; } u = { v: value };
+	return (u.i[2] & 0x8000) != 0;
 }
