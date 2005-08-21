@@ -89,8 +89,8 @@ main(int argc, char *argv[])
 		int64 frameCount;
 		bigtime_t duration;
 		media_format format;
-		void *infoBuffer;
-		int32 infoSize;
+		const void *infoBuffer;
+		size_t infoSize;
 		status = reader->GetStreamInfo(cookies[i], &frameCount, &duration, &format,
 			&infoBuffer, &infoSize);
 		if (status != B_OK) {
@@ -103,8 +103,8 @@ main(int argc, char *argv[])
 	}
 
 	for (int i = 0; i < streamCount; i++) {
-		void *chunkBuffer;
-		int32 chunkSize;
+		const void *chunkBuffer;
+		size_t chunkSize;
 		media_header mediaHeader;
 		for (int j = 0; j < 5; j++) {
 			status = reader->GetNextChunk(cookies[i], &chunkBuffer, &chunkSize, &mediaHeader);
