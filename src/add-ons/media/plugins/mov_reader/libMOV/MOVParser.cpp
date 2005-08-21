@@ -709,7 +709,10 @@ uint64	STCOAtom::getOffsetForChunk(uint32 pChunkID)
 		return theChunkToOffsetArray[pChunkID - 1]->Offset;
 	}
 	
-	DEBUGGER(("Bad Chunk ID %ld / %ld\n",pChunkID,theHeader.NoEntries));
+	#if DEBUG
+	  char msg[100]; sprintf(msg, "Bad Chunk ID %ld / %ld\n", pChunkID, theHeader.NoEntries);
+	  DEBUGGER(msg);
+	#endif
 
 	TRESPASS();
 	return 0LL;
