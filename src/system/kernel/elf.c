@@ -148,15 +148,16 @@ dump_address_info(int argc, char **argv)
 	addr_t address, baseAddress;
 
 	if (argc < 2) {
-		kprintf("not enough arguments\n");
+		kprintf("usage: ls <address>\n");
 		return 0;
 	}
 
 	address = strtoul(argv[1], NULL, 16);
 
-	if (elf_lookup_symbol_address(address, &baseAddress, &symbol, &imageName, &exactMatch) == B_OK) {
-		kprintf("%p = %s + 0x%lx (%s)%s\n", (void *)address, symbol, address - baseAddress,
-			imageName, exactMatch ? "" : " (nearest)");
+	if (elf_debug_lookup_symbol_address(address, &baseAddress, &symbol,
+			&imageName, &exactMatch) == B_OK) {
+		kprintf("%p = %s + 0x%lx (%s)%s\n", (void *)address, symbol,
+			address - baseAddress, imageName, exactMatch ? "" : " (nearest)");
 	} else
 		kprintf("There is no image loaded at this address!\n");
 
@@ -879,12 +880,12 @@ done:
 
 /**	Looks up a symbol by address in all images loaded in kernel space.
  *	Note, if you need to call this function outside a debugger, make
- *	sure you fix the way it returns its information, first!
+ *	sure you fix locking and the way it returns its information, first!
  */
 
 status_t
-elf_lookup_symbol_address(addr_t address, addr_t *_baseAddress, const char **_symbolName,
-	const char **_imageName, bool *_exactMatch)
+elf_debug_lookup_symbol_address(addr_t address, addr_t *_baseAddress,
+	const char **_symbolName, const char **_imageName, bool *_exactMatch)
 {
 	struct elf_image_info *image;
 	struct Elf32_Sym *symbolFound = NULL;
@@ -898,7 +899,7 @@ elf_lookup_symbol_address(addr_t address, addr_t *_baseAddress, const char **_sy
 	if (!sInitialized)
 		return B_ERROR;
 
-	mutex_lock(&sImageMutex);
+	//mutex_lock(&sImageMutex);
 
 	image = find_image_at_address(address);
 		// get image that may contain the address
@@ -1000,7 +1001,7 @@ symbol_found:
 	// would have to be locked - but since this function is only called
 	// from the debugger, it's safe to do it this way
 
-	mutex_unlock(&sImageMutex);
+	//mutex_unlock(&sImageMutex);
 
 	return status;
 }

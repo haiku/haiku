@@ -162,7 +162,7 @@ stack_trace(int argc, char **argv)
 			if (diff & 0x80000000)
 				diff = 0;
 
-			if (elf_lookup_symbol_address(eip, &baseAddress, &symbol,
+			if (elf_debug_lookup_symbol_address(eip, &baseAddress, &symbol,
 					&image, &exactMatch) == B_OK) {
 				if (symbol != NULL) {
 					kprintf("%08lx (+%4ld) %08lx   <%s>:%s + 0x%04lx%s\n", ebp, diff, eip,
