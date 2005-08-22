@@ -224,14 +224,13 @@ add_wall(void *address, size_t size, size_t alignment)
 		address = (uint8 *)address + alignment;
 
 	wall = get_wall(address);
+	set_wall(wall, size, alignment);
 
 #if USE_CHECKING_WALL
 	acquire_sem(sWallCheckLock);
 	list_add_link_to_tail(&sWalls, &wall->link);
 	release_sem(sWallCheckLock);
 #endif
-
-	set_wall(wall, size, alignment);
 	return address;
 }
 
@@ -246,8 +245,8 @@ check_wall(void *address)
 
 	for (i = 0; i < WALL_SIZE / 4; i++) {
 		if (frontWall->wall[i] != 0xabadcafe) {
-			panic("free: front wall %i was overwritten (allocation at %p, %lu bytes): %08lx\n",
-				i, address, frontWall->size, frontWall->wall[i]);
+			panic("free: front wall %i (%p) was overwritten (allocation at %p, %lu bytes): %08lx\n",
+				i, frontWall, address, frontWall->size, frontWall->wall[i]);
 		}
 	}
 
@@ -255,8 +254,8 @@ check_wall(void *address)
 
 	for (i = 0; i < WALL_SIZE / 4; i++) {
 		if (backWall->wall[i] != 0xabadcafe) {
-			panic("free: back wall %i was overwritten (allocation at %p, %lu bytes): %08lx\n",
-				i, address, frontWall->size, backWall->wall[i]);
+			panic("free: back wall %i (%p) was overwritten (allocation at %p, %lu bytes): %08lx\n",
+				i, backWall, address, frontWall->size, backWall->wall[i]);
 		}
 	}
 }
