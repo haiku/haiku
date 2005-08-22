@@ -169,6 +169,9 @@ vm_page_write_modified(vm_cache *cache)
 		cpu_status state = disable_interrupts();
 		acquire_spinlock(&page_lock);
 
+		// ToDo: if this is a memory mapped page, the PAGE_MODIFIED bit might
+		//	not yet have been propagated to the page state!
+
 		if (page->state == PAGE_STATE_MODIFIED) {
 			remove_page_from_queue(&page_modified_queue, page);
 			page->state = PAGE_STATE_BUSY;
