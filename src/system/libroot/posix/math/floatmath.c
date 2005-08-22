@@ -92,3 +92,27 @@ __signbitl(long double value)
 	union { long double v; int i[2]; } u = { v: value };
 	return (u.i[2] & 0x8000) != 0;
 }
+
+
+int
+__fpclassifyf(float value)
+{
+	// TODO: implement me!
+	return FP_NORMAL;
+}
+
+
+int
+__fpclassify(double value)
+{
+	// TODO: implement me!
+	return FP_NORMAL;
+}
+
+
+int
+__fpclassifyl(long double value)
+{
+	// TODO: implement me!
+	return FP_NORMAL;
+}
