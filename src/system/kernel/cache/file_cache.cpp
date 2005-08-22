@@ -784,9 +784,13 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size, bool doWri
 			}
 
 			// and copy the contents of the page already in memory
-			if (doWrite)
+			if (doWrite) {
 				user_memcpy((void *)(virtualAddress + pageOffset), (void *)buffer, bytesInPage);
-			else
+
+				// make sure the page is in the modified list
+				if (page->state != PAGE_STATE_MODIFIED)
+					vm_page_set_state(page, PAGE_STATE_MODIFIED);
+			} else
 				user_memcpy((void *)buffer, (void *)(virtualAddress + pageOffset), bytesInPage);
 
 			vm_put_physical_page(virtualAddress);
@@ -1001,7 +1005,7 @@ file_cache_init_post_boot_device(void)
 	// ToDo: get cache module out of driver settings
 
 	if (get_module("file_cache/launch_speedup/v1", (module_info **)&sCacheModule) == B_OK) {
-		dprintf("** opened launch speedup\n");
+		dprintf("** opened launch speedup: %Ld\n", system_time());
 	} else
 		dprintf("** could not open launch speedup!\n");
 
