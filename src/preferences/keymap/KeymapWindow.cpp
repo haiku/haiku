@@ -49,8 +49,8 @@
 #define	USE_KEYMAP			'UkyM'
 #define REVERT				'Rvrt'
 
-KeymapWindow::KeymapWindow( BRect frame )
-	:	BWindow( frame, WINDOW_TITLE, B_TITLED_WINDOW,
+KeymapWindow::KeymapWindow()
+	:	BWindow(BRect(80,25,692,281), "Keymap", B_TITLED_WINDOW,
 			B_NOT_ZOOMABLE|B_NOT_RESIZABLE|B_ASYNCHRONOUS_CONTROLS )
 {
 	// Add the menu bar

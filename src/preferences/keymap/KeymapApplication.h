@@ -16,11 +16,11 @@
 #ifndef KEYMAP_APPLICATION_H
 #define KEYMAP_APPLICATION_H
 
-#include <storage/Entry.h>
+#include <Application.h>
+#include <Entry.h>
+#include "KeymapWindow.h"
 
 #define APP_SIGNATURE		"application/x-vnd.haiku.Keymap"
-
-class KeymapWindow;
 
 class KeymapApplication : public BApplication {
 public:

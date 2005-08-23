@@ -23,12 +23,7 @@
 #include "KeymapTextView.h"
 #include "Keymap.h"
 
-#define WINDOW_TITLE				"Keymap"
-#define WINDOW_LEFT_TOP_POSITION	BPoint( 80, 25 )
-#define WINDOW_DIMENSIONS			BRect( 0,0, 612,256 )
-
 class KeymapListItem;
-class KeymapApplication;
 
 class MapView : public BControl
 {
@@ -64,7 +59,7 @@ private:
 
 class KeymapWindow : public BWindow {
 public:
-			KeymapWindow( BRect frame );
+			KeymapWindow();
 			~KeymapWindow();
 	bool	QuitRequested();
 	void	MessageReceived( BMessage* message );
