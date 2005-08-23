@@ -1740,15 +1740,20 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
 			// 3) int32 - numChars
-			// 4) char - chars (numChars times)
+                        // 4) int32 - numBytes
+                        // 5) char - the char buffer with size numBytes
 			
 			uint16 famid, styid;
 			link.Read<uint16>(&famid);
 			link.Read<uint16>(&styid);
 			int32 numChars;
 			link.Read<int32>(&numChars);
-			char charArray[numChars];
-			link.Read(&charArray, numChars);
+			
+			uint32 numBytes;
+			link.Read<uint32>(&numBytes);
+
+			char* charArray = new char[numBytes];
+			link.Read(charArray, numBytes);
 			
 			ServerFont font;
 			if (font.SetFamilyAndStyle(famid, styid) == B_OK) {

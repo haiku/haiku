@@ -1174,7 +1174,10 @@ BFont::GetHasGlyphs(const char charArray[], int32 numChars, bool hasArray[]) con
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
 	link.Attach<int32>(numChars);
-	link.Attach(charArray, numChars);
+
+	uint32 bytesInBuffer = UTF8CountBytes(charArray, numChars);
+	link.Attach<int32>(bytesInBuffer);
+	link.Attach(charArray, bytesInBuffer);
 
 	if (link.FlushWithReply(code) != B_OK
 		|| code != SERVER_TRUE)

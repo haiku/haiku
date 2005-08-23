@@ -339,11 +339,42 @@ ServerFont::GetHasGlyphs(const char charArray[], int32 numChars, bool hasArray[]
 	if (!fStyle || !charArray || numChars <= 0 || !hasArray)
 		return;
 
-	// TODO : implement for real
+		FT_Face face = fStyle->GetFTFace();
+	if (!face)
+		return;
 
-	for (int i = 0; i < numChars; i++) {
+	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
+
+	// UTF8 handling...this can probably be smarter
+	// Here is what I do in the AGGTextRenderer to handle UTF8...
+	// It is probably highly inefficient, so it should be reviewed.
+	int32 numBytes = UTF8CountBytes(charArray, numChars);
+	int32 convertedLength = numBytes * 2;
+	char* convertedBuffer = new char[convertedLength];
+
+	int32 state = 0;
+	status_t ret;
+	if ((ret = convert_from_utf8(B_UNICODE_CONVERSION, 
+								 charArray, &numBytes,
+								 convertedBuffer, &convertedLength,
+								 &state, B_SUBSTITUTE)) >= B_OK
+		&& (ret = swap_data(B_INT16_TYPE, convertedBuffer, convertedLength,
+							B_SWAP_BENDIAN_TO_HOST)) >= B_OK) {
+
+		uint16* glyphIndex = (uint16*)convertedBuffer;
+		// just to be sure
+		numChars = min_c((uint32)numChars, convertedLength / sizeof(uint16));
+
+		for (int i = 0; i < numChars; i++) {
+			hasArray[i] = FT_Get_Char_Index(face, glyphIndex[i]) > 0;
+		}
+	}
+	delete[] convertedBuffer;
+
+
+	/*for (int i = 0; i < numChars; i++) {
 		hasArray[i] = true;
-	}	
+	}*/	
 }
 
 
