@@ -1239,14 +1239,13 @@ MapView::DrawKey(uint32 keyCode)
 		
 	}
 	
-	char *str;
+	char *str = NULL;
 	int32 numBytes;
 	fCurrentMap->GetChars(keyCode, fOldKeyInfo.modifiers, fActiveDeadKey, &str, &numBytes);
 	if (str) {
 		bool hasGlyphs;
 		if (deadKey>0) {
 			delete str;
-			hasGlyphs = true;
 			switch (deadKey) {
 				case 1: str = strdup("'"); break;
 				case 2: str = strdup("`"); break;
@@ -1254,8 +1253,8 @@ MapView::DrawKey(uint32 keyCode)
 				case 4: str = strdup("\""); break;
 				case 5: str = strdup("~"); break;
 			}
-		} else
-			fCurrentFont.GetHasGlyphs(str, 1, &hasGlyphs);
+		} 
+		fCurrentFont.GetHasGlyphs(str, 1, &hasGlyphs);
 		
 		if (hasGlyphs) {
 			SetFont(&fCurrentFont);
