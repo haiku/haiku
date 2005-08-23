@@ -103,7 +103,7 @@ ScreenSaverWin::ScreenSaverWin()
 	fFadeNowString2(NULL),
 	fDontFadeString(NULL), fDontFadeString2(NULL),
 	fFadeNow(NULL),fFadeNever(NULL),
-	fPwMessenger(NULL),
+	fPwMessenger(NULL), fFilePanel(NULL),
 	fSettingsArea(NULL) 
 {
 	SetupForm();
@@ -112,6 +112,7 @@ ScreenSaverWin::ScreenSaverWin()
 
 ScreenSaverWin::~ScreenSaverWin()
 {
+	delete fFilePanel;
 }
 
 
@@ -172,9 +173,6 @@ ScreenSaverWin::MessageReceived(BMessage *msg)
 		case kPwbutton: 
 			fPwMessenger->SendMessage(kShow);
       			break;
-		case B_QUIT_REQUESTED:
-			be_app->PostMessage(B_QUIT_REQUESTED);
-			break;
 		case kSaver_sel: 
 			SaverSelected();
 			break;
@@ -201,7 +199,7 @@ ScreenSaverWin::QuitRequested()
 	UpdateStatus();
 	fPrefs.SaveSettings();
 	be_app->PostMessage(B_QUIT_REQUESTED);
-	return(true);
+	return true;
 }       
 
 
@@ -251,7 +249,7 @@ ScreenSaverWin::UpdateStatus(void)
 void 
 ScreenSaverWin::SetupForm() 
 {
-	fFilePanel=new BFilePanel();
+	fFilePanel = new BFilePanel();
 
 	BRect r = Bounds();
 	BTab *tab;
