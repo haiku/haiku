@@ -1,17 +1,10 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2005, Haiku
-//
-//  This software is part of the Haiku distribution and is covered 
-//  by the Haiku license.
-//
-//
-//  File:        ScreenSaverItem.h
-//  Author:      JÃ©rÃ´me Duval
-//  Description: ScreenSaver Preferences
-//  Created :    July 28, 2005
-// 
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *              Jérôme Duval, jerome.duval@free.fr
+ */
 
 #ifndef __SCREENSAVERITEM_H__
 #define __SCREENSAVERITEM_H__

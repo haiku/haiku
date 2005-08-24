@@ -1,6 +1,9 @@
 /*
- * Copyright 2003, Michael Phipps. All rights reserved.
+ * Copyright 2003, Haiku.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *              Michael Phipps
  */
 
 #include "MouseAreaView.h"
