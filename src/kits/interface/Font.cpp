@@ -860,8 +860,12 @@ BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings,
 float
 BFont::StringWidth(const char *string) const
 {
+	if (!string)
+		return 0.0;
 	int32 length = strlen(string);
- 	return StringWidth(string, length);
+	float width;
+	GetStringWidths(&string, &length, 1, &width);
+	return width;
 }
 
 
@@ -870,24 +874,9 @@ BFont::StringWidth(const char *string, int32 length) const
 {
 	if (!string || length < 1)
 		return 0.0;
-	
-	int32 code;
-	BPrivate::AppServerLink link;
-
-	link.StartMessage(AS_GET_STRING_WIDTH);
-	link.AttachString(string);
-	link.Attach<int32>(length);
-	link.Attach<uint16>(fFamilyID);
-	link.Attach<uint16>(fStyleID);
-	link.Attach<float>(fSize);
-	link.Attach<uint8>(fSpacing);
-
-	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE)
-		return 0.0;
 
 	float width;
-	link.Read<float>(&width);
+	GetStringWidths(&string, &length, 1, &width);
 	return width;
 }
 
@@ -903,11 +892,15 @@ BFont::GetStringWidths(const char *stringArray[], const int32 lengthArray[],
 	BPrivate::AppServerLink link;
 
 	link.StartMessage(AS_GET_STRING_WIDTHS);
+	link.Attach<uint16>(fFamilyID);
+	link.Attach<uint16>(fStyleID);
+	link.Attach<float>(fSize);
+	link.Attach<uint8>(fSpacing);
 	link.Attach<int32>(numStrings);
 
 	for (int32 i = 0; i < numStrings; i++) {
-		link.AttachString(stringArray[i]);
 		link.Attach<int32>(lengthArray[i]);
+		link.AttachString(stringArray[i]);
 	}
 
 	if (link.FlushWithReply(code) != B_OK
@@ -1013,23 +1006,26 @@ BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *
 
 
 void
-BFont::GetEdges(const char charArray[], int32 numBytes, edge_info edgeArray[]) const
+BFont::GetEdges(const char charArray[], int32 numChars, edge_info edgeArray[]) const
 {
-	if (!charArray || numBytes < 1 || !edgeArray)
+	if (!charArray || numChars < 1 || !edgeArray)
 		return;
 
 	int32 code;
 	BPrivate::AppServerLink link;
 
 	link.StartMessage(AS_GET_EDGES);
-	link.Attach<int32>(numBytes);
-	link.Attach(charArray, numBytes);
+	link.Attach<int32>(numChars);
+
+	uint32 bytesInBuffer = UTF8CountBytes(charArray, numChars);
+	link.Attach<int32>(bytesInBuffer);
+	link.Attach(charArray, bytesInBuffer);
 
 	if (link.FlushWithReply(code) != B_OK
 		|| code != SERVER_TRUE)
 		return;
 
-	link.Read(edgeArray, sizeof(edge_info) * numBytes);
+	link.Read(edgeArray, sizeof(edge_info) * numChars);
 }
 
 

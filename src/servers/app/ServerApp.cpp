@@ -1348,53 +1348,68 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 //			gFontServer->Unlock();
 			break;
 		}
-		case AS_GET_STRING_WIDTH:
+		case AS_GET_STRING_WIDTHS:
 		{
-			FTRACE(("ServerApp %s: AS_GET_STRING_WIDTH\n", Signature()));
+			FTRACE(("ServerApp %s: AS_GET_STRING_WIDTHS\n", Signature()));
 			// Attached Data:
-			// 1) string String to measure
-			// 2) int32 string length to measure
-			// 3) uint16 ID of family
-			// 4) uint16 ID of style
-			// 5) float point size of font
-			// 6) uint8 spacing to use
-
+			// 1) uint16 ID of family
+			// 2) uint16 ID of style
+			// 3) float point size of font
+			// 4) uint8 spacing to use
+			// 5) int32 numStrings 
+			// 6) int32 string length to measure (numStrings times)
+			// 7) string String to measure (numStrings times)
+			
 			// Returns:
-			// 1) float - width of the string in pixels
-			char *string = NULL;
-			int32 length;
+			// 1) float - width of the string in pixels (numStrings times)
+			
 			uint16 family, style;
-			float size, width = 0;
+			float size;
 			uint8 spacing;
 
-			link.ReadString(&string);
-			link.Read<int32>(&length);
 			link.Read<uint16>(&family);
 			link.Read<uint16>(&style);
 			link.Read<float>(&size);
 			link.Read<uint8>(&spacing);
+			int32 numStrings;
+			link.Read<int32>(&numStrings);
+
+			float widthArray[numStrings];
+			int32 lengthArray[numStrings];
+			char *stringArray[numStrings];
+			for(int32 i=0; i<numStrings; i++) {
+				link.Read<int32>(&lengthArray[i]);
+				stringArray[i] = new char[lengthArray[i]];
+				link.ReadString(&stringArray[i]);
+			}
 
 			ServerFont font;
 
-			if (length > 0 && font.SetFamilyAndStyle(family, style) == B_OK
-				&& size > 0 && string) {
+			if (font.SetFamilyAndStyle(family, style) == B_OK
+				&& size > 0) {
 
 				font.SetSize(size);
 				font.SetSpacing(spacing);
 
-				width = fDesktop->GetDisplayDriver()->StringWidth(string, length, font);
+				for (int32 i=0; i<numStrings; i++)
+					if (!stringArray[i] || lengthArray[i] <= 0)
+						widthArray[i] = 0.0;
+					else
+						widthArray[i] = fDesktop->GetDisplayDriver()->StringWidth(stringArray[i], lengthArray[i], font);
 				// NOTE: The line below will return the exact same thing. However,
 				// the line above uses the AGG rendering backend, for which glyph caching
 				// actually works. It is about 20 times faster!
 				//width = font.StringWidth(string, length);
 
 				fLink.StartMessage(SERVER_TRUE);
-				fLink.Attach<float>(width);
+				fLink.Attach(widthArray, sizeof(widthArray));
 			} else
 				fLink.StartMessage(SERVER_FALSE);
 
 			fLink.Flush();
-			free(string);
+			for(int32 i=0; i<numStrings; i++) {
+				delete[] stringArray[i];
+			}
 			break;
 		}
 		case AS_GET_FONT_BOUNDING_BOX:
@@ -1761,6 +1776,38 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				font.GetHasGlyphs(charArray, numChars, hasArray);
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach(hasArray, sizeof(hasArray));
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+			fLink.Flush();
+			break;
+		}
+		case AS_GET_EDGES:
+		{
+			FTRACE(("ServerApp %s: AS_GET_EDGES\n", Signature()));
+			// Attached Data:
+			// 1) uint16 - family ID
+			// 2) uint16 - style ID
+			// 3) int32 - numChars
+			// 4) int32 - numBytes
+			// 5) char - the char buffer with size numBytes
+			
+			uint16 famid, styid;
+			link.Read<uint16>(&famid);
+			link.Read<uint16>(&styid);
+			int32 numChars;
+			link.Read<int32>(&numChars);
+
+			uint32 numBytes;
+			link.Read<uint32>(&numBytes);
+			char* charArray = new char[numBytes];
+			link.Read(charArray, numBytes);
+			
+			ServerFont font;
+			if (font.SetFamilyAndStyle(famid, styid) == B_OK) {
+				edge_info edgeArray[numChars];
+				font.GetEdges(charArray, numChars, edgeArray);
+				fLink.StartMessage(SERVER_TRUE);
+				fLink.Attach(edgeArray, sizeof(edgeArray));
 			} else
 				fLink.StartMessage(SERVER_FALSE);
 			fLink.Flush();

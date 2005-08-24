@@ -131,10 +131,13 @@ class ServerFont {
 									{ return fStyle->CharMapCount(); }
 
 			BShape**			GetGlyphShapes(const char charArray[],
-											   int32 numChars) const;
+									int32 numChars) const;
 
 			void				GetHasGlyphs(const char charArray[], 
-										int32 numChars, bool hasArray[]) const;
+									int32 numChars, bool hasArray[]) const;
+			
+			void				GetEdges(const char charArray[], 
+									int32 numChars, edge_info edgeArray[]) const;
 
 			BPoint*				GetEscapements(const char charArray[],
 											   int32 numChars,

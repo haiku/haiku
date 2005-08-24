@@ -370,11 +370,52 @@ ServerFont::GetHasGlyphs(const char charArray[], int32 numChars, bool hasArray[]
 		}
 	}
 	delete[] convertedBuffer;
+}
 
 
-	/*for (int i = 0; i < numChars; i++) {
-		hasArray[i] = true;
-	}*/	
+// GetEdges
+void
+ServerFont::GetEdges(const char charArray[], int32 numChars, edge_info edgeArray[]) const
+{
+	if (!fStyle || !charArray || numChars <= 0 || !edgeArray)
+		return;
+
+	FT_Face face = fStyle->GetFTFace();
+	if (!face)
+		return;
+
+	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
+
+	// UTF8 handling...this can probably be smarter
+	// Here is what I do in the AGGTextRenderer to handle UTF8...
+	// It is probably highly inefficient, so it should be reviewed.
+	int32 numBytes = UTF8CountBytes(charArray, numChars);
+	int32 convertedLength = numBytes * 2;
+	char* convertedBuffer = new char[convertedLength];
+
+	int32 state = 0;
+	status_t ret;
+	if ((ret = convert_from_utf8(B_UNICODE_CONVERSION, 
+								 charArray, &numBytes,
+								 convertedBuffer, &convertedLength,
+								 &state, B_SUBSTITUTE)) >= B_OK
+		&& (ret = swap_data(B_INT16_TYPE, convertedBuffer, convertedLength,
+							B_SWAP_BENDIAN_TO_HOST)) >= B_OK) {
+
+		uint16* glyphIndex = (uint16*)convertedBuffer;
+		// just to be sure
+		numChars = min_c((uint32)numChars, convertedLength / sizeof(uint16));
+
+		for (int i = 0; i < numChars; i++) {
+			FT_Load_Char(face, glyphIndex[i], FT_LOAD_NO_BITMAP);
+			if (face->glyph) {
+				edgeArray[i].left = float(face->glyph->metrics.horiBearingX /64) / fSize;
+				edgeArray[i].right = float((face->glyph->metrics.horiBearingX 
+					+ face->glyph->metrics.width - face->glyph->metrics.horiAdvance)/64) /fSize;
+			}
+		}
+	}
+	delete[] convertedBuffer;
 }
 
 
