@@ -4,6 +4,7 @@
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Jérôme Duval, jerome.duval@free.fr
  */
 
 
