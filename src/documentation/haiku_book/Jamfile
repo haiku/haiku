@@ -23,4 +23,8 @@ translationkit.xml ;
 
 Includes [ FGristFiles Haiku_Book.xml ] 
 	: [ FGristFiles $(chapter_files) ] <src!documentation>license.xml ;
-SEARCH on [ FGristFiles $(chapter_files) ] = [ FDirName $(OBOS_TOP) src documentation haiku_book ] ;
+SEARCH on [ FGristFiles $(chapter_files) ] = [ FDirName $(SUB_DIR) ] ;
+
+local app_files = intro.xml messaging.xml scripting.xml Application.xml ;
+Includes [ FGristFiles appkit.xml ] : [ FGristFiles $(app_files) ] ;
+SEARCH on [ FGristFiles $(app_files) ] = [ FDirName $(SUB_DIR) app ] ;

@@ -19,24 +19,24 @@ rule Doc2HTML
 
 	MakeLocate $(target) : $(basedir) ;
 	if $(2) {
-		XSLBASEDIR on $(target) = "-stringparam base.dir \""$(basedir)"/\"" ; 
+		XSLBASEDIR on $(target) = -stringparam base.dir \"$(basedir)/\" ; 
 	}
 	XSLSHEET on $(target) = $(xslsheet) ;
 	XSLOPTIONS on $(target) = $(options) ;
-	if ! $(2) {
-		XSLOUTPUT on $(target) = "-o \""$(target)"\"" ;
+	if $(2) = "" {
+		XSLOUTPUT on $(target) = "-o "\"$(target:D=$(basedir))\" ;
 	}
 
 	Depends $(target) : $(source) ;
 	LocalDepends doc_files : $(target) ;
-	XSLPROCPATHS on $(target) = "-path \""$(paths:J=\ )"\"" ;
+	XSLPROCPATHS on $(target) = -path \" $(paths:J=\ ) \" ;
 	Doc2HTML1 $(target) : $(source) ;
 	LocalClean clean : $(target) ;
 }
 
 actions Doc2HTML1
 {
-	$(XSLTPROC) -xinclude $(XSLPROCPATHS) $(XSLBASEDIR) $(XSLOPTIONS) $(XSLOUTPUT) $(XSLSHEET) $(2) ;
+	$(XSLTPROC) -xinclude $(XSLPROCPATHS) $(XSLBASEDIR) $(XSLOPTIONS) $(XSLOUTPUT) $(XSLSHEET) $(2)
 }
 
 SEARCH on  <src!documentation>license.xml = [ FDirName $(OBOS_TOP) src documentation ] ;
