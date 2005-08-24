@@ -3,41 +3,10 @@
 <chapter id="st-kernelkit">
 <title>The Kernel Kit</title>
 
-<sect1>
-<title>Introduction</title>
-</sect1>
-
-<sect1>
-<title>Threads</title>
-</sect1>
-
-<sect1>
-<title>Semaphores</title>
-</sect1>
-
-<sect1>
-<title>Ports</title>
-</sect1>
-
-<sect1>
-<title>Areas</title>
-</sect1>
-
-<sect1>
-<title>Images</title>
-</sect1>
-
-<sect1>
-<title>System info</title>
-</sect1>
-
-<sect1>
-<title>Time</title>
-</sect1>
-
-<sect1>
-<title>Other</title>
-</sect1>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="kernel/intro.xml" />
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="kernel/threads.xml" />
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="kernel/ports.xml" />
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="kernel/sems.xml" />
 
 </chapter>
 

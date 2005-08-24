@@ -7,6 +7,11 @@ Doc2HTML
 	: Haiku_Book
 	;
 
+rule FRelGristFiles 
+{
+	return $(<:G=$(SOURCE_GRIST:E)$(>:J=!)) ;
+}
+
 local chapter_files = appkit.xml
 devicekit.xml
 gamekit.xml
@@ -26,5 +31,9 @@ Includes [ FGristFiles Haiku_Book.xml ]
 SEARCH on [ FGristFiles $(chapter_files) ] = [ FDirName $(SUB_DIR) ] ;
 
 local app_files = intro.xml messaging.xml scripting.xml Application.xml ;
-Includes [ FGristFiles appkit.xml ] : [ FGristFiles $(app_files) ] ;
-SEARCH on [ FGristFiles $(app_files) ] = [ FDirName $(SUB_DIR) app ] ;
+Includes [ FGristFiles appkit.xml ] : [ FRelGristFiles $(app_files) : app ] ;
+SEARCH on [ FRelGristFiles $(app_files) : app ] = [ FDirName $(SUB_DIR) app ] ;
+
+local kern_files = intro.xml threads.xml ports.xml sems.xml ;
+Includes [ FGristFiles kernelkit.xml ] : [ FRelGristFiles $(kern_files) : kernel ] ;
+SEARCH on [ FRelGristFiles $(kern_files) : kernel ] = [ FDirName $(SUB_DIR) kernel ] ;
