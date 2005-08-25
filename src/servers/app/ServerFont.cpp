@@ -523,6 +523,41 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 	return ret >= B_OK;
 }
 
+
+bool
+ServerFont::GetBoundingBoxesAsString(const char charArray[], int32 numChars, BRect rectArray[],
+		font_metric_mode mode, escapement_delta delta)
+{
+	if (!fStyle || !charArray || numChars <= 0 || !rectArray)
+		return false;
+
+	FT_Face face = fStyle->GetFTFace();
+	if (!face)
+		return false;
+	
+	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
+
+	return true;
+}
+
+
+bool
+ServerFont::GetBoundingBoxesAsStrings(char *charArray[], int32 lengthArray[], 
+	int32 numStrings, BRect rectArray[], font_metric_mode mode, escapement_delta deltaArray[])
+{
+	if (!fStyle || !charArray || !lengthArray|| numStrings <= 0 || !rectArray || !deltaArray)
+		return false;
+
+	FT_Face face = fStyle->GetFTFace();
+	if (!face)
+		return false;
+
+	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
+
+	return true;
+}
+
+
 // StringWidth
 float
 ServerFont::StringWidth(const char* string, int32 numBytes) const

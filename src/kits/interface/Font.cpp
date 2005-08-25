@@ -1039,7 +1039,7 @@ void
 BFont::GetBoundingBoxesAsGlyphs(const char charArray[], int32 numChars, font_metric_mode mode,
 	BRect boundingBoxArray[]) const
 {
-	GetBoundingBoxesAsString(charArray,numChars,mode,NULL,boundingBoxArray);
+	GetBoundingBoxesAsString(charArray, numChars, mode, NULL, boundingBoxArray);
 }
 
 
@@ -1054,6 +1054,11 @@ BFont::GetBoundingBoxesAsString(const char charArray[], int32 numChars, font_met
 	BPrivate::AppServerLink link;
 
 	link.StartMessage(AS_GET_BOUNDINGBOXES_CHARS);
+	link.Attach<uint16>(fFamilyID);
+	link.Attach<uint16>(fStyleID);
+	link.Attach<float>(fSize);
+	link.Attach<float>(fRotation);
+	link.Attach<uint32>(fFlags);
 	link.Attach<font_metric_mode>(mode);
 
 	if (delta) {
@@ -1064,7 +1069,9 @@ BFont::GetBoundingBoxesAsString(const char charArray[], int32 numChars, font_met
 	}
 
 	link.Attach<int32>(numChars);
-	link.Attach(charArray, numChars);
+	uint32 bytesInBuffer = UTF8CountBytes(charArray, numChars);
+	link.Attach<int32>(bytesInBuffer);
+	link.Attach(charArray, bytesInBuffer);
 
 	if (link.FlushWithReply(code) != B_OK
 		|| code != SERVER_TRUE)
@@ -1085,6 +1092,11 @@ BFont::GetBoundingBoxesForStrings(const char *stringArray[], int32 numStrings,
 	BPrivate::AppServerLink link;
 
 	link.StartMessage(AS_GET_BOUNDINGBOXES_STRINGS);
+	link.Attach<uint16>(fFamilyID);
+	link.Attach<uint16>(fStyleID);
+	link.Attach<float>(fSize);
+	link.Attach<float>(fRotation);
+	link.Attach<uint32>(fFlags);
 	link.Attach<font_metric_mode>(mode);
 	link.Attach<int32>(numStrings);
 

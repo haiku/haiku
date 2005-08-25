@@ -1942,6 +1942,147 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			fLink.Flush();
 			break;
 		}
+		case AS_GET_BOUNDINGBOXES_CHARS:
+		{
+			FTRACE(("ServerApp %s: AS_GET_BOUNDINGBOXES_CHARS\n", Signature()));
+			// Attached Data:
+			// 1) uint16 - family ID
+			// 2) uint16 - style ID
+			// 3) float - point size
+			// 4) float - rotation
+			// 5) uint32 - flags
+			
+			// 6) font_metric_mode - mode
+
+			// 7) escapement_delta - additional delta
+
+			// 8) int32 - numChars
+			// 9) int32 - numBytes
+			// 10) char - the char buffer with size numBytes
+
+			// Returns:
+			// 1) BRect - rects with numChar entries
+			
+			uint16 famid, styid;
+			uint32 flags;
+			float ptsize, rotation;
+			font_metric_mode mode;
+			
+			link.Read<uint16>(&famid);
+			link.Read<uint16>(&styid);
+			link.Read<float>(&ptsize);
+			link.Read<float>(&rotation);
+			link.Read<uint32>(&flags);
+			link.Read<font_metric_mode>(&mode);
+
+			escapement_delta delta;
+			link.Read<escapement_delta>(&delta);
+			
+			int32 numChars;
+			link.Read<int32>(&numChars);
+
+			uint32 numBytes;
+			link.Read<uint32>(&numBytes);
+
+			char* charArray = new char[numBytes];
+			link.Read(charArray, numBytes);
+
+			BRect* rectArray = new BRect[numChars];
+			// figure out escapements
+
+			ServerFont font;
+			bool success = false;
+			if (font.SetFamilyAndStyle(famid, styid) == B_OK) {
+				font.SetSize(ptsize);
+				font.SetRotation(rotation);
+				font.SetFlags(flags);
+
+				if (font.GetBoundingBoxesAsString(charArray, numChars, rectArray, mode, delta)) {
+					fLink.StartMessage(SERVER_TRUE);
+					fLink.Attach(rectArray, sizeof(rectArray));
+					success = true;
+				}
+			}
+
+			delete[] charArray;
+			delete[] rectArray;
+
+			if (!success)
+				fLink.StartMessage(SERVER_FALSE);
+
+			fLink.Flush();
+			break;
+		}
+		case AS_GET_BOUNDINGBOXES_STRINGS:
+		{
+			FTRACE(("ServerApp %s: AS_GET_BOUNDINGBOXES_STRINGS\n", Signature()));
+			// Attached Data:
+			// 1) uint16 - family ID
+			// 2) uint16 - style ID
+			// 3) float - point size
+			// 4) float - rotation
+			// 5) uint32 - flags
+			
+			// 6) font_metric_mode - mode
+			// 7) int32 numStrings
+
+			// 8) escapement_delta - additional delta (numStrings times)
+			// 9) int32 string length to measure (numStrings times)
+			// 10) string - string (numStrings times)
+
+			// Returns:
+			// 1) BRect - rects with numStrings entries
+			
+			uint16 famid, styid;
+			uint32 flags;
+			float ptsize, rotation;
+			font_metric_mode mode;
+			
+			link.Read<uint16>(&famid);
+			link.Read<uint16>(&styid);
+			link.Read<float>(&ptsize);
+			link.Read<float>(&rotation);
+			link.Read<uint32>(&flags);
+			link.Read<font_metric_mode>(&mode);
+
+			int32 numStrings;
+			link.Read<int32>(&numStrings);
+			
+			escapement_delta deltaArray[numStrings];
+			char *stringArray[numStrings];
+			int32 lengthArray[numStrings];
+			for(int32 i=0; i<numStrings; i++) {
+				link.Read<int32>(&lengthArray[i]);
+				link.Read<escapement_delta>(&deltaArray[i]);
+				stringArray[i] = new char[lengthArray[i]];
+				link.ReadString(&stringArray[i]);
+			}
+
+			BRect rectArray[numStrings];
+
+			ServerFont font;
+			bool success = false;
+			if (font.SetFamilyAndStyle(famid, styid) == B_OK) {
+				font.SetSize(ptsize);
+				font.SetRotation(rotation);
+				font.SetFlags(flags);
+
+				if (font.GetBoundingBoxesAsStrings(stringArray, lengthArray, numStrings, rectArray, mode, deltaArray)) {
+					fLink.StartMessage(SERVER_TRUE);
+					fLink.Attach(rectArray, sizeof(rectArray));
+					success = true;
+				}
+			}
+
+			for (int32 i=0; i<numStrings; i++)
+				delete[] stringArray[i];
+
+			if (!success)
+				fLink.StartMessage(SERVER_FALSE);
+
+			fLink.Flush();
+			break;
+		}
 		case AS_SCREEN_GET_MODE:
 		{
 			STRACE(("ServerApp %s: AS_SCREEN_GET_MODE\n", Signature()));

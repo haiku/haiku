@@ -130,6 +130,14 @@ class ServerFont {
 											   float widthArray[],
 											   escapement_delta delta) const;
 
+			bool				GetBoundingBoxesAsString(const char charArray[],
+									int32 numChars, BRect rectArray[],
+									font_metric_mode mode, escapement_delta delta);
+
+			bool				GetBoundingBoxesAsStrings(char *charArray[], int32 lengthArray[], 
+									int32 numStrings, BRect rectArray[],
+									font_metric_mode mode, escapement_delta deltaArray[]);
+
 			float				StringWidth(const char* string, int32 numBytes) const;
 
 			FT_Face				GetFTFace() const
