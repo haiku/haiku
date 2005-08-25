@@ -87,7 +87,7 @@ struct bplustree_node {
 	void Initialize();
 	uint8 CountDuplicates(off_t offset, bool isFragment) const;
 	off_t DuplicateAt(off_t offset, bool isFragment, int8 index) const;
-	int32 FragmentsUsed(uint32 nodeSize);
+	uint32 FragmentsUsed(uint32 nodeSize);
 	inline duplicate_array *FragmentAt(int8 index);
 	inline duplicate_array *DuplicateArray();
 
@@ -96,6 +96,7 @@ struct bplustree_node {
 	static inline bool IsDuplicate(off_t link);
 	static inline off_t FragmentOffset(off_t link);
 	static inline uint32 FragmentIndex(off_t link);
+	static inline uint32 MaxFragments(uint32 nodeSize);
 
 #ifdef DEBUG
 	status_t CheckIntegrity(uint32 nodeSize);
@@ -503,6 +504,13 @@ inline uint32
 bplustree_node::FragmentIndex(off_t link)
 {
 	return (uint32)(link & 0x3ff);
+}
+
+
+inline uint32
+bplustree_node::MaxFragments(uint32 nodeSize)
+{
+	return nodeSize / ((NUM_FRAGMENT_VALUES + 1) * sizeof(off_t));
 }
 
 #endif	/* B_PLUS_TREE_H */
