@@ -1218,9 +1218,11 @@ BPlusTree::RemoveDuplicate(Transaction *transaction, bplustree_node *node, Cache
 				bplustree_node::FragmentIndex(oldValue), duplicateOffset, array->count));
 			return B_BAD_DATA;
 		}
-		if (!array->Remove(value))
+		if (!array->Remove(value)) {
 			FATAL(("Oh no, value %Ld not found in fragments of node %Ld...\n",
 				value, duplicateOffset));
+			return B_ENTRY_NOT_FOUND;
+		}
 
 		// remove the array from the fragment node if it is empty
 		if (array->count == 1) {
@@ -1307,6 +1309,7 @@ BPlusTree::RemoveDuplicate(Transaction *transaction, bplustree_node *node, Cache
 
 				// If the next node is the last node, we need to free that node
 				// and convert the duplicate entry back into a normal entry
+				array = duplicate->DuplicateArray();
 				if (right == BPLUSTREE_NULL && duplicate->LeftLink() == BPLUSTREE_NULL
 					&& duplicate->DuplicateArray()->count <= NUM_FRAGMENT_VALUES) {
 					duplicateOffset = left;
