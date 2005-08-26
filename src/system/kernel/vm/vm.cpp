@@ -97,7 +97,7 @@ area_hash(void *_area, const void *key, uint32 range)
 	if (area != NULL)
 		return area->id % range;
 
-	return *id % range;
+	return (uint32)*id % range;
 }
 
 

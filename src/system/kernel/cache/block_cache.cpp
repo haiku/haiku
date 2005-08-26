@@ -74,7 +74,7 @@ transaction_hash(void *_transaction, const void *_id, uint32 range)
 	if (transaction != NULL)
 		return transaction->id % range;
 
-	return *id % range;
+	return (uint32)*id % range;
 }
 
 
@@ -121,7 +121,7 @@ cached_block::Hash(void *_cacheEntry, const void *_block, uint32 range)
 	if (cacheEntry != NULL)
 		return cacheEntry->block_number % range;
 
-	return *block % range;
+	return (uint64)*block % range;
 }
 
 
