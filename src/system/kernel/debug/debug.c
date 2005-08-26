@@ -272,6 +272,7 @@ parse_line(char *buf, char **argv, int *argc, int max_args)
 static void
 kernel_debugger_loop(void)
 {
+	int32 previousCPU = sDebuggerOnCPU;
 	sDebuggerOnCPU = smp_get_current_cpu();
 
 	kprintf("Welcome to Kernel Debugging Land...\n");
@@ -311,7 +312,7 @@ kernel_debugger_loop(void)
 			sCurrentLine = 0;
 	}
 
-	sDebuggerOnCPU = -1;
+	sDebuggerOnCPU = previousCPU;
 }
 
 
