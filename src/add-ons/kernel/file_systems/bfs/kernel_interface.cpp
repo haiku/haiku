@@ -257,8 +257,11 @@ bfs_read_vnode(void *_ns, vnode_id id, void **_node, bool reenter)
 	//FUNCTION_START(("vnode_id = %Ld\n", id));
 	Volume *volume = (Volume *)_ns;
 
-	if (id < 0 || id > volume->NumBlocks()) {
-		FATAL(("inode at %Ld requested!\n", id));
+	// first inode may be after the log area, we don't go through
+	// the hassle and try to load an earlier block from disk
+	if (id < volume->ToBlock(volume->Log()) + volume->Log().Length()
+		|| id > volume->NumBlocks()) {
+		INFORM(("inode at %Ld requested!\n", id));
 		return B_ERROR;
 	}
 
