@@ -377,7 +377,7 @@ team_struct_hash(void *_p, const void *_key, uint32 range)
 	if (p != NULL)
 		return p->id % range;
 
-	return key->id % range;
+	return (uint32)key->id % range;
 }
 
 

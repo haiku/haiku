@@ -145,7 +145,7 @@ thread_struct_hash(void *_t, const void *_key, uint32 range)
 	if (t != NULL)
 		return t->id % range;
 
-	return key->id % range;
+	return (uint32)key->id % range;
 }
 
 

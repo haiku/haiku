@@ -69,7 +69,7 @@ image_hash(void *_image, const void *_key, uint32 range)
 	if (image != NULL)
 		return image->id % range;
 
-	return id % range;
+	return (uint32)id % range;
 }
 
 
