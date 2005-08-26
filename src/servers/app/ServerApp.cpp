@@ -1950,30 +1950,35 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// 2) uint16 - style ID
 			// 3) float - point size
 			// 4) float - rotation
-			// 5) uint32 - flags
+			// 5) shear - shear
+			// 6) uint32 - flags
 			
-			// 6) font_metric_mode - mode
+			// 7) font_metric_mode - mode
+			// 8) bool - string escapement
 
-			// 7) escapement_delta - additional delta
+			// 9) escapement_delta - additional delta
 
-			// 8) int32 - numChars
-			// 9) int32 - numBytes
-			// 10) char - the char buffer with size numBytes
+			// 10) int32 - numChars
+			// 11) int32 - numBytes
+			// 12) char - the char buffer with size numBytes
 
 			// Returns:
 			// 1) BRect - rects with numChar entries
 			
 			uint16 famid, styid;
 			uint32 flags;
-			float ptsize, rotation;
+			float ptsize, rotation, shear;
 			font_metric_mode mode;
+			bool string_escapement;
 			
 			link.Read<uint16>(&famid);
 			link.Read<uint16>(&styid);
 			link.Read<float>(&ptsize);
 			link.Read<float>(&rotation);
+			link.Read<float>(&shear);
 			link.Read<uint32>(&flags);
 			link.Read<font_metric_mode>(&mode);
+			link.Read<bool>(&string_escapement);
 
 			escapement_delta delta;
 			link.Read<escapement_delta>(&delta);
@@ -1984,10 +1989,10 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			uint32 numBytes;
 			link.Read<uint32>(&numBytes);
 
-			char* charArray = new char[numBytes];
+			char charArray[numBytes];
 			link.Read(charArray, numBytes);
 
-			BRect* rectArray = new BRect[numChars];
+			BRect rectArray[numChars];
 			// figure out escapements
 
 			ServerFont font;
@@ -1995,17 +2000,16 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (font.SetFamilyAndStyle(famid, styid) == B_OK) {
 				font.SetSize(ptsize);
 				font.SetRotation(rotation);
+				font.SetShear(shear);
 				font.SetFlags(flags);
 
+				// TODO implement for real
 				if (font.GetBoundingBoxesAsString(charArray, numChars, rectArray, mode, delta)) {
 					fLink.StartMessage(SERVER_TRUE);
 					fLink.Attach(rectArray, sizeof(rectArray));
 					success = true;
 				}
 			}
-
-			delete[] charArray;
-			delete[] rectArray;
 
 			if (!success)
 				fLink.StartMessage(SERVER_FALSE);
@@ -2021,27 +2025,29 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// 2) uint16 - style ID
 			// 3) float - point size
 			// 4) float - rotation
-			// 5) uint32 - flags
+			// 5) float - shear
+			// 6) uint32 - flags
 			
-			// 6) font_metric_mode - mode
-			// 7) int32 numStrings
+			// 7) font_metric_mode - mode
+			// 8) int32 numStrings
 
-			// 8) escapement_delta - additional delta (numStrings times)
-			// 9) int32 string length to measure (numStrings times)
-			// 10) string - string (numStrings times)
+			// 9) escapement_delta - additional delta (numStrings times)
+			// 10) int32 string length to measure (numStrings times)
+			// 11) string - string (numStrings times)
 
 			// Returns:
 			// 1) BRect - rects with numStrings entries
 			
 			uint16 famid, styid;
 			uint32 flags;
-			float ptsize, rotation;
+			float ptsize, rotation, shear;
 			font_metric_mode mode;
 			
 			link.Read<uint16>(&famid);
 			link.Read<uint16>(&styid);
 			link.Read<float>(&ptsize);
 			link.Read<float>(&rotation);
+			link.Read<float>(&shear);
 			link.Read<uint32>(&flags);
 			link.Read<font_metric_mode>(&mode);
 
@@ -2065,8 +2071,10 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (font.SetFamilyAndStyle(famid, styid) == B_OK) {
 				font.SetSize(ptsize);
 				font.SetRotation(rotation);
+				font.SetShear(shear);
 				font.SetFlags(flags);
 
+				// TODO implement for real
 				if (font.GetBoundingBoxesAsStrings(stringArray, lengthArray, numStrings, rectArray, mode, deltaArray)) {
 					fLink.StartMessage(SERVER_TRUE);
 					fLink.Attach(rectArray, sizeof(rectArray));

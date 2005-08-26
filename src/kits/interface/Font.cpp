@@ -1039,13 +1039,21 @@ void
 BFont::GetBoundingBoxesAsGlyphs(const char charArray[], int32 numChars, font_metric_mode mode,
 	BRect boundingBoxArray[]) const
 {
-	GetBoundingBoxesAsString(charArray, numChars, mode, NULL, boundingBoxArray);
+	_GetBoundingBoxes_(charArray, numChars, mode, false, NULL, boundingBoxArray);
 }
 
 
 void
 BFont::GetBoundingBoxesAsString(const char charArray[], int32 numChars, font_metric_mode mode,
 	escapement_delta *delta, BRect boundingBoxArray[]) const
+{
+	_GetBoundingBoxes_(charArray, numChars, mode, true, delta, boundingBoxArray);
+}
+
+
+void
+BFont::_GetBoundingBoxes_(const char charArray[], int32 numChars, font_metric_mode mode,
+	bool string_escapement, escapement_delta *delta, BRect boundingBoxArray[]) const
 {
 	if (!charArray || numChars < 1 || !boundingBoxArray)
 		return;
@@ -1058,8 +1066,10 @@ BFont::GetBoundingBoxesAsString(const char charArray[], int32 numChars, font_met
 	link.Attach<uint16>(fStyleID);
 	link.Attach<float>(fSize);
 	link.Attach<float>(fRotation);
+	link.Attach<float>(fShear);
 	link.Attach<uint32>(fFlags);
 	link.Attach<font_metric_mode>(mode);
+	link.Attach<bool>(string_escapement);
 
 	if (delta) {
 		link.Attach<escapement_delta>(*delta);
@@ -1096,6 +1106,7 @@ BFont::GetBoundingBoxesForStrings(const char *stringArray[], int32 numStrings,
 	link.Attach<uint16>(fStyleID);
 	link.Attach<float>(fSize);
 	link.Attach<float>(fRotation);
+	link.Attach<float>(fShear);
 	link.Attach<uint32>(fFlags);
 	link.Attach<font_metric_mode>(mode);
 	link.Attach<int32>(numStrings);
