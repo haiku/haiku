@@ -536,13 +536,47 @@ ServerFont::GetBoundingBoxesAsString(const char charArray[], int32 numChars, BRe
 		return false;
 	
 	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
+	
+	// UTF8 handling...this can probably be smarter
+	// Here is what I do in the AGGTextRenderer to handle UTF8...
+	// It is probably highly inefficient, so it should be reviewed.
+	int32 numBytes = UTF8CountBytes(charArray, numChars);
+	int32 convertedLength = numBytes * 2;
+	char* convertedBuffer = new char[convertedLength];
+
+	int32 state = 0;
+	status_t ret;
+	if ((ret = convert_from_utf8(B_UNICODE_CONVERSION, 
+								 charArray, &numBytes,
+								 convertedBuffer, &convertedLength,
+								 &state, B_SUBSTITUTE)) >= B_OK
+		&& (ret = swap_data(B_INT16_TYPE, convertedBuffer, convertedLength,
+							B_SWAP_BENDIAN_TO_HOST)) >= B_OK) {
+
+		uint16* glyphIndex = (uint16*)convertedBuffer;
+		// just to be sure
+		numChars = min_c((uint32)numChars, convertedLength / sizeof(uint16));
+
+		for (int i = 0; i < numChars; i++) {
+			FT_Load_Char(face, glyphIndex[i], FT_LOAD_NO_BITMAP);
+			if (face->glyph) {
+				rectArray[i].left = float(face->glyph->metrics.horiBearingX) /64.0;
+				rectArray[i].right = float(face->glyph->metrics.horiBearingX 
+					+ face->glyph->metrics.width)/64.0;
+				rectArray[i].top = -float(face->glyph->metrics.horiBearingY) /64.0;
+				rectArray[i].bottom = float(face->glyph->metrics.height 
+					- face->glyph->metrics.horiBearingY) /64.0;
+			}
+		}
+	}
+	delete[] convertedBuffer;
 
 	return true;
 }
 
 
 bool
-ServerFont::GetBoundingBoxesAsStrings(char *charArray[], int32 lengthArray[], 
+ServerFont::GetBoundingBoxesForStrings(char *charArray[], int32 lengthArray[], 
 	int32 numStrings, BRect rectArray[], font_metric_mode mode, escapement_delta deltaArray[])
 {
 	if (!fStyle || !charArray || !lengthArray|| numStrings <= 0 || !rectArray || !deltaArray)
@@ -553,6 +587,11 @@ ServerFont::GetBoundingBoxesAsStrings(char *charArray[], int32 lengthArray[],
 		return false;
 
 	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
+
+	for (int32 i=0; i<numStrings; i++) {
+		
+
+	}
 
 	return true;
 }
