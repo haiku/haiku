@@ -214,7 +214,7 @@ BRect::OffsetToCopy(float dx, float dy)
 void
 BRect::PrintToStream() const
 {
-	printf("BRect(%.1f, %.1f, %.1f, %.1f)\n", left, top, right, bottom);
+	printf("BRect(l:%.1f, t:%.1f, r:%.1f, b:%.1f)\n", left, top, right, bottom);
 }
 //------------------------------------------------------------------------------
 bool
