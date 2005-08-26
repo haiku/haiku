@@ -1950,17 +1950,18 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// 2) uint16 - style ID
 			// 3) float - point size
 			// 4) float - rotation
-			// 5) shear - shear
-			// 6) uint32 - flags
+			// 5) float - shear
+			// 6) uint8 - spacing
+			// 7) uint32 - flags
 			
-			// 7) font_metric_mode - mode
-			// 8) bool - string escapement
+			// 8) font_metric_mode - mode
+			// 9) bool - string escapement
 
-			// 9) escapement_delta - additional delta
+			// 10) escapement_delta - additional delta
 
-			// 10) int32 - numChars
-			// 11) int32 - numBytes
-			// 12) char - the char buffer with size numBytes
+			// 11) int32 - numChars
+			// 12) int32 - numBytes
+			// 13) char - the char buffer with size numBytes
 
 			// Returns:
 			// 1) BRect - rects with numChar entries
@@ -1968,6 +1969,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			uint16 famid, styid;
 			uint32 flags;
 			float ptsize, rotation, shear;
+			uint8 spacing;
 			font_metric_mode mode;
 			bool string_escapement;
 			
@@ -1976,6 +1978,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&ptsize);
 			link.Read<float>(&rotation);
 			link.Read<float>(&shear);
+			link.Read<uint8>(&spacing);
 			link.Read<uint32>(&flags);
 			link.Read<font_metric_mode>(&mode);
 			link.Read<bool>(&string_escapement);
@@ -2001,6 +2004,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				font.SetSize(ptsize);
 				font.SetRotation(rotation);
 				font.SetShear(shear);
+				font.SetSpacing(spacing);
 				font.SetFlags(flags);
 
 				// TODO implement for real
@@ -2026,14 +2030,15 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// 3) float - point size
 			// 4) float - rotation
 			// 5) float - shear
-			// 6) uint32 - flags
+			// 6) uint8 - spacing
+			// 7) uint32 - flags
 			
-			// 7) font_metric_mode - mode
-			// 8) int32 numStrings
+			// 8) font_metric_mode - mode
+			// 9) int32 numStrings
 
-			// 9) escapement_delta - additional delta (numStrings times)
-			// 10) int32 string length to measure (numStrings times)
-			// 11) string - string (numStrings times)
+			// 10) escapement_delta - additional delta (numStrings times)
+			// 11) int32 string length to measure (numStrings times)
+			// 12) string - string (numStrings times)
 
 			// Returns:
 			// 1) BRect - rects with numStrings entries
@@ -2041,6 +2046,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			uint16 famid, styid;
 			uint32 flags;
 			float ptsize, rotation, shear;
+			uint8 spacing;
 			font_metric_mode mode;
 			
 			link.Read<uint16>(&famid);
@@ -2048,6 +2054,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&ptsize);
 			link.Read<float>(&rotation);
 			link.Read<float>(&shear);
+			link.Read<uint8>(&spacing);
 			link.Read<uint32>(&flags);
 			link.Read<font_metric_mode>(&mode);
 
@@ -2072,6 +2079,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				font.SetSize(ptsize);
 				font.SetRotation(rotation);
 				font.SetShear(shear);
+				font.SetSpacing(spacing);
 				font.SetFlags(flags);
 
 				// TODO implement for real

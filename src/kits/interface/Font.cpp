@@ -1067,6 +1067,8 @@ BFont::_GetBoundingBoxes_(const char charArray[], int32 numChars, font_metric_mo
 	link.Attach<float>(fSize);
 	link.Attach<float>(fRotation);
 	link.Attach<float>(fShear);
+	link.Attach<uint8>(fSpacing);
+	
 	link.Attach<uint32>(fFlags);
 	link.Attach<font_metric_mode>(mode);
 	link.Attach<bool>(string_escapement);
@@ -1107,6 +1109,7 @@ BFont::GetBoundingBoxesForStrings(const char *stringArray[], int32 numStrings,
 	link.Attach<float>(fSize);
 	link.Attach<float>(fRotation);
 	link.Attach<float>(fShear);
+	link.Attach<uint8>(fSpacing);
 	link.Attach<uint32>(fFlags);
 	link.Attach<font_metric_mode>(mode);
 	link.Attach<int32>(numStrings);
