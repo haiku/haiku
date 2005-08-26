@@ -90,7 +90,7 @@ rootfs_vnode_hash_func(void *_v, const void *_key, uint32 range)
 	if (vnode != NULL)
 		return vnode->id % range;
 
-	return (*key) % range;
+	return (uint64)*key % range;
 }
 
 
@@ -441,23 +441,25 @@ static status_t
 rootfs_get_vnode(fs_volume _fs, vnode_id id, fs_vnode *_vnode, bool reenter)
 {
 	struct rootfs *fs = (struct rootfs *)_fs;
+	struct rootfs_vnode *vnode;
 
-	TRACE(("rootfs_getvnode: asking for vnode 0x%Lx, r %d\n", id, reenter));
+	TRACE(("rootfs_getvnode: asking for vnode %Ld, r %d\n", id, reenter));
 
 	if (!reenter)
 		mutex_lock(&fs->lock);
 
-	*_vnode = hash_lookup(fs->vnode_list_hash, &id);
+	vnode = hash_lookup(fs->vnode_list_hash, &id);
 
 	if (!reenter)
 		mutex_unlock(&fs->lock);
 
 	TRACE(("rootfs_getnvnode: looked it up at %p\n", *_vnode));
 
-	if (*_vnode)
-		return B_NO_ERROR;
+	if (vnode == NULL)
+		return B_ENTRY_NOT_FOUND;
 
-	return B_ENTRY_NOT_FOUND;
+	*_vnode = vnode;
+	return B_OK;
 }
 
 
@@ -555,7 +557,7 @@ rootfs_write(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
 	off_t pos, const void *buffer, size_t *_length)
 {
 	TRACE(("rootfs_write: vnode %p, cookie %p, pos 0x%Lx , len 0x%lx\n", 
-		vnode, cookie, pos, *len));
+		vnode, cookie, pos, *_length));
 
 	return EPERM;
 }
@@ -570,7 +572,7 @@ rootfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name, int mode, vnod
 	status_t status = 0;
 
 	TRACE(("rootfs_create_dir: dir %p, name = '%s', perms = %d, id = 0x%Lx pointer id = %p\n",
-		dir, name, perms,*_newID, _newID));
+		dir, name, mode,*_newID, _newID));
 
 	mutex_lock(&fs->lock);
 

@@ -155,7 +155,7 @@ driver_entry_hash(void *_driver, const void *_key, uint32 range)
 	if (driver != NULL)
 		return driver->node % range;
 
-	return (*key) % range;
+	return (uint64)*key % range;
 }
 
 
@@ -337,7 +337,7 @@ devfs_vnode_hash(void *_vnode, const void *_key, uint32 range)
 	if (vnode != NULL)
 		return vnode->id % range;
 
-	return (*key) % range;
+	return (uint64)*key % range;
 }
 
 
@@ -1112,23 +1112,25 @@ static status_t
 devfs_get_vnode(fs_volume _fs, vnode_id id, fs_vnode *_vnode, bool reenter)
 {
 	struct devfs *fs = (struct devfs *)_fs;
+	struct devfs_vnode *vnode;
 
 	TRACE(("devfs_get_vnode: asking for vnode id = %Ld, vnode = %p, r %d\n", id, _vnode, reenter));
 
 	if (!reenter)
 		recursive_lock_lock(&fs->lock);
 
-	*_vnode = hash_lookup(fs->vnode_hash, &id);
+	vnode = (devfs_vnode *)hash_lookup(fs->vnode_hash, &id);
 
 	if (!reenter)
 		recursive_lock_unlock(&fs->lock);
 
 	TRACE(("devfs_get_vnode: looked it up at %p\n", *_vnode));
 
-	if (*_vnode)
-		return B_OK;
+	if (vnode == NULL)
+		return B_ENTRY_NOT_FOUND;
 
-	return B_ENTRY_NOT_FOUND;
+	*_vnode = vnode;
+	return B_OK;
 }
 
 

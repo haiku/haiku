@@ -90,7 +90,7 @@ bootfs_vnode_hash_func(void *_v, const void *_key, uint32 range)
 	if (v != NULL)
 		return v->id % range;
 
-	return (*key) % range;
+	return (uint64)*key % range;
 }
 
 

@@ -440,7 +440,7 @@ mount_hash(void *_m, const void *_key, uint32 range)
 	if (mount)
 		return mount->id % range;
 
-	return *id % range;
+	return (uint32)*id % range;
 }
 
 
@@ -577,9 +577,9 @@ vnode_hash(void *_vnode, const void *_key, uint32 range)
 #define VHASH(mountid, vnodeid) (((uint32)((vnodeid) >> 32) + (uint32)(vnodeid)) ^ (uint32)(mountid))
 
 	if (vnode != NULL)
-		return (VHASH(vnode->device, vnode->id) % range);
+		return VHASH(vnode->device, vnode->id) % range;
 
-	return (VHASH(key->device, key->vnode) % range);
+	return VHASH(key->device, key->vnode) % range;
 
 #undef VHASH
 }
@@ -3333,7 +3333,8 @@ file_open_entry_ref(mount_id mountID, vnode_id directoryID, const char *name, in
 	if (name == NULL || *name == '\0')
 		return B_BAD_VALUE;
 
-	FUNCTION(("file_open_entry_ref()\n"));
+	FUNCTION(("file_open_entry_ref(ref = (%ld, %Ld, %s), openMode = %d)\n",
+		mountID, directoryID, name, openMode));
 
 	// get the vnode matching the entry_ref
 	status = entry_ref_to_vnode(mountID, directoryID, name, &vnode);

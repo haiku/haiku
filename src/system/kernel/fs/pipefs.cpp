@@ -823,7 +823,7 @@ Inode::hash_func(void *_node, const void *_key, uint32 range)
 	if (inode != NULL)
 		return inode->ID() % range;
 
-	return (*key) % range;
+	return (uint64)*key % range;
 }
 
 
@@ -1088,23 +1088,25 @@ static status_t
 pipefs_get_vnode(fs_volume _volume, vnode_id id, fs_vnode *_inode, bool reenter)
 {
 	Volume *volume = (Volume *)_volume;
+	Inode *inode;
 
 	TRACE(("pipefs_getvnode: asking for vnode 0x%Lx, r %d\n", id, reenter));
 
 	if (!reenter)
 		volume->Lock();
 
-	*_inode = volume->Lookup(id);
+	inode = volume->Lookup(id);
 
 	if (!reenter)
 		volume->Unlock();
 
 	TRACE(("pipefs_getnvnode: looked it up at %p\n", *_inode));
 
-	if (*_inode)
-		return B_OK;
+	if (inode == NULL)
+		return B_ENTRY_NOT_FOUND;
 
-	return B_ENTRY_NOT_FOUND;
+	*_inode = inode;
+	return B_OK;
 }
 
 

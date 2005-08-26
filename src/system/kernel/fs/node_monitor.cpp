@@ -94,9 +94,9 @@ monitor_hash(void *_monitor, const void *_key, uint32 range)
 #define MHASH(device, node) (((uint32)((node) >> 32) + (uint32)(node)) ^ (uint32)(device))
 
 	if (monitor != NULL)
-		return (MHASH(monitor->device, monitor->node) % range);
+		return MHASH(monitor->device, monitor->node) % range;
 
-	return (MHASH(key->device, key->node) % range);
+	return MHASH(key->device, key->node) % range;
 #undef MHASH
 }
 
