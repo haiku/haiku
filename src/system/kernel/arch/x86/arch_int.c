@@ -407,21 +407,36 @@ i386_handle_trap(struct iframe frame)
 
 		case 14: 	// Page-Fault Exception (#PF)
 		{
-			bool disabledInterrupts = /*kernel_startup ||*/ debug_debugger_running();
+			bool kernelDebugger = debug_debugger_running();
 			unsigned int cr2;
 			addr_t newip;
 
 			asm("movl %%cr2, %0" : "=r" (cr2));
 
-			if ((frame.flags & 0x200) == 0 && !disabledInterrupts) {
+			if (kernelDebugger) {
+				// if this thread has a fault handler, we're allowed to be here
+				struct thread *thread = thread_get_current_thread();
+				if (thread && thread->fault_handler != NULL) {
+					frame.eip = thread->fault_handler;
+					break;
+				}
+
+				// otherwise, not really
+				panic("page fault in debugger without fault handler! Touching "
+					"address %p from eip %p\n", (void *)cr2, (void *)frame.eip);
+				break;
+			} else if ((frame.flags & 0x200) == 0) {
 				// if the interrupts were disabled, and we are not running the kernel startup
 				// the page fault was not allowed to happen and we must panic
-				panic("page fault, but interrupts were disabled. Touching address %p from eip %p\n", (void *)cr2, (void *)frame.eip);
-			} else if (thread != NULL && thread->page_faults_allowed < 1)
-				panic("page fault not allowed at this place. Touching address %p from eip %p\n", (void *)cr2, (void *)frame.eip);
+				panic("page fault, but interrupts were disabled. Touching address "
+					"%p from eip %p\n", (void *)cr2, (void *)frame.eip);
+				break;
+			} else if (thread != NULL && thread->page_faults_allowed < 1) {
+				panic("page fault not allowed at this place. Touching address "
+					"%p from eip %p\n", (void *)cr2, (void *)frame.eip);
+			}
 
-			if (!disabledInterrupts)
-				enable_interrupts();
+			enable_interrupts();
 
 			ret = vm_page_fault(cr2, frame.eip,
 				(frame.error_code & 0x2) != 0,	// write access
