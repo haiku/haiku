@@ -134,7 +134,7 @@ class ServerFont {
 									int32 numChars, BRect rectArray[],
 									font_metric_mode mode, escapement_delta delta);
 
-			bool				GetBoundingBoxesAsStrings(char *charArray[], int32 lengthArray[], 
+			bool				GetBoundingBoxesForStrings(char *charArray[], int32 lengthArray[], 
 									int32 numStrings, BRect rectArray[],
 									font_metric_mode mode, escapement_delta deltaArray[]);
 
