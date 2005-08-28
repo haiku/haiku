@@ -19,7 +19,7 @@
 #include <errno.h>
 
 
-#define TRACE_CACHE_MODULE
+//#define TRACE_CACHE_MODULE
 #ifdef TRACE_CACHE_MODULE
 #	define TRACE(x) dprintf x
 #else
@@ -85,15 +85,7 @@ get_log_entry()
 
 	struct thread *thread = thread_get_current_thread();
 	log->team = thread->team->id;
-
-	// cut off path from name
-	const char *leaf = strrchr(thread->team->name, '/');
-	if (leaf == NULL)
-		leaf = thread->team->name;
-	else
-		leaf++;
-
-	strlcpy(log->team_name, leaf, B_OS_NAME_LENGTH);
+	strlcpy(log->team_name, thread->name, B_OS_NAME_LENGTH);
 
 	log->timestamp = system_time();
 
@@ -183,18 +175,12 @@ log_node_launched(size_t argCount, char * const *args)
 			GRAB_TEAM_LOCK();
 
 			log->launch.parent = team->parent->id;
-			strlcpy(name, team->parent->name, B_OS_NAME_LENGTH);
+			strlcpy(name, team->parent->main_thread->name, B_OS_NAME_LENGTH);
 
 			RELEASE_TEAM_LOCK();
 			restore_interrupts(state);
 
-			const char *leaf = strrchr(name, '/');
-			if (leaf == NULL)
-				leaf = name;
-			else
-				leaf++;
-
-			log->launch.args[0] = strdup(leaf);
+			log->launch.args[0] = strdup(name);
 		} else
 			log->launch.args[i] = strdup(args[i]);
 
@@ -205,7 +191,13 @@ log_node_launched(size_t argCount, char * const *args)
 		}
 	}
 
-	TRACE(("log: added entry %s, <l> %s ...\n", log->team_name, args[0]));
+	if (vfs_get_cwd(&log->device, &log->parent) != B_OK) {
+		log->device = -1;
+		log->parent = -1;
+	}
+
+	TRACE(("log: added entry %s, <l> %ld:%Ld %s ...\n", log->team_name,
+		log->device, log->parent, args[0]));
 
 	put_log_entry(log);
 
@@ -275,18 +267,29 @@ log_writer_daemon(void *arg, int /*iteration*/)
 
 		for (uint32 i = 0; i < sCurrentEntry; i++) {
 			cache_log *log = &sLogEntries[i];
-			char line[1536];
+			char line[1236];
 			ssize_t length = 0;
 
 			switch (log->action) {
 				case 'l':	// launch
-					length = snprintf(line, sizeof(line), "%ld: %Ld \"%s\" l %ld \"%s\" ",
+					length = snprintf(line, sizeof(line), "%ld: %Ld \"%s\" l %ld:%Ld %ld \"%s\" ",
 								log->team, log->timestamp, log->team_name,
-								log->launch.parent, log->launch.args[0]);
+								log->device, log->parent, log->launch.parent,
+								log->launch.args[0]);
 
 					for (int32 j = 1; j < log->launch.arg_count; j++) {
-						strlcat(line, log->launch.args[j], sizeof(line));
-						length = strlcat(line, " ", sizeof(line));
+						// write argument list one by one, so that we can deal
+						// with very long argument lists
+						ssize_t written = write(sLogFile, line, length);
+						if (written != length) {
+							dprintf("log: must drop log entries: %ld, %s!\n",
+								written, strerror(written));
+							break;
+						} else
+							fileSize += length;
+
+						strlcpy(line, log->launch.args[j], sizeof(line));
+						length = strlcat(line, "\xb0 ", sizeof(line));
 					}
 
 					if (length >= (ssize_t)sizeof(line))
