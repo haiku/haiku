@@ -313,7 +313,7 @@ rootfs_mount(mount_id id, const char *device, uint32 flags, const char *args,
 		return B_NO_MEMORY;
 
 	fs->id = id;
-	fs->next_vnode_id = 0;
+	fs->next_vnode_id = 1;
 
 	err = mutex_init(&fs->lock, "rootfs_mutex");
 	if (err < B_OK)

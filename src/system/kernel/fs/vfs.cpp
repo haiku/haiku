@@ -1338,7 +1338,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 	int count, struct vnode **_vnode, vnode_id *_parentID, int *_type)
 {
 	status_t status = 0;
-	vnode_id lastParentID = -1;
+	vnode_id lastParentID = vnode->id;
 	int type = 0;
 
 	FUNCTION(("vnode_path_to_vnode(vnode = %p, path = %s)\n", vnode, path));
