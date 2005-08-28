@@ -11,3 +11,8 @@ KernelAddon log : kernel file_cache :
 KernelAddon launch_speedup : kernel file_cache :
 	launch_speedup.cpp
 	;
+
+KernelAddon rule_based_prefetcher : kernel file_cache :
+	rule_based_prefetcher.cpp
+	;
+
