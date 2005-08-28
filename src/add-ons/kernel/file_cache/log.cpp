@@ -10,6 +10,7 @@
 #include <thread.h>
 #include <file_cache.h>
 #include <fs/fd.h>
+#include <generic_syscall.h>
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -24,6 +25,11 @@
 #else
 #	define TRACE(x) ;
 #endif
+
+
+// generic syscall interface
+#define CACHE_LOG_SYSCALLS "cache_log"
+#define CACHE_LOG_SET_MODULE	1
 
 
 struct cache_log {
@@ -56,6 +62,7 @@ static uint32 sCurrentEntry;
 static sem_id sLogEntrySem;
 static struct mutex sLock;
 static int sLogFile;
+static struct cache_module_info *sCacheModule;
 
 
 static void
@@ -120,6 +127,9 @@ log_node_opened(void *vnode, int32 fdType, mount_id device, vnode_id parent,
 		log->type, device, parent, node, log->file_name));
 
 	put_log_entry(log);
+
+	if (sCacheModule != NULL && sCacheModule->node_opened != NULL)
+		sCacheModule->node_opened(vnode, fdType, device, parent, node, name, size);
 }
 
 
@@ -143,6 +153,9 @@ log_node_closed(void *vnode, int32 fdType, mount_id device, vnode_id node, int32
 		log->team_name, log->type, device, node, accessType));
 
 	put_log_entry(log);
+
+	if (sCacheModule != NULL && sCacheModule->node_closed != NULL)
+		sCacheModule->node_closed(vnode, fdType, device, node, accessType);
 }
 
 
@@ -195,6 +208,53 @@ log_node_launched(size_t argCount, char * const *args)
 	TRACE(("log: added entry %s, <l> %s ...\n", log->team_name, args[0]));
 
 	put_log_entry(log);
+
+	if (sCacheModule != NULL && sCacheModule->node_launched != NULL)
+		sCacheModule->node_launched(argCount, args);
+}
+
+
+static status_t
+log_control(const char *subsystem, uint32 function,
+	void *buffer, size_t bufferSize)
+{
+	switch (function) {
+		case CACHE_LOG_SET_MODULE:
+		{
+			cache_module_info *module = sCacheModule;
+
+			// unset previous module
+
+			if (sCacheModule != NULL) {
+				sCacheModule = NULL;
+				snooze(100000);	// 0.1 secs
+				put_module(module->info.name);
+			}
+
+			// get new module, if any
+
+			if (buffer == NULL)
+				return B_OK;
+
+			char name[B_FILE_NAME_LENGTH];
+			if (!IS_USER_ADDRESS(buffer)
+				|| user_strlcpy(name, (char *)buffer, B_FILE_NAME_LENGTH) < B_OK)
+				return B_BAD_ADDRESS;
+
+			if (strncmp(name, CACHE_MODULES_NAME, strlen(CACHE_MODULES_NAME)))
+				return B_BAD_VALUE;
+
+			TRACE(("log_control: set module %s!\n", name));
+
+			status_t status = get_module(name, (module_info **)&module);
+			if (status == B_OK)
+				sCacheModule = module;
+
+			return status;
+		}
+	}
+
+	return B_BAD_HANDLER;
 }
 
 
@@ -287,6 +347,7 @@ uninit_log(void)
 	TRACE(("** log uninit - \n"));
 
 	unregister_kernel_daemon(log_writer_daemon, NULL);
+	unregister_generic_syscall(CACHE_LOG_SYSCALLS, 1);
 
 	log_writer_daemon((void *)true, 0);
 		// flush log entries
@@ -294,6 +355,9 @@ uninit_log(void)
 	delete_sem(sLogEntrySem);
 	mutex_destroy(&sLock);
 	close(sLogFile);
+
+	if (sCacheModule != NULL)
+		put_module(sCacheModule->info.name);
 
 	TRACE(("** - log uninit\n"));
 }
@@ -321,11 +385,14 @@ init_log(void)
 	if (sLogEntrySem >= B_OK) {
 		if (mutex_init(&sLock, "log cache module") >= B_OK) {
 			register_kernel_daemon(log_writer_daemon, NULL, kLogWriterFrequency);
+			register_generic_syscall(CACHE_LOG_SYSCALLS, log_control, 1, 0);
+
 			TRACE(("** - log init\n"));
 			return B_OK;
 		}
 		delete_sem(sLogEntrySem);
 	}
+
 	close(sLogFile);
 	return B_ERROR;
 }
