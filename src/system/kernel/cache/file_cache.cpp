@@ -836,7 +836,8 @@ file_cache_control(const char *subsystem, uint32 function, void *buffer, size_t 
 		case CACHE_CLEAR:
 			// ToDo: clear the cache
 			dprintf("cache_control: clear cache!\n");
-			break;
+			return B_OK;
+
 		case CACHE_SET_MODULE:
 		{
 			cache_module_info *module = sCacheModule;
@@ -852,7 +853,7 @@ file_cache_control(const char *subsystem, uint32 function, void *buffer, size_t 
 			// get new module, if any
 
 			if (buffer == NULL)
-				break;
+				return B_OK;
 
 			char name[B_FILE_NAME_LENGTH];
 			if (!IS_USER_ADDRESS(buffer)
@@ -864,13 +865,15 @@ file_cache_control(const char *subsystem, uint32 function, void *buffer, size_t 
 
 			dprintf("cache_control: set module %s!\n", name);
 
-			if (get_module(name, (module_info **)&module) == B_OK)
+			status_t status = get_module(name, (module_info **)&module);
+			if (status == B_OK)
 				sCacheModule = module;
-			break;
+
+			return status;
 		}
 	}
 
-	return B_OK;
+	return B_BAD_HANDLER;
 }
 
 
