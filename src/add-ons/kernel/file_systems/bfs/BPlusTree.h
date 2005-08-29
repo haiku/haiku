@@ -41,8 +41,8 @@ struct bplustree_header {
 	off_t MaximumSize() const { return BFS_ENDIAN_TO_HOST_INT64(maximum_size); }
 	uint32 MaxNumberOfLevels() const { return BFS_ENDIAN_TO_HOST_INT32(max_number_of_levels); }
 
-	inline bool CheckNode(bplustree_node *node);
-	inline bool IsValidLink(off_t link);
+	inline bool CheckNode(bplustree_node *node) const;
+	inline bool IsValidLink(off_t link) const;
 } _PACKED;
 
 #define BPLUSTREE_MAGIC 			0x69f6c2e8
@@ -87,9 +87,9 @@ struct bplustree_node {
 	void Initialize();
 	uint8 CountDuplicates(off_t offset, bool isFragment) const;
 	off_t DuplicateAt(off_t offset, bool isFragment, int8 index) const;
-	uint32 FragmentsUsed(uint32 nodeSize);
-	inline duplicate_array *FragmentAt(int8 index);
-	inline duplicate_array *DuplicateArray();
+	uint32 FragmentsUsed(uint32 nodeSize) const;
+	inline duplicate_array *FragmentAt(int8 index) const;
+	inline duplicate_array *DuplicateArray() const;
 
 	static inline uint8 LinkType(off_t link);
 	static inline off_t MakeLink(uint8 type, off_t link, uint32 fragmentIndex = 0);
@@ -99,7 +99,7 @@ struct bplustree_node {
 	static inline uint32 MaxFragments(uint32 nodeSize);
 
 #ifdef DEBUG
-	status_t CheckIntegrity(uint32 nodeSize);
+	status_t CheckIntegrity(uint32 nodeSize) const;
 #endif
 } _PACKED;
 
@@ -160,11 +160,13 @@ class CachedNode {
 			Unset();
 		}
 
-		bplustree_node *SetTo(off_t offset, bool check = true);
+		const bplustree_node *SetTo(off_t offset, bool check = true);
 		bplustree_node *SetToWritable(Transaction &transaction, off_t offset, bool check = true);
+		bplustree_node *MakeWritable(Transaction &transaction);
+		const bplustree_header *SetToHeader();
 		bplustree_header *SetToWritableHeader(Transaction &transaction);
-		bplustree_header *SetToHeader();
-		status_t MakeWritable(Transaction &transaction);
+		bplustree_header *MakeWritableHeader(Transaction &transaction);
+
 		void UnsetUnchanged(Transaction &transaction);
 		void Unset();
 
@@ -225,21 +227,22 @@ class BPlusTree {
 			// no implementation
 
 		int32		CompareKeys(const void *key1, int keylength1, const void *key2, int keylength2);
-		status_t	FindKey(bplustree_node *node, const uint8 *key, uint16 keyLength,
+		status_t	FindKey(const bplustree_node *node, const uint8 *key, uint16 keyLength,
 						uint16 *index = NULL, off_t *next = NULL);
 		status_t	SeekDown(Stack<node_and_key> &stack, const uint8 *key, uint16 keyLength);
 
-		status_t	FindFreeDuplicateFragment(bplustree_node *node, CachedNode &cached,
+		status_t	FindFreeDuplicateFragment(Transaction &transaction, 
+						const bplustree_node *node, CachedNode &cached,
 						off_t *_offset, bplustree_node **_fragment, uint32 *_index);
 		status_t	InsertDuplicate(Transaction &transaction, CachedNode &cached,
-						bplustree_node *node, uint16 index, off_t value);
+						const bplustree_node *node, uint16 index, off_t value);
 		void		InsertKey(bplustree_node *node, uint16 index, uint8 *key, uint16 keyLength,
 						off_t value);
 		status_t	SplitNode(bplustree_node *node, off_t nodeOffset, bplustree_node *other,
 						off_t otherOffset, uint16 *_keyIndex, uint8 *key, uint16 *_keyLength,
 						off_t *_value);
 
-		status_t	RemoveDuplicate(Transaction &transaction, bplustree_node *node,
+		status_t	RemoveDuplicate(Transaction &transaction, const bplustree_node *node,
 						CachedNode &cached, uint16 keyIndex, off_t value);
 		void		RemoveKey(bplustree_node *node, uint16 index);
 
@@ -253,7 +256,7 @@ class BPlusTree {
 		friend class CachedNode;
 
 		Inode		*fStream;
-		bplustree_header *fHeader;
+		const bplustree_header *fHeader;
 		CachedNode	fCachedHeader;
 		int32		fNodeSize;
 		bool		fAllowDuplicates;
@@ -402,7 +405,7 @@ TreeIterator::GetPreviousEntry(void *key, uint16 *keyLength, uint16 maxLength,
 
 
 inline bool 
-bplustree_header::CheckNode(bplustree_node *node)
+bplustree_header::CheckNode(bplustree_node *node) const
 {
 	// sanity checks (links, all_key_count)
 	return IsValidLink(node->LeftLink())
@@ -413,7 +416,7 @@ bplustree_header::CheckNode(bplustree_node *node)
 
 
 inline bool
-bplustree_header::IsValidLink(off_t link)
+bplustree_header::IsValidLink(off_t link) const
 {
 	return link == BPLUSTREE_NULL || (link > 0 && link <= MaximumSize() - NodeSize());
 }
@@ -459,14 +462,14 @@ bplustree_node::IsLeaf() const
 
 
 inline duplicate_array *
-bplustree_node::FragmentAt(int8 index)
+bplustree_node::FragmentAt(int8 index) const
 {
 	return (duplicate_array *)((off_t *)this + index * (NUM_FRAGMENT_VALUES + 1));
 }
 
 
 inline duplicate_array *
-bplustree_node::DuplicateArray()
+bplustree_node::DuplicateArray() const
 {
 	return (duplicate_array *)&this->overflow_link;
 }
