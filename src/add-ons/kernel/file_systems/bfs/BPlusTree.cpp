@@ -294,12 +294,12 @@ CachedNode::Allocate(Transaction &transaction, bplustree_node **_node, off_t *_o
 		if (header == NULL)
 			return B_IO_ERROR;
 
+		*_offset = header->FreeNode();
+		*_node = fNode;
+
 		// set new free node pointer
 		header->free_node_pointer = fNode->left_link;
 		fNode->Initialize();
-
-		*_offset = header->FreeNode();
-		*_node = fNode;
 		return B_OK;
 	}
 
