@@ -38,7 +38,7 @@ get_tupel(uint32 id)
 
 
 void
-dump_block_run(const char *prefix, block_run &run)
+dump_block_run(const char *prefix, const block_run &run)
 {
 	Print("%s(%ld, %d, %d)\n", prefix, run.allocation_group, run.start, run.length);
 }
@@ -59,7 +59,7 @@ dump_inode(Inode &inode)
 
 
 void
-dump_super_block(disk_super_block *superBlock)
+dump_super_block(const disk_super_block *superBlock)
 {
 	Print("disk_super_block:\n");
 	Print("  name           = %s\n", superBlock->name);
@@ -85,7 +85,7 @@ dump_super_block(disk_super_block *superBlock)
 
 
 void
-dump_data_stream(data_stream *stream)
+dump_data_stream(const data_stream *stream)
 {
 	Print("data_stream:\n");
 	for (int i = 0; i < NUM_DIRECT_BLOCKS; i++) {
@@ -110,7 +110,7 @@ dump_data_stream(data_stream *stream)
 
 
 void
-dump_inode(bfs_inode *inode)
+dump_inode(const bfs_inode *inode)
 {
 	Print("inode:\n");
 	Print("  magic1             = %08lx (%s) %s\n", inode->magic1,
@@ -141,7 +141,7 @@ dump_inode(bfs_inode *inode)
 
 
 void
-dump_bplustree_header(bplustree_header *header)
+dump_bplustree_header(const bplustree_header *header)
 {
 	Print("bplustree_header:\n");
 	Print("  magic                = %#08lx (%s) %s\n", header->magic,
@@ -191,7 +191,8 @@ dump_block(const char *buffer,int size)
 
 
 void
-dump_bplustree_node(bplustree_node *node,bplustree_header *header,Volume *volume)
+dump_bplustree_node(const bplustree_node *node, const bplustree_header *header,
+	Volume *volume)
 {
 	Print("bplustree_node:\n");
 	Print("  left_link      = %Ld\n", node->left_link);
