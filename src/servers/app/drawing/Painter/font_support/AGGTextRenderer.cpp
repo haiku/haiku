@@ -82,8 +82,8 @@ AGGTextRenderer::SetFont(const ServerFont &font)
 	bool success = true;
 	// construct an embedded transformation (rotate & shear)
 	Transformable transform;
-// TODO: convert BFont::Shear(), which is in degrees 45°...135° to whatever AGG is using
-//	transform.ShearBy(B_ORIGIN, fFont.Shear(), 0.0);
+// TODO: check if Transformable::ShearBy should accept degrees instead of radians 
+	transform.ShearBy(B_ORIGIN, (90.0 - font.Shear()) * PI / 180.0, 0.0);
 	transform.RotateBy(B_ORIGIN, -font.Rotation());
 
 	bool load = font.GetFamilyAndStyle() != fLastFamilyAndStyle ||
