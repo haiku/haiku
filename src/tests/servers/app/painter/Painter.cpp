@@ -779,9 +779,8 @@ Painter::DrawString(const char* utf8String, uint32 length,
 	if (fBuffer) {
 
 		Transformable transform;
-// TODO: convert BFont::Shear(), which is in degrees 45°...135° to whatever AGG is using
-//		transform.ShearBy(B_ORIGIN, fFont.Shear(), 0.0);
-		transform.RotateBy(B_ORIGIN, -fFont.Rotation());
+		transform.ShearBy(B_ORIGIN, (90.0 - fFont.Shear()) * PI / 180.0, 0.0);
+		transform.RotateBy(B_ORIGIN, -fFont.Rotation() * PI / 180.0);
 		transform.TranslateBy(baseLine);
 		transform.ScaleBy(B_ORIGIN, fScale, fScale);
 		transform.TranslateBy(fOrigin);
