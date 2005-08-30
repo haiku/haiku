@@ -32,10 +32,6 @@ SFHash::SFHash(int size) {
 	}
 }
 
-SFHash::SFHash() {
-	SFHash(4096);
-}
-
 void SFHash::AddItem(HashItem *item) {
 	item->next = NULL;
 	int pos = item->key % size;

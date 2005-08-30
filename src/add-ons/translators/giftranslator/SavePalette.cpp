@@ -201,10 +201,10 @@ SavePalette::SavePalette(BBitmap *bitmap) {
 	fatalerror = false;
 	mode = OPTIMAL_PALETTE;
 
-	SFHash *hash = new SFHash(1 << 16);
-	if (hash == NULL || hash->fatalerror) {
-		if (debug) printf("Out of memory in SavePalette(BBitmap *)\n");
-		if (hash != NULL) delete hash;
+	SFHash hash(1 << 16);
+	if (hash.fatalerror) {
+		if (debug)
+			printf("Out of memory in SavePalette(BBitmap *)\n");
 		fatalerror = true;
 		return;
 	}
@@ -217,7 +217,6 @@ SavePalette::SavePalette(BBitmap *bitmap) {
     		printf("%d %d %d %d or 0x%x\n", (cs & 0xff000000) >> 24, (cs & 0xff0000) >> 16,
     			(cs & 0xff00) >> 8, cs & 0xff, cs);
     	}
-    	delete hash;
     	fatalerror = true;
     	return;
    	}
@@ -241,23 +240,22 @@ SavePalette::SavePalette(BBitmap *bitmap) {
 			bits += 4;
 			
             unsigned int key = (r << 16) + (g << 8) + b;
-            ColorItem *ci = (ColorItem *)hash->GetItem(key);
+            ColorItem *ci = (ColorItem *)hash.GetItem(key);
             if (ci == NULL) {
                 ci = new ColorItem(key, 1);
                 if (ci == NULL) {
                 	if (debug) printf("Out of memory in SavePalette(BBitmap *)\n");
-			        delete hash;
 			        fatalerror = true;
 			        return;
 			    }
-                hash->AddItem((HashItem *)ci);
+                hash.AddItem((HashItem *)ci);
             } else {
                 ci->count++;
             }
         }
     }
     
-	int unique_colors = hash->CountItems();
+	int unique_colors = hash.CountItems();
 	size_in_bits = 1;
 	while (((1 << size_in_bits) < unique_colors) && (size_in_bits < 8)) size_in_bits++;
 	size = 1 << size_in_bits;
@@ -265,7 +263,6 @@ SavePalette::SavePalette(BBitmap *bitmap) {
     ColorItem **topcolors = (ColorItem **)malloc(size  * 4);
     if (topcolors == NULL) {
         if (debug) printf("Out of memory in SavePalette(BBitmap *)\n");
-        delete hash;
         fatalerror = true;
         return;
     }
@@ -273,7 +270,7 @@ SavePalette::SavePalette(BBitmap *bitmap) {
     for (int x = 0; x < size; x++) topcolors[x] = dummy;
 
     for (int x = 0; x < unique_colors; x++) {
-        ColorItem *ci = (ColorItem *)hash->NextItem();
+        ColorItem *ci = (ColorItem *)hash.NextItem();
         for (int y = 0; y < size; y++) {
             if (ci->count > topcolors[y]->count) {
                 for (int z = size - 1; z > y; z--) {
@@ -294,7 +291,6 @@ SavePalette::SavePalette(BBitmap *bitmap) {
     
     delete dummy;
     free(topcolors);
-    delete hash;
 }
 
 /* Standard mapping services once a palette is loaded */

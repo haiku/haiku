@@ -26,8 +26,7 @@ class HashItem {
 
 class SFHash {
     public:
-        SFHash();
-        SFHash(int size);
+        SFHash(int size = 4096);
         ~SFHash();
         
         void AddItem(HashItem *item);
