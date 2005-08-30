@@ -55,7 +55,7 @@ class Transformable : public BArchivable,
 
 								// some convenience functions
 	virtual	void				TranslateBy(BPoint offset);
-	virtual	void				RotateBy(BPoint origin, double degrees);
+	virtual	void				RotateBy(BPoint origin, double radians);
 	virtual	void				ScaleBy(BPoint origin, double xScale, double yScale);
 	virtual	void				ShearBy(BPoint origin, double xShear, double yShear);
 

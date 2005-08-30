@@ -280,11 +280,11 @@ Transformable::TranslateBy(BPoint offset)
 
 // RotateBy
 void
-Transformable::RotateBy(BPoint origin, double degrees)
+Transformable::RotateBy(BPoint origin, double radians)
 {
-	if (degrees != 0.0) {
+	if (radians != 0.0) {
 		multiply(agg::trans_affine_translation(-origin.x, -origin.y));
-		multiply(agg::trans_affine_rotation(degrees * (PI / 180.0)));
+		multiply(agg::trans_affine_rotation(radians));
 		multiply(agg::trans_affine_translation(origin.x, origin.y));
 		TransformationChanged();
 	}
