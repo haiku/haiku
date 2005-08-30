@@ -131,7 +131,7 @@ class ServerFont {
 											   escapement_delta delta) const;
 
 			bool				GetBoundingBoxesAsString(const char charArray[],
-									int32 numChars, BRect rectArray[],
+									int32 numChars, BRect rectArray[], bool string_escapement,
 									font_metric_mode mode, escapement_delta delta);
 
 			bool				GetBoundingBoxesForStrings(char *charArray[], int32 lengthArray[], 

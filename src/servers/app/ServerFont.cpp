@@ -526,7 +526,7 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 
 bool
 ServerFont::GetBoundingBoxesAsString(const char charArray[], int32 numChars, BRect rectArray[],
-		font_metric_mode mode, escapement_delta delta)
+		bool string_escapement, font_metric_mode mode, escapement_delta delta)
 {
 	if (!fStyle || !charArray || numChars <= 0 || !rectArray)
 		return false;
@@ -558,10 +558,18 @@ ServerFont::GetBoundingBoxesAsString(const char charArray[], int32 numChars, BRe
 		numChars = min_c((uint32)numChars, convertedLength / sizeof(uint16));
 
 		for (int i = 0; i < numChars; i++) {
+			if (string_escapement) {
+				if (i>0)
+					rectArray[i].OffsetBy(is_white_space(glyphIndex[i-1]) ? delta.space/2.0 : delta.nonspace/2.0, 0.0);
+				rectArray[i].OffsetBy(is_white_space(glyphIndex[i]) ? delta.space/2.0 : delta.nonspace/2.0, 0.0);
+			}
 			FT_Load_Char(face, glyphIndex[i], FT_LOAD_NO_BITMAP);
 			if (face->glyph) {
-				rectArray[i].left = float(face->glyph->metrics.horiBearingX) /64.0;
-				rectArray[i].right = float(face->glyph->metrics.horiBearingX 
+				if (i<numChars-1)
+					rectArray[i+1].left = rectArray[i+1].right = rectArray[i].left + 
+						face->glyph->metrics.horiAdvance / 64.0;
+				rectArray[i].left += float(face->glyph->metrics.horiBearingX) /64.0;
+				rectArray[i].right += float(face->glyph->metrics.horiBearingX 
 					+ face->glyph->metrics.width)/64.0;
 				rectArray[i].top = -float(face->glyph->metrics.horiBearingY) /64.0;
 				rectArray[i].bottom = float(face->glyph->metrics.height 

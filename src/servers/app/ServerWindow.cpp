@@ -2075,7 +2075,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (fCurrentLayer && fCurrentLayer->fLayerData)
 				driver->DrawString(string, length,
 								   fCurrentLayer->ConvertToTop(location),
-								   fCurrentLayer->fLayerData);
+								   fCurrentLayer->fLayerData, &delta);
 			
 			free(string);
 			break;

@@ -2336,21 +2336,21 @@ BView::DrawChar(char c, BPoint location)
 void
 BView::DrawString(const char *string, escapement_delta *delta)
 {
-	DrawString(string, strlen(string), PenLocation());
+	DrawString(string, strlen(string), PenLocation(), delta);
 }
 
 
 void
 BView::DrawString(const char *string, BPoint location, escapement_delta *delta)
 {
-	DrawString(string, strlen(string), location);
+	DrawString(string, strlen(string), location, delta);
 }
 
 
 void
 BView::DrawString(const char *string, int32 length, escapement_delta *delta)
 {
-	DrawString(string, length, PenLocation());
+	DrawString(string, length, PenLocation(), delta);
 }
 
 

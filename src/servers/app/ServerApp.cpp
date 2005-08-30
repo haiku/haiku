@@ -2008,7 +2008,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				font.SetFlags(flags);
 
 				// TODO implement for real
-				if (font.GetBoundingBoxesAsString(charArray, numChars, rectArray, mode, delta)) {
+				if (font.GetBoundingBoxesAsString(charArray, numChars, rectArray, string_escapement, mode, delta)) {
 					fLink.StartMessage(SERVER_TRUE);
 					fLink.Attach(rectArray, sizeof(rectArray));
 					success = true;

@@ -1075,7 +1075,7 @@ DisplayDriverPainter::DrawString(const char *string, const int32 &length,
 	static DrawData d;
 	d.SetHighColor(color);
 
-	DrawString(string, length, pt, &d);
+	DrawString(string, length, pt, &d, delta);
 }
 */
 // DrawString
@@ -1101,7 +1101,7 @@ DisplayDriverPainter::DrawString(const char* string, int32 length,
 			fGraphicsCard->HideSoftwareCursor(b);
 	
 //now = system_time();
-			BRect touched = fPainter->DrawString(string, length, pt);
+			BRect touched = fPainter->DrawString(string, length, pt, delta);
 //printf("drawing string: %lld µs\n", system_time() - now);
 	
 			fGraphicsCard->Invalidate(touched);
