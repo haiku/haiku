@@ -122,4 +122,14 @@ Depends OpenGLKit :
 	GLInfo
 ;
 
+# Pseudo-target to build the screensaver kit only
+NotFile ScreenSaverKit ;
+Depends ScreenSaverKit :
+	libscreensaver.so
+	screen_saver
+	screen_blanker
+	ScreenSaver
+	Haiku
+;
+
 SubInclude OBOS_TOP src ;

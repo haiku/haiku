@@ -16,3 +16,8 @@ Preference ScreenSaver :
 SEARCH on [ FGristFiles
                 ScreenSaver.cpp
         ] = [ FDirName $(OBOS_TOP) src kits screensaver ] ;
+
+Package haiku-screensaverkit-cvs :
+	ScreenSaver :
+#	boot beos preferences ;
+	boot home Desktop haiku-screensaverkit ;

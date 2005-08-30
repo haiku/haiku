@@ -14,3 +14,7 @@ LinkSharedOSLibs libscreensaver.so :
 
 MakeLocate <develop>libscreensaver.so : $(OBOS_STLIB_DIR) ;
 RelSymLink <develop>libscreensaver.so : libscreensaver.so ;
+
+Package haiku-screensaverkit-cvs :
+	libscreensaver.so :
+	boot home config lib ;

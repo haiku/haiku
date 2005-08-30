@@ -7,3 +7,7 @@ Addon screen_saver : input_server/filters :
 	: false 
 	: be libscreensaver.so <nogrist>input_server ;
 
+Package haiku-screensaverkit-cvs :
+	screen_saver :
+	boot home config add-ons input_server filters
+;
