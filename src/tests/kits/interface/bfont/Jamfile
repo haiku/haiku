@@ -1,0 +1,3 @@
+SubDir OBOS_TOP src tests kits interface bfont ;
+
+StdBinCommands GetBoundingBoxesTest.cpp : libbe.so ;

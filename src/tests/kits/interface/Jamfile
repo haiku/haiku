@@ -118,4 +118,5 @@ SEARCH on [ FGristFiles
 	] = [ FDirName $(OBOS_TOP) src kits interface ] ;
 
 SubInclude OBOS_TOP src tests kits interface bprintjob ;
+SubInclude OBOS_TOP src tests kits interface bfont ;
 SubInclude OBOS_TOP src tests kits interface picture ;
