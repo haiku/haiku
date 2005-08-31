@@ -199,8 +199,12 @@ class TMailApp : public BApplication {
 	private:
 		void ClearPrintSettings();
 		void CheckForSpamFilterExistence();
-		void LoadSavePrefs (bool loadThem);
-		
+
+		status_t GetSettingsPath(BPath &path);
+		status_t LoadOldSettings();
+		status_t SaveSettings();
+		status_t LoadSettings();
+
 		BList			fWindowList;
 		int32			fWindowCount;
 		TPrefsWindow	*fPrefsWindow;

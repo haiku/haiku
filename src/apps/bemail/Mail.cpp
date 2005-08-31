@@ -177,7 +177,7 @@ int32
 header_len(BFile *file)
 {
 	char	*buffer;
-	int32	len;
+	int32	length;
 	int32	result = 0;
 	off_t	size;
 
@@ -190,10 +190,10 @@ header_len(BFile *file)
 			file->Seek(0, 0);
 			if (file->Read(buffer, size) == size)
 			{
-				while ((len = linelen(buffer + result, size - result, true)) > 2)
-					result += len;
+				while ((length = linelen(buffer + result, size - result, true)) > 2)
+					result += length;
 
-				result += len;
+				result += length;
 			}
 			free(buffer);
 			file->WriteAttr(B_MAIL_ATTR_HEADER, B_INT32_TYPE, 0, &result, sizeof(int32));
@@ -203,7 +203,6 @@ header_len(BFile *file)
 }
 
 
-//--------------------------------------------------------------------
 //	#pragma mark -
 
 
@@ -225,8 +224,8 @@ TMailApp::TMailApp()
 	signature_window.Set(6, TITLE_BAR_HEIGHT, 6 + kSigWidth, TITLE_BAR_HEIGHT + kSigHeight);
 	prefs_window.Set(6, TITLE_BAR_HEIGHT);
 
-	// Find and read preferences file.
-	LoadSavePrefs (true /* TRUE to load them */);
+	// Find and read settings file.
+	LoadSettings();
 
 	CheckForSpamFilterExistence();
 	fFont.SetSpacing(B_BITMAP_SPACING);
@@ -522,8 +521,10 @@ TMailApp::QuitRequested()
 	if (!BApplication::QuitRequested())
 		return false;
 
-    mail_window = last_window; /* Last closed window becomes standard window size. */
-	LoadSavePrefs(false /* TRUE to load them */);
+    mail_window = last_window;
+    	// Last closed window becomes standard window size.
+
+	SaveSettings();
 	return true;
 }
 
@@ -798,354 +799,284 @@ TMailApp::ClearPrintSettings()
 	print_settings = NULL;
 }
 
-/*
-status_t
-TMailApp::LoadSettings()
-{
-	// write settings file
-	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) < B_OK)
-		return;
 
-	path.Append(kWorkspacesSettingFile);
+status_t
+TMailApp::GetSettingsPath(BPath &path)
+{
+	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+	if (status != B_OK)
+		return status;
+
+	path.Append("Mail");
+	return create_directory(path.Path(), 0755);
+}
+
+
+status_t
+TMailApp::LoadOldSettings()
+{
+	BPath path;
+	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+	if (status != B_OK)
+		return status;
+
+	path.Append("Mail_data");
+
+	BFile file;
+	status = file.SetTo(path.Path(), B_READ_ONLY);
+	if (status != B_OK)
+		return status;
+
+	file.Read(&mail_window, sizeof(BRect));
+	file.Read(&level, sizeof(level));
+
+	font_family	fontFamily;
+	font_style	fontStyle;
+	float size;
+	file.Read(&fontFamily, sizeof(font_family));
+	file.Read(&fontStyle, sizeof(font_style));
+	file.Read(&size, sizeof(float));
+	if (size >= 9)
+		fFont.SetSize(size);
+
+	if (fontFamily[0] && fontStyle[0])
+		fFont.SetFamilyAndStyle(fontFamily, fontStyle);
+
+	file.Read(&signature_window, sizeof(BRect));
+	file.Read(&header_flag, sizeof(bool));
+	file.Read(&sWrapMode, sizeof(bool));
+	file.Read(&prefs_window, sizeof(BPoint));
+
+	int32 length;
+	if (file.Read(&length, sizeof(int32)) < (ssize_t)sizeof(int32))
+		return B_IO_ERROR;
+
+	free(signature);
+	signature = NULL;
+
+	if (length > 0) {
+		signature = (char *)malloc(length);
+		if (signature == NULL)
+			return B_NO_MEMORY;
+
+		file.Read(signature, length);
+	}
+
+	file.Read(&gMailCharacterSet, sizeof(int32));
+	if (gMailCharacterSet != B_MAIL_UTF8_CONVERSION
+		&& gMailCharacterSet != B_MAIL_US_ASCII_CONVERSION
+		&& BCharacterSetRoster::GetCharacterSetByConversionID(gMailCharacterSet) == NULL)
+		gMailCharacterSet = B_MS_WINDOWS_CONVERSION;
+
+	if (file.Read(&length, sizeof(int32)) == (ssize_t)sizeof(int32)) {
+		char *findString = (char *)malloc(length + 1);
+		if (findString == NULL)
+			return B_NO_MEMORY;
+
+		file.Read(findString, length);
+		findString[length] = '\0';
+		FindWindow::SetFindString(findString);
+		free(findString);
+	}
+	if (file.Read(&sShowButtonBar, sizeof(uint8)) < (ssize_t)sizeof(uint8))
+		sShowButtonBar = true;
+	if (file.Read(&gUseAccountFrom, sizeof(int32)) < (ssize_t)sizeof(int32)
+		|| gUseAccountFrom < ACCOUNT_USE_DEFAULT
+		|| gUseAccountFrom > ACCOUNT_FROM_MAIL)
+		gUseAccountFrom = ACCOUNT_USE_DEFAULT;
+	if (file.Read(&gColoredQuotes, sizeof(bool)) < (ssize_t)sizeof(bool))
+		gColoredQuotes = true;
+
+	if (file.Read(&length, sizeof(int32)) == (ssize_t)sizeof(int32)) {
+		free(gReplyPreamble);
+		gReplyPreamble = (char *)malloc(length + 1);
+		if (gReplyPreamble == NULL)
+			return B_NO_MEMORY;
+
+		file.Read(gReplyPreamble, length);
+		gReplyPreamble[length] = '\0';
+	}
+
+	file.Read(&attachAttributes_mode, sizeof(bool));
+	file.Read(&gWarnAboutUnencodableCharacters, sizeof(bool));
+
+	return B_OK;
 }
 
 
 status_t
 TMailApp::SaveSettings()
 {
-	// write settings file
-	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) < B_OK)
-		return;
-
-	path.Append(kWorkspacesSettingFile);
-}
-*/
-
-void
-TMailApp::LoadSavePrefs(bool loadThem)
-{
-	// Load the preferences if loadThem is TRUE, otherwise save them.  Uses a
-	// flattened BMessage (after a year or two of inertia with the unreliable
-	// binary dumps) in a file named "BeMail Settings" in the Mail folder in
-	// the user's settings directory.  It can also read (but not write) the
-	// older binary dump file "Mail_data" in the top level settings directory,
-	// if it can't find the new settings.
-
 	BMailSettings chainSettings;
-	BDirectory directory;
-	status_t errorCode;
-	const char *fieldName;
-	BPath filePath;
-	BPath mailSettingsPath;
-	BFile prefsFile;
-	BMessage settingsMsg;
-	bool tempBool;
-	float tempFloat;
-	int32 tempInt32;
-	BPoint tempPoint;
-	BRect tempRect;
-	const char *tempString;
-	BPath topSettingsPath;
 
-	// Prepare the settings directories.
-
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &topSettingsPath,
-		true /* create if needed */) != B_OK)
-		return; // No main settings directory, can't do anything.
-
-	mailSettingsPath = topSettingsPath;
-	mailSettingsPath.Append("Mail");
-	if (directory.SetTo(mailSettingsPath.Path()) != B_OK) {
-		mkdir (mailSettingsPath.Path(), 0755);
-		if (directory.SetTo(mailSettingsPath.Path()) != B_OK)
-			return;
-	}
-	directory.Unset(); // Not actually used any more.
-
-	// Read/write the default chain settings from somewhere system dependent.
-
-	if (loadThem) {
-		gDefaultChain = chainSettings.DefaultOutboundChainID();
-	} else if (gDefaultChain != ~0UL) {
+	if (gDefaultChain != ~0UL) {
 		chainSettings.SetDefaultOutboundChainID(gDefaultChain);
 		chainSettings.Save();
 	}
 
-	// Open the new style settings file.
+	BPath path;
+	status_t status = GetSettingsPath(path);
+	if (status != B_OK)
+		return status;
 
-	filePath = mailSettingsPath;
-	filePath.Append("BeMail Settings");
-	errorCode = prefsFile.SetTo (filePath.Path(), loadThem ? B_READ_ONLY :
-		B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
-	if (!loadThem && errorCode != B_OK)
-		return; // Need the file when saving.
+	path.Append("BeMail Settings~");
 
-	if (loadThem && errorCode == B_OK)
-		errorCode = settingsMsg.Unflatten (&prefsFile);
+	BFile file;
+	status = file.SetTo(path.Path(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+	if (status != B_OK)
+		return status;
 
-	if (loadThem && errorCode == B_OK && settingsMsg.what != 'BeMl')
-		errorCode = B_BAD_VALUE;
-
-	if (loadThem && errorCode != B_OK) {
-		// Unable to read the new style "BeMail Settings" file, try reading the
-		// old style "Mail_data" file.
-
-		filePath = topSettingsPath;
-		filePath.Append("Mail_data");
-		errorCode = prefsFile.SetTo (filePath.Path(), B_READ_ONLY);
-		if (errorCode != B_OK)
-			return; // Can't even find an old style file.
-
-		prefsFile.Read(&mail_window, sizeof(BRect));
-		prefsFile.Read(&level, sizeof(level));
-
-		font_family	f_family;
-		font_style	f_style;
-		float size;
-		prefsFile.Read(&f_family, sizeof(font_family));
-		prefsFile.Read(&f_style, sizeof(font_style));
-		prefsFile.Read(&size, sizeof(float));
-		if (size >= 9)
-			fFont.SetSize(size);
-
-		if ((strlen(f_family)) && (strlen(f_style)))
-			fFont.SetFamilyAndStyle(f_family, f_style);
-
-		prefsFile.Read(&signature_window, sizeof(BRect));
-		prefsFile.Read(&header_flag, sizeof(bool));
-		prefsFile.Read(&sWrapMode, sizeof(bool));
-		prefsFile.Read(&prefs_window, sizeof(BPoint));
-		int32 len;
-		if (prefsFile.Read(&len, sizeof(int32)) > 0)
-		{
-			free(signature);
-			signature = (char *)malloc(len);
-			prefsFile.Read(signature, len);
-		}
-
-		prefsFile.Read(&gMailCharacterSet, sizeof(int32));
-		if ((gMailCharacterSet != B_MAIL_UTF8_CONVERSION) &&
-		    (gMailCharacterSet != B_MAIL_US_ASCII_CONVERSION) &&
-		    (BCharacterSetRoster::GetCharacterSetByConversionID(gMailCharacterSet) == NULL)) {
-			gMailCharacterSet = B_MS_WINDOWS_CONVERSION;
-		}
-
-		if (prefsFile.Read(&len, sizeof(int32)) > 0)
-		{
-			char *findString = (char *)malloc(len + 1);
-			prefsFile.Read(findString, len);
-			findString[len] = '\0';
-			FindWindow::SetFindString(findString);
-			free(findString);
-		}
-		if (prefsFile.Read(&sShowButtonBar, sizeof(uint8)) <= 0)
-			sShowButtonBar = true;
-		if (prefsFile.Read(&gUseAccountFrom, sizeof(int32)) <= 0
-			|| gUseAccountFrom < ACCOUNT_USE_DEFAULT
-			|| gUseAccountFrom > ACCOUNT_FROM_MAIL)
-			gUseAccountFrom = ACCOUNT_USE_DEFAULT;
-		if (prefsFile.Read(&gColoredQuotes, sizeof(bool)) <= 0)
-			gColoredQuotes = true;
-
-		if (prefsFile.Read(&len, sizeof(int32)) > 0)
-		{
-			free(gReplyPreamble);
-			gReplyPreamble = (char *)malloc(len + 1);
-			prefsFile.Read(gReplyPreamble, len);
-			gReplyPreamble[len] = '\0';
-		}
-		prefsFile.Read(&attachAttributes_mode, sizeof(bool));
-		prefsFile.Read(&gWarnAboutUnencodableCharacters, sizeof(bool));
-
-		return; // Finished reading old style settings.
-	}
-
-	// Transfer the settings between the BMessage and our various global
-	// variables.  For loading, if the setting isn't present, leave it at the
-	// default value.  Note that loading and saving are intermingled here to
-	// make code maintenance easier (less chance of forgetting to update it if
-	// load and save were separate functions).
-
-	errorCode = B_OK; // So that saving settings can record an error.
-
-	fieldName = "MailWindowSize";
-	if (loadThem) {
-		if (settingsMsg.FindRect(fieldName, &tempRect) == B_OK)
-			mail_window = tempRect;
-	} else if (errorCode == B_OK)
-		errorCode = settingsMsg.AddRect(fieldName, mail_window);
-
-	fieldName = "ExperienceLevel";
-	if (loadThem) {
-		if (settingsMsg.FindInt32(fieldName, &tempInt32) == B_OK)
-			level = tempInt32;
-	} else if (errorCode == B_OK)
-		errorCode = settingsMsg.AddInt32(fieldName, level);
+	BMessage settings('BeMl');
+	settings.AddRect("MailWindowSize", mail_window);
+	settings.AddInt32("ExperienceLevel", level);
 
 	font_family fontFamily;
-	memset (fontFamily, 0, sizeof (fontFamily));
 	font_style fontStyle;
-	memset (fontStyle, 0, sizeof (fontStyle));
-	float fontSize = 0;
+	fFont.GetFamilyAndStyle(&fontFamily, &fontStyle);
 
-	if (!loadThem) {
-		fFont.GetFamilyAndStyle(&fontFamily, &fontStyle);
-		fontSize = fFont.Size();
+	settings.AddString("FontFamily", fontFamily);
+	settings.AddString("FontStyle", fontStyle);
+	settings.AddFloat("FontSize", fFont.Size());
+
+	settings.AddRect("SignatureWindowSize", signature_window);
+	settings.AddBool("ShowHeadersMode", header_flag);
+	settings.AddBool("WordWrapMode", sWrapMode);
+	settings.AddPoint("PreferencesWindowLocation", prefs_window);
+	settings.AddString("SignatureText", signature);
+	settings.AddInt32("CharacterSet", gMailCharacterSet);
+	settings.AddString("FindString", FindWindow::GetFindString());
+	settings.AddInt8("ShowButtonBar", sShowButtonBar);
+	settings.AddInt32("UseAccountFrom", gUseAccountFrom);
+	settings.AddBool("ColoredQuotes", gColoredQuotes);
+	settings.AddString("ReplyPreamble", gReplyPreamble);
+	settings.AddBool("AttachAttributes", attachAttributes_mode);
+	settings.AddBool("WarnAboutUnencodableCharacters", gWarnAboutUnencodableCharacters);
+	settings.AddBool("StartWithSpellCheck", gStartWithSpellCheckOn);
+
+	BEntry entry;
+	status = entry.SetTo(path.Path());
+	if (status != B_OK)
+		return status;
+
+	status = settings.Flatten(&file);
+	if (status == B_OK) {
+		// replace original settings file
+		status = entry.Rename("BeMail Settings", true);
+	} else
+		entry.Remove();
+
+	return status;
+}
+
+
+status_t
+TMailApp::LoadSettings()
+{
+	BMailSettings chainSettings;
+	gDefaultChain = chainSettings.DefaultOutboundChainID();
+
+	BPath path;
+	status_t status = GetSettingsPath(path);
+	if (status != B_OK)
+		return status;
+
+	path.Append("BeMail Settings");
+
+	BFile file;
+	status = file.SetTo(path.Path(), B_READ_ONLY);
+	if (status != B_OK)
+		return LoadOldSettings();
+
+	BMessage settings;
+	status = settings.Unflatten(&file);
+	if (status < B_OK || settings.what != 'BeMl') {
+		// the current settings are corrupted, try old ones
+		return LoadOldSettings();
 	}
 
-	fieldName = "FontFamily";
-	if (loadThem) {
-		if (settingsMsg.FindString(fieldName, &tempString) == B_OK)
-			strncpy (fontFamily, tempString, B_FONT_FAMILY_LENGTH);
-	} else if (errorCode == B_OK)
-		errorCode = settingsMsg.AddString(fieldName, fontFamily);
+	BRect rect;
+	if (settings.FindRect("MailWindowSize", &rect) == B_OK)
+		mail_window = rect;
 
-	fieldName = "FontStyle";
-	if (loadThem) {
-		if (settingsMsg.FindString(fieldName, &tempString) == B_OK)
-			strncpy (fontStyle, tempString, B_FONT_STYLE_LENGTH);
-	} else if (errorCode == B_OK)
-		errorCode = settingsMsg.AddString(fieldName, fontStyle);
+	int32 int32Value;
+	if (settings.FindInt32("ExperienceLevel", &int32Value) == B_OK)
+		level = int32Value;
 
-	fieldName = "FontSize";
-	if (loadThem) {
-		if (settingsMsg.FindFloat(fieldName, &tempFloat) == B_OK)
-			fontSize = tempFloat;
-	} else if (errorCode == B_OK)
-		errorCode = settingsMsg.AddFloat(fieldName, fontSize);
+	const char *fontFamily;
+	if (settings.FindString("FontFamily", &fontFamily) == B_OK) {
+		const char *fontStyle;
+		if (settings.FindString("FontStyle", &fontStyle) == B_OK) {
+			float size;
+			if (settings.FindFloat("FontSize", &size) == B_OK) {
+				if (size >= 7)
+					fFont.SetSize(size);
 
-	if (loadThem) {
-		if (fontSize >= 9)
-			fFont.SetSize(fontSize);
-		if (fontFamily[0] != 0 || fontStyle[0] != 0)
-			fFont.SetFamilyAndStyle(
-				(fontFamily[0] == 0) ? NULL : fontFamily,
-				(fontStyle[0] == 0) ? NULL : fontStyle);
+				if (fontFamily[0] && fontStyle[0]) {
+					fFont.SetFamilyAndStyle(fontFamily[0] ? NULL : fontFamily,
+						fontStyle[0] ? NULL : fontStyle);
+				}
+			}
+		}
 	}
 
-	fieldName = "SignatureWindowSize";
-	if (loadThem) {
-		if (settingsMsg.FindRect(fieldName, &tempRect) == B_OK)
-			signature_window = tempRect;
-	} else if (errorCode == B_OK)
-		errorCode = settingsMsg.AddRect(fieldName, signature_window);
+	if (settings.FindRect("SignatureWindowSize", &rect) == B_OK)
+		signature_window = rect;
 
-	fieldName = "ShowHeadersMode";
-	if (loadThem) {
-		if (settingsMsg.FindBool(fieldName, &tempBool) == B_OK)
-			header_flag = tempBool;
-	} else if (errorCode == B_OK)
-		errorCode = settingsMsg.AddBool(fieldName, header_flag);
+	bool boolValue;
+	if (settings.FindBool("ShowHeadersMode", &boolValue) == B_OK)
+		header_flag = boolValue;
 
-	fieldName = "WordWrapMode";
-	if (loadThem) {
-		if (settingsMsg.FindBool(fieldName, &tempBool) == B_OK)
-			sWrapMode = tempBool;
-	} else if (errorCode == B_OK)
-		errorCode = settingsMsg.AddBool(fieldName, sWrapMode);
+	if (settings.FindBool("WordWrapMode", &boolValue) == B_OK)
+		sWrapMode = boolValue;
 
-	fieldName = "PreferencesWindowLocation";
-	if (loadThem) {
-		if (settingsMsg.FindPoint(fieldName, &tempPoint) == B_OK)
-			prefs_window = tempPoint;
-	} else if (errorCode == B_OK)
-		errorCode = settingsMsg.AddPoint(fieldName, prefs_window);
+	BPoint point;
+	if (settings.FindPoint("PreferencesWindowLocation", &point) == B_OK)
+		prefs_window = point;
 
-	fieldName = "SignatureText";
-	if (loadThem) {
-		if (settingsMsg.FindString(fieldName, &tempString) == B_OK) {
-			free(signature);
-			signature = (char *) malloc(strlen(tempString) + 1);
-			if (signature != NULL)
-				strcpy (signature, tempString);
-		}
-	} else if (errorCode == B_OK && signature != NULL)
-		errorCode = settingsMsg.AddString(fieldName, signature);
-
-	fieldName = "CharacterSet";
-	if (loadThem) {
-		if (settingsMsg.FindInt32(fieldName, &tempInt32) == B_OK)
-			gMailCharacterSet = tempInt32;
-		if ((gMailCharacterSet != B_MAIL_UTF8_CONVERSION) &&
-		    (gMailCharacterSet != B_MAIL_US_ASCII_CONVERSION) &&
-		    (BCharacterSetRoster::GetCharacterSetByConversionID(gMailCharacterSet) == NULL)) {
-			gMailCharacterSet = B_MS_WINDOWS_CONVERSION;
-		}
-	} else if (errorCode == B_OK)
-		errorCode = settingsMsg.AddInt32(fieldName, gMailCharacterSet);
-
-	fieldName = "FindString";
-	if (loadThem) {
-		if (settingsMsg.FindString(fieldName, &tempString) == B_OK)
-			FindWindow::SetFindString(tempString);
-	} else if (errorCode == B_OK)
-		errorCode = settingsMsg.AddString(fieldName, FindWindow::GetFindString());
-
-	fieldName = "ShowButtonBar";
-	if (loadThem) {
-		int8 value;
-		if (settingsMsg.FindInt8(fieldName, &value) == B_OK)
-			sShowButtonBar = value;
-	} else if (errorCode == B_OK)
-		errorCode = settingsMsg.AddInt8(fieldName, sShowButtonBar);
-
-	fieldName = "UseAccountFrom";
-	if (loadThem) {
-		if (settingsMsg.FindInt32(fieldName, &tempInt32) == B_OK)
-			gUseAccountFrom = tempInt32;
-		if (gUseAccountFrom < ACCOUNT_USE_DEFAULT
-			|| gUseAccountFrom > ACCOUNT_FROM_MAIL)
-			gUseAccountFrom = ACCOUNT_USE_DEFAULT;
-	} else if (errorCode == B_OK)
-		errorCode = settingsMsg.AddInt32(fieldName, gUseAccountFrom);
-
-	fieldName = "ColoredQuotes";
-	if (loadThem) {
-		if (settingsMsg.FindBool(fieldName, &tempBool) == B_OK)
-			gColoredQuotes = tempBool;
-	} else if (errorCode == B_OK)
-		errorCode = settingsMsg.AddBool(fieldName, gColoredQuotes);
-
-	fieldName = "ReplyPreamble";
-	if (loadThem) {
-		if (settingsMsg.FindString(fieldName, &tempString) == B_OK) {
-			free(gReplyPreamble);
-			gReplyPreamble = (char *)malloc(strlen(tempString) + 1);
-			if (gReplyPreamble != NULL)
-				strcpy (gReplyPreamble, tempString);
-		}
-	} else if (errorCode == B_OK)
-		errorCode = settingsMsg.AddString(fieldName, gReplyPreamble);
-
-	fieldName = "AttachAttributes";
-	if (loadThem) {
-		if (settingsMsg.FindBool(fieldName, &tempBool) == B_OK)
-			attachAttributes_mode = tempBool;
-	} else if (errorCode == B_OK)
-		errorCode = settingsMsg.AddBool(fieldName, attachAttributes_mode);
-
-	fieldName = "WarnAboutUnencodableCharacters";
-	if (loadThem) {
-		if (settingsMsg.FindBool(fieldName, &tempBool) == B_OK)
-			gWarnAboutUnencodableCharacters = tempBool;
-	} else if (errorCode == B_OK)
-		errorCode = settingsMsg.AddBool(fieldName, gWarnAboutUnencodableCharacters);
-
-	fieldName = "StartWithSpellCheck";
-	if (loadThem) {
-		if (settingsMsg.FindBool(fieldName, &tempBool) == B_OK)
-			gStartWithSpellCheckOn = tempBool;
-	} else if (errorCode == B_OK)
-		errorCode = settingsMsg.AddBool(fieldName, gStartWithSpellCheckOn);
-
-	// Save the settings BMessage to the settings file.
-
-	if (!loadThem && errorCode == B_OK) {
-		settingsMsg.what = 'BeMl';
-		errorCode = settingsMsg.Flatten (&prefsFile);
+	const char *string;
+	if (settings.FindString("SignatureText", &string) == B_OK) {
+		free(signature);
+		signature = strdup(string);
 	}
+
+	if (settings.FindInt32("CharacterSet", &int32Value) == B_OK)
+		gMailCharacterSet = int32Value;
+	if (gMailCharacterSet != B_MAIL_UTF8_CONVERSION
+		&& gMailCharacterSet != B_MAIL_US_ASCII_CONVERSION
+		&& BCharacterSetRoster::GetCharacterSetByConversionID(gMailCharacterSet) == NULL)
+		gMailCharacterSet = B_MS_WINDOWS_CONVERSION;
+
+	if (settings.FindString("FindString", &string) == B_OK)
+		FindWindow::SetFindString(string);
+
+	int8 int8Value;
+	if (settings.FindInt8("ShowButtonBar", &int8Value) == B_OK)
+		sShowButtonBar = int8Value;
+
+	if (settings.FindInt32("UseAccountFrom", &int32Value) == B_OK)
+		gUseAccountFrom = int32Value;
+	if (gUseAccountFrom < ACCOUNT_USE_DEFAULT
+		|| gUseAccountFrom > ACCOUNT_FROM_MAIL)
+		gUseAccountFrom = ACCOUNT_USE_DEFAULT;
+
+	if (settings.FindBool("ColoredQuotes", &boolValue) == B_OK)
+		gColoredQuotes = boolValue;
+
+	if (settings.FindString("ReplyPreamble", &string) == B_OK) {
+		free(gReplyPreamble);
+		gReplyPreamble = strdup(string);
+	}
+
+	if (settings.FindBool("AttachAttributes", &boolValue) == B_OK)
+		attachAttributes_mode = boolValue;
+
+	if (settings.FindBool("WarnAboutUnencodableCharacters", &boolValue) == B_OK)
+		gWarnAboutUnencodableCharacters = boolValue;
+
+	if (settings.FindBool("StartWithSpellCheck", &boolValue) == B_OK)
+		gStartWithSpellCheckOn = boolValue;
+
+	return B_OK;
 }
 
 
@@ -2684,9 +2615,7 @@ TMailWindow::QuitRequested()
 	be_app->PostMessage(&message);
 
 	if ((CurrentMessage()) && (CurrentMessage()->HasString("status"))) {
-		//
 		//	User explicitly requests a status to set this message to.
-		//
 		if (!CurrentMessage()->HasString("same")) {
 			const char *status = CurrentMessage()->FindString("status");
 			if (status != NULL) {
@@ -2698,9 +2627,7 @@ TMailWindow::QuitRequested()
 			}
 		}
 	} else if (fRef) {
-		//
 		//	...Otherwise just set the message read
-		//
 		SetCurrentMessageRead();
 	}
 
