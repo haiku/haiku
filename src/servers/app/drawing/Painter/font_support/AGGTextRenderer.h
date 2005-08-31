@@ -41,7 +41,8 @@ class AGGTextRenderer {
 											 const BPoint& baseLine,
 											 const BRect& clippingFrame,
 											 bool dryRun = false,
-											 BPoint* nextCharPos = NULL);
+											 BPoint* nextCharPos = NULL,
+											 const escapement_delta* delta = NULL);
 
 			double				StringWidth(const char* utf8String,
 											uint32 length);

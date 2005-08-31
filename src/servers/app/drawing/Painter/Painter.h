@@ -204,9 +204,8 @@ class Painter {
 
 			BRect				InvertRect(		const BRect& r) const;
 
-			BRect				BoundingBox(	const char* utf8String,
-												uint32 length,
-												const BPoint& baseLine) const;
+			BRect				BoundingBox(	const char* utf8String, uint32 length,
+									const BPoint& baseLine, const escapement_delta* delta = NULL) const;
 
 			float				StringWidth(	const char* utf8String,
 												uint32 length) const;

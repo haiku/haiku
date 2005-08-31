@@ -899,7 +899,8 @@ Painter::DrawString(const char* utf8String, uint32 length,
 											 baseLine,
 											 fClippingRegion->Frame(),
 											 false,
-											 &fPenLocation);
+											 &fPenLocation, 
+											 delta);
 	}
 	return _Clipped(bounds);
 }
@@ -985,14 +986,16 @@ Painter::InvertRect(const BRect& r) const
 // BoundingBox
 BRect
 Painter::BoundingBox(const char* utf8String, uint32 length,
-					 const BPoint& baseLine) const
+	const BPoint& baseLine, const escapement_delta* delta) const
 {
 	static BRect dummy;
+	BPoint penPosition;
 	return fTextRenderer->RenderString(utf8String,
 									   length,
 									   fFontRendererSolid,
 									   fFontRendererBin,
-									   baseLine, dummy, true);
+									   baseLine, dummy, true, &penPosition,
+									   delta);
 }
 
 // StringWidth

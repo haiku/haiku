@@ -41,6 +41,17 @@ rect_to_int(BRect r,
 	bottom = (int32)ceilf(r.bottom);
 }
 
+
+// is_white_space
+inline bool
+is_white_space(uint16 glyph)
+{
+	// TODO: handle them all!
+	if (glyph == ' ' || glyph == B_TAB)
+		return true;
+	return false;
+}
+
 #define DEFAULT_UNI_CODE_BUFFER_SIZE	2048
 
 // constructor
@@ -150,7 +161,8 @@ AGGTextRenderer::RenderString(const char* string,
 							  const BPoint& baseLine,
 							  const BRect& clippingFrame,
 							  bool dryRun,
-							  BPoint* nextCharPos)
+							  BPoint* nextCharPos,
+							  const escapement_delta* delta)
 {
 //printf("RenderString(\"%s\", length: %ld, dry: %d)\n", string, length, dryRun);
 
@@ -209,6 +221,9 @@ AGGTextRenderer::RenderString(const char* string,
 
 				x += advanceX;
 				y += advanceY;
+
+				if (delta)
+					x += is_white_space(*p) ? delta->space : delta->nonspace;
 
 				// "glyphBounds" is the bounds of the glyph transformed
 				// by the x y location of the glyph along the base line,

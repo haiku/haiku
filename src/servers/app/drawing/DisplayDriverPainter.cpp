@@ -1093,7 +1093,7 @@ DisplayDriverPainter::DrawString(const char* string, int32 length,
 // TODO: make the availability of the hardware cursor part of the 
 // HW acceleration flags and skip all calculations for HideSoftwareCursor
 // in case we don't have one.
-		BRect b = fPainter->BoundingBox(string, length, pt);
+		BRect b = fPainter->BoundingBox(string, length, pt, delta);
 		// stop here if we're supposed to render outside of the clipping
 		b = fPainter->ClipRect(b);
 		if (b.IsValid()) {
