@@ -66,17 +66,17 @@ class Button;
 
 //====================================================================
 
-class TPrefsWindow : public BWindow
-{
+class TPrefsWindow : public BWindow {
 	public:
 		TPrefsWindow(BRect rect, BFont *font, int32 *level, bool *warp,
 			bool *attachAttributes, bool *cquotes, uint32 *account,
 			int32 *replyTo, char **preamble, char **sig, uint32 *encoding,
-			bool *warnUnencodable, bool *spellCheckStartOn, bool *buttonBar);
+			bool *warnUnencodable, bool *spellCheckStartOn, uint8 *buttonBar);
 		~TPrefsWindow();
 
-		virtual void MessageReceived(BMessage*);
+		virtual void MessageReceived(BMessage *message);
 
+	private:
 		BPopUpMenu *BuildFontMenu(BFont*);
 		BPopUpMenu *BuildLevelMenu(int32);
 		BPopUpMenu *BuildAccountMenu(uint32);
@@ -90,17 +90,16 @@ class TPrefsWindow : public BWindow
 		BPopUpMenu *BuildEncodingMenu(uint32 encoding);
 		BPopUpMenu *BuildWarnUnencodableMenu(bool warnUnencodable);
 		BPopUpMenu *BuildSpellCheckStartOnMenu(bool spellCheckStartOn);
-		BPopUpMenu *BuildButtonBarMenu(bool show);
+		BPopUpMenu *BuildButtonBarMenu(uint8 show);
 
-	private:
 		BPopUpMenu *BuildBoolMenu(uint32 msg, const char *boolItem, bool isTrue);
 
 		bool	fWrap;
 		bool	*fNewWrap;
 		bool	fAttachAttributes;
 		bool	*fNewAttachAttributes;
-		bool	fButtonBar;
-		bool	*fNewButtonBar;
+		uint8	fButtonBar;
+		uint8	*fNewButtonBar;
 		bool	fColoredQuotes, *fNewColoredQuotes;
 		uint32	fAccount;
 		uint32	*fNewAccount;

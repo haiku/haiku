@@ -138,7 +138,7 @@ bool		header_flag = false;
 static bool	sWrapMode = true;
 bool		attachAttributes_mode = true;
 bool		gColoredQuotes = true;
-bool		show_buttonbar = true;
+static uint8 sShowButtonBar = true;
 char		*gReplyPreamble;
 char		*signature;
 int32		level = L_BEGINNER;
@@ -428,26 +428,24 @@ TMailApp::MessageReceived(BMessage *msg)
 						&gColoredQuotes, &gDefaultChain, &gUseAccountFrom,
 						&gReplyPreamble, &signature, &gMailCharacterSet,
 						&gWarnAboutUnencodableCharacters,
-						&gStartWithSpellCheckOn, &show_buttonbar);
+						&gStartWithSpellCheckOn, &sShowButtonBar);
 				fPrefsWindow->Show();
-				fPrevBBPref = show_buttonbar;
+				fPreviousShowButtonBar = sShowButtonBar;
 			}
 			break;
 
 		case PREFS_CHANGED:
 		{
 			// Do we need to update the state of the button bars?
-			if (fPrevBBPref != show_buttonbar)
-			{
+			if (fPreviousShowButtonBar != sShowButtonBar) {
 				// Notify all BeMail windows
 				TMailWindow	*window;
-				for (int32 i = 0; (window=(TMailWindow *)fWindowList.ItemAt(i)) != NULL; i++)
-				{
+				for (int32 i = 0; (window=(TMailWindow *)fWindowList.ItemAt(i)) != NULL; i++) {
 					window->Lock();
 					window->UpdateViews();
 					window->Unlock();
 				}
-				fPrevBBPref = show_buttonbar;
+				fPreviousShowButtonBar = sShowButtonBar;
 			}
 			break;
 		}
@@ -455,8 +453,7 @@ TMailApp::MessageReceived(BMessage *msg)
 		case M_EDIT_SIGNATURE:
 			if (fSigWindow)
 				fSigWindow->Activate(true);
-			else
-			{
+			else {
 				fSigWindow = new TSignatureWindow(signature_window);
 				fSigWindow->Show();
 			}
@@ -943,8 +940,8 @@ TMailApp::LoadSavePrefs(bool loadThem)
 			FindWindow::SetFindString(findString);
 			free(findString);
 		}
-		if (prefsFile.Read(&show_buttonbar, sizeof(bool)) <= 0)
-			show_buttonbar = true;
+		if (prefsFile.Read(&sShowButtonBar, sizeof(uint8)) <= 0)
+			sShowButtonBar = true;
 		if (prefsFile.Read(&gUseAccountFrom, sizeof(int32)) <= 0
 			|| gUseAccountFrom < ACCOUNT_USE_DEFAULT
 			|| gUseAccountFrom > ACCOUNT_FROM_MAIL)
@@ -1088,10 +1085,11 @@ TMailApp::LoadSavePrefs(bool loadThem)
 
 	fieldName = "ShowButtonBar";
 	if (loadThem) {
-		if (settingsMsg.FindBool(fieldName, &tempBool) == B_OK)
-			show_buttonbar = tempBool;
+		int8 value;
+		if (settingsMsg.FindInt8(fieldName, &value) == B_OK)
+			sShowButtonBar = value;
 	} else if (errorCode == B_OK)
-		errorCode = settingsMsg.AddBool(fieldName, show_buttonbar);
+		errorCode = settingsMsg.AddInt8(fieldName, sShowButtonBar);
 
 	fieldName = "UseAccountFrom";
 	if (loadThem) {
@@ -1503,13 +1501,11 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 		}
 
 		menu->AddItem(subMenu);
-	}
-	else {
+	} else {
 		menu->AddItem(fSendNow = new BMenuItem(
 			MDR_DIALECT_CHOICE ("Send Message", "M) メッセージを送信"),
 			new BMessage(M_SEND_NOW), 'M'));
-		if (!fResending)
-		{
+		if (!fResending) {
 			// We want to make alt-shift-M work to send mail as well as just alt-M
 			// Gross hack follows... hey, don't look at me like that... it works.
 			// Create a hidden menu bar with a single "Send Now" item linked to alt-shift-M
@@ -1525,8 +1521,7 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 	//
 	//	Enclosures Menu
 	//
-	if (!fIncoming)
-	{
+	if (!fIncoming) {
 		menu = new BMenu(MDR_DIALECT_CHOICE ("Enclosures","N) 添付ファイル"));
 		menu->AddItem(fAdd = new BMenuItem(MDR_DIALECT_CHOICE ("Add","E) 追加")B_UTF8_ELLIPSIS, new BMessage(M_ADD), 'E'));
 		menu->AddItem(fRemove = new BMenuItem(MDR_DIALECT_CHOICE ("Remove","T) 削除"), new BMessage(M_REMOVE), 'T'));
@@ -1543,18 +1538,16 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 	//
 	float bbwidth = 0, bbheight = 0;
 
-	if (show_buttonbar)
-	{
+	if (sShowButtonBar) {
 		BuildButtonBar();
-		fButtonBar->ShowLabels(show_buttonbar & 1);
+		fButtonBar->ShowLabels(sShowButtonBar == 1);
 		fButtonBar->Arrange(/* True for all buttons same size, false to just fit */
 			MDR_DIALECT_CHOICE (true, true));
 		fButtonBar->GetPreferredSize(&bbwidth, &bbheight);
 		fButtonBar->ResizeTo(Bounds().right+3, bbheight+1);
 		fButtonBar->MoveTo(-1, height-1);
 		fButtonBar->Show();
-	}
-	else
+	} else
 		fButtonBar = NULL;
 
 	r.top = r.bottom = height + bbheight + 1;
@@ -1576,8 +1569,7 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 	AddChild(fContentView);
 	Unlock();
 
-	if (to)
-	{
+	if (to) {
 		Lock();
 		fHeaderView->fTo->SetText(to);
 		Unlock();
@@ -1593,12 +1585,10 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 	// 	If auto-signature, add signature to the text here.
 	//
 
-	if (!fIncoming && strcmp(signature, SIG_NONE) != 0)
-	{
+	if (!fIncoming && strcmp(signature, SIG_NONE) != 0) {
 		if (strcmp(signature, SIG_RANDOM) == 0)
 			PostMessage(M_RANDOM_SIG);
-		else
-		{
+		else {
 			//
 			//	Create a query to find this signature
 			//
@@ -1616,13 +1606,11 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 			//	If we find the named query, add it to the text.
 			//
 			BEntry entry;
-			if (query.GetNextEntry(&entry) == B_NO_ERROR)
-			{
+			if (query.GetNextEntry(&entry) == B_NO_ERROR) {
 				off_t size;
 				BFile file;
 				file.SetTo(&entry, O_RDWR);
-				if (file.InitCheck() == B_NO_ERROR)
-				{
+				if (file.InitCheck() == B_NO_ERROR) {
 					file.GetSize(&size);
 					char *str = (char *)malloc(size);
 					size = file.Read(str, size);
@@ -1635,8 +1623,7 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 					if (fStartingText != NULL)
 						strcpy(fStartingText, fContentView->fTextView->Text());
 				}
-			}
-			else {
+			} else {
 				char tempString [2048];
 				query.GetPredicate (tempString, sizeof (tempString));
 				printf ("Query failed, was looking for: %s\n", tempString);
@@ -1703,18 +1690,18 @@ TMailWindow::BuildButtonBar()
 }
 
 
-void TMailWindow::UpdateViews( void )
+void
+TMailWindow::UpdateViews()
 {
 	float bbwidth = 0, bbheight = 0;
 	float nextY = fMenuBar->Frame().bottom+1;
 
 	// Show/Hide Button Bar
-	if (show_buttonbar)
-	{
+	if (sShowButtonBar) {
 		// Create the Button Bar if needed
 		if (!fButtonBar)
 			BuildButtonBar();
-		fButtonBar->ShowLabels(show_buttonbar & 1);
+		fButtonBar->ShowLabels(sShowButtonBar == 1);
 		fButtonBar->Arrange(/* True for all buttons same size, false to just fit */
 			MDR_DIALECT_CHOICE (true, true));
 		fButtonBar->GetPreferredSize( &bbwidth, &bbheight);
@@ -1725,15 +1712,13 @@ void TMailWindow::UpdateViews( void )
 			fButtonBar->Show();
 		else
 			fButtonBar->Invalidate();
-	}
-	else if (fButtonBar)
+	} else if (fButtonBar)
 		fButtonBar->Hide();
 
 	// Arange other views to match
 	fHeaderView->MoveTo(0, nextY);
 	nextY = fHeaderView->Frame().bottom;
-	if (fEnclosuresView)
-	{
+	if (fEnclosuresView) {
 		fEnclosuresView->MoveTo(0, nextY);
 		nextY = fEnclosuresView->Frame().bottom+1;
 	}

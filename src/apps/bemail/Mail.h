@@ -205,10 +205,8 @@ class TMailApp : public BApplication {
 		int32			fWindowCount;
 		TPrefsWindow	*fPrefsWindow;
 		TSignatureWindow *fSigWindow;
-		//BMessenger		fTrackerMessenger;
-			// Talks to tracker window that this was launched from.
 
-		bool			fPrevBBPref;
+		uint8			fPreviousShowButtonBar;
 };
 
 //--------------------------------------------------------------------

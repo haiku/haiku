@@ -113,7 +113,7 @@ extern BPoint	prefs_window;
 TPrefsWindow::TPrefsWindow(BRect rect, BFont *font, int32 *level, bool *wrap,
 	bool *attachAttributes, bool *cquotes, uint32 *account, int32 *replyTo,
 	char **preamble, char **sig, uint32 *encoding, bool *warnUnencodable,
-	bool *spellCheckStartOn, bool *buttonBar)
+	bool *spellCheckStartOn, uint8 *buttonBar)
 	:	BWindow(rect, MDR_DIALECT_CHOICE ("BeMail Preferences","BeMailの設定"), B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 {
 	BMenuField *menu;
@@ -530,13 +530,10 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 		}
 		case P_SIG:
 			free(*fNewSignature);
-			if (msg->FindString("signature", &signature) == B_NO_ERROR)
-			{
+			if (msg->FindString("signature", &signature) == B_NO_ERROR) {
 				*fNewSignature = (char *)malloc(strlen(signature) + 1);
 				strcpy(*fNewSignature, signature);
-			}
-			else
-			{
+			} else {
 				*fNewSignature = (char *)malloc(strlen(SIG_NONE) + 1);
 				strcpy(*fNewSignature, SIG_NONE);
 			}
@@ -552,7 +549,7 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 			break;
 		case P_BUTTON_BAR:
 			msg->FindInt8("bar", (int8 *)fNewButtonBar);
-			be_app->PostMessage( PREFS_CHANGED );
+			be_app->PostMessage(PREFS_CHANGED);
 			break;
 
 		default:
@@ -585,7 +582,6 @@ TPrefsWindow::MessageReceived(BMessage *msg)
 BPopUpMenu *
 TPrefsWindow::BuildFontMenu(BFont *font)
 {
-
 	font_family	def_family;
 	font_style	def_style;
 	font_family	f_family;
@@ -594,7 +590,7 @@ TPrefsWindow::BuildFontMenu(BFont *font)
 	BPopUpMenu *menu = new BPopUpMenu("");
 	font->GetFamilyAndStyle(&def_family, &def_style);
 
-	int32 family_menu_index=0;
+	int32 family_menu_index = 0;
 	int family_count = count_font_families();
 	for (int family_loop = 0; family_loop < family_count; family_loop++) {
 		get_font_family(family_loop, &f_family);
@@ -612,9 +608,9 @@ TPrefsWindow::BuildFontMenu(BFont *font)
 
 			BMenuItem *item = new BMenuItem(f_style, msg);
 			family_menu->AddItem(item);
-			if ((strcmp(def_family, f_family) == 0) && (strcmp(def_style, f_style) == 0)) {
+			if ((strcmp(def_family, f_family) == 0) && (strcmp(def_style, f_style) == 0))
 				item->SetMarked(true);
-			}
+
 			item->SetTarget(this);
 		}
 
@@ -622,10 +618,12 @@ TPrefsWindow::BuildFontMenu(BFont *font)
 		BMenuItem *item = menu->ItemAt(family_menu_index);
 		BMessage *msg = new BMessage(P_FONT);
 		msg->AddString("font", f_family);
-		
+
 		item->SetMessage(msg);
 		item->SetTarget(this);
-		if (strcmp(def_family, f_family) == 0) { item->SetMarked(true); }
+		if (strcmp(def_family, f_family) == 0)
+			item->SetMarked(true);
+
 		family_menu_index++;
 	}
 	return menu;
@@ -635,9 +633,9 @@ TPrefsWindow::BuildFontMenu(BFont *font)
 BPopUpMenu *
 TPrefsWindow::BuildLevelMenu(int32 level)
 {
-	BMenuItem	*item;
-	BMessage	*msg;
-	BPopUpMenu	*menu;
+	BMenuItem *item;
+	BMessage *msg;
+	BPopUpMenu *menu;
 
 	menu = new BPopUpMenu("");
 	msg = new BMessage(P_LEVEL);
@@ -660,23 +658,20 @@ BPopUpMenu *
 TPrefsWindow::BuildAccountMenu(uint32 account)
 {
 	BPopUpMenu *menu = new BPopUpMenu("");
-	
 	BMenuItem *item;
 
 	//menu->SetRadioMode(true);
 	BList chains;
-	if (GetOutboundMailChains(&chains) < B_OK)
-	{
-		menu->AddItem(item = new BMenuItem("<no account found>",NULL));
+	if (GetOutboundMailChains(&chains) < B_OK) {
+		menu->AddItem(item = new BMenuItem("<no account found>", NULL));
 		item->SetEnabled(false);
 		return menu;
 	}
 
 	BMessage *msg;
-	for (int32 i = 0;i < chains.CountItems();i++)
-	{
+	for (int32 i = 0; i < chains.CountItems(); i++) {
 		BMailChain *chain = (BMailChain *)chains.ItemAt(i);
-		item = new BMenuItem(chain->Name(),msg = new BMessage(P_ACCOUNT));
+		item = new BMenuItem(chain->Name(), msg = new BMessage(P_ACCOUNT));
 
 		msg->AddInt32("id",chain->ID());
 
@@ -928,35 +923,36 @@ TPrefsWindow::BuildWarnUnencodableMenu(bool warnUnencodable)
 BPopUpMenu *
 TPrefsWindow::BuildSpellCheckStartOnMenu(bool spellCheckStartOn)
 {
-	return BuildBoolMenu(P_SPELL_CHECK_START_ON,"spellCheckStartOn",spellCheckStartOn);
+	return BuildBoolMenu(P_SPELL_CHECK_START_ON, "spellCheckStartOn", spellCheckStartOn);
 }
 
 
 BPopUpMenu *
-TPrefsWindow::BuildButtonBarMenu(bool show)
+TPrefsWindow::BuildButtonBarMenu(uint8 show)
 {
 	BMenuItem	*item;
 	BMessage	*msg;
 	BPopUpMenu	*menu;
-	
+
 	menu = new BPopUpMenu("");
-	
+
 	msg = new BMessage(P_BUTTON_BAR);
 	msg->AddInt8("bar", 1);
 	menu->AddItem(item = new BMenuItem(ICON_LABEL_TEXT, msg));
 	if (show & 1)
 		item->SetMarked(true);
-	
+
 	msg = new BMessage(P_BUTTON_BAR);
 	msg->AddInt8("bar", 2);
 	menu->AddItem(item = new BMenuItem(ICON_TEXT, msg));
 	if (show & 2)
 		item->SetMarked(true);
-	
+
 	msg = new BMessage(P_BUTTON_BAR);
 	msg->AddInt8("bar", 0);
 	menu->AddItem(item = new BMenuItem(HIDE_TEXT, msg));
 	if (!show)
 		item->SetMarked(true);
+
 	return menu;
 }
