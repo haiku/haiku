@@ -190,10 +190,10 @@ BmapButton::Draw(BRect updateRect)
 		renderFont = *be_plain_font;
 		renderFont.GetHeight(&fheight);
 		SetFont(&renderFont);
-		
+
 		labelHeight = fheight.leading + fheight.ascent + fheight.descent + 1;
-		labelWidth = renderFont.StringWidth(Label())-2;
-		
+		labelWidth = renderFont.StringWidth(Label());
+
 		BRect textRect;
 		textRect.left = (bounds.right-bounds.left-labelWidth+1)/2;
 		textRect.right = textRect.left+labelWidth;
