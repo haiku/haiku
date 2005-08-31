@@ -40,6 +40,7 @@ public:
 	bool LockEnable() {return fLockEnabled;}
 	bigtime_t PasswordTime() {return fPasswordTime;}
 	const char *Password() { return fPassword.String(); }
+	const char *LockMethod() { return fLockMethod.String(); }
 	bool IsNetworkPassword() {return fIsNetworkPassword;}
 	const char *ModuleName() {return fModuleName.String();}
 	status_t GetState(const char *name, BMessage *stateMsg);
@@ -55,7 +56,8 @@ public:
 	void SetNeverBlankCorner(arrowDirection in) {fNeverBlankCorner = in;}
 	void SetLockEnable(bool en) {fLockEnabled = en;}
 	void SetPasswordTime(bigtime_t pt) {fPasswordTime = pt;}
-	void SetPassword(char *pw) {fPassword = pw;} // Can not set network password from here.
+	void SetPassword(const char *pw) {fPassword = pw;} // Can not set network password from here.
+	void SetLockMethod(const char *method) {fLockMethod = method;}
 	void SetModuleName(const char *mn) {fModuleName = mn;}
 	void SetState(const char *name, BMessage *stateMsg);
 	void SaveSettings();

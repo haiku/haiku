@@ -129,7 +129,7 @@ ScreenSaverApp::MessageReceived(BMessage *message)
 bool 
 ScreenSaverApp::QuitRequested()
 {
-	if (system_time()-fBlankTime > fPref.PasswordTime()) {
+	if (fPref.LockEnable() && (system_time()-fBlankTime > fPref.PasswordTime())) {
 		ShowPW();
 		return false;
 	} else

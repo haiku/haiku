@@ -14,8 +14,9 @@
 #include <Screen.h>
 
 
-PasswordWindow::PasswordWindow() 
-	: BWindow(BRect(100,100,380,250),"",B_MODAL_WINDOW_LOOK,B_MODAL_APP_WINDOW_FEEL,B_NOT_RESIZABLE) 
+PasswordWindow::PasswordWindow(ScreenSaverPrefs &prefs) 
+	: BWindow(BRect(100,100,380,250),"",B_MODAL_WINDOW_LOOK,B_MODAL_APP_WINDOW_FEEL,B_NOT_RESIZABLE),
+	fPrefs(prefs)
 {
 	Setup();
 	BRect screenFrame = BScreen(B_MAIN_SCREEN_ID).Frame();
@@ -35,7 +36,6 @@ PasswordWindow::Setup()
 	owner->SetViewColor(216,216,216);
 	AddChild(owner);
 	fUseNetwork=new BRadioButton(BRect(15,10,160,20),"useNetwork","Use Network password",new BMessage(kButton_changed),B_FOLLOW_NONE);
-	fUseNetwork->SetValue(1);
 	owner->AddChild(fUseNetwork);
 	fUseCustom=new BRadioButton(BRect(30,50,130,60),"fUseCustom","Use custom password",new BMessage(kButton_changed),B_FOLLOW_NONE);
 
@@ -65,6 +65,10 @@ PasswordWindow::Setup()
 void 
 PasswordWindow::Update() 
 {
+	if (strcmp(fPrefs.LockMethod(), "custom") == 0)
+		fUseCustom->SetValue(B_CONTROL_ON);
+	else
+		fUseNetwork->SetValue(B_CONTROL_ON);
 	fUseNetPassword=(fUseCustom->Value()>0);
 	fConfirm->SetEnabled(fUseNetPassword);
 	fPassword->SetEnabled(fUseNetPassword);
@@ -75,20 +79,21 @@ void
 PasswordWindow::MessageReceived(BMessage *message) 
 {
 	switch(message->what) {
-		case kDone_clicked:
-		if (fUseCustom->Value())
+	case kDone_clicked:
+		fPrefs.SetLockMethod(fUseCustom->Value() ? "custom" : "network");
+		if (fUseCustom->Value()) {
 			if (strcmp(fPassword->Text(),fConfirm->Text())) {
 				BAlert *alert=new BAlert("noMatch","Passwords don't match. Try again.","OK");
 				alert->Go();
-			} else {
-				fThePassword=fPassword->Text();
-				Hide();
-			}
-		else {
-			fPassword->SetText("");
-			fConfirm->SetText("");
-			Hide();
-			}
+				break;
+			} 
+			fPrefs.SetPassword(crypt(fPassword->Text(), fPassword->Text()));
+		} else {
+			fPrefs.SetPassword("");
+		}
+		fPassword->SetText("");
+		fConfirm->SetText("");
+		Hide();
 		break;
 	case kCancel_clicked:
 		fPassword->SetText("");
@@ -101,23 +106,8 @@ PasswordWindow::MessageReceived(BMessage *message)
 	case kShow:
 		Show();
 		break;
-	case kPopulate:
-		message->ReplaceString("lockpassword", ((fUseNetPassword)?"":fThePassword)); 
-		message->ReplaceString("lockmethod", (fUseNetPassword?"network":"custom")); 
-		message->SendReply(message);
-		break;
-	case kUtilize: {
-		BString temp;
-		message->FindString("lockmethod",&temp);
-		fUseNetPassword=(temp=="custom");
-		if (!fUseNetPassword) {
-			message->FindString("lockpassword",&temp);
-			fThePassword=temp;
-		}
-		break;
-	}
 	default:
 		BWindow::MessageReceived(message);
-	break;
-  }
+		break;
+ 	}
 }

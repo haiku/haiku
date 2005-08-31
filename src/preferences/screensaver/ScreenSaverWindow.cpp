@@ -290,7 +290,7 @@ ScreenSaverWin::SetupForm()
 	SetupTab1();
 
 // Create the password editing window
-	fPwWin = new PasswordWindow();
+	fPwWin = new PasswordWindow(fPrefs);
 	fPwMessenger = new BMessenger(NULL,fPwWin);
 	fPwWin->Run();
 

@@ -16,11 +16,12 @@
 #include <TextControl.h>
 #include <Button.h>
 #include <Constants.h>
+#include "ScreenSaverPrefs.h"
 
 class PasswordWindow : public BWindow
 {
 	public:
-		PasswordWindow();
+		PasswordWindow(ScreenSaverPrefs &prefs);
 		void Setup();
 		void Update();
 		virtual void MessageReceived(BMessage *message);
@@ -32,6 +33,7 @@ class PasswordWindow : public BWindow
 		BButton *fCancel,*fDone;
 		BString fThePassword; 
 		bool fUseNetPassword;
+		ScreenSaverPrefs &fPrefs;
 
 };
 
