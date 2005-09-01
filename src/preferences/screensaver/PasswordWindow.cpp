@@ -39,8 +39,8 @@ PasswordWindow::Setup()
 	owner->AddChild(fUseNetwork);
 	fUseCustom=new BRadioButton(BRect(30,50,130,60),"fUseCustom","Use custom password",new BMessage(kButton_changed),B_FOLLOW_NONE);
 
-	fCustomBox=new BBox(BRect(9,30,269,105),"custBeBox",B_FOLLOW_NONE);
-	fCustomBox->SetLabel(fUseCustom);
+	BBox *customBox=new BBox(BRect(9,30,269,105),"custBeBox",B_FOLLOW_NONE);
+	customBox->SetLabel(fUseCustom);
 	fPassword=new BTextControl(BRect(10,20,251,35),"pwdCntrl","Password:",NULL,B_FOLLOW_NONE);
 	fConfirm=new BTextControl(BRect(10,45,251,60),"fConfirmCntrl","Confirm password:",NULL,B_FOLLOW_NONE);
 	fPassword->SetAlignment(B_ALIGN_RIGHT,B_ALIGN_LEFT);
@@ -50,9 +50,9 @@ PasswordWindow::Setup()
 	fConfirm->SetAlignment(B_ALIGN_RIGHT,B_ALIGN_LEFT);
 	fConfirm->SetDivider(divider);
 	fConfirm->TextView()->HideTyping(true);
-	fCustomBox->AddChild(fPassword);
-	fCustomBox->AddChild(fConfirm);
-	owner->AddChild(fCustomBox);
+	customBox->AddChild(fPassword);
+	customBox->AddChild(fConfirm);
+	owner->AddChild(customBox);
 
 	fDone = new BButton(BRect(194,118,269,129),"done","Done",new BMessage (kDone_clicked),B_FOLLOW_NONE);
 	fCancel = new BButton(BRect(109,118,184,129),"cancel","Cancel",new BMessage (kCancel_clicked),B_FOLLOW_NONE);
@@ -66,13 +66,13 @@ PasswordWindow::Setup()
 void 
 PasswordWindow::Update() 
 {
-	if (strcmp(fPrefs.LockMethod(), "custom") == 0)
-		fUseCustom->SetValue(B_CONTROL_ON);
-	else
+	if (fPrefs.IsNetworkPassword())
 		fUseNetwork->SetValue(B_CONTROL_ON);
-	fUseNetPassword=(fUseCustom->Value()>0);
-	fConfirm->SetEnabled(fUseNetPassword);
-	fPassword->SetEnabled(fUseNetPassword);
+	else
+		fUseCustom->SetValue(B_CONTROL_ON);
+	bool useNetPassword=(fUseCustom->Value()>0);
+	fConfirm->SetEnabled(useNetPassword);
+	fPassword->SetEnabled(useNetPassword);
 }
 
 
@@ -102,6 +102,7 @@ PasswordWindow::MessageReceived(BMessage *message)
 		Hide();
 		break;
 	case kButton_changed:
+		fPrefs.SetLockMethod(fUseCustom->Value()>0 ? "custom" : "network");
 		Update();
 		break;
 	case kShow:

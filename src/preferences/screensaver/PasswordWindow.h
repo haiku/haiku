@@ -28,11 +28,9 @@ class PasswordWindow : public BWindow
 
 	private:
 		BRadioButton *fUseNetwork,*fUseCustom;
-		BBox *fCustomBox;
 		BTextControl *fPassword,*fConfirm;
 		BButton *fCancel,*fDone;
 		BString fThePassword; 
-		bool fUseNetPassword;
 		ScreenSaverPrefs &fPrefs;
 
 };
