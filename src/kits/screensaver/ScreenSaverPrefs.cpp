@@ -64,10 +64,12 @@ ScreenSaverPrefs::LoadSettings()
 			// This ugly piece opens the networking file and reads the password, if it exists.
 			if ((networkFile=fopen(fNetworkPath.Path(),"r")))
 			while (buffer==fgets(buffer,512,networkFile))
-				if ((start=strstr(buffer,"PASSWORD ="))) {
-					char password[12];
-					strncpy(password, start+10,strlen(start-11));
+				if ((start=strstr(buffer,"PASSWORD = "))) {
+					char password[14];
+					strncpy(password, start+11,strlen(start+11)-1);
+					password[strlen(start+11)-1] = 0;
 					fPassword = password;
+					break;
                                 }
         	}
 		return true;
@@ -124,7 +126,10 @@ ScreenSaverPrefs::GetSettings()
 	fSettings.AddInt32("cornernever", fNeverBlankCorner);
 	fSettings.AddBool("lockenable", fLockEnabled);
 	fSettings.AddInt32("lockdelay", fPasswordTime/1000000);
-	fSettings.AddString("lockpassword", fPassword);
+	if (IsNetworkPassword())
+		fSettings.AddString("lockpassword", "");
+	else
+		fSettings.AddString("lockpassword", fPassword);
 	fSettings.AddString("lockmethod", fLockMethod);
 	fSettings.AddString("modulename", fModuleName);
 	

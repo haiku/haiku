@@ -94,9 +94,7 @@ ScreenSaverApp::MessageReceived(BMessage *message)
 	switch(message->what) {
 		case UNLOCK_MESSAGE:
 		{
-			char salt[3] = "";
-			strncpy(salt, fPref.Password(), 2);
-			if (strcmp(crypt(fPww->GetPassword(), salt),fPref.Password()) != 0) {
+			if (strcmp(fPref.Password(), crypt(fPww->GetPassword(), fPref.Password())) != 0) {
 				beep();
 				fPww->SetPassword("");
 				delete fRunner;

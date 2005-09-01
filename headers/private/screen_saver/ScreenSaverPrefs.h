@@ -41,7 +41,7 @@ public:
 	bigtime_t PasswordTime() {return fPasswordTime;}
 	const char *Password() { return fPassword.String(); }
 	const char *LockMethod() { return fLockMethod.String(); }
-	bool IsNetworkPassword() {return fIsNetworkPassword;}
+	bool IsNetworkPassword() {return (strcmp(fLockMethod.String(), "custom") != 0);}
 	const char *ModuleName() {return fModuleName.String();}
 	status_t GetState(const char *name, BMessage *stateMsg);
 
@@ -77,8 +77,6 @@ private:
 	BString fPassword;
 	BString fModuleName;
 	BString fLockMethod;
-
-	bool fIsNetworkPassword;
 
 	BMessage fSettings;
 	BPath fSSPath, fNetworkPath;
