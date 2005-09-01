@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    TrueType font driver implementation (body).                          */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004 by                               */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005 by                         */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -23,8 +23,17 @@
 #include FT_TRUETYPE_IDS_H
 #include FT_SERVICE_XFREE86_NAME_H
 
+#ifdef TT_CONFIG_OPTION_GX_VAR_SUPPORT
+#include FT_MULTIPLE_MASTERS_H
+#include FT_SERVICE_MULTIPLE_MASTERS_H
+#endif
+
 #include "ttdriver.h"
 #include "ttgload.h"
+
+#ifdef TT_CONFIG_OPTION_GX_VAR_SUPPORT
+#include "ttgxvar.h"
+#endif
 
 #include "tterrors.h"
 
@@ -60,7 +69,7 @@
   /*************************************************************************/
   /*                                                                       */
   /* <Function>                                                            */
-  /*    Get_Kerning                                                        */
+  /*    tt_get_kerning                                                     */
   /*                                                                       */
   /* <Description>                                                         */
   /*    A driver method used to return the kerning vector between two      */
@@ -90,55 +99,22 @@
   /*    They can be implemented by format-specific interfaces.             */
   /*                                                                       */
   static FT_Error
-  Get_Kerning( TT_Face     face,
-               FT_UInt     left_glyph,
-               FT_UInt     right_glyph,
-               FT_Vector*  kerning )
+  tt_get_kerning( FT_Face     ttface,          /* TT_Face */
+                  FT_UInt     left_glyph,
+                  FT_UInt     right_glyph,
+                  FT_Vector*  kerning )
   {
-    TT_Kern0_Pair  pair;
+    TT_Face       face = (TT_Face)ttface;
+    SFNT_Service  sfnt = (SFNT_Service)face->sfnt;
 
-
-    if ( !face )
-      return TT_Err_Invalid_Face_Handle;
 
     kerning->x = 0;
     kerning->y = 0;
 
-    if ( face->kern_pairs )
-    {
-      /* there are some kerning pairs in this font file! */
-      FT_ULong  search_tag = PAIR_TAG( left_glyph, right_glyph );
-      FT_Long   left, right;
-
-
-      left  = 0;
-      right = face->num_kern_pairs - 1;
-
-      while ( left <= right )
-      {
-        FT_Long   middle = left + ( ( right - left ) >> 1 );
-        FT_ULong  cur_pair;
-
-
-        pair     = face->kern_pairs + middle;
-        cur_pair = PAIR_TAG( pair->left, pair->right );
-
-        if ( cur_pair == search_tag )
-          goto Found;
-
-        if ( cur_pair < search_tag )
-          left = middle + 1;
-        else
-          right = middle - 1;
-      }
-    }
-
-  Exit:
-    return TT_Err_Ok;
-
-  Found:
-    kerning->x = pair->value;
-    goto Exit;
+    if ( sfnt )
+      kerning->x = sfnt->get_kerning( face, left_glyph, right_glyph );
+      
+    return 0;
   }
 
 
@@ -185,12 +161,13 @@
   /*    FreeType error code.  0 means success.                             */
   /*                                                                       */
   static FT_Error
-  Set_Char_Sizes( TT_Size     size,
+  Set_Char_Sizes( FT_Size     ttsize,       /* TT_Size */
                   FT_F26Dot6  char_width,
                   FT_F26Dot6  char_height,
                   FT_UInt     horz_resolution,
                   FT_UInt     vert_resolution )
   {
+    TT_Size           size     = (TT_Size)ttsize;
     FT_Size_Metrics*  metrics  = &size->root.metrics;
     FT_Size_Metrics*  metrics2 = &size->metrics;
     TT_Face           face     = (TT_Face)size->root.face;
@@ -250,8 +227,16 @@
   /*    FreeType error code.  0 means success.                             */
   /*                                                                       */
   static FT_Error
-  Set_Pixel_Sizes( TT_Size  size )
+  Set_Pixel_Sizes( FT_Size  ttsize,         /* TT_Size */
+                   FT_UInt  pixel_width,
+                   FT_UInt  pixel_height )
   {
+    TT_Size  size = (TT_Size)ttsize;
+
+    FT_UNUSED( pixel_width );
+    FT_UNUSED( pixel_height );
+
+
     /* many things have been pre-computed by the base layer */
 
     size->metrics         = size->root.metrics;
@@ -291,12 +276,14 @@
   /*    FreeType error code.  0 means success.                             */
   /*                                                                       */
   static FT_Error
-  Load_Glyph( TT_GlyphSlot  slot,
-              TT_Size       size,
+  Load_Glyph( FT_GlyphSlot  ttslot,         /* TT_GlyphSlot */
+              FT_Size       ttsize,         /* TT_Size      */
               FT_UInt       glyph_index,
               FT_Int32      load_flags )
   {
-    FT_Error  error;
+    TT_GlyphSlot  slot = (TT_GlyphSlot)ttslot;
+    TT_Size       size = (TT_Size)ttsize;
+    FT_Error      error;
 
 
     if ( !slot )
@@ -345,14 +332,30 @@
   /*************************************************************************/
   /*************************************************************************/
 
+#ifdef TT_CONFIG_OPTION_GX_VAR_SUPPORT
+  static const FT_Service_MultiMastersRec  tt_service_gx_multi_masters =
+  {
+    (FT_Get_MM_Func)        NULL,
+    (FT_Set_MM_Design_Func) NULL,
+    (FT_Set_MM_Blend_Func)  TT_Set_MM_Blend,
+    (FT_Get_MM_Var_Func)    TT_Get_MM_Var,
+    (FT_Set_Var_Design_Func)TT_Set_Var_Design
+  };
+#endif
+
+
   static const FT_ServiceDescRec  tt_services[] =
   {
-    { FT_SERVICE_ID_XF86_NAME, FT_XF86_FORMAT_TRUETYPE },
+    { FT_SERVICE_ID_XF86_NAME,     FT_XF86_FORMAT_TRUETYPE },
+#ifdef TT_CONFIG_OPTION_GX_VAR_SUPPORT
+    { FT_SERVICE_ID_MULTI_MASTERS, &tt_service_gx_multi_masters },
+#endif
     { NULL, NULL }
   };
 
-  static FT_Module_Interface
-  tt_get_interface( TT_Driver    driver,
+
+  FT_CALLBACK_DEF( FT_Module_Interface )
+  tt_get_interface( FT_Module    driver,    /* TT_Driver */
                     const char*  tt_interface )
   {
     FT_Module_Interface  result;
@@ -365,12 +368,12 @@
       return result;
 
     /* only return the default interface from the SFNT module */
-    sfntd = FT_Get_Module( driver->root.root.library, "sfnt" );
+    sfntd = FT_Get_Module( driver->library, "sfnt" );
     if ( sfntd )
     {
       sfnt = (SFNT_Service)( sfntd->clazz->module_interface );
       if ( sfnt )
-        return sfnt->get_interface( FT_MODULE( driver ), tt_interface );
+        return sfnt->get_interface( driver, tt_interface );
     }
 
     return 0;
@@ -399,30 +402,29 @@
 
       (void*)0,        /* driver specific interface */
 
-      (FT_Module_Constructor)tt_driver_init,
-      (FT_Module_Destructor) tt_driver_done,
-      (FT_Module_Requester)  tt_get_interface,
+      tt_driver_init,
+      tt_driver_done,
+      tt_get_interface,
     },
 
     sizeof ( TT_FaceRec ),
     sizeof ( TT_SizeRec ),
     sizeof ( FT_GlyphSlotRec ),
 
+    tt_face_init,
+    tt_face_done,
+    tt_size_init,
+    tt_size_done,
+    0,                      /* FT_Slot_InitFunc        */
+    0,                      /* FT_Slot_DoneFunc        */
 
-    (FT_Face_InitFunc)       tt_face_init,
-    (FT_Face_DoneFunc)       tt_face_done,
-    (FT_Size_InitFunc)       tt_size_init,
-    (FT_Size_DoneFunc)       tt_size_done,
-    (FT_Slot_InitFunc)       0,
-    (FT_Slot_DoneFunc)       0,
+    Set_Char_Sizes,
+    Set_Pixel_Sizes,
+    Load_Glyph,
 
-    (FT_Size_ResetPointsFunc)Set_Char_Sizes,
-    (FT_Size_ResetPixelsFunc)Set_Pixel_Sizes,
-    (FT_Slot_LoadFunc)       Load_Glyph,
-
-    (FT_Face_GetKerningFunc) Get_Kerning,
-    (FT_Face_AttachFunc)     0,
-    (FT_Face_GetAdvancesFunc)0
+    tt_get_kerning,
+    0,                      /* FT_Face_AttachFunc      */
+    0                       /* FT_Face_GetAdvancesFunc */
   };
 
 

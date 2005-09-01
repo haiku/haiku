@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    SFNT object management (base).                                       */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003 by                                     */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005 by                         */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -19,7 +19,8 @@
 #include <ft2build.h>
 #include "sfobjs.h"
 #include "ttload.h"
-#include "ttcmap0.h"
+#include "ttcmap.h"
+#include "ttkern.h"
 #include FT_INTERNAL_SFNT_H
 #include FT_TRUETYPE_IDS_H
 #include FT_TRUETYPE_TAGS_H
@@ -160,6 +161,8 @@
     FT_Int            found_win     = -1;
     FT_Int            found_unicode = -1;
 
+    FT_Bool           is_english = 0;
+
     TT_NameEntry_ConvertFunc  convert;
 
 
@@ -205,7 +208,8 @@
             case TT_MS_ID_SYMBOL_CS:
             case TT_MS_ID_UNICODE_CS:
             case TT_MS_ID_UCS_4:
-              found_win = n;
+              is_english = FT_BOOL( ( rec->languageID & 0x3FF ) == 0x009 );
+              found_win  = n;
               break;
 
             default:
@@ -222,9 +226,10 @@
 
     /* some fonts contain invalid Unicode or Macintosh formatted entries; */
     /* we will thus favor names encoded in Windows formats if available   */
+    /* (provided it is an English name)                                   */
     /*                                                                    */
     convert = NULL;
-    if ( found_win >= 0 )
+    if ( found_win >= 0 && !( found_apple >= 0 && !is_english ) )
     {
       rec = face->name_table.names + found_win;
       switch ( rec->encodingID )
@@ -263,7 +268,7 @@
         FT_UNUSED( error );
 
 
-        if ( FT_NEW_ARRAY  ( rec->string, rec->stringLength ) ||
+        if ( FT_QNEW_ARRAY ( rec->string, rec->stringLength ) ||
              FT_STREAM_SEEK( rec->stringOffset )              ||
              FT_STREAM_READ( rec->string, rec->stringLength ) )
         {
@@ -431,11 +436,11 @@
     /* do we have outlines in there? */
 #ifdef FT_CONFIG_OPTION_INCREMENTAL
     has_outline   = FT_BOOL( face->root.internal->incremental_interface != 0 ||
-                             tt_face_lookup_table( face, TTAG_glyf ) != 0         ||
-                             tt_face_lookup_table( face, TTAG_CFF ) != 0          );
+                             tt_face_lookup_table( face, TTAG_glyf )    != 0 ||
+                             tt_face_lookup_table( face, TTAG_CFF )     != 0 );
 #else
     has_outline   = FT_BOOL( tt_face_lookup_table( face, TTAG_glyf ) != 0 ||
-                             tt_face_lookup_table( face, TTAG_CFF ) != 0  );
+                             tt_face_lookup_table( face, TTAG_CFF )  != 0 );
 #endif
 
     is_apple_sbit = 0;
@@ -499,31 +504,39 @@
 #endif /* TT_CONFIG_OPTION_EMBEDDED_BITMAPS */
 
     if ( LOAD_( hdmx )    ||
-         LOAD_( gasp )    ||
-         LOAD_( kerning ) ||
          LOAD_( pclt )    )
       goto Exit;
 
+    /* consider the kerning and gasp tables as optional */
+    (void)LOAD_( gasp );
+    (void)LOAD_( kerning );
+
+    error = SFNT_Err_Ok;
+
     face->root.family_name = tt_face_get_name( face,
-                                               TT_NAME_ID_FONT_FAMILY );
-    face->root.style_name  = tt_face_get_name( face,
-                                               TT_NAME_ID_FONT_SUBFAMILY );
+                                               TT_NAME_ID_PREFERRED_FAMILY );
+    if ( !face->root.family_name )
+      face->root.family_name = tt_face_get_name( face,
+                                                 TT_NAME_ID_FONT_FAMILY );
+
+    face->root.style_name = tt_face_get_name( face,
+                                              TT_NAME_ID_PREFERRED_SUBFAMILY );
+    if ( !face->root.style_name )
+      face->root.style_name  = tt_face_get_name( face,
+                                                 TT_NAME_ID_FONT_SUBFAMILY );
 
     /* now set up root fields */
     {
       FT_Face    root = &face->root;
-      FT_Int32   flags = 0;
-      FT_Memory  memory;
+      FT_Int32   flags = root->face_flags;
 
-
-      memory = root->memory;
 
       /*********************************************************************/
       /*                                                                   */
       /* Compute face flags.                                               */
       /*                                                                   */
       if ( has_outline == TRUE )
-        flags = FT_FACE_FLAG_SCALABLE;    /* scalable outlines */
+        flags |= FT_FACE_FLAG_SCALABLE;    /* scalable outlines */
 
       flags |= FT_FACE_FLAG_SFNT      |   /* SFNT file format  */
                FT_FACE_FLAG_HORIZONTAL;   /* horizontal data   */
@@ -542,9 +555,20 @@
       if ( face->vertical_info )
         flags |= FT_FACE_FLAG_VERTICAL;
 
+#if 0
       /* kerning available ? */
-      if ( face->kern_pairs )
+      if ( TT_FACE_HAS_KERNING( face ) )
         flags |= FT_FACE_FLAG_KERNING;
+#endif
+
+#ifdef TT_CONFIG_OPTION_GX_VAR_SUPPORT
+      /* Don't bother to load the tables unless somebody asks for them. */
+      /* No need to do work which will (probably) not be used.          */
+      if ( tt_face_lookup_table( face, TTAG_glyf ) != 0 &&
+           tt_face_lookup_table( face, TTAG_fvar ) != 0 &&
+           tt_face_lookup_table( face, TTAG_gvar ) != 0 )
+        flags |= FT_FACE_FLAG_MULTIPLE_MASTERS;
+#endif
 
       root->face_flags = flags;
 
@@ -609,59 +633,6 @@
         }
       }
 
-
-#ifdef TT_CONFIG_OPTION_EMBEDDED_BITMAPS
-
-      if ( face->num_sbit_strikes )
-      {
-        FT_ULong  n;
-
-
-        root->face_flags |= FT_FACE_FLAG_FIXED_SIZES;
-
-#if 0
-        /* XXX: I don't know criteria whether layout is horizontal */
-        /*      or vertical.                                       */
-        if ( has_outline.... )
-        {
-          ...
-          root->face_flags |= FT_FACE_FLAG_VERTICAL;
-        }
-#endif
-        root->num_fixed_sizes = (FT_Int)face->num_sbit_strikes;
-
-        if ( FT_NEW_ARRAY( root->available_sizes, face->num_sbit_strikes ) )
-          goto Exit;
-
-        for ( n = 0 ; n < face->num_sbit_strikes ; n++ )
-        {
-          FT_Bitmap_Size*  bsize  = root->available_sizes + n;
-          TT_SBit_Strike   strike = face->sbit_strikes + n;
-          FT_UShort        fupem  = face->header.Units_Per_EM;
-          FT_Short         height = (FT_Short)( face->horizontal.Ascender -
-                                                face->horizontal.Descender +
-                                                face->horizontal.Line_Gap );
-          FT_Short         avg    = face->os2.xAvgCharWidth;
-
-
-          /* assume 72dpi */
-          bsize->height =
-            (FT_Short)( ( height * strike->y_ppem + fupem/2 ) / fupem );
-          bsize->width  =
-            (FT_Short)( ( avg * strike->y_ppem + fupem/2 ) / fupem );
-          bsize->size   = strike->y_ppem << 6;
-          bsize->x_ppem = strike->x_ppem << 6;
-          bsize->y_ppem = strike->y_ppem << 6;
-        }
-      }
-      else
-
-#endif /* TT_CONFIG_OPTION_EMBEDDED_BITMAPS */
-
-      {
-        root->num_fixed_sizes = 0;
-        root->available_sizes = 0;
-      }
 
       /*********************************************************************/
       /*                                                                   */
@@ -782,8 +753,7 @@
     }
 
     /* freeing the kerning table */
-    FT_FREE( face->kern_pairs );
-    face->num_kern_pairs = 0;
+    tt_face_done_kern( face );
 
     /* freeing the collection table */
     FT_FREE( face->ttc_header.offsets );
@@ -803,8 +773,20 @@
     }
 
     /* freeing the horizontal metrics */
+#ifdef FT_OPTIMIZE_MEMORY
+    {
+      FT_Stream  stream = FT_FACE_STREAM( face );
+
+
+      FT_FRAME_RELEASE( face->horz_metrics );
+      FT_FRAME_RELEASE( face->vert_metrics );
+      face->horz_metrics_size = 0;
+      face->vert_metrics_size = 0;
+    }
+#else
     FT_FREE( face->horizontal.long_metrics );
     FT_FREE( face->horizontal.short_metrics );
+#endif
 
     /* freeing the vertical ones, if any */
     if ( face->vertical_info )
@@ -829,9 +811,10 @@
     FT_FREE( face->root.style_name );
 
     /* freeing sbit size table */
+    FT_FREE( face->root.available_sizes );
     face->root.num_fixed_sizes = 0;
-    if ( face->root.available_sizes )
-      FT_FREE( face->root.available_sizes );
+
+    FT_FREE( face->postscript_name );
 
     face->sfnt = 0;
   }

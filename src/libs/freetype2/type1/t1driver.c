@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Type 1 driver interface (body).                                      */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003 by                                     */
+/*  Copyright 1996-2001, 2002, 2003, 2004 by                               */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -129,9 +129,11 @@
 #ifndef T1_CONFIG_OPTION_NO_MM_SUPPORT
   static const FT_Service_MultiMastersRec  t1_service_multi_masters =
   {
-    (FT_Get_MM_Func)       T1_Get_Multi_Master,
-    (FT_Set_MM_Design_Func)T1_Set_MM_Design,
-    (FT_Set_MM_Blend_Func) T1_Set_MM_Blend
+    (FT_Get_MM_Func)        T1_Get_Multi_Master,
+    (FT_Set_MM_Design_Func) T1_Set_MM_Design,
+    (FT_Set_MM_Blend_Func)  T1_Set_MM_Blend,
+    (FT_Get_MM_Var_Func)    T1_Get_MM_Var,
+    (FT_Set_Var_Design_Func)T1_Set_Var_Design
   };
 #endif
 
@@ -158,10 +160,20 @@
   }
 
 
+  static FT_Error
+  t1_ps_get_font_private( FT_Face         face,
+                          PS_PrivateRec*  afont_private )
+  {
+    *afont_private = ((T1_Face)face)->type1.private_dict;
+    return 0;
+  }
+
+
   static const FT_Service_PsInfoRec  t1_service_ps_info =
   {
-    (PS_GetFontInfoFunc)  t1_ps_get_font_info,
-    (PS_HasGlyphNamesFunc)t1_ps_has_glyph_names
+    (PS_GetFontInfoFunc)   t1_ps_get_font_info,
+    (PS_HasGlyphNamesFunc) t1_ps_has_glyph_names,
+    (PS_GetFontPrivateFunc)t1_ps_get_font_private,
   };
 
 
@@ -292,7 +304,7 @@
     (FT_Face_AttachFunc)      0,
 #else
     (FT_Face_GetKerningFunc)  Get_Kerning,
-    (FT_Face_AttachFunc)      T1_Read_AFM,
+    (FT_Face_AttachFunc)      T1_Read_Metrics,
 #endif
     (FT_Face_GetAdvancesFunc) 0
   };

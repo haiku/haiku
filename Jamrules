@@ -2227,12 +2227,14 @@ FT2_LIB     = freetype ;
 
 FT2_COMPONENTS ?= gzip       # support for gzip-compressed files.
                   autohint   # auto-hinter
+		  autofit
                   base       # base component (public APIs)
                   bdf        # BDF font driver
                   cache      # cache sub-system
                   cff        # CFF/CEF font driver
                   cid        # Postscript CID-keyed font driver
 		lzw	   # LZW routines
+		  otvalid
                   pcf        # PCF font driver
                   pfr        # PFR/TrueDoc font driver
                   psaux      # Common Postscript routines module

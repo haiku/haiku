@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Objects manager (body).                                              */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003 by                                     */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005 by                         */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -35,6 +35,10 @@
 
 #ifdef TT_CONFIG_OPTION_UNPATENTED_HINTING
 #include FT_TRUETYPE_UNPATENTED_H
+#endif
+
+#ifdef TT_CONFIG_OPTION_GX_VAR_SUPPORT
+#include "ttgxvar.h"
 #endif
 
   /*************************************************************************/
@@ -161,7 +165,7 @@
   /*                                                                       */
   FT_LOCAL_DEF( FT_Error )
   tt_face_init( FT_Stream      stream,
-                TT_Face        face,
+                FT_Face        ttface,      /* TT_Face */
                 FT_Int         face_index,
                 FT_Int         num_params,
                 FT_Parameter*  params )
@@ -169,6 +173,7 @@
     FT_Error      error;
     FT_Library    library;
     SFNT_Service  sfnt;
+    TT_Face       face = (TT_Face)ttface;
 
 
     library = face->root.driver->root.library;
@@ -185,8 +190,11 @@
     if ( error )
       goto Exit;
 
-    /* We must also be able to accept Mac/GX fonts, as well as OT ones */
+    /* We must also be able to accept Mac/GX fonts, as well as OT ones. */
+    /* The 0x00020000 tag is completely undocumented; some fonts from   */
+    /* Arphic made for Chinese Windows 3.1 have this.                   */
     if ( face->format_tag != 0x00010000L &&    /* MS fonts  */
+         face->format_tag != 0x00020000L &&    /* CJK fonts for Win 3.1 */
          face->format_tag != TTAG_true   )     /* Mac fonts */
     {
       FT_TRACE2(( "[not a valid TTF font]\n" ));
@@ -210,8 +218,11 @@
       if ( !face->root.internal->incremental_interface )
         error = tt_face_load_loca( face, stream );
       if ( !error )
-        error = tt_face_load_cvt( face, stream ) ||
-                tt_face_load_fpgm( face, stream );
+      {
+        error = tt_face_load_cvt( face, stream );
+        if ( !error )
+          error = tt_face_load_fpgm( face, stream );
+      }
 
 #else
 
@@ -265,8 +276,9 @@
   /*    face :: A pointer to the face object to destroy.                   */
   /*                                                                       */
   FT_LOCAL_DEF( void )
-  tt_face_done( TT_Face  face )
+  tt_face_done( FT_Face  ttface )           /* TT_Face */
   {
+    TT_Face       face   = (TT_Face)ttface;
     FT_Memory     memory = face->root.memory;
     FT_Stream     stream = face->root.stream;
 
@@ -281,8 +293,7 @@
       sfnt->done_face( face );
 
     /* freeing the locations table */
-    FT_FREE( face->glyph_locations );
-    face->num_locations = 0;
+    tt_face_done_loca( face );
 
     /* freeing the CVT */
     FT_FREE( face->cvt );
@@ -293,6 +304,11 @@
     FT_FRAME_RELEASE( face->cvt_program );
     face->font_program_size = 0;
     face->cvt_program_size  = 0;
+
+#ifdef TT_CONFIG_OPTION_GX_VAR_SUPPORT
+    tt_done_blend( memory, face->blend );
+    face->blend = NULL;
+#endif
   }
 
 
@@ -318,8 +334,9 @@
   /*    FreeType error code.  0 means success.                             */
   /*                                                                       */
   FT_LOCAL_DEF( FT_Error )
-  tt_size_init( TT_Size  size )
+  tt_size_init( FT_Size  ttsize )           /* TT_Size */
   {
+    TT_Size   size  = (TT_Size)ttsize;
     FT_Error  error = TT_Err_Ok;
 
 
@@ -476,7 +493,7 @@
 
   Fail_Memory:
 
-    tt_size_done( size );
+    tt_size_done( ttsize );
     return error;
 
 #endif /* TT_CONFIG_OPTION_BYTECODE_INTERPRETER */
@@ -496,8 +513,9 @@
   /*    size :: A handle to the target size object.                        */
   /*                                                                       */
   FT_LOCAL_DEF( void )
-  tt_size_done( TT_Size  size )
+  tt_size_done( FT_Size  ttsize )           /* TT_Size */
   {
+    TT_Size    size = (TT_Size)ttsize;
 
 #ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
 
@@ -731,33 +749,42 @@
 
     if ( !error )
     {
+      /* XXX: TODO: move this code to the SFNT module where it belongs */
+
+#ifdef FT_OPTIMIZE_MEMORY
+      FT_Byte*    strike = face->sbit_table + 8 + strike_index*48;
+
+      sbit_metrics->ascender  = (FT_Char)strike[16] << 6;  /* hori.ascender  */
+      sbit_metrics->descender = (FT_Char)strike[17] << 6;  /* hori.descender */
+
+      /* XXX: Is this correct? */
+      sbit_metrics->max_advance = ( (FT_Char)strike[22] + /* min_origin_SB  */
+                                             strike[18] + /* max_width      */
+                                    (FT_Char)strike[23]   /* min_advance_SB */
+                                                        ) << 6;
+
+#else /* !FT_OPTIMIZE_MEMORY */
+
       TT_SBit_Strike  strike = face->sbit_strikes + strike_index;
 
 
-      sbit_metrics->x_ppem = metrics->x_ppem;
-      sbit_metrics->y_ppem = metrics->y_ppem;
-#if 0
-      /*
-       * sbit_metrics->?_scale
-       * are not used now.
-       */
-      sbit_metrics->x_scale = 1 << 16;
-      sbit_metrics->y_scale = 1 << 16;
-#endif
-
       sbit_metrics->ascender  = strike->hori.ascender << 6;
       sbit_metrics->descender = strike->hori.descender << 6;
-
-      /* XXX: Is this correct? */
-      sbit_metrics->height = sbit_metrics->ascender -
-                             sbit_metrics->descender;
 
       /* XXX: Is this correct? */
       sbit_metrics->max_advance = ( strike->hori.min_origin_SB  +
                                     strike->hori.max_width      +
                                     strike->hori.min_advance_SB ) << 6;
 
-      size->strike_index = (FT_UInt)strike_index;
+#endif /* !FT_OPTIMIZE_MEMORY */
+
+      /* XXX: Is this correct? */
+      sbit_metrics->height = sbit_metrics->ascender -
+                             sbit_metrics->descender;
+
+      sbit_metrics->x_ppem = metrics->x_ppem;
+      sbit_metrics->y_ppem = metrics->y_ppem;
+      size->strike_index   = (FT_UInt)strike_index;
     }
     else
     {
@@ -842,7 +869,7 @@
   /*    FreeType error code.  0 means success.                             */
   /*                                                                       */
   FT_LOCAL_DEF( FT_Error )
-  tt_driver_init( TT_Driver  driver )
+  tt_driver_init( FT_Module  driver )       /* TT_Driver */
   {
     FT_Error  error;
 
@@ -866,9 +893,11 @@
   /*    driver :: A handle to the target TrueType driver.                  */
   /*                                                                       */
   FT_LOCAL_DEF( void )
-  tt_driver_done( TT_Driver  driver )
+  tt_driver_done( FT_Module  ttdriver )     /* TT_Driver */
   {
 #ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+    TT_Driver  driver = (TT_Driver)ttdriver;
+
 
     /* destroy the execution context */
     if ( driver->context )
@@ -877,7 +906,7 @@
       driver->context = NULL;
     }
 #else
-    FT_UNUSED( driver );
+    FT_UNUSED( ttdriver );
 #endif
 
   }

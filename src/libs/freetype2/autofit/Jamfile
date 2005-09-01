@@ -10,7 +10,7 @@ UseFreeTypeHeaders ;
 
   if $(FT2_MULTI)
   {
-    _sources = autofit afmodule afloader aflatin afhints afglobal afdummy afangles ;
+    _sources = afangles afglobal afhints aflatin afloader afmodule afdummy ;
   }
   else
   {

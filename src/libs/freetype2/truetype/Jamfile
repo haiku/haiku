@@ -10,7 +10,7 @@ UseFreeTypeHeaders ;
 
   if $(FT2_MULTI)
   {
-    _sources = ttdriver ttobjs ttpload ttgload ttinterp ;
+    _sources = ttdriver ttobjs ttpload ttgload ttinterp ttgxvar ;
   }
   else
   {

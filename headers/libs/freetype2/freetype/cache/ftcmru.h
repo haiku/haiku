@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Simple MRU list-cache (specification).                               */
 /*                                                                         */
-/*  Copyright 2000-2001, 2003, 2004 by                                     */
+/*  Copyright 2000-2001, 2003, 2004, 2005 by                               */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -86,7 +86,7 @@ FT_BEGIN_HEADER
   typedef struct FTC_MruListClassRec_ const *  FTC_MruListClass;
 
 
-  typedef FT_Int
+  typedef FT_Bool
   (*FTC_MruNode_CompareFunc)( FTC_MruNode  node,
                               FT_Pointer   key );
 
@@ -154,7 +154,7 @@ FT_BEGIN_HEADER
   FTC_MruList_Lookup( FTC_MruList   list,
                       FT_Pointer    key,
                       FTC_MruNode  *pnode );
-                      
+
 
   FT_EXPORT( void )
   FTC_MruList_Remove( FTC_MruList  list,
@@ -172,34 +172,35 @@ FT_BEGIN_HEADER
   FT_BEGIN_STMNT                                                            \
     FTC_MruNode*             _pfirst  = &(list)->nodes;                     \
     FTC_MruNode_CompareFunc  _compare = (FTC_MruNode_CompareFunc)(compare); \
-    FTC_MruNode              _first, _node;                              \
-                                                                         \
-                                                                         \
-    error  = 0;                                                          \
-    _first = *(_pfirst);                                                 \
-    _node  = NULL;                                                       \
-                                                                         \
-    if ( _first )                                                        \
-    {                                                                    \
-      _node = _first;                                                    \
-      do                                                                 \
-      {                                                                  \
-        if ( _compare( _node, (key) ) )                                  \
-        {                                                                \
-          if ( _node != _first )                                         \
-            FTC_MruNode_Up( _pfirst, _node );                            \
-                                                                         \
-          *(FTC_MruNode*)&(node) = _node;                                \
-          goto _MruOk;                                                   \
-        }                                                                \
-        _node = _node->next;                                             \
-                                                                         \
-      } while ( _node != _first) ;                                       \
-    }                                                                    \
-                                                                         \
-    error = FTC_MruList_New( (list), (key), (FTC_MruNode*)&(node) );     \
-  _MruOk:                                                                \
-    ;                                                                    \
+    FTC_MruNode              _first, _node, *_pnode;                        \
+                                                                            \
+                                                                            \
+    error  = 0;                                                             \
+    _first = *(_pfirst);                                                    \
+    _node  = NULL;                                                          \
+                                                                            \
+    if ( _first )                                                           \
+    {                                                                       \
+      _node = _first;                                                       \
+      do                                                                    \
+      {                                                                     \
+        if ( _compare( _node, (key) ) )                                     \
+        {                                                                   \
+          if ( _node != _first )                                            \
+            FTC_MruNode_Up( _pfirst, _node );                               \
+                                                                            \
+          _pnode = (FTC_MruNode*)(void*)&(node);                            \
+          *_pnode = _node;                                                  \
+          goto _MruOk;                                                      \
+        }                                                                   \
+        _node = _node->next;                                                \
+                                                                            \
+      } while ( _node != _first) ;                                          \
+    }                                                                       \
+                                                                            \
+    error = FTC_MruList_New( (list), (key), (FTC_MruNode*)(void*)&(node) ); \
+  _MruOk:                                                                   \
+    ;                                                                       \
   FT_END_STMNT
 
 #define FTC_MRULIST_LOOKUP( list, key, node, error ) \
@@ -208,7 +209,7 @@ FT_BEGIN_HEADER
 #else  /* !FTC_INLINE */
 
 #define FTC_MRULIST_LOOKUP( list, key, node, error ) \
-  error = FTC_MruList_Lookup( (list), (key), (FTC_MruNode*)&(node) ) 
+  error = FTC_MruList_Lookup( (list), (key), (FTC_MruNode*)&(node) )
 
 #endif /* !FTC_INLINE */
 

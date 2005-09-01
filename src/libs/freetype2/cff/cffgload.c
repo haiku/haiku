@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    OpenType Glyph Loader (body).                                        */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004 by                               */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005 by                         */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -825,7 +825,7 @@
     zone          = decoder->zones;
     stack         = decoder->top;
 
-    hinter = (T2_Hints_Funcs) builder->hints_funcs;
+    hinter = (T2_Hints_Funcs)builder->hints_funcs;
 
     builder->path_begun = 0;
 
@@ -842,7 +842,7 @@
     if ( hinter )
       hinter->open( hinter->hints );
 
-    /* now, execute loop */
+    /* now execute loop */
     while ( ip < limit )
     {
       CFF_Operator  op;
@@ -1266,7 +1266,7 @@
 
           if ( cff_builder_start_point ( builder, x, y ) ||
                check_points( builder, num_args / 2 )     )
-            goto Memory_Error;
+            goto Fail;
 
           if ( num_args < 2 || num_args & 1 )
             goto Stack_Underflow;
@@ -1291,9 +1291,9 @@
             FT_TRACE4(( op == cff_op_hlineto ? " hlineto"
                                              : " vlineto" ));
 
-            if ( cff_builder_start_point ( builder, x, y )     ||
-                 check_points( builder, num_args ) )
-              goto Memory_Error;
+            if ( cff_builder_start_point ( builder, x, y ) ||
+                 check_points( builder, num_args )         )
+              goto Fail;
 
             args = stack;
             while (args < decoder->top )
@@ -1304,7 +1304,7 @@
                 y += args[0];
 
               if ( cff_builder_add_point1( builder, x, y ) )
-                goto Memory_Error;
+                goto Fail;
 
               args++;
               phase ^= 1;
@@ -1322,7 +1322,7 @@
 
           if ( cff_builder_start_point ( builder, x, y ) ||
                check_points( builder, num_args / 2 )     )
-            goto Memory_Error;
+            goto Fail;
 
           args = stack;
           while ( args < decoder->top )
@@ -1344,8 +1344,8 @@
         case cff_op_vvcurveto:
           FT_TRACE4(( " vvcurveto" ));
 
-          if ( cff_builder_start_point ( builder, x, y ) )
-            goto Memory_Error;
+          if ( cff_builder_start_point( builder, x, y ) )
+            goto Fail;
 
           args = stack;
           if ( num_args & 1 )
@@ -1359,7 +1359,7 @@
             goto Stack_Underflow;
 
           if ( check_points( builder, 3 * ( num_args / 4 ) ) )
-            goto Memory_Error;
+            goto Fail;
 
           while ( args < decoder->top )
           {
@@ -1378,8 +1378,8 @@
         case cff_op_hhcurveto:
           FT_TRACE4(( " hhcurveto" ));
 
-          if ( cff_builder_start_point ( builder, x, y ) )
-            goto Memory_Error;
+          if ( cff_builder_start_point( builder, x, y ) )
+            goto Fail;
 
           args = stack;
           if ( num_args & 1 )
@@ -1393,7 +1393,7 @@
             goto Stack_Underflow;
 
           if ( check_points( builder, 3 * ( num_args / 4 ) ) )
-            goto Memory_Error;
+            goto Fail;
 
           while ( args < decoder->top )
           {
@@ -1418,8 +1418,8 @@
             FT_TRACE4(( op == cff_op_vhcurveto ? " vhcurveto"
                                                : " hvcurveto" ));
 
-            if ( cff_builder_start_point ( builder, x, y ) )
-              goto Memory_Error;
+            if ( cff_builder_start_point( builder, x, y ) )
+              goto Fail;
 
             args = stack;
             if (num_args < 4 || ( num_args % 4 ) > 1 )
@@ -1476,7 +1476,7 @@
 
             if ( cff_builder_start_point( builder, x, y ) ||
                  check_points( builder, num_lines + 3 )   )
-              goto Memory_Error;
+              goto Fail;
 
             args = stack;
 
@@ -1516,7 +1516,7 @@
 
             if ( cff_builder_start_point ( builder, x, y ) ||
                  check_points( builder, num_curves*3 + 2 ) )
-              goto Memory_Error;
+              goto Fail;
 
             args = stack;
 
@@ -1555,10 +1555,10 @@
 
             /* adding five more points; 4 control points, 1 on-curve point */
             /* make sure we have enough space for the start point if it    */
-            /* needs to be added..                                         */
+            /* needs to be added                                           */
             if ( cff_builder_start_point( builder, x, y ) ||
                  check_points( builder, 6 )               )
-              goto Memory_Error;
+              goto Fail;
 
             /* Record the starting point's y postion for later use */
             start_y = y;
@@ -1608,8 +1608,8 @@
 
             /* adding six more points; 4 control points, 2 on-curve points */
             if ( cff_builder_start_point( builder, x, y ) ||
-                 check_points ( builder, 6 )              )
-              goto Memory_Error;
+                 check_points( builder, 6 )               )
+              goto Fail;
 
             /* record the starting point's y-position for later use */
             start_y = y;
@@ -1661,7 +1661,7 @@
             /* adding six more points; 4 control points, 2 on-curve points */
             if ( cff_builder_start_point( builder, x, y ) ||
                  check_points( builder, 6 )               )
-               goto Memory_Error;
+              goto Fail;
 
             /* record the starting point's x, y postion for later use */
             start_x = x;
@@ -1724,7 +1724,7 @@
 
             if ( cff_builder_start_point( builder, x, y ) ||
                  check_points( builder, 6 )               )
-              goto Memory_Error;
+              goto Fail;
 
             args = stack;
             for ( count = 6; count > 0; count-- )
@@ -2175,6 +2175,7 @@
 
     FT_TRACE4(( "..end..\n\n" ));
 
+  Fail:
     return error;
 
   Syntax_Error:
@@ -2188,9 +2189,6 @@
   Stack_Overflow:
     FT_TRACE4(( "cff_decoder_parse_charstrings: stack overflow!" ));
     return CFF_Err_Stack_Overflow;
-
-  Memory_Error:
-    return builder->error;
   }
 
 
@@ -2468,8 +2466,19 @@
 
 #endif /* FT_CONFIG_OPTION_INCREMENTAL */
 
-    font_matrix = cff->top_font.font_dict.font_matrix;
-    font_offset = cff->top_font.font_dict.font_offset;
+    if ( cff->num_subfonts >= 1 )
+    {
+      FT_Byte  fd_index = cff_fd_select_get( &cff->fd_select, glyph_index );
+
+
+      font_matrix = cff->subfonts[fd_index]->font_dict.font_matrix;
+      font_offset = cff->subfonts[fd_index]->font_dict.font_offset;
+    }
+    else
+    {
+      font_matrix = cff->top_font.font_dict.font_matrix;
+      font_offset = cff->top_font.font_dict.font_offset;
+    }
 
     /* Now, set the metrics -- this is rather simple, as   */
     /* the left side bearing is the xMin, and the top side */

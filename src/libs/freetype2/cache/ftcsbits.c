@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType sbits manager (body).                                       */
 /*                                                                         */
-/*  Copyright 2000-2001, 2002, 2003, 2004 by                               */
+/*  Copyright 2000-2001, 2002, 2003, 2004, 2005 by                         */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -58,10 +58,11 @@
   }
 
 
-  FT_EXPORT_DEF( void )
-  FTC_SNode_Free( FTC_SNode  snode,
+  FT_LOCAL_DEF( void )
+  ftc_snode_free( FTC_Node   ftcsnode,
                   FTC_Cache  cache )
   {
+    FTC_SNode  snode  = (FTC_SNode)ftcsnode;
     FTC_SBit   sbit   = snode->sbits;
     FT_UInt    count  = snode->count;
     FT_Memory  memory = cache->memory;
@@ -76,14 +77,24 @@
   }
 
 
-  FT_LOCAL_DEF( void )
-  ftc_snode_free( FTC_SNode  snode,
+  FT_EXPORT_DEF( void )
+  FTC_SNode_Free( FTC_SNode  snode,
                   FTC_Cache  cache )
   {
-    FTC_SNode_Free( snode, cache );
+    ftc_snode_free( FTC_NODE( snode ), cache );
   }
 
 
+  /*
+   *  This function tries to load a small bitmap within a given FTC_SNode.
+   *  Note that it returns a non-zero error code _only_ in the case of
+   *  out-of-memory condition.  For all other errors (e.g., corresponding
+   *  to a bad font file), this function will mark the sbit as `unavailable'
+   *  and return a value of 0.
+   *
+   *  You should also read the comment within the @ftc_snode_compare
+   *  function below to see how out-of-memory is handled during a lookup.
+   */
   static FT_Error
   ftc_snode_load( FTC_SNode    snode,
                   FTC_Manager  manager,
@@ -136,8 +147,8 @@
 #define CHECK_BYTE( d )  ( temp = (FT_Byte)d, temp == d )
 
       /* horizontal advance in pixels */
-      xadvance = ( slot->metrics.horiAdvance + 32 ) >> 6;
-      yadvance = ( slot->metrics.vertAdvance + 32 ) >> 6;
+      xadvance = ( slot->advance.x + 32 ) >> 6;
+      yadvance = ( slot->advance.y + 32 ) >> 6;
 
       if ( !CHECK_BYTE( bitmap->rows  )     ||
            !CHECK_BYTE( bitmap->width )     ||
@@ -240,21 +251,29 @@
 
 
   FT_LOCAL_DEF( FT_Error )
-  ftc_snode_new( FTC_SNode  *psnode,
-                 FTC_GQuery  gquery,
+  ftc_snode_new( FTC_Node   *ftcpsnode,
+                 FT_Pointer  ftcgquery,
                  FTC_Cache   cache )
   {
+    FTC_SNode  *psnode = (FTC_SNode*)ftcpsnode;
+    FTC_GQuery  gquery = (FTC_GQuery)ftcgquery;
+
+
     return FTC_SNode_New( psnode, gquery, cache );
   }
 
 
-  FT_EXPORT_DEF( FT_ULong )
-  FTC_SNode_Weight( FTC_SNode  snode )
+  FT_LOCAL_DEF( FT_ULong )
+  ftc_snode_weight( FTC_Node   ftcsnode,
+                    FTC_Cache  cache )
   {
+    FTC_SNode  snode = (FTC_SNode)ftcsnode;
     FT_UInt    count = snode->count;
     FTC_SBit   sbit  = snode->sbits;
     FT_Int     pitch;
     FT_ULong   size;
+
+    FT_UNUSED( cache );
 
 
     FT_ASSERT( snode->count <= FTC_SBIT_ITEMS_PER_NODE );
@@ -279,21 +298,23 @@
   }
 
 
-  FT_LOCAL_DEF( FT_ULong )
-  ftc_snode_weight( FTC_SNode  snode )
+  FT_EXPORT_DEF( FT_ULong )
+  FTC_SNode_Weight( FTC_SNode  snode )
   {
-    return FTC_SNode_Weight( snode );
+    return ftc_snode_weight( FTC_NODE( snode ), NULL );
   }
 
 
-  FT_EXPORT_DEF( FT_Bool )
-  FTC_SNode_Compare( FTC_SNode   snode,
-                     FTC_GQuery  gquery,
+  FT_LOCAL_DEF( FT_Bool )
+  ftc_snode_compare( FTC_Node    ftcsnode,
+                     FT_Pointer  ftcgquery,
                      FTC_Cache   cache )
   {
-    FTC_GNode  gnode  = FTC_GNODE( snode );
-    FT_UInt    gindex = gquery->gindex;
-    FT_Bool    result;
+    FTC_SNode   snode  = (FTC_SNode)ftcsnode;
+    FTC_GQuery  gquery = (FTC_GQuery)ftcgquery;
+    FTC_GNode   gnode  = FTC_GNODE( snode );
+    FT_UInt     gindex = gquery->gindex;
+    FT_Bool     result;
 
 
     result = FT_BOOL( gnode->family == gquery->family                    &&
@@ -304,16 +325,59 @@
       FTC_SBit  sbit = snode->sbits + ( gindex - gnode->gindex );
 
 
+      /*
+       *  The following code illustrates what to do when you want to
+       *  perform operations that may fail within a lookup function.
+       *
+       *  Here, we want to load a small bitmap on-demand; we thus
+       *  need to call the `ftc_snode_load' function which may return
+       *  a non-zero error code only when we are out of memory (OOM).
+       *
+       *  The correct thing to do is to use @FTC_CACHE_TRYLOOP and
+       *  @FTC_CACHE_TRYLOOP_END in order to implement a retry loop
+       *  that is capable of flushing the cache incrementally when
+       *  an OOM errors occur.
+       *
+       *  However, we need to `lock' the node before this operation to
+       *  prevent it from being flushed within the loop.
+       *
+       *  When we exit the loop, we unlock the node, then check the `error' 
+       *  variable.  If it is non-zero, this means that the cache was
+       *  completely flushed and that no usable memory was found to load
+       *  the bitmap.
+       *
+       *  We then prefer to return a value of 0 (i.e., NO MATCH).  This
+       *  ensures that the caller will try to allocate a new node.
+       *  This operation consequently _fail_ and the lookup function
+       *  returns the appropriate OOM error code.
+       *
+       *  Note that `buffer == NULL && width == 255' is a hack used to
+       *  tag `unavailable' bitmaps in the array.  We should never try
+       *  to load these.
+       *
+       */
+
       if ( sbit->buffer == NULL && sbit->width != 255 )
       {
         FT_ULong  size;
+        FT_Error  error;
 
 
-        if ( !ftc_snode_load( snode, cache->manager,
-                              gindex, &size ) )
+        ftcsnode->ref_count++;  /* lock node to prevent flushing */
+                                /* in retry loop                 */
+
+        FTC_CACHE_TRYLOOP( cache )
         {
-          cache->manager->cur_weight += size;
+          error = ftc_snode_load( snode, cache->manager, gindex, &size );
         }
+        FTC_CACHE_TRYLOOP_END();
+
+        ftcsnode->ref_count--;  /* unlock the node */
+
+        if ( error )
+          result = 0;
+        else
+          cache->manager->cur_weight += size;
       }
     }
 
@@ -321,12 +385,12 @@
   }
 
 
-  FT_LOCAL_DEF( FT_Bool )
-  ftc_snode_compare( FTC_SNode   snode,
+  FT_EXPORT_DEF( FT_Bool )
+  FTC_SNode_Compare( FTC_SNode   snode,
                      FTC_GQuery  gquery,
                      FTC_Cache   cache )
   {
-    return FTC_SNode_Compare( snode, gquery, cache );
+    return ftc_snode_compare( FTC_NODE( snode ), gquery, cache );
   }
 
 

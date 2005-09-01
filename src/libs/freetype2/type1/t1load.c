@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Type 1 font loader (body).                                           */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004 by                               */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005 by                         */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -211,6 +211,159 @@
   }
 
 
+#define FT_INT_TO_FIXED( a )  ( (a) << 16 )
+#define FT_FIXED_TO_INT( a )  ( FT_RoundFix( a ) >> 16 )
+
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* Given a normalized (blend) coordinate, figure out the design          */
+  /* coordinate appropriate for that value.                                */
+  /*                                                                       */
+  FT_LOCAL_DEF( FT_Fixed )
+  mm_axis_unmap( PS_DesignMap  axismap,
+                 FT_Fixed      ncv )
+  {
+    int  j;
+
+
+    if ( ncv <= axismap->blend_points[0] )
+      return axismap->design_points[0];
+
+    for ( j = 1; j < axismap->num_points; ++j )
+    {
+      if ( ncv <= axismap->blend_points[j] )
+      {
+        FT_Fixed  t = FT_MulDiv( ncv - axismap->blend_points[j - 1],
+                                 0x10000L,
+                                 axismap->blend_points[j] -
+                                   axismap->blend_points[j - 1] );
+
+
+        return axismap->design_points[j - 1] +
+                 FT_MulDiv( t,
+                            axismap->design_points[j] - 
+                              axismap->design_points[j - 1],
+                            1L );
+      }
+    }
+
+    return axismap->design_points[axismap->num_points - 1];
+  }
+
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* Given a vector of weights, one for each design, figure out the        */
+  /* normalized axis coordinates which gave rise to those weights.         */
+  /*                                                                       */
+  FT_LOCAL_DEF( void )
+  mm_weights_unmap( FT_Fixed*  weights,
+                    FT_Fixed*  axiscoords,
+                    FT_UInt    axis_count )
+  {
+    FT_ASSERT( axis_count <= T1_MAX_MM_AXIS );
+
+    if ( axis_count == 1 )
+      axiscoords[0] = weights[1];
+
+    else if ( axis_count == 2 )
+    {
+      axiscoords[0] = weights[3] + weights[1];
+      axiscoords[1] = weights[3] + weights[2];
+    }
+
+    else if ( axis_count == 3 )
+    {
+      axiscoords[0] = weights[7] + weights[5] + weights[3] + weights[1];
+      axiscoords[1] = weights[7] + weights[6] + weights[3] + weights[2];
+      axiscoords[2] = weights[7] + weights[6] + weights[5] + weights[4];
+    }
+
+    else
+    {
+      axiscoords[0] = weights[15] + weights[13] + weights[11] + weights[9] +
+                        weights[7] + weights[5] + weights[3] + weights[1];
+      axiscoords[1] = weights[15] + weights[14] + weights[11] + weights[10] +
+                        weights[7] + weights[6] + weights[3] + weights[2];
+      axiscoords[2] = weights[15] + weights[14] + weights[13] + weights[12] +
+                        weights[7] + weights[6] + weights[5] + weights[4];
+      axiscoords[3] = weights[15] + weights[14] + weights[13] + weights[12] +
+                        weights[11] + weights[10] + weights[9] + weights[8];
+    }
+  }
+
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* Just a wrapper around T1_Get_Multi_Master to support the different    */
+  /*  arguments needed by the GX var distortable fonts.                    */
+  /*                                                                       */
+  FT_LOCAL_DEF( FT_Error )
+  T1_Get_MM_Var( T1_Face      face,
+                 FT_MM_Var*  *master )
+  {
+    FT_Memory        memory = face->root.memory;
+    FT_MM_Var       *mmvar;
+    FT_Multi_Master  mmaster;
+    FT_Error         error;
+    FT_UInt          i;
+    FT_Fixed         axiscoords[T1_MAX_MM_AXIS];
+    PS_Blend         blend = face->blend;
+
+
+    error = T1_Get_Multi_Master( face, &mmaster );
+    if ( error )
+      goto Exit;
+    if ( FT_ALLOC( mmvar,
+                   sizeof ( FT_MM_Var ) +
+                     mmaster.num_axis * sizeof ( FT_Var_Axis ) ) )
+      goto Exit;
+
+    mmvar->num_axis        = mmaster.num_axis;
+    mmvar->num_designs     = mmaster.num_designs;
+    mmvar->num_namedstyles = (FT_UInt)-1;                /* Does not apply */
+    mmvar->axis            = (FT_Var_Axis*)&mmvar[1];
+                                      /* Point to axes after MM_Var struct */
+    mmvar->namedstyle      = NULL;
+
+    for ( i = 0 ; i < mmaster.num_axis; ++i )
+    {
+      mmvar->axis[i].name    = mmaster.axis[i].name;
+      mmvar->axis[i].minimum = FT_INT_TO_FIXED( mmaster.axis[i].minimum);
+      mmvar->axis[i].maximum = FT_INT_TO_FIXED( mmaster.axis[i].maximum);
+      mmvar->axis[i].def     = ( mmvar->axis[i].minimum +
+                                   mmvar->axis[i].maximum ) / 2;
+                            /* Does not apply.  But this value is in range */
+      mmvar->axis[i].strid   = 0xFFFFFFFFLU;   /* Does not apply */
+      mmvar->axis[i].tag     = 0xFFFFFFFFLU;   /* Does not apply */
+
+      if ( ft_strcmp( mmvar->axis[i].name, "Weight" ) == 0 )
+        mmvar->axis[i].tag = FT_MAKE_TAG( 'w', 'g', 'h', 't' );
+      else if ( ft_strcmp( mmvar->axis[i].name, "Width" ) == 0 )
+        mmvar->axis[i].tag = FT_MAKE_TAG( 'w', 'd', 't', 'h' );
+      else if ( ft_strcmp( mmvar->axis[i].name, "OpticalSize" ) == 0 )
+        mmvar->axis[i].tag = FT_MAKE_TAG( 'o', 'p', 's', 'z' );
+    }
+
+    if ( blend->num_designs == 1U << blend->num_axis )
+    {
+      mm_weights_unmap( blend->default_weight_vector,
+                        axiscoords,
+                        blend->num_axis );
+
+      for ( i = 0; i < mmaster.num_axis; ++i )
+        mmvar->axis[i].def = mm_axis_unmap( &blend->design_map[i],
+                                            axiscoords[i] );
+    }
+
+    *master = mmvar;
+
+  Exit:
+    return error;
+  }
+
+
   FT_LOCAL_DEF( FT_Error )
   T1_Set_MM_Blend( T1_Face    face,
                    FT_UInt    num_coords,
@@ -280,14 +433,14 @@
         FT_Long       design  = coords[n];
         FT_Fixed      the_blend;
         PS_DesignMap  map     = blend->design_map + n;
-        FT_Fixed*     designs = map->design_points;
+        FT_Long*      designs = map->design_points;
         FT_Fixed*     blends  = map->blend_points;
         FT_Int        before  = -1, after = -1;
 
 
         for ( p = 0; p < (FT_UInt)map->num_points; p++ )
         {
-          FT_Fixed  p_design = designs[p];
+          FT_Long  p_design = designs[p];
 
 
           /* exact match? */
@@ -326,6 +479,33 @@
     }
 
     return error;
+  }
+
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* Just a wrapper around T1_Set_MM_Design to support the different       */
+  /* arguments needed by the GX var distortable fonts.                     */
+  /*                                                                       */
+  FT_LOCAL_DEF( FT_Error )
+  T1_Set_Var_Design( T1_Face    face,
+                     FT_UInt    num_coords,
+                     FT_Fixed*  coords )
+  {
+     FT_Long   lcoords[4];          /* maximum axis count is 4 */
+     FT_UInt   i;
+     FT_Error  error;
+
+
+     error = T1_Err_Invalid_Argument;
+     if ( num_coords <= 4 && num_coords > 0 )
+     {
+       for ( i = 0; i < num_coords; ++i )
+         lcoords[i] = FT_FIXED_TO_INT( coords[i] );
+       error = T1_Set_MM_Design( face, num_coords, lcoords );
+     }
+
+     return error;
   }
 
 
@@ -828,7 +1008,7 @@
       *base = parser->root.cursor + 1;
 
       parser->root.cursor += *size + 1;
-      return 1;
+      return !parser->root.error;
     }
 
     FT_ERROR(( "read_binary_data: invalid size field\n" ));
@@ -1022,6 +1202,8 @@
 
             parser->root.cursor = cur;
             T1_Skip_PS_Token( parser );
+            if ( parser->root.error )
+              return;
 
             len = parser->root.cursor - cur;
 
@@ -1097,7 +1279,9 @@
 
     /* position the parser right before the `dup' of the first subr */
     T1_Skip_PS_Token( parser );         /* `array' */
-    T1_Skip_Spaces  ( parser );
+    if ( parser->root.error )
+      return;
+    T1_Skip_Spaces( parser );
 
     /* initialize subrs array -- with synthetic fonts it is possible */
     /* we get here twice                                             */
@@ -1135,6 +1319,8 @@
       /* `noaccess' & `put'.  We position the parser right     */
       /* before the next `dup', if any.                        */
       T1_Skip_PS_Token( parser );   /* `NP' or `|' or `noaccess' */
+      if ( parser->root.error )
+        return;
       T1_Skip_Spaces  ( parser );
 
       if ( ft_strncmp( (char*)parser->root.cursor, "put", 3 ) == 0 )
@@ -1262,7 +1448,20 @@
         if ( cur[0] == 'd' &&
              cur[1] == 'e' &&
              cur[2] == 'f' )
-          break;
+        {
+          /* There are fonts which have this: */
+          /*                                  */
+          /*   /CharStrings 118 dict def      */
+          /*   Private begin                  */
+          /*   CharStrings begin              */
+          /*   ...                            */
+          /*                                  */
+          /* To catch this we ignore `def' if */
+          /* no charstring has actually been  */
+          /* seen.                            */
+          if ( n )
+            break;
+        }
 
         if ( cur[0] == 'e' &&
              cur[1] == 'n' &&
@@ -1271,6 +1470,8 @@
       }
 
       T1_Skip_PS_Token( parser );
+      if ( parser->root.error )
+        return;
 
       if ( *cur == '/' )
       {
@@ -1543,7 +1744,9 @@
             break;
 
           T1_Skip_PS_Token( parser );
-          T1_Skip_Spaces  ( parser );
+          if ( parser->root.error )
+            goto Exit;
+          T1_Skip_Spaces( parser );
           cur = parser->root.cursor;
         }
 
@@ -1579,6 +1782,8 @@
       {
         start_binary = cur;
         T1_Skip_PS_Token( parser );
+        if ( parser->root.error )
+          goto Exit;
         have_integer = 1;
       }
 
@@ -1621,6 +1826,8 @@
 
         parser->root.cursor = cur;
         T1_Skip_PS_Token( parser );
+        if ( parser->root.error )
+          goto Exit;
 
         len = parser->root.cursor - cur;
 
@@ -1640,9 +1847,9 @@
             if ( !name )
               break;
 
-            if ( cur[0] == name[0]                      &&
-                 len == ft_strlen( (const char *)name ) &&
-                 ft_memcmp( cur, name, len ) == 0       )
+            if ( cur[0] == name[0]                                  &&
+                 len == (FT_PtrDist)ft_strlen( (const char *)name ) &&
+                 ft_memcmp( cur, name, len ) == 0                   )
             {
               /* We found it -- run the parsing callback! */
               /* We only record the first instance of any */

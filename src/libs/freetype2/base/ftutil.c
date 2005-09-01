@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType utility file for memory and list management (body).         */
 /*                                                                         */
-/*  Copyright 2002 by                                                      */
+/*  Copyright 2002, 2004, 2005 by                                          */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -19,6 +19,7 @@
 #include <ft2build.h>
 #include FT_INTERNAL_DEBUG_H
 #include FT_INTERNAL_MEMORY_H
+#include FT_INTERNAL_OBJECTS_H
 #include FT_LIST_H
 
 
@@ -80,6 +81,38 @@
   /* documentation is in ftmemory.h */
 
   FT_BASE_DEF( FT_Error )
+  FT_QAlloc( FT_Memory  memory,
+             FT_Long    size,
+             void*     *P )
+  {
+    FT_ASSERT( P != 0 );
+
+    if ( size > 0 )
+    {
+      *P = memory->alloc( memory, size );
+      if ( !*P )
+      {
+        FT_ERROR(( "FT_QAlloc:" ));
+        FT_ERROR(( " Out of memory? (%ld requested)\n",
+                   size ));
+
+        return FT_Err_Out_Of_Memory;
+      }
+    }
+    else
+      *P = NULL;
+
+    FT_TRACE7(( "FT_QAlloc:" ));
+    FT_TRACE7(( " size = %ld, block = 0x%08p, ref = 0x%08p\n",
+                size, *P, P ));
+
+    return FT_Err_Ok;
+  }
+
+
+  /* documentation is in ftmemory.h */
+
+  FT_BASE_DEF( FT_Error )
   FT_Realloc( FT_Memory  memory,
               FT_Long    current,
               FT_Long    size,
@@ -113,6 +146,45 @@
 
   Fail:
     FT_ERROR(( "FT_Realloc:" ));
+    FT_ERROR(( " Failed (current %ld, requested %ld)\n",
+               current, size ));
+    return FT_Err_Out_Of_Memory;
+  }
+
+
+  /* documentation is in ftmemory.h */
+
+  FT_BASE_DEF( FT_Error )
+  FT_QRealloc( FT_Memory  memory,
+               FT_Long    current,
+               FT_Long    size,
+               void**     P )
+  {
+    void*  Q;
+
+
+    FT_ASSERT( P != 0 );
+
+    /* if the original pointer is NULL, call FT_QAlloc() */
+    if ( !*P )
+      return FT_QAlloc( memory, size, P );
+
+    /* if the new block if zero-sized, clear the current one */
+    if ( size <= 0 )
+    {
+      FT_Free( memory, P );
+      return FT_Err_Ok;
+    }
+
+    Q = memory->realloc( memory, current, size, *P );
+    if ( !Q )
+      goto Fail;
+
+    *P = Q;
+    return FT_Err_Ok;
+
+  Fail:
+    FT_ERROR(( "FT_QRealloc:" ));
     FT_ERROR(( " Failed (current %ld, requested %ld)\n",
                current, size ));
     return FT_Err_Out_Of_Memory;
@@ -324,6 +396,28 @@
 
     list->head = 0;
     list->tail = 0;
+  }
+
+
+  FT_BASE( FT_UInt32 )
+  ft_highpow2( FT_UInt32  value )
+  {
+    FT_UInt32  value2;
+
+
+    /*
+     *  We simply clear the lowest bit in each iteration.  When
+     *  we reach 0, we know that the previous value was our result.
+     */
+    for ( ;; )
+    {
+      value2 = value & (value - 1);  /* clear lowest bit */
+      if ( value2 == 0 )
+        break;
+
+      value = value2;
+    }
+    return value;
   }
 
 
