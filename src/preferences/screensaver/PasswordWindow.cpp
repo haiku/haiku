@@ -10,12 +10,13 @@
 #include "PasswordWindow.h"
 #include <stdio.h>
 #include <Alert.h>
+#include <Box.h>
 #include <RadioButton.h>
 #include <Screen.h>
 
 
 PasswordWindow::PasswordWindow(ScreenSaverPrefs &prefs) 
-	: BWindow(BRect(100,100,380,250),"",B_MODAL_WINDOW_LOOK,B_MODAL_APP_WINDOW_FEEL,B_NOT_RESIZABLE),
+	: BWindow(BRect(100,100,380,249),"",B_MODAL_WINDOW_LOOK,B_MODAL_APP_WINDOW_FEEL,B_NOT_RESIZABLE),
 	fPrefs(prefs)
 {
 	Setup();
@@ -32,29 +33,29 @@ PasswordWindow::PasswordWindow(ScreenSaverPrefs &prefs)
 void 
 PasswordWindow::Setup() 
 {
-	BView *owner=new BView(Bounds(),"ownerView",B_FOLLOW_NONE,B_WILL_DRAW);
-	owner->SetViewColor(216,216,216);
+	BBox *owner=new BBox(Bounds(),"ownerView",B_FOLLOW_NONE,B_WILL_DRAW, B_PLAIN_BORDER);
 	AddChild(owner);
-	fUseNetwork=new BRadioButton(BRect(15,10,160,20),"useNetwork","Use Network password",new BMessage(kButton_changed),B_FOLLOW_NONE);
+	fUseNetwork=new BRadioButton(BRect(14,10,159,20),"useNetwork","Use Network password",new BMessage(kButton_changed),B_FOLLOW_NONE);
 	owner->AddChild(fUseNetwork);
 	fUseCustom=new BRadioButton(BRect(30,50,130,60),"fUseCustom","Use custom password",new BMessage(kButton_changed),B_FOLLOW_NONE);
 
-	fCustomBox=new BBox(BRect(10,30,270,105),"custBeBox",B_FOLLOW_NONE);
+	fCustomBox=new BBox(BRect(9,30,269,105),"custBeBox",B_FOLLOW_NONE);
 	fCustomBox->SetLabel(fUseCustom);
-	fPassword=new BTextControl(BRect(10,20,250,35),"pwdCntrl","Password:",NULL,B_FOLLOW_NONE);
-	fConfirm=new BTextControl(BRect(10,45,250,60),"fConfirmCntrl","Confirm fPassword:",NULL,B_FOLLOW_NONE);
+	fPassword=new BTextControl(BRect(10,20,251,35),"pwdCntrl","Password:",NULL,B_FOLLOW_NONE);
+	fConfirm=new BTextControl(BRect(10,45,251,60),"fConfirmCntrl","Confirm password:",NULL,B_FOLLOW_NONE);
 	fPassword->SetAlignment(B_ALIGN_RIGHT,B_ALIGN_LEFT);
-	fPassword->SetDivider(90);
+	float divider = be_plain_font->StringWidth("Confirm password:") + 5.0;
+	fPassword->SetDivider(divider);
 	fPassword->TextView()->HideTyping(true);
 	fConfirm->SetAlignment(B_ALIGN_RIGHT,B_ALIGN_LEFT);
-	fConfirm->SetDivider(90);
+	fConfirm->SetDivider(divider);
 	fConfirm->TextView()->HideTyping(true);
 	fCustomBox->AddChild(fPassword);
 	fCustomBox->AddChild(fConfirm);
 	owner->AddChild(fCustomBox);
 
-	fDone=new BButton(BRect(200,120,275,130),"done","Done",new BMessage (kDone_clicked),B_FOLLOW_NONE);
-	fCancel=new BButton(BRect(115,120,190,130),"cancel","Cancel",new BMessage (kCancel_clicked),B_FOLLOW_NONE);
+	fDone = new BButton(BRect(194,118,269,129),"done","Done",new BMessage (kDone_clicked),B_FOLLOW_NONE);
+	fCancel = new BButton(BRect(109,118,184,129),"cancel","Cancel",new BMessage (kCancel_clicked),B_FOLLOW_NONE);
 	owner->AddChild(fDone);
 	owner->AddChild(fCancel);
 	fDone->MakeDefault(true);
