@@ -100,19 +100,15 @@ if [ -n "$floppy" ]; then
 	esac
 fi
 
-# BeOS
-if [ "${platform}" = "BeOS" ] ; then
-	standard_gcc_settings
-
-# Linux
-else if [ "${platform}" = "Linux" ] ; then
-	standard_gcc_settings
-
-# Unknown platform
-else
-	echo Unsupported platform: ${platform}
-	exit 1
-fi; fi
+# platform specific GCC settings
+case "$platform" in
+	BeOS | Haiku | Linux)
+		standard_gcc_settings ;;
+	*)
+		# Unknown platform
+		echo Unsupported platform: ${platform}
+		exit 1 ;;
+esac
 
 # Generate BuildConfig
 cat << EOF > build/BuildConfig
