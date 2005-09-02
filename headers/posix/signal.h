@@ -143,30 +143,30 @@ int        sigsuspend(const sigset_t *mask);
 
 int        sigemptyset(sigset_t *set);
 int        sigfillset(sigset_t *set);
-static int sigaddset(sigset_t *set, int signo);
-static int sigdelset(sigset_t *set, int signo);
-static int sigismember(const sigset_t *set, int signo);
+int sigaddset(sigset_t *set, int signo);
+int sigdelset(sigset_t *set, int signo);
+int sigismember(const sigset_t *set, int signo);
 
 const char *strsignal(int sig);
 
 const void  set_signal_stack(void *ptr, size_t size);
 int         sigaltstack(const stack_t *ss, stack_t *oss);         /* XXXdbg */
 
-static inline int
+extern inline int
 sigismember(const sigset_t *set, int sig)
 {
 	sigset_t mask = (((sigset_t) 1) << (( sig ) - 1)) ;	
 	return   (*set & mask) ? 1 : 0 ;	
 }
 
-static inline int
+extern inline int
 sigaddset(sigset_t *set, int sig)	
 {
 	sigset_t mask = (((sigset_t) 1) << (( sig ) - 1)) ;	
 	return   ((*set |= mask), 0) ;	
 }
 
-static inline int
+extern inline int
 sigdelset(sigset_t *set, int sig)	
 {
 	sigset_t mask = (((sigset_t) 1) << (( sig ) - 1)) ;	

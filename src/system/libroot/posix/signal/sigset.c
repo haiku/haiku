@@ -38,3 +38,27 @@ sigfillset(sigset_t *set)
 	return 0;
 }
 
+
+int
+sigismember(const sigset_t *set, int sig)
+{
+	sigset_t mask = (((sigset_t) 1) << (( sig ) - 1)) ;
+	return   (*set & mask) ? 1 : 0 ;
+}
+
+
+int
+sigaddset(sigset_t *set, int sig)
+{
+	sigset_t mask = (((sigset_t) 1) << (( sig ) - 1)) ;
+	return   ((*set |= mask), 0) ;
+}
+
+
+int
+sigdelset(sigset_t *set, int sig)
+{
+	sigset_t mask = (((sigset_t) 1) << (( sig ) - 1)) ;
+	return   ((*set &= ~mask), 0) ;
+}
+
