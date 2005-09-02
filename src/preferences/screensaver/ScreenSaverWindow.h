@@ -9,6 +9,7 @@
 
 #ifndef _ScreenSaverWindow_H
 #define _ScreenSaverWindow_H
+#include <CheckBox.h>
 #include <FilePanel.h>
 #include "PasswordWindow.h"
 #include "ScreenSaverPrefs.h"

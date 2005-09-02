@@ -64,31 +64,31 @@ UnitsToSlider(bigtime_t val)
 }
 
 
-class ModulesTab : public BTab
+class CustomTab : public BTab
 {
 public:
-	ModulesTab(ScreenSaverWin *win, BView *view = NULL);
-	virtual ~ModulesTab();
+	CustomTab(ScreenSaverWin *win, BView *view = NULL);
+	virtual ~CustomTab();
 	virtual void Select(BView *view);
 private:
 	ScreenSaverWin *fWin;
 };
 
 
-ModulesTab::ModulesTab(ScreenSaverWin *win, BView *view = NULL)
+CustomTab::CustomTab(ScreenSaverWin *win, BView *view = NULL)
 	: BTab(view),
 	fWin(win)
 {
 
 }
 
-ModulesTab::~ModulesTab()
+CustomTab::~CustomTab()
 {
 }
 
 
 void
-ModulesTab::Select(BView *view)
+CustomTab::Select(BView *view)
 {
 	BTab::Select(view);
 	fWin->SelectCurrentModule();
@@ -98,9 +98,10 @@ ModulesTab::Select(BView *view)
 ScreenSaverWin::ScreenSaverWin() 
 	: BWindow(BRect(50,50,496,375),"OBOS Screen Saver",
 		B_TITLED_WINDOW,B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE) ,
-	fFadeState(0),fNoFadeState(0),
-	fSelectedAddonFileName(NULL),
+	fFadeState(0),fNoFadeState(0), fListView1(NULL),
+	fSelectedAddonFileName(NULL), 
 	fCurrentAddon(NULL), fTestButton(NULL),
+	fEnableCheckbox(NULL),
 	fTurnOffMinutes(NULL), fRunMinutes(NULL),
 	fPasswordMinutes(NULL), fPasswordButton(NULL),
 	fFadeNowString(NULL),
@@ -108,7 +109,8 @@ ScreenSaverWin::ScreenSaverWin()
 	fDontFadeString(NULL), fDontFadeString2(NULL),
 	fFadeNow(NULL),fFadeNever(NULL),
 	fPwMessenger(NULL), fFilePanel(NULL),
-	fSettingsArea(NULL) 
+	fSettingsArea(NULL)
+
 {
 	SetupForm();
 }
@@ -125,6 +127,7 @@ ScreenSaverWin::SaverSelected()
 {
 	CALLED();
 	UpdateStatus();
+	fPrefs.SaveSettings();
 	if (fListView1->CurrentSelection()>=0) {
 		if (fPreviewDisplay->ScreenSaver())
 			fPreviewDisplay->ScreenSaver()->StopConfig();
@@ -143,7 +146,7 @@ ScreenSaverWin::SaverSelected()
 			
 		if (fPreviewDisplay->ScreenSaver())
 			fPreviewDisplay->ScreenSaver()->StartConfig(fSettingsArea);
-		}
+	}
 }
 
 
@@ -256,7 +259,7 @@ ScreenSaverWin::SetupForm()
 	fFilePanel = new BFilePanel();
 
 	BRect r = Bounds();
-	BTab *tab;
+	BTab *tab1, *tab2;
 	
 // Create a background view
 	BView *background = new BView(r,"background",B_FOLLOW_NONE,0);
@@ -274,20 +277,21 @@ ScreenSaverWin::SetupForm()
 // Time to load the settings into a message and implement them...
 	fPrefs.LoadSettings();
 
-	tab = new BTab();
+	tab2 = new BTab();
 	fTab2 = new BView(r,"Fade",B_FOLLOW_NONE,0);
-	fTabView->AddTab(fTab2, tab);
-	tab->SetLabel("Fade");
+	tab2->SetLabel("Fade");
 
-	tab = new ModulesTab(this);
+	tab1 = new CustomTab(this);
 	fTab1 = new BView(r,"Modules",B_FOLLOW_NONE,0);
-	fTabView->AddTab(fTab1, tab);
-	tab->SetLabel("Modules");
-	background->AddChild(fTabView);
+	tab1->SetLabel("Modules");
 
 // Create the controls inside the tabs
 	SetupTab2();
 	SetupTab1();
+	
+	fTabView->AddTab(fTab2, tab2);
+	fTabView->AddTab(fTab1, tab1);
+	background->AddChild(fTabView);
 
 // Create the password editing window
 	fPwWin = new PasswordWindow(fPrefs);
@@ -295,7 +299,7 @@ ScreenSaverWin::SetupForm()
 	fPwWin->Run();
 
 	MoveTo(fPrefs.WindowFrame().left,fPrefs.WindowFrame().top);
-	fTabView->Select(fPrefs.WindowTab());
+
 	fEnableCheckbox->SetValue(fPrefs.TimeFlags());
 	fRunSlider->SetValue(UnitsToSlider(fPrefs.BlankTime()));
 	fTurnOffSlider->SetValue(UnitsToSlider(fPrefs.OffTime()));
@@ -303,6 +307,8 @@ ScreenSaverWin::SetupForm()
 	fFadeNever->setDirection(fPrefs.GetNeverBlankCorner());
 	fPasswordCheckbox->SetValue(fPrefs.LockEnable());
 	fPasswordSlider->SetValue(UnitsToSlider(fPrefs.PasswordTime()));
+
+	fTabView->Select(fPrefs.WindowTab());
 	SelectCurrentModule();
 	UpdateStatus();
 } 
@@ -311,17 +317,19 @@ ScreenSaverWin::SetupForm()
 void
 ScreenSaverWin::SelectCurrentModule()
 {
+	CALLED();
+	
 	int32 count = fListView1->CountItems();
-        for (int32 i=0; i<count; i++) {
-                ScreenSaverItem *item = dynamic_cast<ScreenSaverItem*>(fListView1->ItemAt(i));
-                if ((strcmp(fPrefs.ModuleName(), item->Text()) == 0)
-                        || (strcmp(fPrefs.ModuleName(),"") == 0 && strcmp(item->Text(), "Blackness") ==0)) {
-                        fListView1->Select(i);
-                        SaverSelected();
-                        fListView1->ScrollToSelection();
-                        break;
-                }
-        }
+	for (int32 i=0; i<count; i++) {
+		ScreenSaverItem *item = dynamic_cast<ScreenSaverItem*>(fListView1->ItemAt(i));
+		if ((strcmp(fPrefs.ModuleName(), item->Text()) == 0)
+			|| (strcmp(fPrefs.ModuleName(),"") == 0 && strcmp(item->Text(), "Blackness") ==0)) {
+			fListView1->Select(i);
+			SaverSelected();
+			fListView1->ScrollToSelection();
+			break;
+		}
+	}
 }
 
 
@@ -454,12 +462,12 @@ ScreenSaverWin::SetupTab2()
 
 	// Run Module
 	topEdge=26;
-	fEnableScreenSaverBox->AddChild( fStringView1 = new BStringView(BRect(21,topEdge,101,topEdge+stringHeight),"StringView1","Run module"));
+	fEnableScreenSaverBox->AddChild( fStringView1 = new BStringView(BRect(40,topEdge,101,topEdge+stringHeight),"StringView1","Run module"));
 	commonLookAndFeel(fStringView1,false,false);
 	fStringView1->SetText("Run module");
 	fStringView1->SetAlignment(B_ALIGN_LEFT);
 
-	fEnableScreenSaverBox->AddChild( fRunSlider = new BSlider(BRect(132,topEdge,415,topEdge+sliderHeight),"RunSlider","minutes", new BMessage(kRunSliderChanged), 0, 25));
+	fEnableScreenSaverBox->AddChild( fRunSlider = new BSlider(BRect(135,topEdge,420,topEdge+sliderHeight),"RunSlider","minutes", new BMessage(kRunSliderChanged), 0, 25));
 	fRunSlider->SetModificationMessage(new BMessage(kRunSliderChanged));
 	commonLookAndFeel(fRunSlider,true,true);
 	float w,h;
@@ -473,7 +481,7 @@ ScreenSaverWin::SetupTab2()
 	fTurnOffScreenCheckBox->SetLabel("Turn off screen");
 	fTurnOffScreenCheckBox->SetResizingMode(B_FOLLOW_NONE);
 
-	fEnableScreenSaverBox->AddChild( fTurnOffSlider = new BSlider(BRect(132,topEdge,415,topEdge+sliderHeight),"TurnOffSlider","", new BMessage(kTurnOffSliderChanged), 0, 25));
+	fEnableScreenSaverBox->AddChild( fTurnOffSlider = new BSlider(BRect(135,topEdge,420,topEdge+sliderHeight),"TurnOffSlider","", new BMessage(kTurnOffSliderChanged), 0, 25));
 	fTurnOffSlider->SetModificationMessage(new BMessage(kTurnOffSliderChanged));
 	commonLookAndFeel(fTurnOffSlider,true,true);
 
@@ -483,7 +491,7 @@ ScreenSaverWin::SetupTab2()
 	commonLookAndFeel(fPasswordCheckbox,false,true);
 	fPasswordCheckbox->SetLabel("Password lock");
 
-	fEnableScreenSaverBox->AddChild( fPasswordSlider = new BSlider(BRect(132,topEdge,415,topEdge+sliderHeight),"PasswordSlider","", new BMessage(kPasswordSliderChanged), 0, 25));
+	fEnableScreenSaverBox->AddChild( fPasswordSlider = new BSlider(BRect(135,topEdge,420,topEdge+sliderHeight),"PasswordSlider","", new BMessage(kPasswordSliderChanged), 0, 25));
 	fPasswordSlider->SetModificationMessage(new BMessage(kPasswordSliderChanged));
 	commonLookAndFeel(fPasswordSlider,true,true);
 

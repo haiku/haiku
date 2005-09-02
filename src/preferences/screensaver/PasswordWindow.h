@@ -10,9 +10,7 @@
 #define PASSWORDWINDOW_H
 
 #include <Window.h>
-#include <CheckBox.h>
 #include <String.h>
-#include <Box.h>
 #include <TextControl.h>
 #include <Button.h>
 #include <Constants.h>
