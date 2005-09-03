@@ -1757,6 +1757,42 @@ RootLayer::SetEventMaskLayer(Layer *lay, uint32 mask, uint32 options)
 
 	Lock();
 
+	if (mask & B_POINTER_EVENTS) {
+		if (fMouseEventsLayerList.HasItem(lay))
+			fMouseEventsLayerList.AddItem(lay);
+	}
+	else {
+		if (options == 0)
+			fMouseEventsLayerList.RemoveItem(lay);
+	}
+
+	if (mask & B_KEYBOARD_EVENTS) {
+		if (fKeyboardEventsLayerList.HasItem(lay))
+			fKeyboardEventsLayerList.AddItem(lay);
+	}
+	else {
+		if (options == 0)
+			fKeyboardEventsLayerList.RemoveItem(lay);
+	}
+
+	// TODO: set options!!!
+	// B_NO_POINTER_HISTORY only! How? By telling to the input_server?
+	
+	Unlock();
+
+	return returnValue;
+}
+
+bool
+RootLayer::SetMouseEventMaskLayer(Layer *lay, uint32 mask, uint32 options)
+{
+	if (!lay)
+		return false;
+
+	bool returnValue = true;
+
+	Lock();
+
 	if (fEventMaskLayer && fEventMaskLayer != lay) {
 		fprintf(stderr, "WARNING: fEventMaskLayer already set and different than the required one!\n");
 		returnValue = false;

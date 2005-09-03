@@ -115,6 +115,7 @@ public:
 			BMessage*			DragMessage(void) const;
 
 			bool				SetEventMaskLayer(Layer *lay, uint32 mask, uint32 options);
+			bool				SetMouseEventMaskLayer(Layer *lay, uint32 mask, uint32 options);
 
 			void				LayerRemoved(Layer* layer);
 
@@ -176,6 +177,8 @@ friend class Desktop;
 			WinBorder*			fMouseTargetWinBorder;
 			int32				fViewAction;
 			Layer*				fEventMaskLayer;
+			BList				fMouseEventsLayerList;
+			BList				fKeyboardEventsLayerList;
 
 			BLocker				fAllRegionsLock;
 

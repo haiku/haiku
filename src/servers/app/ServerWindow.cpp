@@ -668,7 +668,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			fLink.Flush();
 			break;
 		}
-		case AS_LAYER_SET_MOUSE_EVENT_MASK:
+		case AS_LAYER_SET_EVENT_MASK:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_MOUSE_EVENT_MASK: Layer name: %s\n", fTitle, fCurrentLayer->Name()));			
 
@@ -680,6 +680,19 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			if (myRootLayer)
 				myRootLayer->SetEventMaskLayer(fCurrentLayer, mask, options);
+		}
+		case AS_LAYER_SET_MOUSE_EVENT_MASK:
+		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_MOUSE_EVENT_MASK: Layer name: %s\n", fTitle, fCurrentLayer->Name()));			
+
+			uint32		mask;
+			uint32		options;
+
+			link.Read<uint32>(&mask);
+			link.Read<uint32>(&options);
+
+			if (myRootLayer)
+				myRootLayer->SetMouseEventMaskLayer(fCurrentLayer, mask, options);
 			break;
 		}
 		case AS_LAYER_MOVE_TO:
