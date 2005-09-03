@@ -1793,6 +1793,24 @@ RootLayer::SetMouseEventMaskLayer(Layer *lay, uint32 mask, uint32 options)
 
 	Lock();
 
+#if 0 // to be removed when the new "event" stuff is ready
+	// TODO: fEventMaskLayer to be changed in fMouseEventLayer
+	fEventMaskLayer = lay;
+	if (mask & B_POINTER_EVENTS) {
+		if (fMouseEventsLayerList.HasItem(lay))
+			fMouseEventsLayerList.AddItem(lay);
+	}
+
+	if (mask & B_KEYBOARD_EVENTS) {
+		if (fKeyboardEventsLayerList.HasItem(lay))
+			fKeyboardEventsLayerList.AddItem(lay);
+	}
+
+	// TODO: set options!!!
+	// B_NO_POINTER_HISTORY How? By telling to the input_server?
+	// B_SUSPEND_VIEW_FOCUS
+	// B_LOCK_WINDOW_FOCUS
+#else
 	if (fEventMaskLayer && fEventMaskLayer != lay) {
 		fprintf(stderr, "WARNING: fEventMaskLayer already set and different than the required one!\n");
 		returnValue = false;
@@ -1800,7 +1818,7 @@ RootLayer::SetMouseEventMaskLayer(Layer *lay, uint32 mask, uint32 options)
 		fEventMaskLayer = lay;
 		// TODO: use this mask and options!
 	}
-	
+#endif
 	Unlock();
 
 	return returnValue;
