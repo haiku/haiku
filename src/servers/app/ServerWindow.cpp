@@ -679,7 +679,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<uint32>(&options);
 
 			if (myRootLayer)
-				myRootLayer->SetEventMaskLayer(fCurrentLayer, mask, options);
+				myRootLayer->AddToInputNotificationLists(fCurrentLayer, mask, options);
 		}
 		case AS_LAYER_SET_MOUSE_EVENT_MASK:
 		{
@@ -692,7 +692,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<uint32>(&options);
 
 			if (myRootLayer)
-				myRootLayer->SetMouseEventMaskLayer(fCurrentLayer, mask, options);
+				myRootLayer->SetNotifyLayer(fCurrentLayer, mask, options);
 			break;
 		}
 		case AS_LAYER_MOVE_TO:

@@ -190,6 +190,12 @@ class Layer {
 			uint32				EventOptions() const
 									{ return fEventOptions; }
 
+	inline	void				QuietlySetEventMask(uint32 em)
+									{ fEventMask = em; }
+
+	inline	void				QuietlySetEventOptions(uint32 eo)
+									{ fEventOptions = eo; }
+
 			void				PruneTree();
 	
 	// debugging

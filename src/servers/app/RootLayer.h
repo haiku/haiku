@@ -114,8 +114,9 @@ public:
 			void				SetDragMessage(BMessage *msg);
 			BMessage*			DragMessage(void) const;
 
-			bool				SetEventMaskLayer(Layer *lay, uint32 mask, uint32 options);
-			bool				SetMouseEventMaskLayer(Layer *lay, uint32 mask, uint32 options);
+			bool				AddToInputNotificationLists(Layer *lay, uint32 mask, uint32 options);
+			bool				SetNotifyLayer(Layer *lay, uint32 mask, uint32 options);
+			void				ClearNotifyLayer();
 
 			void				LayerRemoved(Layer* layer);
 
@@ -176,9 +177,12 @@ friend class Desktop;
 			Layer*				fLastMouseMoved;
 			WinBorder*			fMouseTargetWinBorder;
 			int32				fViewAction;
-			Layer*				fEventMaskLayer;
-			BList				fMouseEventsLayerList;
-			BList				fKeyboardEventsLayerList;
+
+			Layer*				fNotifyLayer;
+			uint32				fSavedEventMask;
+			uint32				fSavedEventOptions;
+			BList				fMouseNotificationList;
+			BList				fKeyboardNotificationList;
 
 			BLocker				fAllRegionsLock;
 

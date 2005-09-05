@@ -79,8 +79,9 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	  fLastMouseMoved(this),
 	  fMouseTargetWinBorder(NULL),
 	  fViewAction(B_ENTERED_VIEW),
-	  fEventMaskLayer(NULL),
-
+	  fNotifyLayer(NULL),
+	  fSavedEventMask(0),
+	  fSavedEventOptions(0),
 	  fAllRegionsLock("root layer region lock"),
 
 	  fThreadID(B_ERROR),
@@ -682,7 +683,7 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 		return false;
 
 	// you cannot switch workspaces on R5 if there is an event mask layer
-	if (fEventMaskLayer)
+	if (fNotifyLayer)
 		return false;
 
 	// if fWorkspace[index] object does not exist, create and add allowed WinBorders
@@ -733,13 +734,13 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 	fActiveWksIndex	= index;
 
 	if (fMouseTargetWinBorder) {
-//	if (fMovingWindow && fEventMaskLayer) {
-//		WinBorder	*movingWinBorder = (WinBorder*)fEventMaskLayer;
+//	if (fMovingWindow && fNotifyLayer) {
+//		WinBorder	*movingWinBorder = (WinBorder*)fNotifyLayer;
 
 //		movingWinBorder->MouseUp(DEC_NONE);
 
 		// NOTE: DO NOT reset these 2 members! We still want to move our window in the new workspace
-		//fEventMaskLayer	= NULL;
+		//fNotifyLayer	= NULL;
 		//fMovingWindow = false;
 //		fResizingWindow	= false;
 
@@ -772,15 +773,15 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 			fMouseTargetWinBorder->QuietlySetWorkspaces(wks);
 			fMouseTargetWinBorder->Window()->SendMessageToClient(&changedMsg, B_NULL_TOKEN, false);
 		}
-	}/* else if (fEventMaskLayer) {
+	}/* else if (fNotifyLayer) {
 		// is this a WinBorder object?
-		if (!fEventMaskLayer->fOwner)
+		if (!fNotifyLayer->fOwner)
 		{
 			// this WinBorder captured the mouse for a reason. allow it to finish its task.
-			((WinBorder*)fEventMaskLayer)->MouseUp(DEC_NONE);
+			((WinBorder*)fNotifyLayer)->MouseUp(DEC_NONE);
 		}
 
-		fEventMaskLayer	= NULL;
+		fNotifyLayer	= NULL;
 		fMovingWindow = false;
 		fResizingWindow	= false;
 	}*/
@@ -853,18 +854,18 @@ RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldWksIndex, uint
 	}
 
 // TODO: look into this...
-	if (fEventMaskLayer) {
-		WinBorder* wb = fEventMaskLayer->fOwner ?
-			fEventMaskLayer->fOwner : (WinBorder*)fEventMaskLayer;
+	if (fNotifyLayer) {
+		WinBorder* wb = fNotifyLayer->fOwner ?
+			fNotifyLayer->fOwner : (WinBorder*)fNotifyLayer;
 
 		if (!fWorkspace[fActiveWksIndex]->HasWinBorder(wb)) {
-/*			if (wb == fEventMaskLayer)
+/*			if (wb == fNotifyLayer)
 			{
 				fMovingWindow	= false;
 				fResizingWindow	= false;
 				wb->MouseUp(DEC_NONE);
 			}*/
-			fEventMaskLayer	= NULL;
+			fNotifyLayer	= NULL;
 		}
 	}
 
@@ -1132,7 +1133,7 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 					}
 
 					if (fLastMouseMoved->EventMask() & B_POINTER_EVENTS)
-						fEventMaskLayer = fLastMouseMoved;
+						fNotifyLayer = fLastMouseMoved;
 					break;
 				}
 
@@ -1163,6 +1164,10 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 
 			evt.where.ConstrainTo(fFrame);
 
+#if 0
+			ClearNotifyLayer();
+#endif
+
 			if (fLastMouseMoved == NULL) {
 				CRITICAL("RootLayer::MouseEventHandler(B_MOUSE_UP) fLastMouseMoved is null!\n");
 				break;
@@ -1178,23 +1183,23 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 				fLastMousePosition	= evt.where;
 			}
 
-			// TODO: what if 'fEventMaskLayer' is deleted in the mean time.
-			if (fEventMaskLayer) {
+			// TODO: what if 'fNotifyLayer' is deleted in the mean time.
+			if (fNotifyLayer) {
 				// if this is a regular Layer, sent message to counterpart BView.
-				if (fEventMaskLayer->fOwner) {
+				if (fNotifyLayer->fOwner) {
 					BMessage upmsg(B_MOUSE_UP);
 					upmsg.AddInt64("when",evt.when);
 					upmsg.AddPoint("where",evt.where);
 					upmsg.AddInt32("modifiers",evt.modifiers);
 
-					fEventMaskLayer->Window()->SendMessageToClient(&upmsg, fEventMaskLayer->fViewToken, false);
+					fNotifyLayer->Window()->SendMessageToClient(&upmsg, fNotifyLayer->fViewToken, false);
 				} else {
 					// this surely is a WinBorder
 // TODO: This code is too confusing. There should be a clear separation.
-//					((WinBorder*)fEventMaskLayer)->MouseUp(((WinBorder*)fEventMaskLayer)->TellWhat(evt));
+//					((WinBorder*)fNotifyLayer)->MouseUp(((WinBorder*)fNotifyLayer)->TellWhat(evt));
 				}
 
-				fEventMaskLayer	= NULL;	
+				fNotifyLayer	= NULL;	
 			} else {
 				// NOTE: focus may be NULL
 				if (fLastMouseMoved->Window() && fLastMouseMoved->fOwner == FocusWinBorder()) {
@@ -1272,20 +1277,20 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 			// This will need to be cleaned up as following the code flow
 			// is very hard.
 			
-			// fEventMaskLayer is always != this
-			if (fEventMaskLayer) {
-				if (fEventMaskLayer == target) {
+			// fNotifyLayer is always != this
+			if (fNotifyLayer) {
+				if (fNotifyLayer == target) {
 					if (target == fLastMouseMoved)
 						fViewAction = B_INSIDE_VIEW;
 					else
 						fViewAction = B_ENTERED_VIEW;
-				} else if (fEventMaskLayer == fLastMouseMoved) {
+				} else if (fNotifyLayer == fLastMouseMoved) {
 					fViewAction = B_EXITED_VIEW;
 				} else {
 					fViewAction = B_OUTSIDE_VIEW;
 				}
 
-				if (fEventMaskLayer->fOwner) {
+				if (fNotifyLayer->fOwner) {
 					// top layer does not have B_POINTER_EVENTS in its event mask
 					BMessage movemsg(B_MOUSE_MOVED);
 					movemsg.AddInt64("when", evt.when);
@@ -1293,9 +1298,9 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 					movemsg.AddInt32("buttons", evt.buttons);
 					movemsg.AddInt32("transit", fViewAction);
 
-					fEventMaskLayer->Window()->SendMessageToClient(&movemsg, fEventMaskLayer->fViewToken, false);
+					fNotifyLayer->Window()->SendMessageToClient(&movemsg, fNotifyLayer->fViewToken, false);
 				} else {
-					winBorderUnder = (WinBorder*)fEventMaskLayer;
+					winBorderUnder = (WinBorder*)fNotifyLayer;
 				}
 			} else {
 				if (fLastMouseMoved && fLastMouseMoved != target) {
@@ -1748,7 +1753,7 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 }
 
 bool
-RootLayer::SetEventMaskLayer(Layer *lay, uint32 mask, uint32 options)
+RootLayer::AddToInputNotificationLists(Layer *lay, uint32 mask, uint32 options)
 {
 	if (!lay)
 		return false;
@@ -1758,21 +1763,21 @@ RootLayer::SetEventMaskLayer(Layer *lay, uint32 mask, uint32 options)
 	Lock();
 
 	if (mask & B_POINTER_EVENTS) {
-		if (fMouseEventsLayerList.HasItem(lay))
-			fMouseEventsLayerList.AddItem(lay);
+		if (!fMouseNotificationList.HasItem(lay))
+			fMouseNotificationList.AddItem(lay);
 	}
 	else {
 		if (options == 0)
-			fMouseEventsLayerList.RemoveItem(lay);
+			fMouseNotificationList.RemoveItem(lay);
 	}
 
 	if (mask & B_KEYBOARD_EVENTS) {
-		if (fKeyboardEventsLayerList.HasItem(lay))
-			fKeyboardEventsLayerList.AddItem(lay);
+		if (!fKeyboardNotificationList.HasItem(lay))
+			fKeyboardNotificationList.AddItem(lay);
 	}
 	else {
 		if (options == 0)
-			fKeyboardEventsLayerList.RemoveItem(lay);
+			fKeyboardNotificationList.RemoveItem(lay);
 	}
 
 	// TODO: set options!!!
@@ -1784,7 +1789,7 @@ RootLayer::SetEventMaskLayer(Layer *lay, uint32 mask, uint32 options)
 }
 
 bool
-RootLayer::SetMouseEventMaskLayer(Layer *lay, uint32 mask, uint32 options)
+RootLayer::SetNotifyLayer(Layer *lay, uint32 mask, uint32 options)
 {
 	if (!lay)
 		return false;
@@ -1794,28 +1799,21 @@ RootLayer::SetMouseEventMaskLayer(Layer *lay, uint32 mask, uint32 options)
 	Lock();
 
 #if 0 // to be removed when the new "event" stuff is ready
-	// TODO: fEventMaskLayer to be changed in fMouseEventLayer
-	fEventMaskLayer = lay;
-	if (mask & B_POINTER_EVENTS) {
-		if (fMouseEventsLayerList.HasItem(lay))
-			fMouseEventsLayerList.AddItem(lay);
-	}
+	fNotifyLayer = lay;
+	fSavedEventMask = lay->EventMask();
+	fSavedOptions = lay->EventOptions();
 
-	if (mask & B_KEYBOARD_EVENTS) {
-		if (fKeyboardEventsLayerList.HasItem(lay))
-			fKeyboardEventsLayerList.AddItem(lay);
-	}
+	AddToInputNotificationLists(lay, mask, options);
 
-	// TODO: set options!!!
-	// B_NO_POINTER_HISTORY How? By telling to the input_server?
+	// TODO: set other options!!!
 	// B_SUSPEND_VIEW_FOCUS
 	// B_LOCK_WINDOW_FOCUS
 #else
-	if (fEventMaskLayer && fEventMaskLayer != lay) {
-		fprintf(stderr, "WARNING: fEventMaskLayer already set and different than the required one!\n");
+	if (fNotifyLayer && fNotifyLayer != lay) {
+		fprintf(stderr, "WARNING: fNotifyLayer already set and different than the required one!\n");
 		returnValue = false;
 	} else {
-		fEventMaskLayer = lay;
+		fNotifyLayer = lay;
 		// TODO: use this mask and options!
 	}
 #endif
@@ -1824,12 +1822,33 @@ RootLayer::SetMouseEventMaskLayer(Layer *lay, uint32 mask, uint32 options)
 	return returnValue;
 }
 
+void
+RootLayer::ClearNotifyLayer()
+{
+	if (fNotifyLayer) {
+		Lock();
+
+		AddToInputNotificationLists(fNotifyLayer, 0UL, 0UL);
+
+		fNotifyLayer->QuietlySetEventMask(fSavedEventMask);
+		fNotifyLayer->QuietlySetEventOptions(fSavedEventOptions);
+
+		AddToInputNotificationLists(fNotifyLayer, fSavedEventMask, fSavedEventOptions);
+
+		fNotifyLayer = NULL;
+		fSavedEventMask = 0UL;
+		fSavedEventOptions = 0UL;
+
+		Unlock();
+	}
+}
+
 // LayerRemoved
 void
 RootLayer::LayerRemoved(Layer* layer)
 {
-	if (layer == fEventMaskLayer)
-		fEventMaskLayer = NULL;
+	if (layer == fNotifyLayer)
+		fNotifyLayer = NULL;
 
 	if (layer == fLastMouseMoved)
 		fLastMouseMoved = NULL;
@@ -1965,19 +1984,19 @@ RootLayer::change_winBorder_feel(WinBorder *winBorder, int32 newFeel)
 
 	if (isVisible)
 	{
-		if (fEventMaskLayer)
+		if (fNotifyLayer)
 		{
 // TODO: What was this supposed to do?!?
-/*			WinBorder	*wb	= fEventMaskLayer->fOwner?
-								fEventMaskLayer->fOwner:
-								(WinBorder*)fEventMaskLayer;
-			if (wb == fEventMaskLayer)
+/*			WinBorder	*wb	= fNotifyLayer->fOwner?
+								fNotifyLayer->fOwner:
+								(WinBorder*)fNotifyLayer;
+			if (wb == fNotifyLayer)
 			{
 				fMovingWindow	= false;
 				fResizingWindow	= false;
 				wb->MouseUp(DEC_NONE);
 			}*/
-			fEventMaskLayer	= NULL;
+			fNotifyLayer	= NULL;
 		}
 
 		winBorder->Show(false);
