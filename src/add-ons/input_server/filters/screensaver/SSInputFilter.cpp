@@ -65,24 +65,56 @@ SSInputFilter::SSInputFilter()
 		fCurrent(NONE),
 		fEnabled(false),
 		fFrameNum(0),
-		fRunner(NULL) {
+		fRunner(NULL),
+		fWatchingDirectory(false), 
+		fWatchingFile(false) {
 	CALLED();
 	fSSController = new SSController(this);
 	fSSController->Run();
 
 	ReloadSettings();
-	BEntry entry(fPref.GetPath().Path());
-	entry.GetNodeRef(&fPrefNodeRef);
-	watch_node(&fPrefNodeRef, B_WATCH_ALL, NULL, fSSController);
 	be_roster->StartWatching(fSSController);
 }
 
 
 SSInputFilter::~SSInputFilter() {
 	delete fRunner;
-	watch_node(&fPrefNodeRef, B_STOP_WATCHING, NULL);
+	if (fWatchingFile)
+		watch_node(&fPrefNodeRef, B_STOP_WATCHING, NULL);
+	if (fWatchingDirectory)
+		watch_node(&fPrefDirNodeRef, B_STOP_WATCHING, NULL);
 	be_roster->StopWatching(fSSController);
 	delete fSSController;
+}
+
+
+void
+SSInputFilter::WatchPreferences() {
+	BEntry entry(fPref.GetPath().Path());
+	if (entry.Exists()) {
+		if (fWatchingFile)
+			return;
+		if (fWatchingDirectory) {
+			watch_node(&fPrefDirNodeRef, B_STOP_WATCHING, NULL);
+			fWatchingDirectory = false;
+		}
+		entry.GetNodeRef(&fPrefNodeRef);
+		watch_node(&fPrefNodeRef, B_WATCH_ALL, NULL, fSSController);
+		fWatchingFile = true;
+	} else {
+		if (fWatchingDirectory)
+			return;
+		if (fWatchingFile) {
+			watch_node(&fPrefNodeRef, B_STOP_WATCHING, NULL);
+			fWatchingFile = false;
+		}
+		BEntry dir;
+		entry.GetParent(&dir);
+		dir.GetNodeRef(&fPrefDirNodeRef);
+		watch_node(&fPrefDirNodeRef, B_WATCH_ALL, NULL, fSSController);
+		fWatchingDirectory = true;
+	}
+	
 }
 
 
@@ -113,6 +145,7 @@ SSInputFilter::ReloadSettings()
 	if (fRunner->InitCheck() != B_OK) {
 		SERIAL_PRINT(("fRunner init failed\n"));
 	}
+	WatchPreferences();
 }
 
 

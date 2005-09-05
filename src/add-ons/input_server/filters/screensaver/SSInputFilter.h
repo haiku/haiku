@@ -45,9 +45,11 @@ private:
 	uint32 fFrameNum; // Used so that we don't update the screen coord's so often
 				// Ideally, we would get a message when the screen changes. R5 doesn't do this.
 	SSController *fSSController;
-	node_ref fPrefNodeRef;
+	node_ref fPrefNodeRef, fPrefDirNodeRef;
 	BMessageRunner *fRunner;
+	bool fWatchingDirectory, fWatchingFile;
 
+	void WatchPreferences();
 	void UpdateRectangles();
 	void Cornered(arrowDirection pos);
 	void Invoke();
