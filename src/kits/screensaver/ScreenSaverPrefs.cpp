@@ -1,9 +1,11 @@
 /*
- * Copyright 2003, Michael Phipps. All rights reserved.
- * Copyright 2005, Jérôme Duval. All rights reserved.
+ * Copyright 2003-2005, Haiku.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Michael Phipps
+ *		Jérôme Duval, jerome.duval@free.fr
  */
-
 #include <Debug.h>
 #include <File.h>
 #include <FindDirectory.h>

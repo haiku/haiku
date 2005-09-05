@@ -1,8 +1,11 @@
 /*
- * Copyright 2003, Michael Phipps. All rights reserved.
+ * Copyright 2003-2005, Haiku.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Michael Phipps
+ *		Jérôme Duval, jerome.duval@free.fr
  */
-
 #include <Debug.h>
 #include <stdio.h>
 #include <Screen.h>
@@ -127,7 +130,7 @@ ScreenSaverApp::MessageReceived(BMessage *message)
 bool 
 ScreenSaverApp::QuitRequested()
 {
-	if (fPref.LockEnable() && (system_time()-fBlankTime > fPref.PasswordTime())) {
+	if (fPref.LockEnable() && (system_time()-fBlankTime > (fPref.PasswordTime()-fPref.BlankTime()))) {
 		ShowPW();
 		return false;
 	} else
