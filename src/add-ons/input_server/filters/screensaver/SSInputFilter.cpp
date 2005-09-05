@@ -122,7 +122,7 @@ void
 SSInputFilter::Invoke() 
 {
 	CALLED();
-	if ((fKeep!=NONE && fCurrent == fKeep) || fEnabled || fPref.TimeFlags()!=1)
+	if ((fKeep!=NONE && fCurrent == fKeep) || fEnabled || fPref.TimeFlags()!=1 || be_roster->IsRunning(SCREEN_BLANKER_SIG))
 		return; // If mouse is in this corner, never invoke.
 	SERIAL_PRINT(("we run screenblanker\n"));
 	be_roster->Launch(SCREEN_BLANKER_SIG);
