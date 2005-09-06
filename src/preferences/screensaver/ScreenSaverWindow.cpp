@@ -139,7 +139,10 @@ ScreenSaverWin::SaverSelected()
 			delete fSettingsArea;
 		}
 		BRect bnds = fModuleSettingsBox->Bounds();
-		bnds.InsetBy(5,10);
+		bnds.left = 3;
+		bnds.right -= 7;
+		bnds.top = 21;
+		bnds.bottom -= 2;
 		fSettingsArea = new BView(bnds,"settingsArea",B_FOLLOW_NONE,B_WILL_DRAW);
 		fSettingsArea->SetViewColor(216,216,216);
 		fModuleSettingsBox->AddChild(fSettingsArea);
@@ -414,15 +417,12 @@ ScreenSaverWin::PopulateScreenSaverList(void)
 void 
 ScreenSaverWin::SetupTab1() 
 {
-	int columns[4]={15,150,180,430};
-	int rows[6]={15,120,135,255,263,280};
-
 	{rgb_color clr = {216,216,216,255}; fTab1->SetViewColor(clr);}
-	fTab1->AddChild( fModuleSettingsBox = new BBox(BRect(columns[2],rows[0],columns[3],rows[5]),"ModuleSettingsBox",B_FOLLOW_NONE,B_WILL_DRAW));
+	fTab1->AddChild( fModuleSettingsBox = new BBox(BRect(183,11,434,285),"ModuleSettingsBox",B_FOLLOW_NONE,B_WILL_DRAW));
 	fModuleSettingsBox->SetLabel("Module settings");
 	fModuleSettingsBox->SetBorder(B_FANCY_BORDER);
 
-	fListView1 = new BListView(BRect(columns[0],rows[2],columns[1]+3,rows[3]),"ListView1",B_SINGLE_SELECTION_LIST);
+	fListView1 = new BListView(BRect(16,136,156,255),"ListView1",B_SINGLE_SELECTION_LIST);
 	fTab1->AddChild(new BScrollView("scroll_list",fListView1,B_FOLLOW_NONE,0,false,true));
 	commonLookAndFeel(fModuleSettingsBox,false,false);
 	{rgb_color clr = {255,255,255,0}; fListView1->SetViewColor(clr);}
@@ -431,15 +431,15 @@ ScreenSaverWin::SetupTab1()
 	// selection message for screensaver list
 	fListView1->SetSelectionMessage( new BMessage( kSaver_sel ) );
   
-	fTab1->AddChild( fTestButton = new BButton(BRect(columns[0],rows[4],91,rows[5]),"TestButton","Test", new BMessage (kTest_btn)));
+	fTab1->AddChild( fTestButton = new BButton(BRect(13,260,88,277),"TestButton","Test", new BMessage (kTest_btn)));
 	commonLookAndFeel(fTestButton,false,true);
 	fTestButton->SetLabel("Test");
 
-	fTab1->AddChild( fAddButton = new BButton(BRect(97,rows[4],columns[2]-10,rows[5]),"AddButton","Add...", new BMessage (kAdd_btn)));
+	fTab1->AddChild( fAddButton = new BButton(BRect(98,260,173,277),"AddButton","Add...", new BMessage (kAdd_btn)));
 	commonLookAndFeel(fAddButton,false,true);
 	fAddButton->SetLabel("Add...");
 
-	fTab1->AddChild(fPreviewDisplay = new PreviewView(BRect(columns[0]+5,rows[0],columns[1],rows[1]),"preview",&fPrefs));
+	fTab1->AddChild(fPreviewDisplay = new PreviewView(BRect(20,15,150,120),"preview",&fPrefs));
  	PopulateScreenSaverList(); 
 } 
 
