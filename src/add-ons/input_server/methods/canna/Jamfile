@@ -2,7 +2,9 @@ SubDir OBOS_TOP src add-ons input_server methods canna ;
 
 UsePrivateHeaders interface ;
 
-SubDirC++Flags -fmultiple-symbol-spaces ;
+if $(TARGET_PLATFORM) != haiku {
+	SubDirC++Flags -fmultiple-symbol-spaces ;
+}
 
 Addon canna : input_server/methods : 
 	CannaInterface.cpp
