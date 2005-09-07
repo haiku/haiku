@@ -683,6 +683,45 @@ scsi_periph_callbacks callbacks = {
 };
 
 
+static float
+cd_supports_device(device_node_handle parent, bool *_noConnection)
+{
+	char *bus;
+	uint8 device_type;
+
+	SHOW_FLOW0(3, "");
+
+	// make sure parent is really the SCSI bus manager
+	if (pnp->get_attr_string(parent, B_DRIVER_BUS, &bus, false))
+		return B_ERROR;
+
+	if (strcmp(bus, "scsi")) {
+		free(bus);
+		return 0.0;
+	}
+
+	// check whether it's really a Direct Access Device
+	if (pnp->get_attr_uint8(parent, SCSI_DEVICE_TYPE_ITEM, &device_type, true) != B_OK
+		|| (device_type != scsi_dev_CDROM && device_type != scsi_dev_WORM)) {
+		free(bus);
+		return 0.0;
+	}	
+
+	free(bus);
+	return 0.6;
+}
+
+
+static void
+cd_get_paths(const char ***_bus, const char ***_device)
+{
+	static const char *kBus[] = { "scsi", NULL };
+
+	*_bus = kBus;
+	*_device = NULL;
+}
+
+
 static status_t
 std_ops(int32 op, ...)
 {
@@ -712,11 +751,13 @@ block_device_interface scsi_cd_module = {
 			std_ops
 		},
 
-		NULL,		
+		cd_supports_device,		
 		cd_device_added,
 		cd_init_device,
 		(status_t (*) (void *))cd_uninit_device,
-		NULL
+		NULL,	// remove device
+		NULL,	// cleanup device
+		cd_get_paths,
 	},
 
 	(status_t (*)(block_device_device_cookie, block_device_handle_cookie *))&cd_open,

@@ -18,6 +18,6 @@
 
 #include <device_manager.h>
 
-#define SCSI_CD_MODULE_NAME "drivers/disk/scsi/scsi_cd/"SCSI_DEVICE_TYPE_NAME
+#define SCSI_CD_MODULE_NAME "drivers/disk/scsi/scsi_cd/device_v1"
 
 #endif

@@ -228,6 +228,7 @@ static float
 das_supports_device(device_node_handle parent, bool *_noConnection)
 {
 	char *bus;
+	uint8 device_type;
 
 	// make sure parent is really the SCSI bus manager
 	if (pnp->get_attr_string(parent, B_DRIVER_BUS, &bus, false))
@@ -238,7 +239,12 @@ das_supports_device(device_node_handle parent, bool *_noConnection)
 		return 0.0;
 	}
 
-	// ToDo: check SCSI device type! (must be "disk")
+	// check whether it's really a Direct Access Device
+	if (pnp->get_attr_uint8(parent, SCSI_DEVICE_TYPE_ITEM, &device_type, true) != B_OK
+		|| device_type != scsi_dev_direct_access) {
+		free(bus);
+		return 0.0;
+	}	
 
 	free(bus);
 	return 0.6;
