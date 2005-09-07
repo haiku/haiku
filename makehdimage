@@ -118,7 +118,7 @@ BEOS_BIN="touch sync ln listarea listattr listsem listport \
 	strace rmdir error ifconfig ping traceroute arp pppconfig \
 	ppp_up gdb tail head zip unzip mountvolume top finddir groups \
 	id env basename factor tty dstcheck comm modifiers version \
-	csplit cut beep screen_blanker"
+	csplit cut beep screen_blanker play"
 
 BEOS_APPS="MiniTerminal Terminal Expander People ShowImage Clock Pulse Playground \
 	SoundRecorder BitmapDrawing Magnify DiskProbe AboutHaiku StyledEdit"
