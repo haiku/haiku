@@ -76,7 +76,7 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 
 	  fDesktop(desktop),
 	  fDragMessage(NULL),
-	  fLastMouseMoved(this),
+	  fLastLayerUnderMouse(this),
 	  fMouseTargetWinBorder(NULL),
 	  fViewAction(B_ENTERED_VIEW),
 	  fNotifyLayer(NULL),
@@ -1029,7 +1029,70 @@ RootLayer::WinBorderAt(const BPoint& pt) const
 //---------------------------------------------------------------------------
 //				Input related methods
 //---------------------------------------------------------------------------
+#ifdef NEW_INPUT_HANDLING
+void
+RootLayer::_ProcessMouseMovedEvent(PointerEvent &evt)
+{
+	// move cursor on screen
+	GetHWInterface()->MoveCursorTo(evt.where.x, evt.where.y);
 
+	Layer* target = LayerAt(evt.where);
+	if (target == NULL) {
+		CRITICAL("RootLayer::_ProcessMouseMovedEvent() 'target' can't be null.\n");
+		return;
+	}
+
+	// change focus in FFM mode
+	WinBorder* winBorderTarget = dynamic_cast<WinBorder*>(target);
+	if (winBorderTarget) {
+		// TODO: figure out what other mouse modes are for!!!
+		DesktopSettings ds(gDesktop);
+		// TODO: Focus should be a RootLayer option/feature, NOT a Workspace one!!!
+		WinBorder* exFocus = FocusWinBorder();
+		if (ds.MouseMode() != B_NORMAL_MOUSE && exFocus != winBorderTarget) {
+			ActiveWorkspace()->SetFocus(winBorderTarget);
+			// Workspace::SetFocus() *attempts* to set a new focus WinBorder, it may not succeed
+			if (exFocus != FocusWinBorder()) {
+				// TODO: invalidate border area and send message to client for the widgets to light up
+			}
+		}
+	}
+
+	// add the layer under mouse to the list of layers to be notified on mouse moved
+	bool alreadyPresent = fMouseNotificationList.HasItem(target);
+	if (!alreadyPresent)
+		fMouseNotificationList.AddItem(target);
+
+	int32 count = fMouseNotificationList.CountItems();
+	Layer *lay;
+	for (int32 i = 0; i <= count; i++) {
+		lay = static_cast<Layer*>(fMouseNotificationList.ItemAt(i));
+		if (lay) {
+			// set transit state
+			if (lay == target)
+				if (lay == fLastLayerUnderMouse)
+					fViewAction = B_INSIDE_VIEW;
+				else
+					fViewAction = B_ENTERED_VIEW;
+			else
+				if (lay == fLastLayerUnderMouse)
+					fViewAction = B_EXITED_VIEW;
+				else
+					fViewAction = B_OUTSIDE_VIEW;
+
+			// NOTE: testing under R5 shows that it doesn't matter if a window is created 
+			// with B_ASYNCHRONOUS_CONTROLS flag or not. B_MOUSE_DOWN is always transmited.
+			lay->MouseMoved(evt, fViewAction);
+		}
+	}
+
+	if (!alreadyPresent)
+		fMouseNotificationList.RemoveItem(target);
+
+	fLastLayerUnderMouse = target;
+	fLastMousePosition = evt.where;
+}
+#endif
 void
 RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 {
@@ -1056,34 +1119,41 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 			evt.where.ConstrainTo(fFrame);
 
 			if (fLastMousePosition != evt.where) {
+#ifdef NEW_INPUT_HANDLING
+				_ProcessMouseMovedEvent(evt);
+#else
+
 				// TODO: a B_MOUSE_MOVED message might have to be generated in order to
 				// correctly trigger entered/exited view transits.
 // Commented for now, since it is not _that_ critical and happens frequently with the Haiku
 // mouse driver (which is ok, but we need to catch it here).
-//				CRITICAL("mouse position changed in B_MOUSE_DOWN from last B_MOUSE_MOVED\n");
+				//CRITICAL("mouse position changed in B_MOUSE_DOWN from last B_MOUSE_MOVED\n");
 				// update on screen mouse pos
 				GetHWInterface()->MoveCursorTo(evt.where.x, evt.where.y);
-				fLastMousePosition = evt.where;
+				fLastMousePosition = evt.where;                        
+#endif
 			}
-			
+
 			// We'll need this so that GetMouse can query for which buttons
 			// are down.
 			fButtons = evt.buttons;
 
-			if (fLastMouseMoved == NULL) {
-				CRITICAL("RootLayer::MouseEventHandler(B_MOUSE_DOWN) fLastMouseMoved is null!\n");
+			if (fLastLayerUnderMouse == NULL) {
+				CRITICAL("RootLayer::MouseEventHandler(B_MOUSE_DOWN) fLastLayerUnderMouse is null!\n");
 				break;
 			}
 
-			if (fLastMouseMoved == this)
+			if (fLastLayerUnderMouse == this)
 				break;
-
+#ifdef NEW_INPUT_HANDLING
+			fLastLayerUnderMouse->MouseDown(evt);
+#else
 			// we are clicking a WinBorder
 
 			WinBorder* exActive	= ActiveWinBorder();
 			WinBorder* exFocus = FocusWinBorder();
-			WinBorder* target = fLastMouseMoved->fOwner ? fLastMouseMoved->fOwner
-														: (WinBorder*)fLastMouseMoved;
+			WinBorder* target = fLastLayerUnderMouse->fOwner ? fLastLayerUnderMouse->fOwner
+														: (WinBorder*)fLastLayerUnderMouse;
 
 			click_type action = target->MouseDown(evt);
 
@@ -1120,7 +1190,7 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 							 && !(target->WindowFlags() & B_WILL_ACCEPT_FIRST_CLICK))
 						sendMessage = false;
 
-					if (sendMessage && fLastMouseMoved != target->fTopLayer) {
+					if (sendMessage && fLastLayerUnderMouse != target->fTopLayer) {
 						BMessage msg;
 						msg.what = B_MOUSE_DOWN;
 						msg.AddInt64("when", evt.when);
@@ -1129,11 +1199,11 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 						msg.AddInt32("buttons", evt.buttons);
 						msg.AddInt32("clicks", evt.clicks);
 
-						target->Window()->SendMessageToClient(&msg, fLastMouseMoved->fViewToken, false);
+						target->Window()->SendMessageToClient(&msg, fLastLayerUnderMouse->fViewToken, false);
 					}
 
-					if (fLastMouseMoved->EventMask() & B_POINTER_EVENTS)
-						fNotifyLayer = fLastMouseMoved;
+					if (fLastLayerUnderMouse->EventMask() & B_POINTER_EVENTS)
+						fNotifyLayer = fLastLayerUnderMouse;
 					break;
 				}
 
@@ -1145,6 +1215,7 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 					fMouseTargetWinBorder = target;
 					break;
 			}
+#endif
 			break;
 		}
 		case B_MOUSE_UP: {
@@ -1164,12 +1235,12 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 
 			evt.where.ConstrainTo(fFrame);
 
-#if 0
+#ifdef NEW_INPUT_HANDLING
 			ClearNotifyLayer();
 #endif
 
-			if (fLastMouseMoved == NULL) {
-				CRITICAL("RootLayer::MouseEventHandler(B_MOUSE_UP) fLastMouseMoved is null!\n");
+			if (fLastLayerUnderMouse == NULL) {
+				CRITICAL("RootLayer::MouseEventHandler(B_MOUSE_UP) fLastLayerUnderMouse is null!\n");
 				break;
 			}
 
@@ -1202,14 +1273,14 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 				fNotifyLayer	= NULL;	
 			} else {
 				// NOTE: focus may be NULL
-				if (fLastMouseMoved->Window() && fLastMouseMoved->fOwner == FocusWinBorder()) {
+				if (fLastLayerUnderMouse->Window() && fLastLayerUnderMouse->fOwner == FocusWinBorder()) {
 					// send B_MOUSE_UP for regular Layers/BViews
 					BMessage upmsg(B_MOUSE_UP);
 					upmsg.AddInt64("when",evt.when);
 					upmsg.AddPoint("where",evt.where);
 					upmsg.AddInt32("modifiers",evt.modifiers);
 
-					fLastMouseMoved->Window()->SendMessageToClient(&upmsg, fLastMouseMoved->fViewToken, false);
+					fLastLayerUnderMouse->Window()->SendMessageToClient(&upmsg, fLastLayerUnderMouse->fViewToken, false);
 				} else {
 					// WinBorders don't need _UP_ messages unless they received _DOWN_ messages,
 					// and that case is threated above - WinBorders use Layer::fEventMask to
@@ -1248,7 +1319,9 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 			msg.Read<int32>(&evt.buttons);
 
 			evt.where.ConstrainTo(fFrame);
-
+#ifdef NEW_INPUT_HANDLING
+			_ProcessMouseMovedEvent(evt);
+#else
 			GetHWInterface()->MoveCursorTo(evt.where.x, evt.where.y);
 
 			fLastMousePosition = evt.where;
@@ -1259,7 +1332,7 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 			// down.
 			if (fMouseTargetWinBorder) {
 				fMouseTargetWinBorder->MouseMoved(evt);
-				fLastMouseMoved = fMouseTargetWinBorder;
+				fLastLayerUnderMouse = fMouseTargetWinBorder;
 				break;
 			}
 
@@ -1280,11 +1353,11 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 			// fNotifyLayer is always != this
 			if (fNotifyLayer) {
 				if (fNotifyLayer == target) {
-					if (target == fLastMouseMoved)
+					if (target == fLastLayerUnderMouse)
 						fViewAction = B_INSIDE_VIEW;
 					else
 						fViewAction = B_ENTERED_VIEW;
-				} else if (fNotifyLayer == fLastMouseMoved) {
+				} else if (fNotifyLayer == fLastLayerUnderMouse) {
 					fViewAction = B_EXITED_VIEW;
 				} else {
 					fViewAction = B_OUTSIDE_VIEW;
@@ -1303,19 +1376,19 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 					winBorderUnder = (WinBorder*)fNotifyLayer;
 				}
 			} else {
-				if (fLastMouseMoved && fLastMouseMoved != target) {
+				if (fLastLayerUnderMouse && fLastLayerUnderMouse != target) {
 					fViewAction = B_EXITED_VIEW;
-					if (fLastMouseMoved->fOwner) {
-						if (fLastMouseMoved != fLastMouseMoved->fOwner->fTopLayer) {
+					if (fLastLayerUnderMouse->fOwner) {
+						if (fLastLayerUnderMouse != fLastLayerUnderMouse->fOwner->fTopLayer) {
 							BMessage movemsg(B_MOUSE_MOVED);
 							movemsg.AddInt64("when",evt.when);
 							movemsg.AddPoint("where",evt.where);
 							movemsg.AddInt32("buttons",evt.buttons);
 							movemsg.AddInt32("transit",fViewAction);
-							fLastMouseMoved->Window()->SendMessageToClient(&movemsg, fLastMouseMoved->fViewToken, false);
+							fLastLayerUnderMouse->Window()->SendMessageToClient(&movemsg, fLastLayerUnderMouse->fViewToken, false);
 						}
-					}// else if (fLastMouseMoved != this)
-					//	((WinBorder*)fLastMouseMoved)->MouseMoved(DEC_NONE);
+					}// else if (fLastLayerUnderMouse != this)
+					//	((WinBorder*)fLastLayerUnderMouse)->MouseMoved(DEC_NONE);
 
 					fViewAction = B_ENTERED_VIEW;
 				} else {
@@ -1366,8 +1439,8 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 				}
 			}*/
 
-			fLastMouseMoved = target;
-
+			fLastLayerUnderMouse = target;
+#endif
 			break;
 		}
 		case B_MOUSE_WHEEL_CHANGED: {
@@ -1382,18 +1455,18 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 			msg.Read<float>(&evt.wheel_delta_x);
 			msg.Read<float>(&evt.wheel_delta_y);
 
-			if (fLastMouseMoved && fLastMouseMoved != this) {
-				if (fLastMouseMoved->fOwner) { // is a Layer object not a WinBorder one
-					if (fLastMouseMoved->fOwner->fTopLayer != fLastMouseMoved) { // must not be the top_view's counterpart
+			if (fLastLayerUnderMouse && fLastLayerUnderMouse != this) {
+				if (fLastLayerUnderMouse->fOwner) { // is a Layer object not a WinBorder one
+					if (fLastLayerUnderMouse->fOwner->fTopLayer != fLastLayerUnderMouse) { // must not be the top_view's counterpart
 						BMessage wheelmsg(B_MOUSE_WHEEL_CHANGED);
 						wheelmsg.AddInt64("when", evt.when);
 						wheelmsg.AddFloat("be:wheel_delta_x",evt.wheel_delta_x);
 						wheelmsg.AddFloat("be:wheel_delta_y",evt.wheel_delta_y);
-						fLastMouseMoved->Window()->SendMessageToClient(&wheelmsg, fLastMouseMoved->fViewToken, false);
+						fLastLayerUnderMouse->Window()->SendMessageToClient(&wheelmsg, fLastLayerUnderMouse->fViewToken, false);
 					}
 				} else {
 					// TODO: WinBorder::MouseWheel() should dissapear or get other params!
-					// ((WinBorder*)fLastMouseMoved)->MouseWheel(...)
+					// ((WinBorder*)fLastLayerUnderMouse)->MouseWheel(...)
 				}
 			}
 			break;
@@ -1850,8 +1923,8 @@ RootLayer::LayerRemoved(Layer* layer)
 	if (layer == fNotifyLayer)
 		fNotifyLayer = NULL;
 
-	if (layer == fLastMouseMoved)
-		fLastMouseMoved = NULL;
+	if (layer == fLastLayerUnderMouse)
+		fLastLayerUnderMouse = NULL;
 
 	if (layer == fMouseTargetWinBorder)
 		fMouseTargetWinBorder = NULL;
@@ -2150,14 +2223,14 @@ RootLayer::show_final_scene(WinBorder *exFocus, WinBorder *exActive)
 // TODO: MoveEventHandler::B_MOUSE_DOWN may not need this. Investigate.
 // TODO: B_ENTERD_VIEW, B_EXITED_VIEW, B_INSIDE_VIEW, B_OUTSIDE_VIEW are sent only
 // when the mouse is moved. What about when adding or removing a window that contains
-// fLastMouseMoved, shouldn't the next fLastMouseMoved Layer get a B_MOUSE_MOVE at
+// fLastLayerUnderMouse, shouldn't the next fLastLayerUnderMouse Layer get a B_MOUSE_MOVE at
 // the same mouse position with B_ENTERD_VIEW??? Same when changing workspaces!!!
 // INVESTIGATE, INVESTIGATE, INVESTIGATE!!!
 // NOTE: the following 3 lines are here for safety reasons!
-	fLastMouseMoved = LayerAt(fLastMousePosition);
-	if (fLastMouseMoved == NULL) {
-		CRITICAL("RootLayer::show_final_scene: 'fLastMouseMoved' can't be null.\n");
-		fLastMouseMoved = this;
+	fLastLayerUnderMouse = LayerAt(fLastMousePosition);
+	if (fLastLayerUnderMouse == NULL) {
+		CRITICAL("RootLayer::show_final_scene: 'fLastLayerUnderMouse' can't be null.\n");
+		fLastLayerUnderMouse = this;
 	}
 }
 

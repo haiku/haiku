@@ -33,20 +33,6 @@ class Decorator;
 class DisplayDriver;
 class Desktop;
 
-class PointerEvent {
- public:
-	int32		code;		// B_MOUSE_UP, B_MOUSE_DOWN, B_MOUSE_MOVED,
-							// B_MOUSE_WHEEL_CHANGED
-	bigtime_t	when;
-	BPoint		where;
-	float		wheel_delta_x;
-	float		wheel_delta_y;
-	int32		modifiers;
-	int32		buttons;	// B_PRIMARY_MOUSE_BUTTON, B_SECONDARY_MOUSE_BUTTON
-							// B_TERTIARY_MOUSE_BUTTON
-	int32		clicks;
-};
-
 class WinBorder : public Layer {
  public:
 								WinBorder(const BRect &frame,
@@ -95,10 +81,15 @@ class WinBorder : public Layer {
 											  float* minHeight,
 											  float* maxHeight) const;
 
+#ifdef NEW_INPUT_HANDLING
+	virtual	void				MouseDown(const PointerEvent& evt);
+	virtual	void				MouseUp(const PointerEvent& evt);
+	virtual	void				MouseMoved(const PointerEvent& evt, uint32 transit);
+#else
 			click_type			MouseDown(const PointerEvent& evt);
 			void				MouseMoved(const PointerEvent& evt);
 			void				MouseUp(const PointerEvent& evt);
-	
+#endif	
 			void				UpdateColors();
 			void				UpdateDecorator();
 			void				UpdateFont();

@@ -42,6 +42,7 @@
 #include "ServerWindow.h"
 
 //#define NEW_CLIPPING 1
+//#define NEW_INPUT_HANDLING 1
 
 enum {
 	B_LAYER_NONE		= 1,
@@ -73,6 +74,20 @@ class RootLayer;
 class DisplayDriver;
 class LayerData;
 class ServerBitmap;
+
+class PointerEvent {
+ public:
+	int32		code;		// B_MOUSE_UP, B_MOUSE_DOWN, B_MOUSE_MOVED,
+							// B_MOUSE_WHEEL_CHANGED
+	bigtime_t	when;
+	BPoint		where;
+	float		wheel_delta_x;
+	float		wheel_delta_y;
+	int32		modifiers;
+	int32		buttons;	// B_PRIMARY_MOUSE_BUTTON, B_SECONDARY_MOUSE_BUTTON
+							// B_TERTIARY_MOUSE_BUTTON
+	int32		clicks;
+};
 
 class Layer {
  public:
@@ -150,7 +165,11 @@ class Layer {
 	virtual	void				MoveBy(float x, float y);
 	virtual	void				ResizeBy(float x, float y);
 	virtual	void				ScrollBy(float x, float y);
-
+#ifdef NEW_INPUT_HANDLING
+	virtual	void				MouseDown(const PointerEvent& evt);
+	virtual	void				MouseUp(const PointerEvent& evt);
+	virtual	void				MouseMoved(const PointerEvent& evt, uint32 transit);
+#endif
 			BPoint				BoundsOrigin() const; // BoundsFrameDiff()?
 			float				Scale() const;
 

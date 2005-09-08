@@ -1096,7 +1096,50 @@ Layer::ScrollBy(float x, float y)
 
 	STRACE(("Layer(%s)::ScrollBy() END\n", Name()));
 }
+#ifdef NEW_INPUT_HANDLING
+void
+Layer::MouseDown(const PointerEvent& evt)
+{
+	if (Window()) {
+		BMessage msg;
+		msg.what = B_MOUSE_DOWN;
+		msg.AddInt64("when", evt.when);
+		msg.AddPoint("where", evt.where);
+		msg.AddInt32("modifiers", evt.modifiers);
+		msg.AddInt32("buttons", evt.buttons);
+		msg.AddInt32("clicks", evt.clicks);
 
+		Window()->SendMessageToClient(&msg, fViewToken, false);
+	}
+}
+
+void
+Layer::MouseUp(const PointerEvent& evt)
+{
+	if (Window()) {
+		BMessage upmsg(B_MOUSE_UP);
+		upmsg.AddInt64("when",evt.when);
+		upmsg.AddPoint("where",evt.where);
+		upmsg.AddInt32("modifiers",evt.modifiers);
+
+		Window()->SendMessageToClient(&upmsg, fViewToken, false);
+	}
+}
+
+void
+Layer::MouseMoved(const PointerEvent& evt, uint32 transit)
+{
+	if (Window()) {
+		BMessage movemsg(B_MOUSE_MOVED);
+		movemsg.AddInt64("when", evt.when);
+		movemsg.AddPoint("where", evt.where);
+		movemsg.AddInt32("buttons", evt.buttons);
+		movemsg.AddInt32("transit", transit);
+
+		Window()->SendMessageToClient(&movemsg, fViewToken, false);
+	}
+}
+#endif
 // BoundsOrigin
 BPoint
 Layer::BoundsOrigin() const

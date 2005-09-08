@@ -169,12 +169,15 @@ friend class Desktop;
 			void				MouseEventHandler(int32 code, BPrivate::PortLink& link);
 			void				KeyboardEventHandler(int32 code, BPrivate::PortLink& link);
 
+#ifdef NEW_INPUT_HANDLING
+			void				_ProcessMouseMovedEvent(PointerEvent &evt);
+#endif
 	inline	HWInterface*		GetHWInterface() const
 									{ return fDesktop->GetHWInterface(); }
 
 			Desktop*			fDesktop;
 			BMessage*			fDragMessage;
-			Layer*				fLastMouseMoved;
+			Layer*				fLastLayerUnderMouse;
 			WinBorder*			fMouseTargetWinBorder;
 			int32				fViewAction;
 

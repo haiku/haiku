@@ -445,6 +445,24 @@ WinBorder::GetSizeLimits(float* minWidth, float* maxWidth,
 	*maxHeight = fMaxHeight;
 }
 
+#ifdef NEW_INPUT_HANDLING
+
+void
+WinBorder::MouseDown(const PointerEvent& event)
+{
+}
+
+void
+WinBorder::MouseUp(const PointerEvent& event)
+{
+}
+
+void
+WinBorder::MouseMoved(const PointerEvent& event, uint32 transit)
+{
+}
+
+#else
 /*!
 	\brief Handles B_MOUSE_DOWN events and takes appropriate actions
 	\param evt PointerEvent object containing the info from the last B_MOUSE_DOWN message
@@ -601,7 +619,7 @@ WinBorder::MouseUp(const PointerEvent& event)
 	fIsSlidingTab = false;
 	fBringToFrontOnRelease = false;
 }
-
+#endif
 // SetTabLocation
 void
 WinBorder::SetTabLocation(float location)

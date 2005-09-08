@@ -678,6 +678,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<uint32>(&mask);
 			link.Read<uint32>(&options);
 
+			fCurrentLayer->QuietlySetEventMask(mask);
+			fCurrentLayer->QuietlySetEventOptions(options);
+
 			if (myRootLayer)
 				myRootLayer->AddToInputNotificationLists(fCurrentLayer, mask, options);
 		}
