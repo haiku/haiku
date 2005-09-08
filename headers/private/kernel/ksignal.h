@@ -29,6 +29,7 @@ extern int _user_send_signal(pid_t tid, uint sig);
 extern int _user_sigprocmask(int how, const sigset_t *set, sigset_t *oldSet);
 extern int _user_sigaction(int sig, const struct sigaction *action, struct sigaction *oldAction);
 extern bigtime_t _user_set_alarm(bigtime_t time, uint32 mode);
+extern int _user_sigsuspend(const sigset_t *mask);
 
 #ifdef __cplusplus
 }	// extern "C"

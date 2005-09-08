@@ -8,6 +8,7 @@ KernelMergeObject posix_signal.o :
 	signal.c
 	sigprocmask.c
 	sigset.c
+	sigsuspend.c
 	strsignal.c
 	: -fPIC -DPIC
 	;

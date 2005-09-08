@@ -598,3 +598,16 @@ _user_sigaction(int signal, const struct sigaction *userAction, struct sigaction
 	return status;
 }
 
+
+int
+_user_sigsuspend(const sigset_t *mask) {
+	sigset_t set;
+	if (mask == NULL)
+		return B_BAD_VALUE;
+
+	if (user_memcpy(&set, mask, sizeof(sigset_t)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	// Todo : implement
+	return EINVAL;	
+}
