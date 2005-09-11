@@ -1221,13 +1221,24 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 		"New Mail Message", "N) 新規メッセージ作成"), msg, 'N'));
 	item->SetTarget(be_app);
 
-	QueryMenu *queryMenu;
-	queryMenu = new QueryMenu(MDR_DIALECT_CHOICE ("Open Draft", "O) ドラフトを開く"), false);
-	queryMenu->SetTargetForItems(be_app);
+	// Cheap hack - only show the drafts menu when composing messages.  Insert
+	// a "true || " in the following IF statement if you want the old BeMail
+	// behaviour.  The difference is that without live draft menu updating you
+	// can open around 100 e-mails (the BeOS maximum number of open files)
+	// rather than merely around 20, since each open draft-monitoring query
+	// sucks up one file handle per mounted BFS disk volume.  Plus mail file
+	// opening speed is noticably improved!  Possible ToDo: change this to pop
+	// up a Tracker query for drafts rather than populating the menu item with
+	// file names, then we can always have a draft menu turned on.
 
-	queryMenu->SetPredicate("MAIL:draft==1");
-	menu->AddItem(queryMenu);
+	if (!fIncoming) {
+		QueryMenu *queryMenu;
+		queryMenu = new QueryMenu(MDR_DIALECT_CHOICE ("Open Draft", "O) ドラフトを開く"), false);
+		queryMenu->SetTargetForItems(be_app);
 
+		queryMenu->SetPredicate("MAIL:draft==1");
+		menu->AddItem(queryMenu);
+	}
 	menu->AddSeparatorItem();
 
 	if (!resending && fIncoming) {
@@ -2786,7 +2797,7 @@ void
 TMailWindow::Print()
 {
 	BPrintJob print(Title());
-	
+
 	if (!print_settings)
 	{
 		if (print.Settings()) {
@@ -2966,7 +2977,7 @@ TMailWindow::Reply(entry_ref *ref, TMailWindow *window, uint32 type)
 	fHeaderView->fCc->SetText(fMail->CC());
 	fHeaderView->fSubject->SetText(fMail->Subject());
 
-	int32 chainID;	
+	int32 chainID;
 	BFile file(window->fRef, B_READ_ONLY);
 	if (file.ReadAttr("MAIL:reply_with", B_INT32_TYPE, 0, &chainID, 4) < B_OK)
 		chainID = -1;
