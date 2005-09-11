@@ -1012,8 +1012,8 @@ TMailApp::LoadSettings()
 					fFont.SetSize(size);
 
 				if (fontFamily[0] && fontStyle[0]) {
-					fFont.SetFamilyAndStyle(fontFamily[0] ? NULL : fontFamily,
-						fontStyle[0] ? NULL : fontStyle);
+					fFont.SetFamilyAndStyle(fontFamily[0] ? fontFamily : NULL,
+						fontStyle[0] ? fontStyle : NULL);
 				}
 			}
 		}
