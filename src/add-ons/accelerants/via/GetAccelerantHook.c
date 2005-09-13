@@ -90,15 +90,15 @@ void *	get_accelerant_hook(uint32 feature, void *data)
 		*/
 
 		/* only export video overlay functions if card is capable of it */
-//		CHKO(OVERLAY_COUNT);
-//		CHKO(OVERLAY_SUPPORTED_SPACES);
-//		CHKO(OVERLAY_SUPPORTED_FEATURES);
-//		CHKO(ALLOCATE_OVERLAY_BUFFER);
-//		CHKO(RELEASE_OVERLAY_BUFFER);
-//		CHKO(GET_OVERLAY_CONSTRAINTS);
-//		CHKO(ALLOCATE_OVERLAY);
-//		CHKO(RELEASE_OVERLAY);
-//		CHKO(CONFIGURE_OVERLAY);
+		CHKO(OVERLAY_COUNT);
+		CHKO(OVERLAY_SUPPORTED_SPACES);
+		CHKO(OVERLAY_SUPPORTED_FEATURES);
+		CHKO(ALLOCATE_OVERLAY_BUFFER);
+		CHKO(RELEASE_OVERLAY_BUFFER);
+		CHKO(GET_OVERLAY_CONSTRAINTS);
+		CHKO(ALLOCATE_OVERLAY);
+		CHKO(RELEASE_OVERLAY);
+		CHKO(CONFIGURE_OVERLAY);
 
 		/*
 		When requesting an acceleration hook, the calling application provides a
@@ -170,8 +170,11 @@ status_t check_overlay_capability(uint32 feature)
 		break;
 	}
 
-	/* all supported cards have a bes */
-	LOG(4, ("Overlay: Exporting hook %s.\n", msg));
+	/* all supported cards have a bes, but it can't always be used... */
+	if (eng_bes_chk_bandwidth())
+		LOG(4, ("Overlay: Exporting hook %s.\n", msg));
+	else
+		LOG(4, ("Overlay: Not exporting hook %s.\n", msg));
 
 	return B_OK;
 }

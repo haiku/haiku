@@ -115,6 +115,7 @@ status_t eng_acc_wait_idle(void);
 
 /* backend scaler functions */
 status_t check_overlay_capability(uint32 feature);
+bool eng_bes_chk_bandwidth(void);
 void eng_bes_move_overlay(void);
 status_t eng_bes_to_crtc(bool crtc);
 status_t eng_bes_init(void);

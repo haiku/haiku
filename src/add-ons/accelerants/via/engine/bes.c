@@ -19,6 +19,64 @@ struct move_overlay_info
 static void eng_bes_calc_move_overlay(move_overlay_info *moi);
 static void eng_bes_program_move_overlay(move_overlay_info moi);
 
+/* returns true if the current displaymode leaves enough bandwidth for overlay
+ * support, false if not. */
+bool eng_bes_chk_bandwidth()
+{
+	float refresh, bandwidth;
+	uint8 depth;
+
+	switch(si->dm.space)
+	{
+	case B_CMAP8:        depth =  8; break;
+	case B_RGB15_LITTLE: depth = 16; break;
+	case B_RGB16_LITTLE: depth = 16; break;
+	case B_RGB32_LITTLE: depth = 32; break;
+	default:
+		LOG(8,("Overlay: Invalid colour depth 0x%08x\n", si->dm.space));
+		return false;
+	}
+
+	refresh =
+		(si->dm.timing.pixel_clock * 1000) /
+		(si->dm.timing.h_total * si->dm.timing.v_total);
+	bandwidth =
+		si->dm.timing.h_display * si->dm.timing.v_display * refresh * depth;
+	LOG(8,("Overlay: Current mode's refreshrate is %.2fHz, bandwidth is %.0f\n",
+		refresh, bandwidth));
+
+	switch (((CRTCR(MEMCLK)) & 0x70) >> 4)
+	{
+	case 0: /* SDR  66 */
+	case 1: /* SDR 100 */
+	case 2: /* SDR 133 */
+		/* memory is too slow, sorry. */
+		return false;
+		break;
+	case 3: /* DDR 100 */
+		/* DDR100's basic limit... */
+		if (bandwidth > 921600000.0) return false;
+		/* ... but we have constraints at higher than 800x600 */
+		if (si->dm.timing.h_display > 800)
+		{
+			if (depth != 8) return false;
+			if (si->dm.timing.v_display > 768) return false;
+			if (refresh > 60.2) return false;
+		}
+		break;
+	case 4: /* DDR 133 */
+		if (bandwidth > 4045440000.0) return false;
+		break;
+	default: /* not (yet?) used */
+		return false;
+		break;
+	}
+
+//fixme: temporary (implement overlay first)
+//	return true;
+	return false;
+}
+
 /* move the overlay output window in virtualscreens */
 /* Note:
  * si->dm.h_display_start and si->dm.v_display_start determine where the new
