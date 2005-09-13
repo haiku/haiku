@@ -583,6 +583,7 @@
 #define ENCRTCX_VTIMEXT_PIT	0x35
 #define ENCRTCX_HTIMEXT2	0x36
 #define ENCRTCX_TVTYPE		0x3b //TVtype jumper: b1=1 = PAL, else NTSC
+#define ENCRTCX_MEMCLK		0x3d
 //end via
 /* Nvidia specific registers: */
 #define ENCRTCX_REPAINT0	0x19
