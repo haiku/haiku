@@ -900,10 +900,10 @@ create_team_arg(int32 argc, char **args, int32 envCount, char **env)
 }
 
 
-static int32
+static status_t 
 team_create_thread_start(void *args)
 {
-	int err;
+	status_t err;
 	struct thread *t;
 	struct team *team;
 	struct team_arg *teamArgs = args;
@@ -1015,6 +1015,7 @@ team_create_thread_start(void *args)
 	if (err < B_OK) {
 		// Luckily, we don't have to clean up the mess we created - that's
 		// done for us by the normal team deletion process
+		TRACE(("team_create_thread_start: error when elf_load_user_image() %s\n", strerror(err))); 
 		return err;
 	}
 
@@ -1026,7 +1027,7 @@ team_create_thread_start(void *args)
 	arch_thread_enter_uspace(t, entry, uspa, NULL);
 
 	// never gets here
-	return 0;
+	return B_OK;
 }
 
 
@@ -1268,7 +1269,7 @@ exec_team(int32 argCount, char **args, int32 envCount, char **env)
 	// sorry, we have to kill us, there is no way out anymore (without any areas left and all that)
 	exit_thread(status);
 	
-	// we'll never make it here
+	// we'll never make it here (korli: not that sure ...)
 	return B_ERROR;
 }
 
