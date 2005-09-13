@@ -181,7 +181,10 @@ status_t eng_dac_set_pix_pll(display_mode target)
 		return result;
 	}
 
-	/*reprogram (disable,select,wait for stability,enable)*/
+	/* reset primary pixelPLL */
+	SEQW(PLL_RESET, ((SEQR(PLL_RESET)) | 0x02));
+	snooze(1000);
+	SEQW(PLL_RESET, ((SEQR(PLL_RESET)) & ~0x02));
 
 	/* program new frequency */
 	if (si->ps.card_arch != K8M800)
@@ -197,6 +200,15 @@ status_t eng_dac_set_pix_pll(display_mode target)
 		SEQW(PPLL_M_OTH, (m & 0x3f));
 		SEQW(PPLL_P_OTH, (p & 0x03));
 	}
+
+	/* reset primary pixelPLL (playing it safe) */
+	SEQW(PLL_RESET, ((SEQR(PLL_RESET)) | 0x02));
+	snooze(1000);
+	SEQW(PLL_RESET, ((SEQR(PLL_RESET)) & ~0x02));
+
+	/* now select pixelclock source D (the above custom VIA programmable PLL) */
+	snooze(1000);
+	ENG_REG8(RG8_MISCW) = 0xcf;
 
 	/* Wait for the PIXPLL frequency to lock until timeout occurs */
 //fixme: do VIA cards have a LOCK indication bit??

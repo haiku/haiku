@@ -90,7 +90,7 @@ status_t eng_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku VIA Accelerant 0.09 running.\n"));
+	LOG(1,("POWERUP: Haiku VIA Accelerant 0.10 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -452,8 +452,6 @@ status_t eng_general_head_select(bool cross)
  * Should work from VGA BIOS POST init state. */
 static status_t eng_general_bios_to_powergraphics()
 {
-	display_mode dummy;
-
 	/* let acc engine make power off/power on cycle to start 'fresh' */
 //	ENG_REG32(RG32_PWRUPCTRL) = 0x13110011;
 	snooze(1000);
@@ -528,23 +526,6 @@ static status_t eng_general_bios_to_powergraphics()
 	SEQW(MAPMASK, 0x0f);
 	/* setup sequencer clocking mode */
 	SEQW(CLKMODE, 0x21);
-
-	/* playing it safe (I hope): */
-	/* reset primary pixelPLL */
-	SEQW(PLL_RESET, ((SEQR(PLL_RESET)) | 0x02));
-	snooze(1000);
-	SEQW(PLL_RESET, ((SEQR(PLL_RESET)) & ~0x02));
-	/* set some valid pixelclock PLL speed (using 40Mhz) */
-	dummy.timing.pixel_clock = 40000;
-	head1_set_pix_pll(dummy);
-	/* reset primary pixelPLL */
-	SEQW(PLL_RESET, ((SEQR(PLL_RESET)) | 0x02));
-	snooze(1000);
-	SEQW(PLL_RESET, ((SEQR(PLL_RESET)) & ~0x02));
-
-	/* now select pixelclock source D (the above custom VIA programmable PLL) */
-	snooze(1000);
-	ENG_REG8(RG8_MISCW) = 0xcf;
 
 	/* setup AGP:
 	 * Note:
