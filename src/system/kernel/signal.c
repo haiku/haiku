@@ -600,7 +600,8 @@ _user_sigaction(int signal, const struct sigaction *userAction, struct sigaction
 
 
 int
-_user_sigsuspend(const sigset_t *mask) {
+_user_sigsuspend(const sigset_t *mask)
+{
 	sigset_t set;
 	if (mask == NULL)
 		return B_BAD_VALUE;
@@ -611,3 +612,14 @@ _user_sigsuspend(const sigset_t *mask) {
 	// Todo : implement
 	return EINVAL;	
 }
+
+
+int
+_user_sigpending(sigset_t *set) {
+	if (set == NULL)
+		return B_BAD_VALUE;
+
+	// Todo : implement
+	return EINVAL;
+}
+

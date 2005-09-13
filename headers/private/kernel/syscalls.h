@@ -104,6 +104,7 @@ extern int		_kern_sigprocmask(int how, const sigset_t *set, sigset_t *oldSet);
 extern int		_kern_sigaction(int sig, const struct sigaction *action, struct sigaction *oldAction);
 extern bigtime_t	_kern_set_alarm(bigtime_t time, uint32 mode);
 extern int		_kern_sigsuspend(const sigset_t *mask);
+extern int		_kern_sigpending(sigset_t *set);
 
 // image functions
 extern image_id		_kern_register_image(image_info *info, size_t size);

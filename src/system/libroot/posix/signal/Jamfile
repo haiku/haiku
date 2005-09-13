@@ -6,6 +6,7 @@ KernelMergeObject posix_signal.o :
 	send_signal.c
 	sigaction.c
 	signal.c
+	sigpending.c
 	sigprocmask.c
 	sigset.c
 	sigsuspend.c
