@@ -1,0 +1,49 @@
+Haiku ScreenSaver Kit Replacement v1.0.0
+
+ABOUT:
+
+This is a drop-in replacement for the BeOS ScreenSaver Kit that comes with
+BeOS. The package contains the following files:
+
+  README
+   The file you are reading.
+
+  LICENSE
+   Conditions for using/distributing this package.
+
+  screen_blanker
+   This is the new screen_blanker. It will be installed in 
+   /boot/home/config/bin/
+
+  ScreenSaver preferences app
+   This is the new preferences app. It will be installed in 
+   /boot/home/Desktop/haiku-screensaverkit
+
+  screen_saver
+   This is the new input filter addon. It will be installed in
+    /boot/home/config/add-ons/input_server/filters/
+
+  libscreensaver.so
+   This is the new library. It will be installed in 
+    /boot/home/config/lib/
+
+  Haiku
+   This is a ScreenSaver addon we wrote for fun. It will be installed in
+    /boot/home/config/add-ons/Screen Savers/
+
+REQUIREMENTS: BeOS R5 - R5.0.3 for Intel
+
+INSTALLATION:
+
+Installation is through a zip file. Just unzip the
+file somewhere and double click the install.sh icon.
+
+File bug reports at (category ScreenSaver Kit)
+http://www.haiku-os.org/bugzilla
+
+TODO:
+
+This is a partial list of what we intend to implement. Suggestions are welcome:
+
+ - More...
+
