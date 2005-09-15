@@ -312,7 +312,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	/* set up acceleration for this mode */
 //	eng_acc_init();
 	/* set up overlay unit for this mode */
-//	eng_bes_init();
+	eng_bes_init();
 
 	LOG(1,("SETMODE: booted since %f mS\n", system_time()/1000.0));
 

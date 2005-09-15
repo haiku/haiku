@@ -437,6 +437,18 @@ status_t eng_bes_to_crtc(bool crtc)
 
 status_t eng_bes_init()
 {
+	/* select colorspace setup for B_YCbCr422 */
+	//depending on chiprrev:
+        /* Read PCI bus 0, dev 0, function 0, index 0xF6 to get chip rev. */
+//        pVia->ChipRev = pciReadByte(pciTag(0, 0, 0), 0xF6);
+//rev <= 0x09: (gives more color saturation?)
+//BTW: Nimble V5 = pre rev 10. (runtime check will be added asap)
+BESW(VID1_COLSPAC1, 0x140020f2);
+BESW(VID1_COLSPAC2, 0x0a0a2c00);
+//rev >= 0x10:
+//BESW(VID1_COLSPAC1, 0x13000ded);
+//BESW(VID1_COLSPAC2, 0x13171000);
+
 	if (si->ps.card_arch < NV10A)
 	{
 		/* disable overlay ints (b0 = buffer 0, b4 = buffer 1) */
@@ -754,26 +766,15 @@ status_t eng_configure_bes
 	 *** actually program the registers ***
 	 **************************************/
 
-	if (1)//si->ps.card_arch < NV10A)
-	{
-		/* unknown, but needed (otherwise high-res distortions and only half the frames */
-//		BESW(NV04_OE_STATE, 0x00000000);
-		/* select buffer 0 as active (b16) */
-//		BESW(NV04_SU_STATE, 0x00000000);
-		/* unknown (no effect?) */
-//		BESW(NV04_RM_STATE, 0x00000000);
-		/* setup clipped(!) buffer startadress in RAM */
-		/* RIVA128 - TNT bes doesn't have clipping registers, so no subpixelprecise clipping
-		 * either. We do pixelprecise vertical and 'two pixel' precise horizontal clipping here. */
-		/* (program both buffers to prevent sync distortions) */
-		/* first include 'pixel precise' left clipping... (top clipping was already included) */
-		moi.a1orgv += ((moi.hsrcstv >> 16) * 2);
-		/* we need to step in 4-byte (2 pixel) granularity due to the nature of yuy2 */
-//		BESW(NV04_0BUFADR, (moi.a1orgv & ~0x03));
-//		BESW(NV04_1BUFADR, (moi.a1orgv & ~0x03));
-		BESW(VID1Y_ADDR0, (moi.a1orgv & 0x07fffffc));
+	/* setup clipped(!) buffer startadress in RAM */
+	/* VIA bes doesn't have clipping registers, so no subpixelprecise clipping
+	 * either. We do pixelprecise vertical and 'two pixel' precise horizontal clipping here. */
+	/* first include 'pixel precise' left clipping... (top clipping was already included) */
+	moi.a1orgv += ((moi.hsrcstv >> 16) * 2);
+	/* we need to step in 4-byte (2 pixel) granularity due to the nature of yuy2 */
+	BESW(VID1Y_ADDR0, (moi.a1orgv & 0x07fffffc));
 
-		/* setup buffersize */
+	/* setup buffersize */
 		//fixme if needed: width must be even officially...
 //		BESW(NV10_0SRCSIZE, ((ob->height << 16) | ob->width));
 //linux b0-15:
@@ -801,56 +802,53 @@ status_t eng_configure_bes
 //               to small to handle (limit reached)
 //rud +instruct VID1_MINI_CTL register about modified scaling. (V1_X_DIV_2 | V1_X_INTERPOLY)
 BESW(VID1_MINI_CTL, 0);
+
 //fixme for minimize ctrl...
-		BESW(V1_SOURCE_WH, ((ob->height << 16) | (ob->width - 0)));
+	BESW(V1_SOURCE_WH, ((ob->height << 16) | (ob->width - 0)));
 
-		/* setup buffer source pitch including slopspace (in bytes).
-		 * Note:
-		 * source pitch granularity = 16 pixels on the RIVA128 - TNT (so pre-NV10) bes */
-		/* (program both buffers to prevent sync distortions) */
+	/* setup buffer source pitch including slopspace (in bytes).
+	 * Note:
+	 * source pitch granularity = yet unknown (fixme) */
+	BESW(VID1_STRIDE, (ob->width * 2));
 
-		BESW(VID1_STRIDE, (ob->width * 2));
-//		BESW(NV04_0SRCPTCH, (ob->width * 2));
-//		BESW(NV04_1SRCPTCH, (ob->width * 2));
-		/* setup output window position */
-//		BESW(NV04_DSTREF, ((moi.vcoordv & 0xffff0000) | ((moi.hcoordv & 0xffff0000) >> 16)));
-		BESW(VID1_HVSTART, ((moi.hcoordv & 0xffff0000) | ((moi.vcoordv & 0xffff0000) >> 16)));
+	/* setup output window position */
+	BESW(VID1_HVSTART, ((moi.hcoordv & 0xffff0000) | ((moi.vcoordv & 0xffff0000) >> 16)));
 
-		/* setup output window size */
-//		BESW(NV04_DSTSIZE, (
-//			(((moi.vcoordv & 0x0000ffff) - ((moi.vcoordv & 0xffff0000) >> 16) + 1) << 16) |
-//			((moi.hcoordv & 0x0000ffff) - ((moi.hcoordv & 0xffff0000) >> 16) + 1)
-//			));
-		BESW(VID1_SIZE, (((moi.hcoordv & 0x0000ffff) << 16) | (moi.vcoordv & 0x0000ffff)));
-		/* setup horizontal and vertical scaling */
+	/* setup output window size */
+	BESW(VID1_SIZE, (((moi.hcoordv & 0x0000ffff) << 16) | (moi.vcoordv & 0x0000ffff)));
+
+	/* setup horizontal and vertical scaling */
 //		BESW(NV04_ISCALVH, (((viscalv << 16) >> 5) | (hiscalv >> 5)));
 //fixme: scaling 1x
-		BESW(VID1_ZOOM, 0);
+	BESW(VID1_ZOOM, 0);
 
 		/* enable vertical filtering (b0) */
 //		BESW(NV04_CTRL_V, 0x00000001);
 		/* enable horizontal filtering (no effect?) */
 //		BESW(NV04_CTRL_H, 0x00000111);
 
-		/* enable BES (b0), format yuv422 (b2-4 = %000), input is frame (not field) (b9=0) */
-//		BESW(VID1_CTL, 0x00000001);
-		BESW(VID1_CTL, 0x01050001);
-//0x00050000
-		/* enable colorkeying (b0 = 1), V1 cmds fire (b31), V1 on top of V3 (b20=0),
-		 * no chromakey (b1=0) */
-//		BESW(COMPOSE, 0x80000000);
-		BESW(COMPOSE, 0xe0000000);//a = nu, 9 = vbi load all regs
+	/* enable BES (b0), format yuv422 (b2-4 = %000), set colorspace sign (b7 = 1),
+	 * input is frame (not field) picture (b9 = 0), expire = $f (b16-19),
+	 * select field (not frame)(!) base (b24 = 0) */
+//pre rev 0x10:
+	BESW(VID1_CTL, 0x00050081);
+//rev 0x10 and later:
+//	BESW(VID1_CTL, 0x000f0081);
 
-//rud: add from MGA driver: horizontal last position in source:
-//#define V1_FETCHCOUNT_ALIGNMENT 0x0000000f
-//#define V1_FETCHCOUNT_UNIT      0x00000004   /* Doubld QWORD */
-//((((dwSrcWidth<<1)+V1_FETCHCOUNT_ALIGNMENT)&~V1_FETCHCOUNT_ALIGNMENT) >> V1_FETCHCOUNT_UNIT)+1;
-//max = 0x3ff
+	/* enable colorkeying (b0 = 1), enable chromakeying (b1 = 1), Vid1 on top of Vid3 (b20 = 0),
+	 * all registers are loaded immediately (b29 = 1), Vid1 cmds fire (b31 = 1) */
+	BESW(COMPOSE, 0xa0000000);//tst, fixme: 9 = vbi load all regs
+
+//rud: add from MGA driver: horizontal last position in source: (also update on left+right clips!)
+//max = 0x3ff BYTES(!)
 //test:(fixme!)
-		BESW(VID1_FETCH, (0x200 << 20));
+	BESW(VID1_FETCH, (0x028 << 20));//mpeg1 temp tst. (320 pixels)
 
-		/* select buffer 1 as active (b16) */
-//		BESW(NV04_SU_STATE, 0x00010000);
+//rud: via special: fifo depth is $20 (b0-5), threshold $10 (b8-13), prethreshold $1d (b24-29)
+//pre rev 0x10:
+	BESW(VID1_FIFO, 0x1d00101f);
+//rev 0x10 and later:
+//	BESW(VID1_FIFO, 0x3800383f);
 
 		/**************************
 		 *** setup color keying ***
@@ -886,75 +884,6 @@ BESW(VID1_MINI_CTL, 0);
 //				));
 			break;
 		}
-	}
-	else
-	{
-		/* >= NV10A */
-	
-		/* setup buffer origin: GeForce uses subpixel precise clipping on left and top! (12.4 values) */
-//		BESW(NV10_0SRCREF, ((moi.v1srcstv << 4) & 0xffff0000) | ((moi.hsrcstv >> 12) & 0x0000ffff));
-		/* setup buffersize */
-		//fixme if needed: width must be even officially...
-//		BESW(NV10_0SRCSIZE, ((ob->height << 16) | ob->width));
-		/* setup source pitch including slopspace (in bytes),
-		 * b16: select YUY2 (0 = YV12), b20: use colorkey, b24: no iturbt_709 (do iturbt_601) */
-		/* Note:
-		 * source pitch granularity = 32 pixels on GeForce cards!! */
-//		BESW(NV10_0SRCPTCH, (((ob->width * 2) & 0x0000ffff) | (1 << 16) | (1 << 20) | (0 << 24)));
-		/* setup output window position */
-//		BESW(NV10_0DSTREF, ((moi.vcoordv & 0xffff0000) | ((moi.hcoordv & 0xffff0000) >> 16)));
-		/* setup output window size */
-//		BESW(NV10_0DSTSIZE, (
-//			(((moi.vcoordv & 0x0000ffff) - ((moi.vcoordv & 0xffff0000) >> 16) + 1) << 16) |
-//			((moi.hcoordv & 0x0000ffff) - ((moi.hcoordv & 0xffff0000) >> 16) + 1)
-//			));
-		/* setup horizontal scaling */
-//		BESW(NV10_0ISCALH, (hiscalv << 4));
-		/* setup vertical scaling */
-//		BESW(NV10_0ISCALV, (viscalv << 4));
-		/* setup (unclipped!) buffer startadress in RAM */
-//		BESW(NV10_0BUFADR, moi.a1orgv);
-		/* enable BES (b0 = 0) */
-//		BESW(NV10_GENCTRL, 0x00000000);
-		/* We only use buffer buffer 0: select it. (0x01 = buffer 0, 0x10 = buffer 1) */
-		/* This also triggers activation of programmed values (double buffered registers feature) */
-//		BESW(NV10_BUFSEL, 0x00000001);
-
-		/**************************
-		 *** setup color keying ***
-		 **************************/
-
-		/* setup colorkeying */
-		switch(si->dm.space)
-		{
-		case B_RGB15_LITTLE:
-//			BESW(NV10_COLKEY, (
-//				((ow->blue.value & ow->blue.mask) << 0)   |
-//				((ow->green.value & ow->green.mask) << 5) |
-//				((ow->red.value & ow->red.mask) << 10)    |
-//				((ow->alpha.value & ow->alpha.mask) << 15)
-//				));
-			break;
-		case B_RGB16_LITTLE:
-//			BESW(NV10_COLKEY, (
-//				((ow->blue.value & ow->blue.mask) << 0)   |
-//				((ow->green.value & ow->green.mask) << 5) |
-//				((ow->red.value & ow->red.mask) << 11)
-				/* this space has no alpha bits */
-//				));
-			break;
-		case B_CMAP8:
-		case B_RGB32_LITTLE:
-		default:
-//			BESW(NV10_COLKEY, (
-//				((ow->blue.value & ow->blue.mask) << 0)   |
-//				((ow->green.value & ow->green.mask) << 8) |
-//				((ow->red.value & ow->red.mask) << 16)    |
-//				((ow->alpha.value & ow->alpha.mask) << 24)
-//				));
-			break;
-		}
-	}
 
 	/* note that overlay is in use (for eng_bes_move_overlay()) */
 	si->overlay.active = true;
