@@ -72,9 +72,7 @@ bool eng_bes_chk_bandwidth()
 		break;
 	}
 
-//temp, until overlay works:
-//	return true;
-	return false;
+	return true;
 }
 
 /* move the overlay output window in virtualscreens */
@@ -449,6 +447,12 @@ BESW(VID1_COLSPAC2, 0x0a0a2c00);
 //BESW(VID1_COLSPAC1, 0x13000ded);
 //BESW(VID1_COLSPAC2, 0x13171000);
 
+//rud: via special: fifo depth is $20 (b0-5), threshold $10 (b8-13), prethreshold $1d (b24-29)
+//pre rev 0x10:
+	BESW(VID1_FIFO, 0x1d00101f);
+//rev 0x10 and later:
+//	BESW(VID1_FIFO, 0x3800383f);
+
 	if (si->ps.card_arch < NV10A)
 	{
 		/* disable overlay ints (b0 = buffer 0, b4 = buffer 1) */
@@ -518,7 +522,10 @@ status_t eng_configure_bes
 	uint32 ifactor;
 	/* copy of overlay view which has checked valid values */
 	overlay_view my_ov;
-
+	/* true if scaling needed */
+	bool scale_x, scale_y;
+	/* for computing scaling register value */
+	uint32 scaleval;
 
 	/**************************************************************************************
 	 *** copy, check and limit if needed the user-specified view into the intput bitmap ***
@@ -586,7 +593,7 @@ status_t eng_configure_bes
 	ifactor = (((uint32)(my_ov.width - intrep)) << 16) / (ow->width - intrep); 
 
 	/* correct factor to prevent most-right visible 'line' from distorting */
-	ifactor -= (1 << 2);
+	ifactor -= (1 << 5);
 	hiscalv = ifactor;
 	/* save for eng_bes_calc_move_overlay() */
 	si->overlay.h_ifactor = ifactor;
@@ -594,48 +601,26 @@ status_t eng_configure_bes
 
 	/* check scaling factor (and modify if needed) to be within scaling limits */
 	/* all cards have a upscaling limit of 8.0 (see official nVidia specsheets) */
+	//fixme: checkout...
 	if (hiscalv < 0x00002000)
 	{
 		/* (non-inverse) factor too large, set factor to max. valid value */
 		hiscalv = 0x00002000;
 		LOG(4,("Overlay: horizontal scaling factor too large, clamping at %f\n", (float)65536 / hiscalv));
 	}
-	switch (si->ps.card_arch)
+	/* VIA has a 'downscaling' limit of 1.0
+	 * (11bit register with 0.11 format value, with special 1.0 scaling factor setting) */
+	//fixme: add downscaling 'trick' solution as supported by VIA (1/16 is min. size).
+	scale_x = true;
+	if (hiscalv > 0x00010000)
 	{
-	case NV04A:
-		/* Riva128-TNT2 series have a 'downscaling' limit of 1.000489
-		 * (16bit register with 0.11 format value) */
-		if (hiscalv > 0x0000ffff)
-		{
-			/* (non-inverse) factor too small, set factor to min. valid value */
-			hiscalv = 0x0000ffff;
-			LOG(4,("Overlay: horizontal scaling factor too small, clamping at %f\n", (float)2048 / (hiscalv >> 5)));
-		}
-		break;
-	case NV30A:
-	case NV40A:
-		/* GeForceFX series and up have a downscaling limit of 0.5 (except NV31!) */
-		if ((hiscalv > (2 << 16)) && (si->ps.card_type != NV31))
-		{
-			/* (non-inverse) factor too small, set factor to min. valid value */
-			hiscalv = (2 << 16);
-			LOG(4,("Overlay: horizontal scaling factor too small, clamping at %f\n", (float)65536 / hiscalv));
-		}
-		/* NV31 (confirmed GeForceFX 5600) has NV20A scaling limits!
-		 * So let it fall through... */
-		if (si->ps.card_type != NV31) break;
-	default:
-		/* the rest has a downscaling limit of 0.125 */
-		if (hiscalv > (8 << 16))
-		{
-			/* (non-inverse) factor too small, set factor to min. valid value */
-			hiscalv = (8 << 16);
-			LOG(4,("Overlay: horizontal scaling factor too small, clamping at %f\n", (float)65536 / hiscalv));
-		}
-		break;
+		/* (non-inverse) factor too small, set factor to min. valid value */
+		hiscalv = 0x00010000;
+		scale_x = false;
+		LOG(4,("Overlay: horizontal scaling factor too small, clamping at %f\n", (float)2048 / (hiscalv >> 5)));
 	}
 	/* AND below is required by hardware */
-	hiscalv &= 0x001ffffc;
+	hiscalv &= 0x0000ffe0;
 
 
 	/******************************
@@ -676,7 +661,7 @@ status_t eng_configure_bes
 	ifactor = (((uint32)(my_ov.height - intrep)) << 16) / (ow->height - intrep); 
 
 	/* correct factor to prevent lowest visible line from distorting */
-	ifactor -= (1 << 2);
+	ifactor -= (1 << 6);
 	LOG(4,("Overlay: vertical scaling factor is %f\n", (float)65536 / ifactor));
 
 	/* preserve ifactor for source positioning calculations later on */
@@ -686,48 +671,26 @@ status_t eng_configure_bes
 
 	/* check scaling factor (and modify if needed) to be within scaling limits */
 	/* all cards have a upscaling limit of 8.0 (see official nVidia specsheets) */
+	//fixme: checkout...
 	if (viscalv < 0x00002000)
 	{
 		/* (non-inverse) factor too large, set factor to max. valid value */
 		viscalv = 0x00002000;
 		LOG(4,("Overlay: vertical scaling factor too large, clamping at %f\n", (float)65536 / viscalv));
 	}
-	switch (si->ps.card_arch)
+	/* VIA has a 'downscaling' limit of 1.0
+	 * (10bit register with 0.10 format value, with special 1.0 scaling factor setting) */
+	//fixme: add downscaling 'trick' solution as supported by VIA (1/16 is min. size).
+	scale_y = true;
+	if (viscalv > 0x00010000)
 	{
-	case NV04A:
-		/* Riva128-TNT2 series have a 'downscaling' limit of 1.000489
-		 * (16bit register with 0.11 format value) */
-		if (viscalv > 0x0000ffff)
-		{
-			/* (non-inverse) factor too small, set factor to min. valid value */
-			viscalv = 0x0000ffff;
-			LOG(4,("Overlay: vertical scaling factor too small, clamping at %f\n", (float)2048 / (viscalv >> 5)));
-		}
-		break;
-	case NV30A:
-	case NV40A:
-		/* GeForceFX series and up have a downscaling limit of 0.5 (except NV31!) */
-		if ((viscalv > (2 << 16)) && (si->ps.card_type != NV31))
-		{
-			/* (non-inverse) factor too small, set factor to min. valid value */
-			viscalv = (2 << 16);
-			LOG(4,("Overlay: vertical scaling factor too small, clamping at %f\n", (float)65536 / viscalv));
-		}
-		/* NV31 (confirmed GeForceFX 5600) has NV20A scaling limits!
-		 * So let it fall through... */
-		if (si->ps.card_type != NV31) break;
-	default:
-		/* the rest has a downscaling limit of 0.125 */
-		if (viscalv > (8 << 16))
-		{
-			/* (non-inverse) factor too small, set factor to min. valid value */
-			viscalv = (8 << 16);
-			LOG(4,("Overlay: vertical scaling factor too small, clamping at %f\n", (float)65536 / viscalv));
-		}
-		break;
+		/* (non-inverse) factor too small, set factor to min. valid value */
+		viscalv = 0x00010000;
+		scale_y = false;
+		LOG(4,("Overlay: vertical scaling factor too small, clamping at %f\n", (float)1024 / (viscalv >> 6)));
 	}
 	/* AND below is required by hardware */
-	viscalv &= 0x001ffffc;
+	viscalv &= 0x0000ffc0;
 
 
 	/********************************************************************************
@@ -817,10 +780,14 @@ BESW(VID1_MINI_CTL, 0);
 	/* setup output window size */
 	BESW(VID1_SIZE, (((moi.hcoordv & 0x0000ffff) << 16) | (moi.vcoordv & 0x0000ffff)));
 
-	/* setup horizontal and vertical scaling */
-//		BESW(NV04_ISCALVH, (((viscalv << 16) >> 5) | (hiscalv >> 5)));
-//fixme: scaling 1x
-	BESW(VID1_ZOOM, 0);
+	/* setup horizontal and vertical scaling:
+	 * setup horizontal scaling enable (b31), setup vertical scaling enable (b15).
+	 * Note:
+	 * Vertical scaling has a different resolution than horizontal scaling(!).  */
+	scaleval = 0x00000000;
+	if (scale_x) scaleval |= 0x80000000;
+	if (scale_y) scaleval |= 0x00008000;
+	BESW(VID1_ZOOM, (scaleval | ((hiscalv << 16) >> 5) | (viscalv >> 6)));
 
 		/* enable vertical filtering (b0) */
 //		BESW(NV04_CTRL_V, 0x00000001);
@@ -842,13 +809,7 @@ BESW(VID1_MINI_CTL, 0);
 //rud: add from MGA driver: horizontal last position in source: (also update on left+right clips!)
 //max = 0x3ff BYTES(!)
 //test:(fixme!)
-	BESW(VID1_FETCH, (0x028 << 20));//mpeg1 temp tst. (320 pixels)
-
-//rud: via special: fifo depth is $20 (b0-5), threshold $10 (b8-13), prethreshold $1d (b24-29)
-//pre rev 0x10:
-	BESW(VID1_FIFO, 0x1d00101f);
-//rev 0x10 and later:
-//	BESW(VID1_FIFO, 0x3800383f);
+	BESW(VID1_FETCH, (0x030 << 20));//mpeg1 temp tst. (384 pixels)
 
 		/**************************
 		 *** setup color keying ***

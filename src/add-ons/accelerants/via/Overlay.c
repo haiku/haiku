@@ -440,29 +440,12 @@ status_t GET_OVERLAY_CONSTRAINTS
 			oc->window.height.max = dm->virtual_height;
 		}
 
-		/* GeForce scaling restrictions */
-		switch (si->ps.card_arch)
-		{
-		case NV04A:
-			/* Riva128-TNT2 series have an old BES engine... */
-			oc->h_scale.min = 1.0;
-			oc->v_scale.min = 1.0;
-			break;
-		case NV30A:
-		case NV40A:
-			/* GeForceFX series and up have a new BES engine... */
-			oc->h_scale.min = 0.5;
-			oc->v_scale.min = 0.5;
-			/* NV31 (confirmed GeForceFX 5600) has NV20A scaling limits!
-			 * So let it fall through... */
-			if (si->ps.card_type != NV31) break;
-		default:
-			/* the rest in between... */
-			oc->h_scale.min = 0.125;
-			oc->v_scale.min = 0.125;
-			break;
-		}
+		/* VIA scaling restrictions */
+		/* VIA has a 'tricked' 1/16 minimum */
+		oc->h_scale.min = 0.0625;
+		oc->v_scale.min = 0.0625;
 		/* all cards have a upscaling limit of 8.0 (see official nVidia specsheets) */
+		//checkout.. (fixme)
 		oc->h_scale.max = 8.0;
 		oc->v_scale.max = 8.0;
 
