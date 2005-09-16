@@ -900,7 +900,7 @@ create_team_arg(int32 argc, char **args, int32 envCount, char **env)
 }
 
 
-static status_t 
+static int32
 team_create_thread_start(void *args)
 {
 	status_t err;

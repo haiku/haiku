@@ -609,17 +609,18 @@ _user_sigsuspend(const sigset_t *mask)
 	if (user_memcpy(&set, mask, sizeof(sigset_t)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	// Todo : implement
-	return EINVAL;	
+	// ToDo: implement
+	return B_ERROR;	
 }
 
 
 int
-_user_sigpending(sigset_t *set) {
+_user_sigpending(sigset_t *set)
+{
 	if (set == NULL)
 		return B_BAD_VALUE;
 
-	// Todo : implement
-	return EINVAL;
+	// ToDo: implement
+	return B_ERROR;
 }
 
