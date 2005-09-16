@@ -85,6 +85,8 @@ class WinBorder : public Layer {
 	virtual	void				MouseDown(const PointerEvent& evt);
 	virtual	void				MouseUp(const PointerEvent& evt);
 	virtual	void				MouseMoved(const PointerEvent& evt, uint32 transit);
+			click_type			ActionFor(const PointerEvent& evt)
+									{ return _ActionFor(evt); }
 #else
 			click_type			MouseDown(const PointerEvent& evt);
 			void				MouseMoved(const PointerEvent& evt);

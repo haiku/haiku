@@ -1100,7 +1100,7 @@ Layer::ScrollBy(float x, float y)
 void
 Layer::MouseDown(const PointerEvent& evt)
 {
-	if (Window()) {
+	if (Window() && !IsTopLayer()) {
 		BMessage msg;
 		msg.what = B_MOUSE_DOWN;
 		msg.AddInt64("when", evt.when);
@@ -1116,7 +1116,7 @@ Layer::MouseDown(const PointerEvent& evt)
 void
 Layer::MouseUp(const PointerEvent& evt)
 {
-	if (Window()) {
+	if (Window() && !IsTopLayer()) {
 		BMessage upmsg(B_MOUSE_UP);
 		upmsg.AddInt64("when",evt.when);
 		upmsg.AddPoint("where",evt.where);
@@ -1129,7 +1129,7 @@ Layer::MouseUp(const PointerEvent& evt)
 void
 Layer::MouseMoved(const PointerEvent& evt, uint32 transit)
 {
-	if (Window()) {
+	if (Window() && !IsTopLayer()) {
 		BMessage movemsg(B_MOUSE_MOVED);
 		movemsg.AddInt64("when", evt.when);
 		movemsg.AddPoint("where", evt.where);

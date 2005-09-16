@@ -49,6 +49,13 @@ struct ListData
 
 class Workspace {
 	public:
+		class State {
+			public:
+							State() : Front(NULL), Focus(NULL), WindowList(40) { }
+				WinBorder*	Front;
+				WinBorder*	Focus;
+				BList		WindowList;
+		};
 								Workspace(	const int32 ID,
 											const uint32 colorspace,
 											const RGBColor& BGColor);
@@ -63,6 +70,10 @@ class Workspace {
 			WinBorder*			Focus() const;
 			WinBorder*			Front() const;
 			WinBorder*			Active() const;
+			void				GetState(Workspace::State *state) const;
+			bool				AttemptToSetFront(WinBorder *newFront);
+			bool				AttemptToSetFocus(WinBorder *newFocus);
+			bool				AttemptToMoveToBack(WinBorder *newBack);
 
 			bool				GetWinBorderList(void **list, int32 *itemCount ) const;
 

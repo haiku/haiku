@@ -142,7 +142,9 @@ public:
 
 private:
 friend class Desktop;
-
+#ifdef NEW_INPUT_HANDLING
+friend class WinBorder; // temporarily, I need invalidate_layer()
+#endif
 			// these are meant for Desktop class only!
 			void				AddWinBorder(WinBorder* winBorder);
 			void				RemoveWinBorder(WinBorder* winBorder);

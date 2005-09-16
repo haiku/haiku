@@ -219,7 +219,36 @@ Workspace::Active() const
 	//return fActiveItem ? fActiveItem->layerPtr: NULL;
 }
 
+void
+Workspace::GetState(Workspace::State *state) const
+{
+	state->Front = Front();
+	state->Focus = Focus();
 
+	ListData *cursor = fBottomItem;
+	while (cursor) {
+		if (!cursor->layerPtr->IsHidden())
+			state->WindowList.AddItem(cursor->layerPtr);
+		cursor = cursor->upperItem;
+	}
+}
+bool
+Workspace::AttemptToSetFront(WinBorder *newFront)
+{
+	return MoveToFront(newFront);
+}
+
+bool
+Workspace::AttemptToSetFocus(WinBorder *newFocus)
+{
+	return SetFocus(newFocus);
+}
+
+bool
+Workspace::AttemptToMoveToBack(WinBorder *newBack)
+{
+	return MoveToBack(newBack);
+}
 /*
 	\brief	This method provides you the list of visible windows in this workspace.
 	\param	list The list of visible WinBorders found in this workspace.

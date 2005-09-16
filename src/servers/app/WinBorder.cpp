@@ -450,16 +450,134 @@ WinBorder::GetSizeLimits(float* minWidth, float* maxWidth,
 void
 WinBorder::MouseDown(const PointerEvent& event)
 {
+	if (fDecorator) {
+		click_type action = _ActionFor(event);
+		// find out where user clicked in Decorator
+		switch(action) {
+			case DEC_CLOSE:
+				fIsClosing = true;
+				fDecorator->SetClose(true);
+				STRACE_CLICK(("===> DEC_CLOSE\n"));
+				break;
+	
+			case DEC_ZOOM:
+				fIsZooming = true;
+				fDecorator->SetZoom(true);
+				STRACE_CLICK(("===> DEC_ZOOM\n"));
+				break;
+	
+			case DEC_MINIMIZE:
+				fIsMinimizing = true;
+				fDecorator->SetMinimize(true);
+				STRACE_CLICK(("===> DEC_MINIMIZE\n"));
+				break;
+
+			case DEC_DRAG:
+				fIsDragging = true;
+#ifdef NEW_INPUT_HANDLING
+GetRootLayer()->SetNotifyLayer(this, B_POINTER_EVENTS, 0UL);
+#endif
+				fLastMousePosition = event.where;
+				STRACE_CLICK(("===> DEC_DRAG\n"));
+				break;
+
+			case DEC_RESIZE:
+				fIsResizing = true;
+				fLastMousePosition = event.where;
+				STRACE_CLICK(("===> DEC_RESIZE\n"));
+				break;
+
+			case DEC_SLIDETAB:
+				fIsSlidingTab = true;
+				fLastMousePosition = event.where;
+				STRACE_CLICK(("===> DEC_SLIDETAB\n"));
+				break;
+
+			default:
+				break;
+		}
+	}
+
+	// TODO: set dirty regions!
+#ifndef NEW_CLIPPING
+	GetRootLayer()->invalidate_layer(this, VisibleRegion());
+#else
+	do_Invalidate(VisibleRegion());
+#endif
 }
 
 void
 WinBorder::MouseUp(const PointerEvent& event)
 {
+	if (fDecorator) {
+		click_type action = _ActionFor(event);
+
+		if (fIsZooming) {
+			fIsZooming	= false;
+			fDecorator->SetZoom(false);
+			if (action == DEC_ZOOM)
+				Window()->NotifyZoom();
+			return;
+		}
+		if (fIsClosing) {
+			fIsClosing	= false;
+			fDecorator->SetClose(false);
+			if (action == DEC_CLOSE)
+				Window()->NotifyQuitRequested();
+			return;
+		}
+		if (fIsMinimizing) {
+			fIsMinimizing = false;
+			fDecorator->SetMinimize(false);
+			if (action == DEC_MINIMIZE)
+				Window()->NotifyMinimize(true);
+			return;
+		}
+	}
+	fIsDragging = false;
+	fIsResizing = false;
+	fIsSlidingTab = false;
+
+	// TODO: set dirty regions!
+#ifndef NEW_CLIPPING
+	GetRootLayer()->invalidate_layer(this, VisibleRegion());
+#else
+	do_Invalidate(VisibleRegion());
+#endif
 }
 
 void
 WinBorder::MouseMoved(const PointerEvent& event, uint32 transit)
 {
+	if (fDecorator) {
+		if (fIsZooming) {
+			fDecorator->SetZoom(_ActionFor(event) == DEC_ZOOM);
+		} else if (fIsClosing) {
+			fDecorator->SetClose(_ActionFor(event) == DEC_CLOSE);
+		} else if (fIsMinimizing) {
+			fDecorator->SetMinimize(_ActionFor(event) == DEC_MINIMIZE);
+		}
+	}
+	if (fIsDragging) {
+		BPoint delta = event.where - fLastMousePosition;
+#ifndef NEW_CLIPPING
+		MoveBy(delta.x, delta.y);
+#else
+		do_MoveBy(delta.x, delta.y);
+#endif
+	}
+	if (fIsResizing) {
+		BPoint delta = event.where - fLastMousePosition;
+#ifndef NEW_CLIPPING
+		ResizeBy(delta.x, delta.y);
+#else
+		do_ResizeBy(delta.x, delta.y);
+#endif
+	}
+	if (fIsSlidingTab) {
+		// TODO: implement
+	}
+	fLastMousePosition = event.where;
 }
 
 #else
@@ -745,6 +863,7 @@ WinBorder::QuietlySetFeel(int32 feel)
 click_type
 WinBorder::_ActionFor(const PointerEvent& event) const
 {
+#ifndef NEW_INPUT_HANDING
 #ifndef NEW_CLIPPING
 	if (fTopLayer->fFullVisible.Contains(event.where))
 		return DEC_NONE;
@@ -753,6 +872,7 @@ WinBorder::_ActionFor(const PointerEvent& event) const
 	if (fTopLayer->fFullVisible2.Contains(event.where))
 		return DEC_NONE;
 	else
+#endif
 #endif
 	if (fDecorator)
 		return fDecorator->Clicked(event.where, event.buttons, event.modifiers);

@@ -199,9 +199,11 @@ class Layer {
 			ServerApp*			App() const
 									{ return fServerWin? fServerWin->App(): NULL; }
 
+	inline	WinBorder*			Owner() const
+									{ return fOwner; }
+
 	virtual	bool				HasClient()
 									{ return true; }
-//			bool				IsServerLayer() const;
 
 			uint32				EventMask() const
 									{ return fEventMask; }
@@ -249,6 +251,9 @@ class Layer {
 
 			void				CopyBits(BRect& src, BRect& dst,
 										 int32 xOffset, int32 yOffset);
+
+	inline	const BRegion&		VisibleRegion() const { return fVisible; }
+	inline	const BRegion&		FullVisible() const { return fFullVisible; }
 
 #ifdef NEW_CLIPPING
 	inline	const BRegion&		VisibleRegion() const { return fVisible2; }

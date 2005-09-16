@@ -1033,9 +1033,6 @@ RootLayer::WinBorderAt(const BPoint& pt) const
 void
 RootLayer::_ProcessMouseMovedEvent(PointerEvent &evt)
 {
-	// move cursor on screen
-	GetHWInterface()->MoveCursorTo(evt.where.x, evt.where.y);
-
 	Layer* target = LayerAt(evt.where);
 	if (target == NULL) {
 		CRITICAL("RootLayer::_ProcessMouseMovedEvent() 'target' can't be null.\n");
@@ -1120,6 +1117,9 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 
 			if (fLastMousePosition != evt.where) {
 #ifdef NEW_INPUT_HANDLING
+				// move cursor on screen
+				GetHWInterface()->MoveCursorTo(evt.where.x, evt.where.y);
+
 				_ProcessMouseMovedEvent(evt);
 #else
 
@@ -1146,6 +1146,65 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 			if (fLastLayerUnderMouse == this)
 				break;
 #ifdef NEW_INPUT_HANDLING
+			WinBorder* winBorderUnderMouse = fLastLayerUnderMouse->Owner() ?
+												fLastLayerUnderMouse->fOwner :
+												(WinBorder*)fLastLayerUnderMouse;
+
+			DesktopSettings ds(gDesktop);
+			Workspace::State oldState, newState;
+			click_type action = winBorderUnderMouse->ActionFor(evt);
+
+			ActiveWorkspace()->GetState(&oldState);
+			if (action == DEC_MOVETOBACK) {
+				ActiveWorkspace()->AttemptToMoveToBack(winBorderUnderMouse);
+			}
+			// in FFM, only bring in front if clicking on WinBorder's(decorator's) area
+			else if (dynamic_cast<WinBorder*>(fLastLayerUnderMouse) || ds.MouseMode() == B_NORMAL_MOUSE) {
+				ActiveWorkspace()->AttemptToSetFront(winBorderUnderMouse);
+			}
+			ActiveWorkspace()->AttemptToSetFocus(winBorderUnderMouse);
+			ActiveWorkspace()->GetState(&newState);
+
+			// send window activation messages
+
+			// NOTE !!! ATM we're sending B_WINDOW_ACTIVATED to front windows only!
+			// This means floating windows do not have their BWindow::WindowActivated()
+			// hook function called. 
+			if (oldState.Front != newState.Front) {
+				if (oldState.Front && oldState.Front->Window()) {
+					BMessage msg(B_WINDOW_ACTIVATED);
+					msg.AddBool("active", false);
+					oldState.Front->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
+				}
+				if (newState.Front && newState.Front->Window()) {
+					BMessage msg(B_WINDOW_ACTIVATED);
+					msg.AddBool("active", true);
+					newState.Front->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
+				}
+			}
+
+			// calculate the region that must be invalidated/redrawn
+
+			// first, if the focus window changed, make sure the decorators reflect this state.
+			BRegion		dirtyRegion;
+			if (oldState.Focus != newState.Focus) {
+				dirtyRegion.Include(&oldState.Focus->VisibleRegion());
+				dirtyRegion.Include(&newState.Focus->VisibleRegion());
+			}
+
+#ifndef NEW_CLIPPING
+			invalidate_layer(this, dirtyRegion);
+#else
+			do_Invalidate(dirtyRegion);
+#endif
+
+#ifndef NEW_CLIPPING
+			invalidate_layer(this, fFull);
+#else
+			do_Invalidate(Bounds());
+#endif
+// TODO: DO NOT ALWAYS SEND THE FIRST MOUSE DOWN!!!
+// TODO: if B_WILL_ACCEPT_FIRST_CLICK, DO NOT ACTIVATE THE CLICKED WINDOW!!!
 			fLastLayerUnderMouse->MouseDown(evt);
 #else
 			// we are clicking a WinBorder
@@ -1235,16 +1294,13 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 
 			evt.where.ConstrainTo(fFrame);
 
-#ifdef NEW_INPUT_HANDLING
-			ClearNotifyLayer();
-#endif
-
-			if (fLastLayerUnderMouse == NULL) {
-				CRITICAL("RootLayer::MouseEventHandler(B_MOUSE_UP) fLastLayerUnderMouse is null!\n");
-				break;
-			}
-
 			if (fLastMousePosition != evt.where) {
+#ifdef NEW_INPUT_HANDLING
+				// move cursor on screen
+				GetHWInterface()->MoveCursorTo(evt.where.x, evt.where.y);
+
+				_ProcessMouseMovedEvent(evt);
+#else
 				// TODO: a B_MOUSE_MOVED message might have to be generated in order to
 				// correctly trigger entered/exited view transits.
 fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_MOUSE_MOVED (%.1f, %.1f)!\n",
@@ -1252,6 +1308,20 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 				// update on screen mouse pos
 				GetHWInterface()->MoveCursorTo(evt.where.x, evt.where.y);
 				fLastMousePosition	= evt.where;
+#endif
+			}
+
+#ifdef NEW_INPUT_HANDLING
+			ClearNotifyLayer();
+			if (fLastLayerUnderMouse == NULL) {
+				CRITICAL("RootLayer::MouseEventHandler(B_MOUSE_UP) fLastLayerUnderMouse is null!\n");
+				break;
+			}
+			fLastLayerUnderMouse->MouseUp(evt);
+#else
+			if (fLastLayerUnderMouse == NULL) {
+				CRITICAL("RootLayer::MouseEventHandler(B_MOUSE_UP) fLastLayerUnderMouse is null!\n");
+				break;
 			}
 
 			// TODO: what if 'fNotifyLayer' is deleted in the mean time.
@@ -1296,7 +1366,7 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 			}
 
 			STRACE(("MOUSE UP: at (%f, %f)\n", evt.where.x, evt.where.y));
-			
+#endif
 			// TODO: This is a quick fix to avoid the endless loop with windows created
 			// with the B_ASYNCHRONOUS_CONTROLS flag, but please someone have a look into this.
 			fButtons = 0;
@@ -1320,6 +1390,9 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 
 			evt.where.ConstrainTo(fFrame);
 #ifdef NEW_INPUT_HANDLING
+			// move cursor on screen
+			GetHWInterface()->MoveCursorTo(evt.where.x, evt.where.y);
+
 			_ProcessMouseMovedEvent(evt);
 #else
 			GetHWInterface()->MoveCursorTo(evt.where.x, evt.where.y);
@@ -1871,10 +1944,10 @@ RootLayer::SetNotifyLayer(Layer *lay, uint32 mask, uint32 options)
 
 	Lock();
 
-#if 0 // to be removed when the new "event" stuff is ready
+#if NEW_INPUT_HANDLING // to be removed when the new "event" stuff is ready
 	fNotifyLayer = lay;
 	fSavedEventMask = lay->EventMask();
-	fSavedOptions = lay->EventOptions();
+	fSavedEventOptions = lay->EventOptions();
 
 	AddToInputNotificationLists(lay, mask, options);
 
