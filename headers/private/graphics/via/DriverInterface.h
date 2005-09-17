@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-9/2004.
+	Rudolf Cornelissen 10/2002-9/2005.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -244,6 +244,7 @@ typedef struct {
 		/* general card information */
 		uint32 card_type;           /* see card_type enum above */
 		uint32 card_arch;           /* see card_arch enum above */
+		uint8 chip_rev;				/* chip revision number */
 		bool laptop;	            /* mobile chipset or not ('internal' flatpanel!) */
 		bool slaved_tmds1;			/* external TMDS encoder active on CRTC1 */
 		bool slaved_tmds2;			/* external TMDS encoder active on CRTC2 */
