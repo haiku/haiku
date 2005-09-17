@@ -90,7 +90,7 @@ status_t eng_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku VIA Accelerant 0.11 running.\n"));
+	LOG(1,("POWERUP: Haiku VIA Accelerant 0.12 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -332,6 +332,7 @@ void set_crtc_owner(bool head)
 
 static status_t engxx_general_powerup()
 {
+	LOG(4,("POWERUP: Chip revision is $%02x\n", si->ps.chip_rev));
 	LOG(4, ("INIT: card powerup\n"));
 
 	/* setup cardspecs */

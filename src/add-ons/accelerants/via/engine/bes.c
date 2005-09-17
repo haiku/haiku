@@ -435,62 +435,32 @@ status_t eng_bes_to_crtc(bool crtc)
 
 status_t eng_bes_init()
 {
-	/* select colorspace setup for B_YCbCr422 */
-	//depending on chiprrev:
-        /* Read PCI bus 0, dev 0, function 0, index 0xF6 to get chip rev. */
-//        pVia->ChipRev = pciReadByte(pciTag(0, 0, 0), 0xF6);
-//rev <= 0x09: (gives more color saturation?)
-//BTW: Nimble V5 = pre rev 10. (runtime check will be added asap)
-BESW(VID1_COLSPAC1, 0x140020f2);
-BESW(VID1_COLSPAC2, 0x0a0a2c00);
-//rev >= 0x10:
-//BESW(VID1_COLSPAC1, 0x13000ded);
-//BESW(VID1_COLSPAC2, 0x13171000);
-
-//rud: via special: fifo depth is $20 (b0-5), threshold $10 (b8-13), prethreshold $1d (b24-29)
-//pre rev 0x10:
-	BESW(VID1_FIFO, 0x1d00101f);
-//rev 0x10 and later:
-//	BESW(VID1_FIFO, 0x3800383f);
-
-	if (si->ps.card_arch < NV10A)
+	if (si->ps.chip_rev < 0x10)
 	{
-		/* disable overlay ints (b0 = buffer 0, b4 = buffer 1) */
-//		BESW(NV04_INTE, 0x00000000);
-
-		/* setup saturation to be 'neutral' */
-//		BESW(NV04_SAT, 0x00000000);
-		/* setup RGB brightness to be 'neutral' */
-//		BESW(NV04_RED_AMP, 0x00000069);
-//		BESW(NV04_GRN_AMP, 0x0000003e);
-//		BESW(NV04_BLU_AMP, 0x00000089);
-
-		/* setup fifo for fetching data */
-//		BESW(NV04_FIFOBURL, 0x00000003);
-//		BESW(NV04_FIFOTHRS, 0x00000038);
-
-		/* unknown, but needed (registers only have b0 implemented) */
-		/* (program both buffers to prevent sync distortions) */
-//		BESW(NV04_0OFFSET, 0x00000000);
-//		BESW(NV04_1OFFSET, 0x00000000);
+		/* select colorspace setup for B_YCbCr422 */
+		BESW(VID1_COLSPAC1, 0x140020f2);
+		BESW(VID1_COLSPAC2, 0x0a0a2c00);
+		/* fifo depth is $20 (b0-5), threshold $10 (b8-13), prethreshold $1d (b24-29) */
+		BESW(VID1_FIFO, 0x1d00101f);
 	}
 	else
 	{
-		/* >= NV10A */
+		/* select colorspace setup for B_YCbCr422 */
+		BESW(VID1_COLSPAC1, 0x13000ded);
+		BESW(VID1_COLSPAC2, 0x13171000);
+		/* fifo depth is $40 (b0-5), threshold $38 (b8-13), prethreshold $38 (b24-29) */
+		BESW(VID1_FIFO, 0x3800383f);
+	}
 
 		/* disable overlay ints (b0 = buffer 0, b4 = buffer 1) */
-//		BESW(NV10_INTE, 0x00000000);
+//		BESW(NV04_INTE, 0x00000000);
 		/* shut off GeForce4MX MPEG2 decoder */
 //		BESW(DEC_GENCTRL, 0x00000000);
 		/* setup BES memory-range mask */
 //		BESW(NV10_0MEMMASK, (si->ps.memory_size - 1));
-		/* unknown, but needed */
-//		BESW(NV10_0OFFSET, 0x00000000);
-
 		/* setup brightness, contrast and saturation to be 'neutral' */
 //		BESW(NV10_0BRICON, ((0x1000 << 16) | 0x1000));
 //		BESW(NV10_0SAT, ((0x0000 << 16) | 0x1000));
-	}
 
 	return B_OK;
 }
@@ -526,6 +496,8 @@ status_t eng_configure_bes
 	bool scale_x, scale_y;
 	/* for computing scaling register value */
 	uint32 scaleval;
+	/* for computing 'pre-scaling' on downscaling */
+	uint32 minictrl;
 
 	/**************************************************************************************
 	 *** copy, check and limit if needed the user-specified view into the intput bitmap ***
@@ -723,6 +695,7 @@ status_t eng_configure_bes
 
 	/* Done in card hardware:
 	 * double buffered registers + trigger if programming complete feature. */
+	//fixme probably... need sw sync(?)
 
 
 	/**************************************
@@ -737,7 +710,7 @@ status_t eng_configure_bes
 	/* we need to step in 4-byte (2 pixel) granularity due to the nature of yuy2 */
 	BESW(VID1Y_ADDR0, (moi.a1orgv & 0x07fffffc));
 
-	/* setup buffersize */
+	/* setup horizontal and vertical 'prescaling' for downscaling */
 		//fixme if needed: width must be even officially...
 //		BESW(NV10_0SRCSIZE, ((ob->height << 16) | ob->width));
 //linux b0-15:
@@ -763,10 +736,25 @@ status_t eng_configure_bes
 //  		      dwminifyH = 16
 //			  else
 //               to small to handle (limit reached)
-//rud +instruct VID1_MINI_CTL register about modified scaling. (V1_X_DIV_2 | V1_X_INTERPOLY)
-BESW(VID1_MINI_CTL, 0);
+	//rud +instruct VID1_MINI_CTL register about modified scaling. (V1_X_DIV_2 etc)
+	minictrl = 0x00000000;
+	/* enable horizontal filtering if asked for */
+	if (ow->flags & B_OVERLAY_HORIZONTAL_FILTERING)
+	{
+		minictrl |= (1 << 1);
+		LOG(4,("Overlay: using horizontal interpolation on scaling\n"));
+	}
+	/* enable vertical filtering if asked for */
+	if (ow->flags & B_OVERLAY_VERTICAL_FILTERING)
+	{
+		/* vertical interpolation b0, interpolation on Y, Cb and Cr all (b2) */
+		minictrl |= ((1 << 2) | (1 << 0));
+		LOG(4,("Overlay: using vertical interpolation on scaling\n"));
+	}
+	BESW(VID1_MINI_CTL, minictrl);
 
-//fixme for minimize ctrl...
+	/* setup buffersize */
+	//fixme for minimize ctrl...
 	BESW(V1_SOURCE_WH, ((ob->height << 16) | (ob->width - 0)));
 
 	/* setup buffer source pitch including slopspace (in bytes).
@@ -789,18 +777,20 @@ BESW(VID1_MINI_CTL, 0);
 	if (scale_y) scaleval |= 0x00008000;
 	BESW(VID1_ZOOM, (scaleval | ((hiscalv << 16) >> 5) | (viscalv >> 6)));
 
-		/* enable vertical filtering (b0) */
-//		BESW(NV04_CTRL_V, 0x00000001);
-		/* enable horizontal filtering (no effect?) */
-//		BESW(NV04_CTRL_H, 0x00000111);
-
-	/* enable BES (b0), format yuv422 (b2-4 = %000), set colorspace sign (b7 = 1),
-	 * input is frame (not field) picture (b9 = 0), expire = $f (b16-19),
-	 * select field (not frame)(!) base (b24 = 0) */
-//pre rev 0x10:
-	BESW(VID1_CTL, 0x00050081);
-//rev 0x10 and later:
-//	BESW(VID1_CTL, 0x000f0081);
+	if (si->ps.chip_rev < 0x10)
+	{
+		/* enable BES (b0), format yuv422 (b2-4 = %000), set colorspace sign (b7 = 1),
+		 * input is frame (not field) picture (b9 = 0), expire = $5 (b16-19),
+		 * select field (not frame)(!) base (b24 = 0) */
+		BESW(VID1_CTL, 0x00050081);
+	}
+	else
+	{
+		/* enable BES (b0), format yuv422 (b2-4 = %000), set colorspace sign (b7 = 1),
+		 * input is frame (not field) picture (b9 = 0), expire = $f (b16-19),
+		 * select field (not frame)(!) base (b24 = 0) */
+		BESW(VID1_CTL, 0x000f0081);
+	}
 
 	/* enable colorkeying (b0 = 1), enable chromakeying (b1 = 1), Vid1 on top of Vid3 (b20 = 0),
 	 * all registers are loaded immediately (b29 = 1), Vid1 cmds fire (b31 = 1) */
