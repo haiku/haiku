@@ -1227,9 +1227,10 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref, co
 	// can open around 100 e-mails (the BeOS maximum number of open files)
 	// rather than merely around 20, since each open draft-monitoring query
 	// sucks up one file handle per mounted BFS disk volume.  Plus mail file
-	// opening speed is noticably improved!  Possible ToDo: change this to pop
-	// up a Tracker query for drafts rather than populating the menu item with
-	// file names, then we can always have a draft menu turned on.
+	// opening speed is noticably improved!  ToDo: change this to populate the
+	// Draft menu with the file names on demand - when the user clicks on it;
+	// don't need a live query since the menu isn't staying up for more than a
+	// few seconds.
 
 	if (!fIncoming) {
 		QueryMenu *queryMenu;
