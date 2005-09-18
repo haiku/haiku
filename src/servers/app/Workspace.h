@@ -74,6 +74,7 @@ class Workspace {
 			bool				AttemptToSetFront(WinBorder *newFront);
 			bool				AttemptToSetFocus(WinBorder *newFocus);
 			bool				AttemptToMoveToBack(WinBorder *newBack);
+			bool				AttemptToActivate(WinBorder *toActivate);
 
 			bool				GetWinBorderList(void **list, int32 *itemCount ) const;
 

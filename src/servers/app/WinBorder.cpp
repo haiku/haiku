@@ -218,7 +218,7 @@ fInUpdateRegion.OffsetBy(x, y);
 		// ...and here we get really hacky...
 		fTopLayer->fFrame.OffsetTo(0.0, 0.0);
 	} else {
-		move_layer(x, y);
+		Layer::move_layer(x, y);
 	}
 
 	if (Window()) {
@@ -448,62 +448,145 @@ WinBorder::GetSizeLimits(float* minWidth, float* maxWidth,
 #ifdef NEW_INPUT_HANDLING
 
 void
-WinBorder::MouseDown(const PointerEvent& event)
+WinBorder::MouseDown(const PointerEvent& evt)
 {
-	if (fDecorator) {
-		click_type action = _ActionFor(event);
-		// find out where user clicked in Decorator
-		switch(action) {
-			case DEC_CLOSE:
-				fIsClosing = true;
-				fDecorator->SetClose(true);
-				STRACE_CLICK(("===> DEC_CLOSE\n"));
-				break;
-	
-			case DEC_ZOOM:
-				fIsZooming = true;
-				fDecorator->SetZoom(true);
-				STRACE_CLICK(("===> DEC_ZOOM\n"));
-				break;
-	
-			case DEC_MINIMIZE:
-				fIsMinimizing = true;
-				fDecorator->SetMinimize(true);
-				STRACE_CLICK(("===> DEC_MINIMIZE\n"));
-				break;
+	DesktopSettings desktopSettings(gDesktop);
+	Workspace::State oldState, newState;
 
-			case DEC_DRAG:
-				fIsDragging = true;
-#ifdef NEW_INPUT_HANDLING
-GetRootLayer()->SetNotifyLayer(this, B_POINTER_EVENTS, 0UL);
+	GetRootLayer()->ActiveWorkspace()->GetState(&oldState);
+
+	// not in FFM mode?
+	if (desktopSettings.MouseMode() == B_NORMAL_MOUSE) {
+		// default action is to drag the WinBorder
+		click_type action = DEC_DRAG;
+		Layer *target = LayerAt(evt.where);
+		// clicking a simple Layer.
+		if (target != this) {
+			if (GetRootLayer()->ActiveWorkspace()->Active() == this) {
+				target->MouseDown(evt);
+			}
+			else {
+				if (WindowFlags() & B_WILL_ACCEPT_FIRST_CLICK)
+					target->MouseDown(evt);
+				else
+					goto activateWindow;
+			}
+// TODO: send mouse down to event registered BViews!!!
+		}
+		// clicking WinBorder visible area
+		else {
+			winBorderAreaHandle:
+
+			if (fDecorator)
+				action = _ActionFor(evt);
+			
+			// set decorator internals
+			switch(action) {
+				case DEC_CLOSE:
+					fIsClosing = true;
+					fDecorator->SetClose(true);
+					STRACE_CLICK(("===> DEC_CLOSE\n"));
+					break;
+	
+				case DEC_ZOOM:
+					fIsZooming = true;
+					fDecorator->SetZoom(true);
+					STRACE_CLICK(("===> DEC_ZOOM\n"));
+					break;
+	
+				case DEC_MINIMIZE:
+					fIsMinimizing = true;
+					fDecorator->SetMinimize(true);
+					STRACE_CLICK(("===> DEC_MINIMIZE\n"));
+					break;
+
+				case DEC_DRAG:
+					fIsDragging = true;
+					fLastMousePosition = evt.where;
+					STRACE_CLICK(("===> DEC_DRAG\n"));
+					break;
+
+				case DEC_RESIZE:
+					fIsResizing = true;
+					fLastMousePosition = evt.where;
+					STRACE_CLICK(("===> DEC_RESIZE\n"));
+					break;
+
+				case DEC_SLIDETAB:
+					fIsSlidingTab = true;
+					fLastMousePosition = evt.where;
+					STRACE_CLICK(("===> DEC_SLIDETAB\n"));
+					break;
+
+				default:
+					break;
+			}
+
+			// based on what the Decorator returned, properly place this window.
+			if (action == DEC_MOVETOBACK) {
+				GetRootLayer()->ActiveWorkspace()->MoveToBack(this);
+			}
+			else if (action == DEC_DRAG) {
+				GetRootLayer()->SetNotifyLayer(this, B_POINTER_EVENTS, 0UL);
+				activateWindow:
+				GetRootLayer()->ActiveWorkspace()->AttemptToActivate(this);
+			}
+
+			GetRootLayer()->ActiveWorkspace()->GetState(&newState);
+//--------------------------
+// BOOKMARK!
+			// send window activation messages
+
+			// NOTE !!! ATM we're sending B_WINDOW_ACTIVATED to front windows only!
+			// This means floating windows do not have their BWindow::WindowActivated()
+			// hook function called. 
+			if (oldState.Front != newState.Front) {
+				if (oldState.Front && oldState.Front->Window()) {
+					BMessage msg(B_WINDOW_ACTIVATED);
+					msg.AddBool("active", false);
+					oldState.Front->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
+				}
+				if (newState.Front && newState.Front->Window()) {
+					BMessage msg(B_WINDOW_ACTIVATED);
+					msg.AddBool("active", true);
+					newState.Front->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
+				}
+			}
+
+			// calculate the region that must be invalidated/redrawn
+
+			// first, if the focus window changed, make sure the decorators reflect this state.
+			BRegion		dirtyRegion;
+			if (oldState.Focus != newState.Focus) {
+				dirtyRegion.Include(&oldState.Focus->VisibleRegion());
+				dirtyRegion.Include(&newState.Focus->VisibleRegion());
+#ifndef NEW_CLIPPING
+				GetRootLayer()->fRedrawReg.Include(&dirtyRegion);
+#else
+// TODO: code for new clipping engine!
 #endif
-				fLastMousePosition = event.where;
-				STRACE_CLICK(("===> DEC_DRAG\n"));
-				break;
+			}
 
-			case DEC_RESIZE:
-				fIsResizing = true;
-				fLastMousePosition = event.where;
-				STRACE_CLICK(("===> DEC_RESIZE\n"));
-				break;
+#ifndef NEW_CLIPPING
+			GetRootLayer()->invalidate_layer(this, fFull);
+#else
+			GetRootLayer()->do_Invalidate(Bounds());
+#endif
 
-			case DEC_SLIDETAB:
-				fIsSlidingTab = true;
-				fLastMousePosition = event.where;
-				STRACE_CLICK(("===> DEC_SLIDETAB\n"));
-				break;
 
-			default:
-				break;
+// TODO: FINISH ABOVE.
 		}
 	}
-
-	// TODO: set dirty regions!
-#ifndef NEW_CLIPPING
-	GetRootLayer()->invalidate_layer(this, VisibleRegion());
-#else
-	do_Invalidate(VisibleRegion());
-#endif
+	// in FFM mode
+	else {
+		Layer *target = LayerAt(evt.where);
+		// clicking a simple Layer; forward event.
+		if (target != this)
+			target->MouseDown(evt);
+		// clicking inside our visible area.
+		else
+			goto winBorderAreaHandle;
+	}
 }
 
 void

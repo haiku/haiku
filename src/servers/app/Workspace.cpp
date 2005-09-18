@@ -214,9 +214,16 @@ Workspace::Front() const
 WinBorder *
 Workspace::Active() const
 {
-	// ToDo: for now!
-	return Focus();
-	//return fActiveItem ? fActiveItem->layerPtr: NULL;
+	// in case of a normal or modal window
+	if (fFrontItem && fFrontItem == fFocusItem)
+		return fFrontItem->layerPtr;
+
+	// a floating window is considered active if it has focus.
+	if (fFocusItem &&  (fFocusItem->layerPtr->Level() == B_FLOATING_APP ||
+						fFocusItem->layerPtr->Level() == B_FLOATING_ALL))
+		return fFocusItem->layerPtr;
+
+	return NULL;
 }
 
 void
@@ -248,6 +255,14 @@ bool
 Workspace::AttemptToMoveToBack(WinBorder *newBack)
 {
 	return MoveToBack(newBack);
+}
+
+bool
+Workspace::AttemptToActivate(WinBorder *toActivate)
+{
+	MoveToFront(toActivate);
+	SetFocus(toActivate);
+	return Active() == toActivate;
 }
 /*
 	\brief	This method provides you the list of visible windows in this workspace.

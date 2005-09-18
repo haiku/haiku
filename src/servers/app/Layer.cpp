@@ -404,9 +404,20 @@ Layer::FindLayer(const int32 token)
 	\return The layer containing the point or NULL if no layer found
 */
 Layer*
-Layer::LayerAt(const BPoint &pt)
+Layer::LayerAt(const BPoint &pt, bool recursive)
 {
 	//printf("%p:%s:LayerAt(x = %g, y = %g)\n", this, Name(), pt.x, pt.y);
+	if (!recursive)	{
+		if (VisibleRegion().Contains(pt))
+			return this;
+
+		for (Layer* child = LastChild(); child; child = PreviousChild())
+			if (child->FullVisible().Contains(pt))
+				return child;
+
+		return NULL;
+	}
+
 #ifndef NEW_CLIPPING
 	if (fVisible.Contains(pt))
 		return this;

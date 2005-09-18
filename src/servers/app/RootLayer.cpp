@@ -1145,67 +1145,11 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 
 			if (fLastLayerUnderMouse == this)
 				break;
+
 #ifdef NEW_INPUT_HANDLING
-			WinBorder* winBorderUnderMouse = fLastLayerUnderMouse->Owner() ?
-												fLastLayerUnderMouse->fOwner :
-												(WinBorder*)fLastLayerUnderMouse;
-
-			DesktopSettings ds(gDesktop);
-			Workspace::State oldState, newState;
-			click_type action = winBorderUnderMouse->ActionFor(evt);
-
-			ActiveWorkspace()->GetState(&oldState);
-			if (action == DEC_MOVETOBACK) {
-				ActiveWorkspace()->AttemptToMoveToBack(winBorderUnderMouse);
-			}
-			// in FFM, only bring in front if clicking on WinBorder's(decorator's) area
-			else if (dynamic_cast<WinBorder*>(fLastLayerUnderMouse) || ds.MouseMode() == B_NORMAL_MOUSE) {
-				ActiveWorkspace()->AttemptToSetFront(winBorderUnderMouse);
-			}
-			ActiveWorkspace()->AttemptToSetFocus(winBorderUnderMouse);
-			ActiveWorkspace()->GetState(&newState);
-
-			// send window activation messages
-
-			// NOTE !!! ATM we're sending B_WINDOW_ACTIVATED to front windows only!
-			// This means floating windows do not have their BWindow::WindowActivated()
-			// hook function called. 
-			if (oldState.Front != newState.Front) {
-				if (oldState.Front && oldState.Front->Window()) {
-					BMessage msg(B_WINDOW_ACTIVATED);
-					msg.AddBool("active", false);
-					oldState.Front->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
-				}
-				if (newState.Front && newState.Front->Window()) {
-					BMessage msg(B_WINDOW_ACTIVATED);
-					msg.AddBool("active", true);
-					newState.Front->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
-				}
-			}
-
-			// calculate the region that must be invalidated/redrawn
-
-			// first, if the focus window changed, make sure the decorators reflect this state.
-			BRegion		dirtyRegion;
-			if (oldState.Focus != newState.Focus) {
-				dirtyRegion.Include(&oldState.Focus->VisibleRegion());
-				dirtyRegion.Include(&newState.Focus->VisibleRegion());
-			}
-
-#ifndef NEW_CLIPPING
-			invalidate_layer(this, dirtyRegion);
-#else
-			do_Invalidate(dirtyRegion);
-#endif
-
-#ifndef NEW_CLIPPING
-			invalidate_layer(this, fFull);
-#else
-			do_Invalidate(Bounds());
-#endif
-// TODO: DO NOT ALWAYS SEND THE FIRST MOUSE DOWN!!!
-// TODO: if B_WILL_ACCEPT_FIRST_CLICK, DO NOT ACTIVATE THE CLICKED WINDOW!!!
-			fLastLayerUnderMouse->MouseDown(evt);
+			// get the pointer for one of the first RootLayer's descendants
+			Layer *primaryTarget = LayerAt(evt.where, false);
+			primaryTarget->MouseDown(evt);
 #else
 			// we are clicking a WinBorder
 
@@ -2241,7 +2185,7 @@ RootLayer::draw_window_tab(WinBorder *exFocus)
 }
 
 #ifndef NEW_CLIPPING
-inline void
+void
 RootLayer::empty_visible_regions(Layer *layer)
 {
 // TODO: optimize by avoiding recursion?
@@ -2257,7 +2201,7 @@ RootLayer::empty_visible_regions(Layer *layer)
 }
 #endif
 
-inline void
+void
 RootLayer::winborder_activation(WinBorder* exActive)
 {
 	// ToDo: not sure if this is correct - do floating windows get WindowActivated() events?
@@ -2274,7 +2218,7 @@ RootLayer::winborder_activation(WinBorder* exActive)
 }
 
 
-inline void
+void
 RootLayer::show_final_scene(WinBorder *exFocus, WinBorder *exActive)
 {
 	if (fHaveWinBorderList || get_workspace_windows()) {
