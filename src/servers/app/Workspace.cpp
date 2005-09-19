@@ -231,6 +231,7 @@ Workspace::GetState(Workspace::State *state) const
 {
 	state->Front = Front();
 	state->Focus = Focus();
+	state->Active = Active();
 
 	ListData *cursor = fBottomItem;
 	while (cursor) {

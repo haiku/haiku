@@ -1077,8 +1077,6 @@ RootLayer::_ProcessMouseMovedEvent(PointerEvent &evt)
 				else
 					fViewAction = B_OUTSIDE_VIEW;
 
-			// NOTE: testing under R5 shows that it doesn't matter if a window is created 
-			// with B_ASYNCHRONOUS_CONTROLS flag or not. B_MOUSE_DOWN is always transmited.
 			lay->MouseMoved(evt, fViewAction);
 		}
 	}
@@ -1147,6 +1145,16 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 				break;
 
 #ifdef NEW_INPUT_HANDLING
+			int32 count = fMouseNotificationList.CountItems();
+			Layer *lay;
+			for (int32 i = 0; i <= count; i++) {
+				lay = static_cast<Layer*>(fMouseNotificationList.ItemAt(i));
+				if (lay)
+					// NOTE: testing under R5 shows that it doesn't matter if a window is created 
+					// with B_ASYNCHRONOUS_CONTROLS flag or not. B_MOUSE_DOWN is always transmited.
+					lay->MouseDown(evt);
+			}
+
 			// get the pointer for one of the first RootLayer's descendants
 			Layer *primaryTarget = LayerAt(evt.where, false);
 			primaryTarget->MouseDown(evt);
@@ -1256,12 +1264,23 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 			}
 
 #ifdef NEW_INPUT_HANDLING
-			ClearNotifyLayer();
 			if (fLastLayerUnderMouse == NULL) {
 				CRITICAL("RootLayer::MouseEventHandler(B_MOUSE_UP) fLastLayerUnderMouse is null!\n");
 				break;
 			}
-			fLastLayerUnderMouse->MouseUp(evt);
+
+			bool foundCurrent = fMouseNotificationList.HasItem(fLastLayerUnderMouse);
+			int32 count = fMouseNotificationList.CountItems();
+			Layer *lay;
+			for (int32 i = 0; i <= count; i++) {
+				lay = static_cast<Layer*>(fMouseNotificationList.ItemAt(i));
+				if (lay)
+					lay->MouseUp(evt);
+			}
+			ClearNotifyLayer();
+
+			if (!foundCurrent)
+				fLastLayerUnderMouse->MouseUp(evt);
 #else
 			if (fLastLayerUnderMouse == NULL) {
 				CRITICAL("RootLayer::MouseEventHandler(B_MOUSE_UP) fLastLayerUnderMouse is null!\n");
@@ -1917,12 +1936,12 @@ RootLayer::ClearNotifyLayer()
 {
 	if (fNotifyLayer) {
 		Lock();
-
+		// remove from notification list.
 		AddToInputNotificationLists(fNotifyLayer, 0UL, 0UL);
-
+		// set event masks
 		fNotifyLayer->QuietlySetEventMask(fSavedEventMask);
 		fNotifyLayer->QuietlySetEventOptions(fSavedEventOptions);
-
+		// add to notification list with event masks set my BView::SetEventMask()
 		AddToInputNotificationLists(fNotifyLayer, fSavedEventMask, fSavedEventOptions);
 
 		fNotifyLayer = NULL;

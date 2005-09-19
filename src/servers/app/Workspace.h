@@ -54,6 +54,7 @@ class Workspace {
 							State() : Front(NULL), Focus(NULL), WindowList(40) { }
 				WinBorder*	Front;
 				WinBorder*	Focus;
+				WinBorder*	Active;
 				BList		WindowList;
 		};
 								Workspace(	const int32 ID,

@@ -109,7 +109,6 @@ WinBorder::WinBorder(const BRect &frame,
 	fClassID		= AS_WINBORDER_CLASS;
 	fAdFlags		= fAdFlags | B_LAYER_CHILDREN_DEPENDANT;
 	fFlags			= B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE;
-	fEventMask		= B_POINTER_EVENTS;
 #ifdef NEW_CLIPPING
 	fRebuildDecRegion = true;
 #endif
@@ -471,7 +470,6 @@ WinBorder::MouseDown(const PointerEvent& evt)
 				else
 					goto activateWindow;
 			}
-// TODO: send mouse down to event registered BViews!!!
 		}
 		// clicking WinBorder visible area
 		else {
@@ -526,30 +524,30 @@ WinBorder::MouseDown(const PointerEvent& evt)
 			if (action == DEC_MOVETOBACK) {
 				GetRootLayer()->ActiveWorkspace()->MoveToBack(this);
 			}
-			else if (action == DEC_DRAG) {
-				GetRootLayer()->SetNotifyLayer(this, B_POINTER_EVENTS, 0UL);
+			else {
+				if (action == DEC_DRAG || action == DEC_RESIZE || action == DEC_SLIDETAB)
+					GetRootLayer()->SetNotifyLayer(this, B_POINTER_EVENTS, 0UL);
+	
 				activateWindow:
 				GetRootLayer()->ActiveWorkspace()->AttemptToActivate(this);
 			}
 
 			GetRootLayer()->ActiveWorkspace()->GetState(&newState);
-//--------------------------
-// BOOKMARK!
-			// send window activation messages
 
-			// NOTE !!! ATM we're sending B_WINDOW_ACTIVATED to front windows only!
-			// This means floating windows do not have their BWindow::WindowActivated()
-			// hook function called. 
-			if (oldState.Front != newState.Front) {
-				if (oldState.Front && oldState.Front->Window()) {
+// BOOKMARK!
+// TODO: there can be more than one window active at a time! ex: a normal + floating_app, with
+// floating window having focus.
+			// send window activation messages
+			if (oldState.Active != newState.Active) {
+				if (oldState.Active && oldState.Active->Window()) {
 					BMessage msg(B_WINDOW_ACTIVATED);
 					msg.AddBool("active", false);
-					oldState.Front->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
+					oldState.Active->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
 				}
-				if (newState.Front && newState.Front->Window()) {
+				if (newState.Active && newState.Active->Window()) {
 					BMessage msg(B_WINDOW_ACTIVATED);
 					msg.AddBool("active", true);
-					newState.Front->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
+					newState.Active->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
 				}
 			}
 
@@ -567,14 +565,12 @@ WinBorder::MouseDown(const PointerEvent& evt)
 #endif
 			}
 
+			// trigger region rebuilding and redraw
 #ifndef NEW_CLIPPING
 			GetRootLayer()->invalidate_layer(this, fFull);
 #else
 			GetRootLayer()->do_Invalidate(Bounds());
 #endif
-
-
-// TODO: FINISH ABOVE.
 		}
 	}
 	// in FFM mode
