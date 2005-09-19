@@ -567,7 +567,10 @@ BRegion::Support::ROr(long top, long bottom, const BRegion &first,
 	if (foundCount > 1)
 		SortTrans(lefts, rights, foundCount);
 	
-	ASSERT(foundCount > 0);
+// TODO: This needs to be reviewed by BRegion owner.
+//	ASSERT(foundCount > 0);
+	if (foundCount == 0)
+		return;
 	
 	clipping_rect rect;
 	rect.top = top;
