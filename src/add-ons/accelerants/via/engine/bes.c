@@ -1,5 +1,5 @@
 /* Nvidia TNT and GeForce Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/2002-9/2004 */
+/* Written by Rudolf Cornelissen 05/2002-9/2005 */
 
 #define MODULE_BIT 0x00000200
 
@@ -389,7 +389,7 @@ static void eng_bes_program_move_overlay(move_overlay_info moi)
 	 *************************************/
 
 	/* Done in card hardware:
-	 * double buffered registers + trigger if programming complete feature. */
+	 * double buffered registers + trigger during 'BES-'VBI feature. */
 
 
 	/**************************************
@@ -705,8 +705,7 @@ status_t eng_configure_bes
 	 *************************************/
 
 	/* Done in card hardware:
-	 * double buffered registers + trigger if programming complete feature. */
-	//fixme probably... need sw sync(?)
+	 * double buffered registers + trigger during 'BES-'VBI feature. */
 
 
 	/**************************************
@@ -811,14 +810,15 @@ status_t eng_configure_bes
 		BESW(VID1_CTL, 0x000f0081);
 	}
 
+	//fixme: best move this instruction to be the last one done (so do after keying)
 	/* enable colorkeying (b0 = 1), enable chromakeying (b1 = 1), Vid1 on top of Vid3 (b20 = 0),
-	 * all registers are loaded immediately (b29 = 1), Vid1 cmds fire (b31 = 1) */
-	BESW(COMPOSE, 0xa0000000);//tst, fixme: 9 = vbi load all regs
+	 * all registers are loaded during the next 'BES-'VBI (b28 = 1), Vid1 cmds fire (b31 = 1) */
+	BESW(COMPOSE, 0x90000000);
 
 
-		/**************************
-		 *** setup color keying ***
-		 **************************/
+	/**************************
+	 *** setup color keying ***
+	 **************************/
 
 		/* setup colorkeying */
 		switch(si->dm.space)
@@ -861,6 +861,10 @@ status_t eng_release_bes()
 {
 	/* setup BES control: disable scaler (b0 = 0) */
 	BESW(VID1_CTL, 0x00000000);
+
+	/* make sure the 'disable' command really gets executed: (no 'VBI' anymore if BES disabled) */
+	/* all registers are loaded immediately (b29 = 1), Vid1 cmds fire (b31 = 1) */
+	BESW(COMPOSE, 0xa0000000);
 
 	/* note that overlay is not in use (for eng_bes_move_overlay()) */
 	si->overlay.active = false;
