@@ -264,6 +264,7 @@ struct cmsghdr {
 #ifndef _KERNEL_MODE
 /* Function declarations */
 int     socket (int, int, int);
+int	socketpair(int domain, int type, int protocol, int socket_vector[2]);
 int     bind(int, const struct sockaddr *, int);
 int     connect(int, const struct sockaddr *, int);
 int 	listen(int, int);
