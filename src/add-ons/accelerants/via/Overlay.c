@@ -96,18 +96,8 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 		switch (cs)
 		{
 			case B_YCbCr422:
-					if (si->ps.card_arch < NV10A)
-					{
-						/* check if slopspace is needed: RIVA128 and TNT need ~0x000f. */
-						si->overlay.myBuffer[offset].width = ((width + 0x000f) & ~0x000f);
-					}
-					else
-					{
-						/* check if slopspace is needed: GeForce need ~0x001f. */
-						/* fixme:
-						 * update needed for GF DVDmax support to adhere to CRTC2 constraints?? */
-						si->overlay.myBuffer[offset].width = ((width + 0x001f) & ~0x001f);
-					}
+					/* check if slopspace is needed: RIVA128 and TNT need ~0x000f. */
+					si->overlay.myBuffer[offset].width = ((width + 0x000f) & ~0x000f);
 					si->overlay.myBuffer[offset].bytes_per_row = 2 * si->overlay.myBuffer[offset].width;
 
 					/* check if the requested horizontal pitch is supported: */
@@ -387,22 +377,12 @@ status_t GET_OVERLAY_CONSTRAINTS
 		switch (ob->space)
 		{
 			case B_YCbCr422:
-					if (si->ps.card_arch < NV10A)
-					{
-						/* RIVA128 and TNT need 15.
-						 * Note: this has to be in sync with the slopspace setup during buffer allocation.. */
-						oc->view.width_alignment = 15;
-					}
-					else
-					{
-						/* GeForce need 31. 
-						 * Note: this has to be in sync with the slopspace setup during buffer allocation.. */
-						oc->view.width_alignment = 31;
-					}
+					/* Note: this has to be in sync with the slopspace setup during buffer allocation.. */
+					oc->view.width_alignment = 15;
 					break;
 			default:
 					/* we should not be here, but set the worst-case value just to be safe anyway */
-					oc->view.width_alignment = 31;
+					oc->view.width_alignment = 15;
 					break;
 		}
 

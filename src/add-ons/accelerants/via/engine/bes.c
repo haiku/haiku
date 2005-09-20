@@ -12,6 +12,7 @@ struct move_overlay_info
 	uint32 hcoordv;		/* left and right edges of video output window */
 	uint32 vcoordv;		/* top and bottom edges of video output window */
 	uint32 hsrcstv;		/* horizontal source start in source buffer (clipping) */
+	uint32 hsrcendv;	/* horizontal source end in source buffer (clipping) */
 	uint32 v1srcstv;	/* vertical source start in source buffer (clipping) */
 	uint32 a1orgv;		/* alternate source clipping via startadress of source buffer */
 };
@@ -285,6 +286,47 @@ static void eng_bes_calc_move_overlay(move_overlay_info *moi)
 	moi->hsrcstv &= 0x03fffffc;
 	LOG(4,("Overlay: first hor. (sub)pixel of input bitmap contributing %f\n", moi->hsrcstv / (float)65536));
 
+	/* Setup horizontal source end: last (sub)pixel contributing to output picture */
+	/* Note:
+	 * The method is to calculate, based on 1:1 scaling, based on the output window.
+	 * After this is done, include the scaling factor so you get a value based on the input bitmap.
+	 * Then add the right ending position of the bitmap's view (zoom function) to get the final value needed. */
+	/* Note also:
+	 * Even if the scaling factor is clamping we instruct the BES to use the correct source end pos.! */
+
+	moi->hsrcendv = 0;
+	/* check for destination horizontal clipping at right side */
+	if ((si->overlay.ow.h_start + si->overlay.ow.width - 1) > (crtc_hend - 1))
+	{
+		/* check if entire destination picture is clipping right:
+		 * (2 pixels will be clamped onscreen at least) */
+		if (si->overlay.ow.h_start > (crtc_hend - 2))
+		{
+			/* increase 'number of clipping pixels' with 'fixed value': (total dest. width - 2) */
+			moi->hsrcendv += (si->overlay.ow.width - 2);
+		}
+		else
+		{
+			/* increase 'number of clipping pixels' with actual number of dest. clipping pixels */
+			moi->hsrcendv += ((si->overlay.ow.h_start + si->overlay.ow.width - 1) - (crtc_hend - 1));
+		}
+		LOG(4,("Overlay: clipping right...\n"));
+
+		/* The calculated value is based on scaling = 1x. So we now compensate for scaling.
+		 * Note that this also already takes care of aligning the value to the BES register! */
+		moi->hsrcendv *= si->overlay.h_ifactor;
+		/* now subtract this value from the last used pixel in (zoomed) inputbuffer, aligned to BES */
+		moi->hsrcendv = (((uint32)((si->overlay.my_ov.h_start + si->overlay.my_ov.width) - 1)) << 16) - moi->hsrcendv;
+	}
+	else
+	{
+		/* set last contributing pixel to last used pixel in (zoomed) inputbuffer, aligned to BES */
+		moi->hsrcendv = (((uint32)((si->overlay.my_ov.h_start + si->overlay.my_ov.width) - 1)) << 16);
+	}
+	/* AND below required by hardware */
+	moi->hsrcendv &= 0x03ffffff;
+	LOG(4,("Overlay: last horizontal (sub)pixel of input bitmap contributing %f\n", moi->hsrcendv / (float)65536));
+
 
 	/*******************************
 	 *** setup vertical clipping ***
@@ -314,30 +356,25 @@ static void eng_bes_calc_move_overlay(move_overlay_info *moi)
 			/* increase 'number of clipping pixels' with 'fixed value':
 			 * 'total height - 2' of dest. picture in pixels * inverse scaling factor */
 			moi->v1srcstv = (si->overlay.ow.height - 2) * si->overlay.v_ifactor;
-			/* on pre-NV10 we need to do clipping in the source
-			 * bitmap because no seperate clipping registers exist... */
-			if (si->ps.card_arch < NV10A)
-				moi->a1orgv += ((moi->v1srcstv >> 16) * si->overlay.ob.bytes_per_row);
+			/* we need to do clipping in the source bitmap because no seperate clipping
+			 * registers exist... */
+			moi->a1orgv += ((moi->v1srcstv >> 16) * si->overlay.ob.bytes_per_row);
 		}
 		else
 		{
 			/* increase 'first contributing pixel' with:
 			 * number of destination picture clipping pixels * inverse scaling factor */
 			moi->v1srcstv = (crtc_vstart - si->overlay.ow.v_start) * si->overlay.v_ifactor;
-			/* on pre-NV10 we need to do clipping in the source
-			 * bitmap because no seperate clipping registers exist... */
-			if (si->ps.card_arch < NV10A)
-				moi->a1orgv += ((moi->v1srcstv >> 16) * si->overlay.ob.bytes_per_row);
+			/* we need to do clipping in the source bitmap because no seperate clipping
+			 * registers exist... */
+			moi->a1orgv += ((moi->v1srcstv >> 16) * si->overlay.ob.bytes_per_row);
 		}
 		LOG(4,("Overlay: clipping at top...\n"));
 	}
 	/* take zoom into account */
 	moi->v1srcstv += (((uint32)si->overlay.my_ov.v_start) << 16);
-	if (si->ps.card_arch < NV10A)
-	{
-		moi->a1orgv += (si->overlay.my_ov.v_start * si->overlay.ob.bytes_per_row);
-		LOG(4,("Overlay: 'contributing part of buffer' origin is (cardRAM offset) $%08x\n", moi->a1orgv));
-	}
+	moi->a1orgv += (si->overlay.my_ov.v_start * si->overlay.ob.bytes_per_row);
+	LOG(4,("Overlay: 'contributing part of buffer' origin is (cardRAM offset) $%08x\n", moi->a1orgv));
 	LOG(4,("Overlay: first vert. (sub)pixel of input bitmap contributing %f\n", moi->v1srcstv / (float)65536));
 
 	/* AND below is probably required by hardware. */
@@ -359,50 +396,24 @@ static void eng_bes_program_move_overlay(move_overlay_info moi)
 	 *** actually program the registers ***
 	 **************************************/
 
-	if (si->ps.card_arch < NV10A)
-	{
-		/* unknown, but needed (otherwise high-res distortions and only half the frames */
-//		BESW(NV04_OE_STATE, 0x00000000);
-		/* select buffer 0 as active (b16) */
-//		BESW(NV04_SU_STATE, 0x00000000);
-		/* unknown (no effect?) */
-//		BESW(NV04_RM_STATE, 0x00000000);
-		/* setup clipped(!) buffer startadress in RAM */
-		/* RIVA128 - TNT bes doesn't have clipping registers, so no subpixelprecise clipping
-		 * either. We do pixelprecise vertical and 'two pixel' precise horizontal clipping here. */
-		/* (program both buffers to prevent sync distortions) */
-		/* first include 'pixel precise' left clipping... (top clipping was already included) */
-		moi.a1orgv += ((moi.hsrcstv >> 16) * 2);
-		/* we need to step in 4-byte (2 pixel) granularity due to the nature of yuy2 */
+	/* setup clipped(!) buffer startadress in RAM */
+	/* RIVA128 - TNT bes doesn't have clipping registers, so no subpixelprecise clipping
+	 * either. We do pixelprecise vertical and 'two pixel' precise horizontal clipping here. */
+	/* (program both buffers to prevent sync distortions) */
+	/* first include 'pixel precise' left clipping... (top clipping was already included) */
+	moi.a1orgv += ((moi.hsrcstv >> 16) * 2);
+	/* we need to step in 4-byte (2 pixel) granularity due to the nature of yuy2 */
 //		BESW(NV04_0BUFADR, (moi.a1orgv & ~0x03));
 //		BESW(NV04_1BUFADR, (moi.a1orgv & ~0x03));
-		/* setup output window position */
+	/* setup output window position */
 //		BESW(NV04_DSTREF, ((moi.vcoordv & 0xffff0000) | ((moi.hcoordv & 0xffff0000) >> 16)));
-		/* setup output window size */
+	/* setup output window size */
 //		BESW(NV04_DSTSIZE, (
 //			(((moi.vcoordv & 0x0000ffff) - ((moi.vcoordv & 0xffff0000) >> 16) + 1) << 16) |
 //			((moi.hcoordv & 0x0000ffff) - ((moi.hcoordv & 0xffff0000) >> 16) + 1)
 //			));
-		/* select buffer 1 as active (b16) */
+	/* select buffer 1 as active (b16) */
 //		BESW(NV04_SU_STATE, 0x00010000);
-	}
-	else
-	{
-		/* >= NV10A */
-	
-		/* setup buffer origin: GeForce uses subpixel precise clipping on left and top! (12.4 values) */
-//		BESW(NV10_0SRCREF, ((moi.v1srcstv << 4) & 0xffff0000) | ((moi.hsrcstv >> 12) & 0x0000ffff));
-		/* setup output window position */
-//		BESW(NV10_0DSTREF, ((moi.vcoordv & 0xffff0000) | ((moi.hcoordv & 0xffff0000) >> 16)));
-		/* setup output window size */
-//		BESW(NV10_0DSTSIZE, (
-//			(((moi.vcoordv & 0x0000ffff) - ((moi.vcoordv & 0xffff0000) >> 16) + 1) << 16) |
-//			((moi.hcoordv & 0x0000ffff) - ((moi.hcoordv & 0xffff0000) >> 16) + 1)
-//			));
-		/* We only use buffer buffer 0: select it. (0x01 = buffer 0, 0x10 = buffer 1) */
-		/* This also triggers activation of programmed values (double buffered registers feature) */
-//		BESW(NV10_BUFSEL, 0x00000001);
-	}
 }
 
 status_t eng_bes_to_crtc(bool crtc)
@@ -710,6 +721,14 @@ status_t eng_configure_bes
 	/* we need to step in 4-byte (2 pixel) granularity due to the nature of yuy2 */
 	BESW(VID1Y_ADDR0, (moi.a1orgv & 0x07fffffc));
 
+	/* horizontal source end does not use subpixelprecision: granularity is 8 pixels */
+	/* notes:
+	 * - make absolutely sure the engine can fetch the last pixel needed from
+	 *   the sourcebitmap even if only to generate a tiny subpixel from it!
+	 * - the engine uses byte format instead of pixel format;
+	 * - the engine uses 16 bytes, so 8 pixels granularity. */
+	BESW(VID1_FETCH, (((((moi.hsrcendv >> 16) + 1 + 0x0007) & ~0x0007) * 2) << (20 - 4)));
+
 	/* setup horizontal and vertical 'prescaling' for downscaling */
 		//fixme if needed: width must be even officially...
 //		BESW(NV10_0SRCSIZE, ((ob->height << 16) | ob->width));
@@ -796,10 +815,6 @@ status_t eng_configure_bes
 	 * all registers are loaded immediately (b29 = 1), Vid1 cmds fire (b31 = 1) */
 	BESW(COMPOSE, 0xa0000000);//tst, fixme: 9 = vbi load all regs
 
-//rud: add from MGA driver: horizontal last position in source: (also update on left+right clips!)
-//max = 0x3ff BYTES(!)
-//test:(fixme!)
-	BESW(VID1_FETCH, (0x030 << 20));//mpeg1 temp tst. (384 pixels)
 
 		/**************************
 		 *** setup color keying ***
