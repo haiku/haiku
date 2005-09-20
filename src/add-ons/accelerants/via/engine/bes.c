@@ -594,7 +594,7 @@ status_t eng_configure_bes
 		LOG(4,("Overlay: horizontal scaling factor too large, clamping at %f\n", (float)65536 / hiscalv));
 	}
 	/* VIA has a 'downscaling' limit of 1.0, but seperate prescaling to 1/16th can be done.
-	 * (scaler has 11bit register with 0.11 format value, with special 1.0 scaling factor setting;
+	 * (X-scaler has 11bit register with 0.11 format value, with special 1.0 scaling factor setting;
 	 *  prescaler has fixed 1x, 1/2x, 1/4x, 1/8x and 1/16x settings.) */
 	if (hiscalv > 0x00100000)
 	{
@@ -699,17 +699,53 @@ status_t eng_configure_bes
 		viscalv = 0x00002000;
 		LOG(4,("Overlay: vertical scaling factor too large, clamping at %f\n", (float)65536 / viscalv));
 	}
-	/* VIA has a 'downscaling' limit of 1.0
-	 * (10bit register with 0.10 format value, with special 1.0 scaling factor setting) */
-	//fixme: add downscaling 'trick' solution as supported by VIA (1/16 is min. size).
-	scale_y = true;
-	if (viscalv > 0x00010000)
+	/* VIA has a 'downscaling' limit of 1.0, but seperate prescaling to 1/16th can be done.
+	 * (Y-scaler has 10bit register with 0.10 format value, with special 1.0 scaling factor setting;
+	 *  prescaler has fixed 1x, 1/2x, 1/4x, 1/8x and 1/16x settings.) */
+	if (viscalv > 0x00100000)
 	{
 		/* (non-inverse) factor too small, set factor to min. valid value */
-		viscalv = 0x00010000;
-		scale_y = false;
+		viscalv = 0x00100000;
 		LOG(4,("Overlay: vertical scaling factor too small, clamping at %f\n", (float)1024 / (viscalv >> 6)));
 	}
+
+	/* setup pre-downscaling if 'requested' */
+	if ((viscalv > 0x00010000) && (viscalv <= 0x00020000))
+	{
+		/* instruct BES to horizontal prescale 0.5x */
+		minictrl |= 0x00010000;
+		/* correct normal scalingfactor so total scaling is 0.5 <= factor < 1.0x */
+		viscalv >>= 1;
+	}
+	else 
+		if ((viscalv > 0x00020000) && (viscalv <= 0x00040000))
+		{
+			/* instruct BES to horizontal prescale 0.25x */
+			minictrl |= 0x00030000;
+			/* correct normal scalingfactor so total scaling is 0.5 <= factor < 1.0x */
+			viscalv >>= 2;
+		}
+		else
+			if ((viscalv > 0x00040000) && (viscalv <= 0x00080000))
+			{
+				/* instruct BES to horizontal prescale 0.125x */
+				minictrl |= 0x00050000;
+				/* correct normal scalingfactor so total scaling is 0.5 <= factor < 1.0x */
+				viscalv >>= 3;
+			}
+			else
+				if ((viscalv > 0x00080000) && (viscalv <= 0x00100000))
+				{
+					/* instruct BES to horizontal prescale 0.125x */
+					minictrl |= 0x00070000;
+					/* correct normal scalingfactor so total scaling is 0.5 <= factor < 1.0x */
+					viscalv >>= 4;
+				}
+
+	/* only instruct normal scaler to scale if it must do so */
+	scale_y = true;
+	if (viscalv == 0x00010000) scale_y = false;
+
 	/* AND below is required by hardware */
 	viscalv &= 0x0000ffc0;
 
