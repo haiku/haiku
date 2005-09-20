@@ -1,0 +1,8 @@
+SubDir OBOS_TOP src apps installer ;
+
+App Installer : 
+	InstallerApp.cpp
+	InstallerWindow.cpp
+	: libbe.so
+	: Installer.rdef ;
+
