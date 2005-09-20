@@ -4,6 +4,7 @@
  */
 
 #include <Alert.h>
+#include <Screen.h>
 #include <TextView.h>
 #include "InstallerApp.h"
 
@@ -20,7 +21,9 @@ InstallerApp::InstallerApp()
 	: BApplication(APP_SIG)
 {
 	BRect windowFrame(0,0,332,160);
-	windowFrame.OffsetBy(154,87);
+	BRect frame = BScreen().Frame();
+	windowFrame.OffsetBy((frame.Width() - windowFrame.Width())/2, 
+		frame.Height()/2 - windowFrame.Height()/4 - 113);
 	fWindow = new InstallerWindow(windowFrame);
 }
 
