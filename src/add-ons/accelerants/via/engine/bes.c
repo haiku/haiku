@@ -1,4 +1,4 @@
-/* Nvidia TNT and GeForce Back End Scaler functions */
+/* VIA Unichrome Back End Scaler functions */
 /* Written by Rudolf Cornelissen 05/2002-9/2005 */
 
 #define MODULE_BIT 0x00000200
@@ -542,6 +542,8 @@ status_t eng_configure_bes
 			(ob->width - si->overlay.myBufInfo[offset].slopspace), ob->height));
 	LOG(4,("Overlay: output picture width = %d, height = %d\n", ow->width, ow->height));
 
+	/* preset X and Y prescaling to be 1x */
+	minictrl = 0x00000000;
 	/* determine interval representation value, taking zoom into account */
 	if (ow->flags & B_OVERLAY_HORIZONTAL_FILTERING)
 	{
@@ -591,17 +593,53 @@ status_t eng_configure_bes
 		hiscalv = 0x00002000;
 		LOG(4,("Overlay: horizontal scaling factor too large, clamping at %f\n", (float)65536 / hiscalv));
 	}
-	/* VIA has a 'downscaling' limit of 1.0
-	 * (11bit register with 0.11 format value, with special 1.0 scaling factor setting) */
-	//fixme: add downscaling 'trick' solution as supported by VIA (1/16 is min. size).
-	scale_x = true;
-	if (hiscalv > 0x00010000)
+	/* VIA has a 'downscaling' limit of 1.0, but seperate prescaling to 1/16th can be done.
+	 * (scaler has 11bit register with 0.11 format value, with special 1.0 scaling factor setting;
+	 *  prescaler has fixed 1x, 1/2x, 1/4x, 1/8x and 1/16x settings.) */
+	if (hiscalv > 0x00100000)
 	{
 		/* (non-inverse) factor too small, set factor to min. valid value */
-		hiscalv = 0x00010000;
-		scale_x = false;
+		hiscalv = 0x00100000;
 		LOG(4,("Overlay: horizontal scaling factor too small, clamping at %f\n", (float)2048 / (hiscalv >> 5)));
 	}
+
+	/* setup pre-downscaling if 'requested' */
+	if ((hiscalv > 0x00010000) && (hiscalv <= 0x00020000))
+	{
+		/* instruct BES to horizontal prescale 0.5x */
+		minictrl |= 0x01000000;
+		/* correct normal scalingfactor so total scaling is 0.5 <= factor < 1.0x */
+		hiscalv >>= 1;
+	}
+	else 
+		if ((hiscalv > 0x00020000) && (hiscalv <= 0x00040000))
+		{
+			/* instruct BES to horizontal prescale 0.25x */
+			minictrl |= 0x03000000;
+			/* correct normal scalingfactor so total scaling is 0.5 <= factor < 1.0x */
+			hiscalv >>= 2;
+		}
+		else
+			if ((hiscalv > 0x00040000) && (hiscalv <= 0x00080000))
+			{
+				/* instruct BES to horizontal prescale 0.125x */
+				minictrl |= 0x05000000;
+				/* correct normal scalingfactor so total scaling is 0.5 <= factor < 1.0x */
+				hiscalv >>= 3;
+			}
+			else
+				if ((hiscalv > 0x00080000) && (hiscalv <= 0x00100000))
+				{
+					/* instruct BES to horizontal prescale 0.125x */
+					minictrl |= 0x07000000;
+					/* correct normal scalingfactor so total scaling is 0.5 <= factor < 1.0x */
+					hiscalv >>= 4;
+				}
+
+	/* only instruct normal scaler to scale if it must do so */
+	scale_x = true;
+	if (hiscalv == 0x00010000) scale_x = false;
+
 	/* AND below is required by hardware */
 	hiscalv &= 0x0000ffe0;
 
@@ -755,7 +793,7 @@ status_t eng_configure_bes
 //			  else
 //               to small to handle (limit reached)
 	//rud +instruct VID1_MINI_CTL register about modified scaling. (V1_X_DIV_2 etc)
-	minictrl = 0x00000000;
+//	minictrl = 0x00000000;
 	/* enable horizontal filtering if asked for */
 	if (ow->flags & B_OVERLAY_HORIZONTAL_FILTERING)
 	{
