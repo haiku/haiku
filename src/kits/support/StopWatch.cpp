@@ -71,8 +71,10 @@ BStopWatch::Suspend()
 void
 BStopWatch::Resume()
 {
-	if (fSuspendTime)
-		fStart = system_time() - fSuspendTime - fStart;
+	if (fSuspendTime) {
+		fStart += system_time() - fSuspendTime;
+		fSuspendTime = 0;
+	}
 }
 
 
@@ -121,3 +123,4 @@ BStopWatch::Name() const
 // just for future binary compatibility
 void BStopWatch::_ReservedStopWatch1()	{}
 void BStopWatch::_ReservedStopWatch2()	{}
+
