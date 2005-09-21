@@ -282,11 +282,13 @@ MediaWindow::InitMedia(bool first)
 	FindNodes(B_MEDIA_RAW_VIDEO, B_PHYSICAL_INPUT, mVideoInputs);
 	FindNodes(B_MEDIA_ENCODED_VIDEO, B_PHYSICAL_OUTPUT, mVideoOutputs);
 	FindNodes(B_MEDIA_ENCODED_VIDEO, B_PHYSICAL_INPUT, mVideoInputs);
-	
-	AddNodes(mAudioOutputs, false);
-	AddNodes(mAudioInputs, false);
+
+	// Add video nodes first. They might have an additional audio
+	// output or input, but still should be listed as video node.
 	AddNodes(mVideoOutputs, true);
 	AddNodes(mVideoInputs, true);
+	AddNodes(mAudioOutputs, false);
+	AddNodes(mAudioInputs, false);
 	
 	mAudioView->AddNodes(mAudioOutputs, false);
 	mAudioView->AddNodes(mAudioInputs, true);
