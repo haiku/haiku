@@ -584,7 +584,7 @@ SMTPProtocol::Login(const char *_login, const char *password)
 		char temp[33];
 		for( int i=0; i<32; ++i)
 			temp[i] = 1+(rand()%254);
-		temp[33] = '\0';
+		temp[32] = '\0';
 		BString rawCnonce(temp);
 		BString cnonce;
 		char* cnoncePtr = cnonce.LockBuffer(rawCnonce.Length()*2);
@@ -611,7 +611,6 @@ SMTPProtocol::Login(const char *_login, const char *password)
 		MD5Digest(hex_digest, (unsigned char*)kd.String(), kd.Length());
 
 		rawResponse << ",response=" << hex_digest;
-		rawResponse << ",charset=utf-8";
 		BString postResponse;
 		char *resp = postResponse.LockBuffer(rawResponse.Length() * 2 + 10);
 		baselen = ::encode_base64(resp, rawResponse.String(), rawResponse.Length(), true /* headerMode */);
