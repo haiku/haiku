@@ -5,12 +5,12 @@
 //		Include file for the CEchoGals generic driver class.
 //		Set editor tabs to 3 for your viewing pleasure.
 //
-// 	CEchoGals is the big daddy class of the generic code.  It is the upper
+// 		CEchoGals is the big daddy class of the generic code.  It is the upper
 //		edge of the generic code - that is, it is the interface between the
-// 	operating system-specific code and the generic driver.
+// 		operating system-specific code and the generic driver.
 //
 //		There are a number of terms in this file that won't make any sense unless
-// 	you go read EchoGalsXface.h first.
+// 		you go read EchoGalsXface.h first.
 //
 // ----------------------------------------------------------------------------
 //
@@ -217,7 +217,7 @@ public:
 	//
 	virtual BYTE GetDigitalMode()
 		{ return( ( NULL == GetDspCommObject() )
-						? DIGITAL_MODE_SPDIF_RCA
+						? (BYTE) DIGITAL_MODE_SPDIF_RCA
 						: GetDspCommObject()->GetDigitalMode() ); }
 
 	//
@@ -408,11 +408,6 @@ public:
 	//	Audio transport (public) - playing and recording audio
 	//
 	//***********************************************************************	
-
-	//
-	// Make a Daffy Duck object (scatter-gather list)
-	//
-	CDaffyDuck * MakeDaffyDuck();
 
 	//
 	// Set the scatter-gather list for a pipe
@@ -623,7 +618,6 @@ public:
 	(
 		WORD		wPipeIndex
 	);
-	
 	
 	//***********************************************************************
 	//

@@ -76,12 +76,12 @@
 #define LAYLA24_DSP_CODE			pwLayla24DSP
 #define LAYLA24_HAS_VMIXER			FALSE
 #define LAYLA24_2ASIC_FILENAME	"Layla24_2S_ASIC.c"
-
-#define LAYLA24_DSP_FILENAME		"Layla24DSP.c"
+#define LAYLA24_DSP_FILENAME           "Layla24DSP.c"
 
 #define MIN_MTC_1X_RATE							8000
 
 #endif // ECHO24_FAMILY
+
 
 
 

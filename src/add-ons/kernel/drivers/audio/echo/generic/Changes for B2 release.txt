@@ -1,0 +1,42 @@
+Echo Generic Driver
+
+Release B2
+
+-New firmware for Gina3G & Layla3G that fixes pops and clicks with simultaneous MIDI
+and audio I/O.  There is now only one DSP firmware image for both Gina3G and Layla3G.
+
+-The new firmware does not support 8 kHz sampling
+
+-Changed C3g and C3gDco to support the new firmware
+	-Added C3gDco::GetAudioMeters virtual method so that the correct meter values
+	are returned for Gina3G and Layla3G
+
+-Simplified CChannelMask; the mask is no longer stored byte-swapped on Macs and the 
+masks are at most 32 bits wide
+
+-Moved the MakeDaffyDuck method from CEchoGals to a static member of CDaffyDuck; 
+the constructor for CDaffyDuck is now protected, so that you can only create new
+ducks by calling MakeDaffyDuck.
+
+-Various minor changes to avoid compiler warnings for AMD64 build
+
+-OsSupportWdm has been rewritten to use the WDM DMA APIs
+
+
+
+Release B1
+
+B1 is very similar to B0, with the following changes:
+
+-The code is now licensed under the terms of the Lesser GNU Public License.
+
+-Fixed a minor bug in CDspCommObject::ReadMidi
+
+-Added support for 8 kHz sampling with Gina3G
+
+-Removed obsolete "AddBuffer" command from DSP comm object
+
+-Removed support for Gina24 CD-ROM S/PDIF mode
+
+-Rewrote and fixed some bugs in digital mode switching for Layla24/Gina24/Mona
+

@@ -391,7 +391,7 @@ ECHOSTATUS CLaylaDspCommObject::SetNominalLevel
 		//	
 		ECHO_DEBUGPRINTF(("\tCalling SetBusInGain\n"));
 		
-		wBus -= m_wNumBussesOut;
+		wBus = wBus - m_wNumBussesOut;
 		return SetBusInGain(	wBus, (INT32) m_byInputTrims[wBus]);
 	}
 

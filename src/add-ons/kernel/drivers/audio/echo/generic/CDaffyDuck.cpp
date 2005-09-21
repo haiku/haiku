@@ -35,8 +35,6 @@
 
 #include "CEchoGals.h"
 
-
-
 /****************************************************************************
 
 	Construction/destruction
@@ -96,33 +94,9 @@ CDaffyDuck::CDaffyDuck
 )
 {
 	//
-	// Allocate the page for the duck entries
-	//
-	ECHOSTATUS Status;
-	DWORD dwSegmentSize;
-	
-	
-	Status = pOsSupport->AllocPhysPageBlock( PAGE_SIZE, m_pDuckPage);
-	if (ECHOSTATUS_OK != Status)
-	{
-		ECHO_DEBUGPRINTF(("CDaffyDuck::CDaffyDuck - duck entry malloc failed\n"));
-		return;
-	}
-	
-	m_DuckEntries = (DUCKENTRY *) pOsSupport->GetPageBlockVirtAddress( m_pDuckPage );
-	pOsSupport->GetPageBlockPhysSegment(m_pDuckPage,
-													0,
-													m_dwDuckEntriesPhys,
-													dwSegmentSize);
-	//
 	//	Stash stuff
 	// 
 	m_pOsSupport = pOsSupport;
-	
-	//
-	// Other init
-	// 
-	Reset();
 	
 }	// CDaffyDuck::CDaffyDuck()
 
@@ -136,7 +110,8 @@ CDaffyDuck::CDaffyDuck
 CDaffyDuck::~CDaffyDuck()
 {
 
-	m_pOsSupport->FreePhysPageBlock( PAGE_SIZE, m_pDuckPage);
+	if (NULL != m_pDuckPage)
+		m_pOsSupport->FreePhysPageBlock( PAGE_SIZE, m_pDuckPage);
 	
 }	// CDaffyDuck::~CDaffyDuck()
 
@@ -148,22 +123,6 @@ CDaffyDuck::~CDaffyDuck()
 	Setup and initialization
 
  ****************************************************************************/
-
-//===========================================================================
-//
-// InitCheck - returns ECHOSTATUS_OK if the duck created OK
-//
-//===========================================================================
-
-ECHOSTATUS CDaffyDuck::InitCheck()
-{
-	if (NULL == m_DuckEntries)
-		return ECHOSTATUS_NO_MEM;
-		
-	return ECHOSTATUS_OK;
-	
-}	// InitCheck
-
 
 //===========================================================================
 //
@@ -813,6 +772,84 @@ void CDaffyDuck::CheckIntegrity()
 }	// CheckIntegrity
 
 #endif // INTEGRITY_CHECK
+
+
+VOID CDaffyDuck::DbgDump()
+{
+	ECHO_DEBUGPRINTF(("duck list starts at virt %p, phys %08x\n",m_DuckEntries,m_dwDuckEntriesPhys));
+	ECHO_DEBUGPRINTF(("count %d  head %d  tail %d\n",m_dwCount,m_dwHead,m_dwTail));
+	ECHO_DEBUGPRINTF(("Head phys %08x   tail phys %08x\n",
+				(m_dwHead * sizeof(DUCKENTRY)) + m_dwDuckEntriesPhys,
+				(m_dwTail * sizeof(DUCKENTRY)) + m_dwDuckEntriesPhys));
+				
+	DWORD idx,count;
+	
+	idx = m_dwTail;
+	count = m_dwCount;
+	while (count != 0)
+	{
+		ECHO_DEBUGPRINTF(("\t%08x :  %08x  %08x\n",(idx * sizeof(DUCKENTRY)) + m_dwDuckEntriesPhys,
+														m_DuckEntries[idx].dwSize,m_DuckEntries[idx].PhysAddr));
+		count--;
+		idx ++;
+		idx &= ENTRY_INDEX_MASK;
+	}
+}
+
+//===========================================================================
+//
+// This function is used to create a CDaffyDuck object to 
+// manage a scatter-gather list for a newly opened pipe.  Call
+// this instead of using "new CDaffyDuck" directly.
+//
+//===========================================================================
+
+CDaffyDuck * CDaffyDuck::MakeDaffyDuck(COsSupport *pOsSupport)
+{
+	ECHOSTATUS 	Status = ECHOSTATUS_OK;
+	CDaffyDuck 	*pDuck;
+	
+	pDuck = new CDaffyDuck(	pOsSupport );
+	if (NULL == pDuck)
+	{
+		ECHO_DEBUGPRINTF(("CDaffyDuck::CDaffyDuck - duck entry malloc failed\n"));
+		return NULL;
+	}
+		
+	//
+	// Allocate the page for the duck entries
+	//
+	DWORD dwSegmentSize;
+	PHYS_ADDR PhysAddr;
+	PPAGE_BLOCK pPageBlock;
+	
+	Status = pOsSupport->AllocPhysPageBlock( PAGE_SIZE, pPageBlock);
+	if (ECHOSTATUS_OK != Status)
+	{
+		ECHO_DEBUGPRINTF(("CDaffyDuck::CDaffyDuck - duck entry page block malloc failed\n"));
+		delete pDuck;
+		return NULL;
+	}
+	
+	pDuck->m_pDuckPage = pPageBlock;
+	
+	pDuck->m_DuckEntries = (DUCKENTRY *) pOsSupport->GetPageBlockVirtAddress( pPageBlock );
+	pOsSupport->GetPageBlockPhysSegment(pPageBlock,
+													0,
+													PhysAddr,
+													dwSegmentSize);
+
+	pDuck->m_dwDuckEntriesPhys = PhysAddr;
+
+	//
+	// Finish initializing
+	// 
+	pDuck->Reset();
+
+	return pDuck;
+		
+}	// MakeDaffyDuck
+
 
 
 // *** CDaffyDuck.cpp ***

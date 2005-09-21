@@ -5,6 +5,8 @@
 //		Include file for interfacing with the CLayla24 generic driver class
 //		Set editor tabs to 3 for your viewing pleasure.
 //
+// ----------------------------------------------------------------------------
+//
 // This file is part of Echo Digital Audio's generic driver library.
 // Copyright Echo Digital Audio Corporation (c) 1998 - 2005
 // All rights reserved

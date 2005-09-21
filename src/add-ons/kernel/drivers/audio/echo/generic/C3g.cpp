@@ -303,16 +303,7 @@ ECHOSTATUS C3g::QueryAudioSampleRate
 			(dwSampleRate > 50000) && 
 			(dwSampleRate <= 100000))
 		return ECHOSTATUS_OK;
-	
-	//
-	// Also allow 8 kHz for Gina3G
-	//
-	DWORD dwBoxType;
-	
-	GetDspCommObject()->Get3gBoxType(&dwBoxType,NULL);
-	if ((GINA3G == dwBoxType) && (8000 == dwSampleRate))
-		return ECHOSTATUS_OK;
-		
+
 	ECHO_DEBUGPRINTF(("C3g::QueryAudioSampleRate() - rate %ld invalid\n",dwSampleRate) );
 
 	return ECHOSTATUS_BAD_FORMAT;
@@ -475,5 +466,44 @@ void C3g::GetAudioLatency(ECHO_AUDIO_LATENCY *pLatency)
 	
 }	// GetAudioLatency
 
+
+
+//===========================================================================
+//
+//	Start transport for a group of pipes
+//
+// Use this to make sure no one tries to start digital channels 3-8 
+// with the hardware in double speed mode.
+//
+//===========================================================================
+
+ECHOSTATUS C3g::Start
+(
+	PCChannelMask	pChannelMask
+)
+{
+	PC3gDco pDCO;
+
+	//
+	// Double speed mode?
+	//
+	pDCO = GetDspCommObject();
+	if (pDCO->DoubleSpeedMode())
+	{
+		BOOL intersect;
+		
+		//
+		// See if ADAT in 3-8 or out 3-8 have been opened
+		//		
+		intersect = m_cmAudioOpen.IsIntersectionOf( pDCO->m_Adat38Mask );
+		if (intersect)
+		{
+			ECHO_DEBUGPRINTF(("Cannot start ADAT channels 3-8 in double speed mode\n"));
+			return ECHOSTATUS_INVALID_CHANNEL;
+		}
+	}
+
+	return CEchoGals::Start(pChannelMask);
+}
 
 // *** C3g.cpp ***

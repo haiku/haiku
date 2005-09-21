@@ -569,5 +569,4 @@ ECHOSTATUS CLayla24DspCommObject::SetInputClock(WORD wClock)
 }		// ECHOSTATUS CLayla24DspCommObject::SetInputClock()
 
 
-
 // **** Layla24DspCommObject.cpp ****

@@ -67,7 +67,7 @@
 //
 //==================================================================================
 
-#define GENERIC_TO_DSP(iValue) 	((iValue + 0x80) >> 8)
+#define GENERIC_TO_DSP(iValue) 	((iValue + 0x80) >> 8)	
 #define DSP_TO_GENERIC(iValue)	(iValue << 8)
 
 
@@ -345,7 +345,7 @@ SET_LAYLA24_FREQUENCY_REG command.
 
 //==================================================================================
 //
-//	DSP Audio formats
+////	DSP Audio formats
 //
 // These are the audio formats that the DSP can transfer
 // via input and output pipes.  LE means little-endian,

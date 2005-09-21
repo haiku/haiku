@@ -103,13 +103,19 @@ public:
 	};
 	
 	//
-	//	Construction/destruction
+	//	Destructor
 	//
-	CDaffyDuck(PCOsSupport 	pOsSupport);
 	~CDaffyDuck();
+	
+	static CDaffyDuck * MakeDaffyDuck(COsSupport *pOsSupport);
 
 protected:
 
+	//
+	// Protected constructor
+	//
+	CDaffyDuck(PCOsSupport 	pOsSupport);
+	
 	DWORD			m_dwPipeIndex;
 	
 	PPAGE_BLOCK	m_pDuckPage;
@@ -141,12 +147,6 @@ protected:
 	
 public:
 
-	//
-	// InitCheck should be called after constructing the CDaffyDuck; this
-	// is needed because you can't use exceptions in the Windows kernel.
-	//
-	ECHOSTATUS InitCheck();
-	
 	void Reset();
 	
 	void ResetStartPos();
@@ -254,6 +254,11 @@ public:
 	// of the list that might be left over from earlier
 	//	
 	void CleanUpTail();
+	
+	//
+	// Spew out some info
+	//
+	VOID DbgDump();
 	
 	//
 	//	Overload new & delete to make sure these objects are allocated from

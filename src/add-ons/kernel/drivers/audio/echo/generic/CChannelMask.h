@@ -48,7 +48,6 @@
 //
 typedef unsigned long	CH_MASK;
 
-#define	CH_MASK_SZ		(2)				// Max channel mask array size
 #define	CH_MASK_BITS	(sizeof( CH_MASK ) * 8)
 													// Max bits per mask entry
 
@@ -73,7 +72,7 @@ protected:
 	friend class CInOutChannelMask;
 #endif
 
-	CH_MASK	m_MaskRegs[ CH_MASK_SZ ];	// One bit per output or input channel
+	CH_MASK	m_Mask;						// One bit per output or input channel
 
 public:
 
@@ -135,18 +134,12 @@ public:
 	//
 	friend class CChMaskDsp;
 
-	inline CH_MASK operator []  ( int iNdx )
-		{ return SWAP( m_MaskRegs[ iNdx ] ); }
-
 	//	Return TRUE if source mask equals this mask
 	friend BOOLEAN operator == ( CONST CChannelMask &LVal,
 										  CONST CChannelMask &RVal );
 
 	// Copy mask bits in source to this mask
 	CChannelMask& operator = (CONST CChannelMask & RVal);
-
-	// Copy mask bits in source to this mask
-	CChannelMask& operator = (CONST CChMaskDsp & RVal);
 
 	// Add mask bits in source to this mask
 	VOID operator += (CONST CChannelMask & RVal);
@@ -193,7 +186,13 @@ class CChMaskDsp
 {
 protected:
 
-	CH_MASK_DSP	m_MaskRegs[ CH_MASK_SZ ];	// One bit per output or input channel
+	enum
+	{
+		CH_MASK_SZ = 4 / sizeof(CH_MASK_DSP)
+	};
+
+	CH_MASK_DSP	m_MaskRegs[ CH_MASK_SZ  ];	// One bit per output or input channel
+														// 32 bits total
 
 public:
 

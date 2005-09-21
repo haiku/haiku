@@ -32,7 +32,6 @@
 #include "C3gDco.h"
 
 #include "Echo3gDSP.c"
-#include "Gina3gDSP.c"
 #include "3G_ASIC.c"
 
 /****************************************************************************
@@ -183,6 +182,7 @@ BOOL C3gDco::LoadASIC()
 ECHOSTATUS C3gDco::SetInputClock(WORD wClock)
 {
 	DWORD dwControlReg,dwSampleRate;
+	ECHOSTATUS Status;
 
 	ECHO_DEBUGPRINTF( ("C3gDco::SetInputClock:\n") );
 	
@@ -203,8 +203,7 @@ ECHOSTATUS C3gDco::SetInputClock(WORD wClock)
 			m_wInputClock = ECHO_CLOCK_INTERNAL;	// prevent recursion
 			
 			dwSampleRate = GetSampleRate();
-			if ((dwSampleRate != 8000) &&
-				((dwSampleRate < 32000) || (dwSampleRate > 100000)))
+			if ((dwSampleRate < 32000) || (dwSampleRate > 100000))
 				dwSampleRate = 48000;
 				
 			SetSampleRate(dwSampleRate);
@@ -263,14 +262,15 @@ ECHOSTATUS C3gDco::SetInputClock(WORD wClock)
 			ECHO_DEBUGBREAK();
 				return ECHOSTATUS_CLOCK_NOT_SUPPORTED;
 	}
-
-	//
-	// Winner! Set the new input clock.
-	//
-	m_wInputClock = wClock;
-	WriteControlReg( dwControlReg, Get3gFreqReg(), TRUE );
 	
-	return ECHOSTATUS_OK;
+	//
+	// Winner! Try to write the hardware
+	//
+	Status = WriteControlReg( dwControlReg, Get3gFreqReg(), TRUE );
+	if (ECHOSTATUS_OK == Status)
+		m_wInputClock = wClock;
+	
+	return Status;
 
 }	// ECHOSTATUS C3gDco::SetInputClock
 
@@ -344,10 +344,6 @@ DWORD C3gDco::SetSampleRate( DWORD dwNewSampleRate )
 		
 		case 32000 :
 			dwNewClock = E3G_32KHZ;
-			break;
-			
-		case 8000 :
-			dwNewClock = E3G_32KHZ | E3G_SRC_4X;
 			break;
 
 		default :
@@ -488,8 +484,17 @@ ECHOSTATUS C3gDco::WriteControlReg
 	BOOL 	fForceWrite
 )
 {
+	ECHOSTATUS Status;
+
 	ECHO_DEBUGPRINTF(("C3gDco::WriteControlReg 0x%lx 0x%lx\n",dwControlReg,dwFreqReg));
 	
+	//
+	// New value OK?
+	//
+	Status = ValidateCtrlReg(dwControlReg);
+	if (ECHOSTATUS_OK != Status)
+		return Status;
+
 	//
 	// Ready to go?
 	//
@@ -646,8 +651,6 @@ BOOL C3gDco::CheckAsicStatus()
 {
 	DWORD	dwBoxStatus,dwBoxType;
 	
-	m_bReloadFirmware = FALSE;
-	
 	if ( !WaitForHandshake() )
 		return FALSE;
 		
@@ -674,9 +677,14 @@ BOOL C3gDco::CheckAsicStatus()
 	//
 	dwBoxStatus = SWAP(m_pDspCommPage->dwExtBoxStatus);
 	if (E3G_ASIC_NOT_LOADED == dwBoxStatus)
+	{
 		dwBoxType = NO3GBOX;
+	}
 	else
+	{
 		dwBoxType = dwBoxStatus & E3G_BOX_TYPE_MASK;
+		m_bASICLoaded = TRUE;
+	}
 		
 	m_dwCurrentBoxType = dwBoxType;
 
@@ -713,20 +721,6 @@ BOOL C3gDco::CheckAsicStatus()
 	//
 	if (NO3GBOX == dwBoxType)
 		m_bBadBoard = TRUE;
-	
-	//
-	// OK if correct DSP code is loaded for this box type
-	//
-	if (m_pwDspCode == m_pwDspCodeToLoad)
-	{
-		m_bASICLoaded = TRUE;
-	}
-	else
-	{
-		m_pwDspCode = NULL;
-		m_ullLastLoadAttemptTime = 0;	// so LoadFirmware will try again right away
-		m_bReloadFirmware = TRUE;
-	}
 
 	return m_bASICLoaded;
 
@@ -766,6 +760,7 @@ void C3gDco::SetPhantomPower(BOOL fPhantom)
 void C3gDco::SetChannelCounts()
 {
 	char *pszName;
+	WORD ch,i;
 	
 	switch (m_dwOriginalBoxType)
 	{
@@ -776,8 +771,6 @@ void C3gDco::SetChannelCounts()
 			m_wFirstDigitalBusIn = 2;
 			
 			pszName = "Gina3G";
-			
-			m_pwDspCodeToLoad = pwGina3gDSP; 
 			break;
 			
 		
@@ -790,36 +783,32 @@ void C3gDco::SetChannelCounts()
 			m_wFirstDigitalBusIn = 8;
 			
 			pszName = "Layla3G";
-			
-			m_pwDspCodeToLoad = pwEcho3gDSP; 
 			break;
 	}
 
 	m_wNumBussesOut = m_wNumPipesOut;
 	m_wNumBussesIn = m_wNumPipesIn;
 	strcpy( m_szCardName, pszName);
-}
-
-
-//===========================================================================
-//
-// Override LoadFirmware to try again in case the box type doesn't match
-//
-//===========================================================================
-
-ECHOSTATUS C3gDco::LoadFirmware()
-{
-	ECHOSTATUS status;
 	
-	m_bReloadFirmware = FALSE;
-	do
+	//
+	// Build a channel mask for ADAT inputs & outputs 3-8
+	// OK to use bus # here since this hardware has no virtual outputs
+	//
+	m_Adat38Mask.Clear(); 
+	ch = m_wFirstDigitalBusOut + 2;
+	for (i = 0; i < 6; i++)
 	{
-		status = CDspCommObject::LoadFirmware();
-	} while ( m_bReloadFirmware );
+		m_Adat38Mask.SetIndexInMask(ch);
+		ch++;
+	}
 	
-	return status;
-
-} // LoadFirmware
+	ch += m_wFirstDigitalBusIn + 2;
+	for (i = 0; i < 6; i++)
+	{
+		m_Adat38Mask.SetIndexInMask(ch);
+		ch++;
+	}
+}
 
 
 //===========================================================================
@@ -842,5 +831,114 @@ void C3gDco::Get3gBoxType(DWORD *pOriginalBoxType,DWORD *pCurrentBoxType)
 
 } // Get3gBoxType
 
+
+
+//===========================================================================
+//
+// Fill out an ECHOGALS_METERS struct using the current values in the 
+// comm page.  This method is overridden for vmixer cards.
+//
+//===========================================================================
+
+ECHOSTATUS C3gDco::GetAudioMeters
+(
+	PECHOGALS_METERS	pMeters
+)
+{
+	pMeters->iNumPipesOut = 0;
+	pMeters->iNumPipesIn = 0;
+
+	//
+	//	Output 
+	// 
+	DWORD dwCh = 0;
+	WORD 	i;
+
+	pMeters->iNumBussesOut = (INT32) m_wNumBussesOut;
+	for (i = 0; i < m_wNumBussesOut; i++)
+	{
+		pMeters->iBusOutVU[i] = 
+			DSP_TO_GENERIC( ((INT32) (INT8) m_pDspCommPage->VUMeter[ dwCh ]) );
+
+		pMeters->iBusOutPeak[i] = 
+			DSP_TO_GENERIC( ((INT32) (INT8) m_pDspCommPage->PeakMeter[ dwCh ]) );
+		
+		dwCh++;
+	}
+
+	pMeters->iNumBussesIn = (INT32) m_wNumBussesIn;	
+	dwCh = E3G_MAX_OUTPUTS;
+	for (i = 0; i < m_wNumBussesIn; i++)
+	{
+		pMeters->iBusInVU[i] = 
+			DSP_TO_GENERIC( ((INT32) (INT8) m_pDspCommPage->VUMeter[ dwCh ]) );
+		pMeters->iBusInPeak[i] = 
+			DSP_TO_GENERIC( ((INT32) (INT8) m_pDspCommPage->PeakMeter[ dwCh ]) );
+		
+		dwCh++;
+	}
+	
+	return ECHOSTATUS_OK;
+	
+} // GetAudioMeters
+
+
+
+//===========================================================================
+//
+// Utility function; returns TRUE if double speed mode is set
+//
+//===========================================================================
+
+BOOL C3gDco::DoubleSpeedMode(DWORD *pdwNewCtrlReg)
+{
+	DWORD dwControlReg;
+	
+	if (NULL == pdwNewCtrlReg)
+		dwControlReg = GetControlRegister();
+	else
+		dwControlReg = *pdwNewCtrlReg;
+	
+	if (0 != (dwControlReg & E3G_DOUBLE_SPEED_MODE))
+		return TRUE;
+		
+	return FALSE;
+}
+
+
+//===========================================================================
+//
+// Utility function; validates a new control register value.  Prevents
+// speed change while transport is running
+//
+//===========================================================================
+
+ECHOSTATUS C3gDco::ValidateCtrlReg(DWORD dwNewControlReg)
+{
+	BOOL fCurrDoubleSpeed,fNewDoubleSpeed;
+	
+	//
+	// Return OK if transport is off
+	//
+	if (m_cmActive.IsEmpty())
+		return ECHOSTATUS_OK;
+
+	//
+	// Get the new and current state of things
+	//
+	fNewDoubleSpeed = DoubleSpeedMode(&dwNewControlReg);
+	fCurrDoubleSpeed = DoubleSpeedMode(NULL);	
+
+	//
+	// OK to change?
+	//
+	if (fCurrDoubleSpeed != fNewDoubleSpeed)
+	{
+		ECHO_DEBUGPRINTF(("Can't switch to speeds with transport active\n"));
+		return ECHOSTATUS_INVALID_CHANNEL;
+	}
+
+	return ECHOSTATUS_OK;
+}
 
 // **** C3gDco.cpp ****

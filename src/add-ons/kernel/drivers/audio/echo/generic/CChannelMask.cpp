@@ -67,9 +67,8 @@ CChannelMask::CChannelMask()
 void CChannelMask::SetMask( CH_MASK OutMask, CH_MASK InMask, int nOutputs )
 {
 
-	m_MaskRegs[ 0 ] = SWAP( OutMask );
-	m_MaskRegs[ 0 ] |= SWAP( (CH_MASK) ( InMask << nOutputs ) );
-	m_MaskRegs[ 1 ] = SWAP( (CH_MASK) ( InMask >> ( CH_MASK_BITS - nOutputs ) ) );
+	m_Mask = OutMask;
+	m_Mask |= InMask << nOutputs;
 
 }	// void CChannelMask::SetMask( ... )
 
@@ -77,17 +76,16 @@ void CChannelMask::SetMask( CH_MASK OutMask, CH_MASK InMask, int nOutputs )
 void CChannelMask::SetOutMask( CH_MASK OutMask, int nOutputs )
 {
 
-	m_MaskRegs[ 0 ] &= SWAP( (CH_MASK) ( (CH_MASK) -1 << nOutputs ) );
-	m_MaskRegs[ 0 ] |= SWAP( OutMask );
+	m_Mask &= ((CH_MASK) -1) << nOutputs;
+	m_Mask |= OutMask;
 
 }	// void CChannelMask::SetOutMask( CH_MASK OutMask, int nOutputs )
 
 
 void CChannelMask::SetInMask( CH_MASK InMask, int nOutputs )
 {
-	m_MaskRegs[ 0 ] &= SWAP( (CH_MASK) (~( (CH_MASK) -1 << nOutputs ) ) );
-	m_MaskRegs[ 0 ] |= SWAP( (CH_MASK) ( InMask << nOutputs ) );
-	m_MaskRegs[ 1 ] = SWAP( (CH_MASK) ( InMask >> ( CH_MASK_BITS - nOutputs ) ) );
+	m_Mask &= ~( (CH_MASK) -1 << nOutputs );
+	m_Mask |= InMask << nOutputs;
 }	// void CChannelMask::SetInMask( CH_MASK InMask, int nOutputs )
 
 
@@ -105,13 +103,12 @@ void CChannelMask::GetMask( CH_MASK & OutMask, CH_MASK & InMask, int nOutputs )
 
 CH_MASK CChannelMask::GetOutMask( int nOutputs )
 {
-	return  SWAP( m_MaskRegs[ 0 ] ) & ~( (CH_MASK) -1 << nOutputs );
+	return  m_Mask & ~( (CH_MASK) -1 << nOutputs );
 }	// CH_MASK CChannelMask::GetOutMask( int nOutputs )
 
 CH_MASK CChannelMask::GetInMask( int nOutputs )
 {
-	return ( SWAP( m_MaskRegs[ 0 ] ) >> nOutputs ) |
-			  ( SWAP( m_MaskRegs[ 1 ] ) << ( CH_MASK_BITS - nOutputs ) );
+	return  m_Mask >> nOutputs;
 }	// CH_MASK CChannelMask::GetIntMask( int nOutputs )
 
 
@@ -123,11 +120,8 @@ CH_MASK CChannelMask::GetInMask( int nOutputs )
 
 BOOL CChannelMask::IsEmpty()
 {
-	int	i;
-
-	for ( i = 0; i < CH_MASK_SZ; i++ )
-		if ( 0 != m_MaskRegs[ i ] )
-			return FALSE;
+	if (0 != m_Mask)
+		return FALSE;
 
 	return TRUE;
 
@@ -143,9 +137,7 @@ BOOL CChannelMask::IsEmpty()
 // Set driver channel index into DSP mask format
 void CChannelMask::SetIndexInMask( WORD wPipeIndex )
 {
-
-	m_MaskRegs[ wPipeIndex / CH_MASK_BITS ] |=
-		  SWAP( (CH_MASK) (( (CH_MASK) 1 ) << ( wPipeIndex % CH_MASK_BITS ) ) );
+	m_Mask |= 1 << wPipeIndex;
 
 }	// void CChannelMask::SetIndexInMask( WORD wPipeIndex )
 	
@@ -154,9 +146,8 @@ void CChannelMask::SetIndexInMask( WORD wPipeIndex )
 void CChannelMask::ClearIndexInMask( WORD wPipeIndex )
 {
 
-	m_MaskRegs[ wPipeIndex / CH_MASK_BITS ] &=
-			SWAP( (CH_MASK)(~( ( (CH_MASK) 1 ) << ( wPipeIndex % CH_MASK_BITS ) ) ) );
-
+	m_Mask &= ~((CH_MASK) 1 << wPipeIndex);
+	
 }	// void CChannelMask::ClearIndexInMask( WORD wPipeIndex )
 
 
@@ -173,23 +164,20 @@ void CChannelMask::ClearIndexInMask( WORD wPipeIndex )
 
 WORD CChannelMask::GetIndexFromMask( WORD wStartPipeIndex )
 {
-	WORD		wIndex = wStartPipeIndex % CH_MASK_BITS;
-	WORD		wCt	 = wStartPipeIndex / CH_MASK_BITS;
-	CH_MASK	Mask;
-
-	for ( ; wCt < CH_MASK_SZ; wCt++ )
+	CH_MASK bit;
+	WORD index;
+	
+	bit = 1 << wStartPipeIndex;
+	index = wStartPipeIndex;
+	while (bit != 0)
 	{
-		Mask = SWAP( m_MaskRegs[ wCt ] );
-		if ( 0 != Mask )
-		{
-			while( !( Mask & (1<<wIndex) ) &&
-					 wIndex < CH_MASK_BITS )
-				wIndex++;
-			if ( wIndex < CH_MASK_BITS )	
-				return( wIndex + ( wCt * CH_MASK_BITS ) );	
-		}
-		wIndex = 0;
+		if (0 != (m_Mask & bit))
+			return index;
+	
+		bit <<= 1;
+		index++;
 	}
+
 	return( (WORD) ECHO_INVALID_CHANNEL );
 	
 }		// WORD CChannelMask::GetIndexFromMask( WORD wStartIndex )
@@ -203,9 +191,7 @@ WORD CChannelMask::GetIndexFromMask( WORD wStartPipeIndex )
 
 BOOL CChannelMask::TestIndexInMask( WORD wPipeIndex )
 {
-	if ( SWAP( m_MaskRegs[ wPipeIndex / CH_MASK_BITS ] ) &
-			  (CH_MASK)( ( (CH_MASK) 1 ) << ( wPipeIndex % CH_MASK_BITS ) ) 
-		)
+	if (0 != (m_Mask & ((CH_MASK) 1 << wPipeIndex)))
 		return TRUE;
 		
 	return FALSE;
@@ -221,12 +207,7 @@ BOOL CChannelMask::TestIndexInMask( WORD wPipeIndex )
 
 void CChannelMask::ClearMask( CChannelMask SrcMask )
 {
-	int	i;
-
-	for ( i = 0; i < CH_MASK_SZ; i++ )
-	{
-		m_MaskRegs[ i ] &= ~SrcMask.m_MaskRegs[ i ];
-	}
+	m_Mask &= ~SrcMask.m_Mask;
 
 }	// void CChannelMask::ClearMask( CChannelMask SrcMask )
 
@@ -239,11 +220,7 @@ void CChannelMask::ClearMask( CChannelMask SrcMask )
 
 void CChannelMask::Clear()
 {
-	int	i;
-
-	for ( i = 0; i < CH_MASK_SZ; i++ )
-		m_MaskRegs[ i ] = 0;
-
+	m_Mask = 0;
 }	// void CChannelMask::Clear()
 
 	
@@ -255,10 +232,8 @@ void CChannelMask::Clear()
 
 VOID CChannelMask::operator += (CONST CChannelMask & RVal)
 {
-	int	i;
+	m_Mask |= RVal.m_Mask;
 
-	for ( i = 0; i < CH_MASK_SZ; i++ )
-		m_MaskRegs[ i ] |= RVal.m_MaskRegs[ i ];
 }	// VOID operator += (CONST CChannelMask & RVal)
 
 	
@@ -270,11 +245,7 @@ VOID CChannelMask::operator += (CONST CChannelMask & RVal)
 
 VOID CChannelMask::operator -= (CONST CChannelMask & RVal)
 {
-	int	i;
-
-	for ( i = 0; i < CH_MASK_SZ; i++ )
-		m_MaskRegs[ i ] &= ~RVal.m_MaskRegs[ i ];
-
+	ClearMask(RVal);
 }	// VOID operator -= (CONST CChannelMask & RVal)
 
 
@@ -286,11 +257,9 @@ VOID CChannelMask::operator -= (CONST CChannelMask & RVal)
 
 BOOL CChannelMask::Test( PCChannelMask pSrcMask )
 {
-	int	i;
-
-	for ( i = 0; i < CH_MASK_SZ; i++ )
-		if ( m_MaskRegs[ i ] & pSrcMask->m_MaskRegs[ i ] )
-			return TRUE;
+	if (0 != (m_Mask & pSrcMask->m_Mask))
+		return TRUE;
+	
 	return FALSE;	
 
 }	// BOOL CChannelMask::Test( PChannelMask pSrcMask )
@@ -299,7 +268,7 @@ BOOL CChannelMask::Test( PCChannelMask pSrcMask )
 //===========================================================================
 //
 //	IsSubsetOf returns TRUE if all of the channels in TstMask are set in 
-// m_MaskRegs.  
+// m_Mask.  
 //
 //	Use to be sure all channels in this instance exist in
 //	another instance.
@@ -311,15 +280,9 @@ BOOL CChannelMask::IsSubsetOf
 	CChannelMask& TstMask
 )
 {
-	for ( int i = 0; i < CH_MASK_SZ; i++ )
-	{
-		CH_MASK ThisMask;
+	if ((m_Mask & TstMask.m_Mask) != TstMask.m_Mask)
+		return FALSE;
 		
-		ThisMask = SWAP( m_MaskRegs[ i ]);
-		if ( ( ThisMask & TstMask[ i ] ) != ThisMask )
-			return FALSE;
-	}
-
 	return TRUE;
 
 }	// BOOL CChannelMask::IsSubsetOf
@@ -340,9 +303,8 @@ BOOL CChannelMask::IsIntersectionOf
 	CChannelMask& TstMask
 )
 {
-	for ( int i = 0; i < CH_MASK_SZ; i++ )
-		if ( 0 != ( m_MaskRegs[ i ] & TstMask[ i ] ) )
-			return TRUE;
+	if (0 != (m_Mask & TstMask.m_Mask))
+		return TRUE;
 
 	return FALSE;
 
@@ -358,9 +320,8 @@ BOOL CChannelMask::IsIntersectionOf
 
 BOOLEAN operator == ( CONST CChannelMask &LVal, CONST CChannelMask &RVal )
 {
-	for ( int i = 0; i < CH_MASK_SZ; i++ )
-		if ( LVal.m_MaskRegs[ i ] != RVal.m_MaskRegs[ i ] )
-			return FALSE;
+	if (LVal.m_Mask != RVal.m_Mask)
+		return FALSE;
 
 	return TRUE;
 
@@ -378,24 +339,11 @@ CChannelMask& CChannelMask::operator =(CONST CChannelMask & RVal)
 	if ( &RVal == this )
 		return *this;
 
-	for ( int i = 0; i < CH_MASK_SZ; i++ )
-		m_MaskRegs[ i ] = RVal.m_MaskRegs[ i ];
+	m_Mask = RVal.m_Mask;
 
 	return *this;
 
 }	// CChannelMask& CChannelMask::operator = (CONTS CChannelMask & RVal)
-
-
-CChannelMask& CChannelMask::operator =(CONST CChMaskDsp & RVal)
-{
-	CH_MASK *	pMask = (CH_MASK *) &RVal.m_MaskRegs[ 0 ];
-
-	m_MaskRegs[ 0 ] = *pMask;
-	m_MaskRegs[ 1 ] = 0;
-
-	return *this;
-
-}	// CChannelMask& CChannelMask::operator =(CONST CChMaskDsp & RVal)
 
 
 //===========================================================================
@@ -409,8 +357,7 @@ VOID CChannelMask::operator &= (CONST CChannelMask & RVal)
 	if ( &RVal == this )
 		return;
 
-	for ( int i = 0; i < CH_MASK_SZ; i++ )
-		m_MaskRegs[ i ] &= RVal.m_MaskRegs[ i ];
+	m_Mask &= RVal.m_Mask;
 
 }	// VOID CChannelMask::operator &= (CONST CChannelMask & RVal)
 
@@ -426,8 +373,7 @@ VOID CChannelMask::operator |= (CONST CChannelMask & RVal)
 	if ( &RVal == this )
 		return;
 
-	for ( int i = 0; i < CH_MASK_SZ; i++ )
-		m_MaskRegs[ i ] |= RVal.m_MaskRegs[ i ];
+	m_Mask |= RVal.m_Mask;
 
 }	// VOID CChannelMask::operator |= (CONST CChannelMask & RVal)
 
@@ -578,7 +524,7 @@ VOID CChMaskDsp::operator += (CONST CChannelMask & RVal)
 {
 	CH_MASK *	pMask = (CH_MASK *) &m_MaskRegs[ 0 ];
 
-	*pMask |= RVal.m_MaskRegs[ 0 ];
+	*pMask |= RVal.m_Mask;
 }	// VOID operator += (CONST CChMaskDsp & RVal)
 
 	
@@ -592,7 +538,7 @@ VOID CChMaskDsp::operator -= (CONST CChannelMask & RVal)
 {
 	CH_MASK *	pMask = (CH_MASK *) &m_MaskRegs[ 0 ];
 
-	*pMask &= ~RVal.m_MaskRegs[ 0 ];
+	*pMask &= ~RVal.m_Mask;
 }	// VOID operator += (CONST CChMaskDsp & RVal)
 
 
@@ -606,7 +552,7 @@ CChMaskDsp& CChMaskDsp::operator =(CONST CChannelMask & RVal)
 {
 	CH_MASK *	pMask = (CH_MASK *) &m_MaskRegs[ 0 ];
 
-	*pMask = RVal.m_MaskRegs[ 0 ];
+	*pMask = RVal.m_Mask;
 	return *this;
 
 }	// CChMaskDsp& CChMaskDsp::operator =(CONST CChannelMask & RVal)

@@ -1,18 +1,16 @@
 //	Mona361 DSP Code File (Converted by LRS2VxD)
-//	Copyright (c) Echo Digital Audio, 2002. All Rights Reserved.
-
 // ----------------------------------------------------------------------------
 //
-// Copyright Echo Digital Audio Corporation (c) 1998 - 2004
+// Copyright Echo Digital Audio Corporation (c) 2005
 // All rights reserved
 // www.echoaudio.com
-//   
+//
 // Echo Digital Audio does not disclose the source code from which these 
 // firmware images are derived. Permission is hereby granted for the 
 // distribution of these firmware images as part of the Linux kernel or 
 // other GPL project in text or binary 
 // form as required.
-//   
+//
 // This file is part of Echo Digital Audio's generic driver library.
 //
 // This library is free software; you can redistribute it and/or
@@ -1057,7 +1055,7 @@ WORD pwMona361DSP[] =
 	0x0000, 0x0159, 0x005e, 0xdc00, 0x004c, 0xe000, 0x000d, 0x0161, 
 	0x005e, 0x5800, 0x0020, 0x000b, 0x000e, 0x215e, 0x000a, 0x7002, 
 	0x0000, 0x0025, 0x000a, 0x2587, 0x0000, 0x015e, 0x000c, 0x0127, 
-	0x0021, 0xc644, 0x000c, 0x1c08, 0x000e, 0xa166, 0x0020, 0x0040, 
+	0x0021, 0xc644, 0x000c, 0x1ec8, 0x000e, 0xa166, 0x0020, 0x0040, 
 	0x0000, 0x000c, 0x0020, 0x0051, 0x0000, 0x000c, 0x009d, 0x0002, 
 	0x0000, 0x0049, 0x0000, 0x09e0, 0x000a, 0x2596, 0x0000, 0x0a0e, 
 	0x0004, 0x4e70, 0x0044, 0xaa00, 0x0020, 0x0045, 0x000e, 0xa9f0, 

@@ -277,7 +277,7 @@ ECHOSTATUS CPipeOutCtrl::SetGain
 		else if (iGain < ECHOGAIN_MUTED)
 			iGain = ECHOGAIN_MUTED;
 	
-		m_Gains[ wIndex ] = GENERIC_TO_DSP( iGain );
+		m_Gains[ wIndex ] = (INT8) GENERIC_TO_DSP( iGain );
 		
 		//
 		// Store the notify
@@ -546,8 +546,8 @@ ECHOSTATUS CPipeOutCtrl::SetPan(WORD wPipeOut, WORD wBusOut, INT32 iPan)
 	//
 	//	Convert this pan setting into left and right dB values
 	// 		
-	m_PanDbs[wIndex].iLeft = GENERIC_TO_DSP( PanToDb(MAX_MIXER_PAN - iPan) );
-	m_PanDbs[wIndex].iRight = GENERIC_TO_DSP( PanToDb(iPan) );
+	m_PanDbs[wIndex].iLeft = (INT8) GENERIC_TO_DSP( PanToDb(MAX_MIXER_PAN - iPan) );
+	m_PanDbs[wIndex].iRight = (INT8) GENERIC_TO_DSP( PanToDb(iPan) );
 
 	//
 	// Again, SetGain does all the hard work

@@ -33,6 +33,8 @@
 #include "LoaderDSP.c"
 #endif
 
+#define COMM_PAGE_PHYS_BYTES	((sizeof(DspCommPage)+PAGE_SIZE-1)/PAGE_SIZE)*PAGE_SIZE
+
 
 /****************************************************************************
 
@@ -107,7 +109,7 @@ CDspCommObject::CDspCommObject
 	m_byDigitalMode = DIGITAL_MODE_NONE;
 	m_wInputClock = ECHO_CLOCK_INTERNAL;
 	m_wOutputClock = ECHO_CLOCK_WORD;
-	m_ullLastLoadAttemptTime = 0L - DSP_LOAD_ATTEMPT_PERIOD;	// force first load to go
+	m_ullLastLoadAttemptTime = (ULONGLONG)(DWORD)(0L - DSP_LOAD_ATTEMPT_PERIOD);	// force first load to go
 
 #ifdef MIDI_SUPPORT	
 	m_ullNextMidiWriteTime = 0;
@@ -119,9 +121,10 @@ CDspCommObject::CDspCommObject
 	//
 	ECHOSTATUS Status;
 	DWORD dwSegmentSize;
+	PHYS_ADDR PhysAddr;
 	
-	Status = pOsSupport->AllocPhysPageBlock(sizeof( DspCommPage ) / PAGE_SIZE + 1, 
-													m_pDspCommPageBlock);
+	Status = pOsSupport->AllocPhysPageBlock(	COMM_PAGE_PHYS_BYTES,
+															m_pDspCommPageBlock);
 	if (ECHOSTATUS_OK != Status)
 	{
 		ECHO_DEBUGPRINTF( ("CDspCommObject::CDspCommObject DSP comm page "
@@ -134,8 +137,9 @@ CDspCommObject::CDspCommObject
 	
 	pOsSupport->GetPageBlockPhysSegment(m_pDspCommPageBlock,
 													0,
-													m_dwCommPagePhys,
+													PhysAddr,
 													dwSegmentSize);
+	m_dwCommPagePhys = PhysAddr;
 	
 	//
 	// Init the comm page
@@ -185,8 +189,8 @@ CDspCommObject::~CDspCommObject()
 	//
 	if ( NULL != m_pDspCommPageBlock )
 	{
-		m_pOsSupport->FreePhysPageBlock( sizeof( DspCommPage ) / PAGE_SIZE + 1,
-											m_pDspCommPageBlock);
+		m_pOsSupport->FreePhysPageBlock( COMM_PAGE_PHYS_BYTES,
+													m_pDspCommPageBlock);
 	}
 
 	ECHO_DEBUGPRINTF( ( "CDspCommObject::~CDspCommObject() is toast!\n" ) );
@@ -534,10 +538,11 @@ ECHOSTATUS CDspCommObject::LoadDSP
 	m_pOsSupport->OsGetSystemTime( &ullCurTime );
 	ullTimeout = ullCurTime + 10000L;		// 10m.s.
 
-	while ( 1 ) 
-	{
-		if ( GetDspRegister( CHI32_STATUS_REG ) & CHI32_STATUS_REG_HF3 )
-			break;
+	// wait for HF3 to be set
+wait_for_hf3:
+	
+	if ( GetDspRegister( CHI32_STATUS_REG ) & CHI32_STATUS_REG_HF3 )
+			goto set_dsp_format_bits;
 		m_pOsSupport->OsGetSystemTime( &ullCurTime );
 		if ( ullCurTime > ullTimeout)
 		{
@@ -548,10 +553,12 @@ ECHOSTATUS CDspCommObject::LoadDSP
 				"Critical Failure" );
 			return ECHOSTATUS_DSP_TIMEOUT;
 		}
-	}
+	goto wait_for_hf3;
+
 
 	// Set DSP format bits for 24 bit mode now that soft reset is done
-	SetDspRegister( CHI32_CONTROL_REG,
+set_dsp_format_bits:
+		SetDspRegister( CHI32_CONTROL_REG,
 						 GetDspRegister( CHI32_CONTROL_REG ) | (DWORD) 0x900 );
 
 	//---------------------------------------------------------------------------
@@ -1091,7 +1098,6 @@ ECHOSTATUS CDspCommObject::SendVector
 
 BOOL CDspCommObject::WaitForHandshake()
 {
-	INT32	i;
 	DWORD dwDelta;
 	ULONGLONG ullStartTime,ullTime;
 	
@@ -1526,7 +1532,6 @@ ECHOSTATUS CDspCommObject::GetAudioFormat
 
 
 
-
 /****************************************************************************
 
 	Mixer methods
@@ -1835,8 +1840,11 @@ ECHOSTATUS CDspCommObject::SetMetersOn
 			
 			for ( iDevice = 0; iDevice < DSP_MAXPIPES; iDevice++ )
 			{
-				m_pDspCommPage->VUMeter[ iDevice ]   = GENERIC_TO_DSP(ECHOGAIN_MUTED);
-				m_pDspCommPage->PeakMeter[ iDevice ] = GENERIC_TO_DSP(ECHOGAIN_MUTED);
+				BYTE muted;
+
+				muted = (BYTE) GENERIC_TO_DSP(ECHOGAIN_MUTED);
+				m_pDspCommPage->VUMeter[ iDevice ]   = muted;
+				m_pDspCommPage->PeakMeter[ iDevice ] = muted;
 			}
 		}
 	}
@@ -1987,7 +1995,7 @@ ECHOSTATUS CDspCommObject::GetAudioMeters
 		
 		dwCh++;
 	}
-
+	
 	return ECHOSTATUS_OK;
 	
 } // GetAudioMeters
@@ -2156,9 +2164,11 @@ ECHOSTATUS CDspCommObject::WriteMidi
 	//
 	// Save the current time - used to detect if MIDI out is currently busy
 	//
-	m_pOsSupport->OsGetSystemTime( &m_ullMidiOutTime );
-														// Last time MIDI out occured
+	ULONGLONG ullTime;
 
+	m_pOsSupport->OsGetSystemTime( &ullTime );
+	m_ullMidiOutTime = ullTime;
+														
 	return ECHOSTATUS_OK;
 	
 }		// ECHOSTATUS CDspCommObject::WriteMidi
@@ -2187,7 +2197,10 @@ ECHOSTATUS CDspCommObject::ReadMidi
 	//
 	// Timestamp for the MIDI input activity indicator
 	//
-	m_pOsSupport->OsGetSystemTime( &m_ullMidiInTime );
+	ULONGLONG ullTime;
+
+	m_pOsSupport->OsGetSystemTime( &ullTime );
+	m_ullMidiInTime = ullTime;
 
 	return ECHOSTATUS_OK;
 	

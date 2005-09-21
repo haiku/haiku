@@ -80,7 +80,7 @@ echo_channel_get_mix(void *card, MIXER_AUDIO_CHANNEL channel, int32 type, float 
 		} else {
 			values[0] = function[0].Data.iNominal == 4 ? 1.0 : 0.0;
 		}
-		PRINT(("echo_channel_get_mix iLevel: %d, %d, %d\n", function[0].Data.iLevel, channel.wChannel, channel.dwType));
+		PRINT(("echo_channel_get_mix iLevel: %ld, %d, %ld\n", function[0].Data.iLevel, channel.wChannel, channel.dwType));
 	}
 
 }
@@ -115,7 +115,7 @@ echo_channel_set_mix(void *card, MIXER_AUDIO_CHANNEL channel, int32 type, float 
         dev->pEG->ProcessMixerMultiFunction(multi_function, size);
 
         if (function[0].RtnStatus == ECHOSTATUS_OK) {
-                PRINT(("echo_channel_set_mix OK: %d, %d, %d\n", function[0].Data.iLevel, channel.wChannel, channel.dwType));
+                PRINT(("echo_channel_set_mix OK: %ld, %d, %ld\n", function[0].Data.iLevel, channel.wChannel, channel.dwType));
         }
 
 }
@@ -221,7 +221,7 @@ echo_create_controls_list(multi_dev *multi)
 	}
 
 	multi->control_count = index;
-	PRINT(("multi->control_count %u\n", multi->control_count));
+	PRINT(("multi->control_count %lu\n", multi->control_count));
 	return B_OK;
 }
 
@@ -234,7 +234,7 @@ echo_get_mix(echo_dev *card, multi_mix_value_info * MMVI)
 	for(i=0; i<MMVI->item_count; i++) {
 		id = MMVI->values[i].id - MULTI_CONTROL_FIRSTID;
 		if(id < 0 || id >= card->multi.control_count) {
-			PRINT(("echo_get_mix : invalid control id requested : %i\n", id));
+			PRINT(("echo_get_mix : invalid control id requested : %li\n", id));
 			continue;
 		}
 		control = &card->multi.controls[id];
@@ -274,7 +274,7 @@ echo_set_mix(echo_dev *card, multi_mix_value_info * MMVI)
 	for(i=0; i<MMVI->item_count; i++) {
 		id = MMVI->values[i].id - MULTI_CONTROL_FIRSTID;
 		if(id < 0 || id >= card->multi.control_count) {
-			PRINT(("echo_set_mix : invalid control id requested : %i\n", id));
+			PRINT(("echo_set_mix : invalid control id requested : %li\n", id));
 			continue;
 		}
 		control = &card->multi.controls[id];
@@ -284,7 +284,7 @@ echo_set_mix(echo_dev *card, multi_mix_value_info * MMVI)
 			if(i+1<MMVI->item_count) {
 				id = MMVI->values[i + 1].id - MULTI_CONTROL_FIRSTID;
 				if(id < 0 || id >= card->multi.control_count) {
-					PRINT(("echo_set_mix : invalid control id requested : %i\n", id));
+					PRINT(("echo_set_mix : invalid control id requested : %li\n", id));
 				} else {
 					control2 = &card->multi.controls[id];
 					if(control2->mix_control.master != control->mix_control.id)

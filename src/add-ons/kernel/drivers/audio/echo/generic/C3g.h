@@ -7,6 +7,8 @@
 //
 // ----------------------------------------------------------------------------
 //
+// ----------------------------------------------------------------------------
+//
 // This file is part of Echo Digital Audio's generic driver library.
 // Copyright Echo Digital Audio Corporation (c) 1998 - 2005
 // All rights reserved
@@ -77,6 +79,14 @@ public:
 	virtual ECHOSTATUS QueryAudioSampleRate
 	(
 		DWORD		dwSampleRate
+	);
+
+	//
+	//	Start transport for several pipes at once
+	//
+	virtual ECHOSTATUS Start
+	(
+		PCChannelMask	pChannelMask
 	);
 
 	//

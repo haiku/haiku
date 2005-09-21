@@ -143,18 +143,29 @@ ECHOSTATUS CEchoGals::OpenAudio
 		return( ECHOSTATUS_CHANNEL_ALREADY_OPEN );
 	}
 
+#ifdef AUTO_DUCK_ALLOCATE
 	//
 	// Make a daffy duck
 	//
 	if (NULL == pDuck)
 	{
-		pDuck = MakeDaffyDuck();
+		pDuck = CDaffyDuck::MakeDaffyDuck(m_pOsSupport);
 
 		if (NULL == pDuck)
 			return ECHOSTATUS_NO_MEM;
 	}
 
 	SetDaffyDuck( wPipeIndex, pDuck );	
+	
+#else
+
+	//
+	// Use the specified duck if one was passed in
+	//
+	if (NULL != pDuck)
+		SetDaffyDuck( wPipeIndex, pDuck );	
+		
+#endif
 		
 	
 	//
@@ -394,7 +405,7 @@ ECHOSTATUS CEchoGals::QueryAudioFormat
 		if (wPipeIndex >= GetNumPipesOut())
 		{
 			wMaxPipe = GetNumPipesIn();
-			wPipeIndex -= GetNumPipesOut();
+			wPipeIndex = wPipeIndex - GetNumPipesOut();
 		}
 		else
 		{
@@ -525,6 +536,15 @@ ECHOSTATUS CEchoGals::SetAudioFormat
 	// Set the format
 	//
 	Status = GetDspCommObject()->SetAudioFormat( wPipeIndex, pAudioFormat );
+	if (ECHOSTATUS_OK == Status)
+	{
+		WORD wBytesPerSample;
+		
+		wBytesPerSample = pAudioFormat->wDataInterleave * (pAudioFormat->wBitsPerSample / 8);
+		m_wBytesPerSample[ wPipeIndex ] = wBytesPerSample;
+		m_Pipes[ wPipeIndex ].wInterleave = pAudioFormat->wDataInterleave;
+	}	
+	
 	return Status;
 	
 }	// ECHOSTATUS CEchoGals::SetAudioFormat - single pipe
@@ -553,6 +573,8 @@ ECHOSTATUS CEchoGals::SetAudioFormat
 
 	for ( ; ; )
 	{
+		WORD wBytesPerSample;
+
 		wPipeIndex = pChannelMask->GetIndexFromMask( ++wPipeIndex );
 		if ( (WORD) ECHO_INVALID_CHANNEL == wPipeIndex )
 			break;							// We be done!
@@ -585,13 +607,15 @@ ECHOSTATUS CEchoGals::SetAudioFormat
 		if ( ECHOSTATUS_OK != Status )
 			return Status;
 
-		m_wBytesPerSample[ wPipeIndex ] = pAudioFormat->wBitsPerSample / 8;
-		m_wBytesPerSample[ wPipeIndex ] *= pAudioFormat->wDataInterleave;
+		wBytesPerSample = pAudioFormat->wDataInterleave * (pAudioFormat->wBitsPerSample / 8);
+		m_wBytesPerSample[ wPipeIndex ] = wBytesPerSample;
+		m_Pipes[ wPipeIndex ].wInterleave = pAudioFormat->wDataInterleave;
 	}
 
 	return ECHOSTATUS_OK;
 
 }	// ECHOSTATUS CEchoGals::SetAudioFormat - multiple pipes
+
 
 
 //===========================================================================
@@ -691,45 +715,6 @@ ECHOSTATUS CEchoGals::GetAudioSampleRate
  Functions related to the scatter-gather list
 
  ******************************************************************************/
-
-//===========================================================================
-//
-// This method is used to create a CDaffyDuck object to 
-// manage a scatter-gather list for a newly opened pipe.
-//
-//===========================================================================
-
-CDaffyDuck * CEchoGals::MakeDaffyDuck()
-{
-	ECHOSTATUS 	Status = ECHOSTATUS_OK;
-	CDaffyDuck 	*pDuck;
-	
-	//---------------------------------------------------------
-	//
-	// Allocate the main daffy duck for this pipe
-	//
-	//---------------------------------------------------------
-
-	pDuck = new CDaffyDuck(	m_pOsSupport );
-		
-	//
-	// Check the daffy duck				 
-	//
-	if (pDuck)
-	{
-		Status = pDuck->InitCheck();
-		if (ECHOSTATUS_OK != Status)
-		{
-			delete pDuck;
-			return NULL;
-		}
-	}
-	
-	return pDuck;
-		
-}	// MakeDaffyDuck
-
-
 
 
 //===========================================================================

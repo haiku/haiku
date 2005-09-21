@@ -44,11 +44,6 @@ public:
 	virtual ~C3gDco();
 
 	//
-	//	Reset the DSP and load new firmware.
-	//
-	virtual ECHOSTATUS LoadFirmware();
-
-	//
 	//	Set the DSP sample rate.
 	//	Return rate that was set, -1 if error
 	//
@@ -105,7 +100,15 @@ public:
 	virtual void SetSpdifOutNonAudio(BOOL bNonAudio);
 	
 	void SetPhantomPower( BOOL fPhantom );
+	
+	virtual ECHOSTATUS GetAudioMeters
+	(
+		PECHOGALS_METERS	pMeters
+	);
 		
+	BOOL DoubleSpeedMode(DWORD *pdwNewCtrlReg = NULL);
+
+	CChannelMask m_Adat38Mask;
 
 protected:
 
@@ -143,6 +146,12 @@ protected:
 	);
 	
 	//
+	// Use this to check if a new control reg setting may be 
+	// applied
+	//
+	ECHOSTATUS ValidateCtrlReg(DWORD dwNewControlReg );
+
+	//
 	// Set the various S/PDIF status bits
 	//
 	void SetSpdifBits(DWORD *pdwCtrlReg,DWORD dwSampleRate);
@@ -155,8 +164,7 @@ protected:
 	DWORD m_dwOriginalBoxType;
 	DWORD m_dwCurrentBoxType;
 	BOOL	m_bBoxTypeSet;
-	BOOL m_bReloadFirmware;
-
+	
 };		// class C3gDco
 
 typedef C3gDco* PC3gDco;
@@ -192,8 +200,6 @@ typedef C3gDco* PC3gDco;
 #define E3G_ADAT_MODE				0x1000
 #define E3G_SPDIF_OPTICAL_MODE	0x2000
 
-#define E3G_SRC_4X					0x40000000
-
 #define E3G_CLOCK_CLEAR_MASK			0xbfffbff0
 #define E3G_DIGITAL_MODE_CLEAR_MASK	0xffffcfff
 #define E3G_SPDIF_FORMAT_CLEAR_MASK	0xfffff01f
@@ -216,6 +222,12 @@ typedef C3gDco* PC3gDco;
 #define E3G_MAGIC_NUMBER				   677376000
 #define E3G_FREQ_REG_DEFAULT				(E3G_MAGIC_NUMBER / 48000 - 2)
 #define E3G_FREQ_REG_MAX					0xffff
+
+
+//
+// Other stuff
+//
+#define E3G_MAX_OUTPUTS						16
 
 #endif // _3GDSPCOMMOBJECT_
 

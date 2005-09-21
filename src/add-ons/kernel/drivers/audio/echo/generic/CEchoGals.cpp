@@ -96,7 +96,9 @@ CEchoGals::CEchoGals
 	m_wFlags = ECHOGALS_FLAG_BADBOARD;
 				  
 	for ( i = 0; i < ECHO_MAXAUDIOPIPES; i++ )
+	{
 		m_wBytesPerSample[ i ] = 1;
+	}
 
 	m_dwLockedSampleRate	= 44100;
 

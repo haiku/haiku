@@ -191,6 +191,7 @@
 #define INDIGO_IO						0x00a0
 #define INDIGO_DJ						0x00b0
 #define ECHO3G							0x0100
+#define BASEPCI						0xfff0
 
 
 //***********************************************************************
