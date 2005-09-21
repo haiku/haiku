@@ -8,7 +8,11 @@
 
 #include <Box.h>
 #include <Button.h>
+#include <Menu.h>
+#include <MenuField.h>
+#include <TextView.h>
 #include <Window.h>
+#include "DrawButton.h"
 
 class InstallerWindow : public BWindow {
 public:
@@ -19,9 +23,18 @@ public:
 	virtual bool QuitRequested();
 	
 private:
-	void ShowBottom(bool show);
+	void DisableInterface(bool disable);
+	void LaunchDriveSetup();
+	void ShowBottom();
+	void ScanningComplete();
+	void ScanningInProgress();
 	BBox *fBackBox;
-	BButton *fBeginButton;
+	BButton *fBeginButton, *fSetupButton;
+	DrawButton *fDrawButton;
+	bool fDriveSetupLaunched;
+	BTextView *fStatusView;
+	BMenu* fSrcMenu, *fDestMenu;
+	BMenuField* fSrcMenuField, *fDestMenuField;
 };
 
 #endif /* _InstallerWindow_h */
