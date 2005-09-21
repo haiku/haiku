@@ -1,8 +1,12 @@
 SubDir OBOS_TOP src apps installer ;
 
+UsePrivateHeaders shared ;
+SubDirHdrs [ FDirName $(OBOS_TOP) src kits tracker ] ;
+
 App Installer : 
+	DrawButton.cpp
 	InstallerApp.cpp
 	InstallerWindow.cpp
-	: libbe.so
+	: libbe.so libtracker.so
 	: Installer.rdef ;
 

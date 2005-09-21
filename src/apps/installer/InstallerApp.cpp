@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Jérôme DUVAL. All rights reserved.
+ * Copyright 2005, JÃ©rÃ´me DUVAL. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
