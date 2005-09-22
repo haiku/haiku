@@ -450,9 +450,9 @@ void
 WinBorder::MouseDown(const PointerEvent& evt)
 {
 	DesktopSettings desktopSettings(gDesktop);
-	Workspace::State oldState, newState;
+	Workspace::State oldWMState;
 
-	GetRootLayer()->ActiveWorkspace()->GetState(&oldState);
+	GetRootLayer()->ActiveWorkspace()->GetState(&oldWMState);
 
 	// not in FFM mode?
 	if (desktopSettings.MouseMode() == B_NORMAL_MOUSE) {
@@ -532,45 +532,7 @@ WinBorder::MouseDown(const PointerEvent& evt)
 				GetRootLayer()->ActiveWorkspace()->AttemptToActivate(this);
 			}
 
-			GetRootLayer()->ActiveWorkspace()->GetState(&newState);
-
-// BOOKMARK!
-// TODO: there can be more than one window active at a time! ex: a normal + floating_app, with
-// floating window having focus.
-			// send window activation messages
-			if (oldState.Active != newState.Active) {
-				if (oldState.Active && oldState.Active->Window()) {
-					BMessage msg(B_WINDOW_ACTIVATED);
-					msg.AddBool("active", false);
-					oldState.Active->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
-				}
-				if (newState.Active && newState.Active->Window()) {
-					BMessage msg(B_WINDOW_ACTIVATED);
-					msg.AddBool("active", true);
-					newState.Active->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
-				}
-			}
-
-			// calculate the region that must be invalidated/redrawn
-
-			// first, if the focus window changed, make sure the decorators reflect this state.
-			BRegion		dirtyRegion;
-			if (oldState.Focus != newState.Focus) {
-				dirtyRegion.Include(&oldState.Focus->VisibleRegion());
-				dirtyRegion.Include(&newState.Focus->VisibleRegion());
-#ifndef NEW_CLIPPING
-				GetRootLayer()->fRedrawReg.Include(&dirtyRegion);
-#else
-// TODO: code for new clipping engine!
-#endif
-			}
-
-			// trigger region rebuilding and redraw
-#ifndef NEW_CLIPPING
-			GetRootLayer()->invalidate_layer(this, fFull);
-#else
-			GetRootLayer()->do_Invalidate(Bounds());
-#endif
+			GetRootLayer()->RevealNewWMState(oldWMState);
 		}
 	}
 	// in FFM mode
@@ -619,7 +581,7 @@ WinBorder::MouseUp(const PointerEvent& event)
 
 	// TODO: set dirty regions!
 #ifndef NEW_CLIPPING
-	GetRootLayer()->invalidate_layer(this, VisibleRegion());
+	GetRootLayer()->invalidate_layer(GetRootLayer(), VisibleRegion());
 #else
 	do_Invalidate(VisibleRegion());
 #endif

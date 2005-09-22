@@ -87,7 +87,9 @@ public:
 										uint32 oldWksIndex,
 										uint32 newWksIndex);
 			WinBorder*			WinBorderAt(const BPoint& pt) const;
-
+#ifdef NEW_INPUT_HANDLING
+			void				RevealNewWMState(Workspace::State &oldWMState);
+#endif
 	inline	WinBorder*			FocusWinBorder() const { return ActiveWorkspace()->Focus(); }
 	inline	WinBorder*			FrontWinBorder() const { return ActiveWorkspace()->Front(); }
 	inline	WinBorder*			ActiveWinBorder() const { return ActiveWorkspace()->Active(); }
@@ -156,17 +158,17 @@ friend class WinBorder; // temporarily, I need invalidate_layer()
 
 			void				change_winBorder_feel(WinBorder *winBorder, int32 newFeel);
 
-			bool				get_workspace_windows();
-			void 				draw_window_tab(WinBorder *exFocus);
 #ifndef NEW_CLIPPING
 			void				empty_visible_regions(Layer *layer);
 			void				invalidate_layer(Layer *layer, const BRegion &region);
 			void				redraw_layer(Layer *layer, const BRegion &region);
 #endif
+#ifndef NEW_INPUT_HANDLING
+			bool				get_workspace_windows();
+			void 				draw_window_tab(WinBorder *exFocus);
 			void				winborder_activation(WinBorder* exActive);
-
 			void				show_final_scene(WinBorder *exFocus, WinBorder *exActive);
-
+#endif
 			// Input related methods
 			void				MouseEventHandler(int32 code, BPrivate::PortLink& link);
 			void				KeyboardEventHandler(int32 code, BPrivate::PortLink& link);
@@ -205,9 +207,16 @@ friend class WinBorder; // temporarily, I need invalidate_layer()
 			Workspace**			fWorkspace;
 			Layer*				fWorkspacesLayer;
 
+#ifndef NEW_INPUT_HANDLING
 			int32				fWinBorderListLength;
 			WinBorder**			fWinBorderList2;
 			WinBorder**			fWinBorderList;
+#else
+// TODO: fWMState MUST be associated with a surface. This is the case now
+//   with RootLayer, but after Axel's refractoring this should go in
+//   WorkspaceLayer, I think.
+			Workspace::State	fWMState;
+#endif
 			int32				fWinBorderCount;
 	mutable int32				fWinBorderIndex;
 

@@ -51,7 +51,7 @@ class Workspace {
 	public:
 		class State {
 			public:
-							State() : Front(NULL), Focus(NULL), WindowList(40) { }
+							State() : Front(NULL), Focus(NULL), WindowList(50) { }
 				WinBorder*	Front;
 				WinBorder*	Focus;
 				WinBorder*	Active;

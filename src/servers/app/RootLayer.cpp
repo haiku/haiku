@@ -97,10 +97,13 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	  fWsCount(0),
 	  fWorkspace(new Workspace*[kMaxWorkspaceCount]),
 	  fWorkspacesLayer(NULL),
-
+#ifndef NEW_INPUT_HANDLING
 	  fWinBorderListLength(64),
 	  fWinBorderList2((WinBorder**)malloc(fWinBorderListLength * sizeof(WinBorder*))),
 	  fWinBorderList((WinBorder**)malloc(fWinBorderListLength * sizeof(WinBorder*))),
+#else
+	  fWMState(),
+#endif
 	  fWinBorderCount(0),
 	  fWinBorderIndex(0),
 
@@ -185,8 +188,11 @@ RootLayer::~RootLayer()
 		delete fWorkspace[i];
 	delete[] fWorkspace;
 
+#ifndef NEW_INPUT_HANDLING
 	free(fWinBorderList2);
 	free(fWinBorderList);
+#endif
+
 	// RootLayer object just uses Screen objects, it is not allowed to delete them.
 
 #if DISPLAY_HAIKU_LOGO
@@ -497,45 +503,63 @@ RootLayer::ResizeBy(float x, float y)
 Layer*
 RootLayer::FirstChild() const
 {
+#ifndef NEW_INPUT_HANDLING
 	fWinBorderIndex	= fWinBorderCount - 1;
 
 	if (fWinBorderIndex >= 0)
 		return fWinBorderList[fWinBorderIndex];
 
 	return NULL;
+#else
+	fWinBorderIndex = fWMState.WindowList.CountItems()-1;
+	return static_cast<Layer*>(fWMState.WindowList.ItemAt(fWinBorderIndex--));
+#endif
 }
 
 Layer*
 RootLayer::NextChild() const
 {
+#ifndef NEW_INPUT_HANDLING
 	fWinBorderIndex--;
 
 	if (fWinBorderIndex < fWinBorderCount && fWinBorderIndex >= 0)
 		return fWinBorderList[fWinBorderIndex];
 
 	return NULL;
+#else
+	return static_cast<Layer*>(fWMState.WindowList.ItemAt(fWinBorderIndex--));
+#endif
 }
 
 Layer*
 RootLayer::PreviousChild() const
 {
+#ifndef NEW_INPUT_HANDLING
 	fWinBorderIndex++;
 
 	if (fWinBorderIndex < fWinBorderCount && fWinBorderIndex >= 0)
 		return fWinBorderList[fWinBorderIndex];
 
 	return NULL;
+#else
+	return static_cast<Layer*>(fWMState.WindowList.ItemAt(fWinBorderIndex++));
+#endif
 }
 
 Layer*
 RootLayer::LastChild() const
 {
+#ifndef NEW_INPUT_HANDLING
 	fWinBorderIndex	= 0;
 
 	if (fWinBorderIndex < fWinBorderCount)
 		return fWinBorderList[fWinBorderIndex];
 
 	return NULL;
+#else
+	fWinBorderIndex = 0;
+	return static_cast<Layer*>(fWMState.WindowList.ItemAt(fWinBorderIndex++));
+#endif
 }
 
 
@@ -625,9 +649,13 @@ RootLayer::AddSubsetWinBorder(WinBorder *winBorder, WinBorder *toWinBorder)
 
 	bool invalidate	= false;
 	bool invalid;
+#ifndef NEW_INPUT_HANDLING
 	WinBorder* exFocus = FocusWinBorder();
 	WinBorder* exActive = ActiveWinBorder();
-
+#else
+	Workspace::State oldWMState;
+	ActiveWorkspace()->GetState(&oldWMState);
+#endif
 	// we try to add WinBorders to all workspaces. If they are not needed, nothing will be done.
 	// If they are needed, Workspace automaticaly allocates space and inserts them.
 	for (int32 i = 0; i < fWsCount; i++) {
@@ -641,7 +669,11 @@ RootLayer::AddSubsetWinBorder(WinBorder *winBorder, WinBorder *toWinBorder)
 	}
 
 	if (invalidate)
+#ifndef NEW_INPUT_HANDLING
 		show_final_scene(exFocus, exActive);
+#else
+		RevealNewWMState(oldWMState);
+#endif
 }
 
 
@@ -655,8 +687,13 @@ RootLayer::RemoveSubsetWinBorder(WinBorder *winBorder, WinBorder *fromWinBorder)
 
 	bool invalidate	= false;
 	bool invalid;
+#ifndef NEW_INPUT_HANDLING
 	WinBorder* exFocus = FocusWinBorder();
 	WinBorder* exActive = ActiveWinBorder();
+#else
+	Workspace::State oldWMState;
+	ActiveWorkspace()->GetState(&oldWMState);
+#endif
 
 	// we try to remove from all workspaces. If winBorder is not in there, nothing will be done.
 	for (int32 i = 0; i < fWsCount; i++) {
@@ -670,7 +707,11 @@ RootLayer::RemoveSubsetWinBorder(WinBorder *winBorder, WinBorder *fromWinBorder)
 	}
 
 	if (invalidate)
+#ifndef NEW_INPUT_HANDLING
 		show_final_scene(exFocus, exActive);
+#else
+		RevealNewWMState(oldWMState);
+#endif
 }
 
 // NOTE: This must be called by RootLayer's thread!!!!
@@ -719,7 +760,10 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 	fLayerData->SetLowColor(fWorkspace[index]->BGColor());
 
 	int32 exIndex = ActiveWorkspaceIndex();
-
+#ifdef NEW_INPUT_HANDLING
+	Workspace::State oldWMState;
+	ActiveWorkspace()->GetState(&oldWMState);
+#endif
 	// send the workspace changed message for the old workspace
 	{
 		BMessage activatedMsg(B_WORKSPACE_ACTIVATED);
@@ -727,8 +771,18 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 		activatedMsg.AddInt32("workspace", fActiveWksIndex);
 		activatedMsg.AddBool("active", false);
 
+#ifndef NEW_INPUT_HANDLING
 		for (int32 i = 0; i < fWinBorderCount; i++)
 			fWinBorderList[i]->Window()->SendMessageToClient(&activatedMsg, B_NULL_TOKEN, false);
+#else
+		Layer *layer;
+		WinBorder *winBorder;
+		for (int32 i = 0; (layer = static_cast<Layer*>(fWMState.WindowList.ItemAt(i++))); ) {
+			winBorder = dynamic_cast<WinBorder*>(layer);
+			if (winBorder)
+				winBorder->Window()->SendMessageToClient(&activatedMsg, B_NULL_TOKEN, false);
+		}
+#endif
 	}
 
 	fActiveWksIndex	= index;
@@ -787,6 +841,7 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 	}*/
 
 	fHaveWinBorderList = true;
+#ifndef NEW_INPUT_HANDLING
 	get_workspace_windows();
 
 	if (WorkspacesLayer() != NULL)
@@ -796,6 +851,10 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 		GoRedraw(WorkspacesLayer(), WorkspacesLayer()->VisibleRegion());
 #endif
 
+#else
+	RevealNewWMState(oldWMState);
+#endif
+
 	// send the workspace changed message for the new workspace
 	{
 		BMessage	activatedMsg(B_WORKSPACE_ACTIVATED);
@@ -803,8 +862,19 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 		activatedMsg.AddInt32("workspace", fActiveWksIndex);
 		activatedMsg.AddBool("active", true);
 
+#ifndef NEW_INPUT_HANDLING
 		for (int32 i = 0; i < fWinBorderCount; i++)
 			fWinBorderList[i]->Window()->SendMessageToClient(&activatedMsg, B_NULL_TOKEN, false);
+#else
+		Layer *layer;
+		WinBorder *winBorder;
+		for (int32 i = 0; (layer = static_cast<Layer*>(fWMState.WindowList.ItemAt(i++))); ) {
+			winBorder = dynamic_cast<WinBorder*>(layer);
+			if (winBorder)
+				winBorder->Window()->SendMessageToClient(&activatedMsg, B_NULL_TOKEN, false);
+		}
+#endif
+
 	}
 
 	// workspace changed
@@ -822,8 +892,13 @@ RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldWksIndex, uint
 
 	bool invalidate = false;
 	bool invalid;
+#ifndef NEW_INPUT_HANDLING
 	WinBorder* exFocus = FocusWinBorder();
-	WinBorder* exActive	= ActiveWinBorder();
+	WinBorder* exActive = ActiveWinBorder();
+#else
+	Workspace::State oldWMState;
+	ActiveWorkspace()->GetState(&oldWMState);
+#endif
 
 	for (int32 i = 0; i < 32; i++) {
 		if (fWorkspace[i]) {
@@ -877,7 +952,11 @@ RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldWksIndex, uint
 	winBorder->Window()->SendMessageToClient(&changedMsg, B_NULL_TOKEN, false);
 
 	if (invalidate)
+#ifndef NEW_INPUT_HANDLING
 		show_final_scene(exFocus, exActive);
+#else
+		RevealNewWMState(oldWMState);
+#endif
 }
 
 
@@ -1011,6 +1090,7 @@ RootLayer::ShowWinBorder(WinBorder* winBorder)
 WinBorder *
 RootLayer::WinBorderAt(const BPoint& pt) const
 {
+#ifndef NEW_INPUT_HANDLING
 	for (int32 i = 0; i < fWinBorderCount; i++)
 	{
 #ifndef NEW_CLIPPING
@@ -1018,10 +1098,91 @@ RootLayer::WinBorderAt(const BPoint& pt) const
 			return fWinBorderList[i];
 #endif
 	}
+#endif
 	return NULL;
 }
 
+#ifdef NEW_INPUT_HANDLING
+void
+RootLayer::RevealNewWMState(Workspace::State &oldWMState)
+{
+	// clean fWMState
+	fWMState.Focus = NULL;
+	fWMState.Front = NULL;
+	fWMState.Active = NULL;
+	fWMState.WindowList.MakeEmpty();
 
+	ActiveWorkspace()->GetState(&fWMState);
+
+// BOOKMARK!
+// TODO: there can be more than one window active at a time! ex: a normal + floating_app, with
+// floating window having focus.
+	// send window activation messages
+	if (oldWMState.Active != fWMState.Active) {
+		if (oldWMState.Active && oldWMState.Active->Window()) {
+			BMessage msg(B_WINDOW_ACTIVATED);
+			msg.AddBool("active", false);
+			oldWMState.Active->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
+		}
+		if (fWMState.Active && fWMState.Active->Window()) {
+			BMessage msg(B_WINDOW_ACTIVATED);
+			msg.AddBool("active", true);
+			fWMState.Active->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
+		}
+	}
+
+	// calculate the region that must be invalidated/redrawn
+
+	bool redraw = false;
+	// first, if the focus window changed, make sure the decorators reflect this state.
+	BRegion dirtyRegion;
+	if (oldWMState.Focus != fWMState.Focus) {
+		if (oldWMState.Focus) {
+			dirtyRegion.Include(&oldWMState.Focus->VisibleRegion());
+			redraw = true;			
+		}
+		if (fWMState.Focus) {
+			dirtyRegion.Include(&fWMState.Focus->VisibleRegion());
+			redraw = true;			
+		}
+		if (redraw) {
+#ifndef NEW_CLIPPING
+			fRedrawReg.Include(&dirtyRegion);
+#else
+// TODO: code for new clipping engine!
+#endif
+		}
+	}
+
+	bool invalidate = false;
+	// check to see if window count changed over states
+	if (oldWMState.WindowList.CountItems() != fWMState.WindowList.CountItems()) {
+		invalidate = true;
+	}
+	else if (memcmp(oldWMState.WindowList.Items(), fWMState.WindowList.Items(),
+			fWMState.WindowList.CountItems()) != 0) {
+		invalidate = true;
+	}
+
+	if (invalidate) {
+		// redraw of focus change is automaticaly done
+		redraw = false;
+		// trigger region rebuilding and redraw
+#ifndef NEW_CLIPPING
+		invalidate_layer(this, fFull);
+#else
+		do_Invalidate(Bounds());
+#endif
+	}
+	else if (redraw) {
+#ifndef NEW_CLIPPING
+		invalidate_layer(this, dirtyRegion);
+#else
+		do_Redraw(dirtyRegion);
+#endif
+	}
+}
+#endif
 //---------------------------------------------------------------------------
 //				Workspace related methods
 //---------------------------------------------------------------------------
@@ -1575,12 +1736,15 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 #endif
 				{
 					STRACE(("Set Workspace %ld\n",scancode-1));
+#ifndef NEW_INPUT_HANDLING
 					WinBorder* exFocus = FocusWinBorder();
 					WinBorder* exActive = ActiveWinBorder();
 
 					if (SetActiveWorkspace(scancode - 2))
 						show_final_scene(exFocus, exActive);
-
+#else
+					SetActiveWorkspace(scancode - 2);
+#endif
 				#ifdef APPSERVER_ROOTLAYER_SHOW_WORKSPACE_NUMBER
 					// to draw the current Workspace index on screen.
 #ifndef NEW_CLIPPING
@@ -1606,11 +1770,14 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 				//ServerApp *deskbar = app_server->FindApp("application/x-vnd.Be-TSKB");
 				//if(deskbar)
 				//{
+#ifndef NEW_INPUT_HANDLING
 					WinBorder* exActive = ActiveWinBorder();
 					WinBorder* exFocus = FocusWinBorder();
 					if (ActiveWorkspace()->MoveToBack(exActive))
 						show_final_scene(exFocus, exActive);
-
+#else
+ // TODO: implement;
+#endif
 					printf("Send Twitcher message key to Deskbar - unimplmemented\n");
 					free(string);
 					break;
@@ -1994,8 +2161,13 @@ RootLayer::show_winBorder(WinBorder *winBorder)
 {
 	bool invalidate = false;
 	bool invalid;
+#ifndef NEW_INPUT_HANDLING
 	WinBorder* exFocus = FocusWinBorder();
 	WinBorder* exActive = ActiveWinBorder();
+#else
+	Workspace::State oldWMState;
+	ActiveWorkspace()->GetState(&oldWMState);
+#endif
 
 	winBorder->Show(false);
 
@@ -2027,6 +2199,7 @@ RootLayer::show_winBorder(WinBorder *winBorder)
 	}
 
 	if (invalidate)
+#ifndef NEW_INPUT_HANDLING
 		show_final_scene(exFocus, exActive);
 
 	if (WorkspacesLayer())
@@ -2035,6 +2208,11 @@ RootLayer::show_winBorder(WinBorder *winBorder)
 #else
 		GoRedraw(WorkspacesLayer(), FullVisible());
 #endif
+
+#else
+		RevealNewWMState(oldWMState);
+#endif
+
 }
 
 
@@ -2043,8 +2221,13 @@ RootLayer::hide_winBorder(WinBorder *winBorder)
 {
 	bool invalidate = false;
 	bool invalid;
+#ifndef NEW_INPUT_HANDLING
 	WinBorder* exFocus = FocusWinBorder();
 	WinBorder* exActive = ActiveWinBorder();
+#else
+	Workspace::State oldWMState;
+	ActiveWorkspace()->GetState(&oldWMState);
+#endif
 
 	winBorder->Hide(false);
 
@@ -2063,6 +2246,7 @@ RootLayer::hide_winBorder(WinBorder *winBorder)
 	}
 
 	if (invalidate)
+#ifndef NEW_INPUT_HANDLING
 		show_final_scene(exFocus, exActive);
 
 	if (WorkspacesLayer())
@@ -2070,6 +2254,10 @@ RootLayer::hide_winBorder(WinBorder *winBorder)
 		GoRedraw(WorkspacesLayer(), fFullVisible);
 #else
 		GoRedraw(WorkspacesLayer(), FullVisible());
+#endif
+
+#else
+		RevealNewWMState(oldWMState);
 #endif
 }
 
@@ -2080,8 +2268,13 @@ RootLayer::change_winBorder_feel(WinBorder *winBorder, int32 newFeel)
 	bool	isVisible = false;
 	bool	wasVisibleInActiveWorkspace = false;
 
+#ifndef NEW_INPUT_HANDLING
 	WinBorder* exFocus = FocusWinBorder();
 	WinBorder* exActive = ActiveWinBorder();
+#else
+	Workspace::State oldWMState;
+	ActiveWorkspace()->GetState(&oldWMState);
+#endif
 
 	if (!winBorder->IsHidden()) {
 		isVisible = true;
@@ -2110,10 +2303,15 @@ RootLayer::change_winBorder_feel(WinBorder *winBorder, int32 newFeel)
 
 		winBorder->Show(false);
 		if (wasVisibleInActiveWorkspace || ActiveWorkspace()->HasWinBorder(winBorder))
-			show_final_scene(exFocus, exActive);
+#ifndef NEW_INPUT_HANDLING
+		show_final_scene(exFocus, exActive);
+#else
+		RevealNewWMState(oldWMState);
+#endif
 	}
 }
 
+#ifndef NEW_INPUT_HANDLING
 bool RootLayer::get_workspace_windows()
 {
 	int32 bufferSize = fWinBorderListLength;
@@ -2202,6 +2400,7 @@ RootLayer::draw_window_tab(WinBorder *exFocus)
 		}
 	}
 }
+#endif
 
 #ifndef NEW_CLIPPING
 void
@@ -2220,6 +2419,7 @@ RootLayer::empty_visible_regions(Layer *layer)
 }
 #endif
 
+#ifndef NEW_INPUT_HANDLING
 void
 RootLayer::winborder_activation(WinBorder* exActive)
 {
@@ -2269,7 +2469,7 @@ RootLayer::show_final_scene(WinBorder *exFocus, WinBorder *exActive)
 		fLastLayerUnderMouse = this;
 	}
 }
-
+#endif
 
 void
 RootLayer::Draw(const BRect &r)
