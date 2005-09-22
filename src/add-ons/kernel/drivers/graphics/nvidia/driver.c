@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-6/2005.
+	Rudolf Cornelissen 3/2002-9/2005.
 */
 
 /* standard kernel driver stuff */
@@ -347,7 +347,7 @@ static nv_settings current_settings = { // see comments in nv.settings
 	false,		// force_pci
 	false,		// unhide_fw
 	true,		// pgm_panel
-	false,		// dma_acc
+	true,		// dma_acc
 };
 
 static void dumprom (void *rom, uint32 size)
