@@ -60,9 +60,8 @@ uint32 OVERLAY_SUPPORTED_FEATURES(uint32 a_color_space)
 	switch (a_color_space)
 	{
 	default:
-			return 
-				( B_OVERLAY_KEYING_USES_ALPHA 	 |
-				  B_OVERLAY_COLOR_KEY 			 |
+			return
+				( B_OVERLAY_COLOR_KEY 			 |
 				  B_OVERLAY_HORIZONTAL_FILTERING |
 				  B_OVERLAY_VERTICAL_FILTERING );
 	}

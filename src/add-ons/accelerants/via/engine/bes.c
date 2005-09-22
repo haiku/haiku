@@ -884,46 +884,74 @@ status_t eng_configure_bes
 		BESW(VID1_CTL, 0x000f0081);
 	}
 
-	//fixme: best move this instruction to be the last one done (so do after keying)
-	/* enable colorkeying (b0 = 1), enable chromakeying (b1 = 1), Vid1 on top of Vid3 (b20 = 0),
-	 * all registers are loaded during the next 'BES-'VBI (b28 = 1), Vid1 cmds fire (b31 = 1) */
-	BESW(COMPOSE, 0x90000000);
-
 
 	/**************************
 	 *** setup color keying ***
 	 **************************/
 
-		/* setup colorkeying */
-		switch(si->dm.space)
+	/* setup colorkeying */
+	switch(si->dm.space)
+	{
+	case B_CMAP8:
 		{
-		case B_RGB15_LITTLE:
-//			BESW(NV04_COLKEY, (
-//				((ow->blue.value & ow->blue.mask) << 0)   |
-//				((ow->green.value & ow->green.mask) << 5) |
-//				((ow->red.value & ow->red.mask) << 10)    |
-//				((ow->alpha.value & ow->alpha.mask) << 15)
-//				));
-			break;
-		case B_RGB16_LITTLE:
-//			BESW(NV04_COLKEY, (
-//				((ow->blue.value & ow->blue.mask) << 0)   |
-//				((ow->green.value & ow->green.mask) << 5) |
-//				((ow->red.value & ow->red.mask) << 11)
-				/* this space has no alpha bits */
-//				));
-			break;
-		case B_CMAP8:
-		case B_RGB32_LITTLE:
-		default:
-//			BESW(NV04_COLKEY, (
-//				((ow->blue.value & ow->blue.mask) << 0)   |
-//				((ow->green.value & ow->green.mask) << 8) |
-//				((ow->red.value & ow->red.mask) << 16)    |
-//				((ow->alpha.value & ow->alpha.mask) << 24)
-//				));
-			break;
+			/* do color palette index lookup for current colorkey */
+			/* note:
+			 * since apparantly some hardware works with color indexes instead of colors,
+			 * it might be a good idea(!!) to include the colorindex in the system's
+			 * overlay_window struct. */
+			static uint8 *r,*g,*b;
+			static uint32 idx;
+			r = si->color_data;
+			g = r + 256;
+			b = g + 256;
+			/* if index 1 doesn't help us, we assume 0 will (got to program something anyway) */
+			//fixme, note, find a workaround or better HW setup:
+			//I'm counting down for a reason:
+			//BeOS assigns the color white (0x00ffffff) to two indexes in the palette:
+			//index 0x3f and 0xff. In the framebuffer index 0xff is used (apparantly).
+			//The hardware compares framebuffer to given key, so the BES must receive 0xff.
+			for (idx = 255; idx > 0; idx--)
+			{
+				if ((r[idx] == ow->red.value) &&
+					(g[idx] == ow->green.value) &&
+					(b[idx] == ow->blue.value))
+						break;
+			}
+			LOG(4,("Overlay: colorkey's palette index is $%02x\n", idx));
+			/* program color palette index into BES engine */
+			BESW(COLKEY, idx);
 		}
+		break;
+	case B_RGB15_LITTLE:
+		BESW(COLKEY, (
+			((ow->blue.value & ow->blue.mask) << 0)   |
+			((ow->green.value & ow->green.mask) << 5) |
+			((ow->red.value & ow->red.mask) << 10)
+			/* alpha keying is not supported here */
+			));
+		break;
+	case B_RGB16_LITTLE:
+		BESW(COLKEY, (
+			((ow->blue.value & ow->blue.mask) << 0)   |
+			((ow->green.value & ow->green.mask) << 5) |
+			((ow->red.value & ow->red.mask) << 11)
+			/* this space has no alpha bits */
+			));
+		break;
+	case B_RGB32_LITTLE:
+	default:
+		BESW(COLKEY, (
+			((ow->blue.value & ow->blue.mask) << 0)   |
+			((ow->green.value & ow->green.mask) << 8) |
+			((ow->red.value & ow->red.mask) << 16)
+			/* alpha keying is not supported here */
+			));
+		break;
+	}
+
+	/* enable colorkeying (b0 = 1), disable chromakeying (b1 = 0), Vid1 on top of Vid3 (b20 = 0),
+	 * all registers are loaded during the next 'BES-'VBI (b28 = 1), Vid1 cmds fire (b31 = 1) */
+	BESW(COMPOSE, 0x90000001);
 
 	/* note that overlay is in use (for eng_bes_move_overlay()) */
 	si->overlay.active = true;
