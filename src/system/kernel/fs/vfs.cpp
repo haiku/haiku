@@ -457,10 +457,11 @@ find_mount(mount_id id)
 }
 
 
-static struct fs_mount *
-get_mount(mount_id id)
+static status_t
+get_mount(mount_id id, struct fs_mount **_mount)
 {
 	struct fs_mount *mount;
+	status_t status;
 
 	mutex_lock(&sMountMutex);
 
@@ -470,13 +471,21 @@ get_mount(mount_id id)
 		//	its root node - investigate if that's a good idea
 		if (mount->root_vnode)
 			inc_vnode_ref_count(mount->root_vnode);
-		else
+		else {
+			// might have been called during a mount operation in which
+			// case the root node may still be NULL
 			mount = NULL;
-	}
+		}
+	} else
+		status = B_BAD_VALUE;
 
 	mutex_unlock(&sMountMutex);
 
-	return mount;
+	if (mount == NULL)
+		return B_BUSY;
+
+	*_mount = mount;
+	return B_OK;
 }
 
 
@@ -4514,13 +4523,12 @@ index_dir_open(mount_id mountID, bool kernel)
 {
 	struct fs_mount *mount;
 	fs_cookie cookie;
-	status_t status;
 
 	FUNCTION(("index_dir_open(mountID = %ld, kernel = %d)\n", mountID, kernel));
 
-	mount = get_mount(mountID);
-	if (mount == NULL)
-		return B_BAD_VALUE;
+	status_t status = get_mount(mountID, &mount);
+	if (status < B_OK)
+		return status;
 
 	if (FS_MOUNT_CALL(mount, open_index_dir) == NULL) {
 		status = EOPNOTSUPP;
@@ -4600,14 +4608,12 @@ index_dir_rewind(struct file_descriptor *descriptor)
 static status_t
 index_create(mount_id mountID, const char *name, uint32 type, uint32 flags, bool kernel)
 {
-	struct fs_mount *mount;
-	status_t status;
-
 	FUNCTION(("index_create(mountID = %ld, name = %s, kernel = %d)\n", mountID, name, kernel));
 
-	mount = get_mount(mountID);
-	if (mount == NULL)
-		return B_BAD_VALUE;
+	struct fs_mount *mount;
+	status_t status = get_mount(mountID, &mount);
+	if (status < B_OK)
+		return status;
 
 	if (FS_MOUNT_CALL(mount, create_index) == NULL) {
 		status = EROFS;
@@ -4654,14 +4660,12 @@ index_free_fd(struct file_descriptor *descriptor)
 static status_t
 index_name_read_stat(mount_id mountID, const char *name, struct stat *stat, bool kernel)
 {
-	struct fs_mount *mount;
-	status_t status;
-
 	FUNCTION(("index_remove(mountID = %ld, name = %s, kernel = %d)\n", mountID, name, kernel));
 
-	mount = get_mount(mountID);
-	if (mount == NULL)
-		return B_BAD_VALUE;
+	struct fs_mount *mount;
+	status_t status = get_mount(mountID, &mount);
+	if (status < B_OK)
+		return status;
 
 	if (FS_MOUNT_CALL(mount, read_index_stat) == NULL) {
 		status = EOPNOTSUPP;
@@ -4679,14 +4683,12 @@ out:
 static status_t
 index_remove(mount_id mountID, const char *name, bool kernel)
 {
-	struct fs_mount *mount;
-	status_t status;
-
 	FUNCTION(("index_remove(mountID = %ld, name = %s, kernel = %d)\n", mountID, name, kernel));
 
-	mount = get_mount(mountID);
-	if (mount == NULL)
-		return B_BAD_VALUE;
+	struct fs_mount *mount;
+	status_t status = get_mount(mountID, &mount);
+	if (status < B_OK)
+		return status;
 
 	if (FS_MOUNT_CALL(mount, remove_index) == NULL) {
 		status = EROFS;
@@ -4713,13 +4715,12 @@ query_open(dev_t device, const char *query, uint32 flags,
 {
 	struct fs_mount *mount;
 	fs_cookie cookie;
-	status_t status;
 
 	FUNCTION(("query_open(device = %ld, query = \"%s\", kernel = %d)\n", device, query, kernel));
 
-	mount = get_mount(device);
-	if (mount == NULL)
-		return B_BAD_VALUE;
+	status_t status = get_mount(device, &mount);
+	if (status < B_OK)
+		return status;
 
 	if (FS_MOUNT_CALL(mount, open_query) == NULL) {
 		status = EOPNOTSUPP;
@@ -4939,12 +4940,17 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 	if (status < B_OK)
 		goto err4;
 
+	// initialize structure
 	mount->id = sNextMountID++;
 	mount->partition = NULL;
+	mount->root_vnode = NULL;
+	mount->covers_vnode = NULL;
+	mount->cookie = NULL;
 	mount->unmounting = false;
 	mount->owns_file_device = false;
 
-	// insert mount struct into list before we call fs mount()
+	// insert mount struct into list before we call FS's mount() function
+	// so that vnodes can be created for this mount
 	mutex_lock(&sMountMutex);
 	hash_insert(sMountsTable, mount);
 	mutex_unlock(&sMountMutex);
@@ -4964,8 +4970,6 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 			//status = ERR_VFS_GENERAL;
 			goto err5;
 		}
-
-		mount->covers_vnode = NULL; // this is the root mount
 	} else {
 		struct vnode *coveredVnode;
 		status = path_to_vnode(path, true, &coveredVnode, NULL, kernel);
@@ -5177,14 +5181,12 @@ static status_t
 fs_sync(dev_t device)
 {
 	struct fs_mount *mount;
-
-	mount = get_mount(device);
-	if (mount == NULL)
-		return B_BAD_VALUE;
+	status_t status = get_mount(device, &mount);
+	if (status < B_OK)
+		return status;
 
 	mutex_lock(&sMountMutex);
 
-	status_t status = B_OK;
 	if (FS_MOUNT_CALL(mount, sync))
 		status = FS_MOUNT_CALL(mount, sync)(mount->cookie);
 
@@ -5209,11 +5211,9 @@ static status_t
 fs_read_info(dev_t device, struct fs_info *info)
 {
 	struct fs_mount *mount;
-	status_t status = B_OK;
-
-	mount = get_mount(device);
-	if (mount == NULL)
-		return B_BAD_VALUE;
+	status_t status = get_mount(device, &mount);
+	if (status < B_OK)
+		return status;
 
 	// fill in info the file system doesn't (have to) know about
 	memset(info, 0, sizeof(struct fs_info));
@@ -5238,11 +5238,9 @@ static status_t
 fs_write_info(dev_t device, const struct fs_info *info, int mask)
 {
 	struct fs_mount *mount;
-	status_t status;
-
-	mount = get_mount(device);
-	if (mount == NULL)
-		return B_BAD_VALUE;
+	status_t status = get_mount(device, &mount);
+	if (status < B_OK)
+		return status;
 
 	if (FS_MOUNT_CALL(mount, write_fs_info))
 		status = FS_MOUNT_CALL(mount, write_fs_info)(mount->cookie, info, mask);
@@ -5269,7 +5267,7 @@ fs_next_device(int32 *_cookie)
 
 	while (device < sNextMountID) {
 		mount = find_mount(device++);
-		if (mount != NULL)
+		if (mount != NULL && mount->cookie != NULL)
 			break;
 	}
 
