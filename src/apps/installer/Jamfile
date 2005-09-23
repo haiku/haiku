@@ -7,6 +7,8 @@ App Installer :
 	DrawButton.cpp
 	InstallerApp.cpp
 	InstallerWindow.cpp
-	: libbe.so libtracker.so
+	PackageViews.cpp
+	PartitionMenuItem.cpp
+	: be tracker
 	: Installer.rdef ;
 

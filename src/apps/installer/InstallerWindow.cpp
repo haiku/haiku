@@ -6,17 +6,22 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Box.h>
+#include <Directory.h>
+#include <Path.h>
 #include <PopUpMenu.h>
 #include <Roster.h>
-#include <ScrollView.h>
 #include <string.h>
 #include "InstallerWindow.h"
+#include "PartitionMenuItem.h"
 
 #define DRIVESETUP_SIG "application/x-vnd.Be-DRV$"
 
 const uint32 BEGIN_MESSAGE = 'iBGN';
 const uint32 SHOW_BOTTOM_MESSAGE = 'iSBT';
 const uint32 SETUP_MESSAGE = 'iSEP';
+const uint32 START_SCAN = 'iSSC';
+const uint32 SRC_PARTITION = 'iSPT';
+const uint32 DST_PARTITION = 'iDPT';
 
 InstallerWindow::InstallerWindow(BRect frame_rect)
 	: BWindow(frame_rect, "Installer", B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
@@ -51,6 +56,12 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 	fBackBox->AddChild(fSetupButton);
 	fSetupButton->Hide();
 
+	fPackagesView = new PackagesView(BRect(bounds.left+12, bounds.top+4, bounds.right-15-B_V_SCROLL_BAR_WIDTH, bounds.bottom-61), "packages_view");
+	fPackagesScrollView = new BScrollView("packagesScroll", fPackagesView, B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW,
+		false, true);
+	fBackBox->AddChild(fPackagesScrollView);
+	fPackagesScrollView->Hide();
+
 	fDrawButton = new DrawButton(BRect(bounds.left+12, bounds.bottom-33, bounds.left+100, bounds.bottom-20),
 		"options_button", "Fewer options", "More options", new BMessage(SHOW_BOTTOM_MESSAGE));
 	fBackBox->AddChild(fDrawButton);
@@ -58,7 +69,7 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 	fDestMenu = new BPopUpMenu("scanning" B_UTF8_ELLIPSIS);
 	fSrcMenu = new BPopUpMenu("scanning" B_UTF8_ELLIPSIS);
 
-	BRect fieldRect(bounds.left+50, bounds.top+70, bounds.left+250, bounds.top+90);
+	BRect fieldRect(bounds.left+50, bounds.top+70, bounds.right-13, bounds.top+90);
 	fSrcMenuField = new BMenuField(fieldRect, "srcMenuField",
                 "Install from: ", fSrcMenu);
         fSrcMenuField->SetDivider(70.0);
@@ -77,6 +88,8 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 
 	fDriveSetupLaunched = be_roster->IsRunning(DRIVESETUP_SIG);
 	be_roster->StartWatching(this);
+	
+	PostMessage(START_SCAN);
 }
 
 InstallerWindow::~InstallerWindow()
@@ -89,10 +102,16 @@ void
 InstallerWindow::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
+		case START_SCAN:
+			StartScan();
+			break;
 		case BEGIN_MESSAGE:
 			break;
 		case SHOW_BOTTOM_MESSAGE:
 			ShowBottom();
+			break;
+		case SRC_PARTITION:
+			PublishPackages();
 			break;
 		case SETUP_MESSAGE:
 			LaunchDriveSetup();
@@ -133,10 +152,14 @@ InstallerWindow::ShowBottom()
 		ResizeTo(332,306);
 		if (fSetupButton->IsHidden())
 			fSetupButton->Show();
+		if (fPackagesScrollView->IsHidden())
+			fPackagesScrollView->Show();
 	} else {
-		ResizeTo(332,160);
 		if (!fSetupButton->IsHidden())
 			fSetupButton->Hide();
+		if (!fPackagesScrollView->IsHidden())
+			fPackagesScrollView->Hide();
+		ResizeTo(332,160);
 	}
 }
 
@@ -153,7 +176,7 @@ void
 InstallerWindow::DisableInterface(bool disable)
 {
 	if (!disable) {
-		ScanningInProgress();
+		StartScan();
 	}
 	fDriveSetupLaunched = disable;
 	fBeginButton->SetEnabled(!disable);
@@ -162,20 +185,44 @@ InstallerWindow::DisableInterface(bool disable)
 	fDestMenuField->SetEnabled(!disable);
 	if (disable)
 		fStatusView->SetText("Running DriveSetup" B_UTF8_ELLIPSIS "\nClose DriveSetup to continue with the\ninstallation.");
-
 }
 
 
 void
-InstallerWindow::ScanningComplete()
+InstallerWindow::StartScan()
 {
+	fStatusView->SetText("Scanning for disks" B_UTF8_ELLIPSIS);
+
+	BMenuItem *item;
+	while ((item = fSrcMenu->RemoveItem((int32)0)))
+		delete item;
+	while ((item = fDestMenu->RemoveItem((int32)0)))
+		delete item;
+
+	fSrcMenu->AddItem(new PartitionMenuItem("BeOS 5 PE Max Edition V3.1 beta", 
+		new BMessage(SRC_PARTITION), "/BeOS 5 PE Max Edition V3.1 beta"));
+
+	if (fSrcMenu->ItemAt(0))
+		fSrcMenu->ItemAt(0)->SetMarked(true);
 	fStatusView->SetText("Choose the disk you want to install onto\nfrom the pop-up menu. Then click \"Begin\".");
 }
 
 
 void
-InstallerWindow::ScanningInProgress()
+InstallerWindow::PublishPackages()
 {
-	fStatusView->SetText("Scanning for disks" B_UTF8_ELLIPSIS);
-}
+	fPackagesView->Clean();
+	PartitionMenuItem *item = (PartitionMenuItem *)fSrcMenu->FindMarked();
+	if (!item)
+		return;
 
+	BPath directory(item->Path());
+	directory.Append("_packages_");
+	BDirectory dir(directory.Path());
+	if (dir.InitCheck()!=B_OK)
+		return;
+
+	BEntry packageEntry;
+	while (dir.GetNextEntry(&packageEntry)==B_OK) {
+	}
+}
