@@ -193,7 +193,8 @@ OHCI::OHCI( pci_info *info , Stack *stack )
 	int i;
 	hcd_soft_endpoint *sed, *psed;
 	dprintf( "OHCI: constructing new BusManager\n" );
-	m_opreg_base = OHCI::pci_module->read_pci_config(m_pcii->bus, m_pcii->device, m_pcii->function, 0x20 , 4 ) ^ 1;
+	m_opreg_base = OHCI::pci_module->read_pci_config(m_pcii->bus, m_pcii->device, m_pcii->function, 0x20, 4);
+	m_opreg_base &= ~PCI_address_io_mask;
 	TRACE( "OHCI: iospace offset: %lx\n" , m_opreg_base );
 	m_roothub_base = 255; //Invalidate the Root Hub address
 	{

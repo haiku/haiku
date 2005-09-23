@@ -153,7 +153,8 @@ UHCI::UHCI( pci_info *info , Stack *stack )
 	dprintf( "UHCI: constructing new BusManager\n" );
 	m_pcii = info;
 	m_stack = stack;
-	m_reg_base = UHCI::pci_module->read_pci_config(m_pcii->bus, m_pcii->device, m_pcii->function, PCI_memory_base , 4 ) & PCI_address_io_mask ;
+	m_reg_base = UHCI::pci_module->read_pci_config(m_pcii->bus, m_pcii->device, m_pcii->function, PCI_memory_base, 4);
+	m_reg_base &= ~PCI_address_io_mask;
 	TRACE( "USB UHCI: iospace offset: %lx\n" , m_reg_base );
 	m_rh_address = 255; //Invalidate the RH address
 	{
