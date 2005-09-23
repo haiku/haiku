@@ -165,7 +165,7 @@ WinBorder::Draw(const BRect &r)
 	
 	// if we have a visible region, it is decorator's one.
 	if (fDecorator) {
-		WinBorder* wb = GetRootLayer()->FocusWinBorder();
+		WinBorder* wb = GetRootLayer()->Focus();
 		if (wb == this)
 			fDecorator->SetFocus(true);
 		else
@@ -477,7 +477,12 @@ WinBorder::MouseDown(const PointerEvent& evt)
 
 			if (fDecorator)
 				action = _ActionFor(evt);
-			
+
+			// deactivate border buttons on first click(select)
+			if (GetRootLayer()->Focus() != this && action != DEC_MOVETOBACK
+					&& action != DEC_RESIZE && action != DEC_SLIDETAB)
+				action = DEC_DRAG;
+
 			// set decorator internals
 			switch(action) {
 				case DEC_CLOSE:

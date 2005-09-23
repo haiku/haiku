@@ -89,11 +89,15 @@ public:
 			WinBorder*			WinBorderAt(const BPoint& pt) const;
 #ifdef NEW_INPUT_HANDLING
 			void				RevealNewWMState(Workspace::State &oldWMState);
+// TODO: we need to replace Winborder* with Layer*
+	inline	WinBorder*			Focus() const { return fWMState.Focus; }
+	inline	WinBorder*			Front() const { return fWMState.Front; }
+	inline	WinBorder*			Active() const { return fWMState.Active; }
+#else
+	inline	WinBorder*			Focus() const { return ActiveWorkspace()->Focus(); }
+	inline	WinBorder*			Front() const { return ActiveWorkspace()->Front(); }
+	inline	WinBorder*			Active() const { return ActiveWorkspace()->Active(); }
 #endif
-	inline	WinBorder*			FocusWinBorder() const { return ActiveWorkspace()->Focus(); }
-	inline	WinBorder*			FrontWinBorder() const { return ActiveWorkspace()->Front(); }
-	inline	WinBorder*			ActiveWinBorder() const { return ActiveWorkspace()->Active(); }
-
 	inline	void				SetWorkspaceCount(int32 wksCount);
 	inline	int32				WorkspaceCount() const { return fWsCount; }
 	inline	Workspace*			WorkspaceAt(int32 index) const { return fWorkspace[index]; }

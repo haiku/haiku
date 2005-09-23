@@ -650,8 +650,8 @@ RootLayer::AddSubsetWinBorder(WinBorder *winBorder, WinBorder *toWinBorder)
 	bool invalidate	= false;
 	bool invalid;
 #ifndef NEW_INPUT_HANDLING
-	WinBorder* exFocus = FocusWinBorder();
-	WinBorder* exActive = ActiveWinBorder();
+	WinBorder* exFocus = Focus();
+	WinBorder* exActive = Active();
 #else
 	Workspace::State oldWMState;
 	ActiveWorkspace()->GetState(&oldWMState);
@@ -688,8 +688,8 @@ RootLayer::RemoveSubsetWinBorder(WinBorder *winBorder, WinBorder *fromWinBorder)
 	bool invalidate	= false;
 	bool invalid;
 #ifndef NEW_INPUT_HANDLING
-	WinBorder* exFocus = FocusWinBorder();
-	WinBorder* exActive = ActiveWinBorder();
+	WinBorder* exFocus = Focus();
+	WinBorder* exActive = Active();
 #else
 	Workspace::State oldWMState;
 	ActiveWorkspace()->GetState(&oldWMState);
@@ -893,8 +893,8 @@ RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldWksIndex, uint
 	bool invalidate = false;
 	bool invalid;
 #ifndef NEW_INPUT_HANDLING
-	WinBorder* exFocus = FocusWinBorder();
-	WinBorder* exActive = ActiveWinBorder();
+	WinBorder* exFocus = Focus();
+	WinBorder* exActive = Active();
 #else
 	Workspace::State oldWMState;
 	ActiveWorkspace()->GetState(&oldWMState);
@@ -1165,6 +1165,26 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 	}
 
 	if (invalidate) {
+		// clear visible areas for windows not visible anymore.
+		int32 oldWindowCount = oldWMState.WindowList.CountItems();
+		int32 newWindowCount = fWMState.WindowList.CountItems();
+		bool stillPresent;
+		Layer *layer;
+		for (int32 i = 0; i < oldWindowCount; i++)
+		{
+			layer = static_cast<Layer*>(oldWMState.WindowList.ItemAtFast(i));
+			stillPresent = false;
+			for (int32 j = 0; j < newWindowCount; j++)
+				if (layer == fWMState.WindowList.ItemAtFast(j))
+					stillPresent = true;
+
+			if (!stillPresent && layer)
+#ifndef NEW_CLIPPING
+				empty_visible_regions(layer);
+#else
+				layer->clear_visible_regions();
+#endif
+		}
 		// redraw of focus change is automaticaly done
 		redraw = false;
 		// trigger region rebuilding and redraw
@@ -1206,12 +1226,13 @@ RootLayer::_ProcessMouseMovedEvent(PointerEvent &evt)
 		// TODO: figure out what other mouse modes are for!!!
 		DesktopSettings ds(gDesktop);
 		// TODO: Focus should be a RootLayer option/feature, NOT a Workspace one!!!
-		WinBorder* exFocus = FocusWinBorder();
+		WinBorder* exFocus = Focus();
 		if (ds.MouseMode() != B_NORMAL_MOUSE && exFocus != winBorderTarget) {
 			ActiveWorkspace()->SetFocus(winBorderTarget);
 			// Workspace::SetFocus() *attempts* to set a new focus WinBorder, it may not succeed
-			if (exFocus != FocusWinBorder()) {
+			if (exFocus != Focus()) {
 				// TODO: invalidate border area and send message to client for the widgets to light up
+				// What message? Is there a message on Focus change?
 			}
 		}
 	}
@@ -1322,8 +1343,8 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 #else
 			// we are clicking a WinBorder
 
-			WinBorder* exActive	= ActiveWinBorder();
-			WinBorder* exFocus = FocusWinBorder();
+			WinBorder* exActive	= Active();
+			WinBorder* exFocus = Focus();
 			WinBorder* target = fLastLayerUnderMouse->fOwner ? fLastLayerUnderMouse->fOwner
 														: (WinBorder*)fLastLayerUnderMouse;
 
@@ -1356,9 +1377,9 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 					bool sendMessage = true;
 					// supress mouse down events if the window has no focus or
 					// does not accept first clicks
-					if (target != FocusWinBorder())
+					if (target != Focus())
 						sendMessage = false;
-					else if (exFocus != FocusWinBorder()
+					else if (exFocus != Focus()
 							 && !(target->WindowFlags() & B_WILL_ACCEPT_FIRST_CLICK))
 						sendMessage = false;
 
@@ -1467,7 +1488,7 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 				fNotifyLayer	= NULL;	
 			} else {
 				// NOTE: focus may be NULL
-				if (fLastLayerUnderMouse->Window() && fLastLayerUnderMouse->fOwner == FocusWinBorder()) {
+				if (fLastLayerUnderMouse->Window() && fLastLayerUnderMouse->fOwner == Focus()) {
 					// send B_MOUSE_UP for regular Layers/BViews
 					BMessage upmsg(B_MOUSE_UP);
 					upmsg.AddInt64("when",evt.when);
@@ -1737,8 +1758,8 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 				{
 					STRACE(("Set Workspace %ld\n",scancode-1));
 #ifndef NEW_INPUT_HANDLING
-					WinBorder* exFocus = FocusWinBorder();
-					WinBorder* exActive = ActiveWinBorder();
+					WinBorder* exFocus = Focus();
+					WinBorder* exActive = Active();
 
 					if (SetActiveWorkspace(scancode - 2))
 						show_final_scene(exFocus, exActive);
@@ -1771,8 +1792,8 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 				//if(deskbar)
 				//{
 #ifndef NEW_INPUT_HANDLING
-					WinBorder* exActive = ActiveWinBorder();
-					WinBorder* exFocus = FocusWinBorder();
+					WinBorder* exActive = Active();
+					WinBorder* exFocus = Focus();
 					if (ActiveWorkspace()->MoveToBack(exActive))
 						show_final_scene(exFocus, exActive);
 #else
@@ -1812,8 +1833,8 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 			// We got this far, so apparently it's safe to pass to the active
 			// window.
 
-			if (FocusWinBorder()) {
-				ServerWindow *win = FocusWinBorder()->Window();
+			if (Focus()) {
+				ServerWindow *win = Focus()->Window();
 				if (win) {
 					BMessage keymsg(B_KEY_DOWN);
 					keymsg.AddInt64("when", time);
@@ -1893,8 +1914,8 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 			// We got this far, so apparently it's safe to pass to the active
 			// window.
 
-			if (FocusWinBorder()) {
-				ServerWindow *win = FocusWinBorder()->Window();
+			if (Focus()) {
+				ServerWindow *win = Focus()->Window();
 				if (win) {
 					BMessage keymsg(B_KEY_UP);
 					keymsg.AddInt64("when", time);
@@ -1936,9 +1957,9 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 	
 			STRACE(("Unmapped Key Down: 0x%lx\n",scancode));
 			
-			if(FocusWinBorder())
+			if(Focus())
 			{
-				ServerWindow *win = FocusWinBorder()->Window();
+				ServerWindow *win = Focus()->Window();
 				if(win)
 				{
 					BMessage keymsg(B_UNMAPPED_KEY_DOWN);
@@ -1972,9 +1993,9 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 	
 			STRACE(("Unmapped Key Up: 0x%lx\n",scancode));
 			
-			if(FocusWinBorder())
+			if(Focus())
 			{
-				ServerWindow *win = FocusWinBorder()->Window();
+				ServerWindow *win = Focus()->Window();
 				if(win)
 				{
 					BMessage keymsg(B_UNMAPPED_KEY_UP);
@@ -2006,9 +2027,9 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 			msg.Read<int32>(&oldmodifiers);
 			msg.Read(keystates,sizeof(int8)*16);
 
-			if(FocusWinBorder())
+			if(Focus())
 			{
-				ServerWindow *win = FocusWinBorder()->Window();
+				ServerWindow *win = Focus()->Window();
 				if(win)
 				{
 					BMessage keymsg(B_MODIFIERS_CHANGED);
@@ -2162,8 +2183,8 @@ RootLayer::show_winBorder(WinBorder *winBorder)
 	bool invalidate = false;
 	bool invalid;
 #ifndef NEW_INPUT_HANDLING
-	WinBorder* exFocus = FocusWinBorder();
-	WinBorder* exActive = ActiveWinBorder();
+	WinBorder* exFocus = Focus();
+	WinBorder* exActive = Active();
 #else
 	Workspace::State oldWMState;
 	ActiveWorkspace()->GetState(&oldWMState);
@@ -2222,8 +2243,8 @@ RootLayer::hide_winBorder(WinBorder *winBorder)
 	bool invalidate = false;
 	bool invalid;
 #ifndef NEW_INPUT_HANDLING
-	WinBorder* exFocus = FocusWinBorder();
-	WinBorder* exActive = ActiveWinBorder();
+	WinBorder* exFocus = Focus();
+	WinBorder* exActive = Active();
 #else
 	Workspace::State oldWMState;
 	ActiveWorkspace()->GetState(&oldWMState);
@@ -2269,8 +2290,8 @@ RootLayer::change_winBorder_feel(WinBorder *winBorder, int32 newFeel)
 	bool	wasVisibleInActiveWorkspace = false;
 
 #ifndef NEW_INPUT_HANDLING
-	WinBorder* exFocus = FocusWinBorder();
-	WinBorder* exActive = ActiveWinBorder();
+	WinBorder* exFocus = Focus();
+	WinBorder* exActive = Active();
 #else
 	Workspace::State oldWMState;
 	ActiveWorkspace()->GetState(&oldWMState);
@@ -2382,7 +2403,7 @@ bool RootLayer::get_workspace_windows()
 void
 RootLayer::draw_window_tab(WinBorder *exFocus)
 {
-	WinBorder *focus = FocusWinBorder();
+	WinBorder *focus = Focus();
 	if (exFocus || focus) {
 		if (exFocus && exFocus != focus && exFocus->fDecorator)
 			exFocus->fDecorator->SetFocus(false);
@@ -2424,15 +2445,15 @@ void
 RootLayer::winborder_activation(WinBorder* exActive)
 {
 	// ToDo: not sure if this is correct - do floating windows get WindowActivated() events?
-	if (exActive && FocusWinBorder() != exActive) {
+	if (exActive && Focus() != exActive) {
 		BMessage msg(B_WINDOW_ACTIVATED);
 		msg.AddBool("active", false);
 		exActive->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
 	}
-	if (FocusWinBorder() && FocusWinBorder() != exActive) {
+	if (Focus() && Focus() != exActive) {
 		BMessage msg(B_WINDOW_ACTIVATED);
 		msg.AddBool("active", true);
-		FocusWinBorder()->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
+		Focus()->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
 	}
 }
 
