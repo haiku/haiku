@@ -277,7 +277,7 @@ OHCI::OHCI( pci_info *info , Stack *stack )
 		OHCI::pci_module->write_io_16( m_opreg_base + OHCI_COMMAND_STATUS,statusmsg | OHCI_OCR);
 		for (i = 0; i < 100 && (ctrlmsg & OHCI_IR); i++) 
 		{
-			spin(100);
+			snooze(100);
 			ctrlmsg = OHCI::pci_module->read_io_16( m_opreg_base + OHCI_CONTROL);
 		}
 		if ((ctrlmsg & OHCI_IR) == 0) 
@@ -295,7 +295,7 @@ OHCI::OHCI( pci_info *info , Stack *stack )
 		if ((ctrlmsg & OHCI_HCFS_MASK) != OHCI_HCFS_OPERATIONAL) 
 		{
 			OHCI::pci_module->write_io_16( m_opreg_base + OHCI_CONTROL,OHCI_HCFS_OPERATIONAL);
-			spin(250000);
+			snooze(250000);
 		}
 	} 
 	else 
@@ -303,7 +303,7 @@ OHCI::OHCI( pci_info *info , Stack *stack )
 		dprintf("OHCI: cold started\n");
 	reset:
 		// Controller was cold started.
-		spin(100000);
+		snooze(100000);
 	}
 	
 	//	This reset should not be necessary according to the OHCI spec, but
