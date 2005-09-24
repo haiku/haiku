@@ -48,7 +48,10 @@ PlayList::SetTrackCount(const int16 &count)
 	STRACE(("PlayList::SetTrackCount(%d)\n",count));
 	
 	if(count < 0)
+	{
 		fTrackCount = 0;
+		fTrackIndex = 0;
+	}
 	else
 	if(count > 500)
 		fTrackCount = 500;
@@ -145,7 +148,7 @@ PlayList::GetCurrentTrack(void)
 	fLocker.Lock();
 	
 	int16 value = fTrackList[fTrackIndex];
-	STRACE(("PlayList::GetCurrentTrack()=%d\n",value));
+//	STRACE(("PlayList::GetCurrentTrack()=%d\n",value));
 	
 	fLocker.Unlock();
 	return value;

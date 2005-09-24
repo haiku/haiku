@@ -148,8 +148,16 @@ TrackState::UpdateState()
 	}
 
 	// If we're not playing, just monitor the current track in the playlist
-	cdTrack = sPlayList.GetCurrentTrack();
 	count = gCDDevice.CountTracks();
+	if(count>0)
+	{
+		cdTrack = sPlayList.GetCurrentTrack();
+	}
+	else
+	{
+		sPlayList.SetTrackCount(0);
+		cdTrack=-1;
+	}
 	return CurrentState(cdTrack,count);
 }
 

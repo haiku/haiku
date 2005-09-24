@@ -498,7 +498,11 @@ CDPlayer::UpdateCDInfo(void)
 	bool trackresult = engine->ContentWatcher()->GetContent(&CDName,&trackNames);
 		
 	if(currentTrack < 0)
+	{
+		fCDTitle->SetText("");
+		fCurrentTrack->SetText("");
 		return;
+	}
 	
 	if(currentTrack == 0)
 		currentTrack++;
