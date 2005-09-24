@@ -9,7 +9,7 @@
  *
  * Other authors:
  * Mark Watson 6/2000,
- * Rudolf Cornelissen 12/2002-12/2003
+ * Rudolf Cornelissen 12/2002-9/2005
  */
 
 #define MODULE_BIT 0x00004000
@@ -25,7 +25,6 @@ void i2c_low(void);
 int i2c_get_ack(void);
 void i2c_send_ack(void);
 int i2c_sendbyte(unsigned char data);
-unsigned char i2c_readbyte(int ack_required);
 
 /*which device on the bus is the MAVEN?*/
 #define MAVEN_WRITE (0x1B<<1)
@@ -263,26 +262,127 @@ int i2c_sendbyte(unsigned char data)
 	return i2c_get_ack();
 }
 
-unsigned char i2c_readbyte(int ack_required)
+//rud's betvout:
+static char FlagIICError (char ErrNo)
+//error code list:
+//1 - SCL locked low by device (bus is still busy)
+//2 - SDA locked low by device (bus is still busy)
+//3 - No Acknowledge from device (no handshake)
+//4 - SDA not released for master to generate STOP bit
 {
-	int i;
-	unsigned char data=0;
-    
-	/*read data*/
-	i2c_set_lines(0,1);
-	for (i=7; i>=0; i--) 
-	{
-		i2c_set_lines(1,1);
-		if (i2c_get_data()==1)
-			data |= (1<<i);
-		i2c_set_lines(0,1);
-	}
+	static char IICError = 0;
 
-	/*send acknowledge*/
-	if (ack_required) i2c_send_ack();
-
-	return data;
+	if (!IICError) IICError = ErrNo;
+	if (ErrNo == -1) IICError = 0;
+	return IICError;
 }
+
+static void OutSCL(uint8 BusNR, bool Bit)
+{
+	uint8 data;
+	
+	/* enable access to primary head */
+	set_crtc_owner(0);
+
+	if (BusNR)
+	{
+		data = (CRTCR(WR_I2CBUS_1) & 0xf0) | 0x01;
+		if (Bit)
+			CRTCW(WR_I2CBUS_1, (data | 0x20));
+		else
+			CRTCW(WR_I2CBUS_1, (data & ~0x20));
+	}
+	else
+	{
+		data = CRTCR(WR_I2CBUS_0) & 0xf0;
+		if (Bit)
+			CRTCW(WR_I2CBUS_0, (data | 0x20));
+		else
+			CRTCW(WR_I2CBUS_0, (data & ~0x20));
+	}
+}
+
+static void OutSDA(uint8 BusNR, bool Bit)
+{
+//fixme..
+}
+
+static bool InSCL(uint8 BusNR)
+{
+//fixme..
+	return 0;
+}
+
+static bool InSDA(uint8 BusNR)
+{
+//fixme..
+	return 0;
+}
+
+static void TXBit (uint8 BusNR, bool Bit)
+{
+	/* send out databit */
+	if (Bit)
+	{
+		OutSDA(BusNR, 1);
+		snooze(3);
+		if (!InSDA(BusNR)) FlagIICError (2);
+	}
+	else
+	{
+		OutSDA(BusNR, 0);
+	}
+	/* generate clock pulse */
+	snooze(6);
+	OutSCL(BusNR, 1);
+	snooze(3);
+	if (!InSCL(BusNR)) FlagIICError (1);
+	snooze(6);
+	OutSCL(BusNR, 0);
+	snooze(6);
+}
+
+static uint8 RXBit (uint8 BusNR)
+{
+	uint8 Bit = 0;
+
+	/* set SDA so input is possible */
+	OutSDA(BusNR, 1);
+	/* generate clock pulse */
+	snooze(6);
+	OutSCL(BusNR, 1);
+	snooze(3);
+	if (!InSCL(BusNR)) FlagIICError (1);
+	snooze(3);
+	/* read databit */
+	if (InSDA(BusNR)) Bit = 1;
+	/* finish clockpulse */
+	OutSCL(BusNR, 0);
+	snooze(6);
+
+	return Bit;
+}
+
+static uint8 i2c_readbyte(uint8 BusNR, bool Ack)
+{
+	uint8 cnt, bit, byte = 0;
+
+	/* read data */
+	for (cnt = 8; cnt > 0; cnt--)
+	{
+		byte <<= 1;
+		bit = RXBit (BusNR);
+		byte += bit;
+	}
+	/* send acknowledge */
+	TXBit (BusNR, Ack);
+
+	LOG(4,("I2C: read byte ($%02x) from bus #%d; status is %d\n",
+		byte, BusNR, FlagIICError(0)));
+
+	return byte;
+}
+//end rud.
 
 /*-------------------------------------------
  *PUBLIC functions
@@ -290,13 +390,13 @@ unsigned char i2c_readbyte(int ack_required)
 int i2c_maven_read(unsigned char address)
 {
 	int error=0;
-	int data;
+	int data=0;
 
 	i2c_start();
 	{
 		error+=i2c_sendbyte(MAVEN_READ);
 		error+=i2c_sendbyte(address);
-		data = i2c_readbyte(0);
+//		data = i2c_readbyte(0);
 	}	
 	i2c_stop();
 	if (error>0) LOG(8,("I2C: MAVR ERROR - %x\n",error));
