@@ -6,11 +6,13 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Box.h>
+#include <ClassInfo.h>
 #include <Directory.h>
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Roster.h>
 #include <string.h>
+#include <String.h>
 #include "InstallerWindow.h"
 #include "PartitionMenuItem.h"
 
@@ -202,8 +204,10 @@ InstallerWindow::StartScan()
 	fSrcMenu->AddItem(new PartitionMenuItem("BeOS 5 PE Max Edition V3.1 beta", 
 		new BMessage(SRC_PARTITION), "/BeOS 5 PE Max Edition V3.1 beta"));
 
-	if (fSrcMenu->ItemAt(0))
+	if (fSrcMenu->ItemAt(0)) {
 		fSrcMenu->ItemAt(0)->SetMarked(true);
+		PublishPackages();
+	}
 	fStatusView->SetText("Choose the disk you want to install onto\nfrom the pop-up menu. Then click \"Begin\".");
 }
 
@@ -223,6 +227,33 @@ InstallerWindow::PublishPackages()
 		return;
 
 	BEntry packageEntry;
+	BList packages;
 	while (dir.GetNextEntry(&packageEntry)==B_OK) {
+		Package *package = Package::PackageFromEntry(packageEntry);
+		if (package) {
+			packages.AddItem(package);
+		}
 	}
+	packages.SortItems(ComparePackages);
+
+	fPackagesView->AddPackages(packages);
 }
+
+
+int 
+InstallerWindow::ComparePackages(const void *firstArg, const void *secondArg)
+{
+	const Group *group1 = *static_cast<const Group * const *>(firstArg);
+	const Group *group2 = *static_cast<const Group * const *>(secondArg);
+	const Package *package1 = dynamic_cast<const Package *>(group1);
+	const Package *package2 = dynamic_cast<const Package *>(group2);
+	int sameGroup = strcmp(group1->GroupName(), group2->GroupName());
+	if (sameGroup != 0)
+		return sameGroup;
+	if (!package2)
+		return -1;
+	if (!package1)
+		return 1;
+	return strcmp(package1->Name(), package2->Name());
+}
+

@@ -12,40 +12,43 @@
 #include <stdlib.h>
 #include <string.h>
 
-class Package {
-public:
-	Package();
-	~Package();
-	void SetName(const char *name) { free(fName); fName=strdup(name);};
-	void SetGroup(const char *group) { free(fGroup); fName=strdup(group);};
-	void SetDescription(const char *description) { free(fDescription); fName=strdup(description);};
-	void SetSize(const int32 size) { fSize = size; };
-	void SetIcon(const BBitmap * icon);
-	const char * Name() { return fName; };
-	const char * Group() { return fGroup; };
-	const char * Description() { return fDescription; };
-	const int32 Size() { return fSize; };
-	const BBitmap * Icon() { return fIcon; };
-
-	static int Compare(const void *firstArg, const void *secondArg);
-	static Package *PackageFromEntry(BEntry &dir);
-private:
-	char *fName;
-	char *fGroup;
-	char *fDescription;
-	int32 fSize;
-	BBitmap *fIcon;
-};
-
 class Group {
 public:
 	Group();
-	~Group();
+	virtual ~Group();
+	void SetGroupName(const char *group) { free(fGroup); fGroup=strdup(group);};
+	const char * GroupName() const { return fGroup; };
+private:
+	char *fGroup;
+};
+
+
+class Package : public Group {
+public:
+	Package();
+	virtual ~Package();
 	void SetName(const char *name) { free(fName); fName=strdup(name);};
-	const char * Name() { return fName; };
+	void SetDescription(const char *description) { free(fDescription); fDescription=strdup(description);};
+	void SetSize(const int32 size) { fSize = size; };
+	void SetIcon(const BBitmap * icon);
+	void SetOnByDefault(bool onByDefault) { fOnByDefault = onByDefault; };
+	void SetAlwaysOn(bool alwaysOn) { fAlwaysOn = alwaysOn; };
+	const char * Name() const { return fName; };
+	const char * Description() const { return fDescription; };
+	const int32 Size() const { return fSize; };
+	const BBitmap * Icon() const { return fIcon; };
+	bool OnByDefault() const { return fOnByDefault; };
+	bool AlwaysOn() const { return fAlwaysOn; };
+
+	static Package *PackageFromEntry(BEntry &dir);
 private:
 	char *fName;
+	char *fDescription;
+	int32 fSize;
+	BBitmap *fIcon;
+	bool fAlwaysOn, fOnByDefault;
 };
+
 
 class PackageCheckBox : public BCheckBox {
 	public:
@@ -70,9 +73,8 @@ class PackagesView : public BView {
 public:
 	PackagesView(BRect rect, const char* name);
 	~PackagesView();
-	void AddPackage(Package &package);
-	void AddGroup(Group &group);
 	void Clean();
+	void AddPackages(BList &list);
 private:
 	BList fViews;
 };

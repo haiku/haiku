@@ -23,13 +23,13 @@ public:
 
 	virtual void MessageReceived(BMessage *msg);
 	virtual bool QuitRequested();
-	
 private:
 	void DisableInterface(bool disable);
 	void LaunchDriveSetup();
 	void PublishPackages();
 	void ShowBottom();
 	void StartScan();
+	static int ComparePackages(const void *firstArg, const void *secondArg);
 	BBox *fBackBox;
 	BButton *fBeginButton, *fSetupButton;
 	DrawButton *fDrawButton;
