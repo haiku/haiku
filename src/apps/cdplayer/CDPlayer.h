@@ -16,15 +16,16 @@
 #include <TextControl.h>
 #include <StringView.h>
 
-#include "Observer.h"
-#include "CDEngine.h"
 #include "TrackMenu.h"
+#include "CDAudioDevice.h"
+#include "CDDBSupport.h"
+#include "PlayList.h"
 
 class DrawButton;
 class DoubleShotDrawButton;
 class TwoStateDrawButton;
 
-class CDPlayer : public BView, private Observer 
+class CDPlayer : public BView
 {
 public:
 						CDPlayer(BRect frame, const char *name,	
@@ -40,18 +41,10 @@ public:
 	virtual	void 		FrameResized(float new_width, float new_height);
 	virtual void	 	MessageReceived(BMessage *);
 
-	// observing overrides
-	virtual BHandler	*RecipientHandler() const { return (BHandler *)this; }
-	
-	virtual void		NoticeChange(Notifier *);
-
 private:
-			void				HandlePlayState(void);
-			void				UpdateCDInfo(void);
+			void				WatchCDState(void);
 			void				UpdateTimeInfo(void);
 			void				AdjustButtonStates(void);
-	
-			CDEngine			*engine;
 	
 			DrawButton			*fStop,
 								*fNextTrack,
@@ -67,7 +60,7 @@ private:
 								*fRepeat,
 								*fPlay;
 			
-			BSlider				*fVolume;
+			BSlider				*fVolumeSlider;
 			
 			BStringView			*fCDTitle,
 								*fCurrentTrack,
@@ -84,6 +77,16 @@ private:
 			
 			rgb_color			fStopColor;
 			rgb_color			fPlayColor;
+			
+			CDAudioDevice		fCDDrive;
+			PlayList			fPlayList;
+			CDState				fWindowState;
+			int32				fDiscID;
+			CDDBQuery			fCDQuery;
+			uint8				fVolume;
+			bool				fUseTrackNames;
+			vector<BString>		fTrackNames;
+			BString				fCDName;
 };
 
 

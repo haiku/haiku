@@ -109,7 +109,6 @@ void
 TrackMenu::MouseDown(BPoint point)
 {
 	BPoint pt(point);
-	
 	int32 saveditem = fCurrentItem;
 	int32 item = ItemAt(pt);
 	

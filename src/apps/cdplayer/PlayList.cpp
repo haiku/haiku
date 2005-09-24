@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define DEBUG_PLAYLIST
+//#define DEBUG_PLAYLIST
 
 #ifdef DEBUG_PLAYLIST
 #include <stdio.h>
@@ -47,7 +47,7 @@ PlayList::SetTrackCount(const int16 &count)
 	
 	STRACE(("PlayList::SetTrackCount(%d)\n",count));
 	
-	if(count < 0)
+	if(count <= 0)
 	{
 		fTrackCount = 0;
 		fTrackIndex = 0;
@@ -71,13 +71,7 @@ PlayList::SetStartingTrack(const int16 &start)
 	
 	STRACE(("PlayList::SetStartingTrack(%d)\n",start));
 	
-	if(start >= TrackCount())
-		fStartingTrack = TrackCount() - 1;
-	else
-	if(start < 1)
-		fStartingTrack = 1;
-	else
-		fStartingTrack = start;
+	fStartingTrack = start;
 	
 	fLocker.Unlock();
 }

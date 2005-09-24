@@ -4,15 +4,11 @@ AddResources CDPlayer : CDPlayer.rdef ;
 App CDPlayer : 
 	CDAudioDevice.cpp
 	CDDBSupport.cpp
-	CDEngine.cpp
 	CDPlayer.cpp
 	DoubleShotDrawButton.cpp
 	DrawButton.cpp
-	FunctionObjectMessage.cpp
-	Observer.cpp
 	PlayList.cpp
 	TrackMenu.cpp
 	TwoStateDrawButton.cpp
-	TypedList.cpp
 	;
 LinkSharedOSLibs CDPlayer : be net netapi translation ;
