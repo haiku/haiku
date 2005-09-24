@@ -6,6 +6,7 @@
 #include <Directory.h>
 #include <ScrollBar.h>
 #include <String.h>
+#include <stdio.h>
 #include <View.h>
 #include "PackageViews.h"
 
@@ -66,6 +67,24 @@ err:
 }
 
 
+void 
+Package::GetSizeAsString(char *string)
+{
+	float kb = fSize / 1024.0;
+	if (kb < 1.0) {
+		sprintf(string, "%ld B", fSize);
+		return;
+	}
+	float mb = kb / 1024.0;
+	if (mb < 1.0) {
+		sprintf(string, "%3.1f KB", kb);
+		return;
+	}
+	sprintf(string, "%3.1f MB", mb);
+	
+}
+
+
 Group::Group()
 	: fGroup(NULL)
 {
@@ -94,8 +113,11 @@ void
 PackageCheckBox::Draw(BRect update)
 {
 	BCheckBox::Draw(update);
+	char string[255];
+	fPackage.GetSizeAsString(string);
+	float width = StringWidth(string);
+	DrawString(string, BPoint(Bounds().right - width - 8, 11));
 }
-
 
 GroupView::GroupView(BRect rect, Group &group)
 	: BStringView(rect, "group", group.GroupName()),

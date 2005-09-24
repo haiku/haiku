@@ -36,6 +36,7 @@ public:
 	const char * Name() const { return fName; };
 	const char * Description() const { return fDescription; };
 	const int32 Size() const { return fSize; };
+	void GetSizeAsString(char *string);
 	const BBitmap * Icon() const { return fIcon; };
 	bool OnByDefault() const { return fOnByDefault; };
 	bool AlwaysOn() const { return fAlwaysOn; };

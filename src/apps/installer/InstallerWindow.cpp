@@ -48,7 +48,7 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 	BScrollView *scroll = new BScrollView("statusScroll", fStatusView, B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW|B_FRAME_EVENTS);
         fBackBox->AddChild(scroll);
 
-	fBeginButton = new BButton(BRect(bounds.right-90, bounds.bottom-35, bounds.right-10, bounds.bottom-11), 
+	fBeginButton = new BButton(BRect(bounds.right-90, bounds.bottom-35, bounds.right-11, bounds.bottom-11), 
 		"begin_button", "Begin", new BMessage(BEGIN_MESSAGE), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	fBeginButton->MakeDefault(true);
 	fBackBox->AddChild(fBeginButton);
