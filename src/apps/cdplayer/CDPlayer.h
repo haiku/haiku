@@ -43,8 +43,6 @@ public:
 
 private:
 			void				WatchCDState(void);
-			void				UpdateTimeInfo(void);
-			void				AdjustButtonStates(void);
 	
 			DrawButton			*fStop,
 								*fNextTrack,

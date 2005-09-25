@@ -1,9 +1,3 @@
-// Copyright 1992-1999, Be Incorporated, All Rights Reserved.
-// This file may be used under the terms of the Be Sample Code License.
-//
-// send comments/suggestions/feedback to pavel@be.com
-//
-
 #include <Alert.h>
 #include <Application.h>
 #include <Bitmap.h>
@@ -122,7 +116,7 @@ void CDPlayer::BuildGUI(void)
 	view->SetViewColor(0,34,7);
 	fTrackBox->AddChild(view);
 	
-	fCurrentTrack = new BStringView( view->Bounds(),"TrackNumber","Track:",B_FOLLOW_ALL);
+	fCurrentTrack = new BStringView( view->Bounds(),"TrackNumber","",B_FOLLOW_ALL);
 	view->AddChild(fCurrentTrack);
 	fCurrentTrack->SetHighColor(fStopColor);
 	fCurrentTrack->SetFont(be_bold_font);
@@ -291,7 +285,11 @@ CDPlayer::MessageReceived(BMessage *msg)
 		{
 			fPlayList.SetCurrentTrack(fTrackMenu->Value()+1);
 			fWindowState=kPlaying;
-			fCDDrive.Play(fPlayList.GetCurrentTrack());
+			if(!fCDDrive.Play(fPlayList.GetCurrentTrack()))
+			{
+				fWindowState=kStopped;
+				fCDDrive.Stop();
+			}
 			break;
 		}
 		case M_EJECT:
@@ -314,7 +312,19 @@ CDPlayer::MessageReceived(BMessage *msg)
 			{
 				CDState state = fCDDrive.GetState();
 				if(state == kPlaying)
-					fCDDrive.Play(next);
+				{
+					while(!fCDDrive.Play(next))
+					{
+						next = fPlayList.GetNextTrack();
+						if(next<1)
+						{
+							fWindowState=kStopped;
+							fCDDrive.Stop();
+							fPlayList.Rewind();
+							break;
+						}
+					}
+				}
 				else
 				if(state == kPaused)
 				{
@@ -344,7 +354,19 @@ CDPlayer::MessageReceived(BMessage *msg)
 			{
 				CDState state = fCDDrive.GetState();
 				if(state == kPlaying)
-					fCDDrive.Play(prev);
+				{
+					while(!fCDDrive.Play(prev))
+					{
+						prev = fPlayList.GetPreviousTrack();
+						if(prev < 1)
+						{
+							fWindowState=kStopped;
+							fCDDrive.Stop();
+							fPlayList.Rewind();
+							break;
+						}
+					}
+				}
 				else
 				if(state == kPaused)
 				{
@@ -419,72 +441,6 @@ CDPlayer::MessageReceived(BMessage *msg)
 			break;		
 		}
 	}
-}
-
-void
-CDPlayer::AdjustButtonStates(void)
-{
-/*	CDState state = gCDDevice.GetState();
-	
-	if(state==kNoCD)
-	{
-		// Everything needs to be disabled when there is no CD
-		fStop->SetEnabled(false);
-		fPlay->SetEnabled(false);
-		fNextTrack->SetEnabled(false);
-		fPrevTrack->SetEnabled(false);
-		
-		fSave->SetEnabled(false);
-	}
-	else
-	{
-		fStop->SetEnabled(true);
-		fPlay->SetEnabled(true);
-		fNextTrack->SetEnabled(true);
-		fPrevTrack->SetEnabled(true);
-		
-		// TODO: Enable when Save is implemented
-//		fSave->SetEnabled(true);
-	}
-	
-	if(state==kPlaying)
-		fPlay->SetState(1);
-	else
-		fPlay->SetState(0);
-*/
-}
-
-void
-CDPlayer::UpdateTimeInfo(void)
-{
-/*
-	int32 min,sec;
-	char string[1024];
-	
-	engine->TimeStateWatcher()->GetDiscTime(min,sec);
-	if(min >= 0)
-	{
-		int32 tmin,tsec;
-		engine->TimeStateWatcher()->GetTotalDiscTime(tmin,tsec);
-		
-		sprintf(string,"Disc %ld:%.2ld / %ld:%.2ld",min,sec,tmin,tsec);
-	}
-	else
-		sprintf(string,"Disc --:-- / --:--");
-	fDiscTime->SetText(string);
-	
-	engine->TimeStateWatcher()->GetTrackTime(min,sec);
-	if(min >= 0)
-	{
-		int32 tmin,tsec;
-		engine->TimeStateWatcher()->GetTotalTrackTime(tmin,tsec);
-		
-		sprintf(string,"Track %ld:%.2ld / %ld:%.2ld",min,sec,tmin,tsec);
-	}
-	else
-		sprintf(string,"Track --:-- / --:--");
-	fTrackTime->SetText(string);
-*/
 }
 
 void 
