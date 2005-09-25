@@ -280,9 +280,6 @@ static char FlagIICError (char ErrNo)
 static void OutSCL(uint8 BusNR, bool Bit)
 {
 	uint8 data;
-	
-	/* enable access to primary head */
-	set_crtc_owner(0);
 
 	if (BusNR)
 	{
@@ -294,7 +291,7 @@ static void OutSCL(uint8 BusNR, bool Bit)
 	}
 	else
 	{
-		data = CRTCR(WR_I2CBUS_0) & 0xf0;
+		data = (CRTCR(WR_I2CBUS_0) & 0xf0) | 0x01;
 		if (Bit)
 			CRTCW(WR_I2CBUS_0, (data | 0x20));
 		else
@@ -304,19 +301,52 @@ static void OutSCL(uint8 BusNR, bool Bit)
 
 static void OutSDA(uint8 BusNR, bool Bit)
 {
-//fixme..
+	uint8 data;
+	
+	if (BusNR)
+	{
+		data = (CRTCR(WR_I2CBUS_1) & 0xf0) | 0x01;
+		if (Bit)
+			CRTCW(WR_I2CBUS_1, (data | 0x10));
+		else
+			CRTCW(WR_I2CBUS_1, (data & ~0x10));
+	}
+	else
+	{
+		data = (CRTCR(WR_I2CBUS_0) & 0xf0) | 0x01;
+		if (Bit)
+			CRTCW(WR_I2CBUS_0, (data | 0x10));
+		else
+			CRTCW(WR_I2CBUS_0, (data & ~0x10));
+	}
 }
 
 static bool InSCL(uint8 BusNR)
 {
-//fixme..
-	return 0;
+	if (BusNR)
+	{
+		if ((CRTCR(RD_I2CBUS_1) & 0x04)) return true;
+	}
+	else
+	{
+		if ((CRTCR(RD_I2CBUS_0) & 0x04)) return true;
+	}
+
+	return false;
 }
 
 static bool InSDA(uint8 BusNR)
 {
-//fixme..
-	return 0;
+	if (BusNR)
+	{
+		if ((CRTCR(RD_I2CBUS_1) & 0x08)) return true;
+	}
+	else
+	{
+		if ((CRTCR(RD_I2CBUS_0) & 0x08)) return true;
+	}
+
+	return false;
 }
 
 static void TXBit (uint8 BusNR, bool Bit)
@@ -366,6 +396,9 @@ static uint8 RXBit (uint8 BusNR)
 static uint8 i2c_readbyte(uint8 BusNR, bool Ack)
 {
 	uint8 cnt, bit, byte = 0;
+
+	/* enable access to primary head */
+	set_crtc_owner(0);
 
 	/* read data */
 	for (cnt = 8; cnt > 0; cnt--)
