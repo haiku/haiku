@@ -354,21 +354,21 @@ static void TXBit (uint8 BusNR, bool Bit)
 	/* send out databit */
 	if (Bit)
 	{
-		OutSDA(BusNR, 1);
+		OutSDA(BusNR, true);
 		snooze(3);
 		if (!InSDA(BusNR)) FlagIICError (2);
 	}
 	else
 	{
-		OutSDA(BusNR, 0);
+		OutSDA(BusNR, false);
 	}
 	/* generate clock pulse */
 	snooze(6);
-	OutSCL(BusNR, 1);
+	OutSCL(BusNR, true);
 	snooze(3);
 	if (!InSCL(BusNR)) FlagIICError (1);
 	snooze(6);
-	OutSCL(BusNR, 0);
+	OutSCL(BusNR, false);
 	snooze(6);
 }
 
@@ -377,20 +377,56 @@ static uint8 RXBit (uint8 BusNR)
 	uint8 Bit = 0;
 
 	/* set SDA so input is possible */
-	OutSDA(BusNR, 1);
+	OutSDA(BusNR, true);
 	/* generate clock pulse */
 	snooze(6);
-	OutSCL(BusNR, 1);
+	OutSCL(BusNR, true);
 	snooze(3);
 	if (!InSCL(BusNR)) FlagIICError (1);
 	snooze(3);
 	/* read databit */
 	if (InSDA(BusNR)) Bit = 1;
 	/* finish clockpulse */
-	OutSCL(BusNR, 0);
+	OutSCL(BusNR, false);
 	snooze(6);
 
 	return Bit;
+}
+
+static void bstart (uint8 BusNR)
+{
+	/* make sure SDA is high */
+	OutSDA(BusNR, true);
+	snooze(3);
+	OutSCL(BusNR, true);
+	snooze(3);
+	if (!InSCL(BusNR)) FlagIICError (1);
+	snooze(6);
+	/* clear SDA while SCL set (bus-start condition) */
+	OutSDA(BusNR, false);
+	snooze(6);
+	OutSCL(BusNR, false);
+	snooze(6);
+
+	LOG(4,("I2C: START condition generated on bus %d.\n", BusNR));
+}
+
+static void bstop (uint8 BusNR)
+{
+	/* make sure SDA is low */
+	OutSDA(BusNR, false);
+	snooze(3);
+	OutSCL(BusNR, true);
+	snooze(3);
+	if (!InSCL(BusNR)) FlagIICError (1);
+	snooze(6);
+	/* set SDA while SCL set (bus-stop condition) */
+	OutSDA(BusNR, true);
+	snooze(3);
+	if (!InSDA(BusNR)) FlagIICError (4);
+	snooze(3);
+
+	LOG(4,("I2C: STOP condition generated on bus %d.\n", BusNR));
 }
 
 static uint8 i2c_readbyte(uint8 BusNR, bool Ack)
@@ -415,6 +451,32 @@ static uint8 i2c_readbyte(uint8 BusNR, bool Ack)
 
 	return byte;
 }
+
+static bool i2c_writebyte (uint8 BusNR, uint8 byte)
+{
+	uint8 cnt;
+	bool bit;
+
+	/* enable access to primary head */
+	set_crtc_owner(0);
+
+	/* write data */
+	for (cnt = 8; cnt > 0; cnt--)
+	{
+		bit = (byte & 0x80);
+		TXBit (BusNR, bit);
+		byte <<= 1;
+	}
+	/* read acknowledge */
+	bit = RXBit (BusNR);
+	if (bit) FlagIICError (3);
+
+	LOG(4,("I2C: written byte ($%02x) to bus #%d; status is %d\n",
+		byte, BusNR, FlagIICError(0)));
+
+	return bit;
+}
+
 //end rud.
 
 /*-------------------------------------------
