@@ -3,12 +3,15 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <fs_attr.h>
 #include <Directory.h>
 #include <ScrollBar.h>
 #include <String.h>
 #include <stdio.h>
 #include <View.h>
 #include "PackageViews.h"
+
+#define ICON_ATTRIBUTE "INSTALLER PACKAGE: ICON"
 
 Package::Package()
 	: Group(),
@@ -25,7 +28,7 @@ Package::~Package()
 {
 	free(fName);
 	free(fDescription);
-	free(fIcon);	
+	delete fIcon;	
 }
 
 
@@ -60,6 +63,16 @@ Package::PackageFromEntry(BEntry &entry)
 	package->SetSize(size);
 	package->SetAlwaysOn(alwaysOn);
 	package->SetOnByDefault(onByDefault);
+
+	attr_info info;
+	if (directory.GetAttrInfo(ICON_ATTRIBUTE, &info) == B_OK) {
+		char buffer[info.size];
+		BMessage msg;
+		if ((directory.ReadAttr(ICON_ATTRIBUTE, info.type, 0, buffer, info.size) == info.size)
+			&& (msg.Unflatten(buffer) == B_OK)) {
+			package->SetIcon(new BBitmap(&msg));
+		}
+	}
 	return package;
 err:
 	delete package;
@@ -117,6 +130,10 @@ PackageCheckBox::Draw(BRect update)
 	fPackage.GetSizeAsString(string);
 	float width = StringWidth(string);
 	DrawString(string, BPoint(Bounds().right - width - 8, 11));
+
+	const BBitmap *icon = fPackage.Icon();
+	if (icon)
+		DrawBitmap(icon, BPoint(Bounds().right - 92, 0));
 }
 
 GroupView::GroupView(BRect rect, Group &group)
@@ -125,6 +142,7 @@ GroupView::GroupView(BRect rect, Group &group)
 {
 	SetFont(be_bold_font);
 }
+
 
 GroupView::~GroupView()
 {

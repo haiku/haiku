@@ -6,6 +6,7 @@
 #ifndef __PACKAGEVIEWS_H__
 #define __PACKAGEVIEWS_H__
 
+#include <Bitmap.h>
 #include <CheckBox.h>
 #include <List.h>
 #include <StringView.h>
@@ -30,7 +31,7 @@ public:
 	void SetName(const char *name) { free(fName); fName=strdup(name);};
 	void SetDescription(const char *description) { free(fDescription); fDescription=strdup(description);};
 	void SetSize(const int32 size) { fSize = size; };
-	void SetIcon(const BBitmap * icon);
+	void SetIcon(BBitmap * icon) { delete fIcon; fIcon = icon; };
 	void SetOnByDefault(bool onByDefault) { fOnByDefault = onByDefault; };
 	void SetAlwaysOn(bool alwaysOn) { fAlwaysOn = alwaysOn; };
 	const char * Name() const { return fName; };
@@ -54,8 +55,8 @@ private:
 class PackageCheckBox : public BCheckBox {
 	public:
 		PackageCheckBox(BRect rect, Package &item);
-		~PackageCheckBox();
-		void Draw(BRect update);
+		virtual ~PackageCheckBox();
+		virtual void Draw(BRect update);
 	private:
 		Package &fPackage;
 };
@@ -63,7 +64,7 @@ class PackageCheckBox : public BCheckBox {
 class GroupView : public BStringView {
 	public:
 		GroupView(BRect rect, Group &group);
-		~GroupView();
+		virtual ~GroupView();
 	private:
 		Group &fGroup;
 
@@ -73,7 +74,7 @@ class GroupView : public BStringView {
 class PackagesView : public BView {
 public:
 	PackagesView(BRect rect, const char* name);
-	~PackagesView();
+	virtual ~PackagesView();
 	void Clean();
 	void AddPackages(BList &list);
 private:

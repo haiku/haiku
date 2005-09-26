@@ -1,14 +1,16 @@
 SubDir OBOS_TOP src apps installer ;
 
 UsePrivateHeaders shared ;
+UsePrivateHeaders tracker ;
 SubDirHdrs [ FDirName $(OBOS_TOP) src kits tracker ] ;
 
 App Installer : 
 	DrawButton.cpp
 	InstallerApp.cpp
+	InstallerCopyLoopControl.cpp
 	InstallerWindow.cpp
 	PackageViews.cpp
 	PartitionMenuItem.cpp
-	: be tracker
+	: libbe.so libtracker.so
 	: Installer.rdef ;
 
