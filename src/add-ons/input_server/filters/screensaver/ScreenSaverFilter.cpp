@@ -13,7 +13,7 @@
 #include <Roster.h>
 #include <Screen.h>
 #include <Application.h>
-#include "SSInputFilter.h"
+#include "ScreenSaverFilter.h"
 
 #include <Debug.h>
 #define CALLED() SERIAL_PRINT(("%s\n", __PRETTY_FUNCTION__))
@@ -31,14 +31,14 @@ extern "C" _EXPORT BInputServerFilter* instantiate_input_filter();
 BInputServerFilter*
 instantiate_input_filter()
 {
-	return new SSInputFilter();
+	return new ScreenSaverFilter();
 }
 
 
 //	#pragma mark -
 
 
-SSController::SSController(SSInputFilter *filter)
+ScreenSaverController::ScreenSaverController(ScreenSaverFilter *filter)
 	: BLooper("screensaver controller", B_LOW_PRIORITY),
 	fFilter(filter)
 {
@@ -47,7 +47,7 @@ SSController::SSController(SSInputFilter *filter)
 
 
 void
-SSController::MessageReceived(BMessage *msg)
+ScreenSaverController::MessageReceived(BMessage *msg)
 {
 	CALLED();
 	SERIAL_PRINT(("what %lx\n", msg->what));
@@ -79,7 +79,7 @@ SSController::MessageReceived(BMessage *msg)
 //	#pragma mark -
 
 
-SSInputFilter::SSInputFilter() 
+ScreenSaverFilter::ScreenSaverFilter() 
 	: fLastEventTime(0),
 		fBlankTime(0),
 		fSnoozeTime(0),
@@ -91,15 +91,15 @@ SSInputFilter::SSInputFilter()
 		fWatchingFile(false)
 {
 	CALLED();
-	fSSController = new SSController(this);
-	fSSController->Run();
+	fController = new ScreenSaverController(this);
+	fController->Run();
 
 	ReloadSettings();
-	be_roster->StartWatching(fSSController);
+	be_roster->StartWatching(fController);
 }
 
 
-SSInputFilter::~SSInputFilter()
+ScreenSaverFilter::~ScreenSaverFilter()
 {
 	delete fRunner;
 
@@ -108,13 +108,13 @@ SSInputFilter::~SSInputFilter()
 	if (fWatchingDirectory)
 		watch_node(&fPrefsDirNodeRef, B_STOP_WATCHING, NULL);
 
-	be_roster->StopWatching(fSSController);
-	delete fSSController;
+	be_roster->StopWatching(fController);
+	delete fController;
 }
 
 
 void
-SSInputFilter::WatchPreferences()
+ScreenSaverFilter::WatchPreferences()
 {
 	BEntry entry(fPrefs.GetPath().Path());
 	if (entry.Exists()) {
@@ -125,7 +125,7 @@ SSInputFilter::WatchPreferences()
 			fWatchingDirectory = false;
 		}
 		entry.GetNodeRef(&fPrefsNodeRef);
-		watch_node(&fPrefsNodeRef, B_WATCH_ALL, NULL, fSSController);
+		watch_node(&fPrefsNodeRef, B_WATCH_ALL, NULL, fController);
 		fWatchingFile = true;
 	} else {
 		if (fWatchingDirectory)
@@ -137,14 +137,14 @@ SSInputFilter::WatchPreferences()
 		BEntry dir;
 		entry.GetParent(&dir);
 		dir.GetNodeRef(&fPrefsDirNodeRef);
-		watch_node(&fPrefsDirNodeRef, B_WATCH_ALL, NULL, fSSController);
+		watch_node(&fPrefsDirNodeRef, B_WATCH_ALL, NULL, fController);
 		fWatchingDirectory = true;
 	}
 }
 
 
 void 
-SSInputFilter::Invoke() 
+ScreenSaverFilter::Invoke() 
 {
 	CALLED();
 	if ((fKeep != NONE && fCurrent == fKeep)
@@ -161,7 +161,7 @@ SSInputFilter::Invoke()
 
 
 void 
-SSInputFilter::ReloadSettings()
+ScreenSaverFilter::ReloadSettings()
 {
 	CALLED();
 	if (!fPrefs.LoadSettings()) {
@@ -174,7 +174,7 @@ SSInputFilter::ReloadSettings()
 	CheckTime();
 
 	delete fRunner;
-	fRunner = new BMessageRunner(BMessenger(NULL, fSSController),
+	fRunner = new BMessageRunner(BMessenger(NULL, fController),
 		new BMessage(SS_CHECK_TIME), fSnoozeTime, -1);
 	if (fRunner->InitCheck() != B_OK) {
 		SERIAL_PRINT(("fRunner init failed\n"));
@@ -185,7 +185,7 @@ SSInputFilter::ReloadSettings()
 
 
 void 
-SSInputFilter::Banish() 
+ScreenSaverFilter::Banish() 
 {
 	CALLED();
 	if (!fEnabled)
@@ -200,7 +200,7 @@ SSInputFilter::Banish()
 
 
 void 
-SSInputFilter::CheckTime()
+ScreenSaverFilter::CheckTime()
 {
 	CALLED();
 	bigtime_t now = system_time();
@@ -218,13 +218,14 @@ SSInputFilter::CheckTime()
 		fSnoozeTime = fBlankTime;
 	else
 		fSnoozeTime = fLastEventTime + fBlankTime - now;
+
 	if (fRunner)
 		fRunner->SetInterval(fSnoozeTime);
 }
 
 
 void 
-SSInputFilter::UpdateRectangles()
+ScreenSaverFilter::UpdateRectangles()
 {
 	// TODO: make this better if possible at all (in a clean way)
 	CALLED();
@@ -242,7 +243,7 @@ SSInputFilter::UpdateRectangles()
 
 
 void 
-SSInputFilter::Cornered(arrowDirection pos)
+ScreenSaverFilter::Cornered(arrowDirection pos)
 {
 	//CALLED();
 	fCurrent = pos;
@@ -252,7 +253,7 @@ SSInputFilter::Cornered(arrowDirection pos)
 
 
 filter_result 
-SSInputFilter::Filter(BMessage *msg, BList *outList)
+ScreenSaverFilter::Filter(BMessage *msg, BList *outList)
 {
 	fLastEventTime = system_time();
 

@@ -6,6 +6,8 @@
  *		Michael Phipps
  *		Jérôme Duval, jerome.duval@free.fr
  */
+#ifndef SCREEN_SAVER_FILTER_H
+#define SCREEN_SAVER_FILTER_H
 
 
 #include <InputServerFilter.h>
@@ -18,24 +20,25 @@
 #include "ScreenSaverPrefs.h"
 
 
-class SSInputFilter;
+class ScreenSaverFilter;
 
-class SSController : public BLooper {
+class ScreenSaverController : public BLooper {
 	public:
-        SSController(SSInputFilter *filter);
+        ScreenSaverController(ScreenSaverFilter *filter);
         void MessageReceived(BMessage *msg);
 
 	private:
-        SSInputFilter* fFilter;
+        ScreenSaverFilter* fFilter;
 };
 
-class SSInputFilter : public BInputServerFilter {
+class ScreenSaverFilter : public BInputServerFilter {
 	public:
-		SSInputFilter();
-		virtual ~SSInputFilter();
-		virtual filter_result Filter(BMessage *msg, BList *outList);
-		void CheckTime();
+		ScreenSaverFilter();
+		virtual ~ScreenSaverFilter();
 
+		virtual filter_result Filter(BMessage *msg, BList *outList);
+
+		void CheckTime();
 		uint32 SnoozeTime() {return fSnoozeTime;}
 		void ReloadSettings();
 		void SetEnabled(bool enabled) { fEnabled = enabled; }
@@ -51,7 +54,7 @@ class SSInputFilter : public BInputServerFilter {
 			// Ideally, we would get a message when the screen changes.
 			// R5 doesn't do this.
 
-		SSController *fSSController;
+		ScreenSaverController *fController;
 		node_ref fPrefsNodeRef, fPrefsDirNodeRef;
 		BMessageRunner *fRunner;
 		bool fWatchingDirectory, fWatchingFile;
@@ -63,3 +66,4 @@ class SSInputFilter : public BInputServerFilter {
 		void Banish();
 };
 
+#endif	/* SCREEN_SAVER_FILTER_H */
