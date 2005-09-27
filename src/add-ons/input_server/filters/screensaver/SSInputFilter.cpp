@@ -218,6 +218,8 @@ SSInputFilter::CheckTime()
 		fSnoozeTime = fBlankTime;
 	else
 		fSnoozeTime = fLastEventTime + fBlankTime - now;
+	if (fRunner)
+		fRunner->SetInterval(fSnoozeTime);
 }
 
 
