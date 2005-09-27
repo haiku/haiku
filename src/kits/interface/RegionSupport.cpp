@@ -567,8 +567,10 @@ BRegion::Support::ROr(long top, long bottom, const BRegion &first,
 	if (foundCount > 1)
 		SortTrans(lefts, rights, foundCount);
 	
-// TODO: This needs to be reviewed by BRegion owner.
-//	ASSERT(foundCount > 0);
+	// TODO: Make sure that OrRegionComplex() skips horizontal
+	// bands which don't contain any rectangle. Then we can
+	// uncomment the assertion here.
+	//ASSERT(foundCount > 0);
 	if (foundCount == 0)
 		return;
 	
