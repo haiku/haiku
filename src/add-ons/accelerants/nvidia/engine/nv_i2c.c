@@ -171,6 +171,9 @@ static uint8 RXBit (uint8 BusNR)
 
 void i2c_bstart (uint8 BusNR)
 {
+	/* enable access to primary head */
+	set_crtc_owner(0);
+
 	/* make sure SDA is high */
 	OutSDA(BusNR, true);
 	snooze(3);
@@ -190,6 +193,9 @@ void i2c_bstart (uint8 BusNR)
 
 void i2c_bstop (uint8 BusNR)
 {
+	/* enable access to primary head */
+	set_crtc_owner(0);
+
 	/* make sure SDA is low */
 	OutSDA(BusNR, false);
 	snooze(3);
@@ -262,6 +268,9 @@ status_t i2c_init(void)
 	bool *i2c_bus = &(si->ps.i2c_bus0);
 
 	LOG(4,("I2C: searching for wired I2C buses...\n"));
+
+	/* enable access to primary head */
+	set_crtc_owner(0);
 
 	/* preset no board wired buses */
 	si->ps.i2c_bus0 = false;
