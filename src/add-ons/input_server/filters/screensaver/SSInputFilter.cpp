@@ -19,6 +19,10 @@
 #define CALLED() SERIAL_PRINT(("%s\n", __PRETTY_FUNCTION__))
 
 
+const int CORNER_SIZE = 10;
+const int32 SS_CHECK_TIME = 'SSCT';
+
+
 extern "C" _EXPORT BInputServerFilter* instantiate_input_filter();
 
 
@@ -47,6 +51,7 @@ SSController::MessageReceived(BMessage *msg)
 {
 	CALLED();
 	SERIAL_PRINT(("what %lx\n", msg->what));
+
 	switch (msg->what) {
 		case B_NODE_MONITOR:
 			fFilter->ReloadSettings();
@@ -78,7 +83,6 @@ SSInputFilter::SSInputFilter()
 	: fLastEventTime(0),
 		fBlankTime(0),
 		fSnoozeTime(0),
-		fRtc(0),
 		fCurrent(NONE),
 		fEnabled(false),
 		fFrameNum(0),
@@ -100,9 +104,9 @@ SSInputFilter::~SSInputFilter()
 	delete fRunner;
 
 	if (fWatchingFile)
-		watch_node(&fPrefNodeRef, B_STOP_WATCHING, NULL);
+		watch_node(&fPrefsNodeRef, B_STOP_WATCHING, NULL);
 	if (fWatchingDirectory)
-		watch_node(&fPrefDirNodeRef, B_STOP_WATCHING, NULL);
+		watch_node(&fPrefsDirNodeRef, B_STOP_WATCHING, NULL);
 
 	be_roster->StopWatching(fSSController);
 	delete fSSController;
@@ -112,28 +116,28 @@ SSInputFilter::~SSInputFilter()
 void
 SSInputFilter::WatchPreferences()
 {
-	BEntry entry(fPref.GetPath().Path());
+	BEntry entry(fPrefs.GetPath().Path());
 	if (entry.Exists()) {
 		if (fWatchingFile)
 			return;
 		if (fWatchingDirectory) {
-			watch_node(&fPrefDirNodeRef, B_STOP_WATCHING, NULL);
+			watch_node(&fPrefsDirNodeRef, B_STOP_WATCHING, NULL);
 			fWatchingDirectory = false;
 		}
-		entry.GetNodeRef(&fPrefNodeRef);
-		watch_node(&fPrefNodeRef, B_WATCH_ALL, NULL, fSSController);
+		entry.GetNodeRef(&fPrefsNodeRef);
+		watch_node(&fPrefsNodeRef, B_WATCH_ALL, NULL, fSSController);
 		fWatchingFile = true;
 	} else {
 		if (fWatchingDirectory)
 			return;
 		if (fWatchingFile) {
-			watch_node(&fPrefNodeRef, B_STOP_WATCHING, NULL);
+			watch_node(&fPrefsNodeRef, B_STOP_WATCHING, NULL);
 			fWatchingFile = false;
 		}
 		BEntry dir;
 		entry.GetParent(&dir);
-		dir.GetNodeRef(&fPrefDirNodeRef);
-		watch_node(&fPrefDirNodeRef, B_WATCH_ALL, NULL, fSSController);
+		dir.GetNodeRef(&fPrefsDirNodeRef);
+		watch_node(&fPrefsDirNodeRef, B_WATCH_ALL, NULL, fSSController);
 		fWatchingDirectory = true;
 	}
 }
@@ -145,7 +149,7 @@ SSInputFilter::Invoke()
 	CALLED();
 	if ((fKeep != NONE && fCurrent == fKeep)
 		|| fEnabled
-		|| fPref.TimeFlags() != 1
+		|| fPrefs.TimeFlags() != 1
 		|| be_roster->IsRunning(SCREEN_BLANKER_SIG)) {
 		// If mouse is in this corner, never invoke.
 		return;
@@ -160,13 +164,13 @@ void
 SSInputFilter::ReloadSettings()
 {
 	CALLED();
-	if (!fPref.LoadSettings()) {
+	if (!fPrefs.LoadSettings()) {
 		SERIAL_PRINT(("preferences loading failed: going to defaults\n"));
 	}
 
-	fBlank = fPref.GetBlankCorner();
-	fKeep = fPref.GetNeverBlankCorner();
-	fBlankTime = fSnoozeTime = fPref.BlankTime();
+	fBlank = fPrefs.GetBlankCorner();
+	fKeep = fPrefs.GetNeverBlankCorner();
+	fBlankTime = fSnoozeTime = fPrefs.BlankTime();
 	CheckTime();
 
 	delete fRunner;
@@ -199,18 +203,21 @@ void
 SSInputFilter::CheckTime()
 {
 	CALLED();
-	fRtc = system_time();
-	if (fRtc >= fLastEventTime + fBlankTime)  
+	bigtime_t now = system_time();
+	if (now >= fLastEventTime + fBlankTime)  
 		Invoke();
+
+	// TODO: this doesn't work correctly - since the BMessageRunner is not
+	// restarted, the next check will be too far away
 
 	// If the screen saver is on OR it was time to come on but it didn't (corner),
 	// snooze for blankTime.
 	// Otherwise, there was an event in the middle of the last snooze, so snooze
 	// for the remainder.
-	if (fEnabled || fLastEventTime + fBlankTime <= fRtc)
+	if (fEnabled || fLastEventTime + fBlankTime <= now)
 		fSnoozeTime = fBlankTime;
 	else
-		fSnoozeTime = fLastEventTime + fBlankTime - fRtc;
+		fSnoozeTime = fLastEventTime + fBlankTime - now;
 }
 
 
