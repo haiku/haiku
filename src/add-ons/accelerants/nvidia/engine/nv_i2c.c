@@ -38,8 +38,9 @@ status_t i2c_sec_tv_adapter()
 	return result;
 }
 
-static char FlagIICError (char ErrNo)
+char i2c_flag_error (char ErrNo)
 //error code list:
+//0 - OK status
 //1 - SCL locked low by device (bus is still busy)
 //2 - SDA locked low by device (bus is still busy)
 //3 - No Acknowledge from device (no handshake)
@@ -131,7 +132,7 @@ static void TXBit (uint8 BusNR, bool Bit)
 	{
 		OutSDA(BusNR, true);
 		snooze(3);
-		if (!InSDA(BusNR)) FlagIICError (2);
+		if (!InSDA(BusNR)) i2c_flag_error (2);
 	}
 	else
 	{
@@ -141,7 +142,7 @@ static void TXBit (uint8 BusNR, bool Bit)
 	snooze(6);
 	OutSCL(BusNR, true);
 	snooze(3);
-	if (!InSCL(BusNR)) FlagIICError (1);
+	if (!InSCL(BusNR)) i2c_flag_error (1);
 	snooze(6);
 	OutSCL(BusNR, false);
 	snooze(6);
@@ -157,7 +158,7 @@ static uint8 RXBit (uint8 BusNR)
 	snooze(6);
 	OutSCL(BusNR, true);
 	snooze(3);
-	if (!InSCL(BusNR)) FlagIICError (1);
+	if (!InSCL(BusNR)) i2c_flag_error (1);
 	snooze(3);
 	/* read databit */
 	if (InSDA(BusNR)) Bit = 1;
@@ -168,14 +169,14 @@ static uint8 RXBit (uint8 BusNR)
 	return Bit;
 }
 
-static void bstart (uint8 BusNR)
+void i2c_bstart (uint8 BusNR)
 {
 	/* make sure SDA is high */
 	OutSDA(BusNR, true);
 	snooze(3);
 	OutSCL(BusNR, true);
 	snooze(3);
-	if (!InSCL(BusNR)) FlagIICError (1);
+	if (!InSCL(BusNR)) i2c_flag_error (1);
 	snooze(6);
 	/* clear SDA while SCL set (bus-start condition) */
 	OutSDA(BusNR, false);
@@ -184,29 +185,29 @@ static void bstart (uint8 BusNR)
 	snooze(6);
 
 	LOG(4,("I2C: START condition generated on bus %d; status is %d\n",
-		BusNR, FlagIICError (0)));
+		BusNR, i2c_flag_error (0)));
 }
 
-static void bstop (uint8 BusNR)
+void i2c_bstop (uint8 BusNR)
 {
 	/* make sure SDA is low */
 	OutSDA(BusNR, false);
 	snooze(3);
 	OutSCL(BusNR, true);
 	snooze(3);
-	if (!InSCL(BusNR)) FlagIICError (1);
+	if (!InSCL(BusNR)) i2c_flag_error (1);
 	snooze(6);
 	/* set SDA while SCL set (bus-stop condition) */
 	OutSDA(BusNR, true);
 	snooze(3);
-	if (!InSDA(BusNR)) FlagIICError (4);
+	if (!InSDA(BusNR)) i2c_flag_error (4);
 	snooze(3);
 
 	LOG(4,("I2C: STOP condition generated on bus %d; status is %d\n",
-		BusNR, FlagIICError (0)));
+		BusNR, i2c_flag_error (0)));
 }
 
-static uint8 i2c_readbyte(uint8 BusNR, bool Ack)
+uint8 i2c_readbyte(uint8 BusNR, bool Ack)
 {
 	uint8 cnt, bit, byte = 0;
 
@@ -224,15 +225,16 @@ static uint8 i2c_readbyte(uint8 BusNR, bool Ack)
 	TXBit (BusNR, Ack);
 
 	LOG(4,("I2C: read byte ($%02x) from bus #%d; status is %d\n",
-		byte, BusNR, FlagIICError(0)));
+		byte, BusNR, i2c_flag_error(0)));
 
 	return byte;
 }
 
-static bool i2c_writebyte (uint8 BusNR, uint8 byte)
+bool i2c_writebyte (uint8 BusNR, uint8 byte)
 {
 	uint8 cnt;
 	bool bit;
+	uint8 tmp = byte;
 
 	/* enable access to primary head */
 	set_crtc_owner(0);
@@ -240,54 +242,18 @@ static bool i2c_writebyte (uint8 BusNR, uint8 byte)
 	/* write data */
 	for (cnt = 8; cnt > 0; cnt--)
 	{
-		bit = (byte & 0x80);
+		bit = (tmp & 0x80);
 		TXBit (BusNR, bit);
-		byte <<= 1;
+		tmp <<= 1;
 	}
 	/* read acknowledge */
 	bit = RXBit (BusNR);
-	if (bit) FlagIICError (3);
+	if (bit) i2c_flag_error (3);
 
 	LOG(4,("I2C: written byte ($%02x) to bus #%d; status is %d\n",
-		byte, BusNR, FlagIICError(0)));
+		byte, BusNR, i2c_flag_error(0)));
 
 	return bit;
-}
-//end rud.
-
-/*-------------------------------------------
- *PUBLIC functions
- */ 
-int i2c_maven_read(unsigned char address)
-{
-	int error=0;
-	int data=0;
-/*
-	i2c_start();
-	{
-		error+=i2c_sendbyte(MAVEN_READ);
-		error+=i2c_sendbyte(address);
-//		data = i2c_readbyte(0);
-	}	
-	i2c_stop();
-*/
-	if (error>0) LOG(8,("I2C: MAVR ERROR - %x\n",error));
-	return data;
-}
-
-void i2c_maven_write(unsigned char address, unsigned char data)
-{
-	int error=0;
-/*
-	i2c_start();
-	{
-		error+=i2c_sendbyte(MAVEN_WRITE);
-		error+=i2c_sendbyte(address);
-		error+=i2c_sendbyte(data);
-	}	
-	i2c_stop();
-*/
-	if (error>0) LOG(8,("I2C: MAVW ERROR - %x\n",error));
 }
 
 status_t i2c_init(void)
@@ -305,10 +271,10 @@ status_t i2c_init(void)
 	for (bus = 0; bus < 2; bus++)
 	{
 		/* reset status */
-		FlagIICError (-1);
+		i2c_flag_error (-1);
 		snooze(6);
 		/* init and/or stop I2C bus */
-		bstop(bus);
+		i2c_bstop(bus);
 		/* check for hardware coupling of SCL and SDA -out and -in lines */
 		snooze(6);
 		OutSCL(bus, false);
@@ -323,7 +289,7 @@ status_t i2c_init(void)
 		i2c_bus[bus] = true;
 		snooze(3);
 		/* re-init bus */
-		bstop(bus);
+		i2c_bstop(bus);
 	}
 
 	for (bus = 0; bus < 2; bus++)
@@ -334,5 +300,6 @@ status_t i2c_init(void)
 			LOG(4,("I2C: bus #%d wiring check: failed\n", bus));
 	}
 
+	if (!si->ps.i2c_bus0 && !si->ps.i2c_bus1) return B_ERROR;
 	return B_OK;
 }

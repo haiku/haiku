@@ -1,14 +1,166 @@
-/* Authors:
-   Mark Watson 2000,
-   Rudolf Cornelissen 1/2003-12/2003
-
-   Thanx to Petr Vandrovec for writing matroxfb.
+/*
+	Author:
+	Rudolf Cornelissen 4/2002-9/2005
 */
 
 #define MODULE_BIT 0x00100000
 
 #include "nv_std.h"
 
+#define PRADR	0x88
+#define SCADR	0x8a
+#define WR		0x00
+#define RD		0x01
+
+/*
+ see if a (possible) BT/CX chip resides at the given adress.
+ Return zero if no errors occurred.
+*/
+static uint8 BT_check (uint8 bus, uint8 adress)
+{
+	/* reset status */
+	i2c_flag_error (-1);
+
+	/* do check */
+	i2c_bstart(bus);
+	i2c_writebyte(bus, adress + WR);
+	/* set ESTATUS at b'00'; and enable bt chip-outputs
+	 * WARNING:
+	 * If bit0 = 0 is issued below (EN_OUT = disabled), the BT will lock SDA
+	 * after writing adress $A0 (setting EN_XCLK)!!!
+	 * Until a reboot the corresponding IIC bus will be inacessable then!!! */
+	i2c_writebyte(bus, 0xc4);
+	/* fixme: if testimage 'was' active txbuffer[3] should become 0x05...
+	 * (currently this cannot be detected in a 'foolproof' way so don't touch...) */
+	/* (ESTATUS b'0x' means: RX ID and VERSION info later..) */
+	i2c_writebyte(bus, 0x01);
+	i2c_bstop(bus);
+	return i2c_flag_error(0);
+}
+
+/* identify chiptype */
+static uint8 BT_read_type (void)
+{
+	uint8 id, stat;
+
+	/* reset status */
+	i2c_flag_error (-1);
+
+//fixme: setup higher level static I2C routines in this file.
+	/* Make sure a CX (Conexant) chip (if this turns out to be there) is set to
+	 * BT-compatibility mode! (This command will do nothing on a BT chip...) */
+	i2c_bstart(si->ps.tv_encoder.bus);
+	i2c_writebyte(si->ps.tv_encoder.bus, si->ps.tv_encoder.adress + WR);
+	/* select CX reg. for BT-compatible readback, video still off */
+	i2c_writebyte(si->ps.tv_encoder.bus, 0x6c);
+	/* set it up */
+	i2c_writebyte(si->ps.tv_encoder.bus, 0x02);
+	i2c_bstop(si->ps.tv_encoder.bus);
+	/* abort on errors */
+	stat = i2c_flag_error(0);
+	if (stat) return stat;
+
+	/* Do actual readtype command */
+	i2c_bstart(si->ps.tv_encoder.bus);
+	/* issue IIC read command */
+	i2c_writebyte(si->ps.tv_encoder.bus, si->ps.tv_encoder.adress + RD);
+	/* receive 1 byte;
+	 * ACK level to TX after last byte to RX should be 1 (= NACK) (see IIC spec). */
+	/* note:
+	 * While the BT's don't care, CX chips will block the SDA line if
+	 * an ACK gets sent! */
+	id = i2c_readbyte(si->ps.tv_encoder.bus, true);
+	i2c_bstop(si->ps.tv_encoder.bus);
+	/* abort on errors */
+	stat = i2c_flag_error(0);
+	if (stat) return stat;
+
+	/* inform driver about TV encoder found */
+	si->ps.tvout = true;
+	si->ps.tv_encoder.type = BT868 + ((id & 0xe0) >> 5);
+	si->ps.tv_encoder.version = id & 0x1f;
+
+	return stat;
+}
+
+bool BT_probe()
+{
+	bool btfound = false;
+
+	LOG(4,("Brooktree: Checking IIC bus(ses) for first possible TV encoder...\n"));
+	if (si->ps.i2c_bus0)
+	{
+		/* try primary adress on bus 0 */
+		if (!BT_check(0, PRADR))
+		{
+			btfound = true;
+			si->ps.tv_encoder.adress = PRADR;
+			si->ps.tv_encoder.bus = 0;
+		}
+		else
+		{
+			/* try secondary adress on bus 0 */
+			if (!BT_check(0, SCADR))
+			{
+				btfound = true;
+				si->ps.tv_encoder.adress = SCADR;
+				si->ps.tv_encoder.bus = 0;
+			}
+		}
+	}
+
+	if (si->ps.i2c_bus1 && !btfound)
+	{
+		/* try primary adress on bus 1 */
+		if (!BT_check(1, PRADR))
+		{
+			btfound = true;
+			si->ps.tv_encoder.adress = PRADR;
+			si->ps.tv_encoder.bus = 1;
+		}
+		else
+		{
+			/* try secondary adress on bus 1 */
+			if (!BT_check(1, SCADR))
+			{
+				btfound = true;
+				si->ps.tv_encoder.adress = SCADR;
+				si->ps.tv_encoder.bus = 1;
+			}
+		}
+	}
+
+	/* identify exact TV encoder type */
+	if (btfound)
+	{
+		/* if errors are found, retry */
+		/* note:
+		 * NACK: occurs on some ASUS V7700 GeForce cards!
+		 * (apparantly the video-in chip or another chip resides at 'BT' adresses
+		 * there..) */
+		uint8 stat;
+		uint8 cnt = 0;
+		while ((stat = BT_read_type()) && (cnt < 3))
+		{
+			cnt++;
+		}
+		if (stat)
+		{
+			LOG(4,("Brooktree: too much errors occurred, aborting.\n"));
+			btfound = 0;
+		}
+	}
+
+	if (btfound)
+		LOG(4,("Brooktree: Found TV encoder on bus %d, adress $%02x\n",
+			si->ps.tv_encoder.bus, si->ps.tv_encoder.adress));
+	else
+		LOG(4,("Brooktree: No TV encoder Found\n"));
+
+	return btfound;
+}
+
+//matrox old stuff..
 typedef struct {
 	uint32 h_total;
 	uint32 h_display;

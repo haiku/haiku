@@ -2129,16 +2129,11 @@ void fake_panel_start(void)
 
 	/* find out if the card has a tvout chip */
 	si->ps.tvout = false;
-	si->ps.tvout_chip_type = NONE;
-//fixme ;-)
+	si->ps.tv_encoder.type = NONE;
+	si->ps.tv_encoder.version = 0;
 	i2c_init();
-/*	if (i2c_maven_probe() == B_OK)
-	{
-		si->ps.tvout = true;
-		si->ps.tvout_chip_bus = ???;
-		si->ps.tvout_chip_type = ???;
-	}
-*/
+	//fixme: add support for more encoders...
+	BT_probe();
 
 	LOG(8,("INFO: faking panel startup\n"));
 
@@ -3149,7 +3144,7 @@ void dump_pins(void)
 	LOG(2,("tvout: "));
 	if (si->ps.tvout) LOG(2,("present\n")); else LOG(2,("absent\n"));
 	/* setup TVout logmessage text */
-	switch (si->ps.tvout_chip_type)
+	switch (si->ps.tv_encoder.type)
 	{
 	case NONE:
 		msg = "No";
@@ -3203,7 +3198,8 @@ void dump_pins(void)
 		msg = "Unknown";
 		break;
 	}
-	LOG(2, ("%s TVout chip detected\n", msg));
+	LOG(2, ("%s TV encoder detected; silicon revision is $%02x\n",
+		msg, si->ps.tv_encoder.version));
 //	LOG(2,("primary_dvi: "));
 //	if (si->ps.primary_dvi) LOG(2,("present\n")); else LOG(2,("absent\n"));
 //	LOG(2,("secondary_dvi: "));

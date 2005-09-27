@@ -1107,7 +1107,8 @@ static status_t nvxx_general_powerup()
 
 	unlock_card();
 
-	/* get RAM size and fake panel startup (panel init code is still missing) */
+	/* get RAM size, detect TV encoder and do fake panel startup (panel init code
+	 *  is still missing). */
 	fake_panel_start();
 
 	/* log the final card specifications */

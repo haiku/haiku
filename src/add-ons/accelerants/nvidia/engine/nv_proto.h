@@ -26,10 +26,13 @@ void delay(bigtime_t i);
 void nv_log(char *format, ...);
 
 /* i2c functions */
-int i2c_maven_read(unsigned char address);
-void i2c_maven_write(unsigned char address, unsigned char data);
+status_t i2c_sec_tv_adapter(void);
+char i2c_flag_error (char ErrNo);
+void i2c_bstart (uint8 BusNR);
+void i2c_bstop (uint8 BusNR);
+uint8 i2c_readbyte(uint8 BusNR, bool Ack);
+bool i2c_writebyte (uint8 BusNR, uint8 byte);
 status_t i2c_init(void);
-status_t i2c_maven_probe(void);
 
 /* card info functions */
 status_t parse_pins(void);
@@ -53,7 +56,8 @@ status_t nv_dac2_palette(uint8*,uint8*,uint8*);
 status_t nv_dac2_pix_pll_find(display_mode target,float * result,uint8 *,uint8 *,uint8 *, uint8);
 status_t nv_dac2_set_pix_pll(display_mode target);
 
-/*MAVENTV functions*/
+/* Brooktree TV functions */
+bool BT_probe(void);
 status_t g100_g400max_maventv_vid_pll_find(
 	display_mode target, unsigned int * ht_new, unsigned int * ht_last_line,
 	uint8 * m_result, uint8 * n_result, uint8 * p_result);
@@ -133,9 +137,6 @@ status_t nv_bes_init(void);
 status_t nv_configure_bes
 	(const overlay_buffer *ob, const overlay_window *ow,const overlay_view *ov, int offset);
 status_t nv_release_bes(void);
-
-/* I2C functions */
-status_t i2c_sec_tv_adapter(void);
 
 /* driver structures and enums */
 enum{BPP8 = 0, BPP15 = 1, BPP16 = 2, BPP24 = 3, BPP32 = 4};
