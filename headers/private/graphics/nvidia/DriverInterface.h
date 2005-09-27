@@ -249,7 +249,7 @@ typedef struct {
 		NV40A
 	};
 	enum
-	{	// tvout_chip_type in order of capability (more or less)
+	{	// tv_encoder_type in order of capability (more or less)
 		NONE = 0,
 		CH7003,
 		CH7004,
@@ -289,9 +289,13 @@ typedef struct {
 		bool crtc2_prim;			/* using CRTC2 as primary CRTC */
 		bool i2c_bus0;				/* we have a wired I2C bus 0 on board */
 		bool i2c_bus1;				/* we have a wired I2C bus 0 on board */
-		uint32 tvout_chip_type;     /* see tvchip_type enum above */
-		uint8 tvout_chip_bus;		/* I2C bus on which TVout chip resides */
-		uint8 tvout_chip_adress;	/* I2C adress on which TVout chip resides */
+		struct
+		{
+			uint32 type;			/* see tvchip_type enum above */
+			uint8 version;			/* chip silicon version */
+			uint8 bus;				/* I2C bus on which TVout chip resides */
+			uint8 adress;			/* I2C adress on which TVout chip resides */
+		} tv_encoder;
 		uint8 monitors;				/* output devices connection matrix */
 		status_t pins_status;		/* B_OK if read correctly, B_ERROR if faked */
 
