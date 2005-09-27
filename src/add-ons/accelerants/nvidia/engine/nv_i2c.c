@@ -1,50 +1,13 @@
 /*
- * i2c interface for the G400 MAVEN under BeOS
- *
- * Provides I2CR,I2CW - functions to parallel DACW,DACR
+ * i2c interface.
  * Bus should be run at max. 100kHz: see original Philips I2C specification
  *	
- * Much help was provided by observing the Linux i2c code, 
- * so thanks go to: Gerd Knorr
- *
- * Other authors:
- * Mark Watson 6/2000,
  * Rudolf Cornelissen 12/2002-9/2005
  */
 
 #define MODULE_BIT 0x00004000
 
 #include "nv_std.h"
-
-int i2c_set_lines(int clock, int data);
-int i2c_get_data(void);
-void i2c_start(void);
-void i2c_stop(void);
-void i2c_high(void);
-void i2c_low(void);
-int i2c_get_ack(void);
-void i2c_send_ack(void);
-int i2c_sendbyte(unsigned char data);
-
-/*which device on the bus is the MAVEN?*/
-#define MAVEN_WRITE (0x1B<<1)
-#define MAVEN_READ ((0x1B<<1)|1)
-
-#define I2C_CLOCK 0x20
-#define I2C_DATA 0x10
-
-/* NV-TVO I2C for G200, G400 */
-#define I2C_CLOCK 0x20
-#define I2C_DATA 0x10
-/* primary head DDC for Mystique(?), G100, G200, G400 */
-#define DDC1_CLK	0x08
-#define DDC1_DATA	0x02
-/* primary head DDC for Millennium, Millennium II */
-#define DDC1B_CLK	0x10
-#define DDC1B_DATA	0x04
-/* secondary head DDC for G400, G450 and G550 */
-#define DDC2_CLK	0x04
-#define DDC2_DATA	0x01
 
 status_t i2c_sec_tv_adapter()
 {
@@ -75,194 +38,6 @@ status_t i2c_sec_tv_adapter()
 	return result;
 }
 
-/*-----------------------------
- *low level hardware access
- */
-#define I2C_DELAY 2
-#define I2C_TIMEOUT 100
-int i2c_set_lines(int clock,int data)
-{
-	int count=0;
-	int program;
-	int required;
-
-	/*work out which bits to zero*/
-	program = 
-		(clock ? 0 : I2C_CLOCK)|
-		(data ? 0 : I2C_DATA);
-
-	/*what value do I require on data lines*/
-	required = 
-		(clock ? I2C_CLOCK : 0);
-
-	/*set the bits to zero*/
-//	DXIW(GENIOCTRL,program); /*drive these bits*/
-//	DXIW(GENIODATA,0x00);    /*to zero*/
-
-	/*wait a bit*/
-	delay(I2C_DELAY);
-
-	/*loop until the clock is as required*/
-//	while ((DXIR(GENIODATA)&I2C_CLOCK)!=required)
-	{
-		delay(I2C_DELAY);
-		count++;
-		if (count>I2C_TIMEOUT)
-		{
-//			LOG(8,("I2C: Timeout on set lines - clock:%d data:%d actual:%x\n",clock,data,DXIR(GENIODATA)));
-			return -1;
-		}
-	}
-
-	return 0;
-}
-
-int i2c_get_data()
-{
-	int data = 0;
-	int clock;
-	int count=0;
-
-	do
-	{
-		/*read the data and clock lines*/
-//		data = DXIR(GENIODATA);
-		clock = (data&I2C_CLOCK) ? 1 : 0;
-		data = (data&I2C_DATA) ? 1 : 0;
-	
-		/*manage timeout*/
-		count++;
-		if (count>I2C_TIMEOUT)
-		{
-			return -1;
-		}
-
-		/*wait a bit, so not hammering bus*/
-		delay(I2C_DELAY);
-
-	}while (!clock); /*wait for high clock*/
-
-	return data;
-}
-
-
-/*----------------------- 
- *Standard I2C operations
- */
-void i2c_start()
-{
-	int error=0;
-
-	error+= i2c_set_lines(0,1);
-	error+= i2c_set_lines(1,1);
-	error+= i2c_set_lines(1,0);
-	error+= i2c_set_lines(0,0);
-
-	if (error)
-	{
-		LOG(8,("I2C: start - %d\n",error));
-	}
-}
-
-void i2c_stop()
-{
-	int error=0;
-
-	error+= i2c_set_lines(0,0);
-	error+= i2c_set_lines(1,0);
-	error+= i2c_set_lines(1,1);
-	error+= i2c_set_lines(0,1);
-
-	if (error)
-	{
-		LOG(8,("I2C: stop - %d\n",error));
-	}
-}
-
-void i2c_high()
-{
-	int error=0;
-
-	error+= i2c_set_lines(0,1);
-	error+= i2c_set_lines(1,1);
-	error+= i2c_set_lines(0,1);
-
-	if (error)
-	{
-		LOG(8,("I2C: high - %d\n",error));
-	}
-}
-
-void i2c_low()
-{
-	int error=0;
-
-	error+= i2c_set_lines(0,0);
-	error+= i2c_set_lines(1,0);
-	error+= i2c_set_lines(0,0);
-
-	if (error)
-	{
-		LOG(8,("I2C: low - %d\n",error));
-	}
-}
-
-int i2c_get_ack()
-{
-	int error=0;
-	int ack;
-    
-	error+= i2c_set_lines(0,1);
-	error+= i2c_set_lines(1,1);
-	ack = i2c_get_data();
-	error+= i2c_set_lines(0,1);
-
-	if (error)
-	{
-		LOG(8,("I2C: get_ack - %d value:%x\n",error,ack));
-	}
-
-	return ack;
-}
-
-void i2c_send_ack()
-{
-	int error=0;
-    
-	error+= i2c_set_lines(0,0);
-	error+= i2c_set_lines(1,0);
-	error+= i2c_set_lines(0,0);
-
-	if (error)
-	{
-		LOG(8,("I2C: send_ack - %d\n",error));
-	}
-}
-
-/*------------------------------
- *use above functions to send and receive bytes
- */
-
-int i2c_sendbyte(unsigned char data)
-{
-	int i;
-
-	for (i=7; i>=0; i--)
-	{
-		if (data&(1<<i)) 
-		{
-			i2c_high();
-		}
-		else
-		{
-			i2c_low();
-		}
-	}
-
-	return i2c_get_ack();
-}
-
-//rud's betvout:
 static char FlagIICError (char ErrNo)
 //error code list:
 //1 - SCL locked low by device (bus is still busy)
@@ -408,7 +183,8 @@ static void bstart (uint8 BusNR)
 	OutSCL(BusNR, false);
 	snooze(6);
 
-	LOG(4,("I2C: START condition generated on bus %d.\n", BusNR));
+	LOG(4,("I2C: START condition generated on bus %d; status is %d\n",
+		BusNR, FlagIICError (0)));
 }
 
 static void bstop (uint8 BusNR)
@@ -426,7 +202,8 @@ static void bstop (uint8 BusNR)
 	if (!InSDA(BusNR)) FlagIICError (4);
 	snooze(3);
 
-	LOG(4,("I2C: STOP condition generated on bus %d.\n", BusNR));
+	LOG(4,("I2C: STOP condition generated on bus %d; status is %d\n",
+		BusNR, FlagIICError (0)));
 }
 
 static uint8 i2c_readbyte(uint8 BusNR, bool Ack)
@@ -476,7 +253,6 @@ static bool i2c_writebyte (uint8 BusNR, uint8 byte)
 
 	return bit;
 }
-
 //end rud.
 
 /*-------------------------------------------
@@ -486,7 +262,7 @@ int i2c_maven_read(unsigned char address)
 {
 	int error=0;
 	int data=0;
-
+/*
 	i2c_start();
 	{
 		error+=i2c_sendbyte(MAVEN_READ);
@@ -494,6 +270,7 @@ int i2c_maven_read(unsigned char address)
 //		data = i2c_readbyte(0);
 	}	
 	i2c_stop();
+*/
 	if (error>0) LOG(8,("I2C: MAVR ERROR - %x\n",error));
 	return data;
 }
@@ -501,7 +278,7 @@ int i2c_maven_read(unsigned char address)
 void i2c_maven_write(unsigned char address, unsigned char data)
 {
 	int error=0;
-
+/*
 	i2c_start();
 	{
 		error+=i2c_sendbyte(MAVEN_WRITE);
@@ -509,35 +286,53 @@ void i2c_maven_write(unsigned char address, unsigned char data)
 		error+=i2c_sendbyte(data);
 	}	
 	i2c_stop();
+*/
 	if (error>0) LOG(8,("I2C: MAVW ERROR - %x\n",error));
 }
 
 status_t i2c_init(void)
 {
-	/*init g400 i2c*/
-//	DXIW(GENIODATA,0x00); /*to zero*/
-//	DXIW(GENIOCTRL,0x30); /*drive clock and data*/
-//	DXIW(GENIOCTRL,0x00); /*stop driving*/
+	uint8 bus;
+	bool *i2c_bus = &(si->ps.i2c_bus0);
+
+	LOG(4,("I2C: searching for wired I2C buses...\n"));
+
+	/* preset no board wired buses */
+	si->ps.i2c_bus0 = false;
+	si->ps.i2c_bus1 = false;
+
+	/* find existing buses */	
+	for (bus = 0; bus < 2; bus++)
+	{
+		/* reset status */
+		FlagIICError (-1);
+		snooze(6);
+		/* init and/or stop I2C bus */
+		bstop(bus);
+		/* check for hardware coupling of SCL and SDA -out and -in lines */
+		snooze(6);
+		OutSCL(bus, false);
+		OutSDA(bus, true);
+		snooze(3);
+		if (InSCL(bus) || !InSDA(bus)) continue;
+		snooze(3);
+		OutSCL(bus, true);
+		OutSDA(bus, false);
+		snooze(3);
+		if (!InSCL(bus) || InSDA(bus)) continue;
+		i2c_bus[bus] = true;
+		snooze(3);
+		/* re-init bus */
+		bstop(bus);
+	}
+
+	for (bus = 0; bus < 2; bus++)
+	{
+		if (i2c_bus[bus])
+			LOG(4,("I2C: bus #%d wiring check: passed\n", bus));
+		else
+			LOG(4,("I2C: bus #%d wiring check: failed\n", bus));
+	}
 
 	return B_OK;
-}
-
-status_t i2c_maven_probe(void)
-{
-	int ack;
-
-	/*scan the bus for the MAVEN*/
-	i2c_start();
-	{
-		ack = i2c_sendbyte(MAVEN_READ);
-	}
-	i2c_stop();
-	if (ack==0) 
-	{
-		return B_OK;
-	}
-	else
-	{
-		return B_ERROR;
-	}
 }

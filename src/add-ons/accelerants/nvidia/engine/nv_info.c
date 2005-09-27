@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-6/2005
+   Rudolf Cornelissen 7/2003-9/2005
 */
 
 #define MODULE_BIT 0x00002000
@@ -2131,6 +2131,7 @@ void fake_panel_start(void)
 	si->ps.tvout = false;
 	si->ps.tvout_chip_type = NONE;
 //fixme ;-)
+	i2c_init();
 /*	if (i2c_maven_probe() == B_OK)
 	{
 		si->ps.tvout = true;

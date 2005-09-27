@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-6/2005
+   Rudolf Cornelissen 10/2002-9/2005
 */
 
 #define MODULE_BIT 0x00008000
@@ -10,6 +10,7 @@
 
 static status_t test_ram(void);
 static status_t nvxx_general_powerup (void);
+static void unlock_card(void);
 static status_t nv_general_bios_to_powergraphics(void);
 
 static void nv_dump_configuration_space (void)
@@ -90,7 +91,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.53 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.54 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -1104,6 +1105,8 @@ static status_t nvxx_general_powerup()
 		LOG(2, ("INIT: Skipping card coldstart!\n"));
 	}
 
+	unlock_card();
+
 	/* get RAM size and fake panel startup (panel init code is still missing) */
 	fake_panel_start();
 
@@ -1195,14 +1198,8 @@ status_t nv_general_head_select(bool cross)
 	}
 }
 
-/* basic change of card state from VGA to enhanced mode:
- * Should work from VGA BIOS POST init state. */
-static status_t nv_general_bios_to_powergraphics()
+static void unlock_card(void)
 {
-	/* let acc engine make power off/power on cycle to start 'fresh' */
-	NV_REG32(NV32_PWRUPCTRL) = 0x13110011;
-	snooze(1000);
-
 	/* power-up all nvidia hardware function blocks */
 	/* bit 28: OVERLAY ENGINE (BES),
 	 * bit 25: CRTC2, (> NV04A)
@@ -1231,6 +1228,18 @@ static status_t nv_general_bios_to_powergraphics()
 		CRTC2W(LOCK, 0x57);
 		CRTC2W(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
 	}
+}
+
+/* basic change of card state from VGA to enhanced mode:
+ * Should work from VGA BIOS POST init state. */
+static status_t nv_general_bios_to_powergraphics()
+{
+	/* let acc engine make power off/power on cycle to start 'fresh' */
+	NV_REG32(NV32_PWRUPCTRL) = 0x13110011;
+	snooze(1000);
+	NV_REG32(NV32_PWRUPCTRL) = 0x13111111;
+
+	unlock_card();
 
 	/* turn off both displays and the hardcursors (also disables transfers) */
 	head1_dpms(false, false, false);
