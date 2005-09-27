@@ -507,6 +507,7 @@ void CDPlayer::WatchCDState(void)
 	
 	// Second, establish whether or not we have a CD in the drive
 	CDState playstate = fCDDrive.GetState();
+	bool internal_track_change=false;
 	
 	if(playstate == kNoCD)
 	{
@@ -549,6 +550,8 @@ void CDPlayer::WatchCDState(void)
 	{
 		if(fWindowState == kPlaying)
 		{
+			internal_track_change=true;
+			
 			// This means that the drive finished playing the song, so get the next one
 			// from the list and play it
 			int16 next = fPlayList.GetNextTrack();
@@ -623,16 +626,21 @@ void CDPlayer::WatchCDState(void)
 	
 	if(playstate == kPlaying)
 	{
-		// The main thing is that we need to make sure that the playlist and the drive's track
-		// stay in sync. The CD's track may have been changed by an outside source, so if
-		// the drive is playing, check for playlist sync.
 		if(playlisttrack != drivetrack)
 		{
 			playlisttrack = drivetrack;
-			fPlayList.SetTrackCount(drivecount);
-			fPlayList.SetCurrentTrack(drivetrack);
+			
+			if(!internal_track_change)
+			{
+				// The main thing is that we need to make sure that the playlist and the drive's track
+				// stay in sync. The CD's track may have been changed by an outside source, so if
+				// the drive is playing, check for playlist sync.
+				fPlayList.SetTrackCount(drivecount);
+				fPlayList.SetCurrentTrack(drivetrack);
+			}
 		}
 		update_track_gui=true;
+
 	}
 	else
 	{
