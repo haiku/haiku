@@ -282,6 +282,47 @@ _EXPORT int getsockname(int sock, struct sockaddr *addr, int *addrlen)
 	return rv;
 }
 
+
+_EXPORT int socketpair(int family, int type, int protocol, int socket_vector[2])
+{
+	struct stack_driver_args args;
+	int rv;
+	void *cookie;
+
+	socket_vector[0] = socket(family, type, protocol);
+	if (socket_vector[0] < 0) {
+		return socket_vector[0];
+	}
+
+	socket_vector[1] = socket(family, type, protocol);
+	if (socket_vector[1] < 0) {
+		close(socket_vector[0]);
+		return socket_vector[1];
+	}
+
+	// The network stack driver will need to know to which net_stack_cookie to 
+	// *bind* with the new accepted socket. He can't know himself find out 
+	// the net_stack_cookie of our new_sock file descriptor, the just open() one... 
+	// So, here, we ask him the net_stack_cookie value for our fd... :-) 
+	rv = ioctl(socket_vector[1], NET_STACK_GET_COOKIE, &cookie); 
+	if (rv < 0) {
+		close(socket_vector[0]);
+		close(socket_vector[1]); 
+		return rv;
+	}
+	
+	args.u.socketpair.cookie     = cookie; // this way driver can use the right fd/cookie! 	
+
+	rv = ioctl(socket_vector[0], NET_STACK_SOCKETPAIR, &args, sizeof(args));
+	if (rv < 0) {
+		close(socket_vector[0]);
+		close(socket_vector[1]);
+		return rv;
+	}
+	return rv;
+}
+
+
 // #pragma mark -
 
 

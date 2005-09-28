@@ -207,6 +207,7 @@ struct core_module_info core_info = {
 	socket_getsockopt,
 	socket_getpeername,
 	socket_getsockname,
+	socket_socketpair,
 	socket_set_event_callback,
 	socket_shutdown
 };

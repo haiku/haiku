@@ -433,7 +433,11 @@ static status_t net_stack_control(void *cookie, uint32 op, void *data, size_t le
 	
 			case NET_STACK_GETPEERNAME:
 				return g_core->socket_getpeername(nsc->socket, args->u.sockaddr.addr, &args->u.sockaddr.addrlen);
-				
+			
+			case NET_STACK_SOCKETPAIR: {
+				net_stack_cookie *ansc = args->u.socketpair.cookie;
+				return g_core->socket_socketpair(nsc->socket, &ansc->socket);
+			}
 			case B_SET_BLOCKING_IO: {
 				int off = false;
 				nsc->open_flags &= ~O_NONBLOCK;

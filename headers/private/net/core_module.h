@@ -157,6 +157,7 @@ struct core_module_info {
 	int (*socket_getsockopt)	(struct socket *so, int, int, void *, size_t *);
 	int (*socket_getpeername)	(struct socket *so, struct sockaddr *, int *);
 	int (*socket_getsockname)	(struct socket *so, struct sockaddr *, int *);
+	int (*socket_socketpair)	(struct socket *so, struct socket **nso);
 	int (*socket_set_event_callback)(struct socket *so, socket_event_callback, void *, int);
 	int (*socket_shutdown)		(struct socket *so, int how);
 };

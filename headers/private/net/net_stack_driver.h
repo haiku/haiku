@@ -37,6 +37,7 @@ enum {
 	NET_STACK_SETSOCKOPT,						// sockopt_args *
 	NET_STACK_GETSOCKNAME,						// sockaddr_args *
 	NET_STACK_GETPEERNAME,						// sockaddr_args *
+	NET_STACK_SOCKETPAIR,							// 
 
 	NET_STACK_SYSCTL,							// sysctl_args *
 	NET_STACK_SELECT,							// select_args *
@@ -77,6 +78,10 @@ struct socket_args {	// used by NET_STACK_SOCKET
 	int family;
 	int type;
 	int proto;
+};
+
+struct socketpair_args {	// used by NET_STACK_SOCKETPAIR
+	void *cookie;
 };
 
 struct accept_args {  // used by NET_STACK_ACCEPT 
@@ -156,6 +161,7 @@ struct stack_driver_args {
 		struct sysctl_args				sysctl;
 		struct select_args				select;
 		struct control_net_module_args	control;
+		struct socketpair_args				socketpair;
 	} u;
 };
 

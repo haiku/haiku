@@ -1565,3 +1565,12 @@ int socket_accept(struct socket *so, struct socket **nso, void *data, int *alen)
 	*nso = so;			
 	return error;
 }
+
+
+void
+socket_socketpair(struct socket *so, struct socket **nso)
+{
+	// TODO : implement, eventually fill nso with a new cookie
+	return ENOIMPL;
+}
+
