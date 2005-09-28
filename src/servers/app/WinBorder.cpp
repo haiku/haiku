@@ -626,6 +626,17 @@ WinBorder::MouseMoved(const PointerEvent& event, uint32 transit)
 	fLastMousePosition = event.where;
 }
 
+void
+WinBorder::WorkspaceActivated(int32 index, bool active)
+{
+	BMessage activatedMsg(B_WORKSPACE_ACTIVATED);
+	activatedMsg.AddInt64("when", real_time_clock_usecs());
+	activatedMsg.AddInt32("workspace", index);
+	activatedMsg.AddBool("active", active);
+
+	Window()->SendMessageToClient(&activatedMsg, B_NULL_TOKEN, false);
+}
+
 #else
 /*!
 	\brief Handles B_MOUSE_DOWN events and takes appropriate actions

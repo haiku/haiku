@@ -186,7 +186,6 @@ friend class WinBorder; // temporarily, I need invalidate_layer()
 			Desktop*			fDesktop;
 			BMessage*			fDragMessage;
 			Layer*				fLastLayerUnderMouse;
-			WinBorder*			fMouseTargetWinBorder;
 			int32				fViewAction;
 
 			Layer*				fNotifyLayer;
@@ -215,6 +214,7 @@ friend class WinBorder; // temporarily, I need invalidate_layer()
 			int32				fWinBorderListLength;
 			WinBorder**			fWinBorderList2;
 			WinBorder**			fWinBorderList;
+			WinBorder*			fMouseTargetWinBorder;
 #else
 // TODO: fWMState MUST be associated with a surface. This is the case now
 //   with RootLayer, but after Axel's refractoring this should go in

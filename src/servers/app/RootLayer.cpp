@@ -77,7 +77,6 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	  fDesktop(desktop),
 	  fDragMessage(NULL),
 	  fLastLayerUnderMouse(this),
-	  fMouseTargetWinBorder(NULL),
 	  fViewAction(B_ENTERED_VIEW),
 	  fNotifyLayer(NULL),
 	  fSavedEventMask(0),
@@ -101,6 +100,7 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	  fWinBorderListLength(64),
 	  fWinBorderList2((WinBorder**)malloc(fWinBorderListLength * sizeof(WinBorder*))),
 	  fWinBorderList((WinBorder**)malloc(fWinBorderListLength * sizeof(WinBorder*))),
+	  fMouseTargetWinBorder(NULL),
 #else
 	  fWMState(),
 #endif
@@ -723,9 +723,21 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 	if (index >= fWsCount || index == fActiveWksIndex || index < 0)
 		return false;
 
-	// you cannot switch workspaces on R5 if there is an event mask layer
-	if (fNotifyLayer)
+	// you cannot switch workspaces on R5 if there is an event mask BView
+	if (fNotifyLayer && fNotifyLayer->Owner())
 		return false;
+
+	// if you're dragging something you are allowed to change workspaces only if
+	// the Layer being dragged is a B_NORMAL_WINDOW_FEEL WinBorder.
+	WinBorder *draggedWinBorder = dynamic_cast<WinBorder*>(fNotifyLayer);
+	if (fNotifyLayer) {
+		if (draggedWinBorder) {
+			if (draggedWinBorder->Feel() != B_NORMAL_WINDOW_FEEL)
+				return false;
+		}
+		else
+			return false;
+	}
 
 	// if fWorkspace[index] object does not exist, create and add allowed WinBorders
 	if (!fWorkspace[index]) {
@@ -759,6 +771,7 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 		fLayerData->SetHighColor(RGBColor(255, 255, 255));
 	fLayerData->SetLowColor(fWorkspace[index]->BGColor());
 
+	// save some datas
 	int32 exIndex = ActiveWorkspaceIndex();
 #ifdef NEW_INPUT_HANDLING
 	Workspace::State oldWMState;
@@ -766,27 +779,48 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 #endif
 	// send the workspace changed message for the old workspace
 	{
+#ifndef NEW_INPUT_HANDLING
 		BMessage activatedMsg(B_WORKSPACE_ACTIVATED);
 		activatedMsg.AddInt64("when", real_time_clock_usecs());
 		activatedMsg.AddInt32("workspace", fActiveWksIndex);
 		activatedMsg.AddBool("active", false);
 
-#ifndef NEW_INPUT_HANDLING
 		for (int32 i = 0; i < fWinBorderCount; i++)
 			fWinBorderList[i]->Window()->SendMessageToClient(&activatedMsg, B_NULL_TOKEN, false);
 #else
 		Layer *layer;
-		WinBorder *winBorder;
 		for (int32 i = 0; (layer = static_cast<Layer*>(fWMState.WindowList.ItemAt(i++))); ) {
-			winBorder = dynamic_cast<WinBorder*>(layer);
-			if (winBorder)
-				winBorder->Window()->SendMessageToClient(&activatedMsg, B_NULL_TOKEN, false);
+			layer->WorkspaceActivated(fActiveWksIndex, false);
 		}
 #endif
 	}
 
 	fActiveWksIndex	= index;
+#ifdef NEW_INPUT_HANDLING
+	if (draggedWinBorder && !ActiveWorkspace()->HasWinBorder(draggedWinBorder)) {
+		// Workspace class expects a window to be hidden when it's about to be removed.
+		// As we surely know this windows is visible, we simply set fHidden to true and then
+		// change it back when adding winBorder to the current workspace.
+		draggedWinBorder->fHidden = true;
+		fWorkspace[exIndex]->HideWinBorder(draggedWinBorder);
+		fWorkspace[exIndex]->RemoveWinBorder(draggedWinBorder);
 
+		draggedWinBorder->fHidden = false;
+		ActiveWorkspace()->AddWinBorder(draggedWinBorder);
+		ActiveWorkspace()->ShowWinBorder(draggedWinBorder);
+
+		// TODO: can you call SetWinBorderWorskpaces() instead of this?
+		uint32 wks = draggedWinBorder->Workspaces();
+		BMessage changedMsg(B_WORKSPACES_CHANGED);
+		changedMsg.AddInt64("when", real_time_clock_usecs());
+		changedMsg.AddInt32("old", wks);
+		wks &= ~(0x00000001 << exIndex);
+		wks |= (0x00000001 << fActiveWksIndex);
+		changedMsg.AddInt32("new", wks);
+		draggedWinBorder->QuietlySetWorkspaces(wks);
+		draggedWinBorder->Window()->SendMessageToClient(&changedMsg, B_NULL_TOKEN, false);
+	}
+#else
 	if (fMouseTargetWinBorder) {
 //	if (fMovingWindow && fNotifyLayer) {
 //		WinBorder	*movingWinBorder = (WinBorder*)fNotifyLayer;
@@ -839,9 +873,9 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 		fMovingWindow = false;
 		fResizingWindow	= false;
 	}*/
-
-	fHaveWinBorderList = true;
+#endif
 #ifndef NEW_INPUT_HANDLING
+	fHaveWinBorderList = true;
 	get_workspace_windows();
 
 	if (WorkspacesLayer() != NULL)
@@ -857,21 +891,18 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 
 	// send the workspace changed message for the new workspace
 	{
+#ifndef NEW_INPUT_HANDLING
 		BMessage	activatedMsg(B_WORKSPACE_ACTIVATED);
 		activatedMsg.AddInt64("when", real_time_clock_usecs());
 		activatedMsg.AddInt32("workspace", fActiveWksIndex);
 		activatedMsg.AddBool("active", true);
 
-#ifndef NEW_INPUT_HANDLING
 		for (int32 i = 0; i < fWinBorderCount; i++)
 			fWinBorderList[i]->Window()->SendMessageToClient(&activatedMsg, B_NULL_TOKEN, false);
 #else
 		Layer *layer;
-		WinBorder *winBorder;
 		for (int32 i = 0; (layer = static_cast<Layer*>(fWMState.WindowList.ItemAt(i++))); ) {
-			winBorder = dynamic_cast<WinBorder*>(layer);
-			if (winBorder)
-				winBorder->Window()->SendMessageToClient(&activatedMsg, B_NULL_TOKEN, false);
+			layer->WorkspaceActivated(fActiveWksIndex, true);
 		}
 #endif
 
@@ -885,6 +916,10 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 void
 RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldWksIndex, uint32 newWksIndex)
 {
+#ifdef NEW_INPUT_HANDLING
+	printf("RootLayer::SetWinBorderWorskpaces() UNIMPLEMENTED\n");
+	return;
+#endif
 	// you *cannot* set workspaces index for a window other than a normal one!
 	// Note: See ServerWindow class.
 	if (winBorder->Feel() != B_NORMAL_WINDOW_FEEL)
@@ -1223,7 +1258,6 @@ RootLayer::_ProcessMouseMovedEvent(PointerEvent &evt)
 	// change focus in FFM mode
 	WinBorder* winBorderTarget = dynamic_cast<WinBorder*>(target);
 	if (winBorderTarget) {
-		// TODO: figure out what other mouse modes are for!!!
 		DesktopSettings ds(gDesktop);
 		// TODO: Focus should be a RootLayer option/feature, NOT a Workspace one!!!
 		WinBorder* exFocus = Focus();
@@ -2095,7 +2129,7 @@ RootLayer::SetNotifyLayer(Layer *lay, uint32 mask, uint32 options)
 
 	Lock();
 
-#if NEW_INPUT_HANDLING // to be removed when the new "event" stuff is ready
+#ifdef NEW_INPUT_HANDLING
 	fNotifyLayer = lay;
 	fSavedEventMask = lay->EventMask();
 	fSavedEventOptions = lay->EventOptions();
@@ -2149,9 +2183,10 @@ RootLayer::LayerRemoved(Layer* layer)
 
 	if (layer == fLastLayerUnderMouse)
 		fLastLayerUnderMouse = NULL;
-
+#ifndef NEW_INPUT_HANDLING
 	if (layer == fMouseTargetWinBorder)
 		fMouseTargetWinBorder = NULL;
+#endif
 }
 
 

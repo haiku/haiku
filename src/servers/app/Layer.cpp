@@ -1150,6 +1150,11 @@ Layer::MouseMoved(const PointerEvent& evt, uint32 transit)
 		Window()->SendMessageToClient(&movemsg, fViewToken, false);
 	}
 }
+void
+Layer::WorkspaceActivated(int32 index, bool active)
+{
+	// Empty
+}
 #endif
 // BoundsOrigin
 BPoint

@@ -169,6 +169,7 @@ class Layer {
 	virtual	void				MouseDown(const PointerEvent& evt);
 	virtual	void				MouseUp(const PointerEvent& evt);
 	virtual	void				MouseMoved(const PointerEvent& evt, uint32 transit);
+	virtual	void				WorkspaceActivated(int32 index, bool active);
 #endif
 			BPoint				BoundsOrigin() const; // BoundsFrameDiff()?
 			float				Scale() const;
