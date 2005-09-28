@@ -286,7 +286,7 @@
 /* #undef gid_t */
 
 /* Define to `unsigned int' if <sys/socket.h> doesn't define. */
-#define socklen_t int
+// #define socklen_t int
 
 /* Define if you have quad_t in <sys/types.h>. */
 /* #undef HAVE_QUAD_T */
