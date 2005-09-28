@@ -57,6 +57,7 @@ class PackageCheckBox : public BCheckBox {
 		PackageCheckBox(BRect rect, Package &item);
 		virtual ~PackageCheckBox();
 		virtual void Draw(BRect update);
+		Package *GetPackage() { return &fPackage; };
 	private:
 		Package &fPackage;
 };

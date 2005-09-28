@@ -5,14 +5,40 @@
  */
 #include "InstallerCopyLoopControl.h"
 
-InstallerCopyLoopControl::InstallerCopyLoopControl(InstallerWindow *window)
-	: CopyLoopControl(),
-	fWindow(window)
+/* copied from libtracker, because beos loader doesn't seem to find them correctly in libtracker.so */
+
+BPrivate::CopyLoopControl::~CopyLoopControl()
+{
+}
+
+void 
+BPrivate::CopyLoopControl::ChecksumChunk(const char *, size_t)
 {
 }
 
 
-InstallerCopyLoopControl::~InstallerCopyLoopControl(void)
+bool 
+BPrivate::CopyLoopControl::ChecksumFile(const entry_ref *)
+{
+	return true;
+}
+
+
+bool
+BPrivate::CopyLoopControl::SkipAttribute(const char*)
+{
+	return false;
+}
+
+
+bool
+BPrivate::CopyLoopControl::PreserveAttribute(const char*)
+{
+	return false;
+}
+
+InstallerCopyLoopControl::InstallerCopyLoopControl(InstallerWindow *window)
+	: fWindow(window)
 {
 }
 

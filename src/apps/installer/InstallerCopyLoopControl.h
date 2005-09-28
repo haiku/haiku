@@ -14,7 +14,7 @@ class InstallerCopyLoopControl : public CopyLoopControl
 {
 public:
 		InstallerCopyLoopControl(InstallerWindow *window);
-		~InstallerCopyLoopControl(void);
+		virtual ~InstallerCopyLoopControl() {};
 		
 		virtual bool FileError(const char *message, const char *name, status_t error,
 			bool allowContinue);

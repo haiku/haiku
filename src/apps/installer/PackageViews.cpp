@@ -223,5 +223,12 @@ PackagesView::AddPackages(BList &packages, BMessage *msg)
 void 
 PackagesView::GetTotalSizeAsString(char *string)
 {
-	SizeAsString(0, string);
+	int32 count = CountChildren();
+	int32 size = 0;
+	for (int32 i=0; i<count; i++) {
+		PackageCheckBox *cb = dynamic_cast<PackageCheckBox*>(ChildAt(i));
+		if (cb && cb->Value())
+			size += cb->GetPackage()->Size();
+	}
+	SizeAsString(size, string);
 }

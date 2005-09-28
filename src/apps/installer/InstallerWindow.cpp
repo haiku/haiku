@@ -87,11 +87,14 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 	fBackBox->AddChild(fDestMenuField);
 
 	BRect sizeRect = fBackBox->Bounds();
-	sizeRect.top = sizeRect.bottom - 15;
-	sizeRect.left = sizeRect.right - 100;
-	fSizeView = new BStringView(sizeRect, "size_view", "Disk space required : 0.0 KB");
+	sizeRect.top = 105;
+	sizeRect.bottom = sizeRect.top + 15;
+	sizeRect.right -= 12;
+	sizeRect.left = sizeRect.right - 150;
+	fSizeView = new BStringView(sizeRect, "size_view", "Disk space required: 0.0 KB", B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	fSizeView->SetAlignment(B_ALIGN_RIGHT);
 	fBackBox->AddChild(fSizeView);
+	fSizeView->Hide();
 
 	// finish creating window
 	Show();
@@ -172,11 +175,15 @@ InstallerWindow::ShowBottom()
 			fSetupButton->Show();
 		if (fPackagesScrollView->IsHidden())
 			fPackagesScrollView->Show();
+		if (fSizeView->IsHidden())
+			fSizeView->Show();
 	} else {
 		if (!fSetupButton->IsHidden())
 			fSetupButton->Hide();
 		if (!fPackagesScrollView->IsHidden())
 			fPackagesScrollView->Hide();
+		if (!fSizeView->IsHidden())
+			fSizeView->Hide();
 		ResizeTo(332,160);
 	}
 }
@@ -253,6 +260,7 @@ InstallerWindow::PublishPackages()
 	packages.SortItems(ComparePackages);
 
 	fPackagesView->AddPackages(packages, new BMessage(PACKAGE_CHECKBOX));
+	PostMessage(PACKAGE_CHECKBOX);	
 }
 
 
