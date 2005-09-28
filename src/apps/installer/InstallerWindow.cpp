@@ -24,6 +24,7 @@ const uint32 SETUP_MESSAGE = 'iSEP';
 const uint32 START_SCAN = 'iSSC';
 const uint32 SRC_PARTITION = 'iSPT';
 const uint32 DST_PARTITION = 'iDPT';
+const uint32 PACKAGE_CHECKBOX = 'iPCB';
 
 InstallerWindow::InstallerWindow(BRect frame_rect)
 	: BWindow(frame_rect, "Installer", B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
@@ -84,7 +85,14 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 	fDestMenuField->SetDivider(70.0);
 	fDestMenuField->SetAlignment(B_ALIGN_RIGHT);
 	fBackBox->AddChild(fDestMenuField);
-	
+
+	BRect sizeRect = fBackBox->Bounds();
+	sizeRect.top = sizeRect.bottom - 15;
+	sizeRect.left = sizeRect.right - 100;
+	fSizeView = new BStringView(sizeRect, "size_view", "Disk space required : 0.0 KB");
+	fSizeView->SetAlignment(B_ALIGN_RIGHT);
+	fBackBox->AddChild(fSizeView);
+
 	// finish creating window
 	Show();
 
@@ -118,6 +126,14 @@ InstallerWindow::MessageReceived(BMessage *msg)
 		case SETUP_MESSAGE:
 			LaunchDriveSetup();
 			break;
+		case PACKAGE_CHECKBOX: {
+			char buffer[15];
+			fPackagesView->GetTotalSizeAsString(buffer);
+			char string[255];
+			sprintf(string, "Disk space required: %s", buffer);
+			fSizeView->SetText(string);
+			break;
+		}
 		case B_SOME_APP_LAUNCHED:
 		case B_SOME_APP_QUIT:
 		{
@@ -236,7 +252,7 @@ InstallerWindow::PublishPackages()
 	}
 	packages.SortItems(ComparePackages);
 
-	fPackagesView->AddPackages(packages);
+	fPackagesView->AddPackages(packages, new BMessage(PACKAGE_CHECKBOX));
 }
 
 

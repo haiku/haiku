@@ -8,14 +8,35 @@
 #define _INSTALLERCOPYLOOPCONTROL_H
 
 #include "FSUtils.h"
+#include "InstallerWindow.h"
 
 class InstallerCopyLoopControl : public CopyLoopControl
 {
 public:
-	InstallerCopyLoopControl();
-	~InstallerCopyLoopControl(void);
+		InstallerCopyLoopControl(InstallerWindow *window);
+		~InstallerCopyLoopControl(void);
+		
+		virtual bool FileError(const char *message, const char *name, status_t error,
+			bool allowContinue);
+
+		virtual void UpdateStatus(const char *name, entry_ref ref, int32 count, 
+			bool optional = false);
+
+		virtual bool CheckUserCanceled();
+
+		virtual OverwriteMode OverwriteOnConflict(const BEntry *srcEntry, 
+			const char *destName, const BDirectory *destDir, bool srcIsDir, 
+			bool dstIsDir);
+
+		virtual bool SkipEntry(const BEntry *, bool file);
+		
+		virtual void ChecksumChunk(const char *block, size_t size);
+		virtual bool ChecksumFile(const entry_ref *);
+		virtual bool SkipAttribute(const char *attributeName);
+		virtual bool PreserveAttribute(const char *attributeName);
 	
 private:
+	InstallerWindow *fWindow;
 };
 
 #endif

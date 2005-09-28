@@ -76,7 +76,8 @@ public:
 	PackagesView(BRect rect, const char* name);
 	virtual ~PackagesView();
 	void Clean();
-	void AddPackages(BList &list);
+	void AddPackages(BList &list, BMessage *msg);
+	void GetTotalSizeAsString(char *string);
 private:
 	BList fViews;
 };

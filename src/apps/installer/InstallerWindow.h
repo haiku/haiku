@@ -39,6 +39,7 @@ private:
 	BMenuField* fSrcMenuField, *fDestMenuField;
 	PackagesView *fPackagesView;
 	BScrollView *fPackagesScrollView;
+	BStringView *fSizeView;
 };
 
 #endif /* _InstallerWindow_h */

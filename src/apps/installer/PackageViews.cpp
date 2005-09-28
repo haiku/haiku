@@ -13,6 +13,23 @@
 
 #define ICON_ATTRIBUTE "INSTALLER PACKAGE: ICON"
 
+static void
+SizeAsString(int32 size, char *string)
+{
+	float kb = size / 1024.0;
+	if (kb < 1.0) {
+		sprintf(string, "%ld B", size);
+		return;
+	}
+	float mb = kb / 1024.0;
+	if (mb < 1.0) {
+		sprintf(string, "%3.1f KB", kb);
+		return;
+	}
+	sprintf(string, "%3.1f MB", mb);
+}
+
+
 Package::Package()
 	: Group(),
 	fName(NULL),
@@ -83,18 +100,7 @@ err:
 void 
 Package::GetSizeAsString(char *string)
 {
-	float kb = fSize / 1024.0;
-	if (kb < 1.0) {
-		sprintf(string, "%ld B", fSize);
-		return;
-	}
-	float mb = kb / 1024.0;
-	if (mb < 1.0) {
-		sprintf(string, "%3.1f KB", kb);
-		return;
-	}
-	sprintf(string, "%3.1f MB", mb);
-	
+	SizeAsString(fSize, string);
 }
 
 
@@ -126,7 +132,7 @@ void
 PackageCheckBox::Draw(BRect update)
 {
 	BCheckBox::Draw(update);
-	char string[255];
+	char string[15];
 	fPackage.GetSizeAsString(string);
 	float width = StringWidth(string);
 	DrawString(string, BPoint(Bounds().right - width - 8, 11));
@@ -152,7 +158,6 @@ GroupView::~GroupView()
 PackagesView::PackagesView(BRect rect, const char* name)
 	: BView(rect, name, B_FOLLOW_ALL_SIDES, B_WILL_DRAW|B_FRAME_EVENTS)
 {
-
 }
 
 
@@ -170,7 +175,7 @@ PackagesView::Clean()
 
 
 void
-PackagesView::AddPackages(BList &packages)
+PackagesView::AddPackages(BList &packages, BMessage *msg)
 {
 	int32 count = packages.CountItems();
 	BRect rect = Bounds();
@@ -193,6 +198,7 @@ PackagesView::AddPackages(BList &packages)
 		PackageCheckBox *checkBox = new PackageCheckBox(rect, *package);
 		checkBox->SetValue(package->OnByDefault() ? B_CONTROL_ON : B_CONTROL_OFF);
 		checkBox->SetEnabled(!package->AlwaysOn());
+		checkBox->SetMessage(msg);
 		AddChild(checkBox);
 		rect.OffsetBy(0, 20);
 	}
@@ -211,4 +217,11 @@ PackagesView::AddPackages(BList &packages)
 	vertScroller->SetSteps(15, bounds.Height());
 	
 	Invalidate();
+}
+
+
+void 
+PackagesView::GetTotalSizeAsString(char *string)
+{
+	SizeAsString(0, string);
 }
