@@ -43,6 +43,7 @@ StdBinCommands
 #	whoami.c
 	: libroot.so ;
 
+# standard commands that need libtermcap.a
 StdBinCommands
 	top.c
 	tput.c
@@ -61,6 +62,7 @@ StdBinCommands
 	ffm.cpp
 	iroster.cpp
 	listattr.cpp
+	mimeset.cpp
 	mkindex.cpp
 	modifiers.cpp
 	open.cpp
