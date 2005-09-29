@@ -8,6 +8,17 @@
 
 #include "boot_block.h"
 #include "compat.h"
+
+// the definitions in fsproto.h (included by kprotos.h) and fs_interface.h
+// (included by Volume.h) are not compatible
+#define get_vnode _get_vnode
+#define put_vnode _put_vnode
+#define new_vnode _new_vnode
+#define remove_vnode _remove_vnode
+#define unremove_vnode _unremove_vnode
+#define notify_listener _notify_listener
+#define send_notification _send_notification
+
 #include "kprotos.h"
 
 #include <string.h>
