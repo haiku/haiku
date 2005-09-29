@@ -778,66 +778,6 @@
 #define NV32_NV44_WHAT12	0x00001708
 #define NV32_NV44_WHAT13	0x0000170c
 
-//old:
-/*MAVEN registers (<= G400) */
-#define NVMAV_PGM            0x3E
-#define NVMAV_PIXPLLM        0x80
-#define NVMAV_PIXPLLN        0x81
-#define NVMAV_PIXPLLP        0x82
-#define NVMAV_GAMMA1         0x83
-#define NVMAV_GAMMA2         0x84
-#define NVMAV_GAMMA3         0x85
-#define NVMAV_GAMMA4         0x86
-#define NVMAV_GAMMA5         0x87
-#define NVMAV_GAMMA6         0x88
-#define NVMAV_GAMMA7         0x89
-#define NVMAV_GAMMA8         0x8A
-#define NVMAV_GAMMA9         0x8B
-#define NVMAV_MONSET         0x8C
-#define NVMAV_TEST           0x8D
-#define NVMAV_WREG_0X8E_L    0x8E
-#define NVMAV_WREG_0X8E_H    0x8F
-#define NVMAV_HSCALETV       0x90
-#define NVMAV_TSCALETVL      0x91
-#define NVMAV_TSCALETVH      0x92
-#define NVMAV_FFILTER        0x93
-#define NVMAV_MONEN          0x94
-#define NVMAV_RESYNC         0x95
-#define NVMAV_LASTLINEL      0x96
-#define NVMAV_LASTLINEH      0x97
-#define NVMAV_WREG_0X98_L    0x98
-#define NVMAV_WREG_0X98_H    0x99
-#define NVMAV_HSYNCLENL      0x9A
-#define NVMAV_HSYNCLENH      0x9B
-#define NVMAV_HSYNCSTRL      0x9C
-#define NVMAV_HSYNCSTRH      0x9D
-#define NVMAV_HDISPLAYL      0x9E
-#define NVMAV_HDISPLAYH      0x9F
-#define NVMAV_HTOTALL        0xA0
-#define NVMAV_HTOTALH        0xA1
-#define NVMAV_VSYNCLENL      0xA2
-#define NVMAV_VSYNCLENH      0xA3
-#define NVMAV_VSYNCSTRL      0xA4
-#define NVMAV_VSYNCSTRH      0xA5
-#define NVMAV_VDISPLAYL      0xA6
-#define NVMAV_VDISPLAYH      0xA7
-#define NVMAV_VTOTALL        0xA8
-#define NVMAV_VTOTALH        0xA9
-#define NVMAV_HVIDRSTL       0xAA
-#define NVMAV_HVIDRSTH       0xAB
-#define NVMAV_VVIDRSTL       0xAC
-#define NVMAV_VVIDRSTH       0xAD
-#define NVMAV_VSOMETHINGL    0xAE
-#define NVMAV_VSOMETHINGH    0xAF
-#define NVMAV_OUTMODE        0xB0
-#define NVMAV_LOCK           0xB3
-#define NVMAV_LUMA           0xB9
-#define NVMAV_VDISPLAYTV     0xBE
-#define NVMAV_STABLE         0xBF
-#define NVMAV_HDISPLAYTV     0xC2
-#define NVMAV_BREG_0XC6      0xC6
-//end old.
-
 /* Macros for convenient accesses to the NV chips */
 #define NV_REG8(r_)  ((vuint8  *)regs)[(r_)]
 #define NV_REG16(r_) ((vuint16 *)regs)[(r_) >> 1]
@@ -892,10 +832,3 @@
 /* read and write from the acceleration engine registers */
 #define ACCR(A)    (NV_REG32(NVACC_##A))
 #define ACCW(A,B)  (NV_REG32(NVACC_##A)=B)
-
-//old:
-/* read and write from maven (<= G400) */
-#define MAVR(A)     (i2c_maven_read (NVMAV_##A ))
-#define MAVW(A,B)   (i2c_maven_write(NVMAV_##A ,B))
-#define MAVRW(A)    (i2c_maven_read (NVMAV_##A )|(i2c_maven_read(NVMAV_##A +1)<<8))
-#define MAVWW(A,B)  (i2c_maven_write(NVMAV_##A ,B &0xFF),i2c_maven_write(NVMAV_##A +1,B >>8))
