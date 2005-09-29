@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 4/2003-5/2004
+	Rudolf Cornelissen 4/2003-9/2005
 */
 
 #define MODULE_BIT 0x20000000
@@ -55,9 +55,41 @@ void MOVE_CURSOR(uint16 x, uint16 y)
 	si->cursor.x = x;
 	si->cursor.y = y;
 
-	/* setting up minimum amount to scroll not needed:
-	 * Nvidia cards can always do pixelprecise panning on both heads */
-	h_adjust = 0x00;
+	/* set up minimum amount to scroll */
+	if (si->dm.flags & DUALHEAD_BITS)
+	{
+		//fixme for VIA...
+		switch(si->dm.space)
+		{
+		case B_RGB16_LITTLE:
+			h_adjust = 0x1f;
+			break;
+		case B_RGB32_LITTLE:
+			h_adjust = 0x0f;
+			break;
+		default:
+			h_adjust = 0x1f;
+			break;
+		}
+	}
+	else
+	{
+		switch(si->dm.space)
+		{
+		case B_CMAP8:
+			h_adjust = 0x07;
+			break;
+		case B_RGB15_LITTLE:case B_RGB16_LITTLE:
+			h_adjust = 0x03;
+			break;
+		case B_RGB32_LITTLE:
+			h_adjust = 0x01;
+			break;
+		default:
+			h_adjust = 0x07;
+			break;
+		}
+	}
 
 	/* adjust h/v_display_start to move cursor onto screen */
 	switch (si->dm.flags & DUALHEAD_BITS)

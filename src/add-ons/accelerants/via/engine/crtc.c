@@ -1,6 +1,6 @@
 /* CTRC functionality */
 /* Author:
-   Rudolf Cornelissen 11/2002-7/2005
+   Rudolf Cornelissen 11/2002-9/2005
 */
 
 #define MODULE_BIT 0x00040000
@@ -585,76 +585,27 @@ status_t eng_crtc_set_display_pitch()
 	CRTCW(PITCHL, (offset & 0x00ff));
 	CRTCW(VTIMEXT_PIT, (((CRTCR(VTIMEXT_PIT)) & 0x1f) | ((offset & 0x0700) >> 3)));
 
-//test stuff:
-//	LOG(2,("CRTC: $32=$%02x, $33=$%02x, $35=$%02x, $36=$%02x\n",
-//		(CRTCR(0x32)), (CRTCR(0x33)), (CRTCR(0x35)), (CRTCR(0x36))));
-//	LOG(2,("SEQ: $14=$%02x, $15=$%02x, $16=$%02x, $17=$%02x\n",
-//		(SEQR(0x14)), (SEQR(0x15)), (SEQR(0x16)), (SEQR(0x17))));
-//	LOG(2,("SEQ: $18=$%02x, $19=$%02x, $1a=$%02x, $1b=$%02x\n",
-//		(SEQR(0x18)), (SEQR(0x19)), (SEQR(0x1a)), (SEQR(0x1b))));
-//	LOG(2,("SEQ: $1c=$%02x, $1d=$%02x, $1e=$%02x, $1f=$%02x\n",
-//		(SEQR(0x1c)), (SEQR(0x1d)), (SEQR(0x1e)), (SEQR(0x1f))));
-//	LOG(2,("SEQ: $22=$%02x, $23=$%02x, $24=$%02x, $25=$%02x\n",
-//		(SEQR(0x22)), (SEQR(0x23)), (SEQR(0x24)), (SEQR(0x25))));
-//	LOG(2,("SEQ: $26=$%02x, $27=$%02x, $28=$%02x, $29=$%02x\n",
-//		(SEQR(0x26)), (SEQR(0x27)), (SEQR(0x28)), (SEQR(0x29))));
-//	LOG(2,("SEQ: $2a=$%02x, $2b=$%02x, $2e=$%02x\n",
-//		(SEQR(0x2a)), (SEQR(0x2b)), (SEQR(0x2e))));
-//	LOG(2,("SEQ: $44=$%02x, $45=$%02x, $46=$%02x, $47=$%02x\n",
-//		(SEQR(0x44)), (SEQR(0x45)), (SEQR(0x46)), (SEQR(0x47))));
-
 	return B_OK;
 }
 
 status_t eng_crtc_set_display_start(uint32 startadd,uint8 bpp) 
 {
-//	uint8 temp;
-	uint32 timeout = 0;
-
 	LOG(4,("CRTC: setting card RAM to be displayed bpp %d\n", bpp));
 
 	LOG(2,("CRTC: startadd: $%08x\n", startadd));
 	LOG(2,("CRTC: frameRAM: $%08x\n", si->framebuffer));
 	LOG(2,("CRTC: framebuffer: $%08x\n", si->fbc.frame_buffer));
 
-	/* we might have no retraces during setmode! */
-	/* wait 25mS max. for retrace to occur (refresh > 40Hz) */
-//	while (((ENG_REG32(RG32_RASTER) & 0x000007ff) < si->dm.timing.v_display) &&
-//			(timeout < (25000/10)))
-	if (0)
-	{
-		/* don't snooze much longer or retrace might get missed! */
-		snooze(10);
-		timeout++;
-	}
-
-/*
-linux:
-   vgaHWGetIOBase(hwp);
-        vgaIOBase = hwp->IOBase; //3d0 (rud)
-        vgaCRIndex = vgaIOBase + 4;
-
-define VGAOUT16(addr, val) MMIO_OUT16(pVia->MapBase+0x8000, addr, val)
-
-      Base = Base >> 1;
-        VGAOUT16(vgaCRIndex, (Base & 0x00ff00) | 0x0c);
-        VGAOUT16(vgaCRIndex, ((Base & 0x00ff) << 8) | 0x0d);
-        VGAOUT16(vgaCRIndex, ((Base & 0xff0000) >> 8) | 0x34);
-*/
- 
 	/* VIA: upto 32Mb RAM can be adressed */
 
 	/* set standard registers */
-	/* (VIA: startadress in 16bit words (b1 - b16) */
-	CRTCW(FBSTADDL, ((startadd & 0x000001fe) >> 1));
+	/* (VIA: startadress in 64bit words (b3 - b16): checked CLE266) */
+	CRTCW(FBSTADDL, ((startadd & 0x000001f8) >> 1));
 	CRTCW(FBSTADDH, ((startadd & 0x0001fe00) >> 9));
 	/* set extended bits: (b17-24) */
 	CRTCW(FBSTADDE, ((startadd & 0x01fe0000) >> 17));
 
-//fixme: findout if VIA supports pixelpanning...
-
-	/* set NV4/NV10 byte adress: (b0 - 1) */
-//	ATBW(HORPIXPAN, ((startadd & 0x00000003) << 1));
+	/* VIA doesn't support pixelpanning (checked CLE266). */
 
 	return B_OK;
 }

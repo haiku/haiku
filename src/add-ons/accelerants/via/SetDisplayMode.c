@@ -6,7 +6,7 @@
 	Other authors:
 	Mark Watson,
 	Apsed,
-	Rudolf Cornelissen 11/2002-7/2005
+	Rudolf Cornelissen 11/2002-9/2005
 */
 
 #define MODULE_BIT 0x00200000
@@ -339,27 +339,48 @@ status_t MOVE_DISPLAY(uint16 h_display_start, uint16 v_display_start) {
 
 	LOG(4,("MOVE_DISPLAY: h %d, v %d\n", h_display_start, v_display_start));
 
-	/* nVidia cards support pixelprecise panning on both heads in all modes:
-	 * No stepping granularity needed! */
+	/* VIA CRTC1 handles multiples of 8 for 8bit, 4 for 16bit, 2 for 32 bit 
+	   VIA CRTC2 is yet unknown...
+     */
 
-	/* determine bits used for the colordepth */
-	switch(si->dm.space)
+	/* reset lower bits, don't return an error! */
+	if (si->dm.flags & DUALHEAD_BITS)
 	{
-	case B_CMAP8:
-		colour_depth=8;
-		break;
-	case B_RGB15_LITTLE:
-	case B_RGB16_LITTLE:
-		colour_depth=16;
-		break;
-	case B_RGB24_LITTLE:
-		colour_depth=24;
-		break;
-	case B_RGB32_LITTLE:
-		colour_depth=32;
-		break;
-	default:
-		return B_ERROR;
+		//fixme for VIA...
+		switch(si->dm.space)
+		{
+		case B_RGB16_LITTLE:
+			colour_depth=16;
+			h_display_start &= ~0x1f;
+			break;
+		case B_RGB32_LITTLE:
+			colour_depth=32;
+			h_display_start &= ~0x0f;
+			break;
+		default:
+			LOG(8,("SET:Invalid DH colour depth 0x%08x, should never happen\n", si->dm.space));
+			return B_ERROR;
+		}
+	}
+	else
+	{
+		switch(si->dm.space)
+		{
+		case B_CMAP8:
+			colour_depth=8;
+			h_display_start &= ~0x07;
+			break;
+		case B_RGB15_LITTLE: case B_RGB16_LITTLE:
+			colour_depth=16;
+			h_display_start &= ~0x03;
+			break;
+		case B_RGB32_LITTLE:
+			colour_depth=32;
+			h_display_start &= ~0x01;
+			break;
+		default:
+			return B_ERROR;
+		}
 	}
 
 	/* do not run past end of display */
