@@ -1,4 +1,4 @@
-/* Written by Rudolf Cornelissen 05/2002-9/2004 */
+/* Written by Rudolf Cornelissen 05/2002-9/2005 */
 
 /* Note on 'missing features' in BeOS 5.0.3 and DANO:
  * BeOS needs to define more colorspaces! It would be nice if BeOS would support the FourCC 'definitions'
@@ -95,12 +95,12 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 		switch (cs)
 		{
 			case B_YCbCr422:
-					/* check if slopspace is needed: RIVA128 and TNT need ~0x000f. */
-					si->overlay.myBuffer[offset].width = ((width + 0x000f) & ~0x000f);
+					/* check if slopspace is needed: VIA CLE266 needs ~0x0007. */
+					si->overlay.myBuffer[offset].width = ((width + 0x0007) & ~0x0007);
 					si->overlay.myBuffer[offset].bytes_per_row = 2 * si->overlay.myBuffer[offset].width;
 
 					/* check if the requested horizontal pitch is supported: */
-					//fixme: tune for GF and TNT...
+					//fixme: tune for VIA... (overruled below, this should probably be a bytes_per_row check)
 					if (si->overlay.myBuffer[offset].width > 4088)
 					{
 						LOG(4,("Overlay: Sorry, requested buffer pitch not supported, aborted\n"));
@@ -377,11 +377,11 @@ status_t GET_OVERLAY_CONSTRAINTS
 		{
 			case B_YCbCr422:
 					/* Note: this has to be in sync with the slopspace setup during buffer allocation.. */
-					oc->view.width_alignment = 15;
+					oc->view.width_alignment = 7;
 					break;
 			default:
 					/* we should not be here, but set the worst-case value just to be safe anyway */
-					oc->view.width_alignment = 15;
+					oc->view.width_alignment = 7;
 					break;
 		}
 
