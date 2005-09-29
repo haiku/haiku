@@ -18,22 +18,26 @@
 */
 static uint8 BT_check (uint8 bus, uint8 adress)
 {
-	/* reset status */
-	i2c_flag_error (-1);
+	uint8 buffer[3];
 
-	/* do check */
-	i2c_bstart(bus);
-	i2c_writebyte(bus, adress + WR);
+	buffer[0] = adress + WR;
 	/* set ESTATUS at b'00'; and enable bt chip-outputs
 	 * WARNING:
 	 * If bit0 = 0 is issued below (EN_OUT = disabled), the BT will lock SDA
 	 * after writing adress $A0 (setting EN_XCLK)!!!
 	 * Until a reboot the corresponding IIC bus will be inacessable then!!! */
-	i2c_writebyte(bus, 0xc4);
+	buffer[1] = 0xc4;
 	/* fixme: if testimage 'was' active txbuffer[3] should become 0x05...
 	 * (currently this cannot be detected in a 'foolproof' way so don't touch...) */
 	/* (ESTATUS b'0x' means: RX ID and VERSION info later..) */
-	i2c_writebyte(bus, 0x01);
+	buffer[2] = 0x01;
+
+	/* reset status */
+	i2c_flag_error (-1);
+
+	/* do check */
+	i2c_bstart(bus);
+	i2c_writebuffer(bus, buffer, sizeof(buffer));
 	i2c_bstop(bus);
 	return i2c_flag_error(0);
 }
@@ -41,20 +45,22 @@ static uint8 BT_check (uint8 bus, uint8 adress)
 /* identify chiptype */
 static uint8 BT_read_type (void)
 {
-	uint8 id, stat;
+	uint8 id, type, stat;
+	uint8 buffer[3];
+
+	/* Make sure a CX (Conexant) chip (if this turns out to be there) is set to
+	 * BT-compatibility mode! (This command will do nothing on a BT chip...) */
+	buffer[0] = si->ps.tv_encoder.adress + WR;
+	/* select CX reg. for BT-compatible readback, video still off */
+	buffer[1] = 0x6c;
+	/* set it up */
+	buffer[2] = 0x02;
 
 	/* reset status */
 	i2c_flag_error (-1);
 
-//fixme: setup higher level static I2C routines in this file.
-	/* Make sure a CX (Conexant) chip (if this turns out to be there) is set to
-	 * BT-compatibility mode! (This command will do nothing on a BT chip...) */
 	i2c_bstart(si->ps.tv_encoder.bus);
-	i2c_writebyte(si->ps.tv_encoder.bus, si->ps.tv_encoder.adress + WR);
-	/* select CX reg. for BT-compatible readback, video still off */
-	i2c_writebyte(si->ps.tv_encoder.bus, 0x6c);
-	/* set it up */
-	i2c_writebyte(si->ps.tv_encoder.bus, 0x02);
+	i2c_writebuffer(si->ps.tv_encoder.bus, buffer, sizeof(buffer));
 	i2c_bstop(si->ps.tv_encoder.bus);
 	/* abort on errors */
 	stat = i2c_flag_error(0);
@@ -75,9 +81,17 @@ static uint8 BT_read_type (void)
 	stat = i2c_flag_error(0);
 	if (stat) return stat;
 
+	/* check type to be supported one */
+	type = (id & 0xe0) >> 5;
+	if (type > 3)
+	{
+		LOG(4,("Brooktree: Found unsupported encoder type %d, aborting.\n", type));
+		return 0x80;
+	}
+
 	/* inform driver about TV encoder found */
 	si->ps.tvout = true;
-	si->ps.tv_encoder.type = BT868 + ((id & 0xe0) >> 5);
+	si->ps.tv_encoder.type = BT868 + type;
 	si->ps.tv_encoder.version = id & 0x1f;
 
 	return stat;
@@ -142,9 +156,15 @@ bool BT_probe()
 		uint8 cnt = 0;
 		while ((stat = BT_read_type()) && (cnt < 3))
 		{
+			/* don't retry on unsupported chiptype */
+			if (stat == 0x80)
+			{
+				btfound = 0;
+				break;
+			}
 			cnt++;
 		}
-		if (stat)
+		if (stat & 0x7f)
 		{
 			LOG(4,("Brooktree: too much errors occurred, aborting.\n"));
 			btfound = 0;

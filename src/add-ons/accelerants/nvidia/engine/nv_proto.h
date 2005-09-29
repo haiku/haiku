@@ -32,6 +32,8 @@ void i2c_bstart (uint8 BusNR);
 void i2c_bstop (uint8 BusNR);
 uint8 i2c_readbyte(uint8 BusNR, bool Ack);
 bool i2c_writebyte (uint8 BusNR, uint8 byte);
+void i2c_readbuffer (uint8 BusNR, uint8* buf, uint8 size);
+void i2c_writebuffer (uint8 BusNR, uint8* buf, uint8 size);
 status_t i2c_init(void);
 
 /* card info functions */

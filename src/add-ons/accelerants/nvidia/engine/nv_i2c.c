@@ -262,6 +262,26 @@ bool i2c_writebyte (uint8 BusNR, uint8 byte)
 	return bit;
 }
 
+void i2c_readbuffer (uint8 BusNR, uint8* buf, uint8 size)
+{
+	uint8 cnt;
+
+	for (cnt = 0; cnt < size; cnt++)
+	{
+		buf[cnt] = i2c_readbyte(BusNR, buf[cnt]);
+	}
+}
+
+void i2c_writebuffer (uint8 BusNR, uint8* buf, uint8 size)
+{
+	uint8 cnt;
+
+	for (cnt = 0; cnt < size; cnt++)
+	{
+		i2c_writebyte(BusNR, buf[cnt]);
+	}
+}
+
 status_t i2c_init(void)
 {
 	uint8 bus;
