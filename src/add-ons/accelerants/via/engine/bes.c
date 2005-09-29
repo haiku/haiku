@@ -397,23 +397,30 @@ static void eng_bes_program_move_overlay(move_overlay_info moi)
 	 **************************************/
 
 	/* setup clipped(!) buffer startadress in RAM */
-	/* RIVA128 - TNT bes doesn't have clipping registers, so no subpixelprecise clipping
+	/* VIA bes doesn't have clipping registers, so no subpixelprecise clipping
 	 * either. We do pixelprecise vertical and 'two pixel' precise horizontal clipping here. */
-	/* (program both buffers to prevent sync distortions) */
 	/* first include 'pixel precise' left clipping... (top clipping was already included) */
 	moi.a1orgv += ((moi.hsrcstv >> 16) * 2);
 	/* we need to step in 4-byte (2 pixel) granularity due to the nature of yuy2 */
-//		BESW(NV04_0BUFADR, (moi.a1orgv & ~0x03));
-//		BESW(NV04_1BUFADR, (moi.a1orgv & ~0x03));
+	BESW(VID1Y_ADDR0, (moi.a1orgv & 0x07fffffc));
+
+	/* horizontal source end does not use subpixelprecision: granularity is 8 pixels */
+	/* notes:
+	 * - make absolutely sure the engine can fetch the last pixel needed from
+	 *   the sourcebitmap even if only to generate a tiny subpixel from it!
+	 * - the engine uses byte format instead of pixel format;
+	 * - the engine uses 16 bytes, so 8 pixels granularity. */
+	BESW(VID1_FETCH, (((((moi.hsrcendv >> 16) + 1 + 0x0007) & ~0x0007) * 2) << (20 - 4)));
+
 	/* setup output window position */
-//		BESW(NV04_DSTREF, ((moi.vcoordv & 0xffff0000) | ((moi.hcoordv & 0xffff0000) >> 16)));
+	BESW(VID1_HVSTART, ((moi.hcoordv & 0xffff0000) | ((moi.vcoordv & 0xffff0000) >> 16)));
+
 	/* setup output window size */
-//		BESW(NV04_DSTSIZE, (
-//			(((moi.vcoordv & 0x0000ffff) - ((moi.vcoordv & 0xffff0000) >> 16) + 1) << 16) |
-//			((moi.hcoordv & 0x0000ffff) - ((moi.hcoordv & 0xffff0000) >> 16) + 1)
-//			));
-	/* select buffer 1 as active (b16) */
-//		BESW(NV04_SU_STATE, 0x00010000);
+	BESW(VID1_SIZE, (((moi.hcoordv & 0x0000ffff) << 16) | (moi.vcoordv & 0x0000ffff)));
+
+	/* enable colorkeying (b0 = 1), disable chromakeying (b1 = 0), Vid1 on top of Vid3 (b20 = 0),
+	 * all registers are loaded during the next 'BES-'VBI (b28 = 1), Vid1 cmds fire (b31 = 1) */
+	BESW(COMPOSE, 0x90000001);
 }
 
 status_t eng_bes_to_crtc(bool crtc)
@@ -802,34 +809,6 @@ status_t eng_configure_bes
 	 * - the engine uses 16 bytes, so 8 pixels granularity. */
 	BESW(VID1_FETCH, (((((moi.hsrcendv >> 16) + 1 + 0x0007) & ~0x0007) * 2) << (20 - 4)));
 
-	/* setup horizontal and vertical 'prescaling' for downscaling */
-		//fixme if needed: width must be even officially...
-//		BESW(NV10_0SRCSIZE, ((ob->height << 16) | ob->width));
-//linux b0-15:
-//dwSrcWidth - pVia->swov.overlayRecordV1.dwminifyH;
-//en:
-//srcWidth1 = srcWidth >> 1;
-//if (srcWidth1 <= dstWidth)
-//    dwminifyH = 2;
-//else
-//{
-//    srcWidth1 >>= 1;
-//    if (srcWidth1 <= dstWidth)
-//		 dwminifyH = 4;
-//	  else
-//    {
-//        srcWidth1 >>= 1;    
-//        if (srcWidth1 <= dstWidth)
-//            dwminifyH = 8;
-//        else
-//        {
-//            srcWidth1 >>= 1;
-//            if (srcWidth1 <= dstWidth)
-//  		      dwminifyH = 16
-//			  else
-//               to small to handle (limit reached)
-	//rud +instruct VID1_MINI_CTL register about modified scaling. (V1_X_DIV_2 etc)
-//	minictrl = 0x00000000;
 	/* enable horizontal filtering if asked for */
 	if (ow->flags & B_OVERLAY_HORIZONTAL_FILTERING)
 	{
@@ -843,15 +822,13 @@ status_t eng_configure_bes
 		minictrl |= ((1 << 2) | (1 << 0));
 		LOG(4,("Overlay: using vertical interpolation on scaling\n"));
 	}
+	/* and program horizontal and vertical 'prescaling' for downscaling */
 	BESW(VID1_MINI_CTL, minictrl);
 
 	/* setup buffersize */
-	//fixme for minimize ctrl...
-	BESW(V1_SOURCE_WH, ((ob->height << 16) | (ob->width - 0)));
+	BESW(V1_SOURCE_WH, ((ob->height << 16) | (ob->width)));
 
-	/* setup buffer source pitch including slopspace (in bytes).
-	 * Note:
-	 * source pitch granularity = yet unknown (fixme) */
+	/* setup buffer source pitch including slopspace (in bytes) */
 	BESW(VID1_STRIDE, (ob->width * 2));
 
 	/* setup output window position */
