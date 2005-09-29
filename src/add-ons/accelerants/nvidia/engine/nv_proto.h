@@ -60,9 +60,6 @@ status_t nv_dac2_set_pix_pll(display_mode target);
 
 /* Brooktree TV functions */
 bool BT_probe(void);
-status_t g100_g400max_maventv_vid_pll_find(
-	display_mode target, unsigned int * ht_new, unsigned int * ht_last_line,
-	uint8 * m_result, uint8 * n_result, uint8 * p_result);
 int maventv_init(display_mode target);
 
 /* CRTC1 functions */
