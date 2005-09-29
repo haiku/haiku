@@ -905,7 +905,7 @@ status_t eng_configure_bes
 			g = r + 256;
 			b = g + 256;
 			/* if index 1 doesn't help us, we assume 0 will (got to program something anyway) */
-			//fixme, note, find a workaround or better HW setup:
+			//fixme, note, tweakalert:
 			//I'm counting down for a reason:
 			//BeOS assigns the color white (0x00ffffff) to two indexes in the palette:
 			//index 0x3f and 0xff. In the framebuffer index 0xff is used (apparantly).
