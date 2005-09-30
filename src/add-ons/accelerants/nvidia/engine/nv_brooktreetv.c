@@ -12,6 +12,24 @@
 #define WR		0x00
 #define RD		0x01
 
+//fixme: remove rubbish..
+enum
+{	// TVoutput mode to set
+	NOT_USED = 0,
+	NTSC640_TST,
+	NTSC640,
+	NTSC800,
+	PAL800_TST,
+	PAL640,
+	PAL800,
+	VGA,
+	EXIT,
+	NTSC720,
+	PAL720,
+	NTSC640_OS,
+	PAL800_OS
+};
+
 /*
  see if a (possible) BT/CX chip resides at the given adress.
  Return zero if no errors occurred.
@@ -745,6 +763,377 @@ static uint8 BT_init_NTSC640_OS()
 
 	return stat;
 }//end BT_init_NTSC640_OS.
+
+static uint8 BT_testsignal (void)
+{
+	uint8 stat;
+
+	uint8 buffer[3];
+
+	buffer[0] = si->ps.tv_encoder.adress + WR;
+	/* select bt register for enabling colorbars and outputs */
+	buffer[1] = 0xc4;
+	/* issue the actual command */
+	buffer[2] = 0x05;
+
+	/* reset status */
+	i2c_flag_error (-1);
+
+	i2c_bstart(si->ps.tv_encoder.bus);
+	i2c_writebuffer(si->ps.tv_encoder.bus, buffer, sizeof(buffer));
+	i2c_bstop(si->ps.tv_encoder.bus);
+	/* log on errors */
+	stat = i2c_flag_error(0);
+	if (stat)
+		LOG(4,("Brooktree: I2C errors occurred while setting up flickerfilter and outputs\n"));
+
+	return stat;
+}//end BT_testsignal.
+
+static uint8 BT_setup_output(uint8 monstat, uint8 output, uint8 ffilter)
+{
+	uint8 stat;
+
+	uint8 buffer[7];
+
+	buffer[0] = si->ps.tv_encoder.adress + WR;
+	/* select first TV config register to write */
+	buffer[1] = 0xc6;
+	/* input is 24bit mpx'd RGB, BLANK = out, sync = act. hi */
+	buffer[2] = 0x98;
+	/* disable all filters, exept flicker filter */
+	buffer[3] = 0x98;
+	if (!ffilter)
+	{
+		/* disable flicker filter */ 
+		buffer[3] = 0xc0;
+	}
+	/* (disable filters) */
+	buffer[4] = 0xc0;
+	/* (disable filters) */
+	buffer[5] = 0xc0;
+	switch (output)
+	/* Description of ELSA Erazor III hardware layout:
+	 * (This is the default (recommended) layout by NVIDIA)
+	 * DAC A = CVBS
+	 * DAC B = C (chrominance)
+	 * DAC C = Y (luminance) */
+		
+	/* Description of Diamond VIPER550:
+	 * DAC A = Not connected
+	 * DAC B = C (chrominance)
+	 * DAC C = Y (luminance)
+	 * To be able to connect to CVBS TV's a special cable is supplied:
+	 * This cable connects the Y (DAC C) output to the TV CVBS input. */
+	{
+		case 1: buffer[6] = 0x18;	// Y/C and CVBS out if all ports implemented
+									// in hardware, else only Y/C or CVBS out.
+				break;
+		case 2: buffer[6] = 0x00;	// put CVBS on all outputs. Used for cards
+				break;				// with only Y/C out and 'translation cable'.
+		default:switch (monstat)	// only 'autodetect' remains...
+				{
+					case 1: buffer[6] = 0x00;	//only Y connected: must be CVBS!
+							break;
+					case 2: buffer[6] = 0x00;	//only C connected: must be CVBS!
+							break;				//(though cable is wired wrong...)
+					case 5: buffer[6] = 0x00;	//CVBS and only Y connected: 2x CVBS!
+							break;			   	//(officially not supported...)
+					case 6: buffer[6] = 0x00;	//CVBS and only C connected: 2x CVBS!
+							break;			   	//(officially not supported...)
+					default:buffer[6] = 0x18;	//nothing, or
+											 	//Y/C only, or
+											 	//CVBS only (but on CVBS output), or
+											 	//Y/C and CVBS connected:
+											 	//So activate recommended signals.
+				}
+	}
+
+	/* reset status */
+	i2c_flag_error (-1);
+
+	i2c_bstart(si->ps.tv_encoder.bus);
+	i2c_writebuffer(si->ps.tv_encoder.bus, buffer, sizeof(buffer));
+	i2c_bstop(si->ps.tv_encoder.bus);
+	/* log on errors */
+	stat = i2c_flag_error(0);
+	if (stat)
+		LOG(4,("Brooktree: I2C errors occurred while setting up flickerfilter and outputs\n"));
+
+	return stat;
+}//end BT_setup_output.
+
+static uint8 BT_setup_hphase(uint8 mode)
+{
+	uint8 stat, hoffset;
+
+	uint8 buffer[7];
+
+	/* CX needs timing reset (advised on BT also), first 1mS delay needed! */
+	snooze(1000);
+
+	/* values below are all tested on TNT1, TNT2 and GeForce2MX */
+	buffer[0] = si->ps.tv_encoder.adress + WR;
+	/* select first TV output timing register to write */
+	buffer[1] = 0x6c;
+	/* turn on active video & generate timing reset on CX chips! */
+	buffer[2] = 0x86;
+	/* (set fail save values...) */
+	buffer[3] = 0x00;		//set default horizontal sync offset
+	buffer[4] = 0x02;		//set default horizontal sync width
+	buffer[5] = 0x00;		//set default vertical sync offset
+
+	/* do specific timing setup for all chips and modes: */
+	hoffset = 8;					//TNT2 and TNT2 M64...(8 pixels delayed hpos,
+									//so picture more to the right)
+//fixme: check this out...
+//	if (ddata->type == 1) hoffset = 0;	//TNT1 or GeForce2... (std hpos)
+									//NOTE: It might be that GeForce needs TNT2 offset:
+									//for now CX chips get seperate extra offset, until sure.
+									//(CX is only found AFAIK on GeForce cards, no BT tested
+									// on GeForce yet. CH was tested on GeForce and seemed to
+									// indicate TNT1 offset was needed.)
+
+	switch (mode)
+		{
+		case NTSC640_TST: 
+		case NTSC640:
+			if (si->ps.tv_encoder.type >= CX25870) hoffset +=8; //if CX shift picture right some more... 
+			buffer[3] = (0x25 + hoffset);	//set horizontal sync offset
+			break;
+		case NTSC800:
+			if (si->ps.tv_encoder.type >= CX25870) hoffset +=8; //if CX shift picture right some more... 
+			buffer[3] = (0xe1 + hoffset);	//set horizontal sync offset
+			buffer[4] = 0xc2;
+			//Vsync offset reg. does not exist on CX: mode is checked and OK.
+			buffer[5] = 0x40;				//set VSync offset (on BT's only)
+			break;
+		case PAL640:
+			if (si->ps.tv_encoder.type >= CX25870) hoffset +=8; //if CX shift picture right some more... 
+			buffer[3] = (0xa8 + hoffset);
+			break;
+		case PAL800_TST: 
+		case PAL800:
+			if (si->ps.tv_encoder.type >= CX25870) hoffset +=8; //if CX shift picture right some more... 
+			buffer[3] = (0x2c + hoffset);
+			break;
+		case NTSC720:
+			if (si->ps.tv_encoder.type >= CX25870)
+				buffer[3] = (0xb2 + hoffset); //set horizontal sync offset CX
+			else
+				buffer[3] = (0xd0 + hoffset); //set horizontal sync offset BT
+			buffer[4] = 0xff;				//hsync width = max:
+			break;							//to prevent vertical image 'shivering'.
+		case PAL720:
+			buffer[3] = (0xd4 + hoffset);
+			buffer[4] = 0xff;
+			break;
+		case NTSC640_OS:
+			buffer[3] = (0xc8 + hoffset);
+			buffer[4] = 0xff;
+			break;
+		case PAL800_OS:
+			if (si->ps.tv_encoder.type >= CX25870)
+				buffer[3] = (0x78 + hoffset); //set horizontal sync offset CX
+			else
+				buffer[3] = (0xc4 + hoffset); //set horizontal sync offset BT
+			buffer[4] = 0xff;
+			break;
+		default: //nothing to be done here...
+			break;
+		}
+
+	buffer[6] = 0x01;		//set default vertical sync width
+
+	/* reset status */
+	i2c_flag_error (-1);
+
+	i2c_bstart(si->ps.tv_encoder.bus);
+	i2c_writebuffer(si->ps.tv_encoder.bus, buffer, sizeof(buffer));
+	i2c_bstop(si->ps.tv_encoder.bus);
+	/* log on errors */
+	stat = i2c_flag_error(0);
+	if (stat)
+		LOG(4,("Brooktree: I2C errors occurred while setting up h_phase\n"));
+
+	return stat;
+}//end BT_setup_hphase.
+
+static uint8 BT_read_monstat(uint8* monstat)
+{
+	uint8 stat;
+
+	uint8 buffer[3];
+
+	/* set BT to return connection status in ESTATUS on next read CMD: */
+	buffer[0] = si->ps.tv_encoder.adress + WR;
+	/* set ESTATUS at b'01' (return conn.stat.) */
+	buffer[1] = 0xc4;
+	/* and leave chip outputs on. */
+	buffer[2] = 0x41;
+
+	/* reset status */
+	i2c_flag_error (-1);
+
+	i2c_bstart(si->ps.tv_encoder.bus);
+	i2c_writebuffer(si->ps.tv_encoder.bus, buffer, sizeof(buffer));
+	i2c_bstop(si->ps.tv_encoder.bus);
+	/* log on errors */
+	stat = i2c_flag_error(0);
+	if (stat)
+	{
+		LOG(4,("Brooktree: I2C errors occurred while reading connection status (1)\n"));
+		return stat;
+	}
+
+	/* do actual read connection status: */
+	buffer[0] = si->ps.tv_encoder.adress + WR;
+	/* select register with CHECK_STAT CMD */
+	buffer[1] = 0xba;
+	/* issue actual command. */
+	buffer[2] = 0x40;
+
+	i2c_bstart(si->ps.tv_encoder.bus);
+	i2c_writebuffer(si->ps.tv_encoder.bus, buffer, sizeof(buffer));
+	i2c_bstop(si->ps.tv_encoder.bus);
+	/* log on errors */
+	stat = i2c_flag_error(0);
+	if (stat)
+	{
+		LOG(4,("Brooktree: I2C errors occurred while reading connection status (2)\n"));
+		return stat;
+	}
+
+	/* CX: Wait 600uS for signals to stabilize (see datasheet) */
+	/* warning, note:
+	 * datasheet is in error! 60mS needed!! */
+	snooze(60000);
+
+	/* read back updated connection status: */
+	buffer[0] = si->ps.tv_encoder.adress + RD;
+
+	/* transmit 1 byte */
+	i2c_bstart(si->ps.tv_encoder.bus);
+	i2c_writebuffer(si->ps.tv_encoder.bus, buffer, 1);
+
+	/* receive 1 byte */
+	/* ACK level to TX after last byte to RX should be 1 (= NACK) (see IIC spec)
+	 * While the BT's don't care, CX chips will block the SDA line if an ACK gets sent! */
+	buffer[0] = 1;
+	i2c_readbuffer(si->ps.tv_encoder.bus, buffer, 1);
+	i2c_bstop(si->ps.tv_encoder.bus);
+	/* log on errors */
+	stat = i2c_flag_error(0);
+	if (stat)
+	{
+		LOG(4,("Brooktree: I2C errors occurred while reading connection status (3)\n"));
+		return stat;
+	}
+
+	*monstat = ((buffer[0] & 0xe0) >> 5);
+	LOG(4,("Brooktree: TV output monitor status = %d\n", *monstat));
+
+	/* instruct BT to go back to normal operation: */
+	buffer[0] = si->ps.tv_encoder.adress + WR;
+	/* select register with CHECK_STAT CMD */
+	buffer[1] = 0xba;
+	/* issue actual command. */
+	buffer[2] = 0x00;
+
+	i2c_bstart(si->ps.tv_encoder.bus);
+	i2c_writebuffer(si->ps.tv_encoder.bus, buffer, sizeof(buffer));
+	i2c_bstop(si->ps.tv_encoder.bus);
+	/* log on errors */
+	stat = i2c_flag_error(0);
+	if (stat)
+	{
+		LOG(4,("Brooktree: I2C errors occurred while reading connection status (4)\n"));
+		return stat;
+	}
+
+	return stat;
+}//end BT_read_monstat.
+
+static uint8 BT_killclk_blackout(void)
+{
+	uint8 stat;
+
+	uint8 buffer[4];
+
+	/* reset status */
+	i2c_flag_error (-1);
+
+	if (si->ps.tv_encoder.type <= BT869) //BT...
+	{
+		/* Only disable external pixelclock input on BT's.
+		 * CX chips will lock the bus if you do this.
+		 * (It looks like the external pixelclock is always OK as long as a valid 
+		 * mode is programmed for the TVout chip. This means that disabling the use
+		 * of this clock is not needed anyway.
+		 * If you do disable this input, this pixelclock will rise to about 60Mhz BTW..) */
+
+		/* disable use of external pixelclock source... */
+		/* (should prevent BT for being 'overclocked' by RIVA in VGA-only mode...) */
+		buffer[0] = si->ps.tv_encoder.adress + WR;
+		/* select BT register for setting EN_XCLK */
+		buffer[1] = 0xa0;
+		/* clear it */
+		buffer[2] = 0x00;
+
+		i2c_bstart(si->ps.tv_encoder.bus);
+		i2c_writebuffer(si->ps.tv_encoder.bus, buffer, 3);
+		i2c_bstop(si->ps.tv_encoder.bus);
+		/* log on errors */
+		stat = i2c_flag_error(0);
+		if (stat)
+		{
+			LOG(4,("Brooktree: I2C errors occurred while doing killclk_blackout (1-BT)\n"));
+			return stat;
+		}
+	}
+	else //CX...
+	{
+		/* Disable CX video out (or wild output will be seen on TV..) */
+		buffer[0] = si->ps.tv_encoder.adress + WR;
+		/* select register in CX */
+		buffer[1] = 0x6c;
+		/* disable active video out. */
+		buffer[2] = 0x02;
+	
+		i2c_bstart(si->ps.tv_encoder.bus);
+		i2c_writebuffer(si->ps.tv_encoder.bus, buffer, 3);
+		i2c_bstop(si->ps.tv_encoder.bus);
+		/* log on errors */
+		stat = i2c_flag_error(0);
+		if (stat)
+		{
+			LOG(4,("Brooktree: I2C errors occurred while doing killclk_blackout (1-CX)\n"));
+			return stat;
+		}
+	}
+
+	/* black-out TVout while outputs are enabled... */
+	buffer[0] = si->ps.tv_encoder.adress + WR;
+	/* select first TV config register to write */
+	buffer[1] = 0xc4;
+	/* disable testimage while outputs remain enabled */
+	buffer[2] = 0x01;
+	/* input is 24bit mpx'd RGB, BLANK = in, sync = act. hi */
+	buffer[3] = 0x18;
+
+	i2c_bstart(si->ps.tv_encoder.bus);
+	i2c_writebuffer(si->ps.tv_encoder.bus, buffer, sizeof(buffer));
+	i2c_bstop(si->ps.tv_encoder.bus);
+	/* log on errors */
+	stat = i2c_flag_error(0);
+	if (stat)
+	{
+		LOG(4,("Brooktree: I2C errors occurred while doing killclk_blackout (2)\n"));
+		return stat;
+	}
+
+	return stat;
+}//end BT_killclk_blackout.
 
 //fixme: resetup for brooktreetv, should cover all supported encoders later on..
 int maventv_init(display_mode target)
