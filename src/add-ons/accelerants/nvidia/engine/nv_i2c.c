@@ -46,11 +46,11 @@ char i2c_flag_error (char ErrNo)
 //3 - No Acknowledge from device (no handshake)
 //4 - SDA not released for master to generate STOP bit
 {
-	static char IICError = 0;
+	static char I2CError = 0;
 
-	if (!IICError) IICError = ErrNo;
-	if (ErrNo == -1) IICError = 0;
-	return IICError;
+	if (!I2CError) I2CError = ErrNo;
+	if (ErrNo == -1) I2CError = 0;
+	return I2CError;
 }
 
 static void OutSCL(uint8 BusNR, bool Bit)

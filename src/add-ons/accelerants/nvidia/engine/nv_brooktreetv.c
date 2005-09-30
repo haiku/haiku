@@ -30,6 +30,100 @@ enum
 	PAL800_OS
 };
 
+/* Dirk Thierbach's Macro setup for registers 0xda-0xfe */
+static uint8 BtNtscMacro0 [] = {
+  0x0f,0xfc,0x20,0xd0,0x6f,0x0f,0x00,0x00,0x0c,0xf3,0x09,
+  0xbd,0x67,0xb5,0x90,0xb2,0x7d,0x00,0x00};
+static uint8 BtNtscMacro1 [] = {
+  0x0f,0xfc,0x20,0xd0,0x6f,0x0f,0x00,0x00,0x0c,0xf3,0x09,
+  0xbd,0x67,0xb5,0x90,0xb2,0x7d,0x63,0x00};
+static uint8 BtNtscMacro2 [] = {
+  0x0f,0xfc,0x20,0xd0,0x6f,0x0f,0x00,0x00,0x0c,0xf3,0x09,
+  0xbd,0x6c,0x31,0x92,0x32,0xdd,0xe3,0x00};
+static uint8 BtNtscMacro3 [] = {
+  0x0f,0xfc,0x20,0xd0,0x6f,0x0f,0x00,0x00,0x0c,0xf3,0x09,
+  0xbd,0x66,0xb5,0x90,0xb2,0x7d,0xe3,0x00};
+
+static uint8 BtPalMacro0 [] = {
+  0x05,0x57,0x20,0x40,0x6e,0x7e,0xf4,0x51,0x0f,0xf1,0x05,
+  0xd3,0x78,0xa2,0x25,0x54,0xa5,0x00,0x00};
+static uint8 BtPalMacro1 [] = {
+  0x05,0x57,0x20,0x40,0x6e,0x7e,0xf4,0x51,0x0f,0xf1,0x05,
+  0xd3,0x78,0xa2,0x25,0x54,0xa5,0x63,0x00};
+
+static uint8 BT_set_macro (int std, int mode)
+{
+	uint8 stat;
+	uint8 buffer[21];
+
+	LOG(4,("Brooktree: Setting Macro\n"));
+
+	if ((std < 0) | (std > 1) | (mode < 0) | (mode > 3))
+	{
+		LOG(4,("Brooktree: Non existing mode or standard selected, aborting.\n"));
+		return 0x80;
+	}
+	
+	switch (std)
+	{
+	case 0:
+		/* NTSC */
+		switch (mode)
+		{
+		case 0:
+			/* disabled */
+			memcpy(&buffer[2], &BtNtscMacro0, 19);
+			break;
+		case 1:
+			/* enabled mode 1 */
+			memcpy(&buffer[2], &BtNtscMacro1, 19);
+			break;
+		case 2:
+			/* enabled mode 2 */
+			memcpy(&buffer[2], &BtNtscMacro2, 19);
+			break;
+		case 3:
+			/* enabled mode 3 */
+			memcpy(&buffer[2], &BtNtscMacro3, 19);
+			break;
+		}
+		break;
+	case 1:
+		/* PAL */
+		switch (mode)
+		{
+		case 0:
+			/* disabled */
+			memcpy(&buffer[2], &BtPalMacro0, 19);
+			break;
+		case 1:
+		case 2:
+		case 3:
+			/* enabled */
+			memcpy(&buffer[2], &BtPalMacro1, 19);
+			break;
+		}
+		break;
+	}
+
+	buffer[0] = si->ps.tv_encoder.adress + WR;
+	/* select first register to write to */
+	buffer[1] = 0xda;
+
+	/* reset status */
+	i2c_flag_error (-1);
+
+	i2c_bstart(si->ps.tv_encoder.bus);
+	i2c_writebuffer(si->ps.tv_encoder.bus, buffer, sizeof(buffer));
+	i2c_bstop(si->ps.tv_encoder.bus);
+	/* log on errors */
+	stat = i2c_flag_error(0);
+	if (stat)
+		LOG(4,("Brooktree: I2C errors occurred while setting Macro\n"));
+
+	return stat;
+}//end BT_set_macro.
+
 /*
  see if a (possible) BT/CX chip resides at the given adress.
  Return zero if no errors occurred.
@@ -43,7 +137,7 @@ static uint8 BT_check (uint8 bus, uint8 adress)
 	 * WARNING:
 	 * If bit0 = 0 is issued below (EN_OUT = disabled), the BT will lock SDA
 	 * after writing adress $A0 (setting EN_XCLK)!!!
-	 * Until a reboot the corresponding IIC bus will be inacessable then!!! */
+	 * Until a reboot the corresponding I2C bus will be inacessable then!!! */
 	buffer[1] = 0xc4;
 	/* fixme: if testimage 'was' active txbuffer[3] should become 0x05...
 	 * (currently this cannot be detected in a 'foolproof' way so don't touch...) */
@@ -86,10 +180,10 @@ static uint8 BT_read_type (void)
 
 	/* Do actual readtype command */
 	i2c_bstart(si->ps.tv_encoder.bus);
-	/* issue IIC read command */
+	/* issue I2C read command */
 	i2c_writebyte(si->ps.tv_encoder.bus, si->ps.tv_encoder.adress + RD);
 	/* receive 1 byte;
-	 * ACK level to TX after last byte to RX should be 1 (= NACK) (see IIC spec). */
+	 * ACK level to TX after last byte to RX should be 1 (= NACK) (see I2C spec). */
 	/* note:
 	 * While the BT's don't care, CX chips will block the SDA line if
 	 * an ACK gets sent! */
@@ -119,7 +213,7 @@ bool BT_probe()
 {
 	bool btfound = false;
 
-	LOG(4,("Brooktree: Checking IIC bus(ses) for first possible TV encoder...\n"));
+	LOG(4,("Brooktree: Checking I2C bus(ses) for first possible TV encoder...\n"));
 	if (si->ps.i2c_bus0)
 	{
 		/* try primary adress on bus 0 */
@@ -184,7 +278,7 @@ bool BT_probe()
 		}
 		if (stat & 0x7f)
 		{
-			LOG(4,("Brooktree: too much errors occurred, aborting.\n"));
+			LOG(4,("Brooktree: Too much errors occurred, aborting.\n"));
 			btfound = 0;
 		}
 	}
@@ -204,7 +298,9 @@ static uint8 BT_init_PAL640()
 
 	uint8 buffer[35];
 
-	buffer[0] = si->ps.tv_encoder.adress + WR;	//issue IIC write command
+	LOG(4,("Brooktree: Setting PAL 640x480 desktop mode\n"));
+
+	buffer[0] = si->ps.tv_encoder.adress + WR;	//issue I2C write command
 	buffer[1] = 0x76;			//select first bt register to write to
 	buffer[2] = 0x60;
 	buffer[3] = 0x80;
@@ -260,7 +356,9 @@ static uint8 BT_init_PAL800()
 	
 	uint8 buffer[35];
 
-	buffer[0] = si->ps.tv_encoder.adress + WR;	//issue IIC write command
+	LOG(4,("Brooktree: Setting PAL 800x600 desktop mode\n"));
+
+	buffer[0] = si->ps.tv_encoder.adress + WR;	//issue I2C write command
 	buffer[1] = 0x76;			//select first bt register to write to
 	buffer[2] = 0x00;
 	buffer[3] = 0x20;
@@ -316,7 +414,9 @@ static uint8 BT_init_NTSC640()
 	
 	uint8 buffer[35];
 
-	buffer[0] = si->ps.tv_encoder.adress + WR;	//issue IIC write command
+	LOG(4,("Brooktree: Setting NTSC 640x480 desktop mode\n"));
+
+	buffer[0] = si->ps.tv_encoder.adress + WR;	//issue I2C write command
 	buffer[1] = 0x76;			//select first bt register to write to
 	buffer[2] = 0x00;
 	buffer[3] = 0x80;
@@ -372,7 +472,9 @@ static uint8 BT_init_NTSC800()
 	
 	uint8 buffer[35];
 
-	buffer[0] = si->ps.tv_encoder.adress + WR;	//issue IIC write command
+	LOG(4,("Brooktree: Setting NTSC 800x600 desktop mode\n"));
+
+	buffer[0] = si->ps.tv_encoder.adress + WR;	//issue I2C write command
 	buffer[1] = 0x76;			//select first bt register to write to
 	buffer[2] = 0xa0;
 	buffer[3] = 0x20;
@@ -428,7 +530,9 @@ static uint8 BT_init_PAL720()
 	
 	uint8 buffer[35];
 
-	buffer[0] = si->ps.tv_encoder.adress + WR;	//issue IIC write command
+	LOG(4,("Brooktree: Setting PAL 720x576 overscanning DVD mode\n"));
+
+	buffer[0] = si->ps.tv_encoder.adress + WR;	//issue I2C write command
 	buffer[1] = 0x76;			//select first bt register to write to
 	buffer[2] = 0xf0;
 	buffer[3] = 0xd0;
@@ -484,7 +588,9 @@ static uint8 BT_init_NTSC720()
 	
 	uint8 buffer[35];
 
-	buffer[0] = si->ps.tv_encoder.adress + WR;	//issue IIC write command
+	LOG(4,("Brooktree: Setting NTSC 720x480 overscanning DVD mode\n"));
+
+	buffer[0] = si->ps.tv_encoder.adress + WR;	//issue I2C write command
 	buffer[1] = 0x76;		//select first bt register to write to.
 	buffer[2] = 0xf0;		//lsb h_clk_o: overscan comp = 0, so h_clk_o = 2 * h_clk_i (VSR=2 = scaling=1)
 	buffer[3] = 0xd0;		//lsb h_active: h_active = 720 pixels wide port
@@ -572,7 +678,9 @@ static uint8 BT_init_PAL800_OS()
 	
 	uint8 buffer[35];
 
-	buffer[0] = si->ps.tv_encoder.adress + WR;	//issue IIC write command
+	LOG(4,("Brooktree: Setting PAL 800x600 overscanning VCD mode\n"));
+
+	buffer[0] = si->ps.tv_encoder.adress + WR;	//issue I2C write command
 	buffer[1] = 0x76;		//select first bt register to write to.
 	buffer[2] = 0x60;		//lsb h_clk_o: overscan comp = 0, so h_clk_o = 2 * h_clk_i (VSR=2 = scaling=1)
 	buffer[3] = 0x20;		//lsb h_active: h_active = 800 pixels wide port
@@ -678,7 +786,9 @@ static uint8 BT_init_NTSC640_OS()
 	
 	uint8 buffer[35];
 
-	buffer[0] = si->ps.tv_encoder.adress + WR;	//issue IIC write command
+	LOG(4,("Brooktree: Setting NTSC 640x480 overscanning VCD mode\n"));
+
+	buffer[0] = si->ps.tv_encoder.adress + WR;	//issue I2C write command
 	buffer[1] = 0x76;		//select first bt register to write to.
 	buffer[2] = 0x20;		//lsb h_clk_o: overscan comp = 0, so h_clk_o = 2 * h_clk_i (VSR=2 = scaling=1)
 	buffer[3] = 0x80;		//lsb h_active: h_active = 640 pixels wide port
@@ -770,6 +880,8 @@ static uint8 BT_testsignal (void)
 
 	uint8 buffer[3];
 
+	LOG(4,("Brooktree: Enabling testsignal\n"));
+
 	buffer[0] = si->ps.tv_encoder.adress + WR;
 	/* select bt register for enabling colorbars and outputs */
 	buffer[1] = 0xc4;
@@ -807,7 +919,11 @@ static uint8 BT_setup_output(uint8 monstat, uint8 output, uint8 ffilter)
 	{
 		/* disable flicker filter */ 
 		buffer[3] = 0xc0;
+		LOG(4,("Brooktree: Disabling flickerfilter\n"));
 	}
+	else
+		LOG(4,("Brooktree: Enabling flickerfilter\n"));
+
 	/* (disable filters) */
 	buffer[4] = 0xc0;
 	/* (disable filters) */
@@ -826,27 +942,38 @@ static uint8 BT_setup_output(uint8 monstat, uint8 output, uint8 ffilter)
 	 * To be able to connect to CVBS TV's a special cable is supplied:
 	 * This cable connects the Y (DAC C) output to the TV CVBS input. */
 	{
-		case 1: buffer[6] = 0x18;	// Y/C and CVBS out if all ports implemented
-									// in hardware, else only Y/C or CVBS out.
-				break;
-		case 2: buffer[6] = 0x00;	// put CVBS on all outputs. Used for cards
-				break;				// with only Y/C out and 'translation cable'.
-		default:switch (monstat)	// only 'autodetect' remains...
-				{
-					case 1: buffer[6] = 0x00;	//only Y connected: must be CVBS!
-							break;
-					case 2: buffer[6] = 0x00;	//only C connected: must be CVBS!
-							break;				//(though cable is wired wrong...)
-					case 5: buffer[6] = 0x00;	//CVBS and only Y connected: 2x CVBS!
-							break;			   	//(officially not supported...)
-					case 6: buffer[6] = 0x00;	//CVBS and only C connected: 2x CVBS!
-							break;			   	//(officially not supported...)
-					default:buffer[6] = 0x18;	//nothing, or
-											 	//Y/C only, or
-											 	//CVBS only (but on CVBS output), or
-											 	//Y/C and CVBS connected:
-											 	//So activate recommended signals.
-				}
+	case 1:
+		LOG(4,("Brooktree: Outputting both Y/C and CVBS where supported by hardware\n"));
+		buffer[6] = 0x18;	// Y/C and CVBS out if all ports implemented
+							// in hardware, else only Y/C or CVBS out.
+		break;
+	case 2:
+		LOG(4,("Brooktree: Outputting CVBS on all outputs\n"));
+		buffer[6] = 0x00;	// put CVBS on all outputs. Used for cards
+		break;				// with only Y/C out and 'translation cable'.
+	default:
+		LOG(4,("Brooktree: Outputting signals according to autodetect status\n"));
+		switch (monstat)	// only 'autodetect' remains...
+		{
+		case 1: 
+			buffer[6] = 0x00;	//only Y connected: must be CVBS!
+			break;
+		case 2:
+			buffer[6] = 0x00;	//only C connected: must be CVBS!
+			break;				//(though cable is wired wrong...)
+		case 5:
+			buffer[6] = 0x00;	//CVBS and only Y connected: 2x CVBS!
+			break;			   	//(officially not supported...)
+		case 6:
+			buffer[6] = 0x00;	//CVBS and only C connected: 2x CVBS!
+			break;			   	//(officially not supported...)
+		default:
+			buffer[6] = 0x18;	//nothing, or
+							 	//Y/C only, or
+							 	//CVBS only (but on CVBS output), or
+							 	//Y/C and CVBS connected:
+							 	//So activate recommended signals.
+		}
 	}
 
 	/* reset status */
@@ -868,6 +995,8 @@ static uint8 BT_setup_hphase(uint8 mode)
 	uint8 stat, hoffset;
 
 	uint8 buffer[7];
+
+	LOG(4,("Brooktree: Tuning horizontal phase\n"));
 
 	/* CX needs timing reset (advised on BT also), first 1mS delay needed! */
 	snooze(1000);
@@ -895,53 +1024,53 @@ static uint8 BT_setup_hphase(uint8 mode)
 									// indicate TNT1 offset was needed.)
 
 	switch (mode)
-		{
-		case NTSC640_TST: 
-		case NTSC640:
-			if (si->ps.tv_encoder.type >= CX25870) hoffset +=8; //if CX shift picture right some more... 
-			buffer[3] = (0x25 + hoffset);	//set horizontal sync offset
-			break;
-		case NTSC800:
-			if (si->ps.tv_encoder.type >= CX25870) hoffset +=8; //if CX shift picture right some more... 
-			buffer[3] = (0xe1 + hoffset);	//set horizontal sync offset
-			buffer[4] = 0xc2;
-			//Vsync offset reg. does not exist on CX: mode is checked and OK.
-			buffer[5] = 0x40;				//set VSync offset (on BT's only)
-			break;
-		case PAL640:
-			if (si->ps.tv_encoder.type >= CX25870) hoffset +=8; //if CX shift picture right some more... 
-			buffer[3] = (0xa8 + hoffset);
-			break;
-		case PAL800_TST: 
-		case PAL800:
-			if (si->ps.tv_encoder.type >= CX25870) hoffset +=8; //if CX shift picture right some more... 
-			buffer[3] = (0x2c + hoffset);
-			break;
-		case NTSC720:
-			if (si->ps.tv_encoder.type >= CX25870)
-				buffer[3] = (0xb2 + hoffset); //set horizontal sync offset CX
-			else
-				buffer[3] = (0xd0 + hoffset); //set horizontal sync offset BT
-			buffer[4] = 0xff;				//hsync width = max:
-			break;							//to prevent vertical image 'shivering'.
-		case PAL720:
-			buffer[3] = (0xd4 + hoffset);
-			buffer[4] = 0xff;
-			break;
-		case NTSC640_OS:
-			buffer[3] = (0xc8 + hoffset);
-			buffer[4] = 0xff;
-			break;
-		case PAL800_OS:
-			if (si->ps.tv_encoder.type >= CX25870)
-				buffer[3] = (0x78 + hoffset); //set horizontal sync offset CX
-			else
-				buffer[3] = (0xc4 + hoffset); //set horizontal sync offset BT
-			buffer[4] = 0xff;
-			break;
-		default: //nothing to be done here...
-			break;
-		}
+	{
+	case NTSC640_TST: 
+	case NTSC640:
+		if (si->ps.tv_encoder.type >= CX25870) hoffset +=8; //if CX shift picture right some more... 
+		buffer[3] = (0x25 + hoffset);	//set horizontal sync offset
+		break;
+	case NTSC800:
+		if (si->ps.tv_encoder.type >= CX25870) hoffset +=8; //if CX shift picture right some more... 
+		buffer[3] = (0xe1 + hoffset);	//set horizontal sync offset
+		buffer[4] = 0xc2;
+		//Vsync offset reg. does not exist on CX: mode is checked and OK.
+		buffer[5] = 0x40;				//set VSync offset (on BT's only)
+		break;
+	case PAL640:
+		if (si->ps.tv_encoder.type >= CX25870) hoffset +=8; //if CX shift picture right some more... 
+		buffer[3] = (0xa8 + hoffset);
+		break;
+	case PAL800_TST: 
+	case PAL800:
+		if (si->ps.tv_encoder.type >= CX25870) hoffset +=8; //if CX shift picture right some more... 
+		buffer[3] = (0x2c + hoffset);
+		break;
+	case NTSC720:
+		if (si->ps.tv_encoder.type >= CX25870)
+			buffer[3] = (0xb2 + hoffset); //set horizontal sync offset CX
+		else
+			buffer[3] = (0xd0 + hoffset); //set horizontal sync offset BT
+		buffer[4] = 0xff;				//hsync width = max:
+		break;							//to prevent vertical image 'shivering'.
+	case PAL720:
+		buffer[3] = (0xd4 + hoffset);
+		buffer[4] = 0xff;
+		break;
+	case NTSC640_OS:
+		buffer[3] = (0xc8 + hoffset);
+		buffer[4] = 0xff;
+		break;
+	case PAL800_OS:
+		if (si->ps.tv_encoder.type >= CX25870)
+			buffer[3] = (0x78 + hoffset); //set horizontal sync offset CX
+		else
+			buffer[3] = (0xc4 + hoffset); //set horizontal sync offset BT
+		buffer[4] = 0xff;
+		break;
+	default: //nothing to be done here...
+		break;
+	}
 
 	buffer[6] = 0x01;		//set default vertical sync width
 
@@ -964,6 +1093,8 @@ static uint8 BT_read_monstat(uint8* monstat)
 	uint8 stat;
 
 	uint8 buffer[3];
+
+	LOG(4,("Brooktree: Autodetecting connected output devices\n"));
 
 	/* set BT to return connection status in ESTATUS on next read CMD: */
 	buffer[0] = si->ps.tv_encoder.adress + WR;
@@ -1017,7 +1148,7 @@ static uint8 BT_read_monstat(uint8* monstat)
 	i2c_writebuffer(si->ps.tv_encoder.bus, buffer, 1);
 
 	/* receive 1 byte */
-	/* ACK level to TX after last byte to RX should be 1 (= NACK) (see IIC spec)
+	/* ACK level to TX after last byte to RX should be 1 (= NACK) (see I2C spec)
 	 * While the BT's don't care, CX chips will block the SDA line if an ACK gets sent! */
 	buffer[0] = 1;
 	i2c_readbuffer(si->ps.tv_encoder.bus, buffer, 1);
@@ -1059,6 +1190,8 @@ static uint8 BT_killclk_blackout(void)
 	uint8 stat;
 
 	uint8 buffer[4];
+
+	LOG(4,("Brooktree: Killing clock and/or blacking out (blocking output signals)\n"));
 
 	/* reset status */
 	i2c_flag_error (-1);
