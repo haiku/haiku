@@ -98,7 +98,8 @@ ExpanderWindow::ExpanderWindow(BRect frame_rect, const entry_ref *ref, BMessage 
 	BBox *box = new BBox(rect, "background", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER);
 	AddChild(box);
 
-	rect = BRect(10, 10, 75, 25);
+	float size = 8 + be_plain_font->StringWidth("Destination")/2;
+	rect = BRect(42 - size, 10, 42 + size, 25);
 	fSourceButton = new BButton(rect, "sourceButton", "Source", 
 		new BMessage(MSG_SOURCE), B_FOLLOW_LEFT | B_FOLLOW_TOP);
 	box->AddChild(fSourceButton);
@@ -138,7 +139,7 @@ ExpanderWindow::ExpanderWindow(BRect frame_rect, const entry_ref *ref, BMessage 
 	box->AddChild(fExpandedText);
 	fExpandedText->SetText("");
 		
-	rect = BRect(Bounds().right - 105, rect.bottom + 13, Bounds().right - 10, rect.bottom + 28);
+	rect = BRect(Bounds().right - 38 - be_plain_font->StringWidth("Show Contents"), rect.bottom + 13, Bounds().right - 10, rect.bottom + 28);
 	fShowContents = new BCheckBox(rect, "showContents", "Show Contents", 
 		new BMessage(MSG_SHOWCONTENTS), B_FOLLOW_RIGHT | B_FOLLOW_TOP);
 	box->AddChild(fShowContents);
