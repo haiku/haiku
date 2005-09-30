@@ -1567,10 +1567,10 @@ int socket_accept(struct socket *so, struct socket **nso, void *data, int *alen)
 }
 
 
-void
+int
 socket_socketpair(struct socket *so, struct socket **nso)
 {
 	// TODO : implement, eventually fill nso with a new cookie
-	return ENOIMPL;
+	return ENOSYS;
 }
 

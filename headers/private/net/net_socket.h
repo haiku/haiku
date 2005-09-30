@@ -30,7 +30,7 @@ int socket_ioctl		(struct socket *so, int cmd, caddr_t data);
 int socket_getpeername	(struct socket *so, struct sockaddr *, int *);
 int socket_getsockname	(struct socket *so, struct sockaddr *, int *);
 
-int socket_pair		(struct socket *so, struct socket **nso);
+int socket_socketpair		(struct socket *so, struct socket **nso);
 
 int socket_set_event_callback(struct socket *so, socket_event_callback, void *, int);
 
