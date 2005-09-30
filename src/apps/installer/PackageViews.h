@@ -17,10 +17,10 @@ class Group {
 public:
 	Group();
 	virtual ~Group();
-	void SetGroupName(const char *group) { free(fGroup); fGroup=strdup(group);};
+	void SetGroupName(const char *group) { strcpy(fGroup, group); };
 	const char * GroupName() const { return fGroup; };
 private:
-	char *fGroup;
+	char fGroup[64];
 };
 
 
@@ -28,8 +28,8 @@ class Package : public Group {
 public:
 	Package();
 	virtual ~Package();
-	void SetName(const char *name) { free(fName); fName=strdup(name);};
-	void SetDescription(const char *description) { free(fDescription); fDescription=strdup(description);};
+	void SetName(const char *name) { strcpy(fName, name);};
+	void SetDescription(const char *description) { strcpy(fDescription, description);};
 	void SetSize(const int32 size) { fSize = size; };
 	void SetIcon(BBitmap * icon) { delete fIcon; fIcon = icon; };
 	void SetOnByDefault(bool onByDefault) { fOnByDefault = onByDefault; };
@@ -44,8 +44,8 @@ public:
 
 	static Package *PackageFromEntry(BEntry &dir);
 private:
-	char *fName;
-	char *fDescription;
+	char fName[64];
+	char fDescription[64];
 	int32 fSize;
 	BBitmap *fIcon;
 	bool fAlwaysOn, fOnByDefault;
@@ -54,20 +54,20 @@ private:
 
 class PackageCheckBox : public BCheckBox {
 	public:
-		PackageCheckBox(BRect rect, Package &item);
+		PackageCheckBox(BRect rect, Package *item);
 		virtual ~PackageCheckBox();
 		virtual void Draw(BRect update);
-		Package *GetPackage() { return &fPackage; };
+		Package *GetPackage() { return fPackage; };
 	private:
-		Package &fPackage;
+		Package *fPackage;
 };
 
 class GroupView : public BStringView {
 	public:
-		GroupView(BRect rect, Group &group);
+		GroupView(BRect rect, Group *group);
 		virtual ~GroupView();
 	private:
-		Group &fGroup;
+		Group *fGroup;
 
 };
 

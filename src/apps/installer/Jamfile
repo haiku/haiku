@@ -1,10 +1,12 @@
 SubDir OBOS_TOP src apps installer ;
 
 UsePrivateHeaders shared ;
+UsePrivateHeaders storage ;
 UsePrivateHeaders tracker ;
 SubDirHdrs [ FDirName $(OBOS_TOP) src kits tracker ] ;
 
 App Installer : 
+	CopyEngine.cpp
 	DrawButton.cpp
 	InstallerApp.cpp
 	InstallerCopyLoopControl.cpp

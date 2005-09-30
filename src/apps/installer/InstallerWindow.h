@@ -13,6 +13,7 @@
 #include <ScrollView.h>
 #include <TextView.h>
 #include <Window.h>
+#include "CopyEngine.h"
 #include "DrawButton.h"
 #include "PackageViews.h"
 
@@ -23,6 +24,7 @@ public:
 
 	virtual void MessageReceived(BMessage *msg);
 	virtual bool QuitRequested();
+	void SetStatusMessage(char *text);
 private:
 	void DisableInterface(bool disable);
 	void LaunchDriveSetup();
@@ -40,6 +42,8 @@ private:
 	PackagesView *fPackagesView;
 	BScrollView *fPackagesScrollView;
 	BStringView *fSizeView;
+
+	CopyEngine fCopyEngine;
 };
 
 #endif /* _InstallerWindow_h */

@@ -32,8 +32,6 @@ SizeAsString(int32 size, char *string)
 
 Package::Package()
 	: Group(),
-	fName(NULL),
-	fDescription(NULL),
 	fSize(0),
 	fIcon(NULL)
 {
@@ -43,8 +41,6 @@ Package::Package()
 
 Package::~Package()
 {
-	free(fName);
-	free(fDescription);
 	delete fIcon;	
 }
 
@@ -56,17 +52,16 @@ Package::PackageFromEntry(BEntry &entry)
 	if (directory.InitCheck()!=B_OK)
 		return NULL;
 	Package *package = new Package();
-	char name[255];
-	char group[255];
-	char description[255];
 	bool alwaysOn;
 	bool onByDefault;
 	int32 size;
-	if (directory.ReadAttr("INSTALLER PACKAGE: NAME", B_STRING_TYPE, 0, name, 255)<0)
+	char group[64];
+	memset(group, 0, 64);
+	if (directory.ReadAttr("INSTALLER PACKAGE: NAME", B_STRING_TYPE, 0, package->fName, 64)<0)
 		goto err;
-	if (directory.ReadAttr("INSTALLER PACKAGE: GROUP", B_STRING_TYPE, 0, group, 255)<0)
+	if (directory.ReadAttr("INSTALLER PACKAGE: GROUP", B_STRING_TYPE, 0, group, 64)<0)
 		goto err;
-	if (directory.ReadAttr("INSTALLER PACKAGE: DESCRIPTION", B_STRING_TYPE, 0, description, 255)<0)
+	if (directory.ReadAttr("INSTALLER PACKAGE: DESCRIPTION", B_STRING_TYPE, 0, package->fDescription, 64)<0)
 		goto err;
 	if (directory.ReadAttr("INSTALLER PACKAGE: ON_BY_DEFAULT", B_BOOL_TYPE, 0, &onByDefault, sizeof(onByDefault))<0)
 		goto err;
@@ -74,9 +69,7 @@ Package::PackageFromEntry(BEntry &entry)
 		goto err;
 	if (directory.ReadAttr("INSTALLER PACKAGE: SIZE", B_INT32_TYPE, 0, &size, sizeof(size))<0)
 		goto err;
-	package->SetName(name);
 	package->SetGroupName(group);
-	package->SetDescription(description);
 	package->SetSize(size);
 	package->SetAlwaysOn(alwaysOn);
 	package->SetOnByDefault(onByDefault);
@@ -105,19 +98,17 @@ Package::GetSizeAsString(char *string)
 
 
 Group::Group()
-	: fGroup(NULL)
 {
 
 }
 
 Group::~Group()
 {
-	free(fGroup);
 }
 
 
-PackageCheckBox::PackageCheckBox(BRect rect, Package &item) 
-	: BCheckBox(rect.OffsetBySelf(7,0), "pack_cb", item.Name(), NULL),
+PackageCheckBox::PackageCheckBox(BRect rect, Package *item) 
+	: BCheckBox(rect.OffsetBySelf(7,0), "pack_cb", item->Name(), NULL),
 	fPackage(item)
 {
 }
@@ -125,6 +116,7 @@ PackageCheckBox::PackageCheckBox(BRect rect, Package &item)
 
 PackageCheckBox::~PackageCheckBox()
 {
+	delete fPackage;
 }
 
 
@@ -133,17 +125,17 @@ PackageCheckBox::Draw(BRect update)
 {
 	BCheckBox::Draw(update);
 	char string[15];
-	fPackage.GetSizeAsString(string);
+	fPackage->GetSizeAsString(string);
 	float width = StringWidth(string);
 	DrawString(string, BPoint(Bounds().right - width - 8, 11));
 
-	const BBitmap *icon = fPackage.Icon();
+	const BBitmap *icon = fPackage->Icon();
 	if (icon)
 		DrawBitmap(icon, BPoint(Bounds().right - 92, 0));
 }
 
-GroupView::GroupView(BRect rect, Group &group)
-	: BStringView(rect, "group", group.GroupName()),
+GroupView::GroupView(BRect rect, Group *group)
+	: BStringView(rect, "group", group->GroupName()),
 	fGroup(group)
 {
 	SetFont(be_bold_font);
@@ -152,6 +144,7 @@ GroupView::GroupView(BRect rect, Group &group)
 
 GroupView::~GroupView()
 {
+	delete fGroup;
 }
 
 
@@ -170,7 +163,14 @@ PackagesView::~PackagesView()
 void
 PackagesView::Clean()
 {
-	
+	BView *view;
+	while ((view = ChildAt(0))) {
+		if (dynamic_cast<GroupView*>(view) || dynamic_cast<PackageCheckBox*>(view)) {
+			RemoveChild(view);
+			delete view;
+		}
+	}
+	ScrollTo(0,0);
 }
 
 
@@ -182,6 +182,7 @@ PackagesView::AddPackages(BList &packages, BMessage *msg)
 	BRect bounds = rect;
 	rect.left = 1;
 	rect.bottom = 15;
+	rect.top = 0;
 	BString lastGroup = "";
 	for (int32 i=0; i<count; i++) {
 		void *item = packages.ItemAt(i);
@@ -191,30 +192,30 @@ PackagesView::AddPackages(BList &packages, BMessage *msg)
 			lastGroup = package->GroupName();
 			Group *group = new Group();
 			group->SetGroupName(package->GroupName());
-			GroupView *view = new GroupView(rect, *group);
+			GroupView *view = new GroupView(rect, group);
 			AddChild(view);
 			rect.OffsetBy(0, 17);
 		}
-		PackageCheckBox *checkBox = new PackageCheckBox(rect, *package);
+		PackageCheckBox *checkBox = new PackageCheckBox(rect, package);
 		checkBox->SetValue(package->OnByDefault() ? B_CONTROL_ON : B_CONTROL_OFF);
 		checkBox->SetEnabled(!package->AlwaysOn());
-		checkBox->SetMessage(msg);
+		checkBox->SetMessage(new BMessage(*msg));
 		AddChild(checkBox);
 		rect.OffsetBy(0, 20);
 	}
-	ResizeTo(bounds.Width(), rect.bottom);
+	ResizeTo(bounds.Width(), rect.top);
 
 	BScrollBar *vertScroller = ScrollBar(B_VERTICAL);
 
-	if (bounds.Height() > rect.top) {
+	if (vertScroller->Bounds().Height() > rect.top) {
 		vertScroller->SetRange(0.0f, 0.0f);
 		vertScroller->SetValue(0.0f);
 	} else {
-		vertScroller->SetRange(0.0f, rect.top - bounds.Height());
-		vertScroller->SetProportion(bounds.Height () / rect.top);
+		vertScroller->SetRange(0.0f, rect.top - vertScroller->Bounds().Height());
+		vertScroller->SetProportion(vertScroller->Bounds().Height() / rect.top);
         }
 
-	vertScroller->SetSteps(15, bounds.Height());
+	vertScroller->SetSteps(15, vertScroller->Bounds().Height());
 	
 	Invalidate();
 }
@@ -232,3 +233,4 @@ PackagesView::GetTotalSizeAsString(char *string)
 	}
 	SizeAsString(size, string);
 }
+

@@ -5,6 +5,7 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Autolock.h>
 #include <Box.h>
 #include <ClassInfo.h>
 #include <Directory.h>
@@ -28,7 +29,8 @@ const uint32 PACKAGE_CHECKBOX = 'iPCB';
 
 InstallerWindow::InstallerWindow(BRect frame_rect)
 	: BWindow(frame_rect, "Installer", B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
-	fDriveSetupLaunched(false)
+	fDriveSetupLaunched(false),
+	fCopyEngine(this)
 {
 
 	BRect bounds = Bounds();
@@ -119,6 +121,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			StartScan();
 			break;
 		case BEGIN_MESSAGE:
+			fCopyEngine.Start();
 			break;
 		case SHOW_BOTTOM_MESSAGE:
 			ShowBottom();
@@ -209,20 +212,22 @@ InstallerWindow::DisableInterface(bool disable)
 	fSrcMenuField->SetEnabled(!disable);
 	fDestMenuField->SetEnabled(!disable);
 	if (disable)
-		fStatusView->SetText("Running DriveSetup" B_UTF8_ELLIPSIS "\nClose DriveSetup to continue with the\ninstallation.");
+		SetStatusMessage("Running DriveSetup" B_UTF8_ELLIPSIS "\nClose DriveSetup to continue with the\ninstallation.");
 }
 
 
 void
 InstallerWindow::StartScan()
 {
-	fStatusView->SetText("Scanning for disks" B_UTF8_ELLIPSIS);
+	SetStatusMessage("Scanning for disks" B_UTF8_ELLIPSIS);
 
 	BMenuItem *item;
 	while ((item = fSrcMenu->RemoveItem((int32)0)))
 		delete item;
 	while ((item = fDestMenu->RemoveItem((int32)0)))
 		delete item;
+
+	fCopyEngine.ScanDisksPartitions(fSrcMenu, fDestMenu);
 
 	fSrcMenu->AddItem(new PartitionMenuItem("BeOS 5 PE Max Edition V3.1 beta", 
 		new BMessage(SRC_PARTITION), "/BeOS 5 PE Max Edition V3.1 beta"));
@@ -231,7 +236,7 @@ InstallerWindow::StartScan()
 		fSrcMenu->ItemAt(0)->SetMarked(true);
 		PublishPackages();
 	}
-	fStatusView->SetText("Choose the disk you want to install onto\nfrom the pop-up menu. Then click \"Begin\".");
+	SetStatusMessage("Choose the disk you want to install onto\nfrom the pop-up menu. Then click \"Begin\".");
 }
 
 
@@ -281,3 +286,10 @@ InstallerWindow::ComparePackages(const void *firstArg, const void *secondArg)
 	return strcmp(package1->Name(), package2->Name());
 }
 
+
+void
+InstallerWindow::SetStatusMessage(char *text)
+{
+	BAutolock(this);
+	fStatusView->SetText(text);
+}
