@@ -874,7 +874,7 @@ static uint8 BT_init_NTSC640_OS()
 	return stat;
 }//end BT_init_NTSC640_OS.
 
-static uint8 BT_testsignal (void)
+static uint8 BT_testsignal(void)
 {
 	uint8 stat;
 
@@ -1091,8 +1091,10 @@ static uint8 BT_setup_hphase(uint8 mode)
 static uint8 BT_read_monstat(uint8* monstat)
 {
 	uint8 stat;
-
 	uint8 buffer[3];
+
+	/* make sure we have the recommended failsafe selected */
+	*monstat = 0;
 
 	LOG(4,("Brooktree: Autodetecting connected output devices\n"));
 
@@ -1312,7 +1314,9 @@ uint8 BT_check_tvmode(display_mode target)
 
 status_t BT_setmode(display_mode target)
 {
-	uint8 tvmode;
+	uint8 tvmode, monstat;
+	/* enable flickerfilter in desktop modes, disable it in video modes. */
+	uint8 ffilter = 0;
 
 	/* use a display_mode copy because we might tune it for TVout compatibility */
 	display_mode tv_target = target;
@@ -1328,42 +1332,93 @@ if (si->ps.secondary_head)
 	return B_ERROR;
 }
 
+	/* fixme: reset BT should be here...
+	 * (but: beware of the 'locked SDA' syndrome then!) */
+	BT_killclk_blackout();
+
+	/* read current output devices connection status */
+	BT_read_monstat(&monstat);
+
+	//fixme?
+	//'slowdown RIVA clock' if TVout is requested:
+	//makes sure TVout chip is not being overclocked! (VESA640/800 is safe..)
+	//NOTE: it looks like this is unnesessary after all..
+
+	/* (pre)set TV mode */
+	/* note:
+	 * Manual config is non-dependent of the state of the PAL hardware input pin;
+	 * Also SDA lockups occur when setting EN_XCLK after autoconfig!
+	 * Make sure PAL_MD=0 for NTSC and PAL_MD = 1 for PAL... */
 	switch (tvmode)
 	{
 	case NTSC640:
 	case NTSC640_TST:
+		ffilter = 1;
+		BT_init_NTSC640();
 		break;
 	case NTSC800:
+		ffilter = 1;
+		BT_init_NTSC800();
 		break;
 	case PAL640:
+		ffilter = 1;
+		BT_init_PAL640();
 		break;
 	case PAL800:
 	case PAL800_TST:
+		ffilter = 1;
+		BT_init_PAL800();
 		break;
 	case NTSC640_OS:
+		BT_init_NTSC640_OS();
 		break;
 	case PAL800_OS:
+		BT_init_PAL800_OS();
 		break;
 	case NTSC720:
+		BT_init_NTSC720();
 		break;
 	case PAL720:
+		BT_init_PAL720();
 		break;
 	}
 
-	/* tune new TVout mode */
+	/* modify BT Hphase signal to center TV image... */
+	BT_setup_hphase(tvmode);
 
-	/* set flickerfilter */
+	/* disable Macro mode */
+	switch (tvmode)
+	{
+	case NTSC640:
+	case NTSC640_TST:
+	case NTSC800:
+	case NTSC640_OS:
+	case NTSC720:
+		/* NTSC */
+		BT_set_macro (0, 0);
+		break;
+	default:
+		/* PAL */
+		BT_set_macro (1, 0);
+		break;
+	}
 
-	/* output: SVideo/Composite */
+	/* setup output signal routing and flickerfilter */
+	//fixme: add output force settings in nv.settings, defaulting to autodetect.
+	BT_setup_output(monstat, 0, ffilter);
 
-	/* calculate vertical sync point */
+//tmp: enabling testimage...
+BT_testsignal();
 
-	/* program new TVout mode */
+	//fixme: add custom fixed modelines here that will be pgm'd into the CRTC...
 
-	/* setup CRTC timing */
+	/* setup GPU CRTC timing */
 	head1_set_timing(tv_target);
 
-	/* start whole thing if needed */
+	//fixme: set GPU CRTC to slave mode...
+
+	//fixme: add code to disable VGA screen when TVout enabled
+	//(use via nv.setting preset)
 
 	return B_OK;
 }
