@@ -4,7 +4,7 @@
 
 	Other authors for NV driver:
 	Mark Watson,
-	Rudolf Cornelissen 9/2002-2/2005
+	Rudolf Cornelissen 9/2002-10/2005
 */
 
 #define MODULE_BIT 0x00400000
@@ -503,15 +503,9 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	}
 
 	/* set TV_CAPABLE if suitable: pixelclock is not important (defined by TVstandard) */
-	//fixme: modify for G100 and G200 TVout later on...
-	if (target->flags & DUALHEAD_CAPABLE)
+	if (si->ps.tvout && BT_check_tvmode(*target))
 	{
-		if (si->ps.tvout &&
-			(target->timing.h_display <= 1024) &&
-			(target->timing.v_display <= 768))
-		{
-			target->flags |= TV_CAPABLE;
-		}
+		target->flags |= TV_CAPABLE;
 	}
 
 	/* set HARDWARE_CURSOR mode if suitable */

@@ -2,41 +2,12 @@
  * i2c interface.
  * Bus should be run at max. 100kHz: see original Philips I2C specification
  *	
- * Rudolf Cornelissen 12/2002-9/2005
+ * Rudolf Cornelissen 12/2002-10/2005
  */
 
 #define MODULE_BIT 0x00004000
 
 #include "nv_std.h"
-
-status_t i2c_sec_tv_adapter()
-{
-	status_t result = B_ERROR;
-
-	/* The secondary DDC channel only exist on dualhead cards */
-	if (!si->ps.secondary_head) return result;
-
-	/* make sure the output lines will be active-low when enabled
-	 * (they will be pulled 'passive-high' when disabled) */
-//	DXIW(GENIODATA,0x00);
-	/* send out B_STOP condition on secondary head DDC channel and use it to
-	 * check for 'shortcut', indicating the Matrox VGA->TV adapter is connected */
-
-	/* make sure SDA is low */
-//	DXIW(GENIOCTRL, (DXIR(GENIOCTRL) | DDC2_DATA));
-	snooze(2);
-	/* make sure SCL should be high */
-//	DXIW(GENIOCTRL, (DXIR(GENIOCTRL) & ~DDC2_CLK));
-	snooze(2);
-	/* if SCL is low then the bus is blocked by a TV adapter */
-//	if (!(DXIR(GENIODATA) & DDC2_CLK)) result = B_OK;
-	snooze(5);
-	/* set SDA while SCL should be set (generates actual bus-stop condition) */
-//	DXIW(GENIOCTRL, (DXIR(GENIOCTRL) & ~DDC2_DATA));
-	snooze(5);
-
-	return result;
-}
 
 char i2c_flag_error (char ErrNo)
 //error code list:

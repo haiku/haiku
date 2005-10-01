@@ -1,6 +1,6 @@
 /*
 	Author:
-	Rudolf Cornelissen 4/2002-9/2005
+	Rudolf Cornelissen 4/2002-10/2005
 */
 
 #define MODULE_BIT 0x00100000
@@ -15,7 +15,7 @@
 //fixme: remove rubbish..
 enum
 {	// TVoutput mode to set
-	NOT_USED = 0,
+	NOT_SUPPORTED = 0,
 	NTSC640_TST,
 	NTSC640,
 	NTSC800,
@@ -1268,20 +1268,86 @@ static uint8 BT_killclk_blackout(void)
 	return stat;
 }//end BT_killclk_blackout.
 
-//fixme: resetup for brooktreetv, should cover all supported encoders later on..
-int maventv_init(display_mode target)
+uint8 BT_check_tvmode(display_mode target)
 {
+	uint8 status = NOT_SUPPORTED;
+	uint32 mode = ((target.timing.h_display) | ((target.timing.v_display) << 16));
+
+	switch (mode)
+	{
+	case (640 | (480 << 16)):
+		if ((target.flags & TV_BITS) == TV_PAL)
+		{
+			if (!(target.flags & TV_VIDEO)) status = PAL640;
+		}
+		if ((target.flags & TV_BITS) == TV_NTSC)
+		{
+			if (!(target.flags & TV_VIDEO)) status = NTSC640;
+			else status = NTSC640_OS;
+		}
+		break;
+	case (800 | (600 << 16)):
+		if ((target.flags & TV_BITS) == TV_PAL)
+		{
+			if (!(target.flags & TV_VIDEO)) status = PAL800;
+			else status = PAL800_OS;
+		}
+		if ((target.flags & TV_BITS) == TV_NTSC)
+		{
+			if (!(target.flags & TV_VIDEO)) status = NTSC800;
+		}
+		break;
+	case (720 | (480 << 16)):
+		if (((target.flags & TV_BITS) == TV_NTSC) && (target.flags & TV_VIDEO))
+			status = NTSC720;
+		break;
+	case (720 | (576 << 16)):
+		if (((target.flags & TV_BITS) == TV_PAL) && (target.flags & TV_VIDEO))
+			status = PAL720;
+		break;
+	}
+
+	return status;
+}//end BT_check_tvmode.
+
+status_t BT_setmode(display_mode target)
+{
+	uint8 tvmode;
+
 	/* use a display_mode copy because we might tune it for TVout compatibility */
 	display_mode tv_target = target;
 
 	/* preset new TVout mode */
-	if ((tv_target.flags & TV_BITS) == TV_PAL)
+	tvmode = BT_check_tvmode(tv_target);
+	if (!tvmode) return B_ERROR;
+
+//fixme: only testing singlehead cards for now...
+if (si->ps.secondary_head)
+{
+	head1_set_timing(tv_target);
+	return B_ERROR;
+}
+
+	switch (tvmode)
 	{
-		LOG(4, ("MAVENTV: PAL TVout\n"));
-	}
-	else
-	{
-		LOG(4, ("MAVENTV: NTSC TVout\n"));
+	case NTSC640:
+	case NTSC640_TST:
+		break;
+	case NTSC800:
+		break;
+	case PAL640:
+		break;
+	case PAL800:
+	case PAL800_TST:
+		break;
+	case NTSC640_OS:
+		break;
+	case PAL800_OS:
+		break;
+	case NTSC720:
+		break;
+	case PAL720:
+		break;
 	}
 
 	/* tune new TVout mode */
@@ -1295,9 +1361,9 @@ int maventv_init(display_mode target)
 	/* program new TVout mode */
 
 	/* setup CRTC timing */
-	head2_set_timing(tv_target);
+	head1_set_timing(tv_target);
 
 	/* start whole thing if needed */
 
-	return 0;
+	return B_OK;
 }

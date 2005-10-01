@@ -60,7 +60,8 @@ status_t nv_dac2_set_pix_pll(display_mode target);
 
 /* Brooktree TV functions */
 bool BT_probe(void);
-int maventv_init(display_mode target);
+uint8 BT_check_tvmode(display_mode target);
+status_t BT_setmode(display_mode target);
 
 /* CRTC1 functions */
 status_t nv_crtc_update_fifo(void);

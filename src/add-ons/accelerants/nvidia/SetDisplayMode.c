@@ -6,7 +6,7 @@
 	Other authors:
 	Mark Watson,
 	Apsed,
-	Rudolf Cornelissen 11/2002-6/2005
+	Rudolf Cornelissen 11/2002-10/2005
 */
 
 #define MODULE_BIT 0x00200000
@@ -112,7 +112,8 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		LOG(1,("SETMODE: setting DUALHEAD mode\n"));
 
 		/* validate flags for secondary TVout */
-		if ((i2c_sec_tv_adapter() != B_OK) && (target2.flags & TV_BITS))
+		//fixme: remove or block on autodetect fail. (is now shutoff)
+		if ((0) && (target2.flags & TV_BITS))
 		{
 			target.flags &= ~TV_BITS;//still needed for some routines...
 			target2.flags &= ~TV_BITS;
@@ -209,6 +210,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		}
 
 		/* check if we are doing interlaced TVout mode */
+		//fixme: we don't support interlaced mode?
 		si->interlaced_tv_mode = false;
 /*		if ((target2.flags & TV_BITS) && (si->ps.card_type >= G450))
 			si->interlaced_tv_mode = true;
@@ -242,7 +244,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		if (!(target2.flags & TV_BITS))	result = head2_set_timing(target2);
 
 		/* TVout support: setup CRTC2 and it's pixelclock */
-		if (si->ps.tvout && (target2.flags & TV_BITS)) maventv_init(target2);
+		if (si->ps.tvout && (target2.flags & TV_BITS)) BT_setmode(target2);
 	}
 	else /* single head mode */
 	{
@@ -306,7 +308,10 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		head1_set_display_start(startadd,colour_depth1);
 
 		/* set the timing */
-		head1_set_timing(target);
+		if (!(target.flags & TV_BITS)) head1_set_timing(target);
+
+		/* TVout support: setup CRTC and it's pixelclock */
+		if (si->ps.tvout && (target.flags & TV_BITS)) BT_setmode(target);
 
 		//fixme: shut-off the videoPLL if it exists...
 	}
