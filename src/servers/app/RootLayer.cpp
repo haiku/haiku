@@ -756,8 +756,9 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 			if (ptrWin[i]->Workspaces() & (0x00000001UL << index)) {
 				fWorkspace[index]->AddWinBorder(ptrWin[i]);
 
-				if (!ptrWin[i]->IsHidden())
+				if (!ptrWin[i]->IsHidden()) {
 					fWorkspace[index]->ShowWinBorder(ptrWin[i]);
+				}
 			}
 		}
 
@@ -914,19 +915,30 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 
 
 void
-RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldWksIndex, uint32 newWksIndex)
+RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldIndex, uint32 newIndex)
 {
-#ifdef NEW_INPUT_HANDLING
-	printf("RootLayer::SetWinBorderWorskpaces() UNIMPLEMENTED\n");
-	return;
-#endif
-	// you *cannot* set workspaces index for a window other than a normal one!
-	// Note: See ServerWindow class.
-	if (winBorder->Feel() != B_NORMAL_WINDOW_FEEL)
-		return;
+	// if the active notify Layer is somehow related to winBorder, then
+	// this window/WinBorder is not allowed to leave this workspace.
+	if (fNotifyLayer && (fNotifyLayer == winBorder || fNotifyLayer->Owner() == winBorder)) {
+		newIndex |= (0x00000001UL << fActiveWksIndex);
+	}
 
+	uint32 localOldIndex = oldIndex;
+	uint32 localNewIndex = newIndex;
 	bool invalidate = false;
 	bool invalid;
+
+	// if we're in the current workspace only, reflect that in the workspace index
+	if (localOldIndex == 0UL)
+		localOldIndex |= (0x00000001UL << fActiveWksIndex);
+	if (localNewIndex == 0UL)
+		localNewIndex |= (0x00000001UL << fActiveWksIndex);
+
+	// you *cannot* set workspaces index for a window other than a normal one!
+	// Note: See ServerWindow class.
+	if (winBorder->Feel() != B_NORMAL_WINDOW_FEEL || localOldIndex == localNewIndex)
+		return;
+
 #ifndef NEW_INPUT_HANDLING
 	WinBorder* exFocus = Focus();
 	WinBorder* exActive = Active();
@@ -939,8 +951,7 @@ RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldWksIndex, uint
 		if (fWorkspace[i]) {
 			invalid = false;
 
-			if (fWorkspace[i]->HasWinBorder(winBorder)
-				&& !(newWksIndex & (0x00000001UL << i))) {
+			if (!(localNewIndex & (0x00000001UL << i)) && fWorkspace[i]->HasWinBorder(winBorder)) {
 				if (!winBorder->IsHidden()) {
 					// a little trick to force Workspace to properly pick the next front.
 					winBorder->fHidden = true;
@@ -948,14 +959,12 @@ RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldWksIndex, uint
 					winBorder->fHidden = false;
 				}
 				fWorkspace[i]->RemoveWinBorder(winBorder);
-			} else if (newWksIndex & (0x00000001UL << i)
-				&& !(oldWksIndex & (0x00000001UL << i))) {
+			}
+
+			if ((localNewIndex & (0x00000001UL << i)) && !fWorkspace[i]->HasWinBorder(winBorder)) {
 				fWorkspace[i]->AddWinBorder(winBorder);
 				if (!winBorder->IsHidden())
 					invalid = fWorkspace[i]->ShowWinBorder(winBorder);
-			} else {
-				// do nothing. winBorder was, and it still is a member of this workspace
-				// OR, winBorder wasn't and it will not be in this workspace
 			}
 
 			if (fActiveWksIndex == i)
@@ -963,29 +972,16 @@ RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldWksIndex, uint
 		}
 	}
 
-// TODO: look into this...
-	if (fNotifyLayer) {
-		WinBorder* wb = fNotifyLayer->fOwner ?
-			fNotifyLayer->fOwner : (WinBorder*)fNotifyLayer;
-
-		if (!fWorkspace[fActiveWksIndex]->HasWinBorder(wb)) {
-/*			if (wb == fNotifyLayer)
-			{
-				fMovingWindow	= false;
-				fResizingWindow	= false;
-				wb->MouseUp(DEC_NONE);
-			}*/
-			fNotifyLayer	= NULL;
-		}
-	}
-
+#ifndef NEW_INPUT_HANDLING
 	BMessage changedMsg(B_WORKSPACES_CHANGED);
 	changedMsg.AddInt64("when", real_time_clock_usecs());
-	changedMsg.AddInt32("old", oldWksIndex);
-	changedMsg.AddInt32("new", newWksIndex);
-	winBorder->QuietlySetWorkspaces(newWksIndex);
+	changedMsg.AddInt32("old", oldIndex);
+	changedMsg.AddInt32("new", newIndex);
+	winBorder->QuietlySetWorkspaces(newIndex);
 	winBorder->Window()->SendMessageToClient(&changedMsg, B_NULL_TOKEN, false);
-
+#else
+	winBorder->WorkspacesChanged(oldIndex, newIndex);
+#endif
 	if (invalidate)
 #ifndef NEW_INPUT_HANDLING
 		show_final_scene(exFocus, exActive);
@@ -2321,8 +2317,14 @@ RootLayer::hide_winBorder(WinBorder *winBorder)
 void
 RootLayer::change_winBorder_feel(WinBorder *winBorder, int32 newFeel)
 {
-	bool	isVisible = false;
-	bool	wasVisibleInActiveWorkspace = false;
+	// if the notify Layer is somehow related to winBorder, then
+	// this window/WinBorder is not allowed to change feel.
+	if (fNotifyLayer && (fNotifyLayer == winBorder || fNotifyLayer->Owner() == winBorder)) {
+		return;
+	}
+
+	bool isVisible = false;
+	bool isVisibleInActiveWorkspace = false;
 
 #ifndef NEW_INPUT_HANDLING
 	WinBorder* exFocus = Focus();
@@ -2334,35 +2336,37 @@ RootLayer::change_winBorder_feel(WinBorder *winBorder, int32 newFeel)
 
 	if (!winBorder->IsHidden()) {
 		isVisible = true;
-		wasVisibleInActiveWorkspace = ActiveWorkspace()->HasWinBorder(winBorder);
+		isVisibleInActiveWorkspace = ActiveWorkspace()->HasWinBorder(winBorder);
+		// just hide, don't invalidate
 		winBorder->Hide(false);
+		// all workspaces must be up-to-date with this change of feel.
+		for (int32 i = 0; i < kMaxWorkspaceCount; i++) {
+			if (fWorkspace[i]) {
+				fWorkspace[i]->HideWinBorder(winBorder);
+				fWorkspace[i]->RemoveWinBorder(winBorder);
+			}
+		}
 	}
 
 	gDesktop->SetWinBorderFeel(winBorder, newFeel);
 
 	if (isVisible)
 	{
-		if (fNotifyLayer)
-		{
-// TODO: What was this supposed to do?!?
-/*			WinBorder	*wb	= fNotifyLayer->fOwner?
-								fNotifyLayer->fOwner:
-								(WinBorder*)fNotifyLayer;
-			if (wb == fNotifyLayer)
-			{
-				fMovingWindow	= false;
-				fResizingWindow	= false;
-				wb->MouseUp(DEC_NONE);
-			}*/
-			fNotifyLayer	= NULL;
+		// just show, don't invalidate
+		winBorder->Show(false);
+		// all workspaces must be up-to-date with this change of feel.
+		for (int32 i = 0; i < kMaxWorkspaceCount; i++) {
+			if (fWorkspace[i]) {
+				fWorkspace[i]->AddWinBorder(winBorder);
+				fWorkspace[i]->ShowWinBorder(winBorder);
+			}
 		}
 
-		winBorder->Show(false);
-		if (wasVisibleInActiveWorkspace || ActiveWorkspace()->HasWinBorder(winBorder))
+		if (isVisibleInActiveWorkspace)
 #ifndef NEW_INPUT_HANDLING
-		show_final_scene(exFocus, exActive);
+			show_final_scene(exFocus, exActive);
 #else
-		RevealNewWMState(oldWMState);
+			RevealNewWMState(oldWMState);
 #endif
 	}
 }

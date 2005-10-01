@@ -637,6 +637,19 @@ WinBorder::WorkspaceActivated(int32 index, bool active)
 	Window()->SendMessageToClient(&activatedMsg, B_NULL_TOKEN, false);
 }
 
+void
+WinBorder::WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces)
+{
+	fWorkspaces = newWorkspaces;
+
+	BMessage changedMsg(B_WORKSPACES_CHANGED);
+	changedMsg.AddInt64("when", real_time_clock_usecs());
+	changedMsg.AddInt32("old", oldWorkspaces);
+	changedMsg.AddInt32("new", newWorkspaces);
+
+	Window()->SendMessageToClient(&changedMsg, B_NULL_TOKEN, false);
+}
+
 #else
 /*!
 	\brief Handles B_MOUSE_DOWN events and takes appropriate actions

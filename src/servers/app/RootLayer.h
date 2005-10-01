@@ -84,8 +84,8 @@ public:
 			void				HideWinBorder(WinBorder* winBorder);
 			void				ShowWinBorder(WinBorder* winBorder);
 			void				SetWinBorderWorskpaces(WinBorder *winBorder,
-										uint32 oldWksIndex,
-										uint32 newWksIndex);
+										uint32 oldIndex,
+										uint32 newIndex);
 			WinBorder*			WinBorderAt(const BPoint& pt) const;
 #ifdef NEW_INPUT_HANDLING
 			void				RevealNewWMState(Workspace::State &oldWMState);

@@ -42,7 +42,7 @@
 #include "ServerWindow.h"
 
 //#define NEW_CLIPPING 1
-//#define NEW_INPUT_HANDLING 1
+#define NEW_INPUT_HANDLING 1
 
 enum {
 	B_LAYER_NONE		= 1,
@@ -170,6 +170,7 @@ class Layer {
 	virtual	void				MouseUp(const PointerEvent& evt);
 	virtual	void				MouseMoved(const PointerEvent& evt, uint32 transit);
 	virtual	void				WorkspaceActivated(int32 index, bool active);
+	virtual	void				WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces);
 #endif
 			BPoint				BoundsOrigin() const; // BoundsFrameDiff()?
 			float				Scale() const;
