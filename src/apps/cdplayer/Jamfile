@@ -11,4 +11,4 @@ App CDPlayer :
 	TrackMenu.cpp
 	TwoStateDrawButton.cpp
 	;
-LinkSharedOSLibs CDPlayer : be net netapi translation ;
+LinkSharedOSLibs CDPlayer : be libnet.so libnetapi.so translation ;

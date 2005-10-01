@@ -10,4 +10,4 @@ App CodyCam :
 	VideoConsumer.cpp
 ;
 
-LinkSharedOSLibs CodyCam : be media translation netapi stdc++.r4 ;
+LinkSharedOSLibs CodyCam : be media translation libnetapi.so stdc++.r4 ;
