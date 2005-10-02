@@ -1278,26 +1278,23 @@ uint8 BT_check_tvmode(display_mode target)
 	switch (mode)
 	{
 	case (640 | (480 << 16)):
-		if ((target.flags & TV_BITS) == TV_PAL)
-		{
-			if (!(target.flags & TV_VIDEO)) status = PAL640;
-		}
+		if (((target.flags & TV_BITS) == TV_PAL) && (!(target.flags & TV_VIDEO)))
+			status = PAL640;
 		if ((target.flags & TV_BITS) == TV_NTSC)
 		{
 			if (!(target.flags & TV_VIDEO)) status = NTSC640;
 			else status = NTSC640_OS;
 		}
 		break;
+	case (768 | (576 << 16)):
+		if (((target.flags & TV_BITS) == TV_PAL) && (target.flags & TV_VIDEO))
+			status = PAL800_OS;
+		break;
 	case (800 | (600 << 16)):
-		if ((target.flags & TV_BITS) == TV_PAL)
-		{
-			if (!(target.flags & TV_VIDEO)) status = PAL800;
-			else status = PAL800_OS;
-		}
-		if ((target.flags & TV_BITS) == TV_NTSC)
-		{
-			if (!(target.flags & TV_VIDEO)) status = NTSC800;
-		}
+		if (((target.flags & TV_BITS) == TV_PAL) && (!(target.flags & TV_VIDEO)))
+			status = PAL800;
+		if (((target.flags & TV_BITS) == TV_NTSC) && (!(target.flags & TV_VIDEO)))
+			status = NTSC800;
 		break;
 	case (720 | (480 << 16)):
 		if (((target.flags & TV_BITS) == TV_NTSC) && (target.flags & TV_VIDEO))
