@@ -196,70 +196,75 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 		return result;
 	}
 
-	/* check if all connected output devices can display the requested mode's aspect: */
-	/* calculate display mode aspect */
-	target_aspect = (target->timing.h_display / ((float)target->timing.v_display));
-	/* NOTE:
-	 * allow 0.10 difference so 5:4 aspect panels will be able to use 4:3 aspect modes! */
-	switch (si->ps.monitors)
+	/* disable aspect checks for a requested TVout mode when mode is TVout capable */
+	if (!(si->ps.tvout) ||
+		!(BT_check_tvmode(*target) && (target->flags & TV_BITS)))
 	{
-	case 0x01: /* digital panel on head 1, nothing on head 2 */
-		if (si->ps.panel1_aspect < (target_aspect - 0.10))
+		/* check if all connected output devices can display the requested mode's aspect: */
+		/* calculate display mode aspect */
+		target_aspect = (target->timing.h_display / ((float)target->timing.v_display));
+		/* NOTE:
+		 * allow 0.10 difference so 5:4 aspect panels will be able to use 4:3 aspect modes! */
+		switch (si->ps.monitors)
 		{
-			LOG(4, ("PROPOSEMODE: connected panel1 is not widescreen type, aborted.\n"));
-			return B_ERROR;
-		}
-		break;
-	case 0x10: /* nothing on head 1, digital panel on head 2 */
-		if (si->ps.panel2_aspect < (target_aspect - 0.10))
-		{
-			LOG(4, ("PROPOSEMODE: connected panel2 is not widescreen type, aborted.\n"));
-			return B_ERROR;
-		}
-		break;
-	case 0x11: /* digital panels on both heads */
-		if ((si->ps.panel1_aspect < (target_aspect - 0.10)) ||
-			(si->ps.panel2_aspect < (target_aspect - 0.10)))
-		{
-			LOG(4, ("PROPOSEMODE: not all connected panels are widescreen type, aborted.\n"));
-			return B_ERROR;
-		}
-		break;
-	default: /* at least one analog monitor is connected, or nothing detected at all */
-		if (target_aspect > 1.34)
-		{
-			LOG(4, ("PROPOSEMODE: not all output devices can display widescreen modes, aborted.\n"));
-			return B_ERROR;
-		}
-		break;
-	}
-
-	/* only export widescreen panel-TV modes when an exact resolution match exists,
-	 * to prevent the modelist from becoming too crowded */
-	if (target_aspect > 1.61)
-	{
-		status_t panel_TV_stat = B_ERROR;
-
-		if (si->ps.tmds1_active)
-		{
-			if ((target->timing.h_display == si->ps.p1_timing.h_display) &&
-				(target->timing.v_display == si->ps.p1_timing.v_display))
+		case 0x01: /* digital panel on head 1, nothing on head 2 */
+			if (si->ps.panel1_aspect < (target_aspect - 0.10))
 			{
-				panel_TV_stat = B_OK;
+				LOG(4, ("PROPOSEMODE: connected panel1 is not widescreen type, aborted.\n"));
+				return B_ERROR;
 			}
-		}
-		if (si->ps.tmds2_active)
-		{
-			if ((target->timing.h_display == si->ps.p2_timing.h_display) &&
-				(target->timing.v_display == si->ps.p2_timing.v_display))
+			break;
+		case 0x10: /* nothing on head 1, digital panel on head 2 */
+			if (si->ps.panel2_aspect < (target_aspect - 0.10))
 			{
-				panel_TV_stat = B_OK;
+				LOG(4, ("PROPOSEMODE: connected panel2 is not widescreen type, aborted.\n"));
+				return B_ERROR;
 			}
+			break;
+		case 0x11: /* digital panels on both heads */
+			if ((si->ps.panel1_aspect < (target_aspect - 0.10)) ||
+				(si->ps.panel2_aspect < (target_aspect - 0.10)))
+			{
+				LOG(4, ("PROPOSEMODE: not all connected panels are widescreen type, aborted.\n"));
+				return B_ERROR;
+			}
+			break;
+		default: /* at least one analog monitor is connected, or nothing detected at all */
+			if (target_aspect > 1.34)
+			{
+				LOG(4, ("PROPOSEMODE: not all output devices can display widescreen modes, aborted.\n"));
+				return B_ERROR;
+			}
+			break;
 		}
-		if (panel_TV_stat != B_OK)
+
+		/* only export widescreen panel-TV modes when an exact resolution match exists,
+		 * to prevent the modelist from becoming too crowded */
+		if (target_aspect > 1.61)
 		{
-			LOG(4, ("PROPOSEMODE: WS panel_TV mode requested but no such TV here, aborted.\n"));
-			return B_ERROR;
+			status_t panel_TV_stat = B_ERROR;
+
+			if (si->ps.tmds1_active)
+			{
+				if ((target->timing.h_display == si->ps.p1_timing.h_display) &&
+					(target->timing.v_display == si->ps.p1_timing.v_display))
+				{
+					panel_TV_stat = B_OK;
+				}
+			}
+			if (si->ps.tmds2_active)
+			{
+				if ((target->timing.h_display == si->ps.p2_timing.h_display) &&
+					(target->timing.v_display == si->ps.p2_timing.v_display))
+				{
+					panel_TV_stat = B_OK;
+				}
+			}
+			if (panel_TV_stat != B_OK)
+			{
+				LOG(4, ("PROPOSEMODE: WS panel_TV mode requested but no such TV here, aborted.\n"));
+				return B_ERROR;
+			}
 		}
 	}
 
