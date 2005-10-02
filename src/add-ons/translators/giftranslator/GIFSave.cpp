@@ -104,20 +104,13 @@ GIFSave::GIFSave(BBitmap *bitmap, BPositionIO *output)
 			if (debug)
 				printf("GIFSave::GIFSave() - Using transparent index %d\n", palette->TransparentIndex());
 		} else {
-			bool found = palette->SetTransparentColor((uint8)prefs->transparentred,
-													  (uint8)prefs->transparentred,
-													  (uint8)prefs->transparentblue);
-			if (found) {
-				if (debug) {
-					printf("GIFSave::GIFSave() - Found transparent color %d,%d,%d at index %d\n",
-						   prefs->transparentred, prefs->transparentgreen, prefs->transparentblue,
-						   palette->TransparentIndex());
-				}
-			} else {
-				if (debug) {
-					printf("GIFSave::GIFSave() - Did not find color %d,%d,%d - deactivating transparency\n",
-						   prefs->transparentred, prefs->transparentgreen, prefs->transparentblue);
-				}
+			palette->SetTransparentColor((uint8)prefs->transparentred,
+									     (uint8)prefs->transparentgreen,
+									     (uint8)prefs->transparentblue);
+			if (debug) {
+				printf("GIFSave::GIFSave() - Found transparent color %d,%d,%d at index %d\n",
+					   prefs->transparentred, prefs->transparentgreen, prefs->transparentblue,
+					   palette->TransparentIndex());
 			}
 		}
 	} else {

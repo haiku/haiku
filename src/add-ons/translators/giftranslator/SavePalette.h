@@ -47,7 +47,7 @@ class SavePalette {
 			void			SetTransparentIndex(int index);
 	inline	int				TransparentIndex() const
 								{ return fTransparentIndex; }
-			bool			SetTransparentColor(uint8 red,
+			void			SetTransparentColor(uint8 red,
 												uint8 green,
 												uint8 blue);
 

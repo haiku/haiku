@@ -229,9 +229,9 @@ touch_color_item(SFHash& hash, unsigned int key, uint8 r, uint8 g, uint8 b)
 	} else {
 		ci->count++;
 		// use brightest color
-		ci->red = max_c(ci->red, r);
+/*		ci->red = max_c(ci->red, r);
 		ci->green = max_c(ci->green, g);
-		ci->blue = max_c(ci->blue, b);
+		ci->blue = max_c(ci->blue, b);*/
 	}
 	return true;
 }
@@ -404,11 +404,12 @@ SavePalette::SetTransparentIndex(int index)
 }
 
 // SetTransparentColor
-bool
+void
 SavePalette::SetTransparentColor(uint8 red, uint8 green, uint8 blue)
 {
 	bool found = false;
 
+	// try direct hit first
 	for (int i = 0; i < fSize; i++) {
 		if (pal[i].red == red &&
 			pal[i].green == green &&
@@ -421,10 +422,25 @@ SavePalette::SetTransparentColor(uint8 red, uint8 green, uint8 blue)
 		}
 	}
 	if (!found) {
-		fTransparentIndex = 0;
-		fUseTransparent = false;
+		// find closest match
+		fTransparentIndex = IndexForColor(red, green, blue);
+		// NOTE: This is a tough decision:
+		// -> the exact color might be contained within the image
+		//    but have slipped through the net and is now not in the
+		//    palette, the user still wants those pixels to be
+		//    transparent of course, so it is best to match up a
+		//    color from the palette
+		// -> on the other hand, the setting might still be there
+		//    from some previous image and the color might not
+		//    even appear in the current image at all... but I guess
+		//    handling it like below is the lesser evil.
+		// match up color at index to provided transparent color,
+		// to make sure it actually works
+		pal[fTransparentIndex].red = red;
+		pal[fTransparentIndex].green = green;
+		pal[fTransparentIndex].blue = blue;
+		found = true;
 	}
-	return found;
 }
 
 // GetColors
