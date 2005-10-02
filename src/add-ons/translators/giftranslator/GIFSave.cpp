@@ -13,6 +13,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+// Additional authors:	Stephan Aßmus, <superstippi@gmx.de>
+
 #include "GIFSave.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,7 +28,14 @@ const int32 seven_sixteenth = (int32)((7.0 / 16.0) * 32768);
 
 extern bool debug;
 
-GIFSave::GIFSave(BBitmap *bitmap, BPositionIO *output) {
+class ColorCache : public HashItem {
+	public:
+		unsigned char index;
+};
+
+// constructor
+GIFSave::GIFSave(BBitmap *bitmap, BPositionIO *output)
+{
 	color_space cs = bitmap->ColorSpace();
     if (cs != B_RGB32 && cs != B_RGBA32 && cs != B_RGB32_BIG && cs != B_RGBA32_BIG) {
     	if (debug) printf("GIFSave::GIFSave() - Unknown color space\n");
@@ -36,9 +45,11 @@ GIFSave::GIFSave(BBitmap *bitmap, BPositionIO *output) {
     
 	fatalerror = false;
 	prefs = new Prefs();
-	if (prefs->palettemode == OPTIMAL_PALETTE) palette = new SavePalette(bitmap);
-	else palette = new SavePalette(prefs->palettemode);
-	if (palette->fatalerror) {
+	if (prefs->palettemode == OPTIMAL_PALETTE)
+		palette = new SavePalette(bitmap, prefs->palette_size_in_bits);
+	else
+		palette = new SavePalette(prefs->palettemode);
+	if (!palette->IsValid()) {
 		fatalerror = true;
 		return;
 	}
@@ -86,33 +97,32 @@ GIFSave::GIFSave(BBitmap *bitmap, BPositionIO *output) {
 		}
 	}
 	
-	palette->usetransparent = prefs->usetransparent;
+	palette->SetUseTransparent(prefs->usetransparent);
 	if (prefs->usetransparent) {
 		if (prefs->usetransparentindex) {
-			palette->transparentindex = prefs->transparentindex;
-			if (debug) printf("GIFSave::GIFSave() - Using transparent index %d\n", palette->transparentindex);
+			palette->SetTransparentIndex(prefs->transparentindex);
+			if (debug)
+				printf("GIFSave::GIFSave() - Using transparent index %d\n", palette->TransparentIndex());
 		} else {
-			palette->transparentindex = -1;
-			for (int x = 0; x < palette->size; x++) {
-				if (palette->pal[x].red == prefs->transparentred &&
-					palette->pal[x].green == prefs->transparentgreen &&
-					palette->pal[x].blue == prefs->transparentblue) {
-					
-					palette->transparentindex = x;
-					if (debug) printf("GIFSave::GIFSave() - Found transparent color %d,%d,%d at index %d\n", prefs->transparentred,
-						prefs->transparentgreen, prefs->transparentblue, x);
-					break;
+			bool found = palette->SetTransparentColor((uint8)prefs->transparentred,
+													  (uint8)prefs->transparentred,
+													  (uint8)prefs->transparentblue);
+			if (found) {
+				if (debug) {
+					printf("GIFSave::GIFSave() - Found transparent color %d,%d,%d at index %d\n",
+						   prefs->transparentred, prefs->transparentgreen, prefs->transparentblue,
+						   palette->TransparentIndex());
 				}
-			}
-			if (palette->transparentindex == -1) {
-				palette->usetransparent = false;
-				palette->transparentindex = 0;
-				if (debug) printf("GIFSave::GIFSave() - Did not find color %d,%d,%d - deactivating transparency\n",
-					prefs->transparentred, prefs->transparentgreen, prefs->transparentblue);
+			} else {
+				if (debug) {
+					printf("GIFSave::GIFSave() - Did not find color %d,%d,%d - deactivating transparency\n",
+						   prefs->transparentred, prefs->transparentgreen, prefs->transparentblue);
+				}
 			}
 		}
 	} else {
-		if (debug) printf("GIFSave::GIFSave() - Not using transparency\n");
+		if (debug)
+			printf("GIFSave::GIFSave() - Not using transparency\n");
 	}
 
 	this->output = output;
@@ -140,38 +150,50 @@ GIFSave::GIFSave(BBitmap *bitmap, BPositionIO *output) {
 	output->Write(&t, 1);
 }
 
-void GIFSave::WriteGIFHeader() {
+// destructor
+GIFSave::~GIFSave()
+{
+	delete palette;
+	delete prefs;
+}
+
+// WriteGIFHeader
+void
+GIFSave::WriteGIFHeader()
+{
 	// Standard header
 	unsigned char header[] = {'G', 'I', 'F', '8', '9', 'a', 0, 0, 0, 0, 0, 0, 0};
 	header[6] = width & 0xff;
 	header[7] = (width & 0xff00) >> 8;
 	header[8] = height & 0xff;
 	header[9] = (height & 0xff00) >> 8;
-	header[10] = 0xf0 | (palette->size_in_bits - 1);
-	header[11] = palette->backgroundindex;
+	header[10] = 0xf0 | (palette->SizeInBits() - 1);
+	header[11] = palette->BackgroundIndex();
 	output->Write(header, 13);
 	
 	// Global palette
-	int size = 1 << palette->size_in_bits;
-	char c[256 * 3]; // can't be bigger than this
-	for (int x = 0; x < size; x++) {
-		c[x * 3] = palette->pal[x].red;
-		c[x * 3 + 1] = palette->pal[x].green;
-		c[x * 3 + 2] = palette->pal[x].blue;
-	}
-	output->Write(c, size * 3);
+	int size = (1 << palette->SizeInBits()) * 3;
+	uint8* buffer = new uint8[size]; // can't be bigger than this
+	palette->GetColors(buffer, size);
+	output->Write(buffer, size);
+	delete[] buffer;
 }
 
-void GIFSave::WriteGIFControlBlock() {
+// WriteGIFControlBlock
+void
+GIFSave::WriteGIFControlBlock()
+{
 	unsigned char b[8] = {0x21, 0xf9, 0x04, 0, 0, 0, 0, 0x00};
-	if (palette->usetransparent) {
+	if (palette->UseTransparent()) {
 		b[3] = b[3] | 1;
-		b[6] = palette->transparentindex;
+		b[6] = palette->TransparentIndex();
 	}
 	output->Write(b, 8);
 }
 
-void GIFSave::WriteGIFImageHeader() {
+// WriteGIFImageHeader
+void GIFSave::WriteGIFImageHeader()
+{
 	unsigned char header[10];
 	header[0] = 0x2c;
 	header[1] = header[2] = 0;
@@ -187,7 +209,9 @@ void GIFSave::WriteGIFImageHeader() {
 	output->Write(header, 10);
 }
 
-void GIFSave::WriteGIFImageData() {
+// WriteGIFImageData
+void GIFSave::WriteGIFImageData()
+{
 	InitFrame();
 	code_value = (short *)malloc(HASHSIZE * 2);
 	prefix_code = (short *)malloc(HASHSIZE * 2);
@@ -232,7 +256,10 @@ void GIFSave::WriteGIFImageData() {
 	free(append_char);
 }
 
-void GIFSave::OutputCode(short code, int BITS, bool flush) {
+// OutputCode
+void
+GIFSave::OutputCode(short code, int BITS, bool flush)
+{
 	if (!flush) {
 		bit_buffer |= (unsigned int) code << bit_count;
 		bit_count += BITS;
@@ -266,7 +293,10 @@ void GIFSave::OutputCode(short code, int BITS, bool flush) {
 	}
 }
 
-void GIFSave::ResetHashtable() {
+// ResetHashtable
+void
+GIFSave::ResetHashtable()
+{
 	for (int q = 0; q < HASHSIZE; q++) {
 		code_value[q] = -1;
 		prefix_code[q] = 0;
@@ -274,7 +304,10 @@ void GIFSave::ResetHashtable() {
 	}
 }
 
-int GIFSave::CheckHashtable(int s, unsigned char c) {
+// CheckHashtable
+int
+GIFSave::CheckHashtable(int s, unsigned char c)
+{
 	if (s == -1) return c;
 	int hashindex = HASH(s, c);
 	int nextindex;
@@ -286,7 +319,10 @@ int GIFSave::CheckHashtable(int s, unsigned char c) {
 	return -1;
 }
 
-void GIFSave::AddToHashtable(int s, unsigned char c) {
+// AddToHashtable
+void
+GIFSave::AddToHashtable(int s, unsigned char c)
+{
     int hashindex = HASH(s, c);
     while (code_value[hashindex] != -1)	hashindex = (hashindex + HASHSTEP) % HASHSIZE;
     code_value[hashindex] = next_code;
@@ -294,7 +330,10 @@ void GIFSave::AddToHashtable(int s, unsigned char c) {
     append_char[next_code] = c;
 }
 
-unsigned char GIFSave::NextPixel(int pixel) {
+// NextPixel
+unsigned char
+GIFSave::NextPixel(int pixel)
+{
 	int bpr = bitmap->BytesPerRow();
 	color_space cs = bitmap->ColorSpace();
 	unsigned char r, g, b;
@@ -340,7 +379,7 @@ unsigned char GIFSave::NextPixel(int pixel) {
 		cc->index = palette->IndexForColor(r, g, b);
 		hash->AddItem((HashItem *)cc);
 	}
-	
+
 	if (prefs->usedithering) {
 		int x = pixel % width;
 		// Don't carry error on to next line when interlaced because
@@ -352,10 +391,10 @@ unsigned char GIFSave::NextPixel(int pixel) {
 				blue_error[y] = 0;
 			}
 		}
-		
-		int32 red_total_error = palette->pal[cc->index].red - r; 
-		int32 green_total_error = palette->pal[cc->index].green - g; 
-		int32 blue_total_error = palette->pal[cc->index].blue - b; 
+
+		int32 red_total_error = palette->pal[cc->index].red - r;
+		int32 green_total_error = palette->pal[cc->index].green - g;
+		int32 blue_total_error = palette->pal[cc->index].blue - b;
 
 		red_side_error = (red_error[x + 1] + (red_total_error * seven_sixteenth)) >> 15;
 		blue_side_error = (blue_error[x + 1] + (blue_total_error * seven_sixteenth)) >> 15;
@@ -368,7 +407,7 @@ unsigned char GIFSave::NextPixel(int pixel) {
 		red_error[x] += (red_total_error * five_sixteenth);
 		green_error[x] += (green_total_error * five_sixteenth);
 		blue_error[x] += (blue_total_error * five_sixteenth);
-			
+
 		red_error[x + 1] = (red_total_error * one_sixteenth);
 		green_error[x + 1] = (green_total_error * one_sixteenth);
 		blue_error[x + 1] = (blue_total_error * one_sixteenth);
@@ -377,9 +416,13 @@ unsigned char GIFSave::NextPixel(int pixel) {
 	return cc->index;
 }
 
-void GIFSave::InitFrame() {
-	code_size = palette->size_in_bits;
-	if (code_size == 1) code_size++;
+// InitFrame
+void
+GIFSave::InitFrame()
+{
+	code_size = palette->SizeInBits();
+	if (code_size == 1)
+		code_size++;
 	BITS = code_size + 1;
 	clear_code = 1 << code_size;
 	end_code = clear_code + 1;
@@ -398,9 +441,3 @@ void GIFSave::InitFrame() {
 	
 	gifbits = (unsigned char *)bitmap->Bits();
 }
-
-GIFSave::~GIFSave() {
-	delete palette;
-	delete prefs;
-}
-

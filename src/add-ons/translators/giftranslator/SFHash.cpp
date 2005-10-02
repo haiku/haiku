@@ -13,6 +13,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+// Additional authors:	Stephan Aßmus, <superstippi@gmx.de>
+
 #include "SFHash.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -46,7 +48,9 @@ void SFHash::AddItem(HashItem *item) {
 	}
 }
 
-HashItem *SFHash::GetItem(unsigned int key) {
+HashItem*
+SFHash::GetItem(unsigned int key)
+{
 	int pos = key % size;
 	HashItem *item = main_array[pos];
 	
@@ -57,7 +61,9 @@ HashItem *SFHash::GetItem(unsigned int key) {
 	return NULL;
 }
 
-unsigned int SFHash::CountItems() {
+unsigned int
+SFHash::CountItems()
+{
     unsigned int count = 0;
     for (int x = 0; x < this->size; x++) {
         HashItem *item = main_array[x];
@@ -69,7 +75,9 @@ unsigned int SFHash::CountItems() {
     return count;
 }
 
-HashItem *SFHash::NextItem() {
+HashItem*
+SFHash::NextItem()
+{
     if (iterate_pos >= size) {
         Rewind();
         return NULL;

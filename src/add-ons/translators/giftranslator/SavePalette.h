@@ -27,34 +27,58 @@ enum {
 	OPTIMAL_PALETTE
 };
 
-class ColorItem : public HashItem {
-	public:
-		ColorItem(unsigned int k, unsigned int c);
-        unsigned int count;
-};
-
-class ColorCache : public HashItem {
-	public:
-		unsigned char index;
-};
-
 class SavePalette {
 	public:
-		SavePalette(int predefined);
-		SavePalette(BBitmap *bitmap);
-		SavePalette();
-		~SavePalette();
+							SavePalette(int mode);
+							SavePalette(BBitmap *bitmap,
+										int32 maxSizeInBits = 8);
+	virtual					~SavePalette();
 		
-		unsigned char IndexForColor(unsigned char red, unsigned char green,
-			unsigned char blue);
-		unsigned char IndexForColor(rgb_color color);
+	inline	bool			IsValid() const
+								{ return !fFatalError; }
 
-		rgb_color *pal;
-		int size, size_in_bits, mode;
-		bool usetransparent;
-		int backgroundindex, transparentindex;
-		bool fatalerror;
+			uint8			IndexForColor(uint8 red, uint8 green, uint8 blue);
+	inline	uint8			IndexForColor(const rgb_color& color);
+
+			void			SetUseTransparent(bool use);
+	inline	bool			UseTransparent() const
+								{ return fUseTransparent; }
+
+			void			SetTransparentIndex(int index);
+	inline	int				TransparentIndex() const
+								{ return fTransparentIndex; }
+			bool			SetTransparentColor(uint8 red,
+												uint8 green,
+												uint8 blue);
+
+	inline	int				SizeInBits() const
+								{ return fSizeInBits; }
+
+	inline	int				BackgroundIndex() const
+								{ return fBackgroundIndex; }
+
+			void			GetColors(uint8* buffer, int size) const;
+
+			rgb_color*		pal;
+
+	private:
+			int				fSize;
+			int				fSizeInBits;
+			int				fMode;
+			bool			fUseTransparent;
+			int				fTransparentIndex;
+			int				fBackgroundIndex;
+			bool			fFatalError;
 };
 
+// IndexForColor
+inline uint8
+SavePalette::IndexForColor(const rgb_color& color)
+{
+	return IndexForColor(color.red, color.green, color.blue);
+}
+
+
 #endif
+
 

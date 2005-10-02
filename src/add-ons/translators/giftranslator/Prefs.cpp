@@ -13,6 +13,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+// Additional authors:	Stephan Aßmus, <superstippi@gmx.de>
+
 #include "Prefs.h"
 #include <File.h>
 #include <Path.h>
@@ -26,7 +28,8 @@ Prefs::Prefs() {
 	usedithering = true;
 	transparentindex = transparentred = transparentgreen = 
 		transparentblue = palettemode = 0;
-	
+	palette_size_in_bits = 8;
+
 	BPath path;
 	find_directory(B_USER_SETTINGS_DIRECTORY, &path);
 	path.Append("GIFTranslator_settings");
@@ -47,6 +50,8 @@ Prefs::Prefs() {
 	if (!GetBool("usedithering", &usedithering, &db)) return;
 	int di = 0;
 	if (!GetInt("palettemode", &palettemode, &di)) return;
+	di = 8;
+	if (!GetInt("palettesize", &palette_size_in_bits, &di)) return;
 	di = 0;
 	if (!GetInt("transparentindex", &transparentindex, &di)) return;
 	di = 0;
@@ -111,6 +116,7 @@ void Prefs::Save() {
 	if (!PutBool("usetransparentindex", &usetransparentindex)) return;
 	if (!PutBool("usedithering", &usedithering)) return;
 	if (!PutInt("palettemode", &palettemode)) return;
+	if (!PutInt("palettesize", &palette_size_in_bits)) return;
 	if (!PutInt("transparentindex", &transparentindex)) return;
 	if (!PutInt("transparentred", &transparentred)) return;
 	if (!PutInt("transparentgreen", &transparentgreen)) return;

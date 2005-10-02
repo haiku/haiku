@@ -41,8 +41,8 @@ status_t GetBitmap(BPositionIO *in, BBitmap **out);
 
 /* Required data */
 char translatorName[] = "GIF Images"; 
-char translatorInfo[] = "GIF image translator v1.3"; 
-int32 translatorVersion = 0x130;
+char translatorInfo[] = "GIF image translator v1.4"; 
+int32 translatorVersion = 0x140;
 
 translation_format inputFormats[] = { 
 	{ GIF_TYPE, B_TRANSLATOR_BITMAP, 0.8, 0.8, "image/gif", "GIF image" }, 

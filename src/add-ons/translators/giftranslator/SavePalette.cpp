@@ -13,6 +13,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+// Additional authors:	Stephan Aßmus, <superstippi@gmx.de>
+
+#include <new>
+
 #include "SavePalette.h"
 #include <Bitmap.h>
 #include <stdlib.h>
@@ -21,6 +25,7 @@
 
 extern bool debug;
 
+// "web safe palette"
 const rgb_color wsp[256] = {
 	{0xff, 0xff, 0xff, 0xff}, {0xff, 0xff, 0xcc, 0xff}, 
 	{0xff, 0xff, 0x99, 0xff}, {0xff, 0xff, 0x66, 0xff}, 
@@ -152,64 +157,109 @@ const rgb_color wsp[256] = {
 	{0x00, 0x00, 0x00, 0xff}, {0x00, 0x00, 0x00, 0xff}
 };
 
-ColorItem::ColorItem(unsigned int k, unsigned int c) {
-    key = k;
-    count = c;
-}
-
-SavePalette::SavePalette() {
-	pal = new rgb_color[256];
-	backgroundindex = 0;
-	usetransparent = false;
-	transparentindex = 0;
-	size = size_in_bits = 0;
-	fatalerror = false;
-	mode = WEB_SAFE_PALETTE;
-}
-
-SavePalette::SavePalette(int predefined) {
-	pal = new rgb_color[256];
-	backgroundindex = 0;
-	usetransparent = false;
-	transparentindex = 0;
-	fatalerror = false;
-	
-	mode = predefined;
-	size_in_bits = 8;
-	
-	if (predefined == WEB_SAFE_PALETTE) {
-		memcpy(pal, wsp, sizeof(rgb_color) * 256);
-		size = 216;
-	} else if (predefined == BEOS_SYSTEM_PALETTE) {
-		color_map *map = (color_map *)system_colors();
-		memcpy(pal, map->color_list, sizeof(rgb_color) * 256);
-		size = 256;
-	} else if (predefined == GREYSCALE_PALETTE) {
-		for (int x = 0; x < 256; x++) {
-			pal[x].red = pal[x].green = pal[x].blue = x;
-			pal[x].alpha = 0xff;
+class ColorItem : public HashItem {
+	public:
+		ColorItem(unsigned int k, unsigned int c,
+				  uint8 r, uint8 g, uint8 b)
+			: count(c),
+			  red(r),
+			  green(g),
+			  blue(b)
+		{
+			key = k;
 		}
-		size = 256;
+        unsigned int count;
+        uint8 red;
+        uint8 green;
+        uint8 blue;
+};
+
+// constructor
+SavePalette::SavePalette(int mode)
+	: pal(new(nothrow) rgb_color[256]),
+	  fSize(0),
+	  fSizeInBits(8),
+	  fMode(mode),
+	  fUseTransparent(false),
+	  fTransparentIndex(0),
+	  fBackgroundIndex(0),
+	  fFatalError(pal == NULL)
+{
+	if (IsValid()) {
+		if (fMode == WEB_SAFE_PALETTE) {
+			memcpy(pal, wsp, sizeof(rgb_color) * 256);
+			fSize = 216;
+		} else if (fMode == BEOS_SYSTEM_PALETTE) {
+			color_map *map = (color_map *)system_colors();
+			memcpy(pal, map->color_list, sizeof(rgb_color) * 256);
+			fSize = 256;
+		} else if (fMode == GREYSCALE_PALETTE) {
+			for (int i = 0; i < 256; i++) {
+				pal[i].red = pal[i].green = pal[i].blue = i;
+				pal[i].alpha = 0xff;
+			}
+			fSize = 256;
+		}
 	}
 }
 
-SavePalette::SavePalette(BBitmap *bitmap) {
-	pal = new rgb_color[256];
-	backgroundindex = 0;
-	usetransparent = false;
-	transparentindex = 0;
-	fatalerror = false;
-	mode = OPTIMAL_PALETTE;
+// make_key
+static int
+make_key(uint8 r, uint8 g, uint8 b, uint8 bits)
+{
+	r = r >> (8 - bits);
+	g = g >> (8 - bits);
+	b = b >> (8 - bits);
+	return (r << (bits * 2)) | (g << bits) | b;
+}
+
+// touch_color_item
+static bool
+touch_color_item(SFHash& hash, unsigned int key, uint8 r, uint8 g, uint8 b)
+{
+	ColorItem* ci = (ColorItem*)hash.GetItem(key);
+	if (ci == NULL) {
+		ci = new(nothrow) ColorItem(key, 1, r, g, b);
+		if (ci == NULL) {
+			if (debug)
+				printf("Out of memory in touch_color_item()\n");
+			return false;
+		}
+		hash.AddItem((HashItem *)ci);
+	} else {
+		ci->count++;
+		// use brightest color
+		ci->red = max_c(ci->red, r);
+		ci->green = max_c(ci->green, g);
+		ci->blue = max_c(ci->blue, b);
+	}
+	return true;
+}
+
+// constructor
+SavePalette::SavePalette(BBitmap *bitmap, int32 maxSizeInBits)
+	: pal(new(nothrow) rgb_color[256]),
+	  fSize(0),
+	  fSizeInBits(0),
+	  fMode(OPTIMAL_PALETTE),
+	  fUseTransparent(false),
+	  fTransparentIndex(0),
+	  fBackgroundIndex(0),
+	  fFatalError(pal == NULL)
+{
+	if (!IsValid())
+		return;
 
 	SFHash hash(1 << 16);
 	if (hash.fatalerror) {
 		if (debug)
 			printf("Out of memory in SavePalette(BBitmap *)\n");
-		fatalerror = true;
+		fFatalError = true;
 		return;
 	}
-    unsigned char r, g, b;
-    
+
+	// reject unsupported color spaces
+	// TODO: B_CMAP8 and B_GRAY8 should be really easy to support as well!!
     color_space cs = bitmap->ColorSpace();
     if (cs != B_RGB32 && cs != B_RGBA32 && cs != B_RGB32_BIG && cs != B_RGBA32_BIG) {
     	if (debug) {
@@ -217,111 +267,177 @@ SavePalette::SavePalette(BBitmap *bitmap) {
     		printf("%d %d %d %d or 0x%x\n", (cs & 0xff000000) >> 24, (cs & 0xff0000) >> 16,
     			(cs & 0xff00) >> 8, cs & 0xff, cs);
     	}
-    	fatalerror = true;
+    	fFatalError = true;
     	return;
    	}
    	
-   	BRect rect = bitmap->Bounds();
-   	int height = rect.IntegerHeight() + 1;
-   	int width = rect.IntegerWidth() + 1;
-   	unsigned char *bits = (unsigned char *)bitmap->Bits();
+	BRect rect = bitmap->Bounds();
+	uint32 height = rect.IntegerHeight() + 1;
+	uint32 width = rect.IntegerWidth() + 1;
+	uint8* bits = (uint8*)bitmap->Bits();
+	uint32 bpr = bitmap->BytesPerRow();
 
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-        	if (cs == B_RGB32 || cs == B_RGBA32) {
-        		b = bits[0];
-        		g = bits[1];
-        		r = bits[2];
-        	} else {
-        		r = bits[1];
-        		g = bits[2];
-        		b = bits[3];
-        	}
-			bits += 4;
-			
-            unsigned int key = (r << 16) + (g << 8) + b;
-            ColorItem *ci = (ColorItem *)hash.GetItem(key);
-            if (ci == NULL) {
-                ci = new ColorItem(key, 1);
-                if (ci == NULL) {
-                	if (debug) printf("Out of memory in SavePalette(BBitmap *)\n");
-			        fatalerror = true;
+	uint8 r, g, b;
+	uint8 useBits = 3 + maxSizeInBits / 2;
+	if (cs == B_RGB32 || cs == B_RGBA32) {
+		for (uint32 y = 0; y < height; y++) {
+			uint8* handle = bits;
+			for (uint32 x = 0; x < width; x++) {
+				b = handle[0];
+				g = handle[1];
+				r = handle[2];
+				handle += 4;
+
+				uint32 key = make_key(r, g, b, useBits);
+				if (!touch_color_item(hash, key, r, g, b)) {
+					if (debug) printf("Out of memory in SavePalette(BBitmap *)\n");
+					fFatalError = true;
 			        return;
-			    }
-                hash.AddItem((HashItem *)ci);
-            } else {
-                ci->count++;
-            }
-        }
-    }
+	            }
+	        }
+	        bits += bpr;
+	    }
+	} else if ((cs == B_RGB32_BIG || cs == B_RGBA32_BIG)) {
+		for (uint32 y = 0; y < height; y++) {
+			uint8* handle = bits;
+			for (uint32 x = 0; x < width; x++) {
+				b = handle[2];
+				g = handle[1];
+				r = handle[0];
+				handle += 4;
+
+				uint32 key = make_key(r, g, b, useBits);
+				if (!touch_color_item(hash, key, r, g, b)) {
+					if (debug) printf("Out of memory in SavePalette(BBitmap *)\n");
+					fFatalError = true;
+			        return;
+	            }
+	        }
+	        bits += bpr;
+	    }
+	}
     
 	int unique_colors = hash.CountItems();
-	size_in_bits = 1;
-	while (((1 << size_in_bits) < unique_colors) && (size_in_bits < 8)) size_in_bits++;
-	size = 1 << size_in_bits;
+	while (((1 << fSizeInBits) < unique_colors) && (fSizeInBits < maxSizeInBits))
+		fSizeInBits++;
+	fSize = 1 << fSizeInBits;
 
-    ColorItem **topcolors = (ColorItem **)malloc(size  * 4);
+    ColorItem **topcolors = (ColorItem **)malloc(fSize  * 4);
     if (topcolors == NULL) {
         if (debug) printf("Out of memory in SavePalette(BBitmap *)\n");
-        fatalerror = true;
+        fFatalError = true;
         return;
     }
-    ColorItem *dummy = new ColorItem(0, 0);
-    for (int x = 0; x < size; x++) topcolors[x] = dummy;
+    ColorItem *dummy = new ColorItem(0, 0, 0, 0, 0);
+    for (int i = 0; i < fSize; i++)
+    	topcolors[i] = dummy;
 
-    for (int x = 0; x < unique_colors; x++) {
+    for (int i = 0; i < unique_colors; i++) {
         ColorItem *ci = (ColorItem *)hash.NextItem();
-        for (int y = 0; y < size; y++) {
-            if (ci->count > topcolors[y]->count) {
-                for (int z = size - 1; z > y; z--) {
-                    topcolors[z] = topcolors[z-1];
+        for (int j = 0; j < fSize; j++) {
+            if (ci->count > topcolors[j]->count) {
+                for (int k = fSize - 1; k > j; k--) {
+                    topcolors[k] = topcolors[k - 1];
                 }
-                topcolors[y] = ci;
+                topcolors[j] = ci;
                 break;
             }
         }
     }
     
-    for (int x = 0; x < size; x++) {
-    	pal[x].red = topcolors[x]->key >> 16;
-    	pal[x].green = (topcolors[x]->key & 0xff00) >> 8;
-        pal[x].blue = topcolors[x]->key & 0xff;
-        pal[x].alpha = 0xff;
+    for (int i = 0; i < fSize; i++) {
+    	pal[i].red = topcolors[i]->red;
+    	pal[i].green = topcolors[i]->green;
+        pal[i].blue = topcolors[i]->blue;
+        pal[i].alpha = 0xff;
     }
     
     delete dummy;
     free(topcolors);
 }
 
-/* Standard mapping services once a palette is loaded */
-unsigned char SavePalette::IndexForColor(unsigned char red, unsigned char green,
-	unsigned char blue) {
+// destructor
+SavePalette::~SavePalette()
+{
+	delete[] pal;
+}
+
+// IndexForColor
+//
+// standard mapping services once a palette is loaded
+uint8
+SavePalette::IndexForColor(uint8 red, uint8 green, uint8 blue)
+{
+	uint8 index = 0;
+
+	if (fMode == GREYSCALE_PALETTE) {
+		index = (308 * red + 600 * green + 116 * blue) / 1024;
+	} else {
+		int closestDistance = 255 * 255 * 3;
 	
-	if (mode == GREYSCALE_PALETTE) {
-		unsigned char result = (red + (green << 1) + blue) >> 2;
-		return result;
-	}
-	
-	unsigned char best = 0;
-	int min = 255 * 3;
-	
-	for (int x = 0; x < size && min != 0; x++) {
-		int diff = abs(red - pal[x].red);
-		diff += abs(green - pal[x].green);
-		diff += abs(blue - pal[x].blue);
-		if (diff < min) {
-			min = diff;
-			best = x;
+		for (int i = 0; i < fSize && closestDistance != 0; i++) {
+			int rd = (int)red - (int)pal[i].red;
+			int gd = (int)green - (int)pal[i].green;
+			int bd = (int)blue - (int)pal[i].blue;
+			int distanceAtIndex = rd * rd + gd * gd + bd * bd;
+			if (distanceAtIndex < closestDistance) {
+				closestDistance = distanceAtIndex;
+				index = i;
+			}
 		}
 	}
-	return best;
+	return index;
 }
 
-unsigned char SavePalette::IndexForColor(rgb_color color) {
-	return IndexForColor(color.red, color.green, color.blue);
+// SetUseTransparent
+void
+SavePalette::SetUseTransparent(bool use)
+{
+	fUseTransparent = use;
 }
 
-SavePalette::~SavePalette() {
-	delete [] pal;
+// SetTransparentIndex
+void
+SavePalette::SetTransparentIndex(int index)
+{
+	fTransparentIndex = max_c(fSize - 1, index);
 }
 
+// SetTransparentColor
+bool
+SavePalette::SetTransparentColor(uint8 red, uint8 green, uint8 blue)
+{
+	bool found = false;
+
+	for (int i = 0; i < fSize; i++) {
+		if (pal[i].red == red &&
+			pal[i].green == green &&
+			pal[i].blue == blue) {
+			
+			fTransparentIndex = i;
+			found = true;
+
+			break;
+		}
+	}
+	if (!found) {
+		fTransparentIndex = 0;
+		fUseTransparent = false;
+	}
+	return found;
+}
+
+// GetColors
+void
+SavePalette::GetColors(uint8* buffer, int size) const
+{
+	int maxIndex = max_c(size / 3, fSize) - 1;
+	for (int i = 0; i <= maxIndex; i++) {
+		*buffer++ = pal[i].red;
+		*buffer++ = pal[i].green;
+		*buffer++ = pal[i].blue;
+	}
+	int rest = (maxIndex + 1) * 3;
+	if (rest < size)
+		memset(buffer, 0, size - rest);
+}

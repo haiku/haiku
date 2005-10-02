@@ -13,6 +13,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+// Additional authors:	Stephan Aßmus, <superstippi@gmx.de>
+
 #ifndef PREFS_H
 #define PREFS_H
 
@@ -26,7 +28,7 @@ class Prefs {
 		bool interlaced, usetransparent, usetransparentindex,
 			usedithering;
 		int transparentindex, transparentred, transparentgreen,
-			transparentblue, palettemode;
+			transparentblue, palettemode, palette_size_in_bits;
 	private:
 		bool GetInt(char *name, int *value, int *defaultvalue);
 		bool GetBool(char *name, bool *value, bool *defaultvalue);

@@ -13,10 +13,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+// Additional authors:	Stephan Aßmus, <superstippi@gmx.de>
+
 #ifndef GIFVIEW_H
 #define GIFVIEW_H
 
 #include <View.h>
+
 class BMenuField;
 class BPopUpMenu;
 class BMenuItem;
@@ -38,26 +41,45 @@ class Prefs;
 #define GV_TRANSPARENT_RED			'gvtr'
 #define GV_TRANSPARENT_GREEN		'gvtg'
 #define GV_TRANSPARENT_BLUE			'gvtb'
+#define GV_SET_COLOR_COUNT			'gvcc'
 
 class GIFView : public BView {
-	public:
-		GIFView(BRect rect, const char *name);
-		~GIFView();
-		void MessageReceived(BMessage *message);
-		void AllAttached();
+ public:
+							GIFView(BRect rect, const char* name);
+	virtual					~GIFView();
+
+	virtual	void			MessageReceived(BMessage* message);
+	virtual	void			AllAttached();
 		
-		Prefs *prefs;
-		BMenuField *palettemenufield;
-		BPopUpMenu *palettepopupmenu;
-		BMenuItem *websafe, *beossystem, *greyscale, *optimal;
-		BCheckBox *interlaced, *usetransparent, *usedithering;
-		BRadioButton *usetransparentindex, *usetransparentcolor;
-		BTextControl *transparentindex, *transparentred,
-			*transparentgreen, *transparentblue;
-			
-	private:
-		void RestorePrefs();
-		int CheckInput(BTextControl *control);
+ private:
+			void			RestorePrefs();
+			int				CheckInput(BTextControl* control);
+
+		Prefs*				fPrefs;
+
+		BMenuField*			fPaletteMF;
+		BPopUpMenu*			fPaletteM;
+		BMenuItem*			fWebSafeMI;
+		BMenuItem*			fBeOSSystemMI;
+		BMenuItem*			fGreyScaleMI;
+		BMenuItem*			fOptimalMI;
+
+		BMenuField*			fColorCountMF;
+		BPopUpMenu*			fColorCountM;
+		BMenuItem*			fColorCountMI[8];
+		BMenuItem*			fColorCount256MI;
+
+		BCheckBox*			fInterlacedCB;
+		BCheckBox*			fUseTransparentCB;
+		BCheckBox*			fUseDitheringCB;
+
+		BRadioButton*		fUseTransparentIndexRB;
+		BRadioButton*		fUseTransparentColorRB;
+
+		BTextControl*		fTransparentIndexTC;
+		BTextControl*		fTransparentRedTC;
+		BTextControl*		fTransparentGreenTC;
+		BTextControl*		fTransparentBlueTC;
 };
 
 #endif

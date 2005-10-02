@@ -13,6 +13,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+// Additional authors:	Stephan Aßmus, <superstippi@gmx.de>
+
 #ifndef SFHASH_H
 #define SFHASH_H
 
@@ -26,16 +28,17 @@ class HashItem {
 
 class SFHash {
     public:
-        SFHash(int size = 4096);
-        ~SFHash();
-        
-        void AddItem(HashItem *item);
-        HashItem *GetItem(unsigned int key);
-        unsigned int CountItems();
-        HashItem *NextItem();
-        void Rewind();
-        
+						SFHash(int size = 4096);
+						~SFHash();
+
+		void			AddItem(HashItem *item);
+		HashItem*		GetItem(unsigned int key);
+		unsigned int	CountItems();
+		HashItem*		NextItem();
+		void			Rewind();
+
         bool fatalerror;
+
     private:
         int size, iterate_pos, iterate_depth;
         HashItem **main_array;
