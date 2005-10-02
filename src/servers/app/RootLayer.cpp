@@ -1118,21 +1118,6 @@ RootLayer::ShowWinBorder(WinBorder* winBorder)
 }
 
 
-WinBorder *
-RootLayer::WinBorderAt(const BPoint& pt) const
-{
-#ifndef NEW_INPUT_HANDLING
-	for (int32 i = 0; i < fWinBorderCount; i++)
-	{
-#ifndef NEW_CLIPPING
-		if (fWinBorderList[i]->fFullVisible.Contains(pt))
-			return fWinBorderList[i];
-#endif
-	}
-#endif
-	return NULL;
-}
-
 #ifdef NEW_INPUT_HANDLING
 void
 RootLayer::RevealNewWMState(Workspace::State &oldWMState)
@@ -1233,6 +1218,13 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 #endif
 	}
 }
+
+bool
+RootLayer::SetActive(WinBorder* newActive)
+{
+// TODO: properly implement
+	return ActiveWorkspace()->AttemptToActivate(newActive);
+}
 #endif
 //---------------------------------------------------------------------------
 //				Workspace related methods
@@ -1258,7 +1250,7 @@ RootLayer::_ProcessMouseMovedEvent(PointerEvent &evt)
 		// TODO: Focus should be a RootLayer option/feature, NOT a Workspace one!!!
 		WinBorder* exFocus = Focus();
 		if (ds.MouseMode() != B_NORMAL_MOUSE && exFocus != winBorderTarget) {
-			ActiveWorkspace()->SetFocus(winBorderTarget);
+			ActiveWorkspace()->AttemptToSetFocus(winBorderTarget);
 			// Workspace::SetFocus() *attempts* to set a new focus WinBorder, it may not succeed
 			if (exFocus != Focus()) {
 				// TODO: invalidate border area and send message to client for the widgets to light up
@@ -2239,7 +2231,7 @@ RootLayer::show_winBorder(WinBorder *winBorder)
 			invalid = fWorkspace[i]->ShowWinBorder(winBorder);
 
 			// ToDo: this won't work with FFM
-			fWorkspace[i]->SetFocus(winBorder);
+			fWorkspace[i]->AttemptToSetFocus(winBorder);
 		}
 
 		if (fActiveWksIndex == i) {

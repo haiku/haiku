@@ -73,13 +73,12 @@ class Workspace {
 			WinBorder*			Active() const;
 			void				GetState(Workspace::State *state) const;
 			bool				AttemptToSetFront(WinBorder *newFront);
-			bool				AttemptToSetFocus(WinBorder *newFocus);
+			int32				AttemptToSetFocus(WinBorder *newFocus);
 			bool				AttemptToMoveToBack(WinBorder *newBack);
 			bool				AttemptToActivate(WinBorder *toActivate);
 
 			bool				GetWinBorderList(void **list, int32 *itemCount ) const;
 
-			bool				SetFocus(WinBorder* newFocus);
 			bool				MoveToBack(WinBorder *newLast);
 			bool				MoveToFront(WinBorder *newFront, bool doNotDisturb = false);
 
@@ -112,6 +111,8 @@ private:
 
 			bool				placeToBack(ListData *newLast);
 			void				placeInFront(ListData *item, const bool userBusy);
+
+			int32				_SetFocus(ListData *newFocusItem);
 
 			bool				removeAndPlaceBefore(const WinBorder *wb, ListData *beforeItem);
 			bool				removeAndPlaceBefore(ListData *item, ListData *beforeItem);
@@ -154,7 +155,6 @@ private:
 
 			// pointer for which "big" actions are intended
 			ListData			*fFrontItem;
-			ListData*			fActiveItem;
 
 			// settings for each workspace -- example taken from R5's app_server_settings file
 			display_timing		fDisplayTiming;

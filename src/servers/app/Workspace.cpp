@@ -246,10 +246,12 @@ Workspace::AttemptToSetFront(WinBorder *newFront)
 	return MoveToFront(newFront);
 }
 
-bool
+int32
 Workspace::AttemptToSetFocus(WinBorder *newFocus)
 {
-	return SetFocus(newFocus);
+	ListData* newFocusItem = HasItem(newFocus);
+
+	return _SetFocus(newFocusItem);
 }
 
 bool
@@ -262,7 +264,7 @@ bool
 Workspace::AttemptToActivate(WinBorder *toActivate)
 {
 	MoveToFront(toActivate);
-	SetFocus(toActivate);
+	AttemptToSetFocus(toActivate);
 	return Active() == toActivate;
 }
 /*
@@ -305,26 +307,71 @@ Workspace::GetWinBorderList(void **list, int32 *itemCount ) const
 	return true;
 }
 
+/*!
+	\brief	Makes the specified WinBorder the focus one.
+	\param	newFocus WinBorder which will try to take focus state.
+	\return	0 - setting focus failed, focus did not change.
+			1 - the new focus WinBorder is \a winBorder
+			2 - focus changed but not to \a winBorder because in front of it there
+				are other modal windows.
 
-bool
-Workspace::SetFocus(WinBorder* newFocus)
+	Set a new focus WinBorder if possible.
+*/
+
+int32
+Workspace::_SetFocus(ListData *newFocusItem)
 {
-	// in case this normal window is the front window,
-	// BUT it does not have focus.
-	ListData* newFocusItem = HasItem(newFocus);
+	if (!newFocusItem || newFocusItem == fFocusItem 
+			|| (newFocusItem && !newFocusItem->layerPtr->IsHidden()
+				&& newFocusItem->layerPtr->WindowFlags() & B_AVOID_FOCUS))
+		return 0L;
 
-	if (newFocusItem && fFocusItem != newFocusItem
-		&& !(newFocus->WindowFlags() & B_AVOID_FOCUS)) {
-		// ToDo: for now, the focus item is always the active item...
-		// (it will be changed later on, and fixed with the refactoring)
-		fFocusItem = newFocusItem;
-		fActiveItem = newFocusItem;
-		return true;
+	WinBorder *newFocus = newFocusItem->layerPtr;
+	bool rv = 1;
+
+	switch(newFocus->Level()) {
+		case B_MODAL_APP:
+		case B_NORMAL: {
+			ListData *item = newFocusItem->upperItem;
+			while (	item &&
+					!item->layerPtr->IsHidden() &&
+					((item->layerPtr->Level() == B_MODAL_APP &&
+						item->layerPtr->App()->ClientTeam() == newFocus->App()->ClientTeam()) ||
+					 item->layerPtr->Level() >= B_MODAL_ALL))
+			{
+				if (item->layerPtr->WindowFlags() & B_AVOID_FOCUS)
+					newFocusItem = NULL;
+				else
+					newFocusItem = item;
+				rv = 2;
+			}
+		}
+		break;
+
+		case B_SYSTEM_FIRST:
+		case B_MODAL_ALL: {
+			ListData *item = newFocusItem->upperItem;			
+			while (	item &&
+					!item->layerPtr->IsHidden() &&
+					item->layerPtr->Level() >= newFocus->Level())
+			{
+				if (item->layerPtr->WindowFlags() & B_AVOID_FOCUS)
+					newFocusItem = NULL;
+				else
+					newFocusItem = item;
+				rv = 2;
+			}
+		}
+		break;
+
+		default:
+		break;
 	}
 
-	return false;
-}
+	fFocusItem = newFocusItem;
 
+	return rv;
+}
 
 /*!
 	\brief	Makes the specified WinBorder the front one.
@@ -584,8 +631,8 @@ Workspace::HideWinBorder(WinBorder *winBorder)
 
 		case B_NORMAL:
 		{
-			if (Focus() == winBorder)
-				saveFloatingWindows(fFocusItem);
+			if (fFrontItem && fFrontItem->layerPtr == winBorder)
+				saveFloatingWindows(fFrontItem);
 
 			// remove B_MODAL_SUBSET windows present before this window.
 			ListData* itemThis = HasItem(winBorder);
@@ -677,7 +724,6 @@ Workspace::HideWinBorder(WinBorder *winBorder)
 		}
 
 		fFocusItem = nextFocus;
-		fActiveItem = nextFocus;
 	}
 
 	return returnValue;
@@ -1282,9 +1328,6 @@ Workspace::RemoveItem(ListData *item)
 
 	if (fFrontItem == item)
 		fFrontItem = NULL;
-
-	if (fActiveItem == item)
-		fActiveItem = NULL;
 }
 
 

@@ -530,11 +530,10 @@ WinBorder::MouseDown(const PointerEvent& evt)
 				GetRootLayer()->ActiveWorkspace()->MoveToBack(this);
 			}
 			else {
-				if (action == DEC_DRAG || action == DEC_RESIZE || action == DEC_SLIDETAB)
-					GetRootLayer()->SetNotifyLayer(this, B_POINTER_EVENTS, 0UL);
+				GetRootLayer()->SetNotifyLayer(this, B_POINTER_EVENTS, 0UL);
 	
 				activateWindow:
-				GetRootLayer()->ActiveWorkspace()->AttemptToActivate(this);
+				GetRootLayer()->SetActive(this);
 			}
 
 			GetRootLayer()->RevealNewWMState(oldWMState);
@@ -555,47 +554,53 @@ WinBorder::MouseDown(const PointerEvent& evt)
 void
 WinBorder::MouseUp(const PointerEvent& event)
 {
+	bool invalidate = false;
 	if (fDecorator) {
 		click_type action = _ActionFor(event);
-
+// TODO: present behavior is not fine!
+//		Decorator's Set*() methods _actualy draw_! on screen, not
+//		 taking into account if that region is visible or not!
+//		Decorator redraw code should follow the same path as Layer's
+//		 one!
 		if (fIsZooming) {
 			fIsZooming	= false;
 			fDecorator->SetZoom(false);
-			if (action == DEC_ZOOM)
+			if (action == DEC_ZOOM) {
+				invalidate = true;
 				Window()->NotifyZoom();
-			return;
+			}
 		}
 		if (fIsClosing) {
 			fIsClosing	= false;
 			fDecorator->SetClose(false);
-			if (action == DEC_CLOSE)
+			if (action == DEC_CLOSE) {
+				invalidate = true;
 				Window()->NotifyQuitRequested();
-			return;
+			}
 		}
 		if (fIsMinimizing) {
 			fIsMinimizing = false;
 			fDecorator->SetMinimize(false);
-			if (action == DEC_MINIMIZE)
+			if (action == DEC_MINIMIZE) {
+				invalidate = true;
 				Window()->NotifyMinimize(true);
-			return;
+			}
 		}
 	}
 	fIsDragging = false;
 	fIsResizing = false;
 	fIsSlidingTab = false;
-
-	// TODO: set dirty regions!
-#ifndef NEW_CLIPPING
-	GetRootLayer()->invalidate_layer(GetRootLayer(), VisibleRegion());
-#else
-	do_Invalidate(VisibleRegion());
-#endif
 }
 
 void
 WinBorder::MouseMoved(const PointerEvent& event, uint32 transit)
 {
 	if (fDecorator) {
+// TODO: present behavior is not fine!
+//		Decorator's Set*() methods _actualy draw_! on screen, not
+//		 taking into account if that region is visible or not!
+//		Decorator redraw code should follow the same path as Layer's
+//		 one!
 		if (fIsZooming) {
 			fDecorator->SetZoom(_ActionFor(event) == DEC_ZOOM);
 		} else if (fIsClosing) {
@@ -604,6 +609,7 @@ WinBorder::MouseMoved(const PointerEvent& event, uint32 transit)
 			fDecorator->SetMinimize(_ActionFor(event) == DEC_MINIMIZE);
 		}
 	}
+
 	if (fIsDragging) {
 		BPoint delta = event.where - fLastMousePosition;
 #ifndef NEW_CLIPPING
@@ -623,6 +629,7 @@ WinBorder::MouseMoved(const PointerEvent& event, uint32 transit)
 	if (fIsSlidingTab) {
 		// TODO: implement
 	}
+
 	fLastMousePosition = event.where;
 }
 

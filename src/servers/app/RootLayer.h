@@ -86,13 +86,13 @@ public:
 			void				SetWinBorderWorskpaces(WinBorder *winBorder,
 										uint32 oldIndex,
 										uint32 newIndex);
-			WinBorder*			WinBorderAt(const BPoint& pt) const;
 #ifdef NEW_INPUT_HANDLING
 			void				RevealNewWMState(Workspace::State &oldWMState);
 // TODO: we need to replace Winborder* with Layer*
 	inline	WinBorder*			Focus() const { return fWMState.Focus; }
 	inline	WinBorder*			Front() const { return fWMState.Front; }
 	inline	WinBorder*			Active() const { return fWMState.Active; }
+			bool				SetActive(WinBorder* newActive);
 #else
 	inline	WinBorder*			Focus() const { return ActiveWorkspace()->Focus(); }
 	inline	WinBorder*			Front() const { return ActiveWorkspace()->Front(); }
