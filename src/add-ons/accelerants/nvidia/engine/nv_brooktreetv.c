@@ -1309,6 +1309,76 @@ uint8 BT_check_tvmode(display_mode target)
 	return status;
 }//end BT_check_tvmode.
 
+static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
+{
+	switch (tvmode)
+	{
+	case NTSC640:
+	case NTSC640_TST:
+		break;
+	case NTSC800:
+		break;
+	case PAL640:
+		break;
+	case PAL800:
+	case PAL800_TST:
+		break;
+	case NTSC640_OS:
+		target->timing.h_display = 640;			//BT H_ACTIVE
+		target->timing.h_sync_start = 744;		//set for CH/BT compatible TV output
+		target->timing.h_sync_end = 744+20;		//delta is BT H_BLANKI
+		target->timing.h_total = 784;			//BT H_CLKI
+		target->timing.v_display = 480;			//BT  V_ACTIVEI
+		target->timing.v_sync_start = 490;		//set for centered sync pulse
+		target->timing.v_sync_end = 490+25;		//delta is BT V_BLANKI
+		target->timing.v_total = 525;			//BT V_LINESI
+//fixme: not actually programmed because PLL is programmed earlier...
+		target->timing.pixel_clock = ((784 * 525 * 60) / 1000); //refresh
+		break;
+	case PAL800_OS:
+		target->timing.h_display = 768;			//H_ACTIVE
+		target->timing.h_sync_start = 848;		//set for centered TV output
+		target->timing.h_sync_end = 848+20;		//delta is BT H_BLANKI
+		target->timing.h_total = 944;			//BT H_CLKI
+		target->timing.v_display = 576;			//V_ACTIVEI
+		target->timing.v_sync_start = 579;		//set for centered sync pulse
+		target->timing.v_sync_end = 579+42;		//delta is BT V_BLANKI
+		target->timing.v_total = 625;			//BT V_LINESI
+//fixme: not actually programmed because PLL is programmed earlier...
+		target->timing.pixel_clock = ((944 * 625 * 50) / 1000); //refresh
+		break;
+	case NTSC720:
+		/* (tested on TNT2 with BT869) */
+		target->timing.h_display = 720;			//H_ACTIVE
+		target->timing.h_sync_start = 744;		//do not change!
+		target->timing.h_sync_end = 744+144;	//delta is H_sync_pulse
+		target->timing.h_total = 888;			//BT H_TOTAL
+		target->timing.v_display = 480;			//V_ACTIVEI
+		target->timing.v_sync_start = 490;		//set for centered sync pulse
+		target->timing.v_sync_end = 490+26;		//delta is V_sync_pulse
+		target->timing.v_total = 525;			//CH V_TOTAL
+//fixme: not actually programmed because PLL is programmed earlier...
+		target->timing.pixel_clock = ((888 * 525 * 60) / 1000); //refresh
+		break;
+	case PAL720:
+		target->timing.h_display = 720;			//BT H_ACTIVE
+		target->timing.h_sync_start = 744;		//set for centered sync pulse
+		target->timing.h_sync_end = 744+140;	//delta is BT H_BLANKI
+		target->timing.h_total = 888;			//BT H_CLKI
+		target->timing.v_display = 576;			//BT  V_ACTIVEI
+		target->timing.v_sync_start = 579;		//set for centered sync pulse
+		target->timing.v_sync_end = 579+42;		//delta is BT V_BLANKI
+		target->timing.v_total = 625;			//BT V_LINESI
+//fixme: not actually programmed because PLL is programmed earlier...
+		target->timing.pixel_clock = ((888 * 625 * 50) / 1000); //refresh
+		break;
+	default:
+		return B_ERROR;
+	}
+
+	return B_OK;
+}//end BT_update_mode_for_gpu.
+
 status_t BT_setmode(display_mode target)
 {
 	uint8 tvmode, monstat;
@@ -1407,7 +1477,8 @@ if (si->ps.secondary_head)
 //tmp: enabling testimage...
 BT_testsignal();
 
-	//fixme: add custom fixed modelines here that will be pgm'd into the CRTC...
+	/* update the GPU CRTC timing for the requested mode */
+	BT_update_mode_for_gpu(&tv_target, tvmode);
 
 	/* setup GPU CRTC timing */
 	head1_set_timing(tv_target);
