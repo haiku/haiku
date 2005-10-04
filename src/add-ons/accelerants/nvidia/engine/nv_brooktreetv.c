@@ -1498,6 +1498,82 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 	return B_OK;
 }//end BT_update_mode_for_gpu.
 
+/* note:
+ * tested on ELSA Erazor III 32Mb AGP (TNT2/BT869),
+ * Diamond Viper V550 16Mb PCI (TNT1/BT869),
+ * and ASUS V7100 GeForce2 MX200 AGP/32Mb (CH7007). */
+static status_t BT_start_tvout(void)
+{
+	/* enable access to primary head */
+	set_crtc_owner(0);
+
+	//fixme: checkout...
+	//CAUTION:
+	//On the TNT1, these memadresses apparantly cannot be read (sometimes)!;
+	//write actions do succeed though... (tested only on ISA bus yet..)
+
+	/* setup TVencoder connection */
+	/* b1-0 = %01: encoder type is MASTER;
+	 * b24 = 1: VIP datapos is b0-7 */
+	//fixme: setup completely instead of relying on pre-init by BIOS..
+	DACW(TV_SETUP, (DACR(TV_SETUP) | 0x01000001));
+
+	/* tell GPU to use pixelclock from TVencoder instead of using internal source */
+	/* (nessecary or display will 'shiver' on both TV and VGA.) */
+	//fixme: checkout if this works for singlehead cards!! (read possible??)
+	DACW(PLLSEL, (DACR(PLLSEL) | 0x00030000));
+//std val for singlehead cards:
+//	DACW(PLLSEL, 0x10000700);
+
+	//fixme: is this needed? does b5 have a special meaning in nvidia cards?
+//normal in this driver is:
+//	SEQW(CLKMODE, 0x21);
+//betvout:
+	SEQW(CLKMODE, 0x01);
+
+	/* Set overscan color to 'black' */
+	/* note:
+	 * Change this instruction for a visible overscan color if you're trying to
+	 * center the output on TV. Use it as a guide-'line' then ;-) */
+	ATBW(OSCANCOLOR, 0x00);
+
+	/* unlock CRTC registers at 'index 0-7' (just to be sure) */
+	CRTCW(VSYNCE, (CRTCR(VSYNCE) & 0x7f));
+
+	/* set CRTC to slaved mode (b7 = 1) and clear TVadjust (b3-5 = %000) */
+	//fixme:
+	//add tvout_active flag to shared_info and use it to update
+	//crtc.c to prevent it from disabling slaved mode (again) to be sure this works..
+	//fixme:
+	//checkout combination flatpanel and TVout: conflicting slave-wise? (how about
+	//the LCD register for determining better?)
+	CRTCW(PIXEL, ((CRTCR(PIXEL) & 0xc7) | 0x80));
+
+  	//LCD:
+//	*(dev->pcio_base + AdresReg) = 0x33;
+//	*(dev->pcio_base + DataReg) &= 0xfe;
+
+	//TREG:
+//	*(dev->pcio_base + AdresReg) = 0x3d;
+//	*(dev->pcio_base + DataReg) = 0x80;
+
+	return B_OK;
+}//end BT_start_tvout.
+
+status_t BT_stop_tvout(void)
+{
+	/* prevent BT from being overclocked by VGA-only modes & black-out TV-out */
+	BT_killclk_blackout();
+
+//fixme: add..
+//SwitchToVGA(dev);
+
+	/* fixme if needed:
+	 * a full encoder chip reset could be done here (so after decoupling crtc)... */
+
+	return B_OK;
+}
+
 status_t BT_setmode(display_mode target)
 {
 	uint8 tvmode, monstat;
@@ -1602,7 +1678,9 @@ BT_testsignal();
 	/* setup GPU CRTC timing */
 	head1_set_timing(tv_target);
 
-	//fixme: set GPU CRTC to slave mode...
+	/* now set GPU CRTC to slave mode */
+//tmp disabled:
+//	BT_start_tvout();
 
 	//fixme: add code to disable VGA screen when TVout enabled
 	//(use via nv.setting preset)
