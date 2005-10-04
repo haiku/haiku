@@ -165,7 +165,7 @@ status_t nv_crtc2_set_timing(display_mode target)
 	htotal = ((target.timing.h_total >> 3) - 5);
 	hdisp_e = ((target.timing.h_display >> 3) - 1);
 	hblnk_s = hdisp_e;
-	hblnk_e = (htotal + 4);//0;
+	hblnk_e = (htotal + 4);
 	hsync_s = (target.timing.h_sync_start >> 3);
 	hsync_e = (target.timing.h_sync_end >> 3);
 
@@ -173,8 +173,8 @@ status_t nv_crtc2_set_timing(display_mode target)
 	vdisp_e = target.timing.v_display - 1;
 	vblnk_s = vdisp_e;
 	vblnk_e = (vtotal + 1);
-	vsync_s = target.timing.v_sync_start;//-1;
-	vsync_e = target.timing.v_sync_end;//-1;
+	vsync_s = target.timing.v_sync_start;
+	vsync_e = target.timing.v_sync_end;
 
 	/* prevent memory adress counter from being reset (linecomp may not occur) */
 	linecomp = target.timing.v_display;

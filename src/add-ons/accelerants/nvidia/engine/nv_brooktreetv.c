@@ -1311,7 +1311,7 @@ uint8 BT_check_tvmode(display_mode target)
 
 
 /*
-//BeTVOut's SwitchRIVAtoTV() timing formula:
+//BeTVOut's SwitchRIVAtoTV(vtot) timing formula: (note: vtot = (v_total - 2))
 //-----------------------------------------------------------------------------------
 //HORIZONTAL:
 //-----------
@@ -1339,16 +1339,11 @@ else //TNT1, TNT2, Geforce2... (so default)
 //-----------------------------------------------------------------------------------
 //VERTICAL:
 //---------
-disp_e		-> blank_s (b0-10)
-disp_e + 1	-> sync_s (b0-10)
-
-vtot + 1	-> sync_e (b0-3) //(This takes care of the 'cursor trash' on TNT1's...)
-vtot + 1	-> blank_e (b0-7) //(This takes care of the 'cursor trash' on TNT1's...)
-
-vtot		-> total (b0-10)
+v_sync_start = v_display;
+v_total = vtot + 2;
+v_sync_end = v_total - 1; //(This takes care of the 'cursor trash' on TNT1's...)
 //-----------------------------------------------------------------------------------
 */
-
 static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 {
 	switch (tvmode)
@@ -1368,31 +1363,84 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 			target->timing.h_total = 688;
 		}
 		target->timing.v_display = 480;
-//fixme: still run trough betvout's routine (SwitchRIVAtoTV (0x22a)):
-		target->timing.v_sync_start = 490;
-		target->timing.v_sync_end = 492; //((0x1ea && 0xff0) + 0x00c)--???
-		target->timing.v_total = 523;
+		target->timing.v_sync_start = 480;
+		target->timing.v_sync_end = 555;	//This prevents 'cursor trash' on TNT1's
+		target->timing.v_total = 556;		//Above 525 because mode scales down
 //fixme: not actually programmed because PLL is programmed earlier...
-		target->timing.pixel_clock = ((760 * 523 * 60) / 1000);
+		if (si->ps.card_type == NV05M64)
+			target->timing.pixel_clock = ((696 * 556 * 60) / 1000);
+		else
+			target->timing.pixel_clock = ((688 * 556 * 60) / 1000);
 		break;
 	case NTSC800:
+		target->timing.h_display = 800;
+		target->timing.h_sync_start = 800;
+		if (si->ps.card_type == NV05M64)
+		{
+			target->timing.h_sync_end = 808;
+			target->timing.h_total = 856;
+		}
+		else
+		{
+			target->timing.h_sync_end = 816;
+			target->timing.h_total = 848;
+		}
+		target->timing.v_display = 600;
+		target->timing.v_sync_start = 600;
+		target->timing.v_sync_end = 685;	//This prevents 'cursor trash' on TNT1's
+		target->timing.v_total = 686;		//Above 525 because mode scales down
+//fixme: not actually programmed because PLL is programmed earlier...
+		if (si->ps.card_type == NV05M64)
+			target->timing.pixel_clock = ((856 * 686 * 60) / 1000);
+		else
+			target->timing.pixel_clock = ((848 * 686 * 60) / 1000);
 		break;
 	case PAL640:
-//fixme: still run trough betvout's correction routine:
 		target->timing.h_display = 640;
-		target->timing.h_sync_start = 664;
-		target->timing.h_sync_end = 760; //((0x1f + (0x53 && 0xe0)) * 8)--???
-		target->timing.h_total = 760; //this exact value *must* be set!
+		target->timing.h_sync_start = 640;
+		if (si->ps.card_type == NV05M64)
+		{
+			target->timing.h_sync_end = 648;
+			target->timing.h_total = 696;
+		}
+		else
+		{
+			target->timing.h_sync_end = 656;
+			target->timing.h_total = 688;
+		}
 		target->timing.v_display = 480;
-		target->timing.v_sync_start = 490;
-		target->timing.v_sync_end = 492; //((0x1ea && 0xff0) + 0x00c)--???
-		target->timing.v_total = 523;
+		target->timing.v_sync_start = 480;
+		target->timing.v_sync_end = 570;	//This prevents 'cursor trash' on TNT1's
+		target->timing.v_total = 571;		//Below 625 because mode scales up
 //fixme: not actually programmed because PLL is programmed earlier...
-		target->timing.pixel_clock = ((760 * 523 * 60) / 1000);
-//fixme: complete..
+		if (si->ps.card_type == NV05M64)
+			target->timing.pixel_clock = ((696 * 571 * 50) / 1000);
+		else
+			target->timing.pixel_clock = ((688 * 571 * 50) / 1000);
 		break;
 	case PAL800:
 	case PAL800_TST:
+		target->timing.h_display = 800;
+		target->timing.h_sync_start = 800;
+		if (si->ps.card_type == NV05M64)
+		{
+			target->timing.h_sync_end = 808;
+			target->timing.h_total = 856;
+		}
+		else
+		{
+			target->timing.h_sync_end = 816;
+			target->timing.h_total = 848;
+		}
+		target->timing.v_display = 600;
+		target->timing.v_sync_start = 600;
+		target->timing.v_sync_end = 695;	//This prevents 'cursor trash' on TNT1's
+		target->timing.v_total = 696;		//Above 625 because mode scales down
+//fixme: not actually programmed because PLL is programmed earlier...
+		if (si->ps.card_type == NV05M64)
+			target->timing.pixel_clock = ((856 * 696 * 50) / 1000);
+		else
+			target->timing.pixel_clock = ((848 * 696 * 50) / 1000);
 		break;
 	case NTSC640_OS:
 		target->timing.h_display = 640;			//BT H_ACTIVE
@@ -1402,7 +1450,7 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 		target->timing.v_display = 480;			//BT  V_ACTIVEI
 		target->timing.v_sync_start = 490;		//set for centered sync pulse
 		target->timing.v_sync_end = 490+25;		//delta is BT V_BLANKI
-		target->timing.v_total = 525;			//BT V_LINESI
+		target->timing.v_total = 525;			//BT V_LINESI (== 525: 1:1 scaled mode)
 //fixme: not actually programmed because PLL is programmed earlier...
 		target->timing.pixel_clock = ((784 * 525 * 60) / 1000); //refresh
 		break;
@@ -1414,7 +1462,7 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 		target->timing.v_display = 576;			//V_ACTIVEI
 		target->timing.v_sync_start = 579;		//set for centered sync pulse
 		target->timing.v_sync_end = 579+42;		//delta is BT V_BLANKI
-		target->timing.v_total = 625;			//BT V_LINESI
+		target->timing.v_total = 625;			//BT V_LINESI (== 625: 1:1 scaled mode)
 //fixme: not actually programmed because PLL is programmed earlier...
 		target->timing.pixel_clock = ((944 * 625 * 50) / 1000); //refresh
 		break;
@@ -1427,7 +1475,7 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 		target->timing.v_display = 480;			//V_ACTIVEI
 		target->timing.v_sync_start = 490;		//set for centered sync pulse
 		target->timing.v_sync_end = 490+26;		//delta is V_sync_pulse
-		target->timing.v_total = 525;			//CH V_TOTAL
+		target->timing.v_total = 525;			//CH V_TOTAL (== 525: 1:1 scaled mode)
 //fixme: not actually programmed because PLL is programmed earlier...
 		target->timing.pixel_clock = ((888 * 525 * 60) / 1000); //refresh
 		break;
@@ -1439,7 +1487,7 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 		target->timing.v_display = 576;			//BT  V_ACTIVEI
 		target->timing.v_sync_start = 579;		//set for centered sync pulse
 		target->timing.v_sync_end = 579+42;		//delta is BT V_BLANKI
-		target->timing.v_total = 625;			//BT V_LINESI
+		target->timing.v_total = 625;			//BT V_LINESI (== 625: 1:1 scaled mode)
 //fixme: not actually programmed because PLL is programmed earlier...
 		target->timing.pixel_clock = ((888 * 625 * 50) / 1000); //refresh
 		break;
