@@ -1309,16 +1309,87 @@ uint8 BT_check_tvmode(display_mode target)
 	return status;
 }//end BT_check_tvmode.
 
+
+/*
+//BeTVOut's SwitchRIVAtoTV() timing formula:
+//-----------------------------------------------------------------------------------
+//HORIZONTAL:
+//-----------
+h_sync_start = h_display; 
+
+//fixme, note, checkout:
+//feels like in fact TNT2-M64 nv_crtc.c registerprogramming should be adapted...
+if (TNT2-M64)
+{
+	h_sync_end = h_display + 8;
+	h_total = h_display + 56;
+}
+else //TNT1, TNT2, Geforce2... (so default)
+{
+	h_sync_end = h_display + 16;
+	h_total = h_display + 48;
+}
+
+//fixme, note, checkout:
+//BeTVOut uses two 'tweaks':
+// - on TNT2-M64 only:
+//   register h_blank_e is increased with 1 (so should be done in nv_crtc.c here)
+// - all cards:
+//   register h_blank_e b6 = 0.
+//-----------------------------------------------------------------------------------
+//VERTICAL:
+//---------
+disp_e		-> blank_s (b0-10)
+disp_e + 1	-> sync_s (b0-10)
+
+vtot + 1	-> sync_e (b0-3) //(This takes care of the 'cursor trash' on TNT1's...)
+vtot + 1	-> blank_e (b0-7) //(This takes care of the 'cursor trash' on TNT1's...)
+
+vtot		-> total (b0-10)
+//-----------------------------------------------------------------------------------
+*/
+
 static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 {
 	switch (tvmode)
 	{
 	case NTSC640:
 	case NTSC640_TST:
+		target->timing.h_display = 640;
+		target->timing.h_sync_start = 640;
+		if (si->ps.card_type == NV05M64)
+		{
+			target->timing.h_sync_end = 648;
+			target->timing.h_total = 696;
+		}
+		else
+		{
+			target->timing.h_sync_end = 656;
+			target->timing.h_total = 688;
+		}
+		target->timing.v_display = 480;
+//fixme: still run trough betvout's routine (SwitchRIVAtoTV (0x22a)):
+		target->timing.v_sync_start = 490;
+		target->timing.v_sync_end = 492; //((0x1ea && 0xff0) + 0x00c)--???
+		target->timing.v_total = 523;
+//fixme: not actually programmed because PLL is programmed earlier...
+		target->timing.pixel_clock = ((760 * 523 * 60) / 1000);
 		break;
 	case NTSC800:
 		break;
 	case PAL640:
+//fixme: still run trough betvout's correction routine:
+		target->timing.h_display = 640;
+		target->timing.h_sync_start = 664;
+		target->timing.h_sync_end = 760; //((0x1f + (0x53 && 0xe0)) * 8)--???
+		target->timing.h_total = 760; //this exact value *must* be set!
+		target->timing.v_display = 480;
+		target->timing.v_sync_start = 490;
+		target->timing.v_sync_end = 492; //((0x1ea && 0xff0) + 0x00c)--???
+		target->timing.v_total = 523;
+//fixme: not actually programmed because PLL is programmed earlier...
+		target->timing.pixel_clock = ((760 * 523 * 60) / 1000);
+//fixme: complete..
 		break;
 	case PAL800:
 	case PAL800_TST:
