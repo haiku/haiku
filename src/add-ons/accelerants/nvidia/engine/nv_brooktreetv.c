@@ -1334,8 +1334,8 @@ else //TNT1, TNT2, Geforce2... (so default)
 //BeTVOut uses two 'tweaks':
 // - on TNT2-M64 only:
 //   register h_blank_e is increased with 1 (so should be done in nv_crtc.c here)
-// - all cards:
-//   register h_blank_e b6 = 0.
+// - 'all cards':
+//   register h_blank_e b6 = 0 (only influences TNT2-M64 in modes NTSC800 and PAL800).
 //-----------------------------------------------------------------------------------
 //VERTICAL:
 //---------
