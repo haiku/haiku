@@ -2198,6 +2198,46 @@ dump_vnode_caches(int argc, char **argv)
 	return 0;
 }
 
+
+int
+dump_iocontext(int argc, char **argv)
+{
+	struct io_context *context = NULL;
+
+	if (argc > 1) {
+		context = (struct io_context *)strtoul(argv[1], NULL, 0);
+		if (IS_USER_ADDRESS(context)) {
+			kprintf("invalid I/O context address\n");
+			return 0;
+		}
+	} else
+		context = get_current_io_context(true);
+
+	kprintf("I/O CONTEXT: %p\n", context);
+	kprintf(" cwd vnode:\t%p\n", context->cwd);
+	kprintf(" used fds:\t%lu\n", context->table_size);
+	kprintf(" max fds:\t%lu\n", context->num_used_fds);
+	
+	if (context->num_used_fds)
+		kprintf("   no. type     ops ref open mode        pos cookie\n");
+
+	for (uint32 i = 0; i < context->table_size; i++) {
+		struct file_descriptor *fd = context->fds[i];
+		if (fd == NULL)
+			continue;
+
+		kprintf("  %3lu: %ld %p %3ld %4ld %4lx %10Ld %p %s %p\n", i, fd->type, fd->ops,
+			fd->ref_count, fd->open_count, fd->open_mode, fd->pos, fd->cookie,
+			fd->type >= FDTYPE_INDEX && fd->type <= FDTYPE_QUERY ? "mount" : "vnode",
+			fd->u.vnode);
+	}
+
+	kprintf(" used monitors:\t%lu\n", context->num_monitors);
+	kprintf(" max monitors:\t%lu\n", context->max_monitors);
+
+	return 0;
+}
+
 #endif	// ADD_DEBUGGER_COMMANDS
 
 
@@ -3160,6 +3200,7 @@ vfs_init(kernel_args *args)
 	add_debugger_command("vnode_caches", &dump_vnode_caches, "list all vnode caches");
 	add_debugger_command("mount", &dump_mount, "info about the specified fs_mount");
 	add_debugger_command("mounts", &dump_mounts, "list all fs_mounts");
+	add_debugger_command("iocontext", &dump_iocontext, "info about the I/O context");
 #endif
 
 	return file_cache_init();
