@@ -237,7 +237,7 @@ free_strings_array(char **strings, int32 count)
  */
 
 static status_t
-copy_strings_array(const char **in, int32 count, char ***_strings)
+kernel_copy_strings_array(char * const *in, int32 count, char ***_strings)
 {
 	status_t status;
 	char **strings;
@@ -317,6 +317,17 @@ error:
 
 	TRACE(("user_copy_strings_array failed %ld\n", err));
 	return err;
+}
+
+
+static status_t
+copy_strings_array(char * const *strings, int32 count, char ***_strings,
+	bool kernel)
+{
+	if (kernel)
+		return kernel_copy_strings_array(strings, count, _strings);
+
+	return user_copy_strings_array(strings, count, _strings);
 }
 
 
@@ -765,7 +776,7 @@ team_delete_team(struct team *team)
 		sprintf(death_sem_name, "team %ld death sem", teamID);
 		deathSem = create_sem(0, death_sem_name);
 		if (deathSem < 0)
-			panic("thread_exit: cannot init death sem for team %ld\n", teamID);
+			panic("team_delete_team: cannot init death sem for team %ld\n", teamID);
 
 		state = disable_interrupts();
 		GRAB_TEAM_LOCK();
@@ -884,19 +895,37 @@ free_team_arg(struct team_arg *teamArg)
 }
 
 
-static struct team_arg *
-create_team_arg(int32 argc, char **args, int32 envCount, char **env)
+static status_t
+create_team_arg(struct team_arg **_teamArg, int32 argCount, char * const *args,
+	int32 envCount, char * const *env, bool kernel)
 {
+	status_t status;
+	char **argsCopy;
+	char **envCopy;
+
 	struct team_arg *teamArg = (struct team_arg *)malloc(sizeof(struct team_arg));
 	if (teamArg == NULL)
-		return NULL;
+		return B_NO_MEMORY;
 
-	teamArg->arg_count = argc;
-	teamArg->args = args;
+	// copy the args over
+	
+	status = copy_strings_array(args, argCount, &argsCopy, kernel);
+	if (status != B_OK)
+		return status;
+
+	status = copy_strings_array(env, envCount, &envCopy, kernel);
+	if (status != B_OK) {
+		free_strings_array(argsCopy, argCount);
+		return status;
+	}
+
+	teamArg->arg_count = argCount;
+	teamArg->args = argsCopy;
 	teamArg->env_count = envCount;
-	teamArg->env = env;
+	teamArg->env = envCopy;
 
-	return teamArg;
+	*_teamArg = teamArg;
+	return B_OK;
 }
 
 
@@ -948,6 +977,8 @@ team_create_thread_start(void *args)
 		B_EXACT_ADDRESS, sizeLeft, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA | B_STACK_AREA);
 	if (t->user_stack_area < 0) {
 		dprintf("team_create_thread_start: could not create default user stack region\n");
+		
+		free_team_arg(teamArgs);
 		return t->user_stack_area;
 	}
 
@@ -1009,6 +1040,7 @@ team_create_thread_start(void *args)
 	TRACE(("team_create_thread_start: loading elf binary '%s'\n", path));
 
 	free_team_arg(teamArgs);
+		// the arguments are already on the user stack, we no longer need them in this form
 
 	// ToDo: don't use fixed paths!
 	err = elf_load_user_image("/boot/beos/system/lib/rld.so", team, 0, &entry);
@@ -1036,14 +1068,14 @@ team_create_thread_start(void *args)
  */
 
 static thread_id
-load_image_etc(int32 argCount, char **args, int32 envCount, char **env,
-	int32 priority, uint32 flags)
+load_image_etc(int32 argCount, char * const *args, int32 envCount, char * const *env,
+	int32 priority, uint32 flags, bool kernel)
 {
 	struct process_group *group;
 	struct team *team, *parent;
 	const char *threadName;
 	thread_id thread;
-	status_t err;
+	status_t status;
 	cpu_status state;
 	struct team_arg *teamArgs;
 	struct team_loading_info loadingInfo;
@@ -1078,23 +1110,20 @@ load_image_etc(int32 argCount, char **args, int32 envCount, char **env,
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 
-	// copy the args over
-	teamArgs = create_team_arg(argCount, args, envCount, env);
-	if (teamArgs == NULL) {
-		err = B_NO_MEMORY;
+	status = create_team_arg(&teamArgs, argCount, args, envCount, env, kernel);
+	if (status != B_OK)
 		goto err1;
-	}
 
 	// create a new io_context for this team
 	team->io_context = vfs_new_io_context(parent->io_context);
 	if (!team->io_context) {
-		err = B_NO_MEMORY;
+		status = B_NO_MEMORY;
 		goto err2;
 	}
 
 	// create an address space for this team
-	err = vm_create_aspace(team->name, team->id, USER_BASE, USER_SIZE, false, &team->aspace);
-	if (err < B_OK)
+	status = vm_create_aspace(team->name, team->id, USER_BASE, USER_SIZE, false, &team->aspace);
+	if (status < B_OK)
 		goto err3;
 
 	// cut the path from the main thread name
@@ -1104,11 +1133,12 @@ load_image_etc(int32 argCount, char **args, int32 envCount, char **env,
 	else
 		threadName = args[0];
 
-	// create a kernel thread, but under the context of the new team
+	// Create a kernel thread, but under the context of the new team
+	// The new thread will take over ownership of teamArgs
 	thread = spawn_kernel_thread_etc(team_create_thread_start, threadName, B_NORMAL_PRIORITY,
 				teamArgs, team->id, team->id);
 	if (thread < 0) {
-		err = thread;
+		status = thread;
 		goto err4;
 	}
 
@@ -1174,17 +1204,19 @@ err1:
 	team_delete_process_group(group);
 	delete_team_struct(team);
 
-	return err;
+	return status;
 }
 
 
 /**	Almost shuts down the current team and loads a new image into it.
  *	If successful, this function does not return and will takeover ownership of
  *	the arguments provided.
+ *	This function may only be called from user space.
  */
 
 static status_t
-exec_team(int32 argCount, char **args, int32 envCount, char **env)
+exec_team(const char *path, int32 argCount, char * const *args,
+	int32 envCount, char * const *env)
 {
 	struct team *team = thread_get_current_thread()->team;
 	struct team_arg *teamArgs;
@@ -1233,9 +1265,13 @@ exec_team(int32 argCount, char **args, int32 envCount, char **env)
 
 	// ToDo: maybe we should make sure upfront that the target path is an app?
 
-	teamArgs = create_team_arg(argCount, args, envCount, env);
-	if (teamArgs == NULL)
-		return B_NO_MEMORY;
+	status = create_team_arg(&teamArgs, argCount, args, envCount, env, false);
+	if (status != B_OK)
+		return status;
+
+	// replace args[0] with the path argument, just to be on the safe side
+	free(teamArgs->args[0]);
+	teamArgs->args[0] = strdup(path);
 
 	// ToDo: remove team resources if there are any left
 	// alarm, signals
@@ -1253,23 +1289,25 @@ exec_team(int32 argCount, char **args, int32 envCount, char **env)
 
 	// rename the team
 
-	strlcpy(team->name, args[0], B_OS_NAME_LENGTH);
+	strlcpy(team->name, path, B_OS_NAME_LENGTH);
 
 	// cut the path from the team name and rename the main thread, too
-	threadName = strrchr(args[0], '/');
+	threadName = strrchr(path, '/');
 	if (threadName != NULL)
 		threadName++;
 	else
-		threadName = args[0];
+		threadName = path;
 	rename_thread(thread_get_current_thread_id(), threadName);
 
 	status = team_create_thread_start(teamArgs);
 		// this one usually doesn't return...
 
-	// sorry, we have to kill us, there is no way out anymore (without any areas left and all that)
+	// sorry, we have to kill us, there is no way out anymore
+	// (without any areas left and all that)
 	exit_thread(status);
-	
-	// we'll never make it here (korli: not that sure ...)
+
+	// we return a status here since the signal that is sent by the
+	// call above is not immediately handled
 	return B_ERROR;
 }
 
@@ -1749,23 +1787,14 @@ stop_watching_team(team_id teamID, void (*hook)(team_id, void *), void *data)
 thread_id
 load_image(int32 argCount, const char **args, const char **env)
 {
-	char **argsCopy, **envCopy;
 	int32 envCount = 0;
-
-	if (copy_strings_array(args, argCount, &argsCopy) != B_OK)
-		return B_NO_MEMORY;
 
 	// count env variables
 	while (env && env[envCount] != NULL)
 		envCount++;
 
-	if (copy_strings_array(env, envCount, &envCopy) != B_OK) {
-		free_strings_array(argsCopy, argCount);
-		return B_NO_MEMORY;
-	}
-
-	return load_image_etc(argCount, argsCopy, envCount, envCopy,
-		B_NORMAL_PRIORITY, B_WAIT_TILL_LOADED);
+	return load_image_etc(argCount, (char * const *)args, envCount,
+		(char * const *)env, B_NORMAL_PRIORITY, B_WAIT_TILL_LOADED, true);
 }
 
 
@@ -2082,37 +2111,17 @@ _user_exec(const char *userPath, int32 argCount, char * const *userArgs,
 	int32 envCount, char * const *userEnvironment)
 {
 	char path[B_PATH_NAME_LENGTH];
-	status_t status;
-	char **args;
-	char **env;
 
 	if (argCount < 1)
 		return B_BAD_VALUE;
 
-	if (!IS_USER_ADDRESS(userPath) || !IS_USER_ADDRESS(userArgs) || !IS_USER_ADDRESS(userEnvironment)
+	if (!IS_USER_ADDRESS(userPath) || !IS_USER_ADDRESS(userArgs)
+		|| !IS_USER_ADDRESS(userEnvironment)
 		|| user_strlcpy(path, userPath, sizeof(path)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	status = user_copy_strings_array(userArgs, argCount, &args);
-	if (status < B_OK)
-		return status;
-
-	status = user_copy_strings_array(userEnvironment, envCount, &env);
-	if (status < B_OK) {
-		free_strings_array(args, argCount);
-		return status;
-	}
-
-	// replace args[0] with the path argument, just to be on the safe side
-	free(args[0]);
-	args[0] = strdup(path);
-
-	status = exec_team(argCount, args, envCount, env);
+	return exec_team(path, argCount, userArgs, envCount, userEnvironment);
 		// this one only returns in case of error
-
-	free_strings_array(args, argCount);
-	free_strings_array(env, envCount);
-	return status;
 }
 
 
@@ -2354,24 +2363,16 @@ team_id
 _user_load_image(int32 argCount, const char **userArgs, int32 envCount,
 	const char **userEnv, int32 priority, uint32 flags)
 {
-	char **args = NULL;
-	char **env = NULL;
-
 	TRACE(("_user_load_image_etc: argc = %ld\n", argCount));
 
 	if (argCount < 1 || userArgs == NULL || userEnv == NULL)
 		return B_BAD_VALUE;
 
-	if (!IS_USER_ADDRESS(userArgs) || !IS_USER_ADDRESS(userEnv)
-		|| user_copy_strings_array((char * const *)userArgs, argCount, &args) < B_OK)
+	if (!IS_USER_ADDRESS(userArgs) || !IS_USER_ADDRESS(userEnv))
 		return B_BAD_ADDRESS;
 
-	if (user_copy_strings_array((char * const *)userEnv, envCount, &env) < B_OK) {
-		free_strings_array(args, argCount);
-		return B_BAD_ADDRESS;
-	}
-
-	return load_image_etc(argCount, args, envCount, env, priority, flags);
+	return load_image_etc(argCount, (char * const *)userArgs,
+		envCount, (char * const *)userEnv, priority, flags, false);
 }
 
 
