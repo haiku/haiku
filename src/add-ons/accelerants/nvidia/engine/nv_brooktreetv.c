@@ -1548,31 +1548,106 @@ static status_t BT_start_tvout(void)
 	//checkout combination flatpanel and TVout: conflicting slave-wise? (how about
 	//the LCD register for determining better?)
 	CRTCW(PIXEL, ((CRTCR(PIXEL) & 0xc7) | 0x80));
+	/* select TV encoder, not panel encoder (b0 = 0).
+	 * Note:
+	 * Both are devices using the CRTC in slaved mode. */
+	CRTCW(LCD, (CRTCR(LCD) & 0xfe));
 
-  	//LCD:
-//	*(dev->pcio_base + AdresReg) = 0x33;
-//	*(dev->pcio_base + DataReg) &= 0xfe;
-
-	//TREG:
-//	*(dev->pcio_base + AdresReg) = 0x3d;
-//	*(dev->pcio_base + DataReg) = 0x80;
+	/* HTOTAL, VTOTAL and OVERFLOW return their default CRTC use, instead of
+	 * H, V-low and V-high 'shadow' counters(?)(b0, 4 and 6 = 0) (b7 use = unknown) */
+	CRTCW(TREG, 0x80);
 
 	return B_OK;
 }//end BT_start_tvout.
 
+/* note:
+ * tested on ELSA Erazor III 32Mb AGP (TNT2/BT869),
+ * Diamond Viper V550 16Mb PCI (TNT1/BT869),
+ * and ASUS V7100 GeForce2 MX200 AGP/32Mb (CH7007). */
 status_t BT_stop_tvout(void)
 {
 	/* prevent BT from being overclocked by VGA-only modes & black-out TV-out */
 	BT_killclk_blackout();
 
-//fixme: add..
-//SwitchToVGA(dev);
+	/* enable access to primary head */
+	set_crtc_owner(0);
+
+	/* switch on VGA monitor HSYNC and VSYNC */
+	//fixme: see if better DPMS state fetching can be setup for crtc.c (!)
+	CRTCW(REPAINT1, (CRTCR(REPAINT1) & 0x3f));
+
+//fixme: setup...
+/*
+	uint32 temp32;
+	unsigned char VertRetrace;
+	
+	//SEQ:
+	*(dev->pcio_base + 0x3c4) = 0x01;
+	*(dev->pcio_base + 0x3c5) = 0x01;
+
+	//wait for 1 image to be generated to make sure VGA has kicked in and is
+	//running OK before continuing...
+	//(Kick in will fail often if we do not wait here: You'll notice this most
+	// prominently in VESA 640x480 mode. Just try switching about 10 times and
+	// you'll probably see... (re-checked for PCI V0.20))
+	VertRetrace = 1;
+	//(make sure we are 'in' active VGA picture:)
+	do  VertRetrace = (*(dev->pcio_base + 0x3da) & 0x08);
+		while (VertRetrace);
+	//(wait for vertical retrace start on VGA:)
+	do  VertRetrace = (*(dev->pcio_base + 0x3da) & 0x08);
+		while (!VertRetrace);
+	//(make sure we are 'in' active VGA picture again:)
+	do  VertRetrace = (*(dev->pcio_base + 0x3da) & 0x08);
+		while (VertRetrace);
+
+	//'update' PIXEL/TV:
+	*(dev->pcio_base + AdresReg) = 0x28;
+	*(dev->pcio_base + DataReg) &= 0x03;
+
+	//CAUTION:
+	//On the TNT1, these memadresses apparantly cannot be read (sometimes)!;
+	//write actions do succeed though... (tested on ISA...)
+	//($00680700 b1-23 and b25-31 apparantly are 'don't cares'...)
+
+	//SWITCH RIVA pixelclock to be RIVA's own (so: directly):
+	//MEMADR $00680700:
+	temp32 = (*(dev->regs + (0x00680700 >> 2)) & ~0x00000001);
+	*(dev->regs + (0x00680700 >> 2)) = (temp32 | 0x01000000);
+
+	//switch RIVA PLL phase-lock to lock to RIVA's own internal pixelclock:
+	//MEMADR $0068050c: PLLSEL: warning dualhead is killed here! (PLL2 shutoff)
+	*(dev->regs + (0x0068050c >> 2)) = 0x10000700;
+
+	//TREG:
+	*(dev->pcio_base + AdresReg) = 0x3d;
+	*(dev->pcio_base + DataReg) = 0x00;
+
+	//make sure LCD is switched off:
+	//MEMADR $00680880:
+	*(dev->regs + (0x00680880 >> 2)) |= 0x10000000;
+
+   	//LCD:
+	*(dev->pcio_base + AdresReg) = 0x33;
+	*(dev->pcio_base + DataReg) &= 0xfc;
+
+
+	//Set overscan color to 'black':
+	//Disable this part if you're trying to center the output on TV,
+	//you'll get blue overscan range color then. Use this as a guide-'line' ;-)
+	//(select index adress register:)
+	*(dev->pcio_base + 0x3da);
+	//(write index for 'overscan color' register:)
+	*(dev->pcio_base + 0x3c0) = 0x11;
+    //(write data for 'overscan color' register:)
+	*(dev->pcio_base + 0x3c0) = 0x00;
+*/
 
 	/* fixme if needed:
 	 * a full encoder chip reset could be done here (so after decoupling crtc)... */
 
 	return B_OK;
-}
+}//end BT_stop_tvout.
 
 status_t BT_setmode(display_mode target)
 {
