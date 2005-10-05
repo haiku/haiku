@@ -1382,11 +1382,10 @@ load_kernel_add_on(const char *path)
 		load_elf_symbol_table(fd, image);
 
 	free(pheaders);
-	_kern_close(fd);
-
 	register_elf_image(image);
 
 done:
+	_kern_close(fd);
 	mutex_unlock(&sImageLoadMutex);
 
 	return image->id;
