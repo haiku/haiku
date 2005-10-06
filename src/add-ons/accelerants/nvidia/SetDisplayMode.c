@@ -90,10 +90,8 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	/* disable interrupts using the kernel driver */
 	interrupt_enable(false);
 
-	/* disable TVout (set GPU CRTC to master mode) */
-	//fixme: testing on singlehead cards only for now...
-//tmp disabled:
-//	if (!(si->ps.secondary_head)) BT_stop_tvout();
+	/* disable TVout */
+	BT_stop_tvout();
 
 	/* find current DPMS state, then turn off screen(s) */
 	head1_dpms_fetch(&display, &h, &v);

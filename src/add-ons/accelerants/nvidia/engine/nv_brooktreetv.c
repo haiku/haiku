@@ -12,7 +12,6 @@
 #define WR		0x00
 #define RD		0x01
 
-//fixme: remove rubbish..
 enum
 {	// TVoutput mode to set
 	NOT_SUPPORTED = 0,
@@ -22,15 +21,14 @@ enum
 	PAL800_TST,
 	PAL640,
 	PAL800,
-	VGA,
-	EXIT,
 	NTSC720,
 	PAL720,
 	NTSC640_OS,
 	PAL800_OS
 };
 
-/* Dirk Thierbach's Macro setup for registers 0xda-0xfe */
+/* Dirk Thierbach's Macro setup for registers 0xda-0xfe.
+ * (also see http://sourceforge.net/projects/nv-tv-out/) */
 static uint8 BtNtscMacro0 [] = {
   0x0f,0xfc,0x20,0xd0,0x6f,0x0f,0x00,0x00,0x0c,0xf3,0x09,
   0xbd,0x67,0xb5,0x90,0xb2,0x7d,0x00,0x00};
@@ -56,7 +54,7 @@ static uint8 BT_set_macro (int std, int mode)
 	uint8 stat;
 	uint8 buffer[21];
 
-	LOG(4,("Brooktree: Setting Macro\n"));
+	LOG(4,("Brooktree: Setting Macro:\n"));
 
 	if ((std < 0) | (std > 1) | (mode < 0) | (mode > 3))
 	{
@@ -72,18 +70,22 @@ static uint8 BT_set_macro (int std, int mode)
 		{
 		case 0:
 			/* disabled */
+			LOG(4,("Brooktree: NTSC, disabled\n"));
 			memcpy(&buffer[2], &BtNtscMacro0, 19);
 			break;
 		case 1:
 			/* enabled mode 1 */
+			LOG(4,("Brooktree: NTSC, mode 1\n"));
 			memcpy(&buffer[2], &BtNtscMacro1, 19);
 			break;
 		case 2:
 			/* enabled mode 2 */
+			LOG(4,("Brooktree: NTSC, mode 2\n"));
 			memcpy(&buffer[2], &BtNtscMacro2, 19);
 			break;
 		case 3:
 			/* enabled mode 3 */
+			LOG(4,("Brooktree: NTSC, mode 3\n"));
 			memcpy(&buffer[2], &BtNtscMacro3, 19);
 			break;
 		}
@@ -94,12 +96,14 @@ static uint8 BT_set_macro (int std, int mode)
 		{
 		case 0:
 			/* disabled */
+			LOG(4,("Brooktree: PAL, disabled\n"));
 			memcpy(&buffer[2], &BtPalMacro0, 19);
 			break;
 		case 1:
 		case 2:
 		case 3:
 			/* enabled */
+			LOG(4,("Brooktree: PAL, enabled\n"));
 			memcpy(&buffer[2], &BtPalMacro1, 19);
 			break;
 		}
@@ -952,22 +956,27 @@ static uint8 BT_setup_output(uint8 monstat, uint8 output, uint8 ffilter)
 		buffer[6] = 0x00;	// put CVBS on all outputs. Used for cards
 		break;				// with only Y/C out and 'translation cable'.
 	default:
-		LOG(4,("Brooktree: Outputting signals according to autodetect status\n"));
+		LOG(4,("Brooktree: Outputting signals according to autodetect status:\n"));
 		switch (monstat)	// only 'autodetect' remains...
 		{
 		case 1: 
+			LOG(4,("Brooktree: Only Y connected, outputting CVBS on all outputs\n"));
 			buffer[6] = 0x00;	//only Y connected: must be CVBS!
 			break;
 		case 2:
+			LOG(4,("Brooktree: Only C connected, outputting CVBS on all outputs\n"));
 			buffer[6] = 0x00;	//only C connected: must be CVBS!
 			break;				//(though cable is wired wrong...)
 		case 5:
+			LOG(4,("Brooktree: CVBS and only Y connected, outputting CVBS on all outputs\n"));
 			buffer[6] = 0x00;	//CVBS and only Y connected: 2x CVBS!
 			break;			   	//(officially not supported...)
 		case 6:
+			LOG(4,("Brooktree: CVBS and only C connected, outputting CVBS on all outputs\n"));
 			buffer[6] = 0x00;	//CVBS and only C connected: 2x CVBS!
 			break;			   	//(officially not supported...)
 		default:
+			LOG(4,("Brooktree: Outputting both Y/C and CVBS where supported by hardware\n"));
 			buffer[6] = 0x18;	//nothing, or
 							 	//Y/C only, or
 							 	//CVBS only (but on CVBS output), or
@@ -1013,15 +1022,23 @@ static uint8 BT_setup_hphase(uint8 mode)
 	buffer[5] = 0x00;		//set default vertical sync offset
 
 	/* do specific timing setup for all chips and modes: */
-	hoffset = 8;					//TNT2 and TNT2 M64...(8 pixels delayed hpos,
-									//so picture more to the right)
-//fixme: check this out...
-//	if (ddata->type == 1) hoffset = 0;	//TNT1 or GeForce2... (std hpos)
-									//NOTE: It might be that GeForce needs TNT2 offset:
-									//for now CX chips get seperate extra offset, until sure.
-									//(CX is only found AFAIK on GeForce cards, no BT tested
-									// on GeForce yet. CH was tested on GeForce and seemed to
-									// indicate TNT1 offset was needed.)
+	if ((si->ps.card_type == NV05) || (si->ps.card_type == NV05M64))
+	{
+		/* TNT2 and TNT2 M64...
+		 * (8 pixels delayed hpos, so picture more to the right) */
+		hoffset = 8;
+	}
+	else
+	{
+		/* TNT1 or GeForce2...
+		 * (std hpos)
+		 * NOTE: It might be that GeForce needs TNT2 offset:
+		 * for now CX chips get seperate extra offset, until sure.
+		 * (CX is only found AFAIK on GeForce cards, no BT tested
+		 * on GeForce yet. CH was tested on GeForce and seemed to
+		 * indicate TNT1 offset was needed.) */
+		hoffset = 0;
+	}
 
 	switch (mode)
 	{
@@ -1346,6 +1363,8 @@ v_sync_end = v_total - 1; //(This takes care of the 'cursor trash' on TNT1's...)
 */
 static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 {
+	//fixme if needed:
+	//pixelclock is not actually pgm'd because PLL is pgm' earlier during setmode...
 	switch (tvmode)
 	{
 	case NTSC640:
@@ -1366,7 +1385,6 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 		target->timing.v_sync_start = 480;
 		target->timing.v_sync_end = 555;	//This prevents 'cursor trash' on TNT1's
 		target->timing.v_total = 556;		//Above 525 because mode scales down
-//fixme: not actually programmed because PLL is programmed earlier...
 		if (si->ps.card_type == NV05M64)
 			target->timing.pixel_clock = ((696 * 556 * 60) / 1000);
 		else
@@ -1389,7 +1407,6 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 		target->timing.v_sync_start = 600;
 		target->timing.v_sync_end = 685;	//This prevents 'cursor trash' on TNT1's
 		target->timing.v_total = 686;		//Above 525 because mode scales down
-//fixme: not actually programmed because PLL is programmed earlier...
 		if (si->ps.card_type == NV05M64)
 			target->timing.pixel_clock = ((856 * 686 * 60) / 1000);
 		else
@@ -1412,7 +1429,6 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 		target->timing.v_sync_start = 480;
 		target->timing.v_sync_end = 570;	//This prevents 'cursor trash' on TNT1's
 		target->timing.v_total = 571;		//Below 625 because mode scales up
-//fixme: not actually programmed because PLL is programmed earlier...
 		if (si->ps.card_type == NV05M64)
 			target->timing.pixel_clock = ((696 * 571 * 50) / 1000);
 		else
@@ -1436,7 +1452,6 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 		target->timing.v_sync_start = 600;
 		target->timing.v_sync_end = 695;	//This prevents 'cursor trash' on TNT1's
 		target->timing.v_total = 696;		//Above 625 because mode scales down
-//fixme: not actually programmed because PLL is programmed earlier...
 		if (si->ps.card_type == NV05M64)
 			target->timing.pixel_clock = ((856 * 696 * 50) / 1000);
 		else
@@ -1451,7 +1466,6 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 		target->timing.v_sync_start = 490;		//set for centered sync pulse
 		target->timing.v_sync_end = 490+25;		//delta is BT V_BLANKI
 		target->timing.v_total = 525;			//BT V_LINESI (== 525: 1:1 scaled mode)
-//fixme: not actually programmed because PLL is programmed earlier...
 		target->timing.pixel_clock = ((784 * 525 * 60) / 1000); //refresh
 		break;
 	case PAL800_OS:
@@ -1463,7 +1477,6 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 		target->timing.v_sync_start = 579;		//set for centered sync pulse
 		target->timing.v_sync_end = 579+42;		//delta is BT V_BLANKI
 		target->timing.v_total = 625;			//BT V_LINESI (== 625: 1:1 scaled mode)
-//fixme: not actually programmed because PLL is programmed earlier...
 		target->timing.pixel_clock = ((944 * 625 * 50) / 1000); //refresh
 		break;
 	case NTSC720:
@@ -1476,7 +1489,6 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 		target->timing.v_sync_start = 490;		//set for centered sync pulse
 		target->timing.v_sync_end = 490+26;		//delta is V_sync_pulse
 		target->timing.v_total = 525;			//CH V_TOTAL (== 525: 1:1 scaled mode)
-//fixme: not actually programmed because PLL is programmed earlier...
 		target->timing.pixel_clock = ((888 * 525 * 60) / 1000); //refresh
 		break;
 	case PAL720:
@@ -1488,7 +1500,6 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 		target->timing.v_sync_start = 579;		//set for centered sync pulse
 		target->timing.v_sync_end = 579+42;		//delta is BT V_BLANKI
 		target->timing.v_total = 625;			//BT V_LINESI (== 625: 1:1 scaled mode)
-//fixme: not actually programmed because PLL is programmed earlier...
 		target->timing.pixel_clock = ((888 * 625 * 50) / 1000); //refresh
 		break;
 	default:
@@ -1515,21 +1526,12 @@ static status_t BT_start_tvout(void)
 	/* setup TVencoder connection */
 	/* b1-0 = %01: encoder type is MASTER;
 	 * b24 = 1: VIP datapos is b0-7 */
-	//fixme: setup completely instead of relying on pre-init by BIOS..
-	DACW(TV_SETUP, (DACR(TV_SETUP) | 0x01000001));
+	//fixme if needed: setup completely instead of relying on pre-init by BIOS..
+	DACW(TV_SETUP, ((DACR(TV_SETUP) & ~0x00000002) | 0x01000001));
 
 	/* tell GPU to use pixelclock from TVencoder instead of using internal source */
 	/* (nessecary or display will 'shiver' on both TV and VGA.) */
-	//fixme: checkout if this works for singlehead cards!! (read possible??)
 	DACW(PLLSEL, (DACR(PLLSEL) | 0x00030000));
-//std val for singlehead cards:
-//	DACW(PLLSEL, 0x10000700);
-
-	//fixme: is this needed? does b5 have a special meaning in nvidia cards?
-//normal in this driver is:
-//	SEQW(CLKMODE, 0x21);
-//betvout:
-	SEQW(CLKMODE, 0x01);
 
 	/* Set overscan color to 'black' */
 	/* note:
@@ -1537,20 +1539,11 @@ static status_t BT_start_tvout(void)
 	 * center the output on TV. Use it as a guide-'line' then ;-) */
 	ATBW(OSCANCOLOR, 0x00);
 
-	/* unlock CRTC registers at 'index 0-7' (just to be sure) */
-	CRTCW(VSYNCE, (CRTCR(VSYNCE) & 0x7f));
-
 	/* set CRTC to slaved mode (b7 = 1) and clear TVadjust (b3-5 = %000) */
-	//fixme:
-	//add tvout_active flag to shared_info and use it to update
-	//crtc.c to prevent it from disabling slaved mode (again) to be sure this works..
-	//fixme:
-	//checkout combination flatpanel and TVout: conflicting slave-wise? (how about
-	//the LCD register for determining better?)
 	CRTCW(PIXEL, ((CRTCR(PIXEL) & 0xc7) | 0x80));
 	/* select TV encoder, not panel encoder (b0 = 0).
 	 * Note:
-	 * Both are devices using the CRTC in slaved mode. */
+	 * Both are devices (often) using the CRTC in slaved mode. */
 	CRTCW(LCD, (CRTCR(LCD) & 0xfe));
 
 	/* HTOTAL, VTOTAL and OVERFLOW return their default CRTC use, instead of
@@ -1573,14 +1566,8 @@ status_t BT_stop_tvout(void)
 	set_crtc_owner(0);
 
 	/* switch on VGA monitor HSYNC and VSYNC */
-	//fixme: see if better DPMS state fetching can be setup for crtc.c (!)
+//fixme: see if better DPMS state fetching can be setup for crtc.c (!)
 	CRTCW(REPAINT1, (CRTCR(REPAINT1) & 0x3f));
-
-	//fixme: is this needed? does b5 have a special meaning in nvidia cards?
-//normal in this driver is:
-//	SEQW(CLKMODE, 0x21);
-//betvout:
-	SEQW(CLKMODE, 0x01);
 
 
 	/* wait for one image to be generated to make sure VGA has kicked in and is
@@ -1595,10 +1582,8 @@ status_t BT_stop_tvout(void)
 	while (NV_REG8(NV8_INSTAT1) & 0x08) snooze(1);
 
 
-	/* set CRTC to master mode (b7 = 0) and clear TVadjust (b3-5 = %000) */
-	//fixme:
-	//update this to take flatpanels into consideration..
-	CRTCW(PIXEL, (CRTCR(PIXEL) & 0x03));
+	/* set CRTC to master mode (b7 = 0) if it wasn't slaved for a panel before */
+	if (!(si->ps.slaved_tmds1))	CRTCW(PIXEL, (CRTCR(PIXEL) & 0x03));
 
 	//fixme: checkout...
 	//CAUTION:
@@ -1608,8 +1593,8 @@ status_t BT_stop_tvout(void)
 	/* setup TVencoder connection */
 	/* b1-0 = %00: encoder type is SLAVE;
 	 * b24 = 1: VIP datapos is b0-7 */
-	//fixme: setup completely instead of relying on pre-init by BIOS..
-	DACW(TV_SETUP, ((DACR(TV_SETUP) & ~0x00000001) | 0x01000000));
+	//fixme if needed: setup completely instead of relying on pre-init by BIOS..
+	DACW(TV_SETUP, ((DACR(TV_SETUP) & ~0x00000003) | 0x01000000));
 
 	/* tell GPU to use pixelclock from internal source instead of using TVencoder */
 	DACW(PLLSEL, 0x10000700);
@@ -1619,21 +1604,14 @@ status_t BT_stop_tvout(void)
 	 * H, V-low and V-high 'shadow' counters(?)(b0, 4 and 6 = 0) (b7 use = unknown) */
 	CRTCW(TREG, 0x00);
 
-	/* powerdown FPclock (not touching TMDS power) */
-	//fixme: do we need this? might kill off panel support...
-	DACW(FP_DEBUG0, (DACR(FP_DEBUG0) | 0x10000000));
-
-	/* select TV encoder, not panel encoder (b0 = 0).
+	/* select panel encoder, not TV encoder if needed (b0 = 1).
 	 * Note:
-	 * Both are devices using the CRTC in slaved mode. */
-	//fixme:
-	//update this to take flatpanels into consideration..
-	//fixme2:
-	//probably better don't touch b1: it's used for powering ext. TMDS (or so) (?)
-	CRTCW(LCD, (CRTCR(LCD) & 0xfc));
+	 * Both are devices (often) using the CRTC in slaved mode. */
+	if (si->ps.slaved_tmds1) CRTCW(LCD, (CRTCR(LCD) | 0x01));
 
 	/* fixme if needed:
 	 * a full encoder chip reset could be done here (so after decoupling crtc)... */
+	/* (but: beware of the 'locked SDA' syndrome then!) */
 
 	return B_OK;
 }//end BT_stop_tvout.
@@ -1651,24 +1629,8 @@ status_t BT_setmode(display_mode target)
 	tvmode = BT_check_tvmode(tv_target);
 	if (!tvmode) return B_ERROR;
 
-//fixme: only testing singlehead cards for now...
-if (si->ps.secondary_head)
-{
-	head1_set_timing(tv_target);
-	return B_ERROR;
-}
-
-	/* fixme: reset BT should be here...
-	 * (but: beware of the 'locked SDA' syndrome then!) */
-	BT_killclk_blackout();
-
 	/* read current output devices connection status */
 	BT_read_monstat(&monstat);
-
-	//fixme?
-	//'slowdown RIVA clock' if TVout is requested:
-	//makes sure TVout chip is not being overclocked! (VESA640/800 is safe..)
-	//NOTE: it looks like this is unnesessary after all..
 
 	/* (pre)set TV mode */
 	/* note:
@@ -1730,11 +1692,8 @@ if (si->ps.secondary_head)
 	}
 
 	/* setup output signal routing and flickerfilter */
-	//fixme: add output force settings in nv.settings, defaulting to autodetect.
+//fixme: add output force settings in nv.settings, defaulting to autodetect.
 	BT_setup_output(monstat, 0, ffilter);
-
-//tmp: enabling testimage...
-BT_testsignal();
 
 	/* update the GPU CRTC timing for the requested mode */
 	BT_update_mode_for_gpu(&tv_target, tvmode);
@@ -1742,12 +1701,18 @@ BT_testsignal();
 	/* setup GPU CRTC timing */
 	head1_set_timing(tv_target);
 
-	/* now set GPU CRTC to slave mode */
-//tmp disabled:
-//	BT_start_tvout();
+//fixme: only testing singlehead cards for now...
+if (si->ps.secondary_head)
+{
+	BT_testsignal();
+	return B_OK;
+}
 
-	//fixme: add code to disable VGA screen when TVout enabled
-	//(use via nv.setting preset)
+	/* now set GPU CRTC to slave mode */
+	BT_start_tvout();
+
+//fixme: add code to disable VGA screen when TVout enabled
+//(use via nv.setting preset)
 
 	return B_OK;
 }
