@@ -180,8 +180,8 @@ SavePalette::SavePalette(int mode)
 	  fSize(0),
 	  fSizeInBits(8),
 	  fMode(mode),
-	  fUseTransparent(false),
-	  fTransparentIndex(0),
+	  fTransparentMode(NO_TRANSPARENCY),
+	  fTransparentIndex(-1),
 	  fBackgroundIndex(0),
 	  fFatalError(pal == NULL)
 {
@@ -242,8 +242,8 @@ SavePalette::SavePalette(BBitmap *bitmap, int32 maxSizeInBits)
 	  fSize(0),
 	  fSizeInBits(0),
 	  fMode(OPTIMAL_PALETTE),
-	  fUseTransparent(false),
-	  fTransparentIndex(0),
+	  fTransparentMode(fTransparentMode),
+	  fTransparentIndex(-1),
 	  fBackgroundIndex(0),
 	  fFatalError(pal == NULL)
 {
@@ -366,49 +366,93 @@ SavePalette::~SavePalette()
 //
 // standard mapping services once a palette is loaded
 uint8
-SavePalette::IndexForColor(uint8 red, uint8 green, uint8 blue)
+SavePalette::IndexForColor(uint8 red, uint8 green, uint8 blue, uint8 alpha)
 {
+	if (fTransparentMode > NO_TRANSPARENCY && alpha < 128)
+		return fTransparentIndex;
+
 	uint8 index = 0;
 
 	if (fMode == GREYSCALE_PALETTE) {
 		index = (308 * red + 600 * green + 116 * blue) / 1024;
+		// avoid transparent index
+		if (fTransparentMode == AUTO_TRANSPARENCY && index == 1 && fTransparentIndex == 1)
+			index = 0;
 	} else {
 		int closestDistance = 255 * 255 * 3;
 	
-		for (int i = 0; i < fSize && closestDistance != 0; i++) {
-			int rd = (int)red - (int)pal[i].red;
-			int gd = (int)green - (int)pal[i].green;
-			int bd = (int)blue - (int)pal[i].blue;
-			int distanceAtIndex = rd * rd + gd * gd + bd * bd;
-			if (distanceAtIndex < closestDistance) {
-				closestDistance = distanceAtIndex;
-				index = i;
+		if (fTransparentMode == AUTO_TRANSPARENCY) {
+			for (int i = 0; i < fTransparentIndex && closestDistance != 0; i++) {
+				int rd = (int)red - (int)pal[i].red;
+				int gd = (int)green - (int)pal[i].green;
+				int bd = (int)blue - (int)pal[i].blue;
+				int distanceAtIndex = rd * rd + gd * gd + bd * bd;
+				if (distanceAtIndex < closestDistance) {
+					closestDistance = distanceAtIndex;
+					index = i;
+				}
+			}
+			for (int i = fTransparentIndex + 1; i < fSize && closestDistance != 0; i++) {
+				int rd = (int)red - (int)pal[i].red;
+				int gd = (int)green - (int)pal[i].green;
+				int bd = (int)blue - (int)pal[i].blue;
+				int distanceAtIndex = rd * rd + gd * gd + bd * bd;
+				if (distanceAtIndex < closestDistance) {
+					closestDistance = distanceAtIndex;
+					index = i;
+				}
+			}
+		} else {
+			for (int i = 0; i < fSize && closestDistance != 0; i++) {
+				int rd = (int)red - (int)pal[i].red;
+				int gd = (int)green - (int)pal[i].green;
+				int bd = (int)blue - (int)pal[i].blue;
+				int distanceAtIndex = rd * rd + gd * gd + bd * bd;
+				if (distanceAtIndex < closestDistance) {
+					closestDistance = distanceAtIndex;
+					index = i;
+				}
 			}
 		}
 	}
 	return index;
 }
 
-// SetUseTransparent
-void
-SavePalette::SetUseTransparent(bool use)
-{
-	fUseTransparent = use;
-}
-
 // SetTransparentIndex
 void
-SavePalette::SetTransparentIndex(int index)
+SavePalette::PrepareForAutoTransparency()
 {
-	fTransparentIndex = max_c(fSize - 1, index);
+	fTransparentMode = AUTO_TRANSPARENCY;
+	// TODO: in the SavePalette::SavePalette(BBitmap*),
+	// we don't use more colors than necessary, however,
+	// here we take a slot away for transparency, even if
+	// we might still have used less colors than the user
+	// wanted as a maximum
+	// NOTE: the last index
+	switch (fMode) {
+		case WEB_SAFE_PALETTE:
+			fTransparentIndex = 216;
+			fSize = 217;
+			break;
+		case BEOS_SYSTEM_PALETTE:
+			fTransparentIndex = 0;
+			break;
+		case GREYSCALE_PALETTE:
+			fTransparentIndex = 1;
+			break;
+		case OPTIMAL_PALETTE:
+			fTransparentIndex = fSize - 1;
+			break;
+	}
 }
 
 // SetTransparentColor
 void
 SavePalette::SetTransparentColor(uint8 red, uint8 green, uint8 blue)
 {
-	bool found = false;
+	fTransparentMode = COLOR_KEY_TRANSPARENCY;
 
+	bool found = false;
 	// try direct hit first
 	for (int i = 0; i < fSize; i++) {
 		if (pal[i].red == red &&

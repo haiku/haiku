@@ -131,23 +131,16 @@ GIFView::GIFView(BRect rect, const char *name)
 	// radio buttons
 	r.top = fUseTransparentCB->Frame().bottom + 2;
 	r.bottom = r.top + 10;
-	r.right = r.left + be_plain_font->StringWidth("Use index") + 20;
-	fUseTransparentIndexRB = new BRadioButton(r, "UseTransparentIndex", "Use index",
-		new BMessage(GV_USE_TRANSPARENT_INDEX));
-	AddChild(fUseTransparentIndexRB);
+	r.right = r.left + be_plain_font->StringWidth("Automatic (from alpha channel)") + 20;
+	fUseTransparentAutoRB = new BRadioButton(r, "UseTransparentAuto", "Automatic (from alpha channel)",
+		new BMessage(GV_USE_TRANSPARENT_AUTO));
+	AddChild(fUseTransparentAutoRB);
 	
-	r.left = r.right + 1;
-	r.right = r.left + 30;
-	fTransparentIndexTC = new BTextControl(r, "TransparentIndex", "", "0",
-		new BMessage(GV_TRANSPARENT_INDEX));
-	AddChild(fTransparentIndexTC);
-	fTransparentIndexTC->SetDivider(0);
-	
-	r.top = fUseTransparentIndexRB->Frame().bottom + 0;
+	r.top = fUseTransparentAutoRB->Frame().bottom + 0;
 	r.bottom = r.top + 10;
 	r.left = 10;
-	r.right = r.left + be_plain_font->StringWidth("Use rgb color") + 20;
-	fUseTransparentColorRB = new BRadioButton(r, "UseTransparentColor", "Use rgb color",
+	r.right = r.left + be_plain_font->StringWidth("Use RGB color") + 20;
+	fUseTransparentColorRB = new BRadioButton(r, "UseTransparentColor", "Use RGB color",
 		new BMessage(GV_USE_TRANSPARENT_COLOR));
 	AddChild(fUseTransparentColorRB);
 	
@@ -172,24 +165,12 @@ GIFView::GIFView(BRect rect, const char *name)
 	AddChild(fTransparentBlueTC);
 	fTransparentBlueTC->SetDivider(0);
 
-	// align text controls
-	float diff = fTransparentRedTC->Frame().left - fTransparentIndexTC->Frame().left;
-	if (diff > 0) {
-		fTransparentIndexTC->MoveBy(diff, 0);
-	} else {
-		fTransparentRedTC->MoveBy(-diff, 0);
-		fTransparentGreenTC->MoveBy(-diff, 0);
-		fTransparentBlueTC->MoveBy(-diff, 0);
-	}
-
-	BTextView *ti = fTransparentIndexTC->TextView();
 	BTextView *tr = fTransparentRedTC->TextView();
 	BTextView *tg = fTransparentGreenTC->TextView();
 	BTextView *tb = fTransparentBlueTC->TextView();
 	
 	for (uint32 x = 0; x < 256; x++) {
 		if (x < '0' || x > '9') {
-			ti->DisallowChar(x);
 			tr->DisallowChar(x);
 			tg->DisallowChar(x);
 			tb->DisallowChar(x);
@@ -251,27 +232,23 @@ GIFView::RestorePrefs()
 	if (fGreyScaleMI->IsMarked()) fUseDitheringCB->SetValue(false);
 	else fUseDitheringCB->SetValue(fPrefs->usedithering);
 	fUseTransparentCB->SetValue(fPrefs->usetransparent);
-	fUseTransparentIndexRB->SetValue(fPrefs->usetransparentindex);
-	fUseTransparentColorRB->SetValue(!fPrefs->usetransparentindex);
+	fUseTransparentAutoRB->SetValue(fPrefs->usetransparentauto);
+	fUseTransparentColorRB->SetValue(!fPrefs->usetransparentauto);
 	if (fPrefs->usetransparent) {
-		fUseTransparentIndexRB->SetEnabled(true);
+		fUseTransparentAutoRB->SetEnabled(true);
 		fUseTransparentColorRB->SetEnabled(true);
-		fTransparentIndexTC->SetEnabled(fPrefs->usetransparentindex);
-		fTransparentRedTC->SetEnabled(!fPrefs->usetransparentindex);
-		fTransparentGreenTC->SetEnabled(!fPrefs->usetransparentindex);
-		fTransparentBlueTC->SetEnabled(!fPrefs->usetransparentindex);
+		fTransparentRedTC->SetEnabled(!fPrefs->usetransparentauto);
+		fTransparentGreenTC->SetEnabled(!fPrefs->usetransparentauto);
+		fTransparentBlueTC->SetEnabled(!fPrefs->usetransparentauto);
 	} else {
-		fUseTransparentIndexRB->SetEnabled(false);
+		fUseTransparentAutoRB->SetEnabled(false);
 		fUseTransparentColorRB->SetEnabled(false);
-		fTransparentIndexTC->SetEnabled(false);
 		fTransparentRedTC->SetEnabled(false);
 		fTransparentGreenTC->SetEnabled(false);
 		fTransparentBlueTC->SetEnabled(false);
 	}
 	
 	char temp[4];
-	sprintf(temp, "%d", fPrefs->transparentindex);
-	fTransparentIndexTC->SetText(temp);
 	sprintf(temp, "%d", fPrefs->transparentred);
 	fTransparentRedTC->SetText(temp);
 	sprintf(temp, "%d", fPrefs->transparentgreen);
@@ -289,8 +266,7 @@ GIFView::AllAttached()
 	fInterlacedCB->SetTarget(msgr);
 	fUseDitheringCB->SetTarget(msgr);
 	fUseTransparentCB->SetTarget(msgr);
-	fUseTransparentIndexRB->SetTarget(msgr);
-	fTransparentIndexTC->SetTarget(msgr);
+	fUseTransparentAutoRB->SetTarget(msgr);
 	fUseTransparentColorRB->SetTarget(msgr);
 	fTransparentRedTC->SetTarget(msgr);
 	fTransparentGreenTC->SetTarget(msgr);
@@ -348,34 +324,27 @@ GIFView::MessageReceived(BMessage *message)
 		case GV_USE_TRANSPARENT:
 			fPrefs->usetransparent = fUseTransparentCB->Value();
 			if (fPrefs->usetransparent) {
-				fUseTransparentIndexRB->SetEnabled(true);
+				fUseTransparentAutoRB->SetEnabled(true);
 				fUseTransparentColorRB->SetEnabled(true);
-				fTransparentIndexTC->SetEnabled(fUseTransparentIndexRB->Value());
 				fTransparentRedTC->SetEnabled(fUseTransparentColorRB->Value());
 				fTransparentGreenTC->SetEnabled(fUseTransparentColorRB->Value());
 				fTransparentBlueTC->SetEnabled(fUseTransparentColorRB->Value());
 			} else {
-				fUseTransparentIndexRB->SetEnabled(false);
+				fUseTransparentAutoRB->SetEnabled(false);
 				fUseTransparentColorRB->SetEnabled(false);
-				fTransparentIndexTC->SetEnabled(false);
 				fTransparentRedTC->SetEnabled(false);
 				fTransparentGreenTC->SetEnabled(false);
 				fTransparentBlueTC->SetEnabled(false);
 			}
 			break;
-		case GV_USE_TRANSPARENT_INDEX:
-			fPrefs->usetransparentindex = true;
-			fTransparentIndexTC->SetEnabled(true);
+		case GV_USE_TRANSPARENT_AUTO:
+			fPrefs->usetransparentauto = true;
 			fTransparentRedTC->SetEnabled(false);
 			fTransparentGreenTC->SetEnabled(false);
 			fTransparentBlueTC->SetEnabled(false);
 			break;
-		case GV_TRANSPARENT_INDEX:
-			fPrefs->transparentindex = CheckInput(fTransparentIndexTC);
-			break;
 		case GV_USE_TRANSPARENT_COLOR:
-			fPrefs->usetransparentindex = false;
-			fTransparentIndexTC->SetEnabled(false);
+			fPrefs->usetransparentauto = false;
 			fTransparentRedTC->SetEnabled(true);
 			fTransparentGreenTC->SetEnabled(true);
 			fTransparentBlueTC->SetEnabled(true);

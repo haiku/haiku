@@ -35,8 +35,7 @@ class Prefs;
 #define GV_INTERLACED				'gvin'
 #define GV_USE_DITHERING			'gvud'
 #define GV_USE_TRANSPARENT			'gvut'
-#define GV_USE_TRANSPARENT_INDEX	'gvui'
-#define GV_TRANSPARENT_INDEX		'gvti'
+#define GV_USE_TRANSPARENT_AUTO		'gvua'
 #define GV_USE_TRANSPARENT_COLOR	'gvuc'
 #define GV_TRANSPARENT_RED			'gvtr'
 #define GV_TRANSPARENT_GREEN		'gvtg'
@@ -73,10 +72,9 @@ class GIFView : public BView {
 		BCheckBox*			fUseTransparentCB;
 		BCheckBox*			fUseDitheringCB;
 
-		BRadioButton*		fUseTransparentIndexRB;
+		BRadioButton*		fUseTransparentAutoRB;
 		BRadioButton*		fUseTransparentColorRB;
 
-		BTextControl*		fTransparentIndexTC;
 		BTextControl*		fTransparentRedTC;
 		BTextControl*		fTransparentGreenTC;
 		BTextControl*		fTransparentBlueTC;

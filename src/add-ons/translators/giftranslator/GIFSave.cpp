@@ -97,10 +97,9 @@ GIFSave::GIFSave(BBitmap *bitmap, BPositionIO *output)
 		}
 	}
 	
-	palette->SetUseTransparent(prefs->usetransparent);
 	if (prefs->usetransparent) {
-		if (prefs->usetransparentindex) {
-			palette->SetTransparentIndex(prefs->transparentindex);
+		if (prefs->usetransparentauto) {
+			palette->PrepareForAutoTransparency();
 			if (debug)
 				printf("GIFSave::GIFSave() - Using transparent index %d\n", palette->TransparentIndex());
 		} else {
@@ -329,27 +328,36 @@ GIFSave::NextPixel(int pixel)
 {
 	int bpr = bitmap->BytesPerRow();
 	color_space cs = bitmap->ColorSpace();
-	unsigned char r, g, b;
+	bool useAlphaForTransparency = prefs->usetransparentauto && cs == B_RGBA32 || cs == B_RGBA32_BIG;
+	unsigned char r, g, b, a;
 
 	if (cs == B_RGB32 || cs == B_RGBA32) {
 		b = gifbits[0];
 		g = gifbits[1];
 		r = gifbits[2];
+		a = gifbits[3];
 	} else {
+		a = gifbits[0];
 		r = gifbits[1];
 		g = gifbits[2];
 		b = gifbits[3];
 	}
 	gifbits += 4;
 	pos += 4;
+
+	if (!prefs->usetransparent || prefs->usetransparentauto ||
+		r != prefs->transparentred ||
+		g != prefs->transparentgreen ||
+		b != prefs->transparentblue) {
 	
-	if (prefs->usedithering) {
-		if (pixel % width == 0) {
-			red_side_error = green_side_error = blue_side_error = 0;
+		if (prefs->usedithering) {
+			if (pixel % width == 0) {
+				red_side_error = green_side_error = blue_side_error = 0;
+			}
+			b = min_c(255, max_c(0, b - blue_side_error));
+			g = min_c(255, max_c(0, g - green_side_error));
+			r = min_c(255, max_c(0, r - red_side_error));
 		}
-		b = min_c(255, max_c(0, b - blue_side_error));
-		g = min_c(255, max_c(0, g - green_side_error));
-		r = min_c(255, max_c(0, r - red_side_error));
 	}
 	
 	if (prefs->interlaced) {
@@ -363,7 +371,7 @@ GIFSave::NextPixel(int pixel)
 			gifbits = (unsigned char *)bitmap->Bits() + (bpr * row);
 		}
 	}
-
+/*
 	unsigned int key = (r << 16) + (g << 8) + b;
 	ColorCache *cc = (ColorCache *)hash->GetItem(key);
 	if (cc == NULL) {
@@ -406,7 +414,44 @@ GIFSave::NextPixel(int pixel)
 		blue_error[x + 1] = (blue_total_error * one_sixteenth);
 	}
 	
-	return cc->index;
+	return cc->index;*/
+
+	int index = palette->IndexForColor(r, g, b, useAlphaForTransparency ? a : 255);
+
+	if (index != palette->TransparentIndex() && prefs->usedithering) {
+		int x = pixel % width;
+		// Don't carry error on to next line when interlaced because
+		// that line won't be adjacent, hence error is meaningless
+		if (prefs->interlaced && x == width - 1) {
+			for (int32 y = -1; y < width + 1; y++) {
+				red_error[y] = 0;
+				green_error[y] = 0;
+				blue_error[y] = 0;
+			}
+		}
+
+		int32 red_total_error = palette->pal[index].red - r;
+		int32 green_total_error = palette->pal[index].green - g;
+		int32 blue_total_error = palette->pal[index].blue - b;
+
+		red_side_error = (red_error[x + 1] + (red_total_error * seven_sixteenth)) >> 15;
+		blue_side_error = (blue_error[x + 1] + (blue_total_error * seven_sixteenth)) >> 15;
+		green_side_error = (green_error[x + 1] + (green_total_error * seven_sixteenth)) >> 15;
+		
+		red_error[x - 1] += (red_total_error * three_sixteenth);
+		green_error[x - 1] += (green_total_error * three_sixteenth);
+		blue_error[x - 1] += (blue_total_error * three_sixteenth);
+
+		red_error[x] += (red_total_error * five_sixteenth);
+		green_error[x] += (green_total_error * five_sixteenth);
+		blue_error[x] += (blue_total_error * five_sixteenth);
+
+		red_error[x + 1] = (red_total_error * one_sixteenth);
+		green_error[x + 1] = (green_total_error * one_sixteenth);
+		blue_error[x + 1] = (blue_total_error * one_sixteenth);
+	}
+
+	return index;
 }
 
 // InitFrame

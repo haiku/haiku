@@ -27,6 +27,12 @@ enum {
 	OPTIMAL_PALETTE
 };
 
+enum {
+	NO_TRANSPARENCY = 0,
+	AUTO_TRANSPARENCY,
+	COLOR_KEY_TRANSPARENCY
+};
+
 class SavePalette {
 	public:
 							SavePalette(int mode);
@@ -37,14 +43,14 @@ class SavePalette {
 	inline	bool			IsValid() const
 								{ return !fFatalError; }
 
-			uint8			IndexForColor(uint8 red, uint8 green, uint8 blue);
+			uint8			IndexForColor(uint8 red, uint8 green,
+										  uint8 blue, uint8 alpha = 255);
 	inline	uint8			IndexForColor(const rgb_color& color);
 
-			void			SetUseTransparent(bool use);
 	inline	bool			UseTransparent() const
-								{ return fUseTransparent; }
+								{ return fTransparentMode > NO_TRANSPARENCY; }
 
-			void			SetTransparentIndex(int index);
+			void			PrepareForAutoTransparency();
 	inline	int				TransparentIndex() const
 								{ return fTransparentIndex; }
 			void			SetTransparentColor(uint8 red,
@@ -65,7 +71,7 @@ class SavePalette {
 			int				fSize;
 			int				fSizeInBits;
 			int				fMode;
-			bool			fUseTransparent;
+			uint32			fTransparentMode;
 			int				fTransparentIndex;
 			int				fBackgroundIndex;
 			bool			fFatalError;
@@ -75,7 +81,7 @@ class SavePalette {
 inline uint8
 SavePalette::IndexForColor(const rgb_color& color)
 {
-	return IndexForColor(color.red, color.green, color.blue);
+	return IndexForColor(color.red, color.green, color.blue, color.alpha);
 }
 
 

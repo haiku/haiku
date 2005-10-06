@@ -25,9 +25,9 @@ class Prefs {
 		Prefs();
 		void Save();
 		~Prefs();
-		bool interlaced, usetransparent, usetransparentindex,
+		bool interlaced, usetransparent, usetransparentauto,
 			usedithering;
-		int transparentindex, transparentred, transparentgreen,
+		int transparentred, transparentgreen,
 			transparentblue, palettemode, palette_size_in_bits;
 	private:
 		bool GetInt(char *name, int *value, int *defaultvalue);

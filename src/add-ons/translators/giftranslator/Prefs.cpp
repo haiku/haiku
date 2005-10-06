@@ -23,13 +23,19 @@
 
 extern bool debug;
 
-Prefs::Prefs() {
-	interlaced = usetransparent = usetransparentindex = false;
-	usedithering = true;
-	transparentindex = transparentred = transparentgreen = 
-		transparentblue = palettemode = 0;
-	palette_size_in_bits = 8;
-
+// constructor
+Prefs::Prefs()
+	: interlaced(false),
+	  usetransparent(false),
+	  usetransparentauto(false),
+	  usedithering(false),
+	  transparentred(0),
+	  transparentgreen(0),
+	  transparentblue(0),
+	  palettemode(0),
+	  palette_size_in_bits(8),
+	  file(NULL)
+{
 	BPath path;
 	find_directory(B_USER_SETTINGS_DIRECTORY, &path);
 	path.Append("GIFTranslator_settings");
@@ -45,15 +51,13 @@ Prefs::Prefs() {
 	db = false;
 	if (!GetBool("usetransparent", &usetransparent, &db)) return;
 	db = false;
-	if (!GetBool("usetransparentindex", &usetransparentindex, &db)) return;
+	if (!GetBool("usetransparentauto", &usetransparentauto, &db)) return;
 	db = true;
 	if (!GetBool("usedithering", &usedithering, &db)) return;
 	int di = 0;
 	if (!GetInt("palettemode", &palettemode, &di)) return;
 	di = 8;
 	if (!GetInt("palettesize", &palette_size_in_bits, &di)) return;
-	di = 0;
-	if (!GetInt("transparentindex", &transparentindex, &di)) return;
 	di = 0;
 	if (!GetInt("transparentred", &transparentred, &di)) return;
 	di = 0;
@@ -62,7 +66,16 @@ Prefs::Prefs() {
 	if (!GetInt("transparentblue", &transparentblue, &di)) return;
 }
 
-bool Prefs::GetInt(char *name, int *value, int *defaultvalue) {
+// destructor
+Prefs::~Prefs()
+{
+	delete file;
+}
+
+// GetInt
+bool
+Prefs::GetInt(char *name, int *value, int *defaultvalue)
+{
 	status_t err = file->ReadAttr(name, B_INT32_TYPE, 0, value, 4);
 	if (err == B_ENTRY_NOT_FOUND) {
 		*value = *defaultvalue;
@@ -77,7 +90,10 @@ bool Prefs::GetInt(char *name, int *value, int *defaultvalue) {
 	return true;
 }
 
-bool Prefs::GetBool(char *name, bool *value, bool *defaultvalue) {
+// GetBool
+bool
+Prefs::GetBool(char *name, bool *value, bool *defaultvalue)
+{
 	status_t err = file->ReadAttr(name, B_BOOL_TYPE, 0, value, 1);
 	if (err == B_ENTRY_NOT_FOUND) {
 		*value = *defaultvalue;
@@ -92,7 +108,10 @@ bool Prefs::GetBool(char *name, bool *value, bool *defaultvalue) {
 	return true;
 }
 
-bool Prefs::PutInt(char *name, int *value) {
+// PutInt
+bool
+Prefs::PutInt(char *name, int *value)
+{
 	status_t err = file->WriteAttr(name, B_INT32_TYPE, 0, value, 4);
 	if (err < 0) {
 		if (debug) printf("WriteAttr on %s died\n", name);
@@ -101,7 +120,10 @@ bool Prefs::PutInt(char *name, int *value) {
 	return true;
 }
 
-bool Prefs::PutBool(char *name, bool *value) {
+// PutBool
+bool
+Prefs::PutBool(char *name, bool *value)
+{
 	status_t err = file->WriteAttr(name, B_BOOL_TYPE, 0, value, 1);
 	if (err < 0) {
 		if (debug) printf("WriteAttr on %s died\n", name);
@@ -110,20 +132,18 @@ bool Prefs::PutBool(char *name, bool *value) {
 	return true;
 }
 
-void Prefs::Save() {
+// Save
+void
+Prefs::Save()
+{
 	if (!PutBool("interlaced", &interlaced)) return;
 	if (!PutBool("usetransparent", &usetransparent)) return;
-	if (!PutBool("usetransparentindex", &usetransparentindex)) return;
+	if (!PutBool("usetransparentauto", &usetransparentauto)) return;
 	if (!PutBool("usedithering", &usedithering)) return;
 	if (!PutInt("palettemode", &palettemode)) return;
 	if (!PutInt("palettesize", &palette_size_in_bits)) return;
-	if (!PutInt("transparentindex", &transparentindex)) return;
 	if (!PutInt("transparentred", &transparentred)) return;
 	if (!PutInt("transparentgreen", &transparentgreen)) return;
 	if (!PutInt("transparentblue", &transparentblue)) return;
-}
-
-Prefs::~Prefs() {
-	delete file;
 }
 
