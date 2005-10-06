@@ -208,6 +208,13 @@ dup_fd(int fd, bool kernel)
 }
 
 
+/**	POSIX says this should be the same as:
+ *		close(newfd);
+ *		fcntl(oldfd, F_DUPFD, newfd);
+ *
+ *	We do dup2() directly to be thread-safe.
+ */
+
 static int
 dup2_fd(int oldfd, int newfd, bool kernel)
 {
@@ -250,8 +257,10 @@ dup2_fd(int oldfd, int newfd, bool kernel)
 	mutex_unlock(&context->io_mutex);
 
 	// Say bye bye to the evicted fd
-	if (evicted)
+	if (evicted) {
+		close_fd(evicted);
 		put_fd(evicted);
+	}
 
 	return newfd;
 }
