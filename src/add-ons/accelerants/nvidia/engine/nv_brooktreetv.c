@@ -1576,72 +1576,61 @@ status_t BT_stop_tvout(void)
 	//fixme: see if better DPMS state fetching can be setup for crtc.c (!)
 	CRTCW(REPAINT1, (CRTCR(REPAINT1) & 0x3f));
 
-//fixme: setup...
-/*
-	uint32 temp32;
-	unsigned char VertRetrace;
-	
-	//SEQ:
-	*(dev->pcio_base + 0x3c4) = 0x01;
-	*(dev->pcio_base + 0x3c5) = 0x01;
+	//fixme: is this needed? does b5 have a special meaning in nvidia cards?
+//normal in this driver is:
+//	SEQW(CLKMODE, 0x21);
+//betvout:
+	SEQW(CLKMODE, 0x01);
 
-	//wait for 1 image to be generated to make sure VGA has kicked in and is
-	//running OK before continuing...
-	//(Kick in will fail often if we do not wait here: You'll notice this most
-	// prominently in VESA 640x480 mode. Just try switching about 10 times and
-	// you'll probably see... (re-checked for PCI V0.20))
-	VertRetrace = 1;
-	//(make sure we are 'in' active VGA picture:)
-	do  VertRetrace = (*(dev->pcio_base + 0x3da) & 0x08);
-		while (VertRetrace);
-	//(wait for vertical retrace start on VGA:)
-	do  VertRetrace = (*(dev->pcio_base + 0x3da) & 0x08);
-		while (!VertRetrace);
-	//(make sure we are 'in' active VGA picture again:)
-	do  VertRetrace = (*(dev->pcio_base + 0x3da) & 0x08);
-		while (VertRetrace);
 
-	//'update' PIXEL/TV:
-	*(dev->pcio_base + AdresReg) = 0x28;
-	*(dev->pcio_base + DataReg) &= 0x03;
+	/* wait for one image to be generated to make sure VGA has kicked in and is
+	 * running OK before continuing...
+	 * (Kicking in will fail often if we do not wait here) */
 
+	/* make sure we are 'in' active VGA picture */
+	while (NV_REG8(NV8_INSTAT1) & 0x08) snooze(1);
+	/* wait for next vertical retrace start on VGA */
+	while (!(NV_REG8(NV8_INSTAT1) & 0x08)) snooze(1);
+	/* now wait until we are 'in' active VGA picture again */
+	while (NV_REG8(NV8_INSTAT1) & 0x08) snooze(1);
+
+
+	/* set CRTC to master mode (b7 = 0) and clear TVadjust (b3-5 = %000) */
+	//fixme:
+	//update this to take flatpanels into consideration..
+	CRTCW(PIXEL, (CRTCR(PIXEL) & 0x03));
+
+	//fixme: checkout...
 	//CAUTION:
 	//On the TNT1, these memadresses apparantly cannot be read (sometimes)!;
-	//write actions do succeed though... (tested on ISA...)
-	//($00680700 b1-23 and b25-31 apparantly are 'don't cares'...)
+	//write actions do succeed though... (tested only on ISA bus yet..)
 
-	//SWITCH RIVA pixelclock to be RIVA's own (so: directly):
-	//MEMADR $00680700:
-	temp32 = (*(dev->regs + (0x00680700 >> 2)) & ~0x00000001);
-	*(dev->regs + (0x00680700 >> 2)) = (temp32 | 0x01000000);
+	/* setup TVencoder connection */
+	/* b1-0 = %00: encoder type is SLAVE;
+	 * b24 = 1: VIP datapos is b0-7 */
+	//fixme: setup completely instead of relying on pre-init by BIOS..
+	DACW(TV_SETUP, ((DACR(TV_SETUP) & ~0x00000001) | 0x01000000));
 
-	//switch RIVA PLL phase-lock to lock to RIVA's own internal pixelclock:
-	//MEMADR $0068050c: PLLSEL: warning dualhead is killed here! (PLL2 shutoff)
-	*(dev->regs + (0x0068050c >> 2)) = 0x10000700;
+	/* tell GPU to use pixelclock from internal source instead of using TVencoder */
+	DACW(PLLSEL, 0x10000700);
+	if (si->ps.secondary_head) DACW(PLLSEL, (DACR(PLLSEL) | 0x20000800));
 
-	//TREG:
-	*(dev->pcio_base + AdresReg) = 0x3d;
-	*(dev->pcio_base + DataReg) = 0x00;
+	/* HTOTAL, VTOTAL and OVERFLOW return their default CRTC use, instead of
+	 * H, V-low and V-high 'shadow' counters(?)(b0, 4 and 6 = 0) (b7 use = unknown) */
+	CRTCW(TREG, 0x00);
 
-	//make sure LCD is switched off:
-	//MEMADR $00680880:
-	*(dev->regs + (0x00680880 >> 2)) |= 0x10000000;
+	/* powerdown FPclock (not touching TMDS power) */
+	//fixme: do we need this? might kill off panel support...
+	DACW(FP_DEBUG0, (DACR(FP_DEBUG0) | 0x10000000));
 
-   	//LCD:
-	*(dev->pcio_base + AdresReg) = 0x33;
-	*(dev->pcio_base + DataReg) &= 0xfc;
-
-
-	//Set overscan color to 'black':
-	//Disable this part if you're trying to center the output on TV,
-	//you'll get blue overscan range color then. Use this as a guide-'line' ;-)
-	//(select index adress register:)
-	*(dev->pcio_base + 0x3da);
-	//(write index for 'overscan color' register:)
-	*(dev->pcio_base + 0x3c0) = 0x11;
-    //(write data for 'overscan color' register:)
-	*(dev->pcio_base + 0x3c0) = 0x00;
-*/
+	/* select TV encoder, not panel encoder (b0 = 0).
+	 * Note:
+	 * Both are devices using the CRTC in slaved mode. */
+	//fixme:
+	//update this to take flatpanels into consideration..
+	//fixme2:
+	//probably better don't touch b1: it's used for powering ext. TMDS (or so) (?)
+	CRTCW(LCD, (CRTCR(LCD) & 0xfc));
 
 	/* fixme if needed:
 	 * a full encoder chip reset could be done here (so after decoupling crtc)... */
