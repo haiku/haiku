@@ -178,8 +178,9 @@ Inode::Inode(Volume *volume, vnode_id id)
 	NodeGetter node(volume, this);
 	memcpy(&fNode, node.Node(), sizeof(bfs_inode));
 
-	char lockName[32];
-	sprintf(lockName, "bfs inode %ld.%d", BlockRun().AllocationGroup(), BlockRun().Start());
+	char lockName[B_OS_NAME_LENGTH];
+	snprintf(lockName, sizeof(lockName), "bfs inode %ld.%d",
+		BlockRun().AllocationGroup(), BlockRun().Start());
 	fLock.Initialize(lockName);
 
 	// these two will help to maintain the indices
@@ -204,8 +205,9 @@ Inode::Inode(Volume *volume, Transaction &transaction, vnode_id id, mode_t mode,
 	PRINT(("Inode::Inode(volume = %p, transaction = %p, id = %Ld) @ %p\n",
 		volume, &transaction, id, this));
 
-	char lockName[32];
-	sprintf(lockName, "bfs inode %ld.%d", run.AllocationGroup(), run.Start());
+	char lockName[B_OS_NAME_LENGTH];
+	snprintf(lockName, sizeof(lockName), "bfs inode %ld.%d",
+		BlockRun().AllocationGroup(), BlockRun().Start());
 	fLock.Initialize(lockName);
 
 	NodeGetter node(volume, transaction, this, true);
