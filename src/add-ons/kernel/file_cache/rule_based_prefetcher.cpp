@@ -49,19 +49,23 @@ enum match_type {
 };
 
 enum rule_type {
-	COMMAND_NAME	= 0x1,
-	OPEN_FILE		= 0x2,
-	ARGUMENT_NAME	= 0x4,	
-	ALL				= 0xff,
+	LAUNCH_TYPE		= 0x1,
+	OPEN_FILE_TYPE	= 0x2,
+	ARGUMENTS_TYPE	= 0x4,	
+	ALL_TYPES		= 0xff,
 };
 
 struct head {
+	head();
+
 	struct list_link	link;
 	mount_id			device;
 	vnode_id			parent;
+	vnode_id			node;
 	char				name[B_FILE_NAME_LENGTH];
 	int32				confidence;
 	bigtime_t			timestamp;
+	int32				used_count;
 };
 
 struct body {
@@ -79,12 +83,18 @@ class Rule {
 		void AddHead(struct head *head);
 		void AddBody(struct body *body);
 
+		struct head *FindHead(mount_id device, vnode_id node);
 		match_type Match(int32 state, mount_id device, vnode_id parent, const char *name);
-		void Prefetch();
+		void Apply();
+
+		void KnownFileOpened() { fKnownFileOpened++; }
+		void UnknownFileOpened() { fUnknownFileOpened++; }
+
+		void Dump();
 
 		Rule *&Next() { return fNext; }
-		static uint32 NextOffset() { return offsetof(Rule, fNext); }
 
+		static uint32 NextOffset() { return offsetof(Rule, fNext); }
 		static status_t LoadRules();
 
 	private:
@@ -95,6 +105,9 @@ class Rule {
 		int32		fHeadCount;
 		int32		fBodyCount;
 		int32		fConfidence;
+		int32		fAppliedCount;
+		int32		fKnownFileOpened;
+		int32		fUnknownFileOpened;
 };
 
 struct rule_state {
@@ -110,23 +123,35 @@ struct rules {
 };
 
 struct team_rules {
+	~team_rules();
+
 	team_rules	*next;
 	team_id		team;
 	struct list	states;
+	struct list	applied;
+	bigtime_t	timestamp;
 };
 
 class RuleMatcher {
 	public:
-		RuleMatcher(team_id team, Rule **_rule);
+		RuleMatcher(team_id team, const char *name = NULL);
 		~RuleMatcher();
 
+		void GotFile(mount_id device, vnode_id node);
+		void GotArguments(int32 argCount, char * const *args);
+
 	private:
-		Rule	*fRule;
+		void _CollectRules(const char *name);
+		void _MatchFile(mount_id device, vnode_id parent, const char *name);
+		void _MatchArguments(int32 argCount, char * const *args);		
+
+		team_rules	*fRules;
 };
 
 static hash_table *sRulesHash;
 static hash_table *sTeamHash;
 static recursive_lock sLock;
+int32 sMinConfidence = 5000;
 
 
 static int
@@ -150,6 +175,9 @@ rules_hash(void *_rules, const void *_key, uint32 range)
 
 	return hash_hash_string(key) % range;
 }
+
+
+//	#pragma mark -
 
 
 static int
@@ -191,6 +219,37 @@ team_gone(team_id team, void *_rules)
 }
 
 
+team_rules::~team_rules()
+{
+	// free rule states
+
+	rule_state *state;
+	while ((state = (rule_state *)list_remove_head_item(&states)) != NULL) {
+		delete state;
+	}
+	while ((state = (rule_state *)list_remove_head_item(&applied)) != NULL) {
+		delete state;
+	}
+
+	stop_watching_team(team, team_gone, this);
+}
+
+
+//	#pragma mark -
+
+
+head::head()
+{
+	device = -1;
+	parent = -1;
+	node = -1;
+	name[0] = '\0';
+	confidence = -1;
+	timestamp = 0;
+	used_count = 0;
+}
+
+
 static inline rules *
 find_rules(const char *name)
 {
@@ -215,16 +274,18 @@ get_rule(const char *name, rule_type type)
 
 		strlcpy(rules->name, name, B_FILE_NAME_LENGTH);
 		rules->first = NULL;
+		hash_insert(sRulesHash, rules);
 	}
 
 	// search for matching rule type
-	
+
 	Rule *rule = rules->first;
-	while (rule && rule->Type() == type) {
+	while (rule && rule->Type() != type) {
 		rule = rule->Next();
 	}
-	
+
 	if (rule == NULL) {
+		TRACE(("create new rule for \"%s\", type %d\n", name, type));
 		// there is no rule yet, create one
 		rule = new Rule(type);
 		if (rule == NULL)
@@ -347,15 +408,15 @@ load_rules()
 						if (name != NULL) {
 							eat_spaces(line);
 							int32 confidence = strtoul(line, &line, 10);
-							dprintf("%ld:%Ld:%s %s %ld\n", device, node, fileName, name, confidence);
-							
+							TRACE(("c %ld:%Ld:%s %s %ld\n", device, node, fileName, name, confidence));
+
 							struct head *head = new ::head;
 							head->device = device;
 							head->parent = node;
 							strlcpy(head->name, fileName, B_FILE_NAME_LENGTH);
 							head->confidence = confidence;
 
-							Rule *rule = get_rule(name, COMMAND_NAME);
+							Rule *rule = get_rule(name, LAUNCH_TYPE);
 							if (rule != NULL)
 								rule->AddHead(head);
 							break;
@@ -387,7 +448,9 @@ Rule::Rule(rule_type type)
 	fType(type),
 	fHeadCount(0),
 	fBodyCount(0),
-	fConfidence(0)
+	fAppliedCount(0),
+	fKnownFileOpened(0),
+	fUnknownFileOpened(0)
 {
 	list_init(&fHeads);
 	list_init(&fBodies);
@@ -424,6 +487,186 @@ Rule::AddBody(struct body *body)
 }
 
 
+void
+Rule::Apply()
+{
+	TRACE(("Apply rule %p", this));
+
+	struct head *head = NULL;
+	while ((head = (struct head *)list_get_next_item(&fHeads, head)) != NULL) {
+		if (head->confidence < sMinConfidence)
+			continue;
+
+		// prefetch node
+		void *vnode;
+		if (vfs_entry_ref_to_vnode(head->device, head->parent, head->name, &vnode) == B_OK) {
+			vfs_vnode_to_node_ref(vnode, &head->device, &head->node);
+
+			TRACE(("prefetch: %ld:%Ld:%s\n", head->device, head->parent, head->name));
+			cache_prefetch(head->device, head->node, 0, ~0UL);
+
+			// ToDo: put head into a hash so that some statistics can be backpropagated quickly
+		} else {
+			// node doesn't exist anymore
+			head->confidence = -1;
+		}
+	}
+
+	fAppliedCount++;
+}
+
+
+struct head *
+Rule::FindHead(mount_id device, vnode_id node)
+{
+	// ToDo: use a hash for this!
+
+	struct head *head = NULL;
+	while ((head = (struct head *)list_get_next_item(&fHeads, head)) != NULL) {
+		if (head->node == node && head->device == device)
+			return head;
+	}
+
+	return NULL;
+}
+
+
+void
+Rule::Dump()
+{
+	dprintf("  applied: %ld, known: %ld, unknown: %ld\n",
+		fAppliedCount, fKnownFileOpened, fUnknownFileOpened);
+
+	struct head *head = NULL;
+	while ((head = (struct head *)list_get_next_item(&fHeads, head)) != NULL) {
+		dprintf("  %ld:%Ld:\"%s\", ", head->device, head->parent, head->name);
+		if (head->confidence < sMinConfidence)
+			dprintf("-\n");
+		else
+			dprintf("%ld (%ld), %Ld us\n", head->used_count,
+				head->used_count - fAppliedCount, head->timestamp);
+	}
+}
+
+
+//	#pragma mark -
+
+
+RuleMatcher::RuleMatcher(team_id team, const char *name)
+{
+	recursive_lock_lock(&sLock);
+
+	fRules = (team_rules *)hash_lookup(sTeamHash, &team);
+	if (fRules != NULL)
+		return;
+
+	fRules = new team_rules;
+	if (fRules == NULL)
+		return;
+
+	fRules->team = team;
+	list_init(&fRules->states);
+	list_init(&fRules->applied);
+
+dprintf("new rules for \"%s\"\n", name);
+	_CollectRules(name);
+
+	hash_insert(sTeamHash, fRules);
+	start_watching_team(team, team_gone, fRules);
+
+	fRules->timestamp = system_time();
+}
+
+
+RuleMatcher::~RuleMatcher()
+{
+	recursive_lock_unlock(&sLock);
+}
+
+
+void
+RuleMatcher::_CollectRules(const char *name)
+{
+	struct rules *rules = (struct rules *)hash_lookup(sRulesHash, name);
+	if (rules == NULL) {
+		// there are no rules for this command
+		return;
+	}
+
+	// allocate states for all rules found
+
+	for (Rule *rule = rules->first; rule != NULL; rule = rule->Next()) {
+		rule_state *state = new rule_state;
+		if (state == NULL)
+			continue;
+
+		TRACE(("found rule %p for \"%s\"\n", rule, rules->name));
+		state->rule = rule;
+		state->state = 0;
+
+		if (rule->Type() == LAUNCH_TYPE) {
+			// we can already prefetch the simplest of all rules here
+			// (it's fulfilled as soon as the command is launched)
+			rule->Apply();
+			list_add_item(&fRules->applied, state);
+		} else
+			list_add_item(&fRules->states, state);
+	}
+}
+
+
+void
+RuleMatcher::GotFile(mount_id device, vnode_id node)
+{
+	if (fRules == NULL)
+		return;
+
+	// try to match the file with all open rules
+
+	rule_state *state = NULL;
+	while ((state = (rule_state *)list_get_next_item(&fRules->states, state)) != NULL) {
+		if ((state->rule->Type() & OPEN_FILE_TYPE) == 0)
+			continue;
+
+		// ToDo
+	}
+
+	bigtime_t diff = system_time() - fRules->timestamp;
+
+	// propagate the usage of this file back to the applied rules
+
+	while ((state = (rule_state *)list_get_next_item(&fRules->applied, state)) != NULL) {
+		struct head *head = state->rule->FindHead(device, node);
+		if (head != NULL) {
+			// grow confidence
+			state->rule->KnownFileOpened();
+			head->used_count++;
+			if (head->used_count > 1)
+				head->timestamp = (head->timestamp * (head->used_count - 1) + diff) / head->used_count;
+		} else
+			state->rule->UnknownFileOpened();
+	}
+}
+
+
+void
+RuleMatcher::GotArguments(int32 argCount, char * const *args)
+{
+	if (fRules == NULL)
+		return;
+
+	// try to match the arguments with all open rules
+
+	rule_state *state = NULL;
+	while ((state = (rule_state *)list_get_next_item(&fRules->states, state)) != NULL) {
+		if ((state->rule->Type() & ARGUMENTS_TYPE) == 0)
+			continue;
+
+		// ToDo
+	}
+}
+
+
 //	#pragma mark -
 
 
@@ -436,12 +679,27 @@ node_opened(void *vnode, int32 fdType, mount_id device, vnode_id parent,
 		// ToDo: if we can ever move the boot device on the fly, this will break
 		return;
 	}
+
+	// ToDo: this is only needed if there is no rule for this team yet - ideally,
+	//	it would be handled by the log module, so that the vnode ID is sufficient
+	//	to recognize a rule
+	char buffer[B_FILE_NAME_LENGTH];
+	if (name == NULL
+		&& vfs_get_vnode_name(vnode, buffer, sizeof(buffer)) == B_OK)
+		name = buffer;
+
+	//dprintf("opened: %ld:%Ld:%Ld:%s (%s)\n", device, parent, node, name, thread_get_current_thread()->name);
+	RuleMatcher matcher(team_get_current_team_id(), name);
+	matcher.GotFile(device, node);
 }
 
 
 static void
 node_launched(size_t argCount, char * const *args)
 {
+	//dprintf("launched: %s (%s)\n", args[0], thread_get_current_thread()->name);
+	RuleMatcher matcher(team_get_current_team_id());
+	matcher.GotArguments(argCount, args);
 }
 
 
@@ -453,14 +711,24 @@ uninit()
 	// free all sessions from the hashes
 
 	uint32 cookie = 0;
-	team_rules *rules;
-	while ((rules = (team_rules *)hash_remove_first(sTeamHash, &cookie)) != NULL) {
-		delete rules;
+	team_rules *teamRules;
+	while ((teamRules = (team_rules *)hash_remove_first(sTeamHash, &cookie)) != NULL) {
+		delete teamRules;
 	}
-	Rule *rule;
+	struct rules *rules;
 	cookie = 0;
-	while ((rule = (Rule *)hash_remove_first(sRulesHash, &cookie)) != NULL) {
-		delete rule;
+	while ((rules = (struct rules *)hash_remove_first(sRulesHash, &cookie)) != NULL) {
+		Rule *rule = rules->first;
+		while (rule) {
+			Rule *next = rule->Next();
+
+			dprintf("Rule %p \"%s\"\n", rule, rules->name);
+			rule->Dump();
+
+			delete rule;
+			rule = next;
+		}
+		delete rules;
 	}
 
 	hash_uninit(sTeamHash);
