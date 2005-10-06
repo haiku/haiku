@@ -2200,23 +2200,34 @@ dump_vnode_caches(int argc, char **argv)
 
 
 int
-dump_iocontext(int argc, char **argv)
+dump_io_context(int argc, char **argv)
 {
+	if (argc > 2) {
+		kprintf("usage: io_context [team id/address]\n");
+		return 0;
+	}
+
 	struct io_context *context = NULL;
 
 	if (argc > 1) {
-		context = (struct io_context *)strtoul(argv[1], NULL, 0);
-		if (IS_USER_ADDRESS(context)) {
-			kprintf("invalid I/O context address\n");
-			return 0;
+		uint32 num = strtoul(argv[1], NULL, 0);
+		if (IS_KERNEL_ADDRESS(num))
+			context = (struct io_context *)num;
+		else {
+			struct team *team = team_get_team_struct_locked(num);
+			if (team == NULL) {
+				kprintf("could not find team with ID %ld\n", num);
+				return 0;
+			}
+			context = (struct io_context *)team->io_context;
 		}
 	} else
 		context = get_current_io_context(true);
 
 	kprintf("I/O CONTEXT: %p\n", context);
 	kprintf(" cwd vnode:\t%p\n", context->cwd);
-	kprintf(" used fds:\t%lu\n", context->table_size);
-	kprintf(" max fds:\t%lu\n", context->num_used_fds);
+	kprintf(" used fds:\t%lu\n", context->num_used_fds);
+	kprintf(" max fds:\t%lu\n", context->table_size);
 	
 	if (context->num_used_fds)
 		kprintf("   no. type     ops ref open mode        pos cookie\n");
@@ -3200,7 +3211,7 @@ vfs_init(kernel_args *args)
 	add_debugger_command("vnode_caches", &dump_vnode_caches, "list all vnode caches");
 	add_debugger_command("mount", &dump_mount, "info about the specified fs_mount");
 	add_debugger_command("mounts", &dump_mounts, "list all fs_mounts");
-	add_debugger_command("iocontext", &dump_iocontext, "info about the I/O context");
+	add_debugger_command("io_context", &dump_io_context, "info about the I/O context");
 #endif
 
 	return file_cache_init();
