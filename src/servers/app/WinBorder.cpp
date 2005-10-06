@@ -450,9 +450,6 @@ void
 WinBorder::MouseDown(const PointerEvent& evt)
 {
 	DesktopSettings desktopSettings(gDesktop);
-	Workspace::State oldWMState;
-
-	GetRootLayer()->ActiveWorkspace()->GetState(&oldWMState);
 
 	// not in FFM mode?
 	if (desktopSettings.MouseMode() == B_NORMAL_MOUSE) {
@@ -527,7 +524,12 @@ WinBorder::MouseDown(const PointerEvent& evt)
 
 			// based on what the Decorator returned, properly place this window.
 			if (action == DEC_MOVETOBACK) {
+				Workspace::State oldWMState;
+				GetRootLayer()->ActiveWorkspace()->GetState(&oldWMState);
+
 				GetRootLayer()->ActiveWorkspace()->MoveToBack(this);
+
+				GetRootLayer()->RevealNewWMState(oldWMState);
 			}
 			else {
 				GetRootLayer()->SetNotifyLayer(this, B_POINTER_EVENTS, 0UL);
@@ -535,8 +537,6 @@ WinBorder::MouseDown(const PointerEvent& evt)
 				activateWindow:
 				GetRootLayer()->SetActive(this);
 			}
-
-			GetRootLayer()->RevealNewWMState(oldWMState);
 		}
 	}
 	// in FFM mode

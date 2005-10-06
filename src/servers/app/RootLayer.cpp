@@ -1222,8 +1222,43 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 bool
 RootLayer::SetActive(WinBorder* newActive)
 {
-// TODO: properly implement
-	return ActiveWorkspace()->AttemptToActivate(newActive);
+	bool returnValue = false;
+	uint32 workspaceIndex = newActive->Workspaces();
+	if (workspaceIndex == 0)
+		workspaceIndex = 0x00000001UL << fActiveWksIndex;
+
+	for (int32 i = 0; i < kMaxWorkspaceCount; i++) {
+		if (fWorkspace[i] && (workspaceIndex & (0x00000001UL << i))) {
+			if (i == fActiveWksIndex) {
+				Workspace::State oldWMState;
+				ActiveWorkspace()->GetState(&oldWMState);
+
+				returnValue = ActiveWorkspace()->AttemptToActivate(newActive);
+
+				RevealNewWMState(oldWMState);		
+			}
+			else {
+				fWorkspace[i]->AttemptToActivate(newActive);
+				// NOTE: for multiple monitor support, if a workspaces is mapped to
+				// a Screen, we must invalidate/redraw to see the change.
+			}
+		}
+	}
+
+	// If this WinBorder does not appear in current workspace,
+	// change to the first one who does.	
+	if (!(workspaceIndex & (0x00000001UL << fActiveWksIndex))) {
+		// find an workspace index in which this Layer appears
+		for (int32 i = 0; i < kMaxWorkspaceCount; i++) {
+			if (workspaceIndex & (0x00000001UL << i)) {
+				SetActiveWorkspace(i);
+				returnValue = Active() == newActive;
+				break;
+			}
+		}
+	}
+
+	return returnValue;
 }
 #endif
 //---------------------------------------------------------------------------

@@ -1415,22 +1415,13 @@ myRootLayer->Unlock();
 			fLink.Flush();
 			break;
 		}
-		case B_MINIMIZE:
+		case AS_ACTIVATE_WINDOW:
 		{
-			// TODO: Implement B_MINIMIZE
-			STRACE(("ServerWindow %s: Message Minimize unimplemented\n", Title()));
-			break;
-		}
-		case B_WINDOW_ACTIVATED:
-		{
-			// TODO: Implement B_WINDOW_ACTIVATED
-			STRACE(("ServerWindow %s: Message Window_Activated unimplemented\n", Title()));
-			break;
-		}
-		case B_ZOOM:
-		{
-			// TODO: Implement B_ZOOM
-			STRACE(("ServerWindow %s: Message Zoom unimplemented\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_ACTIVATE_WINDOW: Layer: %s\n", Title(), fCurrentLayer->Name()));
+			if (myRootLayer && myRootLayer->Lock()) {
+				myRootLayer->SetActive(fWinBorder);
+				myRootLayer->Unlock();
+			}
 			break;
 		}
 		// Some BView drawing messages, but which don't need clipping

@@ -253,11 +253,11 @@ class Layer {
 
 			void				CopyBits(BRect& src, BRect& dst,
 										 int32 xOffset, int32 yOffset);
-
+#ifndef NEW_CLIPPING
 	inline	const BRegion&		VisibleRegion() const { return fVisible; }
 	inline	const BRegion&		FullVisible() const { return fFullVisible; }
 
-#ifdef NEW_CLIPPING
+#else
 	inline	const BRegion&		VisibleRegion() const { return fVisible2; }
 	inline	const BRegion&		FullVisible() const { return fFullVisible2; }
 
