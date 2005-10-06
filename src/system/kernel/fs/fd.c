@@ -61,6 +61,23 @@ alloc_fd(void)
 }
 
 
+bool
+fd_close_on_exec(struct io_context *context, int fd)
+{
+	return CHECK_BIT(context->fds_close_on_exec[fd / 8], fd & 7) ? true : false;
+}
+
+
+void
+fd_set_close_on_exec(struct io_context *context, int fd, bool closeFD)
+{
+	if (closeFD)
+		context->fds_close_on_exec[fd / 8] |= (1 << (fd & 7));
+	else
+		context->fds_close_on_exec[fd / 8] &= ~(1 << (fd & 7));
+}
+
+
 /** Searches a free slot in the FD table of the provided I/O context, and inserts
  *	the specified descriptor into it.
  */
@@ -176,6 +193,7 @@ remove_fd(struct io_context *context, int fd)
 
 	if (descriptor)	{	// fd is valid
 		context->fds[fd] = NULL;
+		fd_set_close_on_exec(context, fd, false);
 		context->num_used_fds--;
 	}
 
@@ -203,6 +221,11 @@ dup_fd(int fd, bool kernel)
 	status = new_fd(context, descriptor);
 	if (status < 0)
 		put_fd(descriptor);
+	else {
+		mutex_lock(&context->io_mutex);
+		fd_set_close_on_exec(context, status, false);
+		mutex_unlock(&context->io_mutex);
+	}
 
 	return status;
 }
@@ -253,6 +276,8 @@ dup2_fd(int oldfd, int newfd, bool kernel)
 		if (evicted == NULL)
 			context->num_used_fds++;
 	}
+
+	fd_set_close_on_exec(context, newfd, false);
 
 	mutex_unlock(&context->io_mutex);
 

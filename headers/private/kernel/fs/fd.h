@@ -74,6 +74,9 @@ extern status_t select_fd(int fd, uint8 event, uint32 ref, struct select_sync *s
 extern status_t deselect_fd(int fd, uint8 event, struct select_sync *sync, bool kernel);
 extern bool fd_is_valid(int fd, bool kernel);
 
+extern bool fd_close_on_exec(struct io_context *context, int fd);
+extern void fd_set_close_on_exec(struct io_context *context, int fd, bool closeFD);
+
 static struct io_context *get_current_io_context(bool kernel);
 
 /* The prototypes of the (sys|user)_ functions are currently defined in vfs.h */

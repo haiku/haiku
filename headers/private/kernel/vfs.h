@@ -37,6 +37,7 @@ typedef struct io_context {
 	uint32		table_size;
 	uint32		num_used_fds;
 	struct file_descriptor **fds;
+	uint8		*fds_close_on_exec;
 	struct list node_monitors;
 	uint32		num_monitors;
 	uint32		max_monitors;

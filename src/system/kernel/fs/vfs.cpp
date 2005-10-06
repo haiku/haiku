@@ -2826,14 +2826,13 @@ vfs_exec_io_context(void *_context)
 	struct io_context *context = (struct io_context *)_context;
 	uint32 i;
 
-
 	for (i = 0; i < context->table_size; i++) {
 		mutex_lock(&context->io_mutex);
 
 		struct file_descriptor *descriptor = context->fds[i];
 		bool remove = false;
 
-		if (descriptor != NULL && (descriptor->open_mode & O_CLOEXEC) != 0) {
+		if (descriptor != NULL && fd_close_on_exec(context, i)) {
 			context->fds[i] = NULL;
 			context->num_used_fds--;
 
@@ -2873,13 +2872,17 @@ vfs_new_io_context(void *_parentContext)
 	else
 		tableSize = DEFAULT_FD_TABLE_SIZE;
 
-	context->fds = (file_descriptor **)malloc(sizeof(struct file_descriptor *) * tableSize);
+	// allocate space for FDs and their close-on-exec flag
+	context->fds = (file_descriptor **)malloc(sizeof(struct file_descriptor *) * tableSize
+		+ tableSize / 8);
 	if (context->fds == NULL) {
 		free(context);
 		return NULL;
 	}
 
-	memset(context->fds, 0, sizeof(struct file_descriptor *) * tableSize);
+	memset(context->fds, 0, sizeof(struct file_descriptor *) * tableSize
+		+ tableSize / 8);
+	context->fds_close_on_exec = (uint8 *)(context->fds + tableSize);
 
 	if (mutex_init(&context->io_mutex, "I/O context") < 0) {
 		free(context->fds);
@@ -2901,7 +2904,7 @@ vfs_new_io_context(void *_parentContext)
 		for (i = 0; i < tableSize; i++) {
 			struct file_descriptor *descriptor = parentContext->fds[i];
 
-			if (descriptor != NULL && (descriptor->open_mode & O_CLOEXEC) == 0) {
+			if (descriptor != NULL && !fd_close_on_exec(parentContext, i)) {
 				context->fds[i] = descriptor;
 				context->num_used_fds++;
 				atomic_add(&descriptor->ref_count, 1);
@@ -3840,21 +3843,29 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 
 	switch (op) {
 		case F_SETFD:
+		{
+			struct io_context *context = get_current_io_context(kernel);
 			// Set file descriptor flags
 
 			// O_CLOEXEC is the only flag available at this time
-			if (argument == FD_CLOEXEC)
-				atomic_or(&descriptor->open_mode, O_CLOEXEC);
-			else
-				atomic_and(&descriptor->open_mode, O_CLOEXEC);
-
+			mutex_lock(&context->io_mutex);
+			fd_set_close_on_exec(context, fd, argument == FD_CLOEXEC);
+			mutex_unlock(&context->io_mutex);
+			
 			status = B_OK;
 			break;
+		}
 
 		case F_GETFD:
+		{
+			struct io_context *context = get_current_io_context(kernel);
+
 			// Get file descriptor flags
-			status = (descriptor->open_mode & O_CLOEXEC) ? FD_CLOEXEC : 0;
+			mutex_lock(&context->io_mutex);
+			status = fd_close_on_exec(context, fd) ? FD_CLOEXEC : 0;
+			mutex_unlock(&context->io_mutex);
 			break;
+		}
 
 		case F_SETFL:
 			// Set file descriptor open mode
@@ -3877,10 +3888,19 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 			break;
 
 		case F_DUPFD:
-			status = new_fd_etc(get_current_io_context(kernel), descriptor, (int)argument);
-			if (status >= 0)
+		{
+			struct io_context *context = get_current_io_context(kernel);
+
+			status = new_fd_etc(context, descriptor, (int)argument);
+			if (status >= 0) {
+				mutex_lock(&context->io_mutex);
+				fd_set_close_on_exec(context, fd, false);
+				mutex_unlock(&context->io_mutex);
+
 				atomic_add(&descriptor->ref_count, 1);
+			}
 			break;
+		}
 
 		case F_GETLK:
 			status = get_advisory_lock(descriptor->u.vnode, &flock);
