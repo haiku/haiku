@@ -1382,7 +1382,13 @@ exit_thread(status_t returnValue)
 	thread->exit.status = returnValue;
 	thread->exit.reason = THREAD_RETURN_EXIT;
 
-	send_signal_etc(thread->id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
+	// if called from a kernel thread, we don't deliver the signal,
+	// we just exit directly to keep the user space behaviour of
+	// this function
+	if (thread->team != team_get_kernel_team())
+		send_signal_etc(thread->id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
+	else
+		thread_exit();
 }
 
 
