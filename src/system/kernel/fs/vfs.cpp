@@ -2479,6 +2479,24 @@ vfs_get_vnode(mount_id mountID, vnode_id vnodeID, void **_vnode)
 
 
 extern "C" status_t
+vfs_entry_ref_to_vnode(mount_id mountID, vnode_id directoryID,
+	const char *name, void **_vnode)
+{
+	return entry_ref_to_vnode(mountID, directoryID, name, (struct vnode **)_vnode);
+}
+
+
+extern "C" void
+vfs_vnode_to_node_ref(void *_vnode, mount_id *_mountID, vnode_id *_vnodeID)
+{
+	struct vnode *vnode = (struct vnode *)_vnode;
+
+	*_mountID = vnode->device;
+	*_vnodeID = vnode->id;
+}
+
+
+extern "C" status_t
 vfs_lookup_vnode(mount_id mountID, vnode_id vnodeID, void **_vnode)
 {
 	// ToDo: this currently doesn't use the sVnodeMutex lock - that's
@@ -2491,7 +2509,6 @@ vfs_lookup_vnode(mount_id mountID, vnode_id vnodeID, void **_vnode)
 
 	*_vnode = vnode;
 	return B_OK;
-	//return get_vnode(mountID, vnodeID, (struct vnode **)_vnode, true);
 }
 
 

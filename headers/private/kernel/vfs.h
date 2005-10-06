@@ -69,22 +69,31 @@ int vfs_setrlimit(int resource, const struct rlimit * rlp);
 int vfs_get_vnode_from_fd(int fd, bool kernel, void **vnode);
 status_t vfs_get_vnode_from_path(const char *path, bool kernel, void **vnode);
 status_t vfs_get_vnode(mount_id mountID, vnode_id vnodeID, void **_vnode);
+status_t vfs_entry_ref_to_vnode(mount_id mountID, vnode_id directoryID,
+			const char *name, void **_vnode);
+void vfs_vnode_to_node_ref(void *_vnode, mount_id *_mountID, vnode_id *_vnodeID);
+
 status_t vfs_lookup_vnode(mount_id mountID, vnode_id vnodeID, void **_vnode);
 void vfs_put_vnode(void *vnode);
 void vfs_acquire_vnode(void *vnode);
 status_t vfs_get_cookie_from_fd(int fd, void **_cookie);
 bool vfs_can_page(void *vnode, void *cookie);
-status_t vfs_read_pages(void *vnode, void *cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes);
-status_t vfs_write_pages(void *vnode, void *cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes);
+status_t vfs_read_pages(void *vnode, void *cookie, off_t pos,
+			const iovec *vecs, size_t count, size_t *_numBytes);
+status_t vfs_write_pages(void *vnode, void *cookie, off_t pos,
+			const iovec *vecs, size_t count, size_t *_numBytes);
 status_t vfs_get_vnode_cache(void *vnode, struct vm_cache_ref **_cache, bool allocate);
-status_t vfs_get_file_map( void *_vnode, off_t offset, size_t size, struct file_io_vec *vecs, size_t *_count);
-status_t vfs_get_fs_node_from_path(mount_id mountID, const char *path, bool kernel, void **_node);
+status_t vfs_get_file_map( void *_vnode, off_t offset, size_t size,
+			struct file_io_vec *vecs, size_t *_count);
+status_t vfs_get_fs_node_from_path(mount_id mountID, const char *path,
+			bool kernel, void **_node);
 status_t vfs_stat_vnode(void *_vnode, struct stat *stat);
 status_t vfs_get_vnode_name(void *vnode, char *name, size_t nameSize);
 status_t vfs_get_cwd(mount_id *_mountID, vnode_id *_vnodeID);
 
 /* special module convenience call */
-status_t vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuffer, size_t bufferSize);
+status_t vfs_get_module_path(const char *basePath, const char *moduleName,
+			char *pathBuffer, size_t bufferSize);
 
 /* service call for whoever needs a normalized path */
 status_t vfs_normalize_path(const char *path, char *buffer, size_t bufferSize,
@@ -92,7 +101,7 @@ status_t vfs_normalize_path(const char *path, char *buffer, size_t bufferSize,
 
 /* service call for the node monitor */
 status_t resolve_mount_point_to_volume_root(mount_id mountID, vnode_id nodeID,
-	mount_id *resolvedMountID, vnode_id *resolvedNodeID);
+			mount_id *resolvedMountID, vnode_id *resolvedNodeID);
 
 /* calls the syscall dispatcher should use for user file I/O */
 status_t _user_mount(const char *path, const char *device, const char *fs_name,
