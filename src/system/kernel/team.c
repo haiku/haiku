@@ -99,8 +99,8 @@ _dump_team_info(struct team *team)
 	dprintf("state:       %d\n", team->state);
 	dprintf("pending_signals: 0x%x\n", team->pending_signals);
 	dprintf("io_context:  %p\n", team->io_context);
-//	dprintf("path:        '%s'\n", team->path);
-	dprintf("aspace:      %p (id = %ld)\n", team->aspace, team->aspace->id);
+	if (team->aspace)
+		dprintf("aspace:      %p (id = %ld)\n", team->aspace, team->aspace->id);
 	dprintf("kaspace:     %p\n", team->kaspace);
 	dprintf("main_thread: %p\n", team->main_thread);
 	dprintf("thread_list: %p\n", team->thread_list);
@@ -112,8 +112,13 @@ dump_team_info(int argc, char **argv)
 {
 	struct team *team;
 	team_id id = -1;
-	unsigned long num;
 	struct hash_iterator i;
+	bool found = false;
+
+	if (argc > 2) {
+		kprintf("usage: team [id/address/name]\n");
+		return 0;
+	}
 
 	if (argc < 2) {
 		// just list the existing teams
@@ -125,16 +130,11 @@ dump_team_info(int argc, char **argv)
 		return 0;
 	}
 
-	// if the argument looks like a hex number, treat it as such
-	if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
-		num = strtoul(argv[1], NULL, 16);
-		if (num > vm_get_kernel_aspace()->virtual_map.base) {
-			// XXX semi-hack
-			_dump_team_info((struct team *)num);
-			return 0;
-		} else {
-			id = num;
-		}
+	id = strtoul(argv[1], NULL, 0);
+	if (IS_KERNEL_ADDRESS(id)) {
+		// semi-hack
+		_dump_team_info((struct team *)id);
+		return 0;
 	}
 
 	// walk through the thread list, trying to match name or id
@@ -142,10 +142,14 @@ dump_team_info(int argc, char **argv)
 	while ((team = hash_next(team_hash, &i)) != NULL) {
 		if ((team->name && strcmp(argv[1], team->name) == 0) || team->id == id) {
 			_dump_team_info(team);
+			found = true;
 			break;
 		}
 	}
 	hash_close(team_hash, &i, false);
+
+	if (!found)
+		kprintf("team \"%s\" (%ld) doesn't exist!\n", argv[1], id);
 	return 0;
 }
 
