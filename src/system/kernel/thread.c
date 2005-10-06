@@ -548,7 +548,7 @@ dump_thread_info(int argc, char **argv)
 	bool found = false;
 
 	if (argc > 2) {
-		kprintf("usage: thread [id/name]\n");
+		kprintf("usage: thread [id/address/name]\n");
 		return 0;
 	}
 
@@ -558,6 +558,12 @@ dump_thread_info(int argc, char **argv)
 	} else {
 		name = argv[1];
 		id = strtoul(argv[1], NULL, 0);
+
+		if (IS_KERNEL_ADDRESS(id)) {
+			// semi-hack
+			_dump_thread_info((struct thread *)id);
+			return 0;
+		}
 	}
 
 	// walk through the thread list, trying to match name or id
