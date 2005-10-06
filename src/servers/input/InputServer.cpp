@@ -119,6 +119,7 @@ int main()
  */
 InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 	sSafeMode(false),
+	fChars(NULL),
 	fScreen(B_MAIN_SCREEN_ID),
 	fBLWindow(NULL),
 	fIMAware(false)
@@ -808,8 +809,11 @@ InputServer::HandleSetMousePosition(BMessage *message, BMessage *outbound)
 			outbound->FindInt32("modifiers", (int32*)&fKey_info.modifiers);
 			if ((outbound->FindData("states", B_UINT8_TYPE, (const void**)&data, &size) == B_OK) 
 				&& (size == (ssize_t)sizeof(fKey_info.key_states))) {
+				PRINT(("updated keyinfo\n"));
 				memcpy(fKey_info.key_states, data, size);
 			}
+			PRINT(("keyinfo %ld %ld\n", size, (ssize_t)sizeof(fKey_info.key_states)));
+				
 		}
    		default:
 			break;
@@ -1542,13 +1546,17 @@ InputServer::SanitizeEvents(BList *events)
 	CALLED();
 	int32 index = 0;
 	BMessage *event;
+	PRINT(("SanitizeEvents: %ld \n", events->CountItems()));
 	while (NULL != (event = (BMessage*)events->ItemAt(index) ) ) {
+		PRINT(("SanitizeEvents: what:%lx\n", event->what));
 		switch (event->what) {
 			case B_KEY_DOWN:
 			case B_UNMAPPED_KEY_DOWN:
 				// we scan for Alt+Space key down events which means we change to next input method
 				// Note : Shift+Alt+Space key allows to change to the previous input method
 
+				PRINT(("SanitizeEvents: %lx, %lx\n",fKey_info.modifiers, fKey_info.key_states[KEY_Spacebar >> 3] ));
+				
 				if ((fKey_info.modifiers & B_COMMAND_KEY) 
 					&& (fKey_info.key_states[KEY_Spacebar >> 3] & (1 << (7 - (KEY_Spacebar % 8))))) {
 					SetNextMethod(!fKey_info.modifiers & B_SHIFT_KEY);
