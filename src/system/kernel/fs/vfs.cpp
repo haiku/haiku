@@ -2903,6 +2903,7 @@ vfs_new_io_context(void *_parentContext)
 
 			if (descriptor != NULL && (descriptor->open_mode & O_CLOEXEC) == 0) {
 				context->fds[i] = descriptor;
+				context->num_used_fds++;
 				atomic_add(&descriptor->ref_count, 1);
 				atomic_add(&descriptor->open_count, 1);
 			}

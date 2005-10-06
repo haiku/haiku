@@ -242,6 +242,9 @@ dup2_fd(int oldfd, int newfd, bool kernel)
 		atomic_add(&context->fds[oldfd]->ref_count, 1);
 		atomic_add(&context->fds[oldfd]->open_count, 1);
 		context->fds[newfd] = context->fds[oldfd];
+
+		if (evicted == NULL)
+			context->num_used_fds++;
 	}
 
 	mutex_unlock(&context->io_mutex);
