@@ -960,7 +960,7 @@ RebuildFullRegion();
 	if (invalidate) {
 		// compute the region this layer wants for itself
 		BRegion	invalidRegion;
-		get_user_regions(invalidRegion);
+		_GetWantedRegion(invalidRegion);
 		if (invalidRegion.CountRects() > 0)
 			GetRootLayer()->GoInvalidate(this, invalidRegion);
 	}
@@ -1943,7 +1943,7 @@ Layer::GetWantedRegion(BRegion& reg) const
 {
 	// this is the same as get_user_region.
 	// because get_user_region modifies nothing.
-	const_cast<Layer*>(this)->Layer::get_user_regions(reg);
+	const_cast<Layer*>(this)->Layer::_GetWantedRegion(reg);
 }
 
 //! converts a point from local to parent's coordinate system 
@@ -2129,7 +2129,7 @@ Layer::do_Show()
 	if (fParent && !fParent->IsHidden() && GetRootLayer()) {
 		BRegion invalid;
 
-		get_user_regions(invalid);
+		_GetWantedRegion(invalid);
 
 		if (invalid.CountRects() > 0)
 			fParent->do_Invalidate(invalid, this);
@@ -2313,7 +2313,7 @@ Layer::do_ResizeBy(float dx, float dy)
 
 		// we'll invalidate the old area and the new, maxmial one.
 		BRegion invalid;
-		get_user_regions(invalid);
+		_GetWantedRegion(invalid);
 		invalid.Include(&fFullVisible2);
 
 		clear_visible_regions();
@@ -2370,7 +2370,7 @@ void Layer::do_MoveBy(float dx, float dy)
 
 		// we'll invalidate the old position and the new, maxmial one.
 		BRegion invalid;
-		get_user_regions(invalid);
+		_GetWantedRegion(invalid);
 		invalid.Include(&fFullVisible2);
 
 		clear_visible_regions();
@@ -2445,7 +2445,7 @@ Layer::do_ScrollBy(float dx, float dy)
 }
 
 void
-Layer::get_user_regions(BRegion &reg)
+Layer::_GetWantedRegion(BRegion &reg)
 {
 	// 1) set to frame in screen coords
 	BRect screenFrame(Bounds());
@@ -2486,8 +2486,7 @@ Layer::rebuild_visible_regions(const BRegion &invalid,
 								const BRegion &parentLocalVisible,
 								const Layer *startFrom)
 {
-	// no point in continuing if this layer is hidden. starting from here, all
-	// descendants have (and will have) invalid visible regions.
+	// no point in continuing if this layer is hidden.
 	if (fHidden)
 		return;
 
@@ -2500,7 +2499,7 @@ Layer::rebuild_visible_regions(const BRegion &invalid,
 
 	// intersect maximum wanted region with the invalid region
 	BRegion common;
-	get_user_regions(common);
+	_GetWantedRegion(common);
 	common.IntersectWith(&invalid);
 
 	// if the resulted region is not valid, this layer is not in the catchment area
@@ -2518,10 +2517,8 @@ Layer::rebuild_visible_regions(const BRegion &invalid,
 	// put in what's really visible
 	fFullVisible2.Include(&common);
 
-	// this is to allow a layer to hide some parts of itself so children
-	// won't take them.
-	BRegion unalteredVisible(common);
-	bool altered = alter_visible_for_children(common);
+	// allow this layer to hide some parts from its children
+	_ReserveRegions(common);
 
 	for (Layer *lay = LastChild(); lay; lay = PreviousChild()) {
 		if (lay == startFrom)
@@ -2532,25 +2529,16 @@ Layer::rebuild_visible_regions(const BRegion &invalid,
 
 		// to let children know much they can take from parent's visible region
 		common.Exclude(&lay->fFullVisible2);
-		// we've hidden some parts of our visible region from our children,
-		// and we must be in sysnc with this region too...
-		if (altered)
-			unalteredVisible.Exclude(&lay->fFullVisible2);
 	}
 
-	// the visible region of this layer is what left after all its children took
-	// what they could.
-	if (altered)
-		fVisible2.Include(&unalteredVisible);
-	else
-		fVisible2.Include(&common);
+	// include what's left after all children took what they could.
+	fVisible2.Include(&common);
 }
 
-bool
-Layer::alter_visible_for_children(BRegion &reg)
+void
+Layer::_ReserveRegions(BRegion &reg)
 {
-	// Empty Hook function
-	return false;
+	// Empty for Layer objects
 }
 
 void

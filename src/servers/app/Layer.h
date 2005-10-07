@@ -300,8 +300,8 @@ class Layer {
 													const BRegion &parentLocalVisible,
 													const Layer *startFrom);
 
-	virtual	bool				alter_visible_for_children(BRegion &region);
-	virtual	void				get_user_regions(BRegion &reg);
+	virtual	void				_ReserveRegions(BRegion &reg);
+	virtual	void				_GetWantedRegion(BRegion &reg);
 
 			void				clear_visible_regions();
 			void				resize_layer_frame_by(float x, float y);

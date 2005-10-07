@@ -1005,13 +1005,17 @@ void WinBorder::set_decorator_region(BRect bounds)
 	}
 }
 
-bool WinBorder::alter_visible_for_children(BRegion &region)
+void
+WinBorder::_ReserveRegions(BRegion &reg)
 {
-	region.Exclude(&fDecRegion);
-	return true;
+	BRegion reserve(reg);
+	reserve.IntersectWith(&fDecRegion);
+	fVisible2.Include(&reserve);
+	reg.Exclude(&reserve);
 }
 
-void WinBorder::get_user_regions(BRegion &reg)
+void
+WinBorder::_GetWantedRegion(BRegion &reg)
 {
 	if (fRebuildDecRegion)
 	{

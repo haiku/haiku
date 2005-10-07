@@ -126,8 +126,8 @@ class WinBorder : public Layer {
 
  private:
 			void				set_decorator_region(BRect frame);
-	virtual	bool				alter_visible_for_children(BRegion &region);
-	virtual	void				get_user_regions(BRegion &reg);
+	virtual	void				_ReserveRegions(BRegion &reg);
+	virtual	void				_GetWantedRegion(BRegion &reg);
 
 			BRegion				fDecRegion;
 			bool				fRebuildDecRegion;
