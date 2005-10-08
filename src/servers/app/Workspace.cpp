@@ -100,27 +100,14 @@ Workspace::Workspace(const int32 ID, const uint32 colorspace, const RGBColor& BG
 {
 STRACE(("New Workspace(%ld)\n", fID));
 	fID			= ID;
-	fSpace		= colorspace;
-
+	
 	fBottomItem	= NULL;
 	fTopItem	= NULL;
 	fFocusItem	= NULL;
 	fFrontItem	= NULL;
 	
-	fVirtualWidth=-1;
-	fVirtualHeight=-1;
-
-	// TODO: find out more about good default values and init the structure to them
-	fDisplayTiming.pixel_clock=0;
-	fDisplayTiming.h_display=0;
-	fDisplayTiming.h_sync_start=0;
-	fDisplayTiming.h_sync_end=0;
-	fDisplayTiming.h_total=0;
-	fDisplayTiming.v_display=0;
-	fDisplayTiming.v_sync_start=0;
-	fDisplayTiming.v_sync_end=0;
-	fDisplayTiming.v_total=0;
-	fDisplayTiming.flags=0;
+	memset(&fDisplayMode, 0, sizeof(fDisplayMode));
+	fDisplayMode.space = colorspace;
 }
 
 //----------------------------------------------------------------------------------
@@ -1008,17 +995,19 @@ Workspace::ShowWinBorder(WinBorder *winBorder, bool userBusy)
 }
 
 
-void
-Workspace::SetLocalSpace(const uint32 colorspace)
+status_t
+Workspace::SetDisplayMode(const display_mode &mode)
 {
-	fSpace = colorspace;
+	fDisplayMode = mode;
+	return B_OK;
 }
 
 
-uint32
-Workspace::LocalSpace() const
+status_t
+Workspace::GetDisplayMode(display_mode &mode) const
 {
-	return fSpace;
+	mode = fDisplayMode;
+	return B_OK;
 }
 
 
@@ -1060,39 +1049,39 @@ Workspace::GetSettings(const BMessage &msg)
 		return;
 	}
 	
-	if(container.FindInt32("timing_pixel_clock",(int32*)&fDisplayTiming.pixel_clock)!=B_OK)
-		fDisplayTiming.pixel_clock=25175;
-	if(container.FindInt16("timing_h_display",(int16*)&fDisplayTiming.h_display)!=B_OK)
-		fDisplayTiming.h_display=640;
-	if(container.FindInt16("timing_h_sync_start",(int16*)&fDisplayTiming.h_sync_start)!=B_OK)
-		fDisplayTiming.h_sync_start=656;
-	if(container.FindInt16("timing_h_sync_end",(int16*)&fDisplayTiming.h_sync_end)!=B_OK)
-		fDisplayTiming.h_sync_end=752;
-	if(container.FindInt16("timing_h_total",(int16*)&fDisplayTiming.h_total)!=B_OK)
-		fDisplayTiming.h_total=800;
-	if(container.FindInt16("timing_v_display",(int16*)&fDisplayTiming.v_display)!=B_OK)
-		fDisplayTiming.v_display=480;
-	if(container.FindInt16("timing_v_sync_start",(int16*)&fDisplayTiming.v_sync_start)!=B_OK)
-		fDisplayTiming.v_sync_start=490;
-	if(container.FindInt16("timing_v_sync_end",(int16*)&fDisplayTiming.v_sync_end)!=B_OK)
-		fDisplayTiming.v_sync_end=492;
-	if(container.FindInt16("timing_v_total",(int16*)&fDisplayTiming.v_total)!=B_OK)
-		fDisplayTiming.v_total=525;
-	if(container.FindInt32("timing_flags",(int32*)&fDisplayTiming.flags)!=B_OK)
-		fDisplayTiming.flags=0;
+	if(container.FindInt32("timing_pixel_clock",(int32*)&fDisplayMode.timing.pixel_clock) != B_OK)
+		fDisplayMode.timing.pixel_clock=25175;
+	if(container.FindInt16("timing_h_display",(int16*)&fDisplayMode.timing.h_display)!=B_OK)
+		fDisplayMode.timing.h_display=640;
+	if(container.FindInt16("timing_h_sync_start",(int16*)&fDisplayMode.timing.h_sync_start)!=B_OK)
+		fDisplayMode.timing.h_sync_start=656;
+	if(container.FindInt16("timing_h_sync_end",(int16*)&fDisplayMode.timing.h_sync_end)!=B_OK)
+		fDisplayMode.timing.h_sync_end=752;
+	if(container.FindInt16("timing_h_total",(int16*)&fDisplayMode.timing.h_total)!=B_OK)
+		fDisplayMode.timing.h_total=800;
+	if(container.FindInt16("timing_v_display",(int16*)&fDisplayMode.timing.v_display)!=B_OK)
+		fDisplayMode.timing.v_display=480;
+	if(container.FindInt16("timing_v_sync_start",(int16*)&fDisplayMode.timing.v_sync_start)!=B_OK)
+		fDisplayMode.timing.v_sync_start=490;
+	if(container.FindInt16("timing_v_sync_end",(int16*)&fDisplayMode.timing.v_sync_end)!=B_OK)
+		fDisplayMode.timing.v_sync_end=492;
+	if(container.FindInt16("timing_v_total",(int16*)&fDisplayMode.timing.v_total)!=B_OK)
+		fDisplayMode.timing.v_total=525;
+	if(container.FindInt32("timing_flags",(int32*)&fDisplayMode.timing.flags)!=B_OK)
+		fDisplayMode.timing.flags=0;
 	
-	if(container.FindInt32("color_space",(int32*)&fSpace)!=B_OK)
-		fSpace=B_CMAP8;
+	if(container.FindInt32("color_space", (int32*)&fDisplayMode.space) != B_OK)
+		fDisplayMode.space = B_CMAP8;
 	
 	if(container.FindData("bgcolor",B_RGB_COLOR_TYPE,(const void **)&color,&size)==B_OK)
 		fBGColor.SetColor(*color);
 	else
 		fBGColor.SetColor(0,0,0);
 	
-	if(container.FindInt16("virtual_width",&fVirtualWidth)!=B_OK)
-		fVirtualWidth=640;
-	if(container.FindInt16("virtual_height",&fVirtualHeight)!=B_OK)
-		fVirtualHeight=480;
+	if(container.FindInt16("virtual_width", (int16 *)&fDisplayMode.virtual_width) != B_OK)
+		fDisplayMode.virtual_width = 640;
+	if(container.FindInt16("virtual_height", (int16 *)&fDisplayMode.virtual_height) != B_OK)
+		fDisplayMode.virtual_height = 480;
 }
 
 //----------------------------------------------------------------------------------
@@ -1101,20 +1090,20 @@ void Workspace::GetDefaultSettings(void)
 {
 	fBGColor.SetColor(0,0,0);
 	
-	fDisplayTiming.pixel_clock=25175;
-	fDisplayTiming.h_display=640;
-	fDisplayTiming.h_sync_start=656;
-	fDisplayTiming.h_sync_end=752;
-	fDisplayTiming.h_total=800;
-	fDisplayTiming.v_display=480;
-	fDisplayTiming.v_sync_start=490;
-	fDisplayTiming.v_sync_end=492;
-	fDisplayTiming.v_total=525;
-	fDisplayTiming.flags=0;
-	fSpace=B_CMAP8;
+	fDisplayMode.timing.pixel_clock = 25175;
+	fDisplayMode.timing.h_display = 640;
+	fDisplayMode.timing.h_sync_start = 656;
+	fDisplayMode.timing.h_sync_end = 752;
+	fDisplayMode.timing.h_total = 800;
+	fDisplayMode.timing.v_display = 480;
+	fDisplayMode.timing.v_sync_start = 490;
+	fDisplayMode.timing.v_sync_end = 492;
+	fDisplayMode.timing.v_total = 525;
+	fDisplayMode.timing.flags = 0;
+	fDisplayMode.space = B_CMAP8;
 		
-	fVirtualWidth=640;
-	fVirtualHeight=480;
+	fDisplayMode.virtual_width = 640;
+	fDisplayMode.virtual_height = 480;
 }
 
 //----------------------------------------------------------------------------------
@@ -1146,22 +1135,22 @@ void Workspace::PutSettings(BMessage *msg, const uint8 &index) const
 	// a little longer than we need in case someone tries to pass index=255 or something
 	char fieldname[4];
 	
-	container.AddInt32("timing_pixel_clock",fDisplayTiming.pixel_clock);
-	container.AddInt16("timing_h_display",fDisplayTiming.h_display);
-	container.AddInt16("timing_h_sync_start",fDisplayTiming.h_sync_start);
-	container.AddInt16("timing_h_sync_end",fDisplayTiming.h_sync_end);
-	container.AddInt16("timing_h_total",fDisplayTiming.h_total);
-	container.AddInt16("timing_v_display",fDisplayTiming.v_display);
-	container.AddInt16("timing_v_sync_start",fDisplayTiming.v_sync_start);
-	container.AddInt16("timing_v_sync_end",fDisplayTiming.v_sync_end);
-	container.AddInt16("timing_v_total",fDisplayTiming.v_total);
-	container.AddInt32("timing_flags",fDisplayTiming.flags);
+	container.AddInt32("timing_pixel_clock",fDisplayMode.timing.pixel_clock);
+	container.AddInt16("timing_h_display",fDisplayMode.timing.h_display);
+	container.AddInt16("timing_h_sync_start",fDisplayMode.timing.h_sync_start);
+	container.AddInt16("timing_h_sync_end",fDisplayMode.timing.h_sync_end);
+	container.AddInt16("timing_h_total",fDisplayMode.timing.h_total);
+	container.AddInt16("timing_v_display",fDisplayMode.timing.v_display);
+	container.AddInt16("timing_v_sync_start",fDisplayMode.timing.v_sync_start);
+	container.AddInt16("timing_v_sync_end",fDisplayMode.timing.v_sync_end);
+	container.AddInt16("timing_v_total",fDisplayMode.timing.v_total);
+	container.AddInt32("timing_flags",fDisplayMode.timing.flags);
 	
-	container.AddInt32("color_space",fSpace);
-	container.AddData("bgcolor",B_RGB_COLOR_TYPE,&color,sizeof(rgb_color));
+	container.AddInt32("color_space", fDisplayMode.space);
+	container.AddData("bgcolor", B_RGB_COLOR_TYPE, &color, sizeof(rgb_color));
 	
-	container.AddInt16("virtual_width",fVirtualWidth);
-	container.AddInt16("virtual_height",fVirtualHeight);
+	container.AddInt16("virtual_width", fDisplayMode.virtual_width);
+	container.AddInt16("virtual_height", fDisplayMode.virtual_height);
 	
 	sprintf(fieldname,"%d",index);
 	

@@ -86,8 +86,8 @@ class Workspace {
 			bool				ShowWinBorder(WinBorder *winBorder, bool userBusy = false);
 
 			// resolution related methods.
-			void				SetLocalSpace(const uint32 colorspace);
-			uint32				LocalSpace(void) const;
+			status_t			SetDisplayMode(const display_mode &mode);
+			status_t			GetDisplayMode(display_mode &mode) const;
 	
 			void				SetBGColor(const RGBColor &c);
 			RGBColor			BGColor(void) const;
@@ -141,7 +141,6 @@ private:
 	};
 
 			int32				fID;
-			uint32				fSpace;
 			RGBColor			fBGColor;
 
 			// first visible onscreen
@@ -156,11 +155,9 @@ private:
 			// pointer for which "big" actions are intended
 			ListData			*fFrontItem;
 
-			// settings for each workspace -- example taken from R5's app_server_settings file
-			display_timing		fDisplayTiming;
-			int16				fVirtualWidth;
-			int16				fVirtualHeight;
-	
+			// settings for each workspace
+			display_mode		fDisplayMode;
+			
 			MemoryPool			fPool;
 };
 
