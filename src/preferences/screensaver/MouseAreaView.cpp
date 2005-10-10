@@ -57,7 +57,7 @@ getArrowSize(BRect area,bool isCentered)
 	int areaHeight=area.IntegerHeight();
 	if (areaHeight<areaWidth)
 		areaWidth=areaHeight;
-	areaWidth/=3;
+	areaWidth /= 3;
 	BRect foo(0,0,areaWidth,areaWidth);
 	if (isCentered)
 		foo.OffsetBy(area.left+area.Width()/2-(areaWidth/2),area.top+area.Height()/2-(areaWidth/2));
@@ -90,7 +90,7 @@ MouseAreaView::DrawArrow(void)
 	} else {
 		PushState();
 		BRect area(getArrowSize(fScreenArea,true));
-		SetHighColor(kRed);
+		SetHighColor(255,0,0);
 		SetPenSize(2);
 		StrokeEllipse(area);
 		StrokeLine(BPoint(area.right,area.top),BPoint(area.left,area.bottom));

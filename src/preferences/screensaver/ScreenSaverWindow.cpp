@@ -4,7 +4,7 @@
  *
  * Authors:
  *              Michael Phipps
- *              Jérôme Duval, jerome.duval@free.fr
+ *              JÃ©rÃ´me Duval, jerome.duval@free.fr
  */
 
 #include <ListView.h>
@@ -448,12 +448,13 @@ ScreenSaverWin::SetupTab1()
 void 
 ScreenSaverWin::SetupTab2() 
 {
-	font_height stdFontHt;
-	be_plain_font->GetHeight(&stdFontHt);  
-	int stringHeight=(int)(stdFontHt.ascent+stdFontHt.descent),sliderHeight=30;
+	font_height height;
+	be_plain_font->GetHeight(&height);  
+	int32 stringHeight = (int32)(height.ascent+height.descent);
+	int32 sliderHeight = 30;
 	int topEdge;
 	{rgb_color clr = {216,216,216,255}; fTab2->SetViewColor(clr);}
-	fTab2->AddChild( fEnableScreenSaverBox = new BBox(BRect(8,6,436,280),"EnableScreenSaverBox"));
+	fTab2->AddChild( fEnableScreenSaverBox = new BBox(BRect(8,6,436,287),"EnableScreenSaverBox"));
 	commonLookAndFeel(fEnableScreenSaverBox,false,false);
 
 	fEnableCheckbox = new BCheckBox(BRect(0,0,90,stringHeight),"EnableCheckBox","Enable Screen Saver", new BMessage(kEnableScreenSaverChanged));
@@ -461,8 +462,8 @@ ScreenSaverWin::SetupTab2()
 	fEnableScreenSaverBox->SetBorder(B_FANCY_BORDER);
 
 	// Run Module
-	topEdge=26;
-	fEnableScreenSaverBox->AddChild( fStringView1 = new BStringView(BRect(40,topEdge,101,topEdge+stringHeight),"StringView1","Run module"));
+	topEdge=32;
+	fEnableScreenSaverBox->AddChild( fStringView1 = new BStringView(BRect(40,topEdge+2,130,topEdge+2+stringHeight),"StringView1","Run module"));
 	commonLookAndFeel(fStringView1,false,false);
 	fStringView1->SetText("Run module");
 	fStringView1->SetAlignment(B_ALIGN_LEFT);
@@ -472,11 +473,11 @@ ScreenSaverWin::SetupTab2()
 	commonLookAndFeel(fRunSlider,true,true);
 	float w,h;
 	fRunSlider->GetPreferredSize(&w,&h);
-	sliderHeight=(int)h;
+	sliderHeight= (int32)h - 6;
 
 	// Turn Off
 	topEdge+=sliderHeight;
-	fEnableScreenSaverBox->AddChild( fTurnOffScreenCheckBox = new BCheckBox(BRect(9,topEdge,107,topEdge+stringHeight),"TurnOffScreenCheckBox","Turn off screen",  new BMessage (kTab2_chg)));
+	fEnableScreenSaverBox->AddChild( fTurnOffScreenCheckBox = new BCheckBox(BRect(20,topEdge-2,127,topEdge-2+stringHeight),"TurnOffScreenCheckBox","Turn off screen",  new BMessage (kTab2_chg)));
 	commonLookAndFeel(fTurnOffScreenCheckBox,false,true);
 	fTurnOffScreenCheckBox->SetLabel("Turn off screen");
 	fTurnOffScreenCheckBox->SetResizingMode(B_FOLLOW_NONE);
@@ -487,7 +488,7 @@ ScreenSaverWin::SetupTab2()
 
 	// Password
 	topEdge+=sliderHeight;
-	fEnableScreenSaverBox->AddChild( fPasswordCheckbox = new BCheckBox(BRect(9,topEdge,108,topEdge+stringHeight),"PasswordCheckbox","Password lock",  new BMessage (kPasswordCheckbox)));
+	fEnableScreenSaverBox->AddChild( fPasswordCheckbox = new BCheckBox(BRect(20,topEdge-2,127,topEdge-2+stringHeight),"PasswordCheckbox","Password lock",  new BMessage (kPasswordCheckbox)));
 	commonLookAndFeel(fPasswordCheckbox,false,true);
 	fPasswordCheckbox->SetLabel("Password lock");
 
@@ -495,8 +496,8 @@ ScreenSaverWin::SetupTab2()
 	fPasswordSlider->SetModificationMessage(new BMessage(kPasswordSliderChanged));
 	commonLookAndFeel(fPasswordSlider,true,true);
 
-	topEdge+=sliderHeight;
-	fEnableScreenSaverBox->AddChild( fPasswordButton = new BButton(BRect(331,topEdge,405,topEdge+25),"PasswordButton","Password...",  new BMessage (kPwbutton)));
+	topEdge+=sliderHeight - 6;
+	fEnableScreenSaverBox->AddChild( fPasswordButton = new BButton(BRect(335,topEdge,410,topEdge+24),"PasswordButton","Password...",  new BMessage (kPwbutton)));
 	commonLookAndFeel(fPasswordButton,false,true);
 	fPasswordButton->SetLabel("Password...");
 
@@ -505,22 +506,22 @@ ScreenSaverWin::SetupTab2()
 	fEnableScreenSaverBox->AddChild(fFadeNow=new MouseAreaView(BRect(20,205,80,260),"fadeNow"));
 	fEnableScreenSaverBox->AddChild(fFadeNever=new MouseAreaView(BRect(220,205,280,260),"fadeNever"));
 
-	fEnableScreenSaverBox->AddChild( fFadeNowString = new BStringView(BRect(85,210,188,222),"FadeNowString","Fade now when"));
+	fEnableScreenSaverBox->AddChild( fFadeNowString = new BStringView(BRect(90,215,193,230),"FadeNowString","Fade now when"));
 	commonLookAndFeel(fFadeNowString,false,false);
 	fFadeNowString->SetText("Fade now when");
 	fFadeNowString->SetAlignment(B_ALIGN_LEFT);
 
-	fEnableScreenSaverBox->AddChild( fFadeNowString2 = new BStringView(BRect(85,225,188,237),"FadeNowString2","mouse is here"));
+	fEnableScreenSaverBox->AddChild( fFadeNowString2 = new BStringView(BRect(90,233,193,248),"FadeNowString2","mouse is here"));
 	commonLookAndFeel(fFadeNowString2,false,false);
 	fFadeNowString2->SetText("mouse is here");
 	fFadeNowString2->SetAlignment(B_ALIGN_LEFT);
 
-	fEnableScreenSaverBox->AddChild( fDontFadeString = new BStringView(BRect(285,210,382,222),"DontFadeString","Don't fade when"));
+	fEnableScreenSaverBox->AddChild( fDontFadeString = new BStringView(BRect(290,215,387,230),"DontFadeString","Don't fade when"));
 	commonLookAndFeel(fDontFadeString,false,false);
 	fDontFadeString->SetText("Don't fade when");
 	fDontFadeString->SetAlignment(B_ALIGN_LEFT);
 
-	fEnableScreenSaverBox->AddChild( fDontFadeString2 = new BStringView(BRect(285,225,382,237),"DontFadeString2","mouse is here"));
+	fEnableScreenSaverBox->AddChild( fDontFadeString2 = new BStringView(BRect(290,233,387,248),"DontFadeString2","mouse is here"));
 	commonLookAndFeel(fDontFadeString2,false,false);
 	fDontFadeString2->SetText("mouse is here");
 	fDontFadeString2->SetAlignment(B_ALIGN_LEFT);
