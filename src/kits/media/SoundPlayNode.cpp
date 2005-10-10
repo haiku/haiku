@@ -736,6 +736,9 @@ _SoundPlayNode::AllocateBuffers()
 	TRACE("_SoundPlayNode::AllocateBuffers: creating group of %ld buffers, size = %lu\n", count, size);
 	
 	mBufferGroup = new BBufferGroup(size, count);
+	if (mBufferGroup->InitCheck() != B_OK) {
+		ERROR("_SoundPlayNode::AllocateBuffers: BufferGroup::InitCheck() failed\n");
+	}		
 }
 
 BBuffer*
