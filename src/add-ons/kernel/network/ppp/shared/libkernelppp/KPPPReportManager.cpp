@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,9 +8,25 @@
 */
 
 #include <KPPPReportManager.h>
-#include <LockerHelper.h>
 
+#include <LockerHelper.h>
 #include <KPPPUtils.h>
+
+
+typedef struct report_sender_info {
+	thread_id thread;
+	ppp_report_packet report;
+} report_sender_info;
+
+
+static status_t
+report_sender_thread(void *data)
+{
+	report_sender_info *info = static_cast<report_sender_info*>(data);
+	KPPPReportManager::SendReport(info->thread, &info->report);
+	delete info;
+	return B_OK;
+}
 
 
 /*!	\brief Constructor.
@@ -28,6 +44,34 @@ KPPPReportManager::~KPPPReportManager()
 {
 	for(int32 index = 0; index < fReportRequests.CountItems(); index++)
 		delete fReportRequests.ItemAt(index);
+}
+
+
+/*!	\brief Send the given report message to the given thread.
+	
+	\param thread The report receiver.
+	\param report The report message.
+	
+	\return \c false on error.
+*/
+bool
+KPPPReportManager::SendReport(thread_id thread, const ppp_report_packet *report)
+{
+	if(!report)
+		return false;
+	
+	if(thread == find_thread(NULL)) {
+		report_sender_info *info = new report_sender_info;
+		info->thread = thread;
+		memcpy(&info->report, report, sizeof(ppp_report_packet));
+		resume_thread(spawn_thread(report_sender_thread, "PPP: ReportSender",
+			B_NORMAL_PRIORITY, info));
+		return true;
+	}
+	
+	send_data_with_timeout(thread, PPP_REPORT_CODE, &report, sizeof(report),
+		PPP_REPORT_TIMEOUT);
+	return true;
 }
 
 
@@ -75,6 +119,12 @@ KPPPReportManager::DisableReports(ppp_report_type type, thread_id thread)
 		if(request->type == type || type == PPP_ALL_REPORTS)
 			fReportRequests.RemoveItem(request);
 	}
+	
+	// empty message queue
+	while(has_data(thread)) {
+		thread_id sender;
+		receive_data(&sender, NULL, 0);
+	}
 }
 
 
@@ -110,7 +160,7 @@ KPPPReportManager::DoesReport(ppp_report_type type, thread_id thread)
 	\param data Additional data.
 	\param length Length of the data.
 	
-	\return \c true if all receivers accepted the message or \c false otherwise.
+	\return \c false on error.
 */
 bool
 KPPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 length)
@@ -130,8 +180,7 @@ KPPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 le
 	LockerHelper locker(fLock);
 	
 	status_t result;
-	thread_id sender, me = find_thread(NULL);
-	bool acceptable = true;
+	thread_id me = find_thread(NULL);
 	
 	ppp_report_packet report;
 	report.type = type;
@@ -156,63 +205,13 @@ KPPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 le
 			TRACE("KPPPReportManager::Report(): timed out sending\n");
 #endif
 		
-		thread_info info;
-		
-		if(result == B_BAD_THREAD_ID || result == B_NO_MEMORY) {
+		if(result == B_BAD_THREAD_ID || result == B_NO_MEMORY
+				|| request->flags & PPP_REMOVE_AFTER_REPORT) {
 			fReportRequests.RemoveItem(request);
 			--index;
 			continue;
-		} else if(result == B_OK && request->flags & PPP_WAIT_FOR_REPLY) {
-			if(request->flags & PPP_NO_REPLY_TIMEOUT) {
-				sender = -1;
-				result = B_ERROR;
-				// always check if the thread still exists
-				while(sender != request->thread
-						&& get_thread_info(request->thread, &info) == B_OK) {
-					result = receive_data_with_timeout(&sender, &code, NULL, 0,
-						PPP_REPORT_TIMEOUT);
-					
-					if(request->flags & PPP_ALLOW_ANY_REPLY_THREAD
-							&& result == B_OK)
-						sender = request->thread;
-				}
-			} else {
-				sender = -1;
-				result = B_OK;
-				while(sender != request->thread && result == B_OK
-						&& get_thread_info(request->thread, &info) == B_OK) {
-					result = receive_data_with_timeout(&sender, &code, NULL, 0,
-						PPP_REPORT_TIMEOUT);
-					
-					if(request->flags & PPP_ALLOW_ANY_REPLY_THREAD)
-						sender = request->thread;
-				}
-			}
-			
-			if(sender != request->thread) {
-				TRACE("KPPPReportManager::Report(): sender != requested\n");
-				continue;
-			}
-			
-			if(result == B_OK && code != B_OK && code != PPP_OK_DISABLE_REPORTS)
-				acceptable = false;
-			
-#if DEBUG
-			if(result == B_TIMED_OUT)
-				TRACE("KPPPReportManager::Report(): reply timed out\n");
-#endif
-		}
-		
-		// remove thread if it is not existant or if remove-flag is set
-		if(request->flags & PPP_REMOVE_AFTER_REPORT
-				|| get_thread_info(request->thread, &info) != B_OK
-				|| code == PPP_OK_DISABLE_REPORTS) {
-			fReportRequests.RemoveItem(request);
-			--index;
 		}
 	}
 	
-	TRACE("KPPPReportManager::Report(): returning: %s\n", acceptable?"true":"false");
-	
-	return acceptable;
+	return true;
 }

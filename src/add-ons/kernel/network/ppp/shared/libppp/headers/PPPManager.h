@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Haiku Inc.
+ * Copyright 2003-2005, Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 
@@ -7,6 +7,7 @@
 #define _PPP_MANAGER__H
 
 #include <KPPPManager.h>
+#include <String.h>
 
 
 class PPPManager {
@@ -19,16 +20,18 @@ class PPPManager {
 		PPPManager();
 		~PPPManager();
 		
+		static bool SetDefaultInterface(const BString name);
+		static BString DefaultInterface();
+		static bool GetSettingsDirectory(BDirectory *settingsDirectory);
+		
 		status_t InitCheck() const;
 		
 		status_t Control(uint32 op, void *data, size_t length) const;
 		status_t ControlModule(const char *name, uint32 op, void *data,
 			size_t length) const;
 		
-		ppp_interface_id CreateInterface(const driver_settings *settings,
-			const driver_settings *profile = NULL) const;
-		ppp_interface_id CreateInterfaceWithName(const char *name,
-			const driver_settings *profile = NULL) const;
+		ppp_interface_id CreateInterface(const driver_settings *settings) const;
+		ppp_interface_id CreateInterfaceWithName(const char *name) const;
 		bool DeleteInterface(ppp_interface_id ID) const;
 		
 		ppp_interface_id *Interfaces(int32 *count,

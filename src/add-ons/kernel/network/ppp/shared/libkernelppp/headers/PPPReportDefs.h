@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Haiku Inc.
+ * Copyright 2003-2005, Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 
@@ -16,19 +16,10 @@
 #define PPP_REPORT_CODE				'_3PR'
 	// the code of receive_data() must have this value
 
-//!	Sends a reply to the report message sender.
-#define PPP_REPLY(sender, value) \
-	send_data_with_timeout((sender), (value), NULL, 0, PPP_REPORT_TIMEOUT)
-
-#define PPP_OK_DISABLE_REPORTS		'OKDR'
-	// additional reply code (B_OK should be used)
-
 //!	Report flags.
 enum ppp_report_flags {
-	PPP_WAIT_FOR_REPLY = 0x01,
-	PPP_REMOVE_AFTER_REPORT = 0x02,
-	PPP_NO_REPLY_TIMEOUT = 0x04,
-	PPP_ALLOW_ANY_REPLY_THREAD = 0x08
+	PPP_REMOVE_AFTER_REPORT = 0x01,
+	PPP_REGISTER_SUBITEMS = 0x02
 };
 
 // report types
@@ -57,15 +48,10 @@ enum ppp_connection_report_codes {
 	PPP_REPORT_GOING_UP = 0,
 	PPP_REPORT_UP_SUCCESSFUL = 1,
 	PPP_REPORT_DOWN_SUCCESSFUL = 2,
-	PPP_REPORT_UP_ABORTED = 3,
-	PPP_REPORT_DEVICE_UP_FAILED = 4,
-	PPP_REPORT_LOCAL_AUTHENTICATION_REQUESTED = 5,
-	PPP_REPORT_PEER_AUTHENTICATION_REQUESTED = 6,
-	PPP_REPORT_LOCAL_AUTHENTICATION_SUCCESSFUL = 7,
-	PPP_REPORT_PEER_AUTHENTICATION_SUCCESSFUL = 8,
-	PPP_REPORT_LOCAL_AUTHENTICATION_FAILED = 9,
-	PPP_REPORT_PEER_AUTHENTICATION_FAILED = 10,
-	PPP_REPORT_CONNECTION_LOST = 11
+	PPP_REPORT_DEVICE_UP_FAILED = 3,
+	PPP_REPORT_AUTHENTICATION_REQUESTED = 4,
+	PPP_REPORT_AUTHENTICATION_FAILED = 5,
+	PPP_REPORT_CONNECTION_LOST = 6
 };
 
 

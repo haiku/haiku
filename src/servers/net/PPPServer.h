@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2004-2005, Waldemar Kornewald <Waldemar.Kornewald@web.de>
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,8 +8,6 @@
 
 #include <Handler.h>
 #include <PPPInterfaceListener.h>
-
-class SimpleMessageFilter;
 
 
 class PPPServer : public BHandler {
@@ -22,14 +20,13 @@ class PPPServer : public BHandler {
 
 	private:
 		void InitInterfaces();
-		bool AskBeforeDialing(ppp_interface_id id);
+		void UninitInterfaces();
 		
 		void HandleReportMessage(BMessage *message);
-		void OpenDialRequestWindow(ppp_interface_id id, thread_id sender);
+		void CreateConnectionRequestWindow(ppp_interface_id id);
 
 	private:
-		SimpleMessageFilter *fFilter;
-		PPPInterfaceListener *fListener;
+		PPPInterfaceListener fListener;
 };
 
 

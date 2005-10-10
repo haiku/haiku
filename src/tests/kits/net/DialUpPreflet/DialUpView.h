@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -24,9 +24,6 @@ class DialUpView : public BView {
 		void UpDownThread();
 
 	private:
-		void GetPPPDirectories(BDirectory *settingsDirectory,
-			BDirectory *profileDirectory) const;
-		
 		void HandleReportMessage(BMessage *message);
 		void CreateTabs();
 		
@@ -38,7 +35,7 @@ class DialUpView : public BView {
 		void AddInterface(const char *name, bool isNew = false);
 		void SelectInterface(int32 index, bool isNew = false);
 		int32 CountInterfaces() const;
-		BMenuItem *FindInterface(const char *name);
+		BMenuItem *FindInterface(BString name);
 		
 		void UpdateControls();
 		void UpdateDefaultInterface();

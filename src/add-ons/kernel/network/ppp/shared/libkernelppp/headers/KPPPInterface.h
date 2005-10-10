@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Haiku Inc.
+ * Copyright 2003-2005, Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 
@@ -18,10 +18,6 @@
 
 #ifndef _K_PPP_LCP__H
 #include <KPPPLCP.h>
-#endif
-
-#ifndef _K_PPP_PROFILE__H
-#include <KPPPProfile.h>
 #endif
 
 #ifndef _K_PPP_REPORT_MANAGER__H
@@ -56,7 +52,7 @@ class KPPPInterface : public KPPPLayer {
 		// only PPPManager may construct us!
 		KPPPInterface(const char *name, ppp_interface_entry *entry,
 			ppp_interface_id ID, const driver_settings *settings,
-			const driver_settings *profile, KPPPInterface *parent = NULL);
+			KPPPInterface *parent = NULL);
 		~KPPPInterface();
 
 	public:
@@ -78,13 +74,13 @@ class KPPPInterface : public KPPPLayer {
 		//!	Returns the KPPPLCP protocol of this interface.
 		KPPPLCP& LCP()
 			{ return fLCP; }
-		//!	Returns interface's profile object.
-		KPPPProfile& Profile()
-			{ return fProfile; }
 		
 		//!	Returns the interfac's ifnet structure that is exported to the netstack.
 		struct ifnet *Ifnet() const
 			{ return fIfnet; }
+		
+		const char *Username() const;
+		const char *Password() const;
 		
 		//!	Delay in miliseconds between a connect retry.
 		uint32 ConnectRetryDelay() const
@@ -199,6 +195,7 @@ class KPPPInterface : public KPPPLayer {
 		virtual bool Up();
 			// in server mode Up() listens for an incoming connection
 		virtual bool Down();
+		bool WaitForConnection();
 		bool IsUp() const;
 		
 		//!	Returns interface's report manager.
@@ -233,8 +230,6 @@ class KPPPInterface : public KPPPLayer {
 			// saves the returned ifnet structure
 		bool UnregisterInterface();
 		
-		void UpdateProfile();
-		
 		status_t StackControl(uint32 op, void *data);
 			// stack routes ioctls to interface
 		status_t StackControlEachHandler(uint32 op, void *data);
@@ -242,12 +237,6 @@ class KPPPInterface : public KPPPLayer {
 		
 		void CalculateInterfaceMTU();
 		void CalculateBaudRate();
-		
-		// these two methods are used by the open/close_event_threads
-		void CallOpenEvent()
-			{ StateMachine().OpenEvent(); }
-		void CallCloseEvent()
-			{ StateMachine().CloseEvent(); }
 		
 		void Reconnect(uint32 delay);
 		
@@ -262,10 +251,10 @@ class KPPPInterface : public KPPPLayer {
 		driver_settings *fSettings;
 		struct ifnet *fIfnet;
 		
-		thread_id fUpThread, fOpenEventThread, fCloseEventThread;
+		char *fUsername, *fPassword;
 		
 		thread_id fReconnectThread;
-		uint32 fConnectRetry, fConnectRetriesLimit;
+		uint32 fConnectAttempt, fConnectRetriesLimit;
 		uint32 fConnectRetryDelay, fReconnectDelay;
 		
 		ppp_interface_module_info *fManager;
@@ -280,7 +269,7 @@ class KPPPInterface : public KPPPLayer {
 		TemplateList<KPPPInterface*> fChildren;
 		bool fIsMultilink;
 		
-		bool fAutoReconnect, fConnectOnDemand;
+		bool fAutoReconnect, fConnectOnDemand, fAskBeforeConnecting;
 		
 		ppp_mode fMode;
 		ppp_pfc_state fLocalPFCState, fPeerPFCState;
@@ -292,7 +281,6 @@ class KPPPInterface : public KPPPLayer {
 		
 		KPPPStateMachine fStateMachine;
 		KPPPLCP fLCP;
-		KPPPProfile fProfile;
 		KPPPReportManager fReportManager;
 		BLocker& fLock;
 		int32 fDeleteCounter;

@@ -17,10 +17,6 @@ Server net_server :
 	
 	# built-in add-ons
 	PPPServer.cpp
-	
-	# old net_server (was a netstack tester app)
-#	userland_server.c
-#	userland_ipc.c 
 ;
 
 LinkSharedOSLibs net_server : 
@@ -29,6 +25,5 @@ LinkSharedOSLibs net_server :
 	libbind.so
 	
 	# for PPP
-	libdunview.a
 	libppp.a
 ;

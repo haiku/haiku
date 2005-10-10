@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -218,27 +218,6 @@ KPPPLCP::AdditionalOverhead() const
 		overhead += Interface().Device()->Overhead();
 	
 	return overhead;
-}
-
-
-//!	Calls \c ProfileChanged() for each option handler and LCP extension.
-void
-KPPPLCP::ProfileChanged()
-{
-	KPPPLCPExtension *extension;
-	KPPPOptionHandler *handler;
-	
-	for(int32 index = 0; index < CountLCPExtensions(); index++) {
-		extension = LCPExtensionAt(index);
-		if(extension)
-			extension->ProfileChanged();
-	}
-	
-	for(int32 index = 0; index < CountOptionHandlers(); index++) {
-		handler = OptionHandlerAt(index);
-		if(handler)
-			handler->ProfileChanged();
-	}
 }
 
 

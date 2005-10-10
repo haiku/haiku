@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Haiku Inc.
+ * Copyright 2003-2005, Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 
@@ -17,8 +17,6 @@ class BHandler;
 
 
 class PPPInterfaceListener {
-		friend class PPPInterfaceListenerThread;
-
 	public:
 		PPPInterfaceListener(BHandler *target);
 		PPPInterfaceListener(const PPPInterfaceListener& copy);
@@ -31,20 +29,21 @@ class PPPInterfaceListener {
 			{ return fTarget; }
 		void SetTarget(BHandler *target);
 		
-		//!	Returns whether watching an interface.
-		bool DoesWatch() const
-			{ return fDoesWatch; }
+		//!	Returns whether the listener is watching an interface.
+		bool IsWatching() const
+			{ return fIsWatching; }
 		//!	Returns which interface is being watched or \c PPP_UNDEFINED_INTERFACE_ID.
-		ppp_interface_id WatchingInterface() const
-			{ return fWatchingInterface; }
+		ppp_interface_id Interface() const
+			{ return fInterface; }
 		
 		//!	Returns the internal PPPManager object used for accessing the PPP stack.
 		const PPPManager& Manager() const
 			{ return fManager; }
 		
 		bool WatchInterface(ppp_interface_id ID);
-		void WatchAllInterfaces();
-		void StopWatchingInterfaces();
+		void WatchManager();
+		void StopWatchingInterface();
+		void StopWatchingManager();
 		
 		//!	Just sets the target to the given listener's target.
 		PPPInterfaceListener& operator= (const PPPInterfaceListener& copy)
@@ -57,11 +56,10 @@ class PPPInterfaceListener {
 		BHandler *fTarget;
 		thread_id fReportThread;
 		
-		bool fDoesWatch;
-		ppp_interface_id fWatchingInterface;
+		bool fIsWatching;
+		ppp_interface_id fInterface;
 		
 		PPPManager fManager;
-		BLocker fLock;
 };
 
 

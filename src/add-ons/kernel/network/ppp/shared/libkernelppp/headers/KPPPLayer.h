@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Haiku Inc.
+ * Copyright 2003-2005, Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 
@@ -38,8 +38,6 @@ class KPPPLayer {
 		//!	Next layer in chain.
 		KPPPLayer *Next() const
 			{ return fNext; }
-		
-		virtual void ProfileChanged();
 		
 		//!	Brings this layer up.
 		virtual bool Up() = 0;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Haiku Inc.
+ * Copyright 2003-2005, Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,8 +15,9 @@ typedef uint32 ppp_interface_id;
 
 
 // settings keys
+#define PPP_USERNAME_KEY					"Username"
+#define PPP_PASSWORD_KEY					"Password"
 #define PPP_ASK_BEFORE_CONNECTING_KEY		"AskBeforeConnecting"
-	// userland ppp_up and preflet handle this key
 #define PPP_DISONNECT_AFTER_IDLE_SINCE_KEY	"DisonnectAfterIdleSince"
 #define PPP_MODE_KEY						"Mode"
 #define PPP_CONNECT_RETRIES_LIMIT_KEY		"ConnectRetriesLimit"
@@ -37,10 +38,10 @@ typedef uint32 ppp_interface_id;
 #define PPP_MODULES_PATH					NETWORK_MODULES_ROOT "ppp"
 #define PTP_INTERFACE_SETTINGS_PATH	\
 	"/boot/home/config/settings/kernel/drivers/ptpnet"
-		// should be: /etc/ptpnet
+		// TODO: should be: /etc/ptpnet
 #define PTP_SETTINGS_PATH \
 	"/boot/home/config/settings/kernel/drivers/ptpnet.settings"
-		// should be: /etc/ptpnet.settings
+		// TODO: should be: /etc/ptpnet.settings
 
 // built-in protocols
 #define PPP_LCP_PROTOCOL					0xC021

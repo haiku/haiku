@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Haiku Inc.
+ * Copyright 2003-2005, Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 
@@ -51,8 +51,6 @@ class KPPPOptionHandler {
 		virtual status_t Control(uint32 op, void *data, size_t length);
 		virtual status_t StackControl(uint32 op, void *data);
 			// called by netstack (forwarded by KPPPInterface)
-		
-		virtual void ProfileChanged();
 		
 		// we want to send a configure request or we received a reply
 		virtual status_t AddToRequest(KPPPConfigurePacket& request);

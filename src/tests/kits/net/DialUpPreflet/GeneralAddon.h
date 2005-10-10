@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -34,6 +34,7 @@ class GeneralAddon : public DialUpAddon {
 			{ return fUsername.String(); }
 		const char *Password() const
 			{ return fPassword.String(); }
+		const char *SessionPassword() const;
 		bool HasPassword() const
 			{ return fHasPassword; }
 		
@@ -46,22 +47,18 @@ class GeneralAddon : public DialUpAddon {
 		
 		BMessage *Settings() const
 			{ return fSettings; }
-		BMessage *Profile() const
-			{ return fProfile; }
 		
 		virtual int32 Position() const
 			{ return 0; }
-		virtual bool LoadSettings(BMessage *settings, BMessage *profile, bool isNew);
+		virtual bool LoadSettings(BMessage *settings, bool isNew);
 		bool LoadDeviceSettings();
 		bool LoadAuthenticationSettings();
 		
-		virtual bool HasTemporaryProfile() const;
-		virtual void IsModified(bool *settings, bool *profile) const;
-		void IsDeviceModified(bool *settings, bool *profile) const;
-		void IsAuthenticationModified(bool *settings, bool *profile) const;
+		virtual void IsModified(bool *settings) const;
+		void IsDeviceModified(bool *settings) const;
+		void IsAuthenticationModified(bool *settings) const;
 		
-		virtual bool SaveSettings(BMessage *settings, BMessage *profile,
-			bool saveTemporary);
+		virtual bool SaveSettings(BMessage *settings);
 		virtual bool GetPreferredSize(float *width, float *height) const;
 		virtual BView *CreateView(BPoint leftTop);
 
@@ -74,7 +71,7 @@ class GeneralAddon : public DialUpAddon {
 		BString fDeviceName, fUsername, fPassword;
 		DialUpAddon *fDeviceAddon;
 		int32 fAuthenticatorsCount;
-		BMessage *fSettings, *fProfile;
+		BMessage *fSettings;
 			// saves last settings state
 		GeneralView *fGeneralView;
 };
@@ -96,15 +93,11 @@ class GeneralView : public BView {
 		bool DoesSavePassword() const
 			{ return fSavePassword->Value(); }
 		
-		bool HasTemporaryProfile() const
-			{ return !DoesSavePassword() || (fDeviceAddon &&
-				fDeviceAddon->HasTemporaryProfile()); }
-		
 		DialUpAddon *DeviceAddon() const
 			{ return fDeviceAddon; }
 		const char *DeviceName() const;
 		const char *AuthenticatorName() const;
-		void IsDeviceModified(bool *settings, bool *profile) const;
+		void IsDeviceModified(bool *settings) const;
 		
 		virtual void AttachedToWindow();
 		virtual void MessageReceived(BMessage *message);

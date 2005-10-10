@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -67,8 +67,6 @@ class IPCP : public KPPPProtocol {
 			{ return fState; }
 		
 		virtual status_t StackControl(uint32 op, void *data);
-		
-		virtual void ProfileChanged();
 		
 		virtual bool Up();
 		virtual bool Down();

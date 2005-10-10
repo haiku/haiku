@@ -1,12 +1,14 @@
 /*
- * Copyright 2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2005, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
 #include <PTPSettings.h>
 
-// built-in add-ons
 #include <PPPDefs.h>
+#include <PPPManager.h>
+
+// built-in add-ons
 #include "ConnectionOptionsAddon.h"
 #include "GeneralAddon.h"
 #include "IPCPAddon.h"
@@ -22,17 +24,11 @@
 
 PTPSettings::PTPSettings()
 {
-	void *handle = load_driver_settings("ptpnet.settings");
-	const char *name = get_driver_parameter(handle, "default", NULL, NULL);
-	fDefaultInterface = name ? strdup(name) : NULL;
-	unload_driver_settings(handle);
 }
 
 
 PTPSettings::~PTPSettings()
 {
-	free(fDefaultInterface);
-	
 	// free known add-on types (these should free their known add-on types, etc.)
 	DialUpAddon *addon;
 	for(int32 index = 0;
@@ -43,68 +39,11 @@ PTPSettings::~PTPSettings()
 }
 
 
-bool
-PTPSettings::SetDefaultInterface(const char *name)
-{
-	// load current settings and replace value of "default" with <name>
-	BMessage settings;
-	if(!ReadMessageDriverSettings("ptpnet.settings", &settings))
-		settings.MakeEmpty();
-	
-	BMessage parameter;
-	int32 index = 0;
-	if(FindMessageParameter("default", settings, &parameter, &index))
-		settings.RemoveData(MDSU_PARAMETERS, index);
-	
-	parameter.MakeEmpty();
-	if(name) {
-		parameter.AddString(MDSU_NAME, "default");
-		parameter.AddString(MDSU_VALUES, name);
-		settings.AddMessage(MDSU_PARAMETERS, &parameter);
-	}
-	
-	BFile file(PTP_SETTINGS_PATH, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
-	if(file.InitCheck() != B_OK)
-		return false;
-	
-	if(WriteMessageDriverSettings(file, settings)) {
-		free(fDefaultInterface);
-		fDefaultInterface = name ? strdup(name) : NULL;
-		return true;
-	} else
-		return false;
-}
 
-
-bool
-PTPSettings::GetPTPDirectories(BDirectory *settingsDirectory,
-	BDirectory *profileDirectory) const
+const char*
+PTPSettings::SessionPassword() const
 {
-	if(settingsDirectory) {
-		BDirectory settings(PTP_INTERFACE_SETTINGS_PATH);
-		if(settings.InitCheck() != B_OK) {
-			create_directory(PTP_INTERFACE_SETTINGS_PATH, 0750);
-			settings.SetTo(PTP_INTERFACE_SETTINGS_PATH);
-			if(settings.InitCheck() != B_OK)
-				return false;
-		}
-		
-		*settingsDirectory = settings;
-	}
-	
-	if(profileDirectory) {
-		BDirectory profile(PTP_INTERFACE_SETTINGS_PATH "/profile");
-		if(profile.InitCheck() != B_OK) {
-			create_directory(PTP_INTERFACE_SETTINGS_PATH "/profile", 0750);
-			profile.SetTo(PTP_INTERFACE_SETTINGS_PATH "/profile");
-			if(profile.InitCheck() != B_OK)
-				return false;
-		}
-		
-		*profileDirectory = profile;
-	}
-	
-	return true;
+	return fGeneralAddon->SessionPassword();
 }
 
 
@@ -116,19 +55,13 @@ PTPSettings::LoadSettings(const char *interfaceName, bool isNew)
 	
 	fCurrent = interfaceName ? interfaceName : "";
 	fSettings.MakeEmpty();
-	fProfile.MakeEmpty();
-	BMessage *settingsPointer = interfaceName ? &fSettings : NULL,
-		*profilePointer = interfaceName ? &fProfile : NULL;
+	BMessage *settingsPointer = interfaceName ? &fSettings : NULL;
 	
 	if(interfaceName && !isNew) {
 		BString name("ptpnet/");
 		name << fCurrent;
 		if(!ReadMessageDriverSettings(name.String(), &fSettings))
 			return false;
-		name = "ptpnet/profile/";
-		name << fCurrent;
-		if(!ReadMessageDriverSettings(name.String(), &fProfile))
-			profilePointer = settingsPointer;
 	}
 	
 	DialUpAddon *addon;
@@ -137,7 +70,7 @@ PTPSettings::LoadSettings(const char *interfaceName, bool isNew)
 		if(!addon)
 			continue;
 		
-		if(!addon->LoadSettings(settingsPointer, profilePointer, isNew))
+		if(!addon->LoadSettings(settingsPointer, isNew))
 			return false;
 	}
 	
@@ -148,11 +81,10 @@ PTPSettings::LoadSettings(const char *interfaceName, bool isNew)
 
 
 void
-PTPSettings::IsModified(bool *settings, bool *profile)
+PTPSettings::IsModified(bool *settings)
 {
-	*settings = *profile = false;
-	bool addonSettingsChanged, addonProfileChanged;
-		// for current addon
+	*settings = false;
+	bool addonSettingsChanged;
 	
 	DialUpAddon *addon;
 	for(int32 index = 0; fAddons.FindPointer(DUN_TAB_ADDON_TYPE, index,
@@ -160,19 +92,17 @@ PTPSettings::IsModified(bool *settings, bool *profile)
 		if(!addon)
 			continue;
 		
-		addon->IsModified(&addonSettingsChanged, &addonProfileChanged);
+		addon->IsModified(&addonSettingsChanged);
 		if(addonSettingsChanged)
 			*settings = true;
-		if(addonProfileChanged)
-			*profile = true;
 	}
 }
 
 
 bool
-PTPSettings::SaveSettings(BMessage *settings, BMessage *profile, bool saveTemporary)
+PTPSettings::SaveSettings(BMessage *settings)
 {
-	if(fCurrent.Length() == 0 || !settings || !profile)
+	if(fCurrent.Length() == 0 || !settings)
 		return false;
 	
 	DialUpAddon *addon;
@@ -199,7 +129,7 @@ PTPSettings::SaveSettings(BMessage *settings, BMessage *profile, bool saveTempor
 	settings->AddString("InterfaceName", fCurrent);
 	
 	for(int32 index = 0; index < addons.CountItems(); index++)
-		if(!addons.ItemAt(index)->SaveSettings(settings, profile, saveTemporary))
+		if(!addons.ItemAt(index)->SaveSettings(settings))
 			return false;
 	
 	return true;
@@ -209,18 +139,17 @@ PTPSettings::SaveSettings(BMessage *settings, BMessage *profile, bool saveTempor
 bool
 PTPSettings::SaveSettingsToFile()
 {
-	bool settingsChanged, profileChanged;
-	IsModified(&settingsChanged, &profileChanged);
-	if(!settingsChanged && !profileChanged)
+	bool settingsChanged;
+	IsModified(&settingsChanged);
+	if(!settingsChanged)
 		return true;
 	
-	BMessage settings, profile;
-	if(!SaveSettings(&settings, &profile, false))
+	BMessage settings;
+	if(!SaveSettings(&settings))
 		return false;
 	
 	BDirectory settingsDirectory;
-	BDirectory profileDirectory;
-	if(!GetPTPDirectories(&settingsDirectory, &profileDirectory))
+	if(!PPPManager::GetSettingsDirectory(&settingsDirectory))
 		return false;
 	
 	BFile file;
@@ -229,17 +158,12 @@ PTPSettings::SaveSettingsToFile()
 		WriteMessageDriverSettings(file, settings);
 	}
 	
-	if(profileChanged) {
-		profileDirectory.CreateFile(fCurrent.String(), &file);
-		WriteMessageDriverSettings(file, profile);
-	}
-	
 	return true;
 }
 
 
 void
-PTPSettings::LoadAddons(bool loadGeneralAddon = true)
+PTPSettings::LoadAddons()
 {
 	// Load built-in add-ons:
 	// "Connection Options" tab
@@ -248,11 +172,9 @@ PTPSettings::LoadAddons(bool loadGeneralAddon = true)
 	fAddons.AddPointer(DUN_TAB_ADDON_TYPE, connectionOptionsAddon);
 	fAddons.AddPointer(DUN_DELETE_ON_QUIT, connectionOptionsAddon);
 	// "General" tab
-	if(loadGeneralAddon) {
-		GeneralAddon *fGeneralAddon = new GeneralAddon(&fAddons);
-		fAddons.AddPointer(DUN_TAB_ADDON_TYPE, fGeneralAddon);
-		fAddons.AddPointer(DUN_DELETE_ON_QUIT, fGeneralAddon);
-	}
+	fGeneralAddon = new GeneralAddon(&fAddons);
+	fAddons.AddPointer(DUN_TAB_ADDON_TYPE, fGeneralAddon);
+	fAddons.AddPointer(DUN_DELETE_ON_QUIT, fGeneralAddon);
 	// "IPCP" protocol
 	IPCPAddon *ipcpAddon = new IPCPAddon(&fAddons);
 	fAddons.AddPointer(DUN_TAB_ADDON_TYPE, ipcpAddon);
@@ -264,11 +186,7 @@ PTPSettings::LoadAddons(bool loadGeneralAddon = true)
 	
 	// "PAP" authenticator
 	BMessage addon;
-#ifdef LANG_GERMAN
-	addon.AddString("FriendlyName", "Unverschlüsselt");
-#else
 	addon.AddString("FriendlyName", "Plain-text Authentication");
-#endif
 	addon.AddString("TechnicalName", "PAP");
 	addon.AddString("KernelModuleName", "pap");
 	fAddons.AddMessage(DUN_AUTHENTICATOR_ADDON_TYPE, &addon);

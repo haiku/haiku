@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2005, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,6 +8,9 @@
 
 #include <Message.h>
 #include <String.h>
+
+
+class GeneralAddon;
 
 
 class PTPSettings {
@@ -19,26 +22,20 @@ class PTPSettings {
 			{ return fAddons; }
 		const BString& CurrentInterface() const
 			{ return fCurrent; }
-		
-		bool SetDefaultInterface(const char *name);
-		const char *DefaultInterface() const
-			{ return fDefaultInterface; }
-		
-		bool GetPTPDirectories(BDirectory *settingsDirectory,
-			BDirectory *profileDirectory) const;
+		const char *SessionPassword() const;
 		
 		bool LoadSettings(const char *interfaceName, bool isNew);
-		void IsModified(bool *settings, bool *profile);
-		bool SaveSettings(BMessage *settings, BMessage *profile, bool saveTemporary);
+		void IsModified(bool *settings);
+		bool SaveSettings(BMessage *settings);
 		bool SaveSettingsToFile();
 		
-		void LoadAddons(bool loadGeneralAddon = true);
+		void LoadAddons();
 			// must be called manually
 
 	private:
-		BMessage fAddons, fSettings, fProfile;
+		BMessage fAddons, fSettings;
 		BString fCurrent;
-		char *fDefaultInterface;
+		GeneralAddon *fGeneralAddon;
 };
 
 

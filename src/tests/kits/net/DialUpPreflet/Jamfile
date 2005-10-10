@@ -1,18 +1,5 @@
 SubDir OBOS_TOP src tests kits net DialUpPreflet ;
 
-# set some additional defines
-{
-	local defines ;
-	
-	if $(LANG_GERMAN) {
-		defines += LANG_GERMAN ;
-	}
-	
-	defines = [ FDefines $(defines) ] ;
-	SubDirCcFlags $(defines) ;
-	SubDirC++Flags $(defines) ;
-}
-
 UsePrivateHeaders net ;
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libppp headers ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
@@ -23,13 +10,15 @@ UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp ipcp ] ; # IPCP
 
 AddResources DialUpPreflet : DialUpPreflet.rdef ;
 
-StaticLibrary ptpnet :
-	PTPSettings.cpp
+SimpleTest DialUpPreflet :
+	# Application
+	DialUpApplication.cpp
+	DialUpView.cpp
 	
-	# utils (TODO: move into their own library)
+	# utils (TODO: move some of them into a separate library)
 	InterfaceUtils.cpp
-	MessageDriverSettingsUtils.cpp
 	TextRequestDialog.cpp
+	PTPSettings.cpp
 	
 	# built-in add-ons
 	ConnectionOptionsAddon.cpp
@@ -38,9 +27,4 @@ StaticLibrary ptpnet :
 	PPPoEAddon.cpp
 ;
 
-SimpleTest DialUpPreflet :
-	DialUpApplication.cpp
-	DialUpView.cpp
-;
-
-LinkSharedOSLibs DialUpPreflet : libptpnet.a libppp.a be ;
+LinkSharedOSLibs DialUpPreflet : libppp.a be ;

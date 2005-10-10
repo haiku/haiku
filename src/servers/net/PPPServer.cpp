@@ -1,28 +1,19 @@
 /*
- * Copyright 2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2004-2005, Waldemar Kornewald <Waldemar.Kornewald@web.de>
  * Distributed under the terms of the MIT License.
  */
 
 #include "PPPServer.h"
-#include "SimpleMessageFilter.h"
 #include <Application.h>
 
 
-// the message constants that should be filtered
-static const uint32 *kPPPWhatValues = {
-	// PPPS_CONNECT,
-	0 // end-of-list
-};
-
-
 PPPServer::PPPServer()
-	: BHandler("PPPServer")
+	: BHandler("PPPServer"),
+	fListener(this)
 {
 	be_app->AddHandler(this);
-	fFilter = new SimpleMessageFilter(kPPPWhatValues, this);
-	be_app->AddCommonFilter(fFilter);
-	fListener = new PPPInterfaceListener(this);
-	fListener->WatchAllInterfaces();
+	
+	fListener.WatchManager();
 	
 	InitInterfaces();
 }
@@ -30,10 +21,11 @@ PPPServer::PPPServer()
 
 PPPServer::~PPPServer()
 {
-	delete fListener;
-	be_app->RemoveCommonFilter(fFilter);
+	UninitInterfaces();
+	
+	fListener.StopWatchingManager();
+	
 	be_app->RemoveHandler(this);
-	delete fFilter;
 }
 
 
@@ -54,53 +46,36 @@ PPPServer::MessageReceived(BMessage *message)
 void
 PPPServer::InitInterfaces()
 {
+	// TODO: create one ConnectionRequestWindow per interface
 }
 
 
-bool
-PPPServer::AskBeforeDialing(ppp_interface_id id)
+void
+PPPServer::UninitInterfaces()
 {
-	return false;
+	// TODO: delete all ConnectionRequestWindows
 }
 
 
 void
 PPPServer::HandleReportMessage(BMessage *message)
 {
-	thread_id sender;
-	message->FindInt32("sender", &sender);
-	
 	ppp_interface_id id;
-	if(message->FindInt32("interface", reinterpret_cast<int32*>(&id)) != B_OK) {
-		send_data(sender, B_OK, NULL, 0);
+	if(message->FindInt32("interface", reinterpret_cast<int32*>(&id)) != B_OK)
 		return;
-	}
 	
 	int32 type, code;
 	message->FindInt32("type", &type);
 	message->FindInt32("code", &code);
 	
-	if(type == PPP_MANAGER_REPORT && code == PPP_REPORT_INTERFACE_CREATED) {
-		// TODO: check if we need to add this interface to our watch-list
-	} else if(type == PPP_CONNECTION_REPORT) {
-		switch(code) {
-			case PPP_REPORT_GOING_UP: {
-				if(AskBeforeDialing(id)) {
-					OpenDialRequestWindow(id, sender);
-					return;
-				}
-			} break;
-		}
-	} else if(type == PPP_DESTRUCTION_REPORT) {
-		// TODO: check if this interface has DOD enabled. if so: create new!
-	}
-	
-	send_data(sender, B_OK, NULL, 0);
+	if(type == PPP_MANAGER_REPORT && code == PPP_REPORT_INTERFACE_CREATED)
+		CreateConnectionRequestWindow(id);
 }
 
 
 void
-PPPServer::OpenDialRequestWindow(ppp_interface_id id, thread_id sender)
+PPPServer::CreateConnectionRequestWindow(ppp_interface_id id)
 {
-	
+	// TODO: create window, register window as report receiver for the interface
+	// XXX: if a window for that ID exists then only register it as report receiver
 }

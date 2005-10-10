@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Haiku Inc.
+ * Copyright 2003-2005, Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 
@@ -30,12 +30,14 @@ class PPPInterface {
 		
 		status_t Control(uint32 op, void *data, size_t length) const;
 		
+		bool SetUsername(const char *username) const;
+		bool SetPassword(const char *password) const;
+		bool SetAskBeforeConnecting(bool askBeforeConnecting) const;
+		
 		status_t GetSettingsEntry(BEntry *entry) const;
 		bool GetInterfaceInfo(ppp_interface_info_t *info) const;
 		bool GetStatistics(ppp_statistics *statistics) const;
 		bool HasSettings(const driver_settings *settings) const;
-		
-		void SetProfile(const driver_settings *profile) const;
 		
 		bool Up() const;
 		bool Down() const;

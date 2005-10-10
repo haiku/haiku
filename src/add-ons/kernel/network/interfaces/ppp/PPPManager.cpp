@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <Waldemar.Kornewald@web.de>
  * Distributed under the terms of the MIT License.
  */
 
@@ -20,63 +20,6 @@
 
 
 static const char sKPPPIfNameBase[] =	"ppp";
-
-
-static
-status_t
-interface_up_thread(void *data)
-{
-	ppp_interface_entry *entry = (ppp_interface_entry*) data;
-	
-	entry->interface->Up();
-	--entry->accessing;
-	
-	return B_OK;
-}
-
-
-static
-status_t
-bring_interface_up(ppp_interface_entry *entry)
-{
-	thread_id upThread = spawn_kernel_thread(interface_up_thread,
-		"PPPManager: up_thread", B_NORMAL_PRIORITY, entry);
-	resume_thread(upThread);
-	
-	return B_OK;
-}
-
-
-#if DOWN_AS_THREAD
-static
-status_t
-interface_down_thread(void *data)
-{
-	ppp_interface_entry *entry = (ppp_interface_entry*) data;
-	
-	entry->interface->Down();
-	--entry->accessing;
-	
-	return B_OK;
-}
-#endif
-
-
-static
-status_t
-bring_interface_down(ppp_interface_entry *entry)
-{
-#if DOWN_AS_THREAD
-	thread_id downThread = spawn_kernel_thread(interface_down_thread,
-		"PPPManager: down_thread", B_NORMAL_PRIORITY, entry);
-	resume_thread(downThread); */
-#else
-	entry->interface->Down();
-	--entry->accessing;
-#endif
-	
-	return B_OK;
-}
 
 
 static
@@ -138,8 +81,8 @@ PPPManager::~PPPManager()
 	for(int32 index = 0; index < fEntries.CountItems(); index++) {
 		entry = fEntries.ItemAt(index);
 		if(entry) {
-			free(entry->name);
 			delete entry->interface;
+			free(entry->name);
 			delete entry;
 		}
 	}
@@ -181,13 +124,13 @@ PPPManager::Output(ifnet *ifp, struct mbuf *buf, struct sockaddr *dst,
 		return B_ERROR;
 	}
 	
-	++entry->accessing;
+	atomic_add(entry->accessing, 1);
 	locker.UnlockNow();
 	
 	if(!entry->interface->DoesConnectOnDemand()
 			&& ifp->if_flags & (IFF_UP | IFF_RUNNING) != (IFF_UP | IFF_RUNNING)) {
 		m_freem(buf);
-		--entry->accessing;
+		atomic_add(entry->accessing, -1);
 		return ENETDOWN;
 	}
 	
@@ -204,12 +147,12 @@ PPPManager::Output(ifnet *ifp, struct mbuf *buf, struct sockaddr *dst,
 		if(result == PPP_UNHANDLED)
 			continue;
 		
-		--entry->accessing;
+		atomic_add(entry->accessing, -1);
 		return result;
 	}
 	
 	m_freem(buf);
-	--entry->accessing;
+	atomic_add(entry->accessing, -1);
 	return B_ERROR;
 }
 
@@ -227,7 +170,7 @@ PPPManager::Control(ifnet *ifp, ulong cmd, caddr_t data)
 	}
 	
 	int32 status = B_OK;
-	++entry->accessing;
+	atomic_add(entry->accessing, 1);
 	locker.UnlockNow();
 	
 	switch(cmd) {
@@ -237,38 +180,36 @@ PPPManager::Control(ifnet *ifp, ulong cmd, caddr_t data)
 						&& entry->interface->Phase() == PPP_DOWN_PHASE)
 					DeleteInterface(entry->interface->ID());
 				else
-					return bring_interface_down(entry);
+					entry->interface->Down();
 			} else if(((ifreq*)data)->ifr_flags & IFF_UP)
-				return bring_interface_up(entry);
+				entry->interface->Up();
 		break;
 		
 		default:
 			status = entry->interface->StackControl(cmd, data);
 	}
 	
-	--entry->accessing;
+	atomic_add(entry->accessing, -1);
 	return status;
 }
 
 
 ppp_interface_id
 PPPManager::CreateInterface(const driver_settings *settings,
-	const driver_settings *profile = NULL,
 	ppp_interface_id parentID = PPP_UNDEFINED_INTERFACE_ID)
 {
-	return _CreateInterface(NULL, settings, profile, parentID);
+	return _CreateInterface(NULL, settings, parentID);
 }
 
 
 ppp_interface_id
 PPPManager::CreateInterfaceWithName(const char *name,
-	const driver_settings *profile = NULL,
 	ppp_interface_id parentID = PPP_UNDEFINED_INTERFACE_ID)
 {
 	if(!name)
 		return PPP_UNDEFINED_INTERFACE_ID;
 	
-	ppp_interface_id result = _CreateInterface(name, NULL, profile, parentID);
+	ppp_interface_id result = _CreateInterface(name, NULL, parentID);
 	
 	return result;
 }
@@ -292,7 +233,7 @@ PPPManager::DeleteInterface(ppp_interface_id ID)
 			// this check prevents a dead-lock
 	
 	entry->deleting = true;
-	++entry->accessing;
+	atomic_add(entry->accessing, 1);
 	locker.UnlockNow();
 	
 	// bring interface down if needed
@@ -300,7 +241,7 @@ PPPManager::DeleteInterface(ppp_interface_id ID)
 			|| entry->interface->Phase() != PPP_DOWN_PHASE)
 		entry->interface->Down();
 	
-	--entry->accessing;
+	atomic_add(entry->accessing, -1);
 	
 	return true;
 }
@@ -420,7 +361,7 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 			if(!info->u.settings)
 				return B_ERROR;
 			
-			info->interface = CreateInterface(info->u.settings, info->profile);
+			info->interface = CreateInterface(info->u.settings);
 				// parents cannot be set from userland
 			return info->interface != PPP_UNDEFINED_INTERFACE_ID ? B_OK : B_ERROR;
 		} break;
@@ -434,7 +375,7 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 			if(!info->u.name)
 				return B_ERROR;
 			
-			info->interface = CreateInterfaceWithName(info->u.name, info->profile);
+			info->interface = CreateInterfaceWithName(info->u.name);
 				// parents cannot be set from userland
 			return info->interface != PPP_UNDEFINED_INTERFACE_ID ? B_OK : B_ERROR;
 		} break;
@@ -457,10 +398,11 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 			if(!entry || entry->deleting)
 				return B_BAD_INDEX;
 			
-			++entry->accessing;
+			atomic_add(entry->accessing, 1);
 			locker.UnlockNow();
 			
-			return bring_interface_up(entry);
+			entry->interface->Up();
+			atomic_add(entry->accessing, -1);
 		} break;
 		
 		case PPPC_BRING_INTERFACE_DOWN: {
@@ -473,10 +415,11 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 			if(!entry || entry->deleting)
 				return B_BAD_INDEX;
 			
-			++entry->accessing;
+			atomic_add(entry->accessing, 1);
 			locker.UnlockNow();
 			
-			return bring_interface_down(entry);
+			entry->interface->Down();
+			atomic_add(entry->accessing, -1);
 		} break;
 		
 		case PPPC_CONTROL_INTERFACE: {
@@ -564,10 +507,10 @@ PPPManager::ControlInterface(ppp_interface_id ID, uint32 op, void *data, size_t 
 	status_t result = B_BAD_INDEX;
 	ppp_interface_entry *entry = EntryFor(ID);
 	if(entry && !entry->deleting) {
-		++entry->accessing;
+		atomic_add(entry->accessing, 1);
 		locker.UnlockNow();
 		result = entry->interface->Control(op, data, length);
-		--entry->accessing;
+		atomic_add(entry->accessing, -1);
 	}
 	
 	return result;
@@ -666,7 +609,7 @@ PPPManager::EntryFor(ppp_interface_id ID, int32 *saveIndex = NULL) const
 	ppp_interface_entry *entry;
 	for(int32 index = 0; index < fEntries.CountItems(); index++) {
 		entry = fEntries.ItemAt(index);
-		if(entry && entry->interface && entry->interface->ID() == ID) {
+		if(entry && entry->interface->ID() == ID) {
 			if(saveIndex)
 				*saveIndex = index;
 			return entry;
@@ -688,7 +631,7 @@ PPPManager::EntryFor(ifnet *ifp, int32 *saveIndex = NULL) const
 	ppp_interface_entry *entry;
 	for(int32 index = 0; index < fEntries.CountItems(); index++) {
 		entry = fEntries.ItemAt(index);
-		if(entry && entry->interface && entry->interface->Ifnet() == ifp) {
+		if(entry && entry->interface->Ifnet() == ifp) {
 			if(saveIndex)
 				*saveIndex = index;
 			return entry;
@@ -732,8 +675,7 @@ PPPManager::EntryFor(const driver_settings *settings) const
 	ppp_interface_entry *entry;
 	for(int32 index = 0; index < fEntries.CountItems(); index++) {
 		entry = fEntries.ItemAt(index);
-		if(entry && entry->interface
-				&& equal_interface_settings(entry->interface->Settings(), settings))
+		if(entry && equal_interface_settings(entry->interface->Settings(), settings))
 			return entry;
 	}
 	
@@ -754,8 +696,7 @@ PPPManager::SettingsChanged()
 		return;
 	
 	ppp_interface_entry *entry = EntryFor(fDefaultInterface);
-	if(entry && entry->interface
-			&& entry->interface->StateMachine().Phase() == PPP_DOWN_PHASE)
+	if(entry && entry->interface->StateMachine().Phase() == PPP_DOWN_PHASE)
 		DeleteInterface(entry->interface->ID());
 	
 	free(fDefaultInterface);
@@ -767,7 +708,7 @@ PPPManager::SettingsChanged()
 	fDefaultInterface = strdup(name);
 	ppp_interface_id id = CreateInterfaceWithName(name);
 	entry = EntryFor(id);
-	if(entry && entry->interface)
+	if(entry)
 		entry->interface->SetConnectOnDemand(true);
 }
 
@@ -782,8 +723,8 @@ greater(const void *a, const void *b)
 
 // used by the public CreateInterface() methods
 ppp_interface_id
-PPPManager::_CreateInterface(const char *name, const driver_settings *settings,
-	const driver_settings *profile, ppp_interface_id parentID)
+PPPManager::_CreateInterface(const char *name,
+	const driver_settings *settings, ppp_interface_id parentID)
 {
 	TRACE("PPPManager: CreateInterface(%s)\n", name ? name : "Unnamed");
 	
@@ -800,77 +741,27 @@ PPPManager::_CreateInterface(const char *name, const driver_settings *settings,
 	
 	// check if we already have an entry for the named interface
 	ppp_interface_entry *entry = EntryFor(name);
-	if(entry) {
-		if(entry->interface)
-			return entry->interface->ID();
-				// already existing interfaces do not need a PPP team
-		
-		++entry->accessing;
-		
-		thread_info info;
-		if(get_thread_info(entry->requestThread, &info) != B_OK)
-			entry->requestThread = -1;
-		else {
-			// test if app is responsive (i.e.: it reacts in at most 0.5secs)
-			thread_id sender;
-			int32 code;
-			if(send_data_with_timeout(entry->requestThread, PPP_RESPONSE_TEST_CODE,
-						NULL, 0, PPP_REPORT_TIMEOUT) != B_OK
-					|| receive_data_with_timeout(&sender, &code, NULL, 0, 500)
-						!= B_OK || code != B_OK) {
-				entry->requestThread = -1;
-				kill_team(info.team);
-			}
-		}
-	} else {
-		entry = new ppp_interface_entry;
-		entry->name = name ? strdup(name) : NULL;
-		entry->accessing = 1;
-		entry->requestThread = -1;
-		fEntries.AddItem(entry);
-			// nothing bad can happen because we are in a locked section
-	}
+	if(entry)
+		return entry->interface->ID();
 	
+	entry = new ppp_interface_entry;
+	entry->name = name ? strdup(name) : NULL;
+	entry->accessing = 1;
 	entry->deleting = false;
+	entry->requestThread = -1;
+	fEntries.AddItem(entry);
+		// nothing bad can happen because we are in a locked section
 	
-	new KPPPInterface(name, entry, id, settings, profile,
+	new KPPPInterface(name, entry, id, settings,
 		parentEntry ? parentEntry->interface : NULL);
 			// KPPPInterface will add itself to the entry (no need to do it here)
 	if(entry->interface->InitCheck() != B_OK) {
-		// use safe code because entry might have existed before this method call
-		--entry->accessing;
-		entry->deleting = true;
-		if(entry->accessing > 0)
-			return PPP_UNDEFINED_INTERFACE_ID;
-		
-		free(entry->name);
 		delete entry->interface;
+		free(entry->name);
 		fEntries.RemoveItem(entry);
 		delete entry;
 		return PPP_UNDEFINED_INTERFACE_ID;
 	}
-	
-	// run ppp_up and enable reports for the request window (DONE?)
-	if(entry->requestThread < 0 && name) {
-		const char *argv[] = { "/boot/beos/bin/ppp_up", name, NULL };
-		const char *env[] = { NULL };
-		thread_id app = load_image(2, argv, env);
-		if(app < 0)
-			ERROR("KPPPInterface::Up(): Error: could not load ppp_up!\n");
-		resume_thread(app);
-		
-		// XXX: Sending to a thread does not work immediately. So, we wait...
-		snooze(150000);
-		
-		if(send_data(app, 0, &id, sizeof(id)) < B_OK)
-			ERROR("KPPPInterface::Up(): Error: could not send to ppp_up!\n");
-		
-		// register the request thread as a report receiver
-		receive_data(&entry->requestThread, NULL, 0);
-	}
-	if(entry->requestThread >= 0)
-		entry->interface->ReportManager().EnableReports(PPP_CONNECTION_REPORT,
-			entry->requestThread, PPP_WAIT_FOR_REPLY | PPP_NO_REPLY_TIMEOUT);
 	
 	locker.UnlockNow();
 		// it is safe to access the manager from userland now
@@ -878,7 +769,7 @@ PPPManager::_CreateInterface(const char *name, const driver_settings *settings,
 	if(!Report(PPP_MANAGER_REPORT, PPP_REPORT_INTERFACE_CREATED,
 			&id, sizeof(ppp_interface_id))) {
 		DeleteInterface(id);
-		--entry->accessing;
+		atomic_add(entry->accessing, -1);
 		return PPP_UNDEFINED_INTERFACE_ID;
 	}
 	
@@ -886,7 +777,7 @@ PPPManager::_CreateInterface(const char *name, const driver_settings *settings,
 	entry->interface->StateMachine().DownProtocols();
 	entry->interface->StateMachine().ResetLCPHandlers();
 	
-	--entry->accessing;
+	atomic_add(entry->accessing, -1);
 	
 	return id;
 }
@@ -901,7 +792,7 @@ PPPManager::FindUnit() const
 	ppp_interface_entry *entry;
 	for(int32 index = 0; index < fEntries.CountItems(); index++) {
 		entry = fEntries.ItemAt(index);
-		if(entry && entry->interface && entry->interface->Ifnet())
+		if(entry && entry->interface->Ifnet())
 			units[index] = entry->interface->Ifnet()->if_unit;
 		else
 			units[index] = -1;
@@ -933,39 +824,21 @@ PPPManager::DeleterThreadEvent()
 	ppp_interface_entry *entry;
 	for(int32 index = 0; index < fEntries.CountItems(); index++) {
 		entry = fEntries.ItemAt(index);
-		if(!entry) {
+		if(entry && entry->deleting && entry->accessing <= 0) {
+			delete entry->interface;
 			fEntries.RemoveItem(index);
 			--index;
-			continue;
-		}
-		
-		if(entry->deleting && entry->accessing <= 0) {
-			// XXX: check twice if it is safe to delete the interface
-			// such that it is reused by _CreateInterface()
-			delete entry->interface;
-			entry->interface = NULL;
-			
-			// only remove entries that do not have ppp_up associated with them
-			if(entry->requestThread >= 0) {
-				thread_info info;
-				if(get_thread_info(entry->requestThread, &info) == B_OK)
-					continue;
-			}
 			
 			// recreate default interface
 			if(entry->name && fDefaultInterface &&
 					!strcmp(entry->name, fDefaultInterface)) {
+				free(fDefaultInterface);
+				fDefaultInterface = NULL;
 				SettingsChanged();
-				CreateInterfaceWithName(fDefaultInterface);
-				if(entry->interface)
-					entry->interface->SetConnectOnDemand(true);
-				continue;
 			}
 			
 			free(entry->name);
 			delete entry;
-			fEntries.RemoveItem(index);
-			--index;
 		}
 	}
 }
@@ -979,7 +852,7 @@ PPPManager::Pulse()
 	ppp_interface_entry *entry;
 	for(int32 index = 0; index < fEntries.CountItems(); index++) {
 		entry = fEntries.ItemAt(index);
-		if(entry && entry->interface)
+		if(entry)
 			entry->interface->Pulse();
 	}
 }

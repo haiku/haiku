@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -84,7 +84,6 @@ PAP::PAP(KPPPInterface& interface, driver_parameter *settings)
 	fNextTimeout(0),
 	fLock("PAP")
 {
-	ProfileChanged();
 }
 
 
@@ -100,13 +99,6 @@ PAP::InitCheck() const
 		return B_ERROR;
 	
 	return KPPPProtocol::InitCheck();
-}
-
-
-void
-PAP::ProfileChanged()
-{
-	ParseSettings(Interface().Profile().SettingsFor("authenticator", "pap"));
 }
 
 
@@ -262,36 +254,6 @@ PAP::Pulse()
 }
 
 
-bool
-PAP::ParseSettings(const driver_parameter *requests)
-{
-	memset(fUser, 0, sizeof(fUser));
-	memset(fPassword, 0, sizeof(fPassword));
-	
-	if(!requests)
-		return false;
-	
-	// The following values are allowed:
-	//  "User"
-	//  "Password"
-	
-	for(int32 index = 0; index < requests->parameter_count; index++) {
-		if(requests->parameters[index].value_count == 0)
-			continue;
-		
-		// ignore user and password if too long (255 chars at max)
-		if(!strcasecmp(requests->parameters[index].name, "User")
-				&& strlen(requests->parameters[index].values[0]) < sizeof(fUser))
-			strcpy(fUser, requests->parameters[index].values[0]);
-		else if(!strcasecmp(requests->parameters[index].name, "Password")
-				&& strlen(requests->parameters[index].values[0]) < sizeof(fPassword))
-			strcpy(fPassword, requests->parameters[index].values[0]);
-	}
-	
-	return true;
-}
-
-
 uint8
 PAP::NextID()
 {
@@ -359,9 +321,11 @@ PAP::TOBadEvent()
 			NewState(INITIAL);
 			locker.UnlockNow();
 			if(State() == REQ_SENT)
-				Interface().StateMachine().LocalAuthenticationDenied(fUser);
+				Interface().StateMachine().LocalAuthenticationDenied(
+					Interface().Username());
 			else
-				Interface().StateMachine().PeerAuthenticationDenied(fUser);
+				Interface().StateMachine().PeerAuthenticationDenied(
+					Interface().Username());
 			
 			UpFailedEvent();
 		break;
@@ -391,11 +355,14 @@ PAP::RREvent(struct mbuf *packet)
 		return;
 	}
 	
-	char *user = (char*) userLength + 1, *password = (char*) passwordLength + 1;
+	char *peerUsername = (char*) userLength + 1,
+		*peerPassword = (char*) passwordLength + 1;
+	const char *username = Interface().Username(), *password = Interface().Password();
 	
-	if(*userLength == strlen(fUser) && *passwordLength == strlen(fPassword)
-			&& !strncmp(user, fUser, *userLength)
-			&& !strncmp(password, fPassword, *passwordLength)) {
+	
+	if(*userLength == strlen(username) && *passwordLength == strlen(password)
+			&& !strncmp(peerUsername, username, *userLength)
+			&& !strncmp(peerPassword, password, *passwordLength)) {
 		NewState(ACCEPTED);
 		locker.UnlockNow();
 		Interface().StateMachine().PeerAuthenticationAccepted(user);
@@ -430,7 +397,8 @@ PAP::RAEvent(struct mbuf *packet)
 		case REQ_SENT:
 			NewState(ACCEPTED);
 			locker.UnlockNow();
-			Interface().StateMachine().LocalAuthenticationAccepted(fUser);
+			Interface().StateMachine().LocalAuthenticationAccepted(
+				Interface().Username());
 			UpEvent();
 		break;
 		
@@ -461,7 +429,8 @@ PAP::RNEvent(struct mbuf *packet)
 		case REQ_SENT:
 			NewState(INITIAL);
 			locker.UnlockNow();
-			Interface().StateMachine().LocalAuthenticationDenied(fUser);
+			Interface().StateMachine().LocalAuthenticationDenied(
+				Interface().Username());
 			UpFailedEvent();
 		break;
 		
@@ -494,7 +463,9 @@ PAP::SendRequest()
 	if(!packet)
 		return false;
 	
-	packet->m_pkthdr.len = packet->m_len = 6 + strlen(fUser) + strlen(fPassword);
+	const char *username = Interface().Username(), *password = Interface().Password();
+	
+	packet->m_pkthdr.len = packet->m_len = 6 + strlen(username) + strlen(password);
 	
 	// reserve some space for overhead (we are lazy and reserve too much)
 	packet->m_data += Interface().PacketOverhead();
@@ -504,10 +475,10 @@ PAP::SendRequest()
 	request->id = fRequestID = NextID();
 	request->length = htons(packet->m_len);
 	uint8 *data = request->data;
-	data[0] = strlen(fUser);
-	memcpy(data + 1, fUser, strlen(fUser));
-	data[1 + data[0]] = strlen(fPassword);
-	memcpy(data + 2 + data[0], fPassword, strlen(fPassword));
+	data[0] = strlen(username);
+	memcpy(data + 1, username, strlen(username));
+	data[1 + data[0]] = strlen(password);
+	memcpy(data + 2 + data[0], password, strlen(password));
 	
 	return Interface().Send(packet, PAP_PROTOCOL) == B_OK;
 }

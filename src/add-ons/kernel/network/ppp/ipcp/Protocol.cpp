@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -75,7 +75,20 @@ IPCP::IPCP(KPPPInterface& interface, driver_parameter *settings)
 	fNextTimeout(0),
 	fLock("IPCP")
 {
-	ProfileChanged();
+	// reset configurations
+	memset(&fLocalConfiguration, 0, sizeof(ipcp_configuration));
+	memset(&fPeerConfiguration, 0, sizeof(ipcp_configuration));
+	
+	// reset requests
+	memset(&fLocalRequests, 0, sizeof(ipcp_requests));
+	memset(&fPeerRequests, 0, sizeof(ipcp_requests));
+	
+	// Parse settings:
+	// "Local" and "Peer" describe each side's settings
+	ParseSideRequests(get_parameter_with_name(IPCP_LOCAL_SIDE_KEY, Settings()),
+		PPP_LOCAL_SIDE);
+	ParseSideRequests(get_parameter_with_name(IPCP_PEER_SIDE_KEY, Settings()),
+		PPP_PEER_SIDE);
 	
 #if DEBUG
 	sFD = open("/boot/home/ipcpdebug", O_WRONLY | O_CREAT | O_TRUNC);
@@ -125,28 +138,6 @@ IPCP::StackControl(uint32 op, void *data)
 	}
 	
 	return B_OK;
-}
-
-
-void
-IPCP::ProfileChanged()
-{
-	// reset configurations
-	memset(&fLocalConfiguration, 0, sizeof(ipcp_configuration));
-	memset(&fPeerConfiguration, 0, sizeof(ipcp_configuration));
-	
-	// reset requests
-	memset(&fLocalRequests, 0, sizeof(ipcp_requests));
-	memset(&fPeerRequests, 0, sizeof(ipcp_requests));
-	
-	// Parse settings:
-	// "Local" and "Peer" describe each side's settings
-	const driver_parameter *profile
-		= Interface().Profile().SettingsFor("protocol", "ipcp");
-	ParseSideRequests(get_parameter_with_name(IPCP_LOCAL_SIDE_KEY, profile),
-		PPP_LOCAL_SIDE);
-	ParseSideRequests(get_parameter_with_name(IPCP_PEER_SIDE_KEY, profile),
-		PPP_PEER_SIDE);
 }
 
 

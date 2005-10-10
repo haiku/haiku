@@ -159,6 +159,7 @@ class KPPPStateMachine {
 		
 		vint32 fID;
 		uint32 fMagicNumber;
+		int32 fLastConnectionReportCode;
 		
 		ppp_authentication_status fLocalAuthenticationStatus,
 			fPeerAuthenticationStatus;

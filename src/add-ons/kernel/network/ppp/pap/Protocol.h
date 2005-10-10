@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -54,8 +54,6 @@ class PAP : public KPPPProtocol {
 		pap_state State() const
 			{ return fState; }
 		
-		virtual void ProfileChanged();
-		
 		virtual bool Up();
 		virtual bool Down();
 		
@@ -64,8 +62,6 @@ class PAP : public KPPPProtocol {
 		virtual void Pulse();
 
 	private:
-		bool ParseSettings(const driver_parameter *settings);
-		
 		// for state machine
 		void NewState(pap_state next);
 		uint8 NextID();
@@ -88,8 +84,6 @@ class PAP : public KPPPProtocol {
 		bool SendNak(struct mbuf *packet);
 
 	private:
-		char fUser[256], fPassword[256];
-		
 		// for state machine
 		pap_state fState;
 		vint32 fID;

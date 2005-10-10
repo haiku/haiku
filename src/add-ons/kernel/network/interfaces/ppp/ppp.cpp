@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <Waldemar.Kornewald@web.de>
  * Distributed under the terms of the MIT License.
  */
 
@@ -86,11 +86,10 @@ ppp_control(uint32 op, void *data, size_t length)
 
 static
 ppp_interface_id
-CreateInterface(const driver_settings *settings, const driver_settings *profile,
-	ppp_interface_id parent)
+CreateInterface(const driver_settings *settings, ppp_interface_id parent)
 {
 	if(sManager)
-		return sManager->CreateInterface(settings, profile, parent);
+		return sManager->CreateInterface(settings, parent);
 	else
 		return PPP_UNDEFINED_INTERFACE_ID;
 }
@@ -98,11 +97,10 @@ CreateInterface(const driver_settings *settings, const driver_settings *profile,
 
 static
 ppp_interface_id
-CreateInterfaceWithName(const char *name, const driver_settings *profile,
-	ppp_interface_id parent)
+CreateInterfaceWithName(const char *name, ppp_interface_id parent)
 {
 	if(sManager)
-		return sManager->CreateInterfaceWithName(name, profile, parent);
+		return sManager->CreateInterfaceWithName(name, parent);
 	else
 		return PPP_UNDEFINED_INTERFACE_ID;
 }

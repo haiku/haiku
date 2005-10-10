@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -39,16 +39,13 @@ class IPCPAddon : public DialUpAddon {
 		
 		BMessage *Settings() const
 			{ return fSettings; }
-		BMessage *Profile() const
-			{ return fProfile; }
 		
 		virtual int32 Position() const
 			{ return 10; }
 		
-		virtual bool LoadSettings(BMessage *settings, BMessage *profile, bool isNew);
-		virtual void IsModified(bool *settings, bool *profile) const;
-		virtual bool SaveSettings(BMessage *settings, BMessage *profile,
-			bool saveTemporary);
+		virtual bool LoadSettings(BMessage *settings, bool isNew);
+		virtual void IsModified(bool *settings) const;
+		virtual bool SaveSettings(BMessage *settings);
 		virtual bool GetPreferredSize(float *width, float *height) const;
 		virtual BView *CreateView(BPoint leftTop);
 
@@ -58,7 +55,7 @@ class IPCPAddon : public DialUpAddon {
 	private:
 		bool fIsNew, fIsEnabled, fDeleteView;
 		BString fIPAddress, fPrimaryDNS, fSecondaryDNS;
-		BMessage *fSettings, *fProfile;
+		BMessage *fSettings;
 			// saves last settings state
 		IPCPView *fIPCPView;
 };

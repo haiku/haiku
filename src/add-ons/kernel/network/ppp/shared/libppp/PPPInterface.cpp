@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -140,6 +140,42 @@ PPPInterface::Control(uint32 op, void *data, size_t length) const
 }
 
 
+//!	Sets the username used for authentication.
+bool
+PPPInterface::SetUsername(const char *username) const
+{
+	if(InitCheck() != B_OK || !username)
+		return false;
+	
+	return Control(PPPC_SET_USERNAME, const_cast<char*>(username), strlen(username))
+		== B_OK;
+}
+
+
+//!	Sets the password used for authentication.
+bool
+PPPInterface::SetPassword(const char *password) const
+{
+	if(InitCheck() != B_OK || !password)
+		return false;
+	
+	return Control(PPPC_SET_PASSWORD, const_cast<char*>(password), strlen(password))
+		== B_OK;
+}
+
+
+//!	Sets whether a request window should be shown before connecting.
+bool
+PPPInterface::SetAskBeforeConnecting(bool askBeforeConnecting) const
+{
+	if(InitCheck() != B_OK)
+		return false;
+	
+	uint32 value = askBeforeConnecting ? 1 : 0;
+	return Control(PPPC_SET_ASK_BEFORE_CONNECTING, &value, sizeof(value)) == B_OK;
+}
+
+
 /*!	\brief Find BEntry to the interface settings that this object represents.
 	
 	\param entry The entry gets stored in this argument.
@@ -209,23 +245,6 @@ PPPInterface::HasSettings(const driver_settings *settings) const
 		return true;
 	
 	return false;
-}
-
-
-/*!	\brief Changes the current interface profile.
-	
-	You may change the interface's profile at any time. The changes take effect when
-	the interface connects.
-	
-	\param profile The new profile.
-*/
-void
-PPPInterface::SetProfile(const driver_settings *profile) const
-{
-	if(InitCheck() != B_OK || !profile)
-		return;
-	
-	Control(PPPC_SET_PROFILE, const_cast<driver_settings*>(profile), 0);
 }
 
 

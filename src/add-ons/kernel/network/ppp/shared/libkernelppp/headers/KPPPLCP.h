@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Haiku Inc.
+ * Copyright 2003-2005, Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 
@@ -81,8 +81,6 @@ class KPPPLCP : public KPPPProtocol {
 		
 		uint32 AdditionalOverhead() const;
 			// the overhead caused by the target, the device, and the interface
-		
-		virtual void ProfileChanged();
 		
 		virtual bool Up();
 		virtual bool Down();

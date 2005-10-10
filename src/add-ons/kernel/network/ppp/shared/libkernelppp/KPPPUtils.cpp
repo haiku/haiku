@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -48,8 +48,9 @@ status_t
 receive_data_with_timeout(thread_id *sender, int32 *code, void *buffer,
 	size_t buffer_size, uint32 timeout)
 {
+	thread_id me = find_thread(NULL);
 	for(uint32 tries = 0; tries < timeout; tries += 5) {
-		if(!has_data(find_thread(NULL)))
+		if(!has_data(me))
 			snooze(5000);
 		else
 			break;

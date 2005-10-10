@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -20,6 +20,7 @@
 #include <KPPPOptionHandler.h>
 
 #include <LockerHelper.h>
+#include <KPPPUtils.h>
 
 #include <net/if.h>
 #include <core_funcs.h>
@@ -37,6 +38,7 @@ KPPPStateMachine::KPPPStateMachine(KPPPInterface& interface)
 	fPhase(PPP_DOWN_PHASE),
 	fID(system_time() & 0xFF),
 	fMagicNumber(0),
+	fLastConnectionReportCode(PPP_REPORT_DOWN_SUCCESSFUL),
 	fLocalAuthenticationStatus(PPP_NOT_AUTHENTICATED),
 	fPeerAuthenticationStatus(PPP_NOT_AUTHENTICATED),
 	fLocalAuthenticationName(NULL),
@@ -129,6 +131,11 @@ KPPPStateMachine::NewPhase(ppp_phase next)
 		if(Interface().Ifnet())
 			Interface().Ifnet()->if_flags |= IFF_UP | IFF_RUNNING;
 		
+		Interface().fConnectAttempt = 0;
+			// when we Reconnect() this becomes 1 (the first connection attempt)
+		send_data_with_timeout(Interface().fReconnectThread, 0, NULL, 0, 200);
+			// abort possible reconnect attempt
+		fLastConnectionReportCode = PPP_REPORT_UP_SUCCESSFUL;
 		Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_UP_SUCCESSFUL,
 			&fInterface.fID, sizeof(ppp_interface_id));
 	}
@@ -230,8 +237,9 @@ KPPPStateMachine::LocalAuthenticationRequested()
 	
 	LockerHelper locker(fLock);
 	
+	fLastConnectionReportCode = PPP_REPORT_AUTHENTICATION_REQUESTED;
 	Interface().Report(PPP_CONNECTION_REPORT,
-		PPP_REPORT_LOCAL_AUTHENTICATION_REQUESTED, &fInterface.fID,
+		PPP_REPORT_AUTHENTICATION_REQUESTED, &fInterface.fID,
 		sizeof(ppp_interface_id));
 	
 	fLocalAuthenticationStatus = PPP_AUTHENTICATING;
@@ -260,10 +268,6 @@ KPPPStateMachine::LocalAuthenticationAccepted(const char *name)
 		fLocalAuthenticationName = strdup(name);
 	else
 		fLocalAuthenticationName = NULL;
-	
-	Interface().Report(PPP_CONNECTION_REPORT,
-		PPP_REPORT_LOCAL_AUTHENTICATION_SUCCESSFUL, &fInterface.fID,
-		sizeof(ppp_interface_id));
 }
 
 
@@ -300,8 +304,9 @@ KPPPStateMachine::PeerAuthenticationRequested()
 	
 	LockerHelper locker(fLock);
 	
+	fLastConnectionReportCode = PPP_REPORT_AUTHENTICATION_REQUESTED;
 	Interface().Report(PPP_CONNECTION_REPORT,
-		PPP_REPORT_PEER_AUTHENTICATION_REQUESTED, &fInterface.fID,
+		PPP_REPORT_AUTHENTICATION_REQUESTED, &fInterface.fID,
 		sizeof(ppp_interface_id));
 	
 	fPeerAuthenticationStatus = PPP_AUTHENTICATING;
@@ -330,10 +335,6 @@ KPPPStateMachine::PeerAuthenticationAccepted(const char *name)
 		fPeerAuthenticationName = strdup(name);
 	else
 		fPeerAuthenticationName = NULL;
-	
-	Interface().Report(PPP_CONNECTION_REPORT,
-		PPP_REPORT_PEER_AUTHENTICATION_SUCCESSFUL, &fInterface.fID,
-		sizeof(ppp_interface_id));
 }
 
 
@@ -560,6 +561,7 @@ KPPPStateMachine::UpFailedEvent()
 	
 	switch(State()) {
 		case PPP_STARTING_STATE:
+			fLastConnectionReportCode = PPP_REPORT_DEVICE_UP_FAILED;
 			Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_DEVICE_UP_FAILED,
 				&fInterface.fID, sizeof(ppp_interface_id));
 			if(Interface().Parent())
@@ -696,29 +698,32 @@ KPPPStateMachine::DownEvent()
 	
 	// maybe we need to reconnect
 	if(State() == PPP_STARTING_STATE) {
-		bool needsReconnect = false;
+		bool deleteInterface = false, retry = false;
 		
 		// we do not try to reconnect if authentication failed
 		if(fLocalAuthenticationStatus == PPP_AUTHENTICATION_FAILED
-				|| fLocalAuthenticationStatus == PPP_AUTHENTICATING)
+				|| fLocalAuthenticationStatus == PPP_AUTHENTICATING
+				|| fPeerAuthenticationStatus == PPP_AUTHENTICATION_FAILED
+				|| fPeerAuthenticationStatus == PPP_AUTHENTICATING) {
+			fLastConnectionReportCode = PPP_REPORT_AUTHENTICATION_FAILED;
 			Interface().Report(PPP_CONNECTION_REPORT,
-				PPP_REPORT_LOCAL_AUTHENTICATION_FAILED, &fInterface.fID,
+				PPP_REPORT_AUTHENTICATION_FAILED, &fInterface.fID,
 				sizeof(ppp_interface_id));
-		else if(fPeerAuthenticationStatus == PPP_AUTHENTICATION_FAILED
-				|| fPeerAuthenticationStatus == PPP_AUTHENTICATING)
-			Interface().Report(PPP_CONNECTION_REPORT,
-				PPP_REPORT_PEER_AUTHENTICATION_FAILED, &fInterface.fID,
-				sizeof(ppp_interface_id));
-		else {
-			// if we are going up and lost connection the reconnect attempt becomes
-			// a connect retry which is managed by the main thread in Interface::Up()
-			if(Interface().fUpThread == -1)
-				needsReconnect = true;
+			deleteInterface = true;
+		} else {
+			if(Interface().fConnectAttempt > (Interface().fConnectRetriesLimit + 1))
+				deleteInterface = true;
 			
-			// test if UpFailedEvent() was not called
-			if(oldPhase != PPP_DOWN_PHASE)
+			if(oldPhase == PPP_DOWN_PHASE) {
+				// failed to bring device up (UpFailedEvent() was called)
+				retry = true;
+					// this may have been overridden by "deleteInterface = true"
+			} else {
+				// lost connection (TLFNotify() was called)
+				fLastConnectionReportCode = PPP_REPORT_CONNECTION_LOST;
 				Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_CONNECTION_LOST,
 					&fInterface.fID, sizeof(ppp_interface_id));
+			}
 		}
 		
 		if(Interface().Parent())
@@ -726,15 +731,14 @@ KPPPStateMachine::DownEvent()
 		
 		NewState(PPP_INITIAL_STATE);
 		
-		if(Interface().DoesAutoReconnect()) {
-			if(needsReconnect)
-				Interface().Reconnect(Interface().ReconnectDelay());
-		} else
+		if(!deleteInterface && (retry || Interface().DoesAutoReconnect()))
+			Interface().Reconnect(Interface().ReconnectDelay());
+		else
 			Interface().Delete();
 	} else {
+		fLastConnectionReportCode = PPP_REPORT_DOWN_SUCCESSFUL;
 		Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_DOWN_SUCCESSFUL,
 			&fInterface.fID, sizeof(ppp_interface_id));
-		
 		Interface().Delete();
 	}
 	
@@ -759,9 +763,9 @@ KPPPStateMachine::OpenEvent()
 	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
-			if(!Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_GOING_UP,
-					&fInterface.fID, sizeof(ppp_interface_id)))
-				return;
+			fLastConnectionReportCode = PPP_REPORT_GOING_UP;
+			Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_GOING_UP,
+					&fInterface.fID, sizeof(ppp_interface_id))
 			
 			if(Interface().Mode() == PPP_SERVER_MODE) {
 				NewPhase(PPP_ESTABLISHMENT_PHASE);
@@ -773,14 +777,9 @@ KPPPStateMachine::OpenEvent()
 			} else
 				NewState(PPP_STARTING_STATE);
 			
-			if(Interface().IsMultilink() && !Interface().Parent()) {
-				NewPhase(PPP_ESTABLISHMENT_PHASE);
-				for(int32 index = 0; index < Interface().CountChildren(); index++)
-					if(Interface().ChildAt(index)->Mode() == Interface().Mode())
-						Interface().ChildAt(index)->StateMachine().OpenEvent();
-			} else {
+			if(Interface().fAskBeforeConnecting == false) {
 				locker.UnlockNow();
-				ThisLayerStarted();
+				ContinueOpenEvent();
 			}
 		break;
 		
@@ -804,6 +803,22 @@ KPPPStateMachine::OpenEvent()
 		default:
 			;
 	}
+}
+
+
+void
+KPPPStateMachine::ContinueOpenEvent()
+{
+	TRACE("KPPPSM: ContinueOpenEvent() state=%d phase=%d\n", State(), Phase());
+	
+	if(Interface().IsMultilink() && !Interface().Parent()) {
+		LockerHelper locker(fLock);
+		NewPhase(PPP_ESTABLISHMENT_PHASE);
+		for(int32 index = 0; index < Interface().CountChildren(); index++)
+			if(Interface().ChildAt(index)->Mode() == Interface().Mode())
+				Interface().ChildAt(index)->StateMachine().OpenEvent();
+	} else
+		ThisLayerStarted();
 }
 
 
@@ -1560,11 +1575,11 @@ KPPPStateMachine::RCREvent(struct mbuf *packet)
 		}
 	}
 	
-	if(nak.CountItems() > 0) {
-		RCRBadEvent(nak.ToMbuf(Interface().MRU(), LCP().AdditionalOverhead()), NULL);
-		m_freem(packet);
-	} else if(reject.CountItems() > 0) {
+	if(reject.CountItems() > 0) {
 		RCRBadEvent(NULL, reject.ToMbuf(Interface().MRU(), LCP().AdditionalOverhead()));
+		m_freem(packet);
+	} else if(nak.CountItems() > 0) {
+		RCRBadEvent(nak.ToMbuf(Interface().MRU(), LCP().AdditionalOverhead()), NULL);
 		m_freem(packet);
 	} else
 		RCRGoodEvent(packet);

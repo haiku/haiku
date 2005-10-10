@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -51,19 +51,6 @@ status_t
 KPPPLayer::InitCheck() const
 {
 	return fInitStatus;
-}
-
-
-/*!	\brief Notification hook when the interface profile changes dynamically.
-	
-	You should override this method to update your profile settings if this layer
-	has such settings at all. This is mostly used by authenticators and possibly
-	protocols.
-*/
-void
-KPPPLayer::ProfileChanged()
-{
-	// do nothing by default
 }
 
 

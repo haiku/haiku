@@ -1,12 +1,12 @@
 /*
- * Copyright 2003-2004, Haiku Inc.
+ * Copyright 2003-2005, Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 
 /*!	\class DialUpAddon
 	\brief Base class for DialUpPreflet add-ons.
 	
-	Connect-Up add-ons must export the following function: \n
+	DialUp add-ons must export the following function: \n
 	bool register(BMessage *addons) \n
 	You should add your DialUpAddon object to the given BMessage. \n
 	\n
@@ -68,32 +68,22 @@ class DialUpAddon {
 		virtual int32 Priority() const
 			{ return 0; }
 		
-		/*!	\brief Load the given settings and profile.
+		/*!	\brief Load the given settings.
 			
 			\param isNew Specifies if this is a newly created interface.
 			
 			\return \c true if loading was successful or \c false otherwise.
 		*/
-		virtual bool LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
+		virtual bool LoadSettings(BMessage *settings, bool isNew)
 			{ return false; }
-		/*!	\brief Returns if this module has a temporary profile.
-			
-			A temporary profile is never stored on the hard-disk, but only passed
-			to the interface on connection. This can include passwords, for example.
-		*/
-		virtual bool HasTemporaryProfile() const
-			{ return false; }
-		//!	Are the settings or the profile modified?
-		virtual void IsModified(bool *settings, bool *profile) const
-			{ *settings = *profile = false; }
-		/*!	\brief Save the given settings and profile.
-			
-			\param saveTemporary Specifies if the temporary profile should be written.
+		//!	Are the settings modified?
+		virtual void IsModified(bool *settings) const
+			{ *settings = false; }
+		/*!	\brief Save the given settings.
 			
 			\return \c true if saving was successful or \c false otherwise.
 		*/
-		virtual bool SaveSettings(BMessage *settings, BMessage *profile,
-				bool saveTemporary)
+		virtual bool SaveSettings(BMessage *settings)
 			{ return false; }
 		/*!	\brief Get the preferred view size.
 			

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -20,21 +20,14 @@
 static const uint32 kMsgUpdateControls = 'UCTL';
 
 // labels
-#ifdef LANG_GERMAN
-static const char *kLabelConnectionOptions = "Optionen";
-static const char *kLabelAskBeforeConnecting = "Vor Dem Verbinden Fragen";
-static const char *kLabelAutoReconnect = "Verbindung Automatisch Wiederherstellen";
-#else
 static const char *kLabelConnectionOptions = "Options";
 static const char *kLabelAskBeforeConnecting = "Ask Before Connecting";
 static const char *kLabelAutoReconnect = "Reconnect Automatically";
-#endif
 
 
 ConnectionOptionsAddon::ConnectionOptionsAddon(BMessage *addons)
 	: DialUpAddon(addons),
 	fSettings(NULL),
-	fProfile(NULL),
 	fConnectionOptionsView(NULL)
 {
 	CreateView(BPoint(0,0));
@@ -50,17 +43,16 @@ ConnectionOptionsAddon::~ConnectionOptionsAddon()
 
 
 bool
-ConnectionOptionsAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
+ConnectionOptionsAddon::LoadSettings(BMessage *settings, bool isNew)
 {
 	fIsNew = isNew;
 	fAskBeforeConnecting = fDoesAutoReconnect = false;
 	fSettings = settings;
-	fProfile = profile;
 	
 	fConnectionOptionsView->Reload();
 		// reset all views (empty settings)
 	
-	if(!settings || !profile || isNew)
+	if(!settings || isNew)
 		return true;
 	
 	BMessage parameter;
@@ -93,9 +85,9 @@ ConnectionOptionsAddon::LoadSettings(BMessage *settings, BMessage *profile, bool
 
 
 void
-ConnectionOptionsAddon::IsModified(bool *settings, bool *profile) const
+ConnectionOptionsAddon::IsModified(bool *settings) const
 {
-	*settings = *profile = false;
+	*settings = false;
 	
 	if(!fSettings || !fConnectionOptionsView)
 		return;
@@ -106,8 +98,7 @@ ConnectionOptionsAddon::IsModified(bool *settings, bool *profile) const
 
 
 bool
-ConnectionOptionsAddon::SaveSettings(BMessage *settings, BMessage *profile,
-	bool saveTemporary)
+ConnectionOptionsAddon::SaveSettings(BMessage *settings)
 {
 	if(!fSettings || !settings)
 		return false;

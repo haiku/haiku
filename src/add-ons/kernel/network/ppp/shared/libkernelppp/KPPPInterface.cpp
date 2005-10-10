@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -66,8 +66,6 @@ status_t reconnect_thread(void *data);
 
 // other functions
 status_t interface_deleter_thread(void *data);
-status_t call_open_event_thread(void *data);
-status_t call_close_event_thread(void *data);
 
 
 /*!	\brief Creates a new interface.
@@ -76,23 +74,17 @@ status_t call_close_event_thread(void *data);
 	\param entry The PPP manager passes an internal structure to the constructor.
 	\param ID The interface's ID.
 	\param settings (Optional): If no name is given you must pass the settings here.
-	\param profile (Optional): Overriding profile for this interface.
 	\param parent (Optional): Interface's parent (only used for multilink interfaces).
-	
-	\sa KPPPProfile
 */
 KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 		ppp_interface_id ID, const driver_settings *settings,
-		const driver_settings *profile, KPPPInterface *parent = NULL)
+		KPPPInterface *parent = NULL)
 	: KPPPLayer(name, PPP_INTERFACE_LEVEL, 2),
 	fID(ID),
 	fSettings(NULL),
 	fIfnet(NULL),
-	fUpThread(-1),
-	fOpenEventThread(-1),
-	fCloseEventThread(-1),
 	fReconnectThread(-1),
-	fConnectRetry(0),
+	fConnectAttempt(1),
 	fConnectRetriesLimit(0),
 	fManager(NULL),
 	fConnectedSince(0),
@@ -104,6 +96,7 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 	fIsMultilink(false),
 	fAutoReconnect(false),
 	fConnectOnDemand(false),
+	fAskBeforeConnecting(false),
 	fMode(PPP_CLIENT_MODE),
 	fLocalPFCState(PPP_PFC_DISABLED),
 	fPeerPFCState(PPP_PFC_DISABLED),
@@ -112,7 +105,6 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 	fFirstProtocol(NULL),
 	fStateMachine(*this),
 	fLCP(*this),
-	fProfile(*this),
 	fReportManager(StateMachine().fLock),
 	fLock(StateMachine().fLock),
 	fDeleteCounter(0)
@@ -141,7 +133,6 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 		fInitStatus = B_ERROR;
 		return;
 	}
-	fProfile.LoadSettings(profile, fSettings);
 	
 	// add internal modules
 	// LCP
@@ -197,6 +188,12 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 	
 	const char *value;
 	
+	// get login
+	value = get_settings_value(PPP_USERNAME_KEY, fSettings);
+	fUsername = value ? strdup(value) : strdup("");
+	value = get_settings_value(PPP_PASSWORD_KEY, fSettings);
+	fPassword = value ? strdup(value) : strdup("");
+	
 	// get DisonnectAfterIdleSince settings
 	value = get_settings_value(PPP_DISONNECT_AFTER_IDLE_SINCE_KEY, fSettings);
 	if(!value)
@@ -221,6 +218,9 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 		false)
 		);
 		// auto reconnect is disabled by default
+	
+	fAskBeforeConnecting = get_boolean_value(
+		get_settings_value(PPP_ASK_BEFORE_CONNECTING_KEY, fSettings), false);
 	
 	// load all protocols and the device
 	if(!LoadModules(fSettings, 0, fSettings->parameter_count)) {
@@ -265,8 +265,6 @@ KPPPInterface::~KPPPInterface()
 	send_data_with_timeout(fReconnectThread, 0, NULL, 0, 200);
 		// tell thread that we are being destroyed (200ms timeout)
 	wait_for_thread(fReconnectThread, &tmp);
-	wait_for_thread(fOpenEventThread, &tmp);
-	wait_for_thread(fCloseEventThread, &tmp);
 	
 	while(CountChildren())
 		delete ChildAt(0);
@@ -340,6 +338,30 @@ KPPPInterface::InitCheck() const
 }
 
 
+//!	The username used for authentication.
+const char*
+KPPPInterface::Username() const
+{
+	// this data is not available before we authenticate
+	if(Phase() < PPP_AUTHENTICATION_PHASE)
+		return NULL;
+	
+	return fUsername;
+}
+
+
+//!	The password used for authentication.
+const char*
+KPPPInterface::Password() const
+{
+	// this data is not available before we authenticate
+	if(Phase() < PPP_AUTHENTICATION_PHASE)
+		return NULL;
+	
+	return fPassword;
+}
+
+
 //!	Sets interface MRU.
 bool
 KPPPInterface::SetMRU(uint32 MRU)
@@ -383,6 +405,7 @@ KPPPInterface::PacketOverhead() const
 	\return
 		- \c B_OK: \c Control() was successful.
 		- \c B_ERROR: Either \a length is too small or data is NULL.
+		- \c B_NOT_ALLOWED: Operation not allowed (at this point in time).
 		- \c B_BAD_INDEX: Wrong index (e.g.: when accessing interface submodules).
 		- \c B_BAD_VALUE: Unknown op.
 		- Return value of submodule (when controlling one).
@@ -419,7 +442,7 @@ KPPPInterface::Control(uint32 op, void *data, size_t length)
 			info->childrenCount = CountChildren();
 			info->MRU = MRU();
 			info->interfaceMTU = InterfaceMTU();
-			info->connectRetry = fConnectRetry;
+			info->connectAttempt = fConnectAttempt;
 			info->connectRetriesLimit = fConnectRetriesLimit;
 			info->connectRetryDelay = ConnectRetryDelay();
 			info->reconnectDelay = ReconnectDelay();
@@ -432,6 +455,46 @@ KPPPInterface::Control(uint32 op, void *data, size_t length)
 			info->isMultilink = IsMultilink();
 			info->hasParent = Parent();
 		} break;
+		
+		case PPPC_SET_USERNAME: {
+			if(!data)
+				return B_ERROR;
+			
+			LockerHelper locker(fLock);
+			// login information can only be changed before we authenticate
+			if(Phase() >= PPP_AUTHENTICATION_PHASE)
+				return B_NOT_ALLOWED;
+			
+			free(fUsername);
+			fUsername = data ? strdup((const char*) data) : strdup("");
+		} break;
+		
+		case PPPC_SET_PASSWORD: {
+			if(!data)
+				return B_ERROR;
+			
+			LockerHelper locker(fLock);
+			// login information can only be changed before we authenticate
+			if(Phase() >= PPP_AUTHENTICATION_PHASE)
+				return B_NOT_ALLOWED;
+			
+			free(fPassword);
+			fPassword = data ? strdup((const char*) data) : strdup("");
+		} break;
+		
+		case PPPC_SET_ASK_BEFORE_CONNECTING:
+			if(length < sizeof(uint32) || !data)
+				return B_ERROR;
+			
+			LockerHelper locker(fLock);
+			bool old = fAskBeforeConnecting;
+			fAskBeforeConnecting = *((uint32*)data);
+			if(old && fAskBeforeConnecting == false && State() == PPP_STARTING_STATE
+					&& Phase() == PPP_DOWN_PHASE) {
+				locker.UnlockNow();
+				StateMachine().ContinueOpenEvent();
+			}
+		break;
 		
 		case PPPC_SET_MRU:
 			if(length < sizeof(uint32) || !data)
@@ -468,7 +531,18 @@ KPPPInterface::Control(uint32 op, void *data, size_t length)
 			if(length < sizeof(ppp_report_request) || !data)
 				return B_ERROR;
 			
+			LockerHelper locker(fLock);
 			ppp_report_request *request = (ppp_report_request*) data;
+			// first, we send an initial state report
+			if(request->type == PPP_CONNECTION_REPORT) {
+				ppp_report_packet report;
+				report.type = PPP_CONNECTION_REPORT;
+				report.code = StateMachine().fLastConnectionReportCode;
+				report.length = sizeof(fID);
+				KPPPReportManager::SendReport(request->thread, &report);
+				if(request->flags & PPP_REMOVE_AFTER_REPORT)
+					return B_OK;
+			}
 			ReportManager().EnableReports(request->type, request->thread,
 				request->flags);
 		} break;
@@ -479,16 +553,6 @@ KPPPInterface::Control(uint32 op, void *data, size_t length)
 			
 			ppp_report_request *request = (ppp_report_request*) data;
 			ReportManager().DisableReports(request->type, request->thread);
-		} break;
-		
-		case PPPC_SET_PROFILE: {
-			if(!data)
-				return B_ERROR;
-			
-			driver_settings *profile = (driver_settings*) data;
-			fProfile.LoadSettings(profile, fSettings);
-			
-			UpdateProfile();
 		} break;
 		
 		case PPPC_GET_STATISTICS: {
@@ -927,9 +991,9 @@ KPPPInterface::SetPFCOptions(uint8 pfcOptions)
 /*!	\brief Brings this interface up.
 	
 	\c Down() overrides all \c Up() requests. \n
-	This blocks until the connection process is finished.
+	This method runs an asynchronous process (it returns immediately).
 	
-	\return \c true if successful or \c false otherwise.
+	\return \c false on error.
 */
 bool
 KPPPInterface::Up()
@@ -942,173 +1006,24 @@ KPPPInterface::Up()
 	if(IsUp())
 		return true;
 	
-	ppp_report_packet report;
-	thread_id me = find_thread(NULL), sender;
-	
-	// One thread has to do the real task while all other threads are observers.
 	// Lock needs timeout because destructor could have locked the interface.
 	while(fLock.LockWithTimeout(100000) != B_NO_ERROR)
 		if(fDeleteCounter > 0)
 			return false;
 	
-	if(fUpThread == -1)
-		fUpThread = me;
-	
-	ReportManager().EnableReports(PPP_CONNECTION_REPORT, me, PPP_WAIT_FOR_REPLY);
-	
-	// fUpThread/fReconnectThread tells the state machine to go up (using a new thread
-	// because we might not receive report messages otherwise)
-	if(me == fUpThread || me == fReconnectThread) {
-		if(fOpenEventThread != -1) {
-			int32 tmp;
-			wait_for_thread(fOpenEventThread, &tmp);
-		}
-		fOpenEventThread = spawn_kernel_thread(call_open_event_thread,
-			"KPPPInterface: call_open_event_thread", B_NORMAL_PRIORITY, this);
-		resume_thread(fOpenEventThread);
-	}
+	StateMachine().OpenEvent();
 	fLock.Unlock();
 	
-	if(me == fReconnectThread && me != fUpThread)
-		return true;
-			// the reconnect thread is doing a ConnectRetry in this case (fUpThread
-			// is waiting for new reports)
-	
-	while(true) {
-		// A wrong code usually happens when the reconnect thread gets notified
-		// of a Down() request. In that case a report will follow soon, so
-		// this can be ignored.
-		if(receive_data(&sender, &report, sizeof(report)) != PPP_REPORT_CODE)
-			continue;
-		
-//		TRACE("KPPPInterface::Up(): Report: Type = %ld Code = %ld\n", report.type,
-//			report.code);
-		
-		if(IsUp()) {
-			if(me == fUpThread) {
-				fConnectRetry = 0;
-				fUpThread = -1;
-			}
-			
-			PPP_REPLY(sender, PPP_OK_DISABLE_REPORTS);
-			return true;
-		}
-		
-		if(report.type == PPP_DESTRUCTION_REPORT) {
-			if(me == fUpThread) {
-				fConnectRetry = 0;
-				fUpThread = -1;
-			}
-			
-			PPP_REPLY(sender, PPP_OK_DISABLE_REPORTS);
-			return false;
-		} else if(report.type != PPP_CONNECTION_REPORT) {
-			PPP_REPLY(sender, B_OK);
-			continue;
-		}
-		
-		if(report.code == PPP_REPORT_GOING_UP) {
-			PPP_REPLY(sender, B_OK);
-			continue;
-		} else if(report.code == PPP_REPORT_UP_SUCCESSFUL) {
-			if(me == fUpThread) {
-				fConnectRetry = 0;
-				fUpThread = -1;
-				send_data_with_timeout(fReconnectThread, 0, NULL, 0, 200);
-					// notify reconnect thread that we do not need it anymore
-			}
-			
-			PPP_REPLY(sender, PPP_OK_DISABLE_REPORTS);
-			return true;
-		} else if(report.code == PPP_REPORT_DOWN_SUCCESSFUL
-				|| report.code == PPP_REPORT_UP_ABORTED
-				|| report.code == PPP_REPORT_LOCAL_AUTHENTICATION_FAILED
-				|| report.code == PPP_REPORT_PEER_AUTHENTICATION_FAILED) {
-			if(me == fUpThread) {
-				fConnectRetry = 0;
-				fUpThread = -1;
-				
-				if(report.code != PPP_REPORT_DOWN_SUCCESSFUL)
-					Delete();
-			}
-			
-			PPP_REPLY(sender, PPP_OK_DISABLE_REPORTS);
-			return false;
-		}
-		
-		if(me != fUpThread) {
-			// I am an observer
-			if(report.code == PPP_REPORT_DEVICE_UP_FAILED) {
-				if(fConnectRetry >= fConnectRetriesLimit || fUpThread == -1) {
-					PPP_REPLY(sender, PPP_OK_DISABLE_REPORTS);
-					return false;
-				} else {
-					PPP_REPLY(sender, B_OK);
-					continue;
-				}
-			} else if(report.code == PPP_REPORT_CONNECTION_LOST) {
-				if(DoesAutoReconnect()) {
-					PPP_REPLY(sender, B_OK);
-					continue;
-				} else {
-					PPP_REPLY(sender, PPP_OK_DISABLE_REPORTS);
-					return false;
-				}
-			}
-		} else {
-			// I am the thread for the real task
-			if(report.code == PPP_REPORT_DEVICE_UP_FAILED) {
-				if(fConnectRetry >= fConnectRetriesLimit) {
-					TRACE("KPPPInterface::Up(): DEVICE_UP_FAILED: >=maxretries!\n");
-					
-					fConnectRetry = 0;
-					fUpThread = -1;
-					Delete();
-					PPP_REPLY(sender, PPP_OK_DISABLE_REPORTS);
-					
-					return false;
-				} else {
-					TRACE("KPPPInterface::Up(): DEVICE_UP_FAILED: <maxretries\n");
-					
-					++fConnectRetry;
-					PPP_REPLY(sender, B_OK);
-					TRACE("KPPPInterface::Up(): DEVICE_UP_FAILED: replied\n");
-					Reconnect(ConnectRetryDelay());
-					continue;
-				}
-			} else if(report.code == PPP_REPORT_CONNECTION_LOST) {
-				// the state machine knows that we are going up and leaves
-				// the reconnect task to us
-				if(DoesAutoReconnect() && fConnectRetry < fConnectRetriesLimit) {
-					++fConnectRetry;
-					PPP_REPLY(sender, B_OK);
-					Reconnect(ConnectRetryDelay());
-					continue;
-				} else {
-					fConnectRetry = 0;
-					fUpThread = -1;
-					Delete();
-					PPP_REPLY(sender, PPP_OK_DISABLE_REPORTS);
-					
-					return false;
-				}
-			}
-		}
-		
-		// if the code is unknown we continue
-		PPP_REPLY(sender, B_OK);
-	}
-	
-	return false;
+	return true;
 }
 
 
 /*!	\brief Brings this interface down.
 	
 	\c Down() overrides all \c Up() requests. \n
-	This blocks until diconnecting finished.
+	This method runs an asynchronous process (it returns immediately).
 	
-	\return \c true if successful or \c false otherwise.
+	\return \c false on error.
 */
 bool
 KPPPInterface::Down()
@@ -1121,49 +1036,51 @@ KPPPInterface::Down()
 		return true;
 	
 	send_data_with_timeout(fReconnectThread, 0, NULL, 0, 200);
-		// the reconnect thread should be notified that the user wants to disconnect
+		// tell the reconnect thread to abort its attempt (if it's still waiting)
+	StateMachine().CloseEvent();
 	
-	// this locked section guarantees that there are no state changes before we
-	// enable the connection reports
-	LockerHelper locker(fLock);
-	if(State() == PPP_INITIAL_STATE && Phase() == PPP_DOWN_PHASE)
-		return true;
+	return true;
+}
+
+
+//!	Waits for connection establishment. Returns true if successful.
+bool
+KPPPInterface::WaitForConnection()
+{
+	TRACE("KPPPInterface: WaitForConnection()\n");
+	
+	if(InitCheck() != B_OK)
+		return false;
+	
+	// Lock needs timeout because destructor could have locked the interface.
+	while(fLock.LockWithTimeout(100000) != B_NO_ERROR)
+		if(fDeleteCounter > 0)
+			return false;
 	
 	ReportManager().EnableReports(PPP_CONNECTION_REPORT, find_thread(NULL));
+	fLock.Unlock();
 	
-	thread_id sender;
 	ppp_report_packet report;
-	
-	if(fCloseEventThread != -1) {
-		int32 tmp;
-		wait_for_thread(fCloseEventThread, &tmp);
-	}
-	
-	fCloseEventThread = spawn_kernel_thread(call_close_event_thread,
-		"KPPPInterface: call_close_event_thread", B_NORMAL_PRIORITY, this);
-	resume_thread(fCloseEventThread);
-	locker.UnlockNow();
-	
+	thread_id sender;
+	bool successful = false;
 	while(true) {
 		if(receive_data(&sender, &report, sizeof(report)) != PPP_REPORT_CODE)
 			continue;
 		
 		if(report.type == PPP_DESTRUCTION_REPORT)
-			return true;
-		
-		if(report.type != PPP_CONNECTION_REPORT)
+			break;
+		else if(report.type != PPP_CONNECTION_REPORT)
 			continue;
 		
-		if(report.code == PPP_REPORT_DOWN_SUCCESSFUL
-				|| report.code == PPP_REPORT_UP_ABORTED
-				|| (State() == PPP_INITIAL_STATE && Phase() == PPP_DOWN_PHASE)) {
-			ReportManager().DisableReports(PPP_CONNECTION_REPORT, find_thread(NULL));
+		if(report.code == PPP_REPORT_UP_SUCCESSFUL) {
+			successful = true;
 			break;
-		}
+		} else if(report.code == PPP_REPORT_DOWN_SUCCESSFUL)
+			break;
 	}
 	
-	Delete();
-	return true;
+	ReportManager().DisableReports(PPP_CONNECTION_REPORT, find_thread(NULL));
+	return successful;
 }
 
 
@@ -1172,7 +1089,6 @@ bool
 KPPPInterface::IsUp() const
 {
 	LockerHelper locker(fLock);
-	
 	return Phase() == PPP_ESTABLISHED_PHASE;
 }
 
@@ -1215,7 +1131,7 @@ KPPPInterface::LoadModules(driver_settings *settings, int32 start, int32 count)
 	if(IsMultilink() && !Parent()) {
 		// main interfaces only load the multilink module
 		// and create a child using their settings
-		fManager->CreateInterface(settings, Profile().Settings(), ID());
+		fManager->CreateInterface(settings, ID());
 		return true;
 	}
 	
@@ -1322,11 +1238,11 @@ KPPPInterface::Send(struct mbuf *packet, uint16 protocolNumber)
 		return B_ERROR;
 	}
 	
-	// go up if ConnectOnDemand enabled and we are down
-	if(protocolNumber != PPP_LCP_PROTOCOL && DoesConnectOnDemand()
+	// go up if ConnectOnDemand is enabled and we are disconnected
+	if((protocolNumber != PPP_LCP_PROTOCOL && DoesConnectOnDemand()
 			&& (Phase() == PPP_DOWN_PHASE
 				|| Phase() == PPP_ESTABLISHMENT_PHASE)
-			&& !Up()) {
+			&& !Up()) || !WaitForConnection()) {
 		m_freem(packet);
 		return B_ERROR;
 	}
@@ -1604,16 +1520,6 @@ KPPPInterface::UnregisterInterface()
 }
 
 
-//!	Called when profile changes.
-void
-KPPPInterface::UpdateProfile()
-{
-	KPPPLayer *layer = FirstProtocol();
-	for(; layer; layer = layer->Next())
-		layer->ProfileChanged();
-}
-
-
 //!	Called by KPPPManager: manager routes stack ioctls to the corresponding interface.
 status_t
 KPPPInterface::StackControl(uint32 op, void *data)
@@ -1741,14 +1647,16 @@ KPPPInterface::Reconnect(uint32 delay)
 	if(fReconnectThread != -1)
 		return;
 	
+	++fConnectAttempt;
+	
 	// start a new thread that calls our Up() method
 	reconnect_info info;
 	info.interface = this;
 	info.thread = &fReconnectThread;
 	info.delay = delay;
 	
-	fReconnectThread = spawn_kernel_thread(reconnect_thread, "KPPPInterface: reconnect_thread",
-		B_NORMAL_PRIORITY, NULL);
+	fReconnectThread = spawn_kernel_thread(reconnect_thread,
+		"KPPPInterface: reconnect_thread", B_NORMAL_PRIORITY, NULL);
 	
 	resume_thread(fReconnectThread);
 	
@@ -1768,9 +1676,6 @@ reconnect_thread(void *data)
 	// we try to receive data instead of snooze, so we can quit on destruction
 	if(receive_data_with_timeout(&sender, &code, NULL, 0, info.delay) == B_OK) {
 		*info.thread = -1;
-		ppp_interface_id id = info.interface->ID();
-		info.interface->Report(PPP_CONNECTION_REPORT, PPP_REPORT_UP_ABORTED,
-			&id, sizeof(ppp_interface_id));
 		return B_OK;
 	}
 	
@@ -1791,24 +1696,6 @@ class KPPPInterfaceAccess {
 		
 		void Delete(KPPPInterface *interface)
 			{ delete interface; }
-		void CallOpenEvent(KPPPInterface *interface)
-		{
-			while(interface->fLock.LockWithTimeout(100000) != B_NO_ERROR)
-				if(interface->fDeleteCounter > 0)
-					return;
-			interface->CallOpenEvent();
-			interface->fOpenEventThread = -1;
-			interface->fLock.Unlock();
-		}
-		void CallCloseEvent(KPPPInterface *interface)
-		{
-			while(interface->fLock.LockWithTimeout(100000) != B_NO_ERROR)
-				if(interface->fDeleteCounter > 0)
-					return;
-			interface->CallCloseEvent();
-			interface->fCloseEventThread = -1;
-			interface->fLock.Unlock();
-		}
 };
 
 
@@ -1817,26 +1704,6 @@ interface_deleter_thread(void *data)
 {
 	KPPPInterfaceAccess access;
 	access.Delete((KPPPInterface*) data);
-	
-	return B_OK;
-}
-
-
-status_t
-call_open_event_thread(void *data)
-{
-	KPPPInterfaceAccess access;
-	access.CallOpenEvent((KPPPInterface*) data);
-	
-	return B_OK;
-}
-
-
-status_t
-call_close_event_thread(void *data)
-{
-	KPPPInterfaceAccess access;
-	access.CallCloseEvent((KPPPInterface*) data);
 	
 	return B_OK;
 }

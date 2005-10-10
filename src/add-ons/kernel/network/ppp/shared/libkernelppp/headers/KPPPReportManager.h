@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Haiku Inc.
+ * Copyright 2003-2005, Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 
@@ -18,6 +18,9 @@ class KPPPReportManager {
 	public:
 		KPPPReportManager(BLocker& lock);
 		~KPPPReportManager();
+		
+		static bool SendReport(thread_id thread, const ppp_report_packet *report);
+			// returns false if reply was bad (or an error occured)
 		
 		void EnableReports(ppp_report_type type, thread_id thread,
 				int32 flags = PPP_NO_FLAGS);

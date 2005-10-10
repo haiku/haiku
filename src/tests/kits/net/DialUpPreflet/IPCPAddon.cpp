@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -28,15 +28,6 @@ static const uint32 kDefaultButtonWidth = 80;
 static const uint32 kMsgUpdateControls = 'UCTL';
 
 // labels
-#ifdef LANG_GERMAN
-static const char *kLabelIPCP = "TCP/IP";
-static const char *kLabelIPAddress = "IP Adresse: ";
-static const char *kLabelPrimaryDNS = "Primärer DNS: ";
-static const char *kLabelSecondaryDNS = "Sekundärer DNS: ";
-static const char *kLabelOptional = "(Optional)";
-static const char *kLabelExtendedOptions = "Erweiterte Optionen:";
-static const char *kLabelEnabled = "TCP/IP-Protokoll Verwenden";
-#else
 static const char *kLabelIPCP = "TCP/IP";
 static const char *kLabelIPAddress = "IP Address: ";
 static const char *kLabelPrimaryDNS = "Primary DNS: ";
@@ -44,7 +35,6 @@ static const char *kLabelSecondaryDNS = "Secondary DNS: ";
 static const char *kLabelOptional = "(Optional)";
 static const char *kLabelExtendedOptions = "Extended Options:";
 static const char *kLabelEnabled = "Enable TCP/IP Protocol";
-#endif
 
 // add-on descriptions
 static const char *kKernelModuleName = "ipcp";
@@ -53,7 +43,6 @@ static const char *kKernelModuleName = "ipcp";
 IPCPAddon::IPCPAddon(BMessage *addons)
 	: DialUpAddon(addons),
 	fSettings(NULL),
-	fProfile(NULL),
 	fIPCPView(NULL)
 {
 	CreateView(BPoint(0,0));
@@ -69,34 +58,27 @@ IPCPAddon::~IPCPAddon()
 
 
 bool
-IPCPAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
+IPCPAddon::LoadSettings(BMessage *settings, bool isNew)
 {
 	fIsNew = isNew;
 	fIsEnabled = false;
 	fIPAddress = fPrimaryDNS = fSecondaryDNS = "";
 	fSettings = settings;
-	fProfile = profile;
 	
 	fIPCPView->Reload();
 		// reset all views (empty settings)
 	
-	if(!settings || !profile || isNew)
+	if(!settings || isNew)
 		return true;
 	
 	BMessage protocol;
 	
-	// settings
 	int32 protocolIndex = FindIPCPProtocol(*fSettings, &protocol);
 	if(protocolIndex < 0)
 		return true;
 	
 	protocol.AddBool(MDSU_VALID, true);
 	fSettings->ReplaceMessage(MDSU_PARAMETERS, protocolIndex, &protocol);
-	
-	// profile
-	protocolIndex = FindIPCPProtocol(*fProfile, &protocol);
-	if(protocolIndex < 0)
-		return true;
 	
 	fIsEnabled = true;
 	
@@ -149,7 +131,7 @@ IPCPAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	local.AddBool(MDSU_VALID, true);
 	protocol.ReplaceMessage(MDSU_PARAMETERS, localSideIndex, &local);
 	protocol.AddBool(MDSU_VALID, true);
-	fProfile->ReplaceMessage(MDSU_PARAMETERS, protocolIndex, &protocol);
+	fSettings->ReplaceMessage(MDSU_PARAMETERS, protocolIndex, &protocol);
 	
 	fIPCPView->Reload();
 	
@@ -158,22 +140,22 @@ IPCPAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 
 
 void
-IPCPAddon::IsModified(bool *settings, bool *profile) const
+IPCPAddon::IsModified(bool *settings) const
 {
 	if(!fSettings) {
-		*settings = *profile = false;
+		*settings = false;
 		return;
 	}
 	
-	*settings = fIsEnabled != fIPCPView->IsEnabled();
-	*profile = (*settings || fIPAddress != fIPCPView->IPAddress()
+	*settings = (fIsEnabled != fIPCPView->IsEnabled()
+		|| fIPAddress != fIPCPView->IPAddress()
 		|| fPrimaryDNS != fIPCPView->PrimaryDNS()
 		|| fSecondaryDNS != fIPCPView->SecondaryDNS());
 }
 
 
 bool
-IPCPAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTemporary)
+IPCPAddon::SaveSettings(BMessage *settings)
 {
 	if(!fSettings || !settings)
 		return false;
@@ -184,10 +166,9 @@ IPCPAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTemporar
 	BMessage protocol, local;
 	protocol.AddString(MDSU_NAME, PPP_PROTOCOL_KEY);
 	protocol.AddString(MDSU_VALUES, kKernelModuleName);
-	settings->AddMessage(MDSU_PARAMETERS, &protocol);
 		// the settings contain a simple "protocol ipcp" string
 	
-	// now create the profile with all subparameters
+	// now create the settings with all subparameters
 	local.AddString(MDSU_NAME, IPCP_LOCAL_SIDE_KEY);
 	bool needsLocal = false;
 	
@@ -221,7 +202,7 @@ IPCPAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTemporar
 	if(needsLocal)
 		protocol.AddMessage(MDSU_PARAMETERS, &local);
 	
-	profile->AddMessage(MDSU_PARAMETERS, &protocol);
+	settings->AddMessage(MDSU_PARAMETERS, &protocol);
 	
 	return true;
 }

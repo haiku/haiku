@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <Waldemar.Kornewald@web.de>
  * Distributed under the terms of the MIT License.
  */
 
@@ -29,10 +29,8 @@ class PPPManager {
 		int32 Control(ifnet *ifp, ulong cmd, caddr_t data);
 		
 		ppp_interface_id CreateInterface(const driver_settings *settings,
-			const driver_settings *profile = NULL,
 			ppp_interface_id parentID = PPP_UNDEFINED_INTERFACE_ID);
 		ppp_interface_id CreateInterfaceWithName(const char *name,
-			const driver_settings *profile = NULL,
 			ppp_interface_id parentID = PPP_UNDEFINED_INTERFACE_ID);
 		bool DeleteInterface(ppp_interface_id ID);
 		bool RemoveInterface(ppp_interface_id ID);
@@ -70,8 +68,7 @@ class PPPManager {
 
 	private:
 		ppp_interface_id _CreateInterface(const char *name,
-			const driver_settings *settings, const driver_settings *profile,
-			ppp_interface_id parentID);
+			const driver_settings *settings, ppp_interface_id parentID);
 		int32 FindUnit() const;
 
 	private:

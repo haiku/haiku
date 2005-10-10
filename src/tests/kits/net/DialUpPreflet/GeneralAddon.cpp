@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -30,17 +30,6 @@ static const uint32 kMsgSelectDevice = 'SELD';
 static const uint32 kMsgSelectAuthenticator = 'SELA';
 
 // labels
-#ifdef LANG_GERMAN
-static const char *kLabelGeneral = "Allgemein";
-static const char *kLabelDevice = "Gerät: ";
-static const char *kLabelNoDevicesFound = "Keine Geräte Gefunden!";
-static const char *kLabelAuthenticator = "Login: ";
-static const char *kLabelNoAuthenticatorsFound = "Keine Login-Methoden gefunden!";
-static const char *kLabelName = "Benutzername: ";
-static const char *kLabelPassword = "Password: ";
-static const char *kLabelSavePassword = "Passwort Speichern";
-static const char *kLabelNone = "Ohne";
-#else
 static const char *kLabelGeneral = "General";
 static const char *kLabelDevice = "Device: ";
 static const char *kLabelNoDevicesFound = "No Devices Found!";
@@ -50,7 +39,6 @@ static const char *kLabelName = "Username: ";
 static const char *kLabelPassword = "Password: ";
 static const char *kLabelSavePassword = "Save Password";
 static const char *kLabelNone = "None";
-#endif
 
 // string constants for information saved in the settings message
 static const char *kGeneralTabAuthentication = "Authentication";
@@ -67,7 +55,6 @@ GeneralAddon::GeneralAddon(BMessage *addons)
 	fDeleteView(false),
 	fAuthenticatorsCount(0),
 	fSettings(NULL),
-	fProfile(NULL),
 	fGeneralView(NULL)
 {
 }
@@ -77,6 +64,15 @@ GeneralAddon::~GeneralAddon()
 {
 	if(fDeleteView)
 		delete fGeneralView;
+}
+
+
+const char*
+GeneralAddon::SessionPassword() const
+{
+	if(fGeneralView && fGeneralView->AuthenticatorName())
+		return fGeneralView->Password();
+	return NULL;
 }
 
 
@@ -94,7 +90,7 @@ GeneralAddon::FindDevice(const BString& moduleName) const
 
 
 bool
-GeneralAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
+GeneralAddon::LoadSettings(BMessage *settings, bool isNew)
 {
 	fIsNew = isNew;
 	fHasPassword = false;
@@ -102,7 +98,6 @@ GeneralAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	fDeviceAddon = NULL;
 	fAuthenticatorsCount = 0;
 	fSettings = settings;
-	fProfile = profile;
 	
 	if(!fGeneralView) {
 		CreateView(BPoint(0,0));
@@ -112,7 +107,7 @@ GeneralAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	fGeneralView->Reload();
 		// reset all views (empty settings)
 	
-	if(!settings || !profile || isNew)
+	if(!settings || isNew)
 		return true;
 	
 	if(!LoadDeviceSettings())
@@ -148,18 +143,17 @@ GeneralAddon::LoadDeviceSettings()
 	if(!fDeviceAddon)
 		return false;
 	
-	return fDeviceAddon->LoadSettings(fSettings, fProfile, false);
+	return fDeviceAddon->LoadSettings(fSettings, false);
 }
 
 
 bool
 GeneralAddon::LoadAuthenticationSettings()
 {
-	// we only handle the profile (although settings could contain different data)
 	int32 itemIndex = 0;
 	BMessage authentication, item;
 	
-	if(!FindMessageParameter(PPP_AUTHENTICATOR_KEY, *fProfile, &item, &itemIndex))
+	if(!FindMessageParameter(PPP_AUTHENTICATOR_KEY, *fSettings, &item, &itemIndex))
 		return true;
 	
 	// find authenticators (though we load all authenticators, we only use one)
@@ -183,73 +177,66 @@ GeneralAddon::LoadAuthenticationSettings()
 	// load username and password
 	BMessage parameter;
 	int32 parameterIndex = 0;
-	if(FindMessageParameter("User", item, &parameter, &parameterIndex)
+	if(FindMessageParameter("Username", *fSettings, &parameter, &parameterIndex)
 			&& parameter.FindString(MDSU_VALUES, &fUsername) == B_OK) {
 		hasUsername = true;
 		parameter.AddBool(MDSU_VALID, true);
-		item.ReplaceMessage(MDSU_PARAMETERS, parameterIndex, &parameter);
+		fSettings->ReplaceMessage(MDSU_PARAMETERS, parameterIndex, &parameter);
 	}
 	
 	parameterIndex = 0;
-	if(FindMessageParameter("Password", item, &parameter, &parameterIndex)
+	if(FindMessageParameter("Password", *fSettings, &parameter, &parameterIndex)
 			&& parameter.FindString(MDSU_VALUES, &fPassword) == B_OK) {
 		fHasPassword = true;
 		parameter.AddBool(MDSU_VALID, true);
-		item.ReplaceMessage(MDSU_PARAMETERS, parameterIndex, &parameter);
+		fSettings->ReplaceMessage(MDSU_PARAMETERS, parameterIndex, &parameter);
 	}
 	
 	// tell DUN whether everything is valid
 	if(hasUsername)
 		item.AddBool(MDSU_VALID, true);
 	
-	fProfile->ReplaceMessage(MDSU_PARAMETERS, itemIndex, &item);
+	fSettings->ReplaceMessage(MDSU_PARAMETERS, itemIndex, &item);
 	
 	return true;
 }
 
 
-bool
-GeneralAddon::HasTemporaryProfile() const
-{
-	return fGeneralView->HasTemporaryProfile();
-}
-
-
 void
-GeneralAddon::IsModified(bool *settings, bool *profile) const
+GeneralAddon::IsModified(bool *settings) const
 {
 	if(!fSettings) {
-		*settings = *profile = false;
+		*settings = false;
 		return;
 	}
 	
-	bool deviceSettings, authenticationSettings, deviceProfile, authenticationProfile;
+	bool deviceSettings, authenticationSettings;
 	
-	IsDeviceModified(&deviceSettings, &deviceProfile);
-	IsAuthenticationModified(&authenticationSettings, &authenticationProfile);
+	IsDeviceModified(&deviceSettings);
+	IsAuthenticationModified(&authenticationSettings);
 	
 	*settings = (deviceSettings || authenticationSettings);
-	*profile = (deviceProfile || authenticationProfile);
 }
 
 
 void
-GeneralAddon::IsDeviceModified(bool *settings, bool *profile) const
+GeneralAddon::IsDeviceModified(bool *settings) const
 {
-	fGeneralView->IsDeviceModified(settings, profile);
+	fGeneralView->IsDeviceModified(settings);
 }
 
 
 void
-GeneralAddon::IsAuthenticationModified(bool *settings, bool *profile) const
+GeneralAddon::IsAuthenticationModified(bool *settings) const
 {
 	// currently we only support selecting one authenticator
 	if(fAuthenticatorsCount == 0)
 		*settings = fGeneralView->AuthenticatorName();
 	else {
 		BMessage authentication;
-		if(fSettings->FindMessage(kGeneralTabAuthentication, &authentication) != B_OK) {
-			*settings = *profile = false;
+		if(fSettings->FindMessage(kGeneralTabAuthentication,
+				&authentication) != B_OK) {
+			*settings = false;
 			return;
 				// error!
 		}
@@ -257,30 +244,29 @@ GeneralAddon::IsAuthenticationModified(bool *settings, bool *profile) const
 		BString authenticator;
 		if(authentication.FindString(kGeneralTabAuthenticators,
 				&authenticator) != B_OK) {
-			*settings = *profile = false;
+			*settings = false;
 			return;
 				// error!
 		}
 		
 		*settings = (!fGeneralView->AuthenticatorName()
-			|| authenticator != fGeneralView->AuthenticatorName());
+			|| authenticator != fGeneralView->AuthenticatorName()
+			|| fUsername != fGeneralView->Username()
+			|| (fPassword != fGeneralView->Password() && fHasPassword)
+			|| fHasPassword != fGeneralView->DoesSavePassword());
 	}
-	
-	*profile = (*settings || fUsername != fGeneralView->Username()
-		|| (fPassword != fGeneralView->Password() && fHasPassword)
-		|| fHasPassword != fGeneralView->DoesSavePassword());
 }
 
 
 bool
-GeneralAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTemporary)
+GeneralAddon::SaveSettings(BMessage *settings)
 {
 	if(!fSettings || !settings || !fGeneralView->DeviceName())
 		return false;
 			// TODO: tell user that a device is needed (if we fail because of this)
 	
-	if(!fGeneralView->DeviceAddon() || !fGeneralView->DeviceAddon()->SaveSettings(
-			settings, profile, saveTemporary))
+	if(!fGeneralView->DeviceAddon()
+			|| !fGeneralView->DeviceAddon()->SaveSettings(settings))
 		return false;
 	
 	if(fGeneralView->AuthenticatorName()) {
@@ -290,19 +276,17 @@ GeneralAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTempo
 		settings->AddMessage(MDSU_PARAMETERS, &authenticator);
 		
 		BMessage username;
-		username.AddString(MDSU_NAME, "User");
+		username.AddString(MDSU_NAME, PPP_USERNAME_KEY);
 		username.AddString(MDSU_VALUES, fGeneralView->Username());
-		authenticator.AddMessage(MDSU_PARAMETERS, &username);
+		settings->AddMessage(MDSU_PARAMETERS, &username);
 		
-		if(saveTemporary || fGeneralView->DoesSavePassword()) {
+		if(fGeneralView->DoesSavePassword()) {
 			// save password, too
 			BMessage password;
-			password.AddString(MDSU_NAME, "Password");
+			password.AddString(MDSU_NAME, PPP_PASSWORD_KEY);
 			password.AddString(MDSU_VALUES, fGeneralView->Password());
-			authenticator.AddMessage(MDSU_PARAMETERS, &password);
+			settings->AddMessage(MDSU_PARAMETERS, &password);
 		}
-		
-		profile->AddMessage(MDSU_PARAMETERS, &authenticator);
 	}
 	
 	return true;
@@ -466,7 +450,7 @@ GeneralView::Reload()
 		item = fDeviceField->Menu()->ItemAt(0);
 		item->SetMarked(true);
 		item->Message()->FindPointer("Addon", reinterpret_cast<void**>(&fDeviceAddon));
-		fDeviceAddon->LoadSettings(Addon()->Settings(), Addon()->Profile(), true);
+		fDeviceAddon->LoadSettings(Addon()->Settings(), true);
 	} else {
 		fDeviceAddon = NULL;
 		item = fDeviceField->Menu()->FindMarked();
@@ -526,14 +510,14 @@ GeneralView::AuthenticatorName() const
 
 
 void
-GeneralView::IsDeviceModified(bool *settings, bool *profile) const
+GeneralView::IsDeviceModified(bool *settings) const
 {
 	if(fDeviceAddon != Addon()->DeviceAddon())
-		*settings = *profile = true;
+		*settings = true;
 	else if(fDeviceAddon)
-		fDeviceAddon->IsModified(settings, profile);
+		fDeviceAddon->IsModified(settings);
 	else
-		*settings = *profile = false;
+		*settings = false;
 }
 
 
@@ -558,8 +542,7 @@ GeneralView::MessageReceived(BMessage *message)
 				fDeviceAddon = NULL;
 			else {
 				if(fDeviceAddon != Addon()->DeviceAddon())
-					fDeviceAddon->LoadSettings(Addon()->Settings(), Addon()->Profile(),
-						Addon()->IsNew());
+					fDeviceAddon->LoadSettings(Addon()->Settings(), Addon()->IsNew());
 				
 				ReloadDeviceView();
 			}

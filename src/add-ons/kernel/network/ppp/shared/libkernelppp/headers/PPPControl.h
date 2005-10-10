@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Haiku Inc.
+ * Copyright 2003-2005, Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 
@@ -46,11 +46,14 @@ enum ppp_control_ops {
 	// -----------------------------------------------------
 	// KPPPInterface
 	PPPC_GET_INTERFACE_INFO = PPP_INTERFACE_OPS_START,
+	PPPC_SET_USERNAME,
+	PPPC_SET_PASSWORD,
+	PPPC_SET_ASK_BEFORE_CONNECTING,
+	  // ppp_up uses this in order to finalize a connection request
 	PPPC_SET_MRU,
 	PPPC_SET_CONNECT_ON_DEMAND,
 	PPPC_SET_AUTO_RECONNECT,
 	PPPC_HAS_INTERFACE_SETTINGS,
-	PPPC_SET_PROFILE,
 	PPPC_GET_STATISTICS,
 	
 	// handler access
@@ -96,8 +99,6 @@ typedef struct ppp_interface_description_info {
 		const char *name;
 			//!< Name of interface description file.
 	} u;
-	const driver_settings *profile;
-		//!< An optional profile. If \a profile == NULL the default profile is used.
 	ppp_interface_id interface;
 		//!< The id of the found/created interface.
 } ppp_interface_description_info;
@@ -152,13 +153,14 @@ typedef struct ppp_interface_info {
 	uint32 protocolsCount, optionHandlersCount, LCPExtensionsCount, childrenCount;
 	uint32 MRU, interfaceMTU;
 	
-	uint32 connectRetry, connectRetriesLimit;
+	uint32 connectAttempt, connectRetriesLimit;
 	uint32 connectRetryDelay, reconnectDelay;
 	bigtime_t connectedSince;
 		// undefined if disconnected
 	uint32 idleSince, disconnectAfterIdleSince;
 	
-	bool doesConnectOnDemand, doesAutoReconnect, hasDevice, isMultilink, hasParent;
+	bool doesConnectOnDemand, doesAutoReconnect, askBeforeConnecting, hasDevice;
+	bool isMultilink, hasParent;
 } ppp_interface_info;
 /*!	\brief You \e must use this encapsulator instead of \c ppp_interface_info!
 	

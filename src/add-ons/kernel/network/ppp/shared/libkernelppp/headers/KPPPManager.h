@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Haiku Inc.
+ * Copyright 2003-2005, Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 
@@ -24,9 +24,6 @@ typedef struct ppp_interface_entry {
 	KPPPInterface *interface;
 	vint32 accessing;
 	bool deleting;
-	
-	// ppp_up communication
-	thread_id requestThread;
 } ppp_interface_entry;
 
 
@@ -41,10 +38,8 @@ typedef struct ppp_interface_module_info {
 		//!< Exports needed network module functions.
 	
 	ppp_interface_id (*CreateInterface)(const driver_settings *settings,
-		const driver_settings *profile = NULL,
 		ppp_interface_id parentID = PPP_UNDEFINED_INTERFACE_ID);
 	ppp_interface_id (*CreateInterfaceWithName)(const char *name,
-		const driver_settings *profile = NULL,
 		ppp_interface_id parentID = PPP_UNDEFINED_INTERFACE_ID);
 	bool (*DeleteInterface)(ppp_interface_id ID);
 		// this marks the interface for deletion

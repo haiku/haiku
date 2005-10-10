@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -12,6 +12,11 @@
 
 #include "PPPManager.h"
 #include "PPPInterface.h"
+#include "MessageDriverSettingsUtils.h"
+
+#include <Directory.h>
+#include <File.h>
+#include <Message.h>
 
 #include <cstring>
 #include <cstdlib>
@@ -33,6 +38,69 @@ PPPManager::~PPPManager()
 {
 	if(fFD >= 0)
 		close(fFD);
+}
+
+
+//!	Sets the default interface.
+bool
+PPPManager::SetDefaultInterface(const BString name)
+{
+	// load current settings and replace value of "default" with <name>
+	BMessage settings;
+	if(!ReadMessageDriverSettings("ptpnet.settings", &settings))
+		settings.MakeEmpty();
+	
+	BMessage parameter;
+	int32 index = 0;
+	if(FindMessageParameter("default", settings, &parameter, &index))
+		settings.RemoveData(MDSU_PARAMETERS, index);
+	
+	parameter.MakeEmpty();
+	if(name != "") {
+		parameter.AddString(MDSU_NAME, "default");
+		parameter.AddString(MDSU_VALUES, name);
+		settings.AddMessage(MDSU_PARAMETERS, &parameter);
+	}
+	
+	BFile file(PTP_SETTINGS_PATH, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	if(file.InitCheck() != B_OK)
+		return false;
+	
+	if(WriteMessageDriverSettings(file, settings))
+		return true;
+	else
+		return false;
+}
+
+
+//!	Returns the name of the default interface.
+BString
+PPPManager::DefaultInterface()
+{
+	void *handle = load_driver_settings("ptpnet.settings");
+	BString name = get_driver_parameter(handle, "default", NULL, NULL);
+	unload_driver_settings(handle);
+	return name;
+}
+
+
+//!	Sets the given BDirectory to the settings folder.
+bool
+PPPManager::GetSettingsDirectory(BDirectory *settingsDirectory)
+{
+	if(settingsDirectory) {
+		BDirectory settings(PTP_INTERFACE_SETTINGS_PATH);
+		if(settings.InitCheck() != B_OK) {
+			create_directory(PTP_INTERFACE_SETTINGS_PATH, 0750);
+			settings.SetTo(PTP_INTERFACE_SETTINGS_PATH);
+			if(settings.InitCheck() != B_OK)
+				return false;
+		}
+		
+		*settingsDirectory = settings;
+	}
+	
+	return true;
 }
 
 
@@ -109,19 +177,17 @@ PPPManager::ControlModule(const char *name, uint32 op, void *data,
 }
 
 
-/*!	\brief Creates a nameless interface with the given settings and profile.
+/*!	\brief Creates a nameless interface with the given settings.
 	
 	Please use \c CreateInterfaceWithName() instead of this method.
 	
 	\return the new interface's ID or \c PPP_UNDEFINED_INTERFACE_ID on failure.
 */
 ppp_interface_id
-PPPManager::CreateInterface(const driver_settings *settings,
-	const driver_settings *profile = NULL) const
+PPPManager::CreateInterface(const driver_settings *settings) const
 {
 	ppp_interface_description_info info;
 	info.u.settings = settings;
-	info.profile = profile;
 	
 	if(Control(PPPC_CREATE_INTERFACE, &info, sizeof(info)) != B_OK)
 		return PPP_UNDEFINED_INTERFACE_ID;
@@ -130,29 +196,19 @@ PPPManager::CreateInterface(const driver_settings *settings,
 }
 
 
-/*!	\brief Creates an interface with the given name and profile.
+/*!	\brief Creates an interface with the given name.
 	
 	If the interface already exists its ID will be returned.
-	Every PPP interface has a profile. By default it checks if the ptpnet/profile
-	folder contains a profile with the interface's name. Otherwise the interface's
-	settings become its profile. This has the advantage that you can put the profile
-	and the settings into the same file which simplifies your PPP configuration if
-	you edit your PPP interface definitions by hand. In this case PAP, for example,
-	would still find the username and password although you specify them in the same
-	parameter that loads the PAP module.
 	
 	\param name The PPP interface description file's name.
-	\param profile You may override the default profile.
 	
 	\return the new interface's ID or \c PPP_UNDEFINED_INTERFACE_ID on failure.
 */
 ppp_interface_id
-PPPManager::CreateInterfaceWithName(const char *name,
-	const driver_settings *profile = NULL) const
+PPPManager::CreateInterfaceWithName(const char *name) const
 {
 	ppp_interface_description_info info;
 	info.u.name = name;
-	info.profile = profile;
 	
 	if(Control(PPPC_CREATE_INTERFACE_WITH_NAME, &info, sizeof(info)) != B_OK)
 		return PPP_UNDEFINED_INTERFACE_ID;
