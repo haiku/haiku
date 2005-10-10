@@ -190,8 +190,10 @@ MediaAddonServer::ReadyToRun()
 	// register it with the server, and make it the default SYSTEM_TIME_SOURCE
 	BMediaNode *ts = new SystemTimeSource;
 	status_t result = mediaroster->RegisterNode(ts);
-	if (result != B_OK)
+	if (result != B_OK) {
+		fprintf(stderr, "Can't register system time source : %s\n", strerror(result));
 		debugger("Can't register system time source");
+	}
 	if (ts->ID() != NODE_SYSTEM_TIMESOURCE_ID)
 		debugger("System time source got wrong node ID");
 	media_node node = ts->Node();
