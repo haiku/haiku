@@ -254,7 +254,7 @@ enable_keyboard(void)
 status_t
 probe_keyboard(void)
 {
-	uint32 tries;
+	int32 tries;
 
 	// ToDo: for now there just is a keyboard ready to be used...
 	
@@ -271,8 +271,10 @@ probe_keyboard(void)
 		if (ps2_read_data(&acknowledged) == B_OK && acknowledged == PS2_REPLY_ACK)
 			break;
 	}
-	if (tries < 0)
-		return B_ERROR;
+
+	// This selftest appears to fail quite frequently we'll just disable it
+	/*if (tries < 0)
+		return B_ERROR;*/
 
 	// Activate keyboard
 

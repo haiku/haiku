@@ -54,6 +54,7 @@ sem_id gDeviceOpenSemaphore;
 static int32 sInitialized = 0;
 static uint8 sCommandByte = 0;
 static bool sKeyboardDetected = false;
+static bool sMouseDetected = false;
 
 static sem_id sResultSemaphore;
 static sem_id sResultOwnerSemaphore;
@@ -77,7 +78,7 @@ wait_for_status(int32 bits, bool set)
 
 	while (tries-- > 0) {
 		read = gIsa->read_io_8(PS2_PORT_CTRL);
-		if (((read & bits) != 0) == set)
+		if (((read & bits) == bits) == set)
 			return B_OK;
 
 		spin(100);
@@ -299,14 +300,15 @@ const char **
 publish_devices(void)
 {
 	static char *kDevices[3];
-	
-	kDevices[0] = DEVICE_MOUSE_NAME;
+	int index = 0;
 
-	if (sKeyboardDetected) {
-		kDevices[1] = DEVICE_KEYBOARD_NAME;
-		kDevices[2] = NULL;
-	} else
-		kDevices[1] = NULL;
+	if (sMouseDetected)
+		kDevices[index++] = DEVICE_MOUSE_NAME;
+
+	if (sKeyboardDetected)
+		kDevices[index++] = DEVICE_KEYBOARD_NAME;
+
+	kDevices[index++] = NULL;
 
 	return (const char **)kDevices;
 }
@@ -335,14 +337,23 @@ init_driver(void)
 		return status;
 	}
 
-	// If there is no keyboard or mouse, we don't need to publish ourselves
+	// Try to probe for the mouse first, as this can hang the keyboard if no
+	// mouse is found.
+	// Probing the mouse first and initializing the keyboard later appearantly
+	// clears the keyboard stall.
+
+	if (probe_mouse() == B_OK)
+		sMouseDetected = true;
+	else
+		dprintf("ps2_hid: no mouse detected!\n");
 
 	if (probe_keyboard() == B_OK)
 		sKeyboardDetected = true;
 	else
 		dprintf("ps2_hid: no keyboard detected!\n");
 
-	if (!sKeyboardDetected && probe_mouse() != B_OK) {
+	// If there is no keyboard or mouse, we don't need to publish ourselves
+	if (!sKeyboardDetected && !sMouseDetected) {
 		put_module(B_ISA_MODULE_NAME);
 		return B_ERROR;
 	}

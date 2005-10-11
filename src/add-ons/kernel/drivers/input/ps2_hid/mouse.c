@@ -320,7 +320,6 @@ probe_mouse(void)
 		TRACE(("Extended PS/2 mouse found\n"));
 	} else {
 		// Something's wrong. Better quit
-		dprintf("ps2_hid: No mouse found\n");
 		return B_ERROR;
 	}
 
