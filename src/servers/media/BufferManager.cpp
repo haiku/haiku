@@ -10,12 +10,13 @@
 
 BufferManager::BufferManager()
  :	fSharedBufferList(_shared_buffer_list::Clone()),
-	fSharedBufferListId(-1),
 	fNextBufferId(1),
 	fLocker(new BLocker("buffer manager locker")),
 	fBufferInfoMap(new Map<media_buffer_id, buffer_info>)
 {
 	fSharedBufferListId = area_for(fSharedBufferList);
+	ASSERT(fSharedBufferList!=NULL);
+	ASSERT(fSharedBufferListId > 0);
 }
 
 BufferManager::~BufferManager()
