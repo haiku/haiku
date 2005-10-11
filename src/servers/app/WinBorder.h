@@ -81,7 +81,6 @@ class WinBorder : public Layer {
 											  float* minHeight,
 											  float* maxHeight) const;
 
-#ifdef NEW_INPUT_HANDLING
 	virtual	void				MouseDown(const PointerEvent& evt);
 	virtual	void				MouseUp(const PointerEvent& evt);
 	virtual	void				MouseMoved(const PointerEvent& evt, uint32 transit);
@@ -89,11 +88,7 @@ class WinBorder : public Layer {
 									{ return _ActionFor(evt); }
 	virtual	void				WorkspaceActivated(int32 index, bool active);
 	virtual	void				WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces);
-#else
-			click_type			MouseDown(const PointerEvent& evt);
-			void				MouseMoved(const PointerEvent& evt);
-			void				MouseUp(const PointerEvent& evt);
-#endif	
+
 			void				UpdateColors();
 			void				UpdateDecorator();
 			void				UpdateFont();

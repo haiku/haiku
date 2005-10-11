@@ -86,18 +86,14 @@ public:
 			void				SetWinBorderWorskpaces(WinBorder *winBorder,
 										uint32 oldIndex,
 										uint32 newIndex);
-#ifdef NEW_INPUT_HANDLING
+
 			void				RevealNewWMState(Workspace::State &oldWMState);
 // TODO: we need to replace Winborder* with Layer*
 	inline	WinBorder*			Focus() const { return fWMState.Focus; }
 	inline	WinBorder*			Front() const { return fWMState.Front; }
 	inline	WinBorder*			Active() const { return fWMState.Active; }
 			bool				SetActive(WinBorder* newActive);
-#else
-	inline	WinBorder*			Focus() const { return ActiveWorkspace()->Focus(); }
-	inline	WinBorder*			Front() const { return ActiveWorkspace()->Front(); }
-	inline	WinBorder*			Active() const { return ActiveWorkspace()->Active(); }
-#endif
+
 	inline	void				SetWorkspaceCount(int32 wksCount);
 	inline	int32				WorkspaceCount() const { return fWsCount; }
 	inline	Workspace*			WorkspaceAt(int32 index) const { return fWorkspace[index]; }
@@ -148,9 +144,8 @@ public:
 
 private:
 friend class Desktop;
-#ifdef NEW_INPUT_HANDLING
 friend class WinBorder; // temporarily, I need invalidate_layer()
-#endif
+
 			// these are meant for Desktop class only!
 			void				AddWinBorder(WinBorder* winBorder);
 			void				RemoveWinBorder(WinBorder* winBorder);
@@ -167,26 +162,18 @@ friend class WinBorder; // temporarily, I need invalidate_layer()
 			void				invalidate_layer(Layer *layer, const BRegion &region);
 			void				redraw_layer(Layer *layer, const BRegion &region);
 #endif
-#ifndef NEW_INPUT_HANDLING
-			bool				get_workspace_windows();
-			void 				draw_window_tab(WinBorder *exFocus);
-			void				winborder_activation(WinBorder* exActive);
-			void				show_final_scene(WinBorder *exFocus, WinBorder *exActive);
-#endif
 			// Input related methods
 			void				MouseEventHandler(int32 code, BPrivate::PortLink& link);
 			void				KeyboardEventHandler(int32 code, BPrivate::PortLink& link);
 
-#ifdef NEW_INPUT_HANDLING
 			void				_ProcessMouseMovedEvent(PointerEvent &evt);
-#endif
+
 	inline	HWInterface*		GetHWInterface() const
 									{ return fDesktop->GetHWInterface(); }
 
 			Desktop*			fDesktop;
 			BMessage*			fDragMessage;
 			Layer*				fLastLayerUnderMouse;
-			int32				fViewAction;
 
 			Layer*				fNotifyLayer;
 			uint32				fSavedEventMask;
@@ -201,27 +188,16 @@ friend class WinBorder; // temporarily, I need invalidate_layer()
 
 			int32				fButtons;
 			BPoint				fLastMousePosition;
-			bool				fMovingWindow;
-			bool				fResizingWindow;
-			bool				fHaveWinBorderList;
 	
 			int32				fActiveWksIndex;
 			int32				fWsCount;
 			Workspace**			fWorkspace;
 			Layer*				fWorkspacesLayer;
 
-#ifndef NEW_INPUT_HANDLING
-			int32				fWinBorderListLength;
-			WinBorder**			fWinBorderList2;
-			WinBorder**			fWinBorderList;
-			WinBorder*			fMouseTargetWinBorder;
-#else
 // TODO: fWMState MUST be associated with a surface. This is the case now
 //   with RootLayer, but after Axel's refractoring this should go in
 //   WorkspaceLayer, I think.
 			Workspace::State	fWMState;
-#endif
-			int32				fWinBorderCount;
 	mutable int32				fWinBorderIndex;
 
 			int32				fScreenShotIndex;

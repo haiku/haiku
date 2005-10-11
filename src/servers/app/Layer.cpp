@@ -1107,7 +1107,7 @@ Layer::ScrollBy(float x, float y)
 
 	STRACE(("Layer(%s)::ScrollBy() END\n", Name()));
 }
-#ifdef NEW_INPUT_HANDLING
+
 void
 Layer::MouseDown(const PointerEvent& evt)
 {
@@ -1150,6 +1150,7 @@ Layer::MouseMoved(const PointerEvent& evt, uint32 transit)
 		Window()->SendMessageToClient(&movemsg, fViewToken, false);
 	}
 }
+
 void
 Layer::WorkspaceActivated(int32 index, bool active)
 {
@@ -1161,7 +1162,7 @@ Layer::WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces)
 {
 	// Empty
 }
-#endif
+
 // BoundsOrigin
 BPoint
 Layer::BoundsOrigin() const

@@ -42,7 +42,6 @@
 #include "ServerWindow.h"
 
 //#define NEW_CLIPPING 1
-#define NEW_INPUT_HANDLING 1
 
 enum {
 	B_LAYER_NONE		= 1,
@@ -165,13 +164,13 @@ class Layer {
 	virtual	void				MoveBy(float x, float y);
 	virtual	void				ResizeBy(float x, float y);
 	virtual	void				ScrollBy(float x, float y);
-#ifdef NEW_INPUT_HANDLING
+
 	virtual	void				MouseDown(const PointerEvent& evt);
 	virtual	void				MouseUp(const PointerEvent& evt);
 	virtual	void				MouseMoved(const PointerEvent& evt, uint32 transit);
 	virtual	void				WorkspaceActivated(int32 index, bool active);
 	virtual	void				WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces);
-#endif
+
 			BPoint				BoundsOrigin() const; // BoundsFrameDiff()?
 			float				Scale() const;
 
