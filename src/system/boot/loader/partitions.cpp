@@ -57,6 +57,9 @@ static file_system_module_info *sFileSystemModules[] = {
 #ifdef BOOT_SUPPORT_FILE_SYSTEM_HFS_PLUS
 	&gHFSPlusFileSystemModule,
 #endif
+#ifdef BOOT_SUPPORT_FILE_SYSTEM_TARFS
+	&gTarFileSystemModule,
+#endif
 };
 static const int32 sNumFileSystemModules = sizeof(sFileSystemModules) / sizeof(file_system_module_info *);
 

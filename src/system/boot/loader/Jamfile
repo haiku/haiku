@@ -18,6 +18,7 @@ UsePrivateHeaders [ FDirName storage ] ;
 
 		BOOT_SUPPORT_FILE_SYSTEM_BFS
 		BOOT_SUPPORT_FILE_SYSTEM_AMIGA_FFS
+		BOOT_SUPPORT_FILE_SYSTEM_TARFS
 		;
 
 	defines = [ FDefines $(defines) ] ;

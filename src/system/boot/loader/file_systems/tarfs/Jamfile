@@ -1,0 +1,19 @@
+SubDir OBOS_TOP src system boot loader file_systems tarfs ;
+
+UseHeaders [ FDirName $(OBOS_TOP) headers libs zlib ] ;
+
+UsePrivateHeaders [ FDirName kernel boot platform $(OBOS_BOOT_PLATFORM) ] ;
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders shared storage ;
+SubDirHdrs $(OBOS_TOP) headers libs zlib ;
+
+SubDirC++Flags -fno-rtti ;
+#SubDirCcFlags -DGUNZIP=1 ;
+
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src libs zlib ] ;
+
+KernelStaticLibrary boot_tarfs :
+	tarfs.cpp
+	inflate.c
+	: -fno-pic
+	;
