@@ -5,6 +5,7 @@
  * Used for BBufferGroup and BBuffer management across teams
  ***********************************************************************/
 #include <Buffer.h>
+#include <string.h>
 #include "SharedBufferList.h"
 #include "debug.h"
 
@@ -39,18 +40,20 @@ _shared_buffer_list::Clone(area_id id)
 
 	if (id == -1) {
 		size_t size = ((sizeof(_shared_buffer_list)) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1);
-		status = create_area("shared buffer list",(void **)&adr,B_ANY_KERNEL_ADDRESS,size,B_LAZY_LOCK,B_READ_AREA | B_WRITE_AREA);
+		status = create_area("shared buffer list",(void **)&adr,B_ANY_ADDRESS,size,B_LAZY_LOCK,B_READ_AREA | B_WRITE_AREA);
 		if (status >= B_OK) {
 			status = adr->Init();
 			if (status != B_OK)
 				delete_area(area_for(adr));
 		}
 	} else {
-		status = clone_area("shared buffer list clone",(void **)&adr,B_ANY_KERNEL_ADDRESS,B_READ_AREA | B_WRITE_AREA,id);
-		//TRACE("cloned area, id = 0x%08lx, ptr = 0x%08x\n",status,(int)adr);
+		status = clone_area("shared buffer list clone", (void **)&adr, B_ANY_ADDRESS, B_READ_AREA|B_WRITE_AREA, id);
+		if (status < B_OK) {
+			ERROR("_shared_buffer_list::Clone() clone area: %ld err = %s\n", id, strerror(status));
+		}
 	}
 	
-	return (status < B_OK) ? 	NULL : adr;
+	return (status < B_OK) ? NULL : adr;
 }
 
 void
@@ -183,6 +186,7 @@ _shared_buffer_list::RequestBuffer(sem_id group_reclaim_sem, int32 buffers_in_gr
 
 		// try to exit savely if the lock fails			
 		if (Lock() != B_OK) {
+			ERROR("_shared_buffer_list:: RequestBuffer: Lock failed\n");
 			release_sem_etc(group_reclaim_sem, count, 0);
 			return B_ERROR;
 		}
@@ -212,13 +216,15 @@ _shared_buffer_list::RequestBuffer(sem_id group_reclaim_sem, int32 buffers_in_gr
 		}
 
 		release_sem_etc(group_reclaim_sem, count, B_DO_NOT_RESCHEDULE);
-		if (Unlock() != B_OK)
+		if (Unlock() != B_OK) {
+			ERROR("_shared_buffer_list:: RequestBuffer: unlock failed\n");
 			return B_ERROR;
-
+		}
 		// prepare to request one more buffer next time
 		count++;
 	} while (count <= buffers_in_group);
 
+	ERROR("_shared_buffer_list:: RequestBuffer: no buffer found\n");
 	return B_ERROR;
 }
 
