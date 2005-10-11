@@ -44,6 +44,7 @@
 #include "Layer.h"
 #include "MessagePrivate.h"
 #include "RAMLinkMsgReader.h"
+#include "RenderingBuffer.h"
 #include "RootLayer.h"
 #include "ServerApp.h"
 #include "ServerBitmap.h"
@@ -56,6 +57,8 @@
 #include "WorkspacesLayer.h"
 
 #include "ServerWindow.h"
+
+#include "clipping.h"
 
 //#define DEBUG_SERVERWINDOW
 //#define DEBUG_SERVERWINDOW_GRAPHICS
@@ -84,7 +87,8 @@ struct dw_data {
 	dw_data() :
 		direct_sem(-1),
 		direct_sem_ack(-1),
-		direct_area(-1)
+		direct_area(-1),
+		direct_info(NULL)
 	{
 		direct_area = create_area("direct area", (void **)&direct_info,
 							B_ANY_ADDRESS, B_PAGE_SIZE, B_NO_LOCK, B_READ_WRITE);
@@ -105,7 +109,8 @@ struct dw_data {
 	
 	bool IsValid() const 
 	{
-		return (direct_area >= 0) && (direct_sem >= 0) && (direct_sem_ack >= 0);
+		return (direct_area >= 0) && (direct_sem >= 0)
+			&& (direct_sem_ack >= 0) && (direct_info != NULL);
 	}
 };
 
@@ -279,14 +284,14 @@ ServerWindow::Hide()
 	if (fWinBorder->IsHidden())
 		return;
 
+	if (fDirectWindowData != NULL)
+		_HandleDirectConnection(B_DIRECT_STOP);
+	
 	RootLayer* rootLayer = fWinBorder->GetRootLayer();
 	if (rootLayer && rootLayer->Lock()) {
 		rootLayer->HideWinBorder(fWinBorder);
 		rootLayer->Unlock();
 	}
-	
-	if (fDirectWindowData != NULL)
-		_HandleDirectConnection(B_DIRECT_STOP);
 }
 
 
@@ -2385,10 +2390,30 @@ ServerWindow::_HandleDirectConnection(direct_buffer_state state)
 	fDirectWindowData->direct_info->buffer_state = state;
 	
 	if ((state & B_DIRECT_MODE_MASK) != B_DIRECT_STOP) {
-		// TODO: Fill these correctly
-		fDirectWindowData->direct_info->bits = NULL;
-		fDirectWindowData->direct_info->pci_bits = NULL;
-		fDirectWindowData->direct_info->clip_list_count = 0;
+		// TODO: Locking ?
+		RenderingBuffer *buffer = gDesktop->GetHWInterface()->FrontBuffer();
+		fDirectWindowData->direct_info->bits = buffer->Bits();
+		fDirectWindowData->direct_info->pci_bits = NULL; // TODO	
+		fDirectWindowData->direct_info->bytes_per_row = buffer->BytesPerRow();
+		fDirectWindowData->direct_info->bits_per_pixel = buffer->BytesPerRow() / buffer->Width() * 8;
+		fDirectWindowData->direct_info->pixel_format = buffer->ColorSpace();
+		fDirectWindowData->direct_info->layout = B_BUFFER_NONINTERLEAVED;
+		fDirectWindowData->direct_info->orientation = B_BUFFER_TOP_TO_BOTTOM; // TODO
+		
+		const WinBorder *border = GetWinBorder();
+		fDirectWindowData->direct_info->window_bounds = to_clipping_rect(border->Bounds());
+		
+		// TODO: Review this
+		const int32 kMaxClipRectsCount = (B_PAGE_SIZE - sizeof(direct_buffer_info)) / sizeof(clipping_rect);
+	
+		// const_cast<> is needed because BRegion::CountRects() isn't const. Bah.
+		// TODO: Is this the correct region to take into account ?
+		BRegion &clipRegion = const_cast<BRegion &>(border->VisibleRegion());
+		fDirectWindowData->direct_info->clip_list_count = min_c(clipRegion.CountRects(), kMaxClipRectsCount);
+		fDirectWindowData->direct_info->clip_bounds = clipRegion.FrameInt();
+		
+		for (uint32 i = 0; i < fDirectWindowData->direct_info->clip_list_count; i++)
+			fDirectWindowData->direct_info->clip_list[i] = clipRegion.RectAtInt(i);
 	}
 	
 	// Releasing this sem causes the client to call BDirectWindow::DirectConnected()
@@ -2399,6 +2424,8 @@ ServerWindow::_HandleDirectConnection(direct_buffer_state state)
 	if (status == B_TIMED_OUT) {
 		// The client application didn't release the semaphore
 		// within the given timeout. Deleting this member should make it crash.
+		// TODO: Actually, it will not. At least, not always. Find a better way to 
+		// crash the client application.
 		delete fDirectWindowData;
 		fDirectWindowData = NULL;
 	}
