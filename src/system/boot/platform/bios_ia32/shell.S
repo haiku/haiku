@@ -35,7 +35,9 @@
 sNumSectors:
 	// this location will contain the length of the boot loader as
 	// written by the "makeflop" command in 512 byte blocks
-	.word	0x00c0
+	// 0x180 is the allowed maximum, as the zipped TAR with the
+	// kernel and the boot module might start at offset 192 kB
+	.word	0x0180
 
 floppy_start:
 	cli
