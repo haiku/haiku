@@ -26,6 +26,7 @@
 //	Description:	Global functions and variables for the Interface Kit
 //
 //------------------------------------------------------------------------------
+#include <Application.h>
 #include <InterfaceDefs.h>
 #include <Menu.h>
 #include <Roster.h>
@@ -44,6 +45,7 @@
 #include <ServerProtocol.h>
 #include <WidthBuffer.h>
 #include <ColorSet.h>	// for private system colors stuff
+#include <ColorTools.h>
 
 #include <string.h>
 #include <Font.h>
@@ -689,9 +691,56 @@ mouse_mode()
 
 _IMPEXP_BE rgb_color
 ui_color(color_which which)
-{
+{		
+	if (!be_app) {
+			switch (which) {
+				case B_PANEL_BACKGROUND_COLOR:
+					return make_color(216,216,216);
+				case B_PANEL_TEXT_COLOR:
+					return make_color(0,0,0);
+				case B_DOCUMENT_BACKGROUND_COLOR:
+					return make_color(255,255,255);
+				case B_DOCUMENT_TEXT_COLOR:
+					return make_color(0,0,0);
+				case B_CONTROL_BACKGROUND_COLOR:
+					return make_color(245,245,245);
+				case B_CONTROL_TEXT_COLOR:
+					return make_color(0,0,0);
+				case B_CONTROL_BORDER_COLOR:
+					return make_color(0,0,0);
+				case B_CONTROL_HIGHLIGHT_COLOR:
+					return make_color(102, 152, 203);
+				case B_NAVIGATION_BASE_COLOR:
+					return make_color(0,0,229);
+				case B_NAVIGATION_PULSE_COLOR:
+					return make_color(0,0,0);
+				case B_SHINE_COLOR:
+					return make_color(255,255,255);
+				case B_SHADOW_COLOR:
+					return make_color(0,0,0);
+				case B_MENU_BACKGROUND_COLOR:
+					return make_color(216,216,216);
+				case B_MENU_SELECTED_BACKGROUND_COLOR:
+					return make_color(115,120,184);
+				case B_MENU_ITEM_TEXT_COLOR:
+					return make_color(0,0,0);
+				case B_MENU_SELECTED_BORDER_COLOR:
+					return make_color(0,0,0);
+				case B_TOOLTIP_BACKGROUND_COLOR:
+					return make_color(255,255,0);
+				case B_TOOLTIP_TEXT_COLOR:
+					return make_color(0,0,0);
+				case B_SUCCESS_COLOR:
+					return make_color(0,255,0);
+				case B_FAILURE_COLOR:
+					return make_color(255,0,0);
+				default:
+					fprintf(stderr, "ui_color(): unknown color_which\n");
+					return make_color(0,0,0);
+			}
+	}
+	
 	rgb_color color;
-
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_UI_COLOR);
 	link.Attach<color_which>(which);
