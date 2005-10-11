@@ -23,6 +23,7 @@
 #include <new>
 
 #include <AppDefs.h>
+#include <DirectWindow.h>
 #include <GraphicsDefs.h>
 #include <Message.h>
 #include <PortLink.h>
@@ -74,6 +75,47 @@
 #	define DTRACE(x) ;
 #endif
 
+struct dw_data {
+	sem_id direct_sem;
+	sem_id direct_sem_ack;
+	area_id direct_area;
+	direct_buffer_info *direct_info;
+	
+	dw_data() :
+		direct_sem(-1),
+		direct_sem_ack(-1),
+		direct_area(-1)
+	{
+		direct_area = create_area("direct area", (void **)&direct_info,
+							B_ANY_ADDRESS, B_PAGE_SIZE, B_NO_LOCK, B_READ_WRITE);
+	
+		direct_sem = create_sem(1, "direct sem");
+		direct_sem_ack = create_sem(1, "direct sem ack");
+	}
+	
+	~dw_data()
+	{
+		if (direct_area >= 0)
+			delete_area(direct_area);
+		if (direct_sem >= 0)
+			delete_sem(direct_sem);
+		if (direct_sem_ack >= 0)
+			delete_sem(direct_sem_ack);
+	}
+	
+	bool IsValid() const 
+	{
+		return (direct_area >= 0) && (direct_sem >= 0) && (direct_sem_ack >= 0);
+	}
+};
+
+
+// TODO: Copied from DirectWindow.cpp: Move to a common header
+struct dw_sync_data {
+	area_id area;
+	sem_id disableSem;
+	sem_id disableSemAck;
+};
 
 /*!
 	\brief Constructor
@@ -93,7 +135,8 @@ ServerWindow::ServerWindow(const char *title, ServerApp *app,
 	fClientLooperPort(looperPort),
 	fClientViewsWithInvalidCoords(B_VIEW_RESIZED),
 	fHandlerToken(handlerID),
-	fCurrentLayer(NULL)
+	fCurrentLayer(NULL),
+	fDirectWindowData(NULL)
 {
 	STRACE(("ServerWindow(%s)::ServerWindow()\n", title));
 
@@ -116,6 +159,7 @@ ServerWindow::~ServerWindow()
 
 	BPrivate::gDefaultTokens.RemoveToken(fServerToken);
 
+	delete fDirectWindowData;
 	STRACE(("#ServerWindow(%p) will exit NOW\n", this));
 }
 
@@ -220,6 +264,9 @@ ServerWindow::Show()
 		rootLayer->ShowWinBorder(fWinBorder);
 		rootLayer->Unlock();
 	}
+	
+	if (fDirectWindowData != NULL)
+		_HandleDirectConnection(B_DIRECT_START);
 }
 
 //! Hides the window's WinBorder
@@ -237,6 +284,9 @@ ServerWindow::Hide()
 		rootLayer->HideWinBorder(fWinBorder);
 		rootLayer->Unlock();
 	}
+	
+	if (fDirectWindowData != NULL)
+		_HandleDirectConnection(B_DIRECT_STOP);
 }
 
 
@@ -1568,7 +1618,31 @@ myRootLayer->Unlock();
 			fLink.Flush();
 			break;
 		}
-
+		
+		case AS_DW_GET_SYNC_DATA:
+		{
+			// TODO: Use token or get rid of it.
+			int32 serverToken;
+			link.Read<int32>(&serverToken);
+			
+			if (_EnableDirectWindowMode() == B_OK) {
+				fLink.StartMessage(SERVER_TRUE);
+				struct dw_sync_data syncData = { 
+					fDirectWindowData->direct_area,
+					fDirectWindowData->direct_sem,
+					fDirectWindowData->direct_sem_ack
+				};
+				
+				fLink.Attach(&syncData, sizeof(syncData));
+				 
+			} else
+				fLink.StartMessage(SERVER_FALSE);
+			
+			fLink.Flush();
+			
+			break;
+		}
+		
 		default:
 			_DispatchGraphicsMessage(code, link);
 			break;
@@ -2280,6 +2354,56 @@ ServerWindow::MakeWinBorder(BRect frame, const char* name,
 	return new(nothrow) WinBorder(frame, name, look, feel, flags,
 								  workspace, this, gDesktop->GetDisplayDriver());
 }
+
+
+status_t
+ServerWindow::_EnableDirectWindowMode()
+{
+	if (fDirectWindowData != NULL)
+		return B_ERROR; // already in direct window mode
+	
+	fDirectWindowData = new (nothrow) dw_data;
+	if (fDirectWindowData == NULL)
+		return B_NO_MEMORY;
+		
+	if (!fDirectWindowData->IsValid()) {
+		delete fDirectWindowData;
+		fDirectWindowData = NULL;
+		return B_ERROR;
+	}
+	
+	return B_OK;
+}
+
+
+void
+ServerWindow::_HandleDirectConnection(direct_buffer_state state)
+{
+	if (fDirectWindowData == NULL)
+		return;
+	
+	fDirectWindowData->direct_info->buffer_state = state;
+	
+	if ((state & B_DIRECT_MODE_MASK) != B_DIRECT_STOP) {
+		// TODO: Fill these correctly
+		fDirectWindowData->direct_info->bits = NULL;
+		fDirectWindowData->direct_info->pci_bits = NULL;
+		fDirectWindowData->direct_info->clip_list_count = 0;
+	}
+	
+	// Releasing this sem causes the client to call BDirectWindow::DirectConnected()
+	release_sem(fDirectWindowData->direct_sem);
+	
+	// TODO: Waiting 3 seconds in this thread could cause weird things: test
+	status_t status = acquire_sem_etc(fDirectWindowData->direct_sem_ack, 1, B_TIMEOUT, 3000000);
+	if (status == B_TIMED_OUT) {
+		// The client application didn't release the semaphore
+		// within the given timeout. Deleting this member should make it crash.
+		delete fDirectWindowData;
+		fDirectWindowData = NULL;
+	}
+}
+
 
 status_t
 ServerWindow::PictureToRegion(ServerPicture *picture, BRegion &region,

@@ -13,6 +13,7 @@
 #define _SERVERWIN_H_
 
 
+#include <DirectWindow.h> // for direct_buffer_state
 #include <GraphicsDefs.h>
 #include <PortLink.h>
 #include <Locker.h>
@@ -38,6 +39,7 @@ class Workspace;
 class RootLayer;
 class Layer;
 class ServerPicture;
+struct dw_data;
 struct window_info;
 
 #define AS_UPDATE_DECORATOR 'asud'
@@ -115,6 +117,9 @@ private:
 	virtual void				_PrepareQuit();
 	virtual void				_GetLooperName(char* name, size_t size);
 
+			status_t			_EnableDirectWindowMode();
+			void				_HandleDirectConnection(direct_buffer_state state);
+			
 			// TODO: Move me elsewhere
 			status_t			PictureToRegion(ServerPicture *picture,
 												BRegion &,
@@ -139,6 +144,8 @@ private:
 			int32				fHandlerToken;
 
 			Layer*				fCurrentLayer;
+			
+			dw_data*			fDirectWindowData;
 };
 
 #endif	// _SERVERWIN_H_
