@@ -709,7 +709,9 @@ static uint8 BT_init_PAL800_OS()
 	}
 	else
 	{	//set BT value
-		buffer[7] = 0xc0;//scope: tuned. lsb h_blank_o: h_blank_o = horizontal viewport location on TV
+		//fixme: checkout ws-tv (added 0x10)..
+		/* confirmed on TNT1 using 4:3 TV */
+		buffer[7] = 0xd0;//scope: tuned. lsb h_blank_o: h_blank_o = horizontal viewport location on TV
 						//(guideline for initial setting: (h_blank_o / h_clk_0) * 64.0uS = 10.0uS for PAL)
 		buffer[8] = 0x18;//try-out; scope: checked against other modes, looks OK.	v_blank_o: 1e active line ('pixel')
 	}
@@ -1470,8 +1472,18 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 		break;
 	case PAL800_OS:
 		target->timing.h_display = 768;			//H_ACTIVE
-		target->timing.h_sync_start = 848;		//set for centered TV output
-		target->timing.h_sync_end = 848+20;		//delta is BT H_BLANKI
+		if (si->ps.tv_encoder.type <= BT869)
+		{
+			//fixme: checkout ws-tv (added 8)..
+			/* confirmed on TNT1 using 4:3 TV */
+			target->timing.h_sync_start = 856;		//set for centered TV output
+			target->timing.h_sync_end = 856+20;		//delta is BT H_BLANKI
+		}
+		else
+		{
+			target->timing.h_sync_start = 848;		//set for centered TV output
+			target->timing.h_sync_end = 848+20;		//delta is BT H_BLANKI
+		}
 		target->timing.h_total = 944;			//BT H_CLKI
 		target->timing.v_display = 576;			//V_ACTIVEI
 		target->timing.v_sync_start = 579;		//set for centered sync pulse
