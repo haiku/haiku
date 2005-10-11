@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2004-2005, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
