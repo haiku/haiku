@@ -1518,20 +1518,28 @@ static status_t BT_start_tvout(void)
 	/* enable access to primary head */
 	set_crtc_owner(0);
 
-	//fixme: checkout...
-	//CAUTION:
-	//On the TNT1, these memadresses apparantly cannot be read (sometimes)!;
-	//write actions do succeed though... (tested only on ISA bus yet..)
+	/* CAUTION:
+	 * On the TNT1, TV_SETUP and PLLSEL cannot be read (sometimes), but
+	 * write actions do succeed ... (tested on both ISA and PCI bus!) */
 
 	/* setup TVencoder connection */
 	/* b1-0 = %01: encoder type is MASTER;
 	 * b24 = 1: VIP datapos is b0-7 */
 	//fixme if needed: setup completely instead of relying on pre-init by BIOS..
+	//(it seems to work OK on TNT1 although read reg. doesn't seem to work)
 	DACW(TV_SETUP, ((DACR(TV_SETUP) & ~0x00000002) | 0x01000001));
 
 	/* tell GPU to use pixelclock from TVencoder instead of using internal source */
 	/* (nessecary or display will 'shiver' on both TV and VGA.) */
-	DACW(PLLSEL, (DACR(PLLSEL) | 0x00030000));
+	if (si->ps.secondary_head)
+	{
+		DACW(PLLSEL, (DACR(PLLSEL) | 0x00030000));
+	}
+	else
+	{
+		/* confirmed PLLSEL to be a write-only register on TNT1! */
+		DACW(PLLSEL, 0x00030700);
+	}
 
 	/* Set overscan color to 'black' */
 	/* note:
