@@ -2400,15 +2400,15 @@ ServerWindow::_HandleDirectConnection(direct_buffer_state state)
 		fDirectWindowData->direct_info->layout = B_BUFFER_NONINTERLEAVED;
 		fDirectWindowData->direct_info->orientation = B_BUFFER_TOP_TO_BOTTOM; // TODO
 		
-		const WinBorder *border = GetWinBorder();
-		fDirectWindowData->direct_info->window_bounds = to_clipping_rect(border->Bounds());
+		WinBorder *border = const_cast<WinBorder *>(GetWinBorder());
+		fDirectWindowData->direct_info->window_bounds = to_clipping_rect(border->Frame());
 		
 		// TODO: Review this
 		const int32 kMaxClipRectsCount = (B_PAGE_SIZE - sizeof(direct_buffer_info)) / sizeof(clipping_rect);
 	
-		// const_cast<> is needed because BRegion::CountRects() isn't const. Bah.
 		// TODO: Is this the correct region to take into account ?
-		BRegion &clipRegion = const_cast<BRegion &>(border->VisibleRegion());
+		BRegion clipRegion = const_cast<BRegion &>(border->VisibleRegion());
+		border->ConvertToTop(&clipRegion);
 		fDirectWindowData->direct_info->clip_list_count = min_c(clipRegion.CountRects(), kMaxClipRectsCount);
 		fDirectWindowData->direct_info->clip_bounds = clipRegion.FrameInt();
 		
