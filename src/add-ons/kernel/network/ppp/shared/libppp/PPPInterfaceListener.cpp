@@ -192,7 +192,7 @@ PPPInterfaceListener::StopWatchingInterface()
 
 //!	Disables interface creation messages from the PPP manager.
 void
-PPPInterfaceListener::StopWachingManager()
+PPPInterfaceListener::StopWatchingManager()
 {
 	Manager().DisableReports(PPP_ALL_REPORTS, fReportThread);
 }
