@@ -50,6 +50,7 @@ ObjectsDefines
 
 		BOOT_SUPPORT_FILE_SYSTEM_BFS
 		BOOT_SUPPORT_FILE_SYSTEM_AMIGA_FFS
+		BOOT_SUPPORT_FILE_SYSTEM_TARFS
 		;
 
 	defines = [ FDefines $(defines) ] ;
@@ -96,7 +97,7 @@ SimpleTest BootLoaderTest :
 	strlcpy.c
 	driver_settings.c
 
-	: boottest_bfs.a boottest_amiga_ffs.a
+	: boottest_bfs.a boottest_amiga_ffs.a boottest_tarfs.a libz.a
 	;
 
 # Tell Jam where to find the utility sources

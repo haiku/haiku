@@ -1,4 +1,5 @@
 SubDir OBOS_TOP src tests kernel boot loader file_systems ;
 
-SubInclude OBOS_TOP src tests kernel boot loader file_systems bfs ;
 SubInclude OBOS_TOP src tests kernel boot loader file_systems amiga_ffs ;
+SubInclude OBOS_TOP src tests kernel boot loader file_systems bfs ;
+SubInclude OBOS_TOP src tests kernel boot loader file_systems tarfs ;
