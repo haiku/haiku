@@ -8,6 +8,9 @@ KernelLd boot_loader :
 	# file systems
 	boot_bfs.a
 	boot_amiga_ffs.a
+	boot_tarfs.a
+
+	libz.a
 
 	# libroot functions needed by the stage2 boot loader
 	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>byteorder.o

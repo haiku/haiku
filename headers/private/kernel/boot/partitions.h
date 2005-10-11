@@ -66,6 +66,7 @@ class Partition : public Node, public partition_data {
 #define kPartitionTypeHFSPlus	"HFS+ Filesystem"
 #define kPartitionTypeISO9660	"ISO9660 Filesystem"
 #define kPartitionTypeReiser	"Reiser Filesystem"
+#define kPartitionTypeTarFS		"TAR Filesystem"
 #define kPartitionTypeUDF		"UDF Filesystem"
 
 // structure definitions as used in the boot loader
@@ -87,5 +88,6 @@ struct file_system_module_info {
 
 extern file_system_module_info gBFSFileSystemModule;
 extern file_system_module_info gAmigaFFSFileSystemModule;
+extern file_system_module_info gTarFileSystemModule;
 
 #endif	/* KERNEL_BOOT_PARTITIONS_H */
