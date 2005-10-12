@@ -22,3 +22,11 @@ strrchr(char const *s, int c)
 
 	return (char *)last;
 }
+
+
+char *
+rindex(char const *s, int c)
+{
+	return strrchr(s, c);
+}
+

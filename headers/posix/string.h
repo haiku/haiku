@@ -78,6 +78,8 @@ extern const char	*strsignal(int signal);
 #define bzero(buffer, length) memset((buffer), 0, (length))
 
 extern int ffs(int i);
+extern char 		*index(const char *s, int c);
+extern char 		*rindex(char const *s, int c);
 
 #ifdef __cplusplus
 }

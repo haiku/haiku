@@ -16,3 +16,10 @@ strchr(const char *s, int c)
 	return (char *)s;
 }
 
+
+char *
+index(const char *s, int c)
+{
+	return strchr(s, c);
+}
+
