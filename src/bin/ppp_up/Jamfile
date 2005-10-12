@@ -1,0 +1,27 @@
+SubDir OBOS_TOP src bin ppp_up ;
+
+UsePrivateHeaders net ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libppp headers ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+
+AddResources ppp_up : ppp_up.rdef ;
+
+BinCommand ppp_up :
+	ConnectionView.cpp
+	ConnectionWindow.cpp
+	PPPDeskbarReplicant.cpp
+	PPPStatusView.cpp
+	PPPStatusWindow.cpp
+	PPPUpApplication.cpp
+;
+
+LinkSharedOSLibs ppp_up : libppp.a be ;
+
+# Installation
+OBOSInstall install-networking
+	: /boot/beos/bin
+	: ppp_up ;
+
+Package haiku-networkingkit-cvs :
+	ppp_up :
+	boot beos bin ;
