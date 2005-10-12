@@ -254,6 +254,7 @@ ServerWindow::ReplaceDecorator()
 	fWinBorder->UpdateDecorator();
 }
 
+
 //! Shows the window's WinBorder
 void
 ServerWindow::Show()
@@ -270,9 +271,13 @@ ServerWindow::Show()
 		rootLayer->Unlock();
 	}
 	
+	// TODO: This doesn't work: Here we aren't shown yet as RootLayer::ShowWinBorder()
+	// does its work asynchronously. As we lock the rootlayer, I think it could be synchronous.
+	// Otherwise, we need a "Shown()" hook or something like that.
 	if (fDirectWindowData != NULL)
 		_HandleDirectConnection(B_DIRECT_START);
 }
+
 
 //! Hides the window's WinBorder
 void
