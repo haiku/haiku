@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src system libroot posix stdio ;
 
 KernelMergeObject posix_stdio.o :
+	_fseek.c
 	<$(SOURCE_GRIST)>remove.c
 	<$(SOURCE_GRIST)>rename.c
 # The other files are superseded by the glibc libio/stdio stuff
