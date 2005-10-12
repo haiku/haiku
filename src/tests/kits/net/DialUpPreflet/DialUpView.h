@@ -20,10 +20,10 @@ class DialUpView : public BView {
 		
 		virtual void AttachedToWindow();
 		virtual void MessageReceived(BMessage *message);
-		
-		void UpDownThread();
 
 	private:
+		void BringUpOrDown();
+		
 		void HandleReportMessage(BMessage *message);
 		void CreateTabs();
 		
@@ -47,7 +47,6 @@ class DialUpView : public BView {
 		thread_id fUpDownThread;
 		
 		BMenuItem *fCurrentItem, *fDeleterItem;
-		ppp_interface_id fWatching;
 		
 		bool fKeepLabel;
 		BStringView *fStatusView;

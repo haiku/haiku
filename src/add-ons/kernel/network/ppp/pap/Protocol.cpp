@@ -359,19 +359,18 @@ PAP::RREvent(struct mbuf *packet)
 		*peerPassword = (char*) passwordLength + 1;
 	const char *username = Interface().Username(), *password = Interface().Password();
 	
-	
 	if(*userLength == strlen(username) && *passwordLength == strlen(password)
 			&& !strncmp(peerUsername, username, *userLength)
 			&& !strncmp(peerPassword, password, *passwordLength)) {
 		NewState(ACCEPTED);
 		locker.UnlockNow();
-		Interface().StateMachine().PeerAuthenticationAccepted(user);
+		Interface().StateMachine().PeerAuthenticationAccepted(username);
 		UpEvent();
 		SendAck(packet);
 	} else {
 		NewState(INITIAL);
 		locker.UnlockNow();
-		Interface().StateMachine().PeerAuthenticationDenied(user);
+		Interface().StateMachine().PeerAuthenticationDenied(username);
 		UpFailedEvent();
 		SendNak(packet);
 	}

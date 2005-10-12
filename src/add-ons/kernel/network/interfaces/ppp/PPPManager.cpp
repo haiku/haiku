@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -77,12 +77,22 @@ PPPManager::~PPPManager()
 	net_remove_timer(fPulseTimer);
 	
 	// now really delete the interfaces (the deleter_thread is not running)
-	ppp_interface_entry *entry;
+	ppp_interface_entry *entry = NULL;
 	for(int32 index = 0; index < fEntries.CountItems(); index++) {
 		entry = fEntries.ItemAt(index);
 		if(entry) {
 			delete entry->interface;
 			free(entry->name);
+			delete entry;
+		}
+	}
+	
+	// also delete all ppp_up references
+	ppp_app_entry *app = NULL;
+	for(int32 index = 0; index < fApps.CountItems(); index++) {
+		app = fApps.ItemAt(index);
+		if(app) {
+			free(app->interfaceName);
 			delete entry;
 		}
 	}
@@ -124,13 +134,13 @@ PPPManager::Output(ifnet *ifp, struct mbuf *buf, struct sockaddr *dst,
 		return B_ERROR;
 	}
 	
-	atomic_add(entry->accessing, 1);
+	atomic_add(&entry->accessing, 1);
 	locker.UnlockNow();
 	
 	if(!entry->interface->DoesConnectOnDemand()
 			&& ifp->if_flags & (IFF_UP | IFF_RUNNING) != (IFF_UP | IFF_RUNNING)) {
 		m_freem(buf);
-		atomic_add(entry->accessing, -1);
+		atomic_add(&entry->accessing, -1);
 		return ENETDOWN;
 	}
 	
@@ -147,12 +157,12 @@ PPPManager::Output(ifnet *ifp, struct mbuf *buf, struct sockaddr *dst,
 		if(result == PPP_UNHANDLED)
 			continue;
 		
-		atomic_add(entry->accessing, -1);
+		atomic_add(&entry->accessing, -1);
 		return result;
 	}
 	
 	m_freem(buf);
-	atomic_add(entry->accessing, -1);
+	atomic_add(&entry->accessing, -1);
 	return B_ERROR;
 }
 
@@ -170,7 +180,7 @@ PPPManager::Control(ifnet *ifp, ulong cmd, caddr_t data)
 	}
 	
 	int32 status = B_OK;
-	atomic_add(entry->accessing, 1);
+	atomic_add(&entry->accessing, 1);
 	locker.UnlockNow();
 	
 	switch(cmd) {
@@ -189,7 +199,7 @@ PPPManager::Control(ifnet *ifp, ulong cmd, caddr_t data)
 			status = entry->interface->StackControl(cmd, data);
 	}
 	
-	atomic_add(entry->accessing, -1);
+	atomic_add(&entry->accessing, -1);
 	return status;
 }
 
@@ -233,7 +243,7 @@ PPPManager::DeleteInterface(ppp_interface_id ID)
 			// this check prevents a dead-lock
 	
 	entry->deleting = true;
-	atomic_add(entry->accessing, 1);
+	atomic_add(&entry->accessing, 1);
 	locker.UnlockNow();
 	
 	// bring interface down if needed
@@ -241,7 +251,7 @@ PPPManager::DeleteInterface(ppp_interface_id ID)
 			|| entry->interface->Phase() != PPP_DOWN_PHASE)
 		entry->interface->Down();
 	
-	atomic_add(entry->accessing, -1);
+	atomic_add(&entry->accessing, -1);
 	
 	return true;
 }
@@ -398,11 +408,11 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 			if(!entry || entry->deleting)
 				return B_BAD_INDEX;
 			
-			atomic_add(entry->accessing, 1);
+			atomic_add(&entry->accessing, 1);
 			locker.UnlockNow();
 			
 			entry->interface->Up();
-			atomic_add(entry->accessing, -1);
+			atomic_add(&entry->accessing, -1);
 		} break;
 		
 		case PPPC_BRING_INTERFACE_DOWN: {
@@ -415,11 +425,11 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 			if(!entry || entry->deleting)
 				return B_BAD_INDEX;
 			
-			atomic_add(entry->accessing, 1);
+			atomic_add(&entry->accessing, 1);
 			locker.UnlockNow();
 			
 			entry->interface->Down();
-			atomic_add(entry->accessing, -1);
+			atomic_add(&entry->accessing, -1);
 		} break;
 		
 		case PPPC_CONTROL_INTERFACE: {
@@ -507,10 +517,10 @@ PPPManager::ControlInterface(ppp_interface_id ID, uint32 op, void *data, size_t 
 	status_t result = B_BAD_INDEX;
 	ppp_interface_entry *entry = EntryFor(ID);
 	if(entry && !entry->deleting) {
-		atomic_add(entry->accessing, 1);
+		atomic_add(&entry->accessing, 1);
 		locker.UnlockNow();
 		result = entry->interface->Control(op, data, length);
-		atomic_add(entry->accessing, -1);
+		atomic_add(&entry->accessing, -1);
 	}
 	
 	return result;
@@ -683,6 +693,23 @@ PPPManager::EntryFor(const driver_settings *settings) const
 }
 
 
+ppp_app_entry*
+PPPManager::AppFor(const char *name) const
+{
+	if(!name)
+		return NULL;
+	
+	ppp_app_entry *app;
+	for(int32 index = 0; index < fApps.CountItems(); index++) {
+		app = fApps.ItemAt(index);
+		if(app && !strcmp(app->interfaceName, name))
+			return app;
+	}
+	
+	return NULL;
+}
+
+
 void
 PPPManager::SettingsChanged()
 {
@@ -748,7 +775,6 @@ PPPManager::_CreateInterface(const char *name,
 	entry->name = name ? strdup(name) : NULL;
 	entry->accessing = 1;
 	entry->deleting = false;
-	entry->requestThread = -1;
 	fEntries.AddItem(entry);
 		// nothing bad can happen because we are in a locked section
 	
@@ -763,13 +789,35 @@ PPPManager::_CreateInterface(const char *name,
 		return PPP_UNDEFINED_INTERFACE_ID;
 	}
 	
+	// find an existing ppp_up entry or create a new one otherwise
+	if(entry->name) {
+		ppp_app_entry *app = AppFor(entry->name);
+		thread_info info;
+		if(!app || get_thread_info(app->thread, &info) != B_OK) {
+			if(!app) {
+				app = new ppp_app_entry;
+				app->interfaceName = strdup(entry->name);
+				fApps.AddItem(app);
+			}
+			
+			// run new ppp_up instance
+			const char *argv[] = { "/boot/beos/bin/ppp_up", entry->name, NULL };
+			const char *env[] = { NULL };
+			app->thread = load_image(2, argv, env);
+			if(app->thread < 0)
+				ERROR("KPPPInterface::Up(): Error: could not load ppp_up!\n");
+			resume_thread(app->thread);
+		}
+	} else
+		entry->interface->SetAskBeforeConnecting(false);
+	
 	locker.UnlockNow();
 		// it is safe to access the manager from userland now
 	
 	if(!Report(PPP_MANAGER_REPORT, PPP_REPORT_INTERFACE_CREATED,
 			&id, sizeof(ppp_interface_id))) {
 		DeleteInterface(id);
-		atomic_add(entry->accessing, -1);
+		atomic_add(&entry->accessing, -1);
 		return PPP_UNDEFINED_INTERFACE_ID;
 	}
 	
@@ -777,7 +825,7 @@ PPPManager::_CreateInterface(const char *name,
 	entry->interface->StateMachine().DownProtocols();
 	entry->interface->StateMachine().ResetLCPHandlers();
 	
-	atomic_add(entry->accessing, -1);
+	atomic_add(&entry->accessing, -1);
 	
 	return id;
 }
@@ -839,6 +887,19 @@ PPPManager::DeleterThreadEvent()
 			
 			free(entry->name);
 			delete entry;
+		}
+	}
+	
+	// remove dead ppp_up entries
+	ppp_app_entry *app;
+	thread_info info;
+	for(int32 index = 0; index < fApps.CountItems(); index++) {
+		app = fApps.ItemAt(index);
+		if(app && get_thread_info(app->thread, &info) != B_OK) {
+			fApps.RemoveItem(index);
+			--index;
+			free(app->interfaceName);
+			delete app;
 		}
 	}
 }

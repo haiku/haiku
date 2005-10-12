@@ -73,9 +73,6 @@ PPPInterface::InitCheck() const
 
 /*!	\brief Changes the current interface.
 	
-	The interface's info structure is cached in this object. If you want to update
-	its values you must call \c SetTo() again or use \c Control() with an op of
-	\c PPPC_GET_INTERFACE_INFO.\n
 	If this fails it will set the interface's \a ID to \c PPP_UNDEFINED_INTERFACE_ID.
 	
 	\param ID The ID of the new interface.
@@ -93,15 +90,17 @@ PPPInterface::SetTo(ppp_interface_id ID)
 	if(fFD < 0)
 		return B_ERROR;
 	
-	fID = ID;
-	
-	status_t error = Control(PPPC_GET_INTERFACE_INFO, &fInfo, sizeof(fInfo));
-	if(error != B_OK) {
-		memset(&fInfo, 0, sizeof(fInfo));
+	ppp_interface_info_t info;
+	if(GetInterfaceInfo(&info)) {
+		fName = info.info.name;
+		fID = ID;
+	} else {
+		fName = "";
 		fID = PPP_UNDEFINED_INTERFACE_ID;
+		return B_ERROR;
 	}
 	
-	return error;
+	return B_OK;
 }
 
 
@@ -199,9 +198,7 @@ PPPInterface::GetSettingsEntry(BEntry *entry) const
 }
 
 
-/*!	\brief Get the cached ppp_interface_info_t structure.
-	
-	\param info The info structure is copied into this argument.
+/*!	\brief Get the ppp_interface_info_t structure.
 	
 	\return \c true on success, \c false otherwise.
 */
@@ -211,9 +208,8 @@ PPPInterface::GetInterfaceInfo(ppp_interface_info_t *info) const
 	if(InitCheck() != B_OK || !info)
 		return false;
 	
-	memcpy(info, &fInfo, sizeof(fInfo));
-	
-	return true;
+	return Control(PPPC_GET_INTERFACE_INFO, &info, sizeof(ppp_interface_info_t))
+		== B_OK;
 }
 
 

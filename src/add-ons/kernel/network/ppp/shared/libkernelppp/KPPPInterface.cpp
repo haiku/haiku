@@ -486,14 +486,7 @@ KPPPInterface::Control(uint32 op, void *data, size_t length)
 			if(length < sizeof(uint32) || !data)
 				return B_ERROR;
 			
-			LockerHelper locker(fLock);
-			bool old = fAskBeforeConnecting;
-			fAskBeforeConnecting = *((uint32*)data);
-			if(old && fAskBeforeConnecting == false && State() == PPP_STARTING_STATE
-					&& Phase() == PPP_DOWN_PHASE) {
-				locker.UnlockNow();
-				StateMachine().ContinueOpenEvent();
-			}
+			SetAskBeforeConnecting(*((uint32*)data));
 		break;
 		
 		case PPPC_SET_MRU:
@@ -970,6 +963,21 @@ KPPPInterface::SetConnectOnDemand(bool connectOnDemand = true)
 	} else if(!connectOnDemand && Phase() < PPP_ESTABLISHED_PHASE) {
 		if(Ifnet())
 			Ifnet()->if_flags &= ~IFF_UP;
+	}
+}
+
+
+//!	Sets whether the user is asked before establishing the connection.
+void
+KPPPInterface::SetAskBeforeConnecting(bool ask)
+{
+	LockerHelper locker(fLock);
+	bool old = fAskBeforeConnecting;
+	fAskBeforeConnecting = ask;
+	if(old && fAskBeforeConnecting == false && State() == PPP_STARTING_STATE
+			&& Phase() == PPP_DOWN_PHASE) {
+		locker.UnlockNow();
+		StateMachine().ContinueOpenEvent();
 	}
 }
 

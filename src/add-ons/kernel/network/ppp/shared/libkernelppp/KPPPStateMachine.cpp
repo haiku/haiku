@@ -765,7 +765,7 @@ KPPPStateMachine::OpenEvent()
 		case PPP_INITIAL_STATE:
 			fLastConnectionReportCode = PPP_REPORT_GOING_UP;
 			Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_GOING_UP,
-					&fInterface.fID, sizeof(ppp_interface_id))
+					&fInterface.fID, sizeof(ppp_interface_id));
 			
 			if(Interface().Mode() == PPP_SERVER_MODE) {
 				NewPhase(PPP_ESTABLISHMENT_PHASE);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2004-2005, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -19,7 +19,7 @@
 BPoint
 center_on_screen(BRect rect, BWindow *window = NULL)
 {
-	BRect screenFrame = (BScreen(window).Frame());
+	BRect screenFrame = BScreen(window).Frame();
 	BPoint point((screenFrame.Width() - rect.Width()) / 2.0,
 		(screenFrame.Height() - rect.Height()) / 2.0);
 	if(!screenFrame.Contains(point))

@@ -108,6 +108,7 @@ class KPPPStateMachine {
 		
 		// private events
 		void OpenEvent();
+		void ContinueOpenEvent();
 		void CloseEvent();
 		void TOGoodEvent();
 		void TOBadEvent();

@@ -64,7 +64,7 @@ KPPPReportManager::SendReport(thread_id thread, const ppp_report_packet *report)
 		report_sender_info *info = new report_sender_info;
 		info->thread = thread;
 		memcpy(&info->report, report, sizeof(ppp_report_packet));
-		resume_thread(spawn_thread(report_sender_thread, "PPP: ReportSender",
+		resume_thread(spawn_kernel_thread(report_sender_thread, "PPP: ReportSender",
 			B_NORMAL_PRIORITY, info));
 		return true;
 	}

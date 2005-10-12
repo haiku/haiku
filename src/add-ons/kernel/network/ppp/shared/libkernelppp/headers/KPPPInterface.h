@@ -157,6 +157,11 @@ class KPPPInterface : public KPPPLayer {
 		bool DoesConnectOnDemand() const
 			{ return fConnectOnDemand; }
 		
+		void SetAskBeforeConnecting(bool ask);
+		//!	Returns whether the user is asked before establishing the connection.
+		bool DoesAskBeforeConnecting() const
+			{ return fAskBeforeConnecting; }
+		
 		//!	Clients are in \c PPP_CLIENT_MODE and servers are in \c PPP_SERVER_MODE.
 		ppp_mode Mode() const
 			{ return fMode; }

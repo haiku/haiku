@@ -7,6 +7,7 @@
 #define _PPP_INTERFACE__H
 
 #include <KPPPManager.h>
+#include <String.h>
 
 class BEntry;
 
@@ -21,7 +22,7 @@ class PPPInterface {
 		
 		//!	Returns the name of the interface description file.
 		const char *Name() const
-			{ return fInfo.info.name; }
+			{ return fName.String(); }
 		
 		status_t SetTo(ppp_interface_id ID);
 		//!	Returns the unique id of this interface.
@@ -55,9 +56,8 @@ class PPPInterface {
 
 	private:
 		ppp_interface_id fID;
-		
 		int fFD;
-		ppp_interface_info_t fInfo;
+		BString fName;
 };
 
 

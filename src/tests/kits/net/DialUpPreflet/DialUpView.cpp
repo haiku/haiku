@@ -77,21 +77,10 @@ static const char *kErrorLoadingFailed = "Error: Failed loading interface! The "
 static const char *kErrorSavingFailed = "Error: Failed saving interface settings!";
 
 
-static
-status_t
-up_down_thread(void *data)
-{
-	static_cast<DialUpView*>(data)->UpDownThread();
-	return B_OK;
-}
-
-
 DialUpView::DialUpView(BRect frame)
 	: BView(frame, "DialUpView", B_FOLLOW_NONE, 0),
 	fListener(this),
-	fUpDownThread(-1),
 	fCurrentItem(NULL),
-	fWatching(PPP_UNDEFINED_INTERFACE_ID),
 	fKeepLabel(false)
 {
 	BRect bounds = Bounds();
@@ -175,10 +164,9 @@ DialUpView::DialUpView(BRect frame)
 
 DialUpView::~DialUpView()
 {
+	fListener.StopWatchingInterface();
+	fListener.StopWatchingManager();
 	fSettings.SaveSettingsToFile();
-	
-	int32 tmp;
-	wait_for_thread(fUpDownThread, &tmp);
 }
 
 
@@ -268,12 +256,10 @@ DialUpView::MessageReceived(BMessage *message)
 		} break;
 		
 		case kMsgConnectButton: {
-			if(!fCurrentItem || fUpDownThread != -1)
+			if(!fCurrentItem)
 				return;
 			
-			fUpDownThread = spawn_thread(up_down_thread, "up_down_thread",
-				B_NORMAL_PRIORITY, this);
-			resume_thread(fUpDownThread);
+			BringUpOrDown();
 		} break;
 		
 		case kMsgUpdateDefaultInterface:
@@ -287,7 +273,7 @@ DialUpView::MessageReceived(BMessage *message)
 
 
 void
-DialUpView::UpDownThread()
+DialUpView::BringUpOrDown()
 {
 	fSettings.SaveSettingsToFile();
 	BMessage settings;
@@ -321,8 +307,6 @@ DialUpView::UpDownThread()
 		interface.Up();
 	} else
 		interface.Down();
-	
-	fUpDownThread = -1;
 }
 
 
@@ -334,7 +318,8 @@ DialUpView::HandleReportMessage(BMessage *message)
 	
 	ppp_interface_id id;
 	if(message->FindInt32("interface", reinterpret_cast<int32*>(&id)) != B_OK
-			|| (fWatching != PPP_UNDEFINED_INTERFACE_ID && id != fWatching))
+			|| (fListener.Interface() != PPP_UNDEFINED_INTERFACE_ID
+				&& id != fListener.Interface()))
 		return;
 	
 	int32 type, code;
@@ -343,27 +328,17 @@ DialUpView::HandleReportMessage(BMessage *message)
 	
 	if(type == PPP_MANAGER_REPORT && code == PPP_REPORT_INTERFACE_CREATED) {
 		PPPInterface interface(id);
-		if(interface.InitCheck() != B_OK)
-			return;
-		
-		ppp_interface_info_t info;
-		interface.GetInterfaceInfo(&info);
-		if(strcasecmp(info.info.name, fCurrentItem->Message()->FindString("name")))
+		if(interface.InitCheck() != B_OK
+				|| strcasecmp(interface.Name(),
+					fCurrentItem->Message()->FindString("name")))
 			return;
 		
 		WatchInterface(id);
-	} else if(type == PPP_CONNECTION_REPORT) {
-		if(fWatching == PPP_UNDEFINED_INTERFACE_ID)
-			return;
-		
+	} else if(type == PPP_CONNECTION_REPORT)
 		UpdateStatus(code);
-	} else if(type == PPP_DESTRUCTION_REPORT) {
-		if(fWatching == PPP_UNDEFINED_INTERFACE_ID)
-			return;
-		
+	else if(type == PPP_DESTRUCTION_REPORT)
 		WatchInterface(fListener.Manager().InterfaceWithName(
 			fCurrentItem->Message()->FindString("name")));
-	}
 }
 
 
@@ -472,44 +447,12 @@ DialUpView::UpdateStatus(int32 code)
 void
 DialUpView::WatchInterface(ppp_interface_id ID)
 {
-	// This method can be used to update the interface's connection status.
-	
-	if(fWatching != ID) {
-		fListener.StopWatchingInterfaces();
-		
-		if(ID == PPP_UNDEFINED_INTERFACE_ID || fListener.WatchInterface(ID))
-			fWatching = ID;
-	}
+	fListener.WatchInterface(ID);
 	
 	// update status
-	PPPInterface interface(fWatching);
-	if(interface.InitCheck() != B_OK) {
+	PPPInterface interface(fListener.Interface());
+	if(interface.InitCheck() != B_OK)
 		UpdateStatus(PPP_REPORT_DOWN_SUCCESSFUL);
-		return;
-	}
-	
-	ppp_interface_info_t info;
-	interface.GetInterfaceInfo(&info);
-	
-	// transform phase into status
-	switch(info.info.phase) {
-		case PPP_DOWN_PHASE:
-			if(info.info.state == PPP_STARTING_STATE)
-				UpdateStatus(PPP_REPORT_GOING_UP);
-			else
-				UpdateStatus(PPP_REPORT_DOWN_SUCCESSFUL);
-		break;
-		
-		case PPP_TERMINATION_PHASE:
-		break;
-		
-		case PPP_ESTABLISHED_PHASE:
-			UpdateStatus(PPP_REPORT_UP_SUCCESSFUL);
-		break;
-		
-		default:
-			UpdateStatus(PPP_REPORT_GOING_UP);
-	}
 }
 
 

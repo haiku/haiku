@@ -147,7 +147,13 @@ PPPInterfaceListener::SetTarget(BHandler *target)
 bool
 PPPInterfaceListener::WatchInterface(ppp_interface_id ID)
 {
+	if(ID == fInterface)
+		return true;
+	
 	StopWatchingInterface();
+	
+	if(ID == PPP_UNDEFINED_INTERFACE_ID)
+		return true;
 	
 	// enable reports
 	PPPInterface interface(ID);

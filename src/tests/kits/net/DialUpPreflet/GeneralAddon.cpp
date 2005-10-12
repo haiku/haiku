@@ -177,7 +177,7 @@ GeneralAddon::LoadAuthenticationSettings()
 	// load username and password
 	BMessage parameter;
 	int32 parameterIndex = 0;
-	if(FindMessageParameter("Username", *fSettings, &parameter, &parameterIndex)
+	if(FindMessageParameter(PPP_USERNAME_KEY, *fSettings, &parameter, &parameterIndex)
 			&& parameter.FindString(MDSU_VALUES, &fUsername) == B_OK) {
 		hasUsername = true;
 		parameter.AddBool(MDSU_VALID, true);
@@ -185,7 +185,7 @@ GeneralAddon::LoadAuthenticationSettings()
 	}
 	
 	parameterIndex = 0;
-	if(FindMessageParameter("Password", *fSettings, &parameter, &parameterIndex)
+	if(FindMessageParameter(PPP_PASSWORD_KEY, *fSettings, &parameter, &parameterIndex)
 			&& parameter.FindString(MDSU_VALUES, &fPassword) == B_OK) {
 		fHasPassword = true;
 		parameter.AddBool(MDSU_VALID, true);
