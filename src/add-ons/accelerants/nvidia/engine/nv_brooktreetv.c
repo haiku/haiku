@@ -1044,10 +1044,12 @@ static uint8 BT_setup_hphase(uint8 mode)
 
 	switch (mode)
 	{
-	case NTSC640_TST: 
+	case NTSC640_TST:
 	case NTSC640:
 		if (si->ps.tv_encoder.type >= CX25870) hoffset +=8; //if CX shift picture right some more... 
-		buffer[3] = (0x25 + hoffset);	//set horizontal sync offset
+		//fixme: checkout ws-tv and CX (subtracted 0x07)..
+		/* confirmed on TNT1 with BT869 using 4:3 TV */
+		buffer[3] = (0x1e + hoffset);	//set horizontal sync offset
 		break;
 	case NTSC800:
 		if (si->ps.tv_encoder.type >= CX25870) hoffset +=8; //if CX shift picture right some more... 
