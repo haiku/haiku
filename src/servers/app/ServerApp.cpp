@@ -354,83 +354,12 @@ ServerApp::_MessageLooper()
 				break;
 
 			case AS_CREATE_WINDOW:
-			{
-				// Create a ServerWindow
-				// NOTE/TODO: Code duplication in part to below case.
-				// Watch out, if you make changes here, you might have to do them below.
-				// Go ahead and fix if you have an idea for unification...
-
-				// Attached data:
-				// 1) BRect window frame
-				// 2) uint32 window look
-				// 3) uint32 window feel
-				// 4) uint32 window flags
-				// 5) uint32 workspace index
-				// 6) int32 BHandler token of the window
-				// 7) port_id window's reply port
-				// 8) port_id window's looper port
-				// 9) const char * title
-
-				BRect frame;
-				uint32 look;
-				uint32 feel;
-				uint32 flags;
-				uint32 workspaces;
-				int32 token = B_NULL_TOKEN;
-				port_id	clientReplyPort = -1;
-				port_id looperPort = -1;
-				char *title = NULL;
-
-				receiver.Read<BRect>(&frame);
-				receiver.Read<uint32>(&look);
-				receiver.Read<uint32>(&feel);
-				receiver.Read<uint32>(&flags);
-				receiver.Read<uint32>(&workspaces);
-				receiver.Read<int32>(&token);
-				receiver.Read<port_id>(&clientReplyPort);
-				receiver.Read<port_id>(&looperPort);
-				if (receiver.ReadString(&title) != B_OK)
-					break;
-
-				if (!frame.IsValid()) {
-					// make sure we pass a valid rectangle to ServerWindow
-					frame.right = frame.left + 1;
-					frame.bottom = frame.top + 1;
-				}
-
-				// ServerWindow constructor will reply with port_id of a newly created port
-				ServerWindow *window = new ServerWindow(title, this, clientReplyPort,
-					looperPort, token);
-
-				STRACE(("\nServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
-					fSignature(), title, frame.left, frame.top, frame.right, frame.bottom));
-
-				// NOTE: the reply to the client is handled in window->Run()				
-				if (window->Init(frame, look, feel, flags, workspaces) >= B_OK && window->Run()) {
-					// add the window to the list
-					if (fWindowListLock.Lock()) {
-						fWindowList.AddItem(window);
-						fWindowListLock.Unlock();
-					}
-				} else {
-					delete window;
-
-					// window creation failed, we need to notify the client
-					BPrivate::LinkSender reply(clientReplyPort);
-					reply.StartMessage(SERVER_FALSE);
-					reply.Flush();
-				}
-
-				// We don't have to free the title, as it's owned by the ServerWindow now
-				break;
-			}
 			case AS_CREATE_OFFSCREEN_WINDOW:
 			{
-				// Create an OffscreenServerWindow
-				// NOTE/TODO: Code duplication in part to above case.
-
+				// Create a ServerWindow/OffscreenServerWindow
+				
 				// Attached data:
-				// 1) int32 bitmap token
+				// 1) int32 bitmap token (only for AS_CREATE_OFFSCREEN_WINDOW)
 				// 2) BRect window frame
 				// 3) uint32 window look
 				// 4) uint32 window feel
@@ -452,7 +381,9 @@ ServerApp::_MessageLooper()
 				port_id looperPort = -1;
 				char *title = NULL;
 
-				receiver.Read<int32>(&bitmapToken);
+				if (code == AS_CREATE_OFFSCREEN_WINDOW)
+					receiver.Read<int32>(&bitmapToken);
+				
 				receiver.Read<BRect>(&frame);
 				receiver.Read<uint32>(&look);
 				receiver.Read<uint32>(&feel);
@@ -469,16 +400,25 @@ ServerApp::_MessageLooper()
 					frame.right = frame.left + 1;
 					frame.bottom = frame.top + 1;
 				}
-				ServerBitmap* bitmap = FindBitmap(bitmapToken);
-
+				
 				bool success = false;
-
-				if (bitmap) {
-					// ServerWindow constructor will reply with port_id of a newly created port
-					OffscreenServerWindow *window = new OffscreenServerWindow(title, this, clientReplyPort,
-																			  looperPort, token, bitmap);
-					
-					// NOTE: the reply to the client is handled in window->Run()				
+				ServerWindow *window = NULL;
+				
+				if (code == AS_CREATE_OFFSCREEN_WINDOW) {
+					ServerBitmap* bitmap = FindBitmap(bitmapToken);
+				
+					if (bitmap != NULL)
+						// ServerWindow constructor will reply with port_id of a newly created port
+						window = new OffscreenServerWindow(title, this, clientReplyPort, 
+																looperPort, token, bitmap);
+				} else {
+					window = new ServerWindow(title, this, clientReplyPort, looperPort, token);
+					STRACE(("\nServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
+							fSignature(), title, frame.left, frame.top, frame.right, frame.bottom));
+				}
+				
+				// NOTE: the reply to the client is handled in window->Run()				
+				if (window != NULL) {
 					success = window->Init(frame, look, feel, flags, workspaces) >= B_OK && window->Run();
 
 					// add the window to the list
@@ -490,6 +430,7 @@ ServerApp::_MessageLooper()
 					if (!success)
 						delete window;
 				}
+				
 				if (!success) {
 					// window creation failed, we need to notify the client
 					BPrivate::LinkSender reply(clientReplyPort);
