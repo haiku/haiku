@@ -42,6 +42,8 @@ if ( $(TARGET_PLATFORM) = r5 ) {
 
 SharedLibrary net :
 	$(PLATFORM_SOURCES)
+	netdebug.c
+	netconfig.c
 	socket.c
 	compat.c
 	arc4random.c

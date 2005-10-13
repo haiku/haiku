@@ -25,12 +25,10 @@ void initialize_before(void);
 void terminate_after(void);
 void _b_pre_accept(void);
 void _b_post_accept(void);
-void _debug_setflags(int flags);
 
 const char * hstrerror(int error);
 
 int _socket_interrupt(void);
-int _netconfig_find(void);
 
 char _socket_signals[5];
 
@@ -39,10 +37,6 @@ _EXPORT void _b_pre_accept(void)
 }
 
 _EXPORT void _b_post_accept(void)
-{
-}
-
-_EXPORT void _debug_setflags(int flags)
 {
 }
 
@@ -86,13 +80,6 @@ _EXPORT int _socket_interrupt(void)
 	return 0;
 }
 
-_EXPORT int _netconfig_find(void)
-{
-	printf("_netconfig_find\n");
-	return 0;
-}
-
-
 /* XXX: HACK HACK HACK! FIXME! */
 /* This is a terrible hack :(
  * TODO: We should really get these settings values by parsing
@@ -113,6 +100,10 @@ _EXPORT char * find_net_setting(net_settings * ncw, const char * heading,
 		strncpy(value, "baron\0", nbytes);
 	else if (strcmp(name, "PASSWORD") == 0)
 		strncpy(value, "password", nbytes);
+	else if (strcmp(name, "FTP_ENABLED") == 0)
+		strncpy(value, "1", nbytes);
+	else if (strcmp(name, "TELNETD_ENABLED") == 0)
+		strncpy(value, "1", nbytes);
 	else
 		return NULL;
 	
