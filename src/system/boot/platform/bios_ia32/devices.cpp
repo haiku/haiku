@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -13,12 +13,20 @@
 
 #include <string.h>
 
+//#define TRACE_DEVICES
+#ifdef TRACE_DEVICES
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
 
 // exported from shell.S
 extern uint8 gBootDriveID;
 extern uint32 gBootPartitionOffset;
 
 // int 0x13 definitions
+#define BIOS_READ						0x0200
 #define BIOS_GET_DRIVE_PARAMETERS		0x0800
 #define BIOS_IS_EXT_PRESENT				0x4100
 #define BIOS_EXT_READ					0x4200
@@ -148,6 +156,34 @@ get_ext_drive_parameters(uint8 drive, drive_parameters *targetParameters)
 		return B_ERROR;
 
 	memcpy(targetParameters, parameter, sizeof(drive_parameters));
+	return B_OK;
+}
+
+
+static status_t
+get_drive_parameters(uint8 drive, drive_parameters *parameters)
+{
+	struct bios_regs regs;
+	regs.eax = BIOS_GET_DRIVE_PARAMETERS;
+	regs.edx = drive;
+	regs.es = 0;
+	regs.edi = 0;	// guard against faulty BIOS, see Ralf Brown's interrupt list
+	call_bios(0x13, &regs);
+
+	if ((regs.flags & CARRY_FLAG) != 0 || (regs.ecx & 0x3f) == 0)
+		return B_ERROR;
+
+	// fill drive_parameters structure with useful values
+	parameters->parameters_size = kParametersSizeVersion1;
+	parameters->flags = 0;
+	parameters->cylinders = (((regs.ecx << 8) & 0xc000) | ((regs.ecx >> 8) & 0xff)) + 1;
+	parameters->heads = ((regs.edx >> 8) & 0xff) + 1;
+		// heads and cylinders start counting from 0
+	parameters->sectors_per_track = regs.ecx & 0x3f;
+	parameters->sectors = parameters->cylinders * parameters->heads
+		* parameters->sectors_per_track;
+	parameters->bytes_per_sector = 512;
+
 	return B_OK;
 }
 
@@ -293,21 +329,32 @@ BIOSDrive::BIOSDrive(uint8 driveID)
 	:
 	fDriveID(driveID)
 {
+	TRACE(("drive ID %u\n", driveID));
+
 	if (get_ext_drive_parameters(driveID, &fParameters) != B_OK) {
-		// ToDo: old style CHS support
-		dprintf("%d requires CHS support - not yet implemented...\n", driveID);
+		// old style CHS support
+
+		if (get_drive_parameters(driveID, &fParameters) != B_OK)
+			return;
+
+		TRACE(("  cylinders: %lu, heads: %lu, sectors: %lu, bytes_per_sector: %u\n",
+			fParameters.cylinders, fParameters.heads, fParameters.sectors_per_track,
+			fParameters.bytes_per_sector));
+		TRACE(("  total sectors: %Ld\n", fParameters.sectors));
+
 		fBlockSize = 512;
-		fSize = 0;
+		fSize = fParameters.sectors * fBlockSize;
 		fLBA = false;
 		fHasParameters = false;
 	} else {
-		dprintf("size: %x\n", fParameters.parameters_size);
-		dprintf("drive_path_signature: %x\n", fParameters.device_path_signature);
-		dprintf("host bus: \"%s\", interface: \"%s\"\n", fParameters.host_bus, fParameters.interface_type);
-		dprintf("cylinders: %lu, heads: %lu, sectors: %lu, bytes_per_sector: %u\n",
+		TRACE(("size: %x\n", fParameters.parameters_size));
+		TRACE(("drive_path_signature: %x\n", fParameters.device_path_signature));
+		TRACE(("host bus: \"%s\", interface: \"%s\"\n", fParameters.host_bus,
+			fParameters.interface_type));
+		TRACE(("cylinders: %lu, heads: %lu, sectors: %lu, bytes_per_sector: %u\n",
 			fParameters.cylinders, fParameters.heads, fParameters.sectors_per_track,
-			fParameters.bytes_per_sector);
-		dprintf("total sectors: %Ld\n", fParameters.sectors);
+			fParameters.bytes_per_sector));
+		TRACE(("total sectors: %Ld\n", fParameters.sectors));
 
 		fBlockSize = fParameters.bytes_per_sector;
 		fSize = fParameters.sectors * fBlockSize;
@@ -325,40 +372,33 @@ BIOSDrive::~BIOSDrive()
 status_t 
 BIOSDrive::InitCheck() const
 {
-	return fLBA ? B_OK : B_ERROR;
-		// ToDo: for now...
+	return fSize > 0 ? B_OK : B_ERROR;
 }
 
 
 ssize_t 
 BIOSDrive::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
-	//printf("read %lu bytes from %Ld\n", bufferSize, pos);
-
-	int32 totalBytesRead = 0;
-
-	// ToDo: convert query to blocks correctly
 	uint32 offset = pos % fBlockSize;
 	pos /= fBlockSize;
 
 	uint32 blocksLeft = (bufferSize + offset + fBlockSize - 1) / fBlockSize;
+	int32 totalBytesRead = 0;
 
-	//printf("   really reads %lu bytes from %Ld (offset = %lu)\n",
-	//	blocksLeft * fBlockSize, pos * fBlockSize, offset);
+	TRACE(("BIOS reads %lu bytes from %Ld (offset = %lu), drive %ld\n",
+		blocksLeft * fBlockSize, pos * fBlockSize, offset, fDriveID));
 
 	uint32 scratchSize = 24 * 1024 / fBlockSize;
 		// maximum value allowed by Phoenix BIOS is 0x7f
 
 	while (blocksLeft > 0) {
-		uint32 blocksRead;
+		uint32 blocksRead = blocksLeft;
+		if (blocksRead > scratchSize)
+			blocksRead = scratchSize;
 
 		if (fLBA) {
 			struct disk_address_packet *packet = (disk_address_packet *)kDataSegmentScratch;
 			memset(packet, 0, sizeof(disk_address_packet));
-
-			blocksRead = blocksLeft;
-			if (blocksRead > scratchSize)
-				blocksRead = scratchSize;
 
 			packet->size = sizeof(disk_address_packet);
 			packet->number_of_blocks = blocksRead;
@@ -373,20 +413,43 @@ BIOSDrive::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 
 			if (regs.flags & CARRY_FLAG)
 				goto chs_read;
-
 		} else {
 	chs_read:
-			// ToDo: Left to be done!
-			return B_ERROR;
+			// Old style CHS read routine
+
+			// We can only read up to 64 kB this way, but since scratchSize
+			// is actually lower than this value, we don't have to take care
+			// of this here.
+
+			uint32 sector = pos % fParameters.sectors_per_track + 1;
+				// sectors start countint at 1 (unlike head and cylinder)
+			uint32 head = pos / fParameters.sectors_per_track;
+			uint32 cylinder = head / fParameters.heads;
+			head %= fParameters.heads;
+
+			if (cylinder >= fParameters.cylinders)
+				return B_BAD_VALUE;
+
+			struct bios_regs regs;
+			regs.eax = BIOS_READ | blocksRead;
+			regs.edx = fDriveID | (head << 8);
+			regs.ecx = sector | ((cylinder >> 8) << 6) | ((cylinder & 0xff) << 8);
+			regs.es = 0;
+			regs.ebx = kExtraSegmentScratch;
+			call_bios(0x13, &regs);
+
+			if (regs.flags & CARRY_FLAG)
+				return B_ERROR;
 		}
 
-		uint32 bytesRead = fBlockSize * blocksRead;
+		uint32 bytesRead = fBlockSize * blocksRead - offset;
 		// copy no more than bufferSize bytes
 		if (bytesRead > bufferSize)
 			bytesRead = bufferSize;
 
 		memcpy(buffer, (void *)(kExtraSegmentScratch + offset), bytesRead);
 		pos += blocksRead;
+		offset = 0;
 		blocksLeft -= blocksRead;
 		bufferSize -= bytesRead;
 		buffer = (void *)((addr_t)buffer + bytesRead);
@@ -418,7 +481,7 @@ BIOSDrive::Size() const
 status_t 
 platform_get_boot_device(struct stage2_args *args, Node **_device)
 {
-	dprintf("boot drive ID: %x\n", gBootDriveID);
+	TRACE(("boot drive ID: %x\n", gBootDriveID));
 
 	BIOSDrive *drive = new BIOSDrive(gBootDriveID);
 	if (drive->InitCheck() != B_OK) {
@@ -426,7 +489,7 @@ platform_get_boot_device(struct stage2_args *args, Node **_device)
 		return B_ERROR;
 	}
 
-	dprintf("drive size: %Ld bytes\n", drive->Size());
+	TRACE(("drive size: %Ld bytes\n", drive->Size()));
 
 	*_device = drive;
 	return B_OK;
@@ -445,7 +508,7 @@ platform_get_boot_partition(struct stage2_args *args, Node *bootDevice,
 	NodeIterator iterator = list->GetIterator();
 	boot::Partition *partition = NULL;
 	while ((partition = (boot::Partition *)iterator.Next()) != NULL) {
-		dprintf("partition offset = %Ld, size = %Ld\n", partition->offset, partition->size);
+		TRACE(("partition offset = %Ld, size = %Ld\n", partition->offset, partition->size));
 		// search for the partition that contains the partition
 		// offset as reported by the BFS boot block
 		if (offset >= partition->offset
@@ -466,6 +529,7 @@ platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 	if (get_number_of_drives(&driveCount) == B_OK)
 		dprintf("number of drives: %d\n", driveCount);
 
+	// ToDo: add other devices
 	return B_OK; 
 }
 
