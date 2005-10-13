@@ -59,6 +59,7 @@ struct extended_memory {
 
 static const uint32 kDefaultPageTableFlags = 0x07;	// present, user, R/W
 static const size_t kMaxKernelSize = 0x100000;		// 1 MB for the kernel
+static const uint32 kPageTableRegionEnd = 0xa0000;
 
 // working page directory and page table
 static uint32 *sPageDirectory = 0;
@@ -68,6 +69,8 @@ static uint32 *sPageTable = 0;
 static addr_t sNextPhysicalAddress = 0x100000;
 static addr_t sNextVirtualAddress = KERNEL_BASE + kMaxKernelSize;
 static addr_t sMaxVirtualAddress = KERNEL_BASE + 0x400000;
+
+static addr_t sNextPageTableAddress = 0x90000;
 
 
 static addr_t
@@ -104,6 +107,18 @@ get_next_physical_page()
 }
 
 
+static uint32 *
+get_next_page_table()
+{
+	addr_t address = sNextPageTableAddress;
+	if (address >= kPageTableRegionEnd)
+		return (uint32 *)get_next_physical_page();
+
+	sNextPageTableAddress += B_PAGE_SIZE;
+	return (uint32 *)address;
+}
+
+
 /**	Adds a new page table for the specified base address and makes
  *	it current, ie. sets sPageTable to point to the new table.
  */
@@ -111,8 +126,10 @@ get_next_physical_page()
 static void
 add_page_table(addr_t base)
 {
+	TRACE(("add_page_table(base = %p)\n", (void *)base));
+
 	// Get new page table and clear it out
-	sPageTable = (uint32 *)get_next_physical_page();
+	sPageTable = get_next_page_table();
 	if (sPageTable > (uint32 *)(8 * 1024 * 1024))
 		panic("tried to add page table beyond the indentity mapped 8 MB region\n");
 
@@ -134,7 +151,10 @@ unmap_page(addr_t virtualAddress)
 	if (virtualAddress < KERNEL_BASE)
 		panic("unmap_page: asked to unmap invalid page %p!\n", (void *)virtualAddress);
 
-	sPageTable[(virtualAddress % (B_PAGE_SIZE * 1024)) / B_PAGE_SIZE] = 0;
+	// unmap the page from the correct page table
+	uint32 *pageTable = (uint32 *)(sPageDirectory[virtualAddress
+		/ (B_PAGE_SIZE * 1024)] & 0xfffff000);
+	pageTable[(virtualAddress % (B_PAGE_SIZE * 1024)) / B_PAGE_SIZE] = 0;
 
 	asm volatile("invlpg (%0)" : : "r" (virtualAddress));
 }
@@ -166,9 +186,10 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 
 	physicalAddress &= ~(B_PAGE_SIZE - 1);
 
-	TRACE(("paddr 0x%lx @ index %ld\n", physicalAddress,
-		(virtualAddress % (B_PAGE_SIZE * 1024)) / B_PAGE_SIZE));
-	sPageTable[(virtualAddress % (B_PAGE_SIZE * 1024)) / B_PAGE_SIZE] = physicalAddress | flags;
+	// map the page to the correct page table
+	uint32 *pageTable = (uint32 *)(sPageDirectory[virtualAddress
+		/ (B_PAGE_SIZE * 1024)] & 0xfffff000);
+	pageTable[(virtualAddress % (B_PAGE_SIZE * 1024)) / B_PAGE_SIZE] = physicalAddress | flags;
 
 	asm volatile("invlpg (%0)" : : "r" (virtualAddress));
 }
@@ -245,23 +266,23 @@ init_page_directory(void)
 	// physical and virtual address are the same.
 	// These page tables won't be taken over into the kernel.
 
-	// make a pagetable at this random spot
-	uint32 *pgtable = (uint32 *)0x91000;
+	// make the first page table at the first free spot
+	uint32 *pageTable = get_next_page_table();;
 
 	for (int32 i = 0; i < 1024; i++) {
-		pgtable[i] = (i * 0x1000) | kDefaultPageFlags;
+		pageTable[i] = (i * 0x1000) | kDefaultPageFlags;
 	}
 
-	sPageDirectory[0] = (uint32)pgtable | kDefaultPageFlags;
+	sPageDirectory[0] = (uint32)pageTable | kDefaultPageFlags;
 
-	// make another pagetable at this random spot
-	pgtable = (uint32 *)0x92000;
+	// make the second page table
+	pageTable = get_next_page_table();;
 
 	for (int32 i = 0; i < 1024; i++) {
-		pgtable[i] = (i * 0x1000 + 0x400000) | kDefaultPageFlags;
+		pageTable[i] = (i * 0x1000 + 0x400000) | kDefaultPageFlags;
 	}
 
-	sPageDirectory[1] = (uint32)pgtable | kDefaultPageFlags;
+	sPageDirectory[1] = (uint32)pageTable | kDefaultPageFlags;
 
 	gKernelArgs.arch_args.num_pgtables = 0;
 	add_page_table(KERNEL_BASE);
@@ -587,8 +608,8 @@ platform_allocate_region(void **_address, size_t size, uint8 protection)
 extern "C" status_t
 platform_free_region(void *address, size_t size)
 {
-	puts(__FUNCTION__);
-	return B_ERROR;
+	mmu_free(address, size);
+	return B_OK;
 }
 
 
