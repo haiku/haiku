@@ -1,7 +1,7 @@
 /*
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <OS.h>
@@ -17,7 +17,7 @@
 #include "machine.h"
 
 
-#define HEAP_SIZE 32768
+#define HEAP_SIZE 65536
 
 
 void _start(uint32 _unused1, uint32 _unused2, void *openFirmwareEntry);

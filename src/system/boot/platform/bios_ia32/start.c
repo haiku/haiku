@@ -21,7 +21,7 @@
 #include <string.h>
 
 
-#define HEAP_SIZE 32768
+#define HEAP_SIZE 65536
 
 // GCC defined globals
 extern void (*__ctor_list)(void);
