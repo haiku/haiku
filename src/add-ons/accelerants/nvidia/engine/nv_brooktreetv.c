@@ -704,13 +704,13 @@ static uint8 BT_init_PAL800_OS()
 
 	if (si->ps.tv_encoder.type >= CX25870)//set CX value
 	{
+		//fixme if needed: (added 0x10 for BT)..
 		buffer[7] = 0xf4;
 		buffer[8] = 0x17;
 	}
 	else
 	{	//set BT value
-		//fixme: checkout ws-tv (added 0x10)..
-		/* confirmed on TNT1 using 4:3 TV */
+		/* confirmed on TNT1 using 4:3 TV and 16:9 TV */
 		buffer[7] = 0xd0;//scope: tuned. lsb h_blank_o: h_blank_o = horizontal viewport location on TV
 						//(guideline for initial setting: (h_blank_o / h_clk_0) * 64.0uS = 10.0uS for PAL)
 		buffer[8] = 0x18;//try-out; scope: checked against other modes, looks OK.	v_blank_o: 1e active line ('pixel')
@@ -1046,9 +1046,9 @@ static uint8 BT_setup_hphase(uint8 mode)
 	{
 	case NTSC640_TST:
 	case NTSC640:
+		//fixme if needed (subtracted 0x07 for BT)..
 		if (si->ps.tv_encoder.type >= CX25870) hoffset +=8; //if CX shift picture right some more... 
-		//fixme: checkout ws-tv and CX (subtracted 0x07)..
-		/* confirmed on TNT1 with BT869 using 4:3 TV */
+		/* confirmed on TNT1 with BT869 using 4:3 TV and 16:9 TV */
 		buffer[3] = (0x1e + hoffset);	//set horizontal sync offset
 		break;
 	case NTSC800:
@@ -1382,6 +1382,9 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 		}
 		else
 		{
+			//fixme if possible:
+			//see if tweaking h_sync_end can shift picture 8 pixels right to fix
+			//ws tv's tuning fault (always going for max. compatibility :)
 			target->timing.h_sync_end = 656;
 			target->timing.h_total = 688;
 		}
@@ -1476,13 +1479,13 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 		target->timing.h_display = 768;			//H_ACTIVE
 		if (si->ps.tv_encoder.type <= BT869)
 		{
-			//fixme: checkout ws-tv (added 8)..
-			/* confirmed on TNT1 using 4:3 TV */
+			/* confirmed on TNT1 using 4:3 TV and 16:9 TV */
 			target->timing.h_sync_start = 856;		//set for centered TV output
 			target->timing.h_sync_end = 856+20;		//delta is BT H_BLANKI
 		}
 		else
 		{
+			//fixme if needed (added 8 for BT)..
 			target->timing.h_sync_start = 848;		//set for centered TV output
 			target->timing.h_sync_end = 848+20;		//delta is BT H_BLANKI
 		}
