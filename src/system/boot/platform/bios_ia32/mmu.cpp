@@ -25,8 +25,10 @@
  *	  0x0500 - 0x10000	protected mode stack
  *	  0x0500 - 0x09000	real mode stack
  *	 0x10000 - ?		code (up to ~500 kB)
- *	 0x91000			1st temporary page table (identity maps 0-4 MB)
- *	 0x92000			2nd (4-8 MB)
+ *	 0x90000			1st temporary page table (identity maps 0-4 MB)
+ *	 0x91000			2nd (4-8 MB)
+ *	 0x92000 - 0xa0000	further page tables
+ *	[0xa0000 - 0x100000	BIOS/ROM/reserved area]
  *	0x100000			page directory
  *	     ...			boot loader heap (32 kB)
  *	     ...			free physical memory
