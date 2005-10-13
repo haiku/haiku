@@ -5,6 +5,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "tarfs.h"
 
 #include <fcntl.h>
@@ -24,6 +25,14 @@
 #include <util/DoublyLinkedList.h>
 
 
+//#define TRACE_TARFS
+#ifdef TRACE_TARFS
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
 static const uint32 kCompressedArchiveOffset = 192 * 1024;	// at 192 kB
 static const size_t kTarRegionSize = 4 * 1024 * 1024;		// 4 MB
 
@@ -32,7 +41,8 @@ namespace TarFS {
 struct RegionDelete {
 	inline void operator()(void *memory)
 	{
-		platform_free_region(memory, kTarRegionSize);
+		if (memory != NULL)
+			platform_free_region(memory, kTarRegionSize);
 	}
 };
 
@@ -45,14 +55,12 @@ class Directory;
 
 class Entry : public DoublyLinkedListLinkImpl<Entry> {
 	public:
-		Entry(const char *name)	: fName(name) {
-printf("created Entry %p: %s\n", this, fName);
-		}
+		Entry(const char *name)	: fName(name) {}
 		virtual ~Entry() {}
 
 		const char *Name() const { return fName; }
 		virtual ::Node *ToNode() = 0;
-		virtual TarFS::Directory *ToTarDirectory()	{ return NULL; }
+		virtual TarFS::Directory *ToTarDirectory() { return NULL; }
 
 	protected:
 		const char	*fName;
@@ -195,6 +203,8 @@ TarFS::Node::~Node()
 ssize_t
 TarFS::Node::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
+	TRACE(("tarfs: read at %Ld, %lu bytes, fSize = %Ld\n", pos, bufferSize, fSize));
+
 	if (pos < 0 || !buffer)
 		return B_BAD_VALUE;
 
@@ -205,7 +215,7 @@ TarFS::Node::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 	if (toRead > bufferSize)
 		toRead = bufferSize;
 
-	memcpy(buffer, (char*)fHeader + 512 + pos, toRead);
+	memcpy(buffer, (char*)fHeader + BLOCK_SIZE + pos, toRead);
 
 	return toRead;
 }
@@ -455,7 +465,7 @@ TarFS::Volume::Init(boot::Partition *partition)
 			  cookie(cookie)
 		{
 		}
-		
+
 		~PartitionCloser()
 		{
 			partition->Close(cookie);
@@ -502,8 +512,10 @@ TarFS::Volume::Init(boot::Partition *partition)
 				return B_BAD_DATA;
 
 			if (platform_allocate_region((void **)&out, kTarRegionSize,
-					B_READ_AREA | B_WRITE_AREA) != B_OK)
+					B_READ_AREA | B_WRITE_AREA) != B_OK) {
+				TRACE(("tarfs: allocating region failed!\n"));
 				return B_NO_MEMORY;
+			}
 
 			regionDeleter.SetTo(out);
 			zStream.avail_out = kTarRegionSize;
@@ -518,13 +530,15 @@ TarFS::Volume::Init(boot::Partition *partition)
 		offset += sizeof(in);
 
 		if (zStream.avail_in != 0 && status != Z_STREAM_END)
-			printf("buhuuu");
+			dprintf("tarfs: didn't read whole block!\n");
 	} while (status == Z_OK);
 
 	inflateEnd(&zStream);
 
-	if (status != Z_STREAM_END)
+	if (status != Z_STREAM_END) {
+		TRACE(("tarfs: inflating failed: %d!\n", status));
 		return B_BAD_DATA;
+	}
 
 	status = B_OK;
 
@@ -543,14 +557,15 @@ TarFS::Volume::Init(boot::Partition *partition)
 
 		if (strcmp(header->magic, kTarHeaderMagic) != 0) {
 			if (strcmp(header->magic, kOldTarHeaderMagic) != 0) {
-				fprintf(stderr, "Bad tar header magic in block %d.\n",
-					blockIndex);
+				dprintf("Bad tar header magic in block %d.\n", blockIndex);
 				status = B_BAD_DATA;
 				break;
 			}
 		}
 
 		off_t size = strtol(header->size, NULL, 8);
+
+		TRACE(("tarfs: \"%s\", %Ld bytes\n", header->name, size));
 
 		// TODO: this is old-style GNU tar which probably won't work with newer ones...
 		switch (header->type) {
@@ -593,12 +608,12 @@ TarFS::Volume::Init(boot::Partition *partition)
 static status_t
 tarfs_get_file_system(boot::Partition *partition, ::Directory **_root)
 {
-// TODO: Who owns the Volume object created here?
 	TarFS::Volume *volume = new TarFS::Volume;
 	if (volume == NULL)
 		return B_NO_MEMORY;
 
 	if (volume->Init(partition) < B_OK) {
+		TRACE(("Initializing tarfs failed\n"));
 		delete volume;
 		return B_ERROR;
 	}
