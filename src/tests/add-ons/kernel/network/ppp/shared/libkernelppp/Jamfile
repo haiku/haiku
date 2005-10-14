@@ -15,7 +15,6 @@ StaticLibrary <userland>kernelppp :
 	KPPPLCP.cpp
 	KPPPLCPExtension.cpp
 	KPPPOptionHandler.cpp
-	KPPPProfile.cpp
 	KPPPProtocol.cpp
 	KPPPReportManager.cpp
 	KPPPStateMachine.cpp
