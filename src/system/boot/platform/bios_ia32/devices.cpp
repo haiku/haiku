@@ -4,7 +4,6 @@
  */
 
 
-#include "devices.h"
 #include "bios.h"
 
 #include <boot/platform.h>
@@ -33,6 +32,7 @@ extern uint32 gBootPartitionOffset;
 #define BIOS_IS_EXT_PRESENT				0x4100
 #define BIOS_EXT_READ					0x4200
 #define BIOS_GET_EXT_DRIVE_PARAMETERS	0x4800
+#define BIOS_BOOT_CD_GET_STATUS			0x4b01
 
 struct real_addr {
 	uint16	offset;
@@ -150,6 +150,42 @@ class BIOSDrive : public Node {
 		bool	fHasParameters;
 		drive_parameters fParameters;
 };
+
+
+static void
+check_cd_boot(void)
+{
+	gKernelArgs.boot_disk.cd = false;
+
+	if (gBootDriveID != 0)
+		return;
+
+	struct bios_regs regs;
+	regs.eax = BIOS_BOOT_CD_GET_STATUS;
+	regs.edx = 0;
+	regs.esi = kDataSegmentScratch;
+	call_bios(0x13, &regs);
+
+	if ((regs.flags & CARRY_FLAG) != 0)
+		return;
+
+	// we obviously were booted from CD!
+
+	specification_packet *packet = (specification_packet *)kDataSegmentScratch;
+
+	if (packet->media_type != 0)
+		gKernelArgs.boot_disk.cd = false;
+
+#if 0
+	dprintf("got CD boot spec:\n");
+	dprintf("  size: %#x\n", packet->size);
+	dprintf("  media type: %u\n", packet->media_type);
+	dprintf("  drive_number: %u\n", packet->drive_number);
+	dprintf("  controller index: %u\n", packet->controller_index);
+	dprintf("  start emulation: %lu\n", packet->start_emulation);
+	dprintf("  device_specification: %u\n", packet->device_specification);
+#endif
+}
 
 
 static status_t
@@ -490,45 +526,6 @@ BIOSDrive::Size() const
 //	#pragma mark -
 
 
-extern "C" void
-devices_check_cd_boot(void)
-{
-	gKernelArgs.boot_disk.cd = false;
-
-	if (gBootDriveID != 0)
-		return;
-
-	struct bios_regs regs;
-	regs.eax = 0x4b00;
-	regs.edx = 0;
-	regs.esi = kDataSegmentScratch;
-	call_bios(0x13, &regs);
-
-	if ((regs.flags & CARRY_FLAG) != 0)
-		return;
-
-	// we obviously were booted from CD!
-
-	specification_packet *packet = (specification_packet *)kDataSegmentScratch;
-
-	if (packet->media_type != 0)
-		gKernelArgs.boot_disk.cd = false;
-
-#if 0
-	dprintf("got CD boot spec:\n");
-	dprintf("  size: %#x\n", packet->size);
-	dprintf("  media type: %u\n", packet->media_type);
-	dprintf("  drive_number: %u\n", packet->drive_number);
-	dprintf("  controller index: %u\n", packet->controller_index);
-	dprintf("  start emulation: %lu\n", packet->start_emulation);
-	dprintf("  device_specification: %u\n", packet->device_specification);
-#endif
-}
-
-
-//	#pragma mark -
-
-
 status_t 
 platform_get_boot_device(struct stage2_args *args, Node **_device)
 {
@@ -593,6 +590,7 @@ platform_register_boot_device(Node *device)
 	BIOSDrive *drive = (BIOSDrive *)device;
 
 	gKernelArgs.platform_args.boot_drive_number = gBootDriveID;
+	check_cd_boot();
 
 	if (drive->HasParameters()) {
 		const drive_parameters &parameters = drive->Parameters();
