@@ -108,7 +108,6 @@ ConnectionView::ConnectionView(BRect rect, const BString& interfaceName)
 	rect.right = rect.left + kDefaultButtonWidth;
 	fConnectButton = new BButton(rect, "ConnectButton", kLabelConnect,
 		new BMessage(kMsgConnect));
-	Window()->SetDefaultButton(fConnectButton);
 	
 	rect.left = rect.right + 10;
 	rect.right = rect.left + kDefaultButtonWidth;
@@ -127,6 +126,7 @@ ConnectionView::AttachedToWindow()
 	fListener.WatchManager();
 	WatchInterface(fListener.Manager().InterfaceWithName(fInterfaceName.String()));
 	
+	Window()->SetDefaultButton(fConnectButton);
 	fConnectButton->SetTarget(this);
 	fCancelButton->SetTarget(this);
 }
