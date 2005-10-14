@@ -104,20 +104,15 @@ print_item_at(int32 line, MenuItem *item, bool clearHelp = true)
 	
 	if (item->Submenu() && item->Submenu()->Type() == CHOICE_MENU) {
 		// show the current choice (if any)
-		Menu *subMenu = item->Submenu();
-		MenuItem *subItem = NULL;
-
-		for (int32 i = subMenu->CountItems(); i-- > 0; ) {
-			subItem = subMenu->ItemAt(i);
-			if (subItem != NULL && subItem->IsMarked())
-				break;
-		}
-
 		const char *text = " (Current: ";
 		printf(text);
 		length += strlen(text);
 
-		text = subItem != NULL ? subItem->Label() : "None";
+		Menu *subMenu = item->Submenu();
+		if (subMenu->ChoiceText() != NULL)
+			text = subMenu->ChoiceText();
+		else
+			text = "None";
 		length += strlen(text);
 
 		console_set_color(selected ? DARK_GRAY : WHITE, background);
@@ -207,7 +202,7 @@ draw_menu(Menu *menu)
 	print_centered(2, "Haiku Boot Loader");
 
 	console_set_color(kCopyrightColor, kBackgroundColor);
-	print_centered(4, "Copyright 2004 Haiku Inc.");
+	print_centered(4, "Copyright 2004-2005 Haiku Inc.");
 
 	if (menu->Title()) {
 		console_set_cursor(kOffsetX, kFirstLine - 2);

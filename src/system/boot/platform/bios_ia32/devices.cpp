@@ -4,6 +4,7 @@
  */
 
 
+#include "devices.h"
 #include "bios.h"
 
 #include <boot/platform.h>
@@ -22,7 +23,7 @@
 
 
 // exported from shell.S
-extern uint8 gCDFloppyBoot;
+extern uint8 gBootedFromImage;
 extern uint8 gBootDriveID;
 extern uint32 gBootPartitionOffset;
 
@@ -112,6 +113,16 @@ struct device_table {
 	uint8	is_slave : 1;
 	uint8	_reserved2 : 1;
 	uint8	lba_enabled : 1;
+} _PACKED;
+
+struct specification_packet {
+	uint8	size;
+	uint8	media_type;
+	uint8	drive_number;
+	uint8	controller_index;
+	uint32	start_emulation;
+	uint16	device_specification;
+	uint8	_more_[9];
 } _PACKED;
 
 class BIOSDrive : public Node {
@@ -479,6 +490,45 @@ BIOSDrive::Size() const
 //	#pragma mark -
 
 
+extern "C" void
+devices_check_cd_boot(void)
+{
+	gKernelArgs.boot_disk.cd = false;
+
+	if (gBootDriveID != 0)
+		return;
+
+	struct bios_regs regs;
+	regs.eax = 0x4b00;
+	regs.edx = 0;
+	regs.esi = kDataSegmentScratch;
+	call_bios(0x13, &regs);
+
+	if ((regs.flags & CARRY_FLAG) != 0)
+		return;
+
+	// we obviously were booted from CD!
+
+	specification_packet *packet = (specification_packet *)kDataSegmentScratch;
+
+	if (packet->media_type != 0)
+		gKernelArgs.boot_disk.cd = false;
+
+#if 0
+	dprintf("got CD boot spec:\n");
+	dprintf("  size: %#x\n", packet->size);
+	dprintf("  media type: %u\n", packet->media_type);
+	dprintf("  drive_number: %u\n", packet->drive_number);
+	dprintf("  controller index: %u\n", packet->controller_index);
+	dprintf("  start emulation: %lu\n", packet->start_emulation);
+	dprintf("  device_specification: %u\n", packet->device_specification);
+#endif
+}
+
+
+//	#pragma mark -
+
+
 status_t 
 platform_get_boot_device(struct stage2_args *args, Node **_device)
 {
@@ -491,6 +541,7 @@ platform_get_boot_device(struct stage2_args *args, Node **_device)
 	}
 
 	TRACE(("drive size: %Ld bytes\n", drive->Size()));
+	gKernelArgs.boot_disk.booted_from_image = gBootedFromImage;
 
 	*_device = drive;
 	return B_OK;
@@ -571,9 +622,3 @@ platform_register_boot_device(Node *device)
 	return B_OK;
 }
 
-
-bool
-platform_boot_device_is_image()
-{
-	return gCDFloppyBoot;
-}

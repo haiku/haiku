@@ -72,10 +72,10 @@ floppy_start:
 #endif
 
 start_loader:
-	// indicate that we were booted from CD/floppy
+	// indicate that we were booted from CD/floppy/whatever
 	.code32
 	.byte	0x67
-	movb	$1, gCDFloppyBoot - 0x7c00
+	movb	$1, gBootedFromImage - 0x7c00
 		// %ds is 0x7c0 right now, but the symbol were loaded
 		// to offset 0x10000
 	.code16
@@ -364,7 +364,7 @@ gdt_descriptor:
 	.word	0x2f			// 6 entries in the GDT (8 bytes each)
 	.long	gdt
 
-GLOBAL(gCDFloppyBoot):
+GLOBAL(gBootedFromImage):
 	.byte	0
 
 GLOBAL(gBootDriveID):
