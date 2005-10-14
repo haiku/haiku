@@ -716,11 +716,12 @@ PPPManager::SettingsChanged()
 	// get default interface name and update interfaces if it changed
 	void *handle = load_driver_settings("ptpnet.settings");
 	const char *name = get_driver_parameter(handle, "default", NULL, NULL);
-	unload_driver_settings(handle);
 	
 	if((!fDefaultInterface && !name) || (fDefaultInterface && name
-			&& !strcmp(name, fDefaultInterface)))
+			&& !strcmp(name, fDefaultInterface))) {
+		unload_driver_settings(handle);
 		return;
+	}
 	
 	ppp_interface_entry *entry = EntryFor(fDefaultInterface);
 	if(entry && entry->interface->StateMachine().Phase() == PPP_DOWN_PHASE)
@@ -729,11 +730,13 @@ PPPManager::SettingsChanged()
 	free(fDefaultInterface);
 	if(!name) {
 		fDefaultInterface = NULL;
+		unload_driver_settings(handle);
 		return;
 	}
 	
 	fDefaultInterface = strdup(name);
-	ppp_interface_id id = CreateInterfaceWithName(name);
+	unload_driver_settings(handle);
+	ppp_interface_id id = CreateInterfaceWithName(fDefaultInterface);
 	entry = EntryFor(id);
 	if(entry)
 		entry->interface->SetConnectOnDemand(true);
@@ -814,12 +817,8 @@ PPPManager::_CreateInterface(const char *name,
 	locker.UnlockNow();
 		// it is safe to access the manager from userland now
 	
-	if(!Report(PPP_MANAGER_REPORT, PPP_REPORT_INTERFACE_CREATED,
-			&id, sizeof(ppp_interface_id))) {
-		DeleteInterface(id);
-		atomic_add(&entry->accessing, -1);
-		return PPP_UNDEFINED_INTERFACE_ID;
-	}
+	Report(PPP_MANAGER_REPORT, PPP_REPORT_INTERFACE_CREATED, &id,
+		sizeof(ppp_interface_id)));
 	
 	// notify handlers that interface has been created and they can initialize it now
 	entry->interface->StateMachine().DownProtocols();
