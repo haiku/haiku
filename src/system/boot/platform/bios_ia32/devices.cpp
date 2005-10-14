@@ -176,7 +176,7 @@ get_drive_parameters(uint8 drive, drive_parameters *parameters)
 	// fill drive_parameters structure with useful values
 	parameters->parameters_size = kParametersSizeVersion1;
 	parameters->flags = 0;
-	parameters->cylinders = (((regs.ecx << 8) & 0xc000) | ((regs.ecx >> 8) & 0xff)) + 1;
+	parameters->cylinders = (((regs.ecx & 0xc0) << 2) | ((regs.ecx >> 8) & 0xff)) + 1;
 	parameters->heads = ((regs.edx >> 8) & 0xff) + 1;
 		// heads and cylinders start counting from 0
 	parameters->sectors_per_track = regs.ecx & 0x3f;
@@ -433,7 +433,7 @@ BIOSDrive::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 			struct bios_regs regs;
 			regs.eax = BIOS_READ | blocksRead;
 			regs.edx = fDriveID | (head << 8);
-			regs.ecx = sector | ((cylinder >> 8) << 6) | ((cylinder & 0xff) << 8);
+			regs.ecx = sector | ((cylinder >> 2) & 0xc0) | ((cylinder & 0xff) << 8);
 			regs.es = 0;
 			regs.ebx = kExtraSegmentScratch;
 			call_bios(0x13, &regs);
