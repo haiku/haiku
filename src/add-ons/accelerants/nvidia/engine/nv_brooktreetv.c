@@ -1024,15 +1024,17 @@ static uint8 BT_setup_hphase(uint8 mode)
 	buffer[5] = 0x00;		//set default vertical sync offset
 
 	/* do specific timing setup for all chips and modes: */
-	if ((si->ps.card_type == NV05) || (si->ps.card_type == NV05M64))
+	switch (si->ps.card_type)
 	{
-		/* TNT2 and TNT2 M64...
+	case NV05:
+	case NV05M64:
+	case NV15:
+		/* confirmed TNT2, TNT2M64, GeForce2Ti.
 		 * (8 pixels delayed hpos, so picture more to the right) */
 		hoffset = 8;
-	}
-	else
-	{
-		/* TNT1 or GeForce2...
+		break;
+	default:
+		/* confirmed TNT1, GeForce256, GeForce2MX.
 		 * (std hpos)
 		 * NOTE: It might be that GeForce needs TNT2 offset:
 		 * for now CX chips get seperate extra offset, until sure.
@@ -1040,6 +1042,7 @@ static uint8 BT_setup_hphase(uint8 mode)
 		 * on GeForce yet. CH was tested on GeForce and seemed to
 		 * indicate TNT1 offset was needed.) */
 		hoffset = 0;
+		break;
 	}
 
 	switch (mode)
