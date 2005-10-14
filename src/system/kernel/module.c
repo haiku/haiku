@@ -968,6 +968,8 @@ register_preloaded_module_image(struct preloaded_image *image)
 	status_t status;
 	int32 index = 0;
 
+	TRACE(("register_preloaded_module_image(image = \"%s\")\n", image->name));
+
 	if (image->id < 0)
 		return B_BAD_VALUE;
 
@@ -1291,7 +1293,7 @@ get_next_loaded_module_name(uint32 *_cookie, char *buffer, size_t *_bufferSize)
 	struct module *module;
 	status_t status;
 
-	TRACE(("get_next_loaded_module_name()\n"));
+	TRACE(("get_next_loaded_module_name(\"%s\")\n", buffer));
 
 	if (_cookie == NULL || buffer == NULL || _bufferSize == NULL)
 		return B_BAD_VALUE;
