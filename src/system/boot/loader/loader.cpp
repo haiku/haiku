@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -129,6 +129,10 @@ load_module(Directory *volume, const char *name)
 		while (true) {
 			int fd = open_from(base, moduleName, O_RDONLY);
 			if (fd >= B_OK) {
+				struct stat stat;
+				if (fstat(fd, &stat) != 0 || !S_ISREG(stat.st_mode))
+					return B_BAD_VALUE;
+
 				status_t status = elf_load_image(base, moduleName);
 
 				close(fd);
@@ -155,22 +159,47 @@ load_module(Directory *volume, const char *name)
 status_t 
 load_modules(stage2_args *args, Directory *volume)
 {
+	int32 failed = 0;
+
+	// ToDo: this should be mostly replaced by a hardware oriented detection mechanism
+
 	for (int32 i = 0; sPaths[i]; i++) {
 		char path[B_FILE_NAME_LENGTH];
 		sprintf(path, "%s/boot", sPaths[i]);
 
-		load_modules_from(volume, path);
+		if (load_modules_from(volume, path) != B_OK)
+			failed++;
+	}
+
+	if (failed > 1) {
+		// couldn't load any boot modules
+		// fall back to load all modules (currently needed by the boot floppy)
+		const char *paths[] = { "bus_managers", "busses/ide", "busses/scsi",
+			"generic", "partitioning_systems", "drivers/bin", NULL};
+
+		for (int32 i = 0; paths[i]; i++) {
+			char path[B_FILE_NAME_LENGTH];
+			sprintf(path, "%s/%s", sPaths[0], paths[i]);
+			load_modules_from(volume, path);
+		}
 	}
 
 	// and now load all partitioning and file system modules
 	// needed to identify the boot volume
 
-	Partition *partition;
-	if (gRoot->GetPartitionFor(volume, &partition) == B_OK) {
-		while (partition != NULL) {
-			load_module(volume, partition->ModuleName());
-			partition = partition->Parent();
+	if (!platform_boot_device_is_image()) {
+		// iterate over the mounted volumes and load their file system
+		Partition *partition;
+		if (gRoot->GetPartitionFor(volume, &partition) == B_OK) {
+			while (partition != NULL) {
+				load_module(volume, partition->ModuleName());
+				partition = partition->Parent();
+			}
 		}
+	} else {
+		// just make sure BFS is loaded - the boot file system
+		// does not help our decision of what's needed
+		load_module(volume, "file_systems/bfs");
 	}
 
 	return B_OK;

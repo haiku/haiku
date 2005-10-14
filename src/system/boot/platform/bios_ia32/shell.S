@@ -71,6 +71,12 @@ floppy_start:
 #endif
 
 start_loader:
+	// indicate that we were booted from CD/floppy
+	.code32
+	.byte	0x67
+	movb	$1, gCDFloppyBoot - 0x7c00	// %ds is 0x7c0 right now
+	.code16
+
 	// set our environment and jump to the standard BFS boot block entry point
 	xor		%dx, %dx		// boot device ID and partition offset to 0
 	xor		%eax, %eax
@@ -354,6 +360,9 @@ gdt:
 gdt_descriptor:
 	.word	0x2f			// 6 entries in the GDT (8 bytes each)
 	.long	gdt
+
+GLOBAL(gCDFloppyBoot):
+	.byte	0
 
 GLOBAL(gBootDriveID):
 	.byte	0

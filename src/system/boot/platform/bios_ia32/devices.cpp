@@ -22,6 +22,7 @@
 
 
 // exported from shell.S
+extern uint8 gCDFloppyBoot;
 extern uint8 gBootDriveID;
 extern uint32 gBootPartitionOffset;
 
@@ -571,3 +572,8 @@ platform_register_boot_device(Node *device)
 }
 
 
+bool
+platform_boot_device_is_image()
+{
+	return gCDFloppyBoot;
+}

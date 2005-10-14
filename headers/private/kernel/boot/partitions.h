@@ -10,6 +10,8 @@
 #include <disk_device_manager.h>
 
 
+struct file_system_module_info;
+
 namespace boot {
 
 class Partition : public Node, public partition_data {
@@ -25,8 +27,8 @@ class Partition : public Node, public partition_data {
 
 		Partition *AddChild();
 
-		status_t Mount(Directory **_fileSystem = NULL);
-		status_t Scan(bool mountFileSystems);
+		status_t Mount(Directory **_fileSystem = NULL, bool isBootDevice = false);
+		status_t Scan(bool mountFileSystems, bool isBootDevice = false);
 
 		void SetParent(Partition *parent) { fParent = parent; }
 		Partition *Parent() const { return fParent; }
@@ -38,6 +40,8 @@ class Partition : public Node, public partition_data {
 		int FD() const { return fFD; }
 
 	private:
+		status_t _Mount(file_system_module_info *module, Directory **_fileSystem);
+
 		int			fFD;
 		NodeList	fChildren;
 		Partition	*fParent;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef KERNEL_BOOT_VFS_H
@@ -84,8 +84,8 @@ extern int open_from(Directory *directory, const char *path, int mode);
 
 extern Node *get_node_from(int fd);
 
-extern status_t add_partitions_for(int fd, bool mountFileSystems);
-extern status_t add_partitions_for(Node *device, bool mountFileSystems);
+extern status_t add_partitions_for(int fd, bool mountFileSystems, bool isBootDevice = false);
+extern status_t add_partitions_for(Node *device, bool mountFileSystems, bool isBootDevice = false);
 
 #endif	/* __cplusplus */
 

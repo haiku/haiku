@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef KERNEL_BOOT_PLATFORM_H
@@ -58,6 +58,7 @@ extern status_t platform_add_block_devices(struct stage2_args *args, NodeList *d
 extern status_t platform_get_boot_partition(struct stage2_args *args, Node *bootDevice,
 					NodeList *partitions, boot::Partition **_partition);
 extern status_t platform_register_boot_device(Node *device);
+extern bool platform_boot_device_is_image();
 
 /* menu functions */
 

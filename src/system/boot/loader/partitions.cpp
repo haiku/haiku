@@ -1,7 +1,7 @@
 /*
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "RootFileSystem.h"
@@ -182,25 +182,37 @@ Partition::AddChild()
 
 
 status_t
-Partition::Mount(Directory **_fileSystem)
+Partition::_Mount(file_system_module_info *module, Directory **_fileSystem)
 {
+	TRACE(("check for file_system: %s\n", module->pretty_name));
+
+	Directory *fileSystem;
+	if (module->get_file_system(this, &fileSystem) == B_OK) {
+		gRoot->AddVolume(fileSystem, this);
+		if (_fileSystem)
+			*_fileSystem = fileSystem;
+
+		// remember the module name that mounted us
+		fModuleName = module->module_name;
+
+		fIsFileSystem = true;
+		return B_OK;
+	}
+
+	return B_BAD_VALUE;
+}
+
+
+status_t
+Partition::Mount(Directory **_fileSystem, bool isBootDevice)
+{
+	if (isBootDevice && platform_boot_device_is_image())
+		return _Mount(&gTarFileSystemModule, _fileSystem);
+
 	for (int32 i = 0; i < sNumFileSystemModules; i++) {
-		file_system_module_info *module = sFileSystemModules[i];
-
-		TRACE(("check for file_system: %s\n", module->pretty_name));
-
-		Directory *fileSystem;
-		if (module->get_file_system(this, &fileSystem) == B_OK) {
-			gRoot->AddVolume(fileSystem, this);
-			if (_fileSystem)
-				*_fileSystem = fileSystem;
-
-			// remember the module name that mounted us
-			fModuleName = module->module_name;
-
-			fIsFileSystem = true;
+		status_t status = _Mount(sFileSystemModules[i], _fileSystem);
+		if (status == B_OK)
 			return B_OK;
-		}
 	}
 
 	return B_ENTRY_NOT_FOUND;
@@ -208,11 +220,17 @@ Partition::Mount(Directory **_fileSystem)
 
 
 status_t 
-Partition::Scan(bool mountFileSystems)
+Partition::Scan(bool mountFileSystems, bool isBootDevice)
 {
 	// scan for partitions first (recursively all eventual children as well)
 	
 	TRACE(("Partition::Scan()\n"));
+
+	// if we were not booted from the real boot device, we won't scan
+	// the device we were booted from (which is likely to be a slow
+	// floppy or CD)
+	if (isBootDevice && platform_boot_device_is_image())
+		return B_ENTRY_NOT_FOUND;
 
 	const partition_module_info *bestModule = NULL;
 	void *bestCookie = NULL;
@@ -309,8 +327,13 @@ Partition::Scan(bool mountFileSystems)
 //	#pragma mark -
 
 
+/**	Scans the device passed in for partitioning systems. If none are found,
+ *	a partition containing the whole device is created.
+ *	All created partitions are added to the gPartitions list.
+ */
+
 status_t
-add_partitions_for(int fd, bool mountFileSystems)
+add_partitions_for(int fd, bool mountFileSystems, bool isBootDevice)
 {
 	TRACE(("add_partitions_for(fd = %d, mountFS = %s)\n", fd, mountFileSystems ? "yes" : "no"));
 
@@ -322,7 +345,7 @@ add_partitions_for(int fd, bool mountFileSystems)
 
 	// add this partition to the list of partitions, if it contains
 	// or might contain a file system
-	if ((partition->Scan(mountFileSystems) == B_OK && partition->IsFileSystem())
+	if ((partition->Scan(mountFileSystems, isBootDevice) == B_OK && partition->IsFileSystem())
 		|| (!partition->IsPartitioningSystem() && !mountFileSystems)) {
 		gPartitions.Add(partition);
 		return B_OK;
@@ -344,7 +367,7 @@ add_partitions_for(int fd, bool mountFileSystems)
 
 
 status_t
-add_partitions_for(Node *device, bool mountFileSystems)
+add_partitions_for(Node *device, bool mountFileSystems, bool isBootDevice)
 {
 	TRACE(("add_partitions_for(%p, mountFS = %s)\n", device, mountFileSystems ? "yes" : "no"));
 
@@ -352,7 +375,7 @@ add_partitions_for(Node *device, bool mountFileSystems)
 	if (fd < B_OK)
 		return fd;
 
-	status_t status = add_partitions_for(fd, mountFileSystems);
+	status_t status = add_partitions_for(fd, mountFileSystems, isBootDevice);
 	if (status < B_OK)
 		dprintf("add_partitions_for(%d) failed: %ld\n", fd, status);
 

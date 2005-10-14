@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -334,7 +334,7 @@ get_boot_file_system(stage2_args *args)
 	// add the boot device to the list of devices
 	gBootDevices.Add(device);
 
-	if (add_partitions_for(device, false) < B_OK)
+	if (add_partitions_for(device, false, true) < B_OK)
 		return NULL;
 
 	Partition *partition;
@@ -342,7 +342,7 @@ get_boot_file_system(stage2_args *args)
 		return NULL;
 
 	Directory *fileSystem;
-	status_t status = partition->Mount(&fileSystem);
+	status_t status = partition->Mount(&fileSystem, true);
 
 	if (status < B_OK) {
 		// this partition doesn't contain any known file system; we
