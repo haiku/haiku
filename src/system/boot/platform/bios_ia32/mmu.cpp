@@ -65,8 +65,6 @@ static const uint32 kPageTableRegionEnd = 0xa0000;
 
 // working page directory and page table
 static uint32 *sPageDirectory = 0;
-static uint32 *sPageTable = 0;
-	// this points to the most recently added kernel page table
 
 static addr_t sNextPhysicalAddress = 0x100000;
 static addr_t sNextVirtualAddress = KERNEL_BASE + kMaxKernelSize;
@@ -121,9 +119,7 @@ get_next_page_table()
 }
 
 
-/**	Adds a new page table for the specified base address and makes
- *	it current, ie. sets sPageTable to point to the new table.
- */
+/**	Adds a new page table for the specified base address */
 
 static void
 add_page_table(addr_t base)
@@ -131,17 +127,17 @@ add_page_table(addr_t base)
 	TRACE(("add_page_table(base = %p)\n", (void *)base));
 
 	// Get new page table and clear it out
-	sPageTable = get_next_page_table();
-	if (sPageTable > (uint32 *)(8 * 1024 * 1024))
+	uint32 *pageTable = get_next_page_table();
+	if (pageTable > (uint32 *)(8 * 1024 * 1024))
 		panic("tried to add page table beyond the indentity mapped 8 MB region\n");
 
-	gKernelArgs.arch_args.pgtables[gKernelArgs.arch_args.num_pgtables++] = (uint32)sPageTable;
+	gKernelArgs.arch_args.pgtables[gKernelArgs.arch_args.num_pgtables++] = (uint32)pageTable;
 
 	for (int32 i = 0; i < 1024; i++)
-		sPageTable[i] = 0;
+		pageTable[i] = 0;
 
 	// put the new page table into the page directory
-	sPageDirectory[base/(4*1024*1024)] = (uint32)sPageTable | kDefaultPageTableFlags;
+	sPageDirectory[base/(4*1024*1024)] = (uint32)pageTable | kDefaultPageTableFlags;
 }
 
 
