@@ -55,7 +55,7 @@ class Directory;
 
 class Entry : public DoublyLinkedListLinkImpl<Entry> {
 	public:
-		Entry(const char *name)	: fName(name) {}
+		Entry(const char *name);
 		virtual ~Entry() {}
 
 		const char *Name() const { return fName; }
@@ -64,6 +64,7 @@ class Entry : public DoublyLinkedListLinkImpl<Entry> {
 
 	protected:
 		const char	*fName;
+		int32		fID;
 };
 
 
@@ -71,15 +72,19 @@ typedef DoublyLinkedList<TarFS::Entry>	EntryList;
 typedef EntryList::Iterator	EntryIterator;
 
 
-class Node : public ::Node, public Entry {
+class File : public ::Node, public Entry {
 	public:
-		Node(tar_header *header, const char *name);
-		virtual ~Node();
+		File(tar_header *header, const char *name);
+		virtual ~File();
 
 		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize);
 		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize);
 
 		virtual status_t GetName(char *nameBuffer, size_t bufferSize) const;
+
+		virtual int32 Type() const;
+		virtual off_t Size() const;
+		virtual ino_t Inode() const;
 
 		virtual ::Node *ToNode() { return this; }
 
@@ -100,12 +105,14 @@ class Directory : public ::Directory, public Entry {
 		virtual status_t GetName(char *nameBuffer, size_t bufferSize) const;
 
 		virtual TarFS::Entry *LookupEntry(const char *name);
-		virtual Node *Lookup(const char *name, bool traverseLinks);
+		virtual ::Node *Lookup(const char *name, bool traverseLinks);
 
 		virtual status_t GetNextEntry(void *cookie, char *nameBuffer, size_t bufferSize);
 		virtual status_t GetNextNode(void *cookie, Node **_node);
 		virtual status_t Rewind(void *cookie);
 		virtual bool IsEmpty();
+
+		virtual ino_t Inode() const;
 
 		virtual ::Node *ToNode() { return this; };
 		virtual TarFS::Directory *ToTarDirectory()	{ return this; }
@@ -131,7 +138,8 @@ class Volume : public TarFS::Directory {
 
 }	// namespace TarFS
 
-//using namespace TarFS;
+
+static int32 sNextID = 1;
 
 
 // #pragma mark -
@@ -186,22 +194,32 @@ skip_gzip_header(z_stream *stream)
 // #pragma mark -
 
 
-TarFS::Node::Node(tar_header *header, const char *name)
+TarFS::Entry::Entry(const char *name)
 	:
-	TarFS::Entry(name),
+	fName(name),
+	fID(sNextID++)
+{
+}
+
+
+// #pragma mark -
+
+
+TarFS::File::File(tar_header *header, const char *name)
+	: TarFS::Entry(name),
 	fHeader(header)
 {
 	fSize = strtol(header->size, NULL, 8);
 }
 
 
-TarFS::Node::~Node()
+TarFS::File::~File()
 {
 }
 
 
 ssize_t
-TarFS::Node::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
+TarFS::File::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
 	TRACE(("tarfs: read at %Ld, %lu bytes, fSize = %Ld\n", pos, bufferSize, fSize));
 
@@ -222,16 +240,37 @@ TarFS::Node::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 
 
 ssize_t
-TarFS::Node::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
+TarFS::File::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
 {
 	return B_NOT_ALLOWED;
 }
 
 
 status_t
-TarFS::Node::GetName(char *nameBuffer, size_t bufferSize) const
+TarFS::File::GetName(char *nameBuffer, size_t bufferSize) const
 {
 	return strlcpy(nameBuffer, Name(), bufferSize) >= bufferSize ? B_BUFFER_OVERFLOW : B_OK;
+}
+
+
+int32
+TarFS::File::Type() const
+{
+	return S_IFREG;
+}
+
+
+off_t
+TarFS::File::Size() const
+{
+	return fSize;
+}
+
+
+ino_t
+TarFS::File::Inode() const
+{
+	return fID;
 }
 
 
@@ -416,8 +455,8 @@ TarFS::Directory::AddFile(tar_header *header)
 			return error;
 	}
 
-	// create the node
-	TarFS::Node *file = new TarFS::Node(header, leaf);
+	// create the file
+	TarFS::File *file = new TarFS::File(header, leaf);
 	if (!file)
 		return B_NO_MEMORY;
 
@@ -431,6 +470,13 @@ bool
 TarFS::Directory::IsEmpty()
 {
 	return fEntries.IsEmpty();
+}
+
+
+ino_t
+TarFS::Directory::Inode() const
+{
+	return fID;
 }
 
 
