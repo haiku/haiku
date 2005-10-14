@@ -405,7 +405,7 @@ BMenuItem *
 BMenu::RemoveItem(int32 index)
 {
 	BMenuItem *item = ItemAt(index);
-	RemoveItems(index, 1, NULL, false);
+	RemoveItems(0, 0, item, false);
 	return item;
 }
 
@@ -1214,7 +1214,7 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *_item, bool del)
 		// We iterate backwards because it's simpler
 		// TODO: We should check if index and count are in bounds.
 		for (int32 i = index + count - 1; i >= index; i--) {
-			item = static_cast<BMenuItem *>(fItems.ItemAt(index));
+			item = static_cast<BMenuItem *>(fItems.ItemAt(i));
 			if (item != NULL) {
 				fItems.RemoveItem(item);
 				item->SetSuper(NULL);
