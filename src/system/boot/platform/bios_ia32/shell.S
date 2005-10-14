@@ -57,6 +57,7 @@ floppy_start:
 	.code32					// we need to create a 32-bit relocation entry for the linker...
 	.byte	0x67
 	movw	sNumSectors - 0x10000, %di
+		// the loader symbols are located at offset 0x10000
 	.code16
 	xor		%dh, %dh		// head 0, don't change BIOS boot device
 	mov		$0x2, %cx		// sector 2
@@ -74,7 +75,9 @@ start_loader:
 	// indicate that we were booted from CD/floppy
 	.code32
 	.byte	0x67
-	movb	$1, gCDFloppyBoot - 0x7c00	// %ds is 0x7c0 right now
+	movb	$1, gCDFloppyBoot - 0x7c00
+		// %ds is 0x7c0 right now, but the symbol were loaded
+		// to offset 0x10000
 	.code16
 
 	// set our environment and jump to the standard BFS boot block entry point
@@ -97,27 +100,27 @@ load_sectors:
 	push	%di
 	push	%es
 
-	movb	$8, %ah				// get drive parameters - changes a lot of registers
+	movb	$8, %ah			// get drive parameters - changes a lot of registers
 	int		$0x13
 
 	pop		%es
 	pop		%di
 		// ToDo: store the number of heads somewhere (it's in %dh)
 	pop		%dx
-	and		$63, %cx			// mask out max. sector number (bit 0-5)
-	mov		%cx, %si			// and remember it
+	and		$63, %cx		// mask out max. sector number (bit 0-5)
+	mov		%cx, %si		// and remember it
 	pop		%cx
 	pop		%bx
 	
 load_track:
-	mov		%di, %ax			// limit the sector count to track boundaries
+	mov		%di, %ax		// limit the sector count to track boundaries
 	add		%cl, %al
 	dec		%ax
 	cmp		%si, %ax
 	jbe		matches_track_boundary
 	mov		%si, %ax
 matches_track_boundary:
-	inc		%ax					// take the current sector offset into account
+	inc		%ax				// take the current sector offset into account
 	sub		%cl, %al
 
 	// make sure we don't cross a 64kB address boundary or else the read will fail
@@ -126,7 +129,7 @@ matches_track_boundary:
 	mov		%ax, %bp
 	add		%bx, %bp
 	jnc		respects_boundary
-	xor		%ax, %ax			// only read up to the 64kB boundary
+	xor		%ax, %ax		// only read up to the 64kB boundary
 	sub		%bx, %ax
 respects_boundary:
 	shr		$9, %ax
@@ -134,16 +137,16 @@ respects_boundary:
 
 try_to_read:
 	pusha
-	movb	$2, %ah				// load sectors from drive
+	movb	$2, %ah			// load sectors from drive
 	int		$0x13
 	jnc		read_succeeded
 
 	xor		%ax, %ax
-	int		$0x13				// reset drive
+	int		$0x13			// reset drive
 	popa
 
 	dec		%bp
-	jz		load_failed			// if already retried often enough, bail out
+	jz		load_failed		// if already retried often enough, bail out
 	jmp		try_to_read
 
 read_succeeded:
@@ -152,29 +155,29 @@ read_succeeded:
 	popa
 
 	xor		%ah, %ah
-	add		%ax, %cx			// next sector start
-	sub		%ax, %di			// update sectors left to be read
+	add		%ax, %cx		// next sector start
+	sub		%ax, %di		// update sectors left to be read
 
-	shl		$9, %ax				// get byte offset
-	add		%ax, %bx			// update target address
+	shl		$9, %ax			// get byte offset
+	add		%ax, %bx		// update target address
 	jnz		check_sector_start
 
-	mov		%es, %ax			// overflow to the next 64kB, %bx is already zero
+	mov		%es, %ax		// overflow to the next 64kB, %bx is already zero
 	add		$0x1000, %ax
 	mov		%ax, %es
 
 check_sector_start:
-	mov		%si, %ax			// compare the sectors, not the cylinders
+	mov		%si, %ax		// compare the sectors, not the cylinders
 	cmp		%al, %cl
 	jbe		continue_reading
 
 	sub		%si, %cx
-	inc		%dh					// next head
+	inc		%dh				// next head
 	cmp		$1, %dh
 		// ToDo: check max. number of heads!
 	jbe		check_sector_start
 
-	xor		%dh, %dh			// next cylinder
+	xor		%dh, %dh		// next cylinder
 	inc		%ch
 	jmp		check_sector_start
 
@@ -188,8 +191,8 @@ load_failed:
 	call	print_string
 
 	xor		%ax, %ax
-	int		$0x16				// wait for key
-	int		$0x19				// and reboot
+	int		$0x16			// wait for key
+	int		$0x19			// and reboot
 
 disable_floppy_motor:
 	xor		%al, %al
@@ -202,7 +205,7 @@ print_string:
 	xor		%bx, %bx
 print_char:
 	lodsb
-	orb		%al, %al			// are there still characters left?
+	orb		%al, %al		// are there still characters left?
 	jz		no_more_chars
 	int		$0x10
 	jmp		print_char
