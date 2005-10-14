@@ -197,9 +197,14 @@ load_modules(stage2_args *args, Directory *volume)
 			}
 		}
 	} else {
-		// just make sure BFS is loaded - the boot file system
-		// does not help our decision of what's needed
-		load_module(volume, "file_systems/bfs");
+		// The boot image should only contain the file system
+		// needed to boot the system, so we just load it.
+		// ToDo: this is separate from the fall back from above
+		//	as this piece will survive a more intelligent module
+		//	loading approach...
+		char path[B_FILE_NAME_LENGTH];
+		sprintf(path, "%s/%s", sPaths[0], "file_systems");
+		load_modules_from(volume, path);
 	}
 
 	return B_OK;
