@@ -484,7 +484,7 @@ TarFS::Directory::Inode() const
 
 
 TarFS::Volume::Volume()
-	: TarFS::Directory("CD/Floppy Boot Disk")
+	: TarFS::Directory("Boot from CD-ROM")
 {
 }
 

@@ -9,6 +9,7 @@
 #include <boot/partitions.h>
 #include <boot/vfs.h>
 #include <boot/platform.h>
+#include <boot/stage2.h>
 #include <boot/stdio.h>
 #include <ddm_modules.h>
 #include <util/kernel_cpp.h>
@@ -206,7 +207,7 @@ Partition::_Mount(file_system_module_info *module, Directory **_fileSystem)
 status_t
 Partition::Mount(Directory **_fileSystem, bool isBootDevice)
 {
-	if (isBootDevice && platform_boot_device_is_image())
+	if (isBootDevice && gKernelArgs.boot_disk.booted_from_image)
 		return _Mount(&gTarFileSystemModule, _fileSystem);
 
 	for (int32 i = 0; i < sNumFileSystemModules; i++) {
@@ -229,7 +230,7 @@ Partition::Scan(bool mountFileSystems, bool isBootDevice)
 	// if we were not booted from the real boot device, we won't scan
 	// the device we were booted from (which is likely to be a slow
 	// floppy or CD)
-	if (isBootDevice && platform_boot_device_is_image())
+	if (isBootDevice && gKernelArgs.boot_disk.booted_from_image)
 		return B_ENTRY_NOT_FOUND;
 
 	const partition_module_info *bestModule = NULL;

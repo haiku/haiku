@@ -187,7 +187,7 @@ load_modules(stage2_args *args, Directory *volume)
 	// and now load all partitioning and file system modules
 	// needed to identify the boot volume
 
-	if (!platform_boot_device_is_image()) {
+	if (!gKernelArgs.boot_disk.booted_from_image) {
 		// iterate over the mounted volumes and load their file system
 		Partition *partition;
 		if (gRoot->GetPartitionFor(volume, &partition) == B_OK) {

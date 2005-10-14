@@ -76,12 +76,24 @@ MenuItem::SetMarked(bool marked)
 }
 
 
-void MenuItem::Select(bool selected) { if (fIsSelected == selected) return;
+void
+MenuItem::Select(bool selected)
+{
+	if (selected && fMenu != NULL) {
+		// always set choice text of parent if we were selected
+		if (fMenu->Type() == CHOICE_MENU && Type() != MENU_ITEM_NO_CHOICE)
+			fMenu->SetChoiceText(Label());
+	}
+
+	if (fIsSelected == selected)
+		return;
 
 	if (selected && fMenu != NULL) {
 		// unselect previous item
-		MenuItem *selectedItem = fMenu->FindSelected(); if (selectedItem !=
-				NULL) selectedItem->Select(false); }
+		MenuItem *selectedItem = fMenu->FindSelected();
+		if (selectedItem != NULL)
+			selectedItem->Select(false);
+	}
 
 	fIsSelected = selected;
 
@@ -144,6 +156,7 @@ MenuItem::SetMenu(Menu *menu)
 Menu::Menu(menu_type type, const char *title)
 	:
 	fTitle(title),
+	fChoiceText(NULL),
 	fCount(0),
 	fIsHidden(true),
 	fType(type),
@@ -342,6 +355,7 @@ user_menu_boot_volume(Menu *menu, MenuItem *item)
 	bootItem->Select(true);
 	bootItem->SetData(item->Data());
 
+	gKernelArgs.boot_disk.user_selected = true;
 	return true;
 }
 
@@ -390,10 +404,14 @@ add_boot_volume_menu(Directory *bootVolume)
 	menu->AddItem(item = new MenuItem("Rescan volumes"));
 	item->SetHelpText("Please insert a Haiku CD-ROM or attach a USB disk - depending on your system, you can then boot from them.");
 	item->SetType(MENU_ITEM_NO_CHOICE);
-	item->Select(true);
+	if (count == 0)
+		item->Select(true);
 
 	menu->AddItem(item = new MenuItem("Return to main menu"));
 	item->SetType(MENU_ITEM_NO_CHOICE);
+
+	if (gKernelArgs.boot_disk.booted_from_image)
+		menu->SetChoiceText("CD-ROM or hard drive");
 
 	return menu;
 }

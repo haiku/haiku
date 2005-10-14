@@ -47,6 +47,9 @@ typedef struct kernel_args {
 	struct {
 		disk_identifier identifier;
 		off_t	partition_offset;
+		bool	user_selected;
+		bool	booted_from_image;
+		bool	cd;
 	} boot_disk;
 
 	struct driver_settings_file *driver_settings;

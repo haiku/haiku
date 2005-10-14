@@ -108,6 +108,9 @@ class Menu {
 
 		const char *Title() const { return fTitle; }
 
+		void SetChoiceText(const char *text) { fChoiceText = text; }
+		const char *ChoiceText() const { return fChoiceText; }
+
 		void Run();
 
 	private:
@@ -115,6 +118,7 @@ class Menu {
 		void Draw(MenuItem *item);
 
 		const char		*fTitle;
+		const char		*fChoiceText;
 		int32			fCount;
 		bool			fIsHidden;
 		MenuItemList	fItems;
