@@ -1211,48 +1211,6 @@ static uint8 BT_read_monstat(uint8* monstat)
 	return stat;
 }//end BT_read_monstat.
 
-static uint8 BT_dpms(bool display)
-{
-	uint8 stat;
-
-	uint8 buffer[3];
-
-	LOG(4,("Brooktree: setting DPMS: "));
-
-	/* reset status */
-	i2c_flag_error (-1);
-
-	/* shutdown all analog electronics... */
-	buffer[0] = si->ps.tv_encoder.adress + WR;
-	/* select first TV config register to write */
-	buffer[1] = 0xba;
-	if (display)
-	{
-		/* enable all DACs */
-		buffer[2] = 0x00;
-		LOG(4,("display on\n"));
-	}
-	else
-	{
-		/* shutdown all DACs */
-		buffer[2] = 0x10;
-		LOG(4,("display off\n"));
-	}
-
-	i2c_bstart(si->ps.tv_encoder.bus);
-	i2c_writebuffer(si->ps.tv_encoder.bus, buffer, 3);
-	i2c_bstop(si->ps.tv_encoder.bus);
-	/* log on errors */
-	stat = i2c_flag_error(0);
-	if (stat)
-	{
-		LOG(4,("Brooktree: I2C errors occurred while setting DPMS\n"));
-		return stat;
-	}
-
-	return stat;
-}//end BT_dpms.
-
 static uint8 BT_killclk_blackout(void)
 {
 	uint8 stat;
@@ -1333,11 +1291,50 @@ static uint8 BT_killclk_blackout(void)
 		return stat;
 	}
 
-	/* shutdown all analog electronics */
-	stat = BT_dpms(false);
-
 	return stat;
 }//end BT_killclk_blackout.
+
+uint8 BT_dpms(bool display)
+{
+	uint8 stat;
+
+	uint8 buffer[3];
+
+	LOG(4,("Brooktree: setting DPMS: "));
+
+	/* reset status */
+	i2c_flag_error (-1);
+
+	/* shutdown all analog electronics... */
+	buffer[0] = si->ps.tv_encoder.adress + WR;
+	/* select first TV config register to write */
+	buffer[1] = 0xba;
+	if (display)
+	{
+		/* enable all DACs */
+		buffer[2] = 0x00;
+		LOG(4,("display on\n"));
+	}
+	else
+	{
+		/* shutdown all DACs */
+		buffer[2] = 0x10;
+		LOG(4,("display off\n"));
+	}
+
+	i2c_bstart(si->ps.tv_encoder.bus);
+	i2c_writebuffer(si->ps.tv_encoder.bus, buffer, 3);
+	i2c_bstop(si->ps.tv_encoder.bus);
+	/* log on errors */
+	stat = i2c_flag_error(0);
+	if (stat)
+	{
+		LOG(4,("Brooktree: I2C errors occurred while setting DPMS\n"));
+		return stat;
+	}
+
+	return stat;
+}//end BT_dpms.
 
 uint8 BT_check_tvmode(display_mode target)
 {

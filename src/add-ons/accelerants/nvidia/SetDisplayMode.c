@@ -97,6 +97,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	head1_dpms_fetch(&display, &h, &v);
 	head1_dpms(false, false, false);
 	if (si->ps.secondary_head) head2_dpms(false, false, false);
+	if (si->ps.tvout) BT_dpms(false);
 
 	/*where in framebuffer the screen is (should this be dependant on previous MOVEDISPLAY?)*/
 	startadd = (uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer;
@@ -329,6 +330,8 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	head1_dpms(display, h, v);
 	/* turn screen two on if a dualhead mode is active */
 	if (target.flags & DUALHEAD_BITS) head2_dpms(display,h,v);
+	/* turn TVout on if this is a TVout mode */
+	if (target.flags & TV_BITS) BT_dpms(true);
 
 	/* set up acceleration for this mode */
 	/* note:
@@ -510,18 +513,22 @@ status_t SET_DPMS_MODE(uint32 dpms_flags) {
 		case B_DPMS_ON:	/* H: on, V: on, display on */
 			head1_dpms(true, true, true);
 			if (si->ps.secondary_head) head2_dpms(true, true, true);
+			if (si->dm.flags & TV_BITS) BT_dpms(true);
 			break;
 		case B_DPMS_STAND_BY:
 			head1_dpms(false, false, true);
 			if (si->ps.secondary_head) head2_dpms(false, false, true);
+			if (si->dm.flags & TV_BITS) BT_dpms(false);
 			break;
 		case B_DPMS_SUSPEND:
 			head1_dpms(false, true, false);
 			if (si->ps.secondary_head) head2_dpms(false, true, false);
+			if (si->dm.flags & TV_BITS) BT_dpms(false);
 			break;
 		case B_DPMS_OFF: /* H: off, V: off, display off */
 			head1_dpms(false, false, false);
 			if (si->ps.secondary_head) head2_dpms(false, false, false);
+			if (si->dm.flags & TV_BITS) BT_dpms(false);
 			break;
 		default:
 			LOG(8,("SET: Invalid DPMS settings (DH) 0x%08x\n", dpms_flags));
@@ -535,15 +542,19 @@ status_t SET_DPMS_MODE(uint32 dpms_flags) {
 		{
 		case B_DPMS_ON:	/* H: on, V: on, display on */
 			head1_dpms(true, true, true);
+			if (si->dm.flags & TV_BITS) BT_dpms(true);
 			break;
 		case B_DPMS_STAND_BY:
 			head1_dpms(false, false, true);
+			if (si->dm.flags & TV_BITS) BT_dpms(false);
 			break;
 		case B_DPMS_SUSPEND:
 			head1_dpms(false, true, false);
+			if (si->dm.flags & TV_BITS) BT_dpms(false);
 			break;
 		case B_DPMS_OFF: /* H: off, V: off, display off */
 			head1_dpms(false, false, false);
+			if (si->dm.flags & TV_BITS) BT_dpms(false);
 			break;
 		default:
 			LOG(8,("SET: Invalid DPMS settings (DH) 0x%08x\n", dpms_flags));
@@ -551,6 +562,7 @@ status_t SET_DPMS_MODE(uint32 dpms_flags) {
 			return B_ERROR;
 		}
 	}
+
 	interrupt_enable(true);
 	return B_OK;
 }
