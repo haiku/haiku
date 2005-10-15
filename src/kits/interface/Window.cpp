@@ -812,73 +812,21 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			break;
 		}
 
-		case B_VIEW_RESIZED:
-		case B_VIEW_MOVED:
-		{
-			// NOTE: The problem with this implementation is that BView::Window()->CurrentMessage()
-			// will show this message, and not what it used to be on R5. This might break apps and
-			// we need to fix this here or change the way this feature is implemented. However, this
-			// implementation shows what has to be done when Layers are moved or resized inside the
-			// app_server. This message is generated from Layer::move_by() and resize_by() in
-			// Layer::AddToViewsWithInvalidCoords().
-			int32 token;
-			BPoint frameLeftTop;
-			float width;
-			float height;
-			BView *view;
-			for (int32 i = 0; msg->FindInt32("_token", i, &token) >= B_OK; i++) {
-				if (token >= 0) {
-					msg->FindPoint("where", i, &frameLeftTop);
-					msg->FindFloat("width", i, &width);
-					msg->FindFloat("height", i, &height);
-					if ((view = findView(top_view, token))) {
-						// update the views offset in parent
-						if (view->LeftTop() != frameLeftTop) {
-//printf("updating position (%.1f, %.1f): %s\n", frameLeftTop.x, frameLeftTop.y, view->Name());
-							view->fParentOffset = frameLeftTop;
-
-							// optionally call FrameMoved
-							if (view->fFlags & B_FRAME_EVENTS) {
-								STRACE(("Calling BView(%s)::FrameMoved( %.1f, %.1f )\n", view->Name(),
-										frameLeftTop.x, frameLeftTop.y));
-								view->FrameMoved(frameLeftTop);
-							}
-						}
-						// update the views width and height
-						if (view->fBounds.Width() != width || view->fBounds.Height() != height) {
-//printf("updating size (%.1f, %.1f): %s\n", width, height, view->Name());
-							// TODO: does this work when a views left/top side is resized?
-							view->fBounds.right = view->fBounds.left + width;
-							view->fBounds.bottom = view->fBounds.top + height;
-							// optionally call FrameResized
-							if (view->fFlags & B_FRAME_EVENTS) {
-								STRACE(("Calling BView(%s)::FrameResized( %f, %f )\n", view->Name(), width, height));
-								view->FrameResized(width, height);
-							}
-						}
-					} else {
-						fprintf(stderr, "***PANIC: BW: Can't find view with ID: %ld !***\n", token);
-					}
-				}
-			}
-			break;
-		}
-/*
 		case B_VIEW_MOVED:
 		{
 			BPoint			where;
 
 			msg->FindPoint("where", &where);
 				
-			// TODO: should we use dynamic_cast? isn't that a bit expensive?
-			if (target && target != this)
+			if (target && target != this && dynamic_cast<BView*>(target))
 			{
 				STRACE(("Calling BView(%s)::FrameMoved( %f, %f )\n", target->Name(), where.x, where.y));
-				((BView*)target)->FrameMoved( where );
+				((BView*)target)->FrameMoved(where);
 			}
 			
 			break;
 		}	
+
 		case B_VIEW_RESIZED:
 		{
 			float			newWidth,
@@ -889,15 +837,14 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			msg->FindFloat("height", &newHeight);
 			msg->FindPoint("where", &where);
 
-			// TODO: should we use dynamic_cast? isn't that a bit expensive?				
-			if (target && target != this){
+			if (target && target != this && dynamic_cast<BView*>(target)){
 				STRACE(("Calling BView(%s)::FrameResized( %f, %f )\n", target->Name(), newWidth, newHeight));
-				((BView*)target)->FrameResized( newWidth, newHeight );
+				((BView*)target)->FrameResized(newWidth, newHeight);
 			}
 
 			break;
 		}
-*/
+
 		case _MENUS_DONE_:
 			MenusEnded();
 			break;
