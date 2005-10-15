@@ -818,7 +818,7 @@ PPPManager::_CreateInterface(const char *name,
 		// it is safe to access the manager from userland now
 	
 	Report(PPP_MANAGER_REPORT, PPP_REPORT_INTERFACE_CREATED, &id,
-		sizeof(ppp_interface_id)));
+		sizeof(ppp_interface_id));
 	
 	// notify handlers that interface has been created and they can initialize it now
 	entry->interface->StateMachine().DownProtocols();
