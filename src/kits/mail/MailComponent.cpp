@@ -437,10 +437,19 @@ status_t BTextMailComponent::GetDecodedData(BPositionIO *data) {
 		return B_IO_ERROR;
 
 	BMimeType type;
+	BMimeType textAny ("text");
 	ssize_t written;
-	if (MIMEType(&type) == B_OK && type == "text/plain")
+	if (MIMEType(&type) == B_OK && textAny.Contains (&type))
+		// Write out the string which has been both decoded from quoted
+		// printable or base64 etc, and then converted to UTF-8 from whatever
+		// character set the message specified.  Do it for text/html,
+		// text/plain and all other text datatypes.  Of course, if the message
+		// is HTML and specifies a META tag for a character set, it will now be
+		// wrong.  But then we don't display HTML in BeMail, yet.
 		written = data->Write(text.String(),text.Length());
 	else
+		// Just write out whatever the binary contents are, only decoded from
+		// the quoted printable etc format.
 		written = data->Write(decoded.String(), decoded.Length());
 
 	return written >= 0 ? B_OK : written;
