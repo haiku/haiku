@@ -227,7 +227,7 @@ arch_debug_console_init(kernel_args *args)
 	uint16 divisor = (uint16)(115200 / kSerialBaudRate);
 
 	// only use the port if we could find one, else use the standard port
-	if (args->platform_args.serial_base_ports[0] != 0)
+	if (args != NULL && args->platform_args.serial_base_ports[0] != 0)
 		sSerialBasePort = args->platform_args.serial_base_ports[0];
 
 	out8(0x80, sSerialBasePort + SERIAL_LINE_CONTROL);	/* set divisor latch access bit */
