@@ -302,6 +302,42 @@ make_item_visible(Menu *menu, int32 selected)
 }
 
 
+static int32
+select_previous_valid_item(Menu *menu, int32 selected)
+{
+	MenuItem *item;
+	while ((item = menu->ItemAt(selected)) != NULL) {
+		if (item->IsEnabled() && item->Type() != MENU_ITEM_SEPARATOR)
+			break;
+
+		selected--;
+	}
+
+	if (selected < 0)
+		return first_selectable_item(menu);
+
+	return selected;
+}
+
+
+static int32
+select_next_valid_item(Menu *menu, int32 selected)
+{
+	MenuItem *item;
+	while ((item = menu->ItemAt(selected)) != NULL) {
+		if (item->IsEnabled() && item->Type() != MENU_ITEM_SEPARATOR)
+			break;
+
+		selected++;
+	}
+
+	if (selected >= menu->CountItems())
+		return last_selectable_item(menu);
+
+	return selected;
+}
+
+
 static void
 run_menu(Menu *menu)
 {
@@ -332,52 +368,22 @@ run_menu(Menu *menu)
 
 			switch (key.code.bios) {
 				case BIOS_KEY_UP:
-					while ((item = menu->ItemAt(--selected)) != NULL) {
-						if (item->IsEnabled() && item->Type() != MENU_ITEM_SEPARATOR)
-							break;
-					}
-					if (selected < 0)
-						selected = last_selectable_item(menu);
+					selected = select_previous_valid_item(menu, selected - 1);
 					break;
 				case BIOS_KEY_DOWN:
-					while ((item = menu->ItemAt(++selected)) != NULL) {
-						if (item->IsEnabled() && item->Type() != MENU_ITEM_SEPARATOR)
-							break;
-					}
-					if (selected >= menu->CountItems())
-						selected = first_selectable_item(menu);
+					selected = select_next_valid_item(menu, selected + 1);
 					break;
 				case BIOS_KEY_PAGE_UP:
-					selected -= menu_height() - 1;
-
-					while ((item = menu->ItemAt(selected)) != NULL) {
-						if (item->IsEnabled() && item->Type() != MENU_ITEM_SEPARATOR)
-							break;
-
-						selected--;
-					}
-
-					if (selected < 0)
-						selected = 0;
+					selected = select_previous_valid_item(menu, selected - menu_height() + 1);
 					break;
 				case BIOS_KEY_PAGE_DOWN:
-					selected += menu_height() - 1;
-
-					while ((item = menu->ItemAt(selected)) != NULL) {
-						if (item->IsEnabled() && item->Type() != MENU_ITEM_SEPARATOR)
-							break;
-
-						selected++;
-					}
-
-					if (selected >= menu->CountItems())
-						selected = menu->CountItems() - 1;
+					selected = select_next_valid_item(menu, selected + menu_height() - 1);
 					break;
 				case BIOS_KEY_HOME:
-					selected = 0;
+					selected = first_selectable_item(menu);
 					break;
 				case BIOS_KEY_END:
-					selected = menu->CountItems() - 1;
+					selected = last_selectable_item(menu);
 					break;
 			}
 
