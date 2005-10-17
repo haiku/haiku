@@ -56,9 +56,20 @@ MenuItem::SetTarget(menu_item_hook target)
 }
 
 
+/**	Marks or unmarks a menu item. A marked menu item usually gets a visual
+ *	clue like a checkmark that distinguishes it from others.
+ *	For menus of type CHOICE_MENU, there can only be one marked item - the
+ *	chosen one.
+ */
+
 void
 MenuItem::SetMarked(bool marked)
 {
+	if (marked && fMenu != NULL && fMenu->Type() == CHOICE_MENU) {
+		// always set choice text of parent if we were marked
+		fMenu->SetChoiceText(Label());
+	}
+
 	if (fIsMarked == marked)
 		return;
 
@@ -79,12 +90,6 @@ MenuItem::SetMarked(bool marked)
 void
 MenuItem::Select(bool selected)
 {
-	if (selected && fMenu != NULL) {
-		// always set choice text of parent if we were selected
-		if (fMenu->Type() == CHOICE_MENU && Type() != MENU_ITEM_NO_CHOICE)
-			fMenu->SetChoiceText(Label());
-	}
-
 	if (fIsSelected == selected)
 		return;
 
