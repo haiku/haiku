@@ -522,7 +522,7 @@ TarFS::Volume::Init(boot::Partition *partition)
 
 	char *out = NULL;
 
-	char in[512];
+	char in[2048];
 	z_stream zStream = {
 		(Bytef*)in,		// next in
 		sizeof(in),		// avail in
