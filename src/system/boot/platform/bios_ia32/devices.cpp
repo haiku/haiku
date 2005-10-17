@@ -6,6 +6,7 @@
 
 #include "bios.h"
 
+#include <KernelExport.h>
 #include <boot/platform.h>
 #include <boot/partitions.h>
 #include <boot/stdio.h>
@@ -27,6 +28,7 @@ extern uint8 gBootDriveID;
 extern uint32 gBootPartitionOffset;
 
 // int 0x13 definitions
+#define BIOS_RESET_DISK_SYSTEM			0x0000
 #define BIOS_READ						0x0200
 #define BIOS_GET_DRIVE_PARAMETERS		0x0800
 #define BIOS_IS_EXT_PRESENT				0x4100
@@ -141,6 +143,7 @@ class BIOSDrive : public Node {
 
 		bool HasParameters() const { return fHasParameters; }
 		const drive_parameters &Parameters() const { return fParameters; }
+		uint8 DriveID() const { return fDriveID; }
 
 	protected:
 		uint8	fDriveID;
@@ -153,11 +156,11 @@ class BIOSDrive : public Node {
 
 
 static void
-check_cd_boot(void)
+check_cd_boot(BIOSDrive *drive)
 {
 	gKernelArgs.boot_disk.cd = false;
 
-	if (gBootDriveID != 0)
+	if (drive->DriveID() != 0)
 		return;
 
 	struct bios_regs regs;
@@ -190,6 +193,8 @@ static status_t
 get_ext_drive_parameters(uint8 drive, drive_parameters *targetParameters)
 {
 	drive_parameters *parameter = (drive_parameters *)kDataSegmentScratch;
+
+	memset(parameter, 0, sizeof(drive_parameters);
 	parameter->parameters_size = sizeof(drive_parameters);
 
 	struct bios_regs regs;
@@ -198,7 +203,11 @@ get_ext_drive_parameters(uint8 drive, drive_parameters *targetParameters)
 	regs.esi = (addr_t)parameter - kDataSegmentBase;
 	call_bios(0x13, &regs);
 
-	if (regs.flags & CARRY_FLAG)
+	// filter out faulty BIOS return codes
+	if ((regs.flags & CARRY_FLAG) != 0
+		|| parameter->heads == 0
+		|| parameter->sectors_per_track == 0
+		|| parameter->sectors == 0)
 		return B_ERROR;
 
 	memcpy(targetParameters, parameter, sizeof(drive_parameters));
@@ -380,8 +389,10 @@ BIOSDrive::BIOSDrive(uint8 driveID)
 	if (get_ext_drive_parameters(driveID, &fParameters) != B_OK) {
 		// old style CHS support
 
-		if (get_drive_parameters(driveID, &fParameters) != B_OK)
+		if (get_drive_parameters(driveID, &fParameters) != B_OK) {
+			dprintf("getting drive parameters for: %u failed!\n", fDriveID);
 			return;
+		}
 
 		TRACE(("  cylinders: %lu, heads: %lu, sectors: %lu, bytes_per_sector: %u\n",
 			fParameters.cylinders, fParameters.heads, fParameters.sectors_per_track,
@@ -431,7 +442,7 @@ BIOSDrive::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 	uint32 blocksLeft = (bufferSize + offset + fBlockSize - 1) / fBlockSize;
 	int32 totalBytesRead = 0;
 
-	TRACE(("BIOS reads %lu bytes from %Ld (offset = %lu), drive %ld\n",
+	TRACE(("BIOS reads %lu bytes from %Ld (offset = %lu), drive %u\n",
 		blocksLeft * fBlockSize, pos * fBlockSize, offset, fDriveID));
 
 	uint32 scratchSize = 24 * 1024 / fBlockSize;
@@ -476,16 +487,37 @@ BIOSDrive::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 			if (cylinder >= fParameters.cylinders)
 				return B_BAD_VALUE;
 
+			// try to read from the device more than once, just to make sure it'll work
 			struct bios_regs regs;
-			regs.eax = BIOS_READ | blocksRead;
-			regs.edx = fDriveID | (head << 8);
-			regs.ecx = sector | ((cylinder >> 2) & 0xc0) | ((cylinder & 0xff) << 8);
-			regs.es = 0;
-			regs.ebx = kExtraSegmentScratch;
-			call_bios(0x13, &regs);
+			int32 tries = 3;
 
-			if (regs.flags & CARRY_FLAG)
+			while (tries-- > 0) {
+				regs.eax = BIOS_READ | blocksRead;
+				regs.edx = fDriveID | (head << 8);
+				regs.ecx = sector | ((cylinder >> 2) & 0xc0) | ((cylinder & 0xff) << 8);
+				regs.es = 0;
+				regs.ebx = kExtraSegmentScratch;
+				call_bios(0x13, &regs);
+
+				if ((regs.flags & CARRY_FLAG) == 0)
+					break;
+
+				if (tries < 2) {
+					// reset disk system
+					regs.eax = BIOS_RESET_DISK_SYSTEM;
+					regs.edx = fDriveID;
+					call_bios(0x13, &regs);
+				}
+	
+				// wait a bit between the retries (1/20 sec)
+				spin(50000);
+			}
+
+			if (regs.flags & CARRY_FLAG) {
+				dprintf("reading %ld bytes from drive %u failed at %Ld\n",
+					blocksRead, fDriveID, pos);
 				return B_ERROR;
+			}
 		}
 
 		uint32 bytesRead = fBlockSize * blocksRead - offset;
@@ -588,7 +620,7 @@ platform_register_boot_device(Node *device)
 	BIOSDrive *drive = (BIOSDrive *)device;
 
 	gKernelArgs.platform_args.boot_drive_number = gBootDriveID;
-	check_cd_boot();
+	check_cd_boot(drive);
 
 	if (drive->HasParameters()) {
 		const drive_parameters &parameters = drive->Parameters();
