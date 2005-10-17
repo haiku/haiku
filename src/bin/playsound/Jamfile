@@ -4,3 +4,8 @@ BinCommand playsound :
 	playsound.cpp
 	: be media
 ;
+
+BinCommand playfile :
+	playfile.cpp
+	: be libmedia.so
+;
