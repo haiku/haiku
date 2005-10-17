@@ -194,7 +194,7 @@ get_ext_drive_parameters(uint8 drive, drive_parameters *targetParameters)
 {
 	drive_parameters *parameter = (drive_parameters *)kDataSegmentScratch;
 
-	memset(parameter, 0, sizeof(drive_parameters);
+	memset(parameter, 0, sizeof(drive_parameters));
 	parameter->parameters_size = sizeof(drive_parameters);
 
 	struct bios_regs regs;
@@ -247,7 +247,7 @@ static status_t
 get_number_of_drives(uint8 *_count)
 {
 	struct bios_regs regs;
-	regs.eax = 0x800;
+	regs.eax = BIOS_GET_DRIVE_PARAMETERS;
 	regs.edx = 0x80;
 	regs.es = 0;
 	regs.edi = 0;
@@ -605,10 +605,26 @@ status_t
 platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 {
 	uint8 driveCount;
-	if (get_number_of_drives(&driveCount) == B_OK)
-		dprintf("number of drives: %d\n", driveCount);
+	if (get_number_of_drives(&driveCount) != B_OK)
+		return B_ERROR;
 
-	// ToDo: add other devices
+	dprintf("number of drives: %d\n", driveCount);
+
+	for (int32 i = 0; i < driveCount; i++) {
+		uint8 driveID = i + 0x80;
+		if (driveID == gBootDriveID)
+			continue;
+
+		BIOSDrive *drive = new BIOSDrive(driveID);
+		if (drive->InitCheck() != B_OK) {
+			dprintf("could not add drive %u\n", driveID);
+			delete drive;
+			continue;
+		}
+
+		devicesList->Add(drive);
+	}
+
 	return B_OK; 
 }
 
