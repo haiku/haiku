@@ -172,9 +172,7 @@ check_cd_boot(void)
 	// we obviously were booted from CD!
 
 	specification_packet *packet = (specification_packet *)kDataSegmentScratch;
-
-	if (packet->media_type != 0)
-		gKernelArgs.boot_disk.cd = false;
+	gKernelArgs.boot_disk.cd = packet->media_type != 0;
 
 #if 0
 	dprintf("got CD boot spec:\n");
