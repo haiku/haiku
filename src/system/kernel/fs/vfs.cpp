@@ -17,7 +17,6 @@
 #include <disk_device_manager/KDiskDevice.h>
 #include <disk_device_manager/KDiskDeviceManager.h>
 #include <disk_device_manager/KDiskDeviceUtils.h>
-#include <disk_device_manager/KPartitionVisitor.h>
 #include <disk_device_manager/KDiskSystem.h>
 #include <KPath.h>
 #include <syscalls.h>
@@ -61,18 +60,6 @@ const static uint32 kMaxUnusedVnodes = 8192;
 	// will keep around.
 	// It may be chosen with respect to the available memory or enhanced
 	// by some timestamp/frequency heurism.
-
-static struct {
-	const char *path;
-	const char *target;
-} sPredefinedLinks[] = {
-	{"/system", "/boot/beos/system"},
-	{"/bin", "/boot/beos/bin"},
-	{"/etc", "/boot/beos/etc"},
-	{"/var", "/boot/var"},
-	{"/tmp", "/boot/var/tmp"},
-	{NULL}
-};
 
 struct vnode {
 	struct vnode	*next;
@@ -177,10 +164,6 @@ static hash_table *sMountsTable;
 static mount_id sNextMountID = 1;
 
 mode_t __gUmask = 022;
-
-// This can be used by other code to see if there is a boot file system already
-dev_t gBootDevice = -1;
-
 
 /* function declarations */
 
@@ -3075,123 +3058,6 @@ vfs_setrlimit(int resource, const struct rlimit * rlp)
 
 
 status_t
-vfs_bootstrap_file_systems(void)
-{
-	status_t status;
-
-	// bootstrap the root filesystem
-	status = _kern_mount("/", NULL, "rootfs", 0, NULL);
-	if (status < B_OK)
-		panic("error mounting rootfs!\n");
-
-	_kern_setcwd(-1, "/");
-
-	// bootstrap the devfs
-	_kern_create_dir(-1, "/dev", 0755);
-	status = _kern_mount("/dev", NULL, "devfs", 0, NULL);
-	if (status < B_OK)
-		panic("error mounting devfs\n");
-
-	// bootstrap the pipefs
-	_kern_create_dir(-1, "/pipe", 0755);
-	status = _kern_mount("/pipe", NULL, "pipefs", 0, NULL);
-	if (status < B_OK)
-		panic("error mounting pipefs\n");
-
-	// bootstrap the bootfs (if possible)
-	_kern_create_dir(-1, "/boot", 0755);
-	status = _kern_mount("/boot", NULL, "bootfs", 0, NULL);
-	if (status < B_OK) {
-		// this is no fatal exception at this point, as we may mount
-		// a real on disk file system later
-		dprintf("Can't mount bootfs (will try disk file system later)\n");
-	}
-
-	// create some standard links on the rootfs
-
-	for (int32 i = 0; sPredefinedLinks[i].path != NULL; i++) {
-		_kern_create_symlink(-1, sPredefinedLinks[i].path,
-			sPredefinedLinks[i].target, 0);
-			// we don't care if it will succeed or not
-	}
-
-	return B_OK;
-}
-
-
-status_t
-vfs_mount_boot_file_system(kernel_args *args)
-{
-	// make the boot partition (and probably others) available
-	KDiskDeviceManager::CreateDefault();
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-
-	status_t status = manager->InitialDeviceScan();
-	if (status == B_OK) {
-		// ToDo: do this for real... (no hacks allowed :))
-		for (;;) {
-			snooze(500000);
-			if (manager->CountJobs() == 0)
-				break;
-		}
-	} else
-		dprintf("KDiskDeviceManager::InitialDeviceScan() failed: %s\n", strerror(status));
-
-	file_system_module_info *bootfs;
-	if ((bootfs = get_file_system("bootfs")) == NULL) {
-		// no bootfs there, yet
-
-		// ToDo: do this for real! It will currently only use the partition offset;
-		//	it does not yet use the disk_identifier information.
-
-		KPartition *bootPartition = NULL;
-
-		struct BootPartitionVisitor : KPartitionVisitor {
-			BootPartitionVisitor(off_t offset) : fOffset(offset) {}
-		
-			virtual bool VisitPre(KPartition *partition)
-			{
-				return (partition->ContainsFileSystem()
-						&& partition->Offset() == fOffset);
-			}
-			private:
-				off_t	fOffset;
-		} visitor(args->boot_disk.partition_offset);
-
-		KDiskDevice *device;
-		int32 cookie = 0;
-		while ((device = manager->NextDevice(&cookie)) != NULL) {
-			bootPartition = device->VisitEachDescendant(&visitor);
-			if (bootPartition)
-				break;
-		}
-
-		KPath path;
-		if (bootPartition == NULL
-			|| bootPartition->GetPath(&path) != B_OK
-			|| _kern_mount("/boot", path.Path(), "bfs", 0, NULL) < B_OK)
-			panic("could not get boot device!\n");
-	} else
-		put_file_system(bootfs);
-
-	gBootDevice = sNextMountID - 1;
-
-	// create link for the name of the boot device
-
-	fs_info info;
-	if (_kern_read_fs_info(gBootDevice, &info) == B_OK) {
-		char path[B_FILE_NAME_LENGTH + 1];
-		snprintf(path, sizeof(path), "/%s", info.volume_name);
-
-		_kern_create_symlink(-1, path, "/boot", 0);
-	}
-
-	file_cache_init_post_boot_device();
-	return B_OK;
-}
-
-
-status_t
 vfs_init(kernel_args *args)
 {
 	sVnodeTable = hash_init(VNODE_HASH_TABLE_SIZE, offsetof(struct vnode, next),
@@ -4891,7 +4757,7 @@ query_rewind(struct file_descriptor *descriptor)
 //	General File System functions
 
 
-static status_t
+static dev_t
 fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 	const char *args, bool kernel)
 {
@@ -5121,7 +4987,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 		fileDeviceDeleter.id = -1;
 	}
 
-	return B_OK;
+	return mount->id;
 
 err7:
 	FS_MOUNT_CALL(mount, unmount)(mount->cookie);
@@ -5446,7 +5312,7 @@ err:
 //	Calls from within the kernel
 
 
-status_t
+dev_t
 _kern_mount(const char *path, const char *device, const char *fsName,
 	uint32 flags, const char *args)
 {
@@ -6076,7 +5942,7 @@ _kern_setcwd(int fd, const char *path)
 //	Calls from userland (with extra address checks)
 
 
-status_t
+dev_t
 _user_mount(const char *userPath, const char *userDevice, const char *userFileSystem,
 	uint32 flags, const char *userArgs)
 {

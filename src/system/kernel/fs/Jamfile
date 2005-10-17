@@ -12,6 +12,7 @@ KernelMergeObject kernel_fs.o :
 	pipefs.cpp
 	fd.c
 	vfs.cpp
+	vfs_boot.cpp
 	vfs_select.cpp
 	message.c
 	node_monitor.cpp

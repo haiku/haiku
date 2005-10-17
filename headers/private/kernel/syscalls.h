@@ -115,7 +115,7 @@ extern status_t		_kern_get_image_info(image_id id, image_info *info, size_t size
 extern status_t		_kern_get_next_image_info(team_id team, int32 *cookie, image_info *info, size_t size);
 
 // VFS functions
-extern status_t		_kern_mount(const char *path, const char *device,
+extern dev_t		_kern_mount(const char *path, const char *device,
 						const char *fs_name, uint32 flags, const char *args);
 extern status_t		_kern_unmount(const char *path, uint32 flags);
 extern status_t		_kern_read_fs_info(dev_t device, struct fs_info *info);
