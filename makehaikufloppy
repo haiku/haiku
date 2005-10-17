@@ -1,0 +1,124 @@
+#!/bin/sh
+
+usage() {
+	echo "Usage: makebootfloppy [-cd] [-base <directory>] [-preserve] [-image <target>]"
+	echo "-cd       : Creates a boot floppy capable of booting to a CD."
+	echo "            If not specified, the boot floppy will only be able to boot"
+	echo "            systems from hard drives."
+	echo "-base     : Specifies the base directory of the system you wish to make"
+	echo "            a boot floppy from. Defaults to /boot"
+	echo "-preserve : Leaves a copy of the floppy image in /tmp (only valid when"
+	echo "            used with the -cd option)."
+	echo "-image    : writes the floppy image to the specified file - this implies"
+	echo "            the -cd option."
+	exit $1
+}
+
+BASE=distro/x86.release.haiku/
+CD=0
+PRESERVE=0
+IMAGE=/dev/disk/floppy/raw
+
+while [ "x$1" != "x" ] ; do
+	if [ "$1" = "-help" ] || [ "$1" = "--help" ] ; then
+		usage 0
+	elif [ "$1" = "-cd" ] ; then
+		CD=1
+	elif [ "$1" = "-preserve" ] ; then
+		PRESERVE=1
+	elif [ "$1" = "-image" ] ; then
+		shift
+		IMAGE=$1
+		CD=1
+		if [ "x$1" = "x" ] ; then
+			echo "-image requires an argument."
+			usage 1
+		fi
+	elif [ "$1" = "-base" ] ; then
+		shift
+		BASE=$1
+		if [ "x$1" = "x" ] || [ ! -d $BASE ] ; then
+			echo "-base requires a directory argument."
+			usage 1
+		fi
+	else
+		echo "Invalid option: $1"
+		usage 1
+	fi
+	shift
+done
+
+if [ $CD = 1 ] ; then
+	rm -f /tmp/boot.tgz /tmp/boot.img
+
+	echo "Creating boot image..."
+
+	mkdir -p /tmp/beos/system
+	cp objects/x86.release.haiku/system/kernel_x86 /tmp/beos/system/
+	oldCWD=$(pwd)
+
+	cd /tmp
+	tar chf /tmp/boot.tar beos/system/kernel_x86
+	rm -r /tmp/beos
+
+	cd $oldCWD
+	cd $BASE
+	pwd
+	tar rvhf /tmp/boot.tar \
+		beos/system/add-ons/kernel/busses/ide \
+		beos/system/add-ons/kernel/bus_managers \
+		beos/system/add-ons/kernel/file_systems/bfs \
+		beos/system/add-ons/kernel/generic \
+		beos/system/add-ons/kernel/partitioning_systems \
+		beos/system/add-ons/kernel/drivers/bin/scsi* \
+		beos/system/add-ons/kernel/file_systems/bfs \
+		> /dev/null
+#		beos/system/add-ons/kernel/boot \
+	gzip -c /tmp/boot.tar > /tmp/boot.tgz
+	rm /tmp/boot.tar
+	cd $oldCWD
+	if [ $? != 0 ] ; then
+		echo "Error creating boot floppy"
+		exit 1
+	fi
+
+	dd if=/dev/zero of=/tmp/boot.img bs=1k count=1440
+	if [ $? != 0 ] ; then
+		echo "Error creating temporary boot image"
+		exit 1
+	fi
+	dd if=/media/zbeos of=/tmp/boot.img conv=notrunc
+	dd if=/tmp/boot.tgz of=/tmp/boot.img bs=192k seek=1 conv=notrunc
+
+	echo "Writing boot image to "$IMAGE
+	dd if=/tmp/boot.img of=$IMAGE bs=72k
+	_retval=$?
+
+	if [ $PRESERVE = 0 ] ; then
+		rm -f /tmp/boot.tgz /tmp/boot.img
+	fi
+
+	if [ $_retval != 0 ] ; then
+		echo "Error creating boot floppy"
+		exit 1
+	fi
+else
+	# non-CD mode (only writes the bare boot loader)
+
+	echo "Writing boot loader..."
+	dd if=$BASE/beos/system/zbeos of=$IMAGE bs=18k
+	if [ $? != 0 ] ; then
+		echo "Error creating boot floppy"
+		exit 1
+	fi
+
+	echo "Erasing old boot drivers from the floppy..."
+	dd if=/dev/zero of=$IMAGE bs=512 conv=notrunc seek=384 count=1
+	if [ $? != 0 ] ; then
+		echo "Error creating boot floppy"
+		exit 1
+	fi
+fi
+
+echo "Done!"
+exit 0
