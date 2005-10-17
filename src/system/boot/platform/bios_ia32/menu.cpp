@@ -284,6 +284,24 @@ last_selectable_item(Menu *menu)
 }
 
 
+static bool
+make_item_visible(Menu *menu, int32 selected)
+{
+	if (sMenuOffset > selected
+		|| sMenuOffset + menu_height() <= selected) {
+		if (sMenuOffset > selected)
+			sMenuOffset = selected;
+		else
+			sMenuOffset = selected + 1 - menu_height();
+
+		draw_menu(menu);
+		return true;
+	}
+
+	return false;
+}
+
+
 static void
 run_menu(Menu *menu)
 {
@@ -301,6 +319,8 @@ run_menu(Menu *menu)
 		if (item != NULL)
 			item->Select(true);
 	}
+
+	make_item_visible(menu, selected);
 
 	while (true) {
 		union key key = wait_for_key();
@@ -366,7 +386,8 @@ run_menu(Menu *menu)
 				MenuItem *item = menu->ItemAt(selected);
 				if (item != NULL)
 					item->Select(true);
-				
+
+				make_item_visible(menu, selected);
 				// make sure that the new selected entry is visible
 				if (sMenuOffset > selected
 					|| sMenuOffset + menu_height() <= selected) {
