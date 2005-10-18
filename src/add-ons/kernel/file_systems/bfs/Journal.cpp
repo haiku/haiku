@@ -11,15 +11,280 @@
 
 #include <Drivers.h>
 #include <util/kernel_cpp.h>
+#include <util/Stack.h>
 #include <errno.h>
 
 
-struct log_entry : public DoublyLinkedListLinkImpl<log_entry> {
-	uint16		start;
-	uint16		length;
-	uint32		cached_blocks;
-	Journal		*journal;
+struct run_array {
+	int32		count;
+	union {
+		int32	max_runs;
+		int32	block_count;
+	};
+	block_run	runs[0];
+
+	int32 CountRuns() const { return BFS_ENDIAN_TO_HOST_INT32(count); }
+	int32 MaxRuns() const { return BFS_ENDIAN_TO_HOST_INT32(max_runs); }
+	const block_run &RunAt(int32 i) const { return runs[i]; }
+
+	static int32 MaxRuns(int32 blockSize)
+		{ return (blockSize - sizeof(run_array)) / sizeof(block_run); }
 };
+
+class RunArrays {
+	public:
+		RunArrays(Journal *journal);
+		~RunArrays();
+
+		uint32 Length() const { return fLength; }
+
+		status_t Insert(off_t blockNumber);
+
+		run_array *ArrayAt(int32 i) { return fArrays.Array()[i]; }
+		int32 CountArrays() const { return fArrays.CountItems(); }
+
+		int32 MaxArrayLength();
+		void PrepareForWriting();
+
+	private:
+		status_t _AddArray();
+		bool _ContainsRun(block_run &run);
+		bool _AddRun(block_run &run);
+
+		Journal		*fJournal;
+		uint32		fLength;
+		Stack<run_array *> fArrays;
+		run_array	*fLastArray;
+};
+
+class LogEntry : public DoublyLinkedListLinkImpl<LogEntry> {
+	public:
+		LogEntry(Journal *journal, uint32 logStart, uint32 length);
+		~LogEntry();
+
+		uint32 Start() const { return fStart; }
+		uint32 Length() const { return fLength; }
+
+		Journal *GetJournal() { return fJournal; }
+
+	private:
+		Journal		*fJournal;
+		uint32		fStart;
+		uint32		fLength;
+};
+
+
+//	#pragma mark -
+
+
+static void
+add_to_iovec(iovec *vecs, int32 &index, int32 max, const void *address, size_t size)
+{
+	if (index > 0
+		&& (addr_t)vecs[index - 1].iov_base + vecs[index - 1].iov_len == (addr_t)address) {
+		// the iovec can be combined with the previous one
+		vecs[index - 1].iov_len += size;
+		return;
+	}
+
+	if (index == max)
+		panic("no more space for iovecs!");
+
+	// we need to start a new iovec
+	vecs[index].iov_base = const_cast<void *>(address);
+	vecs[index].iov_len = size;
+	index++;
+}
+
+
+//	#pragma mark -
+
+
+LogEntry::LogEntry(Journal *journal, uint32 start, uint32 length)
+	:
+	fJournal(journal),
+	fStart(start),
+	fLength(length)
+{
+}
+
+
+LogEntry::~LogEntry()
+{
+}
+
+
+//	#pragma mark -
+
+
+RunArrays::RunArrays(Journal *journal)
+	:
+	fJournal(journal),
+	fLength(0),
+	fArrays(),
+	fLastArray(NULL)
+{
+}
+
+
+RunArrays::~RunArrays()
+{
+	run_array *array;
+	while (fArrays.Pop(&array))
+		free(array);
+}
+
+
+bool
+RunArrays::_ContainsRun(block_run &run)
+{
+	for (int32 i = 0; i < CountArrays(); i++) {
+		run_array *array = ArrayAt(i);
+
+		for (int32 j = 0; j < array->CountRuns(); j++) {
+			block_run &arrayRun = array->runs[j];
+			if (run.AllocationGroup() != arrayRun.AllocationGroup())
+				continue;
+
+			if (run.Start() >= arrayRun.Start()
+				&& run.Start() + run.Length() <= arrayRun.Start() + arrayRun.Length())
+				return true;
+		}
+	}
+
+	return false;
+}
+
+
+/**	Adds the specified block_run into the array.
+ *	Note: it doesn't support overlapping - it must only be used
+ *	with block_runs of length 1!
+ */
+
+bool
+RunArrays::_AddRun(block_run &run)
+{
+	ASSERT(run.length == 1);
+
+	// search for an existing adjacent block_run
+	// ToDo: this could be improved by sorting and a binary search
+
+	for (int32 i = 0; i < CountArrays(); i++) {
+		run_array *array = ArrayAt(i);
+
+		for (int32 j = 0; j < array->CountRuns(); j++) {
+			block_run &arrayRun = array->runs[j];
+			if (run.AllocationGroup() != arrayRun.AllocationGroup())
+				continue;
+	
+			if (run.Start() == arrayRun.Start() + arrayRun.Length()) {
+				// matches the end
+				arrayRun.length = HOST_ENDIAN_TO_BFS_INT16(arrayRun.Length() + 1);
+				array->block_count++;
+				fLength++;
+				return true;
+			} else if (run.start + 1 == arrayRun.start) {
+				// matches the start
+				arrayRun.start = run.start;
+				arrayRun.length = HOST_ENDIAN_TO_BFS_INT16(arrayRun.Length() + 1);
+				array->block_count++;
+				fLength++;
+				return true;
+			}
+		}
+	}
+
+	// no entry found, add new to the last array
+
+	if (fLastArray == NULL || fLastArray->CountRuns() == fLastArray->MaxRuns())
+		return false;
+
+	fLastArray->runs[fLastArray->CountRuns()] = run;
+	fLastArray->count = HOST_ENDIAN_TO_BFS_INT16(fLastArray->CountRuns() + 1);
+	fLastArray->block_count++;
+	fLength++;
+	return true;
+}
+
+
+status_t
+RunArrays::_AddArray()
+{
+	int32 blockSize = fJournal->GetVolume()->BlockSize();
+	run_array *array = (run_array *)malloc(blockSize);
+	if (array == NULL)
+		return B_NO_MEMORY;
+
+	if (fArrays.Push(array) != B_OK) {
+		free(array);
+		return B_NO_MEMORY;
+	}
+
+	memset(array, 0, blockSize);
+	array->block_count = 1;
+	fLastArray = array;
+	fLength++;
+
+	return B_OK;
+}
+
+
+status_t
+RunArrays::Insert(off_t blockNumber)
+{
+	Volume *volume = fJournal->GetVolume();
+	block_run run = volume->ToBlockRun(blockNumber);
+
+	if (fLastArray != NULL) {
+		// check if the block is already in the array
+		if (_ContainsRun(run))
+			return B_OK;
+	}
+
+	// insert block into array
+
+	if (!_AddRun(run)) {
+		// array is full
+		if (_AddArray() != B_OK)
+			return B_NO_MEMORY;
+
+		// insert entry manually, because _AddRun() would search the
+		// all arrays again for a free spot
+		fLastArray->runs[0] = run;
+		fLastArray->count = HOST_ENDIAN_TO_BFS_INT16(1);
+		fLastArray->block_count++;
+		fLength++;
+	}
+
+	return B_OK;
+}
+
+
+int32
+RunArrays::MaxArrayLength()
+{
+	int32 max = 0;
+	for (int32 i = 0; i < CountArrays(); i++) {
+		if (ArrayAt(i)->block_count > max)
+			max = ArrayAt(i)->block_count;
+	}
+
+	return max;
+}
+
+
+void
+RunArrays::PrepareForWriting()
+{
+	int32 blockSize = fJournal->GetVolume()->BlockSize();
+
+	for (int32 i = 0; i < CountArrays(); i++) {
+		ArrayAt(i)->max_runs = HOST_ENDIAN_TO_BFS_INT32(run_array::MaxRuns(blockSize));
+	}
+}
+
+
+//	#pragma mark -
 
 
 Journal::Journal(Volume *volume)
@@ -27,7 +292,6 @@ Journal::Journal(Volume *volume)
 	fVolume(volume),
 	fLock("bfs journal"),
 	fOwner(NULL),
-	fArray(volume->BlockSize()),
 	fLogSize(volume->Log().length),
 	fMaxTransactionSize(fLogSize / 4 - 5),
 	fUsed(0),
@@ -59,10 +323,22 @@ Journal::InitCheck()
 
 
 status_t
-Journal::CheckLogEntry(int32 count, const off_t *array)
+Journal::_CheckRunArray(const run_array *array)
 {
-	// ToDo: check log entry integrity (block numbers and entry size)
-	PRINT(("Log entry has %ld entries (%Ld)\n", count, array[0]));
+	int32 maxRuns = run_array::MaxRuns(fVolume->BlockSize());
+	if (array->MaxRuns() != maxRuns
+		|| array->CountRuns() > maxRuns
+		|| array->CountRuns() <= 0) {
+		FATAL(("Log entry has broken header!\n"));
+		return B_ERROR;
+	}
+
+	for (int32 i = 0; i < array->CountRuns(); i++) {
+		if (fVolume->ValidateBlockRun(array->RunAt(i)) != B_OK)
+			return B_ERROR;
+	}
+
+	PRINT(("Log entry has %ld entries (%Ld)\n", array->CountRuns()));
 	return B_OK;
 }
 
@@ -73,65 +349,50 @@ Journal::CheckLogEntry(int32 count, const off_t *array)
  */
 
 status_t
-Journal::ReplayLogEntry(int32 *_start)
+Journal::_ReplayRunArray(int32 *_start)
 {
-	PRINT(("ReplayLogEntry(start = %ld)\n", *_start));
+	PRINT(("ReplayRunArray(start = %ld)\n", *_start));
 
 	off_t logOffset = fVolume->ToBlock(fVolume->Log());
-	off_t arrayBlock = (*_start % fLogSize) + fVolume->ToBlock(fVolume->Log());
+	off_t blockNumber = *_start % fLogSize;
 	int32 blockSize = fVolume->BlockSize();
-	int32 count = 1, valuesInBlock = blockSize / sizeof(off_t);
-	int32 numArrayBlocks;
-	off_t blockNumber = 0;
-	bool first = true;
+	int32 count = 1;
+
+	CachedBlock cachedArray(fVolume);
+
+	const run_array *array = (const run_array *)cachedArray.SetTo(logOffset + blockNumber);
+	if (array == NULL)
+		return B_IO_ERROR;
+
+	if (_CheckRunArray(array) < B_OK)
+		return B_BAD_DATA;
+
+	blockNumber = (blockNumber + 1) % fLogSize;
 
 	CachedBlock cached(fVolume);
+	for (int32 index = 0; index < array->CountRuns(); index++) {
+		const block_run &run = array->RunAt(index);
+		PRINT(("replay block run %lu:%u:%u in log at %Ld!\n", run.AllocationGroup(),
+			run.Start(), run.Length(), blockNumber));
 
-	while (count > 0) {
-		const off_t *array = (const off_t *)cached.SetTo(arrayBlock);
-		if (array == NULL)
-			return B_IO_ERROR;
-
-		int32 index = 0;
-		if (first) {
-			if (array[0] < 1 || array[0] >= fLogSize)
-				return B_BAD_DATA;
-
-			count = array[0];
-			first = false;
-
-			numArrayBlocks = ((count + 1) * sizeof(off_t) + blockSize - 1) / blockSize;
-			blockNumber = (*_start + numArrayBlocks) % fLogSize;
-				// first real block in this log entry
-			*_start += count;
-			index++;
-				// the first entry in the first block is the number
-				// of blocks in that log entry
-		}
-		(*_start)++;
-
-		if (CheckLogEntry(count, array + 1) < B_OK)
-			return B_BAD_DATA;
-
-		CachedBlock cachedCopy(fVolume);
-		for (; index < valuesInBlock && count-- > 0; index++) {
-			PRINT(("replay block %Ld in log at %Ld!\n", array[index], blockNumber));
-
-			const uint8 *copy = cachedCopy.SetTo(logOffset + blockNumber);
-			if (copy == NULL)
+		off_t offset = fVolume->ToOffset(run);
+		for (int32 i = 0; i < run.Length(); i++) {
+			const uint8 *data = cached.SetTo(logOffset + blockNumber);
+			if (data == NULL)
 				RETURN_ERROR(B_IO_ERROR);
 
+dprintf("replay block: %Ld\n", fVolume->ToBlock(run) + i);
 			ssize_t written = write_pos(fVolume->Device(),
-						array[index] << fVolume->BlockShift(), copy, blockSize);
+				offset + (i * blockSize), data, blockSize);
 			if (written != blockSize)
 				RETURN_ERROR(B_IO_ERROR);
 
 			blockNumber = (blockNumber + 1) % fLogSize;
+			count++;
 		}
-		arrayBlock++;
-		if (arrayBlock > fVolume->ToBlock(fVolume->Log()) + fLogSize)
-			arrayBlock = fVolume->ToBlock(fVolume->Log());
 	}
+
+	*_start += count;
 	return B_OK;
 }
 
@@ -161,7 +422,7 @@ Journal::ReplayLog()
 		}
 		lastStart = start;
 
-		status_t status = ReplayLogEntry(&start);
+		status_t status = _ReplayRunArray(&start);
 		if (status < B_OK) {
 			FATAL(("replaying log entry from %ld failed: %s\n", start, strerror(status)));
 			return B_ERROR;
@@ -185,22 +446,26 @@ Journal::ReplayLog()
  */
 
 void
-Journal::blockNotify(int32 transactionID, void *arg)
+Journal::_blockNotify(int32 transactionID, void *arg)
 {
-	log_entry *logEntry = (log_entry *)arg;
+	LogEntry *logEntry = (LogEntry *)arg;
 
 	PRINT(("Log entry %p has been finished, transaction ID = %ld\n", logEntry, transactionID));
 
-	Journal *journal = logEntry->journal;
+	Journal *journal = logEntry->GetJournal();
 	disk_super_block &superBlock = journal->fVolume->SuperBlock();
 	bool update = false;
 
 	// Set log_start pointer if possible...
 
+	journal->fEntriesLock.Lock();
+
 	if (logEntry == journal->fEntries.First()) {
-		log_entry *next = journal->fEntries.GetNext(logEntry);
+		LogEntry *next = journal->fEntries.GetNext(logEntry);
 		if (next != NULL) {
-			int32 length = next->start - logEntry->start;
+			int32 length = next->Start() - logEntry->Start();
+				// log entries inbetween could have been already released, so
+				// we can't just use LogEntry::Length() here
 			superBlock.log_start = (superBlock.log_start + length) % journal->fLogSize;
 		} else
 			superBlock.log_start = journal->fVolume->LogEnd();
@@ -208,12 +473,11 @@ Journal::blockNotify(int32 transactionID, void *arg)
 		update = true;
 	}
 
-	journal->fEntriesLock.Lock();
-	journal->fUsed -= logEntry->length;
+	journal->fUsed -= logEntry->Length();
 	journal->fEntries.Remove(logEntry);
 	journal->fEntriesLock.Unlock();
 
-	free(logEntry);
+	delete logEntry;
 
 	// update the super block, and change the disk's state, if necessary
 
@@ -235,21 +499,34 @@ Journal::blockNotify(int32 transactionID, void *arg)
 status_t
 Journal::WriteLogEntry()
 {
+	// ToDo: in case of a failure, we need a backup plan like writing all
+	//	changed blocks back to disk immediately
+
 	fTransactionsInEntry = 0;
 	fHasChangedBlocks = false;
 
-	// insert all changed blocks into the log array
+	int32 blockShift = fVolume->BlockShift();
+	off_t logOffset = fVolume->ToBlock(fVolume->Log()) << blockShift;
+	off_t logStart = fVolume->LogEnd();
+	off_t logPosition = logStart % fLogSize;
+	status_t status;
+
+	// create run_array structures for all changed blocks
+
+	RunArrays runArrays(this);
+
 	uint32 cookie = 0;
-	{
-		off_t blockNumber;
-		while (cache_next_block_in_transaction(fVolume->BlockCache(), fTransactionID, &cookie,
-				&blockNumber, NULL, NULL) == B_OK)  {
-			fArray.Insert(blockNumber);
+	off_t blockNumber;
+	while (cache_next_block_in_transaction(fVolume->BlockCache(), fTransactionID,
+			&cookie, &blockNumber, NULL, NULL) == B_OK) {
+		status = runArrays.Insert(blockNumber);
+		if (status < B_OK) {
+			FATAL(("filling log entry failed!"));
+			return status;
 		}
 	}
 
-	sorted_array *array = fArray.Array();
-	if (array == NULL || array->count == 0) {
+	if (runArrays.Length() == 0) {
 		// nothing has changed during this transaction
 		cache_end_transaction(fVolume->BlockCache(), fTransactionID, NULL, NULL);
 		return B_OK;
@@ -268,57 +545,85 @@ Journal::WriteLogEntry()
 		return B_BAD_DATA;
 	}
 */
-	int32 blockShift = fVolume->BlockShift();
-	off_t logOffset = fVolume->ToBlock(fVolume->Log()) << blockShift;
-	off_t logStart = fVolume->LogEnd();
-	off_t logPosition = logStart % fLogSize;
 
-	// Write disk block array
+	// Write log entries to disk
 
-	uint8 *arrayBlock = (uint8 *)array;
+	int32 maxVecs = runArrays.MaxArrayLength();
 
-	// ToDo: the single writes should be combined!
-	for (int32 size = fArray.BlocksUsed(); size-- > 0;) {
-		write_pos(fVolume->Device(), logOffset + (logPosition << blockShift),
-			arrayBlock, fVolume->BlockSize());
-
-		logPosition = (logPosition + 1) % fLogSize;
-		arrayBlock += fVolume->BlockSize();
-	}
-
-	// Write logged blocks into the log
-
-	for (int32 i = 0; i < array->count; i++) {
-		const uint8 *block = (const uint8 *)block_cache_get(fVolume->BlockCache(), array->values[i]);
-		if (block == NULL) {
-			FATAL(("Could not get block %Ld\n", array->values[i]));
-			continue;
-		}
-
-		// ToDo: combine blocks whenever possible (using iovecs)!
-		write_pos(fVolume->Device(), logOffset + (logPosition << blockShift),
-			block, fVolume->BlockSize());
-
-		block_cache_put(fVolume->BlockCache(), array->values[i]);
-		logPosition = (logPosition + 1) % fLogSize;
-	}
-
-	// create and add log entry
-
-	log_entry *logEntry = (log_entry *)malloc(sizeof(log_entry));
-	if (logEntry == NULL) {
-		DIE(("Could not create next log entry (out of memory)\n"));
+	iovec *vecs = (iovec *)malloc(sizeof(iovec) * maxVecs);
+	if (vecs == NULL) {
+		// ToDo: write back log entries directly?
 		return B_NO_MEMORY;
 	}
 
-	logEntry->start = logStart;
-	logEntry->length = TransactionSize();
-	logEntry->journal = this;
+	runArrays.PrepareForWriting();
 
-	fEntriesLock.Lock();
-	fEntries.Add(logEntry);
-	fUsed += logEntry->length;
-	fEntriesLock.Unlock();
+	for (int32 k = 0; k < runArrays.CountArrays(); k++) {
+		run_array *array = runArrays.ArrayAt(k);
+		int32 index = 0, count = 1;
+		int32 wrap = fLogSize - logStart;
+		add_to_iovec(vecs, index, maxVecs, (void *)array, fVolume->BlockSize());
+
+		// add block runs
+
+		for (int32 i = 0; i < array->CountRuns(); i++) {
+			const block_run &run = array->RunAt(i);
+			off_t blockNumber = fVolume->ToBlock(run);
+
+			for (int32 j = 0; j < run.Length(); j++) {
+				if (count >= wrap) {
+					// we need to write back the first half of the entry directly
+					logPosition = logStart + count;
+					if (writev_pos(fVolume->Device(), logOffset
+						+ (logStart << blockShift), vecs, index) < 0)
+						FATAL(("could not write log area!\n"));
+
+					logStart = 0;
+					wrap = fLogSize;
+					count = 0;
+					index = 0;
+				}
+
+				// make blocks available in the cache
+				const void *data;
+				if (j == 0) {
+					data = block_cache_get_etc(fVolume->BlockCache(), blockNumber,
+						blockNumber, run.Length());
+				} else
+					data = block_cache_get(fVolume->BlockCache(), blockNumber + j);
+
+				if (data == NULL)
+					return B_IO_ERROR;
+
+				add_to_iovec(vecs, index, maxVecs, data, fVolume->BlockSize());
+				count++;
+			}
+		}
+
+		// write back log entry
+		if (count > 0) {
+			logPosition = logStart + count;
+			if (writev_pos(fVolume->Device(), logOffset + (logStart << blockShift),
+				vecs, index) < 0)
+				FATAL(("could not write log area: %s!\n", strerror(errno)));
+		}
+
+		// release blocks again
+		for (int32 i = 0; i < array->CountRuns(); i++) {
+			const block_run &run = array->RunAt(i);
+			off_t blockNumber = fVolume->ToBlock(run);
+
+			for (int32 j = 0; j < run.Length(); j++) {
+				block_cache_put(fVolume->BlockCache(), blockNumber + j);
+			}
+		}
+	}
+
+	LogEntry *logEntry = new LogEntry(this, fVolume->LogEnd(), runArrays.Length());
+	if (logEntry == NULL) {
+		FATAL(("no memory to allocate log entries!"));
+		return B_NO_MEMORY;
+	}
 
 	// Update the log end pointer in the super block
 
@@ -326,7 +631,7 @@ Journal::WriteLogEntry()
 	fVolume->SuperBlock().log_end = logPosition;
 	fVolume->LogEnd() = logPosition;
 
-	status_t status = fVolume->WriteSuperBlock();
+	status = fVolume->WriteSuperBlock();
 
 	// We need to flush the drives own cache here to ensure
 	// disk consistency.
@@ -335,8 +640,13 @@ Journal::WriteLogEntry()
 
 	// at this point, we can finally end the transaction - we're in
 	// a guaranteed valid state
-	cache_end_transaction(fVolume->BlockCache(), fTransactionID, blockNotify, logEntry);
-	fArray.MakeEmpty();
+
+	fEntriesLock.Lock();
+	fEntries.Add(logEntry);
+	fUsed += logEntry->Length();
+	fEntriesLock.Unlock();
+
+	cache_end_transaction(fVolume->BlockCache(), fTransactionID, _blockNotify, logEntry);
 
 	// If the log goes to the next round (the log is written as a
 	// circular buffer), all blocks will be flushed out which is
@@ -364,7 +674,7 @@ Journal::FlushLogAndBlocks()
 
 	// write the current log entry to disk
 
-	if (fTransactionID != -1 && TransactionSize() != 0) {
+	if (fTransactionID != -1 /*&& TransactionSize() != 0*/) {
 		status = WriteLogEntry();
 		if (status < B_OK)
 			FATAL(("writing current log entry failed: %s\n", strerror(status)));
@@ -413,7 +723,7 @@ Journal::Unlock(Transaction *owner, bool success)
 	if (fLock.OwnerCount() == 1) {
 		// we only end the transaction if we would really unlock it
 		// ToDo: what about failing transactions that do not unlock?
-		TransactionDone(success);
+		_TransactionDone(success);
 
 		fTransactionID = -1;
 		fTimestamp = system_time();
@@ -425,10 +735,9 @@ Journal::Unlock(Transaction *owner, bool success)
 
 
 status_t
-Journal::TransactionDone(bool success)
+Journal::_TransactionDone(bool success)
 {
 	if (!success) {
-		fArray.MakeEmpty();
 		cache_abort_transaction(fVolume->BlockCache(), fTransactionID);
 		return B_OK;
 	}
@@ -466,7 +775,7 @@ status_t
 Journal::LogBlocks(off_t blockNumber, const uint8 *buffer, size_t numBlocks)
 {
 	panic("LogBlocks() called!\n");
-
+#if 0
 	// ToDo: that's for now - we should change the log file size here
 	if (TransactionSize() + numBlocks + 1 > fLogSize)
 		return B_DEVICE_FULL;
@@ -503,6 +812,7 @@ Journal::LogBlocks(off_t blockNumber, const uint8 *buffer, size_t numBlocks)
 /*	if (TransactionSize() > FreeLogBlocks())
 		force_cache_flush(fVolume->Device(), true);
 */
+#endif
 	return B_OK;
 }
 

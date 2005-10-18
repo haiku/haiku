@@ -24,8 +24,9 @@
 #include "Utility.h"
 
 
-struct log_entry;
-typedef DoublyLinkedList<log_entry> LogEntryList;
+struct run_array;
+class LogEntry;
+typedef DoublyLinkedList<LogEntry> LogEntryList;
 
 
 // Locking policy in BFS: if you need both, the volume lock and the
@@ -46,15 +47,13 @@ class Journal {
 		status_t Lock(Transaction *owner);
 		void Unlock(Transaction *owner, bool success);
 
-		status_t CheckLogEntry(int32 count, const off_t *array);
-		status_t ReplayLogEntry(int32 *start);
 		status_t ReplayLog();
 
 		status_t WriteLogEntry();
 		status_t LogBlocks(off_t blockNumber, const uint8 *buffer, size_t numBlocks);
 
 		Transaction *CurrentTransaction() const { return fOwner; }
-		uint32 TransactionSize() const { return fArray.CountItems() + fArray.BlocksUsed(); }
+//		uint32 TransactionSize() const { return fArray.CountItems() + fArray.BlocksUsed(); }
 
 		status_t FlushLogAndBlocks();
 		Volume *GetVolume() const { return fVolume; }
@@ -63,15 +62,16 @@ class Journal {
 		inline uint32 FreeLogBlocks() const;
 
 	private:
-		friend struct log_entry;
+		friend class LogEntry;
 
-		static void blockNotify(int32 transactionID, void *arg);
-		status_t TransactionDone(bool success);
+		status_t _CheckRunArray(const run_array *array);
+		status_t _ReplayRunArray(int32 *start);
+		status_t _TransactionDone(bool success);
+		static void _blockNotify(int32 transactionID, void *arg);
 
 		Volume			*fVolume;
 		RecursiveLock	fLock;
 		Transaction 	*fOwner;
-		BlockArray		fArray;
 		uint32			fLogSize, fMaxTransactionSize, fUsed;
 		int32			fTransactionsInEntry;
 		SimpleLock		fEntriesLock;
