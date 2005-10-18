@@ -166,6 +166,9 @@ RunArrays::_AddRun(block_run &run)
 {
 	ASSERT(run.length == 1);
 
+	// Be's BFS log replay routine can only deal with block_runs of size 1
+	// A pity, isn't it? Too sad we have to be compatible.
+#if 0
 	// search for an existing adjacent block_run
 	// ToDo: this could be improved by sorting and a binary search
 
@@ -193,6 +196,7 @@ RunArrays::_AddRun(block_run &run)
 			}
 		}
 	}
+#endif
 
 	// no entry found, add new to the last array
 
@@ -381,7 +385,6 @@ Journal::_ReplayRunArray(int32 *_start)
 			if (data == NULL)
 				RETURN_ERROR(B_IO_ERROR);
 
-dprintf("replay block: %Ld\n", fVolume->ToBlock(run) + i);
 			ssize_t written = write_pos(fVolume->Device(),
 				offset + (i * blockSize), data, blockSize);
 			if (written != blockSize)
@@ -562,6 +565,7 @@ Journal::WriteLogEntry()
 		run_array *array = runArrays.ArrayAt(k);
 		int32 index = 0, count = 1;
 		int32 wrap = fLogSize - logStart;
+
 		add_to_iovec(vecs, index, maxVecs, (void *)array, fVolume->BlockSize());
 
 		// add block runs
