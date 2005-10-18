@@ -14,6 +14,7 @@
 #include <Roster.h>
 #include <string.h>
 #include <String.h>
+#include <TranslationUtils.h>
 #include "InstallerWindow.h"
 #include "PartitionMenuItem.h"
 
@@ -27,19 +28,62 @@ const uint32 SRC_PARTITION = 'iSPT';
 const uint32 DST_PARTITION = 'iDPT';
 const uint32 PACKAGE_CHECKBOX = 'iPCB';
 
+class LogoView : public BBox {
+	public:
+			LogoView(const BRect &r);
+			~LogoView(void);
+		virtual void Draw(BRect update);
+	private:
+		BBitmap			*fLogo;
+		BPoint			fDrawPoint;
+};
+
+
+LogoView::LogoView(const BRect &r)
+	: BBox(r, "logoview", B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW, B_NO_BORDER)
+{
+	fLogo = BTranslationUtils::GetBitmap('PNG ', "haikulogo.png");
+	if (fLogo) {
+		fDrawPoint.x = (r.Width() - fLogo->Bounds().Width()) / 2;
+		fDrawPoint.y = 0;
+	}
+}
+
+
+LogoView::~LogoView(void)
+{
+	delete fLogo;
+}
+
+
+void
+LogoView::Draw(BRect update)
+{
+	if (fLogo)
+		DrawBitmap(fLogo, fDrawPoint);
+}
+
+
 InstallerWindow::InstallerWindow(BRect frame_rect)
 	: BWindow(frame_rect, "Installer", B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
 	fDriveSetupLaunched(false),
 	fCopyEngine(this)
 {
-
 	BRect bounds = Bounds();
 	bounds.bottom += 1;
 	bounds.right += 1;
 	fBackBox = new BBox(bounds, NULL, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS, B_FANCY_BORDER);
 	AddChild(fBackBox);
+	
+	BRect logoRect = fBackBox->Bounds();
+	logoRect.left += 1;
+	logoRect.top = 12;
+	logoRect.right -= 226;
+	logoRect.bottom = logoRect.top + 46 + B_H_SCROLL_BAR_HEIGHT;
+	LogoView *logoView = new LogoView(logoRect);
+	fBackBox->AddChild(logoView);
 
-	BRect statusRect(bounds.left+120, bounds.top+14, bounds.right-14, bounds.top+60);
+	BRect statusRect(bounds.right-222, logoRect.top+2, bounds.right-14, logoRect.bottom - B_H_SCROLL_BAR_HEIGHT+4);
 	BRect textRect(statusRect);
 	textRect.OffsetTo(B_ORIGIN);
 	textRect.InsetBy(2,2);
@@ -56,7 +100,7 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 	fBeginButton->MakeDefault(true);
 	fBackBox->AddChild(fBeginButton);
 
-	fSetupButton = new BButton(BRect(bounds.left+11, bounds.bottom-35, bounds.left+111, bounds.bottom-22),
+	fSetupButton = new BButton(BRect(bounds.left+11, bounds.bottom-35, bounds.left+121, bounds.bottom-22),
 		"setup_button", "Setup partitions" B_UTF8_ELLIPSIS, new BMessage(SETUP_MESSAGE), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
 	fBackBox->AddChild(fSetupButton);
 	fSetupButton->Hide();
@@ -67,7 +111,7 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 	fBackBox->AddChild(fPackagesScrollView);
 	fPackagesScrollView->Hide();
 
-	fDrawButton = new DrawButton(BRect(bounds.left+12, bounds.bottom-33, bounds.left+100, bounds.bottom-20),
+	fDrawButton = new DrawButton(BRect(bounds.left+12, bounds.bottom-33, bounds.left+120, bounds.bottom-20),
 		"options_button", "Fewer options", "More options", new BMessage(SHOW_BOTTOM_MESSAGE));
 	fBackBox->AddChild(fDrawButton);
 
@@ -77,14 +121,14 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 	BRect fieldRect(bounds.left+50, bounds.top+70, bounds.right-13, bounds.top+90);
 	fSrcMenuField = new BMenuField(fieldRect, "srcMenuField",
                 "Install from: ", fSrcMenu);
-        fSrcMenuField->SetDivider(70.0);
-        fSrcMenuField->SetAlignment(B_ALIGN_RIGHT);
-        fBackBox->AddChild(fSrcMenuField);
+	fSrcMenuField->SetDivider(bounds.right-274);
+	fSrcMenuField->SetAlignment(B_ALIGN_RIGHT);
+	fBackBox->AddChild(fSrcMenuField);
 
 	fieldRect.OffsetBy(0,23);
 	fDestMenuField = new BMenuField(fieldRect, "destMenuField",
 		"Onto: ", fDestMenu);
-	fDestMenuField->SetDivider(70.0);
+	fDestMenuField->SetDivider(bounds.right-274);
 	fDestMenuField->SetAlignment(B_ALIGN_RIGHT);
 	fBackBox->AddChild(fDestMenuField);
 
@@ -92,7 +136,7 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 	sizeRect.top = 105;
 	sizeRect.bottom = sizeRect.top + 15;
 	sizeRect.right -= 12;
-	sizeRect.left = sizeRect.right - 150;
+	sizeRect.left = sizeRect.right - 170;
 	fSizeView = new BStringView(sizeRect, "size_view", "Disk space required: 0.0 KB", B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	fSizeView->SetAlignment(B_ALIGN_RIGHT);
 	fBackBox->AddChild(fSizeView);
@@ -173,7 +217,7 @@ void
 InstallerWindow::ShowBottom()
 {
 	if (fDrawButton->Value()) {
-		ResizeTo(332,306);
+		ResizeTo(INSTALLER_RIGHT, 306);
 		if (fSetupButton->IsHidden())
 			fSetupButton->Show();
 		if (fPackagesScrollView->IsHidden())
@@ -187,7 +231,7 @@ InstallerWindow::ShowBottom()
 			fPackagesScrollView->Hide();
 		if (!fSizeView->IsHidden())
 			fSizeView->Hide();
-		ResizeTo(332,160);
+		ResizeTo(INSTALLER_RIGHT, 160);
 	}
 }
 
@@ -236,7 +280,7 @@ InstallerWindow::StartScan()
 		fSrcMenu->ItemAt(0)->SetMarked(true);
 		PublishPackages();
 	}
-	SetStatusMessage("Choose the disk you want to install onto\nfrom the pop-up menu. Then click \"Begin\".");
+	SetStatusMessage("Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".");
 }
 
 

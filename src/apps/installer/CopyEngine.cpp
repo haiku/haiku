@@ -54,12 +54,12 @@ CopyEngine::Start()
 void
 CopyEngine::ScanDisksPartitions(BMenu *srcMenu, BMenu *dstMenu)
 {
-	BDiskDeviceRoster roster;
+	/*BDiskDeviceRoster roster;
 	BDiskDevice device;
 	roster.VisitEachDevice(this, &device);
 
 	BPartition *partition;
-	roster.VisitEachPartition(this, &device, &partition);
+	roster.VisitEachPartition(this, &device, &partition);*/
 }
 
 

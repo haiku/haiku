@@ -17,6 +17,8 @@
 #include "DrawButton.h"
 #include "PackageViews.h"
 
+#define INSTALLER_RIGHT 402
+
 class InstallerWindow : public BWindow {
 public:
 	InstallerWindow(BRect frameRect);
@@ -43,6 +45,8 @@ private:
 	BScrollView *fPackagesScrollView;
 	BStringView *fSizeView;
 
+	BBitmap *fLogo;
+	BPoint fDrawPoint;
 	CopyEngine fCopyEngine;
 };
 

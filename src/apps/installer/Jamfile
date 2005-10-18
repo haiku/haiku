@@ -13,6 +13,6 @@ App Installer :
 	InstallerWindow.cpp
 	PackageViews.cpp
 	PartitionMenuItem.cpp
-	: libbe.so libtracker.so
+	: libbe.so libtracker.so libtranslation.so
 	: Installer.rdef ;
 

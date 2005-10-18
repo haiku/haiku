@@ -15,7 +15,7 @@
 
 class InstallerWindow;
 
-class CopyEngine : public BLooper, BDiskDeviceVisitor {
+class CopyEngine : public BLooper/*, BDiskDeviceVisitor*/ {
 public:
 	CopyEngine(InstallerWindow *window);
 	void Start();

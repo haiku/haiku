@@ -28,7 +28,7 @@ int main(int, char **)
 InstallerApp::InstallerApp()
 	: BApplication(APP_SIG)
 {
-	BRect windowFrame(0,0,332,160);
+	BRect windowFrame(0,0,INSTALLER_RIGHT, 160);
 	BRect frame = BScreen().Frame();
 	windowFrame.OffsetBy((frame.Width() - windowFrame.Width())/2, 
 		frame.Height()/2 - windowFrame.Height()/4 - 113);
