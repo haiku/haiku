@@ -750,7 +750,7 @@ _kern_readv(int fd, off_t pos, const iovec *vecs, size_t count)
 	status_t status;
 	uint32 i;
 
-	descriptor = get_fd(get_current_io_context(false), fd);
+	descriptor = get_fd(get_current_io_context(true), fd);
 	if (!descriptor)
 		return B_FILE_ERROR;
 	if ((descriptor->open_mode & O_RWMASK) == O_WRONLY) {
@@ -828,7 +828,7 @@ _kern_writev(int fd, off_t pos, const iovec *vecs, size_t count)
 	status_t status;
 	uint32 i;
 
-	descriptor = get_fd(get_current_io_context(false), fd);
+	descriptor = get_fd(get_current_io_context(true), fd);
 	if (!descriptor)
 		return B_FILE_ERROR;
 	if ((descriptor->open_mode & O_RWMASK) == O_RDONLY) {
