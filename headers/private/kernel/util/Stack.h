@@ -1,4 +1,4 @@
-/* Stack - a template stack class
+/* Stack - a template stack class (plus some handy methods)
  *
  * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
@@ -57,6 +57,16 @@ template<class T> class Stack {
 
 			*value = fArray[--fUsed];
 			return true;
+		}
+
+		T *Array()
+		{
+			return fArray;
+		}
+
+		int32 CountItems() const
+		{
+			return fUsed;
 		}
 
 	private:

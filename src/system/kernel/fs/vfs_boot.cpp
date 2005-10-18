@@ -53,6 +53,62 @@ static struct {
 dev_t gBootDevice = -1;
 
 
+/**	No image was chosen - prefer disks with names like "Haiku", or "System"
+ */
+
+static int
+compare_image_boot(const void *_a, const void *_b)
+{
+	KPartition *a = *(KPartition **)_a;
+	KPartition *b = *(KPartition **)_b;
+
+	if (a->ContentName() != NULL) {
+		if (b->ContentName() == NULL)
+			return 1;
+	} else if (b->ContentName() != NULL) {
+		return -1;
+	} else
+		return 0;
+
+	int compare = strcmp(a->ContentName(), b->ContentName());
+	if (!compare)
+		return 0;
+
+	if (!strcasecmp(a->ContentName(), "Haiku"))
+		return 1;
+	if (!strcasecmp(b->ContentName(), "Haiku"))
+		return -1;
+	if (!strncmp(a->ContentName(), "System", 6))
+		return 1;
+	if (!strncmp(b->ContentName(), "System", 6))
+		return -1;
+
+	return compare;	
+}
+
+
+/**	The system was booted from CD - prefer CDs over other entries. If there
+ *	is no CD, fall back to the standard mechanism (as implemented by
+ *	compare_image_boot().
+ */
+
+static int
+compare_cd_boot(const void *_a, const void *_b)
+{
+	KPartition *a = *(KPartition **)_a;
+	KPartition *b = *(KPartition **)_b;
+
+	bool aIsCD = a->Type() != NULL && !strcmp(a->Type(), kPartitionTypeDataSession);
+	bool bIsCD = b->Type() != NULL && !strcmp(b->Type(), kPartitionTypeDataSession);
+
+	int compare = (int)aIsCD - (int)bIsCD;
+	if (compare != 0)
+		return compare;
+
+	return compare_image_boot(_a, _b);
+}
+
+
 static status_t
 get_boot_partitions(kernel_args *args, PartitionStack &partitions)
 {
@@ -116,7 +172,12 @@ get_boot_partitions(kernel_args *args, PartitionStack &partitions)
 			break;
 	}
 
-	// ToDo: sort partition list (ie. when booting from CD, CDs should come first in the list)
+	if (!args->boot_disk.user_selected) {
+		// sort partition list (ie. when booting from CD, CDs should come first in the list)
+		qsort(partitions.Array(), partitions.CountItems(), sizeof(KPartition *),
+			args->boot_disk.cd ? compare_cd_boot : compare_image_boot);
+	}
+
 	return B_OK;
 }
 
