@@ -988,6 +988,8 @@ static int ether_init(void *cpp)
 static int ether_stop()
 {
 	struct ether_device *dptr = ether_devices, *odev;
+	stop_ifq(etherq);
+	etherq = NULL;
 	kill_thread(ether_rxt);
 	
 	while (dptr) {
