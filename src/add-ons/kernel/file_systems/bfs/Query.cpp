@@ -12,7 +12,6 @@
 #include "Query.h"
 #include "bfs.h"
 #include "Debug.h"
-#include "Stack.h"
 #include "Volume.h"
 #include "Inode.h"
 #include "BPlusTree.h"

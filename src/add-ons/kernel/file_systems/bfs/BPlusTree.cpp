@@ -12,9 +12,9 @@
 #include "BPlusTree.h"
 #include "Inode.h"
 #include "Utility.h"
-#include "Stack.h"
 
 #include <util/kernel_cpp.h>
+#include <util/Stack.h>
 #include <TypeConstants.h>
 
 #include <string.h>
