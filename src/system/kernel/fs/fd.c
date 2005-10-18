@@ -469,12 +469,13 @@ _user_readv(int fd, off_t pos, const iovec *userVecs, size_t count)
 			else
 				bytesRead += (ssize_t)length;
 
-			descriptor->pos = pos + length;
+			pos += vecs[i].iov_len;
 		}
 	} else
 		bytesRead = B_BAD_VALUE;
 
 	status = bytesRead;
+	descriptor->pos = pos;
 
 err2:
 	free(vecs);
@@ -571,12 +572,13 @@ _user_writev(int fd, off_t pos, const iovec *userVecs, size_t count)
 			else
 				bytesWritten += (ssize_t)length;
 
-			descriptor->pos = pos + length;
+			pos += vecs[i].iov_len;
 		}
 	} else
 		bytesWritten = B_BAD_VALUE;
 
 	status = bytesWritten;
+	descriptor->pos = pos;
 
 err2:
 	free(vecs);
@@ -775,11 +777,12 @@ _kern_readv(int fd, off_t pos, const iovec *vecs, size_t count)
 			else
 				bytesRead += (ssize_t)length;
 
-			descriptor->pos = pos + length;
+			pos += vecs[i].iov_len;
 		}
 	} else
 		bytesRead = B_BAD_VALUE;
 
+	descriptor->pos = pos;
 	put_fd(descriptor);
 	return bytesRead;
 }
@@ -853,11 +856,12 @@ _kern_writev(int fd, off_t pos, const iovec *vecs, size_t count)
 			else
 				bytesWritten += (ssize_t)length;
 
-			descriptor->pos = pos + length;
+			pos += vecs[i].iov_len;
 		}
 	} else
 		bytesWritten = B_BAD_VALUE;
 
+	descriptor->pos = pos;
 	put_fd(descriptor);
 	return bytesWritten;
 }
