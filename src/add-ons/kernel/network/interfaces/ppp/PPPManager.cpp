@@ -93,9 +93,11 @@ PPPManager::~PPPManager()
 		app = fApps.ItemAt(index);
 		if(app) {
 			free(app->interfaceName);
-			delete entry;
+			delete app;
 		}
 	}
+	
+	free(fDefaultInterface);
 }
 
 

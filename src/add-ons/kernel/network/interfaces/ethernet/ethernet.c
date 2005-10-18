@@ -377,10 +377,13 @@ int32 ether_input(void *data)
 	struct mbuf *m;	
 	struct ether_header *eth;
 	int len;
+	status_t error = B_OK;
 	
 	while (1) {
 		len = sizeof(struct ether_header);
-		acquire_sem_etc(etherq->pop, 1, B_CAN_INTERRUPT, 0);
+		error = acquire_sem_etc(etherq->pop, 1, B_CAN_INTERRUPT, 0);
+		if(error != B_NO_ERROR)
+			return error;
 		IFQ_DEQUEUE(etherq, m);
 		if (!m)
 			continue;
@@ -428,7 +431,7 @@ int32 ether_input(void *data)
 		}
 	}
 	
-	return 0;	
+	return error;
 }
 
 #define senderr(e)	{ error = (e); goto bad; }
