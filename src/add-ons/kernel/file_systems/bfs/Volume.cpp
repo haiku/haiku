@@ -46,11 +46,13 @@ class DeviceOpener {
 		void Keep();
 
 		int Device() const { return fDevice; }
+		int Mode() const { return fMode; }
 
 		status_t GetSize(off_t *_size, uint32 *_blockSize = NULL);
 
 	private:
 		int		fDevice;
+		int		fMode;
 		void	*fBlockCache;
 };
 
@@ -76,6 +78,27 @@ int
 DeviceOpener::Open(const char *device, int mode)
 {
 	fDevice = open(device, mode);
+	if (fDevice < 0 && mode == O_RDWR) {
+		// try again to open read-only (don't rely on a specific error code)
+		return Open(device, O_RDONLY);
+	}
+
+	if (fDevice >= 0) {
+		// opening succeeded
+		fMode = mode;
+		if (mode == O_RDWR) {
+			// check out if the device really allows for read/write access
+			device_geometry geometry;
+			if (!ioctl(fDevice, B_GET_GEOMETRY, &geometry)) {
+				if (geometry.read_only) {
+					// reopen device read-only
+					close(fDevice);
+					return Open(device, O_RDONLY);
+				}
+			}
+		}
+	}
+
 	return fDevice;
 }
 
@@ -257,9 +280,6 @@ Volume::Panic()
 status_t
 Volume::Mount(const char *deviceName, uint32 flags)
 {
-	if (flags & B_MOUNT_READ_ONLY)
-		fFlags |= VOLUME_READ_ONLY;
-
 	// ToDo: validate the FS in write mode as well!
 #if (B_HOST_IS_LENDIAN && defined(BFS_BIG_ENDIAN_ONLY)) \
 	|| (B_HOST_IS_BENDIAN && defined(BFS_LITTLE_ENDIAN_ONLY))
@@ -268,16 +288,12 @@ Volume::Mount(const char *deviceName, uint32 flags)
 #endif
 
 	DeviceOpener opener(deviceName, flags & B_MOUNT_READ_ONLY ? O_RDONLY : O_RDWR);
-
-	// if we couldn't open the device, try read-only (don't rely on a specific error code)
-	if (opener.Device() < B_OK && (flags & B_MOUNT_READ_ONLY) == 0) {
-		opener.Open(deviceName, O_RDONLY);
-		fFlags |= VOLUME_READ_ONLY;
-	}
-
 	fDevice = opener.Device();
 	if (fDevice < B_OK)
 		RETURN_ERROR(fDevice);
+
+	if (opener.Mode() == O_RDONLY)
+		fFlags |= VOLUME_READ_ONLY;
 
 	// check if it's a regular file, and if so, disable the cache for the
 	// underlaying file system
