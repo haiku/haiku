@@ -352,7 +352,7 @@ Journal::WriteLogEntry()
 
 	// Create log entries for the transaction
 
-	LogEntry *logEntry = NULL, *firstEntry = NULL;
+	LogEntry *logEntry = NULL, *firstEntry = NULL, *lastAdded = NULL;
 
 	for (int32 i = 0; i < array->count; i++) {
 	retry:
@@ -375,6 +375,7 @@ Journal::WriteLogEntry()
 			fEntriesLock.Lock();
 			fEntries.Add(logEntry);
 			fEntriesLock.Unlock();
+			lastAdded = logEntry;
 
 			logEntry = NULL;
 			goto retry;
@@ -385,6 +386,12 @@ Journal::WriteLogEntry()
 
 	if (firstEntry == NULL)
 		return B_OK;
+
+	if (logEntry != lastAdded) {
+		fEntriesLock.Lock();
+		fEntries.Add(logEntry);
+		fEntriesLock.Unlock();
+	}
 
 	// Write log entries to disk
 
@@ -432,10 +439,12 @@ Journal::WriteLogEntry()
 
 	for (logEntry = firstEntry; logEntry != NULL; logEntry = fEntries.GetNext(logEntry)) {
 		// Note: this only works this way as we only have block_runs of length 1
+		// We're reusing the fArray array, as we don't need it anymore, and
+		// it's guaranteed to be large enough for us, too
 		for (int32 i = 0; i < logEntry->CountRuns(); i++) {
 			array->values[i] = fVolume->ToBlock(logEntry->RunAt(i));
 		}
-	
+
 		set_blocks_info(fVolume->Device(), &array->values[0],
 			logEntry->CountRuns(), blockNotify, logEntry);
 	}
