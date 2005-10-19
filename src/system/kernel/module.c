@@ -1136,7 +1136,9 @@ module_init(kernel_args *args)
 	// register preloaded images
 
 	for (image = args->preloaded_images; image != NULL; image = image->next) {
-		register_preloaded_module_image(image);
+		status_t status = register_preloaded_module_image(image);
+		if (status != B_OK)
+			dprintf("Could not register image \"%s\": %s\n", image->name, strerror(status));
 	}
 
 	// ToDo: set sDisableUserAddOns from kernel_args!
@@ -1293,7 +1295,7 @@ get_next_loaded_module_name(uint32 *_cookie, char *buffer, size_t *_bufferSize)
 	struct module *module;
 	status_t status;
 
-	TRACE(("get_next_loaded_module_name(\"%s\")\n", buffer));
+	//TRACE(("get_next_loaded_module_name(\"%s\")\n", buffer));
 
 	if (_cookie == NULL || buffer == NULL || _bufferSize == NULL)
 		return B_BAD_VALUE;
