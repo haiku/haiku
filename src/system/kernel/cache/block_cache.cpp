@@ -30,7 +30,7 @@
 //	3) dirty blocks are only written back if asked for
 //	4) blocks are never removed yet
 
-//#define TRACE_BLOCK_CACHE
+#define TRACE_BLOCK_CACHE
 #ifdef TRACE_BLOCK_CACHE
 #	define TRACE(x)	dprintf x
 #else
@@ -47,6 +47,7 @@ struct cache_transaction {
 	transaction_notification_hook notification_hook;
 	void			*notification_data;
 	bool			open;
+	bool			has_sub_transaction;
 };
 
 static status_t write_cached_block(block_cache *cache, cached_block *block, bool deleteTransaction = true);
@@ -243,6 +244,7 @@ block_cache::FreeBlock(cached_block *block)
 	range->Free(this, block);
 
 	Free(block->original);
+	Free(block->parent_data);
 #ifdef DEBUG_CHANGED
 	Free(block->compare);
 #endif
@@ -271,6 +273,7 @@ block_cache::NewBlock(off_t blockNumber)
 	block->transaction_next = NULL;
 	block->transaction = block->previous_transaction = NULL;
 	block->original = NULL;
+	block->parent_data = NULL;
 	block->is_dirty = false;
 #ifdef DEBUG_CHANGED
 	block->compare = NULL;
@@ -424,13 +427,11 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off
 		return block->data;
 	}
 
-	// ToDo: note, even if we panic, we should probably put the cached block
-	//	back before we return
-
 	if (block->transaction != NULL && block->transaction->id != transactionID) {
 		// ToDo: we have to wait here until the other transaction is done.
 		//	Maybe we should even panic, since we can't prevent any deadlocks.
 		panic("get_writable_cached_block(): asked to get busy writable block (transaction %ld)\n", block->transaction->id);
+		put_cached_block(cache, block);
 		return NULL;
 	}
 	if (block->transaction == NULL && transactionID != -1) {
@@ -438,10 +439,12 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off
 		cache_transaction *transaction = lookup_transaction(cache, transactionID);
 		if (transaction == NULL) {
 			panic("get_writable_cached_block(): invalid transaction %ld!\n", transactionID);
+			put_cached_block(cache, block);
 			return NULL;
 		}
 		if (!transaction->open) {
 			panic("get_writable_cached_block(): transaction already done!\n");
+			put_cached_block(cache, block);
 			return NULL;
 		}
 
@@ -462,6 +465,17 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off
 		}
 
 		memcpy(block->original, block->data, cache->block_size);
+	}
+	if (block->parent_data == block->data) {
+		// remember any previous contents for the parent transaction
+		block->parent_data = cache->Allocate();
+		if (block->parent_data == NULL) {
+			// ToDo: maybe we should just continue the current transaction in this case...
+			put_cached_block(cache, block);
+			return NULL;
+		}
+
+		memcpy(block->parent_data, block->data, cache->block_size);
 	}
 
 	if (cleared)
@@ -615,6 +629,10 @@ cache_end_transaction(void *_cache, int32 id, transaction_notification_hook hook
 			cache->Free(block->original);
 			block->original = NULL;
 		}
+		if (transaction->has_sub_transaction && block->parent_data != block->data) {
+			cache->Free(block->parent_data);
+			block->parent_data = NULL;
+		}
 
 		// move the block to the previous transaction list
 		transaction->blocks.Add(block);
@@ -657,6 +675,10 @@ cache_abort_transaction(void *_cache, int32 id)
 			cache->Free(block->original);
 			block->original = NULL;
 		}
+		if (transaction->has_sub_transaction && block->parent_data != block->data) {
+			cache->Free(block->parent_data);
+			block->parent_data = NULL;
+		}
 
 		block->transaction_next = NULL;
 		block->transaction = NULL;
@@ -670,6 +692,7 @@ cache_abort_transaction(void *_cache, int32 id)
 extern "C" int32
 cache_detach_sub_transaction(void *_cache, int32 id)
 {
+	// ToDo: implement me!
 	return B_ERROR;
 }
 
@@ -677,14 +700,88 @@ cache_detach_sub_transaction(void *_cache, int32 id)
 extern "C" status_t
 cache_abort_sub_transaction(void *_cache, int32 id)
 {
-	return B_ERROR;
+	block_cache *cache = (block_cache *)_cache;
+	BenaphoreLocker locker(&cache->lock);
+
+	TRACE(("cache_abort_sub_transaction(id = %ld)\n", id));
+
+	cache_transaction *transaction = lookup_transaction(cache, id);
+	if (transaction == NULL) {
+		panic("cache_abort_sub_transaction(): invalid transaction ID\n");
+		return B_BAD_VALUE;
+	}
+	if (!transaction->has_sub_transaction)
+		return B_BAD_VALUE;
+
+	// revert all changes back to the version of the parent
+
+	cached_block *block = transaction->first_block, *next;
+	for (; block != NULL; block = next) {
+		next = block->transaction_next;
+
+		if (block->original == NULL) {
+			// an unchanged block in the transaction?
+panic("unchanged block in transaction!");
+			continue;
+		}
+
+		if (block->parent_data != block->data) {
+			// the block has been changed and must be restored
+			TRACE(("cache_abort_sub_transaction(id = %ld): restored contents of block %Ld\n",
+				transaction->id, block->block_number));
+			memcpy(block->data, block->parent_data, cache->block_size);
+			cache->Free(block->parent_data);
+		}
+
+		block->parent_data = NULL;
+	}
+
+	// all subsequent changes will go into the main transaction
+	transaction->has_sub_transaction = false;
+	return B_OK;
 }
 
 
 extern "C" status_t
 cache_start_sub_transaction(void *_cache, int32 id)
 {
-	return B_ERROR;
+	block_cache *cache = (block_cache *)_cache;
+	BenaphoreLocker locker(&cache->lock);
+
+	TRACE(("cache_start_sub_transaction(id = %ld)\n", id));
+
+	cache_transaction *transaction = lookup_transaction(cache, id);
+	if (transaction == NULL) {
+		panic("cache_start_sub_transaction(): invalid transaction ID\n");
+		return B_BAD_VALUE;
+	}
+
+	// move all changed blocks up to the parent
+
+	cached_block *block = transaction->first_block, *next;
+	for (; block != NULL; block = next) {
+		next = block->transaction_next;
+
+		if (block->original == NULL) {
+			// an unchanged block in the transaction?
+panic("unchanged block in transaction!");
+			continue;
+		}
+
+		if (transaction->has_sub_transaction && block->parent_data != block->data) {
+			// there already is an older sub transaction - we acknowledge
+			// its changes and move its blocks up to the parent
+			cache->Free(block->parent_data);
+		}
+
+		// we "allocate" the parent data lazily, that means, we don't copy
+		// the data (and allocate memory for it) until we need to
+		block->parent_data = block->data;
+	}
+
+	// all subsequent changes will go into the sub transaction
+	transaction->has_sub_transaction = true;
+	return B_OK;
 }
 
 

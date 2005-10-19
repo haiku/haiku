@@ -37,6 +37,7 @@ struct cached_block {
 	off_t			block_number;
 	void			*data;
 	void			*original;
+	void			*parent_data;
 #ifdef DEBUG_CHANGED
 	void			*compare;
 #endif
