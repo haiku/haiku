@@ -1,6 +1,6 @@
 /* Determine a canonical name for the current locale's character encoding.
 
-   Copyright (C) 2000-2003 Free Software Foundation, Inc.
+   Copyright (C) 2000-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU Library General Public License as published
@@ -14,7 +14,7 @@
 
    You should have received a copy of the GNU Library General Public
    License along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
    USA.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>.  */
@@ -73,8 +73,8 @@
 # define relocate(pathname) (pathname)
 #endif
 
-#if defined _WIN32 || defined __WIN32__ || defined __EMX__ || defined __DJGPP__
-  /* Win32, OS/2, DOS */
+#if defined _WIN32 || defined __WIN32__ || defined __CYGWIN__ || defined __EMX__ || defined __DJGPP__
+  /* Win32, Cygwin, OS/2, DOS */
 # define ISSLASH(C) ((C) == '/' || (C) == '\\')
 #endif
 
@@ -86,7 +86,7 @@
 # define ISSLASH(C) ((C) == DIRECTORY_SEPARATOR)
 #endif
 
-#ifdef HAVE_GETC_UNLOCKED
+#if HAVE_DECL_GETC_UNLOCKED
 # undef getc
 # define getc getc_unlocked
 #endif
@@ -116,9 +116,15 @@ get_charset_aliases ()
     {
 #if !(defined VMS || defined WIN32)
       FILE *fp;
-      const char *dir = relocate (LIBDIR);
+      const char *dir;
       const char *base = "charset.alias";
       char *file_name;
+
+      /* Make it possible to override the charset.alias location.  This is
+	 necessary for running the testsuite before "make install".  */
+      dir = getenv ("CHARSETALIASDIR");
+      if (dir == NULL || dir[0] == '\0')
+	dir = relocate (LIBDIR);
 
       /* Concatenate dir and base into freshly allocated file_name.  */
       {
@@ -141,15 +147,17 @@ get_charset_aliases ()
       else
 	{
 	  /* Parse the file's contents.  */
-	  int c;
-	  char buf1[50+1];
-	  char buf2[50+1];
 	  char *res_ptr = NULL;
 	  size_t res_size = 0;
-	  size_t l1, l2;
 
 	  for (;;)
 	    {
+	      int c;
+	      char buf1[50+1];
+	      char buf2[50+1];
+	      size_t l1, l2;
+	      char *old_res_ptr;
+
 	      c = getc (fp);
 	      if (c == EOF)
 		break;
@@ -170,6 +178,7 @@ get_charset_aliases ()
 		break;
 	      l1 = strlen (buf1);
 	      l2 = strlen (buf2);
+	      old_res_ptr = res_ptr;
 	      if (res_size == 0)
 		{
 		  res_size = l1 + 1 + l2 + 1;
@@ -184,6 +193,8 @@ get_charset_aliases ()
 		{
 		  /* Out of memory. */
 		  res_size = 0;
+		  if (old_res_ptr != NULL)
+		    free (old_res_ptr);
 		  break;
 		}
 	      strcpy (res_ptr + res_size - (l2 + 1) - (l1 + 1), buf1);
@@ -238,6 +249,7 @@ get_charset_aliases ()
 	   "CP1361" "\0" "JOHAB" "\0"
 	   "CP20127" "\0" "ASCII" "\0"
 	   "CP20866" "\0" "KOI8-R" "\0"
+	   "CP20936" "\0" "GB2312" "\0"
 	   "CP21866" "\0" "KOI8-RU" "\0"
 	   "CP28591" "\0" "ISO-8859-1" "\0"
 	   "CP28592" "\0" "ISO-8859-2" "\0"
@@ -248,7 +260,14 @@ get_charset_aliases ()
 	   "CP28597" "\0" "ISO-8859-7" "\0"
 	   "CP28598" "\0" "ISO-8859-8" "\0"
 	   "CP28599" "\0" "ISO-8859-9" "\0"
-	   "CP28605" "\0" "ISO-8859-15" "\0";
+	   "CP28605" "\0" "ISO-8859-15" "\0"
+	   "CP38598" "\0" "ISO-8859-8" "\0"
+	   "CP51932" "\0" "EUC-JP" "\0"
+	   "CP51936" "\0" "GB2312" "\0"
+	   "CP51949" "\0" "EUC-KR" "\0"
+	   "CP51950" "\0" "EUC-TW" "\0"
+	   "CP54936" "\0" "GB18030" "\0"
+	   "CP65001" "\0" "UTF-8" "\0";
 # endif
 #endif
 

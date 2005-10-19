@@ -1,3 +1,710 @@
+2005-07-08  Bruno Haible  <bruno@clisp.org>
+
+	* Version 1.10 released.
+
+2005-07-08  Bruno Haible  <bruno@clisp.org>
+
+	* m4/libtool.m4 (postinstall_cmds) [cygwin,mingw,pw32]: Make DLL
+	executable after installing it.
+
+2005-07-08  Bruno Haible  <bruno@clisp.org>
+
+	* configure.in: Bump version number.
+	* include/iconv.h.in (_LIBICONV_VERSION): Likewise.
+	* windows/iconv.rc: Likewise.
+	* lib/Makefile.in (LIBICONV_VERSION_INFO): Bump to 5:0:3.
+
+2005-07-05  Bruno Haible  <bruno@clisp.org>
+
+	* Makefile.devel (ACLOCAL): New variable.
+	(aclocal.m4): Use it.
+
+2005-07-05  Bruno Haible  <bruno@clisp.org>
+
+	* m4/relocatable.m4 (AC_RELOCATABLE): On mingw, simply set
+	SET_RELOCATABLE to a trivial value.
+
+2004-08-08  Bruno Haible  <bruno@clisp.org>
+
+	* srclib/progreloc.c (xstrdup): Define as strdup if no xmalloc should
+	be used.
+
+2004-04-28  Bruno Haible  <bruno@clisp.org>
+
+	* srclib/progreloc.c (ISSLASH, IS_PATH_WITH_DIR, FILESYSTEM_PREFIX_LEN):
+	Treat Cygwin like Windows, since it now accepts Windows pathnames.
+
+2005-06-09  Bruno Haible  <bruno@clisp.org>
+
+	* Makefile.in (mkinstalldirs): Use build-aux/ instead of autoconf/.
+	* lib/Makefile.in (mkinstalldirs): Likewise.
+	* src/Makefile.in (mkinstalldirs): Likewise.
+	* man/Makefile.in (mkinstalldirs): Likewise.
+
+2005-06-08  Bruno Haible  <bruno@clisp.org>
+
+	* srclib/canonicalize.c (__realpath): Avoid gcc warnings on platforms
+	that don't support symbolic links.
+
+2005-06-08  Bruno Haible  <bruno@clisp.org>
+
+	* srclib/binary-io.h (fileno): Undefine before defining it. Avoids a
+	gcc warning on mingw.
+
+2005-05-22  Bruno Haible  <bruno@clisp.org>
+
+	Implement and document BIG5-2003.
+	* lib/big5_2003.h: New file.
+	* lib/converters.h: Include it.
+	* lib/encodings_extra.def (BIG5-2003): New encoding.
+	* README, man/iconv_open.3: Add BIG5-2003.
+	* tests/Makefile.in (check-extra-yes): Check BIG5-2003.
+	* tests/BIG5-2003.TXT: New file.
+
+2005-05-21  Bruno Haible  <bruno@clisp.org>
+
+	Add EURO SIGN to EUC-TW converter.
+	* lib/cns11643_1.h (cns11643_1_2uni_page42): Add entry for 0x14242.
+	(cns11643_1_mbtowc): Update.
+	* lib/cns11643_inv.h (cns11643_inv_2charset): Add entry for 0x20AC.
+	(cns11643_inv_uni2indx_page*): Update.
+	* lib/dec_hanyu.h (dec_hanyu_mbtowc, dec_hanyu_wctomb): Consider only
+	part of row 42.
+	* tests/EUC-TW.TXT: Add entry for 0x20AC.
+	* tests/EUC-TW.IRREVERSIBLE.TXT: Likewise.
+
+2005-05-03  Bruno Haible  <bruno@clisp.org>
+
+	* tools/Makefile (ALL): Add pt154.h.
+	(pt154.h): New rule.
+	* lib/encodings.def: Add PT154.
+	* lib/pt154.h: New file.
+	* lib/converters.h: Include it.
+        * README, man/iconv_open.3: Add PT154.
+	* NOTES: Mention PT154.
+	* tests/PT154.TXT: New file.
+	* tests/Makefile.in (check): Also test PT154.
+	* tests/Makefile.msvc (check): Likewise.
+	* tests/Makefile.os2 (check): Likewise.
+
+2005-03-29  Bruno Haible  <bruno@clisp.org>
+
+	Rename libiconv_plug.so to preloadable_libiconv.so.
+	* configure.in (PLUGLIB): Set to preloadable_libiconv.so instead of
+	libiconv_plug.so.
+	* lib/Makefile.in (preloadable_libiconv.so): Renamed from
+	libiconv_plug.so.
+	(preloadable_libiconv_linux.so): Renamed from libiconv_plug_linux.so.
+	(preloadable_libiconv_solaris.so): Renamed from
+	libiconv_plug_solaris.so.
+	(preloadable_libiconv_osf.so): Renamed from libiconv_plug_osf.so.
+	(clean): Update.
+	* README: Update.
+
+2005-03-29  Bruno Haible  <bruno@clisp.org>
+
+	Implement and document ATARIST.
+	* tools/Makefile (ALL): Add atarist.h.
+	(atarist.h): New rule.
+	* lib/atarist.h: New file.
+	* lib/converters.h: Include it.
+	* lib/encodings_extra.def (ATARIST): New encoding.
+	* README, man/iconv_open.3: Add ATARIST.
+	* tests/Makefile.in (check-extra-yes): Check ATARIST.
+	* tests/ATARIST.TXT: New file.
+
+2005-03-22  Bruno Haible  <bruno@clisp.org>
+
+	* build-aux: New directory, renamed from autoconf.
+	* configure.in (AC_CONFIG_AUX_DIR): Use build-aux.
+
+2005-03-16  Bruno Haible  <bruno@clisp.org>
+
+	* m4/stdint.m4 (gl_STDINT_H): Define HAVE_LONG_LONG_64BIT instead of
+	HAVE_LONGLONG_64BIT.
+	* srclib/stdint_.h: Use HAVE_LONG_LONG_64BIT instead of
+	HAVE_LONGLONG_64BIT.
+	* srclib/Makefile.am (stdint.h): Likewise.
+
+2005-03-14  Bruno Haible  <bruno@clisp.org>
+
+	* Makefile.devel (aclocal.m4): Depend also on allocsa.m4, eealloc.m4,
+	extensions.m4, intmax.m4, inttypes.m4, longdouble.m4, longlong.m4,
+	printf-posix.m4, readlink.m4, signed.m4, ssize_t.m4, stdint.m4,
+	wchar_t.m4, wint_t.m4.
+
+2005-03-13  Bruno Haible  <bruno@clisp.org>
+
+	Make stdout error checking reliable, also when writing to a NFS file.
+	* src/iconv.c (main): Check the return value of fclose(stdout).
+	* lib/genaliases.c (main): Likewise.
+	* lib/genaliases2.c (main): Likewise.
+	* lib/genflags.c (main): Likewise.
+	* lib/gentranslit.c (main): Likewise.
+	* tests/genutf8.c (main): Likewise.
+	* tests/table-from.c (main): Likewise.
+	* tests/table-to.c (main): Likewise.
+
+2005-03-13  Bruno Haible  <bruno@clisp.org>
+
+	* src/iconv.c (convert): Before outputting an error message, flush
+	stdout and output a newline if suitable.
+
+2005-03-13  Bruno Haible  <bruno@clisp.org>
+
+	Improved error messages.
+	* srclib/width.c: New file, from GNU clisp.
+	* srclib/uniwidth.h: New file, from GNU clisp with modifications.
+	* srclib/unitypes.h: New file, from GNU clisp with modifications.
+	* srclib/cjk.h: New file, from GNU clisp.
+	* srclib/streq.h: New file, from GNU clisp.
+	* srclib/stdint_.h: New file, from gnulib.
+	* m4/stdint.m4: New file, from gnulib.
+	* m4/inttypes.m4: New file, from gnulib.
+	* srclib/Makefile.am: Add gnulib module 'stdint' snippet.
+	(BUILT_SOURCES): New variable.
+	(libicrt_a_SOURCES): Add width.c, uniwidth.h, unitypes.h, cjk.h,
+	streq.h.
+	* configure.in: Invoke gl_STDINT_H.
+	* src/iconv.c: Include cjk.h, uniwidth.h.
+	(line, column, cjkcode): New variables.
+	(update_line_column): New function.
+	(convert): Initialize line and column. In all error message, show also
+	the line and column number.
+	(main): Initialize cjkcode. Set up hooks to call update_line_column.
+
+2005-03-13  Bruno Haible  <bruno@clisp.org>
+
+	* include/iconv.h.in (iconv_canonicalize): New declaration.
+	* lib/genaliases.c (emit_encoding): Take two output streams as
+	arguments. To the second stream, emit a shell command for extracting
+	offsets into the gperf generated string pool.
+	(main): Write the shell commands into file descriptors 3 and 4.
+	* lib/genaliases2.c (emit_encoding): Take two output streams as
+	arguments. To the second stream, emit an expression for the offset
+	into the string pool.
+	(main): Write the offsets into file descriptor 3.
+	* Makefile.devel (lib/aliases.gperf): Remove target.
+	(lib/aliases.h): Generate lib/aliases.gperf temporarily. Generate also
+	lib/canonical.h and lib/canonical_local.h.
+	(lib/aliases_aix.h): Generate also lib/canonical_aix.h.
+	(lib/aliases_osf1.h): Generate also lib/canonical_osf1.h.
+	(lib/aliases_dos.h): Generate also lib/canonical_dos.h.
+	(lib/aliases_extra.h): Generate also lib/canonical_extra.h.
+	* lib/iconv.c (stringpool2): Provide default definition when it doesn't
+	exist.
+	(all_canonical): New array.
+	(iconv_canonicalize): New function.
+
+2005-03-13  Bruno Haible  <bruno@clisp.org>
+
+	* include/iconv.h.in (iconv_unicode_char_hook, iconv_wide_char_hook,
+	iconv_hooks): New types.
+	(ICONV_SET_HOOKS): New macro.
+	* lib/converters.h (struct conv_struct): Add field 'hooks'.
+	* lib/iconv.c (iconv_open): Initialize hooks to NULL.
+	(iconvctl): Handle ICONV_SET_HOOKS.
+	* lib/loop_unicode.h (unicode_loop_convert, unicode_loop_reset): After
+	conversion of a character, call the uc_hook.
+	* lib/loop_wchar.h (wchar_id_loop_convert): After every character, call
+	the wc_hook.
+	* lib/genflags.c (iconv_hooks): Provide a dummy definition.
+
+2005-02-05  Bruno Haible  <bruno@clisp.org>
+
+	* src/iconv.c (main): In case of unsupported encodings, show a hint
+	towards "iconv -l".
+
+2005-01-06  Bruno Haible  <bruno@clisp.org>
+
+	* lib/Makefile.msvc (CFLAGS): Define also INSTALLPREFIX.
+	* lib/Makefile.vms (DEFS): Likewise.
+	Reported by Troels Walsted Hansen <Troels.W.Hansen@fast.no>.
+
+2005-01-05  Bruno Haible  <bruno@clisp.org>
+
+	* autoconf/config.rpath: Update from GNU gettext.
+
+2005-01-05  Bruno Haible  <bruno@clisp.org>
+
+	Assume automake-1.9.
+	* Makefile.devel (AUTOMAKE): Assume automake-1.9.
+
+2005-01-05  Bruno Haible  <bruno@clisp.org>
+
+	* m4/libtool.m4: Update from GNU gettext, based on libtool-1.5.10.
+	* autoconf/ltmain.sh: Update from GNU gettext, based on libtool-1.5.10.
+
+2004-11-11  Bruno Haible  <bruno@clisp.org>
+
+	* lib/iconv.c (iconv_open): Accept the suffixes //TRANSLIT and //IGNORE
+	in arbitrary order.
+	Reported by Lukas Gebauer <gebauerl@mlp.cz>.
+
+2004-09-21  Juan Manuel Guerrero  <st001906@hrz1.hrz.tu-darmstadt.de>
+
+	* djgpp/config.bat: Update.
+	* djgpp/config.sed: Update.
+	* djgpp/config.site: Update.
+	* djgpp/edtest.bat: Update.
+	* djgpp/fnchange.in: Update.
+	* djgpp/Makefile.maint: Update.
+	* djgpp/makefile.sed: Update.
+	* djgpp/README.in: Update.
+	* djgpp/sources.sed: Update.
+	* djgpp/translit-check.sed: Update.
+
+2004-08-25  Bruno Haible  <bruno@clisp.org>
+
+	* m4/libtool.m4: Update from GNU gettext, based on libtool-1.5.6.
+	* autoconf/ltmain.sh: Update from GNU gettext, based on libtool-1.5.6.
+
+2004-07-31  Bruno Haible  <bruno@clisp.org>
+
+	Update to JISX 0213 plane 1 to 2004 version (ISO-IR-233).
+	* tools/Makefile (jisx0213.h): Bump version number.
+	* tools/JISX0213.TXT: Change mappings U+2015 -> U+2014,
+	U+2299 -> U+29BF, and add 10 new characters.
+	* tools/cjk_tab_to_h.c (output_title): Bump year.
+	(do_jisx0213): Update comments. Emit a conditional 'inline'.
+	* lib/jisx0213.h: Regenerated.
+	* lib/iso2022_jp3.h (iso2022_jp3_mbtowc): Accept escape sequence
+	ESC $ ( Q as a synonym of ESC $ ( O.
+	(iso2022_jp3_wctomb): Emit ESC $ ( Q instead of ESC $ ( O.
+	* tests/EUC-JISX0213.TXT: Change mappings U+2015 -> U+2014,
+	U+2299 -> U+29BF, and add 10 new characters.
+	* tests/SHIFT_JISX0213.TXT: Likewise.
+	* tests/ISO-2022-JP-3-snippet: Update.
+	* tests/ISO-2022-JP-3-snippet.UTF-8: Update.
+
+2004-07-22  Bruno Haible  <bruno@clisp.org>
+
+	* lib/encodings.def (ISO-8859-7): Add alias ISO_8859-7:2003.
+	* tools/Makefile (iso8859_7.h): Use conversion table from 2003.
+	* lib/iso8859_7.h: Add mappings for 0xa4, 0xa5, 0xaa.
+	* tests/ISO-8859-7.TXT: Update to ISO_8859-7:2003.
+
+2004-07-22  Bruno Haible  <bruno@clisp.org>
+
+	* tools/Makefile (ALL): Add iso8859_11.h.
+	(iso8859_11.h): New rule.
+	* lib/encodings.def: Add ISO-8859-11.
+	* lib/iso8859_11.h: New file.
+	* lib/converters.h: Include it.
+	* tests/ISO-8859-11.TXT: New file.
+	* tests/Makefile.in (check): Also test ISO-8859-11.
+	* tests/Makefile.msvc (check): Likewise.
+	* tests/Makefile.os2 (check): Likewise.
+
+2004-07-17  Bruno Haible  <bruno@clisp.org>
+
+	* src/iconv.c (main): Terminate option parsing when option -- is seen.
+	Reported by Len Lattanzi <zardoz@users.sourceforge.net>.
+
+2004-03-05  Bruno Haible  <bruno@clisp.org>
+
+	* src/Makefile.in (install): Make DESTDIR work on HP-UX.
+	Reported by Bob Proulx <box@proulx.com>.
+
+2004-02-19  Bruno Haible  <bruno@clisp.org>
+
+	* lib/vietcomb.h (viet_comp_table_data): Un-uncomment 0x00D5, 0x00F5,
+	0x0168, 0x0169. Needed for TCVN-5712 but not for CP1258.
+	(viet_comp_table0301_len): Increment by 4.
+
+	* lib/cp1255.h (cp1255_mbtowc): Don't delay the handling of characters
+	which are not entries in cp1255_comp_table_data.
+	* lib/cp1258.h (cp1258_comp_bases): New array.
+	(cp1258_mbtowc): Don't delay the handling of characters which are not
+	relevant entries in viet_comp_table_data.
+	* lib/tcvn.h (tcvn_comp_bases): New array.
+	(tcvn_mbtowc): Don't delay the handling of characters which are not
+	relevant entries in viet_comp_table_data.
+	Reported by Alain Bench <veronatif@free.fr>.
+
+2004-02-02  Perry Rapp  <lifelines_3_0_18@hotmail.com>
+            Bruno Haible  <bruno@clisp.org>
+
+	* man/iconvctl.3: New file.
+	* man/iconv.3: Refer to it in "See also".
+	* man/iconv_open.3: Likewise.
+
+2004-01-24  Bruno Haible  <bruno@clisp.org>
+
+	* srclib/progreloc.c (xstrdup): Define as strdup if no xmalloc should
+	be used.
+
+2004-01-20  Bruno Haible  <bruno@clisp.org>
+
+	Upgrade from gettext-0.14.
+
+	* configure.in: Call gl_USE_SYSTEM_EXTENSIONS. Call AM_STDBOOL_H
+	instead of gt_STDBOOL_H. Provide a definition for DLL_VARIABLE.
+	* srclib/Makefile.am (libicrt_a_SOURCES): Add allocsa.h, allocsa.c,
+	xalloc.h. Remove xmalloc.h.
+	(libicrt_a_LIBADD): Remove @ALLOCA@.
+	* srclib/Makefile.msvc (OBJECTS): Add allocsa.obj.
+	(allocsa.obj): New rule.
+	* srclib/Makefile.vms (OBJECTS): Add allocsa.obj.
+	(allocsa.obj): New rule.
+	* Makefile.devel (config.h_vms): Set MALLOC_0_IS_NONNULL to 0.
+	(config.h.msvc): Set MALLOC_0_IS_NONNULL to 1.
+
+    lib/:
+
+	2003-10-09  Bruno Haible  <bruno@clisp.org>
+	* lib/relocatable.c: Include xalloc.h instead of xmalloc.h.
+
+	2003-08-01  Bruno Haible  <bruno@clisp.org>
+	* lib/relocatable.c (find_shared_library_fullname): Disable the code on
+	Linux/libc5. Reported by Alain Guibert <derogaton+bgli@oreka.com>.
+
+	2003-06-22  Bruno Haible  <bruno@clisp.org>
+	* lib/relocatable.c (compute_curr_prefix): Comment out this function in
+	the case when it is not used.
+	Reported by Pavel Roskin <proski@gnu.org>.
+
+    m4/:
+
+	* m4/gettext.m4: Upgrade from GNU gettext. Many changes.
+	* m4/po.m4: Likewise.
+
+	* m4/readlink.m4: New file, from GNU gettext.
+
+	2003-11-30  Bruno Haible  <bruno@clisp.org>
+	* m4/allocsa.m4: New file.
+	* m4/eealloc.m4: New file.
+	* m4/setenv.m4 (gl_PREREQ_SETENV): Require gl_ALLOCSA instead of
+	AC_FUNC_ALLOCA.
+
+	2003-10-21  Bruno Haible  <bruno@clisp.org>
+	* m4/canonicalize.m4 (gl_PREREQ_CANONICALIZE): Also test for
+	readlink().
+
+	2003-08-24  Bruno Haible  <bruno@clisp.org>
+	* m4/relocatable.m4 (AC_RELOCATABLE): Use $(host) instead of @host@,
+	since the substitution of @host@ may occur before the substitution of
+	@SET_RELOCATABLE@.
+
+	2003-08-23  Bruno Haible  <bruno@clisp.org>
+	* stdbool.m4: Replace with the version from gnulib, without
+	AC_HEADER_STDBOOL.
+
+	2003-08-08  Paul Eggert  <eggert@twinsun.com>
+	* m4/extensions.m4: New file.
+	* m4/unlocked-io.m4 (jm_FUNC_GLIBC_UNLOCKED_IO):
+	Require gl_USE_SYSTEM_EXTENSIONS rather than AC_GNU_SOURCE.
+
+	2003-07-01  Bruno Haible  <bruno@clisp.org>
+	* m4/ssize_t.m4 (gt_TYPE_SSIZE_T): Don't include <unistd.h>.
+	<sys/types.h> should be sufficient.
+	Reported by Paul Eggert.
+
+	2003-07-01  Bruno Haible  <bruno@clisp.org>
+	* m4/lib-prefix.m4 (AC_LIB_ARG_WITH): Avoid "duplicated macro" error
+	from aclocal-1.4-p4.
+	Reported by Luke Schierer <lschiere@rackspace.com> and
+	Michael C. Toren <mct@toren.net>.
+
+	2003-07-01  Paul Eggert  <eggert@twinsun.com>
+	* m4/xreadlink.m4 (gl_XREADLINK): Don't check for sys/types.h, since
+	xreadlink.c now includes it unconditionally.
+
+	2003-06-17  Paul Eggert  <eggert@twinsun.com>
+	* m4/lib-ld.m4 (AC_LIB_PROG_LD_GNU, AC_LIB_PROG_LD): Don't use egrep,
+	for portability to POSIX 1003.1-2001.  Backported from libtool-1.5.
+
+	2003-05-28  Paul Eggert  <eggert@twinsun.com>
+	* m4/pathmax.m4 (gl_PATHMAX): Don't check for limits.h.
+	* m4/xreadlink.m4 (gl_XREADLINK): Likewise.
+
+	2002-12-24  Bruno Haible  <bruno@clisp.org>
+	* m4/setenv.m4 (gt_FUNC_SETENV): New macro.
+	(gt_CHECK_VAR_DECL): Fix quoting error that led to infinite loop in m4
+	when invoked twice.
+	(gt_PREREQ_SETENV, gt_PREREQ_UNSETENV): New macros, replacing old
+	gt_FUNC_SETENV.
+
+    srclib/:
+
+	2003-11-30  Bruno Haible  <bruno@clisp.org>
+	* srclib/alloca.c: Remove file.
+
+	2003-11-30  Bruno Haible  <bruno@clisp.org>
+	Safer stack allocation.
+	* srclib/allocsa.h: New file.
+	* srclib/allocsa.c: New file.
+	* canonicalize.c: Include allocsa.h.
+	(__realpath): Use allocsa instead of alloca. Don't clobber errno right
+	before returning NULL.
+	* srclib/relocwrapper.c: Indirectly depends on allocsa.
+	* srclib/setenv.c: Include allocsa.h.
+	(alloca): Remove fallback definition.
+	(freea): Remove macro.
+	(__add_to_environ) [!_LIBC]: Use allocsa instead of alloca. Use freesa
+	instead of freea.
+
+	2003-11-17  Bruno Haible  <bruno@clisp.org>
+	* srclib/canonicalize.c: #undef realpath after <config.h> but before
+	the system includes, so as to avoid a prototype clash on Solaris 2.5.1.
+	Reported by Warren L. Dodge <warrend@mdhost.cse.tek.com>.
+
+	2003-10-21  Bruno Haible  <bruno@clisp.org>
+	* srclib/canonicalize.c (lstat): Define as an alias to 'stat' on
+	systems without symbolic links.
+
+	2003-10-17  Bruno Haible  <bruno@clisp.org>
+	* srclib/binary-io.h: Avoid warnings on Cygwin.
+
+	2003-10-09  Bruno Haible  <bruno@clisp.org>
+	* srclib/xalloc.h: Renamed from xmalloc.h.
+	* srclib/progreloc.c: Include xalloc.h instead of xmalloc.h.
+	* srclib/relocatable.c: Likewise.
+	* srclib/xmalloc.c: Likewise.
+	* srclib/xreadlink.c: Likewise.
+	* srclib/xstrdup.c: Likewise.
+
+	2003-09-12  Paul Eggert  <eggert@twinsun.com>
+	* srclib/progreloc.c (get_full_program_name): Define via prototype.
+
+	2003-09-12  Paul Eggert  <eggert@twinsun.com>
+	* srclib/setenv.c (clearenv): Define via prototype.
+
+	2003-09-10  Bruno Haible  <bruno@clisp.org>
+	* srclib/setenv.c: Include <stdlib.h> and <string.h> unconditionally.
+	* srclib/unsetenv.c: Likewise.
+
+	2003-08-28  Bruno Haible  <bruno@clisp.org>
+	* srclib/binary-io.h: Undefine O_BINARY before defining it. This avoids
+	a warning on QNX, which defines O_BINARY to 000000.
+
+	2003-08-24  Bruno Haible  <bruno@clisp.org>
+	* srclib/binary-io.h: Include <stdio.h>, to avoid a compilation error
+	when MSVC7 <stdio.h> is included later.
+
+	2003-08-24  Bruno Haible  <bruno@clisp.org>
+	* srclib/error.h: Use ANSI C "..." declarations when compiling with
+	MSVC, even though it doesn't define __STDC__ by default.
+	* srclib/error.c: Use <stdarg.h> when compiling with MSVC, even though
+	it doesn't define __STDC__ by default.
+
+	2003-08-24  Bruno Haible  <bruno@clisp.org>
+	Support for building DLLs on Windows.
+	* srclib/error.h (error_print_progname, error_message_count,
+	error_one_per_line): Add DLL_VARIABLE attribute.
+	* srclib/progname.h (program_name): Likewise.
+
+	2003-08-24  Bruno Haible  <bruno@clisp.org>
+	* srclib/progname.h: Make this file includable in C++ mode: add extern
+	"C".
+	* srclib/relocatable.h: Likewise.
+	* srclib/xmalloc.h: Likewise.
+
+	2003-08-22  Bruno Haible  <bruno@clisp.org>
+	* srclib/progname.h (error_with_progname, maybe_print_progname): Remove
+	declarations.
+	* srclib/progname.c (error_with_progname): Remove variable.
+	(maybe_print_progname): Remove function.
+
+	2003-08-01  Bruno Haible  <bruno@clisp.org>
+	* srclib/relocatable.c (find_shared_library_fullname): Disable the code
+	on Linux/libc5. Reported by Alain Guibert <derogaton+bgli@oreka.com>.
+
+	2003-07-01  Paul Eggert  <eggert@twinsun.com>
+	* srclib/xreadlink.c: Include <sys/types.h> unconditionally, instead of
+	having it depend on HAVE_SYS_TYPES_H.
+
+	2003-06-23  Bruno Haible  <bruno@clisp.org>
+	Avoid compilation units that are empty after preprocessing.
+	* srclib/canonicalize.c: Add dummy declaration.
+	* srclib/strerror.c: Likewise.
+	* srclib/error.c: Include <stdio.h> even if there's nothing to be
+	compiled.
+
+	2003-06-22  Bruno Haible  <bruno@clisp.org>
+	* srclib/relocatable.c (compute_curr_prefix): Comment out this function
+	in the case when it is not used.
+	Reported by Pavel Roskin <proski@gnu.org>.
+
+	2003-05-28  Paul Eggert  <eggert@twinsun.com>
+	* srclib/pathmax.h: Include <limits.h> without checking for
+	HAVE_LIMITS_H.
+	* srclib/xreadlink.c: Likewise.
+
+2004-01-20  Bruno Haible  <bruno@clisp.org>
+
+	Assume automake-1.8.
+	* Makefile.devel (AUTOCONF, AUTOHEADER): Assume autoconf-2.59.
+	(AUTOMAKE): Assume automake-1.8.
+	* Makefile.in (am--refresh): New target.
+
+2004-01-23  Bruno Haible  <bruno@clisp.org>
+
+	* Version 1.9.2 released.
+
+2004-01-23  Bruno Haible  <bruno@clisp.org>
+
+	* tests/table-from.c: Include binary-io.h.
+	(main): Switch stdout to binary mode.
+	* tests/table-to.c: Include binary-io.h.
+	(main): Switch stdout to binary mode.
+	* tests/genutf8.c: Include binary-io.h.
+	(main): Switch stdout to binary mode.
+	* tests/Makefile.in (INCLUDES): Also look in srclib.
+	(check): Pass INCLUDES when compiling genutf8.c.
+	* tests/Makefile.os2 (INCLUDES): Also look in srclib.
+	(genutf8.exe): Pass INCLUDES when compiling genutf8.c.
+	* tests/Makefile.msvc (INCLUDES): Also look in srclib.
+	(check): Pass INCLUDES when compiling genutf8.c.
+
+2004-01-21  Bruno Haible  <bruno@clisp.org>
+
+	* src/iconv.c (force_binary): Remove variable.
+	(usage): Don't document --binary any more.
+	(convert, main): Always switch to binary mode.
+	* tests/check-stateful.bat: Remove --binary option.
+	* tests/check-translit.bat: Likewise.
+	* tests/check-stateful.cmd: Likewise.
+	* tests/check-translit.cmd: Likewise.
+	* djgpp/stateful-check.sed: Remove MODE variable.
+	* djgpp/translit-check.sed: Likewise.
+
+2004-01-21  Bruno Haible  <bruno@clisp.org>
+
+	* man/iconv.3: Fix description of return value in case of error.
+	Reported by Jonathan Wakely <redi@users.sf.net>.
+
+2003-09-12  Paul Eggert  <eggert@twinsun.com>
+
+	* srclib/progreloc.c (get_full_program_name): Define via prototype.
+
+2003-08-15  Bruno Haible  <bruno@clisp.org>
+
+	* Makefile.devel (lib/translit.h): Add ulimit command so that the
+	gentranslit program gets the stack it needs. Many Linux distributions
+	allow only 8 MB of stack by default.
+
+2003-08-01  Bruno Haible  <bruno@clisp.org>
+
+	* lib/relocatable.c (find_shared_library_fullname): Disable the code on
+	Linux/libc5.
+	* srclib/relocatable.c (find_shared_library_fullname): Likewise.
+	Reported by Alain Guibert <derogaton+bgli@oreka.com>.
+
+2003-07-02  Bruno Haible  <bruno@clisp.org>
+
+	* m4/lib-ld.m4: Update from GNU gettext.
+	* m4/lib-prefix.m4: Update from GNU gettext.
+	* m4/gettext.m4: Update from GNU gettext.
+	* m4/intmax.m4: New file, from GNU gettext.
+	* m4/longdouble.m4: New file, from GNU gettext.
+	* m4/longlong.m4: New file, from GNU gettext.
+	* m4/printf-posix.m4: New file, from GNU gettext.
+	* m4/signed.m4: New file, from GNU gettext.
+	* m4/wchar_t.m4: New file, from GNU gettext.
+	* m4/wint_t.m4: New file, from GNU gettext.
+	* m4/pathmax.m4: Update from GNU gettext and gnulib.
+	* m4/ssize_t.m4: Update from GNU gettext and gnulib.
+	* m4/xreadlink.m4: Update from GNU gettext and gnulib.
+	* m4/readlink.m4: New file, from gnulib.
+	* autoconf/install-reloc: Update from GNU gettext.
+	* srclib/stdbool_.h: Renamed from srclib/stdbool.h.in.
+	* srclib/readlink.c: New file, from GNU gettext and gnulib.
+	* srclib/Makefile.am (LIBADD_SOURCE): Add readlink.c.
+	(EXTRA_DIST, stdbool.h): Use stdbool_.h instead of stdbool.h.in.
+	* configure.in: Invoke gl_FUNC_READLINK.
+
+2003-06-22  Bruno Haible  <bruno@clisp.org>
+
+	* src/Makefile.in (install): Link with the already installed library.
+	This fixes a link error on Solaris.
+	Reported by Paul Eggert.
+
+2003-06-08  Bruno Haible  <bruno@clisp.org>
+
+	* srclib/canonicalize.c (__getcwd) [VMS]: Pass 3 arguments to getcwd.
+
+2003-05-02  Bruno Haible  <bruno@clisp.org>
+
+	Support for libtool-1.5.
+	* srclib/progname.c (set_program_name): Remove a leading
+	"<dirname>/.libs/lt-" or "<dirname>/.libs/", not only "lt-".
+
+2003-06-23  Bruno Haible  <bruno@clisp.org>
+
+	Avoid compilation units that are empty after preprocessing.
+	* srclib/canonicalize.c: Add dummy declaration.
+	* srclib/strerror.c: Likewise.
+	* srclib/error.c: Include <stdio.h> even if there's nothing to be
+	compiled.
+
+2003-06-22  Bruno Haible  <bruno@clisp.org>
+
+	Portability to mingw32.
+	* m4/ssize_t.m4: New file, from GNU gettext.
+	* m4/xreadlink.m4 (gl_XREADLINK): Require gt_TYPE_SSIZE_T.
+	Reported by Jeff Bonggren <jbon@cfl.rr.com>.
+
+2003-06-22  Bruno Haible  <bruno@clisp.org>
+
+	Portability to mingw32.
+	* lib/relocatable.c [WIN32]: Include <windows.h>.
+	* srclib/relocatable.c: Likewise.
+	Reported by Jeff Bonggren <jbon@cfl.rr.com>.
+
+2003-06-22  Bruno Haible  <bruno@clisp.org>
+
+	* lib/relocatable.c (compute_curr_prefix): Comment out this function in
+	the case when it is not used.
+	* srclib/relocatable.c (compute_curr_prefix): Likewise.
+	Reported by Pavel Roskin <proski@gnu.org>.
+
+2003-06-18  Bruno Haible  <bruno@clisp.org>
+
+	* config/install-sh: Update from automake-1.7.5.
+
+2003-06-16  Bruno Haible  <bruno@clisp.org>
+
+	* lib/encodings.def (ISO-8859-15): Add alias LATIN-9.
+	(ISO-8859-16): Add aliases ISO_8859-16:2001, LATIN10, L10. Remove alias
+	ISO_8859-16:2000.
+	(GBK): Add aliases MS936, WINDOWS-936.
+	Reported by Guido Flohr <guido@imperia.net>.
+
+2003-05-09  Bruno Haible  <bruno@clisp.org>
+
+	* srclib/canonicalize.c: Add #ifdef around versioned_symbol. Avoids an
+	"extraneous semicolon" warning from Tru64 cc.
+
+2003-06-07  Bruno Haible  <bruno@clisp.org>
+
+	* Makefile.devel (config.h_vms): Don't define HAVE_ENVIRON_DECL.
+	* Makefile.vms (config.h): New rule.
+	(all, install): Depend on it.
+	(all, install, installdirs, uninstall, check): Fix typo.
+	(mostlyclean, clean, distclean, maintainer-clean): Likewise. Remove
+	config.h.
+	* lib/Makefile.vms (DEFS): Fix value of INSTALLDIR.
+	(OBJECTS): Use libiconv.obj instead of iconv.obj.
+	(libiconv.obj): Renamed from iconv.obj.
+	* srclib/Makefile.vms (INCLUDES): Add parent directory.
+	(OBJECTS): Remove strtoul.obj, setenv.obj, unsetenv.obj.
+	(strtoul.obj, setenv.obj, unsetenv.obj): Remove rules.
+	(alloca.h): New rule.
+	(canonicalize.obj): Depend on it.
+	(clean): Remove alloca.h.
+	* src/Makefile.vms (datadir, localedir): New variables.
+	(DEFS): Also define LOCALEDIR.
+	(iconv.obj): Add flags for relocatability,
+	(iconv.exe): Link with libicrt. Use link_options.
+	* vms/link_options.opt: New file.
+	Reported by Jouk Jansen <joukj@hrem.stm.tudelft.nl>.
+
+2003-06-07  Bruno Haible  <bruno@clisp.org>
+
+	Support for relocatable data files even on Woe32.
+	* lib/Makefile.msvc (PICFLAGS): Also define PIC.
+
 2003-05-22  Bruno Haible  <bruno@clisp.org>
 
 	* Version 1.9.1 released.

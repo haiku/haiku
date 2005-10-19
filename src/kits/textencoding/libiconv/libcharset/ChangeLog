@@ -1,3 +1,65 @@
+2005-07-08  Bruno Haible  <bruno@clisp.org>
+
+	* m4/libtool.m4 (postinstall_cmds) [cygwin,mingw,pw32]: Make DLL
+	executable after installing it.
+
+2005-07-07  Bruno Haible  <bruno@clisp.org>
+
+	* configure.in: Bump version number.
+	* windows/charset.rc: Likewise.
+
+2005-07-05  Bruno Haible  <bruno@clisp.org>
+
+	* Makefile.devel (AUTOHEADER, ACLOCAL): New variables.
+	(autoconf/aclocal.m4, config.h.in): Use them.
+
+2005-03-22  Bruno Haible  <bruno@clisp.org>
+
+	* build-aux: New directory, renamed from autoconf.
+	* configure.in (AC_CONFIG_AUX_DIR): Use build-aux.
+	* Makefile.in (mkinstalldirs): Update.
+
+2005-01-05  Bruno Haible  <bruno@clisp.org>
+
+	* m4/libtool.m4: Update from GNU gettext, based on libtool-1.5.10.
+	* autoconf/ltmain.sh: Update from GNU gettext, based on libtool-1.5.10.
+
+2004-09-21  Juan Manuel Guerrero  <st001906@hrz1.hrz.tu-darmstadt.de>
+
+	* djgpp/config.bat: Update.
+	* djgpp/config.sed: Update.
+	* djgpp/config.site: Update.
+	* djgpp/fnchange.in: Update.
+	* djgpp/README.in: Update.
+
+2004-08-25  Bruno Haible  <bruno@clisp.org>
+
+	* m4/libtool.m4: Update from GNU gettext, based on libtool-1.5.6.
+	* autoconf/ltmain.sh: Update from GNU gettext, based on libtool-1.5.6.
+
+2004-01-20  Bruno Haible  <bruno@clisp.org>
+
+	Upgrade from gettext-0.14.
+
+	2003-08-24  Bruno Haible  <bruno@clisp.org>
+	* m4/relocatable.m4 (AC_RELOCATABLE): Use $(host) instead of @host@,
+	since the substitution of @host@ may occur before the substitution of
+	@SET_RELOCATABLE@.
+
+2004-01-20  Bruno Haible  <bruno@clisp.org>
+
+	Assume automake-1.8.
+	* Makefile.devel (AUTOCONF): Assume autoconf-2.59.
+
+2003-06-18  Bruno Haible  <bruno@clisp.org>
+
+	* config/install-sh: Update from automake-1.7.5.
+
+2003-06-07  Bruno Haible  <bruno@clisp.org>
+
+	* Makefile.devel (config.h_vms): Remove INSTALLPREFIX.
+	Reported by Jouk Jansen <joukj@hrem.stm.tudelft.nl>.
+
 2003-05-19  Bruno Haible  <bruno@clisp.org>
 
 	* windows/charset.rc: Include <winver.h>.

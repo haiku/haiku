@@ -1,3 +1,14 @@
+New in 1.10:
+* Added ISO-8859-11 converter.
+* Updated the ISO-8859-7 converter.
+* Added ATARIST converter, available through --enable-extra-encodings.
+* Added BIG5-2003 converter (experimental), available through
+  --enable-extra-encodings.
+* Updated EUC-TW converter to include the Euro sign.
+* The preloadable library has been renamed from libiconv_plug.so to
+  preloadable_libiconv.so.
+* Portability to mingw.
+
 New in 1.9:
 * Many more transliterations.
 * New configuration option --enable-relocatable.  See the INSTALL.generic file

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1999-2001 Free Software Foundation, Inc.
+ * Copyright (C) 1999-2005 Free Software Foundation, Inc.
  * This file is part of the GNU LIBICONV Library.
  *
  * The GNU LIBICONV Library is free software; you can redistribute it
@@ -14,8 +14,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with the GNU LIBICONV Library; see the file COPYING.LIB.
- * If not, write to the Free Software Foundation, Inc., 59 Temple Place -
- * Suite 330, Boston, MA 02111-1307, USA.
+ * If not, write to the Free Software Foundation, Inc., 51 Franklin Street,
+ * Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 /*
@@ -94,13 +94,13 @@ static const unsigned short cns11643_1_2uni_page21[500] = {
   0x247a, 0x247b, 0x247c, 0x247d, 0x2170, 0x2171, 0x2172, 0x2173,
   0x2174, 0x2175, 0x2176, 0x2177, 0x2178, 0x2179,
 };
-static const unsigned short cns11643_1_2uni_page42[33] = {
+static const unsigned short cns11643_1_2uni_page42[34] = {
   /* 0x42 */
   0x2400, 0x2401, 0x2402, 0x2403, 0x2404, 0x2405, 0x2406, 0x2407,
   0x2408, 0x2409, 0x240a, 0x240b, 0x240c, 0x240d, 0x240e, 0x240f,
   0x2410, 0x2411, 0x2412, 0x2413, 0x2414, 0x2415, 0x2416, 0x2417,
   0x2418, 0x2419, 0x241a, 0x241b, 0x241c, 0x241d, 0x241e, 0x241f,
-  0x2421,
+  0x2421, 0x20ac,
 };
 static const unsigned short cns11643_1_2uni_page44[5401] = {
   /* 0x44 */
@@ -873,7 +873,7 @@ cns11643_1_mbtowc (conv_t conv, ucs4_t *pwc, const unsigned char *s, int n)
           else if (i == 583)
             wc = 0x52f9;
         } else if (i < 3290) {
-          if (i < 3135)
+          if (i < 3136)
             wc = cns11643_1_2uni_page42[i-3102];
         } else {
           if (i < 8691)

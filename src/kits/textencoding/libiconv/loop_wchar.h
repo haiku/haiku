@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2002 Free Software Foundation, Inc.
+ * Copyright (C) 2000-2002, 2005 Free Software Foundation, Inc.
  * This file is part of the GNU LIBICONV Library.
  *
  * The GNU LIBICONV Library is free software; you can redistribute it
@@ -14,8 +14,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with the GNU LIBICONV Library; see the file COPYING.LIB.
- * If not, write to the Free Software Foundation, Inc., 59 Temple Place -
- * Suite 330, Boston, MA 02111-1307, USA.
+ * If not, write to the Free Software Foundation, Inc., 51 Franklin Street,
+ * Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 /* This file defines three conversion loops:
@@ -261,6 +261,7 @@ static size_t wchar_id_loop_convert (iconv_t icd,
                                      const char* * inbuf, size_t *inbytesleft,
                                      char* * outbuf, size_t *outbytesleft)
 {
+  struct conv_struct * cd = (struct conv_struct *) icd;
   const wchar_t* inptr = (const wchar_t*) *inbuf;
   size_t inleft = *inbytesleft / sizeof(wchar_t);
   wchar_t* outptr = (wchar_t*) *outbuf;
@@ -269,9 +270,14 @@ static size_t wchar_id_loop_convert (iconv_t icd,
   if (count > 0) {
     *inbytesleft -= count * sizeof(wchar_t);
     *outbytesleft -= count * sizeof(wchar_t);
-    do
-      *outptr++ = *inptr++;
-    while (--count > 0);
+    do {
+      wchar_t wc = *inptr++;
+      *outptr++ = wc;
+      #ifndef LIBICONV_PLUG
+      if (cd->hooks.wc_hook)
+        (*cd->hooks.wc_hook)(wc, cd->hooks.data);
+      #endif
+    } while (--count > 0);
     *inbuf = (const char*) inptr;
     *outbuf = (char*) outptr;
   }

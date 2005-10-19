@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1999-2001 Free Software Foundation, Inc.
+ * Copyright (C) 1999-2001, 2004 Free Software Foundation, Inc.
  * This file is part of the GNU LIBICONV Library.
  *
  * The GNU LIBICONV Library is free software; you can redistribute it
@@ -14,8 +14,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with the GNU LIBICONV Library; see the file COPYING.LIB.
- * If not, write to the Free Software Foundation, Inc., 59 Temple Place -
- * Suite 330, Boston, MA 02111-1307, USA.
+ * If not, write to the Free Software Foundation, Inc., 51 Franklin Street,
+ * Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 /*
@@ -27,6 +27,18 @@
 
 static const unsigned char cp1258_comb_table[] = {
   0xcc, 0xec, 0xde, 0xd2, 0xf2,
+};
+
+/* The possible bases in viet_comp_table_data:
+   0x0041..0x0045, 0x0047..0x0049, 0x004B..0x0050, 0x0052..0x0057,
+   0x0059..0x005A, 0x0061..0x0065, 0x0067..0x0069, 0x006B..0x0070,
+   0x0072..0x0077, 0x0079..0x007A, 0x00A5, 0x00A8, 0x00C2, 0x00C5..0x00C7,
+   0x00CA, 0x00CF, 0x00D3..0x00D4, 0x00D6, 0x00D8, 0x00DA, 0x00DC, 0x00E2,
+   0x00E5..0x00E7, 0x00EA, 0x00EF, 0x00F3..0x00F4, 0x00F6, 0x00F8, 0x00FA,
+   0x00FC, 0x0102..0x0103, 0x01A0..0x01A1, 0x01AF..0x01B0. */
+static const unsigned int cp1258_comp_bases[] = {
+  0x06fdfbbe, 0x06fdfbbe, 0x00000000, 0x00000120, 0x155884e4, 0x155884e4,
+  0x0000000c, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00018003
 };
 
 static const unsigned short cp1258_2uni[128] = {
@@ -123,7 +135,8 @@ cp1258_mbtowc (conv_t conv, ucs4_t *pwc, const unsigned char *s, int n)
     *pwc = (ucs4_t) last_wc;
     return 0; /* Don't advance the input pointer. */
   }
-  if (wc >= 0x0041 && wc <= 0x01b0) {
+  if (wc >= 0x0041 && wc <= 0x01b0
+      && ((cp1258_comp_bases[(wc - 0x0040) >> 5] >> (wc & 0x1f)) & 1)) {
     /* wc is a possible match in viet_comp_table_data. Buffer it. */
     conv->istate = wc;
     return RET_TOOFEW(1);

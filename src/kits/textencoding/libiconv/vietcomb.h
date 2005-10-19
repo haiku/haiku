@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Free Software Foundation, Inc.
+ * Copyright (C) 2001, 2004 Free Software Foundation, Inc.
  * This file is part of the GNU LIBICONV Library.
  *
  * The GNU LIBICONV Library is free software; you can redistribute it
@@ -14,8 +14,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with the GNU LIBICONV Library; see the file COPYING.LIB.
- * If not, write to the Free Software Foundation, Inc., 59 Temple Place -
- * Suite 330, Boston, MA 02111-1307, USA.
+ * If not, write to the Free Software Foundation, Inc., 51 Franklin Street,
+ * Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 /* Combining characters used in Vietnamese encodings CP1258, TCVN. */
@@ -66,7 +66,7 @@ static const struct { unsigned short base; unsigned short composed; } viet_comp_
   { 0x01AF, 0x1EEA },
   { 0x01B0, 0x1EEB },
 #define viet_comp_table0301_idx (viet_comp_table0300_idx+viet_comp_table0300_len)
-#define viet_comp_table0301_len 60
+#define viet_comp_table0301_len 64
   { 0x0041, 0x00C1 },
   { 0x0043, 0x0106 },
   { 0x0045, 0x00C9 },
@@ -110,7 +110,7 @@ static const struct { unsigned short base; unsigned short composed; } viet_comp_
   { 0x00CA, 0x1EBE },
   { 0x00CF, 0x1E2E },
   { 0x00D4, 0x1ED0 },
-/*{ 0x00D5, 0x1E4C },*/
+  { 0x00D5, 0x1E4C },
   { 0x00D8, 0x01FE },
   { 0x00DC, 0x01D7 },
   { 0x00E2, 0x1EA5 },
@@ -120,7 +120,7 @@ static const struct { unsigned short base; unsigned short composed; } viet_comp_
   { 0x00EA, 0x1EBF },
   { 0x00EF, 0x1E2F },
   { 0x00F4, 0x1ED1 },
-/*{ 0x00F5, 0x1E4D },*/
+  { 0x00F5, 0x1E4D },
   { 0x00F8, 0x01FF },
   { 0x00FC, 0x01D8 },
   { 0x0102, 0x1EAE },
@@ -129,8 +129,8 @@ static const struct { unsigned short base; unsigned short composed; } viet_comp_
 /*{ 0x0113, 0x1E17 },*/
 /*{ 0x014C, 0x1E52 },*/
 /*{ 0x014D, 0x1E53 },*/
-/*{ 0x0168, 0x1E78 },*/
-/*{ 0x0169, 0x1E79 },*/
+  { 0x0168, 0x1E78 },
+  { 0x0169, 0x1E79 },
   { 0x01A0, 0x1EDA },
   { 0x01A1, 0x1EDB },
   { 0x01AF, 0x1EE8 },
@@ -261,7 +261,7 @@ static const struct { unsigned int len; unsigned int idx; } viet_comp_table[] = 
 /* Decomposition table for the relevant Unicode characters. */
 struct viet_decomp { unsigned short composed; unsigned int base : 12; int comb1 : 4; };
 static const struct viet_decomp viet_decomp_table[] = {
-  { 0x00B4, 0x0020, 1 }, /* compatility decomposition - for TCVN only */
+  { 0x00B4, 0x0020, 1 }, /* compatibility decomposition - for TCVN only */
   { 0x00C0, 0x0041, 0 },
   { 0x00C1, 0x0041, 1 },
   { 0x00C3, 0x0041, 2 },
@@ -320,7 +320,7 @@ static const struct viet_decomp viet_decomp_table[] = {
   { 0x01FD, 0x00E6, 1 },
   { 0x01FE, 0x00D8, 1 },
   { 0x01FF, 0x00F8, 1 },
-  { 0x02DC, 0x0020, 2 }, /* compatility decomposition - for TCVN only */
+  { 0x02DC, 0x0020, 2 }, /* compatibility decomposition - for TCVN only */
   { 0x0385, 0x00A5, 1 },
   { 0x1E04, 0x0042, 4 },
   { 0x1E05, 0x0062, 4 },

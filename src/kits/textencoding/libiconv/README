@@ -27,8 +27,10 @@ It provides support for the encodings:
         Georgian-Academy, Georgian-PS
     Tajik
         KOI8-T
+    Kazakh
+        PT154
     Thai
-        TIS-620, CP874, MacThai
+        ISO-8859-11, TIS-620, CP874, MacThai
     Laotian
         MuleLao-1, CP1133
     Vietnamese
@@ -62,10 +64,12 @@ support for a few extra encodings:
         CP864
     Japanese
         EUC-JISX0213, Shift_JISX0213, ISO-2022-JP-3
+    Chinese
+        BIG5-2003 (experimental)
     Turkmen
         TDS565
     Platform specifics
-        RISCOS-LATIN1
+        ATARIST, RISCOS-LATIN1
 
 It can convert from any of these encodings to any other, through Unicode
 conversion.
@@ -123,21 +127,21 @@ This library can be built and installed in two variants:
   - The libc plug/override mode. This works on GNU/Linux, Solaris and OSF/1
     systems only. It is a way to get good iconv support without having
     glibc-2.1.
-    It installs a library `libiconv_plug.so'. This library can be used with
-    LD_PRELOAD, to override the iconv* functions present in the C library.
+    It installs a library `preloadable_libiconv.so'. This library can be used
+    with LD_PRELOAD, to override the iconv* functions present in the C library.
 
     On GNU/Linux and Solaris:
-        $ export LD_PRELOAD=/usr/local/lib/libiconv_plug.so
+        $ export LD_PRELOAD=/usr/local/lib/preloadable_libiconv.so
 
     On OSF/1:
-        $ export _RLD_LIST=/usr/local/lib/libiconv_plug.so:DEFAULT
+        $ export _RLD_LIST=/usr/local/lib/preloadable_libiconv.so:DEFAULT
 
     A program's source need not be modified, the program need not even be
     recompiled. Just set the LD_PRELOAD environment variable, that's it!
 
 
-Distribution:
-    ftp://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.8.tar.gz
+Download:
+    ftp://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.10.tar.gz
 
 Homepage:
     http://www.gnu.org/software/libiconv/

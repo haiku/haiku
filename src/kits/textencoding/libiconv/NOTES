@@ -161,6 +161,9 @@ A: libiconv, as an internationalization library, supports those character
      * KOI8-T
        We implement this because it is the locale encoding in glibc's Tajik
        locale.
+     * PT154
+       We implement this because it is the locale encoding in glibc's Kazakh
+       locale.
      * CP{1250,1251,1252,1253,1254,1255,1256,1257}
        We implement these because they are the predominant Windows encodings
        in Europe.
@@ -256,8 +259,8 @@ A: libiconv, as an internationalization library, supports those character
        We implement these because they appear to be both used for Georgian;
        Xfree86 supports them.
    Thai
-     * TIS-620
-       We implement this because it seems to be standard for Thai.
+     * ISO-8859-11, TIS-620
+       We implement these because it seems to be standard for Thai.
      * CP874
        We implement this because MSIE4 supports it.
      * MacThai

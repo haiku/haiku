@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1999-2002 Free Software Foundation, Inc.
+ * Copyright (C) 1999-2004 Free Software Foundation, Inc.
  * This file is part of the GNU LIBICONV Library.
  *
  * The GNU LIBICONV Library is free software; you can redistribute it
@@ -14,8 +14,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with the GNU LIBICONV Library; see the file COPYING.LIB.
- * If not, write to the Free Software Foundation, Inc., 59 Temple Place -
- * Suite 330, Boston, MA 02111-1307, USA.
+ * If not, write to the Free Software Foundation, Inc., 51 Franklin Street,
+ * Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 /*
@@ -33,7 +33,7 @@
 #define STATE_JISX0201ROMAN     1  /* Esc ( J */
 #define STATE_JISX0201KATAKANA  2  /* Esc ( I */
 #define STATE_JISX0208          3  /* Esc $ @ or Esc $ B */
-#define STATE_JISX02131         4  /* Esc $ ( O */
+#define STATE_JISX02131         4  /* Esc $ ( O or Esc $ ( Q*/
 #define STATE_JISX02132         5  /* Esc $ ( P */
 
 /*
@@ -95,7 +95,7 @@ iso2022_jp3_mbtowc (conv_t conv, ucs4_t *pwc, const unsigned char *s, int n)
           if (s[2] == '(') {
             if (n < count+4)
               goto none;
-            if (s[3] == 'O') {
+            if (s[3] == 'O' || s[3] == 'Q') {
               state = STATE_JISX02131;
               s += 4; count += 4;
               if (n < count+1)
@@ -306,7 +306,7 @@ iso2022_jp3_wctomb (conv_t conv, unsigned char *r, ucs4_t wc, int n)
         r[0] = ESC;
         r[1] = '$';
         r[2] = '(';
-        r[3] = 'O';
+        r[3] = 'Q';
         r += 4;
         state = STATE_JISX02131;
       }
@@ -439,7 +439,7 @@ iso2022_jp3_wctomb (conv_t conv, unsigned char *r, ucs4_t wc, int n)
         r[0] = ESC;
         r[1] = '$';
         r[2] = '(';
-        r[3] = 'O';
+        r[3] = 'Q';
         r += 4;
         state = STATE_JISX02131;
       }
