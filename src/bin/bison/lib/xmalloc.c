@@ -1,7 +1,7 @@
 /* xmalloc.c -- malloc with out of memory checking
 
-   Copyright (C) 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 2003,
-   1999, 2000, 2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+   1999, 2000, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #if HAVE_CONFIG_H
 # include <config.h>
@@ -26,43 +26,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "gettext.h"
-#define _(msgid) gettext (msgid)
-#define N_(msgid) msgid
-
-#include "error.h"
-#include "exitfail.h"
-
 #ifndef SIZE_MAX
 # define SIZE_MAX ((size_t) -1)
 #endif
 
-#ifndef HAVE_MALLOC
-"you must run the autoconf test for a GNU libc compatible malloc"
+/* 1 if calloc is known to be compatible with GNU calloc.  This
+   matters if we are not also using the calloc module, which defines
+   HAVE_CALLOC and supports the GNU API even on non-GNU platforms.  */
+#if defined HAVE_CALLOC || defined __GLIBC__
+enum { HAVE_GNU_CALLOC = 1 };
+#else
+enum { HAVE_GNU_CALLOC = 0 };
 #endif
-
-#ifndef HAVE_REALLOC
-"you must run the autoconf test for a GNU libc compatible realloc"
-#endif
-
-/* If non NULL, call this function when memory is exhausted. */
-void (*xalloc_fail_func) (void) = 0;
-
-/* If XALLOC_FAIL_FUNC is NULL, or does return, display this message
-   before exiting when memory is exhausted.  Goes through gettext. */
-char const xalloc_msg_memory_exhausted[] = N_("memory exhausted");
-
-void
-xalloc_die (void)
-{
-  if (xalloc_fail_func)
-    (*xalloc_fail_func) ();
-  error (exit_failure, 0, "%s", _(xalloc_msg_memory_exhausted));
-  /* The `noreturn' cannot be given to error, since it may return if
-     its first argument is 0.  To help compilers understand the
-     xalloc_die does terminate, call abort.  */
-  abort ();
-}
 
 /* Allocate an array of N objects, each with S bytes of memory,
    dynamically, with error checking.  S must be nonzero.  */
@@ -71,7 +46,7 @@ static inline void *
 xnmalloc_inline (size_t n, size_t s)
 {
   void *p;
-  if (xalloc_oversized (n, s) || ! (p = malloc (n * s)))
+  if (xalloc_oversized (n, s) || (! (p = malloc (n * s)) && n != 0))
     xalloc_die ();
   return p;
 }
@@ -96,7 +71,7 @@ xmalloc (size_t n)
 static inline void *
 xnrealloc_inline (void *p, size_t n, size_t s)
 {
-  if (xalloc_oversized (n, s) || ! (p = realloc (p, n * s)))
+  if (xalloc_oversized (n, s) || (! (p = realloc (p, n * s)) && n != 0))
     xalloc_die ();
   return p;
 }
@@ -238,18 +213,29 @@ xcalloc (size_t n, size_t s)
 {
   void *p;
   /* Test for overflow, since some calloc implementations don't have
-     proper overflow checks.  */
-  if (xalloc_oversized (n, s) || ! (p = calloc (n, s)))
+     proper overflow checks.  But omit overflow and size-zero tests if
+     HAVE_GNU_CALLOC, since GNU calloc catches overflow and never
+     returns NULL if successful.  */
+  if ((! HAVE_GNU_CALLOC && xalloc_oversized (n, s))
+      || (! (p = calloc (n, s)) && (HAVE_GNU_CALLOC || n != 0)))
     xalloc_die ();
   return p;
 }
 
 /* Clone an object P of size S, with error checking.  There's no need
-   for xnclone (P, N, S), since xclone (P, N * S) works without any
+   for xnmemdup (P, N, S), since xmemdup (P, N * S) works without any
    need for an arithmetic overflow check.  */
 
 void *
-xclone (void const *p, size_t s)
+xmemdup (void const *p, size_t s)
 {
   return memcpy (xmalloc (s), p, s);
+}
+
+/* Clone STRING.  */
+
+char *
+xstrdup (char const *string)
+{
+  return xmemdup (string, strlen (string) + 1);
 }

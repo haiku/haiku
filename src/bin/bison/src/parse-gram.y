@@ -1,6 +1,6 @@
 %{/* Bison Grammar Parser                             -*- C -*-
 
-   Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
 
@@ -16,8 +16,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307  USA
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+   02110-1301  USA
 */
 
 #include "system.h"
@@ -29,11 +29,15 @@
 #include "gram.h"
 #include "muscle_tab.h"
 #include "output.h"
+#include "quotearg.h"
 #include "reader.h"
 #include "symlist.h"
 
 #define YYLLOC_DEFAULT(Current, Rhs, N)  (Current) = lloc_default (Rhs, N)
 static YYLTYPE lloc_default (YYLTYPE const *, int);
+
+#define YY_LOCATION_PRINT(File, Loc) \
+          location_print (File, Loc)
 
 /* Request detailed syntax error messages, and pass them to GRAM_ERROR.
    FIXME: depends on the undocumented availability of YYLLOC.  */
@@ -42,21 +46,18 @@ static YYLTYPE lloc_default (YYLTYPE const *, int);
         gram_error (&yylloc, Msg)
 static void gram_error (location const *, char const *);
 
-#define YYPRINT(File, Type, Value) \
-	print_token_value (File, Type, &Value)
-static void print_token_value (FILE *, int, YYSTYPE const *);
-
 static void add_param (char const *, char *, location);
 
-symbol_class current_class = unknown_sym;
-uniqstr current_type = 0;
+static symbol_class current_class = unknown_sym;
+static uniqstr current_type = 0;
 symbol *current_lhs;
 location current_lhs_location;
 assoc current_assoc;
-int current_prec = 0;
+static int current_prec = 0;
 %}
 
 %debug
+%verbose
 %defines
 %locations
 %pure-parser
@@ -160,9 +161,25 @@ int current_prec = 0;
 	      "%union {...}"
 	      BRACED_CODE action
 	      PROLOGUE EPILOGUE
+%printer { fprintf (stderr, "\"%s\"", $$); }
+              STRING string_content
+%printer { fprintf (stderr, "{\n%s\n}", $$); }
+	      "%destructor {...}"
+	      "%initial-action {...}"
+	      "%lex-param {...}"
+	      "%parse-param {...}"
+	      "%printer {...}"
+	      "%union {...}"
+	      BRACED_CODE action
+	      PROLOGUE EPILOGUE
 %type <uniqstr> TYPE
+%printer { fprintf (stderr, "<%s>", $$); } TYPE
 %type <integer> INT
-%type <symbol> ID ID_COLON symbol string_as_id
+%printer { fprintf (stderr, "%d", $$); } INT
+%type <symbol> ID symbol string_as_id
+%printer { fprintf (stderr, "%s", $$->tag); } ID symbol string_as_id
+%type <symbol> ID_COLON
+%printer { fprintf (stderr, "%s:", $$->tag); } ID_COLON
 %type <assoc> precedence_declarator
 %type <list>  symbols.1
 %%
@@ -189,7 +206,7 @@ declaration:
 | "%defines"                               { defines_flag = true; }
 | "%error-verbose"                         { error_verbose = true; }
 | "%expect" INT                            { expected_sr_conflicts = $2; }
-| "%expect-rr" INT 			   { expected_rr_conflicts = $2; }
+| "%expect-rr" INT			   { expected_rr_conflicts = $2; }
 | "%file-prefix" "=" string_content        { spec_file_prefix = $3; }
 | "%glr-parser"
   {
@@ -204,7 +221,7 @@ declaration:
 | "%locations"                             { locations_flag = true; }
 | "%name-prefix" "=" string_content        { spec_name_prefix = $3; }
 | "%no-lines"                              { no_lines_flag = true; }
-| "%nondeterministic-parser" 		   { nondeterministic_parser = true; }
+| "%nondeterministic-parser"		   { nondeterministic_parser = true; }
 | "%output" "=" string_content             { spec_outfile = $3; }
 | "%parse-param {...}"			   { add_param ("parse_param", $1, @1); }
 | "%pure-parser"                           { pure_parser = true; }
@@ -400,25 +417,23 @@ symbol:
 
 action:
   BRACED_CODE
-   { $$ = $1; }
+    { $$ = $1; }
 ;
 
-/* A string used as an ID: we have to keep the quotes. */
+/* A string used as an ID: quote it.  */
 string_as_id:
   STRING
     {
-      $$ = symbol_get ($1, @1);
+      $$ = symbol_get (quotearg_style (c_quoting_style, $1), @1);
       symbol_class_set ($$, token_sym, @1);
     }
 ;
 
-/* A string used for its contents.  Strip the quotes. */
+/* A string used for its contents.  Don't quote it.  */
 string_content:
   STRING
-    {
-      $$ = $1 + 1;
-      $$[strlen ($$) - 1] = '\0';
-    };
+    { $$ = $1; }
+;
 
 
 epilogue.opt:
@@ -443,7 +458,11 @@ lloc_default (YYLTYPE const *rhs, int n)
 {
   int i;
   YYLTYPE loc;
-  loc.start = loc.end = rhs[n].end;
+
+  /* SGI MIPSpro 7.4.1m miscompiles "loc.start = loc.end = rhs[n].end;".
+     The bug is fixed in 7.4.2m, but play it safe for now.  */
+  loc.start = rhs[n].end;
+  loc.end = rhs[n].end;
 
   /* Ignore empty nonterminals the start of the the right-hand side.
      Do not bother to ignore them at the end of the right-hand side,
@@ -465,22 +484,28 @@ lloc_default (YYLTYPE const *rhs, int n)
 static void
 add_param (char const *type, char *decl, location loc)
 {
-  static char const alphanum[] =
-    "0123456789"
+  static char const alphanum[26 + 26 + 1 + 10] =
     "abcdefghijklmnopqrstuvwxyz"
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    "_";
-  char const *alpha = alphanum + 10;
+    "_"
+    "0123456789";
   char const *name_start = NULL;
   char *p;
 
-  for (p = decl; *p; p++)
-    if ((p == decl || ! strchr (alphanum, p[-1])) && strchr (alpha, p[0]))
+  /* Stop on last actual character.  */
+  for (p = decl; p[1]; p++)
+    if ((p == decl
+	 || ! memchr (alphanum, p[-1], sizeof alphanum))
+	&& memchr (alphanum, p[0], sizeof alphanum - 10))
       name_start = p;
 
-  /* Strip the surrounding '{' and '}'.  */
-  decl++;
-  p[-1] = '\0';
+  /* Strip the surrounding '{' and '}', and any blanks just inside
+     the braces.  */
+  while (*--p == ' ' || *p == '\t')
+    continue;
+  p[1] = '\0';
+  while (*++decl == ' ' || *decl == '\t')
+    continue;
 
   if (! name_start)
     complain_at (loc, _("missing identifier in parameter declaration"));
@@ -490,7 +515,7 @@ add_param (char const *type, char *decl, location loc)
       size_t name_len;
 
       for (name_len = 1;
-	   name_start[name_len] && strchr (alphanum, name_start[name_len]);
+	   memchr (alphanum, name_start[name_len], sizeof alphanum);
 	   name_len++)
 	continue;
 
@@ -504,49 +529,6 @@ add_param (char const *type, char *decl, location loc)
   scanner_last_string_free ();
 }
 
-/*----------------------------------------------------.
-| When debugging the parser, display tokens' values.  |
-`----------------------------------------------------*/
-
-static void
-print_token_value (FILE *file, int type, YYSTYPE const *value)
-{
-  fputc (' ', file);
-  switch (type)
-    {
-    case ID:
-      fprintf (file, " = %s", value->symbol->tag);
-      break;
-
-    case INT:
-      fprintf (file, " = %d", value->integer);
-      break;
-
-    case STRING:
-      fprintf (file, " = \"%s\"", value->chars);
-      break;
-
-    case TYPE:
-      fprintf (file, " = <%s>", value->uniqstr);
-      break;
-
-    case BRACED_CODE:
-    case PERCENT_DESTRUCTOR:
-    case PERCENT_LEX_PARAM:
-    case PERCENT_PARSE_PARAM:
-    case PERCENT_PRINTER:
-    case PERCENT_UNION:
-    case PROLOGUE:
-    case EPILOGUE:
-      fprintf (file, " = {{ %s }}", value->chars);
-      break;
-
-    default:
-      fprintf (file, "unknown token type");
-      break;
-    }
-}
-
 static void
 gram_error (location const *loc, char const *msg)
 {
@@ -556,5 +538,5 @@ gram_error (location const *loc, char const *msg)
 char const *
 token_name (int type)
 {
-  return yytname[type];
+  return yytname[YYTRANSLATE (type)];
 }

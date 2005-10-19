@@ -14,7 +14,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
 #ifdef HAVE_CONFIG_H
@@ -41,7 +41,7 @@
 /* Number of words to use for each element.  The larger the value the
    greater the size of the cache and the shorter the time to find a given bit
    but the more memory wasted for sparse bitsets and the longer the time
-   to search for set bits. 
+   to search for set bits.
 
    The routines that dominate timing profiles are lbitset_elt_find
    and lbitset_elt_link, especially when accessing the bits randomly.  */
@@ -888,18 +888,18 @@ lbitset_unused_clear (bitset dst)
 
   n_bits = BITSET_SIZE_ (dst);
   last_bit = n_bits % LBITSET_ELT_BITS;
-  
+
   if (last_bit)
     {
       lbitset_elt *elt;
       bitset_windex windex;
       bitset_word *srcp;
-      
+
       elt = LBITSET_TAIL (dst);
       srcp = elt->words;
       windex = n_bits / BITSET_WORD_BITS;
-  
-      srcp[windex - elt->index] &= ((bitset_word) 1 << last_bit) - 1;	  
+
+      srcp[windex - elt->index] &= ((bitset_word) 1 << last_bit) - 1;
       windex++;
 
       for (; (windex - elt->index) < LBITSET_ELT_WORDS; windex++)

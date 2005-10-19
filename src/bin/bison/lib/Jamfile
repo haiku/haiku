@@ -14,9 +14,12 @@ StaticLibrary bison :
 	bitsetv-print.c
 	bitsetv.c
 	dirname.c
+	dup-safer.c
 	ebitset.c
 	error.c
 	exitfail.c
+	fd-safer.c
+	fopen-safer.c
 	get-errno.c
 	getopt.c
 	getopt1.c
@@ -37,6 +40,7 @@ StaticLibrary bison :
 	timevar.c
 	vbitset.c
 	xmalloc.c
+	xalloc-die.c
 	xstrdup.c
 	xstrndup.c
 ;

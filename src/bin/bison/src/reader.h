@@ -1,6 +1,6 @@
 /* Input parser for Bison
 
-   Copyright (C) 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 2000, 2001, 2002, 2003, 2005 Free Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
 
@@ -16,8 +16,8 @@
 
    You should have received a copy of the GNU General Public License
    along with Bison; see the file COPYING.  If not, write to
-   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 #ifndef READER_H_
 # define READER_H_
@@ -42,6 +42,11 @@ extern int max_left_semantic_context;
 void scanner_initialize (void);
 void scanner_free (void);
 void scanner_last_string_free (void);
+
+/* These are declared by the scanner, but not used.  We put them here
+   to pacify "make syntax-check".  */
+extern FILE *gram_out;
+extern int gram_lineno;
 
 # define YY_DECL int gram_lex (YYSTYPE *val, location *loc)
 YY_DECL;

@@ -1,4 +1,4 @@
-## Copyright (C) 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+## Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -12,12 +12,10 @@
 
 ## You should have received a copy of the GNU General Public License
 ## along with this program; if not, write to the Free Software
-## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-## 02111-1307  USA
+## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+## 02110-1301  USA
 
-DEFS = @DEFS@ \
-  -DPKGDATADIR=\"$(pkgdatadir)\" \
-  -DLOCALEDIR=\"$(datadir)/locale\"
+DEFS += -DPKGDATADIR=\"$(pkgdatadir)\" -DLOCALEDIR=\"$(datadir)/locale\"
 
 AM_CFLAGS = $(WARNING_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = -I$(top_srcdir)/lib -I../lib
@@ -33,7 +31,7 @@ bin_PROGRAMS = bison
 bin_SCRIPTS = $(YACC_SCRIPT)
 EXTRA_SCRIPTS = yacc
 
-bison_SOURCES = 				  \
+bison_SOURCES =					  \
 	LR0.c LR0.h				  \
 	assoc.c assoc.h				  \
 	closure.c closure.h			  \
@@ -56,7 +54,7 @@ bison_SOURCES = 				  \
 	reduce.c reduce.h			  \
 	relation.c relation.h			  \
 	scan-gram.l				  \
-	scan-skel.l				  \
+	scan-skel.h scan-skel.l			  \
 	state.c state.h				  \
 	symlist.c symlist.h			  \
 	symtab.c symtab.h			  \
@@ -77,3 +75,34 @@ yacc:
 
 echo:
 	echo $(bison_SOURCES) $(noinst_HEADERS)
+
+# The following rule is not designed to be portable,
+# and relies on tools that not everyone has.
+
+# Most functions in src/*.c should have static scope.
+# Any that don't must be marked with `extern', but `main'
+# and `usage' are exceptions.  They're always extern, but
+# don't need to be marked.
+#
+# The second nm|grep checks for file-scope variables with `extern' scope.
+sc_tight_scope: $(all_programs)
+	@t=exceptions-$$$$;						\
+	trap 's=$$?; rm -f $$t; exit $$s' 0 1 2 13 15;			\
+	( printf '^main$$\n^usage$$\n';					\
+	  grep -h -A1 '^extern .*[^;]$$' $(SOURCES)			\
+	    | grep -vE '^(extern |--)' |sed 's/^/^/;s/ .*/$$/' ) > $$t;	\
+	if nm -e *.$(OBJEXT)						\
+	    | sed -n 's/.* T //p'					\
+	    | grep -Ev -f $$t; then					\
+	  echo 'the above functions should have static scope' 1>&2;	\
+	  exit 1;							\
+	fi;								\
+	( printf '^program_name$$\n';					\
+	  sed -n 's/^extern .*[* ]\([a-zA-Z_][a-zA-Z_0-9]*\);$$/^\1$$/p' \
+	    $$(ls $(SOURCES) | grep '\.h$$') /dev/null) > $$t;		\
+	if nm -e *.$(OBJEXT)						\
+	    | sed -n 's/.* [BD] //p'					\
+	    | grep -Ev -f $$t; then					\
+	  echo 'the above variables should have static scope' 1>&2;	\
+	  exit 1;							\
+	fi

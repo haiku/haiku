@@ -1,6 +1,6 @@
 /* VCG description handler for Bison.
 
-   Copyright (C) 2001, 2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
 
@@ -16,8 +16,8 @@
 
    You should have received a copy of the GNU General Public License
    along with Bison; see the file COPYING.  If not, write to
-   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 #include "system.h"
 
@@ -59,7 +59,7 @@ new_graph (graph *g)
   g->y = G_Y;
   g->folding = G_FOLDING;
   g->shrink = G_SHRINK;
-  g->expand = G_EXPAND;
+  g->stretch = G_STRETCH;
 
   g->textmode = G_TEXTMODE;
   g->shape = G_SHAPE;
@@ -85,7 +85,6 @@ new_graph (graph *g)
 
   g->classname = G_CLASSNAME; /* No class name association. */
 
-  g->layoutalgorithm = G_LAYOUTALGORITHM;
   g->layout_downfactor = G_LAYOUT_DOWNFACTOR;
   g->layout_upfactor = G_LAYOUT_UPFACTOR;
   g->layout_nearfactor = G_LAYOUT_NEARFACTOR;
@@ -149,7 +148,7 @@ new_node (node *n)
   n->height = N_HEIGHT; /* Also. */
 
   n->shrink = N_SHRINK;
-  n->expand = N_EXPAND;
+  n->stretch = N_STRETCH;
 
   n->folding = N_FOLDING; /* No explicit default value. */
 
@@ -204,7 +203,7 @@ new_edge (edge *e)
 }
 
 /*----------------------------------------------.
-| Get functions.       	                        |
+| Get functions.	                        |
 | Return string corresponding to an enum value. |
 `----------------------------------------------*/
 
@@ -275,29 +274,6 @@ get_shape_str (enum shape shape)
 }
 
 static const char *
-get_layoutalgorithm_str (enum layoutalgorithm layoutalgorithm)
-{
-  switch (layoutalgorithm)
-    {
-    case normal:       	return "normal";
-    case maxdepth:	return "maxdepth";
-    case mindepth:	return "mindepth";
-    case maxdepthslow:	return "maxdepthslow";
-    case mindepthslow:	return "mindepthslow";
-    case maxdegree:	return "maxdegree";
-    case mindegree:	return "mindegree";
-    case maxindegree:	return "maxindegree";
-    case minindegree:	return "minindegree";
-    case maxoutdegree:	return "maxoutdegree";
-    case minoutdegree:	return "minoutdegree";
-    case minbackward:	return "minbackward";
-    case dfs:		return "dfs";
-    case tree:		return "tree";
-    default:		abort (); return NULL;
-    }
-}
-
-static const char *
 get_decision_str (enum decision decision)
 {
   switch (decision)
@@ -360,9 +336,10 @@ get_crossing_type_str (enum crossing_type crossing_type)
 static const char *
 get_view_str (enum view view)
 {
+  /* There is no way with vcg 1.30 to specify a normal view explicitly,
+     so it is an error here if view == normal_view.  */
   switch (view)
     {
-    case normal_view:	return "normal_view";
     case cfish:		return "cfish";
     case pfish:		return "pfish";
     case fcfish:	return "fcfish";
@@ -397,7 +374,7 @@ get_arrowstyle_str (enum arrowstyle arrowstyle)
 }
 
 /*------------------------------.
-| Add functions.       	        |
+| Add functions.	        |
 | Edge and nodes into a graph.  |
 `------------------------------*/
 
@@ -418,9 +395,7 @@ add_edge (graph *g, edge *e)
 void
 add_classname (graph *g, int val, const char *name)
 {
-  struct classname *classname;
-
-  MALLOC (classname, 1);
+  struct classname *classname = xmalloc (sizeof *classname);
   classname->no = val;
   classname->name = name;
   classname->next = g->classname;
@@ -430,9 +405,7 @@ add_classname (graph *g, int val, const char *name)
 void
 add_infoname (graph *g, int integer, const char *str)
 {
-  struct infoname *infoname;
-
-  MALLOC (infoname, 1);
+  struct infoname *infoname = xmalloc (sizeof *infoname);
   infoname->integer = integer;
   infoname->chars = str;
   infoname->next = g->infoname;
@@ -444,9 +417,7 @@ void
 add_colorentry (graph *g, int color_idx, int red_cp,
 		int green_cp, int blue_cp)
 {
-  struct colorentry *ce;
-
-  MALLOC (ce, 1);
+  struct colorentry *ce = xmalloc (sizeof *ce);
   ce->color_index = color_idx;
   ce->red_cp = red_cp;
   ce->green_cp = green_cp;
@@ -565,8 +536,8 @@ output_node (node *n, FILE *fout)
 
   if (n->shrink != N_SHRINK)
     fprintf (fout, "\t\tshrink:\t%d\n", n->shrink);
-  if (n->expand != N_EXPAND)
-    fprintf (fout, "\t\texpand:\t%d\n", n->expand);
+  if (n->stretch != N_STRETCH)
+    fprintf (fout, "\t\tstretch:\t%d\n", n->stretch);
 
   if (n->folding != N_FOLDING)
     fprintf (fout, "\t\tfolding:\t%d\n", n->folding);
@@ -613,8 +584,7 @@ output_edge (edge *e, FILE *fout)
     fprintf (fout, "\t\tlabel:\t%s\n", quote (e->label));
 
   if (e->linestyle != E_LINESTYLE)
-    fprintf (fout, "\t\tlinestyle:\t%s\n",
-	     quote (get_linestyle_str (e->linestyle)));
+    fprintf (fout, "\t\tlinestyle:\t%s\n", get_linestyle_str (e->linestyle));
 
   if (e->thickness != E_THICKNESS)
     fprintf (fout, "\t\tthickness:\t%d\n", e->thickness);
@@ -693,8 +663,8 @@ output_graph (graph *g, FILE *fout)
 
   if (g->shrink != G_SHRINK)
     fprintf (fout, "\tshrink:\t%d\n", g->shrink);
-  if (g->expand != G_EXPAND)
-    fprintf (fout, "\texpand:\t%d\n", g->expand);
+  if (g->stretch != G_STRETCH)
+    fprintf (fout, "\tstretch:\t%d\n", g->stretch);
 
   if (g->textmode != G_TEXTMODE)
     fprintf (fout, "\ttextmode:\t%s\n",
@@ -767,10 +737,6 @@ output_graph (graph *g, FILE *fout)
 	}
     }
 
-  if (g->layoutalgorithm != G_LAYOUTALGORITHM)
-    fprintf (fout, "\tlayoutalgorithm:\t%s\n",
-	     get_layoutalgorithm_str (g->layoutalgorithm));
-
   if (g->layout_downfactor != G_LAYOUT_DOWNFACTOR)
     fprintf (fout, "\tlayout_downfactor:\t%d\n", g->layout_downfactor);
   if (g->layout_upfactor != G_LAYOUT_UPFACTOR)
@@ -842,7 +808,7 @@ output_graph (graph *g, FILE *fout)
     fprintf (fout, "\tcrossing_optimization:\t%s\n",
 	     get_decision_str (g->crossing_optimization));
 
-  if (g->view != G_VIEW)
+  if (g->view != normal_view)
     fprintf (fout, "\tview:\t%s\n", get_view_str (g->view));
 
   if (g->edges != G_EDGES)

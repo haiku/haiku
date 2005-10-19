@@ -15,8 +15,8 @@
 
    You should have received a copy of the GNU General Public License
    along with Bison; see the file COPYING.  If not, write to
-   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 
 #ifndef RELATION_H_
@@ -25,24 +25,26 @@
 /* Performing operations on graphs coded as list of adjacency.
 
    If GRAPH is a relation, then GRAPH[Node] is a list of adjacent
-   nodes, ended with -1.  */
+   nodes, ended with END_NODE.  */
 
-typedef short int relation_node;
+#define END_NODE ((relation_node) -1)
+
+typedef size_t relation_node;
 typedef relation_node *relation_nodes;
 typedef relation_nodes *relation;
 
 
 /* Report a relation R that has SIZE vertices.  */
-void relation_print (relation r, size_t size, FILE *out);
+void relation_print (relation r, relation_node size, FILE *out);
 
 /* Compute the transitive closure of the FUNCTION on the relation R
    with SIZE vertices.
 
    If R (NODE-1, NODE-2) then on exit FUNCTION[NODE - 1] was extended
    (unioned) with FUNCTION[NODE - 2].  */
-void relation_digraph (relation r, size_t size, bitsetv *function);
+void relation_digraph (relation r, relation_node size, bitsetv *function);
 
 /* Destructively transpose *R_ARG, of size N.  */
-void relation_transpose (relation *R_arg, int n);
+void relation_transpose (relation *R_arg, relation_node n);
 
 #endif /* ! RELATION_H_ */

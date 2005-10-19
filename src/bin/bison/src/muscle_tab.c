@@ -1,6 +1,7 @@
 /* Muscle table manager for Bison.
 
-   Copyright (C) 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software
+   Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
 
@@ -16,8 +17,8 @@
 
    You should have received a copy of the GNU General Public License
    along with Bison; see the file COPYING.  If not, write to
-   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 #include "system.h"
 
@@ -40,7 +41,7 @@ struct obstack muscle_obstack;
 /* Initial capacity of muscles hash table.  */
 #define HT_INITIAL_CAPACITY 257
 
-struct hash_table *muscle_table = NULL;
+static struct hash_table *muscle_table = NULL;
 
 static bool
 hash_compare_muscles (void const *x, void const *y)
@@ -73,7 +74,7 @@ muscle_init (void)
 
   /* Version and input file.  */
   MUSCLE_INSERT_STRING ("version", VERSION);
-  MUSCLE_INSERT_C_STRING ("filename", grammar_file);
+  MUSCLE_INSERT_C_STRING ("file_name", grammar_file);
 }
 
 
@@ -99,7 +100,7 @@ void
 muscle_insert (const char *key, char *value)
 {
   muscle_entry probe;
-  muscle_entry *entry = NULL;
+  muscle_entry *entry;
 
   probe.key = key;
   entry = hash_lookup (muscle_table, &probe);
@@ -107,7 +108,7 @@ muscle_insert (const char *key, char *value)
   if (!entry)
     {
       /* First insertion in the hash. */
-      MALLOC (entry, 1);
+      entry = xmalloc (sizeof *entry);
       entry->key = key;
       hash_insert (muscle_table, entry);
     }
@@ -133,7 +134,7 @@ muscle_grow (const char *key, const char *val, const char *separator)
   if (!entry)
     {
       /* First insertion in the hash. */
-      MALLOC (entry, 1);
+      entry = xmalloc (sizeof *entry);
       entry->key = key;
       hash_insert (muscle_table, entry);
       entry->value = xstrdup (val);
@@ -163,7 +164,7 @@ void
 muscle_code_grow (const char *key, const char *val, location loc)
 {
   char *extension = NULL;
-  obstack_fgrow1 (&muscle_obstack, "]b4_syncline([[%d]], [[", loc.start.line);
+  obstack_fgrow1 (&muscle_obstack, "]b4_syncline(%d, [[", loc.start.line);
   MUSCLE_OBSTACK_SGROW (&muscle_obstack,
 			quotearg_style (c_quoting_style, loc.start.file));
   obstack_sgrow (&muscle_obstack, "]])[\n");

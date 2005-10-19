@@ -15,8 +15,8 @@
 
    You should have received a copy of the GNU General Public License
    along with Bison; see the file COPYING.  If not, write to
-   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 #ifndef MUSCLE_TAB_H_
 # define MUSCLE_TAB_H_
@@ -40,14 +40,14 @@ extern struct obstack muscle_obstack;
 
 #define MUSCLE_INSERT_INT(Key, Value)				\
 {								\
-  obstack_fgrow1 (&muscle_obstack, "%d", Value);	       	\
+  obstack_fgrow1 (&muscle_obstack, "%d", Value);		\
   obstack_1grow (&muscle_obstack, 0);				\
   muscle_insert (Key, obstack_finish (&muscle_obstack));	\
 }
 
 #define MUSCLE_INSERT_LONG_INT(Key, Value)			\
 {								\
-  obstack_fgrow1 (&muscle_obstack, "%ld", Value);	       	\
+  obstack_fgrow1 (&muscle_obstack, "%ld", Value);		\
   obstack_1grow (&muscle_obstack, 0);				\
   muscle_insert (Key, obstack_finish (&muscle_obstack));	\
 }

@@ -1,6 +1,6 @@
 /* Definitions for symtab.c and callers, part of Bison.
 
-   Copyright (C) 1984, 1989, 1992, 2000, 2001, 2002, 2004
+   Copyright (C) 1984, 1989, 1992, 2000, 2001, 2002, 2004, 2005
    Free Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
@@ -17,8 +17,8 @@
 
    You should have received a copy of the GNU General Public License
    along with Bison; see the file COPYING.  If not, write to
-   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 #ifndef SYMTAB_H_
 # define SYMTAB_H_
@@ -41,11 +41,14 @@ typedef enum
 
 
 /* Internal token numbers. */
-typedef short int symbol_number;
-#define SYMBOL_NUMBER_MAXIMUM SHRT_MAX
+typedef int symbol_number;
+#define SYMBOL_NUMBER_MAXIMUM INT_MAX
 
 
 typedef struct symbol symbol;
+
+/* When extending this structure, be sure to complete
+   symbol_check_alias_consistency.  */
 struct symbol
 {
   /* The key, name of the symbol.  */
@@ -55,13 +58,19 @@ struct symbol
 
   /* Its %type and associated printer and destructor.  */
   uniqstr type_name;
-  char *destructor;
+  location type_location;
+
+  /* Does not own the memory. */
+  const char *destructor;
   location destructor_location;
-  char *printer;
+
+  /* Does not own the memory. */
+  const char *printer;
   location printer_location;
 
   symbol_number number;
-  short int prec;
+  location prec_location;
+  int prec;
   assoc assoc;
   int user_token_number;
 
@@ -84,6 +93,8 @@ struct symbol
 /* Undefined internal token number.  */
 #define NUMBER_UNDEFINED (-1)
 
+/* Print a symbol (for debugging). */
+void symbol_print (symbol *s, FILE *f);
 
 /* Fetch (or create) the symbol associated to KEY.  */
 symbol *symbol_get (const char *key, location loc);
@@ -100,10 +111,10 @@ void symbol_make_alias (symbol *sym, symbol *symval, location loc);
 void symbol_type_set (symbol *sym, uniqstr type_name, location loc);
 
 /* Set the DESTRUCTOR associated with SYM.  */
-void symbol_destructor_set (symbol *sym, char *destructor, location loc);
+void symbol_destructor_set (symbol *sym, const char *destructor, location loc);
 
 /* Set the PRINTER associated with SYM.  */
-void symbol_printer_set (symbol *sym, char *printer, location loc);
+void symbol_printer_set (symbol *sym, const char *printer, location loc);
 
 /* Set the PRECEDENCE associated with SYM.  Ensure that SYMBOL is a
    terminal.  Do nothing if invoked with UNDEF_ASSOC as ASSOC.  */

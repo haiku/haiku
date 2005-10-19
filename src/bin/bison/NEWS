@@ -1,47 +1,93 @@
 Bison News
 ----------
 
-Changes in version 1.875d, 2004-05-21:
+Changes in version 2.1, 2005-09-16:
 
-* Unescaped newlines are no longer allowed in character constants or
-  string literals.  They were never portable, and GCC 3.4.0 has
-  dropped support for them.  Better diagnostics are now generated if
-  forget a closing quote.
+* Bison-generated parsers now support the translation of diagnostics like
+  "syntax error" into languages other than English.  The default
+  language is still English.  For details, please see the new
+  Internationalization section of the Bison manual.  Software
+  distributors should also see the new PACKAGING file.  Thanks to
+  Bruno Haible for this new feature.
 
-* NUL bytes are no longer allowed in Bison string literals, unfortunately.
+* Wording in the Bison-generated parsers has been changed slightly to
+  simplify translation.  In particular, the message "memory exhausted"
+  has replaced "parser stack overflow", as the old message was not
+  always accurate for modern Bison-generated parsers.
 
-* %token numbers can now be hexadecimal integers, e.g., `%token FOO 0x12d'.
-  This is a GNU extension.
+* Destructors are now called when the parser aborts, for all symbols left
+  behind on the stack.  Also, the start symbol is now destroyed after a
+  successful parse.  In both cases, the behavior was formerly inconsistent.
 
-* A new directive "%expect-rr N" specifies the expected number of
-  reduce/reduce conflicts in GLR parsers.
+* When generating verbose diagnostics, Bison-generated parsers no longer
+  quote the literal strings associated with tokens.  For example, for
+  a syntax error associated with '%token NUM "number"' they might
+  print 'syntax error, unexpected number' instead of 'syntax error,
+  unexpected "number"'.
 
-* Experimental %destructor support has been added to lalr1.cc.
+Changes in version 2.0, 2004-12-25:
 
-Changes in version 1.875c, 2003-08-25:
+* Possibly-incompatible changes
 
-  (Just bug fixes.)
+  - Bison-generated parsers no longer default to using the alloca function
+    (when available) to extend the parser stack, due to widespread
+    problems in unchecked stack-overflow detection.  You can "#define
+    YYSTACK_USE_ALLOCA 1" to require the use of alloca, but please read
+    the manual to determine safe values for YYMAXDEPTH in that case.
 
-Changes in version 1.875b, 2003-06-17:
+  - Error token location.
+    During error recovery, the location of the syntax error is updated
+    to cover the whole sequence covered by the error token: it includes
+    the shifted symbols thrown away during the first part of the error
+    recovery, and the lookahead rejected during the second part.
 
-* GLR grammars now support locations.
+  - Semicolon changes:
+    . Stray semicolons are no longer allowed at the start of a grammar.
+    . Semicolons are now required after in-grammar declarations.
 
-* Semicolon changes:
+  - Unescaped newlines are no longer allowed in character constants or
+    string literals.  They were never portable, and GCC 3.4.0 has
+    dropped support for them.  Better diagnostics are now generated if
+    forget a closing quote.
+
+  - NUL bytes are no longer allowed in Bison string literals, unfortunately.
+
+* New features
+
+  - GLR grammars now support locations.
+
+  - New directive: %initial-action.
+    This directive allows the user to run arbitrary code (including
+    initializing @$) from yyparse before parsing starts.
+
+  - A new directive "%expect-rr N" specifies the expected number of
+    reduce/reduce conflicts in GLR parsers.
+
+  - %token numbers can now be hexadecimal integers, e.g., `%token FOO 0x12d'.
+    This is a GNU extension.
+
+  - The option `--report=lookahead' was changed to `--report=look-ahead'.
+    The old spelling still works, but is not documented and will be
+    removed.
+
+  - Experimental %destructor support has been added to lalr1.cc.
+
+  - New configure option --disable-yacc, to disable installation of the
+    yacc command and -ly library introduced in 1.875 for POSIX conformance.
+
+* Bug fixes
+
+  - For now, %expect-count violations are now just warnings, not errors.
+    This is for compatibility with Bison 1.75 and earlier (when there are
+    reduce/reduce conflicts) and with Bison 1.30 and earlier (when there
+    are too many or too few shift/reduce conflicts).  However, in future
+    versions of Bison we plan to improve the %expect machinery so that
+    these violations will become errors again.
+
+  - Within Bison itself, numbers (e.g., goto numbers) are no longer
+    arbitrarily limited to 16-bit counts.
+
   - Semicolons are now allowed before "|" in grammar rules, as POSIX requires.
-  - Stray semicolons are no longer allowed at the start of a grammar.
-  - Semicolons are now required after in-grammar declarations.
-
-Changes in version 1.875a, 2003-02-01:
-
-* For now, %expect-count violations are now just warnings, not errors.
-  This is for compatibility with Bison 1.75 and earlier (when there are
-  reduce/reduce conflicts) and with Bison 1.30 and earlier (when there
-  are too many or too few shift/reduce conflicts).  However, in future
-  versions of Bison we plan to improve the %expect machinery so that
-  these violations will become errors again.
-
-* New configure option --disable-yacc, to disable installation of the
-  yacc command and -ly library introduced in 1.875 for POSIX conformance.
 
 Changes in version 1.875, 2003-01-01:
 
@@ -213,7 +259,8 @@ Changes in version 1.50, 2002-10-04:
   allowed some non-error action other than a default reduction on the
   error token.  The new behavior has long been the documented behavior,
   and has long been required by POSIX.  For more details, please see
-  <http://mail.gnu.org/pipermail/bug-bison/2002-May/001452.html>.
+  Paul Eggert, "Reductions during Bison error handling" (2002-05-20)
+  <http://lists.gnu.org/archive/html/bug-bison/2002-05/msg00038.html>.
 
 * Traces
   Popped tokens and nonterminals are now reported.
@@ -288,8 +335,8 @@ Changes in version 1.50, 2002-10-04:
   produces additional information:
   - itemset
     complete the core item sets with their closure
-  - lookahead
-    explicitly associate lookaheads to items
+  - lookahead [changed to `look-ahead' in 1.875e and later]
+    explicitly associate look-ahead tokens to items
   - solved
     describe shift/reduce conflicts solving.
     Bison used to systematically output this information on top of
@@ -375,6 +422,8 @@ Changes in version 1.31, 2002-01-14:
 
   alloca is used only when compiled with GCC, to avoid portability
   problems as on AIX.
+
+* yyparse now returns 2 if memory is exhausted; formerly it dumped core.
 
 * When the generated parser lacks debugging code, YYDEBUG is now 0
   (as POSIX requires) instead of being undefined.
@@ -570,7 +619,7 @@ End:
 
 -----
 
-Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
+Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
 Free Software Foundation, Inc.
 
 This file is part of Bison, the GNU Compiler Compiler.
@@ -587,5 +636,5 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with autoconf; see the file COPYING.  If not, write to
-the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-Boston, MA 02111-1307, USA.
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+Boston, MA 02110-1301, USA.

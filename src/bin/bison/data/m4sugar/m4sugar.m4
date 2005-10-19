@@ -2,7 +2,9 @@ divert(-1)#                                                  -*- Autoconf -*-
 # This file is part of Autoconf.
 # Base M4 layer.
 # Requires GNU M4.
-# Copyright (C) 1999, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+#
+# Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 Free Software
+# Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,8 +18,8 @@ divert(-1)#                                                  -*- Autoconf -*-
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-# 02111-1307, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.
 #
 # As a special exception, the Free Software Foundation gives unlimited
 # permission to copy, distribute and modify the configure scripts that
@@ -58,7 +60,7 @@ changequote([, ])
 # long macros we define.
 ifdef([__gnu__], ,
 [errprint(M4sugar requires GNU M4. Install it before installing M4sugar or
-set the M4 environment variable to its path name.)
+set the M4 environment variable to its absolute file name.)
 m4exit(2)])
 
 
@@ -83,12 +85,12 @@ m4_undefine([undefine])
 # Define DST as the definition of SRC.
 # What's the difference between:
 # 1. m4_copy([from], [to])
-# 2. m4_define([from], [to($@)])
-# Well, obviously 1 is more expansive in space.  Maybe 2 is more expansive
+# 2. m4_define([to], [from($@)])
+# Well, obviously 1 is more expensive in space.  Maybe 2 is more expensive
 # in time, but because of the space cost of 1, it's not that obvious.
 # Nevertheless, one huge difference is the handling of `$0'.  If `from'
 # uses `$0', then with 1, `to''s `$0' is `to', while it is `from' in 2.
-# The user will certainly prefer see `from'.
+# The user will certainly prefer to see `to'.
 m4_define([m4_copy],
 [m4_define([$2], m4_defn([$1]))])
 
@@ -131,7 +133,7 @@ m4_rename_m4([eval])
 m4_rename_m4([format])
 m4_rename_m4([ifdef])
 m4_rename([ifelse], [m4_if])
-m4_rename_m4([include])
+m4_undefine([include])
 m4_rename_m4([incr])
 m4_rename_m4([index])
 m4_rename_m4([indir])
@@ -144,7 +146,7 @@ m4_undefine([popdef])
 m4_rename_m4([pushdef])
 m4_rename([regexp], [m4_bregexp])
 m4_rename_m4([shift])
-m4_rename_m4([sinclude])
+m4_undefine([sinclude])
 m4_rename_m4([substr])
 m4_rename_m4([symbols])
 m4_rename_m4([syscmd])
@@ -199,76 +201,29 @@ m4_define([m4_assert],
        [m4_fatal([assert failed: $1], [$2])])])
 
 
+
 ## ------------- ##
 ## 3. Warnings.  ##
 ## ------------- ##
 
 
-# m4_warning_ifelse(CATEGORY, IF-TRUE, IF-FALSE)
-# ----------------------------------------------
-# If the CATEGORY of warnings is enabled, expand IF_TRUE otherwise
-# IF-FALSE.
-#
-# The variable `m4_warnings' contains a comma separated list of
-# warnings which order is the converse from the one specified by
-# the user, i.e., if she specified `-W error,none,obsolete',
-# `m4_warnings' is `obsolete,none,error'.  We read it from left to
-# right, and:
-# - if none or noCATEGORY is met, run IF-FALSE
-# - if all or CATEGORY is met, run IF-TRUE
-# - if there is nothing left, run IF-FALSE.
-m4_define([m4_warning_ifelse],
-[_m4_warning_ifelse([$1], [$2], [$3], m4_warnings)])
-
-
-# _m4_warning_ifelse(CATEGORY, IF-TRUE, IF-FALSE, WARNING1, ...)
-# --------------------------------------------------------------
-# Implementation of the loop described above.
-m4_define([_m4_warning_ifelse],
-[m4_case([$4],
-         [$1],    [$2],
-         [all],   [$2],
-         [],      [$3],
-         [none],  [$3],
-         [no-$1], [$3],
-         [$0([$1], [$2], [$3], m4_shiftn(4, $@))])])
-
-
-# _m4_warning_error_ifelse(IF-TRUE, IF-FALSE)
-# -------------------------------------------
-# The same as m4_warning_ifelse, but scan for `error' only.
-m4_define([_m4_warning_error_ifelse],
-[__m4_warning_error_ifelse([$1], [$2], m4_warnings)])
-
-
-# __m4_warning_error_ifelse(IF-TRUE, IF-FALSE)
-# --------------------------------------------
-# The same as _m4_warning_ifelse, but scan for `error' only.
-m4_define([__m4_warning_error_ifelse],
-[m4_case([$3],
-         [error],    [$1],
-         [],         [$2],
-         [no-error], [$2],
-         [$0([$1], [$2], m4_shiftn(3, $@))])])
-
-
-
-# _m4_warn(MESSAGE)
-# -----------------
-# Report MESSAGE as a warning, unless the user requested -W error,
-# in which case report a fatal error.
-m4_define([_m4_warn],
-[_m4_warning_error_ifelse([m4_fatal([$1])],
-                          [m4_warning([$1])])])
+# _m4_warn(CATEGORY, MESSAGE, STACK-TRACE)
+# ----------------------------------------
+# Report a MESSAGE to the user if the CATEGORY of warnings is enabled.
+# This is for traces only.
+# The STACK-TRACE is a \n-separated list of "LOCATION: MESSAGE".
+m4_define([_m4_warn], [])
 
 
 # m4_warn(CATEGORY, MESSAGE)
 # --------------------------
-# Report a MESSAGE to the autoconf user if the CATEGORY of warnings
-# is requested (in fact, not disabled).
+# Report a MESSAGE to the user if the CATEGORY of warnings is enabled.
 m4_define([m4_warn],
-[m4_warning_ifelse([$1], [_m4_warn([$2])])])
-
+[_m4_warn([$1], [$2],
+m4_ifdef([m4_expansion_stack],
+         [m4_defn([m4_expansion_stack])
+m4_location[: the top level]]))dnl
+])
 
 
 
@@ -294,7 +249,7 @@ m4_define([m4_warn],
 # been included.
 m4_define([m4_include_unique],
 [m4_ifdef([m4_include($1)],
-          [m4_warn([syntax], [file `$1' included several times])])dnl
+	  [m4_warn([syntax], [file `$1' included several times])])dnl
 m4_define([m4_include($1)])])
 
 
@@ -347,7 +302,7 @@ m4_define([m4_ifval],
 m4_define([m4_n],
 [m4_if([$1],
        [], [],
-           [$1
+	   [$1
 ])])
 
 
@@ -358,7 +313,7 @@ m4_define([m4_n],
 m4_define([m4_ifvaln],
 [m4_if([$1],
        [],   [m4_n([$3])],
-             [m4_n([$2])])])
+	     [m4_n([$2])])])
 
 
 # m4_ifset(MACRO, [IF-TRUE], [IF-FALSE])
@@ -367,8 +322,8 @@ m4_define([m4_ifvaln],
 # expand IF-FALSE, otherwise IF-TRUE.
 m4_define([m4_ifset],
 [m4_ifdef([$1],
-          [m4_if(m4_defn([$1]), [], [$3], [$2])],
-          [$3])])
+	  [m4_ifval(m4_defn([$1]), [$2], [$3])],
+	  [$3])])
 
 
 # m4_ifndef(NAME, [IF-NOT-DEFINED], [IF-DEFINED])
@@ -419,11 +374,22 @@ m4_define([m4_case],
 # All the values are optional, and the macro is robust to active symbols
 # properly quoted.
 m4_define([m4_bmatch],
-[m4_if([$#], 0, [],
-       [$#], 1, [],
+[m4_if([$#], 0, [m4_fatal([$0: too few arguments: $#])],
+       [$#], 1, [m4_fatal([$0: too few arguments: $#: $1])],
        [$#], 2, [$2],
        [m4_if(m4_bregexp([$1], [$2]), -1, [$0([$1], m4_shiftn(3, $@))],
 	      [$3])])])
+
+
+# m4_car(LIST)
+# m4_cdr(LIST)
+# ------------
+# Manipulate m4 lists.
+m4_define([m4_car], [[$1]])
+m4_define([m4_cdr],
+[m4_if([$#], 0, [m4_fatal([$0: cannot be called without arguments])],
+       [$#], 1, [],
+       [m4_dquote(m4_shift($@))])])
 
 
 # m4_map(MACRO, LIST)
@@ -432,10 +398,8 @@ m4_define([m4_bmatch],
 # of LIST (which can be lists themselves, for multiple arguments MACROs).
 m4_define([m4_fst], [$1])
 m4_define([m4_map],
-[m4_if([$2], [], [],
-       [$2], [[]], [],
-       [$1(m4_fst($2))[]dnl
-m4_map([$1], m4_cdr($2))])])
+[m4_ifval([$2],
+	  [$1(m4_fst($2))[]m4_map([$1], m4_cdr($2))])])
 
 
 # m4_map_sep(MACRO, SEPARATOR, LIST)
@@ -444,20 +408,16 @@ m4_map([$1], m4_cdr($2))])])
 # are the elements of LIST (which can be lists themselves, for multiple
 # arguments MACROs).
 m4_define([m4_map_sep],
-[m4_if([$3], [[]], [],
-       [$1(m4_fst($3))[]dnl
-m4_if(m4_cdr($3),
-      [[]], [],
-      [$2])[]dnl
-m4_map_sep([$1], [$2], m4_cdr($3))])])
+[m4_ifval([$3],
+	  [$1(m4_fst($3))[]m4_map([$2[]$1], m4_cdr($3))])])
 
 
 ## ---------------------------------------- ##
 ## 6. Enhanced version of some primitives.  ##
 ## ---------------------------------------- ##
 
-# m4_patsubsts(STRING, RE1, SUBST1, RE2, SUBST2, ...)
-# ---------------------------------------------------
+# m4_bpatsubsts(STRING, RE1, SUBST1, RE2, SUBST2, ...)
+# ----------------------------------------------------
 # m4 equivalent of
 #
 #   $_ = STRING;
@@ -468,7 +428,7 @@ m4_map_sep([$1], [$2], m4_cdr($3))])])
 # All the values are optional, and the macro is robust to active symbols
 # properly quoted.
 #
-# I would have liked to name this macro `m4_patsubst', unfortunately,
+# I would have liked to name this macro `m4_bpatsubst', unfortunately,
 # due to quotation problems, I need to double quote $1 below, therefore
 # the anchors are broken :(  I can't let users be trapped by that.
 m4_define([m4_bpatsubsts],
@@ -476,7 +436,7 @@ m4_define([m4_bpatsubsts],
        [$#], 1, [m4_fatal([$0: too few arguments: $#: $1])],
        [$#], 2, [m4_builtin([patsubst], $@)],
        [$0(m4_builtin([patsubst], [[$1]], [$2], [$3]),
-           m4_shiftn(3, $@))])])
+	   m4_shiftn(3, $@))])])
 
 
 
@@ -511,7 +471,7 @@ m4_define([m4_default],
 # undefined.
 m4_define([m4_defn],
 [m4_ifndef([$1],
-           [m4_fatal([$0: undefined macro: $1])])dnl
+	   [m4_fatal([$0: undefined macro: $1])])dnl
 m4_builtin([defn], $@)])
 
 
@@ -519,7 +479,7 @@ m4_builtin([defn], $@)])
 # ---------------------
 m4_define([_m4_dumpdefs_up],
 [m4_ifdef([$1],
-          [m4_pushdef([_m4_dumpdefs], m4_defn([$1]))dnl
+	  [m4_pushdef([_m4_dumpdefs], m4_defn([$1]))dnl
 m4_dumpdef([$1])dnl
 m4_popdef([$1])dnl
 _m4_dumpdefs_up([$1])])])
@@ -529,7 +489,7 @@ _m4_dumpdefs_up([$1])])])
 # -----------------------
 m4_define([_m4_dumpdefs_down],
 [m4_ifdef([_m4_dumpdefs],
-          [m4_pushdef([$1], m4_defn([_m4_dumpdefs]))dnl
+	  [m4_pushdef([$1], m4_defn([_m4_dumpdefs]))dnl
 m4_popdef([_m4_dumpdefs])dnl
 _m4_dumpdefs_down([$1])])])
 
@@ -549,7 +509,7 @@ _m4_dumpdefs_down([$1])])
 # undefined.
 m4_define([m4_popdef],
 [m4_ifndef([$1],
-           [m4_fatal([$0: undefined macro: $1])])dnl
+	   [m4_fatal([$0: undefined macro: $1])])dnl
 m4_builtin([popdef], $@)])
 
 
@@ -594,7 +554,7 @@ m4_define([_m4_shiftn],
 # undefined.
 m4_define([m4_undefine],
 [m4_ifndef([$1],
-           [m4_fatal([$0: undefined macro: $1])])dnl
+	   [m4_fatal([$0: undefined macro: $1])])dnl
 m4_builtin([undefine], $@)])
 
 
@@ -609,8 +569,8 @@ m4_builtin([undefine], $@)])
 # Both limits are included, and bounds are checked for consistency.
 m4_define([m4_for],
 [m4_case(m4_sign(m4_eval($3 - $2)),
-         1, [m4_assert(m4_sign(m4_default($4, 1)) == 1)],
-        -1, [m4_assert(m4_sign(m4_default($4, -1)) == -1)])dnl
+	 1, [m4_assert(m4_sign(m4_default($4, 1)) == 1)],
+	-1, [m4_assert(m4_sign(m4_default($4, -1)) == -1)])dnl
 m4_pushdef([$1], [$2])dnl
 m4_if(m4_eval([$3 > $2]), 1,
       [_m4_for([$1], [$3], m4_default([$4], 1), [$5])],
@@ -639,8 +599,8 @@ m4_if($1, [$2], [],
 # |        [m4_pushdef([$1])_foreach([$1], [$2], [$3])m4_popdef([$1])])
 # | m4_define([_arg1], [$1])
 # | m4_define([_foreach],
-# | 	      [m4_if([$2], [()], ,
-# | 		     [m4_define([$1], _arg1$2)$3[]_foreach([$1],
+# |	       [m4_if([$2], [()], ,
+# |		     [m4_define([$1], _arg1$2)$3[]_foreach([$1],
 # |                                                        (shift$2),
 # |                                                        [$3])])])
 #
@@ -670,7 +630,7 @@ m4_if($1, [$2], [],
 # | m4_define([_arg1], [[$1]])
 # | m4_define([_foreach],
 # |  [m4_if($2, [()], ,
-# | 	    [m4_define([$1], [_arg1$2])$3[]_foreach([$1],
+# |	     [m4_define([$1], [_arg1$2])$3[]_foreach([$1],
 # |                                                 [(shift$2)],
 # |                                                 [$3])])])
 #
@@ -695,7 +655,7 @@ m4_if($1, [$2], [],
 # | m4_define([_arg1], [$1])
 # | m4_define([_foreach],
 # |  [m4_if($2, [], ,
-# | 	    [m4_define([$1], [_arg1($2)])$3[]_foreach([$1],
+# |	     [m4_define([$1], [_arg1($2)])$3[]_foreach([$1],
 # |                                                   [shift($2)],
 # |                                                   [$3])])])
 #
@@ -726,14 +686,25 @@ m4_if($1, [$2], [],
 m4_define([m4_foreach],
 [m4_pushdef([$1])_m4_foreach($@)m4_popdef([$1])])
 
-# Low level macros used to define m4_foreach.
-m4_define([m4_car], [[$1]])
-m4_define([m4_cdr], [m4_dquote(m4_shift($@))])
 m4_define([_m4_foreach],
-[m4_if([$2], [[]], [],
-       [m4_define([$1], m4_car($2))$3[]_m4_foreach([$1],
-                                                   m4_cdr($2),
-                                                   [$3])])])
+[m4_ifval([$2],
+	  [m4_define([$1], m4_car($2))$3[]dnl
+_m4_foreach([$1], m4_cdr($2), [$3])])])
+
+
+# m4_foreach_w(VARIABLE, LIST, EXPRESSION)
+# ----------------------------------------
+#
+# Like m4_foreach, but the list is whitespace separated.
+#
+# This macro is robust to active symbols:
+#    m4_foreach_w([Var], [ active
+#    b	act\
+#    ive  ], [-Var-])end
+#    => -active--b--active-end
+#
+m4_define([m4_foreach_w],
+[m4_foreach([$1], m4_split(m4_normalize([$2])), [$3])])
 
 
 
@@ -745,23 +716,29 @@ m4_define([_m4_foreach],
 # _m4_divert(DIVERSION-NAME or NUMBER)
 # ------------------------------------
 # If DIVERSION-NAME is the name of a diversion, return its number,
-# otherwise if is a NUMBER return it.
+# otherwise if it is a NUMBER return it.
 m4_define([_m4_divert],
 [m4_ifdef([_m4_divert($1)],
-          [m4_indir([_m4_divert($1)])],
-          [$1])])
+	  [m4_indir([_m4_divert($1)])],
+	  [$1])])
 
 # KILL is only used to suppress output.
 m4_define([_m4_divert(KILL)],           -1)
+
+
+# _m4_divert_n_stack
+# ------------------
+# Print m4_divert_stack with newline prepended, if it's nonempty.
+m4_define([_m4_divert_n_stack],
+[m4_ifdef([m4_divert_stack], [
+m4_defn([m4_divert_stack])])])
 
 
 # m4_divert(DIVERSION-NAME)
 # -------------------------
 # Change the diversion stream to DIVERSION-NAME.
 m4_define([m4_divert],
-[m4_define([m4_divert_stack],
-           m4_location[: $0: $1]m4_ifdef([m4_divert_stack], [
-m4_defn([m4_divert_stack])]))dnl
+[m4_define([m4_divert_stack], m4_location[: $0: $1]_m4_divert_n_stack)dnl
 m4_builtin([divert], _m4_divert([$1]))dnl
 ])
 
@@ -770,11 +747,9 @@ m4_builtin([divert], _m4_divert([$1]))dnl
 # ------------------------------
 # Change the diversion stream to DIVERSION-NAME, while stacking old values.
 m4_define([m4_divert_push],
-[m4_pushdef([m4_divert_stack],
-            m4_location[: $0: $1]m4_ifdef([m4_divert_stack], [
-m4_defn([m4_divert_stack])]))dnl
+[m4_pushdef([m4_divert_stack], m4_location[: $0: $1]_m4_divert_n_stack)dnl
 m4_pushdef([_m4_divert_diversion], [$1])dnl
-m4_builtin([divert], _m4_divert(_m4_divert_diversion))dnl
+m4_builtin([divert], _m4_divert([$1]))dnl
 ])
 
 
@@ -782,18 +757,19 @@ m4_builtin([divert], _m4_divert(_m4_divert_diversion))dnl
 # -------------------------------
 # Change the diversion stream to its previous value, unstacking it.
 # If specified, verify we left DIVERSION-NAME.
+# When we pop the last value from the stack, we divert to -1.
 m4_define([m4_divert_pop],
-[m4_ifval([$1],
-     [m4_if(_m4_divert([$1]), m4_divnum, [],
-            [m4_fatal([$0($1): diversion mismatch: ]
-m4_defn([m4_divert_stack]))])])dnl
-m4_popdef([_m4_divert_diversion])dnl
-dnl m4_ifndef([_m4_divert_diversion],
-dnl           [m4_fatal([too many m4_divert_pop])])dnl
-m4_builtin([divert],
-           m4_ifdef([_m4_divert_diversion],
-                    [_m4_divert(_m4_divert_diversion)], -1))dnl
+[m4_ifndef([_m4_divert_diversion],
+           [m4_fatal([too many m4_divert_pop])])dnl
+m4_if([$1], [], [],
+      [$1], m4_defn([_m4_divert_diversion]), [],
+      [m4_fatal([$0($1): diversion mismatch: ]_m4_divert_n_stack)])dnl
 m4_popdef([m4_divert_stack])dnl
+m4_popdef([_m4_divert_diversion])dnl
+m4_builtin([divert],
+	   m4_ifdef([_m4_divert_diversion],
+		    [_m4_divert(m4_defn([_m4_divert_diversion]))],
+		    -1))dnl
 ])
 
 
@@ -866,18 +842,18 @@ m4_define([m4_undivert],
 # must keep the expansions of the various level of m4_require separated.
 # Right before executing the epilogue of TEST1, we have:
 #
-# 	   GROW - 2: Test...3
-# 	   GROW - 1: Test...2
-# 	   GROW:     Test...1
-# 	   BODY:
+#	   GROW - 2: Test...3
+#	   GROW - 1: Test...2
+#	   GROW:     Test...1
+#	   BODY:
 #
 # Finally the epilogue of TEST1 undiverts GROW - 2, GROW - 1, and
 # GROW into the regular flow, BODY.
 #
-# 	   GROW - 2:
-# 	   GROW - 1:
-# 	   GROW:
-# 	   BODY:        Test...3; Test...2; Test...1
+#	   GROW - 2:
+#	   GROW - 1:
+#	   GROW:
+#	   BODY:        Test...3; Test...2; Test...1
 #
 # (The semicolons are here for clarification, but of course are not
 # emitted.)  This is what Autoconf 2.0 (I think) to 2.13 (I'm sure)
@@ -901,27 +877,27 @@ m4_define([m4_undivert],
 #
 # The dependencies between the macros are:
 #
-# 		 3 --- 2b
-# 		/        \              is m4_require'd by
-# 	       /          \       left -------------------- right
-# 	    2a ------------ 1
+#		 3 --- 2b
+#		/        \              is m4_require'd by
+#	       /          \       left -------------------- right
+#	    2a ------------ 1
 #
 # If you strictly apply the rules given in the previous section you get:
 #
-# 	   GROW - 2: TEST3
-# 	   GROW - 1: TEST2a; TEST2b
-# 	   GROW:     TEST1
-# 	   BODY:
+#	   GROW - 2: TEST3
+#	   GROW - 1: TEST2a; TEST2b
+#	   GROW:     TEST1
+#	   BODY:
 #
 # (TEST2a, although required by TEST3 is not expanded in GROW - 3
 # because is has already been expanded before in GROW - 1, so it has
 # been AC_PROVIDE'd, so it is not expanded again) so when you undivert
 # the stack of diversions, you get:
 #
-# 	   GROW - 2:
-# 	   GROW - 1:
-# 	   GROW:
-# 	   BODY:        TEST3; TEST2a; TEST2b; TEST1
+#	   GROW - 2:
+#	   GROW - 1:
+#	   GROW:
+#	   BODY:        TEST3; TEST2a; TEST2b; TEST1
 #
 # i.e., TEST2a is expanded after TEST3 although the latter required the
 # former.
@@ -939,48 +915,48 @@ m4_define([m4_undivert],
 # In the example above, when TEST2a is expanded, but it's epilogue is
 # not run yet, you have:
 #
-# 	   GROW - 2:
-# 	   GROW - 1: TEST2a
-# 	   GROW:     Elaboration of TEST1
-# 	   BODY:
+#	   GROW - 2:
+#	   GROW - 1: TEST2a
+#	   GROW:     Elaboration of TEST1
+#	   BODY:
 #
 # The epilogue of TEST2a emits it immediately:
 #
-# 	   GROW - 2:
-# 	   GROW - 1:
-# 	   GROW:     Elaboration of TEST1
-# 	   BODY:     TEST2a
+#	   GROW - 2:
+#	   GROW - 1:
+#	   GROW:     Elaboration of TEST1
+#	   BODY:     TEST2a
 #
 # TEST2b then requires TEST3, so right before the epilogue of TEST3, you
 # have:
 #
-# 	   GROW - 2: TEST3
-# 	   GROW - 1: Elaboration of TEST2b
-# 	   GROW:     Elaboration of TEST1
-# 	   BODY:      TEST2a
+#	   GROW - 2: TEST3
+#	   GROW - 1: Elaboration of TEST2b
+#	   GROW:     Elaboration of TEST1
+#	   BODY:      TEST2a
 #
 # The epilogue of TEST3 emits it:
 #
-# 	   GROW - 2:
-# 	   GROW - 1: Elaboration of TEST2b
-# 	   GROW:     Elaboration of TEST1
-# 	   BODY:     TEST2a; TEST3
+#	   GROW - 2:
+#	   GROW - 1: Elaboration of TEST2b
+#	   GROW:     Elaboration of TEST1
+#	   BODY:     TEST2a; TEST3
 #
 # TEST2b is now completely expanded, and emitted:
 #
-# 	   GROW - 2:
-# 	   GROW - 1:
-# 	   GROW:     Elaboration of TEST1
-# 	   BODY:     TEST2a; TEST3; TEST2b
+#	   GROW - 2:
+#	   GROW - 1:
+#	   GROW:     Elaboration of TEST1
+#	   BODY:     TEST2a; TEST3; TEST2b
 #
 # and finally, TEST1 is finished and emitted:
 #
-# 	   GROW - 2:
-# 	   GROW - 1:
-# 	   GROW:
-# 	   BODY:     TEST2a; TEST3; TEST2b: TEST1
+#	   GROW - 2:
+#	   GROW - 1:
+#	   GROW:
+#	   BODY:     TEST2a; TEST3; TEST2b: TEST1
 #
-# The idea, is simple, but the implementation is a bit evolved.  If you
+# The idea is simple, but the implementation is a bit evolved.  If you
 # are like me, you will want to see the actual functioning of this
 # implementation to be convinced.  The next section gives the full
 # details.
@@ -991,18 +967,18 @@ m4_define([m4_undivert],
 #
 # We consider the macros above, and this configure.ac:
 #
-# 	    AC_INIT
-# 	    TEST1
+#	    AC_INIT
+#	    TEST1
 #
 # You should keep the definitions of _m4_defun_pro, _m4_defun_epi, and
 # m4_require at hand to follow the steps.
 #
-# This implements tries not to assume that of the current diversion is
+# This implements tries not to assume that the current diversion is
 # BODY, so as soon as a macro (m4_defun'd) is expanded, we first
 # record the current diversion under the name _m4_divert_dump (denoted
 # DUMP below for short).  This introduces an important difference with
 # the previous versions of Autoconf: you cannot use m4_require if you
-# were not inside an m4_defun'd macro, and especially, you cannot
+# are not inside an m4_defun'd macro, and especially, you cannot
 # m4_require directly from the top level.
 #
 # We have not tried to simulate the old behavior (better yet, we
@@ -1017,104 +993,64 @@ m4_define([m4_undivert],
 #   diversion stack:     BODY |-
 #
 # * TEST1 is expanded
-# The prologue of TEST1 sets AC_DIVERSION_DUMP, which is the diversion
+# The prologue of TEST1 sets _m4_divert_dump, which is the diversion
 # where the current elaboration will be dumped, to the current
 # diversion.  It also m4_divert_push to GROW, where the full
 # expansion of TEST1 and its dependencies will be elaborated.
-#   DUMP:       BODY
-#   BODY:       empty
-#   diversions: GROW, BODY |-
-#
-# * TEST1 requires TEST2a: prologue
-# m4_require m4_divert_pushes another temporary diversion GROW - 1 (in
-# fact, the diversion whose number is one less than the current
-# diversion), and expands TEST2a in there.
-#   DUMP:       BODY
-#   BODY:       empty
-#   diversions: GROW-1, GROW, BODY |-
-#
-# * TEST2a is expanded.
-# Its prologue pushes the current diversion again.
-#   DUMP:       BODY
-#   BODY:       empty
-#   diversions: GROW - 1, GROW - 1, GROW, BODY |-
-# It is expanded in GROW - 1, and GROW - 1 is popped by the epilogue
-# of TEST2a.
 #   DUMP:        BODY
-#   BODY:        nothing
+#   BODY:        empty
+#   diversions:  GROW, BODY |-
+#
+# * TEST1 requires TEST2a
+# _m4_require_call m4_divert_pushes another temporary diversion,
+# GROW - 1, and expands TEST2a in there.
+#   DUMP:        BODY
+#   BODY:        empty
 #   GROW - 1:    TEST2a
 #   diversions:  GROW - 1, GROW, BODY |-
+# Than the content of the temporary diversion is moved to DUMP and the
+# temporary diversion is popped.
+#   DUMP:        BODY
+#   BODY:        TEST2a
+#   diversions:  GROW, BODY |-
 #
-# * TEST1 requires TEST2a: epilogue
-# The content of the current diversion is appended to DUMP (and removed
-# from the current diversion).  A diversion is popped.
-#   DUMP:       BODY
-#   BODY:       TEST2a
-#   diversions: GROW, BODY |-
+# * TEST1 requires TEST2b
+# Again, _m4_require_call pushes GROW - 1 and heads to expand TEST2b.
+#   DUMP:        BODY
+#   BODY:        TEST2a
+#   diversions:  GROW - 1, GROW, BODY |-
 #
-# * TEST1 requires TEST2b: prologue
-# m4_require pushes GROW - 1 and expands TEST2b.
-#   DUMP:       BODY
-#   BODY:       TEST2a
-#   diversions: GROW - 1, GROW, BODY |-
+# * TEST2b requires TEST3
+# _m4_require_call pushes GROW - 2 and expands TEST3 here.
+# (TEST3 requires TEST2a, but TEST2a has already been m4_provide'd, so
+# nothing happens.)
+#   DUMP:        BODY
+#   BODY:        TEST2a
+#   GROW - 2:    TEST3
+#   diversions:  GROW - 2, GROW - 1, GROW, BODY |-
+# Than the diversion is appended to DUMP, and popped.
+#   DUMP:        BODY
+#   BODY:        TEST2a; TEST3
+#   diversions:  GROW - 1, GROW, BODY |-
 #
-# * TEST2b is expanded.
-# Its prologue pushes the current diversion again.
-#   DUMP:       BODY
-#   BODY:       TEST2a
-#   diversions: GROW - 1, GROW - 1, GROW, BODY |-
-# The body is expanded here.
-#
-# * TEST2b requires TEST3: prologue
-# m4_require pushes GROW - 2 and expands TEST3.
-#   DUMP:       BODY
-#   BODY:       TEST2a
-#   diversions: GROW - 2, GROW - 1, GROW - 1, GROW, BODY |-
-#
-# * TEST3 is expanded.
-# Its prologue pushes the current diversion again.
-#   DUMP:       BODY
-#   BODY:       TEST2a
-#   diversions: GROW-2, GROW-2, GROW-1, GROW-1, GROW, BODY |-
-# TEST3 requires TEST2a, but TEST2a has already been AC_PROVIDE'd, so
-# nothing happens.  It's body is expanded here, and its epilogue pops a
-# diversion.
-#   DUMP:       BODY
-#   BODY:       TEST2a
-#   GROW - 2:   TEST3
-#   diversions: GROW - 2, GROW - 1, GROW - 1, GROW, BODY |-
-#
-# * TEST2b requires TEST3: epilogue
-# The current diversion is appended to DUMP, and a diversion is popped.
-#   DUMP:       BODY
-#   BODY:       TEST2a; TEST3
-#   diversions: GROW - 1, GROW - 1, GROW, BODY |-
-# The content of TEST2b is expanded here.
-#   DUMP:       BODY
-#   BODY:       TEST2a; TEST3
-#   GROW - 1:   TEST2b,
-#   diversions: GROW - 1, GROW - 1, GROW, BODY |-
-# The epilogue of TEST2b pops a diversion.
-#   DUMP:       BODY
-#   BODY:       TEST2a; TEST3
-#   GROW - 1:   TEST2b,
-#   diversions: GROW - 1, GROW, BODY |-
-#
-# * TEST1 requires TEST2b: epilogue
-# The current diversion is appended to DUMP, and a diversion is popped.
-#   DUMP:       BODY
-#   BODY:       TEST2a; TEST3; TEST2b
-#   diversions: GROW, BODY |-
+# * TEST1 requires TEST2b (contd.)
+# The content of TEST2b is expanded...
+#   DUMP:        BODY
+#   BODY:        TEST2a; TEST3
+#   GROW - 1:    TEST2b,
+#   diversions:  GROW - 1, GROW, BODY |-
+# ... and moved to DUMP.
+#   DUMP:        BODY
+#   BODY:        TEST2a; TEST3; TEST2b
+#   diversions:  GROW, BODY |-
 #
 # * TEST1 is expanded: epilogue
-# TEST1's own content is in GROW, and it's epilogue pops a diversion.
-#   DUMP:       BODY
-#   BODY:       TEST2a; TEST3; TEST2b
-#   GROW:       TEST1
-#   diversions: BODY |-
-# Here, the epilogue of TEST1 notices the elaboration is done because
-# DUMP and the current diversion are the same, it then undiverts
-# GROW by hand, and undefines DUMP.
+# TEST1's own content is in GROW...
+#   DUMP:        BODY
+#   BODY:        TEST2a; TEST3; TEST2b
+#   GROW:        TEST1
+#   diversions:  BODY |-
+# ... and it's epilogue moves it to DUMP and then undefines DUMP.
 #   DUMP:       undefined
 #   BODY:       TEST2a; TEST3; TEST2b; TEST1
 #   diversions: BODY |-
@@ -1136,37 +1072,21 @@ m4_define([m4_undivert],
 # we prepend its name in m4_expansion_stack, and when we exit the
 # macro, we remove it (thanks to pushdef/popdef).
 #
-# In addition, we want to use the expansion stack to detect circular
-# m4_require dependencies.  This means we need to browse the stack to
-# check whether a macro being expanded is m4_require'd.  For ease of
-# implementation, and certainly for the benefit of performances, we
-# don't browse the m4_expansion_stack, rather each time we expand a
-# macro FOO we define _m4_expanding(FOO).  Then m4_require(BAR) simply
-# needs to check whether _m4_expanding(BAR) is defined to diagnose a
-# circular dependency.
-#
-# To improve the diagnostic, in addition to keeping track of the stack
-# of macro calls, m4_expansion_stack also records the m4_require
-# stack.  Note that therefore an m4_defun'd macro being required will
-# appear twice in the stack: the first time because it is required,
-# the second because it is expanded.  We can avoid this, but it has
-# two small drawbacks: (i) the implementation is slightly more
-# complex, and (ii) it hides the difference between define'd macros
-# (which don't appear in m4_expansion_stack) and m4_defun'd macros
-# (which do).  The more debugging information, the better.
+# In addition, we want to detect circular m4_require dependencies.
+# Each time we expand a macro FOO we define _m4_expanding(FOO); and
+# m4_require(BAR) simply checks whether _m4_expanding(BAR) is defined.
 
 
 # m4_expansion_stack_push(TEXT)
 # -----------------------------
 m4_define([m4_expansion_stack_push],
 [m4_pushdef([m4_expansion_stack],
-            [$1]m4_ifdef([m4_expansion_stack], [
+	    [$1]m4_ifdef([m4_expansion_stack], [
 m4_defn([m4_expansion_stack])]))])
 
 
 # m4_expansion_stack_pop
 # ----------------------
-# Dump the expansion stack.
 m4_define([m4_expansion_stack_pop],
 [m4_popdef([m4_expansion_stack])])
 
@@ -1176,7 +1096,7 @@ m4_define([m4_expansion_stack_pop],
 # Dump the expansion stack.
 m4_define([m4_expansion_stack_dump],
 [m4_ifdef([m4_expansion_stack],
-          [m4_errprintn(m4_defn([m4_expansion_stack]))])dnl
+	  [m4_errprintn(m4_defn([m4_expansion_stack]))])dnl
 m4_errprintn(m4_location[: the top level])])
 
 
@@ -1203,27 +1123,31 @@ m4_define([_m4_divert(GROW)],       10000)
 # -------------------------
 # The prologue for Autoconf macros.
 m4_define([_m4_defun_pro],
-[m4_expansion_stack_push(m4_defn([m4_location($1)])[: $1 is expanded from...])dnl
+[m4_ifndef([m4_expansion_stack], [_m4_defun_pro_outer[]])dnl
+m4_expansion_stack_push(m4_defn([m4_location($1)])[: $1 is expanded from...])dnl
 m4_pushdef([_m4_expanding($1)])dnl
-m4_ifdef([_m4_divert_dump],
-         [m4_divert_push(m4_defn([_m4_divert_diversion]))],
-         [m4_copy([_m4_divert_diversion], [_m4_divert_dump])dnl
-m4_divert_push([GROW])])dnl
 ])
 
+m4_define([_m4_defun_pro_outer],
+[m4_copy([_m4_divert_diversion], [_m4_divert_dump])dnl
+m4_divert_push([GROW])dnl
+])
 
 # _m4_defun_epi(MACRO-NAME)
 # -------------------------
 # The Epilogue for Autoconf macros.  MACRO-NAME only helps tracing
 # the PRO/EPI pairs.
 m4_define([_m4_defun_epi],
-[m4_divert_pop()dnl
-m4_if(_m4_divert_dump, _m4_divert_diversion,
-      [m4_undivert([GROW])dnl
-m4_undefine([_m4_divert_dump])])dnl
+[m4_popdef([_m4_expanding($1)])dnl
 m4_expansion_stack_pop()dnl
-m4_popdef([_m4_expanding($1)])dnl
+m4_ifndef([m4_expansion_stack], [_m4_defun_epi_outer[]])dnl
 m4_provide([$1])dnl
+])
+
+m4_define([_m4_defun_epi_outer],
+[m4_undefine([_m4_divert_dump])dnl
+m4_divert_pop([GROW])dnl
+m4_undivert([GROW])dnl
 ])
 
 
@@ -1240,7 +1164,7 @@ m4_provide([$1])dnl
 m4_define([m4_defun],
 [m4_define([m4_location($1)], m4_location)dnl
 m4_define([$1],
-          [_m4_defun_pro([$1])$2[]_m4_defun_epi([$1])])])
+	  [_m4_defun_pro([$1])$2[]_m4_defun_epi([$1])])])
 
 
 # m4_defun_once(NAME, EXPANSION)
@@ -1250,9 +1174,9 @@ m4_define([$1],
 m4_define([m4_defun_once],
 [m4_define([m4_location($1)], m4_location)dnl
 m4_define([$1],
-          [m4_provide_if([$1],
-                         [m4_warn([syntax], [$1 invoked multiple times])],
-                         [_m4_defun_pro([$1])$2[]_m4_defun_epi([$1])])])])
+	  [m4_provide_if([$1],
+			 [m4_warn([syntax], [$1 invoked multiple times])],
+			 [_m4_defun_pro([$1])$2[]_m4_defun_epi([$1])])])])
 
 
 # m4_pattern_forbid(ERE, [WHY])
@@ -1278,7 +1202,7 @@ m4_define([m4_pattern_allow], [])
 # ---------------------------------------------
 m4_define([m4_before],
 [m4_provide_if([$2],
-               [m4_warn([syntax], [$2 was called before $1])])])
+	       [m4_warn([syntax], [$2 was called before $1])])])
 
 
 # m4_require(NAME-TO-CHECK, [BODY-TO-EXPAND = NAME-TO-CHECK])
@@ -1314,24 +1238,38 @@ m4_define([m4_before],
 #   `extension' prevents `AC_LANG_COMPILER' from having actual arguments that
 #   it passes to `AC_LANG_COMPILER(C)'.
 m4_define([m4_require],
-[m4_expansion_stack_push(m4_location[: $1 is required by...])dnl
-m4_ifdef([_m4_expanding($1)],
-         [m4_fatal([$0: circular dependency of $1])])dnl
+[m4_ifdef([_m4_expanding($1)],
+	 [m4_fatal([$0: circular dependency of $1])])dnl
 m4_ifndef([_m4_divert_dump],
-          [m4_fatal([$0: cannot be used outside of an m4_defun'd macro])])dnl
+	  [m4_fatal([$0($1): cannot be used outside of an m4_defun'd macro])])dnl
 m4_provide_if([$1],
-              [],
-              [m4_divert_push(m4_eval(m4_divnum - 1))dnl
-m4_default([$2], [$1])
-m4_divert(m4_defn([_m4_divert_dump]))dnl
-m4_undivert(m4_defn([_m4_divert_diversion]))dnl
-m4_divert_pop(m4_defn([_m4_divert_dump]))])dnl
-m4_provide_if([$1],
-              [],
-              [m4_warn([syntax],
-                       [$1 is m4_require'd but is not m4_defun'd])])dnl
-m4_expansion_stack_pop()dnl
+	      [],
+	      [_m4_require_call([$1], [$2])])dnl
 ])
+
+
+# _m4_require_call(BODY-TO-EXPAND)
+# --------------------------------
+# If m4_require decides to expand the body, it calls this macro.
+m4_define([_m4_require_call],
+[m4_define([_m4_divert_grow], m4_decr(_m4_divert_grow))dnl
+m4_divert_push(_m4_divert_grow)dnl
+m4_default([$2], [$1])
+m4_provide_if([$1],
+	      [],
+	      [m4_warn([syntax],
+		       [$1 is m4_require'd but not m4_defun'd])])dnl
+m4_divert(m4_defn([_m4_divert_dump]))dnl
+m4_undivert(_m4_divert_grow)dnl
+m4_divert_pop(_m4_divert_grow)dnl
+m4_define([_m4_divert_grow], m4_incr(_m4_divert_grow))dnl
+])
+
+
+# _m4_divert_grow
+# ---------------
+# The counter for _m4_require_call.
+m4_define([_m4_divert_grow], _m4_divert([GROW]))
 
 
 # m4_expand_once(TEXT, [WITNESS = TEXT])
@@ -1340,8 +1278,8 @@ m4_expansion_stack_pop()dnl
 # as a memory that TEXT has already been expanded.
 m4_define([m4_expand_once],
 [m4_provide_if(m4_ifval([$2], [[$2]], [[$1]]),
-               [],
-               [m4_provide(m4_ifval([$2], [[$2]], [[$1]]))[]$1])])
+	       [],
+	       [m4_provide(m4_ifval([$2], [[$2]], [[$1]]))[]$1])])
 
 
 # m4_provide(MACRO-NAME)
@@ -1358,7 +1296,7 @@ m4_define([m4_provide],
 # information is coded.
 m4_define([m4_provide_if],
 [m4_ifdef([m4_provide($1)],
-          [$2], [$3])])
+	  [$2], [$3])])
 
 
 ## -------------------- ##
@@ -1397,17 +1335,18 @@ m4_defn([m4_cr_digits])dnl
 
 # m4_re_escape(STRING)
 # --------------------
-# Escape BRE active characters in STRING.
+# Escape RE active characters in STRING.
 m4_define([m4_re_escape],
 [m4_bpatsubst([$1],
-              [[][+*.]], [\\\&])])
+	      [[][*+.?\^$]], [\\\&])])
 
 
 # m4_re_string
 # ------------
 # Regexp for `[a-zA-Z_0-9]*'
+# m4_dquote provides literal [] for the character class.
 m4_define([m4_re_string],
-m4_defn([m4_cr_symbols2])dnl
+m4_dquote(m4_defn([m4_cr_symbols2]))dnl
 [*]dnl
 )
 
@@ -1416,7 +1355,7 @@ m4_defn([m4_cr_symbols2])dnl
 # ----------
 # Regexp for `[a-zA-Z_][a-zA-Z_0-9]*'
 m4_define([m4_re_word],
-m4_defn([m4_cr_symbols1])dnl
+m4_dquote(m4_defn([m4_cr_symbols1]))dnl
 m4_defn([m4_re_string])dnl
 )
 
@@ -1440,11 +1379,11 @@ m4_define([m4_toupper],
 #
 # REGEXP specifies where to split.  Default is [\t ]+.
 #
-# Pay attention to the m4_changequotes.  Inner m4_changequotes exist for
-# obvious reasons (we want to insert square brackets).  Outer
-# m4_changequotes are needed because otherwise the m4 parser, when it
-# sees the closing bracket we add to the result, believes it is the
-# end of the body of the macro we define.
+# If STRING is empty, the result is an empty list.
+#
+# Pay attention to the m4_changequotes.  When m4 reads the definition of
+# m4_split, it still has quotes set to [ and ].  Luckily, these are matched
+# in the macro body, so the definition is stored correctly.
 #
 # Also, notice that $1 is quoted twice, since we want the result to
 # be quoted.  Then you should understand that the argument of
@@ -1455,16 +1394,17 @@ m4_define([m4_toupper],
 #   m4_split([active active ])end
 #   => [active], [active], []end
 
-m4_changequote(<<, >>)
-m4_define(<<m4_split>>,
-<<m4_changequote(``, '')dnl
+m4_define([m4_split],
+[m4_ifval([$1], [_m4_split($@)])])
+
+m4_define([_m4_split],
+[m4_changequote(``, '')dnl
 [dnl Can't use m4_default here instead of m4_if, because m4_default uses
 dnl [ and ] as quotes.
 m4_bpatsubst(````$1'''',
-	     m4_if(``$2'',, ``[ 	]+'', ``$2''),
+	     m4_if(``$2'',, ``[	 ]+'', ``$2''),
 	     ``], ['')]dnl
-m4_changequote([, ])>>)
-m4_changequote([, ])
+m4_changequote([, ])])
 
 
 
@@ -1491,13 +1431,10 @@ m4_define([m4_flatten],
 #
 # This macro is robust to active symbols.
 #    m4_define(active, ACTIVE)
-#    m4_strip([  active  		active ])end
+#    m4_strip([  active <tab> <tab>active ])end
 #    => active activeend
 #
-# This macro is fun!  Because we want to preserve active symbols, STRING
-# must be quoted for each evaluation, which explains there are 4 levels
-# of brackets around $1 (don't forget that the result must be quoted
-# too, hence one more quoting than applications).
+# Because we want to preserve active symbols, STRING must be double-quoted.
 #
 # Then notice the 2 last patterns: they are in charge of removing the
 # leading/trailing spaces.  Why not just `[^ ]'?  Because they are
@@ -1506,9 +1443,9 @@ m4_define([m4_flatten],
 # character, since there are two leading `['; equally for the last pattern.
 m4_define([m4_strip],
 [m4_bpatsubsts([[$1]],
-               [[ 	]+], [ ],
-               [^\(..\) ],    [\1],
-               [ \(..\)$],    [\1])])
+	       [[	 ]+], [ ],
+	       [^\(..\) ],    [\1],
+	       [ \(..\)$],    [\1])])
 
 
 # m4_normalize(STRING)
@@ -1533,9 +1470,9 @@ m4_define([m4_normalize],
 # Produce ARG1SEPARG2...SEPARGn.
 m4_defun([m4_join],
 [m4_case([$#],
-         [1], [],
-         [2], [[$2]],
-         [[$2][$1]$0([$1], m4_shiftn(2, $@))])])
+	 [1], [],
+	 [2], [[$2]],
+	 [[$2][$1]$0([$1], m4_shiftn(2, $@))])])
 
 
 
@@ -1573,7 +1510,7 @@ m4_defun([m4_join],
 #    => active
 m4_define([m4_append],
 [m4_define([$1],
-           m4_ifdef([$1], [m4_defn([$1])$3])[$2])])
+	   m4_ifdef([$1], [m4_defn([$1])$3])[$2])])
 
 
 # m4_append_uniq(MACRO-NAME, STRING, [SEPARATOR])
@@ -1581,18 +1518,18 @@ m4_define([m4_append],
 # As `m4_append', but append only if not yet present.
 m4_define([m4_append_uniq],
 [m4_ifdef([$1],
-          [m4_bmatch([$3]m4_defn([$1])[$3], m4_re_escape([$3$2$3]), [],
-                     [m4_append($@)])],
-          [m4_append($@)])])
+	  [m4_bmatch([$3]m4_defn([$1])[$3], m4_re_escape([$3$2$3]), [],
+		     [m4_append($@)])],
+	  [m4_append($@)])])
 
 
 # m4_text_wrap(STRING, [PREFIX], [FIRST-PREFIX], [WIDTH])
 # -------------------------------------------------------
 # Expands into STRING wrapped to hold in WIDTH columns (default = 79).
-# If prefix is set, each line is prefixed with it.  If FIRST-PREFIX is
-# specified, then the first line is prefixed with it.  As a special
-# case, if the length of the first prefix is greater than that of
-# PREFIX, then FIRST-PREFIX will be left alone on the first line.
+# If PREFIX is given, each line is prefixed with it.  If FIRST-PREFIX is
+# specified, then the first line is prefixed with it.  As a special case,
+# if the length of FIRST-PREFIX is greater than that of PREFIX, then
+# FIRST-PREFIX will be left alone on the first line.
 #
 # Typical outputs are:
 #
@@ -1612,19 +1549,22 @@ m4_define([m4_append_uniq],
 #
 # m4_text_wrap([Super long documentation.], [          ], [  --too-wide ], 30)
 #  =>   --too-wide
-#  => 	  Super long
-#  => 	  documentation.
+#  =>      Super long
+#  =>      documentation.
 #
 # FIXME: there is no checking of a longer PREFIX than WIDTH, but do
 # we really want to bother with people trying each single corner
 # of a software?
+#
+# more important:
+# FIXME: handle quadrigraphs correctly, both in TEXT and in FIRST_PREFIX.
 #
 # This macro does not leave a trailing space behind the last word,
 # what complicates it a bit.  The algorithm is stupid simple: all the
 # words are preceded by m4_Separator which is defined to empty for the
 # first word, and then ` ' (single space) for all the others.
 m4_define([m4_text_wrap],
-[m4_pushdef([m4_Prefix], m4_default([$2], []))dnl
+[m4_pushdef([m4_Prefix], [$2])dnl
 m4_pushdef([m4_Prefix1], m4_default([$3], [m4_Prefix]))dnl
 m4_pushdef([m4_Width], m4_default([$4], 79))dnl
 m4_pushdef([m4_Cursor], m4_len(m4_Prefix1))dnl
@@ -1633,13 +1573,13 @@ m4_Prefix1[]dnl
 m4_if(m4_eval(m4_Cursor > m4_len(m4_Prefix)),
       1, [m4_define([m4_Cursor], m4_len(m4_Prefix))
 m4_Prefix])[]dnl
-m4_foreach([m4_Word], m4_quote(m4_split(m4_normalize([$1]))),
+m4_foreach_w([m4_Word], [$1],
 [m4_define([m4_Cursor], m4_eval(m4_Cursor + m4_len(m4_defn([m4_Word])) + 1))dnl
 dnl New line if too long, else insert a space unless it is the first
 dnl of the words.
 m4_if(m4_eval(m4_Cursor > m4_Width),
       1, [m4_define([m4_Cursor],
-                    m4_eval(m4_len(m4_Prefix) + m4_len(m4_defn([m4_Word])) + 1))]
+		    m4_eval(m4_len(m4_Prefix) + m4_len(m4_defn([m4_Word])) + 1))]
 m4_Prefix,
        [m4_Separator])[]dnl
 m4_defn([m4_Word])[]dnl
@@ -1661,6 +1601,21 @@ m4_define([m4_text_box],
 ])
 
 
+# m4_qlen(STRING)
+# ---------------
+# Expands to the length of STRING after autom4te converts all quadrigraphs.
+m4_define([m4_qlen],
+[m4_len(m4_bpatsubsts([[$1]], [@\(<:\|:>\|S|\|%:\)@], [P], [@&t@]))])
+
+
+# m4_qdelta(STRING)
+# -----------------
+# Expands to the net change in the length of STRING from autom4te converting the
+# quadrigraphs in STRING.  This number is always negative or zero.
+m4_define([m4_qdelta],
+[m4_eval(m4_qlen([$1]) - m4_len([$1]))])
+
+
 
 ## ----------------------- ##
 ## 10. Number processing.  ##
@@ -1672,9 +1627,9 @@ m4_define([m4_text_box],
 # The sign of the integer A.
 m4_define([m4_sign],
 [m4_bmatch([$1],
-           [^-], -1,
-           [^0+], 0,
-                  1)])
+	   [^-], -1,
+	   [^0+], 0,
+		  1)])
 
 # m4_cmp(A, B)
 # ------------
@@ -1703,9 +1658,9 @@ m4_define([m4_list_cmp],
        [$1], [()], [$0((0), [$2])],
        [$2], [()], [$0([$1], (0))],
        [m4_case(m4_cmp(m4_car$1, m4_car$2),
-                -1, -1,
-                 1, 1,
-                 0, [$0((m4_shift$1), (m4_shift$2))])])])
+		-1, -1,
+		 1, 1,
+		 0, [$0((m4_shift$1), (m4_shift$2))])])])
 
 
 
@@ -1725,14 +1680,14 @@ m4_define([m4_list_cmp],
 # reasonable version numbers and is valid up to `z', no double letters.
 m4_define([m4_version_unletter],
 [m4_translit(m4_bpatsubsts([$1],
-                           [\([0-9]+\)\([abcdefghi]\)],
-                             [m4_eval(\1 + 1).-1.\2],
-                           [\([0-9]+\)\([jklmnopqrs]\)],
-                             [m4_eval(\1 + 1).-1.1\2],
-                           [\([0-9]+\)\([tuvwxyz]\)],
-                             [m4_eval(\1 + 1).-1.2\2]),
-             [abcdefghijklmnopqrstuvwxyz],
-             [12345678901234567890123456])])
+			   [\([0-9]+\)\([abcdefghi]\)],
+			     [m4_eval(\1 + 1).-1.\2],
+			   [\([0-9]+\)\([jklmnopqrs]\)],
+			     [m4_eval(\1 + 1).-1.1\2],
+			   [\([0-9]+\)\([tuvwxyz]\)],
+			     [m4_eval(\1 + 1).-1.2\2]),
+	     [abcdefghijklmnopqrstuvwxyz],
+	     [12345678901234567890123456])])
 
 
 # m4_version_compare(VERSION-1, VERSION-2)
@@ -1743,7 +1698,16 @@ m4_define([m4_version_unletter],
 #   1 if           >
 m4_define([m4_version_compare],
 [m4_list_cmp((m4_split(m4_version_unletter([$1]), [\.])),
-             (m4_split(m4_version_unletter([$2]), [\.])))])
+	     (m4_split(m4_version_unletter([$2]), [\.])))])
+
+
+# m4_PACKAGE_NAME
+# m4_PACKAGE_TARNAME
+# m4_PACKAGE_VERSION
+# m4_PACKAGE_STRING
+# m4_PACKAGE_BUGREPORT
+# --------------------
+#m4_include([m4sugar/version.m4]) # This is needed for Autoconf, but not Bison.
 
 
 # m4_version_prereq(VERSION, [IF-OK], [IF-NOT = FAIL])
@@ -1752,7 +1716,8 @@ m4_define([m4_version_compare],
 m4_define([m4_version_prereq],
 [m4_if(m4_version_compare(m4_defn([m4_PACKAGE_VERSION]), [$1]), -1,
        [m4_default([$3],
-                   [m4_fatal([Autoconf version $1 or higher is required])])],
+		   [m4_fatal([Autoconf version $1 or higher is required],
+			     63)])],
        [$2])[]dnl
 ])
 
@@ -1795,8 +1760,7 @@ m4_pattern_forbid([^dnl$])
 
 # Check the divert push/pop perfect balance.
 m4_wrap([m4_ifdef([_m4_divert_diversion],
-                  [m4_fatal([$0: unbalanced m4_divert_push:]
-m4_defn([m4_divert_stack]))])[]])
+	   [m4_fatal([$0: unbalanced m4_divert_push:]_m4_divert_n_stack)])[]])
 
 m4_divert_push([KILL])
 m4_wrap([m4_divert_pop([KILL])[]])

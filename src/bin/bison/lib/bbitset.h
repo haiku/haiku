@@ -14,7 +14,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #ifndef _BBITSET_H
 #define _BBITSET_H
@@ -34,7 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    BITSET_TABLE:  Expandable table of pointers to arrays of bits
 		  (variable size, less storage for large sparse sets).
                   Faster than BITSET_LIST for random access.
-   BITSET_VARRAY: Variable array of bits (variable size, fast for 
+   BITSET_VARRAY: Variable array of bits (variable size, fast for
                   dense bitsets).
    BITSET_STATS:  Wrapper bitset for internal use only.  Used for gathering
                   statistics and/or better run-time checking.

@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #include <stddef.h>
 
@@ -27,6 +27,11 @@
      <wchar.h>.  */
 #if HAVE_DECL_MBSWIDTH_IN_WCHAR_H
 # include <wchar.h>
+#endif
+
+
+#ifdef	__cplusplus
+extern "C" {
 #endif
 
 
@@ -49,3 +54,8 @@ extern int mbswidth (const char *string, int flags);
 /* Returns the number of screen columns needed for the NBYTES bytes
    starting at BUF.  */
 extern int mbsnwidth (const char *buf, size_t nbytes, int flags);
+
+
+#ifdef	__cplusplus
+}
+#endif

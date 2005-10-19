@@ -1,6 +1,6 @@
 # Configure template for GNU Bison.                   -*-Autoconf-*-
 #
-# Copyright (C) 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+# Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,17 +14,21 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-# 02111-1307  USA
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301  USA
 
-# We need a recent Autoconf to run a recent Autotest.
-AC_PREREQ(2.57)
+# This file uses AC_CONFIG_MACRO_DIR, so we need Autoconf 2.58 or better.
+# But Autoconf 2.58 has a bug in the way that it generates tests: it
+# puts the wrong absolute path names in the tests.  So we need at
+# least Autoconf 2.59.
+AC_PREREQ(2.59)
 
-AC_INIT([GNU Bison], [1.875d], [bug-bison@gnu.org])
-AC_CONFIG_AUX_DIR([config])
+AC_INIT([GNU Bison], [2.1], [bug-bison@gnu.org])
+AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 
-AM_INIT_AUTOMAKE([1.7 check-news readme-alpha dist-bzip2])
+# We don't have a file m4/Makefile.am, so we need Automake 1.8 or later.
+AM_INIT_AUTOMAKE([1.8 check-news readme-alpha dist-bzip2])
 AC_CONFIG_HEADERS([config.h:config.hin])
 
 gl_USE_SYSTEM_EXTENSIONS
@@ -103,7 +107,15 @@ BISON_PREREQ_TIMEVAR
 
 # gnulib and gettext.
 GNULIB_AUTOCONF_SNIPPET
-AM_GNU_GETTEXT_VERSION([0.14.1])
+# We use po/Makevars, so we need at least gettext 0.12.
+AM_GNU_GETTEXT_VERSION([0.12])
+BISON_I18N
+
+# Internationalized parsers.
+AC_CONFIG_FILES([runtime-po/Makefile.in])
+# Autoconf macros for packages using internationalized parsers.
+aclocaldir='${datadir}/aclocal'
+AC_SUBST([aclocaldir])
 
 # Initialize the test suite.
 AC_CONFIG_TESTDIR(tests)
@@ -111,15 +123,20 @@ AC_CONFIG_FILES([tests/Makefile tests/atlocal])
 AC_CONFIG_FILES([tests/bison], [chmod +x tests/bison])
 AC_CHECK_PROGS([VALGRIND], [valgrind])
 AC_PROG_CXX
+BISON_TEST_FOR_WORKING_CXX_COMPILER
 AM_MISSING_PROG([AUTOM4TE], [autom4te])
 # Needed by tests/atlocal.in.
 AC_SUBST([GCC])
-O0CFLAGS=`echo $CFLAGS | sed 's/-O[0-9] *//'`
+O0CFLAGS=`echo $CFLAGS | sed 's/-O[[0-9]] *//'`
 AC_SUBST([O0CFLAGS])
+O0CXXFLAGS=`echo $CXXFLAGS | sed 's/-O[[0-9]] *//'`
+AC_SUBST([O0CXXFLAGS])
 
 AC_CONFIG_FILES([Makefile
                  config/Makefile
                  po/Makefile.in
                  data/Makefile
+		 examples/Makefile
+		    examples/calc++/Makefile
                  lib/Makefile src/Makefile doc/Makefile])
 AC_OUTPUT

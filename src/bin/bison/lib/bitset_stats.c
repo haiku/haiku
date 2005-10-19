@@ -1,5 +1,5 @@
 /* Bitset statistics.
-   Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
    Contributed by Michael Hayes (m.hayes@elec.canterbury.ac.nz).
 
    This program is free software; you can redistribute it and/or modify
@@ -14,7 +14,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
 /* This file is a wrapper bitset implementation for the other bitset
@@ -50,29 +50,29 @@
 
 
 /* Accessor macros.  */
-#define BITSET_STATS_ALLOCS_INC(TYPE)	 		\
+#define BITSET_STATS_ALLOCS_INC(TYPE)			\
     bitset_stats_info->types[(TYPE)].allocs++
-#define BITSET_STATS_FREES_INC(BSET) 			\
+#define BITSET_STATS_FREES_INC(BSET)			\
     bitset_stats_info->types[BITSET_TYPE_ (BSET)].frees++
-#define BITSET_STATS_SETS_INC(BSET) 			\
+#define BITSET_STATS_SETS_INC(BSET)			\
     bitset_stats_info->types[BITSET_TYPE_ (BSET)].sets++
-#define BITSET_STATS_CACHE_SETS_INC(BSET) 		\
+#define BITSET_STATS_CACHE_SETS_INC(BSET)		\
     bitset_stats_info->types[BITSET_TYPE_ (BSET)].cache_sets++
-#define BITSET_STATS_RESETS_INC(BSET) 			\
+#define BITSET_STATS_RESETS_INC(BSET)			\
     bitset_stats_info->types[BITSET_TYPE_ (BSET)].resets++
-#define BITSET_STATS_CACHE_RESETS_INC(BSET) 		\
+#define BITSET_STATS_CACHE_RESETS_INC(BSET)		\
     bitset_stats_info->types[BITSET_TYPE_ (BSET)].cache_resets++
-#define BITSET_STATS_TESTS_INC(BSET) 			\
+#define BITSET_STATS_TESTS_INC(BSET)			\
     bitset_stats_info->types[BITSET_TYPE_ (BSET)].tests++
-#define BITSET_STATS_CACHE_TESTS_INC(BSET) 		\
+#define BITSET_STATS_CACHE_TESTS_INC(BSET)		\
     bitset_stats_info->types[BITSET_TYPE_ (BSET)].cache_tests++
-#define BITSET_STATS_LISTS_INC(BSET) 			\
+#define BITSET_STATS_LISTS_INC(BSET)			\
     bitset_stats_info->types[BITSET_TYPE_ (BSET)].lists++
-#define BITSET_STATS_LIST_COUNTS_INC(BSET, I) 		\
+#define BITSET_STATS_LIST_COUNTS_INC(BSET, I)		\
     bitset_stats_info->types[BITSET_TYPE_ (BSET)].list_counts[(I)]++
-#define BITSET_STATS_LIST_SIZES_INC(BSET, I) 		\
+#define BITSET_STATS_LIST_SIZES_INC(BSET, I)		\
     bitset_stats_info->types[BITSET_TYPE_ (BSET)].list_sizes[(I)]++
-#define BITSET_STATS_LIST_DENSITY_INC(BSET, I) 		\
+#define BITSET_STATS_LIST_DENSITY_INC(BSET, I)		\
     bitset_stats_info->types[BITSET_TYPE_ (BSET)].list_density[(I)]++
 
 
@@ -241,17 +241,17 @@ bitset_stats_disable (void)
 
 /* Read bitset statistics file.  */
 void
-bitset_stats_read (const char *filename)
+bitset_stats_read (const char *file_name)
 {
   FILE *file;
 
   if (!bitset_stats_info)
     return;
 
-  if (!filename)
-    filename = BITSET_STATS_FILE;
+  if (!file_name)
+    file_name = BITSET_STATS_FILE;
 
-  file = fopen (filename, "r");
+  file = fopen (file_name, "r");
   if (file)
     {
       if (fread (&bitset_stats_info_data, sizeof (bitset_stats_info_data),
@@ -271,17 +271,17 @@ bitset_stats_read (const char *filename)
 
 /* Write bitset statistics file.  */
 void
-bitset_stats_write (const char *filename)
+bitset_stats_write (const char *file_name)
 {
   FILE *file;
 
   if (!bitset_stats_info)
     return;
 
-  if (!filename)
-    filename = BITSET_STATS_FILE;
+  if (!file_name)
+    file_name = BITSET_STATS_FILE;
 
-  file = fopen (filename, "w");
+  file = fopen (file_name, "w");
   if (file)
     {
       if (fwrite (&bitset_stats_info_data, sizeof (bitset_stats_info_data),
@@ -698,25 +698,25 @@ bitset_stats_init (bitset bset, bitset_bindex n_bits, enum bitset_type type)
     {
     case BITSET_ARRAY:
       bytes = abitset_bytes (n_bits);
-      sbset = (bitset) xcalloc (1, bytes);
+      sbset = xcalloc (1, bytes);
       abitset_init (sbset, n_bits);
       break;
 
     case BITSET_LIST:
       bytes = lbitset_bytes (n_bits);
-      sbset = (bitset) xcalloc (1, bytes);
+      sbset = xcalloc (1, bytes);
       lbitset_init (sbset, n_bits);
       break;
 
     case BITSET_TABLE:
       bytes = ebitset_bytes (n_bits);
-      sbset = (bitset) xcalloc (1, bytes);
+      sbset = xcalloc (1, bytes);
       ebitset_init (sbset, n_bits);
       break;
 
     case BITSET_VARRAY:
       bytes = vbitset_bytes (n_bits);
-      sbset = (bitset) xcalloc (1, bytes);
+      sbset = xcalloc (1, bytes);
       vbitset_init (sbset, n_bits);
       break;
 

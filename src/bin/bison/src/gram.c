@@ -17,8 +17,8 @@
 
    You should have received a copy of the GNU General Public License
    along with Bison; see the file COPYING.  If not, write to
-   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 
 #include "system.h"
@@ -269,7 +269,7 @@ grammar_dump (FILE *out, const char *title)
 	rule *rule_i = &rules[i];
 	item_number *rp = NULL;
 	unsigned int rhs_itemno = rule_i->rhs - ritem;
-  	unsigned int rhs_count = 0;
+	unsigned int rhs_count = 0;
 	/* Find the last RHS index in ritems. */
 	for (rp = rule_i->rhs; *rp >= 0; ++rp)
 	  ++rhs_count;
@@ -326,9 +326,9 @@ grammar_rules_never_reduced_report (const char *message)
 void
 grammar_free (void)
 {
-  XFREE (ritem);
+  free (ritem);
   free (rules);
-  XFREE (token_translations);
+  free (token_translations);
   /* Free the symbol table data structure.  */
   symbols_free ();
   free_merger_functions ();

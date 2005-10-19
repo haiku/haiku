@@ -1,5 +1,5 @@
 /* Binary relations.
-   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005 Free Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
 
@@ -15,8 +15,8 @@
 
    You should have received a copy of the GNU General Public License
    along with Bison; see the file COPYING.  If not, write to
-   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 #include "system.h"
 
@@ -26,17 +26,17 @@
 #include "relation.h"
 
 void
-relation_print (relation r, size_t size, FILE *out)
+relation_print (relation r, relation_node size, FILE *out)
 {
-  unsigned int i;
-  unsigned int j;
+  relation_node i;
+  relation_node j;
 
   for (i = 0; i < size; ++i)
     {
-      fprintf (out, "%3d: ", i);
+      fprintf (out, "%3lu: ", (unsigned long int) i);
       if (r[i])
-	for (j = 0; r[i][j] != -1; ++j)
-	  fprintf (out, "%3d ", r[i][j]);
+	for (j = 0; r[i][j] != END_NODE; ++j)
+	  fprintf (out, "%3lu ", (unsigned long int) r[i][j]);
       fputc ('\n', out);
     }
   fputc ('\n', out);
@@ -53,21 +53,21 @@ relation_print (relation r, size_t size, FILE *out)
 static relation R;
 static relation_nodes INDEX;
 static relation_nodes VERTICES;
-static int top;
-static int infinity;
+static relation_node top;
+static relation_node infinity;
 static bitsetv F;
 
 static void
-traverse (int i)
+traverse (relation_node i)
 {
-  int j;
-  int height;
+  relation_node j;
+  relation_node height;
 
   VERTICES[++top] = i;
   INDEX[i] = height = top;
 
   if (R[i])
-    for (j = 0; R[i][j] >= 0; ++j)
+    for (j = 0; R[i][j] != END_NODE; ++j)
       {
 	if (INDEX[R[i][j]] == 0)
 	  traverse (R[i][j]);
@@ -93,27 +93,24 @@ traverse (int i)
 
 
 void
-relation_digraph (relation r, size_t size, bitsetv *function)
+relation_digraph (relation r, relation_node size, bitsetv *function)
 {
-  unsigned int i;
+  relation_node i;
 
   infinity = size + 2;
-  CALLOC (INDEX, size + 1);
-  CALLOC (VERTICES, size + 1);
+  INDEX = xcalloc (size + 1, sizeof *INDEX);
+  VERTICES = xnmalloc (size + 1, sizeof *VERTICES);
   top = 0;
 
   R = r;
   F = *function;
 
   for (i = 0; i < size; i++)
-    INDEX[i] = 0;
-
-  for (i = 0; i < size; i++)
     if (INDEX[i] == 0 && R[i])
       traverse (i);
 
-  XFREE (INDEX);
-  XFREE (VERTICES);
+  free (INDEX);
+  free (VERTICES);
 
   *function = F;
 }
@@ -124,54 +121,56 @@ relation_digraph (relation r, size_t size, bitsetv *function)
 `-------------------------------------------*/
 
 void
-relation_transpose (relation *R_arg, int n)
+relation_transpose (relation *R_arg, relation_node n)
 {
+  relation r = *R_arg;
   /* The result. */
-  relation new_R = CALLOC (new_R, n);
+  relation new_R = xnmalloc (n, sizeof *new_R);
   /* END_R[I] -- next entry of NEW_R[I]. */
-  relation end_R = CALLOC (end_R, n);
+  relation end_R = xnmalloc (n, sizeof *end_R);
   /* NEDGES[I] -- total size of NEW_R[I]. */
-  int *nedges = CALLOC (nedges, n);
-  int i, j;
+  size_t *nedges = xcalloc (n, sizeof *nedges);
+  relation_node i;
+  relation_node j;
 
   if (trace_flag & trace_sets)
     {
       fputs ("relation_transpose: input\n", stderr);
-      relation_print (*R_arg, n, stderr);
+      relation_print (r, n, stderr);
     }
 
   /* Count. */
   for (i = 0; i < n; i++)
-    if ((*R_arg)[i])
-      for (j = 0; (*R_arg)[i][j] >= 0; ++j)
-	++nedges[(*R_arg)[i][j]];
+    if (r[i])
+      for (j = 0; r[i][j] != END_NODE; ++j)
+	++nedges[r[i][j]];
 
   /* Allocate. */
   for (i = 0; i < n; i++)
-    if (nedges[i] > 0)
-      {
-	relation_node *sp = CALLOC (sp, nedges[i] + 1);
-	sp[nedges[i]] = -1;
-	new_R[i] = sp;
-	end_R[i] = sp;
-      }
+    {
+      relation_node *sp = NULL;
+      if (nedges[i] > 0)
+	{
+	  sp = xnmalloc (nedges[i] + 1, sizeof *sp);
+	  sp[nedges[i]] = END_NODE;
+	}
+      new_R[i] = sp;
+      end_R[i] = sp;
+    }
 
   /* Store. */
   for (i = 0; i < n; i++)
-    if ((*R_arg)[i])
-      for (j = 0; (*R_arg)[i][j] >= 0; ++j)
-	{
-	  *end_R[(*R_arg)[i][j]] = i;
-	  ++end_R[(*R_arg)[i][j]];
-	}
+    if (r[i])
+      for (j = 0; r[i][j] != END_NODE; ++j)
+	*end_R[r[i][j]]++ = i;
 
   free (nedges);
   free (end_R);
 
   /* Free the input: it is replaced with the result. */
   for (i = 0; i < n; i++)
-    XFREE ((*R_arg)[i]);
-  free (*R_arg);
+    free (r[i]);
+  free (r);
 
   if (trace_flag & trace_sets)
     {

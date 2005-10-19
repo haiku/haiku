@@ -15,15 +15,15 @@
 
    You should have received a copy of the GNU General Public License along
    with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #ifndef _GETOPT_INT_H
 #define _GETOPT_INT_H	1
 
-extern int _getopt_internal (int ___argc, char *const *___argv,
+extern int _getopt_internal (int ___argc, char **___argv,
 			     const char *__shortopts,
 		             const struct option *__longopts, int *__longind,
-			     int __long_only);
+			     int __long_only, int __posixly_correct);
 
 
 /* Reentrant versions which can handle parsing multiple argument
@@ -64,7 +64,7 @@ struct _getopt_data
      This is what Unix does.
      This mode of operation is selected by either setting the environment
      variable POSIXLY_CORRECT, or using `+' as the first character
-     of the list of option characters.
+     of the list of option characters, or by calling getopt.
 
      PERMUTE is the default.  We permute the contents of ARGV as we
      scan, so that eventually all the non-options are at the end.
@@ -87,7 +87,8 @@ struct _getopt_data
       REQUIRE_ORDER, PERMUTE, RETURN_IN_ORDER
     } __ordering;
 
-  /* If the POSIXLY_CORRECT environment variable is set.  */
+  /* If the POSIXLY_CORRECT environment variable is set
+     or getopt was called.  */
   int __posixly_correct;
 
 
@@ -110,17 +111,18 @@ struct _getopt_data
    default values and to clear the initialization flag.  */
 #define _GETOPT_DATA_INITIALIZER	{ 1, 1 }
 
-extern int _getopt_internal_r (int ___argc, char *const *___argv,
+extern int _getopt_internal_r (int ___argc, char **___argv,
 			       const char *__shortopts,
 			       const struct option *__longopts, int *__longind,
-			       int __long_only, struct _getopt_data *__data);
+			       int __long_only, int __posixly_correct,
+			       struct _getopt_data *__data);
 
-extern int _getopt_long_r (int ___argc, char *const *___argv,
+extern int _getopt_long_r (int ___argc, char **___argv,
 			   const char *__shortopts,
 			   const struct option *__longopts, int *__longind,
 			   struct _getopt_data *__data);
 
-extern int _getopt_long_only_r (int ___argc, char *const *___argv,
+extern int _getopt_long_only_r (int ___argc, char **___argv,
 				const char *__shortopts,
 				const struct option *__longopts,
 				int *__longind,

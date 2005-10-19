@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by David MacKenzie <djm@ai.mit.edu>
    Modified by Akim Demaille <demaille@inf.enst.fr> */
@@ -49,8 +49,8 @@
    false ambiguities (i.e., different matches of ARG but corresponding
    to the same values in VALLIST).  */
 
-int argmatch (char const *arg, char const *const *arglist,
-	      char const *vallist, size_t valsize);
+ptrdiff_t argmatch (char const *arg, char const *const *arglist,
+		    char const *vallist, size_t valsize);
 
 # define ARGMATCH(Arg, Arglist, Vallist) \
   argmatch (Arg, Arglist, (char const *) (Vallist), sizeof *(Vallist))
@@ -63,7 +63,8 @@ extern argmatch_exit_fn argmatch_die;
 
 /* Report on stderr why argmatch failed.  Report correct values. */
 
-void argmatch_invalid (char const *context, char const *value, int problem);
+void argmatch_invalid (char const *context, char const *value,
+		       ptrdiff_t problem);
 
 /* Left for compatibility with the old name invalid_arg */
 
@@ -85,10 +86,10 @@ void argmatch_valid (char const *const *arglist,
 /* Same as argmatch, but upon failure, reports a explanation on the
    failure, and exits using the function EXIT_FN. */
 
-int __xargmatch_internal (char const *context,
-			  char const *arg, char const *const *arglist,
-			  char const *vallist, size_t valsize,
-			  argmatch_exit_fn exit_fn);
+ptrdiff_t __xargmatch_internal (char const *context,
+				char const *arg, char const *const *arglist,
+				char const *vallist, size_t valsize,
+				argmatch_exit_fn exit_fn);
 
 /* Programmer friendly interface to __xargmatch_internal. */
 

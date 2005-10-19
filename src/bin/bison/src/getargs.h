@@ -1,5 +1,5 @@
 /* Parse command line arguments for bison.
-   Copyright (C) 1984, 1986, 1989, 1992, 2000, 2001, 2002, 2003
+   Copyright (C) 1984, 1986, 1989, 1992, 2000, 2001, 2002, 2003, 2004, 2005
    Free Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
@@ -16,15 +16,19 @@
 
    You should have received a copy of the GNU General Public License
    along with Bison; see the file COPYING.  If not, write to the Free
-   Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-   02111-1307, USA.  */
+   Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+   02110-1301, USA.  */
 
 #ifndef GETARGS_H_
 # define GETARGS_H_
 
 /* flags set by % directives */
-extern const char *skeleton;		/* for -S */
-extern const char *include;		/* for -I */
+
+/* for -S */
+extern char const *skeleton;
+
+/* for -I */
+extern char const *include;
 
 extern bool debug_flag;			/* for -t */
 extern bool defines_flag;		/* for -d */
@@ -76,7 +80,7 @@ enum report
     report_none             = 0,
     report_states           = 1 << 0,
     report_itemsets         = 1 << 1,
-    report_lookaheads       = 1 << 2,
+    report_look_ahead_tokens= 1 << 2,
     report_solved_conflicts = 1 << 3,
     report_all              = ~0
   };

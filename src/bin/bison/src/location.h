@@ -1,5 +1,5 @@
 /* Locations for Bison
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
 
@@ -15,17 +15,19 @@
 
    You should have received a copy of the GNU General Public License
    along with Bison; see the file COPYING.  If not, write to
-   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 #ifndef LOCATION_H_
 # define LOCATION_H_
+
+# include "uniqstr.h"
 
 /* A boundary between two characters.  */
 typedef struct
 {
   /* The name of the file that contains the boundary.  */
-  char const *file;
+  uniqstr file;
 
   /* The (origin-1) line that contains the boundary.  */
   int line;
@@ -42,7 +44,7 @@ equal_boundaries (boundary a, boundary b)
 {
   return (a.column == b.column
 	  && a.line == b.line
-	  && a.file == b.file);
+	  && UNIQSTR_EQ (a.file, b.file));
 }
 
 /* A location, that is, a region of source code.  */

@@ -1,7 +1,7 @@
-/* basename.c -- return the last element in a path
+/* basename.c -- return the last element in a file name
 
-   Copyright (C) 1990, 1998, 1999, 2000, 2001, 2003 Free Software
-   Foundation, Inc.
+   Copyright (C) 1990, 1998, 1999, 2000, 2001, 2003, 2004, 2005 Free
+   Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #if HAVE_CONFIG_H
 # include <config.h>
@@ -35,7 +35,7 @@
 char *
 base_name (char const *name)
 {
-  char const *base = name + FILESYSTEM_PREFIX_LEN (name);
+  char const *base = name + FILE_SYSTEM_PREFIX_LEN (name);
   char const *p;
 
   for (p = base; *p; p++)

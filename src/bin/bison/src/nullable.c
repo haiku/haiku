@@ -17,8 +17,8 @@
 
    You should have received a copy of the GNU General Public License
    along with Bison; see the file COPYING.  If not, write to
-   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 
 /* Set up NULLABLE, a vector saying which nonterminals can expand into
@@ -61,16 +61,16 @@ nullable_compute (void)
   symbol_number *s2;
   rule_list *p;
 
-  symbol_number *squeue = CALLOC (squeue, nvars);
-  short int *rcount = CALLOC (rcount, nrules);
+  symbol_number *squeue = xnmalloc (nvars, sizeof *squeue);
+  size_t *rcount = xcalloc (nrules, sizeof *rcount);
   /* RITEM contains all the rules, including useless productions.
      Hence we must allocate room for useless nonterminals too.  */
-  rule_list **rsets = CALLOC (rsets, nvars);
+  rule_list **rsets = xcalloc (nvars, sizeof *rsets);
   /* This is said to be more elements than we actually use.
      Supposedly NRITEMS - NRULES is enough.  But why take the risk?  */
-  rule_list *relts = CALLOC (relts, nritems + nvars + 1);
+  rule_list *relts = xnmalloc (nritems + nvars + 1, sizeof *relts);
 
-  CALLOC (nullable, nvars);
+  nullable = xcalloc (nvars, sizeof *nullable);
 
   s1 = s2 = squeue;
   p = relts;
@@ -126,10 +126,10 @@ nullable_compute (void)
 	    }
       }
 
-  XFREE (squeue);
-  XFREE (rcount);
-  XFREE (rsets);
-  XFREE (relts);
+  free (squeue);
+  free (rcount);
+  free (rsets);
+  free (relts);
 
   if (trace_flag & trace_sets)
     nullable_print (stderr);
@@ -139,5 +139,5 @@ nullable_compute (void)
 void
 nullable_free (void)
 {
-  XFREE (nullable);
+  free (nullable);
 }

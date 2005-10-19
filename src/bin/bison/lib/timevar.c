@@ -16,8 +16,8 @@ for more details.
 
 You should have received a copy of the GNU General Public License
 along with Bison; see the file COPYING.  If not, write to the Free
-Software Foundation, 59 Temple Place - Suite 330, Boston, MA
-02111-1307, USA.  */
+Software Foundation, 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301, USA.  */
 
 #if IN_GCC
 
@@ -31,7 +31,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 /* This source file is taken from the GCC source code, with slight
    modifications that are under control of the IN_GCC preprocessor
    variable.  The !IN_GCC part of this file is specific to Bison.  */
-   
+
 # include "../src/system.h"
 # if HAVE_SYS_TIME_H
 #  include <sys/time.h>

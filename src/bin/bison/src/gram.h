@@ -17,8 +17,8 @@
 
    You should have received a copy of the GNU General Public License
    along with Bison; see the file COPYING.  If not, write to
-   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 #ifndef GRAM_H_
 # define GRAM_H_
@@ -139,7 +139,7 @@ item_number_as_symbol_number (item_number i)
 }
 
 /* Rule numbers.  */
-typedef short int rule_number;
+typedef int rule_number;
 extern rule_number nrules;
 
 static inline item_number
@@ -175,8 +175,8 @@ typedef struct
   /* This symbol provides both the associativity, and the precedence. */
   symbol *prec;
 
-  short int dprec;
-  short int merger;
+  int dprec;
+  int merger;
 
   /* This symbol was attached to the rule via %prec. */
   symbol *precsym;

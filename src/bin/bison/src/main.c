@@ -1,6 +1,6 @@
 /* Top level entry point of Bison.
 
-   Copyright (C) 1984, 1986, 1989, 1992, 1995, 2000, 2001, 2002
+   Copyright (C) 1984, 1986, 1989, 1992, 1995, 2000, 2001, 2002, 2004, 2005
    Free Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
@@ -17,8 +17,8 @@
 
    You should have received a copy of the GNU General Public License
    along with Bison; see the file COPYING.  If not, write to
-   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 
 #include "system.h"
@@ -57,6 +57,7 @@ main (int argc, char *argv[])
   program_name = argv[0];
   setlocale (LC_ALL, "");
   (void) bindtextdomain (PACKAGE, LOCALEDIR);
+  (void) bindtextdomain ("bison-runtime", LOCALEDIR);
   (void) textdomain (PACKAGE);
 
   uniqstrs_new ();
@@ -107,7 +108,7 @@ main (int argc, char *argv[])
   timevar_pop (TV_LALR);
 
   /* Find and record any conflicts: places where one token of
-     lookahead is not enough to disambiguate the parsing.  In file
+     look-ahead is not enough to disambiguate the parsing.  In file
      conflicts.  Also resolve s/r conflicts based on precedence
      declarations.  */
   timevar_push (TV_CONFLICTS);
@@ -147,7 +148,7 @@ main (int argc, char *argv[])
   if (complaint_issued)
     goto finish;
 
-  /* Lookaheads are no longer needed. */
+  /* Look-ahead tokens are no longer needed. */
   timevar_push (TV_FREE);
   lalr_free ();
   timevar_pop (TV_FREE);

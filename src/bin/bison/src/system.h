@@ -1,6 +1,7 @@
 /* System-dependent definitions for Bison.
 
-   Copyright (C) 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software
+   Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,7 +15,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #ifndef BISON_SYSTEM_H
 #define BISON_SYSTEM_H
@@ -54,9 +55,6 @@ typedef size_t uintptr_t;
 #endif
 
 #include <xalloc.h>
-#define CALLOC(P, N) ((P) = xcalloc (N, sizeof *(P)))
-#define MALLOC(P, N) ((P) = xnmalloc (N, sizeof *(P)))
-#define REALLOC(P, N) ((P) = xnrealloc (P, N, sizeof *(P)))
 
 
 /*---------------------.
@@ -132,9 +130,9 @@ typedef size_t uintptr_t;
 | Obstacks.  |
 `-----------*/
 
-# define obstack_chunk_alloc xmalloc
-# define obstack_chunk_free  free
-# include <obstack.h>
+#define obstack_chunk_alloc xmalloc
+#define obstack_chunk_free  free
+#include <obstack.h>
 
 #define obstack_sgrow(Obs, Str) \
   obstack_grow (Obs, Str, strlen (Str))
@@ -173,21 +171,13 @@ do {								\
 | Extensions to use for the output files.  |
 `-----------------------------------------*/
 
-#ifdef VMS
-  /* VMS. */
-# define TAB_EXT	"_tab"
-# define OUTPUT_EXT	".output"
-#else /* ! VMS */
-# ifdef MSDOS
-   /* MS DOS. */
-#  define TAB_EXT	"_tab"
-#  define OUTPUT_EXT	".out"
-# else /* ! MSDOS */
-  /* Standard. */
-#  define TAB_EXT	".tab"
-#  define OUTPUT_EXT	".output"
-# endif /* ! MSDOS */
-#endif /* ! VMS */
+#ifndef OUTPUT_EXT
+# define OUTPUT_EXT ".output"
+#endif
+
+#ifndef TAB_EXT
+# define TAB_EXT ".tab"
+#endif
 
 #ifndef DEFAULT_TMPDIR
 # define DEFAULT_TMPDIR "/tmp"
@@ -205,7 +195,7 @@ do {						\
   for (_node = List; _node; _node = _next)	\
     {						\
       _next = _node->next;			\
-      XFREE (_node);				\
+      free (_node);				\
     }						\
 } while (0)
 

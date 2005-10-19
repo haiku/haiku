@@ -1,6 +1,7 @@
 /* Closures for Bison
 
-   Copyright (C) 1984, 1989, 2000, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989, 2000, 2001, 2002, 2004 Free Software
+   Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
 
@@ -16,8 +17,8 @@
 
    You should have received a copy of the GNU General Public License
    along with Bison; see the file COPYING.  If not, write to the Free
-   Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-   02111-1307, USA.  */
+   Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+   02110-1301, USA.  */
 
 #include "system.h"
 
@@ -35,7 +36,7 @@
 
 /* NITEMSET is the size of the array ITEMSET.  */
 item_number *itemset;
-int nritemset;
+size_t nritemset;
 
 static bitset ruleset;
 
@@ -180,9 +181,9 @@ set_fderives (void)
 
 
 void
-new_closure (int n)
+new_closure (unsigned int n)
 {
-  CALLOC (itemset, n);
+  itemset = xnmalloc (n, sizeof *itemset);
 
   ruleset = bitset_create (nrules, BITSET_FIXED);
 
@@ -192,10 +193,10 @@ new_closure (int n)
 
 
 void
-closure (item_number *core, int n)
+closure (item_number *core, size_t n)
 {
   /* Index over CORE. */
-  int c;
+  size_t c;
 
   /* A bit index over RULESET. */
   rule_number ruleno;
@@ -241,7 +242,7 @@ closure (item_number *core, int n)
 void
 free_closure (void)
 {
-  XFREE (itemset);
+  free (itemset);
   bitset_free (ruleset);
   bitsetv_free (fderives);
 }

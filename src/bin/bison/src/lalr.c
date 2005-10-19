@@ -1,6 +1,6 @@
 /* Compute look-ahead criteria for Bison.
 
-   Copyright (C) 1984, 1986, 1989, 2000, 2001, 2002, 2003
+   Copyright (C) 1984, 1986, 1989, 2000, 2001, 2002, 2003, 2004
    Free Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
@@ -17,12 +17,12 @@
 
    You should have received a copy of the GNU General Public License
    along with Bison; see the file COPYING.  If not, write to
-   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 
 /* Compute how to make the finite state machine deterministic; find
-   which rules need lookahead in each state, and which lookahead
+   which rules need look-ahead in each state, and which look-ahead
    tokens they accept.  */
 
 #include "system.h"
@@ -42,10 +42,10 @@
 #include "relation.h"
 #include "symtab.h"
 
-goto_number *goto_map = NULL;
-static goto_number ngotos = 0;
-state_number *from_state = NULL;
-state_number *to_state = NULL;
+goto_number *goto_map;
+static goto_number ngotos;
+state_number *from_state;
+state_number *to_state;
 
 /* Linked list of goto numbers.  */
 typedef struct goto_list
@@ -80,8 +80,8 @@ set_goto_map (void)
   state_number s;
   goto_number *temp_map;
 
-  CALLOC (goto_map, nvars + 1);
-  CALLOC (temp_map, nvars + 1);
+  goto_map = xcalloc (nvars + 1, sizeof *goto_map);
+  temp_map = xnmalloc (nvars + 1, sizeof *temp_map);
 
   ngotos = 0;
   for (s = 0; s < nstates; ++s)
@@ -90,15 +90,18 @@ set_goto_map (void)
       int i;
       for (i = sp->num - 1; i >= 0 && TRANSITION_IS_GOTO (sp, i); --i)
 	{
-	  if (ngotos >= GOTO_NUMBER_MAXIMUM)
-	    abort ();
 	  ngotos++;
+
+	  /* Abort if (ngotos + 1) would overflow.  */
+	  if (ngotos == GOTO_NUMBER_MAXIMUM)
+	    abort ();
+
 	  goto_map[TRANSITION_SYMBOL (sp, i) - ntokens]++;
 	}
     }
 
   {
-    int k = 0;
+    goto_number k = 0;
     int i;
     for (i = ntokens; i < nsyms; i++)
       {
@@ -113,8 +116,8 @@ set_goto_map (void)
     temp_map[nsyms - ntokens] = ngotos;
   }
 
-  CALLOC (from_state, ngotos);
-  CALLOC (to_state, ngotos);
+  from_state = xcalloc (ngotos, sizeof *from_state);
+  to_state = xcalloc (ngotos, sizeof *to_state);
 
   for (s = 0; s < nstates; ++s)
     {
@@ -122,13 +125,13 @@ set_goto_map (void)
       int i;
       for (i = sp->num - 1; i >= 0 && TRANSITION_IS_GOTO (sp, i); --i)
 	{
-	  int k = temp_map[TRANSITION_SYMBOL (sp, i) - ntokens]++;
+	  goto_number k = temp_map[TRANSITION_SYMBOL (sp, i) - ntokens]++;
 	  from_state[k] = s;
 	  to_state[k] = sp->states[i]->number;
 	}
     }
 
-  XFREE (temp_map);
+  free (temp_map);
 }
 
 
@@ -137,12 +140,12 @@ set_goto_map (void)
 | Map a state/symbol pair into its numeric representation.  |
 `----------------------------------------------------------*/
 
-static int
+static goto_number
 map_goto (state_number s0, symbol_number sym)
 {
-  int high;
-  int low;
-  int middle;
+  goto_number high;
+  goto_number low;
+  goto_number middle;
   state_number s;
 
   low = goto_map[sym - ntokens];
@@ -167,11 +170,11 @@ map_goto (state_number s0, symbol_number sym)
 static void
 initialize_F (void)
 {
-  goto_number **reads = CALLOC (reads, ngotos);
-  goto_number *edge = CALLOC (edge, ngotos + 1);
-  int nedges = 0;
+  goto_number **reads = xnmalloc (ngotos, sizeof *reads);
+  goto_number *edge = xnmalloc (ngotos + 1, sizeof *edge);
+  goto_number nedges = 0;
 
-  int i;
+  goto_number i;
 
   F = bitsetv_create (ngotos, ntokens, BITSET_FIXED);
 
@@ -191,11 +194,13 @@ initialize_F (void)
 	    edge[nedges++] = map_goto (stateno, sym);
 	}
 
-      if (nedges)
+      if (nedges == 0)
+	reads[i] = NULL;
+      else
 	{
-	  CALLOC (reads[i], nedges + 1);
-	  memcpy (reads[i], edge, nedges * sizeof (edge[0]));
-	  reads[i][nedges] = -1;
+	  reads[i] = xnmalloc (nedges + 1, sizeof reads[i][0]);
+	  memcpy (reads[i], edge, nedges * sizeof edge[0]);
+	  reads[i][nedges] = END_NODE;
 	  nedges = 0;
 	}
     }
@@ -203,21 +208,21 @@ initialize_F (void)
   relation_digraph (reads, ngotos, &F);
 
   for (i = 0; i < ngotos; i++)
-    XFREE (reads[i]);
+    free (reads[i]);
 
-  XFREE (reads);
-  XFREE (edge);
+  free (reads);
+  free (edge);
 }
 
 
 static void
-add_lookback_edge (state *s, rule *r, int gotono)
+add_lookback_edge (state *s, rule *r, goto_number gotono)
 {
   int ri = state_reduction_find (s, r);
-  goto_list *sp = MALLOC (sp, 1);
-  sp->next = lookback[(s->reductions->lookaheads - LA) + ri];
+  goto_list *sp = xmalloc (sizeof *sp);
+  sp->next = lookback[(s->reductions->look_ahead_tokens - LA) + ri];
   sp->value = gotono;
-  lookback[(s->reductions->lookaheads - LA) + ri] = sp;
+  lookback[(s->reductions->look_ahead_tokens - LA) + ri] = sp;
 }
 
 
@@ -225,11 +230,11 @@ add_lookback_edge (state *s, rule *r, int gotono)
 static void
 build_relations (void)
 {
-  goto_number *edge = CALLOC (edge, ngotos + 1);
-  state_number *states1 = CALLOC (states1, ritem_longest_rhs () + 1);
-  int i;
+  goto_number *edge = xnmalloc (ngotos + 1, sizeof *edge);
+  state_number *states1 = xnmalloc (ritem_longest_rhs () + 1, sizeof *states1);
+  goto_number i;
 
-  CALLOC (includes, ngotos);
+  includes = xnmalloc (ngotos, sizeof *includes);
 
   for (i = 0; i < ngotos; i++)
     {
@@ -273,18 +278,20 @@ build_relations (void)
 	    }
 	}
 
-      if (nedges)
+      if (nedges == 0)
+	includes[i] = NULL;
+      else
 	{
 	  int j;
-	  CALLOC (includes[i], nedges + 1);
+	  includes[i] = xnmalloc (nedges + 1, sizeof includes[i][0]);
 	  for (j = 0; j < nedges; j++)
 	    includes[i][j] = edge[j];
-	  includes[i][nedges] = -1;
+	  includes[i][nedges] = END_NODE;
 	}
     }
 
-  XFREE (edge);
-  XFREE (states1);
+  free (edge);
+  free (states1);
 
   relation_transpose (&includes, ngotos);
 }
@@ -294,19 +301,19 @@ build_relations (void)
 static void
 compute_FOLLOWS (void)
 {
-  int i;
+  goto_number i;
 
   relation_digraph (includes, ngotos, &F);
 
   for (i = 0; i < ngotos; i++)
-    XFREE (includes[i]);
+    free (includes[i]);
 
-  XFREE (includes);
+  free (includes);
 }
 
 
 static void
-compute_lookaheads (void)
+compute_look_ahead_tokens (void)
 {
   size_t i;
   goto_list *sp;
@@ -319,32 +326,32 @@ compute_lookaheads (void)
   for (i = 0; i < nLA; i++)
     LIST_FREE (goto_list, lookback[i]);
 
-  XFREE (lookback);
+  free (lookback);
   bitsetv_free (F);
 }
 
 
-/*-----------------------------------------------------------.
-| Count the number of lookaheads required for S (NLOOKAHEADS |
-| member).                                                   |
-`-----------------------------------------------------------*/
+/*-----------------------------------------------------.
+| Count the number of look-ahead tokens required for S |
+| (N_LOOK_AHEAD_TOKENS member).                        |
+`-----------------------------------------------------*/
 
 static int
-state_lookaheads_count (state *s)
+state_look_ahead_tokens_count (state *s)
 {
   int k;
-  int nlookaheads = 0;
+  int n_look_ahead_tokens = 0;
   reductions *rp = s->reductions;
   transitions *sp = s->transitions;
 
-  /* We need a lookahead either to distinguish different
+  /* We need a look-ahead either to distinguish different
      reductions (i.e., there are two or more), or to distinguish a
      reduction from a shift.  Otherwise, it is straightforward,
      and the state is `consistent'.  */
   if (rp->num > 1
       || (rp->num == 1 && sp->num &&
 	  !TRANSITION_IS_DISABLED (sp, 0) && TRANSITION_IS_SHIFT (sp, 0)))
-    nlookaheads += rp->num;
+    n_look_ahead_tokens += rp->num;
   else
     s->consistent = 1;
 
@@ -355,13 +362,13 @@ state_lookaheads_count (state *s)
 	break;
       }
 
-  return nlookaheads;
+  return n_look_ahead_tokens;
 }
 
 
-/*----------------------------------------------.
-| Compute LA, NLA, and the lookaheads members.  |
-`----------------------------------------------*/
+/*-----------------------------------------------------.
+| Compute LA, NLA, and the look_ahead_tokens members.  |
+`-----------------------------------------------------*/
 
 static void
 initialize_LA (void)
@@ -369,65 +376,65 @@ initialize_LA (void)
   state_number i;
   bitsetv pLA;
 
-  /* Compute the total number of reductions requiring a lookahead.  */
+  /* Compute the total number of reductions requiring a look-ahead.  */
   nLA = 0;
   for (i = 0; i < nstates; i++)
-    nLA += state_lookaheads_count (states[i]);
+    nLA += state_look_ahead_tokens_count (states[i]);
   /* Avoid having to special case 0.  */
   if (!nLA)
     nLA = 1;
 
   pLA = LA = bitsetv_create (nLA, ntokens, BITSET_FIXED);
-  CALLOC (lookback, nLA);
+  lookback = xcalloc (nLA, sizeof *lookback);
 
-  /* Initialize the members LOOKAHEADS for each state which reductions
-     require lookaheads.  */
+  /* Initialize the members LOOK_AHEAD_TOKENS for each state whose reductions
+     require look-ahead tokens.  */
   for (i = 0; i < nstates; i++)
     {
-      int count = state_lookaheads_count (states[i]);
+      int count = state_look_ahead_tokens_count (states[i]);
       if (count)
 	{
-	  states[i]->reductions->lookaheads = pLA;
+	  states[i]->reductions->look_ahead_tokens = pLA;
 	  pLA += count;
 	}
     }
 }
 
 
-/*---------------------------------------.
-| Output the lookaheads for each state.  |
-`---------------------------------------*/
+/*----------------------------------------------.
+| Output the look-ahead tokens for each state.  |
+`----------------------------------------------*/
 
 static void
-lookaheads_print (FILE *out)
+look_ahead_tokens_print (FILE *out)
 {
   state_number i;
   int j, k;
-  fprintf (out, "Lookaheads: BEGIN\n");
+  fprintf (out, "Look-ahead tokens: BEGIN\n");
   for (i = 0; i < nstates; ++i)
     {
       reductions *reds = states[i]->reductions;
       bitset_iterator iter;
-      int nlookaheads = 0;
+      int n_look_ahead_tokens = 0;
 
-      if (reds->lookaheads)
+      if (reds->look_ahead_tokens)
 	for (k = 0; k < reds->num; ++k)
-	  if (reds->lookaheads[k])
-	    ++nlookaheads;
+	  if (reds->look_ahead_tokens[k])
+	    ++n_look_ahead_tokens;
 
-      fprintf (out, "State %d: %d lookaheads\n",
-	       i, nlookaheads);
+      fprintf (out, "State %d: %d look-ahead tokens\n",
+	       i, n_look_ahead_tokens);
 
-      if (reds->lookaheads)
+      if (reds->look_ahead_tokens)
 	for (j = 0; j < reds->num; ++j)
-	  BITSET_FOR_EACH (iter, reds->lookaheads[j], k, 0)
+	  BITSET_FOR_EACH (iter, reds->look_ahead_tokens[j], k, 0)
 	  {
 	    fprintf (out, "   on %d (%s) -> rule %d\n",
 		     k, symbols[k]->tag,
 		     reds->rules[j]->number);
 	  };
     }
-  fprintf (out, "Lookaheads: END\n");
+  fprintf (out, "Look-ahead tokens: END\n");
 }
 
 void
@@ -438,10 +445,10 @@ lalr (void)
   initialize_F ();
   build_relations ();
   compute_FOLLOWS ();
-  compute_lookaheads ();
+  compute_look_ahead_tokens ();
 
   if (trace_flag & trace_sets)
-    lookaheads_print (stderr);
+    look_ahead_tokens_print (stderr);
 }
 
 
@@ -450,6 +457,6 @@ lalr_free (void)
 {
   state_number s;
   for (s = 0; s < nstates; ++s)
-    states[s]->reductions->lookaheads = NULL;
+    states[s]->reductions->look_ahead_tokens = NULL;
   bitsetv_free (LA);
 }

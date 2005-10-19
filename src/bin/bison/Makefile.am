@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
-## Copyright (C) 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+## Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -13,14 +13,19 @@
 
 ## You should have received a copy of the GNU General Public License
 ## along with this program; if not, write to the Free Software
-## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-## 02111-1307  USA
+## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+## 02110-1301  USA
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = config po lib data src doc tests
+SUBDIRS = config po runtime-po lib data src doc examples tests
 
-EXTRA_DIST = REFERENCES OChangeLog Makefile.maint GNUmakefile Makefile.cfg
+# Files installed for use by Automake.
+aclocaldir = @aclocaldir@
+aclocal_DATA = m4/bison-i18n.m4
+
+EXTRA_DIST = GNUmakefile Makefile.cfg Makefile.maint \
+  OChangeLog PACKAGING
 
 .PHONY: maintainer-check
 maintainer-check:

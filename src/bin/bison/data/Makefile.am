@@ -1,4 +1,4 @@
-## Copyright (C) 2002 Free Software Foundation, Inc.
+## Copyright (C) 2002, 2005 Free Software Foundation, Inc.
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -12,10 +12,12 @@
 
 ## You should have received a copy of the GNU General Public License
 ## along with this program; if not, write to the Free Software
-## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-## 02111-1307  USA
+## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+## 02110-1301  USA
 
-dist_pkgdata_DATA = README c.m4 yacc.c lalr1.cc glr.c
+dist_pkgdata_DATA = README \
+   c.m4 yacc.c glr.c \
+   c++.m4 lalr1.cc
 
 m4sugardir = $(pkgdatadir)/m4sugar
 dist_m4sugar_DATA = m4sugar/m4sugar.m4

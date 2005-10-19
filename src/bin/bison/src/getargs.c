@@ -1,6 +1,6 @@
 /* Parse command line arguments for Bison.
 
-   Copyright (C) 1984, 1986, 1989, 1992, 2000, 2001, 2002, 2003, 2004
+   Copyright (C) 1984, 1986, 1989, 1992, 2000, 2001, 2002, 2003, 2004, 2005
    Free Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
@@ -17,8 +17,8 @@
 
    You should have received a copy of the GNU General Public License
    along with Bison; see the file COPYING.  If not, write to the Free
-   Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-   02111-1307, USA.  */
+   Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+   02110-1301, USA.  */
 
 #include "system.h"
 
@@ -138,7 +138,7 @@ static const char * const report_args[] =
   "none",
   "state", "states",
   "itemset", "itemsets",
-  "lookahead", "lookaheads",
+  "look-ahead", "lookahead", "lookaheads",
   "solved",
   "all",
   0
@@ -149,7 +149,9 @@ static const int report_types[] =
   report_none,
   report_states, report_states,
   report_states | report_itemsets, report_states | report_itemsets,
-  report_states | report_lookaheads, report_states | report_lookaheads,
+  report_states | report_look_ahead_tokens,
+  report_states | report_look_ahead_tokens,
+  report_states | report_look_ahead_tokens,
   report_states | report_solved_conflicts,
   report_all
 };
@@ -205,9 +207,10 @@ for the equivalent short option also.  Similarly for optional arguments.\n"),
 
       fputs (_("\
 Operation modes:\n\
-  -h, --help      display this help and exit\n\
-  -V, --version   output version information and exit\n\
-  -y, --yacc      emulate POSIX yacc\n"), stdout);
+  -h, --help                 display this help and exit\n\
+  -V, --version              output version information and exit\n\
+      --print-localedir      output directory containing locale-dependent data\n\
+  -y, --yacc                 emulate POSIX yacc\n"), stdout);
       putc ('\n', stdout);
 
       fputs (_("\
@@ -237,7 +240,7 @@ Output:\n\
 THINGS is a list of comma separated words that can include:\n\
   `state'        describe the states\n\
   `itemset'      complete the core item sets with their closure\n\
-  `lookahead'    explicitly associate lookaheads to items\n\
+  `look-ahead'   explicitly associate look-ahead tokens to items\n\
   `solved'       describe shift/reduce conflicts solving\n\
   `all'          include all the above information\n\
   `none'         disable the report\n\
@@ -267,7 +270,7 @@ version (void)
   putc ('\n', stdout);
 
   fprintf (stdout,
-	   _("Copyright (C) %d Free Software Foundation, Inc.\n"), 2004);
+	   _("Copyright (C) %d Free Software Foundation, Inc.\n"), 2005);
 
   fputs (_("\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -282,19 +285,21 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 `----------------------*/
 
 /* Shorts options.  */
-const char *short_options = "yvegdhr:ltknVo:b:p:S:T::";
+static char const short_options[] = "yvegdhr:ltknVo:b:p:S:T::";
 
 /* Values for long options that do not have single-letter equivalents.  */
 enum
 {
-  LOCATIONS_OPTION = CHAR_MAX + 1
+  LOCATIONS_OPTION = CHAR_MAX + 1,
+  PRINT_LOCALEDIR_OPTION
 };
 
 static struct option const long_options[] =
 {
   /* Operation modes. */
-  { "help",          no_argument,		0,   'h' },
-  { "version",       no_argument,		0,   'V' },
+  { "help",            no_argument,	0,   'h' },
+  { "version",         no_argument,	0,   'V' },
+  { "print-localedir", no_argument,	0,   PRINT_LOCALEDIR_OPTION },
 
   /* Parser. */
   { "name-prefix",   required_argument,	  0,   'p' },
@@ -360,6 +365,10 @@ getargs (int argc, char *argv[])
 
       case 'V':
 	version ();
+	exit (EXIT_SUCCESS);
+
+      case PRINT_LOCALEDIR_OPTION:
+	printf ("%s\n", LOCALEDIR);
 	exit (EXIT_SUCCESS);
 
       case 'g':

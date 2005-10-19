@@ -1,6 +1,6 @@
 /* Symbol table manager for Bison.
 
-   Copyright (C) 1984, 1989, 2000, 2001, 2002, 2004 Free Software
+   Copyright (C) 1984, 1989, 2000, 2001, 2002, 2004, 2005 Free Software
    Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
@@ -17,8 +17,8 @@
 
    You should have received a copy of the GNU General Public License
    along with Bison; see the file COPYING.  If not, write to
-   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 
 #include "system.h"
@@ -48,7 +48,7 @@ location startsymbol_location;
 static symbol *
 symbol_new (uniqstr tag, location loc)
 {
-  symbol *res = MALLOC (res, 1);
+  symbol *res = xmalloc (sizeof *res);
 
   uniqstr_assert (tag);
   res->tag = tag;
@@ -66,8 +66,43 @@ symbol_new (uniqstr tag, location loc)
   res->alias = NULL;
   res->class = unknown_sym;
 
+  if (nsyms == SYMBOL_NUMBER_MAXIMUM)
+    fatal (_("too many symbols in input grammar (limit is %d)"),
+	   SYMBOL_NUMBER_MAXIMUM);
   nsyms++;
   return res;
+}
+
+
+/*-----------------.
+| Print a symbol.  |
+`-----------------*/
+
+#define SYMBOL_ATTR_PRINT(Attr)				\
+  if (s->Attr)						\
+    fprintf (f, " %s { %s }", #Attr, s->Attr)
+
+void
+symbol_print (symbol *s, FILE *f)
+{
+  fprintf (f, "\"%s\"", s->tag);
+  SYMBOL_ATTR_PRINT (type_name);
+  SYMBOL_ATTR_PRINT (destructor);
+  SYMBOL_ATTR_PRINT (printer);
+}
+
+#undef SYMBOL_ATTR_PRINT
+
+/*------------------------------------------------------------------.
+| Complain that S's WHAT is redeclared at SECOND, and was first set |
+| at FIRST.                                                         |
+`------------------------------------------------------------------*/
+
+static void
+redeclaration (symbol* s, const char *what, location first, location second)
+{
+  complain_at (second, _("%s redeclaration for %s"), what, s->tag);
+  complain_at (first, _("first declaration"));
 }
 
 
@@ -82,9 +117,10 @@ symbol_type_set (symbol *sym, uniqstr type_name, location loc)
   if (type_name)
     {
       if (sym->type_name)
-	complain_at (loc, _("type redeclaration for %s"), sym->tag);
+	redeclaration (sym, "%type", sym->type_location, loc);
       uniqstr_assert (type_name);
       sym->type_name = type_name;
+      sym->type_location = loc;
     }
 }
 
@@ -94,13 +130,12 @@ symbol_type_set (symbol *sym, uniqstr type_name, location loc)
 `------------------------------------------------------------------*/
 
 void
-symbol_destructor_set (symbol *sym, char *destructor, location loc)
+symbol_destructor_set (symbol *sym, const char *destructor, location loc)
 {
   if (destructor)
     {
       if (sym->destructor)
-	complain_at (loc, _("%s redeclaration for %s"),
-		     "%destructor", sym->tag);
+	redeclaration (sym, "%destructor", sym->destructor_location, loc);
       sym->destructor = destructor;
       sym->destructor_location = loc;
     }
@@ -112,13 +147,12 @@ symbol_destructor_set (symbol *sym, char *destructor, location loc)
 `---------------------------------------------------------------*/
 
 void
-symbol_printer_set (symbol *sym, char *printer, location loc)
+symbol_printer_set (symbol *sym, const char *printer, location loc)
 {
   if (printer)
     {
       if (sym->printer)
-	complain_at (loc, _("%s redeclaration for %s"),
-		     "%printer", sym->tag);
+	redeclaration (sym, "%printer", sym->destructor_location, loc);
       sym->printer = printer;
       sym->printer_location = loc;
     }
@@ -136,9 +170,10 @@ symbol_precedence_set (symbol *sym, int prec, assoc a, location loc)
   if (a != undef_assoc)
     {
       if (sym->prec != 0)
-	complain_at (loc, _("redefining precedence of %s"), sym->tag);
+	redeclaration (sym, assoc_to_string (a), sym->prec_location, loc);
       sym->prec = prec;
       sym->assoc = a;
+      sym->prec_location = loc;
     }
 
   /* Only terminals have a precedence. */
@@ -230,10 +265,10 @@ symbol_make_alias (symbol *sym, symbol *symval, location loc)
 {
   if (symval->alias)
     warn_at (loc, _("symbol `%s' used more than once as a literal string"),
-	  symval->tag);
+	     symval->tag);
   else if (sym->alias)
     warn_at (loc, _("symbol `%s' given more than one literal string"),
-	  sym->tag);
+	     sym->tag);
   else
     {
       symval->class = token_sym;
@@ -258,45 +293,60 @@ symbol_make_alias (symbol *sym, symbol *symval, location loc)
 | associativity.                                           |
 `---------------------------------------------------------*/
 
-static inline bool
+static inline void
 symbol_check_alias_consistency (symbol *this)
 {
-  /* Check only those who _are_ the aliases. */
-  if (this->alias && this->user_token_number == USER_NUMBER_ALIAS)
-    {
-      if (this->prec != this->alias->prec)
-	{
-	  if (this->prec != 0 && this->alias->prec != 0)
-	    complain_at (this->alias->location,
-			 _("conflicting precedences for %s and %s"),
-			 this->tag, this->alias->tag);
-	  if (this->prec != 0)
-	    this->alias->prec = this->prec;
-	  else
-	    this->prec = this->alias->prec;
-	}
+  symbol *alias = this;
+  symbol *orig  = this->alias;
 
-      if (this->assoc != this->alias->assoc)
-	{
-	  if (this->assoc != undef_assoc && this->alias->assoc != undef_assoc)
-	    complain_at (this->alias->location,
-			 _("conflicting associativities for %s (%s) and %s (%s)"),
-			 this->tag, assoc_to_string (this->assoc),
-			 this->alias->tag, assoc_to_string (this->alias->assoc));
-	  if (this->assoc != undef_assoc)
-	    this->alias->assoc = this->assoc;
-	  else
-	    this->assoc = this->alias->assoc;
-	}
+  /* Check only those that _are_ the aliases.  */
+  if (!(this->alias && this->user_token_number == USER_NUMBER_ALIAS))
+    return;
+
+  if (orig->type_name != alias->type_name)
+    {
+      if (orig->type_name)
+	symbol_type_set (alias, orig->type_name, orig->type_location);
+      else
+	symbol_type_set (orig, alias->type_name, alias->type_location);
     }
-  return true;
+
+
+  if (orig->destructor || alias->destructor)
+    {
+      if (orig->destructor)
+	symbol_destructor_set (alias, orig->destructor,
+			       orig->destructor_location);
+      else
+	symbol_destructor_set (orig, alias->destructor,
+			       alias->destructor_location);
+    }
+
+  if (orig->printer || alias->printer)
+    {
+      if (orig->printer)
+	symbol_printer_set (alias, orig->printer, orig->printer_location);
+      else
+	symbol_printer_set (orig, alias->printer, alias->printer_location);
+    }
+
+  if (alias->prec || orig->prec)
+    {
+      if (orig->prec)
+	symbol_precedence_set (alias, orig->prec, orig->assoc,
+			       orig->prec_location);
+      else
+	symbol_precedence_set (orig, alias->prec, alias->assoc,
+			       alias->prec_location);
+    }
 }
 
 static bool
 symbol_check_alias_consistency_processor (void *this,
 					  void *null ATTRIBUTE_UNUSED)
 {
-  return symbol_check_alias_consistency (this);
+  symbol_check_alias_consistency (this);
+  return true;
 }
 
 
@@ -444,8 +494,7 @@ symbol_get (const char *key, location loc)
   symbol probe;
   symbol *entry;
 
-  /* Keep the symbol in a printable form.  */
-  key = uniqstr_new (quotearg_style (escape_quoting_style, key));
+  key = uniqstr_new (key);
   probe.tag = key;
   entry = hash_lookup (symbol_table, &probe);
 
@@ -560,7 +609,8 @@ symbols_token_translations_init (void)
 	max_user_token_number = this->user_token_number;
     }
 
-  CALLOC (token_translations, max_user_token_number + 1);
+  token_translations = xnmalloc (max_user_token_number + 1,
+				 sizeof *token_translations);
 
   /* Initialize all entries for literal tokens to 2, the internal
      token number for $undefined, which represents all invalid inputs.
@@ -579,7 +629,7 @@ symbols_token_translations_init (void)
 void
 symbols_pack (void)
 {
-  CALLOC (symbols, nsyms);
+  symbols = xcalloc (nsyms, sizeof *symbols);
 
   symbols_do (symbol_check_alias_consistency_processor, NULL);
   symbols_do (symbol_pack_processor, NULL);

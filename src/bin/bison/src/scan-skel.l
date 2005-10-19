@@ -1,6 +1,6 @@
 /* Scan Bison Skeletons.                                       -*- C -*-
 
-   Copyright (C) 2001, 2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
 
@@ -16,8 +16,8 @@
 
    You should have received a copy of the GNU General Public License
    along with Bison; see the file COPYING.  If not, write to the Free
-   Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-   02111-1307, USA.  */
+   Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+   02110-1301, USA.  */
 
 %option nodefault noyywrap nounput never-interactive debug
 %option prefix="skel_" outfile="lex.yy.c"
@@ -28,10 +28,10 @@
 #include <error.h>
 #include <quotearg.h>
 
+#include "complain.h"
 #include "getargs.h"
 #include "files.h"
-
-int skel_lex (void);
+#include "scan-skel.h"
 
 #define QPUTS(String) \
    fputs (quotearg_style (c_quoting_style, (String)), yyout)
@@ -45,22 +45,25 @@ int skel_lex (void);
 %}
 
 "@output ".*\n {
-  char const *filename = yytext + sizeof "@output " - 1;
+  char const *file_name = yytext + sizeof "@output " - 1;
   yytext[yyleng - 1] = '\0';
 
-  if (*filename == '@')
+  if (*file_name == '@')
     {
-      if (strcmp (filename, "@output_header_name@") == 0)
-	filename = spec_defines_file;
-      else if (strcmp (filename, "@output_parser_name@") == 0)
-	filename = parser_file_name;
+      if (strcmp (file_name, "@output_header_name@") == 0)
+	file_name = spec_defines_file;
+      else if (strcmp (file_name, "@output_parser_name@") == 0)
+	file_name = parser_file_name;
       else
-	abort ();
+	fatal ("invalid token in skeleton: %s", yytext);
     }
 
-  XFREE (outname);
-  outname = xstrdup (filename);
-  xfclose (yyout);
+  if (outname)
+    {
+      free (outname);
+      xfclose (yyout);
+    }
+  outname = xstrdup (file_name);
   yyout = xfopen (outname, "w");
   lineno = 1;
 }
@@ -72,20 +75,26 @@ int skel_lex (void);
 "@oline@"  fprintf (yyout, "%d", lineno + 1);
 "@ofile@"  QPUTS (outname);
 "@output_parser_name@"	QPUTS (parser_file_name);
-"@output_header_name@"  QPUTS (spec_defines_file);
+"@output_header_name@"	QPUTS (spec_defines_file);
 
-"@"	   abort ();
+  /* This pattern must not match more than the previous @ patterns. */
+@[^{}@\n]* fatal ("invalid @ in skeleton: %s", yytext);
 \n	   lineno++; ECHO;
 [^@\n]+	   ECHO;
 
-<<EOF>>	   xfclose (yyout); free (outname); return EOF;
+<<EOF>> {
+  if (outname)
+    {
+      free (outname);
+      xfclose (yyout);
+    }
+  return EOF;
+}
 %%
 
 /*------------------------.
 | Scan a Bison skeleton.  |
 `------------------------*/
-
-void scan_skel (FILE *);
 
 void
 scan_skel (FILE *in)

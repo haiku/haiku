@@ -17,8 +17,8 @@
 
    You should have received a copy of the GNU General Public License
    along with Bison; see the file COPYING.  If not, write to the Free
-   Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-   02111-1307, USA.  */
+   Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+   02110-1301, USA.  */
 
 #ifndef CLOSURE_H_
 # define CLOSURE_H_
@@ -29,7 +29,7 @@
    data so that closure can be called.  n is the number of elements to
    allocate for itemset.  */
 
-void new_closure (int n);
+void new_closure (unsigned int n);
 
 
 /* Given the kernel (aka core) of a state (a vector of item numbers
@@ -46,7 +46,7 @@ void new_closure (int n);
    significant).  CLOSURE places there the indices of all items which
    represent units of input that could arrive next.  */
 
-void closure (item_number *items, int n);
+void closure (item_number *items, size_t n);
 
 
 /* Frees ITEMSET, RULESET and internal data.  */
@@ -54,6 +54,6 @@ void closure (item_number *items, int n);
 void free_closure (void);
 
 extern item_number *itemset;
-extern int nritemset;
+extern size_t nritemset;
 
 #endif /* !CLOSURE_H_ */

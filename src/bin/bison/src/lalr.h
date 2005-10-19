@@ -17,8 +17,8 @@
 
    You should have received a copy of the GNU General Public License
    along with Bison; see the file COPYING.  If not, write to
-   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 #ifndef LALR_H_
 # define LALR_H_
@@ -33,12 +33,12 @@
 # include "state.h"
 
 /* Compute how to make the finite state machine deterministic; find
-   which rules need lookahead in each state, and which lookahead
+   which rules need look-ahead in each state, and which look-ahead
    tokens they accept.  */
 
 void lalr (void);
 
-/* Release the information related to lookaheads.  Can be performed
+/* Release the information related to look-ahead tokens.  Can be performed
    once the action tables are computed.  */
 
 void lalr_free (void);
@@ -56,8 +56,8 @@ void lalr_free (void);
    together and GOTO_MAP[I - NTOKENS] is the index in FROM_STATE and
    TO_STATE of the first of them.  */
 
-typedef short int goto_number;
-# define GOTO_NUMBER_MAXIMUM SHRT_MAX
+typedef size_t goto_number;
+# define GOTO_NUMBER_MAXIMUM ((goto_number) -1)
 
 extern goto_number *goto_map;
 extern state_number *from_state;

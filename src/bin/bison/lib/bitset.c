@@ -1,5 +1,5 @@
 /* General bitsets.
-   Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
    Contributed by Michael Hayes (m.hayes@elec.canterbury.ac.nz).
 
    This program is free software; you can redistribute it and/or modify
@@ -14,7 +14,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -111,7 +111,7 @@ bitset_type_choose (bitset_bindex n_bits ATTRIBUTE_UNUSED, unsigned int attr)
   /* Choose the type of bitset.  Note that sometimes we will be asked
   for a zero length fixed size bitset.  */
 
-  
+
   /* If no attributes selected, choose a good compromise.  */
   if (!attr)
     return BITSET_VARRAY;
@@ -138,7 +138,7 @@ bitset_alloc (bitset_bindex n_bits, enum bitset_type type)
 
   bytes = bitset_bytes (type, n_bits);
 
-  bset = (bitset) xcalloc (1, bytes);
+  bset = xcalloc (1, bytes);
 
   /* The cache is disabled until some elements are allocated.  If we
      have variable length arrays, then we may need to allocate a dummy
@@ -307,7 +307,7 @@ bitset_print (FILE *file, bitset bset, bool verbose)
 	pos = 0;
       }
 
-    fprintf (file, "%d ", i);
+    fprintf (file, "%lu ", (unsigned long int) i);
     pos += 1 + (i >= 10) + (i >= 100);
   };
 

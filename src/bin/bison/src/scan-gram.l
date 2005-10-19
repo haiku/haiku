@@ -1,6 +1,6 @@
 /* Bison Grammar Scanner                             -*- C -*-
 
-   Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
 
@@ -16,8 +16,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307  USA
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+   02110-1301  USA
 */
 
 %option debug nodefault nounput noyywrap never-interactive
@@ -34,6 +34,7 @@
 #include "files.h"
 #include "getargs.h"
 #include "gram.h"
+#include "quotearg.h"
 #include "reader.h"
 #include "uniqstr.h"
 
@@ -46,6 +47,19 @@
       code_start = scanner_cursor;			\
     }							\
   while (0)
+
+/* Pacify "gcc -Wmissing-prototypes" when flex 2.5.31 is used.  */
+int gram_get_lineno (void);
+FILE *gram_get_in (void);
+FILE *gram_get_out (void);
+int gram_get_leng (void);
+char *gram_get_text (void);
+void gram_set_lineno (int);
+void gram_set_in (FILE *);
+void gram_set_out (FILE *);
+int gram_get_debug (void);
+void gram_set_debug (int);
+int gram_lex_destroy (void);
 
 /* Location of scanner cursor.  */
 boundary scanner_cursor;
@@ -249,7 +263,7 @@ splice	 (\\[ \f\t\v]*\n)*
   "'"	      STRING_GROW; token_start = loc->start; BEGIN SC_ESCAPED_CHARACTER;
 
   /* Strings. */
-  "\""	      STRING_GROW; token_start = loc->start; BEGIN SC_ESCAPED_STRING;
+  "\""	      token_start = loc->start; BEGIN SC_ESCAPED_STRING;
 
   /* Prologue. */
   "%{"        code_start = loc->start; BEGIN SC_PROLOGUE;
@@ -360,7 +374,6 @@ splice	 (\\[ \f\t\v]*\n)*
 <SC_ESCAPED_STRING>
 {
   "\"" {
-    STRING_GROW;
     STRING_FINISH;
     loc->start = token_start;
     val->chars = last_string;
@@ -384,7 +397,9 @@ splice	 (\\[ \f\t\v]*\n)*
     STRING_GROW;
     STRING_FINISH;
     loc->start = token_start;
-    val->symbol = symbol_get (last_string, *loc);
+    val->symbol = symbol_get (quotearg_style (escape_quoting_style,
+					      last_string),
+			      *loc);
     symbol_class_set (val->symbol, token_sym, *loc);
     last_string_1 = last_string[1];
     symbol_user_token_number_set (val->symbol, last_string_1, *loc);
@@ -413,7 +428,7 @@ splice	 (\\[ \f\t\v]*\n)*
     unsigned long int c = strtoul (yytext + 1, 0, 8);
     if (UCHAR_MAX < c)
       complain_at (*loc, _("invalid escape sequence: %s"), quote (yytext));
-    else if (! c) 
+    else if (! c)
       complain_at (*loc, _("invalid null character: %s"), quote (yytext));
     else
       obstack_1grow (&obstack_for_string, c);
@@ -534,7 +549,7 @@ splice	 (\\[ \f\t\v]*\n)*
       }
     else
       {
-	complain_at (*loc, _("missing `{' in `%s'"),
+	complain_at (*loc, _("missing `{' in %s"),
 		     token_name (token_type));
 	obstack_sgrow (&obstack_for_string, "{}");
 	STRING_FINISH;
@@ -805,7 +820,7 @@ handle_action_dollar (char *text, location loc)
 	  if (!type_name)
 	    type_name = "";
 	  obstack_fgrow3 (&obstack_for_string,
-			  "]b4_rhs_value([%d], [%d], [%s])[",
+			  "]b4_rhs_value(%d, %d, [%s])[",
 			  rule_length, n, type_name);
 	}
       else
@@ -874,7 +889,7 @@ handle_action_at (char *text, location loc)
       if (INT_MIN <= num && num <= rule_length && ! get_errno ())
 	{
 	  int n = num;
-	  obstack_fgrow2 (&obstack_for_string, "]b4_rhs_location([%d], [%d])[",
+	  obstack_fgrow2 (&obstack_for_string, "]b4_rhs_location(%d, %d)[",
 			  rule_length, n);
 	}
       else
@@ -1003,7 +1018,7 @@ handle_syncline (char *args)
   const char *file = NULL;
   file = strchr (args, '"') + 1;
   *strchr (file, '"') = 0;
-  scanner_cursor.file = current_file = xstrdup (file);
+  scanner_cursor.file = current_file = uniqstr_new (file);
   scanner_cursor.line = lineno;
   scanner_cursor.column = 1;
 }

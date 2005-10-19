@@ -3,7 +3,7 @@
    "Keep this file name-space clean" means, talk to drepper@gnu.org
    before changing it!
    Copyright (C) 1987,88,89,90,91,92,93,94,95,96,98,99,2000,2001,2002,2003,2004
-   	Free Software Foundation, Inc.
+	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 
    You should have received a copy of the GNU General Public License along
    with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* This tells Alpha OSF/1 not to define a getopt prototype in <stdio.h>.
    Ditto for AIX 3.2 and <stdlib.h>.  */
@@ -31,25 +31,6 @@
 #endif
 
 #include <stdio.h>
-
-/* Comment out all this code if we are using the GNU C Library, and are not
-   actually compiling the library itself.  This code is part of the GNU C
-   Library, but also included in many other GNU distributions.  Compiling
-   and linking in this code is a waste when using the GNU C library
-   (especially if it is a shared library).  Rather than having every GNU
-   program understand `configure --with-gnu-libc' and omit the object files,
-   it is simpler to just do this in the source for each such file.  */
-
-#define GETOPT_INTERFACE_VERSION 2
-#if !defined _LIBC && defined __GLIBC__ && __GLIBC__ >= 2
-# include <gnu-versions.h>
-# if _GNU_GETOPT_INTERFACE_VERSION == GETOPT_INTERFACE_VERSION
-#  define ELIDE_CODE
-# endif
-#endif
-
-#ifndef ELIDE_CODE
-
 
 /* This needs to come after some library #include
    to get __GNU_LIBRARY__ defined.  */
@@ -81,16 +62,16 @@
 # define attribute_hidden
 #endif
 
-/* This version of `getopt' appears to the caller like standard Unix `getopt'
-   but it behaves differently for the user, since it allows the user
-   to intersperse the options with the other arguments.
+/* Unlike standard Unix `getopt', functions like `getopt_long'
+   let the user intersperse the options with the other arguments.
 
-   As `getopt' works, it permutes the elements of ARGV so that,
+   As `getopt_long' works, it permutes the elements of ARGV so that,
    when it is done, all the options precede everything else.  Thus
    all application programs are extended to handle flexible argument order.
 
-   Setting the environment variable POSIXLY_CORRECT disables permutation.
-   Then the behavior is completely standard.
+   Using `getopt' or setting the environment variable POSIXLY_CORRECT
+   disables permutation.
+   Then the application's behavior is completely standard.
 
    GNU application programs can use a third alternative mode in which
    they can distinguish the relative order of options and other arguments.  */
@@ -269,8 +250,8 @@ exchange (char **argv, struct _getopt_data *d)
 /* Initialize the internal data when the first call is made.  */
 
 static const char *
-_getopt_initialize (int argc, char *const *argv, const char *optstring,
-		    struct _getopt_data *d)
+_getopt_initialize (int argc, char **argv, const char *optstring,
+		    int posixly_correct, struct _getopt_data *d)
 {
   /* Start processing options with ARGV-element 1 (since ARGV-element 0
      is the program name); the sequence of previously skipped
@@ -280,7 +261,7 @@ _getopt_initialize (int argc, char *const *argv, const char *optstring,
 
   d->__nextchar = NULL;
 
-  d->__posixly_correct = !!getenv ("POSIXLY_CORRECT");
+  d->__posixly_correct = posixly_correct || !!getenv ("POSIXLY_CORRECT");
 
   /* Determine how to handle the ordering of options and nonoptions.  */
 
@@ -374,10 +355,6 @@ _getopt_initialize (int argc, char *const *argv, const char *optstring,
    `flag' field is nonzero, the value of the option's `val' field
    if the `flag' field is zero.
 
-   The elements of ARGV aren't really const, because we permute them.
-   But we pretend they're const in the prototype to be compatible
-   with other systems.
-
    LONGOPTS is a vector of `struct option' terminated by an
    element containing a name which is zero.
 
@@ -386,12 +363,15 @@ _getopt_initialize (int argc, char *const *argv, const char *optstring,
    recent call.
 
    If LONG_ONLY is nonzero, '-' as well as '--' can introduce
-   long-named options.  */
+   long-named options.
+
+   If POSIXLY_CORRECT is nonzero, behave as if the POSIXLY_CORRECT
+   environment variable were set.  */
 
 int
-_getopt_internal_r (int argc, char *const *argv, const char *optstring,
+_getopt_internal_r (int argc, char **argv, const char *optstring,
 		    const struct option *longopts, int *longind,
-		    int long_only, struct _getopt_data *d)
+		    int long_only, int posixly_correct, struct _getopt_data *d)
 {
   int print_errors = d->opterr;
   if (optstring[0] == ':')
@@ -406,7 +386,8 @@ _getopt_internal_r (int argc, char *const *argv, const char *optstring,
     {
       if (d->optind == 0)
 	d->optind = 1;	/* Don't scan ARGV[0], the program name.  */
-      optstring = _getopt_initialize (argc, argv, optstring, d);
+      optstring = _getopt_initialize (argc, argv, optstring,
+				      posixly_correct, d);
       d->__initialized = 1;
     }
 
@@ -1154,16 +1135,17 @@ _getopt_internal_r (int argc, char *const *argv, const char *optstring,
 }
 
 int
-_getopt_internal (int argc, char *const *argv, const char *optstring,
-		  const struct option *longopts, int *longind, int long_only)
+_getopt_internal (int argc, char **argv, const char *optstring,
+		  const struct option *longopts, int *longind,
+		  int long_only, int posixly_correct)
 {
   int result;
 
   getopt_data.optind = optind;
   getopt_data.opterr = opterr;
 
-  result = _getopt_internal_r (argc, argv, optstring, longopts,
-			       longind, long_only, &getopt_data);
+  result = _getopt_internal_r (argc, argv, optstring, longopts, longind,
+			       long_only, posixly_correct, &getopt_data);
 
   optind = getopt_data.optind;
   optarg = getopt_data.optarg;
@@ -1172,16 +1154,21 @@ _getopt_internal (int argc, char *const *argv, const char *optstring,
   return result;
 }
 
+/* glibc gets a LSB-compliant getopt.
+   Standalone applications get a POSIX-compliant getopt.  */
+#if _LIBC
+enum { POSIXLY_CORRECT = 0 };
+#else
+enum { POSIXLY_CORRECT = 1 };
+#endif
+
 int
 getopt (int argc, char *const *argv, const char *optstring)
 {
-  return _getopt_internal (argc, argv, optstring,
-			   (const struct option *) 0,
-			   (int *) 0,
-			   0);
+  return _getopt_internal (argc, (char **) argv, optstring, NULL, NULL, 0,
+			   POSIXLY_CORRECT);
 }
 
-#endif	/* Not ELIDE_CODE.  */
 
 #ifdef TEST
 

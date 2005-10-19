@@ -16,8 +16,8 @@
 
    You should have received a copy of the GNU General Public License
    along with Bison; see the file COPYING.  If not, write to
-   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 
 #include "system.h"
@@ -102,7 +102,7 @@ reductions_new (int num, rule **reds)
   size_t rules_size = num * sizeof *reds;
   reductions *res = xmalloc (offsetof (reductions, rules) + rules_size);
   res->num = num;
-  res->lookaheads = NULL;
+  res->look_ahead_tokens = NULL;
   memcpy (res->rules, reds, rules_size);
   return res;
 }
@@ -219,26 +219,26 @@ state_errs_set (state *s, int num, symbol **tokens)
 
 
 
-/*-----------------------------------------------------.
-| Print on OUT all the lookaheads such that S wants to |
-| reduce R.                                            |
-`-----------------------------------------------------*/
+/*---------------------------------------------------.
+| Print on OUT all the look-ahead tokens such that S |
+| wants to reduce R.                                 |
+`---------------------------------------------------*/
 
 void
-state_rule_lookaheads_print (state *s, rule *r, FILE *out)
+state_rule_look_ahead_tokens_print (state *s, rule *r, FILE *out)
 {
   /* Find the reduction we are handling.  */
   reductions *reds = s->reductions;
   int red = state_reduction_find (s, r);
 
   /* Print them if there are.  */
-  if (reds->lookaheads && red != -1)
+  if (reds->look_ahead_tokens && red != -1)
     {
       bitset_iterator biter;
       int k;
       char const *sep = "";
       fprintf (out, "  [");
-      BITSET_FOR_EACH (biter, reds->lookaheads[red], k, 0)
+      BITSET_FOR_EACH (biter, reds->look_ahead_tokens[red], k, 0)
 	{
 	  fprintf (out, "%s%s", sep, symbols[k]->tag);
 	  sep = ", ";
@@ -261,7 +261,7 @@ static struct hash_table *state_table = NULL;
 static inline bool
 state_compare (state const *s1, state const *s2)
 {
-  int i;
+  size_t i;
 
   if (s1->nitems != s2->nitems)
     return false;
@@ -284,7 +284,7 @@ state_hash (state const *s, size_t tablesize)
 {
   /* Add up the state's item numbers to get a hash key.  */
   size_t key = 0;
-  int i;
+  size_t i;
   for (i = 0; i < s->nitems; ++i)
     key += s->items[i];
   return key % tablesize;

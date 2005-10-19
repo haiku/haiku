@@ -14,7 +14,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #ifndef _BITSET_H
 #define _BITSET_H
@@ -309,8 +309,8 @@ extern void bitset_dump (FILE *, bitset);
 */
 #define BITSET_FOR_EACH(ITER, BSET, INDEX, MIN)				      \
   for (ITER.next = (MIN), ITER.num = BITSET_LIST_SIZE;			      \
-       (ITER.num == BITSET_LIST_SIZE) 					      \
-       && (ITER.num = bitset_list (BSET, ITER.list, 			      \
+       (ITER.num == BITSET_LIST_SIZE)					      \
+       && (ITER.num = bitset_list (BSET, ITER.list,			      \
 				   BITSET_LIST_SIZE, &ITER.next));)	      \
     for (ITER.i = 0;							      \
 	 ITER.i < ITER.num && ((INDEX) = ITER.list[ITER.i], 1);		      \
@@ -331,7 +331,7 @@ extern void bitset_dump (FILE *, bitset);
 */
 #define BITSET_FOR_EACH_REVERSE(ITER, BSET, INDEX, MIN)			      \
   for (ITER.next = (MIN), ITER.num = BITSET_LIST_SIZE;			      \
-       (ITER.num == BITSET_LIST_SIZE) 					      \
+       (ITER.num == BITSET_LIST_SIZE)					      \
        && (ITER.num = bitset_list_reverse (BSET, ITER.list,		      \
 					   BITSET_LIST_SIZE, &ITER.next));)   \
     for (ITER.i = 0;							      \
@@ -371,10 +371,10 @@ extern void bitset_stats_enable (void);
 extern void bitset_stats_disable (void);
 
 /* Read bitset stats file of accummulated stats.  */
-void bitset_stats_read (const char *filename);
+void bitset_stats_read (const char *file_name);
 
 /* Write bitset stats file of accummulated stats.  */
-void bitset_stats_write (const char *filename);
+void bitset_stats_write (const char *file_name);
 
 /* Dump bitset stats.  */
 extern void bitset_stats_dump (FILE *);
@@ -386,4 +386,3 @@ extern void debug_bitset (bitset);
 extern void debug_bitset_stats (void);
 
 #endif /* _BITSET_H  */
-

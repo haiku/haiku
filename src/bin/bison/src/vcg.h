@@ -1,6 +1,6 @@
 /* VCG description handler for Bison.
 
-   Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2002, 2005 Free Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
 
@@ -16,8 +16,8 @@
 
    You should have received a copy of the GNU General Public License
    along with Bison; see the file COPYING.  If not, write to
-   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 #ifndef VCG_H_
 # define VCG_H_
@@ -100,26 +100,6 @@ struct infoname
   int integer;
   char const *chars;
   struct infoname *next;
-};
-
-/* Layout Algorithms which can be found in VCG.
-   Details about each algoithm can be found below. */
-enum layoutalgorithm
-{
-  normal,
-  maxdepth,
-  mindepth,
-  maxdepthslow,
-  mindepthslow,
-  maxdegree,
-  mindegree,
-  maxindegree,
-  minindegree,
-  maxoutdegree,
-  minoutdegree,
-  minbackward,
-  dfs,
-  tree
 };
 
 /* VCG decision yes/no. */
@@ -232,18 +212,18 @@ struct node
   int width;
   int height;
 
-  /* shrink, expand gives the shrinking and expanding factor of the
+  /* shrink, stretch gives the shrinking and stretching factor of the
      node. The values of the attributes width, height, borderwidth and
-     the size of the label text is scaled by ((expand=shrink) \Lambda
+     the size of the label text is scaled by ((stretch=shrink) \Lambda
      100) percent. Note that the actual scale value is determined by the
      scale value of a node relatively to a scale value of the graph,
-     i.e. if (expand,shrink) = (2,1) for the graph and (expand,shrink)
+     i.e. if (stretch,shrink) = (2,1) for the graph and (stretch,shrink)
      = (2,1) for the node of the graph, then the node is scaled by the
      factor 4 compared to the normal size. The scale value can also be
      specified by scaling: float.
      Default are 1,1. */
   int shrink;
-  int expand;
+  int stretch;
 
   /* folding specifies the default folding of the nodes. The folding k
      (with k ? 0) means that the graph part that is reachable via edges
@@ -542,16 +522,16 @@ struct graph
      Default value is 0 */
   int folding;
 
-  /* Shrink, expand gives the shrinking and expanding factor for the
-     graph's representation (default is 1, 1). ((expand=shrink) \Lambda
+  /* Shrink, stretch gives the shrinking and stretching factor for the
+     graph's representation (default is 1, 1). ((stretch=shrink) \Lambda
      100) is the scaling of the graph in percentage, e.g.,
-     (expand,shrink) = (1,1) or (2,2) or (3,3) : : : is normal size,
-     (expand,shrink) = (1,2) is half size, (expand,shrink) = (2,1) is
+     (stretch,shrink) = (1,1) or (2,2) or (3,3) : : : is normal size,
+     (stretch,shrink) = (1,2) is half size, (stretch,shrink) = (2,1) is
      double size. For subgraphs, it is also the scaling factor of the
      summary node. The scaling factor can also be specified by scaling:
      float (here, scaling 1.0 means normal size). */
   int shrink;
-  int expand;
+  int stretch;
 
   /* textmode specifies the adjustment of the text within the border of a
      summary node. The possibilities are center, left.justify and
@@ -677,34 +657,6 @@ struct graph
      color can be used by specifying just the number 75.
      Default id NULL.  */
   struct colorentry *colorentry;
-
-  /* layoutalgorithm chooses different graph layout algorithms
-     Possibilities are maxdepth, mindepth, maxdepthslow, mindepthslow,
-     maxdegree, mindegree, maxindegree, minindegree, maxoutdegree,
-     minoutdegree, minbackward, dfs and tree. The default algorithm tries
-     to give all edges the same orientation and is based on the
-     calculation of strongly connected components. The algorithms that
-     are based on depth first search are faster. While the simple dfs
-     does not enforce additionally constraints, the algorithm maxdepth
-     tries to increase the depth of the layout and the algorithm mindepth
-     tries to increase the wide of the layout. These algorithms are fast
-     heuristics. If they are not appropriate, the algorithms maxdepthslow
-     or mindepthslow also increase the depth or wide, but they are very
-     slow. The algorithm maxindegree lays out the nodes by scheduling the
-     nodes with the maximum of incoming edges first, and minindegree lays
-     out the nodes by scheduling the nodes with the minimum of incoming
-     edges first. In the same manner work the algorithms maxoutdegree and
-     minoutdegree for outgoing edges, and maxdegree and mindegree for the
-     sum of incoming and outgoing edges. These algorithms may have various
-     effects, and can sometimes be used as replacements of maxdepthslow
-     or mindepthslow.
-
-     The algorithm minbackward can be used if the graph is acyclic.
-     The algorithm tree is a specialized method for downward laid out
-     trees. It is much faster on such tree-like graphs and results in a
-     balanced layout.
-     Default is normal. */
-  enum layoutalgorithm layoutalgorithm;
 
   /* Layout downfactor, layout upfactor, layout nearfactor The layout
      algorithm partitions the set of edges into edges pointing upward,
@@ -932,8 +884,8 @@ struct graph
   int cmin;
 
   /* Cmax set the maximal number of interactions for crossing reduction.
-     This is helpful for speedup the layout process.
-     Default is infinite. */
+     This is helpful for speeding up the layout process.
+     Default is -1, which represents infinity.  */
   int cmax;
 
   /* Pmin set the minimal number of iterations that is done with the

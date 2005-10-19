@@ -1,6 +1,6 @@
 /* Subprocesses with pipes.
 
-   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Paul Eggert <eggert@twinsun.com>
    and Florian Krohm <florian@edamail.fishkill.ibm.com>.  */
@@ -44,9 +44,7 @@
 # define STDOUT_FILENO 1
 #endif
 #if ! HAVE_DUP2 && ! defined dup2
-# if HAVE_FCNTL_H
-#  include <fcntl.h>
-# endif
+# include <fcntl.h>
 # define dup2(f, t) (close (t), fcntl (f, F_DUPFD, t))
 #endif
 
@@ -68,6 +66,7 @@
 #endif
 
 #include "error.h"
+#include "unistd-safer.h"
 
 #include "gettext.h"
 #define _(Msgid)  gettext (Msgid)
@@ -99,56 +98,44 @@ pid_t
 create_subpipe (char const * const *argv, int fd[2])
 {
   int pipe_fd[2];
-  int from_in_fd;
-  int from_out_fd;
-  int to_in_fd;
-  int to_out_fd;
+  int child_fd[2];
   pid_t pid;
 
-  if (pipe (pipe_fd) != 0)
-    error (EXIT_FAILURE, errno, "pipe");
-  to_in_fd = pipe_fd[0];
-  to_out_fd = pipe_fd[1];
-
-  if (pipe (pipe_fd) != 0)
-    error (EXIT_FAILURE, errno, "pipe");
-  from_in_fd = pipe_fd[0];
-  from_out_fd = pipe_fd[1];
+  if (pipe (child_fd) != 0
+      || (child_fd[0] = fd_safer (child_fd[0])) < 0
+      || (fd[0] = fd_safer (child_fd[1])) < 0
+      || pipe (pipe_fd) != 0
+      || (fd[1] = fd_safer (pipe_fd[0])) < 0
+      || (child_fd[1] = fd_safer (pipe_fd[1])) < 0)
+    error (EXIT_FAILURE, errno,
+	   "pipe");
 
   pid = vfork ();
   if (pid < 0)
-    error (EXIT_FAILURE, errno, "fork");
+    error (EXIT_FAILURE, errno,
+	   "fork");
 
   if (! pid)
     {
       /* Child.  */
-      close (to_out_fd);
-      close (from_in_fd);
-
-      if (to_in_fd != STDIN_FILENO)
-	{
-	  dup2 (to_in_fd, STDIN_FILENO);
-	  close (to_in_fd);
-	}
-      if (from_out_fd != STDOUT_FILENO)
-	{
-	  dup2 (from_out_fd, STDOUT_FILENO);
-	  close (from_out_fd);
-	}
+      close (fd[0]);
+      close (fd[1]);
+      dup2 (child_fd[0], STDIN_FILENO);
+      close (child_fd[0]);
+      dup2 (child_fd[1], STDOUT_FILENO);
+      close (child_fd[1]);
 
       /* The cast to (char **) rather than (char * const *) is needed
 	 for portability to older hosts with a nonstandard prototype
 	 for execvp.  */
       execvp (argv[0], (char **) argv);
-    
+
       _exit (errno == ENOENT ? 127 : 126);
     }
 
   /* Parent.  */
-  close (to_in_fd);
-  close (from_out_fd);
-  fd[0] = to_out_fd;
-  fd[1] = from_in_fd;
+  close (child_fd[0]);
+  close (child_fd[1]);
   return pid;
 }
 
@@ -161,7 +148,8 @@ reap_subpipe (pid_t pid, char const *program)
 #if HAVE_WAITPID || defined waitpid
   int wstatus;
   if (waitpid (pid, &wstatus, 0) < 0)
-    error (EXIT_FAILURE, errno, "waitpid");
+    error (EXIT_FAILURE, errno,
+	   "waitpid");
   else
     {
       int status = WIFEXITED (wstatus) ? WEXITSTATUS (wstatus) : -1;

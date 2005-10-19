@@ -1,7 +1,7 @@
 /* obstack.c - subroutines used implicitly by object stack macros
 
    Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1996, 1997,
-   1998, 1999, 2000, 2001, 2002, 2003, 2004 Free Software Foundation,
+   1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation,
    Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 
    You should have received a copy of the GNU General Public License along
    with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -24,6 +24,7 @@
 
 #ifdef _LIBC
 # include <obstack.h>
+# include <shlib-compat.h>
 #else
 # include "obstack.h"
 #endif
@@ -59,19 +60,31 @@
 #ifndef ELIDE_CODE
 
 
+# if HAVE_INTTYPES_H
+#  include <inttypes.h>
+# endif
+# if HAVE_STDINT_H || defined _LIBC
+#  include <stdint.h>
+# endif
+
 /* Determine default alignment.  */
 union fooround
 {
-  long int i;
+  uintmax_t i;
   long double d;
   void *p;
+};
+struct fooalign
+{
+  char c;
+  union fooround u;
 };
 /* If malloc were really smart, it would round addresses to DEFAULT_ALIGNMENT.
    But in fact it might be less smart and round addresses to as much as
    DEFAULT_ROUNDING.  So we prepare for it to do that.  */
 enum
   {
-    DEFAULT_ALIGNMENT = offsetof (struct { char c; union fooround u; }, u),
+    DEFAULT_ALIGNMENT = offsetof (struct fooalign, u),
     DEFAULT_ROUNDING = sizeof (union fooround)
   };
 
@@ -103,10 +116,13 @@ int obstack_exit_failure = EXIT_FAILURE;
 # endif
 
 # ifdef _LIBC
+#  if SHLIB_COMPAT (libc, GLIBC_2_0, GLIBC_2_3_4)
 /* A looong time ago (before 1994, anyway; we're not sure) this global variable
    was used by non-GNU-C macros to avoid multiple evaluation.  The GNU C
    library still exports it because somebody might use it.  */
-struct obstack *_obstack;
+struct obstack *_obstack_compat;
+compat_symbol (libc, _obstack_compat, _obstack, GLIBC_2_0);
+#  endif
 # endif
 
 /* Define a macro that either calls functions with the traditional malloc/free
@@ -173,7 +189,8 @@ _obstack_begin (struct obstack *h,
   chunk = h->chunk = CALL_CHUNKFUN (h, h -> chunk_size);
   if (!chunk)
     (*obstack_alloc_failed_handler) ();
-  h->next_free = h->object_base = chunk->contents;
+  h->next_free = h->object_base = __PTR_ALIGN ((char *) chunk, chunk->contents,
+					       alignment - 1);
   h->chunk_limit = chunk->limit
     = (char *) chunk + h->chunk_size;
   chunk->prev = 0;
@@ -220,7 +237,8 @@ _obstack_begin_1 (struct obstack *h, int size, int alignment,
   chunk = h->chunk = CALL_CHUNKFUN (h, h -> chunk_size);
   if (!chunk)
     (*obstack_alloc_failed_handler) ();
-  h->next_free = h->object_base = chunk->contents;
+  h->next_free = h->object_base = __PTR_ALIGN ((char *) chunk, chunk->contents,
+					       alignment - 1);
   h->chunk_limit = chunk->limit
     = (char *) chunk + h->chunk_size;
   chunk->prev = 0;
@@ -287,7 +305,10 @@ _obstack_newchunk (struct obstack *h, int length)
   /* If the object just copied was the only data in OLD_CHUNK,
      free that chunk and remove it from the chain.
      But not if that chunk might contain an empty object.  */
-  if (h->object_base == old_chunk->contents && ! h->maybe_empty_object)
+  if (! h->maybe_empty_object
+      && (h->object_base
+	  == __PTR_ALIGN ((char *) old_chunk, old_chunk->contents,
+			  h->alignment_mask)))
     {
       new_chunk->prev = old_chunk->prev;
       CALL_FREEFUN (h, old_chunk);

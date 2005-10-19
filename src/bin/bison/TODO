@@ -12,24 +12,22 @@ They should not: it is not documented.  But if they need to, let's
 find something clean (not like YYLSP_NEEDED...).
 
 
-* URGENT: Documenting C++ output
-Write a first documentation for C++ output.
-
-
 * Documentation
 Before releasing, make sure the documentation ("Understanding your
 parser") refers to the current `output' format.
 
+* lalr1.cc
+** vector
+Move to using vector, drop stack.hh.
 
-* GLR & C++
-Currently, the GLR parser cannot compile with a C++ compiler.
-
+** I18n
+Catch up with yacc.c.
 
 * Report
 
 **  GLR
 How would Paul like to display the conflicted actions?  In particular,
-what when two reductions are possible on a given lookahead, but one is
+what when two reductions are possible on a given look-ahead token, but one is
 part of $default.  Should we make the two reductions explicit, or just
 keep $default?  See the following point.
 
@@ -52,14 +50,7 @@ DeRemer and Penello: they already provide the algorithm.
 
 * Extensions
 
-** %destructor
-I think we should document it as experimental, and allow its use in
-the next releases.  But we also need to port it to GLR.  What about
-lalr1.cc?  Well, read what Hans reported, maybe we don't want
-%detructor.  On the other hand, there is no reason not to provide it:
-users can avoid its use.
-
-** $foo
+** Labeling the symbols
 Have a look at the Lemon parser generator: instead of $1, $2 etc. they
 can name the values.  This is much more pleasant.  For instance:
 
@@ -68,6 +59,21 @@ can name the values.  This is much more pleasant.  For instance:
 I love this.  I have been bitten too often by the removal of the
 symbol, and forgetting to shift all the $n to $n-1.  If you are
 unlucky, it compiles...
+
+But instead of using $a etc., we can use regular variables.  And
+instead of using (), I propose to use `:' (again).  Paul suggests
+supporting `->' in addition to `:' to separate LHS and RHS. In other
+words:
+
+       r:exp -> a:exp '+' b:exp { r = a + b; };
+
+That requires an significant improvement of the grammar parser.  Using
+GLR would be nice.  It also requires that Bison know the type of the
+symbols (which will be useful for %include anyway).  So we have some
+time before...
+
+Note that there remains the problem of locations: `@r'?
+
 
 ** $-1
 We should find a means to provide an access to values deep in the
@@ -192,7 +198,9 @@ Paul notes:
 	PDP-10 ports :-) but they should probably be documented
 	somewhere.
 
-
+	More importantly, Bison does not currently allow NUL bytes in
+	tokens, either via escapes (e.g., "x\0y") or via a NUL byte in
+	the source code.  This should get fixed.
 
 * --graph
 Show reductions.	[]
@@ -337,7 +345,7 @@ the parser with a means to create the (visual) parse tree.
 
 -----
 
-Copyright (C) 2001, 2002, 2003 Free Software Foundation, Inc.
+Copyright (C) 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Bison.
 
@@ -353,5 +361,5 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Bison; see the file COPYING.  If not, write to
-the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-Boston, MA 02111-1307, USA.
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+Boston, MA 02110-1301, USA.

@@ -15,15 +15,13 @@
 
    You should have received a copy of the GNU General Public
    License along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
    USA.  */
 
-/* When this file is included, it may be preceded only by preprocessor
-   declarations.  Thanks to AIX.  Therefore we include it right after
-   "config.h", not later.  */
-
-#ifndef _ALLOCA_H
-# define _ALLOCA_H
+/* Avoid using the symbol _ALLOCA_H here, as Bison assumes _ALLOCA_H
+   means there is a real alloca function.  */
+#ifndef _GNULIB_ALLOCA_H
+# define _GNULIB_ALLOCA_H
 
 /* alloca (N) returns a pointer to N bytes of memory
    allocated on the stack, which will last until the function returns.
@@ -39,7 +37,7 @@
 #ifdef __GNUC__
 # define alloca __builtin_alloca
 #elif defined _AIX
-# define alloca __alloca 
+# define alloca __alloca
 #elif defined _MSC_VER
 # include <malloc.h>
 # define alloca _alloca
@@ -51,4 +49,4 @@ extern "C"
 void *alloca (size_t);
 #endif
 
-#endif /* _ALLOCA_H */
+#endif /* _GNULIB_ALLOCA_H */

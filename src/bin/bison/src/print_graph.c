@@ -1,6 +1,6 @@
 /* Output a VCG description on generated parser, for Bison,
 
-   Copyright (C) 2001, 2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
 
    This file is part of Bison, the GNU Compiler Compiler.
 
@@ -16,12 +16,11 @@
 
    You should have received a copy of the GNU General Public License
    along with Bison; see the file COPYING.  If not, write to
-   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 #include "system.h"
 
-#include <obstack.h>
 #include <quotearg.h>
 
 #include "LR0.h"
@@ -49,9 +48,9 @@ static FILE *fgraph = NULL;
 static void
 print_core (struct obstack *oout, state *s)
 {
-  int i;
+  size_t i;
   item_number *sitems = s->items;
-  int snritems = s->nitems;
+  size_t snritems = s->nitems;
 
   /* Output all the items of a state, not only its kernel.  */
   if (report_flag & report_itemsets)
@@ -88,21 +87,21 @@ print_core (struct obstack *oout, state *s)
       for (/* Nothing */; *sp >= 0; ++sp)
 	obstack_fgrow1 (oout, " %s", symbols[*sp]->tag);
 
-      /* Experimental feature: display the lookaheads. */
-      if (report_flag & report_lookaheads)
+      /* Experimental feature: display the look-ahead tokens. */
+      if (report_flag & report_look_ahead_tokens)
 	{
 	  /* Find the reduction we are handling.  */
 	  reductions *reds = s->reductions;
 	  int redno = state_reduction_find (s, &rules[r]);
 
 	  /* Print them if there are.  */
-	  if (reds->lookaheads && redno != -1)
+	  if (reds->look_ahead_tokens && redno != -1)
 	    {
 	      bitset_iterator biter;
 	      int k;
 	      char const *sep = "";
 	      obstack_sgrow (oout, "[");
-	      BITSET_FOR_EACH (biter, reds->lookaheads[redno], k, 0)
+	      BITSET_FOR_EACH (biter, reds->look_ahead_tokens[redno], k, 0)
 		{
 		  obstack_fgrow2 (oout, "%s%s", sep, symbols[k]->tag);
 		  sep = ", ";
@@ -202,13 +201,7 @@ print_graph (void)
 
   new_graph (&static_graph);
 
-#if 0
-  static_graph.smanhattan_edges = yes;
-  static_graph.manhattan_edges = yes;
-#endif
-
   static_graph.display_edge_labels = yes;
-  static_graph.layoutalgorithm = normal;
 
   static_graph.port_sharing = no;
   static_graph.finetuning = yes;

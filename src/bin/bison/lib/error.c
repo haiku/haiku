@@ -1,5 +1,5 @@
 /* Error handler for noninteractive utilities
-   Copyright (C) 1990-1998, 2000-2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1990-1998, 2000-2003, 2004 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    This program is free software; you can redistribute it and/or modify
@@ -14,7 +14,7 @@
 
    You should have received a copy of the GNU General Public License along
    with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by David MacKenzie <djm@gnu.ai.mit.edu>.  */
 
@@ -29,9 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef _LIBC
-# include <libintl.h>
-#else
+#if !_LIBC && ENABLE_NLS
 # include "gettext.h"
 #endif
 
@@ -40,7 +38,7 @@
 # define mbsrtowcs __mbsrtowcs
 #endif
 
-#if !_LIBC
+#if USE_UNLOCKED_IO
 # include "unlocked-io.h"
 #endif
 
@@ -106,7 +104,7 @@ extern char *program_name;
 static void
 print_errno_message (int errnum)
 {
-  char const *s;
+  char const *s = NULL;
 
 #if defined HAVE_STRERROR_R || _LIBC
   char errbuf[1024];
@@ -115,15 +113,11 @@ print_errno_message (int errnum)
 # else
   if (__strerror_r (errnum, errbuf, sizeof errbuf) == 0)
     s = errbuf;
-  else
-    s = 0;
 # endif
-#else
-  s = strerror (errnum);
 #endif
 
 #if !_LIBC
-  if (! s)
+  if (! s && ! (s = strerror (errnum)))
     s = _("Unknown system error");
 #endif
 

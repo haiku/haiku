@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Paul Eggert <eggert@twinsun.com> */
 
@@ -29,7 +29,7 @@ enum quoting_style
   {
     /* Output names as-is (ls --quoting-style=literal).  */
     literal_quoting_style,
-    
+
     /* Quote names for the shell if they contain shell metacharacters
        or would cause ambiguous output (ls --quoting-style=shell).  */
     shell_quoting_style,
