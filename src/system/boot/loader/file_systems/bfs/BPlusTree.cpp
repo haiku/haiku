@@ -1,18 +1,18 @@
 /* BPlusTree - BFS B+Tree implementation
-**
-** Initial version by Axel Dörfler, axeld@pinc-software.de
-** Roughly based on 'btlib' written by Marcus J. Ranum
-**
-** Copyright (c) 2001-2002 pinc Software. All Rights Reserved.
-** This file may be used under the terms of the OpenBeOS License.
-*/
+ *
+ * Roughly based on 'btlib' written by Marcus J. Ranum - it shares
+ * no code but achieves binary compatibility with the on disk format.
+ *
+ * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ */
 
 
 #include "BPlusTree.h"
-#include "Stack.h"
 
 #include <boot/platform.h>
 #include <util/kernel_cpp.h>
+#include <util/Stack.h>
 
 #include <TypeConstants.h>
 
