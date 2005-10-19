@@ -205,8 +205,6 @@ get_ext_drive_parameters(uint8 drive, drive_parameters *targetParameters)
 
 	// filter out faulty BIOS return codes
 	if ((regs.flags & CARRY_FLAG) != 0
-		|| parameter->heads == 0
-		|| parameter->sectors_per_track == 0
 		|| parameter->sectors == 0)
 		return B_ERROR;
 
