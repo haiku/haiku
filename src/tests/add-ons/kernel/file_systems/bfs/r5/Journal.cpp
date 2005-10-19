@@ -13,12 +13,106 @@
 #include <util/kernel_cpp.h>
 
 
-struct log_entry : public DoublyLinkedListLinkImpl<log_entry> {
-	uint16		start;
-	uint16		length;
-	uint32		cached_blocks;
-	Journal		*journal;
+struct run_array {
+	int32		count;
+	int32		max_runs;
+	block_run	runs[0];
+
+	int32 CountRuns() const { return BFS_ENDIAN_TO_HOST_INT32(count); }
+	int32 MaxRuns() const { return BFS_ENDIAN_TO_HOST_INT32(max_runs); }
+	const block_run &RunAt(int32 i) const { return runs[i]; }
+
+	static int32 MaxRuns(int32 blockSize)
+		{ return (blockSize - sizeof(run_array)) / sizeof(block_run); }
 };
+
+class LogEntry : public DoublyLinkedListLinkImpl<LogEntry> {
+	public:
+		LogEntry(Journal *journal, uint32 logStart);
+		~LogEntry();
+
+		status_t InitCheck() const { return fArray != NULL ? B_OK : B_NO_MEMORY; }
+
+		uint32 Start() const { return fStart; }
+		uint32 Length() const { return fLength; }
+
+		Journal *GetJournal() { return fJournal; }
+
+		bool InsertBlock(off_t blockNumber);
+		bool NotifyBlocks(int32 count);
+
+		run_array *Array() const { return fArray; }
+		int32 CountRuns() const { return fArray->CountRuns(); }
+		int32 MaxRuns() const { return fArray->MaxRuns() - 1; }
+			// the -1 is an off-by-one error in Be's BFS implementation
+		const block_run &RunAt(int32 i) const { return fArray->RunAt(i); }
+
+	private:
+		Journal		*fJournal;
+		uint32		fStart;
+		uint32		fLength;
+		uint32		fCachedBlocks;
+		run_array	*fArray;
+};
+
+
+//	#pragma mark -
+
+
+LogEntry::LogEntry(Journal *journal, uint32 start)
+	:
+	fJournal(journal),
+	fStart(start),
+	fLength(1),
+	fCachedBlocks(0)
+{
+	int32 blockSize = fJournal->GetVolume()->BlockSize();
+	fArray = (run_array *)malloc(blockSize);
+	if (fArray == NULL)
+		return;
+
+	memset(fArray, 0, blockSize);
+	fArray->max_runs = HOST_ENDIAN_TO_BFS_INT32(run_array::MaxRuns(blockSize));
+}
+
+
+LogEntry::~LogEntry()
+{
+	free(fArray);
+}
+
+
+/**	Adds the specified block into the array.
+ */
+
+bool
+LogEntry::InsertBlock(off_t blockNumber)
+{
+	// Be's BFS log replay routine can only deal with block_runs of size 1
+	// A pity, isn't it? Too sad we have to be compatible.
+
+	if (CountRuns() >= MaxRuns())
+		return false;
+
+	block_run run = fJournal->GetVolume()->ToBlockRun(blockNumber);
+
+	fArray->runs[CountRuns()] = run;
+	fArray->count = HOST_ENDIAN_TO_BFS_INT16(CountRuns() + 1);
+	fLength++;
+	fCachedBlocks++;
+	return true;
+}
+
+
+bool
+LogEntry::NotifyBlocks(int32 count)
+{
+	fCachedBlocks -= count;
+	return fCachedBlocks == 0;
+}
+
+
+//	#pragma mark -
 
 
 Journal::Journal(Volume *volume)
@@ -58,73 +152,75 @@ Journal::InitCheck()
 
 
 status_t
-Journal::CheckLogEntry(int32 count, off_t *array)
+Journal::_CheckRunArray(const run_array *array)
 {
-	// ToDo: check log entry integrity (block numbers and entry size)
-	PRINT(("Log entry has %ld entries (%Ld)\n", count, array[0]));
+	int32 maxRuns = run_array::MaxRuns(fVolume->BlockSize());
+	if (array->MaxRuns() != maxRuns
+		|| array->CountRuns() > maxRuns
+		|| array->CountRuns() <= 0) {
+		FATAL(("Log entry has broken header!\n"));
+		return B_ERROR;
+	}
+
+	for (int32 i = 0; i < array->CountRuns(); i++) {
+		if (fVolume->ValidateBlockRun(array->RunAt(i)) != B_OK)
+			return B_ERROR;
+	}
+
+	PRINT(("Log entry has %ld entries (%Ld)\n", array->CountRuns()));
 	return B_OK;
 }
 
 
+/**	Replays an entry in the log.
+ *	\a _start points to the entry in the log, and will be bumped to the next
+ *	one if replaying succeeded.
+ */
+
 status_t
-Journal::ReplayLogEntry(int32 *_start)
+Journal::_ReplayRunArray(int32 *_start)
 {
-	PRINT(("ReplayLogEntry(start = %ld)\n", *_start));
+	PRINT(("ReplayRunArray(start = %ld)\n", *_start));
 
 	off_t logOffset = fVolume->ToBlock(fVolume->Log());
-	off_t arrayBlock = (*_start % fLogSize) + fVolume->ToBlock(fVolume->Log());
+	off_t blockNumber = *_start % fLogSize;
 	int32 blockSize = fVolume->BlockSize();
-	int32 count = 1, valuesInBlock = blockSize / sizeof(off_t);
-	int32 numArrayBlocks;
-	off_t blockNumber = 0;
-	bool first = true;
+	int32 count = 1;
+
+	CachedBlock cachedArray(fVolume);
+
+	const run_array *array = (const run_array *)cachedArray.SetTo(logOffset + blockNumber);
+	if (array == NULL)
+		return B_IO_ERROR;
+
+	if (_CheckRunArray(array) < B_OK)
+		return B_BAD_DATA;
+
+	blockNumber = (blockNumber + 1) % fLogSize;
 
 	CachedBlock cached(fVolume);
-	while (count > 0) {
-		off_t *array = (off_t *)cached.SetTo(arrayBlock);
-		if (array == NULL)
-			return B_IO_ERROR;
+	for (int32 index = 0; index < array->CountRuns(); index++) {
+		const block_run &run = array->RunAt(index);
+		PRINT(("replay block run %lu:%u:%u in log at %Ld!\n", run.AllocationGroup(),
+			run.Start(), run.Length(), blockNumber));
 
-		int32 index = 0;
-		if (first) {
-			if (array[0] < 1 || array[0] >= fLogSize)
-				return B_BAD_DATA;
-
-			count = array[0];
-			first = false;
-
-			numArrayBlocks = ((count + 1) * sizeof(off_t) + blockSize - 1) / blockSize;
-			blockNumber = (*_start + numArrayBlocks) % fLogSize;
-				// first real block in this log entry
-			*_start += count;
-			index++;
-				// the first entry in the first block is the number
-				// of blocks in that log entry
-		}
-		(*_start)++;
-
-		if (CheckLogEntry(count, array + 1) < B_OK)
-			return B_BAD_DATA;
-
-		CachedBlock cachedCopy(fVolume);
-		for (; index < valuesInBlock && count-- > 0; index++) {
-			PRINT(("replay block %Ld in log at %Ld!\n", array[index], blockNumber));
-
-			uint8 *copy = cachedCopy.SetTo(logOffset + blockNumber);
-			if (copy == NULL)
+		off_t offset = fVolume->ToOffset(run);
+		for (int32 i = 0; i < run.Length(); i++) {
+			const uint8 *data = cached.SetTo(logOffset + blockNumber);
+			if (data == NULL)
 				RETURN_ERROR(B_IO_ERROR);
 
 			ssize_t written = write_pos(fVolume->Device(),
-						array[index] << fVolume->BlockShift(), copy, blockSize);
+				offset + (i * blockSize), data, blockSize);
 			if (written != blockSize)
 				RETURN_ERROR(B_IO_ERROR);
 
 			blockNumber = (blockNumber + 1) % fLogSize;
+			count++;
 		}
-		arrayBlock++;
-		if (arrayBlock > fVolume->ToBlock(fVolume->Log()) + fLogSize)
-			arrayBlock = fVolume->ToBlock(fVolume->Log());
 	}
+
+	*_start += count;
 	return B_OK;
 }
 
@@ -154,7 +250,7 @@ Journal::ReplayLog()
 		}
 		lastStart = start;
 
-		status_t status = ReplayLogEntry(&start);
+		status_t status = _ReplayRunArray(&start);
 		if (status < B_OK) {
 			FATAL(("replaying log entry from %ld failed: %s\n", start, strerror(status)));
 			return B_ERROR;
@@ -180,33 +276,33 @@ Journal::ReplayLog()
 void
 Journal::blockNotify(off_t blockNumber, size_t numBlocks, void *arg)
 {
-	log_entry *logEntry = (log_entry *)arg;
+	LogEntry *logEntry = (LogEntry *)arg;
 
-	logEntry->cached_blocks -= numBlocks;
-	if (logEntry->cached_blocks > 0) {
+	if (!logEntry->NotifyBlocks(numBlocks)) {
 		// nothing to do yet...
 		return;
 	}
 
-	Journal *journal = logEntry->journal;
+	Journal *journal = logEntry->GetJournal();
 	disk_super_block &superBlock = journal->fVolume->SuperBlock();
 	bool update = false;
 
 	// Set log_start pointer if possible...
 
+	journal->fEntriesLock.Lock();
+
 	if (logEntry == journal->fEntries.First()) {
-		log_entry *next = journal->fEntries.GetNext(logEntry);
+		LogEntry *next = journal->fEntries.GetNext(logEntry);
 		if (next != NULL) {
-			int32 length = next->start - logEntry->start;
+			int32 length = next->Start() - logEntry->Start();
 			superBlock.log_start = (superBlock.log_start + length) % journal->fLogSize;
 		} else
 			superBlock.log_start = journal->fVolume->LogEnd();
 
 		update = true;
 	}
-	journal->fUsed -= logEntry->length;
 
-	journal->fEntriesLock.Lock();
+	journal->fUsed -= logEntry->Length();
 	journal->fEntries.Remove(logEntry);
 	journal->fEntriesLock.Unlock();
 
@@ -254,52 +350,70 @@ Journal::WriteLogEntry()
 	off_t logStart = fVolume->LogEnd();
 	off_t logPosition = logStart % fLogSize;
 
-	// Write disk block array
+	// Create log entries for the transaction
 
-	uint8 *arrayBlock = (uint8 *)array;
+	LogEntry *logEntry = NULL, *firstEntry = NULL;
 
-	for (int32 size = fArray.BlocksUsed(); size-- > 0;) {
-		write_pos(fVolume->Device(), logOffset + (logPosition << blockShift),
-			arrayBlock, fVolume->BlockSize());
+	for (int32 i = 0; i < array->count; i++) {
+	retry:
+		if (logEntry == NULL) {
+			logEntry = new LogEntry(this, logStart);
+			if (logEntry == NULL)
+				return B_NO_MEMORY;
+			if (logEntry->InitCheck() != B_OK) {
+				delete logEntry;
+				return B_NO_MEMORY;
+			}
+			if (firstEntry == NULL)
+				firstEntry = logEntry;
 
-		logPosition = (logPosition + 1) % fLogSize;
-		arrayBlock += fVolume->BlockSize();
+			logStart++;
+		}
+
+		if (!logEntry->InsertBlock(array->values[i])) {
+			// log entry is full - start a new one
+			fEntriesLock.Lock();
+			fEntries.Add(logEntry);
+			fEntriesLock.Unlock();
+
+			logEntry = NULL;
+			goto retry;
+		}
+
+		logStart++;
 	}
 
-	// Write logged blocks into the log
+	if (firstEntry == NULL)
+		return B_OK;
+
+	// Write log entries to disk
 
 	CachedBlock cached(fVolume);
-	for (int32 i = 0;i < array->count;i++) {
-		// ToDo: combine blocks if possible (using iovecs)!
-
-		uint8 *block = cached.SetTo(array->values[i]);
-		if (block == NULL)
-			return B_IO_ERROR;
-
-		write_pos(fVolume->Device(), logOffset + (logPosition << blockShift),
-			block, fVolume->BlockSize());
-		logPosition = (logPosition + 1) % fLogSize;
-	}
-
-	// create and add log entry
-
-	log_entry *logEntry = (log_entry *)malloc(sizeof(log_entry));
-	if (logEntry == NULL) {
-		DIE(("Could not create next log entry (out of memory)\n"));
-		return B_NO_MEMORY;
-	}
-
-	logEntry->start = logStart;
-	logEntry->length = TransactionSize();
-	logEntry->cached_blocks = array->count;
-	logEntry->journal = this;
-
 	fEntriesLock.Lock();
-	fEntries.Add(logEntry);
+
+	for (logEntry = firstEntry; logEntry != NULL; logEntry = fEntries.GetNext(logEntry)) {
+		// first write the log entry array
+		write_pos(fVolume->Device(), logOffset + (logPosition << blockShift),
+			logEntry->Array(), fVolume->BlockSize());
+
+		logPosition = (logPosition + 1) % fLogSize;
+
+		for (int32 i = 0; i < logEntry->CountRuns(); i++) {
+			uint8 *block = cached.SetTo(logEntry->RunAt(i));
+			if (block == NULL)
+				return B_IO_ERROR;
+
+			// write blocks			
+			write_pos(fVolume->Device(), logOffset + (logPosition << blockShift),
+				block, fVolume->BlockSize());
+
+			logPosition = (logPosition + 1) % fLogSize;
+		}
+	}
+
 	fEntriesLock.Unlock();
 
-	fCurrent = logEntry;
-	fUsed += logEntry->length;
+	fUsed += array->count;
 
 	// Update the log end pointer in the super block
 	fVolume->SuperBlock().flags = SUPER_BLOCK_DISK_DIRTY;
@@ -313,8 +427,21 @@ Journal::WriteLogEntry()
 	// If that call fails, we can't do anything about it anyway
 	ioctl(fVolume->Device(), B_FLUSH_DRIVE_CACHE);
 
-	set_blocks_info(fVolume->Device(), &array->values[0],
-		array->count, blockNotify, logEntry);
+	fEntriesLock.Lock();
+	logStart = firstEntry->Start();
+
+	for (logEntry = firstEntry; logEntry != NULL; logEntry = fEntries.GetNext(logEntry)) {
+		// Note: this only works this way as we only have block_runs of length 1
+		for (int32 i = 0; i < logEntry->CountRuns(); i++) {
+			array->values[i] = fVolume->ToBlock(logEntry->RunAt(i));
+		}
+	
+		set_blocks_info(fVolume->Device(), &array->values[0],
+			logEntry->CountRuns(), blockNotify, logEntry);
+	}
+
+	fEntriesLock.Unlock();
+
 	fArray.MakeEmpty();
 
 	// If the log goes to the next round (the log is written as a

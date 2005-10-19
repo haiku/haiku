@@ -21,8 +21,9 @@
 #include "Utility.h"
 
 
-struct log_entry;
-typedef DoublyLinkedList<log_entry> LogEntryList;
+struct run_array;
+class LogEntry;
+typedef DoublyLinkedList<LogEntry> LogEntryList;
 
 // Locking policy in BFS: if you need both, the volume lock and the
 //	journal lock, you must lock the volume first - or else you will
@@ -42,8 +43,6 @@ class Journal {
 		status_t Lock(Transaction *owner);
 		void Unlock(Transaction *owner, bool success);
 
-		status_t CheckLogEntry(int32 count, off_t *array);
-		status_t ReplayLogEntry(int32 *start);
 		status_t ReplayLog();
 
 		status_t WriteLogEntry();
@@ -58,10 +57,10 @@ class Journal {
 		inline uint32 FreeLogBlocks() const;
 
 	private:
-		friend struct log_entry;
-
-		static void blockNotify(off_t blockNumber, size_t numBlocks, void *arg);
+		status_t _CheckRunArray(const run_array *array);
+		status_t _ReplayRunArray(int32 *start);
 		status_t TransactionDone(bool success);
+		static void blockNotify(off_t blockNumber, size_t numBlocks, void *arg);
 
 		Volume			*fVolume;
 		RecursiveLock	fLock;
@@ -71,7 +70,6 @@ class Journal {
 		int32			fTransactionsInEntry;
 		SimpleLock		fEntriesLock;
 		LogEntryList	fEntries;
-		log_entry		*fCurrent;
 		bool			fHasChangedBlocks;
 		bigtime_t		fTimestamp;
 };
