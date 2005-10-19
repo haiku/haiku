@@ -762,7 +762,6 @@ Journal::_TransactionDone(bool success)
 		else
 			cache_abort_transaction(fVolume->BlockCache(), fTransactionID);
 
-		fUnwrittenTransactions--;
 		return B_OK;
 	}
 
