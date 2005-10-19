@@ -24,7 +24,8 @@ struct run_array {
 	block_run	runs[0];
 
 	int32 CountRuns() const { return BFS_ENDIAN_TO_HOST_INT32(count); }
-	int32 MaxRuns() const { return BFS_ENDIAN_TO_HOST_INT32(max_runs); }
+	int32 MaxRuns() const { return BFS_ENDIAN_TO_HOST_INT32(max_runs) - 1; }
+		// that -1 accounts for an off-by-one error in Be's BFS implementation
 	const block_run &RunAt(int32 i) const { return runs[i]; }
 
 	static int32 MaxRuns(int32 blockSize)

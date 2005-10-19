@@ -62,8 +62,6 @@ class Journal {
 		inline uint32 FreeLogBlocks() const;
 
 	private:
-		friend class LogEntry;
-
 		status_t _CheckRunArray(const run_array *array);
 		status_t _ReplayRunArray(int32 *start);
 		status_t _TransactionDone(bool success);
