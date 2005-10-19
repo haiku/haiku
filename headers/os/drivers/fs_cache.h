@@ -21,11 +21,13 @@ extern int32 cache_start_transaction(void *_cache);
 extern status_t cache_sync_transaction(void *_cache, int32 id);
 extern status_t cache_end_transaction(void *_cache, int32 id, transaction_notification_hook hook, void *data);
 extern status_t cache_abort_transaction(void *_cache, int32 id);
-extern int32 cache_detach_sub_transaction(void *_cache, int32 id);
+extern int32 cache_detach_sub_transaction(void *_cache, int32 id, transaction_notification_hook hook, void *data);
 extern status_t cache_abort_sub_transaction(void *_cache, int32 id);
 extern status_t cache_start_sub_transaction(void *_cache, int32 id);
 extern status_t cache_next_block_in_transaction(void *_cache, int32 id, uint32 *_cookie,
 					off_t *_blockNumber, void **_data, void **_unchangedData);
+extern int32 cache_blocks_in_transaction(void *_cache, int32 id);
+extern int32 cache_blocks_in_sub_transaction(void *_cache, int32 id);
 
 /* block cache */
 extern void block_cache_delete(void *_cache, bool allowWrites);

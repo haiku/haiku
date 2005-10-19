@@ -39,9 +39,12 @@
 
 
 struct cache_transaction {
+	cache_transaction();
+
 	cache_transaction *next;
 	int32			id;
 	int32			num_blocks;
+	int32			sub_num_blocks;
 	cached_block	*first_block;
 	block_list		blocks;
 	transaction_notification_hook notification_hook;
@@ -54,6 +57,17 @@ static status_t write_cached_block(block_cache *cache, cached_block *block, bool
 
 
 //	#pragma mark - private transaction
+
+
+cache_transaction::cache_transaction()
+{
+	num_blocks = 0;
+	sub_num_blocks = 0;
+	first_block = NULL;
+	notification_hook = NULL;
+	notification_data = NULL;
+	open = true;
+}
 
 
 static int
@@ -476,6 +490,7 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off
 		}
 
 		memcpy(block->parent_data, block->data, cache->block_size);
+		block->transaction->sub_num_blocks++;
 	}
 
 	if (cleared)
@@ -551,11 +566,6 @@ cache_start_transaction(void *_cache)
 		return B_NO_MEMORY;
 
 	transaction->id = atomic_add(&cache->next_transaction_id, 1);
-	transaction->num_blocks = 0;
-	transaction->first_block = NULL;
-	transaction->notification_hook = NULL;
-	transaction->notification_data = NULL;
-	transaction->open = true;
 	cache->last_transaction = transaction;
 
 	TRACE(("cache_transaction_start(): id %ld started\n", transaction->id));
@@ -629,8 +639,9 @@ cache_end_transaction(void *_cache, int32 id, transaction_notification_hook hook
 			cache->Free(block->original);
 			block->original = NULL;
 		}
-		if (transaction->has_sub_transaction && block->parent_data != block->data) {
-			cache->Free(block->parent_data);
+		if (transaction->has_sub_transaction) {
+			if (block->parent_data != block->data)
+				cache->Free(block->parent_data);
 			block->parent_data = NULL;
 		}
 
@@ -690,10 +701,73 @@ cache_abort_transaction(void *_cache, int32 id)
 
 
 extern "C" int32
-cache_detach_sub_transaction(void *_cache, int32 id)
+cache_detach_sub_transaction(void *_cache, int32 id,
+	transaction_notification_hook hook, void *data)
 {
-	// ToDo: implement me!
-	return B_ERROR;
+	block_cache *cache = (block_cache *)_cache;
+	BenaphoreLocker locker(&cache->lock);
+
+	TRACE(("cache_end_transaction(id = %ld)\n", id));
+
+	cache_transaction *transaction = lookup_transaction(cache, id);
+	if (transaction == NULL) {
+		panic("cache_end_transaction(): invalid transaction ID\n");
+		return B_BAD_VALUE;
+	}
+	if (!transaction->has_sub_transaction)
+		return B_BAD_VALUE;
+
+	// create a new transaction for the sub transaction
+	cache_transaction *newTransaction = new cache_transaction;
+	if (transaction == NULL)
+		return B_NO_MEMORY;
+
+	newTransaction->id = atomic_add(&cache->next_transaction_id, 1);
+
+	transaction->notification_hook = hook;
+	transaction->notification_data = data;
+
+	// iterate through all blocks and free the unchanged original contents
+
+	cached_block *block = transaction->first_block, *next, *last = NULL;
+	for (; block != NULL; block = next) {
+		next = block->transaction_next;
+
+		if (block->previous_transaction != NULL) {
+			// need to write back pending changes
+			write_cached_block(cache, block);
+		}
+
+		if (block->original != NULL) {
+			cache->Free(block->original);
+			block->original = NULL;
+		}
+		if (block->parent_data != block->data) {
+			// we need to move this block over to the new transaction
+			block->original = block->parent_data;
+			if (last == NULL)
+				newTransaction->first_block = block;
+			else
+				last->transaction_next = block;
+
+			last = block;
+		}
+		block->parent_data = NULL;
+
+		// move the block to the previous transaction list
+		transaction->blocks.Add(block);
+
+		block->previous_transaction = transaction;
+		block->transaction_next = NULL;
+		block->transaction = newTransaction;
+	}
+
+	transaction->open = false;
+
+	hash_insert(cache->transaction_hash, newTransaction);
+	cache->last_transaction = newTransaction;
+
+	return B_OK;
 }
 
 
@@ -781,6 +855,8 @@ panic("unchanged block in transaction!");
 
 	// all subsequent changes will go into the sub transaction
 	transaction->has_sub_transaction = true;
+	transaction->sub_num_blocks = 0;
+
 	return B_OK;
 }
 
@@ -815,6 +891,34 @@ cache_next_block_in_transaction(void *_cache, int32 id, uint32 *_cookie, off_t *
 
 	*_cookie = (uint32)block;
 	return B_OK;	
+}
+
+
+extern "C" int32
+cache_blocks_in_transaction(void *_cache, int32 id)
+{
+	block_cache *cache = (block_cache *)_cache;
+	BenaphoreLocker locker(&cache->lock);
+
+	cache_transaction *transaction = lookup_transaction(cache, id);
+	if (transaction == NULL)
+		return B_BAD_VALUE;
+
+	return transaction->num_blocks;
+}
+
+
+extern "C" int32
+cache_blocks_in_sub_transaction(void *_cache, int32 id)
+{
+	block_cache *cache = (block_cache *)_cache;
+	BenaphoreLocker locker(&cache->lock);
+
+	cache_transaction *transaction = lookup_transaction(cache, id);
+	if (transaction == NULL)
+		return B_BAD_VALUE;
+
+	return transaction->sub_num_blocks;
 }
 
 
