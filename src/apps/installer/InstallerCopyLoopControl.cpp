@@ -7,7 +7,7 @@
 
 /* copied from libtracker, because beos loader doesn't seem to find them correctly in libtracker.so */
 
-BPrivate::CopyLoopControl::~CopyLoopControl()
+/*BPrivate::CopyLoopControl::~CopyLoopControl()
 {
 }
 
@@ -35,7 +35,7 @@ bool
 BPrivate::CopyLoopControl::PreserveAttribute(const char*)
 {
 	return false;
-}
+}*/
 
 InstallerCopyLoopControl::InstallerCopyLoopControl(InstallerWindow *window)
 	: fWindow(window)

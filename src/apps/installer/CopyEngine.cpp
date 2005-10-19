@@ -5,8 +5,31 @@
 
 #include "CopyEngine.h"
 #include "InstallerWindow.h"
-#include <DiskDeviceRoster.h>
+#include <DiskDeviceVisitor.h>
+#include <DiskDeviceTypes.h>
 #include <Path.h>
+
+class SourceVisitor : public BDiskDeviceVisitor 
+{
+public:
+	SourceVisitor(BMenu *menu);
+	virtual bool Visit(BDiskDevice *device);
+	virtual bool Visit(BPartition *partition, int32 level);
+private:
+	BMenu *fMenu;
+};
+
+
+class TargetVisitor : public BDiskDeviceVisitor
+{
+public:
+	TargetVisitor(BMenu *menu);
+	virtual bool Visit(BDiskDevice *device);
+	virtual bool Visit(BPartition *partition, int32 level);
+private:
+	BMenu *fMenu;
+};
+
 
 CopyEngine::CopyEngine(InstallerWindow *window)
 	: BLooper("copy_engine"),
@@ -52,34 +75,77 @@ CopyEngine::Start()
 
 
 void
-CopyEngine::ScanDisksPartitions(BMenu *srcMenu, BMenu *dstMenu)
+CopyEngine::ScanDisksPartitions(BMenu *srcMenu, BMenu *targetMenu)
 {
-	/*BDiskDeviceRoster roster;
 	BDiskDevice device;
-	roster.VisitEachDevice(this, &device);
+	BPartition *partition = NULL;
 
-	BPartition *partition;
-	roster.VisitEachPartition(this, &device, &partition);*/
+	printf("ScanDisksPartitions partitions begin\n");
+	SourceVisitor srcVisitor(srcMenu);
+	fDDRoster.VisitEachMountedPartition(&srcVisitor, &device, &partition);
+
+	printf("ScanDisksPartitions partitions begin\n");
+	TargetVisitor targetVisitor(targetMenu);
+	fDDRoster.VisitEachPartition(&targetVisitor, &device, &partition);
 }
 
 
-bool
-CopyEngine::Visit(BDiskDevice *device)
+SourceVisitor::SourceVisitor(BMenu *menu)
+	: fMenu(menu)
 {
+}
+
+bool
+SourceVisitor::Visit(BDiskDevice *device)
+{
+	if (!device->Type() || strcmp(device->Type(), kPartitionTypeBFS)!=0)
+		return false;
 	BPath path;
 	if (device->GetPath(&path)==B_OK)
-		printf("CopyEngine::Visit(BDiskDevice *) : %s\n", path.Path());
+		printf("SourceVisitor::Visit(BDiskDevice *) : %s\n", path.Path());
 	return false;
 }
 
 
 bool
-CopyEngine::Visit(BPartition *partition, int32 level)
+SourceVisitor::Visit(BPartition *partition, int32 level)
 {
+	if (!partition->Type() || strcmp(partition->Type(), kPartitionTypeBFS)!=0)
+		return false;
 	BPath path;
-	if (partition->GetPath(&path)==B_OK) 
-		printf("CopyEngine::Visit(BPartition *) : %s\n", path.Path());
-	printf("CopyEngine::Visit(BPartition *) : %s\n", partition->Name());
+	if (partition->GetPath(&path)==B_OK)
+		printf("SourceVisitor::Visit(BPartition *) : %s\n", path.Path());
+	printf("SourceVisitor::Visit(BPartition *) : %s\n", partition->Name());
 	return false;
 }
 
+
+TargetVisitor::TargetVisitor(BMenu *menu)
+	: fMenu(menu)
+{
+}
+
+
+bool
+TargetVisitor::Visit(BDiskDevice *device)
+{
+	if (device->IsReadOnly())
+		return false;
+	BPath path;
+	if (device->GetPath(&path)==B_OK)
+		printf("TargetVisitor::Visit(BDiskDevice *) : %s\n", path.Path());
+	return false;
+}
+
+
+bool
+TargetVisitor::Visit(BPartition *partition, int32 level)
+{
+	if (partition->IsReadOnly())
+		return false;
+	BPath path;
+	if (partition->GetPath(&path)==B_OK) 
+		printf("TargetVisitor::Visit(BPartition *) : %s\n", path.Path());
+	printf("TargetVisitor::Visit(BPartition *) : %s\n", partition->Name());
+	return false;
+}

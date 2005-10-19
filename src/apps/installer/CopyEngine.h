@@ -6,8 +6,8 @@
 #ifndef _CopyEngine_h
 #define _CopyEngine_h
 
-#include <DiskDeviceVisitor.h>
 #include <DiskDevice.h>
+#include <DiskDeviceRoster.h>
 #include <Looper.h>
 #include <Messenger.h>
 #include <Partition.h>
@@ -15,18 +15,17 @@
 
 class InstallerWindow;
 
-class CopyEngine : public BLooper/*, BDiskDeviceVisitor*/ {
+class CopyEngine : public BLooper {
 public:
 	CopyEngine(InstallerWindow *window);
 	void Start();
-	void ScanDisksPartitions(BMenu *srcMenu, BMenu *dstMenu);
+	void ScanDisksPartitions(BMenu *srcMenu, BMenu *targetMenu);
 
-	virtual bool Visit(BDiskDevice *device);
-	virtual bool Visit(BPartition *partition, int32 level);
 private:
 	void LaunchInitScript(BVolume *volume);
 	void LaunchFinishScript(BVolume *volume);
 	InstallerWindow *fWindow;
+	BDiskDeviceRoster fDDRoster;
 };
 
 #endif /* _CopyEngine_h */
