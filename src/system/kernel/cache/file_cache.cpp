@@ -323,7 +323,7 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 		//	a) also use this direct I/O for writes (otherwise, it would overwrite precious data)
 		//	b) panic if the term below is true (at least for writes)
 		if (size > fileVecs[0].length) {
-			dprintf("warning: device driver %p doesn't respect total length in read_pages() call!\n", ref->device);
+			//dprintf("warning: device driver %p doesn't respect total length in read_pages() call!\n", ref->device);
 			size = fileVecs[0].length;
 		}
 

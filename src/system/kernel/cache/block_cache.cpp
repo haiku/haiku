@@ -30,7 +30,7 @@
 //	3) dirty blocks are only written back if asked for
 //	4) blocks are never removed yet
 
-#define TRACE_BLOCK_CACHE
+//#define TRACE_BLOCK_CACHE
 #ifdef TRACE_BLOCK_CACHE
 #	define TRACE(x)	dprintf x
 #else
@@ -793,12 +793,6 @@ cache_abort_sub_transaction(void *_cache, int32 id)
 	for (; block != NULL; block = next) {
 		next = block->transaction_next;
 
-		if (block->original == NULL) {
-			// an unchanged block in the transaction?
-panic("unchanged block in transaction!");
-			continue;
-		}
-
 		if (block->parent_data != block->data) {
 			// the block has been changed and must be restored
 			TRACE(("cache_abort_sub_transaction(id = %ld): restored contents of block %Ld\n",
@@ -835,12 +829,6 @@ cache_start_sub_transaction(void *_cache, int32 id)
 	cached_block *block = transaction->first_block, *next;
 	for (; block != NULL; block = next) {
 		next = block->transaction_next;
-
-		if (block->original == NULL) {
-			// an unchanged block in the transaction?
-panic("unchanged block in transaction!");
-			continue;
-		}
 
 		if (transaction->has_sub_transaction && block->parent_data != block->data) {
 			// there already is an older sub transaction - we acknowledge
