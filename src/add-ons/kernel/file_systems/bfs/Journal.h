@@ -49,11 +49,9 @@ class Journal {
 
 		status_t ReplayLog();
 
-		status_t WriteLogEntry();
 		status_t LogBlocks(off_t blockNumber, const uint8 *buffer, size_t numBlocks);
 
 		Transaction *CurrentTransaction() const { return fOwner; }
-//		uint32 TransactionSize() const { return fArray.CountItems() + fArray.BlocksUsed(); }
 
 		status_t FlushLogAndBlocks();
 		Volume *GetVolume() const { return fVolume; }
@@ -62,6 +60,9 @@ class Journal {
 		inline uint32 FreeLogBlocks() const;
 
 	private:
+		bool _HasSubTransaction() { return fUnwrittenTransactions > 1; }
+		uint32 _TransactionSize() const;
+		status_t _WriteTransactionToLog();
 		status_t _CheckRunArray(const run_array *array);
 		status_t _ReplayRunArray(int32 *start);
 		status_t _TransactionDone(bool success);
@@ -71,10 +72,9 @@ class Journal {
 		RecursiveLock	fLock;
 		Transaction 	*fOwner;
 		uint32			fLogSize, fMaxTransactionSize, fUsed;
-		int32			fTransactionsInEntry;
+		int32			fUnwrittenTransactions;
 		SimpleLock		fEntriesLock;
 		LogEntryList	fEntries;
-		bool			fHasChangedBlocks;
 		bigtime_t		fTimestamp;
 		int32			fTransactionID;
 };

@@ -300,7 +300,7 @@ Journal::Journal(Volume *volume)
 	fLogSize(volume->Log().length),
 	fMaxTransactionSize(fLogSize / 4 - 5),
 	fUsed(0),
-	fTransactionsInEntry(0)
+	fUnwrittenTransactions(0)
 {
 	if (fMaxTransactionSize > fLogSize / 2)
 		fMaxTransactionSize = fLogSize / 2 - 5;
@@ -501,13 +501,12 @@ Journal::_blockNotify(int32 transactionID, void *arg)
 
 
 status_t
-Journal::WriteLogEntry()
+Journal::_WriteTransactionToLog()
 {
 	// ToDo: in case of a failure, we need a backup plan like writing all
 	//	changed blocks back to disk immediately
 
-	fTransactionsInEntry = 0;
-	fHasChangedBlocks = false;
+	fUnwrittenTransactions = 0;
 
 	int32 blockShift = fVolume->BlockShift();
 	off_t logOffset = fVolume->ToBlock(fVolume->Log()) << blockShift;
@@ -679,8 +678,8 @@ Journal::FlushLogAndBlocks()
 
 	// write the current log entry to disk
 
-	if (fTransactionID != -1 /*&& TransactionSize() != 0*/) {
-		status = WriteLogEntry();
+	if (fUnwrittenTransactions != 0 && _TransactionSize() != 0) {
+		status = _WriteTransactionToLog();
 		if (status < B_OK)
 			FATAL(("writing current log entry failed: %s\n", strerror(status)));
 	}
@@ -712,7 +711,12 @@ Journal::Lock(Transaction *owner)
 
 	fOwner = owner;
 
-	fTransactionID = cache_start_transaction(fVolume->BlockCache());
+	if (fUnwrittenTransactions > 0) {
+		// start a sub transaction
+		cache_start_sub_transaction(fVolume->BlockCache(), fTransactionID);
+	} else
+		fTransactionID = cache_start_transaction(fVolume->BlockCache());
+
 	if (fTransactionID < B_OK) {
 		fLock.Unlock();
 		return fTransactionID;
@@ -730,7 +734,6 @@ Journal::Unlock(Transaction *owner, bool success)
 		// ToDo: what about failing transactions that do not unlock?
 		_TransactionDone(success);
 
-		fTransactionID = -1;
 		fTimestamp = system_time();
 		fOwner = NULL;
 	}
@@ -739,40 +742,38 @@ Journal::Unlock(Transaction *owner, bool success)
 }
 
 
+uint32
+Journal::_TransactionSize() const
+{
+	int32 count = cache_blocks_in_transaction(fVolume->BlockCache(), fTransactionID);
+	if (count < 0)
+		return 0;
+
+	return count;
+}
+
+
 status_t
 Journal::_TransactionDone(bool success)
 {
 	if (!success) {
-		cache_abort_transaction(fVolume->BlockCache(), fTransactionID);
-		return B_OK;
-	}
+		if (_HasSubTransaction())
+			cache_abort_sub_transaction(fVolume->BlockCache(), fTransactionID);
+		else
+			cache_abort_transaction(fVolume->BlockCache(), fTransactionID);
 
-// ToDo:
-/*
-	if (!success && fTransactionsInEntry == 0) {
-		// we can safely abort the transaction
-		sorted_array *array = fArray.Array();
-		if (array != NULL) {
-			// release the lock for all blocks in the array (we don't need
-			// to be notified when they are actually written to disk)
-			for (int32 i = 0; i < array->count; i++)
-				release_block(fVolume->Device(), array->values[i]);
-		}
-
+		fUnwrittenTransactions--;
 		return B_OK;
 	}
 
 	// Up to a maximum size, we will just batch several
 	// transactions together to improve speed
-	if (TransactionSize() < fMaxTransactionSize) {
-		fTransactionsInEntry++;
-		fHasChangedBlocks = false;
-
+	if (_TransactionSize() < fMaxTransactionSize) {
+		fUnwrittenTransactions++;
 		return B_OK;
 	}
-*/
 
-	return WriteLogEntry();
+	return _WriteTransactionToLog();
 }
 
 
@@ -785,7 +786,6 @@ Journal::LogBlocks(off_t blockNumber, const uint8 *buffer, size_t numBlocks)
 	if (TransactionSize() + numBlocks + 1 > fLogSize)
 		return B_DEVICE_FULL;
 
-	fHasChangedBlocks = true;
 	int32 blockSize = fVolume->BlockSize();
 
 	for (;numBlocks-- > 0; blockNumber++, buffer += blockSize) {
