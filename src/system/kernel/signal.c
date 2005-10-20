@@ -30,7 +30,10 @@
 #endif
 
 
-#define SIGNAL_TO_MASK(signal) (1LL << (signal - 1))
+#define SIGNAL_TO_MASK(signal)	(1LL << (signal - 1))
+#define BLOCKABLE_SIGNALS		(~(KILL_SIGNALS | SIGNAL_TO_MASK(SIGSTOP)))
+#define DEFAULT_IGNORE_SIGNALS \
+	(SIGNAL_TO_MASK(SIGCHLD) | SIGNAL_TO_MASK(SIGWINCH) | SIGNAL_TO_MASK(SIGCONT))
 
 
 const char * const sigstr[NSIG] = {
@@ -42,15 +45,14 @@ const char * const sigstr[NSIG] = {
 
 static bool
 notify_debugger(struct thread *thread, int signal, struct sigaction *handler,
-	bool deadly, cpu_status *state)
+	bool deadly)
 {
-	bool result;
 	uint64 signalMask = SIGNAL_TO_MASK(signal);
 
 	// first check the ignore signal masks the debugger specified for the thread
 
 	if (thread->debug_info.ignore_signals_once & signalMask) {
-		thread->debug_info.ignore_signals_once &= ~signalMask;
+		atomic_and(&thread->debug_info.ignore_signals_once, ~signalMask);
 		return true;
 	}
 
@@ -58,184 +60,154 @@ notify_debugger(struct thread *thread, int signal, struct sigaction *handler,
 		return true;
 
 	// deliver the event
-
-	RELEASE_THREAD_LOCK();
-	restore_interrupts(*state);
-
-	result = user_debug_handle_signal(signal, handler, deadly);
-
-	*state = disable_interrupts();
-	GRAB_THREAD_LOCK();
-
-	return result;
+	return user_debug_handle_signal(signal, handler, deadly);
 }
 
 
-/**
- *	Expects interrupts off and thread lock held.
- *	The function may release the lock and enable interrupts temporarily, so the
- *	caller must be aware that operations before calling this function and after
- *	its return might not belong to the same atomic section.
+/** Actually handles the signal - ie. the thread will exit, a custom signal
+ *	handler is prepared, or whatever the signal demands.
  */
 
-int
-handle_signals(struct thread *thread, cpu_status *state)
+bool
+handle_signals(struct thread *thread)
 {
-	uint32 signalMask = thread->sig_pending & (~thread->sig_block_mask);
-	int i, signal, global_resched = 0;
+	uint32 signalMask = atomic_get(&thread->sig_pending)
+		& ~atomic_get(&thread->sig_block_mask);
 	struct sigaction *handler;
+	bool reschedule = false;
+	int32 i;
 
 	// If SIGKILL[THR] are pending, we ignore other signals.
 	// Otherwise check, if the thread shall stop for debugging.
 	if (signalMask & KILL_SIGNALS) {
 		signalMask &= KILL_SIGNALS;
 	} else if (thread->debug_info.flags & B_THREAD_DEBUG_STOP) {
-		RELEASE_THREAD_LOCK();
-		restore_interrupts(*state);
-
 		user_debug_stop_thread();
-
-		*state = disable_interrupts();
-		GRAB_THREAD_LOCK();
-
-		signalMask = thread->sig_pending & (~thread->sig_block_mask);
 	}
 
 	if (signalMask == 0)
 		return 0;
 
 	for (i = 0; i < NSIG; i++) {
-		if (signalMask & 0x1) {
-			bool debugSignal = !(~atomic_get(&thread->team->debug_info.flags)
+		bool debugSignal;
+		int32 signal = i + 1;
+
+		if ((signalMask & SIGNAL_TO_MASK(signal)) == 0)
+			continue;
+
+		// clear the signal that we will handle
+		atomic_and(&thread->sig_pending, ~SIGNAL_TO_MASK(signal));
+
+		debugSignal = !(~atomic_get(&thread->team->debug_info.flags)
 				& (B_TEAM_DEBUG_SIGNALS | B_TEAM_DEBUG_DEBUGGER_INSTALLED));
 
-			signal = i + 1;
-			handler = &thread->sig_action[i];
-			signalMask >>= 1;
-			thread->sig_pending &= ~SIGNAL_TO_MASK(signal);
+		// ToDo: since sigaction_etc() could clobber the fields at any time,
+		//		we should actually copy the relevant fields atomically before
+		//		accessing them (only the debugger is calling sigaction_etc()
+		//		right now).
+		handler = &thread->sig_action[i];
 
-			TRACE(("Thread 0x%lx received signal %s\n", thread->id, sigstr[signal]));
+		TRACE(("Thread 0x%lx received signal %s\n", thread->id, sigstr[signal]));
 
-			if (handler->sa_handler == SIG_IGN) {
-				// signal is to be ignored
-				// ToDo: apply zombie cleaning on SIGCHLD
-
-				// notify the debugger
-				if (debugSignal)
-					notify_debugger(thread, signal, handler, false, state);
-				continue;
-			}
-			if (handler->sa_handler == SIG_DFL) {
-				// default signal behaviour
-				switch (signal) {
-					case SIGCHLD:
-					case SIGWINCH:
-					case SIGTSTP:
-					case SIGTTIN:
-					case SIGTTOU:
-					case SIGCONT:
-						// notify the debugger
-						if (debugSignal) {
-							notify_debugger(thread, signal, handler, false, state);
-						}
-						continue;
-
-					case SIGSTOP:
-						// notify the debugger
-						if (debugSignal) {
-							if (!notify_debugger(thread, signal, handler, false,
-								state)) {
-								continue;
-							}
-						}
-
-						thread->next_state = B_THREAD_SUSPENDED;
-						global_resched = 1;
-						continue;
-
-					case SIGQUIT:
-					case SIGILL:
-					case SIGTRAP:
-					case SIGABRT:
-					case SIGFPE:
-					case SIGSEGV:
-						TRACE(("Shutting down thread 0x%lx due to signal #%d\n", thread->id, signal));
-					case SIGKILL:
-					case SIGKILLTHR:
-					default:
-						if (thread->exit.reason != THREAD_RETURN_EXIT)
-							thread->exit.reason = THREAD_RETURN_INTERRUPTED;
-
-						// notify the debugger
-						if (debugSignal && signal != SIGKILL
-								&& signal != SIGKILLTHR) {
-							if (!notify_debugger(thread, signal, handler, true,
-								state)) {
-								continue;
-							}
-						}
-
-						RELEASE_THREAD_LOCK();
-						restore_interrupts(*state);
-
-						// ToDo: when we have more than a thread per process,
-						// it can likely happen (for any thread other than the first)
-						// that here, interrupts are still disabled.
-						// Changing the above line with "enable_interrupts()" fixes
-						// the problem, though we should find its cause.
-						// We absolutely need interrupts enabled when we enter
-						// thread_exit().
-
-						thread_exit();
-				}
-			}
+		if (handler->sa_handler == SIG_IGN) {
+			// signal is to be ignored
+			// ToDo: apply zombie cleaning on SIGCHLD
 
 			// notify the debugger
-			if (debugSignal) {
-				if (!notify_debugger(thread, signal, handler, false, state))
+			if (debugSignal)
+				notify_debugger(thread, signal, handler, false);
+			continue;
+		}
+		if (handler->sa_handler == SIG_DFL) {
+			// default signal behaviour
+			switch (signal) {
+				case SIGCHLD:
+				case SIGWINCH:
+				case SIGTSTP:
+				case SIGTTIN:
+				case SIGTTOU:
+				case SIGCONT:
+					// notify the debugger
+					if (debugSignal)
+						notify_debugger(thread, signal, handler, false);
 					continue;
+
+				case SIGSTOP:
+					// notify the debugger
+					if (debugSignal
+						&& !notify_debugger(thread, signal, handler, false))
+						continue;
+
+					thread->next_state = B_THREAD_SUSPENDED;
+					reschedule = true;
+					continue;
+
+				case SIGQUIT:
+				case SIGILL:
+				case SIGTRAP:
+				case SIGABRT:
+				case SIGFPE:
+				case SIGSEGV:
+					TRACE(("Shutting down thread 0x%lx due to signal #%d\n",
+						thread->id, signal));
+				case SIGKILL:
+				case SIGKILLTHR:
+				default:
+					if (thread->exit.reason != THREAD_RETURN_EXIT)
+						thread->exit.reason = THREAD_RETURN_INTERRUPTED;
+
+					// notify the debugger
+					if (debugSignal && signal != SIGKILL && signal != SIGKILLTHR
+						&& !notify_debugger(thread, signal, handler, true))
+						continue;
+
+					// ToDo: when we have more than a thread per process,
+					// it can likely happen (for any thread other than the first)
+					// that here, interrupts are still disabled.
+					// Just search for the cause if it still happens!
+
+					thread_exit();
+						// won't return
 			}
+		}
 
-			// ToDo: it's not safe to call arch_setup_signal_frame with
-			//		interrupts disabled since it writes to the user stack
-			//		and may page fault.
+		// notify the debugger
+		if (debugSignal && !notify_debugger(thread, signal, handler, false))
+			continue;
 
-			// User defined signal handler
-			TRACE(("### Setting up custom signal handler frame...\n"));
-			arch_setup_signal_frame(thread, handler, signal, thread->sig_block_mask);
+		// User defined signal handler
+		TRACE(("### Setting up custom signal handler frame...\n"));
+		arch_setup_signal_frame(thread, handler, signal, atomic_get(&thread->sig_block_mask));
 
-			if (handler->sa_flags & SA_ONESHOT)
-				handler->sa_handler = SIG_DFL;
-			if (!(handler->sa_flags & SA_NOMASK))
-				thread->sig_block_mask |= (handler->sa_mask | SIGNAL_TO_MASK(signal)) & BLOCKABLE_SIGS;
+		if (handler->sa_flags & SA_ONESHOT)
+			handler->sa_handler = SIG_DFL;
+		if ((handler->sa_flags & SA_NOMASK) == 0) {
+			// Update the block mask while the signal handler is running - it
+			// will be automatically restored when the signal frame is left.
+			atomic_or(&thread->sig_block_mask,
+				(handler->sa_mask | SIGNAL_TO_MASK(signal)) & BLOCKABLE_SIGNALS);
+		}
 
-			return global_resched;
-		} else
-			signalMask >>= 1;
+		return reschedule;
 	}
-	arch_check_syscall_restart(thread);
 
-	return global_resched;
+	arch_check_syscall_restart(thread);
+	return reschedule;
 }
 
 
 bool
-is_kill_signal_pending()
+is_kill_signal_pending(void)
 {
-	bool result;
-	struct thread *thread = thread_get_current_thread();
-	
-	cpu_status state = disable_interrupts();
-	GRAB_THREAD_LOCK();
-
-	result = (thread->sig_pending & KILL_SIGNALS);
-
-	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
-
-	return result;
+	return (atomic_get(&thread_get_current_thread()->sig_pending) & KILL_SIGNALS) != 0;
 }
 
+
+/**	Delivers the \a signal to the \a thread, but doesn't handle the signal -
+ *	it just makes sure the thread gets the signal, ie. unblocks it if needed.
+ *	This function must be called with interrupts disabled and the
+ *	thread lock held.
+ */
 
 static status_t
 deliver_signal(struct thread *thread, uint signal, uint32 flags)
@@ -253,7 +225,7 @@ deliver_signal(struct thread *thread, uint signal, uint32 flags)
 		return B_OK;
 	}
 
-	thread->sig_pending |= SIGNAL_TO_MASK(signal);
+	atomic_or(&thread->sig_pending, SIGNAL_TO_MASK(signal));
 
 	switch (signal) {
 		case SIGKILL:
@@ -398,7 +370,7 @@ has_signals_pending(void *_thread)
 	if (thread == NULL)
 		thread = thread_get_current_thread();
 
-	return thread->sig_pending & ~thread->sig_block_mask;
+	return atomic_get(&thread->sig_pending) & ~atomic_get(&thread->sig_block_mask);
 }
 
 
@@ -406,20 +378,17 @@ int
 sigprocmask(int how, const sigset_t *set, sigset_t *oldSet)
 {
 	struct thread *thread = thread_get_current_thread();
-	sigset_t oldMask = thread->sig_block_mask;
-
-	// ToDo: "sig_block_mask" is probably not the right thing to change?
-	//	At least it's often changed at other places...
+	sigset_t oldMask = atomic_get(&thread->sig_block_mask);
 
 	switch (how) {
 		case SIG_BLOCK:
-			atomic_or(&thread->sig_block_mask, *set);
+			atomic_or(&thread->sig_block_mask, *set & BLOCKABLE_SIGNALS);
 			break;
 		case SIG_UNBLOCK:
 			atomic_and(&thread->sig_block_mask, ~*set);
 			break;
 		case SIG_SETMASK:
-			atomic_set(&thread->sig_block_mask, *set);
+			atomic_set(&thread->sig_block_mask, *set & BLOCKABLE_SIGNALS);
 			break;
 
 		default:
@@ -433,7 +402,7 @@ sigprocmask(int how, const sigset_t *set, sigset_t *oldSet)
 }
 
 
-/**	\brief Similar to sigaction(), just for a specified thread.
+/**	\brief sigaction() for the specified thread.
  *
  *	A \a threadID is < 0 specifies the current thread.
  *
@@ -441,15 +410,15 @@ sigprocmask(int how, const sigset_t *set, sigset_t *oldSet)
 
 int
 sigaction_etc(thread_id threadID, int signal, const struct sigaction *act,
-	struct sigaction *oact)
+	struct sigaction *oldAction)
 {
 	struct thread *thread;
 	cpu_status state;
 	status_t error = B_OK;
 
 	if (signal < 1 || signal > MAX_SIGNO
-		|| signal == SIGKILL || signal == SIGKILLTHR || signal == SIGSTOP)
-		return EINVAL;
+		|| (SIGNAL_TO_MASK(signal) & ~BLOCKABLE_SIGNALS) != 0)
+		return B_BAD_VALUE;
 
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
@@ -459,25 +428,28 @@ sigaction_etc(thread_id threadID, int signal, const struct sigaction *act,
 		: thread_get_thread_struct_locked(threadID));
 
 	if (thread) {
-		if (oact) {
-			memcpy(oact, &thread->sig_action[signal - 1],
+		if (oldAction) {
+			// save previous sigaction structure
+			memcpy(oldAction, &thread->sig_action[signal - 1],
 				sizeof(struct sigaction));
 		}
 
 		if (act) {
+			// set new sigaction structure
 			memcpy(&thread->sig_action[signal - 1], act,
 				sizeof(struct sigaction));
+			thread->sig_action[signal - 1].sa_mask &= BLOCKABLE_SIGNALS;
 		}
 
-		if (act && act->sa_handler == SIG_IGN)
-			thread->sig_pending &= ~SIGNAL_TO_MASK(signal);
-		else if (act && act->sa_handler == SIG_DFL) {
-			if (signal == SIGCONT || signal == SIGCHLD
-				|| signal == SIGWINCH) {
-				thread->sig_pending &= ~SIGNAL_TO_MASK(signal);
-			}
-		} /*else
-			dprintf("### custom signal handler set\n");*/
+		if (act && act->sa_handler == SIG_IGN) {
+			// remove pending signal if it should now be ignored
+			atomic_and(&thread->sig_pending, ~SIGNAL_TO_MASK(signal));
+		} else if (act && act->sa_handler == SIG_DFL
+			&& (SIGNAL_TO_MASK(signal) & DEFAULT_IGNORE_SIGNALS) != NULL) {
+			// remove pending signal for those signals whose default
+			// action is to ignore them
+			atomic_and(&thread->sig_pending, ~SIGNAL_TO_MASK(signal));
+		}
 	} else
 		error = B_BAD_THREAD_ID;
 
@@ -489,9 +461,9 @@ sigaction_etc(thread_id threadID, int signal, const struct sigaction *act,
 
 
 int
-sigaction(int signal, const struct sigaction *act, struct sigaction *oact)
+sigaction(int signal, const struct sigaction *act, struct sigaction *oldAction)
 {
-	return sigaction_etc(-1, signal, act, oact);
+	return sigaction_etc(-1, signal, act, oldAction);
 }
 
 

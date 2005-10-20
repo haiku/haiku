@@ -396,7 +396,7 @@ arch_setup_signal_frame(struct thread *t, struct sigaction *sa, int sig, int sig
 int64
 arch_restore_signal_frame(void)
 {
-	struct thread *t = thread_get_current_thread();
+	struct thread *thread = thread_get_current_thread();
 	struct iframe *frame = i386_get_current_iframe();
 	uint32 *stack;
 	struct vregs *regs;
@@ -404,7 +404,7 @@ arch_restore_signal_frame(void)
 	TRACE(("### arch_restore_signal_frame: entry\n"));
 
 	stack = (uint32 *)frame->user_esp;
-	t->sig_block_mask = stack[0];
+	atomic_set(&thread->sig_block_mask, stack[0]);
 	regs = (struct vregs *)stack[1];
 
 	frame->eip = regs->eip;
@@ -429,18 +429,19 @@ arch_restore_signal_frame(void)
 
 
 void
-arch_check_syscall_restart(struct thread *t)
+arch_check_syscall_restart(struct thread *thread)
 {
 	struct iframe *frame = i386_get_current_iframe();
-	if (frame == NULL)
+	if (frame == NULL) {
 		// this thread is obviously new; we didn't come from an interrupt
 		return;
+	}
 
 	if ((status_t)frame->orig_eax >= 0 && (status_t)frame->eax == EINTR) {
 		frame->eax = frame->orig_eax;
 		frame->edx = frame->orig_edx;
 		frame->eip -= 2;
-			// undos the "int $99" syscall interrupt (so that it'll be called again)
+			// undoes the "int $99" syscall interrupt (so that it'll be called again)
 	}
 }
 

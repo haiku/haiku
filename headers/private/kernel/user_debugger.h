@@ -55,9 +55,9 @@ struct thread_debug_info {
 	port_id		debug_port;
 		// the port the thread is waiting on for commands from the nub thread
 
-	uint64		ignore_signals;
+	sigset_t	ignore_signals;
 		// the signals the debugger is not interested in
-	uint64		ignore_signals_once;
+	sigset_t	ignore_signals_once;
 		// the signals the debugger wishes not to be notified of, when they
 		// occur the next time
 

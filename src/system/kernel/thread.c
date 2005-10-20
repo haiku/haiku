@@ -1097,16 +1097,18 @@ thread_at_kernel_exit(void)
 
 	TRACE(("thread_atkernel_exit: exit thread 0x%lx\n", thread->id));
 
-	state = disable_interrupts();
-	GRAB_THREAD_LOCK();
+	if (handle_signals(thread)) {
+		state = disable_interrupts();
+		GRAB_THREAD_LOCK();
 
-	if (handle_signals(thread, &state))
+		// was: smp_send_broadcast_ici(SMP_MSG_RESCHEDULE, 0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
 		scheduler_reschedule();
-	// was: smp_send_broadcast_ici(SMP_MSG_RESCHEDULE, 0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
+
+		RELEASE_THREAD_LOCK();
+	} else
+		state = disable_interrupts();
 
 	thread->in_kernel = false;
-
-	RELEASE_THREAD_LOCK();
 
 	// track kernel time
 	now = system_time();
