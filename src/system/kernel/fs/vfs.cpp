@@ -2342,6 +2342,12 @@ remove_vnode(mount_id mountID, vnode_id vnodeID)
 
 	vnode = lookup_vnode(mountID, vnodeID);
 	if (vnode != NULL) {
+		if (vnode->covered_by != NULL) {
+			// this vnode is in use
+			mutex_unlock(&sVnodeMutex);
+			return B_BUSY;
+		}
+
 		vnode->remove = true;
 		if (vnode->unpublished) {
 			// prepare the vnode for deletion

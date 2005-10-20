@@ -2043,8 +2043,9 @@ Inode::Remove(Transaction &transaction, const char *name, off_t *_id, bool isDir
 	}
 
 	// remove_vnode() allows the inode to be accessed until the last put_vnode()
-	if (remove_vnode(fVolume->ID(), id) != B_OK)
-		return B_ERROR;
+	status = remove_vnode(fVolume->ID(), id);
+	if (status != B_OK)
+		return status;
 
 	if (tree->Remove(transaction, name, id) < B_OK) {
 		unremove_vnode(fVolume->ID(), id);

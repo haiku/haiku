@@ -257,11 +257,15 @@ rootfs_is_dir_empty(struct rootfs_vnode *dir)
 static status_t
 remove_node(struct rootfs *fs, struct rootfs_vnode *directory, struct rootfs_vnode *vnode)
 {
+	// schedule this vnode to be removed when it's ref goes to zero
+	status_t status = remove_vnode(fs->id, vnode->id);
+	if (status < B_OK)
+		return status;
+
 	rootfs_remove_from_dir(fs, directory, vnode);
 	notify_entry_removed(fs->id, directory->id, vnode->name, vnode->id);
 
-	// schedule this vnode to be removed when it's ref goes to zero
-	return remove_vnode(fs->id, vnode->id);
+	return B_OK;
 }
 
 
@@ -286,7 +290,7 @@ rootfs_remove(struct rootfs *fs, struct rootfs_vnode *dir, const char *name, boo
 	if (status < B_OK)
 		goto err;
 
-	remove_node(fs, dir, vnode);
+	status = remove_node(fs, dir, vnode);
 
 err:
 	mutex_unlock(&fs->lock);
@@ -481,14 +485,14 @@ rootfs_remove_vnode(fs_volume _fs, fs_vnode _vnode, bool reenter)
 	struct rootfs *fs = (struct rootfs *)_fs;
 	struct rootfs_vnode *vnode = (struct rootfs_vnode *)_vnode;
 
-	TRACE(("rootfs_removevnode: remove %p (0x%Lx), r %d\n", vnode, vnode->id, reenter));
+	TRACE(("rootfs_remove_vnode: remove %p (0x%Lx), r %d\n", vnode, vnode->id, reenter));
 
 	if (!reenter)
 		mutex_lock(&fs->lock);
 
 	if (vnode->dir_next) {
 		// can't remove node if it's linked to the dir
-		panic("rootfs_removevnode: vnode %p asked to be removed is present in dir\n", vnode);
+		panic("rootfs_remove_vnode: vnode %p asked to be removed is present in dir\n", vnode);
 	}
 
 	rootfs_delete_vnode(fs, vnode, false);

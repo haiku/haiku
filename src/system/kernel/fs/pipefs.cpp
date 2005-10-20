@@ -513,11 +513,13 @@ Volume::RemoveNode(Inode *directory, const char *name)
 	if (status < B_OK)
 		goto err;
 
+	// schedule this vnode to be removed when it's ref goes to zero
+	status = remove_vnode(ID(), inode->ID());
+	if (status < B_OK)
+		goto err;
+
 	RemoveNode(inode);
 	notify_entry_removed(ID(), directory->ID(), name, inode->ID());
-
-	// schedule this vnode to be removed when it's ref goes to zero
-	remove_vnode(ID(), inode->ID());
 
 err:
 	Unlock();
