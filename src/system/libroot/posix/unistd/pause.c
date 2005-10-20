@@ -1,21 +1,24 @@
 /*
- *  Copyright (c) 2005, Haiku Project. All rights reserved.
- *  Distributed under the terms of the Haiku license.
+ * Copyright (c) 2005, Haiku Project. All rights reserved.
+ * Distributed under the terms of the MIT license.
  *
- *  Author(s):
- *  Jérôme Duval
+ * Author(s):
+ *		JÃ©rÃ´me Duval
  */
+
+
+#include <syscalls.h>
 
 #include <errno.h>
 #include <signal.h>
-#include <syscalls.h>
-#include <unistd.h>
+
 
 int
-pause()
+pause(void)
 {
 	sigset_t mask;
 	sigemptyset(&mask);
+
 	errno = _kern_sigsuspend(&mask);
 	return -1;
 }
