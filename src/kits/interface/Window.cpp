@@ -811,7 +811,7 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			fLink->Flush();
 			break;
 		}
-
+#if 1 // 0 to make the new clipping code work
 		case B_VIEW_RESIZED:
 		case B_VIEW_MOVED:
 		{
@@ -826,7 +826,7 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			float width;
 			float height;
 			BView *view;
-			for (int32 i = 0; msg->FindInt32("_token", i, &token) >= B_OK; i++) {
+			for (int32 i = 0; CurrentMessage() && msg->FindInt32("_token", i, &token) >= B_OK; i++) {
 				if (token >= 0) {
 					msg->FindPoint("where", i, &frameLeftTop);
 					msg->FindFloat("width", i, &width);
@@ -863,7 +863,7 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			}
 			break;
 		}
-/*
+#else
 		case B_VIEW_MOVED:
 		{
 			BPoint			where;
@@ -896,7 +896,7 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 
 			break;
 		}
-*/
+#endif
 		case _MENUS_DONE_:
 			MenusEnded();
 			break;

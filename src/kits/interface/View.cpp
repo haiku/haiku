@@ -561,7 +561,11 @@ BRect
 BView::Bounds() const
 {
 	// do we need to update our bounds?
-	if (!fState->IsValid(B_VIEW_FRAME_BIT) && fOwner) {
+	if (
+#if 1 // 0 to make the new clipping code work
+!fState->IsValid(B_VIEW_FRAME_BIT) && 
+#endif
+		fOwner) {
 		check_lock();
 
 		fOwner->fLink->StartMessage(AS_LAYER_GET_COORD);
@@ -3961,7 +3965,8 @@ BView::attachView(BView *view)
 
 	fOwner->fLink->Attach<int32>(_get_object_token_(view));
 	fOwner->fLink->AttachString(view->Name());
-	fOwner->fLink->Attach<BRect>(view->Frame());
+		// send view's frame. the next line replaces: fOwner->fLink->Attach<BRect>(view->Frame());
+	fOwner->fLink->Attach<BRect>(view->fBounds.OffsetToCopy(view->fParentOffset));
 	fOwner->fLink->Attach<uint32>(view->ResizingMode());
 	fOwner->fLink->Attach<uint32>(view->fEventMask);
 	fOwner->fLink->Attach<uint32>(view->fEventOptions);
