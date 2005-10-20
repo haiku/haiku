@@ -36,25 +36,18 @@ FTC_Manager ftmanager;
 	\param face FreeType handle for the font file after it is loaded - it will be kept open until the FontStyle is destroied
 */
 FontStyle::FontStyle(const char *filepath, FT_Face face)
+	: fFTFace(face),
+	  fFontFamily(NULL),
+	  fName(face->style_name),
+	  fPath(filepath),
+	  fBounds(0, 0, 0, 0),
+	  fID(0),
+	  fFace(TranslateStyleToFace(face->style_name))
 {
-	fFTFace = face;
-	fName=face->style_name;
-	cachedface=new CachedFaceRec;
-	cachedface->file_path=filepath;
-	family=NULL;
-	has_bitmaps=(face->num_fixed_sizes>0)?true:false;
-	is_fixedwidth=(face->face_flags & FT_FACE_FLAG_FIXED_WIDTH)?true:false;
-	is_scalable=(face->face_flags & FT_FACE_FLAG_SCALABLE)?true:false;
-	has_kerning=(face->face_flags & FT_FACE_FLAG_KERNING)?true:false;
-	glyphcount=face->num_glyphs;
-	charmapcount=face->num_charmaps;
-	tunedcount=face->num_fixed_sizes;
-	fPath=filepath;
-	fbounds.Set(0,0,0,0);
-	fFace=TranslateStyleToFace(face->style_name);
-	fID=0;
+//	cachedface = new CachedFaceRec;
+//	cachedface->file_path = filepath;
+
 	fHeight.ascent = face->ascender;
-	
 	// FT2's descent numbers are negative. Be's is positive
 	fHeight.descent = -face->descender;
 	
@@ -74,7 +67,10 @@ FontStyle::FontStyle(const char *filepath, FT_Face face)
 */
 FontStyle::~FontStyle()
 {
-	delete cachedface;
+// TODO: what was the purpose of this?
+//	delete cachedface;
+// TODO: figure out if it is safe to call this:
+//	FT_Done_Face(fFTFace);
 }
 
 /*!
@@ -197,14 +193,13 @@ FontFamily::~FontFamily()
 	\return The family's name
 */
 const char*
-FontFamily::Name()
+FontFamily::Name() const
 {
 	return fName.String();
 }
 
 /*!
 	\brief Adds the style to the family
-	\param path full path to the style's font file
 	\param face FreeType face handle used to obtain info about the font
 */
 bool
@@ -223,7 +218,7 @@ FontFamily::AddStyle(FontStyle *style)
 			return false;
 	}
 	
-	style->family=this;
+	style->fFontFamily = this;
 	
 	if (fStyles.CountItems() > 0) {
 		item = (FontStyle*)fStyles.ItemAt(fStyles.CountItems() - 1);
@@ -246,26 +241,23 @@ FontFamily::AddStyle(FontStyle *style)
 	\param style Name of the style to be removed from the family
 */
 void
-FontFamily::RemoveStyle(const char *style)
+FontFamily::RemoveStyle(const char* style)
 {
-	int32 count=fStyles.CountItems();
-	if(!style || count<1)
+	int32 count = fStyles.CountItems();
+	if (!style || count < 1)
 		return;
 
 	FontStyle *fs;
-	for(int32 i=0; i<count; i++)
-	{
-		fs=(FontStyle *)fStyles.ItemAt(i);
-		if(fs && fs->fName.Compare(style)==0)
-		{
-			fs=(FontStyle *)fStyles.RemoveItem(i);
-			if(fs)
-			{
+	for (int32 i = 0; i < count; i++) {
+		fs = (FontStyle*)fStyles.ItemAt(i);
+		if (fs && fs->fName.Compare(style) == 0) {
+			if (fStyles.RemoveItem((void*)fs)) {
 				delete fs;
 				RemoveDependent();
 				
 				// force a refresh if a request for font flags is needed
-				fFlags=-1;
+				fFlags = -1;
+				break;
 			}
 		}
 	}
@@ -276,10 +268,9 @@ FontFamily::RemoveStyle(const char *style)
 	\param style The style to be removed from the family
 */
 void
-FontFamily::RemoveStyle(FontStyle *style)
+FontFamily::RemoveStyle(FontStyle* style)
 {
-	if (fStyles.HasItem(style)) {
-		fStyles.RemoveItem(style);
+	if (fStyles.RemoveItem((void*)style)) {
 		RemoveDependent();
 		
 		// force a refresh if a request for font flags is needed

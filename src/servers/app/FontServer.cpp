@@ -32,14 +32,14 @@ FontServer *gFontServer = NULL;
 /*!
 	\brief Access function to request a face via the FreeType font cache
 */
-static FT_Error
+/*static FT_Error
 face_requester(FTC_FaceID face_id, FT_Library library,
 	FT_Pointer request_data, FT_Face *aface)
 { 
 	CachedFace face = (CachedFace) face_id;
 	return FT_New_Face(ftlib, face->file_path.String(), face->face_index,aface); 
 } 
-
+*/
 
 //	#pragma mark -
 
@@ -61,8 +61,8 @@ FontServer::FontServer(void)
 	these numbers in the future to maximize performance for your "average"
 	application.
 */
-	if (FTC_Manager_New(ftlib, 0, 0, 0, &face_requester, NULL, &ftmanager) != 0)
-		fInit = false;
+//	if (FTC_Manager_New(ftlib, 0, 0, 0, &face_requester, NULL, &ftmanager) != 0)
+//		fInit = false;
 }
 
 
@@ -257,11 +257,13 @@ FontServer::ScanDirectory(const char *directoryPath)
 
 			family = new FontFamily(face->family_name, fFamilies.CountItems());
 			fFamilies.AddItem(family);
-		}
-
-		if (family->HasStyle(face->style_name)) {
-			FT_Done_Face(face);
-			continue;
+		} else {
+			// prevent adding the same style twice
+			// (this indicates a problem with the installed fonts maybe?)
+			if (family->HasStyle(face->style_name)) {
+				FT_Done_Face(face);
+				continue;
+			}
 		}
 
 		#ifdef PRINT_FONT_LIST
@@ -274,6 +276,7 @@ FontServer::ScanDirectory(const char *directoryPath)
 
 		// FT_Face is kept open in FontStyle and will be unset in the
 		// FontStyle destructor
+		// TODO: nope, it is not (yet)
 	}
 
 	fNeedUpdate = true;
