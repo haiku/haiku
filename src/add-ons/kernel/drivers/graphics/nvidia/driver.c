@@ -1101,13 +1101,13 @@ free_hook (void* dev) {
 
 	/* disable and clear any pending interrupts */
 	disable_vbi(regs);
-	
-	/* remove interrupt handler */
-	remove_io_interrupt_handler(di->pcii.u.h0.interrupt_line, nv_interrupt, di);
 
-	/* delete the semaphores, ignoring any errors ('cause the owning team may have died on us) */
 	if (si->ps.int_assigned)
 	{
+		/* remove interrupt handler */
+		remove_io_interrupt_handler(di->pcii.u.h0.interrupt_line, nv_interrupt, di);
+
+		/* delete the semaphores, ignoring any errors ('cause the owning team may have died on us) */
 		delete_sem(si->vblank);
 		si->vblank = -1;
 	}
