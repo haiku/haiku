@@ -1854,8 +1854,16 @@ Layer::do_CopyBits(BRect& src, BRect& dst, int32 xOffset, int32 yOffset) {
 	// the region that is going to be copied
 	BRegion copyRegion(src);
 	// apply the current clipping of the layer
-
 	copyRegion.IntersectWith(&fVisible);
+	// don't scroll regions that are pending for
+	// (or already in) an update
+	// NOTE: this fixes the visible glitches that resulted from
+	// scrolling, but it brings up a new problem, which looks
+	// like the the client receives multiple update messages for
+	// the same area
+	// NOTE2: if you don't include both regions, it doesn't work
+	copyRegion.Exclude(&fOwner->CulmulatedUpdateRegion());
+	copyRegion.Exclude(&fOwner->RegionToBeUpdated());
 
 	// offset the region to the destination
 	// and apply the current clipping there as well
