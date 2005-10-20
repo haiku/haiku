@@ -1,14 +1,14 @@
 SubDir OBOS_TOP src add-ons translators ;
 
-SubInclude OBOS_TOP src add-ons translators bmptranslator ;
-SubInclude OBOS_TOP src add-ons translators giftranslator ;
-SubInclude OBOS_TOP src add-ons translators icotranslator ;
-SubInclude OBOS_TOP src add-ons translators jpegtranslator ;
-SubInclude OBOS_TOP src add-ons translators jpeg2000translator ;
-SubInclude OBOS_TOP src add-ons translators libtifftranslator ;
-SubInclude OBOS_TOP src add-ons translators pngtranslator ;
-SubInclude OBOS_TOP src add-ons translators ppmtranslator ;
-SubInclude OBOS_TOP src add-ons translators rtftranslator ;
-SubInclude OBOS_TOP src add-ons translators sgitranslator ;
-SubInclude OBOS_TOP src add-ons translators stxttranslator ;
-SubInclude OBOS_TOP src add-ons translators tgatranslator ;
+SubInclude OBOS_TOP src add-ons translators bmp ;
+SubInclude OBOS_TOP src add-ons translators gif ;
+SubInclude OBOS_TOP src add-ons translators ico ;
+SubInclude OBOS_TOP src add-ons translators jpeg ;
+SubInclude OBOS_TOP src add-ons translators jpeg2000 ;
+SubInclude OBOS_TOP src add-ons translators libtiff ;
+SubInclude OBOS_TOP src add-ons translators png ;
+SubInclude OBOS_TOP src add-ons translators ppm ;
+SubInclude OBOS_TOP src add-ons translators rtf ;
+SubInclude OBOS_TOP src add-ons translators sgi ;
+SubInclude OBOS_TOP src add-ons translators stxt ;
+SubInclude OBOS_TOP src add-ons translators tga ;

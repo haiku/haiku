@@ -1,0 +1,23 @@
+SubDir OBOS_TOP src add-ons translators gif ;
+
+Translator GIFTranslator :
+	# Main Source
+	GIFTranslator.cpp
+	GIFView.cpp
+	GIFWindow.cpp
+	Prefs.cpp
+
+	# Real Work
+	GIFLoad.cpp
+	LoadPalette.cpp
+	GIFSave.cpp
+	SavePalette.cpp
+	SFHash.cpp
+ ;
+
+LinkSharedOSLibs GIFTranslator : be translation ;
+
+Package haiku-translationkit-cvs :
+	GIFTranslator :
+	boot home config add-ons Translators ;
+

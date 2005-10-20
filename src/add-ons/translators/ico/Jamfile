@@ -1,0 +1,24 @@
+SubDir OBOS_TOP src add-ons translators ico ;
+
+# Include code from shared translator directory
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons translators shared ] ;
+
+Translator ICOTranslator :
+	# ICOTranslator classes
+	main.cpp
+	ICOTranslator.cpp
+	ConfigView.cpp
+	ICO.cpp
+
+	# shared classes
+	BaseTranslator.cpp
+	TranslatorSettings.cpp
+	TranslatorWindow.cpp
+	;
+
+LinkSharedOSLibs ICOTranslator : be translation ;
+
+Package haiku-translationkit-cvs :
+	ICOTranslator
+	: boot home config add-ons Translators
+	;

@@ -1,0 +1,27 @@
+SubDir OBOS_TOP src add-ons translators rtf ;
+
+# Include code from shared translator directory
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons translators shared ] ;
+
+# It's called RTF-Translator (with a dash) to differentiate it from the
+# RTFTranslator that comes with Gobe Productive (that doesn't support
+# STXT or plain text files output).
+
+Translator RTF-Translator :
+	# RTFTranslator classes
+	main.cpp
+	RTFTranslator.cpp
+	ConfigView.cpp
+	RTF.cpp
+	convert.cpp
+
+	# shared classes
+	TranslatorWindow.cpp
+	;
+
+LinkSharedOSLibs RTF-Translator : be translation ;
+
+Package haiku-translationkit-cvs :
+	RTF-Translator
+	: boot home config add-ons Translators
+	;
