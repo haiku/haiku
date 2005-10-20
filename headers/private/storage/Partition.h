@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  This software is part of the Haiku distribution and is covered 
+//  by the MIT license.
 //---------------------------------------------------------------------
 
 #ifndef _PARTITION_H
@@ -55,10 +55,10 @@ public:
 	status_t GetIcon(BBitmap *icon, icon_size which) const;
 	status_t GetMountPoint(BPath *mountPoint) const;
 
-	status_t Mount(const char *mountPoint = NULL, uint32 mountFlags = 0,
+	dev_t Mount(const char *mountPoint = NULL, uint32 mountFlags = 0,
 		const char *parameters = NULL);
 	status_t Unmount(uint32 unmountFlags = 0);
-	
+
 	// Hierarchy Info
 
 	BDiskDevice *Device() const;

@@ -1,7 +1,7 @@
 /*
-** Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /**	Mounts a volume with the specified file system */
 
@@ -33,7 +33,7 @@ main(int argc, char **argv)
 	const char *parameter = NULL;
 	const char *fs = NULL;
 	struct stat mountStat;
-	status_t status;
+	dev_t device;
 	uint32 flags = 0;
 
 	/* prettify the program name */
@@ -77,9 +77,9 @@ main(int argc, char **argv)
 
 	/* do the work */
 
-	status = fs_mount_volume(mountPoint, device, fs, flags, parameter);
-	if (status != B_OK) {
-		fprintf(stderr, "%s: %s\n", programName, strerror(status));
+	device = fs_mount_volume(mountPoint, device, fs, flags, parameter);
+	if (device < B_OK) {
+		fprintf(stderr, "%s: %s\n", programName, strerror(device));
 		return -1;
 	}
 	return 0;

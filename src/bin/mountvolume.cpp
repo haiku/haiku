@@ -143,7 +143,7 @@ struct MountVisitor : public BDiskDeviceVisitor {
 			status_t error = partition->Mount(NULL,
 				(readOnly ? B_MOUNT_READ_ONLY : 0));
 			if (!silent) {
-				if (error == B_OK) {
+				if (error >= B_OK) {
 					printf("Volume `%s' mounted successfully.\n", name);
 				} else {
 					fprintf(stderr, "Failed to mount volume `%s': %s\n",

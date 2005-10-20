@@ -474,7 +474,7 @@ BPartition::GetMountPoint(BPath *mountPoint) const
 	\param parameters File system specific mount parameters.
 	\return \c B_OK, if everything went fine, another error code otherwise.
 */
-status_t
+dev_t
 BPartition::Mount(const char *mountPoint, uint32 mountFlags,
 	const char *parameters)
 {
@@ -506,14 +506,14 @@ BPartition::Mount(const char *mountPoint, uint32 mountFlags,
 	}
 
 	// mount the partition
-	error = fs_mount_volume(mountPoint, partitionPath.Path(), NULL, mountFlags,
-		parameters);
+	dev_t device = fs_mount_volume(mountPoint, partitionPath.Path(), NULL,
+		mountFlags, parameters);
 
 	// delete the mount point on error, if we created it
-	if (error != B_OK && deleteMountPoint)
+	if (device < B_OK && deleteMountPoint)
 		rmdir(mountPoint);
 
-	return error;
+	return device;
 }
 
 // Unmount
