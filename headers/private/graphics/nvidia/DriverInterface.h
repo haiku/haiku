@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-9/2005.
+	Rudolf Cornelissen 10/2002-10/2005.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -297,6 +297,7 @@ typedef struct {
 			uint8 adress;			/* I2C adress on which TVout chip resides */
 		} tv_encoder;
 		uint8 monitors;				/* output devices connection matrix */
+		bool int_assigned;			/* card has a useable INT assigned to it */
 		status_t pins_status;		/* B_OK if read correctly, B_ERROR if faked */
 
 		/* PINS */
