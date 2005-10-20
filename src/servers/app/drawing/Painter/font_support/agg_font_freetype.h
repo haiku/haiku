@@ -126,7 +126,6 @@ namespace agg
         bool            m_flip_y;
         bool            m_library_initialized;
         FT_Library      m_library;    // handle to library    
-        FT_Face*        m_faces;      // A pool of font faces
         unsigned*       m_face_ids; 
         unsigned        m_num_faces;
         unsigned        m_max_faces;

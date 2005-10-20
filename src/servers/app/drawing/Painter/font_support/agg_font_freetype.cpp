@@ -417,7 +417,6 @@ namespace agg
     font_engine_freetype_base::~font_engine_freetype_base()
     {
         delete [] m_face_ids;
-        delete [] m_faces;
         delete [] m_signature;
     }
 
@@ -437,7 +436,6 @@ namespace agg
         m_hinting(true),
         m_flip_y(false),
         m_library(library),
-        m_faces(new FT_Face [max_faces]),
         m_face_ids(new unsigned [max_faces]),
         m_num_faces(0),
         m_max_faces(max_faces),
@@ -503,25 +501,21 @@ namespace agg
         int idx = find_face(font.GetFamilyAndStyle());
         if(idx >= 0)
         {
-            m_cur_face = m_faces[idx];
+            m_cur_face = font.GetFTFace();
             m_cur_id   = m_face_ids[idx];
         }
         else
         {
             if(m_num_faces >= m_max_faces)
             {
-                memcpy(m_faces, 
-                       m_faces + 1, 
-                       (m_max_faces - 1) * sizeof(FT_Face));
                 memcpy(m_face_ids, 
                        m_face_ids + 1, 
                        (m_max_faces - 1) * sizeof(unsigned));
                 m_num_faces = m_max_faces - 1;
             }
 
-	        m_faces[m_num_faces] = font.GetFTFace();
             m_face_ids[m_num_faces] = font.GetFamilyAndStyle();
-            m_cur_face = m_faces[m_num_faces];
+            m_cur_face = font.GetFTFace();
             m_cur_id   = m_face_ids[m_num_faces];
             ++m_num_faces;
         }
