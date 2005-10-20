@@ -70,6 +70,7 @@ AGGTextRenderer::AGGTextRenderer()
 	  fKerning(true),
 	  fEmbeddedTransformation(),
 
+	  fFont(),
 	  fLastFamilyAndStyle(0),
 	  fLastPointSize(-1.0),
 	  fLastHinted(false)
@@ -111,6 +112,7 @@ AGGTextRenderer::SetFont(const ServerFont &font)
 
 	fLastFamilyAndStyle = font.GetFamilyAndStyle();
 	fEmbeddedTransformation = transform;
+	fFont = font;
 
 	_UpdateSizeAndHinting(font.Size(), fEmbeddedTransformation.IsIdentity() && fHinted, load);
 

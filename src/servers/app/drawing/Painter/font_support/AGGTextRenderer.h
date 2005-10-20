@@ -80,6 +80,7 @@ class AGGTextRenderer {
 	Transformable				fEmbeddedTransformation;	// rotated or sheared font?
 
 	// caching to avoid loading a font unnecessarily
+	ServerFont					fFont;
 	uint32						fLastFamilyAndStyle;
 	float						fLastPointSize;
 	bool						fLastHinted;
