@@ -509,10 +509,43 @@ set_alarm(bigtime_t time, uint32 mode)
 }
 
 
+/**	Replace the current signal block mask and wait for any event to happen.
+ *	Before returning, the original signal block mask is reinstantiated.
+ */
+
 int
 sigsuspend(const sigset_t *mask)
 {
-	return B_OK;
+	struct thread *thread = thread_get_current_thread();
+	sigset_t oldMask = atomic_get(&thread->sig_block_mask);
+	cpu_status state;
+
+	// set the new block mask and suspend ourselves - we cannot use
+	// SIGSTOP for this, as signals are only handled upon kernel exit
+
+	atomic_set(&thread->sig_block_mask, *mask);
+
+	while (true) {
+		thread->next_state = B_THREAD_SUSPENDED;
+
+		state = disable_interrupts();
+		GRAB_THREAD_LOCK();
+
+		scheduler_reschedule();
+
+		RELEASE_THREAD_LOCK();
+		restore_interrupts(state);
+
+		if (has_signals_pending(thread))
+			break;
+	}
+
+	// restore the original block mask
+	atomic_set(&thread->sig_block_mask, oldMask);
+
+	// we're not supposed to actually succeed
+	// ToDo: could this get us into trouble with SA_RESTART handlers?
+	return B_INTERRUPTED;
 }
 
 
