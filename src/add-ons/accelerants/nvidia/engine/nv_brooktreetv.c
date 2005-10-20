@@ -614,8 +614,7 @@ static uint8 BT_init_NTSC720()
 
 	if (si->ps.tv_encoder.type >= CX25870)//set CX value
 	{
-		/* confirmed on NV11 using 4:3 TV */
-		//fixme: checkout wstv.. (was 0x28)
+		/* confirmed on NV11 using 4:3 TV and 16:9 TV */
 		buffer[7] = 0x0c;	//scope: tuned. lsb h_blank_o: h_blank_o = horizontal viewport location on TV
 							//(guideline for initial setting: (h_blank_o / h_clk_0) * 63.55556uS = 9.5uS for NTSC)
 	}
@@ -715,8 +714,7 @@ static uint8 BT_init_PAL800_OS()
 
 	if (si->ps.tv_encoder.type >= CX25870)//set CX value
 	{
-		/* confirmed on NV11 using 4:3 TV */
-		//fixme: checkout wstv.. (was 0xf4)
+		/* confirmed on NV11 using 4:3 TV and 16:9 TV */
 		buffer[7] = 0xf0;
 		buffer[8] = 0x17;
 	}
@@ -737,7 +735,7 @@ static uint8 BT_init_PAL800_OS()
 
 	if (si->ps.tv_encoder.type >= CX25870)//set CX value
 		buffer[13] = 0x20;
-	else				//set BT value
+	else //set BT value
 		buffer[13] = 0x14;//try-out; lsb h_blank_i: #clks between start sync and new line 1st pixel; copy to VGA delta-sync!
 
 	buffer[14] = 0x03;		//b2-0 = msn h_clk_i;
@@ -829,7 +827,7 @@ static uint8 BT_init_NTSC640_OS()
 
 	if (si->ps.tv_encoder.type >= CX25870)//set CX value
 		buffer[8] = 0x1d;
-	else				//set BT value
+	else //set BT value
 		buffer[8] = 0x1c;//try-out; scope: checked against other modes, looks OK.	v_blank_o: 1e active line ('pixel')
 
 	buffer[9] = 0xf2;		//v_active_o: = (active output lines + 2) / field (on TV)
@@ -1061,7 +1059,6 @@ static uint8 BT_setup_hphase(uint8 mode)
 	{
 	case NTSC640_TST:
 	case NTSC640:
-		//fixme if needed (subtracted 0x07 for BT)..
 		if (si->ps.tv_encoder.type >= CX25870) hoffset +=8; //if CX shift picture right some more... 
 		/* confirmed on TNT1 with BT869 using 4:3 TV and 16:9 TV */
 		buffer[3] = (0x1e + hoffset);	//set horizontal sync offset
@@ -1542,8 +1539,7 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 		}
 		else
 		{
-			/* confirmed on TNT1 using 4:3 TV */
-			//fixme: checkout wstv..
+			/* confirmed on NV11 using 4:3 TV and 16:9 TV */
 			target->timing.h_sync_start = 848;		//set for centered TV output
 			target->timing.h_sync_end = 848+20;		//delta is BT H_BLANKI
 		}
@@ -1565,8 +1561,7 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 		}
 		else
 		{
-			/* confirmed on NV11 using 4:3 TV */
-			//fixme: checkout wstv (was 744)..
+			/* confirmed on NV11 using 4:3 TV and 16:9 TV */
 			target->timing.h_sync_start = 728;		//do not change!
 			target->timing.h_sync_end = 728+160;	//delta is H_sync_pulse
 		}
