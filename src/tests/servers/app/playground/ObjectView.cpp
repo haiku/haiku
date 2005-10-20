@@ -90,7 +90,10 @@ void
 ObjectView::MouseDown(BPoint where)
 {
 	uint32 buttons;
+	int32 clicks;
 	Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
+	Window()->CurrentMessage()->FindInt32("clicks", &clicks);
+printf("ObjectView::MouseDown() - clicks: %ld\n", clicks);
 	fScrolling = buttons & B_SECONDARY_MOUSE_BUTTON;
 
 	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);

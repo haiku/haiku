@@ -44,7 +44,7 @@ enum {
 // constructor
 ObjectWindow::ObjectWindow(BRect frame, const char* name)
 	: BWindow(frame, name, B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-			  B_ASYNCHRONOUS_CONTROLS)
+			  B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
 //	: BWindow(frame, name, B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 //			  B_ASYNCHRONOUS_CONTROLS)
 //	: BWindow(frame, name, B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,

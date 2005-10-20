@@ -1,3 +1,0 @@
-For the test to run properly on BeOS, you need to make links to some Haiku libs in your ~/config/lib folder. The test itself links to libopenbeos.so, app_server additionally links to libappserver.so, libz.so, libpng.so and libfreetype.so.
-
-The script "run" launches the Haiku app_server and a second later the test app which connects to it.
