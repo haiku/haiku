@@ -711,6 +711,13 @@ Journal::Lock(Transaction *owner)
 
 	fOwner = owner;
 
+	// ToDo: we need a way to find out how big the current transaction is;
+	//	we need to be able to either detach the latest sub transaction on
+	//	demand, as well as having some kind of fall back plan in case the
+	//	sub transaction itself grows bigger than the log.
+	//	For that, it would be nice to have some call-back interface in the
+	//	cache transaction API...
+
 	if (fUnwrittenTransactions > 0) {
 		// start a sub transaction
 		cache_start_sub_transaction(fVolume->BlockCache(), fTransactionID);
