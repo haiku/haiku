@@ -33,7 +33,7 @@ main(int argc, char **argv)
 	const char *parameter = NULL;
 	const char *fs = NULL;
 	struct stat mountStat;
-	dev_t device;
+	dev_t volume;
 	uint32 flags = 0;
 
 	/* prettify the program name */
@@ -77,9 +77,9 @@ main(int argc, char **argv)
 
 	/* do the work */
 
-	device = fs_mount_volume(mountPoint, device, fs, flags, parameter);
-	if (device < B_OK) {
-		fprintf(stderr, "%s: %s\n", programName, strerror(device));
+	volume = fs_mount_volume(mountPoint, device, fs, flags, parameter);
+	if (volume < B_OK) {
+		fprintf(stderr, "%s: %s\n", programName, strerror(volume));
 		return -1;
 	}
 	return 0;
