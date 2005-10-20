@@ -612,8 +612,19 @@ static uint8 BT_init_NTSC720()
 	// 6. Modify the RIVA (BeScreen) h_sync_start setting somewhat to get stable centered picture possible on TV AND!:
 	// 7. Make sure you update the Chrontel horizontal Phase setting also then!
 
-	buffer[7] = 0x28;	//scope: tuned. lsb h_blank_o: h_blank_o = horizontal viewport location on TV
-						//(guideline for initial setting: (h_blank_o / h_clk_0) * 63.55556uS = 9.5uS for NTSC)
+	if (si->ps.tv_encoder.type >= CX25870)//set CX value
+	{
+		/* confirmed on NV11 using 4:3 TV */
+		//fixme: checkout wstv.. (was 0x28)
+		buffer[7] = 0x0c;	//scope: tuned. lsb h_blank_o: h_blank_o = horizontal viewport location on TV
+							//(guideline for initial setting: (h_blank_o / h_clk_0) * 63.55556uS = 9.5uS for NTSC)
+	}
+	else //set BT value
+	{
+		/* confirmed on TNT1 using 4:3 TV and 16:9 TV */
+		buffer[7] = 0x28;	//scope: tuned. lsb h_blank_o: h_blank_o = horizontal viewport location on TV
+							//(guideline for initial setting: (h_blank_o / h_clk_0) * 63.55556uS = 9.5uS for NTSC)
+	}
 	buffer[8] = 0x18;	//try-out; scope: checked against other modes, looks OK.	v_blank_o: 1e active line ('pixel')
 
 	buffer[9] = 0xf2;		//v_active_o: = (active output lines + 2) / field (on TV)
@@ -704,12 +715,13 @@ static uint8 BT_init_PAL800_OS()
 
 	if (si->ps.tv_encoder.type >= CX25870)//set CX value
 	{
-		//fixme if needed: (added 0x10 for BT)..
-		buffer[7] = 0xf4;
+		/* confirmed on NV11 using 4:3 TV */
+		//fixme: checkout wstv.. (was 0xf4)
+		buffer[7] = 0xf0;
 		buffer[8] = 0x17;
 	}
-	else
-	{	//set BT value
+	else //set BT value
+	{
 		/* confirmed on TNT1 using 4:3 TV and 16:9 TV */
 		buffer[7] = 0xd0;//scope: tuned. lsb h_blank_o: h_blank_o = horizontal viewport location on TV
 						//(guideline for initial setting: (h_blank_o / h_clk_0) * 64.0uS = 10.0uS for PAL)
@@ -1530,7 +1542,8 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 		}
 		else
 		{
-			//fixme if needed (added 8 for BT)..
+			/* confirmed on TNT1 using 4:3 TV */
+			//fixme: checkout wstv..
 			target->timing.h_sync_start = 848;		//set for centered TV output
 			target->timing.h_sync_end = 848+20;		//delta is BT H_BLANKI
 		}
@@ -1544,8 +1557,19 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 	case NTSC720:
 		/* (tested on TNT2 with BT869) */
 		target->timing.h_display = 720;			//H_ACTIVE
-		target->timing.h_sync_start = 744;		//do not change!
-		target->timing.h_sync_end = 744+144;	//delta is H_sync_pulse
+		if (si->ps.tv_encoder.type <= BT869)
+		{
+			/* confirmed on TNT1 using 4:3 TV and 16:9 TV */
+			target->timing.h_sync_start = 744;		//do not change!
+			target->timing.h_sync_end = 744+144;	//delta is H_sync_pulse
+		}
+		else
+		{
+			/* confirmed on NV11 using 4:3 TV */
+			//fixme: checkout wstv (was 744)..
+			target->timing.h_sync_start = 728;		//do not change!
+			target->timing.h_sync_end = 728+160;	//delta is H_sync_pulse
+		}
 		target->timing.h_total = 888;			//BT H_TOTAL
 		target->timing.v_display = 480;			//V_ACTIVEI
 		target->timing.v_sync_start = 490;		//set for centered sync pulse
@@ -1581,27 +1605,24 @@ static status_t BT_start_tvout(void)
 	set_crtc_owner(0);
 
 	/* CAUTION:
-	 * On the TNT1, TV_SETUP and PLLSEL cannot be read (sometimes), but
-	 * write actions do succeed ... (tested on both ISA and PCI bus!) */
+	 * On old cards, PLLSEL (and TV_SETUP?) cannot be read (sometimes?), but
+	 * write actions do succeed ...
+	 * This is confirmed for both ISA and PCI access, on NV04 and NV11. */
 
 	/* setup TVencoder connection */
 	/* b1-0 = %01: encoder type is MASTER;
 	 * b24 = 1: VIP datapos is b0-7 */
 	//fixme if needed: setup completely instead of relying on pre-init by BIOS..
-	//(it seems to work OK on TNT1 although read reg. doesn't seem to work)
+	//(it seems to work OK on NV04 and NV11 although read reg. doesn't seem to work)
 	DACW(TV_SETUP, ((DACR(TV_SETUP) & ~0x00000002) | 0x01000001));
 
 	/* tell GPU to use pixelclock from TVencoder instead of using internal source */
 	/* (nessecary or display will 'shiver' on both TV and VGA.) */
 	if (si->ps.secondary_head)
-	{
-		DACW(PLLSEL, (DACR(PLLSEL) | 0x00030000));
-	}
+		//fixme: assuming TVout is on primary head!!
+		DACW(PLLSEL, 0x20030f00);
 	else
-	{
-		/* confirmed PLLSEL to be a write-only register on TNT1! */
 		DACW(PLLSEL, 0x00030700);
-	}
 
 	/* Set overscan color to 'black' */
 	/* note:
@@ -1655,20 +1676,23 @@ status_t BT_stop_tvout(void)
 	/* set CRTC to master mode (b7 = 0) if it wasn't slaved for a panel before */
 	if (!(si->ps.slaved_tmds1))	CRTCW(PIXEL, (CRTCR(PIXEL) & 0x03));
 
-	//fixme: checkout...
-	//CAUTION:
-	//On the TNT1, these memadresses apparantly cannot be read (sometimes)!;
-	//write actions do succeed though... (tested only on ISA bus yet..)
+	/* CAUTION:
+	 * On old cards, PLLSEL (and TV_SETUP?) cannot be read (sometimes?), but
+	 * write actions do succeed ...
+	 * This is confirmed for both ISA and PCI access, on NV04 and NV11. */
 
 	/* setup TVencoder connection */
 	/* b1-0 = %00: encoder type is SLAVE;
 	 * b24 = 1: VIP datapos is b0-7 */
 	//fixme if needed: setup completely instead of relying on pre-init by BIOS..
+	//(it seems to work OK on NV04 and NV11 although read reg. doesn't seem to work)
 	DACW(TV_SETUP, ((DACR(TV_SETUP) & ~0x00000003) | 0x01000000));
 
 	/* tell GPU to use pixelclock from internal source instead of using TVencoder */
-	DACW(PLLSEL, 0x10000700);
-	if (si->ps.secondary_head) DACW(PLLSEL, (DACR(PLLSEL) | 0x20000800));
+	if (si->ps.secondary_head)
+		DACW(PLLSEL, 0x30000f00);
+	else
+		DACW(PLLSEL, 0x10000700);
 
 	/* HTOTAL, VTOTAL and OVERFLOW return their default CRTC use, instead of
 	 * H, V-low and V-high 'shadow' counters(?)(b0, 4 and 6 = 0) (b7 use = unknown) */
@@ -1771,8 +1795,8 @@ status_t BT_setmode(display_mode target)
 	/* setup GPU CRTC timing */
 	head1_set_timing(tv_target);
 
-//fixme: only testing singlehead cards for now...
-if (si->ps.secondary_head)
+//fixme: only testing older cards for now...
+if (si->ps.secondary_head && (si->ps.card_type > NV15))
 {
 	BT_testsignal();
 	return B_OK;

@@ -1341,8 +1341,11 @@ static status_t nv_general_bios_to_powergraphics()
 	if (si->ps.secondary_head) DAC2W(GENCTRL, 0x00100100);
 
 	/* enable programmable PLLs */
-	DACW(PLLSEL, 0x10000700);
-	if (si->ps.secondary_head) DACW(PLLSEL, (DACR(PLLSEL) | 0x20000800));
+	/* (confirmed PLLSEL to be a write-only register on NV04 and NV11!) */
+	if (si->ps.secondary_head)
+		DACW(PLLSEL, 0x30000f00);
+	else
+		DACW(PLLSEL, 0x10000700);
 
 	/* turn on DAC and make sure detection testsignal routing is disabled
 	 * (b16 = disable DAC,
