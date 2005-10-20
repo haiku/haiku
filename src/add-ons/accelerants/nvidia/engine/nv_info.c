@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-9/2005
+   Rudolf Cornelissen 7/2003-10/2005
 */
 
 #define MODULE_BIT 0x00002000
