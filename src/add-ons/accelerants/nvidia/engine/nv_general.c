@@ -91,13 +91,13 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.57 running.\n"));
+
 	/* log VBLANK INT usability status */
 	if (si->ps.int_assigned)
 		LOG(4,("POWERUP: Usable INT assigned to HW; Vblank semaphore enabled\n"));
 	else
 		LOG(4,("POWERUP: No (usable) INT assigned to HW; Vblank semaphore disabled\n"));
-
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.56 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;

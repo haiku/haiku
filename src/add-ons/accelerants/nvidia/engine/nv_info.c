@@ -3051,63 +3051,38 @@ static void getstrap_arch_nv10_20_30_40(void)
 	uint32 dev_manID = CFGR(DEVID);
 	uint32 strapinfo = NV_REG32(NV32_NVSTRAPINFO2);
 
+	/* determine if we have a dualhead card */
+	si->ps.secondary_head = false;
+	switch (si->ps.card_type)
+	{
+	case NV04:
+	case NV05:
+	case NV05M64:
+	case NV06:
+	case NV10:
+	case NV15:
+	case NV20:
+		break;
+	default:
+		if ((dev_manID & 0xfff0ffff) == 0x01a010de)
+		{
+			/* this is a singlehead NV11! */
+		}
+		else
+		{
+			si->ps.secondary_head = true;
+		}
+	}
+
 	/* determine PLL reference crystal frequency: three types are used... */
 	if (strapinfo & 0x00000040)
 		si->ps.f_ref = 14.31818;
 	else
 		si->ps.f_ref = 13.50000;
 
-	switch (dev_manID & 0xfff0ffff)
+	if ((si->ps.secondary_head) && (si->ps.card_type != NV11))
 	{
-	/* Nvidia cards: */
-	case 0x004010de:
-	case 0x00c010de:
-	case 0x00f010de:
-	case 0x014010de:
-	case 0x017010de:
-	case 0x018010de:
-	case 0x01f010de:
-	case 0x025010de:
-	case 0x028010de:
-	case 0x030010de:
-	case 0x031010de:
-	case 0x032010de:
-	case 0x033010de:
-	case 0x034010de:
-	/* Varisys cards: */
-	case 0x35001888:
 		if (strapinfo & 0x00400000) si->ps.f_ref = 27.00000;
-		break;
-	default:
-		break;
-	}
-
-	/* determine if we have a dualhead card */
-	switch (dev_manID & 0xfff0ffff)
-	{
-	/* Nvidia cards: */
-	case 0x004010de:
-	case 0x00c010de:
-	case 0x00f010de:
-	case 0x011010de:
-	case 0x014010de:
-	case 0x017010de:
-	case 0x018010de:
-	case 0x01f010de:
-	case 0x025010de:
-	case 0x028010de:
-	case 0x030010de:
-	case 0x031010de:
-	case 0x032010de:
-	case 0x033010de:
-	case 0x034010de:
-	/* Varisys cards: */
-	case 0x35001888:
-		si->ps.secondary_head = true;
-		break;
-	default:
-		si->ps.secondary_head = false;
-		break;
 	}
 }
 
