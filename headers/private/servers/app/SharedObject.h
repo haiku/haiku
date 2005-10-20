@@ -40,16 +40,22 @@
 	possible to ensure that a shared resource is not deleted if something else
 	needs it. How the dependency tracking is done largely depends on the child class.
 */
-class SharedObject
-{
-public:
-	SharedObject(void) { dependents=0; }
-	virtual ~SharedObject(void){}
-	virtual void AddDependent(void) { dependents++; }
-	virtual void RemoveDependent(void) { dependents--; }
-	virtual bool HasDependents(void) { return (dependents>0)?true:false; }
-private:
-	uint32 dependents;
+class SharedObject {
+ public:
+							SharedObject()
+								: fReferenceCount(0)
+								{}
+	virtual					~SharedObject()
+								{}
+
+	virtual	void			AddDependent()
+								{ fReferenceCount++; }
+	virtual	void			RemoveDependent()
+								{ fReferenceCount--; }
+	virtual	bool			HasDependents()
+								{ return (fReferenceCount > 0); }
+ private:
+			uint32			fReferenceCount;
 };
 
 #endif
