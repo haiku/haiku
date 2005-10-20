@@ -4,7 +4,7 @@
  *
  * Authors:
  *              DarkWyrm <bpmagic@columbus.rr.com>
- *              Jérôme Duval, jerome.duval@free.fr
+ *              JÃ©rÃ´me Duval, jerome.duval@free.fr
  */
 
 #ifndef SERVERFONT_H_
