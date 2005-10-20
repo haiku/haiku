@@ -9,15 +9,14 @@
 
 #include <OS.h>
 #include <KernelExport.h>
+
 #include <debug.h>
-#include <debugger.h>
 #include <thread.h>
 #include <team.h>
-#include <int.h>
 #include <sem.h>
 #include <ksignal.h>
-#include <syscalls.h>
 #include <user_debugger.h>
+#include <kernel.h>
 
 #include <stddef.h>
 #include <string.h>
@@ -51,12 +50,12 @@ notify_debugger(struct thread *thread, int signal, struct sigaction *handler,
 
 	// first check the ignore signal masks the debugger specified for the thread
 
-	if (thread->debug_info.ignore_signals_once & signalMask) {
+	if (atomic_get(&thread->debug_info.ignore_signals_once) & signalMask) {
 		atomic_and(&thread->debug_info.ignore_signals_once, ~signalMask);
 		return true;
 	}
 
-	if (thread->debug_info.ignore_signals & signalMask)
+	if (atomic_get(&thread->debug_info.ignore_signals) & signalMask)
 		return true;
 
 	// deliver the event
@@ -510,6 +509,26 @@ set_alarm(bigtime_t time, uint32 mode)
 }
 
 
+int
+sigsuspend(const sigset_t *mask)
+{
+	return B_OK;
+}
+
+
+int
+sigpending(sigset_t *set)
+{
+	struct thread *thread = thread_get_current_thread();
+
+	if (set == NULL)
+		return B_BAD_VALUE;
+
+	*set = atomic_get(&thread->sig_pending);	
+	return B_OK;
+}
+
+
 //	#pragma mark -
 
 
@@ -572,27 +591,35 @@ _user_sigaction(int signal, const struct sigaction *userAction, struct sigaction
 
 
 int
-_user_sigsuspend(const sigset_t *mask)
+_user_sigsuspend(const sigset_t *userMask)
 {
-	sigset_t set;
-	if (mask == NULL)
-		return B_BAD_VALUE;
+	sigset_t mask;
 
-	if (user_memcpy(&set, mask, sizeof(sigset_t)) < B_OK)
+	if (userMask == NULL)
+		return B_BAD_VALUE;
+	if (user_memcpy(&mask, userMask, sizeof(sigset_t)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	// ToDo: implement
-	return B_ERROR;	
+	return sigsuspend(&mask);
 }
 
 
 int
-_user_sigpending(sigset_t *set)
+_user_sigpending(sigset_t *userSet)
 {
-	if (set == NULL)
-		return B_BAD_VALUE;
+	sigset_t set;
+	int status;
 
-	// ToDo: implement
-	return B_ERROR;
+	if (userSet == NULL)
+		return B_BAD_VALUE;
+	if (!IS_USER_ADDRESS(userSet))
+		return B_BAD_ADDRESS;
+
+	status = sigpending(&set);
+	if (status == B_OK
+		&& user_memcpy(userSet, &set, sizeof(sigset_t)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return status;
 }
 
