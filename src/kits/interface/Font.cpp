@@ -369,6 +369,7 @@ BFont::BFont(const BFont &font)
 	fSpacing = font.fSpacing;
 	fEncoding = font.fEncoding;
 	fFace = font.fFace;
+	fFlags = font.fFlags;
 	fHeight = font.fHeight;
 }
 
@@ -384,6 +385,7 @@ BFont::BFont(const BFont *font)
 		fSpacing = font->fSpacing;
 		fEncoding = font->fEncoding;
 		fFace = font->fFace;
+		fFlags = font->fFlags;
 		fHeight = font->fHeight;
 	} else {
 		fFamilyID = be_plain_font->fFamilyID;
@@ -394,6 +396,7 @@ BFont::BFont(const BFont *font)
 		fSpacing = be_plain_font->fSpacing;
 		fEncoding = be_plain_font->fEncoding;
 		fFace = be_plain_font->fFace;
+		fFlags = be_plain_font->fFlags;
 		fHeight = be_plain_font->fHeight;
 	}
 }
@@ -1204,6 +1207,7 @@ BFont
 	fEncoding = font.fEncoding;
 	fFace = font.fFace;
 	fHeight = font.fHeight;
+	fFlags = font.fFlags;
 	return *this;
 }
 
