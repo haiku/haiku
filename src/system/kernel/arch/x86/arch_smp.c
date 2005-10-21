@@ -53,8 +53,8 @@ i386_timer_interrupt(void *data)
 static int32
 i386_ici_interrupt(void *data)
 {
-	// gin-u-wine inter-cpu interrupt
-//	dprintf("inter-cpu interrupt on cpu %d\n", arch_smp_get_current_cpu());
+	// genuine inter-cpu interrupt
+	TRACE(("inter-cpu interrupt on cpu %d\n", smp_get_current_cpu()));
 	arch_smp_ack_interrupt();
 
 	return smp_intercpu_int_handler();
@@ -65,7 +65,7 @@ static int32
 i386_spurious_interrupt(void *data)
 {
 	// spurious interrupt
-//	dprintf("spurious interrupt on cpu %d\n", arch_smp_get_current_cpu());
+	TRACE(("spurious interrupt on cpu %d\n", smp_get_current_cpu()));
 	arch_smp_ack_interrupt();
 
 	return B_HANDLED_INTERRUPT;
@@ -76,7 +76,7 @@ static int32
 i386_smp_error_interrupt(void *data)
 {
 	// smp error interrupt
-	TRACE(("smp error interrupt on cpu %d\n", arch_smp_get_current_cpu()));
+	TRACE(("smp error interrupt on cpu %d\n", smp_get_current_cpu()));
 	arch_smp_ack_interrupt();
 
 	return B_HANDLED_INTERRUPT;
@@ -255,8 +255,8 @@ arch_smp_set_apic_timer(bigtime_t relativeTimeout)
 	config = apic_read(APIC_LVTT) & ~APIC_LVTT_M; // unmask the timer
 	apic_write(APIC_LVTT, config);
 
-	TRACE(("arch_smp_set_apic_timer: config 0x%x, timeout %Ld, tics/sec %d, tics %d\n",
-		config, relative_timeout, apic_timer_tics_per_sec, ticks));
+	TRACE(("arch_smp_set_apic_timer: config 0x%lx, timeout %Ld, tics/sec %d, tics %lu\n",
+		config, relativeTimeout, apic_timer_tics_per_sec, ticks));
 
 	apic_write(APIC_ICRT, ticks); // start it up
 
