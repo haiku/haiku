@@ -945,10 +945,6 @@ thread_exit(void)
 				groupDeadSem = team->group->dead_child_sem;
 			}
 
-			// remember how long this team lasted
-			parent->dead_children.kernel_time += team->dead_threads_kernel_time;
-			parent->dead_children.user_time += team->dead_threads_user_time;
-
 			team_remove_team(team, &freeGroup);
 		}
 		RELEASE_TEAM_LOCK();

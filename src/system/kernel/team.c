@@ -745,6 +745,14 @@ delete_team_struct(struct team *team)
 void
 team_remove_team(struct team *team, struct process_group **_freeGroup)
 {
+	struct team *parent = team->parent;
+
+	// remember how long this team lasted
+	parent->dead_children.kernel_time += team->dead_threads_kernel_time
+		+ team->dead_children.kernel_time;
+	parent->dead_children.user_time += team->dead_threads_user_time
+		+ team->dead_children.user_time;
+
 	hash_remove(team_hash, team);
 	sUsedTeams--;
 
@@ -756,8 +764,8 @@ team_remove_team(struct team *team, struct process_group **_freeGroup)
 	// remove us from our process group
 	remove_team_from_group(team, _freeGroup);
 
-	// remove us from our parent 
-	remove_team_from_parent(team->parent, team);
+	// remove us from our parent
+	remove_team_from_parent(parent, team);
 }
 
 
