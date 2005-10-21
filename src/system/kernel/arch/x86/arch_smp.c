@@ -255,7 +255,7 @@ arch_smp_set_apic_timer(bigtime_t relativeTimeout)
 	config = apic_read(APIC_LVTT) & ~APIC_LVTT_M; // unmask the timer
 	apic_write(APIC_LVTT, config);
 
-	TRACE(("arch_smp_set_apic_timer: config 0x%lx, timeout %Ld, tics/sec %d, tics %lu\n",
+	TRACE(("arch_smp_set_apic_timer: config 0x%lx, timeout %Ld, tics/sec %lu, tics %lu\n",
 		config, relativeTimeout, apic_timer_tics_per_sec, ticks));
 
 	apic_write(APIC_ICRT, ticks); // start it up
