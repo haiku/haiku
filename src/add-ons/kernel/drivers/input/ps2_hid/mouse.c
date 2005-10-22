@@ -206,9 +206,9 @@ ps2_mouse_read(mouse_movement *userMovement)
 	if (status < B_OK)
 		return status;
 
-	if (packet_buffer_read(sMouseBuffer, packet, sPacketSize) < (size_t)sPacketSize) {
+	if (packet_buffer_read(sMouseBuffer, packet, sPacketSize) != (ssize_t)sPacketSize) {
 		TRACE(("error copying buffer\n"));
-		return status;
+		return B_ERROR;
 	}
 	
 	if (!(packet[0] & 8))
