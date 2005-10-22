@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-6/2005.
+	Rudolf Cornelissen 10/2002-10/2005.
 */
 
 #define MODULE_BIT 0x00800000
@@ -40,8 +40,8 @@ static status_t init_common(int the_fd) {
 	// LOG is now available, si !NULL
 	LOG(4,("init_common: logmask 0x%08x, memory %dMB, hardcursor %d, usebios %d, switchhead %d, force_pci %d\n",
 		si->settings.logmask, si->settings.memory, si->settings.hardcursor, si->settings.usebios, si->settings.switchhead, si->settings.force_pci));
-	LOG(4,("init_common: dumprom %d, unhide_fw %d, pgm_panel %d, dma_acc %d\n",
-		si->settings.dumprom, si->settings.unhide_fw, si->settings.pgm_panel, si->settings.dma_acc));
+	LOG(4,("init_common: dumprom %d, unhide_fw %d, pgm_panel %d, dma_acc %d, tv_output %d, vga_on_tv %d\n",
+		si->settings.dumprom, si->settings.unhide_fw, si->settings.pgm_panel, si->settings.dma_acc, si->settings.tv_output, si->settings.vga_on_tv));
 
  	/*Check for R4.5.0 and if it is running, use work around*/
  	{

@@ -1781,8 +1781,7 @@ status_t BT_setmode(display_mode target)
 	}
 
 	/* setup output signal routing and flickerfilter */
-//fixme: add output force settings in nv.settings, defaulting to autodetect.
-	BT_setup_output(monstat, 0, ffilter);
+	BT_setup_output(monstat, (uint8)(si->settings.tv_output), ffilter);
 
 	/* update the GPU CRTC timing for the requested mode */
 	BT_update_mode_for_gpu(&tv_target, tvmode);
