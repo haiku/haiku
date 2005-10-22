@@ -340,8 +340,8 @@ calculate_apic_timer_conversion_factor(void)
 void
 smp_boot_other_cpus(void)
 {
-	uint32 trampoline_code;
-	uint32 trampoline_stack;
+	uint32 trampolineCode;
+	uint32 trampolineStack;
 	uint32 i;
 
 	if (gKernelArgs.num_cpus < 2)
@@ -354,44 +354,41 @@ smp_boot_other_cpus(void)
 
 	// allocate a stack and a code area for the smp trampoline
 	// (these have to be < 1M physical)
-	trampoline_code = 0x9f000; 	// 640kB - 4096 == 0x9f000
-	trampoline_stack = 0x9e000; // 640kB - 8192 == 0x9e000
+	trampolineCode = 0x9f000; 	// 640kB - 4096 == 0x9f000
+	trampolineStack = 0x9e000; // 640kB - 8192 == 0x9e000
 
 	// copy the trampoline code over
-	memcpy((char *)trampoline_code, &smp_trampoline,
+	memcpy((char *)trampolineCode, &smp_trampoline,
 		(uint32)&smp_trampoline_end - (uint32)&smp_trampoline);
 
 	// boot the cpus
 	for (i = 1; i < gKernelArgs.num_cpus; i++) {
-		uint32 *final_stack;
-		uint32 *final_stack_ptr;
-		uint32 *tramp_stack_ptr;
+		uint32 *finalStack;
+		uint32 *tempStack;
 		uint32 config;
-		uint32 num_startups;
+		uint32 numStartups;
 		uint32 j;
 
 		// set this stack up
-		final_stack = (uint32 *)gKernelArgs.cpu_kstack[i].start;
-		memset(final_stack, 0, KERNEL_STACK_SIZE);
-		final_stack_ptr = (final_stack + KERNEL_STACK_SIZE / sizeof(uint32)) - 1;
-		*final_stack_ptr = (uint32)&smp_cpu_ready;
-		final_stack_ptr--;
+		finalStack = (uint32 *)gKernelArgs.cpu_kstack[i].start;
+		memset(finalStack, 0, KERNEL_STACK_SIZE);
+		tempStack = (finalStack + KERNEL_STACK_SIZE / sizeof(uint32)) - 1;
+		*tempStack = (uint32)&smp_cpu_ready;
 
 		// set the trampoline stack up
-		tramp_stack_ptr = (uint32 *)(trampoline_stack + B_PAGE_SIZE - 4);
+		tempStack = (uint32 *)(trampolineStack + B_PAGE_SIZE - 4);
 		// final location of the stack
-		*tramp_stack_ptr = ((uint32)final_stack) + KERNEL_STACK_SIZE - sizeof(uint32);
-		tramp_stack_ptr--;
+		*tempStack = ((uint32)finalStack) + KERNEL_STACK_SIZE - sizeof(uint32);
+		tempStack--;
 		// page dir
-		*tramp_stack_ptr = gKernelArgs.arch_args.phys_pgdir;
-		tramp_stack_ptr--;
+		*tempStack = gKernelArgs.arch_args.phys_pgdir;
 
 		// put a gdt descriptor at the bottom of the stack
-		*((uint16 *)trampoline_stack) = 0x18 - 1; // LIMIT
-		*((uint32 *)(trampoline_stack + 2)) = trampoline_stack + 8;
+		*((uint16 *)trampolineStack) = 0x18 - 1; // LIMIT
+		*((uint32 *)(trampolineStack + 2)) = trampolineStack + 8;
 
 		// put the gdt at the bottom
-		memcpy(&((uint32 *)trampoline_stack)[2], (void *)gKernelArgs.arch_args.vir_gdt, 6*4);
+		memcpy(&((uint32 *)trampolineStack)[2], (void *)gKernelArgs.arch_args.vir_gdt, 6*4);
 
 		/* clear apic errors */
 		if (gKernelArgs.arch_args.cpu_apic_version[i] & 0xf0) {
@@ -400,47 +397,52 @@ smp_boot_other_cpus(void)
 		}
 
 		/* send (aka assert) INIT IPI */
-		config = (apic_read(APIC_ICR2) & 0x00ffffff) | (gKernelArgs.arch_args.cpu_apic_id[i] << 24);
+		config = (apic_read(APIC_ICR2) & APIC_ICR2_MASK)
+			| (gKernelArgs.arch_args.cpu_apic_id[i] << 24);
 		apic_write(APIC_ICR2, config); /* set target pe */
-		config = (apic_read(APIC_ICR1) & 0xfff00000) | 0x0000c500;
+		config = (apic_read(APIC_ICR1) & 0xfff00000) | APIC_ICR1_TRIGGER_MODE_LEVEL
+			| APIC_ICR1_ASSERT | APIC_ICR1_DELIVERY_MODE_INIT;
 		apic_write(APIC_ICR1, config);
 
 		// wait for pending to end
-		while ((apic_read(APIC_ICR1) & 0x00001000) == 0x00001000)
+		while ((apic_read(APIC_ICR1) & APIC_ICR1_DELIVERY_STATUS) != 0)
 			;
 
 		/* deassert INIT */
-		config = (apic_read(APIC_ICR2) & 0x00ffffff) | (gKernelArgs.arch_args.cpu_apic_id[i] << 24);
+		config = (apic_read(APIC_ICR2) & APIC_ICR2_MASK)
+			| (gKernelArgs.arch_args.cpu_apic_id[i] << 24);
 		apic_write(APIC_ICR2, config);
-		config = (apic_read(APIC_ICR1) & 0xfff00000) | 0x00008500;
+		config = (apic_read(APIC_ICR1) & 0xfff00000) | APIC_ICR1_TRIGGER_MODE_LEVEL
+			| APIC_ICR1_DELIVERY_MODE_INIT;
 		apic_write(APIC_ICR1, config);
 
 		// wait for pending to end
-		while ((apic_read(APIC_ICR1) & 0x00001000) == 0x00001000)
+		while ((apic_read(APIC_ICR1) & APIC_ICR1_DELIVERY_STATUS) != 0)
 			;
 
 		/* wait 10ms */
 		spin(10000);
 
 		/* is this a local apic or an 82489dx ? */
-		num_startups = (gKernelArgs.arch_args.cpu_apic_version[i] & 0xf0) ? 2 : 0;
-		for (j = 0; j < num_startups; j++) {
+		numStartups = (gKernelArgs.arch_args.cpu_apic_version[i] & 0xf0) ? 2 : 0;
+		for (j = 0; j < numStartups; j++) {
 			/* it's a local apic, so send STARTUP IPIs */
 			apic_write(APIC_ESR, 0);
 
 			/* set target pe */
-			config = (apic_read(APIC_ICR2) & 0xf0ffffff) | (gKernelArgs.arch_args.cpu_apic_id[i] << 24);
+			config = (apic_read(APIC_ICR2) & APIC_ICR2_MASK)
+				| (gKernelArgs.arch_args.cpu_apic_id[i] << 24);
 			apic_write(APIC_ICR2, config);
 
 			/* send the IPI */
-			config = (apic_read(APIC_ICR1) & 0xfff0f800) | APIC_DM_STARTUP |
-				(0x9f000 >> 12);
+			config = (apic_read(APIC_ICR1) & 0xfff0f800) | APIC_ICR1_DELIVERY_MODE_STARTUP
+				| (trampolineCode >> 12);
 			apic_write(APIC_ICR1, config);
 
 			/* wait */
 			spin(200);
 
-			while ((apic_read(APIC_ICR1)& 0x00001000) == 0x00001000)
+			while ((apic_read(APIC_ICR1) & APIC_ICR1_DELIVERY_STATUS) != 0)
 				;
 		}
 	}

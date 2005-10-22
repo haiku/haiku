@@ -199,7 +199,8 @@ arch_smp_send_broadcast_ici(void)
 	cpu_status state = disable_interrupts();
 
 	config = apic_read(APIC_ICR1) & APIC_ICR1_WRITE_MASK;
-	apic_write(APIC_ICR1, config | 0xfd | APIC_ICR1_DELMODE_FIXED | APIC_ICR1_DESTMODE_PHYS | APIC_ICR1_DEST_ALL_BUT_SELF);
+	apic_write(APIC_ICR1, config | 0xfd | APIC_ICR1_DELIVERY_MODE_FIXED
+		| APIC_ICR1_DEST_MODE_PHYSICAL | APIC_ICR1_DEST_ALL_BUT_SELF);
 
 	restore_interrupts(state);
 }
@@ -215,7 +216,8 @@ arch_smp_send_ici(int32 target_cpu)
 	apic_write(APIC_ICR2, config | cpu_apic_id[target_cpu] << 24);
 
 	config = apic_read(APIC_ICR1) & APIC_ICR1_WRITE_MASK;
-	apic_write(APIC_ICR1, config | 0xfd | APIC_ICR1_DELMODE_FIXED | APIC_ICR1_DESTMODE_PHYS | APIC_ICR1_DEST_FIELD);
+	apic_write(APIC_ICR1, config | 0xfd | APIC_ICR1_DELIVERY_MODE_FIXED
+		| APIC_ICR1_DEST_MODE_PHYSICAL | APIC_ICR1_DEST_FIELD);
 
 	restore_interrupts(state);
 }

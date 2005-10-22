@@ -8,11 +8,6 @@
 #define MP_FLT_SIGNATURE		'_PM_'
 #define MP_CTH_SIGNATURE		'PCMP'
 
-#define APIC_DM_INIT			(5 << 8)
-#define APIC_DM_STARTUP			(6 << 8)
-#define APIC_LEVEL_TRIG			(1 << 14)
-#define APIC_ASSERT				(1 << 13)
-
 #define APIC_ENABLE				0x100
 #define APIC_FOCUS				(~(1 << 9))
 #define APIC_SIV				(0xff)
@@ -35,21 +30,29 @@
 #define APIC_CCRT				0x390
 #define APIC_TDCR				0x3e0
 
-#define APIC_ICR1_WRITE_MASK    0xfff3f000
-#define APIC_ICR1_DELMODE_FIXED 0
-#define APIC_ICR1_DELMODE_LOWESTPRI (1 << 8)
-#define APIC_ICR1_DESTMODE_LOG (1 << 11)
-#define APIC_ICR1_DESTMODE_PHYS 0
+/* ICR defines */
+#define APIC_ICR1_WRITE_MASK				0xfff3f000
+#define APIC_ICR1_READ_MASK					0xfff32000
+#define APIC_ICR2_MASK						0x00ffffff
 
-#define APIC_ICR1_READ_MASK     0xfff32000
-#define APIC_ICR1_DELSTATUS (1 << 12)
+#define APIC_ICR1_DELIVERY_MODE_FIXED		0
+#define APIC_ICR1_DELIVERY_MODE_LOWESTPRI	(1 << 8)
+#define APIC_ICR1_DELIVERY_MODE_INIT		(5 << 8)
+#define APIC_ICR1_DELIVERY_MODE_STARTUP		(6 << 8)
 
-#define APIC_ICR1_DEST_FIELD		(0)
-#define APIC_ICR1_DEST_SELF			(1 << 18)
-#define APIC_ICR1_DEST_ALL			(2 << 18)
-#define APIC_ICR1_DEST_ALL_BUT_SELF	(3 << 18)
+#define APIC_ICR1_DEST_MODE_PHYSICAL		0
+#define APIC_ICR1_DEST_MODE_LOGICAL			(1 << 11)
 
-#define APIC_ICR2_MASK			0x00ffffff
+#define APIC_ICR1_ASSERT					(1 << 13)
+#define APIC_ICR1_TRIGGER_MODE_LEVEL		(1 << 14)
+#define APIC_ICR1_DELIVERY_STATUS			(1 << 12)
+
+#define APIC_ICR1_DEST_FIELD				0
+#define APIC_ICR1_DEST_SELF					(1 << 18)
+#define APIC_ICR1_DEST_ALL					(2 << 18)
+#define APIC_ICR1_DEST_ALL_BUT_SELF			(3 << 18)
+
+/* other defines */
 
 #define APIC_TDCR_2				0x00
 #define APIC_TDCR_4				0x01
