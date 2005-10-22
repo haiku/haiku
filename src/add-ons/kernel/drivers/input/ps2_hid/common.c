@@ -342,7 +342,7 @@ init_driver(void)
 	// Probing the mouse first and initializing the keyboard later appearantly
 	// clears the keyboard stall.
 
-	if (probe_mouse() == B_OK)
+	if (probe_mouse(NULL) == B_OK)
 		sMouseDetected = true;
 	else
 		dprintf("ps2_hid: no mouse detected!\n");

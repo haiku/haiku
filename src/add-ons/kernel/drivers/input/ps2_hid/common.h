@@ -50,7 +50,7 @@ extern status_t ps2_common_initialize(void);
 
 // prototypes from keyboard.c & mouse.c
 extern status_t probe_keyboard(void);
-extern status_t probe_mouse(void);
+extern status_t probe_mouse(size_t *probed_packet_size);
 
 extern status_t keyboard_open(const char *name, uint32 flags, void **cookie);
 extern status_t keyboard_close(void *cookie);

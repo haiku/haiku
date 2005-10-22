@@ -70,7 +70,6 @@
 	// we record that many mouse packets before we start to drop them
 
 static sem_id sMouseSem;
-static int32 sSync;
 static struct packet_buffer *sMouseBuffer;
 static int32 sOpenMask;
 
@@ -79,8 +78,10 @@ static bigtime_t sClickSpeed;
 static int32 sClickCount;
 static int sButtonsState;
 
-static int32 sPacketSize;
- 
+static size_t sPacketSize;
+static size_t sPacketIndex;
+static uint8 sPacketBuffer[PS2_MAX_PACKET_SIZE];
+
 
 /** Writes a byte to the mouse device. Uses the control port to indicate
  *	that the byte is sent to the auxiliary device (mouse), instead of the
@@ -206,7 +207,7 @@ ps2_mouse_read(mouse_movement *userMovement)
 	if (status < B_OK)
 		return status;
 
-	if (packet_buffer_read(sMouseBuffer, packet, sPacketSize) != (ssize_t)sPacketSize) {
+	if (packet_buffer_read(sMouseBuffer, packet, sPacketSize) != sPacketSize) {
 		TRACE(("error copying buffer\n"));
 		return B_ERROR;
 	}
@@ -258,27 +259,31 @@ handle_mouse_interrupt(void* cookie)
 	}
 
 	data = gIsa->read_io_8(PS2_PORT_DATA);
-	TRACE(("mouse interrupt : byte %x\n", data));
+	TRACE(("mouse interrupt: %d byte: 0x%02x\n", sPacketIndex, data));
 
-	if (sSync == 0 && !(data & 8)) {
-		TRACE(("mouse resynched, bad data\n"));
+	if (sPacketIndex == 0 && !(data & 8)) {
+		TRACE(("bad mouse data, trying resync\n"));
 		return B_HANDLED_INTERRUPT;
 	}
 
-	while (packet_buffer_write(sMouseBuffer, &data, sizeof(data)) == 0) {
-		// we start dropping packets when the buffer is full
-		packet_buffer_flush(sMouseBuffer, sPacketSize);
+	sPacketBuffer[sPacketIndex++] = data;
+
+	if (sPacketIndex != sPacketSize) {
+		// packet not yet complete
+		return B_HANDLED_INTERRUPT;
 	}
 
-	if (++sSync == sPacketSize) {
-		TRACE(("mouse synched\n"));
-		sSync = 0;
-		release_sem_etc(sMouseSem, 1, B_DO_NOT_RESCHEDULE);
-
-		return B_INVOKE_SCHEDULER;
+	// complete packet is assembled
+	
+	sPacketIndex = 0;
+	
+	if (packet_buffer_write(sMouseBuffer, sPacketBuffer, sPacketSize) != sPacketSize) {
+		// buffer is full, drop new data
+		return B_HANDLED_INTERRUPT;
 	}
 
-	return B_HANDLED_INTERRUPT;
+	release_sem_etc(sMouseSem, 1, B_DO_NOT_RESCHEDULE);
+	return B_INVOKE_SCHEDULER;
 }
 
 
@@ -286,7 +291,7 @@ handle_mouse_interrupt(void* cookie)
 
 
 status_t
-probe_mouse(void)
+probe_mouse(size_t *probed_packet_size)
 {
 	int8 deviceId = -1;
 
@@ -313,11 +318,13 @@ probe_mouse(void)
 	}
 
 	if (deviceId == PS2_DEV_ID_STANDARD) {
-		sPacketSize = PS2_PACKET_STANDARD;
 		TRACE(("Standard PS/2 mouse found\n"));
+		if (probed_packet_size)
+			*probed_packet_size = PS2_PACKET_STANDARD;
 	} else if (deviceId == PS2_DEV_ID_INTELLIMOUSE) {
-		sPacketSize = PS2_PACKET_INTELLIMOUSE;
 		TRACE(("Extended PS/2 mouse found\n"));
+		if (probed_packet_size)
+			*probed_packet_size = PS2_PACKET_INTELLIMOUSE;
 	} else {
 		// Something's wrong. Better quit
 		return B_ERROR;
@@ -344,9 +351,11 @@ mouse_open(const char *name, uint32 flags, void **_cookie)
 
 	acquire_sem(gDeviceOpenSemaphore);
 
-	status = probe_mouse();
+	status = probe_mouse(&sPacketSize);
 	if (status != B_OK)
 		goto err1;
+		
+	sPacketIndex = 0;
 
 	status = ps2_common_initialize();
 	if (status != B_OK)
