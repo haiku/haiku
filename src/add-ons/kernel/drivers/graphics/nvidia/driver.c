@@ -341,6 +341,7 @@ static nv_settings current_settings = { // see comments in nv.settings
 	// for accelerant
 	0x00000000, // logmask
 	0,          // memory
+	0,			// tv_output
 	true,       // usebios
 	true,       // hardcursor
 	false,		// switchhead
@@ -348,6 +349,7 @@ static nv_settings current_settings = { // see comments in nv.settings
 	false,		// unhide_fw
 	true,		// pgm_panel
 	true,		// dma_acc
+	false,		// vga_on_tv
 };
 
 static void dumprom (void *rom, uint32 size)
@@ -477,6 +479,10 @@ init_driver(void) {
 		value = strtoul (item, &end, 0);
 		if (*end == '\0') current_settings.memory = value;
 
+		item = get_driver_parameter (settings_handle, "tv_output", "0", "0");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0') current_settings.tv_output = value;
+
 		current_settings.hardcursor = get_driver_boolean_parameter (settings_handle, "hardcursor", false, false);
 		current_settings.usebios = get_driver_boolean_parameter (settings_handle, "usebios", false, false);
 		current_settings.switchhead = get_driver_boolean_parameter (settings_handle, "switchhead", false, false);
@@ -484,6 +490,7 @@ init_driver(void) {
 		current_settings.unhide_fw = get_driver_boolean_parameter (settings_handle, "unhide_fw", false, false);
 		current_settings.pgm_panel = get_driver_boolean_parameter (settings_handle, "pgm_panel", false, false);
 		current_settings.dma_acc = get_driver_boolean_parameter (settings_handle, "dma_acc", false, false);
+		current_settings.dma_acc = get_driver_boolean_parameter (settings_handle, "vga_on_tv", false, false);
 
 		unload_driver_settings (settings_handle);
 	}

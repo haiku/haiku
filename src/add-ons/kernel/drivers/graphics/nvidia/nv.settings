@@ -8,20 +8,23 @@
 # accelerant "nv.accelerant"
 
 # nv.accelerant parameters
-usebios    true			# if true rely on bios to coldstart the card
-#memory     2			# in MB, override builtin memory size detection
-hardcursor true			# if true use on-chip cursor capabilities
-#logmask   0x00000000	# nothing logged, is default
-#logmask   0x08000604	# log overlay use in full
-#logmask 	0xffffffff		# log everything
-dumprom    false        		# dump bios rom in ~/nv.rom
-switchhead false			# switch head assignment (dualhead cards only)
+usebios	true			# if true rely on bios to coldstart the card
+#memory	2			# in MB, override builtin memory size detection
+hardcursor	true			# if true use on-chip cursor capabilities
+#logmask	0x00000000	# nothing logged, is default
+#logmask	0x08000604	# log overlay use in full
+#logmask	0xffffffff		# log everything
+dumprom	false        		# dump bios rom in ~/nv.rom
+switchhead	false			# switch head assignment (dualhead cards only)
 force_pci	false			# block AGP mode use if true (AGP cards only)
 dma_acc	true			# if true enable DMA cmd fetching for 2D acc (instead of using PIO)
+#tv_output	0			# disabled or 0 = autodetect, 1 = Y/C (and CVBS if possible), 2 = CVBS
 
 # WARNING: tweak alert! modify stuff below on your own risk...
 unhide_fw	false			# if true 'unhide' cards AGP fastwrite support on cards that hide it
 pgm_panel	true			# if false don't program DVI and laptop panel pixelclocks (refreshrates)
+vga_on_tv	false			# if true enables VGA output on the head outputting to TV
+
 #--------- that's all.
 
 
