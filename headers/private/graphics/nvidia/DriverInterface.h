@@ -111,6 +111,7 @@ typedef struct { // apsed, see comments in nv.settings
 	// for accelerant
 	uint32 logmask;
 	uint32 memory;
+	uint32 tv_output;
 	bool   usebios;
 	bool   hardcursor;
 	bool   switchhead;
@@ -118,6 +119,7 @@ typedef struct { // apsed, see comments in nv.settings
 	bool   unhide_fw;
 	bool   pgm_panel;
 	bool   dma_acc;
+	bool   vga_on_tv;
 } nv_settings;
 
 /*shared info*/
