@@ -959,12 +959,12 @@ static uint8 BT_setup_output(uint8 monstat, uint8 output, uint8 ffilter)
 	 * This cable connects the Y (DAC C) output to the TV CVBS input. */
 	{
 	case 1:
-		LOG(4,("Brooktree: Outputting both Y/C and CVBS where supported by hardware\n"));
+		LOG(4,("Brooktree: Forcing both Y/C and CVBS signals where supported by hardware\n"));
 		buffer[6] = 0x18;	// Y/C and CVBS out if all ports implemented
 							// in hardware, else only Y/C or CVBS out.
 		break;
 	case 2:
-		LOG(4,("Brooktree: Outputting CVBS on all outputs\n"));
+		LOG(4,("Brooktree: Forcing CVBS signals on all outputs\n"));
 		buffer[6] = 0x00;	// put CVBS on all outputs. Used for cards
 		break;				// with only Y/C out and 'translation cable'.
 	default:
