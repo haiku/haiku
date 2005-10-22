@@ -50,7 +50,7 @@ read_from_buffer(struct ring_buffer *buffer, uint8 *data, ssize_t length,
 
 	ssize_t bytesRead = length;
 
-	if (buffer->first + length < buffer->size) {
+	if (buffer->first + length <= buffer->size) {
 		// simple copy
 		if (user) {
 			if (user_memcpy(data, buffer->buffer + buffer->first, length) < B_OK)
@@ -91,7 +91,7 @@ write_to_buffer(struct ring_buffer *buffer, const uint8 *data, ssize_t length,
 		return 0;
 
 	ssize_t bytesWritten = length;
-	int32 position = buffer->first + buffer->in;
+	int32 position = (buffer->first + buffer->in) % buffer->size;
 
 	if (position + length <= buffer->size) {
 		// simple copy
