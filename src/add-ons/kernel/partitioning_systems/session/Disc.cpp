@@ -818,7 +818,6 @@ static
 void
 dump_full_table_of_contents(uchar *data, uint16 data_length)
 {
-	return;
 	cdrom_table_of_contents_header *header;
 	cdrom_full_table_of_contents_entry *entries;
 	int i, count;
@@ -888,8 +887,8 @@ read_table_of_contents(int deviceFD, uint32 first_session, uchar *buffer,
 	// Init the scsi command and copy it into the BeOS "raw scsi command" ioctl struct
 	memset(raw_command.command, 0, 16);
 	scsi_command.command = 0x43;
-	scsi_command.msf = 0;
-	scsi_command.format = 2;
+	scsi_command.msf = 1;
+	scsi_command.format = kFullTableOfContentsFormat;
 	scsi_command.number = first_session;
 	scsi_command.length = B_HOST_TO_BENDIAN_INT16(buffer_length);
 	scsi_command.control = 0;	

@@ -70,7 +70,7 @@ typedef struct {
 // Some of the possible "READ TOC/PMA/ATIP" formats
 const uint8 kTableOfContentsFormat = 0x00;
 const uint8 kSessionFormat = 0x01;
-const uint8 kFullTableOfContentsFormat = 0x10;	//!< "READ TOC/PMA/ATIP" format of interest
+const uint8 kFullTableOfContentsFormat = 0x02;	//!< "READ TOC/PMA/ATIP" format of interest
 	
 /*! \brief Minutes:Seconds:Frames format address
 
@@ -138,7 +138,7 @@ typedef struct {
 } cdrom_table_of_contents_entry;
 
 /*! \brief Type of entries returned by "READ TOC/PMA/ATIP" when called with format
-    \c kFullTableOfContentsFormat == 0x10
+    \c kFullTableOfContentsFormat == 0x02
 */
 typedef struct {
 	uint8 session;
