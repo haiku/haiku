@@ -322,8 +322,10 @@ TabletInputDevice::DeviceWatcher(void *arg)
 	BMessage *message;
 	while (dev->active) {
 		memset(&movements, 0, sizeof(movements));
-		if (ioctl(dev->fd, MS_READ, &movements) < B_OK)
+		if (ioctl(dev->fd, MS_READ, &movements) != B_OK) {
+			snooze(10000); // this is a realtime thread, and something is wrong...
 			continue;
+		}
 		
 		uint32 buttons = buttons_state ^ movements.buttons;	
 	

@@ -306,11 +306,8 @@ SerialMouse::GetMouseEvent(mouse_movement* mm)
 	if (GetPacket(data) != B_OK)
 		return B_ERROR;		// not enough, or out-of-sync, data.
 
-	if (PacketToMM(data, mm) != B_OK) {
-		// Something went wrong, clean up.
-		memset(mm, 0, sizeof(mouse_movement));
-		return B_ERROR;
-	}
+	if (PacketToMM(data, mm) != B_OK)
+		return B_ERROR;     // something went wrong
 
 #ifdef DEBUG_SERIAL_MOUSE
 	DumpData(mm);
@@ -344,8 +341,10 @@ SerialMouse::GetPacket(char data[])
 		// TODO: Shall we block here instead of leaving after a timeout?
 		// Yes, if we get called it's because there IS a mouse out there.
 
-		if (fSerialPort->Read(&c, 1) != 1)
+		if (fSerialPort->Read(&c, 1) != 1) {
+			snooze(5000); // this is a realtime thread, and something is wrong...
 			break;
+		}
 
 		if (bytes_read == 0) {
 			if ((c & mp[fMouseID].sync[0]) != mp[fMouseID].sync[1]) {
@@ -383,7 +382,7 @@ SerialMouse::PacketToMM(char data[], mouse_movement* mm)
 	const uint8 kTertiaryButton  = 4;
 
 	static uint8 previous_buttons = 0;	// only meaningful for kMicrosoft.
-
+	
 	mm->timestamp = system_time();
 
 	switch (fMouseID) {

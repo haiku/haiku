@@ -251,9 +251,10 @@ MouseInputDevice::DeviceWatcher(void* arg)
 	while (dev->active)
 	{
 		memset(&movements, 0, sizeof(movements));
-
-		if (dev->sm->GetMouseEvent(&movements) < B_OK)
+		if (dev->sm->GetMouseEvent(&movements) != B_OK) {
+			snooze(10000); // this is a realtime thread, and something is wrong...
 			continue;
+		}
 /*
 		LOG("%s: buttons: 0x%lx, x: %ld, y: %ld, clicks:%ld, wheel_x:%ld, \
 			wheel_y:%ld\n", dev->device_ref.name, movements.buttons,

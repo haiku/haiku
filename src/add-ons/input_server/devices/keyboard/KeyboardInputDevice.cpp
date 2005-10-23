@@ -618,10 +618,15 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 	
 	memset(states, 0, sizeof(states));
 	
+	LOG("%s\n", __PRETTY_FUNCTION__);
+
 	while (dev->active) {
-		LOG("%s\n", __PRETTY_FUNCTION__);
 		
-		if (ioctl(dev->fd, kGetNextKey, &buffer) == B_OK) {
+		if (ioctl(dev->fd, kGetNextKey, &buffer) != B_OK) {
+			snooze(10000); // this is a realtime thread, and something is wrong...
+			continue;
+		}
+
 			uint32 keycode = 0;
 			bool is_keydown = false;
 			bigtime_t timestamp = 0;
@@ -769,10 +774,6 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 				activeDeadKey = newDeadKey;
 			}
 			lastKeyCode = keycode;
-		} else {
-			LOG("kGetNextKey error 2\n");
-			snooze(100000);
-		}
 	}
 	
 	return 0;
