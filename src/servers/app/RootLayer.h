@@ -130,9 +130,9 @@ public:
 			bool				IsLocked() { return fAllRegionsLock.IsLocked(); }
 			void				RunThread();
 			status_t			EnqueueMessage(BPrivate::PortLink &message);
-			void				GoInvalidate(const Layer *layer, const BRegion &region);
-			void				GoRedraw(const Layer *layer, const BRegion &region);
-			void				GoChangeWinBorderFeel(const WinBorder *winBorder, int32 newFeel);
+			void				GoInvalidate(Layer *layer, const BRegion &region);
+			void				GoRedraw(Layer *layer, const BRegion &region);
+			void				GoChangeWinBorderFeel(WinBorder *winBorder, int32 newFeel);
 
 	virtual	void				Draw(const BRect &r);
 
@@ -159,8 +159,6 @@ friend class WinBorder; // temporarily, I need invalidate_layer()
 
 #ifndef NEW_CLIPPING
 			void				empty_visible_regions(Layer *layer);
-			void				invalidate_layer(Layer *layer, const BRegion &region);
-			void				redraw_layer(Layer *layer, const BRegion &region);
 #endif
 			// Input related methods
 			void				MouseEventHandler(int32 code, BPrivate::PortLink& link);

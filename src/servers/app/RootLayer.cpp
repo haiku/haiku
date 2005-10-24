@@ -207,7 +207,7 @@ RootLayer::WorkingThread(void *data)
 	oneRootLayer->Lock();
 #ifndef NEW_CLIPPING
 	oneRootLayer->RebuildFullRegion();
-	oneRootLayer->invalidate_layer(oneRootLayer, oneRootLayer->Bounds());
+	oneRootLayer->GoInvalidate(oneRootLayer, oneRootLayer->Bounds());
 #else
 	oneRootLayer->rebuild_visible_regions(
 		BRegion(oneRootLayer->Bounds()),
@@ -252,143 +252,6 @@ RootLayer::WorkingThread(void *data)
 				exit_thread(0);
 				break;
 
-			case AS_ROOTLAYER_SHOW_WINBORDER:
-			{
-				WinBorder *winBorder = NULL;
-				messageQueue.Read<WinBorder*>(&winBorder);
-				oneRootLayer->show_winBorder(winBorder);
-				break;
-			}
-			case AS_ROOTLAYER_HIDE_WINBORDER:
-			{
-				WinBorder *winBorder = NULL;
-				messageQueue.Read<WinBorder*>(&winBorder);
-				oneRootLayer->hide_winBorder(winBorder);
-				break;
-			}
-			case AS_ROOTLAYER_DO_INVALIDATE:
-			{
-				BRegion invalidRegion;
-				Layer *layer = NULL;
-				messageQueue.Read<Layer*>(&layer);
-				messageQueue.ReadRegion(&invalidRegion);
-#ifndef NEW_CLIPPING
-				oneRootLayer->invalidate_layer(layer, invalidRegion);
-#else
-				layer->do_Invalidate(invalidRegion);
-#endif
-				break;
-			}
-			case AS_ROOTLAYER_DO_REDRAW:
-			{
-				BRegion redrawRegion;
-				Layer *layer = NULL;
-				messageQueue.Read<Layer*>(&layer);
-				messageQueue.ReadRegion(&redrawRegion);
-#ifndef NEW_CLIPPING
-				oneRootLayer->redraw_layer(layer, redrawRegion);
-#else
-				layer->do_Redraw(redrawRegion);
-#endif
-				break;
-			}
-			case AS_ROOTLAYER_LAYER_MOVE:
-			{
-				Layer *layer = NULL;
-				float x, y;
-				messageQueue.Read<Layer*>(&layer);
-				messageQueue.Read<float>(&x);
-				messageQueue.Read<float>(&y);
-#ifndef NEW_CLIPPING
-				layer->move_layer(x, y);
-#else
-				layer->do_MoveBy(x, y);
-#endif
-				break;
-			}
-			case AS_ROOTLAYER_LAYER_RESIZE:
-			{
-				Layer *layer = NULL;
-				float x, y;
-				messageQueue.Read<Layer*>(&layer);
-				messageQueue.Read<float>(&x);
-				messageQueue.Read<float>(&y);
-#ifndef NEW_CLIPPING
-				layer->resize_layer(x, y);
-#else
-				layer->do_ResizeBy(x, y);
-#endif
-				break;
-			}
-			case AS_ROOTLAYER_LAYER_SCROLL:
-			{
-				Layer *layer = NULL;
-				float x, y;
-				messageQueue.Read<Layer*>(&layer);
-				messageQueue.Read<float>(&x);
-				messageQueue.Read<float>(&y);
-#ifndef NEW_CLIPPING
-				// nothing
-#else
-				layer->do_ScrollBy(x, y);
-#endif
-				break;
-			}
-			case AS_ROOTLAYER_LAYER_COPYBITS:
-			{
-				Layer *layer = NULL;
-				int32 xOffset, yOffset;
-				BRect src, dst;
-				messageQueue.Read<Layer*>(&layer);
-				messageQueue.Read<BRect>(&src);
-				messageQueue.Read<BRect>(&dst);
-				messageQueue.Read<int32>(&xOffset);
-				messageQueue.Read<int32>(&yOffset);
-
-				layer->do_CopyBits(src, dst, xOffset, yOffset);
-
-				break;
-			}
-
-			case AS_ROOTLAYER_ADD_TO_SUBSET:
-			{
-				WinBorder *winBorder = NULL;
-				WinBorder *toWinBorder = NULL;
-				messageQueue.Read<WinBorder*>(&winBorder);
-				messageQueue.Read<WinBorder*>(&toWinBorder);
-				oneRootLayer->fDesktop->AddWinBorderToSubset(winBorder, toWinBorder);
-				break;
-			}
-			case AS_ROOTLAYER_REMOVE_FROM_SUBSET:
-			{
-				WinBorder *winBorder = NULL;
-				WinBorder *fromWinBorder = NULL;
-				messageQueue.Read<WinBorder*>(&winBorder);
-				messageQueue.Read<WinBorder*>(&fromWinBorder);
-				oneRootLayer->fDesktop->RemoveWinBorderFromSubset(winBorder, fromWinBorder);
-				break;
-			}
-			case AS_ROOTLAYER_WINBORDER_SET_WORKSPACES:
-			{
-				WinBorder *winBorder = NULL;
-				uint32 oldWks = 0, newWks = 0;
-
-				messageQueue.Read<WinBorder*>(&winBorder);
-				messageQueue.Read<uint32>(&oldWks);
-				messageQueue.Read<uint32>(&newWks);
-				oneRootLayer->SetWinBorderWorskpaces(winBorder, oldWks, newWks);
-				break;
-			}
-			case AS_ROOTLAYER_DO_CHANGE_WINBORDER_FEEL:
-			{
-				WinBorder *winBorder = NULL;
-				int32 newFeel = 0;
-
-				messageQueue.Read<WinBorder*>(&winBorder);
-				messageQueue.Read<int32>(&newFeel);
-				oneRootLayer->change_winBorder_feel(winBorder, newFeel);
-				break;
-			}
 			default:
 				printf("RootLayer(%s)::WorkingThread received unexpected code %lx\n", oneRootLayer->Name(), code);
 				break;
@@ -405,27 +268,21 @@ RootLayer::WorkingThread(void *data)
 
 
 void
-RootLayer::GoInvalidate(const Layer *layer, const BRegion &region)
+RootLayer::GoInvalidate(Layer *layer, const BRegion &region)
 {
-	BPrivate::PortLink msg(fListenPort, -1);
-	msg.StartMessage(AS_ROOTLAYER_DO_INVALIDATE);
-	msg.Attach<const Layer*>(layer);
-	msg.AttachRegion(region);
-	msg.Flush();
-}
+	BRegion invalidRegion(region);
 
+	Lock();
 #ifndef NEW_CLIPPING
-void RootLayer::invalidate_layer(Layer *layer, const BRegion &region)
-{
-	// NOTE: our thread (WorkingThread) is locked here.
-	STRACE(("RootLayer::invalidate_layer(%s)\n", layer->Name()));
-
 	if (layer->fParent)
 		layer = layer->fParent;
 
-	layer->FullInvalidate(region);
-}
+	layer->FullInvalidate(invalidRegion);
+#else
+	layer->do_Invalidate(invalidRegion);
 #endif
+	Unlock();
+}
 
 status_t
 RootLayer::EnqueueMessage(BPrivate::PortLink &message)
@@ -437,33 +294,25 @@ RootLayer::EnqueueMessage(BPrivate::PortLink &message)
 
 
 void
-RootLayer::GoRedraw(const Layer *layer, const BRegion &region)
+RootLayer::GoRedraw(Layer *layer, const BRegion &region)
 {
-	BPrivate::PortLink msg(fListenPort, -1);
-	msg.StartMessage(AS_ROOTLAYER_DO_REDRAW);
-	msg.Attach<const Layer*>(layer);
-	msg.AttachRegion(region);
-	msg.Flush();
-}
-
+	BRegion redrawRegion(region);
+	
+	Lock();
 #ifndef NEW_CLIPPING
-void
-RootLayer::redraw_layer(Layer *layer, const BRegion &region)
-{
-	// NOTE: our thread (WorkingThread) is locked here.
-
-	layer->Invalidate(region);
-}
+	layer->Invalidate(redrawRegion);
+#else
+	layer->do_Redraw(redrawRegion);
 #endif
+	Unlock();
+}
 
 void
-RootLayer::GoChangeWinBorderFeel(const WinBorder *winBorder, int32 newFeel)
+RootLayer::GoChangeWinBorderFeel(WinBorder *winBorder, int32 newFeel)
 {
-	BPrivate::PortLink msg(fListenPort, -1);
-	msg.StartMessage(AS_ROOTLAYER_DO_CHANGE_WINBORDER_FEEL);
-	msg.Attach<const WinBorder*>(winBorder);
-	msg.Attach<int32>(newFeel);
-	msg.Flush();
+	Lock();
+	change_winBorder_feel(winBorder, newFeel);
+	Unlock();
 }
 
 
@@ -923,20 +772,18 @@ RootLayer::SaveWorkspaceData(const char *path)
 void
 RootLayer::HideWinBorder(WinBorder* winBorder)
 {
-	BPrivate::PortLink msg(fListenPort, -1);
-	msg.StartMessage(AS_ROOTLAYER_HIDE_WINBORDER);
-	msg.Attach<WinBorder*>(winBorder);
-	msg.Flush();
+	Lock();
+	hide_winBorder(winBorder);
+	Unlock();
 }
 
 
 void
 RootLayer::ShowWinBorder(WinBorder* winBorder)
 {
-	BPrivate::PortLink msg(fListenPort, -1);
-	msg.StartMessage(AS_ROOTLAYER_SHOW_WINBORDER);
-	msg.Attach<WinBorder*>(winBorder);
-	msg.Flush();
+	Lock();
+	show_winBorder(winBorder);
+	Unlock();
 }
 
 
@@ -1026,14 +873,14 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 		redraw = false;
 		// trigger region rebuilding and redraw
 #ifndef NEW_CLIPPING
-		invalidate_layer(this, fFull);
+		GoInvalidate(this, fFull);
 #else
 		do_Invalidate(Bounds());
 #endif
 	}
 	else if (redraw) {
 #ifndef NEW_CLIPPING
-		invalidate_layer(this, dirtyRegion);
+		GoInvalidate(this, dirtyRegion);
 #else
 		do_Redraw(dirtyRegion);
 #endif
@@ -1257,7 +1104,7 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 			break;
 		}
 		case B_MOUSE_MOVED: {
-//printf("RootLayer::MouseEventHandler(B_MOUSE_MOVED)\n");
+			//printf("RootLayer::MouseEventHandler(B_MOUSE_MOVED)\n");
 			// Attached data:
 			// 1) int64 - time of mouse click
 			// 2) float - x coordinate of mouse click
@@ -1280,7 +1127,7 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 			break;
 		}
 		case B_MOUSE_WHEEL_CHANGED: {
-//printf("RootLayer::MouseEventHandler(B_MOUSE_WHEEL_CHANGED)\n");
+			//printf("RootLayer::MouseEventHandler(B_MOUSE_WHEEL_CHANGED)\n");
 			// FEATURE: This is a tentative change: mouse wheel messages are always sent to the window
 			// under the cursor. It's pretty stupid to send it to the active window unless a particular
 			// view has locked focus via SetMouseEventMask

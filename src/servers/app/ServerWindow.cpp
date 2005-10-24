@@ -1319,12 +1319,9 @@ myRootLayer->Unlock();
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Flush();
 
-				// ToDo: this is a pretty expensive and complicated way to send a message...
-				BPrivate::PortLink msg(-1, -1);
-				msg.StartMessage(AS_ROOTLAYER_ADD_TO_SUBSET);
-				msg.Attach<WinBorder*>(fWinBorder);
-				msg.Attach<WinBorder*>(windowBorder);
-				fWinBorder->GetRootLayer()->EnqueueMessage(msg);
+				fWinBorder->GetRootLayer()->Lock();
+				gDesktop->AddWinBorderToSubset(fWinBorder, windowBorder);
+				fWinBorder->GetRootLayer()->Unlock();
 			} else {
 				fLink.StartMessage(SERVER_FALSE);
 				fLink.Flush();
@@ -1346,11 +1343,9 @@ myRootLayer->Unlock();
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Flush();
 
-				BPrivate::PortLink msg(-1, -1);
-				msg.StartMessage(AS_ROOTLAYER_REMOVE_FROM_SUBSET);
-				msg.Attach<WinBorder*>(fWinBorder);
-				msg.Attach<WinBorder*>(windowBorder);
-				fWinBorder->GetRootLayer()->EnqueueMessage(msg);
+				fWinBorder->GetRootLayer()->Lock();
+				gDesktop->RemoveWinBorderFromSubset(fWinBorder, windowBorder);
+				fWinBorder->GetRootLayer()->Unlock();
 			} else {
 				fLink.StartMessage(SERVER_FALSE);
 				fLink.Flush();
@@ -1376,8 +1371,7 @@ myRootLayer->Unlock();
 			int32 newFeel;
 			link.Read<int32>(&newFeel);
 
-			if (myRootLayer)
-				myRootLayer->GoChangeWinBorderFeel(fWinBorder, newFeel);
+			fWinBorder->GetRootLayer()->GoChangeWinBorderFeel(winBorder, newFeel);
 			break;
 		}
 		case AS_SET_ALIGNMENT:
@@ -1403,17 +1397,15 @@ myRootLayer->Unlock();
 		}
 		case AS_SET_WORKSPACES:
 		{
-			// TODO: Implement AS_SET_WORKSPACES
 			STRACE(("ServerWindow %s: Message Set_Workspaces unimplemented\n", Title()));
 			uint32 newWorkspaces;
 			link.Read<uint32>(&newWorkspaces);
 
-			BPrivate::PortLink msg(-1, -1);
-			msg.StartMessage(AS_ROOTLAYER_WINBORDER_SET_WORKSPACES);
-			msg.Attach<WinBorder*>(fWinBorder);
-			msg.Attach<uint32>(fWinBorder->Workspaces());
-			msg.Attach<uint32>(newWorkspaces);
-			fWinBorder->GetRootLayer()->EnqueueMessage(msg);
+			fWinBorder->GetRootLayer()->Lock();
+			fWinBorder->GetRootLayer()->SetWinBorderWorskpaces( fWinBorder,
+																fWinBorder->Workspaces(),
+																newWorkspaces);
+			fWinBorder->GetRootLayer()->Unlock();
 			break;
 		}
 		case AS_WINDOW_RESIZE:

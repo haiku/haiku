@@ -1060,12 +1060,13 @@ Layer::MoveBy(float x, float y)
 		return;
 	}
 
-	BPrivate::PortLink msg(-1, -1);
-	msg.StartMessage(AS_ROOTLAYER_LAYER_MOVE);
-	msg.Attach<Layer*>(this);
-	msg.Attach<float>(x);
-	msg.Attach<float>(y);
-	GetRootLayer()->EnqueueMessage(msg);
+	GetRootLayer()->Lock();
+#ifndef NEW_CLIPPING
+	move_layer(x, y);
+#else
+	do_MoveBy(x, y);
+#endif
+	GetRootLayer()->Unlock();
 
 	STRACE(("Layer(%s)::MoveBy() END\n", Name()));
 }
@@ -1081,12 +1082,13 @@ Layer::ResizeBy(float x, float y)
 		return;
 	}
 
-	BPrivate::PortLink msg(-1, -1);
-	msg.StartMessage(AS_ROOTLAYER_LAYER_RESIZE);
-	msg.Attach<Layer*>(this);
-	msg.Attach<float>(x);
-	msg.Attach<float>(y);
-	GetRootLayer()->EnqueueMessage(msg);
+	GetRootLayer()->Lock();
+#ifndef NEW_CLIPPING
+	resize_layer(x, y);
+#else
+	do_ResizeBy(x, y);
+#endif
+	GetRootLayer()->Unlock();
 
 	STRACE(("Layer(%s)::ResizeBy() END\n", Name()));
 }
@@ -1097,12 +1099,13 @@ Layer::ScrollBy(float x, float y)
 {
 	STRACE(("Layer(%s)::ScrollBy() START\n", Name()));
 
-	BPrivate::PortLink msg(-1, -1);
-	msg.StartMessage(AS_ROOTLAYER_LAYER_SCROLL);
-	msg.Attach<Layer*>(this);
-	msg.Attach<float>(x);
-	msg.Attach<float>(y);
-	GetRootLayer()->EnqueueMessage(msg);
+	GetRootLayer()->Lock();
+#ifndef NEW_CLIPPING
+	// nothing
+#else
+	do_ScrollBy(x, y);
+#endif
+	GetRootLayer()->Unlock();
 
 	STRACE(("Layer(%s)::ScrollBy() END\n", Name()));
 }
@@ -1817,14 +1820,9 @@ Layer::SetOverlayBitmap(const ServerBitmap* bitmap)
 void
 Layer::CopyBits(BRect& src, BRect& dst, int32 xOffset, int32 yOffset) {
 
-	BPrivate::PortLink msg(-1, -1);
-	msg.StartMessage(AS_ROOTLAYER_LAYER_COPYBITS);
-	msg.Attach<Layer*>(this);	
-	msg.Attach<BRect>(src);
-	msg.Attach<BRect>(dst);
-	msg.Attach<int32>(xOffset);
-	msg.Attach<int32>(yOffset);
-	GetRootLayer()->EnqueueMessage(msg);
+	GetRootLayer()->Lock();
+	do_CopyBits(src, dst, xOffset, yOffset);
+	GetRootLayer()->Unlock();
 }		
 
 void
