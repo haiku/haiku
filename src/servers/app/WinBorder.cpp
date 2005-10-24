@@ -106,7 +106,6 @@ WinBorder::WinBorder(const BRect &frame,
 	// unlike BViews, windows start off as hidden
 	fHidden			= true;
 	fServerWin		= window;
-	fClassID		= AS_WINBORDER_CLASS;
 	fAdFlags		= fAdFlags | B_LAYER_CHILDREN_DEPENDANT;
 	fFlags			= B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE;
 #ifdef NEW_CLIPPING

@@ -61,13 +61,6 @@ enum {
 	B_LAYER_CHILDREN_DEPENDANT = 0x1000U,
 };
 
-// easy way to determine class type
-enum {
-	AS_LAYER_CLASS		= 1,
-	AS_WINBORDER_CLASS	= 2,
-	AS_ROOTLAYER_CLASS	= 3,
-};
-
 class ServerApp;
 class RootLayer;
 class DisplayDriver;
@@ -367,7 +360,6 @@ friend class OffscreenWinBorder;
 			bool				fHidden;
 			bool				fIsTopLayer;
 			uint16				fAdFlags;
-			int8				fClassID;
 	
 			DisplayDriver*		fDriver;
 			LayerData*			fLayerData;

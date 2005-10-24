@@ -119,9 +119,6 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	}
 #endif // DISPLAY_HAIKU_LOGO
 
-
-	// easy way to identify this class.
-	fClassID = AS_ROOTLAYER_CLASS;
 	fHidden	= false;
 
 	memset(fWorkspace, 0, sizeof(Workspace*) * kMaxWorkspaceCount);

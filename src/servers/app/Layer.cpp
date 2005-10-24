@@ -103,7 +103,6 @@ Layer::Layer(BRect frame, const char* name, int32 token,
 	fIsTopLayer(false),
 
 	fAdFlags(0),
-	fClassID(AS_LAYER_CLASS),
 
 	fDriver(driver),
 	fLayerData(new LayerData()),
