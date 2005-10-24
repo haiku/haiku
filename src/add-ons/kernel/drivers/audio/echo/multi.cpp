@@ -577,7 +577,8 @@ echo_get_global_format(echo_dev *card, multi_format_info *data)
 static status_t 
 echo_get_buffers(echo_dev *card, multi_buffer_list *data)
 {
-	int32 i, j, pchannels, rchannels, pchannels2;
+	int32 i, j, channels;
+	echo_stream *stream;
 	
 	LOG(("flags = %#x\n",data->flags));
 	LOG(("request_playback_buffers = %#x\n",data->request_playback_buffers));
@@ -587,14 +588,8 @@ echo_get_buffers(echo_dev *card, multi_buffer_list *data)
 	LOG(("request_record_channels = %#x\n",data->request_record_channels));
 	LOG(("request_record_buffer_size = %#x\n",data->request_record_buffer_size));
 	
-	pchannels = card->pstream->channels;
-	pchannels2 = card->pstream2->channels;
-	rchannels = card->rstream->channels;
-	
 	if (data->request_playback_buffers < BUFFER_COUNT ||
-		data->request_playback_channels < (pchannels + pchannels2) ||
-		data->request_record_buffers < BUFFER_COUNT ||
-		data->request_record_channels < (rchannels)) {
+		data->request_record_buffers < BUFFER_COUNT) {
 		LOG(("not enough channels/buffers\n"));
 	}
 
@@ -604,30 +599,44 @@ echo_get_buffers(echo_dev *card, multi_buffer_list *data)
 //	data->flags = 0;
 		
 	data->return_playback_buffers = BUFFER_COUNT;	/* playback_buffers[b][] */
-	data->return_playback_channels = pchannels + pchannels2;	/* playback_buffers[][c] */
+	data->return_playback_channels = 0;	/* playback_buffers[][c] */
 	data->return_playback_buffer_size = BUFFER_FRAMES;		/* frames */
 
-	for(i=0; i<BUFFER_COUNT; i++)
-		for(j=0; j<pchannels; j++)
-			echo_stream_get_nth_buffer(card->pstream, j, i, 
-				&data->playback_buffers[i][j].base,
-				&data->playback_buffers[i][j].stride);
-
-	for(i=0; i<BUFFER_COUNT; i++)
-		for(j=0; j<pchannels2; j++)
-			echo_stream_get_nth_buffer(card->pstream2, j, i,
-				&data->playback_buffers[i][pchannels + j].base,
-				&data->playback_buffers[i][pchannels + j].stride);
-					
+	LIST_FOREACH(stream, &card->streams, next) {
+		if ((stream->use & ECHO_USE_PLAY) == 0)
+			continue;
+		LOG(("get_buffers pipe %d\n", stream->pipe));
+		channels = data->return_playback_channels;
+		data->return_playback_channels += stream->channels;
+		if (data->request_playback_channels < data->return_playback_channels) {
+			LOG(("not enough channels\n"));
+		}	
+		for(i=0; i<BUFFER_COUNT; i++)
+			for(j=0; j<stream->channels; j++)
+				echo_stream_get_nth_buffer(stream, j, i, 
+					&data->playback_buffers[i][channels+j].base,
+					&data->playback_buffers[i][channels+j].stride);
+	}
+	
 	data->return_record_buffers = BUFFER_COUNT;
-	data->return_record_channels = rchannels;
+	data->return_record_channels = 0;
 	data->return_record_buffer_size = BUFFER_FRAMES;	/* frames */
 
-	for(i=0; i<BUFFER_COUNT; i++)
-		for(j=0; j<rchannels; j++)
-			echo_stream_get_nth_buffer(card->rstream, j, i, 
-				&data->record_buffers[i][j].base,
-				&data->record_buffers[i][j].stride);
+	LIST_FOREACH(stream, &card->streams, next) {
+		if ((stream->use & ECHO_USE_PLAY) != 0)
+			continue;
+		LOG(("get_buffers pipe %d\n", stream->pipe));
+		channels = data->return_record_channels;
+		data->return_record_channels += stream->channels;
+		if (data->request_record_channels < data->return_record_channels) {
+			LOG(("not enough channels\n"));
+		}
+		for(i=0; i<BUFFER_COUNT; i++)
+			for(j=0; j<stream->channels; j++)
+				echo_stream_get_nth_buffer(stream, j, i, 
+					&data->record_buffers[i][channels+j].base,
+					&data->record_buffers[i][channels+j].stride);
+	}
 		
 	return B_OK;
 }
@@ -679,17 +688,17 @@ static status_t
 echo_buffer_exchange(echo_dev *card, multi_buffer_info *data)
 {
 	cpu_status status;
-	echo_stream *pstream, *rstream;
+	echo_stream *pstream, *rstream, *stream;
 
 	data->flags = B_MULTI_BUFFER_PLAYBACK | B_MULTI_BUFFER_RECORD;
-	
-	if (!(card->pstream->state & ECHO_STATE_STARTED))
-		echo_stream_start(card->pstream, echo_play_inth, card->pstream);
-	if (!(card->pstream2->state & ECHO_STATE_STARTED))
-                echo_stream_start(card->pstream2, echo_play_inth, card->pstream2);
-	if (!(card->rstream->state & ECHO_STATE_STARTED))
-		echo_stream_start(card->rstream, echo_record_inth, card->rstream);
 
+	LIST_FOREACH(stream, &card->streams, next) {
+		if ((stream->state & ECHO_STATE_STARTED) != 0)
+			continue;
+		echo_stream_start(stream, 
+			(stream->use & ECHO_USE_PLAY == 0) ? echo_record_inth : echo_play_inth, stream);
+	}
+	
 	if(acquire_sem_etc(card->buffer_ready_sem, 1, B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, 50000)
 		== B_TIMED_OUT) {
 		LOG(("buffer_exchange timeout ff\n"));
@@ -841,13 +850,14 @@ static status_t
 echo_open(const char *name, uint32 flags, void** cookie)
 {
 	echo_dev *card = NULL;
-	int ix;
+	int ix, i, first_record_channel;
+	echo_stream *stream = NULL;
 	
 	LOG(("echo_open()\n"));
 	
-	for (ix=0; ix<num_cards; ix++) {
-		if (!strcmp(cards[ix].name, name)) {
-			card = &cards[ix];
+	for (i=0; i<num_cards; i++) {
+		if (!strcmp(cards[i].name, name)) {
+			card = &cards[i];
 		}
 	}
 	
@@ -865,30 +875,35 @@ echo_open(const char *name, uint32 flags, void** cookie)
 		return B_ERROR;
 	if (card->rstream != NULL)
 		return B_ERROR;
-	if (card->pstream2 != NULL)
-		return B_ERROR;
 			
 	*cookie = card;
 	card->multi.card = card;
 		
-	LOG(("stream_new\n"));
-		
-	card->rstream = echo_stream_new(card, ECHO_USE_RECORD, BUFFER_FRAMES, BUFFER_COUNT);
-	card->pstream2= echo_stream_new(card, ECHO_USE_PLAY, BUFFER_FRAMES, BUFFER_COUNT);
-	card->pstream = echo_stream_new(card, ECHO_USE_PLAY, BUFFER_FRAMES, BUFFER_COUNT);
+	LOG(("creating play streams\n"));
+	
+	for (i=card->caps.wNumPipesOut - 2; i >=0 ; i-=2) {
+		stream = echo_stream_new(card, ECHO_USE_PLAY, BUFFER_FRAMES, BUFFER_COUNT);
+		if (!card->pstream)
+			card->pstream = stream;
+		echo_stream_set_audioparms(stream, 2, 16, 48000, i);
+		stream->first_channel = i;
+	}
+	
+	first_record_channel = card->caps.wNumPipesOut;
+	
+	LOG(("creating record streams\n"));
+	
+	for (i=card->caps.wNumPipesIn - 2; i >= 0; i-=2) {
+		stream = echo_stream_new(card, ECHO_USE_RECORD, BUFFER_FRAMES, BUFFER_COUNT);
+		if (!card->rstream)
+			card->rstream = stream;
+		echo_stream_set_audioparms(stream, 2, 16, 48000, i);
+		stream->first_channel = i + first_record_channel;
+	}
 	
 	card->buffer_ready_sem = create_sem(0, "pbuffer ready");
-		
-	LOG(("stream_setaudio\n"));
 	
-	echo_stream_set_audioparms(card->pstream, 2, 16, 48000, 0);
-	echo_stream_set_audioparms(card->pstream2, 2, 16, 48000, 2);
-	echo_stream_set_audioparms(card->rstream, 2, 16, 48000, 0);
-		
-	card->pstream->first_channel = 0;
-	card->pstream2->first_channel = 2;
-	card->rstream->first_channel = 4;
-	
+	LOG(("creating channels list\n"));
 	echo_create_channels_list(&card->multi);
 
 	return B_OK;

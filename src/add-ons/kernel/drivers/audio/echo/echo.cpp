@@ -33,6 +33,9 @@
 #include "CDarla.h"
 #include "CGina.h"
 #include "CGina24.h"
+#include "CIndigo.h"
+#include "CIndigoDJ.h"
+#include "CIndigoIO.h"
 #include "CLayla.h"
 #include "CLayla24.h"
 #include "CMia.h"
@@ -444,10 +447,14 @@ init_hardware(void)
 			|| (card_type == LAYLA24)
 			|| (card_type == MONA)
 			|| (card_type == MIA)
-			|| (card_type == INDIGO)
+#endif
+#ifdef INDIGO_FAMILY
+			(card_type == INDIGO)
 			|| (card_type == INDIGO_IO)
 			|| (card_type == INDIGO_DJ)
-			|| (card_type == ECHO3G)
+#endif
+#ifdef ECHO3G_FAMILY
+			(card_type == ECHO3G)
 #endif
 			 )) {
 			err = B_OK;
@@ -498,10 +505,14 @@ init_driver(void)
 			|| (card_type == LAYLA24)
 			|| (card_type == MONA)
 			|| (card_type == MIA)
-			|| (card_type == INDIGO)
+#endif
+#ifdef INDIGO_FAMILY
+			(card_type == INDIGO)
 			|| (card_type == INDIGO_IO)
 			|| (card_type == INDIGO_DJ)
-			|| (card_type == ECHO3G)
+#endif
+#ifdef ECHO3G_FAMILY
+			(card_type == ECHO3G)
 #endif
 			)) {			
 			
@@ -600,6 +611,22 @@ echo_setup(echo_dev * card)
 			card->pEG = new CMia(card->pOSS);
 			name = "Echo Mia";
 			break;
+#endif
+#ifdef INDIGO_FAMILY
+		case INDIGO:
+			card->pEG = new CIndigo(card->pOSS);
+			name = "Echo Mia";
+			break;
+		case INDIGO_IO:
+			card->pEG = new CIndigoIO(card->pOSS);
+			name = "Echo Mia";
+			break;
+		case INDIGO_DJ:
+			card->pEG = new CIndigoDJ(card->pOSS);
+			name = "Echo Mia";
+			break;
+#endif
+#ifdef ECHO3G_FAMILY
 		case ECHO3G:
 			card->pEG = new C3g(card->pOSS);
 			name = "Echo 3g";
@@ -650,7 +677,7 @@ echo_setup(echo_dev * card)
 
 	echo_dump_caps(card);
 
-#ifdef ECHO24_FAMILY
+#ifdef ECHO3G_FAMILY
 	if (card->type == ECHO3G) {
 		strncpy(card->caps.szName, ((C3g*)card->pEG)->Get3gBoxName(), ECHO_MAXNAMELEN);
 	}

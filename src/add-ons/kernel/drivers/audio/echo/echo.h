@@ -99,7 +99,7 @@ typedef struct _echo_dev {
 	LIST_HEAD(, _echo_stream) streams;
 	LIST_HEAD(, _echo_mem) mems;
 	
-	echo_stream		*pstream, *pstream2;
+	echo_stream		*pstream;
 	echo_stream		*rstream;
 	
 	/* multi_audio */

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel drivers audio echo 24 ;
+SubDir OBOS_TOP src add-ons kernel drivers audio echo 3g ;
 
 SubDirHdrs $(OBOS_TOP) src add-ons kernel drivers audio echo ;
 SubDirHdrs $(OBOS_TOP) src add-ons kernel drivers audio echo generic ;
@@ -8,10 +8,12 @@ SubDirHdrs $(OBOS_TOP) src add-ons kernel drivers audio echo generic ASIC ;
 UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
 
 # set some additional defines
-SubDirCcFlags -DECHO_BEOS -DECHO24_FAMILY ;
-SubDirC++Flags -DECHO_BEOS -DECHO24_FAMILY -fno-rtti -DAUTO_DUCK_ALLOCATE ;
+SubDirCcFlags -DECHO_BEOS -DECHO3G_FAMILY ;
+SubDirC++Flags -DECHO_BEOS -DECHO3G_FAMILY -fno-rtti -DAUTO_DUCK_ALLOCATE ;
 
 local echo_files =
+	C3g.cpp
+	C3gDco.cpp
 	CChannelMask.cpp
 	CDaffyDuck.cpp
 	CDspCommObject.cpp
@@ -24,23 +26,14 @@ local echo_files =
 	CEchoGals_transport.cpp
 	CEchoGalsMTC.cpp
 	CEchoGalsVmixer.cpp
-	CGina24.cpp
-	CGina24DspCommObject.cpp
-	CGMLDspCommObject.cpp
-	CLayla24.cpp
-	CLayla24DspCommObject.cpp
 	CLineLevel.cpp
-	CMia.cpp
-	CMiaDspCommObject.cpp
 	CMidiInQ.cpp
-	CMona.cpp
-	CMonaDspCommObject.cpp
 	CMonitorCtrl.cpp
 	CMtcSync.cpp
 	CPipeOutCtrl.cpp
 	;
 
-R5KernelAddon echo24 : kernel drivers bin :
+R5KernelAddon echo3g : kernel drivers bin :
 	kernel_cpp.cpp
 	debug.c
 	echo.cpp
@@ -70,22 +63,22 @@ SEARCH on [ FGristFiles
 		util.c
 	] = [ FDirName $(OBOS_TOP) src add-ons kernel drivers audio echo ] ;
 
-Package haiku-echo24-cvs
+Package haiku-echo3g-cvs
 	:
-	echo24
+	echo3g
 	:
 	boot home config add-ons kernel drivers bin ;
 
-Package haiku-echo24-cvs
+Package haiku-echo3g-cvs
 	:
-	<kernel!drivers!dev!audio!multi>echo24
+	<kernel!drivers!dev!audio!multi>echo3g
 	:
 	boot home config add-ons kernel drivers dev audio multi ;
 
 # Link to kernel/drivers/dev/audio/multi
 {
 	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev audio multi ] ;
-	local instDriver = <kernel!drivers!dev!audio!multi>echo24 ;
+	local instDriver = <kernel!drivers!dev!audio!multi>echo3g ;
 	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : echo24 ;
+	RelSymLink $(instDriver) : echo3g ;
 }

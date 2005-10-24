@@ -9,7 +9,7 @@ UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
 
 # set some additional defines
 SubDirCcFlags -DECHO_BEOS -DECHOGALS_FAMILY ;
-SubDirC++Flags -DECHO_BEOS -DECHOGALS_FAMILY -fno-rtti ;
+SubDirC++Flags -DECHO_BEOS -DECHOGALS_FAMILY -fno-rtti -DAUTO_DUCK_ALLOCATE ;
 
 local echo_files =
 	CChannelMask.cpp

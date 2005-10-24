@@ -37,6 +37,12 @@
 #ifdef ECHOGALS_FAMILY
 #define DRIVER_NAME "echogals"
 #endif
+#ifdef INDIGO_FAMILY
+#define DRIVER_NAME "echoindigo"
+#endif
+#ifdef ECHO3G_FAMILY
+#define DRIVER_NAME "echo3g"
+#endif
 #define VERSION		"0.0"
 
 /*
