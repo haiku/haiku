@@ -331,6 +331,7 @@ AboutView::AboutView(const BRect &r)
 		"Rudolf Cornelissen\n"
 		"Jérôme Duval\n"
 		"Matthijs Hollemans\n"
+		"Waldemar Kornewald\n"
 		"Thomas Kurschel\n"
 		"Adi Oanca\n"
 		"Niels Reedijk\n"
