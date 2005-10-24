@@ -61,7 +61,8 @@ struct extended_memory {
 
 static const uint32 kDefaultPageTableFlags = 0x07;	// present, user, R/W
 static const size_t kMaxKernelSize = 0x100000;		// 1 MB for the kernel
-static const uint32 kPageTableRegionEnd = 0xa0000;
+static const uint32 kPageTableRegionEnd = 0x9e000;
+	// we need to reserve 2 pages for the SMP trampoline code
 
 // working page directory and page table
 static uint32 *sPageDirectory = 0;
