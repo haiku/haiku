@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_SAFEMODE_H
@@ -14,6 +14,7 @@
 
 #define B_SAFEMODE_DISABLE_USER_ADD_ONS		"disableuseraddons"
 #define B_SAFEMODE_DISABLE_IDE_DMA			"disableidedma"
+#define B_SAFEMODE_DISABLE_SMP				"disablesmp"
 
 
 #ifdef __cplusplus

@@ -14,12 +14,12 @@
 
 #include <boot/stage2.h>
 #include <arch/x86/smp_apic.h>
+#include <safemode.h>
 #include <kernel.h>
 
 #include <string.h>
 
-// ToDo: SMP is temporarily disabled!
-#define NO_SMP 1
+#define NO_SMP 0
 
 #define TRACE_SMP
 #ifdef TRACE_SMP
@@ -109,9 +109,6 @@ smp_do_config(void)
 	char *ptr;
 	int i;
 	struct mp_config_table *mpc;
-	struct mp_ext_pe *pe;
-	struct mp_ext_ioapic *io;
-	struct mp_ext_bus *bus;
 #ifdef TRACE_SMP
 	const char *cpu_family[] = { "", "", "", "", "Intel 486",
 		"Intel Pentium", "Intel Pentium Pro", "Intel Pentium II" };
@@ -142,7 +139,9 @@ smp_do_config(void)
 	for (i = 0; i < mpc->num_entries; i++) {
 		switch (*ptr) {
 			case MP_EXT_PE:
-				pe = (struct mp_ext_pe *) ptr;
+			{
+				struct mp_ext_pe *pe = (struct mp_ext_pe *)ptr;
+
 				gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus] = pe->apic_id;
 				gKernelArgs.arch_args.cpu_os_id[pe->apic_id] = gKernelArgs.num_cpus;
 				gKernelArgs.arch_args.cpu_apic_version[gKernelArgs.num_cpus] = pe->apic_version;
@@ -152,33 +151,52 @@ smp_do_config(void)
 					pe->apic_id, pe->apic_version, (pe->cpu_flags & 0x2) ?
 					", BSP" : ""));
 
-				ptr += 20;
 				gKernelArgs.num_cpus++;
+				ptr += sizeof(struct mp_ext_pe);
 				break;
+			}
 			case MP_EXT_BUS:
-				bus = (struct mp_ext_bus *)ptr;
+			{
+				struct mp_ext_bus *bus = (struct mp_ext_bus *)ptr;
 
-				TRACE(("smp: bus%d: %c%c%c%c%c%c\n", bus->bus_id,
+				TRACE(("smp: bus %d: %c%c%c%c%c%c\n", bus->bus_id,
 					bus->name[0], bus->name[1], bus->name[2], bus->name[3],
 					bus->name[4], bus->name[5]));
 
-				ptr += 8;
+				ptr += sizeof(struct mp_ext_bus);
 				break;
+			}
 			case MP_EXT_IO_APIC:
-				io = (struct mp_ext_ioapic *) ptr;
+			{
+				struct mp_ext_ioapic *io = (struct mp_ext_ioapic *) ptr;
 				gKernelArgs.arch_args.ioapic_phys = (uint32)io->addr;
 
 				TRACE(("smp: found io apic with apic id %d, version %d\n",
 					io->ioapic_id, io->ioapic_version));
 
-				ptr += 8;
+				ptr += sizeof(struct mp_ext_ioapic);
 				break;
+			}
 			case MP_EXT_IO_INT:
-				ptr += 8;
+			{
+				struct mp_ext_interrupt *interrupt = (struct mp_ext_interrupt *)ptr;
+				dprintf("smp: I/O int: source bus %d, irq %d, dest apic %d, int %d, polarity %d, trigger mode %d\n",
+					interrupt->source_bus_id, interrupt->source_bus_irq,
+					interrupt->dest_apic_id, interrupt->dest_apic_int,
+					interrupt->polarity, interrupt->trigger_mode);
+				ptr += sizeof(struct mp_ext_interrupt);
 				break;
+			}
 			case MP_EXT_LOCAL_INT:
-				ptr += 8;
+			{
+				struct mp_ext_interrupt *interrupt = (struct mp_ext_interrupt *)ptr;
+				dprintf("smp: local int: source bus %d, irq %d, dest apic %d, int %d, polarity %d, trigger mode %d\n",
+					interrupt->source_bus_id, interrupt->source_bus_irq,
+					interrupt->dest_apic_id, interrupt->dest_apic_int,
+					interrupt->polarity, interrupt->trigger_mode);
+				ptr += sizeof(struct mp_ext_interrupt);
 				break;
+			}
 		}
 	}
 	dprintf("smp: apic @ %p, i/o apic @ %p, total %ld processors detected\n",
@@ -296,7 +314,7 @@ smp_cpu_ready(void)
 		"pushl 	$0x0;"					// dummy retval for call to main
 		"pushl 	%2;	"					// this is the start address
 		"ret;		"					// jump.
-		: : "r" (curr_cpu), "m" (&gKernelArgs), "g" (gKernelArgs.kernel_image.elf_header.e_entry));
+		: : "g" (curr_cpu), "g" (&gKernelArgs), "g" (gKernelArgs.kernel_image.elf_header.e_entry));
 
 	// no where to return to
 	return 0;
@@ -344,18 +362,26 @@ smp_boot_other_cpus(void)
 	uint32 trampolineStack;
 	uint32 i;
 
+	void *handle = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
+	if (handle != NULL) {
+		if (get_driver_boolean_parameter(handle, B_SAFEMODE_DISABLE_SMP, false, false)) {
+			// SMP has been disabled!
+			gKernelArgs.num_cpus = 1;
+		}
+		unload_driver_settings(handle);
+	}
+
 	if (gKernelArgs.num_cpus < 2)
 		return;
 
 	TRACE(("trampolining other cpus\n"));
 
-	// XXX assume low 1 meg is identity mapped by the 1st stage bootloader
-	// and nothing important is in 0x9e000 & 0x9f000
+	// The first 8 MB are identity mapped, 0x9e000-0x9ffff is reserved for this
 
 	// allocate a stack and a code area for the smp trampoline
-	// (these have to be < 1M physical)
-	trampolineCode = 0x9f000; 	// 640kB - 4096 == 0x9f000
-	trampolineStack = 0x9e000; // 640kB - 8192 == 0x9e000
+	// (these have to be < 1M physical, 0xa0000-0xfffff is reserved by the BIOS)
+	trampolineCode = 0x9f000;
+	trampolineStack = 0x9e000;
 
 	// copy the trampoline code over
 	memcpy((char *)trampolineCode, &smp_trampoline,

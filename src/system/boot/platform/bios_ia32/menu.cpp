@@ -11,6 +11,7 @@
 
 #include <boot/platform.h>
 #include <boot/menu.h>
+#include <safemode.h>
 
 #include <string.h>
 
@@ -463,6 +464,9 @@ platform_add_menus(Menu *menu)
 			item->SetTarget(video_mode_hook);
 			break;
 		case SAFE_MODE_MENU:
+			menu->AddItem(item = new MenuItem("Disable SMP"));
+			item->SetData(B_SAFEMODE_DISABLE_SMP);
+			item->SetType(MENU_ITEM_MARKABLE);
 			menu->AddItem(item = new MenuItem("Don't call the BIOS"));
 			item->SetType(MENU_ITEM_MARKABLE);
 			break;

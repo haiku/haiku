@@ -1,7 +1,10 @@
-/* 
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+/*
+ * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 #ifndef _KERNEL_ARCH_x86_SMP_APIC_H
 #define _KERNEL_ARCH_x86_SMP_APIC_H
 
@@ -159,6 +162,18 @@ struct mp_ext_bus {
 	uint8	type;
 	uint8	bus_id;
 	char	name[6];
+};
+
+struct mp_ext_interrupt {
+	uint8	type;
+	uint8	interrupt_type;
+	uint16	polarity : 2;
+	uint16	trigger_mode : 2;
+	uint16	_reserved : 12;
+	uint8	source_bus_id;
+	uint8	source_bus_irq;
+	uint8	dest_apic_id;
+	uint8	dest_apic_int;
 };
 
 #endif	/* _KERNEL_ARCH_x86_SMP_APIC_H */
