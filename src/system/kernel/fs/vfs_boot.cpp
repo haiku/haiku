@@ -235,8 +235,10 @@ vfs_mount_boot_file_system(kernel_args *args)
 {
 	PartitionStack partitions;
 	status_t status = get_boot_partitions(args, partitions);
-	if (status < B_OK)
+	if (status < B_OK) {
+		panic("Did not get any boot partitions!");
 		return status;
+	}
 
 	KPartition *bootPartition;
 	while (partitions.Pop(&bootPartition)) {
