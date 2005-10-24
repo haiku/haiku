@@ -372,6 +372,7 @@ AboutView::AboutView(const BRect &r)
 		"Thomas Roell\n"
 		"Rafael Romo\n"
 		"Zousar Shaker\n"
+		"Jonas Sundström\n"
 		"Daniel Switkin\n"
 		"Atsushi Takamatsu\n"
 		"Jason Vandermark\n"
