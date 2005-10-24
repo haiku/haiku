@@ -162,6 +162,13 @@ class Layer {
 	virtual	void				MouseUp(const PointerEvent& evt);
 	virtual	void				MouseMoved(const PointerEvent& evt, uint32 transit);
 	virtual	void				MouseWheelChanged(const PointerEvent& evt);
+
+	virtual	void				KeyDown(const BMessage& msg);
+	virtual	void				KeyUp(const BMessage& msg);
+	virtual	void				UnmappedKeyDown(const BMessage& msg);
+	virtual	void				UnmappedKeyUp(const BMessage& msg);
+	virtual	void				ModifiersChanged(const BMessage& msg);
+
 	virtual	void				WorkspaceActivated(int32 index, bool active);
 	virtual	void				WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces);
 

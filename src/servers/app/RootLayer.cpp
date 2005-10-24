@@ -1276,26 +1276,23 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 			// window.
 
 			if (Focus()) {
-				ServerWindow *win = Focus()->Window();
-				if (win) {
-					BMessage keymsg(B_KEY_DOWN);
-					keymsg.AddInt64("when", time);
-					keymsg.AddInt32("key", scancode);
+				BMessage keymsg(B_KEY_DOWN);
+				keymsg.AddInt64("when", time);
+				keymsg.AddInt32("key", scancode);
 
-					if (repeatcount > 1)
-						keymsg.AddInt32("be:key_repeat", repeatcount);
+				if (repeatcount > 1)
+					keymsg.AddInt32("be:key_repeat", repeatcount);
 
-					keymsg.AddInt32("modifiers", modifiers);
-					keymsg.AddData("states", B_UINT8_TYPE, keystates, sizeof(int8) * 16);
+				keymsg.AddInt32("modifiers", modifiers);
+				keymsg.AddData("states", B_UINT8_TYPE, keystates, sizeof(int8) * 16);
 
-					for (uint8 i = 0; i < 3; i++)
-						keymsg.AddInt8("byte", utf[i]);
+				for (uint8 i = 0; i < 3; i++)
+					keymsg.AddInt8("byte", utf[i]);
 
-					keymsg.AddString("bytes", string);
-					keymsg.AddInt32("raw_char", raw_char);
+				keymsg.AddString("bytes", string);
+				keymsg.AddInt32("raw_char", raw_char);
 
-					win->SendMessageToClient(&keymsg, B_NULL_TOKEN, true);
-				}
+				Focus()->KeyDown(keymsg);
 			}
 
 			free(string);
@@ -1357,23 +1354,19 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 			// window.
 
 			if (Focus()) {
-				ServerWindow *win = Focus()->Window();
-				if (win) {
-					BMessage keymsg(B_KEY_UP);
-					keymsg.AddInt64("when", time);
-					keymsg.AddInt32("key", scancode);
-					keymsg.AddInt32("modifiers", modifiers);
-					keymsg.AddData("states", B_UINT8_TYPE, keystates, sizeof(int8) * 16);
+				BMessage keymsg(B_KEY_UP);
+				keymsg.AddInt64("when", time);
+				keymsg.AddInt32("key", scancode);
+				keymsg.AddInt32("modifiers", modifiers);
+				keymsg.AddData("states", B_UINT8_TYPE, keystates, sizeof(int8) * 16);
 
-					for (uint8 i = 0; i < 3; i++) {
-						keymsg.AddInt8("byte", utf[i]);
-					}
+				for (uint8 i = 0; i < 3; i++)
+					keymsg.AddInt8("byte", utf[i]);
 
-					keymsg.AddString("bytes", string);
-					keymsg.AddInt32("raw_char", raw_char);
+				keymsg.AddString("bytes", string);
+				keymsg.AddInt32("raw_char", raw_char);
 
-					win->SendMessageToClient(&keymsg, B_NULL_TOKEN, true);
-				}
+				Focus()->KeyUp(keymsg);
 			}
 
 			free(string);
@@ -1399,19 +1392,14 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 	
 			STRACE(("Unmapped Key Down: 0x%lx\n",scancode));
 			
-			if(Focus())
-			{
-				ServerWindow *win = Focus()->Window();
-				if(win)
-				{
-					BMessage keymsg(B_UNMAPPED_KEY_DOWN);
-					keymsg.AddInt64("when", time);
-					keymsg.AddInt32("key", scancode);
-					keymsg.AddInt32("modifiers", modifiers);
-					keymsg.AddData("states", B_UINT8_TYPE, keystates, sizeof(int8) * 16);
+			if(Focus()) {
+				BMessage keymsg(B_UNMAPPED_KEY_DOWN);
+				keymsg.AddInt64("when", time);
+				keymsg.AddInt32("key", scancode);
+				keymsg.AddInt32("modifiers", modifiers);
+				keymsg.AddData("states", B_UINT8_TYPE, keystates, sizeof(int8) * 16);
 					
-					win->SendMessageToClient(&keymsg, B_NULL_TOKEN, true);
-				}
+				Focus()->UnmappedKeyDown(keymsg);
 			}
 			
 			break;
@@ -1435,19 +1423,14 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 	
 			STRACE(("Unmapped Key Up: 0x%lx\n",scancode));
 			
-			if(Focus())
-			{
-				ServerWindow *win = Focus()->Window();
-				if(win)
-				{
-					BMessage keymsg(B_UNMAPPED_KEY_UP);
-					keymsg.AddInt64("when", time);
-					keymsg.AddInt32("key", scancode);
-					keymsg.AddInt32("modifiers", modifiers);
-					keymsg.AddData("states", B_UINT8_TYPE, keystates, sizeof(int8) * 16);
+			if(Focus()) {
+				BMessage keymsg(B_UNMAPPED_KEY_UP);
+				keymsg.AddInt64("when", time);
+				keymsg.AddInt32("key", scancode);
+				keymsg.AddInt32("modifiers", modifiers);
+				keymsg.AddData("states", B_UINT8_TYPE, keystates, sizeof(int8) * 16);
 					
-					win->SendMessageToClient(&keymsg, B_NULL_TOKEN, true);
-				}
+				Focus()->UnmappedKeyUp(keymsg);
 			}
 			
 			break;
@@ -1469,19 +1452,14 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 			msg.Read<int32>(&oldmodifiers);
 			msg.Read(keystates,sizeof(int8)*16);
 
-			if(Focus())
-			{
-				ServerWindow *win = Focus()->Window();
-				if(win)
-				{
-					BMessage keymsg(B_MODIFIERS_CHANGED);
-					keymsg.AddInt64("when", time);
-					keymsg.AddInt32("modifiers", modifiers);
-					keymsg.AddInt32("be:old_modifiers", oldmodifiers);
-					keymsg.AddData("states", B_UINT8_TYPE, keystates, sizeof(int8) * 16);
+			if(Focus()) {
+				BMessage keymsg(B_MODIFIERS_CHANGED);
+				keymsg.AddInt64("when", time);
+				keymsg.AddInt32("modifiers", modifiers);
+				keymsg.AddInt32("be:old_modifiers", oldmodifiers);
+				keymsg.AddData("states", B_UINT8_TYPE, keystates, sizeof(int8) * 16);
 					
-					win->SendMessageToClient(&keymsg, B_NULL_TOKEN, true);
-				}
+				Focus()->ModifiersChanged(keymsg);
 			}
 
 			break;
