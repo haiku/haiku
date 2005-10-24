@@ -1138,20 +1138,12 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 			msg.Read<float>(&evt.wheel_delta_x);
 			msg.Read<float>(&evt.wheel_delta_y);
 
-			if (fLastLayerUnderMouse && fLastLayerUnderMouse != this) {
-				if (fLastLayerUnderMouse->fOwner) { // is a Layer object not a WinBorder one
-					if (fLastLayerUnderMouse->fOwner->fTopLayer != fLastLayerUnderMouse) { // must not be the top_view's counterpart
-						BMessage wheelmsg(B_MOUSE_WHEEL_CHANGED);
-						wheelmsg.AddInt64("when", evt.when);
-						wheelmsg.AddFloat("be:wheel_delta_x",evt.wheel_delta_x);
-						wheelmsg.AddFloat("be:wheel_delta_y",evt.wheel_delta_y);
-						fLastLayerUnderMouse->Window()->SendMessageToClient(&wheelmsg, fLastLayerUnderMouse->fViewToken, false);
-					}
-				} else {
-					// TODO: WinBorder::MouseWheel() should dissapear or get other params!
-					// ((WinBorder*)fLastLayerUnderMouse)->MouseWheel(...)
-				}
+			if (fLastLayerUnderMouse == NULL) {
+				CRITICAL("RootLayer::MouseEventHandler(B_MOUSE_DOWN) fLastLayerUnderMouse is null!\n");
+				break;
 			}
+
+			fLastLayerUnderMouse->MouseWheelChanged(evt);
 			break;
 		}
 		default:

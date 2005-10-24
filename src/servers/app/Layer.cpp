@@ -1154,6 +1154,19 @@ Layer::MouseMoved(const PointerEvent& evt, uint32 transit)
 }
 
 void
+Layer::MouseWheelChanged(const PointerEvent& evt)
+{
+	if (Window() && !IsTopLayer()) {
+		BMessage wheelmsg(B_MOUSE_WHEEL_CHANGED);
+		wheelmsg.AddInt64("when", evt.when);
+		wheelmsg.AddFloat("be:wheel_delta_x",evt.wheel_delta_x);
+		wheelmsg.AddFloat("be:wheel_delta_y",evt.wheel_delta_y);
+
+		Window()->SendMessageToClient(&wheelmsg, fViewToken, false);
+	}
+}
+
+void
 Layer::WorkspaceActivated(int32 index, bool active)
 {
 	// Empty
