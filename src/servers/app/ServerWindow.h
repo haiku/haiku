@@ -71,7 +71,7 @@ public:
 									const color_space cspace);
 
 			// util methods.	
-	virtual	void				SendMessageToClient(const BMessage* msg,
+			status_t			SendMessageToClient(const BMessage* msg,
 													int32 target = B_NULL_TOKEN,
 													bool usePreferred = false) const;
 

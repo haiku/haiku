@@ -2329,21 +2329,24 @@ ServerWindow::_CopyBits(RootLayer* rootLayer, Layer* layer,
 }*/
 
 
-void
+status_t
 ServerWindow::SendMessageToClient(const BMessage* msg, int32 target, bool usePreferred) const
 {
 	ssize_t size = msg->FlattenedSize();
 	char* buffer = new char[size];
+	status_t ret;
 
-	if (msg->Flatten(buffer, size) == B_OK) {
-		status_t ret = BMessage::Private::SendFlattenedMessage(buffer, size,
-							fClientLooperPort, target, usePreferred, 100000);
+	if ((ret = msg->Flatten(buffer, size)) == B_OK) {
+		ret = BMessage::Private::SendFlattenedMessage(buffer, size,
+					fClientLooperPort, target, usePreferred, 100000);
 		if (ret < B_OK)
 			fprintf(stderr, "ServerWindow::SendMessageToClient(): %s\n", strerror(ret));
 	} else
 		printf("PANIC: ServerWindow %s: can't flatten message in 'SendMessageToClient()'\n", fTitle);
 
 	delete[] buffer;
+
+	return ret;
 }
 
 // MakeWinBorder
