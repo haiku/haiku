@@ -372,7 +372,7 @@ friend class OffscreenWinBorder;
 											Layer* startFrom);
 			ServerWindow*		SearchForServerWindow();
 
-			void				SendUpdateMsg(BRegion& reg);
+			status_t			SendUpdateMsg(BRegion& reg);
 			void				AddToViewsWithInvalidCoords() const;
 			void				SendViewCoordUpdateMsg() const;
 

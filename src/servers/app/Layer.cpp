@@ -1535,9 +1535,14 @@ Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 fOwner->cnt++;
 if (fOwner->cnt != 1)
 	CRITICAL("Layer::RequestDraw(): fOwner->cnt != 1 -> Not Allowed!");
-				fOwner->fCumulativeRegion.MakeEmpty();
-				fOwner->fRequestSent = true;
-				SendUpdateMsg(fOwner->fInUpdateRegion);
+				fOwner->fRequestSent = true; // this is here to avoid a possible de-synchronization
+				if (SendUpdateMsg(fOwner->fInUpdateRegion) == B_OK) {
+					fOwner->fCumulativeRegion.MakeEmpty();
+				}
+				else {
+					fOwner->fRequestSent = false;
+					fOwner->fInUpdateRegion.MakeEmpty();
+				}
 			}
 		}
 	}
@@ -1587,9 +1592,14 @@ if (fOwner->cnt != 1)
 fOwner->cnt++;
 if (fOwner->cnt != 1)
 	CRITICAL("Layer::RequestDraw(): fOwner->cnt != 1 -> Not Allowed!");
-				fOwner->fCumulativeRegion.MakeEmpty();
-				fOwner->fRequestSent = true;
-				SendUpdateMsg(fOwner->fInUpdateRegion);
+				fOwner->fRequestSent = true; // this is here to avoid a possible de-synchronization
+				if (SendUpdateMsg(fOwner->fInUpdateRegion) == B_OK) {
+					fOwner->fCumulativeRegion.MakeEmpty();
+				}
+				else {
+					fOwner->fRequestSent = false;
+					fOwner->fInUpdateRegion.MakeEmpty();
+				}
 			}
 		}
 	}
@@ -1765,7 +1775,7 @@ Layer::SearchForServerWindow()
 }
 
 //! Sends an _UPDATE_ message to the client BWindow
-void
+status_t
 Layer::SendUpdateMsg(BRegion& reg)
 {
 	BMessage msg;
@@ -1780,7 +1790,7 @@ Layer::SendUpdateMsg(BRegion& reg)
 	msg.AddRect("debug_rect", reg.Frame());
 //	msg.AddInt32("_token",fViewToken);
 		
-	fOwner->Window()->SendMessageToClient(&msg);
+	return Owner()->Window()->SendMessageToClient(&msg);
 }
 
 // AddToViewsWithInvalidCoords
