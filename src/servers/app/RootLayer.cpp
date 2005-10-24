@@ -1771,3 +1771,67 @@ RootLayer::AddDebugInfo(const char* string)
 	}
 }
 #endif // ON_SCREEN_DEBUGGING_INFO
+
+
+// taken from BLooper
+void *
+RootLayer::ReadRawFromPort(int32 *msgCode, bigtime_t timeout)
+{
+	int8 *msgBuffer = NULL;
+	ssize_t bufferSize;
+
+	do {
+		bufferSize = port_buffer_size_etc(fListenPort, B_RELATIVE_TIMEOUT, timeout);
+	} while (bufferSize == B_INTERRUPTED);
+
+	if (bufferSize < B_OK)
+		return NULL;
+
+	if (bufferSize > 0)
+		msgBuffer = new int8[bufferSize];
+
+	// we don't want to wait again here, since that can only mean
+	// that someone else has read our message and our bufferSize
+	// is now probably wrong
+	bufferSize = read_port_etc(fListenPort, msgCode, msgBuffer, bufferSize,
+					  B_RELATIVE_TIMEOUT, 0);
+	if (bufferSize < B_OK) {
+		delete[] msgBuffer;
+		return NULL;
+	}
+
+	return msgBuffer;
+}
+
+
+BMessage *
+RootLayer::ReadMessageFromPort(bigtime_t tout)
+{
+	int32 msgcode;
+	BMessage* bmsg;
+
+	void* msgbuffer = ReadRawFromPort(&msgcode, tout);
+	if (!msgbuffer)
+		return NULL;
+
+	bmsg = ConvertToMessage(msgbuffer, msgcode);
+
+	delete[] (int8*)msgbuffer;
+
+	return bmsg;
+}
+//------------------------------------------------------------------------------
+BMessage*
+RootLayer::ConvertToMessage(void* raw, int32 code)
+{
+	BMessage* bmsg = new BMessage(code);
+
+	if (raw != NULL) {
+		if (bmsg->Unflatten((const char*)raw) != B_OK) {
+			delete bmsg;
+			bmsg = NULL;
+		}
+	}
+
+	return bmsg;
+}

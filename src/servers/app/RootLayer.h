@@ -169,6 +169,10 @@ friend class WinBorder; // temporarily, I need invalidate_layer()
 	inline	HWInterface*		GetHWInterface() const
 									{ return fDesktop->GetHWInterface(); }
 
+			void*				ReadRawFromPort(int32 *msgCode, bigtime_t timeout);
+			BMessage*			ReadMessageFromPort(bigtime_t tout);
+			BMessage*			ConvertToMessage(void* raw, int32 code);
+
 			Desktop*			fDesktop;
 			BMessage*			fDragMessage;
 			Layer*				fLastLayerUnderMouse;
