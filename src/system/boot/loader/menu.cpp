@@ -464,10 +464,12 @@ apply_safe_mode_options(Menu *menu)
 	buffer[0] = '\0';
 
 	while ((item = iterator.Next()) != NULL) {
-		if (item->Type() == MENU_ITEM_SEPARATOR || !item->IsMarked() || (uint32)pos > sizeof(buffer))
+		if (item->Type() == MENU_ITEM_SEPARATOR || !item->IsMarked()
+			|| item->Data() == NULL || (uint32)pos > sizeof(buffer))
 			continue;
 
-		pos += snprintf(buffer + pos, sizeof(buffer) - pos, "%s true\n", (const char *)item->Data());
+		pos += snprintf(buffer + pos, sizeof(buffer) - pos, "%s true\n",
+			(const char *)item->Data());
 	}
 
 	add_safe_mode_settings(buffer);
