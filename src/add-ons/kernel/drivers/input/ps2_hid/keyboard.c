@@ -27,8 +27,9 @@ enum {
 } leds_status;
 
 enum {
-	PS2_DATA_SET_LEDS	= 0xed,
-	PS2_ENABLE_KEYBOARD	= 0xf4,
+	PS2_DATA_SET_LEDS		= 0xed,
+	PS2_ENABLE_KEYBOARD		= 0xf4,
+	PS2_DISABLE_KEYBOARD	= 0xf5,
 
 	EXTENDED_KEY = 0xe0,
 };
@@ -237,13 +238,14 @@ enable_keyboard(void)
 {
 	uint32 tries = 3;
 
-	keyboard_empty_data();
-
 	while (tries-- > 0) {
+		keyboard_empty_data();
+
 		if (keyboard_command(PS2_ENABLE_KEYBOARD, NULL, 0) == B_OK)
 			return B_OK;
 	}
 
+	dprintf("enable_keyboard() failed\n");	
 	return B_ERROR;
 }
 
@@ -260,6 +262,8 @@ probe_keyboard(void)
 	
 	keyboard_empty_data();
 
+	// Keyboard detection does not seem to be working always correctly
+#if 0
 	// Keyboard self-test
 
 	if (ps2_write_ctrl(PS2_CTRL_KEYBOARD_SELF_TEST) != B_OK)
@@ -284,6 +288,8 @@ probe_keyboard(void)
 	// Enable keyboard
 
 	return enable_keyboard();
+#endif
+	return B_OK;
 }
 
 
