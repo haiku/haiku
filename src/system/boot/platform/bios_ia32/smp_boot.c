@@ -33,6 +33,18 @@ struct gdt_idt_descr {
 	uint32 *b;
 } _PACKED;
 
+struct smp_scan_spots_struct {
+	uint32 start;
+	uint32 stop;
+	uint32 length;
+};
+
+static struct smp_scan_spots_struct smp_scan_spots[] = {
+	{ 0x9fc00, 0xa0000, 0xa0000 - 0x9fc00 },
+	{ 0xf0000, 0x100000, 0x100000 - 0xf0000 },
+	{ 0, 0, 0 }
+};
+
 
 extern void execute_n_instructions(int count);
 
@@ -40,9 +52,7 @@ extern void smp_trampoline(void);
 extern void smp_trampoline_end(void);
 
 
-static uint32 mp_mem_phys = 0;
-static uint32 mp_mem_virt = 0;
-static struct mp_flt_struct *mp_flt_ptr = NULL;
+static struct mp_floating_struct *sFloatingStruct = NULL;
 
 static int smp_get_current_cpu(void);
 
@@ -59,20 +69,6 @@ apic_write(uint32 offset, uint32 data)
 {
 	uint32 *addr = (uint32 *)((uint32)gKernelArgs.arch_args.apic + offset);
 	*addr = data;
-}
-
-/*
-static void *
-mp_virt_to_phys(void *ptr)
-{
-	return ((void *)(((unsigned int)ptr - mp_mem_virt) + mp_mem_phys));
-}
-*/
-
-static void *
-mp_phys_to_virt(void *ptr)
-{
-	return ((void *)(((uint32)ptr - mp_mem_phys) + mp_mem_virt));
 }
 
 
@@ -106,9 +102,9 @@ smp_probe(uint32 base, uint32 limit)
 static void
 smp_do_config(void)
 {
+	struct mp_config_table *config;
 	char *ptr;
 	int i;
-	struct mp_config_table *mpc;
 #ifdef TRACE_SMP
 	const char *cpu_family[] = { "", "", "", "", "Intel 486",
 		"Intel Pentium", "Intel Pentium Pro", "Intel Pentium II" };
@@ -121,104 +117,88 @@ smp_do_config(void)
 	 */
 	gKernelArgs.num_cpus = 0;
 
-	mpc = mp_phys_to_virt(mp_flt_ptr->mpc);
+	config = sFloatingStruct->config_table;
 
 	/* print out our new found configuration. */
-	ptr = (char *) &(mpc->oem[0]);
 
+	ptr = (char *)&(config->oem[0]);
 	TRACE(("smp: oem id: %c%c%c%c%c%c%c%c product id: "
 		"%c%c%c%c%c%c%c%c%c%c%c%c\n", ptr[0], ptr[1], ptr[2], ptr[3], ptr[4],
 		ptr[5], ptr[6], ptr[7], ptr[8], ptr[9], ptr[10], ptr[11], ptr[12],
 		ptr[13], ptr[14], ptr[15], ptr[16], ptr[17], ptr[18], ptr[19]));
 	TRACE(("smp: base table has %d entries, extended section %d bytes\n",
-		mpc->num_entries, mpc->ext_len));
+		config->num_base_entries, config->ext_length));
 
-	gKernelArgs.arch_args.apic_phys = (uint32)mpc->apic;
+	gKernelArgs.arch_args.apic_phys = (uint32)config->apic;
 
-	ptr = (char *)((uint32)mpc + sizeof(struct mp_config_table));
-	for (i = 0; i < mpc->num_entries; i++) {
+	ptr = (char *)((uint32)config + sizeof(struct mp_config_table));
+	for (i = 0; i < config->num_base_entries; i++) {
 		switch (*ptr) {
 			case MP_EXT_PE:
 			{
-				struct mp_ext_pe *pe = (struct mp_ext_pe *)ptr;
+				struct mp_base_processor *processor = (struct mp_base_processor *)ptr;
 
-				gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus] = pe->apic_id;
-				gKernelArgs.arch_args.cpu_os_id[pe->apic_id] = gKernelArgs.num_cpus;
-				gKernelArgs.arch_args.cpu_apic_version[gKernelArgs.num_cpus] = pe->apic_version;
+				gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus] = processor->apic_id;
+				gKernelArgs.arch_args.cpu_os_id[processor->apic_id] = gKernelArgs.num_cpus;
+				gKernelArgs.arch_args.cpu_apic_version[gKernelArgs.num_cpus] = processor->apic_version;
 
 				TRACE(("smp: cpu#%ld: %s, apic id %d, version %d%s\n",
-					gKernelArgs.num_cpus, cpu_family[(pe->signature & 0xf00) >> 8],
-					pe->apic_id, pe->apic_version, (pe->cpu_flags & 0x2) ?
+					gKernelArgs.num_cpus, cpu_family[(processor->signature & 0xf00) >> 8],
+					processor->apic_id, processor->apic_version, (processor->cpu_flags & 0x2) ?
 					", BSP" : ""));
 
 				gKernelArgs.num_cpus++;
-				ptr += sizeof(struct mp_ext_pe);
+				ptr += sizeof(struct mp_base_processor);
 				break;
 			}
 			case MP_EXT_BUS:
 			{
-				struct mp_ext_bus *bus = (struct mp_ext_bus *)ptr;
+				struct mp_base_bus *bus = (struct mp_base_bus *)ptr;
 
 				TRACE(("smp: bus %d: %c%c%c%c%c%c\n", bus->bus_id,
 					bus->name[0], bus->name[1], bus->name[2], bus->name[3],
 					bus->name[4], bus->name[5]));
 
-				ptr += sizeof(struct mp_ext_bus);
+				ptr += sizeof(struct mp_base_bus);
 				break;
 			}
 			case MP_EXT_IO_APIC:
 			{
-				struct mp_ext_ioapic *io = (struct mp_ext_ioapic *) ptr;
+				struct mp_base_ioapic *io = (struct mp_base_ioapic *) ptr;
 				gKernelArgs.arch_args.ioapic_phys = (uint32)io->addr;
 
 				TRACE(("smp: found io apic with apic id %d, version %d\n",
 					io->ioapic_id, io->ioapic_version));
 
-				ptr += sizeof(struct mp_ext_ioapic);
+				ptr += sizeof(struct mp_base_ioapic);
 				break;
 			}
 			case MP_EXT_IO_INT:
-			{
-				struct mp_ext_interrupt *interrupt = (struct mp_ext_interrupt *)ptr;
-				dprintf("smp: I/O int: source bus %d, irq %d, dest apic %d, int %d, polarity %d, trigger mode %d\n",
-					interrupt->source_bus_id, interrupt->source_bus_irq,
-					interrupt->dest_apic_id, interrupt->dest_apic_int,
-					interrupt->polarity, interrupt->trigger_mode);
-				ptr += sizeof(struct mp_ext_interrupt);
-				break;
-			}
 			case MP_EXT_LOCAL_INT:
 			{
-				struct mp_ext_interrupt *interrupt = (struct mp_ext_interrupt *)ptr;
-				dprintf("smp: local int: source bus %d, irq %d, dest apic %d, int %d, polarity %d, trigger mode %d\n",
-					interrupt->source_bus_id, interrupt->source_bus_irq,
-					interrupt->dest_apic_id, interrupt->dest_apic_int,
-					interrupt->polarity, interrupt->trigger_mode);
-				ptr += sizeof(struct mp_ext_interrupt);
+				struct mp_base_interrupt *interrupt = (struct mp_base_interrupt *)ptr;
+
+				dprintf("smp: %s int: type %d, source bus %d, irq %d, dest apic %d, int %d, polarity %d, trigger mode %d\n",
+					interrupt->type == MP_EXT_IO_INT ? "I/O" : "local",
+					interrupt->interrupt_type, interrupt->source_bus_id,
+					interrupt->source_bus_irq, interrupt->dest_apic_id,
+					interrupt->dest_apic_int, interrupt->polarity,
+					interrupt->trigger_mode);
+				ptr += sizeof(struct mp_base_interrupt);
 				break;
 			}
 		}
 	}
+
 	dprintf("smp: apic @ %p, i/o apic @ %p, total %ld processors detected\n",
-		(void *)gKernelArgs.arch_args.apic_phys, (void *)gKernelArgs.arch_args.ioapic_phys, gKernelArgs.num_cpus);
+		(void *)gKernelArgs.arch_args.apic_phys,
+		(void *)gKernelArgs.arch_args.ioapic_phys,
+		gKernelArgs.num_cpus);
 
 	// this BIOS looks broken, because it didn't report any cpus (VMWare)
 	if (gKernelArgs.num_cpus == 0)
 		gKernelArgs.num_cpus = 1;
 }
-
-
-struct smp_scan_spots_struct {
-	uint32 start;
-	uint32 stop;
-	uint32 len;
-};
-
-static struct smp_scan_spots_struct smp_scan_spots[] = {
-	{ 0x9fc00, 0xa0000, 0xa0000 - 0x9fc00 },
-	{ 0xf0000, 0x100000, 0x100000 - 0xf0000 },
-	{ 0, 0, 0 }
-};
 
 
 static int
@@ -232,30 +212,29 @@ smp_find_mp_config(void)
 #endif
 
 	// XXX for now, assume the memory is identity mapped by the 1st stage
-	for (i = 0; smp_scan_spots[i].len > 0; i++) {
-		mp_flt_ptr = (struct mp_flt_struct *)smp_probe(smp_scan_spots[i].start,
+	for (i = 0; smp_scan_spots[i].length > 0; i++) {
+		sFloatingStruct = (struct mp_floating_struct *)smp_probe(smp_scan_spots[i].start,
 			smp_scan_spots[i].stop);
-		if (mp_flt_ptr != NULL)
+		if (sFloatingStruct != NULL)
 			break;
 	}
 
-	if (mp_flt_ptr != NULL) {
-		mp_mem_phys = smp_scan_spots[i].start;
-		mp_mem_virt = smp_scan_spots[i].start;
+	if (sFloatingStruct != NULL) {
+		TRACE(("smp_boot: intel mp version %s, %s",
+			(sFloatingStruct->spec_revision == 1) ? "1.1" : "1.4",
+			(sFloatingStruct->mp_feature_2 & 0x80)
+				? "imcr and pic compatibility mode.\n"
+				: "virtual wire compatibility mode.\n"));
 
-		TRACE(("smp_boot: intel mp version %s, %s", (mp_flt_ptr->mp_rev == 1) ? "1.1" :
-			"1.4", (mp_flt_ptr->mp_feature_2 & 0x80) ?
-			"imcr and pic compatibility mode.\n" : "virtual wire compatibility mode.\n"));
-
-		if (mp_flt_ptr->mpc == 0) {
+		if (sFloatingStruct->config_table == NULL) {
 			// XXX need to implement
 #if 1
 			gKernelArgs.num_cpus = 1;
 			return 1;
 #else
 			/* this system conforms to one of the default configurations */
-//			mp_num_def_config = mp_flt_ptr->mp_feature_1;
-			TRACE(("smp: standard configuration %d\n", mp_flt_ptr->mp_feature_1));
+//			mp_num_def_config = sFloatingStruct->mp_feature_1;
+			TRACE(("smp: standard configuration %d\n", sFloatingStruct->mp_feature_1));
 /*			num_cpus = 2;
 			gKernelArgs.cpu_apic_id[0] = 0;
 			gKernelArgs.cpu_apic_id[1] = 1;

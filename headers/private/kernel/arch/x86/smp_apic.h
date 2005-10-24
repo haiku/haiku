@@ -108,39 +108,33 @@
 #define MP_EXT_IO_INT			3
 #define MP_EXT_LOCAL_INT		4
 
-#define MP_EXT_PE_LEN			20
-#define MP_EXT_BUS_LEN			8
-#define MP_EXT_IO_APIC_LEN		8
-#define MP_EXT_IO_INT_LEN		8
-#define MP_EXT_LOCAL_INT_LEN	8
-
 struct mp_config_table {
 	uint32	signature;			/* "PCMP" */
-	uint16	table_len;			/* length of this structure */
-	uint8	mp_rev;				/* spec supported, 1 for 1.1 or 4 for 1.4 */
+	uint16	base_table_length;	/* length of the base table entries and this structure */
+	uint8	spec_revision;		/* spec supported, 1 for 1.1 or 4 for 1.4 */
 	uint8	checksum;			/* checksum, all bytes add up to zero */
 	char	oem[8];				/* oem identification, not null-terminated */
 	char	product[12];		/* product name, not null-terminated */
-	void	*oem_table_ptr;		/* addr of oem-defined table, zero if none */
-	uint16	oem_len;			/* length of oem table */
-	uint16	num_entries;		/* number of entries in base table */
+	void	*oem_table;			/* addr of oem-defined table, zero if none */
+	uint16	oem_length;			/* length of oem table */
+	uint16	num_base_entries;	/* number of entries in base table */
 	uint32	apic;				/* address of apic */
-	uint16	ext_len;			/* length of extended section */
+	uint16	ext_length;			/* length of extended section */
 	uint8	ext_checksum;		/* checksum of extended table entries */
 };
 
-struct mp_flt_struct {
+struct mp_floating_struct {
 	uint32	signature;			/* "_MP_" */
-	struct mp_config_table *mpc; /* address of mp configuration table */
-	uint8	mpc_len;			/* length of this structure in 16-byte units */
-	uint8	mp_rev;				/* spec supported, 1 for 1.1 or 4 for 1.4 */
+	struct mp_config_table *config_table; /* address of mp configuration table */
+	uint8	config_length;		/* length of the table in 16-byte units */
+	uint8	spec_revision;		/* spec supported, 1 for 1.1 or 4 for 1.4 */
 	uint8	checksum;			/* checksum, all bytes add up to zero */
 	uint8	mp_feature_1;		/* mp system configuration type if no mpc */
 	uint8	mp_feature_2;		/* imcrp */
 	uint8	mp_feature_3, mp_feature_4, mp_feature_5; /* reserved */
 };
 
-struct mp_ext_pe {
+struct mp_base_processor {
 	uint8	type;
 	uint8	apic_id;
 	uint8	apic_version;
@@ -150,7 +144,7 @@ struct mp_ext_pe {
 	uint32	res1, res2;
 };
 
-struct mp_ext_ioapic {
+struct mp_base_ioapic {
 	uint8	type;
 	uint8	ioapic_id;
 	uint8	ioapic_version;
@@ -158,13 +152,13 @@ struct mp_ext_ioapic {
 	uint32	*addr;
 };
 
-struct mp_ext_bus {
+struct mp_base_bus {
 	uint8	type;
 	uint8	bus_id;
 	char	name[6];
 };
 
-struct mp_ext_interrupt {
+struct mp_base_interrupt {
 	uint8	type;
 	uint8	interrupt_type;
 	uint16	polarity : 2;
@@ -174,6 +168,13 @@ struct mp_ext_interrupt {
 	uint8	source_bus_irq;
 	uint8	dest_apic_id;
 	uint8	dest_apic_int;
+};
+
+enum {
+	MP_INT_TYPE_INT = 0,
+	MP_INT_TYPE_NMI,
+	MP_INT_TYPE_SMI,
+	MP_INT_TYPE_ExtINT,
 };
 
 #endif	/* _KERNEL_ARCH_x86_SMP_APIC_H */
