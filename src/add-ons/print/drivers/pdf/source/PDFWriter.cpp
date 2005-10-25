@@ -236,9 +236,9 @@ PDFWriter::EndJob()
 	PDF_close(fPdf);
 	REPORT(kDebug, 0, ">>>> PDF_close");
 
-   	PDF_delete(fPdf);
-    PDF_shutdown();
-
+	PDF_delete(fPdf);
+	PDF_shutdown();
+	
 	fclose(fLog);
 	return B_OK;
 }
@@ -268,9 +268,11 @@ PDFWriter::InitWriter()
 	fState = NULL;
 	fStateDepth = 0;
 
-	// Set MIME-type explicit
-	SetAttribute("BEOS:TYPE", "application/pdf");
-	
+	// Set MIME type explicit as we *do* know it's a PDF document
+	BFile * file = dynamic_cast<BFile *>(Transport());
+	if (file)
+		BNodeInfo(file).SetType("application/pdf");
+
 	// pdflib scope: object
 /*
 	const char* license_key;
