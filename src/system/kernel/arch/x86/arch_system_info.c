@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,25 +15,44 @@
 #include <string.h>
 
 
-extern void cpuid(uint32 selector, cpuid_info *info);
-extern uint32 cv_factor;
-
-
 uint32 sCpuType;
 int32 sCpuRevision;
 int64 sCpuClockSpeed;
 
 
-status_t
-get_cpuid(cpuid_info *info, uint32 eaxRegister, uint32 cpuNum)
+static bool
+get_cpuid_for(cpuid_info *info, uint32 currentCPU, uint32 eaxRegister, uint32 forCPU)
 {
-	if (cpuNum >= (uint32)smp_get_num_cpus())
+	if (currentCPU != forCPU)
+		return false;
+
+	get_current_cpuid(info, eaxRegister);
+	return true;
+}
+
+
+status_t
+get_cpuid(cpuid_info *info, uint32 eaxRegister, uint32 forCPU)
+{
+	uint32 numCPUs = (uint32)smp_get_num_cpus();
+	cpu_status state;
+
+	if (forCPU >= numCPUs)
 		return B_BAD_VALUE;
 
-	// ToDo: cpu_num is ignored, we should use the call_all_cpus() function
-	//		to fix this.
+	// prevent us from being rescheduled
+	state = disable_interrupts();
 
-	return get_current_cpuid(info, eaxRegister);
+	// ToDo: as long as we only run on pentium-class systems, we can assume
+	//	that the CPU supports cpuid.
+
+	if (!get_cpuid_for(info, smp_get_current_cpu(), eaxRegister, forCPU)) {
+		smp_send_broadcast_ici(SMP_MSG_CALL_FUNCTION, (uint32)info,
+			eaxRegister, forCPU, (void *)get_cpuid_for, SMP_MSG_FLAG_SYNC);
+	}
+
+	restore_interrupts(state);
+	return B_OK;
 }
 
 

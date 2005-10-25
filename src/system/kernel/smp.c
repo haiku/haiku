@@ -184,9 +184,10 @@ release_spinlock(spinlock *lock)
 }
 
 
-// finds a free message and gets it
-// NOTE: has side effect of disabling interrupts
-// return value is interrupt state
+/** Finds a free message and gets it.
+ *	NOTE: has side effect of disabling interrupts
+ *	return value is the former interrupt state
+ */
 
 static cpu_status
 find_free_message(struct smp_msg **msg)
@@ -328,10 +329,10 @@ finish_message_processing(int currentCPU, struct smp_msg *msg, int source_mailbo
 
 		release_spinlock(spinlock);
 
-		if (msg->data_ptr != NULL)
+		if ((msg->flags & SMP_MSG_FLAG_FREE_ARG) != 0 && msg->data_ptr != NULL)
 			free(msg->data_ptr);
 
-		if (msg->flags == SMP_MSG_FLAG_SYNC) {
+		if (msg->flags & SMP_MSG_FLAG_SYNC) {
 			msg->done = true;
 			// the caller cpu should now free the message
 		} else {
@@ -373,7 +374,13 @@ process_pending_ici(int32 currentCPU)
 			halt = true;
 			dprintf("cpu %ld halted!\n", currentCPU);
 			break;
-		case SMP_MSG_1:
+		case SMP_MSG_CALL_FUNCTION:
+		{
+			smp_call_func func = (smp_call_func)msg->data_ptr;
+			func(msg->data, currentCPU, msg->data2, msg->data3);
+			break;
+		}
+
 		default:
 			dprintf("smp_intercpu_int_handler: got unknown message %ld\n", msg->message);
 	}
@@ -390,6 +397,9 @@ process_pending_ici(int32 currentCPU)
 
 	return retval;
 }
+
+
+//	#pragma mark -
 
 
 int
@@ -449,7 +459,7 @@ smp_send_ici(int32 targetCPU, int32 message, uint32 data, uint32 data2, uint32 d
 
 		arch_smp_send_ici(targetCPU);
 
-		if (flags == SMP_MSG_FLAG_SYNC) {
+		if (flags & SMP_MSG_FLAG_SYNC) {
 			// wait for the other cpu to finish processing it
 			// the interrupt handler will ref count it to <0
 			// if the message is sync after it has removed it from the mailbox
@@ -508,7 +518,7 @@ smp_send_broadcast_ici(int32 message, uint32 data, uint32 data2, uint32 data3,
 
 		TRACE(("smp_send_broadcast_ici: sent interrupt\n"));
 
-		if (flags == SMP_MSG_FLAG_SYNC) {
+		if (flags & SMP_MSG_FLAG_SYNC) {
 			// wait for the other cpus to finish processing it
 			// the interrupt handler will ref count it to <0
 			// if the message is sync after it has removed it from the mailbox
@@ -652,9 +662,18 @@ smp_get_current_cpu(void)
 
 
 void
-call_all_cpus(void (*f)(void *, int), void *cookie)
+call_all_cpus(void (*func)(void *, int), void *cookie)
 {
-	// ToDo: this is a dummy, but at least it works for single CPU machines
-	f(cookie, smp_get_current_cpu());
+	cpu_status state = disable_interrupts();
+
+	if (smp_get_num_cpus() > 1) {
+		smp_send_broadcast_ici(SMP_MSG_CALL_FUNCTION, (uint32)cookie,
+			0, 0, (void *)func, SMP_MSG_FLAG_SYNC);
+	}
+
+	// we need to call this function ourselves as well
+	func(cookie, smp_get_current_cpu());
+
+	restore_interrupts(state);
 }
 

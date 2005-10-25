@@ -21,13 +21,17 @@ enum {
 	SMP_MSG_GLOBAL_INVL_PAGE,
 	SMP_MSG_RESCHEDULE,
 	SMP_MSG_CPU_HALT,
-	SMP_MSG_1,
+	SMP_MSG_CALL_FUNCTION,
 };
 
 enum {
-	SMP_MSG_FLAG_ASYNC = 0,
-	SMP_MSG_FLAG_SYNC,
+	SMP_MSG_FLAG_ASYNC		= 0x0,
+	SMP_MSG_FLAG_SYNC		= 0x1,
+	SMP_MSG_FLAG_FREE_ARG	= 0x2,
 };
+
+typedef void (*smp_call_func)(uint32 data1, int32 currentCPU, uint32 data2, uint32 data3);
+
 
 #ifdef __cplusplus
 extern "C" {
