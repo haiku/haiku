@@ -1651,13 +1651,16 @@ status_t BT_stop_tvout(void)
 	/* enable access to primary head */
 	set_crtc_owner(0);
 
+	/* just to be sure Vsync is _really_ enabled */
+	CRTCW(REPAINT1, (CRTCR(REPAINT1) & 0xbf));
 
 	/* wait for one image to be generated to make sure VGA has kicked in and is
 	 * running OK before continuing...
 	 * (Kicking in will fail often if we do not wait here) */
 	/* Note:
 	 * The used CRTC's Vsync is required to be enabled here. The DPMS state
-	 * programming in the driver makes sure this is the case. */
+	 * programming in the driver makes sure this is the case.
+	 * (except for driver startup: see nv_general.c.) */
 
 	/* make sure we are 'in' active VGA picture */
 	while (NV_REG8(NV8_INSTAT1) & 0x08) snooze(1);
