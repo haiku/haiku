@@ -24,7 +24,8 @@ You use this software at your own risk! Although I don't expect it to damage you
 	<li>GeForce (4 MX) PCX 4300;
 	<li>GeForce FX/PCX 5200/5300/5600/5700/5750/5800/5900/5950/Go;
 	<li>GeForce FX/PCX 6200/6600/6800/Go;
-	<li>Quadro (2/4/FX/PCX/Go).
+	<li>Quadro (2/4/FX/PCX/Go);
+	<li>Preliminary GeForce 7800 GT/GTX/Go support (without acceleration currently). If your card isn't recognized yet please report your CardID!
 </ul>
 <br>
 <hr>
@@ -34,18 +35,18 @@ You use this software at your own risk! Although I don't expect it to damage you
 	<li>Full 2D acceleration;
 	<li>Full BWindowScreen support (used for hardware pageflipping, scrolling/panning and acceleration in applications/games);
 	<li>DPMS support for both DVI and analog connected screens (on both heads on dualhead cards), <strong>but not</strong> for panels on laptops ;
-	<li>B_YCbCr422 hardware overlay support on both TNT and GeForce series cards, <strong>except</strong> for GeForce 6200 and 6600. Overlay output 'follows head' in dualhead stretch/switch modes;
+	<li>B_YCbCr422 hardware overlay support on both TNT and GeForce series cards, <strong>except</strong> for GeForce 6200, 6600 and 7800. Overlay output 'follows head' in dualhead stretch/switch modes;
 	<li>Dualhead support on GeForce dualhead cards (use Mark Watson's 'Dualhead Setup' from BeBits for now);
 	<li>DVI and laptop panel support;
 	<li>Widescreen mode support (<strong>all</strong> screens must be widescreen type <strong>and</strong> they must all be digitally connected);
 	<li>Basic AGP mode support on AGP cards, using the new (seperate) Haiku AGP busmanager;
 	<li>Basic ('legacy') PCIe support;
-	<li>Coldstart support for analog connected screens on most cards except TNT1, GeForce 6200, 6600 and 6800;
+	<li>Coldstart support for analog connected screens on most cards except TNT1, GeForce 6200, 6600, 6800 and 7800;
 	<li>TVout support on cards with Brooktree BT868/BT869 and Conexant CX25870/CX25871 encoders (still in development).
 </ul>
 <strong>Known limitations:</strong> 
 <ul>
-	<li>If you want 'Sync_to_Retrace' capability make sure you enabled 'assign IRQ to VGA card' in your system BIOS (if available);
+	<li>If you want BScreen 'Sync_to_Retrace' capability make sure you enabled 'assign IRQ to VGA card' in your system BIOS (if available);
 	<li>If the driver still seems to create 'random' trouble make sure you have a fully functional VGA BIOS, or system BIOS for embedded cards (check for updates on the manufacturor's site). Make sure you mail me if you still have trouble but also if this version fixed that!
 	<li>If on a laptop the internal panel doesn't work when you connect an external monitor, make sure you set 'output device selection' to 'internal' (instead of 'auto') in the system BIOS if it has such an option. If you have this symptom on a normal card, or on a laptop without that BIOS option then you are probably out of luck for dualhead support;
 	<li><strong>NV40 architecture cards:</strong> (GeForce 6200 and 6600 at least, but 6800 AGP seems to be OK)<br>
@@ -170,6 +171,25 @@ If the default setting does not work as expected, you can try falling back to PI
 		<li><strong>true:</strong> (default setting)<br>
 <strong>dma_acc true</strong> enables DMA cmd fetching by the GPU for (2D) acceleration instead of using the old PIO method (which directly programs acceleration commands inside the GPU). The DMA method works (much) faster than PIO mode depending on system CPU speed. Also the DMA method is the only method that works on NV40 and higher GPU's (GeForce 6200, 6600 and 6800 like types) currently.
 	</ul>
+	<li><strong>tv_output:</strong> (disabled by default: preceded by a '#')<br>
+		This option enables you to override the 'TV output signal cable autodetection' of the driver. If autodetection is working incorrect, you can manually select a signal type this way. Specify 0, 1 or 2 (if enabled).<br>
+	<ul>
+		<li><strong>disabled or 0:</strong> (default setting)<br>
+		With this setting the driver will autodetect which signal(s) to output for a TVout mode. Normally you can leave it at that: but it's possible that the manufacturor of your card and/or TVset made a mistake in their design concerning line 'impedance'. In this case the driver might detect incorrectly leaving you with a (almost) black-and-white or color-distorted TV picture. In such a case you would probably like to instruct the driver what signals to output, overruling the autodetection result.
+		<li><strong>1:</strong><br>
+		Force Y/C (and CVBS if supported by hardware). Use this setting if you use a Y/C cable with or without a CVBS cable (some cards have both Y/C and CVBS outputs, so you can output a head to two sets at the same time).
+		<li><strong>2:</strong><br>
+		Force CVBS on all outputs. Use this setting if you use CVBS cable(s) only.
+	</ul>
+<strong>Notes:</strong>
+<ul>
+<li>Y/C stands for Luminance/Chrominance, or S-VHS. This signal is transferred using a 4 (or more) pins mini-DIN connector: two pins carry the color-info, and two pins carry the intensity-info.
+<li>CVBS stands for 'Composite Video Baseband Signal' which means that '2 pins' carry both color- and intensity info 'frequency-multiplexed' (at the same time). This signal is transferred using a 'Tulip', 'Cinch' or RCA plugged cable (all the same thing).
+<li>Y/C connections deliver a better image quality than CVBS connections do. Originally, CVBS connections were used for VHS video recorders (about 300 'vertical lines' horizontal resolution), while Y/C connections were used for S-VHS recorders (about 400 'vertical lines' horizontal resolution).
+<li>Some cards only having a Y/C connector also have a seperate short cable with them which 'converts' the Y/C connector into a CVBS connector. If you use that you are in fact using a CVBS connection.
+<li>TVsets that do not have a RCA and/or mini-DIN video connector might still be useable: most sets have a SCART connector. SCART has settings that can accomodate RGB (some sets on some inputs), Y/C and CVBS signals. You can get Y/C and CVBS to/from (switched) SCART adaptors seperately from stores. You need to set the switch (if there) to 'input', and select the signal type you want to use on your TVset. A/V stands for CVBS, and Y/C stands for Y/C.
+<li>Turn the TVset on before setting a TVout mode if you use the driver's default 'autodetection' setting. You probably don't need to pre-select the correct TV input as turning the power on is mostly enough to enable all of the set's input 'impendances' enabling correct autodetection by the driver.
+</ul>
 	<li><strong>unhide_fw:</strong><br>
 This option is only used if your card is running in AGP mode. It's a real <strong>tweak</strong> option. It's officially unsupported, and it's unknown if it can do harm to your card or system. It exists because using it <strong>can</strong> speedup unaccelerated graphics <strong>a lot</strong>. Think about video playback or playing quake2 in software rendering mode...
 	<ul>
@@ -186,11 +206,18 @@ If you select <strong>pgm_panel false</strong> the driver will not program the p
 		<li><strong>true:</strong> (default setting)<br>
 With the <strong>pgm_panel true</strong> setting, the driver will fix your panel's refreshrate to 60Hz. While this should be working on all panels outthere, some panels are particular picky about refreshrates below 60.0Hz (they shut off), and some other panels are particular picky about refreshrates above 60.0Hz (they shut off). While the driver requests the hardware to set 60.0Hz, this isn't exactly possible, so the actual setting is <strong>bound</strong> to be a tiny bit below or above 60.0Hz.
 	</ul>
+	<li><strong>vga_on_tv:</strong><br>
+This option only has an effect if you have a card with supported TV encoder chip when you use TV out modes. When set to <strong>true</strong> it provides a <strong>'tweaked'</strong> dualhead clone mode for singlehead cards and dualhead cards using singlehead modes on TV. Because this special mode can possibly destroy old VGA monitors it's disabled by default.
+	<ul>
+		<li><strong>false:</strong> (default setting)<br>
+If you select <strong>vga_on_tv false</strong> the driver will automatically shut-off your VGA monitor (by means of special internal DPMS settings) when a TVout mode is enabled on the head the VGA monitor is connected to. This means that on singlehead cards and on dualhead cards using singlehead TV modes your only output will be on TV. This is the standard way of doing things.
+		<li><strong>true:</strong> With this setting VGA output on a head is enabled concurrent with TV output on that head: that is if you select a TVout mode. This setting is a 'tweak' because the modeline used to drive your VGA monitor is the same modeline that is used for the TV output. This means that the VGA picture positioning is probably a bit odd, in some modes it might distort somewhat, and the refreshrate will be 50Hz for PAL modes, and 60Hz for NTSC modes. Make sure you only enable this tweak if you know your monitor supports down to 50Hz refreshrate, and preferably has a failsafe built in that blocks output when out-of-range signals are sent to it (almost every newer monitor has this feature).<br>
+	</ul>
 </ul>
 
 <hr>
 <br>
 <a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on October 20, 2005)</p>
+<p>(Page last updated on October 25, 2005)</p>
 </body>
 </html>
