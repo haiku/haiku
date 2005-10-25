@@ -96,7 +96,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	/* disable TVout if supported */
 	if (si->ps.tvout) BT_stop_tvout();
 
-	/* turn off screen(s) */
+	/* turn off screen(s) _after_ TVout is disabled (if applicable) */
 	head1_dpms(false, false, false);
 	if (si->ps.secondary_head) head2_dpms(false, false, false);
 	if (si->ps.tvout) BT_dpms(false);
@@ -501,6 +501,8 @@ void SET_INDEXED_COLORS(uint count, uint8 first, uint8 *color_data, uint32 flags
 /* Put the display into one of the Display Power Management modes. */
 status_t SET_DPMS_MODE(uint32 dpms_flags)
 {
+	bool display, h1h, h1v, h2h, h2v;
+
 	interrupt_enable(false);
 
 	LOG(4,("SET_DPMS_MODE: 0x%08x\n", dpms_flags));
@@ -508,69 +510,72 @@ status_t SET_DPMS_MODE(uint32 dpms_flags)
 	/* note current DPMS state for our reference */
 	si->dpms_flags = dpms_flags;
 
-	if (si->dm.flags & DUALHEAD_BITS) /*dualhead*/
+	/* determine signals to send to head(s) */
+	display = h1h = h1v = h2h = h2v = true;
+	switch(dpms_flags) 
 	{
-		switch(dpms_flags) 
+	case B_DPMS_ON:	/* H: on, V: on, display on */
+		break;
+	case B_DPMS_STAND_BY:
+		display = h1h = h2h = false;
+		break;
+	case B_DPMS_SUSPEND:
+		display = h1v = h2v = false;
+		break;
+	case B_DPMS_OFF: /* H: off, V: off, display off */
+		display = h1h = h1v = h2h = h2v = false;
+		break;
+	default:
+		LOG(8,("SET: Invalid DPMS settings (DH) 0x%08x\n", dpms_flags));
+		interrupt_enable(true);
+		return B_ERROR;
+	}
+
+	/* CRTC used for TVout needs specific DPMS programming */
+	//fixme: assuming tvout is on head1, while head assignment is straight!!
+	if (si->dm.flags & TV_BITS)
+	{
+		LOG(4,("SET_DPMS_MODE: tuning DPMS settings for TVout compatibility\n"));
+
+		if (!(si->settings.vga_on_tv))
 		{
-		case B_DPMS_ON:	/* H: on, V: on, display on */
-			head1_dpms(true, true, true);
-			if (si->ps.secondary_head) head2_dpms(true, true, true);
-			if (si->dm.flags & TV_BITS) BT_dpms(true);
-			break;
-		case B_DPMS_STAND_BY:
-			head1_dpms(false, false, true);
-			if (si->ps.secondary_head) head2_dpms(false, false, true);
-			if (si->dm.flags & TV_BITS) BT_dpms(false);
-			break;
-		case B_DPMS_SUSPEND:
-			head1_dpms(false, true, false);
-			if (si->ps.secondary_head) head2_dpms(false, true, false);
-			if (si->dm.flags & TV_BITS) BT_dpms(false);
-			break;
-		case B_DPMS_OFF: /* H: off, V: off, display off */
-			head1_dpms(false, false, false);
-			if (si->ps.secondary_head) head2_dpms(false, false, false);
-			if (si->dm.flags & TV_BITS) BT_dpms(false);
-			break;
-		default:
-			LOG(8,("SET: Invalid DPMS settings (DH) 0x%08x\n", dpms_flags));
-			interrupt_enable(true);
-			return B_ERROR;
+			/* block VGA output on head displaying on TV */
+			/* Note:
+			 * this specific sync setting is required: Vsync is used to keep TVout
+			 * synchronized to the CRTC 'vertically' (otherwise 'rolling' occurs).
+			 * This leaves Hsync only for shutting off the VGA screen. */
+			h1h = false;
+			h1v = true;
+		}
+		else
+		{
+			/* when concurrent VGA is used alongside TVout on a head, DPMS is safest
+			 * applied this way: Vsync is needed for stopping TVout successfully when
+			 * a (new) modeswitch occurs.
+			 * (see routine BT_stop_tvout() in nv_brooktreetv.c) */
+			/* Note:
+			 * applying 'normal' DPMS here and forcing Vsync on in the above mentioned
+			 * routine seems to not always be enough: sometimes image generation will
+			 * not resume in that case. */
+			h1h = display;
+			h1v = true;
 		}
 	}
-	else /* singlehead */
-	{
-		switch(dpms_flags) 
-		{
-		case B_DPMS_ON:	/* H: on, V: on, display on */
-			head1_dpms(true, true, true);
-			if (si->dm.flags & TV_BITS) BT_dpms(true);
-			break;
-		case B_DPMS_STAND_BY:
-			head1_dpms(false, false, true);
-			if (si->dm.flags & TV_BITS) BT_dpms(false);
-			break;
-		case B_DPMS_SUSPEND:
-			head1_dpms(false, true, false);
-			if (si->dm.flags & TV_BITS) BT_dpms(false);
-			break;
-		case B_DPMS_OFF: /* H: off, V: off, display off */
-			head1_dpms(false, false, false);
-			if (si->dm.flags & TV_BITS) BT_dpms(false);
-			break;
-		default:
-			LOG(8,("SET: Invalid DPMS settings (DH) 0x%08x\n", dpms_flags));
-			interrupt_enable(true);
-			return B_ERROR;
-		}
-	}
+
+	/* issue actual DPMS commands as far as applicable */
+	head1_dpms(display, h1h, h1v);
+	if ((si->ps.secondary_head) && (si->dm.flags & DUALHEAD_BITS))
+		head2_dpms(display, h2h, h2v);
+	if (si->dm.flags & TV_BITS)
+		BT_dpms(display);
 
 	interrupt_enable(true);
 	return B_OK;
 }
 
 /* Report device DPMS capabilities */
-uint32 DPMS_CAPABILITIES(void) {
+uint32 DPMS_CAPABILITIES(void)
+{
 	return 	(B_DPMS_ON | B_DPMS_STAND_BY | B_DPMS_SUSPEND | B_DPMS_OFF);
 }
 

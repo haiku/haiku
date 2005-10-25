@@ -1614,7 +1614,7 @@ static status_t BT_start_tvout(void)
 	/* tell GPU to use pixelclock from TVencoder instead of using internal source */
 	/* (nessecary or display will 'shiver' on both TV and VGA.) */
 	if (si->ps.secondary_head)
-		//fixme: assuming TVout is on primary head!!
+		//fixme: assuming TVout is on crtc1!!
 		DACW(PLLSEL, 0x20030f00);
 	else
 		DACW(PLLSEL, 0x00030700);
@@ -1651,14 +1651,13 @@ status_t BT_stop_tvout(void)
 	/* enable access to primary head */
 	set_crtc_owner(0);
 
-	/* switch on VGA monitor HSYNC and VSYNC */
-	//fixme: is this needed?
-	CRTCW(REPAINT1, (CRTCR(REPAINT1) & 0x3f));
-
 
 	/* wait for one image to be generated to make sure VGA has kicked in and is
 	 * running OK before continuing...
 	 * (Kicking in will fail often if we do not wait here) */
+	/* Note:
+	 * The used CRTC's Vsync is required to be enabled here. The DPMS state
+	 * programming in the driver makes sure this is the case. */
 
 	/* make sure we are 'in' active VGA picture */
 	while (NV_REG8(NV8_INSTAT1) & 0x08) snooze(1);
@@ -1798,9 +1797,6 @@ if (si->ps.secondary_head && (si->ps.card_type > NV15))
 
 	/* now set GPU CRTC to slave mode */
 	BT_start_tvout();
-
-//fixme: add code to disable VGA screen when TVout enabled
-//(use via nv.setting preset)
 
 	return B_OK;
 }
