@@ -167,6 +167,21 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia Quadro FX 4000/4400 (NV40)\n"));
 		status = nvxx_general_powerup();
 		break;
+//fixme: reported, but yet untested card..
+	case 0x009210de: /* Nvidia Geforce 7800 GT PCIe */
+		si->ps.card_type = NV47;
+		si->ps.card_arch = NV40A;
+		LOG(4,("POWERUP: Detected Nvidia Geforce 7800 GT PCIe (NV47)\n"));
+		status = nvxx_general_powerup();
+		break;
+//fixme: reported, but yet untested card..
+	case 0x009910de: /* Nvidia Geforce 7800 GTX Go PCIe */
+		si->ps.card_type = NV47;
+		si->ps.card_arch = NV40A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia Geforce 7800 GTX Go PCIe (NV47)\n"));
+		status = nvxx_general_powerup();
+		break;
 	case 0x00a010de: /* Nvidia Aladdin TNT2 */
 		si->ps.card_type = NV05;
 		si->ps.card_arch = NV04A;
@@ -1587,6 +1602,8 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	{
 		/* check if we can setup this mode with acceleration */
 		*acc_mode = true;
+//temporary disabling ACC on NV47:
+if (si->ps.card_type == NV47) *acc_mode = false;
 		/* virtual_width */
 		if (target->virtual_width > max_acc_width) *acc_mode = false;
 		/* virtual_height */
@@ -1619,6 +1636,8 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	{
 		/* check if we can setup this mode with acceleration */
 		*acc_mode = true;
+//temporary disabling ACC on NV47:
+if (si->ps.card_type == NV47) *acc_mode = false;
 		/* (we already know virtual_width will be no problem) */
 		/* virtual_height */
 		/* (NV cards can even do more than this(?)...

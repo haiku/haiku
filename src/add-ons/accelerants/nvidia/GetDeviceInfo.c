@@ -87,6 +87,9 @@ status_t GET_ACCELERANT_DEVICE_INFO(accelerant_device_info * adi)
 	case NV45:
 		sprintf(adi->chipset, "NV45");
 		break;
+	case NV47:
+		sprintf(adi->chipset, "NV47");
+		break;
 	default:
 		sprintf(adi->chipset, "unknown");
 		break;
