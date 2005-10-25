@@ -256,8 +256,8 @@ notify_loading_app(status_t result, bool suspend)
 		loadingInfo->done = true;
 
 		// we're done with the team stuff, get the thread lock instead
-		GRAB_THREAD_LOCK();
 		RELEASE_TEAM_LOCK();
+		GRAB_THREAD_LOCK();
 
 		// wake up the waiting thread
 		if (loadingInfo->thread->state == B_THREAD_SUSPENDED) {

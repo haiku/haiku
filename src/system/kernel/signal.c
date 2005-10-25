@@ -318,12 +318,9 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 			group = team->group;
 
 			for (team = group->teams; team != NULL; team = next) {
-				// ToDo: there is a *big* race condition here on SMP machines;
-				// the team pointer will probably have gone bad in the mean time
 				next = team->group_next;
 				id = team->main_thread->id;
 
-				RELEASE_TEAM_LOCK();
 				GRAB_THREAD_LOCK();
 
 				thread = thread_get_thread_struct_locked(id);
@@ -334,7 +331,6 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 				}
 
 				RELEASE_THREAD_LOCK();
-				GRAB_TEAM_LOCK();
 			}
 			
 			RELEASE_TEAM_LOCK();
@@ -342,7 +338,7 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 		}
 	}		
 
-	// ToDo: maybe the scheduler should only be invoked is there is reason to do it?
+	// ToDo: maybe the scheduler should only be invoked if there is reason to do it?
 	//	(ie. deliver_signal() moved some threads in the running queue?)
 	if ((flags & B_DO_NOT_RESCHEDULE) == 0)
 		scheduler_reschedule();
