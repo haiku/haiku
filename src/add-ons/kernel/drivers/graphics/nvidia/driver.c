@@ -122,6 +122,8 @@ static uint16 nvidia_device_list[] = {
 	0x0045, /* Nvidia GeForce FX 6800 GT */
 	0x004d, /* Nvidia Quadro FX 4400 */
 	0x004e, /* Nvidia Quadro FX 4000 */
+	0x0092, /* Nvidia Geforce 7800 GT PCIe */
+	0x0099, /* Nvidia Geforce 7800 GTX Go PCIe */
 	0x00a0, /* Nvidia Aladdin TNT2 */
 	0x00c0,	/* Nvidia unknown FX */
 	0x00c1, /* Nvidia GeForce FX 6800 */
