@@ -31,6 +31,7 @@
 
 #include <List.h>
 #include <Locker.h>
+#include <MessageQueue.h>
 
 #include "DebugInfoManager.h"
 #include "Desktop.h"
@@ -161,10 +162,10 @@ friend class WinBorder; // temporarily, I need invalidate_layer()
 			void				empty_visible_regions(Layer *layer);
 #endif
 			// Input related methods
-			void				MouseEventHandler(int32 code, BPrivate::PortLink& link);
-			void				KeyboardEventHandler(int32 code, BPrivate::PortLink& link);
+			void				MouseEventHandler(BMessage *msg);
+			void				KeyboardEventHandler(BMessage *msg);
 
-			void				_ProcessMouseMovedEvent(PointerEvent &evt);
+			void				_ProcessMouseMovedEvent(BMessage *msg);
 
 	inline	HWInterface*		GetHWInterface() const
 									{ return fDesktop->GetHWInterface(); }
@@ -187,6 +188,7 @@ friend class WinBorder; // temporarily, I need invalidate_layer()
 
 			thread_id			fThreadID;
 			port_id				fListenPort;
+			BMessageQueue		fQueue;
 
 			int32				fButtons;
 			BPoint				fLastMousePosition;

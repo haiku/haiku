@@ -81,11 +81,13 @@ class WinBorder : public Layer {
 											  float* minHeight,
 											  float* maxHeight) const;
 
-	virtual	void				MouseDown(const PointerEvent& evt);
-	virtual	void				MouseUp(const PointerEvent& evt);
-	virtual	void				MouseMoved(const PointerEvent& evt, uint32 transit);
-			click_type			ActionFor(const PointerEvent& evt)
-									{ return _ActionFor(evt); }
+	virtual	void				MouseDown(const BMessage *msg);
+	virtual	void				MouseUp(const BMessage *msg);
+	virtual	void				MouseMoved(const BMessage *msg);
+
+//			click_type			ActionFor(const BMessage *msg)
+//									{ return _ActionFor(evt); }
+
 	virtual	void				WorkspaceActivated(int32 index, bool active);
 	virtual	void				WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces);
 
@@ -138,7 +140,7 @@ class WinBorder : public Layer {
 	friend class Layer;
 	friend class RootLayer;
 
-			click_type			_ActionFor(const PointerEvent& evt) const;
+			click_type			_ActionFor(const BMessage *msg) const;
 			bool				_ResizeBy(float x, float y);
 
 			Decorator*			fDecorator;
@@ -148,7 +150,6 @@ class WinBorder : public Layer {
 			BRegion				fInUpdateRegion;
 
 			int32				fMouseButtons;
-			int32				fKeyModifiers;
 			BPoint				fLastMousePosition;
 			BPoint				fResizingClickOffset;
 

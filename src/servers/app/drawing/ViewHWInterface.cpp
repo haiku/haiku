@@ -26,8 +26,6 @@
 #include <View.h>
 #include <Window.h>
 
-#include "fake_input_server.h"
-
 #include "BBitmapBuffer.h"
 #include "PortLink.h"
 #include "ServerConfig.h"
@@ -123,14 +121,10 @@ class CardView : public BView {
 								// CardView
 			void				SetBitmap(const BBitmap* bimtap);
 
-	inline	BPrivate::PortLink*	ServerLink() const
-									{ return fServerLink; }
-
 	void						ForwardMessage();
 
 private:
 			port_id			fInputPort;
-			BPrivate::PortLink*	fServerLink;
 			const BBitmap*		fBitmap;
 };
 
@@ -158,16 +152,12 @@ class CardWindow : public BWindow {
 
 CardView::CardView(BRect bounds)
 	: BView(bounds, "graphics card view", B_FOLLOW_ALL, B_WILL_DRAW),
-	  fServerLink(NULL),
 	  fBitmap(NULL)
 {
 	SetViewColor(B_TRANSPARENT_32_BIT);
 
 #ifndef INPUTSERVER_TEST_MODE
-	// This link for sending mouse messages to the Haiku app_server.
-	// This is only to take the place of the input_server. 
-	port_id input_port = find_port(SERVER_INPUT_PORT);
-	fServerLink = new BPrivate::PortLink(input_port);
+	fInputPort = find_port(SERVER_INPUT_PORT);
 #else
 	fInputPort = create_port(100, "ViewInputDevice");
 #endif
@@ -176,7 +166,6 @@ CardView::CardView(BRect bounds)
 
 CardView::~CardView()
 {
-	delete fServerLink;
 }
 
 // AttachedToWindow
@@ -216,11 +205,7 @@ void
 CardView::MouseDown(BPoint pt)
 {
 #ifdef ENABLE_INPUT_SERVER_EMULATION
-#ifndef INPUTSERVER_TEST_MODE
-	send_mouse_down(fServerLink, pt, Window()->CurrentMessage());
-#else
 	ForwardMessage();
-#endif
 #endif
 }
 
@@ -237,11 +222,7 @@ CardView::MouseMoved(BPoint pt, uint32 transit, const BMessage* dragMessage)
 	SetViewCursor(&cursor, true);
 
 #ifdef ENABLE_INPUT_SERVER_EMULATION
-#ifndef INPUTSERVER_TEST_MODE
-	send_mouse_moved(fServerLink, pt, Window()->CurrentMessage());
-#else
 	ForwardMessage();
-#endif
 #endif
 }
 
@@ -250,11 +231,7 @@ void
 CardView::MouseUp(BPoint pt)
 {
 #ifdef ENABLE_INPUT_SERVER_EMULATION
-#ifndef INPUTSERVER_TEST_MODE
-	send_mouse_up(fServerLink, pt, Window()->CurrentMessage());
-#else
 	ForwardMessage();
-#endif
 #endif
 }
 
@@ -324,11 +301,7 @@ STRACE("MSG_UPDATE\n");
 			break;
 		default:
 #ifdef ENABLE_INPUT_SERVER_EMULATION
-#ifndef INPUTSERVER_TEST_MODE
-			if (!handle_message(fView->ServerLink(), msg))
-#else
 			fView->ForwardMessage();
-#endif
 #endif
 				BWindow::MessageReceived(msg);
 			break;
@@ -348,7 +321,7 @@ CardWindow::QuitRequested()
 		link.Flush();
 	} else
 		printf("ERROR: couldn't find the app_server's main port!");
-	
+
 	// we don't quit on ourself, we let us be Quit()!
 	return false;
 }

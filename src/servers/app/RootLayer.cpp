@@ -159,10 +159,12 @@ RootLayer::~RootLayer()
 {
 	fQuiting = true;
 
-	BPrivate::PortLink msg(fListenPort, -1);
-	msg.StartMessage(B_QUIT_REQUESTED);
-	msg.EndMessage();
-	msg.Flush();
+//	BMessage quitMsg(B_QUIT_REQUESTED);
+
+//	BPrivate::PortLink msg(fListenPort, -1);
+//	msg.StartMessage(B_QUIT_REQUESTED);
+//	msg.EndMessage();
+//	msg.Flush();
 
 	status_t dummy;
 	wait_for_thread(fThreadID, &dummy);
@@ -198,10 +200,7 @@ RootLayer::RunThread()
 int32
 RootLayer::WorkingThread(void *data)
 {
-	int32 code = 0;
-	status_t err = B_OK;
 	RootLayer *oneRootLayer = (RootLayer*)data;
-	BPrivate::PortLink messageQueue(-1, oneRootLayer->fListenPort);
 
 	// first make sure we are actualy visible
 	oneRootLayer->Lock();
@@ -220,48 +219,69 @@ RootLayer::WorkingThread(void *data)
 	oneRootLayer->Unlock();
 	
 	STRACE(("info: RootLayer(%s)::WorkingThread listening on port %ld.\n", oneRootLayer->Name(), oneRootLayer->fListenPort));
-	for (;;) {
-		err = messageQueue.GetNextMessage(code);
-		if (err < B_OK) {
-			STRACE(("WorkingThread: messageQueue.GetNextMessage() failed: %s\n", strerror(err)));
-			continue;
+	while(!oneRootLayer->fQuiting) {
+
+		BMessage *msg = oneRootLayer->ReadMessageFromPort(B_INFINITE_TIMEOUT);
+
+		if (msg)
+			oneRootLayer->fQueue.AddMessage(msg);
+
+		int32 msgCount = port_count(oneRootLayer->fListenPort);
+		for (int32 i = 0; i < msgCount; ++i) {
+			msg = oneRootLayer->ReadMessageFromPort(0);
+			if (msg)
+				oneRootLayer->fQueue.AddMessage(msg);
 		}
 
-		oneRootLayer->Lock();
+		//	loop as long as there are messages in the queue and the port is empty.
+		bool dispatchNextMessage = true;
+		while(dispatchNextMessage && !oneRootLayer->fQuiting) {
+			BMessage *currentMessage = oneRootLayer->fQueue.NextMessage();
+			
+			if (!currentMessage)
+				// no more messages
+				dispatchNextMessage = false;
+			else {
 
-		switch (code) {
-			// We don't need to do anything with these two, so just pass them
-			// onto the active application. Eventually, we will end up passing 
-			// them onto the window which is currently under the cursor.
-			case B_MOUSE_DOWN:
-			case B_MOUSE_UP:
-			case B_MOUSE_MOVED:
-			case B_MOUSE_WHEEL_CHANGED:
-				oneRootLayer->MouseEventHandler(code, messageQueue);
-				break;
+				oneRootLayer->Lock();
 
-			case B_KEY_DOWN:
-			case B_KEY_UP:
-			case B_UNMAPPED_KEY_DOWN:
-			case B_UNMAPPED_KEY_UP:
-			case B_MODIFIERS_CHANGED:
-				oneRootLayer->KeyboardEventHandler(code, messageQueue);
-				break;
+				switch (currentMessage->what) {
+					// We don't need to do anything with these two, so just pass them
+					// onto the active application. Eventually, we will end up passing 
+					// them onto the window which is currently under the cursor.
+					case B_MOUSE_DOWN:
+					case B_MOUSE_UP:
+					case B_MOUSE_MOVED:
+					case B_MOUSE_WHEEL_CHANGED:
+						oneRootLayer->MouseEventHandler(currentMessage);
+					break;
 
-			case B_QUIT_REQUESTED:
-				exit_thread(0);
-				break;
+					case B_KEY_DOWN:
+					case B_KEY_UP:
+					case B_UNMAPPED_KEY_DOWN:
+					case B_UNMAPPED_KEY_UP:
+					case B_MODIFIERS_CHANGED:
+						oneRootLayer->KeyboardEventHandler(currentMessage);
+					break;
 
-			default:
-				printf("RootLayer(%s)::WorkingThread received unexpected code %lx\n", oneRootLayer->Name(), code);
-				break;
+					case B_QUIT_REQUESTED:
+						exit_thread(0);
+					break;
+
+					default:
+						printf("RootLayer(%s)::WorkingThread received unexpected code %lx\n", oneRootLayer->Name(), msg->what);
+					break;
+				}
+
+				oneRootLayer->Unlock();
+
+				delete currentMessage;
+
+				//	Are any messages on the port?
+				if (port_count(oneRootLayer->fListenPort) > 0)
+					dispatchNextMessage = false;
+			}
 		}
-
-		oneRootLayer->Unlock();
-
-		// if we still have other messages in our queue, but we really want to quit
-		if (oneRootLayer->fQuiting)
-			break;
 	}
 	return 0;
 }
@@ -937,9 +957,12 @@ RootLayer::SetActive(WinBorder* newActive)
 //				Input related methods
 //---------------------------------------------------------------------------
 void
-RootLayer::_ProcessMouseMovedEvent(PointerEvent &evt)
+RootLayer::_ProcessMouseMovedEvent(BMessage *msg)
 {
-	Layer* target = LayerAt(evt.where);
+	BPoint where(0,0);
+	msg->FindPoint("where", &where);
+
+	Layer* target = LayerAt(where);
 	if (target == NULL) {
 		CRITICAL("RootLayer::_ProcessMouseMovedEvent() 'target' can't be null.\n");
 		return;
@@ -984,7 +1007,8 @@ RootLayer::_ProcessMouseMovedEvent(PointerEvent &evt)
 				else
 					viewAction = B_OUTSIDE_VIEW;
 
-			lay->MouseMoved(evt, viewAction);
+			msg->AddInt32("transit", viewAction);
+			lay->MouseMoved(msg);
 		}
 	}
 
@@ -992,44 +1016,44 @@ RootLayer::_ProcessMouseMovedEvent(PointerEvent &evt)
 		fMouseNotificationList.RemoveItem(target);
 
 	fLastLayerUnderMouse = target;
-	fLastMousePosition = evt.where;
+	fLastMousePosition = where;
 }
 
 void
-RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
+RootLayer::MouseEventHandler(BMessage *msg)
 {
-	switch (code) {
+	switch (msg->what) {
 		case B_MOUSE_DOWN: {
 			//printf("RootLayer::MouseEventHandler(B_MOUSE_DOWN)\n");
-			// Attached data:
-			// 1) int64 - time of mouse click
-			// 2) float - x coordinate of mouse click
-			// 3) float - y coordinate of mouse click
-			// 4) int32 - modifier keys down
-			// 5) int32 - buttons down
-			// 6) int32 - clicks
 
-			PointerEvent evt;	
-			evt.code = B_MOUSE_DOWN;
-			msg.Read<int64>(&evt.when);
-			msg.Read<float>(&evt.where.x);
-			msg.Read<float>(&evt.where.y);
-			msg.Read<int32>(&evt.modifiers);
-			msg.Read<int32>(&evt.buttons);
-			msg.Read<int32>(&evt.clicks);
+			BPoint where(0,0);
 
-			evt.where.ConstrainTo(fFrame);
+			msg->FindPoint("where", &where);
+			// We'll need this so that GetMouse can query for which buttons are down.
+			msg->FindInt32("buttons", &fButtons);
 
-			if (fLastMousePosition != evt.where) {
+			where.ConstrainTo(Frame());
+
+			if (fLastMousePosition != where) {
 				// move cursor on screen
-				GetHWInterface()->MoveCursorTo(evt.where.x, evt.where.y);
+				GetHWInterface()->MoveCursorTo(where.x, where.y);
 
-				_ProcessMouseMovedEvent(evt);
+				// If this happens, it's input server's fault.
+				// There might be additional fields an application expects in B_MOUSE_MOVED
+				// message, and in this way it won't get them. 
+				int64 when = 0;
+				int32 buttons = 0;
+
+				msg->FindInt64("when", &when);
+				msg->FindInt32("buttons", &buttons);
+
+				BMessage mouseMovedMsg(B_MOUSE_MOVED);
+				mouseMovedMsg.AddInt64("when", when);
+				mouseMovedMsg.AddInt32("buttons", buttons);
+				mouseMovedMsg.AddPoint("where", where);
+
+				_ProcessMouseMovedEvent(msg);
 			}
-
-			// We'll need this so that GetMouse can query for which buttons
-			// are down.
-			fButtons = evt.buttons;
 
 			if (fLastLayerUnderMouse == NULL) {
 				CRITICAL("RootLayer::MouseEventHandler(B_MOUSE_DOWN) fLastLayerUnderMouse is null!\n");
@@ -1046,37 +1070,43 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 				if (lay)
 					// NOTE: testing under R5 shows that it doesn't matter if a window is created 
 					// with B_ASYNCHRONOUS_CONTROLS flag or not. B_MOUSE_DOWN is always transmited.
-					lay->MouseDown(evt);
+					lay->MouseDown(msg);
 			}
 
 			// get the pointer for one of the first RootLayer's descendants
-			Layer *primaryTarget = LayerAt(evt.where, false);
-			primaryTarget->MouseDown(evt);
+			Layer *primaryTarget = LayerAt(where, false);
+			primaryTarget->MouseDown(msg);
 
 			break;
 		}
 		case B_MOUSE_UP: {
 			//printf("RootLayer::MouseEventHandler(B_MOUSE_UP)\n");
-			// Attached data:
-			// 1) int64 - time of mouse click
-			// 2) float - x coordinate of mouse click
-			// 3) float - y coordinate of mouse click
-			// 4) int32 - modifier keys down
 
-			PointerEvent evt;	
-			evt.code = B_MOUSE_UP;
-			msg.Read<int64>(&evt.when);
-			msg.Read<float>(&evt.where.x);
-			msg.Read<float>(&evt.where.y);
-			msg.Read<int32>(&evt.modifiers);
+			BPoint where(0,0);
 
-			evt.where.ConstrainTo(fFrame);
+			msg->FindPoint("where", &where);
 
-			if (fLastMousePosition != evt.where) {
+			where.ConstrainTo(fFrame);
+
+			if (fLastMousePosition != where) {
 				// move cursor on screen
-				GetHWInterface()->MoveCursorTo(evt.where.x, evt.where.y);
+				GetHWInterface()->MoveCursorTo(where.x, where.y);
 
-				_ProcessMouseMovedEvent(evt);
+				// If this happens, it's input server's fault.
+				// There might be additional fields an application expects in B_MOUSE_MOVED
+				// message, and in this way it won't get them. 
+				int64 when = 0;
+				int32 buttons = 0;
+
+				msg->FindInt64("when", &when);
+				msg->FindInt32("buttons", &buttons);
+
+				BMessage mouseMovedMsg(B_MOUSE_MOVED);
+				mouseMovedMsg.AddInt64("when", when);
+				mouseMovedMsg.AddInt32("buttons", buttons);
+				mouseMovedMsg.AddPoint("where", where);
+
+				_ProcessMouseMovedEvent(msg);
 			}
 
 			if (fLastLayerUnderMouse == NULL) {
@@ -1090,12 +1120,12 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 			for (int32 i = 0; i <= count; i++) {
 				lay = static_cast<Layer*>(fMouseNotificationList.ItemAt(i));
 				if (lay)
-					lay->MouseUp(evt);
+					lay->MouseUp(msg);
 			}
 			ClearNotifyLayer();
 
 			if (!foundCurrent)
-				fLastLayerUnderMouse->MouseUp(evt);
+				fLastLayerUnderMouse->MouseUp(msg);
 
 			// TODO: This is a quick fix to avoid the endless loop with windows created
 			// with the B_ASYNCHRONOUS_CONTROLS flag, but please someone have a look into this.
@@ -1110,19 +1140,16 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 			// 2) float - x coordinate of mouse click
 			// 3) float - y coordinate of mouse click
 			// 4) int32 - buttons down
-			
-			PointerEvent evt;
-			evt.code = B_MOUSE_MOVED;
-			msg.Read<int64>(&evt.when);
-			msg.Read<float>(&evt.where.x);
-			msg.Read<float>(&evt.where.y);
-			msg.Read<int32>(&evt.buttons);
 
-			evt.where.ConstrainTo(fFrame);
+			BPoint where(0,0);
+
+			msg->FindPoint("where", &where);
+
+			where.ConstrainTo(fFrame);
 			// move cursor on screen
-			GetHWInterface()->MoveCursorTo(evt.where.x, evt.where.y);
+			GetHWInterface()->MoveCursorTo(where.x, where.y);
 
-			_ProcessMouseMovedEvent(evt);
+			_ProcessMouseMovedEvent(msg);
 
 			break;
 		}
@@ -1132,18 +1159,12 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 			// under the cursor. It's pretty stupid to send it to the active window unless a particular
 			// view has locked focus via SetMouseEventMask
 						
-			PointerEvent evt;	
-			evt.code = B_MOUSE_WHEEL_CHANGED;
-			msg.Read<int64>(&evt.when);
-			msg.Read<float>(&evt.wheel_delta_x);
-			msg.Read<float>(&evt.wheel_delta_y);
-
 			if (fLastLayerUnderMouse == NULL) {
 				CRITICAL("RootLayer::MouseEventHandler(B_MOUSE_DOWN) fLastLayerUnderMouse is null!\n");
 				break;
 			}
 
-			fLastLayerUnderMouse->MouseWheelChanged(evt);
+			fLastLayerUnderMouse->MouseWheelChanged(msg);
 			break;
 		}
 		default:
@@ -1156,39 +1177,16 @@ RootLayer::MouseEventHandler(int32 code, BPrivate::PortLink& msg)
 
 
 void
-RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
+RootLayer::KeyboardEventHandler(BMessage *msg)
 {
-	switch (code) {
+	switch (msg->what) {
 		case B_KEY_DOWN:
 		{
-			// Attached Data:
-			// 1) int64 bigtime_t object of when the message was sent
-			// 2) int32 raw key code (scancode)
-			// 3) int32 modifier-independent ASCII code for the character
-			// 4) int32 repeat count
-			// 5) int32 modifiers
-			// 6) int8[3] UTF-8 data generated
-			// 7) Character string generated by the keystroke
-			// 8) int8[16] state of all keys
-
-			bigtime_t time;
-			int32 scancode, modifiers;
-			int8 utf[3] = { 0, 0, 0 };
-			char *string = NULL;
-			int8 keystates[16];
-			int32 raw_char;
-			int32 repeatcount;
-
-			msg.Read<bigtime_t>(&time);
-			msg.Read<int32>(&scancode);
-			msg.Read<int32>(&raw_char);
-			msg.Read<int32>(&repeatcount);
-			msg.Read<int32>(&modifiers);
-			msg.Read(utf, sizeof(utf));
-			msg.ReadString(&string);
-			msg.Read(keystates, sizeof(keystates));
-
-			STRACE(("Key Down: 0x%lx\n",scancode));
+			int32 scancode = 0;
+			int32 modifiers = 0;
+			
+			msg->FindInt32("key", &scancode);
+			msg->FindInt32("modifiers", &modifiers);
 
 			// F1-F12		
 			if (scancode > 0x01 && scancode < 0x0e) {
@@ -1203,7 +1201,6 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 				{
 					// TODO: Set to Safe Mode in KeyboardEventHandler:B_KEY_DOWN. (DisplayDriver API change)
 					STRACE(("Safe Video Mode invoked - code unimplemented\n"));
-					free(string);
 					break;
 				}
 
@@ -1224,7 +1221,6 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 					fDriver->ConstrainClippingRegion(NULL);
 #endif
 				#endif
-					free(string);
 					break;
 				}	
 			}
@@ -1242,7 +1238,6 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 				//{
 			// TODO: implement;
 					printf("Send Twitcher message key to Deskbar - unimplmemented\n");
-					free(string);
 					break;
 				//}
 			}
@@ -1267,7 +1262,6 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 
 					GetDisplayDriver()->DumpToFile(filename);
 
-					free(string);
 					break;
 				}
 			}
@@ -1275,57 +1269,19 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 			// We got this far, so apparently it's safe to pass to the active
 			// window.
 
-			if (Focus()) {
-				BMessage keymsg(B_KEY_DOWN);
-				keymsg.AddInt64("when", time);
-				keymsg.AddInt32("key", scancode);
+			if (Focus())
+				Focus()->KeyDown(msg);
 
-				if (repeatcount > 1)
-					keymsg.AddInt32("be:key_repeat", repeatcount);
-
-				keymsg.AddInt32("modifiers", modifiers);
-				keymsg.AddData("states", B_UINT8_TYPE, keystates, sizeof(int8) * 16);
-
-				for (uint8 i = 0; i < 3; i++)
-					keymsg.AddInt8("byte", utf[i]);
-
-				keymsg.AddString("bytes", string);
-				keymsg.AddInt32("raw_char", raw_char);
-
-				Focus()->KeyDown(keymsg);
-			}
-
-			free(string);
 			break;
 		}
 
 		case B_KEY_UP:
 		{
-			// Attached Data:
-			// 1) int64 bigtime_t object of when the message was sent
-			// 2) int32 raw key code (scancode)
-			// 3) int32 modifier-independent ASCII code for the character
-			// 4) int32 modifiers
-			// 5) int8[3] UTF-8 data generated
-			// 6) Character string generated by the keystroke
-			// 7) int8[16] state of all keys
-
-			bigtime_t time;
-			int32 scancode, modifiers;
-			int8 utf[3] = { 0, 0, 0 };
-			char *string = NULL;
-			int8 keystates[16];
-			int32 raw_char;
-
-			msg.Read<bigtime_t>(&time);
-			msg.Read<int32>(&scancode);
-			msg.Read<int32>(&raw_char);
-			msg.Read<int32>(&modifiers);
-			msg.Read(utf, sizeof(utf));
-			msg.ReadString(&string);
-			msg.Read(keystates, sizeof(keystates));
-
-			STRACE(("Key Up: 0x%lx\n", scancode));
+			int32 scancode = 0;
+			int32 modifiers = 0;
+			
+			msg->FindInt32("key", &scancode);
+			msg->FindInt32("modifiers", &modifiers);
 
 #if !TEST_MODE
 			// Tab key
@@ -1353,114 +1309,30 @@ RootLayer::KeyboardEventHandler(int32 code, BPrivate::PortLink& msg)
 			// We got this far, so apparently it's safe to pass to the active
 			// window.
 
-			if (Focus()) {
-				BMessage keymsg(B_KEY_UP);
-				keymsg.AddInt64("when", time);
-				keymsg.AddInt32("key", scancode);
-				keymsg.AddInt32("modifiers", modifiers);
-				keymsg.AddData("states", B_UINT8_TYPE, keystates, sizeof(int8) * 16);
+			if (Focus())
+				Focus()->KeyUp(msg);
 
-				for (uint8 i = 0; i < 3; i++)
-					keymsg.AddInt8("byte", utf[i]);
-
-				keymsg.AddString("bytes", string);
-				keymsg.AddInt32("raw_char", raw_char);
-
-				Focus()->KeyUp(keymsg);
-			}
-
-			free(string);
 			break;
 		}
 
 		case B_UNMAPPED_KEY_DOWN:
 		{
-			// Attached Data:
-			// 1) int64 bigtime_t object of when the message was sent
-			// 2) int32 raw key code (scancode)
-			// 3) int32 modifiers
-			// 4) int8 state of all keys
-
-			bigtime_t time;
-			int32 scancode, modifiers;
-			int8 keystates[16];
-			
-			msg.Read<bigtime_t>(&time);
-			msg.Read<int32>(&scancode);
-			msg.Read<int32>(&modifiers);
-			msg.Read(keystates,sizeof(int8)*16);
-	
-			STRACE(("Unmapped Key Down: 0x%lx\n",scancode));
-			
-			if(Focus()) {
-				BMessage keymsg(B_UNMAPPED_KEY_DOWN);
-				keymsg.AddInt64("when", time);
-				keymsg.AddInt32("key", scancode);
-				keymsg.AddInt32("modifiers", modifiers);
-				keymsg.AddData("states", B_UINT8_TYPE, keystates, sizeof(int8) * 16);
-					
-				Focus()->UnmappedKeyDown(keymsg);
-			}
+			if(Focus())
+				Focus()->UnmappedKeyDown(msg);
 			
 			break;
 		}
 		case B_UNMAPPED_KEY_UP:
 		{
-			// Attached Data:
-			// 1) int64 bigtime_t object of when the message was sent
-			// 2) int32 raw key code (scancode)
-			// 3) int32 modifiers
-			// 4) int8 state of all keys
-
-			bigtime_t time;
-			int32 scancode, modifiers;
-			int8 keystates[16];
-			
-			msg.Read<bigtime_t>(&time);
-			msg.Read<int32>(&scancode);
-			msg.Read<int32>(&modifiers);
-			msg.Read(keystates,sizeof(int8)*16);
-	
-			STRACE(("Unmapped Key Up: 0x%lx\n",scancode));
-			
-			if(Focus()) {
-				BMessage keymsg(B_UNMAPPED_KEY_UP);
-				keymsg.AddInt64("when", time);
-				keymsg.AddInt32("key", scancode);
-				keymsg.AddInt32("modifiers", modifiers);
-				keymsg.AddData("states", B_UINT8_TYPE, keystates, sizeof(int8) * 16);
-					
-				Focus()->UnmappedKeyUp(keymsg);
-			}
+			if(Focus())
+				Focus()->UnmappedKeyUp(msg);
 			
 			break;
 		}
 		case B_MODIFIERS_CHANGED:
 		{
-			// Attached Data:
-			// 1) int64 bigtime_t object of when the message was sent
-			// 2) int32 modifiers
-			// 3) int32 old modifiers
-			// 4) int8 state of all keys
-			
-			bigtime_t time;
-			int32 modifiers,oldmodifiers;
-			int8 keystates[16];
-			
-			msg.Read<bigtime_t>(&time);
-			msg.Read<int32>(&modifiers);
-			msg.Read<int32>(&oldmodifiers);
-			msg.Read(keystates,sizeof(int8)*16);
-
-			if(Focus()) {
-				BMessage keymsg(B_MODIFIERS_CHANGED);
-				keymsg.AddInt64("when", time);
-				keymsg.AddInt32("modifiers", modifiers);
-				keymsg.AddInt32("be:old_modifiers", oldmodifiers);
-				keymsg.AddData("states", B_UINT8_TYPE, keystates, sizeof(int8) * 16);
-					
-				Focus()->ModifiersChanged(keymsg);
-			}
+			if(Focus())
+				Focus()->ModifiersChanged(msg);
 
 			break;
 		}
@@ -1828,6 +1700,8 @@ RootLayer::ConvertToMessage(void* raw, int32 code)
 
 	if (raw != NULL) {
 		if (bmsg->Unflatten((const char*)raw) != B_OK) {
+			printf("Convert To BMessage FAILED. port message code was: %ld - %c%c%c%c",
+			code, (int8)(code >> 24), (int8)(code >> 16), (int8)(code >> 8), (int8)code  );
 			delete bmsg;
 			bmsg = NULL;
 		}

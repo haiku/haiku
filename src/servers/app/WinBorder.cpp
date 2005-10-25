@@ -74,7 +74,6 @@ WinBorder::WinBorder(const BRect &frame,
 	  fInUpdateRegion(),
 
 	  fMouseButtons(0),
-	  fKeyModifiers(0),
 	  fLastMousePosition(-1.0, -1.0),
 
 	  fIsClosing(false),
@@ -444,23 +443,26 @@ WinBorder::GetSizeLimits(float* minWidth, float* maxWidth,
 }
 
 void
-WinBorder::MouseDown(const PointerEvent& evt)
+WinBorder::MouseDown(const BMessage *msg)
 {
 	DesktopSettings desktopSettings(gDesktop);
+	BPoint where(0,0);
+	
+	msg->FindPoint("where", &where);
 
 	// not in FFM mode?
 	if (desktopSettings.MouseMode() == B_NORMAL_MOUSE) {
 		// default action is to drag the WinBorder
 		click_type action = DEC_DRAG;
-		Layer *target = LayerAt(evt.where);
+		Layer *target = LayerAt(where);
 		// clicking a simple Layer.
 		if (target != this) {
 			if (GetRootLayer()->ActiveWorkspace()->Active() == this) {
-				target->MouseDown(evt);
+				target->MouseDown(msg);
 			}
 			else {
 				if (WindowFlags() & B_WILL_ACCEPT_FIRST_CLICK)
-					target->MouseDown(evt);
+					target->MouseDown(msg);
 				else
 					goto activateWindow;
 			}
@@ -470,7 +472,7 @@ WinBorder::MouseDown(const PointerEvent& evt)
 			winBorderAreaHandle:
 
 			if (fDecorator)
-				action = _ActionFor(evt);
+				action = _ActionFor(msg);
 
 			// deactivate border buttons on first click(select)
 			if (GetRootLayer()->Focus() != this && action != DEC_MOVETOBACK
@@ -499,19 +501,19 @@ WinBorder::MouseDown(const PointerEvent& evt)
 
 				case DEC_DRAG:
 					fIsDragging = true;
-					fLastMousePosition = evt.where;
+					fLastMousePosition = where;
 					STRACE_CLICK(("===> DEC_DRAG\n"));
 					break;
 
 				case DEC_RESIZE:
 					fIsResizing = true;
-					fLastMousePosition = evt.where;
+					fLastMousePosition = where;
 					STRACE_CLICK(("===> DEC_RESIZE\n"));
 					break;
 
 				case DEC_SLIDETAB:
 					fIsSlidingTab = true;
-					fLastMousePosition = evt.where;
+					fLastMousePosition = where;
 					STRACE_CLICK(("===> DEC_SLIDETAB\n"));
 					break;
 
@@ -538,10 +540,10 @@ WinBorder::MouseDown(const PointerEvent& evt)
 	}
 	// in FFM mode
 	else {
-		Layer *target = LayerAt(evt.where);
+		Layer *target = LayerAt(where);
 		// clicking a simple Layer; forward event.
 		if (target != this)
-			target->MouseDown(evt);
+			target->MouseDown(msg);
 		// clicking inside our visible area.
 		else
 			goto winBorderAreaHandle;
@@ -549,11 +551,11 @@ WinBorder::MouseDown(const PointerEvent& evt)
 }
 
 void
-WinBorder::MouseUp(const PointerEvent& event)
+WinBorder::MouseUp(const BMessage *msg)
 {
 	bool invalidate = false;
 	if (fDecorator) {
-		click_type action = _ActionFor(event);
+		click_type action = _ActionFor(msg);
 // TODO: present behavior is not fine!
 //		Decorator's Set*() methods _actualy draw_! on screen, not
 //		 taking into account if that region is visible or not!
@@ -590,8 +592,12 @@ WinBorder::MouseUp(const PointerEvent& event)
 }
 
 void
-WinBorder::MouseMoved(const PointerEvent& event, uint32 transit)
+WinBorder::MouseMoved(const BMessage *msg)
 {
+	BPoint where(0,0);
+
+	msg->FindPoint("where", &where);
+
 	if (fDecorator) {
 // TODO: present behavior is not fine!
 //		Decorator's Set*() methods _actualy draw_! on screen, not
@@ -599,16 +605,16 @@ WinBorder::MouseMoved(const PointerEvent& event, uint32 transit)
 //		Decorator redraw code should follow the same path as Layer's
 //		 one!
 		if (fIsZooming) {
-			fDecorator->SetZoom(_ActionFor(event) == DEC_ZOOM);
+			fDecorator->SetZoom(_ActionFor(msg) == DEC_ZOOM);
 		} else if (fIsClosing) {
-			fDecorator->SetClose(_ActionFor(event) == DEC_CLOSE);
+			fDecorator->SetClose(_ActionFor(msg) == DEC_CLOSE);
 		} else if (fIsMinimizing) {
-			fDecorator->SetMinimize(_ActionFor(event) == DEC_MINIMIZE);
+			fDecorator->SetMinimize(_ActionFor(msg) == DEC_MINIMIZE);
 		}
 	}
 
 	if (fIsDragging) {
-		BPoint delta = event.where - fLastMousePosition;
+		BPoint delta = where - fLastMousePosition;
 #ifndef NEW_CLIPPING
 		MoveBy(delta.x, delta.y);
 #else
@@ -616,7 +622,7 @@ WinBorder::MouseMoved(const PointerEvent& event, uint32 transit)
 #endif
 	}
 	if (fIsResizing) {
-		BPoint delta = event.where - fLastMousePosition;
+		BPoint delta = where - fLastMousePosition;
 #ifndef NEW_CLIPPING
 		ResizeBy(delta.x, delta.y);
 #else
@@ -627,7 +633,7 @@ WinBorder::MouseMoved(const PointerEvent& event, uint32 transit)
 		// TODO: implement
 	}
 
-	fLastMousePosition = event.where;
+	fLastMousePosition = where;
 }
 
 void
@@ -777,21 +783,29 @@ WinBorder::QuietlySetFeel(int32 feel)
 
 // _ActionFor
 click_type
-WinBorder::_ActionFor(const PointerEvent& event) const
+WinBorder::_ActionFor(const BMessage *msg) const
 {
+	BPoint where(0,0);
+	int32 buttons = 0;
+	int32 modifiers = 0;
+
+	msg->FindPoint("where", &where);
+	msg->FindInt32("buttons", &buttons);
+	msg->FindInt32("modifiers", &modifiers);
+
 #ifndef NEW_INPUT_HANDING
 #ifndef NEW_CLIPPING
-	if (fTopLayer->fFullVisible.Contains(event.where))
+	if (fTopLayer->fFullVisible.Contains(where))
 		return DEC_NONE;
 	else
 #else
-	if (fTopLayer->fFullVisible2.Contains(event.where))
+	if (fTopLayer->fFullVisible2.Contains(where))
 		return DEC_NONE;
 	else
 #endif
 #endif
 	if (fDecorator)
-		return fDecorator->Clicked(event.where, event.buttons, event.modifiers);
+		return fDecorator->Clicked(where, buttons, modifiers);
 	else
 		return DEC_NONE;
 }

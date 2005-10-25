@@ -1111,98 +1111,74 @@ Layer::ScrollBy(float x, float y)
 }
 
 void
-Layer::MouseDown(const PointerEvent& evt)
+Layer::MouseDown(const BMessage *msg)
 {
 	if (Window() && !IsTopLayer()) {
-		BMessage msg;
-		msg.what = B_MOUSE_DOWN;
-		msg.AddInt64("when", evt.when);
-		msg.AddPoint("where", evt.where);
-		msg.AddInt32("modifiers", evt.modifiers);
-		msg.AddInt32("buttons", evt.buttons);
-		msg.AddInt32("clicks", evt.clicks);
-
-		Window()->SendMessageToClient(&msg, fViewToken, false);
+		Window()->SendMessageToClient(msg, fViewToken, false);
 	}
 }
 
 void
-Layer::MouseUp(const PointerEvent& evt)
+Layer::MouseUp(const BMessage *msg)
 {
 	if (Window() && !IsTopLayer()) {
-		BMessage upmsg(B_MOUSE_UP);
-		upmsg.AddInt64("when",evt.when);
-		upmsg.AddPoint("where",evt.where);
-		upmsg.AddInt32("modifiers",evt.modifiers);
-
-		Window()->SendMessageToClient(&upmsg, fViewToken, false);
+		Window()->SendMessageToClient(msg, fViewToken, false);
 	}
 }
 
 void
-Layer::MouseMoved(const PointerEvent& evt, uint32 transit)
+Layer::MouseMoved(const BMessage *msg)
 {
 	if (Window() && !IsTopLayer()) {
-		BMessage movemsg(B_MOUSE_MOVED);
-		movemsg.AddInt64("when", evt.when);
-		movemsg.AddPoint("where", evt.where);
-		movemsg.AddInt32("buttons", evt.buttons);
-		movemsg.AddInt32("transit", transit);
-
-		Window()->SendMessageToClient(&movemsg, fViewToken, false);
+		Window()->SendMessageToClient(msg, fViewToken, false);
 	}
 }
 
 void
-Layer::MouseWheelChanged(const PointerEvent& evt)
+Layer::MouseWheelChanged(const BMessage *msg)
 {
 	if (Window() && !IsTopLayer()) {
-		BMessage wheelmsg(B_MOUSE_WHEEL_CHANGED);
-		wheelmsg.AddInt64("when", evt.when);
-		wheelmsg.AddFloat("be:wheel_delta_x",evt.wheel_delta_x);
-		wheelmsg.AddFloat("be:wheel_delta_y",evt.wheel_delta_y);
-
-		Window()->SendMessageToClient(&wheelmsg, fViewToken, false);
+		Window()->SendMessageToClient(msg, fViewToken, false);
 	}
 }
 
 void
-Layer::KeyDown(const BMessage& msg)
+Layer::KeyDown(const BMessage *msg)
 {
 	if (Window() && !IsTopLayer()) {
-		Window()->SendMessageToClient(&msg, B_NULL_TOKEN, true);
+		Window()->SendMessageToClient(msg, B_NULL_TOKEN, true);
 	}
 }
 
 void
-Layer::KeyUp(const BMessage& msg)
+Layer::KeyUp(const BMessage *msg)
 {
 	if (Window() && !IsTopLayer()) {
-		Window()->SendMessageToClient(&msg, B_NULL_TOKEN, true);
+		Window()->SendMessageToClient(msg, B_NULL_TOKEN, true);
 	}
 }
 
 void
-Layer::UnmappedKeyDown(const BMessage& msg)
+Layer::UnmappedKeyDown(const BMessage *msg)
 {
 	if (Window() && !IsTopLayer()) {
-		Window()->SendMessageToClient(&msg, B_NULL_TOKEN, true);
+		Window()->SendMessageToClient(msg, B_NULL_TOKEN, true);
 	}
 }
 
 void
-Layer::UnmappedKeyUp(const BMessage& msg)
+Layer::UnmappedKeyUp(const BMessage *msg)
 {
 	if (Window() && !IsTopLayer()) {
-		Window()->SendMessageToClient(&msg, B_NULL_TOKEN, true);
+		Window()->SendMessageToClient(msg, B_NULL_TOKEN, true);
 	}
 }
 
 void
-Layer::ModifiersChanged(const BMessage& msg)
+Layer::ModifiersChanged(const BMessage *msg)
 {
 	if (Window() && !IsTopLayer()) {
-		Window()->SendMessageToClient(&msg, B_NULL_TOKEN, true);
+		Window()->SendMessageToClient(msg, B_NULL_TOKEN, true);
 	}
 }
 
