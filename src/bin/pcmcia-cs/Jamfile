@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src bin pcmcia-cs ;
+
+StdBinCommands 
+	cardctl.c
+	dump_cis.c
+	dump_cisreg.c
+	: libroot.so ;

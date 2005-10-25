@@ -1,0 +1,97 @@
+.\" Copyright (C) 1998 David A. Hinds -- dahinds@users.sourceforge.net
+.\" cardctl.8 1.18 2002/08/19 03:08:44
+.\"
+.TH CARDCTL 8 "2002/08/19 03:08:44" "pcmcia-cs"
+.SH NAME
+cardctl \- PCMCIA card control utility
+
+.SH SYNOPSIS
+\fBcardctl\fR [\fB-V\fR] \fIcommand\fR [\fIsocket\fR]
+.br
+\fBcardctl\fR
+[\fB\-c \fIconfig\fR] [\fB\-f \fIscheme\fR] [\fB\-s \fIstab\fR]
+\fBscheme\fR [\fIname\fR]
+
+.SH DESCRIPTION
+\fBCardctl\fR is used to monitor and control the state of PCMCIA
+sockets.  If a socket number is specified, the command will be applied
+to just one socket; otherwise, all sockets will be affected.
+.PP
+\fBCardctl\fR is also used to select between multiple PCMCIA
+configuration schemes.  The current scheme name is passed to the
+device option scripts as part of the ``device address'', so the
+scripts can use it to choose between different setups.
+.PP
+If \fBcardctl\fR is executed by root, all commands are available.  If
+it is executed by an unpriviledged user, only the informational
+commands are accessible.
+.PP
+Some commands may not work or give misleading results if \fBcardmgr\fR
+is not running.
+
+.SH COMMANDS
+.TP \w'abcd'u
+.B status
+Display the current socket status flags.
+.TP
+.B config
+Display the socket configuration, including power settings, interrupt
+and I/O window settings, and configuration registers.
+.TP
+.B ident
+Display card identification information, including product
+identification strings, manufacturer ID codes, and function ID codes.
+.TP
+.B info
+Much like the \fBident\fR command, but its output is formatted as a
+series of Bourne-stype shell variable definitions for use in scripts.
+.TP
+.B suspend
+Shut down and then disable power for a socket.
+.TP
+.B resume
+Restore power to a socket, and re-configure for use.
+.TP
+.B reset
+Send a reset signal to a socket, subject to approval by any drivers
+already bound to the socket.
+.TP
+.B eject
+Notify all client drivers that this card will be ejected, then cut
+power to the socket.
+.TP
+.B insert
+Notify all client drivers that this card has just been inserted.
+.TP
+.B scheme
+If no scheme name is given,
+.B cardctl
+will display the current PCMCIA configuration scheme.  If a scheme
+name is given,
+.B cardctl
+will unconfigure all PCMCIA devices, and reconfigure for the new
+scheme.
+
+.SH OPTIONS
+.TP
+.B \-V
+Show version information and exit.
+.TP
+.BI "\-c " config
+Look for the card configuration database and card configuration
+scripts in the specified directory, instead of 
+.IR /etc/pcmcia .
+.TP
+.BI "\-f " scheme
+Use the specified file to keep track of the current configuration
+scheme, instead of
+.IR /var/lib/pcmcia/scheme .
+.TP
+.BI "\-s " stab
+Read current socket information from the specified file, instead of
+.IR /var/lib/pcmcia/stab .
+
+.SH AUTHOR
+David Hinds \- dahinds@users.sourceforge.net
+.SH "SEE ALSO"
+cardmgr(8).

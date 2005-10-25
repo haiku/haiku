@@ -1,0 +1,48 @@
+.\" Copyright (C) 1998 David A. Hinds -- dahinds@users.sourceforge.net
+.\" dump_cis.8 1.5 2000/06/12 21:24:48
+.\"
+.TH DUMP_CIS 8 "2000/06/12 21:24:48" "pcmcia-cs"
+.SH NAME
+dump_cis \- display PCMCIA Card Information Structures
+.SH SYNOPSIS
+.B dump_cis
+.RB [ -f ]
+.RB [ -v ]
+.RB [ "\-i\ "\c
+.I infile\c
+]
+.SH DESCRIPTION
+.B Dump_cis
+retrieves and parses the Card Information Structures for inserted
+PCMCIA devices, or optionally, parses CIS information from a file.
+.PP
+The
+.B pack_cis
+utility can parse a subset of the non-verbose output
+of
+.BR dump_cis ,
+so it is fairly easy to use
+.B dump_cis
+output as templates for
+.BR pack_cis .
+If a replacement CIS has been loaded for a card,
+.B dump_cis
+will display the replacement rather than the actual data on the card.
+.SH OPTIONS
+.TP
+.B \-f
+Force: attempt to decode any available CIS information even if the
+overall CIS organization appears to be invalid.
+.TP
+.B \-v
+Verbose output: display raw hex data for each tuple, and provide a
+more complete dump of some tuple types.
+.TP
+.BI "\-i " infile
+Read packed CIS data from a file (as created by
+.BR pack_cis )
+instead of reading from active cards.
+.SH AUTHOR
+David Hinds \- dahinds@users.sourceforge.net
+.SH "SEE ALSO"
+pack_cis(8).
