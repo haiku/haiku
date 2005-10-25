@@ -11,8 +11,7 @@
 
 #include <smp.h>
 #include <timer.h>
-
-struct kernel_args;
+#include <boot/kernel_args.h>
 
 
 /* CPU local data structure */

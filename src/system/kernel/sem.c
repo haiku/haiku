@@ -13,6 +13,7 @@
 
 #include <sem.h>
 #include <kernel.h>
+#include <kscheduler.h>
 #include <ksignal.h>
 #include <smp.h>
 #include <int.h>

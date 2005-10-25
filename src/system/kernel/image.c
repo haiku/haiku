@@ -7,15 +7,17 @@
 
 
 #include <KernelExport.h>
+
 #include <kernel.h>
 #include <kimage.h>
+#include <kscheduler.h>
 #include <lock.h>
 #include <team.h>
 #include <thread.h>
 #include <thread_types.h>
 #include <user_debugger.h>
 
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 
 

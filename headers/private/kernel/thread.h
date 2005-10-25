@@ -20,16 +20,10 @@ struct kernel_args;
 extern "C" {
 #endif
 
-void scheduler_reschedule(void);
-void start_scheduler(void);
-
 void thread_enqueue(struct thread *t, struct thread_queue *q);
 struct thread *thread_lookat_queue(struct thread_queue *q);
 struct thread *thread_dequeue(struct thread_queue *q);
 struct thread *thread_dequeue_id(struct thread_queue *q, thread_id thr_id);
-
-void scheduler_enqueue_in_run_queue(struct thread *thread);
-void scheduler_remove_from_run_queue(struct thread *thread);
 
 void thread_at_kernel_entry(void);
 	// called when the thread enters the kernel on behalf of the thread

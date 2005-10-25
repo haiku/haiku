@@ -10,6 +10,7 @@
 #include <debugger.h>
 #include <kernel.h>
 #include <KernelExport.h>
+#include <kscheduler.h>
 #include <ksignal.h>
 #include <ksyscalls.h>
 #include <sem.h>

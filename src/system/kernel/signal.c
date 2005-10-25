@@ -11,12 +11,13 @@
 #include <KernelExport.h>
 
 #include <debug.h>
-#include <thread.h>
-#include <team.h>
-#include <sem.h>
-#include <ksignal.h>
-#include <user_debugger.h>
 #include <kernel.h>
+#include <kscheduler.h>
+#include <ksignal.h>
+#include <sem.h>
+#include <team.h>
+#include <thread.h>
+#include <user_debugger.h>
 
 #include <stddef.h>
 #include <string.h>

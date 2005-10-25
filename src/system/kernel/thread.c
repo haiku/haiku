@@ -18,6 +18,7 @@
 #include <arch/vm.h>
 #include <kimage.h>
 #include <ksignal.h>
+#include <kscheduler.h>
 #include <syscalls.h>
 #include <tls.h>
 #include <vfs.h>

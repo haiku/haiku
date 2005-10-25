@@ -11,29 +11,30 @@
 
 #include <OS.h>
 
-#include <boot/kernel_args.h>
-#include <debug.h>
-#include <ksyscalls.h>
-#include <vm.h>
-#include <timer.h>
-#include <smp.h>
-#include <sem.h>
-#include <port.h>
-#include <vfs.h>
-#include <cbuf.h>
-#include <elf.h>
-#include <cpu.h>
-#include <kdriver_settings.h>
 #include <boot_item.h>
-#include <kmodule.h>
+#include <cbuf.h>
+#include <cpu.h>
+#include <debug.h>
+#include <elf.h>
 #include <int.h>
-#include <team.h>
-#include <system_info.h>
 #include <kdevice_manager.h>
-#include <real_time_clock.h>
+#include <kdriver_settings.h>
 #include <kernel_daemon.h>
+#include <kmodule.h>
+#include <kscheduler.h>
+#include <ksyscalls.h>
 #include <messaging.h>
+#include <port.h>
+#include <real_time_clock.h>
+#include <sem.h>
+#include <smp.h>
+#include <system_info.h>
+#include <team.h>
+#include <timer.h>
 #include <user_debugger.h>
+#include <vfs.h>
+#include <vm.h>
+#include <boot/kernel_args.h>
 
 #include <string.h>
 
@@ -47,21 +48,19 @@
 
 bool kernel_startup;
 
-static kernel_args ka;
+static kernel_args sKernelArgs;
 
 static int32 main2(void *);
-int _start(kernel_args *oldka, int cpu);	/* keep compiler happy */
+int _start(kernel_args *bootKernelArgs, int cpu);	/* keep compiler happy */
 
 
 int
-_start(kernel_args *oldka, int cpu_num)
+_start(kernel_args *bootKernelArgs, int currentCPU)
 {
-	thread_id thread = -1;
-
 	kernel_startup = true;
 
-	if (oldka->kernel_args_size != sizeof(kernel_args)
-		|| oldka->version != CURRENT_KERNEL_ARGS_VERSION) {
+	if (bootKernelArgs->kernel_args_size != sizeof(kernel_args)
+		|| bootKernelArgs->version != CURRENT_KERNEL_ARGS_VERSION) {
 		// This is something we cannot handle right now - release kernels
 		// should always be able to handle the kernel_args of earlier
 		// released kernels.
@@ -69,100 +68,104 @@ _start(kernel_args *oldka, int cpu_num)
 		return -1;
 	}
 
-	memcpy(&ka, oldka, sizeof(kernel_args));
+	memcpy(&sKernelArgs, bootKernelArgs, sizeof(kernel_args));
 		// the passed in kernel args are in a non-allocated range of memory
 
-	smp_set_num_cpus(ka.num_cpus);
+	smp_set_num_cpus(sKernelArgs.num_cpus);
 
 	// do any pre-booting cpu config
-	cpu_preboot_init(&ka);
+	cpu_preboot_init(&sKernelArgs);
 
 	// if we're not a boot cpu, spin here until someone wakes us up
-	if (smp_trap_non_boot_cpus(&ka, cpu_num) == B_NO_ERROR) {
-		// we're the boot processor, so wait for all of the APs to enter the kernel
-		smp_wait_for_ap_cpus(&ka);
+	if (smp_trap_non_boot_cpus(currentCPU)) {
+		thread_id thread;
 
 		// setup debug output
-		debug_init(&ka);
+		debug_init(&sKernelArgs);
 		set_dprintf_enabled(true);
 		dprintf("Welcome to kernel debugger output!\n");
 
+		// we're the boot processor, so wait for all of the APs to enter the kernel
+		smp_wait_for_non_boot_cpus();
+
 		// init modules
 		TRACE(("init CPU\n"));
-		cpu_init(&ka);
+		cpu_init(&sKernelArgs);
 		TRACE(("init interrupts\n"));
-		int_init(&ka);
+		int_init(&sKernelArgs);
 
 		TRACE(("init VM\n"));
-		vm_init(&ka);
+		vm_init(&sKernelArgs);
 			// Before vm_init_post_sem() is called, we have to make sure that
 			// the boot loader allocated region is not used anymore
 
 		// now we can use the heap and create areas
 		TRACE(("init driver_settings\n"));
 		boot_item_init();
-		driver_settings_init(&ka);
-		debug_init_post_vm(&ka);
-		int_init_post_vm(&ka);
-		cpu_init_post_vm(&ka);
+		driver_settings_init(&sKernelArgs);
+		debug_init_post_vm(&sKernelArgs);
+		int_init_post_vm(&sKernelArgs);
+		cpu_init_post_vm(&sKernelArgs);
 		TRACE(("init system info\n"));
-		system_info_init(&ka);
+		system_info_init(&sKernelArgs);
 
 		TRACE(("init SMP\n"));
-		smp_init(&ka);
+		smp_init(&sKernelArgs);
 		TRACE(("init timer\n"));
-		timer_init(&ka);
+		timer_init(&sKernelArgs);
 		TRACE(("init real time clock\n"));
-		rtc_init(&ka);
+		rtc_init(&sKernelArgs);
 
 		TRACE(("init semaphores\n"));
-		sem_init(&ka);
+		sem_init(&sKernelArgs);
 
 		// now we can create and use semaphores
 		TRACE(("init VM semaphores\n"));
-		vm_init_post_sem(&ka);
+		vm_init_post_sem(&sKernelArgs);
 		TRACE(("init driver_settings\n"));
-		driver_settings_init_post_sem(&ka);
+		driver_settings_init_post_sem(&sKernelArgs);
 		TRACE(("init generic syscall\n"));
 		generic_syscall_init();
 		TRACE(("init cbuf\n"));
 		cbuf_init();
 		TRACE(("init VFS\n"));
-		vfs_init(&ka);
+		vfs_init(&sKernelArgs);
 		TRACE(("init teams\n"));
-		team_init(&ka);
+		team_init(&sKernelArgs);
 		TRACE(("init threads\n"));
-		thread_init(&ka);
+		thread_init(&sKernelArgs);
 		TRACE(("init ports\n"));
-		port_init(&ka);
+		port_init(&sKernelArgs);
 		TRACE(("init kernel daemons\n"));
 		kernel_daemon_init();
 
 		TRACE(("init VM threads\n"));
-		vm_init_post_thread(&ka);
+		vm_init_post_thread(&sKernelArgs);
 		TRACE(("init ELF loader\n"));
-		elf_init(&ka);
+		elf_init(&sKernelArgs);
+		TRACE(("init scheduler\n"));
+		scheduler_init();
 
 		// start a thread to finish initializing the rest of the system
 		thread = spawn_kernel_thread(&main2, "main2", B_NORMAL_PRIORITY, NULL);
 
-		smp_wake_up_all_non_boot_cpus();
-		smp_enable_ici(); // ici's were previously being ignored
-		start_scheduler();
+		smp_wake_up_non_boot_cpus();
+
+		TRACE(("enable interrupts, exit kernel startup\n"));
+		kernel_startup = false;
+		enable_interrupts();
+
+		scheduler_start();
+		resume_thread(thread);
 	} else {
-		// this is run per cpu for each AP processor after they've been set loose
-		smp_per_cpu_init(&ka, cpu_num);
-		thread_per_cpu_init(cpu_num);
+		// this is run for each non boot processor after they've been set loose
+		smp_per_cpu_init(&sKernelArgs, currentCPU);
+		thread_per_cpu_init(currentCPU);
+
+		enable_interrupts();
 	}
 
-	TRACE(("enable interrupts, exit kernel startup\n"));
-	kernel_startup = false;
-	enable_interrupts();
-
-	if (thread >= B_OK)
-		resume_thread(thread);
-
-	TRACE(("main: done... begin idle loop on cpu %d\n", cpu_num));
+	TRACE(("main: done... begin idle loop on cpu %d\n", currentCPU));
 	for (;;)
 		arch_cpu_idle();
 
@@ -178,7 +181,7 @@ main2(void *unused)
 	TRACE(("start of main2: initializing devices\n"));
 
 	TRACE(("Init modules\n"));
-	module_init(&ka);
+	module_init(&sKernelArgs);
 
 	// ToDo: the preloaded image debug data is placed in the kernel args, and
 	//	thus, if they are enabled, the kernel args shouldn't be freed, so
@@ -188,7 +191,7 @@ main2(void *unused)
 		// module_init() is supposed to be the last user of the kernel args
 		// Note: don't confuse the kernel_args structure (which is never freed)
 		// with the kernel args ranges it contains (and which are freed here).
-		vm_free_kernel_args(&ka);
+		vm_free_kernel_args(&sKernelArgs);
 	}
 
 	// init userland debugging
@@ -204,15 +207,13 @@ main2(void *unused)
 	vfs_bootstrap_file_systems();
 
 	TRACE(("Init Device Manager\n"));
-	device_manager_init(&ka);
+	device_manager_init(&sKernelArgs);
 
 	// ToDo: device manager starts here, bus_init()/dev_init() won't be necessary anymore,
 	//	but instead, the hardware and drivers are rescanned then.
 
 	TRACE(("Mount boot file system\n"));
-	vfs_mount_boot_file_system(&ka);
-
-	//net_init_postdev(&ka);
+	vfs_mount_boot_file_system(&sKernelArgs);
 
 	//module_test();
 #if 0

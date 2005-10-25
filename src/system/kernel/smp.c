@@ -21,9 +21,9 @@
 #include <string.h>
 
 #define DEBUG_SPINLOCKS 1
-#define TRACE_SMP 0
+//#define TRACE_SMP
 
-#if TRACE_SMP
+#ifdef TRACE_SMP
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
@@ -38,17 +38,16 @@
 #define MSG_POOL_SIZE (SMP_MAX_CPUS * 4)
 
 struct smp_msg {
-	struct smp_msg *next;
-	int            message;
-	unsigned long  data;
-	unsigned long  data2;
-	unsigned long  data3;
-	void           *data_ptr;
-	int            flags;
-	int32          ref_count;
-	volatile bool  done;
-	unsigned int   proc_bitmap;
-	int            lock;
+	struct smp_msg	*next;
+	int32			message;
+	uint32			data;
+	uint32			data2;
+	uint32			data3;
+	void			*data_ptr;
+	uint32			flags;
+	int32			ref_count;
+	volatile bool	done;
+	uint32			proc_bitmap;
 };
 
 #define MAILBOX_LOCAL 1
@@ -66,13 +65,13 @@ static spinlock cpu_msg_spinlock[SMP_MAX_CPUS] = { 0, };
 static struct smp_msg *smp_broadcast_msgs = NULL;
 static spinlock broadcast_msg_spinlock = 0;
 
-static bool ici_enabled = false;
+static bool sICIEnabled = false;
+static int32 sNumCPUs = 1;
 
-static int smp_num_cpus = 1;
+static int32 process_pending_ici(int32 currentCPU);
 
-static int smp_process_pending_ici(int curr_cpu);
 
-#ifdef DEBUG_SPINLOCKS
+#if DEBUG_SPINLOCKS
 #define NUM_LAST_CALLERS	32
 
 static struct {
@@ -112,13 +111,13 @@ find_lock_caller(spinlock *lock)
 void
 acquire_spinlock(spinlock *lock)
 {
-	if (smp_num_cpus > 1) {
-		int curr_cpu = smp_get_current_cpu();
+	if (sNumCPUs > 1) {
+		int currentCPU = smp_get_current_cpu();
 		if (are_interrupts_enabled())
 			panic("acquire_spinlock: attempt to acquire lock %p with interrupts enabled\n", lock);
 		while (1) {
 			while (*lock != 0) {
-				smp_process_pending_ici(curr_cpu);
+				process_pending_ici(currentCPU);
 				PAUSE();
 			}
 			if (atomic_set((int32 *)lock, 1) == 0)
@@ -144,7 +143,7 @@ acquire_spinlock(spinlock *lock)
 static void
 acquire_spinlock_nocheck(spinlock *lock)
 {
-	if (smp_num_cpus > 1) {
+	if (sNumCPUs > 1) {
 #if DEBUG_SPINLOCKS
 		if (are_interrupts_enabled())
 			panic("acquire_spinlock_nocheck: attempt to acquire lock %p with interrupts enabled\n", lock);
@@ -169,7 +168,7 @@ acquire_spinlock_nocheck(spinlock *lock)
 void
 release_spinlock(spinlock *lock)
 {
-	if (smp_num_cpus > 1) {
+	if (sNumCPUs > 1) {
 		if (are_interrupts_enabled())
 			panic("release_spinlock: attempt to release lock %p with interrupts enabled\n", lock);
 		if (atomic_set((int32 *)lock, 0) != 1)
@@ -189,10 +188,10 @@ release_spinlock(spinlock *lock)
 // NOTE: has side effect of disabling interrupts
 // return value is interrupt state
 
-static int
+static cpu_status
 find_free_message(struct smp_msg **msg)
 {
-	int state;
+	cpu_status state;
 
 	TRACE(("find_free_message: entry\n"));
 
@@ -236,33 +235,36 @@ return_free_message(struct smp_msg *msg)
 
 
 static struct smp_msg *
-smp_check_for_message(int curr_cpu, int *source_mailbox)
+check_for_message(int currentCPU, int *source_mailbox)
 {
 	struct smp_msg *msg;
 
-	acquire_spinlock_nocheck(&cpu_msg_spinlock[curr_cpu]);
-	msg = smp_msgs[curr_cpu];
+	if (!sICIEnabled)
+		return NULL;
+
+	acquire_spinlock_nocheck(&cpu_msg_spinlock[currentCPU]);
+	msg = smp_msgs[currentCPU];
 	if (msg != NULL) {
-		smp_msgs[curr_cpu] = msg->next;
-		release_spinlock(&cpu_msg_spinlock[curr_cpu]);
+		smp_msgs[currentCPU] = msg->next;
+		release_spinlock(&cpu_msg_spinlock[currentCPU]);
 		TRACE((" found msg %p in cpu mailbox\n", msg));
 		*source_mailbox = MAILBOX_LOCAL;
 	} else {
 		// try getting one from the broadcast mailbox
 
-		release_spinlock(&cpu_msg_spinlock[curr_cpu]);
+		release_spinlock(&cpu_msg_spinlock[currentCPU]);
 		acquire_spinlock_nocheck(&broadcast_msg_spinlock);
 
 		msg = smp_broadcast_msgs;
 		while (msg != NULL) {
-			if (CHECK_BIT(msg->proc_bitmap, curr_cpu) != 0) {
+			if (CHECK_BIT(msg->proc_bitmap, currentCPU) != 0) {
 				// we have handled this one already
 				msg = msg->next;
 				continue;
 			}
 
 			// mark it so we wont try to process this one again
-			msg->proc_bitmap = SET_BIT(msg->proc_bitmap, curr_cpu);
+			msg->proc_bitmap = SET_BIT(msg->proc_bitmap, currentCPU);
 			*source_mailbox = MAILBOX_BCAST;
 			break;
 		}
@@ -274,7 +276,7 @@ smp_check_for_message(int curr_cpu, int *source_mailbox)
 
 
 static void
-smp_finish_message_processing(int curr_cpu, struct smp_msg *msg, int source_mailbox)
+finish_message_processing(int currentCPU, struct smp_msg *msg, int source_mailbox)
 {
 	int old_refcount;
 
@@ -292,8 +294,8 @@ smp_finish_message_processing(int curr_cpu, struct smp_msg *msg, int source_mail
 				spinlock = &broadcast_msg_spinlock;
 				break;
 			case MAILBOX_LOCAL:
-				mbox = &smp_msgs[curr_cpu];
-				spinlock = &cpu_msg_spinlock[curr_cpu];
+				mbox = &smp_msgs[currentCPU];
+				spinlock = &cpu_msg_spinlock[currentCPU];
 				break;
 		}
 
@@ -340,15 +342,15 @@ smp_finish_message_processing(int curr_cpu, struct smp_msg *msg, int source_mail
 }
 
 
-static int
-smp_process_pending_ici(int curr_cpu)
+static int32
+process_pending_ici(int32 currentCPU)
 {
 	struct smp_msg *msg;
 	bool halt = false;
 	int source_mailbox = 0;
 	int retval = B_HANDLED_INTERRUPT;
 
-	msg = smp_check_for_message(curr_cpu, &source_mailbox);
+	msg = check_for_message(currentCPU, &source_mailbox);
 	if (msg == NULL)
 		return retval;
 
@@ -369,15 +371,15 @@ smp_process_pending_ici(int curr_cpu)
 			break;
 		case SMP_MSG_CPU_HALT:
 			halt = true;
-			dprintf("cpu %d halted!\n", curr_cpu);
+			dprintf("cpu %ld halted!\n", currentCPU);
 			break;
 		case SMP_MSG_1:
 		default:
-			dprintf("smp_intercpu_int_handler: got unknown message %d\n", msg->message);
+			dprintf("smp_intercpu_int_handler: got unknown message %ld\n", msg->message);
 	}
 
 	// finish dealing with this message, possibly removing it from the list
-	smp_finish_message_processing(curr_cpu, msg, source_mailbox);
+	finish_message_processing(currentCPU, msg, source_mailbox);
 
 	// special case for the halt message
 	// we otherwise wouldn't have gotten the opportunity to clean up
@@ -394,11 +396,11 @@ int
 smp_intercpu_int_handler(void)
 {
 	int retval;
-	int curr_cpu = smp_get_current_cpu();
+	int currentCPU = smp_get_current_cpu();
 
-	TRACE(("smp_intercpu_int_handler: entry on cpu %d\n", curr_cpu));
+	TRACE(("smp_intercpu_int_handler: entry on cpu %d\n", currentCPU));
 
-	retval = smp_process_pending_ici(curr_cpu);
+	retval = process_pending_ici(currentCPU);
 
 	TRACE(("smp_intercpu_int_handler: done\n"));
 
@@ -407,22 +409,23 @@ smp_intercpu_int_handler(void)
 
 
 void
-smp_send_ici(int target_cpu, int message, uint32 data, uint32 data2, uint32 data3, void *data_ptr, int flags)
+smp_send_ici(int32 targetCPU, int32 message, uint32 data, uint32 data2, uint32 data3,
+	void *data_ptr, uint32 flags)
 {
 	struct smp_msg *msg;
 
 	TRACE(("smp_send_ici: target 0x%x, mess 0x%x, data 0x%lx, data2 0x%lx, data3 0x%lx, ptr %p, flags 0x%x\n",
 		target_cpu, message, data, data2, data3, data_ptr, flags));
 
-	if (ici_enabled) {
+	if (sICIEnabled) {
 		int state;
-		int curr_cpu;
+		int currentCPU;
 
 		// find_free_message leaves interrupts disabled
 		state = find_free_message(&msg);
 
-		curr_cpu = smp_get_current_cpu();
-		if (target_cpu == curr_cpu) {
+		currentCPU = smp_get_current_cpu();
+		if (targetCPU == currentCPU) {
 			return_free_message(msg);
 			restore_interrupts(state);
 			return; // nope, cant do that
@@ -439,19 +442,19 @@ smp_send_ici(int target_cpu, int message, uint32 data, uint32 data2, uint32 data
 		msg->done = false;
 
 		// stick it in the appropriate cpu's mailbox
-		acquire_spinlock_nocheck(&cpu_msg_spinlock[target_cpu]);
-		msg->next = smp_msgs[target_cpu];
-		smp_msgs[target_cpu] = msg;
-		release_spinlock(&cpu_msg_spinlock[target_cpu]);
+		acquire_spinlock_nocheck(&cpu_msg_spinlock[targetCPU]);
+		msg->next = smp_msgs[targetCPU];
+		smp_msgs[targetCPU] = msg;
+		release_spinlock(&cpu_msg_spinlock[targetCPU]);
 
-		arch_smp_send_ici(target_cpu);
+		arch_smp_send_ici(targetCPU);
 
 		if (flags == SMP_MSG_FLAG_SYNC) {
 			// wait for the other cpu to finish processing it
 			// the interrupt handler will ref count it to <0
 			// if the message is sync after it has removed it from the mailbox
 			while (msg->done == false) {
-				smp_process_pending_ici(curr_cpu);
+				process_pending_ici(currentCPU);
 				PAUSE();
 			}
 			// for SYNC messages, it's our responsibility to put it
@@ -465,30 +468,31 @@ smp_send_ici(int target_cpu, int message, uint32 data, uint32 data2, uint32 data
 
 
 void
-smp_send_broadcast_ici(int message, uint32 data, uint32 data2, uint32 data3, void *data_ptr, int flags)
+smp_send_broadcast_ici(int32 message, uint32 data, uint32 data2, uint32 data3,
+	void *data_ptr, uint32 flags)
 {
 	struct smp_msg *msg;
 
 	TRACE(("smp_send_broadcast_ici: cpu %d mess 0x%x, data 0x%lx, data2 0x%lx, data3 0x%lx, ptr %p, flags 0x%x\n",
 		smp_get_current_cpu(), message, data, data2, data3, data_ptr, flags));
 
-	if (ici_enabled) {
+	if (sICIEnabled) {
 		int state;
-		int curr_cpu;
+		int currentCPU;
 
 		// find_free_message leaves interrupts disabled
 		state = find_free_message(&msg);
 
-		curr_cpu = smp_get_current_cpu();
+		currentCPU = smp_get_current_cpu();
 
 		msg->message = message;
 		msg->data = data;
 		msg->data2 = data2;
 		msg->data3 = data3;
 		msg->data_ptr = data_ptr;
-		msg->ref_count = smp_num_cpus - 1;
+		msg->ref_count = sNumCPUs - 1;
 		msg->flags = flags;
-		msg->proc_bitmap = SET_BIT(0, curr_cpu);
+		msg->proc_bitmap = SET_BIT(0, currentCPU);
 		msg->done = false;
 
 		TRACE(("smp_send_broadcast_ici%d: inserting msg %p into broadcast mbox\n",
@@ -511,7 +515,7 @@ smp_send_broadcast_ici(int message, uint32 data, uint32 data2, uint32 data3, voi
 			TRACE(("smp_send_broadcast_ici: waiting for ack\n"));
 
 			while (msg->done == false) {
-				smp_process_pending_ici(curr_cpu);
+				process_pending_ici(currentCPU);
 				PAUSE();
 			}
 
@@ -529,52 +533,65 @@ smp_send_broadcast_ici(int message, uint32 data, uint32 data2, uint32 data3, voi
 }
 
 
-int
-smp_trap_non_boot_cpus(kernel_args *ka, int cpu)
+bool
+smp_trap_non_boot_cpus(int32 cpu)
 {
 	if (cpu > 0) {
 		boot_cpu_spin[cpu] = 1;
 		acquire_spinlock(&boot_cpu_spin[cpu]);
-		return 1;
+		return false;
 	}
-	return 0;
+
+	return true;
 }
 
 
 void
-smp_wake_up_all_non_boot_cpus()
+smp_wake_up_non_boot_cpus()
 {
+	// resume non boot CPUs
 	int i;
-	for (i = 1; i < smp_num_cpus; i++) {
+	for (i = 1; i < sNumCPUs; i++) {
 		release_spinlock(&boot_cpu_spin[i]);
 	}
+
+	// ICIs were previously being ignored
+	if (sNumCPUs > 1)
+		sICIEnabled = true;
+
+	// invalidate all of the other processors' TLB caches
+	arch_cpu_global_TLB_invalidate();
+	smp_send_broadcast_ici(SMP_MSG_GLOBAL_INVL_PAGE, 0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
+
+	// start the other processors
+	smp_send_broadcast_ici(SMP_MSG_RESCHEDULE, 0, 0, 0, NULL, SMP_MSG_FLAG_ASYNC);
 }
 
 
 void
-smp_wait_for_ap_cpus(kernel_args *ka)
+smp_wait_for_non_boot_cpus(void)
 {
-	unsigned int i;
-	int retry;
+	bool retry;
+	int32 i;
 	do {
-		retry = 0;
-		for (i = 1; i < ka->num_cpus; i++) {
+		retry = false;
+		for (i = 1; i < sNumCPUs; i++) {
 			if (boot_cpu_spin[i] != 1)
-				retry = 1;
+				retry = true;
 		}
-	} while (retry == 1);
+	} while (retry == true);
 }
 
 
 status_t
-smp_init(kernel_args *ka)
+smp_init(kernel_args *args)
 {
 	struct smp_msg *msg;
 	int i;
 
 	TRACE(("smp_init: entry\n"));
 
-	if (ka->num_cpus > 1) {
+	if (args->num_cpus > 1) {
 		free_msgs = NULL;
 		free_msg_count = 0;
 		for (i = 0; i < MSG_POOL_SIZE; i++) {
@@ -588,11 +605,11 @@ smp_init(kernel_args *ka)
 			free_msgs = msg;
 			free_msg_count++;
 		}
-		smp_num_cpus = ka->num_cpus;
+		sNumCPUs = args->num_cpus;
 	}
 	TRACE(("smp_init: calling arch_smp_init\n"));
 
-	return arch_smp_init(ka);
+	return arch_smp_init(args);
 }
 
 
@@ -604,45 +621,29 @@ smp_per_cpu_init(kernel_args *args, int32 cpu)
 
 
 void
-smp_set_num_cpus(int num_cpus)
+smp_set_num_cpus(int32 numCPUs)
 {
-	smp_num_cpus = num_cpus;
+	sNumCPUs = numCPUs;
 }
 
 
-int
+int32
 smp_get_num_cpus()
 {
-	return smp_num_cpus;
+	return sNumCPUs;
 }
 
 
-int
+int32
 smp_get_current_cpu(void)
 {
-	struct thread *t = thread_get_current_thread();
-	if (t)
-		return t->cpu->info.cpu_num;
+	struct thread *thread = thread_get_current_thread();
+	if (thread)
+		return thread->cpu->info.cpu_num;
 
+	// this is not always correct during early boot, but it's okay for
+	// for the boot process
 	return 0;
-}
-
-
-int
-smp_enable_ici()
-{
-	if (smp_num_cpus > 1) // dont actually do it if we only have one cpu
-		ici_enabled = true;
-
-	return B_NO_ERROR;
-}
-
-
-int
-smp_disable_ici()
-{
-	ici_enabled = false;
-	return B_NO_ERROR;
 }
 
 

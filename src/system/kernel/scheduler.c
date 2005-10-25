@@ -12,6 +12,7 @@
 
 #include <OS.h>
 
+#include <kscheduler.h>
 #include <thread.h>
 #include <timer.h>
 #include <int.h>
@@ -84,7 +85,8 @@ scheduler_enqueue_in_run_queue(struct thread *thread)
 	if (thread->priority < B_MIN_PRIORITY)
 		thread->priority = B_MIN_PRIORITY;
 
-	for (curr = sRunQueue.head, prev = NULL; curr && (curr->priority >= thread->priority); curr = curr->queue_next) {
+	for (curr = sRunQueue.head, prev = NULL; curr && curr->priority >= thread->priority;
+			curr = curr->queue_next) {
 		if (prev)
 			prev = prev->queue_next;
 		else
@@ -166,7 +168,7 @@ scheduler_reschedule(void)
 	switch (oldThread->next_state) {
 		case B_THREAD_RUNNING:
 		case B_THREAD_READY:
-			TRACE(("enqueueing thread 0x%lx into run q. pri = %d\n", oldThread->id, oldThread->priority));
+			TRACE(("enqueueing thread 0x%lx into run q. pri = %ld\n", oldThread->id, oldThread->priority));
 			scheduler_enqueue_in_run_queue(oldThread);
 			break;
 		case B_THREAD_SUSPENDED:
@@ -178,7 +180,7 @@ scheduler_reschedule(void)
 			thread_enqueue(oldThread, &dead_q);
 			break;
 		default:
-			TRACE(("not enqueueing thread 0x%lx into run q. next_state = %d\n", oldThread->id, oldThread->next_state));
+			TRACE(("not enqueueing thread 0x%lx into run q. next_state = %ld\n", oldThread->id, oldThread->next_state));
 			break;
 	}
 	oldThread->state = oldThread->next_state;
@@ -186,13 +188,13 @@ scheduler_reschedule(void)
 	// select next thread from the run queue
 	nextThread = sRunQueue.head;
 	prevThread = NULL;
-	while (nextThread && (nextThread->priority > B_IDLE_PRIORITY)) {
+	while (nextThread && nextThread->priority > B_IDLE_PRIORITY) {
 		// always extract real time threads
 		if (nextThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
 			break;
 
 		// never skip last non-idle normal thread
-		if (nextThread->queue_next && (nextThread->queue_next->priority == B_IDLE_PRIORITY))
+		if (nextThread->queue_next && nextThread->queue_next->priority == B_IDLE_PRIORITY)
 			break;
 
 		// skip normal threads sometimes
@@ -217,17 +219,24 @@ scheduler_reschedule(void)
 
 	if (nextThread != oldThread || oldThread->cpu->info.preempted) {
 		bigtime_t quantum = 3000;	// ToDo: calculate quantum!
-		timer *quantum_timer= &oldThread->cpu->info.quantum_timer;
+		timer *quantumTimer = &oldThread->cpu->info.quantum_timer;
 
 		if (!oldThread->cpu->info.preempted)
-			_local_timer_cancel_event(oldThread->cpu->info.cpu_num, quantum_timer);
+			_local_timer_cancel_event(oldThread->cpu->info.cpu_num, quantumTimer);
 
 		oldThread->cpu->info.preempted = 0;
-		add_timer(quantum_timer, &reschedule_event, quantum, B_ONE_SHOT_RELATIVE_TIMER);
+		add_timer(quantumTimer, &reschedule_event, quantum, B_ONE_SHOT_RELATIVE_TIMER);
 
 		if (nextThread != oldThread)
 			context_switch(oldThread, nextThread);
 	}
+}
+
+
+void
+scheduler_init(void)
+{
+	add_debugger_command("run_queue", &dump_run_queue, "list threads in run queue");
 }
 
 
@@ -236,29 +245,15 @@ scheduler_reschedule(void)
  */
 
 void
-start_scheduler(void)
+scheduler_start(void)
 {
-	cpu_status state;
-
-	// ToDo: may not be the best place for this
-	// invalidate all of the other processors' TLB caches
-	state = disable_interrupts();
-	arch_cpu_global_TLB_invalidate();
-	smp_send_broadcast_ici(SMP_MSG_GLOBAL_INVL_PAGE, 0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
-	restore_interrupts(state);
-
-	// start the other processors
-	smp_send_broadcast_ici(SMP_MSG_RESCHEDULE, 0, 0, 0, NULL, SMP_MSG_FLAG_ASYNC);
-
-	state = disable_interrupts();
+	cpu_status state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
 	scheduler_reschedule();
 
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
-
-	add_debugger_command("run_queue", &dump_run_queue, "list threads in run queue");
 }
 
 

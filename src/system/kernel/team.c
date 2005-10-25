@@ -17,6 +17,7 @@
 #include <sem.h>
 #include <user_runtime.h>
 #include <kimage.h>
+#include <kscheduler.h>
 #include <elf.h>
 #include <syscalls.h>
 #include <syscall_process_info.h>

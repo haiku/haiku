@@ -6,12 +6,13 @@
  * Distributed under the terms of the NewOS License.
  */
 
-#include <vm.h>
 #include <int.h>
+#include <kscheduler.h>
 #include <ksyscalls.h>
 #include <smp.h>
 #include <team.h>
 #include <thread.h>
+#include <vm.h>
 #include <vm_priv.h>
 
 #include <arch/cpu.h>

@@ -98,6 +98,61 @@ apic_write(uint32 offset, uint32 data)
 }
 
 
+static status_t
+setup_apic(kernel_args *args, int32 cpu)
+{
+	uint32 config;
+
+	TRACE(("setting up the apic..."));
+
+	/* set spurious interrupt vector to 0xff */
+	config = apic_read(APIC_SIVR) & 0xffffff00;
+	config |= APIC_ENABLE | 0xff;
+	apic_write(APIC_SIVR, config);
+
+	// don't touch the LINT0/1 configuration in virtual wire mode
+	// ToDo: implement support for other modes...
+#if 0
+	if (cpu == 0) {
+		/* setup LINT0 as ExtINT */
+		config = (apic_read(APIC_LINT0) & 0xffff00ff);
+		config |= APIC_LVT_DM_ExtINT | APIC_LVT_IIPP | APIC_LVT_TM;
+		apic_write(APIC_LINT0, config);
+	
+		/* setup LINT1 as NMI */
+		config = (apic_read(APIC_LINT1) & 0xffff00ff);
+		config |= APIC_LVT_DM_NMI | APIC_LVT_IIPP;
+		apic_write(APIC_LINT1, config);
+	}
+#endif
+
+	/* setup timer */
+	config = apic_read(APIC_LVTT) & ~APIC_LVTT_MASK;
+	config |= 0xfb | APIC_LVTT_M; // vector 0xfb, timer masked
+	apic_write(APIC_LVTT, config);
+
+	apic_write(APIC_ICRT, 0); // zero out the clock
+
+	config = apic_read(APIC_TDCR) & ~0x0000000f;
+	config |= APIC_TDCR_1; // clock division by 1
+	apic_write(APIC_TDCR, config);
+
+	/* setup error vector to 0xfe */
+	config = (apic_read(APIC_LVT3) & 0xffffff00) | 0xfe;
+	apic_write(APIC_LVT3, config);
+
+	/* accept all interrupts */
+	config = apic_read(APIC_TPRI) & 0xffffff00;
+	apic_write(APIC_TPRI, config);
+
+	config = apic_read(APIC_SIVR);
+	apic_write(APIC_EOI, 0);
+
+	TRACE((" done\n"));
+	return 0;
+}
+
+
 status_t
 arch_smp_init(kernel_args *args)
 {
@@ -131,62 +186,12 @@ arch_smp_init(kernel_args *args)
 }
 
 
-static int
-smp_setup_apic(kernel_args *args)
-{
-	uint32 config;
-
-	TRACE(("setting up the apic..."));
-
-	/* set spurious interrupt vector to 0xff */
-	config = apic_read(APIC_SIVR) & 0xfffffc00;
-	config |= APIC_ENABLE | 0xff;
-	apic_write(APIC_SIVR, config);
-#if 0
-	/* setup LINT0 as ExtINT */
-	config = (apic_read(APIC_LINT0) & 0xffff1c00);
-	config |= APIC_LVT_DM_ExtINT | APIC_LVT_IIPP | APIC_LVT_TM;
-	apic_write(APIC_LINT0, config);
-
-	/* setup LINT1 as NMI */
-	config = (apic_read(APIC_LINT1) & 0xffff1c00);
-	config |= APIC_LVT_DM_NMI | APIC_LVT_IIPP;
-	apic_write(APIC_LINT1, config);
-#endif
-
-	/* setup timer */
-	config = apic_read(APIC_LVTT) & ~APIC_LVTT_MASK;
-	config |= 0xfb | APIC_LVTT_M; // vector 0xfb, timer masked
-	apic_write(APIC_LVTT, config);
-
-	apic_write(APIC_ICRT, 0); // zero out the clock
-
-	config = apic_read(APIC_TDCR) & ~0x0000000f;
-	config |= APIC_TDCR_1; // clock division by 1
-	apic_write(APIC_TDCR, config);
-
-	/* setup error vector to 0xfe */
-	config = (apic_read(APIC_LVT3) & 0xffffff00) | 0xfe;
-	apic_write(APIC_LVT3, config);
-
-	/* accept all interrupts */
-	config = apic_read(APIC_TPRI) & 0xffffff00;
-	apic_write(APIC_TPRI, config);
-
-	config = apic_read(APIC_SIVR);
-	apic_write(APIC_EOI, 0);
-
-	TRACE((" done\n"));
-	return 0;
-}
-
-
 status_t
 arch_smp_per_cpu_init(kernel_args *args, int32 cpu)
 {
 	// set up the local apic on the current cpu
 	TRACE(("arch_smp_init_percpu: setting up the apic on cpu %ld\n", cpu));
-	smp_setup_apic(args);
+	setup_apic(args, cpu);
 
 	return B_OK;
 }
@@ -218,6 +223,10 @@ arch_smp_send_ici(int32 target_cpu)
 	config = apic_read(APIC_ICR1) & APIC_ICR1_WRITE_MASK;
 	apic_write(APIC_ICR1, config | 0xfd | APIC_ICR1_DELIVERY_MODE_FIXED
 		| APIC_ICR1_DEST_MODE_PHYSICAL | APIC_ICR1_DEST_FIELD);
+
+	// wait for message to be sent
+	while ((apic_read(APIC_ICR1) & APIC_ICR1_DELIVERY_STATUS) != 0)
+		;
 
 	restore_interrupts(state);
 }
