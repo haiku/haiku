@@ -232,7 +232,7 @@ PDFWriter::EndJob()
 	}
 #endif
 	fImageCache.Flush();
-	
+		
 	PDF_close(fPdf);
 	REPORT(kDebug, 0, ">>>> PDF_close");
 
@@ -247,9 +247,13 @@ PDFWriter::EndJob()
 // --------------------------------------------------
 void 
 PDFWriter::SetAttribute(const char* name, const char* value) {
-	BFile* file = dynamic_cast<BFile*>(Transport());
+	
+	if (!name || !value)
+		return;
+	
+	BFile * file = dynamic_cast<BFile *>(Transport());
 	if (file) {
-		
+		file->WriteAttr(name, B_STRING_TYPE, 0, value, strlen(value) + 1);
 	}
 }
 
@@ -264,6 +268,9 @@ PDFWriter::InitWriter()
 	fState = NULL;
 	fStateDepth = 0;
 
+	// Set MIME-type explicit
+	SetAttribute("BEOS:TYPE", "application/pdf");
+	
 	// pdflib scope: object
 /*
 	const char* license_key;
@@ -303,7 +310,7 @@ PDFWriter::InitWriter()
 
 	REPORT(kDebug, 0, ">>>> PDF_open_mem");	
 	PDF_open_mem(fPdf, _WriteData);	// use callback to stream PDF document data to printer transport
-	
+
 	// pdflib scope:
 
 	PDF_set_parameter(fPdf, "flush", "content");
