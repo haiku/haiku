@@ -119,7 +119,7 @@ BEOS_BIN="touch sync ln listarea listattr listsem listport \
 	ppp_up gdb tail head zip unzip mountvolume top finddir groups \
 	id env basename factor tty dstcheck comm modifiers version \
 	csplit cut beep screen_blanker play eject uptime sed gawk \
-	mimeset"
+	mimeset dirname"
 
 BEOS_APPS="MiniTerminal Terminal Expander People ShowImage Clock Pulse Playground \
 	SoundRecorder BitmapDrawing Magnify DiskProbe AboutHaiku StyledEdit \
@@ -147,7 +147,7 @@ BEOS_ADD_ONS_TRANSLATORS="STXTTranslator RTF-Translator PNGTranslator \
 BEOS_ADD_ONS_MEDIA="mixer.media_addon legacy.media_addon multi_audio.media_addon"
 BEOS_ADD_ONS_MEDIA_PLUGINS="aiff_reader avcodec mp3_decoder musepack raw_decoder \
 	wav_reader mov_reader au_reader avi_reader mp3_reader ogg speex vorbis \
-	matroska" # ac3_decoder theora
+	" # ac3_decoder theora matroska
 BEOS_ADD_ONS_INPUT="<input>keyboard <input>mouse canna screen_saver"
 BEOS_ADD_ONS_SCREENSAVERS="Haiku"
 BEOS_ADD_ONS_DRIVERS_MISC="keyboard scsi_dsk scsi_cd dprintf null zero random \
