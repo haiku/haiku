@@ -492,7 +492,7 @@ init_driver(void) {
 		current_settings.unhide_fw = get_driver_boolean_parameter (settings_handle, "unhide_fw", false, false);
 		current_settings.pgm_panel = get_driver_boolean_parameter (settings_handle, "pgm_panel", false, false);
 		current_settings.dma_acc = get_driver_boolean_parameter (settings_handle, "dma_acc", false, false);
-		current_settings.dma_acc = get_driver_boolean_parameter (settings_handle, "vga_on_tv", false, false);
+		current_settings.vga_on_tv = get_driver_boolean_parameter (settings_handle, "vga_on_tv", false, false);
 
 		unload_driver_settings (settings_handle);
 	}
