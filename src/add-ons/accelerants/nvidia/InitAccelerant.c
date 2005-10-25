@@ -192,6 +192,9 @@ status_t INIT_ACCELERANT(int the_fd) {
 	head1_cursor_hide();
 	if (si->ps.secondary_head) head2_cursor_hide();
 
+	/* ensure DPMS state */
+	si->dpms_flags = B_DPMS_ON;
+
 	/* make sure a possible 3D add-on will block rendering and re-initialize itself.
 	 * note: update in _this_ order only */
 	/* SET_DISPLAY_MODE will reset this flag when it's done. */

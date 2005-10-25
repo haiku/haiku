@@ -1,6 +1,6 @@
 /* CTRC functionality */
 /* Author:
-   Rudolf Cornelissen 11/2002-5/2005
+   Rudolf Cornelissen 11/2002-10/2005
 */
 
 #define MODULE_BIT 0x00040000
@@ -639,26 +639,6 @@ status_t nv_crtc_dpms(bool display, bool h, bool v)
 		CRTCW(REPAINT1, (CRTCR(REPAINT1) | 0x40));
 		LOG(4,("vsync disabled\n"));
 	}
-
-	return B_OK;
-}
-
-status_t nv_crtc_dpms_fetch(bool *display, bool *h, bool *v)
-{
-	/* enable access to primary head */
-	set_crtc_owner(0);
-
-	*display = !(SEQR(CLKMODE) & 0x20);
-	*h = !(CRTCR(REPAINT1) & 0x80);
-	*v = !(CRTCR(REPAINT1) & 0x40);
-
-	LOG(4,("CTRC: fetched DPMS state: "));
-	if (*display) LOG(4,("display on, "));
-	else LOG(4,("display off, "));
-	if (*h) LOG(4,("hsync enabled, "));
-	else LOG(4,("hsync disabled, "));
-	if (*v) LOG(4,("vsync enabled\n"));
-	else LOG(4,("vsync disabled\n"));
 
 	return B_OK;
 }

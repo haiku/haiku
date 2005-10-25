@@ -69,18 +69,14 @@ status_t BT_setmode(display_mode target);
 status_t nv_crtc_update_fifo(void);
 status_t nv_crtc_validate_timing(
 	uint16 *hd_e,uint16 *hs_s,uint16 *hs_e,uint16 *ht,
-	uint16 *vd_e,uint16 *vs_s,uint16 *vs_e,uint16 *vt
-);
+	uint16 *vd_e,uint16 *vs_s,uint16 *vs_e,uint16 *vt);
 status_t nv_crtc_set_timing(display_mode target);
 status_t nv_crtc_depth(int mode);
 status_t nv_crtc_set_display_start(uint32 startadd,uint8 bpp); 
 status_t nv_crtc_set_display_pitch(void);
-
 status_t nv_crtc_dpms(bool, bool, bool);
-status_t nv_crtc_dpms_fetch(bool*, bool*, bool*);
 status_t nv_crtc_mem_priority(uint8);
-
-status_t nv_crtc_cursor_init(void); /*Yes, cursor follows CRTC1 - not the DAC!*/
+status_t nv_crtc_cursor_init(void);
 status_t nv_crtc_cursor_define(uint8*,uint8*);
 status_t nv_crtc_cursor_position(uint16 x ,uint16 y);
 status_t nv_crtc_cursor_show(void);
@@ -89,17 +85,13 @@ status_t nv_crtc_cursor_hide(void);
 /* CRTC2 functions */
 status_t nv_crtc2_validate_timing(
 	uint16 *hd_e,uint16 *hs_s,uint16 *hs_e,uint16 *ht,
-	uint16 *vd_e,uint16 *vs_s,uint16 *vs_e,uint16 *vt
-);
+	uint16 *vd_e,uint16 *vs_s,uint16 *vs_e,uint16 *vt);
 status_t nv_crtc2_set_timing(display_mode target);
 status_t nv_crtc2_depth(int mode);
 status_t nv_crtc2_set_display_start(uint32 startadd,uint8 bpp); 
 status_t nv_crtc2_set_display_pitch(void);
-
 status_t nv_crtc2_dpms(bool, bool, bool);
-status_t nv_crtc2_dpms_fetch(bool*, bool*, bool*);
 status_t nv_crtc2_mem_priority(uint8);
-
 status_t nv_crtc2_cursor_init(void);
 status_t nv_crtc2_cursor_define(uint8*,uint8*);
 status_t nv_crtc2_cursor_position(uint16 x ,uint16 y);
@@ -142,4 +134,3 @@ status_t nv_release_bes(void);
 
 /* driver structures and enums */
 enum{BPP8 = 0, BPP15 = 1, BPP16 = 2, BPP24 = 3, BPP32 = 4};
-enum{DS_CRTC1DAC_CRTC2MAVEN, DS_CRTC1MAVEN_CRTC2DAC, DS_CRTC1CON1_CRTC2CON2, DS_CRTC1CON2_CRTC2CON1};

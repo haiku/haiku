@@ -91,7 +91,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.58 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.59 running.\n"));
 
 	/* log VBLANK INT usability status */
 	if (si->ps.int_assigned)
@@ -998,7 +998,6 @@ void setup_virtualized_heads(bool cross)
 		head1_set_timing		= (crtc_set_timing)			nv_crtc2_set_timing;
 		head1_depth				= (crtc_depth)				nv_crtc2_depth;
 		head1_dpms				= (crtc_dpms)				nv_crtc2_dpms;
-		head1_dpms_fetch		= (crtc_dpms_fetch)			nv_crtc2_dpms_fetch;
 		head1_set_display_pitch	= (crtc_set_display_pitch)	nv_crtc2_set_display_pitch;
 		head1_set_display_start	= (crtc_set_display_start)	nv_crtc2_set_display_start;
 		head1_cursor_init		= (crtc_cursor_init)		nv_crtc2_cursor_init;
@@ -1016,7 +1015,6 @@ void setup_virtualized_heads(bool cross)
 		head2_set_timing		= (crtc_set_timing)			nv_crtc_set_timing;
 		head2_depth				= (crtc_depth)				nv_crtc_depth;
 		head2_dpms				= (crtc_dpms)				nv_crtc_dpms;
-		head2_dpms_fetch		= (crtc_dpms_fetch)			nv_crtc_dpms_fetch;
 		head2_set_display_pitch	= (crtc_set_display_pitch)	nv_crtc_set_display_pitch;
 		head2_set_display_start	= (crtc_set_display_start)	nv_crtc_set_display_start;
 		head2_cursor_init		= (crtc_cursor_init)		nv_crtc_cursor_init;
@@ -1036,7 +1034,6 @@ void setup_virtualized_heads(bool cross)
 		head1_set_timing		= (crtc_set_timing)			nv_crtc_set_timing;
 		head1_depth				= (crtc_depth)				nv_crtc_depth;
 		head1_dpms				= (crtc_dpms)				nv_crtc_dpms;
-		head1_dpms_fetch		= (crtc_dpms_fetch)			nv_crtc_dpms_fetch;
 		head1_set_display_pitch	= (crtc_set_display_pitch)	nv_crtc_set_display_pitch;
 		head1_set_display_start	= (crtc_set_display_start)	nv_crtc_set_display_start;
 		head1_cursor_init		= (crtc_cursor_init)		nv_crtc_cursor_init;
@@ -1054,7 +1051,6 @@ void setup_virtualized_heads(bool cross)
 		head2_set_timing		= (crtc_set_timing)			nv_crtc2_set_timing;
 		head2_depth				= (crtc_depth)				nv_crtc2_depth;
 		head2_dpms				= (crtc_dpms)				nv_crtc2_dpms;
-		head2_dpms_fetch		= (crtc_dpms_fetch)			nv_crtc2_dpms_fetch;
 		head2_set_display_pitch	= (crtc_set_display_pitch)	nv_crtc2_set_display_pitch;
 		head2_set_display_start	= (crtc_set_display_start)	nv_crtc2_set_display_start;
 		head2_cursor_init		= (crtc_cursor_init)		nv_crtc2_cursor_init;
@@ -1389,9 +1385,6 @@ static status_t nv_general_bios_to_powergraphics()
 	 * This may only be done when no transfers are in progress on the bus, so now
 	 * is probably a good time.. */
 	nv_agp_setup();
-
-	/* turn screen one on */
-	head1_dpms(true, true, true);
 
 	return B_OK;
 }

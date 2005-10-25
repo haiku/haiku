@@ -55,7 +55,6 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	uint8 colour_depth1 = 32;
 	status_t result;
 	uint32 startadd,startadd_right;
-	bool display, h, v;
 //	bool crt1, crt2, cross;
 
 	/* Adjust mode to valid one and fail if invalid */
@@ -97,8 +96,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	/* disable TVout if supported */
 	if (si->ps.tvout) BT_stop_tvout();
 
-	/* find current DPMS state, then turn off screen(s) */
-	head1_dpms_fetch(&display, &h, &v);
+	/* turn off screen(s) */
 	head1_dpms(false, false, false);
 	if (si->ps.secondary_head) head2_dpms(false, false, false);
 	if (si->ps.tvout) BT_dpms(false);
@@ -330,13 +328,6 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	/* update FIFO data fetching according to mode */
 	nv_crtc_update_fifo();
 
-	/* turn screen one on */
-	head1_dpms(display, h, v);
-	/* turn screen two on if a dualhead mode is active */
-	if (target.flags & DUALHEAD_BITS) head2_dpms(display,h,v);
-	/* turn TVout on if this is a TVout mode */
-	if (target.flags & TV_BITS) BT_dpms(true);
-
 	/* set up acceleration for this mode */
 	/* note:
 	 * Maybe later we can forget about non-DMA mode (depends on 3D acceleration
@@ -380,7 +371,8 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	}
 	si->engine.threeD.mem_high -= (MAXBUFFERS * 1024 * 1024 * 2); /* see overlay.c file */
 
-	LOG(1,("SETMODE: booted since %f mS\n", system_time()/1000.0));
+	/* restore screen(s) output state(s) */
+	SET_DPMS_MODE(si->dpms_flags);
 
 	/* enable interrupts using the kernel driver */
 	interrupt_enable(true);
@@ -393,6 +385,8 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 
 	/* Tune RAM CAS-latency if needed. Must be done *here*! */
 	nv_set_cas_latency();
+
+	LOG(1,("SETMODE: booted since %f mS\n", system_time()/1000.0));
 
 	return B_OK;
 }
@@ -505,11 +499,15 @@ void SET_INDEXED_COLORS(uint count, uint8 first, uint8 *color_data, uint32 flags
 }
 
 /* Put the display into one of the Display Power Management modes. */
-status_t SET_DPMS_MODE(uint32 dpms_flags) {
+status_t SET_DPMS_MODE(uint32 dpms_flags)
+{
 	interrupt_enable(false);
 
 	LOG(4,("SET_DPMS_MODE: 0x%08x\n", dpms_flags));
-	
+
+	/* note current DPMS state for our reference */
+	si->dpms_flags = dpms_flags;
+
 	if (si->dm.flags & DUALHEAD_BITS) /*dualhead*/
 	{
 		switch(dpms_flags) 
@@ -577,19 +575,7 @@ uint32 DPMS_CAPABILITIES(void) {
 }
 
 /* Return the current DPMS mode */
-uint32 DPMS_MODE(void) {
-	bool display, h, v;
-	
-	interrupt_enable(false);
-	head1_dpms_fetch(&display, &h, &v);
-	interrupt_enable(true);
-
-	if (display && h && v)
-		return B_DPMS_ON;
-	else if(v)
-		return B_DPMS_STAND_BY;
-	else if(h)
-		return B_DPMS_SUSPEND;
-	else
-		return B_DPMS_OFF;
+uint32 DPMS_MODE(void)
+{
+	return si->dpms_flags;
 }

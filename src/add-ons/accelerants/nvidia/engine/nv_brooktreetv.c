@@ -1652,7 +1652,7 @@ status_t BT_stop_tvout(void)
 	set_crtc_owner(0);
 
 	/* switch on VGA monitor HSYNC and VSYNC */
-//fixme: see if better DPMS state fetching can be setup for crtc.c (!)
+	//fixme: is this needed?
 	CRTCW(REPAINT1, (CRTCR(REPAINT1) & 0x3f));
 
 
