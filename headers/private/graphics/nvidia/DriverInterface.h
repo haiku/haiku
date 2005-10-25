@@ -178,6 +178,7 @@ typedef struct {
 
   /*more display mode stuff*/
 	display_mode dm;		/* current display mode configuration: head1 */
+	uint32 dpms_flags;		/* current DPMS mode */
 	bool acc_mode;			/* signals (non)accelerated mode */
 	bool interlaced_tv_mode;/* signals interlaced CRTC TV output mode */
 	bool crtc_switch_mode;	/* signals dualhead switch mode if panels are used */
