@@ -53,7 +53,7 @@
 #include <Screen.h>
 #include <SupportDefs.h>
 
-#define APPSERVER_PORTLINK_COMM
+#define HAIKU_APPSERVER_COMM
 #define R5_CURSOR_COMM // define this when R5 cursor communication should be used
 //#define APPSERVER_R5_COMM // define this when R5 app_server communication should be used
 
@@ -61,13 +61,7 @@
 
 #ifdef APPSERVER_R5_COMM
 	#define R5_CURSOR_COMM
-	#undef APPSERVER_PORTLINK_COMM
-#endif
-
-#ifdef APPSERVER_PORTLINK_COMM
-namespace BPrivate {
-	class PortLink;
-};
+	#undef HAIKU_APPSERVER_COMM
 #endif
 
 class InputDeviceListItem
@@ -241,10 +235,6 @@ private:
 	BottomlineWindow 	*fBLWindow;
 	bool			fIMAware;
 
-#ifdef 	APPSERVER_PORTLINK_COMM
-	// added this to communicate via portlink
-	BPrivate::PortLink	*fAppServerLink;
-#endif
 #ifdef R5_CURSOR_COMM
 	sem_id 		fCursorSem;
 	port_id		fAsPort;

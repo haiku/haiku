@@ -51,8 +51,6 @@
 #include "MethodReplicant.h"
 
 #ifndef USE_R5_STYLE_COMM
-// include app_server headers for communication
-#include <PortLink.h>
 #include <ServerProtocol.h>
 #endif
 
@@ -181,11 +179,10 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 			PRINTERR(("error when send_data %s\n", strerror(err)));
 	}
 #endif
-#ifdef APPSERVER_PORTLINK_COMM
-	port_id input_port = find_port(SERVER_INPUT_PORT);
-	if (input_port == B_NAME_NOT_FOUND)
+#ifdef HAIKU_APPSERVER_COMM
+	fAsPort = find_port(SERVER_INPUT_PORT);
+	if (fAsPort == B_NAME_NOT_FOUND)
 		PRINTERR(("input_server couldn't find app_server's input port\n"));
-	fAppServerLink = new BPrivate::PortLink(input_port);
 #endif 
 
 	InitKeyboardMouseStates();
@@ -1206,214 +1203,6 @@ InputServer::DispatchEvent(BMessage *message)
 		}
 	}
 	
-#ifdef APPSERVER_PORTLINK_COMM
-	if (!fAppServerLink) {
-		debugger("InputServer::DispatchEvent(): app_server link not valid\n");
-		return false;
-	}
-	
-	switch(message->what){
-		case B_MOUSE_MOVED:{
-			uint32 buttons;
-			BPoint pt;
-			int64 time;
-    			message->FindPoint("where",&pt);
-			message->FindInt64("when", &time);
-			fAppServerLink->StartMessage(B_MOUSE_MOVED);
-    			fAppServerLink->Attach(&time,sizeof(int64));
-    			fAppServerLink->Attach(&pt.x,sizeof(float));
-				fAppServerLink->Attach(&pt.y,sizeof(float));
-    			message->FindInt32("buttons",buttons);
-    			fAppServerLink->Attach(&buttons,sizeof(uint32));
-    			fAppServerLink->Flush();
-    			PRINT(("B_MOUSE_MOVED: x = %f: y = %f: time = %llu: buttons = %lu\n",pt.x,pt.y,time,buttons));
-    		break;
-    		}
-    	case B_MOUSE_DOWN:{
-
-			BPoint pt;
-			int32 buttons,clicks,mod;
-			int64 time;
-			message->FindInt64("when", &time);
-			
-			if(message->FindPoint("where",&pt)!=B_OK ||
-					message->FindInt32("modifiers",&mod)!=B_OK ||
-					message->FindInt32("buttons",&buttons)!=B_OK ||
-					message->FindInt32("clicks",&clicks)!=B_OK)
-				break;
-		
-			fAppServerLink->StartMessage(B_MOUSE_DOWN);
-			fAppServerLink->Attach(&time, sizeof(int64));
-			fAppServerLink->Attach(&pt.x,sizeof(float));
-			fAppServerLink->Attach(&pt.y,sizeof(float));
-			fAppServerLink->Attach(&mod, sizeof(uint32));
-			fAppServerLink->Attach(&buttons, sizeof(uint32));
-			fAppServerLink->Attach(&clicks, sizeof(uint32));
-			fAppServerLink->Flush();
-    		break;
-    		}
-    	case B_MOUSE_UP:{
-			BPoint pt;
-			int32 mod;
-			int64 time;
-			message->FindInt64("when", &time);
-
-			if(message->FindPoint("where",&pt)!=B_OK ||
-					message->FindInt32("modifiers",&mod)!=B_OK)
-				break;
-			
-			fAppServerLink->StartMessage(B_MOUSE_UP);
-			fAppServerLink->Attach(&time, sizeof(int64));
-			fAppServerLink->Attach(&pt.x,sizeof(float));
-			fAppServerLink->Attach(&pt.y,sizeof(float));
-			fAppServerLink->Attach(&mod, sizeof(uint32));
-			fAppServerLink->Flush();
-    		break;
-    		}
-    	case B_MOUSE_WHEEL_CHANGED:{
-			float x,y;
-			message->FindFloat("be:wheel_delta_x",&x);
-			message->FindFloat("be:wheel_delta_y",&y);
-			bigtime_t time;
-			message->FindInt64("when", &time);
-			
-			fAppServerLink->StartMessage(B_MOUSE_WHEEL_CHANGED);
-			fAppServerLink->Attach(&time,sizeof(int64));
-			fAppServerLink->Attach(x);
-			fAppServerLink->Attach(y);
-			fAppServerLink->Flush();
-			break;
-    		}
-		case B_KEY_DOWN:{
-			bigtime_t time;
-			int32 scancode, asciicode,repeatcount,modifiers;
-			int8 utf8data[3];
-			BString string;
-			uint8 keyarray[16];
-
-			message->FindInt64("when", &time);
-			message->FindInt32("key",&scancode);
-			message->FindInt32("be:key_repeat",&repeatcount);
-			message->FindInt32("modifiers",&modifiers);
-			message->FindInt32("raw_char",&asciicode);
-			message->FindInt8("byte",0,utf8data);
-			message->FindInt8("byte",1,utf8data+1);
-			message->FindInt8("byte",2,utf8data+2);
-			message->FindString("bytes",&string);
-			uint8 *data = NULL;
-			ssize_t size = 0;
-			if ((message->FindData("states", B_UINT8_TYPE, (const void**)&data, &size) == B_OK)
-				&& (size == (ssize_t)sizeof(keyarray))) {
-				memcpy(keyarray, data, size);
-			}
-			fAppServerLink->StartMessage(B_KEY_DOWN);
-			fAppServerLink->Attach(&time,sizeof(bigtime_t));
-			fAppServerLink->Attach(scancode);
-			fAppServerLink->Attach(asciicode);
-			fAppServerLink->Attach(repeatcount);
-			fAppServerLink->Attach(modifiers);
-			fAppServerLink->Attach(utf8data,sizeof(int8)*3);
-			fAppServerLink->AttachString(string.String());
-			fAppServerLink->Attach(keyarray,sizeof(int8)*16);
-			fAppServerLink->Flush();
-			break;
-		}
-		case B_KEY_UP:{
-			bigtime_t time;
-			int32 scancode, asciicode,modifiers;
-			int8 utf8data[3];
-			BString string;
-			uint8 keyarray[16];
-
-			message->FindInt64("when", &time);
-			message->FindInt32("key",&scancode);
-			message->FindInt32("raw_char",&asciicode);
-			message->FindInt32("modifiers",&modifiers);
-			message->FindInt8("byte",0,utf8data);
-			message->FindInt8("byte",1,utf8data+1);
-			message->FindInt8("byte",2,utf8data+2);
-			message->FindString("bytes",&string);
-			uint8 *data = NULL;
-			ssize_t size = 0;
-			if ((message->FindData("states", B_UINT8_TYPE, (const void**)&data, &size) == B_OK)
-				&& (size == (ssize_t)sizeof(keyarray))) {
-				memcpy(keyarray, data, size);
-			}
-
-			fAppServerLink->StartMessage(B_KEY_UP);
-			fAppServerLink->Attach(&time,sizeof(bigtime_t));
-			fAppServerLink->Attach(scancode);
-			fAppServerLink->Attach(asciicode);
-			fAppServerLink->Attach(modifiers);
-			fAppServerLink->Attach(utf8data,sizeof(int8)*3);
-			fAppServerLink->AttachString(string.String());
-			fAppServerLink->Attach(keyarray,sizeof(int8)*16);
-			fAppServerLink->Flush();
-			break;
-		}
-		case B_UNMAPPED_KEY_DOWN:{
-			bigtime_t time;
-			int32 scancode,modifiers;
-			int8 keyarray[16];
-
-			message->FindInt64("when", &time);
-			message->FindInt32("key",&scancode);
-			message->FindInt32("modifiers",&modifiers);
-			for(int8 i=0;i<15;i++)
-				message->FindInt8("states",i,&keyarray[i]);
-			fAppServerLink->StartMessage(B_UNMAPPED_KEY_DOWN);
-			fAppServerLink->Attach(&time,sizeof(bigtime_t));
-			fAppServerLink->Attach(scancode);
-			fAppServerLink->Attach(modifiers);
-			fAppServerLink->Attach(keyarray,sizeof(int8)*16);
-			fAppServerLink->Flush();
-			break;
-		}
-		case B_UNMAPPED_KEY_UP:{
-			bigtime_t time;
-			int32 scancode,modifiers;
-			int8 keyarray[16];
-
-			message->FindInt64("when", &time);
-			message->FindInt32("key",&scancode);
-			message->FindInt32("modifiers",&modifiers);
-			for(int8 i=0;i<15;i++)
-				message->FindInt8("states",i,&keyarray[i]);
-			fAppServerLink->StartMessage(B_UNMAPPED_KEY_UP);
-			fAppServerLink->Attach(&time,sizeof(bigtime_t));
-			fAppServerLink->Attach(scancode);
-			fAppServerLink->Attach(modifiers);
-			fAppServerLink->Attach(keyarray,sizeof(int8)*16);
-			fAppServerLink->Flush();
-			break;
-		}
-		case B_MODIFIERS_CHANGED:{
-			bigtime_t time;
-			int32 scancode,modifiers,oldmodifiers;
-			int8 keyarray[16];
-
-			message->FindInt64("when", &time);
-			message->FindInt32("key",&scancode);
-			message->FindInt32("modifiers",&modifiers);
-			message->FindInt32("be:old_modifiers",&oldmodifiers);
-			for(int8 i=0;i<15;i++)
-				message->FindInt8("states",i,&keyarray[i]);
-			fAppServerLink->StartMessage(B_MODIFIERS_CHANGED);
-			fAppServerLink->Attach(&time,sizeof(bigtime_t));
-			fAppServerLink->Attach(scancode);
-			fAppServerLink->Attach(modifiers);
-			fAppServerLink->Attach(oldmodifiers);
-			fAppServerLink->Attach(keyarray,sizeof(int8)*16);
-			fAppServerLink->Flush();
-			break;
-		}
-   		default:
-      		break;
-   			
-		}
-	
-#else // APPSERVER_PORTLINK_COMM
-
 	status_t  	err;
 	
 	ssize_t length = message->FlattenedSize();
@@ -1423,8 +1212,6 @@ InputServer::DispatchEvent(BMessage *message)
 	
 	if (fAsPort>0)
 		write_port(fAsPort, 0, buffer, length);
-	
-#endif	// APPSERVER_PORTLINK_COMM
 
     return true;
 }
