@@ -80,6 +80,7 @@ main(int argc, char **argv)
 {
 	time_t t;
 	struct tm tm;
+	tzset();
 	time(&t);
 	localtime_r(&t, &tm);	
 
