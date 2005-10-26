@@ -9,15 +9,14 @@
 
 #include "PartitionMenuItem.h"
 
-PartitionMenuItem::PartitionMenuItem(const char *label, BMessage *msg, const char* path) 
+PartitionMenuItem::PartitionMenuItem(const char *label, BMessage *msg, partition_id id) 
 	: BMenuItem(label, msg)
 {
-	fPath = strdup(path);
+	fID = id;
 }
 
 
 PartitionMenuItem::~PartitionMenuItem()
 {
-	free(fPath);
 }
 

@@ -5,6 +5,7 @@
 
 #include "CopyEngine.h"
 #include "InstallerWindow.h"
+#include "PartitionMenuItem.h"
 #include <DiskDeviceVisitor.h>
 #include <DiskDeviceTypes.h>
 #include <Path.h>
@@ -98,11 +99,12 @@ SourceVisitor::SourceVisitor(BMenu *menu)
 bool
 SourceVisitor::Visit(BDiskDevice *device)
 {
-	if (!device->Type() || strcmp(device->Type(), kPartitionTypeBFS)!=0)
+	if (!device->ContentType() || strcmp(device->ContentType(), kPartitionTypeBFS)!=0)
 		return false;
 	BPath path;
 	if (device->GetPath(&path)==B_OK)
-		printf("SourceVisitor::Visit(BDiskDevice *) : %s\n", path.Path());
+		printf("SourceVisitor::Visit(BDiskDevice *) : %s type:%s, contentType:%s\n", path.Path(), device->Type(), device->ContentType());
+	fMenu->AddItem(new PartitionMenuItem(device->Name(), new BMessage(SRC_PARTITION), device->ID()));
 	return false;
 }
 
@@ -110,12 +112,13 @@ SourceVisitor::Visit(BDiskDevice *device)
 bool
 SourceVisitor::Visit(BPartition *partition, int32 level)
 {
-	if (!partition->Type() || strcmp(partition->Type(), kPartitionTypeBFS)!=0)
+	if (!partition->ContentType() || strcmp(partition->ContentType(), kPartitionTypeBFS)!=0)
 		return false;
 	BPath path;
 	if (partition->GetPath(&path)==B_OK)
 		printf("SourceVisitor::Visit(BPartition *) : %s\n", path.Path());
 	printf("SourceVisitor::Visit(BPartition *) : %s\n", partition->Name());
+	fMenu->AddItem(new PartitionMenuItem(partition->Name(), new BMessage(SRC_PARTITION), partition->ID()));
 	return false;
 }
 
@@ -134,6 +137,7 @@ TargetVisitor::Visit(BDiskDevice *device)
 	BPath path;
 	if (device->GetPath(&path)==B_OK)
 		printf("TargetVisitor::Visit(BDiskDevice *) : %s\n", path.Path());
+	fMenu->AddItem(new PartitionMenuItem(device->Name(), new BMessage(TARGET_PARTITION), device->ID()));
 	return false;
 }
 
@@ -147,5 +151,6 @@ TargetVisitor::Visit(BPartition *partition, int32 level)
 	if (partition->GetPath(&path)==B_OK) 
 		printf("TargetVisitor::Visit(BPartition *) : %s\n", path.Path());
 	printf("TargetVisitor::Visit(BPartition *) : %s\n", partition->Name());
+	fMenu->AddItem(new PartitionMenuItem(partition->Name(), new BMessage(TARGET_PARTITION), partition->ID()));
 	return false;
 }

@@ -24,8 +24,6 @@ const uint32 BEGIN_MESSAGE = 'iBGN';
 const uint32 SHOW_BOTTOM_MESSAGE = 'iSBT';
 const uint32 SETUP_MESSAGE = 'iSEP';
 const uint32 START_SCAN = 'iSSC';
-const uint32 SRC_PARTITION = 'iSPT';
-const uint32 DST_PARTITION = 'iDPT';
 const uint32 PACKAGE_CHECKBOX = 'iPCB';
 
 class LogoView : public BBox {
@@ -273,9 +271,9 @@ InstallerWindow::StartScan()
 
 	fCopyEngine.ScanDisksPartitions(fSrcMenu, fDestMenu);
 
-	fSrcMenu->AddItem(new PartitionMenuItem("BeOS 5 PE Max Edition V3.1 beta", 
+	/*fSrcMenu->AddItem(new PartitionMenuItem("BeOS 5 PE Max Edition V3.1 beta", 
 		new BMessage(SRC_PARTITION), "/BeOS 5 PE Max Edition V3.1 beta"));
-
+	*/
 	if (fSrcMenu->ItemAt(0)) {
 		fSrcMenu->ItemAt(0)->SetMarked(true);
 		PublishPackages();
@@ -292,7 +290,19 @@ InstallerWindow::PublishPackages()
 	if (!item)
 		return;
 
-	BPath directory(item->Path());
+	BPath directory;
+	BDiskDeviceRoster roster;
+	BDiskDevice device;
+	BPartition *partition;
+	if (roster.GetPartitionWithID(item->ID(), &device, &partition) == B_OK) {
+		if (partition->GetPath(&directory)!=B_OK)
+			return;
+	} else if (roster.GetDeviceWithID(item->ID(), &device) == B_OK) {
+		if (device.GetPath(&directory)!=B_OK)
+			return;
+	} else 
+		return; // shouldn't happen
+	
 	directory.Append("_packages_");
 	BDirectory dir(directory.Path());
 	if (dir.InitCheck()!=B_OK)
