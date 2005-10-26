@@ -1,6 +1,6 @@
 /* Kernel specific structures and functions
  *
- * Copyright 2004, Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2005, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _OS_H
@@ -75,24 +75,25 @@ typedef struct area_info {
 #define B_READ_AREA				1
 #define B_WRITE_AREA			2
 
-extern area_id	create_area(const char *name, void **start_addr, uint32 addr_spec,
+extern area_id	create_area(const char *name, void **startAddress, uint32 addressSpec,
 					size_t size, uint32 lock, uint32 protection);
-extern area_id	clone_area(const char *name, void **dest_addr, uint32 addr_spec,
+extern area_id	clone_area(const char *name, void **destAddress, uint32 addressSpec,
 					uint32 protection, area_id source);
 extern area_id	find_area(const char *name);
 extern area_id	area_for(void *address);
 extern status_t	delete_area(area_id id);
-extern status_t	resize_area(area_id id, size_t new_size);
-extern status_t	set_area_protection(area_id id, uint32 new_protection);
+extern status_t	resize_area(area_id id, size_t newSize);
+extern status_t	set_area_protection(area_id id, uint32 newProtection);
 
 /* system private, use macros instead */
 extern status_t	_get_area_info(area_id id, area_info *areaInfo, size_t size);
-extern status_t	_get_next_area_info(team_id team, int32 *cookie, area_info *areaInfo, size_t size);
+extern status_t	_get_next_area_info(team_id team, int32 *cookie,
+					area_info *areaInfo, size_t size);
 
-#define get_area_info(id, ainfo) \
-			_get_area_info((id), (ainfo),sizeof(*(ainfo)))
-#define get_next_area_info(team, cookie, ainfo) \
-			_get_next_area_info((team), (cookie), (ainfo), sizeof(*(ainfo)))
+#define get_area_info(id, areaInfo) \
+			_get_area_info((id), (areaInfo),sizeof(*(areaInfo)))
+#define get_next_area_info(team, cookie, areaInfo) \
+			_get_next_area_info((team), (cookie), (areaInfo), sizeof(*(areaInfo)))
 
 
 /*-------------------------------------------------------------*/
@@ -102,9 +103,9 @@ typedef struct port_info {
 	port_id		port;
 	team_id		team;
 	char		name[B_OS_NAME_LENGTH];
-	int32		capacity; /* queue depth */
-	int32		queue_count; /* # msgs waiting to be read */
-	int32		total_count; /* total # msgs read so far */
+	int32		capacity;		// queue depth
+	int32		queue_count;	// # msgs waiting to be read
+	int32		total_count;	// total # msgs read so far
 } port_info;
 
 extern port_id	create_port(int32 capacity, const char *name);
@@ -113,8 +114,8 @@ extern ssize_t	read_port(port_id port, int32 *code, void *buffer, size_t bufferS
 extern ssize_t	read_port_etc(port_id port, int32 *code, void *buffer, size_t bufferSize,
 					uint32 flags, bigtime_t timeout);
 extern status_t write_port(port_id port, int32 code, const void *buffer, size_t bufferSize);
-extern status_t write_port_etc(port_id port, int32 code, const void *buffer, size_t bufferSize,
-					uint32 flags, bigtime_t timeout);
+extern status_t write_port_etc(port_id port, int32 code, const void *buffer,
+					size_t bufferSize, uint32 flags, bigtime_t timeout);
 extern status_t close_port(port_id port);
 extern status_t delete_port(port_id port);
 
@@ -282,8 +283,9 @@ typedef struct {
 
 #define B_SYSTEM_TIMEBASE				0
 
-typedef int32 (*thread_func) (void *);
-#define thread_entry thread_func /* thread_entry is for backward compatibility only! Use thread_func */
+typedef status_t (*thread_func)(void *);
+#define thread_entry thread_func
+	/* thread_entry is for backward compatibility only! Use thread_func */
 
 extern thread_id	spawn_thread(thread_func, const char *name, int32 priority, void *data);
 extern status_t		kill_thread(thread_id thread);
@@ -524,9 +526,13 @@ typedef union {
 		uint32	extended_family	: 8;
 		uint32	reserved_1		: 4;
 
-		uint32	reserved_2;
-		uint32	features; 
-		uint32	reserved_3;
+		uint32	brand_index		: 8;
+		uint32	clflush			: 8;
+		uint32	logical_cpus	: 8;
+		uint32	apic_id			: 8;
+
+		uint32	features;
+		uint32	extended_features;	// Intel only
 	} eax_1;
 
 	struct {
@@ -612,7 +618,7 @@ typedef struct {
 } system_info;
 
 /* system private, use macro instead */
-extern status_t _get_system_info(system_info *returned_info, size_t size);
+extern status_t _get_system_info(system_info *info, size_t size);
 
 #define get_system_info(info) \
 			_get_system_info((info), sizeof(*(info)))

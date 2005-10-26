@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de.
  * Copyright (c) 2002, Carlos Hasan, for Haiku.
  *
  * Distributed under the terms of the MIT license.
@@ -262,6 +262,34 @@ print_amd_features(uint32 features)
 
 
 static void
+print_extended_features(uint32 features)
+{
+	static const char *kFeatures[32] = {
+		"SSE3", NULL, NULL, "MONITOR", "DS-CPL", NULL, NULL, "EST",
+		"TM2", NULL, "CNTXT-ID", NULL, NULL, "CMPXCHG16B", NULL, NULL,
+		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+	};
+	int32 found = 0;
+	int32 i;
+
+	for (i = 0; i < 32; i++) {
+		if ((features & (1UL << i)) && kFeatures[i] != NULL) {
+			printf("%s%s", found == 0 ? "\t\t" : " ", kFeatures[i]);
+			found++;
+			if (found > 0 && (found % 16) == 0) {
+				putchar('\n');
+				found = 0;
+			}
+		}
+	}
+
+	if (found != 0)
+		putchar('\n');
+}
+
+
+static void
 print_features(uint32 features)
 {
 	static const char *kFeatures[32] = {
@@ -272,7 +300,7 @@ print_features(uint32 features)
 		"PAT", "PSE36", "PSN", "CFLUSH",
 		NULL, "DS", "ACPI", "MMX",
 		"FXSTR", "SSE", "SSE2", "SS",
-		NULL, "TM", NULL, NULL, 
+		"HTT", "TM", NULL, "PBE", 
 	};
 	int32 found = 0;
 	int32 i;
@@ -388,6 +416,12 @@ dump_cpu(system_info *info, int32 cpu)
 	get_cpuid(&cpuInfo, 1, cpu);
 	print_processor_signature(&cpuInfo, NULL);
 	print_features(cpuInfo.eax_1.features);
+
+	/* Extended features */
+	if ((info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86) {
+		printf("\tExtended: 0x%08lx\n", cpuInfo.eax_1.extended_features);
+		print_extended_features(cpuInfo.eax_1.extended_features);
+	}
 
 	/* Extended CPUID */
 	if (max_extended_eax >= 1 && (info->cpu_type & B_CPU_x86_VENDOR_MASK) != B_CPU_INTEL_x86) {
