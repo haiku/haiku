@@ -10,6 +10,8 @@
 #include <DiskDeviceTypes.h>
 #include <Path.h>
 
+extern void SizeAsString(int32 size, char *string);
+
 class SourceVisitor : public BDiskDeviceVisitor 
 {
 public:
@@ -28,6 +30,7 @@ public:
 	virtual bool Visit(BDiskDevice *device);
 	virtual bool Visit(BPartition *partition, int32 level);
 private:
+	void MakeLabel(BPartition *partition, char *label, char *menuLabel);
 	BMenu *fMenu;
 };
 
@@ -103,8 +106,9 @@ SourceVisitor::Visit(BDiskDevice *device)
 		return false;
 	BPath path;
 	if (device->GetPath(&path)==B_OK)
-		printf("SourceVisitor::Visit(BDiskDevice *) : %s type:%s, contentType:%s\n", path.Path(), device->Type(), device->ContentType());
-	fMenu->AddItem(new PartitionMenuItem(device->Name(), new BMessage(SRC_PARTITION), device->ID()));
+		printf("SourceVisitor::Visit(BDiskDevice *) : %s type:%s, contentType:%s\n", 
+			path.Path(), device->Type(), device->ContentType());
+	fMenu->AddItem(new PartitionMenuItem(NULL, device->ContentName(), NULL, new BMessage(SRC_PARTITION), device->ID()));
 	return false;
 }
 
@@ -118,7 +122,7 @@ SourceVisitor::Visit(BPartition *partition, int32 level)
 	if (partition->GetPath(&path)==B_OK)
 		printf("SourceVisitor::Visit(BPartition *) : %s\n", path.Path());
 	printf("SourceVisitor::Visit(BPartition *) : %s\n", partition->Name());
-	fMenu->AddItem(new PartitionMenuItem(partition->Name(), new BMessage(SRC_PARTITION), partition->ID()));
+	fMenu->AddItem(new PartitionMenuItem(NULL, partition->ContentName(), NULL, new BMessage(SRC_PARTITION), partition->ID()));
 	return false;
 }
 
@@ -137,7 +141,9 @@ TargetVisitor::Visit(BDiskDevice *device)
 	BPath path;
 	if (device->GetPath(&path)==B_OK)
 		printf("TargetVisitor::Visit(BDiskDevice *) : %s\n", path.Path());
-	fMenu->AddItem(new PartitionMenuItem(device->Name(), new BMessage(TARGET_PARTITION), device->ID()));
+	char label[255], menuLabel[255];
+	MakeLabel(device, label, menuLabel);
+	fMenu->AddItem(new PartitionMenuItem(device->ContentName(), label, menuLabel, new BMessage(TARGET_PARTITION), device->ID()));
 	return false;
 }
 
@@ -151,6 +157,25 @@ TargetVisitor::Visit(BPartition *partition, int32 level)
 	if (partition->GetPath(&path)==B_OK) 
 		printf("TargetVisitor::Visit(BPartition *) : %s\n", path.Path());
 	printf("TargetVisitor::Visit(BPartition *) : %s\n", partition->Name());
-	fMenu->AddItem(new PartitionMenuItem(partition->Name(), new BMessage(TARGET_PARTITION), partition->ID()));
+	char label[255], menuLabel[255];
+	MakeLabel(partition, label, menuLabel);
+	fMenu->AddItem(new PartitionMenuItem(partition->ContentName(), label, menuLabel, new BMessage(TARGET_PARTITION), partition->ID()));
 	return false;
 }
+
+
+void
+TargetVisitor::MakeLabel(BPartition *partition, char *label, char *menuLabel)
+{
+	char size[15];
+	SizeAsString(partition->ContentSize(), size);
+	BPath path;
+	if (partition->Parent())
+		partition->Parent()->GetPath(&path);
+	
+	sprintf(label, "%s - %s [%s] [%s partition:%li]", partition->ContentName(), size, partition->ContentType(),
+			path.Path(), partition->ID());
+	sprintf(menuLabel, "%s - %s [%s]", partition->ContentName(), size, partition->ContentType());
+
+}
+

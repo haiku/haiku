@@ -113,8 +113,8 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 		"options_button", "Fewer options", "More options", new BMessage(SHOW_BOTTOM_MESSAGE));
 	fBackBox->AddChild(fDrawButton);
 
-	fDestMenu = new BPopUpMenu("scanning" B_UTF8_ELLIPSIS);
-	fSrcMenu = new BPopUpMenu("scanning" B_UTF8_ELLIPSIS);
+	fDestMenu = new BPopUpMenu("scanning" B_UTF8_ELLIPSIS, true, false);
+	fSrcMenu = new BPopUpMenu("scanning" B_UTF8_ELLIPSIS, true, false);
 
 	BRect fieldRect(bounds.left+50, bounds.top+70, bounds.right-13, bounds.top+90);
 	fSrcMenuField = new BMenuField(fieldRect, "srcMenuField",
@@ -170,6 +170,10 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			break;
 		case SRC_PARTITION:
 			PublishPackages();
+			AdjustMenus();
+			break;
+		case TARGET_PARTITION:
+			AdjustMenus();
 			break;
 		case SETUP_MESSAGE:
 			LaunchDriveSetup();
@@ -271,14 +275,31 @@ InstallerWindow::StartScan()
 
 	fCopyEngine.ScanDisksPartitions(fSrcMenu, fDestMenu);
 
-	/*fSrcMenu->AddItem(new PartitionMenuItem("BeOS 5 PE Max Edition V3.1 beta", 
-		new BMessage(SRC_PARTITION), "/BeOS 5 PE Max Edition V3.1 beta"));
-	*/
 	if (fSrcMenu->ItemAt(0)) {
-		fSrcMenu->ItemAt(0)->SetMarked(true);
 		PublishPackages();
 	}
+	AdjustMenus();
 	SetStatusMessage("Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".");
+}
+
+
+void
+InstallerWindow::AdjustMenus()
+{
+	PartitionMenuItem *item1 = (PartitionMenuItem *)fSrcMenu->FindMarked();
+	if (!item1) {
+	} else {
+		fSrcMenuField->MenuItem()->SetLabel(item1->MenuLabel());
+	}
+	
+	PartitionMenuItem *item2 = (PartitionMenuItem *)fDestMenu->FindMarked();
+	if (!item2) {
+	} else {
+		fDestMenuField->MenuItem()->SetLabel(item2->MenuLabel());
+	}
+	char message[255];
+	sprintf(message, "Press the Begin button to install from '%s' onto '%s'", item1->Name(), item2->Name());
+	SetStatusMessage(message);
 }
 
 
@@ -295,10 +316,10 @@ InstallerWindow::PublishPackages()
 	BDiskDevice device;
 	BPartition *partition;
 	if (roster.GetPartitionWithID(item->ID(), &device, &partition) == B_OK) {
-		if (partition->GetPath(&directory)!=B_OK)
+		if (partition->GetMountPoint(&directory)!=B_OK)
 			return;
 	} else if (roster.GetDeviceWithID(item->ID(), &device) == B_OK) {
-		if (device.GetPath(&directory)!=B_OK)
+		if (device.GetMountPoint(&directory)!=B_OK)
 			return;
 	} else 
 		return; // shouldn't happen

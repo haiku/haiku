@@ -33,6 +33,7 @@ private:
 	void PublishPackages();
 	void ShowBottom();
 	void StartScan();
+	void AdjustMenus();
 	static int ComparePackages(const void *firstArg, const void *secondArg);
 	BBox *fBackBox;
 	BButton *fBeginButton, *fSetupButton;

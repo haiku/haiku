@@ -13,7 +13,9 @@
 
 #define ICON_ATTRIBUTE "INSTALLER PACKAGE: ICON"
 
-static void
+void SizeAsString(int32 size, char *string);
+
+void
 SizeAsString(int32 size, char *string)
 {
 	float kb = size / 1024.0;
@@ -26,7 +28,17 @@ SizeAsString(int32 size, char *string)
 		sprintf(string, "%3.1f KB", kb);
 		return;
 	}
-	sprintf(string, "%3.1f MB", mb);
+	float gb = mb / 1024.0;
+	if (gb < 1.0) {
+		sprintf(string, "%3.1f MB", mb);
+		return;
+	}
+	float tb = gb / 1024.0;
+	if (tb < 1.0) {
+		sprintf(string, "%3.1f GB", gb);
+		return;
+	}
+	sprintf(string, "%3.1f TB", tb);
 }
 
 

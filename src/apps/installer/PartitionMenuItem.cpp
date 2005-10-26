@@ -9,14 +9,18 @@
 
 #include "PartitionMenuItem.h"
 
-PartitionMenuItem::PartitionMenuItem(const char *label, BMessage *msg, partition_id id) 
+PartitionMenuItem::PartitionMenuItem(const char *name, const char *label, const char *menuLabel, 
+	BMessage *msg, partition_id id) 
 	: BMenuItem(label, msg)
 {
 	fID = id;
+	fMenuLabel = strdup(menuLabel);
+	fName = strdup(name);
 }
 
 
 PartitionMenuItem::~PartitionMenuItem()
 {
+	free(fMenuLabel);
+	free(fName);
 }
-

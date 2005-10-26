@@ -24,6 +24,7 @@ public:
 private:
 	void LaunchInitScript(BVolume *volume);
 	void LaunchFinishScript(BVolume *volume);
+	
 	InstallerWindow *fWindow;
 	BDiskDeviceRoster fDDRoster;
 };
