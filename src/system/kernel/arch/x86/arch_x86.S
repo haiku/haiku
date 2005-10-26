@@ -1,8 +1,11 @@
 /*
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Copyright 2002, Michael Noisternig. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Copyright 2002, Michael Noisternig. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 #include <arch/x86/descriptors.h>
 
@@ -56,6 +59,20 @@ FUNCTION(i386_fxsave_swap):
 	fxsave	(%eax)
 	movl	8(%esp),%eax
 	fxrstor	(%eax)
+	ret
+
+/* uint64 x86_read_msr(uint32 register); */
+FUNCTION(x86_read_msr):
+	movl	4(%esp), %ecx
+	rdmsr
+	ret
+
+/* void x86_write_msr(uint32 register, uint64 value); */
+FUNCTION(x86_write_msr):
+	movl	4(%esp), %ecx
+	movl	8(%esp), %edx
+	movl	12(%esp), %eax
+	wrmsr
 	ret
 
 /* void i386_context_switch(struct arch_thread *old_state, struct arch_thread *new_state, addr new_pgdir); */

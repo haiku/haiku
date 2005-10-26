@@ -130,17 +130,17 @@ stack_trace(int argc, char **argv)
 			struct iframe *frame = (struct iframe *)(ebp + 8);
 
 			kprintf("iframe at %p\n", frame);
-			kprintf(" eax 0x%-9x    ebx 0x%-9x     ecx 0x%-9x  edx 0x%x\n",
+			kprintf(" eax 0x%-9lx    ebx 0x%-9lx     ecx 0x%-9lx  edx 0x%lx\n",
 				frame->eax, frame->ebx, frame->ecx, frame->edx);
-			kprintf(" esi 0x%-9x    edi 0x%-9x     ebp 0x%-9x  esp 0x%x\n",
+			kprintf(" esi 0x%-9lx    edi 0x%-9lx     ebp 0x%-9lx  esp 0x%lx\n",
 				frame->esi, frame->edi, frame->ebp, frame->esp);
-			kprintf(" eip 0x%-9x eflags 0x%-9x", frame->eip, frame->flags);
+			kprintf(" eip 0x%-9lx eflags 0x%-9lx", frame->eip, frame->flags);
 			if ((frame->error_code & 0x4) != 0) {
 				// from user space
-				kprintf("user esp 0x%x", frame->user_esp);
+				kprintf("user esp 0x%lx", frame->user_esp);
 			}
 			kprintf("\n");
-			kprintf(" vector: 0x%x, error code: 0x%x\n", frame->vector, frame->error_code);
+			kprintf(" vector: 0x%lx, error code: 0x%lx\n", frame->vector, frame->error_code);
  			ebp = frame->ebp;
 		} else {
 			addr_t eip, nextEbp, diff;
