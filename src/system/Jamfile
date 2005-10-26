@@ -34,6 +34,7 @@ KernelLd boot_loader :
 	<$(SOURCE_GRIST)!libroot!posix!string>strrchr.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtol.o
 	<$(SOURCE_GRIST)!libroot>qsort.o
+	<$(SOURCE_GRIST)!kernel!arch!$(OBOS_ARCH)>cpuid.o
 	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/boot_loader.ld 
 	: -Bstatic
 	;

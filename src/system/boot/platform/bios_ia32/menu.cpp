@@ -4,9 +4,10 @@
  */
 
 
-#include "keyboard.h"
-#include "console.h"
 #include "bios.h"
+#include "console.h"
+#include "keyboard.h"
+#include "smp.h"
 #include "video.h"
 
 #include <boot/platform.h>
@@ -464,9 +465,8 @@ platform_add_menus(Menu *menu)
 			item->SetTarget(video_mode_hook);
 			break;
 		case SAFE_MODE_MENU:
-			menu->AddItem(item = new MenuItem("Disable SMP"));
-			item->SetData(B_SAFEMODE_DISABLE_SMP);
-			item->SetType(MENU_ITEM_MARKABLE);
+			smp_add_safemode_menus(menu);
+
 			menu->AddItem(item = new MenuItem("Don't call the BIOS"));
 			item->SetType(MENU_ITEM_MARKABLE);
 			break;

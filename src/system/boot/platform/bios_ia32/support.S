@@ -54,30 +54,6 @@ FUNCTION(system_time):
 	popl	%ebx
 	ret
 
-FUNCTION(cpuid):
- 	pushl	%ebx
- 	pushl	%edi
- 	movl	12(%esp),%eax
- 	movl	16(%esp),%edi
- 	cpuid
- 	movl	%eax,0(%edi)
- 	movl	%ebx,4(%edi)
- 	movl	%ecx,8(%edi)
- 	movl	%edx,12(%edi)
- 	popl	%edi
- 	popl	%ebx
- 	ret
-
-FUNCTION(get_eflags):
- 	pushfl
- 	popl	%eax
- 	ret
-
-FUNCTION(set_eflags):
- 	pushl	4(%esp)
- 	popfl
-	ret
-
 null_idt_descr:
 	.word	0
 	.word	0,0

@@ -20,7 +20,7 @@ KernelMergeObject boot_platform_bios_ia32.o :
 	menu.cpp
 	mmu.cpp
 	cpu.cpp
-	smp_boot.c
+	smp.cpp
 	smp_trampoline.S
 	support.S
 	video.cpp

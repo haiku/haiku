@@ -103,12 +103,12 @@ setup_apic(kernel_args *args, int32 cpu)
 {
 	uint32 config;
 
-	TRACE(("setting up the apic..."));
+	TRACE(("setting up the APIC for CPU %ld...\n", cpu));
 
 	/* set spurious interrupt vector to 0xff */
-	config = apic_read(APIC_SIVR) & 0xffffff00;
+	config = apic_read(APIC_SPURIOUS_INTR_VECTOR) & 0xffffff00;
 	config |= APIC_ENABLE | 0xff;
-	apic_write(APIC_SIVR, config);
+	apic_write(APIC_SPURIOUS_INTR_VECTOR, config);
 
 	// don't touch the LINT0/1 configuration in virtual wire mode
 	// ToDo: implement support for other modes...
@@ -124,32 +124,45 @@ setup_apic(kernel_args *args, int32 cpu)
 		config |= APIC_LVT_DM_NMI | APIC_LVT_IIPP;
 		apic_write(APIC_LINT1, config);
 	}
+	if (cpu > 0) {
+		dprintf("LINT0: %p\n", (void *)apic_read(APIC_LINT0));
+		dprintf("LINT1: %p\n", (void *)apic_read(APIC_LINT1));
+
+		/* disable LINT0/1 */
+		config = apic_read(APIC_LINT0);
+		apic_write(APIC_LINT0, config | APIC_LVT_MASKED);
+
+		config = apic_read(APIC_LINT1);
+		apic_write(APIC_LINT1, config | APIC_LVT_MASKED);
+	} else {
+		dprintf("0: LINT0: %p\n", (void *)apic_read(APIC_LINT0));
+		dprintf("0: LINT1: %p\n", (void *)apic_read(APIC_LINT1));
+	}
 #endif
 
 	/* setup timer */
-	config = apic_read(APIC_LVTT) & ~APIC_LVTT_MASK;
-	config |= 0xfb | APIC_LVTT_M; // vector 0xfb, timer masked
-	apic_write(APIC_LVTT, config);
+	config = apic_read(APIC_LVT_TIMER) & APIC_LVT_TIMER_MASK;
+	config |= 0xfb | APIC_LVT_MASKED; // vector 0xfb, timer masked
+	apic_write(APIC_LVT_TIMER, config);
 
-	apic_write(APIC_ICRT, 0); // zero out the clock
+	apic_write(APIC_INITIAL_TIMER_COUNT, 0); // zero out the clock
 
-	config = apic_read(APIC_TDCR) & ~0x0000000f;
-	config |= APIC_TDCR_1; // clock division by 1
-	apic_write(APIC_TDCR, config);
+	config = apic_read(APIC_TIMER_DIVIDE_CONFIG) & 0xfffffff0;
+	config |= APIC_TIMER_DIVIDE_CONFIG_1; // clock division by 1
+	apic_write(APIC_TIMER_DIVIDE_CONFIG, config);
 
 	/* setup error vector to 0xfe */
-	config = (apic_read(APIC_LVT3) & 0xffffff00) | 0xfe;
-	apic_write(APIC_LVT3, config);
+	config = (apic_read(APIC_LVT_ERROR) & 0xffffff00) | 0xfe;
+	apic_write(APIC_LVT_ERROR, config);
 
 	/* accept all interrupts */
-	config = apic_read(APIC_TPRI) & 0xffffff00;
-	apic_write(APIC_TPRI, config);
+	config = apic_read(APIC_TASK_PRIORITY) & 0xffffff00;
+	apic_write(APIC_TASK_PRIORITY, config);
 
-	config = apic_read(APIC_SIVR);
+	config = apic_read(APIC_SPURIOUS_INTR_VECTOR);
 	apic_write(APIC_EOI, 0);
 
-	TRACE((" done\n"));
-	return 0;
+	return B_OK;
 }
 
 
@@ -203,9 +216,11 @@ arch_smp_send_broadcast_ici(void)
 	uint32 config;
 	cpu_status state = disable_interrupts();
 
-	config = apic_read(APIC_ICR1) & APIC_ICR1_WRITE_MASK;
-	apic_write(APIC_ICR1, config | 0xfd | APIC_ICR1_DELIVERY_MODE_FIXED
-		| APIC_ICR1_DEST_MODE_PHYSICAL | APIC_ICR1_DEST_ALL_BUT_SELF);
+	config = apic_read(APIC_INTR_COMMAND_1) & APIC_INTR_COMMAND_1_MASK;
+	apic_write(APIC_INTR_COMMAND_1, config | 0xfd | APIC_DELIVERY_MODE_FIXED
+		| APIC_INTR_COMMAND_1_ASSERT
+		| APIC_INTR_COMMAND_1_DEST_MODE_PHYSICAL
+		| APIC_INTR_COMMAND_1_DEST_ALL_BUT_SELF);
 
 	restore_interrupts(state);
 }
@@ -217,15 +232,17 @@ arch_smp_send_ici(int32 target_cpu)
 	uint32 config;
 	int state = disable_interrupts();
 
-	config = apic_read(APIC_ICR2) & APIC_ICR2_MASK;
-	apic_write(APIC_ICR2, config | cpu_apic_id[target_cpu] << 24);
+	config = apic_read(APIC_INTR_COMMAND_2) & APIC_INTR_COMMAND_2_MASK;
+	apic_write(APIC_INTR_COMMAND_2, config | cpu_apic_id[target_cpu] << 24);
 
-	config = apic_read(APIC_ICR1) & APIC_ICR1_WRITE_MASK;
-	apic_write(APIC_ICR1, config | 0xfd | APIC_ICR1_DELIVERY_MODE_FIXED
-		| APIC_ICR1_DEST_MODE_PHYSICAL | APIC_ICR1_DEST_FIELD);
+	config = apic_read(APIC_INTR_COMMAND_1) & APIC_INTR_COMMAND_1_MASK;
+	apic_write(APIC_INTR_COMMAND_1, config | 0xfd | APIC_DELIVERY_MODE_FIXED
+		| APIC_INTR_COMMAND_1_ASSERT
+		| APIC_INTR_COMMAND_1_DEST_MODE_PHYSICAL
+		| APIC_INTR_COMMAND_1_DEST_FIELD);
 
 	// wait for message to be sent
-	while ((apic_read(APIC_ICR1) & APIC_ICR1_DELIVERY_STATUS) != 0)
+	while ((apic_read(APIC_INTR_COMMAND_1) & APIC_DELIVERY_STATUS) != 0)
 		;
 
 	restore_interrupts(state);
@@ -258,18 +275,18 @@ arch_smp_set_apic_timer(bigtime_t relativeTimeout)
 
 	state = disable_interrupts();
 
-	config = apic_read(APIC_LVTT) | APIC_LVTT_M; // mask the timer
-	apic_write(APIC_LVTT, config);
+	config = apic_read(APIC_LVT_TIMER) | APIC_LVT_MASKED; // mask the timer
+	apic_write(APIC_LVT_TIMER, config);
 
-	apic_write(APIC_ICRT, 0); // zero out the timer
+	apic_write(APIC_INITIAL_TIMER_COUNT, 0); // zero out the timer
 
-	config = apic_read(APIC_LVTT) & ~APIC_LVTT_M; // unmask the timer
-	apic_write(APIC_LVTT, config);
+	config = apic_read(APIC_LVT_TIMER) & ~APIC_LVT_MASKED; // unmask the timer
+	apic_write(APIC_LVT_TIMER, config);
 
 	TRACE(("arch_smp_set_apic_timer: config 0x%lx, timeout %Ld, tics/sec %lu, tics %lu\n",
 		config, relativeTimeout, apic_timer_tics_per_sec, ticks));
 
-	apic_write(APIC_ICRT, ticks); // start it up
+	apic_write(APIC_INITIAL_TIMER_COUNT, ticks); // start it up
 
 	restore_interrupts(state);
 
@@ -288,13 +305,12 @@ arch_smp_clear_apic_timer(void)
 
 	state = disable_interrupts();
 
-	config = apic_read(APIC_LVTT) | APIC_LVTT_M; // mask the timer
-	apic_write(APIC_LVTT, config);
+	config = apic_read(APIC_LVT_TIMER) | APIC_LVT_MASKED; // mask the timer
+	apic_write(APIC_LVT_TIMER, config);
 
-	apic_write(APIC_ICRT, 0); // zero out the timer
+	apic_write(APIC_INITIAL_TIMER_COUNT, 0); // zero out the timer
 
 	restore_interrupts(state);
-
 	return 0;
 }
 

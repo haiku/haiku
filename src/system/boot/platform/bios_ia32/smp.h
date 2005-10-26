@@ -10,6 +10,10 @@
 
 
 #ifdef __cplusplus
+// this is only available in C++
+#	include <boot/menu.h>
+extern void smp_add_safemode_menus(Menu *menu);
+
 extern "C" {
 #endif
 

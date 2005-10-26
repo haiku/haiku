@@ -12,10 +12,12 @@
 
 #include <KernelExport.h>
 
-#include <boot/stage2.h>
-#include <arch/x86/smp_apic.h>
-#include <safemode.h>
 #include <kernel.h>
+#include <safemode.h>
+#include <boot/stage2.h>
+#include <boot/menu.h>
+#include <arch/x86/smp_apic.h>
+#include <arch/x86/arch_system_info.h>
 
 #include <string.h>
 
@@ -46,10 +48,10 @@ static struct smp_scan_spots_struct smp_scan_spots[] = {
 };
 
 
-extern void execute_n_instructions(int count);
+extern "C" void execute_n_instructions(int count);
 
-extern void smp_trampoline(void);
-extern void smp_trampoline_end(void);
+extern "C" void smp_trampoline(void);
+extern "C" void smp_trampoline_end(void);
 
 
 static struct mp_floating_struct *sFloatingStruct = NULL;
@@ -72,6 +74,21 @@ apic_write(uint32 offset, uint32 data)
 }
 
 
+static bool
+supports_hyper_threading(void)
+{
+	cpuid_info info;
+	if (get_current_cpuid(&info, 0) == B_OK
+		&& !strncmp(info.eax_0.vendor_id, "GenuineIntel", 12)
+		&& info.eax_0.max_eax > 0) {
+		if (get_current_cpuid(&info, 1) == B_OK)
+			return (info.eax_1.features & (1 << 28)) != 0;
+	}
+
+	return false;
+}
+
+
 static int
 smp_get_current_cpu(void)
 {
@@ -90,7 +107,7 @@ smp_probe(uint32 base, uint32 limit)
 	TRACE(("smp_probe: entry base 0x%lx, limit 0x%lx\n", base, limit));
 
 	for (ptr = (uint32 *) base; (uint32)ptr < limit; ptr++) {
-		if (*ptr == MP_FLT_SIGNATURE) {
+		if (*ptr == MP_FLOATING_SIGNATURE) {
 			TRACE(("smp_probe: found floating pointer structure at %p\n", ptr));
 			return ptr;
 		}
@@ -134,7 +151,7 @@ smp_do_config(void)
 	ptr = (char *)((uint32)config + sizeof(struct mp_config_table));
 	for (i = 0; i < config->num_base_entries; i++) {
 		switch (*ptr) {
-			case MP_EXT_PE:
+			case MP_BASE_PROCESSOR:
 			{
 				struct mp_base_processor *processor = (struct mp_base_processor *)ptr;
 
@@ -151,7 +168,7 @@ smp_do_config(void)
 				ptr += sizeof(struct mp_base_processor);
 				break;
 			}
-			case MP_EXT_BUS:
+			case MP_BASE_BUS:
 			{
 				struct mp_base_bus *bus = (struct mp_base_bus *)ptr;
 
@@ -162,7 +179,7 @@ smp_do_config(void)
 				ptr += sizeof(struct mp_base_bus);
 				break;
 			}
-			case MP_EXT_IO_APIC:
+			case MP_BASE_IO_APIC:
 			{
 				struct mp_base_ioapic *io = (struct mp_base_ioapic *) ptr;
 				gKernelArgs.arch_args.ioapic_phys = (uint32)io->addr;
@@ -173,13 +190,13 @@ smp_do_config(void)
 				ptr += sizeof(struct mp_base_ioapic);
 				break;
 			}
-			case MP_EXT_IO_INT:
-			case MP_EXT_LOCAL_INT:
+			case MP_BASE_IO_INTR:
+			case MP_BASE_LOCAL_INTR:
 			{
 				struct mp_base_interrupt *interrupt = (struct mp_base_interrupt *)ptr;
 
 				dprintf("smp: %s int: type %d, source bus %d, irq %d, dest apic %d, int %d, polarity %d, trigger mode %d\n",
-					interrupt->type == MP_EXT_IO_INT ? "I/O" : "local",
+					interrupt->type == MP_BASE_IO_INTR ? "I/O" : "local",
 					interrupt->interrupt_type, interrupt->source_bus_id,
 					interrupt->source_bus_irq, interrupt->dest_apic_id,
 					interrupt->dest_apic_int, interrupt->polarity,
@@ -194,6 +211,26 @@ smp_do_config(void)
 		(void *)gKernelArgs.arch_args.apic_phys,
 		(void *)gKernelArgs.arch_args.ioapic_phys,
 		gKernelArgs.num_cpus);
+
+	// Try to detect single CPU hyper threading setup
+	// ToDo: this should be done using the ACPI APIC table
+	// ToDo: this only works with a single HT enabled CPU anyway
+
+	if (gKernelArgs.num_cpus == 1 && supports_hyper_threading()) {
+		cpuid_info info;
+		get_current_cpuid(&info, 1);
+
+		dprintf("CPU supports Hyper-Threading, %ld processors in package\n",
+			info.eax_1.logical_cpus);
+
+		// enable the second logical processor
+/*
+		gKernelArgs.num_cpus = 2;
+		gKernelArgs.arch_args.cpu_apic_id[1] = gKernelArgs.arch_args.cpu_apic_id[0] + 1;
+		gKernelArgs.arch_args.cpu_os_id[gKernelArgs.arch_args.cpu_apic_id[1]] = 1;
+		gKernelArgs.arch_args.cpu_apic_version[1] = gKernelArgs.arch_args.cpu_apic_version[0];;
+*/
+	}
 
 	// this BIOS looks broken, because it didn't report any cpus (VMWare)
 	if (gKernelArgs.num_cpus == 0)
@@ -211,7 +248,6 @@ smp_find_mp_config(void)
 		return gKernelArgs.num_cpus = 1;
 #endif
 
-	// XXX for now, assume the memory is identity mapped by the 1st stage
 	for (i = 0; smp_scan_spots[i].length > 0; i++) {
 		sFloatingStruct = (struct mp_floating_struct *)smp_probe(smp_scan_spots[i].start,
 			smp_scan_spots[i].stop);
@@ -308,19 +344,20 @@ calculate_apic_timer_conversion_factor(void)
 	uint32 count;
 
 	// setup the timer
-	config = apic_read(APIC_LVTT);
-	config = (config & ~APIC_LVTT_MASK) + APIC_LVTT_M; // timer masked, vector 0
-	apic_write(APIC_LVTT, config);
+	config = apic_read(APIC_LVT_TIMER);
+	config = (config & APIC_LVT_TIMER_MASK) + APIC_LVT_MASKED; // timer masked, vector 0
+	apic_write(APIC_LVT_TIMER, config);
 
-	config = (apic_read(APIC_TDCR) & ~0x0000000f) + 0xb; // divide clock by one
-	apic_write(APIC_TDCR, config);
+	config = (apic_read(APIC_TIMER_DIVIDE_CONFIG) & ~0x0000000f);
+	apic_write(APIC_TIMER_DIVIDE_CONFIG, config | APIC_TIMER_DIVIDE_CONFIG_1);
+		// divide clock by one
 
 	t1 = system_time();
-	apic_write(APIC_ICRT, 0xffffffff); // start the counter
+	apic_write(APIC_INITIAL_TIMER_COUNT, 0xffffffff); // start the counter
 
 	execute_n_instructions(128*20000);
 
-	count = apic_read(APIC_CCRT);
+	count = apic_read(APIC_CURRENT_TIMER_COUNT);
 	t2 = system_time();
 
 	count = 0xffffffff - count;
@@ -397,32 +434,36 @@ smp_boot_other_cpus(void)
 
 		/* clear apic errors */
 		if (gKernelArgs.arch_args.cpu_apic_version[i] & 0xf0) {
-			apic_write(APIC_ESR, 0);
-			apic_read(APIC_ESR);
+			apic_write(APIC_ERROR_STATUS, 0);
+			apic_read(APIC_ERROR_STATUS);
 		}
 
+//dprintf("assert INIT\n");
 		/* send (aka assert) INIT IPI */
-		config = (apic_read(APIC_ICR2) & APIC_ICR2_MASK)
+		config = (apic_read(APIC_INTR_COMMAND_2) & APIC_INTR_COMMAND_2_MASK)
 			| (gKernelArgs.arch_args.cpu_apic_id[i] << 24);
-		apic_write(APIC_ICR2, config); /* set target pe */
-		config = (apic_read(APIC_ICR1) & 0xfff00000) | APIC_ICR1_TRIGGER_MODE_LEVEL
-			| APIC_ICR1_ASSERT | APIC_ICR1_DELIVERY_MODE_INIT;
-		apic_write(APIC_ICR1, config);
+		apic_write(APIC_INTR_COMMAND_2, config); /* set target pe */
+		config = (apic_read(APIC_INTR_COMMAND_1) & 0xfff00000)
+			| APIC_TRIGGER_MODE_LEVEL | APIC_INTR_COMMAND_1_ASSERT | APIC_DELIVERY_MODE_INIT;
+		apic_write(APIC_INTR_COMMAND_1, config);
 
+dprintf("wait for delivery\n");
 		// wait for pending to end
-		while ((apic_read(APIC_ICR1) & APIC_ICR1_DELIVERY_STATUS) != 0)
+		while ((apic_read(APIC_INTR_COMMAND_1) & APIC_DELIVERY_STATUS) != 0)
 			;
 
+dprintf("deassert INIT\n");
 		/* deassert INIT */
-		config = (apic_read(APIC_ICR2) & APIC_ICR2_MASK)
+		config = (apic_read(APIC_INTR_COMMAND_2) & APIC_INTR_COMMAND_2_MASK)
 			| (gKernelArgs.arch_args.cpu_apic_id[i] << 24);
-		apic_write(APIC_ICR2, config);
-		config = (apic_read(APIC_ICR1) & 0xfff00000) | APIC_ICR1_TRIGGER_MODE_LEVEL
-			| APIC_ICR1_DELIVERY_MODE_INIT;
-		apic_write(APIC_ICR1, config);
+		apic_write(APIC_INTR_COMMAND_2, config);
+		config = (apic_read(APIC_INTR_COMMAND_1) & 0xfff00000)
+			| APIC_TRIGGER_MODE_LEVEL | APIC_DELIVERY_MODE_INIT;
+		apic_write(APIC_INTR_COMMAND_1, config);
 
+dprintf("wait for delivery\n");
 		// wait for pending to end
-		while ((apic_read(APIC_ICR1) & APIC_ICR1_DELIVERY_STATUS) != 0)
+		while ((apic_read(APIC_INTR_COMMAND_1) & APIC_DELIVERY_STATUS) != 0)
 			;
 
 		/* wait 10ms */
@@ -430,29 +471,55 @@ smp_boot_other_cpus(void)
 
 		/* is this a local apic or an 82489dx ? */
 		numStartups = (gKernelArgs.arch_args.cpu_apic_version[i] & 0xf0) ? 2 : 0;
+dprintf("num startups = %ld\n", numStartups);
 		for (j = 0; j < numStartups; j++) {
 			/* it's a local apic, so send STARTUP IPIs */
-			apic_write(APIC_ESR, 0);
+dprintf("send STARTUP\n");
+			apic_write(APIC_ERROR_STATUS, 0);
 
 			/* set target pe */
-			config = (apic_read(APIC_ICR2) & APIC_ICR2_MASK)
+			config = (apic_read(APIC_INTR_COMMAND_2) & APIC_INTR_COMMAND_2_MASK)
 				| (gKernelArgs.arch_args.cpu_apic_id[i] << 24);
-			apic_write(APIC_ICR2, config);
+			apic_write(APIC_INTR_COMMAND_2, config);
 
 			/* send the IPI */
-			config = (apic_read(APIC_ICR1) & 0xfff0f800) | APIC_ICR1_DELIVERY_MODE_STARTUP
-				| (trampolineCode >> 12);
-			apic_write(APIC_ICR1, config);
+			config = (apic_read(APIC_INTR_COMMAND_1) & 0xfff0f800)
+				| APIC_DELIVERY_MODE_STARTUP | (trampolineCode >> 12);
+			apic_write(APIC_INTR_COMMAND_1, config);
 
 			/* wait */
 			spin(200);
 
-			while ((apic_read(APIC_ICR1) & APIC_ICR1_DELIVERY_STATUS) != 0)
+dprintf("wait for delivery\n");
+			while ((apic_read(APIC_INTR_COMMAND_1) & APIC_DELIVERY_STATUS) != 0)
 				;
 		}
 	}
 
 	TRACE(("done trampolining\n"));
+}
+
+
+void
+smp_add_safemode_menus(Menu *menu)
+{
+	MenuItem *item;
+
+	if (gKernelArgs.num_cpus < 2)
+		return;
+
+	// ToDo: this should work with dual CPUs with HT as well!
+	if (gKernelArgs.num_cpus > 2 || !supports_hyper_threading()) {
+		menu->AddItem(item = new MenuItem("Disable SMP"));
+		item->SetData(B_SAFEMODE_DISABLE_SMP);
+		item->SetType(MENU_ITEM_MARKABLE);
+	}
+
+	if (supports_hyper_threading()) {
+		menu->AddItem(item = new MenuItem("Disable Hyper-Threading"));
+		item->SetData(B_SAFEMODE_DISABLE_HYPER_THREADING);
+		item->SetType(MENU_ITEM_MARKABLE);
+	}
 }
 
 

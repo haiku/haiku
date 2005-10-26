@@ -355,7 +355,7 @@ process_pending_ici(int32 currentCPU)
 	if (msg == NULL)
 		return retval;
 
-	TRACE(("  message = %d\n", msg->message));
+	TRACE(("  cpu %d message = %d\n", curr_cpu, msg->message));
 
 	switch (msg->message) {
 		case SMP_MSG_INVL_PAGE_RANGE:

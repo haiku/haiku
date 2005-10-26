@@ -8,70 +8,83 @@
 #ifndef _KERNEL_ARCH_x86_SMP_APIC_H
 #define _KERNEL_ARCH_x86_SMP_APIC_H
 
-#define MP_FLT_SIGNATURE		'_PM_'
-#define MP_CTH_SIGNATURE		'PCMP'
+#define MP_FLOATING_SIGNATURE			'_PM_'
+#define MP_CONFIG_TABLE_SIGNATURE		'PCMP'
 
 #define APIC_ENABLE				0x100
 #define APIC_FOCUS				(~(1 << 9))
 #define APIC_SIV				(0xff)
 
 // offsets to APIC register
-#define APIC_ID					0x020
-#define APIC_VERSION			0x030
-#define APIC_TPRI				0x080
-#define APIC_EOI				0x0b0
-#define APIC_LDR				0x0d0
-#define APIC_SIVR				0x0f0
-#define APIC_ESR				0x280
-#define APIC_ICR1				0x300
-#define APIC_ICR2				0x310
-#define APIC_LVTT				0x320
-#define APIC_LINT0				0x350
-#define APIC_LINT1				0x360
-#define APIC_LVT3				0x370
-#define APIC_ICRT				0x380
-#define APIC_CCRT				0x390
-#define APIC_TDCR				0x3e0
+#define APIC_ID							0x020
+#define APIC_VERSION					0x030
+#define APIC_TASK_PRIORITY				0x080
+#define APIC_ARBITRATION_PRIORITY		0x090
+#define APIC_PROCESSOR_PRIORITY			0x0a0
+#define APIC_EOI						0x0b0
+#define APIC_LOGICAL_DEST				0x0d0
+#define APIC_DEST_FORMAT				0x0e0
+#define APIC_SPURIOUS_INTR_VECTOR		0x0f0
+#define APIC_ERROR_STATUS				0x280
+#define APIC_INTR_COMMAND_1				0x300	// bits 0-31
+#define APIC_INTR_COMMAND_2				0x310	// bits 32-63
+#define APIC_LVT_TIMER					0x320
+#define APIC_LVT_THERMAL_SENSOR			0x330
+#define APIC_LVT_PERFMON_COUNTERS		0x340
+#define APIC_LVT_LINT0					0x350
+#define APIC_LVT_LINT1					0x360
+#define APIC_LVT_ERROR					0x370
+#define APIC_INITIAL_TIMER_COUNT		0x380
+#define APIC_CURRENT_TIMER_COUNT		0x390
+#define APIC_TIMER_DIVIDE_CONFIG		0x3e0
 
-/* ICR defines */
-#define APIC_ICR1_WRITE_MASK				0xfff3f000
-#define APIC_ICR1_READ_MASK					0xfff32000
-#define APIC_ICR2_MASK						0x00ffffff
+/* standard APIC interrupt defines */
+#define APIC_DELIVERY_MODE_FIXED				0
+#define APIC_DELIVERY_MODE_LOWESTPRI			(1 << 8)	// ICR1 only
+#define APIC_DELIVERY_MODE_SMI					(2 << 8)
+#define APIC_DELIVERY_MODE_NMI					(4 << 8)
+#define APIC_DELIVERY_MODE_INIT					(5 << 8)
+#define APIC_DELIVERY_MODE_STARTUP				(6 << 8)	// ICR1 only
+#define APIC_DELIVERY_MODE_ExtINT				(7 << 8)	// LINT0/1 only
 
-#define APIC_ICR1_DELIVERY_MODE_FIXED		0
-#define APIC_ICR1_DELIVERY_MODE_LOWESTPRI	(1 << 8)
-#define APIC_ICR1_DELIVERY_MODE_INIT		(5 << 8)
-#define APIC_ICR1_DELIVERY_MODE_STARTUP		(6 << 8)
+#define APIC_DELIVERY_STATUS					(1 << 12)
+#define APIC_TRIGGER_MODE_LEVEL					(1 << 15)
 
-#define APIC_ICR1_DEST_MODE_PHYSICAL		0
-#define APIC_ICR1_DEST_MODE_LOGICAL			(1 << 11)
+/* Interrupt Command defines */
+#define APIC_INTR_COMMAND_1_MASK				0xfff3f000
+#define APIC_INTR_COMMAND_2_MASK				0x00ffffff
 
-#define APIC_ICR1_ASSERT					(1 << 13)
-#define APIC_ICR1_TRIGGER_MODE_LEVEL		(1 << 14)
-#define APIC_ICR1_DELIVERY_STATUS			(1 << 12)
+#define APIC_INTR_COMMAND_1_DEST_MODE_PHYSICAL	0
+#define APIC_INTR_COMMAND_1_DEST_MODE_LOGICAL	(1 << 11)
 
-#define APIC_ICR1_DEST_FIELD				0
-#define APIC_ICR1_DEST_SELF					(1 << 18)
-#define APIC_ICR1_DEST_ALL					(2 << 18)
-#define APIC_ICR1_DEST_ALL_BUT_SELF			(3 << 18)
+#define APIC_INTR_COMMAND_1_ASSERT				(1 << 14)
 
-/* other defines */
+#define APIC_INTR_COMMAND_1_DEST_FIELD			0
+#define APIC_INTR_COMMAND_1_DEST_SELF			(1 << 18)
+#define APIC_INTR_COMMAND_1_DEST_ALL			(2 << 18)
+#define APIC_INTR_COMMAND_1_DEST_ALL_BUT_SELF	(3 << 18)
 
-#define APIC_TDCR_2				0x00
-#define APIC_TDCR_4				0x01
-#define APIC_TDCR_8				0x02
-#define APIC_TDCR_16			0x03
-#define APIC_TDCR_32			0x08
-#define APIC_TDCR_64			0x09
-#define APIC_TDCR_128			0x0a
-#define APIC_TDCR_1				0x0b
+/* Local Vector Table defines */
+#define APIC_LVT_MASKED							(1 << 16)
 
-#define APIC_LVTT_MASK			0x000310ff
-#define APIC_LVTT_VECTOR		0x000000ff
-#define APIC_LVTT_DS			0x00001000
-#define APIC_LVTT_M				0x00010000
-#define APIC_LVTT_TM			0x00020000
+// timer defines
+#define APIC_LVT_TIMER_MASK						0xfffcef00
 
+// LINT0/1 defines 
+#define APIC_LVT_LINT_MASK						0xfffe0800
+#define APIC_LVT_LINT_INPUT_POLARITY			(1 << 13)
+
+// Timer Divide Config Divisors
+#define APIC_TIMER_DIVIDE_CONFIG_1				0x0b
+#define APIC_TIMER_DIVIDE_CONFIG_2				0x00
+#define APIC_TIMER_DIVIDE_CONFIG_4				0x01
+#define APIC_TIMER_DIVIDE_CONFIG_8				0x02
+#define APIC_TIMER_DIVIDE_CONFIG_16				0x03
+#define APIC_TIMER_DIVIDE_CONFIG_32				0x08
+#define APIC_TIMER_DIVIDE_CONFIG_64				0x09
+#define APIC_TIMER_DIVIDE_CONFIG_128			0x0a
+
+/*
 #define APIC_LVT_DM				0x00000700
 #define APIC_LVT_DM_ExtINT		0x00000700
 #define APIC_LVT_DM_NMI			0x00000400
@@ -87,10 +100,6 @@
 #define APIC_SVR_SWEN			0x00000100
 #define APIC_SVR_FOCUS			0x00000200
 
-#define APIC_DEST_STARTUP		0x00600
-
-#define LOPRIO_LEVEL			0x00000010
-
 #define IOAPIC_ID				0x0
 #define IOAPIC_VERSION			0x1
 #define IOAPIC_ARB				0x2
@@ -101,12 +110,7 @@
 #define IPI_INV_PTE				0x42
 #define IPI_INV_RESCHED			0x43
 #define IPI_STOP				0x44
-
-#define MP_EXT_PE				0
-#define MP_EXT_BUS				1
-#define MP_EXT_IO_APIC			2
-#define MP_EXT_IO_INT			3
-#define MP_EXT_LOCAL_INT		4
+*/
 
 struct mp_config_table {
 	uint32	signature;			/* "PCMP" */
@@ -132,6 +136,15 @@ struct mp_floating_struct {
 	uint8	mp_feature_1;		/* mp system configuration type if no mpc */
 	uint8	mp_feature_2;		/* imcrp */
 	uint8	mp_feature_3, mp_feature_4, mp_feature_5; /* reserved */
+};
+
+/* base config entry types */
+enum {
+	MP_BASE_PROCESSOR = 0,
+	MP_BASE_BUS,
+	MP_BASE_IO_APIC,
+	MP_BASE_IO_INTR,
+	MP_BASE_LOCAL_INTR,
 };
 
 struct mp_base_processor {
@@ -171,10 +184,10 @@ struct mp_base_interrupt {
 };
 
 enum {
-	MP_INT_TYPE_INT = 0,
-	MP_INT_TYPE_NMI,
-	MP_INT_TYPE_SMI,
-	MP_INT_TYPE_ExtINT,
+	MP_INTR_TYPE_INT = 0,
+	MP_INTR_TYPE_NMI,
+	MP_INTR_TYPE_SMI,
+	MP_INTR_TYPE_ExtINT,
 };
 
 #endif	/* _KERNEL_ARCH_x86_SMP_APIC_H */
