@@ -215,47 +215,31 @@ static uint8 BT_read_type (void)
 
 bool BT_probe()
 {
+	uint8 bus;
 	bool btfound = false;
+	bool *i2c_bus = &(si->ps.i2c_bus0);
 
-	LOG(4,("Brooktree: Checking I2C bus(ses) for first possible TV encoder...\n"));
-	if (si->ps.i2c_bus0)
+	LOG(4,("Brooktree: Checking wired I2C bus(ses) for first possible TV encoder...\n"));
+	for (bus = 0; bus < 3; bus++)
 	{
-		/* try primary adress on bus 0 */
-		if (!BT_check(0, PRADR))
+		if (i2c_bus[bus] && !btfound)
 		{
-			btfound = true;
-			si->ps.tv_encoder.adress = PRADR;
-			si->ps.tv_encoder.bus = 0;
-		}
-		else
-		{
-			/* try secondary adress on bus 0 */
-			if (!BT_check(0, SCADR))
+			/* try primary adress on bus */
+			if (!BT_check(bus, PRADR))
 			{
 				btfound = true;
-				si->ps.tv_encoder.adress = SCADR;
-				si->ps.tv_encoder.bus = 0;
+				si->ps.tv_encoder.adress = PRADR;
+				si->ps.tv_encoder.bus = bus;
 			}
-		}
-	}
-
-	if (si->ps.i2c_bus1 && !btfound)
-	{
-		/* try primary adress on bus 1 */
-		if (!BT_check(1, PRADR))
-		{
-			btfound = true;
-			si->ps.tv_encoder.adress = PRADR;
-			si->ps.tv_encoder.bus = 1;
-		}
-		else
-		{
-			/* try secondary adress on bus 1 */
-			if (!BT_check(1, SCADR))
+			else
 			{
-				btfound = true;
-				si->ps.tv_encoder.adress = SCADR;
-				si->ps.tv_encoder.bus = 1;
+				/* try secondary adress on bus */
+				if (!BT_check(bus, SCADR))
+				{
+					btfound = true;
+					si->ps.tv_encoder.adress = SCADR;
+					si->ps.tv_encoder.bus = bus;
+				}
 			}
 		}
 	}

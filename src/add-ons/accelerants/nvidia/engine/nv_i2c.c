@@ -24,11 +24,29 @@ char i2c_flag_error (char ErrNo)
 	return I2CError;
 }
 
+static void i2c_select_bus_set(bool set)
+{
+	/* I/O pins set selection is only valid on dualhead cards */
+	if (!si->ps.secondary_head) return;
+
+	/* select GPU I/O pins set to connect to I2C 'registers' */
+	if (set)
+	{
+		NV_REG32(NV32_FUNCSEL) &= ~0x00000010;
+		NV_REG32(NV32_2FUNCSEL) |= 0x00000010;
+	}
+	else
+	{
+		NV_REG32(NV32_2FUNCSEL) &= ~0x00000010;
+		NV_REG32(NV32_FUNCSEL) |= 0x00000010;
+	}
+}
+
 static void OutSCL(uint8 BusNR, bool Bit)
 {
 	uint8 data;
 
-	if (BusNR)
+	if (BusNR & 0x01)
 	{
 		data = (CRTCR(WR_I2CBUS_1) & 0xf0) | 0x01;
 		if (Bit)
@@ -50,7 +68,7 @@ static void OutSDA(uint8 BusNR, bool Bit)
 {
 	uint8 data;
 	
-	if (BusNR)
+	if (BusNR & 0x01)
 	{
 		data = (CRTCR(WR_I2CBUS_1) & 0xf0) | 0x01;
 		if (Bit)
@@ -70,7 +88,7 @@ static void OutSDA(uint8 BusNR, bool Bit)
 
 static bool InSCL(uint8 BusNR)
 {
-	if (BusNR)
+	if (BusNR & 0x01)
 	{
 		if ((CRTCR(RD_I2CBUS_1) & 0x04)) return true;
 	}
@@ -84,7 +102,7 @@ static bool InSCL(uint8 BusNR)
 
 static bool InSDA(uint8 BusNR)
 {
-	if (BusNR)
+	if (BusNR & 0x01)
 	{
 		if ((CRTCR(RD_I2CBUS_1) & 0x08)) return true;
 	}
@@ -142,6 +160,9 @@ static uint8 RXBit (uint8 BusNR)
 
 void i2c_bstart (uint8 BusNR)
 {
+	/* select GPU I/O pins set */
+	i2c_select_bus_set(BusNR & 0x02);
+
 	/* enable access to primary head */
 	set_crtc_owner(0);
 
@@ -164,6 +185,9 @@ void i2c_bstart (uint8 BusNR)
 
 void i2c_bstop (uint8 BusNR)
 {
+	/* select GPU I/O pins set */
+	i2c_select_bus_set(BusNR & 0x02);
+
 	/* enable access to primary head */
 	set_crtc_owner(0);
 
@@ -187,6 +211,9 @@ void i2c_bstop (uint8 BusNR)
 uint8 i2c_readbyte(uint8 BusNR, bool Ack)
 {
 	uint8 cnt, bit, byte = 0;
+
+	/* select GPU I/O pins set */
+	i2c_select_bus_set(BusNR & 0x02);
 
 	/* enable access to primary head */
 	set_crtc_owner(0);
@@ -212,6 +239,9 @@ bool i2c_writebyte (uint8 BusNR, uint8 byte)
 	uint8 cnt;
 	bool bit;
 	uint8 tmp = byte;
+
+	/* select GPU I/O pins set */
+	i2c_select_bus_set(BusNR & 0x02);
 
 	/* enable access to primary head */
 	set_crtc_owner(0);
@@ -255,8 +285,9 @@ void i2c_writebuffer (uint8 BusNR, uint8* buf, uint8 size)
 
 status_t i2c_init(void)
 {
-	uint8 bus;
+	uint8 bus, buses;
 	bool *i2c_bus = &(si->ps.i2c_bus0);
+	status_t result = B_ERROR;
 
 	LOG(4,("I2C: searching for wired I2C buses...\n"));
 
@@ -266,9 +297,15 @@ status_t i2c_init(void)
 	/* preset no board wired buses */
 	si->ps.i2c_bus0 = false;
 	si->ps.i2c_bus1 = false;
+	si->ps.i2c_bus2 = false;
+	si->ps.i2c_bus3 = false;
 
-	/* find existing buses */	
-	for (bus = 0; bus < 2; bus++)
+	/* set number of buses to test for */
+	buses = 2;
+	if (si->ps.secondary_head) buses = 4;
+
+	/* find existing buses */
+	for (bus = 0; bus < buses; bus++)
 	{
 		/* reset status */
 		i2c_flag_error (-1);
@@ -292,14 +329,16 @@ status_t i2c_init(void)
 		i2c_bstop(bus);
 	}
 
-	for (bus = 0; bus < 2; bus++)
+	for (bus = 0; bus < buses; bus++)
 	{
 		if (i2c_bus[bus])
+		{
 			LOG(4,("I2C: bus #%d wiring check: passed\n", bus));
+			result = B_OK;
+		}
 		else
 			LOG(4,("I2C: bus #%d wiring check: failed\n", bus));
 	}
 
-	if (!si->ps.i2c_bus0 && !si->ps.i2c_bus1) return B_ERROR;
-	return B_OK;
+	return result;
 }
