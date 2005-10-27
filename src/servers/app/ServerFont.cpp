@@ -89,6 +89,33 @@ is_white_space(uint16 glyph)
 //	#pragma mark -
 
 
+class FaceGetter {
+	public:
+		FaceGetter(FontStyle *style)
+			:
+			fStyle(style)
+		{
+			style->Lock();
+		}
+
+		~FaceGetter()
+		{
+			fStyle->Unlock();
+		}
+
+		FT_Face Face()
+		{
+			return fStyle->GetFTFace();
+		}
+
+	private:
+		FontStyle *fStyle;
+};
+
+
+//	#pragma mark -
+
+
 /*! 
 	\brief Constructor
 	\param style Style object to which the ServerFont belongs
@@ -241,7 +268,7 @@ ServerFont::SetFamilyAndStyle(uint16 familyID, uint16 styleID)
 	FontStyle* style = NULL;
 
 	if (gFontServer->Lock()) {
-		 style = gFontServer->GetStyle(familyID, styleID);
+		style = gFontServer->GetStyle(familyID, styleID);
 		gFontServer->Unlock();
 	}
 
@@ -290,7 +317,8 @@ ServerFont::GetGlyphShapes(const char charArray[], int32 numChars) const
 	funcs.conic_to = ConicToFunc;
 	funcs.cubic_to = CubicToFunc;
 	
-	FT_Face face = fStyle->GetFTFace();
+	FaceGetter getter(fStyle);
+	FT_Face face = getter.Face();
 	if (!face)
 		return NULL;
 	
@@ -340,7 +368,8 @@ ServerFont::GetHasGlyphs(const char charArray[], int32 numChars, bool hasArray[]
 	if (!fStyle || !charArray || numChars <= 0 || !hasArray)
 		return;
 
-		FT_Face face = fStyle->GetFTFace();
+	FaceGetter getter(fStyle);
+	FT_Face face = getter.Face();
 	if (!face)
 		return;
 
@@ -381,7 +410,8 @@ ServerFont::GetEdges(const char charArray[], int32 numChars, edge_info edgeArray
 	if (!fStyle || !charArray || numChars <= 0 || !edgeArray)
 		return;
 
-	FT_Face face = fStyle->GetFTFace();
+	FaceGetter getter(fStyle);
+	FT_Face face = getter.Face();
 	if (!face)
 		return;
 
@@ -428,10 +458,11 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 	if (!fStyle || !charArray || numChars <= 0 || !offsetArray)
 		return NULL;
 	
-	FT_Face face = fStyle->GetFTFace();
+	FaceGetter getter(fStyle);
+	FT_Face face = getter.Face();
 	if (!face)
 		return NULL;
-	
+
 	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
 	
 	Angle rotation(fRotation);
@@ -484,7 +515,8 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 	if (!fStyle || !charArray || numChars <= 0)
 		return false;
 	
-	FT_Face face = fStyle->GetFTFace();
+	FaceGetter getter(fStyle);
+	FT_Face face = getter.Face();
 	if (!face)
 		return false;
 
@@ -531,7 +563,8 @@ ServerFont::GetBoundingBoxesAsString(const char charArray[], int32 numChars, BRe
 	if (!fStyle || !charArray || numChars <= 0 || !rectArray)
 		return false;
 
-	FT_Face face = fStyle->GetFTFace();
+	FaceGetter getter(fStyle);
+	FT_Face face = getter.Face();
 	if (!face)
 		return false;
 	
@@ -590,7 +623,8 @@ ServerFont::GetBoundingBoxesForStrings(char *charArray[], int32 lengthArray[],
 	if (!fStyle || !charArray || !lengthArray|| numStrings <= 0 || !rectArray || !deltaArray)
 		return false;
 
-	FT_Face face = fStyle->GetFTFace();
+	FaceGetter getter(fStyle);
+	FT_Face face = getter.Face();
 	if (!face)
 		return false;
 
@@ -612,7 +646,8 @@ ServerFont::StringWidth(const char* string, int32 numBytes) const
 	if (!fStyle || !string || numBytes <= 0)
 		return 0.0;
 
-	FT_Face face = fStyle->GetFTFace();
+	FaceGetter getter(fStyle);
+	FT_Face face = getter.Face();
 	if (!face)
 		return 0.0;
 

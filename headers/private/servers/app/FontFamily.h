@@ -31,6 +31,7 @@
 #include <Rect.h>
 #include <Font.h>
 #include <List.h>
+#include <Locker.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include "SharedObject.h"
@@ -83,7 +84,7 @@ typedef struct
 	FontStyle objects help abstract a lot of the font engine details while
 	still offering plenty of information the style in question.
 */
-class FontStyle : public SharedObject {
+class FontStyle : public SharedObject, public BLocker {
  public:
 								FontStyle(const char* filepath,
 										  FT_Face face);
