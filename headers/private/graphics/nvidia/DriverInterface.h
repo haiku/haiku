@@ -53,6 +53,7 @@ typedef struct {
 #define TV_NTSC (2<<9)
 #define TV_CAPABLE (1<<11)
 #define TV_VIDEO (1<<12)
+#define TV_PRIMARY (1<<13)
 
 #define SKD_MOVE_CURSOR    0x00000001
 #define SKD_PROGRAM_CLUT   0x00000002
