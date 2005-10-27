@@ -195,6 +195,10 @@ status_t INIT_ACCELERANT(int the_fd) {
 	/* ensure DPMS state */
 	si->dpms_flags = B_DPMS_ON;
 
+	/* ensure TVout state */
+	//fixme: actually check on what CRTC TVout was active during boot (if any)...
+	si->dm.flags = TV_PRIMARY;
+
 	/* make sure a possible 3D add-on will block rendering and re-initialize itself.
 	 * note: update in _this_ order only */
 	/* SET_DISPLAY_MODE will reset this flag when it's done. */

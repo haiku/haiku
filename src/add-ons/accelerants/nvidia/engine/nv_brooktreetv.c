@@ -1578,47 +1578,28 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
  * tested on ELSA Erazor III 32Mb AGP (TNT2/BT869),
  * Diamond Viper V550 16Mb PCI (TNT1/BT869),
  * and ASUS V7100 GeForce2 MX200 AGP/32Mb (CH7007). */
-static status_t BT_start_tvout(void)
+static status_t BT_start_tvout(display_mode tv_target)
 {
-	/* enable access to primary head */
-	set_crtc_owner(0);
+	if (!si->ps.secondary_head || (tv_target.flags & TV_PRIMARY))
+	{
+		if (si->ps.secondary_head)
+		{
+			/* switch TV encoder to CRTC1 */
+			NV_REG32(NV32_2FUNCSEL) &= ~0x00000100;
+			NV_REG32(NV32_FUNCSEL) |= 0x00000100;
+		}
 
-	/* CAUTION:
-	 * On old cards, PLLSEL (and TV_SETUP?) cannot be read (sometimes?), but
-	 * write actions do succeed ...
-	 * This is confirmed for both ISA and PCI access, on NV04 and NV11. */
+		nv_crtc_start_tvout();
+	}
 
-	/* setup TVencoder connection */
-	/* b1-0 = %01: encoder type is MASTER;
-	 * b24 = 1: VIP datapos is b0-7 */
-	//fixme if needed: setup completely instead of relying on pre-init by BIOS..
-	//(it seems to work OK on NV04 and NV11 although read reg. doesn't seem to work)
-	DACW(TV_SETUP, ((DACR(TV_SETUP) & ~0x00000002) | 0x01000001));
+	if (si->ps.secondary_head && !(tv_target.flags & TV_PRIMARY))
+	{
+		/* switch TV encoder to CRTC2 */
+		NV_REG32(NV32_FUNCSEL) &= ~0x00000100;
+		NV_REG32(NV32_2FUNCSEL) |= 0x00000100;
 
-	/* tell GPU to use pixelclock from TVencoder instead of using internal source */
-	/* (nessecary or display will 'shiver' on both TV and VGA.) */
-	if (si->ps.secondary_head)
-		//fixme: assuming TVout is on crtc1!!
-		DACW(PLLSEL, 0x20030f00);
-	else
-		DACW(PLLSEL, 0x00030700);
-
-	/* Set overscan color to 'black' */
-	/* note:
-	 * Change this instruction for a visible overscan color if you're trying to
-	 * center the output on TV. Use it as a guide-'line' then ;-) */
-	ATBW(OSCANCOLOR, 0x00);
-
-	/* set CRTC to slaved mode (b7 = 1) and clear TVadjust (b3-5 = %000) */
-	CRTCW(PIXEL, ((CRTCR(PIXEL) & 0xc7) | 0x80));
-	/* select TV encoder, not panel encoder (b0 = 0).
-	 * Note:
-	 * Both are devices (often) using the CRTC in slaved mode. */
-	CRTCW(LCD, (CRTCR(LCD) & 0xfe));
-
-	/* HTOTAL, VTOTAL and OVERFLOW return their default CRTC use, instead of
-	 * H, V-low and V-high 'shadow' counters(?)(b0, 4 and 6 = 0) (b7 use = unknown) */
-	CRTCW(TREG, 0x80);
+		nv_crtc2_start_tvout();
+	}
 
 	return B_OK;
 }//end BT_start_tvout.
@@ -1632,57 +1613,11 @@ status_t BT_stop_tvout(void)
 	/* prevent BT from being overclocked by VGA-only modes & black-out TV-out */
 	BT_killclk_blackout();
 
-	/* enable access to primary head */
-	set_crtc_owner(0);
+	if (!si->ps.secondary_head || (si->dm.flags & TV_PRIMARY))
+		nv_crtc_stop_tvout();
 
-	/* just to be sure Vsync is _really_ enabled */
-	CRTCW(REPAINT1, (CRTCR(REPAINT1) & 0xbf));
-
-	/* wait for one image to be generated to make sure VGA has kicked in and is
-	 * running OK before continuing...
-	 * (Kicking in will fail often if we do not wait here) */
-	/* Note:
-	 * The used CRTC's Vsync is required to be enabled here. The DPMS state
-	 * programming in the driver makes sure this is the case.
-	 * (except for driver startup: see nv_general.c.) */
-
-	/* make sure we are 'in' active VGA picture */
-	while (NV_REG8(NV8_INSTAT1) & 0x08) snooze(1);
-	/* wait for next vertical retrace start on VGA */
-	while (!(NV_REG8(NV8_INSTAT1) & 0x08)) snooze(1);
-	/* now wait until we are 'in' active VGA picture again */
-	while (NV_REG8(NV8_INSTAT1) & 0x08) snooze(1);
-
-
-	/* set CRTC to master mode (b7 = 0) if it wasn't slaved for a panel before */
-	if (!(si->ps.slaved_tmds1))	CRTCW(PIXEL, (CRTCR(PIXEL) & 0x03));
-
-	/* CAUTION:
-	 * On old cards, PLLSEL (and TV_SETUP?) cannot be read (sometimes?), but
-	 * write actions do succeed ...
-	 * This is confirmed for both ISA and PCI access, on NV04 and NV11. */
-
-	/* setup TVencoder connection */
-	/* b1-0 = %00: encoder type is SLAVE;
-	 * b24 = 1: VIP datapos is b0-7 */
-	//fixme if needed: setup completely instead of relying on pre-init by BIOS..
-	//(it seems to work OK on NV04 and NV11 although read reg. doesn't seem to work)
-	DACW(TV_SETUP, ((DACR(TV_SETUP) & ~0x00000003) | 0x01000000));
-
-	/* tell GPU to use pixelclock from internal source instead of using TVencoder */
-	if (si->ps.secondary_head)
-		DACW(PLLSEL, 0x30000f00);
-	else
-		DACW(PLLSEL, 0x10000700);
-
-	/* HTOTAL, VTOTAL and OVERFLOW return their default CRTC use, instead of
-	 * H, V-low and V-high 'shadow' counters(?)(b0, 4 and 6 = 0) (b7 use = unknown) */
-	CRTCW(TREG, 0x00);
-
-	/* select panel encoder, not TV encoder if needed (b0 = 1).
-	 * Note:
-	 * Both are devices (often) using the CRTC in slaved mode. */
-	if (si->ps.slaved_tmds1) CRTCW(LCD, (CRTCR(LCD) | 0x01));
+	if (si->ps.secondary_head && !(si->dm.flags & TV_PRIMARY))
+		nv_crtc2_stop_tvout();
 
 	/* fixme if needed:
 	 * a full encoder chip reset could be done here (so after decoupling crtc)... */
@@ -1773,7 +1708,11 @@ status_t BT_setmode(display_mode target)
 	BT_update_mode_for_gpu(&tv_target, tvmode);
 
 	/* setup GPU CRTC timing */
-	head1_set_timing(tv_target);
+	if (!si->ps.secondary_head || (si->dm.flags & TV_PRIMARY))
+		head1_set_timing(tv_target);
+
+	if (si->ps.secondary_head && !(si->dm.flags & TV_PRIMARY))
+		head2_set_timing(tv_target);
 
 //fixme: only testing older cards for now...
 if (si->ps.secondary_head && (si->ps.card_type > NV15))
@@ -1783,7 +1722,7 @@ if (si->ps.secondary_head && (si->ps.card_type > NV15))
 }
 
 	/* now set GPU CRTC to slave mode */
-	BT_start_tvout();
+	BT_start_tvout(tv_target);
 
 	return B_OK;
 }

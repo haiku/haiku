@@ -81,6 +81,8 @@ status_t nv_crtc_cursor_define(uint8*,uint8*);
 status_t nv_crtc_cursor_position(uint16 x ,uint16 y);
 status_t nv_crtc_cursor_show(void);
 status_t nv_crtc_cursor_hide(void);
+status_t nv_crtc_stop_tvout(void);
+status_t nv_crtc_start_tvout(void);
 
 /* CRTC2 functions */
 status_t nv_crtc2_validate_timing(
@@ -97,6 +99,8 @@ status_t nv_crtc2_cursor_define(uint8*,uint8*);
 status_t nv_crtc2_cursor_position(uint16 x ,uint16 y);
 status_t nv_crtc2_cursor_show(void);
 status_t nv_crtc2_cursor_hide(void);
+status_t nv_crtc2_stop_tvout(void);
+status_t nv_crtc2_start_tvout(void);
 
 /* acceleration functions */
 status_t check_acc_capability(uint32 feature);
