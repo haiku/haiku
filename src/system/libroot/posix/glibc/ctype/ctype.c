@@ -1,4 +1,4 @@
-/* Copyright (C) 1991,92,97,99,2002 Free Software Foundation, Inc.
+/* Copyright (C) 1991, 1992, 1997, 1999 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -35,11 +35,6 @@ func (ispunct, _ISpunct)
 func (isspace, _ISspace)
 func (isupper, _ISupper)
 func (isxdigit, _ISxdigit)
-
-#define __ctype_tolower \
-  ((int32_t *) _NL_CURRENT (LC_CTYPE, _NL_CTYPE_TOLOWER) + 128)
-#define __ctype_toupper \
-  ((int32_t *) _NL_CURRENT (LC_CTYPE, _NL_CTYPE_TOUPPER) + 128)
 
 int
 tolower (int c)
