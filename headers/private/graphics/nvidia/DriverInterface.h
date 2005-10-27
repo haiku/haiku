@@ -292,7 +292,9 @@ typedef struct {
 		float panel2_aspect;		/* panel's aspect ratio */
 		bool crtc2_prim;			/* using CRTC2 as primary CRTC */
 		bool i2c_bus0;				/* we have a wired I2C bus 0 on board */
-		bool i2c_bus1;				/* we have a wired I2C bus 0 on board */
+		bool i2c_bus1;				/* we have a wired I2C bus 1 on board */
+		bool i2c_bus2;				/* we have a wired I2C bus 2 on board */
+		bool i2c_bus3;				/* we have a wired I2C bus 3 on board */
 		struct
 		{
 			uint32 type;			/* see tvchip_type enum above */
