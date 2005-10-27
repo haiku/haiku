@@ -10,7 +10,7 @@
 #include <DiskDeviceTypes.h>
 #include <Path.h>
 
-extern void SizeAsString(int32 size, char *string);
+extern void SizeAsString(off_t size, char *string);
 
 class SourceVisitor : public BDiskDeviceVisitor 
 {
