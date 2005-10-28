@@ -1935,7 +1935,8 @@ Layer::do_CopyBits(BRect& src, BRect& dst, int32 xOffset, int32 yOffset) {
 	// the region at the destination that needs invalidation
 	GetRootLayer()->fRedrawReg.Set(dst);
 	// exclude the region drawn by the copy operation
-	GetRootLayer()->fRedrawReg.Exclude(&copyRegion);
+// TODO: quick fix for our scrolling problem. FIX THIS!
+//	GetRootLayer()->fRedrawReg.Exclude(&copyRegion);
 	// apply the current clipping as well
 	GetRootLayer()->fRedrawReg.IntersectWith(&fVisible2);
 
@@ -1955,25 +1956,15 @@ Layer::do_CopyBits(BRect& src, BRect& dst, int32 xOffset, int32 yOffset) {
 void
 Layer::MovedByHook(float dx, float dy)
 {
-	if (Window() && Flags() & B_FRAME_EVENTS && !IsTopLayer()) {
-		BMessage msg(B_VIEW_MOVED);
-		msg.AddInt64("when", system_time());
-		msg.AddPoint("where", Frame().LeftTop());
-		Window()->SendMessageToClient(&msg, fViewToken, false);
-	}
+	if (Window() && !IsTopLayer())
+		AddToViewsWithInvalidCoords();
 }
 
 void
 Layer::ResizedByHook(float dx, float dy, bool automatic)
 {
-	if (Window() && Flags() & B_FRAME_EVENTS && !IsTopLayer()) {
-		BMessage msg(B_VIEW_RESIZED);
-		msg.AddInt64("when", system_time());
-		msg.AddFloat("width", Frame().Width());
-		msg.AddFloat("height", Frame().Height());
-		msg.AddPoint("where", Frame().LeftTop());
-		Window()->SendMessageToClient(&msg, fViewToken, false);
-	}
+	if (Window() && !IsTopLayer())
+		AddToViewsWithInvalidCoords();
 }
 
 void
@@ -2242,7 +2233,33 @@ Layer::resize_layer_frame_by(float x, float y)
 		newFrame.bottom += y;
 	else if ((rm & 0x00F0U) == _VIEW_CENTER_ << 4)
 		newFrame.bottom += y/2;
+/*
+	if (newFrame != fFrame) {
+		float offsetX, offsetY;
+		float dx, dy;
 
+		dx = newFrame.Width() - fFrame.Width();
+		dy = newFrame.Height() - fFrame.Height();
+		offsetX = newFrame.left - fFrame.left;
+		offsetY = newFrame.top - fFrame.top;
+
+		fFrame = newFrame;
+
+		if (offsetX != 0.0f || offsetY != 0.0f) {
+			MovedByHook(offsetX, offsetY);
+		}
+
+		if (dx != 0.0f || dy != 0.0f) {
+			// call hook function
+			ResizedByHook(dx, dy, true); // automatic
+
+			for (Layer *lay = LastChild(); lay; lay = PreviousChild())
+				lay->resize_layer_frame_by(dx, dy);
+		}
+	}
+*/
+// TODO: the above code is CORRECT!!!
+// It's commented because BView::FrameResized()/Moved() be called twice a given view. FIX THIS!
 	if (newFrame != fFrame) {
 		float		dx, dy;
 
@@ -2397,6 +2414,8 @@ Layer::do_ResizeBy(float dx, float dy)
 		GetRootLayer()->RequestDraw(GetRootLayer()->fRedrawReg, NULL);
 //	GetRootLayer()->RequestRedraw(); // TODO: what if we pass (fParent, startFromTHIS, &redrawReg)?
 	}
+
+	SendViewCoordUpdateMsg();
 }
 
 void Layer::do_MoveBy(float dx, float dy)
@@ -2448,6 +2467,8 @@ void Layer::do_MoveBy(float dx, float dy)
 		GetRootLayer()->RequestDraw(GetRootLayer()->fRedrawReg, NULL);
 //	GetRootLayer()->RequestRedraw(); // TODO: what if we pass (fParent, startFromTHIS, &redrawReg)?
 	}
+
+	SendViewCoordUpdateMsg();
 }
 
 void
@@ -2477,7 +2498,8 @@ Layer::do_ScrollBy(float dx, float dy)
 		// common region goes back to its original location. then, by excluding
 		// it from curent fullVisible we'll obtain the region that needs to be redrawn.
 		invalid.OffsetBy(-dx, -dy);
-		redrawReg.Exclude(&invalid);
+// TODO: a quick fix for the scrolling problem!!! FIX THIS!
+//		redrawReg.Exclude(&invalid);
 
 //		GetRootLayer()->fRedrawReg.Include(&redrawReg);
 		GetRootLayer()->fRedrawReg = redrawReg;
@@ -2487,6 +2509,8 @@ Layer::do_ScrollBy(float dx, float dy)
 
 	if (dx != 0.0f || dy != 0.0f)
 		ScrolledByHook(dx, dy);
+
+	SendViewCoordUpdateMsg();
 }
 
 void

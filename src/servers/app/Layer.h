@@ -41,7 +41,7 @@
 #include "RGBColor.h"
 #include "ServerWindow.h"
 
-//#define NEW_CLIPPING 1
+#define NEW_CLIPPING 1
 
 enum {
 	B_LAYER_NONE		= 1,
