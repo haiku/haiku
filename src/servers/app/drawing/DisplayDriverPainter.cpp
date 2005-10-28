@@ -44,6 +44,36 @@ extend_by_stroke_width(BRect& rect, const DrawData* context)
 	rect.InsetBy(inset, inset);
 }
 
+
+class FontLocker {
+	public:
+		FontLocker(const DrawData* context)
+			:
+			fFont(&context->Font())
+		{
+			fFont->Lock();
+		}
+		
+		FontLocker(const ServerFont* font)
+			:
+			fFont(font)
+		{
+			fFont->Lock();
+		}
+
+		~FontLocker()
+		{
+			fFont->Unlock();
+		}
+
+	private:
+		const ServerFont*	fFont;
+};
+
+
+//	pragma mark -
+
+
 // constructor
 DisplayDriverPainter::DisplayDriverPainter(HWInterface* interface)
 	: DisplayDriver(),
@@ -1086,6 +1116,7 @@ DisplayDriverPainter::DrawString(const char* string, int32 length,
 {
 // TODO: use delta
 	if (Lock()) {
+		FontLocker locker(d);
 		fPainter->SetDrawData(d);
 //bigtime_t now = system_time();
 // TODO: BoundingBox is quite slow!! Optimizing it will be beneficial.
@@ -1120,6 +1151,7 @@ DisplayDriverPainter::StringWidth(const char* string, int32 length,
 // TODO: use delta
 	float width = 0.0;
 	if (Lock()) {
+		FontLocker locker(d);
 		fPainter->SetDrawData(d);
 		width = fPainter->StringWidth(string, length);
 		Unlock();
@@ -1134,6 +1166,7 @@ DisplayDriverPainter::StringWidth(const char* string, int32 length,
 								  escapement_delta* delta)
 {
 // TODO: use delta
+	FontLocker locker(&font);
 	static DrawData d;
 	d.SetFont(font);
 	return StringWidth(string, length, &d);
@@ -1146,6 +1179,7 @@ DisplayDriverPainter::StringHeight(const char *string, int32 length,
 {
 	float height = 0.0;
 	if (Lock()) {
+		FontLocker locker(d);
 		fPainter->SetDrawData(d);
 		static BPoint dummy(0.0, 0.0);
 		height = fPainter->BoundingBox(string, length, dummy).Height();
@@ -1157,7 +1191,7 @@ DisplayDriverPainter::StringHeight(const char *string, int32 length,
 // Lock
 bool
 DisplayDriverPainter::Lock()
-{	
+{
 	return fGraphicsCard->WriteLock();
 }
 

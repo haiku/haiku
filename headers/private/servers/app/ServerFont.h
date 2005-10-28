@@ -140,6 +140,9 @@ class ServerFont {
 
 			float				StringWidth(const char* string, int32 numBytes) const;
 
+			bool				Lock() const { return fStyle->Lock(); }
+			void				Unlock() const { fStyle->Unlock(); }
+
 			FT_Face				GetFTFace() const
 									{ return fStyle->GetFTFace(); };
 	
