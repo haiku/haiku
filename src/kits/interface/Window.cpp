@@ -811,7 +811,7 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			fLink->Flush();
 			break;
 		}
-#if 1 // 0 to make the new clipping code work
+
 		case B_VIEW_RESIZED:
 		case B_VIEW_MOVED:
 		{
@@ -863,40 +863,7 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			}
 			break;
 		}
-#else
-		case B_VIEW_MOVED:
-		{
-			BPoint			where;
 
-			msg->FindPoint("where", &where);
-				
-			if (target && target != this && dynamic_cast<BView*>(target))
-			{
-				STRACE(("Calling BView(%s)::FrameMoved( %f, %f )\n", target->Name(), where.x, where.y));
-				((BView*)target)->FrameMoved(where);
-			}
-			
-			break;
-		}	
-
-		case B_VIEW_RESIZED:
-		{
-			float			newWidth,
-							newHeight;
-			BPoint			where;
-	
-			msg->FindFloat("width", &newWidth);
-			msg->FindFloat("height", &newHeight);
-			msg->FindPoint("where", &where);
-
-			if (target && target != this && dynamic_cast<BView*>(target)){
-				STRACE(("Calling BView(%s)::FrameResized( %f, %f )\n", target->Name(), newWidth, newHeight));
-				((BView*)target)->FrameResized(newWidth, newHeight);
-			}
-
-			break;
-		}
-#endif
 		case _MENUS_DONE_:
 			MenusEnded();
 			break;

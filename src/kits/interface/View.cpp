@@ -561,11 +561,7 @@ BRect
 BView::Bounds() const
 {
 	// do we need to update our bounds?
-	if (
-#if 1 // 0 to make the new clipping code work
-!fState->IsValid(B_VIEW_FRAME_BIT) && 
-#endif
-		fOwner) {
+	if (!fState->IsValid(B_VIEW_FRAME_BIT) && fOwner) {
 		check_lock();
 
 		fOwner->fLink->StartMessage(AS_LAYER_GET_COORD);
