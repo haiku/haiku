@@ -20,7 +20,7 @@
 //	DEALINGS IN THE SOFTWARE.
 //
 //	File Name:		Window.h
-//	Author:			Adrian Oanca (adioanca@mymail.ro)
+//	Author:			Adrian Oanca (adioanca@gmail.com)
 //	Description:	BWindow is the base class for all windows (graphic areas
 //					displayed on-screen).
 //------------------------------------------------------------------------------
@@ -353,9 +353,6 @@ private:
 			void		BuildTopView();
 			void		setFocus(BView *focusView, bool notifyIputServer = false);
 
-			// message: B_MOUSE_UP, B_MOUSE_DOWN, B_MOUSE_MOVED
-			void		sendMessageUsingEventMask(int32 message, BPoint where);
-			BView*		sendMessageUsingEventMask2(BView* aView, int32 message, BPoint where);
 			int32		findShortcut(uint32 key, uint32 modifiers);
 			bool		findHandler(BView* start, BHandler* handler);
 			BView*		findView(BView* aView, const char* viewName) const;
