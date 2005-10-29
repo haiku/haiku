@@ -740,9 +740,6 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 				} else
 					target->MessageReceived(msg);
 			}
-
-// TODO: use the following line later, instead of the above.
-//			sendMessageUsingEventMask(B_MOUSE_DOWN, where);
 			break;
 		}
 
@@ -760,9 +757,6 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 				} else
 					target->MessageReceived(msg);
 			}
-
-// TODO: use the following line later, instead of the above.
-//			sendMessageUsingEventMask(B_MOUSE_UP, where);
 			break;
 		}
 
@@ -776,12 +770,12 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			msg->FindInt32("transit", (int32 *)&transit);
 			if (target && target != this && target != top_view) {
 				if (BView *view = dynamic_cast<BView *>(target)) {
+					fLastMouseMovedView = view;
 					view->ConvertFromScreen(&where);
 					view->MouseMoved(where, transit, NULL);
 				} else
 					target->MessageReceived(msg);
 			}
-//			sendMessageUsingEventMask(B_MOUSE_MOVED, where);
 			break;
 		}
 
@@ -2525,122 +2519,6 @@ BWindow::_KeyboardNavigation()
 
 	if (nextFocus && nextFocus != fFocus)
 		setFocus(nextFocus, false);
-}
-
-
-BView *
-BWindow::sendMessageUsingEventMask2(BView *view, int32 message, BPoint where)
-{
-	BView *destView = NULL;
-
-	STRACE(("info: BWindow::sendMessageUsingEventMask2() recursing to view %s with point %f,%f.\n",
-	 	view->Name() ? view->Name() : "<no name>", view->ConvertFromScreen(where).x, view->ConvertFromScreen(where).y));
-
-	if (view->fBounds.Contains(view->ConvertFromScreen(where))) {
-		 destView = view;	//this is the lower-most view under the mouse so far
-		 STRACE(("info: BWindow::sendMessageUsingEventMask() targeted view \"%s\".\n",
-		 	view->Name()));
-	}
-
-	// Code for Event Masks
-	BView *child = view->fFirstChild;
-	while (child) {
-		// see if a BView registered for mouse events and it's not the current focus view
-		if (view != fFocus
-			// ToDo: what's this strange event mask test ???
-			&& child->fEventMask & (B_POINTER_EVENTS | B_POINTER_EVENTS << 16)) {
-			switch (message) {
-				case B_MOUSE_DOWN:
-					child->MouseDown(child->ConvertFromScreen(where));
-					break;
-
-				case B_MOUSE_UP:
-					// clear event mask
-					child->fEventMask &= 0x0000FFFF;
-					child->MouseUp(child->ConvertFromScreen(where));
-					break;
-
-				case B_MOUSE_MOVED:
-				{
-					// TODO: get the dragMessage if any for now...
-					BMessage *dragMessage = NULL;
-
-					// TODO: after you have an example working, see if a view that registered for such events,
-					// does reveive B_MOUSE_MOVED with other options than B_OUTDIDE_VIEW !!!
-					// like: B_INSIDE_VIEW, B_ENTERED_VIEW, B_EXITED_VIEW
-
-					child->MouseMoved(child->ConvertFromScreen(where), 
-						B_OUTSIDE_VIEW, dragMessage);
-					break;
-				}
-			}
-		}
-
-		BView *target = sendMessageUsingEventMask2(child, message, where);
-
-		// one of the children contains the point
-		if (target)
-			destView = target;
-		child = child->fNextSibling;
-	}
-
-	return destView;
-}
-
-
-void
-BWindow::sendMessageUsingEventMask(int32 message, BPoint where)
-{
-	BView *destView = sendMessageUsingEventMask2(top_view, message, where);
-
-	// I'm SURE this is NEVER going to happen, but, during development of 
-	// BWindow, it may slip a NULL value
-	if (!destView) {
-		// debugger("There is no BView under the mouse;");
-		return;
-	}
-
-	switch (message) {
-		case B_MOUSE_DOWN:
-			setFocus(destView);
-			destView->MouseDown(destView->ConvertFromScreen(where));
-			break;
-
-		case B_MOUSE_UP:
-			destView->MouseUp(destView->ConvertFromScreen(where));
-			break;
-
-		case B_MOUSE_MOVED:
-		{
-			// TODO: add code for drag and drop
-			// for now...
-			BMessage *dragMessage = NULL;
-
-			if (destView != fLastMouseMovedView) {
-				if (fLastMouseMovedView) {
-	 				fLastMouseMovedView->MouseMoved(destView->ConvertFromScreen(where), 
-	 					B_EXITED_VIEW, dragMessage);
-				}
- 				destView->MouseMoved(ConvertFromScreen(where), B_ENTERED_VIEW, dragMessage);
- 				fLastMouseMovedView = destView;
- 				break;
-			} else {
- 				destView->MouseMoved(ConvertFromScreen(where), B_INSIDE_VIEW, dragMessage);
- 				break;
-			}
-
-			// ToDo: this is never reached!
-
-			// I'm guessing that B_OUTSIDE_VIEW is given to the view that has focus,
-			// I'll have to check
-
-			// TODO: Do research on mouse capturing -- maybe it has something to do 
-			// with this
- 			if (fFocus != destView)
- 				fFocus->MouseMoved(ConvertFromScreen(where), B_OUTSIDE_VIEW, dragMessage);
-			break;
-		}
-	}
 }
 
 
