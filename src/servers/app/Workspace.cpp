@@ -91,6 +91,20 @@
 #	define STRACESTREAM() ;
 #endif
 
+void
+Workspace::State::PrintToStream()
+{
+	printf("WS::State - Front: %s\n", Front? Front->Name(): "NULL");
+	printf("WS::State - Focus: %s\n", Focus? Focus->Name(): "NULL");
+	printf("WS::State - Active: %s\n", Active? Active->Name(): "NULL");
+
+	for (int32 i = 0; i < WindowList.CountItems(); ++i) {
+		Layer *l = (Layer*)WindowList.ItemAt(i);
+		if (l)
+			printf("\t %ld - %s\n", i, l->Name());
+	}
+}
+
 //----------------------------------------------------------------------------------
 /*!
 	\brief	Creates a new Workspace object which has its own resolution and background color.

@@ -93,7 +93,7 @@ public:
 	inline	WinBorder*			Focus() const { return fWMState.Focus; }
 	inline	WinBorder*			Front() const { return fWMState.Front; }
 	inline	WinBorder*			Active() const { return fWMState.Active; }
-			bool				SetActive(WinBorder* newActive);
+			bool				SetActive(WinBorder* newActive, bool activate = true);
 
 	inline	void				SetWorkspaceCount(int32 wksCount);
 	inline	int32				WorkspaceCount() const { return fWsCount; }

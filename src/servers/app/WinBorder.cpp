@@ -523,12 +523,7 @@ WinBorder::MouseDown(const BMessage *msg)
 
 			// based on what the Decorator returned, properly place this window.
 			if (action == DEC_MOVETOBACK) {
-				Workspace::State oldWMState;
-				GetRootLayer()->ActiveWorkspace()->GetState(&oldWMState);
-
-				GetRootLayer()->ActiveWorkspace()->MoveToBack(this);
-
-				GetRootLayer()->RevealNewWMState(oldWMState);
+				GetRootLayer()->SetActive(this, false);
 			}
 			else {
 				GetRootLayer()->SetNotifyLayer(this, B_POINTER_EVENTS, 0UL);

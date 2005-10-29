@@ -52,6 +52,9 @@ class Workspace {
 		class State {
 			public:
 							State() : Front(NULL), Focus(NULL), WindowList(50) { }
+
+				void		PrintToStream();
+
 				WinBorder*	Front;
 				WinBorder*	Focus;
 				WinBorder*	Active;

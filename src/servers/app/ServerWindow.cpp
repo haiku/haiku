@@ -1470,8 +1470,12 @@ myRootLayer->Unlock();
 		case AS_ACTIVATE_WINDOW:
 		{
 			DTRACE(("ServerWindow %s: Message AS_ACTIVATE_WINDOW: Layer: %s\n", Title(), fCurrentLayer->Name()));
+			bool activate = true;
+
+			link.Read<bool>(&activate);
+
 			if (myRootLayer && myRootLayer->Lock()) {
-				myRootLayer->SetActive(fWinBorder);
+				myRootLayer->SetActive(fWinBorder, activate);
 				myRootLayer->Unlock();
 			}
 			break;

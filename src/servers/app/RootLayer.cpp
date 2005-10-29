@@ -864,7 +864,7 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 		invalidate = true;
 	}
 	else if (memcmp(oldWMState.WindowList.Items(), fWMState.WindowList.Items(),
-			fWMState.WindowList.CountItems()) != 0) {
+			fWMState.WindowList.CountItems()*sizeof(void*)) != 0) {
 		invalidate = true;
 	}
 
@@ -908,7 +908,7 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 }
 
 bool
-RootLayer::SetActive(WinBorder* newActive)
+RootLayer::SetActive(WinBorder* newActive, bool activate)
 {
 	bool returnValue = false;
 	uint32 workspaceIndex = newActive->Workspaces();
@@ -921,7 +921,10 @@ RootLayer::SetActive(WinBorder* newActive)
 				Workspace::State oldWMState;
 				ActiveWorkspace()->GetState(&oldWMState);
 
-				returnValue = ActiveWorkspace()->AttemptToActivate(newActive);
+				if (activate)
+					returnValue = ActiveWorkspace()->AttemptToActivate(newActive);
+				else
+					returnValue = ActiveWorkspace()->AttemptToMoveToBack(newActive);
 
 				RevealNewWMState(oldWMState);		
 			}
@@ -935,7 +938,7 @@ RootLayer::SetActive(WinBorder* newActive)
 
 	// If this WinBorder does not appear in current workspace,
 	// change to the first one who does.	
-	if (!(workspaceIndex & (0x00000001UL << fActiveWksIndex))) {
+	if (activate && !(workspaceIndex & (0x00000001UL << fActiveWksIndex))) {
 		// find an workspace index in which this Layer appears
 		for (int32 i = 0; i < kMaxWorkspaceCount; i++) {
 			if (workspaceIndex & (0x00000001UL << i)) {
