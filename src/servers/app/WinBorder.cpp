@@ -655,6 +655,14 @@ WinBorder::WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces)
 	Window()->SendMessageToClient(&changedMsg, B_NULL_TOKEN, false);
 }
 
+void
+WinBorder::Activated(bool active)
+{
+	BMessage msg(B_WINDOW_ACTIVATED);
+	msg.AddBool("active", false);
+	Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
+}
+
 // SetTabLocation
 void
 WinBorder::SetTabLocation(float location)

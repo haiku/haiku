@@ -171,6 +171,7 @@ class Layer {
 
 	virtual	void				WorkspaceActivated(int32 index, bool active);
 	virtual	void				WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces);
+	virtual	void				Activated(bool active);
 
 			BPoint				BoundsOrigin() const; // BoundsFrameDiff()?
 			float				Scale() const;

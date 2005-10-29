@@ -1194,6 +1194,12 @@ Layer::WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces)
 	// Empty
 }
 
+void
+Layer::Activated(bool active)
+{
+	// Empty
+}
+
 // BoundsOrigin
 BPoint
 Layer::BoundsOrigin() const

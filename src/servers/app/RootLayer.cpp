@@ -828,16 +828,10 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 // floating window having focus.
 	// send window activation messages
 	if (oldWMState.Active != fWMState.Active) {
-		if (oldWMState.Active && oldWMState.Active->Window()) {
-			BMessage msg(B_WINDOW_ACTIVATED);
-			msg.AddBool("active", false);
-			oldWMState.Active->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
-		}
-		if (fWMState.Active && fWMState.Active->Window()) {
-			BMessage msg(B_WINDOW_ACTIVATED);
-			msg.AddBool("active", true);
-			fWMState.Active->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
-		}
+		if (oldWMState.Active)
+			oldWMState.Active->Activated(false);
+		if (fWMState.Active)
+			fWMState.Active->Activated(true);
 	}
 
 	// calculate the region that must be invalidated/redrawn
