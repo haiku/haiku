@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src servers power ;
+SubDir HAIKU_TOP src servers power ;
 
 AddResources power_daemon : power_daemon.rdef ;
 
@@ -7,4 +7,4 @@ Server power_daemon :
 	power_button_monitor.cpp
 	;
 
-LinkSharedOSLibs power_daemon : be ;
+LinkAgainst power_daemon : be ;

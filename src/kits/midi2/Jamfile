@@ -1,8 +1,8 @@
-SubDir OBOS_TOP src kits midi2 ;
+SubDir HAIKU_TOP src kits midi2 ;
 
 UsePrivateHeaders midi ;
 
-SharedLibrary midi2 :
+SharedLibrary libmidi2.so :
 	MidiConsumer.cpp
 	MidiEndpoint.cpp
 	MidiLocalConsumer.cpp
@@ -10,11 +10,6 @@ SharedLibrary midi2 :
 	MidiProducer.cpp
 	MidiRoster.cpp
 	MidiRosterLooper.cpp
-;
-
-LinkSharedOSLibs libmidi2.so :
+	:
 	be 
 ;
-
-MakeLocate <develop>libmidi2.so : $(OBOS_STLIB_DIR) ;
-RelSymLink <develop>libmidi2.so : libmidi2.so ;

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel drivers misc ;
+SubDir HAIKU_TOP src add-ons kernel drivers misc ;
 
 UsePrivateHeaders drivers ;
 

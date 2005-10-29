@@ -14,7 +14,7 @@
 #ifndef __BLOCKING_H__
 #define __BLOCKING_H__
 
-#include <dl_list.h>
+#include "dl_list.h"
 
 void scsi_add_queued_request( scsi_ccb *request );
 void scsi_add_queued_request_first( scsi_ccb *request );

@@ -1,8 +1,8 @@
-SubDir OBOS_TOP src tools translation inspector ;
+SubDir HAIKU_TOP src tools translation inspector ;
 
 AddResources Inspector : Inspector.rsrc ;
 
-App Inspector : 
+Application Inspector : 
 	TranslatorItem.cpp
 	StatusCheck.cpp
 	ActiveTranslatorsWindow.cpp
@@ -11,5 +11,5 @@ App Inspector :
 	ImageWindow.cpp
 	InspectorApp.cpp ;
 
-LinkSharedOSLibs Inspector : be tracker translation ;
+LinkAgainst Inspector : be tracker translation ;
 

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src bin patch ;
+SubDir HAIKU_TOP src bin patch ;
 
 SubDirCcFlags -DHAVE_CONFIG_H -Ded_PROGRAM='\"ed\"' -w ;
 

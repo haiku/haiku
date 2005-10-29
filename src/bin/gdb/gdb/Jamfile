@@ -1,11 +1,12 @@
-SubDir OBOS_TOP src bin gdb gdb ;
+SubDir HAIKU_TOP src bin gdb gdb ;
 
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) bfd ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) include ] ;
-SubDirHdrs [ FDirName [ FCurrentObjectsDir ] $(DOTDOT) bfd ] ;
+SubDirHdrs [ FDirName $(TARGET_COMMON_DEBUG_LOCATE_TARGET:D) bfd ] ;
 	# generated bfd headers
-SubDirHdrs [ FDirName $(OBOS_TOP) src bin gawk intl ] ;
+
+SubDirSysHdrs [ FDirName $(HAIKU_TOP) src bin gawk intl ] ;
 	# Use gawk's libintl for the time being.
 	# TODO: Put a current version of intl ot src/libs and build a static lib
 	# all interested apps can link against.
@@ -15,8 +16,8 @@ SubDirCcFlags -DHAVE_CONFIG_H -DLOCALEDIR=\\\"/boot/beos/etc/locale\\\"
 	-DMI_OUT=1 ;
 
 # filter warnings we don't want here
-local originalCCFlags = $(CCFLAGS) ;
-CCFLAGS = [ Filter $(CCFLAGS) : -Wall -Wmissing-prototypes -Wsign-compare ] ;
+TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
+	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) cli ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) mi ] ;
@@ -26,11 +27,11 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) signals ] ;
 local gdbHaikuArchTargetSources ;
 local gdbHaikuArchNativeSources ;
 local gdbProcessorName ;
-if $(OBOS_ARCH) = x86 {
+if $(TARGET_ARCH) = x86 {
 	gdbHaikuArchTargetSources = i386-tdep.c i386-haiku-tdep.c i387-tdep.c ;
 	gdbHaikuArchNativeSources = i386-haiku-nat.c ;
 	gdbProcessorName = i386 ;
-} else if $(OBOS_ARCH) = ppc {
+} else if $(TARGET_ARCH) = ppc {
 	# TODO: Not yet implemented!
 	gdbProcessorName = ppc ;
 } # else: architecture not supported by Haiku
@@ -243,10 +244,8 @@ local gdbAllSources =
 ;
 
 # build the static library
-StaticLibrary gdb :
+StaticLibrary libgdb.a :
 	$(gdbAllLibSources)
-
-	: [ FCurrentObjectsDir ]
 ;
 
 # build the executable
@@ -286,8 +285,8 @@ rule GDBCopyConfigFiles
 	for source in $(sources) {
 		local target = [ FGristFiles $(source) ] ;
 		File $(target) : $(source) ;
-		SEARCH on $(source) = [ FDirName $(SUBDIR) config-$(OBOS_ARCH) ] ;
-		MakeLocate $(target) : $(LOCATE_SOURCE) ;
+		SEARCH on $(source) = [ FDirName $(SUBDIR) config-$(TARGET_ARCH) ] ;
+		MakeLocateArch $(target) ;
 	}
 }
 
@@ -299,7 +298,7 @@ rule GDBCopyHaikuConfigHeader
 
 	File $(target) : $(source) ;
 	SEARCH on $(source) = [ FDirName $(SUBDIR) config $(gdbProcessorName) ] ;
-	MakeLocate $(target) : $(LOCATE_SOURCE) ;
+	MakeLocateArch $(target) ;
 }
 
 local gdbHeadersToCopy =
@@ -333,6 +332,3 @@ Depends [ FGristFiles $(gdbAllSources:S=$(SUFOBJ)) ]
 # not be generated in the first place).
 Depends [ FGristFiles $(gdbAllSources:S=$(SUFOBJ)) ]
 	 : gdb-bfd-generated-headers  ;
-
-# restore CCFLAGS
-CCFLAGS = $(originalCCFlags) ;

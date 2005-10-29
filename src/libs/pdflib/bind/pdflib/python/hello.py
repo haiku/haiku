@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# $Id: hello.py,v 1.1 2004/10/06 17:46:43 laplace Exp $
+# $Id$
 #
 # PDFlib client: hello example in Python
 #

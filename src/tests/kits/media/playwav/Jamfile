@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kits media playwav ;
+SubDir HAIKU_TOP src tests kits media playwav ;
 
 UsePrivateHeaders media ;
 

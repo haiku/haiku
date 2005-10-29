@@ -1,9 +1,11 @@
-SubDir OBOS_TOP src add-ons translators libtiff ;
+SubDir HAIKU_TOP src add-ons translators libtiff ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UseLibraryHeaders zlib ;
 
 # Include BaseTranslator code from shared directory
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons translators shared ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons translators shared ] ;
 
 local tiff_files =
 	# libtiff
@@ -56,9 +58,10 @@ Translator TIFFTranslator :
 	# TIFFTranslator classes
 	TIFFMain.cpp
 	TIFFTranslator.cpp
-	TIFFView.cpp ;
+	TIFFView.cpp
 
-LinkSharedOSLibs TIFFTranslator : be translation libz.a ;
+	:  be translation z
+;
 
 Package haiku-translationkit-cvs :
 	TIFFTranslator :

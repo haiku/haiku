@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons accelerants vesa ;
+SubDir HAIKU_TOP src add-ons accelerants vesa ;
 
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics vesa ] ;

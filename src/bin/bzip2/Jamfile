@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src bin bzip2 ;
+SubDir HAIKU_TOP src bin bzip2 ;
 
 # set some additional defines
 {
@@ -26,22 +26,10 @@ BinCommand bzip2recover :
 ;
 
 {
-	MakeLocate bunzip2 : $(OBOS_BIN_DIR) ;
-	RelSymLink bunzip2 : bzip2 ;
-	MakeLocate bzcat : $(OBOS_BIN_DIR) ;
-	RelSymLink bzcat : bzip2 ;
-	MakeLocate <bin>bzdiff : $(OBOS_BIN_DIR) ;
+	MakeLocatePlatform <bin>bzdiff ;
 	Shell <bin>bzdiff : bzdiff ;
-	MakeLocate bzcmp : $(OBOS_BIN_DIR) ;
-	RelSymLink bzcmp : <bin>bzdiff ;
-	MakeLocate <bin>bzgrep : $(OBOS_BIN_DIR) ;
+	MakeLocatePlatform <bin>bzgrep ;
 	Shell <bin>bzgrep : bzgrep ;
-	MakeLocate bzegrep : $(OBOS_BIN_DIR) ;
-	RelSymLink bzegrep : <bin>bzgrep ;
-	MakeLocate bzfgrep : $(OBOS_BIN_DIR) ;
-	RelSymLink bzfgrep : <bin>bzgrep ;
-	MakeLocate <bin>bzmore : $(OBOS_BIN_DIR) ;
+	MakeLocatePlatform <bin>bzmore ;
 	Shell <bin>bzmore : bzmore ;
-	MakeLocate bzless : $(OBOS_BIN_DIR) ;
-	RelSymLink bzless : <bin>bzmore ;
 }

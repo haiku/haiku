@@ -10,7 +10,7 @@
  |                                                                           |
  *---------------------------------------------------------------------------*/
 
-/* $Id: pdflibdl.h,v 1.1 2004/10/06 17:46:39 laplace Exp $
+/* $Id$
  *
  * Function prototypes for dynamically loading the PDFlib DLL at runtime
  *

@@ -1,13 +1,21 @@
-SubDir OBOS_TOP src add-ons kernel network protocols icmp ;
+SubDir HAIKU_TOP src add-ons kernel network protocols icmp ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# We need the public network headers also when not compiling for Haiku.
+		# Unfortunately we get more than we want, namely all POSIX headers.
+}
 
 UsePrivateHeaders net ;
 
-R5KernelAddon icmp : kernel obos_network protocols :
+KernelAddon icmp : kernel obos_network protocols :
 	icmp.c
 ;
 
 # Installation
-OBOSInstall install-networking
+HaikuInstall install-networking
 	: /boot/home/config/add-ons/kernel/obos_network/protocols
 	: icmp ;
 

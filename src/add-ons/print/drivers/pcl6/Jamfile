@@ -1,6 +1,8 @@
-SubDir OBOS_TOP src add-ons print drivers pcl6 ;
+SubDir HAIKU_TOP src add-ons print drivers pcl6 ;
 
-SubDirHdrs [ FDirName $(OBOS_TOP) headers private print libprint ] ; 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print libprint ] ; 
 
 AddResources PCL6\ Compatible : PCL6.rsrc ;
 
@@ -16,7 +18,7 @@ Addon PCL6\ Compatible : Print :
 
 ObjectC++Flags [ FGristFiles jetlib.o ] : -w ;
 
-LinkSharedOSLibs PCL6\ Compatible : be stdc++.r4 libprint.a ;
+LinkAgainst PCL6\ Compatible : be stdc++.r4 libprint.a ;
 
 Package haiku-printingkit-cvs :
 	PCL6\ Compatible :

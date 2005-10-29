@@ -1,28 +1,28 @@
-SubDir OBOS_TOP src tests kernel core disk_device_manager ;
+SubDir HAIKU_TOP src tests kernel core disk_device_manager ;
 
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src system kernel disk_device_manager jobs ] ;
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src system kernel disk_device_manager ] ;
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src system kernel fs ] ;
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kits storage ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system kernel disk_device_manager jobs ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system kernel disk_device_manager ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system kernel fs ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits storage ] ;
 	# DiskDeviceTypes.cpp
 
 #UsePrivateHeaders $(DOT) ;
 UsePrivateHeaders shared ;
-UsePrivateHeaders [ FDirName kernel boot platform $(OBOS_BOOT_PLATFORM) ] ;
+UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
-UsePrivateHeaders [ FDirName kernel arch $(OBOS_ARCH) ] ;
+UsePrivateHeaders [ FDirName kernel arch $(TARGET_ARCH) ] ;
 UsePrivateHeaders [ FDirName kernel fs ] ;
 UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders storage ;
 UsePrivateHeaders kernel ;
-UseHeaders [ FDirName $(OBOS_TOP) src system kernel disk_device_manager ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src system kernel disk_device_manager ] ;
 
 # As long as we compile for R5 userland, we define the following macros.
 SubDirCcFlags	[ FDefines USER R5_MEMORY_LAYOUT ] ;
 SubDirC++Flags	[ FDefines USER R5_MEMORY_LAYOUT ] ;
 
-SharedLibrary disk_device_manager :
+SharedLibrary libdisk_device_manager.so :
 	ddm_operation_validation.cpp
 #	ddm_userland_interface.cpp
 	disk_device_manager.cpp
@@ -66,7 +66,7 @@ SharedLibrary disk_device_manager :
 	DiskDeviceTypes.cpp
 ;
 
-LinkSharedOSLibs libdisk_device_manager.so
+LinkAgainst libdisk_device_manager.so
 	: <boot!home!config!lib>libkernelland_emu.so ;
 
 AbsSymLink <boot!home!config!lib>libdisk_device_manager.so
@@ -96,4 +96,4 @@ Depends userland_disk_system_modules :
 # KFileDiskDevice.cpp needs the virtualdrive.h Header. Add it here to not
 # contaminate the include paths for the other files.
 ObjectHdrs [ FGristFiles KFileDiskDevice$(SUFOBJ) ]
-	: [ FDirName $(OBOS_TOP) src tests kits storage virtualdrive ] ;
+	: [ FDirName $(HAIKU_TOP) src tests kits storage virtualdrive ] ;

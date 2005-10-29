@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel drivers graphics common ;
+SubDir HAIKU_TOP src add-ons kernel drivers graphics common ;
 
 SubDirCcFlags -DENABLE_LOGGING -DLOG_INCLUDE_STARTUP ;
 
@@ -6,7 +6,7 @@ UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics radeon ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 
-StaticLibrary graphicscommon :
+StaticLibrary libgraphicscommon.a :
 	log_coll.c
 	log_dump.c
 	memmgr.c

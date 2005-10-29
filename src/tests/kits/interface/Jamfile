@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kits interface ;
+SubDir HAIKU_TOP src tests kits interface ;
 
 UsePrivateHeaders interface ;
 
@@ -57,7 +57,7 @@ CommonTestLib libinterfacetest.so
 	: app support
 ;
 
-ObjectsDefines
+ObjectDefines
 	CheckBox.cpp
 	: BCheckBox=HCheckBox
 	;
@@ -115,8 +115,8 @@ SimpleTest SliderTest :
 
 SEARCH on [ FGristFiles
 		ScrollView.cpp CheckBox.cpp ChannelSlider.cpp ChannelControl.cpp Slider.cpp Control.cpp
-	] = [ FDirName $(OBOS_TOP) src kits interface ] ;
+	] = [ FDirName $(HAIKU_TOP) src kits interface ] ;
 
-SubInclude OBOS_TOP src tests kits interface bprintjob ;
-SubInclude OBOS_TOP src tests kits interface bfont ;
-SubInclude OBOS_TOP src tests kits interface picture ;
+SubInclude HAIKU_TOP src tests kits interface bprintjob ;
+SubInclude HAIKU_TOP src tests kits interface bfont ;
+SubInclude HAIKU_TOP src tests kits interface picture ;

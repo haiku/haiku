@@ -2,7 +2,7 @@
 #
 # Return information about the local PDFlib installation
 #
-# $Id: pdflib-config.in,v 1.1 2004/10/06 17:10:36 laplace Exp $
+# $Id$
 
 # installation directories
 prefix=@prefix@

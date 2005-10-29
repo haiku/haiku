@@ -1,25 +1,25 @@
-SubDir OBOS_TOP src tools cppunit ;
+SubDir HAIKU_TOP src tools cppunit ;
 
-UseHeaders [ FDirName $(OBOS_TOP) headers tools elfsymbolpatcher ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers tools elfsymbolpatcher ] ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) cppunit ] ;
 
 rule CppUnitLibrary
 {
 	# CppUnitLibrary <sources> ;
 	local _lib = libcppunit.so ;
 
-	UseCppUnitHeaders ;
-	SetupObjectsDir ;
-	MakeLocateObjects [ FGristFiles $(1) ] ;
-	BuildPlatformMain $(_lib) : $(1) ;
-	MakeLocate $(_lib) : /boot/home/config/lib ;
-	LINKFLAGS on $(_lib) = $(LINKFLAGS) -nostart -Xlinker -soname=\"$(_lib)\" ;
-
 	local defines = BUILDING_CPPUNIT ;
 
 	if $(OS) = BEOS && $(OSPLAT) = PPC {
 		defines += NO_ELF_SYMBOL_PATCHING ;
 	}
-	ObjectsDefines $(1) : $(defines) ;
+	ObjectDefines $(1) : $(defines) ;
+
+	UseCppUnitHeaders ;
+	BuildPlatformMain $(_lib) : $(1) ;
+	MakeLocate $(_lib) : /boot/home/config/lib ;
+	LINKFLAGS on $(_lib) = $(LINKFLAGS) -nostart -Xlinker -soname=\"$(_lib)\" ;
 }
 
 CppUnitLibrary
@@ -31,35 +31,37 @@ CppUnitLibrary
 	TestSuite.cpp
 	TestUtils.cpp
 	ThreadedTestCase.cpp
-	cppunit/Asserter.cpp
-	cppunit/CompilerOutputter.cpp
-	cppunit/Exception.cpp
-	cppunit/NotEqualException.cpp
-	cppunit/RepeatedTest.cpp
-	cppunit/SourceLine.cpp
-	cppunit/SynchronizedObject.cpp
-	cppunit/TestAssert.cpp
-	cppunit/TestCase.cpp
-	cppunit/TestFactoryRegistry.cpp
-	cppunit/TestFailure.cpp
-	cppunit/TestResult.cpp
-	cppunit/TestResultCollector.cpp
-	cppunit/TestRunner.cpp
-	cppunit/TestSetUp.cpp
-	cppunit/TestSucessListener.cpp
-	cppunit/TestSuite.cpp
-	cppunit/TextOutputter.cpp
-	cppunit/TextTestProgressListener.cpp
-	cppunit/TextTestResult.cpp
-	cppunit/TypeInfoHelper.cpp
-	cppunit/XmlOutputter.cpp
+
+	# cppunit
+	Asserter.cpp
+	CompilerOutputter.cpp
+	Exception.cpp
+	NotEqualException.cpp
+	RepeatedTest.cpp
+	SourceLine.cpp
+	SynchronizedObject.cpp
+	TestAssert.cpp
+	TestCase.cpp
+	TestFactoryRegistry.cpp
+	TestFailure.cpp
+	TestResult.cpp
+	TestResultCollector.cpp
+	TestRunner.cpp
+	TestSetUp.cpp
+	TestSucessListener.cpp
+	TestSuite.cpp
+	TextOutputter.cpp
+	TextTestProgressListener.cpp
+	TextTestResult.cpp
+	TypeInfoHelper.cpp
+	XmlOutputter.cpp
 ;
 
-LinkSharedOSLibs libcppunit.so :
+LinkAgainst libcppunit.so :
 	stdc++.r4	# is called `mslcpp_4_0' on PPC -- just create a symlink
 	be
 ;
 
 if  $(OS) != BEOS || $(OSPLAT) != PPC {
-	LinkSharedOSLibs libcppunit.so : libelfsymbolpatcher.a ;
+	LinkAgainst libcppunit.so : libelfsymbolpatcher.a ;
 }

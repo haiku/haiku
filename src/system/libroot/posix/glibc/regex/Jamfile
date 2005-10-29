@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src system libroot posix glibc regex ;
+SubDir HAIKU_TOP src system libroot posix glibc regex ;
 
-SubDirHdrs $(OBOS_TOP) headers ;
+SubDirHdrs $(HAIKU_TOP) headers ;
 
 KernelMergeObject posix_gnu_regex.o :
 	<$(SOURCE_GRIST)>regex.c

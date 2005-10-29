@@ -1,10 +1,14 @@
-SubDir OBOS_TOP src system libroot posix crypt ;
+SubDir HAIKU_TOP src system libroot posix crypt ;
 
 # filter warnings we don't want here
-local originalCCFlags = $(CCFLAGS) ;
-CCFLAGS = [ Filter $(CCFLAGS) : -Wall -Wmissing-prototypes -Wsign-compare ] ;
-local originalKERNEL_CCFlags = $(KERNEL_CCFLAGS) ;
-KERNEL_CCFLAGS = [ Filter $(KERNEL_CCFLAGS) : -Wall -Wmissing-prototypes -Wsign-compare ] ;
+# Note: TARGET_KERNEL_WARNING_CCFLAGS is no config variable, therefore we need
+# to save and restore the original value.
+TARGET_WARNING_CCFLAGS = [ FFilter $(CTARGET_WARNING_CCFLAGS)
+	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
+
+local original_TARGET_KERNEL_WARNING_CCFLAGS = $(TARGET_KERNEL_WARNING_CCFLAGS) ;
+TARGET_KERNEL_WARNING_CCFLAGS = [ FFilter $(TARGET_KERNEL_WARNING_CCFLAGS)
+	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
 KernelMergeObject posix_crypt.o :
 	crypt.c
@@ -12,6 +16,5 @@ KernelMergeObject posix_crypt.o :
 	: -fPIC -DPIC
 	;
 
-# restore CCFLAGS KERNEL_CCFLAGS
-CCFLAGS = $(originalCCFlags) ;
-KERNEL_CCFLAGS = $(originalKERNEL_CCFlags) ;
+# restore TARGET_KERNEL_WARNING_CCFLAGS
+TARGET_KERNEL_WARNING_CCFLAGS = $(original_TARGET_KERNEL_WARNING_CCFLAGS) ;

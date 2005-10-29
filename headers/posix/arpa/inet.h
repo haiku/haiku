@@ -55,7 +55,7 @@
 
 /*
  *	@(#)inet.h	8.1 (Berkeley) 6/2/93
- *	$Id: inet.h,v 1.6 2004/05/13 00:56:00 phoudoin Exp $
+ *	$Id$
  */
 
 #ifndef _INET_H_

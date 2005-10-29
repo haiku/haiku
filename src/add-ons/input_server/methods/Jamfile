@@ -1,3 +1,3 @@
-SubDir OBOS_TOP src add-ons input_server methods ;
+SubDir HAIKU_TOP src add-ons input_server methods ;
 
-SubInclude OBOS_TOP src add-ons input_server methods canna ;
+SubInclude HAIKU_TOP src add-ons input_server methods canna ;

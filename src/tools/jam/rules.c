@@ -44,6 +44,10 @@
 static struct hash *rulehash = 0;
 static struct hash *targethash = 0;
 
+# ifdef OPT_RULE_PROFILING_EXT
+static RULE *profiling_rule_list = 0;
+# endif
+
 
 /*
  * bindrule() - return pointer to RULE, creating it if necessary
@@ -67,6 +71,16 @@ bindrule( const char *rulename )
 	    r->bindlist = L0;
 	    r->params = L0;
 	    r->flags = 0;
+
+# ifdef OPT_RULE_PROFILING_EXT
+		if ( DEBUG_PROFILE_RULES )
+		{
+			r->invocations = 0;
+			r->invocation_time = 0;
+			r->next_profiling_rule = profiling_rule_list;
+			profiling_rule_list = r;
+		}
+# endif
 	}
 
 	return r;
@@ -358,6 +372,25 @@ freesettings( SETTINGS *v )
 void
 donerules()
 {
+# ifdef OPT_RULE_PROFILING_EXT
+	if ( DEBUG_PROFILE_RULES )
+	{
+		RULE *rule;
+
+		printf("# invoked   total time (us)   rule\n");
+		printf("---------   ---------------   "
+			"------------------------------------\n");
+
+		for (rule = profiling_rule_list;
+			 rule;
+			 rule = rule->next_profiling_rule)
+		{
+			printf("%9d   %15lld   %s\n", rule->invocations,
+				(long long)rule->invocation_time, rule->name);
+		}
+	}
+# endif
+
 	hashdone( rulehash );
 	hashdone( targethash );
 }

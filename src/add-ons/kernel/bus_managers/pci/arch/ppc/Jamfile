@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel bus_managers pci arch ppc ;
+SubDir HAIKU_TOP src add-ons kernel bus_managers pci arch ppc ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
 

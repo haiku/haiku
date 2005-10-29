@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src bin pcmcia-cs ;
+SubDir HAIKU_TOP src bin pcmcia-cs ;
 
 StdBinCommands 
 	cardctl.c

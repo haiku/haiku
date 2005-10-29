@@ -1,0 +1,137 @@
+
+rule SetupKernel
+{
+	# Usage SetupKernel <sources_or_objects> : <extra_cc_flags>;
+	#
+	# <sources_or_objects> - Ideally sources, otherwise HDRSEARCH can not be
+	#                        set for the sources and the sources some header
+	#                        dependencies might be missing.
+
+	local sources = [ FGristFiles $(1) ] ;
+	local objects = $(sources:S=$(SUFOBJ)) ;
+
+	# add private kernel headers
+	SourceSysHdrs $(sources) : $(TARGET_PRIVATE_KERNEL_HEADERS) ;
+
+	local object ;
+	for object in $(objects) {
+		# add kernel flags for the object
+		ObjectCcFlags $(object) : $(TARGET_KERNEL_CCFLAGS) $(2) ;
+		ObjectC++Flags $(object) : $(TARGET_KERNEL_C++FLAGS) $(2) ;
+
+		# override warning flags
+		TARGET_WARNING_CCFLAGS on $(object) = $(TARGET_KERNEL_WARNING_CCFLAGS) ;
+		TARGET_WARNING_C++FLAGS on $(object)
+			= $(TARGET_KERNEL_WARNING_C++FLAGS) ;
+	}
+}
+
+rule KernelObjects
+{
+	SetupKernel $(1) : $(2) ;
+	Objects $(1) ;
+}
+
+rule KernelLd
+{
+	# KernelLd <name> : <objs> : <linkerscript> : <args> ;
+
+	LINK on $(1) = $(TARGET_LD) ;
+
+	LINKFLAGS on $(1) = $(4) ;
+	if $(3) { LINKFLAGS on $(1) += --script=$(3) ; }
+
+	# Remove any preset LINKLIBS, but link against libgcc.a
+	LINKLIBS on $(1) = $(TARGET_GCC_LIBGCC) ;
+
+	# TODO: Do we really want to invoke SetupKernel here? The objects should
+	# have been compiled with KernelObjects anyway, so we're doing that twice.
+	SetupKernel $(2) ;
+
+	# Show that we depend on the libraries we need
+	LocalClean clean : $(1) ;
+	LocalDepends all : $(1) ;
+	Depends $(1) : $(2) ;
+
+	MakeLocateDebug $(1) ; 
+}
+
+actions KernelLd
+{
+	$(LINK) $(LINKFLAGS) -o "$(1)" "$(2)" $(LINKLIBS) ;
+}
+
+rule KernelAddon
+{
+	# KernelAddon <name> : <relpath> : <sources> : <static-libraries> ;	
+
+	local sources = $(3) ;
+
+	# platform supported?
+	on $(1) {
+		if ! $(PLATFORM) in $(SUPPORTED_PLATFORMS) {
+			return ;
+		}
+	}
+
+	# When building for Haiku, we link against kernel.so, otherwise
+	# against the system kernel.
+	local kernel ;
+	if [ on $(1) return $(PLATFORM) ] = haiku {
+		kernel = <nogrist>kernel.so ;
+	} else {
+		kernel = /boot/develop/lib/x86/_KERNEL_ ;
+	}
+
+	SetupKernel $(sources) : -fno-pic ;
+
+	Addon $(1) : $(2) : $(sources) ;
+	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ] -nostdlib ;
+	LinkAgainst $(1) : $(4) $(kernel) ;
+}
+
+rule KernelMergeObject
+{
+	# KernelMergeObject <name> : <sources> : <extra CFLAGS> : <other objects> ;
+	# Compiles source files and merges the object files to an object file.
+	# <name>: Name of the object file to create. No grist will be added.
+	# <sources>: Sources to be compiled. Grist will be added.
+	# <extra CFLAGS>: Additional flags for compilation.
+	# <other objects>: Object files or static libraries to be merged. No grist
+	#                  will be added.
+	#
+
+	SetupKernel $(2) : $(3) ;
+	Objects $(2) ;
+	MergeObjectFromObjects $(1) : $(2:S=$(SUFOBJ)) : $(4) ;
+}
+
+rule KernelStaticLibrary
+{
+	# Usage KernelStaticLibrary <name> : <sources> : <extra cc flags>  ;
+	# This is designed to take a set of sources and libraries and create
+	# a file called lib<name>.a
+
+	SetupKernel $(2) : $(3) ;
+	Library $(1) : $(2) ;
+}
+
+rule KernelStaticLibraryObjects
+{
+	# Usage KernelStaticLibrary <name> : <sources> ;
+	# This is designed to take a set of sources and libraries and create
+	# a file called <name>
+
+	# Show that we depend on the libraries we need
+	SetupKernel $(2) ;
+	LocalClean clean : $(1) ;
+	LocalDepends all : $(1) ;
+	Depends $(1) : $(2) ;
+
+	MakeLocateDebug $(1) ;
+}
+
+actions KernelStaticLibraryObjects
+{
+	$(HAIKU_AR) -r "$(1)" "$(2)" ;
+}

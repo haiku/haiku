@@ -1,6 +1,8 @@
-SubDir OBOS_TOP src add-ons media plugins avi_reader ;
+SubDir HAIKU_TOP src add-ons media plugins avi_reader ;
 
 UsePrivateHeaders media ;
+
+SubDirHdrs [ FDirName $(SUBDIR) libOpenDML ] ;
 
 Addon avi_reader : media plugins :
 	avi_reader.cpp
@@ -8,8 +10,7 @@ Addon avi_reader : media plugins :
 	false
 	:
 	libopendml.a
+	be libmedia.so
 ;
 
-LinkSharedOSLibs avi_reader : be libmedia.so ;
-
-SubInclude OBOS_TOP src add-ons media plugins avi_reader libOpenDML ;
+SubInclude HAIKU_TOP src add-ons media plugins avi_reader libOpenDML ;

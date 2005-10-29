@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src system boot platform openfirmware ;
+SubDir HAIKU_TOP src system boot platform openfirmware ;
 
 SubDirC++Flags -fno-rtti ;
 
@@ -14,10 +14,10 @@ KernelMergeObject boot_platform_openfirmware.o :
 	<$(SOURCE_GRIST)>video.cpp
 	<$(SOURCE_GRIST)>menu.cpp
 	:
-	: boot_platform_openfirmware_$(OBOS_ARCH).a
+	: boot_platform_openfirmware_$(TARGET_ARCH).a
 	;
 
 SEARCH on [ FGristFiles crt0.S ]
-    = [ FDirName $(OBOS_TOP) src system boot arch $(OBOS_ARCH) ] ;
+    = [ FDirName $(HAIKU_TOP) src system boot arch $(TARGET_ARCH) ] ;
 
-SubInclude OBOS_TOP src system boot platform openfirmware arch ;
+SubInclude HAIKU_TOP src system boot platform openfirmware arch ;

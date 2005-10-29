@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# configure [ --floppy <floppy location> ]
+# configure [ <options> ]
 
 # usage
 #
@@ -16,10 +16,37 @@ options:
                               (device or image).
   --bochs-debug               Enables bochs serial debug emulation (activated 
                               via kernel settings file).
+  --cross-tools-prefix <prefix>
+                              Assume cross compilation. <prefix> should be a
+                              path to the directory where the cross
+                              compilation tools are located, plus the platform
+                              prefix, e.g. "/path/to/tools/i586-pc-beos-".
+                              This overrides the HAIKU_* tool variables.
+  --build-cross-tools <build tools dir>
+                              Assume cross compilation. <build tools dir>
+                              defines the location of the build tools sources.
+                              They will be compiled and placed in the output
+                              directory under "cross-tools". The HAIKU_* tools
+                              variables will be set accordingly.
   --target=TARGET             Select build target platform. [default=${target}]
                               valid targets=r5,bone,dano,haiku
   --include-gpl-addons        Include GPL licensed add-ons.
   --help                      Prints out this help.
+
+environment variables:
+  HAIKU_AR                    The static library archiver. Defaults to "ar".
+  HAIKU_CC                    The compiler. Defaults to "gcc".
+  HAIKU_LD                    The linker. Defaults to "ld".
+  HAIKU_OBJCOPY               The objcopy to be used. Defaults to "objcopy".
+  HAIKU_RANLIB                The static library indexer. Defaults to "ranlib".
+  HAIKU_CPPFLAGS              The preprocessor flags. Defaults to "".
+  HAIKU_CCFLAGS               The C flags. Defaults to "".
+  HAIKU_CXXFLAGS              The C++ flags. Defaults to "".
+  HAIKU_LDFLAGS               The linker flags. Defaults to "".
+  HAIKU_ARFLAGS               The flags passed to HAIKU_AR for archiving.
+                              Defaults to "ru".
+  HAIKU_UNARFLAGS             The flags passed to HAIKU_AR for unarchiving.
+                              Defaults to "x".
 EOF
 }
 
@@ -42,31 +69,83 @@ assertparam()
 standard_gcc_settings()
 {
 	# PLATFORM_LINKLIBS
-	gcclib=`gcc -print-libgcc-file-name`
+	gcclib=`$HAIKU_CC -print-libgcc-file-name`
 	gccdir=`dirname ${gcclib}`
-	gcc_version=`gcc -dumpversion`
-	if [ "x${PLATFORM_LINKLIBS}" == "x" ] ; then
-		PLATFORM_LINKLIBS="-L ${gccdir} -lgcc"
-	fi
-	if [ "x${PLATFORM_HEADERS}" == "x" ] ; then
-		PLATFORM_HEADERS="${gccdir}/include"
-	fi
-	if [ "${LIBGCC_DIR}" == "" ] ; then
-		LIBGCC_DIR="${gccdir}"
-	fi
-	if [ "${LIBGCC_OBJECTS}" == "" ] ; then
-		LIBGCC_OBJECTS=`ar t ${gccdir}/libgcc.a`
-	fi
+	haikuGCCVersion=`$HAIKU_CC -dumpversion`
+	haikuGCCMachine=`$HAIKU_CC -dumpmachine`
+	
+	HAIKU_GCC_LIB_DIR=${gccdir}
+	HAIKU_GCC_LIBGCC=${gccdir}/libgcc.a
+	HAIKU_GCC_GLUE_CODE="crtbegin.o crtend.o"
+	HAIKU_GCC_HEADERS_DIR=${gccdir}/include
+	HAIKU_GCC_LIBGCC_OBJECTS=`ar t ${HAIKU_GCC_LIBGCC}`
 }
+
+# set_default_value
+#
+# Set the value for a variable, if no value is set yet.
+#
+set_default_value()
+{
+	local var=$1;
+	# any better way?
+	(set -u; (eval "echo \${$var}") &> /dev/null) || eval "$var=$2"
+}
+
+# get_build_tool_path
+#
+# Gets a usable absolute path of a build tool.
+#
+get_build_tool_path()
+{
+	local var="HAIKU_$1"
+	local tool=$2
+	local path="${crossToolsPrefix}$tool"
+	
+	if [ -f "$path" ]; then
+		# get absolute path
+		local oldPwd=$(pwd)
+		cd $(dirname "$path")
+		path="$(pwd)/$(basename "$path")"
+		cd $oldPwd
+	else
+		which "$path" &> /dev/null || {
+			echo "Build tool \"$path\" not found." >&2
+			exit 1
+		}
+	fi
+	
+	eval "$var=$path"
+}
+
+# get cwd and the source directory
+currentDir=`pwd`
+cd `dirname $0`
+sourceDir=`pwd`
+cd $currentDir
 
 # default parameter values
 #
 platform=`uname`
-gcc_version=
+haikuGCCVersion=
 floppy=
 bochs_debug=0
 include_gpl_addons=0
 target=haiku
+crossToolsPrefix=
+buildCrossTools=
+
+set_default_value HAIKU_AR			ar
+set_default_value HAIKU_CC			gcc
+set_default_value HAIKU_LD			ld
+set_default_value HAIKU_OBJCOPY		objcopy
+set_default_value HAIKU_RANLIB		ranlib
+set_default_value HAIKU_CPPFLAGS	""
+set_default_value HAIKU_CCFLAGS		""
+set_default_value HAIKU_CXXFLAGS	""
+set_default_value HAIKU_LDFLAGS		""
+set_default_value HAIKU_ARFLAGS		ru
+set_default_value HAIKU_UNARFLAGS	x
 
 # host BeOS recognition not needed anymore
 # revision=`uname -r`
@@ -85,6 +164,8 @@ while [ $# \> 0 ] ; do
 		--floppy)		assertparam "$1" $#; floppy=$2; shift 2;;
 		--bochs-debug)	bochs_debug=1; shift 1;;
 		--target=*)     target=`echo $1 | cut -d'=' -f2-`; shift 1;;
+		--cross-tools-prefix) assertparam "$1" $#; crossToolsPrefix=$2; shift 2;;
+		--build-cross-tools) assertparam "$1" $#; buildCrossTools=$2; shift 2;;
 		--help | -h)	usage; exit 0;;
 		*)				echo Invalid argument: \`$1\'; exit 1;;
 	esac
@@ -100,55 +181,121 @@ if [ -n "$floppy" ]; then
 	esac
 fi
 
-# platform specific GCC settings
-case "$platform" in
-	BeOS | Haiku | Linux)
-		standard_gcc_settings ;;
-	*)
-		# Unknown platform
-		echo Unsupported platform: ${platform}
-		exit 1 ;;
+case "${platform}" in
+	BeOS)	buildPlatform=r5 ;;
+	Linux)	buildPlatform=linux ;;
+	*)		echo Unsupported platform: ${platform}
+			exit 1 ;;
 esac
 
+# create output directory
+if [ "$currentDir" = "$sourceDir" ]; then
+	outputDir=$currentDir/generated
+else
+	outputDir=$currentDir
+fi
+buildOutputDir=$outputDir/build
+buildAttributesDir=$outputDir/attributes
+mkdir -p $buildOutputDir || exit 1
+
+# build cross tools from sources
+if [ -n "$buildCrossTools" ]; then
+	"$sourceDir/build/scripts/build_cross_tools"  "$sourceDir" \
+		"$buildCrossTools" || exit 1
+	crossToolsPrefix=$outputDir/cross-tools/bin/i586-pc-beos-
+fi
+
+# cross tools
+if [ -n "$crossToolsPrefix" ]; then
+	get_build_tool_path AR ar
+	get_build_tool_path CC gcc
+	get_build_tool_path LD ld
+	get_build_tool_path OBJCOPY objcopy
+	get_build_tool_path RANLIB ranlib
+fi
+
+# prepare gcc settings
+standard_gcc_settings
+
 # Generate BuildConfig
-cat << EOF > build/BuildConfig
+cat << EOF > $buildOutputDir/BuildConfig
 # BuildConfig
 # Note: This file has been automatically generated by configure.
 
 FLOPPY_PATH			?= "${floppy}" ;
-PLATFORM_LINKLIBS	?= ${PLATFORM_LINKLIBS} ;
-PLATFORM_HEADERS	?= ${PLATFORM_HEADERS} ;
-GCC_RAW_VERSION		?= ${gcc_version} ;
-LIBGCC_DIR			?= ${LIBGCC_DIR} ;
 BOCHS_DEBUG_HACK	?= ${bochs_debug} ;
 INCLUDE_GPL_ADDONS	?= ${include_gpl_addons} ;
 TARGET_PLATFORM 	?= ${target} ;
+HOST_PLATFORM		?= ${buildPlatform} ;
+
+HAIKU_GCC_RAW_VERSION	?= ${haikuGCCVersion} ;
+HAIKU_GCC_MACHINE		?= ${haikuGCCMachine} ;
+HAIKU_GCC_LIB_DIR		?= ${HAIKU_GCC_LIB_DIR} ;
+HAIKU_GCC_HEADERS_DIR	?= ${HAIKU_GCC_HEADERS_DIR} ;
+HAIKU_GCC_LIBGCC		?= ${HAIKU_GCC_LIBGCC} ;
+
+HAIKU_BUILD_ATTRIBUTES_DIR	?= ${buildAttributesDir} ;
+
+HAIKU_AR			?= ${HAIKU_AR} ;
+HAIKU_CC			?= ${HAIKU_CC} ;
+HAIKU_LD			?= ${HAIKU_LD} ;
+HAIKU_OBJCOPY		?= ${HAIKU_OBJCOPY} ;
+HAIKU_RANLIB		?= ${HAIKU_RANLIB} ;
+HAIKU_CPPFLAGS		?= ${HAIKU_CPPFLAGS} ;
+HAIKU_CCFLAGS		?= ${HAIKU_CCFLAGS} ;
+HAIKU_CXXFLAGS		?= ${HAIKU_CXXFLAGS} ;
+HAIKU_LDFLAGS		?= ${HAIKU_LDFLAGS} ;
+HAIKU_ARFLAGS		?= ${HAIKU_ARFLAGS} ;
+HAIKU_UNARFLAGS		?= ${HAIKU_UNARFLAGS} ;
+
 EOF
 
 # Libgcc.a objects
 
-cat << EOF > build/libgccObjects
+cat << EOF > $buildOutputDir/libgccObjects
 # libgcc.a objects to be linked against libroot.so
 # Note: This file has been automatically generated by configure.
 
-LIBGCC_OBJECTS ?= ${LIBGCC_OBJECTS} ;
+HAIKU_GCC_LIBGCC_OBJECTS	?= ${HAIKU_GCC_LIBGCC_OBJECTS} ;
 EOF
 
 # Generate Timezones binaries bindings
 
-cat << EOF > build/Timezones
+timezoneSources="africa antarctica asia australasia europe northamerica
+	southamerica pacificnew etcetera factory backward"
+
+cat << EOF > $buildOutputDir/Timezones
 # Timezones used for the build
 # Note: This file has been automatically generated by configure.
 
+HAIKU_TIME_ZONE_SOURCES = ${timezoneSources} ;
+
 EOF
 
-timezones=`echo src/data/etc/timezones/* | sed -e s@src/data/etc/timezones/.svn@@`
-for f in ${timezones}; 
-do 
+for source in ${timezoneSources}; do
+	f=$sourceDir/src/data/etc/timezones/$source
 
 TZOBJECTS=`gawk '/^Zone/ { print $2 } /^Link/ { print $3 } ' $f `
 
-cat << EOF >> build/Timezones
-TZ_OBJECTS on <src!data!etc!timezones>${f##src/data/etc/timezones/} ?= $TZOBJECTS ;
+cat << EOF >> $buildOutputDir/Timezones
+TZ_OBJECTS on <timezone-source>${source} ?= $TZOBJECTS ;
 EOF
 done
+
+# Generate a boot strap Jamfile in the output directory, if it is not in
+# the source dir.
+
+if [ "$currentDir" != "$sourceDir" ]; then
+
+cat << EOF > $outputDir/Jamfile
+# automatically generated Jamfile
+
+HAIKU_TOP			= ${sourceDir} ;
+HAIKU_OUTPUT_DIR	= ${outputDir} ;
+
+include [ FDirName \$(HAIKU_TOP) Jamfile ] ;
+
+EOF
+
+fi
+

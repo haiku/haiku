@@ -1,9 +1,11 @@
-SubDir OBOS_TOP src add-ons accelerants skeleton engine ;
+SubDir HAIKU_TOP src add-ons accelerants skeleton engine ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics skeleton ] ;
 
-StaticLibrary skeleton_engine :
+StaticLibrary libskeleton_engine.a :
 	acc.c
 	bes.c
 	tvout.c

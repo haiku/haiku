@@ -1,21 +1,27 @@
-SubDir OBOS_TOP src data etc timezones ;
+SubDir HAIKU_TOP src data etc timezones ;
 
 NotFile timezone_files ;
 Depends files : timezone_files ;
 
 rule MkZicComp
 {
-	local binaries = $(1) ;
-	local source = $(2) ;
+	local source = $(1:G=timezone-source) ;
+	local binaries = [ FTimeZoneBinaries $(source) : true ] ;
 
 	SEARCH on $(source) = $(SEARCH_SOURCE) ;
 	
-	MakeLocate $(binaries) : [ FDirName $(OBOS_ETC_DIR) timezones ] ;
+	local targetDir = $(TARGET_COMMON_DEBUG_LOCATE_TARGET) ;
+	targetDir = $(targetDir:G=dir) ;
 	
-	LocalDepends timezone_files : $(binaries) ;
-	Depends $(binaries) : $(source) zic ;
+	# introduce a pseudo target all binaries depend on
+	local pseudoBinary = $(source:G=timezone-binary) ;
+	NotFile $(pseudoBinary) ;
+	Depends $(pseudoBinary) : $(binaries) ;
+	LocalDepends timezone_files : $(pseudoBinary) ;
 	
-	MkZicComp1 $(binaries) : zic $(source) "" ;
+	Depends $(binaries) : $(source) zic $(targetDir) ;
+	
+	MkZicComp1 $(binaries) : zic $(source) $(targetDir) ;
 	LocalClean clean : $(binaries) ;
 }
 
@@ -24,14 +30,21 @@ actions MkZicComp1
 	$(2[1]) -d "$(2[3])" -L /dev/null "$(2[2])" ;
 }
 
-local timezoneFiles = africa antarctica asia australasia 
-		europe northamerica southamerica 
-		pacificnew etcetera factory backward ;
-
-# generate the binary file for the timezone files
-local tzFile ;
-for tzFile in [ FGristFiles $(timezoneFiles) ] {
-	local binaries = [ on $(tzFile) return $(TZ_OBJECTS) ] ;
-	MkZicComp [ FGristFiles $(binaries) ] : $(tzFile) ;
+actions MkZicCompDummy
+{
 }
 
+# generate the binary files for the timezone files
+MkDir $(TARGET_COMMON_DEBUG_LOCATE_TARGET) ;
+local tzFile ;
+local backward = [ FGristFiles backward ] ;
+for tzFile in $(HAIKU_TIME_ZONE_SOURCES) {
+	MkZicComp $(tzFile) ;
+}
+
+# The "backward" source file causes links to files generated from
+# other sources to be created. Therefore we introduce dependencies here.
+local nonBackwardBinaries = [ FFilter $(HAIKU_TIME_ZONE_SOURCES) : backward ] ;
+nonBackwardBinaries = $(nonBackwardBinaries:G=timezone-binary) ;
+Depends [ FTimeZoneBinaries [ FGristFiles backward ] ]
+	: $(nonBackwardBinaries) ;

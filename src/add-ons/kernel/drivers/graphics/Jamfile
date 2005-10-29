@@ -1,14 +1,14 @@
-SubDir OBOS_TOP src add-ons kernel drivers graphics ;
+SubDir HAIKU_TOP src add-ons kernel drivers graphics ;
 
-SubInclude OBOS_TOP src add-ons kernel drivers graphics common ;
-SubInclude OBOS_TOP src add-ons kernel drivers graphics et6x00 ;
-SubInclude OBOS_TOP src add-ons kernel drivers graphics matrox ;
-SubInclude OBOS_TOP src add-ons kernel drivers graphics neomagic ;
-SubInclude OBOS_TOP src add-ons kernel drivers graphics nvidia ;
-SubInclude OBOS_TOP src add-ons kernel drivers graphics radeon ;
-SubInclude OBOS_TOP src add-ons kernel drivers graphics tdfx ;
-SubInclude OBOS_TOP src add-ons kernel drivers graphics skeleton ;
-SubInclude OBOS_TOP src add-ons kernel drivers graphics vesa ;
-SubInclude OBOS_TOP src add-ons kernel drivers graphics via ;
+SubInclude HAIKU_TOP src add-ons kernel drivers graphics common ;
+SubInclude HAIKU_TOP src add-ons kernel drivers graphics et6x00 ;
+SubInclude HAIKU_TOP src add-ons kernel drivers graphics matrox ;
+SubInclude HAIKU_TOP src add-ons kernel drivers graphics neomagic ;
+SubInclude HAIKU_TOP src add-ons kernel drivers graphics nvidia ;
+SubInclude HAIKU_TOP src add-ons kernel drivers graphics radeon ;
+SubInclude HAIKU_TOP src add-ons kernel drivers graphics tdfx ;
+SubInclude HAIKU_TOP src add-ons kernel drivers graphics skeleton ;
+SubInclude HAIKU_TOP src add-ons kernel drivers graphics vesa ;
+SubInclude HAIKU_TOP src add-ons kernel drivers graphics via ;
 
-SubIncludeGPL OBOS_TOP src add-ons kernel drivers graphics atimach64 ;
+SubIncludeGPL HAIKU_TOP src add-ons kernel drivers graphics atimach64 ;

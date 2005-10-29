@@ -1,7 +1,7 @@
-SubDir OBOS_TOP src tests add-ons kernel file_systems bfs mkbfs ;
+SubDir HAIKU_TOP src tests add-ons kernel file_systems bfs mkbfs ;
 
-SubDirHdrs $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ;
-SubDirHdrs $(OBOS_TOP) src tests add-ons kernel file_systems bfs r5 ;
+SubDirHdrs $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell ;
+SubDirHdrs $(HAIKU_TOP) src tests add-ons kernel file_systems bfs r5 ;
 UsePrivateHeaders [ FDirName kernel ] ;
 
 {
@@ -46,13 +46,13 @@ SEARCH on [ FGristFiles
 		Volume.cpp BPlusTree.cpp Inode.cpp Index.cpp Query.cpp Journal.cpp
 		BlockAllocator.cpp kernel_interface_r5.cpp Utility.cpp BufferPool.cpp
 		Debug.cpp
-	] = [ FDirName $(OBOS_TOP) src tests add-ons kernel file_systems bfs r5 ] ;
+	] = [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems bfs r5 ] ;
 
 SEARCH on [ FGristFiles
 		fsh.c rootfs.c initfs.c kernel.c cache.c sl.c stub.c tracker.cpp
 		sysdep.c hexdump.c argv.c errors.cpp
-	] = [ FDirName $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ] ;
+	] = [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell ] ;
 
 SEARCH on [ FGristFiles
 		kernel_cpp.cpp
-	] = [ FDirName $(OBOS_TOP) src system kernel util ] ;
+	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;

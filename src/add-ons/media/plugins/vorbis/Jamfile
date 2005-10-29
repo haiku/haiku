@@ -1,16 +1,15 @@
-SubDir OBOS_TOP src add-ons media plugins vorbis ;
+SubDir HAIKU_TOP src add-ons media plugins vorbis ;
 
 UsePrivateHeaders media ;
 
 SubDirHdrs $(SUBDIR) .. ogg ;
-SubDirHdrs $(SUBDIR) .. ogg libogg ;
+SubDirSysHdrs $(SUBDIR) .. ogg libogg ;
 SubDirHdrs $(SUBDIR) libvorbis vorbis ;
 
 Addon vorbis : media plugins :
 	vorbisCodecPlugin.cpp
-	: false : libvorbis.a libogg.a
+	: false
+	: libvorbis.a libogg.a be libmedia.so
 ;
 
-LinkSharedOSLibs vorbis : be libmedia.so ;
-
-SubInclude OBOS_TOP src add-ons media plugins vorbis libvorbis ;
+SubInclude HAIKU_TOP src add-ons media plugins vorbis libvorbis ;

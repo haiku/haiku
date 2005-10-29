@@ -1,2 +1,2 @@
-SubDir OBOS_TOP src system boot arch mips ;
+SubDir HAIKU_TOP src system boot arch mips ;
 

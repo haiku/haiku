@@ -1,3 +1,0 @@
-SubDir OBOS_TOP src tests kernel boot_floppy echo ;
-
-KernelObjects <$(SOURCE_GRIST)>main.c : -fpic -Wno-unused ;

@@ -1,0 +1,41 @@
+SubDir HAIKU_TOP src build libroot ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) headers build ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers build os ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers build os app ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers build os kernel ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers build os interface ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers build os storage ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) headers build private kernel ] : true ;
+
+{
+	local defines = [ FDefines
+		HAIKU_BUILD_ATTRIBUTES_DIR="\\\"$(HAIKU_BUILD_ATTRIBUTES_DIR)\\\""
+	] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+}
+
+# locate the library
+MakeLocate libroot_build.so : $(HOST_BUILD_COMPATIBILITY_LIB_DIR) ;
+
+BuildPlatformSharedLibrary libroot_build.so :
+	byteorder.cpp
+	errors.cpp
+	fs.cpp
+	fs_attr.cpp
+	misc.cpp
+	sem.cpp
+	thread.cpp
+
+	strlcpy.c
+	strlcat.c
+
+	:
+	$(HOST_LIBSTDC++)
+;
+
+SEARCH on [ FGristFiles strlcat.c strlcpy.c ]
+	= [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;

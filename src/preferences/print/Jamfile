@@ -1,4 +1,6 @@
-SubDir OBOS_TOP src preferences print ;
+SubDir HAIKU_TOP src preferences print ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders interface shared print ;
 

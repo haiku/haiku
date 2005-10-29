@@ -1,4 +1,4 @@
-/* PDFlib GmbH cvsid: $Id: port.h,v 1.1 2004/10/06 17:46:51 laplace Exp $ */
+/* PDFlib GmbH cvsid: $Id$ */
 
 #ifndef TIFF_PORT_H
 #define TIFF_PORT_H 1

@@ -1,4 +1,6 @@
-SubDir OBOS_TOP src add-ons kernel drivers network wb840 ;
+SubDir HAIKU_TOP src add-ons kernel drivers network wb840 ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 # set some additional flags
 SubDirCcFlags -Wall ;
@@ -6,7 +8,7 @@ SubDirCcFlags -Wall ;
 # For ether_driver.h
 UsePrivateHeaders net ;
 
-R5KernelAddon wb840 : kernel drivers bin :
+KernelAddon wb840 : kernel drivers bin :
 	driver.c
 	device.c
 	interface.c
@@ -16,9 +18,7 @@ R5KernelAddon wb840 : kernel drivers bin :
 Package haiku-wb840-cvs :
 	wb840 : 
 	boot home config add-ons kernel drivers bin ;
-Package haiku-wb840-cvs :
-	<kernel!drivers!dev!net>wb840 :
-	boot home config add-ons kernel drivers dev net ;
+PackageDriverSymLink haiku-wb840-cvs : net wb840 ;
 # Package haiku-wb840-cvs :
 #	wb840.settings :
 #	boot home config settings kernel drivers sample ;
@@ -26,23 +26,11 @@ Package haiku-wb840-cvs :
 Package haiku-networkingkit-cvs :
 	wb840 :
 	boot home config add-ons kernel drivers bin ;
-Package haiku-networkingkit-cvs :
-	<kernel!drivers!dev!net>wb840 :
-	boot home config add-ons kernel drivers dev net ;
+PackageDriverSymLink haiku-networkingkit-cvs : net wb840 ;
 #Package haiku-networkingkit-cvs :
 #	wb840.settings :
 #	boot home config settings kernel drivers sample ;
 
-
-
-# Link driver(s) to kernel/drivers/dev/net
-{
-	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev net ] ;
-
-	local instDriver = <kernel!drivers!dev!net>wb840 ;
-	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : wb840 ;
-}
 
 
 rule Installwb840
@@ -59,11 +47,11 @@ actions ignore Installwb840
 
 # Installation
 
-OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
+HaikuInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
  	wb840 
 ;
 
-OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
+HaikuInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
 	<installed>wb840 : 
 	installed-symlink 
 ;

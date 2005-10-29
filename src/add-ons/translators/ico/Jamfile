@@ -1,7 +1,9 @@
-SubDir OBOS_TOP src add-ons translators ico ;
+SubDir HAIKU_TOP src add-ons translators ico ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 # Include code from shared translator directory
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons translators shared ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons translators shared ] ;
 
 Translator ICOTranslator :
 	# ICOTranslator classes
@@ -14,9 +16,9 @@ Translator ICOTranslator :
 	BaseTranslator.cpp
 	TranslatorSettings.cpp
 	TranslatorWindow.cpp
-	;
 
-LinkSharedOSLibs ICOTranslator : be translation ;
+	: be translation
+;
 
 Package haiku-translationkit-cvs :
 	ICOTranslator

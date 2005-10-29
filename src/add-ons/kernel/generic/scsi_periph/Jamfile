@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel generic scsi_periph ;
+SubDir HAIKU_TOP src add-ons kernel generic scsi_periph ;
 
 UsePrivateHeaders kernel ;
 

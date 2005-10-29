@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src apps glteapot ;
+SubDir HAIKU_TOP src apps glteapot ;
 
-App GLTeapot :
+Application GLTeapot :
 	FPS.cpp
 	GLObject.cpp
 	ObjectView.cpp

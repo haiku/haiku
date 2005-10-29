@@ -1,9 +1,8 @@
-SubDir OBOS_TOP src add-ons media plugins aiff_reader ;
+SubDir HAIKU_TOP src add-ons media plugins aiff_reader ;
 
 UsePrivateHeaders media ;
 
 Addon aiff_reader : media plugins :
 	aiff_reader.cpp
-;
-
-LinkSharedOSLibs aiff_reader : be libmedia.so ;
+	: false
+	: be libmedia.so ;

@@ -1,6 +1,11 @@
-SubDir OBOS_TOP src add-ons input_server methods canna ;
+SubDir HAIKU_TOP src add-ons input_server methods canna ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders interface ;
+
+SubDirSysHdrs $(SUBDIR) ;
+SubDirHdrs [ FDirName $(SUBDIR) canna ] ;
 
 if $(TARGET_PLATFORM) != haiku {
 	SubDirC++Flags -fmultiple-symbol-spaces ;
@@ -19,5 +24,5 @@ Package haiku-cannaIM-cvs :
 	canna :
 	boot home config add-ons input_server methods ;
 
-SubInclude OBOS_TOP src add-ons input_server methods canna lib ;
-SubInclude OBOS_TOP src add-ons input_server methods canna rk ;
+SubInclude HAIKU_TOP src add-ons input_server methods canna lib ;
+SubInclude HAIKU_TOP src add-ons input_server methods canna rk ;

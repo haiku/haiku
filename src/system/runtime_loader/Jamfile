@@ -1,5 +1,6 @@
-SubDir OBOS_TOP src system runtime_loader ;
+SubDir HAIKU_TOP src system runtime_loader ;
 
+SubDirHdrs [ FDirName $(SUBDIR) arch ] ;
 UsePrivateHeaders runtime_loader ;
 
 KernelObjects 
@@ -14,8 +15,8 @@ KernelStaticLibraryObjects librld.a :
 	# needed for rld.so only
 	<src!system!libroot!os>syscalls.o
 	<src!system!libroot!os>sem.o
-	<src!system!libroot!os!arch!$(OBOS_ARCH)>atomic.o
-	<src!system!libroot!os!arch!$(OBOS_ARCH)>thread.o
+	<src!system!libroot!os!arch!$(TARGET_ARCH)>atomic.o
+	<src!system!libroot!os!arch!$(TARGET_ARCH)>thread.o
 
 	<src!system!libroot!posix>errno.o
 
@@ -56,8 +57,7 @@ KernelLd rld.so :
 	<$(SOURCE_GRIST)>rldheap.o
 	<$(SOURCE_GRIST)>rldaux.o
 	librld.a
-	: $(SUBDIR)/arch/$(OBOS_ARCH)/rld.ld
+	: $(SUBDIR)/arch/$(TARGET_ARCH)/rld.ld
 	:
 	:
-	: beos/system/lib/rld.so
 	;

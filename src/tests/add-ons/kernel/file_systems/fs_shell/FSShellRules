@@ -9,14 +9,11 @@ rule SetupFSShellIncludes
 	# Overwrite any exiting content when changing HDRS. This rule may be invoked multiple times.
 
 	# Use headers directory, to allow to do things like include <posix/string.h>
-	HDRS = [ FDirName $(OBOS_TOP) headers ] ;
+	SYSHDRS = [ FDirName $(OBOS_TOP) headers ] ;
 
 	# Use public OS header directories
-	HDRS += [ PublicHeaders $(os_includes) ] ;
+	SYSHDRS += [ PublicHeaders $(os_includes) ] ;
 
 	# Use the root of the private headers -- not so nice, but simplifies things.
-	HDRS += [ PrivateHeaders $(DOT) ] ;
-
-	# The platform dependent headers.
-	HDRS += $(PLATFORM_HEADERS) ;
+	SYSHDRS += [ PrivateHeaders $(DOT) ] ;
 }

@@ -1,10 +1,14 @@
-SubDir OBOS_TOP src bin gawk intl ;
+SubDir HAIKU_TOP src bin gawk intl ;
+
+# filter warnings we don't want here
+TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
+	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
 SubDirCcFlags -DLOCALEDIR='\"/share/locale\"' -DLOCALE_ALIAS_PATH='\"/share/locale\"' -DLIBDIR='\"/usr/local/lib\"' -DIN_LIBINTL -DENABLE_RELOCATABLE=1 -DIN_LIBRARY -DINSTALLDIR='\"/usr/local/lib\"' -DNO_XMALLOC -Dset_relocation_prefix=libintl_set_relocation_prefix -Drelocate=libintl_relocate -DDEPENDS_ON_LIBICONV=1 -DHAVE_CONFIG_H ;
 
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
-StaticLibrary <gawk>intl : 
+StaticLibrary <gawk>libintl.a : 
 	bindtextdom.c
 	dcgettext.c
 	dgettext.c
@@ -27,5 +31,4 @@ StaticLibrary <gawk>intl :
 	log.c
 	osdep.c
 	intl-compat.c
-	: [ FCurrentObjectsDir ]
 ;

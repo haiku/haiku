@@ -13,7 +13,7 @@
 #include <stdlib.h>
 
 
-extern int main(int argc, char **argv);
+extern int main(int argc, char **argv, char **env);
 
 int _start(int argc, char **argv, char **env, struct uspace_program_args *args);
 
@@ -35,7 +35,7 @@ _start(int argc, char **argv, char **_environ, struct uspace_program_args *args)
 	argv_save = args->argv;
 	__main_thread_id = find_thread(NULL);
 
-	returnCode = main(args->argc, args->argv);
+	returnCode = main(args->argc, args->argv, args->envp);
 
 	exit(returnCode);
 	return 0;

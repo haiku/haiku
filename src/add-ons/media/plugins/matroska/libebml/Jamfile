@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src add-ons media plugins matroska libebml ;
+SubDir HAIKU_TOP src add-ons media plugins matroska libebml ;
 
-StaticLibrary ebml :
+StaticLibrary libebml.a :
 	Debug.cpp
 	EbmlBinary.cpp
 	EbmlContexts.cpp

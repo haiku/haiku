@@ -1,8 +1,8 @@
-SubDir OBOS_TOP src tools elfsymbolpatcher ;
+SubDir HAIKU_TOP src tools elfsymbolpatcher ;
 
-UseHeaders [ FDirName $(OBOS_TOP) headers tools elfsymbolpatcher ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers tools elfsymbolpatcher ] ;
 
-StaticLibrary elfsymbolpatcher
+StaticLibrary libelfsymbolpatcher.a
 	: ElfFile.cpp
 	  ElfImage.cpp
 	  ElfSymbolPatcher.cpp

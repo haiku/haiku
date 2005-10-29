@@ -1,11 +1,15 @@
-SubDir OBOS_TOP src bin bash lib glob ;
+SubDir HAIKU_TOP src bin bash lib glob ;
+
+# filter warnings we don't want here
+TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
+	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
 SubDirCcFlags -DHAVE_CONFIG_H -DSHELL ;
 
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) include ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) include ] ;
 
-StaticLibrary <bash>glob : 
+StaticLibrary <bash>libglob.a : 
 	glob.c 
 	strmatch.c 
 	smatch.c 

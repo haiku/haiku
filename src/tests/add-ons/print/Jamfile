@@ -1,5 +1,5 @@
-SubDir OBOS_TOP src tests add-ons print ;
+SubDir HAIKU_TOP src tests add-ons print ;
 
-SubInclude OBOS_TOP src tests add-ons print pdf ;
-SubInclude OBOS_TOP src tests add-ons print pcl6 ;
-SubInclude OBOS_TOP src tests add-ons print transports ;
+SubInclude HAIKU_TOP src tests add-ons print pdf ;
+SubInclude HAIKU_TOP src tests add-ons print pcl6 ;
+SubInclude HAIKU_TOP src tests add-ons print transports ;

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests servers input comm ;
+SubDir HAIKU_TOP src tests servers input comm ;
 
 SimpleTest  InputAreaTest : area.c ;
 SimpleTest  InputPortTest : port.cpp : be ;

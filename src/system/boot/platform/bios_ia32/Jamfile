@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src system boot platform bios_ia32 ;
+SubDir HAIKU_TOP src system boot platform bios_ia32 ;
 
-SubDirHdrs $(OBOS_TOP) headers private kernel boot platform $(OBOS_BOOT_PLATFORM) ;
+SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform $(TARGET_BOOT_PLATFORM) ;
 
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName graphics vesa ] ;
@@ -26,3 +26,7 @@ KernelMergeObject boot_platform_bios_ia32.o :
 	video.cpp
 	: -fno-pic
 	;
+
+# Tell the build system to where stage1.bin can be found, so it can be used
+# elsewhere.
+SEARCH on stage1.bin = $(SUBDIR) ;

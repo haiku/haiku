@@ -10,7 +10,7 @@
  |                                                                           |
  *---------------------------------------------------------------------------*/
 
-/* $Id: pdflib.h,v 1.1 2004/10/06 17:46:49 laplace Exp $
+/* $Id$
  *
  * PDFlib public function and constant declarations
  *

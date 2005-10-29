@@ -1,41 +1,38 @@
-SubDir OBOS_TOP src add-ons kernel drivers network stack ;
+SubDir HAIKU_TOP src add-ons kernel drivers network stack ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FStandardOSHeaders ] : true ;
+		# Needed for <drivers/Select.h> and maybe other stuff.
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# We need the public network headers also when not compiling for Haiku.
+		# Unfortunately we get more than we want, namely all POSIX headers.
+}
 
 UsePrivateHeaders net ;
-UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
 
 # a) Userland stack version:
 
-R5KernelAddon net_server_driver : kernel drivers bin :
+KernelAddon net_server_driver : kernel drivers bin :
 	net_server_driver.c
 ;
 
 # b) Kernelland stack version:
 
-R5KernelAddon net_stack_driver : kernel drivers bin :
+KernelAddon net_stack_driver : kernel drivers bin :
 	net_stack_driver.c
 ;
 
-# Link driver(s) to kernel/drivers/dev/net
-{
-	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev net ] ;
-
-	local instDriver = <kernel!drivers!dev!net>net_stack_driver ;
-	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : net_stack_driver ;
-
-	local instDriver = <kernel!drivers!dev!net>net_server_driver ;
-	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : net_server_driver ;
-}
-
 # Installation
 
-OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin	: 
+HaikuInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin	: 
 	net_server_driver 
 	net_stack_driver 
 ;
 
-OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
+HaikuInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
 	<installed>net_server_driver 
 	<installed>net_stack_driver	: 
 	installed-symlink 
@@ -45,10 +42,5 @@ Package haiku-networkingkit-cvs :
 	net_stack_driver net_server_driver :
 	boot home config add-ons kernel drivers bin ;
 
-Package haiku-networkingkit-cvs :
-	<kernel!drivers!dev!net>net_stack_driver :
-	boot home config add-ons kernel drivers dev net ;
-
-Package haiku-networkingkit-cvs :
-	<kernel!drivers!dev!net>net_server_driver :
-	boot home config add-ons kernel drivers dev net ;
+PackageDriverSymLink haiku-networkingkit-cvs : net net_stack_driver ;
+PackageDriverSymLink haiku-networkingkit-cvs : net net_server_driver ;

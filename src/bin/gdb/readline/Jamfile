@@ -1,18 +1,19 @@
-SubDir OBOS_TOP src bin gdb readline ;
+SubDir HAIKU_TOP src bin gdb readline ;
 
 # filter warnings we don't want here
-local originalCCFlags = $(CCFLAGS) ;
-CCFLAGS = [ Filter $(CCFLAGS) : -Wall -Wmissing-prototypes -Wsign-compare ] ;
+TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
+	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
 local RL_LIBRARY_VERSION = 4.3 ;
 
 SubDirCcFlags -DHAVE_CONFIG_H -DRL_LIBRARY_VERSION=\\\"$(RL_LIBRARY_VERSION)\\\" ;
 
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;	# for <readline/*.h> includes
+SubDirSysHdrs $(SUBDIR) ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ; # for <readline/*.h> includes
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) support ] ;
 
-StaticLibrary <gdb>readline : 
+StaticLibrary <gdb>libreadline.a : 
 	bind.c
 	callback.c
 	compat.c
@@ -48,9 +49,4 @@ StaticLibrary <gdb>readline :
 
 	# in support
 	wcwidth.c
-
-	: [ FCurrentObjectsDir ]
 ;
-
-# restore CCFLAGS
-CCFLAGS = $(originalCCFlags) ;

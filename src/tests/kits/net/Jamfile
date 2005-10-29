@@ -1,19 +1,18 @@
-SubDir OBOS_TOP src tests kits net ;
+SubDir HAIKU_TOP src tests kits net ;
 
 # bonefish: Tried to get the first test compiling. It complained about not
 # being able to find some headers, thus I added the respective include dirs
 # until it was asking for headers we currently don't have
 # (sys/select.h, sys/sockio.h).
 
-#UsePosixHeaders ;
-#SubDirHdrs [ FDirName $(OBOS_TOP) headers posix sys ] ;
-#SubDirHdrs [ FDirName $(OBOS_TOP) headers posix net ] ;
+#SubDirHdrs [ FDirName $(HAIKU_TOP) headers posix sys ] ;
+#SubDirHdrs [ FDirName $(HAIKU_TOP) headers posix net ] ;
 #UsePrivateHeaders kernel ;
-#UseArchHeaders $(OBOS_ARCH) ;
+#UseArchHeaders $(TARGET_ARCH) ;
 
 # SimpleTest at_client : at_client.c : ;
 
-SubInclude OBOS_TOP src tests kits net DialUpPreflet ;
-SubInclude OBOS_TOP src tests kits net netperf ;
-# SubInclude OBOS_TOP src tests kits net new_stack ;
-SubInclude OBOS_TOP src tests kits net preflet ;
+SubInclude HAIKU_TOP src tests kits net DialUpPreflet ;
+SubInclude HAIKU_TOP src tests kits net netperf ;
+# SubInclude HAIKU_TOP src tests kits net new_stack ;
+SubInclude HAIKU_TOP src tests kits net preflet ;

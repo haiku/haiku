@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kits support barchivable remoteobjectdef ;
+SubDir HAIKU_TOP src tests kits support barchivable remoteobjectdef ;
 
 # Add the libraries' resource files. If this sort of thing is needed
 # anywhere else, we ought to make it into a real rule.

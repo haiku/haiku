@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps diskprobe ;
+SubDir HAIKU_TOP src apps diskprobe ;
 
 UsePrivateHeaders shared ;
 
@@ -9,7 +9,7 @@ if ! $(DANO_COMPATIBLE) {
 	SubDirC++Flags $(defines) ;
 }
 
-App DiskProbe :
+Application DiskProbe :
 	DiskProbe.cpp
 	DataEditor.cpp
 	DataView.cpp
@@ -25,5 +25,5 @@ App DiskProbe :
 	;
 
 if $(HAIKU_COMPATIBLE) {
-	LinkSharedOSLibs DiskProbe : libroot.so ;
+	LinkAgainst DiskProbe : libroot.so ;
 }

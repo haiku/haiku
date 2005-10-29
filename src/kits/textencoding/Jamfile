@@ -1,21 +1,23 @@
-SubDir OBOS_TOP src kits textencoding ;
+SubDir HAIKU_TOP src kits textencoding ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders textencoding ;
-SubDirHdrs [ FDirName $(SUBDIR) libiconv ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) libiconv ] ;
 
-SharedLibrary textencoding :
+if $(TARGET_PLATFORM) != haiku {
+	# Argh! Just for <posix/iconv.h>.
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+}
+
+SharedLibrary libtextencoding.so :
 	CharacterSet.cpp
 	CharacterSetRoster.cpp
 	character_sets.cpp
 	utf8_conversions.cpp
-	: libiconv.a ;
-LinkSharedOSLibs libtextencoding.so : be ;
-
-MakeLocate <develop>libtextencoding.so : $(OBOS_STLIB_DIR) ;
-RelSymLink <develop>libtextencoding.so : libtextencoding.so ;
+	: libiconv.a be ;
 
 Package haiku-maildaemon-cvs :
 	libtextencoding.so :
 	boot beos system lib ;
 
-SubInclude OBOS_TOP src kits textencoding libiconv ;
+SubInclude HAIKU_TOP src kits textencoding libiconv ;

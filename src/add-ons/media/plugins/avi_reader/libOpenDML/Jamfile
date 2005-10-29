@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src add-ons media plugins avi_reader libOpenDML ;
+SubDir HAIKU_TOP src add-ons media plugins avi_reader libOpenDML ;
 
-StaticLibrary opendml :
+StaticLibrary libopendml.a :
 	OpenDMLFile.cpp
 	OpenDMLParser.cpp
 ;

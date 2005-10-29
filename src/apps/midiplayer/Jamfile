@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src apps midiplayer ;
+SubDir HAIKU_TOP src apps midiplayer ;
 
-App MidiPlayer :
+Application MidiPlayer :
 	MidiPlayerApp.cpp 
 	MidiPlayerWindow.cpp 
 	ScopeView.cpp

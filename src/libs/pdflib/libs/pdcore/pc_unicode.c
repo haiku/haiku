@@ -10,7 +10,7 @@
  |                                                                           |
  *---------------------------------------------------------------------------*/
 
-/* $Id: pc_unicode.c,v 1.1 2004/10/06 17:51:27 laplace Exp $
+/* $Id$
  *
  * PDFlib routines for converting between Unicode values and Adobe glyph names
  *

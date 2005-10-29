@@ -1,11 +1,13 @@
-SubDir OBOS_TOP src add-ons kernel drivers network bcm440x ;
+SubDir HAIKU_TOP src add-ons kernel drivers network bcm440x ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 # For ether_driver.h
 UsePrivateHeaders net ;
 
 ObjectCcFlags [ FGristFiles b44lm.o ] : -w ;
 
-R5KernelAddon bcm440x : kernel drivers bin :
+KernelAddon bcm440x : kernel drivers bin :
 	b44lm.c
 	b44um.c
 	mempool.c
@@ -14,26 +16,15 @@ R5KernelAddon bcm440x : kernel drivers bin :
 Package haiku-networkingkit-cvs :
 	bcm440x :
 	boot home config add-ons kernel drivers bin ;
-Package haiku-networkingkit-cvs :
-	<kernel!drivers!dev!net>bcm440x :
-	boot home config add-ons kernel drivers dev net ;
-
-# Link driver(s) to kernel/drivers/dev/net
-{
-	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev net ] ;
-
-	local instDriver = <kernel!drivers!dev!net>bcm440x ;
-	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : bcm440x ;
-}
+PackageDriverSymLink haiku-networkingkit-cvs : net bcm440x ;
 
 # Installation
 
-OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
+HaikuInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
  	bcm440x 
 ;
 
-OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
+HaikuInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
 	<installed>bcm440x : 
 	installed-symlink 
 ;

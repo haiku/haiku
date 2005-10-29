@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src preferences menu ;
+SubDir HAIKU_TOP src preferences menu ;
 
 Preference Menu : 
 	BitmapMenuItem.cpp 

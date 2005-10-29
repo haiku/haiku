@@ -1,3 +1,5 @@
-SubDir OBOS_TOP src system boot platform ;
+SubDir HAIKU_TOP src system boot platform ;
 
-SubInclude OBOS_TOP src system boot platform $(OBOS_BOOT_PLATFORM) ;
+if $(TARGET_BOOT_PLATFORM) {
+	SubInclude HAIKU_TOP src system boot platform $(TARGET_BOOT_PLATFORM) ;
+}

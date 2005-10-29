@@ -1,4 +1,4 @@
-/* $Id: p_icclib.c,v 1.1 2004/10/06 17:46:49 laplace Exp $
+/* $Id$
  *
  * ICClib routines for PDFlib, slightly modified from the original ICClib.
  * (see below).

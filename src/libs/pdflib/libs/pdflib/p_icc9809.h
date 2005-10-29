@@ -1,4 +1,4 @@
-/* $Id: p_icc9809.h,v 1.1 2004/10/06 17:46:49 laplace Exp $ 
+/* $Id$ 
  *
  * Header file of ICC (name see note above) for ICClib and PDFlib
  *

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests servers app copy_bits ;
+SubDir HAIKU_TOP src tests servers app copy_bits ;
 
 UseHeaders [ FDirName os app ] ;
 UseHeaders [ FDirName os interface ] ;

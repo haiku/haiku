@@ -1,12 +1,12 @@
-SubDir OBOS_TOP src add-ons kernel drivers network ;
+SubDir HAIKU_TOP src add-ons kernel drivers network ;
 
-SubInclude OBOS_TOP src add-ons kernel drivers network stack ;
-SubInclude OBOS_TOP src add-ons kernel drivers network rtl8139 ;
-SubInclude OBOS_TOP src add-ons kernel drivers network sis900 ;
-SubInclude OBOS_TOP src add-ons kernel drivers network wb840 ;
-SubInclude OBOS_TOP src add-ons kernel drivers network via-rhine ;
-SubInclude OBOS_TOP src add-ons kernel drivers network rtl8169 ;
-SubInclude OBOS_TOP src add-ons kernel drivers network ipro1000 ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network stack ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network rtl8139 ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network sis900 ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network wb840 ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network via-rhine ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network rtl8169 ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network ipro1000 ;
 
-SubIncludeGPL OBOS_TOP src add-ons kernel drivers network bcm440x ;
-SubIncludeGPL OBOS_TOP src add-ons kernel drivers network bcm570x ;
+SubIncludeGPL HAIKU_TOP src add-ons kernel drivers network bcm440x ;
+SubIncludeGPL HAIKU_TOP src add-ons kernel drivers network bcm570x ;

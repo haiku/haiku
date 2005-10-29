@@ -1,4 +1,4 @@
-/* $Id: pdfclock.c,v 1.1 2004/10/06 17:46:38 laplace Exp $
+/* $Id$
  * A little PDFlib application to draw an analog clock.
  *
  */

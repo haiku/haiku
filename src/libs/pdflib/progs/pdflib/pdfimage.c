@@ -10,7 +10,7 @@
  |                                                                           |
  *---------------------------------------------------------------------------*/
 
-/* $Id: pdfimage.c,v 1.1 2004/10/06 17:46:52 laplace Exp $
+/* $Id$
  *
  * Convert BMP/PNG/TIFF/GIF/JPEG images to PDF
  *

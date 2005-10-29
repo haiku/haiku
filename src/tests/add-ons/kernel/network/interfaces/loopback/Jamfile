@@ -1,12 +1,12 @@
-SubDir OBOS_TOP src tests add-ons kernel network interfaces loopback ;
+SubDir HAIKU_TOP src tests add-ons kernel network interfaces loopback ;
 
 UsePrivateHeaders net ;
 
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network interfaces loopback ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel network interfaces loopback ] ;
 
 Addon <userland>loopback : userland obos_network interfaces : 
 	loopback.c
 ;
 
-LinkSharedOSLibs <userland>loopback : <installed>net_stack_tester ;
+LinkAgainst <userland>loopback : <installed>net_stack_tester ;
 

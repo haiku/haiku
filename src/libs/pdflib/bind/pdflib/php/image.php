@@ -1,5 +1,5 @@
 <?php
-# $Id: image.php,v 1.1 2004/10/06 17:46:43 laplace Exp $
+# $Id$
 
 /* This is where font/image/PDF input files live. Adjust as necessary. */ 
 $searchpath = "../data"; 

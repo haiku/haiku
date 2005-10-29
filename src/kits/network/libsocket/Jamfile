@@ -1,4 +1,12 @@
-SubDir OBOS_TOP src kits network libsocket ;
+SubDir HAIKU_TOP src kits network libsocket ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# We need the public network headers also when not compiling for Haiku.
+		# Unfortunately we get more than we want, namely all POSIX headers.
+}
 
 UsePrivateHeaders net ;
 
@@ -27,15 +35,15 @@ if ( $(TARGET_PLATFORM) = bone ) {
 	PLATFORM_SOURCES = ;
 }
 
-SharedLibrary socket : 
+SharedLibrary libsocket.so : 
 	socket.c
 	$(PLATFORM_SOURCES)
 	: root
 ;
 
 # Installation -- in the test directory for the time being
-OBOSInstallRelSymLink install-networking
-	: [ FDirName $(OBOS_TEST_DIR) kits net lib ]
+HaikuInstallRelSymLink install-networking
+	: [ FDirName $(HAIKU_TEST_DIR) kits net lib ]
 	: libsocket.so
 	: installed-networking-test ;
 

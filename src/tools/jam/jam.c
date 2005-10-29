@@ -189,6 +189,9 @@ main( int argc, char **argv, char **arg_environ )
             printf( "-a      Build all targets, even if they are current.\n" );
             printf( "-dx     Display (a)actions (c)causes (d)dependencies\n" );
 	    printf( "        (m)make tree (x)commands (0-9) debug levels.\n" );
+# ifdef OPT_RULE_PROFILING_EXT
+	    printf( "        (p)profile rules.\n" );
+# endif
             printf( "-fx     Read x instead of Jambase.\n" );
 	    printf( "-g      Build from newest sources first.\n" );
             printf( "-jx     Run up to x shell commands concurrently.\n" );
@@ -265,6 +268,9 @@ main( int argc, char **argv, char **arg_environ )
 	    case 'd': DEBUG_DEPENDS = 1; break;
 	    case 'm': DEBUG_MAKEPROG = 1; break;
 	    case 'x': DEBUG_EXEC = 1; break;
+# ifdef OPT_RULE_PROFILING_EXT
+	    case 'p': DEBUG_PROFILE_RULES = 1; break;
+# endif
 	    case '0': break;
 	    default: printf( "Invalid debug flag '%c'.\n", s[-1] );
 	    }

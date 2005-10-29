@@ -1,4 +1,6 @@
-SubDir OBOS_TOP src libs png ;
+SubDir HAIKU_TOP src libs png ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UseLibraryHeaders zlib ;
 
@@ -24,6 +26,6 @@ local shared_files =
 
 Objects $(shared_files) ;
 
-SharedLibrary png : [ FGristFiles $(shared_files:S=.o) ] : z ;
+SharedLibrary libpng.so : [ FGristFiles $(shared_files:S=.o) ] : z ;
 
-StaticLibrary png : [ FGristFiles $(shared_files:S=.o) ] : STATIC_LIBRARY_DIR ;
+StaticLibrary libpng.a : [ FGristFiles $(shared_files:S=.o) ] ;

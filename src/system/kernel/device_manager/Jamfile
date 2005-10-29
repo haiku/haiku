@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src system kernel device_manager ;
+SubDir HAIKU_TOP src system kernel device_manager ;
 
-UsePrivateHeaders [ FDirName kernel boot platform $(OBOS_BOOT_PLATFORM) ] ;
+UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
 
 KernelMergeObject kernel_device_manager.o : 
@@ -18,5 +18,5 @@ KernelMergeObject kernel_device_manager.o :
 	scan.c
 	settings.cpp
 	:
-	-fno-pic -Wno-unused -D_KERNEL_MODE
+	-fno-pic -Wno-unused
 	;

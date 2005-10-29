@@ -1,11 +1,11 @@
-SubDir OBOS_TOP src bin rcs ;
+SubDir HAIKU_TOP src bin rcs ;
 
 SubDirCcFlags -w ;
 
 local rcs_rsrc = [ FGristFiles rcs.rsrc ] ;
 ResComp $(rcs_rsrc) : [ FGristFiles rcs.rdef ] ;
 
-StaticLibrary rcs : 
+StaticLibrary librcs.a : 
 	rcsutil.c
 	rcsfnms.c
 	rcsmap.c

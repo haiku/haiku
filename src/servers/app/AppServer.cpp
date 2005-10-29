@@ -7,6 +7,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
+#include <unistd.h>
 
 #include <Accelerant.h>
 #include <AppDefs.h>

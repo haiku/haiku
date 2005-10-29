@@ -29,8 +29,8 @@
  *          Addison-Wesley, 1983. ISBN 0-201-06672-6.
  */
 
-/* $Id: trees.c,v 1.1 2004/10/06 17:46:48 laplace Exp $ */
-/* @(#) $Id: trees.c,v 1.1 2004/10/06 17:46:48 laplace Exp $ */
+/* $Id$ */
+/* @(#) $Id$ */
 
 /* #define GEN_TREES_H */
 

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src bin playsound ;
+SubDir HAIKU_TOP src bin playsound ;
 
 BinCommand playsound :
 	playsound.cpp
@@ -7,5 +7,5 @@ BinCommand playsound :
 
 BinCommand playfile :
 	playfile.cpp
-	: be libmedia.so
+	: be media
 ;

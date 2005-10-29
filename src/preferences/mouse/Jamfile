@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src preferences mouse ;
+SubDir HAIKU_TOP src preferences mouse ;
 
 if $(TARGET_PLATFORM) != haiku {
         SubDirC++Flags -DCOMPILE_FOR_R5 ;

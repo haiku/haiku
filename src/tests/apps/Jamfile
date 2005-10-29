@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests apps ;
+SubDir HAIKU_TOP src tests apps ;
 
-SubInclude OBOS_TOP src tests apps miniterminal ;
-SubInclude OBOS_TOP src tests apps fake_app_server ;
+SubInclude HAIKU_TOP src tests apps miniterminal ;
+SubInclude HAIKU_TOP src tests apps fake_app_server ;

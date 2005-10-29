@@ -1,7 +1,11 @@
-SubDir OBOS_TOP src bin findutils find ;
+SubDir HAIKU_TOP src bin findutils find ;
 
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+# filter warnings we don't want here
+TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
+	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
 # set some additional defines
 {

@@ -1,9 +1,11 @@
-SubDir OBOS_TOP src add-ons kernel drivers audio echo 3g ;
+SubDir HAIKU_TOP src add-ons kernel drivers audio echo 3g ;
 
-SubDirHdrs $(OBOS_TOP) src add-ons kernel drivers audio echo ;
-SubDirHdrs $(OBOS_TOP) src add-ons kernel drivers audio echo generic ;
-SubDirHdrs $(OBOS_TOP) src add-ons kernel drivers audio echo generic DSP ;
-SubDirHdrs $(OBOS_TOP) src add-ons kernel drivers audio echo generic ASIC ;
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo generic ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo generic DSP ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo generic ASIC ;
 
 UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
 
@@ -33,7 +35,7 @@ local echo_files =
 	CPipeOutCtrl.cpp
 	;
 
-R5KernelAddon echo3g : kernel drivers bin :
+KernelAddon echo3g : kernel drivers bin :
 	kernel_cpp.cpp
 	debug.c
 	echo.cpp
@@ -50,18 +52,18 @@ ObjectC++Flags echo.cpp : -w ;
 SEARCH on [ FGristFiles
 	$(echo_files)
 	OsSupportBeOS.cpp
-	] = [ FDirName $(OBOS_TOP) src add-ons kernel drivers audio echo generic ] ;
+	] = [ FDirName $(HAIKU_TOP) src add-ons kernel drivers audio echo generic ] ;
 
 SEARCH on [ FGristFiles
 		kernel_cpp.cpp 
-	] = [ FDirName $(OBOS_TOP) src system kernel util ] ;
+	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
 SEARCH on [ FGristFiles
 		debug.c
 		echo.cpp
 		multi.cpp
 		util.c
-	] = [ FDirName $(OBOS_TOP) src add-ons kernel drivers audio echo ] ;
+	] = [ FDirName $(HAIKU_TOP) src add-ons kernel drivers audio echo ] ;
 
 Package haiku-echo3g-cvs
 	:

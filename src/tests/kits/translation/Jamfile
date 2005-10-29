@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kits translation ;
+SubDir HAIKU_TOP src tests kits translation ;
 
 CommonTestLib libtranslationtest.so
 	: TranslationKitTestAddon.cpp

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons disk_scanner partition ;
+SubDir HAIKU_TOP src add-ons disk_scanner partition ;
 
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;

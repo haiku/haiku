@@ -1,3 +1,0 @@
-SubDir OBOS_TOP src system apps sockettest ;
-
-KernelObjects <$(SOURCE_GRIST)>main.c : -fpic -Wno-unused ;

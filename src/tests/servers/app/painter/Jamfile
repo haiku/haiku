@@ -1,12 +1,12 @@
-SubDir OBOS_TOP src tests servers app painter ;
+SubDir HAIKU_TOP src tests servers app painter ;
 
 UseLibraryHeaders agg ;
 UsePrivateHeaders interface ;
 UsePrivateHeaders [ FDirName servers app ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter drawing_modes ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter font_support ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter font_support ] ;
 UseFreeTypeHeaders ;
 
 SimpleTest Painter :
@@ -34,7 +34,7 @@ SimpleTest Painter :
 SEARCH on [ FGristFiles
 	ColorUtils.cc
 	]
-	= [ FDirName $(OBOS_TOP) src kits interface ] ;
+	= [ FDirName $(HAIKU_TOP) src kits interface ] ;
 
 SEARCH on [ FGristFiles
 	PatternHandler.cpp
@@ -44,25 +44,25 @@ SEARCH on [ FGristFiles
 	ServerFont.cpp
 	SystemPalette.cpp
 	]
-	= [ FDirName $(OBOS_TOP) src servers app ] ;
+	= [ FDirName $(HAIKU_TOP) src servers app ] ;
 
 SEARCH on [ FGristFiles
 	BitmapBuffer.cpp
 	PatternHandler.cpp
 	]
-	= [ FDirName $(OBOS_TOP) src servers app drawing ] ;
+	= [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
 
 SEARCH on [ FGristFiles
 	Painter.cpp
 	ShapeConverter.cpp
 	Transformable.cpp
 	]
-	= [ FDirName $(OBOS_TOP) src servers app drawing Painter ] ;
+	= [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
 
 SEARCH on [ FGristFiles
 	DrawingModeFactory.cpp
 	]
-	= [ FDirName $(OBOS_TOP) src servers app drawing Painter drawing_modes ] ;
+	= [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes ] ;
 
 SEARCH on [ FGristFiles
 #	agg_font_freetype.cpp
@@ -70,5 +70,5 @@ SEARCH on [ FGristFiles
 	FontManager.cpp
 	TextRenderer.cpp
 	]
-	= [ FDirName $(OBOS_TOP) src servers app drawing Painter font_support ] ;
+	= [ FDirName $(HAIKU_TOP) src servers app drawing Painter font_support ] ;
 

@@ -5,8 +5,8 @@
 #include <TextControl.h>
 #include <Window.h>
 
-#include <Constants.h>
-#include <ReplaceWindow.h>
+#include "Constants.h"
+#include "ReplaceWindow.h"
 
 
 ReplaceWindow::ReplaceWindow(BRect frame, BHandler *_handler, BString *searchString,

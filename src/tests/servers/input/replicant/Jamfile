@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src tests servers input replicant ;
+SubDir HAIKU_TOP src tests servers input replicant ;
 
-UseHeaders [ FDirName $(OBOS_TOP) src servers input ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers input ] ;
 UsePrivateHeaders input ;
 AddResources ReplicantTest : replicant.rdef ;
 
@@ -18,5 +18,5 @@ SEARCH on [ FGristFiles
 	MethodReplicant.cpp
 	MethodMenuItem.cpp
 	]
-	= [ FDirName $(OBOS_TOP) src servers input ] ;
+	= [ FDirName $(HAIKU_TOP) src servers input ] ;
 

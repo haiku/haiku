@@ -1,8 +1,8 @@
-SubDir OBOS_TOP src add-ons media media-add-ons tone_producer_demo ;
+SubDir HAIKU_TOP src add-ons media media-add-ons tone_producer_demo ;
 
 Addon tone_producer_demo.media_addon : media :
 	ToneProducerAddOn.cpp
 	ToneProducer.cpp
 ;
 
-LinkSharedOSLibs tone_producer_demo.media_addon : be media ;
+LinkAgainst tone_producer_demo.media_addon : be media ;

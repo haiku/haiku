@@ -1,10 +1,15 @@
-SubDir OBOS_TOP src bin diffutils lib ;
+SubDir HAIKU_TOP src bin diffutils lib ;
+
+# filter warnings we don't want here
+TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
+	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
 SubDirCcFlags -DHAVE_CONFIG_H ;
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
-SubDirHdrs [ FDirName $(OBOS_TOP) headers ] ;
+SubDirSysHdrs $(SUBDIR) ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirSysHdrs [ FDirName $(HAIKU_TOP) headers ] ;
 
-StaticLibrary diffutils : 
+StaticLibrary libdiffutils.a : 
 #	alloca.c
 	basename.c
 	c-stack.c

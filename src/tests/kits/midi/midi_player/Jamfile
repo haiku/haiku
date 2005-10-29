@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kits midi midi_player ;
+SubDir HAIKU_TOP src tests kits midi midi_player ;
 
 SimpleTest MidiPlayer
 	: MidiPlayer.cpp

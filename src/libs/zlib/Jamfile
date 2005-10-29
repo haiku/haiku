@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src libs zlib ;
+SubDir HAIKU_TOP src libs zlib ;
 
 UseLibraryHeaders zlib ;
 
@@ -19,7 +19,7 @@ local shared_files =
 
 Objects $(shared_files) ;
 
-SharedLibrary z : [ FGristFiles $(shared_files:S=.o) ] ;
+SharedLibrary libz.so : [ FGristFiles $(shared_files:S=.o) ] ;
 
-StaticLibrary z : [ FGristFiles $(shared_files:S=.o) ] : STATIC_LIBRARY_DIR ;
+StaticLibrary libz.a : [ FGristFiles $(shared_files:S=.o) ] ;
 

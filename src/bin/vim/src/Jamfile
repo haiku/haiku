@@ -1,7 +1,11 @@
-SubDir OBOS_TOP src bin vim src ;
+SubDir HAIKU_TOP src bin vim src ;
 
 SubDirHdrs [ FDirName $(SUBDIR) proto ] ;
 SubDirHdrs [ FDirName $(SUBDIR) ] ;
+
+# filter warnings we don't want here
+TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
+	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
 # set some additional defines
 {
@@ -60,32 +64,3 @@ BinCommand vim :
 	: vim.rdef ;
 
 SEARCH on [ FGristFiles pathdef.c ] = [ FDirName $(SUBDIR) auto ] ;
-
-{
-	MakeLocate vi : $(OBOS_BIN_DIR) ;
-	RelSymLink vi : vim ;
-	MakeLocate view : $(OBOS_BIN_DIR) ;
-	RelSymLink view : vim ;
-	MakeLocate gvim : $(OBOS_BIN_DIR) ;
-	RelSymLink gvim : vim ;
-	MakeLocate gview : $(OBOS_BIN_DIR) ;
-	RelSymLink gview : vim ;
-	MakeLocate eview : $(OBOS_BIN_DIR) ;
-	RelSymLink eview : vim ;
-	MakeLocate evim : $(OBOS_BIN_DIR) ;
-	RelSymLink evim : vim ;
-	MakeLocate ex : $(OBOS_BIN_DIR) ;
-	RelSymLink ex : vim ;
-	MakeLocate rview : $(OBOS_BIN_DIR) ;
-	RelSymLink rview : vim ;
-	MakeLocate rgvim : $(OBOS_BIN_DIR) ;
-	RelSymLink rgvim : vim ;
-	MakeLocate rgview : $(OBOS_BIN_DIR) ;
-	RelSymLink rgview : vim ;
-	MakeLocate rvim : $(OBOS_BIN_DIR) ;
-	RelSymLink rvim : vim ;
-	MakeLocate vimdiff : $(OBOS_BIN_DIR) ;
-	RelSymLink vimdiff : vim ;
-	MakeLocate gvimdiff : $(OBOS_BIN_DIR) ;
-	RelSymLink gvimdiff : vim ;
-}	

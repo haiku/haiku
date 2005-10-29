@@ -1,0 +1,12 @@
+SubDir HAIKU_TOP src tools keymap ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin keymap ] ;
+
+USES_BE_API on <build>keymap = true ;
+
+BuildPlatformMain <build>keymap :
+	main.cpp
+	Keymap.cpp
+;
+
+LinkAgainst <build>keymap : $(HOST_LIBBE) ;

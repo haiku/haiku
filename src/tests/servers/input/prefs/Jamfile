@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests servers input prefs ;
+SubDir HAIKU_TOP src tests servers input prefs ;
 
 UsePrivateHeaders interface ;
 UsePrivateHeaders app ;
@@ -24,7 +24,7 @@ SimpleTest KeymapTest :
 
 if $(COMPILE_FOR_R5) {
 } else {
-	LinkSharedOSLibs KeymapTest : <boot!home!config!lib>libopenbeos.so ;
+	LinkAgainst KeymapTest : <boot!home!config!lib>libopenbeos.so ;
 }
 
 SEARCH on [ FGristFiles
@@ -34,7 +34,7 @@ SEARCH on [ FGristFiles
 	Keymap.cpp
 	KeymapTextView.cpp
 	Keymap.rdef ]
-	= [ FDirName $(OBOS_TOP) src preferences keymap ] ;
+	= [ FDirName $(HAIKU_TOP) src preferences keymap ] ;
 
 AddResources KeyboardTest : Keyboard.rdef ;
 
@@ -50,7 +50,7 @@ SimpleTest KeyboardTest :
 
 if $(COMPILE_FOR_R5) {
 } else {
-	LinkSharedOSLibs KeyboardTest : <boot!home!config!lib>libopenbeos.so ;
+	LinkAgainst KeyboardTest : <boot!home!config!lib>libopenbeos.so ;
 }
 
 SEARCH on [ FGristFiles
@@ -59,7 +59,7 @@ SEARCH on [ FGristFiles
 	KeyboardView.cpp 
 	KeyboardWindow.cpp 
 	Keyboard.rdef ]
-	= [ FDirName $(OBOS_TOP) src preferences keyboard ] ;
+	= [ FDirName $(HAIKU_TOP) src preferences keyboard ] ;
 
 AddResources MouseTest : Mouse.rdef ;
 
@@ -77,7 +77,7 @@ SimpleTest MouseTest :
 
 if $(COMPILE_FOR_R5) {
 } else {
-	LinkSharedOSLibs MouseTest : <boot!home!config!lib>libopenbeos.so ;
+	LinkAgainst MouseTest : <boot!home!config!lib>libopenbeos.so ;
 }
 
 SEARCH on [ FGristFiles
@@ -88,7 +88,7 @@ SEARCH on [ FGristFiles
 	SettingsView.cpp
 	Mouse.rdef
 	]
-	= [ FDirName $(OBOS_TOP) src preferences mouse ] ;
+	= [ FDirName $(HAIKU_TOP) src preferences mouse ] ;
 
 SimpleTest keymapTest :
 	main.cpp
@@ -100,15 +100,15 @@ SimpleTest keymapTest :
 
 if $(COMPILE_FOR_R5) {
 } else {
-	LinkSharedOSLibs keymapTest : <boot!home!config!lib>libopenbeos.so ;
+	LinkAgainst keymapTest : <boot!home!config!lib>libopenbeos.so ;
 }
 
 SEARCH on [ FGristFiles
 	main.cpp
 	Keymap.cpp
 	]
-	= [ FDirName $(OBOS_TOP) src bin keymap ] ;
+	= [ FDirName $(HAIKU_TOP) src bin keymap ] ;
 
 SEARCH on [ FGristFiles InterfaceDefs.cpp Input.cpp ] 
-	= [ FDirName $(OBOS_TOP) src kits interface ] ;
+	= [ FDirName $(HAIKU_TOP) src kits interface ] ;
 

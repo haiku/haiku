@@ -1,8 +1,8 @@
-SubDir OBOS_TOP src system kernel arch x86 ;
+SubDir HAIKU_TOP src system kernel arch x86 ;
 
-SubDirHdrs [ FObjectsDir src system kernel ] ;
+SubDirHdrs [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) system kernel ] ;
 	# for syscall_numbers.h
-SubDirHdrs $(OBOS_TOP) src add-ons kernel drivers input ps2_hid ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers input ps2_hid ;
 
 KernelStaticLibrary libx86 :
 	arch_cpu.c

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel bus_managers acpi ;
+SubDir HAIKU_TOP src add-ons kernel bus_managers acpi ;
 SubDirHdrs [ FDirName $(SUBDIR) include ] ;
 SubDirCcFlags -fno-pic -D_KERNEL_MODE ;
 
@@ -133,7 +133,7 @@ local utilities_src =
 	utxface.c 
 	;
 
-StaticLibrary acpi_ca :
+StaticLibrary libacpi_ca.a :
 	$(events_src)
 	$(hardware_src)
 	$(dispatcher_src)
@@ -145,17 +145,17 @@ StaticLibrary acpi_ca :
 	$(utilities_src)
 	 ;
 
-SEARCH on [ FGristFiles $(events_src)  ] = [ FDirName $(OBOS_TOP) src add-ons kernel bus_managers acpi events ] ;
-SEARCH on [ FGristFiles $(hardware_src)  ] = [ FDirName $(OBOS_TOP) src add-ons kernel bus_managers acpi hardware ] ;
-SEARCH on [ FGristFiles $(namespace_src)  ] = [ FDirName $(OBOS_TOP) src add-ons kernel bus_managers acpi namespace ] ;
-SEARCH on [ FGristFiles $(resources_src)  ] = [ FDirName $(OBOS_TOP) src add-ons kernel bus_managers acpi resources ] ;
-SEARCH on [ FGristFiles $(tables_src)  ] = [ FDirName $(OBOS_TOP) src add-ons kernel bus_managers acpi tables ] ;
-SEARCH on [ FGristFiles $(utilities_src)  ] = [ FDirName $(OBOS_TOP) src add-ons kernel bus_managers acpi utilities ] ;
-SEARCH on [ FGristFiles $(dispatcher_src)  ] = [ FDirName $(OBOS_TOP) src add-ons kernel bus_managers acpi interpreter dispatcher ] ;
-SEARCH on [ FGristFiles $(executer_src)  ] = [ FDirName $(OBOS_TOP) src add-ons kernel bus_managers acpi interpreter executer ] ;
-SEARCH on [ FGristFiles $(parser_src)  ] = [ FDirName $(OBOS_TOP) src add-ons kernel bus_managers acpi interpreter parser ] ;
+SEARCH on [ FGristFiles $(events_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi events ] ;
+SEARCH on [ FGristFiles $(hardware_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi hardware ] ;
+SEARCH on [ FGristFiles $(namespace_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi namespace ] ;
+SEARCH on [ FGristFiles $(resources_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi resources ] ;
+SEARCH on [ FGristFiles $(tables_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi tables ] ;
+SEARCH on [ FGristFiles $(utilities_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi utilities ] ;
+SEARCH on [ FGristFiles $(dispatcher_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi interpreter dispatcher ] ;
+SEARCH on [ FGristFiles $(executer_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi interpreter executer ] ;
+SEARCH on [ FGristFiles $(parser_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi interpreter parser ] ;
 
-R5KernelAddon acpi : kernel bus_managers :
+KernelAddon acpi : kernel bus_managers :
 	oshaiku.c
 	acpi_busman.c
 	:

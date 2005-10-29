@@ -1,4 +1,6 @@
-SubDir OBOS_TOP src add-ons input_server devices keyboard ;
+SubDir HAIKU_TOP src add-ons input_server devices keyboard ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders input ;
 UsePrivateHeaders kernel ;
@@ -14,9 +16,9 @@ Addon <input>keyboard : input_server/devices :
 	: <nogrist>input_server ;
 
 if $(COMPILE_FOR_R5) {
-	LinkSharedOSLibs <input>keyboard : be ;
+	LinkAgainst <input>keyboard : be ;
 } else {
-        LinkSharedOSLibs <input>keyboard : libroot.so libbe.so ;
+        LinkAgainst <input>keyboard : libroot.so libbe.so ;
 }
 
 Package haiku-inputkit-cvs :

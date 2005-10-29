@@ -1,15 +1,8 @@
-SubDir OBOS_TOP src add-ons kernel drivers audio module_driver ;
+SubDir HAIKU_TOP src add-ons kernel drivers audio module_driver ;
 
 UsePrivateHeaders media ;
 
-R5KernelAddon audio_module_driver : kernel drivers bin :
+KernelAddon audio_module_driver : kernel drivers bin :
 	audio_module_driver.c
 ;
 
-# Link to kernel/drivers/dev/audio/multi
-{
-	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev audio ] ;
-	local instDriver = <kernel!drivers!dev!audio>audio_module_driver ;
-	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : audio_module_driver ;
-}

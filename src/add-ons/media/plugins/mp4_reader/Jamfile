@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons media plugins mp4_reader ;
+SubDir HAIKU_TOP src add-ons media plugins mp4_reader ;
 
 UsePrivateHeaders media ;
 
@@ -11,6 +11,6 @@ Addon mp4_reader : media plugins :
 	libz.a
 ;
 
-LinkSharedOSLibs mp4_reader : be libmedia.so ;
+LinkAgainst mp4_reader : be libmedia.so ;
 
-SubInclude OBOS_TOP src add-ons media plugins mp4_reader libMP4 ;
+SubInclude HAIKU_TOP src add-ons media plugins mp4_reader libMP4 ;

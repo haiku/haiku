@@ -1,11 +1,13 @@
-SubDir OBOS_TOP src apps installer ;
+SubDir HAIKU_TOP src apps installer ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 UsePrivateHeaders tracker ;
-SubDirHdrs [ FDirName $(OBOS_TOP) src kits tracker ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src kits tracker ] ;
 
-App Installer : 
+Application Installer : 
 	CopyEngine.cpp
 	DrawButton.cpp
 	InstallerApp.cpp

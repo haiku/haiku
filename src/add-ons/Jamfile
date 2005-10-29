@@ -1,13 +1,13 @@
-SubDir OBOS_TOP src add-ons ;
+SubDir HAIKU_TOP src add-ons ;
 
-SubInclude OBOS_TOP src add-ons accelerants ;
-SubInclude OBOS_TOP src add-ons input_server ;
-SubInclude OBOS_TOP src add-ons kernel ;
-SubInclude OBOS_TOP src add-ons mail_daemon ;
-SubInclude OBOS_TOP src add-ons media ;
-SubInclude OBOS_TOP src add-ons print ;
-SubInclude OBOS_TOP src add-ons translators ;
-SubInclude OBOS_TOP src add-ons decorators ;
-SubInclude OBOS_TOP src add-ons tracker ;
-SubInclude OBOS_TOP src add-ons screen_savers ;
+SubInclude HAIKU_TOP src add-ons accelerants ;
+SubInclude HAIKU_TOP src add-ons input_server ;
+SubInclude HAIKU_TOP src add-ons kernel ;
+SubInclude HAIKU_TOP src add-ons mail_daemon ;
+SubInclude HAIKU_TOP src add-ons media ;
+SubInclude HAIKU_TOP src add-ons print ;
+SubInclude HAIKU_TOP src add-ons translators ;
+SubInclude HAIKU_TOP src add-ons decorators ;
+SubInclude HAIKU_TOP src add-ons tracker ;
+SubInclude HAIKU_TOP src add-ons screen_savers ;
 

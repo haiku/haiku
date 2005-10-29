@@ -29,7 +29,7 @@
 */
 
 
-/* $Id: zlib.h,v 1.1 2004/10/06 17:46:48 laplace Exp $ */
+/* $Id$ */
 
 #ifndef _ZLIB_H
 #define _ZLIB_H

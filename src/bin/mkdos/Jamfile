@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src bin mkdos ;
+SubDir HAIKU_TOP src bin mkdos ;
 
 BinCommand mkdos :
 	mkdos.cpp

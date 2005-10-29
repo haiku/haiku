@@ -1,8 +1,10 @@
-SubDir OBOS_TOP src servers print ;
+SubDir HAIKU_TOP src servers print ;
 
-SubInclude OBOS_TOP src servers print shared ;
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
-SubDir OBOS_TOP src servers print ;
+SubInclude HAIKU_TOP src servers print shared ;
+
+SubDir HAIKU_TOP src servers print ;
 
 UsePrivateHeaders shared interface print ;
 
@@ -25,7 +27,7 @@ Server
 	ConfigWindow.cpp
 	;
 
-LinkSharedOSLibs 
+LinkAgainst 
 	print_server 
 	: 
 	be 

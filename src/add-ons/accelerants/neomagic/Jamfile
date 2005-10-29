@@ -1,9 +1,10 @@
-SubDir OBOS_TOP src add-ons accelerants neomagic ;
+SubDir HAIKU_TOP src add-ons accelerants neomagic ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics neomagic ] ;
 UseHeaders [ FDirName $(SUBDIR) engine ] ;
-
 
 Addon nm.accelerant : accelerants :
 	Acceleration.c
@@ -26,4 +27,4 @@ Package haiku-neomagic-cvs :
 
 Depends nm.accelerant : nm.driver ;
 
-SubInclude OBOS_TOP src add-ons accelerants neomagic engine ;
+SubInclude HAIKU_TOP src add-ons accelerants neomagic engine ;

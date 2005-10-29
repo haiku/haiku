@@ -1,3 +1,3 @@
-SubDir OBOS_TOP src tests kits app bapplication ;
+SubDir HAIKU_TOP src tests kits app bapplication ;
 
-SubInclude OBOS_TOP src tests kits app bapplication testapps ;
+SubInclude HAIKU_TOP src tests kits app bapplication testapps ;

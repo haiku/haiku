@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons media media-add-ons mixer ;
+SubDir HAIKU_TOP src add-ons media media-add-ons mixer ;
 
 UsePrivateHeaders media ;
 
@@ -12,6 +12,6 @@ Addon mixer.media_addon : media :
 	MixerSettings.cpp
 	MixerUtils.cpp
 	Resampler.cpp
+	: false
+	: be media
 ;
-
-LinkSharedOSLibs mixer.media_addon : be media ;

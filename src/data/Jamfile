@@ -1,3 +1,3 @@
-SubDir OBOS_TOP src data ;
+SubDir HAIKU_TOP src data ;
 
-SubInclude OBOS_TOP src data etc ;
+SubInclude HAIKU_TOP src data etc ;

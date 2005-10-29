@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel partitioning_systems intel ;
+SubDir HAIKU_TOP src add-ons kernel partitioning_systems intel ;
 
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders kernel ;
@@ -19,7 +19,7 @@ KernelAddon intel : kernel partitioning_systems :
 #	PartitionMapParser.cpp
 #;
 
-#LinkSharedOSLibs <partitioning_system>intel :
+#LinkAgainst <partitioning_system>intel :
 #	libkernelland_emu.so
 #	libdisk_device_manager.so
 #;

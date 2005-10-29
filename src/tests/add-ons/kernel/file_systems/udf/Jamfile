@@ -1,3 +1,3 @@
-SubDir OBOS_TOP src tests add-ons kernel file_systems udf ;
+SubDir HAIKU_TOP src tests add-ons kernel file_systems udf ;
 
-SubInclude OBOS_TOP src tests add-ons kernel file_systems udf udf_shell ;
+SubInclude HAIKU_TOP src tests add-ons kernel file_systems udf udf_shell ;

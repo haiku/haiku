@@ -1618,7 +1618,13 @@ kill_device_vnodes(dev_t id)
 
 	LOCK(vnlock);
 
-	ns = nstab[id % nns];
+	ns = nsidtons(id);
+	
+	if (!ns) {
+		UNLOCK(vnlock);
+		return;
+	}
+	
 	fs = ns->fs;
 
 	while (ns->vnodes.head) {
@@ -3292,6 +3298,9 @@ nsidtons(nspace_id nsid)
 {
     nspace      *ns;
 
+	if (nsid < 0)
+		return NULL;
+	
     ns = nstab[nsid % nns];
     if (!ns || (ns->nsid != nsid) || ns->shutdown)
         return NULL;
@@ -3371,6 +3380,23 @@ install_file_system(vnode_ops *ops, const char *name, bool fixed, image_id aid)
         return NULL;
     }
     return (void *)fs;
+}
+
+status_t
+initialize_file_system(const char *device, const char *fsName, void *params,
+	int paramLength)
+{
+	status_t error;
+	
+	fsystem *fs = inc_file_system(fsName);
+	if (!fs)
+		return FS_ERROR;
+
+    error = (*fs->ops.initialize)(device, params, paramLength);
+	
+	dec_file_system(fs);
+
+	return error;
 }
 
 static fsystem *

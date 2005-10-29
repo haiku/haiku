@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel partitioning_systems amiga ;
+SubDir HAIKU_TOP src add-ons kernel partitioning_systems amiga ;
 
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel ] ;
@@ -12,7 +12,7 @@ KernelAddon amiga_rdb : kernel partitioning_systems :
 #	amiga_rdb.cpp
 #	;
 #
-#LinkSharedOSLibs <partitioning_system>amiga_rdb :
+#LinkAgainst <partitioning_system>amiga_rdb :
 #	libkernelland_emu.so
 #	libdisk_device_manager.so
 #	;

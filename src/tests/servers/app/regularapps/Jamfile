@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src tests servers app regularapps ;
+SubDir HAIKU_TOP src tests servers app regularapps ;
 
-local clockDir = [ FDirName $(OBOS_TOP) src apps clock ] ;
+local clockDir = [ FDirName $(HAIKU_TOP) src apps clock ] ;
 
 UseHeaders [ FDirName $(clockDir) ] ;
 

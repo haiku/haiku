@@ -4,9 +4,9 @@
  */
 
 
-/* $Id: zconf.h,v 1.1 2004/10/06 17:46:48 laplace Exp $ */
+/* $Id$ */
 
-/* @(#) $Id: zconf.h,v 1.1 2004/10/06 17:46:48 laplace Exp $ */
+/* @(#) $Id$ */
 
 #ifndef _ZCONF_H
 #define _ZCONF_H

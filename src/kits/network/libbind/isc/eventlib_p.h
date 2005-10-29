@@ -18,7 +18,7 @@
 /* eventlib_p.h - private interfaces for eventlib
  * vix 09sep95 [initial]
  *
- * $Id: eventlib_p.h,v 1.1 2004/04/15 16:03:30 wkornew Exp $
+ * $Id$
  */
 
 #ifndef _EVENTLIB_P_H

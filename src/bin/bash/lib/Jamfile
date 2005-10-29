@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src bin bash lib ;
+SubDir HAIKU_TOP src bin bash lib ;
 
-SubInclude OBOS_TOP src bin bash lib glob ;
-SubInclude OBOS_TOP src bin bash lib readline ;
-SubInclude OBOS_TOP src bin bash lib sh ;
-SubInclude OBOS_TOP src bin bash lib tilde ;
+SubInclude HAIKU_TOP src bin bash lib glob ;
+SubInclude HAIKU_TOP src bin bash lib readline ;
+SubInclude HAIKU_TOP src bin bash lib sh ;
+SubInclude HAIKU_TOP src bin bash lib tilde ;

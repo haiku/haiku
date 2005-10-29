@@ -15,7 +15,7 @@
 #include "utils.h"
 #include "set_mode.h"
 
-#include <memory.h>
+#include <string.h>
 
 
 // fixed-point resolution of UV scaler increment

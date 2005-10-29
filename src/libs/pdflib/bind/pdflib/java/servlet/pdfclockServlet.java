@@ -1,4 +1,4 @@
-/* $Id: pdfclockServlet.java,v 1.1 2004/10/06 17:46:42 laplace Exp $
+/* $Id$
  *
  * PDFlib client: pdfclock example in Java
  */

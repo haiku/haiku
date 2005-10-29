@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src tests add-ons print pcl6 ;
+SubDir HAIKU_TOP src tests add-ons print pcl6 ;
 
-SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print drivers pcl6 ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons print drivers pcl6 ] ;
 
 SimpleTest pcl6disasm : disasm.cpp : be stdc++.r4 ;
 

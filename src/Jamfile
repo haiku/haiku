@@ -1,14 +1,15 @@
-SubDir OBOS_TOP src ;
+SubDir HAIKU_TOP src ;
 
-SubInclude OBOS_TOP src add-ons ;
-SubInclude OBOS_TOP src apps ;
-SubInclude OBOS_TOP src bin ;
-SubInclude OBOS_TOP src data ;
-SubInclude OBOS_TOP src documentation ;
-SubInclude OBOS_TOP src kits ;
-SubInclude OBOS_TOP src libs ;
-SubInclude OBOS_TOP src preferences ;
-SubInclude OBOS_TOP src servers ;
-SubInclude OBOS_TOP src system ;
-SubInclude OBOS_TOP src tests ;
-SubInclude OBOS_TOP src tools ;
+SubInclude HAIKU_TOP src add-ons ;
+SubInclude HAIKU_TOP src apps ;
+SubInclude HAIKU_TOP src bin ;
+SubInclude HAIKU_TOP src build ;
+SubInclude HAIKU_TOP src data ;
+SubInclude HAIKU_TOP src documentation ;
+SubInclude HAIKU_TOP src kits ;
+SubInclude HAIKU_TOP src libs ;
+SubInclude HAIKU_TOP src preferences ;
+SubInclude HAIKU_TOP src servers ;
+SubInclude HAIKU_TOP src system ;
+SubInclude HAIKU_TOP src tests ;
+SubInclude HAIKU_TOP src tools ;

@@ -1,6 +1,17 @@
-SubDir OBOS_TOP src kits opengl ;
+SubDir HAIKU_TOP src kits opengl ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders opengl ;
+
+UseHeaders [ FDirName $(SUBDIR) mesa ] ;
+UseHeaders [ FDirName $(SUBDIR) mesa main ] ;
+UseHeaders [ FDirName $(SUBDIR) mesa glapi ] ;
+UseHeaders [ FDirName $(SUBDIR) mesa math ] ;
+UseHeaders [ FDirName $(SUBDIR) mesa tnl ] ;
+UseHeaders [ FDirName $(SUBDIR) mesa shader ] ;
+UseHeaders [ FDirName $(SUBDIR) mesa swrast ] ;
+UseHeaders [ FDirName $(SUBDIR) mesa swrast_setup ] ;
 
 SubDirCcFlags 
 	-DBEOS_THREADS 
@@ -17,31 +28,14 @@ SubDirC++Flags
 	-DUSE_3DNOW_ASM 
 	-DUSE_SSE_ASM ;
 
-# GLView.cpp includes indirectly <image.h>
-# As our build system don't support <> / " " include difference, 
-# we should compile GLView *before* Mesa's include paths are added.
-# Otherwise, src/kits/opengl/mesa/main/image.h will be found first!
-# :-(
+SEARCH_SOURCE += [ FDirName $(SUBDIR) mesa $(TARGET_ARCH) ] ;
 
-Objects 
-	GLView.cpp 
-;
-
-# Now we could add Mesa include paths...
-
-UseHeaders [ FDirName $(SUBDIR) mesa ] ;
-UseHeaders [ FDirName $(SUBDIR) mesa main ] ;
-UseHeaders [ FDirName $(SUBDIR) mesa glapi ] ;
-UseHeaders [ FDirName $(SUBDIR) mesa math ] ;
-UseHeaders [ FDirName $(SUBDIR) mesa tnl ] ;
-UseHeaders [ FDirName $(SUBDIR) mesa shader ] ;
-UseHeaders [ FDirName $(SUBDIR) mesa swrast ] ;
-UseHeaders [ FDirName $(SUBDIR) mesa swrast_setup ] ;
-
-SharedLibrary GL :
-	GLView.o
+SharedLibrary libGL.so :
+	GLView.cpp
 	GLDispatcher.cpp
-	mesa/$(OBOS_ARCH)/glapi_$(OBOS_ARCH).S
+
+	# mesa/$(TARGET_ARCH)
+	glapi_$(TARGET_ARCH).S
 	: 
 	# GLU API is included in libGL.so under BeOS R5, not a separate libglu.so library
 	<opengl>sgi-glu.o
@@ -58,9 +52,6 @@ Package haiku-opengl-cvs :
 	libGL.so : 
 	boot beos system lib ;
 
-MakeLocate <develop>libGL.so : $(OBOS_STLIB_DIR) ;
-RelSymLink <develop>libGL.so : libGL.so ;
-
-SubInclude OBOS_TOP src kits opengl glu ;
-SubInclude OBOS_TOP src kits opengl glut ;
-SubInclude OBOS_TOP src kits opengl mesa ;
+SubInclude HAIKU_TOP src kits opengl glu ;
+SubInclude HAIKU_TOP src kits opengl glut ;
+SubInclude HAIKU_TOP src kits opengl mesa ;

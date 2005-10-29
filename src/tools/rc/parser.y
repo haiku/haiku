@@ -34,6 +34,8 @@
 #include "compile.h"
 #include "private.h"
 
+using namespace std;
+
 #define YYERROR_VERBOSE
 
 static void yyerror(char*);

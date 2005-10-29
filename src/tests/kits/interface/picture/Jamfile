@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kits interface picture ;
+SubDir HAIKU_TOP src tests kits interface picture ;
 
 UsePrivateHeaders interface print ;
 
@@ -9,7 +9,7 @@ SimpleTest TestPictureApp :
 	PictureTestWindow.cpp
 	;	
 
-LinkSharedOSLibs TestPictureApp :
+LinkAgainst TestPictureApp :
 	be
 	root
 	libprint.a
@@ -19,7 +19,7 @@ SimpleTest DumpPrintJob :
 	DumpPrintJob.cpp
 	;
 
-LinkSharedOSLibs DumpPrintJob :
+LinkAgainst DumpPrintJob :
 	be
 	root
 	libprint.a
@@ -29,7 +29,7 @@ SimpleTest ShowPrintJob :
 	Preview.cpp
 	;
 
-LinkSharedOSLibs ShowPrintJob :
+LinkAgainst ShowPrintJob :
 	be
 	root
 	libprint.a

@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src apps terminal ;
+SubDir HAIKU_TOP src apps terminal ;
 
-App Terminal : 
+Application Terminal : 
 	AppearPrefView.cpp
 	CodeConv.cpp
 	CurPos.cpp
@@ -27,5 +27,5 @@ App Terminal :
 if $(TARGET_PLATFORM) = haiku {
         # link for Haiku
 
-        LinkSharedOSLibs Terminal : libroot.so ;
+        LinkAgainst Terminal : libroot.so ;
 }

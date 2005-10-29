@@ -1,6 +1,8 @@
-SubDir OBOS_TOP src add-ons kernel drivers audio ac97 auvia ;
+SubDir HAIKU_TOP src add-ons kernel drivers audio ac97 auvia ;
 
-R5KernelAddon auvia : kernel drivers bin :
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+KernelAddon auvia : kernel drivers bin :
 	ac97.c
 	debug.c
 	auvia.c
@@ -9,22 +11,10 @@ R5KernelAddon auvia : kernel drivers bin :
 	util.c
 ;
 
-# Link to kernel/drivers/dev/audio/multi
-{
-	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev audio multi ] ;
-	local instDriver = <kernel!drivers!dev!audio!multi>auvia ;
-	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : auvia ;
-}
-
 Package haiku-auvia-cvs
 	:
 	auvia
 	:
 	boot home config add-ons kernel drivers bin ;
 
-Package haiku-auvia-cvs
-	:
-	<kernel!drivers!dev!audio!multi>auvia
-	:
-	boot home config add-ons kernel drivers dev audio multi ;
+PackageDriverSymLink haiku-auvia-cvs : audio multi auvia ;

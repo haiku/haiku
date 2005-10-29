@@ -1,9 +1,9 @@
-SubDir OBOS_TOP src bin zip ;
+SubDir HAIKU_TOP src bin zip ;
 
 local zip_rsrc = [ FGristFiles zip.rsrc ] ;
 ResComp $(zip_rsrc) : [ FGristFiles zip.rdef ] ;
 
-StaticLibrary zip : 
+StaticLibrary libzip.a : 
 	zipup.c
 	crypt.c
 	ttyio.c

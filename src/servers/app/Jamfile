@@ -1,14 +1,14 @@
-SubDir OBOS_TOP src servers app ;
+SubDir HAIKU_TOP src servers app ;
 
 AddResources app_server : app_server.rdef ;
 
 UseLibraryHeaders agg png zlib ;
 UsePrivateHeaders app interface shared [ FDirName servers app ] ;
 
-UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter drawing_modes ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter font_support ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter font_support ] ;
 UseFreeTypeHeaders ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) drawing ] ;
@@ -20,7 +20,7 @@ SubDirCcFlags $(defines) ;
 SubDirC++Flags $(defines) ;
 
 
-SharedLibrary appserver :
+SharedLibrary libappserver.so :
 	Angle.cpp
 	BGet++.cpp
 	BitmapManager.cpp
@@ -101,4 +101,4 @@ Server app_server :
 	libtextencoding.so
 ;
 
-SubInclude OBOS_TOP src servers app drawing Painter ;
+SubInclude HAIKU_TOP src servers app drawing Painter ;

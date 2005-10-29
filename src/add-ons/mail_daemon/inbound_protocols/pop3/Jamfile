@@ -1,7 +1,9 @@
-SubDir OBOS_TOP src add-ons mail_daemon inbound_protocols pop3 ;
+SubDir HAIKU_TOP src add-ons mail_daemon inbound_protocols pop3 ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders mail ;
-SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
 if $(USESSL) {
 	SubDirC++Flags -DUSESSL ;
@@ -20,10 +22,10 @@ Addon POP3 : mail_daemon inbound_protocols :
 	SimpleMailProtocol.cpp
 	md5c.c ;
 
-LinkSharedOSLibs POP3 : be libmail.so $(NETWORK_LIBS) ;
+LinkAgainst POP3 : be libmail.so $(NETWORK_LIBS) ;
 
 if $(USESSL) {
-	LinkSharedOSLibs POP3 : ssl crypto ;
+	LinkAgainst POP3 : ssl crypto ;
 }
 
 Package haiku-maildaemon-cvs :

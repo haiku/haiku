@@ -1,10 +1,12 @@
-SubDir OBOS_TOP src preferences network ;
+SubDir HAIKU_TOP src preferences network ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 AddResources Network : Network.rdef ;
 
 Preference Network : Network.cpp funcs.cpp ;
 
-LinkSharedOSLibs Network : be root ;
+LinkAgainst Network : be root ;
 
 Package haiku-networkingkit-cvs :
 	Network :

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src preferences sounds ;
+SubDir HAIKU_TOP src preferences sounds ;
 
 if $(TARGET_PLATFORM) != haiku {
         SubDirC++Flags -fmultiple-symbol-spaces ;

@@ -1,0 +1,72 @@
+rule Man2Doc
+{
+	local source = [ FGristFiles $(2) ] ;
+	local binary = $(1) ;
+
+	SEARCH on $(source) = $(SEARCH_SOURCE) ;
+
+	MakeLocate $(binary)
+		: [ FDirName $(HAIKU_DOCUMENTATION_OBJECT_DIR) Shell_Tools ] ;
+
+        Depends $(binary) : $(source) rman ;
+
+	LocalDepends doc_files : $(binary) ;
+        Man2Doc1 $(binary) : rman $(source) ;
+        LocalClean clean : $(binary) ;
+}
+
+actions Man2Doc1
+{
+        $(2[1]) -f XML "$(2[2])" > "$(1)" ;
+}
+
+rule Man2Docs
+{
+        # Man2Docs <sources> ;
+        local source ;
+        for source in [ FGristFiles $(1) ]
+        {
+                local target = $(source:S=.xml) ;
+
+                Man2Doc $(target) : $(source) ;
+        }
+}
+ 
+XSLTPROC ?= xsltproc ;
+
+rule Doc2HTML
+{
+	local source = [ FGristFiles $(1) ] ;
+	local target = $(2) ;
+	local xslsheet = $(3) ;
+	local basedir = [ FDirName $(HAIKU_DOCUMENTATION_DIR) $(4) ] ;
+	local paths = $(5) ;
+	local options = $(6) ;
+
+	if ! $(target) {
+		target = $(1:S=.html) ;
+	}
+
+	SEARCH on $(source) = $(SEARCH_SOURCE) ;
+
+	MakeLocate $(target) : $(basedir) ;
+	if $(2) {
+		XSLBASEDIR on $(target) = -stringparam base.dir \"$(basedir)/\" ; 
+	}
+	XSLSHEET on $(target) = $(xslsheet) ;
+	XSLOPTIONS on $(target) = $(options) ;
+	if $(2) = "" {
+		XSLOUTPUT on $(target) = "-o "\"$(target:D=$(basedir))\" ;
+	}
+
+	Depends $(target) : $(source) ;
+	LocalDepends doc_files : $(target) ;
+	XSLPROCPATHS on $(target) = -path \" $(paths:J=\ ) \" ;
+	Doc2HTML1 $(target) : $(source) ;
+	LocalClean clean : $(target) ;
+}
+
+actions Doc2HTML1
+{
+	$(XSLTPROC) -xinclude $(XSLPROCPATHS) $(XSLBASEDIR) $(XSLOPTIONS) $(XSLOUTPUT) $(XSLSHEET) $(2)
+}

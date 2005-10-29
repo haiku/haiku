@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src data etc ;
+SubDir HAIKU_TOP src data etc ;
 
-SubInclude OBOS_TOP src data etc keymaps ;
-SubInclude OBOS_TOP src data etc timezones ;
+SubInclude HAIKU_TOP src data etc keymaps ;
+SubInclude HAIKU_TOP src data etc timezones ;

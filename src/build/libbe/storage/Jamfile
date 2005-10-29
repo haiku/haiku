@@ -1,0 +1,30 @@
+SubDir HAIKU_TOP src build libbe storage ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) headers build private shared ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers build private app ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers build private kernel ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers build private storage ] : true ;
+
+USES_BE_API on <libbe_build>storage_kit.o = true ;
+
+BuildPlatformMergeObject <libbe_build>storage_kit.o :
+	AppFileInfo.cpp
+	Directory.cpp
+	Entry.cpp
+	EntryList.cpp
+	File.cpp
+	MimeType.cpp
+	Node.cpp
+	NodeInfo.cpp
+	OffsetFile.cpp
+	Path.cpp
+	ResourceFile.cpp
+	ResourceItem.cpp
+	Resources.cpp
+	ResourcesContainer.cpp
+	ResourceStrings.cpp
+	Statable.cpp
+	SymLink.cpp
+	Volume.cpp
+	storage_support.cpp
+;

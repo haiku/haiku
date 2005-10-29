@@ -1,9 +1,9 @@
-SubDir OBOS_TOP src bin sharutils lib ;
+SubDir HAIKU_TOP src bin sharutils lib ;
 
 SubDirCcFlags -DHAVE_CONFIG_H ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
-StaticLibrary sharutils : 
+StaticLibrary libsharutils.a : 
 #	alloca.c
 	basename.c
 	error.c

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons media media-add-ons demultiplexer ;
+SubDir HAIKU_TOP src add-ons media media-add-ons demultiplexer ;
 
 UsePrivateHeaders demultiplexer ;
 
@@ -8,6 +8,5 @@ Addon demultiplexer.media_addon : media :
 	MediaOutputInfo.cpp
 	misc.cpp
 	: true
+	: be media
 ;
-
-LinkSharedOSLibs demultiplexer.media_addon : be media ;

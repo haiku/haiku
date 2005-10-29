@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src system libroot posix malloc ;
+SubDir HAIKU_TOP src system libroot posix malloc ;
 
 KernelMergeObject posix_malloc.o :
 	arch-specific.cpp 

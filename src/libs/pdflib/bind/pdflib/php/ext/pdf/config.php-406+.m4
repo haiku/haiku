@@ -1,4 +1,4 @@
-dnl $Id: config.php-406+.m4,v 1.1 2004/10/06 17:46:43 laplace Exp $
+dnl $Id$
 
 PHP_ARG_WITH(pdflib,whether to include PDFlib support,
 [  --with-pdflib[=DIR]     Include PDFlib 4.x support. DIR is the PDFlib

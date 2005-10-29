@@ -10,7 +10,7 @@
  |                                                                           |
  *---------------------------------------------------------------------------*/
 
-/* $Id: pc_corefont.h,v 1.1 2004/10/06 17:51:27 laplace Exp $
+/* $Id$
  *
  * Core font data structures and routines
  *

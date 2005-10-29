@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons screen_savers ;
+SubDir HAIKU_TOP src add-ons screen_savers ;
 
-SubInclude OBOS_TOP src add-ons screen_savers haiku ;
-SubInclude OBOS_TOP src add-ons screen_savers slideshowsaver ;
+SubInclude HAIKU_TOP src add-ons screen_savers haiku ;
+SubInclude HAIKU_TOP src add-ons screen_savers slideshowsaver ;

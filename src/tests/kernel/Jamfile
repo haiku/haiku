@@ -1,8 +1,7 @@
-SubDir OBOS_TOP src tests kernel ;
+SubDir HAIKU_TOP src tests kernel ;
 
-SubInclude OBOS_TOP src tests kernel boot ;
-SubInclude OBOS_TOP src tests kernel boot_floppy ;
-SubInclude OBOS_TOP src tests kernel consoled ;
-SubInclude OBOS_TOP src tests kernel core ;
-SubInclude OBOS_TOP src tests kernel libroot ;
-SubInclude OBOS_TOP src tests kernel benchmarks ;
+SubInclude HAIKU_TOP src tests kernel boot ;
+SubInclude HAIKU_TOP src tests kernel consoled ;
+SubInclude HAIKU_TOP src tests kernel core ;
+SubInclude HAIKU_TOP src tests kernel libroot ;
+SubInclude HAIKU_TOP src tests kernel benchmarks ;

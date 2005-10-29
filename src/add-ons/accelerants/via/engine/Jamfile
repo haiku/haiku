@@ -1,9 +1,11 @@
-SubDir OBOS_TOP src add-ons accelerants via engine ;
+SubDir HAIKU_TOP src add-ons accelerants via engine ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics via ] ;
 
-StaticLibrary via_engine :
+StaticLibrary libvia_engine.a :
 	acc.c
 	bes.c
 	tvout.c

@@ -4,7 +4,7 @@
 #include <MediaFormats.h>
 #include <ogg/ogg.h>
 #include <string.h>
-#include <OggFormats.h>
+#include "OggFormats.h"
 
 /*
  * theora descriptions/formats

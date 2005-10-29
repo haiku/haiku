@@ -1,12 +1,16 @@
-SubDir OBOS_TOP src bin bash lib readline ;
+SubDir HAIKU_TOP src bin bash lib readline ;
+
+# filter warnings we don't want here
+TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
+	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
 SubDirCcFlags -DHAVE_CONFIG_H -DSHELL ;
 
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) include ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) include ] ;
 
-StaticLibrary readline : 
+StaticLibrary libreadline.a : 
 	readline.c
 	vi_mode.c
 	funmap.c

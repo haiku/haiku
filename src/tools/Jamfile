@@ -1,13 +1,45 @@
-SubDir OBOS_TOP src tools ;
+SubDir HAIKU_TOP src tools ;
 
-SubInclude OBOS_TOP src tools copy_to_bfs_image ;
-SubInclude OBOS_TOP src tools cppunit ;
-SubInclude OBOS_TOP src tools elfsymbolpatcher ;
-SubInclude OBOS_TOP src tools gensyscalls ;
-SubInclude OBOS_TOP src tools hey ;
-SubInclude OBOS_TOP src tools rc ;
-SubInclude OBOS_TOP src tools resattr ;
-SubInclude OBOS_TOP src tools rman ;
-SubInclude OBOS_TOP src tools translation ;
-SubInclude OBOS_TOP src tools unflatten ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src/bin ] ;
+
+local tools =
+	<build>catattr
+	<build>copyattr
+	<build>listattr
+	<build>rmattr
+	<build>settype
+	<build>setversion
+	<build>xres
+;
+
+USES_BE_API on $(tools) = true ;
+
+BuildPlatformMain <build>catattr : catattr.cpp : $(HOST_LIBBE) ;
+
+BuildPlatformMain <build>copyattr : copyattr.cpp
+	: $(HOST_LIBBE) $(HOST_LIBSTDC++) ;
+
+BuildPlatformMain <build>listattr : listattr.cpp : $(HOST_LIBBE) ;
+
+BuildPlatformMain <build>rmattr : rmattr.cpp : $(HOST_LIBBE) ;
+
+BuildPlatformMain <build>settype : settype.cpp : $(HOST_LIBBE) ;
+
+BuildPlatformMain <build>setversion : setversion.cpp : $(HOST_LIBBE) ;
+
+BuildPlatformMain <build>xres : xres.cpp : $(HOST_LIBBE) $(HOST_LIBSTDC++) ;
+
+
+SubInclude HAIKU_TOP src tools copy_to_bfs_image ;
+SubInclude HAIKU_TOP src tools cppunit ;
+SubInclude HAIKU_TOP src tools elfsymbolpatcher ;
+SubInclude HAIKU_TOP src tools gensyscalls ;
+SubInclude HAIKU_TOP src tools hey ;
+SubInclude HAIKU_TOP src tools keymap ;
+SubInclude HAIKU_TOP src tools makebootable ;
+SubInclude HAIKU_TOP src tools rc ;
+SubInclude HAIKU_TOP src tools resattr ;
+SubInclude HAIKU_TOP src tools rman ;
+SubInclude HAIKU_TOP src tools translation ;
+SubInclude HAIKU_TOP src tools unflatten ;
 

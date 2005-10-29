@@ -47,8 +47,8 @@
  *
  */
 
-/* $Id: deflate.c,v 1.1 2004/10/06 17:46:48 laplace Exp $ */
-/* @(#) $Id: deflate.c,v 1.1 2004/10/06 17:46:48 laplace Exp $ */
+/* $Id$ */
+/* @(#) $Id$ */
 
 #include "deflate.h"
 

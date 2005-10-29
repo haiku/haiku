@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: businesscard.tcl,v 1.1 2004/10/06 17:46:44 laplace Exp $
+# $Id$
 #
 # PDFlib client: block processing example in tcl
 #

@@ -1,7 +1,7 @@
-SubDir OBOS_TOP src bin gdb ;
+SubDir HAIKU_TOP src bin gdb ;
 
-SubInclude OBOS_TOP src bin gdb bfd ;
-SubInclude OBOS_TOP src bin gdb gdb ;
-SubInclude OBOS_TOP src bin gdb libiberty ;
-SubInclude OBOS_TOP src bin gdb opcodes ;
-SubInclude OBOS_TOP src bin gdb readline ;
+SubInclude HAIKU_TOP src bin gdb bfd ;
+SubInclude HAIKU_TOP src bin gdb gdb ;
+SubInclude HAIKU_TOP src bin gdb libiberty ;
+SubInclude HAIKU_TOP src bin gdb opcodes ;
+SubInclude HAIKU_TOP src bin gdb readline ;

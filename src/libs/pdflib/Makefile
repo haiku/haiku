@@ -1,5 +1,5 @@
 # Main PDFlib Makefile
-# $Id: Makefile,v 1.1 2004/10/06 17:10:36 laplace Exp $
+# $Id$
 
 top_builddir=.
 

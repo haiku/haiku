@@ -1,6 +1,8 @@
-SubDir OBOS_TOP src add-ons print transports parallel_port ;
+SubDir HAIKU_TOP src add-ons print transports parallel_port ;
 
-SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print transports shared ] ;
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons print transports shared ] ;
 UsePrivateHeaders interface print ;
 
 Addon Parallel\ Port : Print transport : 
@@ -9,7 +11,7 @@ Addon Parallel\ Port : Print transport :
 ;
 
 ObjectReferences <src!add-ons!print!shared>PrintTransportAddOn.o ;
-LinkSharedOSLibs Parallel\ Port : be ;
+LinkAgainst Parallel\ Port : be ;
 
 Package haiku-printingkit-cvs :
 	Parallel\ Port :

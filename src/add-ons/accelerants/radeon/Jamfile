@@ -1,9 +1,10 @@
-SubDir OBOS_TOP src add-ons accelerants radeon ;
+SubDir HAIKU_TOP src add-ons accelerants radeon ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics radeon ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
-
 
 Addon radeon.accelerant : accelerants :
 	Acceleration.c
@@ -33,10 +34,8 @@ Addon radeon.accelerant : accelerants :
 	theatre_out.c
 	vesa_modes.c
 	: false
-	: libaccelerantscommon.a libradeon.a
+	: libaccelerantscommon.a libradeon.a be
 ;
-
-LinkSharedOSLibs radeon.accelerant : be ;
 
 Package haiku-radeon-cvs :
 	radeon.accelerant : 

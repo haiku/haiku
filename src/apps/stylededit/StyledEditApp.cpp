@@ -8,9 +8,9 @@
 #include <Screen.h>
 #include <stdio.h>
 
-#include <Constants.h>
-#include <StyledEditApp.h>
-#include <StyledEditWindow.h>
+#include "Constants.h"
+#include "StyledEditApp.h"
+#include "StyledEditWindow.h"
 
 using namespace BPrivate;
 

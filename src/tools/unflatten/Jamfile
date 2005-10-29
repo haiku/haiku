@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tools unflatten ;
+SubDir HAIKU_TOP src tools unflatten ;
 
 BinCommand unflatten : unflatten.cpp : be ;
 

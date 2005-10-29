@@ -1,8 +1,8 @@
-SubDir OBOS_TOP src system glue ;
+SubDir HAIKU_TOP src system glue ;
 
 KernelObjects
 	init_term_dyn.c
 	start_dyn.c
 	;
 
-SubInclude OBOS_TOP src system glue arch ;
+SubInclude HAIKU_TOP src system glue arch ;

@@ -1,11 +1,13 @@
-SubDir OBOS_TOP src system libroot posix glibc libio ;
+SubDir HAIKU_TOP src system libroot posix glibc libio ;
 
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc include arch $(OBOS_ARCH) ;
-#SubDirHdrs $(OBOS_TOP) src system libroot posix glibc stdio-common ;
-#SubDirHdrs $(OBOS_TOP) src system libroot posix glibc libio ;
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc include ;
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc locale ;
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch
+	$(TARGET_ARCH) ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc stdio-common ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc libio ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc iconv ;
 
 # For now, all wide character functions are disabled,
 # obprintf() is also disabled, because we don't have
@@ -118,7 +120,7 @@ KernelMergeObject posix_gnu_libio.o :
 
 # use this to build a standalone libio.so
 # using libio.so, haiku's version of libstdc++.r4.so can be tested under R5.
-#SharedLibrary io.so :
+#SharedLibrary libio.so :
 #	<$(SOURCE_GRIST)>clearerr.c
 #	<$(SOURCE_GRIST)>clearerr_u.c
 #	<$(SOURCE_GRIST)>fcloseall.c

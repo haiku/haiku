@@ -1,4 +1,6 @@
-SubDir OBOS_TOP src bin keymap ;
+SubDir HAIKU_TOP src bin keymap ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 BinCommand keymap :
 	main.cpp

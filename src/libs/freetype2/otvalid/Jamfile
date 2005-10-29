@@ -9,7 +9,9 @@
 # indicate that you have read the license and understand and accept it
 # fully.
 
-SubDir  OBOS_TOP src libs freetype2 otvalid ;
+SubDir  HAIKU_TOP src libs freetype2 otvalid ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UseFreeTypeHeaders ;
 

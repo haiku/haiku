@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src bin addattr ;
+SubDir HAIKU_TOP src bin addattr ;
 
 BinCommand addattr :
 	main.cpp

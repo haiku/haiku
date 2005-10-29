@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kits media media_decoder ;
+SubDir HAIKU_TOP src tests kits media media_decoder ;
 
 UsePrivateHeaders media_decoder ;
 

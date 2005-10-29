@@ -1,14 +1,15 @@
-SubDir OBOS_TOP src bin gdb libiberty ;
+SubDir HAIKU_TOP src bin gdb libiberty ;
 
 # filter warnings we don't want here
-local originalCCFlags = $(CCFLAGS) ;
-CCFLAGS = [ Filter $(CCFLAGS) : -Wmissing-prototypes -Wsign-compare ] ;
+TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
+	: -Wmissing-prototypes -Wsign-compare ] ;
 
 SubDirCcFlags -DHAVE_CONFIG_H ;
 
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) include ] ;	# for <libiberty.h>
+SubDirSysHdrs $(SUBDIR) ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) include ] ;	# for <libiberty.h>
 
-StaticLibrary <gdb>iberty :
+StaticLibrary <gdb>libiberty.a :
 	# mandatory source
 	alloca.c
 	argv.c
@@ -67,8 +68,4 @@ StaticLibrary <gdb>iberty :
 	stpncpy.c
 	strncmp.c
 	vfork.c
-	: [ FCurrentObjectsDir ]
 ;
-
-# restore CCFLAGS
-CCFLAGS = $(originalCCFlags) ;

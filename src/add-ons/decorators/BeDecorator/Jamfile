@@ -1,7 +1,7 @@
-SubDir OBOS_TOP src add-ons decorators BeDecorator ;
+SubDir HAIKU_TOP src add-ons decorators BeDecorator ;
 
 UseFreeTypeHeaders ;
-UseHeaders [ FDirName $(OBOS_TOP) src servers app server ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app server ] ;
 UsePrivateHeaders [ FDirName servers app ] ;
 
 Addon BeDecorator : decorators :

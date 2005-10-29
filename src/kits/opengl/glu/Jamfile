@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kits opengl glu ;
+SubDir HAIKU_TOP src kits opengl glu ;
 
 UseHeaders [ FDirName $(SUBDIR) include ] ;
 UseHeaders [ FDirName $(SUBDIR) libnurbs interface  ] ;
@@ -8,98 +8,110 @@ UseHeaders [ FDirName $(SUBDIR) libnurbs nurbtess ] ;
 SubDirCcFlags -DNDEBUG -DLIBRARYBUILD ;
 SubDirC++Flags -DNDEBUG  -DLIBRARYBUILD ;
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) libutil ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) libtess ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) libnurbs interface ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) libnurbs internals ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) libnurbs nurbtess ] ;
+
 MergeObject <opengl>sgi-glu.o :
 
-	libutil/error.c 
-	libutil/glue.c 
-	libutil/mipmap.c	
-	libutil/project.c
-	libutil/quad.c
-	libutil/registry.c
+	# libutil
+	error.c 
+	glue.c 
+	mipmap.c	
+	project.c
+	quad.c
+	registry.c
 
-	libtess/dict.c
-	libtess/geom.c 
-	libtess/memalloc.c 
-	libtess/mesh.c 
-	libtess/normal.c 
-	libtess/priorityq.c 
-	libtess/render.c 
-	libtess/sweep.c 
-	libtess/tess.c 
-	libtess/tessmono.c
+	# libtess
+	dict.c
+	geom.c 
+	memalloc.c 
+	mesh.c 
+	normal.c 
+	priorityq.c 
+	render.c 
+	sweep.c 
+	tess.c 
+	tessmono.c
 
-	libnurbs/interface/bezierEval.cc 
-	libnurbs/interface/bezierPatch.cc 
-	libnurbs/interface/bezierPatchMesh.cc 
-	libnurbs/interface/glcurveval.cc 
-	libnurbs/interface/glinterface.cc 
-	libnurbs/interface/glrenderer.cc 
-	libnurbs/interface/glsurfeval.cc 
-	libnurbs/interface/incurveeval.cc 
-	libnurbs/interface/insurfeval.cc 
-	libnurbs/internals/arc.cc 
-	libnurbs/internals/arcsorter.cc 
-	libnurbs/internals/arctess.cc 
-	libnurbs/internals/backend.cc 
-	libnurbs/internals/basiccrveval.cc 
-	libnurbs/internals/basicsurfeval.cc 
-	libnurbs/internals/bin.cc 
-	libnurbs/internals/bufpool.cc 
-	libnurbs/internals/cachingeval.cc 
-	libnurbs/internals/ccw.cc 
-	libnurbs/internals/coveandtiler.cc 
-	libnurbs/internals/curve.cc 
-	libnurbs/internals/curvelist.cc 
-	libnurbs/internals/curvesub.cc 
-	libnurbs/internals/dataTransform.cc 
-	libnurbs/internals/displaylist.cc 
-	libnurbs/internals/flist.cc 
-	libnurbs/internals/flistsorter.cc 
-	libnurbs/internals/hull.cc 
-	libnurbs/internals/intersect.cc 
-	libnurbs/internals/knotvector.cc 
-	libnurbs/internals/mapdesc.cc 
-	libnurbs/internals/mapdescv.cc 
-	libnurbs/internals/maplist.cc 
-	libnurbs/internals/mesher.cc 
-	libnurbs/internals/monoTriangulationBackend.cc 
-	libnurbs/internals/monotonizer.cc 
-	libnurbs/internals/mycode.cc 
-	libnurbs/internals/nurbsinterfac.cc 
-	libnurbs/internals/nurbstess.cc 
-	libnurbs/internals/patch.cc 
-	libnurbs/internals/patchlist.cc 
-	libnurbs/internals/quilt.cc 	
-	libnurbs/internals/reader.cc 
-	libnurbs/internals/renderhints.cc 
-	libnurbs/internals/slicer.cc 
-	libnurbs/internals/sorter.cc 
-	libnurbs/internals/splitarcs.cc 
-	libnurbs/internals/subdivider.cc 
-	libnurbs/internals/tobezier.cc 
-	libnurbs/internals/trimline.cc 
-	libnurbs/internals/trimregion.cc	 
-	libnurbs/internals/trimvertpool.cc 
-	libnurbs/internals/uarray.cc 
-	libnurbs/internals/varray.cc 
+	# libnurbs/interface
+	bezierEval.cc 
+	bezierPatch.cc 
+	bezierPatchMesh.cc 
+	glcurveval.cc 
+	glinterface.cc 
+	glrenderer.cc 
+	glsurfeval.cc 
+	incurveeval.cc 
+	insurfeval.cc 
+	
+	# libnurbs/internals
+	arc.cc 
+	arcsorter.cc 
+	arctess.cc 
+	backend.cc 
+	basiccrveval.cc 
+	basicsurfeval.cc 
+	bin.cc 
+	bufpool.cc 
+	cachingeval.cc 
+	ccw.cc 
+	coveandtiler.cc 
+	curve.cc 
+	curvelist.cc 
+	curvesub.cc 
+	dataTransform.cc 
+	displaylist.cc 
+	flist.cc 
+	flistsorter.cc 
+	hull.cc 
+	intersect.cc 
+	knotvector.cc 
+	mapdesc.cc 
+	mapdescv.cc 
+	maplist.cc 
+	mesher.cc 
+	monoTriangulationBackend.cc 
+	monotonizer.cc 
+	mycode.cc 
+	nurbsinterfac.cc 
+	nurbstess.cc 
+	patch.cc 
+	patchlist.cc 
+	quilt.cc 	
+	reader.cc 
+	renderhints.cc 
+	slicer.cc 
+	sorter.cc 
+	splitarcs.cc 
+	subdivider.cc 
+	tobezier.cc 
+	trimline.cc 
+	trimregion.cc	 
+	trimvertpool.cc 
+	uarray.cc 
+	varray.cc 
 
-	libnurbs/nurbtess/directedLine.cc 
-	libnurbs/nurbtess/gridWrap.cc 
-	libnurbs/nurbtess/monoChain.cc 
-	libnurbs/nurbtess/monoPolyPart.cc 
-	libnurbs/nurbtess/monoTriangulation.cc 
-	libnurbs/nurbtess/partitionX.cc 
-	libnurbs/nurbtess/partitionY.cc 
-	libnurbs/nurbtess/polyDBG.cc 
-	libnurbs/nurbtess/polyUtil.cc 
-	libnurbs/nurbtess/primitiveStream.cc	 
-	libnurbs/nurbtess/quicksort.cc 
-	libnurbs/nurbtess/rectBlock.cc 
-	libnurbs/nurbtess/sampleComp.cc 
-	libnurbs/nurbtess/sampleCompBot.cc 
-	libnurbs/nurbtess/sampleCompRight.cc 
-	libnurbs/nurbtess/sampleCompTop.cc 
-	libnurbs/nurbtess/sampleMonoPoly.cc 
-	libnurbs/nurbtess/sampledLine.cc 
-	libnurbs/nurbtess/searchTree.cc
+	# libnurbs/nurbtess
+	directedLine.cc 
+	gridWrap.cc 
+	monoChain.cc 
+	monoPolyPart.cc 
+	monoTriangulation.cc 
+	partitionX.cc 
+	partitionY.cc 
+	polyDBG.cc 
+	polyUtil.cc 
+	primitiveStream.cc	 
+	quicksort.cc 
+	rectBlock.cc 
+	sampleComp.cc 
+	sampleCompBot.cc 
+	sampleCompRight.cc 
+	sampleCompTop.cc 
+	sampleMonoPoly.cc 
+	sampledLine.cc 
+	searchTree.cc
 ;

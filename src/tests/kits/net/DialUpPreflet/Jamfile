@@ -1,12 +1,18 @@
-SubDir OBOS_TOP src tests kits net DialUpPreflet ;
+SubDir HAIKU_TOP src tests kits net DialUpPreflet ;
 
 UsePrivateHeaders net ;
-UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libppp headers ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libppp
+	headers ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
+	libkernelppp headers ] : true ;
 
 # additonal headers for built-in add-ons:
-UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp pppoe ] ; # PPPoE
-UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp ipcp ] ; # IPCP
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp pppoe ]
+	: true ; # PPPoE
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp ipcp ]
+	: true ; # IPCP
+
+SubDirSysHdrs $(SUBDIR) ;
 
 AddResources DialUpPreflet : DialUpPreflet.rdef ;
 
@@ -27,4 +33,4 @@ SimpleTest DialUpPreflet :
 	PPPoEAddon.cpp
 ;
 
-LinkSharedOSLibs DialUpPreflet : libppp.a be ;
+LinkAgainst DialUpPreflet : libppp.a be ;

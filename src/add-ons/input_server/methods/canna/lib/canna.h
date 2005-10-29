@@ -21,7 +21,7 @@
  */
 
 /*
- * @(#) 102.1 $Id: canna.h,v 1.2 2005/01/26 11:07:48 korli Exp $
+ * @(#) 102.1 $Id$
  */
 
 /************************************************************************/
@@ -76,8 +76,6 @@ extern CANNA_wcstombs (char *, WCHAR_T *, int);
 #endif
 
 #define STROKE_LIMIT 500 /* ¥¹¥È¥í¡¼¥¯¤ÇÀÜÂ³¤òÀÚ¤ë */
-
-#  include <memory.h>
 
 typedef unsigned char BYTE;
 

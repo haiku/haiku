@@ -1,10 +1,10 @@
-SubDir OBOS_TOP src add-ons print drivers pdf ;
+SubDir HAIKU_TOP src add-ons print drivers pdf ;
 
 Package haiku-pdf_writer-cvs :
 	README TODO CHANGES ;
 
-SubInclude OBOS_TOP src add-ons print drivers pdf source ;
-SubInclude OBOS_TOP src add-ons print drivers pdf bookmarks ;
-SubInclude OBOS_TOP src add-ons print drivers pdf encoding ;
-SubInclude OBOS_TOP src add-ons print drivers pdf xrefs ;
+SubInclude HAIKU_TOP src add-ons print drivers pdf source ;
+SubInclude HAIKU_TOP src add-ons print drivers pdf bookmarks ;
+SubInclude HAIKU_TOP src add-ons print drivers pdf encoding ;
+SubInclude HAIKU_TOP src add-ons print drivers pdf xrefs ;
 

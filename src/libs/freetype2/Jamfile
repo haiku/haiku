@@ -1,7 +1,9 @@
 # FreeType 2 src Jamfile (c) 2001, 2002 David Turner
 #
 
-SubDir  OBOS_TOP src libs freetype2 ;
+SubDir  HAIKU_TOP src libs freetype2 ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 # The file <freetype/internal/internal.h> is used to define macros that are
 # later used in #include statements.  It needs to be parsed in order to
@@ -11,10 +13,10 @@ SubDir  OBOS_TOP src libs freetype2 ;
 
 for xx in $(FT2_COMPONENTS)
 {
-  SubInclude OBOS_TOP src libs freetype2 $(xx) ;
+  SubInclude HAIKU_TOP src libs freetype2 $(xx) ;
 }
 
-SubDir  OBOS_TOP src libs freetype2 ;
+SubDir  HAIKU_TOP src libs freetype2 ;
 
 FT2_LinkLibrary  $(FT2_LIB) ;
 

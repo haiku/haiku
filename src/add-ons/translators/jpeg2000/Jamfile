@@ -1,4 +1,6 @@
-SubDir OBOS_TOP src add-ons translators jpeg2000 ;
+SubDir HAIKU_TOP src add-ons translators jpeg2000 ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 # Exclude unwanted formats
 CCFLAGS += -DEXCLUDE_MIF_SUPPORT
@@ -61,9 +63,9 @@ Translator JPEG2000Translator :
 	JPEG2000Translator.cpp
 
 	$(jasper_files)
-	;
 
-LinkSharedOSLibs JPEG2000Translator : be translation ;
+	: be translation
+;
 
 Package haiku-translationkit-cvs :
 	JPEG2000Translator :

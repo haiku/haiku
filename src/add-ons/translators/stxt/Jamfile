@@ -1,7 +1,9 @@
-SubDir OBOS_TOP src add-ons translators stxt ;
+SubDir HAIKU_TOP src add-ons translators stxt ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 # Include BaseTranslator code from shared directory
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons translators shared ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons translators shared ] ;
 
 Translator STXTTranslator :
 	# shared classes
@@ -12,9 +14,10 @@ Translator STXTTranslator :
 	# STXTTranslator classes
 	STXTMain.cpp
 	STXTTranslator.cpp
-	STXTView.cpp ;
+	STXTView.cpp
 
-LinkSharedOSLibs STXTTranslator : be translation ;
+	: be translation
+;
 
 Package haiku-translationkit-cvs :
 	STXTTranslator :

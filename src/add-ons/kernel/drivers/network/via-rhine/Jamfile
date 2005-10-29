@@ -1,4 +1,6 @@
-SubDir OBOS_TOP src add-ons kernel drivers network via-rhine ;
+SubDir HAIKU_TOP src add-ons kernel drivers network via-rhine ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 # set some additional flags
 SubDirCcFlags -Wall ;
@@ -6,7 +8,7 @@ SubDirCcFlags -Wall ;
 # For ether_driver.h
 UsePrivateHeaders net ;
 
-R5KernelAddon via-rhine : kernel drivers bin :
+KernelAddon via-rhine : kernel drivers bin :
 	entry.c
 	hook.c
 	cmd.c
@@ -27,27 +29,16 @@ R5KernelAddon via-rhine : kernel drivers bin :
 Package haiku-networkingkit-cvs :
 	via-rhine :
 	boot home config add-ons kernel drivers bin ;
-Package haiku-networkingkit-cvs :
-	<kernel!drivers!dev!net>via-rhine :
-	boot home config add-ons kernel drivers dev net ;
-
-# Link driver(s) to kernel/drivers/dev/net
-{
-	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev net ] ;
-
-	local instDriver = <kernel!drivers!dev!net>via-rhine ;
-	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : via-rhine ;
-}
+PackageDriverSymLink haiku-networkingkit-cvs : net via-rhine ;
 
 
 # Installation
 
-OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
+HaikuInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
  	via-rhine 
 ;
 
-OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
+HaikuInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
 	<installed>via-rhine : 
 	installed-symlink 
 ;

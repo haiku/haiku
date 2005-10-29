@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src system boot loader file_systems hfs_plus ;
+SubDir HAIKU_TOP src system boot loader file_systems hfs_plus ;
 
-UsePrivateHeaders [ FDirName kernel boot platform $(OBOS_BOOT_PLATFORM) ] ;
+UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName storage ] ;
 

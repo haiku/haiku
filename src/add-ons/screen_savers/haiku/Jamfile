@@ -1,4 +1,6 @@
-SubDir OBOS_TOP src add-ons screen_savers haiku ;
+SubDir HAIKU_TOP src add-ons screen_savers haiku ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 Addon Haiku : "Screen Savers" :
 	ScreenSaver.cpp : false

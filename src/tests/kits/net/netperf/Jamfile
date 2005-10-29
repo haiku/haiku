@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kits net netperf ;
+SubDir HAIKU_TOP src tests kits net netperf ;
 
 Depends netperf : install_netperf_scripts ;
 
@@ -33,7 +33,7 @@ SimpleTest netserver :
 	: $(NETWORK_LIBS)
 ;
 
-OBOSInstall install_netperf_scripts : [ FDirName $(OBOS_TEST_DIR) kits net netperf ] :
+HaikuInstall install_netperf_scripts : [ FDirName $(HAIKU_TEST_DIR) kits net netperf ] :
 	snapshot_script
 	tcp_range_script
 	tcp_rr_script

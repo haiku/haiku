@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src add-ons media plugins mp3_decoder mpglib ;
+SubDir HAIKU_TOP src add-ons media plugins mp3_decoder mpglib ;
 
-StaticLibrary mpglib :
+StaticLibrary libmpglib.a :
 	common.c
 	dct64_i386.c
 	decode_i386.c

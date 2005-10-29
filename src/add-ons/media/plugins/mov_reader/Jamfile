@@ -1,6 +1,8 @@
-SubDir OBOS_TOP src add-ons media plugins mov_reader ;
+SubDir HAIKU_TOP src add-ons media plugins mov_reader ;
 
 UsePrivateHeaders media ;
+
+SubDirHdrs [ FDirName $(SUBDIR) libMOV ] ;
 
 Addon mov_reader : media plugins :
 	mov_reader.cpp
@@ -9,8 +11,8 @@ Addon mov_reader : media plugins :
 	:
 	libmovreader.a
 	libz.a
+	be
+	libmedia.so
 ;
 
-LinkSharedOSLibs mov_reader : be libmedia.so ;
-
-SubInclude OBOS_TOP src add-ons media plugins mov_reader libMOV ;
+SubInclude HAIKU_TOP src add-ons media plugins mov_reader libMOV ;

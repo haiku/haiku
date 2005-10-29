@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kits app bmessenger ;
+SubDir HAIKU_TOP src tests kits app bmessenger ;
 
 CommonUnitTest SMRemoteTargetApp
 	: SMRemoteTargetApp.cpp
@@ -9,4 +9,4 @@ CommonUnitTest SMRemoteTargetApp
 	: app support
 ;
 
-SubInclude OBOS_TOP src tests kits app bmessenger testapps ;
+SubInclude HAIKU_TOP src tests kits app bmessenger testapps ;

@@ -1,15 +1,15 @@
-SubDir OBOS_TOP src kits debug ;
+SubDir HAIKU_TOP src kits debug ;
 
-UseArchHeaders $(OBOS_ARCH) ;
+UseArchHeaders $(TARGET_ARCH) ;
 UsePrivateHeaders debug ;
 UsePrivateHeaders kernel ;
 UsePrivateHeaders runtime_loader ;
 UsePrivateHeaders shared ;
 SubDirHdrs [ FDirName $(SUBDIR) arch ] ;
 
-SEARCH_SOURCE += [ FDirName $(SUBDIR) arch $(OBOS_ARCH) ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) arch $(TARGET_ARCH) ] ;
 
-SharedLibrary debug :
+SharedLibrary libdebug.so :
 	debug_support.cpp
 	SymbolLookup.cpp
 
@@ -17,6 +17,6 @@ SharedLibrary debug :
 	arch_debug_support.cpp
 ;
 
-LinkSharedOSLibs libdebug.so :
+LinkAgainst libdebug.so :
 	libroot.so
 ;

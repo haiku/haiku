@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel file_systems bfs ;
+SubDir HAIKU_TOP src add-ons kernel file_systems bfs ;
 
 # save original optimization level
 oldOPTIM = $(OPTIM) ;
@@ -49,7 +49,7 @@ KernelAddon bfs : kernel file_systems :
 
 SEARCH on [ FGristFiles
 		kernel_cpp.cpp 
-	] = [ FDirName $(OBOS_TOP) src system kernel util ] ;
+	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
 # restore original optimization level
 OPTIM = $(oldOPTIM) ;

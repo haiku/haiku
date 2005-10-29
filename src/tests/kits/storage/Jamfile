@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kits storage ;
+SubDir HAIKU_TOP src tests kits storage ;
 
 UsePrivateHeaders storage ;
 
@@ -42,6 +42,6 @@ CommonTestLib libstoragetest.so
 	DEPENDS libstoragetest_r5.so : $(resdir_r5) ;
 }
 
-SubInclude OBOS_TOP src tests kits storage disk_device ;
-SubInclude OBOS_TOP src tests kits storage testapps ;
-SubInclude OBOS_TOP src tests kits storage virtualdrive ;
+SubInclude HAIKU_TOP src tests kits storage disk_device ;
+SubInclude HAIKU_TOP src tests kits storage testapps ;
+SubInclude HAIKU_TOP src tests kits storage virtualdrive ;

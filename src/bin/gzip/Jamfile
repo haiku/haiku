@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src bin gzip ;
+SubDir HAIKU_TOP src bin gzip ;
 
 SubDirCcFlags -w ;
 
@@ -18,33 +18,21 @@ BinCommand gzip :
 	crypt.c
 ;
 
-LinkSharedOSLibs gzip : be ;
+LinkAgainst gzip : be ;
 
 {
-	MakeLocate gunzip : $(OBOS_BIN_DIR) ;
-	RelSymLink gunzip : gzip ;
-	MakeLocate zcat : $(OBOS_BIN_DIR) ;
-	RelSymLink zcat : gzip ;
-	MakeLocate <bin>zdiff : $(OBOS_BIN_DIR) ;
+	MakeLocatePlatform <bin>zdiff ;
 	Shell <bin>zdiff : zdiff ;
-	MakeLocate zcmp : $(OBOS_BIN_DIR) ;
-	RelSymLink zcmp : <bin>zdiff ;
-	MakeLocate <bin>zgrep : $(OBOS_BIN_DIR) ;
+	MakeLocatePlatform <bin>zgrep ;
 	Shell <bin>zgrep : zgrep ;
-	MakeLocate zegrep : $(OBOS_BIN_DIR) ;
-	RelSymLink zegrep : <bin>zgrep ;
-	MakeLocate zfgrep : $(OBOS_BIN_DIR) ;
-	RelSymLink zfgrep : <bin>zgrep ;
-	MakeLocate <bin>zmore : $(OBOS_BIN_DIR) ;
+	MakeLocatePlatform <bin>zmore ;
 	Shell <bin>zmore : zmore ;
-	MakeLocate zless : $(OBOS_BIN_DIR) ;
-	RelSymLink zless : <bin>zmore ;
-	MakeLocate <bin>znew : $(OBOS_BIN_DIR) ;
+	MakeLocatePlatform <bin>znew ;
 	Shell <bin>znew : znew ;
-	MakeLocate <bin>zforce : $(OBOS_BIN_DIR) ;
+	MakeLocatePlatform <bin>zforce ;
 	Shell <bin>zforce : zforce ;
-	MakeLocate <bin>zfile : $(OBOS_BIN_DIR) ;
+	MakeLocatePlatform <bin>zfile ;
 	Shell <bin>zfile : zfile ;
-	MakeLocate <bin>gzexe : $(OBOS_BIN_DIR) ;
+	MakeLocatePlatform <bin>gzexe ;
 	Shell <bin>gzexe : gzexe ;
 }

@@ -1,9 +1,9 @@
-SubDir OBOS_TOP src tests servers input ;
+SubDir HAIKU_TOP src tests servers input ;
 
-SubInclude OBOS_TOP src tests servers input comm ;
-SubInclude OBOS_TOP src tests servers input inputdevice ;
-SubInclude OBOS_TOP src tests servers input msgspy ;
-SubInclude OBOS_TOP src tests servers input portspy ;
-SubInclude OBOS_TOP src tests servers input prefs ;
-SubInclude OBOS_TOP src tests servers input replicant ;
-SubInclude OBOS_TOP src tests servers input view_input_device ;
+SubInclude HAIKU_TOP src tests servers input comm ;
+SubInclude HAIKU_TOP src tests servers input inputdevice ;
+SubInclude HAIKU_TOP src tests servers input msgspy ;
+SubInclude HAIKU_TOP src tests servers input portspy ;
+SubInclude HAIKU_TOP src tests servers input prefs ;
+SubInclude HAIKU_TOP src tests servers input replicant ;
+SubInclude HAIKU_TOP src tests servers input view_input_device ;

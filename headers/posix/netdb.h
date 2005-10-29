@@ -90,7 +90,7 @@
 
 /*
  *      @(#)netdb.h	8.1 (Berkeley) 6/2/93
- *	$Id: netdb.h,v 1.8 2004/05/13 00:48:55 phoudoin Exp $
+ *	$Id$
  */
  
 /* Modified for OpenBeOS

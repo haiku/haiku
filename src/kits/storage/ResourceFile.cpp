@@ -1070,7 +1070,9 @@ ResourceFile::_WriteResources(ResourcesContainer &container)
 				infoTableSize += kMinResourceInfoBlockSize;
 			} else
 				infoTableSize += kMinResourceInfoSize;
-			if (const char *name = item->Name())
+
+			const char *name = item->Name();	
+			if (name && name[0] != '\0')
 				infoTableSize += strlen(name) + 1;
 		}
 		infoTableSize += kResourceInfoSeparatorSize
@@ -1180,7 +1182,9 @@ ResourceFile::_WriteResources(ResourcesContainer &container)
 			info->ri_index = i + 1;
 			info->ri_name_size = 0;
 			data = info->ri_name;
-			if (const char *name = item->Name()) {
+			
+			const char *name = item->Name();
+			if (name && name[0] != '\0') {
 				uint32 nameLen = strlen(name);
 				memcpy(info->ri_name, name, nameLen + 1);
 				data = skip_bytes(data, nameLen + 1);

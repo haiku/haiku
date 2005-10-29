@@ -1,11 +1,13 @@
-SubDir OBOS_TOP src tests apps miniterminal ;
+SubDir HAIKU_TOP src tests apps miniterminal ;
 
-UseHeaders [ FDirName $(OBOS_TOP) src tests apps miniterminal ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src apps terminal ] ;
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src tests apps miniterminal ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src apps terminal ] ;
 
 AddResources MiniTerminal : MiniTerminal.rdef ;
 
-App MiniTerminal :
+Application MiniTerminal :
 	Arguments.cpp
 	Console.cpp
 	MiniApp.cpp
@@ -15,7 +17,10 @@ App MiniTerminal :
 	;
 
 if $(TARGET_PLATFORM) = haiku {
-	LinkSharedOSLibs MiniTerminal : libroot.so libbe.so ;
+	LinkAgainst MiniTerminal : be ;
 } else {
-	LinkSharedOSLibs MiniTerminal : libroot.so libopenbeos.so ;
+	LinkAgainst MiniTerminal : libopenbeos.so ;
+
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : MiniTerminal
+		: tests!apps ;
 }

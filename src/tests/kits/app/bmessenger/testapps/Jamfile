@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src tests kits app bmessenger testapps ;
+SubDir HAIKU_TOP src tests kits app bmessenger testapps ;
 
-SubDirHdrs [ FDirName $(OBOS_TOP) src tests kits app common ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src tests kits app common ] ;
 
 local commonObjects = <src!tests!kits!app!common>CommonTestApp$(SUFOBJ) ;
 
@@ -51,8 +51,8 @@ rule CopyBMessengerTestApp
 	local source = $(2) ;
 	local r5target = $(target)_r5 ;
 	local r5source = $(source)_r5 ;
-	MakeLocate $(target) : [ FDirName $(OBOS_TEST_DIR) kits app ] ;
-	MakeLocate $(r5target) : [ FDirName $(OBOS_TEST_DIR) kits app ] ;
+	MakeLocate $(target) : [ FDirName $(HAIKU_TEST_DIR) kits app ] ;
+	MakeLocate $(r5target) : [ FDirName $(HAIKU_TEST_DIR) kits app ] ;
 	File $(target) : $(source) ;
 	File $(r5target) : $(r5source) ;
 	local file ;

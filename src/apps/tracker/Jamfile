@@ -1,16 +1,14 @@
-SubDir OBOS_TOP src apps tracker ;
+SubDir HAIKU_TOP src apps tracker ;
 
 UsePrivateHeaders shared ;
 UsePrivateHeaders tracker ;
-SubDirHdrs $(OBOS_TOP) src kits tracker ;
+SubDirHdrs $(HAIKU_TOP) src kits tracker ;
 
 AddResources Tracker : Tracker.rdef ;
 
-App Tracker :
+Application Tracker :
 	main.cpp
 	;
 
-LinkSharedOSLibs Tracker : libbe.so libtracker.so ;
-
-MakeLocate Tracker : [ FDirName $(OBOS_KERNEL_DIR) ] ;
+LinkAgainst Tracker : libbe.so libtracker.so ;
 

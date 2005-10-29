@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src system boot ;
+SubDir HAIKU_TOP src system boot ;
 
 #SetupIncludes ; 
 #oldccflags = $(CCFLAGS) ;
@@ -19,6 +19,6 @@ BuildPlatformMain makeflop : makeflop.c ;
 
 #CCFLAGS = $(oldccflags) ;
 
-SubInclude OBOS_TOP src system boot arch ;
-SubInclude OBOS_TOP src system boot platform ;
-SubInclude OBOS_TOP src system boot loader ;
+SubInclude HAIKU_TOP src system boot arch ;
+SubInclude HAIKU_TOP src system boot platform ;
+SubInclude HAIKU_TOP src system boot loader ;

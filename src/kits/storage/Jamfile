@@ -1,7 +1,19 @@
-SubDir OBOS_TOP src kits storage ;
+SubDir HAIKU_TOP src kits storage ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FStandardOSHeaders ] : true ;
+	UsePrivateHeaders $(DOT) ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# TODO: POSIX headers shouldn't be used. Needed for strlcpy() and
+		# sys/select.h only.
+}
 
 UsePrivateHeaders shared app kernel storage ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) mime ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) sniffer ] ;
 
 MergeObject <libbe>storage_kit.o :
 	AppFileInfo.cpp
@@ -30,28 +42,30 @@ MergeObject <libbe>storage_kit.o :
 	VolumeRoster.cpp
 	storage_support.cpp
 
-	mime/AssociatedTypes.cpp
-	mime/CreateAppMetaMimeThread.cpp
-	mime/Database.cpp
-	mime/InstalledTypes.cpp
-	mime/MimeUpdateThread.cpp
-	mime/SnifferRules.cpp
-	mime/Supertype.cpp
-	mime/SupportingApps.cpp
-	mime/UpdateMimeInfoThread.cpp
-	mime/database_access.cpp
-	mime/database_support.cpp
+	# mime
+	AssociatedTypes.cpp
+	CreateAppMetaMimeThread.cpp
+	Database.cpp
+	InstalledTypes.cpp
+	MimeUpdateThread.cpp
+	SnifferRules.cpp
+	Supertype.cpp
+	SupportingApps.cpp
+	UpdateMimeInfoThread.cpp
+	database_access.cpp
+	database_support.cpp
 
-	sniffer/CharStream.cpp
-	sniffer/Err.cpp				
-	sniffer/DisjList.cpp		
-	sniffer/Pattern.cpp			
-	sniffer/PatternList.cpp		
-	sniffer/Parser.cpp			
-	sniffer/Range.cpp			
-	sniffer/RPattern.cpp		
-	sniffer/RPatternList.cpp	
-	sniffer/Rule.cpp			
+	# sniffer
+	CharStream.cpp
+	Err.cpp
+	DisjList.cpp
+	Pattern.cpp
+	PatternList.cpp
+	Parser.cpp
+	Range.cpp
+	RPattern.cpp
+	RPatternList.cpp
+	Rule.cpp
 ;
 
 # We need to keep the DiskDevice API out of libopenbeos as long as the
@@ -74,7 +88,7 @@ MergeObject <libbe>storage_diskdevice_kit.o :
 # The adapter library we need (Storage Kit).
 #
 
-SharedLibrary beadapter :
+SharedLibrary libbeadapter.so :
 	LibBeAdapter.cpp
 	strlcat.c
 	strlcpy.c
@@ -85,4 +99,4 @@ SharedLibrary beadapter :
 
 SEARCH on [ FGristFiles
 		strlcat.c strlcpy.c strcasestr.c
-	] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
+	] = [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;

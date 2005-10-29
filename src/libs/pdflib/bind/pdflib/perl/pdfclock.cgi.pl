@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: pdfclock.cgi.pl,v 1.1 2004/10/06 17:46:42 laplace Exp $
+# $Id$
 #
 # PDFlib client: pdfclock CGI example in Perl
 #

@@ -1,9 +1,11 @@
-SubDir OBOS_TOP src add-ons accelerants matrox engine ;
+SubDir HAIKU_TOP src add-ons accelerants matrox engine ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics matrox ] ;
 
-StaticLibrary matrox_engine :
+StaticLibrary libmatrox_engine.a :
 	mga_acc.c
 	mga_bes.c
 	mga_crtc.c

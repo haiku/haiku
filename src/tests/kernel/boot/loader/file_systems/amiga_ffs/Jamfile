@@ -1,11 +1,11 @@
-SubDir OBOS_TOP src tests kernel boot loader file_systems amiga_ffs ;
+SubDir HAIKU_TOP src tests kernel boot loader file_systems amiga_ffs ;
 
 UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName storage ] ;
-SubDirHdrs $(OBOS_TOP) src tests kernel boot loader ;
+SubDirHdrs $(HAIKU_TOP) src tests kernel boot loader ;
 
-ObjectsDefines 
+ObjectDefines 
 	amiga_ffs.cpp
 	Volume.cpp
 	Directory.cpp
@@ -26,4 +26,4 @@ KernelStaticLibrary boottest_amiga_ffs :
 
 SEARCH on [ FGristFiles
 		amiga_ffs.cpp Volume.cpp Directory.cpp File.cpp
-	] = [ FDirName $(OBOS_TOP) src system boot loader file_systems amiga_ffs ] ;
+	] = [ FDirName $(HAIKU_TOP) src system boot loader file_systems amiga_ffs ] ;

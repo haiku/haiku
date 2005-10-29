@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kits opengl glut ;
+SubDir HAIKU_TOP src kits opengl glut ;
 
 MergeObject <opengl>glut.o :
 	# C++ sources

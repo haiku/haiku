@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel drivers common ;
+SubDir HAIKU_TOP src add-ons kernel drivers common ;
 
 KernelAddon dprintf : kernel drivers dev :
 	dprintf.cpp

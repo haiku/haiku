@@ -7,7 +7,8 @@
 #include "RTFTranslator.h"
 #include "RTF.h"
 
-#include <TranslatorWindow.h>
+#include "TranslatorWindow.h"
+
 #include <TranslatorRoster.h>
 #include <Application.h>
 

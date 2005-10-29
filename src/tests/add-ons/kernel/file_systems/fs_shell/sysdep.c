@@ -195,7 +195,7 @@ write_pos(int fd, fs_off_t _pos, const void *data,  size_t nbytes)
 #endif
 
 ssize_t
-readv_pos(int fd, fs_off_t _pos, struct iovec *iov, int count)
+readv_pos(int fd, fs_off_t _pos, const struct iovec *iov, int count)
 {
     off_t  pos = (off_t)_pos;
     size_t amt = 0;
@@ -230,7 +230,7 @@ readv_pos(int fd, fs_off_t _pos, struct iovec *iov, int count)
 }
 
 ssize_t
-writev_pos(int fd, fs_off_t _pos, struct iovec *iov,  int count)
+writev_pos(int fd, fs_off_t _pos, const struct iovec *iov,  int count)
 {
     off_t  pos = (off_t)_pos;
     size_t amt = 0;

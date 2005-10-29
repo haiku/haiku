@@ -1,4 +1,4 @@
-/* PDFlib GmbH cvsid: $Id: pngrutil.c,v 1.1 2004/10/06 17:46:50 laplace Exp $ */
+/* PDFlib GmbH cvsid: $Id$ */
 
 /* pngrutil.c - utilities to read a PNG file
  *

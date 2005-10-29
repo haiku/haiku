@@ -1,4 +1,6 @@
-SubDir OBOS_TOP src add-ons translators gif ;
+SubDir HAIKU_TOP src add-ons translators gif ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 Translator GIFTranslator :
 	# Main Source
@@ -13,9 +15,9 @@ Translator GIFTranslator :
 	GIFSave.cpp
 	SavePalette.cpp
 	SFHash.cpp
- ;
-
-LinkSharedOSLibs GIFTranslator : be translation ;
+	:
+	be translation
+;
 
 Package haiku-translationkit-cvs :
 	GIFTranslator :

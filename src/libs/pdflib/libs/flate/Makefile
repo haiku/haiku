@@ -1,6 +1,6 @@
 # Makefile for zlib
 # This generates a libtool convenience library
-# $Id: Makefile,v 1.1 2004/10/06 17:46:48 laplace Exp $
+# $Id$
 
 top_builddir	= ../..
 

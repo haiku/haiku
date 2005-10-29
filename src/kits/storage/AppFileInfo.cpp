@@ -1048,13 +1048,18 @@ BAppFileInfo::_ReadData(const char *name, int32 id, type_code type,
 						size_t &bytesRead, void **allocatedBuffer) const
 {
 	status_t error = B_OK;
+	
 	if (allocatedBuffer)
 		buffer = NULL;
+
+	bool foundData = false;
+
 	if (IsUsingAttributes()) {
 		// get an attribute info
 		attr_info info;
 		if (error == B_OK)
 			error = fNode->GetAttrInfo(name, &info);
+
 		// check type and size, allocate a buffer, if required
 		if (error == B_OK && info.type != type)
 			error = B_BAD_VALUE;
@@ -1066,6 +1071,7 @@ BAppFileInfo::_ReadData(const char *name, int32 id, type_code type,
 		}
 		if (error == B_OK && bufferSize < info.size)
 			error = B_BAD_VALUE;
+
 		// read the data
 		if (error == B_OK) {
 			ssize_t read = fNode->ReadAttr(name, type, 0, buffer, info.size);
@@ -1076,14 +1082,20 @@ BAppFileInfo::_ReadData(const char *name, int32 id, type_code type,
 			else
 				bytesRead = read;
 		}
-	} else if (IsUsingResources()) {
+
+		foundData = (error == B_OK);
+	}
+
+	if (!foundData && IsUsingResources()) {
 		// get a resource info
+		error = B_OK;
 		int32 idFound;
 		size_t sizeFound;
 		if (error == B_OK) {
 			if (!fResources->GetResourceInfo(type, name, &idFound, &sizeFound))
 				error = B_ENTRY_NOT_FOUND;
 		}
+
 		// check id and size, allocate a buffer, if required
 		if (error == B_OK && id >= 0 && idFound != id)
 			error = B_ENTRY_NOT_FOUND;
@@ -1095,6 +1107,7 @@ BAppFileInfo::_ReadData(const char *name, int32 id, type_code type,
 		}
 		if (error == B_OK && bufferSize < sizeFound)
 			error = B_BAD_VALUE;
+
 		// load resource
 		const void *resourceData = NULL;
 		if (error == B_OK) {
@@ -1104,8 +1117,10 @@ BAppFileInfo::_ReadData(const char *name, int32 id, type_code type,
 			else
 				error = B_ERROR;
 		}
+
 	} else
 		error = B_BAD_VALUE;
+
 	// return the allocated buffer, or free it on error
 	if (allocatedBuffer) {
 		if (error == B_OK)
@@ -1113,6 +1128,7 @@ BAppFileInfo::_ReadData(const char *name, int32 id, type_code type,
 		else
 			free(buffer);
 	}
+
 	return error;
 }
 

@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src add-ons media plugins musepack mpc ;
+SubDir HAIKU_TOP src add-ons media plugins musepack mpc ;
 
-StaticLibrary musepack :
+StaticLibrary libmusepack.a :
 	bitstream.cpp
 	huffsv46.cpp
 	huffsv7.cpp
@@ -10,5 +10,3 @@ StaticLibrary musepack :
 	requant.cpp
 	synth_filter.cpp
 	;
-
-LinkSharedOSLibs musepack : be libmedia.so ;

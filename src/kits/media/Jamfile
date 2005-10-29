@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kits media ;
+SubDir HAIKU_TOP src kits media ;
 
 UsePrivateHeaders media ;
 UsePrivateHeaders shared ;
@@ -9,9 +9,10 @@ if $(CHECK_MALLOC) {
 
 # That's ugly. The header (ServerInterface.h) should reside in
 # headers/private/media.
-SubDirHdrs [ FDirName $(OBOS_TOP) src servers media ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src servers media ] ;
+SubDirSysHdrs $(SUBDIR) ; # for the Old*.h headers
 
-SharedLibrary media :
+SharedLibrary libmedia.so :
 	# Private Media Kit
 	!missing_symbols.cpp
 
@@ -74,11 +75,6 @@ SharedLibrary media :
 	MediaPlugin.cpp
 	PluginManager.cpp
 	ReaderPlugin.cpp
-;
-
-LinkSharedOSLibs libmedia.so :
+	:
 	be
 ;
-
-MakeLocate <develop>libmedia.so : $(OBOS_STLIB_DIR) ;
-RelSymLink <develop>libmedia.so : libmedia.so ;

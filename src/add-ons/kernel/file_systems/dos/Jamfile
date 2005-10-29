@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src add-ons kernel file_systems dos ;
+SubDir HAIKU_TOP src add-ons kernel file_systems dos ;
 
-R5KernelAddon dos : kernel file_systems :
+KernelAddon dos : kernel file_systems :
 	attr.c
 	dir.c
 	dlist.c

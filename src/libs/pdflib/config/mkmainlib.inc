@@ -1,5 +1,5 @@
 # Template to be included from every makefile that creates libs
-# $Id: mkmainlib.inc,v 1.1 2004/10/06 17:46:45 laplace Exp $
+# $Id$
 #
 
 LIBLINKSELF     = $(RPATH) $(MAINOBJ) $(INTERNALLIBS) $(EXTERNALLIBS)

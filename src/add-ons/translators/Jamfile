@@ -1,14 +1,14 @@
-SubDir OBOS_TOP src add-ons translators ;
+SubDir HAIKU_TOP src add-ons translators ;
 
-SubInclude OBOS_TOP src add-ons translators bmp ;
-SubInclude OBOS_TOP src add-ons translators gif ;
-SubInclude OBOS_TOP src add-ons translators ico ;
-SubInclude OBOS_TOP src add-ons translators jpeg ;
-SubInclude OBOS_TOP src add-ons translators jpeg2000 ;
-SubInclude OBOS_TOP src add-ons translators libtiff ;
-SubInclude OBOS_TOP src add-ons translators png ;
-SubInclude OBOS_TOP src add-ons translators ppm ;
-SubInclude OBOS_TOP src add-ons translators rtf ;
-SubInclude OBOS_TOP src add-ons translators sgi ;
-SubInclude OBOS_TOP src add-ons translators stxt ;
-SubInclude OBOS_TOP src add-ons translators tga ;
+SubInclude HAIKU_TOP src add-ons translators bmp ;
+SubInclude HAIKU_TOP src add-ons translators gif ;
+SubInclude HAIKU_TOP src add-ons translators ico ;
+SubInclude HAIKU_TOP src add-ons translators jpeg ;
+SubInclude HAIKU_TOP src add-ons translators jpeg2000 ;
+SubInclude HAIKU_TOP src add-ons translators libtiff ;
+SubInclude HAIKU_TOP src add-ons translators png ;
+SubInclude HAIKU_TOP src add-ons translators ppm ;
+SubInclude HAIKU_TOP src add-ons translators rtf ;
+SubInclude HAIKU_TOP src add-ons translators sgi ;
+SubInclude HAIKU_TOP src add-ons translators stxt ;
+SubInclude HAIKU_TOP src add-ons translators tga ;

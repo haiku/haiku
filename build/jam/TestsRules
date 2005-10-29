@@ -1,0 +1,303 @@
+# test pseudo targets
+NOTFILE obostests ;
+NOTFILE r5tests ;
+
+rule CommonTestLib
+{
+	# CommonTestLib <target> : <sources> : <obos libraries> 
+	#	: <r5 libraries> : <test libraries> : <public headers>;
+	# Builds a unit test for both OBOS and R5 modules.
+	# <target> The name of the target.
+	# <sources> The list of sources.
+	# <obos libraries> A list of link libraries for the OBOS tests (as passed
+	# to LinkAgainst).
+	# <r5 libraries> A list of link libraries for the R5 tests (as passed
+	# to LinkAgainst).
+	# <test libraries> A list of link libraries for both OBOS tests and R5 tests
+	# that have a common name (i.e. specify libx.so and the OBOS tests will link
+	# to libx.so and the R5 tests will link to libx_r5.so).
+	# <public headers> A list of public header dirs (as passed to
+	# UsePublicHeaders).
+
+	TestLib $(1) : $(2) : [ FDirName $(HAIKU_TEST_DIR) unittester lib ] : $(3) $(5) : $(6) ;
+	R5TestLib $(1) : $(2) : [ FDirName $(HAIKU_TEST_DIR) unittester_r5 lib ] : $(4) [ R5SharedLibraryNames $(5) ] ;
+}
+
+rule TestLib
+{
+	# TestLib <target> : <sources> : <dest> : <libraries> : <public headers>
+	# Builds a unit test library for an OBOS module.
+	# <target> The name of the target.
+	# <sources> The list of sources.
+	# <dest> The directory for the target (as passed to FDirName).
+	# <libraries> A list of link libraries (as passed to LinkAgainst).
+	# <public headers> A list of public header dirs (as passed to
+	# UsePublicHeaders).
+
+	local target = $(1) ;
+	local sources = $(2) ;
+	local dest = $(3) ;
+	local libraries = $(4) ;
+	local headerDirs = $(5) ;
+	local objects = [ FGristFiles $(sources:S=$(SUFOBJ)) ] ;
+
+	# Our Main replacement.
+	MakeLocate $(target) : $(dest) ;
+	MainFromObjects $(target) : $(objects) ;
+	TestObjects $(sources) : $(headerDirs) ;
+
+	Depends $(target) : libcppunit.so ;
+	Depends obostests : $(target) ;
+	LinkAgainst $(target) : libcppunit.so $(libraries) ;
+	LINKFLAGS on $(target) = $(LINKFLAGS) -nostart -Xlinker -soname=\"$(target)\" ;
+}
+
+rule R5TestLib
+{
+	# R5TestLib <target> : <sources> : <dest> : <libraries>
+	# Builds a unit test for an R5 module. "_r5" is appended to the object
+	# and the target name.
+	# <target> The name of the target.
+	# <sources> The list of sources.
+	# <dest> The directory for the target (as passed to FDirName).
+	# <libraries> A list of link libraries (as passed to LinkAgainst).
+
+	local target = $(1:B)_r5$(1:S) ;
+	local sources = $(2) ;
+	local dest = $(3) ;
+	local libraries = $(4) ;
+	local objects = [ R5ObjectNames $(sources) ] ;
+
+	# Our Main replacement.
+	MakeLocate $(target) : $(dest) ;
+	MainFromObjects $(target) : $(objects) ;
+	TestObjects $(sources) : : true ;
+
+	Depends $(target) : libcppunit.so ;
+	Depends r5tests : $(target) ;
+	LinkAgainst $(target) : libcppunit.so $(libraries) ;
+	LINKFLAGS on $(target) = $(LINKFLAGS) -nostart -Xlinker -soname=\"$(target)\" ;
+}
+
+rule CommonUnitTest
+{
+	# CommonUnitTest <target> : <sources> : <dest> : <obos libraries> 
+	#	: <r5 libraries> : <public headers>;
+	# Builds a unit test for both OBOS and R5 modules.
+	# <target> The name of the target.
+	# <sources> The list of sources.
+	# <dest> The directory for the target (as passed to FDirName).
+	# <obos libraries> A list of link libraries for the OBOS tests (as passed
+	# to LinkAgainst).
+	# <r5 libraries> A list of link libraries for the R5 tests (as passed
+	# to LinkAgainst).
+	# <public headers> A list of public header dirs (as passed to
+	# UsePublicHeaders).
+
+	UnitTest $(1) : $(2) : $(3) : $(4) : $(6) ;
+	R5UnitTest $(1) : $(2) : $(3) : $(5) ;
+}
+
+rule UnitTest
+{
+	# UnitTest <target> : <sources> : <dest> : <libraries> : <public headers>
+	# Builds a unit test for an OBOS module.
+	# <target> The name of the target.
+	# <sources> The list of sources.
+	# <dest> The directory for the target (as passed to FDirName).
+	# <libraries> A list of link libraries (as passed to LinkAgainst).
+	# <public headers> A list of public header dirs (as passed to
+	# UsePublicHeaders).
+
+	local target = $(1) ;
+	local sources = $(2) ;
+	local dest = $(3) ;
+	local libraries = $(4) ;
+	local headerDirs = $(5) ;
+	local objects = [ FGristFiles $(sources:S=$(SUFOBJ)) ] ;
+
+	# Our Main replacement.
+	MakeLocate $(target) : [ FDirName $(HAIKU_TEST_DIR) $(dest) ] ;
+	MainFromObjects $(target) : $(objects) ;
+	TestObjects $(sources) : $(headerDirs) ;
+
+	Depends $(target) : libcppunit.so ;
+	Depends obostests : $(target) ;
+	LinkAgainst $(target) : libcppunit.so $(libraries) ;
+}
+
+rule R5UnitTest
+{
+	# R5UnitTest <target> : <sources> : <dest> : <libraries>
+	# Builds a unit test for an R5 module. "_r5" is appended to the object
+	# and the target name.
+	# <target> The name of the target.
+	# <sources> The list of sources.
+	# <dest> The directory for the target (as passed to FDirName).
+	# <libraries> A list of link libraries (as passed to LinkAgainst).
+
+	local target = $(1)_r5 ;
+	local sources = $(2) ;
+	local dest = $(3) ;
+	local libraries = $(4) ;
+	local objects = [ R5ObjectNames $(sources) ] ;
+
+	# Our Main replacement.
+	MakeLocate $(target) : [ FDirName $(HAIKU_TEST_DIR) $(dest) ] ;
+	MainFromObjects $(target) : $(objects) ;
+	TestObjects $(sources) : : true ;
+
+	Depends $(target) : libcppunit.so ;
+	Depends r5tests : $(target) ;
+	LinkAgainst $(target) : libcppunit.so $(libraries) ;
+}
+
+rule R5ObjectNames
+{
+	# R5ObjectNames <sources> ;
+	# Returns a list of gristed object names given a list of source file names.
+	# Moreover each object names gets "_r5" inserted before the object suffix.
+	local objects = $(1:S=)_r5 ;
+	return [ FGristFiles $(objects:S=$(SUFOBJ)) ] ;
+}
+
+rule R5Objects
+{
+	# R5Objects <sources>
+	# Similar to Objects, but appends "_r5" to the object file names and
+	# removes `-nostdinc' from the CC and C++ flags to enable system headers.
+	# <sources> The source files.
+
+	# Remove `-nostdinc' from CCFLAGS and C++FLAGS.
+	local oldCCFLAGS = $(CCFLAGS) ;
+	local oldC++FLAGS = $(C++FLAGS) ;
+	CCFLAGS = [ FFilter $(CCFLAGS) : -nostdinc ] ;
+	C++FLAGS = [ FFilter $(C++FLAGS) : -nostdinc ] ;
+
+	local sources = $(1) ;
+	local source ;
+	for source in [ FGristFiles $(sources) ]
+	{
+		local object = [ R5ObjectNames $(source) ] ;
+		Object $(object) : $(source) ;
+		LocalDepends obj : $(object) ;
+	}
+
+	# Reset CCFLAGS and C++FLAGS to original values.
+	CCFLAGS = $(oldCCFLAGS) ;
+	C++FLAGS = $(oldC++FLAGS) ;
+}
+
+rule TestObjects
+{
+	# TestLib <sources> : <public headers> : <r5>
+	# Compiles objects for tests.
+	# <sources> The list of sources.
+	# <public headers> A list of public header dirs (as passed to
+	# UsePublicHeaders).
+	# <r5> If set, "_r5" is appended to the object file names and
+	# <public headers> is ignored. Furthermore the pre-processor macro
+	# TEST_R5 is defined, TEST_OBOS otherwise.
+
+	local sources = $(1) ;
+	local headerDirs = $(2) ;
+	local r5 = $(3) ;
+	local objects ;
+
+	if $(r5) {
+		objects = [ R5ObjectNames $(sources) ] ;
+	} else {
+		objects = [ FGristFiles $(sources:S=$(SUFOBJ)) ] ;
+	}
+
+	# Turn optimization off, if desired.
+	if ! $(NO_TEST_DEBUG) {
+		OPTIM on $(objects) = ;
+	}
+
+	# set headers/defines
+	UseCppUnitObjectHeaders $(sources) : $(objects) ;
+	if $(r5) {
+		ObjectDefines $(sources) : TEST_R5 ;
+	} else {
+		UsePublicObjectHeaders $(sources) : $(headerDirs) : $(objects) ;
+		ObjectDefines $(sources) : TEST_OBOS ;
+	}
+
+	if ! $(NO_TEST_DEBUG) {
+		# Turn debugging on. That is usually desired for test code.
+		ObjectCcFlags $(objects) : $(DEBUG_FLAGS) ;
+		ObjectC++Flags $(objects) : $(DEBUG_FLAGS) ;
+	}
+
+	# compile
+	if $(r5) {
+		R5Objects $(sources) ;
+	} else {
+		Objects $(sources) ;
+	}
+}
+
+rule R5SharedLibraryNames
+{
+	# R5SharedLibraryNames <sources> ;
+	# Returns a list of shared library names given a list of file names. NO
+	# GRISTING IS PERFORMED :-) However, each library names gets "_r5" inserted
+	# before the shared lib suffix.
+	return $(1:S=)_r5.so ;
+}
+
+rule SimpleTest
+{
+	# UnitTest <target> : <sources> : <libraries>
+	# Builds a unit test for an OBOS module.
+	# <target> The name of the target.
+	# <sources> The list of sources.
+	# <dest> The directory for the target (as passed to FDirName).
+	# <libraries> A list of link libraries (as passed to LinkAgainst).
+	# <public headers> A list of public header dirs (as passed to
+	# UsePublicHeaders).
+
+	local target = $(1) ;
+	local sources = $(2) ;
+	local libraries = $(3) ;
+	local relPath = [ FRelPath src tests : $(SUBDIR_TOKENS) ] ;
+
+	# Turn optimization off.
+	if ! $(NO_TEST_DEBUG) {
+		local optim = $(OPTIM) ;
+		OPTIM = ;
+	}
+
+	ObjectDefines $(sources) : TEST_OBOS ;
+	MakeLocate $(target) : [ FDirName $(HAIKU_TEST_DIR) $(relPath) ] ;
+	Main $(target) : $(sources) ;
+	Depends obostests : $(target) ;
+	LinkAgainst $(target) : $(libraries) ;
+	if ! $(NO_TEST_DEBUG) {
+		# Turn debugging on. That is usually desired for test code.
+		ObjectCcFlags $(sources) : $(DEBUG_FLAGS) ;
+		ObjectC++Flags $(sources) : $(DEBUG_FLAGS) ;
+
+		# Turn optimization on again.
+		OPTIM = $(optim) ;
+	}
+}
+
+rule BuildPlatformTest
+{
+	# Usage BuildPlatformTest <target> : <sources> ;
+
+	local target = $(1) ;
+	local sources = $(2) ;
+
+	local relPath ;
+	if [ FIsPrefix src tests : $(SUBDIR_TOKENS) ] {
+		relPath = $(SUBDIR_TOKENS[3-]) ;
+	} else {
+		relPath = $(SUBDIR_TOKENS[2-]) ;
+	}
+	MakeLocate $(target) : [ FDirName $(HAIKU_TEST_DIR) $(relPath) ] ;
+	
+	BuildPlatformMain $(target) : $(sources) ;
+}

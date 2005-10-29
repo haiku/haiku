@@ -1,4 +1,6 @@
-SubDir OBOS_TOP src add-ons print drivers preview ;
+SubDir HAIKU_TOP src add-ons print drivers preview ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders interface print ;
 
@@ -17,7 +19,7 @@ Addon Preview : Print :
 	PreviewDriver.cpp
 ;
 
-LinkSharedOSLibs Preview : be root libprint.a  ;
+LinkAgainst Preview : be root libprint.a  ;
 
 Package haiku-printingkit-cvs :
 	Preview :

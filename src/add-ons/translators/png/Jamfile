@@ -1,10 +1,12 @@
-SubDir OBOS_TOP src add-ons translators png ;
+SubDir HAIKU_TOP src add-ons translators png ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UseLibraryHeaders zlib ;
 UseLibraryHeaders png ;
 
 # Include BaseTranslator code from shared directory
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons translators shared ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons translators shared ] ;
 
 Translator PNGTranslator : 
 	# shared classes
@@ -15,15 +17,10 @@ Translator PNGTranslator :
 	# PNGTranslator classes
 	PNGMain.cpp
 	PNGTranslator.cpp
-	PNGView.cpp ;
+	PNGView.cpp
 
-if ( $(TARGET_PLATFORM) = haiku ) {
-	LinkSharedOSLibs PNGTranslator :
-		libbe.so libtranslation.so libpng.so libz.so ;
-} else {
-	LinkSharedOSLibs PNGTranslator :
-		be translation libpng.a libz.a ;
-}
+	: be translation libpng.a z
+;
 
 Package haiku-translationkit-cvs :
 	PNGTranslator :

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons media plugins ac3_decoder ;
+SubDir HAIKU_TOP src add-ons media plugins ac3_decoder ;
 
 UsePrivateHeaders media ;
 
@@ -10,6 +10,6 @@ Addon ac3_decoder : media plugins :
 	liba52.a
 ;
 
-LinkSharedOSLibs ac3_decoder : be libmedia.so ;
+LinkAgainst ac3_decoder : be libmedia.so ;
 
-SubIncludeGPL OBOS_TOP src add-ons media plugins ac3_decoder liba52 ;
+SubIncludeGPL HAIKU_TOP src add-ons media plugins ac3_decoder liba52 ;

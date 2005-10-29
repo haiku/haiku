@@ -1,4 +1,6 @@
-SubDir OBOS_TOP src add-ons kernel drivers network rtl8139 ;
+SubDir HAIKU_TOP src add-ons kernel drivers network rtl8139 ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 # set some additional flags
 SubDirCcFlags -Wall ;
@@ -6,7 +8,7 @@ SubDirCcFlags -Wall ;
 # For ether_driver.h
 UsePrivateHeaders net ;
 
-R5KernelAddon rtl8139 : kernel drivers bin :
+KernelAddon rtl8139 : kernel drivers bin :
 	driver.c
 	util.c
 	;
@@ -14,24 +16,11 @@ R5KernelAddon rtl8139 : kernel drivers bin :
 Package haiku-rtl8139-cvs :
 	rtl8139 : 
 	boot home config add-ons kernel drivers bin ;
-Package haiku-rtl8139-cvs :
-	<kernel!drivers!dev!net>rtl8139 :
-	boot home config add-ons kernel drivers dev net ;
+PackageDriverSymLink haiku-rtl8139-cvs : net rtl8139 ;
 
 # Package haiku-rtl8139-cvs :
 #	rtl8139.settings :
 #	boot home config settings kernel drivers sample ;
-
-
-
-# Link driver(s) to kernel/drivers/dev/net
-{
-	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev net ] ;
-
-	local instDriver = <kernel!drivers!dev!net>rtl8139 ;
-	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : rtl8139 ;
-}
 
 
 
@@ -49,11 +38,11 @@ actions ignore InstallRTL8139
 
 # Installation
 
-OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
+HaikuInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
  	rtl8139 
 ;
 
-OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
+HaikuInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
 	<installed>rtl8139 : 
 	installed-symlink 
 ;
@@ -61,9 +50,7 @@ OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/driv
 Package haiku-networkingkit-cvs :
 	rtl8139 :
 	boot home config add-ons kernel drivers bin ;
-Package haiku-networkingkit-cvs :
-	<kernel!drivers!dev!net>rtl8139 :
-	boot home config add-ons kernel drivers dev net ;
+PackageDriverSymLink haiku-networkingkit-cvs : net rtl8139 ;
 # Package haiku-networkingkit-cvs :
 #	rtl8139.settings :
 #	boot home config settings kernel drivers sample ;

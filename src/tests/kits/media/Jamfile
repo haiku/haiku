@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kits media ;
+SubDir HAIKU_TOP src tests kits media ;
 
 SimpleTest AreaTest : AreaTest.cpp : be ;
 
@@ -17,10 +17,10 @@ SimpleTest mediaDescriptions :
 	mediaDescriptions.cpp
 	: media ;
 
-SubInclude OBOS_TOP src tests kits media media_decoder ;
-SubInclude OBOS_TOP src tests kits media notificationtest ;
-SubInclude OBOS_TOP src tests kits media nodetest ;
-SubInclude OBOS_TOP src tests kits media playwav ;
-SubInclude OBOS_TOP src tests kits media mp3_reader_test ;
-SubInclude OBOS_TOP src tests kits media wav_reader_test ;
+SubInclude HAIKU_TOP src tests kits media media_decoder ;
+SubInclude HAIKU_TOP src tests kits media notificationtest ;
+SubInclude HAIKU_TOP src tests kits media nodetest ;
+SubInclude HAIKU_TOP src tests kits media playwav ;
+SubInclude HAIKU_TOP src tests kits media mp3_reader_test ;
+SubInclude HAIKU_TOP src tests kits media wav_reader_test ;
 

@@ -2082,8 +2082,11 @@ Inode::Create(Transaction *transaction, Inode *parent, const char *name, int32 m
 
 	if ((status = new_vnode(volume->ID(), inode->ID(), inode)) != B_OK) {
 		// this is a really fatal error, and we can't recover from that
-		FATAL(("new_vnode() failed with: %s\n", strerror(status)));
-		DIE(("new_vnode() failed for inode!"));
+		// The only exception is that the volume is being initialized.
+		if (volume->ID() >= 0) {
+			FATAL(("new_vnode() failed with: %s\n", strerror(status)));
+			DIE(("new_vnode() failed for inode!"));
+		}
 	}
 
 	if (_id != NULL)

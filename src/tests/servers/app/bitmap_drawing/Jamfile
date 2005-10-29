@@ -1,19 +1,19 @@
-SubDir OBOS_TOP src tests servers app bitmap_drawing ;
+SubDir HAIKU_TOP src tests servers app bitmap_drawing ;
 
 UseHeaders [ FDirName os app ] ;
 UseHeaders [ FDirName os interface ] ;
 
-App BitmapDrawing :
+Application BitmapDrawing :
 	main.cpp
 	;
 
 if ( $(TARGET_PLATFORM) = haiku ) {
 	# for running natively under R5 or Haiku:
-	LinkSharedOSLibs BitmapDrawing :
+	LinkAgainst BitmapDrawing :
 		libbe.so ;
 } else {
 	# for running in the Haiku app_server under R5:
-	LinkSharedOSLibs BitmapDrawing :
+	LinkAgainst BitmapDrawing :
 		<boot!home!config!lib>libopenbeos.so ;
 #		be ;
 }

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kits media mp3_reader_test ;
+SubDir HAIKU_TOP src tests kits media mp3_reader_test ;
 
 UsePrivateHeaders media ;
 
@@ -13,7 +13,7 @@ SimpleTest mp3_reader_test
 
 # Tell Jam where to find these sources
 SEARCH on [ FGristFiles MP3ReaderPlugin.cpp ]
-	= [ FDirName $(OBOS_TOP) src add-ons media plugins mp3_reader ] ;
+	= [ FDirName $(HAIKU_TOP) src add-ons media plugins mp3_reader ] ;
 
 SEARCH on [ FGristFiles MediaPlugin.cpp ReaderPlugin.cpp ]
-	= [ FDirName $(OBOS_TOP) src kits media ] ;
+	= [ FDirName $(HAIKU_TOP) src kits media ] ;

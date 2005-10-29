@@ -16,7 +16,7 @@
  */
 
 /*
- *	$Id: res_update.h,v 1.1 2004/04/25 22:53:40 phoudoin Exp $
+ *	$Id$
  */
 
 #ifndef __RES_UPDATE_H

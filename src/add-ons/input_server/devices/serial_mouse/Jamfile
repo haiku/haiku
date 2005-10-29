@@ -1,4 +1,6 @@
-SubDir OBOS_TOP src add-ons input_server devices serial_mouse ;
+SubDir HAIKU_TOP src add-ons input_server devices serial_mouse ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders input ;
 
@@ -10,7 +12,7 @@ Addon <input>serial_mouse : input_server/devices :
 
 if $(COMPILE_FOR_R5) {
 } else {
-        LinkSharedOSLibs <input>mouse : <boot!home!config!lib>libopenbeos.so ;
+        LinkAgainst <input>mouse : <boot!home!config!lib>libopenbeos.so ;
 }
 
 Package haiku-inputkit-cvs :

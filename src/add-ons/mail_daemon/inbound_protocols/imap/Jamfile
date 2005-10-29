@@ -1,8 +1,10 @@
-SubDir OBOS_TOP src add-ons mail_daemon inbound_protocols imap ;
+SubDir HAIKU_TOP src add-ons mail_daemon inbound_protocols imap ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders mail ;
 
-SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
 if $(USESSL) {
 	SubDirC++Flags -DUSESSL ;
@@ -20,10 +22,10 @@ Addon IMAP : mail_daemon inbound_protocols :
 	imap_config.cpp
 	NestedString.cpp ;
 
-LinkSharedOSLibs IMAP : be libmail.so $(NETWORK_LIBS) ;
+LinkAgainst IMAP : be libmail.so $(NETWORK_LIBS) ;
 
 if $(USESSL) {
-	LinkSharedOSLibs IMAP : ssl crypto ;
+	LinkAgainst IMAP : ssl crypto ;
 }
 
 Package haiku-maildaemon-cvs :

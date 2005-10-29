@@ -1,8 +1,8 @@
-SubDir OBOS_TOP src tests kernel consoled ;
+SubDir HAIKU_TOP src tests kernel consoled ;
 
 UsePrivateHeaders kernel ;
-UseHeaders [ FDirName $(OBOS_TOP) src apps terminal ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src apps terminal ] ;
 
-App consoled :
+Application consoled :
 	consoled.cpp
 	: libroot.so libbe.so ;

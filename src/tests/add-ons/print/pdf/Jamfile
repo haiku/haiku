@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests add-ons print pdf ;
+SubDir HAIKU_TOP src tests add-ons print pdf ;
 
-SubInclude OBOS_TOP src tests add-ons print pdf bezierbounds ;
-SubInclude OBOS_TOP src tests add-ons print pdf linepathbuilder ;
+SubInclude HAIKU_TOP src tests add-ons print pdf bezierbounds ;
+SubInclude HAIKU_TOP src tests add-ons print pdf linepathbuilder ;

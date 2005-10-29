@@ -1,7 +1,7 @@
-SubDir OBOS_TOP src tests add-ons kernel disk_scanner session ;
+SubDir HAIKU_TOP src tests add-ons kernel disk_scanner session ;
 
 SEARCH_SOURCE
-	+= [ FDirName $(OBOS_TOP) src add-ons kernel disk_scanner session ] ;
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel disk_scanner session ] ;
 
 UsePrivateHeaders $(DOT) ;
 
@@ -16,4 +16,4 @@ UsePrivateHeaders $(DOT) ;
 Addon <userland>cdrom : userland disk_scanner session :
 	cdrom.cpp
 ;
-LinkSharedOSLibs <userland>cdrom : libkernelland_emu.so ;
+LinkAgainst <userland>cdrom : libkernelland_emu.so ;

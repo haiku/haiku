@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tools translation pnginfo ;
+SubDir HAIKU_TOP src tools translation pnginfo ;
 
 UseLibraryHeaders zlib ;
 UseLibraryHeaders png ;

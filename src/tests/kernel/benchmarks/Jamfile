@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kernel benchmarks ;
+SubDir HAIKU_TOP src tests kernel benchmarks ;
 
 SimpleTest memspeedTest :
 	memspeed.c

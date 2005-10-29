@@ -1,6 +1,8 @@
-SubDir OBOS_TOP src add-ons kernel drivers audio emuxki ;
+SubDir HAIKU_TOP src add-ons kernel drivers audio emuxki ;
 
-R5KernelAddon emuxki : kernel drivers bin :
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+KernelAddon emuxki : kernel drivers bin :
 	ac97.c
 	debug.c
 	emuxki.c
@@ -10,22 +12,10 @@ R5KernelAddon emuxki : kernel drivers bin :
 	util.c
 ;
 
-# Link to kernel/drivers/dev/audio/multi
-{
-	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev audio multi ] ;
-	local instDriver = <kernel!drivers!dev!audio!multi>emuxki ;
-	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : emuxki ;
-}
-
 Package haiku-emuxki-cvs
 	:
 	emuxki
 	:
 	boot home config add-ons kernel drivers bin ;
 
-Package haiku-emuxki-cvs
-	:
-	<kernel!drivers!dev!audio!multi>emuxki
-	:
-	boot home config add-ons kernel drivers dev audio multi ;
+PackageDriverSymLink haiku-emuxki-cvs : audio multi emuxki ;

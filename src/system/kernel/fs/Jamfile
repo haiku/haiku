@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src system kernel fs ;
+SubDir HAIKU_TOP src system kernel fs ;
 
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel fs ] ;
@@ -19,5 +19,5 @@ KernelMergeObject kernel_fs.o :
 	IOScheduler.cpp
 	KPath.cpp
 
-	: -fno-pic -Wno-unused -D_KERNEL_MODE
+	: -fno-pic -Wno-unused
 	;

@@ -1,19 +1,16 @@
-SubDir OBOS_TOP src kits screensaver ;
+SubDir HAIKU_TOP src kits screensaver ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders screen_saver ;
 
-SharedLibrary screensaver :
+SharedLibrary libscreensaver.so :
 	ScreenSaver.cpp
 	ScreenSaverPrefs.cpp
 	ScreenSaverThread.cpp
-;
-
-LinkSharedOSLibs libscreensaver.so :
+	:
 	be game
 ;
-
-MakeLocate <develop>libscreensaver.so : $(OBOS_STLIB_DIR) ;
-RelSymLink <develop>libscreensaver.so : libscreensaver.so ;
 
 Package haiku-screensaverkit-cvs :
 	libscreensaver.so :

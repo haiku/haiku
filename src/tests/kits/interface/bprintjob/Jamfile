@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kits interface bprintjob ;
+SubDir HAIKU_TOP src tests kits interface bprintjob ;
 
 UsePrivateHeaders interface ;
 
@@ -12,5 +12,5 @@ SimpleTest print_test
 
 # Tell Jam where to find these sources
 SEARCH on [ FGristFiles PrintJob.cpp ]
-	= [ FDirName $(OBOS_TOP) src kits interface ] ;
+	= [ FDirName $(HAIKU_TOP) src kits interface ] ;
 

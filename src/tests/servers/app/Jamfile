@@ -1,9 +1,20 @@
-SubDir OBOS_TOP src tests servers app ;
+SubDir HAIKU_TOP src tests servers app ;
+
+SetSubDirSupportedPlatforms r5 bone dano ;
+
+UseHeaders [ FStandardOSHeaders ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+	# TODO: POSIX headers shouldn't be used. Needed for strlcpy() and addr_t.
+
+# Remove _NO_INLINE_ASM from the defines for syslog.cpp. Otherwise we get
+# references to tls_get/set() etc. that don't exist under BeOS.
+#TARGET_DEFINES on [ FGristFiles syslog.o ]
+#	= [ FFilter $(TARGET_DEFINES) : _NO_INLINE_ASM ] ;
 
 UseLibraryHeaders agg png zlib ;
 UsePrivateHeaders app interface shared [ FDirName servers app ] ;
 
-local appServerDir = [ FDirName $(OBOS_TOP) src servers app ] ;
+local appServerDir = [ FDirName $(HAIKU_TOP) src servers app ] ;
 
 UseHeaders [ FDirName $(appServerDir) drawing ] ;
 UseHeaders [ FDirName $(appServerDir) drawing Painter ] ;
@@ -16,7 +27,7 @@ SEARCH_SOURCE += $(appServerDir) [ FDirName $(appServerDir) drawing ] ;
 # No need to define any of those targets, when building for haiku
 if $(TARGET_PLATFORM) != haiku {
 
-SharedLibrary hwinterface :
+SharedLibrary libhwinterface.so :
 	BBitmapBuffer.cpp
 	HWInterface.cpp
 	MultiLocker.cpp
@@ -31,14 +42,14 @@ SharedLibrary hwinterface :
 LINKFLAGS on libhwinterfaceimpl.so ?= $(LINKFLAGS) ;
 LINKFLAGS on libhwinterfaceimpl.so += -lbe ;
 
-SharedLibrary hwinterfaceimpl :
+SharedLibrary libhwinterfaceimpl.so :
 	fake_input_server.cpp
 	ViewHWInterface.cpp
 
 	: libopenbeos.so libhwinterface.so
 ;
 
-SharedLibrary haikuappserver :
+SharedLibrary libhaikuappserver.so :
 	Angle.cpp
 	BGet++.cpp
 	BitmapManager.cpp
@@ -64,8 +75,7 @@ SharedLibrary haikuappserver :
 
 	# libraries
 	:
-	<boot!home!config!lib>libopenbeos.so
-	libtextencoding.so libfreetype.so
+	libopenbeos.so libtextencoding.so libfreetype.so
 ;
 
 AddResources haiku_app_server : app_server.rdef ;
@@ -114,19 +124,28 @@ Server haiku_app_server :
 
 	# libraries
 	:
-	libz.so libpng.so libhaikuappserver.so
-	libpainter.a <boot!home!config!lib>libopenbeos.so 
+	z libpng.so libhaikuappserver.so
+	libpainter.a libopenbeos.so 
 	libhwinterface.so libhwinterfaceimpl.so
 	libagg.a libfreetype.so libtextencoding.so
 ;
 
+# install in the test dir
+HaikuInstall install-test-apps : $(HAIKU_APP_TEST_LIB_DIR)
+	: libpng.so libhaikuappserver.so libopenbeos.so libhwinterface.so
+	  libhwinterfaceimpl.so libfreetype.so libtextencoding.so
+	: tests!apps ;
+
+HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : haiku_app_server
+	: tests!apps ;
+
 } # if $(TARGET_PLATFORM) != haiku
 
-SubInclude OBOS_TOP src tests servers app bitmap_drawing ;
-SubInclude OBOS_TOP src tests servers app copy_bits ;
-SubInclude OBOS_TOP src tests servers app painter ;
-SubInclude OBOS_TOP src tests servers app playground ;
-SubInclude OBOS_TOP src tests servers app resize_limits ;
-SubInclude OBOS_TOP src tests servers app scrolling ;
-SubInclude OBOS_TOP src tests servers app textview ;
-SubInclude OBOS_TOP src tests servers app regularapps ;
+SubInclude HAIKU_TOP src tests servers app bitmap_drawing ;
+SubInclude HAIKU_TOP src tests servers app copy_bits ;
+SubInclude HAIKU_TOP src tests servers app painter ;
+SubInclude HAIKU_TOP src tests servers app playground ;
+SubInclude HAIKU_TOP src tests servers app resize_limits ;
+SubInclude HAIKU_TOP src tests servers app scrolling ;
+SubInclude HAIKU_TOP src tests servers app textview ;
+SubInclude HAIKU_TOP src tests servers app regularapps ;

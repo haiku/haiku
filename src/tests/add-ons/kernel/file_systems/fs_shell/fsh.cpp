@@ -50,6 +50,8 @@ print_usage(const char *program)
 	printf("----------------------------------------------------------------------\n");
 	printf("usage: %s [-n] [%%s:DISK_IMAGE=big_file|%%d:RANDOM_SEED]\n",
 		program);
+	printf("       %s --initialize [-n] %%s:DISK_IMAGE FS_PARAMETERS...\n",
+		program);
 	printf("\n");
 }
 
@@ -62,6 +64,7 @@ main(int argc, char **argv)
 	myfs_info  *myfs;
 	char *arg;
 	int argi = 1;
+	bool initialize = false;
 
 	if (argv[1] && strcmp(argv[1], "--help") == 0) {
 		print_usage(argv[0]);
@@ -73,6 +76,8 @@ main(int argc, char **argv)
 		arg = argv[argi++];
 		if (strcmp(arg, "-n") == 0) {
 			sInteractiveMode = false;
+		} else if (strcmp(arg, "--initialize") == 0) {
+			initialize = true;
 		} else {
 	    	print_usage(argv[0]);
 			exit(1);
@@ -83,29 +88,36 @@ main(int argc, char **argv)
     	print_usage(argv[0]);
 		exit(1);
 	}
+	
 	arg = argv[argi];
 
-    if (arg != NULL && !isdigit(arg[0]))
-        disk_name = arg;
-    else if (arg && isdigit(arg[0]))
-        seed = strtoul(arg, NULL, 0);
-    else
-        seed = getpid() * time(NULL) | 1;
-    printf("random seed == 0x%x\n", seed);
+	if (initialize) {
+		const char *deviceName = arg;
+		initialize_fs(deviceName, argv + argi, argc - argi);
 
-    srand(seed);
+	} else {
+		if (arg != NULL && !isdigit(arg[0]))
+			disk_name = arg;
+		else if (arg && isdigit(arg[0]))
+			seed = strtoul(arg, NULL, 0);
+		else
+			seed = getpid() * time(NULL) | 1;
+		printf("random seed == 0x%x\n", seed);
+	
+		srand(seed);
+	
+	    myfs = init_fs(disk_name);
 
-    myfs = init_fs(disk_name);
+	    do_fsh();
 
-    do_fsh();
+		sys_chdir(1, -1, "/");
+		if (sys_unmount(1, -1, "/myfs") != 0) {
+			printf("could not un-mount /myfs\n");
+			return 5;
+		}
 
-	sys_chdir(1, -1, "/");
-    if (sys_unmount(1, -1, "/myfs") != 0) {
-        printf("could not un-mount /myfs\n");
-        return 5;
-    }
-
-    shutdown_block_cache();
+	    shutdown_block_cache();
+	}
 
     return 0;   
 }
@@ -2107,7 +2119,7 @@ do_fsh(void)
 #endif
     int   argc, len;
     char *prompt = FS_SHELL_PROMPT ">> ";
-    char  input[1024], **argv;
+    char  input[20480], **argv;
     cmd_entry *cmd = NULL;
 
     while(getline(prompt, input, sizeof(input)) != NULL) {

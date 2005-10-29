@@ -2,7 +2,7 @@
  * Copyright (C) 1995-2002 Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h 
  */
-/* $Id: inflate.c,v 1.1 2004/10/06 17:46:48 laplace Exp $ */
+/* $Id$ */
 
 #include "zutil.h"
 #include "infblock.h"

@@ -1,7 +1,7 @@
-SubDir OBOS_TOP src add-ons input_server devices ;
+SubDir HAIKU_TOP src add-ons input_server devices ;
 
-SubInclude OBOS_TOP src add-ons input_server devices keyboard ;
-SubInclude OBOS_TOP src add-ons input_server devices mouse ;
-#SubInclude OBOS_TOP src add-ons input_server devices serial_mouse ;
-#SubInclude OBOS_TOP src add-ons input_server devices tablet ;
+SubInclude HAIKU_TOP src add-ons input_server devices keyboard ;
+SubInclude HAIKU_TOP src add-ons input_server devices mouse ;
+#SubInclude HAIKU_TOP src add-ons input_server devices serial_mouse ;
+#SubInclude HAIKU_TOP src add-ons input_server devices tablet ;
 

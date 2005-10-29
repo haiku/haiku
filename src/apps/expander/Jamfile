@@ -1,8 +1,8 @@
-SubDir OBOS_TOP src apps expander ;
+SubDir HAIKU_TOP src apps expander ;
 
 AddResources Expander : Expander.rdef ;
 
-App Expander : 
+Application Expander : 
 	ExpanderApp.cpp
 	ExpanderWindow.cpp
 	ExpanderThread.cpp
@@ -12,5 +12,5 @@ App Expander :
 	DirectoryFilePanel.cpp
 	ExpanderRules.cpp ;
 
-LinkSharedOSLibs Expander : libbe.so libtracker.so ;
+LinkAgainst Expander : libbe.so libtracker.so ;
 

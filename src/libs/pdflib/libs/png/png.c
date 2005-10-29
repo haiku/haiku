@@ -1,4 +1,4 @@
-/* PDFlib GmbH cvsid: $Id: png.c,v 1.1 2004/10/06 17:46:50 laplace Exp $ */
+/* PDFlib GmbH cvsid: $Id$ */
 
 /* png.c - location for general purpose libpng functions
  *

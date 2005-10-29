@@ -1,8 +1,10 @@
-SubDir OBOS_TOP src kits game ;
+SubDir HAIKU_TOP src kits game ;
 
 UsePrivateHeaders app ;
 UsePrivateHeaders interface ;
 UsePrivateHeaders input ;
+
+SubDirSysHdrs $(SUBDIR) ;
 
 if ! $(HAIKU_COMPATIBLE) {
 	if $(DANO_COMPATIBLE) {
@@ -13,7 +15,7 @@ if ! $(HAIKU_COMPATIBLE) {
 }
 
 
-SharedLibrary game :
+SharedLibrary libgame.so :
 	# Public Game Kit
 	DirectWindow.cpp
 	WindowScreen.cpp
@@ -32,15 +34,11 @@ SharedLibrary game :
 
 
 if $(HAIKU_COMPATIBLE) {
-	LinkSharedOSLibs libgame.so :
+	LinkAgainst libgame.so :
 		libbe.so libmedia.so
 	;
 } else {
-	LinkSharedOSLibs libgame.so :
+	LinkAgainst libgame.so :
 		be libmedia.so
 	;
 }
-
-
-MakeLocate <develop>libgame.so : $(OBOS_STLIB_DIR) ;
-RelSymLink <develop>libgame.so : libgame.so ;

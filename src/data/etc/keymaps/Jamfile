@@ -1,4 +1,6 @@
-SubDir OBOS_TOP src data etc keymaps ;
+SubDir HAIKU_TOP src data etc keymaps ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 NotFile keymap_files ;
 Depends files : keymap_files ;
@@ -9,16 +11,17 @@ rule MkKeymapComp
 	local source = $(2) ;
 
 	SEARCH on $(source) = $(SEARCH_SOURCE) ;
-	MakeLocate $(binary) : [ FDirName $(OBOS_ETC_DIR) Keymap ] ;
+	MakeLocateArch $(binary) ;
 
 	LocalDepends keymap_files : $(binary) ;
-	Depends $(binary) : $(source) keymap ;
-	MkKeymapComp1 $(binary) : keymap $(source) ;
+	Depends $(binary) : $(source) <build>keymap ;
+	MkKeymapComp1 $(binary) : <build>keymap $(source) ;
 	LocalClean clean : $(binary) ;
 }
 
 actions MkKeymapComp1
 {
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 	$(2[1]) -o "$(1)" -c "$(2[2-])" ;
 }
 

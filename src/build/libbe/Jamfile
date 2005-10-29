@@ -1,0 +1,22 @@
+SubDir HAIKU_TOP src build libbe ;
+
+USES_BE_API on libbe_build.so = true ;
+
+# locate the library
+MakeLocate libbe_build.so : $(HOST_BUILD_COMPATIBILITY_LIB_DIR) ;
+
+BuildPlatformSharedLibrary libbe_build.so :
+	# no sources here
+	:
+	<libbe_build>app_kit.o
+	<libbe_build>interface_kit.o
+	<libbe_build>storage_kit.o
+	<libbe_build>support_kit.o
+
+	$(HOST_LIBSTDC++)
+;
+
+SubInclude HAIKU_TOP src build libbe app ;
+SubInclude HAIKU_TOP src build libbe interface ;
+SubInclude HAIKU_TOP src build libbe storage ;
+SubInclude HAIKU_TOP src build libbe support ;

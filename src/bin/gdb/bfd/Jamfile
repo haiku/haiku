@@ -1,7 +1,7 @@
-SubDir OBOS_TOP src bin gdb bfd ;
+SubDir HAIKU_TOP src bin gdb bfd ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) include ] ;
-SubDirHdrs [ FDirName $(OBOS_TOP) src bin gawk intl ] ;
+SubDirSysHdrs [ FDirName $(HAIKU_TOP) src bin gawk intl ] ;
 	# Use gawk's libintl for the time being.
 	# TODO: Put a current version of intl ot src/libs and build a static lib
 	# all interested apps can link against.
@@ -10,7 +10,7 @@ SubDirCcFlags -DHAVE_CONFIG_H -D_GNU_SOURCE ;
 
 # architecture specific sources
 local bfdArchSources ;
-if $(OBOS_ARCH) = x86 {
+if $(TARGET_ARCH) = x86 {
 	bfdArchSources =
 		cpu-i386.c
 		elf32-i386.c
@@ -28,7 +28,7 @@ if $(OBOS_ARCH) = x86 {
 		-DHAVE_bfd_elf32_little_generic_vec
 		-DHAVE_bfd_elf32_big_generic_vec
 	;
-} else if $(OBOS_ARCH) = ppc {
+} else if $(TARGET_ARCH) = ppc {
 	bfdArchSources =
 		cpu-powerpc.c
 		elf32-ppc.c
@@ -90,10 +90,8 @@ local bfdAllSources =
 	$(bfdGeneratedSources)
 ;
 
-StaticLibrary <gdb>bfd :
+StaticLibrary <gdb>libbfd.a :
 	$(bfdAllSources)
-
-	: [ FCurrentObjectsDir ]
 ;
 
 
@@ -110,7 +108,7 @@ rule BFDSimpleSed
 
 	Depends $(target) : $(source) ;
 	SEARCH on $(source) = $(SEARCH_SOURCE) ;
-	MakeLocate $(target) : $(LOCATE_SOURCE) ;
+	MakeLocateArch $(target) ;
 	Clean clean : $(target) ;
 
 	BFDSimpleSed1 $(target) : $(source) ;
@@ -135,7 +133,7 @@ rule BFDFileSed
 
 	Depends $(target) : $(source) ;
 	SEARCH on $(source) = $(SEARCH_SOURCE) ;
-	MakeLocate $(target) : $(LOCATE_SOURCE) ;
+	MakeLocateArch $(target) ;
 	Clean clean : $(target) ;
 
 	BFDFileSed1 $(target) : $(source) ;
@@ -155,8 +153,8 @@ rule BFDCopyConfigHeaders
 	for source in $(sources) {
 		local target = [ FGristFiles $(source) ] ;
 		File $(target) : $(source) ;
-		SEARCH on $(source) = [ FDirName $(SUBDIR) config-$(OBOS_ARCH) ] ;
-		MakeLocate $(target) : $(LOCATE_SOURCE) ;
+		SEARCH on $(source) = [ FDirName $(SUBDIR) config-$(TARGET_ARCH) ] ;
+		MakeLocateArch $(target) ;
 	}
 }
 

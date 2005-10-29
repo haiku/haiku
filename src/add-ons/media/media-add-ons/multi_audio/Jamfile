@@ -1,12 +1,14 @@
-SubDir OBOS_TOP src add-ons media media-add-ons multi_audio ;
+SubDir HAIKU_TOP src add-ons media media-add-ons multi_audio ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 Addon multi_audio.media_addon : media :
 	MultiAudioAddOn.cpp
 	MultiAudioDevice.cpp
 	MultiAudioNode.cpp
+	: false
+	: be media
 ;
-
-LinkSharedOSLibs multi_audio.media_addon : be media ;
 
 Package haiku-multi_audio-cvs
 	: multi_audio.media_addon

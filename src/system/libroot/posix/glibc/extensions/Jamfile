@@ -1,10 +1,11 @@
-SubDir OBOS_TOP src system libroot posix glibc extensions ;
+SubDir HAIKU_TOP src system libroot posix glibc extensions ;
 
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc include arch $(OBOS_ARCH) ;
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc include ;
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc libio ;
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc locale ;
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch
+	$(TARGET_ARCH) ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc libio ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 
 KernelMergeObject posix_gnu_ext.o :
 	getopt.c

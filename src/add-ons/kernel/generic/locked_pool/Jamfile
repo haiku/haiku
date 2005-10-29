@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel generic locked_pool ;
+SubDir HAIKU_TOP src add-ons kernel generic locked_pool ;
 
 UsePrivateHeaders kernel ;
 

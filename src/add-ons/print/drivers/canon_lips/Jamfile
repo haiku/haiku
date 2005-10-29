@@ -1,5 +1,5 @@
-SubDir OBOS_TOP src add-ons print drivers canon_lips ;
+SubDir HAIKU_TOP src add-ons print drivers canon_lips ;
 
-SubInclude OBOS_TOP src add-ons print drivers canon_lips lips3 ;
-SubInclude OBOS_TOP src add-ons print drivers canon_lips lips4 ;
+SubInclude HAIKU_TOP src add-ons print drivers canon_lips lips3 ;
+SubInclude HAIKU_TOP src add-ons print drivers canon_lips lips4 ;
 

@@ -1,14 +1,16 @@
-SubDir OBOS_TOP src add-ons mail_daemon inbound_filters match_header ;
+SubDir HAIKU_TOP src add-ons mail_daemon inbound_filters match_header ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders mail ;
-SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
 Addon Match\ Header : mail_daemon inbound_filters :
 	ConfigView.cpp
 	RuleFilter.cpp
 	StringMatcher.cpp ;
 
-LinkSharedOSLibs Match\ Header :
+LinkAgainst Match\ Header :
 	 be libmail.so ;
 
 Package haiku-maildaemon-cvs :

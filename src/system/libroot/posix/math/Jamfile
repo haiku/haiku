@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src system libroot posix math ;
+SubDir HAIKU_TOP src system libroot posix math ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) glibc ] ;
 SubDirCcFlags -Dnational ;
@@ -42,4 +42,4 @@ KernelMergeObject posix_math.o :
 	-fPIC -DPIC
 	;
 
-SubInclude OBOS_TOP src system libroot posix math arch ;  
+SubInclude HAIKU_TOP src system libroot posix math arch ;  

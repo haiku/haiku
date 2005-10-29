@@ -1,46 +1,40 @@
-SubDir OBOS_TOP src tests add-ons kernel file_systems bfs bfs_shell ;
+SubDir HAIKU_TOP src tests add-ons kernel file_systems bfs bfs_shell ;
 
-include [ FDirName $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell
+include [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell
 				   FSShellRules ] ;
 
-local bfsSourceDir = [ FDirName $(OBOS_TOP) src tests add-ons kernel
+local bfsSourceDir = [ FDirName $(HAIKU_TOP) src tests add-ons kernel
 								file_systems bfs r5 ] ;
 
 local oldSubDirHdrs = $(SUBDIRHDRS) ;
+local oldSubDirSysHdrs = $(SUBDIRSYSHDRS) ;
 
 
 # Compile additional_commands.c with the same environment as the fs_shell. That
 # is all BeOS headers, but the platform POSIX and STL headers.
 
-SubDirHdrs $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ;
+SubDirHdrs $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell ;
 SubDirHdrs $(bfsSourceDir) ;
 
 SetupFSShellIncludes ;
 
-local oldCCFLAGS = $(CCFLAGS) ;
-local oldC++FLAGS = $(C++FLAGS) ;
-CCFLAGS = [ Filter $(CCFLAGS) : -nostdinc ] ;
-C++FLAGS = [ Filter $(C++FLAGS) : -nostdinc ] ;
-
-Objects [ FGristFiles additional_commands.c ] ;
-
-ObjectsDefines [ FGristFiles additional_commands.c ]
+ObjectDefines [ FGristFiles additional_commands.c ]
 	: _NO_INLINE_ASM _GNU_SOURCE ;
 
-# Reset CCFLAGS and C++FLAGS to original values.
-CCFLAGS = $(oldCCFLAGS) ;
-C++FLAGS = $(oldC++FLAGS) ;
+BuildPlatformObjects [ FGristFiles additional_commands.c ] : false ;
 
 
 # Reset the environment for the FS add-on sources. We build using all BFS
 # headers, including the POSIX and STL headers.
 
 SUBDIRHDRS = $(oldSubDirHdrs) ;
+SUBDIRSYSHDRS = $(oldSubDirSysHdrs) ;
 
 SubDirHdrs $(bfsSourceDir) ;
 UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
 
-SetupIncludes ;
+SYSHDRS = $(HAIKU_HDRS) ;
+
 
 {
 	# set CHECK_MALLOC to something when doing tests against memory corruption
@@ -81,10 +75,8 @@ BuildPlatformMain bfs_shell :
 	Debug.cpp
 
 	[ FGristFiles additional_commands$(SUFOBJ) ]
-
-	: false # don't reset header search dirs
 ;
-LinkSharedOSLibs bfs_shell : libfs_shell.a $(C++_SUPPORT_LIBS) ;
+LinkAgainst bfs_shell : libfs_shell.a $(HOST_LIBSTDC++) ;
 
 # Tell Jam where to find these sources
 SEARCH on [ FGristFiles

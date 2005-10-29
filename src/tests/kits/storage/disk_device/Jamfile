@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kits storage disk_device ;
+SubDir HAIKU_TOP src tests kits storage disk_device ;
 
 #UsePrivateHeaders $(DOT) ;
 #UsePrivateHeaders app ;

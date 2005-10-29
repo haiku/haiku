@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel drivers disk scsi scsi_dsk ;
+SubDir HAIKU_TOP src add-ons kernel drivers disk scsi scsi_dsk ;
 
 UsePrivateHeaders kernel ;
 

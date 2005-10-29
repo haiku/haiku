@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests servers app scrolling ;
+SubDir HAIKU_TOP src tests servers app scrolling ;
 
 UseHeaders [ FDirName os app ] ;
 UseHeaders [ FDirName os interface ] ;

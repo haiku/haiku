@@ -1,4 +1,6 @@
-SubDir OBOS_TOP src tools rc ;
+SubDir HAIKU_TOP src tools rc ;
+
+USES_BE_API on <build>librdef.a <build>rc = true ;
 
 GENERATE_C++ on [ FGristFiles lexer.l parser.y ] = true ;
 
@@ -8,18 +10,19 @@ local r5Compatibility = [ FDirName $(SUBDIR) R5Compatibility.h ] ;
 SubDirCcFlags -include $(r5Compatibility) ;
 SubDirC++Flags -include $(r5Compatibility) ;
 
-StaticLibrary rdef :
+BuildPlatformStaticLibrary <build>librdef.a :
 	compile.cpp decompile.cpp lexer.l parser.y rdef.cpp ;
 
-BuildPlatformMain rc :
+BuildPlatformMain <build>rc :
 	rc.cpp
 
 	# these two are needed for R5 only
 	strlcpy.c
 	strlcat.c
 ;
-LinkSharedOSLibs rc : librdef.a $(BUILD_LIBSTDC++) be ;
+LinkAgainst <build>rc
+	: <build>librdef.a $(HOST_LIBSTDC++) $(HOST_LIBBE) ;
 
 SEARCH on [ FGristFiles
 		strlcat.c strlcpy.c
-	] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
+	] = [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;

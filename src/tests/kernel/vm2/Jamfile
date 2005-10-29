@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src system vm2 tests ;
+SubDir HAIKU_TOP src system vm2 tests ;
 
 UseHeaders .. ;
 BinCommand vmTest  : test.C : root be libvm.so ; 

@@ -1,0 +1,74 @@
+# UserBuildConfig can be used to customize the build according to your needs.
+# If existent it is included by the build system, but it is ignored by svn.
+# This file documents a few examples, what can be done.
+
+# Adjusting Build Variables
+
+# Turn off warnings in directory src/system/kernel. As fourth (scope) parameter
+# "local" is specified, which means, that this setting applies only to the
+# given directory, but not any of its subdirectories.
+SetConfigVar WARNINGS : HAIKU_TOP src system kernel : 0 : local ;
+
+# Add "RUN_WITHOUT_REGISTRAR" to the DEFINES for the directory src/kits and
+# all its subdirectories (scope is "global").
+AppendToConfigVar DEFINES : HAIKU_TOP src kits : RUN_WITHOUT_REGISTRAR
+	: global ;
+
+# Set the debug level for file src/bin/gdb/gdb/haiku-nat.c (note, that
+# the object file must be specified) to 1. It is worth mentioning, that the
+# executable the object file is linked into (gdb), will still be placed in
+# generated/objects/.../release/... Only when setting DEBUG for the executable,
+# too, it will be placed in .../debug_1/...
+DEBUG on <src!bin!gdb!gdb!>haiku-nat.o = 1 ;
+
+
+# Haiku Image Related Modifications
+
+# Create a 100 MB image at /tmp/walter.image.
+HAIKU_IMAGE_NAME	= walter.image ;
+HAIKU_IMAGE_DIR		= /tmp ;
+HAIKU_IMAGE_SIZE	= 100 ;
+
+# Install Haiku in directory /Haiku.
+HAIKU_INSTALL_DIR = /Haiku ;
+
+# Add "crashing_app" to the beos/bin directory of the Haiku image/installation.
+# Note, that this also makes the image depend on the target, i.e. it is
+# automatically updated when the image is built.
+AddFilesToHaikuImage beos bin : crashing_app ;
+
+# Make a symlink to home/config/bin/crash.
+AddSymlinkToHaikuImage home config bin : /beos/bin/crashing_app : crash ;
+
+# Specify scripts that shall be run when populating the image/installation
+# directory. The "early" script is run before anything has been copied onto
+# the image/into the installation directory. The "late" script is run after
+# everything has been copied, but before the MIME database is installed.
+HAIKU_IMAGE_EARLY_USER_SCRIPTS	= $(HAIKU_TOP)/../early-image-script.sh ;
+HAIKU_IMAGE_LATE_USER_SCRIPTS	= $(HAIKU_TOP)/../late-image-script.sh ;
+
+
+# Creating Sourceable Shell Scripts
+
+# If you use shell scripts (e.g. for testing) that need to access targets or
+# build system properties, you can tell the build system to generate a
+# variables defining shell script you can source from your shell script.
+
+# General setup for the shell script to generate. Name is test.inc, located
+# in the output directory.
+MakeLocate test.inc : $(HAIKU_OUTPUT_DIR) ;
+Always test.inc ;
+
+# Define variable "outputDir" in the shell script, with the value of
+# HAIKU_OUTPUT_DIR.
+AddVariableToScript test.inc : outputDir : $(HAIKU_OUTPUT_DIR) ;
+
+# Define variables "bfsShell" and "fsShellCommand" referring to the
+# generated bfs_shell and fs_shell_command respectively.
+AddTargetVariableToScript test.inc : bfs_shell : bfsShell ;
+AddTargetVariableToScript test.inc : fs_shell_command : fsShellCommand ;
+
+# If no variable name is given, the name (without grist) of the target is
+# used, i.e. a variable "rc" referring to the rc command built for the host
+# platform is defined in the script.
+AddTargetVariableToScript test.inc : <build>rc ;

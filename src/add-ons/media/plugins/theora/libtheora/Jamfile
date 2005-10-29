@@ -1,11 +1,11 @@
-SubDir OBOS_TOP src add-ons media plugins theora libtheora ;
+SubDir HAIKU_TOP src add-ons media plugins theora libtheora ;
 
 SubDirHdrs [ FDirName $(SUBDIR) .. .. ogg libogg ] ;
 
 SubDirCcFlags -DPACKAGE=\\\"libtheora\\\" -DVERSION=\\\"0.0\\\" ;
 SubDirCcFlags -D_REENTRANT -DPIC -DTRUE=true ;
 
-StaticLibrary theora :
+StaticLibrary libtheora.a :
 	blockmap.c
 	comment.c
 	dct.c

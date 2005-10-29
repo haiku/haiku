@@ -1,5 +1,5 @@
 <?php
-# $Id: hello.php,v 1.1 2004/10/06 17:46:43 laplace Exp $
+# $Id$
 
 /* create a new PDFlib object */
 $p = PDF_new();

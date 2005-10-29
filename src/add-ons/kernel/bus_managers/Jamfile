@@ -1,10 +1,10 @@
-SubDir OBOS_TOP src add-ons kernel bus_managers ;
+SubDir HAIKU_TOP src add-ons kernel bus_managers ;
 
-SubInclude OBOS_TOP src add-ons kernel bus_managers acpi ;
-SubInclude OBOS_TOP src add-ons kernel bus_managers agp ;
-SubInclude OBOS_TOP src add-ons kernel bus_managers config_manager ;
-SubInclude OBOS_TOP src add-ons kernel bus_managers ide ;
-SubInclude OBOS_TOP src add-ons kernel bus_managers isa ;
-SubInclude OBOS_TOP src add-ons kernel bus_managers pci ;
-SubInclude OBOS_TOP src add-ons kernel bus_managers scsi ;
-SubInclude OBOS_TOP src add-ons kernel bus_managers usb ;
+SubInclude HAIKU_TOP src add-ons kernel bus_managers acpi ;
+SubInclude HAIKU_TOP src add-ons kernel bus_managers agp ;
+SubInclude HAIKU_TOP src add-ons kernel bus_managers config_manager ;
+SubInclude HAIKU_TOP src add-ons kernel bus_managers ide ;
+SubInclude HAIKU_TOP src add-ons kernel bus_managers isa ;
+SubInclude HAIKU_TOP src add-ons kernel bus_managers pci ;
+SubInclude HAIKU_TOP src add-ons kernel bus_managers scsi ;
+SubInclude HAIKU_TOP src add-ons kernel bus_managers usb ;

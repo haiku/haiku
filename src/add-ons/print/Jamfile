@@ -1,5 +1,5 @@
-SubDir OBOS_TOP src add-ons print ;
+SubDir HAIKU_TOP src add-ons print ;
 
-SubInclude OBOS_TOP src add-ons print shared ;
-SubInclude OBOS_TOP src add-ons print drivers ;
-SubInclude OBOS_TOP src add-ons print transports ;
+SubInclude HAIKU_TOP src add-ons print shared ;
+SubInclude HAIKU_TOP src add-ons print drivers ;
+SubInclude HAIKU_TOP src add-ons print transports ;

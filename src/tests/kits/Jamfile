@@ -1,13 +1,13 @@
-SubDir OBOS_TOP src tests kits ;
+SubDir HAIKU_TOP src tests kits ;
 
-SubInclude OBOS_TOP src tests kits app ;
-SubInclude OBOS_TOP src tests kits game ;
-SubInclude OBOS_TOP src tests kits interface ;
-SubInclude OBOS_TOP src tests kits media ;
-SubInclude OBOS_TOP src tests kits midi ;
-SubInclude OBOS_TOP src tests kits net ;
-SubInclude OBOS_TOP src tests kits storage ;
-SubInclude OBOS_TOP src tests kits support ;
-SubInclude OBOS_TOP src tests kits translation ;
-SubInclude OBOS_TOP src tests kits opengl ;
+SubInclude HAIKU_TOP src tests kits app ;
+SubInclude HAIKU_TOP src tests kits game ;
+SubInclude HAIKU_TOP src tests kits interface ;
+SubInclude HAIKU_TOP src tests kits media ;
+SubInclude HAIKU_TOP src tests kits midi ;
+SubInclude HAIKU_TOP src tests kits net ;
+SubInclude HAIKU_TOP src tests kits storage ;
+SubInclude HAIKU_TOP src tests kits support ;
+SubInclude HAIKU_TOP src tests kits translation ;
+SubInclude HAIKU_TOP src tests kits opengl ;
 

@@ -1,9 +1,11 @@
-SubDir OBOS_TOP src add-ons accelerants nvidia engine ;
+SubDir HAIKU_TOP src add-ons accelerants nvidia engine ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics nvidia ] ;
 
-StaticLibrary nvidia_engine :
+StaticLibrary libnvidia_engine.a :
 	nv_acc.c
 	nv_acc_dma.c
 	nv_bes.c

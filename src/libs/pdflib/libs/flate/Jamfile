@@ -1,10 +1,10 @@
-SubDir OBOS_TOP src libs pdflib libs flate ;
+SubDir HAIKU_TOP src libs pdflib libs flate ;
 
-SubDirHdrs [ FDirName $(OBOS_TOP) src libs pdflib libs pdcore ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src libs pdflib libs pdcore ] ;
 
 UseLibraryHeaders pdflib ;
 
-StaticLibrary pdf : 
+StaticLibrary libpdf.a : 
 	adler32.c
 	uncompr.c
 	infutil.c
@@ -18,6 +18,5 @@ StaticLibrary pdf :
 	infblock.c
 	inflate.c
 	infcodes.c
-: STATIC_LIBRARY_DIR
 ;
 

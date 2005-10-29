@@ -1,8 +1,19 @@
-SubDir OBOS_TOP src add-ons kernel network core ;
+SubDir HAIKU_TOP src add-ons kernel network core ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FStandardOSHeaders ] : true ;
+		# Needed for <support/Errors.h> and maybe other stuff.
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# We need the public network headers also when not compiling for Haiku.
+		# Unfortunately we get more than we want, namely all POSIX headers.
+}
+
 
 UsePrivateHeaders net ;
 
-R5KernelAddon core : kernel obos_network :
+KernelAddon core : kernel obos_network :
 	cksum.c
 	core.c
 	if.c
@@ -21,7 +32,7 @@ R5KernelAddon core : kernel obos_network :
 ;
 
 # Installation
-OBOSInstall install-networking : /boot/home/config/add-ons/kernel/obos_network
+HaikuInstall install-networking : /boot/home/config/add-ons/kernel/obos_network
 	: core ;
 
 Package haiku-networkingkit-cvs :

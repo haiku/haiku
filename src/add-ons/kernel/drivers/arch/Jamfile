@@ -1,3 +1,3 @@
-SubDir OBOS_TOP src add-ons kernel drivers arch ;
+SubDir HAIKU_TOP src add-ons kernel drivers arch ;
 
-SubInclude OBOS_TOP src add-ons kernel drivers arch $(OBOS_ARCH) ;
+SubInclude HAIKU_TOP src add-ons kernel drivers arch $(TARGET_ARCH) ;

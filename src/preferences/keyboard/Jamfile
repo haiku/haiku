@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src preferences keyboard ;
+SubDir HAIKU_TOP src preferences keyboard ;
 
 if $(TARGET_PLATFORM) != haiku {
         SubDirC++Flags -DCOMPILE_FOR_R5 ;

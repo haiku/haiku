@@ -12,7 +12,7 @@
 #include "multimon.h"
 #include "accelerant_ext.h"
 #include <stdio.h>
-#include <memory.h>
+#include <string.h>
 
 #include <Screen.h>
 

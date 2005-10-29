@@ -1,9 +1,11 @@
-SubDir OBOS_TOP src add-ons kernel drivers graphics neomagic ;
+SubDir HAIKU_TOP src add-ons kernel drivers graphics neomagic ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics neomagic ] ;
 
-R5KernelAddon nm.driver : kernel drivers bin :
+KernelAddon nm.driver : kernel drivers bin :
 	driver.c
 ;
 
@@ -12,18 +14,8 @@ Package haiku-neomagic-cvs :
 Package haiku-neomagic-cvs :
 	nm.driver : 
 	boot home config add-ons kernel drivers bin ;
-Package haiku-neomagic-cvs :
-	<kernel!drivers!dev!graphics>nm.driver :
-	boot home config add-ons kernel drivers dev graphics ;
+PackageDriverSymLink haiku-neomagic-cvs : graphics nm.driver ;
 Package haiku-neomagic-cvs :
 	nm.settings :
 	boot home config settings kernel drivers ;
-
-# Link to kernel/drivers/dev/graphics
-{
-	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev graphics ] ;
-	local instDriver = <kernel!drivers!dev!graphics>nm.driver ;
-	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : nm.driver ;
-}
 

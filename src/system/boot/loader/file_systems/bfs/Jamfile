@@ -1,10 +1,10 @@
-SubDir OBOS_TOP src system boot loader file_systems bfs ;
+SubDir HAIKU_TOP src system boot loader file_systems bfs ;
 
-UsePrivateHeaders [ FDirName kernel boot platform $(OBOS_BOOT_PLATFORM) ] ;
+UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName storage ] ;
 
-SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems bfs ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_systems bfs ;
 
 SubDirC++Flags -fno-rtti ;
 

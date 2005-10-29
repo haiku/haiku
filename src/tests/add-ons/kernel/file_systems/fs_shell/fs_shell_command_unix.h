@@ -8,7 +8,7 @@
 static const char *kFSShellCommandSocketAddress = "/tmp/fs_shell_commands";
 
 struct external_command_message {
-	char		command[1024];
+	char		command[20480];
 };
 
 struct external_command_reply {

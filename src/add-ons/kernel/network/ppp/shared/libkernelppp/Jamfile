@@ -1,9 +1,20 @@
-SubDir OBOS_TOP src add-ons kernel network ppp shared libkernelppp ;
+SubDir HAIKU_TOP src add-ons kernel network ppp shared libkernelppp ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FStandardOSHeaders ] : true ;
+		# Needed for the atomic_add64() prototype. :-/
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# We need the public network headers also when not compiling for Haiku.
+		# Unfortunately we get more than we want, namely all POSIX headers.
+}
 
 UsePrivateHeaders net ;
 UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
+	libkernelppp headers ] : true ;
 
 
 {
@@ -11,7 +22,7 @@ UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkerne
 }
 
 
-R5KernelStaticLibrary kernelppp :
+KernelStaticLibrary libkernelppp.a :
 	atomic.S
 	kernel_cpp.cpp
 	
@@ -33,7 +44,8 @@ R5KernelStaticLibrary kernelppp :
 	_KPPPMRUHandler.cpp
 	_KPPPAuthenticationHandler.cpp
 	_KPPPPFCHandler.cpp
+	: -fno-pic
 ;
 
-SEARCH on [ FGristFiles kernel_cpp.cpp ] = [ FDirName $(OBOS_TOP) src system kernel util ] ;
-SEARCH on [ FGristFiles Locker.cpp ] = [ FDirName $(OBOS_TOP) src system kernel disk_device_manager ] ;
+SEARCH on [ FGristFiles kernel_cpp.cpp ] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
+SEARCH on [ FGristFiles Locker.cpp ] = [ FDirName $(HAIKU_TOP) src system kernel disk_device_manager ] ;

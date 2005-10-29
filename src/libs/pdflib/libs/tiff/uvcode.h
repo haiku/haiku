@@ -1,4 +1,4 @@
-/* PDFlib GmbH cvsid: $Id: uvcode.h,v 1.1 2004/10/06 17:46:51 laplace Exp $ */
+/* PDFlib GmbH cvsid: $Id$ */
 
 /* Version 1.0 generated April 7, 1997 by Greg Ward Larson, SGI */
 #define UV_SQSIZ	(float)0.003500

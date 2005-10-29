@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src bin tar src ;
+SubDir HAIKU_TOP src bin tar src ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;

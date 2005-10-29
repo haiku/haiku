@@ -34,7 +34,7 @@
 #include <OS.h> 
 #include <FindDirectory.h> 
 
-#include <GenericThread.h>
+#include "GenericThread.h"
 #include <stdio.h>
 #include <stdlib.h>
 

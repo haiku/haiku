@@ -1,9 +1,10 @@
-SubDir OBOS_TOP src add-ons accelerants skeleton ;
+SubDir HAIKU_TOP src add-ons accelerants skeleton ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics skeleton ] ;
 UseHeaders [ FDirName $(SUBDIR) engine ] ;
-
 
 Addon skel.accelerant : accelerants :
 	Acceleration.c
@@ -26,4 +27,4 @@ Package haiku-skeleton-cvs :
 
 Depends skel.accelerant : skel.driver ;
 
-SubInclude OBOS_TOP src add-ons accelerants skeleton engine ;
+SubInclude HAIKU_TOP src add-ons accelerants skeleton engine ;

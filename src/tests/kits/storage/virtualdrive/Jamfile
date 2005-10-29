@@ -1,14 +1,14 @@
-SubDir OBOS_TOP src tests kits storage virtualdrive ;
+SubDir HAIKU_TOP src tests kits storage virtualdrive ;
 
-R5KernelAddon virtualdrive : kernel drivers bin : virtualdrive.cpp ;
+KernelAddon virtualdrive : kernel drivers bin : virtualdrive.cpp ;
 
 SimpleTest mkvirtualdrive : mkvirtualdrive.cpp : be ;
 
 # Installation
-OBOSInstall install_virtualdrive
+HaikuInstall install_virtualdrive
 	: /boot/home/config/add-ons/kernel/drivers/bin
 	: virtualdrive ;
-OBOSInstallRelSymLink install_virtualdrive
+HaikuInstallRelSymLink install_virtualdrive
 	: /boot/home/config/add-ons/kernel/drivers/dev/misc
 	: <installed>virtualdrive
 	: installed-symlink ;

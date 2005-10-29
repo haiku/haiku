@@ -68,6 +68,10 @@
  * 12/17/02 (seiwald) - new copysettings() to protect target-specific vars
  */
 
+# ifdef OPT_RULE_PROFILING_EXT
+# include <sys/time.h>
+# endif
+
 # include "jam.h"
 
 # include "lists.h"
@@ -588,6 +592,13 @@ evaluate_rule(
 	    LIST *l;
 	    int i;
 
+# ifdef OPT_RULE_PROFILING_EXT
+		struct timeval startTime, endTime;
+
+		if ( DEBUG_PROFILE_RULES )
+			gettimeofday(&startTime, 0);
+# endif
+
 	    /* build parameters as local vars */
 
 	    for( l = rule->params, i = 0; l; l = l->next, i++ )
@@ -606,6 +617,19 @@ evaluate_rule(
 	    freesettings( s );
 
 	    parse_free( parse );
+
+# ifdef OPT_RULE_PROFILING_EXT
+		if ( DEBUG_PROFILE_RULES )
+		{
+			gettimeofday(&endTime, 0);
+
+			rule->invocations++;
+			rule->invocation_time
+				+= (endTime.tv_sec - startTime.tv_sec) * (int64_t)1000000
+					+ (endTime.tv_usec - startTime.tv_usec);
+		}
+# endif
+
 	}
 
 	if( DEBUG_COMPILE )

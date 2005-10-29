@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tools translation bitsinfo ;
+SubDir HAIKU_TOP src tools translation bitsinfo ;
 
 BinCommand bitsinfo : bitsinfo.cpp : be ;
 

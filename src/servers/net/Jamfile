@@ -1,12 +1,12 @@
-SubDir OBOS_TOP src servers net ;
+SubDir HAIKU_TOP src servers net ;
 
 UsePrivateHeaders net ;
 
 # additonal headers for built-in add-ons:
 UsePrivateHeaders net ;
-UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libppp headers ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src tests kits net DialUpPreflet ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libppp headers ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net DialUpPreflet ] ;
 
 
 Server net_server :
@@ -19,7 +19,7 @@ Server net_server :
 	PPPServer.cpp
 ;
 
-LinkSharedOSLibs net_server : 
+LinkAgainst net_server : 
 	be 
 	libsocket.so
 	libbind.so

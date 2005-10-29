@@ -1,14 +1,16 @@
-SubDir OBOS_TOP src bin bash builtins ;
+SubDir HAIKU_TOP src bin bash builtins ;
+
+# filter warnings we don't want here
+TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
+	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
 SubDirCcFlags -DHAVE_CONFIG_H -DSHELL ;
 
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) include ] ;
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) include ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
 
-BinCommand mkbuiltins : mkbuiltins.c ;
-
-MakeLocate mkbuiltins : $(LOCATE_TARGET) ;
+BuildPlatformMain mkbuiltins : mkbuiltins.c ;
 
 rule MkBuiltinsComp
 {
@@ -16,7 +18,7 @@ rule MkBuiltinsComp
 	local defFile = $(2) ;
 
 	SEARCH on $(defFile) = $(SEARCH_SOURCE) ;
-	MakeLocate $(source) : $(LOCATE_SOURCE) ;
+	MakeLocateArch $(source) ;
 
 	Depends $(source) : $(defFile) mkbuiltins ;
 	MkBuiltinsComp1 $(source) : mkbuiltins $(defFile) ;
@@ -33,7 +35,7 @@ rule MkBuiltinsExt
 	local sources = $(1) ;
 	local defFiles = [ FGristFiles $(2) ] ;
 
-	MakeLocate $(sources) : $(LOCATE_SOURCE) ;
+	MakeLocateArch $(sources) ;
 	SEARCH on $(defFiles) = $(SEARCH_SOURCE) ;
 	
 	Depends $(sources) : $(defFiles) mkbuiltins ;
@@ -68,7 +70,7 @@ for bashDefFile in [ FGristFiles $(bashDefFiles) ] {
 MkBuiltinsExt <bash>builtext.h [ FGristFiles builtins.c ] : $(bashDefFiles) ;
 
 # generate the builtins library
-StaticLibrary builtins
+StaticLibrary libbuiltins.a
 	: common.c evalfile.c evalstring.c getopt.c bashgetopt.c builtins.c
 	  [ FGristFiles $(bashDefFiles:S=.c) ]
 ;

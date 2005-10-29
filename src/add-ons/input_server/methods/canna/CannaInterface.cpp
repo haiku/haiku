@@ -10,7 +10,7 @@
 
 #include "CannaInterface.h"
 #include <UTF8.h>
-#include <memory.h>
+#include <string.h>
 
 #ifdef DEBUG
 #include <Debug.h>

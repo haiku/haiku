@@ -9,7 +9,7 @@
  */
 
 
-/* $Id: infutil.h,v 1.1 2004/10/06 17:46:48 laplace Exp $ */
+/* $Id$ */
 
 #ifndef _INFUTIL_H
 #define _INFUTIL_H

@@ -17,7 +17,7 @@
    +----------------------------------------------------------------------+
 */
 
-/* $Id: pdf.c,v 1.1 2004/10/06 17:46:43 laplace Exp $ */
+/* $Id$ */
 
 /* Bootstrap of PDFlib Feature setup */
 #define PDF_FEATURE_SERIAL

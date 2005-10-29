@@ -230,6 +230,8 @@ Keymap::Dump()
 status_t
 Keymap::LoadCurrent()
 {
+	#ifdef __BEOS__
+
 	key_map *keys = NULL;
 	get_key_map(&keys, &fChars);
 	if (!keys) {
@@ -239,6 +241,11 @@ Keymap::LoadCurrent()
 	memcpy(&fKeys, keys, sizeof(fKeys));
 	delete keys;
 	return B_OK;
+
+	#else	// ! __BEOS__
+	fprintf(stderr, "Unsupported operation on this platform!\n");
+	exit(1);
+	#endif	// ! __BEOS__
 }
 
 /*
@@ -1079,6 +1086,8 @@ status_t _restore_key_map_();
 void
 Keymap::RestoreSystemDefault()
 {
+	#ifdef __BEOS__
+
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path)!=B_OK)
 		return;
@@ -1089,12 +1098,19 @@ Keymap::RestoreSystemDefault()
 	ref.Remove();	
 	
 	_restore_key_map_();
+
+	#else	// ! __BEOS__
+	fprintf(stderr, "Unsupported operation on this platform!\n");
+	exit(1);
+	#endif	// ! __BEOS__
 }
 
 
 void
 Keymap::SaveAsCurrent()
 {
+	#ifdef __BEOS__
+
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path)!=B_OK)
 		return;
@@ -1110,6 +1126,11 @@ Keymap::SaveAsCurrent()
 		return;
 	}
 	Use();
+
+	#else	// ! __BEOS__
+	fprintf(stderr, "Unsupported operation on this platform!\n");
+	exit(1);
+	#endif	// ! __BEOS__
 }
 
 
@@ -1117,5 +1138,12 @@ Keymap::SaveAsCurrent()
 status_t
 Keymap::Use()
 {
+	#ifdef __BEOS__
+
 	return _restore_key_map_();
+
+	#else	// ! __BEOS__
+	fprintf(stderr, "Unsupported operation on this platform!\n");
+	exit(1);
+	#endif	// ! __BEOS__
 }

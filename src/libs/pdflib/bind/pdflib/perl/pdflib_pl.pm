@@ -1,4 +1,4 @@
-# $Id: pdflib_pl.pm,v 1.1 2004/10/06 17:46:42 laplace Exp $
+# $Id$
 package pdflib_pl;
 require Exporter;
 require DynaLoader;

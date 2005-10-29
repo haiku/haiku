@@ -1,0 +1,139 @@
+# parameters <haiku sourcedir> <buildtools dir> [ <haiku output dir> ]
+
+# get and check the parameters
+if [ $# \< 2 ]; then
+	echo Usage: $0 '<haiku sourcedir> <buildtools dir> [ <haiku output dir> ]' >&2
+	exit 1
+fi
+
+haikuSourceDir=$1
+buildToolsDir=$2
+
+if [ $# \< 3 ]; then
+	haikuOutputDir=$haikuSourceDir/generated
+else
+	haikuOutputDir=$3
+fi
+
+if [ ! -d $haikuSourceDir ]; then
+	echo "No such directory: \"$haikuSourceDir\"" >&2
+	exit 1
+fi
+
+if [ ! -d $buildToolsDir ]; then
+	echo "No such directory: \"$buildToolsDir\"" >&2
+	exit 1
+fi
+
+
+# create the output dir
+mkdir -p $haikuOutputDir || exit 1
+
+
+# get absolute paths
+currentDir=$(pwd)
+
+cd $haikuSourceDir
+haikuSourceDir=$(pwd)
+cd $currentDir
+
+cd $buildToolsDir
+buildToolsDir=$(pwd)
+cd $currentDir
+
+cd $haikuOutputDir
+haikuOutputDir=$(pwd)
+
+
+# create the object and installation directories for the cross compilation tools
+installDir=$haikuOutputDir/cross-tools
+objDir=$haikuOutputDir/cross-tools-build
+binutilsObjDir=$objDir/binutils
+gccObjDir=$objDir/gcc
+tmpIncludeDir=$objDir/sysincludes
+tmpLibDir=$objDir/syslibs
+
+rm -rf $installDir $objDir
+
+mkdir -p $installDir $objDir $binutilsObjDir $gccObjDir $tmpIncludeDir \
+	$tmpLibDir || exit 1
+mkdir -p $installDir/lib/gcc-lib/i586-pc-beos/2.95.3-beos-041202
+
+
+# build binutils
+cd $binutilsObjDir
+CFLAGS="-O2" CXXFLAGS="-O2" $buildToolsDir/binutils/configure \
+	--prefix=$installDir --target=i586-pc-beos --disable-nls \
+	--enable-shared=yes || exit 1
+make || exit 1
+make install || exit 1
+
+export PATH=$PATH:$installDir/bin
+
+
+# build gcc
+
+# prepare the include files
+copy_headers()
+{
+	sourceDir=$1
+	targetDir=$2
+
+	headers="$(find $sourceDir -name \*\.h | grep -v /.svn)"
+	headers="$(echo $headers | sed -e s@$sourceDir/@@g)"
+	for f in $headers; do
+		headerTargetDir=$targetDir/$(dirname $f)
+		mkdir -p $headerTargetDir
+		cp $sourceDir/$f $headerTargetDir
+	done
+}
+
+copy_headers $haikuSourceDir/headers/os $tmpIncludeDir/be
+copy_headers $haikuSourceDir/headers/posix $tmpIncludeDir/posix
+
+# configure gcc
+cd $gccObjDir
+CFLAGS="-O2" CXXFLAGS="-O2" $buildToolsDir/gcc/configure --prefix=$installDir \
+	--target=i586-pc-beos --disable-nls --enable-shared=yes \
+	--enable-languages=c,c++ --with-headers=$tmpIncludeDir \
+	--with-libs=$tmpLibDir || exit 1
+
+# hack the Makefile to avoid trouble with stuff we don't need anyway
+sedExpr=
+for toRemove in libiberty libio libjava libobjc libstdc++; do
+	sedExpr="$sedExpr -e 's@^\(TARGET_CONFIGDIRS =.*\)$toRemove\(.*\)@\1\2@'"
+done
+echo sedExpr: $sedExpr
+mv Makefile Makefile.bak || exit 1
+eval "sed $sedExpr Makefile.bak > Makefile" || exit 1
+rm Makefile.bak
+
+# make gcc
+make cross || {
+	echo "ERROR: Building gcc failed." >&2
+	exit 1
+}
+
+# install gcc
+make install-gcc-cross || {
+	echo "ERROR: Installing the cross compiler failed." >&2
+	echo "ERROR: Note, that it is normal for the \"make cross\" to fail" >&2
+	echo "ERROR: at some point, but it must not fail before all" >&2
+	echo "ERROR: components we need have been built." >&2
+	exit 1
+}
+
+
+# cleanup
+
+# remove the system headers from the installation dir
+# Only the ones from the source tree should be used.
+sysIncludeDir=$installDir/i586-pc-beos/sys-include
+rm -rf $sysIncludeDir/be $sysIncludeDir/posix
+
+# remove the objects dir
+rm -rf $objDir
+
+
+echo "binutils and gcc for cross compilation have been built successfully!"
+

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons mail_daemon outbound_filters ;
+SubDir HAIKU_TOP src add-ons mail_daemon outbound_filters ;
 
-SubInclude OBOS_TOP src add-ons mail_daemon outbound_filters fortune ;
+SubInclude HAIKU_TOP src add-ons mail_daemon outbound_filters fortune ;
 

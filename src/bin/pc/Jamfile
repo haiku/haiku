@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src bin pc ;
+SubDir HAIKU_TOP src bin pc ;
 
 BinCommand pc :
 	pc.c

@@ -1,7 +1,11 @@
-SubDir OBOS_TOP src bin findutils locate ;
+SubDir HAIKU_TOP src bin findutils locate ;
 
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+# filter warnings we don't want here
+TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
+	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
 # set some additional defines
 {
@@ -20,25 +24,27 @@ BinCommand bigram :
 	bigram.c
 	: libfindutils.a : $(findutils_rsrc) ;
 
-MakeLocate bigram : [ FDirName $(OBOS_ETC_DIR) libexec locate ] ;
+# TODO: Must be done in HaikuImage.
+#MakeLocate bigram : [ FDirName $(HAIKU_ETC_DIR) libexec locate ] ;
 
 BinCommand frcode :
 	frcode.c
 	: libfindutils.a : $(findutils_rsrc) ;
 
-MakeLocate frcode : [ FDirName $(OBOS_ETC_DIR) libexec locate ] ;
+# TODO: Must be done in HaikuImage.
+#MakeLocate frcode : [ FDirName $(HAIKU_ETC_DIR) libexec locate ] ;
 
 BinCommand code :
 	code.c
 	: libfindutils.a : $(findutils_rsrc) ;
 
-MakeLocate code : [ FDirName $(OBOS_ETC_DIR) libexec locate ] ;
+# TODO: Must be done in HaikuImage.
+#MakeLocate code : [ FDirName $(HAIKU_ETC_DIR) libexec locate ] ;
 
 rule MkUpdateDb
 {
-	SetupObjectsDir ;
 	SEARCH on $(>) = $(SEARCH_SOURCE) ;
-	MakeLocate $(<) : $(LOCATE_TARGET) ;
+	MakeLocatePlatform $(<) ;
 	Depends $(<) : $(>) ;
 	MkUpdateDb1 $(<) : $(>) ;
 	LocalClean clean : $(<) ;
@@ -59,7 +65,7 @@ actions MkUpdateDb1
 }
 
 MkUpdateDb updatedb : updatedb.sh [ FGristFiles version.c ] ;
-MakeLocate <bin>updatedb : $(OBOS_BIN_DIR) ;
+MakeLocatePlatform <bin>updatedb ;
 Shell <bin>updatedb : updatedb ;
 
 SEARCH on [ FGristFiles version.c ] = [ FDirName $(SUBDIR) $(DOTDOT) find ] ;

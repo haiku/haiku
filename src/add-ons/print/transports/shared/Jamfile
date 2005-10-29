@@ -1,6 +1,4 @@
-SubDir OBOS_TOP src add-ons print transports shared ;
-
-SetupObjectsDir ;
+SubDir HAIKU_TOP src add-ons print transports shared ;
 
 if $(BONE_COMPATIBLE) {
 	ObjectC++Flags Socket.cpp : -DHAVE_ARPA_INET -Dclosesocket=close ;

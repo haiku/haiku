@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src tests add-ons print pdf linepathbuilder ;
+SubDir HAIKU_TOP src tests add-ons print pdf linepathbuilder ;
 
-SubDirHdrs $(OBOS_TOP) src add-ons print drivers pdf source ;
+SubDirHdrs $(HAIKU_TOP) src add-ons print drivers pdf source ;
 
 AddResources LinePathBuilder : LinePathBuilder.rdef ;
 
@@ -18,6 +18,6 @@ SimpleTest LinePathBuilder
 
 # Tell Jam where to find these sources:
 SEARCH on [ FGristFiles LinePathBuilder.cpp SubPath.cpp ]
-	= [ FDirName $(OBOS_TOP) src add-ons print drivers pdf source ] ;
+	= [ FDirName $(HAIKU_TOP) src add-ons print drivers pdf source ] ;
 
 

@@ -1,22 +1,24 @@
-SubDir OBOS_TOP src add-ons kernel bus_managers usb ;
+SubDir HAIKU_TOP src add-ons kernel bus_managers usb ;
 
 SubDirC++Flags -fno-rtti ;
 
+SubDirSysHdrs $(SUBDIR) ;
 UsePrivateHeaders [ FDirName kernel ] ;
 
 AddResources usb : usb.rdef ;
 
-R5KernelStaticLibrary usb :
+KernelStaticLibrary libusb.a :
 	Stack.cpp
 	Device.cpp
 	Hub.cpp
 	BusManager.cpp
 	Transfer.cpp
 	Pipe.cpp
-	;	
+	: -fno-pic
+;	
 
-R5KernelAddon usb : [ FDirName kernel bus_managers ] :
+KernelAddon usb : [ FDirName kernel bus_managers ] :
 	usb.cpp
 	;
 
-LinkSharedOSLibs usb : libusb.a ;
+LinkAgainst usb : libusb.a ;

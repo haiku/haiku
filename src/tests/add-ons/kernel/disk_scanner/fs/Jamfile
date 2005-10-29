@@ -1,7 +1,7 @@
-SubDir OBOS_TOP src tests add-ons kernel disk_scanner fs ;
+SubDir HAIKU_TOP src tests add-ons kernel disk_scanner fs ;
 
 SEARCH_SOURCE
-	+= [ FDirName $(OBOS_TOP) src add-ons kernel disk_scanner fs ] ;
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel disk_scanner fs ] ;
 
 UsePrivateHeaders $(DOT) ;
 
@@ -16,12 +16,12 @@ UsePrivateHeaders $(DOT) ;
 Addon <userland>bfs : userland disk_scanner fs :
 	bfs.c
 ;
-LinkSharedOSLibs <userland>bfs : libkernelland_emu.so ;
+LinkAgainst <userland>bfs : libkernelland_emu.so ;
 
 # iso9660
 
 Addon <userland>iso9660 : userland disk_scanner fs :
 	iso9660.cpp
 ;
-LinkSharedOSLibs <userland>iso9660 : libkernelland_emu.so ;
+LinkAgainst <userland>iso9660 : libkernelland_emu.so ;
 

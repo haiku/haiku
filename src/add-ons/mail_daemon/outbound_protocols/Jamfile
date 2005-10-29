@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons mail_daemon outbound_protocols ;
+SubDir HAIKU_TOP src add-ons mail_daemon outbound_protocols ;
 
-SubInclude OBOS_TOP src add-ons mail_daemon outbound_protocols smtp ;
+SubInclude HAIKU_TOP src add-ons mail_daemon outbound_protocols smtp ;
 

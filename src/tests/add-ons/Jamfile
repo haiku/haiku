@@ -1,7 +1,7 @@
-SubDir OBOS_TOP src tests add-ons ;
+SubDir HAIKU_TOP src tests add-ons ;
 
-SubInclude OBOS_TOP src tests add-ons input_server ;
-SubInclude OBOS_TOP src tests add-ons kernel ;
-SubInclude OBOS_TOP src tests add-ons media ;
-SubInclude OBOS_TOP src tests add-ons print ;
-SubInclude OBOS_TOP src tests add-ons translators ;
+SubInclude HAIKU_TOP src tests add-ons input_server ;
+SubInclude HAIKU_TOP src tests add-ons kernel ;
+SubInclude HAIKU_TOP src tests add-ons media ;
+SubInclude HAIKU_TOP src tests add-ons print ;
+SubInclude HAIKU_TOP src tests add-ons translators ;

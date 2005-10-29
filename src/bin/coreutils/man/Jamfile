@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src bin coreutils man ;
+SubDir HAIKU_TOP src bin coreutils man ;
 
 local manpages = 
 basename.1
@@ -100,7 +100,8 @@ rule GenerateChapterXML
 	local template = [ FGristFiles $(2) ] ;
         local target = [ FGristFiles $(1) ] ;
 
-	MakeLocate $(target) : [ FDirName $(OBOS_OBJECT_TARGET) documentation Shell_Tools ] ;
+	MakeLocate $(target)
+		: [ FDirName $(HAIKU_DOCUMENTATION_OBJECT_DIR) Shell_Tools ] ;
 	SEARCH on $(template) = $(SEARCH_SOURCE) ;
 
 	local xmls = [ FGristFiles $(sources:S=.xml) ] ;

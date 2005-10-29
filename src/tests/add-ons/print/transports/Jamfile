@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests add-ons print transports ;
+SubDir HAIKU_TOP src tests add-ons print transports ;
 
 SimpleTest print_transport_loader : main.cpp : be ;
 

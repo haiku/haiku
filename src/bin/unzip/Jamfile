@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src bin unzip ;
+SubDir HAIKU_TOP src bin unzip ;
 
-StaticLibrary unzip : 
+StaticLibrary libunzip.a : 
 	crc32.c
 	ttyio.c
 	crctab.c
@@ -43,6 +43,6 @@ BinCommand unzipsfx :
 ;
 
 {
-	MakeLocate <bin>zipgrep : $(OBOS_BIN_DIR) ;
+	MakeLocatePlatform <bin>zipgrep ;
 	Shell <bin>zipgrep : zipgrep ;
 }

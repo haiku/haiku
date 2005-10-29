@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src add-ons kernel generic mime_table ;
+SubDir HAIKU_TOP src add-ons kernel generic mime_table ;
 
-R5KernelAddon mime_table : kernel generic :
+KernelAddon mime_table : kernel generic :
 	mime_table.c
 	module.c
 ;

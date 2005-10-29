@@ -1,10 +1,10 @@
-SubDir OBOS_TOP src add-ons tracker filetype ;
+SubDir HAIKU_TOP src add-ons tracker filetype ;
 
 AddResources FileType-F :
 	FileType.rdef FileType.icons.rdef FileType.version.rdef
 	;
 	
-App FileType-F :
+Application FileType-F :
 	main.cpp
 	FileTypeApp.cpp
 	FileTypeView.cpp
@@ -17,7 +17,5 @@ App FileType-F :
 	process_refs.cpp
 	;
 
-MakeLocate FileType-F : [ FDirName $(OBOS_ADDON_DIR) Tracker ] ;	
-
-LinkSharedOSLibs FileType-F : be tracker ;
+LinkAgainst FileType-F : be tracker ;
 

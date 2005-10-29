@@ -1,9 +1,9 @@
-SubDir OBOS_TOP src add-ons print shared ;
+SubDir HAIKU_TOP src add-ons print shared ;
 
 UsePrivateHeaders interface print ;
 
 StaticLibrary 
-	print
+	libprint.a
 	: 
 	PicturePrinter.cpp
 	PrintJobReader.cpp
@@ -12,7 +12,7 @@ StaticLibrary
 	;
 
 # StaticLibrary
-#	printtransportaddon
+#	libprinttransportaddon.a
 #	:
 #	PrintTransportAddOn.cpp
 #	;
@@ -23,7 +23,7 @@ Objects
 
 
 #StaticLibrary
-#	printerdriveraddon
+#	libprinterdriveraddon.a
 #	:
 #	PrinterDriverAddOn.cpp
 #	;

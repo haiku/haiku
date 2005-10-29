@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kits interface ;
+SubDir HAIKU_TOP src kits interface ;
 
 # If defined allows to run applications without the registrar
 # -- for development only, of course.
@@ -23,7 +23,17 @@ if ! $(HAIKU_COMPATIBLE) {
 	SubDirC++Flags $(defines) ;
 }
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FStandardOSHeaders ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# TODO: POSIX headers shouldn't be used. Needed for strlcpy() only.
+}
+
+
 UsePrivateHeaders shared app interface input [ FDirName servers app ] ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) BTextView ] ;
 
 MergeObject <libbe>interface_kit.o :
 	Alert.cpp
@@ -82,11 +92,11 @@ MergeObject <libbe>interface_kit.o :
 	ZombieReplicantView.cpp
 
 	# BTextView
-	BTextView/InlineInput.cpp
-	BTextView/LineBuffer.cpp
-	BTextView/StyleBuffer.cpp
-	BTextView/TextGapBuffer.cpp
-	BTextView/TextView.cpp
-	BTextView/UndoBuffer.cpp
-	BTextView/WidthBuffer.cpp
+	InlineInput.cpp
+	LineBuffer.cpp
+	StyleBuffer.cpp
+	TextGapBuffer.cpp
+	TextView.cpp
+	UndoBuffer.cpp
+	WidthBuffer.cpp
 ;

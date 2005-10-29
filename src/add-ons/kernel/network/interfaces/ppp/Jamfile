@@ -1,10 +1,21 @@
-SubDir OBOS_TOP src add-ons kernel network interfaces ppp ;
+SubDir HAIKU_TOP src add-ons kernel network interfaces ppp ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# We need the public network headers also when not compiling for Haiku.
+		# Unfortunately we get more than we want, namely all POSIX headers.
+}
+
+UseHeaders [ FDirName $(HAIKU_TOP) headers cpp ] : true ;
 UsePrivateHeaders net ;
 UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
+	libkernelppp ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
+	libkernelppp headers ] : true ;
 
 
 {
@@ -12,15 +23,15 @@ UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkerne
 }
 
 
-R5KernelAddon ppp : kernel obos_network interfaces :
+KernelAddon ppp : kernel obos_network interfaces :
 	ppp.cpp
 	PPPManager.cpp
 ;
 
-LinkSharedOSLibs ppp : libkernelppp.a ;
+LinkAgainst ppp : libkernelppp.a ;
 
 # Installation
-OBOSInstall install-networking
+HaikuInstall install-networking
 	: /boot/home/config/add-ons/kernel/obos_network/interfaces
 	: ppp ;
 

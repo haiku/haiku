@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src preferences backgrounds ;
+SubDir HAIKU_TOP src preferences backgrounds ;
 
 UsePrivateHeaders shared ;
 

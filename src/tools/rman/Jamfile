@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src tools rman ;
+SubDir HAIKU_TOP src tools rman ;
 
 SubDirCcFlags -w ;
 
-BinCommand rman : rman.c : ;
+BuildPlatformMain rman : rman.c : ;
 

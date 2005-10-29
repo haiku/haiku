@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel bus_managers config_manager ;
+SubDir HAIKU_TOP src add-ons kernel bus_managers config_manager ;
 
 KernelAddon config_manager : kernel bus_managers :
 	config_manager.c

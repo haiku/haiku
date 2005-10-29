@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kernel boot ;
+SubDir HAIKU_TOP src tests kernel boot ;
 
-SubInclude OBOS_TOP src tests kernel boot heap ;
-SubInclude OBOS_TOP src tests kernel boot loader ;
+SubInclude HAIKU_TOP src tests kernel boot heap ;
+SubInclude HAIKU_TOP src tests kernel boot loader ;

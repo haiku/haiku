@@ -1,4 +1,4 @@
-/* $Id: chartab.java,v 1.1 2004/10/06 17:16:51 laplace Exp $
+/* $Id$
  *
  * PDFlib client: character table
  */

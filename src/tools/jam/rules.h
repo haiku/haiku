@@ -36,6 +36,10 @@
  * 01/14/03 (seiwald) - fix includes fix with new internal includes TARGET
  */
 
+# ifdef OPT_RULE_PROFILING_EXT
+# include <stdint.h>
+# endif
+
 typedef struct _rule RULE;
 typedef struct _target TARGET;
 typedef struct _targets TARGETS;
@@ -52,6 +56,12 @@ struct _rule {
 	LIST		*bindlist;	/* variable to bind for actions */
 	LIST		*params;	/* bind args to local vars */
 	int		flags;		/* modifiers on ACTIONS */
+
+# ifdef OPT_RULE_PROFILING_EXT
+	int			invocations;
+	int64_t		invocation_time;
+	RULE		*next_profiling_rule;
+# endif
 
 # define	RULE_UPDATED	0x01	/* $(>) is updated sources only */
 # define	RULE_TOGETHER	0x02	/* combine actions on single target */

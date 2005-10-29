@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kernel libroot os ;
+SubDir HAIKU_TOP src tests kernel libroot os ;
 
 #SubDirCcFlags -fcheck-memory-usage -O0 -D_NO_INLINE_ASM ;
 
@@ -19,4 +19,4 @@ SimpleTest FindDirectoryTest
 SEARCH on [ FGristFiles
 		driver_settings.c
 		parsedate.cpp
-	] = [ FDirName $(OBOS_TOP) src system libroot os ] ;
+	] = [ FDirName $(HAIKU_TOP) src system libroot os ] ;

@@ -1,12 +1,12 @@
-SubDir OBOS_TOP src add-ons media media-add-ons ;
+SubDir HAIKU_TOP src add-ons media media-add-ons ;
 
-# SubInclude OBOS_TOP src add-ons media media-add-ons demultiplexer ;
-# SubInclude OBOS_TOP src add-ons media media-add-ons reader ;
-# SubInclude OBOS_TOP src add-ons media media-add-ons writer ;
-SubInclude OBOS_TOP src add-ons media media-add-ons legacy ;
-SubInclude OBOS_TOP src add-ons media media-add-ons mixer ;
-SubInclude OBOS_TOP src add-ons media media-add-ons multi_audio ;
-SubInclude OBOS_TOP src add-ons media media-add-ons radeon ;
-SubInclude OBOS_TOP src add-ons media media-add-ons tone_producer_demo ;
-SubInclude OBOS_TOP src add-ons media media-add-ons video_producer_demo ;
+# SubInclude HAIKU_TOP src add-ons media media-add-ons demultiplexer ;
+# SubInclude HAIKU_TOP src add-ons media media-add-ons reader ;
+# SubInclude HAIKU_TOP src add-ons media media-add-ons writer ;
+SubInclude HAIKU_TOP src add-ons media media-add-ons legacy ;
+SubInclude HAIKU_TOP src add-ons media media-add-ons mixer ;
+SubInclude HAIKU_TOP src add-ons media media-add-ons multi_audio ;
+SubInclude HAIKU_TOP src add-ons media media-add-ons radeon ;
+SubInclude HAIKU_TOP src add-ons media media-add-ons tone_producer_demo ;
+SubInclude HAIKU_TOP src add-ons media media-add-ons video_producer_demo ;
 

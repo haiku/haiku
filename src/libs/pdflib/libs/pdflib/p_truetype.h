@@ -10,7 +10,7 @@
  |                                                                           |
  *---------------------------------------------------------------------------*/
 
-/* $Id: p_truetype.h,v 1.1 2004/10/06 17:46:49 laplace Exp $
+/* $Id$
  *
  * PDFlib TrueType typedefs, structures, and enums
  *

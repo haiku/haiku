@@ -1,7 +1,6 @@
-SubDir OBOS_TOP src apps cdplayer ;
+SubDir HAIKU_TOP src apps cdplayer ;
 
-AddResources CDPlayer : CDPlayer.rdef ;
-App CDPlayer : 
+Application CDPlayer : 
 	CDAudioDevice.cpp
 	CDDBSupport.cpp
 	CDPlayer.cpp
@@ -10,5 +9,7 @@ App CDPlayer :
 	PlayList.cpp
 	TrackMenu.cpp
 	TwoStateDrawButton.cpp
-	;
-LinkSharedOSLibs CDPlayer : be libnet.so libnetapi.so translation ;
+
+	: be net netapi translation
+	: CDPlayer.rdef
+;

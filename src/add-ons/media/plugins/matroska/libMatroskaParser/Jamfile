@@ -1,8 +1,8 @@
-SubDir OBOS_TOP src add-ons media plugins matroska libMatroskaParser ;
+SubDir HAIKU_TOP src add-ons media plugins matroska libMatroskaParser ;
 
 UseLibraryHeaders zlib ;
 
-StaticLibrary MatroskaParser :
+StaticLibrary libMatroskaParser.a :
 	MatroskaParser.c
 	StreamIO.cpp
 ;

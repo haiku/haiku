@@ -1,4 +1,4 @@
-/* $Id: quickreference.java,v 1.1 2004/10/06 17:16:52 laplace Exp $
+/* $Id$
  *
  * PDFlib/PDI client: mini imposition demo
  */

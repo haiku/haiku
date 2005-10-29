@@ -10,7 +10,7 @@
  |                                                                           |
  *---------------------------------------------------------------------------*/
 
-/* $Id: pdfimpose.c,v 1.1 2004/10/06 17:46:52 laplace Exp $
+/* $Id$
  *
  * Impose multiple PDF documents on a single sheet,
  * or concatenate multiple PDFs (if no -g option is supplied)

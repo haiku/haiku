@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src preferences scrollbar ;
+SubDir HAIKU_TOP src preferences scrollbar ;
 
 Preference ScrollBar : 
 	ScrollBarApp.cpp 

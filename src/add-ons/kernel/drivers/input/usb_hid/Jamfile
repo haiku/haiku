@@ -1,31 +1,24 @@
-SubDir OBOS_TOP src add-ons kernel drivers input usb_hid ;
+SubDir HAIKU_TOP src add-ons kernel drivers input usb_hid ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders input ;
 
-R5KernelAddon usb_hid : kernel drivers bin :
+KernelAddon usb_hid : kernel drivers bin :
 	hid.c
 	hidparse.c
 	devlist.c
 ;
 
-ObjectHdrs [ FGristFiles hid$(SUFOBJ) ] : [ FObjectsDir src preferences devices ] ;
+ObjectHdrs [ FGristFiles hid$(SUFOBJ) ]
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) preferences devices ] ;
 
 Includes [ FGristFiles hid.c ] :
 	<src!preferences!devices>usbdevs.h <src!preferences!devices>usbdevs_data.h ;
-
-# Link to kernel/drivers/dev/input/
-{
-	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev input ] ;
-	local instDriver = <kernel!drivers!dev!input>usb_hid ;
-	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : usb_hid ;
-}
 
 Package haiku-inputkit-cvs :
         usb_hid :
         boot home config add-ons kernel drivers bin ;
 
-Package haiku-inputkit-cvs :
-        <kernel!drivers!dev!input>usb_hid :
-        boot home config add-ons kernel drivers dev input ;
+PackageDriverSymLink haiku-inputkit-cvs : input usb_hid ;
 

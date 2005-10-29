@@ -9,7 +9,11 @@
 extern "C" {
 #endif
 
+// Already defined unter Linux.
+#ifdef __BEOS__
 extern size_t	strnlen(const char *string, size_t count);
+#endif
+
 extern size_t	strlcat(char *dest, const char *source, size_t length);
 extern size_t	strlcpy(char *dest, const char *source, size_t length);
 

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src documentation haiku_book ;
+SubDir HAIKU_TOP src documentation haiku_book ;
 
 Doc2HTML 
 	Haiku_Book.xml

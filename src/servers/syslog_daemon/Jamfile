@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src servers syslog_daemon ;
+SubDir HAIKU_TOP src servers syslog_daemon ;
 
 UsePrivateHeaders syslog_daemon ;
 
@@ -12,10 +12,10 @@ Server syslog_daemon :
 	# that's for a successful build on R5
 	# ToDo: this can be removed for the Haiku build
 	strlcpy.c
-	;
-
-LinkSharedOSLibs syslog_daemon : be ;
+	:
+	be
+;
 
 SEARCH on [ FGristFiles
 		strlcpy.c
-	] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
+	] = [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;

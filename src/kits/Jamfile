@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kits ;
+SubDir HAIKU_TOP src kits ;
 
 # If defined allows to run applications without the registrar
 # -- for development only, of course.
@@ -24,7 +24,7 @@ UsePrivateHeaders syslog_daemon ;             # For syslog.cpp
 
 AddResources libbe.so : libbe_version.rdef ;
 
-SharedLibrary be :
+SharedLibrary libbe.so :
 	KMessage.cpp
 	: 
 	<libbe>app_kit.o
@@ -34,15 +34,25 @@ SharedLibrary be :
 	<libbe>support_kit.o
 
 	libroot.so	# make sure it links against our libroot.so
-	stdc++.r4
+	$(TARGET_LIBSTDC++)
 ;
-
-MakeLocate <develop>libbe.so : $(OBOS_STLIB_DIR) ;
-RelSymLink <develop>libbe.so : libbe.so ;
 
 # Build libopenbeos.so
 
-SharedLibrary openbeos :
+SetSupportedPlatformsForTarget libopenbeos.so : r5 bone dano ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FStandardOSHeaders ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# TODO: POSIX headers shouldn't be used. Needed for strlcpy() only.
+
+	# Remove _NO_INLINE_ASM from the defines for syslog.cpp. Otherwise we get
+	# references to tls_get/set() etc. that don't exist under BeOS.
+	TARGET_DEFINES on [ FGristFiles syslog.o ]
+		= [ FFilter $(TARGET_DEFINES) : _NO_INLINE_ASM ] ;
+}
+
+SharedLibrary libopenbeos.so :
 	KMessage.cpp
 	syslog.cpp
 	:
@@ -57,36 +67,26 @@ SharedLibrary openbeos :
 ;
 
 SEARCH on [ FGristFiles KMessage.cpp ]
-	= [ FDirName $(OBOS_TOP) src system kernel messaging ] ;
+	= [ FDirName $(HAIKU_TOP) src system kernel messaging ] ;
 
 SEARCH on [ FGristFiles syslog.cpp ]
-	= [ FDirName $(OBOS_TOP) src system libroot posix ] ;
+	= [ FDirName $(HAIKU_TOP) src system libroot posix ] ;
 
-# Note: If you want to use /boot/home/config/lib/libopenbeos.so in another
-# rule, use the identifier <boot!home!config!lib>libopenbeos.so, otherwise
-# libopenbeos.so.
 
-LOCATE on <boot!home!config!lib>libopenbeos.so
-		  <boot!home!config!lib>libbeadapter.so = /boot/home/config/lib ;
-File <boot!home!config!lib>libopenbeos.so : libopenbeos.so ;
-File <boot!home!config!lib>libbeadapter.so : libbeadapter.so ;
-Includes <boot!home!config!lib>libopenbeos.so
-	: <boot!home!config!lib>libbeadapter.so ;
-
-SubInclude OBOS_TOP src kits app ;
-SubInclude OBOS_TOP src kits debug ;
-SubInclude OBOS_TOP src kits device ;
-SubInclude OBOS_TOP src kits game ;
-SubInclude OBOS_TOP src kits interface ;
-SubInclude OBOS_TOP src kits mail ;
-SubInclude OBOS_TOP src kits media ;
-SubInclude OBOS_TOP src kits midi ;
-SubInclude OBOS_TOP src kits midi2 ;
-SubInclude OBOS_TOP src kits network ;
-SubInclude OBOS_TOP src kits opengl ;
-SubInclude OBOS_TOP src kits screensaver ;
-SubInclude OBOS_TOP src kits storage ;
-SubInclude OBOS_TOP src kits support ;
-SubInclude OBOS_TOP src kits textencoding ;
-SubInclude OBOS_TOP src kits tracker ;
-SubInclude OBOS_TOP src kits translation ;
+SubInclude HAIKU_TOP src kits app ;
+SubInclude HAIKU_TOP src kits debug ;
+SubInclude HAIKU_TOP src kits device ;
+SubInclude HAIKU_TOP src kits game ;
+SubInclude HAIKU_TOP src kits interface ;
+SubInclude HAIKU_TOP src kits mail ;
+SubInclude HAIKU_TOP src kits media ;
+SubInclude HAIKU_TOP src kits midi ;
+SubInclude HAIKU_TOP src kits midi2 ;
+SubInclude HAIKU_TOP src kits network ;
+SubInclude HAIKU_TOP src kits opengl ;
+SubInclude HAIKU_TOP src kits screensaver ;
+SubInclude HAIKU_TOP src kits storage ;
+SubInclude HAIKU_TOP src kits support ;
+SubInclude HAIKU_TOP src kits textencoding ;
+SubInclude HAIKU_TOP src kits tracker ;
+SubInclude HAIKU_TOP src kits translation ;

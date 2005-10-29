@@ -1,0 +1,5 @@
+SubDir HAIKU_TOP src build ;
+
+SubInclude HAIKU_TOP src build libbe ;
+SubInclude HAIKU_TOP src build libroot ;
+

@@ -1,10 +1,12 @@
-SubDir OBOS_TOP src bin less ;
+SubDir HAIKU_TOP src bin less ;
 
 # filter warnings we don't want here
-local originalCCFlags = $(CCFLAGS) ;
-CCFLAGS = [ Filter $(CCFLAGS) : -Wall -Wmissing-prototypes ] ;
+TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
+	: -Wall -Wmissing-prototypes ] ;
 
 SubDirCcFlags -DBINDIR='\"/bin\"' -DSYSDIR='\"/etc\"' ;
+
+SubDirSysHdrs $(SUBDIR) ;
 
 BinCommand less : 
 	main.c screen.c brac.c ch.c charset.c cmdbuf.c command.c decode.c edit.c filename.c forwback.c 
@@ -15,9 +17,3 @@ BinCommand less :
 BinCommand lesskey : lesskey.c version.c : : less.rdef ;
 
 BinCommand lessecho : lessecho.c version.c : : less.rdef ;
-
-MakeLocate more : $(OBOS_BIN_DIR) ;
-RelSymLink more : less ;
-
-# restore CCFLAGS
-CCFLAGS = $(originalCCFlags) ;

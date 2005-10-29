@@ -1,7 +1,9 @@
-SubDir OBOS_TOP src add-ons translators tga ;
+SubDir HAIKU_TOP src add-ons translators tga ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 # Include BaseTranslator code from shared directory
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons translators shared ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons translators shared ] ;
 
 Translator TGATranslator :
 	# shared classes
@@ -13,9 +15,10 @@ Translator TGATranslator :
 	# TGATranslator classes
 	TGAMain.cpp
 	TGATranslator.cpp
-	TGAView.cpp ;
+	TGAView.cpp
 
-LinkSharedOSLibs TGATranslator : be translation ;
+	: be translation
+;
 
 Package haiku-translationkit-cvs :
 	TGATranslator :

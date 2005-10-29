@@ -25,8 +25,8 @@
 //------------------------------------------------------------------------------
 
 #include <stdio.h>
-#include <malloc.h>
-#include <memory.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <MediaRoster.h>
 #include <MediaAddOn.h>

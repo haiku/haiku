@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src kits device ;
+SubDir HAIKU_TOP src kits device ;
 
-SharedLibrary device :
+SharedLibrary libdevice.so :
 	A2D.cpp
 	D2A.cpp
 	DigitalPort.cpp
@@ -8,6 +8,3 @@ SharedLibrary device :
 	SerialPort.cpp
 	: libbe.so libroot.so
 ;
-
-MakeLocate <develop>libdevice.so : $(OBOS_STLIB_DIR) ;
-RelSymLink <develop>libdevice.so : libdevice.so ;

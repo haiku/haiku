@@ -10,7 +10,7 @@
  |                                                                           |
  *---------------------------------------------------------------------------*/
 
-/* $Id: p_block.c,v 1.1 2004/10/06 17:46:49 laplace Exp $
+/* $Id$
  *
  * Block processing routines (require the PDI library)
  *

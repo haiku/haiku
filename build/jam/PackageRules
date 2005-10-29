@@ -1,0 +1,250 @@
+#-------------------------------------------------------------------------------
+# Packages for OBOS alpha/beta testers
+#-------------------------------------------------------------------------------
+
+rule Copy
+{
+	if $(2) {
+		SEARCH on $(2) = $(SEARCH_SOURCE) ;
+		Depends $(1) : <build>copyattr $(2) ;
+		Copy1 $(1) : <build>copyattr $(2) ;
+	}
+}
+
+actions Copy1
+{
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	"$(2[1])" -d "$(2[2-])" "$(1)"
+}
+
+rule Packages
+{
+	local packagenames = $(1) ;
+	local packagefiles = $(2) ;
+	local path = $(3) ;
+	for name in $(packagenames) {
+		Package $(name) : $(packagefiles) : $(path) ;
+    }
+}
+
+rule FPackageConfigSubPath
+{
+	# FPackageConfigSubPath <packagename>
+	#
+	local packagename = $(1) ;
+
+	local configSubPath ;
+	on $(packagename) {
+		if $(PLATFORM) = host {
+			configSubPath = $(HOST_PLATFORM) $(HOST_ARCH) ;
+		} else {
+			configSubPath = $(TARGET_PLATFORM) $(TARGET_ARCH) ;
+		}
+	
+		if $(DEBUG) = 0 {
+			configSubPath += release ;
+		} else {
+			configSubPath += debug_$(DEBUG) ;
+		}
+	}
+
+	return $(configSubPath) ;
+}
+
+rule Package
+{
+	local packagename = $(1) ;
+    local packagefiles = $(2) ;
+	local path = $(3) ;
+
+	local configSubPath = [ FPackageConfigSubPath $(packagename) ] ;
+	local packagezip = $(packagename:S=.zip:G=_packages) ;
+	local targetDir = [ FDirName $(HAIKU_PACKAGE_DIR) $(configSubPath) ] ;
+	local packagedir = [ FDirName $(targetDir) $(packagename) ] ;
+
+    local installscript = install.sh ;
+	local packageinstallscript = $(installscript:G=_packages!$(packagename)) ;
+    local installzip = install.zip ;
+	local packageinstallzip = $(installzip:G=_packages!$(packagename)) ;
+
+    local packageobjectdir = [ FDirName $(HAIKU_PACKAGE_OBJECT_DIR)
+		$(configSubPath) $(packagename) ] ;
+	local packagefiledir =  [ FDirName $(packageobjectdir) $(path) ] ;
+    local packagefileinstallzip
+    	= $(installzip:G=_package_objects!$(packagename)) ;
+
+	# add the files to the install.zip
+	local packagefilegrist = [ FGrist _package_files $(packagename) $(path) ] ;
+    for file in $(packagefiles) {
+		if $(path[0]) = "boot" {
+			local packagefile = $(file:G=$(packagefilegrist)) ;
+			MakeLocate $(packagefile) : $(packagefiledir) ;
+			Copy $(packagefile) : $(file) ;
+			Clean cleanPackages : $(packagefile) ;
+			PackageInstallZip $(packagefileinstallzip) : $(packagefile) ;
+		} else {
+			local packagefile = $(file:G=_packages!$(packagename)) ;
+			MakeLocate $(packagefile) : $(packagedir) ;
+			Copy $(packagefile) : [ FGristFiles $(file) ] ;
+			Clean cleanPackages : $(packagefile) ;
+			Depends $(packagezip) : $(packagefile) ;
+		}
+	}
+
+	# general setup for this package -- only on first invocation
+	if ! $(_setup_$(packagename)) {
+		_setup_$(packagename) = true ;
+
+		NotFile $(packagename) ;
+		LocalDepends packages : $(packagename) ;
+
+		MakeLocate $(packagezip) : $(targetDir) ;
+		MakeLocate $(packageinstallscript) : $(packagedir) ;
+		MakeLocate $(packageinstallzip) : $(packagedir) ;
+		MakeLocate $(packagefileinstallzip) : $(packageobjectdir) ;
+
+		PackageInstallScript $(packageinstallscript) : $(packagedir) ;
+		LinkInstallZip $(packageinstallzip) : $(packagefileinstallzip) ;
+		Depends $(packagename) : $(packagezip) ;
+		PackageZip $(packagezip) : $(packagedir)
+			: $(packageinstallscript) $(packageinstallzip) ;
+	}
+
+}
+
+rule PackageSymLink
+{
+	# PackageSymLink <packageName> : <symlink path components>
+	#	: <symlink target>
+	#
+	local packagename = $(1) ;
+	local symlinkPath = $(2) ;
+	local symlinkTarget = $(3) ;
+	
+	local configSubPath = [ FPackageConfigSubPath $(packagename) ] ;
+
+	local symlinkDir = [ FReverse $(symlinkPath) ] ;
+	local symlink = $(symlinkDir[1]) ;
+	symlinkDir = [ FReverse $(symlinkDir[2-]) ] ;
+	local symlinkGrist = [ FGrist _package $(packagename) $(symlinkDir) ] ;
+	symlink = $(symlink:G=$(symlinkGrist)) ;
+
+	if $(symlinkDir[1]) = boot {
+	    local installzip = install.zip ;
+	    local packagefileinstallzip
+    		= $(installzip:G=_package_objects!$(packagename)) ;
+
+		local packageobjectdir = [ FDirName $(HAIKU_PACKAGE_OBJECT_DIR)
+			$(configSubPath) $(packagename) ] ;
+		symlinkDir = [ FDirName $(packageobjectdir) $(symlinkDir) ] ;
+
+		PackageInstallZip $(packagefileinstallzip) : $(symlink) ;
+
+	} else {
+		local packagezip = $(packagename:S=.zip:G=_packages) ;
+
+		local packagedir = [ FDirName $(HAIKU_PACKAGE_DIR) $(configSubPath)
+			$(packagename) ] ;
+		symlinkDir = [ FDirName $(packagedir) $(symlinkDir) ] ;
+
+		Depends $(packagezip) : $(symlink) ;
+	}
+
+	MakeLocate $(symlink) : $(symlinkDir) ;
+	SymLink $(symlink) : $(symlinkTarget) : false ;
+	Clean cleanPackages : $(symlink) ;
+}
+
+rule PackageDriverSymLink
+{
+	# PackageDriverSymLink <packageName> : <devRelativeSymlinkComponents> ;
+	# <packageName>: Package name.
+	# <devRelativeSymlinkComponents>: Path components relative to the 
+	#     /boot/home/config/add-ons/kernel/drivers/dev directory, e.g.
+	#     "graphics mga.driver" (no quotation, of course).
+	#
+	local packageName = $(1) ;
+	local symlinkComponents = $(2) ;
+
+	# construct the symlink contents
+	local symlinkPath = [ FReverse $(symlinkComponents) ] ;
+	symlinkPath = bin $(symlinkPath[1]) ;
+
+	for i in $(symlinkComponents) {
+		symlinkPath = $(DOTDOT) $(symlinkPath) ;
+	}
+
+	PackageSymLink $(packageName)
+		: boot home config add-ons kernel drivers dev $(symlinkComponents)
+		: [ FDirName $(symlinkPath) ] ;
+}
+
+rule PackageZip
+{
+	local dir = $(2:G=dir) ;
+	Depends $(1) : $(dir) $(3) ;
+	Clean cleanPackages : $(1) ;
+	PackageZip1 $(1) : $(dir) ;
+}
+
+actions together PackageZip1 {
+	cd "$(2:P)" ;
+	zip -rq "$(1:BS)" "$(2:BS)" ;
+}
+
+rule PackageInstallScript
+{
+	MakeLocate $(1) : $(2) ;
+	Clean cleanPackages : $(1) ;
+	PackageInstallScript1 $(1) : $(2:G=dir) ;
+}
+
+actions together PackageInstallScript1
+{
+echo '#!/bin/sh
+base=`dirname "$0"`
+cd "$base"
+if [ -n "$TTY" ]
+then
+    unzip -d / install.zip
+else
+    response=`alert "Would you like to automatically overwrite existing files, or receive a prompt?" "Overwrite" "Prompt"`
+    if [ $response == "Overwrite" ]
+    then
+        unzip -od / install.zip
+        alert "Finished installing" "Thanks"
+    else
+        if [ -e /boot/beos/apps/Terminal ]
+        then
+            terminal=/boot/beos/apps/Terminal
+        else
+            terminal=`query Terminal | head -1`
+        fi
+        $terminal -t "installer" /bin/sh "$0"
+    fi
+fi' > "$(1)" ;
+	chmod 755 "$(1)" ;
+}
+
+rule PackageInstallZip
+{
+	Depends $(1) : $(2) ;
+	Clean cleanPackages : $(1) ;
+}
+
+actions together PackageInstallZip
+{
+	cd "$(1:P)" ;
+	zip -rqy "$(1:BS)" boot ;
+}
+
+rule LinkInstallZip
+{
+	Depends $(1) : $(2) ;
+	Clean cleanPackages : $(1) ;
+}
+
+actions together LinkInstallZip
+{
+	ln -sf "`pwd`/$(2)" "$(1)" ;
+}

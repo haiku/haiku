@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src tests add-ons kernel file_systems fs_shell ;
+SubDir HAIKU_TOP src tests add-ons kernel file_systems fs_shell ;
 
-include [ FDirName $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell
+include [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell
 				   FSShellRules ] ;
 
 # We compile the fs_shell in a mixed environment: We use the platform POSIX
@@ -8,28 +8,38 @@ include [ FDirName $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell
 # BeOS specific headers. Ideally we would get rid of the latter, but we still
 # have dependencies to them.
 
+# platform specific sources
+local fsShellCommandSources ;
+local externalCommandsSources ;
+local attributeSupportSources ;
+if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+	fsShellCommandSources = fs_shell_command_beos.cpp ;
+	externalCommandsSources = external_commands_beos.cpp ;
+} else {
+	fsShellCommandSources = fs_shell_command_unix.cpp ;
+	externalCommandsSources = external_commands_unix.cpp ;
+	attributeSupportSources = fs_attr.cpp ;
+}
+
 SetupFSShellIncludes ;
+
+if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+	SubDirHdrs [ FDirName $(HAIKU_TOP) src build libroot ] ;
+}
 
 UsePrivateHeaders shared ;
 
 rule BuildLibFSShell
 {
-	SetupObjectsDir ;
+	# some defines actually only relevant for fs_attr.cpp
+	local defines =
+		HAIKU_BUILD_ATTRIBUTES_DIR="\\\"$(HAIKU_BUILD_ATTRIBUTES_DIR)\\\""
+		BUILDING_FS_SHELL=1
+	;
+	
+	ObjectDefines $(2) : $(defines) ;
 
-	# Remove `-nostdinc' from CCFLAGS and C++FLAGS.
-	local oldCCFLAGS = $(CCFLAGS) ;
-	local oldC++FLAGS = $(C++FLAGS) ;
-	CCFLAGS = [ Filter $(CCFLAGS) : -nostdinc ] ;
-	C++FLAGS = [ Filter $(C++FLAGS) : -nostdinc ] ;
-
-	Objects $(2) ;
-	LibraryFromObjects $(1) : $(2:S=$(SUFOBJ)) ;
-
-	ObjectsDefines $(2) : _NO_INLINE_ASM ;
-
-	# Reset CCFLAGS and C++FLAGS to original values.
-	CCFLAGS = $(oldCCFLAGS) ;
-	C++FLAGS = $(oldC++FLAGS) ;
+	BuildPlatformStaticLibrary $(1) : $(2) : false ;
 }
 
 {
@@ -40,18 +50,17 @@ rule BuildLibFSShell
 		
 BuildLibFSShell libfs_shell.a
 	:
-	fsh.cpp rootfs.c initfs.c kernel.c cache.c external_commands.cpp sl.c
+	fsh.cpp rootfs.c initfs.c kernel.c cache.c $(externalCommandsSources) sl.c
 	stub.c tracker.cpp sysdep.c hexdump.c argv.c errors.cpp xcp.cpp
 	path_util.cpp stat_util.cpp
+	$(attributeSupportSources)
 ;
 
+SEARCH on [ FGristFiles fs_attr.cpp ]
+	= [ FDirName $(HAIKU_TOP) src build libroot ] ;
 
-local fsShellCommandSources ;
-if $(OS) = BEOS {
-	fsShellCommandSources = fs_shell_command_beos.cpp ;
-} else {
-	fsShellCommandSources = fs_shell_command_unix.cpp ;
-}
+
+# fs_shell_command
 
 BuildPlatformMain fs_shell_command
 	: fs_shell_command.cpp $(fsShellCommandSources) ;

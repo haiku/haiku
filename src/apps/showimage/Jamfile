@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src apps showimage ;
+SubDir HAIKU_TOP src apps showimage ;
 
-App ShowImage : ShowImageApp.cpp
+Application ShowImage : ShowImageApp.cpp
 	ShowImageConstants.cpp
 	ShowImageSettings.cpp
 	ShowImageStatusView.cpp

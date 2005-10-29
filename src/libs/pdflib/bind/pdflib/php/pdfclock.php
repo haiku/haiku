@@ -1,5 +1,5 @@
 <?php
-/* $Id: pdfclock.php,v 1.1 2004/10/06 17:46:43 laplace Exp $
+/* $Id$
  * A little PDFlib application to draw an analog clock.
  *
  */

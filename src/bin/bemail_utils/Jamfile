@@ -1,4 +1,6 @@
-SubDir OBOS_TOP src bin bemail_utils ;
+SubDir HAIKU_TOP src bin bemail_utils ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders mail ;
 

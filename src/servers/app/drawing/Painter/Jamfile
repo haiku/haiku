@@ -1,22 +1,32 @@
-SubDir OBOS_TOP src servers app drawing Painter ;
+SubDir HAIKU_TOP src servers app drawing Painter ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FStandardOSHeaders ] : true ;
+}
 
 UseLibraryHeaders agg ;
 UsePrivateHeaders app interface [ FDirName servers app ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter drawing_modes ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter font_support ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter font_support ] ;
 UseFreeTypeHeaders ;
 
-StaticLibrary painter :
+SEARCH_SOURCE += [ FDirName $(SUBDIR) drawing_modes ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) font_support ] ;
+
+StaticLibrary libpainter.a :
 	Painter.cpp
 	ShapeConverter.cpp
 	Transformable.cpp
 
-	drawing_modes/DrawingModeFactory.cpp
+	# drawing_modes
+	DrawingModeFactory.cpp
 
+	# font_support
 	# is contained within libagg.a,
 	# but we need a modified version that
 	# uses the FontServer
-	font_support/agg_font_freetype.cpp
+	agg_font_freetype.cpp
 	
-	font_support/AGGTextRenderer.cpp
+	AGGTextRenderer.cpp
 ;

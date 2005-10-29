@@ -1,21 +1,18 @@
-SubDir OBOS_TOP src kits translation ;
+SubDir HAIKU_TOP src kits translation ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders translation ;
 
-SharedLibrary translation :
+SharedLibrary libtranslation.so :
 	BitmapStream.cpp
 	FuncTranslator.cpp
 	TranslationUtils.cpp
 	Translator.cpp
 	TranslatorRoster.cpp
-;
-
-LinkSharedOSLibs libtranslation.so :
+	:
 	be
 ;
-
-MakeLocate <develop>libtranslation.so : $(OBOS_STLIB_DIR) ;
-RelSymLink <develop>libtranslation.so : libtranslation.so ;
 
 Package haiku-translationkit-cvs :
 	README.html ;

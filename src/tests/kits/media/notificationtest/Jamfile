@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kits media notificationtest ;
+SubDir HAIKU_TOP src tests kits media notificationtest ;
 
 SimpleTest NotificationTest
 	: main.cpp

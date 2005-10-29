@@ -12,7 +12,7 @@
    that have 16-bit pointers (e.g. PC's in the small or medium model). */
 
 
-/* $Id: inftrees.h,v 1.1 2004/10/06 17:46:48 laplace Exp $ */
+/* $Id$ */
 
 typedef struct inflate_huft_s FAR inflate_huft;
 

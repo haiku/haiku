@@ -1,8 +1,16 @@
-SubDir OBOS_TOP src add-ons kernel network protocols tcp ;
+SubDir HAIKU_TOP src add-ons kernel network protocols tcp ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# We need the public network headers also when not compiling for Haiku.
+		# Unfortunately we get more than we want, namely all POSIX headers.
+}
 
 UsePrivateHeaders net ;
 
-R5KernelAddon tcp : kernel obos_network protocols :
+KernelAddon tcp : kernel obos_network protocols :
 	arc4random.c
 	tcp.c
 	tcp_debug.c
@@ -12,7 +20,7 @@ R5KernelAddon tcp : kernel obos_network protocols :
 ;
 
 # Installation
-OBOSInstall install-networking
+HaikuInstall install-networking
 	: /boot/home/config/add-ons/kernel/obos_network/protocols
 	: tcp ;
 

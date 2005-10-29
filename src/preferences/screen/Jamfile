@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src preferences screen ;
+SubDir HAIKU_TOP src preferences screen ;
 
 UsePrivateHeaders [ FDirName graphics radeon ] ;
 

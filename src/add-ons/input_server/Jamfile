@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src add-ons input_server ;
+SubDir HAIKU_TOP src add-ons input_server ;
 
-SubInclude OBOS_TOP src add-ons input_server devices ;
-SubInclude OBOS_TOP src add-ons input_server filters ;
-SubInclude OBOS_TOP src add-ons input_server methods ;
+SubInclude HAIKU_TOP src add-ons input_server devices ;
+SubInclude HAIKU_TOP src add-ons input_server filters ;
+SubInclude HAIKU_TOP src add-ons input_server methods ;
 

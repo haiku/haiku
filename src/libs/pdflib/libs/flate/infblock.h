@@ -9,7 +9,7 @@
  */
 
 
-/* $Id: infblock.h,v 1.1 2004/10/06 17:46:48 laplace Exp $ */
+/* $Id$ */
 
 /* struct inflate_blocks_state; */
 typedef struct inflate_blocks_state FAR inflate_blocks_statef;

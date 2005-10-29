@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons media media-add-ons legacy ;
+SubDir HAIKU_TOP src add-ons media media-add-ons legacy ;
 
 UsePrivateHeaders media ;
 
@@ -7,6 +7,6 @@ Addon legacy.media_addon : media :
 	LegacyAudioDevice.cpp
 	LegacyAudioProducer.cpp
 	LegacyMediaAddOn.cpp
+	: false
+	: media
 ;
-
-LinkSharedOSLibs legacy.media_addon : media ;

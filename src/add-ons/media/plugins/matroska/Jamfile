@@ -1,10 +1,10 @@
-SubDir OBOS_TOP src add-ons media plugins matroska ;
+SubDir HAIKU_TOP src add-ons media plugins matroska ;
 
 UsePrivateHeaders media ;
 
 # SubDirHdrs [ FDirName $(SUBDIR) libmatroska ] ;
 SubDirHdrs [ FDirName $(SUBDIR) libMatroskaParser ] ;
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ogg libogg ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ogg libogg ] ;
 
 local r5_src = strlcpy.c ;
 
@@ -28,15 +28,15 @@ Addon matroska : media plugins :
 ;
 
 if $(HAIKU_COMPATIBLE) {
-	LinkSharedOSLibs matroska : libbe.so libroot.so ;
+	LinkAgainst matroska : libbe.so libroot.so ;
 } else {
-	LinkSharedOSLibs matroska : be ;
+	LinkAgainst matroska : be ;
 }
 
 SEARCH on [ FGristFiles
                 strlcpy.c
-        ] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
+        ] = [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
 
-# SubInclude OBOS_TOP src add-ons media plugins matroska libebml ;
-# SubInclude OBOS_TOP src add-ons media plugins matroska libmatroska ;
-SubInclude OBOS_TOP src add-ons media plugins matroska libMatroskaParser ;
+# SubInclude HAIKU_TOP src add-ons media plugins matroska libebml ;
+# SubInclude HAIKU_TOP src add-ons media plugins matroska libmatroska ;
+SubInclude HAIKU_TOP src add-ons media plugins matroska libMatroskaParser ;

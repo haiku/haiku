@@ -1,8 +1,10 @@
-SubDir OBOS_TOP src kits mail ;
+SubDir HAIKU_TOP src kits mail ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders mail ;
 
-SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
 if $(CHECK_MALLOC) {
 	SubDirC++Flags -D_NO_INLINE_ASM -fcheck-memory-usage ;
@@ -18,7 +20,7 @@ SubDirC++Flags -D_BUILDING_mail=1 -DUSE_NASTY_SYNC_THREAD_HACK=1 ;
 
 UsePrivateHeaders textencoding ;
 
-SharedLibrary mail :
+SharedLibrary libmail.so :
 	b_mail_message.cpp
 	c_mail_api.cpp
 	ChainRunner.cpp
@@ -44,19 +46,14 @@ SharedLibrary mail :
 	RemoteStorageProtocol.cpp
 	StatusWindow.cpp
 	StringList.cpp
-;
-
-LinkSharedOSLibs libmail.so :
+	:
 	be
 	libtextencoding.so
 	tracker
-	stdc++.r4
+	$(TARGET_LIBSTDC++)
 	$(NETWORK_LIBS)
 	$(SELECT_UNAME_ETC_LIB)
 ;
-
-MakeLocate <develop>libmail.so : $(OBOS_STLIB_DIR) ;
-RelSymLink <develop>libmail.so : libmail.so ;
 
 Package haiku-maildaemon-cvs :
 	libmail.so : 

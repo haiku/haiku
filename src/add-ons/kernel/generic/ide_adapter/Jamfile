@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel generic ide_adapter ;
+SubDir HAIKU_TOP src add-ons kernel generic ide_adapter ;
 
 UsePrivateHeaders kernel ;
 

@@ -1,9 +1,9 @@
-SubDir OBOS_TOP src apps deskbar ;
+SubDir HAIKU_TOP src apps deskbar ;
 
 UsePrivateHeaders app ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders tracker ;
-SubDirHdrs $(OBOS_TOP) src kits tracker ;
+SubDirHdrs $(HAIKU_TOP) src kits tracker ;
 
 AddResources Deskbar : Deskbar.rdef icon-freelogo.rdef icons.rdef ;
 
@@ -13,7 +13,7 @@ SubDirC++Flags -DDB_ADDONS -DOPEN_TRACKER=1
 	-D_SUPPORTS_FEATURE_SCRIPTING=1
 	-D_SHOW_CALENDAR_MENU_ITEM=1 ;
 
-App Deskbar :
+Application Deskbar :
 	BarApp.cpp
 	BarMenuBar.cpp
 	BarMenuTitle.cpp
@@ -35,19 +35,17 @@ App Deskbar :
 	Switcher.cpp
 	;
 
-MakeLocate Deskbar : [ FDirName $(OBOS_KERNEL_DIR) ] ;
-
 if $(TARGET_PLATFORM) = haiku {
 	# link for Haiku
 
-	LinkSharedOSLibs Deskbar :
+	LinkAgainst Deskbar :
 		libbe.so libtracker.so
 	;
 
 } else {
 	# link against build platform libs
 
-	LinkSharedOSLibs Deskbar :
+	LinkAgainst Deskbar :
 		be tracker
 	;
 }

@@ -1,11 +1,4 @@
-SubDir OBOS_TOP src bin diffutils ;
+SubDir HAIKU_TOP src bin diffutils ;
 
-# filter warnings we don't want here
-local originalCCFlags = $(CCFLAGS) ;
-CCFLAGS = [ Filter $(CCFLAGS) : -Wall -Wmissing-prototypes -Wsign-compare ] ;
-
-SubInclude OBOS_TOP src bin diffutils lib ;
-SubInclude OBOS_TOP src bin diffutils src ; 
-
-# restore CCFLAGS
-CCFLAGS = $(originalCCFlags) ;
+SubInclude HAIKU_TOP src bin diffutils lib ;
+SubInclude HAIKU_TOP src bin diffutils src ; 

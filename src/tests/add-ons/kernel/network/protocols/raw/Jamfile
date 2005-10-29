@@ -1,11 +1,11 @@
-SubDir OBOS_TOP src tests add-ons kernel network protocols raw ;
+SubDir HAIKU_TOP src tests add-ons kernel network protocols raw ;
 
 UsePrivateHeaders net ;
 
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network protocols raw ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel network protocols raw ] ;
 
 Addon <userland>raw : userland obos_network protocols : 
 	raw.c
 ;
 
-LinkSharedOSLibs <userland>raw : <installed>net_stack_tester ;
+LinkAgainst <userland>raw : <installed>net_stack_tester ;

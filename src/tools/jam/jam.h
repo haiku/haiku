@@ -459,7 +459,7 @@
  */
 
 # ifndef MAXLINE
-# define MAXLINE 10240	/* longest 'together' actions' */
+# define MAXLINE 20480	/* longest 'together' actions' */
 # endif
 
 # ifndef EXITOK
@@ -482,6 +482,12 @@
 /* Jam private definitions below. */
 
 # define DEBUG_MAX	15
+
+/* Redefine DEBUG_MAX, if rule profiling support shall be compiled in. */
+# ifdef OPT_RULE_PROFILING_EXT
+# undef DEBUG_MAX
+# define DEBUG_MAX	16
+# endif
 
 struct globs {
 	int	noexec;
@@ -518,3 +524,6 @@ extern struct globs globs;
 # define DEBUG_DEPENDS	( globs.debug[ 13 ] )	/* -dd show dependency graph */
 # define DEBUG_CAUSES	( globs.debug[ 14 ] )	/* -dc show dependency graph */
 
+# ifdef OPT_RULE_PROFILING_EXT
+# define DEBUG_PROFILE_RULES	( globs.debug[ 15 ] )	/* -dp profile rules */
+# endif

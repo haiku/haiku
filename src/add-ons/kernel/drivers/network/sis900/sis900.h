@@ -29,6 +29,10 @@ enum SiS_revisions {
 #define DEVICE_NAME "sis900"
 #define DEVICE_DRIVERNAME "net/" DEVICE_NAME
 
+#ifndef __HAIKU__
+	typedef unsigned long addr_t;
+#endif
+
 
 /***************************** Buffer & Buffer Descriptors *****************************/
 

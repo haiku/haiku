@@ -1,11 +1,11 @@
-SubDir OBOS_TOP src add-ons print drivers shared libprint ;
+SubDir HAIKU_TOP src add-ons print drivers shared libprint ;
 
-SubDirHdrs [ FDirName $(OBOS_TOP) headers private print libprint ] ; 
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print libprint ] ; 
 
 # for BeUtils.h
-SubDirHdrs [ FDirName $(OBOS_TOP) headers private print ] ; 
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print ] ; 
 
-StaticLibrary print :
+StaticLibrary libprint.a :
 	AboutBox.cpp
 	AddPrinterDlg.cpp
 	DbgMsg.cpp

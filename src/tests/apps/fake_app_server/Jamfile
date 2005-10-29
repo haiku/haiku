@@ -1,11 +1,11 @@
-SubDir OBOS_TOP src tests apps fake_app_server ;
+SubDir HAIKU_TOP src tests apps fake_app_server ;
 
 UseLibraryHeaders agg png zlib ;
 UsePrivateHeaders app interface [ FDirName servers app ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter drawing_modes ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter font_support ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter font_support ] ;
 UseFreeTypeHeaders ;
 
 Server fake_app_server :

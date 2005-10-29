@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel disk_scanner fs ;
+SubDir HAIKU_TOP src add-ons kernel disk_scanner fs ;
 
 UsePrivateHeaders $(DOT) ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
@@ -9,17 +9,17 @@ Addon <file_system>bfs : userland file_systems :
 	bfs.c
 ;
 
-LinkSharedOSLibs <file_system>bfs :
+LinkAgainst <file_system>bfs :
 	libkernelland_emu.so
 	libdisk_device_manager.so
 ;
 
 
-#R5KernelAddon bfs : kernel disk_scanner fs :
+#KernelAddon bfs : kernel disk_scanner fs :
 #	bfs.c
 #;
 
-#R5KernelAddon iso9660 : kernel disk_scanner fs :
+#KernelAddon iso9660 : kernel disk_scanner fs :
 #	iso9660.cpp
 #;
 

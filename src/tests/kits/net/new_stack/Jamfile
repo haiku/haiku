@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src tests kits net new_stack ;
+SubDir HAIKU_TOP src tests kits net new_stack ;
 
-UseHeaders [ FDirName $(OBOS_TOP) src tests kits net new_stack headers ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net new_stack headers ] ;
 
 SimpleTest new_stack_tester :
 	net_stack_server.cpp
@@ -12,13 +12,14 @@ SimpleTest new_stack_tester :
 	# symlink the userland add-ons dir to the dir where the net_stack_tester
 	# lives
 	local dir = [ on new_stack_tester return $(LOCATE) ] ;
-	MakeLocate <network_v2-add-ons>userland : $(OBOS_ADDON_DIR) ;
-	MakeLocate <network_v2-add-ons>add-ons : $(dir) ;
-	RelSymLink <network_v2-add-ons>add-ons : <network_v2-add-ons>userland : false ;
+# TODO: We don't have a "distro" tree (including the add-on dir) anymore.
+# 	MakeLocate <network_v2-add-ons>userland : $(HAIKU_ADDON_DIR) ;
+# 	MakeLocate <network_v2-add-ons>add-ons : $(dir) ;
+# 	RelSymLink <network_v2-add-ons>add-ons : <network_v2-add-ons>userland : false ;
 	
 	# alias for the stack_tester the modules link against
 	LOCATE on <installed>new_stack_tester = $(dir) ;
-	Depends <installed>new_stack_tester : <network_v2-add-ons>add-ons ;
+# 	Depends <installed>new_stack_tester : <network_v2-add-ons>add-ons ;
 }
 
 # for convenience: this target builds all userland new_stack modules
@@ -42,10 +43,10 @@ Depends userland_network_v2_modules :
 ;
 
 
-SubInclude OBOS_TOP src tests kits net new_stack memory_pool ;
-SubInclude OBOS_TOP src tests kits net new_stack atomizer ;
-SubInclude OBOS_TOP src tests kits net new_stack stack ;
-SubInclude OBOS_TOP src tests kits net new_stack interfaces ;
-SubInclude OBOS_TOP src tests kits net new_stack protocols ;
-SubInclude OBOS_TOP src tests kits net new_stack framings ;
-# SubInclude OBOS_TOP src tests kits net new_stack ppp ;
+SubInclude HAIKU_TOP src tests kits net new_stack memory_pool ;
+SubInclude HAIKU_TOP src tests kits net new_stack atomizer ;
+SubInclude HAIKU_TOP src tests kits net new_stack stack ;
+SubInclude HAIKU_TOP src tests kits net new_stack interfaces ;
+SubInclude HAIKU_TOP src tests kits net new_stack protocols ;
+SubInclude HAIKU_TOP src tests kits net new_stack framings ;
+# SubInclude HAIKU_TOP src tests kits net new_stack ppp ;

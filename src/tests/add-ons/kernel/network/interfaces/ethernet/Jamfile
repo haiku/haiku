@@ -1,12 +1,12 @@
-SubDir OBOS_TOP src tests add-ons kernel network interfaces ethernet ;
+SubDir HAIKU_TOP src tests add-ons kernel network interfaces ethernet ;
 
 UsePrivateHeaders net ;
 
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network interfaces ethernet ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel network interfaces ethernet ] ;
 
 Addon <userland>ethernet : userland obos_network interfaces : 
 	ethernet.c
 ;
 
-LinkSharedOSLibs <userland>ethernet : <installed>net_stack_tester ;
+LinkAgainst <userland>ethernet : <installed>net_stack_tester ;
 

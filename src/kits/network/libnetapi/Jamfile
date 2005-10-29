@@ -1,4 +1,14 @@
-SubDir OBOS_TOP src kits network libnetapi ;
+SubDir HAIKU_TOP src kits network libnetapi ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# We need the public network headers also when not compiling for Haiku.
+		# Unfortunately we get more than we want, namely all POSIX headers.
+	UseHeaders [ FStandardOSHeaders ] : true ;
+		# Needed for <net/*.h> and maybe other stuff.
+}
 
 UsePrivateHeaders net ;
 
@@ -13,17 +23,17 @@ UsePrivateHeaders net ;
 	}
 }
 
-SharedLibrary netapi :
+SharedLibrary libnetapi.so :
 	NetEndpoint.cpp
 	NetAddress.cpp 
 	NetBuffer.cpp
 	NetDebug.cpp
-	: libroot.so libbe.so libnet.so $(PLATFORM_LIBS)
+	: be libnet.so $(PLATFORM_LIBS)
 ;
 
 # Installation -- in the test directory for the time being
-OBOSInstallRelSymLink install-networking
-	: [ FDirName $(OBOS_TEST_DIR) kits net lib ]
+HaikuInstallRelSymLink install-networking
+	: [ FDirName $(HAIKU_TEST_DIR) kits net lib ]
 	: libnetapi.so
 	: installed-networking-test ;
 

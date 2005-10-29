@@ -5,9 +5,9 @@
 #ifndef CONVERT_H
 #define CONVERT_H
 
-
-#include <RTF.h>
 #include <DataIO.h>
+
+#include "RTF.h"
 
 
 extern status_t convert_to_stxt(RTF::Header &header, BDataIO &target);

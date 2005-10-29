@@ -1,0 +1,78 @@
+
+rule SetupObjectsDir
+{
+	local relPath = [ FDirName $(SUBDIR_TOKENS[2-]) ] ;
+	COMMON_PLATFORM_LOCATE_TARGET =
+		[ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) $(relPath) ] ;
+
+	local var ;
+	for var in COMMON_ARCH COMMON_DEBUG DEBUG_$(HAIKU_DEBUG_LEVELS) {
+		HOST_$(var)_LOCATE_TARGET
+			= [ FDirName $(HOST_$(var)_OBJECT_DIR) $(relPath) ] ;
+		TARGET_$(var)_LOCATE_TARGET
+			= [ FDirName $(TARGET_$(var)_OBJECT_DIR) $(relPath) ] ;
+	}
+
+	LOCATE_TARGET = $(COMMON_PLATFORM_LOCATE_TARGET) ;
+	LOCATE_SOURCE = $(LOCATE_TARGET) ;
+	SEARCH_SOURCE = $(SUBDIR) $(LOCATE_SOURCE)
+		$(HOST_COMMON_DEBUG_LOCATE_TARGET)		# Also add the standard output
+		$(TARGET_COMMON_DEBUG_LOCATE_TARGET)	# dirs for generated sources.
+	;
+}
+
+rule SubIncludeGPL
+{
+	# SubInclude rule that can be used to conditionally include GPL licensed
+	# add-ons
+	if $(INCLUDE_GPL_ADDONS) = 1 {
+		SubInclude $(1) ;
+	} 
+}
+ 
+rule MakeLocateCommonPlatform
+{
+	MakeLocate $(1) : $(COMMON_PLATFORM_LOCATE_TARGET) ;
+}
+
+rule MakeLocatePlatform
+{
+	local files = $(1) ;
+	local file ;
+	for file in $(files) {
+		if [ on $(file) return $(PLATFORM) ] = host {
+			MakeLocate $(file) : $(HOST_COMMON_ARCH_LOCATE_TARGET) ;
+		} else {
+			MakeLocate $(file) : $(TARGET_COMMON_ARCH_LOCATE_TARGET) ;
+		}
+	}
+}
+
+rule MakeLocateArch
+{
+	local files = $(1) ;
+	local file ;
+	for file in $(files) {
+		if [ on $(file) return $(PLATFORM) ] = host {
+			MakeLocate $(file) : $(HOST_COMMON_DEBUG_LOCATE_TARGET) ;
+		} else {
+			MakeLocate $(file) : $(TARGET_COMMON_DEBUG_LOCATE_TARGET) ;
+		}
+	}
+}
+
+rule MakeLocateDebug
+{
+	local files = $(1) ;
+	local file ;
+	for file in $(files) {
+		on $(file) {
+			if $(PLATFORM) = host {
+				MakeLocate $(file) : $(HOST_DEBUG_$(DEBUG)_LOCATE_TARGET) ;
+			} else {
+				MakeLocate $(file) : $(TARGET_DEBUG_$(DEBUG)_LOCATE_TARGET) ;
+			}
+		}
+	}
+}
+

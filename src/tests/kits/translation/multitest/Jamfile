@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kits translation multitest ;
+SubDir HAIKU_TOP src tests kits translation multitest ;
 
 SimpleTest MultiTest
 	: MainControlWindow.cpp

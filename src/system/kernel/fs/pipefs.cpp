@@ -12,7 +12,7 @@
 #include <util/AutoLock.h>
 #include <util/ring_buffer.h>
 #include <vfs.h>
-#include <vfs_select.h>
+#include "vfs_select.h"
 #include <select_sync_pool.h>
 #include <debug.h>
 #include <khash.h>

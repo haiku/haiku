@@ -1,9 +1,11 @@
-SubDir OBOS_TOP src add-ons kernel drivers audio echo gals ;
+SubDir HAIKU_TOP src add-ons kernel drivers audio echo gals ;
 
-SubDirHdrs $(OBOS_TOP) src add-ons kernel drivers audio echo ;
-SubDirHdrs $(OBOS_TOP) src add-ons kernel drivers audio echo generic ;
-SubDirHdrs $(OBOS_TOP) src add-ons kernel drivers audio echo generic DSP ;
-SubDirHdrs $(OBOS_TOP) src add-ons kernel drivers audio echo generic ASIC ;
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo generic ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo generic DSP ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo generic ASIC ;
 
 UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
 
@@ -38,7 +40,7 @@ local echo_files =
 	CPipeOutCtrl.cpp
 	;
 
-R5KernelAddon echogals : kernel drivers bin :
+KernelAddon echogals : kernel drivers bin :
 	kernel_cpp.cpp
 	debug.c
 	echo.cpp
@@ -55,18 +57,18 @@ ObjectC++Flags echo.cpp : -w ;
 SEARCH on [ FGristFiles
 	$(echo_files)
 	OsSupportBeOS.cpp
-	] = [ FDirName $(OBOS_TOP) src add-ons kernel drivers audio echo generic ] ;
+	] = [ FDirName $(HAIKU_TOP) src add-ons kernel drivers audio echo generic ] ;
 
 SEARCH on [ FGristFiles
 		kernel_cpp.cpp 
-	] = [ FDirName $(OBOS_TOP) src system kernel util ] ;
+	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
 SEARCH on [ FGristFiles
 		debug.c
 		echo.cpp
 		multi.cpp
 		util.c
-	] = [ FDirName $(OBOS_TOP) src add-ons kernel drivers audio echo ] ;
+	] = [ FDirName $(HAIKU_TOP) src add-ons kernel drivers audio echo ] ;
 
 Package haiku-echogals-cvs
 	:
@@ -74,16 +76,5 @@ Package haiku-echogals-cvs
 	:
 	boot home config add-ons kernel drivers bin ;
 
-Package haiku-echogals-cvs
-	:
-	<kernel!drivers!dev!audio!multi>echogals
-	:
-	boot home config add-ons kernel drivers dev audio multi ;
+PackageDriverSymLink haiku-echogals-cvs : audio multi echogals ;
 
-# Link to kernel/drivers/dev/audio/multi
-{
-	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev audio multi ] ;
-	local instDriver = <kernel!drivers!dev!audio!multi>echogals ;
-	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : echogals ;
-}

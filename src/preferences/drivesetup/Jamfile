@@ -1,7 +1,7 @@
-SubDir OBOS_TOP src preferences drivesetup ;
+SubDir HAIKU_TOP src preferences drivesetup ;
 
 AddResources DriveSetup : DriveSetup.rdef ;
 
 Preference DriveSetup : main.cpp MainWindow.cpp PosSettings.cpp ;
 
-LinkSharedOSLibs DriveSetup : be ;
+LinkAgainst DriveSetup : be ;

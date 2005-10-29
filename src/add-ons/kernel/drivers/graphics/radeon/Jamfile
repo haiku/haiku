@@ -1,15 +1,17 @@
-SubDir OBOS_TOP src add-ons kernel drivers graphics radeon ;
+SubDir HAIKU_TOP src add-ons kernel drivers graphics radeon ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics radeon ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 
-StaticLibrary radeon :
+StaticLibrary libradeon.a :
 	pll_access.c
 	utils.c
 ;
 
-R5KernelAddon radeon.driver : kernel drivers bin :
+KernelAddon radeon.driver : kernel drivers bin :
 	driver.c
 	agp.c
 	bios.c
@@ -30,18 +32,8 @@ R5KernelAddon radeon.driver : kernel drivers bin :
 Package haiku-radeon-cvs :
 	radeon.driver : 
 	boot home config add-ons kernel drivers bin ;
-Package haiku-radeon-cvs :
-	<kernel!drivers!dev!graphics>radeon.driver :
-	boot home config add-ons kernel drivers dev graphics ;
+PackageDriverSymLink haiku-radeon-cvs : graphics radeon.driver ;
 #Package haiku-radeon-cvs :
 #	radeon.settings :
 #	boot home config settings kernel drivers ;
-
-# Link to kernel/drivers/dev/graphics
-{
-	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev graphics ] ;
-	local instDriver = <kernel!drivers!dev!graphics>radeon.driver ;
-	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : radeon.driver ;
-}
 

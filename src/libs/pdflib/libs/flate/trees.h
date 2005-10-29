@@ -1,7 +1,7 @@
 /* header created automatically with -DGEN_TREES_H */
 
 
-/* $Id: trees.h,v 1.1 2004/10/06 17:46:48 laplace Exp $ */
+/* $Id$ */
 
 local const ct_data static_ltree[L_CODES+2] = {
 {{ 12},{  8}}, {{140},{  8}}, {{ 76},{  8}}, {{204},{  8}}, {{ 44},{  8}},

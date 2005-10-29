@@ -1,7 +1,7 @@
-SubDir OBOS_TOP src add-ons translators tiff ;
+SubDir HAIKU_TOP src add-ons translators tiff ;
 
 # Include StreamBuffer code from shared directory
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons translators shared ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons translators shared ] ;
 
 Translator TIFFTranslator : 
 	StreamBuffer.cpp
@@ -15,6 +15,7 @@ Translator TIFFTranslator :
 	TIFFMain.cpp
 	TIFFTranslator.cpp
 	TIFFView.cpp
-	TIFFWindow.cpp ;
+	TIFFWindow.cpp
 
-LinkSharedOSLibs TIFFTranslator : be translation ;
+	: be translation
+;

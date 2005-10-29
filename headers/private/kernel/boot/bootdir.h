@@ -1,4 +1,4 @@
-/* $Id: bootdir.h,v 1.1 2003/05/03 03:43:30 axeld Exp $
+/* $Id: bootdir.h 3132 2003-05-03 03:43:30Z axeld $
 **
 ** Copyright 1998 Brian J. Swetland
 ** All rights reserved.

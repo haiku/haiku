@@ -7,7 +7,7 @@
 #define ATTRIBUTE_H
 
 
-#include <Inode.h>
+#include "Inode.h"
 
 
 struct attr_cookie {

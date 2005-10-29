@@ -1,7 +1,7 @@
-SubDir OBOS_TOP src tests kernel libroot posix math ;
+SubDir HAIKU_TOP src tests kernel libroot posix math ;
 
 UsePrivateHeaders libroot ;
-SubDirHdrs [ FDirName $(OBOS_TOP) src system libroot posix glibc ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src system libroot posix glibc ] ;
 SubDirCcFlags -Dnational ;
 
 MATH_SOURCES = 	
@@ -24,4 +24,4 @@ SimpleTest math_test
 # Tell Jam where to find these sources
 SEARCH on [ FGristFiles
 		$(MATH_SOURCES)
-	] = [ FDirName $(OBOS_TOP) src system libroot posix math ] ;
+	] = [ FDirName $(HAIKU_TOP) src system libroot posix math ] ;

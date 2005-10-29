@@ -3,8 +3,8 @@
  * For conditions of distribution and use, see copyright notice in zlib.h 
  */
 
-/* $Id: zutil.c,v 1.1 2004/10/06 17:46:48 laplace Exp $ */
-/* @(#) $Id: zutil.c,v 1.1 2004/10/06 17:46:48 laplace Exp $ */
+/* $Id$ */
+/* @(#) $Id$ */
 
 #include "zutil.h"
 

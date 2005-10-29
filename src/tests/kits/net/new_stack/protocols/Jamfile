@@ -1,5 +1,5 @@
-SubDir OBOS_TOP src tests kits net new_stack protocols ;
+SubDir HAIKU_TOP src tests kits net new_stack protocols ;
 
-SubInclude OBOS_TOP src tests kits net new_stack protocols arp ;
-SubInclude OBOS_TOP src tests kits net new_stack protocols ipv4 ;
+SubInclude HAIKU_TOP src tests kits net new_stack protocols arp ;
+SubInclude HAIKU_TOP src tests kits net new_stack protocols ipv4 ;
 

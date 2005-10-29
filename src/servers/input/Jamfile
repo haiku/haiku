@@ -1,4 +1,6 @@
-SubDir OBOS_TOP src servers input ;
+SubDir HAIKU_TOP src servers input ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 if $(COMPILE_FOR_R5) {
 	SubDirC++Flags -DCOMPILE_FOR_R5 ;
@@ -9,18 +11,17 @@ rule MkKeymapHeader
 	local binary = $(1) ;
 	local source = $(2) ;
 
-	SetupObjectsDir ;
-
 	SEARCH on $(source) = $(SEARCH_SOURCE) ;
-	MakeLocate $(binary) : $(LOCATE_TARGET) ;
+	MakeLocateArch $(binary) ;
 
-	Depends $(binary) : $(source) keymap ;
-	MkKeymapHeader1 $(binary) : keymap $(source) ;
+	Depends $(binary) : $(source) <build>keymap ;
+	MkKeymapHeader1 $(binary) : <build>keymap $(source) ;
 	LocalClean clean : $(binary) ;
 }
 
 actions MkKeymapHeader1
 {
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 	$(2[1]) -o "$(1)" -h "$(2[2-])" ;
 }
 
@@ -73,22 +74,22 @@ Server input_server :
 	AddOnMonitorHandler.cpp
 	NodeMonitorHandler.cpp
 
-	: stdc++.r4
+	: $(TARGET_LIBSTDC++)
 ;
 
 if $(TARGET_PLATFORM) = haiku {
         # link for Haiku
 
-        LinkSharedOSLibs input_server :
+        LinkAgainst input_server :
                 libroot.so libbe.so ;
 
 } else {
         # link as test application under R5
 
-        LinkSharedOSLibs input_server :
+        LinkAgainst input_server :
                 be ;
 	if $(APPSERVER_TEST_MODE) {
-		LinkSharedOSLibs input_server :
+		LinkAgainst input_server :
                 <boot!home!config!lib>libopenbeos.so ;
 	}
 }

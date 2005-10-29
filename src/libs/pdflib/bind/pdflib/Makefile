@@ -1,5 +1,5 @@
 # PDFlib bindings Makefile
-# $Id: Makefile,v 1.1 2004/10/06 17:16:51 laplace Exp $
+# $Id$
 
 include ../../config/mkcommon.inc
 

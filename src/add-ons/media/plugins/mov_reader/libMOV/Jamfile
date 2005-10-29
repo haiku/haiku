@@ -1,8 +1,8 @@
-SubDir OBOS_TOP src add-ons media plugins mov_reader libMOV ;
+SubDir HAIKU_TOP src add-ons media plugins mov_reader libMOV ;
 
 UseLibraryHeaders zlib ;
 
-StaticLibrary movreader :
+StaticLibrary libmovreader.a :
 	MOVParser.cpp
 	MOVFileReader.cpp
 	MOVAtom.cpp

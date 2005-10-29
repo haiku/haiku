@@ -1,8 +1,8 @@
-SubDir OBOS_TOP src add-ons media media-add-ons video_producer_demo ;
+SubDir HAIKU_TOP src add-ons media media-add-ons video_producer_demo ;
 
 Addon video_producer_demo.media_addon : media :
 	AddOn.cpp
 	Producer.cpp
 ;
 
-LinkSharedOSLibs video_producer_demo.media_addon : be media ;
+LinkAgainst video_producer_demo.media_addon : be media ;

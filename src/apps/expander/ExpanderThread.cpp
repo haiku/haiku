@@ -27,7 +27,7 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 #include <Path.h>
-#include <ExpanderThread.h>
+#include "ExpanderThread.h"
 #include <image.h>
 #include <signal.h>
 #include <unistd.h>

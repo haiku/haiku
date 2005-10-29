@@ -1,13 +1,14 @@
-SubDir OBOS_TOP src system libroot posix glibc stdio-common ;
+SubDir HAIKU_TOP src system libroot posix glibc stdio-common ;
 
 SubDirCcFlags -D_GNU_SOURCE -DUSE_IN_LIBIO ;
 
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc libio ;
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc include arch $(OBOS_ARCH) ;
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc include ;
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc stdio-common ;
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc locale ;
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc libio ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch
+	$(TARGET_ARCH) ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc stdio-common ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 
 # ToDo: for now, all wide character functions are disabled
 

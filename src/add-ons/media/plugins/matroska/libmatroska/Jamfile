@@ -1,8 +1,8 @@
-SubDir OBOS_TOP src add-ons media plugins matroska libmatroska ;
+SubDir HAIKU_TOP src add-ons media plugins matroska libmatroska ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) libebml ] ;
 
-StaticLibrary matroska :
+StaticLibrary libmatroska.a :
 	FileKax.cpp
 	KaxAttached.cpp
 	KaxAttachments.cpp

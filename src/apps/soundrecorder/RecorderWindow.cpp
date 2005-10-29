@@ -35,7 +35,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <unistd.h>
-#include <sys/fcntl.h>
+#include <fcntl.h>
 
 #include <MediaRoster.h>
 #include <TimeSource.h>

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tools translation tgainfo ;
+SubDir HAIKU_TOP src tools translation tgainfo ;
 
 BinCommand tgainfo : tgainfo.cpp : be ;
 

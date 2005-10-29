@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel drivers graphics vesa ;
+SubDir HAIKU_TOP src add-ons kernel drivers graphics vesa ;
 
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics vesa ] ;
@@ -9,10 +9,3 @@ KernelAddon vesa : kernel drivers bin :
 	vesa.cpp
 	;
 
-# Link to kernel/drivers/dev/graphics
-{
-	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev graphics ] ;
-	local instDriver = <kernel!drivers!dev!graphics>vesa ;
-	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : vesa ;
-}

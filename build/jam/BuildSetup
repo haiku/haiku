@@ -1,0 +1,577 @@
+
+# Variable naming conventions:
+# TARGET_*:	A build system variable specifying a property for building for
+#			the target platform (usually Haiku). E.g. TARGET_CC specifies the
+#			compiler when building a target for the target platform.
+# HOST_*:	A build system variable specifying a property of the platform
+#			hosting the build. E.g. HOST_CC specifies the compiler when
+#			building a target for the host platform (a build tool for
+#			instance).
+# HAIKU_*:	A build system variable specifying a build system property. Usually
+#			directory paths and the like.
+
+
+# Include BuildConfig/Timezones/libgccObjects
+{
+	local buildConfig = [ GLOB $(HAIKU_BUILD_OUTPUT_DIR) : BuildConfig ] ;
+	local timezones = [ GLOB $(HAIKU_BUILD_OUTPUT_DIR) : Timezones ] ;
+	local libgccObjects = [ GLOB $(HAIKU_BUILD_OUTPUT_DIR) : libgccObjects ] ;
+
+	if ! $(buildConfig) {
+		ECHO "No `BuildConfig' found in $(HAIKU_BUILD_OUTPUT_DIR)!" ;
+		EXIT "Run ./configure in the source tree's root directory first!" ;
+	}
+	if ! ( $(timezones) && $(libgccObjects) ) {
+		ECHO "No `Timezones' or `libgccObjects' found in $(HAIKU_BUILD_OUTPUT_DIR)!" ;
+		EXIT "Please run ./configure in the source tree's root directory again!" ;
+	}
+
+	LOCATE on BuildConfig = $(HAIKU_BUILD_OUTPUT_DIR) ;
+	LOCATE on Timezones = $(HAIKU_BUILD_OUTPUT_DIR) ;
+	LOCATE on libgccObjects = $(HAIKU_BUILD_OUTPUT_DIR) ;
+
+	include BuildConfig ;
+	include Timezones ;
+	include libgccObjects ;
+}
+
+
+# supported debug levels
+HAIKU_DEBUG_LEVELS = 0 1 2 3 4 5 ;
+
+# BeOS, BONE, Dan0 compatible platforms
+HAIKU_BEOS_COMPATIBLE_PLATFORMS = haiku r5 bone dano ;
+HAIKU_BONE_COMPATIBLE_PLATFORMS = haiku bone dano ;
+HAIKU_DANO_COMPATIBLE_PLATFORMS = haiku dano ;
+
+
+#pragma mark -
+
+# haiku target platform settings
+
+# initial state for flags etc.
+HAIKU_C++ ?= $(HAIKU_CC) ;
+HAIKU_LINK = $(HAIKU_CC) ;
+HAIKU_LINKFLAGS = ;
+
+HAIKU_HDRS = [ FStandardHeaders ] ;
+HAIKU_CCFLAGS = -nostdinc ;
+HAIKU_C++FLAGS = -nostdinc ;
+HAIKU_DEFINES = __HAIKU__ ;
+
+# analyze the gcc machine spec to determine HAIKU_CPU
+switch $(HAIKU_GCC_MACHINE) {
+	case i386-* : HAIKU_CPU = x86 ;
+	case i486-* : HAIKU_CPU = x86 ;
+	case i586-* : HAIKU_CPU = x86 ;
+	case i686-* : HAIKU_CPU = x86 ;
+	# TODO: PPC?
+	case * : Exit "Unsupported gcc target machine:" $(HAIKU_GCC_MACHINE) ;
+}
+
+switch $(HAIKU_CPU) {
+	case ppc :
+	{
+		HAIKU_DEFINES += __POWERPC__ ;
+		HAIKU_BOOT_PLATFORM = openfirmware ;
+	}
+	case x86 :
+	{
+		HAIKU_DEFINES += __INTEL__ ;
+		HAIKU_BOOT_PLATFORM = bios_ia32 ;
+	}
+	case * :
+		Exit "Currently unsupported target CPU:" $(HAIKU_CPU) ;
+}
+HAIKU_ARCH ?= $(HAIKU_CPU) ;
+HAIKU_ARCH_MACRO_DEFINE = ARCH_$(HAIKU_ARCH) ;
+HAIKU_DEFINES += $(HAIKU_ARCH_MACRO_DEFINE) ;
+
+# directories
+HAIKU_OBJECT_BASE_DIR = [ FDirName $(HAIKU_OBJECT_DIR) haiku ] ;
+HAIKU_COMMON_ARCH_OBJECT_DIR = [ FDirName $(HAIKU_OBJECT_BASE_DIR) common ] ;
+HAIKU_ARCH_OBJECT_DIR = [ FDirName $(HAIKU_OBJECT_BASE_DIR) $(HAIKU_ARCH) ] ;
+HAIKU_COMMON_DEBUG_OBJECT_DIR = [ FDirName $(HAIKU_ARCH_OBJECT_DIR) common ] ;
+HAIKU_DEBUG_0_OBJECT_DIR = [ FDirName $(HAIKU_ARCH_OBJECT_DIR) release ] ;
+
+local level ;
+for level in $(HAIKU_DEBUG_LEVELS[2-]) {
+	HAIKU_DEBUG_$(level)_OBJECT_DIR
+		= [ FDirName $(HAIKU_ARCH_OBJECT_DIR) debug_$(level) ] ;
+}
+
+# analyze GCC version
+if ! $(HAIKU_GCC_RAW_VERSION) {
+	ECHO "Variable HAIKU_GCC_RAW_VERSION not set. Please run ./configure or" ;
+	EXIT "specify it manually." ;
+}
+HAIKU_GCC_VERSION = ;
+{
+	# split the raw version string at `.' and `-' characters
+	local version = $(HAIKU_GCC_RAW_VERSION) ;
+	while $(version) {
+		local split = [ Match "([^.-]*)[.-](.*)" : $(version) ] ;
+		if $(split) {
+			HAIKU_GCC_VERSION += $(split[1]) ;
+			version = $(split[2]) ;
+		} else {
+			HAIKU_GCC_VERSION += $(version) ;
+			version = ;
+		}
+	}
+}
+
+# assembler flags
+HAIKU_ASFLAGS = ;
+
+# C/C++ flags
+HAIKU_CCFLAGS += -Wno-multichar ;
+HAIKU_C++FLAGS += -Wno-multichar ;
+
+HAIKU_KERNEL_CCFLAGS += -finline -fno-builtin
+	-DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) -D_KERNEL_MODE ;
+HAIKU_KERNEL_C++FLAGS += -finline -fno-builtin -fno-exceptions
+	-DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) -D_KERNEL_MODE ;
+
+if $(HAIKU_GCC_VERSION[1]) >= 3 {
+	HAIKU_KERNEL_C++FLAGS += -fno-use-cxa-atexit ;
+}
+
+# If the environment variable DEBUG_PRINTF is defined we define an equally
+# named macro to the variable value. Some components use the macro to allow
+# another function than printf() to print the debug output. The variable should
+# be set to the name of the alternative function.
+#
+if $(DEBUG_PRINTF) {
+	HAIKU_CCFLAGS += [ FDefines DEBUG_PRINTF=$(DEBUG_PRINTF) ] ;
+	HAIKU_C++FLAGS += [ FDefines DEBUG_PRINTF=$(DEBUG_PRINTF) ] ;
+}
+
+# warning flags
+HAIKU_WARNING_CCFLAGS = -Wall -Wmissing-prototypes -Wpointer-arith -Wcast-align
+	-Wsign-compare ;
+HAIKU_WARNING_C++FLAGS = -Wall -Wmissing-prototypes -Wno-ctor-dtor-privacy
+	-Woverloaded-virtual -Wpointer-arith -Wcast-align -Wsign-compare ;
+
+HAIKU_KERNEL_WARNING_CCFLAGS = -Wall -Wmissing-prototypes ;
+HAIKU_KERNEL_WARNING_C++FLAGS = -Wall -Wmissing-prototypes ;
+
+# debug flags
+HAIKU_DEBUG_FLAGS ?= -ggdb ;
+
+# debug 0: suppress asserts
+HAIKU_DEBUG_0_CCFLAGS = [ FDefines NDEBUG=$(NDEBUG) ] ;
+HAIKU_DEBUG_0_C++FLAGS = [ FDefines NDEBUG=$(NDEBUG) ] ;
+
+HAIKU_KERNEL_DEBUG_0_CCFLAGS = [ FDefines NDEBUG=$(NDEBUG) ] ;
+HAIKU_KERNEL_DEBUG_0_C++FLAGS = [ FDefines NDEBUG=$(NDEBUG) ] ;
+
+local level ;
+for level in $(HAIKU_DEBUG_LEVELS[2-]) {
+	local flags = $(HAIKU_DEBUG_FLAGS) [ FDefines DEBUG=$(level) ] ;
+	HAIKU_DEBUG_$(level)_CCFLAGS			= $(flags) ;
+	HAIKU_DEBUG_$(level)_C++FLAGS			= $(flags) ;
+	HAIKU_KERNEL_DEBUG_$(level)_CCFLAGS		= $(flags) ;
+	HAIKU_KERNEL_DEBUG_$(level)_C++FLAGS	= $(flags) ;
+}
+
+# private kernel headers do be used when compiling kernel code
+HAIKU_PRIVATE_KERNEL_HEADERS =
+	[ PrivateHeaders $(DOT) kernel libroot
+		kernel/boot/platform/$(HAIKU_BOOT_PLATFORM) ]
+	[ ArchHeaders $(HAIKU_ARCH) ]
+;
+
+# Add some grist to the libgcc objects
+HAIKU_GCC_LIBGCC_OBJECTS = $(HAIKU_GCC_LIBGCC_OBJECTS:G=libgcc) ;
+
+# the C++ library
+HAIKU_LIBSTDC++ = libstdc++.r4.so ;
+
+# library and executable glue code
+local commonGlueCode =
+	<src!system!glue>init_term_dyn.o
+	<src!system!glue!arch!$(HAIKU_ARCH)>crti.o
+	<src!system!glue!arch!$(HAIKU_ARCH)>crtn.o
+;
+HAIKU_LIBRARY_BEGIN_GLUE_CODE =
+	<src!system!glue!arch!$(HAIKU_ARCH)>crti.o
+	crtbegin.o
+	<src!system!glue>init_term_dyn.o
+;
+HAIKU_LIBRARY_END_GLUE_CODE =
+	crtend.o
+	<src!system!glue!arch!$(HAIKU_ARCH)>crtn.o
+;
+HAIKU_EXECUTABLE_BEGIN_GLUE_CODE =
+	<src!system!glue!arch!$(HAIKU_ARCH)>crti.o
+	crtbegin.o
+	<src!system!glue>start_dyn.o
+	<src!system!glue>init_term_dyn.o
+;
+HAIKU_EXECUTABLE_END_GLUE_CODE = $(HAIKU_LIBRARY_END_GLUE_CODE) ;
+
+SEARCH on crtbegin.o crtend.o = $(HAIKU_GCC_LIB_DIR) ;
+
+HAIKU_EXECUTABLE_MIME_TYPE = "application/x-vnd.Be-elfexecutable" ;
+
+# TODO: The version stuff should probably go into a separate file and be made
+# available as macro, too.
+# Set our version number if not already set and mark it as a developer build
+if ! $(HAIKU_BUILD_VERSION) {
+	HAIKU_BUILD_VERSION ?= "1 0 0 a 1" ;
+	HAIKU_BUILD_DESCRIPTION ?= "Developer Build" ;
+}
+
+# If HAIKU_BUILD_VERSION is set, but HAIKU_BUILD_DESCRIPTION isn't, mark it as
+# an unknown build.
+HAIKU_BUILD_DESCRIPTION ?= "Unknown Build" ;
+
+# init library name map
+{
+	local i ;
+	for i in be game mail media midi midi2 net netapi opengl screensaver root z
+			textencoding tracker translation {
+		HAIKU_LIBRARY_NAME_MAP_$(i) = lib$(i).so ;
+	}
+}
+
+
+#pragma mark -
+
+# host platform settings
+
+# save jam's variables for the build platform
+HOST_AR				?= $(AR) ;
+HOST_CC				?= $(CC) ;
+HOST_C++			?= $(C++) ;
+HOST_LINK			?= $(LINK) ;
+HOST_LD				?= ld ;			# TODO: Fix this!
+HOST_OBJCOPY		?= objcopy ;	#
+HOST_RANLIB			?= $(RANLIB) ;
+HOST_CPPFLAGS		?= $(CPPFLAGS) ;
+HOST_CCFLAGS		?= $(CCFLAGS) ;
+HOST_C++FLAGS		?= $(C++FLAGS) ;
+HOST_LDFLAGS		?= $(LDFLAGS) ;
+HOST_LINKFLAGS		?= $(LINKFLAGS) ;
+HOST_DEFINES		?= $(DEFINES) ;
+HOST_HDRS			?= $(HDRS) ;
+
+# split up HOST_AR into the command name and flags
+HOST_AR				= [ Match "([^ ]*) *(.*)" : $(HOST_AR[1]) ]
+					  $(HOST_AR[2-]) ;
+HOST_ARFLAGS		= $(HOST_AR[2-]) ;
+HOST_AR				= $(HOST_AR[1]) ;
+HOST_UNARFLAGS		?= x ;
+
+# check the host platform compatibility
+SetPlatformCompatibilityFlagVariables HOST_PLATFORM : HOST : host : linux ;
+
+if $(HOST_PLATFORM) = linux {
+	# don't use lex: otherwise rc will not work correctly
+	if $(LEX) = lex {
+		LEX = flex ;
+	}
+}
+
+HOST_CPU	?= $(OSPLAT:L) ;
+
+HOST_ARCH				?= $(HOST_CPU) ;
+HOST_ARCH_MACRO_DEFINE	= ARCH_$(HOST_CPU) ;
+
+# directories
+HOST_OBJECT_BASE_DIR = [ FDirName $(HAIKU_OBJECT_DIR) $(HOST_PLATFORM) ] ;
+HOST_COMMON_ARCH_OBJECT_DIR = [ FDirName $(HOST_OBJECT_BASE_DIR) common ] ;
+HOST_ARCH_OBJECT_DIR = [ FDirName $(HOST_OBJECT_BASE_DIR) $(HOST_ARCH) ] ;
+HOST_COMMON_DEBUG_OBJECT_DIR = [ FDirName $(HOST_ARCH_OBJECT_DIR) common ] ;
+HOST_DEBUG_0_OBJECT_DIR = [ FDirName $(HOST_ARCH_OBJECT_DIR) release ] ;
+
+local level ;
+for level in $(HAIKU_DEBUG_LEVELS[2-]) {
+	HOST_DEBUG_$(level)_OBJECT_DIR
+		= [ FDirName $(HOST_ARCH_OBJECT_DIR) debug_$(level) ] ;
+}
+
+# assembler flags
+HOST_ASFLAGS = ;
+
+# C/C++ flags
+HOST_CCFLAGS += -Wno-multichar ;
+HOST_C++FLAGS += -Wno-multichar ;
+
+HOST_KERNEL_CCFLAGS += -finline -fno-builtin
+	-DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) -D_KERNEL_MODE ;
+HOST_KERNEL_C++FLAGS += -finline -fno-builtin -fno-exceptions
+	-DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) -D_KERNEL_MODE ;
+
+# warning flags
+HOST_WARNING_CCFLAGS = -Wall -Wmissing-prototypes -Wpointer-arith -Wcast-align
+	-Wsign-compare ;
+HOST_WARNING_C++FLAGS = -Wall -Wmissing-prototypes -Wno-ctor-dtor-privacy
+	-Woverloaded-virtual -Wpointer-arith -Wcast-align -Wsign-compare ;
+
+HOST_KERNEL_WARNING_CCFLAGS = -Wall -Wmissing-prototypes ;
+HOST_KERNEL_WARNING_C++FLAGS = -Wall -Wmissing-prototypes ;
+
+# debug flags
+switch $(HOST_PLATFORM) {
+	case haiku	: HOST_DEBUG_FLAGS ?= -ggdb ;
+	case linux	: HOST_DEBUG_FLAGS ?= -ggdb ;
+	case *		: HOST_DEBUG_FLAGS ?= -g ;
+}
+
+# debug 0: suppress asserts
+HOST_DEBUG_0_CCFLAGS = [ FDefines NDEBUG=$(NDEBUG) ] ;
+HOST_DEBUG_0_C++FLAGS = [ FDefines NDEBUG=$(NDEBUG) ] ;
+
+HOST_KERNEL_DEBUG_0_CCFLAGS = [ FDefines NDEBUG=$(NDEBUG) ] ;
+HOST_KERNEL_DEBUG_0_C++FLAGS = [ FDefines NDEBUG=$(NDEBUG) ] ;
+
+local level ;
+for level in $(HAIKU_DEBUG_LEVELS[2-]) {
+	local flags = $(HOST_DEBUG_FLAGS) [ FDefines DEBUG=$(level) ] ;
+	HOST_DEBUG_$(level)_CCFLAGS			= $(flags) ;
+	HOST_DEBUG_$(level)_C++FLAGS		= $(flags) ;
+	HOST_KERNEL_DEBUG_$(level)_CCFLAGS	= $(flags) ;
+	HOST_KERNEL_DEBUG_$(level)_C++FLAGS	= $(flags) ;
+}
+
+# private kernel headers do be used when compiling kernel code
+HOST_PRIVATE_KERNEL_HEADERS = ;
+
+# under BeOS use copyattr instead of cp
+if $(HOST_PLATFORM_BEOS_COMPATIBLE)
+{
+	CP = copyattr --data ;
+}
+
+HOST_DEFINES += $(HOST_ARCH_MACRO_DEFINE) ;
+HOST_DEFINES += _NO_INLINE_ASM ;
+
+if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+	# TODO: That's obviously not correct, but in the way the COMPILE_FOR_R5
+	# macro is used, it actually seems to mean r5/bone/dano.
+	HOST_DEFINES += COMPILE_FOR_R5 ;
+}
+
+# for builds of tools in the current environment
+HOST_BUILD_COMPATIBILITY_LIB_DIR = [ FDirName $(HOST_OBJECT_BASE_DIR) lib ] ;
+
+if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+	HOST_LIBSTDC++ = stdc++.r4 ;
+	HOST_LIBROOT = root ;
+	HOST_LIBBE = be ;
+	HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR = ;
+} else {
+	HOST_LIBSTDC++ = stdc++ ;
+	HOST_LIBROOT = libroot_build.so ;
+	HOST_LIBBE = libbe_build.so ;
+	HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR
+		= "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(HOST_BUILD_COMPATIBILITY_LIB_DIR)" ;
+
+	# The BeOS compilers define __INTEL__ respectively __POWERPC__. On the
+	# build platform we need to make sure, this is also defined.
+	if $(HOST_CPU) = x86 {
+		HOST_DEFINES += __INTEL__ ;
+	} else if $(HOST_CPU) = ppc {
+		HOST_DEFINES += __POWERPC__ ;
+	}
+
+	# Supposing this is a glibc platform, let's try to get large file support
+	HOST_DEFINES +=
+		_LARGEFILE_SOURCE _LARGEFILE64_SOURCE _FILE_OFFSET_BITS=64
+	;
+}
+
+# define the executable MIME type
+HOST_EXECUTABLE_MIME_TYPE = "application/x-vnd.Be-elfexecutable" ;
+
+if $(METROWERKS) {
+	# at least parts of Haiku still can be compiled with
+	# the Metrowerks compiler on BeOS/PPC
+	HOST_EXECUTABLE_MIME_TYPE = "application/x-be-executable" ;
+}
+
+# Be API compatibility
+HOST_BE_API_HEADERS = ;
+HOST_BE_API_CCFLAGS = ;
+HOST_BE_API_C++FLAGS = ;
+	
+if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+	HOST_BE_API_HEADERS =
+		[ FDirName $(HAIKU_TOP) headers build ]
+		[ FDirName $(HAIKU_TOP) headers build os ]
+		[ FDirName $(HAIKU_TOP) headers build os app ]
+		[ FDirName $(HAIKU_TOP) headers build os drivers ]
+		[ FDirName $(HAIKU_TOP) headers build os kernel ]
+		[ FDirName $(HAIKU_TOP) headers build os interface ]
+		[ FDirName $(HAIKU_TOP) headers build os storage ]
+		[ FDirName $(HAIKU_TOP) headers build os support ]
+	;
+	HOST_BE_API_CCFLAGS = -include HaikuBuildCompatibility.h ;
+	HOST_BE_API_C++FLAGS = $(HOST_BE_API_CCFLAGS) ;
+}
+
+
+#pragma mark -
+
+# target platform settings
+
+# check the target platform compatibility
+SetPlatformCompatibilityFlagVariables TARGET_PLATFORM : TARGET : target ;
+
+# check the compatibility between host and target platform
+if $(TARGET_PLATFORM) != haiku {
+	if ! $(HOST_PLATFORM_($(TARGET_PLATFORM))_COMPATIBLE) {
+		Exit ERROR: The host platform is not compatible with target platform
+			$(TARGET_PLATFORM). ;
+	}
+}
+
+# TODO: Fix the naming!
+if $(TARGET_PLATFORM_BONE_COMPATIBLE) {
+	NETWORK_LIBS = libsocket.so libbind.so ;
+	NETAPI_LIB = libbnetapi.so ;
+	SELECT_UNAME_ETC_LIB = libroot.so ;
+} else {
+	NETWORK_LIBS = libnet.so ;
+	NETAPI_LIB = libnetapi.so ;
+	SELECT_UNAME_ETC_LIB = libnet.so ;
+}
+
+# TODO: For compatibility only. Remove when no longer used.
+R5_COMPATIBLE		= $(TARGET_PLATFORM_BEOS_COMPATIBLE) ;
+BONE_COMPATIBLE		= $(TARGET_PLATFORM_BONE_COMPATIBLE) ;
+DANO_COMPATIBLE		= $(TARGET_PLATFORM_DANO_COMPATIBLE) ;
+HAIKU_COMPATIBLE	= $(TARGET_PLATFORM_HAIKU_COMPATIBLE) ;
+
+# Set TARGET_* variables either from HAIKU_* or HOST_* depending on the
+# specified TARGET_PLATFORM.
+
+local buildVars =
+	ARCH CPU
+
+	AR CC C++ LD OBJCOPY RANLIB
+
+	HDRS CPPFLAGS CCFLAGS C++FLAGS LDFLAGS LINK LINKFLAGS DEFINES
+	ARFLAGS UNARFLAGS
+
+	KERNEL_CCFLAGS KERNEL_C++FLAGS
+	WARNING_CCFLAGS WARNING_C++FLAGS
+
+	KERNEL_WARNING_CCFLAGS KERNEL_WARNING_C++FLAGS
+
+	DEBUG_FLAGS
+
+	DEBUG_$(HAIKU_DEBUG_LEVELS)_CCFLAGS DEBUG_$(HAIKU_DEBUG_LEVELS)_C++FLAGS
+
+	KERNEL_DEBUG_$(HAIKU_DEBUG_LEVELS)_CCFLAGS
+	KERNEL_DEBUG_$(HAIKU_DEBUG_LEVELS)_C++FLAGS
+
+	PRIVATE_KERNEL_HEADERS
+
+	LIBSTDC++
+
+	ARCH_MACRO_DEFINE EXECUTABLE_MIME_TYPE
+
+	OBJECT_BASE_DIR COMMON_ARCH_OBJECT_DIR COMMON_DEBUG_OBJECT_DIR
+	DEBUG_$(HAIKU_DEBUG_LEVELS)_OBJECT_DIR
+;
+
+if $(TARGET_PLATFORM) = haiku {
+	local var ;
+	for var in $(buildVars) {
+		TARGET_$(var) = $(HAIKU_$(var)) ;
+	}
+
+	TARGET_GCC_LIB_DIR			= $(HAIKU_GCC_LIB_DIR) ;
+	TARGET_GCC_HEADERS_DIR		= $(HAIKU_GCC_HEADERS_DIR) ;
+	TARGET_GCC_LIBGCC			= $(HAIKU_GCC_LIBGCC) ;
+	TARGET_GCC_LIBGCC_OBJECTS	= $(HAIKU_GCC_LIBGCC_OBJECTS) ;
+
+	TARGET_BOOT_PLATFORM		= $(HAIKU_BOOT_PLATFORM) ;
+
+} else {
+	local var ;
+	for var in $(buildVars) {
+		TARGET_$(var) = $(HOST_$(var)) ;
+	}
+
+	TARGET_GCC_LIB_DIR			= ;
+	TARGET_GCC_HEADERS_DIR		= ;
+	TARGET_GCC_LIBGCC			= ;
+	TARGET_GCC_LIBGCC_OBJECTS	= ;
+
+	TARGET_BOOT_PLATFORM		= ;
+}
+
+
+#pragma mark -
+
+# common stuff
+
+# start with a clean slate
+CCFLAGS = ;
+C++FLAGS = ;
+DEFINES = ;
+
+# Set CC, C++, LINK to invalid values, so that we realize early, that we use
+# the wrong compiler.
+CC = bad-cc ;
+C++ = bad-c++ ;
+LINK = bad-link ;
+
+# Allow compiling unit tests on Zeta. Instead of fixing the PostMessage() 
+# issues, they deprecated that nice function. This will enable it again:
+C++FLAGS += -D_ZETA_USING_DEPRECATED_API_=1 ;
+	# TODO: Doesn't really belong here.
+
+
+# Defaults for warnings, optimization, and debugging.
+#
+WARNINGS ?= 1 ;
+OPTIM ?= -O2 ;
+DEBUG ?= 0 ;
+
+
+# Set the defaults for PLATFORM and SUPPORTED_PLATFORMS. PLATFORM is only
+# overridden for targets to be built for the host platform. SUPPORTED_PLATFORMS
+# can be overridden by the author of a component.
+PLATFORM = $(TARGET_PLATFORM) ;
+SUPPORTED_PLATFORMS = haiku ;
+
+
+# Instructs the Library rule to not make its object files temporary.
+# This is needed as some objects are used in a static library and for an
+# executable.
+KEEPOBJS = true ;
+
+
+# output directories
+# TODO: Review this.
+HAIKU_DOCUMENTATION_DIR ?= [ FDirName $(HAIKU_OUTPUT_DIR) documentation ] ;
+HAIKU_DOCUMENTATION_OBJECT_DIR ?= [ FDirName $(HAIKU_COMMON_PLATFORM_DIR)
+	documentation ] ;
+
+# TODO: Rethink test stuff.
+HAIKU_TEST_DIR			?= [ FDirName $(HAIKU_OUTPUT_DIR) tests ] ;
+HAIKU_APP_TEST_DIR		?= [ FDirName $(HAIKU_TEST_DIR) apps ] ;
+HAIKU_APP_TEST_LIB_DIR 	?= [ FDirName $(HAIKU_APP_TEST_DIR) lib ] ;
+HAIKU_TMP_DIR			?= [ FDirName $(HAIKU_OUTPUT_DIR) tmp ] ;
+
+HAIKU_PACKAGE_DIR ?= [ FDirName $(HAIKU_OUTPUT_DIR) packages ] ;
+HAIKU_PACKAGE_OBJECT_DIR ?= [ FDirName $(HAIKU_OBJECT_DIR) packages ] ;
+
+# automatically setup the objects directory per subdirectory
+SUBDIRRULES += SetupObjectsDir ;
+
+# Add the standard (userland) warning flags variables to the ones restored in
+# every subdirectory. Thus we can easily meddle with them in subdirectories
+# with imported sources.
+AUTO_SET_UP_CONFIG_VARIABLES +=
+	HOST_WARNING_CCFLAGS HOST_WARNING_C++FLAGS
+	TARGET_WARNING_CCFLAGS TARGET_WARNING_C++FLAGS
+
+	# also add PLATFORM and SUPPORTED_PLATFORMS
+	PLATFORM SUPPORTED_PLATFORMS
+;

@@ -1,8 +1,10 @@
-SubDir OBOS_TOP src servers mail ;
+SubDir HAIKU_TOP src servers mail ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders mail ;
 
-SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
 if $(BONE_COMPATIBLE) {
 	SubDirC++Flags -DBONE ;
@@ -18,7 +20,7 @@ Server mail_daemon :
 	main.cpp
 ;
 
-LinkSharedOSLibs mail_daemon : be libmail.so tracker stdc++.r4 $(NETWORK_LIBS) ;
+LinkAgainst mail_daemon : be libmail.so tracker stdc++.r4 $(NETWORK_LIBS) ;
 
 Package haiku-maildaemon-cvs :
 	mail_daemon : 

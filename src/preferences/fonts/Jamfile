@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src preferences fonts ;
+SubDir HAIKU_TOP src preferences fonts ;
 
 Preference Fonts :
 	ButtonView.cpp

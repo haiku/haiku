@@ -1,9 +1,11 @@
-SubDir OBOS_TOP src add-ons kernel drivers graphics nvidia ;
+SubDir HAIKU_TOP src add-ons kernel drivers graphics nvidia ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics nvidia ] ;
 
-R5KernelAddon nv.driver : kernel drivers bin :
+KernelAddon nv.driver : kernel drivers bin :
 	driver.c
 ;
 
@@ -12,18 +14,8 @@ Package haiku-nvidia-cvs :
 Package haiku-nvidia-cvs :
 	nv.driver : 
 	boot home config add-ons kernel drivers bin ;
-Package haiku-nvidia-cvs :
-	<kernel!drivers!dev!graphics>nv.driver :
-	boot home config add-ons kernel drivers dev graphics ;
+PackageDriverSymLink haiku-nvidia-cvs : graphics nv.driver ;
 Package haiku-nvidia-cvs :
 	nv.settings :
 	boot home config settings kernel drivers ;
-
-# Link to kernel/drivers/dev/graphics
-{
-	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev graphics ] ;
-	local instDriver = <kernel!drivers!dev!graphics>nv.driver ;
-	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : nv.driver ;
-}
 

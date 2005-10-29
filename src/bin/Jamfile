@@ -1,10 +1,10 @@
-SubDir OBOS_TOP src bin ;
+SubDir HAIKU_TOP src bin ;
 
 UsePrivateHeaders app ;
 UsePrivateHeaders kernel ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
-SubDirHdrs $(OBOS_TOP) src add-ons kernel file_cache ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_cache ;
 
 # standard commands that don't need any additional library
 StdBinCommands
@@ -18,6 +18,7 @@ StdBinCommands
 #	echo.c
 	eject.c
 	error.c
+	fortune.c
 	finddir.c
 	hd.c
 	idestatus.c
@@ -70,6 +71,7 @@ StdBinCommands
 	query.cpp
 	quit.cpp
 	roster.cpp
+	settype.cpp
 	setversion.cpp
 	shutdown.cpp
 	version.cpp
@@ -78,8 +80,10 @@ StdBinCommands
 
 # standard commands that need libbe.so, libstdc++.so
 StdBinCommands
+	copyattr.cpp
 	mountvolume.cpp
-	: libroot.so libbe.so libstdc++.r4.so
+	xres.cpp
+	: root be $(TARGET_LIBSTDC++)
 	;
 
 # standard commands that need libbe.so, libtranslation.so
@@ -101,54 +105,55 @@ StdBinCommands
 	: be libmail.so
 	;
 
-SubInclude OBOS_TOP src bin addattr ;
-SubInclude OBOS_TOP src bin bash ;
-SubInclude OBOS_TOP src bin bc ;
-SubInclude OBOS_TOP src bin bemail_utils ;
-SubInclude OBOS_TOP src bin bison ;
-SubInclude OBOS_TOP src bin chkbfs ;
-SubInclude OBOS_TOP src bin compress ;
-SubInclude OBOS_TOP src bin coreutils ;
-SubInclude OBOS_TOP src bin desklink ;
-SubInclude OBOS_TOP src bin diffutils ;
-SubInclude OBOS_TOP src bin findutils ;
-SubInclude OBOS_TOP src bin flex ;
-SubInclude OBOS_TOP src bin gawk ;
-SubInclude OBOS_TOP src bin gdb ;
-SubInclude OBOS_TOP src bin grep ;
-SubInclude OBOS_TOP src bin ideinfo ;
-SubInclude OBOS_TOP src bin keymap ;
-SubInclude OBOS_TOP src bin less ;
-SubInclude OBOS_TOP src bin listdev ;
-SubInclude OBOS_TOP src bin make ;
-SubInclude OBOS_TOP src bin makeudfimage ;
-SubInclude OBOS_TOP src bin mkdos ;
-SubInclude OBOS_TOP src bin patch ;
-SubInclude OBOS_TOP src bin pc ;
-SubInclude OBOS_TOP src bin playsound ;
-SubInclude OBOS_TOP src bin rmd160 ;
-SubInclude OBOS_TOP src bin screen_blanker ;
-SubInclude OBOS_TOP src bin sed ;
-SubInclude OBOS_TOP src bin sharutils ;
-SubInclude OBOS_TOP src bin strace ;
-SubInclude OBOS_TOP src bin vim ;
-SubInclude OBOS_TOP src bin zic ;
+SubInclude HAIKU_TOP src bin addattr ;
+SubInclude HAIKU_TOP src bin bash ;
+SubInclude HAIKU_TOP src bin bc ;
+SubInclude HAIKU_TOP src bin bemail_utils ;
+SubInclude HAIKU_TOP src bin bison ;
+SubInclude HAIKU_TOP src bin chkbfs ;
+SubInclude HAIKU_TOP src bin compress ;
+SubInclude HAIKU_TOP src bin coreutils ;
+SubInclude HAIKU_TOP src bin desklink ;
+SubInclude HAIKU_TOP src bin diffutils ;
+SubInclude HAIKU_TOP src bin findutils ;
+SubInclude HAIKU_TOP src bin flex ;
+SubInclude HAIKU_TOP src bin gawk ;
+SubInclude HAIKU_TOP src bin gdb ;
+SubInclude HAIKU_TOP src bin grep ;
+SubInclude HAIKU_TOP src bin ideinfo ;
+SubInclude HAIKU_TOP src bin keymap ;
+SubInclude HAIKU_TOP src bin less ;
+SubInclude HAIKU_TOP src bin listdev ;
+SubInclude HAIKU_TOP src bin make ;
+SubInclude HAIKU_TOP src bin makebootable ;
+SubInclude HAIKU_TOP src bin makeudfimage ;
+SubInclude HAIKU_TOP src bin mkdos ;
+SubInclude HAIKU_TOP src bin patch ;
+SubInclude HAIKU_TOP src bin pc ;
+SubInclude HAIKU_TOP src bin playsound ;
+SubInclude HAIKU_TOP src bin rmd160 ;
+SubInclude HAIKU_TOP src bin screen_blanker ;
+SubInclude HAIKU_TOP src bin sed ;
+SubInclude HAIKU_TOP src bin sharutils ;
+SubInclude HAIKU_TOP src bin strace ;
+SubInclude HAIKU_TOP src bin vim ;
+SubInclude HAIKU_TOP src bin zic ;
 
 # RCS commands
-SubInclude OBOS_TOP src bin rcs ;
+SubInclude HAIKU_TOP src bin rcs ;
 
 # Network command line tools
-SubInclude OBOS_TOP src bin arp ;
-SubInclude OBOS_TOP src bin ifconfig ;
-SubInclude OBOS_TOP src bin pppconfig ;
-SubInclude OBOS_TOP src bin ppp_up ;
-SubInclude OBOS_TOP src bin ping ;
-SubInclude OBOS_TOP src bin route ;
-SubInclude OBOS_TOP src bin traceroute ;
+SubInclude HAIKU_TOP src bin arp ;
+SubInclude HAIKU_TOP src bin ifconfig ;
+SubInclude HAIKU_TOP src bin pppconfig ;
+SubInclude HAIKU_TOP src bin ppp_up ;
+SubInclude HAIKU_TOP src bin ping ;
+SubInclude HAIKU_TOP src bin route ;
+SubInclude HAIKU_TOP src bin traceroute ;
 
 # Compression command line tools
-SubInclude OBOS_TOP src bin unzip ;
-SubInclude OBOS_TOP src bin zip ;
-SubInclude OBOS_TOP src bin gzip ;
-SubInclude OBOS_TOP src bin bzip2 ;
-SubInclude OBOS_TOP src bin tar ;
+SubInclude HAIKU_TOP src bin unzip ;
+SubInclude HAIKU_TOP src bin zip ;
+SubInclude HAIKU_TOP src bin gzip ;
+SubInclude HAIKU_TOP src bin bzip2 ;
+SubInclude HAIKU_TOP src bin tar ;

@@ -1,13 +1,15 @@
-SubDir OBOS_TOP src add-ons mail_daemon outbound_filters fortune ;
+SubDir HAIKU_TOP src add-ons mail_daemon outbound_filters fortune ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders mail ;
-SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
 Addon Fortune : mail_daemon outbound_filters :
 	ConfigView.cpp
 	filter.cpp ;
 
-LinkSharedOSLibs Fortune :
+LinkAgainst Fortune :
 	 be libmail.so  ;
 
 Package haiku-maildaemon-cvs :

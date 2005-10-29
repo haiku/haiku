@@ -1,10 +1,20 @@
-SubDir OBOS_TOP src add-ons kernel network ppp modem ;
+SubDir HAIKU_TOP src add-ons kernel network ppp modem ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# We need the public network headers also when not compiling for Haiku.
+		# Unfortunately we get more than we want, namely all POSIX headers.
+}
 
 # for kernel_cpp.h and BLocker
+UseHeaders [ FDirName $(HAIKU_TOP) headers cpp ] : true ;
 UsePrivateHeaders net ;
 UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
+	libkernelppp headers ] : true ;
 
 
 {
@@ -12,16 +22,16 @@ UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkerne
 }
 
 
-R5KernelAddon modem : kernel obos_network ppp :
+KernelAddon modem : kernel obos_network ppp :
 	modem.cpp
 	ModemDevice.cpp
 	ACFCHandler.cpp
 ;
 
-LinkSharedOSLibs modem : libkernelppp.a ;
+LinkAgainst modem : libkernelppp.a ;
 
 # Installation
-OBOSInstall install-networking
+HaikuInstall install-networking
 	: /boot/home/config/add-ons/kernel/obos_network/ppp
 	: modem ;
 

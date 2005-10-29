@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kits tracker ;
+SubDir HAIKU_TOP src kits tracker ;
 
 UsePrivateHeaders shared ;
 UsePrivateHeaders tracker ;
@@ -13,7 +13,7 @@ SubDirC++Flags
 #	-D_SILENTLY_CORRECT_FILE_NAMES=1 
 	;
 
-SharedLibrary tracker :
+SharedLibrary libtracker.so :
 	AttributeStream.cpp
 	AutoMounter.cpp
 	AutoMounterSettings.cpp
@@ -87,5 +87,5 @@ SharedLibrary tracker :
 	;
 
 if $(HAIKU_COMPATIBLE) {
-	LinkSharedOSLibs libtracker.so : libroot.so ;
+	LinkAgainst libtracker.so : libroot.so ;
 }

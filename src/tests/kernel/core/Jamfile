@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kernel core ;
+SubDir HAIKU_TOP src tests kernel core ;
 
 UsePrivateHeaders kernel ;
 
@@ -16,6 +16,6 @@ SimpleTest syscall_time :
 	syscall_time.cpp
 	: $(LIBROOT) ;
 
-SubInclude OBOS_TOP src tests kernel core cache ;
-#SubInclude OBOS_TOP src tests kernel core disk_device_manager ;
-SubInclude OBOS_TOP src tests kernel core util ;
+SubInclude HAIKU_TOP src tests kernel core cache ;
+#SubInclude HAIKU_TOP src tests kernel core disk_device_manager ;
+SubInclude HAIKU_TOP src tests kernel core util ;

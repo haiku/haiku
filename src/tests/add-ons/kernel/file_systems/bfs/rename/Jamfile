@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests add-ons kernel file_systems bfs rename ;
+SubDir HAIKU_TOP src tests add-ons kernel file_systems bfs rename ;
 
 SimpleTest rename
 	: rename.c

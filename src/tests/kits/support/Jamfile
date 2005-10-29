@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kits support ;
+SubDir HAIKU_TOP src tests kits support ;
 
 # Let Jam know where to find some of our source files
 SEARCH_SOURCE += [ FDirName $(SUBDIR) barchivable ] ;
@@ -81,7 +81,7 @@ CommonTestLib libsupporttest.so
 	: support
 ;
 
-SubInclude OBOS_TOP src tests kits support barchivable ;
-#SubInclude OBOS_TOP src tests kits support bautolock ;
-#SubInclude OBOS_TOP src tests kits support blocker ;
+SubInclude HAIKU_TOP src tests kits support barchivable ;
+#SubInclude HAIKU_TOP src tests kits support bautolock ;
+#SubInclude HAIKU_TOP src tests kits support blocker ;
 

@@ -44,6 +44,14 @@ static benaphore sockets_lock;
 /* OpenBSD sets this at 128??? */
 static int somaxconn = SOMAXCONN;
 
+/* The BeOS R5 kernel doesn't have abs(). */
+#ifdef COMPILE_FOR_R5
+int abs(int num)
+{
+	return (int)labs(num);
+}
+#endif
+
 int sockets_init(void)
 {
 	if (!spool)

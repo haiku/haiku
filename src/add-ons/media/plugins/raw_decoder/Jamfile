@@ -1,10 +1,11 @@
-SubDir OBOS_TOP src add-ons media plugins raw_decoder ;
+SubDir HAIKU_TOP src add-ons media plugins raw_decoder ;
 
 UsePrivateHeaders media ;
 
 Addon raw_decoder : media plugins :
 	AudioConversion.cpp
 	RawDecoderPlugin.cpp
+	: false
+	: be libmedia.so
 ;
 
-LinkSharedOSLibs raw_decoder : be libmedia.so ;

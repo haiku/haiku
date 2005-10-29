@@ -1,12 +1,12 @@
-SubDir OBOS_TOP src tests kernel boot loader file_systems bfs ;
+SubDir HAIKU_TOP src tests kernel boot loader file_systems bfs ;
 
 UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName storage ] ;
-SubDirHdrs $(OBOS_TOP) src tests kernel boot loader ;
-SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems bfs ;
+SubDirHdrs $(HAIKU_TOP) src tests kernel boot loader ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_systems bfs ;
 
-ObjectsDefines
+ObjectDefines
 	bfs.cpp
 	Directory.cpp
 	File.cpp
@@ -31,5 +31,5 @@ KernelStaticLibrary boottest_bfs.a :
 
 SEARCH on [ FGristFiles
 		bfs.cpp Directory.cpp File.cpp Link.cpp Stream.cpp BPlusTree.cpp
-	] = [ FDirName $(OBOS_TOP) src system boot loader file_systems bfs ] ;
+	] = [ FDirName $(HAIKU_TOP) src system boot loader file_systems bfs ] ;
 

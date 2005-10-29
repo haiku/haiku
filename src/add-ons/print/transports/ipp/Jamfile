@@ -1,6 +1,8 @@
-SubDir OBOS_TOP src add-ons print transports ipp ;
+SubDir HAIKU_TOP src add-ons print transports ipp ;
 
-SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print transports shared ] ;
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons print transports shared ] ;
 
 Addon IPP : Print transport : 
 	Ipp.cpp
@@ -21,7 +23,7 @@ ObjectReferences
 	<src!add-ons!print!transports!shared>DbgMsg.o
 ;
 
-LinkSharedOSLibs IPP : be $(NETWORK_LIBS) stdc++.r4 ;
+LinkAgainst IPP : be $(NETWORK_LIBS) stdc++.r4 ;
 
 Package haiku-printingkit-cvs :
 	IPP :

@@ -1,9 +1,11 @@
-SubDir OBOS_TOP src add-ons kernel drivers graphics via ;
+SubDir HAIKU_TOP src add-ons kernel drivers graphics via ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics via ] ;
 
-R5KernelAddon via.driver : kernel drivers bin :
+KernelAddon via.driver : kernel drivers bin :
 	driver.c
 ;
 
@@ -12,17 +14,8 @@ Package haiku-via_gfx-cvs :
 Package haiku-via_gfx-cvs :
 	via.driver : 
 	boot home config add-ons kernel drivers bin ;
-Package haiku-via_gfx-cvs :
-	<kernel!drivers!dev!graphics>via.driver :
-	boot home config add-ons kernel drivers dev graphics ;
+PackageDriverSymLink haiku-via_gfx-cvs : graphics via.driver ;
 Package haiku-via_gfx-cvs :
 	via.settings :
 	boot home config settings kernel drivers ;
 
-# Link to kernel/drivers/dev/graphics
-{
-	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev graphics ] ;
-	local instDriver = <kernel!drivers!dev!graphics>via.driver ;
-	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : via.driver ;
-}

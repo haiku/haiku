@@ -1,8 +1,10 @@
-SubDir OBOS_TOP src add-ons kernel drivers audio ac97 ich ;
+SubDir HAIKU_TOP src add-ons kernel drivers audio ac97 ich ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders media ;
 
-R5KernelAddon ich_ac97 : kernel drivers bin :
+KernelAddon ich_ac97 : kernel drivers bin :
 	ac97_multi.c
 	config.c
 	debug.c
@@ -28,16 +30,6 @@ R5KernelAddon ich_ac97 : kernel drivers bin :
 Package haiku-ich-ac97-cvs :
 	ich_ac97 :
 	boot home config add-ons kernel drivers bin ;
-Package haiku-ich-ac97-cvs :
-	<kernel!drivers!dev!audio!multi>ich_ac97 :
-	boot home config add-ons kernel drivers dev audio multi ;
+PackageDriverSymLink haiku-ich-ac97-cvs : audio multi ich_ac97 ;
 
-# Link to kernel/drivers/dev/audio/multi
-{
-	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev audio multi ] ;
-	local instDriver = <kernel!drivers!dev!audio!multi>ich_ac97 ;
-	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : ich_ac97 ;
-}
-
-SubInclude OBOS_TOP src add-ons kernel drivers audio ac97 ich distro ;
+SubInclude HAIKU_TOP src add-ons kernel drivers audio ac97 ich distro ;

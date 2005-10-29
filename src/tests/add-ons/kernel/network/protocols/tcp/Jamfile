@@ -1,8 +1,8 @@
-SubDir OBOS_TOP src tests add-ons kernel network protocols tcp ;
+SubDir HAIKU_TOP src tests add-ons kernel network protocols tcp ;
 
 UsePrivateHeaders net ;
 
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network protocols tcp ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel network protocols tcp ] ;
 
 Addon <userland>tcp : userland obos_network protocols : 
 	tcp.c
@@ -13,4 +13,4 @@ Addon <userland>tcp : userland obos_network protocols :
 	arc4random.c
 ;
 
-LinkSharedOSLibs <userland>tcp : <installed>net_stack_tester ;
+LinkAgainst <userland>tcp : <installed>net_stack_tester ;

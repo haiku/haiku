@@ -1,4 +1,4 @@
-/* PDFlib GmbH cvsid: $Id: tif_next.c,v 1.1 2004/10/06 17:46:51 laplace Exp $ */
+/* PDFlib GmbH cvsid: $Id$ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler

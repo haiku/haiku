@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src apps magnify ;
+SubDir HAIKU_TOP src apps magnify ;
 
-App Magnify : 
+Application Magnify : 
 	main.cpp 
 	: libbe.so libtracker.so libgame.so 
 	: Magnify.rdef ;

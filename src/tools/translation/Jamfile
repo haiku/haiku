@@ -1,10 +1,10 @@
-SubDir OBOS_TOP src tools translation ;
+SubDir HAIKU_TOP src tools translation ;
 
-SubInclude OBOS_TOP src tools translation bitsinfo ;
-SubInclude OBOS_TOP src tools translation bmpinfo ;
-SubInclude OBOS_TOP src tools translation inspector ;
-SubInclude OBOS_TOP src tools translation pnginfo ;
-SubInclude OBOS_TOP src tools translation stxtinfo ;
-SubInclude OBOS_TOP src tools translation tgainfo ;
-SubInclude OBOS_TOP src tools translation tiffinfo ;
+SubInclude HAIKU_TOP src tools translation bitsinfo ;
+SubInclude HAIKU_TOP src tools translation bmpinfo ;
+SubInclude HAIKU_TOP src tools translation inspector ;
+SubInclude HAIKU_TOP src tools translation pnginfo ;
+SubInclude HAIKU_TOP src tools translation stxtinfo ;
+SubInclude HAIKU_TOP src tools translation tgainfo ;
+SubInclude HAIKU_TOP src tools translation tiffinfo ;
 

@@ -1,15 +1,15 @@
-SubDir OBOS_TOP src add-ons media plugins musepack ;
+SubDir HAIKU_TOP src add-ons media plugins musepack ;
 
 UsePrivateHeaders media ;
+
+SubDirHdrs [ FDirName $(SUBDIR) mpc ] ;
 
 Addon musepack : media plugins :
 	MusePack.cpp
 	MusePackReader.cpp
 	MusePackDecoder.cpp
 	: false
-	: libmusepack.a
-	;
+	: libmusepack.a be libmedia.so
+;
 
-LinkSharedOSLibs musepack : be libmedia.so ;
-
-SubInclude OBOS_TOP src add-ons media plugins musepack mpc ;
+SubInclude HAIKU_TOP src add-ons media plugins musepack mpc ;

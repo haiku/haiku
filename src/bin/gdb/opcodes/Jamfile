@@ -1,9 +1,10 @@
-SubDir OBOS_TOP src bin gdb opcodes ;
+SubDir HAIKU_TOP src bin gdb opcodes ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) include ] ;
-SubDirHdrs [ FDirName [ FCurrentObjectsDir ] $(DOTDOT) bfd ] ;
+SubDirHdrs [ FDirName $(TARGET_COMMON_DEBUG_LOCATE_TARGET:D) bfd ] ;
 	# generated bfd headers
-SubDirHdrs [ FDirName $(OBOS_TOP) src bin gawk intl ] ;
+
+SubDirSysHdrs [ FDirName $(HAIKU_TOP) src bin gawk intl ] ;
 	# Use gawk's libintl for the time being.
 	# TODO: Put a current version of intl ot src/libs and build a static lib
 	# all interested apps can link against.
@@ -12,9 +13,9 @@ SubDirCcFlags -DHAVE_CONFIG_H -D_GNU_SOURCE ;
 
 # architecture specific sources
 local opcodesArchSources ;
-if $(OBOS_ARCH) = x86 {
+if $(TARGET_ARCH) = x86 {
 	opcodesArchSources = i386-dis.c ;
-} else if $(OBOS_ARCH) = ppc {
+} else if $(TARGET_ARCH) = ppc {
 	opcodesArchSources = ppc-dis.c ;
 		# TODO: Check, if this is correct (probably is).
 } # else: architecture not supported by Haiku
@@ -26,10 +27,8 @@ local opcodesAllSources =
 	$(opcodesArchSources)
 ;
 
-StaticLibrary <gdb>opcodes :
+StaticLibrary <gdb>libopcodes.a :
 	$(opcodesAllSources)
-
-	: [ FCurrentObjectsDir ]
 ;
 
 # Make all objects depend on the generated bfd headers (otherwise they will

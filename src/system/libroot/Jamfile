@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src system libroot ;
+SubDir HAIKU_TOP src system libroot ;
 
 UsePrivateHeaders libroot ;
 
@@ -21,7 +21,7 @@ KernelMergeObject kernel_os_main.o :
 
 SEARCH on [ FGristFiles
 		driver_settings.c fs_info.c
-	] = [ FDirName $(OBOS_TOP) src system libroot os ] ;
+	] = [ FDirName $(HAIKU_TOP) src system libroot os ] ;
 
 # kernel libroot posix files
 
@@ -115,5 +115,5 @@ KernelMergeObject kernel_posix.o :
 	: -fno-pic
 	;
 
-SubInclude OBOS_TOP src system libroot os ;
-SubInclude OBOS_TOP src system libroot posix ;
+SubInclude HAIKU_TOP src system libroot os ;
+SubInclude HAIKU_TOP src system libroot posix ;

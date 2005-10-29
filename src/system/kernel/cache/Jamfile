@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src system kernel cache ;
+SubDir HAIKU_TOP src system kernel cache ;
 
 KernelMergeObject kernel_cache.o :
 	block_allocator.cpp

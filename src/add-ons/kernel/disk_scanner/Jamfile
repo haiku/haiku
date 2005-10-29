@@ -1,11 +1,11 @@
-SubDir OBOS_TOP src add-ons kernel disk_scanner ;
+SubDir HAIKU_TOP src add-ons kernel disk_scanner ;
 
 UsePrivateHeaders $(DOT) ;
 
-R5KernelAddon disk_scanner : kernel disk_scanner :
+KernelAddon disk_scanner : kernel disk_scanner :
 	disk_scanner.c
 ;
 
-#SubInclude OBOS_TOP src add-ons kernel disk_scanner fs ;
-SubInclude OBOS_TOP src add-ons kernel disk_scanner partition ;
-SubInclude OBOS_TOP src add-ons kernel disk_scanner session ;
+#SubInclude HAIKU_TOP src add-ons kernel disk_scanner fs ;
+SubInclude HAIKU_TOP src add-ons kernel disk_scanner partition ;
+SubInclude HAIKU_TOP src add-ons kernel disk_scanner session ;

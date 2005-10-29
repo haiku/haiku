@@ -1,18 +1,10 @@
-SubDir OBOS_TOP src add-ons kernel drivers arch x86 floppy ;
+SubDir HAIKU_TOP src add-ons kernel drivers arch x86 floppy ;
 
-R5KernelAddon floppy : kernel drivers bin :
+KernelAddon floppy : kernel drivers bin :
 	floppy.c
 	floppy_ctrl.c
 	device_icons.c
 ;
-
-# Link to kernel/drivers/dev/disk
-{
-	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev disk ] ;
-	local instDriver = <kernel!drivers!dev!disk>floppy ;
-	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : floppy ;
-}
 
 # Not ready for prime-time yet: R5 floppy driver replacement at the moment.
 
@@ -30,7 +22,7 @@ R5KernelAddon floppy : kernel drivers bin :
 #	<$(SOURCE_GRIST)>device_icons.o
 #	kernel.so
 #	:
-#	$(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/add-on.ld
+#	$(HAIKU_TOP)/src/kernel/ldscripts/$(TARGET_ARCH)/add-on.ld
 #	:
 #	-Bdynamic -shared
 #	:

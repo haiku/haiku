@@ -1,7 +1,7 @@
-SubDir OBOS_TOP src tests kits app broster testapps ;
+SubDir HAIKU_TOP src tests kits app broster testapps ;
 
-#SubDirHdrs [ FDirName $(OBOS_TOP) src tests kits app common ] ;
-SubDirHdrs [ FDirName $(OBOS_TOP) src tests kits app broster ] ;
+#SubDirHdrs [ FDirName $(HAIKU_TOP) src tests kits app common ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src tests kits app broster ] ;
 
 UsePrivateHeaders app ;
 
@@ -53,8 +53,8 @@ rule CopyBRosterTestApp
 	local source = $(2) ;
 	local r5target = $(target)_r5 ;
 	local r5source = $(source)_r5 ;
-	MakeLocate $(target) : [ FDirName $(OBOS_TEST_DIR) kits app ] ;
-	MakeLocate $(r5target) : [ FDirName $(OBOS_TEST_DIR) kits app ] ;
+	MakeLocate $(target) : [ FDirName $(HAIKU_TEST_DIR) kits app ] ;
+	MakeLocate $(r5target) : [ FDirName $(HAIKU_TEST_DIR) kits app ] ;
 	File $(target) : $(source) ;
 	File $(r5target) : $(r5source) ;
 	local file ;

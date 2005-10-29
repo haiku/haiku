@@ -1,0 +1,303 @@
+
+# create directories that will remain empty
+AddDirectoryToHaikuImage home Desktop ;
+AddDirectoryToHaikuImage var log ;
+AddDirectoryToHaikuImage var tmp ;
+
+# TODO: Remove the variables we don't need.
+BEOS_BIN = touch sync ln listarea listattr listsem listport
+	true false ls df mount unmount cp mv ps sh mkdir sleep
+	grep cat less clockconfig du rm date find locate xargs
+	isvolume shutdown safemode sysinfo kill diff cmp
+	renice rmattr addattr listdev pwd chmod chown chgrp dd
+	tee md5sum catattr query lsindex mkindex roster listimage
+	quit open translate setvolume waitfor uname iroster keymap
+	strace rmdir error ifconfig ping traceroute arp pppconfig
+	ppp_up gdb tail head zip unzip mountvolume top finddir groups
+	id env basename factor tty dstcheck comm modifiers version
+	csplit cut beep screen_blanker fortune play eject uptime sed gawk mimeset
+	dirname
+;
+
+BEOS_APPS = MiniTerminal Terminal Expander People ShowImage Clock Pulse
+	Playground SoundRecorder BitmapDrawing Magnify DiskProbe AboutHaiku
+	StyledEdit CDPlayer
+;
+BEOS_PREFERENCES = Backgrounds DataTranslations FileTypes Fonts Media Menu
+	Mouse Keyboard Keymap Screen ScrollBar Sounds Time VirtualMemory
+	Workspaces ScreenSaver
+;
+BEOS_SYSTEM_LIB = libbe.so libstdc++.r4.so libnet.so libmedia.so libtracker.so
+	libtranslation.so libbind.so libnetapi.so libsocket.so libdebug.so
+	libtextencoding.so libz.so libfreetype.so libpng.so libappserver.so
+	libdevice.so libgame.so libscreensaver.so libroot.so
+;
+BEOS_SYSTEM_SERVERS = registrar debug_server syslog_daemon media_server
+	media_addon_server input_server app_server fake_app_server
+;
+
+BEOS_NETWORK_CORE = core ;
+BEOS_NETWORK_INTERFACES = ethernet loopback ppp ;
+BEOS_NETWORK_PPP = ipcp modem pap pppoe ;
+BEOS_NETWORK_PROTOCOLS = icmp ipv4 raw route tcp udp ;
+
+BEOS_ADD_ONS_ACCELERANTS = radeon.accelerant nv.accelerant mga.accelerant
+	nm.accelerant vesa.accelerant
+;
+BEOS_ADD_ONS_TRANSLATORS = STXTTranslator RTF-Translator PNGTranslator
+	JPEGTranslator GIFTranslator
+;
+BEOS_ADD_ONS_MEDIA = mixer.media_addon legacy.media_addon
+	multi_audio.media_addon
+;
+BEOS_ADD_ONS_MEDIA_PLUGINS = aiff_reader avcodec mp3_decoder musepack
+	raw_decoder wav_reader mov_reader au_reader avi_reader mp3_reader ogg
+	speex vorbis
+	# ac3_decoder theora matroska
+;
+BEOS_ADD_ONS_INPUT = <input>keyboard <input>mouse canna screen_saver ;
+BEOS_ADD_ONS_SCREENSAVERS = Haiku ;
+BEOS_ADD_ONS_DRIVERS_AUDIO = ich_ac97 auvia emuxki ;
+BEOS_ADD_ONS_DRIVERS_GRAPHICS = radeon.driver nv.driver nm.driver mga.driver
+	vesa
+;
+BEOS_ADD_ONS_DRIVERS_MISC = keyboard scsi_dsk scsi_cd dprintf null zero random
+	ps2_hid <driver>tty console <driver>config
+;
+BEOS_ADD_ONS_DRIVERS_NET = ipro1000 rtl8139 rtl8169 sis900
+	via-rhine wb840 net_stack_driver
+	# bcm440x bcm570x (only available with GPLd add-ons)
+;
+BEOS_ADD_ONS_BUS_MANAGERS = pci isa ide scsi config_manager ;
+BEOS_ADD_ONS_KERNEL_MISC = ide_isa generic_ide_pci block_io fast_log
+	ide_adapter locked_pool scsi_periph intel keyboard vga_text
+;
+BEOS_ADD_ONS_FILESYSTEMS = bfs ;
+BEOS_DATA_FILES = timezone_files keymap_files ;
+
+
+# modules
+AddFilesToHaikuImage beos system add-ons kernel bus_managers
+	: $(BEOS_ADD_ONS_BUS_MANAGERS) ;
+AddFilesToHaikuImage beos system add-ons kernel busses ide
+	: generic_ide_pci ide_isa ;
+AddFilesToHaikuImage beos system add-ons kernel console : vga_text ;
+AddFilesToHaikuImage beos system add-ons kernel file_systems : bfs ;
+AddFilesToHaikuImage beos system add-ons kernel generic
+	: block_io fast_log ide_adapter locked_pool scsi_periph ;
+AddFilesToHaikuImage beos system add-ons kernel partitioning_systems : intel ;
+
+# drivers
+AddDriversToHaikuImage				: console dprintf keyboard null random
+									  <driver>tty zero ;
+AddDriversToHaikuImage audio multi	: $(BEOS_ADD_ONS_DRIVERS_AUDIO) ;
+AddDriversToHaikuImage disk scsi	: scsi_cd scsi_dsk ;
+AddDriversToHaikuImage graphics		: $(BEOS_ADD_ONS_DRIVERS_GRAPHICS) ;
+AddDriversToHaikuImage input		: ps2_hid ;
+AddDriversToHaikuImage misc			: <driver>config ;
+AddDriversToHaikuImage net			: $(BEOS_ADD_ONS_DRIVERS_NET) ;
+
+# kernel
+AddFilesToHaikuImage beos system : kernel_$(TARGET_ARCH) ;
+
+# libs
+AddFilesToHaikuImage beos system lib : $(BEOS_SYSTEM_LIB) rld.so ;
+
+# servers
+AddFilesToHaikuImage beos system servers : $(BEOS_SYSTEM_SERVERS) ;
+
+# apps
+AddFilesToHaikuImage beos				: Deskbar Tracker ;
+AddFilesToHaikuImage beos bin			: $(BEOS_BIN) consoled <bin>route ;
+AddFilesToHaikuImage beos apps			: $(BEOS_APPS) ;
+AddFilesToHaikuImage beos preferences	: $(BEOS_PREFERENCES) ;
+
+AddSymlinkToHaikuImage beos bin : more : less ;
+
+
+# scripts and data files
+local bootScripts = Bootscript SetupEnvironment Netscript ;
+SEARCH on $(bootScripts) = [ FDirName $(HAIKU_TOP) data system boot ] ;
+AddFilesToHaikuImage beos system boot : $(bootScripts) ;
+
+# TODO: Use data/etc/termcap or src/libs/termcap.src?
+local etcFiles = fortunes profile termcap ;
+etcFiles = $(etcFiles:G=etc) ;
+SEARCH on $(etcFiles) = [ FDirName $(HAIKU_TOP) data etc ] ;
+AddFilesToHaikuImage beos etc : $(etcFiles) ;
+
+local fontDir = [ FDirName $(HAIKU_TOP) data etc fonts ] ;
+local psFonts = [ Glob $(fontDir)/psfonts : *.afm *.pfb ] ;
+local ttFonts = [ Glob $(fontDir)/ttfonts : *.ttf ] ;
+AddFilesToHaikuImage beos etc fonts psfonts : $(psFonts) ;
+AddFilesToHaikuImage beos etc fonts ttfonts : $(ttFonts) ;
+
+local kanbeDir = [ FDirName $(HAIKU_TOP) data etc KanBe ] ;
+local kanbeDefault = [ Glob $(kanbeDir)/default : *.canna *.gz ] ;
+local kanbeDic = [ Glob $(kanbeDir)/dic : *.cbp ] ;
+local kanbeDicCanna = [ Glob $(kanbeDir)/dic/canna
+	: *.cld *.ctd *.cbd *.dir ] ;
+AddFilesToHaikuImage beos etc KanBe default : $(kanbeDefault) ;
+AddFilesToHaikuImage beos etc KanBe dic : $(kanbeDic) ;
+AddFilesToHaikuImage beos etc KanBe dic canna : $(kanbeDicCanna) ;
+AddDirectoryToHaikuImage beos etc KanBe dic group ;
+AddDirectoryToHaikuImage beos etc KanBe dic user ;
+
+# TODO: We must get rid of this earlier or later.
+# 
+# if [ -e /boot/beos/etc/fonts/ttfonts/Swiss721.ttf ]; then
+# 	$cp ${sPrefix}/boot/beos/etc/fonts/ttfonts/Courier10Pitch.ttf $targetDir/beos/etc/fonts/ttfonts/
+# 	$cp ${sPrefix}/boot/beos/etc/fonts/ttfonts/Swiss721_Bold.ttf $targetDir/beos/etc/fonts/ttfonts/
+# 	$cp ${sPrefix}/boot/beos/etc/fonts/ttfonts/Swiss721.ttf $targetDir/beos/etc/fonts/ttfonts/
+# fi
+
+local libnetFiles = networks protocols resolv.conf services ;
+libnetFiles = $(libnetFiles:G=libnet-files) ;
+SEARCH on $(libnetFiles) = [ FDirName $(HAIKU_TOP) src kits network libnet ] ;
+AddFilesToHaikuImage beos etc : $(libnetFiles) ;
+
+local keymapFiles = [ GLOB $(SUBDIR) : *.keymap ] ;
+keymapFiles = $(keymapFiles:BG=keymap) ;
+AddFilesToHaikuImage beos etc Keymap : $(libnetFiles) ;
+
+local timezones = [ FTimeZoneBinaries $(HAIKU_TIME_ZONE_SOURCES) : : true ] ;
+for timezone in $(timezones) {
+	local dir = [ on $(timezone) return $(RELATIVE_TIMEZONE_DIR) ] ;
+	AddFilesToHaikuImage beos etc timezones $(dir) : $(timezone) ;
+}
+
+local driverSettingsFiles = <driver-settings>kernel ;
+SEARCH on $(driverSettingsFiles)
+	= [ FDirName $(HAIKU_TOP) data settings kernel drivers ] ;
+AddFilesToHaikuImage home config settings kernel drivers
+	: $(driverSettingsFiles) ;
+# TODO: This looks like it belongs to someones UserBuildConfig.
+# if [ -e data/settings/kernel/drivers/vesa ]; then
+# 	$cp ${sPrefix}data/settings/kernel/drivers/vesa \
+# 		$targetDir/home/config/settings/kernel/drivers/
+# fi
+
+AddSymlinkToHaikuImage home config settings
+	: /boot/beos/etc/timezones/Europe/Paris : timezone ;
+
+AddFilesToHaikuImage home config settings kernel drivers
+	: <keymap>US-International : Key_map ;
+
+# boot loader
+AddFilesToHaikuImage beos system : zbeos ;
+
+# boot module links
+AddBootModuleSymlinks config_manager bfs block_io fast_log generic_ide_pci isa
+	ide ide_adapter ide_isa intel locked_pool pci scsi scsi_cd scsi_dsk
+	scsi_periph
+;
+
+# add-ons
+AddFilesToHaikuImage beos system add-ons accelerants
+	: $(BEOS_ADD_ONS_ACCELERANTS) ;
+AddFilesToHaikuImage beos system add-ons Translators
+	: $(BEOS_ADD_ONS_TRANSLATORS) ;
+AddFilesToHaikuImage beos system add-ons media : $(BEOS_ADD_ONS_MEDIA) ;
+AddFilesToHaikuImage beos system add-ons media plugins
+	: $(BEOS_ADD_ONS_MEDIA_PLUGINS) ;
+AddFilesToHaikuImage beos system add-ons input_server devices
+	: <input>keyboard <input>mouse ;
+AddFilesToHaikuImage beos system add-ons input_server filters : screen_saver ;
+AddFilesToHaikuImage beos system add-ons input_server methods : canna ;
+AddFilesToHaikuImage beos system add-ons kernel network
+	: $(BEOS_NETWORK_CORE) ;
+AddFilesToHaikuImage beos system add-ons kernel network interfaces
+	: $(BEOS_NETWORK_INTERFACES) ;
+AddFilesToHaikuImage beos system add-ons kernel network ppp
+	: $(BEOS_NETWORK_PPP) ;
+AddFilesToHaikuImage beos system add-ons kernel network protocols
+	: $(BEOS_NETWORK_PROTOCOLS) ;
+AddFilesToHaikuImage beos system add-ons Screen\ Savers
+	: $(BEOS_ADD_ONS_SCREENSAVERS) ;
+
+
+#pragma mark -
+
+# Set image name and directory defaults and locate the image.
+HAIKU_IMAGE_NAME ?= haiku.image ;
+HAIKU_IMAGE_DIR ?= $(HAIKU_OUTPUT_DIR) ;
+HAIKU_IMAGE ?= $(HAIKU_IMAGE_NAME) ;
+HAIKU_IMAGE_SIZE ?= 80 ; # 80 MB
+MakeLocate $(HAIKU_IMAGE) : $(HAIKU_IMAGE_DIR) ;
+
+# Set the default installation directory.
+HAIKU_INSTALL_DIR ?= /haiku ;
+
+# the pseudo target all image contents is attached to
+NotFile haiku-image-contents ;
+
+# prepare the script that initializes the shell variables
+HAIKU_IMAGE_INIT_VARIABLES_SCRIPT = <HaikuImage>haiku.image-init-vars ;
+local script = $(HAIKU_IMAGE_INIT_VARIABLES_SCRIPT) ;
+MakeLocate $(script) : $(HAIKU_OUTPUT_DIR) ;
+Always $(script) ;
+
+AddVariableToScript $(script) : sourceDir : $(HAIKU_TOP) ;
+AddVariableToScript $(script) : outputDir : $(HAIKU_OUTPUT_DIR) ;
+AddVariableToScript $(script) : tmpDir : $(HAIKU_TMP_DIR) ;
+AddVariableToScript $(script) : installDir : $(HAIKU_INSTALL_DIR) ;
+#AddVariableToScript $(script) : isImage : 1 ;
+AddVariableToScript $(script) : imageSize : $(HAIKU_IMAGE_SIZE) ;
+AddVariableToScript $(script) : addBuildCompatibilityLibDir
+	: $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ;
+AddTargetVariableToScript $(script) : bfs_shell : bfsShell ;
+AddTargetVariableToScript $(script) : fs_shell_command : fsShellCommand ;
+AddTargetVariableToScript $(script) : <build>copyattr ;
+AddTargetVariableToScript $(script) : <build>makebootable ;
+AddTargetVariableToScript $(script) : <build>rc ;
+AddTargetVariableToScript $(script) : <build>resattr ;
+#AddTargetVariableToScript $(script) : $(HAIKU_IMAGE) : imagePath ;
+	# causes a cyclic dependency
+AddVariableToScript $(script) : imagePath
+	: [ FDirName $(HAIKU_IMAGE_DIR) $(HAIKU_IMAGE_NAME) ] ;
+
+# create the other scripts
+HAIKU_IMAGE_MAKE_DIRS_SCRIPT = <HaikuImage>haiku.image-make-dirs ;
+HAIKU_IMAGE_COPY_FILES_SCRIPT = <HaikuImage>haiku.image-copy-files ;
+MakeLocate $(HAIKU_IMAGE_MAKE_DIRS_SCRIPT) $(HAIKU_IMAGE_COPY_FILES_SCRIPT)
+	: $(HAIKU_OUTPUT_DIR) ;
+
+CreateHaikuImageMakeDirectoriesScript $(HAIKU_IMAGE_MAKE_DIRS_SCRIPT) ;
+CreateHaikuImageCopyFilesScript $(HAIKU_IMAGE_COPY_FILES_SCRIPT) ;
+
+# Convenience wrapper rule around BuildHaikuImage.
+rule _BuildHaikuImage
+{
+	# _BuildHaikuImage <image target> : <isImage> ;
+	#
+	local image = $(1) ;
+	local isImage = $(2) ;
+
+	# build the image
+	# HAIKU_IMAGE_EARLY_USER_SCRIPTS, HAIKU_IMAGE_LATE_USER_SCRIPTS can be
+	# specified by the user.
+	BuildHaikuImage $(image) :
+		$(HAIKU_IMAGE_INIT_VARIABLES_SCRIPT)
+		$(HAIKU_IMAGE_EARLY_USER_SCRIPTS)
+		$(HAIKU_IMAGE_MAKE_DIRS_SCRIPT)
+		$(HAIKU_IMAGE_COPY_FILES_SCRIPT)
+		$(HAIKU_IMAGE_LATE_USER_SCRIPTS)
+		: $(isImage)
+	;
+
+	# remove the scripts we have generated
+	RmTemps $(image) :
+		$(HAIKU_IMAGE_INIT_VARIABLES_SCRIPT)
+		$(HAIKU_IMAGE_MAKE_DIRS_SCRIPT)
+		$(HAIKU_IMAGE_COPY_FILES_SCRIPT)
+	;
+}
+
+# build the image
+_BuildHaikuImage $(HAIKU_IMAGE) : true ;
+NotFile haiku-image ;
+Depends haiku-image : $(HAIKU_IMAGE) ;
+
+# install Haiku into a directory
+NotFile install-haiku ;
+_BuildHaikuImage install-haiku : 0 ;

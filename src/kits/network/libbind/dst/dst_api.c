@@ -46,7 +46,6 @@ static const char rcsid[] = "$Header: /tmp/bonefish/open-beos/current/src/kits/n
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <memory.h>
 #include <ctype.h>
 #include <time.h>
 #include <sys/param.h>

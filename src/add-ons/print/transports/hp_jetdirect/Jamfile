@@ -1,6 +1,8 @@
-SubDir OBOS_TOP src add-ons print transports hp_jetdirect ;
+SubDir HAIKU_TOP src add-ons print transports hp_jetdirect ;
 
-SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print transports shared ] ;
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons print transports shared ] ;
 
 Addon HP\ JetDirect : Print transport : 
 	print_transport.cpp 
@@ -8,7 +10,7 @@ Addon HP\ JetDirect : Print transport :
 	SetupWindow.cpp
 ;
 
-LinkSharedOSLibs HP\ JetDirect : be $(NETAPI_LIB) ;
+LinkAgainst HP\ JetDirect : be $(NETAPI_LIB) ;
 
 Package haiku-printingkit-cvs :
 	HP\ JetDirect :

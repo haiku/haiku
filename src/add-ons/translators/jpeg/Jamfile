@@ -1,9 +1,13 @@
-SubDir OBOS_TOP src add-ons translators jpeg ;
+SubDir HAIKU_TOP src add-ons translators jpeg ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 # Let Jam know where to find some of our source files
 SEARCH_SOURCE += [ FDirName $(SUBDIR) libjpeg ] ;
 
 SubDirC++Flags [ FDefines BEOS_R5_COMPATIBLE ] ;
+
+SubDirSysHdrs [ FDirName $(SUBDIR) libjpeg ] ;
 
 local jpeg_files = 
 	# libjpeg
@@ -81,9 +85,9 @@ Translator JPEGTranslator :
 	JPEGTranslator.cpp
 
 	$(jpeg_files)
-	;
 
-LinkSharedOSLibs JPEGTranslator : libbe.so libtranslation.so ;
+	: be translation
+;
 
 Package haiku-translationkit-cvs :
 	JPEGTranslator :

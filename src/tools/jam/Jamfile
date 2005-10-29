@@ -61,6 +61,16 @@ DEFINES += OPT_JAMFILE_CACHE_EXT ;
 
 ### LOCAL CHANGE
 # 
+# Include rule profiling support, if specified in the environment.
+#
+if $(OPT_RULE_PROFILING_EXT) {
+	DEFINES += OPT_RULE_PROFILING_EXT ;
+}
+#
+### LOCAL CHANGE
+
+### LOCAL CHANGE
+# 
 # Include stat cache server under BeOS.
 #
 if $(OS) = BEOS {
@@ -128,8 +138,11 @@ if $(OS) = BEOS {
 
 Main 		jam : jam.c jambase.c ;
 LinkLibraries 	jam : libjam.a ;
-LINKLIBS on jam += -lnet ;
 GenFile 	jambase.c : mkjambase Jambase ;
+
+if $(OS) = BEOS {
+	LINKLIBS on jam += -lnet ;
+}
 
 Library         libjam.a :
 		    builtins.c command.c compile.c $(code) expand.c
@@ -164,7 +177,7 @@ if $(OS) = BEOS {
 			do
 				for version in release debug_1 debug_2
 				do
-					PATH=../../../objects/${arch}.${version}.${plat}/tools/rc/rc
+					PATH=../../../generated/objects/${plat}/${arch}/${version}/tools/rc/rc
 					if [ -f $PATH ]
 					then
 						RC=$PATH

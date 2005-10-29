@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src tests kits net new_stack stack ;
+SubDir HAIKU_TOP src tests kits net new_stack stack ;
 
-UseHeaders [ FDirName $(OBOS_TOP) src tests kits net new_stack headers ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net new_stack headers ] ;
 
 Addon <v2>stack : userland network_v2 :	
 	stack.c
@@ -11,4 +11,4 @@ Addon <v2>stack : userland network_v2 :
 	dump.c
 ;
 
-LinkSharedOSLibs <v2>stack : <installed>new_stack_tester be ;
+LinkAgainst <v2>stack : <installed>new_stack_tester be ;

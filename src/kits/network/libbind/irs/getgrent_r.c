@@ -16,7 +16,7 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static const char rcsid[] = "$Id: getgrent_r.c,v 1.1 2004/04/15 16:03:29 wkornew Exp $";
+static const char rcsid[] = "$Id$";
 #endif /* LIBC_SCCS and not lint */
 
 #include <port_before.h>

@@ -1,3 +1,3 @@
-SubDir OBOS_TOP src add-ons input_server filters ;
+SubDir HAIKU_TOP src add-ons input_server filters ;
 
-SubInclude OBOS_TOP src add-ons input_server filters screensaver ;
+SubInclude HAIKU_TOP src add-ons input_server filters screensaver ;

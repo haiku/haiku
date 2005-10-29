@@ -1,7 +1,7 @@
-SubDir OBOS_TOP src tools copy_to_bfs_image ;
+SubDir HAIKU_TOP src tools copy_to_bfs_image ;
 
-SubDirHdrs $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ;
-SubDirHdrs $(OBOS_TOP) src tests add-ons kernel file_systems bfs r5 ;
+SubDirHdrs $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell ;
+SubDirHdrs $(HAIKU_TOP) src tests add-ons kernel file_systems bfs r5 ;
 
 UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
 
@@ -42,16 +42,16 @@ SEARCH on [ FGristFiles
 		Volume.cpp BPlusTree.cpp Inode.cpp Index.cpp Query.cpp Journal.cpp
 		BlockAllocator.cpp kernel_interface_r5.cpp Utility.cpp BufferPool.cpp
 		Debug.cpp
-	] = [ FDirName $(OBOS_TOP) src tests add-ons kernel file_systems bfs r5 ] ;
+	] = [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems bfs r5 ] ;
 
 SEARCH on [ FGristFiles
 		kernel_cpp.cpp
-	] = [ FDirName $(OBOS_TOP) src system kernel util ] ;
+	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
 SEARCH on [ FGristFiles
 		strlcat.c
-	] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
+	] = [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
 
 SEARCH on [ FGristFiles
 		rootfs.c initfs.c kernel.c cache.c sl.c stub.c sysdep.c hexdump.c argv.c errors.cpp
-	] = [ FDirName $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ] ;
+	] = [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell ] ;

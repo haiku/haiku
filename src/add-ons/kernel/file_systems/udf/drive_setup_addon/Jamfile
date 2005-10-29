@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel file_systems udf drive_setup_addon ;
+SubDir HAIKU_TOP src add-ons kernel file_systems udf drive_setup_addon ;
 
 # save original optimization level
 oldOPTIM = $(OPTIM) ;
@@ -26,7 +26,7 @@ oldOPTIM = $(OPTIM) ;
 }
 
 UsePrivateHeaders [ FDirName kernel util ] ;
-SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons kernel file_systems udf ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems udf ] ;
 
 # Note that the add-on is named "i-udf-ds" to put it alphabetically
 # before the standard iso9660 add-on, thus giving it first dibs at
@@ -45,7 +45,7 @@ Addon i-udf-ds : [ FDirName drive_setup fs ] :
 
 SEARCH on [ FGristFiles
 		Recognition.cpp UdfDebug.cpp UdfString.cpp UdfStructures.cpp Utils.cpp
-	] = [ FDirName $(OBOS_TOP) src add-ons kernel file_systems udf ] ;
+	] = [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems udf ] ;
 
 rule InstallUDFDS
 {

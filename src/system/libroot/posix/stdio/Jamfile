@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src system libroot posix stdio ;
+SubDir HAIKU_TOP src system libroot posix stdio ;
 
 KernelMergeObject posix_stdio.o :
 	_fseek.c

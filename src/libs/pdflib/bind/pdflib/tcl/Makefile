@@ -1,5 +1,5 @@
 # Makefile for PDFlib's Tcl binding
-# $Id: Makefile,v 1.1 2004/10/06 17:46:44 laplace Exp $
+# $Id$
 
 top_builddir	= ../../..
 

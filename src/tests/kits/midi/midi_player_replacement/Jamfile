@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kits midi midi_player_replacement ;
+SubDir HAIKU_TOP src tests kits midi midi_player_replacement ;
 
 SimpleTest MidiPlayer2
 	: # Midi Class

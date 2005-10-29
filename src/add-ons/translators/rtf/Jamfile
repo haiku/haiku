@@ -1,7 +1,7 @@
-SubDir OBOS_TOP src add-ons translators rtf ;
+SubDir HAIKU_TOP src add-ons translators rtf ;
 
 # Include code from shared translator directory
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons translators shared ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons translators shared ] ;
 
 # It's called RTF-Translator (with a dash) to differentiate it from the
 # RTFTranslator that comes with Gobe Productive (that doesn't support
@@ -17,9 +17,9 @@ Translator RTF-Translator :
 
 	# shared classes
 	TranslatorWindow.cpp
-	;
 
-LinkSharedOSLibs RTF-Translator : be translation ;
+	: be translation
+;
 
 Package haiku-translationkit-cvs :
 	RTF-Translator

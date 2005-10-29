@@ -10,7 +10,7 @@
  |                                                                           |
  *---------------------------------------------------------------------------*/
 
-/* $Id: pc_unicode.h,v 1.1 2004/10/06 17:51:27 laplace Exp $
+/* $Id$
  *
  * Unicode glyph name conversion routines
  *

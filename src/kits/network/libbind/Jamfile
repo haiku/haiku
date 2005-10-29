@@ -1,11 +1,26 @@
-SubDir OBOS_TOP src kits network libbind ;
+SubDir HAIKU_TOP src kits network libbind ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders net ;
-UseHeaders [ FDirName $(SUBDIR) headers ] ;
+UseHeaders [ FDirName $(SUBDIR) headers ] : true ;
+SubDirSysHdrs $(SUBDIR) ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# We need the public network headers also when not compiling for Haiku.
+		# Unfortunately we get more than we want, namely all POSIX headers.
+	UseHeaders [ FStandardOSHeaders ] : true ;
+		# Needed for <support/Errors.h> and maybe other stuff.
+
+	# Remove _NO_INLINE_ASM from the defines. Otherwise we get
+	# references to tls_get/set() etc. that don't exist under BeOS.
+	TARGET_DEFINES = [ FFilter $(TARGET_DEFINES) : _NO_INLINE_ASM ] ;
+}
 
 # our libroot contains functions that are missing in BeOS (e.g.: strlcat)
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src system libroot posix pthread ] ;
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system libroot posix pthread ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
 
 # private sources for this port
 SEARCH_SOURCE += [ FDirName $(SUBDIR) src ] ;
@@ -35,7 +50,7 @@ if ( $(TARGET_PLATFORM) = haiku ) {
 	PLATFORM_LIBS = root be ;
 }
 
-SharedLibrary "bind" :
+SharedLibrary libbind.so :
 	# dst
 	dst_api.c
 	hmac_link.c
@@ -182,15 +197,15 @@ SharedLibrary "bind" :
 	strsep.c
 ;
 
-LinkSharedOSLibs libbind.so :
+LinkAgainst libbind.so :
 	$(PLATFORM_LIBS)
 	libsocket.so 
 	libnet.so # for gethostname()
 ;
 
 # Installation -- in the test directory for the time being
-OBOSInstallRelSymLink install-networking
-	: [ FDirName $(OBOS_TEST_DIR) kits net lib ]
+HaikuInstallRelSymLink install-networking
+	: [ FDirName $(HAIKU_TEST_DIR) kits net lib ]
 	: libbind.so
 	: installed-networking-test ;
 

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src preferences time ;
+SubDir HAIKU_TOP src preferences time ;
 
 Preference Time : 
 	AnalogClock.cpp 

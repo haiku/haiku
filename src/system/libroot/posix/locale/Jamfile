@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src system libroot posix locale ;
+SubDir HAIKU_TOP src system libroot posix locale ;
 
 KernelMergeObject posix_locale.o :
 	#ctype.c

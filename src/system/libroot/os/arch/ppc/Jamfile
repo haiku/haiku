@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src system libroot os arch ppc ;
+SubDir HAIKU_TOP src system libroot os arch ppc ;
 
-KernelMergeObject os_arch_$(OBOS_ARCH).o :
+KernelMergeObject os_arch_$(TARGET_ARCH).o :
 	<$(SOURCE_GRIST)>atomic.S
 	<$(SOURCE_GRIST)>byteorder.S
 #	<$(SOURCE_GRIST)>systeminfo.c
@@ -11,7 +11,7 @@ KernelMergeObject os_arch_$(OBOS_ARCH).o :
 	-fPIC -DPIC
 	;
 
-MergeObjectFromObjects kernel_os_arch_$(OBOS_ARCH).o :
+MergeObjectFromObjects kernel_os_arch_$(TARGET_ARCH).o :
 	<$(SOURCE_GRIST)>atomic.o
 	<$(SOURCE_GRIST)>byteorder.o
 	<$(SOURCE_GRIST)>system_time.o

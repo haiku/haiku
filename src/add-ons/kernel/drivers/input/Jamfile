@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel drivers input ;
+SubDir HAIKU_TOP src add-ons kernel drivers input ;
 
-SubInclude OBOS_TOP src add-ons kernel drivers input ps2_hid ;
-SubInclude OBOS_TOP src add-ons kernel drivers input usb_hid ;
+SubInclude HAIKU_TOP src add-ons kernel drivers input ps2_hid ;
+SubInclude HAIKU_TOP src add-ons kernel drivers input usb_hid ;

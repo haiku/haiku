@@ -1,11 +1,23 @@
-SubDir OBOS_TOP src add-ons kernel network ppp shared libppp ;
+SubDir HAIKU_TOP src add-ons kernel network ppp shared libppp ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FStandardOSHeaders ] : true ;
+		# Needed for <support/Errors.h> and maybe other stuff.
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# We need the public network headers also when not compiling for Haiku.
+		# Unfortunately we get more than we want, namely all POSIX headers.
+}
 
 UsePrivateHeaders net ;
-UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libppp headers ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libppp
+	headers ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
+	libkernelppp headers ] : true ;
 
 
-StaticLibrary ppp :
+StaticLibrary libppp.a :
 	strlcat.c
 	driver_settings.c
 	settings_tools.cpp
@@ -18,7 +30,7 @@ StaticLibrary ppp :
 	MessageDriverSettingsUtils.cpp
 ;
 
-SEARCH on [ FGristFiles strlcat.c ] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
-SEARCH on [ FGristFiles driver_settings.c ] = [ FDirName $(OBOS_TOP) src system libroot os ] ;
-SEARCH on [ FGristFiles settings_tools.cpp ] = [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
-SEARCH on [ FGristFiles KPPPUtils.cpp ] = [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
+SEARCH on [ FGristFiles strlcat.c ] = [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
+SEARCH on [ FGristFiles driver_settings.c ] = [ FDirName $(HAIKU_TOP) src system libroot os ] ;
+SEARCH on [ FGristFiles settings_tools.cpp ] = [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
+SEARCH on [ FGristFiles KPPPUtils.cpp ] = [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkernelppp ] ;

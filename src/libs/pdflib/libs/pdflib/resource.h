@@ -5,7 +5,7 @@
 
 // Next default values for new objects
 // 
-/* $Id: resource.h,v 1.1 2004/10/06 17:46:49 laplace Exp $ */
+/* $Id$ */
 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS

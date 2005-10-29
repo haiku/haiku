@@ -25,8 +25,8 @@
 //					short, and consists of non-changing samples in memory.
 //------------------------------------------------------------------------------
 
-#include <malloc.h>
-#include <memory.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <Entry.h>
 #include <MediaFile.h>

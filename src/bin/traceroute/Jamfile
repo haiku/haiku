@@ -1,4 +1,12 @@
-SubDir OBOS_TOP src bin traceroute ;
+SubDir HAIKU_TOP src bin traceroute ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# We need the public network headers also when not compiling for Haiku.
+		# Unfortunately we get more than we want, namely all POSIX headers.
+}
 
 UsePrivateHeaders net ;
 
@@ -11,8 +19,8 @@ BinCommand traceroute :
 	: $(NETWORK_LIBS) $(SELECT_UNAME_ETC_LIB) ;
 
 # Installation -- in the test directory for the time being
-OBOSInstall install-networking
-	: [ FDirName $(OBOS_TEST_DIR) kits net ]
+HaikuInstall install-networking
+	: [ FDirName $(HAIKU_TEST_DIR) kits net ]
 	: traceroute ;
 
 Package haiku-networkingkit-cvs :

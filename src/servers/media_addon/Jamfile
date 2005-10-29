@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src servers media_addon ;
+SubDir HAIKU_TOP src servers media_addon ;
 
 UsePrivateHeaders media ;
 
@@ -6,11 +6,12 @@ AddResources media_addon_server : media_addon_server.rdef ;
 
 # That's ugly. The header (ServerInterface.h) should reside in
 # headers/private/media.
-SubDirHdrs [ FDirName $(OBOS_TOP) src servers media ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src servers media ] ;
 
 Server media_addon_server :
 	main.cpp
 	MediaFilePlayer.cpp
 	SystemTimeSource.cpp
+	:
+	be libmedia.so
 ;
-LinkSharedOSLibs media_addon_server : be libmedia.so ;

@@ -8,7 +8,7 @@
  */
 
 
-/* $Id: inffixed.h,v 1.1 2004/10/06 17:46:48 laplace Exp $ */
+/* $Id$ */
 
 local uInt fixed_bl = 9;
 local uInt fixed_bd = 5;

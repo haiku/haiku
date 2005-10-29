@@ -252,8 +252,8 @@ extern "C" {
 
 ssize_t    read_pos(int fd, fs_off_t _pos, void *data,  size_t nbytes);
 ssize_t    write_pos(int fd, fs_off_t _pos, const void *data,  size_t nbytes);
-ssize_t    readv_pos(int fd, fs_off_t _pos, struct iovec *iov, int count);
-ssize_t    writev_pos(int fd, fs_off_t _pos, struct iovec *iov,  int count);
+ssize_t    readv_pos(int fd, fs_off_t _pos, const struct iovec *iov, int count);
+ssize_t    writev_pos(int fd, fs_off_t _pos, const struct iovec *iov,  int count);
 
 #ifdef __cplusplus
 }

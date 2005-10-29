@@ -9,7 +9,7 @@
  */
 
 
-/* $Id: inffast.h,v 1.1 2004/10/06 17:46:48 laplace Exp $ */
+/* $Id$ */
 
 extern int inflate_fast OF((
     uInt,

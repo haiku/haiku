@@ -1,23 +1,21 @@
-SubDir OBOS_TOP src tools gensyscalls ;
+SubDir HAIKU_TOP src tools gensyscalls ;
 
 # build gensyscallinfos
 
 BuildPlatformMain gensyscallinfos : gensyscallinfos.cpp ;
-LinkSharedOSLibs gensyscallinfos : $(BUILD_LIBSTDC++) ;
+LinkAgainst gensyscallinfos : $(HOST_LIBSTDC++) ;
 
 
 # generate the syscall infos source file
 
-SetupObjectsDir ;
-
 local syscallsHeader = [ FGristFiles syscalls.h ] ;
-SEARCH on $(syscallsHeader) = [ FDirName $(OBOS_TOP) headers private kernel ] ;
+SEARCH on $(syscallsHeader) = [ FDirName $(HAIKU_TOP) headers private kernel ] ;
 
 local syscallsHeaderPP = [ FGristFiles syscalls.h.pp ] ;
-LOCATE on $(syscallsHeaderPP) = $(LOCATE_SOURCE) ;
+MakeLocateArch $(syscallsHeaderPP) ;
 
 local syscallInfos = [ FGristFiles gensyscalls_infos.c ] ;
-LOCATE on $(syscallInfos) = $(LOCATE_SOURCE) ;
+MakeLocateArch $(syscallInfos) ;
 
 rule GenSyscallInfos {
 	Depends $(1) : gensyscallinfos $(2) ;
@@ -34,21 +32,21 @@ GenSyscallInfos $(syscallInfos) : $(syscallsHeaderPP) ;
 # build gensyscalls
 
 BuildPlatformMain gensyscalls : gensyscalls.cpp $(syscallInfos:S=$(SUFOBJ)) ;
-LinkSharedOSLibs gensyscalls : $(BUILD_LIBSTDC++) ;
+LinkAgainst gensyscalls : $(HOST_LIBSTDC++) ;
 UsePrivateObjectHeaders gensyscalls.cpp : kernel ;
-UseArchObjectHeaders gensyscalls.cpp : $(OBOS_ARCH) ;
+UseArchObjectHeaders gensyscalls.cpp : $(TARGET_ARCH) ;
 
 
 # generate the output files
 
 # place them where there are needed
-MakeLocate <syscalls>syscalls.S.inc : [ FObjectsDir src system libroot os ] ;
-MakeLocate <syscalls>syscall_dispatcher.h : [ FObjectsDir src system kernel ] ;
-MakeLocate <syscalls>syscall_numbers.h : [ FObjectsDir src system kernel ] ;
-MakeLocate <syscalls>syscall_table.h : [ FObjectsDir src system kernel ] ;
-MakeLocate <syscalls>strace_syscalls.h : [ FObjectsDir src bin strace ] ;
+local dir = $(HAIKU_COMMON_DEBUG_OBJECT_DIR) ;
+MakeLocate <syscalls>syscalls.S.inc : [ FDirName $(dir) system libroot os ] ;
+MakeLocate <syscalls>syscall_dispatcher.h : [ FDirName $(dir) system kernel ] ;
+MakeLocate <syscalls>syscall_numbers.h : [ FDirName $(dir) system kernel ] ;
+MakeLocate <syscalls>syscall_table.h : [ FDirName $(dir) system kernel ] ;
+MakeLocate <syscalls>strace_syscalls.h : [ FDirName $(dir) bin strace ] ;
 
-Depends <dir>objects/$(OBOS_TARGET)/kernel/core : <dir>objects/$(OBOS_TARGET)/kernel ;
 
 rule GenSyscallsFile {
 	Depends $(1) : gensyscalls ;
@@ -104,39 +102,42 @@ GenSyscallsSTrace <syscalls>strace_syscalls.h ;
 
 # preprocess the syscalls header
 
-SetupIncludes ;
 UsePrivateHeaders kernel ;
-UseArchHeaders $(OBOS_ARCH) ;
+UseArchHeaders $(TARGET_ARCH) ;
 
-rule Preprocess
+rule PreprocessSyscalls
 {
 	Depends $(<) : $(>) ;
 
-	HDRS on $(<) = $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ;
+	local headers = [ on $(1) return $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ] ;
+	local sysHeaders = [ on $(1) return $(SUBDIRSYSHDRS) $(SYSHDRS) ]
+		$(HAIKU_HDRS) ;
+
+	HDRS on $(<) = $(headers) ;
+	SYSHDRS on $(<) = $(sysHeaders) ;
+
 	HDRRULE on $(>) = HdrRule ;
 	HDRSCAN on $(>) = $(HDRPATTERN) ;
-	HDRSEARCH on $(>) = 
-		$(SEARCH_SOURCE:E) $(SUBDIRHDRS) $(HDRS) $(STDHDRS) ;
-
+	HDRSEARCH on $(>) = $(headers) $(sysHeaders) $(STDHDRS) ;
 	HDRGRIST on $(>) = $(HDRGRIST) ;
 
-	DEFINES on $(<) += $(DEFINES) ;
+	DEFINES on $(<) += $(HAIKU_DEFINES) GEN_SYSCALL_INFOS_PROCESSING ;
 
-	CCFLAGS on $(<) += $(CCFLAGS) $(SUBDIRCCFLAGS) $(OPTIM)
-					   [ FDefines GEN_SYSCALL_INFOS_PROCESSING ] ;
-
-	CCHDRS on $(<) = [ on $(<) FIncludes $(HDRS) ] ;
+	CCFLAGS on $(<) += $(HAIKU_CCFLAGS) $(SUBDIRCCFLAGS) $(OPTIM) ;
+	CCHDRS on $(<) = [ FIncludes $(headers) ]
+		$(HDRS_INCLUDES_SEPARATOR) [ FSysIncludes $(sysHeaders) ] ;
 	CCDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
 }
 
-actions Preprocess 
+actions PreprocessSyscalls
 {
-	$(C++) -xc++ -E "$(2)" $(CCFLAGS) $(CCDEFS) $(CCHDRS) -o "$(1)" ;
+	$(HAIKU_C++) -xc++ -E "$(2)" $(CCFLAGS) $(CCDEFS) $(CCHDRS) -o "$(1)" ;
 }
 
-Preprocess $(syscallsHeaderPP) : $(syscallsHeader) ;
+PreprocessSyscalls $(syscallsHeaderPP) : $(syscallsHeader) ;
 
 
 # compile the syscall infos source file
 
+SYSHDRS on $(syscallInfos:S=$(SUFOBJ)) = $(HAIKU_HDRS) ;
 Object $(syscallInfos:S=$(SUFOBJ)) : $(syscallInfos) ;

@@ -1,9 +1,10 @@
-SubDir OBOS_TOP src bin sed lib ;
+SubDir HAIKU_TOP src bin sed lib ;
 
 SubDirCcFlags -DHAVE_CONFIG_H -w ;
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirSysHdrs $(SUBDIR) ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
-StaticLibrary sed : 
+StaticLibrary libsed.a : 
 #	alloca.c
 	getline.c 
 	getopt.c 

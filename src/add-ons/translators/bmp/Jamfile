@@ -1,7 +1,9 @@
-SubDir OBOS_TOP src add-ons translators bmp ;
+SubDir HAIKU_TOP src add-ons translators bmp ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 # Include BaseTranslator code from shared directory
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons translators shared ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons translators shared ] ;
 
 Translator BMPTranslator :
 	# shared classes
@@ -12,9 +14,10 @@ Translator BMPTranslator :
 	# BMPTranslator classes
 	BMPMain.cpp
 	BMPTranslator.cpp
-	BMPView.cpp ;
+	BMPView.cpp
 
-LinkSharedOSLibs BMPTranslator : be translation ;
+	: be translation
+;
 
 Package haiku-translationkit-cvs :
 	BMPTranslator :

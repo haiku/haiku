@@ -1,7 +1,9 @@
-SubDir OBOS_TOP src add-ons translators sgi ;
+SubDir HAIKU_TOP src add-ons translators sgi ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 # Include BaseTranslator code from shared directory
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons translators shared ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons translators shared ] ;
 
 Translator SGITranslator :
 	# shared classes
@@ -13,9 +15,10 @@ Translator SGITranslator :
 	SGIImage.cpp
 	SGIMain.cpp
 	SGITranslator.cpp
-	SGIView.cpp ;
+	SGIView.cpp
 
-LinkSharedOSLibs SGITranslator : be translation ;
+	: be translation
+;
 
 Package haiku-translationkit-cvs :
 	SGITranslator :

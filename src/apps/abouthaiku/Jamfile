@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps abouthaiku ;
+SubDir HAIKU_TOP src apps abouthaiku ;
 
 UsePrivateHeaders shared ;
 
@@ -6,12 +6,12 @@ if $(TARGET_PLATFORM) = r5 {
 	SubDirC++Flags -DR5_COMPATIBLE ;
 }
 
-App AboutHaiku :
+Application AboutHaiku :
 	AboutHaiku.cpp
 	: libbe.so libtranslation.so libroot.so
 	: AboutHaiku.rdef
 	;
 
 Includes [ FGristFiles AboutHaiku.rdef ] : [ FGristFiles haikulogo.png ] ;
-SEARCH on [ FGristFiles haikulogo.png ] = [ FDirName $(OBOS_TOP) src apps abouthaiku ] ;
+SEARCH on [ FGristFiles haikulogo.png ] = [ FDirName $(HAIKU_TOP) src apps abouthaiku ] ;
 

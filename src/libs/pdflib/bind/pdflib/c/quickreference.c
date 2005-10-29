@@ -1,4 +1,4 @@
-/* $Id: quickreference.c,v 1.1 2004/10/06 17:46:39 laplace Exp $
+/* $Id$
  *
  * PDFlib/PDI client: mini imposition demo
  */

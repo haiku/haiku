@@ -10,7 +10,7 @@ dnl     available, please check http://www.pdflib.com.                         |
 dnl                                                                            |
 dnl --------------------------------------------------------------------------*/
 
-dnl $Id: configure.in,v 1.1 2004/10/06 17:10:36 laplace Exp $
+dnl $Id$
 dnl 
 dnl Process this file with autoconf to produce a configure script.
 dnl 

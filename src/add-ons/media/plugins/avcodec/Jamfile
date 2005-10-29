@@ -1,6 +1,8 @@
-SubDir OBOS_TOP src add-ons media plugins avcodec ;
+SubDir HAIKU_TOP src add-ons media plugins avcodec ;
 
 UsePrivateHeaders media ;
+
+SubDirHdrs [ FDirName $(SUBDIR) libavcodec ] ;
 
 Addon avcodec : media plugins :
  	avcodec.cpp
@@ -13,8 +15,8 @@ Addon avcodec : media plugins :
 	false
 	:  
 	libavcodec.a
+	be
+	libmedia.so
 ;
 
-LinkSharedOSLibs avcodec : be libmedia.so ;
-
-SubInclude OBOS_TOP src add-ons media plugins avcodec libavcodec ;
+SubInclude HAIKU_TOP src add-ons media plugins avcodec libavcodec ;

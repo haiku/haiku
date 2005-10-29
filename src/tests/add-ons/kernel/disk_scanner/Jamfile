@@ -1,10 +1,10 @@
-SubDir OBOS_TOP src tests add-ons kernel disk_scanner ;
+SubDir HAIKU_TOP src tests add-ons kernel disk_scanner ;
 
 #UsePrivateHeaders $(DOT) ;
 #
 # the test app
 #
-#SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src system libroot os ] ;
+#SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system libroot os ] ;
 #SimpleTest DiskScannerTest : DiskScannerTest.cpp
 #	: <boot!home!config!lib>libkernelland_emu.so be stdc++.r4 ;
 #LOCATE on <installed>DiskScannerTest = [ on DiskScannerTest return $(LOCATE) ] ;
@@ -12,7 +12,7 @@ SubDir OBOS_TOP src tests add-ons kernel disk_scanner ;
 #
 # the add-on
 #
-#SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel disk_scanner ] ;
+#SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel disk_scanner ] ;
 #
 #{
 #	local defines = [ FDefines USERLAND ] ;
@@ -23,7 +23,7 @@ SubDir OBOS_TOP src tests add-ons kernel disk_scanner ;
 #Addon <userland>disk_scanner : userland disk_scanner :
 #	disk_scanner.c
 #;
-#LinkSharedOSLibs <userland>disk_scanner : libkernelland_emu.so ;
+#LinkAgainst <userland>disk_scanner : libkernelland_emu.so ;
 #
 # for convenience: this target builds all userland modules
 #
@@ -43,6 +43,6 @@ SubDir OBOS_TOP src tests add-ons kernel disk_scanner ;
 #	<userland>cdrom
 #;
 #
-#SubInclude OBOS_TOP src tests add-ons kernel disk_scanner fs ;
-#SubInclude OBOS_TOP src tests add-ons kernel disk_scanner partition ;
-#SubInclude OBOS_TOP src tests add-ons kernel disk_scanner session ;
+#SubInclude HAIKU_TOP src tests add-ons kernel disk_scanner fs ;
+#SubInclude HAIKU_TOP src tests add-ons kernel disk_scanner partition ;
+#SubInclude HAIKU_TOP src tests add-ons kernel disk_scanner session ;

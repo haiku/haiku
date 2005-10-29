@@ -54,7 +54,7 @@ main(int argc, const char *const *argv)
 	}
 
 	// prepare the command string
-	char command[1024];
+	char command[20480];
 	prepare_command_string(argv + 1, argc - 1, command, sizeof(command));
 
 	// send the command

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src system libroot posix glibc arch ;
+SubDir HAIKU_TOP src system libroot posix glibc arch ;
 
-SubInclude OBOS_TOP src system libroot posix glibc arch $(OBOS_ARCH) ;
+SubInclude HAIKU_TOP src system libroot posix glibc arch $(TARGET_ARCH) ;
 

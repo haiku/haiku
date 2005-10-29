@@ -1,8 +1,8 @@
-SubDir OBOS_TOP src add-ons media plugins mp4_reader libMP4 ;
+SubDir HAIKU_TOP src add-ons media plugins mp4_reader libMP4 ;
 
 UseLibraryHeaders zlib ;
 
-StaticLibrary mp4reader :
+StaticLibrary libmp4reader.a :
 	MP4Parser.cpp
 	MP4FileReader.cpp
 	MP4Atom.cpp

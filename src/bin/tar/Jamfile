@@ -1,11 +1,8 @@
-SubDir OBOS_TOP src bin tar ;
+SubDir HAIKU_TOP src bin tar ;
 
 # filter warnings we don't want here
-local originalCCFlags = $(CCFLAGS) ;
-CCFLAGS = [ Filter $(CCFLAGS) : -Wall -Wmissing-prototypes -Wsign-compare ] ;
+TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
+	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
-SubInclude OBOS_TOP src bin tar lib ;
-SubInclude OBOS_TOP src bin tar src ;
-
-# restore CCFLAGS
-CCFLAGS = $(originalCCFlags) ;
+SubInclude HAIKU_TOP src bin tar lib ;
+SubInclude HAIKU_TOP src bin tar src ;

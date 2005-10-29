@@ -1,8 +1,11 @@
-SubDir OBOS_TOP src add-ons translators ppm ;
+SubDir HAIKU_TOP src add-ons translators ppm ;
 
-Translator PPMTranslator : PPMMain.cpp PPMTranslator.cpp colorspace.cpp ;
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
-LinkSharedOSLibs PPMTranslator : be translation ;
+Translator PPMTranslator
+	: PPMMain.cpp PPMTranslator.cpp colorspace.cpp
+	: be translation
+;
 
 Package haiku-translationkit-cvs :
 	PPMTranslator :

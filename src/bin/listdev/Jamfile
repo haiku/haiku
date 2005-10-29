@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src bin listdev ;
+SubDir HAIKU_TOP src bin listdev ;
 
 BinCommand listdev :
 	cm_wrapper.c

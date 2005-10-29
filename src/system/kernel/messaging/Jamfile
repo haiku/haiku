@@ -1,16 +1,16 @@
-SubDir OBOS_TOP src system kernel messaging ;
+SubDir HAIKU_TOP src system kernel messaging ;
 
 UsePrivateHeaders [ FDirName kernel ] ;
 #UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 #UsePrivateHeaders [ FDirName kernel fs ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;	# for <KMessage.h>
 UsePrivateHeaders shared ;
-UseHeaders [ FDirName $(OBOS_TOP) src system kernel disk_device_manager ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src system kernel disk_device_manager ] ;
 	# for "Locker.h"
 
 KernelMergeObject kernel_messaging.o :
 	KMessage.cpp
 	MessagingService.cpp
 
-	: -fno-pic -Wno-unused -D_KERNEL_MODE
+	: -fno-pic -Wno-unused
 	;

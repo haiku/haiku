@@ -16,7 +16,7 @@
  */
 
 /*
- * $Id: irp.h,v 1.1 2004/04/25 22:53:40 phoudoin Exp $
+ * $Id$
  */
 
 #ifndef _IRP_H_INCLUDED

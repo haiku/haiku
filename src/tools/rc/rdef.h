@@ -34,15 +34,16 @@
 extern "C" {
 #endif
 
-#if __INTEL__
-# ifdef _BUILDING_RDEF
-#  define _IMPEXP_RDEF __declspec(dllexport)
-# else
-#  define _IMPEXP_RDEF __declspec(dllimport)
-# endif
-#else
+// bonefish: What was this needed for?
+//#if __INTEL__
+//# ifdef _BUILDING_RDEF
+//#  define _IMPEXP_RDEF __declspec(dllexport)
+//# else
+//#  define _IMPEXP_RDEF __declspec(dllimport)
+//# endif
+//#else
 # define _IMPEXP_RDEF
-#endif
+//#endif
 
 /**
  * Whether to overwrite or merge with the output file. With this flag, the

@@ -1,9 +1,11 @@
-SubDir OBOS_TOP src system libroot posix glibc ctype ;
+SubDir HAIKU_TOP src system libroot posix glibc ctype ;
 
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc include arch $(OBOS_ARCH) ;
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc include ;
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc locale ;
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc ;
+SubDirSysHdrs $(SUBDIR) ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch
+	$(TARGET_ARCH) ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 
 KernelMergeObject posix_gnu_ctype.o :
 	ctype.c

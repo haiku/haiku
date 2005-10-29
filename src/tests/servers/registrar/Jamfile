@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests servers registrar ;
+SubDir HAIKU_TOP src tests servers registrar ;
 
 local libbe ;
 if $(TARGET_PLATFORM) = r5 {
@@ -35,7 +35,7 @@ if $(TARGET_PLATFORM) = r5 {
 		: shutdown.cpp
 		: <boot!home!config!lib>libopenbeos.so ;
 	
-	SEARCH on [ FGristFiles shutdown.cpp ] = [ FDirName $(OBOS_TOP) src bin ] ;
+	SEARCH on [ FGristFiles shutdown.cpp ] = [ FDirName $(HAIKU_TOP) src bin ] ;
 }
 
 # Two small test apps for testing the shutdown process.
@@ -55,3 +55,62 @@ SimpleTest user_shutdown_reply
 	: $(libbe)
 ;
 
+
+# the registrar itself
+
+SetSupportedPlatformsForTarget haiku_registrar : r5 bone dano ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FStandardOSHeaders ] : true ;
+	UsePrivateHeaders $(DOT) ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# TODO: POSIX headers shouldn't be used. Needed for strlcpy() and
+		# <sys/select.h>.
+}
+
+UsePrivateHeaders app ;
+UsePrivateHeaders kernel ;
+UsePrivateHeaders shared ;
+UsePrivateHeaders storage ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers registrar ] ;
+
+Server haiku_registrar
+ 	:
+	AppInfoList.cpp
+	AppInfoListMessagingTargetSet.cpp
+	Clipboard.cpp
+	ClipboardHandler.cpp
+	Event.cpp
+	EventMaskWatcher.cpp
+	EventQueue.cpp
+	MessageDeliverer.cpp
+	MessageEvent.cpp
+	MessageHandler.cpp
+	MessageRunnerManager.cpp
+	MessagingService.cpp
+	MIMEManager.cpp
+	PriorityMessageQueue.cpp
+	RecentApps.cpp
+	RecentEntries.cpp
+	Referenceable.cpp
+	Registrar.cpp
+	RosterAppInfo.cpp
+	RosterSettingsCharStream.cpp
+	ShutdownProcess.cpp
+	TRoster.cpp
+	Watcher.cpp
+	WatchingService.cpp
+
+	R5Compatibility.cpp
+	:
+	libopenbeos.so
+	stdc++.r4
+	:
+	registrar.rdef
+;
+
+if $(TARGET_PLATFORM) != haiku {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : haiku_registrar
+		: tests!apps ;
+}

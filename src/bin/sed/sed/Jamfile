@@ -1,8 +1,8 @@
-SubDir OBOS_TOP src bin sed sed ;
+SubDir HAIKU_TOP src bin sed sed ;
 
 SubDirCcFlags -I ../lib -DHAVE_CONFIG_H  -DLOCALEDIR=\'\"/share/locale\"\' -w ;
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 BinCommand sed : 
 	compile.c 

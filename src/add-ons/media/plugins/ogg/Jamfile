@@ -1,8 +1,8 @@
-SubDir OBOS_TOP src add-ons media plugins ogg ;
+SubDir HAIKU_TOP src add-ons media plugins ogg ;
 
 UsePrivateHeaders media ;
 
-SubDirHdrs [ FDirName $(SUBDIR) libogg ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) libogg ] ;
 
 Addon ogg : media plugins :
 	OggReaderPlugin.cpp
@@ -16,9 +16,8 @@ Addon ogg : media plugins :
 	OggTobiasSeekable.cpp
 	OggVorbisStream.cpp
 	OggVorbisSeekable.cpp
-	: false : libogg.a
+	: false
+	: libogg.a be libmedia.so
 ;
 
-LinkSharedOSLibs ogg : be libmedia.so ;
-
-SubInclude OBOS_TOP src add-ons media plugins ogg libogg ;
+SubInclude HAIKU_TOP src add-ons media plugins ogg libogg ;

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src bin rmd160 ;
+SubDir HAIKU_TOP src bin rmd160 ;
 
 BinCommand rmd160 :
 	rmd160.c

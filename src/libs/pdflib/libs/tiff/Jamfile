@@ -1,11 +1,11 @@
-SubDir OBOS_TOP src libs pdflib libs tiff ;
+SubDir HAIKU_TOP src libs pdflib libs tiff ;
 
-SubDirHdrs [ FDirName $(OBOS_TOP) src libs pdflib libs pdcore ] ;
-SubDirHdrs [ FDirName $(OBOS_TOP) src libs pdflib libs flate ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src libs pdflib libs pdcore ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src libs pdflib libs flate ] ;
 
 UseLibraryHeaders pdflib ;
 
-StaticLibrary pdf : 
+StaticLibrary libpdf.a : 
 	tif_auxx.c
 	tif_close.c
 	tif_codec.c
@@ -33,6 +33,5 @@ StaticLibrary pdf :
 	tif_version.c
 	tif_warning.c
 	tif_zip.c 
-: STATIC_LIBRARY_DIR
 ;
 

@@ -1,10 +1,10 @@
-SubDir OBOS_TOP src tests kernel boot heap ;
+SubDir HAIKU_TOP src tests kernel boot heap ;
 
 UsePublicHeaders support ;
 UsePrivateHeaders kernel ;
 
-SubDirHdrs $(OBOS_TOP) headers private kernel arch $(OBOS_ARCH) ;
-SubDirHdrs $(OBOS_TOP) headers private kernel boot platform $(OBOS_BOOT_PLATFORM) ;
+SubDirHdrs $(HAIKU_TOP) headers private kernel arch $(TARGET_ARCH) ;
+SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform $(TARGET_BOOT_PLATFORM) ;
 
 ObjectDefines heap.cpp : malloc=heap_malloc free=heap_free realloc=heap_realloc HEAP_TEST=1 ;
 
@@ -27,5 +27,5 @@ BuildPlatformTest heapTest :
 # Tell Jam where to find the utility sources
 SEARCH on [ FGristFiles 
 		heap.cpp
-	] = [ FDirName $(OBOS_TOP) src system boot loader ] ;
+	] = [ FDirName $(HAIKU_TOP) src system boot loader ] ;
 

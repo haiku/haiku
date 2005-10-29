@@ -1,5 +1,5 @@
-SubDir OBOS_TOP src bin bc ;
+SubDir HAIKU_TOP src bin bc ;
 
-SubInclude OBOS_TOP src bin bc lib ;
-SubInclude OBOS_TOP src bin bc bc ; 
-SubInclude OBOS_TOP src bin bc dc ; 
+SubInclude HAIKU_TOP src bin bc lib ;
+SubInclude HAIKU_TOP src bin bc bc ; 
+SubInclude HAIKU_TOP src bin bc dc ; 

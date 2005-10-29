@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel file_systems iso9660 ;
+SubDir HAIKU_TOP src add-ons kernel file_systems iso9660 ;
 
 # save original optimization level
 oldOPTIM = $(OPTIM) ;
@@ -22,7 +22,7 @@ oldOPTIM = $(OPTIM) ;
 	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
 }
 
-R5KernelAddon iso9660 : kernel file_systems :
+KernelAddon iso9660 : kernel file_systems :
 	iso.c
 	kernel_interface.c
 	;

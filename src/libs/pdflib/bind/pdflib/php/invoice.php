@@ -1,5 +1,5 @@
 <?php
-/* $Id: invoice.php,v 1.1 2004/10/06 17:46:43 laplace Exp $
+/* $Id$
  *
  * PDFlib client: invoice example in PHP
  */

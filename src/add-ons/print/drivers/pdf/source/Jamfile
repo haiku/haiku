@@ -1,8 +1,10 @@
-SubDir OBOS_TOP src add-ons print drivers pdf source ;
+SubDir HAIKU_TOP src add-ons print drivers pdf source ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders interface print ;
 
-SubDirHdrs [ FDirName $(OBOS_TOP) src libs pdflib libs pdflib ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src libs pdflib libs pdflib ] ;
 
 AddResources PDF\ Writer : 
 	PDFWriter.rdef
@@ -44,7 +46,7 @@ Addon PDF\ Writer : Print :
 	XReferences.cpp	
 ;
 
-LinkSharedOSLibs PDF\ Writer : 
+LinkAgainst PDF\ Writer : 
 	be 
 	textencoding 
 	translation

@@ -1,7 +1,7 @@
-SubDir OBOS_TOP src system ;
+SubDir HAIKU_TOP src system ;
 
 KernelLd boot_loader :
-	boot_platform_$(OBOS_BOOT_PLATFORM).o
+	boot_platform_$(TARGET_BOOT_PLATFORM).o
 	boot_loader.a
 	boot_partitions.a
 
@@ -13,7 +13,7 @@ KernelLd boot_loader :
 	libz.a
 
 	# libroot functions needed by the stage2 boot loader
-	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>byteorder.o
+	<$(SOURCE_GRIST)!libroot!os!arch!$(TARGET_ARCH)>byteorder.o
 	<$(SOURCE_GRIST)!libroot>ctype.o
 	<$(SOURCE_GRIST)!libroot>kernel_vsprintf.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memset.o
@@ -34,10 +34,25 @@ KernelLd boot_loader :
 	<$(SOURCE_GRIST)!libroot!posix!string>strrchr.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtol.o
 	<$(SOURCE_GRIST)!libroot>qsort.o
-	<$(SOURCE_GRIST)!kernel!arch!$(OBOS_ARCH)>cpuid.o
-	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/boot_loader.ld 
+	<$(SOURCE_GRIST)!kernel!arch!$(TARGET_ARCH)>cpuid.o
+	: $(SUBDIR)/ldscripts/$(TARGET_ARCH)/boot_loader.ld 
 	: -Bstatic
 	;
+
+rule BuildZbeos {
+	local zbeos = $(1) ;
+	local bootLoader = $(2) ;
+
+	Depends $(zbeos) : $(bootLoader) ;
+	MakeLocateDebug $(zbeos) ;
+}
+
+actions BuildZbeos {
+	rm -f $(1)
+	$(TARGET_OBJCOPY) -O binary $(2) $(1)
+}
+
+BuildZbeos zbeos : boot_loader ;
 
 KernelLd stage2 :
 	boot_arch_stage2.o
@@ -48,13 +63,12 @@ KernelLd stage2 :
 	<$(SOURCE_GRIST)!libroot!posix!string>memset.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memcpy.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strnlen.o
-	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/stage2.ld 
+	: $(SUBDIR)/ldscripts/$(TARGET_ARCH)/stage2.ld 
 	: -dN
 	:
-	: bootstrap
 	;
 
-KernelLd kernel_$(OBOS_ARCH) :
+KernelLd kernel_$(TARGET_ARCH) :
 	kernel_core.o
 	kernel_fs.o
 	kernel_vm.o
@@ -65,21 +79,19 @@ KernelLd kernel_$(OBOS_ARCH) :
 	kernel_messaging.o
 	kernel_debug.o
 
-	lib$(OBOS_ARCH).a
+	lib$(TARGET_ARCH).a
 
 	linkhack.so
 
 	# kernel libroot parts
 	kernel_os_main.o
-	kernel_os_arch_$(OBOS_ARCH).o
+	kernel_os_arch_$(TARGET_ARCH).o
 	kernel_posix.o
 
-	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/kernel.ld 
+	: $(SUBDIR)/ldscripts/$(TARGET_ARCH)/kernel.ld 
 	: -Bdynamic -export-dynamic -dynamic-linker /foo/bar
 	:
-	: kernel
 	;
-LINKLIBS on kernel_$(OBOS_ARCH) += $(KERNEL_C++_SUPPORT_LIBS) ;
 
 KernelLd kernel.so :
 	kernel_core.o
@@ -92,62 +104,38 @@ KernelLd kernel.so :
 	kernel_messaging.o
 	kernel_debug.o
 
-	lib$(OBOS_ARCH).a
+	lib$(TARGET_ARCH).a
 
 	linkhack.so
 
 	# kernel libroot parts
 	kernel_os_main.o
-	kernel_os_arch_$(OBOS_ARCH).o
+	kernel_os_arch_$(TARGET_ARCH).o
 	kernel_posix.o
 
-	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/kernel.ld 
+	: $(SUBDIR)/ldscripts/$(TARGET_ARCH)/kernel.ld 
 	: -Bdynamic -shared -export-dynamic -dynamic-linker /foo/bar
 	;
-LINKLIBS on kernel.so += $(KERNEL_C++_SUPPORT_LIBS) ;
 
-# ToDo: this is outdated; instead, the standard Be mechanism should be used
-KernelLd libglue.o :	# libglue.o is used for dynamic libraries
-	<$(SOURCE_GRIST)!glue!arch!$(OBOS_ARCH)>crti.o
-	$(LIBGCC_DIR)/crtbegin.o
-
-	$(LIBGCC_DIR)/crtend.o
-	<$(SOURCE_GRIST)!glue!arch!$(OBOS_ARCH)>crtn.o
-
-	<$(SOURCE_GRIST)!glue>init_term_dyn.o
-	:
-	: -r
-	: no_gcc
-	;
-
-UnarchiveObjects $(LIBGCC_OBJECTS) : $(LIBGCC_DIR)/libgcc.a ;
+UnarchiveObjects $(TARGET_GCC_LIBGCC_OBJECTS) : $(TARGET_GCC_LIBGCC) ;
 	# we need to link against libgcc.a objects and make
 	# it available to other applications as in BeOS
 
-# ToDo: Rewrite as SharedLibrary
-KernelLd libroot.so :
-	<$(SOURCE_GRIST)!glue!arch!$(OBOS_ARCH)>crti.o
-	$(LIBGCC_DIR)/crtbegin.o
-
-	<$(SOURCE_GRIST)!glue>init_term_dyn.o
-
-	$(LIBGCC_OBJECTS)
-	<$(SOURCE_GRIST)!libroot>libroot_init.o
-
+local librootObjects = 
 	os_main.o
-	os_arch_$(OBOS_ARCH).o
+	os_arch_$(TARGET_ARCH).o
 
-	posix_arch_$(OBOS_ARCH).o
+	posix_arch_$(TARGET_ARCH).o
 	posix_crypt.o
 	posix_locale.o
 	posix_main.o
 	posix_malloc.o
 	posix_math.o
-	posix_math_arch_$(OBOS_ARCH).o
+	posix_math_arch_$(TARGET_ARCH).o
 	posix_pthread.o
 	posix_signal.o
 	posix_stdio.o
-	posix_gnu_arch_$(OBOS_ARCH).o
+	posix_gnu_arch_$(TARGET_ARCH).o
 	posix_gnu_ctype.o
 	posix_gnu_ext.o
 	posix_gnu_libio.o
@@ -161,35 +149,22 @@ KernelLd libroot.so :
 	posix_sys.o
 	posix_time.o
 	posix_unistd.o
+;
 
-	$(LIBGCC_DIR)/crtend.o
-	<$(SOURCE_GRIST)!glue!arch!$(OBOS_ARCH)>crtn.o
+SharedLibraryFromObjects libroot.so : :
+	$(TARGET_GCC_LIBGCC_OBJECTS)
+	<$(SOURCE_GRIST)!libroot>libroot_init.o
 
-	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/library.ld
-	: -shared -soname libroot.so -Bdynamic -export-dynamic
-	: no_gcc
-	: beos/system/lib/libroot.so
-	;
-
-KernelLd libglue2.o :	# libglue2.o is used for executables
-	libglue.o
-	<$(SOURCE_GRIST)!glue>start_dyn.o
-	:
-	: -r
-	: no_gcc
-	;
-
-
-WriteKernelConfig $(OBOS_KERNEL_CONFIG) ;
-BuildKernel $(OBOS_KERNEL) : $(OBOS_KERNEL_CONFIG) ;
+	$(librootObjects:G=nogrist)
+;
 
 NotFile kernel ;
-Depends kernel : kernel_$(OBOS_ARCH) ;
+Depends kernel : kernel_$(TARGET_ARCH) ;
 Depends kernel.so : kernel ;
 	# kernel.so will be rebuilt with the kernel
 
-SubInclude OBOS_TOP src system boot ;
-SubInclude OBOS_TOP src system kernel ;
-SubInclude OBOS_TOP src system glue ;
-SubInclude OBOS_TOP src system libroot ;
-SubInclude OBOS_TOP src system runtime_loader ;
+SubInclude HAIKU_TOP src system boot ;
+SubInclude HAIKU_TOP src system kernel ;
+SubInclude HAIKU_TOP src system glue ;
+SubInclude HAIKU_TOP src system libroot ;
+SubInclude HAIKU_TOP src system runtime_loader ;

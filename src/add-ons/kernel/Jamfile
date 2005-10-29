@@ -1,13 +1,13 @@
-SubDir OBOS_TOP src add-ons kernel ;
+SubDir HAIKU_TOP src add-ons kernel ;
 
-SubInclude OBOS_TOP src add-ons kernel bus_managers ;
-SubInclude OBOS_TOP src add-ons kernel busses ;
-SubInclude OBOS_TOP src add-ons kernel console ;
-SubInclude OBOS_TOP src add-ons kernel disk_scanner ;
-SubInclude OBOS_TOP src add-ons kernel drivers ;
-SubInclude OBOS_TOP src add-ons kernel file_cache ;
-SubInclude OBOS_TOP src add-ons kernel file_systems ;
-SubInclude OBOS_TOP src add-ons kernel network ;
-SubInclude OBOS_TOP src add-ons kernel media ;
-SubInclude OBOS_TOP src add-ons kernel partitioning_systems ;
-SubInclude OBOS_TOP src add-ons kernel generic ;
+SubInclude HAIKU_TOP src add-ons kernel bus_managers ;
+SubInclude HAIKU_TOP src add-ons kernel busses ;
+SubInclude HAIKU_TOP src add-ons kernel console ;
+SubInclude HAIKU_TOP src add-ons kernel disk_scanner ;
+SubInclude HAIKU_TOP src add-ons kernel drivers ;
+SubInclude HAIKU_TOP src add-ons kernel file_cache ;
+SubInclude HAIKU_TOP src add-ons kernel file_systems ;
+SubInclude HAIKU_TOP src add-ons kernel network ;
+SubInclude HAIKU_TOP src add-ons kernel media ;
+SubInclude HAIKU_TOP src add-ons kernel partitioning_systems ;
+SubInclude HAIKU_TOP src add-ons kernel generic ;

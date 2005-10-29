@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src apps soundrecorder ;
+SubDir HAIKU_TOP src apps soundrecorder ;
 
-App SoundRecorder :
+Application SoundRecorder :
 	DrawButton.cpp
 	DrawingTidbits.cpp
 	FileUtils.cpp
@@ -20,7 +20,7 @@ App SoundRecorder :
 ;
 
 if $(TARGET_PLATFORM) = haiku {
-	LinkSharedOSLibs SoundRecorder : libbe.so libmedia.so libtracker.so ;
+	LinkAgainst SoundRecorder : libbe.so libmedia.so libtracker.so ;
 } else {
-	LinkSharedOSLibs SoundRecorder : be media tracker ;
+	LinkAgainst SoundRecorder : be media tracker ;
 }

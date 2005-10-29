@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kits app messaging ;
+SubDir HAIKU_TOP src tests kits app messaging ;
 
 UsePrivateHeaders app ;
 UsePrivateHeaders interface ;
@@ -18,7 +18,7 @@ SimpleTest PortLinkTest :
 	;
 
 SEARCH on [ FGristFiles PortLink.cpp LinkReceiver.cpp LinkSender.cpp ]
-	= [ FDirName $(OBOS_TOP) src kits app ] ;
+	= [ FDirName $(HAIKU_TOP) src kits app ] ;
 
 SEARCH on [ FGristFiles Shape.cpp Region.cpp RegionSupport.cpp ]
-	= [ FDirName $(OBOS_TOP) src kits interface ] ;
+	= [ FDirName $(HAIKU_TOP) src kits interface ] ;

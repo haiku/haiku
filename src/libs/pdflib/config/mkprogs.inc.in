@@ -1,5 +1,5 @@
 # Template to be included from every makefile that creates progs
-# $Id: mkprogs.inc.in,v 1.1 2004/10/06 17:46:45 laplace Exp $
+# $Id$
 #
 
 PROGS_BUILD = $(LIBTOOL_LD) $(CC) -static $(FLAGS) -o $@ \

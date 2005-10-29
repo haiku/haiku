@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src add-ons kernel drivers audio ac97 ichaudio lala ;
+SubDir HAIKU_TOP src add-ons kernel drivers audio ac97 ichaudio lala ;
 
-# R5KernelStaticLibrary lala :
+# R5KernelStaticLibrary liblala.a :
 # 	driver.c
 # ;
 

@@ -1,5 +1,5 @@
-SubDir OBOS_TOP src add-ons tracker ;
+SubDir HAIKU_TOP src add-ons tracker ;
 
-SubInclude OBOS_TOP src add-ons tracker zipomatic ;
-SubInclude OBOS_TOP src add-ons tracker filetype ;
+SubInclude HAIKU_TOP src add-ons tracker zipomatic ;
+SubInclude HAIKU_TOP src add-ons tracker filetype ;
 

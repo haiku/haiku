@@ -1,0 +1,21 @@
+SubDir HAIKU_TOP src build libbe support ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) headers build private shared ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers build private app ] : true ;
+
+USES_BE_API on <libbe_build>support_kit.o = true ;
+
+BuildPlatformMergeObject <libbe_build>support_kit.o :
+	Archivable.cpp
+	BlockCache.cpp
+	ByteOrder.cpp
+	DataBuffer.cpp
+	DataIO.cpp
+	BufferIO.cpp
+	Flattenable.cpp
+	List.cpp
+	Locker.cpp
+	PointerList.cpp
+	StopWatch.cpp
+	String.cpp
+;

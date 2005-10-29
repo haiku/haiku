@@ -1,10 +1,10 @@
-SubDir OBOS_TOP src system kernel disk_device_manager ;
+SubDir HAIKU_TOP src system kernel disk_device_manager ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) jobs ] ;
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kits storage ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits storage ] ;
 	# DiskDeviceTypes.cpp
 
-UsePrivateHeaders [ FDirName kernel boot platform $(OBOS_BOOT_PLATFORM) ] ;
+UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel fs ] ;
@@ -52,10 +52,10 @@ KernelMergeObject kernel_disk_device_manager.o :
 	# disk device types
 	DiskDeviceTypes.cpp
 
-	: -fno-pic -Wno-unused -D_KERNEL_MODE
+	: -fno-pic -Wno-unused
 ;
 
 # KFileDiskDevice.cpp needs the virtualdrive.h Header. Add it here to not
 # contaminate the include paths for the other files.
 ObjectHdrs [ FGristFiles KFileDiskDevice$(SUFOBJ) ]
-	: [ FDirName $(OBOS_TOP) src tests kits storage virtualdrive ] ;
+	: [ FDirName $(HAIKU_TOP) src tests kits storage virtualdrive ] ;

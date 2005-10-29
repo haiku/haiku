@@ -3,7 +3,7 @@
 		java.text.*,
 		java.util.*,
 		com.pdflib.pdflib" %><%
-    /* $Id: pdfclock.jsp,v 1.1 2004/10/06 17:46:41 laplace Exp $
+    /* $Id$
      *
      * PDFclock.jsp
      */

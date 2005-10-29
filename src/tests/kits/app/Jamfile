@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kits app ;
+SubDir HAIKU_TOP src tests kits app ;
 
 UsePrivateHeaders app ;
 
@@ -173,16 +173,16 @@ SimpleTest DanoMessageTest :
 
 SEARCH on [ FGristFiles
 		dano_message.cpp
-	] = [ FDirName $(OBOS_TOP) src kits app ] ;
+	] = [ FDirName $(HAIKU_TOP) src kits app ] ;
 
-SubInclude OBOS_TOP src tests kits app bapplication ;
-SubInclude OBOS_TOP src tests kits app bclipboard ;
-SubInclude OBOS_TOP src tests kits app bcursor ;
-#SubInclude OBOS_TOP src tests kits app bhandler ;
-#SubInclude OBOS_TOP src tests kits app blooper ;
-#SubInclude OBOS_TOP src tests kits app bmessage ;
-#SubInclude OBOS_TOP src tests kits app bmessageQueue ;
-SubInclude OBOS_TOP src tests kits app bmessenger ;
-SubInclude OBOS_TOP src tests kits app broster ;
-SubInclude OBOS_TOP src tests kits app common ;
-SubInclude OBOS_TOP src tests kits app messaging ;
+SubInclude HAIKU_TOP src tests kits app bapplication ;
+SubInclude HAIKU_TOP src tests kits app bclipboard ;
+SubInclude HAIKU_TOP src tests kits app bcursor ;
+#SubInclude HAIKU_TOP src tests kits app bhandler ;
+#SubInclude HAIKU_TOP src tests kits app blooper ;
+#SubInclude HAIKU_TOP src tests kits app bmessage ;
+#SubInclude HAIKU_TOP src tests kits app bmessageQueue ;
+SubInclude HAIKU_TOP src tests kits app bmessenger ;
+SubInclude HAIKU_TOP src tests kits app broster ;
+SubInclude HAIKU_TOP src tests kits app common ;
+SubInclude HAIKU_TOP src tests kits app messaging ;

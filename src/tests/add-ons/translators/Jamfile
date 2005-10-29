@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests add-ons translators ;
+SubDir HAIKU_TOP src tests add-ons translators ;
 
 # Let Jam know where to find some of our source files
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bmptranslator ] ;

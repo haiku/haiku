@@ -1,0 +1,157 @@
+# BeOS specific rules
+
+
+rule AddStringDataResource
+{
+	# AddStringDataResource <target> : <resourceID> : <dataString>
+	# Adds a single resource to the resources of an executable/library.
+	# <target>: The executable/library.
+	# <resourceID>: A resource ID string as understood by xres (type:id[:name]).
+	# <dataString>: The string <dataString> will be written to the resource.
+	#               Defaults to "".
+	#
+	local target = $(1) ;
+	local resourceID = $(2) ;
+	local dataString = $(3:E="") ;
+
+	# the resource file
+	local resources
+		= [ FGristFiles $(target:B)-added-string-data-resources.rsrc ] ;
+
+	# add the resource file to the target, if not yet done
+	if ! [ on $(resources) return $(RESOURCES_ADDED) ] {
+		RESOURCES_ADDED on $(resources) = true ;
+		MakeLocateArch $(resources) ;
+		Depends $(resources) : <build>xres ;
+		AddStringDataResource1 $(resources) : <build>xres ;
+		AddResources $(target) : $(resources) ;
+	}
+
+	RESOURCE_STRINGS on $(resources)
+		+= "-a "$(resourceID)" -s \""$(dataString)"\"" ;
+}
+
+actions together AddStringDataResource1
+{
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(2[1]) -o "$(1)" $(RESOURCE_STRINGS)
+}
+
+
+rule AddFileDataResource
+{
+	# AddFileDataResource <target> : <resourceID> : [ <dataFile> ]
+	#	: [ <dataString> ]
+	# Adds a single resource to the resources of an executable/library.
+	# <target>: The executable/library.
+	# <resourceID>: A resource ID string as understood by xres (type:id[:name]).
+	# <dataFile>: The data to be written into the resource will be read from
+	#             that file.
+	#
+	local target = $(1) ;
+	local resourceID = $(2) ;
+	local dataFile = $(3) ;
+
+	# the resource file
+	local resources
+		= <added-resources>file-data-$(resourceID)-$(dataFile).rsrc ;
+
+	# add it to the resources of the given target
+	AddResources $(target) : $(resources) ;
+
+	# if the rule for creating the resource file has not been invoked yet, do it
+	if ! [ on $(resources) return $(RESOURCES_DEFINED) ] {
+		RESOURCES_DEFINED on $(resources) = true ;
+		RESOURCE_ID on $(resources) = $(resourceID) ;
+		MakeLocateArch $(resources) ;
+
+		Depends $(resources) : <build>xres $(dataFile) ;
+		AddFileDataResource1 $(resources) : <build>xres $(dataFile) ;
+	}
+}
+
+actions AddFileDataResource1
+{
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(2[1]) -o "$(1)" -a "$(RESOURCE_ID)" "$(2[2])" ;
+}
+
+rule XRes
+{
+	# XRes <target> : <resource files>
+	if $(2)
+	{
+		Depends $(1) : <build>xres $(2) ;
+		XRes1 $(1) : <build>xres $(2) ;
+	}
+}
+
+actions XRes1
+{
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(2[1]) -o "$(1)" "$(2[2-])" ;
+}
+
+rule SetVersion
+{
+	# SetVersion <target>
+
+	Depends $(1) : <build>setversion ;
+	SetVersion1 $(1) : <build>setversion ;
+}
+
+actions SetVersion1
+{
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(2[1]) "$(1)" -system $(HAIKU_BUILD_VERSION) -short "$(HAIKU_BUILD_DESCRIPTION)" ;
+}
+
+rule SetType
+{
+	# SetType <target>
+
+	Depends $(1) : <build>settype ;
+	SetType1 $(1) : <build>settype ;
+}
+
+actions SetType1
+{
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(2[1]) -t $(TARGET_EXECUTABLE_MIME_TYPE) "$(1)" ;
+}
+
+rule MimeSet
+{
+	# MimeSet <target>
+}
+
+rule ResComp
+{
+	# ResComp <resource file> : <rdef file> ;
+	#
+	# <resource file> and <rdef file> must be gristed.
+
+	SEARCH on $(2) += $(SEARCH_SOURCE) ;
+	MakeLocateArch $(1) ;
+	Depends $(1) : $(2) <build>rc ;
+	LocalClean clean : $(1) ;
+	ResComp1 $(1) : <build>rc $(2) ;
+}
+
+actions ResComp1
+{
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(2[1]) --auto-names -o $(1) $(2[2-])
+}
+
+
+if $(OS) = BEOS
+{
+
+actions MimeSet
+{
+	mimeset -f "$(1)" ;
+}
+
+}	# if BEOS
+

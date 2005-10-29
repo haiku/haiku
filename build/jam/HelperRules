@@ -1,0 +1,248 @@
+# Rules without side effects.
+
+# Vanilla Jam compatibility
+if ! $(INVOCATION_SUBDIR_SET) {
+	rule FIsPrefix
+	{
+		# FIsPrefix <a> : <b> ;
+		# Returns true, if list <a> is a prefix (a proper one or equal) of
+		# list <b>, an empty list otherwise.
+		local a = $(1) ;
+		local b = $(2) ;
+		while $(a) && $(a[1]) = $(b[1]) {
+			a = $(a[2-]) ;
+			b = $(b[2-]) ;
+		}
+	
+		if $(a) {
+			return ;
+		} else {
+			return true ;
+		}
+	}
+
+	rule LocalClean { Clean $(1) : $(2) ; }
+
+	rule LocalDepends { Depends $(1) : $(2) ; }
+
+} # vanilla Jam compatibility
+
+rule FFilter
+{
+	# FFilter <list> : <excludes> ;
+	# Removes all occurrences of <excludes> in <list>.
+
+	local list = $(1) ;
+	local excludes = $(2) ;
+	local newList ;
+	local item ;
+	for item in $(list) {
+		local skip ;
+		local exclude ;
+		for exclude in $(excludes) {
+			if $(item) = $(exclude) {
+				skip = true ;
+			}
+		}
+		if ! $(skip) {
+			newList += $(item) ;
+		}
+	}
+	return $(newList) ;
+}
+
+rule FSplitPath
+{
+	# SplitPath <path> ;
+	# Decomposes a path into its components.
+	local path = $(1:G=) ;
+	local components ;
+	# $(path:D) for "/" is "/". Therefore the second condition.
+	while $(path:D) && $(path:D) != $(path)
+	{
+		# Note: $(path:B) returns "." for "..", but $(path:D=) is fine.
+		components = $(path:D=) $(components) ;
+		path = $(path:D) ;
+	}
+	components = $(path) $(components) ;
+	return $(components) ;
+}
+
+rule FTimeZoneBinaries
+{
+	local sources = $(1:G=timezone-source) ;
+	local locate = $(2) ;
+	local setRelativeTimezoneDir = $(3) ;
+	
+	local gristedBinaries ;
+	
+	local source ;
+	for source in $(sources) {
+		local binaries = [ on $(source) return $(TZ_OBJECTS) ] ;
+
+		local targetDir = [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR)
+			data etc timezones ] ;
+
+		local binary ;
+		for binary in $(binaries) {
+			local dir = $(binary:D) ;
+			if $(dir) {
+				binary = $(binary:BSG=timezone!$(dir)) ;
+				if $(locate) {
+					LOCATE on $(binary) = [ FDirName $(targetDir) $(dir) ] ;
+				}
+			} else {
+				binary = $(binary:BSG=timezone) ;
+				if $(locate) {
+					LOCATE on $(binary) = $(targetDir) ;
+				}
+			}
+
+			if $(setRelativeTimezoneDir) {
+				RELATIVE_TIMEZONE_DIR on $(binary) = $(dir) ;
+			}
+
+			gristedBinaries += $(binary) ;
+		}
+	}
+
+	return $(gristedBinaries) ;
+}
+
+
+rule SetPlatformCompatibilityFlagVariables
+{
+	# SetPlatformCompatibilityFlagVariables <platform var> : <var prefix>
+	#	: <platform kind> [ : other platforms ] ;
+
+	local platformVar = $(1) ;
+	local platform = $($(platformVar)) ;
+	local varPrefix = $(2) ;
+	local platformKind = $(3) ;
+	local otherPlatforms = $(4) ;
+
+	if ! $(platform) {
+		ECHO "Variable $(platformVar) not set. Please run ./configure or" ;
+		EXIT "specify it manually." ;
+	}
+
+	$(varPrefix)_PLATFORM_BEOS_COMPATIBLE = ;
+	$(varPrefix)_PLATFORM_BONE_COMPATIBLE = ;
+	$(varPrefix)_PLATFORM_DANO_COMPATIBLE = ;
+	$(varPrefix)_PLATFORM_HAIKU_COMPATIBLE = ;
+	
+	switch $(platform)
+	{
+		case r5 :
+		{
+			$(varPrefix)_PLATFORM_BEOS_COMPATIBLE = true ;
+		}
+		
+		case bone : 
+		{
+			$(varPrefix)_PLATFORM_BONE_COMPATIBLE = true ;
+		}
+		
+		case dano :
+		{
+			$(varPrefix)_PLATFORM_DANO_COMPATIBLE = true ;
+		}
+		
+		case haiku :
+		{
+			$(varPrefix)_PLATFORM_HAIKU_COMPATIBLE = true ;
+		}
+	
+		case * :
+		{
+			if ! ( $(platform) in $(otherPlatforms) ) {
+				Exit Unsupported $(platformKind) platform: $(platform) ;
+			}
+		}
+	}
+
+	# set lesser flags, e.g. "DANO" for "HAIKU" and "BEOS" for "BONE"
+	$(varPrefix)_PLATFORM_DANO_COMPATIBLE
+		?= $($(varPrefix)_PLATFORM_HAIKU_COMPATIBLE) ;
+	$(varPrefix)_PLATFORM_BONE_COMPATIBLE
+		?= $($(varPrefix)_PLATFORM_DANO_COMPATIBLE) ;
+	$(varPrefix)_PLATFORM_BEOS_COMPATIBLE
+		?= $($(varPrefix)_PLATFORM_BONE_COMPATIBLE) ;
+
+	# set the machine friendly flags
+	$(varPrefix)_PLATFORM_(haiku)_COMPATIBLE
+		?= $($(varPrefix)_PLATFORM_HAIKU_COMPATIBLE) ;
+	$(varPrefix)_PLATFORM_(dano)_COMPATIBLE
+		?= $($(varPrefix)_PLATFORM_DANO_COMPATIBLE) ;
+	$(varPrefix)_PLATFORM_(bone)_COMPATIBLE
+		?= $($(varPrefix)_PLATFORM_BONE_COMPATIBLE) ;
+	$(varPrefix)_PLATFORM_(r5)_COMPATIBLE
+		?= $($(varPrefix)_PLATFORM_BEOS_COMPATIBLE) ;
+}
+
+
+#pragma mark -
+
+rule SetPlatformForTarget
+{
+	# SetPlatformForTarget <target> : <platform> ;
+
+	PLATFORM on $(1) = $(2) ;
+}
+
+rule SetSubDirPlatform
+{
+	# SetSubDirPlatform <platform> ;
+
+	PLATFORM = $(1) ;
+}
+
+rule SetSupportedPlatformsForTarget
+{
+	# SetSupportedPlatformsForTarget <target> : <platforms> ;
+
+	SUPPORTED_PLATFORMS on $(1) = $(2) ;
+}
+
+rule SetSubDirSupportedPlatforms
+{
+	# SetSubDirSupportedPlatforms <platforms> ;
+
+	SUPPORTED_PLATFORMS = $(1) ;
+}
+
+rule SetSubDirSupportedPlatformsBeOSCompatible
+{
+	# SetSubDirSupportedPlatformsBeOSCompatible ;
+
+	SUPPORTED_PLATFORMS = $(HAIKU_BEOS_COMPATIBLE_PLATFORMS) ;
+}
+
+rule IsPlatformSupportedForTarget
+{
+	# IsPlatformSupportedForTarget <target> [ : <platform> ]
+	#
+
+	on $(1) {
+		if $(PLATFORM) in $(SUPPORTED_PLATFORMS) {
+			return true ;
+		} else {
+			return ;
+		}
+	}
+}
+
+rule InheritPlatform
+{
+	# InheritPlatform <children> : <parent> ;
+	# PLATFORM and SUPPORTED_PLATFORMS are set on <children> to their value
+	# on <parent>.
+	#
+	local children = $(1) ;
+	local parent = $(2) ;
+
+	on $(parent) {
+		PLATFORM on $(children) = $(PLATFORM) ;
+		SUPPORTED_PLATFORMS on $(children) = $(SUPPORTED_PLATFORMS) ;
+	}
+}

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src bin flex ;
+SubDir HAIKU_TOP src bin flex ;
 
 SubDirCcFlags -DHAVE_CONFIG_H ;
 

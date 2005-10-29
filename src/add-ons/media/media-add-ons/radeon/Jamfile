@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons media media-add-ons radeon ;
+SubDir HAIKU_TOP src add-ons media media-add-ons radeon ;
 
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics common ] ;
@@ -18,4 +18,4 @@ Addon radeon.media_addon : media :
 	VideoIn.cpp
 ;
 
-LinkSharedOSLibs radeon.media_addon : be media ;
+LinkAgainst radeon.media_addon : be media ;

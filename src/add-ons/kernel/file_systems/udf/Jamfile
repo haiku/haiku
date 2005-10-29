@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel file_systems udf ;
+SubDir HAIKU_TOP src add-ons kernel file_systems udf ;
 
 SubDirC++Flags -fno-rtti ;
 
@@ -26,7 +26,7 @@ oldOPTIM = $(OPTIM) ;
 UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
 UsePrivateHeaders [ FDirName kernel util ] ;	# For all the UDF source files
 
-R5KernelAddon udf : kernel file_systems :
+KernelAddon udf : kernel file_systems :
 	kernel_cpp.cpp
 	udf.cpp
 
@@ -47,7 +47,7 @@ R5KernelAddon udf : kernel file_systems :
 
 SEARCH on [ FGristFiles
 		kernel_cpp.cpp 
-	] = [ FDirName $(OBOS_TOP) src system kernel util ] ;
+	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
 
 rule InstallUDF
@@ -65,4 +65,4 @@ InstallUDF install : udf ;
 # restore original optimization level
 OPTIM = $(oldOPTIM) ;
 
-SubInclude OBOS_TOP src add-ons kernel file_systems udf drive_setup_addon ;
+SubInclude HAIKU_TOP src add-ons kernel file_systems udf drive_setup_addon ;

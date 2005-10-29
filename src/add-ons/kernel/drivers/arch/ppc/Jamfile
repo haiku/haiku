@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel drivers arch ppc ;
+SubDir HAIKU_TOP src add-ons kernel drivers arch ppc ;
 
-#SubInclude OBOS_TOP src add-ons kernel drivers arch x86 keyboard ;
-#SubInclude OBOS_TOP src add-ons kernel drivers arch x86 ps2mouse ;
+#SubInclude HAIKU_TOP src add-ons kernel drivers arch x86 keyboard ;
+#SubInclude HAIKU_TOP src add-ons kernel drivers arch x86 ps2mouse ;

@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src add-ons kernel drivers audio ac97 ;
+SubDir HAIKU_TOP src add-ons kernel drivers audio ac97 ;
 
-SubInclude OBOS_TOP src add-ons kernel drivers audio ac97 auich ;
-SubInclude OBOS_TOP src add-ons kernel drivers audio ac97 auvia ;
-SubInclude OBOS_TOP src add-ons kernel drivers audio ac97 ich ;
-# SubInclude OBOS_TOP src add-ons kernel drivers audio ac97 ichaudio ;
+SubInclude HAIKU_TOP src add-ons kernel drivers audio ac97 auich ;
+SubInclude HAIKU_TOP src add-ons kernel drivers audio ac97 auvia ;
+SubInclude HAIKU_TOP src add-ons kernel drivers audio ac97 ich ;
+# SubInclude HAIKU_TOP src add-ons kernel drivers audio ac97 ichaudio ;

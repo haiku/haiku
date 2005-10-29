@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel partitioning_systems session ;
+SubDir HAIKU_TOP src add-ons kernel partitioning_systems session ;
 
 #UsePrivateHeaders $(DOT) ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
@@ -26,7 +26,7 @@ KernelAddon session : kernel partitioning_systems :
 #	[ FGristFiles $(session_files:S=$(SUFOBJ)) ]
 #;
 #
-#LinkSharedOSLibs <partitioning_system>session :
+#LinkAgainst <partitioning_system>session :
 #	libkernelland_emu.so
 #	libdisk_device_manager.so
 #;

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons disk_scanner ;
+SubDir HAIKU_TOP src add-ons disk_scanner ;
 
 # For convenience: Pseudo target that builds all GUI add-ons.
 #
@@ -7,5 +7,5 @@ Depends gui_disk_scanner_add_ons
 	: <boot!home!config!add-ons!disk_scanner!partition>intel
 ;
 
-SubInclude OBOS_TOP src add-ons disk_scanner fs ;
-SubInclude OBOS_TOP src add-ons disk_scanner partition ;
+SubInclude HAIKU_TOP src add-ons disk_scanner fs ;
+SubInclude HAIKU_TOP src add-ons disk_scanner partition ;

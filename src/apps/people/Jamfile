@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src apps people ;
+SubDir HAIKU_TOP src apps people ;
 
-App People : main.cpp
+Application People : main.cpp
 	PeopleApp.cpp
 	PeopleView.cpp
 	PeopleWindow.cpp 

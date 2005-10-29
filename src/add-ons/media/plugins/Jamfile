@@ -1,26 +1,26 @@
-SubDir OBOS_TOP src add-ons media plugins ;
+SubDir HAIKU_TOP src add-ons media plugins ;
 
-SubInclude OBOS_TOP src add-ons media plugins aiff_reader ;
-SubInclude OBOS_TOP src add-ons media plugins au_reader ;
-SubInclude OBOS_TOP src add-ons media plugins avi_reader ;
-SubInclude OBOS_TOP src add-ons media plugins mp3_reader ;
-SubInclude OBOS_TOP src add-ons media plugins wav_reader ;
+SubInclude HAIKU_TOP src add-ons media plugins aiff_reader ;
+SubInclude HAIKU_TOP src add-ons media plugins au_reader ;
+SubInclude HAIKU_TOP src add-ons media plugins avi_reader ;
+SubInclude HAIKU_TOP src add-ons media plugins mp3_reader ;
+SubInclude HAIKU_TOP src add-ons media plugins wav_reader ;
 
-SubInclude OBOS_TOP src add-ons media plugins matroska ;
-SubInclude OBOS_TOP src add-ons media plugins musepack ;
-SubInclude OBOS_TOP src add-ons media plugins ogg ;
+SubInclude HAIKU_TOP src add-ons media plugins matroska ;
+SubInclude HAIKU_TOP src add-ons media plugins musepack ;
+SubInclude HAIKU_TOP src add-ons media plugins ogg ;
 
-SubInclude OBOS_TOP src add-ons media plugins mp3_decoder ;
-SubInclude OBOS_TOP src add-ons media plugins raw_decoder ;
+SubInclude HAIKU_TOP src add-ons media plugins mp3_decoder ;
+SubInclude HAIKU_TOP src add-ons media plugins raw_decoder ;
 
-SubInclude OBOS_TOP src add-ons media plugins avcodec ;
-SubInclude OBOS_TOP src add-ons media plugins vorbis ;
-SubInclude OBOS_TOP src add-ons media plugins speex ;
-SubInclude OBOS_TOP src add-ons media plugins mov_reader ;
-SubInclude OBOS_TOP src add-ons media plugins mp4_reader ;
+SubInclude HAIKU_TOP src add-ons media plugins avcodec ;
+SubInclude HAIKU_TOP src add-ons media plugins vorbis ;
+SubInclude HAIKU_TOP src add-ons media plugins speex ;
+SubInclude HAIKU_TOP src add-ons media plugins mov_reader ;
+SubInclude HAIKU_TOP src add-ons media plugins mp4_reader ;
 
 # The following add-ons are GPL licensed, and can only be used with
 # software whose license is GPL compatible. To include these GPL
 # licensed add-ons, you need to run configure with the --include-gpl-addons
 # parameter
-SubIncludeGPL OBOS_TOP src add-ons media plugins ac3_decoder ;
+SubIncludeGPL HAIKU_TOP src add-ons media plugins ac3_decoder ;

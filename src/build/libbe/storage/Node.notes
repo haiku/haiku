@@ -1,0 +1,11 @@
+Notes concerning the OpenBeOS implementation of BNode:
+1. GetNextAttrName returns B_BAD_VALUE when passed a NULL pointer instead of crashing
+2. R5::BNode returns B_BAD_ADDRESS when RewindAttrs() fails (not B_FILE_ERROR as claimed in the BeBook). We currently follow suit.
+3. RenameAttr() actually works, whereas the R5 version doesn't (apparently because BFS doesn't implement it directly...).
+4. Write/ReadAttrString() functions need to be documented (they aren't in the R5 BeBook).
+5. ReadAttrString() adds an extra NULL char to the end of the string it reads as a precaution before handing it back to the BString result, since it's possible to read a non-NULL-terminated string of characters from an attribute.
+6. Write/ReadAttrString() can't be tested until we have an OpenBeOS implementation of BString.
+7. Dup() should be declared const, but it isn't by R5, so our implementation follows suit.
+8. Locking is not supported by the Posix implemention of OpenBeOS BNode, due to fcntl(fd, F_SETLK, ...) not being implemented in R5.
+
+

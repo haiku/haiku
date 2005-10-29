@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# $Id: pdfclock.py,v 1.1 2004/10/06 17:46:44 laplace Exp $
+# $Id$
 #
 # PDFlib client: pdfclock example in Python
 #

@@ -1,4 +1,4 @@
-/* $Id: invoice.c,v 1.1 2004/10/06 17:46:38 laplace Exp $
+/* $Id$
  *
  * PDFlib/PDI client: invoice generation demo
  */

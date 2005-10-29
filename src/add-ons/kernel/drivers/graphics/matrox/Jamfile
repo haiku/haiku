@@ -1,9 +1,11 @@
-SubDir OBOS_TOP src add-ons kernel drivers graphics matrox ;
+SubDir HAIKU_TOP src add-ons kernel drivers graphics matrox ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics matrox ] ;
 
-R5KernelAddon mga.driver : kernel drivers bin :
+KernelAddon mga.driver : kernel drivers bin :
 	driver.c
 ;
 
@@ -12,18 +14,8 @@ Package haiku-matrox-cvs :
 Package haiku-matrox-cvs :
 	mga.driver : 
 	boot home config add-ons kernel drivers bin ;
-Package haiku-matrox-cvs :
-	<kernel!drivers!dev!graphics>mga.driver :
-	boot home config add-ons kernel drivers dev graphics ;
+PackageDriverSymLink haiku-matrox-cvs : graphics mga.driver ;
 Package haiku-matrox-cvs :
 	mga.settings :
 	boot home config settings kernel drivers ;
-
-# Link to kernel/drivers/dev/graphics
-{
-	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev graphics ] ;
-	local instDriver = <kernel!drivers!dev!graphics>mga.driver ;
-	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : mga.driver ;
-}
 

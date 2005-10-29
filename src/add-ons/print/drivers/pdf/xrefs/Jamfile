@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons print drivers pdf xrefs ;
+SubDir HAIKU_TOP src add-ons print drivers pdf xrefs ;
 
 Package haiku-pdf_writer-cvs :
 	English Deutsch :

@@ -1,12 +1,14 @@
-SubDir OBOS_TOP src add-ons mail_daemon system_filters notifier ;
+SubDir HAIKU_TOP src add-ons mail_daemon system_filters notifier ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders mail ;
-SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
 Addon New\ Mail\ Notification : mail_daemon system_filters :
 	filter.cpp ConfigView.cpp ;
 
-LinkSharedOSLibs New\ Mail\ Notification :
+LinkAgainst New\ Mail\ Notification :
 	 be libmail.so ;
 
 Package haiku-maildaemon-cvs :

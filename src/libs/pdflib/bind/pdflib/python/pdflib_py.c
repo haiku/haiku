@@ -10,7 +10,7 @@
  |                                                                           |
  *---------------------------------------------------------------------------*/
 
-/* $Id: pdflib_py.c,v 1.1 2004/10/06 17:46:44 laplace Exp $
+/* $Id$
  *
  * Wrapper code for the PDFlib Python binding
  *

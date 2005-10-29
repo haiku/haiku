@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps stylededit ;
+SubDir HAIKU_TOP src apps stylededit ;
 
 UsePrivateHeaders textencoding ;
 
@@ -20,15 +20,15 @@ local styled_edit_files =
 
 Objects $(styled_edit_files) ;
 
-App StyledEdit :
+Application StyledEdit :
 	[ FGristFiles $(styled_edit_files:S=$(SUFOBJ)) ]
 	# Haiku String
 	String.cpp
 	strcasestr.c
-	: : $(styled_edit_rsrc)
+        : be translation tracker libtextencoding.so
+	: $(styled_edit_rsrc)
 	;
 
-SEARCH on <src!apps!stylededit>String.cpp += [ FDirName $(OBOS_TOP) src kits support ] ;
-SEARCH on <src!apps!stylededit>strcasestr.c += [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
+SEARCH on <src!apps!stylededit>String.cpp += [ FDirName $(HAIKU_TOP) src kits support ] ;
+SEARCH on <src!apps!stylededit>strcasestr.c += [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
 
-LinkSharedOSLibs StyledEdit : be translation tracker libtextencoding.so ;

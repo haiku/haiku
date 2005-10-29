@@ -1,0 +1,123 @@
+#!/bin/sh
+
+# The first argument is the shell script that initializes the variables.
+# sourceDir
+# outputDir
+# tmpDir
+# installDir
+# isImage
+# imagePath
+# imageSize
+# addBuildCompatibilityLibDir
+# 
+# bfsShell
+# copyattr
+# fsShellCommand
+# makebootable
+# resattr
+# rc
+#
+if [ $# -gt 0 ]; then
+	. $1
+	shift
+fi
+
+# this adds the build library dir to LD_LIBRARY_PATH
+eval "$addBuildCompatibilityLibDir"
+
+# map the shell commands
+if [ $isImage ]; then
+	sPrefix=:
+	tPrefix=/myfs/
+	cd="$fsShellCommand cd"
+	scd="$fsShellCommand cd"
+	cp="$fsShellCommand cp"
+	ln="$fsShellCommand ln"
+	mkdir="$fsShellCommand mkdir"
+	rm="$fsShellCommand rm"
+	mkindex="$fsShellCommand mkindex"
+else
+	sPrefix=
+	# TODO: This should come from the environment.
+	tPrefix="$installDir/"
+	cd=cd
+	scd=:
+	cp="$copyattr -d"
+	ln=ln
+	mkdir=mkdir
+	rm=rm
+	mkindex=mkindex
+fi
+
+# create the image and mount it
+if [ $isImage ]; then
+	echo
+	echo "Creating image ..."
+	dd if=/dev/zero of=$imagePath bs=1M count=$imageSize
+	$bfsShell --initialize $imagePath Haiku
+	$makebootable $imagePath
+	$bfsShell -n $imagePath > /dev/null &
+	sleep 1
+fi
+
+$mkindex BEOS:APP_SIG
+	# needed to launch apps via signature
+
+echo "Populating image ..."
+while [ $# -gt 0 ]; do
+	. $1
+	shift
+done
+
+
+# install MIME database
+# TODO: It should be possible to do that in the build system too.
+mimeDBSource=$sourceDir/src/data/beos_mime
+mimeDBDest=${tPrefix}home/config/settings/beos_mime
+
+echo "Deleting old MIME database ..."
+
+$rm -rf $mimeDBDest
+$mkdir -p $mimeDBDest
+mkdir -p $tmpDir
+
+echo "Installing MIME database ..."
+
+for inSuperFile in $mimeDBSource/*.super; do
+	superType=$(basename $inSuperFile .super)
+	outSuperDir=$mimeDBDest/$superType
+
+	# compile rdef to rsrc file and the rsrc file to attributes
+	tmpFile=$tmpDir/mimedb$$.rsrc
+	tmpFile2=$tmpDir/mimedb$$.mime
+	$rc -o $tmpFile $inSuperFile
+	mkdir -p $tmpFile2
+	$resattr -O -o $tmpFile2 $tmpFile
+	$cp -r ${sPrefix}$tmpFile2 $outSuperDir
+	rm -rf $tmpFile $tmpFile2
+
+	# iterate through the sub types
+	for inSubFile in $mimeDBSource/$superType/*; do
+		# check, if the type exists
+		if test -f $inSubFile && grep META:TYPE $inSubFile &> /dev/null; then
+			subType=$(basename $inSubFile)
+			outSubFile=$outSuperDir/$subType
+
+			# compile rdef to rsrc file and the rsrc file to attributes
+			tmpFile=$tmpDir/mimedb$$.rsrc
+			tmpFile2=$tmpDir/mimedb$$.mime
+			$rc -o $tmpFile $inSubFile
+			$resattr -O -o $tmpFile2 $tmpFile
+			$cp ${sPrefix}$tmpFile2 $outSubFile
+			rm -f $tmpFile $tmpFile2
+		fi
+	done
+done
+
+
+# unmount
+if [ $isImage ]; then
+	echo "Unmounting ..."
+	$fsShellCommand sync
+	$fsShellCommand quit
+fi

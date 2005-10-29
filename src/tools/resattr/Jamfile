@@ -1,4 +1,7 @@
-SubDir OBOS_TOP src tools resattr ;
+SubDir HAIKU_TOP src tools resattr ;
 
-BuildPlatformMain resattr : resattr.cpp ;
-LinkSharedOSLibs resattr : be ;
+USES_BE_API on <build>resattr = true ;
+
+BuildPlatformMain <build>resattr : resattr.cpp ;
+LinkAgainst <build>resattr : $(HOST_LIBBE) ;
+

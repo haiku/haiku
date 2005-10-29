@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src servers midi ;
+SubDir HAIKU_TOP src servers midi ;
 
 UsePrivateHeaders midi ;
 
@@ -12,7 +12,7 @@ Server midi_server :
 	PortDrivers.cpp
 ;
 
-LinkSharedOSLibs midi_server : 
+LinkAgainst midi_server : 
 	be 
 	midi2
 ;

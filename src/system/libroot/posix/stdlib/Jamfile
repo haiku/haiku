@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src system libroot posix stdlib ;
+SubDir HAIKU_TOP src system libroot posix stdlib ;
 
 UsePrivateHeaders libroot ;
 

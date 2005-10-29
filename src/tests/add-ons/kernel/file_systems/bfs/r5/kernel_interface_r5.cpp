@@ -32,6 +32,11 @@
 #include <fs_index.h>
 #include <fs_query.h>
 
+// needed for bfs_initialize() in the fs_shell only
+#ifdef USER
+#	include "boot_block.h"
+#endif
+
 
 #ifdef USER
 #	define dprintf printf
@@ -335,7 +340,110 @@ bfs_initialize(const char *deviceName, void *parms, size_t len)
 	// backend (to create the file system) is already done; just
 	// call Volume::Initialize().
 
+	// When compiling the userland bfs_shell, we provide a useful
+	// implementation for this function anyway, so that the bfs_shell can
+	// initialize images.
+
+#ifndef USER
+	
 	return B_ERROR;
+
+#else // USER
+
+	if (deviceName == NULL)
+		return B_BAD_VALUE;
+
+	char **argv = (char**)parms;
+	
+	uint32 blockSize = 1024;
+	uint32 flags = 0;
+	bool verbose = false;
+
+	while (argv && *++argv) {
+		char *arg = *argv;
+		if (*arg == '-') {
+			if (arg[1] == '-') {
+				if (!strcmp(arg, "--noindex"))
+					flags |= VOLUME_NO_INDICES;
+				else
+					return B_BAD_VALUE;
+			}
+
+			while (*++arg && *arg >= 'a' && *arg <= 'z') {
+				switch (*arg) {
+					case 'v':
+						verbose = true;
+						break;
+					case 'b':
+						if (*++argv == NULL || !(**argv >= '0' && **argv <= '9'))
+							return B_BAD_VALUE;
+
+						blockSize = atol(*argv);
+						break;
+					case 'n':
+						flags |= VOLUME_NO_INDICES;
+						break;
+				}
+			}
+		}
+		else
+			break;
+	}
+
+	char *volumeName = "Unnamed";
+	if (argv[0] != NULL)
+		volumeName = argv[0];
+
+	if (blockSize != 1024 && blockSize != 2048 && blockSize != 4096 && blockSize != 8192) {
+		FATAL(("valid block sizes are: 1024, 2048, 4096, and 8192\n"));
+		return -1;
+	}
+
+	Volume volume(-1);
+	status_t status = volume.Initialize(deviceName, volumeName, blockSize, flags);
+	if (status < B_OK) {
+		FATAL(("Initializing volume failed: %s\n", strerror(status)));
+		return -1;
+	}
+
+	if (verbose) {
+		disk_super_block super = volume.SuperBlock();
+
+		INFORM(("Disk was initialized successfully.\n"));
+		INFORM(("\tname: \"%s\"\n", super.name));
+		INFORM(("\tnum blocks: %Ld\n", super.NumBlocks()));
+		INFORM(("\tused blocks: %Ld\n", super.UsedBlocks()));
+		INFORM(("\tblock size: %lu bytes\n", super.BlockSize()));
+		INFORM(("\tnum allocation groups: %ld\n", super.AllocationGroups()));
+		INFORM(("\tallocation group size: %ld blocks\n", 1L << super.AllocationGroupShift()));
+		INFORM(("\tlog size: %u blocks\n", super.log_blocks.Length()));
+	}
+
+	// make the disk image bootable
+
+	int device = open(deviceName, O_RDWR);
+	if (device < 0) {
+		FATAL(("Could not make image bootable: Failed to open \"%s\"\n",
+			deviceName));
+		return B_FILE_ERROR;
+	}
+
+	// change BIOS drive and partition offset
+	// ToDo: for now, this will only work for images only
+
+	sBootBlockData1[kBIOSDriveOffset] = 0x80;
+		// for now, this should be replaced by the real thing
+	uint32 *offset = (uint32 *)&sBootBlockData1[kPartitionDataOffset];
+	*offset = 0;
+
+	write_pos(device, 0, sBootBlockData1, kBootBlockData1Size);
+	write_pos(device, kBootBlockData2Offset, sBootBlockData2, kBootBlockData2Size);
+
+	close(device);
+
+	return B_OK;
+
+#endif	// USER
 }
 
 

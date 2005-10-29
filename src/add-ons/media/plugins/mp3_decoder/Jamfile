@@ -1,6 +1,8 @@
-SubDir OBOS_TOP src add-ons media plugins mp3_decoder ;
+SubDir HAIKU_TOP src add-ons media plugins mp3_decoder ;
 
 UsePrivateHeaders media ;
+
+SubDirHdrs [ FDirName $(SUBDIR) mpglib ] ;
 
 Addon mp3_decoder : media plugins :
 	mp3DecoderPlugin.cpp
@@ -8,8 +10,8 @@ Addon mp3_decoder : media plugins :
 	false
 	:  
 	libmpglib.a
+	be
+	libmedia.so
 ;
 
-LinkSharedOSLibs mp3_decoder : be libmedia.so ;
-
-SubInclude OBOS_TOP src add-ons media plugins mp3_decoder mpglib ;
+SubInclude HAIKU_TOP src add-ons media plugins mp3_decoder mpglib ;

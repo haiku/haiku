@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src preferences appearance ;
+SubDir HAIKU_TOP src preferences appearance ;
 
 UsePrivateHeaders app [ FDirName servers app ] ;
 

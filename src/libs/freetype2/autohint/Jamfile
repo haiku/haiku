@@ -1,7 +1,9 @@
 # FreeType 2 src/autohint Jamfile (c) 2001 David Turner
 #
 
-SubDir  OBOS_TOP src libs freetype2 autohint ;
+SubDir  HAIKU_TOP src libs freetype2 autohint ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UseFreeTypeHeaders ;
 
@@ -21,3 +23,4 @@ UseFreeTypeHeaders ;
 }
 
 # end of src/autohint Jamfile
+

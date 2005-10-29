@@ -1,7 +1,7 @@
-SubDir OBOS_TOP src tests add-ons kernel disk_scanner partition ;
+SubDir HAIKU_TOP src tests add-ons kernel disk_scanner partition ;
 
 SEARCH_SOURCE
-	+= [ FDirName $(OBOS_TOP) src add-ons kernel disk_scanner partition ] ;
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel disk_scanner partition ] ;
 
 UsePrivateHeaders $(DOT) ;
 
@@ -16,4 +16,4 @@ UsePrivateHeaders $(DOT) ;
 Addon <userland>intel : userland disk_scanner partition :
 	intel.cpp intel_parameters.cpp intel_partition_map.cpp
 ;
-LinkSharedOSLibs <userland>intel : libkernelland_emu.so ;
+LinkAgainst <userland>intel : libkernelland_emu.so ;

@@ -1,4 +1,6 @@
-SubDir OBOS_TOP src add-ons kernel drivers network sis900 ;
+SubDir HAIKU_TOP src add-ons kernel drivers network sis900 ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 # set some additional flags
 SubDirCcFlags -Wall ;
@@ -6,7 +8,7 @@ SubDirCcFlags -Wall ;
 # For ether_driver.h
 UsePrivateHeaders net ;
 
-R5KernelAddon sis900 : kernel drivers bin :
+KernelAddon sis900 : kernel drivers bin :
 	driver.c
 	device.c
 	interface.c
@@ -16,9 +18,7 @@ R5KernelAddon sis900 : kernel drivers bin :
 Package haiku-sis900-cvs :
 	sis900 : 
 	boot home config add-ons kernel drivers bin ;
-Package haiku-sis900-cvs :
-	<kernel!drivers!dev!net>sis900 :
-	boot home config add-ons kernel drivers dev net ;
+PackageDriverSymLink haiku-sis900-cvs : net sis900 ;
 Package haiku-sis900-cvs :
 	sis900.settings :
 	boot home config settings kernel drivers sample ;
@@ -26,23 +26,11 @@ Package haiku-sis900-cvs :
 Package haiku-networkingkit-cvs :
 	sis900 :
 	boot home config add-ons kernel drivers bin ;
-Package haiku-networkingkit-cvs :
-	<kernel!drivers!dev!net>sis900 :
-	boot home config add-ons kernel drivers dev net ;
+PackageDriverSymLink haiku-networkingkit-cvs : net sis900 ;
 Package haiku-networkingkit-cvs :
 	sis900.settings :
 	boot home config settings kernel drivers sample ;
 
-
-
-# Link driver(s) to kernel/drivers/dev/net
-{
-	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev net ] ;
-
-	local instDriver = <kernel!drivers!dev!net>sis900 ;
-	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : sis900 ;
-}
 
 
 rule InstallSiS900
@@ -59,11 +47,11 @@ actions ignore InstallSiS900
 
 # Installation
 
-OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
+HaikuInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
  	sis900 
 ;
 
-OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
+HaikuInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
 	<installed>sis900 : 
 	installed-symlink 
 ;

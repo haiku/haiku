@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps pulse ;
+SubDir HAIKU_TOP src apps pulse ;
 
 UsePrivateHeaders shared ;
 
@@ -6,7 +6,7 @@ if $(TARGET_PLATFORM) = r5 {
 	SubDirC++Flags -DR5_COMPATIBLE ;
 }
 
-App Pulse : 
+Application Pulse : 
 	BottomPrefsView.cpp
 	ConfigView.cpp
 	CPUButton.cpp
@@ -25,5 +25,5 @@ App Pulse :
 ;
 
 if $(HAIKU_COMPATIBLE) {
-	LinkSharedOSLibs Pulse : libroot.so ;
+	LinkAgainst Pulse : libroot.so ;
 }

@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src add-ons kernel generic atomizer ;
+SubDir HAIKU_TOP src add-ons kernel generic atomizer ;
 
-R5KernelAddon atomizer : kernel generic :
+KernelAddon atomizer : kernel generic :
 	atomizer.c
 ;
 

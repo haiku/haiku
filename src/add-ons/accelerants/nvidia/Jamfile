@@ -1,9 +1,10 @@
-SubDir OBOS_TOP src add-ons accelerants nvidia ;
+SubDir HAIKU_TOP src add-ons accelerants nvidia ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics nvidia ] ;
 UseHeaders [ FDirName $(SUBDIR) engine ] ;
-
 
 Addon nv.accelerant : accelerants :
 	Acceleration.c
@@ -26,4 +27,4 @@ Package haiku-nvidia-cvs :
 
 Depends nv.accelerant : nv.driver ;
 
-SubInclude OBOS_TOP src add-ons accelerants nvidia engine ;
+SubInclude HAIKU_TOP src add-ons accelerants nvidia engine ;

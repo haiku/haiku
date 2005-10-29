@@ -1,12 +1,13 @@
-SubDir OBOS_TOP src system libroot posix glibc wcsmbs ;
+SubDir HAIKU_TOP src system libroot posix glibc wcsmbs ;
 
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc include arch $(OBOS_ARCH) ;
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc include ;
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc libio ;
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc wcsmbs ;
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc iconv ;
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc locale ;
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch
+	$(TARGET_ARCH) ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc libio ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc wcsmbs ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc iconv ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 
 # ToDo: for now, all wide character functions are disabled
 

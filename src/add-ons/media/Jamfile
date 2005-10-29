@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons media ;
+SubDir HAIKU_TOP src add-ons media ;
 
-SubInclude OBOS_TOP src add-ons media media-add-ons ;
-SubInclude OBOS_TOP src add-ons media plugins ;
+SubInclude HAIKU_TOP src add-ons media media-add-ons ;
+SubInclude HAIKU_TOP src add-ons media plugins ;

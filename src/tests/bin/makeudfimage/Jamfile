@@ -1,8 +1,8 @@
-SubDir OBOS_TOP src tests bin makeudfimage ;
+SubDir HAIKU_TOP src tests bin makeudfimage ;
 
 UsePrivateHeaders [ FDirName kernel util ] ;	# For kernel_cpp.h
-SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons kernel file_systems udf ] ;
-SubDirHdrs [ FDirName $(OBOS_TOP) src bin makeudfimage ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems udf ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src bin makeudfimage ] ;
 
 TestLib libmakeudfimagetest.so
 	: MakeudfimageTestAddon.cpp
@@ -19,12 +19,12 @@ TestLib libmakeudfimagetest.so
 		UdfStructures.cpp
 		Utils.cpp
 
-	: [ FDirName $(OBOS_TEST_DIR) unittester lib ]
+	: [ FDirName $(HAIKU_TEST_DIR) unittester lib ]
 	: be stdc++.r4
 	:
 ;
 
 SEARCH on [ FGristFiles Allocator.cpp PhysicalPartitionAllocator.cpp ]
-	= [ FDirName $(OBOS_TOP) src bin makeudfimage ] ;
+	= [ FDirName $(HAIKU_TOP) src bin makeudfimage ] ;
 SEARCH on [ FGristFiles UdfDebug.cpp UdfString.cpp UdfStructures.cpp Utils.cpp ] #DString.cpp UdfDebug.cpp UdfString.cpp UdfStructures.cpp Utils.cpp ]
-	= [ FDirName $(OBOS_TOP) src add-ons kernel file_systems udf ] ;
+	= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems udf ] ;

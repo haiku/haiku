@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons media media-add-ons reader ;
+SubDir HAIKU_TOP src add-ons media media-add-ons reader ;
 
 UsePrivateHeaders media ;
 
@@ -11,4 +11,4 @@ Addon reader.media_addon : media :
 	: true
 ;
 
-LinkSharedOSLibs reader.media_addon : be media ;
+LinkAgainst reader.media_addon : be media ;

@@ -74,6 +74,9 @@ int init_vnode_layer(void);
 void *install_file_system(vnode_ops *ops, const char *name,
                           bool fixed, image_id aid);
 
+status_t initialize_file_system(const char *device, const char *fs,
+			void *params, int paramLength);
+
 #ifdef __cplusplus
 }
 #endif

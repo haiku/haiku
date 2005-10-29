@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests add-ons kernel file_systems bfs r5 ;
+SubDir HAIKU_TOP src tests add-ons kernel file_systems bfs r5 ;
 
 # save original optimization level
 oldOPTIM = $(OPTIM) ;
@@ -51,14 +51,14 @@ KernelStaticLibrary libbfs :
 	BufferPool.cpp
 	;
 
-R5KernelAddon $(bfsAddOnName)_r5 : kernel file_systems :
+KernelAddon $(bfsAddOnName)_r5 : kernel file_systems :
 	kernel_interface_r5.cpp
 	: libbfs.a
 	;
 
 SEARCH on [ FGristFiles
 		kernel_cpp.cpp 
-	] = [ FDirName $(OBOS_TOP) src system kernel util ] ;
+	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
 #-----------------------------------------------------
 

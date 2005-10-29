@@ -1,6 +1,4 @@
-SubDir OBOS_TOP ;
-
-InstallFloppy installfloppy : $(OBOS_FLOPPY) ;
+SubDir HAIKU_TOP ;
 
 NotFile alltests ;
 Depends alltests : r5tests obostests ;
@@ -132,4 +130,4 @@ Depends ScreenSaverKit :
 	Haiku
 ;
 
-SubInclude OBOS_TOP src ;
+SubInclude HAIKU_TOP src ;

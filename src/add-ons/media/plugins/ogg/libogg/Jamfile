@@ -1,6 +1,8 @@
-SubDir OBOS_TOP src add-ons media plugins ogg libogg ;
+SubDir HAIKU_TOP src add-ons media plugins ogg libogg ;
 
-StaticLibrary ogg :
+SubDirSysHdrs $(SUBDIR) ;
+
+StaticLibrary libogg.a :
 	bitwise.c
 	framing.c
 ;

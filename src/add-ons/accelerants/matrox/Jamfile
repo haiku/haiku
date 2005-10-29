@@ -1,9 +1,10 @@
-SubDir OBOS_TOP src add-ons accelerants matrox ;
+SubDir HAIKU_TOP src add-ons accelerants matrox ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics matrox ] ;
 UseHeaders [ FDirName $(SUBDIR) engine ] ;
-
 
 Addon mga.accelerant : accelerants :
 	Acceleration.c
@@ -26,4 +27,4 @@ Package haiku-matrox-cvs :
 
 Depends mga.accelerant : mga.driver ;
 
-SubInclude OBOS_TOP src add-ons accelerants matrox engine ;
+SubInclude HAIKU_TOP src add-ons accelerants matrox engine ;

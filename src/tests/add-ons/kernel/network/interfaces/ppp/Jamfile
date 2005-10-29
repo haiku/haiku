@@ -1,9 +1,9 @@
-SubDir OBOS_TOP src tests add-ons kernel network interfaces ppp ;
+SubDir HAIKU_TOP src tests add-ons kernel network interfaces ppp ;
 
 UsePrivateHeaders net ;
-UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
 
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network interfaces ppp ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel network interfaces ppp ] ;
 
 
 Addon <userland>ppp : userland obos_network interfaces : 
@@ -11,4 +11,4 @@ Addon <userland>ppp : userland obos_network interfaces :
 	PPPManager.cpp
 ;
 
-LinkSharedOSLibs <userland>ppp : <userland>libkernelppp.a <installed>net_stack_tester be ;
+LinkAgainst <userland>ppp : <userland>libkernelppp.a <installed>net_stack_tester be ;

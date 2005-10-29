@@ -1,8 +1,8 @@
-SubDir OBOS_TOP src kits midi ;
+SubDir HAIKU_TOP src kits midi ;
 
 UsePrivateHeaders midi ;
 
-SharedLibrary midi :
+SharedLibrary libmidi.so :
 	Midi.cpp
 	MidiGlue.cpp
 	MidiPort.cpp
@@ -13,12 +13,7 @@ SharedLibrary midi :
 	Samples.cpp
 	SoftSynth.cpp
 	Synth.cpp
-;
-
-LinkSharedOSLibs libmidi.so :
+	:
 	be
 	midi2
 ;
-
-MakeLocate <develop>libmidi.so : $(OBOS_STLIB_DIR) ;
-RelSymLink <develop>libmidi.so : libmidi.so ;

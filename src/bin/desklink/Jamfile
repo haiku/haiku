@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src bin desklink ;
+SubDir HAIKU_TOP src bin desklink ;
 
 AddResources desklink : desklink.rsrc ;
 

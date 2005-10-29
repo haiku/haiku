@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons print drivers pdf bookmarks ;
+SubDir HAIKU_TOP src add-ons print drivers pdf bookmarks ;
 
 Package haiku-pdf_writer-cvs :
 	Sample :

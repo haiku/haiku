@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src tests add-ons input_server ;
+SubDir HAIKU_TOP src tests add-ons input_server ;
 
-SubDirHdrs $(OBOS_TOP) src add-ons input_server devices keyboard ;
+SubDirHdrs $(HAIKU_TOP) src add-ons input_server devices keyboard ;
 UsePrivateHeaders input ;
 
 SimpleTest TeamMonitorTest :
@@ -12,4 +12,4 @@ SimpleTest TeamMonitorTest :
 
 SEARCH on [ FGristFiles
 		TMWindow.cpp TMListItem.cpp
-	] = [ FDirName $(OBOS_TOP) src add-ons input_server devices keyboard ] ;
+	] = [ FDirName $(HAIKU_TOP) src add-ons input_server devices keyboard ] ;

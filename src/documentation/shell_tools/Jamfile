@@ -1,14 +1,15 @@
-SubDir OBOS_TOP src documentation shell_tools ;
+SubDir HAIKU_TOP src documentation shell_tools ;
 
 Doc2HTML 
 	Shell_Tools-Guide.xml
 	: index.html
 	: http://docbook.sourceforge.net/release/xsl/current/html/chunk.xsl
 	: Shell_Tools 
-	: [ FDirName $(OBOS_OBJECT_TARGET) documentation Shell_Tools ] [ FDirName $(OBOS_TOP) src bin coreutils man ] 
+	: [ FDirName $(HAIKU_DOCUMENTATION_OBJECT_DIR) Shell_Tools ]
+	  [ FDirName $(HAIKU_TOP) src bin coreutils man ] 
 	: -stringparam use.id.as.filename 1
 	;
 
 Includes [ FGristFiles Shell_Tools-Guide.xml ] : <src!bin!coreutils!man>coreutils.xml <src!documentation>license.xml ;
-SEARCH on <src!bin!coreutils!man>coreutils.xml = [ FDirName $(OBOS_TOP) src bin coreutils man ] ;
+SEARCH on <src!bin!coreutils!man>coreutils.xml = [ FDirName $(HAIKU_TOP) src bin coreutils man ] ;
 

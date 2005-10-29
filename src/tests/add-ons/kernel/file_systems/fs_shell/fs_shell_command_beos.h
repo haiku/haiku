@@ -9,7 +9,7 @@ static const char *kFSShellCommandPort = "fs shell command port";
 
 struct external_command_message {
 	port_id		reply_port;
-	char		command[1024];
+	char		command[20480];
 };
 
 struct external_command_reply {

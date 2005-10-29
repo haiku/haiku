@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kits opengl glinfo ;
+SubDir HAIKU_TOP src tests kits opengl glinfo ;
 
 SimpleTest GLInfo :
 	GLInfo.cpp

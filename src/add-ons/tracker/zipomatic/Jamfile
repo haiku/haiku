@@ -1,10 +1,10 @@
-SubDir OBOS_TOP src add-ons tracker zipomatic ;
+SubDir HAIKU_TOP src add-ons tracker zipomatic ;
 
 AddResources ZipOMatic-Z :
 	ZipOMatic.rdef ZipOMatic.icons.rdef ZipOMatic.version.rdef
 	;
 
-App ZipOMatic-Z : 
+Application ZipOMatic-Z : 
 	GenericThread.cpp
 	ZipOMatic.cpp
 	ZipOMaticActivity.cpp
@@ -14,6 +14,5 @@ App ZipOMatic-Z :
 	ZipOMaticWindow.cpp
 	ZipOMaticZipper.cpp
 	;
-MakeLocate ZipOMatic-Z : [ FDirName $(OBOS_ADDON_DIR) Tracker ] ;	
 
-LinkSharedOSLibs ZipOMatic-Z : be tracker ;
+LinkAgainst ZipOMatic-Z : be tracker ;

@@ -1,4 +1,6 @@
-SubDir OBOS_TOP src bin screen_blanker ;
+SubDir HAIKU_TOP src bin screen_blanker ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders screen_saver ;
 
@@ -13,7 +15,7 @@ BinCommand screen_blanker :
 
 SEARCH on [ FGristFiles
 		ScreenSaver.cpp
-	] = [ FDirName $(OBOS_TOP) src kits screensaver ] ;
+	] = [ FDirName $(HAIKU_TOP) src kits screensaver ] ;
 
 Package haiku-screensaverkit-cvs :
 	screen_blanker :

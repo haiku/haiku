@@ -1,4 +1,6 @@
-SubDir OBOS_TOP src preferences filetypes ;
+SubDir HAIKU_TOP src preferences filetypes ;
+
+SubDirSysHdrs $(SUBDIR) ;
 
 Preference FileTypes :
 	main.cpp

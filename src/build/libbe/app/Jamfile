@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src build libbe app ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) headers build private app ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers build private shared ] : true ;
+
+USES_BE_API on <libbe_build>app_kit.o = true ;
+
+BuildPlatformMergeObject <libbe_build>app_kit.o :
+ 	AppMisc.cpp
+	Message.cpp
+	MessageBody.cpp
+	MessageField.cpp
+ 	Messenger.cpp
+ 	MessageUtils.cpp
+ 	TypeConstants.cpp 
+;
+

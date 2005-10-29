@@ -1,6 +1,7 @@
-SubDir OBOS_TOP src system libroot posix glibc stdlib ;
+SubDir HAIKU_TOP src system libroot posix glibc stdlib ;
 
-SubDirHdrs $(OBOS_TOP) src system libroot posix glibc include arch $(OBOS_ARCH) ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch
+	$(TARGET_ARCH) ;
 
 KernelMergeObject posix_gnu_stdlib.o :
 	fpioconst.c

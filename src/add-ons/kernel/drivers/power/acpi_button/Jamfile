@@ -1,16 +1,8 @@
-SubDir OBOS_TOP src add-ons kernel drivers power acpi_button ;
+SubDir HAIKU_TOP src add-ons kernel drivers power acpi_button ;
 
-R5KernelAddon acpi_button : kernel drivers bin :
+KernelAddon acpi_button : kernel drivers bin :
 	acpi_button.c
 	;
 
 Depends acpi_button : acpi ;
 
-# Link driver(s) to kernel/drivers/dev/power
-{
-	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev power ] ;
-
-	local instDriver = <kernel!drivers!dev!power>acpi_button ;
-	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : acpi_button ;
-}

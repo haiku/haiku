@@ -1,12 +1,12 @@
-SubDir OBOS_TOP src libs pdflib libs pdcore ;
+SubDir HAIKU_TOP src libs pdflib libs pdcore ;
 
 UseLibraryHeaders pdflib ;
 
-SubDirHdrs [ FDirName $(OBOS_TOP) src libs pdflib libs flate ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src libs pdflib libs flate ] ;
 
 SubDirCcFlags -w ;
 
-StaticLibrary pdf : 
+StaticLibrary libpdf.a : 
 	pc_arc4.c
 	pc_core.c
 	pc_corefont.c
@@ -23,6 +23,5 @@ StaticLibrary pdf :
 	pc_optparse.c
 	pc_md5.c
 	pc_geom.c
-: STATIC_LIBRARY_DIR
 ;
 

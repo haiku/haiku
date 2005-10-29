@@ -21,8 +21,8 @@ static const char rcsid[] = "$Header: /tmp/bonefish/open-beos/current/src/kits/n
 #include "port_before.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
-#include <memory.h>
 #include <string.h>
 #include <errno.h>
 #include <sys/stat.h>

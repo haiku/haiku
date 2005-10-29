@@ -1,7 +1,9 @@
 # FreeType 2 src/sfnt Jamfile (c) 2001, 2002 David Turner
 #
 
-SubDir  OBOS_TOP src libs freetype2 sfnt ;
+SubDir  HAIKU_TOP src libs freetype2 sfnt ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UseFreeTypeHeaders ;
 

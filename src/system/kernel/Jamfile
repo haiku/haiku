@@ -1,14 +1,9 @@
-SubDir OBOS_TOP src system kernel ;
-
-local buildSources = ;
-if $(OS) != BEOS {
-	SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src build ] ;
-	buildSources = cpp_support.cpp ;
-}
+SubDir HAIKU_TOP src system kernel ;
 
 {
+	# TODO: Rename the macro OBOS_ARCH to TARGET_ARCH, or something like that.
 	local defines =
-		OBOS_ARCH=\\\"$(OBOS_ARCH)\\\"
+		OBOS_ARCH=\\\"$(TARGET_ARCH)\\\"
 		;
 
 	defines = [ FDefines $(defines) ] ;
@@ -42,7 +37,6 @@ KernelMergeObject kernel_core.o :
 	thread.c
 	timer.c
 
-	$(buildSources)
 	: -fno-pic
 	;
 
@@ -57,12 +51,12 @@ KernelLd linkhack.so :
 	-shared -Bdynamic
 	;
 
-SubInclude OBOS_TOP src system kernel arch ;
-SubInclude OBOS_TOP src system kernel cache ;
-SubInclude OBOS_TOP src system kernel device_manager ;
-SubInclude OBOS_TOP src system kernel debug ;
-SubInclude OBOS_TOP src system kernel disk_device_manager ;
-SubInclude OBOS_TOP src system kernel fs ;
-SubInclude OBOS_TOP src system kernel messaging ;
-SubInclude OBOS_TOP src system kernel util ;
-SubInclude OBOS_TOP src system kernel vm ;
+SubInclude HAIKU_TOP src system kernel arch ;
+SubInclude HAIKU_TOP src system kernel cache ;
+SubInclude HAIKU_TOP src system kernel device_manager ;
+SubInclude HAIKU_TOP src system kernel debug ;
+SubInclude HAIKU_TOP src system kernel disk_device_manager ;
+SubInclude HAIKU_TOP src system kernel fs ;
+SubInclude HAIKU_TOP src system kernel messaging ;
+SubInclude HAIKU_TOP src system kernel util ;
+SubInclude HAIKU_TOP src system kernel vm ;

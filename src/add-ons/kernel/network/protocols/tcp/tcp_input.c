@@ -141,6 +141,14 @@ extern uint32 sb_max;
 
 int tcp_reass(struct tcpcb *tp, struct tcpiphdr *ti, struct mbuf *m);
 
+/* The BeOS R5 kernel doesn't have abs(). */
+#ifdef COMPILE_FOR_R5
+int abs(int num)
+{
+	return (int)labs(num);
+}
+#endif
+
 
 /*
  * Insert segment ti into reassembly queue of tcp with

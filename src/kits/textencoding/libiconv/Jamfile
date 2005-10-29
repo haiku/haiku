@@ -1,8 +1,10 @@
-SubDir OBOS_TOP src kits textencoding libiconv ;
+SubDir HAIKU_TOP src kits textencoding libiconv ;
 
-# filter warnings we don't want here
-local originalCCFlags = $(CCFLAGS) ;
-CCFLAGS = [ Filter $(CCFLAGS) : -Wall -Wmissing-prototypes -Wsign-compare ] ;
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+# disable warnings we don't want here
+TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
+	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
 SubDirCcFlags
 	-DLIBDIR="\\\"/boot/home/config/lib\\\""
@@ -15,13 +17,17 @@ SubDirCcFlags
 	-DHAVE_CONFIG_H
 	;
 
+SubDirSysHdrs $(SUBDIR) ;
+
+if $(TARGET_PLATFORM) != haiku {
+	# Argh! Just for <posix/iconv.h>.
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+}
+
 SEARCH_SOURCE += [ FDirName $(SUBDIR) libcharset ] ;
 
-StaticLibrary iconv :
+StaticLibrary libiconv.a :
 	iconv.c
 	localcharset.c
 	relocatable.c
 	;
-
-# restore CCFLAGS
-CCFLAGS = $(originalCCFlags) ;

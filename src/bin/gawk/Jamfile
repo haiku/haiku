@@ -1,12 +1,13 @@
-SubDir OBOS_TOP src bin gawk ;
+SubDir HAIKU_TOP src bin gawk ;
 
 # filter warnings we don't want here
-local originalCCFlags = $(CCFLAGS) ;
-CCFLAGS = [ Filter $(CCFLAGS) : -Wall -Wmissing-prototypes -Wsign-compare ] ;
+TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
+	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
 SubDirCcFlags -DDEFPATH='\".:/share/awk\"' -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='\"/share/locale\"' ;
 
-SubDirHdrs [ FDirName $(SUBDIR) intl ] ;
+SubDirSysHdrs $(SUBDIR) ;
+SubDirSysHdrs [ FDirName $(SUBDIR) intl ] ;
 
 local gawk_rsrc = [ FGristFiles gawk.rsrc ] ;
 ResComp $(gawk_rsrc) : [ FGristFiles gawk.rdef ] ;
@@ -30,12 +31,4 @@ BinCommand pgawk :
 	:  <gawk>libintl.a
 	: gawk.rsrc ;
 
-MakeLocate awk : $(OBOS_BIN_DIR) ;
-RelSymLink awk : gawk ;
-MakeLocate igawk : $(OBOS_BIN_DIR) ;
-RelSymLink igawk : gawk ;
-
-SubInclude OBOS_TOP src bin gawk intl ;
-
-# restore CCFLAGS
-CCFLAGS = $(originalCCFlags) ;
+SubInclude HAIKU_TOP src bin gawk intl ;

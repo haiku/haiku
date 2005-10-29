@@ -13,6 +13,7 @@
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <kernel/fs_attr.h>
 
 int main(int32 argc, const char **argv)

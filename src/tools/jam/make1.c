@@ -68,7 +68,8 @@ static void make1c( TARGET *t );
 static void make1d( void *closure, int status );
 
 static CMD *make1cmds( ACTIONS *a0 );
-static LIST *make1list( LIST *l, TARGETS *targets, int flags );
+static LIST *make1list( LIST *l, TARGETS *targets, int flags,
+	int *missingTargets );
 static SETTINGS *make1settings( LIST *vars );
 static void make1bind( TARGET *t, int warn );
 
@@ -428,6 +429,8 @@ make1cmds( ACTIONS *a0 )
 	    ACTIONS *a1;
 	    CMD	    *cmd;
 	    int	    start, chunk, length, maxline;
+	    int missingTargets = 0;
+	    int ruleFlags = rule->flags;
 
 	    /* Only do rules with commands to execute. */
 	    /* If this action has already been executed, use saved status */
@@ -441,21 +444,26 @@ make1cmds( ACTIONS *a0 )
 	    /* If `execute together` has been specified for this rule, tack */
 	    /* on sources from each instance of this rule for this target. */
 
-	    nt = make1list( L0, a0->action->targets, 0 );
-	    ns = make1list( L0, a0->action->sources, rule->flags );
+	    nt = make1list( L0, a0->action->targets, 0 , &missingTargets );
 
-	    if( rule->flags & RULE_TOGETHER )
+		/* If a target is missing use all sources. */
+		if (missingTargets)
+			ruleFlags &= ~RULE_UPDATED;
+
+		ns = make1list( L0, a0->action->sources, ruleFlags, NULL );
+
+	    if( ruleFlags & RULE_TOGETHER )
 		for( a1 = a0->next; a1; a1 = a1->next )
 		    if( a1->action->rule == rule && !a1->action->running )
 	    {
-		ns = make1list( ns, a1->action->sources, rule->flags );
+		ns = make1list( ns, a1->action->sources, ruleFlags, NULL );
 		a1->action->running = 1;
 	    }
 
 	    /* If doing only updated (or existing) sources, but none have */
 	    /* been updated (or exist), skip this action. */
 
-	    if( !ns && ( rule->flags & ( RULE_UPDATED | RULE_EXISTING ) ) )
+	    if( !ns && ( ruleFlags & ( RULE_UPDATED | RULE_EXISTING ) ) )
 	    {
 		list_free( nt );
 		continue;
@@ -488,7 +496,7 @@ make1cmds( ACTIONS *a0 )
 
 	    start = 0;
 	    chunk = length = list_length( ns );
-	    maxline = rule->flags / RULE_MAXLINE;
+	    maxline = ruleFlags / RULE_MAXLINE;
 	    maxline = maxline && maxline < MAXLINE ? maxline : MAXLINE;
 
 	    do
@@ -510,7 +518,7 @@ make1cmds( ACTIONS *a0 )
 		    cmds->tail = cmd;
 		    start += chunk;
 		}
-		else if( ( rule->flags & RULE_PIECEMEAL ) && chunk > 1 )
+		else if( ( ruleFlags & RULE_PIECEMEAL ) && chunk > 1 )
 		{
 		    /* Reduce chunk size slowly. */
 
@@ -550,7 +558,8 @@ static LIST *
 make1list( 
 	LIST	*l,
 	TARGETS	*targets,
-	int	flags )
+	int	flags,
+	int *missingTargets )
 {
     for( ; targets; targets = targets->next )
     {
@@ -566,6 +575,9 @@ make1list(
 
 	if( ( flags & RULE_EXISTING ) && t->binding != T_BIND_EXISTS )
 	    continue;
+
+	if ( t->binding != T_BIND_EXISTS && missingTargets)
+		*missingTargets = 1;
 
 	if( ( flags & RULE_UPDATED ) && t->fate <= T_FATE_STABLE )
 	    continue;

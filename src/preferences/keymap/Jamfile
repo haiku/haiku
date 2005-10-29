@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src preferences keymap ;
+SubDir HAIKU_TOP src preferences keymap ;
 
 UsePrivateHeaders interface ;
 

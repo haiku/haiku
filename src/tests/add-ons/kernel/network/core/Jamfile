@@ -1,8 +1,8 @@
-SubDir OBOS_TOP src tests add-ons kernel network core ;
+SubDir HAIKU_TOP src tests add-ons kernel network core ;
 
 UsePrivateHeaders net ;
 
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network core ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel network core ] ;
 
 Addon <userland>core : userland obos_network :
 	cksum.c
@@ -22,6 +22,6 @@ Addon <userland>core : userland obos_network :
 	socket.c
 ;
 
-LinkSharedOSLibs <userland>core : <installed>net_stack_tester ;
+LinkAgainst <userland>core : <installed>net_stack_tester ;
 
 

@@ -1,0 +1,358 @@
+
+# FSysIncludes <dirs> ;
+#
+# Counterpart of FIncludes for system include search paths.
+#
+#if $(OSPLAT) = X86 {
+	rule FSysIncludes { return -I$(<) ; }
+	HDRS_INCLUDES_SEPARATOR = -I- ;
+# } else {
+# 	rule FSysIncludes { return "-i "$(<) ; }
+# 	HDRS_INCLUDES_SEPARATOR = -i- ;
+# }
+# mwcc support commented out
+
+rule SubDirSysHdrs
+{
+	# SubDirSysHdrs <dirs> ;
+	#
+	# Adds directories to the system include search paths for the current
+	# subdirectory. Counterpart of SubDirHdrs which adds non-system include
+	# search paths.
+	#
+	# <dirs>: The directories to be added to the current subdir's system
+	#         include search paths.
+	#
+	SUBDIRSYSHDRS += [ FDirName $(1) ] ;
+}
+
+rule ObjectSysHdrs
+{
+	# ObjectSysHdrs <sources or objects> : <headers> : <gristed objects>
+	#
+	# Adds directories to the system include search paths for the given
+	# sources or objects. Counterpart of ObjectHdrs which adds non-system
+	# include search paths.
+	#
+	# NOTE: With this incarnation of the Haiku build system this rule doesn't
+	# need to be invoked *after* the rule that generates the objects anymore.
+	# Actually it is even encouraged to do that *before*. Same for ObjectHdrs.
+	#
+	# <sources or objects>: The targets for which to add system include
+	#                       search paths.
+	# <dirs>: The directories to be added to the given objects' system
+	#         include search paths.
+	#
+
+	local objects = [ FGristFiles $(1:S=$(SUFOBJ)) ] $(3) ;
+	local headers = $(2) ;
+
+	local file ;
+	for file in $(objects) {
+		on $(file) {
+			local sysHeaders = $(SYSHDRS) $(headers) ;
+			SYSHDRS on $(file) = $(sysHeaders) ;
+
+			# reformat ASHDRS and CCHDRS
+			local fileHeaders = [ FIncludes $(HDRS) ]
+				$(HDRS_INCLUDES_SEPARATOR) [ FIncludes $(sysHeaders) ] ;
+			ASHDRS on $(file) = $(fileHeaders) ;
+			CCHDRS on $(file) = $(fileHeaders) ;
+		}
+	}
+}
+
+rule SourceHdrs
+{
+	# SourceHdrs <sources> : <headers> [ : <gristed objects> ] ;
+	#
+	# Is a wrapper for ObjectHdrs, that passes <sources> and <headers> or,
+	# if supplied <objects> and <headers>, and also adjusts HDRSEARCH (not
+	# done by ObjectHdrs).
+
+	local sources = [ FGristFiles $(1) ] ;
+	local headers = $(2) ;
+	local objects = $(3) ;
+
+	ObjectHdrs $(sources) : $(headers) : $(objects) ;
+
+	# Also add the header search dirs to HDRSEARCH. Note, that these dirs
+	# will be listed after the STDHDRS (if any), but that's better than not
+	# being listed at all.
+	HDRSEARCH on $(sources) += $(headers) ;
+}
+
+rule SourceSysHdrs
+{
+	# SourceSysHdrs <sources> : <headers> [ : <gristed objects> ] ;
+	#
+	# Is a wrapper for ObjectSysHdrs, that passes <sources> and <headers> or,
+	# if supplied <objects> and <headers>, and also adjusts HDRSEARCH (not
+	# done by ObjectSysHdrs).
+
+	local sources = [ FGristFiles $(1) ] ;
+	local headers = $(2) ;
+	local objects = $(3) ;
+
+	ObjectSysHdrs $(sources) : $(headers) : $(objects) ;
+
+	# Also add the header search dirs to HDRSEARCH. Note, that these dirs
+	# will be listed after the STDHDRS (if any), but that's better than not
+	# being listed at all.
+	HDRSEARCH on $(sources) += $(headers) ;
+}
+
+rule PublicHeaders
+{
+	# PublicHeaders <group list>
+	#
+	# Returns the directory names for the public header dirs identified by
+	# <group list>.
+
+	local list = $(1) ;
+	local dirs = [ FDirName $(HAIKU_TOP) headers os ] ;
+
+	for i in $(list) {
+		dirs += [ FDirName $(HAIKU_TOP) headers os $(i) ] ;
+	}
+	return $(dirs) ;
+}
+
+rule PrivateHeaders
+{
+	# PrivateHeaders <group list>
+	#
+	# Returns the directory names for the private header dirs identified by
+	# <group list>.
+
+	local list = $(1) ;
+	local dirs ;
+	for i in $(list) {
+		dirs += [ FDirName $(HAIKU_TOP) headers private $(i) ] ;
+	}
+	return $(dirs) ;
+}
+
+rule LibraryHeaders
+{
+	# LibraryHeaders <group list>
+	#
+	# Returns the directory names for the library header dirs identified by
+	# <group list>.
+
+	local list = $(1) ;
+	local dirs ;
+	for i in $(list) {
+		dirs += [ FDirName $(HAIKU_TOP) headers libs $(i) ] ;
+	}
+	return $(dirs) ;
+}
+
+rule ArchHeaders
+{
+	# usage: ArchHeaders <arch> ;
+	#
+	# <arch> specifies the architecture (e.g. x86).
+
+	return [ FDirName $(HAIKU_TOP) headers private kernel arch $(1) ] ;
+}
+
+rule UseHeaders
+{
+	# UseHeaders <headers> [ : <system> ] ;
+	#
+	# Adds the C header dirs <headers> to the header search
+	# dirs of the subdirectory.
+	# If <system> is "true", the dirs are added as system otherwise local
+	# search dirs.
+	# NOTE: This rule must be invoked *before* the rule that builds the objects.
+
+	local header ;
+	if $(2) = true {
+		for header in $(1) {
+			SubDirSysHdrs $(header) ;
+		}
+	} else {
+		for header in $(1) {
+			SubDirHdrs $(header) ;
+		}
+	}
+}
+
+rule UsePublicHeaders
+{
+	# UsePublicHeaders <group list> ;
+	#
+	# Adds the public C header dirs given by <group list> to the header search
+	# dirs of the subdirectory.
+	# NOTE: This rule must be invoked *before* the rule that builds the
+	# objects.
+
+	UseHeaders [ PublicHeaders $(1) ] : true ;
+}
+
+rule UsePublicObjectHeaders
+{
+	# UsePublicObjectHeaders <sources> : <group list> [ : <objects> ] ;
+	#
+	# Adds the public C header dirs given by <group list> to the header search
+	# dirs of either the object targets of <sources> or if supplied to
+	# <objects>. Also adjusts HDRSEARCH of <sources>.
+	# NOTE: This rule must be invoked *after* the rule that builds the objects.
+
+	SourceSysHdrs $(1) : [ PublicHeaders $(2) ] : $(3) ;
+}
+
+rule UsePrivateHeaders
+{
+	# UsePrivateHeaders <group list> [ : <system> ] ;
+	#
+	# Adds the private C header dirs given by <group list> to the header search
+	# dirs of the subdirectory.
+	# <system> specifies whether to add the dirs as system or local header
+	# search dirs. Defaults to "true".
+	# NOTE: This rule must be invoked *before* the rule that builds the objects.
+
+	local system = $(2) ;
+	system ?= true ;	
+
+	UseHeaders [ PrivateHeaders $(1) ] : $(system) ;
+}
+
+rule UsePrivateObjectHeaders
+{
+	# UsePrivateObjectHeaders <sources> : <group list> [ : <objects>
+	#	[ : <system> ] ] ;
+	#
+	# Adds the private C header dirs given by <group list> to the header search
+	# dirs of either the object targets of <sources> or if supplied to
+	# <objects>. Also adjusts HDRSEARCH of <sources>.
+	# <system> specifies whether to add the dirs as system or local header
+	# search dirs. Defaults to "true".
+	# NOTE: This rule must be invoked *after* the rule that builds the objects.
+
+	local system = $(4) ;
+	system ?= true ;	
+
+	if $(system) = true {
+		SourceSysHdrs $(1) : [ PrivateHeaders $(2) ] : $(3) ;
+	} else {
+		SourceHdrs $(1) : [ PrivateHeaders $(2) ] : $(3) ;
+	}
+}
+
+rule UseCppUnitHeaders
+{
+	SubDirSysHdrs [ FDirName $(HAIKU_TOP) headers tools cppunit ] ;
+}
+
+rule UseCppUnitObjectHeaders
+{
+	# UseCppUnitObjectHeaders <sources> [ : <objects> ] ;
+	SourceSysHdrs $(1) : [ FDirName $(HAIKU_TOP) headers tools cppunit ]
+		: $(2) ;
+}
+
+rule UseArchHeaders
+{
+	# usage: UseArchHeaders <arch> ;
+	#
+	# <arch> specifies the architecture (e.g. x86).
+	# NOTE: This rule must be invoked *before* the rule that builds the objects.
+
+	local headers = [ ArchHeaders $(1) ] ;
+
+	UseHeaders $(headers) : true ;
+}
+
+rule UseArchObjectHeaders
+{
+	# usage: UseArchObjectHeaders <sources> : <arch> : [ <objects> ] ;
+	#
+	# <arch> specifies the architecture (e.g. x86).
+	# <sources_or_objects> Source or object files.
+	# NOTE: This rule must be invoked *after* the rule that builds the objects.
+
+	local sources = $(1) ;
+	local headers = [ ArchHeaders $(2) ] ;
+	local objects = $(3) ;
+	local targets ;
+	if $(objects) {
+		targets = $(objects) ;
+	} else {
+		targets = [ FGristFiles $(sources:S=$(SUFOBJ)) ] ;
+	}
+
+	SourceSysHdrs $(sources) : $(headers) : $(objects) ;
+}
+
+rule UsePosixObjectHeaders
+{
+	# UsePosixObjectHeaders <sources> [ : <objects> ] ;
+	#
+	# Adds the POSIX header dir to the header search
+	# dirs of either the object targets of <sources> or if supplied to
+	# <objects>. Also adjusts HDRSEARCH of <sources>.
+	# NOTE: This rule must be invoked *after* the rule that builds the objects.
+
+	SourceSysHdrs $(1) : [ FDirName $(HAIKU_TOP) headers posix ] : $(2) ;
+}
+
+rule UseLibraryHeaders
+{
+	# UseLibraryHeaders <group list> ;
+	#
+	# Adds the library header dirs given by <group list> to the header search
+	# dirs of the subdirectory.
+	# NOTE: This rule must be invoked *before* the rule that builds the objects.
+
+	UseHeaders [ LibraryHeaders $(1) ] : true ;
+}
+
+rule FStandardOSHeaders
+{
+	local osIncludes = add-ons add-ons/file_system add-ons/graphics
+					   add-ons/input_server add-ons/screen_saver
+					   add-ons/tracker app device drivers game interface
+					   kernel media mail midi midi2 net opengl storage support
+					   translation ;
+	
+	return [ PublicHeaders $(osIncludes) ] ;
+}
+
+rule FStandardHeaders
+{
+	local osIncludes = add-ons add-ons/file_system add-ons/graphics
+					   add-ons/input_server add-ons/screen_saver
+					   add-ons/tracker app device drivers game interface
+					   kernel media mail midi midi2 net opengl storage support
+					   translation ;
+
+	# Use headers directory, to allow to do things like include <posix/string.h>
+	local headers = [ FDirName $(HAIKU_TOP) headers ] ;
+
+	# Use posix headers directory
+	headers += [ FDirName $(HAIKU_TOP) headers posix ] ;
+
+	# Use GNU headers directory
+	headers += [ FDirName $(HAIKU_TOP) headers gnu ] ;
+
+	# Use glibc headers
+	headers += [ FDirName $(HAIKU_TOP) headers glibc ] ;
+
+	headers += [ FDirName $(HAIKU_TOP) headers cpp ] ;
+
+	# Use public OS header directories
+	headers += [ PublicHeaders $(osIncludes) ] ;
+
+	# Use the root of the private headers -- not so nice, but simplifies things.
+	headers += [ PrivateHeaders $(DOT) ] ;
+
+	# The platform (compiler actually) dependent headers.
+	headers += $(HAIKU_GCC_HEADERS_DIR) ;
+
+	return $(headers) ;
+}
+
+# SUBDIRSYSHDRS shall be reset automatically for each subdir
+SUBDIRRESET += SYSHDRS ;

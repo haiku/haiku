@@ -1,7 +1,9 @@
-SubDir OBOS_TOP src add-ons mail_daemon outbound_protocols smtp ;
+SubDir HAIKU_TOP src add-ons mail_daemon outbound_protocols smtp ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders mail ;
-SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
 if $(USESSL) {
 	SubDirC++Flags -DUSESSL ;
@@ -18,10 +20,10 @@ Addon SMTP : mail_daemon outbound_protocols :
 	smtp.cpp
 	md5c.c ;
 
-LinkSharedOSLibs SMTP : be libmail.so $(NETWORK_LIBS) ;
+LinkAgainst SMTP : be libmail.so $(NETWORK_LIBS) ;
 
 if $(USESSL) {
-	LinkSharedOSLibs SMTP : ssl crypto ;
+	LinkAgainst SMTP : ssl crypto ;
 }
 
 Package haiku-maildaemon-cvs :

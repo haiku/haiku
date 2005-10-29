@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests ;
+SubDir HAIKU_TOP src tests ;
 
 CommonTestLib libexampletest.so
 	: ExampleTestAddon.cpp
@@ -33,9 +33,9 @@ R5UnitTest UnitTesterHelper
 	:
 ;
 
-SubInclude OBOS_TOP src tests add-ons ;
-SubInclude OBOS_TOP src tests apps ;
-SubInclude OBOS_TOP src tests bin ;
-SubInclude OBOS_TOP src tests kernel ;
-SubInclude OBOS_TOP src tests kits ;
-SubInclude OBOS_TOP src tests servers ;
+SubInclude HAIKU_TOP src tests add-ons ;
+SubInclude HAIKU_TOP src tests apps ;
+SubInclude HAIKU_TOP src tests bin ;
+SubInclude HAIKU_TOP src tests kernel ;
+SubInclude HAIKU_TOP src tests kits ;
+SubInclude HAIKU_TOP src tests servers ;

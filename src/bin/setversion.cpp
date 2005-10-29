@@ -360,7 +360,7 @@ int main(int argc, char *argv[])
 
 	parse(bSysModified, bAppModified, argNeeded, mode, sysInfo, appInfo, argc, argv);
 			
-	BFile file(argv[1], B_WRITE_ONLY);
+	BFile file(argv[1], B_READ_WRITE);
 	if(file.InitCheck() != B_OK)
 		errorOut(e_no_file, argv[0], argv[1]);
 	 

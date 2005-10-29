@@ -1,29 +1,29 @@
-SubDir OBOS_TOP src libs stdc++ ;
+SubDir HAIKU_TOP src libs stdc++ ;
 
-local savedCcFlags = $(CCFLAGS) ;
-CCFLAGS = ;
-local savedC++Flags = $(C++FLAGS) ;
-C++FLAGS = ;
+# disable undesired warnings, and add some required C++ flags
+CCFLAGS += -Wno-missing-prototypes ;
+C++FLAGS += -nostdinc++ -fno-implicit-templates -Wno-sign-compare -fpic ;
 
 # define header-searchpaths all by ourselves, as including system headers
 # messes things up:
 # use the following paths to make use of the headers contained in glibc, 
 # but this doesn't work yet, as the libio we are using here and the one 
 # contained in our libroot are different versions.
-HDRS = 
-	[ FDirName $(OBOS_TOP) src system libroot posix glibc libio ]
-	[ FDirName $(OBOS_TOP) src system libroot posix glibc stdlib ] 
-	[ FDirName $(OBOS_TOP) src system libroot posix glibc stdio-common ] 
-	[ FDirName $(OBOS_TOP) src system libroot posix glibc include ] 
-	[ FDirName $(OBOS_TOP) src system libroot posix glibc include arch x86 ] 
-	[ FDirName $(OBOS_TOP) headers cpp ] 
-	[ FDirName $(OBOS_TOP) src system libroot posix glibc ] 
-	[ FDirName $(OBOS_TOP) headers posix ] 
-	[ FDirName $(OBOS_TOP) headers os ] 
-	[ FDirName $(OBOS_TOP) headers os kernel ] 
-	[ FDirName $(OBOS_TOP) headers os storage ] 
-	[ FDirName $(OBOS_TOP) headers os support ] 
-   $(LIBGCC_DIR)/include ; 		# such that include_next will work
+SYSHDRS = 
+	$(SUBDIR)
+	[ FDirName $(HAIKU_TOP) src system libroot posix glibc libio ]
+	[ FDirName $(HAIKU_TOP) src system libroot posix glibc stdlib ] 
+	[ FDirName $(HAIKU_TOP) src system libroot posix glibc stdio-common ] 
+	[ FDirName $(HAIKU_TOP) src system libroot posix glibc include ] 
+	[ FDirName $(HAIKU_TOP) src system libroot posix glibc include arch x86 ] 
+	[ FDirName $(HAIKU_TOP) headers cpp ] 
+	[ FDirName $(HAIKU_TOP) src system libroot posix glibc ] 
+	[ FDirName $(HAIKU_TOP) headers posix ] 
+	[ FDirName $(HAIKU_TOP) headers os ] 
+	[ FDirName $(HAIKU_TOP) headers os kernel ] 
+	[ FDirName $(HAIKU_TOP) headers os storage ] 
+	[ FDirName $(HAIKU_TOP) headers os support ] 
+	$(TARGET_GCC_HEADERS_DIR) ; 		# such that include_next will work
 
 # some source-files generate several different objects, depending on
 # the defines that are used during the compilation call.
@@ -35,27 +35,12 @@ rule GenerateStdC++Object
 	local sources = $(2) ;
 	local defines = $(3) ;
 
-	local source ;
-	
-	for source in [ FGristFiles $(sources) ] {
-		CCFLAGS on $(source:S=$(SUFOBJ)) = $(savedCcFlags) -Wno-missing-prototypes ;
-		C++FLAGS on $(source:S=$(SUFOBJ)) = $(savedC++Flags) -nostdinc++ -fno-implicit-templates 
-													   -Wno-sign-compare -fpic ;
-	}
-
-	SetupObjectsDir ;
-	MakeLocateObjects $(object) ;
 	if $(object) {
 		Object $(object) : $(sources) ;
+		ObjectDefines $(object) : $(defines) ;
 	} else {
 		Objects $(sources) ;
-	}
-	if $(defines) {
-		if $(object) {
-			ObjectDefines $(object) : $(defines) ;
-		} else {
-			ObjectDefines $(sources) : $(defines) ;
-		}
+		ObjectDefines $(sources) : $(defines) ;
 	}
 }
 
@@ -142,7 +127,7 @@ GenerateStdC++Object
 GenerateStdC++Object 
 	: basename.c getpagesize.c insque.c sigsetmask.c strerror.c vfork.c ;
 
-SharedLibraryFromObjects stdc++.r4.so : 
+SharedLibraryFromObjects libstdc++.r4.so : 
 	basename.o
  	builtinbuf.o 
 	cmathi.o
@@ -189,6 +174,3 @@ SharedLibraryFromObjects stdc++.r4.so :
 	strerror.o
 	strstream.o 
 	vfork.o ;
-
-CCFLAGS = $(savedCcFlags) ;
-C++FLAGS = $(savedC++Flags) ;

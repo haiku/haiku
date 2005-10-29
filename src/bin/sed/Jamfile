@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src bin sed ;
+SubDir HAIKU_TOP src bin sed ;
 
-SubInclude OBOS_TOP src bin sed lib ;
-SubInclude OBOS_TOP src bin sed sed ; 
+SubInclude HAIKU_TOP src bin sed lib ;
+SubInclude HAIKU_TOP src bin sed sed ; 

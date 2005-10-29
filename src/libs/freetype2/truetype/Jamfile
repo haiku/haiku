@@ -1,7 +1,9 @@
 # FreeType 2 src/truetype Jamfile (c) 2001 David Turner
 #
 
-SubDir  OBOS_TOP src libs freetype2 truetype ;
+SubDir  HAIKU_TOP src libs freetype2 truetype ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UseFreeTypeHeaders ;
 

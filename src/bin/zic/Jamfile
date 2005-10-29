@@ -1,16 +1,16 @@
-SubDir OBOS_TOP src bin zic ;
+SubDir HAIKU_TOP src bin zic ;
 
 SubDirCcFlags -DNOID ;
 
 UsePrivateHeaders [ FDirName libroot time ] ;
 
-BinCommand zic :
+BuildPlatformMain zic :
 	zic.c
 	scheck.c
 	ialloc.c
 ;
 
-BinCommand zdump :
+BuildPlatformMain zdump :
 	zdump.c 
 	ialloc.c
 ;

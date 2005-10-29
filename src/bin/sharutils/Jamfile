@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src bin sharutils ;
+SubDir HAIKU_TOP src bin sharutils ;
 
-SubInclude OBOS_TOP src bin sharutils lib ;
-SubInclude OBOS_TOP src bin sharutils src ; 
+SubInclude HAIKU_TOP src bin sharutils lib ;
+SubInclude HAIKU_TOP src bin sharutils src ; 

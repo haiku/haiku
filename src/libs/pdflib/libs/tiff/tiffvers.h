@@ -1,4 +1,4 @@
-/* PDFlib GmbH cvsid: $Id: tiffvers.h,v 1.1 2004/10/06 17:46:51 laplace Exp $ */
+/* PDFlib GmbH cvsid: $Id$ */
 
 #define TIFFLIB_VERSION_STR "LIBTIFF, Version 3.5.7\n\
 Copyright (c) 1988-1996 Sam Leffler\n\

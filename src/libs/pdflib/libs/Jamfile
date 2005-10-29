@@ -1,7 +1,7 @@
-SubDir OBOS_TOP src libs pdflib libs ;
+SubDir HAIKU_TOP src libs pdflib libs ;
 
-SubInclude OBOS_TOP src libs pdflib libs flate ;
-SubInclude OBOS_TOP src libs pdflib libs pdcore ;
-SubInclude OBOS_TOP src libs pdflib libs pdflib ;
-SubInclude OBOS_TOP src libs pdflib libs png ;
-SubInclude OBOS_TOP src libs pdflib libs tiff ;
+SubInclude HAIKU_TOP src libs pdflib libs flate ;
+SubInclude HAIKU_TOP src libs pdflib libs pdcore ;
+SubInclude HAIKU_TOP src libs pdflib libs pdflib ;
+SubInclude HAIKU_TOP src libs pdflib libs png ;
+SubInclude HAIKU_TOP src libs pdflib libs tiff ;

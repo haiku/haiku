@@ -1,4 +1,4 @@
-/* $Id: pc_md5.c,v 1.1 2004/10/06 17:51:27 laplace Exp $
+/* $Id$
  *
  * PDFlib MD5 message digest routines
  *

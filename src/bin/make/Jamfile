@@ -1,8 +1,8 @@
-SubDir OBOS_TOP src bin make ;
+SubDir HAIKU_TOP src bin make ;
 
 # filter warnings we don't want here
-local originalCCFlags = $(CCFLAGS) ;
-CCFLAGS = [ Filter $(CCFLAGS) : -Wall -Wmissing-prototypes -Wsign-compare ] ;
+TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
+	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
 SubDirHdrs [ FDirName $(SUBDIR) glob ] ;
 
@@ -35,7 +35,4 @@ BinCommand make :
 	vpath.c
 : <make>libglob.a : make.rdef ;
 
-SubInclude OBOS_TOP src bin make glob ;
-
-# restore CCFLAGS
-CCFLAGS = $(originalCCFlags) ;
+SubInclude HAIKU_TOP src bin make glob ;

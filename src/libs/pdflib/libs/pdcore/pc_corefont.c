@@ -10,7 +10,7 @@
  |                                                                           |
  *---------------------------------------------------------------------------*/
 
-/* $Id: pc_corefont.c,v 1.1 2004/10/06 17:51:27 laplace Exp $
+/* $Id$
  *
  * PDFlib in-core font and basic font metric functions
  *

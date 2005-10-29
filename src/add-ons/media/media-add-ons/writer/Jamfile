@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons media media-add-ons writer ;
+SubDir HAIKU_TOP src add-ons media media-add-ons writer ;
 
 UsePrivateHeaders media ;
 
@@ -11,4 +11,4 @@ Addon writer.media_addon : media :
 	: true
 ;
 
-LinkSharedOSLibs writer.media_addon : be media ;
+LinkAgainst writer.media_addon : be media ;

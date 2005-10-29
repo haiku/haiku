@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel console vga_text ;
+SubDir HAIKU_TOP src add-ons kernel console vga_text ;
 
 UsePrivateHeaders kernel ;
 

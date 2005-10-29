@@ -1,11 +1,11 @@
-SubDir OBOS_TOP src libs pdflib libs png ;
+SubDir HAIKU_TOP src libs pdflib libs png ;
 
-SubDirHdrs [ FDirName $(OBOS_TOP) src libs pdflib libs flate ] ;
-SubDirHdrs [ FDirName $(OBOS_TOP) src libs pdflib libs pdcore ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src libs pdflib libs flate ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src libs pdflib libs pdcore ] ;
 
 UseLibraryHeaders pdflib ;
 
-StaticLibrary pdf : 
+StaticLibrary libpdf.a : 
 	png.c
 	pngerror.c
 	pngget.c
@@ -17,6 +17,5 @@ StaticLibrary pdf :
 	pngset.c
 	pngtrans.c
 	pngvcrd.c 
-: STATIC_LIBRARY_DIR
 ;
 

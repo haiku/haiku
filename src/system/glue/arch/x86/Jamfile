@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src system glue arch x86 ;
+SubDir HAIKU_TOP src system glue arch x86 ;
 
 KernelObjects
 	crti.S

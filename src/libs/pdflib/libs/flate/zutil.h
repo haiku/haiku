@@ -9,9 +9,9 @@
  */
 
 
-/* $Id: zutil.h,v 1.1 2004/10/06 17:46:48 laplace Exp $ */
+/* $Id$ */
 
-/* @(#) $Id: zutil.h,v 1.1 2004/10/06 17:46:48 laplace Exp $ */
+/* @(#) $Id$ */
 
 #ifndef _Z_UTIL_H
 #define _Z_UTIL_H
