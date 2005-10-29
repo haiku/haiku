@@ -159,15 +159,20 @@ RootLayer::~RootLayer()
 {
 	fQuiting = true;
 
-//	BMessage quitMsg(B_QUIT_REQUESTED);
+	BMessage quitMsg(B_QUIT_REQUESTED);
+	ssize_t length = quitMsg.FlattenedSize();
+	char buffer[length];
+	if (quitMsg.Flatten(buffer,length) < B_OK) {
+		// failed to flatten?
+		kill_thread(fThreadID);
+	}
+	else{
+		write_port(fListenPort, 0, buffer, length);
 
-//	BPrivate::PortLink msg(fListenPort, -1);
-//	msg.StartMessage(B_QUIT_REQUESTED);
-//	msg.EndMessage();
-//	msg.Flush();
+		status_t dummy;
+		wait_for_thread(fThreadID, &dummy);
+	}
 
-	status_t dummy;
-	wait_for_thread(fThreadID, &dummy);
 
 	delete fDragMessage;
 
