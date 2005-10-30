@@ -374,13 +374,14 @@ BWindow::SendBehind(const BWindow *window)
 	Lock();
 	fLink->StartMessage(AS_SEND_BEHIND);
 	fLink->Attach<int32>(_get_object_token_(window));
+	fLink->Attach<team_id>(Team());
 
-	int32 code = SERVER_FALSE;
+	int32 code = B_OK;
 	fLink->FlushWithReply(code);
 
 	Unlock();
 
-	return code == SERVER_TRUE ? B_OK : B_ERROR;
+	return code;
 }
 
 
@@ -1197,12 +1198,12 @@ BWindow::NeedsUpdate() const
 	const_cast<BWindow *>(this)->Lock();	
 	fLink->StartMessage(AS_NEEDS_UPDATE);
 
-	int32 code = SERVER_FALSE;
+	int32 code = B_ERROR;
 	fLink->FlushWithReply(code);
 
 	const_cast<BWindow *>(this)->Unlock();
 
-	return code == SERVER_TRUE;
+	return code == B_OK;
 }
 
 
