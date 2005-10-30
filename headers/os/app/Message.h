@@ -1,78 +1,44 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Message.h
-//	Author(s):		Erik Jaesler (erik@cgsoftware.com)
-//					DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	BMessage class creates objects that store data and that
-//					can be processed in a message loop.  BMessage objects
-//					are also used as data containers by the archiving and 
-//					the scripting mechanisms.
-//------------------------------------------------------------------------------
-
+/*
+ * Copyright 2001-2005, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *	Erik Jaesler (erik@cgsoftware.com)
+ *	DarkWyrm <bpmagic@columbus.rr.com>
+ */
 #ifndef _MESSAGE_H
 #define _MESSAGE_H
 
-// Standard Includes -----------------------------------------------------------
-
-// System Includes -------------------------------------------------------------
 #include <BeBuild.h>
 #include <OS.h>
 #include <Rect.h>
 #include <DataIO.h>
 #include <Flattenable.h>
 
-#include <AppDefs.h>		/* For convenience */
-#include <TypeConstants.h>	/* For convenience */
-
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
+// for convenience
+#include <AppDefs.h>
+#include <TypeConstants.h>
 
 
-
-class	BBlockCache;
-class	BMessenger;
-class	BHandler;
-class	BString;
+class BBlockCache;
+class BMessenger;
+class BHandler;
+class BString;
+struct entry_ref;
 
 // Private or reserved ---------------------------------------------------------
-extern "C" void		_msg_cache_cleanup_();
-extern "C" int		_init_message_();
-extern "C" int		_delete_message_();
-//------------------------------------------------------------------------------
+extern "C" void _msg_cache_cleanup_();
+extern "C" int _init_message_();
+extern "C" int _delete_message_();
 
 
 // Name lengths and Scripting specifiers ---------------------------------------
 #define B_FIELD_NAME_LENGTH			255
 #define B_PROPERTY_NAME_LENGTH		255
 
-enum
-{
+enum {
 	B_NO_SPECIFIER = 0,
-	B_DIRECT_SPECIFIER = 1,
+	B_DIRECT_SPECIFIER,
 	B_INDEX_SPECIFIER,
 	B_REVERSE_INDEX_SPECIFIER,
 	B_RANGE_SPECIFIER,
@@ -89,8 +55,7 @@ namespace BPrivate {
 }
 
 // BMessage class --------------------------------------------------------------
-class BMessage
-{
+class BMessage {
 public:
 		uint32		what;
 
@@ -463,14 +428,4 @@ static	BBlockCache	*sMsgCache;
 		bool				fHasSpecifiers;	
 };
 
-//------------------------------------------------------------------------------
-
 #endif	// _MESSAGE_H
-
-/*
- * $Log $
- *
- * $Id  $
- *
- */
-
