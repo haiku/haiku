@@ -107,7 +107,7 @@ AddFilesToHaikuImage beos system lib : $(BEOS_SYSTEM_LIB) rld.so ;
 AddFilesToHaikuImage beos system servers : $(BEOS_SYSTEM_SERVERS) ;
 
 # apps
-AddFilesToHaikuImage beos				: Deskbar Tracker ;
+AddFilesToHaikuImage beos system		: Deskbar Tracker ;
 AddFilesToHaikuImage beos bin			: $(BEOS_BIN) consoled <bin>route ;
 AddFilesToHaikuImage beos apps			: $(BEOS_APPS) ;
 AddFilesToHaikuImage beos preferences	: $(BEOS_PREFERENCES) ;
@@ -226,7 +226,7 @@ HAIKU_IMAGE_SIZE ?= 80 ; # 80 MB
 MakeLocate $(HAIKU_IMAGE) : $(HAIKU_IMAGE_DIR) ;
 
 # Set the default installation directory.
-HAIKU_INSTALL_DIR ?= /haiku ;
+HAIKU_INSTALL_DIR ?= /Haiku ;
 
 # the pseudo target all image contents is attached to
 NotFile haiku-image-contents ;
