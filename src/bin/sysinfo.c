@@ -240,7 +240,7 @@ print_amd_features(uint32 features)
 		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 		NULL, NULL, NULL, "SCE", NULL, NULL, NULL, NULL,
 		NULL, NULL, NULL, NULL, "NX", NULL, "AMD-MMX", NULL,
-		NULL, "FFXSTR", NULL, NULL, NULL, "64", "3DNow+", "3DNow!"
+		NULL, "FFXSTR", NULL, "RDTSCP", NULL, "64", "3DNow+", "3DNow!"
 	};
 	int32 found = 0;
 	int32 i;
@@ -356,16 +356,16 @@ dump_cpu(system_info *info, int32 cpu)
 
 	cpuid_info baseInfo;
 	cpuid_info cpuInfo;
-	int32 max_eax, max_extended_eax = 0;
+	int32 maxStandardFunction, maxExtendedFunction = 0;
 
 	if (get_cpuid(&baseInfo, 0, cpu) != B_OK) {
 		// this CPU doesn't support cpuid
 		return;
 	}
 
-	max_eax = baseInfo.eax_0.max_eax;
-	if (max_eax >= 500)
-		max_eax = 0; /* old Pentium sample chips has cpu signature here */
+	maxStandardFunction = baseInfo.eax_0.max_eax;
+	if (maxStandardFunction >= 500)
+		maxStandardFunction = 0; /* old Pentium sample chips has cpu signature here */
 
 	/* Extended cpuid */
 
@@ -373,9 +373,9 @@ dump_cpu(system_info *info, int32 cpu)
 
 	// extended cpuid is only supported if max_eax is greater than the service id
 	if (cpuInfo.eax_0.max_eax > 0x80000000)
-		max_extended_eax = cpuInfo.eax_0.max_eax & 0xff;
+		maxExtendedFunction = cpuInfo.eax_0.max_eax & 0xff;
 
-	if (max_extended_eax >=4 ) {
+	if (maxExtendedFunction >=4 ) {
 		char buffer[49];
 		char *name = buffer;
 		int32 i;
@@ -409,7 +409,7 @@ dump_cpu(system_info *info, int32 cpu)
 		}
 	} else {
 		printf("CPU #%ld: %.12s\n", cpu, baseInfo.eax_0.vendor_id);
-		if (max_eax == 0)
+		if (maxStandardFunction == 0)
 			return;
 	}
 
@@ -417,20 +417,21 @@ dump_cpu(system_info *info, int32 cpu)
 	print_processor_signature(&cpuInfo, NULL);
 	print_features(cpuInfo.eax_1.features);
 
-	/* Extended features */
-	if ((info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86) {
-		printf("\tExtended: 0x%08lx\n", cpuInfo.eax_1.extended_features);
+	if (maxStandardFunction >= 1) {
+		/* Extended features */
+		printf("\tExtended Intel: 0x%08lx\n", cpuInfo.eax_1.extended_features);
 		print_extended_features(cpuInfo.eax_1.extended_features);
 	}
 
 	/* Extended CPUID */
-	if (max_extended_eax >= 1 && (info->cpu_type & B_CPU_x86_VENDOR_MASK) != B_CPU_INTEL_x86) {
+	if (maxExtendedFunction >= 1) {
 		get_cpuid(&cpuInfo, 0x80000001, cpu);
-		print_processor_signature(&cpuInfo, "Extended: ");
+		print_processor_signature(&cpuInfo, "Extended AMD: ");
 
-		if ((info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_AMD_x86) {
+		if ((info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_AMD_x86
+			|| (info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86) {
 			print_amd_features(cpuInfo.regs.edx);
-			if (max_extended_eax >= 7) {
+			if (maxExtendedFunction >= 7) {
 				get_cpuid(&cpuInfo, 0x80000007, cpu);
 				print_amd_power_management_features(cpuInfo.regs.edx);
 			}
@@ -439,7 +440,7 @@ dump_cpu(system_info *info, int32 cpu)
 	}
 
 	/* Cache/TLB descriptors */
-	if (max_extended_eax >= 5) {
+	if (maxExtendedFunction >= 5) {
 		if (!strncmp(baseInfo.eax_0.vendor_id, "CyrixInstead", 12)) {
 			get_cpuid(&cpuInfo, 0x80000005, cpu);
 			print_intel_cache_descriptors(info->cpu_type, &cpuInfo);
@@ -447,7 +448,7 @@ dump_cpu(system_info *info, int32 cpu)
 			print_cache_descriptors(cpu);
 	}
 
-	if (max_eax >= 2) {
+	if (maxStandardFunction >= 2) {
 		do {
 			get_cpuid(&cpuInfo, 2, cpu);
 
@@ -457,7 +458,7 @@ dump_cpu(system_info *info, int32 cpu)
 	}
 
 	/* Serial number */
-	if (max_eax >= 3) {
+	if (maxStandardFunction >= 3) {
 		cpuid_info flagsInfo;
 		get_cpuid(&flagsInfo, 1, cpu);
 

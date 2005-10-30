@@ -532,7 +532,7 @@ typedef union {
 		uint32	apic_id			: 8;
 
 		uint32	features;
-		uint32	extended_features;	// Intel only
+		uint32	extended_features;
 	} eax_1;
 
 	struct {
