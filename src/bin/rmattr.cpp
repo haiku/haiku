@@ -14,6 +14,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <fcntl.h>  // For O_WRONLY in BeOS R5 headers.
 #include <kernel/fs_attr.h>
 
 int main(int32 argc, const char **argv)
