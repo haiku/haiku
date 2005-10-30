@@ -209,14 +209,8 @@ vfs_bootstrap_file_systems(void)
 	if (status < B_OK)
 		panic("error mounting pipefs\n");
 
-	// bootstrap the bootfs (if possible)
+	// create directory for the boot volume
 	_kern_create_dir(-1, "/boot", 0755);
-	status = _kern_mount("/boot", NULL, "bootfs", 0, NULL);
-	if (status < B_OK) {
-		// this is no fatal exception at this point, as we may mount
-		// a real on disk file system later
-		dprintf("Can't mount bootfs (will try disk file system later)\n");
-	}
 
 	// create some standard links on the rootfs
 

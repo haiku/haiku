@@ -34,7 +34,6 @@
 
 
 #define MODULE_HASH_SIZE 16
-#define SUPPORT_BOOTFS
 
 /** The modules referenced by this structure are built-in
  *	modules that can't be loaded from disk.
@@ -48,7 +47,6 @@ extern module_info gFrameBufferConsoleModule;
 // file systems
 extern module_info gRootFileSystem;
 extern module_info gDeviceFileSystem;
-extern module_info gBootFileSystem;
 extern module_info gPipeFileSystem;
 
 static module_info *sBuiltInModules[] = {
@@ -59,7 +57,6 @@ static module_info *sBuiltInModules[] = {
 
 	&gRootFileSystem,
 	&gDeviceFileSystem,
-	&gBootFileSystem,
 	&gPipeFileSystem,
 	NULL
 };
@@ -147,13 +144,9 @@ static recursive_lock sModulesLock;
 /* These are the standard base paths where we start to look for modules
  * to load. Order is important, the last entry here will be searched
  * first.
- * ToDo: the first entry is only there for bootfs compatibility
  * ToDo: these should probably be retrieved by using find_directory().
  */
 static const char * const sModulePaths[] = {
-#ifdef SUPPORT_BOOTFS
-	"/boot/addons/kernel",
-#endif
 	"/boot/beos/system/add-ons/kernel",
 	"/boot/home/config/add-ons/kernel",
 };
@@ -478,92 +471,6 @@ check_module_image(const char *path, const char *searchedName)
 }
 
 
-#ifdef SUPPORT_BOOTFS	
-/** Recursively scans through the provided path for the specified module
- *	named "searchedName".
- *	If "searchedName" is NULL, all modules will be scanned.
- *	Returns B_OK if the module could be found, B_ENTRY_NOT_FOUND if not,
- *	or some other error occured during scanning.
- */
-
-static status_t
-recurse_directory(const char *path, const char *searchedName)
-{
-	status_t status;
-
-	DIR *dir = opendir(path);
-	if (dir == NULL)
-		return errno;
-
-	errno = 0;
-
-	// loop until we have a match or we run out of entries
-	while (true) {
-		struct dirent *dirent;
-		struct stat st;
-		char *newPath;
-		size_t size = 0;
-
-		TRACE(("scanning %s\n", path));
-
-		dirent = readdir(dir);
-		if (dirent == NULL) {
-			// we tell the upper layer we couldn't find anything in here
-			status = errno == 0 ? B_ENTRY_NOT_FOUND : errno;
-			goto exit;
-		}
-
-		if (!strcmp(dirent->d_name, ".") || !strcmp(dirent->d_name, "..") || !strcmp(dirent->d_name, "boot"))
-			continue;
-
-		size = strlen(path) + strlen(dirent->d_name) + 2;	
-		newPath = (char *)malloc(size);
-		if (newPath == NULL) {
-			status = B_NO_MEMORY;
-			goto exit;
-		}
-
-		strlcpy(newPath, path, size);
-		strlcat(newPath, "/", size);
-			// two slashes wouldn't hurt
-		strlcat(newPath, dirent->d_name, size);
-
-		if (stat(newPath, &st) != 0) {
-			free(newPath);
-			errno = 0;
-
-			// If we couldn't stat the current file, we will just ignore it;
-			// it's a problem of the file system, not ours.
-			continue;
-		}
-
-		if (S_ISREG(st.st_mode)) {
-			// if it's a file, check if we already have it in the hash table,
-			// because then we know it doesn't contain the module we are
-			// searching for (we are here because it couldn't be found in
-			// the first place)
-			if (hash_lookup(sModuleImagesHash, newPath) != NULL)
-				continue;
-
-			status = check_module_image(newPath, searchedName);
-		} else if (S_ISDIR(st.st_mode))
-			status = recurse_directory(newPath, searchedName);
-		else
-			status = B_ERROR;
-
-		if (status == B_OK)
-			goto exit;
-
-		free(newPath);
-	}
-
-exit:
-	closedir(dir);
-	return status;
-}
-#endif
-
-
 /** This is only called if we fail to find a module already in our cache...
  *	saves us some extra checking here :)
  */
@@ -582,7 +489,7 @@ search_module(const char *name)
 		if (sDisableUserAddOns && i >= FIRST_USER_MODULE_PATH)
 			return NULL;
 
-		// let's the VFS find that module for us
+		// let the VFS find that module for us
 
 		status = vfs_get_module_path(sModulePaths[i], name, path, sizeof(path));
 		if (status == B_OK) {
@@ -590,16 +497,6 @@ search_module(const char *name)
 			if (status == B_OK)
 				break;
 		}
-
-#ifdef SUPPORT_BOOTFS
-		// BeOS uses the module name to locate the module on disk. We now have the
-		// above vfs_get_module_path() call to achieve this.
-		// "bootfs" has a very low maximum path length, which makes it unable to
-		// contain the standard module directories).
-
-		if ((status = recurse_directory(sModulePaths[i], name)) == B_OK)
-			break;
-#endif
 	}
 
 	if (status != B_OK)

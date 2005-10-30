@@ -6,7 +6,6 @@ UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders storage ;
 
 KernelMergeObject kernel_fs.o : 
-	bootfs.c
 	devfs.cpp
 	rootfs.c
 	pipefs.cpp
