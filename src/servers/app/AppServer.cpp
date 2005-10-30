@@ -31,6 +31,8 @@
 #include "HWInterface.h"
 #include "RegistrarDefs.h"
 #include "RGBColor.h"
+#include "Layer.h"
+#include "WinBorder.h"
 #include "RootLayer.h"
 #include "ScreenManager.h"
 #include "ServerApp.h"
@@ -396,8 +398,32 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 
 			// activate one of the app's windows.
 			if (error == B_OK) {
-				// TODO: ...
 				error = B_BAD_TEAM_ID;
+				if (gDesktop->Lock() == B_OK) {
+					// search for an unhidden window to give focus to
+					int32 windowCount = gDesktop->WindowList().CountItems();
+					Layer *layer;
+					for (int32 i = 0; i < windowCount; ++i)
+						// is this layer in fact a WinBorder?
+						if ((layer = static_cast<Layer*>(gDesktop->WindowList().ItemAtFast(i)))) {
+							WinBorder *winBorder = dynamic_cast<WinBorder*>(layer);
+							// if winBorder is valid and not hidden, then we've found our target
+							if (winBorder && !winBorder->IsHidden()
+									&& winBorder->App()->ClientTeam() == team) {
+								if (gDesktop->ActiveRootLayer()
+										&& gDesktop->ActiveRootLayer()->Lock() == B_OK) {
+									gDesktop->ActiveRootLayer()->SetActive(winBorder);
+									gDesktop->ActiveRootLayer()->Unlock();
+
+									if (gDesktop->ActiveRootLayer()->Active() == winBorder)
+										error = B_OK;
+									else
+										error = B_ERROR;
+								}
+							}
+						}
+					gDesktop->Unlock();
+				}
 			}
 
 			// send the reply
