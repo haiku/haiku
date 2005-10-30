@@ -1268,32 +1268,55 @@ myRootLayer->Unlock();
 			Hide();
 			break;
 		}
-#if 0
 		case AS_SEND_BEHIND:
 		{
-			// TODO: Implement AS_SEND_BEHIND
 			STRACE(("ServerWindow %s: Message  Send_Behind unimplemented\n", Title()));
+			int32 token;
+			team_id teamID;
+			WinBorder *behindOf;
+			status_t status = B_NAME_NOT_FOUND;
+
+			link.Read<int32>(&token);
+			link.Read<team_id>(&teamID);
+
+			if ((behindOf = gDesktop->FindWinBorderByClientToken(token, teamID))) {
+				fWinBorder->GetRootLayer()->Lock();
+				// TODO: move to back ATM. Fix this later!
+				fWinBorder->GetRootLayer()->SetActive(fWinBorder, false);
+				fWinBorder->GetRootLayer()->Unlock();
+				status = B_OK;
+			}
+
+			fLink.StartMessage(status);
+			fLink.Flush();
 			break;
 		}
 		case AS_ENABLE_UPDATES:
 		{
-			// TODO: Implement AS_ENABLE_UPDATES
 			STRACE(("ServerWindow %s: Message Enable_Updates unimplemented\n", Title()));
+			fWinBorder->EnableUpdateRequests();
+			if (fWinBorder->CulmulatedUpdateRegion().Frame().IsValid()) {
+				BRegion		reg(fWinBorder->CulmulatedUpdateRegion());
+				fWinBorder->RequestDraw(reg, NULL);
+			}
 			break;
 		}
 		case AS_DISABLE_UPDATES:
 		{
-			// TODO: Implement AS_DISABLE_UPDATES
 			STRACE(("ServerWindow %s: Message Disable_Updates unimplemented\n", Title()));
+			fWinBorder->DisableUpdateRequests();
 			break;
 		}
 		case AS_NEEDS_UPDATE:
 		{
-			// TODO: Implement AS_NEEDS_UPDATE
 			STRACE(("ServerWindow %s: Message Needs_Update unimplemented\n", Title()));
+			if (fWinBorder->CulmulatedUpdateRegion().Frame().IsValid())
+				fLink.StartMessage(B_OK);
+			else
+				fLink.StartMessage(B_ERROR);
+			fLink.Flush();
 			break;
 		}
-#endif
 		case AS_SET_WINDOW_TITLE:
 		{
 			char* newTitle;

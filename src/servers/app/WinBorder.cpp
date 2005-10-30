@@ -79,14 +79,11 @@ WinBorder::WinBorder(const BRect &frame,
 	  fIsClosing(false),
 	  fIsMinimizing(false),
 	  fIsZooming(false),
-
-	  fIsDragging(false),
-	  fBringToFrontOnRelease(false),
-
 	  fIsResizing(false),
-
 	  fIsSlidingTab(false),
+	  fIsDragging(false),
 
+	  fUpdateRequestsEnabled(true),
 	  fInUpdate(false),
 	  fRequestSent(false),
 

@@ -1609,7 +1609,7 @@ if (fOwner->cnt != 1)
 
 		if (updateReg.CountRects() > 0) {
 			fOwner->fCumulativeRegion.Include(&updateReg);			
-			if (!fOwner->InUpdate() && !fOwner->fRequestSent) {
+			if (fOwner->fUpdateRequestsEnabled && !fOwner->InUpdate() && !fOwner->fRequestSent) {
 				fOwner->fInUpdateRegion = fOwner->fCumulativeRegion;
 fOwner->cnt++;
 if (fOwner->cnt != 1)

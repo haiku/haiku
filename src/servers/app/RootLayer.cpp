@@ -309,15 +309,6 @@ RootLayer::GoInvalidate(Layer *layer, const BRegion &region)
 	Unlock();
 }
 
-status_t
-RootLayer::EnqueueMessage(BPrivate::PortLink &message)
-{
-	message.SetSenderPort(fListenPort);
-	message.Flush();
-	return B_OK;
-}
-
-
 void
 RootLayer::GoRedraw(Layer *layer, const BRegion &region)
 {
@@ -1137,11 +1128,6 @@ RootLayer::MouseEventHandler(BMessage *msg)
 		}
 		case B_MOUSE_MOVED: {
 			//printf("RootLayer::MouseEventHandler(B_MOUSE_MOVED)\n");
-			// Attached data:
-			// 1) int64 - time of mouse click
-			// 2) float - x coordinate of mouse click
-			// 3) float - y coordinate of mouse click
-			// 4) int32 - buttons down
 
 			BPoint where(0,0);
 

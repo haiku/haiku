@@ -70,6 +70,10 @@ class WinBorder : public Layer {
 									{ return fInUpdateRegion; }
 	inline	const BRegion&		CulmulatedUpdateRegion() const
 									{ return fCumulativeRegion; }
+	inline	void				EnableUpdateRequests()
+									{ fUpdateRequestsEnabled = true; }
+	inline	void				DisableUpdateRequests()
+									{ fUpdateRequestsEnabled = false; }
 
 			void				SetSizeLimits(float minWidth,
 											  float maxWidth,
@@ -157,14 +161,13 @@ class WinBorder : public Layer {
 			bool				fIsClosing;
 			bool				fIsMinimizing;
 			bool				fIsZooming;
-
+			bool				fIsResizing;
+			bool				fIsSlidingTab;
 			bool				fIsDragging;
+
 			bool				fBringToFrontOnRelease;
 
-			bool				fIsResizing;
-
-			bool				fIsSlidingTab;
-
+			bool				fUpdateRequestsEnabled;
 			bool				fInUpdate;
 			bool				fRequestSent;
 

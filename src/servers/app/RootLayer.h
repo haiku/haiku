@@ -130,7 +130,6 @@ public:
 			void				Unlock() { fAllRegionsLock.Unlock(); }
 			bool				IsLocked() { return fAllRegionsLock.IsLocked(); }
 			void				RunThread();
-			status_t			EnqueueMessage(BPrivate::PortLink &message);
 			void				GoInvalidate(Layer *layer, const BRegion &region);
 			void				GoRedraw(Layer *layer, const BRegion &region);
 			void				GoChangeWinBorderFeel(WinBorder *winBorder, int32 newFeel);
