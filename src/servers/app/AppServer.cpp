@@ -399,7 +399,7 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 			// activate one of the app's windows.
 			if (error == B_OK) {
 				error = B_BAD_TEAM_ID;
-				if (gDesktop->Lock() == B_OK) {
+				if (gDesktop->Lock()) {
 					// search for an unhidden window to give focus to
 					int32 windowCount = gDesktop->WindowList().CountItems();
 					Layer *layer;
@@ -411,7 +411,7 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 							if (winBorder && !winBorder->IsHidden()
 									&& winBorder->App()->ClientTeam() == team) {
 								if (gDesktop->ActiveRootLayer()
-										&& gDesktop->ActiveRootLayer()->Lock() == B_OK) {
+										&& gDesktop->ActiveRootLayer()->Lock()) {
 									gDesktop->ActiveRootLayer()->SetActive(winBorder);
 									gDesktop->ActiveRootLayer()->Unlock();
 
