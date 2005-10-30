@@ -28,7 +28,6 @@
 //					BMallocIO and BMemoryIO classes implement the protocol,
 //					as does BFile in the Storage Kit.
 //------------------------------------------------------------------------------
-#include <algorithm>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -251,17 +250,15 @@ BMemoryIO::Position() const
 status_t
 BMemoryIO::SetSize(off_t size)
 {
-	status_t err = B_ERROR;
-	
 	if (fReadOnly)
 		return B_NOT_ALLOWED;
-	
-	if (size <= fPhys) {
-		err = B_OK;
-		fLen = size;
-	}
 
-	return err;
+	if (size > fPhys)
+		return B_ERROR;
+	
+	fLen = size;
+	
+	return B_OK;
 }
 
 

@@ -3766,7 +3766,7 @@ BView::InitData(BRect frame, const char *name, uint32 resizingMode, uint32 flags
 	fPermanentState = NULL;
 	fState = new BPrivate::ViewState;
 
-	fBounds = frame.OffsetToCopy(0.0, 0.0);
+	fBounds = frame.OffsetToCopy(B_ORIGIN);
 	fShelf = NULL;
 	pr_state = NULL;
 

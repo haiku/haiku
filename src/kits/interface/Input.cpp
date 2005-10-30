@@ -23,60 +23,22 @@
 //	Author:			Marc Flerackers (mflerackers@androme.be)
 //	Description:	Functions and class to manage input devices.
 //------------------------------------------------------------------------------
-
-// Standard Includes -----------------------------------------------------------
 #include <stdlib.h>
 #include <string.h>
 
-// System Includes -------------------------------------------------------------
 #include <Input.h>
-#include <Message.h>
-#include <Errors.h>
 #include <List.h>
+#include <Message.h>
 
-// Project Includes ------------------------------------------------------------
-#include "InputServerTypes.h"
+#include <input_globals.h>
+#include <InputServerTypes.h>
 
-// Local Includes --------------------------------------------------------------
 
-// Local Defines ---------------------------------------------------------------
+static BMessenger *sInputServer = NULL;
 
-// Globals ---------------------------------------------------------------------
 
-BMessenger *input_server=NULL;
-
-_IMPEXP_BE status_t _control_input_server_(BMessage *command, BMessage *reply);
-
-/*static bool PrintNameAndDelete(void *ptr)
-{
-   if(ptr)
-   {
-      BInputDevice *dev = (BInputDevice *)ptr;
-	  printf("* %s : %s\n", dev->Name(), dev->IsRunning() ? "running" : "not running");
-      delete dev;
-      return false;
-   }
-
-   return true;
-}
-
-void PrintDevices()
-{
-	BList devices;
-
-	status_t err = get_input_devices(&devices);
-
-	if(err != B_OK)
-		printf("Error while getting input devices\n");
-	else
-	{
-	   devices.DoForEach(PrintNameAndDelete);
-	   devices.MakeEmpty();
-	}
-}*/
-
-//------------------------------------------------------------------------------
-BInputDevice *find_input_device(const char *name)
+BInputDevice *
+find_input_device(const char *name)
 {
 	BMessage command(IS_FIND_DEVICES);
 	BMessage reply;
@@ -100,8 +62,10 @@ BInputDevice *find_input_device(const char *name)
 
 	return dev;
 }
-//------------------------------------------------------------------------------
-status_t get_input_devices(BList *list)
+
+
+status_t
+get_input_devices(BList *list)
 {
 	list->MakeEmpty();
 
@@ -117,8 +81,7 @@ status_t get_input_devices(BList *list)
 	int32 type;
 	int32 i = 0;
 	
-	while (reply.FindString("device", i, &name) == B_OK)
-	{
+	while (reply.FindString("device", i, &name) == B_OK) {
 		reply.FindInt32("type", i++, &type);
 
 		BInputDevice *dev = new BInputDevice;
@@ -130,8 +93,10 @@ status_t get_input_devices(BList *list)
 
 	return err;
 }
-//------------------------------------------------------------------------------
-status_t watch_input_devices(BMessenger target, bool start)
+
+
+status_t
+watch_input_devices(BMessenger target, bool start)
 {
 	BMessage command(IS_WATCH_DEVICES);
 	BMessage reply;
@@ -141,24 +106,30 @@ status_t watch_input_devices(BMessenger target, bool start)
 
 	return _control_input_server_(&command, &reply);
 }
-//------------------------------------------------------------------------------
+
+
 BInputDevice::~BInputDevice()
 {
-	if (fName)
-		free (fName);
+	free(fName);
 }
-//------------------------------------------------------------------------------
-const char *BInputDevice::Name() const
+
+
+const char *
+BInputDevice::Name() const
 {
 	return fName;
 }
-//------------------------------------------------------------------------------
-input_device_type BInputDevice::Type() const
+
+
+input_device_type
+BInputDevice::Type() const
 {
 	return fType;
 }
-//------------------------------------------------------------------------------
-bool BInputDevice::IsRunning() const
+
+
+bool
+BInputDevice::IsRunning() const
 {
 	if (!fName)
 		return false;
@@ -170,8 +141,10 @@ bool BInputDevice::IsRunning() const
 
 	return _control_input_server_(&command, &reply) == B_OK;
 }
-//------------------------------------------------------------------------------
-status_t BInputDevice::Start()
+
+
+status_t
+BInputDevice::Start()
 {
 	if (!fName)
 		return B_ERROR;
@@ -183,8 +156,10 @@ status_t BInputDevice::Start()
 
 	return _control_input_server_(&command, &reply);
 }
-//------------------------------------------------------------------------------
-status_t BInputDevice::Stop()
+
+
+status_t
+BInputDevice::Stop()
 {
 	if (!fName)
 		return B_ERROR;
@@ -196,8 +171,10 @@ status_t BInputDevice::Stop()
 
 	return _control_input_server_(&command, &reply);
 }
-//------------------------------------------------------------------------------
-status_t BInputDevice::Control(uint32 code, BMessage *message)
+
+
+status_t
+BInputDevice::Control(uint32 code, BMessage *message)
 {
 	if (!fName)
 		return B_ERROR;
@@ -218,8 +195,10 @@ status_t BInputDevice::Control(uint32 code, BMessage *message)
 
 	return err;
 }
-//------------------------------------------------------------------------------
-status_t BInputDevice::Start(input_device_type type)
+
+
+status_t
+BInputDevice::Start(input_device_type type)
 {
 	BMessage command(IS_START_DEVICE);
 	BMessage reply;
@@ -228,8 +207,10 @@ status_t BInputDevice::Start(input_device_type type)
 
 	return _control_input_server_(&command, &reply);
 }
-//------------------------------------------------------------------------------
-status_t BInputDevice::Stop(input_device_type type)
+
+
+status_t
+BInputDevice::Stop(input_device_type type)
 {
 	BMessage command(IS_STOP_DEVICE);
 	BMessage reply;
@@ -238,8 +219,10 @@ status_t BInputDevice::Stop(input_device_type type)
 
 	return _control_input_server_(&command, &reply);
 }
-//------------------------------------------------------------------------------
-status_t BInputDevice::Control(input_device_type type, uint32 code,
+
+
+status_t
+BInputDevice::Control(input_device_type type, uint32 code,
 									  BMessage *message)
 {
 	BMessage command(IS_CONTROL_DEVICES);
@@ -258,17 +241,19 @@ status_t BInputDevice::Control(input_device_type type, uint32 code,
 
 	return err;
 }
-//------------------------------------------------------------------------------
+
+
 BInputDevice::BInputDevice()
 {
 	fName = NULL;
 	fType = B_UNDEFINED_DEVICE;
 }
-//------------------------------------------------------------------------------
-void BInputDevice::set_name_and_type(const char *name, input_device_type type)
+
+
+void
+BInputDevice::set_name_and_type(const char *name, input_device_type type)
 {
-	if (fName)
-	{
+	if (fName) {
 		free (fName);
 		fName = NULL;
 	}
@@ -278,17 +263,18 @@ void BInputDevice::set_name_and_type(const char *name, input_device_type type)
 
 	fType = type;
 }
-//------------------------------------------------------------------------------
-status_t _control_input_server_(BMessage *command, BMessage *reply)
-{
-	if (!input_server)
-		input_server = new BMessenger;
 
-	if (!input_server->IsValid())
-		*input_server = BMessenger("application/x-vnd.Be-input_server", -1, NULL);
-		//*input_server = BMessenger("application/x-vnd.OBOS-input_server", -1, NULL);
-	
-	status_t err = input_server->SendMessage(command, reply);
+
+status_t
+_control_input_server_(BMessage *command, BMessage *reply)
+{
+	if (!sInputServer)
+		sInputServer = new BMessenger;
+
+	if (!sInputServer->IsValid())
+		*sInputServer = BMessenger("application/x-vnd.Be-input_server", -1, NULL);
+		
+	status_t err = sInputServer->SendMessage(command, reply);
 
 	if (err != B_OK)
 		return err;
@@ -298,4 +284,3 @@ status_t _control_input_server_(BMessage *command, BMessage *reply)
 
 	return err;
 }
-//------------------------------------------------------------------------------
