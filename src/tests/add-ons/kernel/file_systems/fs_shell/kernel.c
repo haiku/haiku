@@ -3394,8 +3394,8 @@ initialize_file_system(const char *device, const char *fsName, void *params,
 		return FS_ERROR;
 
 	mount = (nspace *)malloc(sizeof(nspace));
-	if (add_nspace(mount, NULL, "myfs", -1, -1) < B_OK) {
-		error = B_ERROR;
+	if (add_nspace(mount, NULL, "myfs", -1, -1) < FS_OK) {
+		error = FS_ERROR;
 	} else {
 	    error = (*fs->ops.initialize)(device, params, paramLength);
 		remove_nspace(mount);
