@@ -147,15 +147,6 @@ set_default_value HAIKU_LDFLAGS		""
 set_default_value HAIKU_ARFLAGS		ru
 set_default_value HAIKU_UNARFLAGS	x
 
-# host BeOS recognition not needed anymore
-# revision=`uname -r`
-# case "$revision" in
-#  5.1)   target=dano ;;
-#  5.0.4) target=bone ;;
-#  5.0*)  target=r5 ;;
-#  *)     target=haiku ;;
-#esac
-
 # parse parameters
 #
 while [ $# \> 0 ] ; do
@@ -181,8 +172,17 @@ if [ -n "$floppy" ]; then
 	esac
 fi
 
+# detect the build platform
 case "${platform}" in
-	BeOS)	buildPlatform=r5 ;;
+	BeOS)	revision=`uname -r`
+			case "$revision" in
+				5.1)	buildPlatform=dano ;;
+				5.0.4)	buildPlatform=bone ;;
+				5.0*)	buildPlatform=r5 ;;
+				*)		echo Unknown BeOS version: $revision
+						exit 1 ;;
+			esac
+			;;
 	Linux)	buildPlatform=linux ;;
 	*)		echo Unsupported platform: ${platform}
 			exit 1 ;;
