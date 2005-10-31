@@ -2,6 +2,11 @@ SubDir HAIKU_TOP src add-ons mail_daemon outbound_filters fortune ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+if $(TARGET_PLATFORM) != haiku {
+	UsePublicHeaders mail ;
+	UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
+}
+
 UsePrivateHeaders mail ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 

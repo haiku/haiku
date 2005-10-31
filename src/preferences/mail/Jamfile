@@ -2,6 +2,10 @@ SubDir HAIKU_TOP src preferences mail ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+if $(TARGET_PLATFORM) != haiku {
+	UsePublicHeaders mail ;
+}
+
 UsePrivateHeaders mail ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
@@ -11,7 +15,7 @@ Preference E-mail :
 	ConfigViews.cpp
 	ConfigWindow.cpp
 	main.cpp 
-	: libbe.so libmail.so
+	: be libmail.so
 	: e-mail.rdef
 	;
 
