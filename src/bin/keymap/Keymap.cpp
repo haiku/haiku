@@ -294,7 +294,7 @@ Keymap::Load(entry_ref &ref)
 void
 Keymap::ComputeChars(const char *buffer, struct re_registers &regs, int i, int &offset)
 {
-	char *current = &fChars[offset+1];
+	char *current = &fChars[offset + 1];
 	char hexChars[12];
 	uint32 length = 0;
 	if (strncmp(buffer + regs.start[i], "''", regs.end[i] - regs.start[i]) == 0)
@@ -307,8 +307,8 @@ Keymap::ComputeChars(const char *buffer, struct re_registers &regs, int i, int &
 		length = 1;
 	} else if (sscanf(buffer + regs.start[i], "0x%s", hexChars) > 0) {
 		length = strlen(hexChars) / 2;
-		for (uint32 j=0; j<length; j++)
-			sscanf(hexChars + 2*j, "%02x", (uint8*)current + j);
+		for (uint32 j = 0; j < length; j++)
+			sscanf(hexChars + 2*j, "%02hhx", current + j);
 	}
 	fChars[offset] = length;
 	offset += length + 1;
@@ -1086,23 +1086,25 @@ status_t _restore_key_map_();
 void
 Keymap::RestoreSystemDefault()
 {
-	#ifdef __BEOS__
-
+#ifdef __BEOS__
+	// work-around to get rid of this stupid find_directory_r() on Zeta
+#	ifdef find_directory
+#		undef find_directory
+#	endif
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path)!=B_OK)
 		return;
-	
+
 	path.Append("Key_map");
 
 	BEntry ref(path.Path());
 	ref.Remove();	
-	
-	_restore_key_map_();
 
-	#else	// ! __BEOS__
+	_restore_key_map_();
+#else	// ! __BEOS__
 	fprintf(stderr, "Unsupported operation on this platform!\n");
 	exit(1);
-	#endif	// ! __BEOS__
+#endif	// ! __BEOS__
 }
 
 
