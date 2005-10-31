@@ -89,7 +89,7 @@ resource                 return RESOURCE;
 array                    return ARRAY;
 message                  return MESSAGE;
 archive                  return ARCHIVE;
-type                     return TYPE;
+type                     return RTYPE;
 import                   return IMPORT;
 
 false                    yylval.b = false; return BOOL;

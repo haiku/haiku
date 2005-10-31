@@ -4,7 +4,6 @@ USES_BE_API on <build>librdef.a <build>rc = true ;
 
 GENERATE_C++ on [ FGristFiles lexer.l parser.y ] = true ;
 
-SubDirSysHdrs [ FDirName $(HAIKU_TOP) headers os app ] ;
 SubDirC++Flags -Wno-sign-compare -Wno-unused ;
 
 local r5Compatibility = [ FDirName $(SUBDIR) R5Compatibility.h ] ;

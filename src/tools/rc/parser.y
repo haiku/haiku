@@ -118,7 +118,7 @@ static void add_resource(res_id_t, type_code, data_t);
 	type_t T;
 }
 
-%token ENUM RESOURCE ARCHIVE ARRAY MESSAGE TYPE IMPORT
+%token ENUM RESOURCE ARCHIVE ARRAY MESSAGE RTYPE IMPORT
 
 %token <b> BOOL
 %token <i> INTEGER
@@ -182,11 +182,11 @@ symboldef
 	;
 
 typedef
-	: TYPE id TYPECODE IDENT '{' typedeffields '}' ';'
+	: RTYPE id TYPECODE IDENT '{' typedeffields '}' ';'
 		{
 			add_user_type($2, $3, $4, $6);
 		}
-	| TYPE id IDENT '{' typedeffields '}' ';'
+	| RTYPE id IDENT '{' typedeffields '}' ';'
 		{
 			add_user_type($2, B_RAW_TYPE, $3, $5);
 		}
