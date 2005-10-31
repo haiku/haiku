@@ -1,24 +1,7 @@
 SubDir HAIKU_TOP src system boot ;
 
-#SetupIncludes ; 
-#oldccflags = $(CCFLAGS) ;
-#{
-#  CCFLAGS = ;
-#  local x ;
-#  for x in $(CCFLAGS) {
-#    if $(x) != --nostdinc {
-#      CCFLAGS += $(x) ;
-#    }
-#  }
-#}
-
-BuildPlatformMain bootmaker : bootmaker.c ;
 BuildPlatformMain bin2h : bin2h.c ;
 BuildPlatformMain bin2asm : bin2asm.c ;
-BuildPlatformMain makeflop : makeflop.c ;
 
-#CCFLAGS = $(oldccflags) ;
-
-SubInclude HAIKU_TOP src system boot arch ;
 SubInclude HAIKU_TOP src system boot platform ;
 SubInclude HAIKU_TOP src system boot loader ;
