@@ -5,7 +5,9 @@
  */
 
 
-#define COMPILE_FOR_R5
+#ifndef COMPILE_FOR_R5
+#	define COMPILE_FOR_R5
+#endif
 
 #include "Debug.h"
 #include "Volume.h"
@@ -399,7 +401,8 @@ bfs_initialize(const char *deviceName, void *parms, size_t len)
 		return -1;
 	}
 
-	Volume volume(-1);
+	Volume volume(2);
+		// we just happen to know it's 2...
 	status_t status = volume.Initialize(deviceName, volumeName, blockSize, flags);
 	if (status < B_OK) {
 		FATAL(("Initializing volume failed: %s\n", strerror(status)));

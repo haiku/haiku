@@ -94,7 +94,6 @@ main(int argc, char **argv)
 	if (initialize) {
 		const char *deviceName = arg;
 		initialize_fs(deviceName, argv + argi, argc - argi);
-
 	} else {
 		if (arg != NULL && !isdigit(arg[0]))
 			disk_name = arg;

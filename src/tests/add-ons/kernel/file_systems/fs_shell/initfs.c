@@ -40,7 +40,6 @@ init_fs(char *disk_name)
         exit(0);
     }
 
-
     data = sys_mount(1, "myfs", -1, "/myfs", disk_name, 0, NULL, 0);
     if (data == NULL) {
         printf("could not mount %s on /myfs\n", disk_name);

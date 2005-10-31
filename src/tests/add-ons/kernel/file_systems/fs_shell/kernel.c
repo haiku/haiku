@@ -3386,14 +3386,21 @@ status_t
 initialize_file_system(const char *device, const char *fsName, void *params,
 	int paramLength)
 {
+	struct nspace *mount;
 	status_t error;
-	
+
 	fsystem *fs = inc_file_system(fsName);
-	if (!fs)
+	if (fs == NULL || fs->ops.initialize == NULL)
 		return FS_ERROR;
 
-    error = (*fs->ops.initialize)(device, params, paramLength);
-	
+	mount = (nspace *)malloc(sizeof(nspace));
+	if (add_nspace(mount, NULL, "myfs", -1, -1) < B_OK) {
+		error = B_ERROR;
+	} else {
+	    error = (*fs->ops.initialize)(device, params, paramLength);
+		remove_nspace(mount);
+	}
+
 	dec_file_system(fs);
 
 	return error;
