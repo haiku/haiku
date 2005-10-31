@@ -28,6 +28,7 @@ class LinkReceiver {
 
 		virtual status_t Read(void *data, ssize_t size);
 		status_t ReadString(char **string);
+		status_t ReadString(char *buffer, size_t bufferSize);
 		template <class Type> status_t Read(Type *data)
 		{
 			return Read(data, sizeof(Type));

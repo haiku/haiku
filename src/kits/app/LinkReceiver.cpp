@@ -298,4 +298,41 @@ LinkReceiver::ReadString(char **_string)
 	}
 }
 
+
+status_t
+LinkReceiver::ReadString(char *buffer, size_t bufferLength)
+{
+	int32 length = 0;
+	status_t status;
+
+	status = Read<int32>(&length);
+	if (status < B_OK)
+		return status;
+
+	if (length >= (int32)bufferLength) {
+		status = B_BUFFER_OVERFLOW;
+		goto err;
+	}
+
+	if (length < 0) {
+		status = B_ERROR;
+		goto err;
+	}
+
+	if (length > 0) {
+		status = Read(buffer, length);
+		if (status < B_OK)
+			goto err;
+	}
+
+	// make sure the string is null terminated
+	buffer[length] = '\0';
+	return B_OK;
+
+err:
+	fRecvPosition -= sizeof(int32);
+		// rewind the transaction
+	return status;
+}
+
 }	// namespace BPrivate
