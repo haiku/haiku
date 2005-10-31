@@ -102,9 +102,10 @@ class PrefHandler {
 		static status_t GetDefaultPath(BPath& path);
 
 	private:
-		status_t    loadFromFile(BEntry *ent);
-		status_t    loadFromDefault(const prefDefaults* defaluts = NULL);
-		status_t    loadFromTextFile(const char * path);
+		void		_ConfirmFont(const char *key, const BFont *fallback);
+		status_t    _LoadFromFile(BEntry *ent);
+		status_t    _LoadFromDefault(const prefDefaults* defaluts = NULL);
+		status_t    _LoadFromTextFile(const char * path);
 
 		BMessage    fContainer;
 };

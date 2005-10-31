@@ -32,13 +32,14 @@
 #include "PrefHandler.h"
 #include "TermConst.h"
 
+#include <Directory.h>
+#include <Entry.h>
+#include <File.h>
+#include <FindDirectory.h>
+#include <Font.h>
 #include <GraphicsDefs.h>
 #include <Message.h>
-#include <File.h>
-#include <Entry.h>
 #include <NodeInfo.h>
-#include <Directory.h>
-#include <FindDirectory.h>
 #include <Path.h>
 
 #include <stdio.h>
@@ -48,8 +49,8 @@
 
 /*
  * Startup preference settings.
-   */
-const prefDefaults  termDefaults[] ={
+ */
+static const prefDefaults kTermDefaults[] = {
 	{ PREF_COLS,				"80" },
 	{ PREF_ROWS,				"25" },
 
@@ -87,12 +88,15 @@ const prefDefaults  termDefaults[] ={
 
 
 PrefHandler::PrefHandler()
+	:
+	fContainer('Pref')
 {
-	fContainer.what = 'Pref';
-
 	BPath path;
 	GetDefaultPath(path);
-	OpenText(path.Path(), termDefaults);
+	OpenText(path.Path(), kTermDefaults);
+
+	_ConfirmFont(PREF_HALF_FONT_FAMILY, be_fixed_font);
+	_ConfirmFont(PREF_FULL_FONT_FAMILY, be_fixed_font);
 }
 
 
@@ -130,9 +134,9 @@ PrefHandler::Open(const char *path, const prefDefaults *defaults)
 {
 	BEntry entry(path);
 	if (entry.Exists())
-		return loadFromFile(&entry);
+		return _LoadFromFile(&entry);
 
-	return loadFromDefault(defaults);
+	return _LoadFromDefault(defaults);
 }
 
 
@@ -141,9 +145,9 @@ PrefHandler::OpenText(const char *path, const prefDefaults *defaults)
 {
 	BEntry entry(path);
 	if (entry.Exists())
-		return loadFromTextFile(path);
+		return _LoadFromTextFile(path);
 
-	return loadFromDefault(defaults);
+	return _LoadFromDefault(defaults);
 }
 
 
@@ -325,83 +329,116 @@ PrefHandler::IsEmpty() const
 }
 
 
-status_t
-PrefHandler::loadFromFile(BEntry *ent)
+void
+PrefHandler::_ConfirmFont(const char *key, const BFont *fallback)
 {
-  // Future: It would be nice if we could simply use a flatened BMessage to
-  // save the settings. (Who cares about compatibility in this case anyway?)
+	int32 count = count_font_families();
+	const char *font = getString(key);
+	if (font == NULL)
+		count = 0;
 
-  BFile file (ent, B_READ_ONLY);
-  //fContainer.MakeEmpty();
-  //fContainer.Unflatten(&file);
-  off_t size;
-  if (file.GetSize(&size) != B_OK || size != sizeof(struct termprefs))
-    return B_ERROR;
+	font_family family;
 
-  struct termprefs prefs;
-  file.Read(&prefs, size);
-  if (prefs.magic != TP_MAGIC || prefs.version != TP_VERSION)
-    return B_ERROR;
+	for (int32 i = 0; i < count; i++) {
+		if (get_font_family(i, &family) != B_OK)
+			continue;
 
-  //Valid settings file!
-  setInt32(PREF_COLS, prefs.cols);
-  setInt32(PREF_ROWS, prefs.rows);
-  setInt32(PREF_HALF_FONT_SIZE, prefs.font_size);
-  setInt32(PREF_FULL_FONT_SIZE, prefs.font_size);
-  char *font_family = strtok(prefs.font, "/");
-  char *font_style = strtok(NULL, "");
-  setString(PREF_FULL_FONT_FAMILY, font_family);
-  setString(PREF_FULL_FONT_STYLE, font_style);
-  setString(PREF_HALF_FONT_FAMILY, font_family);
-  setString(PREF_HALF_FONT_STYLE, font_style);
-  setRGB(PREF_TEXT_BACK_COLOR, prefs.bg);
-  setRGB(PREF_TEXT_FORE_COLOR, prefs.fg);
-  setRGB(PREF_CURSOR_BACK_COLOR, prefs.curbg);
-  setRGB(PREF_CURSOR_FORE_COLOR, prefs.curfg);
-  setRGB(PREF_SELECT_BACK_COLOR, prefs.selbg);
-  setRGB(PREF_SELECT_FORE_COLOR, prefs.selfg);
-  setString(PREF_TEXT_ENCODING, encoding_table[prefs.encoding].name);
-  return B_OK;
+		if (!strcmp(family, font)) {
+			// found font family: we can safely use this font
+			return;
+		}
+	}
+
+	// use fall-back font
+
+	fallback->GetFamilyAndStyle(&family, NULL);
+	setString(key, family);
 }
-/////////////////////////////////////////////////////////////////////////////
-//
-//
-/////////////////////////////////////////////////////////////////////////////
+
 
 status_t
-PrefHandler::loadFromDefault(const prefDefaults* defaluts)
+PrefHandler::_LoadFromFile(BEntry *entry)
 {
-  if(defaluts == NULL) return B_ERROR;
-  
-  while(defaluts->key){
-    this->setString(defaluts->key, defaluts->item);  
-    ++defaluts;
-  }
-  return B_OK;
+	// Future: It would be nice if we could simply use a flatened BMessage to
+	// save the settings. (Who cares about compatibility in this case anyway?)
+
+	BFile file(entry, B_READ_ONLY);
+	//fContainer.MakeEmpty();
+	//fContainer.Unflatten(&file);
+
+	off_t size;
+	if (file.GetSize(&size) != B_OK || size != sizeof(struct termprefs))
+		return B_ERROR;
+
+	struct termprefs prefs;
+	file.Read(&prefs, size);
+	if (prefs.magic != TP_MAGIC || prefs.version != TP_VERSION)
+		return B_ERROR;
+
+	// Valid settings file!
+
+	setInt32(PREF_COLS, prefs.cols);
+	setInt32(PREF_ROWS, prefs.rows);
+	setInt32(PREF_HALF_FONT_SIZE, prefs.font_size);
+	setInt32(PREF_FULL_FONT_SIZE, prefs.font_size);
+	char *font_family = strtok(prefs.font, "/");
+	char *font_style = strtok(NULL, "");
+	setString(PREF_FULL_FONT_FAMILY, font_family);
+	setString(PREF_FULL_FONT_STYLE, font_style);
+	setString(PREF_HALF_FONT_FAMILY, font_family);
+	setString(PREF_HALF_FONT_STYLE, font_style);
+	setRGB(PREF_TEXT_BACK_COLOR, prefs.bg);
+	setRGB(PREF_TEXT_FORE_COLOR, prefs.fg);
+	setRGB(PREF_CURSOR_BACK_COLOR, prefs.curbg);
+	setRGB(PREF_CURSOR_FORE_COLOR, prefs.curfg);
+	setRGB(PREF_SELECT_BACK_COLOR, prefs.selbg);
+	setRGB(PREF_SELECT_FORE_COLOR, prefs.selfg);
+	setString(PREF_TEXT_ENCODING, encoding_table[prefs.encoding].name);
+
+	return B_OK;
 }
-/////////////////////////////////////////////////////////////////////////////
-//
-// Text is "key","Content"
-// Comment : Start with '#'
-/////////////////////////////////////////////////////////////////////////////
+
 
 status_t
-PrefHandler::loadFromTextFile(const char * path)
+PrefHandler::_LoadFromDefault(const prefDefaults* defaults)
 {
-char buf[1024];
-char key[B_FIELD_NAME_LENGTH], data[512];
-int n;
-FILE *fp;
+	if (defaults == NULL)
+		return B_ERROR;
 
-fp = fopen(path, "r");
+	while (defaults->key) {
+		setString(defaults->key, defaults->item);
+		++defaults;
+	}
 
-  while(fgets(buf, sizeof(buf), fp) != NULL){
-    if (*buf == '#') continue;
-      n = sscanf(buf, "%*[\"]%[^\"]%*[\"]%*[^\"]%*[\"]%[^\"]", key, data);
-      if (n == 2) this->setString(key, data);
-  }
+	return B_OK;
+}
 
-  fclose(fp);
 
-  return B_OK;
+/**	Text is "key","Content"
+ *	Comment : Start with '#'
+ */
+
+status_t
+PrefHandler::_LoadFromTextFile(const char * path)
+{
+	char buffer[1024];
+	char key[B_FIELD_NAME_LENGTH], data[512];
+	int n;
+	FILE *file;
+
+	file = fopen(path, "r");
+	if (file == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	while (fgets(buffer, sizeof(buffer), file) != NULL) {
+		if (*buffer == '#')
+			continue;
+
+		n = sscanf(buffer, "%*[\"]%[^\"]%*[\"]%*[^\"]%*[\"]%[^\"]", key, data);
+		if (n == 2)
+			setString(key, data);
+	}
+
+	fclose(file);
+	return B_OK;
 }

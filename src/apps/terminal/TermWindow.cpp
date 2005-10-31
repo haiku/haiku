@@ -86,134 +86,114 @@ TermWindow::~TermWindow()
     delete (fWindowUpdate);
 }
 
-/*
- *
- * PUBLIC MEMBER FUNCTIONS.
- *
- */
-////////////////////////////////////////////////////////////////////////////
-// Init Window (void)
-//  Initialize Window object.
-////////////////////////////////////////////////////////////////////////////
+
+//	#pragma mark - public methods
+
+
+/** Initialize Window object. */
 
 void
 TermWindow::InitWindow(void)
 {
-  // make menu bar
-  SetupMenu();
-  
-  // Setup font.
+	// make menu bar
+	SetupMenu();
 
-  BFont halfFont;
-  BFont fullFont;
-  
-  halfFont.SetFamilyAndStyle (gTermPref->getString(PREF_HALF_FONT_FAMILY),
-            NULL);
-  halfFont.SetSize (gTermPref->getFloat(PREF_HALF_FONT_SIZE));
-  halfFont.SetSpacing (B_FIXED_SPACING);
-  
-  fullFont.SetFamilyAndStyle (gTermPref->getString(PREF_FULL_FONT_FAMILY),
-            NULL);
-  fullFont.SetSize (gTermPref->getFloat(PREF_FULL_FONT_SIZE));
-  fullFont.SetSpacing (B_FIXED_SPACING);
+	// Setup font.
 
-  // Make Terminal text view.
+	const char *family = gTermPref->getString(PREF_HALF_FONT_FAMILY);
 
-  BRect textframe = Bounds();
-  textframe.top = fMenubar->Bounds().bottom + 1.0;
+	BFont halfFont;
+	halfFont.SetFamilyAndStyle(family, NULL);
+	halfFont.SetSize(gTermPref->getFloat(PREF_HALF_FONT_SIZE));
+	halfFont.SetSpacing(B_FIXED_SPACING);
 
-  fCodeConv = new CodeConv ();
-  fTermView = new TermView(Bounds(), fCodeConv);
+	family = gTermPref->getString(PREF_FULL_FONT_FAMILY);
 
-  /*
-   * MuTerm has two views. BaseView is window base view.
-   * TermView is character Terminal view on BaseView. It has paste
-   * on BaseView shift as VIEW_OFFSET.
-   */
-  fBaseView = new TermBaseView (textframe, fTermView);
+	BFont fullFont;
+	fullFont.SetFamilyAndStyle(family, NULL);
+	fullFont.SetSize(gTermPref->getFloat(PREF_FULL_FONT_SIZE));
+	fullFont.SetSpacing(B_FIXED_SPACING);
 
-  //
-  //Initialize TermView. (font, size and color)
-  //
-  fTermView->SetTermFont (&halfFont, &fullFont);
-  BRect r = fTermView->SetTermSize (gTermPref->getInt32 (PREF_ROWS),
-				    gTermPref->getInt32 (PREF_COLS),
-				    1);
+	// Make Terminal text view.
 
-  int width, height;
-  
-  fTermView->GetFontSize (&width, &height);
-  SetSizeLimits (MIN_COLS * width, MAX_COLS * width,
-		 MIN_COLS * height, MAX_COLS * height);
+	BRect textframe = Bounds();
+	textframe.top = fMenubar->Bounds().bottom + 1.0;
 
+	fCodeConv = new CodeConv();
+	fTermView = new TermView(Bounds(), fCodeConv);
 
-  fTermView->SetTermColor ();
-  fBaseView->SetViewColor (gTermPref->getRGB (PREF_TEXT_BACK_COLOR));
+	/*
+	 * MuTerm has two views. BaseView is window base view.
+	 * TermView is character Terminal view on BaseView. It has paste
+	 * on BaseView shift as VIEW_OFFSET.
+	 */
+	fBaseView = new TermBaseView(textframe, fTermView);
 
-  // Add offset to baseview.
-  r.InsetBy (-VIEW_OFFSET, -VIEW_OFFSET);
+	// Initialize TermView. (font, size and color)
 
-  //
-  // Resize Window
-  //
-  ResizeTo (r.Width()+ B_V_SCROLL_BAR_WIDTH,
-        r.Height()+fMenubar->Bounds().Height());
+	fTermView->SetTermFont(&halfFont, &fullFont);
+	BRect rect = fTermView->SetTermSize(gTermPref->getInt32(PREF_ROWS),
+		gTermPref->getInt32(PREF_COLS), 1);
 
-  fBaseView->  ResizeTo (r.Width(), r.Height());
-  fBaseView->AddChild (fTermView);
-  fTermView->MoveBy (VIEW_OFFSET, VIEW_OFFSET);
-  
-  //
-  // Make Scroll Bar.
-  //
-  BRect scr(0, 0,
-	    B_V_SCROLL_BAR_WIDTH,
-	    r.Height() - B_H_SCROLL_BAR_HEIGHT + 1);
+	int width, height;
 
-  scr.OffsetBy (r.Width() + 1 , fMenubar->Bounds().Height());
-  
-  BScrollBar *scrbar =
-    new BScrollBar (scr, "scrollbar", fTermView, 0, 0, B_VERTICAL);
+	fTermView->GetFontSize(&width, &height);
+	SetSizeLimits(MIN_COLS * width, MAX_COLS * width,
+		MIN_COLS * height, MAX_COLS * height);
 
-  fTermView->SetScrollBar (scrbar);
+	fTermView->SetTermColor();
+	fBaseView->SetViewColor(gTermPref->getRGB(PREF_TEXT_BACK_COLOR));
 
-  this->AddChild (scrbar);
-  this->AddChild (fBaseView);
+	// Add offset to baseview.
+	rect.InsetBy(-VIEW_OFFSET, -VIEW_OFFSET);
 
+	// Resize Window
 
-  //  scrview->SetTarget (fTermView);
-  
-  // Set fEditmenu's target to fTermView. (Oh!...)
-  fEditmenu->SetTargetForItems(fTermView);
+	ResizeTo(rect.Width()+ B_V_SCROLL_BAR_WIDTH,
+		rect.Height() + fMenubar->Bounds().Height());
 
-  //
-  // Initialize TermParse
-  //
-  gNowCoding = longname2op(gTermPref->getString(PREF_TEXT_ENCODING));
-  fTermParse = new TermParse ();
-  fTermParse->InitPtyReader (this);
-  fTermParse->InitTermParse(fTermView, fCodeConv);
+	fBaseView->ResizeTo(rect.Width(), rect.Height());
+	fBaseView->AddChild(fTermView);
+	fTermView->MoveBy(VIEW_OFFSET, VIEW_OFFSET);
 
-  // Set Coding.
+	// Make Scroll Bar.
 
-  // Initialize MessageRunner.
-  fWindowUpdate = new BMessageRunner (BMessenger (this),
-				      new BMessage (MSGRUN_WINDOW),
-				      500000);
-  
-  return;
-    
+	BRect scrollRect(0, 0, B_V_SCROLL_BAR_WIDTH,
+		rect.Height() - B_H_SCROLL_BAR_HEIGHT + 1);
+
+	scrollRect.OffsetBy(rect.Width() + 1, fMenubar->Bounds().Height());
+
+	BScrollBar *scrollBar = new BScrollBar(scrollRect, "scrollbar",
+		fTermView, 0, 0, B_VERTICAL);
+	fTermView->SetScrollBar(scrollBar);
+	
+	AddChild(scrollBar);
+	AddChild(fBaseView);
+
+	// Set fEditmenu's target to fTermView. (Oh!...)
+	fEditmenu->SetTargetForItems(fTermView);
+
+	// Initialize TermParse
+
+	gNowCoding = longname2op(gTermPref->getString(PREF_TEXT_ENCODING));
+	fTermParse = new TermParse();
+	fTermParse->InitPtyReader(this);
+	fTermParse->InitTermParse(fTermView, fCodeConv);
+
+	// Set Coding.
+
+	// Initialize MessageRunner.
+	fWindowUpdate = new BMessageRunner(BMessenger(this),
+		new BMessage (MSGRUN_WINDOW), 500000);
 }
-////////////////////////////////////////////////////////////////////////////
-// void MenusBeginning (void)
-//  Dispatch MenuBegininng
-////////////////////////////////////////////////////////////////////////////
+
+
 void
 TermWindow::MenusBeginning(void)
 {
-  // Syncronize Encode Menu Pop-up menu and Preference.
-  (fEncodingmenu->FindItem(op2longname(gNowCoding)))->SetMarked(true);
-  BWindow::MenusBeginning();
+	// Syncronize Encode Menu Pop-up menu and Preference.
+	(fEncodingmenu->FindItem(op2longname(gNowCoding)))->SetMarked(true);
+	BWindow::MenusBeginning();
 }
 
 
