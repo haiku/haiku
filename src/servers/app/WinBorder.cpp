@@ -125,7 +125,7 @@ WinBorder::WinBorder(const BRect &frame,
 		uint16 width, height;
 		uint32 colorSpace;
 		float frequency;
-		gDesktop->ActiveScreen()->GetMode(width, height, colorSpace, frequency);
+		GetRootLayer()->GetDesktop()->ScreenAt(0)->GetMode(width, height, colorSpace, frequency);
 		_ResizeBy(width - frame.Width(), height - frame.Height());
 	} else
 		_ResizeBy(0, 0);
@@ -428,10 +428,10 @@ WinBorder::SetSizeLimits(float minWidth, float maxWidth,
 	ResizeBy(xDiff, yDiff);
 }
 
-// GetSizeLimits
+
 void
 WinBorder::GetSizeLimits(float* minWidth, float* maxWidth,
-						 float* minHeight, float* maxHeight) const
+	float* minHeight, float* maxHeight) const
 {
 	*minWidth = fMinWidth;
 	*maxWidth = fMaxWidth;
@@ -439,10 +439,11 @@ WinBorder::GetSizeLimits(float* minWidth, float* maxWidth,
 	*maxHeight = fMaxHeight;
 }
 
+
 void
 WinBorder::MouseDown(const BMessage *msg)
 {
-	DesktopSettings desktopSettings(gDesktop);
+	DesktopSettings desktopSettings(GetRootLayer()->GetDesktop());
 	BPoint where(0,0);
 	
 	msg->FindPoint("where", &where);

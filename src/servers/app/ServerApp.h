@@ -70,6 +70,8 @@ class ServerApp : public MessageLooper {
 
 		AreaPool *AppAreaPool() { return &fSharedMem; }
 
+		Desktop* GetDesktop() const { return fDesktop; }
+
 		// ToDo: public?
 		SubWindowList fAppSubWindowList;
 

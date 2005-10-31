@@ -71,7 +71,7 @@ class FontLocker {
 };
 
 
-//	pragma mark -
+//	#pragma mark -
 
 
 // constructor

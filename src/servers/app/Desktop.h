@@ -116,6 +116,4 @@ class Desktop : public MessageLooper, public ScreenOwner {
 			CursorManager		fCursorManager;
 };
 
-extern Desktop *gDesktop;
-
 #endif	// _DESKTOP_H_

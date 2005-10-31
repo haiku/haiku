@@ -64,7 +64,7 @@
 
 
 // Globals
-Desktop *gDesktop;
+static Desktop *sDesktop;
 
 port_id gAppServerPort;
 
@@ -163,9 +163,9 @@ AppServer::AppServer()
 	gBitmapManager = new BitmapManager();
 
 	// Set up the Desktop
-	gDesktop = new Desktop();
-	gDesktop->Init();
-	gDesktop->Run();
+	sDesktop = new Desktop();
+	sDesktop->Init();
+	sDesktop->Run();
 
 #if 0
 	LaunchCursorThread();
@@ -275,7 +275,7 @@ AppServer::CursorThread(void* data)
 			p.y = *server->fCursorAddr & 0x7fff;
 			p.x = *server->fCursorAddr >> 15 & 0x7fff;
 
-			gDesktop->GetHWInterface()->MoveCursorTo(p.x, p.y);
+			sDesktop->GetHWInterface()->MoveCursorTo(p.x, p.y);
 			STRACE(("CursorThread : %f, %f\n", p.x, p.y));
 		}
 
@@ -318,7 +318,7 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 
 			BPrivate::LinkSender reply(replyPort);
 			reply.StartMessage(B_OK);
-			reply.Attach<port_id>(gDesktop->MessagePort());
+			reply.Attach<port_id>(sDesktop->MessagePort());
 			reply.Flush();
 			break;
 		}
@@ -350,13 +350,13 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 #if TEST_MODE
 		case B_QUIT_REQUESTED:
 		{
-			thread_id thread = gDesktop->Thread();
+			thread_id thread = sDesktop->Thread();
 
 			// We've been asked to quit, so (for now) broadcast to all
 			// test apps to quit. This situation will occur only when the server
 			// is compiled as a regular Be application.
 
-			gDesktop->PostMessage(B_QUIT_REQUESTED);
+			sDesktop->PostMessage(B_QUIT_REQUESTED);
 			fQuitting = true;
 
 			// we just wait for the desktop to kill itself
@@ -374,7 +374,7 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 
 		case AS_SET_SYSCURSOR_DEFAULTS:
 		{
-			gDesktop->GetCursorManager().SetDefaults();
+			sDesktop->GetCursorManager().SetDefaults();
 			break;
 		}
 
@@ -399,30 +399,30 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 			// activate one of the app's windows.
 			if (error == B_OK) {
 				error = B_BAD_TEAM_ID;
-				if (gDesktop->Lock()) {
+				if (sDesktop->Lock()) {
 					// search for an unhidden window to give focus to
-					int32 windowCount = gDesktop->WindowList().CountItems();
+					int32 windowCount = sDesktop->WindowList().CountItems();
 					Layer *layer;
 					for (int32 i = 0; i < windowCount; ++i)
 						// is this layer in fact a WinBorder?
-						if ((layer = static_cast<Layer*>(gDesktop->WindowList().ItemAtFast(i)))) {
+						if ((layer = static_cast<Layer*>(sDesktop->WindowList().ItemAtFast(i)))) {
 							WinBorder *winBorder = dynamic_cast<WinBorder*>(layer);
 							// if winBorder is valid and not hidden, then we've found our target
 							if (winBorder && !winBorder->IsHidden()
 									&& winBorder->App()->ClientTeam() == team) {
-								if (gDesktop->ActiveRootLayer()
-										&& gDesktop->ActiveRootLayer()->Lock()) {
-									gDesktop->ActiveRootLayer()->SetActive(winBorder);
-									gDesktop->ActiveRootLayer()->Unlock();
+								if (sDesktop->ActiveRootLayer()
+										&& sDesktop->ActiveRootLayer()->Lock()) {
+									sDesktop->ActiveRootLayer()->SetActive(winBorder);
+									sDesktop->ActiveRootLayer()->Unlock();
 
-									if (gDesktop->ActiveRootLayer()->Active() == winBorder)
+									if (sDesktop->ActiveRootLayer()->Active() == winBorder)
 										error = B_OK;
 									else
 										error = B_ERROR;
 								}
 							}
 						}
-					gDesktop->Unlock();
+					sDesktop->Unlock();
 				}
 			}
 

@@ -178,7 +178,7 @@ WorkspacesLayer::_DrawWorkspace(int32 index)
 		uint16 width, height;
 		uint32 colorSpace;
 		float frequency;
-		gDesktop->ScreenAt(0)->GetMode(width, height, colorSpace, frequency);
+		GetRootLayer()->GetDesktop()->ScreenAt(0)->GetMode(width, height, colorSpace, frequency);
 		BRect screenFrame(0, 0, width - 1, height - 1);
 
 		BRegion workspaceRegion(rect);

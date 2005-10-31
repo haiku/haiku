@@ -964,10 +964,10 @@ RootLayer::_ProcessMouseMovedEvent(BMessage *msg)
 	// change focus in FFM mode
 	WinBorder* winBorderTarget = dynamic_cast<WinBorder*>(target);
 	if (winBorderTarget) {
-		DesktopSettings ds(gDesktop);
+		DesktopSettings desktopSettings(fDesktop);
 		// TODO: Focus should be a RootLayer option/feature, NOT a Workspace one!!!
 		WinBorder* exFocus = Focus();
-		if (ds.MouseMode() != B_NORMAL_MOUSE && exFocus != winBorderTarget) {
+		if (desktopSettings.MouseMode() != B_NORMAL_MOUSE && exFocus != winBorderTarget) {
 			ActiveWorkspace()->AttemptToSetFocus(winBorderTarget);
 			// Workspace::SetFocus() *attempts* to set a new focus WinBorder, it may not succeed
 			if (exFocus != Focus()) {
@@ -1544,10 +1544,9 @@ RootLayer::change_winBorder_feel(WinBorder *winBorder, int32 newFeel)
 		}
 	}
 
-	gDesktop->SetWinBorderFeel(winBorder, newFeel);
+	fDesktop->SetWinBorderFeel(winBorder, newFeel);
 
-	if (isVisible)
-	{
+	if (isVisible) {
 		// just show, don't invalidate
 		winBorder->Show(false);
 		// all workspaces must be up-to-date with this change of feel.

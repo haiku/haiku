@@ -8,7 +8,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Stefano Ceccherini (burton666@libero.it)
  *		Axel Dörfler, axeld@pinc-software.de
- *		J�r�me Duval, jerome.duval@free.fr
+ *		Jérôme Duval, jerome.duval@free.fr
  */
 
 /*!

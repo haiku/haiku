@@ -132,6 +132,7 @@ ServerWindow::ServerWindow(const char *title, ServerApp *app,
 						   port_id clientPort, port_id looperPort, int32 handlerID)
 	: MessageLooper(title && *title ? title : "Unnamed Window"),
 	fTitle(title),
+	fDesktop(app->GetDesktop()),
 	fServerApp(app),
 	fWinBorder(NULL),
 	fClientTeam(app->ClientTeam()),
@@ -155,7 +156,7 @@ ServerWindow::~ServerWindow()
 	STRACE(("*ServerWindow(%s@%p):~ServerWindow()\n", fTitle, this));
 
 	if (!fWinBorder->IsOffscreenWindow())
-		gDesktop->RemoveWinBorder(fWinBorder);
+		fDesktop->RemoveWinBorder(fWinBorder);
 
 	delete fWinBorder;
 
@@ -191,7 +192,7 @@ ServerWindow::Init(BRect frame, uint32 look, uint32 feel, uint32 flags, uint32 w
 		return B_NO_MEMORY;
 
 	if (!fWinBorder->IsOffscreenWindow())
-		gDesktop->AddWinBorder(fWinBorder);
+		fDesktop->AddWinBorder(fWinBorder);
 
 	return B_OK;
 }
@@ -487,7 +488,7 @@ ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent)
 								flags, fWinBorder->GetDisplayDriver());
 	} else {
 		newLayer = new Layer(frame, name, token, resizeMask, 
-			flags, gDesktop->GetDisplayDriver());
+			flags, fDesktop->GetDisplayDriver());
 	}
 
 	free(name);
@@ -1273,13 +1274,13 @@ myRootLayer->Unlock();
 			STRACE(("ServerWindow %s: Message  Send_Behind unimplemented\n", Title()));
 			int32 token;
 			team_id teamID;
-			WinBorder *behindOf;
 			status_t status = B_NAME_NOT_FOUND;
 
 			link.Read<int32>(&token);
 			link.Read<team_id>(&teamID);
 
-			if ((behindOf = gDesktop->FindWinBorderByClientToken(token, teamID))) {
+			WinBorder *behindOf;
+			if ((behindOf = fDesktop->FindWinBorderByClientToken(token, teamID)) != NULL) {
 				fWinBorder->GetRootLayer()->Lock();
 				// TODO: move to back ATM. Fix this later!
 				fWinBorder->GetRootLayer()->SetActive(fWinBorder, false);
@@ -1337,13 +1338,13 @@ myRootLayer->Unlock();
 			link.Read<int32>(&mainToken);
 			link.Read(&teamID, sizeof(team_id));
 
-			windowBorder = gDesktop->FindWinBorderByClientToken(mainToken, teamID);
+			windowBorder = fDesktop->FindWinBorderByClientToken(mainToken, teamID);
 			if (windowBorder) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Flush();
 
 				fWinBorder->GetRootLayer()->Lock();
-				gDesktop->AddWinBorderToSubset(fWinBorder, windowBorder);
+				fDesktop->AddWinBorderToSubset(fWinBorder, windowBorder);
 				fWinBorder->GetRootLayer()->Unlock();
 			} else {
 				fLink.StartMessage(SERVER_FALSE);
@@ -1361,13 +1362,13 @@ myRootLayer->Unlock();
 			link.Read<int32>(&mainToken);
 			link.Read(&teamID, sizeof(team_id));
 			
-			windowBorder = gDesktop->FindWinBorderByClientToken(mainToken, teamID);
+			windowBorder = fDesktop->FindWinBorderByClientToken(mainToken, teamID);
 			if (windowBorder) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Flush();
 
 				fWinBorder->GetRootLayer()->Lock();
-				gDesktop->RemoveWinBorderFromSubset(fWinBorder, windowBorder);
+				fDesktop->RemoveWinBorderFromSubset(fWinBorder, windowBorder);
 				fWinBorder->GetRootLayer()->Unlock();
 			} else {
 				fLink.StartMessage(SERVER_FALSE);
@@ -1641,8 +1642,8 @@ myRootLayer->Unlock();
 			// 1) BPoint mouse location
 			// 2) int32 button state
 
-			fLink.Attach<BPoint>(gDesktop->GetHWInterface()->GetCursorPosition());
-			fLink.Attach<int32>(gDesktop->ActiveRootLayer()->Buttons());
+			fLink.Attach<BPoint>(fDesktop->GetHWInterface()->GetCursorPosition());
+			fLink.Attach<int32>(fDesktop->ActiveRootLayer()->Buttons());
 
 			fLink.Flush();
 			break;
@@ -2384,7 +2385,7 @@ ServerWindow::MakeWinBorder(BRect frame, const char* name,
 {
 	// The non-offscreen ServerWindow uses the DisplayDriver instance from the desktop.
 	return new(nothrow) WinBorder(frame, name, look, feel, flags,
-								  workspace, this, gDesktop->GetDisplayDriver());
+								  workspace, this, fDesktop->GetDisplayDriver());
 }
 
 
@@ -2418,7 +2419,7 @@ ServerWindow::_HandleDirectConnection(direct_buffer_state state)
 	
 	if ((state & B_DIRECT_MODE_MASK) != B_DIRECT_STOP) {
 		// TODO: Locking ?
-		RenderingBuffer *buffer = gDesktop->GetHWInterface()->FrontBuffer();
+		RenderingBuffer *buffer = fDesktop->GetHWInterface()->FrontBuffer();
 		fDirectWindowData->direct_info->bits = buffer->Bits();
 		fDirectWindowData->direct_info->pci_bits = NULL; // TODO	
 		fDirectWindowData->direct_info->bytes_per_row = buffer->BytesPerRow();

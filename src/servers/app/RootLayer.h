@@ -67,14 +67,15 @@ class UtilityBitmap;
 class RootLayer : public Layer {
 public:
 								RootLayer(const char *name,	int32 workspaceCount,
-										Desktop *desktop, DisplayDriver *driver);
+									Desktop *desktop, DisplayDriver *driver);
 	virtual						~RootLayer(void);
-	
+
+	Desktop*					GetDesktop() const { return fDesktop; }
+
 	virtual	void				MoveBy(float x, float y);
 	virtual	void				ResizeBy(float x, float y);
 	virtual	void				ScrollBy(float x, float y)
-								{ // not allowed
-								}
+									{ /* not allowed */ }
 
 	// For the active workspaces
 	virtual	Layer*				FirstChild() const;
@@ -85,8 +86,7 @@ public:
 			void				HideWinBorder(WinBorder* winBorder);
 			void				ShowWinBorder(WinBorder* winBorder);
 			void				SetWinBorderWorskpaces(WinBorder *winBorder,
-										uint32 oldIndex,
-										uint32 newIndex);
+									uint32 oldIndex, uint32 newIndex);
 
 			void				RevealNewWMState(Workspace::State &oldWMState);
 // TODO: we need to replace Winborder* with Layer*
@@ -117,7 +117,8 @@ public:
 			void				SetDragMessage(BMessage *msg);
 			BMessage*			DragMessage(void) const;
 
-			bool				AddToInputNotificationLists(Layer *lay, uint32 mask, uint32 options);
+			bool				AddToInputNotificationLists(Layer *lay, uint32 mask,
+									uint32 options);
 			bool				SetNotifyLayer(Layer *lay, uint32 mask, uint32 options);
 			void				ClearNotifyLayer();
 

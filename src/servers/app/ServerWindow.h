@@ -32,6 +32,7 @@ class BMessenger;
 class BPoint;
 class BMessage;
 
+class Desktop;
 class ServerApp;
 class Decorator;
 class WinBorder;
@@ -129,6 +130,7 @@ private:
 private:
 			const char*			fTitle;
 
+			Desktop*			fDesktop;
 			ServerApp*			fServerApp;
 			WinBorder*			fWinBorder;
 
