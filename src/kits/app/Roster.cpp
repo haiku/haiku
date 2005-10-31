@@ -785,6 +785,19 @@ BRoster::ActivateApp(team_id team) const
 
 	BPrivate::PortLink link(port, replyPort.port);
 
+	// We can't use AppServerLink because be_app may be NULL
+	link.StartMessage(AS_GET_DESKTOP);
+	link.Attach<port_id>(replyPort.port);
+	link.Attach<int32>(getuid());
+
+	int32 code;
+	if (link.FlushWithReply(code) != B_OK || code != B_OK)
+		return B_ERROR;
+
+	// we now talk to the desktop
+	link.Read<port_id>(&port);
+	link.SetSenderPort(port);
+
 	// prepare the message
 	status_t error = link.StartMessage(AS_ACTIVATE_APP);
 	if (error != B_OK)
@@ -799,7 +812,6 @@ BRoster::ActivateApp(team_id team) const
 		return error;
 
 	// send it
-	int32 code;
 	error = link.FlushWithReply(code);
 	if (error != B_OK)
 		return error;
