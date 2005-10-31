@@ -1,16 +1,13 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//  Copyright (c) 2001-2004, Haiku
-//
-//  This software is part of the Haiku distribution and is covered 
-//  by the Haiku license.
-//
-//
-//  File:        listimage.c
-//  Author:      Daniel Reinhold (danielre@users.sf.net)
-//  Description: lists image info for all currently running teams
-//
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright (c) 2001-2005, Haiku.
+ *
+ * This software is part of the Haiku distribution and is covered 
+ * by the MIT license.
+ *
+ * Author: Daniel Reinhold (danielre@users.sf.net)
+ */
+
+/**	Description: lists image info for all currently running teams */
 
 
 #include <OS.h>
@@ -42,11 +39,11 @@ list_images_for_team_by_id(team_id id)
 	printf("------------------------------------------------------------------------------------------------------------\n");
 
 	while ((status = get_next_image_info(id, &cookie, &imageInfo)) == B_OK) {
-		printf("%5ld %64s 0x%08lx 0x%08lx %4ld %10lu\n",
+		printf("%5ld %64s %p %p %4ld %10lu\n",
 			imageInfo.id,
 			imageInfo.name,
-			(void *)imageInfo.text,
-			(void *)imageInfo.data,
+			imageInfo.text,
+			imageInfo.data,
 			imageInfo.sequence,
 			imageInfo.init_order);
 	}
