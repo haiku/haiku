@@ -3,9 +3,12 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *              DarkWyrm <bpmagic@columbus.rr.com>
- *              Jérôme Duval, jerome.duval@free.fr
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		JÃ©rÃ´me Duval, jerome.duval@free.fr
+ *		Axel DÃ¶rfler, axeld@pinc-software.de
  */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -22,9 +25,6 @@
 
 #include <Font.h>
 
-//----------------------------------------------------------------------------------------
-//		Globals
-//----------------------------------------------------------------------------------------
 
 // The actual objects which the globals point to
 static BFont sPlainFont;
@@ -39,9 +39,9 @@ const BFont *be_fixed_font = &sFixedFont;
 extern "C" void
 _init_global_fonts()
 {
-	_font_control_(&sPlainFont,AS_SET_SYSFONT_PLAIN,NULL);
-	_font_control_(&sBoldFont,AS_SET_SYSFONT_BOLD,NULL);
-	_font_control_(&sFixedFont,AS_SET_SYSFONT_FIXED,NULL);
+	_font_control_(&sPlainFont, AS_SET_SYSFONT_PLAIN, NULL);
+	_font_control_(&sBoldFont, AS_SET_SYSFONT_BOLD, NULL);
+	_font_control_(&sFixedFont, AS_SET_SYSFONT_FIXED, NULL);
 }
 
 
@@ -73,8 +73,6 @@ _font_control_(BFont *font, int32 cmd, void *data)
 
 	if (link.FlushWithReply(code) != B_OK
 		|| code != SERVER_TRUE) {
-		// Once again, this shouldn't ever happen, but I want to know about it
-		// if it does
 		printf("DEBUG: Couldn't initialize font in _font_control()\n");
 		return;
 	}
@@ -89,6 +87,7 @@ _font_control_(BFont *font, int32 cmd, void *data)
 	link.Read<uint32>(&font->fFlags);
 }
 
+
 /*!
 	\brief Private function used to replace the R5 hack which sets a system font
 	\param which string denoting which font to set
@@ -101,14 +100,14 @@ _font_control_(BFont *font, int32 cmd, void *data)
 */
 void
 _set_system_font_(const char *which, font_family family, font_style style, 
-					float size)
+	float size)
 {
 	if (!which)
 		return;
 	
-	if (!strcmp(which,"plain")
-		|| !strcmp(which,"bold")
-		|| !strcmp(which,"fixed")) {
+	if (!strcmp(which, "plain")
+		|| !strcmp(which, "bold")
+		|| !strcmp(which, "fixed")) {
 		BPrivate::AppServerLink link;
 
 		link.StartMessage(AS_SET_SYSTEM_FONT);
@@ -179,7 +178,7 @@ get_font_family(int32 index, font_family *name, uint32 *flags)
 {
 	// Fix over R5, which does not check for NULL font family names - it just crashes
 	if (!name)
-		return B_ERROR;
+		return B_BAD_VALUE;
 
 	int32 code;
 	BPrivate::AppServerLink link;
@@ -214,8 +213,8 @@ status_t
 get_font_style(font_family family, int32 index, font_style *name,
 	uint32 *flags)
 {
-	if(!name)
-		return B_ERROR;
+	if (!name)
+		return B_BAD_VALUE;
 
 	int32 code;
 	BPrivate::AppServerLink link;
@@ -259,8 +258,8 @@ status_t
 get_font_style(font_family family, int32 index, font_style *name,
 	uint16 *face, uint32 *flags)
 {
-	if(!name || !face)
-		return B_ERROR;
+	if (!name || !face)
+		return B_BAD_VALUE;
 
 	int32 code;
 	BPrivate::AppServerLink link;
@@ -331,12 +330,10 @@ set_font_cache_info(uint32 id, void *set)
 }
 
 
-//----------------------------------------------------------------------------------------
-//		BFont Class Definition
-//----------------------------------------------------------------------------------------
+//	#pragma mark -
 
 
-BFont::BFont(void) 
+BFont::BFont() 
 	:
 	// initialise for be_plain_font (avoid circular definition)
 	fFamilyID(0),
@@ -349,56 +346,28 @@ BFont::BFont(void)
 	fFace(0),
 	fFlags(0)
 {
-	fHeight.ascent = 7.0;
-	fHeight.descent = 2.0;
-	fHeight.leading = 13.0;
- 	
-	fFamilyID = be_plain_font->fFamilyID;
-	fStyleID = be_plain_font->fStyleID;
-	fSize = be_plain_font->fSize;
+	if (be_plain_font != NULL && this != &sPlainFont)
+		*this = *be_plain_font;
+	else {
+		fHeight.ascent = 7.0;
+		fHeight.descent = 2.0;
+		fHeight.leading = 13.0;
+	}
 }
 
 
 BFont::BFont(const BFont &font)
 {
-	fFamilyID = font.fFamilyID;
-	fStyleID = font.fStyleID;
-	fSize = font.fSize;
-	fShear = font.fShear;
-	fRotation = font.fRotation;
-	fSpacing = font.fSpacing;
-	fEncoding = font.fEncoding;
-	fFace = font.fFace;
-	fFlags = font.fFlags;
-	fHeight = font.fHeight;
+	*this = font;
 }
 
 
 BFont::BFont(const BFont *font)
 {
-	if (font) {
-		fFamilyID = font->fFamilyID;
-		fStyleID = font->fStyleID;
-		fSize = font->fSize;
-		fShear = font->fShear;
-		fRotation = font->fRotation;
-		fSpacing = font->fSpacing;
-		fEncoding = font->fEncoding;
-		fFace = font->fFace;
-		fFlags = font->fFlags;
-		fHeight = font->fHeight;
-	} else {
-		fFamilyID = be_plain_font->fFamilyID;
-		fStyleID = be_plain_font->fStyleID;
-		fSize = be_plain_font->fSize;
-		fShear = be_plain_font->fShear;
-		fRotation = be_plain_font->fRotation;
-		fSpacing = be_plain_font->fSpacing;
-		fEncoding = be_plain_font->fEncoding;
-		fFace = be_plain_font->fFace;
-		fFlags = be_plain_font->fFlags;
-		fHeight = be_plain_font->fHeight;
-	}
+	if (font)
+		*this = *font;
+	else
+		*this = *be_plain_font;
 }
 
 
@@ -406,42 +375,30 @@ BFont::BFont(const BFont *font)
 	\brief Sets the font's family and style all at once
 	\param family Font family to set
 	\param style Font style to set
-	\return B_ERROR if family or style do not exist or if style does not belong to family.
+	\return B_NAME_NOT_FOUND if family or style do not exist.
 */
 
 status_t
 BFont::SetFamilyAndStyle(const font_family family, const font_style style)
 {
-	// R5 version always returns B_OK. That's a problem...
-	if (!family)
-		return B_ERROR;
+	if (family == NULL && style == NULL)
+		return B_BAD_VALUE;
 
-	int32 code;
 	BPrivate::AppServerLink link;
 
-	if (!style) {
-		// The BeBook states that a NULL style means set only the family
-		link.StartMessage(AS_SET_FAMILY_NAME);
-		link.Attach(family, sizeof(font_family));
+	link.StartMessage(AS_SET_FAMILY_AND_STYLE);
+	link.AttachString(family);
+	link.AttachString(style);
+	link.Attach<uint16>(fFace);
 
-		if (link.FlushWithReply(code) != B_OK
-			|| code != SERVER_TRUE)
-			return B_ERROR;
+	int32 status;
+	if (link.FlushWithReply(status) != B_OK
+		|| status != B_OK)
+		return status;
 
-		link.Read<uint16>(&fFamilyID);
-	} else {
-		link.StartMessage(AS_SET_FAMILY_AND_STYLE);
-		link.Attach(family, sizeof(font_family));
-		link.Attach(style, sizeof(font_style));
-
-		if (link.FlushWithReply(code) != B_OK
-			|| code != SERVER_TRUE)
-			return B_ERROR;
-
-		link.Read<uint16>(&fFamilyID);
-		link.Read<uint16>(&fStyleID);
-	}
-
+	link.Read<uint16>(&fFamilyID);
+	link.Read<uint16>(&fStyleID);
+	link.Read<uint16>(&fFace);
 	return B_OK;
 }
 
@@ -577,8 +534,18 @@ BFont::SetFlags(uint32 flags)
 void
 BFont::GetFamilyAndStyle(font_family *family, font_style *style) const
 {
-	if (!family || !style)
+	if (family == NULL && style == NULL)
 		return;
+
+	// it's okay to call this function with either family or style set to NULL
+
+	font_family familyBuffer;
+	font_style styleBuffer;
+
+	if (family == NULL)
+		family = &familyBuffer;
+	if (style == NULL)
+		style = &styleBuffer;
 
 	int32 code;
 	BPrivate::AppServerLink link;
@@ -588,8 +555,12 @@ BFont::GetFamilyAndStyle(font_family *family, font_style *style) const
 	link.Attach<uint16>(fStyleID);
 
 	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE)
+		|| code != SERVER_TRUE) {
+		// the least we can do is to clear the buffers
+		memset(family, 0, sizeof(font_family));
+		memset(style, 0, sizeof(font_style));
 		return;
+	}
 
 	link.Read<font_family>(family);
 	link.Read<font_style>(style);
@@ -599,8 +570,7 @@ BFont::GetFamilyAndStyle(font_family *family, font_style *style) const
 uint32
 BFont::FamilyAndStyle(void) const
 {
-	uint32 token = (fFamilyID << 16) | fStyleID;
-	return token;
+	return (fFamilyID << 16UL) | fStyleID;
 }
 
 
@@ -784,7 +754,7 @@ BFont::GetTunedInfo(int32 index, tuned_font_info *info) const
 	link.Read<tuned_font_info>(info);
 }
 
-// TruncateString
+
 void
 BFont::TruncateString(BString *inOut, uint32 mode, float width) const
 {
@@ -795,7 +765,7 @@ BFont::TruncateString(BString *inOut, uint32 mode, float width) const
 	GetTruncatedStrings(array, 1, mode, width, inOut);
 }
 
-// GetTruncatedStrings
+
 void
 BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings, 
 	uint32 mode, float width, BString resultArray[]) const
@@ -818,7 +788,7 @@ BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings,
 	}
 }
 
-// GetTruncatedStrings
+
 void
 BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings, 
 	uint32 mode, float width, char *resultArray[]) const
@@ -842,15 +812,17 @@ BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings,
 	}
 }
 
-// StringWidth
+
 float
 BFont::StringWidth(const char *string) const
 {
 	if (!string)
 		return 0.0;
+
 	int32 length = strlen(string);
 	float width;
 	GetStringWidths(&string, &length, 1, &width);
+
 	return width;
 }
 
@@ -863,6 +835,7 @@ BFont::StringWidth(const char *string, int32 length) const
 
 	float width;
 	GetStringWidths(&string, &length, 1, &width);
+
 	return width;
 }
 
@@ -908,7 +881,7 @@ void
 BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *delta, 
 	float escapementArray[]) const
 {
-	if (!charArray ||  numChars < 1 || !escapementArray)
+	if (!charArray || numChars < 1 || !escapementArray)
 		return;
 
 	// NOTE: The R5 implementation crashes if delta == NULL!
@@ -953,7 +926,7 @@ void
 BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *delta, 
 	BPoint escapementArray[], BPoint offsetArray[]) const
 {
-	if (!charArray ||  numChars<1 || !escapementArray)
+	if (!charArray || numChars < 1 || !escapementArray)
 		return;
 
 	int32 code;

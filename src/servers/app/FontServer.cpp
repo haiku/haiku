@@ -123,7 +123,7 @@ FontServer::GetFamilyName(uint16 id) const
 {
 	for (int32 i = 0; i < fFamilies.CountItems(); i++) {
 		FontFamily* family = (FontFamily*)fFamilies.ItemAt(i);
-		if (family && family->GetID() == id)
+		if (family && family->ID() == id)
 			return family->Name();
 	}
 
@@ -146,12 +146,8 @@ FontStyle*
 FontServer::GetStyle(const char* familyName, uint16 id) const
 {
 	FontFamily* family = GetFamily(familyName);
-
-	for (int32 i = 0; i < family->CountStyles(); i++) {
-		FontStyle* style = family->GetStyle(i);
-		if (style && style->GetID() == id)
-			return style;
-	}
+	if (family != NULL)
+		return family->GetStyleWithID(id);
 
 	return NULL;
 }
@@ -167,7 +163,7 @@ FontServer::GetStyle(const char* familyName, uint16 id) const
 FontFamily*
 FontServer::GetFamily(const char* name) const
 {
-	if (!fInit)
+	if (!fInit || name == NULL)
 		return NULL;
 
 	int32 count = fFamilies.CountItems();
@@ -407,12 +403,16 @@ FontServer::SaveList(void)
 	\return The FontStyle having those attributes or NULL if not available
 */
 FontStyle*
-FontServer::GetStyle(const char* familyName, const char* styleName)
+FontServer::GetStyle(const char* familyName, const char* styleName, uint16 face)
 {
 	FontFamily* family = GetFamily(familyName);
-
-	if (family)
+	if (family) {
+		if (styleName == NULL) {
+			// try to get from face
+			return family->GetStyleWithFace(face);
+		}
 		return family->GetStyle(styleName);
+	}
 
 	return NULL;
 }
@@ -425,23 +425,22 @@ FontServer::GetStyle(const char* familyName, const char* styleName)
 	\return The FontStyle having those attributes or NULL if not available
 */
 FontStyle*
-FontServer::GetStyle(const uint16& familyID, const uint16& styleID)
+FontServer::GetStyle(uint16 familyID, uint16 styleID)
 {
 	FontFamily *family = GetFamily(familyID);
-
 	if (family)
-		return family->GetStyle(styleID);
+		return family->GetStyleWithID(styleID);
 
 	return NULL;
 }
 
 
 FontFamily*
-FontServer::GetFamily(const uint16& familyID) const
+FontServer::GetFamily(uint16 familyID) const
 {
 	for (int32 i = 0; i < fFamilies.CountItems(); i++) {
 		FontFamily *family = (FontFamily*)fFamilies.ItemAt(i);
-		if (family->GetID() == familyID)
+		if (family->ID() == familyID)
 			return family;
 	}
 

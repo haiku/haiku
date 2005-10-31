@@ -6,7 +6,7 @@ if $(TARGET_PLATFORM) != haiku {
 }
 
 UseLibraryHeaders agg ;
-UsePrivateHeaders app interface [ FDirName servers app ] ;
+UsePrivateHeaders app interface shared [ FDirName servers app ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter font_support ] ;
 UseFreeTypeHeaders ;

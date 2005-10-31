@@ -66,16 +66,16 @@ class ServerFont {
 			const char*			GetStyle() const;
 			const char*			GetFamily() const;
 			const char*			GetPath() const
-									{ return fStyle->GetPath(); }
+									{ return fStyle->Path(); }
 	
 			status_t			SetFamilyAndStyle(uint16 familyID,
 												  uint16 styleID);
 			status_t			SetFamilyAndStyle(uint32 fontID);
 
 			uint16				StyleID() const
-									{ return fStyle->GetID(); }
+									{ return fStyle->ID(); }
 			uint16				FamilyID() const
-									{ return fStyle->Family()->GetID(); }
+									{ return fStyle->Family()->ID(); }
 			uint32				GetFamilyAndStyle() const;
 
 

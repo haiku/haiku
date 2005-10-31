@@ -1174,7 +1174,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				fam[sizeof(font_family) - 1] = 0;
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach(fam, sizeof(font_family));
-				fLink.Attach<uint32>(ffamily->GetFlags());
+				fLink.Attach<uint32>(ffamily->Flags());
 			} else
 				fLink.StartMessage(SERVER_FALSE);
 
@@ -1208,8 +1208,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				style[sizeof(font_style) - 1] = 0;
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach(style, sizeof(font_style));
-				fLink.Attach<uint32>(fstyle->GetFace());
-				fLink.Attach<uint32>(fstyle->GetFlags());
+				fLink.Attach<uint32>(fstyle->Face());
+				fLink.Attach<uint32>(fstyle->Flags());
 			} else
 				fLink.StartMessage(SERVER_FALSE);
 
@@ -1227,27 +1227,27 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// Returns:
 			// 1) font_family The name of the font family
 			// 2) font_style - name of the style
-			uint16 famid, styid;
-			font_family fam;
-			font_style sty;
-
-			link.Read<uint16>(&famid);
-			link.Read<uint16>(&styid);
+			uint16 familyID, styleID;
+			link.Read<uint16>(&familyID);
+			link.Read<uint16>(&styleID);
 
 			gFontServer->Lock();
-			FontStyle *fstyle = gFontServer->GetStyle(famid, styid);
-			if (fstyle) {
-				strncpy(fam, fstyle->Family()->Name(), sizeof(font_family) - 1);
-				strncpy(sty, fstyle->Name(), sizeof(font_style) - 1);
-				fam[sizeof(font_family) - 1] = 0;
-				sty[sizeof(font_style) - 1] = 0;
+			FontStyle *fontStyle = gFontServer->GetStyle(familyID, styleID);
+			if (fontStyle != NULL) {
+				font_family family;
+				font_style style;
 
-				fLink.StartMessage(SERVER_TRUE);
-				fLink.Attach(fam, sizeof(font_family));
-				fLink.Attach(sty, sizeof(font_style));
+				strncpy(family, fontStyle->Family()->Name(), sizeof(font_family) - 1);
+				family[sizeof(font_family) - 1] = 0;
+				strncpy(style, fontStyle->Name(), sizeof(font_style) - 1);
+				style[sizeof(font_style) - 1] = 0;
+
+				fLink.StartMessage(B_OK);
+				fLink.Attach(family, sizeof(font_family));
+				fLink.Attach(style, sizeof(font_style));
 			} else
-				fLink.StartMessage(SERVER_FALSE);
-			
+				fLink.StartMessage(B_BAD_VALUE);
+
 			fLink.Flush();
 			gFontServer->Unlock();
 			break;
@@ -1319,7 +1319,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			float widthArray[numStrings];
 			int32 lengthArray[numStrings];
 			char *stringArray[numStrings];
-			for(int32 i=0; i<numStrings; i++) {
+			for (int32 i = 0; i < numStrings; i++) {
 				link.Read<int32>(&lengthArray[i]);
 				stringArray[i] = new char[lengthArray[i]];
 				link.ReadString(&stringArray[i]);
@@ -1333,7 +1333,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				font.SetSize(size);
 				font.SetSpacing(spacing);
 
-				for (int32 i=0; i<numStrings; i++)
+				for (int32 i = 0; i < numStrings; i++)
 					if (!stringArray[i] || lengthArray[i] <= 0)
 						widthArray[i] = 0.0;
 					else
@@ -1349,7 +1349,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				fLink.StartMessage(SERVER_FALSE);
 
 			fLink.Flush();
-			for(int32 i=0; i<numStrings; i++) {
+			for (int32 i = 0; i < numStrings; i++) {
 				delete[] stringArray[i];
 			}
 			break;
@@ -1437,30 +1437,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			gFontServer->Unlock();
 			break;
 		}
-		case AS_SET_FAMILY_NAME:
-		{
-			FTRACE(("ServerApp %s: AS_SET_FAMILY_NAME\n", Signature()));
-			// Attached Data:
-			// 1) font_family - name of font family to use
-
-			// Returns:
-			// 1) uint16 - family ID
-
-			font_family fam;
-			link.Read(fam, sizeof(font_family));
-
-			gFontServer->Lock();
-			FontFamily *ffam = gFontServer->GetFamily(fam);
-			if (ffam) {
-				fLink.StartMessage(SERVER_TRUE);
-				fLink.Attach<uint16>(ffam->GetID());
-			} else
-				fLink.StartMessage(SERVER_FALSE);
-			
-			fLink.Flush();
-			gFontServer->Unlock();
-			break;
-		}
 		case AS_SET_FAMILY_AND_STYLE:
 		{
 			FTRACE(("ServerApp %s: AS_SET_FAMILY_AND_STYLE\n",
@@ -1468,27 +1444,35 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// Attached Data:
 			// 1) font_family - name of font family to use
 			// 2) font_style - name of style in family
+			// 3) face - the font's current face
 
 			// Returns:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
+			// 3) uint16 - face
 
-			font_family fam;
-			font_style sty;
-			link.Read(fam, sizeof(font_family));
-			link.Read(sty, sizeof(font_style));
-
-			gFontServer->Lock();
-			FontStyle *fstyle = gFontServer->GetStyle(fam, sty);
-			if (fstyle) {
-				fLink.StartMessage(SERVER_TRUE);
-				fLink.Attach<uint16>(fstyle->Family()->GetID());
-				fLink.Attach<uint16>(fstyle->GetID());
+			font_family family;
+			font_style style;
+			uint16 face;
+			if (link.ReadString(family, sizeof(font_family)) == B_OK
+				&& link.ReadString(style, sizeof(font_style)) == B_OK
+				&& link.Read<uint16>(&face) == B_OK) {
+				// get the font and return IDs and face
+				gFontServer->Lock();
+				FontStyle *fontStyle = gFontServer->GetStyle(family[0] ? family : NULL,
+					style[0] ? style : NULL, face);
+				if (fontStyle != NULL) {
+					fLink.StartMessage(B_OK);
+					fLink.Attach<uint16>(fontStyle->Family()->ID());
+					fLink.Attach<uint16>(fontStyle->ID());
+					fLink.Attach<uint16>(fontStyle->Face());
+				} else
+					fLink.StartMessage(B_NAME_NOT_FOUND);
+				gFontServer->Unlock();
 			} else
-				fLink.StartMessage(SERVER_FALSE);
+				fLink.StartMessage(B_BAD_VALUE);
 
 			fLink.Flush();
-			gFontServer->Unlock();
 			break;
 		}
 		case AS_SET_FAMILY_AND_STYLE_FROM_ID:

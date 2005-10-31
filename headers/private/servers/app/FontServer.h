@@ -28,43 +28,43 @@ class ServerFont;
 */
 class FontServer : public BLocker {
 public:
-	FontServer(void);
-	~FontServer(void);
+	FontServer();
+	~FontServer();
 
 	/*!
 		\brief Determines whether the font server has started up properly
 		\return true if so, false if not.
 	*/
-	bool IsInitialized(void) { return fInit; }
-	int32 CountFamilies(void);
+	bool IsInitialized() { return fInit; }
+	int32 CountFamilies();
 	int32 CountStyles(const char *family);
 	void RemoveFamily(const char *family);
-	void ScanSystemFolders(void);
+	void ScanSystemFolders();
 	status_t ScanDirectory(const char *path);
-	void SaveList(void);
+	void SaveList();
 
 	const char *GetFamilyName(uint16 id) const;
 	const char *GetStyleName(const char *family, uint16 id) const;
 
-	FontStyle *GetStyle(const char *family, const char *face);
+	FontStyle *GetStyle(const char *family, const char *style, uint16 face = 0);
 	FontStyle *GetStyle(const char *family, uint16 id) const;
-	FontStyle *GetStyle(const uint16 &familyid, const uint16 &styleid);
-	FontFamily *GetFamily(const uint16 &familyid) const;
+	FontStyle *GetStyle(uint16 familyID, uint16 styleID);
+	FontFamily *GetFamily(uint16 familyID) const;
 	FontFamily *GetFamily(const char *name) const;
 
-	ServerFont *GetSystemPlain(void);
-	ServerFont *GetSystemBold(void);
-	ServerFont *GetSystemFixed(void);
+	ServerFont *GetSystemPlain();
+	ServerFont *GetSystemBold();
+	ServerFont *GetSystemFixed();
 
 	bool SetSystemPlain(const char *family, const char *style, float size);
 	bool SetSystemBold(const char *family, const char *style, float size);
 	bool SetSystemFixed(const char *family, const char *style, float size);
 
-	bool FontsNeedUpdated(void) { return fNeedUpdate; }
+	bool FontsNeedUpdated() { return fNeedUpdate; }
 	/*!
 		\brief Called when the fonts list has been updated
 	*/
-	void FontsUpdated(void) { fNeedUpdate = false; }
+	void FontsUpdated() { fNeedUpdate = false; }
 
 protected:
 	uint16 TranslateStyleToFace(const char *name) const;
