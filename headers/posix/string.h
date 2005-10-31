@@ -18,6 +18,7 @@ extern "C" {
 extern void		*memchr(const void *source, int value, size_t length);
 extern int		memcmp(const void *buffer1, const void *buffer2, size_t length);
 extern void		*memcpy(void *dest, const void *source, size_t length);
+extern void		*memccpy(void *dest, const void *source, int stopByte, size_t length);
 extern void		*memmove(void *dest, const void *source, size_t length);
 extern void		*memset(void *dest, int value, size_t length);
 
