@@ -41,7 +41,15 @@ sys_siglist[NSIG] = {
 	/* 19 - SIGUSR2    */  "User defined signal 2",
 	/* 20 - SIGWINCH   */  "Window size changed",
 	/* 21 - SIGKILLTHR */  "Kill Thread",
-	/* 22 - SIGTRAP    */  NULL
+	/* 22 - SIGTRAP    */  "Trace/breakpoint trap",
+	/* 23 - SIGPOLL    */  "Pollable event",
+	/* 24 - SIGPROF    */  "Profiling timer expired",
+	/* 25 - SIGSYS     */  "Bad system call", 
+	/* 26 - SIGURG     */  "High bandwidth data is available at socket",
+	/* 27 - SIGVTALRM  */  "Virtual timer expired",
+	/* 28 - SIGXCPU    */  "CPU time limit exceeded",
+	/* 29 - SIGXFSZ    */  "File size limit exceeded",
+	NULL
 };
 
 

@@ -87,39 +87,46 @@ typedef struct stack_t {
  * some consistency with UN*X conventions so that things 
  * like "kill -9" do what you expect.
  */
-#define	SIGHUP      1      /* hangup -- tty is gone! */
-#define SIGINT      2      /* interrupt */
-#define SIGQUIT     3      /* `quit' special character typed in tty  */
-#define SIGILL	    4      /* illegal instruction */
-#define SIGCHLD     5      /* child process exited */
-#define SIGABRT	    6      /* abort() called, dont' catch */
-#define SIGPIPE	    7      /* write to a pipe w/no readers */
-#define SIGFPE	    8      /* floating point exception */
-#define SIGKILL	    9      /* kill a team (not catchable) */
-#define SIGSTOP	   10      /* suspend a thread (not catchable) */
-#define SIGSEGV	   11      /* segmentation violation (read: invalid pointer) */
-#define SIGCONT    12      /* continue execution if suspended */
-#define SIGTSTP	   13      /* `stop' special character typed in tty */
-#define SIGALRM    14      /* an alarm has gone off (see alarm()) */
-#define SIGTERM	   15      /* termination requested */
-#define SIGTTIN	   16      /* read of tty from bg process */
-#define SIGTTOU	   17      /* write to tty from bg process */
-#define SIGUSR1	   18      /* app defined signal 1 */
-#define SIGUSR2	   19      /* app defined signal 2 */
-#define SIGWINCH   20      /* tty window size changed */
-#define SIGKILLTHR 21      /* be specific: kill just the thread, not team */
-#define SIGTRAP	   22
+#define	SIGHUP		1	/* hangup -- tty is gone! */
+#define SIGINT		2	/* interrupt */
+#define SIGQUIT		3	/* `quit' special character typed in tty  */
+#define SIGILL		4	/* illegal instruction */
+#define SIGCHLD		5	/* child process exited */
+#define SIGABRT		6	/* abort() called, dont' catch */
+#define SIGPIPE		7	/* write to a pipe w/no readers */
+#define SIGFPE		8	/* floating point exception */
+#define SIGKILL		9	/* kill a team (not catchable) */
+#define SIGSTOP		10	/* suspend a thread (not catchable) */
+#define SIGSEGV		11	/* segmentation violation (read: invalid pointer) */
+#define SIGCONT		12	/* continue execution if suspended */
+#define SIGTSTP		13	/* `stop' special character typed in tty */
+#define SIGALRM		14	/* an alarm has gone off (see alarm()) */
+#define SIGTERM		15	/* termination requested */
+#define SIGTTIN		16	/* read of tty from bg process */
+#define SIGTTOU		17	/* write to tty from bg process */
+#define SIGUSR1		18	/* app defined signal 1 */
+#define SIGUSR2		19	/* app defined signal 2 */
+#define SIGWINCH	20	/* tty window size changed */
+#define SIGKILLTHR	21	/* be specific: kill just the thread, not team */
+#define SIGTRAP		22	/* Trace/breakpoint trap */
+#define SIGPOLL		23	/* Pollable event */
+#define SIGPROF		24	/* Profiling timer expired */
+#define SIGSYS		25	/* Bad system call */
+#define SIGURG		26	/* High bandwidth data is available at socket */
+#define SIGVTALRM	27	/* Virtual timer expired */
+#define SIGXCPU		28	/* CPU time limit exceeded */
+#define SIGXFSZ		29	/* File size limit exceeded */
 
 #define SIGBUS     SIGSEGV /* for old style code */
 
 
 /*
- * Signal numbers 23-32 are currently free but may be used in future
+ * Signal numbers 30-32 are currently free but may be used in future
  * releases.  Use them at your own peril (if you do use them, at least
  * be smart and use them backwards from signal 32).
  */
 #define MAX_SIGNO     32       /* the most signals that a single thread can reference */
-#define __signal_max  22       /* the largest signal number that is actually defined */
+#define __signal_max  29       /* the largest signal number that is actually defined */
 #define NSIG (__signal_max+1)  /* the number of defined signals */
 
 

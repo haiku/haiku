@@ -39,7 +39,8 @@
 const char * const sigstr[NSIG] = {
 	"NONE", "HUP", "INT", "QUIT", "ILL", "CHLD", "ABRT", "PIPE",
 	"FPE", "KILL", "STOP", "SEGV", "CONT", "TSTP", "ALRM", "TERM",
-	"TTIN", "TTOU", "USR1", "USR2", "WINCH", "KILLTHR", "TRAP"
+	"TTIN", "TTOU", "USR1", "USR2", "WINCH", "KILLTHR", "TRAP",
+	"POLL", "PROF", "SYS", "URG", "VTALRM", "XCPU", "XFSZ"
 };
 
 
@@ -127,6 +128,7 @@ handle_signals(struct thread *thread)
 				case SIGTTIN:
 				case SIGTTOU:
 				case SIGCONT:
+				case SIGURG:
 					// notify the debugger
 					if (debugSignal)
 						notify_debugger(thread, signal, handler, false);
@@ -148,6 +150,12 @@ handle_signals(struct thread *thread)
 				case SIGABRT:
 				case SIGFPE:
 				case SIGSEGV:
+				case SIGPOLL:
+				case SIGPROF:
+				case SIGSYS:
+				case SIGVTALRM:
+				case SIGXCPU:
+				case SIGXFSZ:
 					TRACE(("Shutting down thread 0x%lx due to signal #%d\n",
 						thread->id, signal));
 				case SIGKILL:
