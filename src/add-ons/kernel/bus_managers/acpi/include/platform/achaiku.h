@@ -137,7 +137,7 @@
 
 #include <string.h>
 #include <ctype.h>
-#include <va_list.h>
+#include <stdarg.h>
 
 #define asm         __asm
 
