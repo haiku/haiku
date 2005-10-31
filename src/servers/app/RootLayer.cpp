@@ -539,18 +539,18 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 		// we need to lock the window list here so no other window can be created 
 		fDesktop->Lock();
 
-		const BList&	windowList = fDesktop->WindowList();
+		const BObjectList<WinBorder>& windowList = fDesktop->WindowList();
+		int32 windowCount = windowList.CountItems();
 
-		int32			ptrCount = windowList.CountItems();
-		WinBorder		**ptrWin = (WinBorder**)windowList.Items();
+		for (int32 i = 0; i < windowCount; i++) {
+			WinBorder* winBorder = windowList.ItemAt(i);
 
-		for (int32 i = 0; i < ptrCount; i++) {
-			if (ptrWin[i]->Workspaces() & (0x00000001UL << index)) {
-				fWorkspace[index]->AddWinBorder(ptrWin[i]);
+			// is WinBorder on this workspace?
+			if (winBorder->Workspaces() & (0x00000001UL << index)) {
+				fWorkspace[index]->AddWinBorder(winBorder);
 
-				if (!ptrWin[i]->IsHidden()) {
-					fWorkspace[index]->ShowWinBorder(ptrWin[i]);
-				}
+				if (!winBorder->IsHidden())
+					fWorkspace[index]->ShowWinBorder(winBorder);
 			}
 		}
 
@@ -1679,7 +1679,8 @@ RootLayer::ReadMessageFromPort(bigtime_t tout)
 
 	return bmsg;
 }
-//------------------------------------------------------------------------------
+
+
 BMessage*
 RootLayer::ConvertToMessage(void* raw, int32 code)
 {

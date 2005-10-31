@@ -22,6 +22,7 @@
 #include <Locker.h>
 #include <Menu.h>
 #include <Autolock.h>
+#include <ObjectList.h>
 
 
 class BMessage;
@@ -40,10 +41,12 @@ namespace BPrivate {
 class Desktop : public MessageLooper, public ScreenOwner {
  public:
 	// startup methods
-								Desktop();
+								Desktop(uid_t userID);
 	virtual						~Desktop();
 
 			void				Init();
+
+			uid_t				UserID() const { return fUserID; }
 	virtual port_id				MessagePort() const { return fMessagePort; }
 
 			void				BroadcastToAllApps(int32 code);
@@ -79,18 +82,14 @@ class Desktop : public MessageLooper, public ScreenOwner {
 			WinBorder*			FindWinBorderByClientToken(int32 token, team_id teamID);
 			//WinBorder*		FindWinBorderByServerToken(int32 token);
 
-	// get list of registed windows
-			const BList&		WindowList() const
-								{
-									if (!IsLocked())
-										debugger("You must lock before getting registered windows list\n");
-									return fWinBorderList;
-								}
+			// get list of registed windows
+			const BObjectList<WinBorder>& WindowList() const;
 
 			void				WriteWindowList(team_id team, BPrivate::LinkSender& sender);
 			void				WriteWindowInfo(int32 serverToken, BPrivate::LinkSender& sender);
 
  private:
+ 			status_t			_ActivateApp(team_id team);
 	virtual void				_GetLooperName(char* name, size_t size);
 	virtual void				_PrepareQuit();
 	virtual void				_DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
@@ -98,6 +97,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
  private:
 			friend class DesktopSettings;
 
+			uid_t				fUserID;
 			::VirtualScreen		fVirtualScreen;
 			DesktopSettings::Private* fSettings;
 			port_id				fMessagePort;
@@ -108,7 +108,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 			sem_id				fShutdownSemaphore;
 			int32				fShutdownCount;
 
-			BList				fWinBorderList;
+			BObjectList<WinBorder> fWinBorderList;
 
 			RootLayer*			fRootLayer;
 			Screen*				fActiveScreen;

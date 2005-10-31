@@ -56,8 +56,9 @@
 #endif
 
 
-Desktop::Desktop()
+Desktop::Desktop(uid_t userID)
 	: MessageLooper("desktop"),
+	fUserID(userID),
 	fSettings(new DesktopSettings::Private()),
 	fAppListLock("application list"),
 	fShutdownSemaphore(-1),
@@ -236,6 +237,38 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			break;
 		}
 
+		case AS_ACTIVATE_APP:
+		{
+			// Someone is requesting to activation of a certain app.
+
+			// Attached data:
+			// 1) port_id reply port
+			// 2) team_id team
+
+			status_t status;
+
+			// get the parameters
+			port_id replyPort;
+			team_id team;
+			if (link.Read(&replyPort) == B_OK
+				&& link.Read(&team) == B_OK)
+				status = _ActivateApp(team);
+			else
+				status = B_ERROR;
+
+			// send the reply
+			BPrivate::PortLink replyLink(replyPort);
+			replyLink.StartMessage(status);
+			replyLink.Flush();
+			break;
+		}
+
+		case AS_SET_SYSCURSOR_DEFAULTS:
+		{
+			GetCursorManager().SetDefaults();
+			break;
+		}
+
 		case B_QUIT_REQUESTED:
 			// We've been asked to quit, so (for now) broadcast to all
 			// test apps to quit. This situation will occur only when the server
@@ -273,6 +306,39 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 
 /*!
+	\brief activate one of the app's windows.
+*/
+status_t
+Desktop::_ActivateApp(team_id team)
+{
+	status_t status = B_BAD_TEAM_ID;
+
+	// search for an unhidden window to give focus to
+	int32 windowCount = WindowList().CountItems();
+	for (int32 i = 0; i < windowCount; ++i) {
+		// is this layer in fact a WinBorder?
+		WinBorder *winBorder = WindowList().ItemAt(i);
+
+		// if winBorder is valid and not hidden, then we've found our target
+		if (winBorder != NULL && !winBorder->IsHidden()
+			&& winBorder->App()->ClientTeam() == team) {
+			if (fRootLayer->Lock()) {
+				fRootLayer->SetActive(winBorder);
+				fRootLayer->Unlock();
+
+				if (fRootLayer->Active() == winBorder)
+					return B_OK;
+
+				status = B_ERROR;
+			}
+		}
+	}
+
+	return status;
+}
+
+
+/*!
 	\brief Send a quick (no attachments) message to all applications
 	
 	Quite useful for notification for things like server shutdown, system 
@@ -295,9 +361,7 @@ Desktop::BroadcastToAllApps(int32 code)
 }
 
 
-//---------------------------------------------------------------------------
-//				Methods for layer(WinBorder) manipulation.
-//---------------------------------------------------------------------------
+//	#pragma mark - Methods for WinBorder manipulation
 
 
 void
@@ -521,6 +585,16 @@ Desktop::FindWinBorderByClientToken(int32 token, team_id teamID)
 }
 
 
+const BObjectList<WinBorder> &
+Desktop::WindowList() const
+{
+	if (!IsLocked())
+		debugger("You must lock before getting registered windows list\n");
+
+	return fWinBorderList;
+}
+
+
 void
 Desktop::WriteWindowList(team_id team, BPrivate::LinkSender& sender)
 {
@@ -531,7 +605,7 @@ Desktop::WriteWindowList(team_id team, BPrivate::LinkSender& sender)
 	int32 count = 0;
 	if (team >= B_OK) {
 		for (int32 i = 0; i < fWinBorderList.CountItems(); i++) {
-			WinBorder* border = (WinBorder*)fWinBorderList.ItemAt(i);
+			WinBorder* border = fWinBorderList.ItemAt(i);
 
 			if (border->Window()->ClientTeam() == team)
 				count++;
@@ -545,7 +619,7 @@ Desktop::WriteWindowList(team_id team, BPrivate::LinkSender& sender)
 	sender.Attach<int32>(count);
 
 	for (int32 i = 0; i < fWinBorderList.CountItems(); i++) {
-		WinBorder* border = (WinBorder*)fWinBorderList.ItemAt(i);
+		WinBorder* border = fWinBorderList.ItemAt(i);
 
 		if (team >= B_OK && border->Window()->ClientTeam() != team)
 			continue;

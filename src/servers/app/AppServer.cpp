@@ -64,10 +64,7 @@
 
 
 // Globals
-static Desktop *sDesktop;
-
 port_id gAppServerPort;
-
 static AppServer *sAppServer;
 
 //! System-wide GUI color object
@@ -162,13 +159,8 @@ AppServer::AppServer()
 	// Create the bitmap allocator. Object declared in BitmapManager.cpp
 	gBitmapManager = new BitmapManager();
 
-	// Set up the Desktop
-	sDesktop = new Desktop();
-	sDesktop->Init();
-	sDesktop->Run();
-
 #if 0
-	LaunchCursorThread();
+	_LaunchCursorThread();
 #endif
 }
 
@@ -188,10 +180,21 @@ AppServer::~AppServer()
 
 
 /*!
+	\brief The call that starts it all...
+*/
+void
+AppServer::RunLooper()
+{
+	rename_thread(find_thread(NULL), "picasso");
+	_message_thread((void *)this);
+}
+
+
+/*!
 	\brief Starts Input Server
 */
 void
-AppServer::LaunchInputServer()
+AppServer::_LaunchInputServer()
 {
 	// We are supposed to start the input_server, but it's a BApplication
 	// that depends on the registrar running, which is started after app_server
@@ -250,10 +253,11 @@ AppServer::LaunchInputServer()
 	\brief Starts the Cursor Thread
 */
 void
-AppServer::LaunchCursorThread()
+AppServer::_LaunchCursorThread()
 {
 	// Spawn our cursor thread
-	fCursorThreadID = spawn_thread(CursorThread, "CursorThreadOfTheDeath", B_REAL_TIME_DISPLAY_PRIORITY - 1, this);
+	fCursorThreadID = spawn_thread(_CursorThread, "CursorThreadOfTheDeath",
+		B_REAL_TIME_DISPLAY_PRIORITY - 1, this);
 	if (fCursorThreadID >= 0)
 		resume_thread(fCursorThreadID);
 
@@ -263,11 +267,11 @@ AppServer::LaunchCursorThread()
 	\brief The Cursor Thread task
 */
 int32
-AppServer::CursorThread(void* data)
+AppServer::_CursorThread(void* data)
 {
 	AppServer *server = (AppServer *)data;
 
-	server->LaunchInputServer();
+	server->_LaunchInputServer();
 
 	do {
 		while (acquire_sem(server->fCursorSem) == B_OK) {
@@ -275,7 +279,7 @@ AppServer::CursorThread(void* data)
 			p.y = *server->fCursorAddr & 0x7fff;
 			p.x = *server->fCursorAddr >> 15 & 0x7fff;
 
-			sDesktop->GetHWInterface()->MoveCursorTo(p.x, p.y);
+			//sDesktop->GetHWInterface()->MoveCursorTo(p.x, p.y);
 			STRACE(("CursorThread : %f, %f\n", p.x, p.y));
 		}
 
@@ -287,13 +291,48 @@ AppServer::CursorThread(void* data)
 
 
 /*!
-	\brief The call that starts it all...
+	\brief Creates a desktop object for an authorized user
 */
-void
-AppServer::RunLooper()
+Desktop *
+AppServer::_CreateDesktop(uid_t userID)
 {
-	rename_thread(find_thread(NULL), "picasso");
-	_message_thread((void *)this);
+	BAutolock locker(fDesktopLock);
+	Desktop* desktop = NULL;
+	try {
+		desktop = new Desktop(userID);
+
+		desktop->Init();
+		desktop->Run();
+
+		if (!fDesktops.AddItem(desktop)) {
+			delete desktop;
+			return NULL;
+		}
+	} catch (...) {
+		// there is obviously no memory left
+		return NULL;
+	}
+
+	return desktop;
+}
+
+
+/*!
+	\brief Finds the desktop object that belongs to a certain user
+*/
+Desktop *
+AppServer::_FindDesktop(uid_t userID)
+{
+	BAutolock locker(fDesktopLock);
+	
+	for (int32 i = 0; i < fDesktops.CountItems(); i++) {
+		Desktop* desktop = fDesktops.ItemAt(i);
+
+		if (desktop->UserID() == userID)
+			return desktop;
+	}
+
+	return NULL;
 }
 
 
@@ -316,9 +355,17 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 			int32 userID;
 			msg.Read<int32>(&userID);
 
+			Desktop* desktop = _FindDesktop(userID);
+			if (desktop == NULL) {
+				// we need to create a new desktop object for this user
+				// ToDo: test if the user exists on the system
+				// ToDo: maybe have a separate AS_START_DESKTOP_SESSION for authorizing the user
+				desktop = _CreateDesktop(userID);
+			}
+
 			BPrivate::LinkSender reply(replyPort);
 			reply.StartMessage(B_OK);
-			reply.Attach<port_id>(sDesktop->MessagePort());
+			reply.Attach<port_id>(desktop->MessagePort());
 			reply.Flush();
 			break;
 		}
@@ -350,18 +397,22 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 #if TEST_MODE
 		case B_QUIT_REQUESTED:
 		{
-			thread_id thread = sDesktop->Thread();
-
 			// We've been asked to quit, so (for now) broadcast to all
-			// test apps to quit. This situation will occur only when the server
+			// desktops to quit. This situation will occur only when the server
 			// is compiled as a regular Be application.
 
-			sDesktop->PostMessage(B_QUIT_REQUESTED);
 			fQuitting = true;
 
-			// we just wait for the desktop to kill itself
-			status_t status;
-			wait_for_thread(thread, &status);
+			while (fDesktops.CountItems() > 0) {
+				Desktop *desktop = fDesktops.RemoveItemAt(0);
+
+				thread_id thread = sDesktop->Thread();
+				desktop->PostMessage(B_QUIT_REQUESTED);
+
+				// we just wait for the desktop to kill itself
+				status_t status;
+				wait_for_thread(thread, &status);
+			}
 
 			kill_thread(fCursorThreadID);
 			delete this;
@@ -371,67 +422,6 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 			break;
 		}
 #endif
-
-		case AS_SET_SYSCURSOR_DEFAULTS:
-		{
-			sDesktop->GetCursorManager().SetDefaults();
-			break;
-		}
-
-		case AS_ACTIVATE_APP:
-		{
-			// Someone is requesting to activation of a certain app.
-
-			// Attached data:
-			// 1) port_id reply port
-			// 2) team_id team
-
-			status_t error = B_OK;
-
-			// get the parameters
-			port_id replyPort;
-			team_id team;
-			if (msg.Read(&replyPort) < B_OK
-				|| msg.Read(&team) < B_OK) {
-				error = B_ERROR;
-			}
-
-			// activate one of the app's windows.
-			if (error == B_OK) {
-				error = B_BAD_TEAM_ID;
-				if (sDesktop->Lock()) {
-					// search for an unhidden window to give focus to
-					int32 windowCount = sDesktop->WindowList().CountItems();
-					Layer *layer;
-					for (int32 i = 0; i < windowCount; ++i)
-						// is this layer in fact a WinBorder?
-						if ((layer = static_cast<Layer*>(sDesktop->WindowList().ItemAtFast(i)))) {
-							WinBorder *winBorder = dynamic_cast<WinBorder*>(layer);
-							// if winBorder is valid and not hidden, then we've found our target
-							if (winBorder && !winBorder->IsHidden()
-									&& winBorder->App()->ClientTeam() == team) {
-								if (sDesktop->ActiveRootLayer()
-										&& sDesktop->ActiveRootLayer()->Lock()) {
-									sDesktop->ActiveRootLayer()->SetActive(winBorder);
-									sDesktop->ActiveRootLayer()->Unlock();
-
-									if (sDesktop->ActiveRootLayer()->Active() == winBorder)
-										error = B_OK;
-									else
-										error = B_ERROR;
-								}
-							}
-						}
-					sDesktop->Unlock();
-				}
-			}
-
-			// send the reply
-			BPrivate::PortLink replyLink(replyPort);
-			replyLink.StartMessage(error);
-			replyLink.Flush();
-			break;
-		}
 
 		default:
 			STRACE(("Server::MainLoop received unexpected code %ld (offset %ld)\n",

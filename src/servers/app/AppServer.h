@@ -14,12 +14,15 @@
 #include <Application.h>
 #include <Window.h>
 #include <String.h>
+#include <ObjectList.h>
+
 #include "ServerConfig.h"
 #include "MessageLooper.h"
 
 class ServerApp;
 class BitmapManager;
 class ColorSet;
+class Desktop;
 
 namespace BPrivate {
 	class PortLink;
@@ -44,11 +47,14 @@ class AppServer : public MessageLooper  {
 
 	private:
 		virtual void	_DispatchMessage(int32 code, BPrivate::LinkReceiver& link);
-		void			LaunchCursorThread();
-		void			LaunchInputServer();
 
-//		static	int32	PollerThread(void *data);
-		static	int32	CursorThread(void *data);
+		Desktop*		_CreateDesktop(uid_t userID);
+		Desktop*		_FindDesktop(uid_t userID);
+
+		void			_LaunchCursorThread();
+		void			_LaunchInputServer();
+
+		static int32	_CursorThread(void *data);
 
 	private:
 		port_id			fMessagePort;
@@ -59,6 +65,9 @@ class AppServer : public MessageLooper  {
 		sem_id			fCursorSem;
 		area_id			fCursorArea;
 		uint32			*fCursorAddr;
+
+		BObjectList<Desktop> fDesktops;
+		BLocker			fDesktopLock;
 
 		port_id			fISASPort;
 		port_id			fISPort;
