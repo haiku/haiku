@@ -123,9 +123,11 @@ rule Object
 	    case .cpp : C++ $(<) : $(>) ;
 	    case .f :	Fortran $(<) : $(>) ;
 	    case .l :	if [ on $(2) return $(GENERATE_C++) ] {
+	    				InheritPlatform $(<:S=.cpp) : $(1) ;
 						C++ $(<) : $(<:S=.cpp) ;
 						Lex $(<:S=.cpp) : $(>) ;
 					} else {
+	    				InheritPlatform $(<:S=.c) : $(1) ;
 						Cc $(<) : $(<:S=.c) ;
 						Lex $(<:S=.c) : $(>) ;
 					}
@@ -133,9 +135,11 @@ rule Object
 	    case .s :	As $(<) : $(>) ;
 	    case .S :	As $(<) : $(>) ;
 	    case .y :	if [ on $(2) return $(GENERATE_C++) ] {
+	    				InheritPlatform $(1:S=.cpp) $(1:S=.hpp) : $(1) ;
 						C++ $(1) : $(1:S=.cpp) ;
 						Yacc $(1:S=.cpp) $(1:S=.hpp) : $(2) ;
 					} else {
+	    				InheritPlatform $(1:S=.c) $(1:S=.h) : $(1) ;
 						Cc $(1) : $(1:S=.c) ;
 						Yacc $(1:S=.c) $(1:S=.h) : $(2) ;
 					}
