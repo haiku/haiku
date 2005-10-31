@@ -1,6 +1,16 @@
 SubDir HAIKU_TOP src add-ons kernel bus_managers acpi ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 SubDirHdrs [ FDirName $(SUBDIR) include ] ;
+SubDirHdrs [ FDirName $(SUBDIR) include platform ] ;
 SubDirCcFlags -fno-pic -D_KERNEL_MODE ;
+
+if $(TARGET_PLATFORM) != haiku {
+	# Needed for <ACPI.h>. Unfortunately we also get the other headers there,
+	# that we don't really want.
+	UsePublicHeaders drivers ;
+}
 
 local events_src =
 	evevent.c
