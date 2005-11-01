@@ -27,9 +27,6 @@
 // Standard Includes -----------------------------------------------------------
 #include <string.h>
 
-// TODO: remove
-#include <stdio.h>
-
 // System Includes -------------------------------------------------------------
 #include <Invoker.h>
 #include <Looper.h>
@@ -51,6 +48,12 @@
 
 #include <Autolock.h>
 
+//#define DEBUG_ALERT
+#ifdef DEBUG_ALERT
+#define FTRACE(x) fprintf(x)
+#else
+#define FTRACE(x) /* nothing */
+#endif
 
 // Default size of the Alert window.
 #define DEFAULT_RECT	BRect(0, 0, 310, 75)
@@ -311,9 +314,6 @@ BAlert::Go()
 status_t
 BAlert::Go(BInvoker* invoker)
 {
-	// TODO: Add sound?
-	// It would be cool if we triggered a system sound depending on the type of
-	// alert.
 	fInvoker = invoker;
 	Show();
 	return B_OK;
@@ -661,16 +661,16 @@ BAlert::InitIcon()
 					icon = new BBitmap(BRect(0, 0, 31, 31), 0, B_CMAP8);
 					icon->SetBits(rawIcon, size, 0, B_CMAP8);
 				} else {
-					fprintf(stderr, "BAlert::InitIcon() - Icon resource not found\n");
+					FTRACE((stderr, "BAlert::InitIcon() - Icon resource not found\n"));
 				}
 			} else {
-				fprintf(stderr, "BAlert::InitIcon() - BResources init failed: %s\n", strerror(status));
+				FTRACE((stderr, "BAlert::InitIcon() - BResources init failed: %s\n", strerror(status)));
 			}
 		} else {
-			fprintf(stderr, "BAlert::InitIcon() - BFile init failed: %s\n", strerror(status));
+			FTRACE((stderr, "BAlert::InitIcon() - BFile init failed: %s\n", strerror(status)));
 		}
 	} else {
-		fprintf(stderr, "BAlert::InitIcon() - find_directory failed: %s\n", strerror(status));
+		FTRACE((stderr, "BAlert::InitIcon() - find_directory failed: %s\n", strerror(status)));
 	}
 
 	if (!icon) {
