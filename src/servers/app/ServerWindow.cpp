@@ -2435,8 +2435,12 @@ ServerWindow::_HandleDirectConnection(int bufferState, int driverState)
 		// TODO: Review this
 		const int32 kMaxClipRectsCount = (B_PAGE_SIZE - sizeof(direct_buffer_info)) / sizeof(clipping_rect);
 	
-		// TODO: Is this the correct region to take into account ?
-		BRegion clipRegion = const_cast<BRegion &>(border->VisibleRegion());
+		// TODO: Is there a simpler way to obtain this result ?
+		// We just want the region INSIDE the window, border excluded.
+		BRegion clipRegion = const_cast<BRegion &>(border->FullVisible());
+		BRegion exclude = const_cast<BRegion &>(border->VisibleRegion());
+		clipRegion.Exclude(&exclude);
+		
 		border->ConvertToTop(&clipRegion);
 		fDirectWindowData->direct_info->clip_list_count = min_c(clipRegion.CountRects(), kMaxClipRectsCount);
 		fDirectWindowData->direct_info->clip_bounds = clipRegion.FrameInt();
