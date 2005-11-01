@@ -101,7 +101,6 @@ AppServer::AppServer()
 	gFontServer = new FontServer;
 	gFontServer->Lock();
 	gFontServer->ScanSystemFolders();
-	gFontServer->SaveList();
 
 	if (!gFontServer->SetSystemPlain(DEFAULT_PLAIN_FONT_FAMILY,
 									DEFAULT_PLAIN_FONT_STYLE,

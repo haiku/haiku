@@ -1,50 +1,43 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		FontFamily.cpp
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	classes to represent font styles and families
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+
+/**	Classes to represent font styles and families */
+
+
 #include "FontFamily.h"
 #include "ServerFont.h"
 #include FT_CACHE_H
 
+
+const int32 kInvalidFamilyFlags = -1;
+
 FTC_Manager ftmanager;
+
 
 /*!
 	\brief Constructor
 	\param filepath path to a font file
 	\param face FreeType handle for the font file after it is loaded - it will be kept open until the FontStyle is destroied
 */
-FontStyle::FontStyle(const char *filepath, FT_Face face)
+FontStyle::FontStyle(const char *path, FT_Face face)
 	:
 	fFTFace(face),
 	fFontFamily(NULL),
 	fName(face->style_name),
-	fPath(filepath),
+	fPath(path),
 	fBounds(0, 0, 0, 0),
 	fID(0),
 	fFace(_TranslateStyleToFace(face->style_name))
 {
+	fName.Truncate(B_FONT_STYLE_LENGTH);
+		// make sure this style can be found using the Be API
+
 //	cachedface = new CachedFaceRec;
 //	cachedface->file_path = filepath;
 
@@ -71,8 +64,7 @@ FontStyle::~FontStyle()
 {
 // TODO: what was the purpose of this?
 //	delete cachedface;
-// TODO: figure out if it is safe to call this:
-//	FT_Done_Face(fFTFace);
+	FT_Done_Face(fFTFace);
 }
 
 
@@ -200,13 +192,15 @@ FontStyle::_TranslateStyleToFace(const char *name) const
 	\brief Constructor
 	\param namestr Name of the family
 */
-FontFamily::FontFamily(const char *name, const uint16 &index)
+FontFamily::FontFamily(const char *name, uint16 id)
+	:
+	fName(name),
+	fID(id),
+	fNextID(0),
+	fFlags(kInvalidFamilyFlags)
 {
-	fName = name;
-	fID = index;
-
-	// will stay uninitialized until needed
-	fFlags = -1;
+	fName.Truncate(B_FONT_FAMILY_LENGTH);
+		// make sure this family can be found using the Be API
 }
 
 /*!
@@ -220,7 +214,7 @@ FontFamily::~FontFamily()
 {
 	int32 count = fStyles.CountItems();
 	for (int32 i = 0; i < count; i++)
-		delete (FontStyle*)fStyles.ItemAt(i);
+		delete fStyles.ItemAt(i);
 }
 
 
@@ -245,30 +239,22 @@ FontFamily::AddStyle(FontStyle *style)
 	if (!style)
 		return false;
 
-	FontStyle *item;
-
 	// Don't add if it already is in the family.	
 	int32 count = fStyles.CountItems();
 	for (int32 i = 0; i < count; i++) {
-		item = (FontStyle*)fStyles.ItemAt(i);
-		if (item->Name() == style->Name())
+		FontStyle *item = fStyles.ItemAt(i);
+		if (!strcmp(item->Name(), style->Name()))
 			return false;
 	}
 
 	style->_SetFontFamily(this);
-
-	if (fStyles.CountItems() > 0) {
-		item = (FontStyle*)fStyles.ItemAt(fStyles.CountItems() - 1);
-		style->_SetID(item->ID() + 1);
-	} else {
-		style->_SetID(0);
-	}
+	style->_SetID(fNextID++);
 
 	fStyles.AddItem(style);
 	AddDependent();
 
 	// force a refresh if a request for font flags is needed
-	fFlags = -1;
+	fFlags = kInvalidFamilyFlags;
 
 	return true;
 }
@@ -291,7 +277,7 @@ FontFamily::RemoveStyle(const char* styleName)
 	RemoveDependent();
 
 	// force a refresh if a request for font flags is needed
-	fFlags = -1;
+	fFlags = kInvalidFamilyFlags;
 }
 
 
@@ -306,7 +292,7 @@ FontFamily::RemoveStyle(FontStyle* style)
 		RemoveDependent();
 
 		// force a refresh if a request for font flags is needed
-		fFlags = -1;
+		fFlags = kInvalidFamilyFlags;
 	}
 }
 
@@ -403,17 +389,16 @@ FontFamily::GetStyleMatchingFace(uint16 face) const
 int32
 FontFamily::Flags()
 {
-	if (fFlags == -1) {
+	if (fFlags == kInvalidFamilyFlags) {
 		fFlags = 0;
 
 		for (int32 i = 0; i < fStyles.CountItems(); i++) {
-			FontStyle* style = (FontStyle*)fStyles.ItemAt(i);
-			if (style) {
-				if (style->IsFixedWidth())
-					fFlags |= B_IS_FIXED;
-				if (style->TunedCount() > 0)
-					fFlags |= B_HAS_TUNED_FONT;
-			}
+			FontStyle* style = fStyles.ItemAt(i);
+
+			if (style->IsFixedWidth())
+				fFlags |= B_IS_FIXED;
+			if (style->TunedCount() > 0)
+				fFlags |= B_HAS_TUNED_FONT;
 		}
 	}
 	

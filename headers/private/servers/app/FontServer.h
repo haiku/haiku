@@ -20,6 +20,8 @@
 #include FT_FREETYPE_H
 #include FT_CACHE_H
 
+class BPath;
+
 class FontFamily;
 class FontStyle;
 class ServerFont;
@@ -41,7 +43,6 @@ class FontServer : public BLocker {
 		void RemoveFamily(const char *family);
 		void ScanSystemFolders();
 		status_t ScanDirectory(const char *path);
-		void SaveList();
 
 		FontFamily* GetFamilyByIndex(int32 index) const;
 		FontFamily *GetFamily(uint16 familyID) const;
@@ -67,8 +68,8 @@ class FontServer : public BLocker {
 		*/
 		void FontsUpdated() { fNeedUpdate = false; }
 
-	protected:
-		uint16 TranslateStyleToFace(const char *name) const;
+	private:
+		void _AddFont(BPath &path);
 
 		FT_CharMap _GetSupportedCharmap(const FT_Face &face);
 
@@ -77,6 +78,7 @@ class FontServer : public BLocker {
 		BObjectList<FontFamily> fFamilies;
 		ServerFont	*fPlain, *fBold, *fFixed;
 		bool		fNeedUpdate;
+		int32		fNextID;
 };
 
 extern FTC_Manager ftmanager; 

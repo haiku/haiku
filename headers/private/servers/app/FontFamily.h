@@ -84,85 +84,81 @@ typedef struct {
 */
 class FontStyle : public SharedObject, public BLocker {
 	public:
-								FontStyle(const char* filepath,
-									FT_Face face);
-		virtual					~FontStyle();
+						FontStyle(const char* path, FT_Face face);
+		virtual			~FontStyle();
 
 /*!
 	\fn bool FontStyle::IsFixedWidth(void)
 	\brief Determines whether the font's character width is fixed
 	\return true if fixed, false if not
 */
-		inline	bool			IsFixedWidth() const
-									{ return fFTFace->face_flags & FT_FACE_FLAG_FIXED_WIDTH; }
+		bool			IsFixedWidth() const
+							{ return fFTFace->face_flags & FT_FACE_FLAG_FIXED_WIDTH; }
 /*!
 	\fn bool FontStyle::IsScalable(void)
 	\brief Determines whether the font can be scaled to any size
 	\return true if scalable, false if not
 */
-		inline	bool			IsScalable() const
-									{ return fFTFace->face_flags & FT_FACE_FLAG_SCALABLE; }
+		bool			IsScalable() const
+							{ return fFTFace->face_flags & FT_FACE_FLAG_SCALABLE; }
 /*!
 	\fn bool FontStyle::HasKerning(void)
 	\brief Determines whether the font has kerning information
 	\return true if kerning info is available, false if not
 */
-		inline	bool			HasKerning() const
-									{ return fFTFace->face_flags & FT_FACE_FLAG_KERNING; }
+		bool			HasKerning() const
+							{ return fFTFace->face_flags & FT_FACE_FLAG_KERNING; }
 /*!
 	\fn bool FontStyle::HasTuned(void)
 	\brief Determines whether the font contains strikes
 	\return true if it has strikes included, false if not
 */
-		inline	bool			HasTuned() const
-									{ return fFTFace->num_fixed_sizes > 0; }
+		bool			HasTuned() const
+							{ return fFTFace->num_fixed_sizes > 0; }
 /*!
 	\fn bool FontStyle::TunedCount(void)
 	\brief Returns the number of strikes the style contains
 	\return The number of strikes the style contains
 */
-		inline	int32			TunedCount() const
-									{ return fFTFace->num_fixed_sizes; }
+		int32			TunedCount() const
+							{ return fFTFace->num_fixed_sizes; }
 /*!
 	\fn bool FontStyle::GlyphCount(void)
 	\brief Returns the number of glyphs in the style
 	\return The number of glyphs the style contains
 */
-		inline	uint16			GlyphCount() const
-									{ return fFTFace->num_glyphs; }
+		uint16			GlyphCount() const
+							{ return fFTFace->num_glyphs; }
 /*!
 	\fn bool FontStyle::CharMapCount(void)
 	\brief Returns the number of character maps the style contains
 	\return The number of character maps the style contains
 */
-		inline	uint16			CharMapCount() const
-									{ return fFTFace->num_charmaps; }
+		uint16			CharMapCount() const
+							{ return fFTFace->num_charmaps; }
 
-				const char*		Name() const;
-		inline	FontFamily*		Family() const
-									{ return fFontFamily; }
-		inline	uint16			ID() const
-									{ return fID; }
-				int32			Flags() const;
+		const char*		Name() const;
+		FontFamily*		Family() const
+							{ return fFontFamily; }
+		uint16			ID() const
+							{ return fID; }
+		int32			Flags() const;
 
-		inline	uint16			Face() const
-									{ return fFace; }
-				uint16			PreservedFace(uint16) const;
+		uint16			Face() const
+							{ return fFace; }
+		uint16			PreservedFace(uint16) const;
 
-				const char*		Path() const;
-				font_height		GetHeight(const float& size) const;
-				font_direction	Direction() const
-									{ return B_FONT_LEFT_TO_RIGHT; }
+		const char*		Path() const;
+		font_height		GetHeight(const float& size) const;
+		font_direction	Direction() const
+							{ return B_FONT_LEFT_TO_RIGHT; }
 
-		inline	FT_Face			GetFTFace() const
-									{ return fFTFace; }
-	
-	// TODO: Re-enable when I understand how the FT2 Cache system changed from
-	// 2.1.4 to 2.1.8
-//				int16			ConvertToUnicode(uint16 c);
+		FT_Face			GetFTFace() const
+							{ return fFTFace; }
 
-				void			AttachedToFamily(FontFamily* family);
-				void			DetachedFromFamily();
+// TODO: Re-enable when I understand how the FT2 Cache system changed from
+// 2.1.4 to 2.1.8
+//		int16			ConvertToUnicode(uint16 c);
 
 	private:
 		friend class FontFamily;
@@ -198,8 +194,7 @@ class FontStyle : public SharedObject, public BLocker {
 */
 class FontFamily : public SharedObject {
 	public:
-		FontFamily(const char* namestr,
-			const uint16& index);
+		FontFamily(const char* name, uint16 id);
 		virtual ~FontFamily();
 
 		const char*	Name() const;
@@ -220,10 +215,11 @@ class FontFamily : public SharedObject {
 		int32		CountStyles() const;
 		FontStyle*	StyleAt(int32 index) const;
 
-	protected:
+	private:
 		BString		fName;
 		BObjectList<FontStyle> fStyles;
 		uint16		fID;
+		uint16		fNextID;
 		int32		fFlags;
 };
 

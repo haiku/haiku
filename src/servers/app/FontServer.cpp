@@ -21,6 +21,8 @@
 #include <ServerFont.h>
 #include "ServerConfig.h"
 
+#include <new>
+
 
 extern FTC_Manager ftmanager; 
 FT_Library ftlib;
@@ -52,7 +54,8 @@ FontServer::FontServer()
 	fFamilies(20),
 	fPlain(NULL),
 	fBold(NULL),
-	fFixed(NULL)
+	fFixed(NULL),
+	fNextID(0)
 {
 	fInitStatus = FT_Init_FreeType(&ftlib) == 0 ? B_OK : B_ERROR;
 
@@ -132,19 +135,50 @@ FontServer::ScanSystemFolders(void)
 #endif
 }
 
+
+/*!
+	\brief Adds the FontFamily/FontStyle that is represented by this path.
+*/
+void
+FontServer::_AddFont(BPath &path)
+{
+	FT_Face face;
+	FT_Error error = FT_New_Face(ftlib, path.Path(), 0, &face);
+	if (error != 0)
+		return;
+
+    FontFamily *family = GetFamily(face->family_name);
+	if (family != NULL && family->HasStyle(face->style_name)) {
+		// prevent adding the same style twice
+		// (this indicates a problem with the installed fonts maybe?)
+		FT_Done_Face(face);
+		return;
+	}
+
+	if (family == NULL) {
+		family = new (nothrow) FontFamily(face->family_name, fNextID++);
+		if (family == NULL
+			|| !fFamilies.AddItem(family)) {
+			delete family;
+			FT_Done_Face(face);
+			return;
+		}
+	}
+
+#ifdef PRINT_FONT_LIST
+	printf("\tFont Style: %s, %s\n", face->family_name, face->style_name);
+#endif
+
+	// the FontStyle takes over ownership of the FT_Face object
+    FontStyle *style = new FontStyle(path.Path(), face);
+	if (!family->AddStyle(style))
+		delete style;
+}
+
+
 /*!
 	\brief Scan a folder for all valid fonts
-	\param fontspath Path of the folder to scan.
-	\return 
-	- \c B_OK				Success
-	- \c B_NAME_TOO_LONG	The path specified is too long
-	- \c B_ENTRY_NOT_FOUND	The path does not exist
-	- \c B_LINK_LIMIT		A cyclic loop was detected in the file system
-	- \c B_BAD_VALUE		Invalid input specified
-	- \c B_NO_MEMORY		Insufficient memory to open the folder for reading
-	- \c B_BUSY				A busy node could not be accessed
-	- \c B_FILE_ERROR		An invalid file prevented the operation.
-	- \c B_NO_MORE_FDS		All file descriptors are in use (too many open files). 
+	\param directoryPath Path of the folder to scan.
 */
 status_t
 FontServer::ScanDirectory(const char *directoryPath)
@@ -165,10 +199,6 @@ FontServer::ScanDirectory(const char *directoryPath)
 		if (status < B_OK)
 			continue;
 
-		FT_Face face;
-		FT_Error error = FT_New_Face(ftlib, path.Path(), 0, &face);
-		if (error != 0)
-			continue;
 
 // TODO: Commenting this out makes my "Unicode glyph lookup"
 // work with our default fonts. The real fix is to select the
@@ -186,34 +216,8 @@ FontServer::ScanDirectory(const char *directoryPath)
 		face->charmap = charmap;
 #endif
 
-	    FontFamily *family = GetFamily(face->family_name);
-		if (family == NULL) {
-			#ifdef PRINT_FONT_LIST
-			printf("Font Family: %s\n", face->family_name);
-			#endif
-
-			family = new FontFamily(face->family_name, fFamilies.CountItems());
-			fFamilies.AddItem(family);
-		} else {
-			// prevent adding the same style twice
-			// (this indicates a problem with the installed fonts maybe?)
-			if (family->HasStyle(face->style_name)) {
-				FT_Done_Face(face);
-				continue;
-			}
-		}
-
-		#ifdef PRINT_FONT_LIST
-		printf("\tFont Style: %s\n", face->style_name);
-		#endif
-
-	    FontStyle *style = new FontStyle(path.Path(), face);
-		if (!family->AddStyle(style))
-			delete style;
-
-		// FT_Face is kept open in FontStyle and will be unset in the
-		// FontStyle destructor
-		// TODO: nope, it is not (yet)
+		_AddFont(path);
+			// takes over ownership of the FT_Face object
 	}
 
 	fNeedUpdate = true;
@@ -258,82 +262,6 @@ FontServer::_GetSupportedCharmap(const FT_Face& face)
 	}
 
 	return NULL;
-}
-
-
-/*!
-	\brief This saves all family names and styles to the file specified in
-	ServerConfig.h as SERVER_FONT_LIST as a flattened BMessage.
-
-	This operation is not done very often because the access to disk adds a significant 
-	performance hit.
-
-	The format for storage consists of two things: an array of strings with the name 'family'
-	and a number of small string arrays which have the name of the font family. These are
-	the style lists. 
-
-	Additionally, any fonts which have bitmap strikes contained in them or any fonts which
-	are fixed-width are named in the arrays 'tuned' and 'fixed'.
-*/
-void
-FontServer::SaveList(void)
-{
-/*	int32 famcount=0, stycount=0,i=0,j=0;
-	FontFamily *fam;
-	FontStyle *sty;
-	BMessage fontmsg, familymsg('FONT');
-	BString famname, styname, extraname;
-	bool fixed,tuned;
-	
-	famcount=families->CountItems();
-	for(i=0; i<famcount; i++)
-	{
-		fam=(FontFamily*)families->ItemAt(i);
-		fixed=false;
-		tuned=false;
-		if(!fam)
-			continue;
-
-		famname=fam->Name();
-				
-		// Add the family to the message
-		familymsg.AddString("name",famname);
-		
-		stycount=fam->CountStyles();
-		for(j=0;j<stycount;j++)
-		{
-			styname.SetTo(fam->GetStyle(j));
-			if(styname.CountChars()>0)
-			{
-				// Add to list
-				familymsg.AddString("styles", styname);
-				
-				// Check to see if it has prerendered strikes (has "tuned" fonts)
-				sty=fam->GetStyle(styname.String());
-				if(!sty)
-					continue;
-				
-				if(sty->HasTuned() && sty->IsScalable())
-					tuned=true;
-
-				// Check to see if it is fixed-width
-				if(sty->IsFixedWidth())
-					fixed=true;
-			}
-		}
-		if(tuned)
-			familymsg.AddBool("tuned",true);
-		if(fixed)
-			familymsg.AddBool("fixed",true);
-		
-		fontmsg.AddMessage("family",&familymsg);
-		familymsg.MakeEmpty();
-	}
-	
-	BFile file(SERVER_FONT_LIST,B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
-	if(file.InitCheck()==B_OK)
-		fontmsg.Flatten(&file);
-*/
 }
 
 
