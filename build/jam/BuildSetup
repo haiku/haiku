@@ -85,6 +85,7 @@ switch $(HAIKU_CPU) {
 }
 HAIKU_ARCH ?= $(HAIKU_CPU) ;
 HAIKU_ARCH_MACRO_DEFINE = ARCH_$(HAIKU_ARCH) ;
+HAIKU_DEFINES += HAIKU_TARGET_PLATFORM_HAIKU ;
 HAIKU_DEFINES += $(HAIKU_ARCH_MACRO_DEFINE) ;
 
 # directories
@@ -345,12 +346,22 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE)
 	CP = copyattr --data ;
 }
 
+# define macro, for identifying the platform
+switch $(HOST_PLATFORM) {
+	case r5		: HOST_DEFINES	+= HAIKU_TARGET_PLATFORM_BEOS ;
+	case bone	: HOST_DEFINES	+= HAIKU_TARGET_PLATFORM_BONE ;
+	case dano	: HOST_DEFINES	+= HAIKU_TARGET_PLATFORM_DANO ;
+	case haiku	: HOST_DEFINES	+= HAIKU_TARGET_PLATFORM_HAIKU ;
+	case linux	: HOST_DEFINES	+= HAIKU_TARGET_PLATFORM_LINUX ;
+}
+
 HOST_DEFINES += $(HOST_ARCH_MACRO_DEFINE) ;
 HOST_DEFINES += _NO_INLINE_ASM ;
 
 if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	# TODO: That's obviously not correct, but in the way the COMPILE_FOR_R5
 	# macro is used, it actually seems to mean r5/bone/dano.
+	# TODO: Deprecated. Remove!
 	HOST_DEFINES += COMPILE_FOR_R5 ;
 }
 
