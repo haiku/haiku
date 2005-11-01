@@ -26,6 +26,8 @@
 #include <Font.h>
 
 
+const float kUninitializedAscent = INFINITY;
+
 // The actual objects which the globals point to
 static BFont sPlainFont;
 static BFont sBoldFont;
@@ -62,15 +64,13 @@ _font_control_(BFont *font, int32 cmd, void *data)
 		|| (cmd != AS_SET_SYSFONT_PLAIN && cmd != AS_SET_SYSFONT_BOLD
 			&& cmd != AS_SET_SYSFONT_FIXED)) {
 		// this shouldn't ever happen, but just in case....
-		printf("DEBUG: Bad parameters in _font_control_()\n");
 		return;
 	}
 
-	int32 code;
 	BPrivate::AppServerLink link;
-
 	link.StartMessage(cmd);
 
+	int32 code;
 	if (link.FlushWithReply(code) != B_OK
 		|| code != SERVER_TRUE) {
 		printf("DEBUG: Couldn't initialize font in _font_control()\n");
@@ -80,11 +80,14 @@ _font_control_(BFont *font, int32 cmd, void *data)
 	// there really isn't that much data that we need to set for such cases -- most
 	// of them need to be set to the defaults. The stuff that can change are family,
 	// style/face, size, and height.
+	// NOTE: this code assumes it's only called 
 	link.Read<uint16>(&font->fFamilyID);
 	link.Read<uint16>(&font->fStyleID);
 	link.Read<float>(&font->fSize);
 	link.Read<uint16>(&font->fFace);
 	link.Read<uint32>(&font->fFlags);
+
+	font->fHeight.ascent = kUninitializedAscent;
 }
 
 
@@ -288,14 +291,17 @@ get_font_style(font_family family, int32 index, font_style *name,
 */
 
 bool
-update_font_families(bool check_only)
+update_font_families(bool checkOnly)
 {
 	int32 code;
 	bool value;
 	BPrivate::AppServerLink link;
 
+	// TODO: get some kind of change counter or timestamp and use node-monitoring
+	//	for fonts in the app_server
+
 	link.StartMessage(AS_QUERY_FONTS_CHANGED);
-	link.Attach<bool>(check_only);
+	link.Attach<bool>(checkOnly);
 
 	if (link.FlushWithReply(code) != B_OK
 		|| code != SERVER_TRUE)
@@ -399,6 +405,8 @@ BFont::SetFamilyAndStyle(const font_family family, const font_style style)
 	link.Read<uint16>(&fFamilyID);
 	link.Read<uint16>(&fStyleID);
 	link.Read<uint16>(&fFace);
+	fHeight.ascent = kUninitializedAscent;
+
 	return B_OK;
 }
 
@@ -416,7 +424,7 @@ BFont::SetFamilyAndStyle(uint32 fontcode)
 	// addition to stuff like underlining and strikethrough. As a result, this will
 	// need a trip to the server and, thus, be slower than R5's in order to be correct
 	
-	uint16 family,style,face;
+	uint16 family, style, face;
 	int32 code;
 	BPrivate::AppServerLink link;
 
@@ -435,7 +443,8 @@ BFont::SetFamilyAndStyle(uint32 fontcode)
 
 	fStyleID = style;
 	fFamilyID = family;
-	
+	fHeight.ascent = kUninitializedAscent;
+
 	// Mask off any references in the face to Bold/Normal/Italic and set the face
 	// value to reflect the new font style
 	fFace &= B_UNDERSCORE_FACE | B_NEGATIVE_FACE | B_OUTLINED_FACE | B_STRIKEOUT_FACE;
@@ -478,6 +487,7 @@ BFont::SetFamilyAndFace(const font_family family, uint16 face)
 	} else
 		fFace = face;
 
+	fHeight.ascent = kUninitializedAscent;
 	return B_OK;
 }
 
@@ -486,6 +496,7 @@ void
 BFont::SetSize(float size)
 {
 	fSize = size;
+	fHeight.ascent = kUninitializedAscent;
 }
 
 
@@ -493,6 +504,7 @@ void
 BFont::SetShear(float shear)
 {
 	fShear = shear;
+	fHeight.ascent = kUninitializedAscent;
 }
 
 
@@ -500,6 +512,7 @@ void
 BFont::SetRotation(float rotation)
 {
 	fRotation = rotation;
+	fHeight.ascent = kUninitializedAscent;
 }
 
 
@@ -520,7 +533,12 @@ BFont::SetEncoding(uint8 encoding)
 void
 BFont::SetFace(uint16 face)
 {
+	// TODO: Should the server ignore faces it doesn't have, or should
+	//	it try to emulate faces it doesn't have, or should it correct
+	//	the face value to something it has?
+	// TODO: don't we have to update the fStyleID?
 	fFace = face;
+	fHeight.ascent = kUninitializedAscent;
 }
 
 
@@ -989,16 +1007,13 @@ BFont::GetEdges(const char charArray[], int32 numChars, edge_info edgeArray[]) c
 
 
 void
-BFont::GetHeight(font_height *height) const
+BFont::GetHeight(font_height *_height) const
 {
-	if (height) {
-		// R5's version actually contacts the server in this call. The more and more
-		// I work with this class, the more and more I can't wait for R2 to fix it. Yeesh.
-		// TODO: As we have a fHeight member, maybe we could cache the height there ?
-		// If the size/family/style change, we can ABUSE the fFlags member and set a bit
-		// there, so that if that bit is high, this method would have to contact the 
-		// server, otherwise it'll use the cached value. Or something like that.
-		int32 code;
+	if (_height == NULL)
+		return;
+
+	if (fHeight.ascent == kUninitializedAscent) {
+		// we don't have the font height cached yet
 		BPrivate::AppServerLink link;
 
 		link.StartMessage(AS_GET_FONT_HEIGHT);
@@ -1006,12 +1021,16 @@ BFont::GetHeight(font_height *height) const
 		link.Attach<uint16>(fStyleID);
 		link.Attach<float>(fSize);
 
+		int32 code;
 		if (link.FlushWithReply(code) != B_OK
 			|| code != SERVER_TRUE)
 			return;
 
-		link.Read<font_height>(height);
+		// who put that "const" to this method? :-)
+		link.Read<font_height>(const_cast<font_height *>(&fHeight));
 	}
+
+	*_height = fHeight;
 }
 
 
