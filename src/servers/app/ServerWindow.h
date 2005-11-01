@@ -128,7 +128,7 @@ private:
 												BPoint where);
 
 private:
-			char *				fTitle;
+			const char*			fTitle;
 
 			Desktop*			fDesktop;
 			ServerApp*			fServerApp;

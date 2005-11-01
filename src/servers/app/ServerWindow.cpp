@@ -131,7 +131,7 @@ struct dw_sync_data {
 ServerWindow::ServerWindow(const char *title, ServerApp *app,
 						   port_id clientPort, port_id looperPort, int32 handlerID)
 	: MessageLooper(title && *title ? title : "Unnamed Window"),
-	fTitle(strdup(title && *title ? title : "Unnamed Window")),
+	fTitle(title),
 	fDesktop(app->GetDesktop()),
 	fServerApp(app),
 	fWinBorder(NULL),
@@ -160,7 +160,7 @@ ServerWindow::~ServerWindow()
 
 	delete fWinBorder;
 
-	free(fTitle);
+	free(const_cast<char *>(fTitle));
 	delete_port(fMessagePort);
 
 	BPrivate::gDefaultTokens.RemoveToken(fServerToken);
@@ -173,6 +173,11 @@ ServerWindow::~ServerWindow()
 status_t
 ServerWindow::Init(BRect frame, uint32 look, uint32 feel, uint32 flags, uint32 workspace)
 {
+	if (fTitle == NULL)
+		fTitle = strdup("Unnamed Window");
+	if (fTitle == NULL)
+		return B_NO_MEMORY;
+
 	// fMessagePort is the port to which the app sends messages for the server
 	fMessagePort = create_port(100, fTitle);
 	if (fMessagePort < B_OK)
@@ -299,12 +304,19 @@ ServerWindow::Hide()
 void
 ServerWindow::SetTitle(const char* newTitle)
 {
-	char *title = strdup(newTitle && *newTitle ? newTitle : "Unnamed Window");
-	if (!title)
+	const char* oldTitle = fTitle;
+
+	if (newTitle == NULL || !newTitle[0])
+		fTitle = strdup("Unnamed Window");
+	else
+		fTitle = strdup(newTitle);
+
+	if (fTitle == NULL) {
+		fTitle = oldTitle;
 		return;
-	
-	free(fTitle);
-	fTitle = title;
+	}
+
+	free(const_cast<char*>(oldTitle));
 
 	if (Thread() >= B_OK) {
 		char name[B_OS_NAME_LENGTH];
