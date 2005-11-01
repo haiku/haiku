@@ -262,7 +262,7 @@ friend	void 				_font_control_(BFont*, int32, void*);
 		uint8				fEncoding;
 		uint16				fFace;
 		uint32				fFlags;
-		font_height			fHeight;
+		mutable font_height	fHeight;
 		uint32				_reserved[3];
 
 		void           		SetPacket(void *packet) const;
@@ -355,4 +355,4 @@ bool unicode_block::operator!=(const unicode_block &block) const {
 	return ((fData[0] != block.fData[0]) || (fData[1] != block.fData[1]));
 }
 
-#endif
+#endif	/* _FONT_H_ */

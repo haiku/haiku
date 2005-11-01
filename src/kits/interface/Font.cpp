@@ -1026,8 +1026,9 @@ BFont::GetHeight(font_height *_height) const
 			|| code != SERVER_TRUE)
 			return;
 
-		// who put that "const" to this method? :-)
-		link.Read<font_height>(const_cast<font_height *>(&fHeight));
+		// Who put that "const" to this method? :-)
+		// We made fHeight mutable for this, but we should drop the "const" when we can
+		link.Read<font_height>(&fHeight);
 	}
 
 	*_height = fHeight;
