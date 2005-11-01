@@ -147,10 +147,13 @@ class FontStyle : public SharedObject, public BLocker {
 
 		inline	uint16			Face() const
 									{ return fFace; }
+				uint16			PreservedFace(uint16) const;
 
 				const char*		Path() const;
 				font_height		GetHeight(const float& size) const;
-	
+				font_direction	Direction() const
+									{ return B_FONT_LEFT_TO_RIGHT; }
+
 		inline	FT_Face			GetFTFace() const
 									{ return fFTFace; }
 	
@@ -206,8 +209,8 @@ class FontFamily : public SharedObject {
 		void		RemoveStyle(FontStyle* style);
 
 		FontStyle*	GetStyle(const char* style) const;
-		FontStyle*	GetStyleWithFace(uint16 face) const;
-		FontStyle*	GetStyleWithID(uint16 face) const;
+		FontStyle*	GetStyleMatchingFace(uint16 face) const;
+		FontStyle*	GetStyleByID(uint16 face) const;
 
 		uint16		ID() const
 						{ return fID; }

@@ -4,15 +4,17 @@
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
-#ifndef FONTSERVER_H_
-#define FONTSERVER_H_
+#ifndef FONT_SERVER_H
+#define FONT_SERVER_H
 
-#include <OS.h>
-#include <List.h>
-#include <SupportDefs.h>
+
 #include <Font.h>
 #include <Locker.h>
+#include <OS.h>
+#include <ObjectList.h>
+#include <SupportDefs.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -22,60 +24,59 @@ class FontFamily;
 class FontStyle;
 class ServerFont;
 
+
 /*!
 	\class FontServer FontServer.h
 	\brief Manager for the largest part of the font subsystem
 */
 class FontServer : public BLocker {
-public:
-	FontServer();
-	~FontServer();
+	public:
+		FontServer();
+		~FontServer();
 
-	/*!
-		\brief Determines whether the font server has started up properly
-		\return true if so, false if not.
-	*/
-	bool IsInitialized() { return fInit; }
-	int32 CountFamilies();
-	int32 CountStyles(const char *family);
-	void RemoveFamily(const char *family);
-	void ScanSystemFolders();
-	status_t ScanDirectory(const char *path);
-	void SaveList();
+		status_t InitCheck() { return fInitStatus; }
 
-	const char *GetFamilyName(uint16 id) const;
-	const char *GetStyleName(const char *family, uint16 id) const;
+		int32 CountFamilies();
+		int32 CountStyles(const char *family);
+		void RemoveFamily(const char *family);
+		void ScanSystemFolders();
+		status_t ScanDirectory(const char *path);
+		void SaveList();
 
-	FontStyle *GetStyle(const char *family, const char *style, uint16 face = 0);
-	FontStyle *GetStyle(const char *family, uint16 id) const;
-	FontStyle *GetStyle(uint16 familyID, uint16 styleID);
-	FontFamily *GetFamily(uint16 familyID) const;
-	FontFamily *GetFamily(const char *name) const;
+		FontFamily* GetFamilyByIndex(int32 index) const;
+		FontFamily *GetFamily(uint16 familyID) const;
+		FontFamily *GetFamily(const char *name) const;
 
-	ServerFont *GetSystemPlain();
-	ServerFont *GetSystemBold();
-	ServerFont *GetSystemFixed();
+		FontStyle *GetStyleByIndex(const char *family, int32 index) const;
+		FontStyle *GetStyle(const char *family, const char *style, uint16 familyID = 0xffff,
+						uint16 styleID = 0xffff, uint16 face = 0);
+		FontStyle *GetStyle(const char *family, uint16 styleID);
+		FontStyle *GetStyle(uint16 familyID, uint16 styleID);
 
-	bool SetSystemPlain(const char *family, const char *style, float size);
-	bool SetSystemBold(const char *family, const char *style, float size);
-	bool SetSystemFixed(const char *family, const char *style, float size);
+		ServerFont *GetSystemPlain();
+		ServerFont *GetSystemBold();
+		ServerFont *GetSystemFixed();
 
-	bool FontsNeedUpdated() { return fNeedUpdate; }
-	/*!
-		\brief Called when the fonts list has been updated
-	*/
-	void FontsUpdated() { fNeedUpdate = false; }
+		bool SetSystemPlain(const char *family, const char *style, float size);
+		bool SetSystemBold(const char *family, const char *style, float size);
+		bool SetSystemFixed(const char *family, const char *style, float size);
 
-protected:
-	uint16 TranslateStyleToFace(const char *name) const;
-	
-	FT_CharMap _GetSupportedCharmap(const FT_Face &face);
+		bool FontsNeedUpdated() { return fNeedUpdate; }
+		/*!
+			\brief Called when the fonts list has been updated
+		*/
+		void FontsUpdated() { fNeedUpdate = false; }
 
-private:
-	bool		fInit;
-	BList		fFamilies;
-	ServerFont	*fPlain, *fBold, *fFixed;
-	bool		fNeedUpdate;
+	protected:
+		uint16 TranslateStyleToFace(const char *name) const;
+
+		FT_CharMap _GetSupportedCharmap(const FT_Face &face);
+
+	private:
+		status_t	fInitStatus;
+		BObjectList<FontFamily> fFamilies;
+		ServerFont	*fPlain, *fBold, *fFixed;
+		bool		fNeedUpdate;
 };
 
 extern FTC_Manager ftmanager; 

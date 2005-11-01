@@ -9,12 +9,11 @@
 /**	Handles the largest part of the font subsystem */
 
 
-#include <String.h>
 #include <Directory.h>
 #include <Entry.h>
-#include <storage/Path.h>	// specified to be able to build under Dano
 #include <File.h>
 #include <Message.h>
+#include <Path.h>
 #include <String.h>
 
 #include <FontServer.h>
@@ -29,30 +28,33 @@ FontServer *gFontServer = NULL;
 
 //#define PRINT_FONT_LIST
 
+
+#if 0
 /*!
 	\brief Access function to request a face via the FreeType font cache
 */
-/*static FT_Error
+static FT_Error
 face_requester(FTC_FaceID face_id, FT_Library library,
 	FT_Pointer request_data, FT_Face *aface)
 { 
 	CachedFace face = (CachedFace) face_id;
 	return FT_New_Face(ftlib, face->file_path.String(), face->face_index,aface); 
 } 
-*/
+#endif
+
 
 //	#pragma mark -
 
 
 //! Does basic set up so that directories can be scanned
-FontServer::FontServer(void)
+FontServer::FontServer()
 	: BLocker("font server lock"),
 	fFamilies(20),
 	fPlain(NULL),
 	fBold(NULL),
 	fFixed(NULL)
 {
-	fInit = FT_Init_FreeType(&ftlib) == 0;
+	fInitStatus = FT_Init_FreeType(&ftlib) == 0 ? B_OK : B_ERROR;
 
 /*
 	Fire up the font caching subsystem.
@@ -67,7 +69,7 @@ FontServer::FontServer(void)
 
 
 //! Frees items allocated in the constructor and shuts down FreeType
-FontServer::~FontServer(void)
+FontServer::~FontServer()
 {
 	FTC_Manager_Done(ftmanager);
 	FT_Done_FreeType(ftlib);
@@ -78,12 +80,10 @@ FontServer::~FontServer(void)
 	\brief Counts the number of font families available
 	\return The number of unique font families currently available
 */
-int32 FontServer::CountFamilies(void)
+int32
+FontServer::CountFamilies(void)
 {
-	if (fInit)
-		return fFamilies.CountItems();
-
-	return 0;
+	return fFamilies.CountItems();
 }
 
 
@@ -117,65 +117,6 @@ FontServer::RemoveFamily(const char *familyName)
 	}
 }
 
-
-const char*
-FontServer::GetFamilyName(uint16 id) const
-{
-	for (int32 i = 0; i < fFamilies.CountItems(); i++) {
-		FontFamily* family = (FontFamily*)fFamilies.ItemAt(i);
-		if (family && family->ID() == id)
-			return family->Name();
-	}
-
-	return NULL;
-}
-
-
-const char*
-FontServer::GetStyleName(const char* familyName, uint16 id) const
-{
-	FontStyle* style = GetStyle(familyName, id);
-	if (style != NULL)
-		return style->Name();
-
-	return NULL;
-}
-
-
-FontStyle*
-FontServer::GetStyle(const char* familyName, uint16 id) const
-{
-	FontFamily* family = GetFamily(familyName);
-	if (family != NULL)
-		return family->GetStyleWithID(id);
-
-	return NULL;
-}
-
-
-/*!
-	\brief Protected function which locates a FontFamily object
-	\param name The family to find
-	\return Pointer to the specified family or NULL if not found.
-	
-	Do NOT delete the FontFamily returned by this function.
-*/
-FontFamily*
-FontServer::GetFamily(const char* name) const
-{
-	if (!fInit || name == NULL)
-		return NULL;
-
-	int32 count = fFamilies.CountItems();
-
-	for (int32 i = 0; i < count; i++) {
-		FontFamily *family = (FontFamily*)fFamilies.ItemAt(i);
-		if (!strcmp(family->Name(), name))
-			return family;
-	}
-
-	return NULL;
-}
 
 //! Scans the four default system font folders
 void
@@ -396,25 +337,98 @@ FontServer::SaveList(void)
 }
 
 
-/*!
-	\brief Retrieves the FontStyle object
-	\param family The font's family
-	\param style The font's style
-	\return The FontStyle having those attributes or NULL if not available
-*/
-FontStyle*
-FontServer::GetStyle(const char* familyName, const char* styleName, uint16 face)
+FontFamily*
+FontServer::GetFamilyByIndex(int32 index) const
 {
-	FontFamily* family = GetFamily(familyName);
-	if (family) {
-		if (styleName == NULL) {
-			// try to get from face
-			return family->GetStyleWithFace(face);
-		}
-		return family->GetStyle(styleName);
+	return fFamilies.ItemAt(index);
+}
+
+
+/*!
+	\brief Locates a FontFamily object by name
+	\param name The family to find
+	\return Pointer to the specified family or NULL if not found.
+*/
+FontFamily*
+FontServer::GetFamily(const char* name) const
+{
+	if (name == NULL)
+		return NULL;
+
+	int32 count = fFamilies.CountItems();
+
+	for (int32 i = 0; i < count; i++) {
+		FontFamily* family = fFamilies.ItemAt(i);
+		if (!strcmp(family->Name(), name))
+			return family;
 	}
 
 	return NULL;
+}
+
+
+FontFamily*
+FontServer::GetFamily(uint16 familyID) const
+{
+	for (int32 i = 0; i < fFamilies.CountItems(); i++) {
+		FontFamily *family = (FontFamily*)fFamilies.ItemAt(i);
+		if (family->ID() == familyID)
+			return family;
+	}
+
+	return NULL;
+}
+
+
+FontStyle*
+FontServer::GetStyleByIndex(const char* familyName, int32 index) const
+{
+	FontFamily* family = GetFamily(familyName);
+	if (family != NULL)
+		return family->StyleAt(index);
+
+	return NULL;
+}
+
+
+/*!
+	\brief Retrieves the FontStyle object that comes closest to the one specified
+
+	\param family The font's family or NULL in which case \a familyID is used
+	\param style The font's style or NULL in which case \a styleID is used
+	\param familyID will only be used if \a family is NULL (or empty)
+	\param styleID will only be used if \a style is NULL (or empty)
+	\param face is used to specify the style if both \a style is NULL or empty
+		and styleID is 0xffff.
+
+	\return The FontStyle having those attributes or NULL if not available
+*/
+FontStyle*
+FontServer::GetStyle(const char* familyName, const char* styleName, uint16 familyID,
+	uint16 styleID, uint16 face)
+{
+	FontFamily* family;
+
+	// find family
+
+	if (familyName != NULL && familyName[0])
+		family = GetFamily(familyName);
+	else
+		family = GetFamily(familyID);
+
+	if (family == NULL)
+		return NULL;
+
+	// find style
+
+	if (styleName != NULL && styleName[0])
+		return family->GetStyle(styleName);
+
+	if (styleID != 0xffff)
+		return family->GetStyleByID(styleID);
+
+	// try to get from face
+	return family->GetStyleMatchingFace(face);
 }
 
 
@@ -429,20 +443,7 @@ FontServer::GetStyle(uint16 familyID, uint16 styleID)
 {
 	FontFamily *family = GetFamily(familyID);
 	if (family)
-		return family->GetStyleWithID(styleID);
-
-	return NULL;
-}
-
-
-FontFamily*
-FontServer::GetFamily(uint16 familyID) const
-{
-	for (int32 i = 0; i < fFamilies.CountItems(); i++) {
-		FontFamily *family = (FontFamily*)fFamilies.ItemAt(i);
-		if (family->ID() == familyID)
-			return family;
-	}
+		return family->GetStyleByID(styleID);
 
 	return NULL;
 }

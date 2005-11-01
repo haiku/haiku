@@ -72,7 +72,7 @@ _font_control_(BFont *font, int32 cmd, void *data)
 
 	int32 code;
 	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE) {
+		|| code != B_OK) {
 		printf("DEBUG: Couldn't initialize font in _font_control()\n");
 		return;
 	}
@@ -137,7 +137,7 @@ count_font_families(void)
 	link.StartMessage(AS_COUNT_FONT_FAMILIES);
 
 	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE)
+		|| code != B_OK)
 		return -1;
 
 	link.Read<int32>(&count);
@@ -160,7 +160,7 @@ count_font_styles(font_family name)
 	link.Attach(name, sizeof(font_family));
 
 	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE)
+		|| code != B_OK)
 		return -1;
 
 	link.Read<int32>(&count);
@@ -190,7 +190,7 @@ get_font_family(int32 index, font_family *name, uint32 *flags)
 	link.Attach<int32>(index);
 
 	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE)
+		|| code != B_OK)
 		return B_ERROR;
 
 	link.Read<font_family>(name);
@@ -213,35 +213,10 @@ get_font_family(int32 index, font_family *name, uint32 *flags)
 */
 
 status_t
-get_font_style(font_family family, int32 index, font_style *name,
-	uint32 *flags)
+get_font_style(font_family family, int32 index, font_style *_name,
+	uint32 *_flags)
 {
-	if (!name)
-		return B_BAD_VALUE;
-
-	int32 code;
-	BPrivate::AppServerLink link;
-
-	link.StartMessage(AS_GET_STYLE_NAME);
-	link.Attach(family, sizeof(font_family));
-	link.Attach<int32>(index);
-
-	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE)
-		return B_ERROR;
-
-	font_style style;
-	link.Read<font_style>(&style);
-	if (name)
-		strcpy(*name, style);
-	
-	uint32 value;
-	link.Read<uint32>(&value); // face - unused
-	link.Read<uint32>(&value); // flags
-	if (flags)
-		*flags = value;
-
-	return B_OK;
+	return get_font_style(family, index, _name, NULL, _flags);
 }
 
 
@@ -250,7 +225,7 @@ get_font_style(font_family family, int32 index, font_style *name,
 	\param index Unique font identifier code.
 	\param name font_family string to receive the name of the family
 	\param face recipient of font face value, such as B_REGULAR_FACE
-	\param flags iF non-NULL, the values of the flags IS_FIXED and B_HAS_TUNED_FONT are returned
+	\param flags if non-NULL, the values of the flags IS_FIXED and B_HAS_TUNED_FONT are returned
 	\return B_ERROR if the index does not correspond to a font style
 	
 	The face value returned by this function is not very reliable. At the same time, the value
@@ -258,27 +233,35 @@ get_font_style(font_family family, int32 index, font_style *name,
 */
 
 status_t
-get_font_style(font_family family, int32 index, font_style *name,
-	uint16 *face, uint32 *flags)
+get_font_style(font_family family, int32 index, font_style *_name,
+	uint16 *_face, uint32 *_flags)
 {
-	if (!name || !face)
+	if (_name == NULL)
 		return B_BAD_VALUE;
 
-	int32 code;
-	BPrivate::AppServerLink link;
+	// TODO: maybe cache the whole font list locally?
 
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_STYLE_NAME);
-	link.Attach(family, sizeof(font_family));
+	link.AttachString(family);
 	link.Attach<int32>(index);
 
-	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE)
-		return B_ERROR;
+	int32 status;
+	if (link.FlushWithReply(status) != B_OK
+		|| status != B_OK)
+		return status;
 
-	link.Read<font_style>(name);
-	link.Read<uint16>(face);
-	if (flags)
-		link.Read<uint32>(flags);
+	link.ReadString(*_name, sizeof(font_style));
+
+	uint16 face;
+	uint32 flags;
+	link.Read<uint16>(&face);
+	link.Read<uint32>(&flags);
+
+	if (_face)
+		*_face = face;
+	if (_flags)
+		*_flags = flags;
 
 	return B_OK;
 }
@@ -304,7 +287,7 @@ update_font_families(bool checkOnly)
 	link.Attach<bool>(checkOnly);
 
 	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE)
+		|| code != B_OK)
 		return false;
 
 	link.Read<bool>(&value);
@@ -395,6 +378,8 @@ BFont::SetFamilyAndStyle(const font_family family, const font_style style)
 	link.StartMessage(AS_SET_FAMILY_AND_STYLE);
 	link.AttachString(family);
 	link.AttachString(style);
+	link.Attach<uint16>(fFamilyID);
+	link.Attach<uint16>(0xffff);
 	link.Attach<uint16>(fFace);
 
 	int32 status;
@@ -423,32 +408,28 @@ BFont::SetFamilyAndStyle(uint32 fontcode)
 	// is a problem because the face flag includes Regular/Bold/Italic information in
 	// addition to stuff like underlining and strikethrough. As a result, this will
 	// need a trip to the server and, thus, be slower than R5's in order to be correct
-	
-	uint16 family, style, face;
-	int32 code;
-	BPrivate::AppServerLink link;
 
+	uint16 family, style;
 	style = fontcode & 0xFFFF;
 	family = (fontcode & 0xFFFF0000) >> 16;
 
-	link.StartMessage(AS_SET_FAMILY_AND_STYLE_FROM_ID);
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_SET_FAMILY_AND_STYLE);
+	link.AttachString(NULL);	// no family and style name
+	link.AttachString(NULL);
 	link.Attach<uint16>(family);
 	link.Attach<uint16>(style);
+	link.Attach<uint16>(fFace);
 
+	int32 code;
 	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE)
+		|| code != B_OK)
 		return;
 
-	link.Read<uint16>(&face);
-
-	fStyleID = style;
-	fFamilyID = family;
+	link.Read<uint16>(&fFamilyID);
+	link.Read<uint16>(&fStyleID);
+	link.Read<uint16>(&fFace);
 	fHeight.ascent = kUninitializedAscent;
-
-	// Mask off any references in the face to Bold/Normal/Italic and set the face
-	// value to reflect the new font style
-	fFace &= B_UNDERSCORE_FACE | B_NEGATIVE_FACE | B_OUTLINED_FACE | B_STRIKEOUT_FACE;
-	fFace |= face;
 }
 
 
@@ -466,28 +447,24 @@ BFont::SetFamilyAndStyle(uint32 fontcode)
 status_t
 BFont::SetFamilyAndFace(const font_family family, uint16 face)
 {
-	if (face & (B_ITALIC_FACE | B_UNDERSCORE_FACE | B_NEGATIVE_FACE | B_OUTLINED_FACE
-			| B_STRIKEOUT_FACE | B_BOLD_FACE | B_REGULAR_FACE) != 0)
-		fFace = face;
-	
-	if (family) {
-		int32 code;
-		BPrivate::AppServerLink link;
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_SET_FAMILY_AND_STYLE);
+	link.AttachString(family);
+	link.AttachString(NULL);	// no style given
+	link.Attach<uint16>(fFamilyID);
+	link.Attach<uint16>(0xffff);
+	link.Attach<uint16>(face);
 
-		link.StartMessage(AS_SET_FAMILY_AND_FACE);
-		link.Attach(family, sizeof(font_family));
-		link.Attach<uint16>(face);
+	int32 status;
+	if (link.FlushWithReply(status) != B_OK
+		|| status != B_OK)
+		return status;
 
-		if (link.FlushWithReply(code) != B_OK
-			|| code != SERVER_TRUE)
-			return B_ERROR;
-
-		link.Read<uint16>(&fFamilyID);
-		link.Read<uint16>(&fStyleID);
-	} else
-		fFace = face;
-
+	link.Read<uint16>(&fFamilyID);
+	link.Read<uint16>(&fStyleID);
+	link.Read<uint16>(&fFace);
 	fHeight.ascent = kUninitializedAscent;
+
 	return B_OK;
 }
 
@@ -533,12 +510,10 @@ BFont::SetEncoding(uint8 encoding)
 void
 BFont::SetFace(uint16 face)
 {
-	// TODO: Should the server ignore faces it doesn't have, or should
-	//	it try to emulate faces it doesn't have, or should it correct
-	//	the face value to something it has?
-	// TODO: don't we have to update the fStyleID?
-	fFace = face;
-	fHeight.ascent = kUninitializedAscent;
+	if (face == fFace)
+		return;
+
+	SetFamilyAndFace(NULL, face);
 }
 
 
@@ -565,15 +540,14 @@ BFont::GetFamilyAndStyle(font_family *family, font_style *style) const
 	if (style == NULL)
 		style = &styleBuffer;
 
-	int32 code;
 	BPrivate::AppServerLink link;
-
 	link.StartMessage(AS_GET_FAMILY_AND_STYLE);
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
 
+	int32 code;
 	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE) {
+		|| code != B_OK) {
 		// the least we can do is to clear the buffers
 		memset(family, 0, sizeof(font_family));
 		memset(style, 0, sizeof(font_style));
@@ -644,15 +618,14 @@ BFont::Flags(void) const
 font_direction
 BFont::Direction(void) const
 {
-	int32 code;
 	BPrivate::AppServerLink link;
-
 	link.StartMessage(AS_GET_FONT_DIRECTION);
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
 
+	int32 code;
 	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE)
+		|| code != B_OK)
 		return B_FONT_LEFT_TO_RIGHT;
 
 	font_direction fdir;
@@ -664,15 +637,14 @@ BFont::Direction(void) const
 bool
 BFont::IsFixed(void) const
 {
-	int32 code;
 	BPrivate::AppServerLink link;
-
 	link.StartMessage(AS_QUERY_FONT_FIXED);
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
 
+	int32 code;
 	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE)
+		|| code != B_OK)
 		return false;
 
 	bool fixed;
@@ -698,15 +670,14 @@ BFont::IsFullAndHalfFixed(void) const
 BRect
 BFont::BoundingBox(void) const
 {
-	int32 code;
 	BPrivate::AppServerLink link;
-
 	link.StartMessage(AS_GET_FONT_BOUNDING_BOX);
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
 
+	int32 code;
 	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE)
+		|| code != B_OK)
 		return BRect(0, 0, 0 ,0);
 
 	BRect box;
@@ -734,15 +705,14 @@ BFont::FileFormat(void) const
 int32
 BFont::CountTuned(void) const
 {
-	int32 code;
 	BPrivate::AppServerLink link;
-
 	link.StartMessage(AS_GET_TUNED_COUNT);
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
 
+	int32 code;
 	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE)
+		|| code != B_OK)
 		return -1;
 
 	int32 count;
@@ -757,16 +727,15 @@ BFont::GetTunedInfo(int32 index, tuned_font_info *info) const
 	if (!info)
 		return;
 
-	int32 code;
 	BPrivate::AppServerLink link;
-
 	link.StartMessage(AS_GET_TUNED_INFO);
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
 	link.Attach<uint32>(index);
 
+	int32 code;
 	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE)
+		|| code != B_OK)
 		return;
 
 	link.Read<tuned_font_info>(info);
@@ -778,9 +747,8 @@ BFont::TruncateString(BString *inOut, uint32 mode, float width) const
 {
 	// NOTE: Careful, we cannot directly use "inOut->String()" as result
 	// array, because the string length increases by 3 bytes in the worst case scenario.
-	const char* array[1];
-	array[0] = inOut->String();
-	GetTruncatedStrings(array, 1, mode, width, inOut);
+	const char *string = inOut->String();
+	GetTruncatedStrings(&string, 1, mode, width, inOut);
 }
 
 
@@ -881,7 +849,7 @@ BFont::GetStringWidths(const char *stringArray[], const int32 lengthArray[],
 	}
 
 	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE)
+		|| code != B_OK)
 		return;
 
 	link.Read(widthArray, sizeof(float) * numStrings);
@@ -925,7 +893,7 @@ BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *
 	link.Attach(charArray, bytesInBuffer);
 
 	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE)
+		|| code != B_OK)
 		return;
 
 	link.Read(escapementArray, numChars * sizeof(float));
@@ -975,7 +943,7 @@ BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *
 	}
 
 	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE)
+		|| code != B_OK)
 		return;
 
 	link.Read(escapementArray, sizeof(BPoint) * numChars);
@@ -999,7 +967,7 @@ BFont::GetEdges(const char charArray[], int32 numChars, edge_info edgeArray[]) c
 	link.Attach(charArray, bytesInBuffer);
 
 	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE)
+		|| code != B_OK)
 		return;
 
 	link.Read(edgeArray, sizeof(edge_info) * numChars);
@@ -1023,7 +991,7 @@ BFont::GetHeight(font_height *_height) const
 
 		int32 code;
 		if (link.FlushWithReply(code) != B_OK
-			|| code != SERVER_TRUE)
+			|| code != B_OK)
 			return;
 
 		// Who put that "const" to this method? :-)
@@ -1086,7 +1054,7 @@ BFont::_GetBoundingBoxes_(const char charArray[], int32 numChars, font_metric_mo
 	link.Attach(charArray, bytesInBuffer);
 
 	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE)
+		|| code != B_OK)
 		return;
 
 	link.Read(boundingBoxArray, sizeof(BRect) * numChars);
@@ -1129,7 +1097,7 @@ BFont::GetBoundingBoxesForStrings(const char *stringArray[], int32 numStrings,
 	}
 
 	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE)
+		|| code != B_OK)
 		return;
 
 	link.Read(boundingBoxArray, sizeof(BRect) * numStrings);
@@ -1158,7 +1126,7 @@ BFont::GetGlyphShapes(const char charArray[], int32 numChars, BShape *glyphShape
 	link.Attach(charArray, numChars);
 
 	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE)
+		|| code != B_OK)
 		return;
 
 	for (int32 i = 0; i < numChars; i++)
@@ -1185,7 +1153,7 @@ BFont::GetHasGlyphs(const char charArray[], int32 numChars, bool hasArray[]) con
 	link.Attach(charArray, bytesInBuffer);
 
 	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE)
+		|| code != B_OK)
 		return;
 
 	link.Read(hasArray, sizeof(bool) * numChars);

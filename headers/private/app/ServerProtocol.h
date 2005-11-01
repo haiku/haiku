@@ -3,8 +3,8 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *              DarkWyrm <bpmagic@columbus.rr.com>
- *              Jérôme Duval, jerome.duval@free.fr
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		JÃ©rÃ´me Duval, jerome.duval@free.fr
  */
 
 #ifndef _APPSERVER_PROTOCOL_
@@ -125,10 +125,7 @@ enum {
 	AS_GET_FONT_HEIGHT,
 
 	AS_QUERY_FONT_FIXED,
-	AS_SET_FAMILY_NAME,
 	AS_SET_FAMILY_AND_STYLE,
-	AS_SET_FAMILY_AND_STYLE_FROM_ID,
-	AS_SET_FAMILY_AND_FACE,
 
 	AS_COUNT_FONT_FAMILIES,
 	AS_COUNT_FONT_STYLES,

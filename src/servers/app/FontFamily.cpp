@@ -130,6 +130,27 @@ FontStyle::Flags() const
 
 
 /*!
+	\brief Updates the given face to match the one from this style
+	
+	The specified font face often doesn't match the exact face of
+	a style. This method will preserve the attributes of the face
+	that this style does not alter, and will only update the
+	attributes that matter to this style.
+	The font renderer could then emulate the other face attributes
+	taking this style as a base.
+*/
+uint16
+FontStyle::PreservedFace(uint16 face) const
+{
+	// TODO: make this better
+	face &= ~(B_REGULAR_FACE | B_BOLD_FACE | B_ITALIC_FACE);
+	face |= Face();
+
+	return face;
+}
+
+
+/*!
 	\brief Converts an ASCII character to Unicode for the style
 	\param c An ASCII character
 	\return A Unicode value for the character
@@ -350,7 +371,7 @@ FontFamily::GetStyle(const char *styleName) const
 
 
 FontStyle*
-FontFamily::GetStyleWithID(uint16 id) const
+FontFamily::GetStyleByID(uint16 id) const
 {
 	for (int32 i = 0; i < fStyles.CountItems(); i++) {
 		FontStyle* style = fStyles.ItemAt(i);
@@ -363,10 +384,14 @@ FontFamily::GetStyleWithID(uint16 id) const
 
 
 FontStyle*
-FontFamily::GetStyleWithFace(uint16 face) const
+FontFamily::GetStyleMatchingFace(uint16 face) const
 {
+	// we currently only use bold/italic/regular faces
+	face &= B_BOLD_FACE | B_ITALIC_FACE | B_REGULAR_FACE;
+
 	for (int32 i = 0; i < fStyles.CountItems(); i++) {
 		FontStyle* style = fStyles.ItemAt(i);
+		
 		if (style->Face() == face)
 			return style;
 	}
