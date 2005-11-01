@@ -1323,7 +1323,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			char *stringArray[numStrings];
 			for (int32 i = 0; i < numStrings; i++) {
 				link.Read<int32>(&lengthArray[i]);
+#ifdef DE_OLD_READ_STRING
 				stringArray[i] = new char[lengthArray[i]];
+#endif
 				link.ReadString(&stringArray[i]);
 			}
 
@@ -1351,9 +1353,15 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				fLink.StartMessage(SERVER_FALSE);
 
 			fLink.Flush();
+#ifndef DE_NEW_READ_STRING
 			for (int32 i = 0; i < numStrings; i++) {
-				delete[] stringArray[i];
+#ifndef DE_OLD_READ_STRING
+				free(stringArray[i]);
+#else
+				delete[] stringArray[i]; 
+#endif
 			}
+#endif			
 			break;
 		}
 		case AS_GET_FONT_BOUNDING_BOX:
