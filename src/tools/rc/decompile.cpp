@@ -554,7 +554,11 @@ write_fields(BMessage &msg)
 	int32 t = 0;
 	int32 item = 0;
 
+#ifdef B_BEOS_VERSION_DANO
+	const char *name;
+#else
 	char *name;
+#endif
 	type_code type;
 	int32 count;
 	const void *data;
