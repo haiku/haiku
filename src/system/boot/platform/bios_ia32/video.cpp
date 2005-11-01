@@ -139,7 +139,7 @@ vesa_init(vbe_info_block *info, video_mode **_standardMode)
 	if (vesa_get_vbe_info_block(info) != B_OK)
 		return B_ERROR;
 
-	// fill mode list
+	// fill mode list and find standard video mode
 
 	video_mode *standardMode = NULL;
 
@@ -176,14 +176,17 @@ vesa_init(vbe_info_block *info, video_mode **_standardMode)
 				videoMode->height = modeInfo.height;
 				videoMode->bits_per_pixel = modeInfo.bits_per_pixel;
 
-				// ToDo: for now, only accept 8 bit modes as standard
-				if (standardMode == NULL && modeInfo.bits_per_pixel == 8)
+				if (standardMode == NULL)
 					standardMode = videoMode;
-				else if (standardMode != NULL) {
+				else if (standardMode != NULL && modeInfo.bits_per_pixel <= 16) {
+					// for the standard mode, we prefer a bit depth of 16
 					// switch to the one with the higher resolution
 					// ToDo: is that always a good idea? for now we'll use 800x600
-					if (modeInfo.width > standardMode->width && modeInfo.width <= 800)
-						standardMode = videoMode;
+					if (modeInfo.width >= standardMode->width && modeInfo.width <= 800) {
+						if (modeInfo.width != standardMode->width
+							|| modeInfo.bits_per_pixel >= standardMode->bits_per_pixel)
+							standardMode = videoMode;
+					}
 				}
 
 				list_add_item(&sModeList, videoMode);
