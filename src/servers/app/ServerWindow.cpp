@@ -272,11 +272,8 @@ ServerWindow::Show()
 		rootLayer->Unlock();
 	}
 	
-	// TODO: This doesn't work: Here we aren't shown yet as RootLayer::ShowWinBorder()
-	// does its work asynchronously. As we lock the rootlayer, I think it could be synchronous.
-	// Otherwise, we need a "Shown()" hook or something like that.
 	if (fDirectWindowData != NULL)
-		_HandleDirectConnection(B_DIRECT_START);
+		_HandleDirectConnection(B_DIRECT_START|B_BUFFER_RESET);
 }
 
 
@@ -2410,14 +2407,18 @@ ServerWindow::_EnableDirectWindowMode()
 
 
 void
-ServerWindow::_HandleDirectConnection(direct_buffer_state state)
+ServerWindow::_HandleDirectConnection(int bufferState, int driverState)
 {
 	if (fDirectWindowData == NULL)
 		return;
 	
-	fDirectWindowData->direct_info->buffer_state = state;
+	if (bufferState != -1)
+		fDirectWindowData->direct_info->buffer_state = (direct_buffer_state)bufferState;
 	
-	if ((state & B_DIRECT_MODE_MASK) != B_DIRECT_STOP) {
+	if (driverState != -1)
+		fDirectWindowData->direct_info->driver_state = (direct_driver_state)driverState;
+	
+	if ((bufferState & B_DIRECT_MODE_MASK) != B_DIRECT_STOP) {
 		// TODO: Locking ?
 		RenderingBuffer *buffer = fDesktop->GetHWInterface()->FrontBuffer();
 		fDirectWindowData->direct_info->bits = buffer->Bits();

@@ -13,7 +13,6 @@
 #define _SERVERWIN_H_
 
 
-#include <DirectWindow.h> // for direct_buffer_state
 #include <GraphicsDefs.h>
 #include <PortLink.h>
 #include <Locker.h>
@@ -119,7 +118,7 @@ private:
 	virtual void				_GetLooperName(char* name, size_t size);
 
 			status_t			_EnableDirectWindowMode();
-			void				_HandleDirectConnection(direct_buffer_state state);
+			void				_HandleDirectConnection(int bufferState = -1, int driverState = -1);
 			
 			// TODO: Move me elsewhere
 			status_t			PictureToRegion(ServerPicture *picture,
