@@ -243,13 +243,34 @@ void
 BBox::FrameResized(float width, float height)
 {
 	BRect bounds(Bounds());
-
-	// TODO: only invalidate the part that really need redrawing!
-
+	BRect r;
+	
+	if(fBounds.right < bounds.right)
+	{
+		r.left = fBounds.right;
+		r.top = 0;
+		r.right = bounds.right;
+		
+		if(fBounds.bottom < bounds.bottom)
+			r.bottom = bounds.bottom;
+		else
+			r.bottom = fBounds.bottom;
+		
+		Invalidate(r);
+	}
+	
+	if(fBounds.bottom < bounds.bottom)
+	{
+		r.left = 0;
+		r.top = fBounds.bottom;
+		r.right = bounds.right;
+		r.bottom = bounds.bottom;
+		
+		Invalidate(r);
+	}
+	
 	fBounds.right = bounds.right;
 	fBounds.bottom = bounds.bottom;
-
-	Invalidate();
 }
 
 
