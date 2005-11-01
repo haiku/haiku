@@ -411,6 +411,8 @@ ServerApp::_MessageLooper()
 						// ServerWindow constructor will reply with port_id of a newly created port
 						window = new OffscreenServerWindow(title, this, clientReplyPort, 
 																looperPort, token, bitmap);
+					else
+						free(title);
 				} else {
 					window = new ServerWindow(title, this, clientReplyPort, looperPort, token);
 					STRACE(("\nServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
@@ -1992,7 +1994,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			for(int32 i=0; i<numStrings; i++) {
 				link.Read<int32>(&lengthArray[i]);
 				link.Read<escapement_delta>(&deltaArray[i]);
-				stringArray[i] = new char[lengthArray[i]];
 				link.ReadString(&stringArray[i]);
 			}
 
@@ -2016,7 +2017,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			}
 
 			for (int32 i=0; i<numStrings; i++)
-				delete[] stringArray[i];
+				free(stringArray[i]);
 
 			if (!success)
 				fLink.StartMessage(SERVER_FALSE);
