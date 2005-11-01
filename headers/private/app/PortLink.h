@@ -7,27 +7,24 @@
  *		Pahtz <pahtz@yahoo.com.au>
  *		Axel Dörfler, axeld@pinc-software.de
  */
-#ifndef _PORTLINK_H
-#define _PORTLINK_H
+#ifndef _SERVER_LINK_H
+#define _SERVER_LINK_H
+
 
 #include <OS.h>
 #include <LinkMsgReader.h>
 #include <LinkMsgSender.h>
 
+
 /*
-	Error checking rules: (for if you don't want to check every return code)
-	
-	Calling EndMessage() is optional, implied by Flush() or StartMessage().
-
-	If you are sending just one message you only need to test Flush() == B_OK
-
-	If you are buffering multiple messages without calling Flush() you must
-		check EndMessage() == B_OK, or the last Attach() for each message. Check
-		Flush() at the end.
-
-	If you are reading, check the last Read() or ReadString() you perform.
-
-*/
+ * Error checking rules: (for if you don't want to check every return code)
+ * - Calling EndMessage() is optional, implied by Flush() or StartMessage().
+ * - If you are sending just one message you only need to test Flush() == B_OK
+ * - If you are buffering multiple messages without calling Flush() you must
+ *   check EndMessage() == B_OK, or the last Attach() for each message.
+ *   Check Flush() at the end.
+ * - If you are reading, check the last Read() or ReadString() you perform.
+ */
 
 namespace BPrivate {
 
@@ -60,6 +57,7 @@ class ServerLink {
 		status_t GetNextMessage(int32 &code, bigtime_t timeout = B_INFINITE_TIMEOUT);
 		bool NeedsReply() const;
 		status_t Read(void *data, ssize_t size);
+		status_t ReadString(char *buffer, size_t bufferSize);
 		status_t ReadString(char **string);
 		status_t ReadRegion(BRegion *region);
 		status_t ReadShape(BShape *shape);
@@ -174,6 +172,12 @@ ServerLink::Read(void *data, ssize_t size)
 }
 
 inline status_t
+ServerLink::ReadString(char *buffer, size_t bufferSize)
+{
+	return fReceiver->ReadString(buffer, bufferSize);
+}
+
+inline status_t
 ServerLink::ReadString(char **string)
 {
 	return fReceiver->ReadString(string);
@@ -187,4 +191,4 @@ ServerLink::Read(Type *data)
 
 }	// namespace BPrivate
 
-#endif	/* _PORTLINK_H */
+#endif	/* _SERVER_LINK_H */
