@@ -1252,8 +1252,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_GET_FONT_DIRECTION:
 		{
-			FTRACE(("ServerApp %s: AS_GET_FONT_DIRECTION unimplemented\n",
-				Signature()));
+			FTRACE(("ServerApp %s: AS_GET_FONT_DIRECTION\n", Signature()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1273,6 +1272,35 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 				fLink.StartMessage(B_OK);
 				fLink.Attach<font_direction>(direction);
+			} else
+				fLink.StartMessage(B_BAD_VALUE);
+
+			gFontServer->Unlock();
+			fLink.Flush();
+			break;
+		}
+		case AS_GET_FONT_FILE_FORMAT:
+		{
+			FTRACE(("ServerApp %s: AS_GET_FONT_FILE_FORMAT\n", Signature()));
+			// Attached Data:
+			// 1) uint16 - family ID
+			// 2) uint16 - style ID
+
+			// Returns:
+			// 1) uint16 font_file_format of font
+
+			int32 familyID, styleID;
+			link.Read<int32>(&familyID);
+			link.Read<int32>(&styleID);
+
+			gFontServer->Lock();
+
+			FontStyle *fontStyle = gFontServer->GetStyle(familyID, styleID);
+			if (fontStyle) {
+				font_direction direction = fontStyle->Direction();
+
+				fLink.StartMessage(B_OK);
+				fLink.Attach<uint16>((uint16)fontStyle->FileFormat());
 			} else
 				fLink.StartMessage(B_BAD_VALUE);
 

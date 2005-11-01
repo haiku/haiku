@@ -246,7 +246,7 @@ get_font_style(font_family family, int32 index, font_style *_name,
 	link.AttachString(family);
 	link.Attach<int32>(index);
 
-	int32 status;
+	int32 status = B_ERROR;
 	if (link.FlushWithReply(status) != B_OK
 		|| status != B_OK)
 		return status;
@@ -382,7 +382,7 @@ BFont::SetFamilyAndStyle(const font_family family, const font_style style)
 	link.Attach<uint16>(0xffff);
 	link.Attach<uint16>(fFace);
 
-	int32 status;
+	int32 status = B_ERROR;
 	if (link.FlushWithReply(status) != B_OK
 		|| status != B_OK)
 		return status;
@@ -455,7 +455,7 @@ BFont::SetFamilyAndFace(const font_family family, uint16 face)
 	link.Attach<uint16>(0xffff);
 	link.Attach<uint16>(face);
 
-	int32 status;
+	int32 status = B_ERROR;
 	if (link.FlushWithReply(status) != B_OK
 		|| status != B_OK)
 		return status;
@@ -697,8 +697,22 @@ BFont::Blocks(void) const
 font_file_format
 BFont::FileFormat(void) const
 {
-	// TODO: this will not work until I extend FreeType to handle this kind of call
-	return B_TRUETYPE_WINDOWS;
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_GET_FONT_FILE_FORMAT);
+	link.Attach<uint16>(fFamilyID);
+	link.Attach<uint16>(fStyleID);
+
+	int32 status;
+	if (link.FlushWithReply(status) != B_OK
+		|| status != B_OK) {
+		// just take a safe bet...
+		return B_TRUETYPE_WINDOWS;
+	}
+
+	uint16 format;
+	link.Read<uint16>(&format);
+
+	return (font_file_format)format;
 }
 
 

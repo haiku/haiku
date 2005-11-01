@@ -1,40 +1,25 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		FontFamily.h
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	classes to represent font styles and families
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
 #ifndef FONT_FAMILY_H_
 #define FONT_FAMILY_H_
+
 
 #include <String.h>
 #include <Rect.h>
 #include <Font.h>
 #include <ObjectList.h>
 #include <Locker.h>
+
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include "SharedObject.h"
+
 
 class FontFamily;
 class ServerFont;
@@ -152,6 +137,8 @@ class FontStyle : public SharedObject, public BLocker {
 		font_height		GetHeight(const float& size) const;
 		font_direction	Direction() const
 							{ return B_FONT_LEFT_TO_RIGHT; }
+		font_file_format FileFormat() const
+							{ return B_TRUETYPE_WINDOWS; }
 
 		FT_Face			GetFTFace() const
 							{ return fFTFace; }
