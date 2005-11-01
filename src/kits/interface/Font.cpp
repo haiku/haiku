@@ -994,6 +994,10 @@ BFont::GetHeight(font_height *height) const
 	if (height) {
 		// R5's version actually contacts the server in this call. The more and more
 		// I work with this class, the more and more I can't wait for R2 to fix it. Yeesh.
+		// TODO: As we have a fHeight member, maybe we could cache the height there ?
+		// If the size/family/style change, we can ABUSE the fFlags member and set a bit
+		// there, so that if that bit is high, this method would have to contact the 
+		// server, otherwise it'll use the cached value. Or something like that.
 		int32 code;
 		BPrivate::AppServerLink link;
 
