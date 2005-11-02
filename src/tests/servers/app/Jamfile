@@ -64,7 +64,7 @@ SharedLibrary libhaikuappserver.so :
 	ServerBitmap.cpp
 	ServerCursor.cpp
 	ServerFont.cpp
-	FontServer.cpp
+	FontManager.cpp
 	SystemPalette.cpp
 	TokenHandler.cpp
 	Utils.cpp
