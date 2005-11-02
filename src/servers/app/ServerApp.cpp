@@ -1343,15 +1343,19 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				font.SetSize(size);
 				font.SetSpacing(spacing);
 
-				for (int32 i = 0; i < numStrings; i++)
+				for (int32 i = 0; i < numStrings; i++) {
 					if (!stringArray[i] || lengthArray[i] <= 0)
 						widthArray[i] = 0.0;
-					else
-						widthArray[i] = fDesktop->GetDisplayDriver()->StringWidth(stringArray[i], lengthArray[i], font);
-				// NOTE: The line below will return the exact same thing. However,
-				// the line above uses the AGG rendering backend, for which glyph caching
-				// actually works. It is about 20 times faster!
-				//width = font.StringWidth(string, length);
+					else {
+//						widthArray[i] = fDesktop->GetDisplayDriver()->StringWidth(stringArray[i], lengthArray[i], font);
+						// NOTE: The line below will return the exact same thing. However,
+						// the line above uses the AGG rendering backend, for which glyph caching
+						// actually works. It is about 20 times faster!
+						// TODO: I've disabled the AGG version for now, as it produces a dead lock
+						//	(font use), that I am currently too lazy to investigate...
+						widthArray[i] = font.StringWidth(stringArray[i], lengthArray[i]);
+					}
+				}
 
 				fLink.StartMessage(B_OK);
 				fLink.Attach(widthArray, sizeof(widthArray));
