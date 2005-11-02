@@ -26,7 +26,7 @@
 #ifndef RAM_LINK_MSG_READER_H
 #define RAM_LINK_MSG_READER_H
 
-#include <LinkMsgReader.h>
+#include <LinkReceiver.h>
 
 /*
 	This class is somewhat an inheritance hack to avoid some *serious* code

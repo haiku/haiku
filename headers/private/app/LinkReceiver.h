@@ -6,8 +6,8 @@
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Pahtz <pahtz@yahoo.com.au>
  */
-#ifndef _LINKMSGREADER_H
-#define _LINKMSGREADER_H
+#ifndef _LINK_RECEIVER_H
+#define _LINK_RECEIVER_H
 
 #include <OS.h>
 
@@ -42,11 +42,8 @@ class LinkReceiver {
 		port_id fReceivePort;
 
 		char	*fRecvBuffer;
-
 		int32	fRecvPosition;	//current read position
-
 		int32	fRecvStart;	//start of current message
-
 		int32	fRecvBufferSize;
 
 		int32	fDataSize;	//size of data in recv buffer
@@ -57,4 +54,4 @@ class LinkReceiver {
 
 }	// namespace BPrivate
 
-#endif	// _LINKMSGREADER_H
+#endif	// _LINK_RECEIVER_H

@@ -15,8 +15,8 @@
 
 #include <Region.h>
 
-#include "LinkMsgReader.h"
-#include "LinkMsgSender.h"
+#include "LinkReceiver.h"
+#include "LinkSender.h"
 
 #include "LayerData.h"
 

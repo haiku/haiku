@@ -59,6 +59,7 @@ MergeObject <libbe>app_kit.o :
 	Roster.cpp
 	RosterPrivate.cpp
 	Server.cpp
+	ServerLink.cpp
 	ServerMemIO.cpp
 	TokenSpace.cpp
 	TypeConstants.cpp 

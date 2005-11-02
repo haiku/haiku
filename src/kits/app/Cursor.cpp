@@ -1,43 +1,23 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Cursor.cpp
-//	Author:			Frans van Nispen (xlr8@tref.nl)
-//					Gabe Yoder (gyoder@stny.rr.com)
-//	Description:	BCursor describes a view-wide or application-wide cursor.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Frans van Nispen (xlr8@tref.nl)
+ *		Gabe Yoder (gyoder@stny.rr.com)
+ */
+
+/**	BCursor describes a view-wide or application-wide cursor. */
+
 /**
 	@note:	As BeOS only supports 16x16 monochrome cursors, and I would like
 			to see a nice shadowes one, we will need to extend this one.
  */
 
-// Standard Includes -----------------------------------------------------------
-
-// System Includes -------------------------------------------------------------
 #include <AppDefs.h>
-#include <Cursor.h>
-#include <PortLink.h>
-#include <AppServerLink.h>
 
-// Project Includes ------------------------------------------------------------
+#include <Cursor.h>
+#include <AppServerLink.h>
 #include <ServerProtocol.h>
 
 

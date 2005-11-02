@@ -15,7 +15,7 @@
 #include <new>
 
 #include <ServerProtocol.h>
-#include <LinkMsgSender.h>
+#include <LinkSender.h>
 
 #include "link_message.h"
 

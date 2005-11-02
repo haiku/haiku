@@ -14,7 +14,7 @@
 #include <new>
 
 #include <ServerProtocol.h>
-#include <LinkMsgReader.h>
+#include <LinkReceiver.h>
 
 #include "link_message.h"
 
@@ -23,7 +23,7 @@
 #ifdef DEBUG_BPORTLINK
 #	include <stdio.h>
 #	define STRACE(x) printf x
-// those are defined in LinkMsgSender.cpp
+// those are defined in LinkSender.cpp
 extern const char *strcode(int32 code);
 extern const char *bstrcode(int32 code);
 #else

@@ -7,8 +7,8 @@
  *		Pahtz <pahtz@yahoo.com.au>
  *		Axel Dörfler, axeld@pinc-software.de
  */
-#ifndef LINKMSGSENDER_H
-#define LINKMSGSENDER_H
+#ifndef _LINK_SENDER_H
+#define _LINK_SENDER_H
 
 
 #include <OS.h>
@@ -29,9 +29,6 @@ class LinkSender {
 		status_t EndMessage(bool needsReply = false);
 
 		status_t Flush(bigtime_t timeout = B_INFINITE_TIMEOUT, bool needsReply = false);
-
-		// see BPrivate::BAppServerLink which inherits from BPortLink
-		//status_t FlushWithReply(int32 *code);
 
 		status_t Attach(const void *data, size_t size);
 		status_t AttachString(const char *string, int32 length = -1);
@@ -60,4 +57,4 @@ class LinkSender {
 
 }	// namespace BPrivate
 
-#endif	/* LINKMSGSENDER_H */
+#endif	/* _LINK_SENDER_H */
