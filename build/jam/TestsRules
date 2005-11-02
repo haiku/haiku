@@ -249,39 +249,14 @@ rule R5SharedLibraryNames
 
 rule SimpleTest
 {
-	# UnitTest <target> : <sources> : <libraries>
-	# Builds a unit test for an OBOS module.
-	# <target> The name of the target.
-	# <sources> The list of sources.
-	# <dest> The directory for the target (as passed to FDirName).
-	# <libraries> A list of link libraries (as passed to LinkAgainst).
-	# <public headers> A list of public header dirs (as passed to
-	# UsePublicHeaders).
+	# SimpleTest <target> : <sources> : [ <libraries> ] : [ <resources> ] ;
 
-	local target = $(1) ;
-	local sources = $(2) ;
-	local libraries = $(3) ;
-	local relPath = [ FRelPath src tests : $(SUBDIR_TOKENS) ] ;
-
-	# Turn optimization off.
+	# unless NO_TEST_DEBUG is defined, we turn on debugging
 	if ! $(NO_TEST_DEBUG) {
-		local optim = $(OPTIM) ;
-		OPTIM = ;
+		DEBUG on $(1) [ FGristFiles $(2:S=$(SUFOBJ)) ] ?= 1 ;
 	}
 
-	ObjectDefines $(sources) : TEST_OBOS ;
-	MakeLocate $(target) : [ FDirName $(HAIKU_TEST_DIR) $(relPath) ] ;
-	Main $(target) : $(sources) ;
-	Depends obostests : $(target) ;
-	LinkAgainst $(target) : $(libraries) ;
-	if ! $(NO_TEST_DEBUG) {
-		# Turn debugging on. That is usually desired for test code.
-		ObjectCcFlags $(sources) : $(DEBUG_FLAGS) ;
-		ObjectC++Flags $(sources) : $(DEBUG_FLAGS) ;
-
-		# Turn optimization on again.
-		OPTIM = $(optim) ;
-	}
+	Executable $(1) : $(2) : $(3) : $(4) ;
 }
 
 rule BuildPlatformTest
