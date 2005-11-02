@@ -968,7 +968,7 @@
 /* #undef HAVE_SYS_SYSINFO_H */
 
 /* Define to 1 if you have the <sys/sysmacros.h> header file. */
-#define HAVE_SYS_SYSMACROS_H 1
+/* #undef HAVE_SYS_SYSMACROS_H */
 
 /* Define to 1 if you have the <sys/sysmp.h> header file. */
 /* #undef HAVE_SYS_SYSMP_H */

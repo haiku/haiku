@@ -1250,7 +1250,7 @@
 
 /* Define to 1 if `major', `minor', and `makedev' are declared in
    <sysmacros.h>. */
-#define MAJOR_IN_SYSMACROS 1
+/* #undef MAJOR_IN_SYSMACROS */
 
 /* If malloc(0) is != NULL, define this to 1. Otherwise define this to 0. */
 #define MALLOC_0_IS_NONNULL 1

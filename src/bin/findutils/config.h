@@ -62,7 +62,7 @@
 /* #undef MAJOR_IN_MKDEV */
 
 /* Define if major, minor, and makedev are declared in <sysmacros.h>.  */
-#define MAJOR_IN_SYSMACROS 1
+/* #undef MAJOR_IN_SYSMACROS */
 
 /* Define if on MINIX.  */
 /* #undef _MINIX */
