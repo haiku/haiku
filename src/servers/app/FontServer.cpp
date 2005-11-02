@@ -24,8 +24,8 @@
 #include <new>
 
 
-extern FTC_Manager ftmanager; 
-FT_Library ftlib;
+static FTC_Manager ftmanager;
+FT_Library gFreeTypeLibrary;
 FontServer *gFontServer = NULL;
 
 //#define PRINT_FONT_LIST
@@ -40,7 +40,7 @@ face_requester(FTC_FaceID face_id, FT_Library library,
 	FT_Pointer request_data, FT_Face *aface)
 { 
 	CachedFace face = (CachedFace) face_id;
-	return FT_New_Face(ftlib, face->file_path.String(), face->face_index,aface); 
+	return FT_New_Face(gFreeTypeLibrary, face->file_path.String(), face->face_index,aface); 
 } 
 #endif
 
@@ -57,7 +57,7 @@ FontServer::FontServer()
 	fFixed(NULL),
 	fNextID(0)
 {
-	fInitStatus = FT_Init_FreeType(&ftlib) == 0 ? B_OK : B_ERROR;
+	fInitStatus = FT_Init_FreeType(&gFreeTypeLibrary) == 0 ? B_OK : B_ERROR;
 
 /*
 	Fire up the font caching subsystem.
@@ -66,7 +66,7 @@ FontServer::FontServer()
 	these numbers in the future to maximize performance for your "average"
 	application.
 */
-//	if (FTC_Manager_New(ftlib, 0, 0, 0, &face_requester, NULL, &ftmanager) != 0)
+//	if (FTC_Manager_New(gFreeTypeLibrary, 0, 0, 0, &face_requester, NULL, &ftmanager) != 0)
 //		fInit = false;
 }
 
@@ -75,7 +75,7 @@ FontServer::FontServer()
 FontServer::~FontServer()
 {
 	FTC_Manager_Done(ftmanager);
-	FT_Done_FreeType(ftlib);
+	FT_Done_FreeType(gFreeTypeLibrary);
 }
 
 
@@ -143,7 +143,7 @@ void
 FontServer::_AddFont(BPath &path)
 {
 	FT_Face face;
-	FT_Error error = FT_New_Face(ftlib, path.Path(), 0, &face);
+	FT_Error error = FT_New_Face(gFreeTypeLibrary, path.Path(), 0, &face);
 	if (error != 0)
 		return;
 

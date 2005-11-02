@@ -17,8 +17,6 @@
 
 const int32 kInvalidFamilyFlags = -1;
 
-FTC_Manager ftmanager;
-
 
 /*!
 	\brief Constructor

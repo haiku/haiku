@@ -81,8 +81,7 @@ class FontServer : public BLocker {
 		int32		fNextID;
 };
 
-extern FTC_Manager ftmanager; 
-extern FT_Library ftlib;
+extern FT_Library gFreeTypeLibrary;
 extern FontServer *gFontServer;
 
 #endif	/* FONTSERVER_H_ */

@@ -56,7 +56,7 @@ is_white_space(uint16 glyph)
 
 // constructor
 AGGTextRenderer::AGGTextRenderer()
-	: fFontEngine(ftlib),
+	: fFontEngine(gFreeTypeLibrary),
 	  fFontManager(fFontEngine),
 
 	  fCurves(fFontManager.path_adaptor()),
