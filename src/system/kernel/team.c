@@ -111,23 +111,13 @@ _dump_team_info(struct team *team)
 static int
 dump_team_info(int argc, char **argv)
 {
+	struct hash_iterator iterator;
 	struct team *team;
 	team_id id = -1;
-	struct hash_iterator i;
 	bool found = false;
 
-	if (argc > 2) {
+	if (argc != 2) {
 		kprintf("usage: team [id/address/name]\n");
-		return 0;
-	}
-
-	if (argc < 2) {
-		// just list the existing teams
-		hash_open(team_hash, &i);
-		while ((team = hash_next(team_hash, &i)) != NULL) {
-			dprintf("%p %5lx %s\n", team, team->id, team->name);
-		}
-		hash_close(team_hash, &i, false);
 		return 0;
 	}
 
@@ -139,18 +129,36 @@ dump_team_info(int argc, char **argv)
 	}
 
 	// walk through the thread list, trying to match name or id
-	hash_open(team_hash, &i);
-	while ((team = hash_next(team_hash, &i)) != NULL) {
+	hash_open(team_hash, &iterator);
+	while ((team = hash_next(team_hash, &iterator)) != NULL) {
 		if ((team->name && strcmp(argv[1], team->name) == 0) || team->id == id) {
 			_dump_team_info(team);
 			found = true;
 			break;
 		}
 	}
-	hash_close(team_hash, &i, false);
+	hash_close(team_hash, &iterator, false);
 
 	if (!found)
 		kprintf("team \"%s\" (%ld) doesn't exist!\n", argv[1], id);
+	return 0;
+}
+
+
+static int
+dump_teams(int argc, char **argv)
+{
+	struct hash_iterator iterator;
+	struct team *team;
+
+	kprintf("team          id  parent      name\n");
+	hash_open(team_hash, &iterator);
+
+	while ((team = hash_next(team_hash, &iterator)) != NULL) {
+		kprintf("%p%6lx  %p  %s\n", team, team->id, team->parent, team->name);
+	}
+
+	hash_close(team_hash, &iterator, false);
 	return 0;
 }
 
@@ -193,6 +201,7 @@ team_init(kernel_args *args)
 	hash_insert(team_hash, kernel_team);
 
 	add_debugger_command("team", &dump_team_info, "list info about a particular team");
+	add_debugger_command("teams", &dump_teams, "list all teams");
 	return 0;
 }
 
