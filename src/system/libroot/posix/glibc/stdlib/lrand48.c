@@ -1,4 +1,4 @@
-/* Copyright (C) 1995,1996,1997,1998,2001,2002 Free Software Foundation, Inc.
+/* Copyright (C) 1995, 1996, 1997, 1998, 2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@gnu.ai.mit.edu>, August 1995.
 
@@ -19,6 +19,8 @@
 
 #include <stdlib.h>
 
+/* Global state for non-reentrant functions.  Defined in drand48-iter.c.  */
+extern struct drand48_data __libc_drand48_data;
 
 long int
 lrand48 ()
