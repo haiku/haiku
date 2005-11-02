@@ -41,8 +41,8 @@ DrawData::DrawData()
 	  fLineJoinMode(B_BEVEL_JOIN),
 	  fMiterLimit(B_DEFAULT_MITER_LIMIT)
 {
-	if (gFontServer && gFontServer->GetSystemPlain())
-		fFont = *(gFontServer->GetSystemPlain());
+	if (gFontManager && gFontManager->GetSystemPlain())
+		fFont = *(gFontManager->GetSystemPlain());
 	
 	fUnscaledFontSize = fFont.Size();
 }

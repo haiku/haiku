@@ -16,7 +16,7 @@
 
 #include "ColorUtils.h"
 #include "DisplayDriver.h"
-#include "FontServer.h"
+#include "FontManager.h"
 #include "LayerData.h"
 #include "PatternHandler.h"
 #include "RGBColor.h"
@@ -38,7 +38,7 @@ DefaultDecorator::DefaultDecorator(BRect rect, int32 wlook, int32 wfeel, int32 w
 	  fTruncatedTitle("")
 {
 	ServerFont font(_look == B_FLOATING_WINDOW_LOOK ?
-		*gFontServer->GetSystemPlain() : *gFontServer->GetSystemBold());
+		*gFontManager->GetSystemPlain() : *gFontManager->GetSystemBold());
 	font.SetFlags(B_FORCE_ANTIALIASING);
 	font.SetSpacing(B_STRING_SPACING);
 	SetFont(&font);

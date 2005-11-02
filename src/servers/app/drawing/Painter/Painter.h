@@ -12,7 +12,7 @@
 
 #include <Font.h>
 #include <Rect.h>
-#include <FontServer.h>
+#include <FontManager.h>
 #include <ServerFont.h>
 
 #include "defines.h"

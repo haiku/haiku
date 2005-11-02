@@ -28,7 +28,7 @@
 #include "DecorManager.h"
 #include "DefaultDecorator.h"
 #include "Desktop.h"
-#include "FontServer.h"
+#include "FontManager.h"
 #include "HWInterface.h"
 #include "RegistrarDefs.h"
 #include "RGBColor.h"
@@ -99,14 +99,14 @@ AppServer::AppServer()
 	sAppServer = this;
 
 	// Create the font server and scan the proper directories.
-	gFontServer = new FontServer;
-	gFontServer->Lock();
-	gFontServer->ScanSystemFolders();
+	gFontManager = new FontManager;
+	gFontManager->Lock();
+	gFontManager->ScanSystemFolders();
 
-	if (!gFontServer->SetSystemPlain(DEFAULT_PLAIN_FONT_FAMILY,
+	if (!gFontManager->SetSystemPlain(DEFAULT_PLAIN_FONT_FAMILY,
 									DEFAULT_PLAIN_FONT_STYLE,
 									DEFAULT_PLAIN_FONT_SIZE) &&
-		!gFontServer->SetSystemPlain(FALLBACK_PLAIN_FONT_FAMILY,
+		!gFontManager->SetSystemPlain(FALLBACK_PLAIN_FONT_FAMILY,
 									DEFAULT_PLAIN_FONT_STYLE,
 									DEFAULT_PLAIN_FONT_SIZE)) {
 		printf("Couldn't set plain to %s (fallback: %s), %s %d pt\n",
@@ -116,10 +116,10 @@ AppServer::AppServer()
 				DEFAULT_PLAIN_FONT_SIZE);
 	}
 
-	if (!gFontServer->SetSystemBold(DEFAULT_BOLD_FONT_FAMILY,
+	if (!gFontManager->SetSystemBold(DEFAULT_BOLD_FONT_FAMILY,
 								   DEFAULT_BOLD_FONT_STYLE,
 								   DEFAULT_BOLD_FONT_SIZE) &&
-		!gFontServer->SetSystemBold(FALLBACK_BOLD_FONT_FAMILY,
+		!gFontManager->SetSystemBold(FALLBACK_BOLD_FONT_FAMILY,
 								   DEFAULT_BOLD_FONT_STYLE,
 								   DEFAULT_BOLD_FONT_SIZE)) {
 		printf("Couldn't set bold to %s (fallback: %s), %s %d pt\n",
@@ -129,10 +129,10 @@ AppServer::AppServer()
 				DEFAULT_BOLD_FONT_SIZE);
 	}
 
-	if (!gFontServer->SetSystemFixed(DEFAULT_FIXED_FONT_FAMILY,
+	if (!gFontManager->SetSystemFixed(DEFAULT_FIXED_FONT_FAMILY,
 									DEFAULT_FIXED_FONT_STYLE,
 									DEFAULT_FIXED_FONT_SIZE) &&
-		!gFontServer->SetSystemFixed(FALLBACK_FIXED_FONT_FAMILY,
+		!gFontManager->SetSystemFixed(FALLBACK_FIXED_FONT_FAMILY,
 									DEFAULT_FIXED_FONT_STYLE,
 									DEFAULT_FIXED_FONT_SIZE)) {
 		printf("Couldn't set fixed to %s (fallback: %s), %s %d pt\n",
@@ -142,7 +142,7 @@ AppServer::AppServer()
 				DEFAULT_FIXED_FONT_SIZE);
 	}
 
-	gFontServer->Unlock();
+	gFontManager->Unlock();
 
 	// Load the GUI colors here and set the global set to the values contained therein. If this
 	// is not possible, set colors to the defaults
@@ -175,7 +175,7 @@ AppServer::~AppServer()
 	gScreenManager->Lock();
 	gScreenManager->Quit();
 
-	delete gFontServer;
+	delete gFontManager;
 }
 
 
@@ -378,9 +378,9 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 			// Attached data:
 			// 1) port_id reply port
 
-			gFontServer->Lock();
-			bool needsUpdate = gFontServer->FontsNeedUpdated();
-			gFontServer->Unlock();
+			gFontManager->Lock();
+			bool needsUpdate = gFontManager->FontsNeedUpdated();
+			gFontManager->Unlock();
 
 			// Seeing how the client merely wants an answer, we'll skip the BPortLink
 			// and all its overhead and just write the code to port.

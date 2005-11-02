@@ -35,7 +35,7 @@
 #include <View.h> // for B_FONT_ALL
 
 #include "RGBColor.h"
-#include "FontServer.h"
+#include "FontManager.h"
 #include "ServerFont.h"
 #include "PatternHandler.h"
 

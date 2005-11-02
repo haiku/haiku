@@ -8,7 +8,7 @@
 #include <Bitmap.h>
 #include <ByteOrder.h>
 #include <Entry.h>
-#include <FontServer.h>
+#include <FontManager.h>
 #include <Message.h>
 #include <ServerFont.h>
 #include <UTF8.h>

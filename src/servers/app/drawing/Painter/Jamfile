@@ -25,7 +25,7 @@ StaticLibrary libpainter.a :
 	# font_support
 	# is contained within libagg.a,
 	# but we need a modified version that
-	# uses the FontServer
+	# uses the FontManager
 	agg_font_freetype.cpp
 	
 	AGGTextRenderer.cpp

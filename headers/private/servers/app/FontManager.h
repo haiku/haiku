@@ -6,8 +6,8 @@
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Axel Dörfler, axeld@pinc-software.de
  */
-#ifndef FONT_SERVER_H
-#define FONT_SERVER_H
+#ifndef FONT_MANAGER_H
+#define FONT_MANAGER_H
 
 
 #include <Font.h>
@@ -28,13 +28,13 @@ class ServerFont;
 
 
 /*!
-	\class FontServer FontServer.h
+	\class FontManager FontManager.h
 	\brief Manager for the largest part of the font subsystem
 */
-class FontServer : public BLocker {
+class FontManager : public BLocker {
 	public:
-		FontServer();
-		~FontServer();
+		FontManager();
+		~FontManager();
 
 		status_t InitCheck() { return fInitStatus; }
 
@@ -82,6 +82,6 @@ class FontServer : public BLocker {
 };
 
 extern FT_Library gFreeTypeLibrary;
-extern FontServer *gFontServer;
+extern FontManager *gFontManager;
 
-#endif	/* FONTSERVER_H_ */
+#endif	/* FONT_MANAGER_H */

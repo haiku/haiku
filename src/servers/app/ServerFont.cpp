@@ -14,7 +14,7 @@
 #include <UTF8.h>
 
 #include "Angle.h"
-#include "FontServer.h"
+#include "FontManager.h"
 #include "moreUTF8.h"
 #include "truncate_string.h"
 
@@ -267,9 +267,9 @@ ServerFont::SetFamilyAndStyle(uint16 familyID, uint16 styleID)
 {
 	FontStyle* style = NULL;
 
-	if (gFontServer->Lock()) {
-		style = gFontServer->GetStyle(familyID, styleID);
-		gFontServer->Unlock();
+	if (gFontManager->Lock()) {
+		style = gFontManager->GetStyle(familyID, styleID);
+		gFontManager->Unlock();
 	}
 
 	if (!style)

@@ -16,7 +16,7 @@
 #include <Path.h>
 #include <String.h>
 
-#include <FontServer.h>
+#include <FontManager.h>
 #include <FontFamily.h>
 #include <ServerFont.h>
 #include "ServerConfig.h"
@@ -26,7 +26,7 @@
 
 static FTC_Manager ftmanager;
 FT_Library gFreeTypeLibrary;
-FontServer *gFontServer = NULL;
+FontManager *gFontManager = NULL;
 
 //#define PRINT_FONT_LIST
 
@@ -49,7 +49,7 @@ face_requester(FTC_FaceID face_id, FT_Library library,
 
 
 //! Does basic set up so that directories can be scanned
-FontServer::FontServer()
+FontManager::FontManager()
 	: BLocker("font server lock"),
 	fFamilies(20),
 	fPlain(NULL),
@@ -72,7 +72,7 @@ FontServer::FontServer()
 
 
 //! Frees items allocated in the constructor and shuts down FreeType
-FontServer::~FontServer()
+FontManager::~FontManager()
 {
 	FTC_Manager_Done(ftmanager);
 	FT_Done_FreeType(gFreeTypeLibrary);
@@ -84,7 +84,7 @@ FontServer::~FontServer()
 	\return The number of unique font families currently available
 */
 int32
-FontServer::CountFamilies(void)
+FontManager::CountFamilies(void)
 {
 	return fFamilies.CountItems();
 }
@@ -96,7 +96,7 @@ FontServer::CountFamilies(void)
 	\return The number of font styles currently available for the font family
 */
 int32
-FontServer::CountStyles(const char *familyName)
+FontManager::CountStyles(const char *familyName)
 {
 	FontFamily *family = GetFamily(familyName);
 	if (family)
@@ -111,7 +111,7 @@ FontServer::CountStyles(const char *familyName)
 	\param family The family to remove
 */
 void
-FontServer::RemoveFamily(const char *familyName)
+FontManager::RemoveFamily(const char *familyName)
 {
 	FontFamily *family = GetFamily(familyName);
 	if (family) {
@@ -123,7 +123,7 @@ FontServer::RemoveFamily(const char *familyName)
 
 //! Scans the four default system font folders
 void
-FontServer::ScanSystemFolders(void)
+FontManager::ScanSystemFolders(void)
 {
 	ScanDirectory("/boot/beos/etc/fonts/ttfonts/");
 	
@@ -140,7 +140,7 @@ FontServer::ScanSystemFolders(void)
 	\brief Adds the FontFamily/FontStyle that is represented by this path.
 */
 void
-FontServer::_AddFont(BPath &path)
+FontManager::_AddFont(BPath &path)
 {
 	FT_Face face;
 	FT_Error error = FT_New_Face(gFreeTypeLibrary, path.Path(), 0, &face);
@@ -181,7 +181,7 @@ FontServer::_AddFont(BPath &path)
 	\param directoryPath Path of the folder to scan.
 */
 status_t
-FontServer::ScanDirectory(const char *directoryPath)
+FontManager::ScanDirectory(const char *directoryPath)
 {
 	// This bad boy does all the real work. It loads each entry in the
 	// directory. If a valid font file, it adds both the family and the style.
@@ -232,7 +232,7 @@ FontServer::ScanDirectory(const char *directoryPath)
 	\return An FT_CharMap or NULL if unsuccessful
 */
 FT_CharMap
-FontServer::_GetSupportedCharmap(const FT_Face& face)
+FontManager::_GetSupportedCharmap(const FT_Face& face)
 {
 	for (int32 i = 0; i < face->num_charmaps; i++) {
 		FT_CharMap charmap = face->charmaps[i];
@@ -266,7 +266,7 @@ FontServer::_GetSupportedCharmap(const FT_Face& face)
 
 
 FontFamily*
-FontServer::GetFamilyByIndex(int32 index) const
+FontManager::GetFamilyByIndex(int32 index) const
 {
 	return fFamilies.ItemAt(index);
 }
@@ -278,7 +278,7 @@ FontServer::GetFamilyByIndex(int32 index) const
 	\return Pointer to the specified family or NULL if not found.
 */
 FontFamily*
-FontServer::GetFamily(const char* name) const
+FontManager::GetFamily(const char* name) const
 {
 	if (name == NULL)
 		return NULL;
@@ -296,7 +296,7 @@ FontServer::GetFamily(const char* name) const
 
 
 FontFamily*
-FontServer::GetFamily(uint16 familyID) const
+FontManager::GetFamily(uint16 familyID) const
 {
 	for (int32 i = 0; i < fFamilies.CountItems(); i++) {
 		FontFamily *family = (FontFamily*)fFamilies.ItemAt(i);
@@ -309,7 +309,7 @@ FontServer::GetFamily(uint16 familyID) const
 
 
 FontStyle*
-FontServer::GetStyleByIndex(const char* familyName, int32 index) const
+FontManager::GetStyleByIndex(const char* familyName, int32 index) const
 {
 	FontFamily* family = GetFamily(familyName);
 	if (family != NULL)
@@ -332,7 +332,7 @@ FontServer::GetStyleByIndex(const char* familyName, int32 index) const
 	\return The FontStyle having those attributes or NULL if not available
 */
 FontStyle*
-FontServer::GetStyle(const char* familyName, const char* styleName, uint16 familyID,
+FontManager::GetStyle(const char* familyName, const char* styleName, uint16 familyID,
 	uint16 styleID, uint16 face)
 {
 	FontFamily* family;
@@ -367,7 +367,7 @@ FontServer::GetStyle(const char* familyName, const char* styleName, uint16 famil
 	\return The FontStyle having those attributes or NULL if not available
 */
 FontStyle*
-FontServer::GetStyle(uint16 familyID, uint16 styleID)
+FontManager::GetStyle(uint16 familyID, uint16 styleID)
 {
 	FontFamily *family = GetFamily(familyID);
 	if (family)
@@ -384,7 +384,7 @@ FontServer::GetStyle(uint16 familyID, uint16 styleID)
 	Do NOT delete this object. If you access it, make a copy of it.
 */
 ServerFont*
-FontServer::GetSystemPlain()
+FontManager::GetSystemPlain()
 {
 	return fPlain;
 }
@@ -397,7 +397,7 @@ FontServer::GetSystemPlain()
 	Do NOT delete this object. If you access it, make a copy of it.
 */
 ServerFont*
-FontServer::GetSystemBold()
+FontManager::GetSystemBold()
 {
 	return fBold;
 }
@@ -410,7 +410,7 @@ FontServer::GetSystemBold()
 	Do NOT delete this object. If you access it, make a copy of it.
 */
 ServerFont*
-FontServer::GetSystemFixed()
+FontManager::GetSystemFixed()
 {
 	return fFixed;
 }
@@ -425,7 +425,7 @@ FontServer::GetSystemFixed()
 	
 */
 bool
-FontServer::SetSystemPlain(const char* familyName, const char* styleName, float size)
+FontManager::SetSystemPlain(const char* familyName, const char* styleName, float size)
 {
 	FontStyle *style = GetStyle(familyName, styleName);
 	if (style == NULL)
@@ -447,7 +447,7 @@ FontServer::SetSystemPlain(const char* familyName, const char* styleName, float 
 	
 */
 bool
-FontServer::SetSystemBold(const char* familyName, const char* styleName, float size)
+FontManager::SetSystemBold(const char* familyName, const char* styleName, float size)
 {
 	FontStyle *style = GetStyle(familyName, styleName);
 	if (style == NULL)
@@ -469,7 +469,7 @@ FontServer::SetSystemBold(const char* familyName, const char* styleName, float s
 	
 */
 bool
-FontServer::SetSystemFixed(const char* familyName, const char* styleName, float size)
+FontManager::SetSystemFixed(const char* familyName, const char* styleName, float size)
 {
 	FontStyle *style = GetStyle(familyName, styleName);
 	if (style == NULL)
