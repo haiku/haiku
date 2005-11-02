@@ -87,16 +87,17 @@ static void thread_kthread_exit(void);
  */
 
 static void
-insert_thread_into_team(struct team *p, struct thread *t)
+insert_thread_into_team(struct team *team, struct thread *thread)
 {
-	t->team_next = p->thread_list;
-	p->thread_list = t;
-	p->num_threads++;
-	if (p->num_threads == 1) {
+	thread->team_next = team->thread_list;
+	team->thread_list = thread;
+	team->num_threads++;
+
+	if (team->num_threads == 1) {
 		// this was the first thread
-		p->main_thread = t;
+		team->main_thread = thread;
 	}
-	t->team = p;
+	thread->team = team;
 }
 
 
@@ -105,18 +106,18 @@ insert_thread_into_team(struct team *p, struct thread *t)
  */
 
 static void
-remove_thread_from_team(struct team *p, struct thread *t)
+remove_thread_from_team(struct team *team, struct thread *thread)
 {
 	struct thread *temp, *last = NULL;
 
-	for (temp = p->thread_list; temp != NULL; temp = temp->team_next) {
-		if (temp == t) {
+	for (temp = team->thread_list; temp != NULL; temp = temp->team_next) {
+		if (temp == thread) {
 			if (last == NULL)
-				p->thread_list = temp->team_next;
+				team->thread_list = temp->team_next;
 			else
 				last->team_next = temp->team_next;
 
-			p->num_threads--;
+			team->num_threads--;
 			break;
 		}
 		last = temp;
@@ -127,10 +128,10 @@ remove_thread_from_team(struct team *p, struct thread *t)
 static int
 thread_struct_compare(void *_t, const void *_key)
 {
-	struct thread *t = _t;
+	struct thread *thread = _t;
 	const struct thread_key *key = _key;
 
-	if (t->id == key->id)
+	if (thread->id == key->id)
 		return 0;
 
 	return 1;
@@ -140,11 +141,11 @@ thread_struct_compare(void *_t, const void *_key)
 static uint32
 thread_struct_hash(void *_t, const void *_key, uint32 range)
 {
-	struct thread *t = _t;
+	struct thread *thread = _t;
 	const struct thread_key *key = _key;
 
-	if (t != NULL)
-		return t->id % range;
+	if (thread != NULL)
+		return thread->id % range;
 
 	return (uint32)key->id % range;
 }
@@ -159,83 +160,83 @@ thread_struct_hash(void *_t, const void *_key, uint32 range)
 static struct thread *
 create_thread_struct(const char *name, thread_id threadID)
 {
-	struct thread *t;
+	struct thread *thread;
 	cpu_status state;
 	char temp[64];
 
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
-	t = thread_dequeue(&dead_q);
+	thread = thread_dequeue(&dead_q);
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
 
-	if (t == NULL) {
-		t = (struct thread *)malloc(sizeof(struct thread));
-		if (t == NULL)
+	if (thread == NULL) {
+		thread = (struct thread *)malloc(sizeof(struct thread));
+		if (thread == NULL)
 			return NULL;
 	}
 
 	if (name != NULL)
-		strlcpy(t->name, name, B_OS_NAME_LENGTH);
+		strlcpy(thread->name, name, B_OS_NAME_LENGTH);
 	else
-		strcpy(t->name, "unnamed thread");
+		strcpy(thread->name, "unnamed thread");
 
-	t->id = threadID >= 0 ? threadID : allocate_thread_id();
-	t->team = NULL;
-	t->cpu = NULL;
-	t->sem.blocking = -1;
-	t->fault_handler = 0;
-	t->page_faults_allowed = 1;
-	t->kernel_stack_area = -1;
-	t->kernel_stack_base = 0;
-	t->user_stack_area = -1;
-	t->user_stack_base = 0;
-	t->user_local_storage = 0;
-	t->kernel_errno = 0;
-	t->team_next = NULL;
-	t->queue_next = NULL;
-	t->priority = -1;
-	t->args1 = NULL;  t->args2 = NULL;
-	t->sig_pending = 0;
-	t->sig_block_mask = 0;
-	memset(t->sig_action, 0, 32 * sizeof(struct sigaction));
-	t->in_kernel = true;
-	t->user_time = 0;
-	t->kernel_time = 0;
-	t->last_time = 0;
-	t->exit.status = 0;
-	t->exit.reason = 0;
-	list_init(&t->exit.waiters);
+	thread->id = threadID >= 0 ? threadID : allocate_thread_id();
+	thread->team = NULL;
+	thread->cpu = NULL;
+	thread->sem.blocking = -1;
+	thread->fault_handler = 0;
+	thread->page_faults_allowed = 1;
+	thread->kernel_stack_area = -1;
+	thread->kernel_stack_base = 0;
+	thread->user_stack_area = -1;
+	thread->user_stack_base = 0;
+	thread->user_local_storage = 0;
+	thread->kernel_errno = 0;
+	thread->team_next = NULL;
+	thread->queue_next = NULL;
+	thread->priority = -1;
+	thread->args1 = NULL;  thread->args2 = NULL;
+	thread->sig_pending = 0;
+	thread->sig_block_mask = 0;
+	memset(thread->sig_action, 0, 32 * sizeof(struct sigaction));
+	thread->in_kernel = true;
+	thread->user_time = 0;
+	thread->kernel_time = 0;
+	thread->last_time = 0;
+	thread->exit.status = 0;
+	thread->exit.reason = 0;
+	list_init(&thread->exit.waiters);
 
-	sprintf(temp, "thread_0x%lx_retcode_sem", t->id);
-	t->exit.sem = create_sem(0, temp);
-	if (t->exit.sem < B_OK)
+	sprintf(temp, "thread_0x%lx_retcode_sem", thread->id);
+	thread->exit.sem = create_sem(0, temp);
+	if (thread->exit.sem < B_OK)
 		goto err1;
 
-	sprintf(temp, "%s send", t->name);
-	t->msg.write_sem = create_sem(1, temp);
-	if (t->msg.write_sem < B_OK)
+	sprintf(temp, "%s send", thread->name);
+	thread->msg.write_sem = create_sem(1, temp);
+	if (thread->msg.write_sem < B_OK)
 		goto err2;
 
-	sprintf(temp, "%s receive", t->name);
-	t->msg.read_sem = create_sem(0, temp);
-	if (t->msg.read_sem < B_OK)
+	sprintf(temp, "%s receive", thread->name);
+	thread->msg.read_sem = create_sem(0, temp);
+	if (thread->msg.read_sem < B_OK)
 		goto err3;
 
-	if (arch_thread_init_thread_struct(t) < B_OK)
+	if (arch_thread_init_thread_struct(thread) < B_OK)
 		goto err4;
 
-	return t;
+	return thread;
 
 err4:
-	delete_sem(t->msg.read_sem);
+	delete_sem(thread->msg.read_sem);
 err3:
-	delete_sem(t->msg.write_sem);
+	delete_sem(thread->msg.write_sem);
 err2:
-	delete_sem(t->exit.sem);
+	delete_sem(thread->exit.sem);
 err1:
 	// ToDo: put them in the dead queue instead?
-	free(t);
+	free(thread);
 	return NULL;
 }
 
@@ -325,7 +326,7 @@ static thread_id
 create_thread(const char *name, team_id teamID, thread_entry_func entry,
 	void *args1, void *args2, int32 priority, bool kernel, thread_id threadID)
 {
-	struct thread *t, *currentThread;
+	struct thread *thread, *currentThread;
 	struct team *team;
 	cpu_status state;
 	char stack_name[B_OS_NAME_LENGTH];
@@ -335,29 +336,29 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 
 	TRACE(("create_thread(%s, id = %ld, %s)\n", name, threadID, kernel ? "kernel" : "user"));
 
-	t = create_thread_struct(name, threadID);
-	if (t == NULL)
+	thread = create_thread_struct(name, threadID);
+	if (thread == NULL)
 		return B_NO_MEMORY;
 
-	t->priority = priority == -1 ? B_NORMAL_PRIORITY : priority;
+	thread->priority = priority == -1 ? B_NORMAL_PRIORITY : priority;
 	// ToDo: this could be dangerous in case someone calls resume_thread() on us
-	t->state = B_THREAD_SUSPENDED;
-	t->next_state = B_THREAD_SUSPENDED;
+	thread->state = B_THREAD_SUSPENDED;
+	thread->next_state = B_THREAD_SUSPENDED;
 
 	// init debug structure
-	clear_thread_debug_info(&t->debug_info, false);
+	clear_thread_debug_info(&thread->debug_info, false);
 
-	snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%lx_kstack", name, t->id);
-	t->kernel_stack_area = create_area(stack_name, (void **)&t->kernel_stack_base,
+	snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%lx_kstack", name, thread->id);
+	thread->kernel_stack_area = create_area(stack_name, (void **)&thread->kernel_stack_base,
 		B_ANY_KERNEL_ADDRESS, KERNEL_STACK_SIZE, B_FULL_LOCK,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_KERNEL_STACK_AREA);
 
-	if (t->kernel_stack_area < 0) {
+	if (thread->kernel_stack_area < 0) {
 		// we're not yet part of a team, so we can just bail out
 		dprintf("create_thread: error creating kernel stack!\n");
 
-		status = t->kernel_stack_area;
-		delete_thread_struct(t);
+		status = thread->kernel_stack_area;
+		delete_thread_struct(thread);
 		return status;
 	}
 
@@ -378,14 +379,14 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 				| B_THREAD_DEBUG_POST_SYSCALL);
 		}
 
-		t->debug_info.flags = debugFlags;
+		thread->debug_info.flags = debugFlags;
 
 		// stop the new thread, if desired
 		debugNewThread = debugFlags & B_THREAD_DEBUG_STOP_CHILD_THREADS;
 	}
 
 	// insert into global list
-	hash_insert(sThreadHash, t);
+	hash_insert(sThreadHash, thread);
 	sUsedThreads++;
 	RELEASE_THREAD_LOCK();
 
@@ -401,64 +402,65 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 		if (debugNewThread
 			&& (atomic_get(&team->debug_info.flags)
 				& B_TEAM_DEBUG_DEBUGGER_INSTALLED)) {
-			t->debug_info.flags |= B_THREAD_DEBUG_STOP;
+			thread->debug_info.flags |= B_THREAD_DEBUG_STOP;
 		}
 
-		insert_thread_into_team(team, t);
+		insert_thread_into_team(team, thread);
 	} else
 		abort = true;
 
 	RELEASE_TEAM_LOCK();
 	if (abort) {
 		GRAB_THREAD_LOCK();
-		hash_remove(sThreadHash, t);
+		hash_remove(sThreadHash, thread);
 		RELEASE_THREAD_LOCK();
 	}
 	restore_interrupts(state);
 	if (abort) {
-		delete_area(t->kernel_stack_area);
-		delete_thread_struct(t);
+		delete_area(thread->kernel_stack_area);
+		delete_thread_struct(thread);
 		return B_BAD_TEAM_ID;
 	}
 
-	t->args1 = args1;
-	t->args2 = args2;
-	t->entry = entry;
-	status = t->id;
+	thread->args1 = args1;
+	thread->args2 = args2;
+	thread->entry = entry;
+	status = thread->id;
 
 	if (kernel) {
 		// this sets up an initial kthread stack that runs the entry
 
 		// Note: whatever function wants to set up a user stack later for this thread
 		// must initialize the TLS for it
-		arch_thread_init_kthread_stack(t, &_create_kernel_thread_kentry, &thread_kthread_entry, &thread_kthread_exit);
+		arch_thread_init_kthread_stack(thread, &_create_kernel_thread_kentry,
+			&thread_kthread_entry, &thread_kthread_exit);
 	} else {
 		// create user stack
 
 		// the stack will be between USER_STACK_REGION and the main thread stack area
 		// (the user stack of the main thread is created in team_create_team())
-		t->user_stack_base = USER_STACK_REGION;
-		t->user_stack_size = USER_STACK_SIZE;
+		thread->user_stack_base = USER_STACK_REGION;
+		thread->user_stack_size = USER_STACK_SIZE;
 
-		snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%lx_stack", name, t->id);
-		t->user_stack_area = create_area_etc(team, stack_name,
-				(void **)&t->user_stack_base, B_BASE_ADDRESS,
-				t->user_stack_size + TLS_SIZE, B_NO_LOCK,
+		snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%lx_stack", name, thread->id);
+		thread->user_stack_area = create_area_etc(team, stack_name,
+				(void **)&thread->user_stack_base, B_BASE_ADDRESS,
+				thread->user_stack_size + TLS_SIZE, B_NO_LOCK,
 				B_READ_AREA | B_WRITE_AREA | B_STACK_AREA);
-		if (t->user_stack_area < 0) {
+		if (thread->user_stack_area < 0) {
 			// great, we have a fully running thread without a stack
 			dprintf("create_thread: unable to create user stack!\n");
-			status = t->user_stack_area;
-			kill_thread(t->id);
+			status = thread->user_stack_area;
+			kill_thread(thread->id);
 		} else {
 			// now that the TLS area is allocated, initialize TLS
-			arch_thread_init_tls(t);
+			arch_thread_init_tls(thread);
 		}
 
 		// copy the user entry over to the args field in the thread struct
 		// the function this will call will immediately switch the thread into
 		// user space.
-		arch_thread_init_kthread_stack(t, &_create_user_thread_kentry, &thread_kthread_entry, &thread_kthread_exit);
+		arch_thread_init_kthread_stack(thread, &_create_user_thread_kentry, &thread_kthread_entry, &thread_kthread_exit);
 	}
 
 	return status;
@@ -498,44 +500,44 @@ state_to_text(struct thread *thread, int32 state)
 static struct thread *last_thread_dumped = NULL;
 
 static void
-_dump_thread_info(struct thread *t)
+_dump_thread_info(struct thread *thread)
 {
-	kprintf("THREAD: %p\n", t);
-	kprintf("id:                 0x%lx\n", t->id);
-	kprintf("name:               \"%s\"\n", t->name);
+	kprintf("THREAD: %p\n", thread);
+	kprintf("id:                 0x%lx\n", thread->id);
+	kprintf("name:               \"%s\"\n", thread->name);
 	kprintf("all_next:           %p\nteam_next:          %p\nq_next:             %p\n",
-		t->all_next, t->team_next, t->queue_next);
-	kprintf("priority:           %ld\n", t->priority);
-	kprintf("state:              %s\n", state_to_text(t, t->state));
-	kprintf("next_state:         %s\n", state_to_text(t, t->next_state));
-	kprintf("cpu:                %p ", t->cpu);
-	if (t->cpu)
-		kprintf("(%d)\n", t->cpu->info.cpu_num);
+		thread->all_next, thread->team_next, thread->queue_next);
+	kprintf("priority:           %ld\n", thread->priority);
+	kprintf("state:              %s\n", state_to_text(thread, thread->state));
+	kprintf("next_state:         %s\n", state_to_text(thread, thread->next_state));
+	kprintf("cpu:                %p ", thread->cpu);
+	if (thread->cpu)
+		kprintf("(%d)\n", thread->cpu->info.cpu_num);
 	else
 		kprintf("\n");
-	kprintf("sig_pending:        0x%lx\n", t->sig_pending);
-	kprintf("in_kernel:          %d\n", t->in_kernel);
-	kprintf("  sem.blocking:     0x%lx\n", t->sem.blocking);
-	kprintf("  sem.count:        0x%lx\n", t->sem.count);
-	kprintf("  sem.acquire_status: 0x%lx\n", t->sem.acquire_status);
-	kprintf("  sem.flags:        0x%lx\n", t->sem.flags);
-	kprintf("fault_handler:      %p\n", (void *)t->fault_handler);
-	kprintf("args:               %p %p\n", t->args1, t->args2);
-	kprintf("entry:              %p\n", (void *)t->entry);
-	kprintf("team:               %p, \"%s\"\n", t->team, t->team->name);
-	kprintf("exit.sem:           0x%lx\n", t->exit.sem);
-	kprintf("kernel_stack_area:  0x%lx\n", t->kernel_stack_area);
-	kprintf("kernel_stack_base:  %p\n", (void *)t->kernel_stack_base);
-	kprintf("user_stack_area:    0x%lx\n", t->user_stack_area);
-	kprintf("user_stack_base:    %p\n", (void *)t->user_stack_base);
-	kprintf("user_local_storage: %p\n", (void *)t->user_local_storage);
-	kprintf("kernel_errno:       %d\n", t->kernel_errno);
-	kprintf("kernel_time:        %Ld\n", t->kernel_time);
-	kprintf("user_time:          %Ld\n", t->user_time);
+	kprintf("sig_pending:        0x%lx\n", thread->sig_pending);
+	kprintf("in_kernel:          %d\n", thread->in_kernel);
+	kprintf("  sem.blocking:     0x%lx\n", thread->sem.blocking);
+	kprintf("  sem.count:        0x%lx\n", thread->sem.count);
+	kprintf("  sem.acquire_status: 0x%lx\n", thread->sem.acquire_status);
+	kprintf("  sem.flags:        0x%lx\n", thread->sem.flags);
+	kprintf("fault_handler:      %p\n", (void *)thread->fault_handler);
+	kprintf("args:               %p %p\n", thread->args1, thread->args2);
+	kprintf("entry:              %p\n", (void *)thread->entry);
+	kprintf("team:               %p, \"%s\"\n", thread->team, thread->team->name);
+	kprintf("exit.sem:           0x%lx\n", thread->exit.sem);
+	kprintf("kernel_stack_area:  0x%lx\n", thread->kernel_stack_area);
+	kprintf("kernel_stack_base:  %p\n", (void *)thread->kernel_stack_base);
+	kprintf("user_stack_area:    0x%lx\n", thread->user_stack_area);
+	kprintf("user_stack_base:    %p\n", (void *)thread->user_stack_base);
+	kprintf("user_local_storage: %p\n", (void *)thread->user_local_storage);
+	kprintf("kernel_errno:       %d\n", thread->kernel_errno);
+	kprintf("kernel_time:        %Ld\n", thread->kernel_time);
+	kprintf("user_time:          %Ld\n", thread->user_time);
 	kprintf("architecture dependant section:\n");
-	arch_thread_dump_info(&t->arch_info);
+	arch_thread_dump_info(&thread->arch_info);
 
-	last_thread_dumped = t;
+	last_thread_dumped = thread;
 }
 
 
@@ -543,7 +545,7 @@ static int
 dump_thread_info(int argc, char **argv)
 {
 	const char *name = NULL;
-	struct thread *t;
+	struct thread *thread;
 	int32 id = -1;
 	struct hash_iterator i;
 	bool found = false;
@@ -569,9 +571,9 @@ dump_thread_info(int argc, char **argv)
 
 	// walk through the thread list, trying to match name or id
 	hash_open(sThreadHash, &i);
-	while ((t = hash_next(sThreadHash, &i)) != NULL) {
-		if ((name != NULL && !strcmp(name, t->name)) || t->id == id) {
-			_dump_thread_info(t);
+	while ((thread = hash_next(sThreadHash, &i)) != NULL) {
+		if ((name != NULL && !strcmp(name, thread->name)) || thread->id == id) {
+			_dump_thread_info(thread);
 			found = true;
 			break;
 		}
@@ -587,9 +589,10 @@ dump_thread_info(int argc, char **argv)
 static int
 dump_thread_list(int argc, char **argv)
 {
-	struct thread *t;
+	struct thread *thread;
 	struct hash_iterator i;
 	int32 requiredState = 0;
+	team_id team = -1;
 	sem_id sem = -1;
 
 	if (!strcmp(argv[0], "ready"))
@@ -604,32 +607,38 @@ dump_thread_list(int argc, char **argv)
 			if (sem == 0)
 				kprintf("ignoring invalid semaphore argument.\n");
 		}
+	} else if (argc > 1) {
+		team = strtoul(argv[1], NULL, 0);
+		if (team == 0)
+			kprintf("ignoring invalid team argument.\n");
 	}
 
-	kprintf("thread         id  state       sem cpu  stack       name\n");
+	kprintf("thread         id  state       sem cpu  stack      team  name\n");
 
 	hash_open(sThreadHash, &i);
-	while ((t = hash_next(sThreadHash, &i)) != NULL) {
-		if (requiredState && t->state != requiredState)
-			continue;
-		if (sem > 0 && t->sem.blocking != sem)
+	while ((thread = hash_next(sThreadHash, &i)) != NULL) {
+		// filter out threads not matching the search criteria
+		if ((requiredState && thread->state != requiredState)
+			|| (sem > 0 && thread->sem.blocking != sem)
+			|| (team > 0 && thread->team->id != team))
 			continue;
 
-		kprintf("%p %6lx  %-9s", t, t->id, state_to_text(t, t->state));
+		kprintf("%p %6lx  %-9s", thread, thread->id, state_to_text(thread, thread->state));
 
 		// does it block on a semaphore?
-		if (t->state == B_THREAD_WAITING)
-			kprintf("%6lx  ", t->sem.blocking);
+		if (thread->state == B_THREAD_WAITING)
+			kprintf("%6lx  ", thread->sem.blocking);
 		else
 			kprintf("     -  ");
 
 		// on which CPU does it run?
-		if (t->cpu)
-			kprintf("%2d", t->cpu->info.cpu_num);
+		if (thread->cpu)
+			kprintf("%2d", thread->cpu->info.cpu_num);
 		else
 			kprintf(" -");
 
-		kprintf("  %p  %s\n", (void *)t->kernel_stack_base, t->name != NULL ? t->name : "<NULL>");
+		kprintf("  %p%5lx  %s\n", (void *)thread->kernel_stack_base,
+			thread->team->id, thread->name != NULL ? thread->name : "<NULL>");
 	}
 	hash_close(sThreadHash, &i, false);
 	return 0;
@@ -639,16 +648,16 @@ dump_thread_list(int argc, char **argv)
 static int
 dump_next_thread_in_q(int argc, char **argv)
 {
-	struct thread *t = last_thread_dumped;
+	struct thread *thread = last_thread_dumped;
 
-	if (t == NULL) {
+	if (thread == NULL) {
 		kprintf("no thread previously dumped. Examine a thread first.\n");
 		return 0;
 	}
 
-	kprintf("next thread in queue after thread @ %p\n", t);
-	if (t->queue_next != NULL)
-		_dump_thread_info(t->queue_next);
+	kprintf("next thread in queue after thread @ %p\n", thread);
+	if (thread->queue_next != NULL)
+		_dump_thread_info(thread->queue_next);
 	else
 		kprintf("NULL\n");
 
@@ -659,16 +668,16 @@ dump_next_thread_in_q(int argc, char **argv)
 static int
 dump_next_thread_in_all_list(int argc, char **argv)
 {
-	struct thread *t = last_thread_dumped;
+	struct thread *thread = last_thread_dumped;
 
-	if (t == NULL) {
+	if (thread == NULL) {
 		kprintf("no thread previously dumped. Examine a thread first.\n");
 		return 0;
 	}
 
-	kprintf("next thread in global list after thread @ %p\n", t);
-	if (t->all_next != NULL)
-		_dump_thread_info(t->all_next);
+	kprintf("next thread in global list after thread @ %p\n", thread);
+	if (thread->all_next != NULL)
+		_dump_thread_info(thread->all_next);
 	else
 		kprintf("NULL\n");
 
@@ -679,16 +688,16 @@ dump_next_thread_in_all_list(int argc, char **argv)
 static int
 dump_next_thread_in_team(int argc, char **argv)
 {
-	struct thread *t = last_thread_dumped;
+	struct thread *thread = last_thread_dumped;
 
-	if (t == NULL) {
+	if (thread == NULL) {
 		kprintf("no thread previously dumped. Examine a thread first.\n");
 		return 0;
 	}
 
-	kprintf("next thread in team after thread @ %p\n", t);
-	if (t->team_next != NULL)
-		_dump_thread_info(t->team_next);
+	kprintf("next thread in team after thread @ %p\n", thread);
+	if (thread->team_next != NULL)
+		_dump_thread_info(thread->team_next);
 	else
 		kprintf("NULL\n");
 
@@ -1028,18 +1037,18 @@ thread_exit(void)
 struct thread *
 thread_get_thread_struct(thread_id id)
 {
-	struct thread *t;
+	struct thread *thread;
 	cpu_status state;
 
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
-	t = thread_get_thread_struct_locked(id);
+	thread = thread_get_thread_struct_locked(id);
 
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
 
-	return t;
+	return thread;
 }
 
 
@@ -1159,27 +1168,27 @@ thread_dequeue(struct thread_queue *queue)
 
 
 struct thread *
-thread_dequeue_id(struct thread_queue *q, thread_id thr_id)
+thread_dequeue_id(struct thread_queue *q, thread_id id)
 {
-	struct thread *t;
+	struct thread *thread;
 	struct thread *last = NULL;
 
-	t = q->head;
-	while (t != NULL) {
-		if (t->id == thr_id) {
+	thread = q->head;
+	while (thread != NULL) {
+		if (thread->id == id) {
 			if (last == NULL)
-				q->head = t->queue_next;
+				q->head = thread->queue_next;
 			else
-				last->queue_next = t->queue_next;
+				last->queue_next = thread->queue_next;
 
-			if (q->tail == t)
+			if (q->tail == thread)
 				q->tail = last;
 			break;
 		}
-		last = t;
-		t = t->queue_next;
+		last = thread;
+		thread = thread->queue_next;
 	}
-	return t;
+	return thread;
 }
 
 
