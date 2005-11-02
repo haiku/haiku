@@ -13,7 +13,6 @@
 #include <Looper.h>
 #include <ObjectLocker.h>
 #include <Partition.h>
-#include <Session.h>
 
 using BPrivate::BObjectLocker;
 
