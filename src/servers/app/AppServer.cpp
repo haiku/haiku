@@ -5,6 +5,7 @@
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 #include <unistd.h>
@@ -405,7 +406,7 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 			while (fDesktops.CountItems() > 0) {
 				Desktop *desktop = fDesktops.RemoveItemAt(0);
 
-				thread_id thread = sDesktop->Thread();
+				thread_id thread = desktop->Thread();
 				desktop->PostMessage(B_QUIT_REQUESTED);
 
 				// we just wait for the desktop to kill itself
