@@ -20,9 +20,11 @@
 #include <ctype.h>
 
 #include <sys/socket.h>
-#include <arpa/inet.h>
 #include <sys/time.h>
-#include <sys/select.h>
+#ifndef HAIKU_TARGET_PLATFORM_BEOS // These headers don't exist in BeOS R5.
+	#include <arpa/inet.h>
+	#include <sys/select.h>
+#endif
 
 #ifdef USESSL
 	#include <openssl/ssl.h>
@@ -160,7 +162,7 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMai
 		return;
 	}
 	
-#ifdef BONE
+#ifndef HAIKU_TARGET_PLATFORM_BEOS
 	net = socket(AF_INET, SOCK_STREAM, 0);
 #else
 	net = socket(AF_INET, 2, 0);
@@ -173,7 +175,7 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMai
 		saAddr.sin_addr.s_addr = hostIP;
 		int result = connect(net, (struct sockaddr *) &saAddr, sizeof(saAddr));
 		if (result < 0) {
-		#ifdef BONE
+		#ifndef HAIKU_TARGET_PLATFORM_BEOS
 			close(net);
 		#else
 			closesocket(net);
@@ -222,7 +224,7 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMai
 			error << ". (SSL Connection Error)";
 			runner->ShowError(error.String());
 			SSL_CTX_free(ctx);
-			#ifdef BONE
+			#ifndef HAIKU_TARGET_PLATFORM_BEOS
 				close(net);
 			#else
 				closesocket(net);
@@ -293,7 +295,7 @@ IMAP4Client::~IMAP4Client() {
 		}
 	#endif
 		
-	#ifdef BONE
+	#ifndef HAIKU_TARGET_PLATFORM_BEOS
 		close(net);
 	#else
 		closesocket(net);
@@ -966,7 +968,7 @@ IMAP4Client::ReceiveLine(BString &out)
 						SSL_CTX_free(ctx);
 				}
 			#endif
-			#ifdef BONE
+			#ifndef HAIKU_TARGET_PLATFORM_BEOS
 				close(net);
 			#else
 				closesocket(net);
@@ -1050,7 +1052,7 @@ int IMAP4Client::GetResponse(BString &tag, NestedString *parsed_response, bool r
 						SSL_CTX_free(ctx);
 				}
 			#endif
-			#ifdef BONE
+			#ifndef HAIKU_TARGET_PLATFORM_BEOS
 				close(net);
 			#else
 				closesocket(net);
