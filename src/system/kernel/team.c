@@ -90,21 +90,26 @@ static int dump_team_info(int argc, char **argv);
 static void
 _dump_team_info(struct team *team)
 {
-	dprintf("TEAM: %p\n", team);
-	dprintf("id:          0x%lx\n", team->id);
-	dprintf("name:        '%s'\n", team->name);
-	dprintf("next:        %p\n", team->next);
-	dprintf("parent:      %p\n", team->parent);
-	dprintf("children:    %p\n", team->children);
-	dprintf("num_threads: %d\n", team->num_threads);
-	dprintf("state:       %d\n", team->state);
-	dprintf("pending_signals: 0x%x\n", team->pending_signals);
-	dprintf("io_context:  %p\n", team->io_context);
+	kprintf("TEAM: %p\n", team);
+	kprintf("id:          0x%lx\n", team->id);
+	kprintf("name:        '%s'\n", team->name);
+	kprintf("next:        %p\n", team->next);
+	kprintf("parent:      %p", team->parent);
+	if (team->parent != NULL) {
+		kprintf(" (id = 0x%lx)\n", team->parent->id);
+	} else
+		kprintf("\n");
+
+	kprintf("children:    %p\n", team->children);
+	kprintf("num_threads: %d\n", team->num_threads);
+	kprintf("state:       %d\n", team->state);
+	kprintf("pending_signals: 0x%x\n", team->pending_signals);
+	kprintf("io_context:  %p\n", team->io_context);
 	if (team->aspace)
-		dprintf("aspace:      %p (id = %ld)\n", team->aspace, team->aspace->id);
-	dprintf("kaspace:     %p\n", team->kaspace);
-	dprintf("main_thread: %p\n", team->main_thread);
-	dprintf("thread_list: %p\n", team->thread_list);
+		kprintf("aspace:      %p (id = 0x%lx)\n", team->aspace, team->aspace->id);
+	kprintf("kaspace:     %p\n", team->kaspace);
+	kprintf("main_thread: %p\n", team->main_thread);
+	kprintf("thread_list: %p\n", team->thread_list);
 }
 
 
