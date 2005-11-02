@@ -1230,19 +1230,12 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<uint16>(&styleID);
 
 			gFontServer->Lock();
+
 			FontStyle *fontStyle = gFontServer->GetStyle(familyID, styleID);
 			if (fontStyle != NULL) {
-				font_family family;
-				font_style style;
-
-				strncpy(family, fontStyle->Family()->Name(), sizeof(font_family) - 1);
-				family[sizeof(font_family) - 1] = 0;
-				strncpy(style, fontStyle->Name(), sizeof(font_style) - 1);
-				style[sizeof(font_style) - 1] = 0;
-
 				fLink.StartMessage(B_OK);
-				fLink.Attach(family, sizeof(font_family));
-				fLink.Attach(style, sizeof(font_style));
+				fLink.AttachString(fontStyle->Family()->Name());
+				fLink.AttachString(fontStyle->Name());
 			} else
 				fLink.StartMessage(B_BAD_VALUE);
 

@@ -151,18 +151,18 @@ count_font_families(void)
 */
 
 int32
-count_font_styles(font_family name)
+count_font_styles(font_family family)
 {
-	int32 code, count;
 	BPrivate::AppServerLink link;
-
 	link.StartMessage(AS_COUNT_FONT_STYLES);
-	link.Attach(name, sizeof(font_family));
+	link.AttachString(family);
 
+	int32 code;
 	if (link.FlushWithReply(code) != B_OK
 		|| code != B_OK)
 		return -1;
 
+	int32 count;
 	link.Read<int32>(&count);
 	return count;
 }
@@ -177,28 +177,26 @@ count_font_styles(font_family name)
 */
 
 status_t
-get_font_family(int32 index, font_family *name, uint32 *flags)
+get_font_family(int32 index, font_family *_name, uint32 *_flags)
 {
-	// Fix over R5, which does not check for NULL font family names - it just crashes
-	if (!name)
+	if (_name == NULL)
 		return B_BAD_VALUE;
 
-	int32 code;
 	BPrivate::AppServerLink link;
-	
 	link.StartMessage(AS_GET_FAMILY_NAME);
 	link.Attach<int32>(index);
 
-	if (link.FlushWithReply(code) != B_OK
-		|| code != B_OK)
-		return B_ERROR;
+	int32 status = B_ERROR;
+	if (link.FlushWithReply(status) != B_OK
+		|| status != B_OK)
+		return status;
 
-	link.Read<font_family>(name);
-	
-	uint32 value;
-	link.Read<uint32>(&value);
-	if (flags)
-		*flags = value;
+	link.ReadString(*_name, sizeof(font_family));
+
+	uint32 flags;
+	link.Read<uint32>(&flags);
+	if (_flags)
+		*_flags = flags;
 
 	return B_OK;
 }
@@ -549,13 +547,13 @@ BFont::GetFamilyAndStyle(font_family *family, font_style *style) const
 	if (link.FlushWithReply(code) != B_OK
 		|| code != B_OK) {
 		// the least we can do is to clear the buffers
-		memset(family, 0, sizeof(font_family));
-		memset(style, 0, sizeof(font_style));
+		memset(*family, 0, sizeof(font_family));
+		memset(*style, 0, sizeof(font_style));
 		return;
 	}
 
-	link.Read<font_family>(family);
-	link.Read<font_style>(style);
+	link.ReadString(*family, sizeof(font_family));
+	link.ReadString(*style, sizeof(font_style));
 }
 
 
@@ -847,9 +845,7 @@ BFont::GetStringWidths(const char *stringArray[], const int32 lengthArray[],
 	if (!stringArray || !lengthArray || numStrings < 1 || !widthArray)
 		return;
 
-	int32 code;
 	BPrivate::AppServerLink link;
-
 	link.StartMessage(AS_GET_STRING_WIDTHS);
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
@@ -862,6 +858,7 @@ BFont::GetStringWidths(const char *stringArray[], const int32 lengthArray[],
 		link.AttachString(stringArray[i]);
 	}
 
+	int32 code;
 	if (link.FlushWithReply(code) != B_OK
 		|| code != B_OK)
 		return;
@@ -884,11 +881,7 @@ BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *
 	if (!charArray || numChars < 1 || !escapementArray)
 		return;
 
-	// NOTE: The R5 implementation crashes if delta == NULL!
-
-	int32 code;
 	BPrivate::AppServerLink link;
-	
 	link.StartMessage(AS_GET_ESCAPEMENTS_AS_FLOATS);
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
@@ -898,7 +891,7 @@ BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *
 
 	link.Attach<float>(delta ? delta->nonspace : 0.0);
 	link.Attach<float>(delta ? delta->space : 0.0);
-	
+
 	// TODO: Should we not worry about the port capacity here?!?
 	link.Attach<int32>(numChars);
 
@@ -906,6 +899,7 @@ BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *
 	link.Attach<int32>(bytesInBuffer);
 	link.Attach(charArray, bytesInBuffer);
 
+	int32 code;
 	if (link.FlushWithReply(code) != B_OK
 		|| code != B_OK)
 		return;
@@ -929,9 +923,7 @@ BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *
 	if (!charArray || numChars < 1 || !escapementArray)
 		return;
 
-	int32 code;
 	BPrivate::AppServerLink link;
-
 	link.StartMessage(AS_GET_ESCAPEMENTS);
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
@@ -956,6 +948,7 @@ BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *
 		}
 	}
 
+	int32 code;
 	if (link.FlushWithReply(code) != B_OK
 		|| code != B_OK)
 		return;
