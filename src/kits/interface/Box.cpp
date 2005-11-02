@@ -1,29 +1,14 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Box.cpp
-//	Author:			Marc Flerackers (mflerackers@androme.be)
-//	Description:	BBox objects group views together and draw a border
-//                  around them.
-//------------------------------------------------------------------------------
+/*
+ * Copyright (c) 2001-2005, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Marc Flerackers (mflerackers@androme.be)
+ *		Stephan Aßmus <superstippi@gmx.de>
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ */
+
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -149,7 +134,7 @@ BBox::SetLabel(BView *viewLabel)
 		// Update fBounds
 		fBounds = Bounds();
 
-		fBounds.top = (float)ceil(viewLabel->Bounds().Height() / 2.0f);
+		fBounds.top = ceilf(viewLabel->Bounds().Height() / 2.0f);
 
 		fLabelView = viewLabel;
 		fLabelView->MoveTo(10.0f, 0.0f);
@@ -243,32 +228,42 @@ void
 BBox::FrameResized(float width, float height)
 {
 	BRect bounds(Bounds());
-	BRect r;
+
+	// invalidate the regions that the app_server did not
+	// (for removing the previous or drawing the new border)
+	if (fStyle != B_NO_BORDER) {
 	
-	if(fBounds.right < bounds.right)
-	{
-		r.left = fBounds.right;
-		r.top = 0;
-		r.right = bounds.right;
-		
-		if(fBounds.bottom < bounds.bottom)
-			r.bottom = bounds.bottom;
-		else
-			r.bottom = fBounds.bottom;
-		
-		Invalidate(r);
+		int32 borderSize = fStyle == B_PLAIN_BORDER ? 0 : 1;
+	
+		BRect invalid(bounds);
+		if (fBounds.right < bounds.right) {
+			// enlarging
+			invalid.left = fBounds.right - borderSize;
+			invalid.right = fBounds.right;
+
+			Invalidate(invalid);
+		} else if (fBounds.right > bounds.right) {
+			// shrinking
+			invalid.left = bounds.right - borderSize;
+
+			Invalidate(invalid);
+		}
+	
+		invalid = bounds;
+		if (fBounds.bottom < bounds.bottom) {
+			// enlarging
+			invalid.top = fBounds.bottom - borderSize;
+			invalid.bottom = fBounds.bottom;
+
+			Invalidate(invalid);
+		} else if (fBounds.bottom > bounds.bottom) {
+			// shrinking
+			invalid.top = bounds.bottom - borderSize;
+
+			Invalidate(invalid);
+		}
 	}
-	
-	if(fBounds.bottom < bounds.bottom)
-	{
-		r.left = 0;
-		r.top = fBounds.bottom;
-		r.right = bounds.right;
-		r.bottom = bounds.bottom;
-		
-		Invalidate(r);
-	}
-	
+
 	fBounds.right = bounds.right;
 	fBounds.bottom = bounds.bottom;
 }
@@ -335,18 +330,46 @@ BBox::ResizeToPreferred()
 void
 BBox::GetPreferredSize(float *width, float *height)
 {
-/*	BRect rect(0,0,99,99);
-
-	if (Parent())
-	{
-		rect = Parent()->Bounds();
-		rect.InsetBy(10,10);
+	bool label = true;
+	// acount for label
+	if (fLabelView) {
+		fLabelView->GetPreferredSize(width, height);
+		*width += 10.0;
+			// the label view is placed 10 pixels from the left
+	} else if (fLabel) {
+		font_height fh;
+		GetFontHeight(&fh);
+		*width += ceilf(StringWidth(fLabel));
+		*height += ceilf(fh.ascent + fh.descent);
+	} else {
+		label = false;
+		*width = 0;
+		*height = 0;
 	}
-	
-	*width = rect.Width();
-	*height = rect.Height();*/
-
-	BView::GetPreferredSize(width, height);
+	// acount for border
+	switch (fStyle) {
+		case B_NO_BORDER:
+			break;
+		case B_PLAIN_BORDER:
+			// label: (1 pixel for border + 1 pixel for padding) * 2
+			// no label: (1 pixel for border) * 2 + 1 pixel for padding
+			*width += label ? 4 : 3;
+			// label: 1 pixel for bottom border + 1 pixel for padding
+			// no label: (1 pixel for border) * 2 + 1 pixel for padding
+			*height += label ? 2 : 3;
+			break;
+		case B_FANCY_BORDER:
+			// label: (2 pixel for border + 1 pixel for padding) * 2
+			// no label: (2 pixel for border) * 2 + 1 pixel for padding
+			*width += label ? 6 : 5;
+			// label: 2 pixel for bottom border + 1 pixel for padding
+			// no label: (2 pixel for border) * 2 + 1 pixel for padding
+			*height += label ? 3 : 5;
+			break;
+	}
+	// NOTE: children are ignored, you can use BBox::GetPreferredSize()
+	// to get the minimum size of this object, then add the size
+	// of your child(ren) plus inner padding for the final size
 }
 
 
