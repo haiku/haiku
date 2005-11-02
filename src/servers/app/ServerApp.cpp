@@ -1297,8 +1297,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			FontStyle *fontStyle = gFontServer->GetStyle(familyID, styleID);
 			if (fontStyle) {
-				font_direction direction = fontStyle->Direction();
-
 				fLink.StartMessage(B_OK);
 				fLink.Attach<uint16>((uint16)fontStyle->FileFormat());
 			} else
