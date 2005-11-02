@@ -1196,41 +1196,51 @@ BMenu::_AddItem(BMenuItem *item, int32 index)
 
 
 bool
-BMenu::RemoveItems(int32 index, int32 count, BMenuItem *_item, bool del)
+BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool del)
 {
-	bool result = false;
+	bool success = false;
+	bool invalidateLayout = false;
 	 
 	// The plan is simple: If we're given a BMenuItem directly, we use it
 	// and ignore index and count. Otherwise, we use them instead.
-	if (_item != NULL) {
-		fItems.RemoveItem(_item);
-		_item->SetSuper(NULL);
-		_item->Uninstall();	
-		if (del)
-			delete _item;
-		result = true;
+	if (item != NULL) {
+		if (fItems.RemoveItem(item)) {
+			item->SetSuper(NULL);
+			item->Uninstall();	
+			if (del)
+				delete item;
+			success = invalidateLayout = true;
+		}
 	} else {
-		BMenuItem *item = NULL;	
 		// We iterate backwards because it's simpler
-		// TODO: We should check if index and count are in bounds.
-		for (int32 i = index + count - 1; i >= index; i--) {
-			item = static_cast<BMenuItem *>(fItems.ItemAt(i));
+		int32 i = min_c(index + count - 1, fItems.CountItems() - 1);
+		// NOTE: the range check for "index" is done after
+		// calculating the last index to be removed, so
+		// that the range is not "shifted" unintentionally
+		index = max_c(0, index);
+		for (; i >= index; i--) {
+			item = static_cast<BMenuItem*>(fItems.ItemAt(i));
 			if (item != NULL) {
-				fItems.RemoveItem(item);
-				item->SetSuper(NULL);
-				item->Uninstall();
-				if (del)
-					delete item;
-				if (!result)
-					result = true;
+				if (fItems.RemoveItem(item)) {
+					item->SetSuper(NULL);
+					item->Uninstall();
+					if (del)
+						delete item;
+					success = true;
+					invalidateLayout = true;
+				} else {
+					// operation not entirely successful
+					success = false;
+					break;
+				}
 			}
 		}
 	}	
 	
-	if (Window() != NULL && fResizeToFit)
+	if (invalidateLayout && Window() != NULL && fResizeToFit)
 		InvalidateLayout();
 		
-	return result;
+	return success;
 }
 
 
