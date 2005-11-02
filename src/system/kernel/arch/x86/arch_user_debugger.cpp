@@ -442,7 +442,6 @@ i386_handle_debug_exception(struct iframe *frame)
 			user_debug_watchpoint_hit();
 		else
 			user_debug_breakpoint_hit(false);
-		
 	} else if (dr6 & (1 << X86_DR6_BD)) {
 		// general detect exception
 		// Occurs only, if GD in DR7 is set (which we don't do) and someone
@@ -451,7 +450,6 @@ i386_handle_debug_exception(struct iframe *frame)
 			"detect exception\n");
 
 		enable_interrupts();
-
 	} else if ((dr6 & (1 << X86_DR6_BS)) || sQEmuSingleStepHack) {
 		// single step
 
@@ -459,7 +457,6 @@ i386_handle_debug_exception(struct iframe *frame)
 		enable_interrupts();
 
 		user_debug_single_stepped();
-
 	} else if (dr6 & (1 << X86_DR6_BT)) {
 		// task switch
 		// Occurs only, if T in EFLAGS is set (which we don't do).
@@ -467,10 +464,9 @@ i386_handle_debug_exception(struct iframe *frame)
 			"exception\n");
 
 		enable_interrupts();
-
 	} else {
-		dprintf("i386_handle_debug_exception(): ignoring spurious debug "
-			"exception (no condition recognized)\n");
+		TRACE(("i386_handle_debug_exception(): ignoring spurious debug "
+			"exception (no condition recognized)\n"));
 
 		enable_interrupts();
 	}
