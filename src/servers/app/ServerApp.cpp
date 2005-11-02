@@ -1852,7 +1852,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				font.SetRotation(rotation);
 				font.SetFlags(flags);
 
-				if (font.GetEscapements(charArray, numChars, escapements, delta)) {
+				if (font.GetEscapements(charArray, numChars, numBytes, escapements, delta)) {
 					fLink.StartMessage(B_OK);
 					fLink.Attach(escapements, numChars * sizeof(float));
 				} else

@@ -509,7 +509,7 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 
 // GetEscapements
 bool
-ServerFont::GetEscapements(const char charArray[], int32 numChars,
+ServerFont::GetEscapements(const char charArray[], int32 numChars, int32 numBytes,
 						   float widthArray[], escapement_delta delta) const
 {
 	if (!fStyle || !charArray || numChars <= 0)
@@ -525,7 +525,6 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 	// UTF8 handling...this can probably be smarter
 	// Here is what I do in the AGGTextRenderer to handle UTF8...
 	// It is probably highly inefficient, so it should be reviewed.
-	int32 numBytes = UTF8CountBytes(charArray, numChars);
 	int32 convertedLength = numBytes * 2;
 	char* convertedBuffer = new char[convertedLength];
 
@@ -631,7 +630,7 @@ ServerFont::GetBoundingBoxesForStrings(char *charArray[], int32 lengthArray[],
 	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
 
 	for (int32 i=0; i<numStrings; i++) {
-		
+		// TODO: ...
 
 	}
 
@@ -717,7 +716,7 @@ ServerFont::TruncateString(BString* inOut, uint32 mode, float width) const
 		// get the escapement of each glyph in font units
 		float* escapementArray = new float[numChars];
 		static escapement_delta delta = (escapement_delta){ 0.0, 0.0 };
-		GetEscapements(string, numChars, escapementArray, delta);
+		GetEscapements(string, numChars, length, escapementArray, delta);
 
 		truncate_string(string, mode, width, result,
 						escapementArray, fSize, ellipsisWidth, length, numChars);

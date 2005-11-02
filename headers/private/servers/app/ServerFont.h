@@ -127,6 +127,7 @@ class ServerFont {
 											   BPoint offsetArray[]) const;
 			bool				GetEscapements(const char charArray[],
 											   int32 numChars,
+											   int32 numBytes,
 											   float widthArray[],
 											   escapement_delta delta) const;
 
