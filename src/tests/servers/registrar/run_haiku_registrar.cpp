@@ -10,6 +10,7 @@
 #include <Query.h>
 #include <Path.h>
 #include <Volume.h>
+#include <fs_info.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -67,11 +68,11 @@ main()
 			continue;
 
 		const char* registrarPath = path.Path();
-		const char* distro = strstr(registrarPath, "distro");
-		if (distro == NULL)
+		const char* generatedPath = strstr(registrarPath, "generated");
+		if (generatedPath == NULL)
 			continue;
 
-		if (!strncmp(currentPath.Path(), registrarPath, distro - registrarPath)) {
+		if (!strncmp(currentPath.Path(), registrarPath, generatedPath - registrarPath)) {
 			// gotcha!
 			const char* args[] = { registrarPath, NULL };
 			thread_id thread = load_image(1, args, (const char**)environ);
