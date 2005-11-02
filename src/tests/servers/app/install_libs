@@ -1,0 +1,33 @@
+#!/bin/sh
+
+CURRENT="$PWD"
+
+if test -d "../../../../generated/objects/r5/x86/release"; then
+	cd "../../../../generated/objects/r5/x86/release"
+elif test -d "../../../../generated/objects/bone/x86/release"; then
+	cd "../../../../generated/objects/bone/x86/release"
+elif test -d "../../../../generated/objects/dano/x86/release"; then
+	cd "../../../../generated/objects/dano/x86/release"
+fi
+
+RELEASE="$PWD"
+DEST="/boot/home/config/lib"
+
+cd "$DEST"
+
+ln -fs "$RELEASE/kits/libopenbeos.so" "libopenbeos.so"
+
+ln -fs "$RELEASE/libs/freetype2/libfreetype.so" "libfreetype.so"
+ln -fs "$RELEASE/libs/png/libpng.so" "libpng.so"
+
+HAIKU_APP_SERVER="$RELEASE/tests/servers/app"
+
+if ! test -d "$HAIKU_APP_SERVER/lib"; then
+	mkdir "$HAIKU_APP_SERVER/lib"
+fi
+
+cd "$HAIKU_APP_SERVER/lib"
+
+ln -fs "../libhaikuappserver.so" "libhaikuappserver.so"
+ln -fs "../libhwinterface.so" "libhwinterface.so"
+ln -fs "../libhwinterfaceimpl.so" "libhwinterfaceimpl.so"

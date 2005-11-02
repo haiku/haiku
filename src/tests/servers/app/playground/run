@@ -1,6 +1,25 @@
 #!/bin/sh
 
 ../../../../../tests/servers/registrar/run_haiku_registrar || exit
-../../../../../distro/x86.release.r5/beos/system/servers/haiku_app_server &
+
+if test -f ../../../../../generated/objects/bone/x86/release/tests/servers/app/haiku_app_server; then
+	../../../../../generated/objects/bone/x86/release/tests/servers/app/haiku_app_server &
+elif test -f ../../../../../generated/objects/r5/x86/release/tests/servers/app/haiku_app_server; then
+	../../../../../generated/objects/r5/x86/release/tests/servers/app/haiku_app_server &
+elif test -f ../../../../../generated/objects/dano/x86/release/tests/servers/app/haiku_app_server; then
+	../../../../../generated/objects/dano/x86/release/tests/servers/app/haiku_app_server &
+else
+	echo "You need to jam haiku_app_server first."
+fi
+
 sleep 1s
-../../../../../distro/x86.release.r5/beos/apps/Playground
+
+if test -f ../../../../../generated/objects/r5/x86/release/tests/servers/app/playground/Playground; then
+	../../../../../generated/objects/r5/x86/release/tests/servers/app/playground/Playground
+elif test -f ../../../../../generated/objects/bone/x86/release/tests/servers/app/playground/Playground; then
+	../../../../../generated/objects/bone/x86/release/tests/servers/app/playground/Playground
+elif test -f ../../../../../generated/objects/dano/x86/release/tests/servers/app/playground/Playground; then
+	../../../../../generated/objects/dano/x86/release/tests/servers/app/playground/Playground
+else
+	echo "You need to jam Playground first."
+fi
