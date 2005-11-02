@@ -332,10 +332,11 @@ BAlert::MessageReceived(BMessage* msg)
 			// Semaphore hasn't been created; we're running asynchronous
 			if (fInvoker) {
 				BMessage* out = fInvoker->Message();
-				if (out && (out->AddInt32("which", which) == B_OK
-						|| out->ReplaceInt32("which", which) == B_OK))
+				if (out && (out->ReplaceInt32("which", which) == B_OK
+							|| out->AddInt32("which", which) == B_OK))
 					fInvoker->Invoke();
 			}
+			PostMessage(B_QUIT_REQUESTED);
 		} else {
 			// Created semaphore means were running synchronously
 			fAlertVal = which;
