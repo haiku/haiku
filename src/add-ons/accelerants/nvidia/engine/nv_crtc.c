@@ -917,6 +917,8 @@ status_t nv_crtc_cursor_position(uint16 x, uint16 y)
 
 status_t nv_crtc_stop_tvout(void)
 {
+	LOG(4,("CRTC: stopping TV output\n"));
+
 	/* enable access to primary head */
 	set_crtc_owner(0);
 
@@ -974,6 +976,8 @@ status_t nv_crtc_stop_tvout(void)
 
 status_t nv_crtc_start_tvout(void)
 {
+	LOG(4,("CRTC: starting TV output\n"));
+
 	/* enable access to primary head */
 	set_crtc_owner(0);
 

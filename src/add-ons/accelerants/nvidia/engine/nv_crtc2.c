@@ -767,6 +767,8 @@ status_t nv_crtc2_cursor_position(uint16 x, uint16 y)
 
 status_t nv_crtc2_stop_tvout(void)
 {
+	LOG(4,("CRTC2: stopping TV output\n"));
+
 	/* enable access to secondary head */
 	set_crtc_owner(1);
 
@@ -821,6 +823,8 @@ status_t nv_crtc2_stop_tvout(void)
 
 status_t nv_crtc2_start_tvout(void)
 {
+	LOG(4,("CRTC2: starting TV output\n"));
+
 	/* enable access to secondary head */
 	set_crtc_owner(1);
 

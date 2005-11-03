@@ -68,18 +68,6 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	/* See BOUNDS WARNING above... */
 	if (PROPOSE_DISPLAY_MODE(&target, &target, &target) == B_ERROR)	return B_ERROR;
 
-	/* if not dualhead capable card clear dualhead flags */
-	if (!(target.flags & DUALHEAD_CAPABLE))
-	{
-		target.flags &= ~DUALHEAD_BITS;
-	}
-	/* if not TVout capable card clear TVout flags */
-	if (!(target.flags & TV_CAPABLE))
-	{
-		target.flags &= ~TV_BITS;
-	}
-	LOG(1, ("SETMODE: (CONT.) validated command modeflags: $%08x\n", target.flags));
-
 	/* make sure a possible 3D add-on will block rendering and re-initialize itself.
 	 * note: update in _this_ order only */
 	/* SET_DISPLAY_MODE will reset this flag when it's done. */

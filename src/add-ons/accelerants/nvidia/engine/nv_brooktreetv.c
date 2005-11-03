@@ -1580,7 +1580,7 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
  * and ASUS V7100 GeForce2 MX200 AGP/32Mb (CH7007). */
 static status_t BT_start_tvout(display_mode tv_target)
 {
-	if (!si->ps.secondary_head || (tv_target.flags & TV_PRIMARY))
+	if (tv_target.flags & TV_PRIMARY)
 	{
 		if (si->ps.secondary_head)
 		{
@@ -1591,8 +1591,7 @@ static status_t BT_start_tvout(display_mode tv_target)
 
 		nv_crtc_start_tvout();
 	}
-
-	if (si->ps.secondary_head && !(tv_target.flags & TV_PRIMARY))
+	else
 	{
 		/* switch TV encoder to CRTC2 */
 		NV_REG32(NV32_FUNCSEL) &= ~0x00000100;
@@ -1613,10 +1612,9 @@ status_t BT_stop_tvout(void)
 	/* prevent BT from being overclocked by VGA-only modes & black-out TV-out */
 	BT_killclk_blackout();
 
-	if (!si->ps.secondary_head || (si->dm.flags & TV_PRIMARY))
+	if (si->dm.flags & TV_PRIMARY)
 		nv_crtc_stop_tvout();
-
-	if (si->ps.secondary_head && !(si->dm.flags & TV_PRIMARY))
+	else
 		nv_crtc2_stop_tvout();
 
 	/* fixme if needed:
@@ -1708,10 +1706,9 @@ status_t BT_setmode(display_mode target)
 	BT_update_mode_for_gpu(&tv_target, tvmode);
 
 	/* setup GPU CRTC timing */
-	if (!si->ps.secondary_head || (si->dm.flags & TV_PRIMARY))
+	if (tv_target.flags & TV_PRIMARY)
 		head1_set_timing(tv_target);
-
-	if (si->ps.secondary_head && !(si->dm.flags & TV_PRIMARY))
+	else
 		head2_set_timing(tv_target);
 
 //fixme: only testing older cards for now...

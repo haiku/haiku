@@ -507,10 +507,40 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 		}
 	}
 
+	/* if not dualhead capable card clear dualhead flags */
+	if (!(target->flags & DUALHEAD_CAPABLE))
+	{
+		target->flags &= ~DUALHEAD_BITS;
+	}
+
 	/* set TV_CAPABLE if suitable: pixelclock is not important (defined by TVstandard) */
 	if (si->ps.tvout && BT_check_tvmode(*target))
 	{
 		target->flags |= TV_CAPABLE;
+	}
+
+	/* if not TVout capable card clear TVout flags */
+	if (!(target->flags & TV_CAPABLE))
+	{
+		target->flags &= ~TV_BITS;
+	}
+
+	/* make sure TV head assignment is sane */
+	if (target->flags & TV_BITS)
+	{
+		if (!si->ps.secondary_head)
+		{
+			target->flags |= TV_PRIMARY;
+		}
+		else
+		{
+			if ((target->flags & DUALHEAD_BITS) == DUALHEAD_OFF)
+				target->flags |= TV_PRIMARY;
+		}
+	}
+	else
+	{
+		target->flags &= ~TV_PRIMARY;
 	}
 
 	/* set HARDWARE_CURSOR mode if suitable */
@@ -520,7 +550,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	/* set SUPPORTS_OVERLAYS */
 	target->flags |= B_SUPPORTS_OVERLAYS;
 
-	LOG(1, ("PROPOSEMODE: validated status modeflags: $%08x\n", target->flags));
+	LOG(1, ("PROPOSEMODE: validated modeflags: $%08x\n", target->flags));
 
 	/* overrule timing command flags to be (fixed) blank_pedestal = 0.0IRE,
 	 * progressive scan (fixed), and sync_on_green not avaible. */
