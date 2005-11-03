@@ -556,8 +556,9 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars, int32 numByte
 
 
 bool
-ServerFont::GetBoundingBoxesAsString(const char charArray[], int32 numChars, BRect rectArray[],
-		bool string_escapement, font_metric_mode mode, escapement_delta delta)
+ServerFont::GetBoundingBoxesAsString(const char charArray[], int32 numChars,
+	BRect rectArray[], bool string_escapement, font_metric_mode mode,
+	escapement_delta delta)
 {
 	if (!fStyle || !charArray || numChars <= 0 || !rectArray)
 		return false;
@@ -629,7 +630,7 @@ ServerFont::GetBoundingBoxesForStrings(char *charArray[], int32 lengthArray[],
 
 	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
 
-	for (int32 i=0; i<numStrings; i++) {
+	for (int32 i = 0; i < numStrings; i++) {
 		// TODO: ...
 
 	}
@@ -650,10 +651,11 @@ ServerFont::StringWidth(const char* string, int32 numBytes) const
 	if (!face)
 		return 0.0;
 
-	float width = 0.0;
+	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
 
 	int32 convertedLength = numBytes * 2;
 	char* convertedBuffer = new char[convertedLength];
+	float width = 0.0;
 
 	int32 state = 0;
 	status_t ret;
@@ -670,7 +672,7 @@ ServerFont::StringWidth(const char* string, int32 numBytes) const
 
 		for (int i = 0; i < numChars; i++) {
 			FT_Load_Char(face, glyphIndex[i], FT_LOAD_NO_BITMAP);
-			width += (float)face->glyph->metrics.horiAdvance / 64.0;
+			width += face->glyph->advance.x / 64.0;
 		}
 	}
 	delete[] convertedBuffer;
