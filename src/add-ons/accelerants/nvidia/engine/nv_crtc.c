@@ -1,6 +1,6 @@
 /* CTRC functionality */
 /* Author:
-   Rudolf Cornelissen 11/2002-10/2005
+   Rudolf Cornelissen 11/2002-11/2005
 */
 
 #define MODULE_BIT 0x00040000
@@ -977,6 +977,13 @@ status_t nv_crtc_stop_tvout(void)
 status_t nv_crtc_start_tvout(void)
 {
 	LOG(4,("CRTC: starting TV output\n"));
+
+	if (si->ps.secondary_head)
+	{
+		/* switch TV encoder to CRTC1 */
+		NV_REG32(NV32_2FUNCSEL) &= ~0x00000100;
+		NV_REG32(NV32_FUNCSEL) |= 0x00000100;
+	}
 
 	/* enable access to primary head */
 	set_crtc_owner(0);

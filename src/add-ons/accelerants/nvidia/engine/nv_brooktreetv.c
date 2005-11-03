@@ -1,6 +1,6 @@
 /*
 	Author:
-	Rudolf Cornelissen 4/2002-10/2005
+	Rudolf Cornelissen 4/2002-11/2005
 */
 
 #define MODULE_BIT 0x00100000
@@ -1581,24 +1581,9 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 static status_t BT_start_tvout(display_mode tv_target)
 {
 	if (tv_target.flags & TV_PRIMARY)
-	{
-		if (si->ps.secondary_head)
-		{
-			/* switch TV encoder to CRTC1 */
-			NV_REG32(NV32_2FUNCSEL) &= ~0x00000100;
-			NV_REG32(NV32_FUNCSEL) |= 0x00000100;
-		}
-
 		nv_crtc_start_tvout();
-	}
 	else
-	{
-		/* switch TV encoder to CRTC2 */
-		NV_REG32(NV32_FUNCSEL) &= ~0x00000100;
-		NV_REG32(NV32_2FUNCSEL) |= 0x00000100;
-
 		nv_crtc2_start_tvout();
-	}
 
 	return B_OK;
 }//end BT_start_tvout.

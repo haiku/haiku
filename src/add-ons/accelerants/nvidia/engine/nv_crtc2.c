@@ -1,6 +1,6 @@
 /* second CTRC functionality for GeForce cards */
 /* Author:
-   Rudolf Cornelissen 11/2002-10/2005
+   Rudolf Cornelissen 11/2002-11/2005
 */
 
 #define MODULE_BIT 0x00020000
@@ -824,6 +824,10 @@ status_t nv_crtc2_stop_tvout(void)
 status_t nv_crtc2_start_tvout(void)
 {
 	LOG(4,("CRTC2: starting TV output\n"));
+
+	/* switch TV encoder to CRTC2 */
+	NV_REG32(NV32_FUNCSEL) &= ~0x00000100;
+	NV_REG32(NV32_2FUNCSEL) |= 0x00000100;
 
 	/* enable access to secondary head */
 	set_crtc_owner(1);
