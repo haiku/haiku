@@ -467,6 +467,24 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 }
 
 
+static int
+make_all_threads_unreal(int argc, char **argv)
+{
+	struct thread *thread;
+	struct hash_iterator i;
+
+	hash_open(sThreadHash, &i);
+	while ((thread = hash_next(sThreadHash, &i)) != NULL) {
+		if (thread->priority > B_DISPLAY_PRIORITY) {
+			thread->priority = B_NORMAL_PRIORITY;
+			kprintf("thread 0x%lx made unreal\n", thread->id);
+		}
+	}
+	hash_close(sThreadHash, &i, false);
+	return 0;
+}
+
+
 static const char *
 state_to_text(struct thread *thread, int32 state)
 {
@@ -1365,6 +1383,7 @@ thread_init(kernel_args *args)
 	add_debugger_command("next_q", &dump_next_thread_in_q, "dump the next thread in the queue of last thread viewed");
 	add_debugger_command("next_all", &dump_next_thread_in_all_list, "dump the next thread in the global list of the last thread viewed");
 	add_debugger_command("next_team", &dump_next_thread_in_team, "dump the next thread in the team of the last thread viewed");
+	add_debugger_command("unreal", &make_all_threads_unreal, "set all realtime priority threads to normal priority");
 
 	return B_OK;
 }
