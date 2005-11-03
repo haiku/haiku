@@ -11,6 +11,8 @@
 #include "DesktopSettings.h"
 #include "DesktopSettingsPrivate.h"
 #include "Desktop.h"
+#include "FontManager.h"
+#include "ServerConfig.h"
 
 
 DesktopSettings::Private::Private()
@@ -30,6 +32,17 @@ DesktopSettings::Private::~Private()
 void
 DesktopSettings::Private::_SetDefaults()
 {
+	_SetFont(fPlainFont, DEFAULT_PLAIN_FONT_FAMILY, DEFAULT_PLAIN_FONT_STYLE,
+		DEFAULT_PLAIN_FONT_SIZE, FALLBACK_PLAIN_FONT_FAMILY, DEFAULT_PLAIN_FONT_STYLE,
+		B_REGULAR_FACE);
+	_SetFont(fBoldFont, DEFAULT_BOLD_FONT_FAMILY, DEFAULT_BOLD_FONT_STYLE,
+		DEFAULT_BOLD_FONT_SIZE, FALLBACK_BOLD_FONT_FAMILY, DEFAULT_BOLD_FONT_STYLE,
+		B_BOLD_FACE);
+	_SetFont(fFixedFont, DEFAULT_FIXED_FONT_FAMILY, DEFAULT_FIXED_FONT_STYLE,
+		DEFAULT_FIXED_FONT_SIZE, FALLBACK_FIXED_FONT_FAMILY, DEFAULT_FIXED_FONT_STYLE,
+		B_REGULAR_FACE);
+	fFixedFont.SetSpacing(B_FIXED_SPACING);
+
 	fMouseMode = B_NORMAL_MOUSE;
 
 	// init scrollbar info
@@ -54,6 +67,28 @@ DesktopSettings::Private::_SetDefaults()
 }
 
 
+void
+DesktopSettings::Private::_SetFont(ServerFont &font, const char *familyName,
+	const char *styleName, float size, const char *fallbackFamily,
+	const char *fallbackStyle, uint16 fallbackFace)
+{
+	BAutolock locker(gFontManager);
+
+	// try to find a matching font
+
+	FontStyle* style = gFontManager->GetStyle(familyName, styleName);
+	if (style == NULL) {
+		style = gFontManager->GetStyle(fallbackFamily, fallbackStyle);
+		if (style == NULL) {
+			style = gFontManager->FindStyleMatchingFace(fallbackFace);
+		}
+	}
+
+	if (style != NULL)
+		font.SetStyle(*style);
+}
+
+
 status_t
 DesktopSettings::Private::_Load()
 {
@@ -66,6 +101,48 @@ status_t
 DesktopSettings::Private::Save()
 {
 	return B_ERROR;
+}
+
+
+void
+DesktopSettings::Private::SetDefaultPlainFont(const ServerFont &font)
+{
+	fPlainFont = font;
+}
+
+
+const ServerFont &
+DesktopSettings::Private::DefaultPlainFont() const
+{
+	return fPlainFont;
+}
+
+
+void
+DesktopSettings::Private::SetDefaultBoldFont(const ServerFont &font)
+{
+	fBoldFont = font;
+}
+
+
+const ServerFont &
+DesktopSettings::Private::DefaultBoldFont() const
+{
+	return fBoldFont;
+}
+
+
+void
+DesktopSettings::Private::SetDefaultFixedFont(const ServerFont &font)
+{
+	fFixedFont = font;
+}
+
+
+const ServerFont &
+DesktopSettings::Private::DefaultFixedFont() const
+{
+	return fFixedFont;
 }
 
 
@@ -171,6 +248,48 @@ DesktopSettings::DesktopSettings(Desktop* desktop)
 DesktopSettings::~DesktopSettings()
 {
 	fSettings->Unlock();
+}
+
+
+void
+DesktopSettings::SetDefaultPlainFont(const ServerFont &font)
+{
+	fSettings->SetDefaultPlainFont(font);
+}
+
+
+void
+DesktopSettings::GetDefaultPlainFont(ServerFont &font) const
+{
+	font = fSettings->DefaultPlainFont();
+}
+
+
+void
+DesktopSettings::SetDefaultBoldFont(const ServerFont &font)
+{
+	fSettings->SetDefaultBoldFont(font);
+}
+
+
+void
+DesktopSettings::GetDefaultBoldFont(ServerFont &font) const
+{
+	font = fSettings->DefaultBoldFont();
+}
+
+
+void
+DesktopSettings::SetDefaultFixedFont(const ServerFont &font)
+{
+	fSettings->SetDefaultFixedFont(font);
+}
+
+
+void
+DesktopSettings::GetDefaultFixedFont(ServerFont &font) const
+{
+	font = fSettings->DefaultFixedFont();
 }
 
 

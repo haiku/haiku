@@ -4,24 +4,26 @@
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 /**	Default and fallback decorator for the app_server - the yellow tabs */
 
 
-#include <stdio.h>
-
-#include <Rect.h>
-#include <View.h>
+#include "DefaultDecorator.h"
 
 #include "ColorUtils.h"
+#include "DesktopSettings.h"
 #include "DisplayDriver.h"
 #include "FontManager.h"
 #include "LayerData.h"
 #include "PatternHandler.h"
 #include "RGBColor.h"
 
-#include "DefaultDecorator.h"
+#include <Rect.h>
+#include <View.h>
+
+#include <stdio.h>
 
 //#define USE_VIEW_FILL_HACK
 
@@ -33,12 +35,17 @@
 #	define STRACE(x) ;
 #endif
 
-DefaultDecorator::DefaultDecorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
-	: Decorator(rect, wlook, wfeel, wflags),
-	  fTruncatedTitle("")
+
+DefaultDecorator::DefaultDecorator(DesktopSettings& settings, BRect rect,
+	int32 look, int32 feel, int32 flags)
+	: Decorator(settings, rect, look, feel, flags)
 {
-	ServerFont font(_look == B_FLOATING_WINDOW_LOOK ?
-		*gFontManager->GetSystemPlain() : *gFontManager->GetSystemBold());
+	ServerFont font;
+	if (_look == B_FLOATING_WINDOW_LOOK)
+		settings.GetDefaultPlainFont(font);
+	else
+		settings.GetDefaultBoldFont(font);
+
 	font.SetFlags(B_FORCE_ANTIALIASING);
 	font.SetSpacing(B_STRING_SPACING);
 	SetFont(&font);

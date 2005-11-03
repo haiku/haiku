@@ -7,14 +7,17 @@
  
 
 #include <Directory.h>
-#include <Rect.h>
+#include <Entry.h>
 #include <File.h>
 #include <Message.h>
-#include <Entry.h>
+#include <Path.h>
+#include <Rect.h>
 
 #include "AppServer.h"
 #include "ColorSet.h"
 #include "DefaultDecorator.h"
+#include "Desktop.h"
+#include "DesktopSettings.h"
 #include "ServerConfig.h"
 #include "DecorManager.h"
 
@@ -23,37 +26,38 @@
 DecorManager gDecorManager;
 
 
-Decorator* create_default_decorator(BRect rect, int32 wlook, int32 wfeel, 
-									int32 wflags);
-
 // This is a class used only by the DecorManager to track all the decorators in memory
 class DecorInfo {
-public:
-						DecorInfo(const image_id &id, const char *name,
-									create_decorator *alloc);
-						~DecorInfo(void);
-	image_id			GetID(void) const { return fID; }
-	const char*			GetName(void) const { return fName.String(); }
-	Decorator*			Instantiate(BRect rect, const char *title, 
-									int32 wlook, int32 wfeel,
-									int32 wflags, DisplayDriver *ddriver);
-private:
-	image_id			fID;
-	BString 			fName;
-	create_decorator	*fAllocator;
+	public:
+							DecorInfo(image_id id, const char* name,
+								create_decorator* allocator = NULL);
+							~DecorInfo();
+
+		status_t			InitCheck() const;
+
+		image_id			ID() const { return fID; }
+		const char*			Name() const { return fName.String(); }
+
+		Decorator*			Instantiate(Desktop* desktop, BRect rect, const char* title,
+								int32 look, int32 feel, int32 flags);
+
+	private:
+		image_id			fID;
+		BString 			fName;
+		create_decorator	*fAllocator;
 };
 
 
-DecorInfo::DecorInfo(const image_id &id, const char *name, create_decorator *alloc)
+DecorInfo::DecorInfo(image_id id, const char* name, create_decorator* allocator)
 	:
 	fID(id),
  	fName(name),
- 	fAllocator(alloc)
+ 	fAllocator(allocator)
 {
 }
 
 
-DecorInfo::~DecorInfo(void)
+DecorInfo::~DecorInfo()
 {
 	// Do nothing. Normal programming practice would say that one should unload
 	// the object's associate image_id. However, there is some  funkiness with
@@ -68,20 +72,30 @@ DecorInfo::~DecorInfo(void)
 
 
 Decorator *
-DecorInfo::Instantiate(BRect rect, const char *title, int32 wlook, int32 wfeel,
-	int32 wflags, DisplayDriver *ddriver)
+DecorInfo::Instantiate(Desktop* desktop, BRect rect, const char *title,
+	int32 look, int32 feel, int32 flags)
 {
-	Decorator *dec = fAllocator(rect, wlook, wfeel, wflags);
-
-	dec->SetDriver(ddriver);
+	DesktopSettings settings(desktop);
+	Decorator *decorator;
 	
+	try {
+		if (fAllocator != NULL)
+			decorator = fAllocator(settings, rect, look, feel, flags);
+		else
+			decorator = new DefaultDecorator(settings, rect, look, feel, flags);
+	} catch (...) {
+		return NULL;
+	}
+
+	decorator->SetDriver(desktop->GetDisplayDriver());
+
 	gGUIColorSet.Lock();
-	dec->SetColors(gGUIColorSet);
+	decorator->SetColors(gGUIColorSet);
 	gGUIColorSet.Unlock();
 	
-	dec->SetTitle(title);
+	decorator->SetTitle(title);
 	
-	return dec;
+	return decorator;
 }
 
 
@@ -94,9 +108,9 @@ DecorManager::DecorManager()
  	fCurrentDecor(NULL)
 {
 	// Start with the default decorator - index is always 0
-	DecorInfo *defaultDecor = new DecorInfo(-1, "Default", create_default_decorator);
-	fDecorList.AddItem( defaultDecor );
-	
+	DecorInfo *defaultDecor = new DecorInfo(-1, "Default", NULL);
+	fDecorList.AddItem(defaultDecor);
+
 	// Add any on disk
 	RescanDecorators();
 
@@ -112,18 +126,18 @@ DecorManager::DecorManager()
 	if (file.InitCheck() == B_OK && settings.Unflatten(&file) == B_OK) {
 		BString itemtext;
 		if (settings.FindString("decorator", &itemtext) == B_OK) {
-			fCurrentDecor = FindDecor(itemtext.String());
+			fCurrentDecor = _FindDecor(itemtext.String());
 		}
 	}
 
 	if (!fCurrentDecor)
-		fCurrentDecor = (DecorInfo*) fDecorList.ItemAt(0L);
+		fCurrentDecor = (DecorInfo*)fDecorList.ItemAt(0L);
 }
 
 
 DecorManager::~DecorManager()
 {
-	EmptyList();
+	_EmptyList();
 }
 
 
@@ -136,11 +150,10 @@ DecorManager::RescanDecorators()
 		return;
 
 	entry_ref ref;
-	BString fullpath;
-
 	while (dir.GetNextRef(&ref) == B_OK) {
-		fullpath = DECORATORS_DIR;
-		fullpath += ref.name;
+		BPath path;
+		path.SetTo(DECORATORS_DIR);
+		path.Append(ref.name);
 
 		// Because this function is used for both initialization and for keeping
 		// the list up to date, check for existence in the list. Note that we
@@ -149,11 +162,11 @@ DecorManager::RescanDecorators()
 		// been deleted, it is still available until the next boot, at which point
 		// it will obviously not be loaded.
 
-		if (FindDecor(ref.name))
+		if (_FindDecor(ref.name))
 			continue;
 
-		image_id tempID = load_add_on(fullpath.String());
-		if (tempID == B_ERROR)
+		image_id image = load_add_on(path.Path());
+		if (image != B_OK)
 			continue;
 
 		// As of now, we do nothing with decorator versions, but the possibility
@@ -161,25 +174,25 @@ DecorManager::RescanDecorators()
 		// to do so. If we *did* do anything with decorator versions, the 
 		// assignment would go here.
 
-		create_decorator *createfunc;
+		create_decorator* createFunc;
 
 		// Get the instantiation function
-		status_t status = get_image_symbol(tempID, "instantiate_decorator",
-								B_SYMBOL_TYPE_TEXT, (void**)&createfunc);
+		status_t status = get_image_symbol(image, "instantiate_decorator",
+								B_SYMBOL_TYPE_TEXT, (void**)&createFunc);
 		if (status != B_OK) {
-			unload_add_on(tempID);
+			unload_add_on(image);
 			continue;
 		}
 
-		fDecorList.AddItem(new DecorInfo(tempID, ref.name, createfunc));
+		// TODO: unload images until they are actually used!
+		fDecorList.AddItem(new DecorInfo(image, ref.name, createFunc));
 	}
 }
 
 
 Decorator *
-DecorManager::AllocateDecorator(BRect rect, const char *title, 
-								int32 wlook, int32 wfeel,
-								int32 wflags, DisplayDriver *ddriver)
+DecorManager::AllocateDecorator(Desktop* desktop, BRect rect, const char *title, 
+	int32 look, int32 feel, int32 flags)
 {
 	// Create a new instance of the current decorator. Ownership is that of the caller
 
@@ -189,26 +202,26 @@ DecorManager::AllocateDecorator(BRect rect, const char *title,
 		return NULL;
 	}
 
-	return fCurrentDecor->Instantiate(rect, title, wlook, wfeel, wflags, ddriver);
+	return fCurrentDecor->Instantiate(desktop, rect, title, look, feel, flags);
 }
 
 
 int32
-DecorManager::CountDecorators(void) const
+DecorManager::CountDecorators() const
 {
 	return fDecorList.CountItems();
 }
 
 
 int32
-DecorManager::GetDecorator(void) const
+DecorManager::GetDecorator() const
 {
 	return fDecorList.IndexOf(fCurrentDecor);
 }
 
 
 bool
-DecorManager::SetDecorator(const int32 &index)
+DecorManager::SetDecorator(int32 index)
 {
 	DecorInfo *newDecInfo = (DecorInfo*)fDecorList.ItemAt(index);
 
@@ -222,7 +235,7 @@ DecorManager::SetDecorator(const int32 &index)
 
 
 bool
-DecorManager::SetR5Decorator(const int32 &value)
+DecorManager::SetR5Decorator(int32 value)
 {
 	BString string;
 
@@ -235,7 +248,7 @@ DecorManager::SetR5Decorator(const int32 &value)
 			return false;
 	}
 
-	DecorInfo *newDecInfo = FindDecor(string.String());
+	DecorInfo *newDecInfo = _FindDecor(string.String());
 	if (newDecInfo) {
 		fCurrentDecor = newDecInfo;
 		return true;
@@ -246,53 +259,41 @@ DecorManager::SetR5Decorator(const int32 &value)
 
 
 const char *
-DecorManager::GetDecoratorName(const int32 &index)
+DecorManager::GetDecoratorName(int32 index)
 {
-	DecorInfo *info = (DecorInfo*)fDecorList.ItemAt(index);
-
+	DecorInfo *info = fDecorList.ItemAt(index);
 	if (info)
-		return info->GetName();
+		return info->Name();
 
 	return NULL;
 }
 
 
 void
-DecorManager::EmptyList(void)
+DecorManager::_EmptyList()
 {
 	for (int32 i = 0; i < fDecorList.CountItems(); i++) {
-		DecorInfo *info = (DecorInfo*)fDecorList.ItemAt(i);
-		delete info;
+		delete fDecorList.ItemAt(i);;
 	}
 
+	fDecorList.MakeEmpty();
 	fCurrentDecor = NULL;
 }
 
 
 DecorInfo*
-DecorManager::FindDecor(const char *name)
+DecorManager::_FindDecor(const char *name)
 {
 	if (!name)
 		return NULL;
 
 	for (int32 i = 0; i < fDecorList.CountItems(); i++) {
-		DecorInfo *info = (DecorInfo*)fDecorList.ItemAt(i);
+		DecorInfo* info = fDecorList.ItemAt(i);
 
-		if (info && strcmp(name, info->GetName()) == 0)
+		if (strcmp(name, info->Name()) == 0)
 			return info;
 	}
 
 	return NULL;
-}
-
-
-//	#pragma mark -
-
-
-// This is the allocator function for the default decorator
-Decorator*
-create_default_decorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
-{
-	return new DefaultDecorator(rect, wlook, wfeel, wflags);
 }
 

@@ -75,6 +75,7 @@ Desktop::Desktop(uid_t userID)
 		return;
 
 	fLink.SetReceiverPort(fMessagePort);
+	gFontManager->AttachUser(fUserID);
 }
 
 
@@ -87,6 +88,7 @@ Desktop::~Desktop()
 	delete fSettings;
 
 	delete_port(fMessagePort);
+	gFontManager->DetachUser(fUserID);
 }
 
 

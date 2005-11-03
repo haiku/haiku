@@ -147,7 +147,7 @@ ServerFont::ServerFont()
 	:
 	fStyle(NULL)
 {
-	*this = *gFontManager->GetSystemPlain();
+	*this = *gFontManager->DefaultFont();
 }
 
 
@@ -190,8 +190,7 @@ ServerFont::operator=(const ServerFont& font)
 	fEncoding	= font.fEncoding;
 	fBounds		= font.fBounds;
 
-	_SetStyle(font.fStyle);
-
+	SetStyle(*font.fStyle);
 	return *this;
 }
 
@@ -232,6 +231,21 @@ ServerFont::GetFamily() const
 }
 
 
+void
+ServerFont::SetStyle(FontStyle& style)
+{
+	if (&style != fStyle) {
+		// detach from old style
+		if (fStyle)
+			fStyle->Release();
+
+		// attach to new style
+		fStyle = &style;
+		fStyle->Acquire();
+	}
+}
+
+
 /*!
 	\brief Sets the ServerFont instance to whatever font is specified
 	\param familyID ID number of the family to set
@@ -254,7 +268,7 @@ ServerFont::SetFamilyAndStyle(uint16 familyID, uint16 styleID)
 	if (!style)
 		return B_ERROR;
 
-	_SetStyle(style);
+	SetStyle(*style);
 	style->Release();
 
 	return B_OK;
@@ -708,20 +722,3 @@ ServerFont::TruncateString(BString* inOut, uint32 mode, float width) const
 	}
 }
 
-
-void
-ServerFont::_SetStyle(FontStyle* style)
-{
-	if (style == NULL)
-		debugger("set NULL style!");
-
-	if (style != fStyle) {
-		// detach from old style
-		if (fStyle)
-			fStyle->Release();
-
-		// attach to new style
-		fStyle = style;
-		fStyle->Acquire();
-	}
-}

@@ -4,22 +4,25 @@
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
-/**	Handles the largest part of the font subsystem */
+/**	Manages font families and styles */
 
 
+#include <FontFamily.h>
+#include <FontManager.h>
+#include <ServerConfig.h>
+#include <ServerFont.h>
+
+#include <Autolock.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
+#include <FindDirectory.h>
 #include <Message.h>
 #include <Path.h>
 #include <String.h>
-
-#include <FontManager.h>
-#include <FontFamily.h>
-#include <ServerFont.h>
-#include "ServerConfig.h"
 
 #include <new>
 
@@ -50,14 +53,21 @@ face_requester(FTC_FaceID face_id, FT_Library library,
 
 //! Does basic set up so that directories can be scanned
 FontManager::FontManager()
-	: BLocker("font server lock"),
+	: BLooper("Font Manager"),
 	fFamilies(20),
-	fPlain(NULL),
-	fBold(NULL),
-	fFixed(NULL),
+	fDefaultFont(NULL),
 	fNextID(0)
 {
 	fInitStatus = FT_Init_FreeType(&gFreeTypeLibrary) == 0 ? B_OK : B_ERROR;
+
+	if (fInitStatus == B_OK) {
+		_ScanSystemFonts();
+		
+		if (CountFamilies() != 0)
+			_SetDefaultFont();
+		else
+			fInitStatus = B_ENTRY_NOT_FOUND;
+	}
 
 /*
 	Fire up the font caching subsystem.
@@ -79,30 +89,10 @@ FontManager::~FontManager()
 }
 
 
-/*!
-	\brief Counts the number of font families available
-	\return The number of unique font families currently available
-*/
-int32
-FontManager::CountFamilies(void)
+void
+FontManager::MessageReceived(BMessage* message)
 {
-	return fFamilies.CountItems();
-}
-
-
-/*!
-	\brief Counts the number of styles available in a font family
-	\param family Name of the font family to scan
-	\return The number of font styles currently available for the font family
-*/
-int32
-FontManager::CountStyles(const char *familyName)
-{
-	FontFamily *family = GetFamily(familyName);
-	if (family)
-		return family->CountStyles();
-
-	return 0;
+	// nothing to do here yet
 }
 
 
@@ -111,7 +101,7 @@ FontManager::CountStyles(const char *familyName)
 	\param family The family to remove
 */
 void
-FontManager::RemoveFamily(const char *familyName)
+FontManager::_RemoveFamily(const char *familyName)
 {
 	FontFamily *family = GetFamily(familyName);
 	if (family) {
@@ -121,17 +111,36 @@ FontManager::RemoveFamily(const char *familyName)
 }
 
 
+/*!
+	\brief Sets the font that will be used when you create an empty
+		ServerFont without specifying a style.
+*/
+void
+FontManager::_SetDefaultFont()
+{
+	FontStyle* style = GetStyle(DEFAULT_PLAIN_FONT_FAMILY, DEFAULT_PLAIN_FONT_STYLE);
+	if (style == NULL) {
+		style = FindStyleMatchingFace(B_REGULAR_FACE);
+		if (style == NULL)
+			style = FamilyAt(0)->StyleAt(0);
+	}
+
+	fDefaultFont = new ServerFont(*style, DEFAULT_PLAIN_FONT_SIZE);
+}
+
+
 //! Scans the four default system font folders
 void
-FontManager::ScanSystemFolders(void)
+FontManager::_ScanSystemFonts()
 {
-	ScanDirectory("/boot/beos/etc/fonts/ttfonts/");
-	
+	BPath path;
+	if (find_directory(B_BEOS_FONTS_DIRECTORY, &path) == B_OK)
+		_AddPath(path.Path());
+
 	// We don't scan these in test mode to help shave off some startup time
 #if !TEST_MODE
-	ScanDirectory("/boot/beos/etc/fonts/PS-Type1/");
-	ScanDirectory("/boot/home/config/fonts/ttfonts/");
-	ScanDirectory("/boot/home/config/fonts/psfonts/");
+	if (find_directory(B_COMMON_FONTS_DIRECTORY, &path) == B_OK)
+		_AddPath(path.Path());
 #endif
 }
 
@@ -176,29 +185,62 @@ FontManager::_AddFont(BPath &path)
 }
 
 
+status_t
+FontManager::_AddPath(const char* path)
+{
+	BEntry entry;
+	status_t status = entry.SetTo(path);
+	if (status != B_OK)
+		return status;
+
+	return _AddPath(entry);
+}
+
+
+status_t
+FontManager::_AddPath(BEntry& entry)
+{
+	status_t status = _ScanDirectory(entry);
+	if (status != B_OK)
+		return status;
+
+	node_ref nodeRef;
+	if (entry.GetNodeRef(&nodeRef) != B_OK)
+		return status;
+
+	// TODO: don't add it twice!
+	// TODO: monitor this directory!
+	return B_OK;
+}
+
+
 /*!
 	\brief Scan a folder for all valid fonts
 	\param directoryPath Path of the folder to scan.
 */
 status_t
-FontManager::ScanDirectory(const char *directoryPath)
+FontManager::_ScanDirectory(BEntry& entry)
 {
 	// This bad boy does all the real work. It loads each entry in the
 	// directory. If a valid font file, it adds both the family and the style.
 	// Both family and style are stored internally as BStrings. Once everything
 
 	BDirectory dir;
-	status_t status = dir.SetTo(directoryPath);
+	status_t status = dir.SetTo(&entry);
 	if (status != B_OK)
 		return status;
 
-	BEntry entry;
 	while (dir.GetNextEntry(&entry) == B_OK) {
 		BPath path;
 		status = entry.GetPath(&path);
 		if (status < B_OK)
 			continue;
 
+		if (entry.IsDirectory()) {
+			// scan this directory recursively
+			_AddPath(entry);
+			continue;
+		}
 
 // TODO: Commenting this out makes my "Unicode glyph lookup"
 // work with our default fonts. The real fix is to select the
@@ -265,8 +307,35 @@ FontManager::_GetSupportedCharmap(const FT_Face& face)
 }
 
 
+/*!
+	\brief Counts the number of font families available
+	\return The number of unique font families currently available
+*/
+int32
+FontManager::CountFamilies() const
+{
+	return fFamilies.CountItems();
+}
+
+
+/*!
+	\brief Counts the number of styles available in a font family
+	\param family Name of the font family to scan
+	\return The number of font styles currently available for the font family
+*/
+int32
+FontManager::CountStyles(const char *familyName) const
+{
+	FontFamily *family = GetFamily(familyName);
+	if (family)
+		return family->CountStyles();
+
+	return 0;
+}
+
+
 FontFamily*
-FontManager::GetFamilyByIndex(int32 index) const
+FontManager::FamilyAt(int32 index) const
 {
 	return fFamilies.ItemAt(index);
 }
@@ -378,106 +447,51 @@ FontManager::GetStyle(uint16 familyID, uint16 styleID)
 
 
 /*!
-	\brief Returns the current object used for the regular style
-	\return A ServerFont pointer which is the plain font.
-	
-	Do NOT delete this object. If you access it, make a copy of it.
+	\brief If you don't find your preferred font style, but are anxious
+		to have one fitting your needs, you may want to use this method.
 */
-ServerFont*
-FontManager::GetSystemPlain()
+FontStyle*
+FontManager::FindStyleMatchingFace(uint16 face) const
 {
-	return fPlain;
+	int32 count = fFamilies.CountItems();
+
+	for (int32 i = 0; i < count; i++) {
+		FontFamily* family = fFamilies.ItemAt(i);
+		FontStyle* style = family->GetStyleMatchingFace(face);
+		if (style != NULL)
+			return style;
+	}
+
+	return NULL;
 }
 
 
-/*!
-	\brief Returns the current object used for the bold style
-	\return A ServerFont pointer which is the bold font.
-	
-	Do NOT delete this object. If you access it, make a copy of it.
-*/
-ServerFont*
-FontManager::GetSystemBold()
+const ServerFont*
+FontManager::DefaultFont() const
 {
-	return fBold;
+	return fDefaultFont;
 }
 
 
-/*!
-	\brief Returns the current object used for the fixed style
-	\return A ServerFont pointer which is the fixed font.
-	
-	Do NOT delete this object. If you access it, make a copy of it.
-*/
-ServerFont*
-FontManager::GetSystemFixed()
+void
+FontManager::AttachUser(uid_t userID)
 {
-	return fFixed;
+	BAutolock locker(this);
+
+/*
+	BPath path;
+	status_t status = find_directory(B_USER_FONTS_DIRECTORY, &path);
+	if (status != B_OK)
+		return status;
+
+	_AddPath(path.Path());
+*/
 }
 
 
-/*!
-	\brief Sets the system's plain font to the specified family and style
-	\param family Name of the font's family
-	\param style Name of the style desired
-	\param size Size desired
-	\return true if successful, false if not.
-	
-*/
-bool
-FontManager::SetSystemPlain(const char* familyName, const char* styleName, float size)
+void
+FontManager::DetachUser(uid_t userID)
 {
-	FontStyle *style = GetStyle(familyName, styleName);
-	if (style == NULL)
-		return false;
-
-	delete fPlain;
-	fPlain = new ServerFont(*style, size);
-
-	return true;
-}
-
-
-/*!
-	\brief Sets the system's bold font to the specified family and style
-	\param family Name of the font's family
-	\param style Name of the style desired
-	\param size Size desired
-	\return true if successful, false if not.
-	
-*/
-bool
-FontManager::SetSystemBold(const char* familyName, const char* styleName, float size)
-{
-	FontStyle *style = GetStyle(familyName, styleName);
-	if (style == NULL)
-		return false;
-
-	delete fBold;
-	fBold = new ServerFont(*style, size);
-
-	return true;
-}
-
-
-/*!
-	\brief Sets the system's fixed font to the specified family and style
-	\param family Name of the font's family
-	\param style Name of the style desired
-	\param size Size desired
-	\return true if successful, false if not.
-	
-*/
-bool
-FontManager::SetSystemFixed(const char* familyName, const char* styleName, float size)
-{
-	FontStyle *style = GetStyle(familyName, styleName);
-	if (style == NULL)
-		return false;
-
-	delete fFixed;
-	fFixed = new ServerFont(*style, size);
-
-	return true;
+	BAutolock locker(this);
 }
 

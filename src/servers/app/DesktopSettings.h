@@ -14,6 +14,7 @@
 #include <Message.h>
 
 class Desktop;
+class ServerFont;
 
 
 static const int32 kMaxWorkspaces = 32;
@@ -25,6 +26,15 @@ class DesktopSettings {
 		~DesktopSettings();
 
 		status_t		Save();
+
+		void			SetDefaultPlainFont(const ServerFont& font);
+		void			GetDefaultPlainFont(ServerFont& font) const;
+
+		void			SetDefaultBoldFont(const ServerFont& font);
+		void			GetDefaultBoldFont(ServerFont& font) const;
+
+		void			SetDefaultFixedFont(const ServerFont& font);
+		void			GetDefaultFixedFont(ServerFont& font) const;
 
 		void			SetScrollBarInfo(const scroll_bar_info& info);
 		void			GetScrollBarInfo(scroll_bar_info& info) const;

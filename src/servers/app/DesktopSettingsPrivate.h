@@ -10,6 +10,7 @@
 
 
 #include "DesktopSettings.h"
+#include "ServerFont.h"
 
 #include <Locker.h>
 
@@ -20,6 +21,15 @@ class DesktopSettings::Private : public BLocker {
 		~Private();
 
 		status_t		Save();
+
+		void			SetDefaultPlainFont(const ServerFont& font);
+		const ServerFont& DefaultPlainFont() const;
+
+		void			SetDefaultBoldFont(const ServerFont& font);
+		const ServerFont& DefaultBoldFont() const;
+
+		void			SetDefaultFixedFont(const ServerFont& font);
+		const ServerFont& DefaultFixedFont() const;
 
 		void			SetScrollBarInfo(const scroll_bar_info &info);
 		const scroll_bar_info& ScrollBarInfo() const;
@@ -39,7 +49,14 @@ class DesktopSettings::Private : public BLocker {
 
 	private:
 		void			_SetDefaults();
+		void			_SetFont(ServerFont& font, const char* family, const char* style,
+							float size, const char *fallbackFamily,
+							const char* fallbackStyle, uint16 fallbackFace);
 		status_t		_Load();
+
+		ServerFont		fPlainFont;
+		ServerFont		fBoldFont;
+		ServerFont		fFixedFont;
 
 		scroll_bar_info	fScrollBarInfo;
 		menu_info		fMenuInfo;

@@ -10,9 +10,7 @@
 #define FONT_MANAGER_H
 
 
-#include <Font.h>
-#include <Locker.h>
-#include <OS.h>
+#include <Looper.h>
 #include <ObjectList.h>
 #include <SupportDefs.h>
 
@@ -31,20 +29,19 @@ class ServerFont;
 	\class FontManager FontManager.h
 	\brief Manager for the largest part of the font subsystem
 */
-class FontManager : public BLocker {
+class FontManager : public BLooper {
 	public:
 		FontManager();
-		~FontManager();
+		virtual ~FontManager();
 
 		status_t InitCheck() { return fInitStatus; }
 
-		int32 CountFamilies();
-		int32 CountStyles(const char *family);
-		void RemoveFamily(const char *family);
-		void ScanSystemFolders();
-		status_t ScanDirectory(const char *path);
+		virtual void MessageReceived(BMessage* message);
 
-		FontFamily* GetFamilyByIndex(int32 index) const;
+		int32 CountFamilies() const;
+		int32 CountStyles(const char *family) const;
+		FontFamily* FamilyAt(int32 index) const;
+
 		FontFamily *GetFamily(uint16 familyID) const;
 		FontFamily *GetFamily(const char *name) const;
 
@@ -53,14 +50,11 @@ class FontManager : public BLocker {
 						uint16 styleID = 0xffff, uint16 face = 0);
 		FontStyle *GetStyle(const char *family, uint16 styleID);
 		FontStyle *GetStyle(uint16 familyID, uint16 styleID);
+		FontStyle* FindStyleMatchingFace(uint16 face) const;
 
-		ServerFont *GetSystemPlain();
-		ServerFont *GetSystemBold();
-		ServerFont *GetSystemFixed();
-
-		bool SetSystemPlain(const char *family, const char *style, float size);
-		bool SetSystemBold(const char *family, const char *style, float size);
-		bool SetSystemFixed(const char *family, const char *style, float size);
+		ServerFont* GetFont(const char *family, const char *style, float size);
+		ServerFont* GetFont(uint16 face, float size);
+		const ServerFont* DefaultFont() const;
 
 		bool FontsNeedUpdated() { return fNeedUpdate; }
 		/*!
@@ -68,15 +62,27 @@ class FontManager : public BLocker {
 		*/
 		void FontsUpdated() { fNeedUpdate = false; }
 
+		void AttachUser(uid_t userID);
+		void DetachUser(uid_t userID);
+
 	private:
-		void _AddFont(BPath &path);
+		void _SetDefaultFont();
+		void _ScanSystemFonts();
+		status_t _AddPath(const char* path);
+		status_t _AddPath(BEntry& entry);
+
+		void _RemoveFamily(const char *family);
+
+		status_t _ScanDirectory(BEntry &entry);
+		void _AddFont(BPath& path);
 
 		FT_CharMap _GetSupportedCharmap(const FT_Face &face);
 
 	private:
 		status_t	fInitStatus;
+		BObjectList<node_ref> fFontDirectories;
 		BObjectList<FontFamily> fFamilies;
-		ServerFont	*fPlain, *fBold, *fFixed;
+		ServerFont	*fDefaultFont;
 		bool		fNeedUpdate;
 		int32		fNextID;
 };

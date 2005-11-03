@@ -21,7 +21,6 @@
 #include "LayerData.h"
 
 
-// constructor
 DrawData::DrawData()
 	: fOrigin(0.0, 0.0),
 	  fScale(1.0),
@@ -34,7 +33,6 @@ DrawData::DrawData()
 	  fAlphaFncMode(B_ALPHA_OVERLAY),
 	  fPenLocation(0.0, 0.0),
 	  fPenSize(1.0),
-	  fFont(*gFontManager->GetSystemPlain()),
 	  fFontAliasing(false),
 	  fSubPixelPrecise(false),
 	  fLineCapMode(B_BUTT_CAP),
@@ -44,14 +42,14 @@ DrawData::DrawData()
 	fUnscaledFontSize = fFont.Size();
 }
 
-// copy constructor
+
 DrawData::DrawData(const DrawData& from)
 	: fClippingRegion(NULL)
 {
 	*this = from;
 }
 
-// copy constructor
+
 DrawData::DrawData(const DrawData* from)
 	: fOrigin(0.0, 0.0),
 	  fScale(1.0),

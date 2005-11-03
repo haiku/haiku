@@ -1134,27 +1134,13 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			gFontManager->Lock();
 			bool needsUpdate = gFontManager->FontsNeedUpdated();
 			gFontManager->Unlock();
-			
-			if(checkonly)
-			{
+
+			if (checkonly) {
 				fLink.StartMessage(needsUpdate ? SERVER_TRUE : SERVER_FALSE);
 				fLink.Flush();
-			}
-			else
-			{
-				if(needsUpdate)
-				{
-					gFontManager->Lock();
-					gFontManager->ScanSystemFolders();
-					gFontManager->Unlock();
-					fLink.StartMessage(SERVER_TRUE);
-					fLink.Flush();
-				}
-				else
-				{
-					fLink.StartMessage(SERVER_FALSE);
-					fLink.Flush();
-				}
+			} else {
+				fLink.StartMessage(SERVER_FALSE);
+				fLink.Flush();
 			}
 			break;
 		}
@@ -1172,7 +1158,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			gFontManager->Lock();
 
-			FontFamily *family = gFontManager->GetFamilyByIndex(index);
+			FontFamily *family = gFontManager->FamilyAt(index);
 			if (family) {
 				fLink.StartMessage(B_OK);
 				fLink.AttachString(family->Name());
@@ -1555,32 +1541,28 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// 4) uint16 - face flags
 			// 5) uint32 - font flags
 
-			gFontManager->Lock();
+			DesktopSettings settings(fDesktop);
 
-			ServerFont *font = NULL;
+			ServerFont font;
 			switch (code) {
 				case AS_SET_SYSFONT_PLAIN:
-					font = gFontManager->GetSystemPlain();
+					settings.GetDefaultPlainFont(font);
 					break;
 				case AS_SET_SYSFONT_BOLD:
-					font = gFontManager->GetSystemBold();
+					settings.GetDefaultBoldFont(font);
 					break;
 				case AS_SET_SYSFONT_FIXED:
-					font = gFontManager->GetSystemFixed();
+					settings.GetDefaultFixedFont(font);
 					break;
 			}
 
-			if (font != NULL) {
-				fLink.StartMessage(B_OK);
-				fLink.Attach<uint16>(font->FamilyID());
-				fLink.Attach<uint16>(font->StyleID());
-				fLink.Attach<float>(font->Size());
-				fLink.Attach<uint16>(font->Face());
-				fLink.Attach<uint32>(font->Flags());
-			} else
-				fLink.StartMessage(B_BAD_VALUE);
+			fLink.StartMessage(B_OK);
+			fLink.Attach<uint16>(font.FamilyID());
+			fLink.Attach<uint16>(font.StyleID());
+			fLink.Attach<float>(font.Size());
+			fLink.Attach<uint16>(font.Face());
+			fLink.Attach<uint32>(font.Flags());
 
-			gFontManager->Unlock();
 			fLink.Flush();
 			break;
 		}

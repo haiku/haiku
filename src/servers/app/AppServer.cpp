@@ -100,49 +100,10 @@ AppServer::AppServer()
 
 	// Create the font server and scan the proper directories.
 	gFontManager = new FontManager;
-	gFontManager->Lock();
-	gFontManager->ScanSystemFolders();
+	if (gFontManager->InitCheck() != B_OK)
+		debugger("font manager could not be initialized!");
 
-	if (!gFontManager->SetSystemPlain(DEFAULT_PLAIN_FONT_FAMILY,
-									DEFAULT_PLAIN_FONT_STYLE,
-									DEFAULT_PLAIN_FONT_SIZE) &&
-		!gFontManager->SetSystemPlain(FALLBACK_PLAIN_FONT_FAMILY,
-									DEFAULT_PLAIN_FONT_STYLE,
-									DEFAULT_PLAIN_FONT_SIZE)) {
-		printf("Couldn't set plain to %s (fallback: %s), %s %d pt\n",
-				DEFAULT_PLAIN_FONT_FAMILY,
-				FALLBACK_PLAIN_FONT_FAMILY,
-				DEFAULT_PLAIN_FONT_STYLE,
-				DEFAULT_PLAIN_FONT_SIZE);
-	}
-
-	if (!gFontManager->SetSystemBold(DEFAULT_BOLD_FONT_FAMILY,
-								   DEFAULT_BOLD_FONT_STYLE,
-								   DEFAULT_BOLD_FONT_SIZE) &&
-		!gFontManager->SetSystemBold(FALLBACK_BOLD_FONT_FAMILY,
-								   DEFAULT_BOLD_FONT_STYLE,
-								   DEFAULT_BOLD_FONT_SIZE)) {
-		printf("Couldn't set bold to %s (fallback: %s), %s %d pt\n",
-				DEFAULT_BOLD_FONT_FAMILY,
-				FALLBACK_BOLD_FONT_FAMILY,
-				DEFAULT_BOLD_FONT_STYLE,
-				DEFAULT_BOLD_FONT_SIZE);
-	}
-
-	if (!gFontManager->SetSystemFixed(DEFAULT_FIXED_FONT_FAMILY,
-									DEFAULT_FIXED_FONT_STYLE,
-									DEFAULT_FIXED_FONT_SIZE) &&
-		!gFontManager->SetSystemFixed(FALLBACK_FIXED_FONT_FAMILY,
-									DEFAULT_FIXED_FONT_STYLE,
-									DEFAULT_FIXED_FONT_SIZE)) {
-		printf("Couldn't set fixed to %s (fallback: %s), %s %d pt\n",
-				DEFAULT_FIXED_FONT_FAMILY,
-				FALLBACK_FIXED_FONT_FAMILY,
-				DEFAULT_FIXED_FONT_STYLE,
-				DEFAULT_FIXED_FONT_SIZE);
-	}
-
-	gFontManager->Unlock();
+	gFontManager->Run();
 
 	// Load the GUI colors here and set the global set to the values contained therein. If this
 	// is not possible, set colors to the defaults

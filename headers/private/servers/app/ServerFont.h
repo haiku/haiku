@@ -5,9 +5,10 @@
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Jérôme Duval, jerome.duval@free.fr
+ *		Axel Dörfler, axeld@pinc-software.de
  */
-#ifndef SERVERFONT_H_
-#define SERVERFONT_H_
+#ifndef SERVER_FONT_H
+#define SERVER_FONT_H
 
 
 #include <Font.h>
@@ -62,7 +63,8 @@ class ServerFont {
 			const char*			GetFamily() const;
 			const char*			GetPath() const
 									{ return fStyle->Path(); }
-	
+
+			void				SetStyle(FontStyle& style);
 			status_t			SetFamilyAndStyle(uint16 familyID,
 												  uint16 styleID);
 			status_t			SetFamilyAndStyle(uint32 fontID);
@@ -151,8 +153,6 @@ class ServerFont {
 
 protected:
 	friend class FontStyle;
-			void				_SetStyle(FontStyle* style);
-
 
 			FontStyle*			fStyle;
 			edge_info			fEdges;
@@ -167,5 +167,4 @@ protected:
 			uint32				fEncoding;
 };
 
-#endif
-
+#endif	/* SERVER_FONT_H */

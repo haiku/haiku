@@ -24,6 +24,7 @@
 #include "MessagePrivate.h"
 #include "PortLink.h"
 #include "RootLayer.h"
+#include "ServerApp.h"
 #include "ServerWindow.h"
 #include "TokenHandler.h"
 #include "Workspace.h"
@@ -110,8 +111,8 @@ WinBorder::WinBorder(const BRect &frame,
 	QuietlySetFeel(feel);
 
 	if (fFeel != B_NO_BORDER_WINDOW_LOOK) {
-		fDecorator = gDecorManager.AllocateDecorator(frame, name, fLook, fFeel, 
-													fWindowFlags, fDriver);
+		fDecorator = gDecorManager.AllocateDecorator(window->App()->GetDesktop(), frame,
+			name, fLook, fFeel,  fWindowFlags);
 		if (fDecorator)
 			fDecorator->GetSizeLimits(&fMinWidth, &fMinHeight, &fMaxWidth, &fMaxHeight);
 	}

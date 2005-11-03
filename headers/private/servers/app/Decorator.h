@@ -1,32 +1,14 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Decorator.h
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//					Stephan Aßmus <superstippi@gmx.de>
-//	Description:	Base class for window decorators
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
 #ifndef _DECORATOR_H_
 #define _DECORATOR_H_
+
 
 #include <Rect.h>
 #include <Region.h>
@@ -36,9 +18,11 @@
 #include "ColorSet.h"
 #include "LayerData.h"
 
+class DesktopSettings;
 class DisplayDriver;
 class ServerFont;
 class BRegion;
+
 
 typedef enum {
 	DEC_NONE = 0,
@@ -63,10 +47,8 @@ typedef enum {
 
 class Decorator {
  public:
-								Decorator(BRect rect,
-										  int32 wlook,
-										  int32 wfeel,
-										  int32 wflags);
+								Decorator(DesktopSettings& settings, BRect rect,
+									int32 look, int32 feel, int32 flags);
 	virtual						~Decorator();
 
 			void				SetColors(const ColorSet &cset);
@@ -145,7 +127,7 @@ class Decorator {
 
 	virtual	void				_DrawFrame(BRect r);
 	virtual	void				_DrawTab(BRect r);
-	
+
 	virtual	void				_DrawClose(BRect r);
 	virtual	void				_DrawTitle(BRect r);
 	virtual	void				_DrawZoom(BRect r);
@@ -153,7 +135,7 @@ class Decorator {
 
 	virtual	void				_SetFocus();
 	virtual	void				_SetColors();
-	
+
 			ColorSet*			_colors;
 			DisplayDriver*		_driver;
 			DrawData			_drawdata;
@@ -182,6 +164,7 @@ class Decorator {
 
 // add-on stuff
 typedef float get_version(void);
-typedef Decorator* create_decorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags);
+typedef Decorator* create_decorator(DesktopSettings& desktopSettings, BRect rect,
+	int32 look, int32 feel, int32 flags);
 
-#endif
+#endif	/* _DECORATOR_H_ */

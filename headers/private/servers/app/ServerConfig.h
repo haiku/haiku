@@ -60,15 +60,15 @@
 # define DEFAULT_PLAIN_FONT_FAMILY "Bitstream Vera Sans"
 # define FALLBACK_PLAIN_FONT_FAMILY "Swis721 BT"
 # define DEFAULT_PLAIN_FONT_STYLE "Roman"
-# define DEFAULT_PLAIN_FONT_SIZE 12
+# define DEFAULT_PLAIN_FONT_SIZE 12.0f
 # define DEFAULT_BOLD_FONT_FAMILY "Bitstream Vera Sans"
 # define FALLBACK_BOLD_FONT_FAMILY "Swis721 BT"
 # define DEFAULT_BOLD_FONT_STYLE "Bold"
-# define DEFAULT_BOLD_FONT_SIZE 12
+# define DEFAULT_BOLD_FONT_SIZE 12.0f
 # define DEFAULT_FIXED_FONT_FAMILY "Bitstream Vera Sans Mono"
 # define FALLBACK_FIXED_FONT_FAMILY "Courier10 BT"
 # define DEFAULT_FIXED_FONT_STYLE "Roman"
-# define DEFAULT_FIXED_FONT_SIZE 12
+# define DEFAULT_FIXED_FONT_SIZE 12.0f
 // This is the port capacity for all monitoring objects - ServerApps
 // and ServerWindows
 #define DEFAULT_MONITOR_PORT_SIZE 30
