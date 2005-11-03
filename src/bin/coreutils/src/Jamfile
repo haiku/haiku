@@ -114,7 +114,8 @@ BinCommand chgrp :
 	chgrp.c chown-core.c : libfetish.a libroot.so : $(coreutils_rsrc) ;
 
 BinCommand chown : 
-	chown.c chown-core.c : libfetish.a libroot.so : $(coreutils_rsrc) ;
+	chown.c [ FGristFiles chown-core.o ]
+	: libfetish.a libroot.so : $(coreutils_rsrc) ;
 
 BinCommand cp : 
 	cp.c copy.c cp-hash.c : libfetish.a : $(coreutils_rsrc) ;
@@ -123,14 +124,14 @@ BinCommand md5sum :
 	md5sum.c md5.c : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand mv : 
-	mv.c copy.c cp-hash.c remove.c : libfetish.a libroot.so : $(coreutils_rsrc) ;
+	mv.c [ FGristFiles copy.o cp-hash.o remove.o ]
+	: libfetish.a libroot.so : $(coreutils_rsrc) ;
 
 BinCommand sha1sum : 
 	md5sum.c sha1sum.c : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand vdir : 
-	ls.c ls-vdir.c : libfetish.a : $(coreutils_rsrc) ;
+	[ FGristFiles ls.o ] ls-vdir.c : libfetish.a : $(coreutils_rsrc) ;
 
 MakeLocatePlatform groups ;
 Shell groups : groups.sh ;
-
