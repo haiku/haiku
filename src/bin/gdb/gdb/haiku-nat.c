@@ -93,6 +93,7 @@ typedef struct extended_image_info {
 typedef struct team_debug_info {
 	team_id				team;
 	port_id				debugger_port;
+	thread_id			nub_thread;
 	debug_context		context;
 	thread_debug_info	*threads;
 	extended_image_info	*images;
@@ -192,10 +193,15 @@ static thread_debug_info *
 haiku_add_thread(team_debug_info *teamDebugInfo, thread_id threadID)
 {
 	struct thread_info *gdbThreadInfo;
+	thread_debug_info *threadDebugInfo;
+
+	if (threadID == teamDebugInfo->nub_thread) {
+		error("haiku_thread_added(): Trying to add debug nub thread (%ld)\n",
+			threadID);
+	}
 
 	// find the thread first
-	thread_debug_info *threadDebugInfo
-		=  haiku_find_thread(teamDebugInfo, threadID);
+	threadDebugInfo = haiku_find_thread(teamDebugInfo, threadID);
 	if (threadDebugInfo)
 		return threadDebugInfo;
 
@@ -260,7 +266,8 @@ haiku_init_thread_list(team_debug_info *teamDebugInfo)
 
 	while (get_next_thread_info(teamDebugInfo->team, &cookie, &threadInfo)
 		== B_OK) {
-		haiku_add_thread(teamDebugInfo, threadInfo.thread);
+		if (threadInfo.thread != teamDebugInfo->nub_thread)
+			haiku_add_thread(teamDebugInfo, threadInfo.thread);
 	}
 }
 
@@ -389,160 +396,6 @@ haiku_get_next_image_info(int lastID)
 		image = image->next;
 
 	return (image ? &image->info : NULL);
-}
-
-
-// #pragma mark -
-
-static void
-haiku_cleanup_team_debug_info()
-{
-	destroy_debug_context(&sTeamDebugInfo.context);
-	delete_port(sTeamDebugInfo.debugger_port);
-	sTeamDebugInfo.debugger_port = -1;
-	sTeamDebugInfo.team = -1;
-	
-	haiku_cleanup_thread_list(&sTeamDebugInfo);
-	haiku_cleanup_image_list(&sTeamDebugInfo);
-}
-
-
-static status_t
-haiku_send_debugger_message(team_debug_info *teamDebugInfo, int32 messageCode,
-	const void *message, int32 messageSize, void *reply, int32 replySize)
-{
-	return send_debug_message(&teamDebugInfo->context, messageCode,
-		message, messageSize, reply, replySize);
-}
-
-
-static void
-haiku_init_child_debugging (thread_id threadID, bool debugThread)
-{
-	thread_info threadInfo;
-	status_t result;
-	port_id nubPort;
-
-	// get a thread info
-	result = get_thread_info(threadID, &threadInfo);
-	if (result != B_OK)
-		error("Thread with ID %ld not found: %s", threadID, strerror(result));
-
-	// init our team debug structure
-	sTeamDebugInfo.team = threadInfo.team;
-	sTeamDebugInfo.debugger_port = -1;
-	sTeamDebugInfo.context.nub_port = -1;
-	sTeamDebugInfo.context.reply_port = -1;
-	sTeamDebugInfo.threads = NULL;
-	sTeamDebugInfo.events.head = NULL;
-	sTeamDebugInfo.events.tail = NULL;
-
-	// create the debugger port
-	sTeamDebugInfo.debugger_port = create_port(10, "gdb debug");
-	if (sTeamDebugInfo.debugger_port < 0) {
-		error("Failed to create debugger port: %s",
-			strerror(sTeamDebugInfo.debugger_port));
-	}
-
-	// install ourselves as the team debugger
-	nubPort = install_team_debugger(sTeamDebugInfo.team,
-		sTeamDebugInfo.debugger_port);
-	if (nubPort < 0) {
-		error("Failed to install ourselves as debugger for team %ld: %s",
-			sTeamDebugInfo.team, strerror(nubPort));
-	}
-
-	// init the debug context
-	result = init_debug_context(&sTeamDebugInfo.context, sTeamDebugInfo.team,
-		nubPort);
-	if (result != B_OK) {
-		error("Failed to init debug context for team %ld: %s\n",
-			sTeamDebugInfo.team, strerror(result));
-	}
-
-	// start debugging the thread
-	if (debugThread) {
-		result = debug_thread(threadID);
-		if (result != B_OK) {
-			error("Failed to start debugging thread %ld: %s", threadID,
-				strerror(result));
-		}
-	}
-
-	// set the team debug flags
-	{
-		debug_nub_set_team_flags message;
-		message.flags = B_TEAM_DEBUG_SIGNALS /*| B_TEAM_DEBUG_PRE_SYSCALL
-			| B_TEAM_DEBUG_POST_SYSCALL*/ | B_TEAM_DEBUG_TEAM_CREATION
-			| B_TEAM_DEBUG_THREADS | B_TEAM_DEBUG_IMAGES;
-			// TODO: We probably don't need all events
-
-		haiku_send_debugger_message(&sTeamDebugInfo,
-			B_DEBUG_MESSAGE_SET_TEAM_FLAGS, &message, sizeof(message), NULL, 0);
-	}
-
-
-	// the fun can start: push the target and init the rest
-	push_target(sHaikuTarget);
-
-	haiku_init_thread_list(&sTeamDebugInfo);
-	haiku_init_image_list(&sTeamDebugInfo);
-
-	disable_breakpoints_in_shlibs (1);
-
-//	child_clear_solibs ();
-		// TODO: Implement? Do we need this?
-
-	clear_proceed_status ();
-	init_wait_for_inferior ();
-
-	target_terminal_init ();
-	target_terminal_inferior ();
-}
-
-
-static void
-haiku_continue_thread(team_debug_info *teamDebugInfo, thread_id threadID,
-	uint32 handleEvent, bool step)
-{
-	debug_nub_continue_thread message;
-	status_t err;
-
-	message.thread = threadID;
-	message.handle_event = handleEvent;
-	message.single_step = step;
-
-	err = haiku_send_debugger_message(teamDebugInfo,
-		B_DEBUG_MESSAGE_CONTINUE_THREAD, &message, sizeof(message), NULL, 0);
-	if (err != B_OK) {
-		printf_unfiltered ("Failed to resume thread %ld: %s\n", threadID,
-			strerror(err));
-	}
-}
-
-
-static status_t
-haiku_get_cpu_state(team_debug_info *teamDebugInfo,
-	debug_nub_get_cpu_state_reply *reply)
-{
-	status_t err;
-	thread_id threadID = ptid_get_tid(inferior_ptid);
-	debug_nub_get_cpu_state message;
-
-	message.reply_port = teamDebugInfo->context.reply_port;
-	message.thread = threadID;
-
-	err = haiku_send_debugger_message(teamDebugInfo,
-		B_DEBUG_MESSAGE_GET_CPU_STATE, &message, sizeof(message), reply,
-		sizeof(*reply));
-	if (err == B_OK)
-		err = reply->error;
-	if (err != B_OK) {
-		printf_unfiltered ("Failed to get status of thread %ld: %s\n",
-			threadID, strerror(err));
-	}
-
-	return err;
 }
 
 
@@ -711,6 +564,228 @@ haiku_thread_event_predicate(void *_closure, debug_event *event)
 	}
 
 	return (closure->event != NULL);
+}
+
+
+// #pragma mark -
+
+static void
+haiku_cleanup_team_debug_info()
+{
+	destroy_debug_context(&sTeamDebugInfo.context);
+	delete_port(sTeamDebugInfo.debugger_port);
+	sTeamDebugInfo.debugger_port = -1;
+	sTeamDebugInfo.team = -1;
+	
+	haiku_cleanup_thread_list(&sTeamDebugInfo);
+	haiku_cleanup_image_list(&sTeamDebugInfo);
+}
+
+
+static status_t
+haiku_send_debugger_message(team_debug_info *teamDebugInfo, int32 messageCode,
+	const void *message, int32 messageSize, void *reply, int32 replySize)
+{
+	return send_debug_message(&teamDebugInfo->context, messageCode,
+		message, messageSize, reply, replySize);
+}
+
+
+static void
+haiku_init_child_debugging (thread_id threadID, bool debugThread)
+{
+	thread_info threadInfo;
+	status_t result;
+	port_id nubPort;
+
+	// get a thread info
+	result = get_thread_info(threadID, &threadInfo);
+	if (result != B_OK)
+		error("Thread with ID %ld not found: %s", threadID, strerror(result));
+
+	// init our team debug structure
+	sTeamDebugInfo.team = threadInfo.team;
+	sTeamDebugInfo.debugger_port = -1;
+	sTeamDebugInfo.context.nub_port = -1;
+	sTeamDebugInfo.context.reply_port = -1;
+	sTeamDebugInfo.threads = NULL;
+	sTeamDebugInfo.events.head = NULL;
+	sTeamDebugInfo.events.tail = NULL;
+
+	// create the debugger port
+	sTeamDebugInfo.debugger_port = create_port(10, "gdb debug");
+	if (sTeamDebugInfo.debugger_port < 0) {
+		error("Failed to create debugger port: %s",
+			strerror(sTeamDebugInfo.debugger_port));
+	}
+
+	// install ourselves as the team debugger
+	nubPort = install_team_debugger(sTeamDebugInfo.team,
+		sTeamDebugInfo.debugger_port);
+	if (nubPort < 0) {
+		error("Failed to install ourselves as debugger for team %ld: %s",
+			sTeamDebugInfo.team, strerror(nubPort));
+	}
+
+	// get the nub thread
+	{
+		team_info teamInfo;
+		result = get_team_info(sTeamDebugInfo.team, &teamInfo);
+		if (result != B_OK) {
+			error("Failed to get info for team %ld: %s\n",
+				sTeamDebugInfo.team, strerror(result));
+		}
+
+		sTeamDebugInfo.nub_thread = teamInfo.debugger_nub_thread;
+	}
+
+	// init the debug context
+	result = init_debug_context(&sTeamDebugInfo.context, sTeamDebugInfo.team,
+		nubPort);
+	if (result != B_OK) {
+		error("Failed to init debug context for team %ld: %s\n",
+			sTeamDebugInfo.team, strerror(result));
+	}
+
+	// start debugging the thread
+	if (debugThread) {
+		result = debug_thread(threadID);
+		if (result != B_OK) {
+			error("Failed to start debugging thread %ld: %s", threadID,
+				strerror(result));
+		}
+	}
+
+	// set the team debug flags
+	{
+		debug_nub_set_team_flags message;
+		message.flags = B_TEAM_DEBUG_SIGNALS /*| B_TEAM_DEBUG_PRE_SYSCALL
+			| B_TEAM_DEBUG_POST_SYSCALL*/ | B_TEAM_DEBUG_TEAM_CREATION
+			| B_TEAM_DEBUG_THREADS | B_TEAM_DEBUG_IMAGES;
+			// TODO: We probably don't need all events
+
+		haiku_send_debugger_message(&sTeamDebugInfo,
+			B_DEBUG_MESSAGE_SET_TEAM_FLAGS, &message, sizeof(message), NULL, 0);
+	}
+
+
+	// the fun can start: push the target and init the rest
+	push_target(sHaikuTarget);
+
+	haiku_init_thread_list(&sTeamDebugInfo);
+	haiku_init_image_list(&sTeamDebugInfo);
+
+	disable_breakpoints_in_shlibs (1);
+
+//	child_clear_solibs ();
+		// TODO: Implement? Do we need this?
+
+	clear_proceed_status ();
+	init_wait_for_inferior ();
+
+	target_terminal_init ();
+	target_terminal_inferior ();
+}
+
+
+static void
+haiku_continue_thread(team_debug_info *teamDebugInfo, thread_id threadID,
+	uint32 handleEvent, bool step)
+{
+	debug_nub_continue_thread message;
+	status_t err;
+
+	message.thread = threadID;
+	message.handle_event = handleEvent;
+	message.single_step = step;
+
+	err = haiku_send_debugger_message(teamDebugInfo,
+		B_DEBUG_MESSAGE_CONTINUE_THREAD, &message, sizeof(message), NULL, 0);
+	if (err != B_OK) {
+		printf_unfiltered ("Failed to resume thread %ld: %s\n", threadID,
+			strerror(err));
+	}
+}
+
+
+static status_t
+haiku_stop_thread(team_debug_info *teamDebugInfo, thread_id threadID)
+{
+	// check whether we know the thread
+	status_t err;
+	thread_event_closure threadEventClosure;
+
+	thread_debug_info *threadInfo = haiku_find_thread(teamDebugInfo, threadID);
+	if (!threadInfo)
+		return B_BAD_THREAD_ID;
+
+	// already stopped?
+	if (threadInfo->stopped)
+		return B_OK;
+
+	// debug the thread
+	err = debug_thread(threadID);
+	if (err != B_OK) {
+		TRACE(("haiku_stop_thread(): failed to debug thread %ld: %s\n",
+			threadID, strerror(err)));
+		return err;
+	}
+
+	// wait for the event to hit our port
+	
+	// prepare closure for finding interesting events
+	threadEventClosure.context = teamDebugInfo;
+	threadEventClosure.thread = threadID;
+	threadEventClosure.event = NULL;
+
+	// find the first interesting queued event
+	threadEventClosure.event = haiku_find_next_debug_event(
+		&teamDebugInfo->events, haiku_thread_event_predicate,
+		&threadEventClosure);
+
+	// read all events pending on the port
+	haiku_read_pending_debug_events(teamDebugInfo,
+		(threadEventClosure.event == NULL), haiku_thread_event_predicate,
+		&threadEventClosure);
+
+	// We should check, whether we really got an event for the thread in
+	// question, but the only possible other event is that the team has
+	// been delete, which ends the game anyway.
+
+	return B_OK;
+}
+
+
+static status_t
+haiku_get_cpu_state(team_debug_info *teamDebugInfo,
+	debug_nub_get_cpu_state_reply *reply)
+{
+	status_t err;
+	thread_id threadID = ptid_get_tid(inferior_ptid);
+	debug_nub_get_cpu_state message;
+
+	// make sure the thread is stopped
+	err = haiku_stop_thread(teamDebugInfo, threadID);
+	if (err != B_OK) {
+		printf_unfiltered ("Failed to stop thread %ld: %s\n",
+			threadID, strerror(err));
+		return err;
+	}
+
+	message.reply_port = teamDebugInfo->context.reply_port;
+	message.thread = threadID;
+
+	err = haiku_send_debugger_message(teamDebugInfo,
+		B_DEBUG_MESSAGE_GET_CPU_STATE, &message, sizeof(message), reply,
+		sizeof(*reply));
+	if (err == B_OK)
+		err = reply->error;
+	if (err != B_OK) {
+		printf_unfiltered ("Failed to get status of thread %ld: %s\n",
+			threadID, strerror(err));
+	}
+
+	return err;
 }
 
 
@@ -1075,11 +1150,14 @@ haiku_child_wait_internal (team_debug_info *teamDebugInfo, ptid_t ptid,
 			break;
 
 		case B_DEBUGGER_MESSAGE_THREAD_CREATED:
+		{
 			// internal bookkeeping only
-			haiku_add_thread(teamDebugInfo,
-				event->data.thread_created.new_thread);
+			thread_id newThread = event->data.thread_created.new_thread;
+			if (newThread != teamDebugInfo->nub_thread)
+				haiku_add_thread(teamDebugInfo, newThread);
 			*ignore = true;
 			break;
+		}
 
 		case B_DEBUGGER_MESSAGE_THREAD_DELETED:
 			// internal bookkeeping
@@ -1228,6 +1306,9 @@ haiku_child_fetch_inferior_registers (int reg)
 
 	// get the CPU state
 	haiku_get_cpu_state(&sTeamDebugInfo, &reply);
+
+// printf("haiku_child_fetch_inferior_registers(): eip: %p, ebp: %p\n",
+// (void*)reply.cpu_state.eip, (void*)reply.cpu_state.ebp);
 
 	// supply the registers (architecture specific)
 	haiku_supply_registers(reg, &reply.cpu_state);
