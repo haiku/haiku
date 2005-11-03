@@ -432,7 +432,7 @@ FontManager::SetSystemPlain(const char* familyName, const char* styleName, float
 		return false;
 
 	delete fPlain;
-	fPlain = new ServerFont(style, size);
+	fPlain = new ServerFont(*style, size);
 
 	return true;
 }
@@ -454,7 +454,7 @@ FontManager::SetSystemBold(const char* familyName, const char* styleName, float 
 		return false;
 
 	delete fBold;
-	fBold = new ServerFont(style, size);
+	fBold = new ServerFont(*style, size);
 
 	return true;
 }
@@ -476,7 +476,7 @@ FontManager::SetSystemFixed(const char* familyName, const char* styleName, float
 		return false;
 
 	delete fFixed;
-	fFixed = new ServerFont(style, size);
+	fFixed = new ServerFont(*style, size);
 
 	return true;
 }

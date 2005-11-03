@@ -12,6 +12,8 @@
 
 #include "FontFamily.h"
 #include "ServerFont.h"
+#include "FontManager.h"
+
 #include FT_CACHE_H
 
 
@@ -25,72 +27,46 @@ const int32 kInvalidFamilyFlags = -1;
 */
 FontStyle::FontStyle(const char *path, FT_Face face)
 	: BLocker(face->style_name),
-	fFTFace(face),
-	fFontFamily(NULL),
+	fFreeTypeFace(face),
 	fName(face->style_name),
 	fPath(path),
-	fBounds(0, 0, 0, 0),
+	fFamily(NULL),
 	fID(0),
+	fBounds(0, 0, 0, 0),
 	fFace(_TranslateStyleToFace(face->style_name))
 {
 	fName.Truncate(B_FONT_STYLE_LENGTH);
 		// make sure this style can be found using the Be API
 
-//	cachedface = new CachedFaceRec;
-//	cachedface->file_path = filepath;
+	fHeight.ascent = (double)face->ascender / face->units_per_EM;
+	fHeight.descent = (double)-face->descender / face->units_per_EM;
+		// FT2's descent numbers are negative. Be's is positive
 
-	fHeight.ascent = face->ascender;
-	// FT2's descent numbers are negative. Be's is positive
-	fHeight.descent = -face->descender;
-	
 	// FT2 doesn't provide a linegap, but according to the docs, we can
 	// calculate it because height = ascending + descending + leading
-	fHeight.leading = face->height - (fHeight.ascent + fHeight.descent);
-	fHeight.units_per_em = face->units_per_EM;
+	fHeight.leading = (double)(face->height - face->ascender + face->descender)
+		/ face->units_per_EM;
 }
 
 
-/*!
-	\brief Destructor
-	
-	Frees all data allocated on the heap. All child ServerFonts are marked as having
-	a NULL style so that each ServerFont knows that it is running on borrowed time. 
-	This is done because a FontStyle should be deleted only when it no longer has any
-	dependencies.
-*/
 FontStyle::~FontStyle()
 {
-// TODO: what was the purpose of this?
-//	delete cachedface;
-	FT_Done_Face(fFTFace);
+	// make sure the font server is ours
+	if (fFamily != NULL && gFontManager->Lock()) {
+		fFamily->RemoveStyle(this);
+		gFontManager->Unlock();
+	}
+
+	FT_Done_Face(fFreeTypeFace);
 }
 
 
-/*!
-	\brief Returns the name of the style as a string
-	\return The style's name
-*/
-const char*
-FontStyle::Name() const
+void
+FontStyle::GetHeight(float size, font_height& height) const
 {
-	return fName.String();
-}
-
-
-font_height
-FontStyle::GetHeight(const float &size) const
-{
-	font_height fh = { 0, 0, 0 };
-	
-	// font units are 26.6 format, so we get REALLY big numbers if
-	// we don't do some shifting.
-	// TODO: As it looks like that the "units_per_em" don't change
-	// for the lifetime of FontStyle, can't we apply these
-	// conversions in the constructor and get rid of "units_per_em" ?
-	fh.ascent = (fHeight.ascent * size) / fHeight.units_per_em;
-	fh.descent = (fHeight.descent * size) / fHeight.units_per_em;
-	fh.leading = (fHeight.leading * size) / fHeight.units_per_em;
-	return fh;
+	height.ascent = fHeight.ascent * size;
+	height.descent = fHeight.descent * size;
+	height.leading = fHeight.leading * size;
 }
 
 
@@ -140,6 +116,28 @@ FontStyle::PreservedFace(uint16 face) const
 }
 
 
+status_t
+FontStyle::UpdateFace(FT_Face face)
+{
+	if (!IsLocked()) {
+		debugger("UpdateFace() called without having locked FontStyle!");
+		return B_ERROR;
+	}
+
+	// we only accept the face if it hasn't change its style
+
+	BString name = face->style_name;
+	name.Truncate(B_FONT_STYLE_LENGTH);
+
+	if (name != fName)
+		return B_BAD_VALUE;
+
+	FT_Done_Face(fFreeTypeFace);
+	fFreeTypeFace = face;
+	return B_OK;
+}
+
+
 /*!
 	\brief Converts an ASCII character to Unicode for the style
 	\param c An ASCII character
@@ -159,6 +157,15 @@ FontStyle::ConvertToUnicode(uint16 c)
 	return FT_Get_Char_Index(f,c);
 }
 */
+
+
+void
+FontStyle::_SetFontFamily(FontFamily* family, uint16 id)
+{
+	fFamily = family;
+	fID = id;
+}
+
 
 uint16
 FontStyle::_TranslateStyleToFace(const char *name) const
@@ -245,11 +252,8 @@ FontFamily::AddStyle(FontStyle *style)
 			return false;
 	}
 
-	style->_SetFontFamily(this);
-	style->_SetID(fNextID++);
-
+	style->_SetFontFamily(this, fNextID++);
 	fStyles.AddItem(style);
-	AddDependent();
 
 	// force a refresh if a request for font flags is needed
 	fFlags = kInvalidFamilyFlags;
@@ -258,40 +262,44 @@ FontFamily::AddStyle(FontStyle *style)
 }
 
 
-/*!
-	\brief Removes a style from the family and deletes it
-	\param style Name of the style to be removed from the family
-*/
-void
+bool
 FontFamily::RemoveStyle(const char* styleName)
 {
 	FontStyle *style = GetStyle(styleName);
-	if (style == NULL)
-		return;
+	if (style != NULL)
+		return RemoveStyle(style);
 
-	fStyles.RemoveItem(style);
-	delete style;
-
-	RemoveDependent();
-
-	// force a refresh if a request for font flags is needed
-	fFlags = kInvalidFamilyFlags;
+	return false;
 }
 
 
 /*!
-	\brief Removes a style from the family. The caller is responsible for freeing the object
+	\brief Removes a style from the family.
+
+	The font family may be deleted during this call - the object might not
+	be valid anymore after this call.
+	The font style will not be altered.
+
 	\param style The style to be removed from the family
 */
-void
+bool
 FontFamily::RemoveStyle(FontStyle* style)
 {
-	if (fStyles.RemoveItem(style)) {
-		RemoveDependent();
-
-		// force a refresh if a request for font flags is needed
-		fFlags = kInvalidFamilyFlags;
+	if (!gFontManager->IsLocked()) {
+		debugger("FontFamily::RemoveStyle() called without having the font manager locked!");
+		return false;
 	}
+
+	if (!fStyles.RemoveItem(style))
+		return false;
+
+	// force a refresh if a request for font flags is needed
+	fFlags = kInvalidFamilyFlags;
+
+	if (CountStyles() == 0)
+		delete this;
+
+	return true;
 }
 
 

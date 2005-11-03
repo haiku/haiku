@@ -34,16 +34,13 @@ DrawData::DrawData()
 	  fAlphaFncMode(B_ALPHA_OVERLAY),
 	  fPenLocation(0.0, 0.0),
 	  fPenSize(1.0),
-	  fFont(),
+	  fFont(*gFontManager->GetSystemPlain()),
 	  fFontAliasing(false),
 	  fSubPixelPrecise(false),
 	  fLineCapMode(B_BUTT_CAP),
 	  fLineJoinMode(B_BEVEL_JOIN),
 	  fMiterLimit(B_DEFAULT_MITER_LIMIT)
 {
-	if (gFontManager && gFontManager->GetSystemPlain())
-		fFont = *(gFontManager->GetSystemPlain());
-	
 	fUnscaledFontSize = fFont.Size();
 }
 

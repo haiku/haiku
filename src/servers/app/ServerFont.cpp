@@ -105,7 +105,7 @@ class FaceGetter {
 
 		FT_Face Face()
 		{
-			return fStyle->GetFTFace();
+			return fStyle->FreeTypeFace();
 		}
 
 	private:
@@ -125,10 +125,10 @@ class FaceGetter {
 	\param flags Style flags as defined in <Font.h>
 	\param spacing String spacing flag as defined in <Font.h>
 */
-ServerFont::ServerFont(FontStyle *style, float size,
+ServerFont::ServerFont(FontStyle& style, float size,
 					   float rotation, float shear,
 					   uint16 flags, uint8 spacing)
-	: fStyle(style),
+	: fStyle(&style),
 	  fSize(size),
 	  fRotation(rotation),
 	  fShear(shear),
@@ -138,58 +138,39 @@ ServerFont::ServerFont(FontStyle *style, float size,
 	  fDirection(B_FONT_LEFT_TO_RIGHT),
 	  fFace(B_REGULAR_FACE),
 	  fEncoding(B_UNICODE_UTF8)
-
 {
-	if (fStyle)
-		fStyle->AddDependent();
+	fStyle->Acquire();
 }
 
-// TODO: fStyle should not be NULL. There should be another FontStyle
-// constructor, that initializes without actually interfacing with
-// freetype, so that a ServerFont can be guaranteed to be "valid".
 
 ServerFont::ServerFont()
-	: fStyle(NULL),
-	  fSize(0.0),
-	  fRotation(0.0),
-	  fShear(90.0),
-	  fBounds(0, 0, 0, 0),
-	  fFlags(0),
-	  fSpacing(B_STRING_SPACING),
-	  fDirection(B_FONT_LEFT_TO_RIGHT),
-	  fFace(B_REGULAR_FACE),
-	  fEncoding(B_UNICODE_UTF8)
+	:
+	fStyle(NULL)
 {
+	*this = *gFontManager->GetSystemPlain();
 }
+
 
 /*! 
 	\brief Copy Constructor
 	\param font ServerFont to copy
 */
 ServerFont::ServerFont(const ServerFont &font)
-	: fStyle(font.fStyle),
-	  fSize(font.fSize),
-	  fRotation(font.fRotation),
-	  fShear(font.fShear),
-	  fBounds(0, 0, 0, 0),
-	  fFlags(font.fFlags),
-	  fSpacing(font.fSpacing),
-	  fDirection(font.fDirection),
-	  fFace(font.fFace),
-	  fEncoding(font.fEncoding)
+	:
+	fStyle(NULL)
 {
-	if (fStyle)
-		fStyle->AddDependent();
+	*this = font;
 }
+
 
 /*! 
 	\brief Removes itself as a dependency of its owning style.
 */
 ServerFont::~ServerFont()
 {
-	if (fStyle)
-		fStyle->RemoveDependent();
+	fStyle->Release();
 }
+
 
 /*! 
 	\brief Returns a copy of the specified font
@@ -214,6 +195,7 @@ ServerFont::operator=(const ServerFont& font)
 	return *this;
 }
 
+
 /*! 
 	\brief Returns the number of strikes in the font
 	\return The number of strikes in the font
@@ -221,40 +203,34 @@ ServerFont::operator=(const ServerFont& font)
 int32
 ServerFont::CountTuned()
 {
-	if (fStyle)
-		return fStyle->TunedCount();
-
-	return 0;
+	return fStyle->TunedCount();
 }
 
+
 /*! 
-	\brief Returns the file format of the font. Currently unimplemented.
-	\return B_TRUETYPE_WINDOWS
+	\brief Returns the file format of the font.
+	\return Mostly B_TRUETYPE_WINDOWS :)
 */
 font_file_format
 ServerFont::FileFormat()
 {
-	// TODO: implement ServerFont::FileFormat
-	return B_TRUETYPE_WINDOWS;
+	return fStyle->FileFormat();
 }
+
 
 const char*
 ServerFont::GetStyle() const
 {
-	if (fStyle)
-		return fStyle->Name();
-
-	return NULL;
+	return fStyle->Name();
 }
+
 
 const char*
 ServerFont::GetFamily() const
 {
-	if (fStyle)
-		return fStyle->Family()->Name();
-
-	return NULL;
+	return fStyle->Family()->Name();
 }
+
 
 /*!
 	\brief Sets the ServerFont instance to whatever font is specified
@@ -269,6 +245,9 @@ ServerFont::SetFamilyAndStyle(uint16 familyID, uint16 styleID)
 
 	if (gFontManager->Lock()) {
 		style = gFontManager->GetStyle(familyID, styleID);
+		if (style != NULL)
+			style->Acquire();
+
 		gFontManager->Unlock();
 	}
 
@@ -276,9 +255,11 @@ ServerFont::SetFamilyAndStyle(uint16 familyID, uint16 styleID)
 		return B_ERROR;
 
 	_SetStyle(style);
+	style->Release();
 
 	return B_OK;
 }
+
 
 /*!
 	\brief Sets the ServerFont instance to whatever font is specified
@@ -293,6 +274,7 @@ ServerFont::SetFamilyAndStyle(uint32 fontID)
 	
 	return SetFamilyAndStyle(family, style);
 }
+
 
 /*!
 	\brief Gets the ID values for the ServerFont instance in one shot
@@ -365,7 +347,7 @@ ServerFont::GetGlyphShapes(const char charArray[], int32 numChars) const
 void
 ServerFont::GetHasGlyphs(const char charArray[], int32 numChars, bool hasArray[]) const
 {
-	if (!fStyle || !charArray || numChars <= 0 || !hasArray)
+	if (!charArray || numChars <= 0 || !hasArray)
 		return;
 
 	FaceGetter getter(fStyle);
@@ -403,11 +385,10 @@ ServerFont::GetHasGlyphs(const char charArray[], int32 numChars, bool hasArray[]
 }
 
 
-// GetEdges
 void
 ServerFont::GetEdges(const char charArray[], int32 numChars, edge_info edgeArray[]) const
 {
-	if (!fStyle || !charArray || numChars <= 0 || !edgeArray)
+	if (!charArray || numChars <= 0 || !edgeArray)
 		return;
 
 	FaceGetter getter(fStyle);
@@ -450,44 +431,43 @@ ServerFont::GetEdges(const char charArray[], int32 numChars, edge_info edgeArray
 }
 
 
-// GetEscapements
 BPoint*
 ServerFont::GetEscapements(const char charArray[], int32 numChars,
 						   BPoint offsetArray[]) const
 {
-	if (!fStyle || !charArray || numChars <= 0 || !offsetArray)
+	if (!charArray || numChars <= 0 || !offsetArray)
 		return NULL;
-	
+
 	FaceGetter getter(fStyle);
 	FT_Face face = getter.Face();
 	if (!face)
 		return NULL;
 
 	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
-	
+
 	Angle rotation(fRotation);
 	Angle shear(fShear);
-	
+
 	// First, rotate
 	FT_Matrix rmatrix;
 	rmatrix.xx = (FT_Fixed)( rotation.Cosine()*0x10000);
 	rmatrix.xy = (FT_Fixed)(-rotation.Sine()*0x10000);
 	rmatrix.yx = (FT_Fixed)( rotation.Sine()*0x10000);
 	rmatrix.yy = (FT_Fixed)( rotation.Cosine()*0x10000);
-	
+
 	// Next, shear
 	FT_Matrix smatrix;
 	smatrix.xx = (FT_Fixed)(0x10000); 
 	smatrix.xy = (FT_Fixed)(-shear.Cosine()*0x10000);
 	smatrix.yx = (FT_Fixed)(0);
 	smatrix.yy = (FT_Fixed)(0x10000);
-	
+
 	// Multiply togheter
 	FT_Matrix_Multiply(&rmatrix, &smatrix);
-	
+
 	//FT_Vector pen;
 	//FT_Set_Transform(face, &smatrix, &pen);
-	
+
 	// TODO: I'm not sure if this the correct interpretation
 	// of the BeBook. Have actual tests been done here?
 
@@ -502,19 +482,18 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 		escapements[i].y = float(face->glyph->metrics.vertAdvance / 64) / fSize;
 		escapements[i] += offsetArray[i];
 	}
-	
+
 	return escapements;
 }
 
 
-// GetEscapements
 bool
 ServerFont::GetEscapements(const char charArray[], int32 numChars, int32 numBytes,
 						   float widthArray[], escapement_delta delta) const
 {
-	if (!fStyle || !charArray || numChars <= 0)
+	if (!charArray || numChars <= 0)
 		return false;
-	
+
 	FaceGetter getter(fStyle);
 	FT_Face face = getter.Face();
 	if (!face)
@@ -560,7 +539,7 @@ ServerFont::GetBoundingBoxesAsString(const char charArray[], int32 numChars,
 	BRect rectArray[], bool string_escapement, font_metric_mode mode,
 	escapement_delta delta)
 {
-	if (!fStyle || !charArray || numChars <= 0 || !rectArray)
+	if (!charArray || numChars <= 0 || !rectArray)
 		return false;
 
 	FaceGetter getter(fStyle);
@@ -620,7 +599,7 @@ bool
 ServerFont::GetBoundingBoxesForStrings(char *charArray[], int32 lengthArray[], 
 	int32 numStrings, BRect rectArray[], font_metric_mode mode, escapement_delta deltaArray[])
 {
-	if (!fStyle || !charArray || !lengthArray|| numStrings <= 0 || !rectArray || !deltaArray)
+	if (!charArray || !lengthArray|| numStrings <= 0 || !rectArray || !deltaArray)
 		return false;
 
 	FaceGetter getter(fStyle);
@@ -632,18 +611,16 @@ ServerFont::GetBoundingBoxesForStrings(char *charArray[], int32 lengthArray[],
 
 	for (int32 i = 0; i < numStrings; i++) {
 		// TODO: ...
-
 	}
 
 	return true;
 }
 
 
-// StringWidth
 float
 ServerFont::StringWidth(const char* string, int32 numBytes) const
 {
-	if (!fStyle || !string || numBytes <= 0)
+	if (!string || numBytes <= 0)
 		return 0.0;
 
 	FaceGetter getter(fStyle);
@@ -680,6 +657,7 @@ ServerFont::StringWidth(const char* string, int32 numBytes) const
 	return width;
 }
 
+
 /*! 
 	\brief Returns a BRect which encloses the entire font
 	\return A BRect which encloses the entire font
@@ -691,18 +669,18 @@ ServerFont::BoundingBox()
 	return fBounds;
 }
 
+
 /*! 
 	\brief Obtains the height values for characters in the font in its current state
 	\param fh pointer to a font_height object to receive the values for the font
 */
 void
-ServerFont::Height(font_height *fh) const
+ServerFont::GetHeight(font_height& height) const
 {
-	if (fh && fStyle)
-		*fh = fStyle->GetHeight(fSize);
+	fStyle->GetHeight(fSize, height);
 }
 
-// TruncateString
+
 void
 ServerFont::TruncateString(BString* inOut, uint32 mode, float width) const
 {
@@ -730,19 +708,20 @@ ServerFont::TruncateString(BString* inOut, uint32 mode, float width) const
 	}
 }
 
-// _SetStyle
+
 void
 ServerFont::_SetStyle(FontStyle* style)
 {
+	if (style == NULL)
+		debugger("set NULL style!");
+
 	if (style != fStyle) {
 		// detach from old style
 		if (fStyle)
-			fStyle->RemoveDependent();
+			fStyle->Release();
 
-		fStyle = style;
-	
 		// attach to new style
-		if (fStyle)
-			fStyle->AddDependent();
+		fStyle = style;
+		fStyle->Acquire();
 	}
 }

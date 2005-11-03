@@ -3,12 +3,12 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *              DarkWyrm <bpmagic@columbus.rr.com>
- *              Jérôme Duval, jerome.duval@free.fr
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Jérôme Duval, jerome.duval@free.fr
  */
-
 #ifndef SERVERFONT_H_
 #define SERVERFONT_H_
+
 
 #include <Font.h>
 #include <Rect.h>
@@ -18,10 +18,11 @@
 class BShape;
 class BString;
 
+
 class ServerFont {
  public:
 								ServerFont();
-								ServerFont(FontStyle* style,
+								ServerFont(FontStyle& style,
 										   float size = 12.0,
 										   float fRotation = 0.0,
 										   float fShear = 90.0,
@@ -30,13 +31,7 @@ class ServerFont {
 								ServerFont(const ServerFont& font);
 	virtual						~ServerFont();
 
-	// TODO: make more advanced...
-			status_t			InitCheck() const
-									{ return fStyle ? B_OK : B_NO_INIT; }
-
-
 			ServerFont			&operator=(const ServerFont& font);
-	
 
 			font_direction		Direction() const
 									{ return fDirection; }
@@ -145,10 +140,10 @@ class ServerFont {
 			void				Unlock() const { fStyle->Unlock(); }
 
 			FT_Face				GetFTFace() const
-									{ return fStyle->GetFTFace(); };
+									{ return fStyle->FreeTypeFace(); };
 	
 			BRect				BoundingBox();
-			void				Height(font_height* fh) const;
+			void				GetHeight(font_height& height) const;
 
 			void				TruncateString(BString* inOut,
 											   uint32 mode,

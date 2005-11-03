@@ -1084,11 +1084,6 @@ Painter::_Clipped(const BRect& rect) const
 void
 Painter::_UpdateFont()
 {
-	// TODO: temporary work arround until ServerFont
-	// is guaranteed to be valid.
-	if (fFont.InitCheck() < B_OK)
-		return;
-
 	fTextRenderer->SetFont(fFont);
 }
 

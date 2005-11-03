@@ -38,27 +38,6 @@ enum font_format {
 	FONT_WINFONT,
 };
 
-/*
-//! data structure used by the FreeType cache manager
-typedef struct CachedFaceRec_
-{
-	BString file_path; 
-	int face_index; 
-} CachedFaceRec, *CachedFace;
-*/
-/*!
-	\brief Private structure to store font height values
-	
-	Units provided by FT2 are in font units, so they are stored in the style as
-	such. Each value must be multiplied by the point size to determine size in pixels
-	
-*/
-typedef struct {
-	FT_Short ascent;
-	FT_Short descent;
-	FT_Short leading;
-	FT_UShort units_per_em;
-} FontStyleHeight;
 
 /*!
 	\class FontStyle FontFamily.h
@@ -78,53 +57,54 @@ class FontStyle : public SharedObject, public BLocker {
 	\return true if fixed, false if not
 */
 		bool			IsFixedWidth() const
-							{ return fFTFace->face_flags & FT_FACE_FLAG_FIXED_WIDTH; }
+							{ return fFreeTypeFace->face_flags & FT_FACE_FLAG_FIXED_WIDTH; }
 /*!
 	\fn bool FontStyle::IsScalable(void)
 	\brief Determines whether the font can be scaled to any size
 	\return true if scalable, false if not
 */
 		bool			IsScalable() const
-							{ return fFTFace->face_flags & FT_FACE_FLAG_SCALABLE; }
+							{ return fFreeTypeFace->face_flags & FT_FACE_FLAG_SCALABLE; }
 /*!
 	\fn bool FontStyle::HasKerning(void)
 	\brief Determines whether the font has kerning information
 	\return true if kerning info is available, false if not
 */
 		bool			HasKerning() const
-							{ return fFTFace->face_flags & FT_FACE_FLAG_KERNING; }
+							{ return fFreeTypeFace->face_flags & FT_FACE_FLAG_KERNING; }
 /*!
 	\fn bool FontStyle::HasTuned(void)
 	\brief Determines whether the font contains strikes
 	\return true if it has strikes included, false if not
 */
 		bool			HasTuned() const
-							{ return fFTFace->num_fixed_sizes > 0; }
+							{ return fFreeTypeFace->num_fixed_sizes > 0; }
 /*!
 	\fn bool FontStyle::TunedCount(void)
 	\brief Returns the number of strikes the style contains
 	\return The number of strikes the style contains
 */
 		int32			TunedCount() const
-							{ return fFTFace->num_fixed_sizes; }
+							{ return fFreeTypeFace->num_fixed_sizes; }
 /*!
 	\fn bool FontStyle::GlyphCount(void)
 	\brief Returns the number of glyphs in the style
 	\return The number of glyphs the style contains
 */
 		uint16			GlyphCount() const
-							{ return fFTFace->num_glyphs; }
+							{ return fFreeTypeFace->num_glyphs; }
 /*!
 	\fn bool FontStyle::CharMapCount(void)
 	\brief Returns the number of character maps the style contains
 	\return The number of character maps the style contains
 */
 		uint16			CharMapCount() const
-							{ return fFTFace->num_charmaps; }
+							{ return fFreeTypeFace->num_charmaps; }
 
-		const char*		Name() const;
+		const char*		Name() const
+							{ return fName.String(); }
 		FontFamily*		Family() const
-							{ return fFontFamily; }
+							{ return fFamily; }
 		uint16			ID() const
 							{ return fID; }
 		int32			Flags() const;
@@ -134,14 +114,16 @@ class FontStyle : public SharedObject, public BLocker {
 		uint16			PreservedFace(uint16) const;
 
 		const char*		Path() const;
-		font_height		GetHeight(const float& size) const;
+		void			GetHeight(float size, font_height &heigth) const;
 		font_direction	Direction() const
 							{ return B_FONT_LEFT_TO_RIGHT; }
 		font_file_format FileFormat() const
 							{ return B_TRUETYPE_WINDOWS; }
 
-		FT_Face			GetFTFace() const
-							{ return fFTFace; }
+		FT_Face			FreeTypeFace() const
+							{ return fFreeTypeFace; }
+
+		status_t		UpdateFace(FT_Face face);
 
 // TODO: Re-enable when I understand how the FT2 Cache system changed from
 // 2.1.4 to 2.1.8
@@ -150,26 +132,20 @@ class FontStyle : public SharedObject, public BLocker {
 	private:
 		friend class FontFamily;
 		uint16			_TranslateStyleToFace(const char *name) const;
-		void			_SetFontFamily(FontFamily* family)
-							{ fFontFamily = family; }
-		void			_SetID(uint16 id)
-							{ fID = id; }
+		void			_SetFontFamily(FontFamily* family, uint16 id);
 
 	private:
-		FT_Face			fFTFace;
-//		CachedFace		cachedface;
-
-		FontFamily*		fFontFamily;
-
+		FT_Face			fFreeTypeFace;
 		BString			fName;
 		BString			fPath;
 
+		FontFamily*		fFamily;
+		uint16			fID;
+
 		BRect			fBounds;
 
-		uint16			fID;
+		font_height		fHeight;
 		uint16			fFace;
-
-		FontStyleHeight	fHeight;
 };
 
 /*!
@@ -179,7 +155,7 @@ class FontStyle : public SharedObject, public BLocker {
 	FontFamily objects bring together many styles of the same face, such as
 	Arial Roman, Arial Italic, Arial Bold, etc.
 */
-class FontFamily : public SharedObject {
+class FontFamily {
 	public:
 		FontFamily(const char* name, uint16 id);
 		virtual ~FontFamily();
@@ -187,8 +163,8 @@ class FontFamily : public SharedObject {
 		const char*	Name() const;
 
 		bool		AddStyle(FontStyle* style);
-		void		RemoveStyle(const char* style);
-		void		RemoveStyle(FontStyle* style);
+		bool		RemoveStyle(const char* style);
+		bool		RemoveStyle(FontStyle* style);
 
 		FontStyle*	GetStyle(const char* style) const;
 		FontStyle*	GetStyleMatchingFace(uint16 face) const;

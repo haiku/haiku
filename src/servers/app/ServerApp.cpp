@@ -1601,8 +1601,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			FontStyle *fontStyle = gFontManager->GetStyle(familyID, styleID);
 			if (fontStyle != NULL) {
+				font_height height;
+				fontStyle->GetHeight(size, height);
+
 				fLink.StartMessage(B_OK);
-				fLink.Attach<font_height>(fontStyle->GetHeight(size));
+				fLink.Attach<font_height>(height);
 			} else
 				fLink.StartMessage(B_BAD_VALUE);
 

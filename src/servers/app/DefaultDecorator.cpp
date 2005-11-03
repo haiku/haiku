@@ -343,11 +343,12 @@ DefaultDecorator::_DoLayout()
 		// In this case the text and close/zoom rects
 		fTextOffset = (_look == B_FLOATING_WINDOW_LOOK) ? 10 : 18;
 
-		font_height fh;
-		_drawdata.Font().Height(&fh);
+		font_height fontHeight;
+		_drawdata.Font().GetHeight(fontHeight);
 
 		_tabrect.Set(_frame.left - fBorderWidth,
-					 _frame.top - fBorderWidth - ceilf(fh.ascent + fh.descent + 7.0),
+					 _frame.top - fBorderWidth
+					 	- ceilf(fontHeight.ascent + fontHeight.descent + 7.0),
 					 ((_frame.right - _frame.left) < 35.0 ?
 					 _frame.left + 35.0 : _frame.right) + fBorderWidth,
 					 _frame.top - fBorderWidth);
@@ -628,13 +629,15 @@ DefaultDecorator::_DrawTitle(BRect r)
 	_drawdata.SetLowColor(fTabColor);
 
 	// figure out position of text
-	font_height fh;
-	_drawdata.Font().Height(&fh);
+	font_height fontHeight;
+	_drawdata.Font().GetHeight(fontHeight);
 
 	BPoint titlePos;
-	titlePos.x = _closerect.IsValid() ? _closerect.right + fTextOffset : _tabrect.left + fTextOffset;
-	titlePos.y = floorf(((_tabrect.top + 2.0) + _tabrect.bottom + fh.ascent + fh.descent) / 2.0 - fh.descent + 0.5);
-	
+	titlePos.x = _closerect.IsValid() ? _closerect.right + fTextOffset
+		: _tabrect.left + fTextOffset;
+	titlePos.y = floorf(((_tabrect.top + 2.0) + _tabrect.bottom + fontHeight.ascent
+		+ fontHeight.descent) / 2.0 - fontHeight.descent + 0.5);
+
 	_driver->DrawString(fTruncatedTitle.String(), fTruncatedTitleLength, titlePos, &_drawdata);
 }
 
