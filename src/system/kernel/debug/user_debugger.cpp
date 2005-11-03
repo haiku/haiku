@@ -339,7 +339,14 @@ thread_hit_debug_event_internal(debug_debugger_message event,
 	threadFlags &= ~B_THREAD_DEBUG_STOP;
 	bool debuggerInstalled
 		= (thread->team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED);
-	if (debuggerInstalled || !requireDebugger) {
+	if (thread->id == thread->team->debug_info.nub_thread) {
+		// Ugh, we're the nub thread. We shouldn't be here.
+		TRACE(("thread_hit_debug_event(): Misdirected nub thread: %ld\n",
+			thread->id));
+
+		error = B_ERROR;
+
+	} else if (debuggerInstalled || !requireDebugger) {
 		if (debuggerInstalled) {
 			debuggerPort = thread->team->debug_info.debugger_port;
 			nubPort = thread->team->debug_info.nub_port;
@@ -1794,7 +1801,9 @@ install_team_debugger_init_debug_infos(struct team *team, team_id debuggerTeam,
 	for (struct thread *thread = team->thread_list;
 		 thread;
 		 thread = thread->team_next) {
-		if (thread->id != nubThread) {
+		if (thread->id == nubThread) {
+			atomic_set(&thread->debug_info.flags, B_THREAD_DEBUG_NUB_THREAD);
+		} else {
 			int32 flags = thread->debug_info.flags
 				& ~B_THREAD_DEBUG_USER_FLAG_MASK;
 			atomic_set(&thread->debug_info.flags,
@@ -2181,6 +2190,9 @@ _user_debug_thread(thread_id threadID)
 	} else if (thread->debug_info.flags & B_THREAD_DEBUG_DYING) {
 		// the thread is already dying -- too late to debug it
 		error = B_BAD_THREAD_ID;
+	} else if (thread->debug_info.flags & B_THREAD_DEBUG_NUB_THREAD) {
+		// don't debug the nub thread
+		error = B_NOT_ALLOWED;
 	} else if (!(thread->debug_info.flags & B_THREAD_DEBUG_STOPPED)) {
 		// set the flag that tells the thread to stop as soon as possible
 		atomic_or(&thread->debug_info.flags, B_THREAD_DEBUG_STOP);
