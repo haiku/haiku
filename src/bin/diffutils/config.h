@@ -1116,7 +1116,7 @@
 
 /* Define to 1 if `major', `minor', and `makedev' are declared in
    <sysmacros.h>. */
-#define MAJOR_IN_SYSMACROS 1
+/* #undef MAJOR_IN_SYSMACROS */
 
 /* Define if there is no specific function for reading the list of mounted
    filesystems. fread will be used to read /etc/mnttab. (SVR2) */
