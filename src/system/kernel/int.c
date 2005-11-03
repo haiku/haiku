@@ -24,6 +24,7 @@
 #	define TRACE(x) ;
 #endif
 
+#define DEBUG_INT
 
 struct io_handler {
 	struct io_handler	*next;
@@ -37,6 +38,10 @@ struct io_vector {
 	struct io_handler	handler_list;
 	spinlock			vector_lock;
 	int32				enable_count;
+#ifdef DEBUG_INT
+	int64				handled_count;
+	int64				unhandled_count;
+#endif
 };
 
 static struct io_vector io_vectors[NUM_IO_VECTORS];
@@ -63,6 +68,31 @@ interrupts_enabled(void)
 }
 
 
+#ifdef DEBUG_INT
+static int
+dump_int_statistics(int argc, char **argv)
+{
+	int i;
+	for (i = 0; i < NUM_IO_VECTORS; i++) {
+		if (io_vectors[i].vector_lock == 0
+			&& io_vectors[i].enable_count == 0
+			&& io_vectors[i].handled_count == 0
+			&& io_vectors[i].unhandled_count == 0
+			&& io_vectors[i].handler_list.next == &io_vectors[i].handler_list)
+			continue;
+		kprintf("int %3d, enabled %ld, handled %8lld, unhandled %8lld%s%s\n",
+			i, 
+			io_vectors[i].enable_count, 
+			io_vectors[i].handled_count, 
+			io_vectors[i].unhandled_count,
+			(io_vectors[i].vector_lock != 0) ? ", ACTIVE" : "",
+			(io_vectors[i].handler_list.next == &io_vectors[i].handler_list) ? ", no handler" : "");
+	}
+	return 0;
+}
+#endif
+
+
 status_t
 int_init(kernel_args *args)
 {
@@ -81,8 +111,16 @@ int_init_post_vm(kernel_args *args)
 	for (i = 0; i < NUM_IO_VECTORS; i++) {
 		io_vectors[i].vector_lock = 0;			/* initialize spinlock */
 		io_vectors[i].enable_count = 0;
+		#ifdef DEBUG_INT
+			io_vectors[i].handled_count = 0;
+			io_vectors[i].unhandled_count = 0;
+		#endif
 		initque(&io_vectors[i].handler_list);	/* initialize handler queue */
 	}
+
+#ifdef DEBUG_INT
+	add_debugger_command("ints", &dump_int_statistics, "list interrupt statistics");
+#endif
 
 	return arch_int_init_post_vm(args);
 }
@@ -227,6 +265,13 @@ int_io_interrupt_handler(int vector)
 		if ((status = io->func(io->data)) != B_UNHANDLED_INTERRUPT)
 			break;
 	}
+
+#ifdef DEBUG_INT
+	if (status != B_UNHANDLED_INTERRUPT)
+		io_vectors[vector].handled_count++;
+	else
+		io_vectors[vector].unhandled_count++;
+#endif
 
 	release_spinlock(&io_vectors[vector].vector_lock);
 
