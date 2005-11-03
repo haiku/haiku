@@ -53,7 +53,6 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	display_mode /*bounds,*/ target;
 
 	uint8 colour_depth1 = 32;
-	status_t result;
 	uint32 startadd,startadd_right;
 //	bool crt1, crt2, cross;
 
@@ -146,13 +145,9 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		if (head1_set_pix_pll(target) == B_ERROR)
 			LOG(8,("SETMODE: error setting pixel clock (internal DAC)\n"));
 
-		/* we do not need to set the pixelclock here for a head that's in TVout mode */
-		if (!(target2.flags & TV_BITS))
-		{
-			LOG(8,("SETMODE: target2 clock %dkHz\n",target2.timing.pixel_clock));
-			if (head2_set_pix_pll(target2) == B_ERROR)
-				LOG(8,("SETMODE: error setting pixel clock (DAC2)\n"));
-		}
+		LOG(8,("SETMODE: target2 clock %dkHz\n",target2.timing.pixel_clock));
+		if (head2_set_pix_pll(target2) == B_ERROR)
+			LOG(8,("SETMODE: error setting pixel clock (DAC2)\n"));
 
 		/*set the colour depth for CRTC1 and the DAC */
 		switch(target.space)
@@ -206,9 +201,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		/* check if we are doing interlaced TVout mode */
 		//fixme: we don't support interlaced mode?
 		si->interlaced_tv_mode = false;
-/*		if ((target2.flags & TV_BITS) && (si->ps.card_type >= G450))
-			si->interlaced_tv_mode = true;
-*/
+
 		/*set the display(s) pitches*/
 		head1_set_display_pitch ();
 		//fixme: seperate for real dualhead modes:
@@ -234,15 +227,13 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 
 		/* set the timing */
 		head1_set_timing(target);
-		/* we do not need to setup CRTC2 here for a head that's in TVout mode */
-		if (!(target2.flags & TV_BITS))	result = head2_set_timing(target2);
+		head2_set_timing(target2);
 
-		/* TVout support: setup CRTC2 and it's pixelclock */
+		/* TVout support: program TVout encoder and modify CRTC timing */
 		if (si->ps.tvout && (target2.flags & TV_BITS)) BT_setmode(target2);
 	}
 	else /* single head mode */
 	{
-		status_t status;
 		int colour_mode = BPP32;
 
 		/* connect output */
@@ -284,9 +275,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		}
 
 		/* set the pixel clock PLL */
-		status = head1_set_pix_pll(target);
-
-		if (status==B_ERROR)
+		if (head1_set_pix_pll(target) == B_ERROR)
 			LOG(8,("CRTC: error setting pixel clock (internal DAC)\n"));
 
 		/* set the colour depth for CRTC1 and the DAC */
@@ -302,9 +291,9 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		head1_set_display_start(startadd,colour_depth1);
 
 		/* set the timing */
-		if (!(target.flags & TV_BITS)) head1_set_timing(target);
+		head1_set_timing(target);
 
-		/* TVout support: setup CRTC and it's pixelclock */
+		/* TVout support: program TVout encoder and modify CRTC timing */
 		if (si->ps.tvout && (target.flags & TV_BITS)) BT_setmode(target);
 
 		//fixme: shut-off the videoPLL if it exists...

@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-10/2005
+   Rudolf Cornelissen 10/2002-11/2005
 */
 
 #define MODULE_BIT 0x00008000
@@ -1005,6 +1005,8 @@ void setup_virtualized_heads(bool cross)
 		head1_cursor_hide		= (crtc_cursor_hide)		nv_crtc2_cursor_hide;
 		head1_cursor_define		= (crtc_cursor_define)		nv_crtc2_cursor_define;
 		head1_cursor_position	= (crtc_cursor_position)	nv_crtc2_cursor_position;
+		head1_stop_tvout		= (crtc_stop_tvout)			nv_crtc2_stop_tvout;
+		head1_start_tvout		= (crtc_start_tvout)		nv_crtc2_start_tvout;
 
 		head1_mode				= (dac_mode)				nv_dac2_mode;
 		head1_palette			= (dac_palette)				nv_dac2_palette;
@@ -1022,6 +1024,8 @@ void setup_virtualized_heads(bool cross)
 		head2_cursor_hide		= (crtc_cursor_hide)		nv_crtc_cursor_hide;
 		head2_cursor_define		= (crtc_cursor_define)		nv_crtc_cursor_define;
 		head2_cursor_position	= (crtc_cursor_position)	nv_crtc_cursor_position;
+		head2_stop_tvout		= (crtc_stop_tvout)			nv_crtc_stop_tvout;
+		head2_start_tvout		= (crtc_start_tvout)		nv_crtc_start_tvout;
 
 		head2_mode				= (dac_mode)				nv_dac_mode;
 		head2_palette			= (dac_palette)				nv_dac_palette;
@@ -1041,6 +1045,8 @@ void setup_virtualized_heads(bool cross)
 		head1_cursor_hide		= (crtc_cursor_hide)		nv_crtc_cursor_hide;
 		head1_cursor_define		= (crtc_cursor_define)		nv_crtc_cursor_define;
 		head1_cursor_position	= (crtc_cursor_position)	nv_crtc_cursor_position;
+		head1_stop_tvout		= (crtc_stop_tvout)			nv_crtc_stop_tvout;
+		head1_start_tvout		= (crtc_start_tvout)		nv_crtc_start_tvout;
 
 		head1_mode				= (dac_mode)				nv_dac_mode;
 		head1_palette			= (dac_palette)				nv_dac_palette;
@@ -1058,6 +1064,8 @@ void setup_virtualized_heads(bool cross)
 		head2_cursor_hide		= (crtc_cursor_hide)		nv_crtc2_cursor_hide;
 		head2_cursor_define		= (crtc_cursor_define)		nv_crtc2_cursor_define;
 		head2_cursor_position	= (crtc_cursor_position)	nv_crtc2_cursor_position;
+		head2_stop_tvout		= (crtc_stop_tvout)			nv_crtc2_stop_tvout;
+		head2_start_tvout		= (crtc_start_tvout)		nv_crtc2_start_tvout;
 
 		head2_mode				= (dac_mode)				nv_dac2_mode;
 		head2_palette			= (dac_palette)				nv_dac2_palette;

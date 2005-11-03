@@ -63,9 +63,6 @@ static status_t init_common(int the_fd) {
  		}
  	}
 
-	/*FIXME - print dma addresses*/
-	//LOG(4,("DMA_virtual:%x\tDMA_physical:%x\tDMA_area:%x\n",si->dma_buffer,si->dma_buffer_pci,si->dma_buffer_area));
-
 	/* all done */
 	goto error0;
 

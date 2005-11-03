@@ -1581,9 +1581,9 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
 static status_t BT_start_tvout(display_mode tv_target)
 {
 	if (tv_target.flags & TV_PRIMARY)
-		nv_crtc_start_tvout();
+		head1_start_tvout();
 	else
-		nv_crtc2_start_tvout();
+		head2_start_tvout();
 
 	return B_OK;
 }//end BT_start_tvout.
@@ -1598,9 +1598,9 @@ status_t BT_stop_tvout(void)
 	BT_killclk_blackout();
 
 	if (si->dm.flags & TV_PRIMARY)
-		nv_crtc_stop_tvout();
+		head1_stop_tvout();
 	else
-		nv_crtc2_stop_tvout();
+		head2_stop_tvout();
 
 	/* fixme if needed:
 	 * a full encoder chip reset could be done here (so after decoupling crtc)... */

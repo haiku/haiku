@@ -16,7 +16,6 @@ typedef status_t (*crtc_validate_timing)(uint16*, uint16*, uint16*, uint16*, uin
 typedef status_t (*crtc_set_timing)(display_mode);
 typedef status_t (*crtc_depth)(int);
 typedef status_t (*crtc_dpms)(bool, bool, bool);
-typedef status_t (*crtc_dpms_fetch)(bool*, bool*, bool*);
 typedef status_t (*crtc_set_display_pitch)(void);
 typedef status_t (*crtc_set_display_start)(uint32, uint8);
 typedef status_t (*crtc_cursor_init)(void);
@@ -24,6 +23,8 @@ typedef status_t (*crtc_cursor_show)(void);
 typedef status_t (*crtc_cursor_hide)(void);
 typedef status_t (*crtc_cursor_define)(uint8*, uint8*);
 typedef status_t (*crtc_cursor_position)(uint16, uint16);
+typedef status_t (*crtc_stop_tvout)(void);
+typedef status_t (*crtc_start_tvout)(void);
 
 typedef status_t (*dac_mode)(int, float);
 typedef status_t (*dac_palette)(uint8[256], uint8[256], uint8[256]);
@@ -34,7 +35,6 @@ crtc_validate_timing 	head1_validate_timing;
 crtc_set_timing 		head1_set_timing;
 crtc_depth				head1_depth;
 crtc_dpms				head1_dpms;
-crtc_dpms_fetch			head1_dpms_fetch;
 crtc_set_display_pitch	head1_set_display_pitch;
 crtc_set_display_start	head1_set_display_start;
 crtc_cursor_init		head1_cursor_init;
@@ -42,12 +42,13 @@ crtc_cursor_show		head1_cursor_show;
 crtc_cursor_hide		head1_cursor_hide;
 crtc_cursor_define		head1_cursor_define;
 crtc_cursor_position	head1_cursor_position;
+crtc_stop_tvout			head1_stop_tvout;
+crtc_start_tvout		head1_start_tvout;
 
 crtc_validate_timing	head2_validate_timing;
 crtc_set_timing			head2_set_timing;
 crtc_depth				head2_depth;
 crtc_dpms				head2_dpms;
-crtc_dpms_fetch			head2_dpms_fetch;
 crtc_set_display_pitch	head2_set_display_pitch;
 crtc_set_display_start	head2_set_display_start;
 crtc_cursor_init		head2_cursor_init;
@@ -55,6 +56,8 @@ crtc_cursor_show		head2_cursor_show;
 crtc_cursor_hide		head2_cursor_hide;
 crtc_cursor_define		head2_cursor_define;
 crtc_cursor_position	head2_cursor_position;
+crtc_stop_tvout			head2_stop_tvout;
+crtc_start_tvout		head2_start_tvout;
 
 dac_mode				head1_mode;
 dac_palette				head1_palette;
