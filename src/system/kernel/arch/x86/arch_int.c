@@ -479,18 +479,18 @@ i386_handle_trap(struct iframe frame)
 #endif
 			/* syscall interface works as such:
 			 *  %eax has syscall #
-			 *  %ecx has number of args (0-16)
-			 *  %edx has pointer to buffer containing args from first to last
-			 * each is verified to make sure someone doesn't try to clobber it
+			 *  %esp + 4 points to the syscall parameters
 			 */
-			if (frame.ecx <= MAX_ARGS) {
-				if (IS_KERNEL_ADDRESS(frame.edx)
-					|| user_memcpy(args, (void *)frame.edx, frame.ecx * sizeof(unsigned int)) < B_OK) {
+			if (frame.eax >= 0 && frame.eax < kSyscallCount) {
+				void *params = (void*)(frame.user_esp + 4);
+				int paramSize = kSyscallInfos[frame.eax].parameter_size;
+				if (IS_KERNEL_ADDRESS((addr_t)params)
+					|| user_memcpy(args, params, paramSize) < B_OK) {
 					retcode =  B_BAD_ADDRESS;
 				} else
 					ret = syscall_dispatcher(frame.eax, (void *)args, &retcode);
 			} else {
-				// want to pass too many args into the system
+				// invalid syscall number
 				retcode = EINVAL;
 			}
 			frame.eax = retcode & 0xffffffff;
