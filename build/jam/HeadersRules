@@ -198,7 +198,6 @@ rule UsePublicObjectHeaders
 	# Adds the public C header dirs given by <group list> to the header search
 	# dirs of either the object targets of <sources> or if supplied to
 	# <objects>. Also adjusts HDRSEARCH of <sources>.
-	# NOTE: This rule must be invoked *after* the rule that builds the objects.
 
 	SourceSysHdrs $(1) : [ PublicHeaders $(2) ] : $(3) ;
 }
@@ -229,7 +228,6 @@ rule UsePrivateObjectHeaders
 	# <objects>. Also adjusts HDRSEARCH of <sources>.
 	# <system> specifies whether to add the dirs as system or local header
 	# search dirs. Defaults to "true".
-	# NOTE: This rule must be invoked *after* the rule that builds the objects.
 
 	local system = $(4) ;
 	system ?= true ;	
@@ -271,7 +269,6 @@ rule UseArchObjectHeaders
 	#
 	# <arch> specifies the architecture (e.g. x86).
 	# <sources_or_objects> Source or object files.
-	# NOTE: This rule must be invoked *after* the rule that builds the objects.
 
 	local sources = $(1) ;
 	local headers = [ ArchHeaders $(2) ] ;
@@ -293,7 +290,6 @@ rule UsePosixObjectHeaders
 	# Adds the POSIX header dir to the header search
 	# dirs of either the object targets of <sources> or if supplied to
 	# <objects>. Also adjusts HDRSEARCH of <sources>.
-	# NOTE: This rule must be invoked *after* the rule that builds the objects.
 
 	SourceSysHdrs $(1) : [ FDirName $(HAIKU_TOP) headers posix ] : $(2) ;
 }
@@ -307,6 +303,26 @@ rule UseLibraryHeaders
 	# NOTE: This rule must be invoked *before* the rule that builds the objects.
 
 	UseHeaders [ LibraryHeaders $(1) ] : true ;
+}
+
+rule UseLegacyHeaders
+{
+	# usage: UseLegacyHeaders ;
+	#
+	# NOTE: This rule must be invoked *before* the rule that builds the objects.
+
+	UseHeaders [ FDirName $(HAIKU_TOP) headers legacy ] : true ;
+}
+
+rule UseLegacyObjectHeaders
+{
+	# UseLegacyObjectHeaders <sources> [ : <objects> ] ;
+	#
+	# Adds the legacy header dir to the header search
+	# dirs of either the object targets of <sources> or if supplied to
+	# <objects>. Also adjusts HDRSEARCH of <sources>.
+
+	SourceSysHdrs $(1) : [ FDirName $(HAIKU_TOP) headers legacy ] : $(2) ;
 }
 
 rule FStandardOSHeaders
