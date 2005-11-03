@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src bin ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 UsePrivateHeaders app ;
 UsePrivateHeaders kernel ;
 UsePrivateHeaders shared ;
@@ -42,13 +44,13 @@ StdBinCommands
 	uptime.cpp
 	waitfor.c
 #	whoami.c
-	: libroot.so ;
+	;
 
 # standard commands that need libtermcap.a
 StdBinCommands
 	top.c
 	tput.c
-	: libroot.so libtermcap.a
+	: libtermcap.a
 	;
 
 # standard commands that need libbe.so
@@ -76,14 +78,14 @@ StdBinCommands
 	shutdown.cpp
 	version.cpp
 #	yes.cpp
-	: libroot.so libbe.so ;
+	: libbe.so ;
 
 # standard commands that need libbe.so, libstdc++.so
 StdBinCommands
 	copyattr.cpp
 	mountvolume.cpp
 	xres.cpp
-	: root be $(TARGET_LIBSTDC++)
+	: be $(TARGET_LIBSTDC++)
 	;
 
 # standard commands that need libbe.so, libtranslation.so
