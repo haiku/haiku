@@ -511,60 +511,82 @@ status_t SET_DPMS_MODE(uint32 dpms_flags)
 	/* CRTC used for TVout needs specific DPMS programming */
 	if (si->dm.flags & TV_BITS)
 	{
+		/* TV_PRIMARY tells us that the head to be used with TVout is the head that's
+		 * actually assigned as being the primary head at powerup:
+		 * so non dualhead-mode-dependant, and not 'fixed' CRTC1! */
 		if (si->dm.flags & TV_PRIMARY)
 		{
 			LOG(4,("SET_DPMS_MODE: tuning primary head DPMS settings for TVout compatibility\n"));
 
-			if (!(si->settings.vga_on_tv))
+			if ((si->dm.flags & DUALHEAD_BITS) != DUALHEAD_SWITCH)
 			{
-				/* block VGA output on head displaying on TV */
-				/* Note:
-				 * this specific sync setting is required: Vsync is used to keep TVout
-				 * synchronized to the CRTC 'vertically' (otherwise 'rolling' occurs).
-				 * This leaves Hsync only for shutting off the VGA screen. */
-				h1h = false;
-				h1v = true;
+				if (!(si->settings.vga_on_tv))
+				{
+					/* block VGA output on head displaying on TV */
+					/* Note:
+					 * this specific sync setting is required: Vsync is used to keep TVout
+					 * synchronized to the CRTC 'vertically' (otherwise 'rolling' occurs).
+					 * This leaves Hsync only for shutting off the VGA screen. */
+					h1h = false;
+					h1v = true;
+				}
+				else
+				{
+					/* when concurrent VGA is used alongside TVout on a head, DPMS is safest
+					 * applied this way: Vsync is needed for stopping TVout successfully when
+					 * a (new) modeswitch occurs.
+					 * (see routine BT_stop_tvout() in nv_brooktreetv.c) */
+					/* Note:
+					 * applying 'normal' DPMS here and forcing Vsync on in the above mentioned
+					 * routine seems to not always be enough: sometimes image generation will
+					 * not resume in that case. */
+					h1h = display;
+					h1v = true;
+				}
 			}
 			else
 			{
-				/* when concurrent VGA is used alongside TVout on a head, DPMS is safest
-				 * applied this way: Vsync is needed for stopping TVout successfully when
-				 * a (new) modeswitch occurs.
-				 * (see routine BT_stop_tvout() in nv_brooktreetv.c) */
-				/* Note:
-				 * applying 'normal' DPMS here and forcing Vsync on in the above mentioned
-				 * routine seems to not always be enough: sometimes image generation will
-				 * not resume in that case. */
-				h1h = display;
-				h1v = true;
+				if (!(si->settings.vga_on_tv))
+				{
+					h2h = false;
+					h2v = true;
+				}
+				else
+				{
+					h2h = display;
+					h2v = true;
+				}
 			}
 		}
 		else
 		{
 			LOG(4,("SET_DPMS_MODE: tuning secondary head DPMS settings for TVout compatibility\n"));
 
-			if (!(si->settings.vga_on_tv))
+			if ((si->dm.flags & DUALHEAD_BITS) != DUALHEAD_SWITCH)
 			{
-				/* block VGA output on head displaying on TV */
-				/* Note:
-				 * this specific sync setting is required: Vsync is used to keep TVout
-				 * synchronized to the CRTC 'vertically' (otherwise 'rolling' occurs).
-				 * This leaves Hsync only for shutting off the VGA screen. */
-				h2h = false;
-				h2v = true;
+				if (!(si->settings.vga_on_tv))
+				{
+					h2h = false;
+					h2v = true;
+				}
+				else
+				{
+					h2h = display;
+					h2v = true;
+				}
 			}
 			else
 			{
-				/* when concurrent VGA is used alongside TVout on a head, DPMS is safest
-				 * applied this way: Vsync is needed for stopping TVout successfully when
-				 * a (new) modeswitch occurs.
-				 * (see routine BT_stop_tvout() in nv_brooktreetv.c) */
-				/* Note:
-				 * applying 'normal' DPMS here and forcing Vsync on in the above mentioned
-				 * routine seems to not always be enough: sometimes image generation will
-				 * not resume in that case. */
-				h2h = display;
-				h2v = true;
+				if (!(si->settings.vga_on_tv))
+				{
+					h1h = false;
+					h1v = true;
+				}
+				else
+				{
+					h1h = display;
+					h1v = true;
+				}
 			}
 		}
 	}

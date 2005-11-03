@@ -192,7 +192,8 @@ status_t INIT_ACCELERANT(int the_fd) {
 	/* ensure DPMS state */
 	si->dpms_flags = B_DPMS_ON;
 
-	/* ensure TVout state */
+	/* ensure TVout state:
+	 * TVencoder is on head to be assigned primary, no dualhead switch mode active. */
 	//fixme: actually check on what CRTC TVout was active during boot (if any)...
 	si->dm.flags = TV_PRIMARY;
 

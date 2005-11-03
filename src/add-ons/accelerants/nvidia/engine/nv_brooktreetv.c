@@ -1580,10 +1580,23 @@ static status_t BT_update_mode_for_gpu(display_mode *target, uint8 tvmode)
  * and ASUS V7100 GeForce2 MX200 AGP/32Mb (CH7007). */
 static status_t BT_start_tvout(display_mode tv_target)
 {
+	/* TV_PRIMARY tells us that the head to be used with TVout is the head that's
+	 * actually assigned as being the primary head at powerup:
+	 * so non dualhead-mode-dependant, and not 'fixed' CRTC1! */
 	if (tv_target.flags & TV_PRIMARY)
-		head1_start_tvout();
+	{
+		if ((tv_target.flags & DUALHEAD_BITS) != DUALHEAD_SWITCH)
+			head1_start_tvout();
+		else
+			head2_start_tvout();
+	}
 	else
-		head2_start_tvout();
+	{
+		if ((tv_target.flags & DUALHEAD_BITS) != DUALHEAD_SWITCH)
+			head2_start_tvout();
+		else
+			head1_start_tvout();
+	}
 
 	return B_OK;
 }//end BT_start_tvout.
@@ -1597,10 +1610,23 @@ status_t BT_stop_tvout(void)
 	/* prevent BT from being overclocked by VGA-only modes & black-out TV-out */
 	BT_killclk_blackout();
 
+	/* TV_PRIMARY tells us that the head to be used with TVout is the head that's
+	 * actually assigned as being the primary head at powerup:
+	 * so non dualhead-mode-dependant, and not 'fixed' CRTC1! */
 	if (si->dm.flags & TV_PRIMARY)
-		head1_stop_tvout();
+	{
+		if ((si->dm.flags & DUALHEAD_BITS) != DUALHEAD_SWITCH)
+			head1_stop_tvout();
+		else
+			head2_stop_tvout();
+	}
 	else
-		head2_stop_tvout();
+	{
+		if ((si->dm.flags & DUALHEAD_BITS) != DUALHEAD_SWITCH)
+			head2_stop_tvout();
+		else
+			head1_stop_tvout();
+	}
 
 	/* fixme if needed:
 	 * a full encoder chip reset could be done here (so after decoupling crtc)... */
@@ -1691,10 +1717,23 @@ status_t BT_setmode(display_mode target)
 	BT_update_mode_for_gpu(&tv_target, tvmode);
 
 	/* setup GPU CRTC timing */
+	/* TV_PRIMARY tells us that the head to be used with TVout is the head that's
+	 * actually assigned as being the primary head at powerup:
+	 * so non dualhead-mode-dependant, and not 'fixed' CRTC1! */
 	if (tv_target.flags & TV_PRIMARY)
-		head1_set_timing(tv_target);
+	{
+		if ((tv_target.flags & DUALHEAD_BITS) != DUALHEAD_SWITCH)
+			head1_set_timing(tv_target);
+		else
+			head2_set_timing(tv_target);
+	}
 	else
-		head2_set_timing(tv_target);
+	{
+		if ((tv_target.flags & DUALHEAD_BITS) != DUALHEAD_SWITCH)
+			head2_set_timing(tv_target);
+		else
+			head1_set_timing(tv_target);
+	}
 
 //fixme: only testing older cards for now...
 if (si->ps.secondary_head && (si->ps.card_type > NV15))
