@@ -103,7 +103,7 @@ static void
 dump_sem(struct sem_entry *sem)
 {
 	kprintf("SEM: %p\n", sem);
-	kprintf("id:      %ld\n", sem->id);
+	kprintf("id:      %#ld\n", sem->id);
 	if (sem->id >= 0) {
 		kprintf("name:    '%s'\n", sem->u.used.name);
 		kprintf("owner:   0x%lx\n", sem->u.used.owner);

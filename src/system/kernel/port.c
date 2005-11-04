@@ -234,13 +234,16 @@ _dump_port_info(struct port_entry *port)
 	int32 count;
 
 	kprintf("PORT: %p\n", port);
+	kprintf(" id:              %#lx\n", port->id);
 	kprintf(" name:            \"%s\"\n", port->name);
 	kprintf(" owner:           %#lx\n", port->owner);
 	kprintf(" capacity:        %ld\n", port->capacity);
+	kprintf(" read_sem:        %#lx\n", port->read_sem);
+	kprintf(" write_sem:       %#lx\n", port->write_sem);
  	get_sem_count(port->read_sem, &count);
- 	kprintf(" read sem count:  %ld\n", count);
+ 	kprintf(" read_sem count:  %ld\n", count);
  	get_sem_count(port->write_sem, &count);
-	kprintf(" write sem count: %ld\n", count);
+	kprintf(" write_sem count: %ld\n", count);
 	kprintf(" total count:     %ld\n", port->total_count);
 }
 
