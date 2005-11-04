@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src apps cdplayer ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 Application CDPlayer : 
 	CDAudioDevice.cpp
 	CDDBSupport.cpp
