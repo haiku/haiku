@@ -530,7 +530,12 @@ if (fWinBorder->IsOffscreenWindow()) {
 void
 ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 {
-	if (fCurrentLayer == NULL && code != AS_LAYER_CREATE_ROOT && code != AS_LAYER_CREATE) {
+	// TODO: when creating a Layer, check for yet non-existing Layer::InitCheck()
+	// and take appropriate actions, then checking for fCurrentLayer->fLayerData
+	// is unnecessary
+	if ((fCurrentLayer == NULL || fCurrentLayer->CurrentState() == NULL) &&
+		code != AS_LAYER_CREATE_ROOT && code != AS_LAYER_CREATE) {
+
 		printf("ServerWindow %s received unexpected code - message offset %ld before top_view attached.\n", Title(), code - SERVER_TRUE);
 		return;
 	}
@@ -1679,6 +1684,9 @@ myRootLayer->Unlock();
 void
 ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 {
+	// NOTE: fCurrentLayer and fCurrentLayer->fLayerData cannot be NULL,
+	// _DispatchGraphicsMessage() is called from _DispatchMessage() which
+	// checks both these conditions
 #ifndef NEW_CLIPPING
 	BRegion rreg(fCurrentLayer->fVisible);
 #else
@@ -1689,6 +1697,11 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 		rreg.IntersectWith(&fWinBorder->RegionToBeUpdated());
 
 	DisplayDriver* driver = fWinBorder->GetDisplayDriver();
+	if (!driver) {
+		// ?!?
+		DTRACE(("ServerWindow %s: no display driver!!\n", Title()));
+		return;
+	}
 
 	driver->ConstrainClippingRegion(&rreg);
 //	rgb_color  rrr = fCurrentLayer->CurrentState()->viewcolor.GetColor32();
@@ -1707,22 +1720,19 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&x2);
 			link.Read<float>(&y2);
 
-			if (fCurrentLayer && fCurrentLayer->CurrentState()) {
+			BPoint p1(x1,y1);
+			BPoint p2(x2,y2);
+			driver->StrokeLine(fCurrentLayer->ConvertToTop(p1),
+							   fCurrentLayer->ConvertToTop(p2),
+							   fCurrentLayer->CurrentState());
+			
+			// We update the pen here because many DisplayDriver calls which do not update the
+			// pen position actually call StrokeLine
 
-				BPoint p1(x1,y1);
-				BPoint p2(x2,y2);
-				driver->StrokeLine(fCurrentLayer->ConvertToTop(p1),
-								   fCurrentLayer->ConvertToTop(p2),
-								   fCurrentLayer->CurrentState());
-				
-				// We update the pen here because many DisplayDriver calls which do not update the
-				// pen position actually call StrokeLine
-
-				// TODO: Decide where to put this, for example, it cannot be done
-				// for DrawString(), also there needs to be a decision, if penlocation
-				// is in View coordinates (I think it should be) or in screen coordinates.
-				fCurrentLayer->CurrentState()->SetPenLocation(p2);
-			}
+			// TODO: Decide where to put this, for example, it cannot be done
+			// for DrawString(), also there needs to be a decision, if penlocation
+			// is in View coordinates (I think it should be) or in screen coordinates.
+			fCurrentLayer->CurrentState()->SetPenLocation(p2);
 			break;
 		}
 		case AS_LAYER_INVERT_RECT:
@@ -1732,8 +1742,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			BRect rect;
 			link.Read<BRect>(&rect);
 			
-			if (fCurrentLayer && fCurrentLayer->CurrentState())
-				driver->InvertRect(fCurrentLayer->ConvertToTop(rect));
+			driver->InvertRect(fCurrentLayer->ConvertToTop(rect));
 			break;
 		}
 		case AS_STROKE_RECT:
@@ -1747,8 +1756,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&bottom);
 			BRect rect(left,top,right,bottom);
 			
-			if (fCurrentLayer && fCurrentLayer->CurrentState())
-				driver->StrokeRect(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->CurrentState());
+			driver->StrokeRect(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->CurrentState());
+
 			break;
 		}
 		case AS_FILL_RECT:
@@ -1757,34 +1766,13 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			
 			BRect rect;
 			link.Read<BRect>(&rect);
-			if (fCurrentLayer && fCurrentLayer->CurrentState())
-				driver->FillRect(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->CurrentState());
+			driver->FillRect(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->CurrentState());
 			break;
 		}
 		case AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
-			int32		bitmapToken;
-			BPoint 		point;
-			
-			link.Read<int32>(&bitmapToken);
-			link.Read<BPoint>(&point);
-			
-			ServerBitmap* sbmp = fServerApp->FindBitmap(bitmapToken);
-			if (sbmp) {
-				BRect src = sbmp->Bounds();
-				BRect dst = src.OffsetToCopy(point);
-				dst = fCurrentLayer->ConvertToTop(dst);
-
-				driver->DrawBitmap(sbmp, src, dst, fCurrentLayer->CurrentState());
-			}
-			
-			// TODO: Adi -- shouldn't AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT sync with the client?
-			break;
-		}
 		case AS_LAYER_DRAW_BITMAP_ASYNC_AT_POINT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_ASYNC_AT_POINT: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_(A)SYNC_AT_POINT: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
 			int32		bitmapToken;
 			BPoint 		point;
 			
@@ -1799,31 +1787,14 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 
 				driver->DrawBitmap(sbmp, src, dst, fCurrentLayer->CurrentState());
 			}
+			
+			// TODO: how should AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT sync with the client?
 			break;
 		}
 		case AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
-			int32 bitmapToken;
-			BRect srcRect, dstRect;
-			
-			link.Read<int32>(&bitmapToken);
-			link.Read<BRect>(&dstRect);
-			link.Read<BRect>(&srcRect);
-			
-			ServerBitmap* sbmp = fServerApp->FindBitmap(bitmapToken);
-			if (sbmp) {
-				dstRect = fCurrentLayer->ConvertToTop(dstRect);
-
-				driver->DrawBitmap(sbmp, srcRect, dstRect, fCurrentLayer->CurrentState());
-			}
-			
-			// TODO: Adi -- shouldn't AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT sync with the client?
-			break;
-		}
 		case AS_LAYER_DRAW_BITMAP_ASYNC_IN_RECT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_ASYNC_IN_RECT: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_(A)SYNC_IN_RECT: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
 			int32 bitmapToken;
 			BRect srcRect, dstRect;
 			
@@ -1837,25 +1808,14 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 
 				driver->DrawBitmap(sbmp, srcRect, dstRect, fCurrentLayer->CurrentState());
 			}
+			
+			// TODO: how should AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT sync with the client?
 			break;
 		}
 		case AS_STROKE_ARC:
-		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE_ARC\n", Title()));
-			
-			float angle, span;
-			BRect r;
-			
-			link.Read<BRect>(&r);
-			link.Read<float>(&angle);
-			link.Read<float>(&span);
-			if (fCurrentLayer && fCurrentLayer->CurrentState())
-				driver->StrokeArc(fCurrentLayer->ConvertToTop(r),angle,span, fCurrentLayer->CurrentState());
-			break;
-		}
 		case AS_FILL_ARC:
 		{
-			DTRACE(("ServerWindow %s: Message AS_FILL_ARC\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_ARC\n", Title()));
 			
 			float angle, span;
 			BRect r;
@@ -1863,89 +1823,51 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<BRect>(&r);
 			link.Read<float>(&angle);
 			link.Read<float>(&span);
-			if (fCurrentLayer && fCurrentLayer->CurrentState())
+
+			if (code == AS_STROKE_ARC)
+				driver->StrokeArc(fCurrentLayer->ConvertToTop(r),angle,span, fCurrentLayer->CurrentState());
+			else
 				driver->FillArc(fCurrentLayer->ConvertToTop(r),angle,span, fCurrentLayer->CurrentState());
+
 			break;
 		}
 		case AS_STROKE_BEZIER:
-		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE_BEZIER\n", Title()));
-			
-			BPoint *pts;
-			int i;
-			pts = new BPoint[4];
-			
-			for (i=0; i<4; i++)
-				link.Read<BPoint>(&(pts[i]));
-			
-			if (fCurrentLayer && fCurrentLayer->CurrentState())
-			{
-				for (i=0; i<4; i++)
-					pts[i]=fCurrentLayer->ConvertToTop(pts[i]);
-				
-				driver->StrokeBezier(pts, fCurrentLayer->CurrentState());
-			}
-			delete [] pts;
-			break;
-		}
 		case AS_FILL_BEZIER:
 		{
-			DTRACE(("ServerWindow %s: Message AS_FILL_BEZIER\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_BEZIER\n", Title()));
 			
-			BPoint *pts;
-			int i;
-			pts = new BPoint[4];
-			
-			for (i=0; i<4; i++)
+			BPoint pts[4];
+			for (int32 i = 0; i < 4; i++) {
 				link.Read<BPoint>(&(pts[i]));
-			
-			if (fCurrentLayer && fCurrentLayer->CurrentState())
-			{
-				for (i=0; i<4; i++)
-					pts[i]=fCurrentLayer->ConvertToTop(pts[i]);
-				
-				driver->FillBezier(pts, fCurrentLayer->CurrentState());
+				pts[i] = fCurrentLayer->ConvertToTop(pts[i]);
 			}
-			delete [] pts;
+				
+			if (code == AS_STROKE_BEZIER)
+				driver->StrokeBezier(pts, fCurrentLayer->CurrentState());
+			else
+				driver->FillBezier(pts, fCurrentLayer->CurrentState());
+
 			break;
 		}
 		case AS_STROKE_ELLIPSE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE_ELLIPSE\n", Title()));
-			
-			BRect rect;
-			link.Read<BRect>(&rect);
-			if (fCurrentLayer && fCurrentLayer->CurrentState())
-				driver->StrokeEllipse(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->CurrentState());
-			break;
-		}
 		case AS_FILL_ELLIPSE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_FILL_ELLIPSE\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_ELLIPSE\n", Title()));
 			
 			BRect rect;
 			link.Read<BRect>(&rect);
-			if (fCurrentLayer && fCurrentLayer->CurrentState())
+
+			if (code == AS_STROKE_ELLIPSE)
+				driver->StrokeEllipse(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->CurrentState());
+			else
 				driver->FillEllipse(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->CurrentState());
+
 			break;
 		}
 		case AS_STROKE_ROUNDRECT:
-		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE_ROUNDRECT\n", Title()));
-			
-			BRect rect;
-			float xrad,yrad;
-			link.Read<BRect>(&rect);
-			link.Read<float>(&xrad);
-			link.Read<float>(&yrad);
-
-			if (fCurrentLayer && fCurrentLayer->CurrentState())
-				driver->StrokeRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad, fCurrentLayer->CurrentState());
-			break;
-		}
 		case AS_FILL_ROUNDRECT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_FILL_ROUNDRECT\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_ROUNDRECT\n", Title()));
 			
 			BRect rect;
 			float xrad,yrad;
@@ -1953,54 +1875,39 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&xrad);
 			link.Read<float>(&yrad);
 
-			if (fCurrentLayer && fCurrentLayer->CurrentState())
+			if (code == AS_STROKE_ROUNDRECT)
+				driver->StrokeRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad, fCurrentLayer->CurrentState());
+			else
 				driver->FillRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad, fCurrentLayer->CurrentState());
+
 			break;
 		}
 		case AS_STROKE_TRIANGLE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE_TRIANGLE\n", Title()));
-
-			BPoint pts[3];
-			BRect rect;
-
-			for (int i = 0; i < 3; i++)
-				link.Read<BPoint>(&(pts[i]));
-
-			link.Read<BRect>(&rect);
-
-			if (fCurrentLayer && fCurrentLayer->CurrentState()) {
-				for (int i = 0;i < 3; i++)
-					pts[i] = fCurrentLayer->ConvertToTop(pts[i]);
-
-				driver->StrokeTriangle(pts, fCurrentLayer->ConvertToTop(rect), fCurrentLayer->CurrentState());
-			}
-			break;
-		}
 		case AS_FILL_TRIANGLE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_FILL_TRIANGLE\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_TRIANGLE\n", Title()));
 
 			BPoint pts[3];
 			BRect rect;
 
-			for (int i = 0; i < 3; i++)
+			for (int32 i = 0; i < 3; i++) {
 				link.Read<BPoint>(&(pts[i]));
+				pts[i] = fCurrentLayer->ConvertToTop(pts[i]);
+			}
 
 			link.Read<BRect>(&rect);
 
-			if (fCurrentLayer && fCurrentLayer->CurrentState()) {
-				for (int i = 0; i < 3; i++)
-					pts[i] = fCurrentLayer->ConvertToTop(pts[i]);
-
+			if (code == AS_STROKE_TRIANGLE)
+				driver->StrokeTriangle(pts, fCurrentLayer->ConvertToTop(rect), fCurrentLayer->CurrentState());
+			else
 				driver->FillTriangle(pts, fCurrentLayer->ConvertToTop(rect), fCurrentLayer->CurrentState());
-			}
+
 			break;
 		}
-// TODO: get rid of all this code duplication!!
 		case AS_STROKE_POLYGON:
+		case AS_FILL_POLYGON:
 		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE_POLYGON\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_POLYGON\n", Title()));
 
 			BRect polyframe;
 			bool isclosed;
@@ -2008,7 +1915,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			BPoint *pointlist;
 
 			link.Read<BRect>(&polyframe);
-			link.Read<bool>(&isclosed);
+			if (code == AS_STROKE_POLYGON)
+				link.Read<bool>(&isclosed);
 			link.Read<int32>(&pointcount);
 
 			pointlist = new BPoint[pointcount];
@@ -2018,87 +1926,40 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			for (int32 i = 0; i < pointcount; i++)
 				pointlist[i] = fCurrentLayer->ConvertToTop(pointlist[i]);
 
-			driver->StrokePolygon(pointlist,pointcount,polyframe,
-					fCurrentLayer->CurrentState(),isclosed);
-
-			delete [] pointlist;
-			break;
-		}
-		case AS_FILL_POLYGON:
-		{
-			DTRACE(("ServerWindow %s: Message AS_FILL_POLYGON\n", Title()));
-
-			BRect polyframe;
-			int32 pointcount;
-			BPoint *pointlist;
-
-			link.Read<BRect>(&polyframe);
-			link.Read<int32>(&pointcount);
-
-			pointlist = new BPoint[pointcount];
-
-			link.Read(pointlist, sizeof(BPoint) * pointcount);
-
-			for (int32 i = 0; i < pointcount; i++)
-				pointlist[i] = fCurrentLayer->ConvertToTop(pointlist[i]);
-
-			driver->FillPolygon(pointlist,pointcount,polyframe, fCurrentLayer->CurrentState());
+			if (code == AS_STROKE_POLYGON)
+				driver->StrokePolygon(pointlist, pointcount, polyframe, fCurrentLayer->CurrentState(), isclosed);
+			else
+				driver->FillPolygon(pointlist, pointcount, polyframe, fCurrentLayer->CurrentState());
 
 			delete [] pointlist;
 			break;
 		}
 		case AS_STROKE_SHAPE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_STROKE_SHAPE\n", Title()));
-			
-			BRect shaperect;
-			int32 opcount;
-			int32 ptcount;
-			int32 *oplist;
-			BPoint *ptlist;
-			
-			link.Read<BRect>(&shaperect);
-			link.Read<int32>(&opcount);
-			link.Read<int32>(&ptcount);
-
-			oplist = new int32[opcount];
-			ptlist = new BPoint[ptcount];
-
-			link.Read(oplist, sizeof(int32) * opcount);
-			link.Read(ptlist, sizeof(BPoint) * ptcount);
-
-			for (int32 i = 0; i < ptcount; i++)
-				ptlist[i] = fCurrentLayer->ConvertToTop(ptlist[i]);
-
-			driver->StrokeShape(shaperect, opcount, oplist, ptcount, ptlist, fCurrentLayer->CurrentState());
-			delete[] oplist;
-			delete[] ptlist;
-			break;
-		}
 		case AS_FILL_SHAPE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_FILL_SHAPE\n", Title()));
-
+			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_SHAPE\n", Title()));
+			
 			BRect shaperect;
 			int32 opcount;
 			int32 ptcount;
-			int32 *oplist;
-			BPoint *ptlist;
-
+			
 			link.Read<BRect>(&shaperect);
 			link.Read<int32>(&opcount);
 			link.Read<int32>(&ptcount);
 
-			oplist = new int32[opcount];
-			ptlist = new BPoint[ptcount];
+			int32* oplist = new int32[opcount];
+			BPoint* ptlist = new BPoint[ptcount];
 
 			link.Read(oplist, sizeof(int32) * opcount);
 			link.Read(ptlist, sizeof(BPoint) * ptcount);
 
 			for (int32 i = 0; i < ptcount; i++)
 				ptlist[i] = fCurrentLayer->ConvertToTop(ptlist[i]);
-			
-			driver->FillShape(shaperect, opcount, oplist, ptcount, ptlist, fCurrentLayer->CurrentState());
+
+			if (code == AS_STROKE_SHAPE)
+				driver->StrokeShape(shaperect, opcount, oplist, ptcount, ptlist, fCurrentLayer->CurrentState());
+			else
+				driver->FillShape(shaperect, opcount, oplist, ptcount, ptlist, fCurrentLayer->CurrentState());
 
 			delete[] oplist;
 			delete[] ptlist;
@@ -2175,10 +2036,9 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<escapement_delta>(&delta);
 			link.ReadString(&string);
 			
-			if (fCurrentLayer && fCurrentLayer->CurrentState())
-				driver->DrawString(string, length,
-								   fCurrentLayer->ConvertToTop(location),
-								   fCurrentLayer->CurrentState(), &delta);
+			driver->DrawString(string, length,
+							   fCurrentLayer->ConvertToTop(location),
+							   fCurrentLayer->CurrentState(), &delta);
 			
 			free(string);
 			break;
