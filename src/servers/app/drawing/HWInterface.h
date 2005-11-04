@@ -96,10 +96,10 @@ class HWInterface : public MultiLocker {
 	// BView::Draw() is called (if the cursor is within that views clipping region),
 	// then, after all drawing commands that triggered have been caried out,
 	// it shows the cursor again. This approach would have the adventage of
-	// the code not cluttering/slowing down DisplayDriverPainter.
+	// the code not cluttering/slowing down DrawingEngine.
 	// For now, we hide the cursor for any drawing operation that has
-	// a bounding box containing the cursor (in DisplayDriverPainter) so
-	// the cursor hiding is completely transparent from code using DisplayDriverPainter.
+	// a bounding box containing the cursor (in DrawingEngine) so
+	// the cursor hiding is completely transparent from code using DrawingEngine.
 	// ---
 	// NOTE: Investigate locking for these! The client code should already hold a
 	// ReadLock, but maybe these functions should acquire a WriteLock!

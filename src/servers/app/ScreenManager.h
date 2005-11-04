@@ -14,7 +14,7 @@
 
 class BMessage;
 
-class DisplayDriver;
+class DrawingEngine;
 class HWInterface;
 class Screen;
 

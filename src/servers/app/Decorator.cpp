@@ -11,7 +11,7 @@
 
 #include "ColorSet.h"
 #include "Decorator.h"
-#include "DisplayDriver.h"
+#include "DisplayDriverPainter.h"
 
 #include <Region.h>
 
@@ -77,10 +77,10 @@ Decorator::SetColors(const ColorSet &cset)
 
 /*!
 	\brief Assigns a display driver to the decorator
-	\param driver A valid DisplayDriver object
+	\param driver A valid DrawingEngine object
 */
 void
-Decorator::SetDriver(DisplayDriver *driver)
+Decorator::SetDriver(DrawingEngine *driver)
 {
 	_driver = driver;
 	// lots of subclasses will depend on the driver for text support, so call

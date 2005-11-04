@@ -10,7 +10,7 @@
 #include "WorkspacesLayer.h"
 #include "Workspace.h"
 #include "RootLayer.h"
-#include "DisplayDriver.h"
+#include "DisplayDriverPainter.h"
 #include "AppServer.h"
 #include "WinBorder.h"
 
@@ -19,7 +19,7 @@
 
 
 WorkspacesLayer::WorkspacesLayer(BRect frame, const char* name,
-	int32 token, uint32 resizeMode, uint32 flags, DisplayDriver* driver)
+	int32 token, uint32 resizeMode, uint32 flags, DrawingEngine* driver)
 	: Layer(frame, name, token, resizeMode, flags, driver)
 {
 }

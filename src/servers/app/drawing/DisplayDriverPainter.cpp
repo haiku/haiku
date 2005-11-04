@@ -6,9 +6,6 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-/**	Implementation of DisplayDriver based on top of Painter */
-
-
 #include <stdio.h>
 #include <algo.h>
 #include <stack.h>
@@ -78,32 +75,28 @@ class FontLocker {
 
 
 // constructor
-DisplayDriverPainter::DisplayDriverPainter(HWInterface* interface)
-	: DisplayDriver(),
-	  fPainter(new Painter()),
+DrawingEngine::DrawingEngine(HWInterface* interface)
+	: fPainter(new Painter()),
 	  fGraphicsCard(interface),
 	  fAvailableHWAccleration(0)
 {
 }
 
 // destructor
-DisplayDriverPainter::~DisplayDriverPainter()
+DrawingEngine::~DrawingEngine()
 {
 	delete fPainter;
 }
 
 // Initialize
 status_t
-DisplayDriverPainter::Initialize()
+DrawingEngine::Initialize()
 {
 	status_t err = B_ERROR;
 	if (WriteLock()) {
 		err = fGraphicsCard->Initialize();
 		if (err < B_OK)
 			fprintf(stderr, "HWInterface::Initialize() failed: %s\n", strerror(err));
-		if (err >= B_OK) {
-			err = DisplayDriver::Initialize();
-		}
 		WriteUnlock();
 	}
 	return err;
@@ -111,14 +104,13 @@ DisplayDriverPainter::Initialize()
 
 // Shutdown
 void
-DisplayDriverPainter::Shutdown()
+DrawingEngine::Shutdown()
 {
-	DisplayDriver::Shutdown();
 }
 
 // Update
 void
-DisplayDriverPainter::Update()
+DrawingEngine::Update()
 {
 	if (Lock()) {
 		fPainter->AttachToBuffer(fGraphicsCard->DrawingBuffer());
@@ -130,13 +122,14 @@ DisplayDriverPainter::Update()
 
 // SetHWInterface
 void
-DisplayDriverPainter::SetHWInterface(HWInterface* interface)
+DrawingEngine::SetHWInterface(HWInterface* interface)
 {
 	fGraphicsCard = interface;
 }
 
 // ConstrainClippingRegion
-void DisplayDriverPainter::ConstrainClippingRegion(BRegion *region)
+void
+DrawingEngine::ConstrainClippingRegion(BRegion *region)
 {
 	if (Lock()) {
 		if (!region) {
@@ -265,7 +258,7 @@ is_above(const BRect& a, const BRect& b)
 
 // CopyRegion
 void
-DisplayDriverPainter::CopyRegion(/*const*/ BRegion* region,
+DrawingEngine::CopyRegion(/*const*/ BRegion* region,
 								 int32 xOffset, int32 yOffset)
 {
 	// NOTE: Write locking because we might use HW acceleration.
@@ -395,7 +388,7 @@ DisplayDriverPainter::CopyRegion(/*const*/ BRegion* region,
 // here. In any case, to copy overlapping regions in app_server doesn't
 // make much sense to me.
 void
-DisplayDriverPainter::CopyRegionList(BList* list, BList* pList,
+DrawingEngine::CopyRegionList(BList* list, BList* pList,
 									 int32 rCount, BRegion* clipReg)
 {
 	// NOTE: Write locking because we might use HW acceleration.
@@ -415,7 +408,7 @@ DisplayDriverPainter::CopyRegionList(BList* list, BList* pList,
 
 // InvertRect
 void
-DisplayDriverPainter::InvertRect(BRect r)
+DrawingEngine::InvertRect(BRect r)
 {
 	// NOTE: Write locking because we might use HW acceleration.
 	// This needs to be investigated, I'm doing this because of
@@ -446,7 +439,7 @@ DisplayDriverPainter::InvertRect(BRect r)
 
 // DrawBitmap
 void
-DisplayDriverPainter::DrawBitmap(ServerBitmap *bitmap,
+DrawingEngine::DrawBitmap(ServerBitmap *bitmap,
 								 const BRect &source, const BRect &dest,
 								 const DrawState *d)
 {
@@ -468,7 +461,7 @@ DisplayDriverPainter::DrawBitmap(ServerBitmap *bitmap,
 
 // FillArc
 void
-DisplayDriverPainter::FillArc(BRect r, const float &angle,
+DrawingEngine::FillArc(BRect r, const float &angle,
 							  const float &span, const DrawState *d)
 {
 	if (Lock()) {
@@ -496,7 +489,7 @@ DisplayDriverPainter::FillArc(BRect r, const float &angle,
 
 // FillBezier
 void
-DisplayDriverPainter::FillBezier(BPoint *pts, const DrawState *d)
+DrawingEngine::FillBezier(BPoint *pts, const DrawState *d)
 {
 	if (Lock()) {
 		fGraphicsCard->HideSoftwareCursor();
@@ -514,7 +507,7 @@ DisplayDriverPainter::FillBezier(BPoint *pts, const DrawState *d)
 
 // FillEllipse
 void
-DisplayDriverPainter::FillEllipse(BRect r, const DrawState *d)
+DrawingEngine::FillEllipse(BRect r, const DrawState *d)
 {
 	if (Lock()) {
 		make_rect_valid(r);
@@ -541,7 +534,7 @@ DisplayDriverPainter::FillEllipse(BRect r, const DrawState *d)
 
 // FillPolygon
 void
-DisplayDriverPainter::FillPolygon(BPoint *ptlist, int32 numpts,
+DrawingEngine::FillPolygon(BPoint *ptlist, int32 numpts,
 								  BRect bounds, const DrawState *d)
 {
 	if (Lock()) {
@@ -563,7 +556,7 @@ DisplayDriverPainter::FillPolygon(BPoint *ptlist, int32 numpts,
 
 // FillRect
 void
-DisplayDriverPainter::FillRect(BRect r, const RGBColor& color)
+DrawingEngine::FillRect(BRect r, const RGBColor& color)
 {
 	// NOTE: Write locking because we might use HW acceleration.
 	// This needs to be investigated, I'm doing this because of
@@ -594,7 +587,7 @@ DisplayDriverPainter::FillRect(BRect r, const RGBColor& color)
 
 // FillRect
 void
-DisplayDriverPainter::FillRect(BRect r, const DrawState *d)
+DrawingEngine::FillRect(BRect r, const DrawState *d)
 {
 	// NOTE: Write locking because we might use HW acceleration.
 	// This needs to be investigated, I'm doing this because of
@@ -640,7 +633,7 @@ DisplayDriverPainter::FillRect(BRect r, const DrawState *d)
 
 // FillRegion
 void
-DisplayDriverPainter::FillRegion(BRegion& r, const DrawState *d)
+DrawingEngine::FillRegion(BRegion& r, const DrawState *d)
 {
 	// NOTE: Write locking because we might use HW acceleration.
 	// This needs to be investigated, I'm doing this because of
@@ -687,7 +680,7 @@ DisplayDriverPainter::FillRegion(BRegion& r, const DrawState *d)
 
 // FillRoundRect
 void
-DisplayDriverPainter::FillRoundRect(BRect r,
+DrawingEngine::FillRoundRect(BRect r,
 									const float &xrad, const float &yrad,
 									const DrawState *d)
 {
@@ -710,14 +703,14 @@ DisplayDriverPainter::FillRoundRect(BRect r,
 
 // FillShape
 void
-DisplayDriverPainter::FillShape(const BRect &bounds,
+DrawingEngine::FillShape(const BRect &bounds,
 								const int32 &opcount, const int32 *oplist, 
 								const int32 &ptcount, const BPoint *ptlist,
 								const DrawState *d)
 {
 	if (Lock()) {
 
-printf("DisplayDriverPainter::FillShape() - what is this stuff that gets passed here?\n");
+printf("DrawingEngine::FillShape() - what is this stuff that gets passed here?\n");
 
 		Unlock();
 	}
@@ -725,7 +718,7 @@ printf("DisplayDriverPainter::FillShape() - what is this stuff that gets passed 
 
 // FillTriangle
 void
-DisplayDriverPainter::FillTriangle(BPoint *pts, BRect bounds,
+DrawingEngine::FillTriangle(BPoint *pts, BRect bounds,
 								   const DrawState *d)
 {
 	if (Lock()) {
@@ -746,7 +739,7 @@ DisplayDriverPainter::FillTriangle(BPoint *pts, BRect bounds,
 
 // StrokeArc
 void
-DisplayDriverPainter::StrokeArc(BRect r, const float &angle,
+DrawingEngine::StrokeArc(BRect r, const float &angle,
 								const float &span, const DrawState *d)
 {
 	if (Lock()) {
@@ -774,7 +767,7 @@ DisplayDriverPainter::StrokeArc(BRect r, const float &angle,
 
 // StrokeBezier
 void
-DisplayDriverPainter::StrokeBezier(BPoint *pts, const DrawState *d)
+DrawingEngine::StrokeBezier(BPoint *pts, const DrawState *d)
 {
 	if (Lock()) {
 		fGraphicsCard->HideSoftwareCursor();
@@ -791,7 +784,7 @@ DisplayDriverPainter::StrokeBezier(BPoint *pts, const DrawState *d)
 
 // StrokeEllipse
 void
-DisplayDriverPainter::StrokeEllipse(BRect r, const DrawState *d)
+DrawingEngine::StrokeEllipse(BRect r, const DrawState *d)
 {
 	if (Lock()) {
 		make_rect_valid(r);
@@ -823,7 +816,7 @@ DisplayDriverPainter::StrokeEllipse(BRect r, const DrawState *d)
 // * this function is only used by Decorators
 // * it assumes a one pixel wide line
 void
-DisplayDriverPainter::StrokeLine(const BPoint &start, const BPoint &end, const RGBColor &color)
+DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end, const RGBColor &color)
 {
 	if (Lock()) {
 		BRect touched(start, end);
@@ -846,7 +839,7 @@ DisplayDriverPainter::StrokeLine(const BPoint &start, const BPoint &end, const R
 
 // StrokeLine
 void
-DisplayDriverPainter::StrokeLine(const BPoint &start, const BPoint &end, DrawState* context)
+DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end, DrawState* context)
 {
 	if (Lock()) {
 		BRect touched(start, end);
@@ -868,7 +861,7 @@ DisplayDriverPainter::StrokeLine(const BPoint &start, const BPoint &end, DrawSta
 
 // StrokeLineArray
 void
-DisplayDriverPainter::StrokeLineArray(const int32 &numlines,
+DrawingEngine::StrokeLineArray(const int32 &numlines,
 									  const LineArrayData *linedata,
 									  const DrawState *d)
 {
@@ -920,21 +913,21 @@ DisplayDriverPainter::StrokeLineArray(const int32 &numlines,
 //
 // * this function is only used by Decorators
 void
-DisplayDriverPainter::StrokePoint(const BPoint& pt, const RGBColor &color)
+DrawingEngine::StrokePoint(const BPoint& pt, const RGBColor &color)
 {
 	StrokeLine(pt, pt, color);
 }
 
 // StrokePoint
 void
-DisplayDriverPainter::StrokePoint(const BPoint& pt, DrawState *context)
+DrawingEngine::StrokePoint(const BPoint& pt, DrawState *context)
 {
 	StrokeLine(pt, pt, context);
 }
 
 // StrokePolygon
 void
-DisplayDriverPainter::StrokePolygon(BPoint* ptlist, int32 numpts,
+DrawingEngine::StrokePolygon(BPoint* ptlist, int32 numpts,
 									BRect bounds, const DrawState* d,
 									bool closed)
 {
@@ -959,7 +952,7 @@ DisplayDriverPainter::StrokePolygon(BPoint* ptlist, int32 numpts,
 // 
 // this function is used to draw a one pixel wide rect
 void
-DisplayDriverPainter::StrokeRect(BRect r, const RGBColor &color)
+DrawingEngine::StrokeRect(BRect r, const RGBColor &color)
 {
 	if (Lock()) {
 		make_rect_valid(r);
@@ -987,7 +980,7 @@ DisplayDriverPainter::StrokeRect(BRect r, const RGBColor &color)
 
 // StrokeRect
 void
-DisplayDriverPainter::StrokeRect(BRect r, const DrawState *d)
+DrawingEngine::StrokeRect(BRect r, const DrawState *d)
 {
 	if (Lock()) {
 		// support invalid rects
@@ -1012,7 +1005,7 @@ DisplayDriverPainter::StrokeRect(BRect r, const DrawState *d)
 
 // StrokeRegion
 void
-DisplayDriverPainter::StrokeRegion(BRegion& r, const DrawState *d)
+DrawingEngine::StrokeRegion(BRegion& r, const DrawState *d)
 {
 	if (Lock()) {
 		BRect clipped(r.Frame());
@@ -1040,7 +1033,7 @@ DisplayDriverPainter::StrokeRegion(BRegion& r, const DrawState *d)
 
 // StrokeRoundRect
 void
-DisplayDriverPainter::StrokeRoundRect(BRect r, const float &xrad,
+DrawingEngine::StrokeRoundRect(BRect r, const float &xrad,
 									  const float &yrad, const DrawState *d)
 {
 	if (Lock()) {
@@ -1064,13 +1057,13 @@ DisplayDriverPainter::StrokeRoundRect(BRect r, const float &xrad,
 
 // StrokeShape
 void
-DisplayDriverPainter::StrokeShape(const BRect &bounds, const int32 &opcount,
+DrawingEngine::StrokeShape(const BRect &bounds, const int32 &opcount,
 								  const int32 *oplist, const int32 &ptcount,
 								  const BPoint *ptlist, const DrawState *d)
 {
 	if (Lock()) {
 
-printf("DisplayDriverPainter::StrokeShape() - what is this stuff that gets passed here?\n");
+printf("DrawingEngine::StrokeShape() - what is this stuff that gets passed here?\n");
 
 		Unlock();
 	}
@@ -1078,7 +1071,7 @@ printf("DisplayDriverPainter::StrokeShape() - what is this stuff that gets passe
 
 // StrokeTriangle
 void
-DisplayDriverPainter::StrokeTriangle(BPoint *pts, const BRect &bounds,
+DrawingEngine::StrokeTriangle(BPoint *pts, const BRect &bounds,
 									 const DrawState *d)
 {
 	if (Lock()) {
@@ -1101,7 +1094,7 @@ DisplayDriverPainter::StrokeTriangle(BPoint *pts, const BRect &bounds,
 /*
 // DrawString
 void
-DisplayDriverPainter::DrawString(const char *string, const int32 &length,
+DrawingEngine::DrawString(const char *string, const int32 &length,
 								 const BPoint &pt, const RGBColor &color,
 								 escapement_delta *delta)
 {
@@ -1113,7 +1106,7 @@ DisplayDriverPainter::DrawString(const char *string, const int32 &length,
 */
 // DrawString
 void
-DisplayDriverPainter::DrawString(const char* string, int32 length,
+DrawingEngine::DrawString(const char* string, int32 length,
 								 const BPoint& pt, DrawState* d,
 								 escapement_delta* delta)
 {
@@ -1147,7 +1140,7 @@ DisplayDriverPainter::DrawString(const char* string, int32 length,
 
 // StringWidth
 float
-DisplayDriverPainter::StringWidth(const char* string, int32 length,
+DrawingEngine::StringWidth(const char* string, int32 length,
 								  const DrawState* d,
 								  escapement_delta* delta)
 {
@@ -1164,7 +1157,7 @@ DisplayDriverPainter::StringWidth(const char* string, int32 length,
 
 // StringWidth
 float
-DisplayDriverPainter::StringWidth(const char* string, int32 length,
+DrawingEngine::StringWidth(const char* string, int32 length,
 								  const ServerFont& font,
 								  escapement_delta* delta)
 {
@@ -1177,7 +1170,7 @@ DisplayDriverPainter::StringWidth(const char* string, int32 length,
 
 // StringHeight
 float
-DisplayDriverPainter::StringHeight(const char *string, int32 length,
+DrawingEngine::StringHeight(const char *string, int32 length,
 								   const DrawState *d)
 {
 	float height = 0.0;
@@ -1193,35 +1186,35 @@ DisplayDriverPainter::StringHeight(const char *string, int32 length,
 
 // Lock
 bool
-DisplayDriverPainter::Lock()
+DrawingEngine::Lock()
 {
 	return fGraphicsCard->WriteLock();
 }
 
 // Unlock
 void
-DisplayDriverPainter::Unlock()
+DrawingEngine::Unlock()
 {
 	fGraphicsCard->WriteUnlock();
 }
 
 // WriteLock
 bool
-DisplayDriverPainter::WriteLock()
+DrawingEngine::WriteLock()
 {	
 	return fGraphicsCard->WriteLock();
 }
 
 // WriteUnlock
 void
-DisplayDriverPainter::WriteUnlock()
+DrawingEngine::WriteUnlock()
 {
 	fGraphicsCard->WriteUnlock();
 }
 
 // DumpToFile
 bool
-DisplayDriverPainter::DumpToFile(const char *path)
+DrawingEngine::DumpToFile(const char *path)
 {
 	if (Lock()) {
 		RenderingBuffer* buffer = fGraphicsCard->DrawingBuffer();
@@ -1240,14 +1233,14 @@ DisplayDriverPainter::DumpToFile(const char *path)
 
 // DumpToBitmap
 ServerBitmap*
-DisplayDriverPainter::DumpToBitmap()
+DrawingEngine::DumpToBitmap()
 {
 	return NULL;
 }
 
 // _CopyRect
 BRect
-DisplayDriverPainter::_CopyRect(BRect src, int32 xOffset, int32 yOffset) const
+DrawingEngine::_CopyRect(BRect src, int32 xOffset, int32 yOffset) const
 {
 	BRect dst;
 	RenderingBuffer* buffer = fGraphicsCard->DrawingBuffer();
@@ -1288,7 +1281,7 @@ DisplayDriverPainter::_CopyRect(BRect src, int32 xOffset, int32 yOffset) const
 
 // _CopyRect
 void
-DisplayDriverPainter::_CopyRect(uint8* src, uint32 width, uint32 height,
+DrawingEngine::_CopyRect(uint8* src, uint32 width, uint32 height,
 								uint32 bpr, int32 xOffset, int32 yOffset) const
 {
 	int32 xIncrement;

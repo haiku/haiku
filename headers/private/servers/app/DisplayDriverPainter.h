@@ -7,19 +7,39 @@
  *		Gabe Yoder <gyoder@stny.rr.com>
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-#ifndef _DISPLAY_DRIVER_PAINTER_H_
-#define _DISPLAY_DRIVER_PAINTER_H_
+#ifndef _DISPLAY_DRIVER_H_
+#define _DISPLAY_DRIVER_H_
 
 
-#include "DisplayDriver.h"
+#include <Accelerant.h>
+#include <Font.h>
+#include <Locker.h>
+#include <Point.h>
 
+class BPoint;
+class BRect;
+class BRegion;
+
+class DrawState;
+class HWInterface;
 class Painter;
+class RGBColor;
+class ServerBitmap;
+class ServerCursor;
+class ServerFont;
 
+typedef struct
+{
+	BPoint pt1;
+	BPoint pt2;
+	rgb_color color;
 
-class DisplayDriverPainter : public DisplayDriver {
+} LineArrayData;
+
+class DrawingEngine {
 public:
-								DisplayDriverPainter(HWInterface* interface = NULL);
-	virtual						~DisplayDriverPainter();
+								DrawingEngine(HWInterface* interface = NULL);
+	virtual						~DrawingEngine();
 
 	// when implementing, be sure to call the inherited version
 	virtual status_t			Initialize();

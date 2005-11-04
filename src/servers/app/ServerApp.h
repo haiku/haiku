@@ -23,7 +23,7 @@
 class AreaPool;
 class BMessage;
 class BList;
-class DisplayDriver;
+class DrawingEngine;
 class ServerPicture;
 class ServerCursor;
 class ServerBitmap;

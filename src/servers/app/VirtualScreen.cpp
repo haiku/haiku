@@ -19,7 +19,7 @@
 VirtualScreen::VirtualScreen()
 	:
 	fScreenList(4, true),
-	fDisplayDriver(NULL),
+	fDrawingEngine(NULL),
 	fHWInterface(NULL)
 {
 }
@@ -46,7 +46,7 @@ VirtualScreen::_Reset()
 	fSettings.MakeEmpty();
 
 	fFrame.Set(0, 0, 0, 0);
-	fDisplayDriver = NULL;
+	fDrawingEngine = NULL;
 	fHWInterface = NULL;
 }
 
@@ -103,7 +103,7 @@ VirtualScreen::AddScreen(Screen* screen)
 	}
 
 	// TODO: this works only for single screen configurations
-	fDisplayDriver = screen->GetDisplayDriver();
+	fDrawingEngine = screen->GetDrawingEngine();
 	fHWInterface = screen->GetHWInterface();
 	fFrame = screen->Frame();
 

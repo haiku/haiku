@@ -25,7 +25,7 @@ OffscreenWinBorder::OffscreenWinBorder(ServerBitmap* bitmap,
 				B_NO_BORDER_WINDOW_LOOK,
 				B_NORMAL_WINDOW_FEEL,
 				0, 0, window,
-				new DisplayDriverPainter()),
+				new DrawingEngine()),
 	  fBitmap(bitmap),
 	  fHWInterface(new BitmapHWInterface(fBitmap))
 {
@@ -42,7 +42,7 @@ OffscreenWinBorder::OffscreenWinBorder(ServerBitmap* bitmap,
 OffscreenWinBorder::~OffscreenWinBorder()
 {
 	fHWInterface->WriteLock();
-	// Unlike normal Layers, we own the DisplayDriver instance
+	// Unlike normal Layers, we own the DrawingEngine instance
 	fDriver->Shutdown();
 	delete fDriver;
 	fHWInterface->Shutdown();

@@ -23,7 +23,7 @@
 #include <PortLink.h>
 
 #include "Decorator.h"
-#include "DisplayDriver.h"
+#include "DisplayDriverPainter.h"
 #include "Globals.h"
 #include "HWInterface.h"
 #include "Layer.h"
@@ -57,7 +57,7 @@ static RGBColor kDefaultWorkspaceColor = RGBColor(51, 102, 152);
 static int32 kMaxWorkspaceCount = 32;
 
 RootLayer::RootLayer(const char *name, int32 workspaceCount,
-					 Desktop *desktop, DisplayDriver *driver)
+					 Desktop *desktop, DrawingEngine *driver)
 	: Layer(BRect(0, 0, 0, 0), name, 0, B_FOLLOW_ALL, B_WILL_DRAW, driver),
 
 	  fDesktop(desktop),
@@ -1173,7 +1173,7 @@ RootLayer::KeyboardEventHandler(BMessage *msg)
 											| B_LEFT_SHIFT_KEY | B_LEFT_OPTION_KEY)) != 0)
 #endif
 				{
-					// TODO: Set to Safe Mode in KeyboardEventHandler:B_KEY_DOWN. (DisplayDriver API change)
+					// TODO: Set to Safe Mode in KeyboardEventHandler:B_KEY_DOWN. (DrawingEngine API change)
 					STRACE(("Safe Video Mode invoked - code unimplemented\n"));
 					break;
 				}
@@ -1224,7 +1224,7 @@ RootLayer::KeyboardEventHandler(BMessage *msg)
 			if (scancode == 0x7f)
 #endif
 			{
-				if (GetDisplayDriver()) {
+				if (GetDrawingEngine()) {
 					char filename[128];
 					BEntry entry;
 
@@ -1234,7 +1234,7 @@ RootLayer::KeyboardEventHandler(BMessage *msg)
 						entry.SetTo(filename);
 					} while(entry.Exists());
 
-					GetDisplayDriver()->DumpToFile(filename);
+					GetDrawingEngine()->DumpToFile(filename);
 
 					break;
 				}

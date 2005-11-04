@@ -37,7 +37,7 @@
 #include <View.h>
 
 #include "DebugInfoManager.h"
-#include "DisplayDriver.h"
+#include "DisplayDriverPainter.h"
 #include "DrawState.h"
 #include "PortLink.h"
 #include "RootLayer.h"
@@ -63,7 +63,7 @@
 
 
 Layer::Layer(BRect frame, const char* name, int32 token,
-	uint32 resize, uint32 flags, DisplayDriver* driver)
+	uint32 resize, uint32 flags, DrawingEngine* driver)
 	:
 	fFrame(frame), // in parent coordinates
 //	fBoundsLeftTop(0.0, 0.0),
@@ -128,7 +128,7 @@ CRITICAL(helper);
 	// NOTE: This flag is forwarded to a DrawState setting, even
 	// though it is actually not part of a "state". However,
 	// it is an important detail of a graphics context, and we
-	// have no other means to pass this setting on to the DisplayDriver
+	// have no other means to pass this setting on to the DrawingEngine
 	// other than through the DrawState. If we ever add a flag
 	// B_ANTI_ALIASING to the view flags, it would have to be passed
 	// in the same way. Though when breaking binary compatibility,
@@ -1912,7 +1912,7 @@ Layer::do_CopyBits(BRect& src, BRect& dst, int32 xOffset, int32 yOffset) {
 	// move the region back for the actual operation
 	copyRegion.OffsetBy(-xOffset, -yOffset);
 
-	GetDisplayDriver()->CopyRegion(&copyRegion, xOffset, yOffset);
+	GetDrawingEngine()->CopyRegion(&copyRegion, xOffset, yOffset);
 
 	// trigger the redraw			
 	GetRootLayer()->RequestDraw(GetRootLayer()->fRedrawReg, NULL);
@@ -1939,7 +1939,7 @@ Layer::do_CopyBits(BRect& src, BRect& dst, int32 xOffset, int32 yOffset) {
 	// move the region back for the actual operation
 	copyRegion.OffsetBy(-xOffset, -yOffset);
 
-	GetDisplayDriver()->CopyRegion(&copyRegion, xOffset, yOffset);
+	GetDrawingEngine()->CopyRegion(&copyRegion, xOffset, yOffset);
 
 	// trigger the redraw			
 	GetRootLayer()->RequestDraw(GetRootLayer()->fRedrawReg, NULL);
@@ -2455,7 +2455,7 @@ void Layer::do_MoveBy(float dx, float dy)
 
 		// offset back and instruct the HW to do the actual copying.
 		oldFullVisible.OffsetBy(-dx, -dy);
-		GetDisplayDriver()->CopyRegion(&oldFullVisible, dx, dy);
+		GetDrawingEngine()->CopyRegion(&oldFullVisible, dx, dy);
 
 		// add redrawReg to our RootLayer's redraw region.
 //		GetRootLayer()->fRedrawReg.Include(&redrawReg);
@@ -2489,7 +2489,7 @@ Layer::do_ScrollBy(float dx, float dy)
 
 		// compute the common region. we'll use HW acc to copy this to the new location.
 		invalid.IntersectWith(&fFullVisible2);
-		GetDisplayDriver()->CopyRegion(&invalid, -dx, -dy);
+		GetDrawingEngine()->CopyRegion(&invalid, -dx, -dy);
 
 		// common region goes back to its original location. then, by excluding
 		// it from curent fullVisible we'll obtain the region that needs to be redrawn.

@@ -19,7 +19,7 @@
 #include "DrawState.h"
 
 class DesktopSettings;
-class DisplayDriver;
+class DrawingEngine;
 class ServerFont;
 class BRegion;
 
@@ -52,7 +52,7 @@ class Decorator {
 	virtual						~Decorator();
 
 			void				SetColors(const ColorSet &cset);
-			void				SetDriver(DisplayDriver *driver);
+			void				SetDriver(DrawingEngine *driver);
 			void				SetFlags(int32 wflags);
 			void				SetFeel(int32 wfeel);
 			void				SetFont(ServerFont *font);
@@ -137,7 +137,7 @@ class Decorator {
 	virtual	void				_SetColors();
 
 			ColorSet*			_colors;
-			DisplayDriver*		_driver;
+			DrawingEngine*		_driver;
 			DrawState			fDrawState;
 
 			int32				_look;

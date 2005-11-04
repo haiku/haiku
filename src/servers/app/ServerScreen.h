@@ -15,7 +15,7 @@
 #include <Accelerant.h>
 #include <Point.h>
 
-class DisplayDriver;
+class DrawingEngine;
 class HWInterface;
 
 class Screen {
@@ -45,7 +45,7 @@ class Screen {
 	inline	int32				ScreenNumber() const
 									{ return fID; }
 
-	inline	DisplayDriver*		GetDisplayDriver() const
+	inline	DrawingEngine*		GetDrawingEngine() const
 									{ return fDriver; }
 	inline	HWInterface*		GetHWInterface() const
 									{ return fHWInterface; }
@@ -63,7 +63,7 @@ class Screen {
 										  bool ignoreFrequency = false) const;
 
 			int32				fID;
-			DisplayDriver*		fDriver;
+			DrawingEngine*		fDriver;
 			HWInterface*		fHWInterface;
 };
 

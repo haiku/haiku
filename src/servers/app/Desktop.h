@@ -27,7 +27,7 @@
 
 class BMessage;
 
-class DisplayDriver;
+class DrawingEngine;
 class HWInterface;
 class Layer;
 class RootLayer;
@@ -64,8 +64,8 @@ class Desktop : public MessageLooper, public ScreenOwner {
 	virtual bool				ReleaseScreen(Screen* screen) { return false; }
 
 	const	::VirtualScreen&	VirtualScreen() const { return fVirtualScreen; }
-	inline	DisplayDriver*		GetDisplayDriver() const
-									{ return fVirtualScreen.DisplayDriver(); }
+	inline	DrawingEngine*		GetDrawingEngine() const
+									{ return fVirtualScreen.DrawingEngine(); }
 	inline	HWInterface*		GetHWInterface() const
 									{ return fVirtualScreen.HWInterface(); }
 

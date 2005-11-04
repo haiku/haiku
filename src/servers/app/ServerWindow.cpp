@@ -39,7 +39,7 @@
 #include "BGet++.h"
 #include "DebugInfoManager.h"
 #include "Desktop.h"
-#include "DisplayDriver.h"
+#include "DisplayDriverPainter.h"
 #include "HWInterface.h"
 #include "Layer.h"
 #include "MessagePrivate.h"
@@ -482,10 +482,10 @@ ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent)
 		&& (fWinBorder->WindowFlags() & kWorkspacesWindowFlag) != 0) {
 		// this is a workspaces window!
 		newLayer = new (nothrow) WorkspacesLayer(frame, name, token, resizeMask,
-			flags, fWinBorder->GetDisplayDriver());
+			flags, fWinBorder->GetDrawingEngine());
 	} else {
 		newLayer = new (nothrow) Layer(frame, name, token, resizeMask, flags,
-			fWinBorder->GetDisplayDriver());
+			fWinBorder->GetDrawingEngine());
 	}
 
 	if (newLayer == NULL)
@@ -1696,7 +1696,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 	if (fWinBorder->InUpdate())
 		rreg.IntersectWith(&fWinBorder->RegionToBeUpdated());
 
-	DisplayDriver* driver = fWinBorder->GetDisplayDriver();
+	DrawingEngine* driver = fWinBorder->GetDrawingEngine();
 	if (!driver) {
 		// ?!?
 		DTRACE(("ServerWindow %s: no display driver!!\n", Title()));
@@ -1726,7 +1726,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 							   fCurrentLayer->ConvertToTop(p2),
 							   fCurrentLayer->CurrentState());
 			
-			// We update the pen here because many DisplayDriver calls which do not update the
+			// We update the pen here because many DrawingEngine calls which do not update the
 			// pen position actually call StrokeLine
 
 			// TODO: Decide where to put this, for example, it cannot be done
@@ -1990,7 +1990,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			delete[] rects;
 
 			// TODO: create support for clipping_rect usage for faster BRegion display.
-			// Tweaks to DisplayDriver are necessary along with conversion routines in Layer
+			// Tweaks to DrawingEngine are necessary along with conversion routines in Layer
 			break;
 		}
 		case AS_STROKE_LINEARRAY:
@@ -2185,7 +2185,7 @@ ServerWindow::_CopyBits(RootLayer* rootLayer, Layer* layer,
 	// move the region back for the actual operation
 	copyRegion.OffsetBy(-xOffset, -yOffset);
 
-	layer->GetDisplayDriver()->CopyRegion(&copyRegion, xOffset, yOffset);
+	layer->GetDrawingEngine()->CopyRegion(&copyRegion, xOffset, yOffset);
 
 	// trigger the redraw			
 	if (rootLayer) {
@@ -2235,9 +2235,9 @@ ServerWindow::MakeWinBorder(BRect frame, const char* name,
 							uint32 look, uint32 feel, uint32 flags,
 							uint32 workspace)
 {
-	// The non-offscreen ServerWindow uses the DisplayDriver instance from the desktop.
+	// The non-offscreen ServerWindow uses the DrawingEngine instance from the desktop.
 	return new(nothrow) WinBorder(frame, name, look, feel, flags,
-		workspace, this, fDesktop->GetDisplayDriver());
+		workspace, this, fDesktop->GetDrawingEngine());
 }
 
 

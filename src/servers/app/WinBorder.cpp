@@ -66,7 +66,7 @@ WinBorder::WinBorder(const BRect &frame,
 					 const uint32 flags,
 					 const uint32 workspaces,
 					 ServerWindow *window,
-					 DisplayDriver *driver)
+					 DrawingEngine *driver)
 	: Layer(frame, name, B_NULL_TOKEN, B_FOLLOW_NONE, 0UL, driver),
 	  fDecorator(NULL),
 	  fTopLayer(NULL),
@@ -126,8 +126,10 @@ WinBorder::WinBorder(const BRect &frame,
 		uint16 width, height;
 		uint32 colorSpace;
 		float frequency;
-		GetRootLayer()->GetDesktop()->ScreenAt(0)->GetMode(width, height, colorSpace, frequency);
-		_ResizeBy(width - frame.Width(), height - frame.Height());
+		if (GetRootLayer()->GetDesktop()->ScreenAt(0)) {
+			GetRootLayer()->GetDesktop()->ScreenAt(0)->GetMode(width, height, colorSpace, frequency);
+			_ResizeBy(width - frame.Width(), height - frame.Height());
+		}
 	} else
 		_ResizeBy(0, 0);
 

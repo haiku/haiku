@@ -104,7 +104,7 @@ Desktop::Init()
 	char name[32];
 	sprintf(name, "RootLayer %d", 1);
 
-	fRootLayer = new RootLayer(name, 4, this, GetDisplayDriver());
+	fRootLayer = new RootLayer(name, 4, this, GetDrawingEngine());
 	fRootLayer->RunThread();
 
 	// take care of setting the default cursor

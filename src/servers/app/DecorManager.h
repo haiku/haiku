@@ -14,7 +14,6 @@
 #include <ObjectList.h>
 
 #include "Decorator.h"
-#include "DisplayDriver.h"
 
 class DecorInfo;
 class Desktop;

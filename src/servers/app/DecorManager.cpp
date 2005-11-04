@@ -87,7 +87,7 @@ DecorInfo::Instantiate(Desktop* desktop, BRect rect, const char *title,
 		return NULL;
 	}
 
-	decorator->SetDriver(desktop->GetDisplayDriver());
+	decorator->SetDriver(desktop->GetDrawingEngine());
 
 	gGUIColorSet.Lock();
 	decorator->SetColors(gGUIColorSet);

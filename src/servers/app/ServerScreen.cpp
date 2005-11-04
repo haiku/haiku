@@ -25,7 +25,7 @@
 
 Screen::Screen(HWInterface *interface, int32 id)
 	: fID(id),
-	  fDriver(interface ? new DisplayDriverPainter(interface) : NULL),
+	  fDriver(interface ? new DrawingEngine(interface) : NULL),
 	  fHWInterface(interface)
 {
 }
@@ -71,7 +71,7 @@ Screen::SetMode(display_mode mode)
 {
 	status_t ret = fHWInterface->SetMode(mode);
 
-	// the DisplayDriverPainter needs to adjust itself
+	// the DrawingEngine needs to adjust itself
 	if (ret >= B_OK)
 		fDriver->Update();
 

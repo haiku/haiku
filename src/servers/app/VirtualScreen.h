@@ -14,7 +14,7 @@
 #include <Message.h>
 
 class Desktop;
-class DisplayDriver;
+class DrawingEngine;
 class HWInterface;
 
 
@@ -23,8 +23,8 @@ class VirtualScreen {
 		VirtualScreen();
 		~VirtualScreen();
 
-		::DisplayDriver*	DisplayDriver() const
-								{ return fDisplayDriver; }
+		::DrawingEngine*	DrawingEngine() const
+								{ return fDrawingEngine; }
 		// TODO: can we have a multiplexing HWInterface as well?
 		//	If not, this would need to be hidden, and only made
 		//	available for the Screen class
@@ -60,7 +60,7 @@ class VirtualScreen {
 		BMessage			fSettings;
 		BRect				fFrame;
 		BObjectList<screen_item> fScreenList;
-		::DisplayDriver*	fDisplayDriver;
+		::DrawingEngine*	fDrawingEngine;
 		::HWInterface*		fHWInterface;
 };
 

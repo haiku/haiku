@@ -17,7 +17,7 @@ class WinBorder;
 class WorkspacesLayer : public Layer {
 	public:
 		WorkspacesLayer(BRect frame, const char* name, int32 token,
-			uint32 resize, uint32 flags, DisplayDriver* driver);
+			uint32 resize, uint32 flags, DrawingEngine* driver);
 		virtual ~WorkspacesLayer();
 
 		virtual	void Draw(const BRect& updateRect);

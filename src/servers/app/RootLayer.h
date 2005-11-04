@@ -38,7 +38,7 @@
 #include "Layer.h"
 #include "Workspace.h"
 
-class DisplayDriver;
+class DrawingEngine;
 class HWInterface;
 class RGBColor;
 class Screen;
@@ -67,7 +67,7 @@ class UtilityBitmap;
 class RootLayer : public Layer {
 public:
 								RootLayer(const char *name,	int32 workspaceCount,
-									Desktop *desktop, DisplayDriver *driver);
+									Desktop *desktop, DrawingEngine *driver);
 	virtual						~RootLayer(void);
 
 	Desktop*					GetDesktop() const { return fDesktop; }

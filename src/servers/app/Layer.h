@@ -48,7 +48,7 @@ enum {
 
 class ServerApp;
 class RootLayer;
-class DisplayDriver;
+class DrawingEngine;
 class DrawState;
 class ServerBitmap;
 
@@ -70,7 +70,7 @@ class Layer {
  public:
 								Layer(BRect frame, const char* name,
 									  int32 token, uint32 resize,
-									  uint32 flags, DisplayDriver* driver);
+									  uint32 flags, DrawingEngine* driver);
 	virtual						~Layer();
 
 			void				AddChild(Layer* child, ServerWindow* serverWin);
@@ -179,7 +179,7 @@ class Layer {
 			BRegion				ConvertFromTop(BRegion *reg);
 	
 
-			DisplayDriver*		GetDisplayDriver() const
+			DrawingEngine*		GetDrawingEngine() const
 									{ return fDriver; }
 
 			ServerWindow*		Window() const
@@ -354,7 +354,7 @@ class Layer {
 			bool				fIsTopLayer;
 			uint16				fAdFlags;
 	
-			DisplayDriver*		fDriver;
+			DrawingEngine*		fDriver;
 			DrawState*			fDrawState;
 	
 			RootLayer*			fRootLayer;

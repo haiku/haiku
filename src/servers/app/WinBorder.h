@@ -30,7 +30,7 @@ enum {
 
 class ServerWindow;
 class Decorator;
-class DisplayDriver;
+class DrawingEngine;
 class Desktop;
 
 class WinBorder : public Layer {
@@ -42,7 +42,7 @@ class WinBorder : public Layer {
 										  const uint32 flags,
 										  const uint32 workspaces,
 										  ServerWindow *window,
-										  DisplayDriver *driver);
+										  DrawingEngine *driver);
 	virtual						~WinBorder();
 	
 	virtual	void				Draw(const BRect &r);
