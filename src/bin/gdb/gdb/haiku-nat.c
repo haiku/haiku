@@ -37,6 +37,7 @@
 #include "observer.h"
 #include "regcache.h"
 #include "solib-haiku.h"
+#include "symfile.h"
 #include "target.h"
 
 //#define TRACE_HAIKU_NAT
@@ -1505,6 +1506,11 @@ haiku_init_debug_create_inferior(int pid)
 		resume(0, stop_signal);
 	}
 	stop_soon = NO_STOP_QUIETLY;
+
+	// load shared library symbols
+	target_terminal_ours_for_output ();
+	SOLIB_ADD (NULL, 0, &current_target, auto_solib_add);
+	target_terminal_inferior ();
 
 //	startup_inferior (START_INFERIOR_TRAPS_EXPECTED);
 
