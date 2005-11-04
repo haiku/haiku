@@ -1,0 +1,22 @@
+SubDir HAIKU_TOP src tests servers app view_state ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UseHeaders [ FDirName os app ] ;
+UseHeaders [ FDirName os interface ] ;
+
+Application ViewState :
+	ViewState.cpp
+;
+
+if ( $(TARGET_PLATFORM) = haiku ) {
+	# for running natively under R5 or Haiku:
+	LinkAgainst ViewState : be ;
+} else {
+	# for running in the Haiku app_server under R5:
+	LinkAgainst ViewState : libopenbeos.so ;
+
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : ViewState
+		: tests!apps ;
+}
+

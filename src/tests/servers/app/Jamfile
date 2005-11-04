@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src tests servers app ;
 
-SetSubDirSupportedPlatforms r5 bone dano ;
+SetSubDirSupportedPlatforms r5 bone ;
 
 UseHeaders [ FStandardOSHeaders ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
@@ -57,6 +57,7 @@ SharedLibrary libhaikuappserver.so :
 	CursorData.cpp
 	CursorSet.cpp
 	Decorator.cpp
+	DesktopSettings.cpp
 	FontFamily.cpp
 	IPoint.cpp
 	LayerData.cpp
@@ -84,7 +85,7 @@ Server haiku_app_server :
 	# Misc. Sources
 	DebugInfoManager.cpp
 	SubWindowList.cpp
-	PicturePlayer.cpp
+	#PicturePlayer.cpp
 	PNGDump.cpp
 	RAMLinkMsgReader.cpp
 	MessageLooper.cpp
@@ -96,7 +97,6 @@ Server haiku_app_server :
 
 	AppServer.cpp
 	Desktop.cpp
-	DesktopSettings.cpp
 
 	ServerApp.cpp
 	ServerWindow.cpp
@@ -149,3 +149,4 @@ SubInclude HAIKU_TOP src tests servers app resize_limits ;
 SubInclude HAIKU_TOP src tests servers app scrolling ;
 SubInclude HAIKU_TOP src tests servers app textview ;
 SubInclude HAIKU_TOP src tests servers app regularapps ;
+SubInclude HAIKU_TOP src tests servers app view_state ;
