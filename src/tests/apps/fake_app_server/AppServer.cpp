@@ -36,7 +36,6 @@
 
 #include "BitmapManager.h"
 #include "ColorSet.h"
-#include "DisplayDriver.h"
 #include "RegistrarDefs.h"
 #include "RGBColor.h"
 #include "ServerApp.h"

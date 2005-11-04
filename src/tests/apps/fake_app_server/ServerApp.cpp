@@ -26,7 +26,6 @@
 #include "BitmapManager.h"
 #include "BGet++.h"
 
-#include "DisplayDriver.h"
 #include "ServerApp.h"
 #include "ServerCursor.h"
 #include "ServerBitmap.h"
