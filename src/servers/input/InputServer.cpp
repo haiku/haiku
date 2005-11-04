@@ -135,10 +135,11 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 	size_t parameterLength = sizeof(parameter);
 
 #ifdef COMPILE_FOR_R5
-	if (_kget_safemode_option_(B_SAFEMODE_SAFE_MODE, parameter, &parameterLength) == B_OK) {
+	if (_kget_safemode_option_(B_SAFEMODE_SAFE_MODE, parameter, &parameterLength) == B_OK)
 #else
-	if (_kern_get_safemode_option(B_SAFEMODE_SAFE_MODE, parameter, &parameterLength) == B_OK) {
+	if (_kern_get_safemode_option(B_SAFEMODE_SAFE_MODE, parameter, &parameterLength) == B_OK)
 #endif
+	{
 		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
 			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
 			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
@@ -1175,10 +1176,9 @@ InputServer::DispatchEvents(BList *eventList)
 		}
 		
 		fEventsCache.MakeEmpty();
-		
 	}
 	return true;
-}// end DispatchEvents()
+}
 
 
 int 
@@ -1633,7 +1633,7 @@ InputServer::WatchPort()
 			delete event;
 			continue;
 		} 
-		
+
 		// This is where the message should be processed.	
 
 		// here we test for a message coming from app_server, screen resolution change could have happened
@@ -1645,15 +1645,14 @@ InputServer::WatchPort()
 				fFrame = frame;
 			}
 		}
-			
+
 		HandleSetMousePosition(event, event);
-						
+
 		BList list;
 		list.AddItem(event);
 		DispatchEvents(&list);
-			
+
 		PRINT(("Event written to port\n"));
 	}
-
 }
 
