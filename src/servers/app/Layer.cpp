@@ -37,7 +37,7 @@
 #include <View.h>
 
 #include "DebugInfoManager.h"
-#include "DisplayDriverPainter.h"
+#include "DrawingEngine.h"
 #include "DrawState.h"
 #include "PortLink.h"
 #include "RootLayer.h"

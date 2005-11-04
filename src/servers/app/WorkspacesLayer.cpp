@@ -4,19 +4,20 @@
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-
-#include "WorkspacesLayer.h"
-#include "Workspace.h"
-#include "RootLayer.h"
-#include "DisplayDriverPainter.h"
-#include "AppServer.h"
-#include "WinBorder.h"
 
 #include <ColorSet.h>
 #include <WindowPrivate.h>
 
+#include "AppServer.h"
+#include "DrawingEngine.h"
+#include "RootLayer.h"
+#include "WinBorder.h"
+#include "Workspace.h"
+
+#include "WorkspacesLayer.h"
 
 WorkspacesLayer::WorkspacesLayer(BRect frame, const char* name,
 	int32 token, uint32 resizeMode, uint32 flags, DrawingEngine* driver)

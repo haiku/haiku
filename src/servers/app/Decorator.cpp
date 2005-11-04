@@ -11,7 +11,7 @@
 
 #include "ColorSet.h"
 #include "Decorator.h"
-#include "DisplayDriverPainter.h"
+#include "DrawingEngine.h"
 
 #include <Region.h>
 

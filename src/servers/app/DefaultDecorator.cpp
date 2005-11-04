@@ -14,7 +14,7 @@
 
 #include "ColorUtils.h"
 #include "DesktopSettings.h"
-#include "DisplayDriverPainter.h"
+#include "DrawingEngine.h"
 #include "DrawState.h"
 #include "FontManager.h"
 #include "PatternHandler.h"

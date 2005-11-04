@@ -35,7 +35,7 @@
 #include "CursorSet.h"
 #include "Desktop.h"
 #include "DecorManager.h"
-#include "DisplayDriver.h"
+#include "DrawingEngine.h"
 #include "FontManager.h"
 #include "HWInterface.h"
 //#include "DrawState.h"
@@ -454,7 +454,7 @@ ServerApp::_MessageLooper()
 				STRACE(("ServerApp %s:Server shutdown notification received\n", Signature()));
 
 				// If we are using the real, accelerated version of the
-				// DisplayDriver, we do NOT want the user to be able shut down
+				// DrawingEngine, we do NOT want the user to be able shut down
 				// the server. The results would NOT be pretty
 #if TEST_MODE
 				BMessage pleaseQuit(B_QUIT_REQUESTED);
@@ -1331,7 +1331,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 					if (!stringArray[i] || lengthArray[i] <= 0)
 						widthArray[i] = 0.0;
 					else {
-						//widthArray[i] = fDesktop->GetDisplayDriver()->StringWidth(stringArray[i], lengthArray[i], font);
+						//widthArray[i] = fDesktop->GetDrawingEngine()->StringWidth(stringArray[i], lengthArray[i], font);
 						// NOTE: The line below will return the exact same thing. However,
 						// the line above uses the AGG rendering backend, for which glyph caching
 						// actually works. It is about 20 times faster!

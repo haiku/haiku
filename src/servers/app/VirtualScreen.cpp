@@ -9,7 +9,6 @@
 
 #include "VirtualScreen.h"
 
-#include <DisplayDriver.h>
 #include "HWInterface.h"
 #include "Desktop.h"
 

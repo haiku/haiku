@@ -32,13 +32,13 @@
 
 #include "ServerBitmap.h"
 
-#include "DisplayDriver.h"
+#include "DrawingEngine.h"
 #include "PictureProtocol.h"
 #include "Utils.h"
 
 #include "PicturePlayer.h"
 
-PicturePlayer::PicturePlayer(DisplayDriver *d,void *data, int32 size)
+PicturePlayer::PicturePlayer(DrawingEngine *d,void *data, int32 size)
  : fData(data, size)
 {
 	fdriver=d;

@@ -16,7 +16,7 @@
 #include "PNGDump.h"
 #include "RenderingBuffer.h"
 
-#include "DisplayDriverPainter.h"
+#include "DrawingEngine.h"
 
 
 // make_rect_valid

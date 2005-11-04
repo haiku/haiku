@@ -20,7 +20,7 @@
 #include <ServerProtocol.h>
 
 #include "AppServer.h"
-#include "DisplayDriverPainter.h"
+#include "DrawingEngine.h"
 #include "Globals.h"
 #include "Layer.h"
 #include "RootLayer.h"

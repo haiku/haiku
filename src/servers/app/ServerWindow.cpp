@@ -39,7 +39,7 @@
 #include "BGet++.h"
 #include "DebugInfoManager.h"
 #include "Desktop.h"
-#include "DisplayDriverPainter.h"
+#include "DrawingEngine.h"
 #include "HWInterface.h"
 #include "Layer.h"
 #include "MessagePrivate.h"

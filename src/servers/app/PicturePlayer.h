@@ -35,12 +35,12 @@
 #include "DrawState.h"
 #include "PatternHandler.h" // for pattern_union
 
-class DisplayDriver;
+class DrawingEngine;
 
 class PicturePlayer
 {
 public:
-	PicturePlayer(DisplayDriver *driver,void *data, int32 size);
+	PicturePlayer(DrawingEngine *driver,void *data, int32 size);
 	virtual	~PicturePlayer();
 
 	int16 GetOp();
@@ -87,7 +87,7 @@ public:
 private:
 	BMemoryIO fData;
 	int32 fSize;
-	DisplayDriver *fdriver;
+	DrawingEngine *fdriver;
 	DrawState fldata;
 	BPoint forigin;
 	Pattern stipplepat;

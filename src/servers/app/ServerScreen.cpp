@@ -17,7 +17,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "DisplayDriverPainter.h"
+#include "DrawingEngine.h"
 #include "HWInterface.h"
 
 #include "ServerScreen.h"

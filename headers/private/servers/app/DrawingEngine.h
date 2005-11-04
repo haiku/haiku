@@ -7,8 +7,8 @@
  *		Gabe Yoder <gyoder@stny.rr.com>
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-#ifndef _DISPLAY_DRIVER_H_
-#define _DISPLAY_DRIVER_H_
+#ifndef DRAWING_ENGINE_H_
+#define DRAWING_ENGINE_H_
 
 
 #include <Accelerant.h>
@@ -229,4 +229,4 @@ public:
 			uint32				fAvailableHWAccleration;
 };
 
-#endif // _DISPLAY_DRIVER_PAINTER_H_
+#endif // DRAWING_ENGINE_H_

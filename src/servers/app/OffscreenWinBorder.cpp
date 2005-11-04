@@ -11,7 +11,7 @@
 #include "DebugInfoManager.h"
 
 #include "BitmapHWInterface.h"
-#include "DisplayDriverPainter.h"
+#include "DrawingEngine.h"
 #include "ServerBitmap.h"
 
 #include "OffscreenWinBorder.h"

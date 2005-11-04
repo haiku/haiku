@@ -42,7 +42,6 @@ SharedLibrary libappserver.so :
 
 	# drawing
 	PatternHandler.cpp
-	DisplayDriver.cpp
 
 	# libraries
 	: libroot.so libbe.so libfreetype.so libtextencoding.so
@@ -69,11 +68,11 @@ Server app_server :
 	ServerApp.cpp
 	ServerWindow.cpp
 
-	# DisplayDriver Classes
+	# DrawingEngine Classes
 	AccelerantBuffer.cpp
 	AccelerantHWInterface.cpp
 	BitmapBuffer.cpp
-	DisplayDriverPainter.cpp
+	DrawingEngine.cpp
 	MallocBuffer.cpp
 	UpdateQueue.cpp
 
