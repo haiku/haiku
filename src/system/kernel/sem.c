@@ -103,7 +103,7 @@ static void
 dump_sem(struct sem_entry *sem)
 {
 	kprintf("SEM: %p\n", sem);
-	kprintf("id:      %#ld\n", sem->id);
+	kprintf("id:      %#lx\n", sem->id);
 	if (sem->id >= 0) {
 		kprintf("name:    '%s'\n", sem->u.used.name);
 		kprintf("owner:   0x%lx\n", sem->u.used.owner);
@@ -115,7 +115,7 @@ dump_sem(struct sem_entry *sem)
 #endif
 	} else {
 		kprintf("next:    %p\n", sem->u.unused.next);
-		kprintf("next_id: %ld\n", sem->u.unused.next_id);
+		kprintf("next_id: %#lx\n", sem->u.unused.next_id);
 	}
 }
 
