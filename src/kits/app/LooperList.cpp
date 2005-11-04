@@ -49,7 +49,8 @@ typedef vector<BLooperList::LooperData>::iterator LDIter;
 
 //------------------------------------------------------------------------------
 BLooperList::BLooperList()
-	:	fLooperID(0)
+ :	fLock("BLooperList lock"),
+	fLooperID(0)
 {
 }
 //------------------------------------------------------------------------------
