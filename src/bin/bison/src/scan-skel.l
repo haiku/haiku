@@ -20,7 +20,7 @@
    02110-1301, USA.  */
 
 %option nodefault noyywrap nounput never-interactive debug
-%option prefix="skel_" outfile="lex.yy.c"
+%option prefix="skel_"
 
 %{
 #include "system.h"

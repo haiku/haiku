@@ -2,8 +2,8 @@ SubDir HAIKU_TOP src bin bison src ;
 
 SubDirCcFlags -DHAVE_CONFIG_H   -DPKGDATADIR=\'\"/etc\"\' -DLOCALEDIR=\'\"/etc/locale\"\' ;
 
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 BinCommand bison :
 	LR0.c
@@ -37,5 +37,9 @@ BinCommand bison :
 	uniqstr.c
 	vcg.c
 	: libbison.a
-	: bison.rdef ;
+	: bison.rdef
+;
 
+# Don't search scan-gram.c and scan-skel.c in the source directory.
+# We want to use the one generated from scan-gram.l and scan-skel.l.
+SEARCH on [ FGristFiles scan-gram.c scan-skel.c ] = ;

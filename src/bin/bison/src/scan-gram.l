@@ -21,7 +21,7 @@
 */
 
 %option debug nodefault nounput noyywrap never-interactive
-%option prefix="gram_" outfile="lex.yy.c"
+%option prefix="gram_"
 
 %{
 #include "system.h"
