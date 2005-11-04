@@ -73,6 +73,20 @@ setuid(uid_t uid)
 }
 
 
+int
+setegid(gid_t gid)
+{
+	return EPERM;
+}
+
+
+int
+seteuid(uid_t uid)
+{
+	return EPERM;
+}
+
+
 char *
 getlogin(void)
 {

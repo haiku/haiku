@@ -155,6 +155,8 @@ extern uid_t	getuid(void);
 
 extern int		setgid(gid_t gid);
 extern int		setuid(uid_t uid);
+extern int		setegid(gid_t gid);
+extern int		seteuid(uid_t uid);
 
 extern char		*getlogin(void);
 extern int		getlogin_r(char *name, size_t nameSize);
