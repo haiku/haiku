@@ -72,7 +72,6 @@ SharedLibrary libhaikuappserver.so :
 
 	# drawing
 	PatternHandler.cpp
-	DisplayDriver.cpp
 
 	# libraries
 	:
@@ -101,11 +100,11 @@ Server haiku_app_server :
 	ServerApp.cpp
 	ServerWindow.cpp
 
-	# DisplayDriver Classes
+	# DrawingEngine Classes
 	AccelerantBuffer.cpp
 	AccelerantHWInterface.cpp
 	BitmapBuffer.cpp
-	DisplayDriverPainter.cpp
+	DrawingEngine.cpp
 	MallocBuffer.cpp
 	UpdateQueue.cpp
 
