@@ -304,6 +304,9 @@ class Layer {
 	friend class RootLayer;
 	friend class WinBorder;
 	friend class ServerWindow;
+#ifndef NEW_CLIPPING
+	friend class OffscreenWinBorder;
+#endif
 
 #ifndef NEW_CLIPPING
 			void				move_layer(float x, float y);
