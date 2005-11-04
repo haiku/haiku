@@ -16,7 +16,7 @@
 
 
 DesktopSettings::Private::Private()
-	: BLocker("desktop settings")
+	: BLocker("DesktopSettings_Private")
 {
 	// if the on-disk settings are not complete, the defaults will be kept
 	_SetDefaults();

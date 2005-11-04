@@ -79,8 +79,17 @@ ColorSet gGUIColorSet;
 */
 AppServer::AppServer()
 	: MessageLooper("app_server"),
+	fMessagePort(-1),
+	fServerInputPort(-1),
+	fISThreadID(-1),
+	fCursorThreadID(-1),
 	fCursorSem(-1),
-	fCursorArea(-1)
+	fCursorArea(-1),
+	fCursorAddr(NULL),
+	fDesktops(),
+	fDesktopLock("AppServerDesktopLock"),
+	fISASPort(-1),
+	fISPort(-1)
 {
 	fMessagePort = create_port(DEFAULT_MONITOR_PORT_SIZE, SERVER_PORT_NAME);
 	if (fMessagePort < B_OK)

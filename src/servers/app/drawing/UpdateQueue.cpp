@@ -10,12 +10,12 @@
 
 // constructor
 UpdateQueue::UpdateQueue(HWInterface* interface)
-	: fInterface(interface),
-	  fUpdateRegion(),
-	  fUpdateExecutor(-1),
-	  fThreadControl(-1),
-	  fStatus(B_ERROR)
-	  
+ :	BLocker("AppServer_UpdateQueue"),
+ 	fInterface(interface),
+	fUpdateRegion(),
+	fUpdateExecutor(-1),
+	fThreadControl(-1),
+	fStatus(B_ERROR)
 {
 	fThreadControl = create_sem(0, "update queue control");
 	if (fThreadControl >= B_OK)

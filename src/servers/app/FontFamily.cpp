@@ -26,7 +26,7 @@ const int32 kInvalidFamilyFlags = -1;
 	\param face FreeType handle for the font file after it is loaded - it will be kept open until the FontStyle is destroied
 */
 FontStyle::FontStyle(const char *path, FT_Face face)
-	: BLocker(face->style_name),
+	: BLocker(BString("FontStyle_").Append(face->style_name).String()),
 	fFreeTypeFace(face),
 	fName(face->style_name),
 	fPath(path),

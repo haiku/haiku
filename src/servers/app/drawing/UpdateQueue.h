@@ -1,7 +1,7 @@
 // UpdateQueue.h
 
-#ifndef EVENT_QUEUE_H
-#define EVENT_QUEUE_H
+#ifndef UPDATE_QUEUE_H
+#define UPDATE_QUEUE_H
 
 #include <List.h>
 #include <Locker.h>
@@ -33,4 +33,4 @@ class UpdateQueue : public BLocker {
 			status_t			fStatus;
 };
 
-#endif	// EVENT_QUEUE_H
+#endif	// UPDATE_QUEUE_H

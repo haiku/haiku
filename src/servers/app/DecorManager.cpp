@@ -103,7 +103,7 @@ DecorInfo::Instantiate(Desktop* desktop, BRect rect, const char *title,
 
 
 DecorManager::DecorManager()
-	:
+ :	BLocker("DecorManager"),
 	fDecorList(0),
  	fCurrentDecor(NULL)
 {

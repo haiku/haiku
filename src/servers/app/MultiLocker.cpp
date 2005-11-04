@@ -38,9 +38,9 @@ MultiLocker::MultiLocker(const char* semaphoreBaseName)
 		sprintf(name, "%s-%s", semaphoreBaseName, "WriterLock");
 		fWriterLock = create_sem(0, name);
 	} else {
-		fReadSem = create_sem(0, "ReadSem");
-		fWriteSem = create_sem(0, "WriteSem");
-		fWriterLock = create_sem(0, "WriterLock");
+		fReadSem = create_sem(0, "MultiLocker_ReadSem");
+		fWriteSem = create_sem(0, "MultiLocker_WriteSem");
+		fWriterLock = create_sem(0, "MultiLocker_WriterLock");
 	}
 
 	if (fReadSem >= 0 && fWriteSem >=0 && fWriterLock >= 0)

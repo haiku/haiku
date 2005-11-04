@@ -34,6 +34,7 @@
 
 //! Initializes the CursorManager
 CursorManager::CursorManager()
+ :	BLocker("CursorManager")
 {
 	// Error code for AddCursor
 	fTokenizer.ExcludeValue(B_ERROR);
