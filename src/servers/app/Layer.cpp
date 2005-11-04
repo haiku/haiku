@@ -513,7 +513,7 @@ Layer::RebuildFullRegion(void)
 		if (const BRegion* userClipping = ld->ClippingRegion())
 			fFull.IntersectWith(userClipping);
 		
-	} while ((ld = ld->prevState));
+	} while ((ld = ld->PreviousState()));
 }
 
 // StartRebuildRegions
