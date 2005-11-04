@@ -79,12 +79,9 @@ private:
 			CDAudioDevice		fCDDrive;
 			PlayList			fPlayList;
 			CDState				fWindowState;
-			int32				fDiscID;
 			CDDBQuery			fCDQuery;
+			CDDBData			fCDData;
 			uint8				fVolume;
-			bool				fUseTrackNames;
-			vector<BString>		fTrackNames;
-			BString				fCDName;
 };
 
 

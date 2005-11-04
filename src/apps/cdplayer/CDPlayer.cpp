@@ -47,9 +47,7 @@ CDPlayer::CDPlayer(BRect frame, const char *name, uint32 resizeMask, uint32 flag
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
-	fDiscID=-1;
 	fVolume=255;
-	fUseTrackNames=false;
 	
 	BuildGUI();
 	
@@ -520,7 +518,7 @@ void CDPlayer::WatchCDState(void)
 			
 			// Because we are changing play states, we will need to update the GUI
 			
-			fDiscID=-1;
+			fCDData.SetDiscID(-1);
 			fCDTitle->SetText("No CD");
 			
 			fCurrentTrack->SetText("");
@@ -586,7 +584,7 @@ void CDPlayer::WatchCDState(void)
 	int32 discid = fCDDrive.GetDiscID();
 	bool update_track_gui=false;
 	
-	if(discid != fDiscID)
+	if(discid != fCDData.DiscID())
 	{
 		update_track_gui = true;
 		
@@ -598,20 +596,17 @@ void CDPlayer::WatchCDState(void)
 		
 		if(fCDQuery.Ready())
 		{
-			fDiscID = discid;
-			
 			// Note that we only update the CD title for now. We still need a track number
 			// in order to update the display for the selected track
-			if(fCDQuery.GetTitles(&fCDName, &fTrackNames, 1000000))
+			if(fCDQuery.GetData(&fCDData, 1000000))
 			{
-				fCDTitle->SetText(fCDName.String());
-				fUseTrackNames=true;
+				BString display(fCDData.Artist());
+				display << " - " << fCDData.Album();
+				fCDTitle->SetText(display.String());
 			}
 			else
 			{
-				fCDName="Audio CD";
 				fCDTitle->SetText("Audio CD");
-				fUseTrackNames=false;
 			}
 		}
 	}
@@ -692,10 +687,7 @@ void CDPlayer::WatchCDState(void)
 			if(whichtrack == 0)
 				whichtrack++;
 			
-			if(fUseTrackNames && fTrackNames.size()>0)
-				currentTrackName << "Track " << whichtrack << ": " << fTrackNames[ whichtrack - 1];
-			else
-				currentTrackName << "Track " << whichtrack;
+			currentTrackName << "Track " << whichtrack << ": " << fCDData.TrackAt(whichtrack-1);
 			
 			fCurrentTrack->SetText(currentTrackName.String());
 			
