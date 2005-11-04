@@ -39,6 +39,8 @@ struct dirent	*readdir(DIR *dir);
 int				readdir_r(DIR *dir, struct dirent *entry, struct dirent **_result);
 int				closedir(DIR *dir);
 void			rewinddir(DIR *dir);
+void 			seekdir(DIR *dir, long int loc);
+long int		telldir(DIR *);
 
 #ifdef __cplusplus
 }
