@@ -15,8 +15,8 @@
 #include "ColorUtils.h"
 #include "DesktopSettings.h"
 #include "DisplayDriver.h"
+#include "DrawState.h"
 #include "FontManager.h"
-#include "LayerData.h"
 #include "PatternHandler.h"
 #include "RGBColor.h"
 
@@ -351,7 +351,7 @@ DefaultDecorator::_DoLayout()
 		fTextOffset = (_look == B_FLOATING_WINDOW_LOOK) ? 10 : 18;
 
 		font_height fontHeight;
-		_drawdata.Font().GetHeight(fontHeight);
+		fDrawState.Font().GetHeight(fontHeight);
 
 		_tabrect.Set(_frame.left - fBorderWidth,
 					 _frame.top - fBorderWidth
@@ -379,7 +379,7 @@ DefaultDecorator::_DoLayout()
 
 		// fMaxTabWidth contains fMinWidth + the width required for the title
 		fMaxTabWidth = _driver ? _driver->StringWidth(GetTitle(), strlen(GetTitle()),
-			&_drawdata) : 0.0;
+			&fDrawState) : 0.0;
 		if (fMaxTabWidth > 0.0)
 			fMaxTabWidth += fTextOffset;
 		fMaxTabWidth += fMinTabWidth;
@@ -436,8 +436,8 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 									 invalid.right, invalid.bottom));
 
 	#ifdef USE_VIEW_FILL_HACK
-		_drawdata.SetHighColor(RGBColor(192, 192, 192 ));	
-		_driver->FillRect(_frame, _drawdata.HighColor());
+		fDrawState.SetHighColor(RGBColor(192, 192, 192 ));	
+		_driver->FillRect(_frame, fDrawState.HighColor());
 	#endif
 
 	if (_look == B_NO_BORDER_WINDOW_LOOK)
@@ -632,12 +632,12 @@ DefaultDecorator::_DrawTitle(BRect r)
 {
 	STRACE(("_DrawTitle(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 
-	_drawdata.SetHighColor(fTextColor);
-	_drawdata.SetLowColor(fTabColor);
+	fDrawState.SetHighColor(fTextColor);
+	fDrawState.SetLowColor(fTabColor);
 
 	// figure out position of text
 	font_height fontHeight;
-	_drawdata.Font().GetHeight(fontHeight);
+	fDrawState.Font().GetHeight(fontHeight);
 
 	BPoint titlePos;
 	titlePos.x = _closerect.IsValid() ? _closerect.right + fTextOffset
@@ -645,7 +645,7 @@ DefaultDecorator::_DrawTitle(BRect r)
 	titlePos.y = floorf(((_tabrect.top + 2.0) + _tabrect.bottom + fontHeight.ascent
 		+ fontHeight.descent) / 2.0 - fontHeight.descent + 0.5);
 
-	_driver->DrawString(fTruncatedTitle.String(), fTruncatedTitleLength, titlePos, &_drawdata);
+	_driver->DrawString(fTruncatedTitle.String(), fTruncatedTitleLength, titlePos, &fDrawState);
 }
 
 // _DrawZoom
@@ -786,6 +786,6 @@ DefaultDecorator::_LayoutTabItems(const BRect& tabRect)
 	//	also not appear perfectly in the middle
 	float width = (_zoomrect.left - _closerect.right) - fTextOffset * 2 + 2;
 	fTruncatedTitle = GetTitle();
-	_drawdata.Font().TruncateString(&fTruncatedTitle, B_TRUNCATE_END, width);
+	fDrawState.Font().TruncateString(&fTruncatedTitle, B_TRUNCATE_END, width);
 	fTruncatedTitleLength = fTruncatedTitle.Length();
 }

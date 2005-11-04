@@ -64,7 +64,7 @@ enum {
 class ServerApp;
 class RootLayer;
 class DisplayDriver;
-class LayerData;
+class DrawState;
 class ServerBitmap;
 
 class PointerEvent {
@@ -371,7 +371,7 @@ friend class OffscreenWinBorder;
 			uint16				fAdFlags;
 	
 			DisplayDriver*		fDriver;
-			LayerData*			fLayerData;
+			DrawState*			fDrawState;
 	
 			RootLayer*			fRootLayer;
 

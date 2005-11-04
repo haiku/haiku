@@ -32,7 +32,7 @@ Decorator::Decorator(DesktopSettings& settings, BRect rect, int32 look,
 	int32 feel, int32 flags)
 	: _colors(new ColorSet()),
 	  _driver(NULL),
-	  _drawdata(),
+	  fDrawState(),
 
 	  _look(look),
 	  _feel(feel),
@@ -124,7 +124,7 @@ void
 Decorator::SetFont(ServerFont *font)
 {
 	if (font) {
-		_drawdata.SetFont(*font);
+		fDrawState.SetFont(*font);
 	}
 }
 
@@ -514,14 +514,14 @@ Decorator::_ClipTitle(float width)
 	// when it exists (if it doesn't already)
 	if (_driver) {
 		int32 strlength = fTitle.CountChars();
-		float pixwidth=_driver->StringWidth(fTitle.String(),strlength,&_drawdata);
+		float pixwidth=_driver->StringWidth(fTitle.String(),strlength,&fDrawState);
 
 		while (strlength >= 0) {
 			if (pixwidth < width)
 				return strlength;
 
 			strlength--;
-			pixwidth=_driver->StringWidth(fTitle.String(), strlength, &_drawdata);
+			pixwidth=_driver->StringWidth(fTitle.String(), strlength, &fDrawState);
 		}
 	}
 	return 0;

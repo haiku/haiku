@@ -128,7 +128,7 @@ void PicturePlayer::GetData(void *data, int32 size)
 	fData.Read(data, size);
 }
 
-status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
+status_t PicturePlayer::Play(int32 tableEntries,void *userData, DrawState *d)
 {
 	if(!userData || !d)
 		return B_ERROR;

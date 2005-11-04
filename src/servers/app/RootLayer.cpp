@@ -1,34 +1,20 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		RootLayer.cpp
-//	Author:			Gabe Yoder <gyoder@stny.rr.com>
-//					DarkWyrm <bpmagic@columbus.rr.com>
-//					Adi Oanca <adioanca@cotty.iren.ro>
-//					Stephan Aßmus <superstippi@gmx.de>
-//	Description:	Class used for the top layer of each workspace's Layer tree
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Gabe Yoder <gyoder@stny.rr.com>
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Adrian Oanca <adioanca@cotty.iren.ro>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+
+/**	Class used for the top layer of each workspace's Layer tree */
+
 
 #include <stdio.h>
+
 #include <Window.h>
 #include <List.h>
 #include <Message.h>
@@ -137,8 +123,8 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	// init the first, default workspace
 	fWorkspace[fActiveWksIndex] = new Workspace(fActiveWksIndex, 0xFF00FF00,
 												kDefaultWorkspaceColor);
-	fLayerData->SetHighColor(RGBColor(255, 255, 255));
-	fLayerData->SetLowColor(fWorkspace[fActiveWksIndex]->BGColor());
+	fDrawState->SetHighColor(RGBColor(255, 255, 255));
+	fDrawState->SetLowColor(fWorkspace[fActiveWksIndex]->BGColor());
 
 	// Spawn our working thread
 	fThreadID = spawn_thread(WorkingThread, name, B_DISPLAY_PRIORITY, this);
@@ -559,10 +545,10 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 	// adjust our DrawData to workspace colors
 	rgb_color bg = fWorkspace[index]->BGColor().GetColor32();
 	if ((bg.red + bg.green + bg.blue) / 3 > 128)
-		fLayerData->SetHighColor(RGBColor(0, 0, 0));
+		fDrawState->SetHighColor(RGBColor(0, 0, 0));
 	else
-		fLayerData->SetHighColor(RGBColor(255, 255, 255));
-	fLayerData->SetLowColor(fWorkspace[index]->BGColor());
+		fDrawState->SetHighColor(RGBColor(255, 255, 255));
+	fDrawState->SetLowColor(fWorkspace[index]->BGColor());
 
 	// save some datas
 	int32 exIndex = ActiveWorkspaceIndex();
@@ -1587,7 +1573,7 @@ RootLayer::Draw(const BRect &r)
 	char	string[30];
 	sprintf(string, "Workspace %ld", fActiveWksIndex + 1);
 	fDriver->DrawString(string, strlen(string), BPoint(5, 15),
-						fLayerData);
+						fDrawState);
 #endif // APPSERVER_ROOTLAYER_SHOW_WORKSPACE_NUMBER
 #if ON_SCREEN_DEBUGGING_INFO
 	BPoint location(5, 40);
@@ -1598,7 +1584,7 @@ RootLayer::Draw(const BRect &r)
 		p++;
 		if (*p == 0 || *p == '\n') {
 			fDriver->DrawString(start, p - start, location,
-								fLayerData);
+								fDrawState);
 			// NOTE: Eventually, this will be below the screen!
 			location.y += textHeight;
 			start = p + 1;
@@ -1614,7 +1600,7 @@ RootLayer::Draw(const BRect &r)
 		logoPos.y = floorf(fFrame.bottom - kLogoHeight * 1.5);
 		BRect bitmapBounds = fLogoBitmap->Bounds();
 		fDriver->DrawBitmap(fLogoBitmap, bitmapBounds,
-							bitmapBounds.OffsetToCopy(logoPos), fLayerData);
+							bitmapBounds.OffsetToCopy(logoPos), fDrawState);
 	}
 #endif // DISPLAY_HAIKU_LOGO
 }

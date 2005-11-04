@@ -58,9 +58,9 @@ SharedLibrary libhaikuappserver.so :
 	CursorSet.cpp
 	Decorator.cpp
 	DesktopSettings.cpp
+	DrawState.cpp
 	FontFamily.cpp
 	IPoint.cpp
-	LayerData.cpp
 	RGBColor.cpp
 	ServerBitmap.cpp
 	ServerCursor.cpp

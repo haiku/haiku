@@ -430,7 +430,7 @@ ServerWindow::SetLayerFontState(Layer *layer, BPrivate::LinkReceiver &link)
 			fTitle, layer->Name()));
 	// NOTE: no need to check for a lock. This is a private method.
 
-	layer->fLayerData->ReadFontFromLink(link);
+	layer->fDrawState->ReadFontFromLink(link);
 }
 
 
@@ -441,7 +441,7 @@ ServerWindow::SetLayerState(Layer *layer, BPrivate::LinkReceiver &link)
 			 layer->Name()));
 	// NOTE: no need to check for a lock. This is a private method.
 
-	layer->fLayerData->ReadFromLink(link);
+	layer->fDrawState->ReadFromLink(link);
 	// TODO: Rebuild clipping here?
 }
 
@@ -503,7 +503,7 @@ ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent)
 	DesktopSettings settings(fDesktop);
 	ServerFont font;
 	settings.GetDefaultPlainFont(font);
-	newLayer->fLayerData->SetFont(font);
+	newLayer->fDrawState->SetFont(font);
 
 // TODO: rework the clipping stuff to remove RootLayer dependency and then
 // remove this hack:
@@ -570,7 +570,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// -> it will invalidate areas previously out of screen
 			dst = dst | src;
 
-			fCurrentLayer->fLayerData->OffsetOrigin(BPoint(dh, dv));
+			fCurrentLayer->fDrawState->OffsetOrigin(BPoint(dh, dv));
 
 			fCurrentLayer->CopyBits(src, dst, xOffset, yOffset);
 #else
@@ -730,7 +730,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			fLink.StartMessage(SERVER_TRUE);
 
 			// attach state data
-			fCurrentLayer->fLayerData->WriteToLink(fLink.Sender());
+			fCurrentLayer->fDrawState->WriteToLink(fLink.Sender());
 			fLink.Flush();
 			break;
 		}
@@ -816,14 +816,14 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&x);
 			link.Read<float>(&y);
 			
-			fCurrentLayer->fLayerData->SetOrigin(BPoint(x, y));
+			fCurrentLayer->fDrawState->SetOrigin(BPoint(x, y));
 			break;
 		}
 		case AS_LAYER_GET_ORIGIN:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_ORIGIN: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<BPoint>(fCurrentLayer->fLayerData->Origin());
+			fLink.Attach<BPoint>(fCurrentLayer->fDrawState->Origin());
 			fLink.Flush();
 			break;
 		}
@@ -878,9 +878,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<int8>(&lineJoin);
 			link.Read<float>(&miterLimit);
 			
-			fCurrentLayer->fLayerData->SetLineCapMode((cap_mode)lineCap);
-			fCurrentLayer->fLayerData->SetLineJoinMode((join_mode)lineJoin);
-			fCurrentLayer->fLayerData->SetMiterLimit(miterLimit);
+			fCurrentLayer->fDrawState->SetLineCapMode((cap_mode)lineCap);
+			fCurrentLayer->fDrawState->SetLineJoinMode((join_mode)lineJoin);
+			fCurrentLayer->fDrawState->SetMiterLimit(miterLimit);
 		
 			break;
 		}
@@ -888,9 +888,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_LINE_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<int8>((int8)(fCurrentLayer->fLayerData->LineCapMode()));
-			fLink.Attach<int8>((int8)(fCurrentLayer->fLayerData->LineJoinMode()));
-			fLink.Attach<float>(fCurrentLayer->fLayerData->MiterLimit());
+			fLink.Attach<int8>((int8)(fCurrentLayer->fDrawState->LineCapMode()));
+			fLink.Attach<int8>((int8)(fCurrentLayer->fDrawState->LineJoinMode()));
+			fLink.Attach<float>(fCurrentLayer->fDrawState->MiterLimit());
 			fLink.Flush();
 		
 			break;
@@ -922,13 +922,13 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&scale);
 			// TODO: The BeBook says, if you call SetScale() it will be
 			// multiplied with the scale from all previous states on the stack
-			fCurrentLayer->fLayerData->SetScale(scale);
+			fCurrentLayer->fDrawState->SetScale(scale);
 			break;
 		}
 		case AS_LAYER_GET_SCALE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_SCALE: Layer: %s\n", Title(), fCurrentLayer->Name()));		
-			LayerData* layerData = fCurrentLayer->fLayerData;
+			DrawState* layerData = fCurrentLayer->fDrawState;
 
 			// TODO: And here, we're taking that into account, but not above
 			// -> refactor put scale into Layer, or better yet, when the
@@ -952,14 +952,14 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&x);
 			link.Read<float>(&y);
 
-			fCurrentLayer->fLayerData->SetPenLocation(BPoint(x, y));
+			fCurrentLayer->fDrawState->SetPenLocation(BPoint(x, y));
 			break;
 		}
 		case AS_LAYER_GET_PEN_LOC:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<BPoint>(fCurrentLayer->fLayerData->PenLocation());
+			fLink.Attach<BPoint>(fCurrentLayer->fDrawState->PenLocation());
 			fLink.Flush();
 		
 			break;
@@ -969,7 +969,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			float penSize;
 			link.Read<float>(&penSize);
-			fCurrentLayer->fLayerData->SetPenSize(penSize);
+			fCurrentLayer->fDrawState->SetPenSize(penSize);
 		
 			break;
 		}
@@ -977,7 +977,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<float>(fCurrentLayer->fLayerData->PenSize());
+			fLink.Attach<float>(fCurrentLayer->fDrawState->PenSize());
 			fLink.Flush();
 		
 			break;
@@ -1006,7 +1006,7 @@ myRootLayer->Unlock();
 				Title(), fCurrentLayer->Name()));
 
 			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<rgb_color>(fCurrentLayer->fLayerData->HighColor().GetColor32());
+			fLink.Attach<rgb_color>(fCurrentLayer->fDrawState->HighColor().GetColor32());
 			fLink.Flush();
 			break;
 
@@ -1015,7 +1015,7 @@ myRootLayer->Unlock();
 				Title(), fCurrentLayer->Name()));
 
 			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<rgb_color>(fCurrentLayer->fLayerData->LowColor().GetColor32());
+			fLink.Attach<rgb_color>(fCurrentLayer->fDrawState->LowColor().GetColor32());
 			fLink.Flush();
 			break;
 
@@ -1036,7 +1036,7 @@ myRootLayer->Unlock();
 			link.Read<int8>(&srcAlpha);
 			link.Read<int8>(&alphaFunc);
 			
-			fCurrentLayer->fLayerData->SetBlendingMode((source_alpha)srcAlpha,
+			fCurrentLayer->fDrawState->SetBlendingMode((source_alpha)srcAlpha,
 											(alpha_function)alphaFunc);
 
 			break;
@@ -1045,8 +1045,8 @@ myRootLayer->Unlock();
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_BLEND_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<int8>((int8)(fCurrentLayer->fLayerData->AlphaSrcMode()));
-			fLink.Attach<int8>((int8)(fCurrentLayer->fLayerData->AlphaFncMode()));
+			fLink.Attach<int8>((int8)(fCurrentLayer->fDrawState->AlphaSrcMode()));
+			fLink.Attach<int8>((int8)(fCurrentLayer->fDrawState->AlphaFncMode()));
 			fLink.Flush();
 
 			break;
@@ -1058,7 +1058,7 @@ myRootLayer->Unlock();
 			
 			link.Read<int8>(&drawingMode);
 			
-			fCurrentLayer->fLayerData->SetDrawingMode((drawing_mode)drawingMode);
+			fCurrentLayer->fDrawState->SetDrawingMode((drawing_mode)drawingMode);
 			
 			break;
 		}
@@ -1066,7 +1066,7 @@ myRootLayer->Unlock();
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_DRAW_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<int8>((int8)(fCurrentLayer->fLayerData->GetDrawingMode()));
+			fLink.Attach<int8>((int8)(fCurrentLayer->fDrawState->GetDrawingMode()));
 			fLink.Flush();
 		
 			break;
@@ -1076,7 +1076,7 @@ myRootLayer->Unlock();
 			DTRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			bool fontAliasing;
 			link.Read<bool>(&fontAliasing);
-			fCurrentLayer->fLayerData->SetForceFontAliasing(fontAliasing);
+			fCurrentLayer->fDrawState->SetForceFontAliasing(fontAliasing);
 			
 			break;
 		}
@@ -1106,7 +1106,7 @@ myRootLayer->Unlock();
 			if (PictureToRegion(picture, region, inverse, where) < B_OK)
 				break;
 
-			fCurrentLayer->fLayerData->SetClippingRegion(region);
+			fCurrentLayer->fDrawState->SetClippingRegion(region);
 
 #ifndef NEW_CLIPPING
 			fCurrentLayer->RebuildFullRegion();
@@ -1176,7 +1176,7 @@ myRootLayer->Unlock();
 // We need to integrate user clipping more, in Layer::PopState, the clipping needs to be
 // restored too. "AS_LAYER_SET_CLIP_REGION" is irritating, as I think it should be
 // "AS_LAYER_CONSTRAIN_CLIP_REGION", since it means to "add" to the current clipping, not "set" it.
-//			fCurrentLayer->fLayerData->SetClippingRegion(region);
+//			fCurrentLayer->fDrawState->SetClippingRegion(region);
 #ifndef NEW_CLIPPING
 // TODO: set the clipping
 //			fCurrentLayer->fVisible.IntersectWith(&region);
@@ -1515,7 +1515,7 @@ myRootLayer->Unlock();
 			
 			link.Read(&c, sizeof(rgb_color));
 			
-			fCurrentLayer->fLayerData->SetHighColor(RGBColor(c));
+			fCurrentLayer->fDrawState->SetHighColor(RGBColor(c));
 
 			break;
 		}
@@ -1526,7 +1526,7 @@ myRootLayer->Unlock();
 			
 			link.Read(&c, sizeof(rgb_color));
 			
-			fCurrentLayer->fLayerData->SetLowColor(RGBColor(c));
+			fCurrentLayer->fDrawState->SetLowColor(RGBColor(c));
 			
 			break;
 		}
@@ -1537,7 +1537,7 @@ myRootLayer->Unlock();
 			
 			link.Read(&pat, sizeof(pattern));
 			
-			fCurrentLayer->fLayerData->SetPattern(Pattern(pat));
+			fCurrentLayer->fDrawState->SetPattern(Pattern(pat));
 			
 			break;
 		}	
@@ -1549,8 +1549,8 @@ myRootLayer->Unlock();
 			
 			link.Read<float>(&x);
 			link.Read<float>(&y);
-			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				fCurrentLayer->fLayerData->SetPenLocation(BPoint(x, y));
+			if (fCurrentLayer && fCurrentLayer->fDrawState)
+				fCurrentLayer->fDrawState->SetPenLocation(BPoint(x, y));
 			
 			break;
 		}
@@ -1560,8 +1560,8 @@ myRootLayer->Unlock();
 			float size;
 			
 			link.Read<float>(&size);
-			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				fCurrentLayer->fLayerData->SetPenSize(size);
+			if (fCurrentLayer && fCurrentLayer->fDrawState)
+				fCurrentLayer->fDrawState->SetPenSize(size);
 			
 			break;
 		}
@@ -1702,7 +1702,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 	DisplayDriver* driver = fWinBorder->GetDisplayDriver();
 
 	driver->ConstrainClippingRegion(&rreg);
-//	rgb_color  rrr = fCurrentLayer->fLayerData->viewcolor.GetColor32();
+//	rgb_color  rrr = fCurrentLayer->fDrawState->viewcolor.GetColor32();
 //	RGBColor c(rand()%255,rand()%255,rand()%255);
 //	driver->FillRect(BRect(0,0,639,479), c);
 
@@ -1718,13 +1718,13 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&x2);
 			link.Read<float>(&y2);
 
-			if (fCurrentLayer && fCurrentLayer->fLayerData) {
+			if (fCurrentLayer && fCurrentLayer->fDrawState) {
 
 				BPoint p1(x1,y1);
 				BPoint p2(x2,y2);
 				driver->StrokeLine(fCurrentLayer->ConvertToTop(p1),
 								   fCurrentLayer->ConvertToTop(p2),
-								   fCurrentLayer->fLayerData);
+								   fCurrentLayer->fDrawState);
 				
 				// We update the pen here because many DisplayDriver calls which do not update the
 				// pen position actually call StrokeLine
@@ -1732,7 +1732,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 				// TODO: Decide where to put this, for example, it cannot be done
 				// for DrawString(), also there needs to be a decision, if penlocation
 				// is in View coordinates (I think it should be) or in screen coordinates.
-				fCurrentLayer->fLayerData->SetPenLocation(p2);
+				fCurrentLayer->fDrawState->SetPenLocation(p2);
 			}
 			break;
 		}
@@ -1743,7 +1743,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			BRect rect;
 			link.Read<BRect>(&rect);
 			
-			if (fCurrentLayer && fCurrentLayer->fLayerData)
+			if (fCurrentLayer && fCurrentLayer->fDrawState)
 				driver->InvertRect(fCurrentLayer->ConvertToTop(rect));
 			break;
 		}
@@ -1758,8 +1758,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&bottom);
 			BRect rect(left,top,right,bottom);
 			
-			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				driver->StrokeRect(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
+			if (fCurrentLayer && fCurrentLayer->fDrawState)
+				driver->StrokeRect(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fDrawState);
 			break;
 		}
 		case AS_FILL_RECT:
@@ -1768,8 +1768,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			
 			BRect rect;
 			link.Read<BRect>(&rect);
-			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				driver->FillRect(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
+			if (fCurrentLayer && fCurrentLayer->fDrawState)
+				driver->FillRect(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fDrawState);
 			break;
 		}
 		case AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT:
@@ -1787,7 +1787,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 				BRect dst = src.OffsetToCopy(point);
 				dst = fCurrentLayer->ConvertToTop(dst);
 
-				driver->DrawBitmap(sbmp, src, dst, fCurrentLayer->fLayerData);
+				driver->DrawBitmap(sbmp, src, dst, fCurrentLayer->fDrawState);
 			}
 			
 			// TODO: Adi -- shouldn't AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT sync with the client?
@@ -1808,7 +1808,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 				BRect dst = src.OffsetToCopy(point);
 				dst = fCurrentLayer->ConvertToTop(dst);
 
-				driver->DrawBitmap(sbmp, src, dst, fCurrentLayer->fLayerData);
+				driver->DrawBitmap(sbmp, src, dst, fCurrentLayer->fDrawState);
 			}
 			break;
 		}
@@ -1826,7 +1826,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (sbmp) {
 				dstRect = fCurrentLayer->ConvertToTop(dstRect);
 
-				driver->DrawBitmap(sbmp, srcRect, dstRect, fCurrentLayer->fLayerData);
+				driver->DrawBitmap(sbmp, srcRect, dstRect, fCurrentLayer->fDrawState);
 			}
 			
 			// TODO: Adi -- shouldn't AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT sync with the client?
@@ -1846,7 +1846,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (sbmp) {
 				dstRect = fCurrentLayer->ConvertToTop(dstRect);
 
-				driver->DrawBitmap(sbmp, srcRect, dstRect, fCurrentLayer->fLayerData);
+				driver->DrawBitmap(sbmp, srcRect, dstRect, fCurrentLayer->fDrawState);
 			}
 			break;
 		}
@@ -1860,8 +1860,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<BRect>(&r);
 			link.Read<float>(&angle);
 			link.Read<float>(&span);
-			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				driver->StrokeArc(fCurrentLayer->ConvertToTop(r),angle,span, fCurrentLayer->fLayerData);
+			if (fCurrentLayer && fCurrentLayer->fDrawState)
+				driver->StrokeArc(fCurrentLayer->ConvertToTop(r),angle,span, fCurrentLayer->fDrawState);
 			break;
 		}
 		case AS_FILL_ARC:
@@ -1874,8 +1874,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<BRect>(&r);
 			link.Read<float>(&angle);
 			link.Read<float>(&span);
-			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				driver->FillArc(fCurrentLayer->ConvertToTop(r),angle,span, fCurrentLayer->fLayerData);
+			if (fCurrentLayer && fCurrentLayer->fDrawState)
+				driver->FillArc(fCurrentLayer->ConvertToTop(r),angle,span, fCurrentLayer->fDrawState);
 			break;
 		}
 		case AS_STROKE_BEZIER:
@@ -1889,12 +1889,12 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			for (i=0; i<4; i++)
 				link.Read<BPoint>(&(pts[i]));
 			
-			if (fCurrentLayer && fCurrentLayer->fLayerData)
+			if (fCurrentLayer && fCurrentLayer->fDrawState)
 			{
 				for (i=0; i<4; i++)
 					pts[i]=fCurrentLayer->ConvertToTop(pts[i]);
 				
-				driver->StrokeBezier(pts, fCurrentLayer->fLayerData);
+				driver->StrokeBezier(pts, fCurrentLayer->fDrawState);
 			}
 			delete [] pts;
 			break;
@@ -1910,12 +1910,12 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			for (i=0; i<4; i++)
 				link.Read<BPoint>(&(pts[i]));
 			
-			if (fCurrentLayer && fCurrentLayer->fLayerData)
+			if (fCurrentLayer && fCurrentLayer->fDrawState)
 			{
 				for (i=0; i<4; i++)
 					pts[i]=fCurrentLayer->ConvertToTop(pts[i]);
 				
-				driver->FillBezier(pts, fCurrentLayer->fLayerData);
+				driver->FillBezier(pts, fCurrentLayer->fDrawState);
 			}
 			delete [] pts;
 			break;
@@ -1926,8 +1926,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			
 			BRect rect;
 			link.Read<BRect>(&rect);
-			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				driver->StrokeEllipse(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
+			if (fCurrentLayer && fCurrentLayer->fDrawState)
+				driver->StrokeEllipse(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fDrawState);
 			break;
 		}
 		case AS_FILL_ELLIPSE:
@@ -1936,8 +1936,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			
 			BRect rect;
 			link.Read<BRect>(&rect);
-			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				driver->FillEllipse(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
+			if (fCurrentLayer && fCurrentLayer->fDrawState)
+				driver->FillEllipse(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fDrawState);
 			break;
 		}
 		case AS_STROKE_ROUNDRECT:
@@ -1950,8 +1950,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&xrad);
 			link.Read<float>(&yrad);
 
-			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				driver->StrokeRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad, fCurrentLayer->fLayerData);
+			if (fCurrentLayer && fCurrentLayer->fDrawState)
+				driver->StrokeRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad, fCurrentLayer->fDrawState);
 			break;
 		}
 		case AS_FILL_ROUNDRECT:
@@ -1964,8 +1964,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&xrad);
 			link.Read<float>(&yrad);
 
-			if (fCurrentLayer && fCurrentLayer->fLayerData)
-				driver->FillRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad, fCurrentLayer->fLayerData);
+			if (fCurrentLayer && fCurrentLayer->fDrawState)
+				driver->FillRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad, fCurrentLayer->fDrawState);
 			break;
 		}
 		case AS_STROKE_TRIANGLE:
@@ -1980,11 +1980,11 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			link.Read<BRect>(&rect);
 
-			if (fCurrentLayer && fCurrentLayer->fLayerData) {
+			if (fCurrentLayer && fCurrentLayer->fDrawState) {
 				for (int i = 0;i < 3; i++)
 					pts[i] = fCurrentLayer->ConvertToTop(pts[i]);
 
-				driver->StrokeTriangle(pts, fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
+				driver->StrokeTriangle(pts, fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fDrawState);
 			}
 			break;
 		}
@@ -2000,11 +2000,11 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			link.Read<BRect>(&rect);
 
-			if (fCurrentLayer && fCurrentLayer->fLayerData) {
+			if (fCurrentLayer && fCurrentLayer->fDrawState) {
 				for (int i = 0; i < 3; i++)
 					pts[i] = fCurrentLayer->ConvertToTop(pts[i]);
 
-				driver->FillTriangle(pts, fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fLayerData);
+				driver->FillTriangle(pts, fCurrentLayer->ConvertToTop(rect), fCurrentLayer->fDrawState);
 			}
 			break;
 		}
@@ -2030,7 +2030,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 				pointlist[i] = fCurrentLayer->ConvertToTop(pointlist[i]);
 
 			driver->StrokePolygon(pointlist,pointcount,polyframe,
-					fCurrentLayer->fLayerData,isclosed);
+					fCurrentLayer->fDrawState,isclosed);
 
 			delete [] pointlist;
 			break;
@@ -2053,7 +2053,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			for (int32 i = 0; i < pointcount; i++)
 				pointlist[i] = fCurrentLayer->ConvertToTop(pointlist[i]);
 
-			driver->FillPolygon(pointlist,pointcount,polyframe, fCurrentLayer->fLayerData);
+			driver->FillPolygon(pointlist,pointcount,polyframe, fCurrentLayer->fDrawState);
 
 			delete [] pointlist;
 			break;
@@ -2081,7 +2081,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			for (int32 i = 0; i < ptcount; i++)
 				ptlist[i] = fCurrentLayer->ConvertToTop(ptlist[i]);
 
-			driver->StrokeShape(shaperect, opcount, oplist, ptcount, ptlist, fCurrentLayer->fLayerData);
+			driver->StrokeShape(shaperect, opcount, oplist, ptcount, ptlist, fCurrentLayer->fDrawState);
 			delete[] oplist;
 			delete[] ptlist;
 			break;
@@ -2109,7 +2109,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			for (int32 i = 0; i < ptcount; i++)
 				ptlist[i] = fCurrentLayer->ConvertToTop(ptlist[i]);
 			
-			driver->FillShape(shaperect, opcount, oplist, ptcount, ptlist, fCurrentLayer->fLayerData);
+			driver->FillShape(shaperect, opcount, oplist, ptcount, ptlist, fCurrentLayer->fDrawState);
 
 			delete[] oplist;
 			delete[] ptlist;
@@ -2135,7 +2135,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			for (int32 i = 0; i < count; i++) {
 				region.Include(fCurrentLayer->ConvertToTop(rects[i]));
 			}
-			driver->FillRegion(region, fCurrentLayer->fLayerData);
+			driver->FillRegion(region, fCurrentLayer->fDrawState);
 
 			delete[] rects;
 
@@ -2169,7 +2169,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 					index->pt1 = fCurrentLayer->ConvertToTop(index->pt1);
 					index->pt2 = fCurrentLayer->ConvertToTop(index->pt2);
 				}
-				driver->StrokeLineArray(linecount,linedata,fCurrentLayer->fLayerData);
+				driver->StrokeLineArray(linecount,linedata,fCurrentLayer->fDrawState);
 			}
 			break;
 		}
@@ -2186,10 +2186,10 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<escapement_delta>(&delta);
 			link.ReadString(&string);
 			
-			if (fCurrentLayer && fCurrentLayer->fLayerData)
+			if (fCurrentLayer && fCurrentLayer->fDrawState)
 				driver->DrawString(string, length,
 								   fCurrentLayer->ConvertToTop(location),
-								   fCurrentLayer->fLayerData, &delta);
+								   fCurrentLayer->fDrawState, &delta);
 			
 			free(string);
 			break;

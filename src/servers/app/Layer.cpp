@@ -38,7 +38,7 @@
 
 #include "DebugInfoManager.h"
 #include "DisplayDriver.h"
-#include "LayerData.h"
+#include "DrawState.h"
 #include "PortLink.h"
 #include "RootLayer.h"
 #include "ServerProtocol.h"
@@ -106,7 +106,7 @@ Layer::Layer(BRect frame, const char* name, int32 token,
 	fAdFlags(0),
 
 	fDriver(driver),
-	fLayerData(new LayerData),
+	fDrawState(new DrawState),
 
 	fRootLayer(NULL),
 
@@ -125,18 +125,18 @@ CRITICAL(helper);
 	if (!fDriver)
 		CRITICAL("You MUST have a valid driver to init a Layer object\n");
 
-	// NOTE: This flag is forwarded to a LayerData setting, even
+	// NOTE: This flag is forwarded to a DrawState setting, even
 	// though it is actually not part of a "state". However,
 	// it is an important detail of a graphics context, and we
 	// have no other means to pass this setting on to the DisplayDriver
-	// other than through the LayerData. If we ever add a flag
+	// other than through the DrawState. If we ever add a flag
 	// B_ANTI_ALIASING to the view flags, it would have to be passed
 	// in the same way. Though when breaking binary compatibility,
 	// we might want to make this an actual part of a "state" (with
 	// a different API to set these).
 	// Note that the flag is also tested (updated) in Push/PopState and
 	// SetFlags().
-	fLayerData->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
+	fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
 
 	STRACE(("Layer(%s) successfuly created\n", Name()));
 }
@@ -144,7 +144,7 @@ CRITICAL(helper);
 
 Layer::~Layer()
 {
-	delete fLayerData;
+	delete fDrawState;
 
 	// TODO: uncomment!
 	//PruneTree();
@@ -486,7 +486,7 @@ void
 Layer::SetFlags(uint32 flags)
 {
 	fFlags = flags;
-	fLayerData->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
+	fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
 }
 
 #ifndef NEW_CLIPPING
@@ -506,8 +506,8 @@ Layer::RebuildFullRegion(void)
 	
 	// TODO: Convert to screen coordinates
 
-	LayerData *ld;
-	ld = fLayerData;
+	DrawState *ld;
+	ld = fDrawState;
 	do {
 		// clip to user region
 		if (const BRegion* userClipping = ld->ClippingRegion())
@@ -1010,23 +1010,21 @@ Layer::IsHidden(void) const
 void
 Layer::PushState()
 {
-	LayerData *data = new LayerData(fLayerData);
-	fLayerData = data;
-
-	fLayerData->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
+	fDrawState = fDrawState->PushState();
+	fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
 }
 
 
 void
 Layer::PopState()
 {
-	if (fLayerData->PreviousState() == NULL) {
+	if (fDrawState->PreviousState() == NULL) {
 		fprintf(stderr, "WARNING: User called BView(%s)::PopState(), but there is NO state on stack!\n", Name());
 		return;
 	}
 
-	fLayerData = fLayerData->PopState();
-	fLayerData->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
+	fDrawState = fDrawState->PopState();
+	fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
 }
 
 
@@ -1204,7 +1202,7 @@ Layer::BoundsOrigin() const
 	BPoint origin(0,0);
 	float scale = Scale();
 
-	LayerData* layerData = fLayerData;
+	DrawState* layerData = fDrawState;
 	do {
 		origin += layerData->Origin();
 	} while ((layerData = layerData->PreviousState()) != NULL);
@@ -1221,7 +1219,7 @@ Layer::Scale() const
 {
 	float scale = 1.0f;
 
-	LayerData* layerData = fLayerData;
+	DrawState* layerData = fDrawState;
 	do {
 		scale *= layerData->Scale();
 	} while ((layerData = layerData->PreviousState()) != NULL);
@@ -1475,10 +1473,10 @@ Layer::PrintToStream()
 	printf("ResizingMode: %lx ", fResizeMode);
 	printf("Flags: %lx\n", fFlags);
 
-	if (fLayerData)
-		fLayerData->PrintToStream();
+	if (fDrawState)
+		fDrawState->PrintToStream();
 	else
-		printf(" NO LayerData valid pointer\n");
+		printf(" NO DrawState valid pointer\n");
 }
 
 //! Prints pointer info kept by the current layer
@@ -2479,7 +2477,7 @@ void Layer::do_MoveBy(float dx, float dy)
 void
 Layer::do_ScrollBy(float dx, float dy)
 {
-	fLayerData->OffsetOrigin(BPoint(dx, dy));
+	fDrawState->OffsetOrigin(BPoint(dx, dy));
 //	fOrigin.Set(fOrigin.x + dx, fOrigin.y + dy);
 
 	if (!IsHidden() && GetRootLayer()) {
@@ -2532,7 +2530,7 @@ Layer::_GetWantedRegion(BRegion &reg)
 
 
 	// 3) impose user constrained regions
-	LayerData *stackData = fLayerData;
+	DrawState *stackData = fDrawState;
 	while (stackData) {
 		if (stackData->ClippingRegion()) {
 			// transform in screen coords

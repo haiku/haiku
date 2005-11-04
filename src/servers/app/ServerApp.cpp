@@ -38,7 +38,7 @@
 #include "DisplayDriver.h"
 #include "FontManager.h"
 #include "HWInterface.h"
-#include "LayerData.h"
+//#include "DrawState.h"
 #include "OffscreenServerWindow.h"
 #include "RAMLinkMsgReader.h"
 #include "RootLayer.h"
@@ -494,8 +494,6 @@ ServerApp::_MessageLooper()
 void
 ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 {
-//	LayerData ld;
-
 	switch (code) {
 		case AS_GET_WINDOW_LIST:
 			team_id team;

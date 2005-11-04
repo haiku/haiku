@@ -1,22 +1,20 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc. All rights reserved.
-//  Distributed under the terms of the MIT license.
-//
-//	File Name:		DisplayDriverPainter.h
-//	Authors:		DarkWyrm <bpmagic@columbus.rr.com>
-//					Gabe Yoder <gyoder@stny.rr.com>
-//					Stephan Aßmus <superstippi@gmx.de>
-//
-//	Description:	Abstract class which handles all graphics output
-//					for the server
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Gabe Yoder <gyoder@stny.rr.com>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
 #ifndef _DISPLAY_DRIVER_PAINTER_H_
 #define _DISPLAY_DRIVER_PAINTER_H_
+
 
 #include "DisplayDriver.h"
 
 class Painter;
+
 
 class DisplayDriverPainter : public DisplayDriver {
 public:
@@ -50,59 +48,59 @@ public:
 	virtual	void				DrawBitmap(		ServerBitmap *bitmap,
 												const BRect &source,
 												const BRect &dest,
-												const DrawData *d);
+												const DrawState *d);
 
 	virtual	void				FillArc(		BRect r,
 												const float &angle,
 												const float &span,
-												const DrawData *d);
+												const DrawState *d);
 
 	virtual	void				FillBezier(		BPoint *pts,
-												const DrawData *d);
+												const DrawState *d);
 
 	virtual	void				FillEllipse(	BRect r,
-												const DrawData *d);
+												const DrawState *d);
 
 	virtual	void				FillPolygon(	BPoint *ptlist,
 												int32 numpts,
 												BRect bounds,
-												const DrawData *d);
+												const DrawState *d);
 
 	virtual	void				FillRect(		BRect r,
 												const RGBColor &color);
 
 	virtual	void				FillRect(		BRect r,
-												const DrawData *d);
+												const DrawState *d);
 
 	virtual	void				FillRegion(		BRegion &r,
-												const DrawData *d);
+												const DrawState *d);
 
 	virtual	void				FillRoundRect(	BRect r,
 												const float &xrad,
 												const float &yrad,
-												const DrawData *d);
+												const DrawState *d);
 
 	virtual	void				FillShape(		const BRect &bounds,
 												const int32 &opcount,
 												const int32 *oplist, 
 												const int32 &ptcount,
 												const BPoint *ptlist,
-												const DrawData *d);
+												const DrawState *d);
 
 	virtual	void				FillTriangle(	BPoint *pts,
 												BRect bounds,
-												const DrawData *d);
+												const DrawState *d);
 
 	virtual	void				StrokeArc(		BRect r,
 												const float &angle,
 												const float &span,
-												const DrawData *d);
+												const DrawState *d);
 
 	virtual	void				StrokeBezier(	BPoint *pts,
-												const DrawData *d);
+												const DrawState *d);
 
 	virtual	void				StrokeEllipse(	BRect r,
-												const DrawData *d);
+												const DrawState *d);
 
 	// this version used by Decorator
 	virtual	void				StrokeLine(		const BPoint &start,
@@ -111,23 +109,23 @@ public:
 
 	virtual	void				StrokeLine(		const BPoint &start,
 												const BPoint &end,
-												DrawData *d);
+												DrawState *d);
 
 	virtual void				StrokeLineArray(const int32 &numlines,
 												const LineArrayData *data,
-												const DrawData *d);
+												const DrawState *d);
 
 	// this version used by Decorator
 	virtual	void				StrokePoint(	const BPoint &pt,
 												const RGBColor &color);
 
 	virtual	void				StrokePoint(	const BPoint &pt,
-												DrawData *d);
+												DrawState *d);
 
 	virtual	void				StrokePolygon(	BPoint *ptlist,
 												int32 numpts,
 												BRect bounds,
-												const DrawData *d,
+												const DrawState *d,
 												bool is_closed=true);
 
 	// this version used by Decorator
@@ -135,34 +133,34 @@ public:
 												const RGBColor &color);
 
 	virtual	void				StrokeRect(		BRect r,
-												const DrawData *d);
+												const DrawState *d);
 
 	virtual	void				StrokeRegion(	BRegion &r,
-												const DrawData *d);
+												const DrawState *d);
 
 	virtual	void				StrokeRoundRect(BRect r,
 												const float &xrad,
 												const float &yrad,
-												const DrawData *d);
+												const DrawState *d);
 
 	virtual	void				StrokeShape(	const BRect &bounds,
 												const int32 &opcount,
 												const int32 *oplist, 
 												const int32 &ptcount,
 												const BPoint *ptlist,
-												const DrawData *d);
+												const DrawState *d);
 
 	virtual	void				StrokeTriangle(	BPoint *pts,
 												const BRect &bounds,
-												const DrawData *d);
+												const DrawState *d);
 
 	// Font-related calls
 	
-	// DrawData is NOT const because this call updates the pen position in the passed DrawData
+	// DrawState is NOT const because this call updates the pen position in the passed DrawState
 	virtual	void				DrawString(		const char* string,
 												int32 length,
 												const BPoint& pt,
-												DrawData* d,
+												DrawState* d,
 												escapement_delta* delta = NULL);
 
 /*	virtual	void				DrawString(		const char *string,
@@ -173,7 +171,7 @@ public:
 
 	virtual	float				StringWidth(	const char* string,
 												int32 length,
-												const DrawData* d,
+												const DrawState* d,
 												escapement_delta* delta = NULL);
 
 	virtual	float				StringWidth(	const char* string,
@@ -183,7 +181,7 @@ public:
 
 	virtual	float				StringHeight(	const char* string,
 												int32 length,
-												const DrawData* d);
+												const DrawState* d);
 
 	virtual bool				Lock();
 	virtual void				Unlock();

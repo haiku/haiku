@@ -28,9 +28,9 @@ SharedLibrary libappserver.so :
 	CursorData.cpp
 	CursorSet.cpp
 	Decorator.cpp
+	DrawState.cpp
 	FontFamily.cpp
 	IPoint.cpp
-	LayerData.cpp
 	RGBColor.cpp
 	ServerBitmap.cpp
 	ServerCursor.cpp

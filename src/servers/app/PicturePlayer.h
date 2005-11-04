@@ -32,7 +32,7 @@
 #include <Point.h>
 #include <Rect.h>
 #include <DataIO.h>
-#include "LayerData.h"
+#include "DrawState.h"
 #include "PatternHandler.h" // for pattern_union
 
 class DisplayDriver;
@@ -81,14 +81,14 @@ public:
 	
 	void SetClippingRegion(BRect *rects, int32 numrects);
 	
-	status_t Play(int32 tableEntries,void *userData, LayerData *d);
+	status_t Play(int32 tableEntries,void *userData, DrawState *d);
 	status_t Rewind();
 
 private:
 	BMemoryIO fData;
 	int32 fSize;
 	DisplayDriver *fdriver;
-	LayerData fldata;
+	DrawState fldata;
 	BPoint forigin;
 	Pattern stipplepat;
 	BRegion *clipreg;

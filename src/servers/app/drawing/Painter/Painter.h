@@ -23,7 +23,7 @@
 class AGGTextRenderer;
 class BBitmap;
 class BRegion;
-class DrawData;
+class DrawState;
 class DrawingModeFactory;
 class PatternHandler;
 class RenderingBuffer;
@@ -31,11 +31,11 @@ class ServerBitmap;
 class ServerFont;
 
 // TODO: API transition:
-// * most all functions should take a DrawData* context parameter instead
+// * most all functions should take a DrawState* context parameter instead
 //   of the current pattern argument, that way, each function can
-//	 decide for itself, which pieces of information in DrawData it
+//	 decide for itself, which pieces of information in DrawState it
 //   needs -> well I'm not so sure about this, there could also
-//   be a DrawData member in Painter fGraphicsState or something...
+//   be a DrawState member in Painter fGraphicsState or something...
 // * Painter itself should be made thread safe. Because no
 //   ServerWindow is supposed to draw outside of its clipping region,
 //   there is actually no reason to lock the DisplayDriver. Multiple
@@ -62,7 +62,7 @@ class Painter {
 			const BRegion*		ClippingRegion() const
 									{ return fClippingRegion; }
 
-			void				SetDrawData(const DrawData* data);
+			void				SetDrawState(const DrawState* data);
 
 								// object settings
 			void				SetHighColor(const rgb_color& color);
@@ -88,10 +88,10 @@ class Painter {
 								// lines
 			BRect				StrokeLine(		BPoint a,
 												BPoint b,
-												DrawData* context);
+												DrawState* context);
 
 			BRect				StrokeLine(		BPoint b,
-												DrawData* context);
+												DrawState* context);
 
 			// returns true if the line was either vertical or horizontal
 			// draws a solid one pixel wide line of color c, no blending

@@ -16,7 +16,7 @@
 #include <Window.h>
 
 #include "ColorSet.h"
-#include "LayerData.h"
+#include "DrawState.h"
 
 class DesktopSettings;
 class DisplayDriver;
@@ -138,7 +138,7 @@ class Decorator {
 
 			ColorSet*			_colors;
 			DisplayDriver*		_driver;
-			DrawData			_drawdata;
+			DrawState			fDrawState;
 
 			int32				_look;
 			int32				_feel;

@@ -24,7 +24,7 @@
 #include <agg_span_image_filter_rgba32.h>
 #include <agg_span_interpolator_linear.h>
 
-#include "LayerData.h"
+#include "DrawState.h"
 
 #include "AGGTextRenderer.h"
 #include "DrawingMode.h"
@@ -168,9 +168,9 @@ Painter::DetachFromBuffer()
 	_MakeEmpty();
 }
 
-// SetDrawData
+// SetDrawState
 void
-Painter::SetDrawData(const DrawData* data)
+Painter::SetDrawState(const DrawState* data)
 {
 	// NOTE: The custom clipping in "data" is ignored, because it has already been
 	// taken into account elsewhere
@@ -296,7 +296,7 @@ Painter::SetFont(const ServerFont& font)
 
 // StrokeLine
 BRect
-Painter::StrokeLine(BPoint a, BPoint b, DrawData* context)
+Painter::StrokeLine(BPoint a, BPoint b, DrawState* context)
 {
 	// this happens independent of wether we actually draw something
 	context->SetPenLocation(b);
@@ -335,7 +335,7 @@ Painter::StrokeLine(BPoint a, BPoint b, DrawData* context)
 //	SetDrawingMode(context->draw_mode);
 //	SetBlendingMode(context->alphaSrcMode, context->alphaFncMode);
 //	fPatternHandler->SetPattern(context->patt);
-	SetDrawData(context);
+	SetDrawState(context);
 
 	// first, try an optimized version
 	if (fPenSize == 1.0 &&
@@ -366,7 +366,7 @@ Painter::StrokeLine(BPoint a, BPoint b, DrawData* context)
 
 // StrokeLine
 BRect
-Painter::StrokeLine(BPoint b, DrawData* context)
+Painter::StrokeLine(BPoint b, DrawState* context)
 {
 	// TODO: move this function elsewhere
 	return StrokeLine(context->PenLocation(), b, context);
@@ -1475,7 +1475,7 @@ Painter::_StrokePath(VertexSource& path) const
 //	if (fPenSize > 1.0) {
 		agg::conv_stroke<VertexSource> stroke(path);
 // TODO: Investigate this for shapes. Maybe we are supposed to
-// use the settings from DrawData! Would make some sense!
+// use the settings from DrawState! Would make some sense!
 //		stroke.line_join(agg::round_join);
 //		stroke.line_cap(agg::butt_cap);
 		stroke.width(fPenSize);
