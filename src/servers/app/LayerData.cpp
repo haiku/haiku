@@ -18,6 +18,7 @@
 #include "LinkReceiver.h"
 #include "LinkSender.h"
 
+#include "DesktopSettings.h"
 #include "LayerData.h"
 
 
@@ -322,45 +323,43 @@ DrawData::SetMiterLimit(float limit)
 	fMiterLimit = limit;
 }
 
-//----------------------------LayerData----------------------
-// #pragmamark -
 
-// constructpr
+//	#pragma mark -
+
+
 LayerData::LayerData()
 	: DrawData(),
-	  prevState(NULL)
+	fPreviousState(NULL)
 {
 }
 
-// LayerData
+
 LayerData::LayerData(const LayerData& data)
-	: DrawData()
+	: DrawData(data),
+	fPreviousState(data.fPreviousState)
 {
-	fClippingRegion = NULL;
-	*this = data;
 }
 
-// LayerData
+
 LayerData::LayerData(LayerData* data)
 	: DrawData(data),
-	  prevState(data)
+	fPreviousState(data)
 {
 }
 
-// destructor
+
 LayerData::~LayerData()
 {
-	delete prevState;
+	delete fPreviousState;
 }
 
-// operator=
+
 LayerData&
 LayerData::operator=(const LayerData& from)
 {
 	DrawData::operator=(from);
+	fPreviousState = from.PreviousState();
 
-	prevState = from.prevState;
-	
 	return *this;
 }
 
@@ -537,5 +536,17 @@ LayerData::WriteToLink(BPrivate::LinkSender& link) const
 		for (int i = 0; i < clippingRectCount; i++)
 			link.Attach<BRect>(fClippingRegion->RectAt(i));
 	}
+}
+
+
+LayerData*
+LayerData::PopState()
+{
+	LayerData* previous = PreviousState();
+
+	fPreviousState = NULL;
+	delete this;
+
+	return previous;
 }
 

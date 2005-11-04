@@ -61,9 +61,10 @@
 #	define RBTRACE(x) ;
 #endif
 
+
 Layer::Layer(BRect frame, const char* name, int32 token,
-			 uint32 resize, uint32 flags, DisplayDriver* driver)
-	: 
+	uint32 resize, uint32 flags, DisplayDriver* driver)
+	:
 	fFrame(frame), // in parent coordinates
 //	fBoundsLeftTop(0.0, 0.0),
 
@@ -105,7 +106,7 @@ Layer::Layer(BRect frame, const char* name, int32 token,
 	fAdFlags(0),
 
 	fDriver(driver),
-	fLayerData(new LayerData()),
+	fLayerData(new LayerData),
 
 	fRootLayer(NULL),
 
@@ -140,7 +141,7 @@ CRITICAL(helper);
 	STRACE(("Layer(%s) successfuly created\n", Name()));
 }
 
-//! Destructor frees all allocated heap space
+
 Layer::~Layer()
 {
 	delete fLayerData;
@@ -1019,16 +1020,12 @@ Layer::PushState()
 void
 Layer::PopState()
 {
-	if (fLayerData->prevState == NULL) {
+	if (fLayerData->PreviousState() == NULL) {
 		fprintf(stderr, "WARNING: User called BView(%s)::PopState(), but there is NO state on stack!\n", Name());
 		return;
 	}
-	
-	LayerData *data = fLayerData;
-	fLayerData = fLayerData->prevState;
-	data->prevState = NULL;
-	delete data;
 
+	fLayerData = fLayerData->PopState();
 	fLayerData->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
 }
 
@@ -1200,17 +1197,17 @@ Layer::Activated(bool active)
 	// Empty
 }
 
-// BoundsOrigin
+
 BPoint
 Layer::BoundsOrigin() const
 {
 	BPoint origin(0,0);
 	float scale = Scale();
 
-	LayerData *ld = fLayerData;
+	LayerData* layerData = fLayerData;
 	do {
-		origin += ld->Origin();
-	} while ((ld = ld->prevState));
+		origin += layerData->Origin();
+	} while ((layerData = layerData->PreviousState()) != NULL);
 
 	origin.x *= scale;
 	origin.y *= scale;
@@ -1218,18 +1215,20 @@ Layer::BoundsOrigin() const
 	return origin;
 }
 
+
 float
 Layer::Scale() const
 {
 	float scale = 1.0f;
 
-	LayerData *ld = fLayerData;
+	LayerData* layerData = fLayerData;
 	do {
-		scale *= ld->Scale();
-	} while ((ld = ld->prevState));
+		scale *= layerData->Scale();
+	} while ((layerData = layerData->PreviousState()) != NULL);
 
 	return scale;
 }
+
 
 //! Converts the passed point to parent coordinates
 BPoint
@@ -2544,7 +2543,7 @@ Layer::_GetWantedRegion(BRegion &reg)
 //			reg.IntersectWith(&screenReg);
 			reg.IntersectWith(stackData->ClippingRegion());
 		}
-		stackData = stackData->prevState;
+		stackData = stackData->PreviousState();
 	}
 }
 

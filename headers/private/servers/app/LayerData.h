@@ -1,33 +1,15 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		LayerData.h
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//					Adi Oanca <adioanca@mymail.ro>
-//					Stephan Aßmus <superstippi@gmx.de>
-//	Description:	Data classes for working with BView states and draw parameters
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Adi Oanca <adioanca@mymail.ro>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
 #ifndef LAYER_DATA_H_
 #define LAYER_DATA_H_
+
 
 #include <GraphicsDefs.h>
 #include <InterfaceDefs.h>
@@ -40,10 +22,12 @@
 #include "PatternHandler.h"
 
 class BRegion;
+
 namespace BPrivate {
 	class LinkReceiver;
 	class LinkSender;
 };
+
 
 class DrawData {
  public:
@@ -199,9 +183,12 @@ class LayerData : public DrawData {
 			void				ReadFromLink(BPrivate::LinkReceiver& link);
 			void				WriteToLink(BPrivate::LinkSender& link) const;
 
- public:
+			LayerData*			PreviousState() const { return fPreviousState; }
+			LayerData*			PopState();
+
+ private:
 			// used for the state stack
-			LayerData*			prevState;
+			LayerData*			fPreviousState;
 };
 
 // inline implementations

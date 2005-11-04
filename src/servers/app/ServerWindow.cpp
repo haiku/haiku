@@ -446,7 +446,7 @@ ServerWindow::SetLayerState(Layer *layer, BPrivate::LinkReceiver &link)
 }
 
 
-inline Layer*
+Layer*
 ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent)
 {
 	// NOTE: no need to check for a lock. This is a private method.
@@ -481,12 +481,15 @@ ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent)
 	if (link.Code() == AS_LAYER_CREATE_ROOT
 		&& (fWinBorder->WindowFlags() & kWorkspacesWindowFlag) != 0) {
 		// this is a workspaces window!
-		newLayer = new WorkspacesLayer(frame, name, token, resizeMask,
-								flags, fWinBorder->GetDisplayDriver());
+		newLayer = new (nothrow) WorkspacesLayer(frame, name, token, resizeMask,
+			flags, fWinBorder->GetDisplayDriver());
 	} else {
-		newLayer = new Layer(frame, name, token, resizeMask, 
-			flags, fDesktop->GetDisplayDriver());
+		newLayer = new (nothrow) Layer(frame, name, token, resizeMask, flags,
+			fWinBorder->GetDisplayDriver());
 	}
+
+	if (newLayer == NULL)
+		return NULL;
 
 	free(name);
 
@@ -496,6 +499,11 @@ ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent)
 	newLayer->fEventMask = eventMask;
 	newLayer->fEventOptions = eventOptions;
 	newLayer->fOwner = fWinBorder;
+
+	DesktopSettings settings(fDesktop);
+	ServerFont font;
+	settings.GetDefaultPlainFont(font);
+	newLayer->fLayerData->SetFont(font);
 
 // TODO: rework the clipping stuff to remove RootLayer dependency and then
 // remove this hack:
@@ -920,33 +928,31 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_LAYER_GET_SCALE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_SCALE: Layer: %s\n", Title(), fCurrentLayer->Name()));		
-			LayerData		*ld = fCurrentLayer->fLayerData;
+			LayerData* layerData = fCurrentLayer->fLayerData;
 
 			// TODO: And here, we're taking that into account, but not above
 			// -> refactor put scale into Layer, or better yet, when the
 			// state stack is within Layer, PushState() should multiply
 			// by the previous last states scale. Would fix the problem above too.
-			float			scale = ld->Scale();
-			
-			while ((ld = ld->prevState))
-				scale *= ld->Scale();
-			
+			float scale = layerData->Scale();
+
+			while ((layerData = layerData->PreviousState()) != NULL)
+				scale *= layerData->Scale();
+
 			fLink.StartMessage(SERVER_TRUE);
 			fLink.Attach<float>(scale);
 			fLink.Flush();
-		
 			break;
 		}
 		case AS_LAYER_SET_PEN_LOC:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_LOC: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			float		x, y;
-			
+			float x, y;
+
 			link.Read<float>(&x);
 			link.Read<float>(&y);
 
 			fCurrentLayer->fLayerData->SetPenLocation(BPoint(x, y));
-
 			break;
 		}
 		case AS_LAYER_GET_PEN_LOC:
@@ -2382,7 +2388,7 @@ ServerWindow::MakeWinBorder(BRect frame, const char* name,
 {
 	// The non-offscreen ServerWindow uses the DisplayDriver instance from the desktop.
 	return new(nothrow) WinBorder(frame, name, look, feel, flags,
-								  workspace, this, fDesktop->GetDisplayDriver());
+		workspace, this, fDesktop->GetDisplayDriver());
 }
 
 
