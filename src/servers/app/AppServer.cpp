@@ -136,7 +136,8 @@ AppServer::~AppServer()
 	gScreenManager->Lock();
 	gScreenManager->Quit();
 
-	delete gFontManager;
+	gFontManager->Lock();
+	gFontManager->Quit();
 }
 
 

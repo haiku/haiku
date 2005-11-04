@@ -371,6 +371,8 @@ ViewHWInterface::~ViewHWInterface()
 	delete fBackBuffer;
 	delete fFrontBuffer;
 
+	be_app->Lock();
+	be_app->Quit();
 	delete be_app;
 }
 
