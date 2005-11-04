@@ -136,6 +136,11 @@ remove_images(struct team *team)
 }
 
 
+/**	Unlike in BeOS, this function only returns images that belong to the
+ *	current team.
+ *	ToDo: we might want to rethink that one day...
+ */
+
 status_t
 _get_image_info(image_id id, image_info *info, size_t size)
 {
@@ -207,23 +212,50 @@ dump_images_list(int argc, char **argv)
 	struct team *team = thread_get_current_thread()->team;
 	struct image *image = NULL;
 
-	dprintf("Registered images of team 0x%lx\n", team->id);
-	dprintf("    ID text       size    data       size    name\n");
-
-	mutex_lock(&sImageMutex);
+	kprintf("Registered images of team 0x%lx\n", team->id);
+	kprintf("    ID text       size    data       size    name\n");
 
 	while ((image = list_get_next_item(&team->image_list, image)) != NULL) {
 		image_info *info = &image->info;
 
-		dprintf("%6ld %p %-7ld %p %-7ld %s\n", info->id, info->text, info->text_size,
+		kprintf("%6ld %p %-7ld %p %-7ld %s\n", info->id, info->text, info->text_size,
 			info->data, info->data_size, info->name);
 	}
-
-	mutex_unlock(&sImageMutex);
 
 	return 0;
 }
 #endif
+
+
+status_t
+image_debug_lookup_user_symbol_address(struct team *team, addr_t address,
+	addr_t *_baseAddress, const char **_symbolName, const char **_imageName,
+	bool *_exactMatch)
+{
+	// TODO: work together with ELF reader and runtime_loader
+	
+	struct image *image = NULL;
+
+	while ((image = list_get_next_item(&team->image_list, image)) != NULL) {
+		image_info *info = &image->info;
+
+		if ((address < (addr_t)info->text
+				|| address >= (addr_t)info->text + info->text_size)
+			&& (address < (addr_t)info->data
+				|| address >= (addr_t)info->data + info->data_size))
+			continue;
+
+		// found image
+		*_symbolName = NULL;
+		*_imageName = info->name;
+		*_baseAddress = (addr_t)info->text;
+		*_exactMatch = false;
+
+		return B_OK;
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
 
 
 status_t
