@@ -21,7 +21,7 @@ BEOS_BIN = touch sync ln listarea listattr listsem listport
 
 BEOS_APPS = MiniTerminal Terminal Expander People ShowImage Clock Pulse
 	Playground SoundRecorder BitmapDrawing Magnify DiskProbe AboutHaiku
-	StyledEdit CDPlayer
+	StyledEdit
 ;
 BEOS_PREFERENCES = Backgrounds DataTranslations FileTypes Fonts Media Menu
 	Mouse Keyboard Keymap Screen ScrollBar Sounds Time VirtualMemory
