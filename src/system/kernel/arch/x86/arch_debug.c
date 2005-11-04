@@ -7,10 +7,11 @@
  */
 
 
-#include <kernel.h>
 #include <debug.h>
-#include <thread.h>
 #include <elf.h>
+#include <kernel.h>
+#include <kimage.h>
+#include <thread.h>
 
 #include <arch/debug.h>
 #include <arch_cpu.h>
@@ -65,6 +66,41 @@ get_next_frame(addr_t ebp, addr_t *_next, addr_t *_eip)
 error:
 	thread_get_current_thread()->fault_handler = NULL;
 	return B_BAD_ADDRESS;
+}
+
+
+static void
+print_stack_frame(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp)
+{
+	const char *symbol, *image;
+	addr_t baseAddress;
+	bool exactMatch;
+	status_t status;
+	addr_t diff;
+
+	diff = nextEbp - ebp;
+
+	// kernel space/user space switch
+	if (diff & 0x80000000)
+		diff = 0;
+
+	status = elf_debug_lookup_symbol_address(eip, &baseAddress, &symbol,
+		&image, &exactMatch);
+	if (status != B_OK) {
+		// try to locate the image in the images loaded into user space
+		status = image_debug_lookup_user_symbol_address(thread->team, eip,
+			&baseAddress, &symbol, &image, &exactMatch);
+	}
+	if (status == B_OK) {
+		if (symbol != NULL) {
+			kprintf("%08lx (+%4ld) %08lx   <%s>:%s + 0x%04lx%s\n", ebp, diff, eip,
+				image, symbol, eip - baseAddress, exactMatch ? "" : " (nearest)");
+		} else {
+			kprintf("%08lx (+%4ld) %08lx   <%s@%p>:unknown + 0x%04lx\n", ebp, diff,
+				eip, image, (void *)baseAddress, eip - baseAddress);
+		}
+	} else
+		kprintf("%08lx (+%4ld) %08lx\n", ebp, diff, eip);
 }
 
 
@@ -154,12 +190,11 @@ stack_trace(int argc, char **argv)
 			}
 			kprintf("\n");
 			kprintf(" vector: 0x%lx, error code: 0x%lx\n", frame->vector, frame->error_code);
+
+			print_stack_frame(thread, frame->eip, ebp, frame->ebp);
  			ebp = frame->ebp;
 		} else {
-			addr_t eip, nextEbp, diff;
-			const char *symbol, *image;
-			addr_t baseAddress;
-			bool exactMatch;
+			addr_t eip, nextEbp;
 
 			if (get_next_frame(ebp, &nextEbp, &eip) != B_OK) {
 				kprintf("%08lx -- read fault\n", ebp);
@@ -169,24 +204,7 @@ stack_trace(int argc, char **argv)
 			if (eip == 0 || ebp == 0)
 				break;
 
-			diff = nextEbp - ebp;
-
-			// kernel space/user space switch
-			if (diff & 0x80000000)
-				diff = 0;
-
-			if (elf_debug_lookup_symbol_address(eip, &baseAddress, &symbol,
-					&image, &exactMatch) == B_OK) {
-				if (symbol != NULL) {
-					kprintf("%08lx (+%4ld) %08lx   <%s>:%s + 0x%04lx%s\n", ebp, diff, eip,
-						image, symbol, eip - baseAddress, exactMatch ? "" : " (nearest)");
-				} else {
-					kprintf("%08lx (+%4ld) %08lx   <%s@%p>:unknown + 0x%04lx\n", ebp, diff, eip,
-						image, (void *)baseAddress, eip - baseAddress);
-				}
-			} else
-				kprintf("%08lx   %08lx\n", ebp, eip);
-
+			print_stack_frame(thread, eip, ebp, nextEbp);
 			ebp = nextEbp;
 		}
 
