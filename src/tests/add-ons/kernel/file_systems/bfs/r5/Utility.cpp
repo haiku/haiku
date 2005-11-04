@@ -1,8 +1,8 @@
 /* Utility - some helper classes
-**
-** Initial version by Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the OpenBeOS License.
-*/
+ *
+ * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ */
 
 
 #include "Utility.h"
@@ -127,7 +127,7 @@ BlockArray::Remove(off_t value)
 	if (fArray == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	return fArray->Remove(value) ? B_OK : B_ENTRY_NOT_FOUND;
+	return fArray->Remove(value) ? (status_t)B_OK : (status_t)B_ENTRY_NOT_FOUND;
 }
 
 
