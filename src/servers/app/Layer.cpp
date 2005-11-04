@@ -1199,7 +1199,7 @@ Layer::Activated(bool active)
 BPoint
 Layer::BoundsOrigin() const
 {
-	BPoint origin(0,0);
+	BPoint origin(0, 0);
 	float scale = Scale();
 
 	DrawState* layerData = fDrawState;
@@ -1242,7 +1242,8 @@ Layer::ConvertToParent(BRect rect)
 #ifndef NEW_CLIPPING
 //	rect.OffsetBy(fFrame.LeftTop());
 //	return rect;
-	rect.OffsetBy(-BoundsOrigin().x, -BoundsOrigin().y);
+	BPoint origin = BoundsOrigin();
+	rect.OffsetBy(-origin.x, -origin.y);
 	rect.OffsetBy(fFrame.LeftTop());
 	return rect;
 #else
@@ -2052,88 +2053,60 @@ Layer::ConvertFromParent2(BRegion* reg) const
 void
 Layer::ConvertToScreen2(BPoint* pt) const
 {
-	if (GetRootLayer())
-		if (fParent) {
-			BPoint origin = BoundsOrigin();
-			pt->x -= origin.x;
-			pt->y -= origin.y;
-			pt->x += fFrame.left;
-			pt->y += fFrame.top;
-
-			fParent->ConvertToScreen2(pt);
-		}
+	if (fParent) {
+		ConvertToParent2(pt);
+		fParent->ConvertToScreen2(pt);
+	}
 }
 
 //! converts a rect from local to screen coordinate system 
 void
 Layer::ConvertToScreen2(BRect* rect) const
 {
-	if (GetRootLayer())
-		if (fParent) {
-			BPoint origin = BoundsOrigin();
-			rect->OffsetBy(-origin.x, -origin.y);
-			rect->OffsetBy(fFrame.left, fFrame.top);
-
-			fParent->ConvertToScreen2(rect);
-		}
+	if (fParent) {
+		ConvertToParent2(rect);
+		fParent->ConvertToScreen2(rect);
+	}
 }
 
 //! converts a region from local to screen coordinate system 
 void
 Layer::ConvertToScreen2(BRegion* reg) const
 {
-	if (GetRootLayer())
-		if (fParent) {
-			BPoint origin = BoundsOrigin();
-			reg->OffsetBy(-origin.x, -origin.y);
-			reg->OffsetBy(fFrame.left, fFrame.top);
-
-			fParent->ConvertToScreen2(reg);
-		}
+	if (fParent) {
+		ConvertToParent2(reg);
+		fParent->ConvertToScreen2(reg);
+	}
 }
 
 //! converts a point from screen to local coordinate system 
 void
 Layer::ConvertFromScreen2(BPoint* pt) const
 {
-	if (GetRootLayer())
-		if (fParent) {
-			BPoint origin = BoundsOrigin();
-			pt->x += origin.x;
-			pt->y += origin.y;
-			pt->x -= fFrame.left;
-			pt->y -= fFrame.top;
-
-			fParent->ConvertToScreen2(pt);
-		}
+	if (fParent) {
+		ConvertFromParent2(pt);
+		fParent->ConvertFromScreen2(pt);
+	}
 }
 
 //! converts a rect from screen to local coordinate system 
 void
 Layer::ConvertFromScreen2(BRect* rect) const
 {
-	if (GetRootLayer())
-		if (fParent) {
-			BPoint origin = BoundsOrigin();
-			rect->OffsetBy(origin.x, origin.y);
-			rect->OffsetBy(-fFrame.left, -fFrame.top);
-
-			fParent->ConvertFromScreen2(rect);
-		}
+	if (fParent) {
+		ConvertFromParent2(rect);
+		fParent->ConvertFromScreen2(rect);
+	}
 }
 
 //! converts a region from screen to local coordinate system 
 void
 Layer::ConvertFromScreen2(BRegion* reg) const
 {
-	if (GetRootLayer())
-		if (fParent) {
-			BPoint origin = BoundsOrigin();
-			reg->OffsetBy(origin.x, origin.y);
-			reg->OffsetBy(-fFrame.left, -fFrame.top);
-
-			fParent->ConvertFromScreen2(reg);
-		}
+	if (fParent) {
+		ConvertFromParent2(reg);
+		fParent->ConvertFromScreen2(reg);
+	}
 }
 
 
