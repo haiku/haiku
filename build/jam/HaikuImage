@@ -158,7 +158,7 @@ AddFilesToHaikuImage beos etc : $(libnetFiles) ;
 
 local keymapFiles = [ GLOB $(SUBDIR) : *.keymap ] ;
 keymapFiles = $(keymapFiles:BG=keymap) ;
-AddFilesToHaikuImage beos etc Keymap : $(libnetFiles) ;
+AddFilesToHaikuImage beos etc Keymap : $(keymapFiles) ;
 
 local timezones = [ FTimeZoneBinaries $(HAIKU_TIME_ZONE_SOURCES) : : true ] ;
 for timezone in $(timezones) {
