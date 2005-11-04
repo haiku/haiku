@@ -149,7 +149,8 @@ class Layer {
 	// graphic state
 			void				PushState();
 			void				PopState();
-			
+			DrawState*			CurrentState() const { return fDrawState; }
+
 	// coordinate system	
 			BRect				Bounds() const;
 			BRect				Frame() const;
@@ -318,8 +319,6 @@ class Layer {
 	friend class RootLayer;
 	friend class WinBorder;
 	friend class ServerWindow;
-// TODO: remove, is here for debugging purposes only
-friend class OffscreenWinBorder;
 
 #ifndef NEW_CLIPPING
 			void				move_layer(float x, float y);
