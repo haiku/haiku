@@ -1217,14 +1217,7 @@ Layer::BoundsOrigin() const
 float
 Layer::Scale() const
 {
-	float scale = 1.0f;
-
-	DrawState* layerData = fDrawState;
-	do {
-		scale *= layerData->Scale();
-	} while ((layerData = layerData->PreviousState()) != NULL);
-
-	return scale;
+	return CurrentState()->Scale();
 }
 
 
