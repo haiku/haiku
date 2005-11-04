@@ -920,27 +920,16 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			float scale;
 			link.Read<float>(&scale);
-			// TODO: The BeBook says, if you call SetScale() it will be
-			// multiplied with the scale from all previous states on the stack
+
 			fCurrentLayer->fDrawState->SetScale(scale);
 			break;
 		}
 		case AS_LAYER_GET_SCALE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_SCALE: Layer: %s\n", Title(), fCurrentLayer->Name()));		
-			DrawState* layerData = fCurrentLayer->fDrawState;
-
-			// TODO: And here, we're taking that into account, but not above
-			// -> refactor put scale into Layer, or better yet, when the
-			// state stack is within Layer, PushState() should multiply
-			// by the previous last states scale. Would fix the problem above too.
-			float scale = layerData->Scale();
-
-			while ((layerData = layerData->PreviousState()) != NULL)
-				scale *= layerData->Scale();
 
 			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<float>(scale);
+			fLink.Attach<float>(fCurrentLayer->fDrawState->Scale());
 			fLink.Flush();
 			break;
 		}

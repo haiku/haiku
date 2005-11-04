@@ -9,8 +9,8 @@
  *		Stefano Ceccherini (burton666@libero.it)
  *		Axel Dörfler, axeld@pinc-software.de
  */
-#ifndef _SERVERWIN_H_
-#define _SERVERWIN_H_
+#ifndef SERVER_WINDOW_H
+#define SERVER_WINDOW_H
 
 
 #include <GraphicsDefs.h>
@@ -149,4 +149,4 @@ private:
 			dw_data*			fDirectWindowData;
 };
 
-#endif	// _SERVERWIN_H_
+#endif	// SERVER_WINDOW_H

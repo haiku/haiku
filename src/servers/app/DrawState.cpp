@@ -282,8 +282,16 @@ DrawState::OffsetOrigin(const BPoint& offset)
 void
 DrawState::SetScale(float scale)
 {
-	if (fScale != scale) {
+	// the scale is multiplied with the scale of the previous state if any
+	float localScale = fScale;
+	if (PreviousState() != NULL)
+		localScale /= PreviousState()->Scale();
+
+	if (localScale != scale) {
 		fScale = scale;
+		if (PreviousState() != NULL)
+			fScale *= PreviousState()->Scale();
+
 		// update font size
 		// (pen size is currently calulated on the fly)
 		fFont.SetSize(fUnscaledFontSize * fScale);
