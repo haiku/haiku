@@ -982,16 +982,19 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			rgb_color c;
 			
 			link.Read(&c, sizeof(rgb_color));
-myRootLayer->Lock();			
+if (myRootLayer)
+	myRootLayer->Lock();			
 			fCurrentLayer->SetViewColor(RGBColor(c));
 
 #ifndef NEW_CLIPPING
 			if (myRootLayer)
 				myRootLayer->GoRedraw(fCurrentLayer, fCurrentLayer->fVisible);
 #else
-			myRootLayer->GoRedraw(fCurrentLayer, fCurrentLayer->VisibleRegion());
+			if (myRootLayer)
+				myRootLayer->GoRedraw(fCurrentLayer, fCurrentLayer->VisibleRegion());
 #endif
-myRootLayer->Unlock();
+if (myRootLayer)
+	myRootLayer->Unlock();
 			break;
 		}
 
