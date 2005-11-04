@@ -25,7 +25,7 @@ BDiskDeviceList::BDiskDeviceList(bool useOwnLocker)
 	  fSubscribed(false)
 {
 	if (useOwnLocker)
-		fLocker = new(nothrow) BLocker;
+		fLocker = new(nothrow) BLocker("BDiskDeviceList_fLocker");
 }
 
 // destructor

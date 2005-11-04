@@ -657,7 +657,7 @@ PaletteConverter::GrayColorForIndex(uint8 index) const
 }
 
 // TODO: Remove these and palette_converter() when BScreen is available.
-static BLocker			gPaletteConverterLock;
+static BLocker			gPaletteConverterLock("BBitmap_PalConvLock");
 static PaletteConverter	gPaletteConverter;
 
 // palette_converter

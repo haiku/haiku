@@ -40,7 +40,7 @@
 
 bool BDragger::sVisible;
 bool BDragger::sInited;
-BLocker BDragger::sLock;
+BLocker BDragger::sLock("BDragger_sLock");
 BList BDragger::sList;
 
 const static rgb_color kZombieColor = {220, 220, 220, 255};

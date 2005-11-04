@@ -42,8 +42,11 @@ namespace OpenBeOS {
  *          in it.
  *
  */
-BMessageQueue::BMessageQueue() :
-	fTheQueue(NULL), fQueueTail(NULL), fMessageCount(0)
+BMessageQueue::BMessageQueue()
+ :	fTheQueue(NULL),
+ 	fQueueTail(NULL),
+ 	fMessageCount(0),
+ 	fLocker("BMessageQueue_fLocker")
 {
 }
 

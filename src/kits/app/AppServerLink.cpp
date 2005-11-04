@@ -23,7 +23,7 @@
  */
 
 
-static BLocker sLock;
+static BLocker sLock("AppServerLink_sLock");
 
 
 namespace BPrivate {
