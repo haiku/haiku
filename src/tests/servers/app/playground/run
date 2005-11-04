@@ -2,24 +2,16 @@
 
 ../../../../../tests/servers/registrar/run_haiku_registrar || exit
 
-if test -f ../../../../../generated/objects/bone/x86/release/tests/servers/app/haiku_app_server; then
-	../../../../../generated/objects/bone/x86/release/tests/servers/app/haiku_app_server &
-elif test -f ../../../../../generated/objects/r5/x86/release/tests/servers/app/haiku_app_server; then
-	../../../../../generated/objects/r5/x86/release/tests/servers/app/haiku_app_server &
-elif test -f ../../../../../generated/objects/dano/x86/release/tests/servers/app/haiku_app_server; then
-	../../../../../generated/objects/dano/x86/release/tests/servers/app/haiku_app_server &
+if test -f ../../../../../generated/tests/apps/haiku_app_server; then
+	../../../../../generated/tests/apps/haiku_app_server &
 else
-	echo "You need to jam haiku_app_server first."
+	echo "You need to \"TARGET_PLATFORM=r5 jam install-test-apps\" first."
 fi
 
 sleep 1s
 
-if test -f ../../../../../generated/objects/r5/x86/release/tests/servers/app/playground/Playground; then
-	../../../../../generated/objects/r5/x86/release/tests/servers/app/playground/Playground
-elif test -f ../../../../../generated/objects/bone/x86/release/tests/servers/app/playground/Playground; then
-	../../../../../generated/objects/bone/x86/release/tests/servers/app/playground/Playground
-elif test -f ../../../../../generated/objects/dano/x86/release/tests/servers/app/playground/Playground; then
-	../../../../../generated/objects/dano/x86/release/tests/servers/app/playground/Playground
+if test -f ../../../../../generated/tests/apps/Playground; then
+	../../../../../generated/tests/apps//Playground
 else
-	echo "You need to jam Playground first."
+	echo "You need to \"TARGET_PLATFORM=r5 jam install-test-apps\" first."
 fi

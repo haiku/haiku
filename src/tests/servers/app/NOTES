@@ -1,16 +1,10 @@
 For the tests to run properly on BeOS, you need to prepare a few things.
 
-1.) make sure your target is "r5" (if your target is "bone", you need to adjust the "run" scripts)
+There is a pseudo target "install-test-apps" which needs to be built like this:
 
-2.) build the Haiku registrar (from anywhere in the Haiku tree):
-jam haiku_registrar
+$ TARGET_PLATFORM=r5 jam install-test-apps
 
-3.) build the Haiku app_server (from anywhere in the Haiku tree):
-jam haiku_app_server
-
-4.) make links to some Haiku libs in your ~/config/lib folder. The tests link to libopenbeos.so, haiku_app_server links to libhaikuappserver.so, libhwinterface.so, libhwinterfaceimpl.so, libpng.so and libfreetype.so. You will find these libs in the distro folder for your target after you build the haiku_app_server.
-
-5.) build the test app you want to run
+This will build "haiku_registrar", "haiku_app_server", the needed libs and some test apps and install all into "generated/tests/apps".
 
 Each test app folder contains a script "run", which launches the Haiku app_server and a second later the test app which connects to it.
 
