@@ -74,6 +74,7 @@ stack_trace(int argc, char **argv)
 	uint32 previousLocations[NUM_PREVIOUS_LOCATIONS];
 	struct iframe_stack *frameStack;
 	struct thread *thread;
+	addr_t oldPageDirectory = 0;
 	uint32 ebp;
 	int32 i, num = 0, last = 0;
 
@@ -90,6 +91,18 @@ stack_trace(int argc, char **argv)
 
 		// read %ebp from the thread's stack stored by a pushad
 		ebp = thread->arch_info.current_stack.esp[2];
+
+		if (id != thread_get_current_thread_id()) {
+			// switch to the page directory of the new thread to be
+			// able to follow the stack trace into userland
+			addr_t newPageDirectory = (addr_t)x86_next_page_directory(
+				thread_get_current_thread(), thread);
+
+			if (newPageDirectory != 0) {
+				read_cr3(oldPageDirectory);
+				write_cr3(newPageDirectory);
+			}
+		}
 	}
 
 	// We don't have a thread pointer early in the boot process
@@ -183,6 +196,11 @@ stack_trace(int argc, char **argv)
 		}
 		if (ebp == 0)
 			break;
+	}
+
+	if (oldPageDirectory != 0) {
+		// switch back to the previous page directory to no cause any troubles
+		write_cr3(oldPageDirectory);
 	}
 
 	return 0;

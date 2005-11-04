@@ -112,6 +112,29 @@ i386_get_user_iframe(void)
 }
 
 
+inline void *
+x86_next_page_directory(struct thread *from, struct thread *to)
+{
+	if (from->team->aspace != NULL && to->team->aspace != NULL) {
+		// they are both uspace threads
+		if (from->team == to->team) {
+			// dont change the pgdir, same address space
+			return NULL;
+		}
+		// switching to a new address space
+		return i386_translation_map_get_pgdir(&to->team->aspace->translation_map);
+	} else if (from->team->aspace == NULL && to->team->aspace == NULL) {
+		// they must both be kspace threads
+		return NULL;
+	} else if (to->team->aspace == NULL) {
+		// the one we're switching to is kspace
+		return i386_translation_map_get_pgdir(&to->team->kaspace->translation_map);
+	}
+	
+	return i386_translation_map_get_pgdir(&to->team->aspace->translation_map);
+}
+
+
 static inline void
 set_fs_register(uint32 segment)
 {
@@ -225,9 +248,9 @@ arch_thread_switch_kstack_and_call(struct thread *t, addr_t new_kstack, void (*f
 
 
 void
-arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
+arch_thread_context_switch(struct thread *from, struct thread *to)
 {
-	void *new_pgdir;
+	addr_t newPageDirectory;
 
 #if 0
 	int i;
@@ -242,42 +265,25 @@ arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 	for (i = 0; i < 11; i++)
 		dprintf("*esp[%d] (0x%x) = 0x%x\n", i, ((unsigned int *)new_at->esp + i), *((unsigned int *)new_at->esp + i));
 #endif
-	i386_set_tss_and_kstack(t_to->kernel_stack_base + KERNEL_STACK_SIZE);
+	i386_set_tss_and_kstack(to->kernel_stack_base + KERNEL_STACK_SIZE);
 
 	// set TLS GDT entry to the current thread - since this action is
 	// dependent on the current CPU, we have to do it here
-	if (t_to->user_local_storage != NULL)
-		set_tls_context(t_to);
+	if (to->user_local_storage != NULL)
+		set_tls_context(to);
 
-	if (t_from->team->aspace != NULL && t_to->team->aspace != NULL) {
-		// they are both uspace threads
-		if (t_from->team == t_to->team) {
-			// dont change the pgdir, same address space
-			new_pgdir = NULL;
-		} else {
-			// switching to a new address space
-			new_pgdir = i386_translation_map_get_pgdir(&t_to->team->aspace->translation_map);
-		}
-	} else if (t_from->team->aspace == NULL && t_to->team->aspace == NULL) {
-		// they must both be kspace threads
-		new_pgdir = NULL;
-	} else if (t_to->team->aspace == NULL) {
-		// the one we're switching to is kspace
-		new_pgdir = i386_translation_map_get_pgdir(&t_to->team->kaspace->translation_map);
-	} else {
-		new_pgdir = i386_translation_map_get_pgdir(&t_to->team->aspace->translation_map);
-	}
+	newPageDirectory = (addr_t)x86_next_page_directory(from, to);
 
-	if (((uint32)new_pgdir % B_PAGE_SIZE) != 0)
-		panic("arch_thread_context_switch: bad pgdir 0x%lx\n", new_pgdir);
+	if ((newPageDirectory % B_PAGE_SIZE) != 0)
+		panic("arch_thread_context_switch: bad pgdir 0x%lx\n", newPageDirectory);
 
 	// reinit debugging; necessary, if the thread was preempted after
 	// initializing debugging before returning to userland
-	if (t_to->team->aspace != NULL)
-		i386_reinit_user_debug_after_context_switch(t_to);
+	if (to->team->aspace != NULL)
+		i386_reinit_user_debug_after_context_switch(to);
 
-	i386_fsave_swap(t_from->arch_info.fpu_state, t_to->arch_info.fpu_state);
-	i386_context_switch(&t_from->arch_info, &t_to->arch_info, (addr_t)new_pgdir);
+	i386_fsave_swap(from->arch_info.fpu_state, to->arch_info.fpu_state);
+	i386_context_switch(&from->arch_info, &to->arch_info, newPageDirectory);
 }
 
 

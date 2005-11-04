@@ -83,12 +83,14 @@ void x86_write_msr(uint32 register, uint64 value);
 void x86_set_task_gate(int32 n, int32 segment);
 struct tss *x86_get_main_tss(void);
 
-
 #define read_ebp(value) \
 	__asm__("movl	%%ebp,%0" : "=r" (value))
 
 #define read_cr3(value) \
 	__asm__("movl	%%cr3,%0" : "=r" (value))
+
+#define write_cr3(value) \
+	__asm__("movl	%0,%%cr3" : : "r" (value))
 
 #define read_dr3(value) \
 	__asm__("movl	%%dr3,%0" : "=r" (value))

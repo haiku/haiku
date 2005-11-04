@@ -19,6 +19,7 @@ extern "C" {
 void x86_push_iframe(struct iframe_stack *stack, struct iframe *frame);
 void x86_pop_iframe(struct iframe_stack *stack);
 struct iframe *i386_get_user_iframe(void);
+void *x86_next_page_directory(struct thread *from, struct thread *to);
 
 void i386_return_from_signal();
 void i386_end_return_from_signal();
