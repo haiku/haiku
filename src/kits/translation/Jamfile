@@ -2,6 +2,10 @@ SubDir HAIKU_TOP src kits translation ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+if $(TARGET_PLATFORM) != haiku {
+	UsePublicHeaders translation ;
+}
+
 UsePrivateHeaders translation ;
 
 SharedLibrary libtranslation.so :
