@@ -120,9 +120,12 @@ FontManager::_SetDefaultFont()
 {
 	FontStyle* style = GetStyle(DEFAULT_PLAIN_FONT_FAMILY, DEFAULT_PLAIN_FONT_STYLE);
 	if (style == NULL) {
-		style = FindStyleMatchingFace(B_REGULAR_FACE);
-		if (style == NULL)
-			style = FamilyAt(0)->StyleAt(0);
+		style = GetStyle(FALLBACK_PLAIN_FONT_FAMILY, DEFAULT_PLAIN_FONT_STYLE);
+		if (style == NULL) {
+			style = FindStyleMatchingFace(B_REGULAR_FACE);
+			if (style == NULL)
+				style = FamilyAt(0)->StyleAt(0);
+		}
 	}
 
 	fDefaultFont = new ServerFont(*style, DEFAULT_PLAIN_FONT_SIZE);
