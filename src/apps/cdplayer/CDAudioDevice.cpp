@@ -12,6 +12,85 @@
 #include <errno.h>
 #include "scsi.h"
 
+cdaudio_data::cdaudio_data(const int32 &id, const int32 &count, 
+			const int32 &disclength)
+ :	disc_id(id),
+ 	track_count(count),
+ 	length(disclength)
+{
+}
+
+cdaudio_data::cdaudio_data(const cdaudio_data &from)
+ :	disc_id(from.disc_id),
+ 	track_count(from.track_count),
+ 	length(from.length)
+{
+}
+
+cdaudio_data &
+cdaudio_data::operator=(const cdaudio_data &from)
+{
+	disc_id = from.disc_id;
+	track_count = from.track_count;
+	length = from.length;
+	frame_offsets = from.frame_offsets;
+	return *this;
+}
+
+cdaudio_time::cdaudio_time(const int32 min,const int32 &sec)
+ :	minutes(min),
+ 	seconds(sec)
+{
+}
+
+cdaudio_time::cdaudio_time(const cdaudio_time &from)
+ :	minutes(from.minutes),
+ 	seconds(from.seconds)
+{
+}
+
+cdaudio_time &
+cdaudio_time::operator=(const cdaudio_time &from)
+{
+	minutes = from.minutes;
+	seconds = from.seconds;
+	return *this;
+}
+
+cdaudio_time
+cdaudio_time::operator+(const cdaudio_time &from)
+{
+	cdaudio_time time;
+	
+	time.minutes = minutes + from.minutes;
+	time.seconds = seconds + from.seconds;
+	
+	while(time.seconds > 59)
+	{
+		time.minutes++;
+		time.seconds-=60;
+	}
+	return time;
+}
+
+cdaudio_time
+cdaudio_time::operator-(const cdaudio_time &from)
+{
+	cdaudio_time time;
+	
+	int32 tsec = ((minutes * 60) + seconds) - ((from.minutes * 60) + from.seconds);
+	if(tsec<0)
+	{
+		time.minutes = 0;
+		time.seconds = 0;
+		return time;
+	}
+	
+	time.minutes = tsec / 60;
+	time.seconds = tsec % 60;
+	
+	return time;
+}
 
 CDAudioDevice::CDAudioDevice(void)
 {
@@ -289,6 +368,7 @@ CDAudioDevice::SetDrive(const int32 &drive)
 	{
 		fFileHandle = device;
 		fDrivePath = path;
+		fDriveIndex = drive;
 		return true;
 	}
 	
@@ -396,20 +476,6 @@ CDAudioDevice::GetTime(cdaudio_time &track, cdaudio_time &disc)
 	return true;
 }
 
-// The SCSI table of contents consists of a 4-byte header followed by 100 track
-// descriptors, which are each 8 bytes. We don't really need the first 5 bytes
-// of the track descriptor, so we'll just ignore them. All we really want is the
-// length of each track, which happen to be the last 3 bytes of the descriptor.
-struct TrackDescriptor
-{
-	int32	unused;
-	int8	unused2;
-	
-	int8	min;
-	int8	sec;
-	int8	frame;
-};
-
 bool
 CDAudioDevice::GetTimeForTrack(const int16 &index, cdaudio_time &track)
 {
@@ -511,3 +577,24 @@ CDAudioDevice::GetDiscID(void)
 	
 	return id;
 }
+
+bool CDAudioDevice::IsDataTrack(const int16 &track)
+{
+	scsi_toc toc;
+	status_t result = ioctl(fFileHandle, B_SCSI_GET_TOC, &toc);
+	
+	if (result != B_OK)
+		return false;
+	
+	TrackDescriptor *trackindex = (TrackDescriptor*) &(toc.toc_data[4]);
+	if(track>toc.toc_data[3])
+		return false;
+	
+	// At least under R5, the SCSI CD drive has each legitimate audio track
+	// have a value of 0x10. Data tracks have a value of 0x14;
+	if(trackindex[track].adr_control & 4)
+		return true;
+	
+	return false;
+}
+

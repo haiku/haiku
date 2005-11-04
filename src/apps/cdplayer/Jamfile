@@ -10,6 +10,6 @@ Application CDPlayer :
 	TrackMenu.cpp
 	TwoStateDrawButton.cpp
 
-	: be net netapi translation
+	: be net netapi translation textencoding 
 	: CDPlayer.rdef
 ;

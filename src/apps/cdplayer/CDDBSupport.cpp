@@ -7,6 +7,7 @@
 #include "CDDBSupport.h"
 
 #include <Debug.h>
+#include <Alert.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
@@ -25,6 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdlib.h>
+#include <UTF8.h>
 
 //#define DEBUG_CDDB
 
@@ -49,6 +51,361 @@ typedef struct TrackRecord
 	int8	frame;
 };
 
+
+CDDBData::CDDBData(int32 discid)
+ :	fDiscID(discid),
+	fYear(-1)
+{
+}
+
+CDDBData::CDDBData(const CDDBData &from)
+ :	fDiscID(from.fDiscID),
+ 	fArtist(from.fArtist),
+ 	fAlbum(from.fAlbum),
+ 	fGenre(from.fGenre),
+ 	fDiscTime(from.fDiscTime),
+	fYear(fYear)
+{
+	STRACE(("CDDBData::Copy Constructor\n"));
+	
+	for(int32 i=0; i<from.fTrackList.CountItems(); i++)
+	{
+		BString *string = (BString*)from.fTrackList.ItemAt(i);
+		cdaudio_time *time = (cdaudio_time*)from.fTimeList.ItemAt(i);
+		
+		if(!string || !time)
+			continue;
+		
+		AddTrack(string->String(),*time);
+	}
+}
+
+CDDBData::~CDDBData(void)
+{
+	STRACE(("CDDBData::~CDDBData\n"));
+	EmptyLists();
+}
+
+CDDBData &
+CDDBData::operator=(const CDDBData &from)
+{
+	EmptyLists();
+	fDiscID=from.fDiscID;
+ 	fArtist=from.fArtist;
+ 	fAlbum=from.fAlbum;
+ 	fGenre=from.fGenre;
+ 	fDiscTime=from.fDiscTime;
+	fYear=fYear;
+	
+	for(int32 i=0; i<from.fTrackList.CountItems(); i++)
+	{
+		BString *string = (BString*)from.fTrackList.ItemAt(i);
+		cdaudio_time *time = (cdaudio_time*)from.fTimeList.ItemAt(i);
+		
+		if(!string || !time)
+			continue;
+		
+		AddTrack(string->String(),*time);
+	}
+	return *this;
+}
+
+void
+CDDBData::MakeEmpty(void)
+{
+	STRACE(("CDDBData::MakeEmpty\n"));
+	
+	EmptyLists();
+	fDiscID=-1;
+	fArtist="";
+	fAlbum="";
+	fGenre="";
+	fDiscTime.minutes=-1;
+	fDiscTime.seconds=-1;
+	fYear=-1;
+}
+
+void
+CDDBData::EmptyLists(void)
+{
+	STRACE(("CDDBData::EmptyLists\n"));
+	
+	for(int32 i=0; i<fTrackList.CountItems(); i++)
+	{
+		BString *string = (BString*)fTrackList.ItemAt(i);
+		delete string;
+	}
+	fTrackList.MakeEmpty();
+	
+	for(int32 j=0; j<fTimeList.CountItems(); j++)
+	{
+		cdaudio_time *time = (cdaudio_time*)fTimeList.ItemAt(j);
+		delete time;
+	}
+	fTimeList.MakeEmpty();
+}
+
+status_t
+CDDBData::Load(const entry_ref &ref)
+{
+	STRACE(("CDDBData::Load(%s)\n",ref.name));
+	
+	BFile file(&ref, B_READ_ONLY);
+	
+	if(file.InitCheck()!=B_OK)
+	{
+		STRACE(("CDDBData::Load failed\n"));
+		return file.InitCheck();
+	}
+	
+	attr_info info;
+	
+	if(file.GetAttrInfo("Audio:Genre",&info)==B_OK && info.size > 0)
+	{
+		char genredata[info.size+2];
+		
+		if(file.ReadAttr("Audio:Genre",B_STRING_TYPE,0,genredata,info.size)>0)
+			fGenre = genredata;
+	}
+
+	if(file.GetAttrInfo("Audio:Year",&info)==B_OK && info.size > 0)
+	{
+		int32 data;
+		
+		if(file.ReadAttr("Audio:Year",B_INT32_TYPE,0,&data,info.size)>0)
+			fYear = data;
+	}
+	
+	// TODO: Attempt reading the file before attempting to read the attributes
+	if(file.GetAttrInfo("CD:tracks",&info)==B_OK && info.size > 0)
+	{
+		char trackdata[info.size+2];
+		
+		if(file.ReadAttr("CD:tracks",B_STRING_TYPE,0,trackdata,info.size)>0)
+		{
+			trackdata[info.size] = 0;
+			BString tmp = GetLineFromString(trackdata);
+			char *index;
+			
+			if(fTrackList.CountItems()>0)
+				EmptyLists();
+			
+			fArtist = tmp;
+			fArtist.Truncate(fArtist.FindFirst(" - "));
+			STRACE(("CDDBData::Load: Artist set to %s\n",fArtist.String()));
+			
+			fAlbum = tmp.String() + (tmp.FindFirst(" - ") + 3);
+			STRACE(("CDDBData::Load: Album set to %s\n",fAlbum.String()));
+			
+			index = strchr(trackdata,'\n') + 1;
+			while(*index)
+			{
+				tmp = GetLineFromString(index);
+				
+				if(tmp.CountChars()>0)
+				{
+					BString *newtrack = new BString(tmp);
+					cdaudio_time *time = new cdaudio_time;
+					time->minutes = 0;
+					time->seconds = 0;
+					
+					STRACE(("CDDBData::Load: Adding Track %s (%ld:%ld)\n",newtrack->String(),
+							time->minutes,time->seconds));
+					
+					fTrackList.AddItem(newtrack);
+					fTimeList.AddItem(time);
+				}
+				
+				index = strchr(index,'\n') + 1;
+			}
+			
+			// We return this so that the caller knows to initialize tracktimes
+			return B_NO_INIT;
+		}
+	}
+	
+	return B_ERROR;
+}
+
+status_t
+CDDBData::Load(void)
+{
+	// This uses the default R5 path
+	
+	BPath path;
+	if(find_directory(B_USER_DIRECTORY, &path, true)!=B_OK)
+		return B_ERROR;
+	
+	path.Append("cd");
+	create_directory(path.Path(), 0755);
+	
+	BString filename(path.Path());
+	filename << "/" << Artist() << " - " << Album();
+	
+	if(filename.Compare("Artist")==0)
+		filename << "." << DiscID();
+	
+	BEntry entry(filename.String());
+	if(entry.InitCheck()!=B_OK)
+		return entry.InitCheck();
+	
+	entry_ref ref;
+	entry.GetRef(&ref);
+	
+	return Load(ref);
+}
+
+status_t
+CDDBData::Save(void)
+{
+	// This uses the default R5 path
+	
+	BPath path;
+	if(find_directory(B_USER_DIRECTORY, &path, true)!=B_OK)
+		return B_ERROR;
+	
+	path.Append("cd");
+	create_directory(path.Path(), 0755);
+	
+	BString filename(path.Path());
+	filename << "/" << Artist() << " - " << Album();
+	
+	if(filename.Compare("Artist")==0)
+		filename << "." << DiscID();
+	
+	return Save(filename.String());
+}
+
+status_t
+CDDBData::Save(const char *filename)
+{
+	if(!filename)
+	{
+		STRACE(("CDDBData::Save failed - NULL filename\n"));
+		return B_ERROR;
+	}
+	
+	BFile file(filename, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+	if(file.InitCheck() != B_OK)
+	{
+		STRACE(("CDDBData::Save failed - couldn't create file %s\n",filename));
+		return file.InitCheck();
+	}
+	
+	BString entry;
+	char timestring[10];
+	
+	sprintf(timestring,"%.2ld:%.2ld",fDiscTime.minutes, fDiscTime.seconds);
+	
+	entry << fArtist << " - " << fAlbum << "\t" << timestring << "\n";
+	file.Write(entry.String(),entry.Length());
+	
+	STRACE(("CDDBData::Save: wrote first line: %s",entry.String()));
+	
+	BString tracksattr(fArtist);
+	tracksattr << " - " << fAlbum << "\n";
+	
+	for(int32 i=0; i<fTrackList.CountItems(); i++)
+	{
+		BString *trackstr = (BString *)fTrackList.ItemAt(i);
+		cdaudio_time *time= (cdaudio_time*)fTimeList.ItemAt(i);
+		
+		if(!trackstr || !time)
+			continue;
+		
+		entry = *trackstr;
+		
+		sprintf(timestring,"%.2ld:%.2ld",time->minutes,	time->seconds);
+		
+		entry << "\t" << timestring << "\n";
+		file.Write(entry.String(),entry.Length());
+		STRACE(("CDDBData::Save: Wrote line: %s",entry.String()));
+		
+		tracksattr << *trackstr << "\n";
+	}
+	
+	file.WriteAttr("CD:key", B_INT32_TYPE, 0, &fDiscID, sizeof(int32));
+	STRACE(("CDDBData::Save: Wrote CD identifier: %ld(%lx)\n",fDiscID,fDiscID));
+	file.WriteAttr("CD:tracks", B_STRING_TYPE, 0, tracksattr.String(), tracksattr.Length()+1);
+	
+	if(fGenre.CountChars()>0)
+		file.WriteAttr("Audio:Genre",B_STRING_TYPE,0, fGenre.String(), fGenre.Length()+1);
+	
+	if(fYear>0)
+		file.WriteAttr("Audio:Year",B_INT32_TYPE,0,&fYear,sizeof(int32));
+	
+	return B_OK;
+}
+
+uint16
+CDDBData::CountTracks(void) const
+{
+	return fTrackList.CountItems();
+}
+
+bool
+CDDBData::RenameTrack(const int32 &index, const char *newname)
+{
+	if(!newname)
+	{
+		STRACE(("CDDBData::RenameTrack failed - NULL newname\n"));
+		return false;
+	}
+	
+	BString *name = (BString*)fTrackList.ItemAt(index);
+	if(name)
+	{
+		STRACE(("CDDBData::RenameTrack(%ld,%s)\n",index,newname));
+		name->SetTo(newname);
+		return true;
+	}
+	
+	STRACE(("CDDBData::RenameTrack failed - invalid index\n"));
+	return false;
+}
+
+void
+CDDBData::AddTrack(const char *track, const cdaudio_time &time,
+					const int16 &index)
+{
+	if(!track)
+	{
+		STRACE(("CDDBData::AddTrack failed - NULL name\n"));
+		return;
+	}
+	STRACE(("CDDBData::AddTrack(%s, %ld:%.2ld,%d)\n",track,time.minutes,time.seconds,index));
+	
+	fTrackList.AddItem(new BString(track));
+	fTimeList.AddItem(new cdaudio_time(time));
+}
+
+void
+CDDBData::RemoveTrack(const int16 &index)
+{
+	// This breaks the general following of the BList style because
+	// removing a track would require returning 2 pointers
+	
+	fTrackList.RemoveItem(index);
+	fTimeList.RemoveItem(index);
+	
+	STRACE(("CDDBData::RemoveTrack(%d)\n",index));
+}
+			
+const char *
+CDDBData::TrackAt(const int16 &index) const
+{
+	BString *track = (BString*)fTrackList.ItemAt(index);
+	if(!track)
+		return NULL;
+	
+	return track->String();
+}
+
+cdaudio_time *
+CDDBData::TrackTimeAt(const int16 &index)
+{
+	return (cdaudio_time *)fTimeList.ItemAt(index);
+}
 
 template <class InitCheckable>
 void
@@ -80,8 +437,7 @@ CDDBQuery::CDDBQuery(const char *server, int32 port)
 	:	fServerName(server),
 		fPort(port),
 		fConnected(false),
-		fState(kInitial),
-		fDiscID(-1)
+		fState(kInitial)
 {
 }
 
@@ -110,8 +466,7 @@ CDDBQuery::SetToCD(const char *path)
 	if(device < 0)
 		return;
 	
-	scsi_toc toc;
-	status_t result = ioctl(device, B_SCSI_GET_TOC, &toc);
+	status_t result = ioctl(device, B_SCSI_GET_TOC, &fSCSIData);
 	
 	close(device);
 	
@@ -121,28 +476,19 @@ CDDBQuery::SetToCD(const char *path)
 	// Calculate the disc's CDDB ID
 	if (fState == kInitial) 
 	{
-		fDiscID = GetDiscID(&toc);
-		fTrackCount = GetTrackCount(&toc);
-		
-		cdaudio_time time = GetDiscTime(&toc);
-		fDiscLength = (time.minutes * 60) + time.seconds;
-		fFrameOffsetString = OffsetsToString(&toc);
-		GetTrackTimes(&toc, fTrackTimes);
+		fCDData.SetDiscID(GetDiscID(&fSCSIData));
+		fCDData.SetDiscTime(GetDiscTime(&fSCSIData));
 	}
 	else
 	{
-		int32 discID = GetDiscID(&toc);
+		int32 discID = GetDiscID(&fSCSIData);
 		
-		if (fDiscID == discID)
+		if (fCDData.DiscID() == discID)
 			return;
 		
-		fDiscID = discID;
-		fTrackCount = GetTrackCount(&toc);
-		
-		cdaudio_time time = GetDiscTime(&toc);
-		fDiscLength = (time.minutes * 60) + time.seconds;
-		fFrameOffsetString = OffsetsToString(&toc);
-		GetTrackTimes(&toc, fTrackTimes);
+		fCDData.SetDiscID(discID);
+		fCDData.SetDiscTime(GetDiscTime(&fSCSIData));
+		fFrameOffsetString = OffsetsToString(&fSCSIData);
 	}
 	
 	result = B_OK;
@@ -220,8 +566,11 @@ CDDBQuery::GetSites(bool (*eachFunc)(const char *site, int port, const char *lat
 }
 
 bool 
-CDDBQuery::GetTitles(BString *resultingTitle, vector<BString> *tracks, bigtime_t timeout)
+CDDBQuery::GetData(CDDBData *data, bigtime_t timeout)
 {
+	if(!data)
+		return false;
+	
 	bigtime_t deadline = system_time() + timeout;
 	while (fState == kReading) 
 	{
@@ -229,18 +578,11 @@ CDDBQuery::GetTitles(BString *resultingTitle, vector<BString> *tracks, bigtime_t
 		if (system_time() > deadline)
 			break;
 	}
-	if (fState != kDone)
+	if(fState != kDone)
 		return false;
-
-	if (resultingTitle)
-	{
-		*resultingTitle = fArtist;
-		resultingTitle->Append(" / ");
-		resultingTitle->Append(fTitle);
-	}
 	
-	if (tracks)
-		*tracks = fTrackNames;
+	*data = fCDData;
+	
 	return true;
 }
 
@@ -339,16 +681,20 @@ CDDBQuery::ReadFromServer(BString &data)
 	
 	// Query for the existence of the disc in the database
 	char idString[10];
-	sprintf(idString, "%08lx", fDiscID);
-	
+	sprintf(idString, "%08lx", fCDData.DiscID());
 	BString query;
-	query << "cddb query " << idString << ' ' << fTrackCount << ' ' 
-		<< fFrameOffsetString << ' ' << fDiscLength << '\n';
+	
+	int32 trackCount = GetTrackCount(&fSCSIData);
+	BString offsetString = OffsetsToString(&fSCSIData);	
+	int32 discLength = (fCDData.DiscTime()->minutes * 60) + fCDData.DiscTime()->seconds;
+	
+	query << "cddb query " << idString << ' ' << trackCount << ' ' 
+		<< offsetString << ' ' << discLength << '\n';
 	
 	STRACE((">%s", query.String()));
 
 	ThrowIfNotSize( fSocket.Send(query.String(), query.Length()) );
-
+	
 	BString tmp;
 	ReadLine(tmp);
 	
@@ -385,7 +731,7 @@ CDDBQuery::ReadFromServer(BString &data)
 		{
 			// We get here for any time the CDDB server does not recognize the CD, amongst other things
 			STRACE(("CDDB lookup error: %s\n",tmp.String()));
-			fCategory = "misc";
+			fCDData.SetGenre("misc");
 			return B_NAME_NOT_FOUND;
 		}
 	}
@@ -394,9 +740,13 @@ CDDBQuery::ReadFromServer(BString &data)
 		GetToken(tmp.String() + 3, category);
 	}
 	
-	if (!category.Length())
+	STRACE(("CDDBQuery::ReadFromServer: Genre: %s\n",category.String()));
+	if(!category.Length())
+	{
+		STRACE(("Set genre to 'misc'\n"));
 		category = "misc";
-
+	}
+	
 	// Query for the disc's data - artist, album, tracks, etc.
 	query = "";
 	query << "cddb read " << category << ' ' << queryDiscID << '\n' ;
@@ -446,22 +796,100 @@ void
 CDDBQuery::ReadLine(BString &buffer)
 {
 	buffer = "";
-	char ch;
+	unsigned char ch;
+	
 	for (;;) 
 	{
 		if (fSocket.Receive(&ch, 1) <= 0)
 			break;
-		if (ch >= ' ')
-			buffer += ch;
-		if (ch == '\n')
+		
+		
+		// This function is more work than it should have to be. FreeDB lookups can sometimes 
+		// be in a non-ASCII encoding, such as Latin-1 or UTF8. The problem lies in Be's implementation
+		// of BString, which does not support UTF8 string assignments. The Be Book says we have to
+		// flatten the string and adjust the character counts manually. Man, this *really* sucks.
+		if(ch > 0x7f)
+		{
+			// Obviously non-ASCII character detected. Let's see if it's Latin-1 or UTF8.
+			unsigned char *string, *stringindex;
+			int32 length = buffer.Length();
+			
+			// The first byte of a UTF8 string will be 110xxxxx
+			if( ((ch & 0xe0) == 0xc0))
+			{
+				// This is UTF8. Get the next byte
+				unsigned char ch2;
+				if (fSocket.Receive(&ch2, 1) <= 0)
+					break;
+				
+				if( (ch2 & 0xc0) == 0x80)
+				{
+					string = (unsigned char *)buffer.LockBuffer(length+10);
+					stringindex = string + length;
+
+					stringindex[0] = ch;
+					stringindex[1] = ch2;
+					stringindex[2] = 0;
+					
+					buffer.UnlockBuffer();
+					
+					// We've added the character, so go to the next iteration
+					continue;
+				}
+			}
+			
+			// Nope. Just Latin-1. Convert to UTF8 and assign
+			char srcstr[2], deststr[5];
+			int32 srclen, destlen, state;
+			
+			srcstr[0]=ch;
+			srcstr[1]='\0';
+			srclen = 1;
+			destlen = 5;
+			
+			if(convert_to_utf8(B_ISO1_CONVERSION,srcstr,&srclen,deststr,&destlen,&state)==B_OK)
+			{
+				// We succeeded. Amazing. Now we hack the string into having the character
+				length = buffer.Length();
+				
+				string = (unsigned char *)buffer.LockBuffer(length+10);
+				stringindex = string + length;
+
+				for (int i = 0; i < 5; i++)
+					stringindex[i] = deststr[i];
+				
+				buffer.UnlockBuffer();
+			}
+			else
+			{
+				// well, we tried. Append the character to the string and live with it
+				buffer+=ch;
+			}
+		}
+		else
+			buffer +=ch;
+		
+		if(ch == '\n')
 			break;
 	}
-	STRACE(("<%s\n", buffer.String()));
+	
+	buffer.RemoveAll("\r");
+	STRACE(("<%s", buffer.String()));
 }
 
 void 
 CDDBQuery::IdentifySelf()
 {
+	// TODO: Figure out a better way to do this for Zeta
+#ifdef B_ZETA_VERSION
+	BString tmp;
+	tmp << "cddb hello simplyvorbis svhost SimplyVorbis v0.1\n";
+
+	STRACE((">%s", tmp.String()));
+	ThrowIfNotSize( fSocket.Send(tmp.String(), tmp.Length()) );
+	
+	ReadLine(tmp);
+#else
 	char username[256];
 	if (!getusername(username,256))
 		strcpy(username, "unknown");
@@ -471,15 +899,17 @@ CDDBQuery::IdentifySelf()
 		strcpy(hostname, "unknown");
 	
 	BString tmp;
-	tmp << "cddb hello " << username << " " << hostname << " Haiku_CD_Player v1.0\n";
+	tmp << "cddb hello " << username << " " << hostname << " SimplyVorbis v0.1\n";
 
 	STRACE((">%s", tmp.String()));
 	ThrowIfNotSize( fSocket.Send(tmp.String(), tmp.Length()) );
 	
 	ReadLine(tmp);
+#endif
+
 }
 
-bool 
+status_t
 CDDBQuery::OpenContentFile(const int32 &discID)
 {
 	// Makes sure that the lookup has a valid file to work with for the CD content.
@@ -509,64 +939,38 @@ CDDBQuery::OpenContentFile(const int32 &discID)
 			continue;
 		
 		if(query.GetNextRef(&ref) == B_OK) 
-		{
-			file.SetTo(&ref, B_READ_ONLY);
 			break;
-		}
 	}
 	
-	if(file.InitCheck() == B_NO_INIT)
-		return false;
-	
-	// Getting this far means that we have a file. Now we parse the data in it and assign it
-	// to the appropriate members of the object
-	attr_info info;
-	
-	if(file.GetAttrInfo("CD:tracks",&info)==B_OK && info.size > 0)
+	status_t status = fCDData.Load(ref);
+	if(status == B_NO_INIT)
 	{
-		char trackdata[info.size+2];
+		// We receive this error when the Load() function couldn't load the track times
+		// This just means that we get it from the SCSI data given to us in SetToCD
+		vector<cdaudio_time> times;
+		GetTrackTimes(&fSCSIData,times);
 		
-		if(file.ReadAttr("CD:tracks",B_STRING_TYPE,0,trackdata,info.size)>0)
+		for(int32 i=0; i<fCDData.CountTracks(); i++)
 		{
-			trackdata[info.size] = 0;
-			BString tmp = GetLineFromString(trackdata);
-			char *index;
-			
-			fTrackNames.clear();
-			fArtist = tmp;
-			fArtist.Truncate(fArtist.FindFirst(" - "));
-			
-			fTitle = strchr(tmp.String(),'-') + 2;
-			
-			index = strchr(trackdata,'\n') + 1;
-			while(*index)
-			{
-				tmp = GetLineFromString(index);
-				
-				fTrackNames.push_back(tmp);
-				index = strchr(index,'\n') + 1;
-			}
-			
-			return true;
+			cdaudio_time *item = fCDData.TrackTimeAt(i);
+			*item = times[i+1] - times[i];
 		}
+		
+		status = B_OK;
 	}
 	
-	// If we got this far, it means the file is corrupted, so nuke it and get a new one
-	BEntry entry(&ref);
-	entry.Remove();
-	return false;
+	return status;
 }
 
 int32 
 CDDBQuery::QueryThread(void *owner)
 {
 	CDDBQuery *query = (CDDBQuery *)owner;
-	
 	try 
 	{
 		signal(kTerminatingSignal, DoNothing);
-	
-		if(!query->OpenContentFile(query->fDiscID)) 
+		
+		if(query->OpenContentFile(query->fCDData.DiscID())!=B_OK)
 		{
 			// new content file, read it in from the server
 			Connector connection(query);
@@ -600,58 +1004,36 @@ CDDBQuery::WriteFile(void)
 	create_directory(path.Path(), 0755);
 	
 	BString filename(path.Path());
-	filename << "/" << fArtist << " - " << fTitle;
+	filename << "/" << fCDData.Artist() << " - " << fCDData.Album();
 	
 	if(filename.Compare("Artist")==0)
-		filename << "." << fDiscID;
+		filename << "." << fCDData.DiscID();
 	
-	BFile file(filename.String(), B_READ_WRITE | B_CREATE_FILE | B_FAIL_IF_EXISTS);
-	if(file.InitCheck() != B_OK)
-		return;
-	
-	BString entry;
-	char timestring[10];
-	
-	sprintf(timestring,"%.2ld:%.2ld",fDiscLength / 60, fDiscLength % 60);
-	
-	entry << fArtist << " - " << fTitle << "\t" << timestring << "\n";
-	file.Write(entry.String(),entry.Length());
-	
-	BString tracksattr(fArtist);
-	tracksattr << " - " << fTitle << "\n";
-	
-	for(int32 i=0; i<fTrackCount; i++)
-	{
-		entry = fTrackNames[i];
-		
-		sprintf(timestring,"%.2ld:%.2ld",fTrackTimes[i+1].minutes-fTrackTimes[i].minutes,
-				fTrackTimes[i].seconds);
-		
-		entry << "\t" << timestring << "\n";
-		file.Write(entry.String(),entry.Length());
-		
-		tracksattr << fTrackNames[i] << "\n";
-	}
-	
-	file.WriteAttr("CD:key", B_INT32_TYPE, 0, &fDiscID, sizeof(int32));
-	file.WriteAttr("CD:tracks", B_STRING_TYPE, 0, tracksattr.String(), tracksattr.Length());
+	fCDData.Save(filename.String());
 }
 
 void
 CDDBQuery::ParseData(const BString &data)
 {
-	fTitle = "";
-	fTrackNames.clear();
+	// Can't simply call MakeEmpty() because the thread is spawned when the discID kept in fCDData
+	// is not the same as what's in the drive and MakeEmpty invalidates *everything* in the object.
+	// Considering that we reassign everything here, simply emptying the track list should be sufficient
+	for(int16 i = fCDData.CountTracks(); i>=0; i--)
+		fCDData.RemoveTrack(i);
+	
+	vector<cdaudio_time> trackTimes;
+	GetTrackTimes(&fSCSIData,trackTimes);
+	int32 trackCount = GetTrackCount(&fSCSIData);
 	
 	if(data.CountChars()<1)
 	{
 		// This case occurs when the CDDB lookup fails. On these occasions, we need to generate
 		// the file ourselves. This is actually pretty easy.
-		fArtist = "Artist";
-		fTitle = "Audio CD";
-		fCategory = "misc";
+		fCDData.SetArtist("Artist");
+		fCDData.SetAlbum("Audio CD");
+		fCDData.SetGenre("misc");
 		
-		for(int32 i=0; i<fTrackCount; i++)
+		for(int32 i=0; i<trackCount; i++)
 		{
 			BString trackname("Track ");
 			
@@ -659,7 +1041,9 @@ CDDBQuery::ParseData(const BString &data)
 				trackname << "0";
 			
 			trackname << i+1;
-			fTrackNames.push_back(trackname.String());
+			
+			cdaudio_time time = trackTimes[i+1] - trackTimes[i];
+			fCDData.AddTrack(trackname.String(),time);
 		}
 		
 	}
@@ -671,41 +1055,39 @@ CDDBQuery::ParseData(const BString &data)
 	
 	int32 pos;
 	
+	pos = data.FindFirst("DYEAR=");
+	if(pos > 0)
+	{
+		BString artist,album;
+		artist = album = GetLineFromString(data.String() + sizeof("DYEAR") + pos);
+		
+		// TODO: finish, once I find an entry which actually has a year in it
+		BAlert *alert = new BAlert("SimplyVorbis","DYEAR entry found\n","OK");
+		alert->Go();
+		
+	}
+	
 	pos = data.FindFirst("DTITLE=");
 	if(pos > 0)
 	{
-		fTitle = fArtist = GetLineFromString(data.String() + sizeof("DTITLE") + pos);
+		BString artist,album;
+		artist = album = GetLineFromString(data.String() + sizeof("DTITLE") + pos);
 		
-		pos = fArtist.FindFirst(" / ");
+		pos = artist.FindFirst(" / ");
 		if(pos > 0)
-			fArtist.Truncate(pos);
+			artist.Truncate(pos);
+		fCDData.SetArtist(artist.String());
 		
-		fTitle = fTitle.String() + pos + sizeof(" / ") - 1;
+		album = album.String() + pos + sizeof(" / ") - 1;
+		fCDData.SetAlbum(album.String());
 	}
 	
-	
-	fCategory = GetLineFromString(data.String() + 4);
-	pos = fCategory.FindFirst(" ");
+	BString category = GetLineFromString(data.String() + 4);
+	pos = category.FindFirst(" ");
 	if(pos > 0)
-		fCategory.Truncate(pos);
+		category.Truncate(pos);
+	fCDData.SetGenre(category.String());
 	
-	
-	pos = data.FindFirst("Disc length: ");
-	if(pos > 0)
-	{
-		BString discLengthString = GetLineFromString(data.String() + pos);
-		pos = discLengthString.FindFirst(" seconds");
-		if(pos > 0)
-		{
-			discLengthString.Truncate(pos);
-		
-			discLengthString = discLengthString.String() + sizeof("Disc length:");
-			fDiscLength = atoi(discLengthString.String());
-		}
-		else
-			fDiscLength = -1;
-	}
-
 	pos = data.FindFirst("TTITLE0=");
 	if(pos > 0)
 	{
@@ -716,19 +1098,25 @@ CDDBQuery::ParseData(const BString &data)
 		{
 			BString trackName = data.String() + pos + searchString.Length();
 			trackName.Truncate(trackName.FindFirst("\n"));
-			fTrackNames.push_back(trackName);
+			
+			cdaudio_time tracktime=trackTimes[trackCount+1] - trackTimes[trackCount];
+			fCDData.AddTrack(trackName.String(),tracktime);
 			
 			trackCount++;
 			searchString = "TTITLE";
 			searchString << trackCount << "=";
 			pos = data.FindFirst(searchString.String(),pos);
 		}
-		fTrackCount = trackCount;
 	}
 }
 
+void CDDBQuery::SetData(const CDDBData &data)
+{
+	fCDData=data;
+}
+
 BString
-CDDBQuery::GetLineFromString(const char *string)
+GetLineFromString(const char *string)
 {
 	if(!string)
 		return NULL;
