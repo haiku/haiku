@@ -56,7 +56,6 @@ SharedLibrary libhaikuappserver.so :
 	ColorSet.cpp
 	CursorData.cpp
 	CursorSet.cpp
-	Decorator.cpp
 	DesktopSettings.cpp
 	DrawState.cpp
 	FontFamily.cpp
@@ -82,6 +81,7 @@ AddResources haiku_app_server : app_server.rdef ;
 
 Server haiku_app_server :
 	# Misc. Sources
+	Decorator.cpp
 	DebugInfoManager.cpp
 	SubWindowList.cpp
 	#PicturePlayer.cpp

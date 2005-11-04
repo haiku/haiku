@@ -41,176 +41,157 @@ public:
 								DrawingEngine(HWInterface* interface = NULL);
 	virtual						~DrawingEngine();
 
-	// when implementing, be sure to call the inherited version
-	virtual status_t			Initialize();
-	virtual void				Shutdown();
+			// when implementing, be sure to call the inherited version
+			status_t			Initialize();
+			void				Shutdown();
 
-	virtual	void				Update();
+			// locking
+			bool				Lock();
+			void				Unlock();
 
-	virtual void				SetHWInterface(HWInterface* interface);
+			bool				WriteLock();
+			void				WriteUnlock();
 
-	// clipping for all drawing functions, passing a NULL region
-	// will remove any clipping (drawing allowed everywhere)
-	virtual	void				ConstrainClippingRegion(BRegion* region);
+			// for "changing" hardware
+			void				Update();
 
-	// drawing functions
-	virtual	void				CopyRegion(		/*const*/ BRegion* region,
+			void				SetHWInterface(HWInterface* interface);
+
+			// for screen shots
+			bool				DumpToFile(		const char *path);
+			ServerBitmap*		DumpToBitmap();
+
+
+			// clipping for all drawing functions, passing a NULL region
+			// will remove any clipping (drawing allowed everywhere)
+			void				ConstrainClippingRegion(BRegion* region);
+
+			// drawing functions
+			void				CopyRegion(		/*const*/ BRegion* region,
 												int32 xOffset,
 												int32 yOffset);
 
-	virtual	void				CopyRegionList(	BList* list,
+			void				CopyRegionList(	BList* list,
 												BList* pList,
 												int32 rCount,
 												BRegion* clipReg);
 
-	virtual void				InvertRect(		BRect r);
+			void				InvertRect(		BRect r);
 
-	virtual	void				DrawBitmap(		ServerBitmap *bitmap,
+			void				DrawBitmap(		ServerBitmap *bitmap,
 												const BRect &source,
 												const BRect &dest,
 												const DrawState *d);
+			// drawing primitives
 
-	virtual	void				FillArc(		BRect r,
+			void				DrawArc(		BRect r,
 												const float &angle,
 												const float &span,
-												const DrawState *d);
+												const DrawState *d,
+												bool filled);
 
-	virtual	void				FillBezier(		BPoint *pts,
-												const DrawState *d);
+			void				DrawBezier(		BPoint *pts,
+												const DrawState *d,
+												bool filled);
 
-	virtual	void				FillEllipse(	BRect r,
-												const DrawState *d);
+			void				DrawEllipse(	BRect r,
+												const DrawState *d,
+												bool filled);
 
-	virtual	void				FillPolygon(	BPoint *ptlist,
-												int32 numpts,
-												BRect bounds,
-												const DrawState *d);
-
-	virtual	void				FillRect(		BRect r,
-												const RGBColor &color);
-
-	virtual	void				FillRect(		BRect r,
-												const DrawState *d);
-
-	virtual	void				FillRegion(		BRegion &r,
-												const DrawState *d);
-
-	virtual	void				FillRoundRect(	BRect r,
-												const float &xrad,
-												const float &yrad,
-												const DrawState *d);
-
-	virtual	void				FillShape(		const BRect &bounds,
-												const int32 &opcount,
-												const int32 *oplist, 
-												const int32 &ptcount,
-												const BPoint *ptlist,
-												const DrawState *d);
-
-	virtual	void				FillTriangle(	BPoint *pts,
-												BRect bounds,
-												const DrawState *d);
-
-	virtual	void				StrokeArc(		BRect r,
-												const float &angle,
-												const float &span,
-												const DrawState *d);
-
-	virtual	void				StrokeBezier(	BPoint *pts,
-												const DrawState *d);
-
-	virtual	void				StrokeEllipse(	BRect r,
-												const DrawState *d);
-
-	// this version used by Decorator
-	virtual	void				StrokeLine(		const BPoint &start,
-												const BPoint &end,
-												const RGBColor &color);
-
-	virtual	void				StrokeLine(		const BPoint &start,
-												const BPoint &end,
-												DrawState *d);
-
-	virtual void				StrokeLineArray(const int32 &numlines,
-												const LineArrayData *data,
-												const DrawState *d);
-
-	// this version used by Decorator
-	virtual	void				StrokePoint(	const BPoint &pt,
-												const RGBColor &color);
-
-	virtual	void				StrokePoint(	const BPoint &pt,
-												DrawState *d);
-
-	virtual	void				StrokePolygon(	BPoint *ptlist,
+			void				DrawPolygon(	BPoint *ptlist,
 												int32 numpts,
 												BRect bounds,
 												const DrawState *d,
-												bool is_closed=true);
+												bool filled,
+												bool closed);
 
-	// this version used by Decorator
-	virtual	void				StrokeRect(		BRect r,
+			// this version used by Decorator
+			void				StrokeRect(		BRect r,
 												const RGBColor &color);
 
-	virtual	void				StrokeRect(		BRect r,
+			void				FillRect(		BRect r,
+												const RGBColor &color);
+
+			void				StrokeRect(		BRect r,
 												const DrawState *d);
 
-	virtual	void				StrokeRegion(	BRegion &r,
+			void				FillRect(		BRect r,
 												const DrawState *d);
 
-	virtual	void				StrokeRoundRect(BRect r,
+			// for debugging purposes?
+			void				StrokeRegion(	BRegion &r,
+												const DrawState *d);
+
+			void				FillRegion(		BRegion &r,
+												const DrawState *d);
+
+			void				DrawRoundRect(	BRect r,
 												const float &xrad,
 												const float &yrad,
-												const DrawState *d);
+												const DrawState *d,
+												bool filled);
 
-	virtual	void				StrokeShape(	const BRect &bounds,
+			void				DrawShape(		const BRect &bounds,
 												const int32 &opcount,
 												const int32 *oplist, 
 												const int32 &ptcount,
 												const BPoint *ptlist,
-												const DrawState *d);
+												const DrawState *d,
+												bool filled);
 
-	virtual	void				StrokeTriangle(	BPoint *pts,
+			void				DrawTriangle(	BPoint *pts,
 												const BRect &bounds,
+												const DrawState *d,
+												bool filled);
+
+			// this version used by Decorator
+			void				StrokeLine(		const BPoint &start,
+												const BPoint &end,
+												const RGBColor &color);
+
+			void				StrokeLine(		const BPoint &start,
+												const BPoint &end,
+												DrawState *d);
+
+			void				StrokeLineArray(const int32 &numlines,
+												const LineArrayData *data,
 												const DrawState *d);
 
-	// Font-related calls
+			// this version used by Decorator
+			void				StrokePoint(	const BPoint &pt,
+												const RGBColor &color);
+
+			void				StrokePoint(	const BPoint &pt,
+												DrawState *d);
+
+			// -------- text related calls
 	
-	// DrawState is NOT const because this call updates the pen position in the passed DrawState
-	virtual	void				DrawString(		const char* string,
+			// DrawState is NOT const because this call updates the pen position in the passed DrawState
+			void				DrawString(		const char* string,
 												int32 length,
 												const BPoint& pt,
 												DrawState* d,
 												escapement_delta* delta = NULL);
 
-/*	virtual	void				DrawString(		const char *string,
+/*			void				DrawString(		const char *string,
 												const int32 &length,
 												const BPoint &pt,
 												const RGBColor &color,
 												escapement_delta *delta=NULL);*/
 
-	virtual	float				StringWidth(	const char* string,
+			float				StringWidth(	const char* string,
 												int32 length,
 												const DrawState* d,
 												escapement_delta* delta = NULL);
 
-	virtual	float				StringWidth(	const char* string,
+			float				StringWidth(	const char* string,
 												int32 length,
 												const ServerFont& font,
 												escapement_delta* delta = NULL);
 
-	virtual	float				StringHeight(	const char* string,
+			float				StringHeight(	const char* string,
 												int32 length,
 												const DrawState* d);
-
-	virtual bool				Lock();
-	virtual void				Unlock();
-
-			bool				WriteLock();
-			void				WriteUnlock();
-
-	virtual bool				DumpToFile(		const char *path);
-	virtual ServerBitmap*		DumpToBitmap();
 
  private:
 			BRect				_CopyRect(		BRect r,

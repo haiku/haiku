@@ -27,7 +27,6 @@ SharedLibrary libappserver.so :
 	ColorSet.cpp
 	CursorData.cpp
 	CursorSet.cpp
-	Decorator.cpp
 	DrawState.cpp
 	FontFamily.cpp
 	IPoint.cpp
@@ -49,6 +48,7 @@ SharedLibrary libappserver.so :
 
 Server app_server :
 	# Misc. Sources
+	Decorator.cpp
 	DebugInfoManager.cpp
 	SubWindowList.cpp
 	PicturePlayer.cpp

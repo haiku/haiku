@@ -1824,10 +1824,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&angle);
 			link.Read<float>(&span);
 
-			if (code == AS_STROKE_ARC)
-				driver->StrokeArc(fCurrentLayer->ConvertToTop(r),angle,span, fCurrentLayer->CurrentState());
-			else
-				driver->FillArc(fCurrentLayer->ConvertToTop(r),angle,span, fCurrentLayer->CurrentState());
+			driver->DrawArc(fCurrentLayer->ConvertToTop(r), angle, span,
+							fCurrentLayer->CurrentState(), code == AS_FILL_ARC);
 
 			break;
 		}
@@ -1842,10 +1840,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 				pts[i] = fCurrentLayer->ConvertToTop(pts[i]);
 			}
 				
-			if (code == AS_STROKE_BEZIER)
-				driver->StrokeBezier(pts, fCurrentLayer->CurrentState());
-			else
-				driver->FillBezier(pts, fCurrentLayer->CurrentState());
+			driver->DrawBezier(pts, fCurrentLayer->CurrentState(), code == AS_FILL_BEZIER);
 
 			break;
 		}
@@ -1857,10 +1852,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			BRect rect;
 			link.Read<BRect>(&rect);
 
-			if (code == AS_STROKE_ELLIPSE)
-				driver->StrokeEllipse(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->CurrentState());
-			else
-				driver->FillEllipse(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->CurrentState());
+			driver->DrawEllipse(fCurrentLayer->ConvertToTop(rect),
+								fCurrentLayer->CurrentState(), code == AS_FILL_ELLIPSE);
 
 			break;
 		}
@@ -1875,10 +1868,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&xrad);
 			link.Read<float>(&yrad);
 
-			if (code == AS_STROKE_ROUNDRECT)
-				driver->StrokeRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad, fCurrentLayer->CurrentState());
-			else
-				driver->FillRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad, fCurrentLayer->CurrentState());
+			driver->DrawRoundRect(fCurrentLayer->ConvertToTop(rect), xrad, yrad,
+								  fCurrentLayer->CurrentState(), code == AS_FILL_ROUNDRECT);
 
 			break;
 		}
@@ -1897,10 +1888,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			link.Read<BRect>(&rect);
 
-			if (code == AS_STROKE_TRIANGLE)
-				driver->StrokeTriangle(pts, fCurrentLayer->ConvertToTop(rect), fCurrentLayer->CurrentState());
-			else
-				driver->FillTriangle(pts, fCurrentLayer->ConvertToTop(rect), fCurrentLayer->CurrentState());
+			driver->DrawTriangle(pts, fCurrentLayer->ConvertToTop(rect),
+								 fCurrentLayer->CurrentState(), code == AS_FILL_TRIANGLE);
 
 			break;
 		}
@@ -1910,7 +1899,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_POLYGON\n", Title()));
 
 			BRect polyframe;
-			bool isclosed;
+			bool isclosed = true;
 			int32 pointcount;
 			BPoint *pointlist;
 
@@ -1926,10 +1915,9 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			for (int32 i = 0; i < pointcount; i++)
 				pointlist[i] = fCurrentLayer->ConvertToTop(pointlist[i]);
 
-			if (code == AS_STROKE_POLYGON)
-				driver->StrokePolygon(pointlist, pointcount, polyframe, fCurrentLayer->CurrentState(), isclosed);
-			else
-				driver->FillPolygon(pointlist, pointcount, polyframe, fCurrentLayer->CurrentState());
+			driver->DrawPolygon(pointlist, pointcount, polyframe,
+								fCurrentLayer->CurrentState(), code == AS_FILL_POLYGON,
+								isclosed);
 
 			delete [] pointlist;
 			break;
@@ -1956,10 +1944,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			for (int32 i = 0; i < ptcount; i++)
 				ptlist[i] = fCurrentLayer->ConvertToTop(ptlist[i]);
 
-			if (code == AS_STROKE_SHAPE)
-				driver->StrokeShape(shaperect, opcount, oplist, ptcount, ptlist, fCurrentLayer->CurrentState());
-			else
-				driver->FillShape(shaperect, opcount, oplist, ptcount, ptlist, fCurrentLayer->CurrentState());
+			driver->DrawShape(shaperect, opcount, oplist, ptcount, ptlist,
+							  fCurrentLayer->CurrentState(), code == AS_FILL_SHAPE);
 
 			delete[] oplist;
 			delete[] ptlist;

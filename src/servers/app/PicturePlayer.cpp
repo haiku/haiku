@@ -174,49 +174,36 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, DrawState *d)
 				break;
 			}
 			case B_PIC_STROKE_ROUND_RECT:
-			{
-				BRect rect = GetRect();
-				BPoint radii = GetCoord();
-				fdriver->StrokeRoundRect(rect,radii.x,radii.y,&fldata);
-				break;
-			}
 			case B_PIC_FILL_ROUND_RECT:
 			{
 				BRect rect = GetRect();
 				BPoint radii = GetCoord();
-				fdriver->FillRoundRect(rect,radii.x,radii.y,&fldata);
+				fdriver->DrawRoundRect(rect, radii.x, radii.y,
+									  &fldata, op == B_PIC_FILL_ROUND_RECT);
 				break;
 			}
 			case B_PIC_STROKE_BEZIER:
-			{
-				BPoint control[4];
-				GetData(control, sizeof(control));
-				fdriver->StrokeBezier(control,&fldata);
-				break;
-			}
 			case B_PIC_FILL_BEZIER:
 			{
 				BPoint control[4];
 				GetData(control, sizeof(control));
-				fdriver->FillBezier(control,&fldata);
+				fdriver->DrawBezier(control, &fldata,
+									op == B_PIC_FILL_BEZIER);
 				break;
 			}
 			case B_PIC_STROKE_POLYGON:
-			{
-				int32 numPoints = GetInt32();
-				BPoint *points = new BPoint[numPoints];
-				GetData(points, numPoints * sizeof(BPoint));
-				bool isClosed = GetBool();
-				fdriver->StrokePolygon(points,numPoints,CalculatePolygonBounds(points,numPoints),&fldata,isClosed);
-				delete points;
-				break;
-			}
 			case B_PIC_FILL_POLYGON:
 			{
 				int32 numPoints = GetInt32();
 				BPoint *points = new BPoint[numPoints];
 				GetData(points, numPoints * sizeof(BPoint));
-				fdriver->FillPolygon(points,numPoints,CalculatePolygonBounds(points,numPoints),&fldata);
+				bool closed = true;
+				if (op == B_PIC_STROKE_POLYGON)
+					closed = GetBool();
+				fdriver->DrawPolygon(points, numPoints,
+									 CalculatePolygonBounds(points, numPoints),
+									 &fldata, op == B_PIC_FILL_POLYGON,
+									 closed);
 				delete points;
 				break;
 			}
@@ -271,41 +258,28 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, DrawState *d)
 				break;
 			}
 			case B_PIC_STROKE_ARC:
-			{
-				BPoint center = GetCoord();
-				BPoint radii = GetCoord();
-				float startTheta = GetFloat();
-				float arcTheta = GetFloat();
-				fdriver->StrokeArc(BRect(center.x-radii.x,center.y-radii.y,center.x+radii.x,
-						center.y+radii.y),startTheta, arcTheta, &fldata);
-				break;
-			}
 			case B_PIC_FILL_ARC:
 			{
 				BPoint center = GetCoord();
 				BPoint radii = GetCoord();
 				float startTheta = GetFloat();
 				float arcTheta = GetFloat();
-				fdriver->FillArc(BRect(center.x-radii.x,center.y-radii.y,center.x+radii.x,
-						center.y+radii.y),startTheta, arcTheta, &fldata);
+				fdriver->DrawArc(BRect(center.x - radii.x,
+									   center.y - radii.y,
+									   center.x + radii.x,
+									   center.y+radii.y),
+								  startTheta, arcTheta, &fldata,
+								  op == B_PIC_FILL_ARC);
 				break;
 			}
 			case B_PIC_STROKE_ELLIPSE:
-			{
-				BRect rect = GetRect();
-				BPoint center;
-				BPoint radii((rect.Width() + 1) / 2.0f, (rect.Height() + 1) / 2.0f);
-				center = rect.LeftTop() + radii;
-				fdriver->StrokeEllipse(rect,&fldata);
-				break;
-			}
 			case B_PIC_FILL_ELLIPSE:
 			{
 				BRect rect = GetRect();
 				BPoint center;
 				BPoint radii((rect.Width() + 1) / 2.0f, (rect.Height() + 1) / 2.0f);
 				center = rect.LeftTop() + radii;
-				fdriver->FillEllipse(rect,&fldata);
+				fdriver->DrawEllipse(rect, &fldata, op == B_PIC_FILL_ELLIPSE);
 				break;
 			}
 			case B_PIC_ENTER_STATE_CHANGE:

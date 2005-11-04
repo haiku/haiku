@@ -259,7 +259,7 @@ is_above(const BRect& a, const BRect& b)
 // CopyRegion
 void
 DrawingEngine::CopyRegion(/*const*/ BRegion* region,
-								 int32 xOffset, int32 yOffset)
+						  int32 xOffset, int32 yOffset)
 {
 	// NOTE: Write locking because we might use HW acceleration.
 	// This needs to be investigated, I'm doing this because of
@@ -389,7 +389,7 @@ DrawingEngine::CopyRegion(/*const*/ BRegion* region,
 // make much sense to me.
 void
 DrawingEngine::CopyRegionList(BList* list, BList* pList,
-									 int32 rCount, BRegion* clipReg)
+							  int32 rCount, BRegion* clipReg)
 {
 	// NOTE: Write locking because we might use HW acceleration.
 	// This needs to be investigated, I'm doing this because of
@@ -440,8 +440,8 @@ DrawingEngine::InvertRect(BRect r)
 // DrawBitmap
 void
 DrawingEngine::DrawBitmap(ServerBitmap *bitmap,
-								 const BRect &source, const BRect &dest,
-								 const DrawState *d)
+						  const BRect &source, const BRect &dest,
+						  const DrawState *d)
 {
 	if (Lock()) {
 		BRect clipped = fPainter->ClipRect(dest);
@@ -459,25 +459,32 @@ DrawingEngine::DrawBitmap(ServerBitmap *bitmap,
 	}
 }
 
-// FillArc
+// DrawArc
 void
-DrawingEngine::FillArc(BRect r, const float &angle,
-							  const float &span, const DrawState *d)
+DrawingEngine::DrawArc(BRect r, const float &angle,
+					   const float &span, const DrawState *d,
+					   bool filled)
 {
 	if (Lock()) {
 		make_rect_valid(r);
-		BRect clipped = fPainter->ClipRect(r);
+		BRect clipped(r);
+		if (!filled)
+			extend_by_stroke_width(clipped, d);
+		clipped = fPainter->ClipRect(r);
 		if (clipped.IsValid()) {
 			fGraphicsCard->HideSoftwareCursor(clipped);
 	
 			fPainter->SetDrawState(d);
 	
 			float xRadius = r.Width() / 2.0;
-			float yRadius = r.Width() / 2.0;
+			float yRadius = r.Height() / 2.0;
 			BPoint center(r.left + xRadius,
 						  r.top + yRadius);
-	
-			fPainter->FillArc(center, xRadius, yRadius, angle, span);
+
+			if (filled)	
+				fPainter->FillArc(center, xRadius, yRadius, angle, span);
+			else
+				fPainter->StrokeArc(center, xRadius, yRadius, angle, span);
 	
 			fGraphicsCard->Invalidate(clipped);
 			fGraphicsCard->ShowSoftwareCursor();
@@ -487,16 +494,16 @@ DrawingEngine::FillArc(BRect r, const float &angle,
 	}
 }
 
-// FillBezier
+// DrawBezier
 void
-DrawingEngine::FillBezier(BPoint *pts, const DrawState *d)
+DrawingEngine::DrawBezier(BPoint *pts, const DrawState *d, bool filled)
 {
 	if (Lock()) {
 		fGraphicsCard->HideSoftwareCursor();
 
 		fPainter->SetDrawState(d);
-
-		BRect touched = fPainter->FillBezier(pts);
+		BRect touched = filled ? fPainter->FillBezier(pts)
+							   : fPainter->StrokeBezier(pts);
 
 		fGraphicsCard->Invalidate(touched);
 		fGraphicsCard->ShowSoftwareCursor();
@@ -505,24 +512,30 @@ DrawingEngine::FillBezier(BPoint *pts, const DrawState *d)
 	}
 }
 
-// FillEllipse
+// DrawEllipse
 void
-DrawingEngine::FillEllipse(BRect r, const DrawState *d)
+DrawingEngine::DrawEllipse(BRect r, const DrawState *d, bool filled)
 {
 	if (Lock()) {
 		make_rect_valid(r);
-		BRect clipped = fPainter->ClipRect(r);
+		BRect clipped = r;
+		if (!filled)
+			extend_by_stroke_width(clipped, d);
+		clipped = fPainter->ClipRect(clipped);
 		if (clipped.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(clipped);
-
+			fGraphicsCard->HideSoftwareCursor(r);
+	
 			fPainter->SetDrawState(d);
 	
 			float xRadius = r.Width() / 2.0;
 			float yRadius = r.Height() / 2.0;
 			BPoint center(r.left + xRadius,
 						  r.top + yRadius);
-	
-			fPainter->FillEllipse(center, xRadius, yRadius);
+
+			if (filled)
+				fPainter->FillEllipse(center, xRadius, yRadius);
+			else
+				fPainter->StrokeEllipse(center, xRadius, yRadius);
 	
 			fGraphicsCard->Invalidate(clipped);
 			fGraphicsCard->ShowSoftwareCursor();
@@ -532,21 +545,57 @@ DrawingEngine::FillEllipse(BRect r, const DrawState *d)
 	}
 }
 
-// FillPolygon
+// DrawPolygon
 void
-DrawingEngine::FillPolygon(BPoint *ptlist, int32 numpts,
-								  BRect bounds, const DrawState *d)
+DrawingEngine::DrawPolygon(BPoint* ptlist, int32 numpts,
+						   BRect bounds, const DrawState* d,
+						   bool filled, bool closed)
 {
 	if (Lock()) {
 		make_rect_valid(bounds);
-		BRect clipped = fPainter->ClipRect(bounds);
-		if (clipped.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(clipped);
-
-			fPainter->SetDrawState(d);
-			fPainter->FillPolygon(ptlist, numpts);
+		if (!filled)
+			extend_by_stroke_width(bounds, d);
+		bounds = fPainter->ClipRect(bounds);
+		if (bounds.IsValid()) {
+			fGraphicsCard->HideSoftwareCursor(bounds);
 	
-			fGraphicsCard->Invalidate(clipped);
+			fPainter->SetDrawState(d);
+			if (filled)
+				fPainter->FillPolygon(ptlist, numpts);
+			else
+				fPainter->StrokePolygon(ptlist, numpts, closed);
+	
+			fGraphicsCard->Invalidate(bounds);
+			fGraphicsCard->ShowSoftwareCursor();
+		}
+
+		Unlock();
+	}
+}
+
+// StrokeRect
+// 
+// this function is used to draw a one pixel wide rect
+void
+DrawingEngine::StrokeRect(BRect r, const RGBColor &color)
+{
+	if (Lock()) {
+		make_rect_valid(r);
+		BRect clipped = fPainter->ClipRect(r);
+		if (clipped.IsValid()) {
+
+			fGraphicsCard->HideSoftwareCursor(clipped);
+	
+			fPainter->StrokeRect(r, color.GetColor32());
+	
+			fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(r.left, r.top,
+															   r.right, r.top)));
+			fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(r.left, r.top + 1,
+															   r.left, r.bottom - 1)));
+			fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(r.right, r.top + 1,
+															   r.right, r.bottom - 1)));
+			fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(r.left, r.bottom,
+															   r.right, r.bottom)));
 			fGraphicsCard->ShowSoftwareCursor();
 		}
 
@@ -582,6 +631,31 @@ DrawingEngine::FillRect(BRect r, const RGBColor& color)
 		}
 
 		WriteUnlock();
+	}
+}
+
+// StrokeRect
+void
+DrawingEngine::StrokeRect(BRect r, const DrawState *d)
+{
+	if (Lock()) {
+		// support invalid rects
+		make_rect_valid(r);
+		BRect clipped(r);
+		extend_by_stroke_width(clipped, d);
+		clipped = fPainter->ClipRect(clipped);
+		if (clipped.IsValid()) {
+	
+			fGraphicsCard->HideSoftwareCursor(clipped);
+	
+			fPainter->SetDrawState(d);
+			fPainter->StrokeRect(r);
+	
+			fGraphicsCard->Invalidate(clipped);
+			fGraphicsCard->ShowSoftwareCursor();
+		}
+
+		Unlock();
 	}
 }
 
@@ -628,6 +702,34 @@ DrawingEngine::FillRect(BRect r, const DrawState *d)
 		}
 
 		WriteUnlock();
+	}
+}
+
+// StrokeRegion
+void
+DrawingEngine::StrokeRegion(BRegion& r, const DrawState *d)
+{
+	if (Lock()) {
+		BRect clipped(r.Frame());
+		extend_by_stroke_width(clipped, d);
+		clipped = fPainter->ClipRect(clipped);
+		if (clipped.IsValid()) {
+			fGraphicsCard->HideSoftwareCursor(clipped);
+	
+			fPainter->SetDrawState(d);
+	
+			BRect touched = fPainter->StrokeRect(r.RectAt(0));
+	
+			int32 count = r.CountRects();
+			for (int32 i = 1; i < count; i++) {
+				touched = touched | fPainter->StrokeRect(r.RectAt(i));
+			}
+	
+			fGraphicsCard->Invalidate(touched);
+			fGraphicsCard->ShowSoftwareCursor();
+		}
+
+		Unlock();
 	}
 }
 
@@ -678,21 +780,24 @@ DrawingEngine::FillRegion(BRegion& r, const DrawState *d)
 	}
 }
 
-// FillRoundRect
+// DrawRoundRect
 void
-DrawingEngine::FillRoundRect(BRect r,
-									const float &xrad, const float &yrad,
-									const DrawState *d)
+DrawingEngine::DrawRoundRect(BRect r, const float &xrad,
+							 const float &yrad, const DrawState *d,
+							 bool filled)
 {
 	if (Lock()) {
+		// NOTE: the stroke does not extend past "r" in R5,
+		// though I consider this unexpected behaviour.
 		make_rect_valid(r);
 		BRect clipped = fPainter->ClipRect(r);
 		if (clipped.IsValid()) {
 			fGraphicsCard->HideSoftwareCursor(clipped);
-		
+	
 			fPainter->SetDrawState(d);
-			BRect touched = fPainter->FillRoundRect(r, xrad, yrad);
-		
+			BRect touched = filled ? fPainter->FillRoundRect(r, xrad, yrad)
+								   : fPainter->StrokeRoundRect(r, xrad, yrad);
+	
 			fGraphicsCard->Invalidate(touched);
 			fGraphicsCard->ShowSoftwareCursor();
 		}
@@ -701,107 +806,39 @@ DrawingEngine::FillRoundRect(BRect r,
 	}
 }
 
-// FillShape
+// DrawShape
 void
-DrawingEngine::FillShape(const BRect &bounds,
-								const int32 &opcount, const int32 *oplist, 
-								const int32 &ptcount, const BPoint *ptlist,
-								const DrawState *d)
+DrawingEngine::DrawShape(const BRect &bounds, const int32 &opcount,
+						 const int32 *oplist, const int32 &ptcount,
+						 const BPoint *ptlist, const DrawState *d,
+						 bool filled)
 {
 	if (Lock()) {
 
-printf("DrawingEngine::FillShape() - what is this stuff that gets passed here?\n");
+printf("DrawingEngine::DrawShape() - what is this stuff that gets passed here?\n");
 
 		Unlock();
 	}
 }
 
-// FillTriangle
+// DrawTriangle
 void
-DrawingEngine::FillTriangle(BPoint *pts, BRect bounds,
-								   const DrawState *d)
+DrawingEngine::DrawTriangle(BPoint* pts, const BRect& bounds,
+							const DrawState* d, bool filled)
 {
 	if (Lock()) {
-		bounds = fPainter->ClipRect(bounds);
-		if (bounds.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(bounds);
-	
-			fPainter->SetDrawState(d);
-			fPainter->FillTriangle(pts[0], pts[1], pts[2]);
-	
-			fGraphicsCard->Invalidate(bounds);
-			fGraphicsCard->ShowSoftwareCursor();
-		}
-
-		Unlock();
-	}
-}
-
-// StrokeArc
-void
-DrawingEngine::StrokeArc(BRect r, const float &angle,
-								const float &span, const DrawState *d)
-{
-	if (Lock()) {
-		make_rect_valid(r);
-		BRect clipped = fPainter->ClipRect(r);
-		if (clipped.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(r);
-	
-			fPainter->SetDrawState(d);
-	
-			float xRadius = r.Width() / 2.0;
-			float yRadius = r.Width() / 2.0;
-			BPoint center(r.left + xRadius,
-						  r.top + yRadius);
-	
-			fPainter->StrokeArc(center, xRadius, yRadius, angle, span);
-	
-			fGraphicsCard->Invalidate(clipped);
-			fGraphicsCard->ShowSoftwareCursor();
-		}
-
-		Unlock();
-	}
-}
-
-// StrokeBezier
-void
-DrawingEngine::StrokeBezier(BPoint *pts, const DrawState *d)
-{
-	if (Lock()) {
-		fGraphicsCard->HideSoftwareCursor();
-
-		fPainter->SetDrawState(d);
-		BRect touched = fPainter->StrokeBezier(pts);
-
-		fGraphicsCard->Invalidate(touched);
-		fGraphicsCard->ShowSoftwareCursor();
-
-		Unlock();
-	}
-}
-
-// StrokeEllipse
-void
-DrawingEngine::StrokeEllipse(BRect r, const DrawState *d)
-{
-	if (Lock()) {
-		make_rect_valid(r);
-		BRect clipped = r;
-		extend_by_stroke_width(clipped, d);
+		BRect clipped(bounds);
+		if (!filled)
+			extend_by_stroke_width(clipped, d);
 		clipped = fPainter->ClipRect(clipped);
 		if (clipped.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(r);
+			fGraphicsCard->HideSoftwareCursor(clipped);
 	
 			fPainter->SetDrawState(d);
-	
-			float xRadius = r.Width() / 2.0;
-			float yRadius = r.Height() / 2.0;
-			BPoint center(r.left + xRadius,
-						  r.top + yRadius);
-	
-			fPainter->StrokeEllipse(center, xRadius, yRadius);
+			if (filled)
+				fPainter->FillTriangle(pts[0], pts[1], pts[2]);
+			else
+				fPainter->StrokeTriangle(pts[0], pts[1], pts[2]);
 	
 			fGraphicsCard->Invalidate(clipped);
 			fGraphicsCard->ShowSoftwareCursor();
@@ -862,8 +899,8 @@ DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end, DrawState* con
 // StrokeLineArray
 void
 DrawingEngine::StrokeLineArray(const int32 &numlines,
-									  const LineArrayData *linedata,
-									  const DrawState *d)
+							   const LineArrayData *linedata,
+							   const DrawState *d)
 {
 	if(!d || !linedata || numlines <= 0)
 		return;
@@ -925,172 +962,6 @@ DrawingEngine::StrokePoint(const BPoint& pt, DrawState *context)
 	StrokeLine(pt, pt, context);
 }
 
-// StrokePolygon
-void
-DrawingEngine::StrokePolygon(BPoint* ptlist, int32 numpts,
-									BRect bounds, const DrawState* d,
-									bool closed)
-{
-	if (Lock()) {
-		extend_by_stroke_width(bounds, d);
-		bounds = fPainter->ClipRect(bounds);
-		if (bounds.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(bounds);
-	
-			fPainter->SetDrawState(d);
-			fPainter->StrokePolygon(ptlist, numpts, closed);
-	
-			fGraphicsCard->Invalidate(bounds);
-			fGraphicsCard->ShowSoftwareCursor();
-		}
-
-		Unlock();
-	}
-}
-
-// StrokeRect
-// 
-// this function is used to draw a one pixel wide rect
-void
-DrawingEngine::StrokeRect(BRect r, const RGBColor &color)
-{
-	if (Lock()) {
-		make_rect_valid(r);
-		BRect clipped = fPainter->ClipRect(r);
-		if (clipped.IsValid()) {
-
-			fGraphicsCard->HideSoftwareCursor(clipped);
-	
-			fPainter->StrokeRect(r, color.GetColor32());
-	
-			fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(r.left, r.top,
-															   r.right, r.top)));
-			fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(r.left, r.top + 1,
-															   r.left, r.bottom - 1)));
-			fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(r.right, r.top + 1,
-															   r.right, r.bottom - 1)));
-			fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(r.left, r.bottom,
-															   r.right, r.bottom)));
-			fGraphicsCard->ShowSoftwareCursor();
-		}
-
-		Unlock();
-	}
-}
-
-// StrokeRect
-void
-DrawingEngine::StrokeRect(BRect r, const DrawState *d)
-{
-	if (Lock()) {
-		// support invalid rects
-		make_rect_valid(r);
-		BRect clipped(r);
-		extend_by_stroke_width(clipped, d);
-		clipped = fPainter->ClipRect(clipped);
-		if (clipped.IsValid()) {
-	
-			fGraphicsCard->HideSoftwareCursor(clipped);
-	
-			fPainter->SetDrawState(d);
-			fPainter->StrokeRect(r);
-	
-			fGraphicsCard->Invalidate(clipped);
-			fGraphicsCard->ShowSoftwareCursor();
-		}
-
-		Unlock();
-	}
-}
-
-// StrokeRegion
-void
-DrawingEngine::StrokeRegion(BRegion& r, const DrawState *d)
-{
-	if (Lock()) {
-		BRect clipped(r.Frame());
-		extend_by_stroke_width(clipped, d);
-		clipped = fPainter->ClipRect(clipped);
-		if (clipped.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(clipped);
-	
-			fPainter->SetDrawState(d);
-	
-			BRect touched = fPainter->StrokeRect(r.RectAt(0));
-	
-			int32 count = r.CountRects();
-			for (int32 i = 1; i < count; i++) {
-				touched = touched | fPainter->StrokeRect(r.RectAt(i));
-			}
-	
-			fGraphicsCard->Invalidate(touched);
-			fGraphicsCard->ShowSoftwareCursor();
-		}
-
-		Unlock();
-	}
-}
-
-// StrokeRoundRect
-void
-DrawingEngine::StrokeRoundRect(BRect r, const float &xrad,
-									  const float &yrad, const DrawState *d)
-{
-	if (Lock()) {
-		// NOTE: the stroke does not extend past "r" in R5,
-		// though I consider this unexpected behaviour.
-		make_rect_valid(r);
-		BRect clipped = fPainter->ClipRect(r);
-		if (clipped.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(clipped);
-	
-			fPainter->SetDrawState(d);
-			BRect touched = fPainter->StrokeRoundRect(r, xrad, yrad);
-	
-			fGraphicsCard->Invalidate(touched);
-			fGraphicsCard->ShowSoftwareCursor();
-		}
-
-		Unlock();
-	}
-}
-
-// StrokeShape
-void
-DrawingEngine::StrokeShape(const BRect &bounds, const int32 &opcount,
-								  const int32 *oplist, const int32 &ptcount,
-								  const BPoint *ptlist, const DrawState *d)
-{
-	if (Lock()) {
-
-printf("DrawingEngine::StrokeShape() - what is this stuff that gets passed here?\n");
-
-		Unlock();
-	}
-}
-
-// StrokeTriangle
-void
-DrawingEngine::StrokeTriangle(BPoint *pts, const BRect &bounds,
-									 const DrawState *d)
-{
-	if (Lock()) {
-		BRect clipped(bounds);
-		extend_by_stroke_width(clipped, d);
-		clipped = fPainter->ClipRect(clipped);
-		if (clipped.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(clipped);
-	
-			fPainter->SetDrawState(d);
-			fPainter->StrokeTriangle(pts[0], pts[1], pts[2]);
-	
-			fGraphicsCard->Invalidate(clipped);
-			fGraphicsCard->ShowSoftwareCursor();
-		}
-
-		Unlock();
-	}
-}
 /*
 // DrawString
 void
@@ -1107,8 +978,8 @@ DrawingEngine::DrawString(const char *string, const int32 &length,
 // DrawString
 void
 DrawingEngine::DrawString(const char* string, int32 length,
-								 const BPoint& pt, DrawState* d,
-								 escapement_delta* delta)
+						  const BPoint& pt, DrawState* d,
+						  escapement_delta* delta)
 {
 // TODO: use delta
 	if (Lock()) {
@@ -1141,8 +1012,7 @@ DrawingEngine::DrawString(const char* string, int32 length,
 // StringWidth
 float
 DrawingEngine::StringWidth(const char* string, int32 length,
-								  const DrawState* d,
-								  escapement_delta* delta)
+						   const DrawState* d, escapement_delta* delta)
 {
 // TODO: use delta
 	float width = 0.0;
@@ -1158,8 +1028,7 @@ DrawingEngine::StringWidth(const char* string, int32 length,
 // StringWidth
 float
 DrawingEngine::StringWidth(const char* string, int32 length,
-								  const ServerFont& font,
-								  escapement_delta* delta)
+						   const ServerFont& font, escapement_delta* delta)
 {
 // TODO: use delta
 	FontLocker locker(&font);
@@ -1171,7 +1040,7 @@ DrawingEngine::StringWidth(const char* string, int32 length,
 // StringHeight
 float
 DrawingEngine::StringHeight(const char *string, int32 length,
-								   const DrawState *d)
+							const DrawState *d)
 {
 	float height = 0.0;
 	if (Lock()) {
