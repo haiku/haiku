@@ -1,4 +1,4 @@
-Haiku Mail Daemon Replacement v3.0.2
+Haiku Mail Daemon Replacement v3.0.3
 
 ABOUT:
 
@@ -21,7 +21,7 @@ files:
    It will be installed in /boot/beos/system/lib
 
   mail_daemon
-   This is the new replacement Mail Daemon. It will be installed in 
+   This is the new replacement Mail Daemon. It will be installed in
    /boot/beos/system/servers, overwriting the original mail_daemon file.
 
   BeMail
@@ -31,7 +31,7 @@ files:
    /boot/beos/apps/BeMail
 
   E-mail
-   This is the new e-mail preferences panel. It will be installed to 
+   This is the new e-mail preferences panel. It will be installed to
    /boot/beos/preferences, overwriting the original preferences app.
 
   Addons
@@ -63,7 +63,7 @@ from your Deskbar menu after installing the package.
 
 USAGE:
 
-Open the E-mail preferences app (BeOS Menu/Preferences/E-mail) and 
+Open the E-mail preferences app (BeOS Menu/Preferences/E-mail) and
 configure your accounts. To save all the changes, close the window
 by clicking "Save".  To delete an account, select it and press the
 DEL key or use the Remove button.
@@ -73,7 +73,7 @@ Single-click the icon to open your mail inbox. The field about new messages
 will be available for selection if you have new messages, and will open a
 Tracker query displaying those messages. The Quit option quits the
 mail_daemon. You don't want to do this. Right-clicking the Deskbar replicant
-while pressing the SHIFT key reveals more options for Sending/Receiving 
+while pressing the SHIFT key reveals more options for Sending/Receiving
 emails.
 
 ADDON INSTALLATION:
@@ -81,7 +81,7 @@ ADDON INSTALLATION:
 Add-ons should be installed in /boot/home/config/add-ons/
 mail_daemon/ in the subdirectory specified in the add on documentation.
 This directory will be automatically created by the installation process.
-The distribution contains POP3 (with APOP support), IMAP and SMTP (including 
+The distribution contains POP3 (with APOP support), IMAP and SMTP (including
 SMTP-Auth) protocols, as well as Add Fortune, R5 Daemon Filter, and Match
 Header filters.
 
@@ -92,7 +92,7 @@ in preferences, and choose the appropriate direction to apply them in
 (specified below), then add that filter. You can add several instances of
 the same filter type, although this is only recomended for RuleFilter. Addons
 will be executed in the order they appear in the list, and can be reorderd with
-a simple drag and drop. To install new filters, follow the directions in 
+a simple drag and drop. To install new filters, follow the directions in
 ADDON INSTALLATION.
 
  Add Fortune
@@ -120,7 +120,7 @@ ADDON INSTALLATION.
    them as [ and ] characters instead of marking a set of values. For more
    info on this, read up on regular expressions.
 
- AGMS Bayesian Spam Filter
+ Spam Filter
    This filters out spam. If you want to know more (and you may) more
    documentation can be found in the directory with no spaces in its
    name: AGMSBayesianSpamDocumentation. It even has, unlike this, lots of
@@ -145,7 +145,7 @@ The latest version has the following (interesting) features:
  - IMAP add-on
  - SMTP add-on
  - SSL support
- - Leave messages on server option, with optional delete messages from 
+ - Leave messages on server option, with optional delete messages from
    server after deleting local message.
  - PPP connection detection.
  - Multiple accounts.
@@ -170,8 +170,8 @@ This is a partial list of what we intend to implement. Suggestions are welcome:
 OTHER STUFF:
 
 This program was created by Haiku, Inc. (http://www.haiku-os.org)
-Special thanks goes to Todd Lair, Brad Froehle, David Reid, 
-Rene Gollent and others for helping us with ideas and code. We also would 
+Special thanks goes to Todd Lair, Brad Froehle, David Reid,
+Rene Gollent and others for helping us with ideas and code. We also would
 like to thank the BeOS community in general for their support.
 
 Japanese translation by: Koki (koki@aequus.net) and Jun Suzki.
@@ -185,4 +185,4 @@ Copyright (c)2001-2005, Haiku, Inc.. All rights reserved.
 
 Original software written by Bruno G. Albuquerque (bga@bug-br.org.br), Nathan Whitehorn (nathanw@uchicago.edu), Peter Folk (pfolk@uni.uiuc.edu), Stephan Assmus
 (stippi@yellowbites.com), Alan Ellis, David Reid,Axel Dörfler (axeld@pinc-software.de)
- and Alexander G. M. Smith (agmsmith@rogers.com).
+and Alexander G. M. Smith (agmsmith@rogers.com).

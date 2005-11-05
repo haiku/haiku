@@ -4,10 +4,11 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders mail ;
-	UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
 }
 
 UsePrivateHeaders mail ;
+UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
+
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
 Addon R5\ Daemon\ Filter : mail_daemon inbound_filters :
@@ -17,5 +18,5 @@ LinkAgainst R5\ Daemon\ Filter :
 	 be libmail.so ;
 
 Package haiku-maildaemon-cvs :
-	R5\ Daemon\ Filter : 
+	R5\ Daemon\ Filter :
 	boot home config add-ons mail_daemon inbound_filters ;

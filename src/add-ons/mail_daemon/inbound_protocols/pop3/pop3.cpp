@@ -12,7 +12,11 @@
 #include <errno.h>
 #include <unistd.h>
 #include <sys/time.h>
-#include <sys/select.h>
+#include <sys/socket.h>
+#ifndef HAIKU_TARGET_PLATFORM_BEOS // These headers don't exist in BeOS R5.
+	#include <arpa/inet.h>
+	#include <sys/select.h>
+#endif
 
 #include <status.h>
 #include <StringList.h>
@@ -20,10 +24,6 @@
 #include <ChainRunner.h>
 
 #include <MDRLanguage.h>
-
-
-#include <sys/socket.h>
-#include <arpa/inet.h>
 
 #if USESSL
 	#include <openssl/ssl.h>
@@ -55,7 +55,7 @@ POP3Protocol::POP3Protocol(BMessage *settings, BMailChainRunner *status)
 POP3Protocol::~POP3Protocol()
 {
 	SendCommand("QUIT" CRLF);
-        
+
 #ifdef USESSL
 	if (use_ssl) {
 		SSL_shutdown(ssl);
@@ -63,7 +63,7 @@ POP3Protocol::~POP3Protocol()
 	}
 #endif
 
-#ifdef BONE
+#ifndef HAIKU_TARGET_PLATFORM_BEOS
 	close(conn);
 #else	
 	closesocket(conn);
@@ -75,7 +75,7 @@ status_t
 POP3Protocol::Open(const char *server, int port, int)
 {
 	runner->ReportProgress(0,0,MDR_DIALECT_CHOICE ("Connecting to POP3 Server...","POP3サーバに接続しています..."));
-        
+
 	if (port <= 0)
 		#ifdef USESSL
 			port = use_ssl ? 995 : 110;
@@ -104,7 +104,7 @@ POP3Protocol::Open(const char *server, int port, int)
 		return B_NAME_NOT_FOUND;
 	}
 	
-#ifdef BONE
+#ifndef HAIKU_TARGET_PLATFORM_BEOS
 	conn = socket(AF_INET, SOCK_STREAM, 0);
 #else
 	conn = socket(AF_INET, 2, 0);
@@ -117,7 +117,7 @@ POP3Protocol::Open(const char *server, int port, int)
 		saAddr.sin_addr.s_addr = hostIP;
 		int result = connect(conn, (struct sockaddr *) &saAddr, sizeof(saAddr));
 		if (result < 0) {
-#ifdef BONE
+#ifndef HAIKU_TARGET_PLATFORM_BEOS
 			close(conn);
 #else
 			closesocket(conn);
@@ -132,7 +132,7 @@ POP3Protocol::Open(const char *server, int port, int)
 		pop3_error(error_msg.String());
 		return B_ERROR;
 	}
-        
+
     #ifdef USESSL
 	if (use_ssl) {
 		SSL_library_init();
@@ -155,7 +155,7 @@ POP3Protocol::Open(const char *server, int port, int)
 			error << ". (SSL Connection Error)";
 			runner->ShowError(error.String());
 			SSL_CTX_free(ctx);
-			#ifdef BONE
+			#ifndef HAIKU_TARGET_PLATFORM_BEOS
 				close(conn);
 			#else
 				closesocket(conn);
@@ -167,7 +167,7 @@ POP3Protocol::Open(const char *server, int port, int)
 	}
 	
     #endif
-        
+
 	BString line;
 	status_t err;
 	int32 tries = 200000;
@@ -178,7 +178,7 @@ POP3Protocol::Open(const char *server, int port, int)
 	}
 
 	if (err < 0) {
-#ifdef BONE
+#ifndef HAIKU_TARGET_PLATFORM_BEOS
 		close(conn);
 #else
 		closesocket(conn);
@@ -368,20 +368,20 @@ status_t POP3Protocol::RetrieveInternal(const char *command, int32 message,
 		return B_ERROR;
 	
 	struct timeval tv;
-	struct fd_set fds; 
+	struct fd_set fds;
 
-	tv.tv_sec = long(POP3_RETRIEVAL_TIMEOUT / 1e6); 
-	tv.tv_usec = long(POP3_RETRIEVAL_TIMEOUT-(tv.tv_sec * 1e6)); 
+	tv.tv_sec = long(POP3_RETRIEVAL_TIMEOUT / 1e6);
+	tv.tv_usec = long(POP3_RETRIEVAL_TIMEOUT-(tv.tv_sec * 1e6));
 	
-	/* Initialize (clear) the socket mask. */ 
+	/* Initialize (clear) the socket mask. */
 	FD_ZERO(&fds);
 	
-	/* Set the socket in the mask. */ 
+	/* Set the socket in the mask. */
 	FD_SET(conn, &fds);
 	
 	while (cont) {
                 int result = 0;
-                
+
             #ifdef USESSL
                 if ((use_ssl) && (SSL_pending(ssl)))
                     result = 1;
@@ -548,16 +548,16 @@ POP3Protocol::ReceiveLine(BString &line)
 	line = "";
 	
 	struct timeval tv;
-	struct fd_set fds; 
+	struct fd_set fds;
 
-	tv.tv_sec = long(POP3_RETRIEVAL_TIMEOUT / 1e6); 
-	tv.tv_usec = long(POP3_RETRIEVAL_TIMEOUT-(tv.tv_sec * 1e6)); 
+	tv.tv_sec = long(POP3_RETRIEVAL_TIMEOUT / 1e6);
+	tv.tv_usec = long(POP3_RETRIEVAL_TIMEOUT-(tv.tv_sec * 1e6));
 	
-	/* Initialize (clear) the socket mask. */ 
+	/* Initialize (clear) the socket mask. */
 	FD_ZERO(&fds);
 	
-	/* Set the socket in the mask. */ 
-	FD_SET(conn, &fds); 
+	/* Set the socket in the mask. */
+	FD_SET(conn, &fds);
 	int result = -1;
     #ifdef USESSL
         if ((use_ssl) && (SSL_pending(ssl)))
@@ -614,15 +614,15 @@ POP3Protocol::SendCommand(const char *cmd)
 	// due to bugs) as being from this command.
 	
 	struct timeval tv;
-	tv.tv_sec = long(1000 / 1e6); 
+	tv.tv_sec = long(1000 / 1e6);
 	tv.tv_usec = long(1000-(tv.tv_sec * 1e6));  /* very short timeout, hangs with 0 in R5 */
 
-	struct fd_set fds; 
+	struct fd_set fds;
 
-	/* Initialize (clear) the socket mask. */ 
+	/* Initialize (clear) the socket mask. */
 	FD_ZERO(&fds);
 
-	/* Set the socket in the mask. */ 
+	/* Set the socket in the mask. */
 	FD_SET(conn, &fds);
         int result;
         #ifdef USESSL
@@ -631,10 +631,10 @@ POP3Protocol::SendCommand(const char *cmd)
                 else
         #endif
         result = select(32, &fds, NULL, NULL, &tv);
-        
+
 	if (result > 0) {
 		int amountReceived;
-		char tempString [1025]; 
+		char tempString [1025];
             #ifdef USESSL
                 if (use_ssl)
                         amountReceived = SSL_read(ssl,tempString, sizeof (tempString) - 1);
@@ -653,7 +653,7 @@ POP3Protocol::SendCommand(const char *cmd)
 	if (use_ssl) {
 		SSL_write(ssl,cmd,::strlen(cmd));
 		//SSL_write(ssl,"\r\n",2);
-	} else 
+	} else
 #endif
 	if (send(conn, cmd, ::strlen(cmd), 0) < 0) {
 		fLog = strerror(errno);
@@ -689,17 +689,17 @@ POP3Protocol::SendCommand(const char *cmd)
 void POP3Protocol::MD5Digest (unsigned char *in,char *ascii_digest)
 {	
         unsigned char digest[16];
-    
+
     #ifdef USESSL
 	MD5(in, ::strlen((char*)in),digest);
     #else
 	MD5_CTX context;
-        
+
         MD5Init(&context);
 	MD5Update(&context, in, ::strlen((char*)in));
 	MD5Final(digest, &context);
     #endif
-    
+
   	for (int i = 0;  i < 16;  i++)
     	sprintf(ascii_digest+2*i, "%02x", digest[i]);
 
@@ -723,12 +723,12 @@ BView* instantiate_config_panel(BMessage *settings,BMessage *)
 	#endif
 	view->AddAuthMethod("Plain Text");
 	view->AddAuthMethod("APOP");
-        
+
         #if USESSL
             view->AddFlavor("Unencrypted");
             view->AddFlavor("SSL");
         #endif
-        
+
 	view->SetTo(settings);
 
 	return view;

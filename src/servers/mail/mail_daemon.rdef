@@ -2,9 +2,9 @@ resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Be-POST";
 
 resource app_version
 {
-	major  = 3, 
+	major  = 3,
 	middle = 0,
-	minor  = 2,
+	minor  = 3,
 
 	/* 0 = development	1 = alpha			2 = beta
 	   3 = gamma		4 = golden master	5 = final */
@@ -12,8 +12,8 @@ resource app_version
 
 	internal = 3,
 
-	short_info = "Mail Daemon 3.0.2",
-	long_info = "Mail Daemon 3.0.2 ©2004 Haiku"
+	short_info = "Mail Daemon 3.0.3",
+	long_info = "Mail Daemon 3.0.3 ©2005 Haiku"
 };
 
 resource(0, "Read") #'BBMP' archive BBitmap

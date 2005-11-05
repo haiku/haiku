@@ -3,7 +3,6 @@
 ** Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
 */
 
-
 #include <DataIO.h>
 #include <Message.h>
 #include <Alert.h>
@@ -16,7 +15,13 @@
 #include <stdio.h>
 #include <errno.h>
 #include <netdb.h>
- 
+#include <sys/time.h>
+#include <sys/socket.h>
+#ifndef HAIKU_TARGET_PLATFORM_BEOS // These headers don't exist in BeOS R5.
+	#include <arpa/inet.h>
+	#include <sys/select.h>
+#endif
+
 #include <status.h>
 #include <ProtocolConfigView.h>
 #include <mail_encoding.h>
@@ -34,10 +39,6 @@
 
 #include <MDRLanguage.h>
 
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <sys/select.h>
-#include <arpa/inet.h>
 
 #define CRLF "\r\n"
 #define SMTP_RESPONSE_SIZE 8192
@@ -146,7 +147,7 @@ MD5HexHmac(char *hexdigest,
 ** Function: MD5Sum
 ** generates an MD5-sum from the given string
 */
-void 
+void
 MD5Sum (char* sum, unsigned char *text, int text_len) {
 	MD5_CTX context;
 	MD5_Init(&context);
@@ -282,7 +283,7 @@ SMTPProtocol::SMTPProtocol(BMessage *message, BMailChainRunner *run)
 
 	if (fStatus < B_OK) {
 		//-----This is a really cool kind of error message. How can we make it work for POP3?
-		error_msg << MDR_DIALECT_CHOICE ("Error while logging in to ","ログイン中にエラーが発生しました\n") << fSettings->FindString("server") 
+		error_msg << MDR_DIALECT_CHOICE ("Error while logging in to ","ログイン中にエラーが発生しました\n") << fSettings->FindString("server")
 			<< MDR_DIALECT_CHOICE (". The server said:\n","サーバーエラー\n") << fLog;
 		runner->ShowError(error_msg.String());
                 runner->Stop(true);
@@ -345,13 +346,13 @@ status_t
 SMTPProtocol::Open(const char *address, int port, bool esmtp)
 {
 	runner->ReportProgress(0, 0, MDR_DIALECT_CHOICE ("Connecting to server...","接続中..."));
-        
+
         #ifdef USESSL
 		use_ssl = (fSettings->FindInt32("flavor") == 1);
 		ssl = NULL;
 		ctx = NULL;
 	#endif
-                
+
         if (port <= 0)
 		#ifdef USESSL
 			port = use_ssl ? 465 : 25;
@@ -364,11 +365,11 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 		struct hostent * he = gethostbyname(address);
 		hostIP = he ? *((uint32*)he->h_addr) : 0;
 	}
-   
+
 	if (hostIP == 0)
 		return EHOSTUNREACH;
 		
-#ifdef BONE
+#ifndef HAIKU_TARGET_PLATFORM_BEOS
 	_fd = socket(AF_INET, SOCK_STREAM, 0);
 #else
 	_fd = socket(AF_INET, 2, 0);
@@ -381,7 +382,7 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 		saAddr.sin_addr.s_addr = hostIP;
 		int result = connect(_fd, (struct sockaddr *) &saAddr, sizeof(saAddr));
 		if (result < 0) {
-#ifdef BONE
+#ifndef HAIKU_TARGET_PLATFORM_BEOS
 			close(_fd);
 #else
 			closesocket(_fd);
@@ -415,7 +416,7 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 			error << ". (SSL Connection Error)";
 			runner->ShowError(error.String());
 			SSL_CTX_free(ctx);
-			#ifdef BONE
+			#ifndef HAIKU_TARGET_PLATFORM_BEOS
 				close(_fd);
 			#else
 				closesocket(_fd);
@@ -558,7 +559,7 @@ SMTPProtocol::Login(const char *_login, const char *password)
 
 	if (fAuthType & DIGEST_MD5) {
 		//******* DIGEST-MD5 Authentication ( tested. works fine [with Cyrus SASL] )
-		// this implements only the subpart of DIGEST-MD5 which is 
+		// this implements only the subpart of DIGEST-MD5 which is
 		// required for authentication to SMTP-servers. Integrity-
 		// and confidentiality-protection are not implemented, as
 		// they are provided by the use of OpenSSL.
@@ -597,16 +598,16 @@ SMTPProtocol::Login(const char *_login, const char *password)
 		rawResponse << ",digest-uri=" << '"' << digestUriValue << '"';
 		char sum[17], hex_digest2[33];
 		BString a1,a2,kd;
-		BString t1 = BString(login) << ":" 
-				<< challengeMap["realm"] << ":" 
+		BString t1 = BString(login) << ":"
+				<< challengeMap["realm"] << ":"
 				<< password;
 		MD5Sum(sum, (unsigned char*)t1.String(), t1.Length());
 		a1 << sum << ":" << challengeMap["nonce"] << ":" << cnonce;
 		MD5Digest(hex_digest, (unsigned char*)a1.String(), a1.Length());
 		a2 << "AUTHENTICATE:" << digestUriValue;
 		MD5Digest(hex_digest2, (unsigned char*)a2.String(), a2.Length());
-		kd << hex_digest << ':' << challengeMap["nonce"] 
-		   << ":" << "00000001" << ':' << cnonce << ':' << "auth" 
+		kd << hex_digest << ':' << challengeMap["nonce"]
+		   << ":" << "00000001" << ':' << cnonce << ':' << "auth"
 		   << ':' << hex_digest2;
 		MD5Digest(hex_digest, (unsigned char*)kd.String(), kd.Length());
 
@@ -754,7 +755,7 @@ SMTPProtocol::Close()
         }
 #endif
 
-#ifdef BONE
+#ifndef HAIKU_TARGET_PLATFORM_BEOS
 	close(_fd);
 #else
 	closesocket(_fd);
@@ -925,16 +926,16 @@ SMTPProtocol::ReceiveResponse(BString &out)
 	BString searchStr = "";
 	
 	struct timeval tv;
-	struct fd_set fds; 
+	struct fd_set fds;
 
-	tv.tv_sec = long(timeout / 1e6); 
-	tv.tv_usec = long(timeout-(tv.tv_sec * 1e6)); 
+	tv.tv_sec = long(timeout / 1e6);
+	tv.tv_usec = long(timeout-(tv.tv_sec * 1e6));
 	
-	/* Initialize (clear) the socket mask. */ 
+	/* Initialize (clear) the socket mask. */
 	FD_ZERO(&fds);
 	
-	/* Set the socket in the mask. */ 
-	FD_SET(_fd, &fds); 
+	/* Set the socket in the mask. */
+	FD_SET(_fd, &fds);
         int result = -1;
 #ifdef USESSL
         if ((use_ssl) && (SSL_pending(ssl)))
@@ -1036,7 +1037,7 @@ BView *
 instantiate_config_panel(BMessage *settings, BMessage *)
 {
 	BMailProtocolConfigView *view = new BMailProtocolConfigView(B_MAIL_PROTOCOL_HAS_AUTH_METHODS | B_MAIL_PROTOCOL_HAS_USERNAME | B_MAIL_PROTOCOL_HAS_PASSWORD | B_MAIL_PROTOCOL_HAS_HOSTNAME
-       
+
          #ifdef USESSL
             | B_MAIL_PROTOCOL_HAS_FLAVORS);
         view->AddFlavor("Unencrypted");

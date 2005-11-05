@@ -1,6 +1,10 @@
-Haiku Mail Daemon Replacement v3.0.2
+Haiku Mail Daemon Replacement v3.0.3
 
 VERSION HISTORY
+
+November 5 2005 - v3.0.3
+- Fixed up source code to compile under the newest Haiku build system.
+- AGMSBayesianSpamServer renamed to "spamdbm", runtime interface between the filter and server repaired, spam MIME types and icons also revived.
 
 January 30 2005 - v3.0.2
 - Added SMTP SSL support
@@ -20,8 +24,7 @@ March 9 2004 - v2.3.0
 - Handle spam messages with a malformed MIME Content-Type header that specifies multipart, but no boundary marker string.  The messages show up as empty.  They also sneakily have a second Content-Type that says the message is text.  So, only use the multipart entry if there is no other, and only if the boundary string exists too.
 - Makefiles changed to do a parallel make on multiprocessor systems.
 - BeMail no longer breaks URLs in outgoing mails, at least it tries to do that. It's kind of a hack like the whole word-wrap algorithm, so it shouldn't do much more harm :)
-- E-mail addresses are now properly recognized without the "mailto:" 
-prefix.
+- E-mail addresses are now properly recognized without the "mailto:" prefix.
 - Doesn't keep as many file handles open as before (was using 4 per window, with the BeOS limit of 100 files open, that was a maximum of 25 BeMail windows).
 - Included new icons by Stefano
 - Fixed a horrible bug that would cause deletion of entire mailboxes on newly set-up IMAP accounts.
@@ -41,7 +44,7 @@ December 4 2003 - v2.2.5
 - General happiness.
 
 October 12 2003 - v2.2.4
-- Fixed IMAP's mailbox look-up routines so that they use LSUB instead of LIST. This fixes a few bugs with certain mail servers, and allows better interoperability with other mail clients on the same account. 
+- Fixed IMAP's mailbox look-up routines so that they use LSUB instead of LIST. This fixes a few bugs with certain mail servers, and allows better interoperability with other mail clients on the same account.
 - Added the X-Mailer header to satisfy Feature Request 788700.
 - Made it so that the message count uses the correct singular/plural form, given the number of messages, in the daemon status window.
 - CHECK_MEM build simply does not work with BONE, changed to get it to partially work.
@@ -243,7 +246,7 @@ November 21 2001 - v2.0.0a2
   - Better RuleFilter (Descriptive filter names)
   - Better Folder Filter (No more email filename colisions)
   - SMTP Auth now works for real
- 
+
 November 06 2001 - v2.0.0 a1
   - Complete rewrite from the ground up
   - Filters
@@ -272,7 +275,7 @@ June 12 2001 - v1.0.0 b4
   - More bug fixes. More error checking is now being done.
   - First version of the filter API.
   - Some brand new bugs for you to play with. :)
-  - The old mail_daemon icon is back! Thanks to Syn.Terra for it. 
+  - The old mail_daemon icon is back! Thanks to Syn.Terra for it.
 
 June 08 2001 - v1.0.0 b3
   - Installation script now creates an index for the MAIL:account

@@ -40,7 +40,7 @@
 
 #include <MDRLanguage.h>
 
-#ifdef BONE
+#ifndef HAIKU_TARGET_PLATFORM_BEOS // BONE and later have these, R5 doesn't.
 	#define BONE_SERIAL_PPP_GET_STATUS 0xbe230501
 	#define BSPPP_CONNECTED 4
 	typedef struct {
@@ -233,7 +233,7 @@ MailDaemonApp::MessageReceived(BMessage *msg)
 	switch (msg->what) {
 		case 'moto':
 			if (settings_file.CheckOnlyIfPPPUp()) {
-#ifdef BONE
+#ifndef HAIKU_TARGET_PLATFORM_BEOS
 				int s = socket(AF_INET, SOCK_DGRAM, 0);
 				bsppp_status_t status;
 			
@@ -602,13 +602,13 @@ makeIndices()
 		if (fs_stat_dev(device,&info) < 0 || (info.flags & B_FS_HAS_QUERY) == 0)
 			continue;
 
-		// Work-around for misbehaviour of earlier versions - should be 
-		// kept in for some time. 
-		// It removes the B_MAIL_ATTR_FLAGS if it is of B_STRING_TYPE, 
-		// because that's what the MDR created before... 
-		index_info indexInfo; 
-		if (fs_stat_index(device, B_MAIL_ATTR_FLAGS, &indexInfo) == 0 
-			&& indexInfo.type == B_STRING_TYPE) 
+		// Work-around for misbehaviour of earlier versions - should be
+		// kept in for some time.
+		// It removes the B_MAIL_ATTR_FLAGS if it is of B_STRING_TYPE,
+		// because that's what the MDR created before...
+		index_info indexInfo;
+		if (fs_stat_index(device, B_MAIL_ATTR_FLAGS, &indexInfo) == 0
+			&& indexInfo.type == B_STRING_TYPE)
 			fs_remove_index(device, B_MAIL_ATTR_FLAGS);
 			
 		for (int32 i = 0;stringIndices[i];i++)
@@ -626,13 +626,13 @@ makeIndices()
 void
 addAttribute(BMessage &msg,char *name,char *publicName,int32 type = B_STRING_TYPE,bool viewable = true,bool editable = false,int32 width = 200)
 {
-	msg.AddString("attr:name",name); 
-	msg.AddString("attr:public_name",publicName); 
-	msg.AddInt32("attr:type",type); 
-	msg.AddBool("attr:viewable",viewable); 
+	msg.AddString("attr:name",name);
+	msg.AddString("attr:public_name",publicName);
+	msg.AddInt32("attr:type",type);
+	msg.AddBool("attr:viewable",viewable);
 	msg.AddBool("attr:editable",editable);
 	msg.AddInt32("attr:width",width);
-	msg.AddInt32("attr:alignment",B_ALIGN_LEFT); 
+	msg.AddInt32("attr:alignment",B_ALIGN_LEFT);
 }
 
 

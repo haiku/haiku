@@ -4,21 +4,16 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders mail ;
-	UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
 }
 
+UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
 UsePrivateHeaders mail ;
+
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
 if $(USESSL) {
 	SubDirC++Flags -DUSESSL ;
 	SubDirHdrs [ FDirName / boot home config include ] ;
-}
-
-if $(BONE_COMPATIBLE) {
-	SubDirC++Flags -DBONE ;
-} else {
-	SubDirC++Flags -DBUILDING_R5_LIBNET ;
 }
 
 Addon SMTP : mail_daemon outbound_protocols :
@@ -32,5 +27,5 @@ if $(USESSL) {
 }
 
 Package haiku-maildaemon-cvs :
-	SMTP : 
+	SMTP :
 	boot home config add-ons mail_daemon outbound_protocols ;
