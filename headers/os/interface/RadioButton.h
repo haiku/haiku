@@ -100,6 +100,8 @@ virtual	void			_ReservedRadioButton2();
 		BRadioButton	&operator=(const BRadioButton &);
 
 		BRect			_KnobFrame() const;
+		// for use in "synchronous" BWindows
+		void			_Redraw();
 
 static	BBitmap			*sBitmaps[2][3];
 
