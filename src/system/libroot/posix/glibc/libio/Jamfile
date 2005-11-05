@@ -40,7 +40,7 @@ KernelMergeObject posix_gnu_libio.o :
 	<$(SOURCE_GRIST)>iofclose.c
 	<$(SOURCE_GRIST)>iofdopen.c
 	<$(SOURCE_GRIST)>iofflush.c
-#	<$(SOURCE_GRIST)>iofgetpos.c
+	<$(SOURCE_GRIST)>iofgetpos.c
 	<$(SOURCE_GRIST)>iofgets.c
 	<$(SOURCE_GRIST)>iofgets_u.c
 	<$(SOURCE_GRIST)>iofopen.c
@@ -48,7 +48,7 @@ KernelMergeObject posix_gnu_libio.o :
 	<$(SOURCE_GRIST)>iofputs_u.c
 	<$(SOURCE_GRIST)>iofread.c
 	<$(SOURCE_GRIST)>iofread_u.c
-#	<$(SOURCE_GRIST)>iofsetpos.c
+	<$(SOURCE_GRIST)>iofsetpos.c
 	<$(SOURCE_GRIST)>ioftell.c
 	<$(SOURCE_GRIST)>iofwrite.c
 	<$(SOURCE_GRIST)>iofwrite_u.c

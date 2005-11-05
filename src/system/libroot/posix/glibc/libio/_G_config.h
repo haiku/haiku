@@ -26,7 +26,7 @@
 #	include <stddef.h>
 #endif
 
-//#include <wchar.h>
+#include <wchar.h>
 
 #ifndef _WINT_T
 /* Integral type unchanged by default argument promotions that can

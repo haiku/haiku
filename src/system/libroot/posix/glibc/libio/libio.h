@@ -46,6 +46,7 @@
 #define _IO_BUFSIZ _G_BUFSIZ
 #define _IO_va_list _G_va_list
 #define _IO_wint_t _G_wint_t
+#define __mbstate_t __c_mbstate_t
 
 #ifdef _G_NEED_STDARG_H
 /* This define avoids name pollution if we're using GNU stdarg.h */
