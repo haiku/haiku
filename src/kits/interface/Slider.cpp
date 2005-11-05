@@ -1594,14 +1594,26 @@ BSlider::_DrawTriangleThumb()
 	BRect frame = ThumbFrame();
 	BView *view = OffscreenView();
 
-	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
-		lighten1 = tint_color(no_tint, B_LIGHTEN_1_TINT),
-//		lighten2 = tint_color(no_tint, B_LIGHTEN_2_TINT),
-		lightenmax = tint_color(no_tint, B_LIGHTEN_MAX_TINT),
-//		darken1 = tint_color(no_tint, B_DARKEN_1_TINT),
-		darken2 = tint_color(no_tint, B_DARKEN_2_TINT),
-		darken3 = tint_color(no_tint, B_DARKEN_3_TINT),
-		darkenmax = tint_color(no_tint, B_DARKEN_MAX_TINT);
+	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color lightenmax;
+	rgb_color lighten1;
+	rgb_color darken2;
+	rgb_color darken3;
+	rgb_color darkenmax;
+
+	if (IsEnabled()) {
+		lightenmax	= tint_color(no_tint, B_LIGHTEN_MAX_TINT);
+		lighten1	= no_tint;
+		darken2		= tint_color(no_tint, B_DARKEN_2_TINT);
+		darken3		= tint_color(no_tint, B_DARKEN_3_TINT);
+		darkenmax	= tint_color(no_tint, B_DARKEN_MAX_TINT);
+	} else {
+		lightenmax	= tint_color(no_tint, B_LIGHTEN_2_TINT);
+		lighten1	= tint_color(no_tint, B_LIGHTEN_1_TINT);
+		darken2		= tint_color(no_tint, (B_NO_TINT + B_DARKEN_1_TINT) / 2.0);
+		darken3		= tint_color(no_tint, B_DARKEN_1_TINT);
+		darkenmax	= tint_color(no_tint, B_DARKEN_3_TINT);
+	}
 
 	view->SetDrawingMode(B_OP_OVER);
 
