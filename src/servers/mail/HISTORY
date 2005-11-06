@@ -5,6 +5,7 @@ VERSION HISTORY
 November 5 2005 - v3.0.3
 - Fixed up source code to compile under the newest Haiku build system.
 - AGMSBayesianSpamServer renamed to "spamdbm", runtime interface between the filter and server repaired, spam MIME types and icons also revived.
+- BeMail supported MIME type added for "application/x-vnd.Be.URL.mailto" as requested by tqh on BeBits.  So now opening a mailto link in NetPositive only opens one BeMail window rather than two.
 
 January 30 2005 - v3.0.2
 - Added SMTP SSL support
