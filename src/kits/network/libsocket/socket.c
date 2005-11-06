@@ -113,7 +113,7 @@ _EXPORT int accept(int sock, struct sockaddr *addr, int *addrlen)
 	args.u.accept.cookie     = cookie; // this way driver can use the right fd/cookie for the new_sock! 		
 	
 	args.u.accept.addr = addr;
-	args.u.accept.addrlen = *addrlen;
+	args.u.accept.addrlen = addrlen ? *addrlen : 0;
 	
 	rv = ioctl(sock, NET_STACK_ACCEPT, &args, sizeof(args));
 	if (rv < 0) { 
