@@ -1116,7 +1116,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// received when the client-side global font list has been
 			// refreshed
 			gFontManager->Lock();
-			gFontManager->FontsUpdated();
+			//gFontManager->FontsUpdated();
 			gFontManager->Unlock();
 			break;
 		}
@@ -1130,7 +1130,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<bool>(&checkonly);
 			
 			gFontManager->Lock();
-			bool needsUpdate = gFontManager->FontsNeedUpdated();
+			bool needsUpdate = false; //gFontManager->FontsNeedUpdated();
 			gFontManager->Unlock();
 
 			if (checkonly) {

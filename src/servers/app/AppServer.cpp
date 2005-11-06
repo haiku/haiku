@@ -350,7 +350,7 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 			// 1) port_id reply port
 
 			gFontManager->Lock();
-			bool needsUpdate = gFontManager->FontsNeedUpdated();
+			bool needsUpdate = false; //gFontManager->FontsNeedUpdated();
 			gFontManager->Unlock();
 
 			// Seeing how the client merely wants an answer, we'll skip the BPortLink

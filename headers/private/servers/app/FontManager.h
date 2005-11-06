@@ -35,55 +35,58 @@ class FontManager : public BLooper {
 		virtual ~FontManager();
 
 		status_t InitCheck() { return fInitStatus; }
+		void SaveRecentFontMappings();
 
 		virtual void MessageReceived(BMessage* message);
 
-		int32 CountFamilies() const;
-		int32 CountStyles(const char *family) const;
+		int32 CheckUpdate(uid_t user);
+		int32 CountFamilies();
+
+		int32 CountStyles(const char *family);
 		FontFamily* FamilyAt(int32 index) const;
 
 		FontFamily *GetFamily(uint16 familyID) const;
-		FontFamily *GetFamily(const char *name) const;
+		FontFamily *GetFamily(const char *name);
 
-		FontStyle *GetStyleByIndex(const char *family, int32 index) const;
+		FontStyle *GetStyleByIndex(const char *family, int32 index);
 		FontStyle *GetStyle(const char *family, const char *style, uint16 familyID = 0xffff,
 						uint16 styleID = 0xffff, uint16 face = 0);
 		FontStyle *GetStyle(const char *family, uint16 styleID);
-		FontStyle *GetStyle(uint16 familyID, uint16 styleID);
+		FontStyle *GetStyle(uint16 familyID, uint16 styleID) const;
 		FontStyle* FindStyleMatchingFace(uint16 face) const;
 
-		ServerFont* GetFont(const char *family, const char *style, float size);
-		ServerFont* GetFont(uint16 face, float size);
 		const ServerFont* DefaultFont() const;
-
-		bool FontsNeedUpdated() { return fNeedUpdate; }
-		/*!
-			\brief Called when the fonts list has been updated
-		*/
-		void FontsUpdated() { fNeedUpdate = false; }
 
 		void AttachUser(uid_t userID);
 		void DetachUser(uid_t userID);
 
 	private:
-		void _SetDefaultFont();
-		void _ScanSystemFonts();
+		struct font_directory;
+		struct font_mapping;
+
+		bool _LoadRecentFontMappings();
+		status_t _SetDefaultFont();
+		void _AddSystemPaths();
 		status_t _AddPath(const char* path);
-		status_t _AddPath(BEntry& entry);
+		status_t _AddPath(BEntry& entry, font_directory** _newDirectory = NULL);
 
-		void _RemoveFamily(const char *family);
+		FontFamily* _FindFamily(const char* family) const;
+		void _RemoveFamily(const char* family);
 
-		status_t _ScanDirectory(BEntry &entry);
-		void _AddFont(BPath& path);
+		void _ScanFontsIfNecessary();
+		void _ScanFonts();
+		status_t _ScanFontDirectory(font_directory& directory);
+		status_t _AddFont(BPath& path);
 
 		FT_CharMap _GetSupportedCharmap(const FT_Face &face);
 
 	private:
 		status_t	fInitStatus;
-		BObjectList<node_ref> fFontDirectories;
+		BObjectList<font_directory> fDirectories;
+		BObjectList<font_mapping> fMappings;
 		BObjectList<FontFamily> fFamilies;
 		ServerFont	*fDefaultFont;
-		bool		fNeedUpdate;
+		bool		fScanned;
 		int32		fNextID;
 };
 
