@@ -49,15 +49,20 @@
 #include <RegionSupport.h>
 
 
+const static int32 kInitialDataSize = 8;
+
+
 /*! \brief Initializes a region. The region will have no rects,
 	and its bound will be invalid.
 */
 BRegion::BRegion()
 	:
-	data_size(8),
+	data_size(0),
 	data(NULL)	
 {
-	data = (clipping_rect *)malloc(data_size * sizeof(clipping_rect));
+	data = (clipping_rect *)malloc(kInitialDataSize * sizeof(clipping_rect));
+	if (data != NULL)
+		data_size = kInitialDataSize;
 	
 	Support::ZeroRegion(*this);
 }
@@ -68,18 +73,19 @@ BRegion::BRegion()
 */
 BRegion::BRegion(const BRegion &region)
 	:
+	data_size(0),
 	data(NULL)
 {
-	bound = region.bound;
-	count = region.count;
-	data_size = region.data_size;
-	
-	if (data_size <= 0)
-		data_size = 1;
+	const int32 size = region.data_size > 0 ? region.data_size : 1;
 		
-	data = (clipping_rect *)malloc(data_size * sizeof(clipping_rect));
-	
-	memcpy(data, region.data, count * sizeof(clipping_rect));
+	data = (clipping_rect *)malloc(size * sizeof(clipping_rect));
+	if (data != NULL) {
+		data_size = size;
+		bound = region.bound;
+		count = region.count;
+		memcpy(data, region.data, count * sizeof(clipping_rect));
+	} else
+		Support::ZeroRegion(*this);
 }
 
 
@@ -88,12 +94,15 @@ BRegion::BRegion(const BRegion &region)
 */
 BRegion::BRegion(const BRect rect)
 	:
-	data_size(8),
+	data_size(0),
 	data(NULL)	
 {
-	data = (clipping_rect *)malloc(data_size * sizeof(clipping_rect));
-		
-	Set(rect);	
+	data = (clipping_rect *)malloc(kInitialDataSize * sizeof(clipping_rect));
+	if (data != NULL) {
+		data_size = kInitialDataSize;
+		Set(rect);	
+	} else
+		Support::ZeroRegion(*this);
 }
 
 
