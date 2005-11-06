@@ -60,8 +60,9 @@ class WinBorder : public Layer {
 
 #ifndef NEW_CLIPPING
 	virtual	void				RebuildFullRegion();
+#else
+	virtual	void				GetWantedRegion(BRegion &reg);
 #endif
-
 			void				UpdateStart();
 			void				UpdateEnd();
 	inline	bool				InUpdate() const
@@ -126,10 +127,11 @@ class WinBorder : public Layer {
 	virtual	void				MovedByHook(float dx, float dy);
 	virtual	void				ResizedByHook(float dx, float dy, bool automatic);
 
+			void				RequestClientRedraw(const BRegion &invalid);
+
  private:
 			void				set_decorator_region(BRect frame);
 	virtual	void				_ReserveRegions(BRegion &reg);
-	virtual	void				_GetWantedRegion(BRegion &reg);
 
 			BRegion				fDecRegion;
 			bool				fRebuildDecRegion;

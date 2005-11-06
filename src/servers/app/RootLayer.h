@@ -131,9 +131,11 @@ public:
 			void				Unlock() { fAllRegionsLock.Unlock(); }
 			bool				IsLocked() { return fAllRegionsLock.IsLocked(); }
 			void				RunThread();
-			void				GoInvalidate(Layer *layer, const BRegion &region);
-			void				GoRedraw(Layer *layer, const BRegion &region);
+
 			void				GoChangeWinBorderFeel(WinBorder *winBorder, int32 newFeel);
+
+			void				MarkForRedraw(const BRegion &dirty);
+			void				TriggerRedraw();
 
 	virtual	void				Draw(const BRect &r);
 
@@ -185,6 +187,8 @@ friend class WinBorder; // temporarily, I need invalidate_layer()
 			BList				fKeyboardNotificationList;
 
 			BLocker				fAllRegionsLock;
+
+			BRegion				fDirtyForRedraw;
 
 			thread_id			fThreadID;
 			port_id				fListenPort;

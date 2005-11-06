@@ -68,6 +68,8 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	  fSavedEventOptions(0),
 	  fAllRegionsLock("root layer region lock"),
 
+	  fDirtyForRedraw(),
+
 	  fThreadID(B_ERROR),
 	  fListenPort(-1),
 
@@ -199,13 +201,15 @@ RootLayer::WorkingThread(void *data)
 	oneRootLayer->RebuildFullRegion();
 	oneRootLayer->GoInvalidate(oneRootLayer, oneRootLayer->Bounds());
 #else
-	oneRootLayer->rebuild_visible_regions(
-		BRegion(oneRootLayer->Bounds()),
-		BRegion(oneRootLayer->Bounds()),
-		oneRootLayer->LastChild());
+	// RootLayer starts with valid visible regions
+	oneRootLayer->fFullVisible2.Set(oneRootLayer->Bounds());
+	oneRootLayer->fVisible2.Set(oneRootLayer->Bounds());
 
-	oneRootLayer->fRedrawReg.Include(oneRootLayer->Bounds());
-	oneRootLayer->RequestDraw(oneRootLayer->fRedrawReg, oneRootLayer->LastChild());
+	oneRootLayer->MarkForRebuild(oneRootLayer->Bounds());
+	oneRootLayer->MarkForRedraw(oneRootLayer->Bounds());
+
+	oneRootLayer->TriggerRebuild();
+	oneRootLayer->TriggerRedraw();
 #endif
 	oneRootLayer->Unlock();
 	
@@ -275,38 +279,6 @@ RootLayer::WorkingThread(void *data)
 		}
 	}
 	return 0;
-}
-
-
-void
-RootLayer::GoInvalidate(Layer *layer, const BRegion &region)
-{
-	BRegion invalidRegion(region);
-
-	Lock();
-#ifndef NEW_CLIPPING
-	if (layer->fParent)
-		layer = layer->fParent;
-
-	layer->FullInvalidate(invalidRegion);
-#else
-	layer->do_Invalidate(invalidRegion);
-#endif
-	Unlock();
-}
-
-void
-RootLayer::GoRedraw(Layer *layer, const BRegion &region)
-{
-	BRegion redrawRegion(region);
-	
-	Lock();
-#ifndef NEW_CLIPPING
-	layer->Invalidate(redrawRegion);
-#else
-	layer->do_Redraw(redrawRegion);
-#endif
-	Unlock();
 }
 
 void
@@ -829,7 +801,7 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 #ifndef NEW_CLIPPING
 			fRedrawReg.Include(&dirtyRegion);
 #else
-// TODO: code for new clipping engine!
+			MarkForRedraw(dirtyRegion);
 #endif
 		}
 	}
@@ -848,37 +820,98 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 		// clear visible areas for windows not visible anymore.
 		int32 oldWindowCount = oldWMState.WindowList.CountItems();
 		int32 newWindowCount = fWMState.WindowList.CountItems();
-		bool stillPresent;
-		Layer *layer;
-		for (int32 i = 0; i < oldWindowCount; i++)
-		{
-			layer = static_cast<Layer*>(oldWMState.WindowList.ItemAtFast(i));
-			stillPresent = false;
-			for (int32 j = 0; j < newWindowCount; j++)
-				if (layer == fWMState.WindowList.ItemAtFast(j))
-					stillPresent = true;
+		BList oldStrippedList, newStrippedList;
+		for (int32 i = 0; i < oldWindowCount; ++i) {
+			Layer *layer = static_cast<Layer*>(oldWMState.WindowList.ItemAtFast(i));
+			if (!layer)
+				continue;
 
-			if (!stillPresent && layer)
+			bool stillPresent = false;
+			for (int32 j = 0; j < newWindowCount; ++j)
+				if (layer == fWMState.WindowList.ItemAtFast(j)) {
+					stillPresent = true;
+					break;
+				}
+
+			if (!stillPresent) {
+				MarkForRebuild(layer->FullVisible());
+				MarkForRedraw(layer->FullVisible());
 #ifndef NEW_CLIPPING
 				empty_visible_regions(layer);
 #else
 				layer->clear_visible_regions();
 #endif
+			}
+			else {
+				oldStrippedList.AddItem(layer);
+			}
 		}
+
+		for (int32 i = 0; i < newWindowCount; ++i) {
+			Layer *layer = static_cast<Layer*>(fWMState.WindowList.ItemAtFast(i));
+			if (!layer)
+				continue;
+
+			bool isNewWindow = true;
+			for (int32 j = 0; j < oldWindowCount; ++j)
+				if (layer == oldWMState.WindowList.ItemAtFast(j)) {
+					isNewWindow = false;
+					break;
+				}
+			if (isNewWindow) {
+				BRegion invalid;
+				layer->GetWantedRegion(invalid);
+
+				MarkForRebuild(invalid);
+				MarkForRedraw(invalid);
+			}
+			else {
+				newStrippedList.AddItem(layer);
+			}
+		}
+
+		oldWindowCount = oldStrippedList.CountItems();
+		newWindowCount = newStrippedList.CountItems();
+		for (int32 i = 0; i < oldWindowCount; ++i) {
+			Layer *layer = static_cast<Layer*>(oldStrippedList.ItemAtFast(i));
+			if (!layer)
+				continue;
+			if (i < newStrippedList.IndexOf(layer)) {
+				BRegion invalid;
+				layer->GetWantedRegion(invalid);
+
+// TODO: we need to invalidate only the ares that became visible
+//		 not the whole surface of this layer!
+//				invalid.Exclude(&layer->FullVisible());
+
+				MarkForRebuild(invalid);
+				MarkForRedraw(invalid);
+			}
+		}
+/*
+// for debugging
+GetDrawingEngine()->ConstrainClippingRegion(&fDirtyForRedraw);
+RGBColor c(rand()%255,rand()%255,rand()%255);
+GetDrawingEngine()->FillRect(BRect(0,0,800,600), c);
+snooze(2000000);
+GetDrawingEngine()->ConstrainClippingRegion(NULL);
+*/
 		// redraw of focus change is automaticaly done
 		redraw = false;
 		// trigger region rebuilding and redraw
 #ifndef NEW_CLIPPING
 		GoInvalidate(this, fFull);
 #else
-		do_Invalidate(Bounds());
+		TriggerRebuild();
+		TriggerRedraw();
 #endif
 	}
 	else if (redraw) {
 #ifndef NEW_CLIPPING
 		GoInvalidate(this, dirtyRegion);
 #else
-		do_Redraw(dirtyRegion);
+		MarkForRedraw(dirtyRegion);
+		TriggerRedraw();
 #endif
 	}
 }
@@ -1402,7 +1435,7 @@ RootLayer::LayerRemoved(Layer* layer)
 {
 	if (layer == fNotifyLayer)
 		fNotifyLayer = NULL;
-
+// TODO: this must not happen!!! Fix this, quickly!
 	if (layer == fLastLayerUnderMouse)
 		fLastLayerUnderMouse = NULL;
 }
@@ -1611,7 +1644,8 @@ RootLayer::AddDebugInfo(const char* string)
 {
 	if (Lock()) {
 		fDebugInfo << string;
-		GoRedraw(this, BRegion(fFrame));
+		MarkForRedraw(VisibleRegion());
+		TriggerRedraw();
 		Unlock();
 	}
 }
@@ -1683,3 +1717,29 @@ RootLayer::ConvertToMessage(void* raw, int32 code)
 
 	return bmsg;
 }
+
+void
+RootLayer::MarkForRedraw(const BRegion &dirty)
+{
+	BAutolock locker(fAllRegionsLock);
+
+	fDirtyForRedraw.Include(&dirty);
+}
+
+void
+RootLayer::TriggerRedraw()
+{
+	BAutolock locker(fAllRegionsLock);
+/*
+// for debugging
+GetDrawingEngine()->ConstrainClippingRegion(&fDirtyForRedraw);
+RGBColor c(rand()%255,rand()%255,rand()%255);
+GetDrawingEngine()->FillRect(BRect(0,0,800,600), c);
+snooze(2000000);
+GetDrawingEngine()->ConstrainClippingRegion(NULL);
+*/
+	_AllRedraw(fDirtyForRedraw);
+
+	fDirtyForRedraw.MakeEmpty();
+}
+

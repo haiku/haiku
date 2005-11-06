@@ -876,7 +876,7 @@ WinBorder::_ReserveRegions(BRegion &reg)
 }
 
 void
-WinBorder::_GetWantedRegion(BRegion &reg)
+WinBorder::GetWantedRegion(BRegion &reg)
 {
 	if (fRebuildDecRegion)
 	{
@@ -889,11 +889,49 @@ WinBorder::_GetWantedRegion(BRegion &reg)
 	ConvertToScreen2(&screenFrame);
 	reg.Set(screenFrame);
 
+	reg.Include(&fDecRegion);
+
 	BRegion			screenReg(GetRootLayer()->Bounds());
 
 	reg.IntersectWith(&screenReg);
+}
 
-	reg.Include(&fDecRegion);
+void
+WinBorder::RequestClientRedraw(const BRegion &invalid)
+{
+	BRegion	updateReg(fTopLayer->FullVisible());
+
+	updateReg.IntersectWith(&invalid);
+
+	if (updateReg.CountRects() > 0) {
+		fCumulativeRegion.Include(&updateReg);			
+		if (fUpdateRequestsEnabled && !InUpdate() && !fRequestSent) {
+			fInUpdateRegion = fCumulativeRegion;
+cnt++;
+if (cnt != 1)
+	CRITICAL("WinBorder::RequestClientRedraw(): cnt != 1 -> Not Allowed!");
+			fRequestSent = true; // this is here to avoid a possible de-synchronization
+
+			BMessage msg;
+			msg.what = _UPDATE_;
+#ifndef NEW_CLIPPING
+			msg.AddRect("_rect", ConvertFromTop(fInUpdateRegion.Frame()));
+#else
+			BRect	rect(fInUpdateRegion.Frame());
+			ConvertFromScreen2(&rect);
+			msg.AddRect("_rect", rect );
+#endif
+			msg.AddRect("debug_rect", fInUpdateRegion.Frame());
+
+			if (Window()->SendMessageToClient(&msg) == B_OK) {
+				fCumulativeRegion.MakeEmpty();
+			}
+			else {
+				fRequestSent = false;
+				fInUpdateRegion.MakeEmpty();
+			}
+		}
+	}
 }
 #endif
 

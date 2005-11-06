@@ -21,7 +21,7 @@
 //
 //	File Name:		Layer.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//					Adi Oanca <adioanca@cotty.iren.ro>
+//					Adi Oanca <adioanca@gmail.com>
 //					Stephan Aßmus <superstippi@gmx.de>
 //	Description:	Class used for rendering to the frame buffer. One layer per 
 //					view on screen and also for window decorators
@@ -89,6 +89,7 @@ Layer::Layer(BRect frame, const char* name, int32 token,
 #else
 	fVisible2(),
 	fFullVisible2(),
+	fDirtyForRebuild(),
 	fClipReg(&fVisible2),
 #endif
 
@@ -959,10 +960,17 @@ RebuildFullRegion();
 #else
 	if (invalidate) {
 		// compute the region this layer wants for itself
-		BRegion	invalidRegion;
-		_GetWantedRegion(invalidRegion);
-		if (invalidRegion.CountRects() > 0)
-			GetRootLayer()->GoInvalidate(this, invalidRegion);
+		BRegion	invalid;
+		GetWantedRegion(invalid);
+		if (invalid.CountRects() > 0) {
+			fParent->MarkForRebuild(invalid);
+			GetRootLayer()->MarkForRedraw(invalid);
+
+			fParent->TriggerRebuild();
+			GetRootLayer()->TriggerRedraw();
+
+//			GetRootLayer()->GoInvalidate(this, invalid);
+		}
 	}
 #endif
 }
@@ -988,7 +996,15 @@ Layer::Hide(bool invalidate)
 		GetRootLayer()->GoInvalidate(this, fFullVisible);
 #else
 	if (invalidate && fFullVisible2.CountRects() > 0) {
-		GetRootLayer()->GoInvalidate(this, fFullVisible2);
+		BRegion invalid(fFullVisible2);
+
+		fParent->MarkForRebuild(invalid);
+		GetRootLayer()->MarkForRedraw(invalid);
+
+		fParent->TriggerRebuild();
+		GetRootLayer()->TriggerRedraw();
+
+//		GetRootLayer()->GoInvalidate(this, fFullVisible2);
 	}
 #endif
 }
@@ -1970,15 +1986,6 @@ Layer::ScrolledByHook(float dx, float dy)
 	// empty.
 }
 
-
-void
-Layer::GetWantedRegion(BRegion& reg) const
-{
-	// this is the same as get_user_region.
-	// because get_user_region modifies nothing.
-	const_cast<Layer*>(this)->Layer::_GetWantedRegion(reg);
-}
-
 //! converts a point from local to parent's coordinate system 
 void
 Layer::ConvertToParent2(BPoint* pt) const
@@ -2121,8 +2128,13 @@ Layer::do_Hide()
 
 		clear_visible_regions();
 
-		if (invalid.Frame().IsValid())
-			fParent->do_Invalidate(invalid, this);
+		if (invalid.CountRects() > 0) {
+			fParent->MarkForRebuild(invalid);
+			GetRootLayer()->MarkForRedraw(invalid);
+
+			fParent->TriggerRebuild();
+			GetRootLayer()->TriggerRedraw();
+		}
 	}
 }
 
@@ -2134,39 +2146,16 @@ Layer::do_Show()
 	if (fParent && !fParent->IsHidden() && GetRootLayer()) {
 		BRegion invalid;
 
-		_GetWantedRegion(invalid);
+		GetWantedRegion(invalid);
 
-		if (invalid.CountRects() > 0)
-			fParent->do_Invalidate(invalid, this);
+		if (invalid.CountRects() > 0) {
+			fParent->MarkForRebuild(invalid);
+			GetRootLayer()->MarkForRedraw(invalid);
+
+			fParent->TriggerRebuild();
+			GetRootLayer()->TriggerRedraw();
+		}
 	}
-}
-
-void
-Layer::do_Invalidate(const BRegion &invalid, const Layer *startFrom)
-{
-	BRegion		localVisible(fFullVisible2);
-	localVisible.IntersectWith(&invalid);
-	rebuild_visible_regions(invalid, localVisible,
-		startFrom? startFrom: LastChild());
-
-	// add localVisible to our RootLayer's redraw region.
-//	GetRootLayer()->fRedrawReg.Include(&localVisible);
-	GetRootLayer()->fRedrawReg = localVisible;
-	GetRootLayer()->RequestDraw(GetRootLayer()->fRedrawReg, NULL);
-//	GetRootLayer()->RequestRedraw(); // TODO: what if we pass (fParent, startFromTHIS, &redrawReg)?
-}
-
-void
-Layer::do_Redraw(const BRegion &invalid, const Layer *startFrom)
-{
-	BRegion		localVisible(fFullVisible2);
-	localVisible.IntersectWith(&invalid);
-
-	// add localVisible to our RootLayer's redraw region.
-//	GetRootLayer()->fRedrawReg.Include(&localVisible);
-	GetRootLayer()->fRedrawReg = localVisible;
-	GetRootLayer()->RequestDraw(GetRootLayer()->fRedrawReg, NULL);
-//	GetRootLayer()->RequestRedraw(); // TODO: what if we pass (fParent, startFromTHIS, &redrawReg)?
 }
 
 inline void
@@ -2344,7 +2333,7 @@ Layer::do_ResizeBy(float dx, float dy)
 
 		// we'll invalidate the old area and the new, maxmial one.
 		BRegion invalid;
-		_GetWantedRegion(invalid);
+		GetWantedRegion(invalid);
 		invalid.Include(&fFullVisible2);
 
 		clear_visible_regions();
@@ -2403,7 +2392,7 @@ void Layer::do_MoveBy(float dx, float dy)
 
 		// we'll invalidate the old position and the new, maxmial one.
 		BRegion invalid;
-		_GetWantedRegion(invalid);
+		GetWantedRegion(invalid);
 		invalid.Include(&fFullVisible2);
 
 		clear_visible_regions();
@@ -2483,7 +2472,7 @@ Layer::do_ScrollBy(float dx, float dy)
 }
 
 void
-Layer::_GetWantedRegion(BRegion &reg)
+Layer::GetWantedRegion(BRegion &reg)
 {
 	// 1) set to frame in screen coords
 	BRect screenFrame(Bounds());
@@ -2537,7 +2526,7 @@ Layer::rebuild_visible_regions(const BRegion &invalid,
 
 	// intersect maximum wanted region with the invalid region
 	BRegion common;
-	_GetWantedRegion(common);
+	GetWantedRegion(common);
 	common.IntersectWith(&invalid);
 
 	// if the resulted region is not valid, this layer is not in the catchment area
@@ -2590,6 +2579,76 @@ Layer::clear_visible_regions()
 	fFullVisible2.MakeEmpty();
 	for (Layer *child = LastChild(); child; child = PreviousChild())
 		child->clear_visible_regions();
+}
+
+// mark a region dirty so that the next region rebuild for us
+// and our children will take this into account
+void
+Layer::MarkForRebuild(const BRegion &dirty)
+{
+	fDirtyForRebuild.Include(&dirty);
+}
+
+// this will trigger visible region recalculation for us and
+// our descendants.
+void 
+Layer::TriggerRebuild()
+{
+	BRegion totalInvalidReg;
+
+	_GetAllRebuildDirty(&totalInvalidReg);
+
+	if (totalInvalidReg.CountRects() > 0) {
+		BRegion localFullVisible(fFullVisible2);
+
+//		localFullVisible.IntersectWith(&totalInvalidReg);
+
+//		clear_visible_regions();
+
+		rebuild_visible_regions(totalInvalidReg, localFullVisible, LastChild());
+	}
+}
+
+// find out the region for which we must rebuild the visible regions
+void
+Layer::_GetAllRebuildDirty(BRegion *totalReg)
+{
+	totalReg->Include(&fDirtyForRebuild);
+
+	for (Layer *child = LastChild(); child; child = PreviousChild())
+		child->_GetAllRebuildDirty(totalReg);
+
+	fDirtyForRebuild.MakeEmpty();
+}
+
+void
+Layer::_AllRedraw(const BRegion &invalid)
+{
+	// couldn't find a simpler way to send _UPDATE_ message to client.
+	WinBorder *wb = dynamic_cast<WinBorder*>(this);
+	if (wb)
+		wb->RequestClientRedraw(invalid);
+
+	if (fVisible2.CountRects() > 0) {
+		BRegion	updateReg(fVisible2);
+		updateReg.IntersectWith(&invalid);
+
+		if (updateReg.CountRects() > 0) {
+			fDriver->ConstrainClippingRegion(&updateReg);
+			Draw(updateReg.Frame());
+			fDriver->ConstrainClippingRegion(NULL);
+		}
+	}
+
+	for (Layer *lay = LastChild(); lay != NULL; lay = PreviousChild()) {
+		if (!(lay->IsHidden())) {
+			BRegion common(lay->fFullVisible2);
+			common.IntersectWith(&invalid);
+			
+			if (common.CountRects() > 0)
+				lay->_AllRedraw(invalid);
+		}
+	}
 }
 
 #endif

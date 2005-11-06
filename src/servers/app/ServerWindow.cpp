@@ -654,7 +654,13 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			{
 				BRegion invalidRegion;
 				newLayer->GetWantedRegion(invalidRegion);
-				myRootLayer->GoInvalidate(newLayer, invalidRegion);
+				parent->MarkForRebuild(invalidRegion);
+				parent->TriggerRebuild();
+				if (newLayer->VisibleRegion().Frame().IsValid()) {
+					myRootLayer->MarkForRedraw(newLayer->VisibleRegion());
+					myRootLayer->TriggerRedraw();
+				}
+//				myRootLayer->GoInvalidate(newLayer, invalidRegion);
 			}
 #endif
 			break;
@@ -669,15 +675,19 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			STRACE(("ServerWindow %s: AS_LAYER_DELETE(self)...\n", fTitle));			
 
 			Layer *parent = fCurrentLayer->fParent;
-			BRegion *invalidRegion = NULL;
+//			BRegion *invalidRegion = NULL;
 
-			if (!fCurrentLayer->IsHidden() && parent) {
+			if (!fCurrentLayer->IsHidden() && parent && myRootLayer) {
 #ifndef NEW_CLIPPING
 				if (fCurrentLayer->fFullVisible.CountRects() > 0)
 					invalidRegion = new BRegion(fCurrentLayer->fFullVisible);
 #else
-				if (fCurrentLayer->FullVisible().Frame().IsValid())
-					invalidRegion = new BRegion(fCurrentLayer->FullVisible());
+				if (fCurrentLayer->FullVisible().Frame().IsValid()) {
+					parent->MarkForRebuild(fCurrentLayer->FullVisible());
+					myRootLayer->MarkForRedraw(fCurrentLayer->FullVisible());
+
+//					invalidRegion = new BRegion(fCurrentLayer->FullVisible());
+				}
 #endif
 			}
 
@@ -685,15 +695,12 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			fCurrentLayer->RemoveSelf();
 			fCurrentLayer->PruneTree();
 
+			if (parent)
+				parent->TriggerRebuild();			
+
 			if (myRootLayer) {
-
 				myRootLayer->LayerRemoved(fCurrentLayer);
-
-				// trigger update
-				if (invalidRegion) {
-					myRootLayer->GoInvalidate(parent, *invalidRegion);
-					delete invalidRegion;
-				}
+				myRootLayer->TriggerRedraw();
 			}
 			
 			#ifdef DEBUG_SERVERWINDOW
@@ -990,8 +997,13 @@ if (myRootLayer)
 			if (myRootLayer)
 				myRootLayer->GoRedraw(fCurrentLayer, fCurrentLayer->fVisible);
 #else
-			if (myRootLayer)
-				myRootLayer->GoRedraw(fCurrentLayer, fCurrentLayer->VisibleRegion());
+			if (myRootLayer) {
+				myRootLayer->MarkForRedraw(fCurrentLayer->VisibleRegion());
+				myRootLayer->TriggerRedraw();
+			}
+
+//			if (myRootLayer)
+//				myRootLayer->GoRedraw(fCurrentLayer, fCurrentLayer->VisibleRegion());
 #endif
 if (myRootLayer)
 	myRootLayer->Unlock();
@@ -1115,7 +1127,15 @@ if (myRootLayer)
 			{
 				BRegion invalidRegion;
 				fCurrentLayer->GetWantedRegion(invalidRegion);
-				myRootLayer->GoInvalidate(fCurrentLayer, invalidRegion);
+
+				// TODO: this is broken! a smaller area may be invalidated!
+
+				fCurrentLayer->fParent->MarkForRebuild(invalidRegion);
+				fCurrentLayer->fParent->TriggerRebuild();
+				myRootLayer->MarkForRedraw(invalidRegion);
+				myRootLayer->TriggerRedraw();
+
+//				myRootLayer->GoInvalidate(fCurrentLayer, invalidRegion);
 			}
 #endif
 				
@@ -1206,8 +1226,9 @@ if (myRootLayer)
 #ifdef NEW_CLIPPING
 				invalidRegion.IntersectWith(&fCurrentLayer->fVisible2);
 #endif
-				myRootLayer->GoRedraw(fWinBorder, invalidRegion);
-//				myRootLayer->RequestDraw(invalidRegion, fWinBorder);
+				myRootLayer->MarkForRedraw(invalidRegion);
+				myRootLayer->TriggerRedraw();
+//				myRootLayer->GoRedraw(fWinBorder, invalidRegion);
 			}
 			break;
 		}
@@ -1217,7 +1238,7 @@ if (myRootLayer)
 			
 			// TODO: handle transformation (origin and scale) prior to converting to top
 			// TODO: Handle conversion to top
-			BRegion invalReg;
+			BRegion invalidReg;
 			int32 noOfRects;
 			BRect rect;
 			
@@ -1225,11 +1246,17 @@ if (myRootLayer)
 			
 			for (int i = 0; i < noOfRects; i++) {
 				link.Read<BRect>(&rect);
-				invalReg.Include(rect);
+				invalidReg.Include(rect);
 			}
 
-			if (myRootLayer)
-				myRootLayer->GoRedraw(fCurrentLayer, invalReg);
+			if (myRootLayer) {
+				fCurrentLayer->ConvertToScreen2(&invalidReg);
+
+				myRootLayer->MarkForRedraw(invalidReg);
+				myRootLayer->TriggerRedraw();
+
+//				myRootLayer->GoRedraw(fCurrentLayer, invalReg);
+			}
 
 			break;
 		}

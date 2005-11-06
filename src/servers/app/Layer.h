@@ -4,7 +4,7 @@
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
- *		Adi Oanca <adioanca@cotty.iren.com>
+ *		Adi Oanca <adioanca@gmail.com>
  *		Stephan Aßmus <superstippi@gmx.de>
  *
  * Description:
@@ -248,7 +248,13 @@ class Layer {
 	inline	const BRegion&		VisibleRegion() const { return fVisible2; }
 	inline	const BRegion&		FullVisible() const { return fFullVisible2; }
 
-	virtual	void				GetWantedRegion(BRegion& reg) const;
+			void				MarkForRebuild(const BRegion &dirty);
+			void				TriggerRebuild();
+			void				_GetAllRebuildDirty(BRegion *totalReg);
+			void				_AllRedraw(const BRegion &invalid);
+
+
+	virtual	void				GetWantedRegion(BRegion& reg);
 
 	virtual	void				MovedByHook(float dx, float dy);
 	virtual	void				ResizedByHook(float dx, float dy, bool automatic);
@@ -277,18 +283,11 @@ class Layer {
 			void				do_ResizeBy(float dx, float dy);
 			void				do_ScrollBy(float dx, float dy);
 
-			void				do_Invalidate(	const BRegion &invalid,
-												const Layer *startFrom = NULL);
-
-			void				do_Redraw(	const BRegion &invalid,
-											const Layer *startFrom = NULL);
-
 			void				rebuild_visible_regions(const BRegion &invalid,
 													const BRegion &parentLocalVisible,
 													const Layer *startFrom);
 
 	virtual	void				_ReserveRegions(BRegion &reg);
-	virtual	void				_GetWantedRegion(BRegion &reg);
 
 			void				clear_visible_regions();
 			void				resize_layer_frame_by(float x, float y);
@@ -342,6 +341,7 @@ class Layer {
  private:
 			BRegion				fVisible2;
 			BRegion				fFullVisible2;
+			BRegion				fDirtyForRebuild;
  protected:
 #endif
 			BRegion*			fClipReg;
