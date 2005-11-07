@@ -247,7 +247,7 @@ class BFont {
 		mutable uint32	fExtraFlags;
 		uint32			_reserved[2];
 
-		status_t		_GetExtraFlags() const;
+		void			_GetExtraFlags() const;
 		void			_GetBoundingBoxes(const char charArray[], 
 							int32 numChars, font_metric_mode mode,
 							bool string_escapement, escapement_delta *delta,

@@ -585,9 +585,7 @@ BFont::Flags() const
 font_direction
 BFont::Direction() const
 {
-	if (_GetExtraFlags() != B_OK)
-		return B_FONT_LEFT_TO_RIGHT;
-
+	_GetExtraFlags();
 	return (font_direction)(fExtraFlags >> B_PRIVATE_FONT_DIRECTION_SHIFT);
 }
  
@@ -1170,12 +1168,12 @@ BFont::PrintToStream() const
 }
 
 
-status_t
+void
 BFont::_GetExtraFlags() const
 {
 	// TODO: this has to be const in order to allow other font getters to stay const as well
 	if (fExtraFlags != kUninitializedExtraFlags)
-		return B_OK;
+		return;
 
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_EXTRA_FONT_FLAGS);
@@ -1184,9 +1182,11 @@ BFont::_GetExtraFlags() const
 
 	status_t status = B_ERROR;
 	if (link.FlushWithReply(status) != B_OK
-		|| status != B_OK)
-		return status;
+		|| status != B_OK) {
+		// use defaut values for the flags
+		fExtraFlags = (uint32)B_FONT_LEFT_TO_RIGHT << B_PRIVATE_FONT_DIRECTION_SHIFT;
+		return;
+	}
 
 	link.Read<uint32>(&fExtraFlags);
-	return B_OK;
 }
