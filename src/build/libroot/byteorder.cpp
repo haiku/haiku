@@ -1,5 +1,5 @@
 
-#include <HaikuBuildCompatibility.h>
+#include <BeOSBuildCompatibility.h>
 
 #include <ByteOrder.h>
 

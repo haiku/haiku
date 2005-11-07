@@ -1,7 +1,7 @@
 
 
 #define BUILDING_HAIKU_ERROR_MAPPER 1
-#include <HaikuBuildCompatibility.h>
+#include <BeOSBuildCompatibility.h>
 
 #include <errno.h>
 #include <string.h>

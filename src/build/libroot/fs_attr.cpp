@@ -5,7 +5,7 @@
 #	define B_BAD_VALUE	EINVAL
 #	define B_FILE_ERROR	EBADF
 #else
-#	include <HaikuBuildCompatibility.h>
+#	include <BeOSBuildCompatibility.h>
 #	include <syscalls.h>
 #endif
 
