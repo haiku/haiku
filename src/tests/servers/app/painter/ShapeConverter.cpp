@@ -66,6 +66,7 @@ ShapeConverter::IterateLineTo(int32 lineCount, BPoint* linePts)
 status_t
 ShapeConverter::IterateBezierTo(int32 bezierCount, BPoint* bezierPts)
 {
+	bezierCount /= 3;
 	while (bezierCount--) {
 
 		double x1 = bezierPts[0].x;
