@@ -26,8 +26,6 @@
 #include "RGBColor.h"
 #include "ServerWindow.h"
 
-#define NEW_CLIPPING 1
-
 enum {
 	B_LAYER_NONE		= 1,
 	B_LAYER_MOVE		= 2,
@@ -103,9 +101,6 @@ class Layer {
 	inline	uint32				Flags() const
 									{ return fFlags; }
 
-			void				Redraw(const BRegion& reg,
-									   Layer* startFrom = NULL);
-	
 	virtual	void				Draw(const BRect& r);
 	
 			void				Show(bool invalidate = true);
@@ -254,8 +249,6 @@ class Layer {
  private:
  			void				do_Hide();
  			void				do_Show();
-			void				do_RebuildVisibleRegions(const BRegion &invalid,
-														const Layer *startFrom);
 			void				do_MoveBy(float dx, float dy);
 			void				do_ResizeBy(float dx, float dy);
 			void				do_ScrollBy(float dx, float dy);
@@ -320,8 +313,6 @@ class Layer {
 			RootLayer*			fRootLayer;
 
  private:
-			void				RequestDraw(const BRegion& reg,
-											Layer* startFrom);
 			ServerWindow*		SearchForServerWindow();
 
 			status_t			SendUpdateMsg(BRegion& reg);

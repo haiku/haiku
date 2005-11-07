@@ -126,10 +126,10 @@ public:
 	virtual	void				Draw(const BRect &r);
 
 			thread_id			LockingThread() { return fAllRegionsLock.LockingThread(); }
-	
-			BRegion				fRedrawReg;
-			BList				fCopyRegList;
-			BList				fCopyList;
+
+//			BRegion				fRedrawReg;
+//			BList				fCopyRegList;
+//			BList				fCopyList;
 
 private:
 friend class Desktop;

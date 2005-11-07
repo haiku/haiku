@@ -68,8 +68,7 @@ class WinBorder : public Layer {
 									{ return fInUpdateRegion; }
 	inline	const BRegion&		CulmulatedUpdateRegion() const
 									{ return fCumulativeRegion; }
-	inline	void				EnableUpdateRequests()
-									{ fUpdateRequestsEnabled = true; }
+			void				EnableUpdateRequests();
 	inline	void				DisableUpdateRequests()
 									{ fUpdateRequestsEnabled = false; }
 

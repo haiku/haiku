@@ -269,8 +269,18 @@ WinBorder::UpdateEnd()
 	fInUpdateRegion.MakeEmpty();
 
 	if (fCumulativeRegion.CountRects() > 0) {
-		BRegion		reg(fCumulativeRegion);
-		RequestDraw(reg, NULL);
+		GetRootLayer()->MarkForRedraw(fCumulativeRegion);
+		GetRootLayer()->TriggerRedraw();
+//		RequestDraw(reg, NULL);
+	}
+}
+void
+WinBorder::EnableUpdateRequests() {
+	fUpdateRequestsEnabled = true;
+	if (fCumulativeRegion.CountRects() > 0) {
+		GetRootLayer()->MarkForRedraw(fCumulativeRegion);
+		GetRootLayer()->TriggerRedraw();
+//		RequestDraw(reg, NULL);
 	}
 }
 
@@ -754,11 +764,7 @@ void
 WinBorder::GetWantedRegion(BRegion &reg)
 {
 	if (fRebuildDecRegion)
-	{
 		set_decorator_region(Bounds());
-		// TODO? the decorator should be in WinBorder coordinates?? It's easier not to.
-		//ConvertToScreen2(&fDecRegion);
-	}
 
 	BRect			screenFrame(Bounds());
 	ConvertToScreen2(&screenFrame);

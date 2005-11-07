@@ -1160,8 +1160,6 @@ if (myRootLayer)
 
 				myRootLayer->MarkForRedraw(invalidReg);
 				myRootLayer->TriggerRedraw();
-
-//				myRootLayer->GoRedraw(fCurrentLayer, invalReg);
 			}
 
 			break;
@@ -1229,10 +1227,6 @@ if (myRootLayer)
 		{
 			STRACE(("ServerWindow %s: Message Enable_Updates unimplemented\n", Title()));
 			fWinBorder->EnableUpdateRequests();
-			if (fWinBorder->CulmulatedUpdateRegion().Frame().IsValid()) {
-				BRegion		reg(fWinBorder->CulmulatedUpdateRegion());
-				fWinBorder->RequestDraw(reg, NULL);
-			}
 			break;
 		}
 		case AS_DISABLE_UPDATES:
