@@ -5,6 +5,7 @@
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
  *		DarkWyrm (bpmagic@columbus.rr.com)
+ *		Stefano Ceccherini (burton666@libero.it)
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
