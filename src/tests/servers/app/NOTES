@@ -2,9 +2,9 @@ For the tests to run properly on BeOS, you need to prepare a few things.
 
 There is a pseudo target "install-test-apps" which needs to be built like this:
 
-$ TARGET_PLATFORM=r5 jam install-test-apps
+$ TARGET_PLATFORM=libbe_test jam install-test-apps
 
-This will build "haiku_registrar", "haiku_app_server", the needed libs and some test apps and install all into "generated/tests/apps".
+This will build "haiku_registrar", "haiku_app_server", the needed libs and some test apps and install everything into "generated/tests/apps".
 
 Each test app folder contains a script "run", which launches the Haiku app_server and a second later the test app which connects to it.
 
