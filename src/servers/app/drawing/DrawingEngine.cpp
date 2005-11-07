@@ -808,14 +808,21 @@ DrawingEngine::DrawRoundRect(BRect r, const float &xrad,
 
 // DrawShape
 void
-DrawingEngine::DrawShape(const BRect &bounds, const int32 &opcount,
-						 const int32 *oplist, const int32 &ptcount,
-						 const BPoint *ptlist, const DrawState *d,
+DrawingEngine::DrawShape(const BRect& bounds, const int32& opCount,
+						 const uint32* opList, const int32& ptCount,
+						 const BPoint* ptList, const DrawState* d,
 						 bool filled)
 {
 	if (Lock()) {
+		fGraphicsCard->HideSoftwareCursor();
 
-printf("DrawingEngine::DrawShape() - what is this stuff that gets passed here?\n");
+		fPainter->SetDrawState(d);
+		BRect touched = fPainter->DrawShape(opCount, opList,
+											ptCount, ptList,
+											filled);
+
+		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}

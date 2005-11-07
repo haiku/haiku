@@ -13,9 +13,11 @@
 #include <Bitmap.h>
 #include <GraphicsDefs.h>
 #include <Region.h>
+#include <String.h>
 
 #include <agg_bezier_arc.h>
 #include <agg_bounding_rect.h>
+#include <agg_conv_clip_polygon.h>
 #include <agg_conv_curve.h>
 #include <agg_conv_stroke.h>
 #include <agg_ellipse.h>
@@ -31,7 +33,6 @@
 #include "DrawingModeFactory.h"
 #include "PatternHandler.h"
 #include "RenderingBuffer.h"
-#include "ShapeConverter.h"
 #include "ServerBitmap.h"
 #include "ServerFont.h"
 
@@ -77,6 +78,7 @@ Painter::Painter()
 	  fFontRendererBin(NULL),
 	  fLineProfile(),
 	  fSubpixelPrecise(false),
+
 	  fPenSize(1.0),
 	  fClippingRegion(new BRegion()),
 	  fValidClipping(false),
@@ -85,6 +87,10 @@ Painter::Painter()
 //	  fAlphaSrcMode(B_CONSTANT_ALPHA),
 	  fAlphaFncMode(B_ALPHA_OVERLAY),
 	  fPenLocation(0.0, 0.0),
+	  fLineCapMode(B_BUTT_CAP),
+	  fLineJoinMode(B_MITER_JOIN),
+	  fMiterLimit(B_DEFAULT_MITER_LIMIT),
+
 	  fDrawingModeFactory(new DrawingModeFactory()),
 	  fPatternHandler(new PatternHandler()),
 	  fTextRenderer(new AGGTextRenderer())
@@ -191,10 +197,13 @@ Painter::SetDrawState(const DrawState* data)
 		(data->GetDrawingMode() == B_OP_ALPHA && (data->AlphaSrcMode() != fAlphaSrcMode ||
 												  data->AlphaFncMode() != fAlphaFncMode));
 
-	fDrawingMode = data->GetDrawingMode();
-	fAlphaSrcMode = data->AlphaSrcMode();
-	fAlphaFncMode = data->AlphaFncMode();
+	fDrawingMode	= data->GetDrawingMode();
+	fAlphaSrcMode	= data->AlphaSrcMode();
+	fAlphaFncMode	= data->AlphaFncMode();
 	fPatternHandler->SetPattern(data->GetPattern());
+	fLineCapMode	= data->LineCapMode();
+	fLineJoinMode	= data->LineJoinMode();
+	fMiterLimit		= data->MiterLimit();
 
 	if (updateDrawingMode)
 		_UpdateDrawingMode();
@@ -533,18 +542,81 @@ Painter::FillBezier(const BPoint* controlPoints) const
 	return _FillPath(path);
 }
 
-// StrokeShape
-BRect
-Painter::StrokeShape(/*const */BShape* shape) const
-{
-	return _DrawShape(shape, false);
-}
+// this comes from Shape.cpp
+// code duplication ahead...
+#define OP_LINETO		0x10000000
+#define OP_BEZIERTO		0x20000000
+#define OP_CLOSE		0x40000000
+#define OP_MOVETO		0x80000000
 
-// FillShape
+// DrawShape
 BRect
-Painter::FillShape(/*const */BShape* shape) const
+Painter::DrawShape(const int32& opCount, const uint32* opList,
+				   const int32& ptCount, const BPoint* points,
+				   bool filled) const
 {
-	return _DrawShape(shape, true);
+	CHECK_CLIPPING
+
+	agg::path_storage path;
+	for (int32 i = 0; i < opCount; i++) {
+		switch (opList[i] & 0xFF000000) {
+			case OP_LINETO: {
+				int32 count = opList[i] & 0x00FFFFFF;
+				while (count--) {
+					path.line_to(points->x, points->y);
+					points++;
+				}
+				break;
+			}
+			case (OP_MOVETO | OP_LINETO): {
+				int32 count = opList[i] & 0x00FFFFFF;
+				path.move_to(points->x, points->y);
+				points++;
+				// execute "line to(s)"
+				while (count--) {
+					path.line_to(points->x, points->y);
+					points++;
+				}
+				break;
+			}
+			case OP_BEZIERTO: {
+				int32 count = opList[i] & 0x00FFFFFF;
+				while (count) {
+					path.curve4(points[0].x, points[0].y,
+								points[1].x, points[1].y,
+								points[2].x, points[2].y);
+					points += 3;
+					count -= 3;
+				}
+				break;
+			}
+			case (OP_MOVETO | OP_BEZIERTO): {
+				int32 count = opList[i] & 0x00FFFFFF;
+				// execute "move to"
+				path.move_to(points->x, points->y);
+				points++;
+				// execute "bezier to(s)"
+				while (count) {
+					path.curve4(points[0].x, points[0].y,
+								points[1].x, points[1].y,
+								points[2].x, points[2].y);
+					points += 3;
+					count -= 3;
+				}
+				break;
+			}
+			case OP_CLOSE:
+			case OP_CLOSE | OP_LINETO | OP_BEZIERTO: {
+				path.close_polygon();
+				break;
+			}
+		}
+	}
+	agg::conv_curve<agg::path_storage> curve(path);
+	if (filled)
+		return _FillPath(curve);
+	else
+		return _StrokePath(curve);
 }
 
 // StrokeRect
@@ -1239,27 +1311,6 @@ Painter::_DrawEllipse(BPoint center, float xRadius, float yRadius,
 	}
 }
 
-// _DrawShape
-inline BRect
-Painter::_DrawShape(/*const */BShape* shape, bool fill) const
-{
-	CHECK_CLIPPING
-
-	// TODO: untested
-	agg::path_storage path;
-	ShapeConverter converter(&path);
-
-	// offset locations to center of pixels
-	converter.TranslateBy(BPoint(0.5, 0.5));
-
-	converter.Iterate(shape);
-
-	if (fill)
-		return _FillPath(path);
-	else
-		return _StrokePath(path);
-}
-
 // _DrawPolygon
 inline BRect
 Painter::_DrawPolygon(const BPoint* ptArray, int32 numPts,
@@ -1463,6 +1514,37 @@ Painter::_BoundingBox(VertexSource& path) const
 	return BRect(left, top, right, bottom);
 }
 
+// agg_line_cap_mode_for
+inline agg::line_cap_e
+agg_line_cap_mode_for(cap_mode mode)
+{
+	switch (mode) {
+		case B_BUTT_CAP:
+			return agg::butt_cap;
+		case B_SQUARE_CAP:
+			return agg::square_cap;
+		case B_ROUND_CAP:
+			return agg::round_cap;
+	}
+	return agg::butt_cap;
+}
+
+// agg_line_join_mode_for
+inline agg::line_join_e
+agg_line_join_mode_for(join_mode mode)
+{
+	switch (mode) {
+		case B_MITER_JOIN:
+			return agg::miter_join;
+		case B_ROUND_JOIN:
+			return agg::round_join;
+		case B_BEVEL_JOIN:
+		case B_BUTT_JOIN: // ??
+		case B_SQUARE_JOIN: // ??
+			return agg::bevel_join;
+	}
+	return agg::miter_join;
+}
 
 // _StrokePath
 template<class VertexSource>
@@ -1474,20 +1556,23 @@ Painter::_StrokePath(VertexSource& path) const
 #else
 //	if (fPenSize > 1.0) {
 		agg::conv_stroke<VertexSource> stroke(path);
-// TODO: Investigate this for shapes. Maybe we are supposed to
-// use the settings from DrawState! Would make some sense!
-//		stroke.line_join(agg::round_join);
-//		stroke.line_cap(agg::butt_cap);
 		stroke.width(fPenSize);
 
 		// special case line width = 1 with square caps
 		// this has a couple of advantages and it looks
 		// like this is also the R5 behaviour.
-		if (fPenSize == 1.0)
+		if (fPenSize == 1.0 && fLineCapMode == B_BUTT_CAP) {
 			stroke.line_cap(agg::square_cap);
+		} else {
+			stroke.line_cap(agg_line_cap_mode_for(fLineCapMode));
+		}
+		stroke.line_join(agg_line_join_mode_for(fLineJoinMode));
+		stroke.miter_limit(fMiterLimit);
 
 		fRasterizer->reset();
-		fRasterizer->add_path(stroke);
+		agg::conv_clip_polygon<agg::conv_stroke<VertexSource> > clippedPath(stroke);
+		clippedPath.clip_box(-500, -500, fBuffer->width() + 500, fBuffer->height() + 500);
+		fRasterizer->add_path(clippedPath);
 		agg::render_scanlines(*fRasterizer, *fScanline, *fRenderer);
 //	} else {
 	// TODO: update to AGG 2.3 to get rid of the remaining problems:
@@ -1509,9 +1594,11 @@ BRect
 Painter::_FillPath(VertexSource& path) const
 {
 	fRasterizer->reset();
-	fRasterizer->add_path(path);
+	agg::conv_clip_polygon<VertexSource> clippedPath(path);
+	clippedPath.clip_box(-500, -500, fBuffer->width() + 500, fBuffer->height() + 500);
+	fRasterizer->add_path(clippedPath);
 	agg::render_scanlines(*fRasterizer, *fScanline, *fRenderer);
 
-	return _Clipped(_BoundingBox(path));
+	return _Clipped(_BoundingBox(clippedPath));
 }
 

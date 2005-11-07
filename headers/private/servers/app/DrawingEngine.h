@@ -133,7 +133,7 @@ public:
 
 			void				DrawShape(		const BRect &bounds,
 												const int32 &opcount,
-												const int32 *oplist, 
+												const uint32 *oplist, 
 												const int32 &ptcount,
 												const BPoint *ptlist,
 												const DrawState *d,

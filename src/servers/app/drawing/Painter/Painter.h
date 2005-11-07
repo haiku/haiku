@@ -29,6 +29,7 @@ class PatternHandler;
 class RenderingBuffer;
 class ServerBitmap;
 class ServerFont;
+class Transformable;
 
 // TODO: API transition:
 // * most all functions should take a DrawState* context parameter instead
@@ -123,10 +124,11 @@ class Painter {
 			BRect				FillBezier(		const BPoint* controlPoints) const;
 	
 								// shapes
-			BRect				StrokeShape(	/*const */BShape* shape) const;
-
-			BRect				FillShape(		/*const */BShape* shape) const;
-
+			BRect				DrawShape(		const int32& opCount,
+												const uint32* opList,
+												const int32& ptCount,
+												const BPoint* ptList,
+												bool filled) const;
 
 								// rects
 			BRect				StrokeRect(		const BRect& r) const;
@@ -236,8 +238,6 @@ class Painter {
 												float xRadius,
 												float yRadius,
 												bool fill) const;
-			BRect				_DrawShape(		/*const */BShape* shape,
-												bool fill) const;
 			BRect				_DrawPolygon(	const BPoint* ptArray,
 												int32 numPts,
 											    bool  closed,
@@ -292,6 +292,9 @@ class Painter {
 	source_alpha				fAlphaSrcMode;
 	alpha_function				fAlphaFncMode;
 	BPoint						fPenLocation;
+	cap_mode					fLineCapMode;
+	join_mode					fLineJoinMode;
+	float						fMiterLimit;
 
 	DrawingModeFactory*			fDrawingModeFactory;
 	PatternHandler*				fPatternHandler;
