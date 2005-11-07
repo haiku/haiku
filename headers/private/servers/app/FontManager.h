@@ -39,7 +39,7 @@ class FontManager : public BLooper {
 
 		virtual void MessageReceived(BMessage* message);
 
-		int32 CheckUpdate(uid_t user);
+		int32 CheckRevision(uid_t user);
 		int32 CountFamilies();
 
 		int32 CountStyles(const char *family);

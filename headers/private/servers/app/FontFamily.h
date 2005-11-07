@@ -107,7 +107,7 @@ class FontStyle : public SharedObject, public BLocker {
 							{ return fFamily; }
 		uint16			ID() const
 							{ return fID; }
-		int32			Flags() const;
+		uint32			Flags() const;
 
 		uint16			Face() const
 							{ return fFace; }
@@ -172,7 +172,7 @@ class FontFamily {
 
 		uint16		ID() const
 						{ return fID; }
-		int32		Flags();
+		uint32		Flags();
 
 		bool		HasStyle(const char* style) const;
 		int32		CountStyles() const;
@@ -183,7 +183,7 @@ class FontFamily {
 		BObjectList<FontStyle> fStyles;
 		uint16		fID;
 		uint16		fNextID;
-		int32		fFlags;
+		uint32		fFlags;
 };
 
 #endif	/* FONT_FAMILY_H_ */
