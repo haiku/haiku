@@ -16,7 +16,6 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) font_support ] ;
 
 StaticLibrary libpainter.a :
 	Painter.cpp
-	ShapeConverter.cpp
 	Transformable.cpp
 
 	# drawing_modes
