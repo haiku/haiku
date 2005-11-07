@@ -1704,18 +1704,18 @@ RootLayer::ReadMessageFromPort(bigtime_t tout)
 BMessage*
 RootLayer::ConvertToMessage(void* raw, int32 code)
 {
-	BMessage* bmsg = new BMessage(code);
+	BMessage* message = new BMessage(code);
 
 	if (raw != NULL) {
-		if (bmsg->Unflatten((const char*)raw) != B_OK) {
-			printf("Convert To BMessage FAILED. port message code was: %ld - %c%c%c%c",
-			code, (int8)(code >> 24), (int8)(code >> 16), (int8)(code >> 8), (int8)code  );
-			delete bmsg;
-			bmsg = NULL;
+		if (message->Unflatten((const char*)raw) != B_OK) {
+			printf("Convert To BMessage FAILED. port message code was: %ld - %c%c%c%c\n",
+				code, (int8)(code >> 24), (int8)(code >> 16), (int8)(code >> 8), (int8)code);
+			delete message;
+			return NULL;
 		}
 	}
 
-	return bmsg;
+	return message;
 }
 
 void
