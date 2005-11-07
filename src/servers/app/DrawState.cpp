@@ -37,7 +37,7 @@ DrawState::DrawState()
 	  fFontAliasing(false),
 	  fSubPixelPrecise(false),
 	  fLineCapMode(B_BUTT_CAP),
-	  fLineJoinMode(B_BEVEL_JOIN),
+	  fLineJoinMode(B_MITER_JOIN),
 	  fMiterLimit(B_DEFAULT_MITER_LIMIT),
 	  fPreviousState(NULL)
 {
