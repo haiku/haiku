@@ -2,7 +2,6 @@ SubDir HAIKU_TOP src preferences fonts ;
 
 Preference Fonts :
 	ButtonView.cpp
-	CacheView.cpp
 	FontSelectionView.cpp
 	FontsSettings.cpp
 	FontView.cpp

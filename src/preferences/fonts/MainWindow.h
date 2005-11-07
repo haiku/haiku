@@ -1,7 +1,6 @@
 /*
  * Copyright 2001-2005, Haiku.
  * Distributed under the terms of the MIT License.
- *
  */
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H
@@ -12,7 +11,6 @@
 #include <Box.h>
 
 #include "FontView.h"
-#include "CacheView.h"
 #include "ButtonView.h"
 #include "FontsSettings.h"
 
@@ -24,21 +22,18 @@
 #define M_SET_BOLD 'stbl'
 #define M_SET_FIXED 'stfx'
 
-class MainWindow : public BWindow
-{
-public:
-					MainWindow(void); 
-	virtual	bool	QuitRequested(void);
-	virtual	void	MessageReceived(BMessage *message);
-			
-private:
-	
-	FontView		*fSelectorView;
-	ButtonView		*fButtonView;
-	CacheView		*fCacheView;
-	
-	FontsSettings	fSettings;
+class MainWindow : public BWindow {
+	public:
+		MainWindow();
+
+		virtual	bool	QuitRequested();
+		virtual	void	MessageReceived(BMessage *message);
+
+	private:
+		FontView		*fSelectorView;
+		ButtonView		*fButtonView;
+
+		FontsSettings	fSettings;
 };
 
-#endif
-
+#endif	/* MAIN_WINDOW_H */
