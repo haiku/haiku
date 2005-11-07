@@ -322,7 +322,7 @@ PCI::ReadPciHeaderInfo(PCIDev *dev)
 			dev->info.u.h1.secondary_status = pci_read_config(dev->bus, dev->dev, dev->func, PCI_secondary_status, 2);
 			dev->info.u.h1.memory_base = pci_read_config(dev->bus, dev->dev, dev->func, PCI_memory_base, 2);
 			dev->info.u.h1.memory_limit = pci_read_config(dev->bus, dev->dev, dev->func, PCI_memory_limit, 2);
-			dev->info.u.h1.prefetchable_memory_base = pci_read_config(dev->bus, dev->dev, dev->func, PCI_prefetchable_memory_limit, 2);
+			dev->info.u.h1.prefetchable_memory_base = pci_read_config(dev->bus, dev->dev, dev->func, PCI_prefetchable_memory_base, 2);
 			dev->info.u.h1.prefetchable_memory_limit = pci_read_config(dev->bus, dev->dev, dev->func, PCI_prefetchable_memory_limit, 2);
 			dev->info.u.h1.prefetchable_memory_base_upper32 = pci_read_config(dev->bus, dev->dev, dev->func, PCI_prefetchable_memory_base_upper32, 4);
 			dev->info.u.h1.prefetchable_memory_limit_upper32 = pci_read_config(dev->bus, dev->dev, dev->func, PCI_prefetchable_memory_limit_upper32, 4);
