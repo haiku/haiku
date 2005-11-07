@@ -4,4 +4,12 @@ StdBinCommands
 	cardctl.c
 	dump_cis.c
 	dump_cisreg.c
-	: libroot.so ;
+	: root ;
+
+BinCommand pack_cis :
+	pack_cis.c
+	lex_cis.l
+	yacc_cis.y
+	;
+
+	
