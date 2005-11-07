@@ -23,9 +23,6 @@
 #ifdef DEBUG_BPORTLINK
 #	include <stdio.h>
 #	define STRACE(x) printf x
-// those are defined in LinkSender.cpp
-extern const char *strcode(int32 code);
-extern const char *bstrcode(int32 code);
 #else
 #	define STRACE(x) ;
 #endif
@@ -96,8 +93,8 @@ LinkReceiver::GetNextMessage(int32 &code, bigtime_t timeout)
 	code = header->code;
 	fRecvPosition += sizeof(message_header);
 
-	STRACE(("info: LinkReceiver got header %s [%ld %ld %ld] from port %ld.\n",
-		strcode(header->code), fReplySize, header->code, header->flags, fReceivePort));
+	STRACE(("info: LinkReceiver got header %ld [%ld %ld %ld] from port %ld.\n",
+		header->code, fReplySize, header->code, header->flags, fReceivePort));
 
 	return B_OK;
 }
