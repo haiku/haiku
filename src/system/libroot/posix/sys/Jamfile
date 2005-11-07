@@ -10,6 +10,7 @@ KernelMergeObject posix_sys.o :
 	rlimit.c
  	select.c
 	stat.c
+	statvfs.c
  	sysctl.c
  	times.c
  	uio.c
