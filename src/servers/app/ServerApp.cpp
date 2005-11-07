@@ -1108,90 +1108,51 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		/* font messages */
 
-		case AS_UPDATED_CLIENT_FONTLIST:
+		case AS_GET_FONT_LIST_REVISION:
 		{
-			STRACE(("ServerApp %s: Acknowledged update of client-side font list\n",
-				Signature()));
+			STRACE(("ServerApp %s: AS_GET_FONT_LIST_REVISION\n", Signature()));
 
-			// received when the client-side global font list has been
-			// refreshed
-			gFontManager->Lock();
-			//gFontManager->FontsUpdated();
-			gFontManager->Unlock();
+			fLink.StartMessage(B_OK);
+			fLink.Attach<int32>(gFontManager->CheckRevision(fDesktop->UserID()));
+			fLink.Flush();
 			break;
 		}
-		case AS_QUERY_FONTS_CHANGED:
+		case AS_GET_FAMILY_AND_STYLES:
 		{
-			FTRACE(("ServerApp %s: AS_QUERY_FONTS_CHANGED\n",Signature()));
-			
-			// Attached Data:
-			// 1) bool check flag
-			bool checkonly;
-			link.Read<bool>(&checkonly);
-			
-			gFontManager->Lock();
-			bool needsUpdate = false; //gFontManager->FontsNeedUpdated();
-			gFontManager->Unlock();
-
-			if (checkonly) {
-				fLink.StartMessage(needsUpdate ? SERVER_TRUE : SERVER_FALSE);
-				fLink.Flush();
-			} else {
-				fLink.StartMessage(SERVER_FALSE);
-				fLink.Flush();
-			}
-			break;
-		}
-		case AS_GET_FAMILY_NAME:
-		{
-			FTRACE(("ServerApp %s: AS_GET_FAMILY_NAME\n", Signature()));
+			FTRACE(("ServerApp %s: AS_GET_FAMILY_AND_STYLES\n", Signature()));
 			// Attached Data:
 			// 1) int32 the index of the font family to get
 
 			// Returns:
-			// 1) font_family - name of family
+			// 1) string - name of family
 			// 2) uint32 - flags of font family (B_IS_FIXED || B_HAS_TUNED_FONT)
+			// 3) count of styles in that family
+			// For each style:
+			//		1) string - name of style
+			//		2) uint16 - face of style
+			//		3) uint32 - flags of style
+
 			int32 index;
 			link.Read<int32>(&index);
 
 			gFontManager->Lock();
 
-			FontFamily *family = gFontManager->FamilyAt(index);
+			FontFamily* family = gFontManager->FamilyAt(index);
 			if (family) {
 				fLink.StartMessage(B_OK);
 				fLink.AttachString(family->Name());
 				fLink.Attach<uint32>(family->Flags());
-			} else
-				fLink.StartMessage(B_BAD_VALUE);
+				
+				int32 count = family->CountStyles();
+				fLink.Attach<int32>(count);
 
-			gFontManager->Unlock();
-			fLink.Flush();
-			break;
-		}
-		case AS_GET_STYLE_NAME:
-		{
-			FTRACE(("ServerApp %s: AS_GET_STYLE_NAME\n", Signature()));
-			// Attached Data:
-			// 1) font_family The name of the font family
-			// 2) int32 index of the style to get
+				for (int32 i = 0; i < count; i++) {
+					FontStyle* style = family->StyleAt(i);
 
-			// Returns:
-			// 1) font_style - name of the style
-			// 2) uint16 - appropriate face values
-			// 3) uint32 - flags of font style (B_IS_FIXED || B_HAS_TUNED_FONT)
-
-			font_family family;
-			int32 styleIndex;
-			link.ReadString(family, sizeof(font_family));
-			link.Read<int32>(&styleIndex);
-
-			gFontManager->Lock();
-			FontStyle *fontStyle = gFontManager->GetStyleByIndex(family, styleIndex);
-			if (fontStyle != NULL) {
-				fLink.StartMessage(B_OK);
-				fLink.AttachString(fontStyle->Name());
-				fLink.Attach<uint16>(fontStyle->Face());
-				fLink.Attach<uint32>(fontStyle->Flags());
+					fLink.AttachString(style->Name());
+					fLink.Attach<uint16>(style->Face());
+					fLink.Attach<uint32>(style->Flags());
+				}
 			} else
 				fLink.StartMessage(B_BAD_VALUE);
 
@@ -1401,18 +1362,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			FontStyle *fontStyle = gFontManager->GetStyle(familyID, styleID);
 			if (fontStyle != NULL) {
 				fLink.StartMessage(B_OK);
-				
-				uint32 flags = 0;
-				if (fontStyle->IsFixedWidth())
-					flags |= B_IS_FIXED;
-				if (fontStyle->HasTuned())
-					flags |= B_HAS_TUNED_FONT;
-				if (fontStyle->HasKerning())
-					flags |= B_PRIVATE_FONT_HAS_KERNING;
-
-				flags |= uint32(fontStyle->Direction()) << B_PRIVATE_FONT_DIRECTION_SHIFT;
-
-				fLink.Attach<uint32>(flags);
+				fLink.Attach<uint32>(fontStyle->Flags());
 			} else
 				fLink.StartMessage(B_BAD_VALUE);
 
@@ -1466,45 +1416,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			} else
 				fLink.StartMessage(B_BAD_VALUE);
 
-			fLink.Flush();
-			break;
-		}
-		case AS_COUNT_FONT_FAMILIES:
-		{
-			FTRACE(("ServerApp %s: AS_COUNT_FONT_FAMILIES\n", Signature()));
-			// Returns:
-			// 1) int32 - # of font families
-
-			gFontManager->Lock();
-
-			fLink.StartMessage(B_OK);
-			fLink.Attach<int32>(gFontManager->CountFamilies());
-			fLink.Flush();
-
-			gFontManager->Unlock();
-			break;
-		}
-		case AS_COUNT_FONT_STYLES:
-		{
-			FTRACE(("ServerApp %s: AS_COUNT_FONT_STYLES\n", Signature()));
-			// Attached Data:
-			// 1) font_family - name of font family
-
-			// Returns:
-			// 1) int32 - # of font styles
-			font_family familyName;
-			link.ReadString(familyName, sizeof(font_family));
-
-			gFontManager->Lock();
-
-			FontFamily *family = gFontManager->GetFamily(familyName);
-			if (family != NULL) {
-				fLink.StartMessage(B_OK);
-				fLink.Attach<int32>(family->CountStyles());
-			} else
-				fLink.StartMessage(B_BAD_VALUE);
-
-			gFontManager->Unlock();
 			fLink.Flush();
 			break;
 		}

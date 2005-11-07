@@ -239,15 +239,10 @@ AppServer::MainLoop(void)
 
 		switch (code) {
 			case B_QUIT_REQUESTED:
+			case AS_GET_DESKTOP:
 			case AS_CREATE_APP:
 			case AS_DELETE_APP:
-			case AS_UPDATED_CLIENT_FONTLIST:
-			case AS_QUERY_FONTS_CHANGED:
-			case AS_SET_UI_COLORS:
-			case AS_GET_UI_COLOR:
-			case AS_SET_DECORATOR:
-			case AS_GET_DECORATOR:
-			case AS_R5_SET_DECORATOR:
+			case AS_SET_SYSCURSOR_DEFAULTS:
 				DispatchMessage(code, pmsg);
 				break;
 			default:

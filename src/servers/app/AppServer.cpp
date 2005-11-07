@@ -341,30 +341,6 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 			break;
 		}
 
-		case AS_QUERY_FONTS_CHANGED:
-		{
-			// Client application is asking if the font list has changed since
-			// the last client-side refresh
-
-			// Attached data:
-			// 1) port_id reply port
-
-			gFontManager->Lock();
-			bool needsUpdate = false; //gFontManager->FontsNeedUpdated();
-			gFontManager->Unlock();
-
-			// Seeing how the client merely wants an answer, we'll skip the BPortLink
-			// and all its overhead and just write the code to port.
-			port_id replyPort;
-			if (msg.Read<port_id>(&replyPort) < B_OK)
-				break;
-
-			BPrivate::PortLink reply(replyPort);
-			reply.StartMessage(needsUpdate ? SERVER_TRUE : SERVER_FALSE);
-			reply.Flush();
-			break;
-		}
-
 #if TEST_MODE
 		case B_QUIT_REQUESTED:
 		{

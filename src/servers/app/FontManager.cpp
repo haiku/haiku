@@ -407,6 +407,25 @@ FontManager::_GetSupportedCharmap(const FT_Face& face)
 }
 
 
+int32
+FontManager::CheckRevision(uid_t user)
+{
+	BAutolock locker(this);
+	int32 revision = 0;
+
+	_ScanFontsIfNecessary();
+
+	for (int32 i = 0; i < fDirectories.CountItems(); i++) {
+		font_directory* directory = fDirectories.ItemAt(i);
+
+		// TODO: for now, add all directories
+		revision += directory->revision;
+	}
+
+	return revision;
+}
+
+
 /*!
 	\brief Counts the number of font families available
 	\return The number of unique font families currently available

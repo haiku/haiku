@@ -14,10 +14,12 @@
 #include "ServerFont.h"
 #include "FontManager.h"
 
+#include <FontPrivate.h>
+
 #include FT_CACHE_H
 
 
-const int32 kInvalidFamilyFlags = -1;
+const uint32 kInvalidFamilyFlags = ~0UL;
 
 
 /*!
@@ -81,15 +83,21 @@ FontStyle::Path() const
 }
 
 
-int32
+/*!
+	\brief Unlike BFont::Flags() this returns the extra flags field as used
+		in the private part of BFont.
+*/
+uint32
 FontStyle::Flags() const
 {
-	int32 flags = 0;
+	uint32 flags = uint32(Direction()) << B_PRIVATE_FONT_DIRECTION_SHIFT;
 
 	if (IsFixedWidth())
 		flags |= B_IS_FIXED;
 	if (TunedCount() > 0)
 		flags |= B_HAS_TUNED_FONT;
+	if (HasKerning())
+		flags |= B_PRIVATE_FONT_HAS_KERNING;
 
 	return flags;
 }
@@ -392,7 +400,7 @@ FontFamily::GetStyleMatchingFace(uint16 face) const
 }
 
 
-int32
+uint32
 FontFamily::Flags()
 {
 	if (fFlags == kInvalidFamilyFlags) {

@@ -9,11 +9,14 @@
  */
 
 
+#include <new>
+
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <AppServerLink.h>
+#include <Autolock.h>
 #include <Font.h>
+#include <Locker.h>
 #include <Message.h>
 #include <PortLink.h>
 #include <Rect.h>
@@ -21,9 +24,11 @@
 #include <Shape.h>
 #include <String.h>
 
+#include <AppServerLink.h>
 #include <moreUTF8.h>
 #include <truncate_string.h>
 #include <FontPrivate.h>
+#include <ObjectList.h>
 
 
 const float kUninitializedAscent = INFINITY;
@@ -37,6 +42,261 @@ static BFont sFixedFont;
 const BFont *be_plain_font = &sPlainFont;
 const BFont *be_bold_font = &sBoldFont;
 const BFont *be_fixed_font = &sFixedFont;
+
+
+struct style {
+	BString	name;
+	uint16	face;
+	uint32	flags;
+};
+
+struct family {
+	BString	name;
+	uint32	flags;
+	BObjectList<style> styles;
+};
+
+namespace BPrivate {
+
+class FontList : public BLocker {
+	public:
+		FontList();
+		~FontList();
+
+		bool UpdatedOnServer();
+
+		status_t FamilyAt(int32 index, font_family *_family, uint32 *_flags);
+		status_t StyleAt(font_family family, int32 index, font_style *_style,
+					uint16 *_face, uint32 *_flags);
+
+		int32 CountFamilies();
+		int32 CountStyles(font_family family);
+
+	private:
+		status_t _UpdateIfNecessary();
+		status_t _Update();
+		int32 _RevisionOnServer();
+		family* _FindFamily(font_family name);
+
+		BObjectList<family> fFamilies;
+		family*		fLastFamily;
+		bigtime_t	fLastUpdate;
+		int32		fRevision;
+};
+
+}	// namespace BPrivate
+
+static BPrivate::FontList sFontList;
+
+
+namespace BPrivate {
+
+FontList::FontList()
+	: BLocker("font list"),
+	fLastFamily(NULL),
+	fLastUpdate(0),
+	fRevision(0)
+{
+}
+
+
+FontList::~FontList()
+{
+}
+
+
+bool
+FontList::UpdatedOnServer()
+{
+	return _RevisionOnServer() != fRevision;
+}
+
+
+int32
+FontList::_RevisionOnServer()
+{
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_GET_FONT_LIST_REVISION);
+
+	int32 code;
+	if (link.FlushWithReply(code) != B_OK || code != B_OK)
+		return B_ERROR;
+
+	int32 revision;
+	link.Read<int32>(&revision);
+
+	return revision;
+}
+
+
+status_t
+FontList::_Update()
+{
+	// check version
+
+	int32 revision = _RevisionOnServer();
+	fLastUpdate = system_time();
+
+	// are we up-to-date already?
+	if (revision == fRevision)
+		return B_OK;
+
+	fFamilies.MakeEmpty();
+	fLastFamily = NULL;
+
+	BPrivate::AppServerLink link;
+
+	for (int32 index = 0;; index++) {
+		link.StartMessage(AS_GET_FAMILY_AND_STYLES);
+		link.Attach<int32>(index);
+
+		int32 status;
+		if (link.FlushWithReply(status) != B_OK
+			|| status != B_OK)
+			break;
+
+		::family* family = new (nothrow) ::family;
+		if (family == NULL)
+			return B_NO_MEMORY;
+
+		link.ReadString(family->name);
+		link.Read<uint32>(&family->flags);
+
+		int32 styleCount;
+		link.Read<int32>(&styleCount);
+
+		for (int32 i = 0; i < styleCount; i++) {
+			::style* style = new (nothrow) ::style;
+			if (style == NULL) {
+				delete family;
+				return B_NO_MEMORY;
+			}
+			
+			link.ReadString(style->name);
+			link.Read<uint16>(&style->face);
+			link.Read<uint32>(&style->flags);
+
+			family->styles.AddItem(style);
+		}
+
+		fFamilies.AddItem(family);
+	}
+
+	fRevision = revision;
+
+	// if the font list has been changed in the mean time, just update again
+	if (UpdatedOnServer())
+		_Update();
+
+	return B_OK;
+}
+
+
+status_t
+FontList::_UpdateIfNecessary()
+{
+	// an updated font list is at least valid for 1 second
+	if (fLastUpdate > system_time() - 1000000)
+		return B_OK;
+
+	return _Update();
+}
+
+
+family*
+FontList::_FindFamily(font_family name)
+{
+	if (fLastFamily != NULL && fLastFamily->name == name)
+		return fLastFamily;
+
+	for (int32 i = 0; i < fFamilies.CountItems(); i++) {
+		family* family = fFamilies.ItemAt(i);
+
+		if (family->name == name) {
+			fLastFamily = family;
+			return family;
+		}
+	}
+
+	return NULL;
+}
+
+
+status_t
+FontList::FamilyAt(int32 index, font_family *_family, uint32 *_flags)
+{
+	BAutolock locker(this);
+
+	status_t status = _UpdateIfNecessary();
+	if (status < B_OK)
+		return status;
+
+	::family* family = fFamilies.ItemAt(index);
+	if (family == NULL)
+		return B_BAD_VALUE;
+
+	memcpy(*_family, family->name.String(), family->name.Length() + 1);
+	if (_flags)
+		*_flags = family->flags;
+	return B_OK;
+}
+
+
+status_t
+FontList::StyleAt(font_family familyName, int32 index, font_style *_style,
+	uint16 *_face, uint32 *_flags)
+{
+	BAutolock locker(this);
+
+	status_t status = _UpdateIfNecessary();
+	if (status < B_OK)
+		return status;
+
+	::family* family = _FindFamily(familyName);
+	if (family == NULL)
+		return B_BAD_VALUE;
+
+	::style* style = family->styles.ItemAt(index);
+	if (style == NULL)
+		return B_BAD_VALUE;
+
+	memcpy(*_style, style->name.String(), style->name.Length() + 1);
+	if (_face)
+		*_face = style->face;
+	if (_flags)
+		*_flags = style->flags;
+	return B_OK;
+}
+
+
+int32
+FontList::CountFamilies()
+{
+	BAutolock locker(this);
+
+	_UpdateIfNecessary();
+	return fFamilies.CountItems();
+}
+
+
+int32
+FontList::CountStyles(font_family familyName)
+{
+	BAutolock locker(this);
+
+	_UpdateIfNecessary();
+
+	::family* family = _FindFamily(familyName);
+	if (family == NULL)
+		return 0;
+
+	return family->styles.CountItems();
+}
+
+}	// namespace BPrivate
+
+
+//	#pragma mark -
 
 
 void
@@ -121,19 +381,9 @@ _set_system_font_(const char *which, font_family family, font_style style,
 */
 
 int32
-count_font_families(void)
+count_font_families()
 {
-	int32 code, count;
-	BPrivate::AppServerLink link;
-
-	link.StartMessage(AS_COUNT_FONT_FAMILIES);
-
-	if (link.FlushWithReply(code) != B_OK
-		|| code != B_OK)
-		return -1;
-
-	link.Read<int32>(&count);
-	return count;
+	return sFontList.CountFamilies();
 }
 
 
@@ -145,18 +395,7 @@ count_font_families(void)
 int32
 count_font_styles(font_family family)
 {
-	BPrivate::AppServerLink link;
-	link.StartMessage(AS_COUNT_FONT_STYLES);
-	link.AttachString(family);
-
-	int32 code;
-	if (link.FlushWithReply(code) != B_OK
-		|| code != B_OK)
-		return -1;
-
-	int32 count;
-	link.Read<int32>(&count);
-	return count;
+	return sFontList.CountStyles(family);
 }
 
 
@@ -174,23 +413,7 @@ get_font_family(int32 index, font_family *_name, uint32 *_flags)
 	if (_name == NULL)
 		return B_BAD_VALUE;
 
-	BPrivate::AppServerLink link;
-	link.StartMessage(AS_GET_FAMILY_NAME);
-	link.Attach<int32>(index);
-
-	int32 status = B_ERROR;
-	if (link.FlushWithReply(status) != B_OK
-		|| status != B_OK)
-		return status;
-
-	link.ReadString(*_name, sizeof(font_family));
-
-	uint32 flags;
-	link.Read<uint32>(&flags);
-	if (_flags)
-		*_flags = flags;
-
-	return B_OK;
+	return sFontList.FamilyAt(index, _name, _flags);
 }
 
 
@@ -229,59 +452,20 @@ get_font_style(font_family family, int32 index, font_style *_name,
 	if (_name == NULL)
 		return B_BAD_VALUE;
 
-	// TODO: maybe cache the whole font list locally?
-
-	BPrivate::AppServerLink link;
-	link.StartMessage(AS_GET_STYLE_NAME);
-	link.AttachString(family);
-	link.Attach<int32>(index);
-
-	int32 status = B_ERROR;
-	if (link.FlushWithReply(status) != B_OK
-		|| status != B_OK)
-		return status;
-
-	link.ReadString(*_name, sizeof(font_style));
-
-	uint16 face;
-	uint32 flags;
-	link.Read<uint16>(&face);
-	link.Read<uint32>(&flags);
-
-	if (_face)
-		*_face = face;
-	if (_flags)
-		*_flags = flags;
-
-	return B_OK;
+	return sFontList.StyleAt(family, index, _name, _face, _flags);
 }
 
 
 /*!
 	\brief Updates the font family list
-	\param check_only If true, the function only checks to see if the font list has changed
+	\param checkOnly is ignored
 	\return true if the font list has changed, false if not.
 */
 
 bool
-update_font_families(bool checkOnly)
+update_font_families(bool /*checkOnly*/)
 {
-	int32 code;
-	bool value;
-	BPrivate::AppServerLink link;
-
-	// TODO: get some kind of change counter or timestamp and use node-monitoring
-	//	for fonts in the app_server
-
-	link.StartMessage(AS_QUERY_FONTS_CHANGED);
-	link.Attach<bool>(checkOnly);
-
-	if (link.FlushWithReply(code) != B_OK
-		|| code != B_OK)
-		return false;
-
-	link.Read<bool>(&value);
-	return value;
+	return sFontList.UpdatedOnServer();
 }
 
 
