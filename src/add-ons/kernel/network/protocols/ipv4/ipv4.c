@@ -65,7 +65,17 @@ struct route ipforward_rt;
 //int ipv4_output(struct mbuf *, struct mbuf *, struct route *, int, void *);
                 
 #if SHOW_DEBUG
-static void dump_ipv4_header(struct mbuf *buf)
+
+void 
+dump_ipv4_addr(char *msg, void *ad)
+{
+        uint8 *b = (uint8*)ad;
+        printf("%s %d.%d.%d.%d\n", msg, b[0], b[1], b[2], b[3]);
+}
+
+
+static void 
+dump_ipv4_header(struct mbuf *buf)
 {
 	struct ip *ip = mtod(buf, struct ip *);
 
@@ -629,7 +639,7 @@ void ipv4_input(struct mbuf *m, int hdrlen)
 	struct ipq *fp;
 	
 #if SHOW_DEBUG
-	dump_ipv4_header(buf);
+	dump_ipv4_header(m);
 #endif
 	if (!m)
 		return;

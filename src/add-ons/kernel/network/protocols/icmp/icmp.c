@@ -1,22 +1,22 @@
 /* icmp.c
  */
- 
 #ifndef _KERNEL_MODE
 	#include <stdio.h>
 	#include <string.h>
 #endif
 
+#include <string.h>
 #include "net_misc.h"
-#include "sys/socket.h"
-#include "netinet/in_systm.h"
-#include "netinet/ip.h"
-#include "netinet/ip_icmp.h"
+#include <sys/socket.h>
+#include <netinet/in_systm.h>
+#include <netinet/ip.h>
+#include <netinet/ip_icmp.h>
 #include "protocols.h"
 #include "sys/protosw.h"
 #include "sys/domain.h"
-#include "netinet/icmp_var.h"
-#include "netinet/in_var.h"
-#include "net/if.h"
+#include <netinet/icmp_var.h>
+#include <netinet/in_var.h>
+#include <net/if.h>
 
 #include "core_module.h"
 #include "net_module.h"
@@ -43,18 +43,18 @@ static struct route icmprt;
 static void dump_icmp(struct mbuf *buf)
 {
 	struct ip *ip = mtod(buf, struct ip *);
-	struct icmp *ic =  (struct icmp*)((caddr_t)ip + (ip->hl * 4));
+	struct icmp *ic =  (struct icmp*)((caddr_t)ip + (ip->ip_hl * 4));
 
 	printf("ICMP: ");
 	switch (ic->icmp_type) {
-		case ICMP_ECHORQST:
+		case ICMP_ECHO:
 			printf ("Echo request\n");
 			break;
-		case ICMP_ECHORPLY:
+		case ICMP_ECHOREPLY:
 			printf("echo reply\n");
 			break;
 		default:
-			printf("?? type = %d\n", ic->type);
+			printf("?? type = %d\n", ic->icmp_type);
 	}
 }
 #endif

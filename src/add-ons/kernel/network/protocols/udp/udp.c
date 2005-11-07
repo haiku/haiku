@@ -3,21 +3,21 @@
 
 #ifndef _KERNEL_MODE
 #include <stdio.h>
-#include <string.h>
 #endif
 
+#include <string.h>
 #include "net_misc.h"
 #include "protocols.h"
-#include "netinet/in_systm.h"
-#include "netinet/in_var.h"
-#include "netinet/in_pcb.h"
-#include "netinet/ip.h"
+#include <netinet/in_systm.h>
+#include <netinet/in_var.h>
+#include <netinet/in_pcb.h>
+#include <netinet/ip.h>
 #include "sys/domain.h"
 #include "sys/protosw.h"
-#include "netinet/ip_var.h"
-#include "netinet/udp.h"
-#include "netinet/udp_var.h"
-#include "netinet/ip_icmp.h"
+#include <netinet/ip_var.h>
+#include <netinet/udp.h>
+#include <netinet/udp_var.h>
+#include <netinet/ip_icmp.h>
 
 #include "core_module.h"
 #include "net_module.h"
@@ -51,9 +51,10 @@ static void dump_udp(struct mbuf *buf)
 	struct udphdr *udp = (struct udphdr*)((caddr_t)ip + (ip->ip_hl * 4));
 
 	printf("udp_header  :\n");
-	printf("            : src_port      : %d\n", ntohs(udp->src_port));
-	printf("            : dst_port      : %d\n", ntohs(udp->dst_port));
-	printf("            : udp length    : %d bytes\n", ntohs(udp->length));
+	printf("            : src_port      : %d\n", ntohs(udp->uh_sport));
+	printf("            : dst_port      : %d\n", ntohs(udp->uh_dport));
+	printf("            : udp length    : %d bytes\n", ntohs(udp->uh_ulen));
+	printf("            : udp sum       : %d\n", ntohs(udp->uh_sum));
 }
 #endif /* SHOW_DEBUG */
 
