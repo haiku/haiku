@@ -16,8 +16,10 @@
 #define printf  dprintf
 #endif  
 
+#ifndef __HAIKU__
 /* Not really sure if this is safe... */
 #define EHOSTDOWN	(B_POSIX_ERROR_BASE + 45)
+#endif
 
 /* These are GCC only, so we'll need PPC version eventually... */
 struct quehead {
