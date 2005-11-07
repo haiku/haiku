@@ -1,5 +1,5 @@
-#ifndef HAIKU_BUILD_COMPATIBILITY_H
-#define HAIKU_BUILD_COMPATIBILITY_H
+#ifndef BEOS_BUILD_COMPATIBILITY_H
+#define BEOS_BUILD_COMPATIBILITY_H
 
 typedef unsigned long haiku_build_addr_t;
 #define addr_t haiku_build_addr_t
@@ -51,5 +51,5 @@ extern char *_haiku_build_strerror(int errnum);
 } // extern "C"
 #endif
 
-#endif	// HAIKU_BUILD_COMPATIBILITY_H
+#endif	// BEOS_BUILD_COMPATIBILITY_H
 
