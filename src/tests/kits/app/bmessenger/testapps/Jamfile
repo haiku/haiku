@@ -38,7 +38,7 @@ rule SimpleBMessengerTestApp2
 	CommonUnitTest $(name)
 		: $(sources)
 		: kits app
-		: <boot!home!config!lib>libopenbeos.so be stdc++.r4 $(useObjects)
+		: be stdc++.r4 $(useObjects)
 		: be stdc++.r4 $(useR5Objects)
 		: app support
 	;

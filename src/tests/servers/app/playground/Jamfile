@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src tests servers app playground ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
 
 UseHeaders [ FDirName os app ] ;
 UseHeaders [ FDirName os interface ] ;
@@ -10,15 +11,10 @@ Application Playground :
 	ObjectView.cpp
 	ObjectWindow.cpp
 	States.cpp
+	: be
 ;
 
-if ( $(TARGET_PLATFORM) = haiku ) {
-	# for running natively under R5 or Haiku:
-	LinkAgainst Playground : be ;
-} else {
-	# for running in the Haiku app_server under R5:
-	LinkAgainst Playground : libopenbeos.so ;
-
+if ( $(TARGET_PLATFORM) = libbe_test ) {
 	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Playground
 		: tests!apps ;
 }

@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src tests apps miniterminal ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src tests apps miniterminal ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src apps terminal ] ;
@@ -14,13 +15,10 @@ Application MiniTerminal :
 	MiniView.cpp 
 	MiniWin.cpp
 	ViewBuffer.cpp
-	;
+	: be
+;
 
-if $(TARGET_PLATFORM) = haiku {
-	LinkAgainst MiniTerminal : be ;
-} else {
-	LinkAgainst MiniTerminal : libopenbeos.so ;
-
+if $(TARGET_PLATFORM) = libbe_test {
 	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : MiniTerminal
 		: tests!apps ;
 }

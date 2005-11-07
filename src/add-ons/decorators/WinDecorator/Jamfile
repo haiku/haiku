@@ -7,5 +7,5 @@ UsePrivateHeaders [ FDirName servers app ] ;
 Addon WinDecorator : decorators :
 	WinDecorator.cpp
 	: false
-	: be libopenbeos.so libappserver.so
+	: be libappserver.so
 ;

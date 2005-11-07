@@ -1,12 +1,12 @@
 SubDir HAIKU_TOP src tests servers app scrolling ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
 UseHeaders [ FDirName os app ] ;
 UseHeaders [ FDirName os interface ] ;
 
 SimpleTest Scrolling :
 	main.cpp
-# for running in the Haiku app_server under R5:
-#	: <boot!home!config!lib>libopenbeos.so ;
-# for running natively under R5 or Haiku:
-	: libbe.so ;
+	: be ;
 

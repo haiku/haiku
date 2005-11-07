@@ -8,8 +8,6 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-#include <syscalls.h>
-
 #include <Directory.h>
 #include <DiskDevice.h>
 #include <DiskDevicePrivate.h>
@@ -22,6 +20,9 @@
 #include <Path.h>
 #include <String.h>
 #include <Volume.h>
+
+#include <syscalls.h>
+#include <disk_device_manager/ddm_userland_interface.h>
 
 /*!	\class BPartition
 	\brief A BPartition object represent a partition and provides a lot of

@@ -5,9 +5,10 @@
 
 #include <new>
 
-#include <syscalls.h>
-
 #include <PartitioningInfo.h>
+
+#include <syscalls.h>
+#include <disk_device_manager/ddm_userland_interface.h>
 
 using namespace std;
 

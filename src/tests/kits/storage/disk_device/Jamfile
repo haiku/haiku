@@ -9,7 +9,7 @@ UsePrivateHeaders storage ;
 SimpleTest DiskDeviceTest
 	: DiskDeviceTest.cpp
 
-	  # We compile these classes in. If we would link against libopenbeos
+	  # We compile these classes in. If we would link against libbe_haiku
 	  # instead, we couldn't use any GUI. At least not at this time.
 	  #
 #	  Mime.cpp

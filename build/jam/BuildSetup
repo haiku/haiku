@@ -409,7 +409,7 @@ if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 		[ FDirName $(HAIKU_TOP) headers build os storage ]
 		[ FDirName $(HAIKU_TOP) headers build os support ]
 	;
-	HOST_BE_API_CCFLAGS = -include HaikuBuildCompatibility.h ;
+	HOST_BE_API_CCFLAGS = -include BeOSBuildCompatibility.h ;
 	HOST_BE_API_C++FLAGS = $(HOST_BE_API_CCFLAGS) ;
 }
 
@@ -492,6 +492,8 @@ if $(TARGET_PLATFORM) = haiku {
 
 	TARGET_BOOT_PLATFORM		= $(HAIKU_BOOT_PLATFORM) ;
 
+	TARGET_LIBRARY_NAME_MAP		= HAIKU_LIBRARY_NAME_MAP ;
+
 } else {
 	local var ;
 	for var in $(buildVars) {
@@ -504,15 +506,67 @@ if $(TARGET_PLATFORM) = haiku {
 	TARGET_GCC_LIBGCC_OBJECTS	= ;
 
 	TARGET_BOOT_PLATFORM		= ;
+
+	TARGET_LIBRARY_NAME_MAP		= ;
 }
 
 # define macro, for identifying the platform
 switch $(TARGET_PLATFORM) {
-	case r5		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_BEOS ;
-	case bone	: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_BONE ;
-	case dano	: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_DANO ;
-	case haiku	: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_HAIKU ;
-	case linux	: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_LINUX ;
+	case r5			: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_BEOS ;
+	case bone		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_BONE ;
+	case dano		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_DANO ;
+	case haiku		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_HAIKU ;
+	case linux		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_LINUX ;
+	case libbe_test	: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_LIBBE_TEST ;
+}
+
+# define macro, for identifying the host platform
+switch $(HOST_PLATFORM) {
+	case r5			: TARGET_DEFINES	+= HAIKU_HOST_PLATFORM_BEOS ;
+	case bone		: TARGET_DEFINES	+= HAIKU_HOST_PLATFORM_BONE ;
+	case dano		: TARGET_DEFINES	+= HAIKU_HOST_PLATFORM_DANO ;
+	case haiku		: TARGET_DEFINES	+= HAIKU_HOST_PLATFORM_HAIKU ;
+	case linux		: TARGET_DEFINES	+= HAIKU_HOST_PLATFORM_LINUX ;
+}
+
+
+#pragma mark -
+
+# special target libbe_test
+
+if $(TARGET_PLATFORM) = libbe_test {
+	# headers and flags
+	TARGET_HDRS += [ PublicHeaders app interface storage support ]
+		[ PrivateHeaders $(DOT) ] ;
+	local compatibilityHeader = -include [ FDirName $(HAIKU_TOP) headers build
+		HaikuBuildCompatibility.h ] ;
+	TARGET_CCFLAGS += $(compatibilityHeader) ;
+	TARGET_C++FLAGS += $(compatibilityHeader) ;
+
+	# compatibility library
+	TARGET_HAIKU_COMPATIBILITY_LIBS = libhaikucompat.a ;
+
+	# directories
+	TARGET_OBJECT_BASE_DIR
+		= [ FDirName $(HAIKU_OBJECT_DIR) $(TARGET_PLATFORM) ] ;
+	TARGET_COMMON_ARCH_OBJECT_DIR
+		= [ FDirName $(TARGET_OBJECT_BASE_DIR) common ] ;
+	TARGET_ARCH_OBJECT_DIR
+		= [ FDirName $(TARGET_OBJECT_BASE_DIR) $(TARGET_ARCH) ] ;
+	TARGET_COMMON_DEBUG_OBJECT_DIR
+		= [ FDirName $(TARGET_ARCH_OBJECT_DIR) common ] ;
+	TARGET_DEBUG_0_OBJECT_DIR
+		= [ FDirName $(TARGET_ARCH_OBJECT_DIR) release ] ;
+
+	local level ;
+	for level in $(HAIKU_DEBUG_LEVELS[2-]) {
+		TARGET_DEBUG_$(level)_OBJECT_DIR
+			= [ FDirName $(TARGET_ARCH_OBJECT_DIR) debug_$(level) ] ;
+	}
+
+	# library name map
+	TARGET_LIBRARY_NAME_MAP = LIBBE_LIBRARY_NAME_MAP ;
+	LIBBE_LIBRARY_NAME_MAP_be = libbe_haiku.so ;
 }
 
 

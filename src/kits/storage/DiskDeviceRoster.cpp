@@ -5,8 +5,6 @@
 
 #include <new>
 
-#include <syscalls.h>
-
 #include <Directory.h>
 #include <DiskDevice.h>
 #include <DiskDeviceJob.h>
@@ -18,6 +16,9 @@
 #include <Message.h>
 #include <Partition.h>
 #include <Path.h>
+
+#include <syscalls.h>
+#include <disk_device_manager/ddm_userland_interface.h>
 
 //#include "AddOnImage.h"
 

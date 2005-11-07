@@ -25,7 +25,7 @@ CommonTestLib libmessagetest.so
 		MessageOpAssignTest.cpp
 		MessageEasyFindTest.cpp
 		MessageSpeedTest.cpp
-	: <boot!home!config!lib>libopenbeos.so stdc++.r4
+	: be stdc++.r4
 	: be stdc++.r4
 	: 
 	: app
@@ -151,8 +151,7 @@ CommonTestLib libapptest.so
 		AppRunner.cpp
 		PipedAppRunner.cpp
 
-	: <boot!home!config!lib>libopenbeos.so
-		be stdc++.r4
+	: be stdc++.r4
 	: be stdc++.r4
 	: 
 	: app support

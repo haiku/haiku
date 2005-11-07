@@ -23,13 +23,7 @@ if ! $(HAIKU_COMPATIBLE) {
 	SubDirC++Flags $(defines) ;
 }
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-if $(TARGET_PLATFORM) != haiku {
-	UseHeaders [ FStandardOSHeaders ] : true ;
-	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
-		# TODO: POSIX headers shouldn't be used. Needed for strlcpy() only.
-}
-
+SetSubDirSupportedPlatforms haiku libbe_test ;
 
 UsePrivateHeaders shared app interface input [ FDirName servers app ] ;
 

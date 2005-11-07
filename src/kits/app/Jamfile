@@ -20,12 +20,7 @@ if $(RUN_WITHOUT_APP_SERVER) != 0 {
 UsePrivateHeaders shared app interface ;
 UsePrivateHeaders [ FDirName kernel util ] ;   # For KMessage.h
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-if $(TARGET_PLATFORM) != haiku {
-	UseHeaders [ FStandardOSHeaders ] : true ;
-	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
-		# TODO: POSIX headers shouldn't be used. Needed for strlcpy() only.
-}
+SetSubDirSupportedPlatforms haiku libbe_test ;
 
 MergeObject <libbe>app_kit.o :
 	AppDefs.cpp

@@ -50,8 +50,7 @@ CommonTestLib libinterfacetest.so
 		WidthBufferTest.cpp
 		WidthBufferSimpleTest.cpp
 
-	: <boot!home!config!lib>libopenbeos.so
-		be stdc++.r4
+	: be stdc++.r4
 	: be stdc++.r4
 	: 
 	: app support

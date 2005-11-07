@@ -10,11 +10,6 @@ Addon <input>serial_mouse : input_server/devices :
 	: false 
 	: be device <nogrist>input_server ;
 
-if $(COMPILE_FOR_R5) {
-} else {
-        LinkAgainst <input>mouse : <boot!home!config!lib>libopenbeos.so ;
-}
-
 Package haiku-inputkit-cvs :
         <input>serial_mouse :
         boot home config add-ons input_server devices ;

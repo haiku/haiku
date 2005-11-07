@@ -5,7 +5,8 @@ rule AddSharedObjectGlueCode
 	
 	# we link with -nostdlib and add the required libs manually, when building
 	# for Haiku
-	if [ on $(1) return $(PLATFORM) ] = haiku {
+	local platform = [ on $(1) return $(PLATFORM) ] ;
+	if $(platform) = haiku {
 		local stdLibs = libroot.so ;
 		local beginGlue ;
 		local endGlue ;
@@ -28,6 +29,11 @@ rule AddSharedObjectGlueCode
 		NEEDLIBS on $(1) = $(stdLibs) [ on $(1) return $(NEEDLIBS) ] ;
 		Depends $(1) : $(stdLibs) $(beginGlue) $(endGlue) ;
 		LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ] -nostdlib ;
+	}
+
+	# link against the compatibility libraries needed for the target
+	if $(platform) != host && $(TARGET_HAIKU_COMPATIBILITY_LIBS) {
+		LinkAgainst $(1) : $(TARGET_HAIKU_COMPATIBILITY_LIBS) ;
 	}
 }
 
@@ -256,26 +262,29 @@ rule SharedLibrary
 
 rule LinkAgainst
 {
-	# LinkAgainst <name> : <libs> ;
-	# Valid elements for <libs> are e.g. "be" or "libopenbeos.so" or
+	# LinkAgainst <name> : <libs> [ : <mapLibs> ] ;
+	# Valid elements for <libs> are e.g. "be" or "libtranslation.so" or
 	# "/boot/.../libfoo.so". If the basename starts with "lib" or the thingy
 	# has a dirname or grist, it is added to the NEEDLIBS variable (i.e. the
 	# file will be bound!), otherwise it is prefixed "-l" and added to
 	# LINKLIBS. If you want to specify a target that isn't a library and
 	# also has neither grist nor a dirname, you can prepend "<nogrist>" as
 	# grist; it will be stripped by this rule.
+	# <mapLibs> specifies whether the to translate library names (e.g. "be"
+	# to "libbe.so" in case of target platform "haiku"). Defaults to "true".
 	#
 	local target = $(1) ;
 	local libs = $(2) ;
-	local mapLibs = $(3) ;
+	local mapLibs = $(3:E=true) ;
 
 	on $(target) {
 		# map libraries, if desired and target platform is Haiku
-		if $(PLATFORM)  = haiku {
+		if $(PLATFORM) != host && $(mapLibs) = true
+				&& $(TARGET_LIBRARY_NAME_MAP) {
 			local mappedLibs ;
 
 			for i in $(libs) {
-				local mapped = $(HAIKU_LIBRARY_NAME_MAP_$(i)) ;
+				local mapped = $($(TARGET_LIBRARY_NAME_MAP)_$(i)) ;
 				mapped ?= $(i) ;
 				mappedLibs += $(mapped) ;
 			}

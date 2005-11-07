@@ -1,12 +1,12 @@
 SubDir HAIKU_TOP src kits support ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-if $(TARGET_PLATFORM) != haiku {
-	UseHeaders [ FStandardOSHeaders ] : true ;
-	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
-		# TODO: POSIX headers shouldn't be used. Needed for strlcpy() and
-		# addr_t.
-}
+SetSubDirSupportedPlatforms haiku libbe_test ;
+#if $(TARGET_PLATFORM) != haiku {
+#	UseHeaders [ FStandardOSHeaders ] : true ;
+#	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+#		# TODO: POSIX headers shouldn't be used. Needed for strlcpy() and
+#		# addr_t.
+#}
 
 UsePrivateHeaders shared app ;
 

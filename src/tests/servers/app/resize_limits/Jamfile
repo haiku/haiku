@@ -1,16 +1,9 @@
 SubDir HAIKU_TOP src tests servers app resize_limits ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
 Application ResizeLimits :
 	ResizeLimits.cpp
-	;
-
-if ( $(TARGET_PLATFORM) = haiku ) {
-	# for running natively under R5 or Haiku:
-	LinkAgainst ResizeLimits :
-		libbe.so ;
-} else {
-	# for running in the Haiku app_server under R5:
-	LinkAgainst ResizeLimits :
-		<boot!home!config!lib>libopenbeos.so ;
-}
-
+	: be
+;

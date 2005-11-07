@@ -1,20 +1,13 @@
 SubDir HAIKU_TOP src tests servers app bitmap_drawing ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
 UseHeaders [ FDirName os app ] ;
 UseHeaders [ FDirName os interface ] ;
 
 Application BitmapDrawing :
 	main.cpp
-	;
-
-if ( $(TARGET_PLATFORM) = haiku ) {
-	# for running natively under R5 or Haiku:
-	LinkAgainst BitmapDrawing :
-		libbe.so ;
-} else {
-	# for running in the Haiku app_server under R5:
-	LinkAgainst BitmapDrawing :
-		<boot!home!config!lib>libopenbeos.so ;
-#		be ;
-}
+	: be
+;
 

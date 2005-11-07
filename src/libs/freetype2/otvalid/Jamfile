@@ -12,6 +12,7 @@
 SubDir  HAIKU_TOP src libs freetype2 otvalid ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
 
 UseFreeTypeHeaders ;
 

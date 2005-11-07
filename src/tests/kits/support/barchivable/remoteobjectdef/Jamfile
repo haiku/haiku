@@ -7,7 +7,7 @@ AddResources libsupporttest_RemoteTestObject_r5.so : RemoteTestObject.rdef ;
 
 CommonTestLib libsupporttest_RemoteTestObject.so
 	: RemoteTestObject.cpp
-	: <boot!home!config!lib>libopenbeos.so be stdc++.r4
+	: be stdc++.r4
 	: be stdc++.r4
 	:
 	: support

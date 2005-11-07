@@ -14,13 +14,14 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <syscalls.h>
-
 #include <DiskDevice.h>
 #include <DiskDeviceVisitor.h>
 #include <Drivers.h>
 #include <Message.h>
 #include <Path.h>
+
+#include <syscalls.h>
+#include <disk_device_manager/ddm_userland_interface.h>
 
 
 /*!	\class BDiskDevice

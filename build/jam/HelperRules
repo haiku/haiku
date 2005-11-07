@@ -126,6 +126,11 @@ rule SetPlatformCompatibilityFlagVariables
 		EXIT "specify it manually." ;
 	}
 
+	# special case: Haiku libbe.so built for testing under BeOS
+	if $(platform) = libbe_test {
+		platform = haiku ;
+	}
+
 	$(varPrefix)_PLATFORM_BEOS_COMPATIBLE = ;
 	$(varPrefix)_PLATFORM_BONE_COMPATIBLE = ;
 	$(varPrefix)_PLATFORM_DANO_COMPATIBLE = ;
@@ -178,6 +183,9 @@ rule SetPlatformCompatibilityFlagVariables
 		?= $($(varPrefix)_PLATFORM_BONE_COMPATIBLE) ;
 	$(varPrefix)_PLATFORM_(r5)_COMPATIBLE
 		?= $($(varPrefix)_PLATFORM_BEOS_COMPATIBLE) ;
+
+	$(varPrefix)_PLATFORM_(libbe_test)_COMPATIBLE
+		?= $($(varPrefix)_PLATFORM_BEOS_COMPATIBLE) ;
 }
 
 
@@ -209,6 +217,13 @@ rule SetSubDirSupportedPlatforms
 	# SetSubDirSupportedPlatforms <platforms> ;
 
 	SUPPORTED_PLATFORMS = $(1) ;
+}
+
+rule AddSubDirSupportedPlatforms
+{
+	# AddSubDirSupportedPlatforms <platforms> ;
+
+	SUPPORTED_PLATFORMS += $(1) ;
 }
 
 rule SetSubDirSupportedPlatformsBeOSCompatible

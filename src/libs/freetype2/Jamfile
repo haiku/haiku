@@ -4,6 +4,7 @@
 SubDir  HAIKU_TOP src libs freetype2 ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
 
 # The file <freetype/internal/internal.h> is used to define macros that are
 # later used in #include statements.  It needs to be parsed in order to

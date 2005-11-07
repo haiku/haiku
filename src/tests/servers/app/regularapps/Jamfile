@@ -7,15 +7,17 @@ UseHeaders [ FDirName $(clockDir) ] ;
 SEARCH_SOURCE += $(clockDir) [ FDirName $(clockDir) ] ;
 
 # No need to define any of those targets, when building for haiku
-if $(TARGET_PLATFORM) != haiku {
+if $(TARGET_PLATFORM) = libbe_test {
+
+SetSubDirSupportedPlatforms libbe_test ;
 
 SimpleTest TestApp_Clock :
 	cl_view.cpp
 	cl_wind.cpp 
 	clock.cpp
-	: libopenbeos.so
+	: be
 	: Clock.rdef
 	;
 
 
-} # if $(TARGET_PLATFORM) != haiku
+} # if $(TARGET_PLATFORM) = libbe_test

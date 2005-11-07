@@ -3,9 +3,10 @@
 //  by the OpenBeOS license.
 //---------------------------------------------------------------------
 
-#include <syscalls.h>
-
 #include <DiskDeviceJob.h>
+
+#include <syscalls.h>
+#include <disk_device_manager/ddm_userland_interface.h>
 
 // constructor
 BDiskDeviceJob::BDiskDeviceJob()

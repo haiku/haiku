@@ -74,8 +74,7 @@ CommonTestLib libsupporttest.so
 		BlockCacheExerciseTest.cpp
 		BlockCacheConcurrencyTest.cpp
 
-	: <boot!home!config!lib>libopenbeos.so
-		be stdc++.r4
+	: be stdc++.r4
 	: be stdc++.r4
 	: libsupporttest_RemoteTestObject.so
 	: support

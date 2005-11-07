@@ -37,22 +37,25 @@ SharedLibrary libbe.so :
 	$(TARGET_LIBSTDC++)
 ;
 
-# Build libopenbeos.so
+# Build libbe_haiku.so
 
-SetSupportedPlatformsForTarget libopenbeos.so : r5 bone dano ;
+SetSupportedPlatformsForTarget libbe_haiku.so : libbe_test ;
 
-if $(TARGET_PLATFORM) != haiku {
-	UseHeaders [ FStandardOSHeaders ] : true ;
-	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
-		# TODO: POSIX headers shouldn't be used. Needed for strlcpy() only.
-
+if $(TARGET_PLATFORM) = libbe_test {
+	local syslog = [ FGristFiles syslog.o ] ;
 	# Remove _NO_INLINE_ASM from the defines for syslog.cpp. Otherwise we get
 	# references to tls_get/set() etc. that don't exist under BeOS.
-	TARGET_DEFINES on [ FGristFiles syslog.o ]
-		= [ FFilter $(TARGET_DEFINES) : _NO_INLINE_ASM ] ;
+	TARGET_DEFINES on $(syslog)
+		= [ on $(syslog) FFilter $(TARGET_DEFINES) : _NO_INLINE_ASM ] ;
+
+	# We need to use our <syslog.h>, because the syslog() prototype differs
+	# from the BeOS one.
+	TARGET_DEFINES on $(syslog) += _SYS_LOG_H ;
+	TARGET_C++FLAGS on $(syslog) = [ on $(syslog) return $(TARGET_C++FLAGS) ]
+		-include [ FDirName $(HAIKU_TOP) headers posix syslog.h ] ;
 }
 
-SharedLibrary libopenbeos.so :
+SharedLibrary libbe_haiku.so :
 	KMessage.cpp
 	syslog.cpp
 	:
@@ -63,7 +66,7 @@ SharedLibrary libopenbeos.so :
 
 	libbeadapter.so
 	net
-	stdc++.r4
+	$(TARGET_LIBSTDC++)
 ;
 
 SEARCH on [ FGristFiles KMessage.cpp ]

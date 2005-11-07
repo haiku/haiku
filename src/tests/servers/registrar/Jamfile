@@ -1,24 +1,18 @@
 SubDir HAIKU_TOP src tests servers registrar ;
 
-local libbe ;
-if $(TARGET_PLATFORM) = r5 {
-	libbe = libopenbeos.so ;
-} else {
-	libbe = be ;
-}
+SetSubDirSupportedPlatforms libbe_test ;
 
 SimpleTest RegistrarTest1
 	: RegistrarTest1.cpp
-	: <boot!home!config!lib>libopenbeos.so be
+	: be
 ;
 
 SimpleTest RosterShell
 	: RosterShell.cpp
-	: $(libbe) stdc++.r4
+	: be stdc++.r4
 ;
 
-SimpleTest message_deliverer_test : message_deliverer_test.cpp
-	: <boot!home!config!lib>libopenbeos.so ;
+SimpleTest message_deliverer_test : message_deliverer_test.cpp : be ;
 
 
 SimpleTest run_haiku_registrar
@@ -27,46 +21,34 @@ SimpleTest run_haiku_registrar
 ;
 
 # a shutdown working with the emulation under R5
-if $(TARGET_PLATFORM) = r5 {
-	UsePrivateHeaders app ;
-	UsePrivateHeaders kernel ;
+UsePrivateHeaders app ;
+UsePrivateHeaders kernel ;
 
-	SimpleTest <test>shutdown
-		: shutdown.cpp
-		: <boot!home!config!lib>libopenbeos.so ;
-	
-	SEARCH on [ FGristFiles shutdown.cpp ] = [ FDirName $(HAIKU_TOP) src bin ] ;
-}
+SimpleTest <test>shutdown
+	: shutdown.cpp
+	: be ;
+
+SEARCH on [ FGristFiles shutdown.cpp ] = [ FDirName $(HAIKU_TOP) src bin ] ;
 
 # Two small test apps for testing the shutdown process.
 
 SimpleTest no_shutdown_reply
 	: no_shutdown_reply.cpp
-	: $(libbe)
+	: be
 ;
 
 SimpleTest negative_shutdown_reply
 	: negative_shutdown_reply.cpp
-	: $(libbe)
+	: be
 ;
 
 SimpleTest user_shutdown_reply
 	: user_shutdown_reply.cpp
-	: $(libbe)
+	: be
 ;
 
 
 # the registrar itself
-
-SetSupportedPlatformsForTarget haiku_registrar : r5 bone dano ;
-
-if $(TARGET_PLATFORM) != haiku {
-	UseHeaders [ FStandardOSHeaders ] : true ;
-	UsePrivateHeaders $(DOT) ;
-	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
-		# TODO: POSIX headers shouldn't be used. Needed for strlcpy() and
-		# <sys/select.h>.
-}
 
 UsePrivateHeaders app ;
 UsePrivateHeaders kernel ;
@@ -104,13 +86,13 @@ Server haiku_registrar
 
 	R5Compatibility.cpp
 	:
-	libopenbeos.so
-	stdc++.r4
+	be
+	$(TARGET_LIBSTDC++)
 	:
 	registrar.rdef
 ;
 
-if $(TARGET_PLATFORM) != haiku {
+if $(TARGET_PLATFORM) = libbe_test {
 	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : haiku_registrar
 		: tests!apps ;
 }

@@ -3,10 +3,11 @@
 //  by the OpenBeOS license.
 //---------------------------------------------------------------------
 
-#include <syscalls.h>
-
 #include <DiskSystem.h>
 #include <Partition.h>
+
+#include <syscalls.h>
+#include <disk_device_manager/ddm_userland_interface.h>
 
 // constructor
 BDiskSystem::BDiskSystem()

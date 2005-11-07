@@ -74,26 +74,8 @@ Server input_server :
 	AddOnMonitorHandler.cpp
 	NodeMonitorHandler.cpp
 
-	: $(TARGET_LIBSTDC++)
+	: be $(TARGET_LIBSTDC++)
 ;
-
-if $(TARGET_PLATFORM) = haiku {
-        # link for Haiku
-
-        LinkAgainst input_server :
-                libroot.so libbe.so ;
-
-} else {
-        # link as test application under R5
-
-        LinkAgainst input_server :
-                be ;
-	if $(APPSERVER_TEST_MODE) {
-		LinkAgainst input_server :
-                <boot!home!config!lib>libopenbeos.so ;
-	}
-}
-
 
 SEARCH on [ FGristFiles AddOnMonitor.cpp
 	AddOnMonitorHandler.cpp

@@ -17,13 +17,16 @@
 #include <Bitmap.h>
 #include <Directory.h>
 #include <fs_info.h>
-#include <fs_interface.h>
 #include <Node.h>
 #include <Path.h>
 #include <Volume.h>
 
 #include <storage_support.h>
 #include <syscalls.h>
+
+#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+#include <fs_interface.h>
+#endif
 
 #ifdef USE_OPENBEOS_NAMESPACE
 namespace OpenBeOS {

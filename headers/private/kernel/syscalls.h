@@ -8,21 +8,29 @@
 
 #include <OS.h>
 #include <image.h>
-#include <disk_device_manager/ddm_userland_interface.h>
+#include <storage/DiskDeviceDefs.h>
 
-#include <sys/select.h>
+#include <signal.h>
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-struct sigaction;
-struct rlimit;
-struct stat;
-struct pollfd;
-struct fs_info;
 struct dirent;
+struct fd_set;
+struct fs_info;
+struct iovec;
+struct pollfd;
+struct rlimit;
+struct sigaction;
+struct stat;
+
+struct disk_device_job_progress_info;
+struct partitionable_space_data;
+struct user_disk_device_data;
+struct user_disk_device_job_info;
+struct user_disk_system_info;
 
 // This marks the beginning of the syscalls prototypes for gensyscallinfos.
 // NOTE:
@@ -146,7 +154,8 @@ extern status_t		_kern_unlink(int fd, const char *path);
 extern status_t		_kern_rename(int oldDir, const char *oldpath, int newDir,
 						const char *newpath);
 extern status_t		_kern_access(const char *path, int mode);
-extern ssize_t		_kern_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
+extern ssize_t		_kern_select(int numfds, struct fd_set *readSet,
+						struct fd_set *writeSet, struct fd_set *errorSet,
 						bigtime_t timeout, const sigset_t *sigMask);
 extern ssize_t		_kern_poll(struct pollfd *fds, int numfds, bigtime_t timeout);
 extern int			_kern_open_attr_dir(int fd, const char *path);
@@ -165,9 +174,10 @@ extern int			_kern_open_query(dev_t device, const char *query, size_t queryLengt
 
 // file descriptor functions
 extern ssize_t		_kern_read(int fd, off_t pos, void *buffer, size_t bufferSize);
-extern ssize_t		_kern_readv(int fd, off_t pos, const iovec *vecs, size_t count);
+extern ssize_t		_kern_readv(int fd, off_t pos, const struct iovec *vecs, size_t count);
 extern ssize_t		_kern_write(int fd, off_t pos, const void *buffer, size_t bufferSize);
-extern ssize_t		_kern_writev(int fd, off_t pos, const iovec *vecs, size_t count);
+extern ssize_t		_kern_writev(int fd, off_t pos, const struct iovec *vecs,
+						size_t count);
 extern status_t		_kern_ioctl(int fd, ulong cmd, void *data, size_t length);
 extern ssize_t		_kern_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount);
 extern status_t		_kern_rewind_dir(int fd);
@@ -231,8 +241,9 @@ extern ssize_t		_kern_read_port_etc(port_id port, int32 *msgCode, void *msgBuffe
 extern status_t		_kern_set_port_owner(port_id port, team_id team);
 extern status_t		_kern_write_port_etc(port_id port, int32 msgCode, const void *msgBuffer,
 						size_t bufferSize, uint32 flags, bigtime_t timeout);
-extern status_t		_kern_writev_port_etc(port_id id, int32 msgCode, const iovec *msgVecs,
-						size_t vecCount, size_t bufferSize, uint32 flags, bigtime_t timeout);
+extern status_t		_kern_writev_port_etc(port_id id, int32 msgCode,
+						const struct iovec *msgVecs, size_t vecCount,
+						size_t bufferSize, uint32 flags, bigtime_t timeout);
 
 // debug support functions
 extern void			_kern_debugger(const char *message);
@@ -297,7 +308,7 @@ extern partition_id	_kern_get_next_disk_device_id(int32 *cookie, size_t *neededS
 extern partition_id	_kern_find_disk_device(const char *filename, size_t *neededSize);
 extern partition_id	_kern_find_partition(const char *filename, size_t *neededSize);
 extern status_t		_kern_get_disk_device_data(partition_id deviceID, bool deviceOnly,
-						bool shadow, user_disk_device_data *buffer,
+						bool shadow, struct user_disk_device_data *buffer,
 						size_t bufferSize, size_t *neededSize);
 extern partition_id	_kern_register_file_device(const char *filename);
 extern status_t		_kern_unregister_file_device(partition_id deviceID,
@@ -307,10 +318,11 @@ extern status_t		_kern_unregister_file_device(partition_id deviceID,
 
 // disk systems
 extern status_t		_kern_get_disk_system_info(disk_system_id id,
-						user_disk_system_info *info);
+						struct user_disk_system_info *info);
 extern status_t		_kern_get_next_disk_system_info(int32 *cookie,
-						user_disk_system_info *info);
-extern status_t		_kern_find_disk_system(const char *name, user_disk_system_info *info);
+						struct user_disk_system_info *info);
+extern status_t		_kern_find_disk_system(const char *name,
+						struct user_disk_system_info *info);
 extern bool			_kern_supports_defragmenting_partition(partition_id partitionID,
 						int32 changeCounter, bool *whileMounted);
 extern bool			_kern_supports_repairing_partition(partition_id partitionID,
@@ -357,8 +369,9 @@ extern status_t		_kern_validate_create_child_partition(partition_id partitionID,
 						const char *type, const char *parameters,
 						size_t parametersSize);
 extern status_t		_kern_get_partitionable_spaces(partition_id partitionID,
-						int32 changeCounter, partitionable_space_data *buffer,
-						int32 count, int32 *actualCount);
+						int32 changeCounter,
+						struct partitionable_space_data *buffer, int32 count,
+						int32 *actualCount);
 extern status_t		_kern_get_next_supported_partition_type(partition_id partitionID,
 						int32 changeCounter, int32 *cookie, char *type);
 extern status_t		_kern_get_partition_type_for_content_type(disk_system_id diskSystemID,
@@ -404,11 +417,11 @@ extern status_t		_kern_delete_partition(partition_id partitionID, int32 changeCo
 
 // jobs
 extern status_t		_kern_get_next_disk_device_job_info(int32 *cookie,
-						user_disk_device_job_info *info);
+						struct user_disk_device_job_info *info);
 extern status_t		_kern_get_disk_device_job_info(disk_job_id id,
-						user_disk_device_job_info *info);
+						struct user_disk_device_job_info *info);
 extern status_t		_kern_get_disk_device_job_progress_info(disk_job_id id,
-						disk_device_job_progress_info *info);
+						struct disk_device_job_progress_info *info);
 extern status_t		_kern_pause_disk_device_job(disk_job_id id);
 extern status_t		_kern_cancel_disk_device_job(disk_job_id id, bool reverse);
 

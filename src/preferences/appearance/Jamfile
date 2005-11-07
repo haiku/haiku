@@ -19,7 +19,7 @@ Preference Appearance :
 	#FontMenu.cpp
 	#MenuView.cpp
 	
-	: libbe.so libopenbeos.so libtranslation.so libappserver.so
+	: be libtranslation.so libappserver.so
 	: Appearance.rdef
 	;
 

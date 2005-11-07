@@ -1,9 +1,7 @@
 SubDir HAIKU_TOP src servers app drawing Painter ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
-if $(TARGET_PLATFORM) != haiku {
-	UseHeaders [ FStandardOSHeaders ] : true ;
-}
+AddSubDirSupportedPlatforms libbe_test ;
 
 UseLibraryHeaders agg ;
 UsePrivateHeaders app interface shared [ FDirName servers app ] ;

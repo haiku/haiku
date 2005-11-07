@@ -1,15 +1,9 @@
 SubDir HAIKU_TOP src tests servers app ;
 
-SetSubDirSupportedPlatforms r5 bone ;
+SetSubDirSupportedPlatforms libbe_test ;
 
-UseHeaders [ FStandardOSHeaders ] : true ;
-UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
-	# TODO: POSIX headers shouldn't be used. Needed for strlcpy() and addr_t.
-
-# Remove _NO_INLINE_ASM from the defines for syslog.cpp. Otherwise we get
-# references to tls_get/set() etc. that don't exist under BeOS.
-#TARGET_DEFINES on [ FGristFiles syslog.o ]
-#	= [ FFilter $(TARGET_DEFINES) : _NO_INLINE_ASM ] ;
+# No need to define any of those targets, when not building for libbe_test
+if $(TARGET_PLATFORM) = libbe_test {
 
 UseLibraryHeaders agg png zlib ;
 UsePrivateHeaders app interface shared [ FDirName servers app ] ;
@@ -24,15 +18,12 @@ UseFreeTypeHeaders ;
 
 SEARCH_SOURCE += $(appServerDir) [ FDirName $(appServerDir) drawing ] ;
 
-# No need to define any of those targets, when building for haiku
-if $(TARGET_PLATFORM) != haiku {
-
 SharedLibrary libhwinterface.so :
 	BBitmapBuffer.cpp
 	HWInterface.cpp
 	MultiLocker.cpp
 
-	: libhaikuappserver.so libopenbeos.so
+	: libhaikuappserver.so be
 ;
 
 
@@ -46,7 +37,7 @@ SharedLibrary libhwinterfaceimpl.so :
 	fake_input_server.cpp
 	ViewHWInterface.cpp
 
-	: libopenbeos.so libhwinterface.so
+	: be libhwinterface.so
 ;
 
 SharedLibrary libhaikuappserver.so :
@@ -74,7 +65,7 @@ SharedLibrary libhaikuappserver.so :
 
 	# libraries
 	:
-	libopenbeos.so libtextencoding.so libfreetype.so
+	be libtextencoding.so libfreetype.so
 ;
 
 AddResources haiku_app_server : app_server.rdef ;
@@ -124,21 +115,21 @@ Server haiku_app_server :
 	# libraries
 	:
 	z libpng.so libhaikuappserver.so
-	libpainter.a libopenbeos.so 
+	libpainter.a be 
 	libhwinterface.so libhwinterfaceimpl.so
 	libagg.a libfreetype.so libtextencoding.so
 ;
 
 # install in the test dir
 HaikuInstall install-test-apps : $(HAIKU_APP_TEST_LIB_DIR)
-	: libpng.so libhaikuappserver.so libopenbeos.so libhwinterface.so
+	: libpng.so libhaikuappserver.so libbe_haiku.so libhwinterface.so
 	  libhwinterfaceimpl.so libfreetype.so libtextencoding.so
 	: tests!apps ;
 
 HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : haiku_app_server
 	: tests!apps ;
 
-} # if $(TARGET_PLATFORM) != haiku
+} # if $(TARGET_PLATFORM) = libbe_test
 
 SubInclude HAIKU_TOP src tests servers app bitmap_drawing ;
 SubInclude HAIKU_TOP src tests servers app copy_bits ;
