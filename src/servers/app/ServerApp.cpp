@@ -18,15 +18,18 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <syslog.h>
 
 #include <AppDefs.h>
 #include <Autolock.h>
-#include <ColorSet.h>
 #include <List.h>
 #include <ScrollBar.h>
-#include <ServerProtocol.h>
 #include <Shape.h>
 #include <String.h>
+
+#include <ColorSet.h>
+#include <ServerProtocol.h>
+#include <FontPrivate.h>
 
 #include "AppServer.h"
 #include "BGet++.h"
@@ -38,10 +41,10 @@
 #include "DrawingEngine.h"
 #include "FontManager.h"
 #include "HWInterface.h"
-//#include "DrawState.h"
 #include "OffscreenServerWindow.h"
 #include "RAMLinkMsgReader.h"
 #include "RootLayer.h"
+#include "ServerApp.h"
 #include "ServerBitmap.h"
 #include "ServerConfig.h"
 #include "ServerCursor.h"
@@ -51,9 +54,6 @@
 #include "SystemPalette.h"
 #include "Utils.h"
 #include "WinBorder.h"
-
-#include "ServerApp.h"
-#include <syslog.h>
 
 //#define DEBUG_SERVERAPP
 
@@ -1227,35 +1227,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			gFontManager->Unlock();
 			break;
 		}
-		case AS_GET_FONT_DIRECTION:
-		{
-			FTRACE(("ServerApp %s: AS_GET_FONT_DIRECTION\n", Signature()));
-			// Attached Data:
-			// 1) uint16 - family ID
-			// 2) uint16 - style ID
-
-			// Returns:
-			// 1) font_direction direction of font
-
-			int32 familyID, styleID;
-			link.Read<int32>(&familyID);
-			link.Read<int32>(&styleID);
-
-			gFontManager->Lock();
-
-			FontStyle *fontStyle = gFontManager->GetStyle(familyID, styleID);
-			if (fontStyle) {
-				font_direction direction = fontStyle->Direction();
-
-				fLink.StartMessage(B_OK);
-				fLink.Attach<font_direction>(direction);
-			} else
-				fLink.StartMessage(B_BAD_VALUE);
-
-			gFontManager->Unlock();
-			fLink.Flush();
-			break;
-		}
 		case AS_GET_FONT_FILE_FORMAT:
 		{
 			FTRACE(("ServerApp %s: AS_GET_FONT_FILE_FORMAT\n", Signature()));
@@ -1411,16 +1382,16 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			fLink.Flush();
 			break;
 		}
-		case AS_QUERY_FONT_FIXED:
+		case AS_GET_EXTRA_FONT_FLAGS:
 		{
-			FTRACE(("ServerApp %s: AS_QUERY_FONT_FIXED unimplmemented\n",
+			FTRACE(("ServerApp %s: AS_GET_EXTRA_FONT_FLAGS\n",
 				Signature()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
 
 			// Returns:
-			// 1) bool - font is/is not fixed
+			// 1) uint32 - extra font flags
 			uint16 familyID, styleID;
 			link.Read<uint16>(&familyID);
 			link.Read<uint16>(&styleID);
@@ -1430,7 +1401,18 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			FontStyle *fontStyle = gFontManager->GetStyle(familyID, styleID);
 			if (fontStyle != NULL) {
 				fLink.StartMessage(B_OK);
-				fLink.Attach<bool>(fontStyle->IsFixedWidth());
+				
+				uint32 flags = 0;
+				if (fontStyle->IsFixedWidth())
+					flags |= B_IS_FIXED;
+				if (fontStyle->HasTuned())
+					flags |= B_HAS_TUNED_FONT;
+				if (fontStyle->HasKerning())
+					flags |= B_PRIVATE_FONT_HAS_KERNING;
+
+				flags |= uint32(fontStyle->Direction()) << B_PRIVATE_FONT_DIRECTION_SHIFT;
+
+				fLink.Attach<uint32>(flags);
 			} else
 				fLink.StartMessage(B_BAD_VALUE);
 
@@ -1438,10 +1420,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			fLink.Flush();
 			break;
 		}
-		case AS_SET_FAMILY_AND_STYLE:
+		case AS_GET_FAMILY_AND_STYLE_IDS:
 		{
-			FTRACE(("ServerApp %s: AS_SET_FAMILY_AND_STYLE\n",
-				Signature()));
+			FTRACE(("ServerApp %s: AS_GET_FAMILY_AND_STYLE_IDS\n", Signature()));
 			// Attached Data:
 			// 1) font_family - name of font family to use
 			// 2) font_style - name of style in family
@@ -1527,11 +1508,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			fLink.Flush();
 			break;
 		}
-		case AS_SET_SYSFONT_PLAIN:
-		case AS_SET_SYSFONT_BOLD:
-		case AS_SET_SYSFONT_FIXED:
+		case AS_GET_SYSTEM_FONTS:
 		{
-			FTRACE(("ServerApp %s: AS_SET_SYSFONT_PLAIN\n", Signature()));
+			FTRACE(("ServerApp %s: AS_GET_SYSTEM_FONTS\n", Signature()));
 			// Returns:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1540,26 +1519,31 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// 5) uint32 - font flags
 
 			DesktopSettings settings(fDesktop);
-
-			ServerFont font;
-			switch (code) {
-				case AS_SET_SYSFONT_PLAIN:
-					settings.GetDefaultPlainFont(font);
-					break;
-				case AS_SET_SYSFONT_BOLD:
-					settings.GetDefaultBoldFont(font);
-					break;
-				case AS_SET_SYSFONT_FIXED:
-					settings.GetDefaultFixedFont(font);
-					break;
-			}
-
 			fLink.StartMessage(B_OK);
-			fLink.Attach<uint16>(font.FamilyID());
-			fLink.Attach<uint16>(font.StyleID());
-			fLink.Attach<float>(font.Size());
-			fLink.Attach<uint16>(font.Face());
-			fLink.Attach<uint32>(font.Flags());
+
+			for (int32 i = 0; i < 3; i++) {
+				ServerFont font;
+				switch (i) {
+					case 0:
+						settings.GetDefaultPlainFont(font);
+						fLink.AttachString("plain");
+						break;
+					case 1:
+						settings.GetDefaultBoldFont(font);
+						fLink.AttachString("bold");
+						break;
+					case 2:
+						settings.GetDefaultFixedFont(font);
+						fLink.AttachString("fixed");
+						break;
+				}
+
+				fLink.Attach<uint16>(font.FamilyID());
+				fLink.Attach<uint16>(font.StyleID());
+				fLink.Attach<float>(font.Size());
+				fLink.Attach<uint16>(font.Face());
+				fLink.Attach<uint32>(font.Flags());
+			}
 
 			fLink.Flush();
 			break;

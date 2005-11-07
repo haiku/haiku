@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2005, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,6 +13,7 @@
 #include <stdlib.h>
 
 #include <AppServerLink.h>
+#include <Font.h>
 #include <Message.h>
 #include <PortLink.h>
 #include <Rect.h>
@@ -22,11 +23,11 @@
 
 #include <moreUTF8.h>
 #include <truncate_string.h>
-
-#include <Font.h>
+#include <FontPrivate.h>
 
 
 const float kUninitializedAscent = INFINITY;
+const uint32 kUninitializedExtraFlags = 0xffffffff;
 
 // The actual objects which the globals point to
 static BFont sPlainFont;
@@ -38,57 +39,51 @@ const BFont *be_bold_font = &sBoldFont;
 const BFont *be_fixed_font = &sFixedFont;
 
 
-extern "C" void
-_init_global_fonts()
-{
-	_font_control_(&sPlainFont, AS_SET_SYSFONT_PLAIN, NULL);
-	_font_control_(&sBoldFont, AS_SET_SYSFONT_BOLD, NULL);
-	_font_control_(&sFixedFont, AS_SET_SYSFONT_FIXED, NULL);
-}
-
-
-/*!
-	\brief Private function originally used by Be. Now used for initialization
-	\param font The font to initialize
-	\param cmd message code to send to the app_server
-	\param data unused
-	
-	While it is not known what Be used it for, Haiku uses it to initialize the
-	three system fonts when the interface kit is initialized when an app starts.
-*/
-
 void
-_font_control_(BFont *font, int32 cmd, void *data)
+_init_global_fonts_()
 {
-	if (!font
-		|| (cmd != AS_SET_SYSFONT_PLAIN && cmd != AS_SET_SYSFONT_BOLD
-			&& cmd != AS_SET_SYSFONT_FIXED)) {
-		// this shouldn't ever happen, but just in case....
-		return;
-	}
-
 	BPrivate::AppServerLink link;
-	link.StartMessage(cmd);
+	link.StartMessage(AS_GET_SYSTEM_FONTS);
 
 	int32 code;
 	if (link.FlushWithReply(code) != B_OK
 		|| code != B_OK) {
-		printf("DEBUG: Couldn't initialize font in _font_control()\n");
+		printf("DEBUG: Couldn't initialize global fonts!\n");
 		return;
 	}
 
-	// there really isn't that much data that we need to set for such cases -- most
-	// of them need to be set to the defaults. The stuff that can change are family,
-	// style/face, size, and height.
-	// NOTE: this code assumes it's only called 
-	link.Read<uint16>(&font->fFamilyID);
-	link.Read<uint16>(&font->fStyleID);
-	link.Read<float>(&font->fSize);
-	link.Read<uint16>(&font->fFace);
-	link.Read<uint32>(&font->fFlags);
+	char type[B_OS_NAME_LENGTH];
 
-	font->fHeight.ascent = kUninitializedAscent;
+	while (link.ReadString(type, sizeof(type)) >= B_OK && type[0]) {
+		BFont dummy;
+		BFont *font = &dummy;
+
+		if (!strcmp(type, "plain"))
+			font = &sPlainFont;
+		else if (!strcmp(type, "bold"))
+			font = &sBoldFont;
+		else if (!strcmp(type, "fixed"))
+			font = &sFixedFont;
+
+		link.Read<uint16>(&font->fFamilyID);
+		link.Read<uint16>(&font->fStyleID);
+		link.Read<float>(&font->fSize);
+		link.Read<uint16>(&font->fFace);
+		link.Read<uint32>(&font->fFlags);
+
+		font->fHeight.ascent = kUninitializedAscent;
+		font->fExtraFlags = kUninitializedExtraFlags;
+	}
 }
+
+
+// TODO: the following functions are private Be API functions - if no problems
+//	arise by not exporting these symbols, we can just remove them
+#if 0
+void _font_control_(BFont *font, int32 cmd, void *data) {}
+status_t get_font_cache_info(uint32 id, void *set) { return B_ERROR; }
+status_t set_font_cache_info(uint32 id, void *set) { return B_ERROR; }
+#endif
 
 
 /*!
@@ -105,21 +100,18 @@ void
 _set_system_font_(const char *which, font_family family, font_style style, 
 	float size)
 {
-	if (!which)
+	if (which == NULL || strcmp(which, "plain")
+		|| strcmp(which, "bold") || strcmp(which, "fixed"))
 		return;
-	
-	if (!strcmp(which, "plain")
-		|| !strcmp(which, "bold")
-		|| !strcmp(which, "fixed")) {
-		BPrivate::AppServerLink link;
 
-		link.StartMessage(AS_SET_SYSTEM_FONT);
-		link.AttachString(which);
-		link.AttachString(family);
-		link.AttachString(style);
-		link.Attach<float>(size);
-		link.Flush();
-	}
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_SET_SYSTEM_FONT);
+	link.AttachString(which);
+	link.AttachString(family);
+	link.AttachString(style);
+	link.Attach<float>(size);
+	link.Flush();
 }
 
 
@@ -293,30 +285,6 @@ update_font_families(bool checkOnly)
 }
 
 
-status_t
-get_font_cache_info(uint32 id, void *set)
-{
-	// TODO: Implement
-
-	// Note that the only reliable data from this function will probably be the cache size
-	// Depending on how the font cache is implemented, this function and the corresponding
-	// set function will either see major revision or completely disappear in R2.
-	return B_ERROR;
-}
-
-
-status_t
-set_font_cache_info(uint32 id, void *set)
-{
-	// TODO: Implement
-
-	// Note that this function will likely only set the cache size in our implementation
-	// because of (a) the lack of knowledge on R5's font system and (b) the fact that it
-	// is a completely different font engine.
-	return B_ERROR;
-}
-
-
 //	#pragma mark -
 
 
@@ -331,7 +299,8 @@ BFont::BFont()
 	fSpacing(0),
 	fEncoding(0),
 	fFace(0),
-	fFlags(0)
+	fFlags(0),
+	fExtraFlags(kUninitializedExtraFlags)
 {
 	if (be_plain_font != NULL && this != &sPlainFont)
 		*this = *be_plain_font;
@@ -373,7 +342,7 @@ BFont::SetFamilyAndStyle(const font_family family, const font_style style)
 
 	BPrivate::AppServerLink link;
 
-	link.StartMessage(AS_SET_FAMILY_AND_STYLE);
+	link.StartMessage(AS_GET_FAMILY_AND_STYLE_IDS);
 	link.AttachString(family);
 	link.AttachString(style);
 	link.Attach<uint16>(fFamilyID);
@@ -412,7 +381,7 @@ BFont::SetFamilyAndStyle(uint32 fontcode)
 	family = (fontcode & 0xFFFF0000) >> 16;
 
 	BPrivate::AppServerLink link;
-	link.StartMessage(AS_SET_FAMILY_AND_STYLE);
+	link.StartMessage(AS_GET_FAMILY_AND_STYLE_IDS);
 	link.AttachString(NULL);	// no family and style name
 	link.AttachString(NULL);
 	link.Attach<uint16>(family);
@@ -446,7 +415,7 @@ status_t
 BFont::SetFamilyAndFace(const font_family family, uint16 face)
 {
 	BPrivate::AppServerLink link;
-	link.StartMessage(AS_SET_FAMILY_AND_STYLE);
+	link.StartMessage(AS_GET_FAMILY_AND_STYLE_IDS);
 	link.AttachString(family);
 	link.AttachString(NULL);	// no style given
 	link.Attach<uint16>(fFamilyID);
@@ -558,96 +527,76 @@ BFont::GetFamilyAndStyle(font_family *family, font_style *style) const
 
 
 uint32
-BFont::FamilyAndStyle(void) const
+BFont::FamilyAndStyle() const
 {
 	return (fFamilyID << 16UL) | fStyleID;
 }
 
 
 float
-BFont::Size(void) const
+BFont::Size() const
 {
 	return fSize;
 }
 
 
 float
-BFont::Shear(void) const
+BFont::Shear() const
 {
 	return fShear;
 }
 
 
 float
-BFont::Rotation(void) const
+BFont::Rotation() const
 {
 	return fRotation;
 }
 
 
 uint8
-BFont::Spacing(void) const
+BFont::Spacing() const
 {
 	return fSpacing;
 }
 
 
 uint8
-BFont::Encoding(void) const
+BFont::Encoding() const
 {
 	return fEncoding;
 }
 
 
 uint16
-BFont::Face(void) const
+BFont::Face() const
 {
 	return fFace;
 }
 
 
 uint32
-BFont::Flags(void) const
+BFont::Flags() const
 {
 	return fFlags;
 }
 
 
 font_direction
-BFont::Direction(void) const
+BFont::Direction() const
 {
-	BPrivate::AppServerLink link;
-	link.StartMessage(AS_GET_FONT_DIRECTION);
-	link.Attach<uint16>(fFamilyID);
-	link.Attach<uint16>(fStyleID);
-
-	int32 code;
-	if (link.FlushWithReply(code) != B_OK
-		|| code != B_OK)
+	if (_GetExtraFlags() != B_OK)
 		return B_FONT_LEFT_TO_RIGHT;
 
-	font_direction fdir;
-	link.Read<font_direction>(&fdir);
-	return fdir;
+	return (font_direction)(fExtraFlags >> B_PRIVATE_FONT_DIRECTION_SHIFT);
 }
  
 
 bool
-BFont::IsFixed(void) const
+BFont::IsFixed() const
 {
-	BPrivate::AppServerLink link;
-	link.StartMessage(AS_QUERY_FONT_FIXED);
-	link.Attach<uint16>(fFamilyID);
-	link.Attach<uint16>(fStyleID);
-
-	int32 code;
-	if (link.FlushWithReply(code) != B_OK
-		|| code != B_OK)
-		return false;
-
-	bool fixed;
-	link.Read<bool>(&fixed);
-	return fixed;
+	_GetExtraFlags();
+	return (fExtraFlags & B_IS_FIXED) != 0;
 }
 
 
@@ -659,14 +608,15 @@ BFont::IsFixed(void) const
 */
 
 bool
-BFont::IsFullAndHalfFixed(void) const
+BFont::IsFullAndHalfFixed() const
 {
-	return false;
+	_GetExtraFlags();
+	return (fExtraFlags & B_PRIVATE_FONT_IS_FULL_AND_HALF_FIXED) != 0;
 }
 
 
 BRect
-BFont::BoundingBox(void) const
+BFont::BoundingBox() const
 {
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_FONT_BOUNDING_BOX);
@@ -685,7 +635,7 @@ BFont::BoundingBox(void) const
 
 
 unicode_block
-BFont::Blocks(void) const
+BFont::Blocks() const
 {
 	// TODO: Add Block support
 	return unicode_block();
@@ -693,7 +643,7 @@ BFont::Blocks(void) const
 
 
 font_file_format
-BFont::FileFormat(void) const
+BFont::FileFormat() const
 {
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_FONT_FILE_FORMAT);
@@ -715,7 +665,7 @@ BFont::FileFormat(void) const
 
 
 int32
-BFont::CountTuned(void) const
+BFont::CountTuned() const
 {
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_TUNED_COUNT);
@@ -1014,7 +964,7 @@ void
 BFont::GetBoundingBoxesAsGlyphs(const char charArray[], int32 numChars, font_metric_mode mode,
 	BRect boundingBoxArray[]) const
 {
-	_GetBoundingBoxes_(charArray, numChars, mode, false, NULL, boundingBoxArray);
+	_GetBoundingBoxes(charArray, numChars, mode, false, NULL, boundingBoxArray);
 }
 
 
@@ -1022,12 +972,12 @@ void
 BFont::GetBoundingBoxesAsString(const char charArray[], int32 numChars, font_metric_mode mode,
 	escapement_delta *delta, BRect boundingBoxArray[]) const
 {
-	_GetBoundingBoxes_(charArray, numChars, mode, true, delta, boundingBoxArray);
+	_GetBoundingBoxes(charArray, numChars, mode, true, delta, boundingBoxArray);
 }
 
 
 void
-BFont::_GetBoundingBoxes_(const char charArray[], int32 numChars, font_metric_mode mode,
+BFont::_GetBoundingBoxes(const char charArray[], int32 numChars, font_metric_mode mode,
 	bool string_escapement, escapement_delta *delta, BRect boundingBoxArray[]) const
 {
 	if (!charArray || numChars < 1 || !boundingBoxArray)
@@ -1213,9 +1163,30 @@ BFont::operator!=(const BFont &font) const
 
 
 void
-BFont::PrintToStream(void) const
+BFont::PrintToStream() const
 {
 	printf("FAMILY STYLE %f %f %f %f %f %f\n", fSize, fShear, fRotation, fHeight.ascent,
 		fHeight.descent, fHeight.leading);
 }
 
+
+status_t
+BFont::_GetExtraFlags() const
+{
+	// TODO: this has to be const in order to allow other font getters to stay const as well
+	if (fExtraFlags != kUninitializedExtraFlags)
+		return B_OK;
+
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_GET_EXTRA_FONT_FLAGS);
+	link.Attach<uint16>(fFamilyID);
+	link.Attach<uint16>(fStyleID);
+
+	status_t status = B_ERROR;
+	if (link.FlushWithReply(status) != B_OK
+		|| status != B_OK)
+		return status;
+
+	link.Read<uint32>(&fExtraFlags);
+	return B_OK;
+}

@@ -1,31 +1,15 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		InterfaceDefs.cpp
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//					Caz <turok2@currantbun.com>
-//					Axel Dörfler <axeld@pinc-software.de>
-//	Description:	Global functions and variables for the Interface Kit
-//
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Caz <turok2@currantbun.com>
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+
+/**	Global functions and variables for the Interface Kit */
+
 #include <Application.h>
 #include <InterfaceDefs.h>
 #include <Menu.h>
@@ -53,7 +37,7 @@
 #include "truncate_string.h"
 
 // Private definitions not placed in public headers
-extern "C" void _init_global_fonts();
+void _init_global_fonts_();
 extern "C" status_t _fini_interface_kit_();
 
 using namespace BPrivate;
@@ -810,7 +794,7 @@ _init_interface_kit_()
 	BTextView::sWidthAtom = 0;
 	BTextView::sWidths = new _BWidthBuffer_;
 
-	_init_global_fonts();
+	_init_global_fonts_();
 
 	_menu_info_ptr_ = &BMenu::sMenuInfo;
 	status_t status = load_menu_settings(BMenu::sMenuInfo);
