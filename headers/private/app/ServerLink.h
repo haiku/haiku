@@ -15,6 +15,8 @@
 #include <LinkReceiver.h>
 #include <LinkSender.h>
 
+class BString;
+
 
 /*
  * Error checking rules: (for if you don't want to check every return code)
@@ -58,6 +60,7 @@ class ServerLink {
 		bool NeedsReply() const;
 		status_t Read(void *data, ssize_t size);
 		status_t ReadString(char *buffer, size_t bufferSize);
+		status_t ReadString(BString& string);
 		status_t ReadString(char **string);
 		status_t ReadRegion(BRegion *region);
 		status_t ReadShape(BShape *shape);
@@ -167,6 +170,12 @@ inline status_t
 ServerLink::ReadString(char *buffer, size_t bufferSize)
 {
 	return fReceiver->ReadString(buffer, bufferSize);
+}
+
+inline status_t
+ServerLink::ReadString(BString& string)
+{
+	return fReceiver->ReadString(string);
 }
 
 inline status_t

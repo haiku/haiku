@@ -15,6 +15,7 @@
 
 #include <ServerProtocol.h>
 #include <LinkReceiver.h>
+#include <String.h>
 
 #include "link_message.h"
 
@@ -293,6 +294,49 @@ LinkReceiver::ReadString(char **_string)
 		fRecvPosition -= sizeof(int32);	// rewind the transaction
 		return B_ERROR;
 	}
+}
+
+
+status_t
+LinkReceiver::ReadString(BString &string)
+{
+	int32 length = 0;
+	status_t status;
+
+	status = Read<int32>(&length);
+	if (status < B_OK)
+		return status;
+
+	if (length < 0) {
+		status = B_ERROR;
+		goto err;
+	}
+
+	if (length > 0) {
+		char* buffer = string.LockBuffer(length + 1);
+		if (buffer == NULL) {
+			status = B_NO_MEMORY;
+			goto err;
+		}
+
+		status = Read(buffer, length);
+		if (status < B_OK) {
+			string.UnlockBuffer();
+			goto err;
+		}
+
+		// make sure the string is null terminated
+		buffer[length] = '\0';
+		string.UnlockBuffer(length);
+	} else
+		string = "";
+
+	return B_OK;
+
+err:
+	fRecvPosition -= sizeof(int32);
+		// rewind the transaction
+	return status;
 }
 
 

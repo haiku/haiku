@@ -17,8 +17,8 @@ namespace BPrivate {
 
 class AppServerLink : public ServerLink {
 	public:
-		AppServerLink(void);
-		~AppServerLink(void);
+		AppServerLink();
+		~AppServerLink();
 };
 
 }	// namespace BPrivate

@@ -5,11 +5,15 @@
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Pahtz <pahtz@yahoo.com.au>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 #ifndef _LINK_RECEIVER_H
 #define _LINK_RECEIVER_H
 
+
 #include <OS.h>
+
+class BString;
 
 
 namespace BPrivate {
@@ -28,6 +32,7 @@ class LinkReceiver {
 
 		virtual status_t Read(void *data, ssize_t size);
 		status_t ReadString(char **string);
+		status_t ReadString(BString& string);
 		status_t ReadString(char *buffer, size_t bufferSize);
 		template <class Type> status_t Read(Type *data)
 		{
