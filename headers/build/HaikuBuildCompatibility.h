@@ -3,6 +3,8 @@
 
 #include <sys/types.h>
 
+#define _BE_ERRNO_H_
+	// this is what Dano/Zeta is using
 #include <Errors.h>
 #include <string.h>
 
