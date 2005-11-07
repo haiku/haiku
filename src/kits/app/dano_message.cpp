@@ -3,7 +3,8 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Axel Dörfler
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Michael Lotz, mmlr@mlotz.ch
  */
 
 
@@ -170,14 +171,15 @@ BPrivate::unflatten_dano_message(uint32 magic, BDataIO &stream,
 					free(fieldBuffer);
 					throw result;
 				}
-			} break;
+				break;
+			}
 
 			case SECTION_FIXED_SIZE_ARRAY_DATA: {
 				FixedSizeArray *field = (FixedSizeArray *)fieldBuffer;
 
 				int32 dataOffset = sizeof(FixedSizeArray) + field->nameLength + 1;
 				dataOffset = pad_to_8(dataOffset);
-				int32 count = *(int32 *)fieldBuffer + dataOffset;
+				int32 count = *(int32 *)(fieldBuffer + dataOffset);
 				dataOffset += 8; /* count and padding */
 
 				if (offset + dataOffset + count * field->sizePerItem > size)
@@ -196,14 +198,15 @@ BPrivate::unflatten_dano_message(uint32 magic, BDataIO &stream,
 
 					dataOffset += field->sizePerItem;
 				}
-			} break;
+				break;
+			}
 
 			case SECTION_VARIABLE_SIZE_ARRAY_DATA: {
 				VariableSizeArray *field = (VariableSizeArray *)fieldBuffer;
 
 				int32 dataOffset = sizeof(VariableSizeArray) + field->nameLength + 1;
 				dataOffset = pad_to_8(dataOffset);
-				int32 count = *(int32 *)fieldBuffer + dataOffset;
+				int32 count = *(int32 *)(fieldBuffer + dataOffset);
 				dataOffset += sizeof(int32);
 				ssize_t totalSize = *(ssize_t *)fieldBuffer + dataOffset;
 				dataOffset += sizeof(ssize_t);
@@ -223,7 +226,8 @@ BPrivate::unflatten_dano_message(uint32 magic, BDataIO &stream,
 						throw result;
 					}
 				}
-			} break;
+				break;
+			}
 		}
 
 		free(fieldBuffer);
