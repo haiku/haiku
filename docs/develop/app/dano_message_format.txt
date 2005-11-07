@@ -1,0 +1,169 @@
+/*	The Dano Message Format
+
+0.	Disclaimer
+	The information herein is based on reverse engeneering flattened BMessages.
+	The conclusions might be wrong in the details, and an implementation can
+	probably not be drawn right from this description, but the overall format
+	described here should come close to the one found on Dano based systems.
+
+1.	Concept
+	In the Dano message format, data is kept in a flat buffer and is organised
+	in multiple "sections". Each section has a header that identifies the type
+	of the section and it's size. Each section contains a field that then holds
+	more information on the data and the data itself. Everything is usually
+	padded to 8 byte boundaries.
+
+2.	Section Headers
+	The section header looks like this:
+
+	typedef struct section_header_s {
+		int32		code;
+		ssize_t		size;
+		uint8		data[0];
+	} SectionHeader;
+
+	The code identifies the type of the data following the header. Valid types
+	are the following:
+
+	enum {
+		SECTION_MESSAGE_HEADER = 'FOB2',
+		SECTION_OFFSET_TABLE = 'STof',
+		SECTION_TARGET_INFORMATION = 'ENwh',
+		SECTION_SINGLE_ITEM_DATA = 'SGDa'
+		SECTION_FIXED_SIZE_ARRAY_DATA = 'FADa',
+		SECTION_VARIABLE_SIZE_ARRAY_DATA = 'VADa',
+		SECTION_SORTED_INDEX_TABLE = 'DXIn',
+		SECTION_END_OF_DATA = 'DDEn'
+	};
+
+	The size field includes the size of the header itself and its data.
+
+3.	Message Header Section
+	The message header section stores the what field of the message. Its code,
+	conveniently at the very first 4 bytes, also identifies the message as a
+	Dano message ('FOB2'). The layout is as follows:
+
+	typedef struct message_header_s {
+		int32		what;
+		int32		padding;
+	} MessageHeader;
+
+4.	Offset Table Section
+	The offset table stores the byte offsets to the sorted index table and to
+	the end of data section. It looks like this:
+
+	typedef struct offset_table_s {
+		int32		indexTable;
+		int32		endOfData;
+		int64		padding;
+	} OffsetTable;
+
+	The index table offset is important since we will usually insert new fields
+	before the index table. The end of data offset can be used to directly
+	know where the index table ends. It's also possible that the end of index
+	offset is actually the end of the index table.
+	Both offsets are based on the beginning of the first data section and not
+	from the top of the message.
+
+5.	Single Item Data Section
+	The single item data section holds information on exactly one data item.
+	Since when only dealing with one item it doesn't matter wether it is fixed
+	size or not we do not distinct between these two types. The format is as
+	follows:
+
+	typedef struct single_item_s {
+		type_code	type;
+		ssize_t		itemSize;
+		uint8		nameLength;
+		char		name[0];
+	} SingleItem;
+
+	The the name is padded to the next 8 byte boundary. After nameLength + 1
+	bytes the item data begins. The nameLength field does not count the
+	terminating 0 of the name, but the name is actually 0 terminated.
+
+6.	Fixed Size Item Array Data
+	This type of section holds an array of fixed size items. Describing the
+	format of this section in a struct is a bit harder, since the count
+	variable is stored after the name field. In pseudo code it would look like
+	this:
+
+	typedef struct fixed_size_s {
+		type_code	type;
+		ssize_t		sizePerItem;
+		uint8		nameLength;
+		char		name[pad_to_8(nameLength + 1)];
+		int32		count;
+		int32		padding;
+		uint8		data[0];
+	} FixedSize;
+
+7.	Variable Sized Item Array Data
+	The format is very similar to the one of the fixed size item array above.
+	Again in pseudo code:
+
+	typedef struct variable_size_s {
+		type_code	type;
+		int32		padding;
+		uint8		nameLength;
+		char		name[pad_to_8(nameLength + 1)];
+		int32		count;
+		ssize_t		totalSize;
+		uint8		data[0];
+	} VariableSize;
+
+	The data itself is constructed of the variable sized items, each padded to
+	an eight byte boundary. Where they begin and where they end is not encoded
+	in the data itself but in an "endpoint table" following the data (at data
+	+ totalSize). The endpoint table is an array of int32 items each pointing
+	to the end of an item (not including padding). As an example we take an
+	array of three variable sized items layouted like this:
+
+		<data>
+			76 61 72 69 61 62 6c 65 variable
+			20 73 69 7a 65 64 20 64  sized d
+			61 74 61 00 00 00 00 00 ata..... (pad)
+			61 72 69 61 62 6c 65 20 ariable 
+			73 69 7a 65 64 20 64 61 sized da
+			74 61 00 00 00 00 00 00 ta...... (pad)
+			6c 61 73 74 20 69 6e 20 last in 
+			74 68 69 73 20 61 72 72 this arr
+			61 79 21 00 00 00 00 00 ay!..... (pad)
+		</data>
+
+	Then the endpoint table would look like this:
+
+		<endPointTable>
+			<endPoint 20 />
+			<endPoint 43 />
+			<endPoint 68 />
+		<endPointTable>
+
+	The first endpoint (20) means that the size of the first item is 20 bytes.
+	The second endpoint (43) is constructed from the start of the second item
+	which is at pad_to_8(endpoint[0]) plus the size of the item. In this case
+	pad_to_8(endpoint[0]) results in 24, this is where the second item begins.
+	So 43 - 24 gives us the unpadded length of item 2 (19). The third item
+	starts at pad_to_8(endpoint[1]) and is in our case 48. The length of item
+	three is therefor 68 - 48 = 20 bytes. Note that in this example we are
+	talking about strings where the 0 termination is included in the item size.
+
+8.	Sorted Index Table
+	The sorted index table is a list of direct offsets to the fields. It is
+	binary sorted using the field names. This means that we can use it for
+	name lookups with a O(log(n)) complexity instead of doing linear searches.
+	The section data is composed directly out of the int32 array of offsets.
+	No extra data is stored in this section. All offsets have the first data
+	section as their base.
+
+9.	End Of Data Section
+	This section terminates the section stream. No other data is stored in this
+	section.
+
+10.	Target Information Section
+	The target information section is used to hold the target team, handler,
+	port information for message delivery. As this data is not relevant when
+	handling disk stored messages only, the format of this section is not
+	discussed here.
+
+*/
