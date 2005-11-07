@@ -4,7 +4,7 @@
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
- *		Adrian Oanca <adioanca@cotty.iren.ro>
+ *		Adrian Oanca <adioanca@gmail.com>
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Stefano Ceccherini (burton666@libero.it)
  *		Axel Dörfler, axeld@pinc-software.de
@@ -442,7 +442,7 @@ ServerWindow::SetLayerState(Layer *layer, BPrivate::LinkReceiver &link)
 	// NOTE: no need to check for a lock. This is a private method.
 
 	layer->CurrentState()->ReadFromLink(link);
-	// TODO: Rebuild clipping here?
+	// TODO: Rebuild clipping here!
 }
 
 
@@ -508,11 +508,7 @@ ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent)
 // TODO: rework the clipping stuff to remove RootLayer dependency and then
 // remove this hack:
 if (fWinBorder->IsOffscreenWindow()) {
-#ifndef NEW_CLIPPING
-	newLayer->fVisible.Set(newLayer->fFrame);
-#else
 	newLayer->fVisible2.Set(newLayer->fFrame);
-#endif
 }
 
 	if (_parent) {
@@ -555,32 +551,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			link.Read<float>(&dh);
 			link.Read<float>(&dv);
-#ifndef NEW_CLIPPING
-			// scroll visually by using the CopyBits() implementation
-			// this will also take care of invalidating previously invisible
-			// areas (areas scrolled into view)
-			BRect src = fCurrentLayer->Bounds();
-			BRect dst = src;
-			// NOTE: if we scroll down, the contents are moved *up*
-			dst.OffsetBy(-dh, -dv);
-
-			// TODO: Are origin and scale handled in this conversion?
-			src = fCurrentLayer->ConvertToTop(src);
-			dst = fCurrentLayer->ConvertToTop(dst);
-
-			int32 xOffset = (int32)(dst.left - src.left);
-			int32 yOffset = (int32)(dst.top - src.top);
-
-			// this little detail is where it differs from CopyBits()
-			// -> it will invalidate areas previously out of screen
-			dst = dst | src;
-
-			fCurrentLayer->CurrentState()->OffsetOrigin(BPoint(dh, dv));
-
-			fCurrentLayer->CopyBits(src, dst, xOffset, yOffset);
-#else
 			fCurrentLayer->ScrollBy(dh, dv);
-#endif
 
 			break;
 		}
@@ -647,11 +618,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (parent != NULL)
 				parent->AddChild(newLayer, this);
 
-			if (myRootLayer && !newLayer->IsHidden() && parent)
-#ifndef NEW_CLIPPING
-				myRootLayer->GoInvalidate(newLayer, newLayer->fFull);
-#else
-			{
+			if (myRootLayer && !newLayer->IsHidden() && parent) {
 				BRegion invalidRegion;
 				newLayer->GetWantedRegion(invalidRegion);
 				parent->MarkForRebuild(invalidRegion);
@@ -660,9 +627,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 					myRootLayer->MarkForRedraw(newLayer->VisibleRegion());
 					myRootLayer->TriggerRedraw();
 				}
-//				myRootLayer->GoInvalidate(newLayer, invalidRegion);
 			}
-#endif
 			break;
 		}
 		case AS_LAYER_DELETE:
@@ -678,17 +643,10 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 //			BRegion *invalidRegion = NULL;
 
 			if (!fCurrentLayer->IsHidden() && parent && myRootLayer) {
-#ifndef NEW_CLIPPING
-				if (fCurrentLayer->fFullVisible.CountRects() > 0)
-					invalidRegion = new BRegion(fCurrentLayer->fFullVisible);
-#else
 				if (fCurrentLayer->FullVisible().Frame().IsValid()) {
 					parent->MarkForRebuild(fCurrentLayer->FullVisible());
 					myRootLayer->MarkForRedraw(fCurrentLayer->FullVisible());
-
-//					invalidRegion = new BRegion(fCurrentLayer->FullVisible());
 				}
-#endif
 			}
 
 			// here we remove current layer from list.
@@ -716,23 +674,15 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_LAYER_SET_STATE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_STATE: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
-//			SetLayerState(fCurrentLayer);
 			SetLayerState(fCurrentLayer, link);
 			// TODO: should this be moved into SetLayerState?
 			// If it _always_ needs to be done afterwards, then yes!
-#ifndef NEW_CLIPPING
-			fCurrentLayer->RebuildFullRegion();
-#endif
 			break;
 		}
 		case AS_LAYER_SET_FONT_STATE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
-//			SetLayerFontState(fCurrentLayer);
 			SetLayerFontState(fCurrentLayer, link);
-#ifndef NEW_CLIPPING
-			fCurrentLayer->RebuildFullRegion();
-#endif
 			break;
 		}
 		case AS_LAYER_GET_STATE:
@@ -912,9 +862,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			DTRACE(("ServerWindow %s: Message AS_LAYER_PUSH_STATE: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			
 			fCurrentLayer->PushState();
-#ifndef NEW_CLIPPING
-			fCurrentLayer->RebuildFullRegion();
-#endif
+
 			break;
 		}
 		case AS_LAYER_POP_STATE:
@@ -922,9 +870,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			DTRACE(("ServerWindow %s: Message AS_LAYER_POP_STATE: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			
 			fCurrentLayer->PopState();
-#ifndef NEW_CLIPPING
-			fCurrentLayer->RebuildFullRegion();
-#endif
+
 			break;
 		}
 		case AS_LAYER_SET_SCALE:
@@ -993,18 +939,10 @@ if (myRootLayer)
 	myRootLayer->Lock();			
 			fCurrentLayer->SetViewColor(RGBColor(c));
 
-#ifndef NEW_CLIPPING
-			if (myRootLayer)
-				myRootLayer->GoRedraw(fCurrentLayer, fCurrentLayer->fVisible);
-#else
 			if (myRootLayer) {
 				myRootLayer->MarkForRedraw(fCurrentLayer->VisibleRegion());
 				myRootLayer->TriggerRedraw();
 			}
-
-//			if (myRootLayer)
-//				myRootLayer->GoRedraw(fCurrentLayer, fCurrentLayer->VisibleRegion());
-#endif
 if (myRootLayer)
 	myRootLayer->Unlock();
 			break;
@@ -1117,14 +1055,7 @@ if (myRootLayer)
 
 			fCurrentLayer->CurrentState()->SetClippingRegion(region);
 
-#ifndef NEW_CLIPPING
-			fCurrentLayer->RebuildFullRegion();
-#endif
-			if (myRootLayer && !(fCurrentLayer->IsHidden()) && !fWinBorder->InUpdate())
-#ifndef NEW_CLIPPING
-				myRootLayer->GoInvalidate(fCurrentLayer, fCurrentLayer->fFull);				
-#else
-			{
+			if (myRootLayer && !(fCurrentLayer->IsHidden()) && !fWinBorder->InUpdate()) {
 				BRegion invalidRegion;
 				fCurrentLayer->GetWantedRegion(invalidRegion);
 
@@ -1134,10 +1065,7 @@ if (myRootLayer)
 				fCurrentLayer->fParent->TriggerRebuild();
 				myRootLayer->MarkForRedraw(invalidRegion);
 				myRootLayer->TriggerRedraw();
-
-//				myRootLayer->GoInvalidate(fCurrentLayer, invalidRegion);
 			}
-#endif
 				
 			break;
 		}
@@ -1153,21 +1081,13 @@ if (myRootLayer)
 				fLink.Flush();
 			} else {
 				// TODO: Watch out for the coordinate system in AS_LAYER_GET_CLIP_REGION
-#ifndef NEW_CLIPPING
-				int32 rectCount = fCurrentLayer->fVisible.CountRects();
-#else
 				int32 rectCount = fCurrentLayer->fVisible2.CountRects();
-#endif
 
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<int32>(rectCount);
 
 				for (int32 i = 0; i < rectCount; i++)
-#ifndef NEW_CLIPPING
-					fLink.Attach<BRect>(fCurrentLayer->ConvertFromTop(fCurrentLayer->fVisible.RectAt(i)));
-#else
 					fLink.Attach<BRect>(fCurrentLayer->ConvertFromTop(fCurrentLayer->fVisible2.RectAt(i)));
-#endif
 
 				fLink.Flush();
 			}
@@ -1194,20 +1114,9 @@ if (myRootLayer)
 // restored too. "AS_LAYER_SET_CLIP_REGION" is irritating, as I think it should be
 // "AS_LAYER_CONSTRAIN_CLIP_REGION", since it means to "add" to the current clipping, not "set" it.
 //			fCurrentLayer->CurrentState()->SetClippingRegion(region);
-#ifndef NEW_CLIPPING
-// TODO: set the clipping
-//			fCurrentLayer->fVisible.IntersectWith(&region);
-#endif
-/*
-#ifndef NEW_CLIPPING
-			fCurrentLayer->RebuildFullRegion();
-			if (myRootLayer && !(fCurrentLayer->IsHidden()) && !fWinBorder->InUpdate())
-				myRootLayer->GoInvalidate(fCurrentLayer, fCurrentLayer->fFull);				
-#else
-			if (myRootLayer && !(fCurrentLayer->IsHidden()) && !fWinBorder->InUpdate())
-				myRootLayer->GoInvalidate(fCurrentLayer, fCurrentLayer->Frame());
-#endif
-*/
+
+			// TODO: rebuild clipping and redraw
+
 			break;
 		}
 		case AS_LAYER_INVAL_RECT:
@@ -1223,12 +1132,9 @@ if (myRootLayer)
 				BRect converted(fCurrentLayer->ConvertToTop(invalRect.LeftTop()),
 								fCurrentLayer->ConvertToTop(invalRect.RightBottom()));
 				BRegion invalidRegion(converted);
-#ifdef NEW_CLIPPING
-				invalidRegion.IntersectWith(&fCurrentLayer->fVisible2);
-#endif
+				invalidRegion.IntersectWith(&fCurrentLayer->VisibleRegion());
 				myRootLayer->MarkForRedraw(invalidRegion);
 				myRootLayer->TriggerRedraw();
-//				myRootLayer->GoRedraw(fWinBorder, invalidRegion);
 			}
 			break;
 		}
@@ -1717,11 +1623,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 	// NOTE: fCurrentLayer and fCurrentLayer->fLayerData cannot be NULL,
 	// _DispatchGraphicsMessage() is called from _DispatchMessage() which
 	// checks both these conditions
-#ifndef NEW_CLIPPING
-	BRegion rreg(fCurrentLayer->fVisible);
-#else
-	BRegion rreg(fCurrentLayer->fVisible2);
-#endif
+	BRegion rreg(fCurrentLayer->VisibleRegion());
 
 	if (fWinBorder->InUpdate())
 		rreg.IntersectWith(&fWinBorder->RegionToBeUpdated());
@@ -2158,72 +2060,6 @@ ServerWindow::_MessageLooper()
 	Quit();
 		// does not return
 }
-
-/*
-void
-ServerWindow::_CopyBits(RootLayer* rootLayer, Layer* layer,
-						BRect& src, BRect& dst,
-						int32 xOffset, int32 yOffset) const
-{
-	// NOTE: The correct behaviour is this:
-	// * The region that is copied is the
-	//   src rectangle, no matter if it fits
-	//   into the dst rectangle. It is copied
-	//   by the offset dst.LeftTop() - src.LeftTop()
-	// * The dst rectangle is used for invalidation:
-	//   Any area in the dst rectangle that could
-	//   not be copied from src (because either the
-	//   src rectangle was not big enough, or because there
-	//   were parts cut off by the current layer clipping),
-	//   are triggering BView::Draw() to be called
-	//   and for these parts only.
-
-#ifndef NEW_CLIPPING
-
-	// the region that is going to be copied
-	BRegion copyRegion(src);
-	// apply the current clipping of the layer
-
-	copyRegion.IntersectWith(&layer->fVisible);
-
-	// offset the region to the destination
-	// and apply the current clipping there as well
-	copyRegion.OffsetBy(xOffset, yOffset);
-	copyRegion.IntersectWith(&layer->fVisible);
-
-	// the region at the destination that needs invalidation
-	BRegion invalidRegion(dst);
-	// exclude the region drawn by the copy operation
-	invalidRegion.Exclude(&copyRegion);
-	// apply the current clipping as well
-	invalidRegion.IntersectWith(&layer->fVisible);
-
-	// move the region back for the actual operation
-	copyRegion.OffsetBy(-xOffset, -yOffset);
-
-	layer->GetDrawingEngine()->CopyRegion(&copyRegion, xOffset, yOffset);
-
-	// trigger the redraw			
-	if (rootLayer) {
-		// the following code solves a "concurrency" problem:
-		// since the scrolling might happen more often
-		// than redrawing, we need to keep track of the region
-		// pending for redraw that might fall into the area
-		// that is scrolled.
-		BRegion scrolledInvalid(fWinBorder->CulmulatedUpdateRegion());
-		scrolledInvalid.IntersectWith(&layer->fVisible);
-		if (scrolledInvalid.Frame().IsValid()) {
-//printf("the layer has pending updates that will be scrolled\n");
-			scrolledInvalid.OffsetBy(xOffset, yOffset);
-			invalidRegion.Include(&scrolledInvalid);
-		}
-
-		rootLayer->GoRedraw(fWinBorder, invalidRegion);
-	}
-
-#endif
-}*/
-
 
 status_t
 ServerWindow::SendMessageToClient(const BMessage* msg, int32 target, bool usePreferred) const

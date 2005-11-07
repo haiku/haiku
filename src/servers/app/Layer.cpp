@@ -65,18 +65,10 @@ Layer::Layer(BRect frame, const char* name, int32 token,
 	fCurrent(NULL),
 
 	// all regions (fVisible, fFullVisible, fFull) start empty
-#ifndef NEW_CLIPPING
-	fVisible(),
-	fFullVisible(),
-	fFull(),
-	fFrameAction(B_LAYER_ACTION_NONE),
-	fClipReg(&fVisible),
-#else
 	fVisible2(),
 	fFullVisible2(),
 	fDirtyForRebuild(),
 	fClipReg(&fVisible2),
-#endif
 
 	fServerWin(NULL),
 	fName(name),
@@ -191,10 +183,6 @@ Layer::AddChild(Layer* layer, ServerWindow* serverWin)
 		// 2.2) this Layer must know if it has a ServerWindow object attached.
 		c->fServerWin=serverWin;
 		
-		// 2.3) we are attached to the main tree so build our full region.
-#ifndef NEW_CLIPPING
-		c->RebuildFullRegion();
-#endif
 		// tree parsing algorithm
 		if (c->fFirstChild) {
 			// go deep
@@ -266,10 +254,7 @@ Layer::RemoveChild(Layer *layer)
 	
 	layer->fPreviousSibling = NULL;
 	layer->fNextSibling = NULL;
-
-#ifdef NEW_CLIPPING
 	layer->clear_visible_regions();
-#endif
 
 	// 2) Iterate over all of the removed-layer's descendants and unset the
 	//	root layer, server window, and all redraw-related regions
@@ -284,14 +269,6 @@ Layer::RemoveChild(Layer *layer)
 			c->SetRootLayer(NULL);
 			// 2.2) this Layer must know if it has a ServerWindow object attached.
 			c->fServerWin = NULL;
-			// 2.3) we were removed from the main tree so clear our full region.
-#ifndef NEW_CLIPPING
-			c->fFull.MakeEmpty();
-			// 2.4) clear fullVisible region.
-			c->fFullVisible.MakeEmpty();
-			// 2.5) we don't have a visible region anymore.
-			c->fVisible.MakeEmpty();
-#endif
 		}
 
 		// tree parsing algorithm
@@ -404,17 +381,6 @@ Layer::LayerAt(const BPoint &pt, bool recursive)
 		return NULL;
 	}
 
-#ifndef NEW_CLIPPING
-	if (fVisible.Contains(pt))
-		return this;
-
-	if (fFullVisible.Contains(pt)) {
-		for (Layer* child = LastChild(); child; child = PreviousChild()) {
-			if (Layer* layer = child->LayerAt(pt))
-				return layer;
-		}
-	}
-#else
 	if (fVisible2.Contains(pt))
 		return this;
 
@@ -424,7 +390,7 @@ Layer::LayerAt(const BPoint &pt, bool recursive)
 				return layer;
 		}
 	}
-#endif	
+
 	return NULL;
 }
 
@@ -475,398 +441,6 @@ Layer::SetFlags(uint32 flags)
 	fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
 }
 
-#ifndef NEW_CLIPPING
-
-//! Rebuilds the layer's "completely visible" region
-void
-Layer::RebuildFullRegion(void)
-{
-	STRACE(("Layer(%s)::RebuildFullRegion()\n", Name()));
-	
-	if (fParent)
-		fFull.Set(fParent->ConvertToTop(fFrame ));
-	else
-		fFull.Set(fFrame);
-
-	// TODO: restrict to screen coordinates
-	
-	// TODO: Convert to screen coordinates
-
-	DrawState *ld;
-	ld = fDrawState;
-	do {
-		// clip to user region
-		if (const BRegion* userClipping = ld->ClippingRegion())
-			fFull.IntersectWith(userClipping);
-		
-	} while ((ld = ld->PreviousState()));
-}
-
-// StartRebuildRegions
-void
-Layer::StartRebuildRegions( const BRegion& reg, Layer *target, uint32 action, BPoint& pt)
-{
-	STRACE(("Layer(%s)::StartRebuildRegions() START\n", Name()));
-	RBTRACE(("\n\nLayer(%s)::StartRebuildRegions() START\n", Name()));
-	if (!fParent)
-		fFullVisible = fFull;
-	
-	BRegion oldVisible = fVisible;
-	
-	fVisible = fFullVisible;
-
-	// Rebuild regions for children...
-	for (Layer *lay = LastChild(); lay; lay = PreviousChild()) {
-		if (lay == target)
-			lay->RebuildRegions(reg, action, pt, BPoint(0.0f, 0.0f));
-		else
-			lay->RebuildRegions(reg, B_LAYER_NONE, pt, BPoint(0.0f, 0.0f));
-	}
-	
-	#ifdef DEBUG_LAYER_REBUILD
-		printf("\nSRR: Layer(%s) ALMOST done regions:\n", Name());
-		printf("\tVisible Region:\n");
-		fVisible.PrintToStream();
-		printf("\tFull Visible Region:\n");
-		fFullVisible.PrintToStream();
-	#endif
-	
-	BRegion redrawReg(fVisible);
-	
-	// if this is the first time
-	if (oldVisible.CountRects() > 0)
-		redrawReg.Exclude(&oldVisible);
-
-	if (redrawReg.CountRects() > 0)
-		fRootLayer->fRedrawReg.Include(&redrawReg);
-	
-	#ifdef DEBUG_LAYER_REBUILD
-		printf("\nLayer(%s)::StartRebuildRegions() DONE. Results:\n", Name());
-		printf("\tRedraw Region:\n");
-		fRootLayer->fRedrawReg.PrintToStream();
-		printf("\tCopy Region:\n");
-		for (int32 k=0; k<fRootLayer->fCopyRegList.CountItems(); k++) {
-			((BRegion*)(fRootLayer->fCopyRegList.ItemAt(k)))->PrintToStream();
-			((BPoint*)(fRootLayer->fCopyList.ItemAt(k)))->PrintToStream();
-		}
-		printf("\n");
-	#endif
-
-	STRACE(("Layer(%s)::StartRebuildRegions() END\n", Name()));
-	RBTRACE(("Layer(%s)::StartRebuildRegions() END\n", Name()));
-}
-
-// RebuildRegions
-void
-Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint ptOffset)
-{
-	STRACE(("Layer(%s)::RebuildRegions() START\n", Name()));
-
-	// TODO:/NOTE: this method must be executed as quickly as possible.
-	
-	// Currently SendView[Moved/Resized]Msg() simply constructs a message and calls
-	// ServerWindow::SendMessageToClient(). This involves the alternative use of 
-	// kernel and this code in the CPU, so there are a lot of context switches. 
-	// This is NOT good at all!
-	
-	// One alternative would be the use of a BMessageQueue per ServerWindows OR only
-	// one for app_server which will be emptied as soon as this critical operation ended.
-	// Talk to DW, Gabe.
-	
-	BRegion	oldRegion;
-	uint32 newAction = action;
-	BPoint newPt = pt;
-	BPoint newOffset = ptOffset; // used for resizing only
-	
-	BPoint dummyNewLocation;
-
-	RRLabel1:
-	switch(action) {
-		case B_LAYER_NONE: {
-			RBTRACE(("1) Layer(%s): Action B_LAYER_NONE\n", Name()));
-			STRACE(("1) Layer(%s): Action B_LAYER_NONE\n", Name()));
-			oldRegion = fVisible;
-			break;
-		}
-		case B_LAYER_MOVE: {
-			RBTRACE(("1) Layer(%s): Action B_LAYER_MOVE\n", Name()));
-			STRACE(("1) Layer(%s): Action B_LAYER_MOVE\n", Name()));
-			oldRegion = fFullVisible;
-			fFrame.OffsetBy(pt.x, pt.y);
-			fFull.OffsetBy(pt.x, pt.y);
-			
-			// TODO: investigate combining frame event messages for efficiency
-			//SendViewMovedMsg();
-			AddToViewsWithInvalidCoords();
-
-			newAction	= B_LAYER_SIMPLE_MOVE;
-			break;
-		}
-		case B_LAYER_SIMPLE_MOVE: {
-			RBTRACE(("1) Layer(%s): Action B_LAYER_SIMPLE_MOVE\n", Name()));
-			STRACE(("1) Layer(%s): Action B_LAYER_SIMPLE_MOVE\n", Name()));
-			fFull.OffsetBy(pt.x, pt.y);
-			
-			break;
-		}
-		case B_LAYER_RESIZE: {
-			RBTRACE(("1) Layer(%s): Action B_LAYER_RESIZE\n", Name()));
-			STRACE(("1) Layer(%s): Action B_LAYER_RESIZE\n", Name()));
-			oldRegion	= fVisible;
-			
-			fFrame.right	+= pt.x;
-			fFrame.bottom	+= pt.y;
-			RebuildFullRegion();
-			
-			// TODO: investigate combining frame event messages for efficiency
-			//SendViewResizedMsg();
-			AddToViewsWithInvalidCoords();
-			
-			newAction = B_LAYER_MASK_RESIZE;
-			break;
-		}
-		case B_LAYER_MASK_RESIZE: {
-			RBTRACE(("1) Layer(%s): Action B_LAYER_MASK_RESIZE\n", Name()));
-			STRACE(("1) Layer(%s): Action B_LAYER_MASK_RESIZE\n", Name()));
-			oldRegion = fVisible;
-			
-			BPoint offset, rSize;
-			BPoint coords[2];
-			
-			ResizeOthers(pt.x, pt.y, coords, NULL);
-			offset = coords[0];
-			rSize = coords[1];
-			newOffset = offset + ptOffset;
-			
-			if (!(rSize.x == 0.0f && rSize.y == 0.0f)) {
-				fFrame.OffsetBy(offset);
-				fFrame.right += rSize.x;
-				fFrame.bottom += rSize.y;
-				RebuildFullRegion();
-				
-				// TODO: investigate combining frame event messages for efficiency
-				//SendViewResizedMsg();
-				AddToViewsWithInvalidCoords();
-				
-				newAction = B_LAYER_MASK_RESIZE;
-				newPt = rSize;
-				dummyNewLocation = newOffset;
-			} else {
-				if (!(offset.x == 0.0f && offset.y == 0.0f)) {
-					pt = newOffset;
-					action = B_LAYER_MOVE;
-					newPt = pt;
-					goto RRLabel1;
-				} else {
-					pt = ptOffset;
-					action = B_LAYER_MOVE;
-					newPt = pt;
-					goto RRLabel1;
-				}
-			}
-			break;
-		}
-	}
-
-	if (!IsHidden()) {
-		#ifdef DEBUG_LAYER_REBUILD
-			printf("Layer(%s) real action START\n", Name());
-			fFull.PrintToStream();
-		#endif
-		fFullVisible.MakeEmpty();
-		fVisible = fFull;
-		
-		if (fParent && fVisible.CountRects() > 0) {
-			// not the usual case, but support fot this is needed.
-			if (fParent->fAdFlags & B_LAYER_CHILDREN_DEPENDANT) {
-				#ifdef DEBUG_LAYER_REBUILD
-					printf("   B_LAYER_CHILDREN_DEPENDANT Parent\n");
-				#endif
-				
-				// because we're skipping one level, we need to do out
-				// parent business as well.
-				
-				// our visible area is relative to our parent's parent.
-				if (fParent->fParent)
-					fVisible.IntersectWith(&(fParent->fParent->fVisible));
-					
-				// exclude parent's visible area which could be composed by
-				// prior siblings' visible areas.
-				if (fVisible.CountRects() > 0)
-					fVisible.Exclude(&(fParent->fVisible));
-				
-				// we have a final visible area. Include it to our parent's one,
-				// exclude from parent's parent.
-				if (fVisible.CountRects() > 0) {
-					fParent->fFullVisible.Include(&fVisible);
-						
-					if (fParent->fParent)
-						fParent->fParent->fVisible.Exclude(&fVisible);
-				}
-			} else {
-				// for 95+% of cases
-				
-				#ifdef DEBUG_LAYER_REBUILD
-					printf("   (!)B_LAYER_CHILDREN_DEPENDANT Parent\n");
-				#endif
-				
-				// the visible area is the one common with parent's one.
-				fVisible.IntersectWith(&(fParent->fVisible));
-				
-				// exclude from parent's visible area. we're the owners now.
-				if (fVisible.CountRects() > 0)
-					fParent->fVisible.Exclude(&fVisible);
-			}
-		}
-		fFullVisible = fVisible;
-	}
-	
-	// Rebuild regions for children...
-	for(Layer *lay = LastChild(); lay != NULL; lay = PreviousChild())
-		lay->RebuildRegions(reg, newAction, newPt, newOffset);
-
-	#ifdef DEBUG_LAYER_REBUILD
-		printf("\nLayer(%s) ALMOST done regions:\n", Name());
-		printf("\tVisible Region:\n");
-		fVisible.PrintToStream();
-		printf("\tFull Visible Region:\n");
-		fFullVisible.PrintToStream();
-	#endif
-
-	if(!IsHidden()) {
-		switch(action) {
-			case B_LAYER_NONE: {
-				RBTRACE(("2) Layer(%s): Action B_LAYER_NONE\n", Name()));
-				BRegion r(fVisible);
-				if (oldRegion.CountRects() > 0)
-					r.Exclude(&oldRegion);
-				
-				if(r.CountRects() > 0)
-					fRootLayer->fRedrawReg.Include(&r);
-				break;
-			}
-			case B_LAYER_MOVE: {
-				RBTRACE(("2) Layer(%s): Action B_LAYER_MOVE\n", Name()));
-				BRegion redrawReg;
-				BRegion	*copyReg = new BRegion();
-				BRegion	screenReg(fRootLayer->Bounds());
-				
-				oldRegion.OffsetBy(pt.x, pt.y);
-				oldRegion.IntersectWith(&fFullVisible);
-				
-				*copyReg = oldRegion;
-				copyReg->IntersectWith(&screenReg);
-				if (copyReg->CountRects() > 0 && !(pt.x == 0.0f && pt.y == 0.0f)) {
-					copyReg->OffsetBy(-pt.x, -pt.y);
-					BPoint		*point = new BPoint(pt);
-					fRootLayer->fCopyRegList.AddItem(copyReg);
-					fRootLayer->fCopyList.AddItem(point);
-				} else {
-					delete copyReg;
-				}
-				
-				redrawReg	= fFullVisible;
-				redrawReg.Exclude(&oldRegion);
-				if (redrawReg.CountRects() > 0 && !(pt.x == 0.0f && pt.y == 0.0f)) {
-					fRootLayer->fRedrawReg.Include(&redrawReg);
-				}
-	
-				break;
-			}
-			case B_LAYER_RESIZE: {
-				RBTRACE(("2) Layer(%s): Action B_LAYER_RESIZE\n", Name()));
-				BRegion redrawReg;
-				
-				redrawReg = fVisible;
-				redrawReg.Exclude(&oldRegion);
-				if(redrawReg.CountRects() > 0)
-					fRootLayer->fRedrawReg.Include(&redrawReg);
-	
-				break;
-			}
-			case B_LAYER_MASK_RESIZE: {
-				RBTRACE(("2) Layer(%s): Action B_LAYER_MASK_RESIZE\n", Name()));
-				BRegion redrawReg;
-				BRegion	*copyReg = new BRegion();
-				
-				oldRegion.OffsetBy(dummyNewLocation.x, dummyNewLocation.y);
-				
-				redrawReg	= fVisible;
-				redrawReg.Exclude(&oldRegion);
-				if (redrawReg.CountRects() > 0)
-					fRootLayer->fRedrawReg.Include(&redrawReg);
-				
-				*copyReg = fVisible;
-				copyReg->IntersectWith(&oldRegion);
-				copyReg->OffsetBy(-dummyNewLocation.x, -dummyNewLocation.y);
-				if (copyReg->CountRects() > 0
-					&& !(dummyNewLocation.x == 0.0f && dummyNewLocation.y == 0.0f)) {
-					fRootLayer->fCopyRegList.AddItem(copyReg);
-					fRootLayer->fCopyList.AddItem(new BPoint(dummyNewLocation));
-				}
-				
-				break;
-			}
-			default:
-				RBTRACE(("2) Layer(%s): Action default\n", Name()));
-				break;
-		}
-	}
-/*	if (IsHidden()) {
-		fFullVisible.MakeEmpty();
-		fVisible.MakeEmpty();
-	}
-*/
-
-	STRACE(("Layer(%s)::RebuildRegions() END\n", Name()));
-}
-
-// ResizeOthers
-uint32
-Layer::ResizeOthers(float x, float y, BPoint coords[], BPoint *ptOffset)
-{
-	STRACE(("Layer(%s)::ResizeOthers() START\n", Name()));
-	uint32 rmask = fResizeMode;
-	
-	// offset
-	coords[0].x	= 0.0f;
-	coords[0].y	= 0.0f;
-	
-	// resize by width/height
-	coords[1].x	= 0.0f;
-	coords[1].y	= 0.0f;
-
-	if ((rmask & 0x00000f00UL)>>8 == _VIEW_LEFT_ &&
-		(rmask & 0x0000000fUL)>>0 == _VIEW_RIGHT_) {
-		coords[1].x		= x;
-	} else if ((rmask & 0x00000f00UL)>>8 == _VIEW_LEFT_) {
-	} else if ((rmask & 0x0000000fUL)>>0 == _VIEW_RIGHT_) {
-		coords[0].x		= x;
-	} else if ((rmask & 0x00000f00UL)>>8 == _VIEW_CENTER_) {
-		coords[0].x		= x/2;
-	} else {
-		// illegal flag. Do nothing.
-	}
-
-
-	if ((rmask & 0x0000f000UL)>>12 == _VIEW_TOP_ &&
-		(rmask & 0x000000f0UL)>>4 == _VIEW_BOTTOM_) {
-		coords[1].y		= y;
-	} else if ((rmask & 0x0000f000UL)>>12 == _VIEW_TOP_) {
-	} else if ((rmask & 0x000000f0UL)>>4 == _VIEW_BOTTOM_) {
-		coords[0].y		= y;
-	} else if ((rmask & 0x0000f000UL)>>12 == _VIEW_CENTER_) {
-		coords[0].y		= y/2;
-	} else {
-		// illegal flag. Do nothing.
-	}
-
-	STRACE(("Layer(%s)::ResizeOthers() END\n", Name()));
-	return 0UL;
-}
-
-#endif
-
 // Redraw
 void
 Layer::Redraw(const BRegion& reg, Layer *startFrom)
@@ -897,25 +471,6 @@ Layer::Draw(const BRect &rect)
 		fDriver->FillRect(rect, ViewColor());
 }
 
-#ifndef NEW_CLIPPING
-// EmptyGlobals
-void
-Layer::EmptyGlobals()
-{
-	fRootLayer->fRedrawReg.MakeEmpty();
-
-	int32 count = fRootLayer->fCopyRegList.CountItems();
-	for (int32 i = 0; i < count; i++)
-		delete (BRegion*)fRootLayer->fCopyRegList.ItemAt(i);
-	fRootLayer->fCopyRegList.MakeEmpty();
-	
-	count = fRootLayer->fCopyList.CountItems();
-	for (int32 i = 0; i < count; i++)
-		delete (BPoint*)fRootLayer->fCopyList.ItemAt(i);
-	fRootLayer->fCopyList.MakeEmpty();
-}
-#endif
-
 /*!
 	\brief Shows the layer
 	\param invalidate Invalidate the region when showing the layer. defaults to true
@@ -935,14 +490,6 @@ Layer::Show(bool invalidate)
 
 	SendViewCoordUpdateMsg();
 
-// NOTE: I added this here and it solves the invalid region problem
-// for Windows that have been resized before they were shown. -Stephan
-#ifndef NEW_CLIPPING
-RebuildFullRegion();
-
-	if (invalidate)
-		GetRootLayer()->GoInvalidate(this, fFull);
-#else
 	if (invalidate) {
 		// compute the region this layer wants for itself
 		BRegion	invalid;
@@ -953,11 +500,8 @@ RebuildFullRegion();
 
 			fParent->TriggerRebuild();
 			GetRootLayer()->TriggerRedraw();
-
-//			GetRootLayer()->GoInvalidate(this, invalid);
 		}
 	}
-#endif
 }
 
 /*!
@@ -976,10 +520,6 @@ Layer::Hide(bool invalidate)
 	}
 
 	fHidden	= true;
-#ifndef NEW_CLIPPING	
-	if (invalidate)
-		GetRootLayer()->GoInvalidate(this, fFullVisible);
-#else
 	if (invalidate && fFullVisible2.CountRects() > 0) {
 		BRegion invalid(fFullVisible2);
 
@@ -988,10 +528,7 @@ Layer::Hide(bool invalidate)
 
 		fParent->TriggerRebuild();
 		GetRootLayer()->TriggerRedraw();
-
-//		GetRootLayer()->GoInvalidate(this, fFullVisible2);
 	}
-#endif
 }
 
 //! Returns true if the layer is hidden
@@ -1013,6 +550,8 @@ Layer::PushState()
 {
 	fDrawState = fDrawState->PushState();
 	fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
+
+	// TODO: rebuild clipping and redraw
 }
 
 
@@ -1026,6 +565,8 @@ Layer::PopState()
 
 	fDrawState = fDrawState->PopState();
 	fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
+
+	// TODO: rebuild clipping and redraw
 }
 
 
@@ -1057,11 +598,7 @@ Layer::MoveBy(float x, float y)
 	}
 
 	GetRootLayer()->Lock();
-#ifndef NEW_CLIPPING
-	move_layer(x, y);
-#else
 	do_MoveBy(x, y);
-#endif
 	GetRootLayer()->Unlock();
 
 	STRACE(("Layer(%s)::MoveBy() END\n", Name()));
@@ -1079,11 +616,7 @@ Layer::ResizeBy(float x, float y)
 	}
 
 	GetRootLayer()->Lock();
-#ifndef NEW_CLIPPING
-	resize_layer(x, y);
-#else
 	do_ResizeBy(x, y);
-#endif
 	GetRootLayer()->Unlock();
 
 	STRACE(("Layer(%s)::ResizeBy() END\n", Name()));
@@ -1096,11 +629,7 @@ Layer::ScrollBy(float x, float y)
 	STRACE(("Layer(%s)::ScrollBy() START\n", Name()));
 
 	GetRootLayer()->Lock();
-#ifndef NEW_CLIPPING
-	// nothing
-#else
 	do_ScrollBy(x, y);
-#endif
 	GetRootLayer()->Unlock();
 
 	STRACE(("Layer(%s)::ScrollBy() END\n", Name()));
@@ -1226,199 +755,100 @@ Layer::Scale() const
 BPoint
 Layer::ConvertToParent(BPoint pt)
 {
-#ifndef NEW_CLIPPING
-	pt -= BoundsOrigin();
-	pt += fFrame.LeftTop();
-	return pt;
-#else
 	ConvertToParent2(&pt);
 	return pt;
-#endif
 }
 
 //! Converts the passed rectangle to parent coordinates
 BRect
 Layer::ConvertToParent(BRect rect)
 {
-#ifndef NEW_CLIPPING
-//	rect.OffsetBy(fFrame.LeftTop());
-//	return rect;
-	BPoint origin = BoundsOrigin();
-	rect.OffsetBy(-origin.x, -origin.y);
-	rect.OffsetBy(fFrame.LeftTop());
-	return rect;
-#else
 	ConvertToParent2(&rect);
 	return rect;
-#endif
 }
 
 //! Converts the passed region to parent coordinates
 BRegion
 Layer::ConvertToParent(BRegion* reg)
 {
-#ifndef NEW_CLIPPING
-	// TODO: wouldn't it be more efficient to use the copy
-	// constructor for BRegion and then call OffsetBy()?
-	BRegion newreg;
-	for (int32 i = 0; i < reg->CountRects(); i++)
-		newreg.Include(ConvertToParent(reg->RectAt(i)));
-	return newreg;
-#else
 	BRegion newReg(*reg);
 	ConvertToParent2(&newReg);
 	return newReg;
-#endif
 }
 
 //! Converts the passed point from parent coordinates
 BPoint
 Layer::ConvertFromParent(BPoint pt)
 {
-#ifndef NEW_CLIPPING
-//	return pt - fFrame.LeftTop();
-	pt -= fFrame.LeftTop();
-	pt += BoundsOrigin();
-	return pt;
-#else
 	ConvertFromParent2(&pt);
 	return pt;
-#endif
 }
 
 //! Converts the passed rectangle from parent coordinates
 BRect
 Layer::ConvertFromParent(BRect rect)
 {
-#ifndef NEW_CLIPPING
-//	rect.OffsetBy(-fFrame.left, -fFrame.top);
-//	return rect;
-	rect.OffsetBy(-fFrame.left, -fFrame.top);
-	rect.OffsetBy(BoundsOrigin());
-	return rect;
-#else
 	ConvertFromParent2(&rect);
 	return rect;
-#endif
 }
 
 //! Converts the passed region from parent coordinates
 BRegion
 Layer::ConvertFromParent(BRegion *reg)
 {
-#ifndef NEW_CLIPPING
-	BRegion newreg;
-	for(int32 i=0; i<reg->CountRects();i++)
-		newreg.Include(ConvertFromParent(reg->RectAt(i)));
-	return newreg;
-#else
 	BRegion newReg(*reg);
 	ConvertFromParent2(&newReg);
 	return newReg;
-#endif
 }
 
 // ConvertToTop
 BPoint
 Layer::ConvertToTop(BPoint pt)
 {
-#ifndef NEW_CLIPPING
-	if (fParent) {
-//		return (fParent->ConvertToTop(pt + fFrame.LeftTop()));
-		pt = ConvertToParent(pt);
-		return fParent->ConvertToTop(pt);
-	} else
-		return pt;
-#else
 	ConvertToScreen2(&pt);
 	return pt;
-#endif
 }
 
 //! Converts the passed rectangle to screen coordinates
 BRect
 Layer::ConvertToTop(BRect rect)
 {
-#ifndef NEW_CLIPPING
-	if (fParent) {
-//		return fParent->ConvertToTop(rect.OffsetByCopy(fFrame.LeftTop()));
-		rect = ConvertToParent(rect);
-		return fParent->ConvertToTop(rect);
-	} else
-		return rect;
-#else
 	ConvertToScreen2(&rect);
 	return rect;
-#endif
 }
 
 //! Converts the passed region to screen coordinates
 BRegion
 Layer::ConvertToTop(BRegion *reg)
 {
-#ifndef NEW_CLIPPING
-	BRegion newreg;
-	for (int32 i = 0; i < reg->CountRects();i++)
-		newreg.Include(ConvertToTop(reg->RectAt(i)));
-	return newreg;
-#else
 	BRegion newReg(*reg);
 	ConvertToScreen2(&newReg);
 	return newReg;
-#endif
 }
 
 // ConvertFromTop
 BPoint
 Layer::ConvertFromTop(BPoint pt)
 {
-#ifndef NEW_CLIPPING
-	if (fParent) {
-//		return fParent->ConvertFromTop(pt-fFrame.LeftTop());
-		pt = ConvertFromParent(pt);
-		return fParent->ConvertFromTop(pt);
-	} else
-		return pt;
-#else
 	ConvertFromScreen2(&pt);
 	return pt;
-#endif
 }
 
 //! Converts the passed rectangle from screen coordinates
 BRect
 Layer::ConvertFromTop(BRect rect)
 {
-#ifndef NEW_CLIPPING
-	if (fParent) {
-//		return fParent->ConvertFromTop(rect.OffsetByCopy(-fFrame.LeftTop().x,
-//														 -fFrame.LeftTop().y));
-		rect = ConvertFromParent(rect);
-		return fParent->ConvertFromTop(rect);
-	} else
-		return rect;
-#else
 	ConvertFromScreen2(&rect);
 	return rect;
-#endif
 }
 
 //! Converts the passed region from screen coordinates
 BRegion
 Layer::ConvertFromTop(BRegion *reg)
 {
-#ifndef NEW_CLIPPING
-	BRegion newreg;
-	
-	for (int32 i = 0; i < reg->CountRects(); i++)
-		newreg.Include(ConvertFromTop(reg->RectAt(i)));
-	
-	return newreg;
-#else
 	BRegion newReg(*reg);
 	ConvertFromScreen2(&newReg);
 	return newReg;
-#endif
 }
 
 //! Recursively deletes all children of the calling layer
@@ -1503,9 +933,6 @@ Layer::PrintNode()
 		printf("Bottom child: %s (%p)\n", fLastChild->Name(), fLastChild);
 	else
 		printf("Bottom child: NULL\n");
-#ifndef NEW_CLIPPING
-	printf("Visible Areas: "); fVisible.PrintToStream();
-#endif
 }
 
 //! Prints the tree hierarchy from the current layer down
@@ -1529,69 +956,6 @@ Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 	if (!startFrom)
 		redraw = true;
 
-#ifndef NEW_CLIPPING
-	if (HasClient() && IsTopLayer()) {
-		// calculate the minimum region/rectangle to be updated with
-		// a single message to the client.
-		BRegion	updateReg(fFullVisible);
-
-		if (fFlags & B_FULL_UPDATE_ON_RESIZE
-			&& fFrameAction	== B_LAYER_ACTION_RESIZE)
-		{
-			// do nothing
-		} else {
-			updateReg.IntersectWith(&reg);
-		}
-		if (updateReg.CountRects() > 0) {
-			fOwner->fCumulativeRegion.Include(&updateReg);			
-			if (!fOwner->InUpdate() && !fOwner->fRequestSent) {
-				fOwner->fInUpdateRegion = fOwner->fCumulativeRegion;
-fOwner->cnt++;
-if (fOwner->cnt != 1)
-	CRITICAL("Layer::RequestDraw(): fOwner->cnt != 1 -> Not Allowed!");
-				fOwner->fRequestSent = true; // this is here to avoid a possible de-synchronization
-				if (SendUpdateMsg(fOwner->fInUpdateRegion) == B_OK) {
-					fOwner->fCumulativeRegion.MakeEmpty();
-				}
-				else {
-					fOwner->fRequestSent = false;
-					fOwner->fInUpdateRegion.MakeEmpty();
-				}
-			}
-		}
-	}
-
-	if (fVisible.CountRects() > 0) {
-		BRegion	updateReg(fVisible);
-		// calculate the update region
-		if (fFlags & B_FULL_UPDATE_ON_RESIZE && fFrameAction == B_LAYER_ACTION_RESIZE) {
-			// do nothing
-		} else {
-			updateReg.IntersectWith(&reg);
-		}
-
-		if (updateReg.CountRects() > 0) {
-			fDriver->ConstrainClippingRegion(&updateReg);
-			Draw(updateReg.Frame());
-			fDriver->ConstrainClippingRegion(NULL);
-		}
-	}
-
-	for (Layer *lay = LastChild(); lay != NULL; lay = PreviousChild()) {
-		if (lay == startFrom)
-			redraw = true;
-
-		if (redraw && !(lay->IsHidden())) {
-			// no need to go deeper if not even the FullVisible region intersects
-			// Update one.
-			BRegion common(lay->fFullVisible);
-			common.IntersectWith(&reg);
-			
-			if (common.CountRects() > 0)
-				lay->RequestDraw(reg, NULL);
-		}
-	}
-#else
 	if (HasClient() && IsTopLayer()) {
 		// calculate the minimum region/rectangle to be updated with
 		// a single message to the client.
@@ -1643,135 +1007,7 @@ if (fOwner->cnt != 1)
 				lay->RequestDraw(reg, NULL);
 		}
 	}
-#endif
 }
-
-#ifndef NEW_CLIPPING
-
-// move_layer
-void
-Layer::move_layer(float x, float y)
-{
-/*	if (fClassID == AS_WINBORDER_CLASS) {
-		WinBorder	*wb = (WinBorder*)this;
-		wb->fCumulativeRegion.OffsetBy(x, y);
-		wb->fInUpdateRegion.OffsetBy(x, y);
-		wb->fSavedForUpdateRegion.OffsetBy(x, y);
-	}*/
-	
-	fFrameAction = B_LAYER_ACTION_MOVE;
-
-	BPoint pt(x, y);	
-	BRect rect(fFull.Frame().OffsetByCopy(pt));
-
-if (!fParent) {
-printf("no parent in Layer::move_layer() (%s)\n", Name());
-fFrameAction = B_LAYER_ACTION_NONE;
-return;
-}
-
-	fParent->StartRebuildRegions(BRegion(rect), this, B_LAYER_MOVE, pt);
-
-	fDriver->CopyRegionList(&fRootLayer->fCopyRegList,
-							&fRootLayer->fCopyList,
-							fRootLayer->fCopyRegList.CountItems(),
-							&fFullVisible);
-
-	fParent->Redraw(fRootLayer->fRedrawReg, this);
-
-	// redraw workspaces layer
-	if (dynamic_cast<WinBorder*>(this) != NULL && fRootLayer->WorkspacesLayer() != NULL) {
-		fRootLayer->GoRedraw(fRootLayer->WorkspacesLayer(), fRootLayer->WorkspacesLayer()->fVisible);
-	}
-
-	SendViewCoordUpdateMsg();
-	
-	EmptyGlobals();
-
-	fFrameAction = B_LAYER_ACTION_NONE;
-}
-
-// resize_layer
-void
-Layer::resize_layer(float x, float y)
-{
-	fFrameAction = B_LAYER_ACTION_RESIZE;
-
-	BPoint pt(x,y);	
-
-	BRect rect(fFull.Frame());
-	rect.right += x;
-	rect.bottom += y;
-
-if (!fParent) {
-printf("no parent in Layer::resize_layer() (%s)\n", Name());
-fFrameAction = B_LAYER_ACTION_NONE;
-return;
-}
-
-	fParent->StartRebuildRegions(BRegion(rect), this, B_LAYER_RESIZE, pt);
-
-	fDriver->CopyRegionList(&fRootLayer->fCopyRegList, &fRootLayer->fCopyList, fRootLayer->fCopyRegList.CountItems(), &fFullVisible);
-
-	fParent->Redraw(fRootLayer->fRedrawReg, this);
-
-	// redraw workspaces layer
-	if (dynamic_cast<WinBorder*>(this) != NULL && fRootLayer->WorkspacesLayer() != NULL) {
-		fRootLayer->GoRedraw(fRootLayer->WorkspacesLayer(), fRootLayer->WorkspacesLayer()->fVisible);
-	}
-
-	SendViewCoordUpdateMsg();
-	
-	EmptyGlobals();
-
-	fFrameAction = B_LAYER_ACTION_NONE;
-}
-
-// FullInvalidate
-void
-Layer::FullInvalidate(const BRect &rect)
-{
-	FullInvalidate(BRegion(rect));
-}
-
-// FullInvalidate
-void
-Layer::FullInvalidate(const BRegion& region)
-{
-	STRACE(("Layer(%s)::FullInvalidate():\n", Name()));
-	
-#ifdef DEBUG_LAYER
-	region.PrintToStream();
-	printf("\n");
-#endif
-
-	BPoint pt(0,0);
-	StartRebuildRegions(region, NULL,/* B_LAYER_INVALIDATE, pt); */B_LAYER_NONE, pt);
-
-	Redraw(fRootLayer->fRedrawReg);
-	
-	EmptyGlobals();
-}
-
-// Invalidate
-void
-Layer::Invalidate(const BRegion& region)
-{
-	STRACE(("Layer(%s)::Invalidate():\n", Name()));
-#ifdef DEBUG_LAYER
-	region.PrintToStream();
-	printf("\n");
-#endif
-	
-	fRootLayer->fRedrawReg	= region;
-	
-	Redraw(fRootLayer->fRedrawReg);
-	
-	EmptyGlobals();
-}
-
-#endif // 5 methods
-
 
 /*!
 	\brief Returns the layer's ServerWindow
@@ -1794,13 +1030,9 @@ Layer::SendUpdateMsg(BRegion& reg)
 {
 	BMessage msg;
 	msg.what = _UPDATE_;
-#ifndef NEW_CLIPPING
-	msg.AddRect("_rect", ConvertFromTop(reg.Frame()));
-#else
 	BRect	rect(reg.Frame());
 	ConvertFromScreen2(&rect);
 	msg.AddRect("_rect", rect );
-#endif
 	msg.AddRect("debug_rect", reg.Frame());
 //	msg.AddInt32("_token",fViewToken);
 		
@@ -1883,42 +1115,6 @@ Layer::do_CopyBits(BRect& src, BRect& dst, int32 xOffset, int32 yOffset) {
 	if (!GetRootLayer())
 		return;
 
-#ifndef NEW_CLIPPING
-
-	// the region that is going to be copied
-	BRegion copyRegion(src);
-	// apply the current clipping of the layer
-	copyRegion.IntersectWith(&fVisible);
-	// don't scroll regions that are pending for
-	// (or already in) an update
-	// NOTE: this fixes the visible glitches that resulted from
-	// scrolling, but it brings up a new problem, which looks
-	// like the the client receives multiple update messages for
-	// the same area
-	// NOTE2: if you don't include both regions, it doesn't work
-	copyRegion.Exclude(&fOwner->CulmulatedUpdateRegion());
-	copyRegion.Exclude(&fOwner->RegionToBeUpdated());
-
-	// offset the region to the destination
-	// and apply the current clipping there as well
-	copyRegion.OffsetBy(xOffset, yOffset);
-	copyRegion.IntersectWith(&fVisible);
-
-	// the region at the destination that needs invalidation
-	GetRootLayer()->fRedrawReg.Set(dst);
-	// exclude the region drawn by the copy operation
-	GetRootLayer()->fRedrawReg.Exclude(&copyRegion);
-	// apply the current clipping as well
-	GetRootLayer()->fRedrawReg.IntersectWith(&fVisible);
-
-	// move the region back for the actual operation
-	copyRegion.OffsetBy(-xOffset, -yOffset);
-
-	GetDrawingEngine()->CopyRegion(&copyRegion, xOffset, yOffset);
-
-	// trigger the redraw			
-	GetRootLayer()->RequestDraw(GetRootLayer()->fRedrawReg, NULL);
-#else
 	// the region that is going to be copied
 	BRegion copyRegion(src);
 	// apply the current clipping of the layer
@@ -1945,11 +1141,7 @@ Layer::do_CopyBits(BRect& src, BRect& dst, int32 xOffset, int32 yOffset) {
 
 	// trigger the redraw			
 	GetRootLayer()->RequestDraw(GetRootLayer()->fRedrawReg, NULL);
-#endif
-
 }
-
-#ifdef NEW_CLIPPING
 
 void
 Layer::MovedByHook(float dx, float dy)
@@ -2635,6 +1827,4 @@ Layer::_AllRedraw(const BRegion &invalid)
 		}
 	}
 }
-
-#endif
 

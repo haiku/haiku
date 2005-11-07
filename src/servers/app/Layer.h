@@ -103,25 +103,6 @@ class Layer {
 	inline	uint32				Flags() const
 									{ return fFlags; }
 
-#ifndef NEW_CLIPPING
-	virtual	void				RebuildFullRegion();
-			void				StartRebuildRegions(const BRegion& reg,
-													Layer* target,
-													uint32 action,
-													BPoint& pt);
-
-			void				RebuildRegions(const BRegion& reg,
-											   uint32 action,
-											   BPoint pt,
-											   BPoint ptOffset);
-
-			uint32				ResizeOthers(float x, float y,
-											 BPoint coords[],
-											 BPoint* ptOffset);
-
-			void				EmptyGlobals();
-
-#endif
 			void				Redraw(const BRegion& reg,
 									   Layer* startFrom = NULL);
 	
@@ -240,11 +221,7 @@ class Layer {
 
 			void				CopyBits(BRect& src, BRect& dst,
 										 int32 xOffset, int32 yOffset);
-#ifndef NEW_CLIPPING
-	inline	const BRegion&		VisibleRegion() const { return fVisible; }
-	inline	const BRegion&		FullVisible() const { return fFullVisible; }
 
-#else
 	inline	const BRegion&		VisibleRegion() const { return fVisible2; }
 	inline	const BRegion&		FullVisible() const { return fFullVisible2; }
 
@@ -294,8 +271,6 @@ class Layer {
 			void				rezize_layer_redraw_more(BRegion &reg, float dx, float dy);
 			void				resize_layer_full_update_on_resize(BRegion &reg, float dx, float dy);
 
-#endif
- private:
 			void				do_CopyBits(BRect& src, BRect& dst,
 											int32 xOffset, int32 yOffset);
 
@@ -303,18 +278,6 @@ class Layer {
 	friend class RootLayer;
 	friend class WinBorder;
 	friend class ServerWindow;
-#ifndef NEW_CLIPPING
-	friend class OffscreenWinBorder;
-#endif
-
-#ifndef NEW_CLIPPING
-			void				move_layer(float x, float y);
-			void				resize_layer(float x, float y);
-
-			void				FullInvalidate(const BRect& rect);
-			void				FullInvalidate(const BRegion& region);
-			void				Invalidate(const BRegion& region);
-#endif
 
 			BRect				fFrame;
 // TODO: should be removed or reused in a similar fashion
@@ -332,18 +295,12 @@ class Layer {
 	
 	mutable	Layer*				fCurrent;
 
-#ifndef NEW_CLIPPING	
-			BRegion				fVisible;
-			BRegion				fFullVisible;
-			BRegion				fFull;
-			int8				fFrameAction;
-#else
  private:
 			BRegion				fVisible2;
 			BRegion				fFullVisible2;
 			BRegion				fDirtyForRebuild;
  protected:
-#endif
+
 			BRegion*			fClipReg;
 	
 			ServerWindow*		fServerWin;

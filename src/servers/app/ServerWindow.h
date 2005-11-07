@@ -4,7 +4,7 @@
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
- *		Adrian Oanca <adioanca@cotty.iren.ro>
+ *		Adrian Oanca <adioanca@gmail.com>
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Stefano Ceccherini (burton666@libero.it)
  *		Axel Dörfler, axeld@pinc-software.de

@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT license.
  *
  * Author:  DarkWyrm <bpmagic@columbus.rr.com>
- *			Adi Oanca <adioanca@cotty.iren.ro>
+ *			Adi Oanca <adioanca@gmail.com>
  *			Stephan Aßmus <superstippi@gmx.de>
  */
 #ifndef _WINBORDER_H_
@@ -58,11 +58,8 @@ class WinBorder : public Layer {
 	virtual	bool				IsOffscreenWindow() const
 									{ return false; }
 
-#ifndef NEW_CLIPPING
-	virtual	void				RebuildFullRegion();
-#else
 	virtual	void				GetWantedRegion(BRegion &reg);
-#endif
+
 			void				UpdateStart();
 			void				UpdateEnd();
 	inline	bool				InUpdate() const
@@ -122,26 +119,18 @@ class WinBorder : public Layer {
 
 			SubWindowList		fSubWindowList;
 
-#ifdef NEW_CLIPPING
- public:
 	virtual	void				MovedByHook(float dx, float dy);
 	virtual	void				ResizedByHook(float dx, float dy, bool automatic);
 
 			void				RequestClientRedraw(const BRegion &invalid);
 
- private:
-			void				set_decorator_region(BRect frame);
-	virtual	void				_ReserveRegions(BRegion &reg);
-
-			BRegion				fDecRegion;
-			bool				fRebuildDecRegion;
-
-#endif
-
- public:
 	virtual	void				SetTopLayer(Layer* layer);
 	inline	Layer*				TopLayer() const
 									{ return fTopLayer; }
+
+ private:
+			void				set_decorator_region(BRect frame);
+	virtual	void				_ReserveRegions(BRegion &reg);
 
  protected:
 	friend class Layer;
@@ -155,6 +144,9 @@ class WinBorder : public Layer {
 
 			BRegion				fCumulativeRegion;
 			BRegion				fInUpdateRegion;
+
+			BRegion				fDecRegion;
+			bool				fRebuildDecRegion;
 
 			int32				fMouseButtons;
 			BPoint				fLastMousePosition;

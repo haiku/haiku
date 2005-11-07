@@ -32,10 +32,6 @@ OffscreenWinBorder::OffscreenWinBorder(ServerBitmap* bitmap,
 	fDriver->SetHWInterface(fHWInterface);
 	fDriver->Initialize();
 	fDriver->Update();
-
-#ifndef NEW_CLIPPING
-	fFull.Set(fFrame);
-#endif
 }
 
 // destructor
@@ -73,11 +69,5 @@ void
 OffscreenWinBorder::SetTopLayer(Layer* layer)
 {
 	WinBorder::SetTopLayer(layer);
-
-#ifndef NEW_CLIPPING
-fTopLayer->fFull.Set(fFrame.OffsetToCopy(0.0, 0.0));
-fTopLayer->fHidden	= false;
-fTopLayer->fVisible = fTopLayer->fFull;
-#endif
 }
 

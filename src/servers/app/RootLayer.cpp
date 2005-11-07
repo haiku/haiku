@@ -5,7 +5,7 @@
  * Authors:
  *		Gabe Yoder <gyoder@stny.rr.com>
  *		DarkWyrm <bpmagic@columbus.rr.com>
- *		Adrian Oanca <adioanca@cotty.iren.ro>
+ *		Adrian Oanca <adioanca@gmail.com>
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Axel Dörfler, axeld@pinc-software.de
  */
@@ -197,10 +197,7 @@ RootLayer::WorkingThread(void *data)
 
 	// first make sure we are actualy visible
 	oneRootLayer->Lock();
-#ifndef NEW_CLIPPING
-	oneRootLayer->RebuildFullRegion();
-	oneRootLayer->GoInvalidate(oneRootLayer, oneRootLayer->Bounds());
-#else
+
 	// RootLayer starts with valid visible regions
 	oneRootLayer->fFullVisible2.Set(oneRootLayer->Bounds());
 	oneRootLayer->fVisible2.Set(oneRootLayer->Bounds());
@@ -210,7 +207,7 @@ RootLayer::WorkingThread(void *data)
 
 	oneRootLayer->TriggerRebuild();
 	oneRootLayer->TriggerRedraw();
-#endif
+
 	oneRootLayer->Unlock();
 	
 	STRACE(("info: RootLayer(%s)::WorkingThread listening on port %ld.\n", oneRootLayer->Name(), oneRootLayer->fListenPort));
@@ -798,11 +795,7 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 			redraw = true;			
 		}
 		if (redraw) {
-#ifndef NEW_CLIPPING
-			fRedrawReg.Include(&dirtyRegion);
-#else
 			MarkForRedraw(dirtyRegion);
-#endif
 		}
 	}
 
@@ -836,11 +829,8 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 			if (!stillPresent) {
 				MarkForRebuild(layer->FullVisible());
 				MarkForRedraw(layer->FullVisible());
-#ifndef NEW_CLIPPING
-				empty_visible_regions(layer);
-#else
+
 				layer->clear_visible_regions();
-#endif
 			}
 			else {
 				oldStrippedList.AddItem(layer);
@@ -899,20 +889,12 @@ GetDrawingEngine()->ConstrainClippingRegion(NULL);
 		// redraw of focus change is automaticaly done
 		redraw = false;
 		// trigger region rebuilding and redraw
-#ifndef NEW_CLIPPING
-		GoInvalidate(this, fFull);
-#else
 		TriggerRebuild();
 		TriggerRedraw();
-#endif
 	}
 	else if (redraw) {
-#ifndef NEW_CLIPPING
-		GoInvalidate(this, dirtyRegion);
-#else
 		MarkForRedraw(dirtyRegion);
 		TriggerRedraw();
-#endif
 	}
 }
 
@@ -1221,12 +1203,10 @@ RootLayer::KeyboardEventHandler(BMessage *msg)
 					SetActiveWorkspace(scancode - 2);
 				#ifdef APPSERVER_ROOTLAYER_SHOW_WORKSPACE_NUMBER
 					// to draw the current Workspace index on screen.
-#ifndef NEW_CLIPPING
-					BRegion	reg(fVisible);
+					BRegion reg(VisibleRegion());
 					fDriver->ConstrainClippingRegion(&reg);
 					Draw(reg.Frame());
 					fDriver->ConstrainClippingRegion(NULL);
-#endif
 				#endif
 					break;
 				}	
@@ -1580,23 +1560,6 @@ RootLayer::change_winBorder_feel(WinBorder *winBorder, int32 newFeel)
 			RevealNewWMState(oldWMState);
 	}
 }
-
-#ifndef NEW_CLIPPING
-void
-RootLayer::empty_visible_regions(Layer *layer)
-{
-// TODO: optimize by avoiding recursion?
-	// NOTE: first 'layer' must be a WinBorder
-	layer->fFullVisible.MakeEmpty();
-	layer->fVisible.MakeEmpty();
-
-	Layer* child = layer->LastChild();
-	while (child) {
-		empty_visible_regions(child);
-		child = layer->PreviousChild();
-	}
-}
-#endif
 
 void
 RootLayer::Draw(const BRect &r)

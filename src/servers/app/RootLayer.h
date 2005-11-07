@@ -1,31 +1,17 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		RootLayer.h
-//	Author:			Gabe Yoder <gyoder@stny.rr.com>
-//					DarkWyrm <bpmagic@columbus.rr.com>
-//					Stephan Aßmus <superstippi@gmx.de>
-//	Description:	Class used for the top layer of each workspace's Layer tree
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Gabe Yoder <gyoder@stny.rr.com>
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Adrian Oanca <adioanca@gmail.com>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+
+/**	Class used for the top layer of each workspace's Layer tree */
+
 #ifndef _ROOTLAYER_H_
 #define _ROOTLAYER_H_
 
@@ -160,9 +146,6 @@ friend class WinBorder; // temporarily, I need invalidate_layer()
 
 			void				change_winBorder_feel(WinBorder *winBorder, int32 newFeel);
 
-#ifndef NEW_CLIPPING
-			void				empty_visible_regions(Layer *layer);
-#endif
 			// Input related methods
 			void				MouseEventHandler(BMessage *msg);
 			void				KeyboardEventHandler(BMessage *msg);

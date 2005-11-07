@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT license.
  *
  * Author:  DarkWyrm <bpmagic@columbus.rr.com>
- *			Adi Oanca <adioanca@cotty.iren.ro>
+ *			Adi Oanca <adioanca@gmail.com>
  *			Stephan Aßmus <superstippi@gmx.de>
  */
 
@@ -74,6 +74,9 @@ WinBorder::WinBorder(const BRect &frame,
 	  fCumulativeRegion(),
 	  fInUpdateRegion(),
 
+	  fDecRegion(),
+	  fRebuildDecRegion(true),
+
 	  fMouseButtons(0),
 	  fLastMousePosition(-1.0, -1.0),
 
@@ -105,9 +108,7 @@ WinBorder::WinBorder(const BRect &frame,
 	fServerWin		= window;
 	fAdFlags		= fAdFlags | B_LAYER_CHILDREN_DEPENDANT;
 	fFlags			= B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE;
-#ifdef NEW_CLIPPING
-	fRebuildDecRegion = true;
-#endif
+
 	QuietlySetFeel(feel);
 
 	if (fFeel != B_NO_BORDER_WINDOW_LOOK) {
@@ -135,10 +136,6 @@ WinBorder::WinBorder(const BRect &frame,
 			_ResizeBy(width - frame.Width(), height - frame.Height());
 		}
 	}
-
-#ifndef NEW_CLIPPING
-	RebuildFullRegion();
-#endif
 
 	STRACE(("WinBorder %p, %s:\n", this, Name()));
 	STRACE(("\tFrame: (%.1f, %.1f, %.1f, %.1f)\n", fFrame.left, fFrame.top,
@@ -179,58 +176,7 @@ WinBorder::Draw(const BRect &r)
 void
 WinBorder::MoveBy(float x, float y)
 {
-#ifndef NEW_CLIPPING
-
-x = (float)int32(x);
-y = (float)int32(y);
-
-	if (x == 0.0 && y == 0.0)
-		return;
-
-	STRACE(("WinBorder(%s)::MoveBy(%.1f, %.1f) fDecorator: %p\n", Name(), x, y, fDecorator));
-	if (fDecorator)
-		fDecorator->MoveBy(x,y);
-
-// NOTE: I moved this here from Layer::move_layer()
-// Should this have any bad consequences I'm not aware of?
-fCumulativeRegion.OffsetBy(x, y);
-fInUpdateRegion.OffsetBy(x, y);
-
-	if (IsHidden()) {
-// TODO: This is a work around for a design issue:
-// The actual movement of a layer is done during
-// the region rebuild. The mechanism is somewhat
-// complicated and scheduled for refractoring...
-// The problem here for hidden layers is that 
-// they seem *not* to be part of the layer tree.
-// I don't think this is wrong as such, but of
-// course the rebuilding of regions does not take
-// place then. I don't understand yet the consequences
-// for normal views, but this here fixes at least
-// BWindows being MoveTo()ed before they are Show()n.
-// In Layer::move_to, StartRebuildRegions() is called
-// on fParent. But the rest of the this layers tree
-// has not been added to fParent apperantly. So now
-// you ask why fParent is even valid? Me too.
-		fFrame.OffsetBy(x, y);
-		fFull.OffsetBy(x, y);
-		fTopLayer->move_layer(x, y);
-		// ...and here we get really hacky...
-		fTopLayer->fFrame.OffsetTo(0.0, 0.0);
-	} else {
-		Layer::move_layer(x, y);
-	}
-
-	if (Window()) {
-		// dispatch a message to the client informing about the changed size
-		BMessage msg(B_WINDOW_MOVED);
-		msg.AddPoint("where", fFrame.LeftTop());
-		Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
-	}
-
-#else
 	Layer::MoveBy(x, y);
-#endif
 }
 
 
@@ -241,20 +187,6 @@ WinBorder::ResizeBy(float x, float y)
 
 	if (!_ResizeBy(x, y))
 		return;
-
-#ifndef NEW_CLIPPING
-	if (Window()) {
-		// send a message to the client informing about the changed size
-		BMessage msg(B_WINDOW_RESIZED);
-		msg.AddInt64("when", system_time());
-
-		BRect frame(fTopLayer->Frame());
-		msg.AddInt32("width", frame.IntegerWidth());
-		msg.AddInt32("height", frame.IntegerHeight());
-
-		Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
-	}
-#endif
 }
 
 
@@ -282,23 +214,7 @@ WinBorder::_ResizeBy(float x, float y)
 	if (x == 0.0 && y == 0.0)
 		return false;
 
-#ifndef NEW_CLIPPING
-	if (fDecorator)
-		fDecorator->ResizeBy(x, y);
-
-	if (IsHidden()) {
-		// TODO: See large comment in MoveBy()
-		fFrame.right += x;
-		fFrame.bottom += y;
-
-		if (fTopLayer)
-			fTopLayer->resize_layer(x, y);
-	} else {
-		resize_layer(x, y);
-	}
-#else
 	Layer::ResizeBy(x, y);
-#endif
 
 	return true;
 }
@@ -312,9 +228,10 @@ WinBorder::SetName(const char* name)
 	// rebuild the clipping for the title area
 	// and redraw it.
 
-	// TODO: Adi, please have a look at this,
-	// it doesn't work yet.
 	if (fDecorator) {
+
+// TODO: Make sure this works!!
+
 		// before the change
 		BRegion invalid(fDecorator->GetTabRect());
 
@@ -323,12 +240,8 @@ WinBorder::SetName(const char* name)
 		// after the change
 		invalid.Include(fDecorator->GetTabRect());
 
-#ifndef NEW_CLIPPING
-		RebuildFullRegion();
-		fRootLayer->GoRedraw(this, invalid);
-#else
-		// TODO: ...
-#endif
+		GetRootLayer()->MarkForRedraw(invalid);
+		GetRootLayer()->TriggerRedraw();
 	}
 }
 
@@ -360,23 +273,6 @@ WinBorder::UpdateEnd()
 		RequestDraw(reg, NULL);
 	}
 }
-
-#ifndef NEW_CLIPPING
-
-//! Rebuilds the WinBorder's "fully-visible" region based on info from the decorator
-void
-WinBorder::RebuildFullRegion()
-{
-	STRACE(("WinBorder(%s)::RebuildFullRegion()\n", Name()));
-
-	fFull.MakeEmpty();
-
-	// Winborder holds Decorator's full regions. if any...
-	if (fDecorator)
-		fDecorator->GetFootprint(&fFull);
-}
-
-#endif
 
 //! Sets the minimum and maximum sizes of the window
 void
@@ -792,24 +688,12 @@ WinBorder::_ActionFor(const BMessage *msg) const
 	msg->FindInt32("buttons", &buttons);
 	msg->FindInt32("modifiers", &modifiers);
 
-#ifndef NEW_INPUT_HANDING
-#ifndef NEW_CLIPPING
-	if (fTopLayer->fFullVisible.Contains(where))
-		return DEC_NONE;
-	else
-#else
-	if (fTopLayer->fFullVisible2.Contains(where))
-		return DEC_NONE;
-	else
-#endif
-#endif
 	if (fDecorator)
 		return fDecorator->Clicked(where, buttons, modifiers);
 	else
 		return DEC_NONE;
 }
 
-#ifdef NEW_CLIPPING
 void WinBorder::MovedByHook(float dx, float dy)
 {
 	STRACE(("WinBorder(%s)::MovedByHook(%.1f, %.1f) fDecorator: %p\n", Name(), x, y, fDecorator));
@@ -905,13 +789,10 @@ if (cnt != 1)
 
 			BMessage msg;
 			msg.what = _UPDATE_;
-#ifndef NEW_CLIPPING
-			msg.AddRect("_rect", ConvertFromTop(fInUpdateRegion.Frame()));
-#else
+
 			BRect	rect(fInUpdateRegion.Frame());
 			ConvertFromScreen2(&rect);
 			msg.AddRect("_rect", rect );
-#endif
 			msg.AddRect("debug_rect", fInUpdateRegion.Frame());
 
 			if (Window()->SendMessageToClient(&msg) == B_OK) {
@@ -924,7 +805,6 @@ if (cnt != 1)
 		}
 	}
 }
-#endif
 
 // SetTopLayer
 void
