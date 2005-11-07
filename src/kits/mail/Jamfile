@@ -12,12 +12,6 @@ if $(CHECK_MALLOC) {
 	SubDirC++Flags -D_NO_INLINE_ASM -fcheck-memory-usage ;
 }
 
-if $(BONE_COMPATIBLE) {
-	SubDirC++Flags -DBONE ;
-} else {
-	SubDirC++Flags -DBUILDING_R5_LIBNET ;
-}
-
 SubDirC++Flags -D_BUILDING_mail=1 -DUSE_NASTY_SYNC_THREAD_HACK=1 ;
 
 UsePrivateHeaders textencoding ;

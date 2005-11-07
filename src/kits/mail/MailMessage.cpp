@@ -24,7 +24,7 @@
 #include <ctype.h>
 #include <parsedate.h>
 
-#ifdef BONE
+#ifndef HAIKU_TARGET_PLATFORM_BEOS
 	#include <sys/socket.h>
 	#define BONE_SERIAL_PPP_GET_STATUS 0xbe230501
 	#define BSPPP_CONNECTED 4
@@ -897,7 +897,7 @@ BEmailMessage::Send(bool send_now)
 	if (status >= B_OK && send_now) {
 		BMailSettings settings_file;
 		if (settings_file.SendOnlyIfPPPUp()) {
-#ifdef BONE
+#ifndef HAIKU_TARGET_PLATFORM_BEOS
 			int s = socket(AF_INET, SOCK_DGRAM, 0);
 			bsppp_status_t ppp_status;
 

@@ -70,8 +70,8 @@ All rights reserved.
 
 using namespace BPrivate ;
 
-#ifndef BONE
-#	include <netdb.h>
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
+	#include <netdb.h>
 #endif
 
 #include "Mail.h"
