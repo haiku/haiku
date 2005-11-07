@@ -145,7 +145,7 @@ ViewState::ViewState()
 
 	origin.Set(0, 0);
 
-	line_join = B_BEVEL_JOIN;
+	line_join = B_MITER_JOIN;
 	line_cap = B_BUTT_CAP;
 	miter_limit = B_DEFAULT_MITER_LIMIT;
 
@@ -2859,8 +2859,8 @@ BView::StrokeShape(BShape *shape, ::pattern pattern)
 		fOwner->fLink->Attach<BRect>(shape->Bounds());
 		fOwner->fLink->Attach<int32>(sd->opCount);
 		fOwner->fLink->Attach<int32>(sd->ptCount);
-		fOwner->fLink->Attach(sd->opList, sd->opCount);
-		fOwner->fLink->Attach(sd->ptList, sd->ptCount);
+		fOwner->fLink->Attach(sd->opList, sd->opCount * sizeof(uint32));
+		fOwner->fLink->Attach(sd->ptList, sd->ptCount * sizeof(BPoint));
 	} else {
 		// TODO: send via an area
 	}
@@ -2885,8 +2885,8 @@ BView::FillShape(BShape *shape, ::pattern pattern)
 		fOwner->fLink->Attach<BRect>(shape->Bounds());
 		fOwner->fLink->Attach<int32>(sd->opCount);
 		fOwner->fLink->Attach<int32>(sd->ptCount);
-		fOwner->fLink->Attach(sd->opList, sd->opCount);
-		fOwner->fLink->Attach(sd->ptList, sd->ptCount);
+		fOwner->fLink->Attach(sd->opList, sd->opCount * sizeof(int32));
+		fOwner->fLink->Attach(sd->ptList, sd->ptCount * sizeof(BPoint));
 	} else {
 		// TODO: send via an area
 		// BTW, in a perfect world, the fLink API would take care of that -- axeld.
