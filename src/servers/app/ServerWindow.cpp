@@ -1965,11 +1965,11 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<int32>(&opcount);
 			link.Read<int32>(&ptcount);
 
-			int32* oplist = new int32[opcount];
+			uint32* oplist = new uint32[opcount];
 			BPoint* ptlist = new BPoint[ptcount];
 
-			link.Read(oplist, sizeof(int32) * opcount);
-			link.Read(ptlist, sizeof(BPoint) * ptcount);
+			link.Read(oplist, opcount * sizeof(uint32));
+			link.Read(ptlist, ptcount * sizeof(BPoint));
 
 			for (int32 i = 0; i < ptcount; i++)
 				ptlist[i] = fCurrentLayer->ConvertToTop(ptlist[i]);
