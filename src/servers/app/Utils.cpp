@@ -1,33 +1,21 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Utils.cpp
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Miscellaneous utility functions
-//
-//------------------------------------------------------------------------------
-#include <Entry.h>
-#include <stdio.h>
+/*
+ * Copyright 2001-2005, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ */
+
+/**	Miscellaneous utility functions */
+
 #include "Utils.h"
+
+#include <Entry.h>
+#include <GraphicsDefs.h>
 #include <String.h>
+
+#include <stdio.h>
+
 
 /*!
 	\brief Send a BMessage to a Looper target
@@ -37,90 +25,99 @@
 	This SendMessage takes ownership of the message sent, so deleting them after this 
 	call is unnecessary. Passing an invalid port will have unpredictable results.
 */
-void SendMessage(port_id port, BMessage *message, int32 target)
+void
+SendMessage(port_id port, BMessage *message, int32 target)
 {
-	if(!message)
+	if (!message)
 		return;
 
-	if(target==-1)
-		_set_message_target_(message,target,true);
+	if (target == -1)
+		_set_message_target_(message, target, true);
 	else
-		_set_message_target_(message,target,false);
-	
-	ssize_t flatsize=message->FlattenedSize();
-	char *buffer=new char[flatsize];
-	
-	if(message->Flatten(buffer,flatsize)==B_OK)
-		write_port(port, message->what, buffer,flatsize);
-	
+		_set_message_target_(message, target, false);
+
+	ssize_t size = message->FlattenedSize();
+	char *buffer = new char[size];
+
+	if (message->Flatten(buffer, size)==B_OK)
+		write_port(port, message->what, buffer, size);
+
 	delete [] buffer;
 	delete message;
 }
+
 
 /*
 	Below are friend functions for BMessage which currently are not in the Message.cpp 
 	that we need to send messages to BLoopers and such. Placed here to allow compilation.
 */
-void _set_message_target_(BMessage *msg, int32 target, bool preferred)
+void
+_set_message_target_(BMessage *msg, int32 target, bool preferred)
 {
-	if (preferred)
-	{
+	if (preferred) {
 		msg->fTarget = -1;
 		msg->fPreferred = true;
-	}
-	else
-	{
+	} else {
 		msg->fTarget = target;
 		msg->fPreferred = false;
 	}
 }
 
-int32 _get_message_target_(BMessage *msg)
+
+int32
+_get_message_target_(BMessage *msg)
 {
 	if (msg->fPreferred)
 		return -1;
-	else
-		return msg->fTarget;
+
+	return msg->fTarget;
 }
 
-bool _use_preferred_target_(BMessage *msg)
+
+bool
+_use_preferred_target_(BMessage *msg)
 {
 	return msg->fPreferred;
 }
 
-const char *MsgCodeToString(int32 code)
+
+const char *
+MsgCodeToString(int32 code)
 {
 	// Used to translate BMessage message codes back to a character
 	// format
 	char string [10];
-	sprintf(string,"'%c%c%c%c'",(char)((code & 0xFF000000) >>  24),
+	sprintf(string, "'%c%c%c%c'", (char)((code & 0xFF000000) >>  24),
 		(char)((code & 0x00FF0000) >>  16),
 		(char)((code & 0x0000FF00) >>  8),
 		(char)((code & 0x000000FF)) );
 	return string;
 }
 
-BString MsgCodeToBString(int32 code)
+
+BString
+MsgCodeToBString(int32 code)
 {
 	// Used to translate BMessage message codes back to a character
 	// format
-	char string [10];
-	sprintf(string,"'%c%c%c%c'",(char)((code & 0xFF000000) >>  24),
+	char buffer[10];
+	sprintf(buffer, "'%c%c%c%c'", (char)((code & 0xFF000000) >>  24),
 		(char)((code & 0x00FF0000) >>  16),
 		(char)((code & 0x0000FF00) >>  8),
 		(char)((code & 0x000000FF)) );
 
-	BString bstring(string);
-	return bstring;
+	BString string(buffer);
+	return string;
 }
 
-status_t ConvertModeToDisplayMode(uint32 mode, display_mode *dmode)
+
+status_t
+ConvertModeToDisplayMode(uint32 mode, display_mode *dmode)
 {
-	if(!mode)
+	if (!mode)
 		return B_BAD_VALUE;
-	
-	switch(mode)
-	{
+
+	switch (mode) {
 		case B_8_BIT_640x400:
 		{
 			dmode->virtual_width=640;
@@ -299,21 +296,23 @@ status_t ConvertModeToDisplayMode(uint32 mode, display_mode *dmode)
 		default:
 			return B_ERROR;
 	}
+
 	return B_OK;
 }
 
-BRect CalculatePolygonBounds(BPoint *pts, int32 pointcount)
+
+BRect
+CalculatePolygonBounds(BPoint *pts, int32 pointcount)
 {
-	if(!pts)
+	if (!pts)
 		return BRect(0,0,0,0);
-	
+
 	BRect r(0,0,0,0);
 
 	// shamelessly stolen from Marc's BPolygon code and tweaked to fit. :P
 	r = BRect(pts[0], pts[0]);
 
-	for (int32 i = 1; i < 4; i++)
-	{
+	for (int32 i = 1; i < 4; i++) {
 		if (pts[i].x < r.left)
 			r.left = pts[i].x;
 		if (pts[i].y < r.top)
@@ -323,5 +322,7 @@ BRect CalculatePolygonBounds(BPoint *pts, int32 pointcount)
 		if (pts[i].y > r.bottom)
 			r.bottom = pts[i].y;
 	}
+
 	return r;
 }
+
