@@ -614,19 +614,11 @@ WinBorder::MouseMoved(const BMessage *msg)
 
 	if (fIsDragging) {
 		BPoint delta = where - fLastMousePosition;
-#ifndef NEW_CLIPPING
 		MoveBy(delta.x, delta.y);
-#else
-		do_MoveBy(delta.x, delta.y);
-#endif
 	}
 	if (fIsResizing) {
 		BPoint delta = where - fLastMousePosition;
-#ifndef NEW_CLIPPING
 		ResizeBy(delta.x, delta.y);
-#else
-		do_ResizeBy(delta.x, delta.y);
-#endif
 	}
 	if (fIsSlidingTab) {
 		// TODO: implement
