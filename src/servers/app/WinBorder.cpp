@@ -134,8 +134,7 @@ WinBorder::WinBorder(const BRect &frame,
 			GetRootLayer()->GetDesktop()->ScreenAt(0)->GetMode(width, height, colorSpace, frequency);
 			_ResizeBy(width - frame.Width(), height - frame.Height());
 		}
-	} else
-		_ResizeBy(0, 0);
+	}
 
 #ifndef NEW_CLIPPING
 	RebuildFullRegion();
