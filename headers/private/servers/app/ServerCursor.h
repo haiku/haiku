@@ -57,11 +57,11 @@ class ServerCursor : public ServerBitmap {
 										 color_space format);
 							ServerCursor(const ServerCursor* cursor);
 
-	virtual					~ServerCursor(void);
+	virtual					~ServerCursor();
 	
 	//! Returns the cursor's hot spot
 			void			SetHotSpot(BPoint pt);
-			BPoint			GetHotSpot(void)
+			BPoint			GetHotSpot() const
 								{ return fHotSpot; }
 
 			void			SetAppSignature(const char* signature);
@@ -69,12 +69,12 @@ class ServerCursor : public ServerBitmap {
 								{ return fAppSignature.String(); }
 
 			void			SetOwningTeam(team_id tid)
-								{ fOwningTeam=tid; }
-			team_id			OwningTeam(void) const
+								{ fOwningTeam = tid; }
+			team_id			OwningTeam() const
 								{ return fOwningTeam; }
 	
 	//! Returns the cursor's ID
-			int32			ID()
+			int32			ID() const
 								{ return fToken; }
  private:
 	friend class CursorManager;
