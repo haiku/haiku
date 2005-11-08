@@ -23,7 +23,7 @@ class HashTable {
 		HashTable(int32 capacity = 100, float loadFactor = 0.75);
 		~HashTable();
 
-		void MakeEmpty();
+		void MakeEmpty(bool deleteValues = true);
 		bool IsEmpty() const { return fCount == 0; }
 		bool ContainsKey(Hashable& key) const { return _GetHashEntry(key) != NULL; }
 		int32 CountItems() const { return fCount; }

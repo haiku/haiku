@@ -45,15 +45,19 @@ HashTable::~HashTable()
 
 
 void
-HashTable::MakeEmpty()
+HashTable::MakeEmpty(bool deleteValues)
 {
+	if (fTable == NULL)
+		return;
+
 	for (int32 index = fCapacity; --index >= 0;) {
 		struct entry *entry, *next;
 
 		for (entry = fTable[index]; entry != NULL; entry = next) {
 			next = entry->next;
 
-			delete entry->value;
+			if (deleteValues)
+				delete entry->value;
 			delete entry;
 		}
 	}

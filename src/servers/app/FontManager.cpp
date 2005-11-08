@@ -88,6 +88,10 @@ FontManager::~FontManager()
 {
 	FTC_Manager_Done(ftmanager);
 	FT_Done_FreeType(gFreeTypeLibrary);
+
+	// we need to make sure the hash table doesn't delete the font styles;
+	// that's already done by the lists
+	fStyleHashTable.MakeEmpty(false);
 }
 
 
