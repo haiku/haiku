@@ -6,10 +6,10 @@
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Adi Oanca <adioanca@gmail.com>
  *		Stephan Aßmus <superstippi@gmx.de>
- *
- * Description:
- *		Class used for tracking drawing context and screen clipping.
- *		One Layer per client BWindow (WindowBorder) and each BView therein.
+ */
+
+/**	Class used for tracking drawing context and screen clipping.
+ *	One Layer per client BWindow (WindowBorder) and each BView therein.
  */
 
 #include <string.h>
@@ -38,6 +38,7 @@
 #else
 #	define STRACE(x) ;
 #endif
+
 
 Layer::Layer(BRect frame, const char* name, int32 token,
 	uint32 resize, uint32 flags, DrawingEngine* driver)
@@ -565,7 +566,7 @@ Layer::MoveBy(float x, float y)
 {
 	STRACE(("Layer(%s)::MoveBy() START\n", Name()));
 	if (!fParent) {
-		CRITICAL("ERROR: in Layer::MoveBy()! - No parent!\n");
+		fFrame.OffsetBy(x, y);
 		return;
 	}
 
