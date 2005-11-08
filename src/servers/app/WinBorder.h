@@ -130,8 +130,6 @@ class WinBorder : public Layer {
 			void				set_decorator_region(BRect frame);
 	virtual	void				_ReserveRegions(BRegion &reg);
 
- protected:
-	friend class Layer;
 	friend class RootLayer;
 
 			click_type			_ActionFor(const BMessage *msg) const;
