@@ -95,7 +95,12 @@ Painter::Painter()
 	  fPatternHandler(new PatternHandler()),
 	  fTextRenderer(new AGGTextRenderer())
 {
+	// Usually, the drawing engine will lock the font for us when
+	// needed - unfortunately, it can't know we need it here
+	fFont.Lock();
 	_UpdateFont();
+	fFont.Unlock();
+
 	_UpdateLineWidth();
 }
 
@@ -960,7 +965,6 @@ Painter::DrawString(const char* utf8String, uint32 length,
 	SetPattern(B_SOLID_HIGH);
 
 	if (fBuffer) {
-
 		bounds = fTextRenderer->RenderString(utf8String,
 											 length,
 											 fFontRendererSolid,
