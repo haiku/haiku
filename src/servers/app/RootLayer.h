@@ -132,7 +132,6 @@ public:
 
 private:
 friend class Desktop;
-friend class WinBorder; // temporarily, I need invalidate_layer()
 
 			// these are meant for Desktop class only!
 			void				AddWinBorder(WinBorder* winBorder);
