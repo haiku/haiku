@@ -121,7 +121,7 @@ BPrivate::unflatten_dano_message(uint32 magic, BDataIO &stream,
 		if (offset + sectionHeader.size > size)
 			return B_BAD_DATA;
 
-		ssize_t fieldSize = sectionHeader.size - sizeof(SectionHeader);
+		ssize_t fieldSize = sectionHeader.size - sizeof(section_header);
 		uint8 *fieldBuffer = NULL;
 		if (fieldSize > 0) {
 			// there may be no data. we shouldn't fail because of that
