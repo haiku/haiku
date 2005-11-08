@@ -94,6 +94,8 @@ public:
 
 			// related thread/team_id(s).
 	inline	team_id				ClientTeam() const { return fClientTeam; }
+			
+			void				HandleDirectConnection(int bufferState = -1, int driverState = -1);
 
 			// server "private" - try not to use.
 	inline	int32				ClientToken() const { return fHandlerToken; }
@@ -118,7 +120,6 @@ private:
 	virtual void				_GetLooperName(char* name, size_t size);
 
 			status_t			_EnableDirectWindowMode();
-			void				_HandleDirectConnection(int bufferState = -1, int driverState = -1);
 			
 			// TODO: Move me elsewhere
 			status_t			PictureToRegion(ServerPicture *picture,

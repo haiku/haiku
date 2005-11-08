@@ -273,7 +273,7 @@ ServerWindow::Show()
 	}
 	
 	if (fDirectWindowData != NULL)
-		_HandleDirectConnection(B_DIRECT_START|B_BUFFER_RESET);
+		HandleDirectConnection(B_DIRECT_START|B_BUFFER_RESET);
 }
 
 
@@ -288,7 +288,7 @@ ServerWindow::Hide()
 		return;
 
 	if (fDirectWindowData != NULL)
-		_HandleDirectConnection(B_DIRECT_STOP);
+		HandleDirectConnection(B_DIRECT_STOP);
 	
 	RootLayer* rootLayer = fWinBorder->GetRootLayer();
 	if (rootLayer && rootLayer->Lock()) {
@@ -2107,7 +2107,7 @@ ServerWindow::_EnableDirectWindowMode()
 
 
 void
-ServerWindow::_HandleDirectConnection(int bufferState, int driverState)
+ServerWindow::HandleDirectConnection(int bufferState, int driverState)
 {
 	if (fDirectWindowData == NULL)
 		return;

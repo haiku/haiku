@@ -181,8 +181,7 @@ WinBorder::ResizeBy(float x, float y)
 {
 	STRACE(("WinBorder(%s)::ResizeBy()\n", Name()));
 
-	if (!_ResizeBy(x, y))
-		return;
+	_ResizeBy(x, y);
 }
 
 
