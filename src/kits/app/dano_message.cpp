@@ -29,18 +29,16 @@ enum {
 };
 
 
-typedef struct section_header_s {
+struct section_header {
 	uint32		code;
 	ssize_t		size;
 	uint8		data[0];
-} SectionHeader;
+} _PACKED;
 
-
-typedef struct message_header_s {
-		int32		what;
-		int32		padding;
-} MessageHeader;
-
+struct message_header {
+	int32		what;
+	int32		padding;
+} _PACKED;
 
 typedef struct offset_table_s {
 	int32		indexTable;
@@ -48,29 +46,27 @@ typedef struct offset_table_s {
 	int64		padding;
 } OffsetTable;
 
-
-typedef struct single_item_s {
+struct single_item {
 	type_code	type;
-	ssize_t		itemSize;
-	uint8		nameLength;
+	ssize_t		item_size;
+	uint8		name_length;
 	char		name[0];
-} _PACKED SingleItem;
+} _PACKED;
 
-
-typedef struct fixed_size_array_s {
+struct fixed_size_array {
 	type_code	type;
-	ssize_t		sizePerItem;
-	uint8		nameLength;
+	ssize_t		size_per_item;
+	uint8		name_length;
 	char		name[0];
-} _PACKED FixedSizeArray;
+} _PACKED;
 
 
-typedef struct variable_size_array_s {
+struct variable_size_array {
 	type_code	type;
 	int32		padding;
-	uint8		nameLength;
+	uint8		name_length;
 	char		name[0];
-} _PACKED VariableSizeArray;
+} _PACKED;
 
 
 static const uint32 kMessageFormatSwapped = '2BOF';
@@ -86,7 +82,7 @@ pad_to_8(int32 value)
 ssize_t
 BPrivate::dano_message_size(const char *buffer)
 {
-	SectionHeader *header = (SectionHeader *)buffer;
+	section_header *header = (section_header *)buffer;
 
 	if (header->code == kMessageFormatSwapped)
 		return __swap_int32(header->size);
@@ -108,15 +104,15 @@ BPrivate::unflatten_dano_message(uint32 magic, BDataIO &stream,
 	ssize_t size;
 	reader(size);
 
-	MessageHeader header;
+	message_header header;
 	reader(header);
 	message.what = header.what;
 
-	size -= sizeof(SectionHeader) + sizeof(MessageHeader);
+	size -= sizeof(section_header) + sizeof(message_header);
 	int32 offset = 0;
 
 	while (offset < size) {
-		SectionHeader sectionHeader;
+		section_header sectionHeader;
 		reader(sectionHeader);
 
 		// be safe. this shouldn't be necessary but in some testcases it was.
@@ -143,12 +139,12 @@ BPrivate::unflatten_dano_message(uint32 magic, BDataIO &stream,
 			case SECTION_END_OF_DATA: break; /* discard */
 
 			case SECTION_SINGLE_ITEM_DATA: {
-				SingleItem *field = (SingleItem *)fieldBuffer;
+				single_item *field = (single_item *)fieldBuffer;
 
-				int32 dataOffset = sizeof(SingleItem) + field->nameLength + 1;
+				int32 dataOffset = sizeof(single_item) + field->name_length + 1;
 				dataOffset = pad_to_8(dataOffset);
 
-				if (offset + dataOffset + field->itemSize > size)
+				if (offset + dataOffset + field->item_size > size)
 					return B_BAD_DATA;
 
 				// support for fixed size is not possible with a single item
@@ -172,7 +168,7 @@ BPrivate::unflatten_dano_message(uint32 magic, BDataIO &stream,
 				}
 
 				status_t result = message.AddData(field->name, field->type,
-					fieldBuffer + dataOffset, field->itemSize, fixedSize);
+					fieldBuffer + dataOffset, field->item_size, fixedSize);
 
 				if (result < B_OK) {
 					free(fieldBuffer);
@@ -182,20 +178,20 @@ BPrivate::unflatten_dano_message(uint32 magic, BDataIO &stream,
 			}
 
 			case SECTION_FIXED_SIZE_ARRAY_DATA: {
-				FixedSizeArray *field = (FixedSizeArray *)fieldBuffer;
+				fixed_size_array *field = (fixed_size_array *)fieldBuffer;
 
-				int32 dataOffset = sizeof(FixedSizeArray) + field->nameLength + 1;
+				int32 dataOffset = sizeof(fixed_size_array) + field->name_length + 1;
 				dataOffset = pad_to_8(dataOffset);
 				int32 count = *(int32 *)(fieldBuffer + dataOffset);
 				dataOffset += 8; /* count and padding */
 
-				if (offset + dataOffset + count * field->sizePerItem > size)
+				if (offset + dataOffset + count * field->size_per_item > size)
 					return B_BAD_DATA;
 
 				status_t result = B_OK;
 				for (int32 i = 0; i < count; i++) {
 					result = message.AddData(field->name, field->type,
-						fieldBuffer + dataOffset, field->sizePerItem, true,
+						fieldBuffer + dataOffset, field->size_per_item, true,
 						count);
 
 					if (result < B_OK) {
@@ -203,15 +199,15 @@ BPrivate::unflatten_dano_message(uint32 magic, BDataIO &stream,
 						throw result;
 					}
 
-					dataOffset += field->sizePerItem;
+					dataOffset += field->size_per_item;
 				}
 				break;
 			}
 
 			case SECTION_VARIABLE_SIZE_ARRAY_DATA: {
-				VariableSizeArray *field = (VariableSizeArray *)fieldBuffer;
+				variable_size_array *field = (variable_size_array *)fieldBuffer;
 
-				int32 dataOffset = sizeof(VariableSizeArray) + field->nameLength + 1;
+				int32 dataOffset = sizeof(variable_size_array) + field->name_length + 1;
 				dataOffset = pad_to_8(dataOffset);
 				int32 count = *(int32 *)(fieldBuffer + dataOffset);
 				dataOffset += sizeof(int32);
