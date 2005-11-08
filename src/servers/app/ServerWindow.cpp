@@ -564,8 +564,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<BRect>(&dst);
 
 			// TODO: Are origin and scale handled in this conversion?
-			src = fCurrentLayer->ConvertToTop(src);
-			dst = fCurrentLayer->ConvertToTop(dst);
+			fCurrentLayer->ConvertToScreen(&src);
+			fCurrentLayer->ConvertToScreen(&dst);
 		
 			int32 xOffset = (int32)(dst.left - src.left);
 			int32 yOffset = (int32)(dst.top - src.top);
@@ -1085,8 +1085,11 @@ if (myRootLayer)
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<int32>(rectCount);
 
-				for (int32 i = 0; i < rectCount; i++)
-					fLink.Attach<BRect>(fCurrentLayer->ConvertFromTop(fCurrentLayer->fVisible2.RectAt(i)));
+				for (int32 i = 0; i < rectCount; i++) {
+					BRect converted(fCurrentLayer->fVisible2.RectAt(i));
+					fCurrentLayer->ConvertFromScreen(&converted);
+					fLink.Attach<BRect>(converted);
+				}
 
 				fLink.Flush();
 			}
@@ -1099,14 +1102,15 @@ if (myRootLayer)
 			
 			// TODO: Watch out for the coordinate system in AS_LAYER_SET_CLIP_REGION
 			int32 noOfRects;
-			BRect r;
 			
 			link.Read<int32>(&noOfRects);
 
 			BRegion region;
 			for (int i = 0; i < noOfRects; i++) {
+				BRect r;
 				link.Read<BRect>(&r);
-				region.Include(fCurrentLayer->ConvertToTop(r));
+				fCurrentLayer->ConvertToScreen(&r);
+				region.Include(r);
 			}
 // TODO: Turned off user clipping for now (will probably not harm anything but performance right now)
 // We need to integrate user clipping more, in Layer::PopState, the clipping needs to be
@@ -1128,8 +1132,10 @@ if (myRootLayer)
 			link.Read<BRect>(&invalRect);
 
 			if (myRootLayer) {
-				BRect converted(fCurrentLayer->ConvertToTop(invalRect.LeftTop()),
-								fCurrentLayer->ConvertToTop(invalRect.RightBottom()));
+				BRect converted(invalRect.LeftTop(), invalRect.RightBottom());
+
+				fCurrentLayer->ConvertToScreen(&converted);
+
 				BRegion invalidRegion(converted);
 				invalidRegion.IntersectWith(&fCurrentLayer->VisibleRegion());
 				myRootLayer->MarkForRedraw(invalidRegion);
@@ -1155,7 +1161,7 @@ if (myRootLayer)
 			}
 
 			if (myRootLayer) {
-				fCurrentLayer->ConvertToScreen2(&invalidReg);
+				fCurrentLayer->ConvertToScreen(&invalidReg);
 
 				myRootLayer->MarkForRedraw(invalidReg);
 				myRootLayer->TriggerRedraw();
@@ -1647,9 +1653,9 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			BPoint p1(x1,y1);
 			BPoint p2(x2,y2);
-			driver->StrokeLine(fCurrentLayer->ConvertToTop(p1),
-							   fCurrentLayer->ConvertToTop(p2),
-							   fCurrentLayer->CurrentState());
+			fCurrentLayer->ConvertToScreen(&p1);
+			fCurrentLayer->ConvertToScreen(&p2);
+			driver->StrokeLine(p1, p2, fCurrentLayer->CurrentState());
 			
 			// We update the pen here because many DrawingEngine calls which do not update the
 			// pen position actually call StrokeLine
@@ -1667,7 +1673,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			BRect rect;
 			link.Read<BRect>(&rect);
 			
-			driver->InvertRect(fCurrentLayer->ConvertToTop(rect));
+			fCurrentLayer->ConvertToScreen(&rect);
+			driver->InvertRect(rect);
 			break;
 		}
 		case AS_STROKE_RECT:
@@ -1681,7 +1688,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&bottom);
 			BRect rect(left,top,right,bottom);
 			
-			driver->StrokeRect(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->CurrentState());
+			fCurrentLayer->ConvertToScreen(&rect);
+			driver->StrokeRect(rect, fCurrentLayer->CurrentState());
 
 			break;
 		}
@@ -1691,7 +1699,9 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			
 			BRect rect;
 			link.Read<BRect>(&rect);
-			driver->FillRect(fCurrentLayer->ConvertToTop(rect), fCurrentLayer->CurrentState());
+
+			fCurrentLayer->ConvertToScreen(&rect);
+			driver->FillRect(rect, fCurrentLayer->CurrentState());
 			break;
 		}
 		case AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT:
@@ -1708,7 +1718,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (sbmp) {
 				BRect src = sbmp->Bounds();
 				BRect dst = src.OffsetToCopy(point);
-				dst = fCurrentLayer->ConvertToTop(dst);
+				fCurrentLayer->ConvertToScreen(&dst);
 
 				driver->DrawBitmap(sbmp, src, dst, fCurrentLayer->CurrentState());
 			}
@@ -1729,7 +1739,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			
 			ServerBitmap* sbmp = fServerApp->FindBitmap(bitmapToken);
 			if (sbmp) {
-				dstRect = fCurrentLayer->ConvertToTop(dstRect);
+				fCurrentLayer->ConvertToScreen(&dstRect);
 
 				driver->DrawBitmap(sbmp, srcRect, dstRect, fCurrentLayer->CurrentState());
 			}
@@ -1749,8 +1759,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&angle);
 			link.Read<float>(&span);
 
-			driver->DrawArc(fCurrentLayer->ConvertToTop(r), angle, span,
-							fCurrentLayer->CurrentState(), code == AS_FILL_ARC);
+			fCurrentLayer->ConvertToScreen(&r);
+			driver->DrawArc(r, angle, span, fCurrentLayer->CurrentState(), code == AS_FILL_ARC);
 
 			break;
 		}
@@ -1762,7 +1772,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			BPoint pts[4];
 			for (int32 i = 0; i < 4; i++) {
 				link.Read<BPoint>(&(pts[i]));
-				pts[i] = fCurrentLayer->ConvertToTop(pts[i]);
+				fCurrentLayer->ConvertToScreen(&pts[i]);
 			}
 				
 			driver->DrawBezier(pts, fCurrentLayer->CurrentState(), code == AS_FILL_BEZIER);
@@ -1777,8 +1787,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			BRect rect;
 			link.Read<BRect>(&rect);
 
-			driver->DrawEllipse(fCurrentLayer->ConvertToTop(rect),
-								fCurrentLayer->CurrentState(), code == AS_FILL_ELLIPSE);
+			fCurrentLayer->ConvertToScreen(&rect);
+			driver->DrawEllipse(rect, fCurrentLayer->CurrentState(), code == AS_FILL_ELLIPSE);
 
 			break;
 		}
@@ -1793,8 +1803,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&xrad);
 			link.Read<float>(&yrad);
 
-			driver->DrawRoundRect(fCurrentLayer->ConvertToTop(rect), xrad, yrad,
-								  fCurrentLayer->CurrentState(), code == AS_FILL_ROUNDRECT);
+			fCurrentLayer->ConvertToScreen(&rect);
+			driver->DrawRoundRect(rect, xrad, yrad, fCurrentLayer->CurrentState(), code == AS_FILL_ROUNDRECT);
 
 			break;
 		}
@@ -1808,13 +1818,13 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			for (int32 i = 0; i < 3; i++) {
 				link.Read<BPoint>(&(pts[i]));
-				pts[i] = fCurrentLayer->ConvertToTop(pts[i]);
+				fCurrentLayer->ConvertToScreen(&pts[i]);
 			}
 
 			link.Read<BRect>(&rect);
 
-			driver->DrawTriangle(pts, fCurrentLayer->ConvertToTop(rect),
-								 fCurrentLayer->CurrentState(), code == AS_FILL_TRIANGLE);
+			fCurrentLayer->ConvertToScreen(&rect);
+			driver->DrawTriangle(pts, rect, fCurrentLayer->CurrentState(), code == AS_FILL_TRIANGLE);
 
 			break;
 		}
@@ -1838,7 +1848,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read(pointlist, sizeof(BPoint)*pointcount);
 			
 			for (int32 i = 0; i < pointcount; i++)
-				pointlist[i] = fCurrentLayer->ConvertToTop(pointlist[i]);
+				fCurrentLayer->ConvertToScreen(&pointlist[i]);
 
 			driver->DrawPolygon(pointlist, pointcount, polyframe,
 								fCurrentLayer->CurrentState(), code == AS_FILL_POLYGON,
@@ -1867,7 +1877,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read(ptlist, ptcount * sizeof(BPoint));
 
 			for (int32 i = 0; i < ptcount; i++)
-				ptlist[i] = fCurrentLayer->ConvertToTop(ptlist[i]);
+				fCurrentLayer->ConvertToScreen(&ptlist[i]);
 
 			driver->DrawShape(shaperect, opcount, oplist, ptcount, ptlist,
 							  fCurrentLayer->CurrentState(), code == AS_FILL_SHAPE);
@@ -1894,8 +1904,10 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			// least it works for now. :)
 			BRegion region;
 			for (int32 i = 0; i < count; i++) {
-				region.Include(fCurrentLayer->ConvertToTop(rects[i]));
+				region.Include(rects[i]);
 			}
+
+			fCurrentLayer->ConvertToScreen(&region);
 			driver->FillRegion(region, fCurrentLayer->CurrentState());
 
 			delete[] rects;
@@ -1927,8 +1939,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 					link.Read<float>(&(index->pt2.y));
 					link.Read<rgb_color>(&(index->color));
 
-					index->pt1 = fCurrentLayer->ConvertToTop(index->pt1);
-					index->pt2 = fCurrentLayer->ConvertToTop(index->pt2);
+					fCurrentLayer->ConvertToScreen(&index->pt1);
+					fCurrentLayer->ConvertToScreen(&index->pt2);
 				}
 				driver->StrokeLineArray(linecount,linedata,fCurrentLayer->CurrentState());
 			}
@@ -1947,9 +1959,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<escapement_delta>(&delta);
 			link.ReadString(&string);
 			
-			driver->DrawString(string, length,
-							   fCurrentLayer->ConvertToTop(location),
-							   fCurrentLayer->CurrentState(), &delta);
+			fCurrentLayer->ConvertToScreen(&location);
+			driver->DrawString(string, length, location, fCurrentLayer->CurrentState(), &delta);
 			
 			free(string);
 			break;
@@ -2141,7 +2152,7 @@ ServerWindow::HandleDirectConnection(int bufferState, int driverState)
 		BRegion exclude = const_cast<BRegion &>(border->VisibleRegion());
 		clipRegion.Exclude(&exclude);
 		
-		border->ConvertToTop(&clipRegion);
+		border->ConvertToScreen(&clipRegion);
 		fDirectWindowData->direct_info->clip_list_count = min_c(clipRegion.CountRects(), kMaxClipRectsCount);
 		fDirectWindowData->direct_info->clip_bounds = clipRegion.FrameInt();
 		

@@ -98,7 +98,6 @@ public:
 			RGBColor			BGColor(void) const;
 	
 	inline	int32				Buttons(void) { return fButtons; }
-	virtual bool				HasClient(void) { return false; }
 	
 			void				SetDragMessage(BMessage *msg);
 			BMessage*			DragMessage(void) const;

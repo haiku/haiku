@@ -830,7 +830,7 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 				MarkForRebuild(layer->FullVisible());
 				MarkForRedraw(layer->FullVisible());
 
-				layer->clear_visible_regions();
+				layer->_ClearVisibleRegions();
 			}
 			else {
 				oldStrippedList.AddItem(layer);

@@ -52,8 +52,8 @@ WorkspacesLayer::_WorkspaceAt(int32 i)
 	int32 columns, rows;
 	_GetGrid(columns, rows);
 
-	int32 width = fFrame.IntegerWidth() / columns;
-	int32 height = fFrame.IntegerHeight() / rows;
+	int32 width = Frame().IntegerWidth() / columns;
+	int32 height = Frame().IntegerHeight() / rows;
 
 	int32 column = i % columns;
 	int32 row = i / columns;
@@ -62,11 +62,13 @@ WorkspacesLayer::_WorkspaceAt(int32 i)
 
 	// make sure there is no gap anywhere
 	if (column == columns - 1)
-		rect.right = fFrame.right;
+		rect.right = Frame().right;
 	if (row == rows - 1)
-		rect.bottom = fFrame.bottom;
+		rect.bottom = Frame().bottom;
 
-	rect.OffsetBy(ConvertToTop(BPoint(0, 0)));
+	BPoint pt(0,0);
+	ConvertToScreen(&pt);
+	rect.OffsetBy(pt);
 	return rect;
 }
 
@@ -124,12 +126,12 @@ WorkspacesLayer::_DrawWindow(const BRect& workspaceFrame,
 	backgroundRegion.Exclude(tabFrame);
 	backgroundRegion.Exclude(frame);
 
-	fDriver->StrokeLine(tabFrame.LeftTop(), tabFrame.RightBottom(), yellow);
+	GetDrawingEngine()->StrokeLine(tabFrame.LeftTop(), tabFrame.RightBottom(), yellow);
 
-	fDriver->StrokeRect(frame, gray);
+	GetDrawingEngine()->StrokeRect(frame, gray);
 
 	frame.InsetBy(1, 1);
-	fDriver->FillRect(frame, white);
+	GetDrawingEngine()->FillRect(frame, white);
 }
 
 
@@ -143,7 +145,7 @@ WorkspacesLayer::_DrawWorkspace(int32 index)
 	if (active) {
 		// draw active frame
 		RGBColor black(0, 0, 0);
-		fDriver->StrokeRect(rect, black);
+		GetDrawingEngine()->StrokeRect(rect, black);
 	}
 
 	// draw background
@@ -181,19 +183,19 @@ WorkspacesLayer::_DrawWorkspace(int32 index)
 
 		BRegion workspaceRegion(rect);
 		backgroundRegion.IntersectWith(&workspaceRegion);
-		fDriver->ConstrainClippingRegion(&backgroundRegion);
+		GetDrawingEngine()->ConstrainClippingRegion(&backgroundRegion);
 
 		for (int32 i = count; i-- > 0;) {
 			_DrawWindow(rect, screenFrame, windows[i], backgroundRegion, active);
 		}
 	}
 
-	fDriver->ConstrainClippingRegion(&backgroundRegion);
-	fDriver->FillRect(rect, color);
+	GetDrawingEngine()->ConstrainClippingRegion(&backgroundRegion);
+	GetDrawingEngine()->FillRect(rect, color);
 
 	// TODO: ConstrainClippingRegion() should accept a const parameter !!
 	BRegion cRegion(VisibleRegion());
-	fDriver->ConstrainClippingRegion(&cRegion);
+	GetDrawingEngine()->ConstrainClippingRegion(&cRegion);
 }
 
 
@@ -215,26 +217,28 @@ WorkspacesLayer::Draw(const BRect& updateRect)
 	// draw grid
 	// horizontal lines
 
-	BRect frame = fFrame;
-	frame.OffsetBy(ConvertToTop(BPoint(0, 0)));
+	BRect frame = Frame();
+	BPoint pt(0,0);
+	ConvertToScreen(&pt);
+	frame.OffsetBy(pt);
 
-	fDriver->StrokeLine(BPoint(frame.left, frame.top),
+	GetDrawingEngine()->StrokeLine(BPoint(frame.left, frame.top),
 		BPoint(frame.right, frame.top), ViewColor());
 
 	for (int32 row = 0; row < rows; row++) {
 		BRect rect = _WorkspaceAt(row * columns);
-		fDriver->StrokeLine(BPoint(frame.left, rect.bottom),
+		GetDrawingEngine()->StrokeLine(BPoint(frame.left, rect.bottom),
 			BPoint(frame.right, rect.bottom), ViewColor());
 	}
 
 	// vertical lines
 
-	fDriver->StrokeLine(BPoint(frame.left, frame.top),
+	GetDrawingEngine()->StrokeLine(BPoint(frame.left, frame.top),
 		BPoint(frame.left, frame.bottom), ViewColor());
 
 	for (int32 column = 0; column < columns; column++) {
 		BRect rect = _WorkspaceAt(column);
-		fDriver->StrokeLine(BPoint(rect.right, frame.top),
+		GetDrawingEngine()->StrokeLine(BPoint(rect.right, frame.top),
 			BPoint(rect.right, frame.bottom), ViewColor());
 	}
 

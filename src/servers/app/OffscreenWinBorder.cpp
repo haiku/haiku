@@ -29,9 +29,9 @@ OffscreenWinBorder::OffscreenWinBorder(ServerBitmap* bitmap,
 	  fBitmap(bitmap),
 	  fHWInterface(new BitmapHWInterface(fBitmap))
 {
-	fDriver->SetHWInterface(fHWInterface);
-	fDriver->Initialize();
-	fDriver->Update();
+	GetDrawingEngine()->SetHWInterface(fHWInterface);
+	GetDrawingEngine()->Initialize();
+	GetDrawingEngine()->Update();
 }
 
 // destructor
@@ -39,8 +39,8 @@ OffscreenWinBorder::~OffscreenWinBorder()
 {
 	fHWInterface->WriteLock();
 	// Unlike normal Layers, we own the DrawingEngine instance
-	fDriver->Shutdown();
-	delete fDriver;
+	GetDrawingEngine()->Shutdown();
+	delete GetDrawingEngine();
 	fHWInterface->Shutdown();
 	fHWInterface->WriteUnlock();
 	delete fHWInterface;

@@ -71,16 +71,17 @@ class Layer {
 									  uint32 flags, DrawingEngine* driver);
 	virtual						~Layer();
 
+	// name
+	virtual	void				SetName(const char* name);	
+	inline	const char*			Name() const
+									{ return fName.String(); }
+
+	// children handling
 			void				AddChild(Layer* child, ServerWindow* serverWin);
 			void				RemoveChild(Layer* child);
 			void				RemoveSelf();
 			bool				HasChild(Layer* layer);
 
-			void				SetRootLayer(RootLayer* rl)
-									{ fRootLayer = rl; }
-			RootLayer*			GetRootLayer() const
-									{ return fRootLayer; }
-	
 			uint32				CountChildren() const;
 			Layer*				FindLayer(const int32 token);
 			Layer*				LayerAt(const BPoint &pt, bool recursive = true);
@@ -90,36 +91,59 @@ class Layer {
 	virtual	Layer*				PreviousChild() const;
 	virtual	Layer*				LastChild() const;
 
-	virtual	void				SetName(const char* name);	
-	inline	const char*			Name() const
-									{ return fName.String(); }
+			void				SetAsTopLayer(bool option)
+									{ fIsTopLayer = option; }
+	inline	bool				IsTopLayer() const
+									{ return fIsTopLayer; }
 
-	inline	uint32				ResizeMode() const
-									{ return fResizeMode; }
-
-	virtual	void				SetFlags(uint32 flags);
-	inline	uint32				Flags() const
-									{ return fFlags; }
-
-	virtual	void				Draw(const BRect& r);
-	
+	// visible state	
 			void				Show(bool invalidate = true);
 			void				Hide(bool invalidate = true);
 			bool				IsHidden() const;
+			bool				IsVisuallyHidden() const;
 			
-	// graphic state
+	// graphic state and attributes
 			void				PushState();
 			void				PopState();
 			DrawState*			CurrentState() const { return fDrawState; }
 
+			void				SetViewColor(const RGBColor& color);
+	inline	const RGBColor&		ViewColor() const
+									{ return fViewColor; }
+			void				SetBackgroundBitmap(const ServerBitmap* bitmap);
+	inline	const ServerBitmap*	BackgroundBitmap() const
+									{ return fBackgroundBitmap; }
+			void				SetOverlayBitmap(const ServerBitmap* bitmap);
+	inline	const ServerBitmap*	OverlayBitmap() const
+									{ return fOverlayBitmap; }
+
 	// coordinate system	
 			BRect				Bounds() const;
 			BRect				Frame() const;
-	
+			BPoint				BoundsOrigin() const; // BoundsFrameDiff()?
+			float				Scale() const;
+
+			void				ConvertToParent(BPoint* pt) const;
+			void				ConvertToParent(BRect* rect) const;
+			void				ConvertToParent(BRegion* reg) const;
+			void				ConvertFromParent(BPoint* pt) const;
+			void				ConvertFromParent(BRect* rect) const;
+			void				ConvertFromParent(BRegion* reg) const;
+
+			void				ConvertToScreen(BPoint* pt) const;
+			void				ConvertToScreen(BRect* rect) const;
+			void				ConvertToScreen(BRegion* reg) const;
+			void				ConvertFromScreen(BPoint* pt) const;
+			void				ConvertFromScreen(BRect* rect) const;
+			void				ConvertFromScreen(BRegion* reg) const;
+
 	virtual	void				MoveBy(float x, float y);
 	virtual	void				ResizeBy(float x, float y);
 	virtual	void				ScrollBy(float x, float y);
+			void				CopyBits(BRect& src, BRect& dst,
+										 int32 xOffset, int32 yOffset);
 
+	// input handling
 	virtual	void				MouseDown(const BMessage *msg);
 	virtual	void				MouseUp(const BMessage *msg);
 	virtual	void				MouseMoved(const BMessage *msg);
@@ -135,150 +159,102 @@ class Layer {
 	virtual	void				WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces);
 	virtual	void				Activated(bool active);
 
-			BPoint				BoundsOrigin() const; // BoundsFrameDiff()?
-			float				Scale() const;
-
-			BPoint				ConvertToParent(BPoint pt);
-			BRect				ConvertToParent(BRect rect);
-			BRegion				ConvertToParent(BRegion* reg);
-
-			BPoint				ConvertFromParent(BPoint pt);
-			BRect				ConvertFromParent(BRect rect);
-			BRegion				ConvertFromParent(BRegion* reg);
-	
-			BPoint				ConvertToTop(BPoint pt);
-			BRect				ConvertToTop(BRect rect);
-			BRegion				ConvertToTop(BRegion* reg);
-
-			BPoint				ConvertFromTop(BPoint pt);
-			BRect				ConvertFromTop(BRect rect);
-			BRegion				ConvertFromTop(BRegion *reg);
-	
-
-			DrawingEngine*		GetDrawingEngine() const
-									{ return fDriver; }
-
-			ServerWindow*		Window() const
-									{ return fServerWin; }
-
-			ServerApp*			App() const
-									{ return fServerWin? fServerWin->App(): NULL; }
-
-	inline	WinBorder*			Owner() const
-									{ return fOwner; }
-
-	virtual	bool				HasClient()
-									{ return true; }
-
-			uint32				EventMask() const
-									{ return fEventMask; }
-
-			uint32				EventOptions() const
-									{ return fEventOptions; }
-
-	inline	void				QuietlySetEventMask(uint32 em)
-									{ fEventMask = em; }
-
-	inline	void				QuietlySetEventOptions(uint32 eo)
-									{ fEventOptions = eo; }
-
-			void				PruneTree();
-	
-	// debugging
-			void				PrintToStream();
-			void				PrintNode();
-			void				PrintTree();
-	
-	// server "private" - should not be used
-			void				SetAsTopLayer(bool option)
-									{ fIsTopLayer = option; }
-
-	inline	bool				IsTopLayer() const
-									{ return fIsTopLayer; }
-
-			BRegion*			ClippingRegion() const
-									{ return fClipReg; }
-
-								// automatic background blanking by app_server
-			void				SetViewColor(const RGBColor& color);
-	inline	const RGBColor&		ViewColor() const
-									{ return fViewColor; }
-
-			void				SetBackgroundBitmap(const ServerBitmap* bitmap);
-	inline	const ServerBitmap*	BackgroundBitmap() const
-									{ return fBackgroundBitmap; }
-
-								// overlay support
-								// TODO: This can't be all, what about color key?
-			void				SetOverlayBitmap(const ServerBitmap* bitmap);
-	inline	const ServerBitmap*	OverlayBitmap() const
-									{ return fOverlayBitmap; }
-
-			void				CopyBits(BRect& src, BRect& dst,
-										 int32 xOffset, int32 yOffset);
-
-	inline	const BRegion&		VisibleRegion() const { return fVisible2; }
-	inline	const BRegion&		FullVisible() const { return fFullVisible2; }
-
-			void				MarkForRebuild(const BRegion &dirty);
-			void				TriggerRebuild();
-			void				_GetAllRebuildDirty(BRegion *totalReg);
-			void				_AllRedraw(const BRegion &invalid);
-
-
-	virtual	void				GetWantedRegion(BRegion& reg);
-
+	// action hooks
 	virtual	void				MovedByHook(float dx, float dy);
 	virtual	void				ResizedByHook(float dx, float dy, bool automatic);
 	virtual	void				ScrolledByHook(float dx, float dy);
 
-			void				ConvertToParent2(BPoint* pt) const;
-			void				ConvertToParent2(BRect* rect) const;
-			void				ConvertToParent2(BRegion* reg) const;
-			void				ConvertFromParent2(BPoint* pt) const;
-			void				ConvertFromParent2(BRect* rect) const;
-			void				ConvertFromParent2(BRegion* reg) const;
+	// app_server objects getters
+			ServerWindow*		Window() const
+									{ return fServerWin; }
+			ServerApp*			App() const
+									{ return fServerWin? fServerWin->App(): NULL; }
+	inline	WinBorder*			Owner() const
+									{ return fOwner; }
+			RootLayer*			GetRootLayer() const
+									{ return fRootLayer; }
+			void				SetRootLayer(RootLayer* rl)
+									{ fRootLayer = rl; }
+			DrawingEngine*		GetDrawingEngine() const
+									{ return fDriver; }
 
-			void				ConvertToScreen2(BPoint* pt) const;
-			void				ConvertToScreen2(BRect* rect) const;
-			void				ConvertToScreen2(BRegion* reg) const;
-			void				ConvertFromScreen2(BPoint* pt) const;
-			void				ConvertFromScreen2(BRect* rect) const;
-			void				ConvertFromScreen2(BRegion* reg) const;
-			bool				IsVisuallyHidden() const;
+	// flags
+			uint32				EventMask() const
+									{ return fEventMask; }
+			uint32				EventOptions() const
+									{ return fEventOptions; }
+	inline	void				QuietlySetEventMask(uint32 em)
+									{ fEventMask = em; }
+	inline	void				QuietlySetEventOptions(uint32 eo)
+									{ fEventOptions = eo; }
+	inline	uint32				ResizeMode() const
+									{ return fResizeMode; }
+	inline	uint32				Flags() const
+									{ return fFlags; }
+			void				SetFlags(uint32 flags);
+
+	// clipping stuff and redraw
+	inline	const BRegion&		VisibleRegion() const { return fVisible2; }
+	inline	const BRegion&		FullVisible() const { return fFullVisible2; }
+
+	virtual	void				GetWantedRegion(BRegion& reg);
+
+			void				MarkForRebuild(const BRegion &dirty);
+			void				TriggerRebuild();
+			void				_GetAllRebuildDirty(BRegion *totalReg);
+
+	virtual	void				Draw(const BRect& r);
+			void				_AllRedraw(const BRegion &invalid);
+
+	// others
+			void				PruneTree();
+	
  private:
+	friend class RootLayer;
+	friend class WinBorder;
+	friend class ServerWindow;
+
  			void				do_Hide();
  			void				do_Show();
 			void				do_MoveBy(float dx, float dy);
 			void				do_ResizeBy(float dx, float dy);
 			void				do_ScrollBy(float dx, float dy);
-
-			void				rebuild_visible_regions(const BRegion &invalid,
-													const BRegion &parentLocalVisible,
-													const Layer *startFrom);
-
-	virtual	void				_ReserveRegions(BRegion &reg);
-
-			void				clear_visible_regions();
-			void				resize_layer_frame_by(float x, float y);
-			void				rezize_layer_redraw_more(BRegion &reg, float dx, float dy);
-			void				resize_layer_full_update_on_resize(BRegion &reg, float dx, float dy);
-
 			void				do_CopyBits(BRect& src, BRect& dst,
 											int32 xOffset, int32 yOffset);
 
- protected:
-	friend class RootLayer;
-	friend class WinBorder;
-	friend class ServerWindow;
+	// private clipping stuff
+	virtual	void				_ReserveRegions(BRegion &reg);
+			void				_RebuildVisibleRegions( const BRegion &invalid,
+														const BRegion &parentLocalVisible,
+														const Layer *startFrom);
+			void				_ClearVisibleRegions();
+			void				_ResizeLayerFrameBy(float x, float y);
+			void				_RezizeLayerRedrawMore(BRegion &reg, float dx, float dy);
+			void				_ResizeLayerFullUpdateOnResize(BRegion &reg, float dx, float dy);
 
+	// for updating client-side coordinates
+			void				AddToViewsWithInvalidCoords() const;
+			void				SendViewCoordUpdateMsg() const;
+
+
+			BString				fName;	
 			BRect				fFrame;
 // TODO: should be removed or reused in a similar fashion
 // to hold the accumulated origins from the graphics state stack.
 // The same needs to be done for "scale". (Keeping an accumulated
 // value.)
 //			BPoint				fBoundsLeftTop;
+
+			BRegion				fVisible2;
+			BRegion				fFullVisible2;
+			BRegion				fDirtyForRebuild;
+
+			DrawingEngine*		fDriver;
+			RootLayer*			fRootLayer;
+			ServerWindow*		fServerWin;
 			WinBorder*			fOwner;
+
+			DrawState*			fDrawState;
 
 			Layer*				fParent;
 			Layer*				fPreviousSibling;
@@ -288,37 +264,15 @@ class Layer {
 	
 	mutable	Layer*				fCurrent;
 
- private:
-			BRegion				fVisible2;
-			BRegion				fFullVisible2;
-			BRegion				fDirtyForRebuild;
- protected:
-
-			BRegion*			fClipReg;
-	
-			ServerWindow*		fServerWin;
-			BString				fName;	
 			int32				fViewToken;
 			uint32				fFlags;
+			uint16				fAdFlags;
 			uint32				fResizeMode;
 			uint32				fEventMask;
 			uint32				fEventOptions;
+
 			bool				fHidden;
 			bool				fIsTopLayer;
-			uint16				fAdFlags;
-	
-			DrawingEngine*		fDriver;
-			DrawState*			fDrawState;
-	
-			RootLayer*			fRootLayer;
-
- private:
-			ServerWindow*		SearchForServerWindow();
-
-			status_t			SendUpdateMsg(BRegion& reg);
-			void				AddToViewsWithInvalidCoords() const;
-			void				SendViewCoordUpdateMsg() const;
-
 			RGBColor			fViewColor;
 
 	const	ServerBitmap*		fBackgroundBitmap;

@@ -39,22 +39,23 @@
 #	define STRACE(x) ;
 #endif
 
-//#define DEBUG_LAYER_REBUILD
-#ifdef DEBUG_LAYER_REBUILD
-#	define RBTRACE(x) printf x
-#else
-#	define RBTRACE(x) ;
-#endif
-
-
 Layer::Layer(BRect frame, const char* name, int32 token,
 	uint32 resize, uint32 flags, DrawingEngine* driver)
 	:
-	fFrame(frame), // in parent coordinates
+	fName(name),
+	fFrame(frame),
 //	fBoundsLeftTop(0.0, 0.0),
 
-	// Layer does not start out as a part of the tree
+	fVisible2(),
+	fFullVisible2(),
+	fDirtyForRebuild(),
+
+	fDriver(driver),
+	fRootLayer(NULL),
+	fServerWin(NULL),
 	fOwner(NULL),
+
+	fDrawState(new DrawState),
 
 	fParent(NULL),
 	fPreviousSibling(NULL),
@@ -64,31 +65,17 @@ Layer::Layer(BRect frame, const char* name, int32 token,
 
 	fCurrent(NULL),
 
-	// all regions (fVisible, fFullVisible, fFull) start empty
-	fVisible2(),
-	fFullVisible2(),
-	fDirtyForRebuild(),
-	fClipReg(&fVisible2),
-
-	fServerWin(NULL),
-	fName(name),
 	fViewToken(token),
-
 	fFlags(flags),
+	fAdFlags(0),
 	fResizeMode(resize),
 	fEventMask(0UL),
 	fEventOptions(0UL),
+
 	fHidden(false),
 	fIsTopLayer(false),
-
-	fAdFlags(0),
-
-	fDriver(driver),
-	fDrawState(new DrawState),
-
-	fRootLayer(NULL),
-
 	fViewColor(255, 255, 255, 255),
+
 	fBackgroundBitmap(NULL),
 	fOverlayBitmap(NULL)
 {
@@ -254,7 +241,7 @@ Layer::RemoveChild(Layer *layer)
 	
 	layer->fPreviousSibling = NULL;
 	layer->fNextSibling = NULL;
-	layer->clear_visible_regions();
+	layer->_ClearVisibleRegions();
 
 	// 2) Iterate over all of the removed-layer's descendants and unset the
 	//	root layer, server window, and all redraw-related regions
@@ -740,107 +727,6 @@ Layer::Scale() const
 	return CurrentState()->Scale();
 }
 
-
-//! Converts the passed point to parent coordinates
-BPoint
-Layer::ConvertToParent(BPoint pt)
-{
-	ConvertToParent2(&pt);
-	return pt;
-}
-
-//! Converts the passed rectangle to parent coordinates
-BRect
-Layer::ConvertToParent(BRect rect)
-{
-	ConvertToParent2(&rect);
-	return rect;
-}
-
-//! Converts the passed region to parent coordinates
-BRegion
-Layer::ConvertToParent(BRegion* reg)
-{
-	BRegion newReg(*reg);
-	ConvertToParent2(&newReg);
-	return newReg;
-}
-
-//! Converts the passed point from parent coordinates
-BPoint
-Layer::ConvertFromParent(BPoint pt)
-{
-	ConvertFromParent2(&pt);
-	return pt;
-}
-
-//! Converts the passed rectangle from parent coordinates
-BRect
-Layer::ConvertFromParent(BRect rect)
-{
-	ConvertFromParent2(&rect);
-	return rect;
-}
-
-//! Converts the passed region from parent coordinates
-BRegion
-Layer::ConvertFromParent(BRegion *reg)
-{
-	BRegion newReg(*reg);
-	ConvertFromParent2(&newReg);
-	return newReg;
-}
-
-// ConvertToTop
-BPoint
-Layer::ConvertToTop(BPoint pt)
-{
-	ConvertToScreen2(&pt);
-	return pt;
-}
-
-//! Converts the passed rectangle to screen coordinates
-BRect
-Layer::ConvertToTop(BRect rect)
-{
-	ConvertToScreen2(&rect);
-	return rect;
-}
-
-//! Converts the passed region to screen coordinates
-BRegion
-Layer::ConvertToTop(BRegion *reg)
-{
-	BRegion newReg(*reg);
-	ConvertToScreen2(&newReg);
-	return newReg;
-}
-
-// ConvertFromTop
-BPoint
-Layer::ConvertFromTop(BPoint pt)
-{
-	ConvertFromScreen2(&pt);
-	return pt;
-}
-
-//! Converts the passed rectangle from screen coordinates
-BRect
-Layer::ConvertFromTop(BRect rect)
-{
-	ConvertFromScreen2(&rect);
-	return rect;
-}
-
-//! Converts the passed region from screen coordinates
-BRegion
-Layer::ConvertFromTop(BRegion *reg)
-{
-	BRegion newReg(*reg);
-	ConvertFromScreen2(&newReg);
-	return newReg;
-}
-
 //! Recursively deletes all children of the calling layer
 void
 Layer::PruneTree(void)
@@ -863,105 +749,6 @@ Layer::PruneTree(void)
 		lay = nextlay;
 	}
 	// Man, this thing is short. Elegant, ain't it? :P
-}
-
-//! Prints information about the layer's current state
-void
-Layer::PrintToStream()
-{
-	printf("\n *** Layer %s:\n", Name());
-	printf("\t Parent: %s", fParent ? fParent->Name() : "<no parent>");
-
-	printf("\t us: %s\t ls: %s\n",
-		fPreviousSibling ? fPreviousSibling->Name() : "<none>",
-		fNextSibling ? fNextSibling->Name() : "<none>");
-
-	printf("\t topChild: %s\t bottomChild: %s\n",
-		fFirstChild ? fFirstChild->Name() : "<none>",
-		fLastChild ? fLastChild->Name() : "<none>");
-	
-	printf("Frame: (%f, %f, %f, %f)\n", fFrame.left, fFrame.top, fFrame.right, fFrame.bottom);
-	printf("LocalOrigin: (%f, %f)\n", BoundsOrigin().x, BoundsOrigin().y);
-	printf("Token: %ld\n", fViewToken);
-	printf("Hidden - direct: %s ", fHidden?"true":"false");
-	printf("Hidden - indirect: %s\n", IsHidden()?"true":"false");
-	printf("ResizingMode: %lx ", fResizeMode);
-	printf("Flags: %lx\n", fFlags);
-
-	if (fDrawState)
-		fDrawState->PrintToStream();
-	else
-		printf(" NO DrawState valid pointer\n");
-}
-
-//! Prints pointer info kept by the current layer
-void
-Layer::PrintNode()
-{
-	printf("-----------\nLayer %s\n", Name());
-	if (fParent)
-		printf("Parent: %s (%p)\n", fParent->Name(), fParent);
-	else
-		printf("Parent: NULL\n");
-
-	if (fPreviousSibling)
-		printf("Upper sibling: %s (%p)\n", fPreviousSibling->Name(), fPreviousSibling);
-	else
-		printf("Upper sibling: NULL\n");
-
-	if (fNextSibling)
-		printf("Lower sibling: %s (%p)\n", fNextSibling->Name(), fNextSibling);
-	else
-		printf("Lower sibling: NULL\n");
-
-	if (fFirstChild)
-		printf("Top child: %s (%p)\n", fFirstChild->Name(), fFirstChild);
-	else
-		printf("Top child: NULL\n");
-
-	if (fLastChild)
-		printf("Bottom child: %s (%p)\n", fLastChild->Name(), fLastChild);
-	else
-		printf("Bottom child: NULL\n");
-}
-
-//! Prints the tree hierarchy from the current layer down
-void
-Layer::PrintTree()
-{
-	printf("\n Tree structure:\n");
-	printf("\t%s\t%s\n", Name(), IsHidden()? "Hidden": "NOT hidden");
-	for(Layer *lay = LastChild(); lay != NULL; lay = PreviousChild())
-		printf("\t%s\t%s\n", lay->Name(), lay->IsHidden()? "Hidden": "NOT hidden");
-}
-
-/*!
-	\brief Returns the layer's ServerWindow
-	
-	If the layer's ServerWindow has not been assigned, it attempts to find 
-	the owning ServerWindow in the tree.
-*/
-ServerWindow*
-Layer::SearchForServerWindow()
-{
-	if (!fServerWin)
-		fServerWin=fParent->SearchForServerWindow();
-	
-	return fServerWin;
-}
-
-//! Sends an _UPDATE_ message to the client BWindow
-status_t
-Layer::SendUpdateMsg(BRegion& reg)
-{
-	BMessage msg;
-	msg.what = _UPDATE_;
-	BRect	rect(reg.Frame());
-	ConvertFromScreen2(&rect);
-	msg.AddRect("_rect", rect );
-	msg.AddRect("debug_rect", reg.Frame());
-		
-	return Owner()->Window()->SendMessageToClient(&msg);
 }
 
 // AddToViewsWithInvalidCoords
@@ -1091,7 +878,7 @@ Layer::ScrolledByHook(float dx, float dy)
 
 //! converts a point from local to parent's coordinate system 
 void
-Layer::ConvertToParent2(BPoint* pt) const
+Layer::ConvertToParent(BPoint* pt) const
 {
 	if (fParent) {
 		BPoint origin = BoundsOrigin();
@@ -1104,7 +891,7 @@ Layer::ConvertToParent2(BPoint* pt) const
 
 //! converts a rect from local to parent's coordinate system 
 void
-Layer::ConvertToParent2(BRect* rect) const
+Layer::ConvertToParent(BRect* rect) const
 {
 	if (fParent) {
 		BPoint origin = BoundsOrigin();
@@ -1115,7 +902,7 @@ Layer::ConvertToParent2(BRect* rect) const
 
 //! converts a region from local to parent's coordinate system 
 void
-Layer::ConvertToParent2(BRegion* reg) const
+Layer::ConvertToParent(BRegion* reg) const
 {
 	if (fParent) {
 		BPoint origin = BoundsOrigin();
@@ -1126,7 +913,7 @@ Layer::ConvertToParent2(BRegion* reg) const
 
 //! converts a point from parent's to local coordinate system 
 void
-Layer::ConvertFromParent2(BPoint* pt) const
+Layer::ConvertFromParent(BPoint* pt) const
 {
 	if (fParent) {
 		BPoint origin = BoundsOrigin();
@@ -1139,7 +926,7 @@ Layer::ConvertFromParent2(BPoint* pt) const
 
 //! converts a rect from parent's to local coordinate system 
 void
-Layer::ConvertFromParent2(BRect* rect) const
+Layer::ConvertFromParent(BRect* rect) const
 {
 	if (fParent) {
 		BPoint origin = BoundsOrigin();
@@ -1150,7 +937,7 @@ Layer::ConvertFromParent2(BRect* rect) const
 
 //! converts a region from parent's to local coordinate system 
 void
-Layer::ConvertFromParent2(BRegion* reg) const
+Layer::ConvertFromParent(BRegion* reg) const
 {
 	if (fParent) {
 		BPoint origin = BoundsOrigin();
@@ -1161,61 +948,61 @@ Layer::ConvertFromParent2(BRegion* reg) const
 
 //! converts a point from local to screen coordinate system 
 void
-Layer::ConvertToScreen2(BPoint* pt) const
+Layer::ConvertToScreen(BPoint* pt) const
 {
 	if (fParent) {
-		ConvertToParent2(pt);
-		fParent->ConvertToScreen2(pt);
+		ConvertToParent(pt);
+		fParent->ConvertToScreen(pt);
 	}
 }
 
 //! converts a rect from local to screen coordinate system 
 void
-Layer::ConvertToScreen2(BRect* rect) const
+Layer::ConvertToScreen(BRect* rect) const
 {
 	if (fParent) {
-		ConvertToParent2(rect);
-		fParent->ConvertToScreen2(rect);
+		ConvertToParent(rect);
+		fParent->ConvertToScreen(rect);
 	}
 }
 
 //! converts a region from local to screen coordinate system 
 void
-Layer::ConvertToScreen2(BRegion* reg) const
+Layer::ConvertToScreen(BRegion* reg) const
 {
 	if (fParent) {
-		ConvertToParent2(reg);
-		fParent->ConvertToScreen2(reg);
+		ConvertToParent(reg);
+		fParent->ConvertToScreen(reg);
 	}
 }
 
 //! converts a point from screen to local coordinate system 
 void
-Layer::ConvertFromScreen2(BPoint* pt) const
+Layer::ConvertFromScreen(BPoint* pt) const
 {
 	if (fParent) {
-		ConvertFromParent2(pt);
-		fParent->ConvertFromScreen2(pt);
+		ConvertFromParent(pt);
+		fParent->ConvertFromScreen(pt);
 	}
 }
 
 //! converts a rect from screen to local coordinate system 
 void
-Layer::ConvertFromScreen2(BRect* rect) const
+Layer::ConvertFromScreen(BRect* rect) const
 {
 	if (fParent) {
-		ConvertFromParent2(rect);
-		fParent->ConvertFromScreen2(rect);
+		ConvertFromParent(rect);
+		fParent->ConvertFromScreen(rect);
 	}
 }
 
 //! converts a region from screen to local coordinate system 
 void
-Layer::ConvertFromScreen2(BRegion* reg) const
+Layer::ConvertFromScreen(BRegion* reg) const
 {
 	if (fParent) {
-		ConvertFromParent2(reg);
-		fParent->ConvertFromScreen2(reg);
+		ConvertFromParent(reg);
+		fParent->ConvertFromScreen(reg);
 	}
 }
 
@@ -1229,7 +1016,7 @@ Layer::do_Hide()
 		// save fullVisible so we know what to invalidate
 		BRegion invalid(fFullVisible2);
 
-		clear_visible_regions();
+		_ClearVisibleRegions();
 
 		if (invalid.CountRects() > 0) {
 			fParent->MarkForRebuild(invalid);
@@ -1262,7 +1049,7 @@ Layer::do_Show()
 }
 
 inline void
-Layer::resize_layer_frame_by(float x, float y)
+Layer::_ResizeLayerFrameBy(float x, float y)
 {
 	uint16		rm = fResizeMode & 0x0000FFFF;
 	BRect		newFrame = fFrame;
@@ -1334,14 +1121,14 @@ Layer::resize_layer_frame_by(float x, float y)
 			ResizedByHook(dx, dy, true); // automatic
 
 			for (Layer *child = LastChild(); child != NULL; child = PreviousChild())
-				child->resize_layer_frame_by(dx, dy);
+				child->_ResizeLayerFrameBy(dx, dy);
 		} else
 			MovedByHook(dx, dy);
 	}
 }
 
 inline void
-Layer::rezize_layer_redraw_more(BRegion &reg, float dx, float dy)
+Layer::_RezizeLayerRedrawMore(BRegion &reg, float dx, float dy)
 {
 	if (dx == 0 && dy == 0)
 		return;
@@ -1367,13 +1154,13 @@ Layer::rezize_layer_redraw_more(BRegion &reg, float dx, float dy)
 			regZ.Include(oldBounds);
 			regZ.Exclude(oldBounds&lay->Bounds());
 
-			lay->ConvertToScreen2(&regZ);
+			lay->ConvertToScreen(&regZ);
 
 			// intersect that with this'(not lay's) fullVisible region
 			regZ.IntersectWith(&fFullVisible2);
 			reg.Include(&regZ);
 
-			lay->rezize_layer_redraw_more(reg,
+			lay->_RezizeLayerRedrawMore(reg,
 				(rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT? dx: 0,
 				(rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM? dy: 0);
 
@@ -1392,7 +1179,7 @@ Layer::rezize_layer_redraw_more(BRegion &reg, float dx, float dy)
 }
 
 inline void
-Layer::resize_layer_full_update_on_resize(BRegion &reg, float dx, float dy)
+Layer::_ResizeLayerFullUpdateOnResize(BRegion &reg, float dx, float dy)
 {
 	if (dx == 0 && dy == 0)
 		return;
@@ -1404,7 +1191,7 @@ Layer::resize_layer_full_update_on_resize(BRegion &reg, float dx, float dy)
 			if (lay->fFlags & B_FULL_UPDATE_ON_RESIZE && lay->fVisible2.CountRects() > 0)
 				reg.Include(&lay->fVisible2);
 
-			lay->resize_layer_full_update_on_resize(reg,
+			lay->_ResizeLayerFullUpdateOnResize(reg,
 				(rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT? dx: 0,
 				(rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM? dy: 0);
 		}
@@ -1418,7 +1205,7 @@ Layer::do_ResizeBy(float dx, float dy)
 
 	// resize children using their resize_mask.
 	for (Layer *child = LastChild(); child != NULL; child = PreviousChild())
-		child->resize_layer_frame_by(dx, dy);
+		child->_ResizeLayerFrameBy(dx, dy);
 
 	// call hook function
 	if (dx != 0.0f || dy != 0.0f)
@@ -1431,7 +1218,7 @@ Layer::do_ResizeBy(float dx, float dy)
 
 		// in case they moved, bottom, right and center aligned layers must be redrawn
 		BRegion redrawMore;
-		rezize_layer_redraw_more(redrawMore, dx, dy);
+		_RezizeLayerRedrawMore(redrawMore, dx, dy);
 
 		// we'll invalidate the old area and the new, maxmial one.
 		BRegion invalid;
@@ -1457,11 +1244,11 @@ Layer::do_ResizeBy(float dx, float dy)
 		redrawReg.Include(&redrawMore);
 
 		// layers that had their frame modified must be entirely redrawn.
-		rezize_layer_redraw_more(redrawReg, dx, dy);
+		_RezizeLayerRedrawMore(redrawReg, dx, dy);
 
 		// include layer's visible region in case we want a full update on resize
 		if (fFlags & B_FULL_UPDATE_ON_RESIZE && fVisible2.Frame().IsValid()) {
-			resize_layer_full_update_on_resize(redrawReg, dx, dy);
+			_ResizeLayerFullUpdateOnResize(redrawReg, dx, dy);
 
 			redrawReg.Include(&fVisible2);
 			redrawReg.Include(&oldVisible);
@@ -1564,7 +1351,7 @@ Layer::GetWantedRegion(BRegion &reg)
 {
 	// 1) set to frame in screen coords
 	BRect screenFrame(Bounds());
-	ConvertToScreen2(&screenFrame);
+	ConvertToScreen(&screenFrame);
 	reg.Set(screenFrame);
 
 	// 2) intersect with screen region
@@ -1589,7 +1376,7 @@ Layer::GetWantedRegion(BRegion &reg)
 }
 
 void
-Layer::rebuild_visible_regions(const BRegion &invalid,
+Layer::_RebuildVisibleRegions(	const BRegion &invalid,
 								const BRegion &parentLocalVisible,
 								const Layer *startFrom)
 {
@@ -1633,7 +1420,7 @@ Layer::rebuild_visible_regions(const BRegion &invalid,
 			fullRebuild = true;
 
 		if (fullRebuild)
-			lay->rebuild_visible_regions(invalid, common, lay->LastChild());
+			lay->_RebuildVisibleRegions(invalid, common, lay->LastChild());
 
 		// to let children know much they can take from parent's visible region
 		common.Exclude(&lay->fFullVisible2);
@@ -1670,7 +1457,7 @@ Layer::rebuild_visible_regions(const BRegion &invalid,
 	_ReserveRegions(common);
 
 	for (Layer *lay = LastChild(); lay; lay = PreviousChild()) {
-		lay->rebuild_visible_regions(invalid, common, lay->LastChild());
+		lay->_RebuildVisibleRegions(invalid, common, lay->LastChild());
 
 		// to let children know much they can take from parent's visible region
 		common.Exclude(&lay->fFullVisible2);
@@ -1687,7 +1474,7 @@ Layer::_ReserveRegions(BRegion &reg)
 }
 
 void
-Layer::clear_visible_regions()
+Layer::_ClearVisibleRegions()
 {
 	// OPT: maybe we should uncomment these lines for performance
 	//if (fFullVisible2.CountRects() <= 0)
@@ -1696,7 +1483,7 @@ Layer::clear_visible_regions()
 	fVisible2.MakeEmpty();
 	fFullVisible2.MakeEmpty();
 	for (Layer *child = LastChild(); child; child = PreviousChild())
-		child->clear_visible_regions();
+		child->_ClearVisibleRegions();
 }
 
 // mark a region dirty so that the next region rebuild for us
@@ -1721,9 +1508,9 @@ Layer::TriggerRebuild()
 
 //		localFullVisible.IntersectWith(&totalInvalidReg);
 
-		clear_visible_regions();
+		_ClearVisibleRegions();
 
-		rebuild_visible_regions(totalInvalidReg, localFullVisible, LastChild());
+		_RebuildVisibleRegions(totalInvalidReg, localFullVisible, LastChild());
 	}
 }
 

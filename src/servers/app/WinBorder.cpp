@@ -761,13 +761,13 @@ WinBorder::GetWantedRegion(BRegion &reg)
 	if (fRebuildDecRegion)
 		set_decorator_region(Bounds());
 
-	BRect			screenFrame(Bounds());
-	ConvertToScreen2(&screenFrame);
+	BRect screenFrame(Bounds());
+	ConvertToScreen(&screenFrame);
 	reg.Set(screenFrame);
 
 	reg.Include(&fDecRegion);
 
-	BRegion			screenReg(GetRootLayer()->Bounds());
+	BRegion screenReg(GetRootLayer()->Bounds());
 
 	reg.IntersectWith(&screenReg);
 }
@@ -792,7 +792,7 @@ if (cnt != 1)
 			msg.what = _UPDATE_;
 
 			BRect	rect(fInUpdateRegion.Frame());
-			ConvertFromScreen2(&rect);
+			ConvertFromScreen(&rect);
 			msg.AddRect("_rect", rect );
 			msg.AddRect("debug_rect", fInUpdateRegion.Frame());
 

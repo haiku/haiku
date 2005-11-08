@@ -98,7 +98,6 @@ class WinBorder : public Layer {
 			void				UpdateFont();
 			void				UpdateScreen();
 
-	virtual bool				HasClient() { return false; }
 	inline	Decorator*			GetDecorator() const { return fDecorator; }
 
 	inline	int32				Look() const { return fLook; }
