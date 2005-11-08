@@ -19,6 +19,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include "SharedObject.h"
+#include "HashTable.h"
 
 
 class FontFamily;
@@ -39,6 +40,23 @@ enum font_format {
 };
 
 
+class FontKey : public Hashable {
+	public:
+		FontKey(uint16 familyID, uint16 styleID)
+			: fHash(familyID | (styleID << 16UL))
+		{
+		}
+
+		virtual uint32	Hash() const
+							{ return fHash; }
+		virtual bool	CompareTo(Hashable& other) const
+							{ return fHash == other.Hash(); }
+
+	private:
+		uint32	fHash;
+};
+
+
 /*!
 	\class FontStyle FontFamily.h
 	\brief Object used to represent a font style
@@ -46,10 +64,13 @@ enum font_format {
 	FontStyle objects help abstract a lot of the font engine details while
 	still offering plenty of information the style in question.
 */
-class FontStyle : public SharedObject, public BLocker {
+class FontStyle : public SharedObject, public Hashable, public BLocker {
 	public:
 						FontStyle(const char* path, FT_Face face);
 		virtual			~FontStyle();
+
+		virtual uint32	Hash() const;
+		virtual bool	CompareTo(Hashable& other) const;
 
 /*!
 	\fn bool FontStyle::IsFixedWidth(void)

@@ -124,6 +124,13 @@ FontManager::_RemoveFamily(const char *familyName)
 {
 	FontFamily *family = GetFamily(familyName);
 	if (family) {
+		// remove styles from hash
+		for (int32 i = 0; i < family->CountStyles(); i++) {
+			FontStyle* style = family->StyleAt(i);
+
+			fStyleHashTable.RemoveItem(*style);
+		}
+
 		fFamilies.RemoveItem(family);
 		delete family;
 	}
@@ -239,6 +246,7 @@ FontManager::_AddFont(BPath &path)
 	if (!family->AddStyle(style))
 		delete style;
 
+	fStyleHashTable.AddItem(style);
 	return B_OK;
 }
 
@@ -523,11 +531,10 @@ FontManager::GetFamily(const char* name)
 FontFamily*
 FontManager::GetFamily(uint16 familyID) const
 {
-	for (int32 i = 0; i < fFamilies.CountItems(); i++) {
-		FontFamily *family = (FontFamily*)fFamilies.ItemAt(i);
-		if (family->ID() == familyID)
-			return family;
-	}
+	FontKey key(familyID, 0);
+	FontStyle* style = (FontStyle*)fStyleHashTable.GetValue(key);
+	if (style != NULL)
+		return style->Family();
 
 	return NULL;
 }
@@ -594,11 +601,8 @@ FontManager::GetStyle(const char* familyName, const char* styleName, uint16 fami
 FontStyle*
 FontManager::GetStyle(uint16 familyID, uint16 styleID) const
 {
-	FontFamily *family = GetFamily(familyID);
-	if (family)
-		return family->GetStyleByID(styleID);
-
-	return NULL;
+	FontKey key(familyID, styleID);
+	return (FontStyle*)fStyleHashTable.GetValue(key);
 }
 
 

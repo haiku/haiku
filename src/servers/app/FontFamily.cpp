@@ -63,6 +63,21 @@ FontStyle::~FontStyle()
 }
 
 
+uint32
+FontStyle::Hash() const
+{
+	return (ID() << 16) | fFamily->ID();
+}
+
+
+bool
+FontStyle::CompareTo(Hashable& other) const
+{
+	// our hash values are unique (unless you have more than 65536 font families installed...)
+	return Hash() == other.Hash();
+}
+
+
 void
 FontStyle::GetHeight(float size, font_height& height) const
 {

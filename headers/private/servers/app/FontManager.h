@@ -10,9 +10,10 @@
 #define FONT_MANAGER_H
 
 
+#include "HashTable.h"
+
 #include <Looper.h>
 #include <ObjectList.h>
-#include <SupportDefs.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -85,6 +86,7 @@ class FontManager : public BLooper {
 		BObjectList<font_directory> fDirectories;
 		BObjectList<font_mapping> fMappings;
 		BObjectList<FontFamily> fFamilies;
+		HashTable	fStyleHashTable;
 		ServerFont	*fDefaultFont;
 		bool		fScanned;
 		int32		fNextID;
