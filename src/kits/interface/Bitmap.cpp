@@ -677,9 +677,8 @@ palette_converter()
 }
 
 
-/////////////
-// BBitmap //
-/////////////
+//	#pragma mark -
+
 
 // constructor
 /*!	\brief Creates and initializes a BBitmap.
@@ -805,35 +804,31 @@ BBitmap::BBitmap(BMessage *data)
 {
 	BRect bounds;
 	data->FindRect("_frame", &bounds);
-	
+
 	color_space cspace;
 	data->FindInt32("_cspace", (int32 *)&cspace);
-	
+
 	int32 flags = 0;
 	data->FindInt32("_bmflags", &flags);
-	
-	int32 rowbytes = 0;
-	data->FindInt32("_rowbytes", &rowbytes);
-	
-	InitObject(bounds, cspace, flags, rowbytes, B_MAIN_SCREEN_ID);
-	
+
+	int32 rowBytes = 0;
+	data->FindInt32("_rowbytes", &rowBytes);
+
+	InitObject(bounds, cspace, flags, rowBytes, B_MAIN_SCREEN_ID);
+
 	if (data->HasData("_data", B_RAW_TYPE) && InitCheck() == B_OK) {
-			ssize_t size = 0;
-			const void *buffer;
-			if (data->FindData("_data", B_RAW_TYPE, &buffer, &size) == B_OK)
-				memcpy(fBasePtr, buffer, size);
+		ssize_t size = 0;
+		const void *buffer;
+		if (data->FindData("_data", B_RAW_TYPE, &buffer, &size) == B_OK)
+			memcpy(fBasePtr, buffer, size);
 	}
-	
+
 	if (fFlags & B_BITMAP_ACCEPTS_VIEWS) {
-		BArchivable *obj;
 		BMessage message;
-		int i = 0;
-		
+		int32 i = 0;
+
 		while (data->FindMessage("_view", i++, &message) == B_OK) {
-			obj = instantiate_object(&message);
-			BView *view = dynamic_cast<BView *>(obj);
-			
-			if (view)
+			if (BView *view = dynamic_cast<BView *>(instantiate_object(&message)))
 				AddChild(view);
 		}
 	}
