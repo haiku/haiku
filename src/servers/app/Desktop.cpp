@@ -21,7 +21,6 @@
 
 #include "AppServer.h"
 #include "DrawingEngine.h"
-#include "Globals.h"
 #include "Layer.h"
 #include "RootLayer.h"
 #include "ServerConfig.h"

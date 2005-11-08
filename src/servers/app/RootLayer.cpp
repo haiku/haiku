@@ -24,7 +24,6 @@
 
 #include "Decorator.h"
 #include "DrawingEngine.h"
-#include "Globals.h"
 #include "HWInterface.h"
 #include "Layer.h"
 #include "ServerApp.h"

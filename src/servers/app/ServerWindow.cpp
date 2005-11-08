@@ -2163,7 +2163,9 @@ ServerWindow::HandleDirectConnection(int bufferState, int driverState)
 	// Releasing this sem causes the client to call BDirectWindow::DirectConnected()
 	release_sem(fDirectWindowData->direct_sem);
 	
-	// TODO: Waiting 3 seconds in this thread could cause weird things: test
+	// TODO: Waiting 3 seconds in this thread is not a problem,
+	// but since we are called from the RootLayer's thread too, very bad things could happen.
+	// Find some way to call this method only within ServerWindow's thread (messaging ?)
 	status_t status = acquire_sem_etc(fDirectWindowData->direct_sem_ack, 1, B_TIMEOUT, 3000000);
 	if (status == B_TIMED_OUT) {
 		// The client application didn't release the semaphore

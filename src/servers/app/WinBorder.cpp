@@ -8,6 +8,7 @@
  */
 
 
+#include <DirectWindow.h>
 #include <Locker.h>
 #include <Region.h>
 #include <String.h>
@@ -20,16 +21,16 @@
 #include "Decorator.h"
 #include "DecorManager.h"
 #include "Desktop.h"
-#include "Globals.h"
 #include "MessagePrivate.h"
 #include "PortLink.h"
 #include "RootLayer.h"
 #include "ServerApp.h"
 #include "ServerWindow.h"
 #include "TokenHandler.h"
+#include "WinBorder.h"
 #include "Workspace.h"
 
-#include "WinBorder.h"
+
 
 // Toggle general function call output
 //#define DEBUG_WINBORDER
@@ -172,7 +173,20 @@ WinBorder::Draw(const BRect &r)
 void
 WinBorder::MoveBy(float x, float y)
 {
+	if (x == 0 && y == 0)
+		return;
+		
+	// TODO: MoveBy and ResizeBy() are usually called
+	// from the rootlayer's thread. HandleDirectConnection() could
+	// block the calling thread for ~3 seconds in the worst case, 
+	// and while it would be acceptable if called from the
+	// ServerWindow's thread (only the window would be blocked), in this case
+	// it's not, as also the mouse movement is driven by rootlayer.
+	// Find some way to call DirectConnected() from the ServerWindow's thread,
+	// by sending a message from here or whatever.	
+	//Window()->HandleDirectConnection(B_DIRECT_STOP);
 	Layer::MoveBy(x, y);
+	//Window()->HandleDirectConnection(B_DIRECT_START|B_BUFFER_MOVED);
 }
 
 
@@ -180,8 +194,12 @@ void
 WinBorder::ResizeBy(float x, float y)
 {
 	STRACE(("WinBorder(%s)::ResizeBy()\n", Name()));
-
+	if (x == 0 && y == 0)
+		return;
+	
+	//Window()->HandleDirectConnection(B_DIRECT_STOP);
 	_ResizeBy(x, y);
+	//Window()->HandleDirectConnection(B_DIRECT_START|B_BUFFER_RESIZED);
 }
 
 
