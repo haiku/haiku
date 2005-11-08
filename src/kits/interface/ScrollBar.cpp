@@ -964,6 +964,7 @@ BScrollBar::_UpdateThumbFrame()
 	if (fPrivateData->fScrollBarInfo.proportional)
 		thumbSize += (maxSize - minSize) * fProportion;
 	thumbSize = floorf(thumbSize + 0.5);
+	thumbSize--;
 
 	// the thumb can be scrolled within the remaining area "maxSize - thumbSize"
 	float offset = floorf(((fValue - fMin) / (fMax - fMin + 1.0)) * (maxSize - thumbSize));
