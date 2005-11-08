@@ -176,6 +176,7 @@ fi
 case "${platform}" in
 	BeOS)	revision=`uname -r`
 			case "$revision" in
+				6.*)	buildPlatform=dano ;;
 				5.1)	buildPlatform=dano ;;
 				5.0.4)	buildPlatform=bone ;;
 				5.0*)	buildPlatform=r5 ;;
