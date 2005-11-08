@@ -21,7 +21,6 @@
  */
 
 %{
-//------------------------------------------------------------------------------
 
 #include <Message.h>
 
@@ -40,9 +39,9 @@ using namespace std;
 
 static void yyerror(char*);
 
-struct ident_compare_t  // allows the maps to compare identifier names
-{
-	bool operator () (char* s1, char* s2) const
+struct ident_compare_t {  // allows the maps to compare identifier names
+	bool
+	operator()(char* s1, char* s2) const
 	{
 		return strcmp(s1, s2) < 0;
 	}
@@ -104,8 +103,7 @@ static void add_resource(res_id_t, type_code, data_t);
 
 %expect 15
 
-%union
-{
+%union {
 	bool b;
 	uint64 i;
 	double f;
@@ -497,7 +495,9 @@ float
 %%
 //------------------------------------------------------------------------------
 
-void yyerror(char* msg)
+
+void
+yyerror(char* msg)
 {
 	// This function is called by the parser when it encounters
 	// an error, after which it aborts parsing and returns from 
@@ -509,35 +509,31 @@ void yyerror(char* msg)
 	strcpy(rdef_err_msg, msg);
 }
 
-//------------------------------------------------------------------------------
 
-void add_symbol(char* name, int32 id)
+void
+add_symbol(char* name, int32 id)
 {
 	if (symbol_table.find(name) != symbol_table.end())
-	{
 		abort_compile(RDEF_COMPILE_ERR, "duplicate symbol %s", name);
-	}
 
 	symbol_table.insert(make_pair(name, id));
 }
 
-//------------------------------------------------------------------------------
 
-int32 get_symbol(char* name)
+int32
+get_symbol(char* name)
 {
 	sym_iter_t i = symbol_table.find(name);
 
 	if (i == symbol_table.end())
-	{
 		abort_compile(RDEF_COMPILE_ERR, "unknown symbol %s", name);
-	}
 
 	return i->second;
 }
 
-//------------------------------------------------------------------------------
 
-static void add_builtin_type(type_code code, char* name)
+static void
+add_builtin_type(type_code code, char* name)
 {
 	type_t type;
 	type.code     = code;
@@ -550,14 +546,12 @@ static void add_builtin_type(type_code code, char* name)
 	type_table.insert(make_pair(name, type));
 }
 
-//------------------------------------------------------------------------------
 
-void add_user_type(res_id_t id, type_code code, char* name, list_t list)
+void
+add_user_type(res_id_t id, type_code code, char* name, list_t list)
 {
 	if (type_table.find(name) != type_table.end())
-	{
 		abort_compile(RDEF_COMPILE_ERR, "duplicate type %s", name);
-	}
 
 	type_t type;
 	type.code     = code;
@@ -568,70 +562,62 @@ void add_user_type(res_id_t id, type_code code, char* name, list_t list)
 	type.def_name = NULL;
 
 	if (id.has_id)
-	{
 		type.def_id = id.id;
-	}
 
 	if (id.has_name)
-	{	
 		type.def_name = id.name;
-	}
 
 	type_table.insert(make_pair(name, type));
 }
 
-//------------------------------------------------------------------------------
 
-static bool is_builtin_type(type_t type)
+static bool
+is_builtin_type(type_t type)
 {
-	return (type.count == 0);
+	return type.count == 0;
 }
 
-//------------------------------------------------------------------------------
 
-static bool same_type(type_t type1, type_t type2)
+static bool
+same_type(type_t type1, type_t type2)
 {
-	return (type1.name == type2.name);  // no need for strcmp
+	return type1.name == type2.name;  // no need for strcmp
 }
 
-//------------------------------------------------------------------------------
 
-type_t get_type(char* name)
+type_t
+get_type(char* name)
 {
 	type_iter_t i = type_table.find(name);
 
 	if (i == type_table.end())
-	{
 		abort_compile(RDEF_COMPILE_ERR, "unknown type %s", name);
-	}
 
 	return i->second;
 }
 
-//------------------------------------------------------------------------------
 
-bool is_type(char* name)
+bool
+is_type(char* name)
 {
 	return type_table.find(name) != type_table.end();
 }
 
-//------------------------------------------------------------------------------
 
-define_t get_define(char* name)
+define_t
+get_define(char* name)
 {
 	define_iter_t i = define_table.find(name);
 
 	if (i == define_table.end())
-	{
 		abort_compile(RDEF_COMPILE_ERR, "unknown define %s", name);
-	}
 
 	return i->second;
 }
 
-//------------------------------------------------------------------------------
 
-data_t make_data(size_t size, type_t type)
+data_t
+make_data(size_t size, type_t type)
 {
 	data_t out;
 	out.type = type;
@@ -641,55 +627,51 @@ data_t make_data(size_t size, type_t type)
 	return out;
 }
 
-//------------------------------------------------------------------------------
 
-data_t make_bool(bool b)
+data_t
+make_bool(bool b)
 {
 	data_t out = make_data(sizeof(bool), get_type("bool"));
-	*((bool*) out.ptr) = b;
+	*((bool*)out.ptr) = b;
 	return out;
 }
 
-//------------------------------------------------------------------------------
 
-data_t make_int(uint64 i)
+data_t
+make_int(uint64 i)
 {
 	data_t out = make_data(sizeof(uint64), get_type("uint64"));
-	*((uint64*) out.ptr) = i;
+	*((uint64*)out.ptr) = i;
 	return out;
 }
 
-//------------------------------------------------------------------------------
 
-data_t make_float(double f)
+data_t
+make_float(double f)
 {
 	data_t out = make_data(sizeof(double), get_type("double"));
-	*((double*) out.ptr) = f;
+	*((double*)out.ptr) = f;
 	return out;
 }
 
-//------------------------------------------------------------------------------
 
-data_t import_data(char* filename)
+data_t
+import_data(char* filename)
 {
 	data_t out;
 	out.type = get_type("raw");
 	out.name = NULL;
 
 	char tmpname[B_PATH_NAME_LENGTH];
-	if (open_file_from_include_dir(filename, tmpname))
-	{
+	if (open_file_from_include_dir(filename, tmpname)) {
 		BFile file(tmpname, B_READ_ONLY);
-		if (file.InitCheck() == B_OK)
-		{
+		if (file.InitCheck() == B_OK) {
 			off_t size;
-			if (file.GetSize(&size) == B_OK)
-			{
+			if (file.GetSize(&size) == B_OK) {
 				out.size = (size_t) size;
 				out.ptr  = alloc_mem(size);
 
-				if (file.Read(out.ptr, out.size) == (ssize_t) out.size)
-				{
+				if (file.Read(out.ptr, out.size) == (ssize_t) out.size) {
 					free_mem(filename);
 					return out;
 				}
@@ -701,43 +683,37 @@ data_t import_data(char* filename)
 	return out;
 }
 
-//------------------------------------------------------------------------------
 
-data_t resize_data(data_t data, size_t new_size)
+data_t
+resize_data(data_t data, size_t newSize)
 {
-	if (new_size == 0)
-	{
-		abort_compile(RDEF_COMPILE_ERR, "invalid size %lu", new_size);
-	}
-	else if (data.size != new_size)
-	{
-		void* new_ptr = alloc_mem(new_size);
+	if (newSize == 0) {
+		abort_compile(RDEF_COMPILE_ERR, "invalid size %lu", newSize);
+	} else if (data.size != newSize) {
+		void* newBuffer = alloc_mem(newSize);
 
-		memset(new_ptr, 0, new_size);
-		memcpy(new_ptr, data.ptr, min(data.size, new_size));
+		memset(newBuffer, 0, newSize);
+		memcpy(newBuffer, data.ptr, min(data.size, newSize));
 
 		if (data.type.code == B_STRING_TYPE)
-		{
-			((char*) new_ptr)[new_size - 1] = '\0';
-		}
+			((char*)newBuffer)[newSize - 1] = '\0';
 
 		free_mem(data.ptr);
-		data.ptr  = new_ptr;
-		data.size = new_size;
+		data.ptr  = newBuffer;
+		data.size = newSize;
 	}
 
 	return data;
 }
 
-//------------------------------------------------------------------------------
 
-BMessage* make_msg(list_t list)
+BMessage*
+make_msg(list_t list)
 {
 	BMessage* msg = new BMessage;
 
-	for (int32 t = 0; t < list.count; ++t)
-	{
-		data_t data = ((data_t*) list.items)[t];
+	for (int32 t = 0; t < list.count; ++t) {
+		data_t data = ((data_t*)list.items)[t];
 		msg->AddData(data.name, data.type.code, data.ptr, data.size, false);
 		free_mem(data.name);
 		free_mem(data.ptr);
@@ -747,9 +723,9 @@ BMessage* make_msg(list_t list)
 	return msg;
 }
 
-//------------------------------------------------------------------------------
 
-data_t flatten_msg(BMessage* msg)
+data_t
+flatten_msg(BMessage* msg)
 {
 #ifndef B_BEOS_VERSION_DANO
 	data_t out = make_data(msg->FlattenedSize(), get_type("message"));
@@ -763,31 +739,29 @@ data_t flatten_msg(BMessage* msg)
 	return out;
 }
 
-//------------------------------------------------------------------------------
 
-data_t make_default(type_t type)
+data_t
+make_default(type_t type)
 { 
 	data_t out;
 
-	if (is_builtin_type(type))
-	{
-		switch (type.code)
-		{
+	if (is_builtin_type(type)) {
+		switch (type.code) {
 			case B_BOOL_TYPE:
 				out = make_data(sizeof(bool), type);
-				*((bool*) out.ptr) = false;
+				*((bool*)out.ptr) = false;
 				break;
 
 			case B_INT8_TYPE:
 			case B_UINT8_TYPE:
 				out = make_data(sizeof(uint8), type);
-				*((uint8*) out.ptr) = 0;
+				*((uint8*)out.ptr) = 0;
 				break;
 
 			case B_INT16_TYPE:
 			case B_UINT16_TYPE:
 				out = make_data(sizeof(uint16), type);
-				*((uint16*) out.ptr) = 0;
+				*((uint16*)out.ptr) = 0;
 				break;
 
 			case B_INT32_TYPE:
@@ -796,31 +770,31 @@ data_t make_default(type_t type)
 			case B_SSIZE_T_TYPE:
 			case B_TIME_TYPE:
 				out = make_data(sizeof(uint32), type);
-				*((uint32*) out.ptr) = 0;
+				*((uint32*)out.ptr) = 0;
 				break;
 
 			case B_INT64_TYPE:
 			case B_UINT64_TYPE:
 			case B_OFF_T_TYPE:
 				out = make_data(sizeof(uint64), type);
-				*((uint64*) out.ptr) = 0;
+				*((uint64*)out.ptr) = 0;
 				break;
 
 			case B_FLOAT_TYPE:
 				out = make_data(sizeof(float), type);
-				*((float*) out.ptr) = 0.0f;
+				*((float*)out.ptr) = 0.0f;
 				break;
 
 			case B_DOUBLE_TYPE:
 				out = make_data(sizeof(double), type);
-				*((double*) out.ptr) = 0.0;
+				*((double*)out.ptr) = 0.0;
 				break;
 
 			case B_STRING_TYPE:
 				out = make_data(sizeof(char), type);
-				*((char*) out.ptr) = '\0';
+				*((char*)out.ptr) = '\0';
 				break;
-		
+
 			case B_RAW_TYPE:
 				out = make_data(0, type);
 				break;
@@ -829,25 +803,21 @@ data_t make_default(type_t type)
 				out = flatten_msg(new BMessage);
 				break;
 		}
-	}
-	else
-	{
+	} else {
 		// For user-defined types, we copy the default values of the fields
 		// into a new data_t object. There is no need to call resize_data()
 		// here, because the default values were already resized to their
 		// proper length when we added them to the type.
 
 		size_t size = 0;
-		for (int32 t = 0; t < type.count; ++t)
-		{
+		for (int32 t = 0; t < type.count; ++t) {
 			size += type.fields[t].data.size;
 		}
 
 		out = make_data(size, type);
 
 		uint8* ptr = (uint8*) out.ptr;
-		for (int32 t = 0; t < type.count; ++t)
-		{
+		for (int32 t = 0; t < type.count; ++t) {
 			data_t field_data = type.fields[t].data;
 			memcpy(ptr, field_data.ptr, field_data.size);
 			ptr += field_data.size;
@@ -857,24 +827,20 @@ data_t make_default(type_t type)
 	return out;
 }
 
-//------------------------------------------------------------------------------
 
-static data_t* fill_slots(type_t type, list_t list)
+static data_t*
+fill_slots(type_t type, list_t list)
 {
-	data_t* slots = (data_t*) alloc_mem(type.count * sizeof(data_t));
+	data_t* slots = (data_t*)alloc_mem(type.count * sizeof(data_t));
 	memset(slots, 0, type.count * sizeof(data_t));
 
-	for (int32 t = 0; t < list.count; ++t)
-	{
-		data_t data = ((data_t*) list.items)[t];
+	for (int32 t = 0; t < list.count; ++t) {
+		data_t data = ((data_t*)list.items)[t];
 
-		if (data.name == NULL)
-		{
+		if (data.name == NULL) {
 			bool found = false;
-			for (int32 k = 0; k < type.count; ++k)
-			{
-				if (slots[k].ptr == NULL)
-				{
+			for (int32 k = 0; k < type.count; ++k) {
+				if (slots[k].ptr == NULL) {
 					slots[k] = cast(type.fields[k].type, data);
 					found = true;
 					break;
@@ -882,21 +848,14 @@ static data_t* fill_slots(type_t type, list_t list)
 			}
 
 			if (!found)
-			{
 				abort_compile(RDEF_COMPILE_ERR, "too many fields");
-			}
-		}
-		else  // named field
-		{
+		} else {
+			// named field
 			bool found = false;
-			for (int32 k = 0; k < type.count; ++k)
-			{
-				if (strcmp(type.fields[k].name, data.name) == 0)
-				{
+			for (int32 k = 0; k < type.count; ++k) {
+				if (strcmp(type.fields[k].name, data.name) == 0) {
 					if (slots[k].ptr != NULL)
-					{
 						free_mem(slots[k].ptr);
-					}
 
 					slots[k] = cast(type.fields[k].type, data);
 					free_mem(data.name);
@@ -906,55 +865,42 @@ static data_t* fill_slots(type_t type, list_t list)
 			}
 
 			if (!found)
-			{
 				abort_compile(RDEF_COMPILE_ERR, "unknown field %s", data.name);
-			}
 		}
 	}
 
 	return slots;
 }
 
-//------------------------------------------------------------------------------
 
-static data_t convert_slots(type_t type, data_t* slots)
+static data_t
+convert_slots(type_t type, data_t* slots)
 {
 	size_t size = 0;
-	for (int32 k = 0; k < type.count; ++k)
-	{
-		if (slots[k].ptr == NULL)  // default value
-		{
+	for (int32 k = 0; k < type.count; ++k) {
+		if (slots[k].ptr == NULL) {
+			// default value
 			size += type.fields[k].data.size;
-		}
-		else if (type.fields[k].resize != 0)
-		{
+		} else if (type.fields[k].resize != 0)
 			size += type.fields[k].resize;
-		}
 		else
-		{
 			size += slots[k].size;
-		}
 	}
 
 	data_t out = make_data(size, type);
 	uint8* ptr = (uint8*) out.ptr;
 
-	for (int32 k = 0; k < type.count; ++k)
-	{
-		if (slots[k].ptr == NULL)  // default value
-		{
+	for (int32 k = 0; k < type.count; ++k) {
+		if (slots[k].ptr == NULL) {
+			// default value
 			memcpy(ptr, type.fields[k].data.ptr, type.fields[k].data.size);
 			ptr += type.fields[k].data.size;
-		}
-		else if (type.fields[k].resize != 0)
-		{
+		} else if (type.fields[k].resize != 0) {
 			data_t temp = resize_data(slots[k], type.fields[k].resize);
 			memcpy(ptr, temp.ptr, temp.size);
 			ptr += temp.size;
 			free_mem(temp.ptr);
-		}
-		else
-		{
+		} else {
 			memcpy(ptr, slots[k].ptr, slots[k].size);
 			ptr += slots[k].size;
 			free_mem(slots[k].ptr);
@@ -965,9 +911,9 @@ static data_t convert_slots(type_t type, data_t* slots)
 	return out;
 }
 
-//------------------------------------------------------------------------------
 
-data_t make_type(char* name, list_t list)
+data_t
+make_type(char* name, list_t list)
 {
 	// Some explanation is in order. The "list" contains zero or more data_t
 	// items. Each of these items corresponds to a data field that the user
@@ -988,99 +934,102 @@ data_t make_type(char* name, list_t list)
 	return out;
 }
 
-//------------------------------------------------------------------------------
 
-list_t make_field_list(field_t field)
+list_t
+make_field_list(field_t field)
 {
 	list_t out;
 	out.count = 1;
 	out.items = alloc_mem(sizeof(field_t));
-	*((field_t*) out.items) = field;
+	*((field_t*)out.items) = field;
 	return out;
 }
 
-//------------------------------------------------------------------------------
 
-list_t concat_field_list(list_t list, field_t field)
+list_t
+concat_field_list(list_t list, field_t field)
 {
 	list_t out;
 	out.count = list.count + 1;
 	out.items = alloc_mem(out.count * sizeof(field_t));
 
 	memcpy(out.items, list.items, list.count * sizeof(field_t));
-	memcpy((field_t*) out.items + list.count, &field, sizeof(field_t));
+	memcpy((field_t*)out.items + list.count, &field, sizeof(field_t));
 
 	free_mem(list.items);
 	return out;
 }
 
-//------------------------------------------------------------------------------
 
-list_t make_data_list(data_t data)
+list_t
+make_data_list(data_t data)
 {
 	list_t out;
 	out.count = 1;
 	out.items = alloc_mem(sizeof(data_t));
-	*((data_t*) out.items) = data;
+	*((data_t*)out.items) = data;
 	return out;
 }
 
-//------------------------------------------------------------------------------
 
-list_t concat_data_list(list_t list, data_t data)
+list_t
+concat_data_list(list_t list, data_t data)
 {
 	list_t out;
 	out.count = list.count + 1;
-	out.items = (data_t*) alloc_mem(out.count * sizeof(data_t));
+	out.items = (data_t*)alloc_mem(out.count * sizeof(data_t));
 
 	memcpy(out.items, list.items, list.count * sizeof(data_t));
-	memcpy((data_t*) out.items + list.count, &data, sizeof(data_t));
+	memcpy((data_t*)out.items + list.count, &data, sizeof(data_t));
 
 	free_mem(list.items);
 	return out;
 }
 
-//------------------------------------------------------------------------------
 
-data_t concat_data(data_t data1, data_t data2)
+data_t
+concat_data(data_t data1, data_t data2)
 {
 	data_t out = make_data(data1.size + data2.size, get_type("raw"));
 
 	memcpy(out.ptr, data1.ptr, data1.size);
-	memcpy((uint8*) out.ptr + data1.size, data2.ptr, data2.size);
+	memcpy((uint8*)out.ptr + data1.size, data2.ptr, data2.size);
 
 	free_mem(data1.ptr);
 	free_mem(data2.ptr);
 	return out;
 }
 
-//------------------------------------------------------------------------------
 
-static data_t cast_to_uint8(type_t new_type, data_t data)
+static data_t
+cast_to_uint8(type_t new_type, data_t data)
 {
 	data_t out = make_data(sizeof(uint8), new_type);
 
-	switch (data.type.code)
-	{
+	switch (data.type.code) {
 		case B_INT8_TYPE:
 		case B_UINT8_TYPE:
-			*((uint8*) out.ptr) = (uint8) *((uint8*) data.ptr); break;
+			*((uint8*)out.ptr) = *(uint8*)data.ptr;
+			break;
 
 		case B_INT16_TYPE:
 		case B_UINT16_TYPE:
-			*((uint8*) out.ptr) = (uint8) *((uint16*) data.ptr); break;
+			*((uint8*)out.ptr) = (uint8)*(uint16*)data.ptr;
+			break;
 
 		case B_INT32_TYPE:
 		case B_UINT32_TYPE:
 		case B_SIZE_T_TYPE:
 		case B_SSIZE_T_TYPE:
 		case B_TIME_TYPE:
-			*((uint8*) out.ptr) = (uint8) *((uint32*) data.ptr); break;
+			*((uint8*)out.ptr) = (uint8)*(uint32*)data.ptr;
+			break;
 
 		case B_INT64_TYPE:
 		case B_UINT64_TYPE:
 		case B_OFF_T_TYPE:
-			*((uint8*) out.ptr) = (uint8) *((uint64*) data.ptr); break;
+			*((uint8*)out.ptr) = (uint8)*(uint64*)data.ptr;
+			break;
 
 		default:
 			abort_compile(RDEF_COMPILE_ERR, "cannot cast to this type");
@@ -1090,33 +1039,36 @@ static data_t cast_to_uint8(type_t new_type, data_t data)
 	return out;
 }
 
-//------------------------------------------------------------------------------
 
-static data_t cast_to_uint16(type_t new_type, data_t data)
+static data_t
+cast_to_uint16(type_t new_type, data_t data)
 {
 	data_t out = make_data(sizeof(uint16), new_type);
 
-	switch (data.type.code)
-	{
+	switch (data.type.code) {
 		case B_INT8_TYPE:
 		case B_UINT8_TYPE:
-			*((uint16*) out.ptr) = (uint16) *((uint8*) data.ptr); break;
+			*((uint16*)out.ptr) = (uint16)*(uint8*)data.ptr;
+			break;
 
 		case B_INT16_TYPE:
 		case B_UINT16_TYPE:
-			*((uint16*) out.ptr) = (uint16) *((uint16*) data.ptr); break;
+			*((uint16*)out.ptr) = *(uint16*)data.ptr;
+			break;
 
 		case B_INT32_TYPE:
 		case B_UINT32_TYPE:
 		case B_SIZE_T_TYPE:
 		case B_SSIZE_T_TYPE:
 		case B_TIME_TYPE:
-			*((uint16*) out.ptr) = (uint16) *((uint32*) data.ptr); break;
+			*((uint16*)out.ptr) = (uint16)*(uint32*)data.ptr;
+			break;
 
 		case B_INT64_TYPE:
 		case B_UINT64_TYPE:
 		case B_OFF_T_TYPE:
-			*((uint16*) out.ptr) = (uint16) *((uint64*) data.ptr); break;
+			*((uint16*)out.ptr) = (uint16)*(uint64*)data.ptr;
+			break;
 
 		default:
 			abort_compile(RDEF_COMPILE_ERR, "cannot cast to this type");
@@ -1126,33 +1078,36 @@ static data_t cast_to_uint16(type_t new_type, data_t data)
 	return out;
 }
 
-//------------------------------------------------------------------------------
 
-static data_t cast_to_uint32(type_t new_type, data_t data)
+static data_t
+cast_to_uint32(type_t new_type, data_t data)
 {
 	data_t out = make_data(sizeof(uint32), new_type);
 
-	switch (data.type.code)
-	{
+	switch (data.type.code) {
 		case B_INT8_TYPE:
 		case B_UINT8_TYPE:
-			*((uint32*) out.ptr) = (uint32) *((uint8*) data.ptr); break;
+			*((uint32*)out.ptr) = (uint32)*(uint8*)data.ptr;
+			break;
 
 		case B_INT16_TYPE:
 		case B_UINT16_TYPE:
-			*((uint32*) out.ptr) = (uint32) *((uint16*) data.ptr); break;
+			*((uint32*)out.ptr) = (uint32)*(uint16*)data.ptr;
+			break;
 
 		case B_INT32_TYPE:
 		case B_UINT32_TYPE:
 		case B_SIZE_T_TYPE:
 		case B_SSIZE_T_TYPE:
 		case B_TIME_TYPE:
-			*((uint32*) out.ptr) = (uint32) *((uint32*) data.ptr); break;
+			*((uint32*)out.ptr) = *(uint32*)data.ptr;
+			break;
 
 		case B_INT64_TYPE:
 		case B_UINT64_TYPE:
 		case B_OFF_T_TYPE:
-			*((uint32*) out.ptr) = (uint32) *((uint64*) data.ptr); break;
+			*((uint32*)out.ptr) = (uint32)*(uint64*)data.ptr;
+			break;
 
 		default:
 			abort_compile(RDEF_COMPILE_ERR, "cannot cast to this type");
@@ -1162,33 +1117,36 @@ static data_t cast_to_uint32(type_t new_type, data_t data)
 	return out;
 }
 
-//------------------------------------------------------------------------------
 
-static data_t cast_to_uint64(type_t new_type, data_t data)
+static data_t
+cast_to_uint64(type_t new_type, data_t data)
 {
 	data_t out = make_data(sizeof(uint64), new_type);
 
-	switch (data.type.code)
-	{
+	switch (data.type.code) {
 		case B_INT8_TYPE:
 		case B_UINT8_TYPE:
-			*((uint64*) out.ptr) = (uint64) *((uint8*) data.ptr); break;
+			*((uint64*)out.ptr) = (uint64)*(uint8*)data.ptr;
+			break;
 
 		case B_INT16_TYPE:
 		case B_UINT16_TYPE:
-			*((uint64*) out.ptr) = (uint64) *((uint16*) data.ptr); break;
+			*((uint64*)out.ptr) = (uint64)*(uint16*)data.ptr;
+			break;
 
 		case B_INT32_TYPE:
 		case B_UINT32_TYPE:
 		case B_SIZE_T_TYPE:
 		case B_SSIZE_T_TYPE:
 		case B_TIME_TYPE:
-			*((uint64*) out.ptr) = (uint64) *((uint32*) data.ptr); break;
+			*((uint64*)out.ptr) = (uint64)*(uint32*)data.ptr;
+			break;
 
 		case B_INT64_TYPE:
 		case B_UINT64_TYPE:
 		case B_OFF_T_TYPE:
-			*((uint64*) out.ptr) = (uint64) *((uint64*) data.ptr); break;
+			*((uint64*)out.ptr) = *(uint64*)data.ptr;
+			break;
 
 		default:
 			abort_compile(RDEF_COMPILE_ERR, "cannot cast to this type");
@@ -1198,36 +1156,40 @@ static data_t cast_to_uint64(type_t new_type, data_t data)
 	return out;
 }
 
-//------------------------------------------------------------------------------
 
-static data_t cast_to_float(type_t new_type, data_t data)
+static data_t
+cast_to_float(type_t new_type, data_t data)
 {
 	data_t out = make_data(sizeof(float), new_type);
 
-	switch (data.type.code)
-	{
+	switch (data.type.code) {
 		case B_INT8_TYPE:
 		case B_UINT8_TYPE:
-			*((float*) out.ptr) = (float) *((uint8*) data.ptr); break;
+			*((float*)out.ptr) = (float)*((uint8*)data.ptr);
+			break;
 
 		case B_INT16_TYPE:
 		case B_UINT16_TYPE:
-			*((float*) out.ptr) = (float) *((uint16*) data.ptr); break;
+			*((float*)out.ptr) = (float)*((uint16*)data.ptr);
+			break;
 
 		case B_INT32_TYPE:
 		case B_UINT32_TYPE:
 		case B_SIZE_T_TYPE:
 		case B_SSIZE_T_TYPE:
 		case B_TIME_TYPE:
-			*((float*) out.ptr) = (float) *((uint32*) data.ptr); break;
+			*((float*)out.ptr) = (float)*((uint32*)data.ptr);
+			break;
 
 		case B_INT64_TYPE:
 		case B_UINT64_TYPE:
 		case B_OFF_T_TYPE:
-			*((float*) out.ptr) = (float) *((uint64*) data.ptr); break;
+			*((float*)out.ptr) = (float)*((uint64*)data.ptr);
+			break;
 
 		case B_DOUBLE_TYPE:
-			*((float*) out.ptr) = (float) *((double*) data.ptr); break;
+			*((float*)out.ptr) = (float)*((double*)data.ptr);
+			break;
 
 		default:
 			abort_compile(RDEF_COMPILE_ERR, "cannot cast to this type");
@@ -1237,36 +1199,40 @@ static data_t cast_to_float(type_t new_type, data_t data)
 	return out;
 }
 
-//------------------------------------------------------------------------------
 
-static data_t cast_to_double(type_t new_type, data_t data)
+static data_t
+cast_to_double(type_t new_type, data_t data)
 {
 	data_t out = make_data(sizeof(double), new_type);
 
-	switch (data.type.code)
-	{
+	switch (data.type.code) {
 		case B_INT8_TYPE:
 		case B_UINT8_TYPE:
-			*((double*) out.ptr) = (double) *((uint8*) data.ptr); break;
+			*((double*)out.ptr) = (double)*((uint8*)data.ptr);
+			break;
 
 		case B_INT16_TYPE:
 		case B_UINT16_TYPE:
-			*((double*) out.ptr) = (double) *((uint16*) data.ptr); break;
+			*((double*)out.ptr) = (double)*((uint16*)data.ptr);
+			break;
 
 		case B_INT32_TYPE:
 		case B_UINT32_TYPE:
 		case B_SIZE_T_TYPE:
 		case B_SSIZE_T_TYPE:
 		case B_TIME_TYPE:
-			*((double*) out.ptr) = (double) *((uint32*) data.ptr); break;
+			*((double*)out.ptr) = (double)*((uint32*)data.ptr);
+			break;
 
 		case B_INT64_TYPE:
 		case B_UINT64_TYPE:
 		case B_OFF_T_TYPE:
-			*((double*) out.ptr) = (double) *((uint64*) data.ptr); break;
+			*((double*)out.ptr) = (double)*((uint64*)data.ptr);
+			break;
 
 		case B_FLOAT_TYPE:
-			*((double*) out.ptr) = (double) *((float*) data.ptr); break;
+			*((double*)out.ptr) = (double)*((float*)data.ptr);
+			break;
 
 		default:
 			abort_compile(RDEF_COMPILE_ERR, "cannot cast to this type");
@@ -1276,48 +1242,49 @@ static data_t cast_to_double(type_t new_type, data_t data)
 	return out;
 }
 
-//------------------------------------------------------------------------------
 
-data_t cast(type_t new_type, data_t data)
+data_t
+cast(type_t newType, data_t data)
 {
-	if (same_type(new_type, data.type))  // you can't cast bool, string,
-	{                                    // message, or user-defined type
-		return data;                     // to another type, only to same
+	if (same_type(newType, data.type)) {
+		// you can't cast bool, string,
+		// message, or user-defined type
+		// to another type, only to same
+		return data;
 	}
 
-	if (is_builtin_type(new_type))
-	{
-		switch (new_type.code)
-		{
+	if (is_builtin_type(newType)) {
+		switch (newType.code) {
 			case B_INT8_TYPE:
 			case B_UINT8_TYPE:
-				return cast_to_uint8(new_type, data);
+				return cast_to_uint8(newType, data);
 
 			case B_INT16_TYPE:
 			case B_UINT16_TYPE:
-				return cast_to_uint16(new_type, data);
+				return cast_to_uint16(newType, data);
 
 			case B_INT32_TYPE:
 			case B_UINT32_TYPE:
 			case B_SIZE_T_TYPE:
 			case B_SSIZE_T_TYPE:
 			case B_TIME_TYPE:
-				return cast_to_uint32(new_type, data);
+				return cast_to_uint32(newType, data);
 
 			case B_INT64_TYPE:
 			case B_UINT64_TYPE:
 			case B_OFF_T_TYPE:
-				return cast_to_uint64(new_type, data);
+				return cast_to_uint64(newType, data);
 
 			case B_FLOAT_TYPE:
-				return cast_to_float(new_type, data);
+				return cast_to_float(newType, data);
 
 			case B_DOUBLE_TYPE:
-				return cast_to_double(new_type, data);
+				return cast_to_double(newType, data);
 
 			case B_RAW_TYPE:
-				data.type = new_type;  // you can always cast
-				return data;           // anything to raw
+				// you can always cast anything to raw
+				data.type = newType;
+				return data;
 		}
 	}
 
@@ -1325,19 +1292,18 @@ data_t cast(type_t new_type, data_t data)
 	return data;
 }
 
-//------------------------------------------------------------------------------
 
-data_t unary_expr(data_t data, char oper)
+data_t
+unary_expr(data_t data, char oper)
 {
 	data_t op = cast_to_uint32(get_type("int32"), data);
-
-	int32 i = *((int32*) op.ptr);
-
+	int32 i = *((int32*)op.ptr);
 	data_t out;
 
-	switch (oper)
-	{
-		case '~': out = make_int(~i); break;
+	switch (oper) {
+		case '~':
+			out = make_int(~i);
+			break;
 	}
 
 	free_mem(op.ptr);
@@ -1345,49 +1311,50 @@ data_t unary_expr(data_t data, char oper)
 	return cast(get_type("int32"), out);
 }
 
-//------------------------------------------------------------------------------
 
-data_t binary_expr(data_t data1, data_t data2, char oper)
+data_t
+binary_expr(data_t data1, data_t data2, char oper)
 {
 	data_t op1 = cast_to_uint32(get_type("int32"), data1);
 	data_t op2 = cast_to_uint32(get_type("int32"), data2);
-
 	int32 i1 = *((int32*) op1.ptr);
 	int32 i2 = *((int32*) op2.ptr);
-
 	data_t out;
 
-	switch (oper)
-	{
-		case '+': out = make_int(i1 + i2); break;
-		case '-': out = make_int(i1 - i2); break;
-		case '*': out = make_int(i1 * i2); break;
+	switch (oper) {
+		case '+':
+			out = make_int(i1 + i2);
+			break;
+		case '-':
+			out = make_int(i1 - i2);
+			break;
+		case '*':
+			out = make_int(i1 * i2);
+			break;
 
 		case '/':
 			if (i2 == 0)
-			{
 				abort_compile(RDEF_COMPILE_ERR, "division by zero");
-			}
 			else
-			{
 				 out = make_int(i1 / i2);
-			}
 			break;
 
 		case '%':
 			if (i2 == 0)
-			{
 				abort_compile(RDEF_COMPILE_ERR, "division by zero");
-			}
 			else
-			{
 				out = make_int(i1 % i2);
-			}
 			break;
 
-		case '|': out = make_int(i1 | i2); break;
-		case '^': out = make_int(i1 ^ i2); break;
-		case '&': out = make_int(i1 & i2); break;
+		case '|':
+			out = make_int(i1 | i2);
+			break;
+		case '^':
+			out = make_int(i1 ^ i2);
+			break;
+		case '&':
+			out = make_int(i1 & i2);
+			break;
 	}
 
 	free_mem(op1.ptr);
@@ -1396,29 +1363,21 @@ data_t binary_expr(data_t data1, data_t data2, char oper)
 	return cast(get_type("int32"), out);
 }
 
-//------------------------------------------------------------------------------
 
-void add_resource(res_id_t id, type_code code, data_t data)
+void
+add_resource(res_id_t id, type_code code, data_t data)
 {
 	if (!id.has_id)
-	{
 		id.id = data.type.def_id;
-	}
 
 	if (!id.has_name)
-	{	
 		id.name = data.type.def_name;
-	}
 
 	if (!(flags & RDEF_MERGE_RESOURCES) && rsrc.HasResource(code, id.id))
-	{
 		abort_compile(RDEF_COMPILE_ERR, "duplicate resource");
-	}
 
 	status_t err = rsrc.AddResource(code, id.id, data.ptr, data.size, id.name);
-
-	if (err != B_OK)
-	{
+	if (err != B_OK) {
 		rdef_err = RDEF_WRITE_ERR;
 		rdef_err_line = 0;
 		strcpy(rdef_err_file, rsrc_file);
@@ -1427,18 +1386,16 @@ void add_resource(res_id_t id, type_code code, data_t data)
 	}
 
 	if (id.has_name)
-	{
 		free_mem(id.name);
-	}
 
 	free_mem(data.ptr);
 }
 
-//------------------------------------------------------------------------------
 
-static void add_point_type()
+static void
+add_point_type()
 {
-	field_t* fields  = (field_t*) alloc_mem(2 * sizeof(field_t));
+	field_t* fields  = (field_t*)alloc_mem(2 * sizeof(field_t));
 	fields[0].type   = get_type("float");
 	fields[0].name   = "x";
 	fields[0].resize = 0;
@@ -1459,11 +1416,11 @@ static void add_point_type()
 	type_table.insert(make_pair(type.name, type));
 }
 
-//------------------------------------------------------------------------------
 
-static void add_rect_type()
+static void
+add_rect_type()
 {
-	field_t* fields  = (field_t*) alloc_mem(4 * sizeof(field_t));
+	field_t* fields  = (field_t*)alloc_mem(4 * sizeof(field_t));
 	fields[0].type   = get_type("float");
 	fields[0].name   = "left";
 	fields[0].resize = 0;
@@ -1492,11 +1449,11 @@ static void add_rect_type()
 	type_table.insert(make_pair(type.name, type));
 }
 
-//------------------------------------------------------------------------------
 
-static void add_rgb_color_type()
+static void
+add_rgb_color_type()
 {
-	field_t* fields  = (field_t*) alloc_mem(4 * sizeof(field_t));
+	field_t* fields  = (field_t*)alloc_mem(4 * sizeof(field_t));
 	fields[0].type   = get_type("uint8");
 	fields[0].name   = "red";
 	fields[0].resize = 0;
@@ -1514,7 +1471,7 @@ static void add_rgb_color_type()
 	fields[3].resize = 0;
 	fields[3].data   = make_default(fields[3].type);
 
-	*((uint8*) fields[3].data.ptr) = 255;
+	*((uint8*)fields[3].data.ptr) = 255;
 
 	type_t type;
 	type.code     = B_RGB_COLOR_TYPE;
@@ -1527,11 +1484,11 @@ static void add_rgb_color_type()
 	type_table.insert(make_pair(type.name, type));
 }
 
-//------------------------------------------------------------------------------
 
-static void add_app_signature_type()
+static void
+add_app_signature_type()
 {
-	field_t* fields  = (field_t*) alloc_mem(1 * sizeof(field_t));
+	field_t* fields  = (field_t*)alloc_mem(1 * sizeof(field_t));
 	fields[0].type   = get_type("string");
 	fields[0].name   = "signature";
 	fields[0].resize = 0;
@@ -1548,11 +1505,11 @@ static void add_app_signature_type()
 	type_table.insert(make_pair(type.name, type));
 }
 
-//------------------------------------------------------------------------------
 
-static void add_app_flags()
+static void
+add_app_flags()
 {
-	field_t* fields  = (field_t*) alloc_mem(1 * sizeof(field_t));
+	field_t* fields  = (field_t*)alloc_mem(1 * sizeof(field_t));
 	fields[0].type   = get_type("uint32");
 	fields[0].name   = "flags";
 	fields[0].resize = 0;
@@ -1569,11 +1526,11 @@ static void add_app_flags()
 	type_table.insert(make_pair(type.name, type));
 }
 
-//------------------------------------------------------------------------------
 
-static void add_app_version()
+static void
+add_app_version()
 {
-	field_t* fields  = (field_t*) alloc_mem(7 * sizeof(field_t));
+	field_t* fields  = (field_t*)alloc_mem(7 * sizeof(field_t));
 	fields[0].type   = get_type("uint32");
 	fields[0].name   = "major";
 	fields[0].resize = 0;
@@ -1617,11 +1574,11 @@ static void add_app_version()
 	type_table.insert(make_pair(type.name, type));
 }
 
-//------------------------------------------------------------------------------
 
-static void add_large_icon()
+static void
+add_large_icon()
 {
-	field_t* fields  = (field_t*) alloc_mem(1 * sizeof(field_t));
+	field_t* fields  = (field_t*)alloc_mem(1 * sizeof(field_t));
 	fields[0].type   = get_type("raw");
 	fields[0].name   = "icon";
 	fields[0].resize = 1024;
@@ -1638,11 +1595,11 @@ static void add_large_icon()
 	type_table.insert(make_pair(type.name, type));
 }
 
-//------------------------------------------------------------------------------
 
-static void add_mini_icon()
+static void
+add_mini_icon()
 {
-	field_t* fields  = (field_t*) alloc_mem(1 * sizeof(field_t));
+	field_t* fields  = (field_t*)alloc_mem(1 * sizeof(field_t));
 	fields[0].type   = get_type("raw");
 	fields[0].name   = "icon";
 	fields[0].resize = 256;
@@ -1659,11 +1616,11 @@ static void add_mini_icon()
 	type_table.insert(make_pair(type.name, type));
 }
 
-//------------------------------------------------------------------------------
 
-static void add_file_types()
+static void
+add_file_types()
 {
-	field_t* fields  = (field_t*) alloc_mem(1 * sizeof(field_t));
+	field_t* fields  = (field_t*)alloc_mem(1 * sizeof(field_t));
 	fields[0].type   = get_type("message");
 	fields[0].name   = "types";
 	fields[0].resize = 0;
@@ -1680,9 +1637,9 @@ static void add_file_types()
 	type_table.insert(make_pair(type.name, type));
 }
 
-//------------------------------------------------------------------------------
 
-static void add_define(char* name, int32 value)
+static void
+add_define(char* name, int32 value)
 {
 	define_t define;
 	define.name  = name;
@@ -1691,9 +1648,9 @@ static void add_define(char* name, int32 value)
 	define_table.insert(make_pair(define.name, define));
 }
 
-//------------------------------------------------------------------------------
 
-void init_parser()
+void
+init_parser()
 {
 	add_builtin_type(B_BOOL_TYPE,    "bool");
 	add_builtin_type(B_INT8_TYPE,    "int8");
@@ -1739,9 +1696,9 @@ void init_parser()
 	add_define("B_APPV_FINAL",         0x5);
 }
 
-//------------------------------------------------------------------------------
 
-void clean_up_parser()
+void
+clean_up_parser()
 {
 	// The symbol table entries have several malloc'ed objects associated
 	// with them (such as their name). They were allocated with alloc_mem(),
@@ -1756,17 +1713,15 @@ void clean_up_parser()
 	// alloc_mem()'d but we still free_mem() them. Not entirely correct, but
 	// it doesn't seem to hurt, and we only do it in DEBUG mode anyway.
 
-	for (sym_iter_t i = symbol_table.begin(); i != symbol_table.end(); ++i)
-	{
+	for (sym_iter_t i = symbol_table.begin(); i != symbol_table.end(); ++i) {
 		free_mem(i->first);
 	}
 
-	for (type_iter_t i = type_table.begin(); i != type_table.end(); ++i)
-	{
+	for (type_iter_t i = type_table.begin(); i != type_table.end(); ++i) {
 		free_mem(i->first);
 		type_t type = i->second;
-		for (int32 t = 0; t < type.count; ++t)
-		{
+
+		for (int32 t = 0; t < type.count; ++t) {
 			free_mem(type.fields[t].name);
 			free_mem(type.fields[t].data.ptr);
 		}
@@ -1781,4 +1736,3 @@ void clean_up_parser()
 	define_table.clear();
 }
 
-//------------------------------------------------------------------------------
