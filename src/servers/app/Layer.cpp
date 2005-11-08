@@ -93,10 +93,10 @@ Layer::Layer(BRect frame, const char* name, int32 token,
 	fOverlayBitmap(NULL)
 {
 	if (!frame.IsValid()) {
-char helper[1024];
-sprintf(helper, "Layer::Layer(BRect(%.1f, %.1f, %.1f, %.1f), name: %s, token: %ld) - frame is invalid\n",
-		frame.left, frame.top, frame.right, frame.bottom, name, token);
-CRITICAL(helper);
+		char helper[1024];
+		sprintf(helper, "Layer::Layer(BRect(%.1f, %.1f, %.1f, %.1f), name: %s, token: %ld) - frame is invalid\n",
+			frame.left, frame.top, frame.right, frame.bottom, name, token);
+		CRITICAL(helper);
 		fFrame.Set(0, 0, 1, 1);
 	}
 
@@ -563,12 +563,14 @@ Layer::Bounds(void) const
 	return r;
 }
 
+
 //! Matches the BView call of the same name
 BRect
 Layer::Frame(void) const
 {
 	return fFrame;
 }
+
 
 //! Moves the layer by specified values, complete with redraw
 void
@@ -587,6 +589,7 @@ Layer::MoveBy(float x, float y)
 	STRACE(("Layer(%s)::MoveBy() END\n", Name()));
 }
 
+
 //! Resize the layer by the specified amount, complete with redraw
 void
 Layer::ResizeBy(float x, float y)
@@ -594,7 +597,9 @@ Layer::ResizeBy(float x, float y)
 	STRACE(("Layer(%s)::ResizeBy() START\n", Name()));
 
 	if (!fParent) {
-		printf("ERROR: in Layer::ResizeBy()! - No parent!\n");
+		// there is no parent yet, so we'll silently adopt the new size
+		fFrame.right += x;
+		fFrame.bottom += y;
 		return;
 	}
 
@@ -604,6 +609,7 @@ Layer::ResizeBy(float x, float y)
 
 	STRACE(("Layer(%s)::ResizeBy() END\n", Name()));
 }
+
 
 //! scrolls the layer by the specified amount, complete with redraw
 void
@@ -1327,10 +1333,9 @@ Layer::resize_layer_frame_by(float x, float y)
 			// call hook function
 			ResizedByHook(dx, dy, true); // automatic
 
-			for (Layer *lay = LastChild(); lay; lay = PreviousChild())
-				lay->resize_layer_frame_by(dx, dy);
-		}
-		else
+			for (Layer *child = LastChild(); child != NULL; child = PreviousChild())
+				child->resize_layer_frame_by(dx, dy);
+		} else
 			MovedByHook(dx, dy);
 	}
 }
@@ -1412,8 +1417,8 @@ Layer::do_ResizeBy(float dx, float dy)
 	fFrame.Set(fFrame.left, fFrame.top, fFrame.right+dx, fFrame.bottom+dy);
 
 	// resize children using their resize_mask.
-	for (Layer *lay = LastChild(); lay; lay = PreviousChild())
-			lay->resize_layer_frame_by(dx, dy);
+	for (Layer *child = LastChild(); child != NULL; child = PreviousChild())
+		child->resize_layer_frame_by(dx, dy);
 
 	// call hook function
 	if (dx != 0.0f || dy != 0.0f)

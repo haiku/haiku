@@ -127,12 +127,8 @@ WinBorder::WinBorder(const BRect &frame,
 		uint16 width, height;
 		uint32 colorSpace;
 		float frequency;
-		if (GetRootLayer() == NULL)
-			debugger("WinBorder: no root layer");
-		if (GetRootLayer()->GetDesktop() == NULL)
-			debugger("WinBorder: no desktop");
-		if (GetRootLayer()->GetDesktop()->ScreenAt(0)) {
-			GetRootLayer()->GetDesktop()->ScreenAt(0)->GetMode(width, height, colorSpace, frequency);
+		if (window->App()->GetDesktop()->ScreenAt(0)) {
+			window->App()->GetDesktop()->ScreenAt(0)->GetMode(width, height, colorSpace, frequency);
 			_ResizeBy(width - frame.Width(), height - frame.Height());
 		}
 	}
