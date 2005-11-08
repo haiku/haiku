@@ -751,8 +751,14 @@ BMessage* make_msg(list_t list)
 
 data_t flatten_msg(BMessage* msg)
 {
+#ifndef B_BEOS_VERSION_DANO
 	data_t out = make_data(msg->FlattenedSize(), get_type("message"));
-	msg->Flatten((char*) out.ptr, out.size);
+	msg->Flatten((char*)out.ptr, out.size);
+#else
+	data_t out = make_data(msg->FlattenedSize(B_MESSAGE_VERSION_1),
+		get_type("message"));
+	msg->Flatten(B_MESSAGE_VERSION_1, (char*)out.ptr, out.size);
+#endif
 	delete msg;
 	return out;
 }
