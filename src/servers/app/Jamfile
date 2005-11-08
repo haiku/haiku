@@ -30,7 +30,6 @@ SharedLibrary libappserver.so :
 	DrawState.cpp
 	FontFamily.cpp
 	HashTable.cpp
-	IPoint.cpp
 	RGBColor.cpp
 	ServerBitmap.cpp
 	ServerCursor.cpp
