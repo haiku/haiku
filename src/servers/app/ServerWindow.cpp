@@ -765,8 +765,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// our offset in the parent -> will be originX and originY in BView
 			fLink.Attach<float>(fCurrentLayer->fFrame.left);
 			fLink.Attach<float>(fCurrentLayer->fFrame.top);
-			// convert frame to bounds
-			fLink.Attach<BRect>(fCurrentLayer->fFrame.OffsetToCopy(fCurrentLayer->BoundsOrigin()));
+			fLink.Attach<BRect>(fCurrentLayer->Bounds());
 			fLink.Flush();
 			break;
 		}

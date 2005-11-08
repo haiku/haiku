@@ -712,13 +712,14 @@ Layer::Activated(bool active)
 BPoint
 Layer::BoundsOrigin() const
 {
-	BPoint origin(0, 0);
+	BPoint origin(fDrawState->Origin());
 	float scale = Scale();
 
-	DrawState* layerData = fDrawState;
-	do {
-		origin += layerData->Origin();
-	} while ((layerData = layerData->PreviousState()) != NULL);
+	// TODO: Figure this out, BoundsOrigin()
+	// is used for BView::Bounds(), but I think
+	// that the scale has nothing to do with it
+	// "local coordinate system origin" does have
+	// something to do with scale.
 
 	origin.x *= scale;
 	origin.y *= scale;
@@ -1473,7 +1474,6 @@ void Layer::do_MoveBy(float dx, float dy)
 	if (dx == 0.0f && dy == 0.0f)
 		return;
 
-//	fFrame.Set(fFrame.left+dx, fFrame.top+dy, fFrame.right+dx, fFrame.bottom+dy);
 	fFrame.OffsetBy(dx, dy);
 
 	// call hook function
@@ -1552,8 +1552,6 @@ Layer::do_ScrollBy(float dx, float dy)
 
 	if (dx != 0.0f || dy != 0.0f)
 		ScrolledByHook(dx, dy);
-
-	SendViewCoordUpdateMsg();
 }
 
 void

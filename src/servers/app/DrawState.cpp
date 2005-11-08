@@ -268,7 +268,7 @@ DrawState::WriteToLink(BPrivate::LinkSender& link) const
 void
 DrawState::SetOrigin(const BPoint& origin)
 {
-	fOrigin = origin;
+	fOrigin = fPreviousState ? fPreviousState->fOrigin + origin : origin;
 }
 
 
@@ -371,6 +371,8 @@ DrawState::PenLocation() const
 void
 DrawState::SetPenSize(float size)
 {
+	// NOTE: since pensize is calculated on the fly,
+	// it is ok to set it here regardless of previous state
 	fPenSize = size;
 }
 
