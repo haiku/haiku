@@ -119,15 +119,22 @@ BPrivate::unflatten_dano_message(uint32 magic, BDataIO &stream,
 		SectionHeader sectionHeader;
 		reader(sectionHeader);
 
+		// be safe. this shouldn't be necessary but in some testcases it was.
+		sectionHeader.size = pad_to_8(sectionHeader.size);
+
 		if (offset + sectionHeader.size > size)
 			return B_BAD_DATA;
 
 		ssize_t fieldSize = sectionHeader.size - sizeof(SectionHeader);
-		uint8 *fieldBuffer = (uint8 *)malloc(fieldSize);
-		if (fieldBuffer == NULL)
-			throw (status_t)B_NO_MEMORY;
+		uint8 *fieldBuffer = NULL;
+		if (fieldSize > 0) {
+			// there may be no data. we shouldn't fail because of that
+			fieldBuffer = (uint8 *)malloc(fieldSize);
+			if (fieldBuffer == NULL)
+				throw (status_t)B_NO_MEMORY;
 
-		reader(fieldBuffer, fieldSize);
+			reader(fieldBuffer, fieldSize);
+		}
 
 		switch (sectionHeader.code) {
 			case SECTION_OFFSET_TABLE: break; /* discard */
@@ -208,10 +215,11 @@ BPrivate::unflatten_dano_message(uint32 magic, BDataIO &stream,
 				dataOffset = pad_to_8(dataOffset);
 				int32 count = *(int32 *)(fieldBuffer + dataOffset);
 				dataOffset += sizeof(int32);
-				ssize_t totalSize = *(ssize_t *)fieldBuffer + dataOffset;
+				ssize_t totalSize = *(ssize_t *)(fieldBuffer + dataOffset);
 				dataOffset += sizeof(ssize_t);
 
-				int32 *endPoints = (int32 *)fieldBuffer + dataOffset + totalSize;
+				int32 *endPoints = (int32 *)(fieldBuffer + dataOffset
+					+ totalSize);
 
 				status_t result = B_OK;
 				for (int32 i = 0; i < count; i++) {
@@ -234,6 +242,5 @@ BPrivate::unflatten_dano_message(uint32 magic, BDataIO &stream,
 		offset += sectionHeader.size;
 	}
 
-	message.PrintToStream();
 	return B_OK;
 }
