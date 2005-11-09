@@ -1108,6 +1108,40 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		/* font messages */
 
+		case AS_SET_SYSTEM_FONT:
+		{
+			// gets:
+			//	1) string - font type ("plain", ...)
+			//	2) string - family
+			//	3) string - style
+			//	4) float - size
+			
+			char type[B_OS_NAME_LENGTH];
+			font_family familyName;
+			font_style styleName;
+			float size;
+
+			if (link.ReadString(type, sizeof(type)) == B_OK
+				&& link.ReadString(familyName, sizeof(familyName)) == B_OK
+				&& link.ReadString(styleName, sizeof(styleName)) == B_OK
+				&& link.Read<float>(&size) == B_OK) {
+				BAutolock locker(gFontManager);
+
+				FontStyle* style = gFontManager->GetStyle(familyName, styleName);
+				if (style != NULL) {
+					ServerFont font(*style, size);
+					DesktopSettings settings(fDesktop);
+
+					if (!strcmp(type, "plain"))
+						settings.SetDefaultPlainFont(font);
+					else if (!strcmp(type, "bold"))
+						settings.SetDefaultBoldFont(font);
+					else if (!strcmp(type, "fixed"))
+						settings.SetDefaultFixedFont(font);
+				}
+			}
+			break;
+		}
 		case AS_GET_SYSTEM_DEFAULT_FONT:
 		{
 			// input:
