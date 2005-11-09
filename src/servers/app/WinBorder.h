@@ -50,8 +50,7 @@ class WinBorder : public Layer {
 	virtual	void				MoveBy(float x, float y);
 	virtual	void				ResizeBy(float x, float y);
 	virtual	void				ScrollBy(float x, float y)
-								{ // not allowed
-								}
+									{ /* not allowed */ }
 
 	virtual	void				SetName(const char* name);
 
@@ -117,9 +116,6 @@ class WinBorder : public Layer {
 
 			SubWindowList		fSubWindowList;
 
-	virtual	void				MovedByHook(float dx, float dy);
-	virtual	void				ResizedByHook(float dx, float dy, bool automatic);
-
 			void				RequestClientRedraw(const BRegion &invalid);
 
 	virtual	void				SetTopLayer(Layer* layer);
@@ -133,7 +129,6 @@ class WinBorder : public Layer {
 	friend class RootLayer;
 
 			click_type			_ActionFor(const BMessage *msg) const;
-			bool				_ResizeBy(float x, float y);
 
 			Decorator*			fDecorator;
 			Layer*				fTopLayer;

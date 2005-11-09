@@ -130,7 +130,8 @@ WinBorder::WinBorder(const BRect &frame,
 		float frequency;
 		if (window->App()->GetDesktop()->ScreenAt(0)) {
 			window->App()->GetDesktop()->ScreenAt(0)->GetMode(width, height, colorSpace, frequency);
-			_ResizeBy(width - frame.Width(), height - frame.Height());
+// TODO: MOVE THIS AWAY!!! RemoveBy contains calls to virtual methods! Also, there is not TopLayer()!
+			WinBorder::ResizeBy(width - frame.Width(), height - frame.Height());
 		}
 	}
 
@@ -173,9 +174,37 @@ WinBorder::Draw(const BRect &r)
 void
 WinBorder::MoveBy(float x, float y)
 {
-	if (x == 0 && y == 0)
+	if (x == 0.0f && y == 0.0f)
 		return;
-		
+
+	// lock here because we play with some regions
+	if (GetRootLayer() && GetRootLayer()->Lock()) {
+		fDecRegion.OffsetBy(x, y);
+
+		fCumulativeRegion.OffsetBy(x, y);
+		fInUpdateRegion.OffsetBy(x, y);
+
+		if (fDecorator)
+			fDecorator->MoveBy(x, y);
+
+		Layer::MoveBy(x, y);
+
+		GetRootLayer()->Unlock();
+	}
+	// just offset to the new position
+	else {
+		if (fDecorator)
+			fDecorator->MoveBy(x, y);
+
+		Layer::MoveBy(x, y);
+	}
+
+	// dispatch a message to the client informing about the changed size
+	BMessage msg(B_WINDOW_MOVED);
+	msg.AddInt64("when",  system_time());
+	msg.AddPoint("where", Frame().LeftTop());
+	Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
+
 	// TODO: MoveBy and ResizeBy() are usually called
 	// from the rootlayer's thread. HandleDirectConnection() could
 	// block the calling thread for ~3 seconds in the worst case, 
@@ -185,27 +214,13 @@ WinBorder::MoveBy(float x, float y)
 	// Find some way to call DirectConnected() from the ServerWindow's thread,
 	// by sending a message from here or whatever.	
 	//Window()->HandleDirectConnection(B_DIRECT_STOP);
-	Layer::MoveBy(x, y);
+//	Layer::MoveBy(x, y);
 	//Window()->HandleDirectConnection(B_DIRECT_START|B_BUFFER_MOVED);
 }
 
 
 void
 WinBorder::ResizeBy(float x, float y)
-{
-	STRACE(("WinBorder(%s)::ResizeBy()\n", Name()));
-	if (x == 0 && y == 0)
-		return;
-	
-	//Window()->HandleDirectConnection(B_DIRECT_STOP);
-	_ResizeBy(x, y);
-	//Window()->HandleDirectConnection(B_DIRECT_START|B_BUFFER_RESIZED);
-}
-
-
-//! Resizes the winborder with redraw
-bool
-WinBorder::_ResizeBy(float x, float y)
 {
 	float wantWidth = fFrame.Width() + x;
 	float wantHeight = fFrame.Height() + y;
@@ -225,11 +240,34 @@ WinBorder::_ResizeBy(float x, float y)
 	y = wantHeight - fFrame.Height();
 
 	if (x == 0.0 && y == 0.0)
-		return false;
+		return;
 
-	Layer::ResizeBy(x, y);
+	// this method can be called from a ServerWindow thread or from a RootLayer one,
+	// so lock
+	if (GetRootLayer() && GetRootLayer()->Lock()) {
+		fRebuildDecRegion = true;
 
-	return true;
+		if (fDecorator)
+			fDecorator->ResizeBy(x, y);
+
+		Layer::ResizeBy(x, y);
+
+		GetRootLayer()->Unlock();
+	}
+	else {
+		if (fDecorator)
+			fDecorator->ResizeBy(x, y);
+
+		Layer::ResizeBy(x, y);
+	}
+
+	// send a message to the client informing about the changed size
+	BRect frame(Frame());
+	BMessage msg(B_WINDOW_RESIZED);
+	msg.AddInt64("when", system_time());
+	msg.AddInt32("width", frame.IntegerWidth());
+	msg.AddInt32("height", frame.IntegerHeight());
+	Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
 }
 
 // SetName
@@ -284,7 +322,6 @@ WinBorder::UpdateEnd()
 	if (fCumulativeRegion.CountRects() > 0) {
 		GetRootLayer()->MarkForRedraw(fCumulativeRegion);
 		GetRootLayer()->TriggerRedraw();
-//		RequestDraw(reg, NULL);
 	}
 }
 void
@@ -293,7 +330,6 @@ WinBorder::EnableUpdateRequests() {
 	if (fCumulativeRegion.CountRects() > 0) {
 		GetRootLayer()->MarkForRedraw(fCumulativeRegion);
 		GetRootLayer()->TriggerRedraw();
-//		RequestDraw(reg, NULL);
 	}
 }
 
@@ -715,42 +751,6 @@ WinBorder::_ActionFor(const BMessage *msg) const
 		return fDecorator->Clicked(where, buttons, modifiers);
 	else
 		return DEC_NONE;
-}
-
-void WinBorder::MovedByHook(float dx, float dy)
-{
-	STRACE(("WinBorder(%s)::MovedByHook(%.1f, %.1f) fDecorator: %p\n", Name(), x, y, fDecorator));
-
-	fDecRegion.OffsetBy(dx, dy);
-
-	if (fDecorator)
-		fDecorator->MoveBy(dx, dy);
-
-	fCumulativeRegion.OffsetBy(dx, dy);
-	fInUpdateRegion.OffsetBy(dx, dy);
-
-	// dispatch a message to the client informing about the changed size
-	BMessage msg(B_WINDOW_MOVED);
-	msg.AddInt64("when",  system_time());
-	msg.AddPoint("where", Frame().LeftTop());
-	Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
-}
-
-void WinBorder::ResizedByHook(float dx, float dy, bool automatic)
-{
-	STRACE(("WinBorder(%s)::ResizedByHook(%.1f, %.1f, %s) fDecorator: %p\n", Name(), x, y, automatic?"true":"false", fDecorator));
-	fRebuildDecRegion = true;
-
-	if (fDecorator)
-		fDecorator->ResizeBy(dx, dy);
-
-	// send a message to the client informing about the changed size
-	BRect frame(fTopLayer->Frame());
-	BMessage msg(B_WINDOW_RESIZED);
-	msg.AddInt64("when", system_time());
-	msg.AddInt32("width", frame.IntegerWidth());
-	msg.AddInt32("height", frame.IntegerHeight());
-	Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
 }
 
 void WinBorder::set_decorator_region(BRect bounds)

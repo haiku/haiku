@@ -564,17 +564,58 @@ Layer::Frame(void) const
 void
 Layer::MoveBy(float x, float y)
 {
-	STRACE(("Layer(%s)::MoveBy() START\n", Name()));
-	if (!fParent) {
-		fFrame.OffsetBy(x, y);
+	STRACE(("Layer(%s)::MoveBy()\n", Name()));
+
+	if (x == 0.0f && y == 0.0f)
 		return;
+
+	// must lock, even if we change frame coordinates
+	if (fParent && !IsHidden() && GetRootLayer() && GetRootLayer()->Lock()) {
+		fFrame.OffsetBy(x, y);
+
+		BRegion oldFullVisible(fFullVisible2);
+
+		// we'll invalidate the old position and the new, maxmial one.
+		BRegion invalid;
+		GetWantedRegion(invalid);
+		invalid.Include(&fFullVisible2);
+
+		fParent->MarkForRebuild(invalid);
+		fParent->TriggerRebuild();
+
+		// done rebuilding regions, now copy common parts and redraw regions that became visible
+
+		// include the actual and the old fullVisible regions. later, we'll exclude the common parts.
+		BRegion		redrawReg(fFullVisible2);
+		redrawReg.Include(&oldFullVisible);
+
+		// offset to layer's new location so that we can calculate the common region.
+		oldFullVisible.OffsetBy(x, y);
+
+		// finally we have the region that needs to be redrawn.
+		redrawReg.Exclude(&oldFullVisible);
+
+		// by intersecting the old fullVisible offseted to layer's new location, with the current
+		// fullVisible, we'll have the common region which can be copied using HW acceleration.
+		oldFullVisible.IntersectWith(&fFullVisible2);
+
+		// offset back and instruct the HW to do the actual copying.
+		oldFullVisible.OffsetBy(-x, -y);
+		GetDrawingEngine()->CopyRegion(&oldFullVisible, x, y);
+
+		GetRootLayer()->MarkForRedraw(redrawReg);
+		GetRootLayer()->TriggerRedraw();
+
+		GetRootLayer()->Unlock();
+	}
+	else {
+		// just offset to the new position
+		fFrame.OffsetBy(x, y);
 	}
 
-	GetRootLayer()->Lock();
-	do_MoveBy(x, y);
-	GetRootLayer()->Unlock();
+	MovedByHook(x, y);
 
-	STRACE(("Layer(%s)::MoveBy() END\n", Name()));
+	SendViewCoordUpdateMsg();
 }
 
 
@@ -582,20 +623,88 @@ Layer::MoveBy(float x, float y)
 void
 Layer::ResizeBy(float x, float y)
 {
-	STRACE(("Layer(%s)::ResizeBy() START\n", Name()));
+	STRACE(("Layer(%s)::ResizeBy()\n", Name()));
 
-	if (!fParent) {
-		// there is no parent yet, so we'll silently adopt the new size
-		fFrame.right += x;
-		fFrame.bottom += y;
+	if (x == 0.0f && y == 0.0f)
 		return;
+
+	// must lock, even if we change frame coordinates
+	if (fParent && !IsHidden() && GetRootLayer() && GetRootLayer()->Lock()) {
+		fFrame.Set(fFrame.left, fFrame.top, fFrame.right+x, fFrame.bottom+y);
+
+// TODO: you should call this hook function AFTER all region rebuilding
+//		 and redrawing stuff
+		ResizedByHook(x, y, false);
+
+// TODO: ResizedByHook(x,y,true) is called from inside _ResizeLayerFrameBy
+//		 Should call this AFTER region rebuilding and redrawing.
+		// resize children using their resize_mask.
+		for (Layer *child = LastChild(); child != NULL; child = PreviousChild())
+			child->_ResizeLayerFrameBy(x, y);
+
+		BRegion oldFullVisible(fFullVisible2);
+		// this is required to invalidate the old border
+		BRegion oldVisible(fVisible2);
+
+		// in case they moved, bottom, right and center aligned layers must be redrawn
+		BRegion redrawMore;
+		_RezizeLayerRedrawMore(redrawMore, x, y);
+
+		// we'll invalidate the old area and the new, maxmial one.
+		BRegion invalid;
+		GetWantedRegion(invalid);
+		invalid.Include(&fFullVisible2);
+
+		fParent->MarkForRebuild(invalid);
+		fParent->TriggerRebuild();
+
+		// done rebuilding regions, now redraw regions that became visible
+
+		// what's invalid, are the differences between to old and the new fullVisible region
+		// 1) in case we grow.
+		BRegion		redrawReg(fFullVisible2);
+		redrawReg.Exclude(&oldFullVisible);
+		// 2) in case we shrink
+		BRegion		redrawReg2(oldFullVisible);
+		redrawReg2.Exclude(&fFullVisible2);
+		// 3) combine.
+		redrawReg.Include(&redrawReg2);
+
+		// for center, right and bottom alligned layers, redraw their old positions
+		redrawReg.Include(&redrawMore);
+
+		// layers that had their frame modified must be entirely redrawn.
+		_RezizeLayerRedrawMore(redrawReg, x, y);
+
+		// include layer's visible region in case we want a full update on resize
+		if (fFlags & B_FULL_UPDATE_ON_RESIZE && fVisible2.Frame().IsValid()) {
+			_ResizeLayerFullUpdateOnResize(redrawReg, x, y);
+
+			redrawReg.Include(&fVisible2);
+			redrawReg.Include(&oldVisible);
+		}
+
+		GetRootLayer()->MarkForRedraw(redrawReg);
+		GetRootLayer()->TriggerRedraw();
+
+		GetRootLayer()->Unlock();
+	}
+	// just resize our frame and those of out descendants if their resize mask says so
+	else {
+		fFrame.Set(fFrame.left, fFrame.top, fFrame.right+x, fFrame.bottom+y);
+
+// TODO: you should call this hook function AFTER all region rebuilding
+//		 and redrawing stuff
+		ResizedByHook(x, y, false);
+
+// TODO: ResizedByHook(x,y,true) is called from inside _ResizeLayerFrameBy
+//		 Should call this AFTER region rebuilding and redrawing.
+		// resize children using their resize_mask.
+		for (Layer *child = LastChild(); child != NULL; child = PreviousChild())
+			child->_ResizeLayerFrameBy(x, y);
 	}
 
-	GetRootLayer()->Lock();
-	do_ResizeBy(x, y);
-	GetRootLayer()->Unlock();
-
-	STRACE(("Layer(%s)::ResizeBy() END\n", Name()));
+	SendViewCoordUpdateMsg();
 }
 
 
@@ -603,13 +712,51 @@ Layer::ResizeBy(float x, float y)
 void
 Layer::ScrollBy(float x, float y)
 {
-	STRACE(("Layer(%s)::ScrollBy() START\n", Name()));
+	STRACE(("Layer(%s)::ScrollBy()\n", Name()));
 
-	GetRootLayer()->Lock();
-	do_ScrollBy(x, y);
-	GetRootLayer()->Unlock();
+	if (x == 0.0f && y == 0.0f)
+		return;
 
-	STRACE(("Layer(%s)::ScrollBy() END\n", Name()));
+	// must lock, even if we change frame/origin coordinates
+	if (fParent && !IsHidden() && GetRootLayer() && GetRootLayer()->Lock()) {
+		fDrawState->OffsetOrigin(BPoint(x, y));
+
+		// set the region to be invalidated.
+		BRegion		invalid(fFullVisible2);
+
+		MarkForRebuild(invalid);
+
+		TriggerRebuild();
+
+		// for the moment we say that the whole surface needs to be redraw.
+		BRegion		redrawReg(fFullVisible2);
+
+		// offset old region so that we can start comparing.
+		invalid.OffsetBy(x, y);
+
+		// compute the common region. we'll use HW acc to copy this to the new location.
+		invalid.IntersectWith(&fFullVisible2);
+		GetDrawingEngine()->CopyRegion(&invalid, -x, -y);
+
+		// common region goes back to its original location. then, by excluding
+		// it from curent fullVisible we'll obtain the region that needs to be redrawn.
+		invalid.OffsetBy(-x, -y);
+// TODO: a quick fix for the scrolling problem!!! FIX THIS!
+//		redrawReg.Exclude(&invalid);
+
+		GetRootLayer()->MarkForRedraw(redrawReg);
+		GetRootLayer()->TriggerRedraw();
+
+		GetRootLayer()->Unlock();
+	}
+	else {
+		fDrawState->OffsetOrigin(BPoint(x, y));	
+	}
+
+	ScrolledByHook(x, y);
+
+// TODO: I think we should update the client-side that bounds rect has modified
+//	SendViewCoordUpdateMsg();
 }
 
 void
@@ -1200,154 +1347,6 @@ Layer::_ResizeLayerFullUpdateOnResize(BRegion &reg, float dx, float dy)
 }
 
 void
-Layer::do_ResizeBy(float dx, float dy)
-{
-	fFrame.Set(fFrame.left, fFrame.top, fFrame.right+dx, fFrame.bottom+dy);
-
-	// resize children using their resize_mask.
-	for (Layer *child = LastChild(); child != NULL; child = PreviousChild())
-		child->_ResizeLayerFrameBy(dx, dy);
-
-	// call hook function
-	if (dx != 0.0f || dy != 0.0f)
-		ResizedByHook(dx, dy, false); // manual
-
-	if (!IsHidden() && GetRootLayer()) {
-		BRegion oldFullVisible(fFullVisible2);
-		// this is required to invalidate the old border
-		BRegion oldVisible(fVisible2);
-
-		// in case they moved, bottom, right and center aligned layers must be redrawn
-		BRegion redrawMore;
-		_RezizeLayerRedrawMore(redrawMore, dx, dy);
-
-		// we'll invalidate the old area and the new, maxmial one.
-		BRegion invalid;
-		GetWantedRegion(invalid);
-		invalid.Include(&fFullVisible2);
-
-		fParent->MarkForRebuild(invalid);
-		fParent->TriggerRebuild();
-
-		// done rebuilding regions, now redraw regions that became visible
-
-		// what's invalid, are the differences between to old and the new fullVisible region
-		// 1) in case we grow.
-		BRegion		redrawReg(fFullVisible2);
-		redrawReg.Exclude(&oldFullVisible);
-		// 2) in case we shrink
-		BRegion		redrawReg2(oldFullVisible);
-		redrawReg2.Exclude(&fFullVisible2);
-		// 3) combine.
-		redrawReg.Include(&redrawReg2);
-
-		// for center, right and bottom alligned layers, redraw their old positions
-		redrawReg.Include(&redrawMore);
-
-		// layers that had their frame modified must be entirely redrawn.
-		_RezizeLayerRedrawMore(redrawReg, dx, dy);
-
-		// include layer's visible region in case we want a full update on resize
-		if (fFlags & B_FULL_UPDATE_ON_RESIZE && fVisible2.Frame().IsValid()) {
-			_ResizeLayerFullUpdateOnResize(redrawReg, dx, dy);
-
-			redrawReg.Include(&fVisible2);
-			redrawReg.Include(&oldVisible);
-		}
-
-		GetRootLayer()->MarkForRedraw(redrawReg);
-		GetRootLayer()->TriggerRedraw();
-	}
-
-	SendViewCoordUpdateMsg();
-}
-
-void Layer::do_MoveBy(float dx, float dy)
-{
-	if (dx == 0.0f && dy == 0.0f)
-		return;
-
-	fFrame.OffsetBy(dx, dy);
-
-	// call hook function
-	MovedByHook(dx, dy);
-
-	if (!IsHidden() && GetRootLayer()) {
-		BRegion oldFullVisible(fFullVisible2);
-
-		// we'll invalidate the old position and the new, maxmial one.
-		BRegion invalid;
-		GetWantedRegion(invalid);
-		invalid.Include(&fFullVisible2);
-
-		fParent->MarkForRebuild(invalid);
-		fParent->TriggerRebuild();
-
-		// done rebuilding regions, now copy common parts and redraw regions that became visible
-
-		// include the actual and the old fullVisible regions. later, we'll exclude the common parts.
-		BRegion		redrawReg(fFullVisible2);
-		redrawReg.Include(&oldFullVisible);
-
-		// offset to layer's new location so that we can calculate the common region.
-		oldFullVisible.OffsetBy(dx, dy);
-
-		// finally we have the region that needs to be redrawn.
-		redrawReg.Exclude(&oldFullVisible);
-
-		// by intersecting the old fullVisible offseted to layer's new location, with the current
-		// fullVisible, we'll have the common region which can be copied using HW acceleration.
-		oldFullVisible.IntersectWith(&fFullVisible2);
-
-		// offset back and instruct the HW to do the actual copying.
-		oldFullVisible.OffsetBy(-dx, -dy);
-		GetDrawingEngine()->CopyRegion(&oldFullVisible, dx, dy);
-
-		GetRootLayer()->MarkForRedraw(redrawReg);
-		GetRootLayer()->TriggerRedraw();
-	}
-
-	SendViewCoordUpdateMsg();
-}
-
-void
-Layer::do_ScrollBy(float dx, float dy)
-{
-	fDrawState->OffsetOrigin(BPoint(dx, dy));
-
-	if (!IsHidden() && GetRootLayer()) {
-		// set the region to be invalidated.
-		BRegion		invalid(fFullVisible2);
-
-		MarkForRebuild(invalid);
-
-		TriggerRebuild();
-
-		// for the moment we say that the whole surface needs to be redraw.
-		BRegion		redrawReg(fFullVisible2);
-
-		// offset old region so that we can start comparing.
-		invalid.OffsetBy(dx, dy);
-
-		// compute the common region. we'll use HW acc to copy this to the new location.
-		invalid.IntersectWith(&fFullVisible2);
-		GetDrawingEngine()->CopyRegion(&invalid, -dx, -dy);
-
-		// common region goes back to its original location. then, by excluding
-		// it from curent fullVisible we'll obtain the region that needs to be redrawn.
-		invalid.OffsetBy(-dx, -dy);
-// TODO: a quick fix for the scrolling problem!!! FIX THIS!
-//		redrawReg.Exclude(&invalid);
-
-		GetRootLayer()->MarkForRedraw(redrawReg);
-		GetRootLayer()->TriggerRedraw();
-	}
-
-	if (dx != 0.0f || dy != 0.0f)
-		ScrolledByHook(dx, dy);
-}
-
-void
 Layer::GetWantedRegion(BRegion &reg)
 {
 	// 1) set to frame in screen coords
@@ -1364,12 +1363,6 @@ Layer::GetWantedRegion(BRegion &reg)
 	DrawState *stackData = fDrawState;
 	while (stackData) {
 		if (stackData->ClippingRegion()) {
-			// transform in screen coords
-// NOTE: Already is in screen coords, but I leave this here in
-// case we change it
-//			BRegion screenReg(*stackData->ClippingRegion());
-//			ConvertToScreen2(&screenReg);
-//			reg.IntersectWith(&screenReg);
 			reg.IntersectWith(stackData->ClippingRegion());
 		}
 		stackData = stackData->PreviousState();

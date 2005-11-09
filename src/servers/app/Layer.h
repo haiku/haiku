@@ -216,9 +216,6 @@ class Layer {
 
  			void				do_Hide();
  			void				do_Show();
-			void				do_MoveBy(float dx, float dy);
-			void				do_ResizeBy(float dx, float dy);
-			void				do_ScrollBy(float dx, float dy);
 			void				do_CopyBits(BRect& src, BRect& dst,
 											int32 xOffset, int32 yOffset);
 
