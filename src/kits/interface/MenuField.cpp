@@ -465,9 +465,39 @@ void BMenuField::ResizeToPreferred()
 	BView::ResizeToPreferred();
 }
 //------------------------------------------------------------------------------
-void BMenuField::GetPreferredSize(float *width, float *height)
+void
+BMenuField::GetPreferredSize(float *_width, float *_height)
 {
-	BView::GetPreferredSize(width, height);
+	BView::GetPreferredSize(_width, _height);
+
+	if (!fFixedSizeMB) {
+		BMenu* menu = Menu();
+		float width = 0;
+
+		if (menu != NULL) {
+			if (menu->IsLabelFromMarked()) {
+				// find the width of the largest item
+				for (int32 i = menu->CountItems(); i-- > 0;) {
+					BMenuItem* item = menu->ItemAt(i);
+
+					if (item != NULL && item->Label() != NULL) {
+						float labelWidth = StringWidth(item->Label());
+						if (labelWidth > width)
+							width = labelWidth;
+					}
+				}
+			} else if (menu->Superitem() != NULL)
+				width = StringWidth(menu->Superitem()->Label());
+		}
+
+		// TODO: fix these values (they should match the visual appearance)
+		*_width = width + 45 + fDivider;
+
+		if (Label())
+			*_width += StringWidth(Label()) + 5;
+	}
+
+	*_height = fMenuBar->Bounds().Height();
 }
 //------------------------------------------------------------------------------
 status_t BMenuField::Perform(perform_code d, void *arg)
@@ -508,6 +538,15 @@ void BMenuField::InitObject(const char *label)
 void BMenuField::InitObject2()
 {
 	// TODO set filter
+	
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+
+	// TODO: fix this calculation
+	float height = floorf(fontHeight.ascent + fontHeight.descent
+		+ fontHeight.leading) + 7;
+
+	fMenuBar->ResizeTo(Bounds().Width() - fDivider, height);
 }
 //------------------------------------------------------------------------------
 void BMenuField::DrawLabel(BRect bounds, BRect update)
