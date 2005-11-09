@@ -2,56 +2,94 @@
  * Copyright 2001-2005, Haiku.
  * Distributed under the terms of the MIT License.
  *
+ * Authors:
+ *		Mark Hogben
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
+
+
 #include "FontView.h"
-#include "Pref_Utils.h"
+
 
 FontView::FontView(BRect rect)
 	: BView(rect, "Fonts", B_FOLLOW_ALL, B_WILL_DRAW)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
-	BRect bounds( Bounds().InsetByCopy(5, 5) );
-	BRect rect(bounds);
-	
-	rect.bottom = rect.top + FontHeight(true) *3.5;
-	fPlainView = new FontSelectionView(rect, "Plain", 
-												PLAIN_FONT_SELECTION_VIEW);
+	BRect rect(Bounds());
+
+	float labelWidth = StringWidth("Fixed Font:") + 8;
+
+	fPlainView = new FontSelectionView(rect, "plain", "Plain Font:", *be_plain_font);
+	fPlainView->SetDivider(labelWidth);
+	fPlainView->ResizeToPreferred();
 	AddChild(fPlainView);
-	
-	rect.OffsetBy(0, rect.Height() + 4);
-	fBoldView = new FontSelectionView(rect, "Bold", 
-												BOLD_FONT_SELECTION_VIEW);
+
+	rect.OffsetBy(0, fPlainView->Bounds().Height() + 10);
+	fBoldView = new FontSelectionView(rect, "bold", "Bold Font:", *be_bold_font);
+	fBoldView->SetDivider(labelWidth);
+	fBoldView->ResizeToPreferred();
 	AddChild(fBoldView);
-	
-	rect.OffsetBy(0, rect.Height() + 4);
-	fFixedView = new FontSelectionView(rect, "Fixed", 
-												FIXED_FONT_SELECTION_VIEW);
+
+	rect.OffsetBy(0, fPlainView->Bounds().Height() + 10);
+	fFixedView = new FontSelectionView(rect, "fixed", "Fixed Font:", *be_fixed_font);
+	fFixedView->SetDivider(labelWidth);
+	fFixedView->ResizeToPreferred();
 	AddChild(fFixedView);
 }
 
 
 void
-FontView::SetDefaults(void)
+FontView::GetPreferredSize(float *_width, float *_height)
 {
-	fPlainView->SetDefaults();
-	fBoldView->SetDefaults();
-	fFixedView->SetDefaults();
+	if (_width)
+		*_width = fPlainView->Bounds().Width();
+
+	if (_height)
+		*_height = fPlainView->Bounds().Height() * 3 + 20;
 }
 
-void
-FontView::Revert(void)
-{
-	fPlainView->Revert();
-	fBoldView->Revert();
-	fFixedView->Revert();
-}
 
 void
-FontView::RescanFonts(void)
+FontView::SetDefaults()
 {
-	fPlainView->RescanFonts();
-	fBoldView->RescanFonts();
-	fFixedView->RescanFonts();
+	for (int32 i = 0; i < CountChildren(); i++) {
+		FontSelectionView* view = dynamic_cast<FontSelectionView *>(ChildAt(i));
+		if (view == NULL)
+			continue;
+
+		view->SetDefaults();
+	}
+}
+
+
+void
+FontView::Revert()
+{
+	for (int32 i = 0; i < CountChildren(); i++) {
+		FontSelectionView* view = dynamic_cast<FontSelectionView *>(ChildAt(i));
+		if (view == NULL)
+			continue;
+
+		view->Revert();
+	}
+}
+
+
+void
+FontView::UpdateFonts()
+{
+	fPlainView->UpdateFontsMenu();
+	fBoldView->UpdateFontsMenu();
+	fFixedView->UpdateFontsMenu();
+}
+
+
+bool
+FontView::IsRevertable()
+{
+	return fPlainView->IsRevertable()
+		|| fBoldView->IsRevertable()
+		|| fFixedView->IsRevertable();
 }
 

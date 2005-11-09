@@ -1,14 +1,19 @@
 SubDir HAIKU_TOP src preferences fonts ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
 Preference Fonts :
-	ButtonView.cpp
 	FontSelectionView.cpp
 	FontsSettings.cpp
 	FontView.cpp
 	main.cpp
 	MainWindow.cpp
-	Pref_Utils.cpp 
-	: libbe.so
+	: be
 	: Fonts.rdef
 	;
 
+if $(TARGET_PLATFORM) = libbe_test {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Fonts
+		: tests!apps ;
+}

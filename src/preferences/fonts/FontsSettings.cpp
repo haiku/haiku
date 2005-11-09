@@ -1,6 +1,11 @@
 /*
  * Copyright 2001-2005, Haiku.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Mark Hogben
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 
@@ -65,6 +70,6 @@ FontsSettings::SetWindowCorner(BPoint where)
 void
 FontsSettings::SetDefaults()
 {
-	fCorner.Set(100, 100);
+	fCorner.Set(-1, -1);
 }
 

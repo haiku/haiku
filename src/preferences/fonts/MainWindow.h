@@ -1,26 +1,23 @@
 /*
  * Copyright 2001-2005, Haiku.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Mark Hogben
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H
 
-#include <Application.h>
-#include <Window.h>
-#include <TabView.h>
-#include <Box.h>
 
-#include "FontView.h"
-#include "ButtonView.h"
 #include "FontsSettings.h"
 
-#define M_ENABLE_REVERT 'enrv'
-#define M_REVERT 'rvrt'
-#define M_SET_DEFAULTS 'stdf'
+#include <Window.h>
 
-#define M_SET_PLAIN 'stpl'
-#define M_SET_BOLD 'stbl'
-#define M_SET_FIXED 'stfx'
+class BButton;
+class FontView;
+
 
 class MainWindow : public BWindow {
 	public:
@@ -30,10 +27,14 @@ class MainWindow : public BWindow {
 		virtual	void	MessageReceived(BMessage *message);
 
 	private:
-		FontView		*fSelectorView;
-		ButtonView		*fButtonView;
+		void			_Center();
+
+		FontView*		fFontsView;
+		BButton*		fRevertButton;
 
 		FontsSettings	fSettings;
 };
+
+static const int32 kMsgUpdate = 'updt';
 
 #endif	/* MAIN_WINDOW_H */

@@ -2,23 +2,30 @@
  * Copyright 2001-2005, Haiku.
  * Distributed under the terms of the MIT License.
  *
+ * Authors:
+ *		Mark Hogben
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 #ifndef FONTS_SETTINGS_H
 #define FONTS_SETTINGS_H
 
-class FontsSettings
-{
-public:
-			FontsSettings(void);
-			~FontsSettings(void);
-		
-	BPoint	WindowCorner(void) const { return fCorner; }
-	void	SetWindowCorner(BPoint);
-	
-	void	SetDefaults(void);
-	
-private:
-	BPoint fCorner;
+
+#include <Point.h>
+
+
+class FontsSettings {
+	public:
+		FontsSettings();
+		~FontsSettings();
+
+		BPoint	WindowCorner() const { return fCorner; }
+		void	SetWindowCorner(BPoint);
+
+		void	SetDefaults();
+
+	private:
+		BPoint	fCorner;
 };
 
-#endif
+#endif	/* FONTS_SETTINGS_H */

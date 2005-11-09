@@ -2,27 +2,34 @@
  * Copyright 2001-2005, Haiku.
  * Distributed under the terms of the MIT License.
  *
+ * Authors:
+ *		Mark Hogben
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 #ifndef FONT_VIEW_H
 #define FONT_VIEW_H
 
-#include <Box.h>
-#include <View.h>
+
 #include "FontSelectionView.h"
 
-class FontView : public BView
-{
-public:
-			FontView(BRect frame); 
-	void	SetDefaults(void);
-	void	Revert(void);
-	void	RescanFonts(void);
 
-private:
+class FontView : public BView {
+	public:
+		FontView(BRect frame);
 
-	FontSelectionView 	*fPlainView;
-	FontSelectionView 	*fBoldView;
-	FontSelectionView 	*fFixedView;
+		virtual void GetPreferredSize(float *_width, float *_height);
+
+		void	SetDefaults();
+		void	Revert();
+		void	UpdateFonts();
+
+		bool	IsRevertable();
+
+	private:
+		FontSelectionView 	*fPlainView;
+		FontSelectionView 	*fBoldView;
+		FontSelectionView 	*fFixedView;
 };
 	
-#endif
+#endif	/* FONT_VIEW_H */
