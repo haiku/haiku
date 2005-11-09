@@ -1,23 +1,18 @@
-#ifndef _LIMITS_H_
-#define _LIMITS_H_
+#ifndef _LIBC_LIMITS_H_
+#define _LIBC_LIMITS_H_
+	// Note: The header guard is checked in gcc's limits.h.
 
 #include <float.h>		/* for DBL_DIG, FLT_DIG, etc */
-
-/* XXX - commented out until we have GCC headers as this stops us 
- * building
- * For now we'll just use the values given for non-intel platforms.
- */
 
 /* _GCC_LIMITS_H_ is defined by GCC's internal limits.h to avoid
  * collisions with any defines in this file.
  */
-/*
 #if __INTEL__
 # ifndef _GCC_LIMITS_H_
 #  include_next <limits.h>
 # endif
 #else
-*/
+
 #define CHAR_BIT		(8)
 
 #define SCHAR_MIN		(-127-1)
@@ -44,7 +39,7 @@
 #define INT_MAX			LONG_MAX
 #define UINT_MAX		ULONG_MAX
 
-//#endif /* else not INTEL */
+#endif /* else not INTEL */
 
 #define LONGLONG_MIN    (-9223372036854775807LL - 1)  /* these are Be specific */
 #define LONGLONG_MAX    (9223372036854775807LL)
@@ -94,4 +89,4 @@
 #define _POSIX_TTY_NAME_MAX		(256)
 #define _POSIX_TZNAME_MAX   	(3)
 
-#endif /* _LIMITS_H_ */
+#endif /* _LIBC_LIMITS_H_ */
