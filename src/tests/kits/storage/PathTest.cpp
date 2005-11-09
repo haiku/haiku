@@ -1,6 +1,6 @@
 // PathTest.cpp
-#include <PathTest.h>
-//#include "StorageKitTester.h"
+#include "PathTest.h"
+
 #include <cppunit/Test.h>
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestSuite.h>

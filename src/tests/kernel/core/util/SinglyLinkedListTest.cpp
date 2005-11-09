@@ -1,10 +1,10 @@
-#include <SinglyLinkedListTest.h>
 #include <cppunit/Test.h>
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestSuite.h>
 #include <stdio.h>
 #include <TestUtils.h>
 
+#include "SinglyLinkedListTest.h"
 #include "SinglyLinkedList.h"
 
 SinglyLinkedListTest::SinglyLinkedListTest(std::string name)

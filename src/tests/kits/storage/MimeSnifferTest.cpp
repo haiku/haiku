@@ -1,6 +1,7 @@
 // MimeSnifferTest.cpp
 
-#include <MimeSnifferTest.h>
+#include "MimeSnifferTest.h"
+
 #include <cppunit/Test.h>
 #include <cppunit/TestSuite.h>
 #include <cppunit/TestCaller.h>

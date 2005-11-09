@@ -1,15 +1,10 @@
 SubDir HAIKU_TOP src tests kits support barchivable remoteobjectdef ;
 
-# Add the libraries' resource files. If this sort of thing is needed
-# anywhere else, we ought to make it into a real rule.
-AddResources libsupporttest_RemoteTestObject.so : RemoteTestObject.rdef ;
-AddResources libsupporttest_RemoteTestObject_r5.so : RemoteTestObject.rdef ;
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
 
-CommonTestLib libsupporttest_RemoteTestObject.so
+UnitTestLib libsupporttest_RemoteTestObject.so
 	: RemoteTestObject.cpp
-	: be stdc++.r4
-	: be stdc++.r4
-	:
-	: support
+	: be $(LIBSTDC++)
 	: RemoteTestObject.rdef
 ;

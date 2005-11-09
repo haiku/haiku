@@ -10,11 +10,11 @@
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestSuite.h>
 
-#include <EntryTest.h>
-
 #include <Entry.h>
 #include <Directory.h>
 #include <Path.h>
+
+#include "EntryTest.h"
 
 enum test_entry_kind {
 	DIR_ENTRY,

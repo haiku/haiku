@@ -22,7 +22,6 @@
 #if !TEST_R5
 	#include <mime/database_support.h>
 #endif
-#include <MimeTypeTest.h>
 #include <Path.h>			// Only needed for entry_ref dumps
 #include <StorageKit.h>
 #include <String.h>
@@ -31,6 +30,8 @@
 #include "TestShell.h"
 #include "TestApp.h"
 #include "TestUtils.h"
+
+#include "MimeTypeTest.h"
 
 // MIME database directories
 static const char *testDir				= "/tmp/mimeTestDir";

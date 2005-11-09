@@ -1,8 +1,11 @@
 SubDir HAIKU_TOP src tests kits storage ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
 UsePrivateHeaders storage ;
 
-CommonTestLib libstoragetest.so
+UnitTestLib libstoragetest.so
 	: StorageKitTestAddon.cpp
 		AppFileInfoTest.cpp
 		BasicTest.cpp
@@ -22,24 +25,15 @@ CommonTestLib libstoragetest.so
 		SymLinkTest.cpp
 		TestApp.cpp
 		VolumeTest.cpp
-	: be stdc++.r4
-	: be stdc++.r4
-	:
-	: storage
+	: be $(TARGET_LIBSTDC++)
 ;
 
 # To run the tests some test files must be around.
 {
-	# OBOS
 	local resdir = <storage!kit!test!files>resources ;
-	MakeLocate $(resdir) : [ on UnitTesterHelper return $(LOCATE[1]) ] ;
+	MakeLocate $(resdir) : $(TARGET_UNIT_TEST_DIR) ;
 	RelSymLink $(resdir) : [ FDirName $(SUBDIR) resources ] : false ;
-	DEPENDS libstoragetest.so : $(resdir) ;
-	# R5
-	local resdir_r5 = <storage!kit!test!files!r5>resources ;
-	MakeLocate $(resdir_r5) : [ on UnitTesterHelper_r5 return $(LOCATE[1]) ] ;
-	RelSymLink $(resdir_r5) : [ FDirName $(SUBDIR) resources ] : false ;
-	DEPENDS libstoragetest_r5.so : $(resdir_r5) ;
+	Depends libstoragetest.so : $(resdir) ;
 }
 
 SubInclude HAIKU_TOP src tests kits storage disk_device ;

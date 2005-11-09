@@ -20,6 +20,7 @@ const char *k40X = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 const char *k60X = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 
 // Required by CPPUNIT_ASSERT_EQUAL(rgb_color, rgb_color)
+#if TEST_R5
 bool operator==(const rgb_color &left, const rgb_color &right)
 {
 	if (left.red == right.red && left.green == right.green &&
@@ -28,6 +29,8 @@ bool operator==(const rgb_color &left, const rgb_color &right)
 	else
 		return false;
 }
+#endif	// TEST_R5
+
 // Required by CPPUNIT_ASSERT_EQUAL(rgb_color, rgb_color)
 ostream &operator<<(ostream &stream, const rgb_color &clr)
 {

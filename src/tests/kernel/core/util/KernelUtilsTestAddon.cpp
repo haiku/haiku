@@ -1,11 +1,12 @@
 #include <TestSuite.h>
 #include <TestSuiteAddon.h>
-//#include <AVLTreeMapTest.h>
-#include <SinglyLinkedListTest.h>
-#include <DoublyLinkedListTest.h>
-#include <VectorMapTest.h>
-#include <VectorSetTest.h>
-#include <VectorTest.h>
+
+//#include "AVLTreeMapTest.h"
+#include "SinglyLinkedListTest.h"
+#include "DoublyLinkedListTest.h"
+#include "VectorMapTest.h"
+#include "VectorSetTest.h"
+#include "VectorTest.h"
 
 
 BTestSuite* getTestSuite() {

@@ -3,9 +3,10 @@
 #ifndef VOLUME_TEST_H
 #define VOLUME_TEST_H
 
+#include "BasicTest.h"
+
 #include <StorageDefs.h>
 #include <SupportDefs.h>
-#include <BasicTest.h>
 
 class BTestApp;
 class BBitmap;

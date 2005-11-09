@@ -626,6 +626,11 @@ HAIKU_TMP_DIR			?= [ FDirName $(HAIKU_OUTPUT_DIR) tmp ] ;
 HAIKU_PACKAGE_DIR ?= [ FDirName $(HAIKU_OUTPUT_DIR) packages ] ;
 HAIKU_PACKAGE_OBJECT_DIR ?= [ FDirName $(HAIKU_OBJECT_DIR) packages ] ;
 
+TARGET_TEST_DIR				?= [ FDirName $(HAIKU_TEST_DIR)
+									$(TARGET_PLATFORM) ] ;
+TARGET_UNIT_TEST_DIR		?= [ FDirName $(TARGET_TEST_DIR) unittests ] ;
+TARGET_UNIT_TEST_LIB_DIR	?= [ FDirName $(TARGET_UNIT_TEST_DIR) lib ] ;
+
 # automatically setup the objects directory per subdirectory
 SUBDIRRULES += SetupObjectsDir ;
 

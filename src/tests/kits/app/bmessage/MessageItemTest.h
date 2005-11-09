@@ -12,11 +12,7 @@
 // Standard Includes -----------------------------------------------------------
 #include <iostream>
 #include <stdio.h>
-#ifdef TEST_OBOS
-#include <posix/typeinfo>
-#else
 #include <typeinfo>
-#endif
 #include <posix/string.h>
 
 // System Includes -------------------------------------------------------------

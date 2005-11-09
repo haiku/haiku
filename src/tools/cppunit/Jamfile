@@ -1,34 +1,28 @@
 SubDir HAIKU_TOP src tools cppunit ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) headers tools elfsymbolpatcher ] ;
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) headers tools elfsymbolpatcher ] : true ;
+UseCppUnitHeaders ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) cppunit ] ;
 
-rule CppUnitLibrary
 {
-	# CppUnitLibrary <sources> ;
-	local _lib = libcppunit.so ;
+	DEFINES += BUILDING_CPPUNIT ;
 
-	local defines = BUILDING_CPPUNIT ;
-
-	if $(OS) = BEOS && $(OSPLAT) = PPC {
-		defines += NO_ELF_SYMBOL_PATCHING ;
+	if $(OS) != BEOS || $(OSPLAT) = PPC {
+		DEFINES += NO_ELF_SYMBOL_PATCHING ;
 	}
-	ObjectDefines $(1) : $(defines) ;
-
-	UseCppUnitHeaders ;
-	BuildPlatformMain $(_lib) : $(1) ;
-	MakeLocate $(_lib) : /boot/home/config/lib ;
-	LINKFLAGS on $(_lib) = $(LINKFLAGS) -nostart -Xlinker -soname=\"$(_lib)\" ;
 }
 
-CppUnitLibrary
+SharedLibrary libcppunit.so :
+	BTestCase.cpp
+	BTestSuite.cpp
 	SemaphoreSyncObject.cpp
 	TestApp.cpp
-	TestCase.cpp
 	TestListener.cpp
 	TestShell.cpp
-	TestSuite.cpp
 	TestUtils.cpp
 	ThreadedTestCase.cpp
 
@@ -55,13 +49,9 @@ CppUnitLibrary
 	TextTestResult.cpp
 	TypeInfoHelper.cpp
 	XmlOutputter.cpp
+	: be $(TARGET_LIBSTDC++)
 ;
 
-LinkAgainst libcppunit.so :
-	stdc++.r4	# is called `mslcpp_4_0' on PPC -- just create a symlink
-	be
-;
-
-if  $(OS) != BEOS || $(OSPLAT) != PPC {
+if  $(OS) = BEOS && $(OSPLAT) != PPC {
 	LinkAgainst libcppunit.so : libelfsymbolpatcher.a ;
 }

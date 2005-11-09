@@ -1,10 +1,14 @@
 SubDir HAIKU_TOP src tests bin makeudfimage ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
+UsePublicHeaders add-ons/file_system ;			# For fsproto.h
 UsePrivateHeaders [ FDirName kernel util ] ;	# For kernel_cpp.h
 SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems udf ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src bin makeudfimage ] ;
 
-TestLib libmakeudfimagetest.so
+UnitTestLib libmakeudfimagetest.so
 	: MakeudfimageTestAddon.cpp
         # test files
 		AllocatorTest.cpp
@@ -19,9 +23,7 @@ TestLib libmakeudfimagetest.so
 		UdfStructures.cpp
 		Utils.cpp
 
-	: [ FDirName $(HAIKU_TEST_DIR) unittester lib ]
-	: be stdc++.r4
-	:
+	: be $(TARGET_LIBSTDC++)
 ;
 
 SEARCH on [ FGristFiles Allocator.cpp PhysicalPartitionAllocator.cpp ]

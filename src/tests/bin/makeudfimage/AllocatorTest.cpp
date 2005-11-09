@@ -1,4 +1,3 @@
-#include <AllocatorTest.h>
 #include <ThreadedTestCaller.h>
 #include <cppunit/Test.h>
 #include <cppunit/TestCaller.h>
@@ -7,6 +6,8 @@
 #include <iostream>
 #include <kernel/OS.h>
 #include <TestUtils.h>
+
+#include "AllocatorTest.h"
 
 #include "Allocator.h"
 #include "PhysicalPartitionAllocator.h"

@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src kits translation ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
 
 if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders translation ;

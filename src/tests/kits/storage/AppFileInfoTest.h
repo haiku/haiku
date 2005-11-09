@@ -3,9 +3,10 @@
 #ifndef APP_FILE_INFO_TEST_H
 #define APP_FILE_INFO_TEST_H
 
+#include "BasicTest.h"
+
 #include <StorageDefs.h>
 #include <SupportDefs.h>
-#include <BasicTest.h>
 
 class BApplication;
 class BBitmap;

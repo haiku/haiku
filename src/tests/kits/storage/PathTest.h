@@ -3,9 +3,10 @@
 #ifndef __sk_path_test_h__
 #define __sk_path_test_h__
 
+#include "BasicTest.h"
+
 #include <StorageDefs.h>
 #include <SupportDefs.h>
-#include <BasicTest.h>
 
 class CppUnit::Test;
 

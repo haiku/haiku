@@ -1,37 +1,28 @@
 SubDir HAIKU_TOP src tests ;
 
-CommonTestLib libexampletest.so
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
+UnitTestLib libexampletest.so
 	: ExampleTestAddon.cpp
 		ExampleTest.cpp
-	: be stdc++.r4
-	: be stdc++.r4
+	: be $(TARGET_LIBSTDC++)
 	:
 ;
 
 UnitTest UnitTester
-	: UnitTester.cpp
-	:
-	: be stdc++.r4
-	:
+	: UnitTesterHelper.cpp
+	: be $(TARGET_LIBSTDC++)
+	: UnitTesterHelper.rsrc
 ;
 
-AddResources UnitTesterHelper : UnitTesterHelper.rsrc ;
-UnitTest UnitTesterHelper
-	: UnitTesterHelper.cpp
-	: unittester
-	: be stdc++.r4
-	: be stdc++.r4
-	:
-;
-
-AddResources UnitTesterHelper_r5 : UnitTesterHelper.rsrc ;
-R5UnitTest UnitTesterHelper
-	: UnitTesterHelper.cpp
-	: unittester_r5
-	: be stdc++.r4
-	: be stdc++.r4
-	:
-;
+# Install libbe and other libraries for target platform libbe_test.
+if $(TARGET_PLATFORM) = libbe_test {
+	local libs = libbe_haiku.so libbeadapter.so libtranslation.so ;
+	HaikuInstall install-unittest-libs : $(TARGET_UNIT_TEST_LIB_DIR)
+		: $(libs)
+		: tests!unittests ;
+}
 
 SubInclude HAIKU_TOP src tests add-ons ;
 SubInclude HAIKU_TOP src tests apps ;

@@ -1,5 +1,8 @@
 SubDir HAIKU_TOP src tools elfsymbolpatcher ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
 UseHeaders [ FDirName $(HAIKU_TOP) headers tools elfsymbolpatcher ] ;
 
 StaticLibrary libelfsymbolpatcher.a

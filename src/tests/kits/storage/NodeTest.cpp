@@ -4,7 +4,6 @@
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestSuite.h>
 #include <TestUtils.h>
-#include <NodeTest.h>
 
 #include <errno.h>
 #include <fs_attr.h>	// For struct attr_info
@@ -18,6 +17,8 @@
 #include <StorageDefs.h>
 #include <String.h>
 #include <TypeConstants.h>
+
+#include "NodeTest.h"
 
 
 // == for attr_info

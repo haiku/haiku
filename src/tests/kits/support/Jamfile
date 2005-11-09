@@ -1,5 +1,8 @@
 SubDir HAIKU_TOP src tests kits support ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
 # Let Jam know where to find some of our source files
 SEARCH_SOURCE += [ FDirName $(SUBDIR) barchivable ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bautolock ] ;
@@ -8,7 +11,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) bmemoryio ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bstring ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bblockcache ] ;
 
-CommonTestLib libsupporttest.so
+UnitTestLib libsupporttest.so
 	: SupportKitTestAddon.cpp
 
 		ByteOrderTest.cpp
@@ -74,10 +77,7 @@ CommonTestLib libsupporttest.so
 		BlockCacheExerciseTest.cpp
 		BlockCacheConcurrencyTest.cpp
 
-	: be stdc++.r4
-	: be stdc++.r4
-	: libsupporttest_RemoteTestObject.so
-	: support
+	: be $(TARGET_LIBSTDC++) libsupporttest_RemoteTestObject.so
 ;
 
 SubInclude HAIKU_TOP src tests kits support barchivable ;

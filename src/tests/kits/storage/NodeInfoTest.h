@@ -3,9 +3,10 @@
 #ifndef NODE_INFO_TEST_H
 #define NODE_INFO_TEST_H
 
+#include "BasicTest.h"
+
 #include <StorageDefs.h>
 #include <SupportDefs.h>
-#include <BasicTest.h>
 
 class BApplication;
 class BBitmap;

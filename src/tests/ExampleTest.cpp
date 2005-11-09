@@ -1,4 +1,5 @@
-#include <ExampleTest.h>
+#include "ExampleTest.h"
+
 #include <ThreadedTestCaller.h>
 #include <cppunit/Test.h>
 #include <cppunit/TestCaller.h>

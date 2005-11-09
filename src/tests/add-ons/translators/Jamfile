@@ -1,5 +1,10 @@
 SubDir HAIKU_TOP src tests add-ons translators ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
+local libtranslation = translation ;
+
 # Let Jam know where to find some of our source files
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bmptranslator ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) pngtranslator ] ;
@@ -7,15 +12,17 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) stxttranslator ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) tgatranslator ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) tifftranslator ] ;
 
-CommonTestLib libtranslatorstest.so
+if $(TARGET_PLATFORM) = libbe_test {
+	UsePublicHeaders translation ;
+	libtranslation = <tests!unittests>libtranslation.so ;
+}
+
+UnitTestLib libtranslatorstest.so
 	: TranslatorTestAddOn.cpp
 		BMPTranslatorTest.cpp
 		PNGTranslatorTest.cpp
 		STXTTranslatorTest.cpp
 		TGATranslatorTest.cpp
 		TIFFTranslatorTest.cpp
-	: libtranslation.so be stdc++.r4
-	: translation be stdc++.r4
-	:
-	: translation
+	: $(libtranslation) be $(TARGET_LIBSTDC++)
 ;

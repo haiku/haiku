@@ -1,5 +1,8 @@
 SubDir HAIKU_TOP src tests kits interface ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
 UsePrivateHeaders interface ;
 
 # Let Jam know where to find some of our source files
@@ -12,7 +15,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) bwidthbuffer ] ;
 
 SEARCH_SOURCE += [ FDirName $(TOP) src kits interface ] ;
 
-CommonTestLib libinterfacetest.so
+UnitTestLib libinterfacetest.so
 	: InterfaceKitTestAddon.cpp
 
 		GraphicsDefsTest.cpp
@@ -50,10 +53,7 @@ CommonTestLib libinterfacetest.so
 		WidthBufferTest.cpp
 		WidthBufferSimpleTest.cpp
 
-	: be stdc++.r4
-	: be stdc++.r4
-	: 
-	: app support
+	: be $(TARGET_LIBSTDC++)
 ;
 
 ObjectDefines

@@ -1,5 +1,8 @@
 SubDir HAIKU_TOP src tests kits app ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
 UsePrivateHeaders app ;
 
 # Let Jam know where to find some of our source files
@@ -17,21 +20,20 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) broster ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) broster testapps ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) common ] ;
 
-CommonTestLib libmessagetest.so
-	: MessageTestAddon.cpp
-		MessageTest.cpp
-		MessageConstructTest.cpp
-		MessageDestructTest.cpp
-		MessageOpAssignTest.cpp
-		MessageEasyFindTest.cpp
-		MessageSpeedTest.cpp
-	: be stdc++.r4
-	: be stdc++.r4
-	: 
-	: app
-;
+# TODO: bonefish: There is no MessageTestAddon.cpp. Remove, if noone uses
+# this.
+#UnitTestLib libmessagetest.so
+#	: MessageTestAddon.cpp
+#		MessageTest.cpp
+#		MessageConstructTest.cpp
+#		MessageDestructTest.cpp
+#		MessageOpAssignTest.cpp
+#		MessageEasyFindTest.cpp
+#		MessageSpeedTest.cpp
+#	: be $(TARGET_LIBSTDC++)
+#;
 
-CommonTestLib libapptest.so
+UnitTestLib libapptest.so
 	: AppKitTestAddon.cpp
 
 		# BApplication
@@ -151,18 +153,12 @@ CommonTestLib libapptest.so
 		AppRunner.cpp
 		PipedAppRunner.cpp
 
-	: be stdc++.r4
-	: be stdc++.r4
-	: 
-	: app support
+	: be $(TARGET_LIBSTDC++)
 ;
 
-CommonTestLib libappteststub.so
+UnitTestLib libappteststub.so
 	: AppKitTestStub.cpp
-	: libapptest.so stdc++.r4
-	: libapptest_r5.so stdc++.r4
-	:
-	:
+	: libapptest.so $(TARGET_LIBSTDC++)
 ;
 
 SimpleTest DanoMessageTest :

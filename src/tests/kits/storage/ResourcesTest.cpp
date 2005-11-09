@@ -5,9 +5,6 @@
 #include <unistd.h>
 #include <vector>
 
-
-#include <ResourcesTest.h>
-
 #include <ByteOrder.h>
 #include <File.h>
 #include <Mime.h>
@@ -16,6 +13,7 @@
 #include <TypeConstants.h>
 #include <TestShell.h>
 
+#include "ResourcesTest.h"
 
 static const char *testDir		= "/tmp/testDir";
 static const char *x86ResFile	= "/tmp/testDir/x86.rsrc";

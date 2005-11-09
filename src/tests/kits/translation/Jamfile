@@ -1,13 +1,20 @@
 SubDir HAIKU_TOP src tests kits translation ;
 
-CommonTestLib libtranslationtest.so
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
+local libtranslation = translation ;
+
+if $(TARGET_PLATFORM) = libbe_test {
+	UsePublicHeaders translation ;
+	libtranslation = <tests!unittests>libtranslation.so ;
+}
+
+UnitTestLib libtranslationtest.so
 	: TranslationKitTestAddon.cpp
 		TranslatorRosterTest.cpp
 		BitmapStreamTest.cpp
 		TranslationUtilsTest.cpp
 		TranslatorTest.cpp
-	: libtranslation.so be stdc++.r4
-	: translation be stdc++.r4
-	:
-	: translation
+	: $(libtranslation) be $(TARGET_LIBSTDC++)
 ;
