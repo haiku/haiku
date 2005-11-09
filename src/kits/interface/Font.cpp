@@ -1370,7 +1370,7 @@ BFont::PrintToStream() const
 	font_style style;
 	GetFamilyAndStyle(&family, &style);
 
-	printf("BFont { %s (%d), %s (%d) 0x%x %f/%f %fpt (%f %f %f), %ld\n", family,
+	printf("BFont { %s (%d), %s (%d) 0x%x %f/%f %fpt (%f %f %f), %d }\n", family,
 		fFamilyID, style, fStyleID, fFace, fShear, fRotation, fSize,
 		fHeight.ascent, fHeight.descent, fHeight.leading, fEncoding);
 }
