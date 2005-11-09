@@ -1169,8 +1169,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				//	3) float - size
 
 				fLink.StartMessage(B_OK);
-				fLink.AttachString(font.GetFamily());
-				fLink.AttachString(font.GetStyle());
+				fLink.AttachString(font.Family());
+				fLink.AttachString(font.Style());
 				fLink.Attach<float>(font.Size());
 			} else
 				fLink.StartMessage(status);

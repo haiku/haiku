@@ -135,8 +135,8 @@ ServerFont::ServerFont(FontStyle& style, float size,
 	  fBounds(0, 0, 0, 0),
 	  fFlags(flags),
 	  fSpacing(spacing),
-	  fDirection(B_FONT_LEFT_TO_RIGHT),
-	  fFace(B_REGULAR_FACE),
+	  fDirection(style.Direction()),
+	  fFace(style.Face()),
 	  fEncoding(B_UNICODE_UTF8)
 {
 	fStyle->Acquire();
@@ -218,14 +218,14 @@ ServerFont::FileFormat()
 
 
 const char*
-ServerFont::GetStyle() const
+ServerFont::Style() const
 {
 	return fStyle->Name();
 }
 
 
 const char*
-ServerFont::GetFamily() const
+ServerFont::Family() const
 {
 	return fStyle->Family()->Name();
 }
@@ -241,6 +241,9 @@ ServerFont::SetStyle(FontStyle& style)
 
 		// attach to new style
 		fStyle = &style;
+		fFace = style.Face();
+		fDirection = style.Direction();
+
 		fStyle->Acquire();
 	}
 }
@@ -287,6 +290,14 @@ ServerFont::SetFamilyAndStyle(uint32 fontID)
 	uint16 family = (fontID & 0xFFFF0000) >> 16;
 	
 	return SetFamilyAndStyle(family, style);
+}
+
+
+void
+ServerFont::SetFace(uint32 face)
+{
+	// TODO: change font style as requested!
+	fFace = face;
 }
 
 

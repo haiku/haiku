@@ -56,12 +56,11 @@ class ServerFont {
 									{ return fStyle->GlyphCount(); }
 			int32				CountTuned();
 
-
 			font_file_format	FileFormat();
 
-			const char*			GetStyle() const;
-			const char*			GetFamily() const;
-			const char*			GetPath() const
+			const char*			Style() const;
+			const char*			Family() const;
+			const char*			Path() const
 									{ return fStyle->Path(); }
 
 			void				SetStyle(FontStyle& style);
@@ -75,26 +74,24 @@ class ServerFont {
 									{ return fStyle->Family()->ID(); }
 			uint32				GetFamilyAndStyle() const;
 
-
-			void				SetDirection(const font_direction& dir)
+			void				SetDirection(font_direction dir)
 									{ fDirection = dir; }
-			void				SetEdges(const edge_info& info)
+			void				SetEdges(edge_info info)
 									{ fEdges = info; }
 			void				SetEncoding(uint32 encoding)
 									{ fEncoding = encoding; }
-			void				SetFlags(const uint32& value)
+			void				SetFlags(uint32 value)
 									{ fFlags = value; }
-			void				SetSpacing(const uint32& value)
+			void				SetSpacing(uint32 value)
 									{ fSpacing = value; }
-			void				SetShear(const float& value)
+			void				SetShear(float value)
 									{ fShear = value; }
-			void				SetSize(const float& value)
+			void				SetSize(float value)
 									{ fSize = value; }
-			void				SetRotation(const float& value)
+			void				SetRotation(float value)
 									{ fRotation = value; }
-			void				SetFace(const uint32& value)
-									{ fFace = value; }
-	
+			void				SetFace(uint32 face);
+
 			bool				IsFixedWidth() const
 									{ return fStyle->IsFixedWidth(); }
 			bool				IsScalable() const
