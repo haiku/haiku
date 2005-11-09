@@ -360,18 +360,35 @@ void
 _set_system_font_(const char *which, font_family family, font_style style, 
 	float size)
 {
-	if (which == NULL || strcmp(which, "plain")
-		|| strcmp(which, "bold") || strcmp(which, "fixed"))
-		return;
-
 	BPrivate::AppServerLink link;
 
 	link.StartMessage(AS_SET_SYSTEM_FONT);
-	link.AttachString(which);
-	link.AttachString(family);
-	link.AttachString(style);
+	link.AttachString(which, B_OS_NAME_LENGTH);
+	link.AttachString(family, sizeof(font_family));
+	link.AttachString(style, sizeof(font_style));
 	link.Attach<float>(size);
 	link.Flush();
+}
+
+
+status_t
+_get_system_default_font_(const char* which, font_family family,
+	font_style style, float* _size)
+{
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_GET_SYSTEM_DEFAULT_FONT);
+	link.AttachString(which, B_OS_NAME_LENGTH);
+
+	int32 status = B_ERROR;
+	if (link.FlushWithReply(status) != B_OK
+		|| status < B_OK)
+		return status;
+
+	link.ReadString(family, sizeof(font_family));
+	link.ReadString(style, sizeof(font_style));
+	link.Read<float>(_size);
+	return B_OK;
 }
 
 
@@ -527,8 +544,8 @@ BFont::SetFamilyAndStyle(const font_family family, const font_style style)
 	BPrivate::AppServerLink link;
 
 	link.StartMessage(AS_GET_FAMILY_AND_STYLE_IDS);
-	link.AttachString(family);
-	link.AttachString(style);
+	link.AttachString(family, sizeof(font_family));
+	link.AttachString(style, sizeof(font_style));
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(0xffff);
 	link.Attach<uint16>(fFace);
@@ -600,7 +617,7 @@ BFont::SetFamilyAndFace(const font_family family, uint16 face)
 {
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_FAMILY_AND_STYLE_IDS);
-	link.AttachString(family);
+	link.AttachString(family, sizeof(font_family));
 	link.AttachString(NULL);	// no style given
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(0xffff);
@@ -985,6 +1002,8 @@ BFont::GetStringWidths(const char *stringArray[], const int32 lengthArray[],
 	link.Attach<uint8>(fSpacing);
 	link.Attach<int32>(numStrings);
 
+	// TODO: all strings into a single array???
+	//	we do have a maximum message length, and it could be easily touched here...
 	for (int32 i = 0; i < numStrings; i++) {
 		link.Attach<int32>(lengthArray[i]);
 		link.AttachString(stringArray[i]);
