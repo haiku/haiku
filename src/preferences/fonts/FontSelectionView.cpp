@@ -346,7 +346,8 @@ FontSelectionView::SetDefaults()
 	defaultFont.SetFamilyAndStyle(family, style);
 	defaultFont.SetSize(size);
 
-	defaultFont.GetFamilyAndStyle(&family, &style);
+	if (defaultFont == fCurrentFont)
+		return;
 
 	_SelectCurrentFont(false);
 

@@ -116,7 +116,7 @@ MainWindow::MessageReceived(BMessage *message)
 
 		case kMsgSetDefaults:
 			fFontsView->SetDefaults();
-			fRevertButton->SetEnabled(true);
+			fRevertButton->SetEnabled(fFontsView->IsRevertable());
 			break;
 
 		case kMsgRevert:
