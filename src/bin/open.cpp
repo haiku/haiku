@@ -12,6 +12,7 @@
 #include <List.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 
@@ -23,6 +24,7 @@ int
 main(int argc, char **argv)
 {
 	const char *openWith = kTrackerSignature;
+	int exitcode = EXIT_SUCCESS;
 
 	char *progName = argv[0];
 	if (strrchr(progName, '/'))
@@ -55,6 +57,8 @@ main(int argc, char **argv)
 			
 			// subsequent files are open with that app
 			openWith = *argv;
+			// clear possible ENOENT from above
+			status = B_OK;
 
 			// in the case the app is already started, 
 			// don't start it twice if we have other args
@@ -78,9 +82,12 @@ main(int argc, char **argv)
 		} else
 			status = B_ENTRY_NOT_FOUND;
 
-		if (status != B_OK && status != B_ALREADY_RUNNING)
+		if (status != B_OK && status != B_ALREADY_RUNNING) {
 			fprintf(stderr, "%s: \"%s\": %s\n", progName, *argv, strerror(status));
+			// make sure the shell knows this
+			exitcode = EXIT_FAILURE;
+		}
 	}
 
-	return 0;
+	return exitcode;
 }
