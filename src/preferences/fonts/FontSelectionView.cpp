@@ -41,8 +41,6 @@ extern status_t _get_system_default_font_(const char* which,
 	font_family family, font_style style, float* _size);
 
 
-#ifndef __HAIKU__
-
 #ifdef B_BEOS_VERSION_DANO
 // this call only exists under R5
 void
@@ -52,7 +50,9 @@ _set_system_font_(const char *which, font_family family,
 	puts("you don't have _set_system_font_()");
 }
 #endif
-/*
+
+#if !defined(HAIKU_TARGET_PLATFORM_HAIKU) && !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
+// this call only exists under Haiku (and the test environment)
 status_t
 _get_system_default_font_(const char* which, font_family family,
 	font_style style, float* _size)
@@ -60,8 +60,10 @@ _get_system_default_font_(const char* which, font_family family,
 	puts("you don't have _get_system_default_font_()");
 	return B_ERROR;
 }
-*/
-#endif	// !__HAIKU__
+#endif
+
+
+//	#pragma mark -
 
 
 FontSelectionView::FontSelectionView(BRect rect, const char* name,
@@ -121,7 +123,7 @@ FontSelectionView::FontSelectionView(BRect rect, const char* name,
 
 FontSelectionView::~FontSelectionView()
 {
-#ifdef INSTANT_UPDATE
+#ifndef INSTANT_UPDATE
 	_UpdateSystemFont();
 #endif
 }
