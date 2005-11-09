@@ -462,16 +462,16 @@ BMenu::FindItem(const char *label) const
 		item = ItemAt(i);
 
 		if (item->Label() && strcmp(item->Label(), label) == 0)
-			break;
+			return item;
 
-		if (item->Submenu()) {
+		if (item->Submenu() != NULL) {
 			item = item->Submenu()->FindItem(label);
-			if (item)
-				break;
+			if (item != NULL)
+				return item;
 		}
 	}
 
-	return item;
+	return NULL;
 }
 
 
@@ -484,16 +484,16 @@ BMenu::FindItem(uint32 command) const
 		item = ItemAt(i);
 
 		if (item->Command() == command)
-			break;
+			return item;
 
-		if (item->Submenu()) {
+		if (item->Submenu() != NULL) {
 			item = item->Submenu()->FindItem(command);
-			if (item)
-				break;
+			if (item != NULL)
+				return item;
 		}
 	}
 
-	return item;
+	return NULL;
 }
 
 
