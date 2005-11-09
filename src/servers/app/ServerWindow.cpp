@@ -1651,8 +1651,9 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&x2);
 			link.Read<float>(&y2);
 
-			BPoint p1(x1,y1);
-			BPoint p2(x2,y2);
+			BPoint p1(x1, y1);
+			BPoint p2(x2, y2);
+			BPoint penPos = p2;
 			fCurrentLayer->ConvertToScreen(&p1);
 			fCurrentLayer->ConvertToScreen(&p2);
 			driver->StrokeLine(p1, p2, fCurrentLayer->CurrentState());
@@ -1663,7 +1664,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			// TODO: Decide where to put this, for example, it cannot be done
 			// for DrawString(), also there needs to be a decision, if penlocation
 			// is in View coordinates (I think it should be) or in screen coordinates.
-			fCurrentLayer->CurrentState()->SetPenLocation(p2);
+			fCurrentLayer->CurrentState()->SetPenLocation(penPos);
 			break;
 		}
 		case AS_LAYER_INVERT_RECT:
@@ -1928,7 +1929,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			
 			link.Read<int32>(&linecount);
 			if (linecount > 0) {
-				LineArrayData linedata[linecount], *index;
+				LineArrayData linedata[linecount];
+				LineArrayData* index;
 
 				for (int32 i = 0; i < linecount; i++) {
 					index = &linedata[i];
@@ -1942,7 +1944,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 					fCurrentLayer->ConvertToScreen(&index->pt1);
 					fCurrentLayer->ConvertToScreen(&index->pt2);
 				}
-				driver->StrokeLineArray(linecount,linedata,fCurrentLayer->CurrentState());
+				driver->StrokeLineArray(linecount, linedata, fCurrentLayer->CurrentState());
 			}
 			break;
 		}
