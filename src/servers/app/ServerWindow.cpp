@@ -1962,7 +1962,10 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.ReadString(&string);
 			
 			fCurrentLayer->ConvertToScreen(&location);
-			driver->DrawString(string, length, location, fCurrentLayer->CurrentState(), &delta);
+			BPoint penLocation = driver->DrawString(string, length, location,
+													fCurrentLayer->CurrentState(), &delta);
+			fCurrentLayer->ConvertFromScreen(&penLocation);
+			fCurrentLayer->CurrentState()->SetPenLocation(penLocation);
 			
 			free(string);
 			break;

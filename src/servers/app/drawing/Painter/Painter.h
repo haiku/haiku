@@ -82,6 +82,8 @@ class Painter {
 			void				SetPattern(const pattern& p);
 
 			void				SetPenLocation(const BPoint& location);
+			BPoint				PenLocation() const
+									{ return fPenLocation; }
 			void				SetFont(const ServerFont& font);
 
 								// painting functions
@@ -206,8 +208,11 @@ class Painter {
 
 			BRect				InvertRect(		const BRect& r) const;
 
-			BRect				BoundingBox(	const char* utf8String, uint32 length,
-									const BPoint& baseLine, const escapement_delta* delta = NULL) const;
+			BRect				BoundingBox(	const char* utf8String,
+												uint32 length,
+												const BPoint& baseLine,
+												BPoint* penLocation,
+												const escapement_delta* delta = NULL) const;
 
 			float				StringWidth(	const char* utf8String,
 												uint32 length) const;

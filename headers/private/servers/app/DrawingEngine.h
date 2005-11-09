@@ -167,7 +167,7 @@ public:
 			// -------- text related calls
 	
 			// DrawState is NOT const because this call updates the pen position in the passed DrawState
-			void				DrawString(		const char* string,
+			BPoint				DrawString(		const char* string,
 												int32 length,
 												const BPoint& pt,
 												DrawState* d,

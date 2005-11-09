@@ -983,12 +983,13 @@ DrawingEngine::DrawString(const char *string, const int32 &length,
 }
 */
 // DrawString
-void
+BPoint
 DrawingEngine::DrawString(const char* string, int32 length,
 						  const BPoint& pt, DrawState* d,
 						  escapement_delta* delta)
 {
 // TODO: use delta
+	BPoint penLocation = pt;
 	if (Lock()) {
 		FontLocker locker(d);
 		fPainter->SetDrawState(d);
@@ -998,7 +999,9 @@ DrawingEngine::DrawString(const char* string, int32 length,
 // TODO: make the availability of the hardware cursor part of the 
 // HW acceleration flags and skip all calculations for HideSoftwareCursor
 // in case we don't have one.
-		BRect b = fPainter->BoundingBox(string, length, pt, delta);
+// TODO: Watch out about penLocation and use Painter::PenLocation() when
+// not using BoundindBox anymore.
+		BRect b = fPainter->BoundingBox(string, length, pt, &penLocation, delta);
 		// stop here if we're supposed to render outside of the clipping
 		b = fPainter->ClipRect(b);
 		if (b.IsValid()) {
@@ -1014,6 +1017,7 @@ DrawingEngine::DrawString(const char* string, int32 length,
 		}
 		Unlock();
 	}
+	return penLocation;
 }
 
 // StringWidth
@@ -1053,8 +1057,9 @@ DrawingEngine::StringHeight(const char *string, int32 length,
 	if (Lock()) {
 		FontLocker locker(d);
 		fPainter->SetDrawState(d);
-		static BPoint dummy(0.0, 0.0);
-		height = fPainter->BoundingBox(string, length, dummy).Height();
+		static BPoint dummy1(0.0, 0.0);
+		static BPoint dummy2(0.0, 0.0);
+		height = fPainter->BoundingBox(string, length, dummy1, &dummy2).Height();
 		Unlock();
 	}
 	return height;

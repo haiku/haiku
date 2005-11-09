@@ -1059,15 +1059,15 @@ Painter::InvertRect(const BRect& r) const
 // BoundingBox
 BRect
 Painter::BoundingBox(const char* utf8String, uint32 length,
-	const BPoint& baseLine, const escapement_delta* delta) const
+					 const BPoint& baseLine, BPoint* penLocation,
+					 const escapement_delta* delta) const
 {
 	static BRect dummy;
-	BPoint penPosition;
 	return fTextRenderer->RenderString(utf8String,
 									   length,
 									   fFontRendererSolid,
 									   fFontRendererBin,
-									   baseLine, dummy, true, &penPosition,
+									   baseLine, dummy, true, penLocation,
 									   delta);
 }
 
