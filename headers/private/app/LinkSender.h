@@ -31,7 +31,7 @@ class LinkSender {
 		status_t Flush(bigtime_t timeout = B_INFINITE_TIMEOUT, bool needsReply = false);
 
 		status_t Attach(const void *data, size_t size);
-		status_t AttachString(const char *string, int32 length = -1);
+		status_t AttachString(const char *string, int32 maxLength = -1);
 		template <class Type> status_t Attach(const Type& data)
 		{
 			return Attach(&data, sizeof(Type));

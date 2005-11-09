@@ -28,6 +28,7 @@
 #	define STRACE(x) ;
 #endif
 
+static const size_t kMaxStringSize = 4096;
 static const size_t kWatermark = kInitialBufferSize - 24;
 	// if a message is started after this mark, the buffer is flushed automatically
 
@@ -160,8 +161,15 @@ LinkSender::AttachString(const char *string, int32 length)
 	if (string == NULL)
 		string = "";
 
-	if (length == -1)
-		length = strlen(string);
+	size_t maxLength = strlen(string);
+	if (length == -1) {
+		length = (int32)maxLength;
+
+		// we should report an error here
+		if (maxLength > kMaxStringSize)
+			length = 0;
+	} else if (length > (int32)maxLength)
+		length = maxLength;
 
 	status_t status = Attach<int32>(length);
 	if (status < B_OK)
