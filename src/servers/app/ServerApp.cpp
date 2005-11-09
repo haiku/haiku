@@ -1147,26 +1147,17 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// input:
 			//	1) string - font type ("plain", ...)
 
-			const char* family = NULL;
-			const char* style = NULL;
-			float size = 0;
+			ServerFont font;
 
 			char type[B_OS_NAME_LENGTH];
 			status_t status = link.ReadString(type, sizeof(type));
 			if (status == B_OK) {
 				if (!strcmp(type, "plain")) {
-					// TODO: we should return an *existing* font here...
-					family = DEFAULT_PLAIN_FONT_FAMILY;
-					style = DEFAULT_PLAIN_FONT_STYLE;
-					size = DEFAULT_PLAIN_FONT_SIZE;
+					font = *gFontManager->DefaultPlainFont();
 				} else if (!strcmp(type, "bold")) {
-					family = DEFAULT_BOLD_FONT_FAMILY;
-					style = DEFAULT_BOLD_FONT_STYLE;
-					size = DEFAULT_BOLD_FONT_SIZE;
+					font = *gFontManager->DefaultBoldFont();
 				} else if (!strcmp(type, "fixed")) {
-					family = DEFAULT_FIXED_FONT_FAMILY;
-					style = DEFAULT_FIXED_FONT_STYLE;
-					size = DEFAULT_FIXED_FONT_SIZE;
+					font = *gFontManager->DefaultFixedFont();
 				} else
 					status = B_BAD_VALUE;
 			}
@@ -1178,9 +1169,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				//	3) float - size
 
 				fLink.StartMessage(B_OK);
-				fLink.AttachString(family);
-				fLink.AttachString(style);
-				fLink.Attach<float>(size);
+				fLink.AttachString(font.GetFamily());
+				fLink.AttachString(font.GetStyle());
+				fLink.Attach<float>(font.Size());
 			} else
 				fLink.StartMessage(status);
 
