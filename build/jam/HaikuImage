@@ -153,7 +153,7 @@ libnetFiles = $(libnetFiles:G=libnet-files) ;
 SEARCH on $(libnetFiles) = [ FDirName $(HAIKU_TOP) src kits network libnet ] ;
 AddFilesToHaikuImage beos etc : $(libnetFiles) ;
 
-local keymapFiles = [ GLOB $(SUBDIR) : *.keymap ] ;
+local keymapFiles = [ GLOB [ FDirName $(HAIKU_TOP) src data etc keymaps ] : *.keymap ] ;
 keymapFiles = $(keymapFiles:BG=keymap) ;
 AddFilesToHaikuImage beos etc Keymap : $(keymapFiles) ;
 
