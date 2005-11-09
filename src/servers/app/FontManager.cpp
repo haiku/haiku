@@ -58,7 +58,6 @@ struct FontManager::font_mapping {
 FontManager::FontManager()
 	: BLooper("Font Manager"),
 	fFamilies(20),
-	fDefaultFont(NULL),
 	fScanned(false),
 	fNextID(0)
 {
@@ -68,7 +67,7 @@ FontManager::FontManager()
 		_AddSystemPaths();
 		_LoadRecentFontMappings();
 
-		fInitStatus = _SetDefaultFont();
+		fInitStatus = _SetDefaultFonts();
 	}
 
 /*
@@ -141,30 +140,61 @@ FontManager::_RemoveFamily(const char *familyName)
 }
 
 
-/*!
-	\brief Sets the font that will be used when you create an empty
-		ServerFont without specifying a style.
-*/
-status_t
-FontManager::_SetDefaultFont()
+FontStyle*
+FontManager::_GetDefaultStyle(const char *familyName, const char *styleName,
+	const char *fallbackFamily, const char *fallbackStyle,
+	uint16 fallbackFace)
 {
-	FontStyle* style = GetStyle(DEFAULT_PLAIN_FONT_FAMILY, DEFAULT_PLAIN_FONT_STYLE);
+	// try to find a matching font
+
+	FontStyle* style = GetStyle(familyName, styleName);
 	if (style == NULL) {
-		style = GetStyle(FALLBACK_PLAIN_FONT_FAMILY, DEFAULT_PLAIN_FONT_STYLE);
+		style = GetStyle(fallbackFamily, fallbackStyle);
 		if (style == NULL) {
-			style = FindStyleMatchingFace(B_REGULAR_FACE);
-			if (style == NULL && fFamilies.CountItems() != 0)
+			style = FindStyleMatchingFace(fallbackFace);
+			if (style == NULL && FamilyAt(0) != NULL)
 				style = FamilyAt(0)->StyleAt(0);
 		}
 	}
 
+	return style;
+}
+
+
+/*!
+	\brief Sets the fonts that will be used when you create an empty
+		ServerFont without specifying a style, as well as the default
+		Desktop fonts if there are no settings available.
+*/
+status_t
+FontManager::_SetDefaultFonts()
+{
+	FontStyle* style = _GetDefaultStyle(DEFAULT_PLAIN_FONT_FAMILY,
+		DEFAULT_PLAIN_FONT_STYLE, FALLBACK_PLAIN_FONT_FAMILY,
+		DEFAULT_PLAIN_FONT_STYLE,
+		B_REGULAR_FACE);
 	if (style == NULL)
 		return B_ERROR;
 
-	fDefaultFont = new (nothrow) ServerFont(*style, DEFAULT_PLAIN_FONT_SIZE);
-	if (fDefaultFont == NULL)
+	fDefaultPlainFont = new (nothrow) ServerFont(*style, DEFAULT_PLAIN_FONT_SIZE);
+	if (fDefaultPlainFont == NULL)
 		return B_NO_MEMORY;
 
+	style = _GetDefaultStyle(DEFAULT_BOLD_FONT_FAMILY, DEFAULT_BOLD_FONT_STYLE,
+		FALLBACK_BOLD_FONT_FAMILY, DEFAULT_BOLD_FONT_STYLE, B_BOLD_FACE);
+
+	fDefaultBoldFont = new (nothrow) ServerFont(*style, DEFAULT_BOLD_FONT_SIZE);
+	if (fDefaultBoldFont == NULL)
+		return B_NO_MEMORY;
+
+	style = _GetDefaultStyle(DEFAULT_FIXED_FONT_FAMILY, DEFAULT_FIXED_FONT_STYLE,
+		FALLBACK_FIXED_FONT_FAMILY, DEFAULT_FIXED_FONT_STYLE, B_REGULAR_FACE);
+
+	fDefaultFixedFont = new (nothrow) ServerFont(*style, DEFAULT_FIXED_FONT_SIZE);
+	if (fDefaultFixedFont == NULL)
+		return B_NO_MEMORY;
+
+	fDefaultFixedFont->SetSpacing(B_FIXED_SPACING);
 	return B_OK;
 }
 
@@ -631,9 +661,23 @@ FontManager::FindStyleMatchingFace(uint16 face) const
 
 
 const ServerFont*
-FontManager::DefaultFont() const
+FontManager::DefaultPlainFont() const
 {
-	return fDefaultFont;
+	return fDefaultPlainFont;
+}
+
+
+const ServerFont*
+FontManager::DefaultBoldFont() const
+{
+	return fDefaultBoldFont;
+}
+
+
+const ServerFont*
+FontManager::DefaultFixedFont() const
+{
+	return fDefaultFixedFont;
 }
 
 

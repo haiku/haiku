@@ -56,7 +56,9 @@ class FontManager : public BLooper {
 		FontStyle *GetStyle(uint16 familyID, uint16 styleID) const;
 		FontStyle* FindStyleMatchingFace(uint16 face) const;
 
-		const ServerFont* DefaultFont() const;
+		const ServerFont* DefaultPlainFont() const;
+		const ServerFont* DefaultBoldFont() const;
+		const ServerFont* DefaultFixedFont() const;
 
 		void AttachUser(uid_t userID);
 		void DetachUser(uid_t userID);
@@ -66,7 +68,10 @@ class FontManager : public BLooper {
 		struct font_mapping;
 
 		bool _LoadRecentFontMappings();
-		status_t _SetDefaultFont();
+		FontStyle* _GetDefaultStyle(const char *familyName, const char *styleName,
+						const char *fallbackFamily, const char *fallbackStyle,
+						uint16 fallbackFace);
+		status_t _SetDefaultFonts();
 		void _AddSystemPaths();
 		status_t _AddPath(const char* path);
 		status_t _AddPath(BEntry& entry, font_directory** _newDirectory = NULL);
@@ -87,7 +92,9 @@ class FontManager : public BLooper {
 		BObjectList<font_mapping> fMappings;
 		BObjectList<FontFamily> fFamilies;
 		HashTable	fStyleHashTable;
-		ServerFont	*fDefaultFont;
+		ServerFont*	fDefaultPlainFont;
+		ServerFont*	fDefaultBoldFont;
+		ServerFont*	fDefaultFixedFont;
 		bool		fScanned;
 		int32		fNextID;
 };

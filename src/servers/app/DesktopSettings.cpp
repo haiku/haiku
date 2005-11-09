@@ -32,16 +32,9 @@ DesktopSettings::Private::~Private()
 void
 DesktopSettings::Private::_SetDefaults()
 {
-	_SetFont(fPlainFont, DEFAULT_PLAIN_FONT_FAMILY, DEFAULT_PLAIN_FONT_STYLE,
-		DEFAULT_PLAIN_FONT_SIZE, FALLBACK_PLAIN_FONT_FAMILY, DEFAULT_PLAIN_FONT_STYLE,
-		B_REGULAR_FACE);
-	_SetFont(fBoldFont, DEFAULT_BOLD_FONT_FAMILY, DEFAULT_BOLD_FONT_STYLE,
-		DEFAULT_BOLD_FONT_SIZE, FALLBACK_BOLD_FONT_FAMILY, DEFAULT_BOLD_FONT_STYLE,
-		B_BOLD_FACE);
-	_SetFont(fFixedFont, DEFAULT_FIXED_FONT_FAMILY, DEFAULT_FIXED_FONT_STYLE,
-		DEFAULT_FIXED_FONT_SIZE, FALLBACK_FIXED_FONT_FAMILY, DEFAULT_FIXED_FONT_STYLE,
-		B_REGULAR_FACE);
-	fFixedFont.SetSpacing(B_FIXED_SPACING);
+	fPlainFont = *gFontManager->DefaultPlainFont();
+	fBoldFont = *gFontManager->DefaultBoldFont();
+	fFixedFont = *gFontManager->DefaultFixedFont();
 
 	fMouseMode = B_NORMAL_MOUSE;
 
@@ -64,28 +57,6 @@ DesktopSettings::Private::_SetDefaults()
 	fMenuInfo.triggers_always_shown = false;
 
 	fWorkspacesCount = 1;
-}
-
-
-void
-DesktopSettings::Private::_SetFont(ServerFont &font, const char *familyName,
-	const char *styleName, float size, const char *fallbackFamily,
-	const char *fallbackStyle, uint16 fallbackFace)
-{
-	BAutolock locker(gFontManager);
-
-	// try to find a matching font
-
-	FontStyle* style = gFontManager->GetStyle(familyName, styleName);
-	if (style == NULL) {
-		style = gFontManager->GetStyle(fallbackFamily, fallbackStyle);
-		if (style == NULL) {
-			style = gFontManager->FindStyleMatchingFace(fallbackFace);
-		}
-	}
-
-	if (style != NULL)
-		font.SetStyle(*style);
 }
 
 

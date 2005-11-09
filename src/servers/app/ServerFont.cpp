@@ -147,7 +147,7 @@ ServerFont::ServerFont()
 	:
 	fStyle(NULL)
 {
-	*this = *gFontManager->DefaultFont();
+	*this = *gFontManager->DefaultPlainFont();
 }
 
 

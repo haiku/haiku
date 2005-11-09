@@ -49,9 +49,6 @@ class DesktopSettings::Private : public BLocker {
 
 	private:
 		void			_SetDefaults();
-		void			_SetFont(ServerFont& font, const char* family, const char* style,
-							float size, const char *fallbackFamily,
-							const char* fallbackStyle, uint16 fallbackFace);
 		status_t		_Load();
 
 		ServerFont		fPlainFont;
