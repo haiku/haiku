@@ -11,9 +11,9 @@ UnitTestLib libexampletest.so
 ;
 
 UnitTest UnitTester
-	: UnitTesterHelper.cpp
+	: UnitTester.cpp
 	: be $(TARGET_LIBSTDC++)
-	: UnitTesterHelper.rsrc
+	: UnitTester.rsrc
 ;
 
 # Install libbe and other libraries for target platform libbe_test.

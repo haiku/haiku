@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "UnitTesterHelper.h"
+#include "UnitTester.h"
 #include <SemaphoreSyncObject.h>
 #include <Directory.h>
 
