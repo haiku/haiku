@@ -1366,8 +1366,13 @@ BFont::operator!=(const BFont &font) const
 void
 BFont::PrintToStream() const
 {
-	printf("FAMILY STYLE %f %f %f %f %f %f\n", fSize, fShear, fRotation, fHeight.ascent,
-		fHeight.descent, fHeight.leading);
+	font_family family;
+	font_style style;
+	GetFamilyAndStyle(&family, &style);
+
+	printf("BFont { %s (%d), %s (%d) 0x%x %f/%f %fpt (%f %f %f), %ld\n", family,
+		fFamilyID, style, fStyleID, fFace, fShear, fRotation, fSize,
+		fHeight.ascent, fHeight.descent, fHeight.leading, fEncoding);
 }
 
 
