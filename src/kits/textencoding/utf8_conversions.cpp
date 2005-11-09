@@ -7,6 +7,14 @@
 #include <stdio.h>
 #include <Debug.h>
 
+//#define DEBUG_CONV 1
+
+#ifdef DEBUG_CONV
+	#define DEBPRINT(ARGS) printf ARGS;
+#else
+	#define DEBPRINT(ARGS) ;
+#endif
+
 using namespace BPrivate;
 
 typedef char ** input_buffer_t;
@@ -22,12 +30,12 @@ convert_encoding(const char * from, const char * to,
 	status_t status;
 	if (*srcLen == 0) {
 		// nothing to do!
-		PRINT(("nothing to do\n"));
+		DEBPRINT(("nothing to do\n"));
 		return B_OK;
 	}
 	iconv_t conversion = iconv_open(to,from);
 	if (conversion == (iconv_t)-1) {
-		PRINT(("iconv_open failed\n"));
+		DEBPRINT(("iconv_open failed\n"));
 		return B_ERROR;
 	}
 	if ((state == NULL) || (*state == 0)) {
@@ -89,11 +97,11 @@ convert_encoding(const char * from, const char * to,
 	iconv_close(conversion);
 	if (*srcLen != 0) {
 		// able to convert at least one character
-		PRINT(("able to convert at least one character\n"));
+		DEBPRINT(("able to convert at least one character\n"));
 		return B_OK;
 	} else {
 		// not able to convert at least one character
-		PRINT(("not able to convert at least one character\n"));
+		DEBPRINT(("not able to convert at least one character\n"));
 		return B_ERROR;
 	}
 }
@@ -108,7 +116,7 @@ convert_to_utf8(uint32 srcEncoding,
 	if (charset == 0) {
 		return B_ERROR;
 	}
-#if DEBUG
+#if DEBUG_CONV
 	fprintf(stderr, "convert_to_utf8(%s) : \"", charset->GetName());
 	for (int i = 0 ; i < *srcLen ; i++) {
 		fprintf(stderr, "%c", src[i]);
@@ -128,7 +136,7 @@ convert_from_utf8(uint32 dstEncoding,
 	if (charset == 0) {
 		return B_ERROR;
 	}
-#if DEBUG
+#if DEBUG_CONV
 	fprintf(stderr, "convert_from_utf8(%s) : \"", charset->GetName());
 	for (int i = 0 ; i < *srcLen ; i++) {
 		fprintf(stderr, "%c", src[i]);
