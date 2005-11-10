@@ -608,14 +608,13 @@ BMenu::MaxContentWidth() const
 BMenuItem *
 BMenu::FindMarked()
 {
-	BMenuItem *item = NULL;
 	for (int32 i = 0; i < fItems.CountItems(); i++) {
-		item = ItemAt(i);
+		BMenuItem *item = ItemAt(i);
 		if (item->IsMarked())
-			break;
+			return item;
 	}
 
-	return item;
+	return NULL;
 }
 
 
