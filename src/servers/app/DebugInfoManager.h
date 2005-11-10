@@ -13,16 +13,17 @@
 #include <OS.h>
 
 #if __HAIKU__
-# define ON_SCREEN_DEBUGGING_INFO 1
+# define ON_SCREEN_DEBUGGING_INFO 0
 #else
-# define ON_SCREEN_DEBUGGING_INFO 1
+# define ON_SCREEN_DEBUGGING_INFO 0
 #endif
 
 #if ON_SCREEN_DEBUGGING_INFO
   extern char* gDebugString;
 # define CRITICAL(x) { sprintf(gDebugString, (x)); DebugInfoManager::Default()->AddInfo(gDebugString); }
 #else
-# define CRITICAL(x) debugger x
+//# define CRITICAL(x) debugger (x)
+# define CRITICAL(x) ;
 #endif // ON_SCREEN_DEBUGGING_INFO
 
 class DebugInfoManager {

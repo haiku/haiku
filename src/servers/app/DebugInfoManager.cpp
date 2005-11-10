@@ -48,10 +48,13 @@ DebugInfoManager::AddInfo(const char* string)
 DebugInfoManager::DebugInfoManager()
 #if ON_SCREEN_DEBUGGING_INFO
 	: fRootLayer(NULL)
-#endif // ON_SCREEN_DEBUGGING_INFO
 {
 	gDebugString[0] = 0;
 }
+#else
+{
+}
+#endif // ON_SCREEN_DEBUGGING_INFO
 
 #if ON_SCREEN_DEBUGGING_INFO
 // SetRootLayer
