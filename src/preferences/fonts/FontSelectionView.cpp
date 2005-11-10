@@ -104,7 +104,7 @@ FontSelectionView::FontSelectionView(BRect rect, const char* name,
 	font.SetSize(kMaxSize);
 	font_height height;
 	font.GetHeight(&height);
-	rect.bottom = rect.top + floorf(height.ascent + height.descent + height.leading) + 5;
+	rect.bottom = rect.top + ceil(height.ascent + height.descent + height.leading) + 5;
 
 	fPreviewBox = new BBox(rect, "preview", B_FOLLOW_LEFT_RIGHT,
 		B_WILL_DRAW | B_FRAME_EVENTS);
@@ -144,7 +144,7 @@ FontSelectionView::GetPreferredSize(float *_width, float *_height)
 	if (_height) {
 		BView* view = FindView("preview");
 		if (view != NULL)
-			*_height = view->Frame().bottom + 1;
+			*_height = view->Frame().bottom;
 	}
 }
 
