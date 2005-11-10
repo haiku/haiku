@@ -190,9 +190,8 @@ WinBorder::MoveBy(float x, float y)
 		Layer::MoveBy(x, y);
 
 		GetRootLayer()->Unlock();
-	}
-	// just offset to the new position
-	else {
+	} else {
+		// just offset to the new position
 		if (fDecorator)
 			fDecorator->MoveBy(x, y);
 
@@ -253,8 +252,7 @@ WinBorder::ResizeBy(float x, float y)
 		Layer::ResizeBy(x, y);
 
 		GetRootLayer()->Unlock();
-	}
-	else {
+	} else {
 		if (fDecorator)
 			fDecorator->ResizeBy(x, y);
 
@@ -309,7 +307,7 @@ if (cnt != 0)
 	CRITICAL("Layer::UpdateStart(): wb->cnt != 0 -> Not Allowed!");
 }
 
-// UpdateEnd
+
 void
 WinBorder::UpdateEnd()
 {
@@ -324,14 +322,18 @@ WinBorder::UpdateEnd()
 		GetRootLayer()->TriggerRedraw();
 	}
 }
+
+
 void
-WinBorder::EnableUpdateRequests() {
+WinBorder::EnableUpdateRequests()
+{
 	fUpdateRequestsEnabled = true;
 	if (fCumulativeRegion.CountRects() > 0) {
 		GetRootLayer()->MarkForRedraw(fCumulativeRegion);
 		GetRootLayer()->TriggerRedraw();
 	}
 }
+
 
 //! Sets the minimum and maximum sizes of the window
 void
@@ -405,8 +407,8 @@ void
 WinBorder::MouseDown(const BMessage *msg)
 {
 	DesktopSettings desktopSettings(GetRootLayer()->GetDesktop());
-	BPoint where(0,0);
-	
+	BPoint where(0, 0);
+
 	msg->FindPoint("where", &where);
 
 	// not in FFM mode?
@@ -414,20 +416,8 @@ WinBorder::MouseDown(const BMessage *msg)
 		// default action is to drag the WinBorder
 		click_type action = DEC_DRAG;
 		Layer *target = LayerAt(where);
-		// clicking a simple Layer.
-		if (target != this) {
-			if (GetRootLayer()->ActiveWorkspace()->Active() == this) {
-				target->MouseDown(msg);
-			}
-			else {
-				if (WindowFlags() & B_WILL_ACCEPT_FIRST_CLICK)
-					target->MouseDown(msg);
-				else
-					goto activateWindow;
-			}
-		}
-		// clicking WinBorder visible area
-		else {
+		if (target == this) {
+			// clicking WinBorder visible area
 			winBorderAreaHandle:
 
 			if (fDecorator)
@@ -435,7 +425,7 @@ WinBorder::MouseDown(const BMessage *msg)
 
 			// deactivate border buttons on first click(select)
 			if (GetRootLayer()->Focus() != this && action != DEC_MOVETOBACK
-					&& action != DEC_RESIZE && action != DEC_SLIDETAB)
+				&& action != DEC_RESIZE && action != DEC_SLIDETAB)
 				action = DEC_DRAG;
 
 			// set decorator internals
@@ -483,26 +473,36 @@ WinBorder::MouseDown(const BMessage *msg)
 			// based on what the Decorator returned, properly place this window.
 			if (action == DEC_MOVETOBACK) {
 				GetRootLayer()->SetActive(this, false);
-			}
-			else {
+			} else {
 				GetRootLayer()->SetNotifyLayer(this, B_POINTER_EVENTS, 0UL);
 	
 				activateWindow:
 				GetRootLayer()->SetActive(this);
 			}
+		} else if (target != NULL) {
+			// clicking a simple Layer.
+			if (GetRootLayer()->ActiveWorkspace()->Active() == this) {
+				target->MouseDown(msg);
+			} else {
+				if (WindowFlags() & B_WILL_ACCEPT_FIRST_CLICK)
+					target->MouseDown(msg);
+				else
+					goto activateWindow;
+			}
+		}
+	} else {
+		// in FFM mode
+		Layer *target = LayerAt(where);
+		if (target == this) {
+			// clicking inside our visible area.
+			goto winBorderAreaHandle;
+		} else if (target != NULL) {
+			// clicking a simple Layer; forward event.
+			target->MouseDown(msg);
 		}
 	}
-	// in FFM mode
-	else {
-		Layer *target = LayerAt(where);
-		// clicking a simple Layer; forward event.
-		if (target != this)
-			target->MouseDown(msg);
-		// clicking inside our visible area.
-		else
-			goto winBorderAreaHandle;
-	}
 }
+
 
 void
 WinBorder::MouseUp(const BMessage *msg)
@@ -545,6 +545,7 @@ WinBorder::MouseUp(const BMessage *msg)
 	fIsSlidingTab = false;
 }
 
+
 void
 WinBorder::MouseMoved(const BMessage *msg)
 {
@@ -582,6 +583,7 @@ WinBorder::MouseMoved(const BMessage *msg)
 	fLastMousePosition = where;
 }
 
+
 void
 WinBorder::WorkspaceActivated(int32 index, bool active)
 {
@@ -592,6 +594,7 @@ WinBorder::WorkspaceActivated(int32 index, bool active)
 
 	Window()->SendMessageToClient(&activatedMsg, B_NULL_TOKEN, false);
 }
+
 
 void
 WinBorder::WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces)
@@ -606,6 +609,7 @@ WinBorder::WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces)
 	Window()->SendMessageToClient(&changedMsg, B_NULL_TOKEN, false);
 }
 
+
 void
 WinBorder::Activated(bool active)
 {
@@ -614,6 +618,7 @@ WinBorder::Activated(bool active)
 	Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
 }
 
+
 // SetTabLocation
 void
 WinBorder::SetTabLocation(float location)
@@ -621,6 +626,7 @@ WinBorder::SetTabLocation(float location)
 	if (fDecorator)
 		fDecorator->SetTabLocation(location);
 }
+
 
 // TabLocation
 float
@@ -631,6 +637,7 @@ WinBorder::TabLocation() const
 	return 0.0;
 }
 
+
 //! Sets the decorator focus to active or inactive colors
 void
 WinBorder::HighlightDecorator(bool active)
@@ -640,35 +647,39 @@ WinBorder::HighlightDecorator(bool active)
 		fDecorator->SetFocus(active);
 }
 
-// Unimplemented. Hook function for handling when system GUI colors change
+
 void
 WinBorder::UpdateColors()
 {
+	// Unimplemented. Hook function for handling when system GUI colors change
 	STRACE(("WinBorder %s: UpdateColors unimplemented\n", Name()));
 }
 
-// Unimplemented. Hook function for handling when the system decorator changes
+
 void
 WinBorder::UpdateDecorator()
 {
+	// Unimplemented. Hook function for handling when the system decorator changes
 	STRACE(("WinBorder %s: UpdateDecorator unimplemented\n", Name()));
 }
 
-// Unimplemented. Hook function for handling when a system font changes
+
 void
 WinBorder::UpdateFont()
 {
+	// Unimplemented. Hook function for handling when a system font changes
 	STRACE(("WinBorder %s: UpdateFont unimplemented\n", Name()));
 }
 
-// Unimplemented. Hook function for handling when the screen resolution changes
+
 void
 WinBorder::UpdateScreen()
 {
+	// Unimplemented. Hook function for handling when the screen resolution changes
 	STRACE(("WinBorder %s: UpdateScreen unimplemented\n", Name()));
 }
 
-// QuietlySetFeel
+
 void
 WinBorder::QuietlySetFeel(int32 feel)
 {
@@ -753,16 +764,18 @@ WinBorder::_ActionFor(const BMessage *msg) const
 		return DEC_NONE;
 }
 
-void WinBorder::set_decorator_region(BRect bounds)
+
+void
+WinBorder::set_decorator_region(BRect bounds)
 {
 	fRebuildDecRegion = false;
 
-	if (fDecorator)
-	{
+	if (fDecorator) {
 		fDecRegion.MakeEmpty();
 		fDecorator->GetFootprint(&fDecRegion);
 	}
 }
+
 
 void
 WinBorder::_ReserveRegions(BRegion &reg)
@@ -772,6 +785,7 @@ WinBorder::_ReserveRegions(BRegion &reg)
 	fVisible2.Include(&reserve);
 	reg.Exclude(&reserve);
 }
+
 
 void
 WinBorder::GetWantedRegion(BRegion &reg)
@@ -789,6 +803,7 @@ WinBorder::GetWantedRegion(BRegion &reg)
 
 	reg.IntersectWith(&screenReg);
 }
+
 
 void
 WinBorder::RequestClientRedraw(const BRegion &invalid)
@@ -825,14 +840,14 @@ if (cnt != 1)
 	}
 }
 
-// SetTopLayer
+
 void
 WinBorder::SetTopLayer(Layer* layer)
 {
 	if (layer) {
 		fTopLayer = layer;
 		fTopLayer->SetAsTopLayer(true);
-	
+
 		// connect decorator and top layer. (?)
 		AddChild(fTopLayer, NULL);
 	}
