@@ -127,7 +127,7 @@ main(int argc, char **argv)
 				"No", "Yes"))->Go();
 
 			if (index == 1)
-				be_roster->Launch("application/x-vnd.Be-TIME");
+				be_roster->Launch("application/x-vnd.Haiku-TIME");
 		}
 	}
 
