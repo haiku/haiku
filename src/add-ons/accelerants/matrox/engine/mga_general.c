@@ -54,7 +54,7 @@ status_t gx00_general_powerup()
 	status_t status;
 	uint32 card_class;
 
-	LOG(1,("POWERUP: Haiku Matrox Accelerant 0.20 running.\n"));
+	LOG(1,("POWERUP: Haiku Matrox Accelerant 0.21 running.\n"));
 
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))

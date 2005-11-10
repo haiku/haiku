@@ -157,6 +157,23 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	}	
 	#endif
 
+	/* check colorspace versus requested dualhead mode */
+	switch (target->space)
+	{
+	case B_CMAP8:
+	case B_RGB15:
+		/* mode will be made 'outside limits' when dualhead was requested */
+		if (target->flags & DUALHEAD_BITS)
+		{
+			status = B_BAD_VALUE;
+			LOG(4, ("PROPOSEMODE: WARNING: Colorspace can't be done in dualhead mode\n"));
+		}
+		/* clear dualhead bits if colorspace isn't supported to prevent ProposeMode
+		 * from aborting */
+		target->flags &= ~(DUALHEAD_BITS | DUALHEAD_CAPABLE);
+		break;
+	}
+
 	/*find a nearby valid timing from that given*/
 	result = gx00_crtc_validate_timing
 	(
@@ -207,10 +224,6 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 		{		
 			status = B_BAD_VALUE;
 		}
-		else
-		{
-			status = B_OK;
-		}
 		LOG(4, ("PROPOSEMODE: WARNING: horizontal timing deviates too much\n"));
 	}
 
@@ -231,10 +244,6 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 			(target->timing.v_display > high->timing.v_display))
 		{		
 			status = B_BAD_VALUE;
-		}
-		else
-		{
-			status = B_OK;
 		}
 		LOG(4, ("PROPOSEMODE: WARNING: vertical timing deviates too much\n"));
 	}
@@ -259,10 +268,6 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 			(target->timing.pixel_clock > (high->timing.pixel_clock + 1000)))
 		{
 			status = B_BAD_VALUE;
-		}
-		else
-		{
-			status = B_OK;
 		}
 		LOG(4, ("PROPOSEMODE: WARNING: pixelclock deviates too much\n"));
 	}
