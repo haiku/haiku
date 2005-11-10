@@ -2543,7 +2543,7 @@ BView::StrokePolygon(const BPoint *ptArray, int32 numPoints, BRect bounds,
 	bool closed, ::pattern pattern)
 {
 	if (!ptArray
-		|| numPoints <= 2
+		|| numPoints <= 1
 		|| fOwner == NULL)
 		return;
 
@@ -2579,7 +2579,8 @@ BView::FillPolygon(const BPolygon *polygon, ::pattern pattern)
 	_UpdatePattern(pattern);
 
 	if (fOwner->fLink->StartMessage(AS_FILL_POLYGON,
-			polygon->fCount * sizeof(BPoint) + sizeof(int32)) == B_OK) {
+			polygon->fCount * sizeof(BPoint) + sizeof(BRect) + sizeof(int32)) == B_OK) {
+		fOwner->fLink->Attach<BRect>(polygon->Frame());
 		fOwner->fLink->Attach<int32>(polygon->fCount);
 		fOwner->fLink->Attach(polygon->fPts, polygon->fCount * sizeof(BPoint));
 	} else {
