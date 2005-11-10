@@ -89,6 +89,17 @@ class FontList : public BLocker {
 static BPrivate::FontList sFontList;
 
 
+//	#pragma mark -
+
+
+static int
+compare_families(const family* a, const family* b)
+{
+	// TODO: compare font names according to the user's locale settings
+	return strcmp(a->name.String(), b->name.String());
+}
+
+
 namespace BPrivate {
 
 FontList::FontList()
@@ -179,7 +190,7 @@ FontList::_Update()
 			family->styles.AddItem(style);
 		}
 
-		fFamilies.AddItem(family);
+		fFamilies.BinaryInsert(family, compare_families);
 	}
 
 	fRevision = revision;
@@ -209,16 +220,10 @@ FontList::_FindFamily(font_family name)
 	if (fLastFamily != NULL && fLastFamily->name == name)
 		return fLastFamily;
 
-	for (int32 i = 0; i < fFamilies.CountItems(); i++) {
-		family* family = fFamilies.ItemAt(i);
-
-		if (family->name == name) {
-			fLastFamily = family;
-			return family;
-		}
-	}
-
-	return NULL;
+	::family family;
+	family.name = name;
+	fLastFamily = const_cast< ::family*>(fFamilies.BinarySearch(family, compare_families));
+	return fLastFamily;
 }
 
 
