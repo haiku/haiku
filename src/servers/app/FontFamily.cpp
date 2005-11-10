@@ -27,11 +27,12 @@ const uint32 kInvalidFamilyFlags = ~0UL;
 	\param filepath path to a font file
 	\param face FreeType handle for the font file after it is loaded - it will be kept open until the FontStyle is destroied
 */
-FontStyle::FontStyle(const char *path, FT_Face face)
+FontStyle::FontStyle(node_ref& nodeRef, const char* path, FT_Face face)
 	: BLocker(BString("FontStyle_").Append(face->style_name).String()),
 	fFreeTypeFace(face),
 	fName(face->style_name),
 	fPath(path),
+	fNodeRef(nodeRef),
 	fFamily(NULL),
 	fID(0),
 	fBounds(0, 0, 0, 0),
@@ -55,7 +56,7 @@ FontStyle::~FontStyle()
 {
 	// make sure the font server is ours
 	if (fFamily != NULL && gFontManager->Lock()) {
-		fFamily->RemoveStyle(this);
+		fFamily->RemoveStyle(this, false);
 		gFontManager->Unlock();
 	}
 
@@ -231,6 +232,7 @@ FontFamily::FontFamily(const char *name, uint16 id)
 		// make sure this family can be found using the Be API
 }
 
+
 /*!
 	\brief Destructor
 	
@@ -240,8 +242,8 @@ FontFamily::FontFamily(const char *name, uint16 id)
 */
 FontFamily::~FontFamily()
 {
-	int32 count = fStyles.CountItems();
-	for (int32 i = 0; i < count; i++)
+	// styles are removing itself when deleted
+	for (int32 i = fStyles.CountItems(); i-- > 0;)
 		delete fStyles.ItemAt(i);
 }
 
@@ -286,11 +288,11 @@ FontFamily::AddStyle(FontStyle *style)
 
 
 bool
-FontFamily::RemoveStyle(const char* styleName)
+FontFamily::RemoveStyle(const char* styleName, bool deleteSelfIfEmpty)
 {
 	FontStyle *style = GetStyle(styleName);
 	if (style != NULL)
-		return RemoveStyle(style);
+		return RemoveStyle(style, deleteSelfIfEmpty);
 
 	return false;
 }
@@ -306,7 +308,7 @@ FontFamily::RemoveStyle(const char* styleName)
 	\param style The style to be removed from the family
 */
 bool
-FontFamily::RemoveStyle(FontStyle* style)
+FontFamily::RemoveStyle(FontStyle* style, bool deleteSelfIfEmpty)
 {
 	if (!gFontManager->IsLocked()) {
 		debugger("FontFamily::RemoveStyle() called without having the font manager locked!");
@@ -319,7 +321,9 @@ FontFamily::RemoveStyle(FontStyle* style)
 	// force a refresh if a request for font flags is needed
 	fFlags = kInvalidFamilyFlags;
 
-	if (CountStyles() == 0)
+	style->_SetFontFamily(NULL, -1);
+
+	if (deleteSelfIfEmpty && CountStyles() == 0)
 		delete this;
 
 	return true;

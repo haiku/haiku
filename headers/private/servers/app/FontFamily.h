@@ -10,11 +10,12 @@
 #define FONT_FAMILY_H_
 
 
-#include <String.h>
-#include <Rect.h>
 #include <Font.h>
-#include <ObjectList.h>
 #include <Locker.h>
+#include <Node.h>
+#include <ObjectList.h>
+#include <Rect.h>
+#include <String.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -22,6 +23,7 @@
 #include "HashTable.h"
 
 
+struct node_ref;
 class FontFamily;
 class ServerFont;
 
@@ -66,11 +68,13 @@ class FontKey : public Hashable {
 */
 class FontStyle : public SharedObject, public Hashable, public BLocker {
 	public:
-						FontStyle(const char* path, FT_Face face);
+						FontStyle(node_ref& nodeRef, const char* path, FT_Face face);
 		virtual			~FontStyle();
 
 		virtual uint32	Hash() const;
 		virtual bool	CompareTo(Hashable& other) const;
+
+		const node_ref& NodeRef() const { return fNodeRef; }
 
 /*!
 	\fn bool FontStyle::IsFixedWidth(void)
@@ -159,6 +163,7 @@ class FontStyle : public SharedObject, public Hashable, public BLocker {
 		FT_Face			fFreeTypeFace;
 		BString			fName;
 		BString			fPath;
+		node_ref		fNodeRef;
 
 		FontFamily*		fFamily;
 		uint16			fID;
@@ -184,8 +189,8 @@ class FontFamily {
 		const char*	Name() const;
 
 		bool		AddStyle(FontStyle* style);
-		bool		RemoveStyle(const char* style);
-		bool		RemoveStyle(FontStyle* style);
+		bool		RemoveStyle(const char* style, bool deleteSelfIfEmpty = true);
+		bool		RemoveStyle(FontStyle* style, bool deleteSelfIfEmpty = true);
 
 		FontStyle*	GetStyle(const char* style) const;
 		FontStyle*	GetStyleMatchingFace(uint16 face) const;

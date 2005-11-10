@@ -73,6 +73,8 @@ class FontManager : public BLooper {
 						uint16 fallbackFace);
 		status_t _SetDefaultFonts();
 		void _AddSystemPaths();
+		font_directory* _FindDirectory(node_ref& nodeRef);
+		void _RemoveDirectory(font_directory* directory);
 		status_t _AddPath(const char* path);
 		status_t _AddPath(BEntry& entry, font_directory** _newDirectory = NULL);
 
@@ -82,7 +84,7 @@ class FontManager : public BLooper {
 		void _ScanFontsIfNecessary();
 		void _ScanFonts();
 		status_t _ScanFontDirectory(font_directory& directory);
-		status_t _AddFont(BPath& path);
+		status_t _AddFont(font_directory& directory, BEntry& entry);
 
 		FT_CharMap _GetSupportedCharmap(const FT_Face &face);
 
