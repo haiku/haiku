@@ -16,12 +16,14 @@
 #include <Window.h>
 
 class BButton;
+class BMessageRunner;
 class FontView;
 
 
 class MainWindow : public BWindow {
 	public:
 		MainWindow();
+		virtual ~MainWindow();
 
 		virtual	bool	QuitRequested();
 		virtual	void	MessageReceived(BMessage *message);
@@ -29,6 +31,7 @@ class MainWindow : public BWindow {
 	private:
 		void			_Center();
 
+		BMessageRunner*	fRunner;
 		FontView*		fFontsView;
 		BButton*		fRevertButton;
 

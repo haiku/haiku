@@ -14,12 +14,14 @@
 
 #include <Application.h>
 #include <Button.h>
+#include <MessageRunner.h>
 #include <Screen.h>
 #include <TabView.h>
 
 
 static const uint32 kMsgSetDefaults = 'dflt';
 static const uint32 kMsgRevert = 'rvrt';
+static const uint32 kMsgCheckFonts = 'chkf';
 
 
 MainWindow::MainWindow()
@@ -93,6 +95,15 @@ MainWindow::MainWindow()
 			|| Frame().top > screen.Frame().bottom - 10)
 			_Center();
 	}
+
+	fRunner = new BMessageRunner(this, new BMessage(kMsgCheckFonts), 3000000);
+		// every 3 seconds
+}
+
+
+MainWindow::~MainWindow()
+{
+	delete fRunner;
 }
 
 
@@ -124,7 +135,12 @@ MainWindow::MessageReceived(BMessage *message)
 			fRevertButton->SetEnabled(false);
 			break;
 
-		default: 
+		case kMsgCheckFonts:
+			if (update_font_families(true))
+				fFontsView->UpdateFonts();
+			break;
+
+		default:
 			BWindow::MessageReceived(message);
 			break;
 	}
