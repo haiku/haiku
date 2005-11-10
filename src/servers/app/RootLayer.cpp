@@ -1179,13 +1179,8 @@ RootLayer::KeyboardEventHandler(BMessage *msg)
 			// F1-F12		
 			if (scancode > 0x01 && scancode < 0x0e) {
 				// Check for workspace change or safe video mode
-#if !TEST_MODE
 				if (scancode == 0x0d && (modifiers & (B_LEFT_COMMAND_KEY
 											| B_LEFT_CONTROL_KEY | B_LEFT_SHIFT_KEY)) != 0)
-#else
-				if (scancode == 0x0d && (modifiers & (B_LEFT_CONTROL_KEY
-											| B_LEFT_SHIFT_KEY | B_LEFT_OPTION_KEY)) != 0)
-#endif
 				{
 					// TODO: Set to Safe Mode in KeyboardEventHandler:B_KEY_DOWN. (DrawingEngine API change)
 					STRACE(("Safe Video Mode invoked - code unimplemented\n"));
@@ -1193,9 +1188,9 @@ RootLayer::KeyboardEventHandler(BMessage *msg)
 				}
 
 #if !TEST_MODE
-				if (modifiers & B_CONTROL_KEY)
+				if (modifiers & B_COMMAND_KEY)
 #else
-				if (modifiers & (B_LEFT_SHIFT_KEY | B_LEFT_CONTROL_KEY))
+				if (modifiers & B_CONTROL_KEY)
 #endif
 				{
 					STRACE(("Set Workspace %ld\n",scancode-1));
@@ -1212,12 +1207,7 @@ RootLayer::KeyboardEventHandler(BMessage *msg)
 			}
 
 			// Tab key
-#if !TEST_MODE
-			if (scancode == 0x26 && (modifiers & B_CONTROL_KEY))
-#else
-			if (scancode == 0x26 && (modifiers & B_SHIFT_KEY))
-#endif
-			{
+			if (scancode == 0x26 && (modifiers & B_CONTROL_KEY)) {
 				STRACE(("Twitcher\n"));
 				//ServerApp *deskbar = app_server->FindApp("application/x-vnd.Be-TSKB");
 				//if(deskbar)
@@ -1228,14 +1218,8 @@ RootLayer::KeyboardEventHandler(BMessage *msg)
 				//}
 			}
 
-#if !TEST_MODE
 			// PrintScreen
-			if (scancode == 0xe)
-#else
-			// Pause/Break
-			if (scancode == 0x7f)
-#endif
-			{
+			if (scancode == 0xe) {
 				if (GetDrawingEngine()) {
 					char filename[128];
 					BEntry entry;
@@ -1269,10 +1253,8 @@ RootLayer::KeyboardEventHandler(BMessage *msg)
 			msg->FindInt32("key", &scancode);
 			msg->FindInt32("modifiers", &modifiers);
 
-#if !TEST_MODE
 			// Tab key
-			if(scancode==0x26 && (modifiers & B_CONTROL_KEY))
-			{
+			if (scancode == 0x26 && (modifiers & B_CONTROL_KEY)) {
 				//ServerApp *deskbar=app_server->FindApp("application/x-vnd.Be-TSKB");
 				//if(deskbar)
 				//{
@@ -1280,52 +1262,35 @@ RootLayer::KeyboardEventHandler(BMessage *msg)
 					break;
 				//}
 			}
-#else	// TEST_MODE
-			if(scancode==0x26 && (modifiers & B_LEFT_SHIFT_KEY))
-			{
-				//ServerApp *deskbar=app_server->FindApp("application/x-vnd.Be-TSKB");
-				//if(deskbar)
-				//{
-					printf("Send Twitcher message key to Deskbar - unimplmemented\n");
-					break;
-				//}
-			}
-#endif
 
 			// We got this far, so apparently it's safe to pass to the active
 			// window.
 
 			if (Focus())
 				Focus()->KeyUp(msg);
-
 			break;
 		}
 
 		case B_UNMAPPED_KEY_DOWN:
-		{
-			if(Focus())
+			if (Focus())
 				Focus()->UnmappedKeyDown(msg);
-			
 			break;
-		}
-		case B_UNMAPPED_KEY_UP:
-		{
-			if(Focus())
-				Focus()->UnmappedKeyUp(msg);
-			
-			break;
-		}
-		case B_MODIFIERS_CHANGED:
-		{
-			if(Focus())
-				Focus()->ModifiersChanged(msg);
 
+		case B_UNMAPPED_KEY_UP:
+			if (Focus())
+				Focus()->UnmappedKeyUp(msg);
 			break;
-		}
+
+		case B_MODIFIERS_CHANGED:
+			if (Focus())
+				Focus()->ModifiersChanged(msg);
+			break;
+
 		default:
 			break;
 	}
 }
+
 
 bool
 RootLayer::AddToInputNotificationLists(Layer *lay, uint32 mask, uint32 options)

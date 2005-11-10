@@ -1,15 +1,13 @@
-//------------------------------------------------------------------------------
-//
-// Copyright 2002-2005, Haiku, Inc.
-// Distributed under the terms of the MIT License.
-//
-//
-//	File Name:		ViewHWInterface.cpp
-//	Authors:		DarkWyrm <bpmagic@columbus.rr.com>
-//					Stephan Aßmus <superstippi@gmx.de>
-//	Description:	BView/BWindow combination HWInterface implementation
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
+
+/**	BView/BWindow combination HWInterface implementation */
 
 #include <new>
 #include <stdio.h>
@@ -19,6 +17,7 @@
 #include <Cursor.h>
 #include <Locker.h>
 #include <Message.h>
+#include <MessageFilter.h>
 #include <MessageRunner.h>
 #include <Region.h>
 #include <Screen.h>
@@ -112,19 +111,15 @@ class CardView : public BView {
 
 	virtual	void				AttachedToWindow();
 	virtual	void				Draw(BRect updateRect);
-	virtual	void				MouseDown(BPoint where);
-	virtual	void				MouseMoved(BPoint where, uint32 transit,
-										   const BMessage* dragMessage);
-	virtual	void				MouseUp(BPoint where);
 	virtual	void				MessageReceived(BMessage* message);
 
 								// CardView
 			void				SetBitmap(const BBitmap* bimtap);
 
-	void						ForwardMessage();
+			void				ForwardMessage(BMessage* message = NULL);
 
 private:
-			port_id			fInputPort;
+			port_id				fInputPort;
 			const BBitmap*		fBitmap;
 };
 
@@ -147,8 +142,18 @@ class CardWindow : public BWindow {
 			BLocker				fUpdateLock;
 };
 
+class CardMessageFilter : public BMessageFilter {
+	public:
+		CardMessageFilter(CardView* view);
 
-//extern RGBColor workspace_default_color;
+		virtual filter_result Filter(BMessage *message, BHandler **_target);
+
+	private:
+		CardView*	fView;
+};
+
+//	#pragma mark -
+
 
 CardView::CardView(BRect bounds)
 	: BView(bounds, "graphics card view", B_FOLLOW_ALL, B_WILL_DRAW),
@@ -162,11 +167,16 @@ CardView::CardView(BRect bounds)
 	fInputPort = create_port(100, "ViewInputDevice");
 #endif
 
+#ifdef ENABLE_INPUT_SERVER_EMULATION
+	AddFilter(new CardMessageFilter(this));
+#endif
 }
+
 
 CardView::~CardView()
 {
 }
+
 
 // AttachedToWindow
 void
@@ -188,63 +198,31 @@ CardView::Draw(BRect updateRect)
 // to do anything else.
 
 void
-CardView::ForwardMessage()
+CardView::ForwardMessage(BMessage* message)
 {
-	BMessage *message = Window()->CurrentMessage();
+	if (message == NULL)
+		message = Window()->CurrentMessage();
+	if (message == NULL)
+		return;
+
 	size_t length = message->FlattenedSize();
 	char stream[length];
 
-	if ( message->Flatten(stream, length) == B_OK) {
+	if (message->Flatten(stream, length) == B_OK)
 		write_port(fInputPort, 0, stream, length);
-	}
 }
 
 
-// MouseDown
-void
-CardView::MouseDown(BPoint pt)
-{
-#ifdef ENABLE_INPUT_SERVER_EMULATION
-	ForwardMessage();
-#endif
-}
-
-// MouseMoved
-void
-CardView::MouseMoved(BPoint pt, uint32 transit, const BMessage* dragMessage)
-{
-	if (!Bounds().Contains(pt))
-		return;
-
-	// A bug in R5 prevents this call from having an effect if
-	// called elsewhere, and calling it here works, if we're lucky :-)
-	BCursor cursor(kEmptyCursor);
-	SetViewCursor(&cursor, true);
-
-#ifdef ENABLE_INPUT_SERVER_EMULATION
-	ForwardMessage();
-#endif
-}
-
-// MouseUp
-void
-CardView::MouseUp(BPoint pt)
-{
-#ifdef ENABLE_INPUT_SERVER_EMULATION
-	ForwardMessage();
-#endif
-}
-
-// MessageReceived
 void
 CardView::MessageReceived(BMessage* message)
 {
-	switch(message->what) {
+	switch (message->what) {
 		default:
 			BView::MessageReceived(message);
 			break;
 	}
 }
+
 
 // SetBitmap
 void
@@ -258,7 +236,53 @@ CardView::SetBitmap(const BBitmap* bitmap)
 	}
 }
 
-// constructor
+
+//	#pragma mark -
+
+
+CardMessageFilter::CardMessageFilter(CardView* view)
+	: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
+	fView(view)
+{
+}
+
+
+filter_result
+CardMessageFilter::Filter(BMessage *message, BHandler **target)
+{
+	switch (message->what) {
+		case B_KEY_DOWN:
+		case B_UNMAPPED_KEY_DOWN:
+		case B_KEY_UP:
+		case B_UNMAPPED_KEY_UP:
+		case B_MOUSE_DOWN:
+		case B_MOUSE_UP:
+		case B_MOUSE_WHEEL_CHANGED:
+			fView->ForwardMessage(message);
+			return B_SKIP_MESSAGE;
+
+		case B_MOUSE_MOVED:
+		{
+			int32 transit;
+			if (message->FindInt32("be:transit", &transit) == B_OK
+				&& transit == B_ENTERED_VIEW) {
+				// A bug in R5 prevents this call from having an effect if
+				// called elsewhere, and calling it here works, if we're lucky :-)
+				BCursor cursor(kEmptyCursor);
+				fView->SetViewCursor(&cursor, true);
+			}
+			fView->ForwardMessage(message);
+			return B_SKIP_MESSAGE;
+		}
+	}
+
+	return B_DISPATCH_MESSAGE;
+}
+
+
+//	#pragma mark -
+
+
 CardWindow::CardWindow(BRect frame)
 	: BWindow(frame, "Haiku App Server", B_TITLED_WINDOW,
 			  B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
@@ -268,20 +292,24 @@ CardWindow::CardWindow(BRect frame)
 {
 	fView = new CardView(Bounds());
 	AddChild(fView);
+	fView->MakeFocus();
+		// make it receive key events
 }
 
-// destructor
+
 CardWindow::~CardWindow()
 {
 	delete fUpdateRunner;
 }
 
-void CardWindow::MessageReceived(BMessage *msg)
+
+void
+CardWindow::MessageReceived(BMessage *msg)
 {
-STRACE("CardWindow::MessageReceived()\n");
+	STRACE("CardWindow::MessageReceived()\n");
 	switch (msg->what) {
 		case MSG_UPDATE:
-STRACE("MSG_UPDATE\n");
+			STRACE("MSG_UPDATE\n");
 			// invalidate all areas in the view that need redrawing
 			if (fUpdateLock.LockWithTimeout(2000LL) >= B_OK) {
 /*				int32 count = fUpdateRegion.CountRects();
@@ -300,14 +328,12 @@ STRACE("MSG_UPDATE\n");
 			}
 			break;
 		default:
-#ifdef ENABLE_INPUT_SERVER_EMULATION
-			fView->ForwardMessage();
-#endif
-				BWindow::MessageReceived(msg);
+			BWindow::MessageReceived(msg);
 			break;
 	}
-STRACE("CardWindow::MessageReceived() - exit\n");
+	STRACE("CardWindow::MessageReceived() - exit\n");
 }
+
 
 // QuitRequested
 bool
@@ -348,7 +374,9 @@ CardWindow::Invalidate(const BRect& frame)
 }
 
 
-// constructor
+//	#pragma mark -
+
+
 ViewHWInterface::ViewHWInterface()
 	: HWInterface(),
 	  fBackBuffer(NULL),
@@ -360,7 +388,7 @@ ViewHWInterface::ViewHWInterface()
 	fDisplayMode.space = B_RGBA32;
 }
 
-// destructor
+
 ViewHWInterface::~ViewHWInterface()
 {
 	if (fWindow) {
