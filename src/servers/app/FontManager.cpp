@@ -89,6 +89,13 @@ set_entry(node_ref& nodeRef, const char* name, BEntry& entry)
 }
 
 
+static int
+compare_font_families(const FontFamily* a, const FontFamily* b)
+{
+	return strcmp(a->Name(), b->Name());
+}
+
+
 //	#pragma mark -
 
 
@@ -426,7 +433,7 @@ FontManager::_AddFont(font_directory& directory, BEntry& entry)
 	if (family == NULL) {
 		family = new (nothrow) FontFamily(face->family_name, fNextID++);
 		if (family == NULL
-			|| !fFamilies.AddItem(family)) {
+			|| !fFamilies.BinaryInsert(family, compare_font_families)) {
 			delete family;
 			FT_Done_Face(face);
 			return B_NO_MEMORY;
@@ -699,15 +706,9 @@ FontManager::_FindFamily(const char* name) const
 	if (name == NULL)
 		return NULL;
 
-	int32 count = fFamilies.CountItems();
-
-	for (int32 i = 0; i < count; i++) {
-		FontFamily* family = fFamilies.ItemAt(i);
-		if (!strcmp(family->Name(), name))
-			return family;
-	}
-
-	return NULL;
+	FontFamily family(name, 0);
+	return const_cast<FontFamily*>(fFamilies.BinarySearch(family,
+		compare_font_families));
 }
 
 
