@@ -17,7 +17,6 @@
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include FT_CACHE_H
 
 class BPath;
 
@@ -56,6 +55,9 @@ class FontManager : public BLooper {
 		FontStyle *GetStyle(uint16 familyID, uint16 styleID) const;
 		FontStyle* FindStyleMatchingFace(uint16 face) const;
 
+		void RemoveStyle(FontStyle* style);
+			// this call must not be used by anything else than class FontStyle
+
 		const ServerFont* DefaultPlainFont() const;
 		const ServerFont* DefaultBoldFont() const;
 		const ServerFont* DefaultFixedFont() const;
@@ -78,8 +80,9 @@ class FontManager : public BLooper {
 		status_t _AddPath(const char* path);
 		status_t _AddPath(BEntry& entry, font_directory** _newDirectory = NULL);
 
+		void _RemoveStyle(font_directory& directory, FontStyle* style);
+		void _RemoveStyle(dev_t device, uint64 directory, uint64 node);
 		FontFamily* _FindFamily(const char* family) const;
-		void _RemoveFamily(const char* family);
 
 		void _ScanFontsIfNecessary();
 		void _ScanFonts();

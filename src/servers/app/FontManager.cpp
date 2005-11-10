@@ -38,7 +38,6 @@
 
 // TODO: needs some more work for multi-user support
 
-static FTC_Manager ftmanager;
 FT_Library gFreeTypeLibrary;
 FontManager *gFontManager = NULL;
 
@@ -116,29 +115,22 @@ FontManager::FontManager()
 
 		fInitStatus = _SetDefaultFonts();
 	}
-
-/*
-	Fire up the font caching subsystem.
-	The three zeros tell FreeType to use the defaults, which are 2 faces,
-	4 face sizes, and a maximum of 200000 bytes. I will probably change
-	these numbers in the future to maximize performance for your "average"
-	application.
-*/
-//	if (FTC_Manager_New(gFreeTypeLibrary, 0, 0, 0, &face_requester, NULL, &ftmanager) != 0)
-//		fInit = false;
 }
 
 
 //! Frees items allocated in the constructor and shuts down FreeType
 FontManager::~FontManager()
 {
+	delete fDefaultPlainFont;
+	delete fDefaultBoldFont;
+	delete fDefaultFixedFont;
+
 	// free families before we're done with FreeType
 
 	for (int32 i = fFamilies.CountItems(); i-- > 0;) {
 		delete fFamilies.ItemAt(i);
 	}
 
-	FTC_Manager_Done(ftmanager);
 	FT_Done_FreeType(gFreeTypeLibrary);
 }
 
@@ -165,6 +157,10 @@ FontManager::MessageReceived(BMessage* message)
 						|| message->FindString("name", &name) != B_OK)
 						break;
 
+					// TODO: make this better (possible under Haiku)
+					snooze(100000);
+						// let the font be written completely before trying to open it
+
 					BEntry entry;
 					if (set_entry(nodeRef, name, entry) != B_OK)
 						break;
@@ -184,6 +180,7 @@ FontManager::MessageReceived(BMessage* message)
 					}
 					break;
 				}
+
 				case B_ENTRY_MOVED:
 				{
 					// has the entry been moved into a monitored directory or has
@@ -234,16 +231,20 @@ FontManager::MessageReceived(BMessage* message)
 							if (entry.GetNodeRef(&nodeRef) == B_OK
 								&& (directory = _FindDirectory(nodeRef)) != NULL)
 								_RemoveDirectory(directory);
-						} else
-							WTRACE(("font removed: %s\n", name));
+						} else {
+							// remove font style from directory
+							_RemoveStyle(nodeRef.device, fromNode, node);
+						}
 					}
-
 					break;
 				}
+
 				case B_ENTRY_REMOVED:
 				{
 					node_ref nodeRef;
+					uint64 directoryNode;
 					if (message->FindInt32("device", &nodeRef.device) != B_OK
+						|| message->FindInt64("directory", (int64 *)&directoryNode) != B_OK
 						|| message->FindInt64("node", &nodeRef.node) != B_OK)
 						break;
 
@@ -252,8 +253,8 @@ FontManager::MessageReceived(BMessage* message)
 						// the directory has been removed, so we remove it as well
 						_RemoveDirectory(directory);
 					} else {
-						// a font was removed?
-						WTRACE(("removed a font?"));
+						// remove font style from directory
+						_RemoveStyle(nodeRef.device, directoryNode, nodeRef.node);
 					}
 					break;
 				}
@@ -278,23 +279,40 @@ FontManager::_LoadRecentFontMappings()
 
 
 /*!
-	\brief Removes a font family from the font list
-	\param family The family to remove
+	\brief Removes the style from the font directory.
+
+	It doesn't necessary delete the font style, if it's still
+	in use, though.
 */
 void
-FontManager::_RemoveFamily(const char *familyName)
+FontManager::_RemoveStyle(font_directory& directory, FontStyle* style)
 {
-	FontFamily *family = GetFamily(familyName);
-	if (family) {
-		// remove styles from hash
-		for (int32 i = 0; i < family->CountStyles(); i++) {
-			FontStyle* style = family->StyleAt(i);
+	WTRACE(("font removed: %s\n", style->Name()));
 
-			fStyleHashTable.RemoveItem(*style);
-		}
+	directory.styles.RemoveItem(style);
+	directory.revision++;
 
-		fFamilies.RemoveItem(family);
-		delete family;
+	fStyleHashTable.RemoveItem(*style);
+
+	style->Release();
+}
+
+
+void
+FontManager::_RemoveStyle(dev_t device, uint64 directoryNode, uint64 node)
+{
+	// remove font style from directory
+	node_ref nodeRef;
+	nodeRef.device = device;
+	nodeRef.node = directoryNode;
+
+	font_directory* directory = _FindDirectory(nodeRef);
+	if (directory != NULL) {
+		// find style in directory and remove it
+		nodeRef.node = node;
+		FontStyle* style = directory->FindStyle(nodeRef);
+		if (style != NULL)
+			_RemoveStyle(*directory, style);
 	}
 }
 
@@ -860,6 +878,28 @@ FontManager::FindStyleMatchingFace(uint16 face) const
 	}
 
 	return NULL;
+}
+
+
+/*!
+	\brief This call is used by the FontStyle class - and the FontStyle class
+		only - to remove itself from the font manager.
+	At this point, the style is already no longer available to the user.
+*/
+void
+FontManager::RemoveStyle(FontStyle* style)
+{
+	FontFamily* family = style->Family();
+	if (family == NULL)
+		debugger("family is NULL!");
+
+	FontStyle* check = GetStyle(family->ID(), style->ID());
+	if (check != NULL)
+		debugger("style removed but still available!");
+
+	if (family->RemoveStyle(style)
+		&& family->CountStyles() == 0)
+		fFamilies.RemoveItem(family);
 }
 
 

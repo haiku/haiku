@@ -19,7 +19,7 @@
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include "SharedObject.h"
+#include "ReferenceCounting.h"
 #include "HashTable.h"
 
 
@@ -66,7 +66,7 @@ class FontKey : public Hashable {
 	FontStyle objects help abstract a lot of the font engine details while
 	still offering plenty of information the style in question.
 */
-class FontStyle : public SharedObject, public Hashable, public BLocker {
+class FontStyle : public ReferenceCounting, public Hashable, public BLocker {
 	public:
 						FontStyle(node_ref& nodeRef, const char* path, FT_Face face);
 		virtual			~FontStyle();
@@ -189,8 +189,7 @@ class FontFamily {
 		const char*	Name() const;
 
 		bool		AddStyle(FontStyle* style);
-		bool		RemoveStyle(const char* style, bool deleteSelfIfEmpty = true);
-		bool		RemoveStyle(FontStyle* style, bool deleteSelfIfEmpty = true);
+		bool		RemoveStyle(FontStyle* style);
 
 		FontStyle*	GetStyle(const char* style) const;
 		FontStyle*	GetStyleMatchingFace(uint16 face) const;
