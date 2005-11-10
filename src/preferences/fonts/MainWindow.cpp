@@ -91,10 +91,7 @@ MainWindow::MainWindow()
 
 		// make sure window is on screen
 		BScreen screen(this);
-		if (Frame().left > screen.Frame().right - 10
-			|| Frame().top > screen.Frame().bottom - 10
-			|| Frame().right < screen.Frame().left + 10
-			|| Frame().bottom < screen.Frame().top + 10)
+		if (!screen.Frame().InsetByCopy(10, 10).Intersects(Frame()))
 			_Center();
 	}
 
