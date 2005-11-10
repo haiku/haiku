@@ -20,7 +20,7 @@ class Hashable {
 
 class HashTable {
 	public:
-		HashTable(int32 capacity = 100, float loadFactor = 0.75);
+		HashTable(bool owning = false, int32 capacity = 100, float loadFactor = 0.75);
 		~HashTable();
 
 		void MakeEmpty(bool deleteValues = true);
@@ -42,6 +42,7 @@ class HashTable {
 		entry**	fTable;
 		int32	fCapacity, fCount, fThreshold;
 		float	fLoadFactor;
+		bool	fOwning;
 };
 
 #endif  /* HASHTABLE_H */

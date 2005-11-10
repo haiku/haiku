@@ -22,11 +22,12 @@ struct HashTable::entry {
 };
 
 
-HashTable::HashTable(int32 capacity, float loadFactor)
+HashTable::HashTable(bool owning, int32 capacity, float loadFactor)
 	:
 	fTable(NULL),
 	fCount(0),
-	fThreshold(0)
+	fThreshold(0),
+	fOwning(owning)
 {
 	if (capacity < 10)
 		capacity = 10;
@@ -40,7 +41,7 @@ HashTable::HashTable(int32 capacity, float loadFactor)
 
 HashTable::~HashTable()
 {
-	MakeEmpty();
+	MakeEmpty(fOwning);
 }
 
 
