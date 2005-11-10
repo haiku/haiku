@@ -46,6 +46,7 @@ KernelAddon echo24 : kernel drivers bin :
 	kernel_cpp.cpp
 	debug.c
 	echo.cpp
+	midi.cpp
 	multi.cpp
 	util.c
 	$(echo_files)
@@ -68,6 +69,7 @@ SEARCH on [ FGristFiles
 SEARCH on [ FGristFiles
 		debug.c
 		echo.cpp
+		midi.cpp
 		multi.cpp
 		util.c
 	] = [ FDirName $(HAIKU_TOP) src add-ons kernel drivers audio echo ] ;

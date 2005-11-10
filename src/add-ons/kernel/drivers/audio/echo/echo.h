@@ -35,6 +35,18 @@
 #define DEVNAME 32
 #define NUM_CARDS 3
 
+
+/*
+ * Echo midi
+ */
+
+typedef struct _midi_dev {
+	int32		count;
+	char		name[64];
+	sem_id 		midi_ready_sem;
+	ECHOGALS_MIDI_IN_CONTEXT	context;
+} midi_dev;
+
 #define	ECHO_USE_PLAY		(1 << 0)
 #define	ECHO_USE_RECORD	(1 << 1)
 #define ECHO_STATE_STARTED	(1 << 0)
@@ -103,7 +115,10 @@ typedef struct _echo_dev {
 	echo_stream		*rstream;
 	
 	/* multi_audio */
-	multi_dev	multi;			
+	multi_dev	multi;		
+#ifdef MIDI_SUPPORT
+	midi_dev 	midi;
+#endif	
 } echo_dev;
 
 extern int32 num_cards;

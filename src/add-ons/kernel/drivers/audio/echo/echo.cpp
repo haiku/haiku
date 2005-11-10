@@ -52,6 +52,9 @@ int32 num_names;
 char * names[NUM_CARDS*20+1];
 
 extern device_hooks multi_hooks;
+#ifdef MIDI_SUPPORT
+extern device_hooks midi_hooks;
+#endif
 
 int32 echo_int(void *arg);
 status_t init_hardware(void);
@@ -380,6 +383,11 @@ int32 echo_int(void *arg)
 		return B_UNHANDLED_INTERRUPT;
 	}
 
+#ifdef MIDI_SUPPORT
+	if (midiReceived)
+		release_sem(card->midi.midi_ready_sem);
+#endif
+
 	LIST_FOREACH(stream, &card->streams, next) {
 		if ((stream->state & ECHO_STATE_STARTED) == 0 ||
 			(stream->inth == NULL))
@@ -547,6 +555,11 @@ static void
 make_device_names(
 	echo_dev * card)
 {
+
+#ifdef MIDI_SUPPORT
+	sprintf(card->midi.name, "midi/"DRIVER_NAME"/%ld", card-cards+1);
+	names[num_names++] = card->midi.name;
+#endif
 	sprintf(card->name, "audio/multi/"DRIVER_NAME"/%ld", card-cards+1);
 	names[num_names++] = card->name;
 
@@ -670,6 +683,10 @@ echo_setup(echo_dev * card)
 	/* Init mems list */
 	LIST_INIT(&(card->mems));
 	
+#ifdef MIDI_SUPPORT
+	card->midi.midi_ready_sem = create_sem(0, "midi sem");
+#endif
+	
 	PRINT(("installing interrupt : %x\n", card->irq));
 	install_io_interrupt_handler(card->irq, echo_int, card, 0);
 	
@@ -701,6 +718,10 @@ echo_shutdown(echo_dev *card)
 		PRINT(("echo_shutdown: error when CloseMixer\n"));
 
 	remove_io_interrupt_handler(card->irq, echo_int, card);
+
+#ifdef MIDI_SUPPORT
+        delete_sem(card->midi.midi_ready_sem);
+#endif
 	
 	delete card->pEG;
 	delete card->pOSS;
@@ -747,6 +768,11 @@ find_device(const char * name)
 	PRINT(("find_device(%s)\n", name));
 
 	for (ix=0; ix<num_cards; ix++) {
+#ifdef MIDI_SUPPORT
+		if (!strcmp(cards[ix].midi.name, name)) {
+			return &midi_hooks;
+		}
+#endif
 		if (!strcmp(cards[ix].name, name)) {
 			return &multi_hooks;
 		}
