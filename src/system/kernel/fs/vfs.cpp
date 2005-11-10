@@ -4010,7 +4010,7 @@ common_access(char *path, int mode, bool kernel)
 	if (FS_CALL(vnode, access) != NULL)
 		status = FS_CALL(vnode, access)(vnode->mount->cookie, vnode->private_node, mode);
 	else
-		status = EOPNOTSUPP;
+		status = B_OK;
 
 	put_vnode(vnode);
 
