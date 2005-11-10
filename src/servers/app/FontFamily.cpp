@@ -22,6 +22,34 @@
 const uint32 kInvalidFamilyFlags = ~0UL;
 
 
+static int
+font_score(const FontStyle* style)
+{
+	int score = 0;
+	if (style->Face() & B_REGULAR_FACE)
+		score += 10;
+	else {
+		if (style->Face() & B_BOLD_FACE)
+			score += 5;
+		if (style->Face() & B_ITALIC_FACE)
+			score--;
+	}
+
+	return score;
+}
+
+
+static int
+compare_font_styles(const FontStyle* a, const FontStyle* b)
+{
+	// Regular fonts come first, then bold, then italics
+	return font_score(b) - font_score(a);
+}
+
+
+//	#pragma mark -
+
+
 /*!
 	\brief Constructor
 	\param filepath path to a font file
@@ -277,8 +305,10 @@ FontFamily::AddStyle(FontStyle *style)
 			return false;
 	}
 
+	if (!fStyles.BinaryInsert(style, compare_font_styles))
+		return false;
+
 	style->_SetFontFamily(this, fNextID++);
-	fStyles.AddItem(style);
 
 	// force a refresh if a request for font flags is needed
 	fFlags = kInvalidFamilyFlags;
