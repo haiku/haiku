@@ -1834,28 +1834,28 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_POLYGON\n", Title()));
 
-			BRect polyframe;
-			bool isclosed = true;
-			int32 pointcount;
-			BPoint *pointlist;
+			BRect polyFrame;
+			bool isClosed = true;
+			int32 pointCount;
 
-			link.Read<BRect>(&polyframe);
+			link.Read<BRect>(&polyFrame);
 			if (code == AS_STROKE_POLYGON)
-				link.Read<bool>(&isclosed);
-			link.Read<int32>(&pointcount);
+				link.Read<bool>(&isClosed);
+			link.Read<int32>(&pointCount);
 
-			pointlist = new BPoint[pointcount];
-			
-			link.Read(pointlist, sizeof(BPoint)*pointcount);
-			
-			for (int32 i = 0; i < pointcount; i++)
-				fCurrentLayer->ConvertToScreen(&pointlist[i]);
+			BPoint* pointList = new(nothrow) BPoint[pointCount];
+			if (link.Read(pointList, pointCount * sizeof(BPoint)) >= B_OK) {
 
-			driver->DrawPolygon(pointlist, pointcount, polyframe,
-								fCurrentLayer->CurrentState(), code == AS_FILL_POLYGON,
-								isclosed);
+				for (int32 i = 0; i < pointCount; i++)
+					fCurrentLayer->ConvertToScreen(&pointList[i]);
+	
+				driver->DrawPolygon(pointList, pointCount, polyFrame,
+									fCurrentLayer->CurrentState(), code == AS_FILL_POLYGON,
+									isClosed && pointCount > 2);
+	
+				delete[] pointList;
+			}
 
-			delete [] pointlist;
 			break;
 		}
 		case AS_STROKE_SHAPE:
@@ -1863,28 +1863,29 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_SHAPE\n", Title()));
 			
-			BRect shaperect;
-			int32 opcount;
-			int32 ptcount;
+			BRect shapeFrame;
+			int32 opCount;
+			int32 ptCount;
 			
-			link.Read<BRect>(&shaperect);
-			link.Read<int32>(&opcount);
-			link.Read<int32>(&ptcount);
+			link.Read<BRect>(&shapeFrame);
+			link.Read<int32>(&opCount);
+			link.Read<int32>(&ptCount);
 
-			uint32* oplist = new uint32[opcount];
-			BPoint* ptlist = new BPoint[ptcount];
+			uint32* opList = new(nothrow) uint32[opCount];
+			BPoint* ptList = new(nothrow) BPoint[ptCount];
+			if (link.Read(opList, opCount * sizeof(uint32)) >= B_OK &&
+				link.Read(ptList, ptCount * sizeof(BPoint)) >= B_OK) {
 
-			link.Read(oplist, opcount * sizeof(uint32));
-			link.Read(ptlist, ptcount * sizeof(BPoint));
+				for (int32 i = 0; i < ptCount; i++)
+					fCurrentLayer->ConvertToScreen(&ptList[i]);
+	
+				driver->DrawShape(shapeFrame, opCount, opList, ptCount, ptList,
+								  fCurrentLayer->CurrentState(), code == AS_FILL_SHAPE);
+			}
 
-			for (int32 i = 0; i < ptcount; i++)
-				fCurrentLayer->ConvertToScreen(&ptlist[i]);
+			delete[] opList;
+			delete[] ptList;
 
-			driver->DrawShape(shaperect, opcount, oplist, ptcount, ptlist,
-							  fCurrentLayer->CurrentState(), code == AS_FILL_SHAPE);
-
-			delete[] oplist;
-			delete[] ptlist;
 			break;
 		}
 		case AS_FILL_REGION:
@@ -1894,8 +1895,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			int32 count;
 			link.Read<int32>(&count);
 
-			BRect *rects = new BRect[count];
-			if (link.Read(rects, sizeof(BRect) * count) != B_OK) {
+			BRect* rects = new(nothrow) BRect[count];
+			if (link.Read(rects, sizeof(BRect) * count) < B_OK) {
 				delete[] rects;
 				break;
 			}
@@ -2074,7 +2075,7 @@ status_t
 ServerWindow::SendMessageToClient(const BMessage* msg, int32 target, bool usePreferred) const
 {
 	ssize_t size = msg->FlattenedSize();
-	char* buffer = new char[size];
+	char* buffer = new(nothrow) char[size];
 	status_t ret;
 
 	if ((ret = msg->Flatten(buffer, size)) == B_OK) {
