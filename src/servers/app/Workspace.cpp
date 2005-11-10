@@ -227,6 +227,15 @@ Workspace::Active() const
 	return NULL;
 }
 
+/*!
+	\brief Method that returns the state of window manager.
+	\param state - a pointer to a valid Workspace::State structure
+	\return void
+
+	Fills the state structure with the most important window manager attibutes:
+front window, focus window, active window and the list of windows starting from
+the backmost one at position 0 and ending with the most visible window.
+*/
 void
 Workspace::GetState(Workspace::State *state) const
 {
@@ -234,11 +243,11 @@ Workspace::GetState(Workspace::State *state) const
 	state->Focus = Focus();
 	state->Active = Active();
 
-	ListData *cursor = fBottomItem;
+	ListData *cursor = fTopItem;
 	while (cursor) {
 		if (!cursor->layerPtr->IsHidden())
 			state->WindowList.AddItem(cursor->layerPtr);
-		cursor = cursor->upperItem;
+		cursor = cursor->lowerItem;
 	}
 }
 bool

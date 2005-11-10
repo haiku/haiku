@@ -302,27 +302,27 @@ RootLayer::ResizeBy(float x, float y)
 Layer*
 RootLayer::FirstChild() const
 {
-	fWinBorderIndex = fWMState.WindowList.CountItems()-1;
-	return static_cast<Layer*>(fWMState.WindowList.ItemAt(fWinBorderIndex--));
+	fWinBorderIndex = 0;
+	return static_cast<Layer*>(fWMState.WindowList.ItemAt(fWinBorderIndex++));
 }
 
 Layer*
 RootLayer::NextChild() const
 {
-	return static_cast<Layer*>(fWMState.WindowList.ItemAt(fWinBorderIndex--));
+	return static_cast<Layer*>(fWMState.WindowList.ItemAt(fWinBorderIndex++));
 }
 
 Layer*
 RootLayer::PreviousChild() const
 {
-	return static_cast<Layer*>(fWMState.WindowList.ItemAt(fWinBorderIndex++));
+	return static_cast<Layer*>(fWMState.WindowList.ItemAt(fWinBorderIndex--));
 }
 
 Layer*
 RootLayer::LastChild() const
 {
-	fWinBorderIndex = 0;
-	return static_cast<Layer*>(fWMState.WindowList.ItemAt(fWinBorderIndex++));
+	fWinBorderIndex = fWMState.WindowList.CountItems()-1;
+	return static_cast<Layer*>(fWMState.WindowList.ItemAt(fWinBorderIndex--));
 }
 
 
@@ -836,6 +836,7 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 			}
 		}
 
+		// for new windows, invalidate(rebuild & redraw) the maximum that it can occupy.
 		for (int32 i = 0; i < newWindowCount; ++i) {
 			Layer *layer = static_cast<Layer*>(fWMState.WindowList.ItemAtFast(i));
 			if (!layer)
@@ -849,6 +850,8 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 				}
 			if (isNewWindow) {
 				BRegion invalid;
+
+				// invalidate the maximum area which this layer/window can occupy.
 				layer->GetWantedRegion(invalid);
 
 				MarkForRebuild(invalid);
@@ -859,6 +862,7 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 			}
 		}
 
+		// if a window came in front ot others, invalidate its previously hidden area.
 		oldWindowCount = oldStrippedList.CountItems();
 		newWindowCount = newStrippedList.CountItems();
 		for (int32 i = 0; i < oldWindowCount; ++i) {
@@ -867,11 +871,12 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 				continue;
 			if (i < newStrippedList.IndexOf(layer)) {
 				BRegion invalid;
+
+				// start by invalidating the maximum area which this layer/window can occupy.
 				layer->GetWantedRegion(invalid);
 
-// TODO: we need to invalidate only the ares that became visible
-//		 not the whole surface of this layer!
-//				invalid.Exclude(&layer->FullVisible());
+				// no reason to invalidate what's currently visible.
+				invalid.Exclude(&layer->FullVisible());
 
 				MarkForRebuild(invalid);
 				MarkForRedraw(invalid);
