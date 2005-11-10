@@ -385,6 +385,9 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 		}
 	}
 
+	/* fixme: currently the matrox driver can only do secondary TVout */
+	target->flags &= ~TV_PRIMARY;
+
 	/* set HARDWARE_CURSOR mode if suitable */
 	if (si->settings.hardcursor)
 		target->flags |= B_HARDWARE_CURSOR;
