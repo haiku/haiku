@@ -144,7 +144,7 @@ public:
 	BObjectList &operator=(const BObjectList &list);
 		// clones list; if list is owning, makes copies of all
 		// the items
-	
+
 	// adding and removing
 	// ToDo:
 	// change Add calls to return const item 
@@ -152,12 +152,12 @@ public:
 	bool AddItem(T *, int32);
 	bool AddList(BObjectList *);
 	bool AddList(BObjectList *, int32);
-	
+
 	bool RemoveItem(T *, bool deleteIfOwning = true);
 		// if owning, deletes the removed item
 	T *RemoveItemAt(int32);
 		// returns the removed item
-	
+
 	void MakeEmpty();
 
 	// item access
@@ -168,10 +168,10 @@ public:
 	T *SwapWithItem(int32 index, T *newItem);
 		// same as ReplaceItem, except does not delete old item at <index>,
 		// returns it instead
-	
+
 	T *FirstItem() const;
 	T *LastItem() const;
-	
+
 	// misc. getters
 	int32 IndexOf(const T *) const;
 	bool HasItem(const T *) const;
@@ -189,19 +189,19 @@ public:
 	// linear search, returns first item that matches predicate
 	const T *FindIf(const UnaryPredicate<T> &) const;
 	T *FindIf(const UnaryPredicate<T> &);
-	
+
 	// list must be sorted with CompareFunction for these to work
 	const T *BinarySearch(const T &, CompareFunction) const;
 	const T *BinarySearch(const T &, CompareFunctionWithState, void *state) const;
 
 	// Binary insertion - list must be sorted with CompareFunction for
 	// these to work
-	
+
 	// simple insert
-	void BinaryInsert(T *, CompareFunction);
-	void BinaryInsert(T *, CompareFunctionWithState, void *state);
-	void BinaryInsert(T *, const UnaryPredicate<T> &);
-	
+	bool BinaryInsert(T *, CompareFunction);
+	bool BinaryInsert(T *, CompareFunctionWithState, void *state);
+	bool BinaryInsert(T *, const UnaryPredicate<T> &);
+
 	// unique insert, returns false if item already in list
 	bool BinaryInsertUnique(T *, CompareFunction);
 	bool BinaryInsertUnique(T *, CompareFunctionWithState, void *state);
@@ -210,12 +210,11 @@ public:
 	// insert a copy of the item, returns new inserted item
 	T *BinaryInsertCopy(const T &copyThis, CompareFunction);
 	T *BinaryInsertCopy(const T &copyThis, CompareFunctionWithState, void *state);
-	
+
 	// insert a copy of the item if not in list already
 	// returns new inserted item or existing item in case of a conflict
 	T *BinaryInsertCopyUnique(const T &copyThis, CompareFunction);
 	T *BinaryInsertCopyUnique(const T &copyThis, CompareFunctionWithState, void *state);
-
 
 	int32 FindBinaryInsertionIndex(const UnaryPredicate<T> &, bool *alreadyInList = 0) const;
 		// returns either the index into which a new item should be inserted
@@ -399,7 +398,6 @@ BObjectList<T>::~BObjectList()
 	if (Owning())
 		// have to nuke elements first
 		MakeEmpty();
-
 }
 
 template<class T> 
@@ -641,55 +639,55 @@ BObjectList<T>::BinarySearch(const T &key, CompareFunctionWithState func, void *
 }
 
 template<class T>
-void 
+bool
 BObjectList<T>::BinaryInsert(T *item, CompareFunction func)
 {
 	int32 index = _PointerList_::BinarySearchIndex(item,
 		(GenericCompareFunction)func);
-	if (index >= 0)
+	if (index >= 0) {
 		// already in list, add after existing
-		AddItem(item, index + 1);
-	else 
-		AddItem(item, -index - 1);
+		return AddItem(item, index + 1);
+	}
+
+	return AddItem(item, -index - 1);
 }
 
 template<class T>
-void 
+bool
 BObjectList<T>::BinaryInsert(T *item, CompareFunctionWithState func, void *state)
 {
 	int32 index = _PointerList_::BinarySearchIndex(item,
 		(GenericCompareFunctionWithState)func, state);
-	if (index >= 0)
+	if (index >= 0) {
 		// already in list, add after existing
-		AddItem(item, index + 1);
-	else 
-		AddItem(item, -index - 1);
+		return AddItem(item, index + 1);
+	}
+
+	return AddItem(item, -index - 1);
 }
 
 template<class T>
 bool 
-BObjectList<T>::BinaryInsertUnique(T *, CompareFunction func)
+BObjectList<T>::BinaryInsertUnique(T *item, CompareFunction func)
 {
 	int32 index = _PointerList_::BinarySearchIndex(item,
 		(GenericCompareFunction)func);
 	if (index >= 0)
 		return false;
 
-	AddItem(item, -index - 1);
-	return true;
+	return AddItem(item, -index - 1);
 }
 
 template<class T>
 bool 
-BObjectList<T>::BinaryInsertUnique(T *, CompareFunctionWithState func, void *state)
+BObjectList<T>::BinaryInsertUnique(T *item, CompareFunctionWithState func, void *state)
 {
 	int32 index = _PointerList_::BinarySearchIndex(item,
 		(GenericCompareFunctionWithState)func, state);
 	if (index >= 0)
 		return false;
 
-	AddItem(item, -index - 1);
-	return true;
+	return AddItem(item, -index - 1);
 }
 
 
@@ -776,15 +774,14 @@ BObjectList<T>::FindBinaryInsertionIndex(const UnaryPredicate<T> &pred, bool *al
 }
 
 template<class T>
-void 
+bool
 BObjectList<T>::BinaryInsert(T *item, const UnaryPredicate<T> &pred)
 {
-	int32 index = FindBinaryInsertionIndex(pred);
-	AddItem(item, index);
+	return AddItem(item, FindBinaryInsertionIndex(pred));
 }
 
 template<class T>
-bool 
+bool
 BObjectList<T>::BinaryInsertUnique(T *item, const UnaryPredicate<T> &pred)
 {
 	bool alreadyInList;
@@ -796,5 +793,4 @@ BObjectList<T>::BinaryInsertUnique(T *item, const UnaryPredicate<T> &pred)
 	return true;
 }
 
-
-#endif
+#endif	/* __OBJECT_LIST__ */
