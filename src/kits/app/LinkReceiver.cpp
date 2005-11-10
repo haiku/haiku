@@ -239,7 +239,7 @@ LinkReceiver::Read(void *data, ssize_t size)
 	if (fReadError < B_OK)
 		return fReadError;
 
-	if (size < 1) {
+	if (data == NULL || size < 1) {
 		fReadError = B_BAD_VALUE;
 		return B_BAD_VALUE;
 	}
