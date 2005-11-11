@@ -569,6 +569,13 @@ if $(TARGET_PLATFORM) = libbe_test {
 	LIBBE_LIBRARY_NAME_MAP_be = libbe_haiku.so ;
 }
 
+if $(TARGET_PLATFORM) = dano {
+	local compatibilityHeader = -include [ FDirName $(HAIKU_TOP) headers build
+		DanoBuildCompatibility.h ] ;
+	TARGET_CCFLAGS += $(compatibilityHeader) ;
+	TARGET_C++FLAGS += $(compatibilityHeader) ;
+}
+
 
 #pragma mark -
 
