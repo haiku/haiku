@@ -771,7 +771,14 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			msg->FindInt32("transit", (int32 *)&transit);
 			if (target && target != this && target != top_view) {
 				if (BView *view = dynamic_cast<BView *>(target)) {
-					fLastMouseMovedView = view;
+					if (fLastMouseMovedView != view) {
+						if (fLastMouseMovedView) {
+							BPoint p(where);
+							fLastMouseMovedView->ConvertFromScreen(&p);
+							fLastMouseMovedView->MouseMoved(p, B_EXITED_VIEW, NULL);
+						}
+						fLastMouseMovedView = view;
+					}
 					view->ConvertFromScreen(&where);
 					view->MouseMoved(where, transit, NULL);
 				} else
