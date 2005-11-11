@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src apps terminal ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 Application Terminal : 
@@ -22,13 +23,12 @@ Application Terminal :
 	UTF8WidthTbl.c
 	VTKeyTbl.c
 	VTPrsTbl.c
-	: be libtracker.so libtextencoding.so
+	: be tracker textencoding
 	: Terminal.rdef Terminal.icons.rdef Terminal.version.rdef
 	;
 
-if $(TARGET_PLATFORM) = haiku {
-	# link for Haiku
-	LinkAgainst Terminal : libgame.so ;
+if $(TARGET_PLATFORM) != libbe_test {
+	LinkAgainst Terminal : game ;
 }
 
 if $(TARGET_PLATFORM) = libbe_test {
