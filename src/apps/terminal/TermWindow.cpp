@@ -528,11 +528,13 @@ TermWindow::TermWinActivate()
 {
 	Activate();
 
+#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 	if (focus_follows_mouse()) {
 		BPoint aMouseLoc = Frame().LeftTop();
 		set_mouse_position(int32(aMouseLoc.x + 16), int32(aMouseLoc.y + 2));
 		be_app->SetCursor(B_HAND_CURSOR);
 	}
+#endif
 }
 
 

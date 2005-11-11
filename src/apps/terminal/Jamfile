@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src apps terminal ;
 
+AddSubDirSupportedPlatforms libbe_test ;
+
 Application Terminal : 
 	AppearPrefView.cpp
 	CodeConv.cpp
@@ -20,12 +22,16 @@ Application Terminal :
 	UTF8WidthTbl.c
 	VTKeyTbl.c
 	VTPrsTbl.c
-	: libbe.so libtracker.so libtextencoding.so libgame.so
+	: be libtracker.so libtextencoding.so
 	: Terminal.rdef Terminal.icons.rdef Terminal.version.rdef
 	;
 
 if $(TARGET_PLATFORM) = haiku {
-        # link for Haiku
+	# link for Haiku
+	LinkAgainst Terminal : libgame.so ;
+}
 
-        LinkAgainst Terminal : libroot.so ;
+if $(TARGET_PLATFORM) = libbe_test {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Terminal
+		: tests!apps ;
 }
