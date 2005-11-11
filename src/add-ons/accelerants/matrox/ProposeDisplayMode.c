@@ -4,7 +4,7 @@
 
 	Other authors for MGA driver:
 	Mark Watson,
-	Rudolf Cornelissen 9/2002-11/2004
+	Rudolf Cornelissen 9/2002-11/2005
 */
 
 #define MODULE_BIT 0x00400000
@@ -379,15 +379,37 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	}
 
 	/* set TV_CAPABLE if suitable: pixelclock is not important (defined by TVstandard) */
-	//fixme: modify for G100 and G200 TVout later on...
-	if (target->flags & DUALHEAD_CAPABLE)
+	switch (si->ps.card_type)
 	{
-		if (si->ps.secondary_tvout &&
-			(target->timing.h_display <= 1024) &&
-			(target->timing.v_display <= 768))
+	case G400:
+	case G400MAX:
+		//fixme: in theory singlehead cards can do TVout as well (if MAVEN mounted)
+		if (target->flags & DUALHEAD_CAPABLE)
 		{
-			target->flags |= TV_CAPABLE;
+			if (si->ps.secondary_tvout &&
+				(target->timing.h_display <= 1024) &&
+				(target->timing.v_display <= 768))
+			{
+				target->flags |= TV_CAPABLE;
+			}
 		}
+		break;
+	case G450:
+	case G550:
+		/* G450/G550 can only do secondary TVout in Video modes (no Desktop modes!) */
+		if ((target->flags & DUALHEAD_CAPABLE) && (target->flags & TV_VIDEO))
+		{
+			if (si->ps.secondary_tvout &&
+				(target->timing.h_display <= 1024) &&	/* Hscaling option exists */
+				(target->timing.v_display <= 576))		/* Vscaling option lacks */
+			{
+				target->flags |= TV_CAPABLE;
+			}
+		}
+		break;
+	default:
+		//fixme: setup for G100 and G200 TVout later on...
+		break;
 	}
 
 	/* fixme: currently the matrox driver can only do secondary TVout */
