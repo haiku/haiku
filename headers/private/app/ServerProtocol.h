@@ -192,7 +192,6 @@ enum {
 	AS_SCREENMODE_CHANGED,
 
 	// Graphics calls
-	// Are these TRANSACTION codes needed ?
 	AS_BEGIN_TRANSACTION,
 	AS_END_TRANSACTION,
 	AS_SET_HIGH_COLOR,

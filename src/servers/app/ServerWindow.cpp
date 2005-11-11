@@ -1222,15 +1222,32 @@ if (myRootLayer)
 			fLink.Flush();
 			break;
 		}
+		case AS_BEGIN_TRANSACTION:
+		{
+			STRACE(("ServerWindow %s: Message AS_BEGIN_TRANSACTION unimplemented\n",
+				Title()));
+			// TODO: we could probably do a bit more here...
+			fWinBorder->DisableUpdateRequests();
+			break;
+		}
+		case AS_END_TRANSACTION:
+		{
+			STRACE(("ServerWindow %s: Message AS_END_TRANSACTION unimplemented\n",
+				Title()));
+			fWinBorder->EnableUpdateRequests();
+			break;
+		}
 		case AS_ENABLE_UPDATES:
 		{
-			STRACE(("ServerWindow %s: Message Enable_Updates unimplemented\n", Title()));
+			STRACE(("ServerWindow %s: Message AS_ENABLE_UPDATES unimplemented\n",
+				Title()));
 			fWinBorder->EnableUpdateRequests();
 			break;
 		}
 		case AS_DISABLE_UPDATES:
 		{
-			STRACE(("ServerWindow %s: Message Disable_Updates unimplemented\n", Title()));
+			STRACE(("ServerWindow %s: Message AS_DISABLE_UPDATES unimplemented\n",
+				Title()));
 			fWinBorder->DisableUpdateRequests();
 			break;
 		}
