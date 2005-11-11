@@ -131,7 +131,7 @@ struct dw_sync_data {
 ServerWindow::ServerWindow(const char *title, ServerApp *app,
 						   port_id clientPort, port_id looperPort, int32 handlerID)
 	: MessageLooper(title && *title ? title : "Unnamed Window"),
-	fTitle(title),
+	fTitle(NULL),
 	fDesktop(app->GetDesktop()),
 	fServerApp(app),
 	fWinBorder(NULL),
@@ -146,6 +146,7 @@ ServerWindow::ServerWindow(const char *title, ServerApp *app,
 {
 	STRACE(("ServerWindow(%s)::ServerWindow()\n", title));
 
+	SetTitle(title);
 	fServerToken = BPrivate::gDefaultTokens.NewToken(B_SERVER_TOKEN, this);
 }
 
@@ -160,7 +161,7 @@ ServerWindow::~ServerWindow()
 
 	delete fWinBorder;
 
-	free(const_cast<char *>(fTitle));
+	free(fTitle);
 	delete_port(fMessagePort);
 
 	BPrivate::gDefaultTokens.RemoveToken(fServerToken);
@@ -173,8 +174,6 @@ ServerWindow::~ServerWindow()
 status_t
 ServerWindow::Init(BRect frame, uint32 look, uint32 feel, uint32 flags, uint32 workspace)
 {
-	if (fTitle == NULL)
-		fTitle = strdup("Unnamed Window");
 	if (fTitle == NULL)
 		return B_NO_MEMORY;
 
@@ -240,7 +239,11 @@ ServerWindow::_PrepareQuit()
 void
 ServerWindow::_GetLooperName(char* name, size_t length)
 {
-	snprintf(name, length, "w:%ld:%s", ClientTeam(), Title());
+	const char *title = Title();
+	if (title == NULL || !title[0])
+		title = "Unnamed Window";
+
+	snprintf(name, length, "w:%ld:%s", ClientTeam(), title);
 }
 
 
@@ -301,23 +304,23 @@ ServerWindow::Hide()
 void
 ServerWindow::SetTitle(const char* newTitle)
 {
-	const char* oldTitle = fTitle;
+	char* oldTitle = fTitle;
 
-	if (newTitle == NULL || !newTitle[0])
-		fTitle = strdup("Unnamed Window");
-	else
-		fTitle = strdup(newTitle);
+	if (newTitle == NULL)
+		newTitle = "";
 
+	fTitle = strdup(newTitle);
 	if (fTitle == NULL) {
+		// out of memory condition
 		fTitle = oldTitle;
 		return;
 	}
 
-	free(const_cast<char*>(oldTitle));
+	free(oldTitle);
 
 	if (Thread() >= B_OK) {
 		char name[B_OS_NAME_LENGTH];
-		snprintf(name, sizeof(name), "w:%ld:%s", ClientTeam(), fTitle);
+		_GetLooperName(name, sizeof(name));
 		rename_thread(Thread(), name);
 	}
 

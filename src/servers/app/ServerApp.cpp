@@ -400,47 +400,48 @@ ServerApp::_MessageLooper()
 					frame.right = frame.left + 1;
 					frame.bottom = frame.top + 1;
 				}
-				
-				bool success = false;
+
+				status_t status = B_ERROR;
 				ServerWindow *window = NULL;
-				
+
 				if (code == AS_CREATE_OFFSCREEN_WINDOW) {
 					ServerBitmap* bitmap = FindBitmap(bitmapToken);
-				
-					if (bitmap != NULL)
-						// ServerWindow constructor will reply with port_id of a newly created port
-						window = new OffscreenServerWindow(title, this, clientReplyPort, 
-																looperPort, token, bitmap);
-					else
-						free(title);
+
+					if (bitmap != NULL) {
+						window = new OffscreenServerWindow(title, this, clientReplyPort,
+							looperPort, token, bitmap);
+					}
 				} else {
 					window = new ServerWindow(title, this, clientReplyPort, looperPort, token);
 					STRACE(("\nServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
-							fSignature(), title, frame.left, frame.top, frame.right, frame.bottom));
+						fSignature(), title, frame.left, frame.top, frame.right, frame.bottom));
 				}
-				
-				// NOTE: the reply to the client is handled in window->Run()				
+
+				free(title);
+
+				// NOTE: the reply to the client is handled in ServerWindow::Run()
 				if (window != NULL) {
-					success = window->Init(frame, look, feel, flags, workspaces) >= B_OK && window->Run();
+					status = window->Init(frame, look, feel, flags, workspaces);
+					if (status == B_OK && !window->Run())
+						status = B_ERROR;
 
 					// add the window to the list
-					if (success && fWindowListLock.Lock()) {
-						success = fWindowList.AddItem(window);
+					if (status == B_OK && fWindowListLock.Lock()) {
+						status = fWindowList.AddItem(window) ? B_OK : B_NO_MEMORY;
 						fWindowListLock.Unlock();
 					}
 
-					if (!success)
+					if (status < B_OK)
 						delete window;
 				}
-				
-				if (!success) {
+
+				// if sucessful, ServerWindow::Run() will already have replied
+				if (status < B_OK) {
 					// window creation failed, we need to notify the client
 					BPrivate::LinkSender reply(clientReplyPort);
-					reply.StartMessage(SERVER_FALSE);
+					reply.StartMessage(status);
 					reply.Flush();
 				}
-
-				// We don't have to free the title, as it's owned by the ServerWindow now
 				break;
 			}
 
