@@ -2154,14 +2154,11 @@ BView::GetClippingRegion(BRegion* region) const
 	if (!region)
 		return;
 
-	// TODO: I think this implementation is wrong,
-	// since on R5, you really get the currently active
-	// clipping region, overlapping windows and all.
-	// I don't think we inform the client in the app_server
-	// when the clipping changes, so that B_VIEW_CLIP_REGION_BIT
-	// is set. -Stephan
+	// TODO: For now, the clipping bit is ignored, since the client has no
+	// idea when the clipping in the server changed. -Stephan
 
-	if (!fState->IsValid(B_VIEW_CLIP_REGION_BIT) && do_owner_check()) {
+//	if (!fState->IsValid(B_VIEW_CLIP_REGION_BIT) && fOwner && do_owner_check()) {
+	if (fOwner && do_owner_check()) {
 		fOwner->fLink->StartMessage(AS_LAYER_GET_CLIP_REGION);
 
  		int32 code;
@@ -2180,6 +2177,8 @@ BView::GetClippingRegion(BRegion* region) const
 			}
 			fState->valid_flags |= B_VIEW_CLIP_REGION_BIT;
 		}
+	} else {
+		fState->clipping_region.MakeEmpty();
 	}
 
 	*region = fState->clipping_region;
@@ -3387,6 +3386,9 @@ BView::RemoveSelf()
 		if (fOwner->fKeyMenuBar == this)
 			fOwner->fKeyMenuBar = NULL;
 
+		if (fOwner->fLastMouseMovedView == this)
+			fOwner->fLastMouseMovedView = NULL;
+
 		if (fOwner->fLastViewToken == _get_object_token_(this))
 			fOwner->fLastViewToken = B_NULL_TOKEN;
 
@@ -3744,6 +3746,12 @@ BView::InitData(BRect frame, const char *name, uint32 resizingMode, uint32 flags
 	
 	// initialize members		
 	fFlags = (resizingMode & _RESIZE_MASK_) | (flags & ~_RESIZE_MASK_);
+
+	// handle rounding
+	frame.left = roundf(frame.left);
+	frame.top = roundf(frame.top);
+	frame.right = roundf(frame.right);
+	frame.bottom = roundf(frame.bottom);
 
 	fParentOffset.Set(frame.left, frame.top);
 
