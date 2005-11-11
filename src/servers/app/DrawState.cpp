@@ -66,7 +66,10 @@ DrawState::operator=(const DrawState& from)
 	fScale	= from.fScale;
 
 	if (from.fClippingRegion) {
-		SetClippingRegion(*(from.fClippingRegion));
+		if (fClippingRegion)
+			*fClippingRegion = *from.fClippingRegion;
+		else
+			fClippingRegion = new BRegion(*from.fClippingRegion);
 	} else {
 		delete fClippingRegion;
 		fClippingRegion = NULL;
@@ -302,14 +305,23 @@ DrawState::SetScale(float scale)
 void
 DrawState::SetClippingRegion(const BRegion& region)
 {
-	if (region.Frame().IsValid()) {
+	// reset clipping to that of previous state
+	if (PreviousState() != NULL && PreviousState()->ClippingRegion()) {
 		if (fClippingRegion)
-			*fClippingRegion = region;
-		else 
-			fClippingRegion = new BRegion(region);
+			*fClippingRegion = *(PreviousState()->ClippingRegion());
+		else
+			fClippingRegion = new BRegion(*(PreviousState()->ClippingRegion()));
 	} else {
 		delete fClippingRegion;
 		fClippingRegion = NULL;
+	}
+
+	// add the clipping from the passed region
+	if (region.Frame().IsValid()) {
+		if (fClippingRegion)
+			fClippingRegion->IntersectWith(&region);
+		else 
+			fClippingRegion = new BRegion(region);
 	}
 }
 
