@@ -2149,7 +2149,6 @@ ServerWindow::HandleDirectConnection(int bufferState, int driverState)
 		BRegion exclude = const_cast<BRegion &>(border->VisibleRegion());
 		clipRegion.Exclude(&exclude);
 		
-		border->ConvertToScreen(&clipRegion);
 		fDirectWindowData->direct_info->clip_list_count = min_c(clipRegion.CountRects(), kMaxClipRectsCount);
 		fDirectWindowData->direct_info->clip_bounds = clipRegion.FrameInt();
 		

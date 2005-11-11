@@ -187,6 +187,7 @@ WinBorder::MoveBy(float x, float y)
 		// it's not, as also the mouse movement is driven by rootlayer.
 		// Find some way to call DirectConnected() from the ServerWindow's thread,
 		// by sending a message from here or whatever.
+		// (Tested with BeSnes9x and works fine, though) 
 		Window()->HandleDirectConnection(B_DIRECT_STOP);
 		
 		if (GetRootLayer()->Lock()) {
@@ -246,15 +247,21 @@ WinBorder::ResizeBy(float x, float y)
 
 	// this method can be called from a ServerWindow thread or from a RootLayer one,
 	// so lock
-	if (GetRootLayer() && GetRootLayer()->Lock()) {
-		fRebuildDecRegion = true;
+	if (GetRootLayer()) {
+		Window()->HandleDirectConnection(B_DIRECT_STOP);
+		
+		if (GetRootLayer()->Lock()) {
+			fRebuildDecRegion = true;
 
-		if (fDecorator)
-			fDecorator->ResizeBy(x, y);
+			if (fDecorator)
+				fDecorator->ResizeBy(x, y);
 
-		Layer::ResizeBy(x, y);
+			Layer::ResizeBy(x, y);
 
-		GetRootLayer()->Unlock();
+			GetRootLayer()->Unlock();
+		}
+		
+		Window()->HandleDirectConnection(B_DIRECT_START|B_BUFFER_RESIZED);
 	} else {
 		if (fDecorator)
 			fDecorator->ResizeBy(x, y);
