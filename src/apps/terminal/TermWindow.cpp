@@ -52,38 +52,25 @@ extern PrefHandler *gTermPref;
 extern int gNowCoding;  /* defined TermParce.cpp */
 char gWindowName[256] = "Terminal";
 
-void SetCoding (int);
+void SetCoding(int);
 
-/*
- *
- * CONSTRUCTOR and DESTRUCTOR
- *
- */
 
-////////////////////////////////////////////////////////////////////////////
-// TermWindow Constructer
-//
-////////////////////////////////////////////////////////////////////////////
-TermWindow::TermWindow( BRect frame, int32 windownumber)
-  : BWindow (frame, NULL, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE)
+TermWindow::TermWindow(BRect frame, int32 windownumber)
+	: BWindow(frame, "Terminal", B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE)
 {
-  sprintf(gWindowName,"Terminal %ld",windownumber);
-  
-  InitWindow();
-  SetWindowTitle();
-  fPrintSettings = NULL;
-  fPrefWindow = NULL;
-  fFindPanel = NULL;
-  
+	sprintf(gWindowName, "Terminal %ld", windownumber);
+
+	InitWindow();
+	SetTitle(gWindowName);
+	fPrintSettings = NULL;
+	fPrefWindow = NULL;
+	fFindPanel = NULL;
 }
-////////////////////////////////////////////////////////////////////////////
-// Desctuctor
-//
-////////////////////////////////////////////////////////////////////////////
+
+
 TermWindow::~TermWindow()
 {
-  if (fWindowUpdate != NULL)
-    delete (fWindowUpdate);
+	delete fWindowUpdate;
 }
 
 
@@ -318,8 +305,7 @@ TermWindow::MessageReceived(BMessage *message)
   case MENU_ENCODING:
     message->FindInt32 ("op", &coding_id);
     gNowCoding = coding_id;
-    SetCoding (coding_id);
-    this->SetWindowTitle ();
+    SetCoding(coding_id);
     break;
 
     /*
@@ -533,42 +519,23 @@ TermWindow::GetTimeZone ()
   return -tm.tz_minuteswest / 60;
 }
 
-////////////////////////////////////////////////////////////////////////////
-// void SetWindowTitle (void)
-// set window title bar (pty device name, and coding)
-////////////////////////////////////////////////////////////////////////////
 
 #include "spawn.h"
 
-void
-TermWindow::SetWindowTitle (void)
-{
-  char windowname[256];
-  sprintf(windowname, gWindowName);
-  this->SetTitle (windowname);
 
-}
-////////////////////////////////////////////////////////////////////////////
-// GetSupoprtedSuites (BMessage *)
-//
-////////////////////////////////////////////////////////////////////////////
 void
-TermWindow::TermWinActivate (void)
+TermWindow::TermWinActivate()
 {
-  
-  this->Activate();
-  
-  if (focus_follows_mouse()) {
-    BPoint aMouseLoc = this->Frame().LeftTop();
-    set_mouse_position(int32(aMouseLoc.x + 16), int32(aMouseLoc.y + 2));
-    be_app->SetCursor(B_HAND_CURSOR);
-  }
+	Activate();
+
+	if (focus_follows_mouse()) {
+		BPoint aMouseLoc = Frame().LeftTop();
+		set_mouse_position(int32(aMouseLoc.x + 16), int32(aMouseLoc.y + 2));
+		be_app->SetCursor(B_HAND_CURSOR);
+	}
 }
 
-////////////////////////////////////////////////////////////////////////////
-// GetSupoprtedSuites (BMessage *)
-//
-////////////////////////////////////////////////////////////////////////////
+
 status_t
 TermWindow::GetSupportedSuites(BMessage *msg) 
 { 

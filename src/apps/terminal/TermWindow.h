@@ -66,7 +66,6 @@ private:
   void		MessageReceived (BMessage *message);
   void		WindowActivated (bool);
   int		GetTimeZone (void);
-  void		SetWindowTitle (void);
   void		MenusBeginning(void);
 //  void		doShowHelp (uint32 command);
   // Printing
