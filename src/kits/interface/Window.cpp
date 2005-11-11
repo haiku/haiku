@@ -1411,16 +1411,15 @@ BWindow::SetTitle(const char *title)
 	SetName(threadName);
 
 	// if the message loop has been started...
-	if (Thread() >= B_OK) {
+	if (Thread() >= B_OK)
 		rename_thread(Thread(), threadName);
 
-		// we notify the app_server so we can actually see the change
-		if (Lock()) {
-			fLink->StartMessage(AS_SET_WINDOW_TITLE);
-			fLink->AttachString(fTitle);
-			fLink->Flush();
-			Unlock();
-		}
+	// we notify the app_server so we can actually see the change
+	if (Lock()) {
+		fLink->StartMessage(AS_SET_WINDOW_TITLE);
+		fLink->AttachString(fTitle);
+		fLink->Flush();
+		Unlock();
 	}
 }
 
@@ -1928,8 +1927,7 @@ BWindow::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 }
 
 
-//	#pragma mark -
-//--------------------Private Methods-------------------------------------------
+//	#pragma mark - Private Methods
 
 
 void 
@@ -1938,8 +1936,6 @@ BWindow::InitData(BRect frame, const char* title, window_look look,
 {
 	STRACE(("BWindow::InitData()\n"));
 
-	fTitle = NULL;
-
 	if (be_app == NULL) {
 		debugger("You need a valid BApplication object before interacting with the app_server");
 		return;
@@ -1947,8 +1943,10 @@ BWindow::InitData(BRect frame, const char* title, window_look look,
 
 	fFrame = frame;
 
-	// ToDo: that looks wrong...
-	SetTitle(title ? title : "no_name_window");
+	if (title == NULL)
+		title = "";
+	fTitle = strdup(title);
+	SetName(title);
 
 	fFeel = feel;
 	fLook = look;
