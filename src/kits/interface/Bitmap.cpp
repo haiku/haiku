@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <limits.h>
 #include <new>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -2177,8 +2178,6 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 //printf("BBitmap::InitObject(bounds: BRect(%.1f, %.1f, %.1f, %.1f), format: %ld, flags: %ld, bpr: %ld\n",
 //	   bounds.left, bounds.top, bounds.right, bounds.bottom, colorSpace, flags, bytesPerRow);
 
-	// TODO: Hanlde setting up the offscreen window if we're such a bitmap!
-
 	// TODO: Should we handle rounding of the "bounds" here? How does R5 behave?
 
 	status_t error = B_OK;
@@ -2190,8 +2189,18 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 	CleanUp();
 
 	// check params
-	if (!bounds.IsValid() || !bitmaps_support_space(colorSpace, NULL))
+	if (!bounds.IsValid() || !bitmaps_support_space(colorSpace, NULL)) {
 		error = B_BAD_VALUE;
+	} else {
+		// bounds is in floats and might be valid but much larger than what we can handle
+		// the size could not be expressed in int32
+		double realSize = bounds.Width() * bounds.Height();
+		if (realSize > (double)(INT32_MAX / 4)) {
+			fprintf(stderr, "bitmap bounds is much too large: BRect(%.1f, %.1f, %.1f, %.1f)\n",
+					bounds.left, bounds.top, bounds.right, bounds.bottom);
+			error = B_BAD_VALUE;
+		}
+	}
 	if (error == B_OK) {
 		int32 bpr = get_bytes_per_row(colorSpace, bounds.IntegerWidth() + 1);
 		if (bytesPerRow < 0)
