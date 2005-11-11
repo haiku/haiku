@@ -15,7 +15,6 @@
 #include <algorithm>
 #include <limits.h>
 #include <new>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -2195,7 +2194,7 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 		// bounds is in floats and might be valid but much larger than what we can handle
 		// the size could not be expressed in int32
 		double realSize = bounds.Width() * bounds.Height();
-		if (realSize > (double)(INT32_MAX / 4)) {
+		if (realSize > (double)(INT_MAX / 4)) {
 			fprintf(stderr, "bitmap bounds is much too large: BRect(%.1f, %.1f, %.1f, %.1f)\n",
 					bounds.left, bounds.top, bounds.right, bounds.bottom);
 			error = B_BAD_VALUE;
