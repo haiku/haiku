@@ -178,18 +178,33 @@ WinBorder::MoveBy(float x, float y)
 		return;
 
 	// lock here because we play with some regions
-	if (GetRootLayer() && GetRootLayer()->Lock()) {
-		fDecRegion.OffsetBy(x, y);
+	if (GetRootLayer()) {
+		// TODO: MoveBy and ResizeBy() are usually called
+		// from the rootlayer's thread. HandleDirectConnection() could
+		// block the calling thread for ~3 seconds in the worst case, 
+		// and while it would be acceptable if called from the
+		// ServerWindow's thread (only the window would be blocked), in this case
+		// it's not, as also the mouse movement is driven by rootlayer.
+		// Find some way to call DirectConnected() from the ServerWindow's thread,
+		// by sending a message from here or whatever.
+		Window()->HandleDirectConnection(B_DIRECT_STOP);
+		
+		if (GetRootLayer()->Lock()) {
+			fDecRegion.OffsetBy(x, y);
 
-		fCumulativeRegion.OffsetBy(x, y);
-		fInUpdateRegion.OffsetBy(x, y);
+			fCumulativeRegion.OffsetBy(x, y);
+			fInUpdateRegion.OffsetBy(x, y);
 
-		if (fDecorator)
-			fDecorator->MoveBy(x, y);
+			if (fDecorator)
+				fDecorator->MoveBy(x, y);
 
-		Layer::MoveBy(x, y);
+			Layer::MoveBy(x, y);
 
-		GetRootLayer()->Unlock();
+			GetRootLayer()->Unlock();
+		}
+		
+		Window()->HandleDirectConnection(B_DIRECT_START|B_BUFFER_MOVED);
+		
 	} else {
 		// just offset to the new position
 		if (fDecorator)
@@ -203,18 +218,6 @@ WinBorder::MoveBy(float x, float y)
 	msg.AddInt64("when",  system_time());
 	msg.AddPoint("where", Frame().LeftTop());
 	Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
-
-	// TODO: MoveBy and ResizeBy() are usually called
-	// from the rootlayer's thread. HandleDirectConnection() could
-	// block the calling thread for ~3 seconds in the worst case, 
-	// and while it would be acceptable if called from the
-	// ServerWindow's thread (only the window would be blocked), in this case
-	// it's not, as also the mouse movement is driven by rootlayer.
-	// Find some way to call DirectConnected() from the ServerWindow's thread,
-	// by sending a message from here or whatever.	
-	//Window()->HandleDirectConnection(B_DIRECT_STOP);
-//	Layer::MoveBy(x, y);
-	//Window()->HandleDirectConnection(B_DIRECT_START|B_BUFFER_MOVED);
 }
 
 
