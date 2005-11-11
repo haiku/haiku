@@ -194,8 +194,12 @@ class Layer {
 			void				SetFlags(uint32 flags);
 
 	// clipping stuff and redraw
+			void				SetUserClipping(const BRegion& region);
+				// region is expected in layer coordinates
+
 	inline	const BRegion&		VisibleRegion() const { return fVisible2; }
 	inline	const BRegion&		FullVisible() const { return fFullVisible2; }
+	inline	const BRegion&		DrawingRegion() const { return fDrawingRegion; }
 
 	virtual	void				GetWantedRegion(BRegion& reg);
 
@@ -224,6 +228,7 @@ class Layer {
 			void				_RebuildVisibleRegions( const BRegion &invalid,
 														const BRegion &parentLocalVisible,
 														const Layer *startFrom);
+			void				_RebuildDrawingRegion();
 			void				_ClearVisibleRegions();
 			void				_ResizeLayerFrameBy(float x, float y);
 			void				_RezizeLayerRedrawMore(BRegion &reg, float dx, float dy);
@@ -245,6 +250,7 @@ class Layer {
 			BRegion				fVisible2;
 			BRegion				fFullVisible2;
 			BRegion				fDirtyForRebuild;
+			BRegion				fDrawingRegion;
 
 			DrawingEngine*		fDriver;
 			RootLayer*			fRootLayer;

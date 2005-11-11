@@ -50,6 +50,7 @@ Layer::Layer(BRect frame, const char* name, int32 token,
 	fVisible2(),
 	fFullVisible2(),
 	fDirtyForRebuild(),
+	fDrawingRegion(),
 
 	fDriver(driver),
 	fRootLayer(NULL),
@@ -421,6 +422,16 @@ Layer::SetName(const char* name)
 	fName.SetTo(name);
 }
 
+// SetUserClipping
+void
+Layer::SetUserClipping(const BRegion& region)
+{
+	fDrawState->SetClippingRegion(region);
+	
+	// rebuild clipping
+	_RebuildDrawingRegion();
+}
+
 // SetFlags
 void
 Layer::SetFlags(uint32 flags)
@@ -521,8 +532,6 @@ Layer::PushState()
 {
 	fDrawState = fDrawState->PushState();
 	fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
-
-	// TODO: rebuild clipping and redraw
 }
 
 
@@ -534,10 +543,15 @@ Layer::PopState()
 		return;
 	}
 
+	bool rebuildClipping = fDrawState->ClippingRegion() != NULL;
+
 	fDrawState = fDrawState->PopState();
 	fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
 
-	// TODO: rebuild clipping and redraw
+	// rebuild clipping
+	// (the clipping from the popped state is not effective anymore)
+	if (rebuildClipping)
+		_RebuildDrawingRegion();
 }
 
 
@@ -880,21 +894,21 @@ void
 Layer::PruneTree(void)
 {
 
-	Layer* lay;
-	Layer* nextlay;
+	Layer* child;
+	Layer* nextChild;
 	
-	lay = fFirstChild;
+	child = fFirstChild;
 	fFirstChild = NULL;
 	
-	while (lay != NULL) {
-		if (lay->fFirstChild != NULL)
-			lay->PruneTree();
+	while (child != NULL) {
+		if (child->fFirstChild != NULL)
+			child->PruneTree();
 		
-		nextlay = lay->fNextSibling;
-		lay->fNextSibling = NULL;
+		nextChild = child->fNextSibling;
+		child->fNextSibling = NULL;
 		
-		delete lay;
-		lay = nextlay;
+		delete child;
+		child = nextChild;
 	}
 	// Man, this thing is short. Elegant, ain't it? :P
 }
@@ -1249,8 +1263,8 @@ Layer::_ResizeLayerFrameBy(float x, float y)
 			// call hook function
 			ResizedByHook(dx, dy, true); // automatic
 
-			for (Layer *lay = LastChild(); lay; lay = PreviousChild())
-				lay->resize_layer_frame_by(dx, dy);
+			for (Layer* child = LastChild(); child; child = PreviousChild())
+				child->resize_layer_frame_by(dx, dy);
 		}
 	}
 */
@@ -1281,39 +1295,39 @@ Layer::_RezizeLayerRedrawMore(BRegion &reg, float dx, float dy)
 	if (dx == 0 && dy == 0)
 		return;
 
-	for (Layer *lay = LastChild(); lay; lay = PreviousChild()) {
-		uint16		rm = lay->fResizeMode & 0x0000FFFF;
+	for (Layer* child = LastChild(); child; child = PreviousChild()) {
+		uint16 rm = child->fResizeMode & 0x0000FFFF;
 
 		if ((rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM) {
 			// NOTE: this is not exactly corect, but it works :-)
-			// Normaly we shoud've used the lay's old, required region - the one returned
-			// from get_user_region() with the old frame, and the current one. lay->Bounds()
+			// Normaly we shoud've used the child's old, required region - the one returned
+			// from get_user_region() with the old frame, and the current one. child->Bounds()
 			// works for the moment so we leave it like this.
 
 			// calculate the old bounds.
-			BRect	oldBounds(lay->Bounds());		
+			BRect	oldBounds(child->Bounds());		
 			if ((rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT)
 				oldBounds.right -=dx;
 			if ((rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM)
 				oldBounds.bottom -=dy;
 			
 			// compute the region that became visible because we got bigger OR smaller.
-			BRegion	regZ(lay->Bounds());
+			BRegion	regZ(child->Bounds());
 			regZ.Include(oldBounds);
-			regZ.Exclude(oldBounds&lay->Bounds());
+			regZ.Exclude(oldBounds & child->Bounds());
 
-			lay->ConvertToScreen(&regZ);
+			child->ConvertToScreen(&regZ);
 
-			// intersect that with this'(not lay's) fullVisible region
+			// intersect that with this'(not child's) fullVisible region
 			regZ.IntersectWith(&fFullVisible2);
 			reg.Include(&regZ);
 
-			lay->_RezizeLayerRedrawMore(reg,
+			child->_RezizeLayerRedrawMore(reg,
 				(rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT? dx: 0,
 				(rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM? dy: 0);
 
 			// above, OR this:
-			// reg.Include(&lay->fFullVisible2);
+			// reg.Include(&child->fFullVisible2);
 		}
 		else
 		if (((rm & 0x0F0F) == (uint16)B_FOLLOW_RIGHT && dx != 0) ||
@@ -1321,7 +1335,7 @@ Layer::_RezizeLayerRedrawMore(BRegion &reg, float dx, float dy)
 			((rm & 0xF0F0) == (uint16)B_FOLLOW_BOTTOM && dy != 0)||
 			((rm & 0xF0F0) == (uint16)B_FOLLOW_V_CENTER && dy != 0))
 		{
-			reg.Include(&lay->fFullVisible2);
+			reg.Include(&child->fFullVisible2);
 		}
 	}
 }
@@ -1332,14 +1346,14 @@ Layer::_ResizeLayerFullUpdateOnResize(BRegion &reg, float dx, float dy)
 	if (dx == 0 && dy == 0)
 		return;
 
-	for (Layer *lay = LastChild(); lay; lay = PreviousChild()) {
-		uint16		rm = lay->fResizeMode & 0x0000FFFF;		
+	for (Layer* child = LastChild(); child; child = PreviousChild()) {
+		uint16 rm = child->fResizeMode & 0x0000FFFF;		
 
 		if ((rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM) {
-			if (lay->fFlags & B_FULL_UPDATE_ON_RESIZE && lay->fVisible2.CountRects() > 0)
-				reg.Include(&lay->fVisible2);
+			if (child->fFlags & B_FULL_UPDATE_ON_RESIZE && child->fVisible2.CountRects() > 0)
+				reg.Include(&child->fVisible2);
 
-			lay->_ResizeLayerFullUpdateOnResize(reg,
+			child->_ResizeLayerFullUpdateOnResize(reg,
 				(rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT? dx: 0,
 				(rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM? dy: 0);
 		}
@@ -1409,15 +1423,15 @@ Layer::_RebuildVisibleRegions(	const BRegion &invalid,
 	// allow this layer to hide some parts from its children
 	_ReserveRegions(common);
 
-	for (Layer *lay = LastChild(); lay; lay = PreviousChild()) {
-		if (lay == startFrom)
+	for (Layer *child = LastChild(); child; child = PreviousChild()) {
+		if (child == startFrom)
 			fullRebuild = true;
 
 		if (fullRebuild)
-			lay->_RebuildVisibleRegions(invalid, common, lay->LastChild());
+			child->_RebuildVisibleRegions(invalid, common, child->LastChild());
 
 		// to let children know much they can take from parent's visible region
-		common.Exclude(&lay->fFullVisible2);
+		common.Exclude(&child->fFullVisible2);
 	}
 
 	// include what's left after all children took what they could.
@@ -1450,15 +1464,30 @@ Layer::_RebuildVisibleRegions(	const BRegion &invalid,
 	// allow this layer to hide some parts from its children
 	_ReserveRegions(common);
 
-	for (Layer *lay = LastChild(); lay; lay = PreviousChild()) {
-		lay->_RebuildVisibleRegions(invalid, common, lay->LastChild());
+	for (Layer *child = LastChild(); child; child = PreviousChild()) {
+		child->_RebuildVisibleRegions(invalid, common, child->LastChild());
 
 		// to let children know much they can take from parent's visible region
-		common.Exclude(&lay->fFullVisible2);
+		common.Exclude(&child->fFullVisible2);
 	}
 
 	// include what's left after all children took what they could.
 	fVisible2.Include(&common);
+
+	_RebuildDrawingRegion();
+}
+
+// _RebuildDrawingRegion
+void
+Layer::_RebuildDrawingRegion()
+{
+	fDrawingRegion = fVisible2;
+	// apply user clipping which is in native coordinate system
+	if (const BRegion* userClipping = fDrawState->ClippingRegion()) {
+		BRegion screenUserClipping(*userClipping);
+		ConvertToScreen(&screenUserClipping);
+		fDrawingRegion.IntersectWith(&screenUserClipping);
+	}
 }
 
 void
@@ -1539,13 +1568,13 @@ Layer::_AllRedraw(const BRegion &invalid)
 		}
 	}
 
-	for (Layer *lay = LastChild(); lay != NULL; lay = PreviousChild()) {
-		if (!(lay->IsHidden())) {
-			BRegion common(lay->fFullVisible2);
+	for (Layer *child = LastChild(); child != NULL; child = PreviousChild()) {
+		if (!(child->IsHidden())) {
+			BRegion common(child->fFullVisible2);
 			common.IntersectWith(&invalid);
 			
 			if (common.CountRects() > 0)
-				lay->_AllRedraw(invalid);
+				child->_AllRedraw(invalid);
 		}
 	}
 }

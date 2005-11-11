@@ -1079,14 +1079,14 @@ if (myRootLayer)
 				fLink.Attach<int32>(0L);
 				fLink.Flush();
 			} else {
-				// TODO: Watch out for the coordinate system in AS_LAYER_GET_CLIP_REGION
-				int32 rectCount = fCurrentLayer->fVisible2.CountRects();
+				BRegion drawingRegion = fCurrentLayer->DrawingRegion();
+				int32 rectCount = drawingRegion.CountRects();
 
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Attach<int32>(rectCount);
 
 				for (int32 i = 0; i < rectCount; i++) {
-					BRect converted(fCurrentLayer->fVisible2.RectAt(i));
+					BRect converted(drawingRegion.RectAt(i));
 					fCurrentLayer->ConvertFromScreen(&converted);
 					fLink.Attach<BRect>(converted);
 				}
@@ -1100,25 +1100,16 @@ if (myRootLayer)
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_CLIP_REGION: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			
-			// TODO: Watch out for the coordinate system in AS_LAYER_SET_CLIP_REGION
-			int32 noOfRects;
-			
-			link.Read<int32>(&noOfRects);
+			int32 rectCount;
+			link.Read<int32>(&rectCount);
 
 			BRegion region;
-			for (int i = 0; i < noOfRects; i++) {
+			for (int32 i = 0; i < rectCount; i++) {
 				BRect r;
 				link.Read<BRect>(&r);
-				fCurrentLayer->ConvertToScreen(&r);
 				region.Include(r);
 			}
-// TODO: Turned off user clipping for now (will probably not harm anything but performance right now)
-// We need to integrate user clipping more, in Layer::PopState, the clipping needs to be
-// restored too. "AS_LAYER_SET_CLIP_REGION" is irritating, as I think it should be
-// "AS_LAYER_CONSTRAIN_CLIP_REGION", since it means to "add" to the current clipping, not "set" it.
-//			fCurrentLayer->CurrentState()->SetClippingRegion(region);
-
-			// TODO: rebuild clipping and redraw
+			fCurrentLayer->SetUserClipping(region);
 
 			break;
 		}
@@ -1622,7 +1613,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 	// NOTE: fCurrentLayer and fCurrentLayer->fLayerData cannot be NULL,
 	// _DispatchGraphicsMessage() is called from _DispatchMessage() which
 	// checks both these conditions
-	BRegion rreg(fCurrentLayer->VisibleRegion());
+	BRegion rreg(fCurrentLayer->DrawingRegion());
 
 	if (fWinBorder->InUpdate())
 		rreg.IntersectWith(&fWinBorder->RegionToBeUpdated());
