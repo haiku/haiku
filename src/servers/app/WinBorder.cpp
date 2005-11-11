@@ -288,9 +288,6 @@ WinBorder::SetName(const char* name)
 	// and redraw it.
 
 	if (fDecorator) {
-
-// TODO: Make sure this works!!
-
 		// before the change
 		BRegion invalid(fDecorator->GetTabRect());
 
@@ -298,6 +295,11 @@ WinBorder::SetName(const char* name)
 
 		// after the change
 		invalid.Include(fDecorator->GetTabRect());
+
+		// TODO: still doesn't look good (visually), but at least it works
+		fRebuildDecRegion = true;
+		GetRootLayer()->MarkForRebuild(invalid);
+		GetRootLayer()->TriggerRebuild();
 
 		GetRootLayer()->MarkForRedraw(invalid);
 		GetRootLayer()->TriggerRedraw();
