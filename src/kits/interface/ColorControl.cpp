@@ -1,34 +1,18 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Button.h
-//	Author:			Marc Flerackers (mflerackers@androme.be)
-//	Description:	BColorControl displays a palette of selectable colors.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Marc Flerackers (mflerackers@androme.be)
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
 
-// Standard Includes -----------------------------------------------------------
+/**	BColorControl displays a palette of selectable colors. */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 
-// System Includes -------------------------------------------------------------
 #include <ColorControl.h>
 #include <Bitmap.h>
 #include <TextControl.h>
@@ -37,26 +21,16 @@
 #include <Errors.h>
 #include <Region.h>
 
-#define min(a,b) ((a)>(b)?(b):(a))
-#define max(a,b) ((a)>(b)?(a):(b))
-
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
 
 const uint32 U_COLOR_CONTROL_RED_CHANGED_MSG = 'CCRC';
 const uint32 U_COLOR_CONTROL_GREEN_CHANGED_MSG = 'CCGC';
 const uint32 U_COLOR_CONTROL_BLUE_CHANGED_MSG = 'CCBC';
 
-//------------------------------------------------------------------------------
+
 BColorControl::BColorControl(BPoint leftTop, color_control_layout matrix,
-							 float cellSize, const char *name,
-							 BMessage *message, bool bufferedDrawing)
-	:	BControl(BRect(leftTop, leftTop), name, NULL, message,
+	float cellSize, const char *name, BMessage *message,
+	bool bufferedDrawing)
+	: BControl(BRect(leftTop, leftTop), name, NULL, message,
 			B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE)
 {
 	InitData(matrix, cellSize, bufferedDrawing, NULL);
@@ -235,8 +209,8 @@ void BColorControl::MouseDown(BPoint point)
 	BRect rect(0.0f, 0.0f, fColumns * fCellSize, fRows * fCellSize);
 	float rampsize = rect.bottom / 4;
 
-	uint8 shade = (unsigned char)max(0,
-		min((point.x - 2) * 255 / (rect.Width() - 4.0f), 255));
+	uint8 shade = (unsigned char)max_c(0,
+		min_c((point.x - 2) * 255 / (rect.Width() - 4.0f), 255));
 
 	if (point.y - 2 < rampsize)
 	{
@@ -343,8 +317,8 @@ void BColorControl::MouseMoved(BPoint point, uint32 transit,
 
 		BRect rect(0.0f, 0.0f, fColumns * fCellSize, fRows * fCellSize);
 
-		uint8 shade = (unsigned char)max(0,
-		min((point.x - 2) * 255 / (rect.Width() - 4.0f), 255));
+		uint8 shade = (unsigned char)max_c(0,
+		min_c((point.x - 2) * 255 / (rect.Width() - 4.0f), 255));
 
 		switch (fFocusedComponent)
 		{
@@ -439,31 +413,45 @@ BColorControl &BColorControl::operator=(const BColorControl &)
 {
 	return *this;
 }
-//------------------------------------------------------------------------------
-void BColorControl::LayoutView(bool calc_frame)
+
+
+void
+BColorControl::LayoutView(bool calcFrame)
 {
-//debugger("");
+	BRect rect(0.0f, 0.0f, ceil(fColumns * fCellSize), ceil(fRows * fCellSize + 2));
 
-	BRect rect(0.0f, 0.0f, fColumns * fCellSize, (fRows * fCellSize) + 2);
-	float rampsize = rect.bottom / 4;
-	float y = (rampsize * 1.5) - 7;
-	
-	ResizeTo(rect.Width() + 70, rect.Height());
+	if (rect.Height() < fBlueText->Frame().bottom) {
+		// adjust the height to fit
+		rect.bottom = fBlueText->Frame().bottom;
+	}
 
-	fRedText->MoveTo(rect.right, y);
-	y += rampsize;
+	ResizeTo(rect.Width() + fRedText->Bounds().Width(), rect.Height());
 
-	fGreenText->MoveTo(rect.right, y);
-	y += rampsize;
+	float offset = floor(rect.bottom / 4);
+	float y = offset;
+	if (offset < fRedText->Bounds().Height() + 2) {
+		offset = fRedText->Bounds().Height() + 2;
+		y = 0;
+	}
 
-	fBlueText->MoveTo(rect.right, y);
+	fRedText->MoveTo(rect.right + 1, y);
+
+	y += offset;
+	fGreenText->MoveTo(rect.right + 1, y);
+
+	y += offset;
+	fBlueText->MoveTo(rect.right + 1, y);
 }
-//------------------------------------------------------------------------------
-void BColorControl::UpdateOffscreen()
+
+
+void
+BColorControl::UpdateOffscreen()
 {
 }
-//------------------------------------------------------------------------------
-void BColorControl::UpdateOffscreen(BRect update)
+
+
+void
+BColorControl::UpdateOffscreen(BRect update)
 {
 	if (fBitmap->Lock())
 	{
@@ -474,19 +462,20 @@ void BColorControl::UpdateOffscreen(BRect update)
 		fBitmap->Unlock();
 	}
 }
-//------------------------------------------------------------------------------
-void BColorControl::DrawColorArea(BView *target, BRect update)
+
+
+void
+BColorControl::DrawColorArea(BView *target, BRect update)
 {
-	BRegion reg(update);
-	
-	target->ConstrainClippingRegion(&reg);
-	
-	BRect rect(0.0f, 0.0f, fColumns * fCellSize, Bounds().bottom);
-	
-	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
-	lightenmax = tint_color(no_tint, B_LIGHTEN_MAX_TINT),
-	darken1 = tint_color(no_tint, B_DARKEN_1_TINT),
-	darken4 = tint_color(no_tint, B_DARKEN_4_TINT);
+	BRegion region(update);
+	target->ConstrainClippingRegion(&region);
+
+	BRect rect(0.0f, 0.0f, ceil(fColumns * fCellSize), Bounds().bottom);
+
+	rgb_color noTint = ui_color(B_PANEL_BACKGROUND_COLOR),
+	lightenmax = tint_color(noTint, B_LIGHTEN_MAX_TINT),
+	darken1 = tint_color(noTint, B_DARKEN_1_TINT),
+	darken4 = tint_color(noTint, B_DARKEN_4_TINT);
 
 	// First bevel
 	target->SetHighColor(darken1);
@@ -502,7 +491,7 @@ void BColorControl::DrawColorArea(BView *target, BRect update)
 	target->SetHighColor(darken4);
 	target->StrokeLine(rect.LeftBottom(), rect.LeftTop());
 	target->StrokeLine(rect.LeftTop(), rect.RightTop());
-	target->SetHighColor(no_tint);
+	target->SetHighColor(noTint);
 	target->StrokeLine(BPoint(rect.left + 1.0f, rect.bottom), rect.RightBottom());
 	target->StrokeLine(rect.RightBottom(), BPoint(rect.right, rect.top + 1.0f));
 
@@ -534,6 +523,7 @@ void BColorControl::DrawColorArea(BView *target, BRect update)
 	rgb_color color = ValueAsColor();
 	float x, y = rampsize * 1.5;
 
+	target->SetDrawingMode(B_OP_OVER);
 	target->SetPenSize(2.0f);
 
 	x = rect.left + color.red * (rect.Width() - 7) / 255;
@@ -553,7 +543,8 @@ void BColorControl::DrawColorArea(BView *target, BRect update)
 	target->StrokeEllipse(BRect ( x, y, x + 4.0f, y + 4.0f));
 
 	target->SetPenSize(1.0f);
-	
+	target->SetDrawingMode(B_OP_COPY);
+
 	target->ConstrainClippingRegion(NULL);
 }
 //------------------------------------------------------------------------------
@@ -624,9 +615,9 @@ BRect BColorControl::CalcFrame(BPoint start, color_control_layout layout,
 
 	return rect;
 }
-//------------------------------------------------------------------------------
-void BColorControl::InitData(color_control_layout layout, float size,
-							 bool use_offscreen, BMessage *data)
+void
+BColorControl::InitData(color_control_layout layout, float size,
+	bool useOffscreen, BMessage *data)
 {
 	BRect bounds(Bounds());
 
@@ -643,17 +634,14 @@ void BColorControl::InitData(color_control_layout layout, float size,
 	BScreen screen(Window());
 	fLastMode = screen.ColorSpace();
 
-	if (use_offscreen)
-	{
+	if (useOffscreen) {
 		fBitmap = new BBitmap(bounds, B_RGB32, true, false);
 		fOffscreenView = new BView(bounds, "off_view", 0, 0);
 
 		fBitmap->Lock();
 		fBitmap->AddChild(fOffscreenView);
 		fBitmap->Unlock();
-	}
-	else
-	{
+	} else {
 		fBitmap = NULL;
 		fOffscreenView = NULL;
 	}
@@ -662,10 +650,8 @@ void BColorControl::InitData(color_control_layout layout, float size,
 	fCachedIndex = -1;
 	fRetainCache = false;
 
-	if (data)
-	{
+	if (data) {
 		int32 _val = 0;
-
 		data->FindInt32("_val", &_val);
 
 		SetValue(_val);
@@ -673,52 +659,52 @@ void BColorControl::InitData(color_control_layout layout, float size,
 		fRedText = (BTextControl*)FindView("_red");
 		fGreenText = (BTextControl*)FindView("_green");
 		fBlueText = (BTextControl*)FindView("_blue");
-	}
-	else
-	{
-		BRect rect(0.0f, 0.0f,70.0f, 15.0f);
-		int32 i;
-		float dividerWidth = StringWidth("Green:") + 2;
-		
+	} else {
+		BRect rect(0.0f, 0.0f, 70.0f, 15.0f);
+		float labelWidth = StringWidth("Green:") + 5;
+		rect.right = labelWidth + StringWidth("999") + 20;
+
+		// red
+
 		fRedText = new BTextControl(rect, "_red", "Red:", "0",
 			new BMessage('ccol'), B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			B_WILL_DRAW | B_NAVIGABLE);
-		
-		fRedText->SetDivider(dividerWidth);
-		
-		for (i = 0; i < 256; i++)
+		fRedText->SetDivider(labelWidth);
+
+		float offset = fRedText->Bounds().Height() + 2;
+
+		for (int32 i = 0; i < 256; i++)
 			fRedText->TextView()->DisallowChar(i);
-		for (i = '0'; i <= '9'; i++)
+		for (int32 i = '0'; i <= '9'; i++)
 			fRedText->TextView()->AllowChar(i);
 		fRedText->TextView()->SetMaxBytes(3);
 
-		rect.OffsetBy(0.0f, 17.0f);
+		// green
 
+		rect.OffsetBy(0.0f, offset);
 		fGreenText = new BTextControl(rect, "_green", "Green:", "0",
 			new BMessage('ccol'), B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			B_WILL_DRAW | B_NAVIGABLE);
-		
-		fGreenText->SetDivider(dividerWidth);
-		
-		for (i = 0; i < 256; i++)
+		fGreenText->SetDivider(labelWidth);
+
+		for (int32 i = 0; i < 256; i++)
 			fGreenText->TextView()->DisallowChar(i);
-		for (i = '0'; i <= '9'; i++)
+		for (int32 i = '0'; i <= '9'; i++)
 			fGreenText->TextView()->AllowChar(i);
 		fGreenText->TextView()->SetMaxBytes(3);
 
-		rect.OffsetBy(0.0f, 17.0f);
+		// blue
 
+		rect.OffsetBy(0.0f, offset);
 		fBlueText = new BTextControl(rect, "_blue", "Blue:", "0",
 			new BMessage('ccol'), B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			B_WILL_DRAW | B_NAVIGABLE);
-		
-		fBlueText->SetDivider(dividerWidth);
-		
-		for (i = 0; i < 256; i++)
+		fBlueText->SetDivider(labelWidth);
+
+		for (int32 i = 0; i < 256; i++)
 			fBlueText->TextView()->DisallowChar(i);
-		for (i = '0'; i <= '9'; i++)
+		for (int32 i = '0'; i <= '9'; i++)
 			fBlueText->TextView()->AllowChar(i);
-		
 		fBlueText->TextView()->SetMaxBytes(3);
 
 		LayoutView(false);
@@ -727,12 +713,16 @@ void BColorControl::InitData(color_control_layout layout, float size,
 		AddChild(fBlueText);
 	}
 }
-//------------------------------------------------------------------------------
-void BColorControl::DoMouseMoved(BPoint pt)
+
+
+void
+BColorControl::DoMouseMoved(BPoint pt)
 {
 }
-//------------------------------------------------------------------------------
-void BColorControl::DoMouseUp(BPoint pt)
+
+
+void
+BColorControl::DoMouseUp(BPoint pt)
 {
 }
-//------------------------------------------------------------------------------
+
