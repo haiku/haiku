@@ -1,30 +1,14 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		TextView.cpp
-//	Authors:		Hiroshi Lockheimer (BTextView is based on his STEEngine)
-//					Marc Flerackers (mflerackers@androme.be)
-//					Stefano Ceccherini (burton666@libero.it)
-//	Description:	BTextView displays and manages styled text.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Hiroshi Lockheimer (BTextView is based on his STEEngine)
+ *		Marc Flerackers (mflerackers@androme.be)
+ *		Stefano Ceccherini (burton666@libero.it)
+ */
+
+/**	BTextView displays and manages styled text. */
 
 // TODOs: 
 // - Finish documenting this class
@@ -37,8 +21,8 @@
 // Known Bugs:
 // - Double buffering doesn't work well (disabled by default)
 
-#include <cstdlib>
-#include <cstdio>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include <Application.h>
 #include <Beep.h>
@@ -691,18 +675,31 @@ BTextView::WindowActivated(bool state)
 void
 BTextView::KeyDown(const char *bytes, int32 numBytes)
 {
-	// TODO: Remove this and move it to specific key handlers ?
-	// moreover, we should check if ARROW keys work in case the object
-	// isn't editable
-	if (!fEditable)
-		return;
-	
 	const char keyPressed = bytes[0];
 
-	// if the character is not allowed, bail out.
-	if (fDisallowedChars
-		&& fDisallowedChars->HasItem(reinterpret_cast<void *>((uint32)keyPressed))) {
-		beep();
+	if (!fEditable) {
+		// only arrow and page keys are allowed
+		// (no need to hide the cursor)
+		switch (keyPressed) {
+			case B_LEFT_ARROW:
+			case B_RIGHT_ARROW:
+			case B_UP_ARROW:
+			case B_DOWN_ARROW:
+				HandleArrowKey(keyPressed);
+				break;
+
+			case B_HOME:
+			case B_END:
+			case B_PAGE_UP:
+			case B_PAGE_DOWN:
+				HandlePageKey(keyPressed);
+				break;
+
+			default:			
+				BView::KeyDown(bytes, numBytes);
+				break;
+		}
+
 		return;
 	}
 
@@ -710,42 +707,49 @@ BTextView::KeyDown(const char *bytes, int32 numBytes)
 	be_app->ObscureCursor();
 	if (fCaretVisible)
 		InvertCaret();
-	
+
 	switch (keyPressed) {
 		case B_BACKSPACE:
 			HandleBackspace();
 			break;
-			
+
 		case B_LEFT_ARROW:
 		case B_RIGHT_ARROW:
 		case B_UP_ARROW:
 		case B_DOWN_ARROW:
 			HandleArrowKey(keyPressed);
 			break;
-		
+
 		case B_DELETE:
 			HandleDelete();
 			break;
-			
+
 		case B_HOME:
 		case B_END:
 		case B_PAGE_UP:
 		case B_PAGE_DOWN:
 			HandlePageKey(keyPressed);
 			break;
-			
+
 		case B_ESCAPE:
 		case B_INSERT:
 		case B_FUNCTION_KEY:
 			// ignore, pass it up to superclass
 			BView::KeyDown(bytes, numBytes);
 			break;
-			
+
 		default:
+			// if the character is not allowed, bail out.
+			if (fDisallowedChars
+				&& fDisallowedChars->HasItem(reinterpret_cast<void *>((uint32)keyPressed))) {
+				beep();
+				return;
+			}
+
 			HandleAlphaKey(bytes, numBytes);
 			break;
 	}
-	
+
 	// draw the caret
 	if (fSelStart == fSelEnd) {
 		if (!fCaretVisible)
@@ -3613,7 +3617,7 @@ BTextView::DoInsertText(const char *inText, int32 inLength, int32 inOffset,
 
 void
 BTextView::DoDeleteText(int32 fromOffset, int32 toOffset,
-							 _BTextChangeResult_ *outResult)
+	_BTextChangeResult_ *outResult)
 {
 	CALLED();
 }
@@ -3621,12 +3625,12 @@ BTextView::DoDeleteText(int32 fromOffset, int32 toOffset,
 
 void
 BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
-						  bool erase)
+	bool erase)
 {
 	// clip the text
 	BRect clipRect = Bounds() & fTextRect;
 	clipRect.InsetBy(-1, -1);
-	
+
 	BView *view = this;
 	if (fOffscreen && fOffscreen->Lock()) {
 		view = fOffscreen->ChildAt(0);
@@ -3635,7 +3639,7 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 		newClip.Set(clipRect);
 		ConstrainClippingRegion(&newClip);	
 	}
-		
+
 	// set the low color to the view color so that 
 	// drawing to a non-white background will work	
 	view->SetLowColor(view->ViewColor());
@@ -3663,20 +3667,20 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 			if (startErase > line->offset)
 				startErase--;
 		}
-		
+
 		eraseRect.left = PointAt(startErase).x;
 		eraseRect.top = line->origin + fTextRect.top;
 		eraseRect.bottom = (line + 1)->origin + fTextRect.top;
-		
+
 		view->FillRect(eraseRect, B_SOLID_LOW);
-					
+
 		eraseRect = clipRect;
 	}
-	
+
 	BRegion inputRegion;
 	if (fInline != NULL && fInline->IsActive())
 		GetTextRegion(fInline->Offset(), fInline->Offset() + fInline->Length(), &inputRegion);
-	
+
 	float startLeft = fTextRect.left;	
 	for (long i = startLine; i <= endLine; i++) {
 		long length = (line + 1)->offset - line->offset;
@@ -3691,7 +3695,7 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 				startLeft /= 2;
 			startLeft += fTextRect.left;
 		}
-			
+
 		view->MovePenTo(startLeft, line->origin + line->ascent + fTextRect.top + 1);
 
 		if (erase && i >= startEraseLine) {
@@ -3803,12 +3807,12 @@ BTextView::DrawCaret(int32 offset)
 	float lineHeight;
 	BPoint caretPoint = PointAt(offset, &lineHeight);
 	caretPoint.x = min_c(caretPoint.x, fTextRect.right);
-	
+
 	BRect caretRect;
 	caretRect.left = caretRect.right = caretPoint.x;
 	caretRect.top = caretPoint.y;
-	caretRect.bottom = caretPoint.y + lineHeight;
-	
+	caretRect.bottom = caretPoint.y + lineHeight - 1;
+
 	InvertRect(caretRect);
 }
 
