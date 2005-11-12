@@ -101,25 +101,10 @@ for level in $(HAIKU_DEBUG_LEVELS[2-]) {
 }
 
 # analyze GCC version
-if ! $(HAIKU_GCC_RAW_VERSION) {
-	ECHO "Variable HAIKU_GCC_RAW_VERSION not set. Please run ./configure or" ;
-	EXIT "specify it manually." ;
-}
-HAIKU_GCC_VERSION = ;
-{
-	# split the raw version string at `.' and `-' characters
-	local version = $(HAIKU_GCC_RAW_VERSION) ;
-	while $(version) {
-		local split = [ Match "([^.-]*)[.-](.*)" : $(version) ] ;
-		if $(split) {
-			HAIKU_GCC_VERSION += $(split[1]) ;
-			version = $(split[2]) ;
-		} else {
-			HAIKU_GCC_VERSION += $(version) ;
-			version = ;
-		}
-	}
-}
+HAIKU_GCC_VERSION = [ FAnalyzeGCCVersion HAIKU_GCC_RAW_VERSION ] ;
+
+# set variables for gcc header options
+SetIncludePropertiesVariables HAIKU ;
 
 # assembler flags
 HAIKU_ASFLAGS = ;
@@ -150,11 +135,11 @@ if $(DEBUG_PRINTF) {
 # warning flags
 HAIKU_WARNING_CCFLAGS = -Wall -Wmissing-prototypes -Wpointer-arith -Wcast-align
 	-Wsign-compare ;
-HAIKU_WARNING_C++FLAGS = -Wall -Wmissing-prototypes -Wno-ctor-dtor-privacy
+HAIKU_WARNING_C++FLAGS = -Wall -Wno-ctor-dtor-privacy
 	-Woverloaded-virtual -Wpointer-arith -Wcast-align -Wsign-compare ;
 
 HAIKU_KERNEL_WARNING_CCFLAGS = -Wall -Wmissing-prototypes ;
-HAIKU_KERNEL_WARNING_C++FLAGS = -Wall -Wmissing-prototypes ;
+HAIKU_KERNEL_WARNING_C++FLAGS = -Wall ;
 
 # debug flags
 HAIKU_DEBUG_FLAGS ?= -ggdb ;
@@ -175,6 +160,11 @@ for level in $(HAIKU_DEBUG_LEVELS[2-]) {
 	HAIKU_KERNEL_DEBUG_$(level)_C++FLAGS	= $(flags) ;
 }
 
+# gcc version dependent defines
+# if $(HAIKU_GCC_VERSION[1]) >= 3 {
+# 	HAIKU_DEFINES += __FUNCTION__=__func__ ;
+# }
+
 # private kernel headers do be used when compiling kernel code
 HAIKU_PRIVATE_KERNEL_HEADERS =
 	[ PrivateHeaders $(DOT) kernel libroot
@@ -186,7 +176,20 @@ HAIKU_PRIVATE_KERNEL_HEADERS =
 HAIKU_GCC_LIBGCC_OBJECTS = $(HAIKU_GCC_LIBGCC_OBJECTS:G=libgcc) ;
 
 # the C++ library
-HAIKU_LIBSTDC++ = libstdc++.r4.so ;
+if $(HAIKU_SHARED_LIBSTDC++) {
+	HAIKU_LIBSTDC++ = $(HAIKU_SHARED_LIBSTDC++) ;
+} else if $(HAIKU_STATIC_LIBSTDC++) {
+	HAIKU_LIBSTDC++ = $(HAIKU_STATIC_LIBSTDC++) ;
+} else {
+	HAIKU_LIBSTDC++ = libstdc++.r4.so ;
+}
+
+# the C++ support library
+if $(HAIKU_GCC_VERSION[1]) < 3 {
+	HAIKU_LIBSUPC++ = ;
+} else {
+	HAIKU_LIBSUPC++ = supc++ ;
+}
 
 # library and executable glue code
 local commonGlueCode =
@@ -234,6 +237,7 @@ HAIKU_BUILD_DESCRIPTION ?= "Unknown Build" ;
 			textencoding tracker translation {
 		HAIKU_LIBRARY_NAME_MAP_$(i) = lib$(i).so ;
 	}
+	HAIKU_LIBRARY_NAME_MAP_libstdc++ = $(HAIKU_LIBSTDC++) ;
 }
 
 
@@ -292,6 +296,12 @@ for level in $(HAIKU_DEBUG_LEVELS[2-]) {
 		= [ FDirName $(HOST_ARCH_OBJECT_DIR) debug_$(level) ] ;
 }
 
+# analyze GCC version
+HOST_GCC_VERSION = [ FAnalyzeGCCVersion HOST_GCC_RAW_VERSION ] ;
+
+# set variables for gcc header options
+SetIncludePropertiesVariables HOST ;
+
 # assembler flags
 HOST_ASFLAGS = ;
 
@@ -307,11 +317,11 @@ HOST_KERNEL_C++FLAGS += -finline -fno-builtin -fno-exceptions
 # warning flags
 HOST_WARNING_CCFLAGS = -Wall -Wmissing-prototypes -Wpointer-arith -Wcast-align
 	-Wsign-compare ;
-HOST_WARNING_C++FLAGS = -Wall -Wmissing-prototypes -Wno-ctor-dtor-privacy
+HOST_WARNING_C++FLAGS = -Wall -Wno-ctor-dtor-privacy
 	-Woverloaded-virtual -Wpointer-arith -Wcast-align -Wsign-compare ;
 
 HOST_KERNEL_WARNING_CCFLAGS = -Wall -Wmissing-prototypes ;
-HOST_KERNEL_WARNING_C++FLAGS = -Wall -Wmissing-prototypes ;
+HOST_KERNEL_WARNING_C++FLAGS = -Wall ;
 
 # debug flags
 switch $(HOST_PLATFORM) {
@@ -369,6 +379,13 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	HOST_LIBBE = libbe_build.so ;
 	HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR
 		= "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(HOST_BUILD_COMPATIBILITY_LIB_DIR)" ;
+
+	# the C++ support library
+	if $(HOST_GCC_VERSION[1]) < 3 {
+		HOST_LIBSUPC++ = ;
+	} else {
+		HOST_LIBSUPC++ = supc++ ;
+	}
 
 	# The BeOS compilers define __INTEL__ respectively __POWERPC__. On the
 	# build platform we need to make sure, this is also defined.
@@ -450,9 +467,11 @@ HAIKU_COMPATIBLE	= $(TARGET_PLATFORM_HAIKU_COMPATIBLE) ;
 # specified TARGET_PLATFORM.
 
 local buildVars =
-	ARCH CPU
+	ARCH CPU GCC_VERSION
 
 	AR CC C++ LD OBJCOPY RANLIB
+
+	INCLUDES_SEPARATOR LOCAL_INCLUDES_OPTION SYSTEM_INCLUDES_OPTION
 
 	HDRS CPPFLAGS CCFLAGS C++FLAGS LDFLAGS LINK LINKFLAGS DEFINES
 	ARFLAGS UNARFLAGS
@@ -471,7 +490,7 @@ local buildVars =
 
 	PRIVATE_KERNEL_HEADERS
 
-	LIBSTDC++
+	LIBSTDC++ LIBSUPC++
 
 	ARCH_MACRO_DEFINE EXECUTABLE_MIME_TYPE
 

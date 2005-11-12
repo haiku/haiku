@@ -79,6 +79,26 @@ standard_gcc_settings()
 	HAIKU_GCC_GLUE_CODE="crtbegin.o crtend.o"
 	HAIKU_GCC_HEADERS_DIR=${gccdir}/include
 	HAIKU_GCC_LIBGCC_OBJECTS=`ar t ${HAIKU_GCC_LIBGCC}`
+
+	# for gcc 4 we use the libstdc++ that comes with the compiler
+	case $haikuGCCVersion in
+		4.*)
+			haikuStaticLibStdCxx=`$HAIKU_CC -print-file-name=libstdc++.a`
+			haikuSharedLibStdCxx=`$HAIKU_CC -print-file-name=libstdc++.so`
+			local headers=$gccdir/../../../../include/c++/$haikuGCCVersion
+			haikuCxxHeadersDir=$headers
+			for d in $haikuGCCMachine backward ext debug; do
+				haikuCxxHeadersDir="$haikuCxxHeadersDir $headers/$d"
+			done
+			
+			if [ $haikuStaticLibStdCxx = libstdc++.a ]; then
+				haikuStaticLibStdCxx=
+			fi
+			if [ $haikuSharedLibStdCxx = libstdc++.so ]; then
+				haikuSharedLibStdCxx=
+			fi
+		;;
+	esac
 }
 
 # set_default_value
@@ -128,6 +148,10 @@ cd $currentDir
 #
 platform=`uname`
 haikuGCCVersion=
+haikuStaticLibStdCxx=
+haikuSharedLibStdCxx=
+haikuCxxHeadersDir=
+hostGCCVersion=`cc -dumpversion`
 floppy=
 bochs_debug=0
 include_gpl_addons=0
@@ -235,6 +259,10 @@ HAIKU_GCC_LIB_DIR		?= ${HAIKU_GCC_LIB_DIR} ;
 HAIKU_GCC_HEADERS_DIR	?= ${HAIKU_GCC_HEADERS_DIR} ;
 HAIKU_GCC_LIBGCC		?= ${HAIKU_GCC_LIBGCC} ;
 
+HAIKU_STATIC_LIBSTDC++	?= ${haikuStaticLibStdCxx} ;
+HAIKU_SHARED_LIBSTDC++	?= ${haikuSharedLibStdCxx} ;
+HAIKU_C++_HEADERS_DIR	?= ${haikuCxxHeadersDir} ;
+
 HAIKU_BUILD_ATTRIBUTES_DIR	?= ${buildAttributesDir} ;
 
 HAIKU_AR			?= ${HAIKU_AR} ;
@@ -248,6 +276,8 @@ HAIKU_CXXFLAGS		?= ${HAIKU_CXXFLAGS} ;
 HAIKU_LDFLAGS		?= ${HAIKU_LDFLAGS} ;
 HAIKU_ARFLAGS		?= ${HAIKU_ARFLAGS} ;
 HAIKU_UNARFLAGS		?= ${HAIKU_UNARFLAGS} ;
+
+HOST_GCC_RAW_VERSION	?= ${hostGCCVersion} ;
 
 EOF
 

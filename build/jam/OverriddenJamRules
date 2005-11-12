@@ -150,21 +150,33 @@ rule Object
 rule As
 {
 	local flags ;
+	local includesSeparator ;
+	local localIncludesOption ;
+	local systemIncludesOption ;
 	if [ on $(1) return $(PLATFORM) ] = host {
 		flags = [ on $(1) return $(HOST_ASFLAGS) $(ASFLAGS) ] ;
 	
 		CC on $(1) = $(HOST_CC) ;
 
+		includesSeparator = $(HOST_INCLUDES_SEPARATOR) ;
+		localIncludesOption = $(HOST_LOCAL_INCLUDES_OPTION) ;
+		systemIncludesOption = $(HOST_SYSTEM_INCLUDES_OPTION) ;
+
 	} else {
 		flags = [ on $(1) return $(TARGET_ASFLAGS) $(ASFLAGS) ] ;
 	
 		CC on $(1) = $(TARGET_CC) ;
+
+		includesSeparator = $(TARGET_INCLUDES_SEPARATOR) ;
+		localIncludesOption = $(TARGET_LOCAL_INCLUDES_OPTION) ;
+		systemIncludesOption = $(TARGET_SYSTEM_INCLUDES_OPTION) ;
 	}
 
 	Depends $(<) : $(>) ;
 	ASFLAGS on $(<) += $(flags) $(SUBDIRASFLAGS) ;
-	ASHDRS on $(<) = [ on $(<) FIncludes $(HDRS) ]
-		$(HDRS_INCLUDES_SEPARATOR) [ on $(<) FSysIncludes $(SYSHDRS) ] ;
+	ASHDRS on $(<) = [ on $(<) FIncludes $(HDRS) : $(localIncludesOption) ]
+		$(includesSeparator)
+		[ on $(<) FSysIncludes $(SYSHDRS) : $(systemIncludesOption) ] ;
 	ASDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
 }
 
@@ -217,6 +229,9 @@ rule Cc
 
 	on $(1) {
 		local flags ;
+		local includesSeparator ;
+		local localIncludesOption ;
+		local systemIncludesOption ;
 
 		# optimization flags
 		if $(DEBUG) = 0 {
@@ -241,6 +256,10 @@ rule Cc
 
 			CC on $(1) = $(HOST_CC) ;
 
+			includesSeparator = $(HOST_INCLUDES_SEPARATOR) ;
+			localIncludesOption = $(HOST_LOCAL_INCLUDES_OPTION) ;
+			systemIncludesOption = $(HOST_SYSTEM_INCLUDES_OPTION) ;
+
 		} else {
 			# warning flags
 			if $(WARNINGS) != 0 {
@@ -252,11 +271,16 @@ rule Cc
 				$(SUBDIRCCFLAGS) $(CCFLAGS) ;
 
 			CC on $(1) = $(TARGET_CC) ;
+
+			includesSeparator = $(TARGET_INCLUDES_SEPARATOR) ;
+			localIncludesOption = $(TARGET_LOCAL_INCLUDES_OPTION) ;
+			systemIncludesOption = $(TARGET_SYSTEM_INCLUDES_OPTION) ;
 		}
 
 		CCFLAGS on $(<) = $(flags) ;
-		CCHDRS on $(<) = [ FIncludes $(HDRS) ] $(HDRS_INCLUDES_SEPARATOR)
-			[ FSysIncludes $(SYSHDRS) ] ;
+		CCHDRS on $(<) = [ FIncludes $(HDRS) : $(localIncludesOption) ]
+			$(includesSeparator)
+			[ FSysIncludes $(SYSHDRS) : $(systemIncludesOption) ] ;
 		CCDEFS on $(<) = [ FDefines $(DEFINES) ] ;
 	}
 }
@@ -272,6 +296,9 @@ rule C++
 
 	on $(1) {
 		local flags ;
+		local includesSeparator ;
+		local localIncludesOption ;
+		local systemIncludesOption ;
 	
 		# optimization flags
 		if $(DEBUG) = 0 {
@@ -296,6 +323,10 @@ rule C++
 	
 			C++ on $(1) = $(HOST_C++) ;
 		
+			includesSeparator = $(HOST_INCLUDES_SEPARATOR) ;
+			localIncludesOption = $(HOST_LOCAL_INCLUDES_OPTION) ;
+			systemIncludesOption = $(HOST_SYSTEM_INCLUDES_OPTION) ;
+
 		} else {
 			# warning flags
 			if $(WARNINGS) != 0 {
@@ -307,11 +338,16 @@ rule C++
 				$(SUBDIRC++FLAGS) $(C++FLAGS) ;
 	
 			C++ on $(1) = $(TARGET_C++) ;
+
+			includesSeparator = $(TARGET_INCLUDES_SEPARATOR) ;
+			localIncludesOption = $(TARGET_LOCAL_INCLUDES_OPTION) ;
+			systemIncludesOption = $(TARGET_SYSTEM_INCLUDES_OPTION) ;
 		}
 	
 		C++FLAGS on $(<) = $(flags) ;
-		CCHDRS on $(<) = [ FIncludes $(HDRS) ] $(HDRS_INCLUDES_SEPARATOR)
-			[ FSysIncludes $(SYSHDRS) ] ;
+		CCHDRS on $(<) = [ FIncludes $(HDRS) : $(localIncludesOption) ]
+			$(includesSeparator)
+			[ FSysIncludes $(SYSHDRS) : $(systemIncludesOption) ] ;
 		CCDEFS on $(<) = [ FDefines $(DEFINES) ] ;
 	}
 }
@@ -563,13 +599,30 @@ rule ObjectHdrs
 
 	local file ;
 	for file in $(objects) {
-		HDRS on $(file) = [ on $(file) return $(HDRS) ] $(headers) ;
+		on $(file) {
+			local localHeaders = $(HDRS) $(headers) ;
+			SYSHDRS on $(file) = $(localHeaders) ;
 
-		# reformat ASHDRS and CCHDRS
-		local fileHeaders = [ on $(file) FIncludes $(HDRS) ]
-			$(HDRS_INCLUDES_SEPARATOR) [ on $(file) FSysIncludes $(SYSHDRS) ] ;
-		ASHDRS on $(file) = $(fileHeaders) ;
-		CCHDRS on $(file) = $(fileHeaders) ;
+			# reformat ASHDRS and CCHDRS
+			local fileHeaders ;
+
+			if $(PLATFORM) = host {
+				fileHeaders =
+					[ FIncludes $(localHeaders) : $(HOST_LOCAL_INCLUDES_OPTION) ]
+					$(HOST_INCLUDES_SEPARATOR)
+					[ FSysIncludes $(SYSHDRS)
+						: $(HOST_SYSTEM_INCLUDES_OPTION) ] ;
+			} else {
+				fileHeaders =
+					[ FIncludes $(localHeaders) : $(TARGET_LOCAL_INCLUDES_OPTION) ]
+					$(TARGET_INCLUDES_SEPARATOR)
+					[ FSysIncludes $(SYSHDRS)
+						: $(TARGET_SYSTEM_INCLUDES_OPTION) ] ;
+			}
+
+			ASHDRS on $(file) = $(fileHeaders) ;
+			CCHDRS on $(file) = $(fileHeaders) ;
+		}
 	}
 }
 

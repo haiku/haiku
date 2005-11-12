@@ -1,16 +1,15 @@
 
+# FIncludes <dirs> ;
+#
+# Overridden to support a second argument, the option to be used.
+#
+rule FIncludes { return $(2:E="--bad-include-option ")$(1) ; }
+
 # FSysIncludes <dirs> ;
 #
 # Counterpart of FIncludes for system include search paths.
 #
-#if $(OSPLAT) = X86 {
-	rule FSysIncludes { return -I$(<) ; }
-	HDRS_INCLUDES_SEPARATOR = -I- ;
-# } else {
-# 	rule FSysIncludes { return "-i "$(<) ; }
-# 	HDRS_INCLUDES_SEPARATOR = -i- ;
-# }
-# mwcc support commented out
+rule FSysIncludes { return $(2:E="--bad-include-option ")$(1) ; }
 
 rule SubDirSysHdrs
 {
@@ -54,8 +53,22 @@ rule ObjectSysHdrs
 			SYSHDRS on $(file) = $(sysHeaders) ;
 
 			# reformat ASHDRS and CCHDRS
-			local fileHeaders = [ FIncludes $(HDRS) ]
-				$(HDRS_INCLUDES_SEPARATOR) [ FIncludes $(sysHeaders) ] ;
+			local fileHeaders ;
+
+			if $(PLATFORM) = host {
+				fileHeaders =
+					[ FIncludes $(HDRS) : $(HOST_LOCAL_INCLUDES_OPTION) ]
+					$(HOST_INCLUDES_SEPARATOR)
+					[ FSysIncludes $(sysHeaders)
+						: $(HOST_SYSTEM_INCLUDES_OPTION) ] ;
+			} else {
+				fileHeaders =
+					[ FIncludes $(HDRS) : $(TARGET_LOCAL_INCLUDES_OPTION) ]
+					$(TARGET_INCLUDES_SEPARATOR)
+					[ FSysIncludes $(sysHeaders)
+						: $(TARGET_SYSTEM_INCLUDES_OPTION) ] ;
+			}
+
 			ASHDRS on $(file) = $(fileHeaders) ;
 			CCHDRS on $(file) = $(fileHeaders) ;
 		}
@@ -356,15 +369,21 @@ rule FStandardHeaders
 	# Use glibc headers
 	headers += [ FDirName $(HAIKU_TOP) headers glibc ] ;
 
-	headers += [ FDirName $(HAIKU_TOP) headers cpp ] ;
-
 	# Use public OS header directories
 	headers += [ PublicHeaders $(osIncludes) ] ;
 
 	# Use the root of the private headers -- not so nice, but simplifies things.
 	headers += [ PrivateHeaders $(DOT) ] ;
 
-	# The platform (compiler actually) dependent headers.
+	# The C++ headers. If specified, we use the compiler headers, otherwise
+	# the ones that come with our libstdc++.
+	if $(HAIKU_C++_HEADERS_DIR) {
+		headers += $(HAIKU_C++_HEADERS_DIR) ;
+	} else {
+		headers += [ FDirName $(HAIKU_TOP) headers cpp ] ;
+	}
+
+	# The compiler dependent headers.
 	headers += $(HAIKU_GCC_HEADERS_DIR) ;
 
 	return $(headers) ;

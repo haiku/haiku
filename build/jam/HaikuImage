@@ -24,7 +24,7 @@ BEOS_PREFERENCES = Backgrounds DataTranslations FileTypes Fonts Media Menu
 	Mouse Keyboard Keymap Screen ScrollBar Sounds Time VirtualMemory
 	Workspaces ScreenSaver
 ;
-BEOS_SYSTEM_LIB = libbe.so libstdc++.r4.so libnet.so libmedia.so libtracker.so
+BEOS_SYSTEM_LIB = libbe.so $(HAIKU_LIBSTDC++) libnet.so libmedia.so libtracker.so
 	libtranslation.so libbind.so libnetapi.so libsocket.so libdebug.so
 	libtextencoding.so libz.so libfreetype.so libpng.so libappserver.so
 	libdevice.so libgame.so libscreensaver.so libroot.so
@@ -47,10 +47,10 @@ BEOS_ADD_ONS_TRANSLATORS = STXTTranslator RTF-Translator PNGTranslator
 BEOS_ADD_ONS_MEDIA = mixer.media_addon legacy.media_addon
 	multi_audio.media_addon
 ;
-BEOS_ADD_ONS_MEDIA_PLUGINS = aiff_reader avcodec mp3_decoder musepack
+BEOS_ADD_ONS_MEDIA_PLUGINS = aiff_reader mp3_decoder musepack
 	raw_decoder wav_reader mov_reader au_reader avi_reader mp3_reader ogg
 	speex vorbis
-	# ac3_decoder theora matroska
+	# ac3_decoder avcodec theora matroska
 ;
 BEOS_ADD_ONS_INPUT = <input>keyboard <input>mouse canna screen_saver ;
 BEOS_ADD_ONS_SCREENSAVERS = Haiku ;

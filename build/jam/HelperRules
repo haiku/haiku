@@ -188,6 +188,50 @@ rule SetPlatformCompatibilityFlagVariables
 		?= $($(varPrefix)_PLATFORM_BEOS_COMPATIBLE) ;
 }
 
+rule FAnalyzeGCCVersion
+{
+	# FAnalyzeGCCVersion <rawVersionVariable> ;
+	#
+	local varName = $(1) ;
+	local rawVersion = $($(varName)) ;
+
+	if ! $(rawVersion) {
+		ECHO "Variable $(varName) not set. Please run ./configure or" ;
+		EXIT "specify it manually." ;
+	}
+
+	local version = ;
+	# split the raw version string at `.' and `-' characters
+	while $(rawVersion) {
+		local split = [ Match "([^.-]*)[.-](.*)" : $(rawVersion) ] ;
+		if $(split) {
+			version += $(split[1]) ;
+			rawVersion = $(split[2]) ;
+		} else {
+			version += $(rawVersion) ;
+			rawVersion = ;
+		}
+	}
+
+	return $(version) ;
+}
+
+rule SetIncludePropertiesVariables
+{
+	# SetIncludePropertiesVariables <varPrefix> ;
+	#
+	local prefix = $(1) ;
+	if $($(prefix)_GCC_VERSION[1]) < 4 {
+		$(prefix)_INCLUDES_SEPARATOR = -I- ;
+		$(prefix)_LOCAL_INCLUDES_OPTION = -I ;
+		$(prefix)_SYSTEM_INCLUDES_OPTION = -I ;
+	} else {
+		$(prefix)_INCLUDES_SEPARATOR = ;
+		$(prefix)_LOCAL_INCLUDES_OPTION = "-iquote " ;
+		$(prefix)_SYSTEM_INCLUDES_OPTION = "-idirafter " ;
+	}
+}
+
 
 #pragma mark -
 
