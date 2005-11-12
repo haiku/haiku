@@ -156,7 +156,7 @@ int sigismember(const sigset_t *set, int signo);
 
 const char *strsignal(int sig);
 
-const void  set_signal_stack(void *ptr, size_t size);
+void        set_signal_stack(void *ptr, size_t size);
 int         sigaltstack(const stack_t *ss, stack_t *oss);         /* XXXdbg */
 
 extern inline int

@@ -954,7 +954,7 @@ MultiAudioNode::AdditionalBufferRequested(const media_source& source, media_buff
 void MultiAudioNode::HandleEvent(
 				const media_timed_event *event,
 				bigtime_t lateness,
-				bool realTimeEvent = false)
+				bool realTimeEvent)
 {
 	//CALLED();
 	switch (event->type) {
@@ -994,7 +994,7 @@ void MultiAudioNode::HandleEvent(
 status_t MultiAudioNode::HandleBuffer(
 				const media_timed_event *event,
 				bigtime_t lateness,
-				bool realTimeEvent = false)
+				bool realTimeEvent)
 {
 	//CALLED();
 	BBuffer * buffer = const_cast<BBuffer*>((BBuffer*)event->pointer);
@@ -1050,7 +1050,7 @@ status_t MultiAudioNode::HandleBuffer(
 status_t MultiAudioNode::HandleDataStatus(
 						const media_timed_event *event,
 						bigtime_t lateness,
-						bool realTimeEvent = false)
+						bool realTimeEvent)
 {
 	//CALLED();
 	PRINT(("MultiAudioNode::HandleDataStatus status:%li, lateness:%li\n", event->data, lateness));
@@ -1070,7 +1070,7 @@ status_t MultiAudioNode::HandleDataStatus(
 status_t MultiAudioNode::HandleStart(
 						const media_timed_event *event,
 						bigtime_t lateness,
-						bool realTimeEvent = false)
+						bool realTimeEvent)
 {
 	CALLED();
 	if (RunState() != B_STARTED) {
@@ -1082,7 +1082,7 @@ status_t MultiAudioNode::HandleStart(
 status_t MultiAudioNode::HandleSeek(
 						const media_timed_event *event,
 						bigtime_t lateness,
-						bool realTimeEvent = false)
+						bool realTimeEvent)
 {
 	CALLED();
 	PRINT(("MultiAudioNode::HandleSeek(t=%lld,d=%li,bd=%lld)\n",event->event_time,event->data,event->bigdata));
@@ -1092,7 +1092,7 @@ status_t MultiAudioNode::HandleSeek(
 status_t MultiAudioNode::HandleWarp(
 						const media_timed_event *event,
 						bigtime_t lateness,
-						bool realTimeEvent = false)
+						bool realTimeEvent)
 {
 	CALLED();
 	return B_OK;
@@ -1101,7 +1101,7 @@ status_t MultiAudioNode::HandleWarp(
 status_t MultiAudioNode::HandleStop(
 						const media_timed_event *event,
 						bigtime_t lateness,
-						bool realTimeEvent = false)
+						bool realTimeEvent)
 {
 	CALLED();
 	// flush the queue so downstreamers don't get any more
@@ -1114,7 +1114,7 @@ status_t MultiAudioNode::HandleStop(
 status_t MultiAudioNode::HandleParameter(
 				const media_timed_event *event,
 				bigtime_t lateness,
-				bool realTimeEvent = false)
+				bool realTimeEvent)
 {
 	CALLED();
 	return B_OK;

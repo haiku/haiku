@@ -7,8 +7,8 @@
 #include "UpDownButton.h"
 #include "icon_button.h"
 
-UpDownButton::UpDownButton(BRect rect, BMessage *msg, uint32 resizeFlags)
-	: BControl(rect, "button", NULL, msg, resizeFlags, B_WILL_DRAW),
+UpDownButton::UpDownButton(BRect _rect, BMessage *msg, uint32 resizeFlags)
+	: BControl(_rect, "button", NULL, msg, resizeFlags, B_WILL_DRAW),
 	fLastValue(B_CONTROL_ON)
 {
 	BRect rect = BRect(0, 0, kUpDownButtonWidth - 1, kUpDownButtonHeight - 1);

@@ -92,7 +92,7 @@ KPPPConfigurePacket::SetCode(uint8 code)
 	\sa ppp_configure_item
 */
 bool
-KPPPConfigurePacket::AddItem(const ppp_configure_item *item, int32 index = -1)
+KPPPConfigurePacket::AddItem(const ppp_configure_item *item, int32 index)
 {
 	if(!item || item->length < 2)
 		return false;
@@ -167,7 +167,7 @@ KPPPConfigurePacket::ItemWithType(uint8 type) const
 	\return The mbuf structure or \c NULL on error (e.g.: too big for given MRU).
 */
 struct mbuf*
-KPPPConfigurePacket::ToMbuf(uint32 MRU, uint32 reserve = 0)
+KPPPConfigurePacket::ToMbuf(uint32 MRU, uint32 reserve)
 {
 	struct mbuf *packet = m_gethdr(MT_DATA);
 	packet->m_data += reserve;

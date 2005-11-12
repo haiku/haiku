@@ -22,6 +22,8 @@
 
 #include "BitmapHWInterface.h"
 
+using std::nothrow;
+
 // constructor
 BitmapHWInterface::BitmapHWInterface(ServerBitmap* bitmap)
 	: HWInterface(),
@@ -145,7 +147,7 @@ BitmapHWInterface::RetraceSemaphore()
 
 // WaitForRetrace
 status_t
-BitmapHWInterface::WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT)
+BitmapHWInterface::WaitForRetrace(bigtime_t timeout)
 {
 	return B_UNSUPPORTED;
 }

@@ -66,9 +66,9 @@ _get_system_default_font_(const char* which, font_family family,
 //	#pragma mark -
 
 
-FontSelectionView::FontSelectionView(BRect rect, const char* name,
+FontSelectionView::FontSelectionView(BRect _rect, const char* name,
 	const char* label, const BFont& currentFont)
-	: BView(rect, name, B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),
+	: BView(_rect, name, B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),
 	fSavedFont(currentFont),
 	fCurrentFont(currentFont)
 {

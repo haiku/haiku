@@ -12,7 +12,7 @@ Preference ScreenSaver :
 	PreviewView.cpp
 	MouseAreaView.cpp
 	ScreenSaver.cpp
-	: libtracker.so libscreensaver.so libbe.so libstdc++.r4.so
+	: libtracker.so libscreensaver.so be $(TARGET_LIBSTDC++)
 	: ScreenSaver.rdef 
 	;
 

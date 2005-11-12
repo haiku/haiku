@@ -27,6 +27,7 @@
 
 #include <new>
 
+using std::nothrow;
 
 //#define TRACE_WATCHING
 #ifdef TRACE_WATCHING

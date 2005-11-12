@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include <MediaDefs.h>
 #include <Locker.h>
 #include <Path.h>

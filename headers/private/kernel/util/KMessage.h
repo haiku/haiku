@@ -11,6 +11,8 @@
 #include <OS.h>
 #include <TypeConstants.h>
 
+class BMessage;
+
 namespace BPrivate {
 
 class KMessageField;
@@ -100,7 +102,7 @@ public:
 
 private:
 	friend class KMessageField;
-	friend class BMessage;		// not so nice, but makes things easier
+	friend class ::BMessage;		// not so nice, but makes things easier
 
 	struct Header {
 		uint32		magic;

@@ -400,7 +400,7 @@ smp_boot_other_cpus(void)
 	trampolineStack = 0x9e000;
 
 	// copy the trampoline code over
-	memcpy((char *)trampolineCode, &smp_trampoline,
+	memcpy((char *)trampolineCode, (const void*)&smp_trampoline,
 		(uint32)&smp_trampoline_end - (uint32)&smp_trampoline);
 
 	// boot the cpus

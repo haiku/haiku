@@ -52,6 +52,7 @@ private:
 	// interface for OggStreams
 	ssize_t		ReadPage(bool first_page = false);
 
+public:
 	class StreamInterface {
 	public:
 		virtual ssize_t		ReadPage() = 0;

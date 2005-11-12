@@ -519,7 +519,7 @@ _SoundPlayNode::LatencyChanged(const media_source& source, const media_destinati
 void _SoundPlayNode::HandleEvent(
 				const media_timed_event *event,
 				bigtime_t lateness,
-				bool realTimeEvent = false)
+				bool realTimeEvent)
 {
 	CALLED();
 	switch (event->type) {
@@ -632,7 +632,7 @@ status_t
 _SoundPlayNode::HandleDataStatus(
 						const media_timed_event *event,
 						bigtime_t lateness,
-						bool realTimeEvent = false)
+						bool realTimeEvent)
 {
 	TRACE("_SoundPlayNode::HandleDataStatus status: %li, lateness: %Li\n", event->data, lateness);
 	switch(event->data) {
@@ -652,7 +652,7 @@ status_t
 _SoundPlayNode::HandleStart(
 						const media_timed_event *event,
 						bigtime_t lateness,
-						bool realTimeEvent = false)
+						bool realTimeEvent)
 {
 	CALLED();
 	// don't do anything if we're already running
@@ -679,7 +679,7 @@ status_t
 _SoundPlayNode::HandleSeek(
 						const media_timed_event *event,
 						bigtime_t lateness,
-						bool realTimeEvent = false)
+						bool realTimeEvent)
 {
 	CALLED();
 	TRACE("_SoundPlayNode::HandleSeek(t=%lld, d=%li, bd=%lld)\n", event->event_time, event->data, event->bigdata);
@@ -690,7 +690,7 @@ status_t
 _SoundPlayNode::HandleWarp(
 						const media_timed_event *event,
 						bigtime_t lateness,
-						bool realTimeEvent = false)
+						bool realTimeEvent)
 {
 	CALLED();
 	return B_OK;
@@ -700,7 +700,7 @@ status_t
 _SoundPlayNode::HandleStop(
 						const media_timed_event *event,
 						bigtime_t lateness,
-						bool realTimeEvent = false)
+						bool realTimeEvent)
 {
 	CALLED();
 	// flush the queue so downstreamers don't get any more
@@ -713,7 +713,7 @@ status_t
 _SoundPlayNode::HandleParameter(
 				const media_timed_event *event,
 				bigtime_t lateness,
-				bool realTimeEvent = false)
+				bool realTimeEvent)
 {
 	CALLED();
 	return B_OK;

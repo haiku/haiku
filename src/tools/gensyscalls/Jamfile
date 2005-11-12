@@ -124,8 +124,9 @@ rule PreprocessSyscalls
 	DEFINES on $(<) += $(HAIKU_DEFINES) GEN_SYSCALL_INFOS_PROCESSING ;
 
 	CCFLAGS on $(<) += $(HAIKU_CCFLAGS) $(SUBDIRCCFLAGS) $(OPTIM) ;
-	CCHDRS on $(<) = [ FIncludes $(headers) ]
-		$(HDRS_INCLUDES_SEPARATOR) [ FSysIncludes $(sysHeaders) ] ;
+	CCHDRS on $(<) = [ FIncludes $(headers) : $(HOST_LOCAL_INCLUDES_OPTION) ]
+		$(HOST_INCLUDES_SEPARATOR)
+		[ FSysIncludes $(sysHeaders) : $(HOST_SYSTEM_INCLUDES_OPTION) ] ;
 	CCDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
 }
 
@@ -139,5 +140,7 @@ PreprocessSyscalls $(syscallsHeaderPP) : $(syscallsHeader) ;
 
 # compile the syscall infos source file
 
+# TODO: Clean this mess up!
 SYSHDRS on $(syscallInfos:S=$(SUFOBJ)) = $(HAIKU_HDRS) ;
 Object $(syscallInfos:S=$(SUFOBJ)) : $(syscallInfos) ;
+CCFLAGS on $(syscallInfos:S=$(SUFOBJ)) += -nostdinc ;

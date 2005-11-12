@@ -9,6 +9,8 @@
 #include "Clipboard.h"
 #include "ClipboardHandler.h"
 
+using std::map;
+using std::string;
 using namespace BPrivate;
 
 /*!

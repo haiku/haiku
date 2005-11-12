@@ -35,6 +35,8 @@
 #include "AccelerantBuffer.h"
 #include "MallocBuffer.h"
 
+using std::nothrow;
+
 
 #ifdef DEBUG_DRIVER_MODULE
 #	include <stdio.h>
@@ -571,7 +573,7 @@ AccelerantHWInterface::RetraceSemaphore()
 
 // WaitForRetrace
 status_t
-AccelerantHWInterface::WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT)
+AccelerantHWInterface::WaitForRetrace(bigtime_t timeout)
 {
 	AutoReadLocker _(this);
 

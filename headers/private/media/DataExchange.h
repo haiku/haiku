@@ -6,6 +6,8 @@
 #ifndef _DATA_EXCHANGE_H
 #define _DATA_EXCHANGE_H
 
+#include <string.h>
+
 #include <MediaFormats.h>
 #include <MediaNode.h>
 #include <MediaAddOn.h>

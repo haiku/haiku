@@ -39,6 +39,12 @@
 #include "RecentEntries.h"
 #include "WatchingService.h"
 
+#if __GNUC__ >= 4
+using __gnu_cxx::hash_set;
+#endif
+
+using std::map;
+
 class BMessage;
 class WatchingService;
 

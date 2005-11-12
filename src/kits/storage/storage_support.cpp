@@ -18,7 +18,7 @@
 
 #include "storage_support.h"
 
-using namespace std;
+using std::nothrow;
 
 namespace BPrivate {
 namespace Storage {

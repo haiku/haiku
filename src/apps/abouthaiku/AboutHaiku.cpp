@@ -107,8 +107,8 @@ AboutWindow::QuitRequested()
 }
 
 
-AboutView::AboutView(const BRect &r)
-	: BView(r, "aboutview", B_FOLLOW_ALL, B_WILL_DRAW | B_PULSE_NEEDED),
+AboutView::AboutView(const BRect &rect)
+	: BView(rect, "aboutview", B_FOLLOW_ALL, B_WILL_DRAW | B_PULSE_NEEDED),
 	fLastActionTime(system_time()),
 	fScrollRunner(NULL)
 {

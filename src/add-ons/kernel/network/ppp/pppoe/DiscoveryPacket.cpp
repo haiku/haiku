@@ -8,7 +8,7 @@
 #include <core_funcs.h>
 
 
-DiscoveryPacket::DiscoveryPacket(uint8 code, uint16 sessionID = 0x0000)
+DiscoveryPacket::DiscoveryPacket(uint8 code, uint16 sessionID)
 	: fCode(code),
 	fSessionID(sessionID),
 	fInitStatus(B_OK)
@@ -16,7 +16,7 @@ DiscoveryPacket::DiscoveryPacket(uint8 code, uint16 sessionID = 0x0000)
 }
 
 
-DiscoveryPacket::DiscoveryPacket(struct mbuf *packet, uint32 start = 0)
+DiscoveryPacket::DiscoveryPacket(struct mbuf *packet, uint32 start)
 {
 	// decode packet
 	uint8 *data = mtod(packet, uint8*);
@@ -55,7 +55,7 @@ DiscoveryPacket::~DiscoveryPacket()
 
 
 bool
-DiscoveryPacket::AddTag(uint16 type, const void *data, uint16 length, int32 index = -1)
+DiscoveryPacket::AddTag(uint16 type, const void *data, uint16 length, int32 index)
 {
 	pppoe_tag *add = (pppoe_tag*) malloc(length + 4);
 	add->type = type;
@@ -117,7 +117,7 @@ DiscoveryPacket::TagWithType(uint16 type) const
 
 
 struct mbuf*
-DiscoveryPacket::ToMbuf(uint32 MTU, uint32 reserve = ETHER_HDR_LEN)
+DiscoveryPacket::ToMbuf(uint32 MTU, uint32 reserve)
 {
 	struct mbuf *packet = m_gethdr(MT_DATA);
 	packet->m_data += reserve;

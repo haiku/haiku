@@ -56,16 +56,16 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Translation Kit required globals
 char translatorName[] = "JPEG translator";
-char translatorInfo[] = "© 2002-2003, Shard
-
-Based on IJG library © 1991-1998, Thomas G. Lane
-          http://www.ijg.org/files/
-with \"Lossless\" encoding support patch by Ken Murchison
-          http://www.oceana.com/ftp/ljpeg/
-
-With some colorspace conversion routines by Magnus Hellman
-          http://www.bebits.com/app/802
-";
+char translatorInfo[] = "© 2002-2003, Shard\n"
+"\n"
+"Based on IJG library © 1991-1998, Thomas G. Lane\"\n"
+"          http://www.ijg.org/files/\n"
+"with \"Lossless\" encoding support patch by Ken Murchison\n"
+"          http://www.oceana.com/ftp/ljpeg/\n"
+"\n"
+"With some colorspace conversion routines by Magnus Hellman\n"
+"          http://www.bebits.com/app/802\n"
+"";
 int32 translatorVersion = 273;	// 256 = v1.0.0
 
 // Define the formats we know how to read

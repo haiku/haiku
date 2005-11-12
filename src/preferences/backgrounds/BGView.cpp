@@ -787,7 +787,7 @@ BGView::LoadSettings(void)
 
 
 void
-SetRGBColor(rgb_color *col,uint8 r, uint8 g, uint8 b, uint8 a=255)
+SetRGBColor(rgb_color *col,uint8 r, uint8 g, uint8 b, uint8 a)
 {
 	col->red=r;
 	col->green=g;

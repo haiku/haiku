@@ -208,7 +208,7 @@ PPPManager::Control(ifnet *ifp, ulong cmd, caddr_t data)
 
 ppp_interface_id
 PPPManager::CreateInterface(const driver_settings *settings,
-	ppp_interface_id parentID = PPP_UNDEFINED_INTERFACE_ID)
+	ppp_interface_id parentID)
 {
 	return _CreateInterface(NULL, settings, parentID);
 }
@@ -216,7 +216,7 @@ PPPManager::CreateInterface(const driver_settings *settings,
 
 ppp_interface_id
 PPPManager::CreateInterfaceWithName(const char *name,
-	ppp_interface_id parentID = PPP_UNDEFINED_INTERFACE_ID)
+	ppp_interface_id parentID)
 {
 	if(!name)
 		return PPP_UNDEFINED_INTERFACE_ID;
@@ -531,7 +531,7 @@ PPPManager::ControlInterface(ppp_interface_id ID, uint32 op, void *data, size_t 
 
 int32
 PPPManager::GetInterfaces(ppp_interface_id *interfaces, int32 count,
-	ppp_interface_filter filter = PPP_REGISTERED_INTERFACES)
+	ppp_interface_filter filter)
 {
 	TRACE("PPPManager: GetInterfaces()\n");
 	
@@ -572,7 +572,7 @@ PPPManager::GetInterfaces(ppp_interface_id *interfaces, int32 count,
 
 
 int32
-PPPManager::CountInterfaces(ppp_interface_filter filter = PPP_REGISTERED_INTERFACES)
+PPPManager::CountInterfaces(ppp_interface_filter filter)
 {
 	TRACE("PPPManager: CountInterfaces()\n");
 	
@@ -611,7 +611,7 @@ PPPManager::CountInterfaces(ppp_interface_filter filter = PPP_REGISTERED_INTERFA
 
 
 ppp_interface_entry*
-PPPManager::EntryFor(ppp_interface_id ID, int32 *saveIndex = NULL) const
+PPPManager::EntryFor(ppp_interface_id ID, int32 *saveIndex) const
 {
 	TRACE("PPPManager: EntryFor(%ld)\n", ID);
 	
@@ -633,7 +633,7 @@ PPPManager::EntryFor(ppp_interface_id ID, int32 *saveIndex = NULL) const
 
 
 ppp_interface_entry*
-PPPManager::EntryFor(ifnet *ifp, int32 *saveIndex = NULL) const
+PPPManager::EntryFor(ifnet *ifp, int32 *saveIndex) const
 {
 	if(!ifp)
 		return NULL;
@@ -655,7 +655,7 @@ PPPManager::EntryFor(ifnet *ifp, int32 *saveIndex = NULL) const
 
 
 ppp_interface_entry*
-PPPManager::EntryFor(const char *name, int32 *saveIndex = NULL) const
+PPPManager::EntryFor(const char *name, int32 *saveIndex) const
 {
 	if(!name)
 		return NULL;

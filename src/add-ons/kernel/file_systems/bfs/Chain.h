@@ -7,6 +7,7 @@
 ** This file may be used under the terms of the OpenBeOS License.
 */
 
+#include <null.h>
 
 /** The Link class you want to use with the Chain class needs to have
  *	a "fNext" member which is accessable from within the Chain class.

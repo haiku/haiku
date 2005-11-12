@@ -124,6 +124,7 @@ int32 pci_getlist(pci_info *info[], int32 maxEntries)
 			j++;
 		}
 next_entry:
+		; // gcc 4 doesn't like labels at the end of a compound statement
 	}
 	
 	info[entries] = NULL;

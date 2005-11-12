@@ -30,6 +30,7 @@
 #include <MessageField.h>
 // Standard Includes -----------------------------------------------------------
 #include <map>
+#include <new>
 #include <stdio.h>
 #include <string>
 
@@ -51,6 +52,8 @@
 // Globals ---------------------------------------------------------------------
 
 enum { B_FLATTENABLE_TYPE = 'FLAT' };
+
+using namespace std;
 
 namespace BPrivate {
 

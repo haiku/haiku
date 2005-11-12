@@ -25,7 +25,7 @@ beep()
 
 
 status_t
-add_system_beep_event(const char *eventName, uint32 flags _BEEP_FLAGS)
+add_system_beep_event(const char *eventName, uint32 flags)
 {
 	// ToDo: ask media server to add beep event
 	return B_ERROR;

@@ -253,7 +253,7 @@ PPPoEDevice::CountOutputBytes() const
 
 
 status_t
-PPPoEDevice::Send(struct mbuf *packet, uint16 protocolNumber = 0)
+PPPoEDevice::Send(struct mbuf *packet, uint16 protocolNumber)
 {
 	// Send() is only for PPP packets. PPPoE packets are sent directly to ethernet.
 	
@@ -313,7 +313,7 @@ PPPoEDevice::Send(struct mbuf *packet, uint16 protocolNumber = 0)
 
 
 status_t
-PPPoEDevice::Receive(struct mbuf *packet, uint16 protocolNumber = 0)
+PPPoEDevice::Receive(struct mbuf *packet, uint16 protocolNumber)
 {
 	if(!packet)
 		return B_ERROR;

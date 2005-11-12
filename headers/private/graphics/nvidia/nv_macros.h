@@ -784,7 +784,7 @@
 #define NV_REG32(r_) ((vuint32 *)regs)[(r_) >> 2]
 
 /* read and write to PCI config space */
-#define CFGR(A)   (nv_pci_access.offset=NVCFG_##A, ioctl(fd,NV_GET_PCI, &nv_pci_access,sizeof(nv_pci_access)), nv_pci_access.value)
+#define CFGR(A)   (*(nv_pci_access.offset=NVCFG_##A, ioctl(fd,NV_GET_PCI, &nv_pci_access,sizeof(nv_pci_access)), &nv_pci_access.value))
 #define CFGW(A,B) (nv_pci_access.offset=NVCFG_##A, nv_pci_access.value = B, ioctl(fd,NV_SET_PCI,&nv_pci_access,sizeof(nv_pci_access)))
 
 /* read and write from ISA I/O space */

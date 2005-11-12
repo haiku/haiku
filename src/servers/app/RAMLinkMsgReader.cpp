@@ -1,5 +1,6 @@
 #include "RAMLinkMsgReader.h"
-#include <malloc.h>
+#include <stdlib.h>
+#include <string.h>
 
 RAMLinkMsgReader::RAMLinkMsgReader(int8 *buffer)
 	: BPrivate::LinkReceiver(-1)

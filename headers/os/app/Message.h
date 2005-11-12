@@ -9,11 +9,11 @@
 #ifndef _MESSAGE_H
 #define _MESSAGE_H
 
-#include <BeBuild.h>
-#include <OS.h>
-#include <Rect.h>
 #include <DataIO.h>
 #include <Flattenable.h>
+#include <Messenger.h>
+#include <OS.h>
+#include <Rect.h>
 
 // for convenience
 #include <AppDefs.h>

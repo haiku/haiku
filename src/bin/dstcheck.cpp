@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004, Jérôme Duval, jerome.duval@free.fr.
+ * Copyright 2004, Jï¿½ï¿½e Duval, jerome.duval@free.fr.
  * Distributed under the terms of the MIT License.
  */
 
@@ -11,6 +11,7 @@
 #include <String.h>
 #include <TextView.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 const uint32 TIMEDALERT_UPDATE = 'taup';
 
@@ -32,8 +33,8 @@ computer's clock may be an hour off. Currently,\nyour computer thinks it is "
 #define STRING2 ".\n\nIs this the correct time?"
 
 TimedAlert::TimedAlert(const char *title, const char *text, const char *button1,
-	const char *button2 = NULL, const char *button3 = NULL,
-	button_width width = B_WIDTH_AS_USUAL,  alert_type type = B_INFO_ALERT)
+	const char *button2, const char *button3,
+	button_width width,  alert_type type)
 	: BAlert(title, text, button1, button2, button3, width, type),
 	fRunner(NULL)
 {

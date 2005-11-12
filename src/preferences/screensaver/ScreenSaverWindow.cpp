@@ -75,7 +75,7 @@ private:
 };
 
 
-CustomTab::CustomTab(ScreenSaverWin *win, BView *view = NULL)
+CustomTab::CustomTab(ScreenSaverWin *win, BView *view)
 	: BTab(view),
 	fWin(win)
 {

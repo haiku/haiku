@@ -12,8 +12,8 @@
 #include "FontView.h"
 
 
-FontView::FontView(BRect rect)
-	: BView(rect, "Fonts", B_FOLLOW_ALL, B_WILL_DRAW)
+FontView::FontView(BRect _rect)
+	: BView(_rect, "Fonts", B_FOLLOW_ALL, B_WILL_DRAW)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	BRect rect(Bounds());

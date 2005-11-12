@@ -211,7 +211,7 @@ status_t MultiAudioAddOn::AutoStart(
 }
 
 status_t
-MultiAudioAddOn::RecursiveScan(char* rootPath, BEntry *rootEntry = NULL)
+MultiAudioAddOn::RecursiveScan(char* rootPath, BEntry *rootEntry)
 {
 	CALLED();
 	

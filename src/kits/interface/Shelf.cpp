@@ -26,6 +26,7 @@
 #include <ZombieReplicantView.h>
 
 #include <stdio.h>
+#include <string.h>
 
 
 extern "C" void  _ReservedShelf1__6BShelfFv(BShelf *const, int32,

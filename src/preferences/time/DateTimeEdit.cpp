@@ -8,7 +8,7 @@
 #define YEAR_DELTA_MIN 64
 
 
-TDateTimeSection::TDateTimeSection(BRect frame, uint32 data = 0)
+TDateTimeSection::TDateTimeSection(BRect frame, uint32 data)
 	: TSection(frame)
 	, f_data(data)
 {

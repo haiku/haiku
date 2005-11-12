@@ -23,6 +23,8 @@
 #include <stdio.h>
 #include <string.h>
 
+using std::nothrow;
+
 extern bool debug;
 
 // "web safe palette"

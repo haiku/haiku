@@ -32,6 +32,8 @@
 #	define TRACE(x) ;
 #endif
 
+using std::map;
+using std::nothrow;
 
 static const char *kSignature = "application/x-vnd.haiku-debug-server";
 

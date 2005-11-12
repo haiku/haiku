@@ -56,7 +56,7 @@
 
 // Implementation of RecentDocumentsMenu
 
-RecentDocumentsMenu::RecentDocumentsMenu(const char *title, menu_layout layout = B_ITEMS_IN_COLUMN)
+RecentDocumentsMenu::RecentDocumentsMenu(const char *title, menu_layout layout)
 	: BMenu(title, layout)
 {
 }

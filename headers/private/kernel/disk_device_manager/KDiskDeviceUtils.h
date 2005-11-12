@@ -10,6 +10,12 @@
 
 #include <util/AutoLock.h>
 
+// instantiations
+#include <KDiskDevice.h>
+#include <KDiskDeviceManager.h>
+#include <KDiskSystem.h>
+#include <KPartition.h>
+
 namespace BPrivate {
 namespace DiskDevice {
 

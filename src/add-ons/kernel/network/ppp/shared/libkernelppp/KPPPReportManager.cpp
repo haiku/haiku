@@ -83,7 +83,7 @@ KPPPReportManager::SendReport(thread_id thread, const ppp_report_packet *report)
 */
 void
 KPPPReportManager::EnableReports(ppp_report_type type, thread_id thread,
-	int32 flags = PPP_NO_FLAGS)
+	int32 flags)
 {
 	if(thread < 0 || type == PPP_ALL_REPORTS)
 		return;

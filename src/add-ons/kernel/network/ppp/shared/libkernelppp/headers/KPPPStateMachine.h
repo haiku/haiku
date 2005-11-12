@@ -16,6 +16,10 @@ class KPPPProtocol;
 
 #include <Locker.h>
 
+class PPPManager;
+class KPPPInterface;
+class KPPPLCP;
+
 
 class KPPPStateMachine {
 		friend class PPPManager;

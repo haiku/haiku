@@ -31,7 +31,7 @@
 #ifdef _KERNEL_MODE
 	#include <kernel_cpp.h>
 #else
-	#include <new.h>
+	#include <new>
 #endif
 
 #include <stdlib.h>
@@ -106,7 +106,7 @@ private:
 
 // sDefaultItem
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
-TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t
+typename TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t
 	TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::sDefaultItem(
 		DEFAULT_ITEM_SUPPLIER::GetItem());
 
@@ -134,7 +134,7 @@ TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::~TemplateList()
 // GetDefaultItem
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
 inline
-const TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
+const typename TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
 TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::GetDefaultItem() const
 {
 	return sDefaultItem;
@@ -143,7 +143,7 @@ TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::GetDefaultItem() const
 // GetDefaultItem
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
 inline
-TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
+typename TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
 TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::GetDefaultItem()
 {
 	return sDefaultItem;
@@ -315,7 +315,7 @@ TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::IsEmpty() const
 
 // ItemAt
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
-const TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
+const typename TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
 TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::ItemAt(int32 index) const
 {
 	if (index >= 0 && index < fItemCount)
@@ -325,7 +325,7 @@ TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::ItemAt(int32 index) const
 
 // ItemAt
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
-TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
+typename TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
 TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::ItemAt(int32 index)
 {
 	if (index >= 0 && index < fItemCount)
@@ -335,7 +335,7 @@ TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::ItemAt(int32 index)
 
 // Items
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
-const TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t *
+const typename TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t *
 TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::Items() const
 {
 	return fItems;

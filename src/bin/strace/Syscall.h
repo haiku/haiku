@@ -12,6 +12,9 @@
 
 #include "TypeHandler.h"
 
+using std::string;
+using std::vector;
+
 // Type
 class Type {
 public:

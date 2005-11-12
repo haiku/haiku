@@ -127,8 +127,11 @@ private:
 	int32 _FindInsertionIndex(const Key &key, bool &exists) const;
 
 private:
-	friend class Entry;
-	friend class ConstEntry;
+//	friend class Entry;
+//	friend class ConstEntry;
+	friend class VectorMapEntry<KeyReference, Value, _Entry, Class>;
+	friend class VectorMapEntry<KeyReference, const Value, const _Entry,
+		const Class>;
 
 	ElementVector	fElements;
 	EntryStrategy	fEntryStrategy;

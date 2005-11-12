@@ -421,7 +421,7 @@ ModemDevice::ConnectionLost()
 
 
 status_t
-ModemDevice::Send(struct mbuf *packet, uint16 protocolNumber = 0)
+ModemDevice::Send(struct mbuf *packet, uint16 protocolNumber)
 {
 #if DEBUG
 	TRACE("ModemDevice: Send()\n");
@@ -525,7 +525,7 @@ ModemDevice::DataReceived(uint8 *buffer, uint32 length)
 
 
 status_t
-ModemDevice::Receive(struct mbuf *packet, uint16 protocolNumber = 0)
+ModemDevice::Receive(struct mbuf *packet, uint16 protocolNumber)
 {
 	// we do not need to lock because only the worker_thread calls this method
 	

@@ -947,7 +947,7 @@ DataEditor::Update()
 
 
 status_t
-DataEditor::UpdateIfNeeded(bool *_updated = NULL)
+DataEditor::UpdateIfNeeded(bool *_updated)
 {
 	if (!fNeedsUpdate) {
 		if (_updated)

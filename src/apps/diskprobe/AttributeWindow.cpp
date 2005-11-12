@@ -168,9 +168,9 @@ EditorTabView::SetTypeEditorTab(BView *view)
 //	#pragma mark -
 
 
-AttributeWindow::AttributeWindow(BRect rect, entry_ref *ref, const char *attribute,
+AttributeWindow::AttributeWindow(BRect _rect, entry_ref *ref, const char *attribute,
 	const BMessage *settings)
-	: ProbeWindow(rect, ref),
+	: ProbeWindow(_rect, ref),
 	fAttribute(strdup(attribute))
 {
 	// Set alternative window title for devices

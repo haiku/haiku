@@ -11,6 +11,7 @@
 
 #include <Autolock.h>
 #include <stdio.h>
+#include <string.h>
 
 
 MessageLooper::MessageLooper(const char* name)

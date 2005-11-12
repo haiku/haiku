@@ -201,7 +201,7 @@ VorbisDecoder::Decode(void *buffer, int64 *frameCount,
 				packet.granulepos = -1;
 				packet.packetno = 7;
 			}
-			packet.packet = static_cast<unsigned char *>(chunkBuffer);
+			packet.packet = (unsigned char *)chunkBuffer;
 			packet.bytes = chunkSize;
 			if (!synced) {
 				if (mh.start_time > 0) {

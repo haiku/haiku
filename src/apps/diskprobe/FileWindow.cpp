@@ -80,9 +80,9 @@ FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
 
 	// add our interface widgets
 
-	BRect rect = Bounds();
-	rect.top = menuBar->Bounds().Height() + 1;
-	fProbeView = new ProbeView(rect, ref, NULL, settings);
+	BRect _rect = Bounds();
+	_rect.top = menuBar->Bounds().Height() + 1;
+	fProbeView = new ProbeView(_rect, ref, NULL, settings);
 	AddChild(fProbeView);
 
 	fProbeView->AddSaveMenuItems(menu, 4);

@@ -4,6 +4,7 @@
 */
 
 #include <stdio.h>
+#include <string.h>
 #include "MusePackDecoder.h"
 #include "mpc/in_mpc.h"
 

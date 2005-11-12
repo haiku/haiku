@@ -13,6 +13,8 @@
 #include "arch_debug_support.h"
 #include "SymbolLookup.h"
 
+using std::nothrow;
+
 struct debug_symbol_lookup_context {
 	debug_context	context;
 	SymbolLookup	*lookup;

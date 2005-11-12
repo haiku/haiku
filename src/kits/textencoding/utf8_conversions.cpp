@@ -110,7 +110,7 @@ status_t
 convert_to_utf8(uint32 srcEncoding,
                 const char * src, int32 * srcLen, 
                 char * dst, int32 * dstLen,
-                int32 * state, char substitute = B_SUBSTITUTE)
+                int32 * state, char substitute)
 {
 	const BCharacterSet * charset = BCharacterSetRoster::GetCharacterSetByConversionID(srcEncoding);
 	if (charset == 0) {
@@ -130,7 +130,7 @@ status_t
 convert_from_utf8(uint32 dstEncoding,
                   const char * src, int32 * srcLen, 
                   char * dst, int32 * dstLen,
-                  int32 * state, char substitute = B_SUBSTITUTE)
+                  int32 * state, char substitute)
 {
 	const BCharacterSet * charset = BCharacterSetRoster::GetCharacterSetByConversionID(dstEncoding);
 	if (charset == 0) {

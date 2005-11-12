@@ -53,10 +53,10 @@ add_event_to_list(timer *event, timer * volatile *list)
 	}
 
 	if (last != NULL) {
-		(timer *)event->entry.next = (timer *)last->entry.next;
-		(timer *)last->entry.next = event;
+		event->entry.next = last->entry.next;
+		last->entry.next = (qent*)event;
 	} else {
-		(timer *)event->entry.next = next;
+		event->entry.next = (qent*)next;
 		*list = event;
 	}
 }
@@ -182,7 +182,7 @@ _local_timer_cancel_event(int cpu, timer *event)
 			if (current == sEvents[cpu])
 				sEvents[cpu] = (timer *)current->entry.next;
 			else
-				(timer *)last->entry.next = (timer *)current->entry.next;
+				last->entry.next = current->entry.next;
 			current->entry.next = NULL;
 			// break out of the whole thing
 			break;
@@ -234,7 +234,7 @@ cancel_timer(timer *event)
 					if (current == sEvents[cpu])
 						sEvents[cpu] = (timer *)current->entry.next;
 					else
-						(timer *)last->entry.next = (timer *)current->entry.next;
+						last->entry.next = current->entry.next;
 					current->entry.next = NULL;
 
 					// break out of the whole thing

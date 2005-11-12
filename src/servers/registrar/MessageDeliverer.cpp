@@ -22,6 +22,10 @@
 #include "MessageDeliverer.h"
 #include "Referenceable.h"
 
+using std::map;
+using std::nothrow;
+using std::set;
+
 // sDeliverer -- the singleton instance
 MessageDeliverer *MessageDeliverer::sDeliverer = NULL;
 

@@ -7,6 +7,7 @@
  *		Stefano Ceccherini (burton666@libero.it)
  */
 
+#include <string.h>
 
 #include <Debug.h>
 #include <File.h>

@@ -20,6 +20,7 @@
 #include "ServerBitmap.h"
 #include "BitmapManager.h"
 
+using std::nothrow;
 
 //! The bitmap allocator for the server. Memory is allocated/freed by the AppServer class
 BitmapManager *gBitmapManager = NULL;

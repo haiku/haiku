@@ -37,6 +37,8 @@
 #include "Debug.h"
 #include "debug.h"
 
+#include <string.h>
+
 _event_queue_imp::_event_queue_imp() :
 	fLock(new BLocker("BTimedEventQueue locker")),
 	fEventCount(0),

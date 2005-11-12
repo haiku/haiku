@@ -29,6 +29,7 @@
 	Glues the registrar services together and dispatches the roster messages.
 */
 
+using std::nothrow;
 using namespace BPrivate;
 
 //! Name of the event queue.

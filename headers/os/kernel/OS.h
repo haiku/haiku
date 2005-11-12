@@ -356,7 +356,7 @@ extern void	debugger(const char *message);
 
    to re-enable the default debugger pass a zero.
 */   
-extern const int disable_debugger(int state);
+extern int disable_debugger(int state);
 
 // TODO: Remove. Temporary debug helper.
 extern void debug_printf(const char *format, ...)

@@ -32,8 +32,8 @@
 #include "SettingsView.h"
 
 
-MouseWindow::MouseWindow(BRect rect)
-	: BWindow(rect, "Mouse", B_TITLED_WINDOW,
+MouseWindow::MouseWindow(BRect _rect)
+	: BWindow(_rect, "Mouse", B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	BView *view = new BView(Bounds(), "view", B_FOLLOW_ALL, 0);

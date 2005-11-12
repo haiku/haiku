@@ -38,9 +38,9 @@ typedef struct ppp_interface_module_info {
 		//!< Exports needed network module functions.
 	
 	ppp_interface_id (*CreateInterface)(const driver_settings *settings,
-		ppp_interface_id parentID = PPP_UNDEFINED_INTERFACE_ID);
+		ppp_interface_id parentID);
 	ppp_interface_id (*CreateInterfaceWithName)(const char *name,
-		ppp_interface_id parentID = PPP_UNDEFINED_INTERFACE_ID);
+		ppp_interface_id parentID);
 	bool (*DeleteInterface)(ppp_interface_id ID);
 		// this marks the interface for deletion
 	bool (*RemoveInterface)(ppp_interface_id ID);
@@ -53,12 +53,12 @@ typedef struct ppp_interface_module_info {
 		size_t length);
 	
 	int32 (*GetInterfaces)(ppp_interface_id *interfaces, int32 count,
-		ppp_interface_filter filter = PPP_REGISTERED_INTERFACES);
+		ppp_interface_filter filter);
 			// make sure interfaces has enough space for count items
-	int32 (*CountInterfaces)(ppp_interface_filter filter = PPP_REGISTERED_INTERFACES);
+	int32 (*CountInterfaces)(ppp_interface_filter filter);
 	
 	void (*EnableReports)(ppp_report_type type, thread_id thread,
-		int32 flags = PPP_NO_FLAGS);
+		int32 flags);
 	void (*DisableReports)(ppp_report_type type, thread_id thread);
 	bool (*DoesReport)(ppp_report_type type, thread_id thread);
 } ppp_interface_module_info;

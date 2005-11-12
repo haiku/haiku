@@ -25,23 +25,23 @@ public:
 template<typename value_t>
 static inline
 string
-get_number_value(const void *address, const char *format)
+get_number_value(value_t value, const char *format)
 {
-	if (sizeof(align_t) > sizeof(value_t))
-		return get_number_value<value_t>(value_t(*(align_t*)address), format);
-	else
-		return get_number_value<value_t>(*(value_t*)address, format);
+	char buffer[32];
+	sprintf(buffer, format, value);
+	return buffer;
 }
 
 // get_number_value
 template<typename value_t>
 static inline
 string
-get_number_value(value_t value, const char *format)
+get_number_value(const void *address, const char *format)
 {
-	char buffer[32];
-	sprintf(buffer, format, value);
-	return buffer;
+	if (sizeof(align_t) > sizeof(value_t))
+		return get_number_value<value_t>(value_t(*(align_t*)address), format);
+	else
+		return get_number_value<value_t>(*(value_t*)address, format);
 }
 
 // get_pointer_value

@@ -62,7 +62,7 @@ debugger(const char *message)
 }
 
 
-const int
+int
 disable_debugger(int state)
 {
 	return _kern_disable_debugger(state);

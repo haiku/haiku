@@ -33,6 +33,7 @@
 #include <FindDirectory.h>
 #include <Entry.h>
 #include <stdlib.h>
+#include <string.h>
 #include <Path.h>
 
 //	Format of Expander_Settings

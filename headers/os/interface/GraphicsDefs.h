@@ -57,6 +57,12 @@ operator==(const pattern& a, const pattern& b)
 	return (*(uint64*)a.data == *(uint64*)b.data);
 }
 
+inline bool
+operator!=(const pattern& a, const pattern& b)
+{
+	return !(a == b);
+}
+
 #endif // __cplusplus
 
 extern _IMPEXP_BE const pattern B_SOLID_HIGH;

@@ -18,6 +18,8 @@
 
 #include <new>
 
+using std::nothrow;
+
 
 #ifdef __HAIKU__
 #	define USE_ACCELERANT 1

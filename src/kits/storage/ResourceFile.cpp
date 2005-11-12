@@ -21,7 +21,9 @@
 #include "ResourcesDefs.h"
 //#include "Warnings.h"
 
-using namespace std;
+using std::max;
+using std::min;
+using std::nothrow;
 
 namespace BPrivate {
 namespace Storage {

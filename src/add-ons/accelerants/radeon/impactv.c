@@ -561,6 +561,7 @@ void Radeon_CalcImpacTVRegisters(
 			values->tv_dac_cntl |= RADEON_TV_DAC_CNTL_STD_PAL;
 			break;
 		default:
+			;
 		}
 		
 		// enable composite or S-Video DAC
@@ -630,6 +631,7 @@ void Radeon_CalcImpacTVRegisters(
 		
     default:
 		// there are many formats missing, sigh...
+		;
     }
     
     // RE:

@@ -41,8 +41,8 @@
 KPPPProtocol::KPPPProtocol(const char *name, ppp_phase activationPhase,
 		uint16 protocolNumber, ppp_level level, int32 addressFamily,
 		uint32 overhead, KPPPInterface& interface,
-		driver_parameter *settings, int32 flags = PPP_NO_FLAGS,
-		const char *type = NULL, KPPPOptionHandler *optionHandler = NULL)
+		driver_parameter *settings, int32 flags,
+		const char *type, KPPPOptionHandler *optionHandler)
 	: KPPPLayer(name, level, overhead),
 	fActivationPhase(activationPhase),
 	fProtocolNumber(protocolNumber),
@@ -156,7 +156,7 @@ KPPPProtocol::StackControl(uint32 op, void *data)
 	A disabled protocol is ignored and Up() is not called!
 */
 void
-KPPPProtocol::SetEnabled(bool enabled = true)
+KPPPProtocol::SetEnabled(bool enabled)
 {
 	fEnabled = enabled;
 	

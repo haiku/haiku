@@ -245,7 +245,7 @@ BaseTranslator::OutputFormats(int32 *out_count) const
 // ---------------------------------------------------------------
 status_t 
 BaseTranslator::identify_bits_header(BPositionIO *inSource,
-	translator_info *outInfo, TranslatorBitmap *pheader = NULL)
+	translator_info *outInfo, TranslatorBitmap *pheader)
 {
 	TranslatorBitmap header;
 

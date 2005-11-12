@@ -20,9 +20,10 @@
 
 #include <PPPInterface.h>
 #include <settings_tools.h>
-#include <stl_algobase.h>
+#include <algorithm>
 	// for max()
 
+using std::max;
 
 // GUI constants
 static const uint32 kDefaultButtonWidth = 80;

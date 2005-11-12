@@ -194,7 +194,7 @@ AppInfoList::Sort(int (*cmpFunc)(const RosterAppInfo *, const RosterAppInfo *))
 	int32 count = CountInfos();
 	if (count > 1) {
 		RosterAppInfo **infos = (RosterAppInfo **)fInfos.Items();
-		sort(infos, infos + count, cmpFunc);
+		std::sort(infos, infos + count, cmpFunc);
 	}
 }
 

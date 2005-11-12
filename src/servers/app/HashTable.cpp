@@ -15,6 +15,7 @@
 //#include <stdarg.h>
 #include <string.h>
 
+using std::nothrow;
 
 struct HashTable::entry {
 	entry*		next;

@@ -33,6 +33,7 @@
 #include "RosterSettingsCharStream.h"
 #include "TRoster.h"
 
+using std::nothrow;
 using namespace BPrivate;
 
 //------------------------------------------------------------------------------

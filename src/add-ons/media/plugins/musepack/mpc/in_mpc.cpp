@@ -20,6 +20,7 @@
 #include "idtag.h"
 
 #include <stdio.h>
+#include <string.h>
 
 //SettingsMPC     PluginSettings;                         // AB: PluginSettings holds the parameters for the plugin-configuration
 

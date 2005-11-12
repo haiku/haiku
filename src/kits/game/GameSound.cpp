@@ -27,6 +27,7 @@
 
 // Standard Includes -----------------------------------------------------------
 #include <stdio.h>
+#include <string.h>
 
 // System Includes -------------------------------------------------------------
 
@@ -36,6 +37,8 @@
 
 // Local Includes --------------------------------------------------------------
 #include <GameSound.h>
+
+using std::nothrow;
 
 // Local Defines ---------------------------------------------------------------
 
@@ -210,7 +213,7 @@ BGameSound::operator new(size_t size)
 
 
 void *
-BGameSound::operator new(size_t size, const nothrow_t &nt) throw()
+BGameSound::operator new(size_t size, const std::nothrow_t &nt) throw()
 {
 	return ::operator new(size, nt);
 }
@@ -226,7 +229,7 @@ BGameSound::operator delete(void *ptr)
 #if !__MWERKS__
 //	there's a bug in MWCC under R4.1 and earlier
 void
-BGameSound::operator delete(void *ptr, const nothrow_t &nt) throw()
+BGameSound::operator delete(void *ptr, const std::nothrow_t &nt) throw()
 {
 	::operator delete(ptr, nt);
 }

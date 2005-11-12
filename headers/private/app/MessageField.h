@@ -29,6 +29,7 @@
 #define MESSAGEFIELD_H
 
 // Standard Includes -----------------------------------------------------------
+#include <new>
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
@@ -57,6 +58,8 @@
 #define MSG_FLAG_ALL			0x0F
 
 #define MSG_LAST_ENTRY			0x0
+
+using namespace std;
 
 // Globals ---------------------------------------------------------------------
 namespace BPrivate {

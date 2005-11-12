@@ -351,9 +351,9 @@ FindTextView::GetData(BMessage &message)
 //	#pragma mark -
 
 
-FindWindow::FindWindow(BRect rect, BMessage &previous, BMessenger &target,
+FindWindow::FindWindow(BRect _rect, BMessage &previous, BMessenger &target,
 	const BMessage *settings)
-	: BWindow(rect, "Find", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS),
+	: BWindow(_rect, "Find", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS),
 	fTarget(target)
 {
 	BView *view = new BView(Bounds(), "main", B_FOLLOW_ALL, 0);

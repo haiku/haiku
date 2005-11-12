@@ -10,7 +10,7 @@ Preference VirtualMemory :
 	Settings.cpp
 	$(DRIVER_SETTINGS)
 
-	: libbe.so libstdc++.r4.so libroot.so
+	: be $(TARGET_LIBSTDC++)
 	: VirtualMemory.rdef
 	;
 

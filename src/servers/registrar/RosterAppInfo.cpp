@@ -30,6 +30,8 @@
 
 #include "RosterAppInfo.h"
 
+using std::nothrow;
+
 // constructor
 RosterAppInfo::RosterAppInfo()
 			 : app_info(),

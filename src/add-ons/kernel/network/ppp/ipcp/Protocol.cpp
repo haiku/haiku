@@ -215,7 +215,7 @@ IPCP::Down()
 
 
 status_t
-IPCP::Send(struct mbuf *packet, uint16 protocolNumber = IPCP_PROTOCOL)
+IPCP::Send(struct mbuf *packet, uint16 protocolNumber)
 {
 	TRACE("IPCP: Send(0x%X)\n", protocolNumber);
 	
@@ -1373,7 +1373,7 @@ IPCP::SendTerminateRequest()
 
 
 bool
-IPCP::SendTerminateAck(struct mbuf *request = NULL)
+IPCP::SendTerminateAck(struct mbuf *request)
 {
 	TRACE("IPCP: SendTerminateAck() state=%d\n", State());
 	

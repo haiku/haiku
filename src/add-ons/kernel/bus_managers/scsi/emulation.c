@@ -271,8 +271,6 @@ scsi_start_emulation(scsi_ccb *request)
 
 		case SCSI_OP_MODE_SELECT_6:
 			return scsi_start_mode_select_6(request);
-
-		default:
 	}
 
 	return true;
@@ -506,7 +504,7 @@ copy_sg_data(scsi_ccb *request, uint offset, uint allocation_length,
 		
 		unmap_mainmemory((void *)virt_addr);
 
-		(char *)buffer += bytes;
+		buffer = (char *)buffer + bytes;
 		size -= bytes;
 		offset = 0;
 	}

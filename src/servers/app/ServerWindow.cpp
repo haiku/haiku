@@ -60,6 +60,8 @@
 
 #include "clipping.h"
 
+using std::nothrow;
+
 //#define DEBUG_SERVERWINDOW
 //#define DEBUG_SERVERWINDOW_GRAPHICS
 

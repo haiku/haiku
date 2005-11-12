@@ -26,7 +26,11 @@
 //------------------------------------------------------------------------------
 #include <new>
 
+#include <string.h>
+
 #include "ServerBitmap.h"
+
+using std::nothrow;
 
 /*!
 	\brief Constructor called by the BitmapManager (only).

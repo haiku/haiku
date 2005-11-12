@@ -1331,7 +1331,7 @@ KPPPStateMachine::RTAEvent(struct mbuf *packet)
 // receive unknown code
 void
 KPPPStateMachine::RUCEvent(struct mbuf *packet, uint16 protocolNumber,
-	uint8 code = PPP_PROTOCOL_REJECT)
+	uint8 code)
 {
 	TRACE("KPPPSM: RUCEvent() state=%d phase=%d\n", State(), Phase());
 	
@@ -1835,7 +1835,7 @@ KPPPStateMachine::SendTerminateRequest()
 
 
 bool
-KPPPStateMachine::SendTerminateAck(struct mbuf *request = NULL)
+KPPPStateMachine::SendTerminateAck(struct mbuf *request)
 {
 	TRACE("KPPPSM: SendTerminateAck() state=%d phase=%d\n", State(), Phase());
 	

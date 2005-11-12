@@ -245,7 +245,7 @@ PPPManager::DeleteInterface(ppp_interface_id ID) const
 */
 ppp_interface_id*
 PPPManager::Interfaces(int32 *count,
-	ppp_interface_filter filter = PPP_REGISTERED_INTERFACES) const
+	ppp_interface_filter filter) const
 {
 	int32 requestCount;
 	ppp_interface_id *interfaces;
@@ -278,7 +278,7 @@ PPPManager::Interfaces(int32 *count,
 //!	Use \c Interfaces() instead of this method.
 int32
 PPPManager::GetInterfaces(ppp_interface_id *interfaces, int32 count,
-	ppp_interface_filter filter = PPP_REGISTERED_INTERFACES) const
+	ppp_interface_filter filter) const
 {
 	ppp_get_interfaces_info info;
 	info.interfaces = interfaces;
@@ -376,8 +376,7 @@ PPPManager::InterfaceWithName(const char *name) const
 
 //!	Returns the number of existing interfaces or a negative value on error.
 int32
-PPPManager::CountInterfaces(ppp_interface_filter filter =
-	PPP_REGISTERED_INTERFACES) const
+PPPManager::CountInterfaces(ppp_interface_filter filter) const
 {
 	return Control(PPPC_COUNT_INTERFACES, &filter, sizeof(filter));
 }
@@ -393,7 +392,7 @@ PPPManager::CountInterfaces(ppp_interface_filter filter =
 */
 bool
 PPPManager::EnableReports(ppp_report_type type, thread_id thread,
-	int32 flags = PPP_NO_FLAGS) const
+	int32 flags) const
 {
 	ppp_report_request request;
 	request.type = type;

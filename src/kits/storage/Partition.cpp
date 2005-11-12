@@ -24,6 +24,8 @@
 #include <syscalls.h>
 #include <disk_device_manager/ddm_userland_interface.h>
 
+using std::nothrow;
+
 /*!	\class BPartition
 	\brief A BPartition object represent a partition and provides a lot of
 		   methods to retrieve information about it and some to manipulate it.

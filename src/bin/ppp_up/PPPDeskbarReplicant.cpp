@@ -60,7 +60,7 @@ PPPDeskbarReplicant::Instantiate(BMessage *data)
 
 
 status_t
-PPPDeskbarReplicant::Archive(BMessage *data, bool deep = true) const
+PPPDeskbarReplicant::Archive(BMessage *data, bool deep) const
 {
 	BView::Archive(data, deep);
 	

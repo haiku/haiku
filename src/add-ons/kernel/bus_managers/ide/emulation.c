@@ -108,7 +108,7 @@ copy_sg_data(scsi_ccb *request, uint offset, uint allocation_length,
 
 		unmap_mainmemory(virt_addr);
 
-		(char *)buffer += bytes;
+		buffer = (char *)buffer + bytes;
 		size -= bytes;
 		offset = 0;
 	}

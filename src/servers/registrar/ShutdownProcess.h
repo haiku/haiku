@@ -14,6 +14,11 @@
 #include "AppInfoList.h"
 #include "EventMaskWatcher.h"
 
+#if __GNUC__ >= 4
+using __gnu_cxx::hash_set;
+#endif
+
+
 class EventQueue;
 class TRoster;
 

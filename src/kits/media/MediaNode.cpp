@@ -44,6 +44,9 @@
 #include "TimeSourceObject.h"
 #include "TimeSourceObjectManager.h"
 
+using std::nothrow;
+using std::nothrow_t;
+
 // don't rename this one, it's used and exported for binary compatibility
 int32 BMediaNode::_m_changeTag = 0;
 

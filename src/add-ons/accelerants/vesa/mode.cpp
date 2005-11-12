@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <string.h>
 
 #include "accelerant_protos.h"
 #include "accelerant.h"

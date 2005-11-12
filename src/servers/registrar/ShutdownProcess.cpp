@@ -41,6 +41,7 @@
 #include "ShutdownProcess.h"
 #include "TRoster.h"
 
+using std::nothrow;
 using namespace BPrivate;
 
 // The time span a non-background application has after the quit message has

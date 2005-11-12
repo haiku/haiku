@@ -12,7 +12,9 @@
 
 
 class BSound;
-class sound_error : public exception {
+class _SoundPlayNode;
+
+class sound_error : public std::exception {
 	const char * m_str_const;
 public:
 	sound_error(const char * str);

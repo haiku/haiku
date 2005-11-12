@@ -11,7 +11,7 @@
  */
 
 #include <stdlib.h>
-
+#include <string.h>
 
 #include <Shape.h>
 #include <Point.h>

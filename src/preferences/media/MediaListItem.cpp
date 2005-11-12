@@ -15,6 +15,8 @@
 
 
 // Includes -------------------------------------------------------------------------------------------------- //
+#include <string.h>
+
 #include <View.h>
 
 #include "MediaListItem.h"
@@ -22,7 +24,7 @@
 #define kITEM_MARGIN					  1
 
 // MediaListItem - Constructor
-MediaListItem::MediaListItem(dormant_node_info *info, uint32 level, bool isVideo, BList *icons, uint32 modifiers=0) 
+MediaListItem::MediaListItem(dormant_node_info *info, uint32 level, bool isVideo, BList *icons, uint32 modifiers) 
 	: BListItem(level),
 	mIsAudioMixer(false),
 	mIsVideo(isVideo),
@@ -36,7 +38,7 @@ MediaListItem::MediaListItem(dormant_node_info *info, uint32 level, bool isVideo
 	SetHeight(16 + kITEM_MARGIN);
 }
 
-MediaListItem::MediaListItem(const char *label, uint32 level, bool isVideo, BList *icons, uint32 modifiers=0) 
+MediaListItem::MediaListItem(const char *label, uint32 level, bool isVideo, BList *icons, uint32 modifiers) 
 	: BListItem(level),
 	mLabel(label),
 	mIsAudioMixer(false),

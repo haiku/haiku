@@ -19,7 +19,7 @@ static pci_module_info *gPCI = NULL;
 
 #define B_CONFIG_MANAGER_FOR_BUS_MODULE_NAME "bus_managers/config_manager/bus/v1"
 
-#define FUNCTION(x...) dprintf(__FUNCTION__ x)
+#define FUNCTION(x, y...) dprintf("%s" x, __FUNCTION__, y)
 #define TRACE(x) dprintf x
 
 

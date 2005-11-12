@@ -308,7 +308,7 @@ public:
 			}
 		}
 		// initializing extern variables
-		character_sets_by_MIBenum = new (const BCharacterSet*)[max_MIBenum+2];
+		character_sets_by_MIBenum = new const BCharacterSet*[max_MIBenum+2];
 		maximum_valid_MIBenum = max_MIBenum;
 		// initializing MIBenum array
 		memset(character_sets_by_MIBenum,0,sizeof(BCharacterSet*)*(max_MIBenum+2));

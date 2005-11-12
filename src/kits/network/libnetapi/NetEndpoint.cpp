@@ -107,7 +107,7 @@ BNetEndpoint::~BNetEndpoint()
 
 // #pragma mark -
 
-status_t BNetEndpoint::Archive(BMessage *into, bool deep = true) const
+status_t BNetEndpoint::Archive(BMessage *into, bool deep) const
 {
 	// TODO
 	

@@ -15,6 +15,7 @@ class BEntry;
 struct entry_ref;
 
 class _rep_data_;
+class _TContainerViewFilter_;
 
 class BShelf : public BHandler {
 	public:

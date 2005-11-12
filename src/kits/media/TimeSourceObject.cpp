@@ -9,6 +9,7 @@
 
 #include <OS.h>
 #include <stdio.h>
+#include <string.h>
 #include <MediaRoster.h>
 #include "MediaMisc.h"
 #include "TimeSourceObject.h"

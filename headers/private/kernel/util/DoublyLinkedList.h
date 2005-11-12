@@ -93,7 +93,7 @@ class List {
 		}
 
 	private:
-		friend class IteratorType;
+		friend class DoublyLinked::Iterator<Item, LinkMember>;
 		Link fLink;
 };
 

@@ -14,13 +14,13 @@
 BSound::BSound(	void * data,
 				size_t size,
 				const media_raw_audio_format & format,
-				bool free_when_done = false)
+				bool free_when_done)
 {
 	UNIMPLEMENTED();
 }
 
 BSound::BSound(	const entry_ref * sound_file,
-				bool load_into_memory = false)
+				bool load_into_memory)
 {
 	UNIMPLEMENTED();
 }

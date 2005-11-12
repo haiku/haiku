@@ -16,6 +16,9 @@
 #include "MessageDeliverer.h"
 #include "MessagingService.h"
 
+using std::map;
+using std::nothrow;
+
 // sService -- the singleton instance
 MessagingService *MessagingService::sService = NULL;
 

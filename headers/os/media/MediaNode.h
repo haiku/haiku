@@ -236,14 +236,14 @@ virtual	status_t HandleMessage(
 				size_t size);
 		void * operator new(
 				size_t size,
-				const nothrow_t &) throw();
+				const std::nothrow_t &) throw();
 		void operator delete(
 				void * ptr);
 #if !__MWERKS__
 		//	there's a bug in MWCC under R4.1 and earlier
 		void operator delete(
 				void * ptr, 
-				const nothrow_t &) throw();
+				const std::nothrow_t &) throw();
 #endif
 
 protected:

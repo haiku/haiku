@@ -203,7 +203,7 @@ TDay::SetTo(BRect frame, int day)
 
 
 void
-TDay::SetTo(int day, bool selected = false)
+TDay::SetTo(int day, bool selected)
 {
 	f_day = day;
 	SetValue(selected);

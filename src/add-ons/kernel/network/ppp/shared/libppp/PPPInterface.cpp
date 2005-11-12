@@ -25,7 +25,7 @@
 	
 	\param ID The ID of the new interface.
 */
-PPPInterface::PPPInterface(ppp_interface_id ID = PPP_UNDEFINED_INTERFACE_ID)
+PPPInterface::PPPInterface(ppp_interface_id ID)
 {
 	fFD = open(get_stack_driver_path(), O_RDWR);
 	
@@ -290,7 +290,7 @@ PPPInterface::Down() const
 */
 bool
 PPPInterface::EnableReports(ppp_report_type type, thread_id thread,
-	int32 flags = PPP_NO_FLAGS) const
+	int32 flags) const
 {
 	ppp_report_request request;
 	request.type = type;

@@ -6,6 +6,7 @@
  */
  
 #include <stdio.h>
+#include <string.h>
 
 #include "TrackSlider.h"
 #include "icon_button.h"

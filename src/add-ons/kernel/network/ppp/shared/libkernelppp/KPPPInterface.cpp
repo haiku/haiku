@@ -78,7 +78,7 @@ status_t interface_deleter_thread(void *data);
 */
 KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 		ppp_interface_id ID, const driver_settings *settings,
-		KPPPInterface *parent = NULL)
+		KPPPInterface *parent)
 	: KPPPLayer(name, PPP_INTERFACE_LEVEL, 2),
 	fID(ID),
 	fSettings(NULL),
@@ -833,7 +833,7 @@ KPPPInterface::ProtocolAt(int32 index) const
 	\return Either the object that was found or \c NULL.
 */
 KPPPProtocol*
-KPPPInterface::ProtocolFor(uint16 protocolNumber, KPPPProtocol *start = NULL) const
+KPPPInterface::ProtocolFor(uint16 protocolNumber, KPPPProtocol *start) const
 {
 	TRACE("KPPPInterface: ProtocolFor(%X)\n", protocolNumber);
 	
@@ -909,7 +909,7 @@ KPPPInterface::ChildAt(int32 index) const
 
 //!	Enables or disables the auto-reconnect feture.
 void
-KPPPInterface::SetAutoReconnect(bool autoReconnect = true)
+KPPPInterface::SetAutoReconnect(bool autoReconnect)
 {
 	TRACE("KPPPInterface: SetAutoReconnect(%s)\n", autoReconnect ? "true" : "false");
 	
@@ -924,7 +924,7 @@ KPPPInterface::SetAutoReconnect(bool autoReconnect = true)
 
 //!	Enables or disables the connect-on-demand feature.
 void
-KPPPInterface::SetConnectOnDemand(bool connectOnDemand = true)
+KPPPInterface::SetConnectOnDemand(bool connectOnDemand)
 {
 	// All protocols must check if ConnectOnDemand was enabled/disabled after this
 	// interface went down. This is the only situation where a change is relevant.

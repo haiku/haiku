@@ -7,7 +7,7 @@
 #include "debug.h"
 #include <string.h>
 
-status_t us_to_timecode(bigtime_t micros, int * hours, int * minutes, int * seconds, int * frames, const timecode_info * code = NULL)
+status_t us_to_timecode(bigtime_t micros, int * hours, int * minutes, int * seconds, int * frames, const timecode_info * code)
 {
 	int32 l_frames;
 
@@ -35,7 +35,7 @@ status_t us_to_timecode(bigtime_t micros, int * hours, int * minutes, int * seco
 	return frames_to_timecode(l_frames, hours, minutes, seconds, frames, code);
 }
 
-status_t timecode_to_us(int hours, int minutes, int seconds, int frames, bigtime_t * micros, const timecode_info * code = NULL)
+status_t timecode_to_us(int hours, int minutes, int seconds, int frames, bigtime_t * micros, const timecode_info * code)
 {
 	int32 l_frames;
 	
@@ -67,7 +67,7 @@ status_t timecode_to_us(int hours, int minutes, int seconds, int frames, bigtime
 	return B_ERROR;
 }
 
-status_t frames_to_timecode(int32 l_frames, int * hours, int * minutes, int * seconds, int * frames, const timecode_info * code = NULL)
+status_t frames_to_timecode(int32 l_frames, int * hours, int * minutes, int * seconds, int * frames, const timecode_info * code)
 {
 	int fps_div;
 	int total_mins;
@@ -139,7 +139,7 @@ status_t frames_to_timecode(int32 l_frames, int * hours, int * minutes, int * se
 	return B_OK;
 }
 
-status_t timecode_to_frames(int hours, int minutes, int seconds, int frames, int32 * l_frames, const timecode_info * code = NULL)
+status_t timecode_to_frames(int hours, int minutes, int seconds, int frames, int32 * l_frames, const timecode_info * code)
 {
 	int fps_div;
 	int total_mins;

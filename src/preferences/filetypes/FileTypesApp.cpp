@@ -24,7 +24,7 @@ void FileTypesApp::DispatchMessage(BMessage *msg, BHandler *handler)
 		if (msg->FindInt32("argc",&argc) != B_OK) {
 			argc=0;
 		}
-		const char ** argv = new (const char*)[argc];
+		const char ** argv = new const char*[argc];
 		for (int arg = 0; (arg < argc) ; arg++) {
 			if (msg->FindString("argv",arg,&argv[arg]) != B_OK) {
 				argv[arg] = "";

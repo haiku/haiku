@@ -58,8 +58,8 @@ class TAlertView : public BView
 };
 
 //------------------------------------------------------------------------------
-MediaAlert::MediaAlert(BRect rect, const char* title, const char* text)
-	:	BWindow(rect, title, B_MODAL_WINDOW,
+MediaAlert::MediaAlert(BRect _rect, const char* title, const char* text)
+	:	BWindow(_rect, title, B_MODAL_WINDOW,
 				B_NOT_CLOSABLE | B_NOT_RESIZABLE)
 {
 	fTextView = NULL;

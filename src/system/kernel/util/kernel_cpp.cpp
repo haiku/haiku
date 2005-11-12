@@ -54,6 +54,34 @@ fprintf(FILE *f, const char *format, ...)
 	return 0;
 }
 
+#if __GNUC__ >= 3
+
+extern "C"
+size_t
+fwrite(const void *buffer, size_t size, size_t numItems, FILE *stream)
+{
+	dprintf("%.*s", int(size * numItems), (char*)buffer);
+	return 0;
+}
+
+extern "C"
+int
+fputs(const char *string, FILE *stream)
+{
+	dprintf("%s", string);
+	return 0;
+}
+
+extern "C"
+int
+fputc(int c, FILE *stream)
+{
+	dprintf("%c", c);
+	return 0;
+}
+
+#endif	// __GNUC__ >= 3
+
 extern "C"
 void
 abort()

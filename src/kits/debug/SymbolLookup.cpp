@@ -8,6 +8,7 @@
 
 #include "SymbolLookup.h"
 
+using std::nothrow;
 using namespace BPrivate;
 
 // PrepareAddress

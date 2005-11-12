@@ -21,6 +21,10 @@
 #include "Syscall.h"
 #include "TypeHandler.h"
 
+using std::map;
+using std::string;
+using std::vector;
+
 extern void get_syscalls0(vector<Syscall*> &syscalls);
 extern void get_syscalls1(vector<Syscall*> &syscalls);
 extern void get_syscalls2(vector<Syscall*> &syscalls);

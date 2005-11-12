@@ -30,6 +30,7 @@
 #include <FontPrivate.h>
 #include <ObjectList.h>
 
+using namespace std;
 
 const float kUninitializedAscent = INFINITY;
 const uint32 kUninitializedExtraFlags = 0xffffffff;

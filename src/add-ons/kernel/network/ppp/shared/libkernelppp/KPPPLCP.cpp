@@ -103,7 +103,7 @@ KPPPLCP::OptionHandlerAt(int32 index) const
 
 //!	Returns the option handler that can handle options of a given \a type.
 KPPPOptionHandler*
-KPPPLCP::OptionHandlerFor(uint8 type, int32 *start = NULL) const
+KPPPLCP::OptionHandlerFor(uint8 type, int32 *start) const
 {
 	// The iteration style in this method is strange C/C++.
 	// Explanation: I use this style because it makes extending all XXXFor
@@ -180,7 +180,7 @@ KPPPLCP::LCPExtensionAt(int32 index) const
 
 //!	Returns the LCP extension that can handle LCP packets of a given \a code.
 KPPPLCPExtension*
-KPPPLCP::LCPExtensionFor(uint8 code, int32 *start = NULL) const
+KPPPLCP::LCPExtensionFor(uint8 code, int32 *start) const
 {
 	// The iteration style in this method is strange C/C++.
 	// Explanation: I use this style because it makes extending all XXXFor
@@ -239,7 +239,7 @@ KPPPLCP::Down()
 
 //!	Sends a packet to the target (if there is one) or to the interface.
 status_t
-KPPPLCP::Send(struct mbuf *packet, uint16 protocolNumber = PPP_LCP_PROTOCOL)
+KPPPLCP::Send(struct mbuf *packet, uint16 protocolNumber)
 {
 	if(Target())
 		return Target()->Send(packet, PPP_LCP_PROTOCOL);

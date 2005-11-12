@@ -12,7 +12,7 @@
 
 
 DataTranslationsView::DataTranslationsView(BRect rect, const char *name,
-	list_view_type type = B_SINGLE_SELECTION_LIST)
+	list_view_type type)
 	: BListView(rect, name, B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES) 
 {	
 }

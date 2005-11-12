@@ -40,6 +40,9 @@
 #include "MessageDeliverer.h"
 #include "MessageRunnerManager.h"
 
+using std::max;
+using std::nothrow;
+
 /*!	\class MessageRunnerManager
 	\brief Manages the registrar side "shadows" of BMessageRunners.
 

@@ -7,6 +7,8 @@
  * It's used by Pulse, AboutHaiku, and sysinfo.
  */
 
+#include <stdlib.h>
+
 #include <OS.h>
 
 #ifdef __cplusplus

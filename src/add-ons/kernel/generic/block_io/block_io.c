@@ -30,7 +30,7 @@ struct iovec block_io_buffer_vec[1];
 void *block_io_buffer_phys;
 char *block_io_buffer;
 phys_vecs block_io_buffer_phys_vec;
-static area_id block_io_buffer_area;
+area_id block_io_buffer_area;
 
 locked_pool_interface *locked_pool;
 device_manager_info *pnp;

@@ -20,6 +20,9 @@
 #include <Path.h>
 #include <fs_volume.h>
 
+using std::set;
+using std::string;
+
 extern const char *__progname;
 
 

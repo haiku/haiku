@@ -60,6 +60,8 @@
 #include "ShowImageView.h"
 #include "ShowImageWindow.h"
 
+using std::nothrow;
+
 #ifndef min
 #define min(a,b) ((a)>(b)?(b):(a))
 #endif

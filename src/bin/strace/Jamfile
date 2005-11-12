@@ -40,7 +40,7 @@ for i in $(straceSyscallsIndices) {
 OPTIM = $(oldOptim) ;
 
 BinCommand strace : $(straceSources)
-	: $(straceSyscallsObjects) libroot.so libstdc++.r4.so ;
+	: $(straceSyscallsObjects) libroot.so $(TARGET_LIBSTDC++) ;
 
 # We need to specify the dependency on the generated syscalls file explicitly.
 Includes $(straceSyscallsSource) : <syscalls>strace_syscalls.h ;

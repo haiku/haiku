@@ -10,6 +10,8 @@
 #include <arch_config.h>
 #include <SupportDefs.h>
 
+using std::string;
+
 class MemoryReader;
 
 typedef FUNCTION_CALL_PARAMETER_ALIGNMENT_TYPE align_t;

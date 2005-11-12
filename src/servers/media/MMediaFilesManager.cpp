@@ -225,7 +225,7 @@ MMediaFilesManager::RewindTypes(BString ***types, int32 *count)
 	BString *type;
 	
 	*count = fRegistryMap->CountItems();
-	*types = new (BString*)[*count];
+	*types = new BString*[*count];
 	int32 i=0; 
 	
 	for (fRegistryMap->Rewind(); i<*count && fRegistryMap->GetNext(&map); i++) {
@@ -255,7 +255,7 @@ MMediaFilesManager::RewindRefs(const char* type, BString ***items, int32 *count)
 		return B_OK;
 	
 	*count = map->CountItems();
-	*items = new (BString*)[*count];
+	*items = new BString*[*count];
 	int32 i=0;
 			
 	for (map->Rewind(); i<*count && map->GetNext(&ref); i++) {

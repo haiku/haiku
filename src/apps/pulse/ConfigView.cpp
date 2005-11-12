@@ -15,6 +15,7 @@
 #include <interface/Box.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 RTColorControl::RTColorControl(BPoint point, BMessage *message)
 	: BColorControl(point, B_CELLS_32x8, 6, "ColorControl", message, false) {

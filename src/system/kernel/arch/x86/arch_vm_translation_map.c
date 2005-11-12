@@ -812,8 +812,8 @@ arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
 	} else {
 		// kernel
 		// we already know the kernel pgdir mapping
-		(addr_t)map->arch_data->pgdir_virt = kernel_pgdir_virt;
-		(addr_t)map->arch_data->pgdir_phys = kernel_pgdir_phys;
+		map->arch_data->pgdir_virt = kernel_pgdir_virt;
+		map->arch_data->pgdir_phys = kernel_pgdir_phys;
 	}
 
 	// zero out the bottom portion of the new pgdir

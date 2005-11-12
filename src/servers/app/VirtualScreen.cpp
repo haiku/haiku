@@ -14,6 +14,8 @@
 
 #include <new>
 
+using std::nothrow;
+
 
 VirtualScreen::VirtualScreen()
 	:

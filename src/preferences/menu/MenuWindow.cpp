@@ -1,5 +1,6 @@
 	#include "MenuApp.h"
 	#include <stdio.h>
+	#include <string.h>
 	#include <Roster.h>
 	
 	int ans;
@@ -64,8 +65,8 @@
 			msg->FindPointer("family", (void**)&family);
 			font_style *style;
 			msg->FindPointer("style", (void**)&style);
-			info.f_family = *family;
-			info.f_style = *style;
+			memcpy(info.f_family, family, sizeof(info.f_family));
+			memcpy(info.f_style, style, sizeof(info.f_style));
 			set_menu_info(&info);
 			Update();
 			break;

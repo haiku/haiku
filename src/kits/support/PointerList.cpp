@@ -16,10 +16,13 @@
 
 // Note: Method Owning() is inlined in header file ObjectList.h
 
-#include <stl.h>
+#include <algorithm>
+#include <functional>
 
 #include <assert.h>
 #include <List.h>
+
+using namespace std;
 
 // If USE_STL is 1 binary search and sort are used from STL.
 // The implementation of _PointerList_ should be completely rewritten to

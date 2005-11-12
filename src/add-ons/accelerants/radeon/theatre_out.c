@@ -266,5 +266,6 @@ void Radeon_DetectTVOut(
 		break; }
 	default:
 		// for internal encoder, we don't have to look farther - it must be there
+		;
 	}
 }

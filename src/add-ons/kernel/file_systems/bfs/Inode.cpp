@@ -1764,8 +1764,11 @@ Inode::ShrinkStream(Transaction &transaction, off_t size)
 	status_t status;
 
 	if (data->MaxDoubleIndirectRange() > size) {
+		off_t *maxDoubleIndirect = &data->max_double_indirect_range;
+			// gcc 4 work-around: "error: cannot bind packed field
+			// 'data->data_stream::max_double_indirect_range' to 'off_t&'"
 		status = FreeStaticStreamArray(transaction, 0, data->double_indirect, size,
-			data->MaxIndirectRange(), data->max_double_indirect_range);
+			data->MaxIndirectRange(), *maxDoubleIndirect);
 		if (status < B_OK)
 			return status;
 
@@ -1785,8 +1788,11 @@ Inode::ShrinkStream(Transaction &transaction, off_t size)
 			if (array == NULL)
 				break;
 
+			off_t *maxIndirect = &data->max_indirect_range;
+				// gcc 4 work-around: "error: cannot bind packed field
+				// 'data->data_stream::max_indirect_range' to 'off_t&'"
 			if (FreeStreamArray(transaction, array, fVolume->BlockSize() / sizeof(block_run),
-					size, offset, data->max_indirect_range) != B_OK)
+					size, offset, *maxIndirect) != B_OK)
 				return B_IO_ERROR;
 		}
 		if (data->max_direct_range == data->max_indirect_range) {
@@ -1797,8 +1803,11 @@ Inode::ShrinkStream(Transaction &transaction, off_t size)
 	}
 	if (data->MaxDirectRange() > size) {
 		off_t offset = 0;
+		off_t *maxDirect = &data->max_indirect_range;
+			// gcc 4 work-around: "error: cannot bind packed field
+			// 'data->data_stream::max_direct_range' to 'off_t&'"
 		status = FreeStreamArray(transaction, data->direct, NUM_DIRECT_BLOCKS,
-			size, offset, data->max_direct_range);
+			size, offset, *maxDirect);
 		if (status < B_OK)
 			return status;
 	}
