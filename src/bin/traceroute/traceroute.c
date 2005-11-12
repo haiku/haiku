@@ -489,8 +489,10 @@ int main(int argc, char **argv)
 		*p++ = lsrrlen - 1;
 		*p++ = IPOPT_MINOFF;
 		gateway[lsrr] = to.sin_addr;
-		for (i = 1; i <= lsrr; i++)
-			*((struct in_addr *)p)++ = gateway[i];
+		for (i = 1; i <= lsrr; i++) {
+			*(struct in_addr *)p = gateway[i];
+			p = (u_char*)((struct in_addr *)p + 1);
+		}
 		ip->ip_dst = gateway[0];
 	} else
 		ip->ip_dst = to.sin_addr;
