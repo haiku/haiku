@@ -426,11 +426,12 @@ WinBorder::MouseDown(const BMessage *msg)
 	// not in FFM mode?
 	if (desktopSettings.MouseMode() == B_NORMAL_MOUSE) {
 		// default action is to drag the WinBorder
-		click_type action = DEC_DRAG;
 		Layer *target = LayerAt(where);
 		if (target == this) {
 			// clicking WinBorder visible area
 			winBorderAreaHandle:
+
+			click_type action = DEC_DRAG;
 
 			if (fDecorator)
 				action = _ActionFor(msg);
@@ -499,7 +500,7 @@ WinBorder::MouseDown(const BMessage *msg)
 				if (WindowFlags() & B_WILL_ACCEPT_FIRST_CLICK)
 					target->MouseDown(msg);
 				else
-					goto activateWindow;
+					GetRootLayer()->SetActive(this);
 			}
 		}
 	} else {
