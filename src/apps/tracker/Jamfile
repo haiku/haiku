@@ -1,14 +1,19 @@
 SubDir HAIKU_TOP src apps tracker ;
 
+AddSubDirSupportedPlatforms libbe_test ;
+
 UsePrivateHeaders shared ;
 UsePrivateHeaders tracker ;
 SubDirHdrs $(HAIKU_TOP) src kits tracker ;
 
-AddResources Tracker : Tracker.rdef ;
-
 Application Tracker :
 	main.cpp
+	: be tracker
+	: Tracker.rdef
 	;
 
-LinkAgainst Tracker : libbe.so libtracker.so ;
+if $(TARGET_PLATFORM) = libbe_test {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Tracker
+		: tests!apps ;
+}
 
