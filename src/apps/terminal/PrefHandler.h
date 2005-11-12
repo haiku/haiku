@@ -1,40 +1,21 @@
 /*
- * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
- * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
+ * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
+ * Copyright (c) 1998,99 Kazuho Okui and Takashi Murai. 
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files or portions
- * thereof (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject
- * to the following conditions:
- *
- *  * Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- *  * Redistributions in binary form must reproduce the above copyright notice
- *    in the  binary, as well as this list of conditions and the following
- *    disclaimer in the documentation and/or other materials provided with
- *    the distribution.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
+ * Distributed unter the terms of the MIT License.
  */
-#ifndef PREFHANDLER_H_INCLUDED
-#define PREFHANDLER_H_INCLUDED
+#ifndef PREF_HANDLER_H
+#define PREF_HANDLER_H
+
 
 #include <SupportDefs.h>
-#include <Errors.h>
 #include <GraphicsDefs.h>
 #include <Message.h>
+
+class BFont;
+class BPath;
+
 
 #define TP_MAGIC 0xf1f2f3f4
 #define TP_VERSION 0x02
@@ -110,4 +91,4 @@ class PrefHandler {
 		BMessage    fContainer;
 };
 
-#endif // PREFHANDLER_H_INCLUDED
+#endif	// PREF_HANDLER_H

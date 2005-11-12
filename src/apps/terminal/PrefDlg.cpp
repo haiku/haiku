@@ -1,32 +1,11 @@
 /*
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
- * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
+ * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files or portions
- * thereof (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject
- * to the following conditions:
- *
- *  * Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- *  * Redistributions in binary form must reproduce the above copyright notice
- *    in the  binary, as well as this list of conditions and the following
- *    disclaimer in the documentation and/or other materials provided with
- *    the distribution.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
+ * Distributed unter the terms of the MIT License.
  */
+
+
 #include <Box.h>
 #include <Button.h>
 #include <FilePanel.h>
@@ -51,9 +30,9 @@
 extern PrefHandler *gTermPref;
 
 PrefDlg::PrefDlg(TermWindow *inWindow)
-  : BWindow(CenteredRect(BRect(0, 0, 350, 215)), "Preference",
-	 	   B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-		    B_NOT_RESIZABLE|B_NOT_ZOOMABLE)
+	: BWindow(CenteredRect(BRect(0, 0, 350, 215)), "Terminal Settings",
+		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+		B_NOT_RESIZABLE|B_NOT_ZOOMABLE)
 {
 	fTermWindow = inWindow;
 	fPrefTemp = new PrefHandler(gTermPref);
@@ -100,16 +79,18 @@ PrefDlg::PrefDlg(TermWindow *inWindow)
 							top->Bounds().Height() - 5 - 
 							fRevertButton->Bounds().Height());
 	top->AddChild(fRevertButton);
-	
+
 	AddShortcut ((ulong)'Q', (ulong)B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
 	AddShortcut ((ulong)'W', (ulong)B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
-	
+
 	Show();
 }
 
-PrefDlg::~PrefDlg (void)
+
+PrefDlg::~PrefDlg()
 {
 }
+
 
 void
 PrefDlg::Quit()
@@ -120,38 +101,41 @@ PrefDlg::Quit()
 	BWindow::Quit();
 }
 
+
 bool
 PrefDlg::QuitRequested()
 {
-  if(!fDirty)
-  	return true;
-	
+	if (!fDirty)
+		return true;
+
 	BAlert *alert = new BAlert("", "Save changes to this preference panel?",
-							     "Cancel", "Don't Save", "Save",
-							     B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
-							     B_WARNING_ALERT); 
+		"Cancel", "Don't Save", "Save",
+		B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
+		B_WARNING_ALERT); 
 	alert->SetShortcut(0, B_ESCAPE); 
 	alert->SetShortcut(1, 'd'); 
 	alert->SetShortcut(2, 's'); 
-	int32 button_index = alert->Go();
-	
-	if(button_index==0)
+
+	int32 index = alert->Go();
+	if (index == 0)
 		return false;
-	else
-	if(button_index==2)
+
+	if (index == 2)
 		doSave();
-	
+
 	return true;
 }
 
+
 void
-PrefDlg::doSaveAs (void)
+PrefDlg::doSaveAs()
 {
-	if(!fSavePanel)
+	if (!fSavePanel)
 		fSavePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(this));
 	
 	fSavePanel->Show();
 }
+
 
 void
 PrefDlg::SaveRequested(BMessage *msg)
@@ -199,11 +183,11 @@ PrefDlg::doRevert()
 	fDirty = false;
 }
 
+
 void
 PrefDlg::MessageReceived(BMessage *msg)
 {
-	switch (msg->what)
-	{
+	switch (msg->what) {
 		case MSG_SAVE_PRESSED:
 		{
 			doSave();
@@ -238,6 +222,7 @@ PrefDlg::MessageReceived(BMessage *msg)
 		}
 	}
 }
+
 
 BRect
 PrefDlg::CenteredRect(BRect r)
