@@ -27,7 +27,7 @@ BTextControl::BTextControl(BRect frame, const char *name, const char *label,
 	InitData(label, text);
 
 	float height;
-	GetPreferredSize(NULL, &height);
+	BTextControl::GetPreferredSize(NULL, &height);
 
 	ResizeTo(Bounds().Width(), height);
 
