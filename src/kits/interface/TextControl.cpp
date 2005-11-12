@@ -13,6 +13,7 @@
 #include <stdio.h>
 
 #include <Message.h>
+#include <Region.h>
 #include <TextControl.h>
 #include <Window.h>
 
@@ -31,7 +32,7 @@ BTextControl::BTextControl(BRect frame, const char *name, const char *label,
 
 	ResizeTo(Bounds().Width(), height);
 
-	float lineHeight = fText->LineHeight(0);
+	float lineHeight = ceil(fText->LineHeight(0));
 	fText->ResizeTo(fText->Bounds().Width(), lineHeight);
 	fText->MoveTo(fText->Frame().left, (height - lineHeight) / 2);
 }
@@ -226,8 +227,30 @@ BTextControl::Draw(BRect updateRect)
 	if (fText->IsFocus() && Window()->IsActive())
 		active = true;
 
-	BRect rect(fText->Frame());
-	rect.InsetBy(-1.0f, -1.0f);
+	// outer bevel
+
+	BRect rect = Bounds();
+	rect.left = fDivider;
+
+	if (enabled)
+		SetHighColor(darken1);
+	else
+		SetHighColor(noTint);
+
+	StrokeLine(rect.LeftBottom(), rect.LeftTop());
+	StrokeLine(rect.RightTop());
+
+	if (enabled)
+		SetHighColor(lighten2);
+	else
+		SetHighColor(lighten1);
+
+	StrokeLine(BPoint(rect.left + 1.0f, rect.bottom), rect.RightBottom());
+	StrokeLine(BPoint(rect.right, rect.top + 1.0f), rect.RightBottom());
+
+	// inner bevel
+
+	rect.InsetBy(1.0f, 1.0f);
 
 	if (active) {
 		SetHighColor(navigationColor);
@@ -246,23 +269,17 @@ BTextControl::Draw(BRect updateRect)
 		StrokeLine(BPoint(rect.right, rect.top + 1.0f));
 	}
 
-	rect.InsetBy(-1.0f, -1.0f);
+	// area around text view
 
-	if (enabled)
-		SetHighColor(darken1);
-	else
-		SetHighColor(noTint);
-
-	StrokeLine(rect.LeftBottom(), rect.LeftTop());
-	StrokeLine(rect.RightTop());
-
-	if (enabled)
-		SetHighColor(lighten2);
-	else
-		SetHighColor(lighten1);
-
-	StrokeLine(BPoint(rect.left + 1.0f, rect.bottom), rect.RightBottom());
-	StrokeLine(BPoint(rect.right, rect.top + 1.0f), rect.RightBottom());
+	SetHighColor(fText->ViewColor());
+	rect.InsetBy(1, 1);
+	BRegion region(rect);
+	BRegion updateRegion(updateRect);
+		// why is there no IntersectWith(BRect &) version?
+	region.IntersectWith(&updateRegion);
+	for (int32 i = region.CountRects(); i-- > 0;) {
+		FillRect(region.RectAt(i));
+	}
 
 	if (Label()) {
 		font_height fontHeight;
@@ -571,8 +588,8 @@ BTextControl::CommitValue()
 
 
 void
-BTextControl::InitData(const char *label, const char *initial_text,
-							BMessage *data)
+BTextControl::InitData(const char *label, const char *initialText,
+	BMessage *data)
 {
 	BRect bounds(Bounds());
 
@@ -614,7 +631,7 @@ BTextControl::InitData(const char *label, const char *initial_text,
 					bounds.right, bounds.bottom);
 		// we are stroking the frame around the text view, which
 		// is 2 pixels wide
-		frame.InsetBy(3.0, 3.0);
+		frame.InsetBy(4.0, 3.0);
 		BRect textRect(frame.OffsetToCopy(0.0f, 0.0f));
 
 		fText = new _BTextInput_(frame, textRect,
@@ -622,7 +639,7 @@ BTextControl::InitData(const char *label, const char *initial_text,
 			B_WILL_DRAW | B_FRAME_EVENTS | navigableFlags);
 		AddChild(fText);
 
-		SetText(initial_text);
+		SetText(initialText);
 		fText->SetAlignment(B_ALIGN_LEFT);
 		fText->AlignTextRect();
 	}
