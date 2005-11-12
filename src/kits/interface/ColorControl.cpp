@@ -35,9 +35,10 @@ BColorControl::BColorControl(BPoint leftTop, color_control_layout matrix,
 {
 	InitData(matrix, cellSize, bufferedDrawing, NULL);
 }
-//------------------------------------------------------------------------------
+
+
 BColorControl::BColorControl(BMessage *archive)
-	:	BControl(archive)
+	: BControl(archive)
 {
 	int32 layout;
 	bool use_offscreen;
@@ -49,20 +50,25 @@ BColorControl::BColorControl(BMessage *archive)
 
 	archive->FindBool("_use_off", &use_offscreen);
 }
-//------------------------------------------------------------------------------
+
+
 BColorControl::~BColorControl()
 {
 }
-//------------------------------------------------------------------------------
-BArchivable *BColorControl::Instantiate(BMessage *archive)
+
+
+BArchivable *
+BColorControl::Instantiate(BMessage *archive)
 {
 	if ( validate_instantiation(archive, "BColorControl"))
 		return new BColorControl(archive);
-	else
-		return NULL;
+
+	return NULL;
 }
-//------------------------------------------------------------------------------
-status_t BColorControl::Archive(BMessage *archive, bool deep) const
+
+
+status_t
+BColorControl::Archive(BMessage *archive, bool deep) const
 {
 	BControl::Archive(archive, deep);
 
@@ -72,18 +78,18 @@ status_t BColorControl::Archive(BMessage *archive, bool deep) const
 
 	return B_OK;
 }
-//------------------------------------------------------------------------------
-void BColorControl::SetValue(int32 color)
+
+
+void
+BColorControl::SetValue(int32 color)
 {
 	if (!fRetainCache)
 		fCachedIndex = -1;
 
 	fRetainCache = false;
 
-	if (fBitmap)
-	{
-		if (fBitmap->Lock())
-		{
+	if (fBitmap) {
+		if (fBitmap->Lock()) {
 			if (!fOffscreenView)
 				UpdateOffscreen();
 			fBitmap->Unlock();
@@ -97,34 +103,32 @@ void BColorControl::SetValue(int32 color)
 	c2.blue = (color & 0x0000FF00) >> 8;
 	char string[4];
 
-	if (c1.red != c2.red)
-	{
+	if (c1.red != c2.red) {
 		sprintf(string, "%d", c2.red);
 		fRedText->SetText(string);
 	}
 
-	if (c1.green != c2.green)
-	{
+	if (c1.green != c2.green) {
 		sprintf(string, "%d", c2.green);
 		fGreenText->SetText(string);
 	}
 
-	if (c1.blue != c2.blue)
-	{
+	if (c1.blue != c2.blue) {
 		sprintf(string, "%d", c2.blue);
 		fBlueText->SetText(string);
 	}
 
-	if (LockLooper())
-	{
+	if (LockLooper()) {
 		Window()->UpdateIfNeeded();
 		UnlockLooper();
 	}
-	
+
 	BControl::SetValue(color);
 }
-//------------------------------------------------------------------------------
-rgb_color BColorControl::ValueAsColor()
+
+
+rgb_color
+BColorControl::ValueAsColor()
 {
 	int32 value = Value();
 	rgb_color color;
@@ -136,8 +140,10 @@ rgb_color BColorControl::ValueAsColor()
 
 	return color;
 }
-//------------------------------------------------------------------------------
-void BColorControl::SetEnabled(bool enabled)
+
+
+void
+BColorControl::SetEnabled(bool enabled)
 {
 	BControl::SetEnabled(enabled);
 
@@ -145,11 +151,15 @@ void BColorControl::SetEnabled(bool enabled)
 	fGreenText->SetEnabled(enabled);
 	fBlueText->SetEnabled(enabled);
 }
-//------------------------------------------------------------------------------
-void BColorControl::AttachedToWindow()
+
+
+void
+BColorControl::AttachedToWindow()
 {
 	if (Parent())
-      SetViewColor(Parent()->ViewColor());
+		SetViewColor(Parent()->ViewColor());
+	else
+		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BControl::AttachedToWindow();
 
@@ -157,52 +167,53 @@ void BColorControl::AttachedToWindow()
 	fGreenText->SetTarget(this);
 	fBlueText->SetTarget(this);
 }
-//------------------------------------------------------------------------------
-void BColorControl::MessageReceived(BMessage *message)
+
+
+void
+BColorControl::MessageReceived(BMessage *message)
 {
-	switch (message->what)
-	{
+	switch (message->what) {
 		case 'ccol':
 		{
 			rgb_color color;
-			
+
 			color.red = strtol(fRedText->Text(), NULL, 10);
 			color.green = strtol(fGreenText->Text(), NULL, 10);
 			color.blue = strtol(fBlueText->Text(), NULL, 10);
 
 			SetValue(color);
 			Invoke();
-
 			break;
 		}
 		default:
 			BControl::MessageReceived(message);
 	}
 }
-//------------------------------------------------------------------------------
-void BColorControl::Draw(BRect updateRect)
+
+
+void
+BColorControl::Draw(BRect updateRect)
 {
 	if (fTState != NULL)
 		return;
 
-	if (fBitmap)
-	{
+	if (fBitmap) {
 		if (!fBitmap->Lock())
 			return;
 
-		if (fOffscreenView->Bounds().Intersects(updateRect))
-		{
+		if (fOffscreenView->Bounds().Intersects(updateRect)) {
 			UpdateOffscreen(updateRect);
 			DrawBitmap(fBitmap, updateRect.LeftTop());
 		}
 
 		fBitmap->Unlock();
-	}
-	else if (Bounds().Intersects(updateRect))
+	} else if (Bounds().Intersects(updateRect))
 		DrawColorArea(this, updateRect);
 }
-//------------------------------------------------------------------------------
-void BColorControl::MouseDown(BPoint point)
+
+
+void
+BColorControl::MouseDown(BPoint point)
 {
 	rgb_color color = ValueAsColor();
 
@@ -212,24 +223,16 @@ void BColorControl::MouseDown(BPoint point)
 	uint8 shade = (unsigned char)max_c(0,
 		min_c((point.x - 2) * 255 / (rect.Width() - 4.0f), 255));
 
-	if (point.y - 2 < rampsize)
-	{
+	if (point.y - 2 < rampsize) {
 		color.red = color.green = color.blue = shade;
 		fFocusedComponent = 1;
-	}
-	else if (point.y - 2 < (rampsize * 2))
-	{
+	} else if (point.y - 2 < (rampsize * 2)) {
 		color.red = shade;
 		fFocusedComponent = 2;
-	}
-	else if (point.y - 2 < (rampsize * 3))
-	{
+	} else if (point.y - 2 < (rampsize * 3)) {
 		color.green = shade;
 		fFocusedComponent = 3;
-	}
-//	else if (point.y - 2 < rect.bottom)
-	else
-	{
+	} else {
 		color.blue = shade;
 		fFocusedComponent = 4;
 	}
@@ -240,25 +243,32 @@ void BColorControl::MouseDown(BPoint point)
 	MakeFocus();
 	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
 }
-//------------------------------------------------------------------------------
-void BColorControl::KeyDown(const char *bytes, int32 numBytes)
+
+
+void
+BColorControl::KeyDown(const char *bytes, int32 numBytes)
 {
 }
-//------------------------------------------------------------------------------
-void BColorControl::SetCellSize(float cellSide)
+
+
+void
+BColorControl::SetCellSize(float cellSide)
 {
 	fCellSize = cellSide;
 }
-//------------------------------------------------------------------------------
-float BColorControl::CellSize() const
+
+
+float
+BColorControl::CellSize() const
 {
 	return fCellSize;
 }
-//------------------------------------------------------------------------------
-void BColorControl::SetLayout(color_control_layout layout)
+
+
+void
+BColorControl::SetLayout(color_control_layout layout)
 {
-	switch (layout)
-	{
+	switch (layout) {
 		case B_CELLS_4x64:
 			fColumns = 4;
 			fRows = 64;
@@ -281,8 +291,10 @@ void BColorControl::SetLayout(color_control_layout layout)
 			break;
 	}
 }
-//------------------------------------------------------------------------------
-color_control_layout BColorControl::Layout() const
+
+
+color_control_layout
+BColorControl::Layout() const
 {
 	if (fColumns == 4 &&fRows == 64)
 		return B_CELLS_4x64;
@@ -297,119 +309,153 @@ color_control_layout BColorControl::Layout() const
 
 	return B_CELLS_32x8;
 }
-//------------------------------------------------------------------------------
-void BColorControl::WindowActivated(bool state)
+
+
+void
+BColorControl::WindowActivated(bool state)
 {
 	BControl::WindowActivated(state);
 }
-//------------------------------------------------------------------------------
-void BColorControl::MouseUp(BPoint point)
+
+
+void
+BColorControl::MouseUp(BPoint point)
 {
 	fFocusedComponent = 0;
 }
-//------------------------------------------------------------------------------
-void BColorControl::MouseMoved(BPoint point, uint32 transit,
-							   const BMessage *message)
+
+
+void
+BColorControl::MouseMoved(BPoint point, uint32 transit,
+	const BMessage *message)
 {
-	if (fFocusedComponent != 0)
-	{
-		rgb_color color = ValueAsColor();
+	if (fFocusedComponent == 0)
+		return;
 
-		BRect rect(0.0f, 0.0f, fColumns * fCellSize, fRows * fCellSize);
+	rgb_color color = ValueAsColor();
 
-		uint8 shade = (unsigned char)max_c(0,
-		min_c((point.x - 2) * 255 / (rect.Width() - 4.0f), 255));
+	BRect rect(0.0f, 0.0f, fColumns * fCellSize, fRows * fCellSize);
 
-		switch (fFocusedComponent)
-		{
-			case 1:
-				color.red = color.green = color.blue = shade;
-				break;
-			case 2:
-				color.red = shade;
-				break;
-			case 3:
-				color.green = shade;
-				break;
-			case 4:
-				color.blue = shade;
-				break;
-		}
+	uint8 shade = (unsigned char)max_c(0,
+	min_c((point.x - 2) * 255 / (rect.Width() - 4.0f), 255));
 
-		SetValue(color);
-		Invoke();
+	switch (fFocusedComponent) {
+		case 1:
+			color.red = color.green = color.blue = shade;
+			break;
+		case 2:
+			color.red = shade;
+			break;
+		case 3:
+			color.green = shade;
+			break;
+		case 4:
+			color.blue = shade;
+			break;
 	}
+
+	SetValue(color);
+	Invoke();
 }
-//------------------------------------------------------------------------------
-void BColorControl::DetachedFromWindow()
+
+
+void
+BColorControl::DetachedFromWindow()
 {
 	BControl::DetachedFromWindow();
 }
-//------------------------------------------------------------------------------
-void BColorControl::GetPreferredSize(float *width, float *height)
+
+
+void
+BColorControl::GetPreferredSize(float *_width, float *_height)
 {
-	*width = fColumns * fCellSize + 4.0f + 88.0f;
-	*height = fRows * fCellSize + 4.0f;
+	if (_width)
+		*_width = fColumns * fCellSize + 4.0f + fRedText->Bounds().Width();
+
+	if (_height)
+		*_height = fBlueText->Frame().bottom;
 }
-//------------------------------------------------------------------------------
-void BColorControl::ResizeToPreferred()
+
+
+void
+BColorControl::ResizeToPreferred()
 {
 	BControl::ResizeToPreferred();
 }
-//------------------------------------------------------------------------------
-status_t BColorControl::Invoke(BMessage *msg)
+
+
+status_t
+BColorControl::Invoke(BMessage *msg)
 {
 	return BControl::Invoke(msg);
 }
-//------------------------------------------------------------------------------
-void BColorControl::FrameMoved(BPoint new_position)
+
+
+void
+BColorControl::FrameMoved(BPoint new_position)
 {
 	BControl::FrameMoved(new_position);
 }
-//------------------------------------------------------------------------------
-void BColorControl::FrameResized(float new_width, float new_height)
+
+
+void
+BColorControl::FrameResized(float new_width, float new_height)
 {
 	BControl::FrameResized(new_width, new_height);
 }
-//------------------------------------------------------------------------------
-BHandler *BColorControl::ResolveSpecifier(BMessage *msg, int32 index,
-										  BMessage *specifier, int32 form,
-										  const char *property)
+
+
+BHandler *
+BColorControl::ResolveSpecifier(BMessage *msg, int32 index,
+	BMessage *specifier, int32 form, const char *property)
 {
 	return BControl::ResolveSpecifier(msg, index, specifier, form, property);
 }
-//------------------------------------------------------------------------------
-status_t BColorControl::GetSupportedSuites(BMessage *data)
+
+
+status_t
+BColorControl::GetSupportedSuites(BMessage *data)
 {
 	return BControl::GetSupportedSuites(data);
 }
-//------------------------------------------------------------------------------
-void BColorControl::MakeFocus(bool state)
+
+
+void
+BColorControl::MakeFocus(bool state)
 {
 	BControl::MakeFocus(state);
 }
-//------------------------------------------------------------------------------
-void BColorControl::AllAttached()
+
+
+void
+BColorControl::AllAttached()
 {
 	BControl::AllAttached();
 }
-//------------------------------------------------------------------------------
-void BColorControl::AllDetached()
+
+
+void
+BColorControl::AllDetached()
 {
 	BControl::AllDetached();
 }
-//------------------------------------------------------------------------------
-status_t BColorControl::Perform(perform_code d, void *arg)
+
+
+status_t
+BColorControl::Perform(perform_code d, void *arg)
 {
 	return B_ERROR;
 }
-//------------------------------------------------------------------------------
+
+
 void BColorControl::_ReservedColorControl1() {}
 void BColorControl::_ReservedColorControl2() {}
 void BColorControl::_ReservedColorControl3() {}
 void BColorControl::_ReservedColorControl4() {}
-//------------------------------------------------------------------------------
-BColorControl &BColorControl::operator=(const BColorControl &)
+
+
+BColorControl &
+BColorControl::operator=(const BColorControl &)
 {
 	return *this;
 }
@@ -453,8 +499,7 @@ BColorControl::UpdateOffscreen()
 void
 BColorControl::UpdateOffscreen(BRect update)
 {
-	if (fBitmap->Lock())
-	{
+	if (fBitmap->Lock()) {
 		update = update & fOffscreenView->Bounds();
 		fOffscreenView->FillRect(update);
 		DrawColorArea(fOffscreenView, update);
@@ -547,17 +592,18 @@ BColorControl::DrawColorArea(BView *target, BRect update)
 
 	target->ConstrainClippingRegion(NULL);
 }
-//------------------------------------------------------------------------------
-void BColorControl::ColorRamp(BRect r, BRect where, BView *target, rgb_color c,
-							  int16 flag, bool focused)
+
+
+void
+BColorControl::ColorRamp(BRect r, BRect where, BView *target, rgb_color c,
+	int16 flag, bool focused)
 {
 	rgb_color color = {255, 255, 255, 255};
 	float width = where.Width()+1;
 
 	target->BeginLineArray(width);
 
-	for (float i = 0; i <= width; i++)
-	{
+	for (float i = 0; i <= width; i++) {
 		color.red = (uint8)(i * c.red / width);
 		color.green = (uint8)(i * c.green / width);
 		color.blue = (uint8)(i * c.blue / width);
@@ -569,28 +615,35 @@ void BColorControl::ColorRamp(BRect r, BRect where, BView *target, rgb_color c,
 
 	target->EndLineArray();
 }
-//------------------------------------------------------------------------------
-void BColorControl::KbAdjustColor(uint32 key)
+
+
+void
+BColorControl::KbAdjustColor(uint32 key)
 {
 }
-//------------------------------------------------------------------------------
-bool BColorControl::key_down32(uint32 key)
+
+
+bool
+BColorControl::key_down32(uint32 key)
 {
 	return false;
 }
-//------------------------------------------------------------------------------
-bool BColorControl::key_down8(uint32 key)
+
+
+bool
+BColorControl::key_down8(uint32 key)
 {
 	return false;
 }
-//------------------------------------------------------------------------------
-BRect BColorControl::CalcFrame(BPoint start, color_control_layout layout,
-							   int32 size)
+
+
+BRect
+BColorControl::CalcFrame(BPoint start, color_control_layout layout,
+	int32 size)
 {
 	BRect rect;
 
-	switch (layout)
-	{
+	switch (layout) {
 		case B_CELLS_4x64:
 			rect.Set(0.0f, 0.0f, 4 * size + 4.0f,
 				64 * size + 4.0f);
@@ -615,6 +668,8 @@ BRect BColorControl::CalcFrame(BPoint start, color_control_layout layout,
 
 	return rect;
 }
+
+
 void
 BColorControl::InitData(color_control_layout layout, float size,
 	bool useOffscreen, BMessage *data)
