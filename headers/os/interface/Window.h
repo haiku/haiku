@@ -259,6 +259,7 @@ public:
 // Private or reserved ---------------------------------------------------------
 private:
 	typedef BLooper inherited;
+	class Shortcut;
 
 	friend class BApplication;
 	friend class BBitmap;
@@ -287,7 +288,7 @@ private:
 			BWindow		&operator=(BWindow&);
 
 						BWindow(BRect frame, int32 bitmapToken);
-			void		InitData(BRect frame, const char* title,
+			void		_InitData(BRect frame, const char* title,
 								window_look look, window_feel feel,
 								uint32 flags, uint32 workspace,
 								int32 bitmapToken = -1);
@@ -307,9 +308,9 @@ private:
 									drawing_mode dragMode,
 									BHandler* reply_to);
 	*/
-			void		prepareView(BView* aView);						// changed from view_builder(BView* a_view);
-			void		attachView(BView* aView);						// changed from attach_builder(BView* a_view);
-			void		detachView(BView* aView);						// changed from detach_builder(BView* a_view);
+			void		prepareView(BView* aView);
+			void		attachView(BView* aView);
+			void		detachView(BView* aView);
 			//int32		get_server_token() const;
 			BMessage	*extract_drop(BMessage* an_event, BHandler* *target);
 			//void		movesize(uint32 opcode, float h, float v);
@@ -334,16 +335,16 @@ private:
 			//void		post_message(BMessage* message);
 			//void		SetLocalTitle(const char* new_title);
 			//void		enable_pulsing(bool enable);
-			BHandler	*determine_target(BMessage* msg, BHandler* target, bool pref);
+			BHandler	*_DetermineTarget(BMessage* message, BHandler* target);
 			//void		kb_navigate();
 			//void		navigate_to_next(int32 direction, bool group = false);
 			//void		set_focus(BView* focus, bool notify_input_server);		// what does notify_input_server mean??? why???
 			bool		InUpdate();
 			void		DequeueAll();
 			//bool		find_token_and_handler(BMessage* msg, int32* token,	BHandler* *handler);
-			window_type	composeType(window_look look,						// changed from: compose_type(...)
+			window_type	_ComposeType(window_look look,
 									 window_feel feel) const;
-			void		decomposeType(window_type type,						// changed from: decompose_type(...)
+			void		_DecomposeType(window_type type,
 									   window_look* look,
 									   window_feel* feel) const;
 
@@ -353,7 +354,7 @@ private:
 			void		BuildTopView();
 			void		setFocus(BView *focusView, bool notifyIputServer = false);
 
-			int32		findShortcut(uint32 key, uint32 modifiers);
+			Shortcut*	_FindShortcut(uint32 key, uint32 modifiers);
 			bool		findHandler(BView* start, BHandler* handler);
 			BView*		findView(BView* aView, const char* viewName) const;
 			BView*		findView(BView* aView, BPoint point) const;
@@ -386,13 +387,13 @@ private:
 	uint32			fFlags;
 
 	uint32			_unused0[2];
-	BView			*top_view;
+	BView			*fTopView;
 	BView			*fFocus;
 	BView			*fLastMouseMovedView;
 	uint32			_unused1;
 	BMenuBar		*fKeyMenuBar;
 	BButton			*fDefaultButton;
-	BList			accelList;
+	BList			fShortcuts;
 	int32			fTopViewToken;
 	bool			fPulseEnabled;
 	bool			fViewsNeedPulse;			// not yet used

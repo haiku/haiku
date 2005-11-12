@@ -33,7 +33,6 @@
 #include <ServerProtocol.h>
 #include <TokenSpace.h>
 #include <MessageUtils.h>
-#include <WindowAux.h>
 
 #include <ctype.h>
 #include <stdio.h>
@@ -47,6 +46,32 @@
 #else
 #	define STRACE(x) ;
 #endif
+
+
+class BWindow::Shortcut {
+	public:
+		Shortcut(uint32 key, uint32 modifiers, BMenuItem* item);
+		Shortcut(uint32 key, uint32 modifiers, BMessage* message, BHandler* target);
+		~Shortcut();
+
+		bool Matches(uint32 key, uint32 modifiers) const;
+
+		BMenuItem* MenuItem() const { return fMenuItem; }
+		BMessage* Message() const { return fMessage; }
+		BHandler* Target() const { return fTarget; }
+
+		static uint32 AllowedModifiers();
+		static uint32 PrepareKey(uint32 key);
+		static uint32 PrepareModifiers(uint32 modifiers);
+
+	private:
+		uint32		fKey;
+		uint32		fModifiers;
+		BMenuItem*	fMenuItem;
+		BMessage*	fMessage;
+		BHandler*	fTarget;
+};
+
 
 using BPrivate::gDefaultTokens;
 
@@ -115,19 +140,81 @@ _set_menu_sem_(BWindow *window, sem_id sem)
 //	#pragma mark -
 
 
+BWindow::Shortcut::Shortcut(uint32 key, uint32 modifiers, BMenuItem* item)
+	:
+	fKey(PrepareKey(key)),
+	fModifiers(PrepareModifiers(modifiers)),
+	fMenuItem(item),
+	fMessage(NULL),
+	fTarget(NULL)
+{
+}
+
+
+BWindow::Shortcut::Shortcut(uint32 key, uint32 modifiers, BMessage* message,
+	BHandler* target)
+	:
+	fKey(PrepareKey(key)),
+	fModifiers(PrepareModifiers(modifiers)),
+	fMenuItem(NULL),
+	fMessage(message),
+	fTarget(target)
+{
+}
+
+
+BWindow::Shortcut::~Shortcut()
+{
+	// we own the message, if any
+	delete fMessage;
+}
+
+
+bool
+BWindow::Shortcut::Matches(uint32 key, uint32 modifiers) const
+{
+	return fKey == key && fModifiers == modifiers;
+}
+
+
+/*static*/
+uint32
+BWindow::Shortcut::AllowedModifiers()
+{
+	return B_COMMAND_KEY | B_OPTION_KEY | B_SHIFT_KEY
+		| B_CONTROL_KEY | B_MENU_KEY;
+}
+
+
+/*static*/
+uint32
+BWindow::Shortcut::PrepareModifiers(uint32 modifiers)
+{
+	return (modifiers & AllowedModifiers()) | B_COMMAND_KEY;
+}
+
+
+/*static*/
+uint32
+BWindow::Shortcut::PrepareKey(uint32 key)
+{
+	return tolower(key);
+		// TODO: support unicode and/or more intelligent key mapping
+}
+
+
+//	#pragma mark -
+
+
 BWindow::BWindow(BRect frame, const char* title, window_type type,
 	uint32 flags, uint32 workspace)
 	: BLooper(title)
 {
-	#ifdef DEBUG_WIN
-		printf("BWindow::BWindow()\n");
-	#endif
 	window_look look;
 	window_feel feel;
+	_DecomposeType(type, &look, &feel);
 
-	decomposeType(type, &look, &feel);
-
-	InitData(frame, title, look, feel, flags, workspace);
+	_InitData(frame, title, look, feel, flags, workspace);
 }
 
 
@@ -135,7 +222,7 @@ BWindow::BWindow(BRect frame, const char* title, window_look look, window_feel f
 	uint32 flags, uint32 workspace)
 	: BLooper(title)
 {
-	InitData(frame, title, look, feel, flags, workspace);
+	_InitData(frame, title, look, feel, flags, workspace);
 }
 
 
@@ -161,10 +248,10 @@ BWindow::BWindow(BMessage* data)
 
 	uint32 type;
 	if (data->FindInt32("_type", (int32*)&type) == B_OK)
-		decomposeType((window_type)type, &fLook, &fFeel);
+		_DecomposeType((window_type)type, &fLook, &fFeel);
 
 		// connect to app_server and initialize data
-	InitData(fFrame, title, look, feel, fFlags, workspaces);
+	_InitData(fFrame, title, look, feel, fFlags, workspaces);
 
 	if (data->FindFloat("_zoom", 0, &fMaxZoomWidth) == B_OK
 		&& data->FindFloat("_zoom", 1, &fMaxZoomHeight) == B_OK)
@@ -195,21 +282,21 @@ BWindow::BWindow(BRect frame, int32 bitmapToken)
 	: BLooper("offscreen bitmap")
 {
 	// TODO: Implement for real
-	decomposeType(B_UNTYPED_WINDOW, &fLook, &fFeel);
-	InitData(frame, "offscreen", fLook, fFeel, 0, 0, bitmapToken);
+	_DecomposeType(B_UNTYPED_WINDOW, &fLook, &fFeel);
+	_InitData(frame, "offscreen", fLook, fFeel, 0, 0, bitmapToken);
 }
 
 
 BWindow::~BWindow()
 {
-	// the following lines, remove all existing shortcuts and delete accelList
-	int32 noOfItems = accelList.CountItems();
-	for (int index = noOfItems-1; index >= 0; index--) {
-		delete (_BCmdKey*)accelList.ItemAt(index);
+	// remove all existing shortcuts
+	int32 noOfItems = fShortcuts.CountItems();
+	for (int32 index = noOfItems - 1; index >= 0; index--) {
+		delete (Shortcut *)fShortcuts.ItemAt(index);
 	}
 
 	// TODO: release other dynamically-allocated objects
-	
+
 	// Deleting this semaphore will tell open menus to quit.
 	if (fMenuSem > 0)
 		delete_sem(fMenuSem);
@@ -252,7 +339,7 @@ BWindow::Archive(BMessage* data, bool deep) const
 		data->AddInt32("_flags", fFlags);
 	data->AddInt32("_wspace", (uint32)Workspaces());
 
-	if (!composeType(fLook, fFeel))
+	if (!_ComposeType(fLook, fFeel))
 		data->AddInt32("_type", (uint32)Type());
 
 	if (fMaxZoomWidth != 32768.0 || fMaxZoomHeight != 32768.0) {
@@ -319,28 +406,28 @@ BWindow::Quit()
 void
 BWindow::AddChild(BView *child, BView *before)
 {
-	top_view->AddChild(child, before);
+	fTopView->AddChild(child, before);
 }
 
 
 bool
 BWindow::RemoveChild(BView *child)
 {
-	return top_view->RemoveChild(child);
+	return fTopView->RemoveChild(child);
 }
 
 
 int32
 BWindow::CountChildren() const
 {
-	return top_view->CountChildren();
+	return fTopView->CountChildren();
 }
 
 
 BView *
 BWindow::ChildAt(int32 index) const
 {
-	return top_view->ChildAt(index);
+	return fTopView->ChildAt(index);
 }
 
 
@@ -715,12 +802,12 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		case B_UNMAPPED_KEY_DOWN:
 		case B_UNMAPPED_KEY_UP:
 		case B_MODIFIERS_CHANGED:
-			if (target != this && target != top_view)
+			if (target != this && target != fTopView)
 				target->MessageReceived(msg);
 			break;
 
 		case B_MOUSE_WHEEL_CHANGED:
-			if (target != this && target != top_view)
+			if (target != this && target != fTopView)
 				target->MessageReceived(msg);
 			break;
 
@@ -735,7 +822,7 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			msg->FindInt32("buttons", (int32 *)&buttons);
 			msg->FindInt32("clicks", &clicks);
 
-			if (target && target != this && target != top_view) {
+			if (target && target != this && target != fTopView) {
 				if (BView *view = dynamic_cast<BView *>(target)) {
 					view->ConvertFromScreen(&where);
 					view->MouseDown(where);
@@ -752,7 +839,7 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			msg->FindPoint("where", &where);
 			msg->FindInt32("modifiers", (int32 *)&modifiers);
 
-			if (target && target != this && target != top_view) {
+			if (target && target != this && target != fTopView) {
 				if (BView *view = dynamic_cast<BView *>(target)) {
 					view->ConvertFromScreen(&where);
 					view->MouseUp(where);
@@ -770,7 +857,7 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			msg->FindPoint("where", &where);
 			msg->FindInt32("buttons", (int32 *)&buttons);
 			msg->FindInt32("transit", (int32 *)&transit);
-			if (target && target != this && target != top_view) {
+			if (target && target != this && target != fTopView) {
 				if (BView *view = dynamic_cast<BView *>(target)) {
 					if (fLastMouseMovedView != view) {
 						if (fLastMouseMovedView) {
@@ -790,7 +877,7 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 
 		case B_PULSE:
 			if (fPulseEnabled) {
-				top_view->_Pulse();
+				fTopView->_Pulse();
 				fLink->Flush();
 			}
 			break;
@@ -809,7 +896,7 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			msg->FindInt32("_token", &token);
 
 			fLink->StartMessage(AS_BEGIN_UPDATE);
-			DoUpdate(top_view, updateRect);
+			DoUpdate(fTopView, updateRect);
 			fLink->StartMessage(AS_END_UPDATE);
 			fLink->Flush();
 			break;
@@ -834,7 +921,7 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 					msg->FindPoint("where", i, &frameLeftTop);
 					msg->FindFloat("width", i, &width);
 					msg->FindFloat("height", i, &height);
-					if ((view = findView(top_view, token))) {
+					if ((view = findView(fTopView, token))) {
 						// update the views offset in parent
 						if (view->LeftTop() != frameLeftTop) {
 //printf("updating position (%.1f, %.1f): %s\n", frameLeftTop.x, frameLeftTop.y, view->Name());
@@ -1112,54 +1199,44 @@ BWindow::PulseRate() const
 void
 BWindow::AddShortcut(uint32 key, uint32 modifiers, BMenuItem *item)
 {
-	if (item->Message())
-		AddShortcut(key, modifiers, new BMessage(*item->Message()), this);
-}
+	Shortcut* shortcut = new Shortcut(key, modifiers, item);
 
-
-void
-BWindow::AddShortcut(uint32 key, uint32 modifiers, BMessage *msg)
-{
-	AddShortcut(key, modifiers, msg, this);
-}
-
-
-void
-BWindow::AddShortcut(uint32 key, uint32 modifiers, BMessage *msg, BHandler *target)
-{
-	// NOTE: I'm not sure if it is OK to use 'key'
-
-	if (msg == NULL)
-		return;
-
-	int64 when = real_time_clock_usecs();
-	msg->AddInt64("when", when);
-
-	// TODO: support unicode here
-	key = tolower(key);
-	modifiers = modifiers | B_COMMAND_KEY;
-
-	_BCmdKey *cmdKey = new _BCmdKey(key, modifiers, msg);
-
-	if (target)
-		cmdKey->targetToken	= _get_object_token_(target);
-
-	// removes the shortcut from accelList if it exists!
+	// removes the shortcut if it already exists!
 	RemoveShortcut(key, modifiers);
 
-	accelList.AddItem((void*)cmdKey);
+	fShortcuts.AddItem(shortcut);
+}
+
+
+void
+BWindow::AddShortcut(uint32 key, uint32 modifiers, BMessage *message)
+{
+	AddShortcut(key, modifiers, message, this);
+}
+
+
+void
+BWindow::AddShortcut(uint32 key, uint32 modifiers, BMessage *message, BHandler *target)
+{
+	if (message == NULL)
+		return;
+
+	Shortcut* shortcut = new Shortcut(key, modifiers, message, target);
+
+	// removes the shortcut if it already exists!
+	RemoveShortcut(key, modifiers);
+
+	fShortcuts.AddItem(shortcut);
 }
 
 
 void
 BWindow::RemoveShortcut(uint32 key, uint32 modifiers)
 {
-	int32 index = findShortcut(key, modifiers | B_COMMAND_KEY);
-	if (index >=0) {
-		_BCmdKey *cmdKey = (_BCmdKey *)accelList.ItemAt(index);
-
-		accelList.RemoveItem(index);
-		delete cmdKey;
+	Shortcut* shortcut = _FindShortcut(key, modifiers);
+	if (shortcut != NULL) {
+		fShortcuts.RemoveItem(shortcut);
+		delete shortcut;
 	}
 }
 
@@ -1252,7 +1329,7 @@ BView *
 BWindow::FindView(const char *viewName) const
 {
 	// TODO: What about locking?!?
-	return findView(top_view, viewName);
+	return findView(fTopView, viewName);
 }
 
 
@@ -1260,13 +1337,12 @@ BView *
 BWindow::FindView(BPoint point) const
 {
 	// TODO: What about locking?!?
-	return findView(top_view, point);
+	return findView(fTopView, point);
 }
 
 
 BView *BWindow::CurrentFocus() const
 {
-	// TODO: What about locking?!?
 	return fFocus;
 }
 
@@ -1521,7 +1597,7 @@ BWindow::SetType(window_type type)
 {
 	window_look look;
 	window_feel feel;
-	decomposeType(type, &look, &feel);
+	_DecomposeType(type, &look, &feel);
 
 	status_t status = SetLook(look);
 	if (status == B_OK)
@@ -1534,7 +1610,7 @@ BWindow::SetType(window_type type)
 window_type
 BWindow::Type() const
 {
-	return composeType(fLook, fFeel);
+	return _ComposeType(fLook, fFeel);
 }
 
 
@@ -1906,7 +1982,7 @@ BWindow::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 	if (propertyInfo.FindMatch(msg, index, specifier, what, property) >= 0) {
 		if (!strcmp(property, "View")) {
 			// we will NOT pop the current specifier
-			return top_view;
+			return fTopView;
 		} else if (!strcmp(property, "MenuBar")) {
 			if (fKeyMenuBar) {
 				msg->PopSpecifier();
@@ -1930,7 +2006,7 @@ BWindow::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 
 
 void 
-BWindow::InitData(BRect frame, const char* title, window_look look,
+BWindow::_InitData(BRect frame, const char* title, window_look look,
 	window_feel feel, uint32 flags,	uint32 workspace, int32 bitmapToken)
 {
 	STRACE(("BWindow::InitData()\n"));
@@ -1955,18 +2031,21 @@ BWindow::InitData(BRect frame, const char* title, window_look look,
 	fActive = false;
 	fShowLevel = 1;
 
-	top_view = NULL;
+	fTopView = NULL;
 	fFocus = NULL;
 	fLastMouseMovedView	= NULL;
 	fKeyMenuBar = NULL;
 	fDefaultButton = NULL;
 
+	// Shortcut 'Q' is handled in _HandleKeyDown() directly, as its message
+	// get sent to the application, and not one of our handlers
+	if ((fFlags & B_NOT_CLOSABLE) == 0)
+		AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
+
 	AddShortcut('X', B_COMMAND_KEY, new BMessage(B_CUT), NULL);
 	AddShortcut('C', B_COMMAND_KEY, new BMessage(B_COPY), NULL);
 	AddShortcut('V', B_COMMAND_KEY, new BMessage(B_PASTE), NULL);
 	AddShortcut('A', B_COMMAND_KEY, new BMessage(B_SELECT_ALL), NULL);
-	if ((fFlags & B_NOT_CLOSABLE) == 0)
-		AddShortcut('W', B_COMMAND_KEY, new BMessage(B_CLOSE_REQUESTED));
 
 	fPulseEnabled = false;
 	fPulseRate = 0;
@@ -2066,7 +2145,7 @@ BWindow::InitData(BRect frame, const char* title, window_look look,
 	STRACE(("Server says that our send port is %ld\n", sendPort));
 	STRACE(("Window locked?: %s\n", IsLocked() ? "True" : "False"));
 
-	// build and register top_view with app_server
+	// build and register fTopView with app_server
 	BuildTopView();
 }
 
@@ -2089,7 +2168,7 @@ BWindow::DequeueAll()
 
 
 // TODO: This here is a nearly full code duplication to BLooper::task_loop
-// but with one little difference: It uses the determine_target function
+// but with one little difference: It uses the _DetermineTarget() method
 // to tell what the later target of a message will be, if no explicit target
 // is supplied. This is important because we need to call the right targets
 // MessageFilter. For B_KEY_DOWN messages for example, not the BWindow but the
@@ -2152,26 +2231,20 @@ BWindow::task_looper()
 				//	Use BMessage friend functions to determine if we are using the
 				//	preferred handler, or if a target has been specified
 				BHandler* handler;
-				if (_use_preferred_target_(fLastMessage)) {
-					handler = fPreferred;
+				bool usePreferred = _use_preferred_target_(fLastMessage);
+				if (usePreferred) {
+					handler = PreferredHandler();
 				} else {
-					/**
-						@note	Here is where all the token stuff starts to
-								make sense.  How, exactly, do we determine
-								what the target BHandler is?  If we look at
-								BMessage, we see an int32 field, fTarget.
-								Amazingly, we happen to have a global mapping
-								of BHandler pointers to int32s!
-					 */
 					gDefaultTokens.GetToken(_get_message_target_(fLastMessage),
 						B_HANDLER_TOKEN, (void **)&handler);
 				}
 
-				if (!handler) {
-					handler = determine_target(fLastMessage, handler, false);
-					if (!handler)
-						handler = this;
-				}
+				// if a target was given, and we should not use the preferred
+				// handler, we can just use that one
+				if (handler == NULL || usePreferred)
+					handler = _DetermineTarget(fLastMessage, handler);
+				if (handler == NULL)
+					handler = this;
 
 				//	Is this a scripting message? (BMessage::HasSpecifiers())
 				if (fLastMessage->HasSpecifiers()) {
@@ -2182,7 +2255,7 @@ BWindow::task_looper()
 				}
 
 				if (handler) {
-					//	Do filtering
+					//	Do filtering and dispatch message
 					handler = top_level_filter(fLastMessage, handler);
 					if (handler && handler->Looper() == this)
 						DispatchMessage(fLastMessage, handler);
@@ -2206,8 +2279,7 @@ BWindow::task_looper()
 
 
 window_type
-BWindow::composeType(window_look look,
-	window_feel feel) const
+BWindow::_ComposeType(window_look look, window_feel feel) const
 {
 	switch (feel) {
 		case B_NORMAL_WINDOW_FEEL:
@@ -2245,52 +2317,36 @@ BWindow::composeType(window_look look,
 
 
 void
-BWindow::decomposeType(window_type type, window_look *look,
-	window_feel *feel) const
+BWindow::_DecomposeType(window_type type, window_look *_look,
+	window_feel *_feel) const
 {
 	switch (type) {
-		case B_TITLED_WINDOW:
-		{
-			*look = B_TITLED_WINDOW_LOOK;
-			*feel = B_NORMAL_WINDOW_FEEL;
-			break;
-		}
 		case B_DOCUMENT_WINDOW:
-		{
-			*look = B_DOCUMENT_WINDOW_LOOK;
-			*feel = B_NORMAL_WINDOW_FEEL;
+			*_look = B_DOCUMENT_WINDOW_LOOK;
+			*_feel = B_NORMAL_WINDOW_FEEL;
 			break;
-		}
+
 		case B_MODAL_WINDOW:
-		{
-			*look = B_MODAL_WINDOW_LOOK;
-			*feel = B_MODAL_APP_WINDOW_FEEL;
+			*_look = B_MODAL_WINDOW_LOOK;
+			*_feel = B_MODAL_APP_WINDOW_FEEL;
 			break;
-		}
+
 		case B_FLOATING_WINDOW:
-		{
-			*look = B_FLOATING_WINDOW_LOOK;
-			*feel = B_FLOATING_APP_WINDOW_FEEL;
+			*_look = B_FLOATING_WINDOW_LOOK;
+			*_feel = B_FLOATING_APP_WINDOW_FEEL;
 			break;
-		}
+
 		case B_BORDERED_WINDOW:
-		{
-			*look = B_BORDERED_WINDOW_LOOK;
-			*feel = B_NORMAL_WINDOW_FEEL;
+			*_look = B_BORDERED_WINDOW_LOOK;
+			*_feel = B_NORMAL_WINDOW_FEEL;
 			break;
-		}
+
+		case B_TITLED_WINDOW:
 		case B_UNTYPED_WINDOW:
-		{
-			*look = B_TITLED_WINDOW_LOOK;
-			*feel = B_NORMAL_WINDOW_FEEL;
-			break;
-		}
 		default:
-		{
-			*look = B_TITLED_WINDOW_LOOK;
-			*feel = B_NORMAL_WINDOW_FEEL;
+			*_look = B_TITLED_WINDOW_LOOK;
+			*_feel = B_NORMAL_WINDOW_FEEL;
 			break;
-		}
 	}
 }
 
@@ -2301,23 +2357,23 @@ BWindow::BuildTopView()
 	STRACE(("BuildTopView(): enter\n"));
 
 	BRect frame = fFrame.OffsetToCopy(B_ORIGIN);
-	top_view = new BView(frame, "top_view",
+	fTopView = new BView(frame, "fTopView",
 		B_FOLLOW_ALL, B_WILL_DRAW);
-	top_view->top_level_view = true;
+	fTopView->top_level_view = true;
 
 	//inhibit check_lock()
-	fLastViewToken = _get_object_token_(top_view);
+	fLastViewToken = _get_object_token_(fTopView);
 
-	// set top_view's owner, add it to window's eligible handler list
+	// set fTopView's owner, add it to window's eligible handler list
 	// and also set its next handler to be this window.
 
-	STRACE(("Calling setowner top_view = %p this = %p.\n", 
-		top_view, this));
+	STRACE(("Calling setowner fTopView = %p this = %p.\n", 
+		fTopView, this));
 
-	top_view->_SetOwner(this);
+	fTopView->_SetOwner(this);
 
-	//we can't use AddChild() because this is the top_view
-  	top_view->attachView(top_view);
+	//we can't use AddChild() because this is the fTopView
+  	fTopView->attachView(fTopView);
 
 	STRACE(("BuildTopView ended\n"));
 }
@@ -2370,49 +2426,52 @@ BWindow::handleActivation(bool active)
 
 	// recursively call hook function 'WindowActivated(bool)'
 	// for all views attached to this window.
-	top_view->_Activate(active);
+	fTopView->_Activate(active);
 }
 
 
+/*!
+	\brief Determines the target of a message received.
+*/
 BHandler *
-BWindow::determine_target(BMessage *msg, BHandler *target, bool pref)
+BWindow::_DetermineTarget(BMessage *message, BHandler *target)
 {
 	// TODO: this is mostly guessed; check for correctness.
-	// I think this function is used to determine if a BView will be
-	// the target of a message. This is used in the BLooper::task_loop
-	// to determine what BHandler will dispatch the message and what filters
-	// should be checked before doing so.
-	
-	switch (msg->what) {
+
+	switch (message->what) {
 		case B_KEY_DOWN:
 		case B_KEY_UP:
 		case B_UNMAPPED_KEY_DOWN:
 		case B_UNMAPPED_KEY_UP:
 		case B_MODIFIERS_CHANGED:
-		case B_MOUSE_WHEEL_CHANGED:
 			// these messages will be dispatched by the focus view later
-			return fFocus;
-		
+			return CurrentFocus();
+
 		case B_MOUSE_DOWN:
 		case B_MOUSE_UP:
 		case B_MOUSE_MOVED:
-			// TODO: find out how to determine the target for these
+		case B_MOUSE_WHEEL_CHANGED:
+			// TODO: the app_server should tell us which view is the target
 			break;
-		
+
 		case B_PULSE:
 		case B_QUIT_REQUESTED:
 			// TODO: test wether R5 will let BView dispatch these messages
-			break;
+			return this;
 		
 		case B_VIEW_RESIZED:
-		case B_VIEW_MOVED: {
-			int32 token = B_NULL_TOKEN;
-			msg->FindInt32("_token", &token);
-			BView *view = findView(top_view, token);
+		case B_VIEW_MOVED:
+		{
+			int32 token;
+			if (message->FindInt32("_token", &token) != B_OK)
+				token = B_NULL_TOKEN;
+
+			BView *view = findView(fTopView, token);
 			if (view)
 				return view;
 			break;
 		}
+
 		default: 
 			break;
 	}
@@ -2446,57 +2505,44 @@ BWindow::_HandleKeyDown(char key, uint32 modifiers)
 	// Handle shortcuts
 	if ((modifiers & B_COMMAND_KEY) != 0) {
 		// Command+q has been pressed, so, we will quit
+		// the shortcut mechanism doesn't allow handlers outside the window
 		if (key == 'Q' || key == 'q') {
 			be_app->PostMessage(B_QUIT_REQUESTED);
 			return true;
 		}
 
-		// we only must consider temporary modifiers for the shortcuts
-		modifiers &= B_COMMAND_KEY | B_OPTION_KEY | B_SHIFT_KEY
-			| B_CONTROL_KEY | B_MENU_KEY;
-
-		int32 index;
-		if ((index = findShortcut(key, modifiers)) >= 0) {
-			_BCmdKey *cmdKey = (_BCmdKey*)accelList.ItemAt(index);
-
-			// TODO: using MessageReceived() here removes the possibility to filter the messages!
-
-			// we'll give the message to the focus view
-			if (cmdKey->targetToken == B_ANY_TOKEN) {
-				fFocus->MessageReceived(cmdKey->message);
-				return true;
+		Shortcut* shortcut = _FindShortcut(key, modifiers);
+		if (shortcut != NULL) {
+			// TODO: would be nice to move this functionality to
+			//	a Shortcut::Invoke() method - but since BMenu::InvokeItem()
+			//	(and BMenuItem::Invoke()) are private, I didn't want
+			//	to mess with them (BMenuItem::Invoke() is public in
+			//	Dano/Zeta, though, maybe we should just follow their
+			//	example)
+			if (shortcut->MenuItem() != NULL) {
+				BMenu* menu = shortcut->MenuItem()->Menu();
+				if (menu != NULL)
+					menu->InvokeItem(shortcut->MenuItem(), true);
 			} else {
-				BHandler *target = NULL;
-				int32 count = CountHandlers();
+				BHandler* target = shortcut->Target();
+				if (target == NULL)
+					target = CurrentFocus();
 
-				// ToDo: this looks wrong: why not just send a message to the
-				//	target? Only if the target is a handler of this looper we
-				//	can do what is done below.
+				BMessage* message = shortcut->Message();
+				if (message->ReplaceInt64("when", system_time()) != B_OK)
+					message->AddInt64("when", system_time());
 
-				// search for a match through BLooper's list of eligible handlers
-				for (int32 i = 0; i < count; i++) {
-					BHandler *handler = HandlerAt(i);
-
-					// do we have a match?
-					if (_get_object_token_(handler) == cmdKey->targetToken) {
-						// yes, we do.
-						target = handler;
-						break;
-					}
-				}
-
-				if (target)
-					target->MessageReceived(cmdKey->message);
-				else {
-					// if no handler was found, BWindow will handle the message
-					PostMessage(cmdKey->message);
-				}
+				PostMessage(message, target);
 			}
+
 			return true;
 		}
 	}
 
+	// TODO: convert keys to the encoding of the target view
+
 	// if <ENTER> is pressed and we have a default button
+	// TODO: what happens if we have a focus view? This code looks wrong
 	if (DefaultButton() && key == B_ENTER) {
 		const char *chars;
 		CurrentMessage()->FindString("bytes", &chars);
@@ -2543,21 +2589,22 @@ BWindow::ConvertToMessage(void *raw, int32 code)
 }
 
 
-int32
-BWindow::findShortcut(uint32 key, uint32 modifiers)
+BWindow::Shortcut *
+BWindow::_FindShortcut(uint32 key, uint32 modifiers)
 {
-	int32 count = accelList.CountItems();
-	// TODO: support unicode here
-	key = tolower(key);
+	int32 count = fShortcuts.CountItems();
+
+	key = Shortcut::PrepareKey(key);
+	modifiers = Shortcut::PrepareModifiers(modifiers);
 
 	for (int32 index = 0; index < count; index++) {
-		_BCmdKey *cmdKey = (_BCmdKey *)accelList.ItemAt(index);
+		Shortcut *shortcut = (Shortcut *)fShortcuts.ItemAt(index);
 
-		if (cmdKey->key == key && cmdKey->modifiers == modifiers)
-			return index;
+		if (shortcut->Matches(key, modifiers))
+			return shortcut;
 	}
 
-	return -1;
+	return NULL;
 }
 
 
@@ -2622,7 +2669,7 @@ BView *
 BWindow::_FindNextNavigable(BView *focus, uint32 flags)
 {
 	if (focus == NULL)
-		focus = top_view;
+		focus = fTopView;
 
 	BView *nextFocus = focus;
 
@@ -2636,7 +2683,7 @@ BWindow::_FindNextNavigable(BView *focus, uint32 flags)
 			while (!nextFocus->fNextSibling && nextFocus->fParent)
 				nextFocus = nextFocus->fParent;
 
-			if (nextFocus == top_view)
+			if (nextFocus == fTopView)
 				nextFocus = nextFocus->fFirstChild;
 			else
 				nextFocus = nextFocus->fNextSibling;
@@ -2669,7 +2716,7 @@ BWindow::_FindPreviousNavigable(BView *focus, uint32 flags)
 			while (!prevFocus->fPreviousSibling && prevFocus->fParent)
 				prevFocus = prevFocus->fParent;
 
-			if (prevFocus == top_view)
+			if (prevFocus == fTopView)
 				prevFocus = findLastChild(prevFocus);
 			else
 				prevFocus = prevFocus->fPreviousSibling;
@@ -2704,7 +2751,7 @@ void
 BWindow::drawAllViews(BView* aView)
 {
 	if (Lock()) {
-		top_view->Invalidate();
+		fTopView->Invalidate();
 		Unlock();
 	}
 	Sync();
@@ -2797,7 +2844,7 @@ BWindow::PrintToStream() const
 		Flags			= %lx\
 		send_port		= %ld\
 		receive_port	= %ld\
-		top_view name	= %s\
+		fTopView name	= %s\
 		focus view name	= %s\
 		lastMouseMoved	= %s\
 		fLink			= %p\
@@ -2812,13 +2859,13 @@ BWindow::PrintToStream() const
 		fFlags,
 		fLink->SenderPort(),
 		fLink->ReceiverPort(),
-		top_view != NULL ? top_view->Name() : "NULL",
+		fTopView != NULL ? fTopView->Name() : "NULL",
 		fFocus != NULL ? fFocus->Name() : "NULL",
 		fLastMouseMovedView != NULL ? fLastMouseMovedView->Name() : "NULL",
 		fLink,
 		fKeyMenuBar != NULL ? fKeyMenuBar->Name() : "NULL",
 		fDefaultButton != NULL ? fDefaultButton->Name() : "NULL",
-		accelList.CountItems());
+		fShortcuts.CountItems());
 /*
 	for( int32 i=0; i<accelList.CountItems(); i++){
 		_BCmdKey	*key = (_BCmdKey*)accelList.ItemAt(i);
