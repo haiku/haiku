@@ -1736,6 +1736,9 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			}
 			
 			// TODO: how should AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT sync with the client?
+			// It Doesn't have to. Sync means: force a sync of the view/link, so that
+			// the bitmap is already drawn when the "BView::DrawBitmap()" call returns.
+			// If this is ever possible.
 			break;
 		}
 		case AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT:
@@ -2179,15 +2182,20 @@ ServerWindow::HandleDirectConnection(int bufferState, int driverState)
 	// Releasing this sem causes the client to call BDirectWindow::DirectConnected()
 	release_sem(fDirectWindowData->direct_sem);
 	
-	// TODO: Waiting 3 seconds in this thread is not a problem,
+	// TODO: Waiting half a second in this thread is not a problem,
 	// but since we are called from the RootLayer's thread too, very bad things could happen.
 	// Find some way to call this method only within ServerWindow's thread (messaging ?)
-	status_t status = acquire_sem_etc(fDirectWindowData->direct_sem_ack, 1, B_TIMEOUT, 3000000);
-	if (status == B_TIMED_OUT) {
+	status_t status;
+	do {
+		// TODO: The timeout is 3000000 usecs (3 seconds) on beos.
+		// Test, but I think half a second is enough.
+		status = acquire_sem_etc(fDirectWindowData->direct_sem_ack, 1, B_TIMEOUT, 500000);
+	} while (status == B_INTERRUPTED);
+	
+	if (status < B_OK) {
 		// The client application didn't release the semaphore
-		// within the given timeout. Deleting this member should make it crash.
-		// TODO: Actually, it will not. At least, not always. Find a better way to 
-		// crash the client application.
+		// within the given timeout. Or something else went wrong.
+		// Deleting this member should make it crash.
 		delete fDirectWindowData;
 		fDirectWindowData = NULL;
 	}
