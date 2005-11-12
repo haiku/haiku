@@ -76,7 +76,7 @@ public:
 							CDDBQuery(const char *server, int32 port = 888);
 							~CDDBQuery(void); 
 			void			SetToSite(const char *server, int32 port);
-			void			GetSites(bool (*)(const char *site, int port, 
+			status_t		GetSites(bool (*)(const char *site, int port, 
 									 const char *latitude, const char *longitude,
 									 const char *description, void *state), void *);
 
@@ -99,34 +99,11 @@ public:
 	static	BString			OffsetsToString(const scsi_toc *);
 	
 private:
-			void					Connect();
+			status_t				Connect();
 			void					Disconnect();
 			bool					IsConnected() const;
 	
 	static	int32	QueryThread(void *);
-
-	class Connector 
-	{
-		public:
-			Connector(CDDBQuery *client)
-				:	client(client),
-					wasConnected(client->IsConnected())
-				{
-					if (!wasConnected)
-						client->Connect();
-				}
-			
-			~Connector()
-				{
-					if (!wasConnected)
-						client->Disconnect();
-				}
-				
-		private:
-			CDDBQuery *client;
-			bool wasConnected;
-	};
-	friend class Connector;
 
 	// cached retrieved data
 	enum State 
@@ -137,7 +114,7 @@ private:
 		kInterrupting,
 		kError
 	};
-	
+			void					SetDefaultInfo(void);
 			status_t				OpenContentFile(const int32 &discID);
 	
 			status_t				ReadFromServer(BString &data);
@@ -145,7 +122,7 @@ private:
 			void					WriteFile(void);
 			
 			void					ReadLine(BString &);
-			void					IdentifySelf();
+			status_t				IdentifySelf();
 
 			const char *			GetToken(const char *, BString &);
 	

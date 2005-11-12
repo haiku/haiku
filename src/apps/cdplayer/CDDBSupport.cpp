@@ -407,32 +407,6 @@ CDDBData::TrackTimeAt(const int16 &index)
 	return (cdaudio_time *)fTimeList.ItemAt(index);
 }
 
-template <class InitCheckable>
-void
-InitCheck(InitCheckable *item)
-{
-	if (!item)
-		throw B_ERROR;
-	status_t error = item->InitCheck();
-	if (error != B_OK)
-		throw error;
-}
-
-inline void
-ThrowOnError(status_t error)
-{
-	if (error != B_OK)
-		throw error; 
-}
-
-inline void
-ThrowIfNotSize(ssize_t size)
-{
-	if (size < 0)
-		throw (status_t)size; 
-}
-
-
 CDDBQuery::CDDBQuery(const char *server, int32 port)
 	:	fServerName(server),
 		fPort(port),
@@ -522,22 +496,29 @@ CDDBQuery::GetToken(const char *stream, BString &result)
 }
 
 
-void 
+status_t
 CDDBQuery::GetSites(bool (*eachFunc)(const char *site, int port, const char *latitude,
 		const char *longitude, const char *description, void *state), void *passThru)
 {
-	Connector connection(this);
+	if(!IsConnected())
+		Connect();
+	
 	BString tmp;
 	
 	tmp = "sites\n";
 	STRACE((">%s", tmp.String()));
 
-	ThrowIfNotSize( fSocket.Send(tmp.String(), tmp.Length()) );
+	if(fSocket.Send(tmp.String(), tmp.Length())==-1)
+		return B_ERROR;
+	
 	ReadLine(tmp);
 
-	if (tmp.FindFirst("210") == -1)
-		throw (status_t)B_ERROR;
-
+	if(tmp.FindFirst("210") == -1)
+	{
+		Disconnect();
+		return B_ERROR;
+	}
+	
 	for (;;) 
 	{
 		BString site;
@@ -563,6 +544,8 @@ CDDBQuery::GetSites(bool (*eachFunc)(const char *site, int port, const char *lat
 			description.String(), passThru))
 			break;
 	}
+	Disconnect();
+	return B_OK;
 }
 
 bool 
@@ -689,14 +672,19 @@ CDDBQuery::ReadFromServer(BString &data)
 	int32 discLength = (fCDData.DiscTime()->minutes * 60) + fCDData.DiscTime()->seconds;
 	
 	query << "cddb query " << idString << ' ' << trackCount << ' ' 
-		<< offsetString << ' ' << discLength << '\n';
+			<< offsetString << ' ' << discLength << '\n';
 	
 	STRACE((">%s", query.String()));
 
-	ThrowIfNotSize( fSocket.Send(query.String(), query.Length()) );
+	if(fSocket.Send(query.String(), query.Length())==-1)
+	{
+		Disconnect();
+		return B_ERROR;
+	}
 	
 	BString tmp;
 	ReadLine(tmp);
+	STRACE(("<%s", tmp.String()));
 	
 	BString category;
 	BString queryDiscID(idString);
@@ -739,18 +727,21 @@ CDDBQuery::ReadFromServer(BString &data)
 	{
 		GetToken(tmp.String() + 3, category);
 	}
-	
 	STRACE(("CDDBQuery::ReadFromServer: Genre: %s\n",category.String()));
 	if(!category.Length())
 	{
 		STRACE(("Set genre to 'misc'\n"));
 		category = "misc";
 	}
-	
+
 	// Query for the disc's data - artist, album, tracks, etc.
 	query = "";
 	query << "cddb read " << category << ' ' << queryDiscID << '\n' ;
-	ThrowIfNotSize( fSocket.Send(query.String(), query.Length()) );
+	if(fSocket.Send(query.String(), query.Length())==-1)
+	{
+		Disconnect();
+		return B_ERROR;
+	}
 	
 	while(true)
 	{
@@ -765,18 +756,29 @@ CDDBQuery::ReadFromServer(BString &data)
 	return B_OK;
 }
 
-void
+status_t
 CDDBQuery::Connect()
 {
-	BNetAddress address(fServerName.String(), fPort);
-	InitCheck(&address);
-
-	ThrowOnError( fSocket.Connect(address) );
+	if(fConnected)
+		Disconnect();
+	
+	BNetAddress address;
+	
+	status_t status = address.SetTo(fServerName.String(), fPort);
+	if(status != B_OK)
+		return status;
+	
+	status = fSocket.Connect(address);
+	if(status != B_OK)
+		return status;
+	
 	fConnected = true;
 
 	BString tmp;
 	ReadLine(tmp);
 	IdentifySelf();
+	
+	return B_OK;
 }
 
 bool 
@@ -788,8 +790,11 @@ CDDBQuery::IsConnected() const
 void 
 CDDBQuery::Disconnect()
 {
-	fSocket.Close();
-	fConnected = false;
+	if(fConnected)
+	{
+		fSocket.Close();
+		fConnected = false;
+	}
 }
 
 void 
@@ -846,6 +851,7 @@ CDDBQuery::ReadLine(BString &buffer)
 			srcstr[1]='\0';
 			srclen = 1;
 			destlen = 5;
+			memset(deststr,0,5);
 			
 			if(convert_to_utf8(B_ISO1_CONVERSION,srcstr,&srclen,deststr,&destlen,&state)==B_OK)
 			{
@@ -856,7 +862,11 @@ CDDBQuery::ReadLine(BString &buffer)
 				stringindex = string + length;
 
 				for (int i = 0; i < 5; i++)
+				{
 					stringindex[i] = deststr[i];
+					if(!deststr[i])
+						break;
+				}
 				
 				buffer.UnlockBuffer();
 			}
@@ -877,7 +887,7 @@ CDDBQuery::ReadLine(BString &buffer)
 	STRACE(("<%s", buffer.String()));
 }
 
-void 
+status_t 
 CDDBQuery::IdentifySelf()
 {
 	// TODO: Figure out a better way to do this for Zeta
@@ -886,7 +896,11 @@ CDDBQuery::IdentifySelf()
 	tmp << "cddb hello simplyvorbis svhost SimplyVorbis v0.1\n";
 
 	STRACE((">%s", tmp.String()));
-	ThrowIfNotSize( fSocket.Send(tmp.String(), tmp.Length()) );
+	if(fSocket.Send(tmp.String(), tmp.Length())==-1)
+	{
+		Disconnect();
+		return B_ERROR;
+	}
 	
 	ReadLine(tmp);
 #else
@@ -902,11 +916,15 @@ CDDBQuery::IdentifySelf()
 	tmp << "cddb hello " << username << " " << hostname << " SimplyVorbis v0.1\n";
 
 	STRACE((">%s", tmp.String()));
-	ThrowIfNotSize( fSocket.Send(tmp.String(), tmp.Length()) );
+	if(fSocket.Send(tmp.String(), tmp.Length())==-1)
+	{
+		Disconnect();
+		return B_ERROR;
+	}
 	
 	ReadLine(tmp);
 #endif
-
+	return B_OK;
 }
 
 status_t
@@ -966,30 +984,33 @@ int32
 CDDBQuery::QueryThread(void *owner)
 {
 	CDDBQuery *query = (CDDBQuery *)owner;
-	try 
+	
+	signal(kTerminatingSignal, DoNothing);
+	
+	if(query->OpenContentFile(query->fCDData.DiscID())!=B_OK)
 	{
-		signal(kTerminatingSignal, DoNothing);
-		
-		if(query->OpenContentFile(query->fCDData.DiscID())!=B_OK)
+		// new content file, read it in from the server
+		if(query->Connect()==B_OK)
 		{
-			// new content file, read it in from the server
-			Connector connection(query);
 			BString data;
 			
 			query->ReadFromServer(data);
 			query->ParseData(data);
 			query->WriteFile();
 		}
+		else
+		{
+			// We apparently couldn't connect to the server, so we'll need to handle
+			// creating tracknames. Note that we do not save to disk. This is because it should
+			// be up to the user what to do.
+			query->SetDefaultInfo();
+		}
+	}
 	
-		query->fState = kDone;
-		query->fThread = -1;
-		query->fResult = B_OK;
-	}
-	catch (status_t error) 
-	{
-		query->fState = kError;
-		query->fResult = error;
-	}
+	query->fState = kDone;
+	query->fThread = -1;
+	query->fResult = B_OK;
+	
 	return 0;
 }
 
@@ -1013,6 +1034,34 @@ CDDBQuery::WriteFile(void)
 }
 
 void
+CDDBQuery::SetDefaultInfo(void)
+{
+	for(int16 i = fCDData.CountTracks(); i>=0; i--)
+		fCDData.RemoveTrack(i);
+	
+	vector<cdaudio_time> trackTimes;
+	GetTrackTimes(&fSCSIData,trackTimes);
+	int32 trackCount = GetTrackCount(&fSCSIData);
+	
+	fCDData.SetArtist("Artist");
+	fCDData.SetAlbum("Audio CD");
+	fCDData.SetGenre("Misc");
+	
+	for(int32 i=0; i<trackCount; i++)
+	{
+		BString trackname("Track ");
+		
+		if(i<9)
+			trackname << "0";
+		
+		trackname << i+1;
+		
+		cdaudio_time time = trackTimes[i+1] - trackTimes[i];
+		fCDData.AddTrack(trackname.String(),time);
+	}
+}			
+
+void
 CDDBQuery::ParseData(const BString &data)
 {
 	// Can't simply call MakeEmpty() because the thread is spawned when the discID kept in fCDData
@@ -1031,7 +1080,7 @@ CDDBQuery::ParseData(const BString &data)
 		// the file ourselves. This is actually pretty easy.
 		fCDData.SetArtist("Artist");
 		fCDData.SetAlbum("Audio CD");
-		fCDData.SetGenre("misc");
+		fCDData.SetGenre("Misc");
 		
 		for(int32 i=0; i<trackCount; i++)
 		{
