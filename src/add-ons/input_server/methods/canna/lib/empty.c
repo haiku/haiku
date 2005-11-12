@@ -26,7 +26,7 @@
 
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "@(#) 102.1 $Id: empty.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char rcs_id[] = "@(#) 102.1 $Id$";
 #endif /* lint */
 
 #include "canna.h"
@@ -36,23 +36,23 @@ static char rcs_id[] = "@(#) 102.1 $Id: empty.c,v 1.1 2004/12/23 21:23:49 korli 
 
 extern struct RkRxDic *romajidic, *englishdic;
 
-static inEmptySelfInsert(uiContext d);
-static EmptySelfInsert(uiContext d);
-static EmptyYomiInsert(uiContext d);
-static EmptyQuotedInsert(uiContext d);
-static AlphaSelfInsert(uiContext d);
-static AlphaNop(uiContext d);
-static EmptyQuit(uiContext d);
-static EmptyKakutei(uiContext d);
-static EmptyDeletePrevious(uiContext d);
-static UserMode(uiContext d, extraFunc *estruct);
-static UserSelect(uiContext d, extraFunc *estruct);
-static UserMenu(uiContext d, extraFunc *estruct);
-static ProcExtraFunc(uiContext d, int fnum);
-static HenkanRegion(uiContext d);
-static PhonoEdit(uiContext d);
-static DicEdit(uiContext d);
-static Configure(uiContext d);
+static int inEmptySelfInsert(uiContext d);
+static int EmptySelfInsert(uiContext d);
+static int EmptyYomiInsert(uiContext d);
+static int EmptyQuotedInsert(uiContext d);
+static int AlphaSelfInsert(uiContext d);
+static int AlphaNop(uiContext d);
+static int EmptyQuit(uiContext d);
+static int EmptyKakutei(uiContext d);
+static int EmptyDeletePrevious(uiContext d);
+static int UserMode(uiContext d, extraFunc *estruct);
+static int UserSelect(uiContext d, extraFunc *estruct);
+static int UserMenu(uiContext d, extraFunc *estruct);
+static int ProcExtraFunc(uiContext d, int fnum);
+static int HenkanRegion(uiContext d);
+static int PhonoEdit(uiContext d);
+static int DicEdit(uiContext d);
+static int Configure(uiContext d);
 static int renbunInit(uiContext d);
 static int showVersion(uiContext d);
 static int showServer(uiContext d);
@@ -67,7 +67,7 @@ extern KanjiModeRec yomi_mode, cy_mode;
  * 
  */
 
-static
+static int
 inEmptySelfInsert(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
@@ -83,7 +83,7 @@ inEmptySelfInsert(uiContext d)
 }
 
 
-static
+static int
 EmptySelfInsert(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
@@ -110,7 +110,7 @@ EmptySelfInsert(uiContext d)
  */
 
 
-static
+static int
 EmptyYomiInsert(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
@@ -131,7 +131,7 @@ EmptyYomiInsert(uiContext d)
   ¤¹¤ë¤Ê¤ó¤Æ¤³¤È¤ÏÉ¬Í×¤Ê¤¤¤Î¤Ç¤Ï¤Ê¤¤¤Î¤«¤Ê¤¡¡£
  */
 
-static
+static int
 EmptyQuotedInsert(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
@@ -145,7 +145,7 @@ EmptyQuotedInsert(uiContext d)
   AlphaSelfInsert -- ¼«Ê¬¼«¿È¤ò³ÎÄêÊ¸»úÎó¤È¤·¤ÆÊÖ¤¹´Ø¿ô¡£
  */
 
-static
+static int
 AlphaSelfInsert(uiContext d)
 {
   unsigned kanap = (unsigned)d->ch;
@@ -166,7 +166,7 @@ AlphaSelfInsert(uiContext d)
   }
 }
 
-static
+static int
 AlphaNop(uiContext d)
 {
   /* currentModeInfo ¤Ç¥â¡¼¥É¾ðÊó¤¬É¬¤ºÊÖ¤ë¤è¤¦¤Ë¥À¥ß¡¼¤Î¥â¡¼¥É¤òÆþ¤ì¤Æ¤ª¤¯ */
@@ -175,7 +175,7 @@ AlphaNop(uiContext d)
   return 0;
 }
 
-static
+static int
 EmptyQuit(uiContext d)
 {
   int res;
@@ -189,7 +189,7 @@ EmptyQuit(uiContext d)
   return res;
 }
 
-static
+static int
 EmptyKakutei(uiContext d)
 {
   int res;
@@ -203,7 +203,7 @@ EmptyKakutei(uiContext d)
   return res;
 }
 
-static
+static int
 EmptyDeletePrevious(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
@@ -231,7 +231,7 @@ FindExtraFunc(int fnum)
   return (extraFunc *)0;
 }
 
-static
+static int
 UserMode(uiContext d, extraFunc *estruct)
 {
   newmode *nmode = estruct->u.modeptr;
@@ -261,7 +261,7 @@ UserMode(uiContext d, extraFunc *estruct)
 }
 
 #ifndef NO_EXTEND_MENU /* continues to the bottom of this file */
-static
+static int
 UserSelect(uiContext d, extraFunc *estruct)
 {
   int curkigo = 0, *posp = (int *)0;
@@ -302,10 +302,10 @@ UserSelect(uiContext d, extraFunc *estruct)
     return NothingChangedWithBeep(d);
   }
   return uuKigoMake(d, kigop->kigo_data, kigop->kigo_size, 
-                    curkigo, kigop->kigo_mode, uuKigoGeneralExitCatch, posp);
+                    curkigo, kigop->kigo_mode, (int(*)(...))uuKigoGeneralExitCatch, posp);
 }
   
-static
+static int
 UserMenu(uiContext d, extraFunc *estruct)
 {
   return showmenu(d, estruct->u.menuptr);
@@ -314,7 +314,7 @@ UserMenu(uiContext d, extraFunc *estruct)
 
 /* ¥Ç¥Õ¥©¥ë¥È°Ê³°¤Î¥â¡¼¥É»ÈÍÑ»þ¤Ë¸Æ¤Ó½Ð¤¹´Ø¿ô¤òÀÚ¤êÊ¬¤±¤ë */
 
-static
+static int
 ProcExtraFunc(uiContext d, int fnum)
 {
   extraFunc *extrafunc;
@@ -337,6 +337,7 @@ ProcExtraFunc(uiContext d, int fnum)
   return NothingChangedWithBeep(d);
 }
 
+int
 getBaseMode(yomiContext yc)
 {
   int res;
@@ -382,6 +383,7 @@ EmptyBaseModeInfo(uiContext d, yomiContext yc)
   currentModeInfo(d);
 }
 
+int
 EmptyBaseHira(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
@@ -395,6 +397,7 @@ EmptyBaseHira(uiContext d)
   return 0;
 }
 
+int
 EmptyBaseKata(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
@@ -411,6 +414,7 @@ EmptyBaseKata(uiContext d)
   return 0;
 }
 
+int
 EmptyBaseEisu(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
@@ -425,6 +429,7 @@ EmptyBaseEisu(uiContext d)
   return 0;
 }
 
+int
 EmptyBaseZen(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
@@ -445,6 +450,7 @@ EmptyBaseZen(uiContext d)
   return 0;
 }
 
+int
 EmptyBaseHan(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
@@ -472,6 +478,7 @@ EmptyBaseHan(uiContext d)
   return 0;
 }
 
+int
 EmptyBaseKana(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
@@ -494,6 +501,7 @@ EmptyBaseKana(uiContext d)
   return 0;
 }
 
+int
 EmptyBaseKakutei(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
@@ -507,6 +515,7 @@ EmptyBaseKakutei(uiContext d)
   return 0;
 }
 
+int
 EmptyBaseHenkan(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
@@ -746,7 +755,7 @@ dicSync(uiContext d)
 {
   int retval = 0;
   char s[512];
-  extern defaultContext;
+  extern int defaultContext;
   yomiContext yc = (yomiContext)d->modec;
 
   if (yc->generalFlags & CANNA_YOMI_CHGMODE_INHIBITTED) {

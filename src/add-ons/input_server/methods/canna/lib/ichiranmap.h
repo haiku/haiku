@@ -22,7 +22,7 @@
 // Modified by T.Murai
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char ichiranmap_id[] = "@(#) 102.1 $Id: ichiranmap.h,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char ichiranmap_id[] = "@(#) 102.1 $Id$";
 #endif /* lint */
 
 #include "canna.h"
@@ -70,7 +70,7 @@ static struct funccfunc ichiran_funcs[] = {
   {0				,0				},
 };
 
-extern searchfunc(...);
+extern int searchfunc(...);
 KanjiModeRec ichiran_mode = {
   searchfunc,
   default_kmap,

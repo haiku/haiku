@@ -26,7 +26,7 @@
 
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "@(#) 102.1 $Id: uldelete.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char rcs_id[] = "@(#) 102.1 $Id$";
 #endif
 
 
@@ -36,28 +36,28 @@ static char rcs_id[] = "@(#) 102.1 $Id: uldelete.c,v 1.1 2004/12/23 21:23:49 kor
 #include "RK.h"
 #include "RKintern.h"
 
-static uuSYomiEveryTimeCatch(uiContext d, int retval, mode_context env);
-static uuSYomiExitCatch(uiContext d, int retval, mode_context env);
-static uuSYomiQuitCatch(uiContext d, int retval, mode_context env);
-static dicSakujoYomi(uiContext d);
-static acDicSakujoYomi(uiContext d, int dn, mode_context dm);
-static acDicSakujoDictionary(uiContext d, int dn, mode_context dm);
+static int uuSYomiEveryTimeCatch(uiContext d, int retval, mode_context env);
+static int uuSYomiExitCatch(uiContext d, int retval, mode_context env);
+static int uuSYomiQuitCatch(uiContext d, int retval, mode_context env);
+static int dicSakujoYomi(uiContext d);
+static int acDicSakujoYomi(uiContext d, int dn, mode_context dm);
+static int acDicSakujoDictionary(uiContext d, int dn, mode_context dm);
 static WCHAR_T **getMountDicName(uiContext d, int *num_return);
 static void CloseDeleteContext(tourokuContext tc);
-static getEffectDic(tourokuContext tc);
-static uuSTangoExitCatch(uiContext d, int retval, mode_context env);
-static uuSTangoQuitCatch(uiContext d, int retval, mode_context env);
-static dicSakujoBgnBun(uiContext d, RkStat *st);
-static dicSakujoEndBun(uiContext d);
-static dicSakujoTango(uiContext d);
-static getDeleteDic(mountContext mc);
-static uuSDicExitCatch(uiContext d, int retval, mode_context env);
-static uuSDicQuitCatch(uiContext d, int retval, mode_context env);
-static dicSakujoDictionary(uiContext d);
-static uuSDeleteYesCatch(uiContext d, int retval, mode_context env);
-static uuSDeleteQuitCatch(uiContext d, int retval, mode_context env);
-static uuSDeleteNoCatch(uiContext d, int retval, mode_context env);
-static dicSakujoDo(uiContext d);
+static int getEffectDic(tourokuContext tc);
+static int uuSTangoExitCatch(uiContext d, int retval, mode_context env);
+static int uuSTangoQuitCatch(uiContext d, int retval, mode_context env);
+static int dicSakujoBgnBun(uiContext d, RkStat *st);
+static int dicSakujoEndBun(uiContext d);
+static int dicSakujoTango(uiContext d);
+static int getDeleteDic(mountContext mc);
+static int uuSDicExitCatch(uiContext d, int retval, mode_context env);
+static int uuSDicQuitCatch(uiContext d, int retval, mode_context env);
+static int dicSakujoDictionary(uiContext d);
+static int uuSDeleteYesCatch(uiContext d, int retval, mode_context env);
+static int uuSDeleteQuitCatch(uiContext d, int retval, mode_context env);
+static int uuSDeleteNoCatch(uiContext d, int retval, mode_context env);
+static int dicSakujoDo(uiContext d);
 
 extern int RkwGetServerVersion (int *, int *);
 extern int RkwChmodDic (int, char *, int);
@@ -115,7 +115,7 @@ freeAndPopTouroku(uiContext d)
  * Ã±¸ìºï½ü¤ÎÆÉ¤ß¤ÎÆþÎÏ                                                      *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 static
-uuSYomiEveryTimeCatch(uiContext d, int retval, mode_context env)
+int uuSYomiEveryTimeCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   int len, echoLen, revPos;
@@ -159,7 +159,7 @@ uuSYomiEveryTimeCatch(uiContext d, int retval, mode_context env)
 }
 
 static
-uuSYomiExitCatch(uiContext d, int retval, mode_context env)
+int uuSYomiExitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   tourokuContext tc;
@@ -176,7 +176,7 @@ uuSYomiExitCatch(uiContext d, int retval, mode_context env)
 }
 
 static
-uuSYomiQuitCatch(uiContext d, int retval, mode_context env)
+int uuSYomiQuitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   popCallback(d); /* ÆÉ¤ß¤ò pop */
@@ -191,7 +191,7 @@ uuSYomiQuitCatch(uiContext d, int retval, mode_context env)
 }
 
 static
-dicSakujoYomi(uiContext d)
+int dicSakujoYomi(uiContext d)
 {
   yomiContext yc;
 
@@ -217,7 +217,7 @@ dicSakujoYomi(uiContext d)
 }
 
 static
-acDicSakujoYomi(uiContext d, int dn, mode_context dm)
+int acDicSakujoYomi(uiContext d, int dn, mode_context dm)
 /* ARGSUSED */
 {
   popCallback(d);
@@ -225,7 +225,7 @@ acDicSakujoYomi(uiContext d, int dn, mode_context dm)
 }
 
 static
-acDicSakujoDictionary(uiContext d, int dn, mode_context dm)
+int acDicSakujoDictionary(uiContext d, int dn, mode_context dm)
 /* ARGSUSED */
 {
   popCallback(d);
@@ -243,7 +243,7 @@ getMountDicName(uiContext d, int *num_return)
   int nmmdic, check, majv, minv;
   struct dicname *p;
   WCHAR_T **tourokup, **tp;
-  extern defaultContext;
+  extern int defaultContext;
 
   if (defaultContext < 0) {
     if ((KanjiInit() < 0) || (defaultContext < 0)) {
@@ -324,7 +324,7 @@ getMountDicName(uiContext d, int *num_return)
   return tourokup;
 }
 
-dicSakujo(uiContext d)
+int dicSakujo(uiContext d)
 {
   WCHAR_T **mp, **p;
   tourokuContext tc;
@@ -389,7 +389,7 @@ CloseDeleteContext(tourokuContext tc)
  * »ØÄê¤µ¤ì¤¿Ã±¸ì¤¬ÅÐÏ¿¤µ¤ì¤Æ¤¤¤ë¼­½ñ¤ò¼è¤ê½Ð¤¹
  */
 static
-getEffectDic(tourokuContext tc)
+int getEffectDic(tourokuContext tc)
 {
   int workContext, currentkouho, nbunsetsu, nelem = tc->nudic;
   WCHAR_T **mdic, **cands, **work;
@@ -538,7 +538,7 @@ getEffectDic(tourokuContext tc)
 }
 
 static
-uuSTangoExitCatch(uiContext d, int retval, mode_context env)
+int uuSTangoExitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   forichiranContext fc;
@@ -569,7 +569,7 @@ uuSTangoExitCatch(uiContext d, int retval, mode_context env)
 }
 
 static
-uuSTangoQuitCatch(uiContext d, int retval, mode_context env)
+int uuSTangoQuitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   forichiranContext fc;
@@ -590,7 +590,7 @@ uuSTangoQuitCatch(uiContext d, int retval, mode_context env)
  * ÆÉ¤ß¤ò»ØÄê¤µ¤ì¤¿¼­½ñ¤«¤éÊÑ´¹¤¹¤ë
  */
 static
-dicSakujoBgnBun(uiContext d, RkStat *st)
+int dicSakujoBgnBun(uiContext d, RkStat *st)
 {
   tourokuContext tc = (tourokuContext)d->modec;
   int nbunsetsu;
@@ -675,7 +675,7 @@ dicSakujoBgnBun(uiContext d, RkStat *st)
 }
 
 static
-dicSakujoEndBun(uiContext d)
+int dicSakujoEndBun(uiContext d)
 {
   tourokuContext tc = (tourokuContext)d->modec;
 
@@ -693,7 +693,7 @@ dicSakujoEndBun(uiContext d)
 }
 
 static
-dicSakujoTango(uiContext d)
+int dicSakujoTango(uiContext d)
 {
   tourokuContext tc = (tourokuContext)d->modec;
   forichiranContext fc;
@@ -802,7 +802,7 @@ dicSakujoTango(uiContext d)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 static
-getDeleteDic(mountContext mc)
+int getDeleteDic(mountContext mc)
 {
   tourokuContext tc = (tourokuContext)mc->next;
   int i, num = 0;
@@ -838,7 +838,7 @@ getDeleteDic(mountContext mc)
 
 
 static
-uuSDicExitCatch(uiContext d, int retval, mode_context env)
+int uuSDicExitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   mountContext mc;
@@ -875,7 +875,7 @@ uuSDicExitCatch(uiContext d, int retval, mode_context env)
 }
 
 static
-uuSDicQuitCatch(uiContext d, int retval, mode_context env)
+int uuSDicQuitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   popCallback(d); /* °ìÍ÷¤ò pop */
@@ -888,7 +888,7 @@ uuSDicQuitCatch(uiContext d, int retval, mode_context env)
 }
 
 static
-dicSakujoDictionary(uiContext d)
+int dicSakujoDictionary(uiContext d)
 {
   tourokuContext tc = (tourokuContext)d->modec;
   mountContext mc;
@@ -966,8 +966,9 @@ dicSakujoDictionary(uiContext d)
             }
             if ((retval = selectOnOff(d, xxxx, &mc->curIkouho, upnelem,
 		            BANGOMAX, 0, mc->mountOldStatus,
-		            NO_CALLBACK, uuSDicExitCatch, 
-                            uuSDicQuitCatch, uiUtilIchiranTooSmall)) == NG) {
+		            (int(*)(...))NO_CALLBACK, (int(*)(...))uuSDicExitCatch, 
+                            (int(*)(...))uuSDicQuitCatch,
+							(int(*)(...))uiUtilIchiranTooSmall)) == NG) {
               popMountMode(d);
               popCallback(d);
               deleteEnd(d);
@@ -1022,14 +1023,14 @@ dicSakujoDictionary(uiContext d)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 static
-uuSDeleteYesCatch(uiContext d, int retval, mode_context env)
+int uuSDeleteYesCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   tourokuContext tc;
   char dicname[1024];
   deldicinfo *dic;
   int bufcnt, l;
-  extern defaultContext;
+  extern int defaultContext;
 
   deleteEnd(d);
   popCallback(d); /* yesNo ¤ò¥Ý¥Ã¥× */
@@ -1122,7 +1123,7 @@ uuSDeleteYesCatch(uiContext d, int retval, mode_context env)
 }
 
 static
-uuSDeleteQuitCatch(uiContext d, int retval, mode_context env)
+int uuSDeleteQuitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   tourokuContext tc = (tourokuContext)env;
@@ -1138,7 +1139,7 @@ uuSDeleteQuitCatch(uiContext d, int retval, mode_context env)
 }
 
 static
-uuSDeleteNoCatch(uiContext d, int retval, mode_context env)
+int uuSDeleteNoCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   popCallback(d); /* yesNo ¤ò¥Ý¥Ã¥× */
@@ -1153,7 +1154,7 @@ uuSDeleteNoCatch(uiContext d, int retval, mode_context env)
 }
 
 static
-dicSakujoDo(uiContext d)
+int dicSakujoDo(uiContext d)
 {
   tourokuContext tc = (tourokuContext)d->modec;
   int l;

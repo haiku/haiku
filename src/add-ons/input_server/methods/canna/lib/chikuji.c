@@ -26,7 +26,7 @@
 
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "$Id: chikuji.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char rcs_id[] = "$Id$";
 #endif
 
 #include	"canna.h"
@@ -90,7 +90,7 @@ clearHenkanContext(yomiContext yc)
   return;
 }
 
-extern NothingChanged (uiContext);
+extern int NothingChanged (uiContext);
 
 /*
   restoreChikujiYomi
@@ -306,6 +306,7 @@ chikujiSubstYomi(uiContext d)
   return(ret);
 }
 
+int
 ChikujiSubstYomi(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
@@ -754,14 +755,14 @@ generalNaive(uiContext d, int (*fn )(...))
 static int
 ChikujiHenkanNaive(uiContext d)
 {
-  return generalNaive(d, YomiInsert);
+  return generalNaive(d, (int(*)(...))YomiInsert);
 }
 
 
 static int
 ChikujiHenkanOrNothing(uiContext d)
 {
-  return generalNaive(d, NothingChanged);
+  return generalNaive(d, (int(*)(...))NothingChanged);
 }
 
 

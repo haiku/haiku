@@ -21,7 +21,7 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcsid[]="@(#) 102.1 $Id: RKkana.c,v 1.1 2004/12/23 21:23:48 korli Exp $";
+static char rcsid[]="@(#) 102.1 $Id$";
 #endif
 
 /* LINTLIBRARY */
@@ -698,6 +698,7 @@ RkCvtSuuji(unsigned char *dst, int maxdst, unsigned char *src, int maxsrc, int f
 
 #define CBUFSIZE     512
 
+int
 RkwCvtHan(WCHAR_T *dst, int maxdst, WCHAR_T *src, int srclen)
 {
   int len = 0;
@@ -732,6 +733,7 @@ RkwCvtHan(WCHAR_T *dst, int maxdst, WCHAR_T *src, int srclen)
   return len;
 }
 
+int
 RkwCvtHira(WCHAR_T *dst, int maxdst, WCHAR_T *src, int srclen)
 {
   int len = 0;
@@ -767,6 +769,7 @@ RkwCvtHira(WCHAR_T *dst, int maxdst, WCHAR_T *src, int srclen)
   return len;
 }
   
+int
 RkwCvtKana(WCHAR_T *dst, int maxdst, WCHAR_T *src, int srclen)
 {
   int len = 0;
@@ -801,7 +804,8 @@ RkwCvtKana(WCHAR_T *dst, int maxdst, WCHAR_T *src, int srclen)
 #endif
   return len;
 }
-  
+
+int  
 RkwCvtZen(WCHAR_T *dst, int maxdst, WCHAR_T *src, int srclen)
 {
   int len = 0;

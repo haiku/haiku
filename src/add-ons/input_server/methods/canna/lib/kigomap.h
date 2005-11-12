@@ -22,13 +22,14 @@
 // Modified by T.Murai
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char kigomap_id[] = "@(#) 102.1 $Id: kigomap.h,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char kigomap_id[] = "@(#) 102.1 $Id$";
 #endif /* lint */
 
 #ifdef NO_EXTEND_MENU
 static struct funccfunc kigo_funcs[] = {{0, 0},};
 #else
-extern DoFuncSequence(),UseOtherKeymap();
+extern int DoFuncSequence();
+extern int UseOtherKeymap();
 
 static struct funccfunc kigo_funcs[] = {
   {CANNA_FN_KigouMode		,KigoQuit		},
@@ -51,7 +52,7 @@ static struct funccfunc kigo_funcs[] = {
 };
 #endif /* NO_EXTEND_MENU */
 
-extern searchfunc(...);
+extern int searchfunc(...);
 
 KanjiModeRec kigo_mode = {
   searchfunc,

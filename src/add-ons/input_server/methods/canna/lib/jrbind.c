@@ -26,7 +26,7 @@
 
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "@(#) 102.1 $Id: jrbind.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char rcs_id[] = "@(#) 102.1 $Id$";
 #endif /* lint */
 
 #include "canna.h"
@@ -116,7 +116,7 @@ newUiContext(unsigned int dpy, unsigned int win)
 
 extern int kanjiControl (int, uiContext, caddr_t);
 
-XwcLookupKanji2(unsigned int dpy, unsigned int win, WCHAR_T *buffer_return, int nbuffer, int nbytes, int functionalChar, wcKanjiStatus *kanji_status_return)
+int XwcLookupKanji2(unsigned int dpy, unsigned int win, WCHAR_T *buffer_return, int nbuffer, int nbytes, int functionalChar, wcKanjiStatus *kanji_status_return)
 {
   uiContext d;
   int retval;
@@ -237,7 +237,9 @@ struct map {
   BYTE key;
   KanjiMode mode;
   struct map *next;
-} *mapFromHash();
+};
+ 
+struct map *mapFromHash();
 
 /* cfuncdef
 

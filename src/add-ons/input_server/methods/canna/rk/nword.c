@@ -24,9 +24,10 @@
 /* THIS SOURCE CODE IS MODIFIED FOR TKO BY T.MURAI 1997
 /************************************************************************/
 
+#include <string.h>
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcsid[]="$Id: nword.c,v 1.1 2004/12/23 21:23:50 korli Exp $";
+static char rcsid[]="$Id$";
 #endif
 
 /* LINTLIBRARY */

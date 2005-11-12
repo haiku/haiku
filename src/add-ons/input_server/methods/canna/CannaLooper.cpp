@@ -8,6 +8,8 @@
 //	(c) 1999 M.Kawamura
 //
 
+#include <string.h>
+
 #include <Input.h>
 #include <Screen.h>
 #include <Menu.h>

@@ -21,7 +21,7 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "@(#) 102.1 $Id: mode.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char rcs_id[] = "@(#) 102.1 $Id$";
 #endif /* lint */
 
 #include "canna.h"
@@ -220,7 +220,7 @@ japaneseMode(uiContext d)
 
  */
 
-JapaneseMode(uiContext d)
+int JapaneseMode(uiContext d)
 {
   coreContext cc = (coreContext)d->modec;
   yomiContext yc = (yomiContext)cc->next;
@@ -234,7 +234,7 @@ JapaneseMode(uiContext d)
   return 0;
 }
 
-AlphaMode(uiContext d)
+int AlphaMode(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -249,7 +249,7 @@ AlphaMode(uiContext d)
   }
 }
 
-HenkanNyuryokuMode(uiContext d)
+int HenkanNyuryokuMode(uiContext d)
 {
   extern KanjiModeRec empty_mode;
   yomiContext yc = (yomiContext)d->modec;
@@ -273,7 +273,7 @@ HenkanNyuryokuMode(uiContext d)
   return 0;
 }
 
-queryMode(uiContext d, WCHAR_T *arg)
+int queryMode(uiContext d, WCHAR_T *arg)
 {
   coreContext cc = (coreContext)d->modec;
   WCHAR_T *mode_str = (WCHAR_T *)0;
@@ -357,7 +357,7 @@ queryMode(uiContext d, WCHAR_T *arg)
  *
  */
 
-changeModeName(int modeid, char *str)
+int changeModeName(int modeid, char *str)
 {
   extraFunc *ep;
 

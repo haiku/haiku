@@ -82,7 +82,7 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "@(#) 102.1 $Id: util.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char rcs_id[] = "@(#) 102.1 $Id$";
 #endif	/* lint */
 
 #include "canna.h"
@@ -102,7 +102,7 @@ static char rcs_id[] = "@(#) 102.1 $Id: util.c,v 1.1 2004/12/23 21:23:49 korli E
 #define MB_LEN_MAX 5 /* 5 ¤â¹Ô¤«¤Ê¤¤¤À¤í¤¦¤È¤Ï»×¤¦ */
 #endif
 
-static wait_anykey_func(uiContext d, KanjiMode mode, int whattodo, int key, int fnum);
+static int wait_anykey_func(uiContext d, KanjiMode mode, int whattodo, int key, int fnum);
 
 /* arraydef
 
@@ -159,7 +159,7 @@ echostrClear(uiContext d)
  */
 
 inline
-colwidth(WCHAR_T *s, int len)
+int colwidth(WCHAR_T *s, int len)
 {
   int ret = 0;
   WCHAR_T *es = s + len;
@@ -217,7 +217,7 @@ NothingChanged(uiContext d)
   return 0;
 }
 
-NothingForGLine(uiContext d)
+int NothingForGLine(uiContext d)
 {
   d->kanji_status_return->length = -1; /* ÊÑ¤ï¤é¤Ê¤¤¡£ */
   d->kanji_status_return->revPos 
@@ -504,7 +504,7 @@ extractYomiString(yomiContext yc, WCHAR_T *s, WCHAR_T *e, int b, WCHAR_T **sr, W
 }
 
 inline
-extractString(WCHAR_T *str, WCHAR_T *s, WCHAR_T *e)
+int extractString(WCHAR_T *str, WCHAR_T *s, WCHAR_T *e)
 {
   int len;
 
@@ -679,7 +679,7 @@ makeGLineMessageFromString(uiContext d, char *msg)
   makeGLineMessage(d, d->genbuf, len);
 }
 
-setWStrings(WCHAR_T **ws, char **s, int sz)
+int setWStrings(WCHAR_T **ws, char **s, int sz)
 {
   int f = sz;
 
@@ -815,14 +815,14 @@ showRomeStruct(unsigned int dpy, unsigned int win)
 
 extern char *jrKanjiError;
 
-NoMoreMemory(void)
+int NoMoreMemory(void)
 {
   jrKanjiError = "\245\341\245\342\245\352\244\254\311\324\302\255\244\267\244\306\244\244\244\336\244\271\241\243";
                 /* ¥á¥â¥ê¤¬ÉÔÂ­¤·¤Æ¤¤¤Þ¤¹¡£ */
   return NG;
 }
 
-GLineNGReturn(uiContext d)
+int GLineNGReturn(uiContext d)
 {
   int len;
   len = MBstowcs(d->genbuf, jrKanjiError, ROMEBUFSIZE);
@@ -832,7 +832,7 @@ GLineNGReturn(uiContext d)
   return(0);
 }
 
-GLineNGReturnFI(uiContext d)
+int GLineNGReturnFI(uiContext d)
 {
   popForIchiranMode(d);
   popCallback(d);
@@ -857,7 +857,7 @@ specialfunc(uiContext d, int fn)
 
 #ifndef NO_EXTEND_MENU
 
-GLineNGReturnTK(uiContext d)
+int GLineNGReturnTK(uiContext d)
 {
   extern void popTourokuMode (uiContext);
  
@@ -1295,7 +1295,7 @@ WStringClose(void)
   nwsmemories = 0;
 }
 
-WSfree(WCHAR_T *s)
+int WSfree(WCHAR_T *s)
 {
   int	i;
   WCHAR_T **t;
@@ -1394,7 +1394,7 @@ generalReplace(WCHAR_T *buf, BYTE *attr, int *startp, int *cursor, int *endp, in
     attr[begin] |= attrmask; */
 }
 
-WToupper(WCHAR_T w)
+int WToupper(WCHAR_T w)
 {
   if ('a' <= w && w <= 'z')
     return((WCHAR_T) (w - 'a' + 'A'));
@@ -1402,7 +1402,7 @@ WToupper(WCHAR_T w)
     return(w);
 }
 
-WTolower(WCHAR_T w)
+int WTolower(WCHAR_T w)
 {
   if ('A' <= w && w <= 'Z') {
     return (WCHAR_T)(w - 'A' + 'a');
@@ -1453,7 +1453,7 @@ key2wchar(int key, int *check)
 int
 confirmContext(uiContext d, yomiContext yc)
 {
-  extern defaultContext;
+  extern int defaultContext;
 
   if (yc->context < 0) {
     if (d->contextCache >= 0) {
@@ -1484,7 +1484,7 @@ confirmContext(uiContext d, yomiContext yc)
 int
 abandonContext(uiContext d, yomiContext yc)
 {
-  extern defaultContext;
+  extern int defaultContext;
 
   if (yc->context >= 0) {
     if (d->contextCache >= 0) {
@@ -1512,7 +1512,7 @@ makeRkError(uiContext d, char *str)
 /* °Ê²¼¥á¥Ã¥»¡¼¥¸¤ò gline ¤Ë½Ð¤¹¤¿¤á¤Î»ÅÁÈ¤ß */
 
 inline
-ProcAnyKey(uiContext d)
+int ProcAnyKey(uiContext d)
 {
   coreContext cc = (coreContext)d->modec;
 
@@ -1524,10 +1524,10 @@ ProcAnyKey(uiContext d)
   return 0;
 }
 
-static wait_anykey_func (uiContext, KanjiMode, int, int, int);
+static int wait_anykey_func (uiContext, KanjiMode, int, int, int);
 
 static
-wait_anykey_func(uiContext d, KanjiMode mode, int whattodo, int key, int fnum)
+int wait_anykey_func(uiContext d, KanjiMode mode, int whattodo, int key, int fnum)
 /* ARGSUSED */
 {
   switch (whattodo) {
@@ -1587,7 +1587,7 @@ cannaMessageMode(uiContext d, canna_callback_t cnt)
 
  */
 
-canna_alert(uiContext d, char *message, canna_callback_t cnt)
+int canna_alert(uiContext d, char *message, canna_callback_t cnt)
 {
   d->nbytes = 0;
 
@@ -1599,7 +1599,7 @@ canna_alert(uiContext d, char *message, canna_callback_t cnt)
 char *
 KanjiInitError(void)
 {
-  extern standalone;
+  extern int standalone;
 
   if (standalone) {
     return "\244\253\244\312\264\301\273\372\312\321\264\271\244\307\244\255\244\336\244\273\244\363";

@@ -26,7 +26,7 @@
 
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "@(#) 102.1 $Id: ulmount.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char rcs_id[] = "@(#) 102.1 $Id$";
 #endif
 
 #ifndef NO_EXTEND_MENU
@@ -38,9 +38,9 @@ static char rcs_id[] = "@(#) 102.1 $Id: ulmount.c,v 1.1 2004/12/23 21:23:49 korl
 static mountContext newMountContext(void);
 static void freeMountContext(mountContext mc);
 static struct dicname *findDic(char *s);
-static uuMountExitCatch(uiContext d, int retval, mode_context env);
-static uuMountQuitCatch(uiContext d, int retval, mode_context env);
-static getDicList(uiContext d);
+static int uuMountExitCatch(uiContext d, int retval, mode_context env);
+static int uuMountQuitCatch(uiContext d, int retval, mode_context env);
+static int getDicList(uiContext d);
 
 /* cfunc mountContext
  *
@@ -90,7 +90,7 @@ freeMountContext(mountContext mc)
 /*
  * ¸õÊä°ìÍ÷¹Ô¤òºî¤ë
  */
-getMountContext(uiContext d)
+int getMountContext(uiContext d)
 {
   mountContext mc;
   int retval = 0;
@@ -149,12 +149,12 @@ findDic(char *s)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 static
-uuMountExitCatch(uiContext d, int retval, mode_context env)
+int uuMountExitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   mountContext mc;
   int i, nmount = 0;
-  extern defaultContext;
+  extern int defaultContext;
   struct dicname *dp;
 
   killmenu(d);
@@ -291,7 +291,7 @@ uuMountExitCatch(uiContext d, int retval, mode_context env)
 }
 
 static
-uuMountQuitCatch(uiContext d, int retval, mode_context env)
+int uuMountQuitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   popCallback(d); /* OnOff ¤ò¥Ý¥Ã¥× */
@@ -320,7 +320,7 @@ uuMountQuitCatch(uiContext d, int retval, mode_context env)
  * ¨¦¨¡¨¡¨¡¨¡¨¡¨¡¨¡¨¡¨¡¨¥ ¨¦¨¡¨¡¨¡¨¥
  */
 static
-getDicList(uiContext d)
+int getDicList(uiContext d)
 {
   mountContext mc = (mountContext)d->modec;
   char *dicLbuf, dicMbuf[ROMEBUFSIZE];
@@ -328,7 +328,7 @@ getDicList(uiContext d)
   char *wptr, **Lp, **Mp;
   BYTE *sop, *snp, *soldp, *snewp;
   int dicLc, dicMc, i;
-  extern defaultContext;
+  extern int defaultContext;
 
   if((dicLbuf = (char *)malloc(ROMEBUFSIZE)) == (char *)NULL) {
 #ifndef WIN
@@ -484,7 +484,7 @@ getDicList(uiContext d)
   return(dicLc);
 }
 
-dicMount(uiContext d)
+int dicMount(uiContext d)
 {
   ichiranContext oc;
   mountContext mc;
@@ -535,8 +535,8 @@ dicMount(uiContext d)
   }
   if((retval = selectOnOff(d, xxxx, &mc->curIkouho, nelem,
 		 BANGOMAX, currentkouho, mc->mountOldStatus,
-		 NO_CALLBACK, uuMountExitCatch,
-		 uuMountQuitCatch, uiUtilIchiranTooSmall)) == NG) {
+		 (int(*)(...))NO_CALLBACK, (int(*)(...))uuMountExitCatch,
+		 (int(*)(...))uuMountQuitCatch, (int(*)(...))uiUtilIchiranTooSmall)) == NG) {
     popMountMode(d);
     popCallback(d);
     killmenu(d);

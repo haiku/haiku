@@ -21,7 +21,7 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "$Id: permdic.c,v 1.1 2004/12/23 21:23:50 korli Exp $";
+static char rcs_id[] = "$Id$";
 #endif
 
 #include	<unistd.h>
@@ -47,7 +47,7 @@ extern int fd_dic;      /* mmap */
 #endif
 
 static unsigned char *assurep(struct ND *dic, int id);
-static readThisCache(struct DM *dm, struct ND *xdm, long pgno, unsigned long val, WCHAR_T *key, int cur, int ylen, struct nread *nread, int mc, int nc, int *cf);
+static int readThisCache(struct DM *dm, struct ND *xdm, long pgno, unsigned long val, WCHAR_T *key, int cur, int ylen, struct nread *nread, int mc, int nc, int *cf);
 static int SearchInPage(struct DM *dm, struct ND *xdm, long pgno, unsigned char *buf, unsigned long val, WCHAR_T *key, int cur, int ylen, struct nread *nread, int mc, int nc, int *cf);
 static int SearchInDir(struct DM *dm, struct ND *xdm, unsigned char *pos, WCHAR_T *key, int cur, int ylen, struct nread *nread, int mc, int nc, int *cf);
 static void ch_perm(struct DM *qm, unsigned offset, int size, int num);
@@ -415,7 +415,7 @@ _RkEql(WCHAR_T *a, unsigned char *b, int n)
 }
 
 static
-readThisCache(struct DM *dm, struct ND *xdm, long pgno, unsigned long val, WCHAR_T *key, int cur, int ylen, struct nread *nread, int mc, int nc, int *cf)
+int readThisCache(struct DM *dm, struct ND *xdm, long pgno, unsigned long val, WCHAR_T *key, int cur, int ylen, struct nread *nread, int mc, int nc, int *cf)
 {
   int		remlen;
   unsigned char	*wrec1, *wrec;

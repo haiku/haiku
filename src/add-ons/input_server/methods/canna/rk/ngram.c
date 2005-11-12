@@ -26,7 +26,7 @@
 
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcsid[]="$Id: ngram.c,v 1.1 2004/12/23 21:23:50 korli Exp $";
+static char rcsid[]="$Id$";
 #endif
 
 #include	<stdio.h>
@@ -42,7 +42,7 @@ static char rcsid[]="$Id: ngram.c,v 1.1 2004/12/23 21:23:50 korli Exp $";
 // There is Exported Symbols !!
 static char **gram_to_tab(struct RkKxGram *gram);
 static WCHAR_T *skip_space(WCHAR_T *src);
-static skip_until_space(WCHAR_T *src, WCHAR_T **next);
+static int skip_until_space(WCHAR_T *src, WCHAR_T **next);
 static int wstowrec(struct RkKxGram *gram, WCHAR_T *src, Wrec *dst, unsigned maxdst, unsigned *yomilen, unsigned *wlen, unsigned long *lucks);
 static Wrec *fil_wc2wrec_flag(Wrec *wrec, unsigned *wreclen, unsigned ncand, WCHAR_T *yomi, unsigned ylen, unsigned left);
 static struct TW *RkWcand2Wrec(Wrec *key, struct RkWcand *wc, int nc, unsigned long *lucks);

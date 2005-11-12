@@ -7,6 +7,8 @@
 //	(c) 1999 M.Kawamura
 //
 
+#include <string.h>
+
 #include <Screen.h>
 #ifdef DEBUG
 #include <Debug.h>

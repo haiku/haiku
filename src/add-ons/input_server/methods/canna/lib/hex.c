@@ -21,7 +21,7 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "@(#) 102.1 $Id: hex.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char rcs_id[] = "@(#) 102.1 $Id$";
 #endif /* lint */
 
 #ifndef NO_EXTEND_MENU
@@ -30,10 +30,10 @@ static char rcs_id[] = "@(#) 102.1 $Id: hex.c,v 1.1 2004/12/23 21:23:49 korli Ex
 #define HEXPROMPT "\245\263\241\274\245\311: "
 #define HEXPROMPTLEN  5 /* "¥³¡¼¥É: " ¤ÎÄ¹¤µ¤Ï5¥Ð¥¤¥È */
 
-static hexEveryTimeCatch(uiContext d, int retval, mode_context env);
-static exitHex(uiContext d, int retval, mode_context env);
-static quitHex(uiContext d, int retval, mode_context env);
-static hexMode(uiContext d, int major_mode);
+static int hexEveryTimeCatch(uiContext d, int retval, mode_context env);
+static int exitHex(uiContext d, int retval, mode_context env);
+static int quitHex(uiContext d, int retval, mode_context env);
+static int hexMode(uiContext d, int major_mode);
 
 static int quitHex();
 
@@ -43,7 +43,7 @@ static int quitHex();
 
  */
 
-static
+static int
 hexEveryTimeCatch(uiContext d, int retval, mode_context env)
      /* ARGSUSED */
 {
@@ -93,7 +93,7 @@ hexEveryTimeCatch(uiContext d, int retval, mode_context env)
   return retval;
 }
 
-static
+static int
 exitHex(uiContext d, int retval, mode_context env)
 {
   killmenu(d);
@@ -121,7 +121,7 @@ quitHex(uiContext d, int retval, mode_context env)
 
 yomiContext GetKanjiString();
 
-static
+static int
 hexMode(uiContext d, int major_mode)
 {
   yomiContext yc;
@@ -147,7 +147,7 @@ hexMode(uiContext d, int major_mode)
 
  */
 
-HexMode(uiContext d)
+int HexMode(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 

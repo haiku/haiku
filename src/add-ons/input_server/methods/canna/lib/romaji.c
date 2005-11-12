@@ -26,7 +26,7 @@
 
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "@(#) 102.1 $Id: romaji.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char rcs_id[] = "@(#) 102.1 $Id$";
 #endif /* lint */
 
 #include "canna.h"
@@ -44,56 +44,56 @@ static char rcs_id[] = "@(#) 102.1 $Id: romaji.c,v 1.1 2004/12/23 21:23:49 korli
 extern struct RkRxDic *romajidic, *englishdic;
 
 static struct RkRxDic *OpenRoma(char *table);
-static makePhonoOnBuffer(uiContext d, yomiContext yc, unsigned char key, int flag, int english);
-static growDakuonP(WCHAR_T ch);
-static KanaYomiInsert(uiContext d);
-static howFarToGoBackward(yomiContext yc);
-static howFarToGoForward(yomiContext yc);
+static int makePhonoOnBuffer(uiContext d, yomiContext yc, unsigned char key, int flag, int english);
+static int growDakuonP(WCHAR_T ch);
+static int KanaYomiInsert(uiContext d);
+static int howFarToGoBackward(yomiContext yc);
+static int howFarToGoForward(yomiContext yc);
 static int YomiBackward(uiContext d);
-static YomiNop(uiContext d);
-static YomiForward(uiContext d);
-static YomiBeginningOfLine(uiContext d);
-static YomiEndOfLine(uiContext d);
-static appendYomi2Yomi(yomiContext yom, yomiContext yc);
+static int YomiNop(uiContext d);
+static int YomiForward(uiContext d);
+static int YomiBeginningOfLine(uiContext d);
+static int YomiEndOfLine(uiContext d);
+static int appendYomi2Yomi(yomiContext yom, yomiContext yc);
 static int YomiDeletePrevious(uiContext d);
 static int YomiDeleteNext(uiContext d);
 static int YomiKillToEndOfLine(uiContext d);
 static int YomiQuit(uiContext d);
-static simplePopCallback(uiContext d, int retval, mode_context env);
-static exitYomiQuotedInsert(uiContext d, int retval, mode_context env);
-static YomiInsertQuoted(uiContext d);
-static yomiquotedfunc(uiContext d, KanjiMode mode, int whattodo, int key, int fnum);
-static ConvertAsHex(uiContext d);
-static everySupkey(uiContext d, int retval, mode_context env);
-static exitSupkey(uiContext d, int retval, mode_context env);
-static quitSupkey(uiContext d, int retval, mode_context env);
+static int simplePopCallback(uiContext d, int retval, mode_context env);
+static int exitYomiQuotedInsert(uiContext d, int retval, mode_context env);
+static int YomiInsertQuoted(uiContext d);
+static int yomiquotedfunc(uiContext d, KanjiMode mode, int whattodo, int key, int fnum);
+static int ConvertAsHex(uiContext d);
+static int everySupkey(uiContext d, int retval, mode_context env);
+static int exitSupkey(uiContext d, int retval, mode_context env);
+static int quitSupkey(uiContext d, int retval, mode_context env);
 static int YomiHenkan(uiContext d);
 static int YomiHenkanNaive(uiContext d);
 static int YomiHenkanOrNothing(uiContext d);
-static YomiBaseHira(uiContext d);
-static YomiBaseKata(uiContext d);
-static YomiBaseEisu(uiContext d);
-static YomiBaseZen(uiContext d);
-static YomiBaseHan(uiContext d);
-static YomiBaseKana(uiContext d);
-static YomiBaseKakutei(uiContext d);
-static YomiBaseHenkan(uiContext d);
-static YomiJishu(uiContext d, int fn);
+static int YomiBaseHira(uiContext d);
+static int YomiBaseKata(uiContext d);
+static int YomiBaseEisu(uiContext d);
+static int YomiBaseZen(uiContext d);
+static int YomiBaseHan(uiContext d);
+static int YomiBaseKana(uiContext d);
+static int YomiBaseKakutei(uiContext d);
+static int YomiBaseHenkan(uiContext d);
+static int YomiJishu(uiContext d, int fn);
 static int chikujiEndBun(uiContext d);
 static void replaceEnglish(uiContext d, yomiContext yc, int start, int end, int RKflag, int engflag);
-static YomiNextJishu(uiContext d);
-static YomiPreviousJishu(uiContext d);
-static YomiKanaRotate(uiContext d);
-static YomiRomajiRotate(uiContext d);
-static YomiCaseRotateForward(uiContext d);
-static YomiZenkaku(uiContext d);
-static YomiHankaku(uiContext d);
-static YomiHiraganaJishu(uiContext d);
-static YomiKatakanaJishu(uiContext d);
-static YomiRomajiJishu(uiContext d);
-static YomiToLower(uiContext d);
-static YomiToUpper(uiContext d);
-static YomiCapitalize(uiContext d);
+static int YomiNextJishu(uiContext d);
+static int YomiPreviousJishu(uiContext d);
+static int YomiKanaRotate(uiContext d);
+static int YomiRomajiRotate(uiContext d);
+static int YomiCaseRotateForward(uiContext d);
+static int YomiZenkaku(uiContext d);
+static int YomiHankaku(uiContext d);
+static int YomiHiraganaJishu(uiContext d);
+static int YomiKatakanaJishu(uiContext d);
+static int YomiRomajiJishu(uiContext d);
+static int YomiToLower(uiContext d);
+static int YomiToUpper(uiContext d);
+static int YomiCapitalize(uiContext d);
 
 int forceRomajiFlushYomi (uiContext);
 static int chikujiEndBun (uiContext);
@@ -451,7 +451,7 @@ extern char basepath[];
   return retval;
 }
 
-RomkanaInit(void)
+int RomkanaInit(void)
 {
   extern char *RomkanaTable, *EnglishTable;
   extern extraFunc *extrafuncp;
@@ -679,7 +679,7 @@ void
 RomkanaFin(void)
 {
   extern char *RomkanaTable, *EnglishTable;
-  extern nkeysup;
+  extern int nkeysup;
   int i;
 
   /* ¥í¡¼¥Þ»ú¤«¤ÊÊÑ´¹¥Æ¡¼¥Ö¥ë¤Î¥¯¥í¡¼¥º */
@@ -851,7 +851,7 @@ popYomiMode(uiContext d)
  */
 
 inline
-checkIfYomiExit(uiContext d, int retval)
+int checkIfYomiExit(uiContext d, int retval)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -880,7 +880,7 @@ checkIfYomiExit(uiContext d, int retval)
 }
 
 static
-checkIfYomiQuit(uiContext d, int retval)
+int checkIfYomiQuit(uiContext d, int retval)
 /* ARGSUSED */
 {
 #ifdef QUIT_IN_YOMI /* ¥³¥á¥ó¥È¥¢¥¦¥È¤¹¤ëÌÜÅª¤Î ifdef */
@@ -1023,7 +1023,7 @@ restoreChikujiIfBaseChikuji(yomiContext yc)
 
 int YomiInsert (uiContext);
 
-YomiInsert(uiContext d)
+int YomiInsert(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
   int subst, autoconvert = (yc->generalFlags & CANNA_YOMI_CHIKUJI_MODE);
@@ -1191,10 +1191,10 @@ YomiInsert(uiContext d)
 
 int findSup (WCHAR_T);
 
-findSup(WCHAR_T key)
+int findSup(WCHAR_T key)
 {
   int i;
-  extern nkeysup;
+  extern int nkeysup;
 
   for (i = 0 ; i < nkeysup ; i++) {
     if (key == keysup[i].key) {
@@ -1217,7 +1217,7 @@ findSup(WCHAR_T key)
  */
 
 static
-makePhonoOnBuffer(uiContext d, yomiContext yc, unsigned char key, int flag, int english)
+int makePhonoOnBuffer(uiContext d, yomiContext yc, unsigned char key, int flag, int english)
 {
   int i, n, m, t, sm, henkanflag, prevflag, cond;
   int retval = 0;
@@ -1483,9 +1483,9 @@ makePhonoOnBuffer(uiContext d, yomiContext yc, unsigned char key, int flag, int 
 #define DAKUON_FV 2
 
 inline
-dakuonP(WCHAR_T ch)
+int dakuonP(WCHAR_T ch)
 {
-  static dakuon_first_time = 1;
+  static int dakuon_first_time = 1;
   static WCHAR_T hv, fv;
 
   if (dakuon_first_time) { /* ÆüËÜ¸ì¸ÇÍ­¤Î½èÍý */
@@ -1528,10 +1528,10 @@ dakuonP(WCHAR_T ch)
 #define GROW_HV 3
 
 static
-growDakuonP(WCHAR_T ch)
+int growDakuonP(WCHAR_T ch)
 {
   /* ÂùÅÀ¤¬Â³¤¯²ÄÇ½À­¤¬¤¢¤ëÊ¸»ú¤Î½èÍý (¤¦¡¢¤«¡Á¤È¡¢¤Ï¡Á¤Û) */
-  static dakuon_first_time = 1;
+  static int dakuon_first_time = 1;
   static WCHAR_T wu, wka, wto, wha, who;
 
   if (dakuon_first_time) { /* ÆüËÜ¸ì¸ÇÍ­¤Î½èÍý */
@@ -1566,7 +1566,7 @@ growDakuonP(WCHAR_T ch)
 }
 
 static
-KanaYomiInsert(uiContext d)
+int KanaYomiInsert(uiContext d)
 {
   static WCHAR_T kana[3], *kanap;
   WCHAR_T buf1[KANAYOMIINSERT_BUFLEN], buf2[KANAYOMIINSERT_BUFLEN];
@@ -1720,7 +1720,7 @@ moveStrings(WCHAR_T *str, BYTE *attr, int start, int end, int distance)
 }
 
 static
-howFarToGoBackward(yomiContext yc)
+int howFarToGoBackward(yomiContext yc)
 {
   if (yc->kCurs <= yc->cStartp) {
     return 0;
@@ -1742,7 +1742,7 @@ howFarToGoBackward(yomiContext yc)
 }
 
 static
-howFarToGoForward(yomiContext yc)
+int howFarToGoForward(yomiContext yc)
 {
   if (yc->kCurs == yc->kEndp) {
     return 0;
@@ -1828,7 +1828,7 @@ YomiBackward(uiContext d)
 }
 
 static
-YomiNop(uiContext d)
+int YomiNop(uiContext d)
 {
   /* currentModeInfo ¤Ç¥â¡¼¥É¾ðÊó¤¬É¬¤ºÊÖ¤ë¤è¤¦¤Ë¥À¥ß¡¼¤Î¥â¡¼¥É¤òÆþ¤ì¤Æ¤ª¤¯ */
   d->majorMode = d->minorMode = CANNA_MODE_AlphaMode;
@@ -1838,7 +1838,7 @@ YomiNop(uiContext d)
 }
 
 static
-YomiForward(uiContext d)
+int YomiForward(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
   int howManyMove;
@@ -1895,10 +1895,10 @@ YomiForward(uiContext d)
   return 0;
 }
 
-static YomiBeginningOfLine (uiContext);
+int static YomiBeginningOfLine (uiContext);
 
 static
-YomiBeginningOfLine(uiContext d)
+int YomiBeginningOfLine(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -1930,7 +1930,7 @@ YomiBeginningOfLine(uiContext d)
 
 
 static
-YomiEndOfLine(uiContext d)
+int YomiEndOfLine(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -1994,7 +1994,7 @@ forceRomajiFlushYomi(uiContext d)
  *
  */
 
-RomajiFlushYomi(uiContext d, WCHAR_T *b, int bsize)
+int RomajiFlushYomi(uiContext d, WCHAR_T *b, int bsize)
 {
   int ret;
   yomiContext yc = (yomiContext)d->modec;
@@ -2128,7 +2128,7 @@ appendTan2Yomi(tanContext tan, yomiContext yc)
 }
 
 static
-appendYomi2Yomi(yomiContext yom, yomiContext yc)
+int appendYomi2Yomi(yomiContext yom, yomiContext yc)
 {
   int rlen, klen;
 
@@ -2641,7 +2641,7 @@ RomajiClearYomi(uiContext d)
   }
 }
 
-YomiExit(uiContext d, int retval)
+int YomiExit(uiContext d, int retval)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -2717,7 +2717,7 @@ RomajiStoreYomi(uiContext d, WCHAR_T *kana, WCHAR_T *roma)
 
 */
 
-KanaDeletePrevious(uiContext d)
+int KanaDeletePrevious(uiContext d)
 {
   int howManyDelete;
   int prevflag;
@@ -2826,7 +2826,7 @@ YomiDeletePrevious(uiContext d)
   return 0;
 }
 
-static YomiDeleteNext (uiContext);
+static int YomiDeleteNext (uiContext);
 
 static int
 YomiDeleteNext(uiContext d)
@@ -2899,7 +2899,7 @@ YomiDeleteNext(uiContext d)
   return 0;
 }
 
-static YomiKillToEndOfLine (uiContext);
+static int YomiKillToEndOfLine (uiContext);
 
 static int
 YomiKillToEndOfLine(uiContext d)
@@ -2930,7 +2930,7 @@ YomiKillToEndOfLine(uiContext d)
   return 0;
 }
 
-static YomiQuit (uiContext);
+static int YomiQuit (uiContext);
 
 static int
 YomiQuit(uiContext d)
@@ -2967,7 +2967,7 @@ newCoreContext(void)
 }
 
 static
-simplePopCallback(uiContext d, int retval, mode_context env)
+int simplePopCallback(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   popCallback(d);
@@ -2975,7 +2975,7 @@ simplePopCallback(uiContext d, int retval, mode_context env)
   return retval;
 }
 
-alphaMode(uiContext d)
+int alphaMode(uiContext d)
 {
   extern KanjiModeRec alpha_mode;
   coreContext cc;
@@ -3010,10 +3010,10 @@ alphaMode(uiContext d)
 
  */
 
-static exitYomiQuotedInsert (uiContext, int, mode_context);
+static int exitYomiQuotedInsert (uiContext, int, mode_context);
 
 static
-exitYomiQuotedInsert(uiContext d, int retval, mode_context env)
+int exitYomiQuotedInsert(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   popCallback(d);
@@ -3021,7 +3021,7 @@ exitYomiQuotedInsert(uiContext d, int retval, mode_context env)
 }
 
 static
-YomiInsertQuoted(uiContext d)
+int YomiInsertQuoted(uiContext d)
 {
   unsigned char ch;
   coreContext cc = (coreContext)d->modec;
@@ -3051,10 +3051,10 @@ YomiInsertQuoted(uiContext d)
   }
 }
 
-static yomiquotedfunc (uiContext, KanjiMode, int, int, int);
+static int yomiquotedfunc (uiContext, KanjiMode, int, int, int);
 
 static
-yomiquotedfunc(uiContext d, KanjiMode mode, int whattodo, int key, int fnum)
+int yomiquotedfunc(uiContext d, KanjiMode mode, int whattodo, int key, int fnum)
      /* ARGSUSED */
 {
   switch (whattodo) {
@@ -3100,7 +3100,7 @@ yomiQuotedInsertMode(uiContext d)
   return;
 }
 
-YomiQuotedInsert(uiContext d)
+int YomiQuotedInsert(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -3138,7 +3138,7 @@ mapAsKuten(uiContext d)
   char tmpbuf[4];
   WCHAR_T *hexbuf;
   WCHAR_T buf[2];
-  static allowTwoByte = 1;
+  static int allowTwoByte = 1;
 
   tmpbuf[0] = tmpbuf[1] = tmpbuf[2] = tmpbuf[3] = '\0';
 
@@ -3230,7 +3230,7 @@ mapAsHex(uiContext d)
   char tmpbuf[8], *a;
   WCHAR_T *hexbuf;
   WCHAR_T buf[2];
-  static allowTwoByte = 1;
+  static int allowTwoByte = 1;
   extern struct CannaConfig cannaconf;
 
   if (yc->kCurs < yc->cmark) {
@@ -3354,10 +3354,10 @@ mapAsHex(uiContext d)
 
   */
 
-static ConvertAsHex (uiContext);
+static int ConvertAsHex (uiContext);
 
 static
-ConvertAsHex(uiContext d)
+int ConvertAsHex(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
   extern struct CannaConfig cannaconf;
@@ -3407,7 +3407,7 @@ ConvertAsHex(uiContext d)
 #ifdef WIN
 static 
 #endif
-cvtAsHex(uiContext d, WCHAR_T *buf, WCHAR_T *hexbuf, int hexlen)
+int cvtAsHex(uiContext d, WCHAR_T *buf, WCHAR_T *hexbuf, int hexlen)
 {
   int i;
   char tmpbuf[5], *a, *b;
@@ -3450,7 +3450,7 @@ cvtAsHex(uiContext d, WCHAR_T *buf, WCHAR_T *hexbuf, int hexlen)
   }
 }
 
-convertAsHex(uiContext d)
+int convertAsHex(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -3481,7 +3481,7 @@ inline void
 replaceSup(int ind, int n)
 {
   int i, group;
-  extern nkeysup;
+  extern int nkeysup;
 
   group = keysup[ind].groupid;
   for (i = 0 ; i < nkeysup ; i++) {
@@ -3491,10 +3491,10 @@ replaceSup(int ind, int n)
   }
 }
 
-static everySupkey (uiContext, int, mode_context);
+static int everySupkey (uiContext, int, mode_context);
 
 static
-everySupkey(uiContext d, int retval, mode_context env)
+int everySupkey(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   ichiranContext ic = (ichiranContext)d->modec;
@@ -3509,10 +3509,10 @@ everySupkey(uiContext d, int retval, mode_context env)
   return retval;
 }
 
-static exitSupkey (uiContext, int, mode_context);
+static int exitSupkey (uiContext, int, mode_context);
 
 static
-exitSupkey(uiContext d, int retval, mode_context env)
+int exitSupkey(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   yomiContext yc;
@@ -3550,10 +3550,10 @@ exitSupkey(uiContext d, int retval, mode_context env)
 #endif
 }
 
-static quitSupkey (uiContext, int, mode_context);
+static int quitSupkey (uiContext, int, mode_context);
 
 static
-quitSupkey(uiContext d, int retval, mode_context env)
+int quitSupkey(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   popCallback(d); /* °ìÍ÷¤ò¥Ý¥Ã¥× */
@@ -3562,11 +3562,11 @@ quitSupkey(uiContext d, int retval, mode_context env)
   return retval;
 }
 
-selectKeysup(uiContext d, yomiContext yc, int ind)
+int selectKeysup(uiContext d, yomiContext yc, int ind)
 {
   int retval;
   ichiranContext ic;
-  extern nkeysup;
+  extern int nkeysup;
 
   yc->cursup = 0;
   retval = selectOne(d, keysup[ind].cand, &(yc->cursup), keysup[ind].ncand,
@@ -3608,7 +3608,7 @@ selectKeysup(uiContext d, yomiContext yc, int ind)
  */
 
 inline
-regionGairaigo(yomiContext yc, int s, int e)
+int regionGairaigo(yomiContext yc, int s, int e)
 {
   if ((yc->kAttr[s] & SENTOU) && (yc->kAttr[e] & SENTOU)) {
     return 1;
@@ -3636,7 +3636,7 @@ containGairaigo(yomiContext yc)
   return 0;
 }
 
-containUnconvertedKey(yomiContext yc)
+int containUnconvertedKey(yomiContext yc)
 {
   int i, s, e;
 
@@ -3667,7 +3667,7 @@ containUnconvertedKey(yomiContext yc)
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0	°Û¾ï½ªÎ»»þ -1
  */
 
-static YomiHenkan (uiContext);
+static int YomiHenkan (uiContext);
 
 static int
 YomiHenkan(uiContext d)
@@ -3736,7 +3736,7 @@ YomiHenkan(uiContext d)
   return 0;
 }
 
-static YomiHenkanNaive (uiContext);
+static int YomiHenkanNaive (uiContext);
 
 static int
 YomiHenkanNaive(uiContext d)
@@ -3752,7 +3752,7 @@ YomiHenkanNaive(uiContext d)
   }
 }
 
-static YomiHenkanOrNothing (uiContext);
+static int YomiHenkanOrNothing (uiContext);
 
 static int
 YomiHenkanOrNothing(uiContext d)
@@ -3770,14 +3770,16 @@ YomiHenkanOrNothing(uiContext d)
 
 /* ¥Ù¡¼¥¹Ê¸»ú¤ÎÀÚ¤êÂØ¤¨ */
 
-extern EmptyBaseHira (uiContext), EmptyBaseKata (uiContext); 
-extern EmptyBaseEisu (uiContext);
-extern EmptyBaseZen (uiContext), EmptyBaseHan (uiContext);
+extern int EmptyBaseHira (uiContext);
+extern int EmptyBaseKata (uiContext); 
+extern int EmptyBaseEisu (uiContext);
+extern int EmptyBaseZen (uiContext);
+extern int EmptyBaseHan (uiContext);
 
-static YomiBaseHira (uiContext);
+static int YomiBaseHira (uiContext);
 
 static
-YomiBaseHira(uiContext d)
+int YomiBaseHira(uiContext d)
 {
   (void)RomajiFlushYomi(d, d->genbuf, ROMEBUFSIZE);
   (void)EmptyBaseHira(d);
@@ -3785,10 +3787,10 @@ YomiBaseHira(uiContext d)
   return 0;
 }
 
-static YomiBaseKata (uiContext);
+static int YomiBaseKata (uiContext);
 
 static
-YomiBaseKata(uiContext d)
+int YomiBaseKata(uiContext d)
 {
   (void)RomajiFlushYomi(d, d->genbuf, ROMEBUFSIZE);
   (void)EmptyBaseKata(d);
@@ -3796,10 +3798,10 @@ YomiBaseKata(uiContext d)
   return 0;
 }
 
-static YomiBaseEisu (uiContext);
+static int YomiBaseEisu (uiContext);
 
 static
-YomiBaseEisu(uiContext d)
+int YomiBaseEisu(uiContext d)
 {
   (void)RomajiFlushYomi(d, d->genbuf, ROMEBUFSIZE);
   (void)EmptyBaseEisu(d);
@@ -3807,10 +3809,10 @@ YomiBaseEisu(uiContext d)
   return 0;
 }
 
-static YomiBaseZen (uiContext);
+static int YomiBaseZen (uiContext);
 
 static
-YomiBaseZen(uiContext d)
+int YomiBaseZen(uiContext d)
 {
   (void)RomajiFlushYomi(d, d->genbuf, ROMEBUFSIZE);
   (void)EmptyBaseZen(d);
@@ -3818,10 +3820,10 @@ YomiBaseZen(uiContext d)
   return 0;
 }
 
-static YomiBaseHan (uiContext);
+static int YomiBaseHan (uiContext);
 
 static
-YomiBaseHan(uiContext d)
+int YomiBaseHan(uiContext d)
 {
   (void)RomajiFlushYomi(d, d->genbuf, ROMEBUFSIZE);
   (void)EmptyBaseHan(d);
@@ -3829,10 +3831,10 @@ YomiBaseHan(uiContext d)
   return 0;
 }
 
-static YomiBaseKana (uiContext);
+static int YomiBaseKana (uiContext);
 
 static
-YomiBaseKana(uiContext d)
+int YomiBaseKana(uiContext d)
 {
   (void)RomajiFlushYomi(d, d->genbuf, ROMEBUFSIZE);
   (void)EmptyBaseKana(d);
@@ -3840,10 +3842,10 @@ YomiBaseKana(uiContext d)
   return 0;
 }
 
-static YomiBaseKakutei (uiContext);
+static int YomiBaseKakutei (uiContext);
 
 static
-YomiBaseKakutei(uiContext d)
+int YomiBaseKakutei(uiContext d)
 {
   (void)RomajiFlushYomi(d, d->genbuf, ROMEBUFSIZE);
   (void)EmptyBaseKakutei(d);
@@ -3851,10 +3853,10 @@ YomiBaseKakutei(uiContext d)
   return 0;
 }
 
-static YomiBaseHenkan (uiContext);
+static int YomiBaseHenkan (uiContext);
 
 static
-YomiBaseHenkan(uiContext d)
+int YomiBaseHenkan(uiContext d)
 {
   (void)RomajiFlushYomi(d, d->genbuf, ROMEBUFSIZE);
   (void)EmptyBaseHenkan(d);
@@ -3864,7 +3866,7 @@ YomiBaseHenkan(uiContext d)
 
 int YomiBaseHiraKataToggle (uiContext);
 
-YomiBaseHiraKataToggle(uiContext d)
+int YomiBaseHiraKataToggle(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -3882,7 +3884,7 @@ YomiBaseHiraKataToggle(uiContext d)
 
 int YomiBaseZenHanToggle (uiContext);
 
-YomiBaseZenHanToggle(uiContext d)
+int YomiBaseZenHanToggle(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -3900,7 +3902,7 @@ YomiBaseZenHanToggle(uiContext d)
 
 int YomiBaseRotateForw (uiContext);
 
-YomiBaseRotateForw(uiContext d)
+int YomiBaseRotateForw(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -3930,7 +3932,7 @@ YomiBaseRotateForw(uiContext d)
 
 int YomiBaseRotateBack (uiContext);
 
-YomiBaseRotateBack(uiContext d)
+int YomiBaseRotateBack(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -3959,7 +3961,7 @@ YomiBaseRotateBack(uiContext d)
 
 int YomiBaseKanaEisuToggle (uiContext);
 
-YomiBaseKanaEisuToggle(uiContext d)
+int YomiBaseKanaEisuToggle(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -3977,7 +3979,7 @@ YomiBaseKanaEisuToggle(uiContext d)
 
 int YomiBaseKakuteiHenkanToggle (uiContext);
 
-YomiBaseKakuteiHenkanToggle(uiContext d)
+int YomiBaseKakuteiHenkanToggle(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -3995,7 +3997,7 @@ YomiBaseKakuteiHenkanToggle(uiContext d)
 
 int YomiModeBackup (uiContext);
 
-YomiModeBackup(uiContext d)
+int YomiModeBackup(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -4038,7 +4040,7 @@ YomiModeBackup(uiContext d)
        ¤«¤ÊÊÑ´¹¤ò¹Ô¤¦¡£
  */
 
-exitJishu(uiContext d)
+int exitJishu(uiContext d)
 {
   yomiContext yc;
   int len, srclen, i, pos;
@@ -4078,18 +4080,18 @@ exitJishu(uiContext d)
   buf = d->genbuf;
   switch (jishu) {
   case JISHU_ZEN_KATA: /* Á´³Ñ¥«¥¿¥«¥Ê¤ËÊÑ´¹¤¹¤ë */
-    func1 = RkwCvtZen;
-    func2 = RkwCvtKana;
+    func1 = (int (*)(...))RkwCvtZen;
+    func2 = (int (*)(...))RkwCvtKana;
     goto jishuKakuteiKana;
 
   case JISHU_HAN_KATA: /* È¾³Ñ¥«¥¿¥«¥Ê¤ËÊÑ´¹¤¹¤ë */
-    func1 = RkwCvtKana;
-    func2 = RkwCvtHan;
+    func1 = (int (*)(...))RkwCvtKana;
+    func2 = (int (*)(...))RkwCvtHan;
     goto jishuKakuteiKana;
 
   case JISHU_HIRA: /* ¤Ò¤é¤¬¤Ê¤ËÊÑ´¹¤¹¤ë */
-    func1 = RkwCvtZen;
-    func2 = RkwCvtHira;
+    func1 = (int (*)(...))RkwCvtZen;
+    func2 = (int (*)(...))RkwCvtHira;
 
   jishuKakuteiKana:
     /* ¤Þ¤º¡¢¥Ù¡¼¥¹¤¬¥í¡¼¥Þ»ú¤Î¤È¤­¤ËÆþÎÏ¤µ¤ì¤¿¤â¤Î¤¬¤¢¤ì¤Ð¤«¤Ê¤ËÊÑ´¹¤¹¤ë */
@@ -4230,7 +4232,7 @@ exitJishu(uiContext d)
 }
 
 static
-YomiJishu(uiContext d, int fn)
+int YomiJishu(uiContext d, int fn)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -4716,58 +4718,58 @@ removeKana(uiContext d, yomiContext yc, int k, int r)
   yc->rStartp = yc->rCurs;
 }
 
-static YomiNextJishu (uiContext);
+static int YomiNextJishu (uiContext);
 
 static
-YomiNextJishu(uiContext d)
+int YomiNextJishu(uiContext d)
 {
   return YomiJishu(d, CANNA_FN_Next);
 }
 
-static YomiPreviousJishu (uiContext);
+static int YomiPreviousJishu (uiContext);
 
 static
-YomiPreviousJishu(uiContext d)
+int YomiPreviousJishu(uiContext d)
 {
   return YomiJishu(d, CANNA_FN_Prev);
 }
 
-static YomiKanaRotate (uiContext);
+static int YomiKanaRotate (uiContext);
 
 static
-YomiKanaRotate(uiContext d)
+int YomiKanaRotate(uiContext d)
 {
   return YomiJishu(d, CANNA_FN_KanaRotate);
 }
 
-static YomiRomajiRotate (uiContext);
+static int YomiRomajiRotate (uiContext);
 
 static
-YomiRomajiRotate(uiContext d)
+int YomiRomajiRotate(uiContext d)
 {
   return YomiJishu(d, CANNA_FN_RomajiRotate);
 }
 
-static YomiCaseRotateForward (uiContext);
+static int YomiCaseRotateForward (uiContext);
 
 static
-YomiCaseRotateForward(uiContext d)
+int YomiCaseRotateForward(uiContext d)
 {
   return YomiJishu(d, CANNA_FN_CaseRotate);
 }
 
-static YomiZenkaku (uiContext);
+static int YomiZenkaku (uiContext);
 
 static
-YomiZenkaku(uiContext d)
+int YomiZenkaku(uiContext d)
 {
   return YomiJishu(d, CANNA_FN_Zenkaku);
 }
 
-static YomiHankaku (uiContext);
+static int YomiHankaku (uiContext);
 
 static
-YomiHankaku(uiContext d)
+int YomiHankaku(uiContext d)
 {
   if (cannaconf.InhibitHankakuKana)
     return NothingChangedWithBeep(d);
@@ -4775,49 +4777,49 @@ YomiHankaku(uiContext d)
     return YomiJishu(d, CANNA_FN_Hankaku);
 }
 
-static YomiHiraganaJishu (uiContext);
+static int YomiHiraganaJishu (uiContext);
 
 static
-YomiHiraganaJishu(uiContext d)
+int YomiHiraganaJishu(uiContext d)
 {
   return YomiJishu(d, CANNA_FN_Hiragana);
 }
 
-static YomiKatakanaJishu (uiContext);
+static int YomiKatakanaJishu (uiContext);
 
 static
-YomiKatakanaJishu(uiContext d)
+int YomiKatakanaJishu(uiContext d)
 {
   return YomiJishu(d, CANNA_FN_Katakana);
 }
 
-static YomiRomajiJishu (uiContext);
+static int YomiRomajiJishu (uiContext);
 
 static
-YomiRomajiJishu(uiContext d)
+int YomiRomajiJishu(uiContext d)
 {
   return YomiJishu(d, CANNA_FN_Romaji);
 }
 
-static YomiToLower (uiContext);
+static int YomiToLower (uiContext);
 static
-YomiToLower(uiContext d)
+int YomiToLower(uiContext d)
 {
   return YomiJishu(d, CANNA_FN_ToLower);
 }
 
-static YomiToUpper (uiContext);
+static int YomiToUpper (uiContext);
 
 static
-YomiToUpper(uiContext d)
+int YomiToUpper(uiContext d)
 {
   return YomiJishu(d, CANNA_FN_ToUpper);
 }
 
-static YomiCapitalize (uiContext);
+static int YomiCapitalize (uiContext);
 
 static
-YomiCapitalize(uiContext d)
+int YomiCapitalize(uiContext d)
 {
   return YomiJishu(d, CANNA_FN_Capitalize);
 }

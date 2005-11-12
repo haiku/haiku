@@ -26,7 +26,7 @@
 
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static	char	rcs_id[] = "@(#) 102.1 $Id: ichiran.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static	char	rcs_id[] = "@(#) 102.1 $Id$";
 #endif /* lint */
 
 #include	<errno.h>
@@ -46,39 +46,39 @@ static void getIchiranNextKouhoretsu();
 
 static void makeIchiranEchoStrCurChange(yomiContext yc);
 static void makeIchiranKanjiStatusReturn(uiContext d, mode_context env, yomiContext yc);
-static ichiranEveryTimeCatch(uiContext d, int retval, mode_context env);
-static ichiranExitCatch(uiContext d, int retval, mode_context env);
-static ichiranQuitCatch(uiContext d, int retval, mode_context env);
+static int ichiranEveryTimeCatch(uiContext d, int retval, mode_context env);
+static int ichiranExitCatch(uiContext d, int retval, mode_context env);
+static int ichiranQuitCatch(uiContext d, int retval, mode_context env);
 static void popIchiranMode(uiContext d);
 static void clearIchiranContext(ichiranContext p);
 static int makeKouhoIchiran(uiContext d, int nelem, int bangomax, unsigned char inhibit, int currentkouho);
-static IchiranKakuteiThenDo(uiContext d, int func);
-static IchiranQuitThenDo(uiContext d, int func);
-static IchiranConvert(uiContext d);
+static int IchiranKakuteiThenDo(uiContext d, int func);
+static int IchiranQuitThenDo(uiContext d, int func);
+static int IchiranConvert(uiContext d);
 static void getIchiranPreviousKouhoretsu(uiContext d);
-static IchiranNextPage(uiContext d);
-static IchiranPreviousPage(uiContext d);
+static int IchiranNextPage(uiContext d);
+static int IchiranPreviousPage(uiContext d);
 static void getIchiranNextKouhoretsu(uiContext d);
-static IchiranBangoKouho(uiContext d);
+static int IchiranBangoKouho(uiContext d);
 static int getIchiranBangoKouho(uiContext d);
-static IchiranKakutei(uiContext d);
-static IchiranExtendBunsetsu(uiContext d);
-static IchiranShrinkBunsetsu(uiContext d);
-static IchiranAdjustBunsetsu(uiContext d);
-static IchiranKillToEndOfLine(uiContext d);
-static IchiranDeleteNext(uiContext d);
-static IchiranBubunMuhenkan(uiContext d);
-static IchiranHiragana(uiContext d);
-static IchiranKatakana(uiContext d);
-static IchiranZenkaku(uiContext d);
-static IchiranHankaku(uiContext d);
-static IchiranRomaji(uiContext d);
-static IchiranToUpper(uiContext d);
-static IchiranToLower(uiContext d);
-static IchiranCapitalize(uiContext d);
-static IchiranKanaRotate(uiContext d);
-static IchiranRomajiRotate(uiContext d);
-static IchiranCaseRotateForward(uiContext d);
+static int IchiranKakutei(uiContext d);
+static int IchiranExtendBunsetsu(uiContext d);
+static int IchiranShrinkBunsetsu(uiContext d);
+static int IchiranAdjustBunsetsu(uiContext d);
+static int IchiranKillToEndOfLine(uiContext d);
+static int IchiranDeleteNext(uiContext d);
+static int IchiranBubunMuhenkan(uiContext d);
+static int IchiranHiragana(uiContext d);
+static int IchiranKatakana(uiContext d);
+static int IchiranZenkaku(uiContext d);
+static int IchiranHankaku(uiContext d);
+static int IchiranRomaji(uiContext d);
+static int IchiranToUpper(uiContext d);
+static int IchiranToLower(uiContext d);
+static int IchiranCapitalize(uiContext d);
+static int IchiranKanaRotate(uiContext d);
+static int IchiranRomajiRotate(uiContext d);
+static int IchiranCaseRotateForward(uiContext d);
 static char *sbango = 
   "\243\261\241\241\243\262\241\241\243\263\241\241\243\264\241\241\243\265"
   "\241\241\243\266\241\241\243\267\241\241\243\270\241\241\243\271\241\241"
@@ -100,7 +100,7 @@ static char *skuuhaku = "\241\241";
 			/* ¡¡ */
 static WCHAR_T *kuuhaku;
 
-initIchiran(void)
+int initIchiran(void)
 {
   int i, retval = 0;
   char buf[16];
@@ -213,9 +213,9 @@ makeGlineStatus(uiContext d)
   }
 }
 
-static ichiranEveryTimeCatch (uiContext, int, mode_context);
+static int ichiranEveryTimeCatch (uiContext, int, mode_context);
 
-static
+static int
 ichiranEveryTimeCatch(uiContext d, int retval, mode_context env)
 {
   yomiContext yc;
@@ -228,9 +228,9 @@ ichiranEveryTimeCatch(uiContext d, int retval, mode_context env)
   return(retval);
 }
 
-static ichiranExitCatch (uiContext, int, mode_context);
+static int ichiranExitCatch (uiContext, int, mode_context);
 
-static
+static int
 ichiranExitCatch(uiContext d, int retval, mode_context env)
 {
   yomiContext yc;
@@ -269,9 +269,9 @@ ichiranExitCatch(uiContext d, int retval, mode_context env)
   return(retval);
 }
 
-static ichiranQuitCatch (uiContext, int, mode_context);
+static int ichiranQuitCatch (uiContext, int, mode_context);
 
-static
+static int
 ichiranQuitCatch(uiContext d, int retval, mode_context env)
 {
   yomiContext yc;
@@ -531,7 +531,7 @@ clearIchiranContext(ichiranContext p)
 /*
  * ¸õÊä°ìÍ÷¤Î¥Ç¡¼¥¿¹½Â¤ÂÎ¤òºî¤ë¤¿¤á¤ÎÎÎ°è¤ò³ÎÊÝ¤¹¤ë
  */
-allocIchiranBuf(uiContext d)
+int allocIchiranBuf(uiContext d)
 {
   ichiranContext ic = (ichiranContext)d->modec;
   int size;
@@ -735,7 +735,7 @@ makeKouhoIchiran(uiContext d, int nelem, int bangomax, unsigned char inhibit, in
   return(0);
 }
 
-tanKouhoIchiran(uiContext d, int step)
+int tanKouhoIchiran(uiContext d, int step)
 {
   yomiContext yc = (yomiContext)d->modec;
   ichiranContext ic;
@@ -805,7 +805,7 @@ tanKouhoIchiran(uiContext d, int step)
 /*
  * ¸õÊä°ìÍ÷¹Ô¤ÎÉ½¼¨¤ò¶¯À©½ªÎ»¤¹¤ë
  */
-IchiranQuit(uiContext d)
+int IchiranQuit(uiContext d)
 {
   ichiranContext ic = (ichiranContext)d->modec;
   int retval = 0;
@@ -860,7 +860,7 @@ IchiranNop(uiContext d)
      -- Do determine from the candidate list, then do one more function.
  */
 
-static
+static int
 IchiranKakuteiThenDo(uiContext d, int func)
 {
   ichiranContext ic = (ichiranContext)d->modec;
@@ -883,7 +883,7 @@ IchiranKakuteiThenDo(uiContext d, int func)
 }
 
 static
-IchiranQuitThenDo(uiContext d, int func)
+int IchiranQuitThenDo(uiContext d, int func)
 {
   ichiranContext ic = (ichiranContext)d->modec;
   int retval;
@@ -908,7 +908,7 @@ IchiranQuitThenDo(uiContext d, int func)
  * °ú¤­¿ô	uiContext
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0	°Û¾ï½ªÎ»»þ -1
  */
-IchiranForwardKouho(uiContext d)
+int IchiranForwardKouho(uiContext d)
 {
   ichiranContext ic = (ichiranContext)d->modec;
 
@@ -960,7 +960,7 @@ IchiranForwardKouho(uiContext d)
  * °ú¤­¿ô	uiContext
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0	°Û¾ï½ªÎ»»þ -1
  */
-IchiranBackwardKouho(uiContext d)
+int IchiranBackwardKouho(uiContext d)
 {
   ichiranContext ic = (ichiranContext)d->modec;
   BYTE mode;
@@ -1012,10 +1012,10 @@ IchiranBackwardKouho(uiContext d)
    IchiranConvert() will be called when `convert' key is pressed
  */
 
-static IchiranConvert (uiContext);
+static int IchiranConvert (uiContext);
 
 static
-IchiranConvert(uiContext d)
+int IchiranConvert(uiContext d)
 {
   ichiranContext ic = (ichiranContext)d->modec;
 
@@ -1037,7 +1037,7 @@ IchiranConvert(uiContext d)
  * °ú¤­¿ô	uiContext
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0	°Û¾ï½ªÎ»»þ -1
  */
-IchiranPreviousKouhoretsu(uiContext d)
+int IchiranPreviousKouhoretsu(uiContext d)
 {
   ichiranContext ic = (ichiranContext)d->modec;
 
@@ -1113,7 +1113,7 @@ getIchiranPreviousKouhoretsu(uiContext d)
  * °ú¤­¿ô	uiContext
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0	°Û¾ï½ªÎ»»þ -1
  */
-IchiranNextKouhoretsu(uiContext d)
+int IchiranNextKouhoretsu(uiContext d)
 {
   ichiranContext ic = (ichiranContext)d->modec;
 
@@ -1150,10 +1150,10 @@ IchiranNextKouhoretsu(uiContext d)
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0	°Û¾ï½ªÎ»»þ -1
  */
 
-static IchiranNextPage (uiContext);
+static int IchiranNextPage (uiContext);
 
 static
-IchiranNextPage(uiContext d)
+int IchiranNextPage(uiContext d)
 {
   ichiranContext ic = (ichiranContext)d->modec;
 
@@ -1180,10 +1180,10 @@ IchiranNextPage(uiContext d)
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0	°Û¾ï½ªÎ»»þ -1
  */
 
-static IchiranPreviousPage (uiContext);
+static int IchiranPreviousPage (uiContext);
 
 static
-IchiranPreviousPage(uiContext d)
+int IchiranPreviousPage(uiContext d)
 {
   ichiranContext ic = (ichiranContext)d->modec;
 
@@ -1249,7 +1249,7 @@ getIchiranNextKouhoretsu(uiContext d)
  * °ú¤­¿ô	uiContext
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0	°Û¾ï½ªÎ»»þ -1
  */
-IchiranBeginningOfKouho(uiContext d)
+int IchiranBeginningOfKouho(uiContext d)
 {
   ichiranContext ic = (ichiranContext)d->modec;
 
@@ -1287,7 +1287,7 @@ IchiranBeginningOfKouho(uiContext d)
  * °ú¤­¿ô	uiContext
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0	°Û¾ï½ªÎ»»þ -1
  */
-IchiranEndOfKouho(uiContext d)
+int IchiranEndOfKouho(uiContext d)
 {
   ichiranContext ic = (ichiranContext)d->modec;
 
@@ -1328,10 +1328,10 @@ IchiranEndOfKouho(uiContext d)
  */
 
 static int getIchiranBangoKouho (uiContext);
-static IchiranBangoKouho (uiContext);
+static int IchiranBangoKouho (uiContext);
 
 static
-IchiranBangoKouho(uiContext d)
+int IchiranBangoKouho(uiContext d)
 {
   ichiranContext ic = (ichiranContext)d->modec;
   int zflag, retval = 0;
@@ -1515,138 +1515,138 @@ ichiranFin(uiContext d)
   GlineClear(d);
 }
 
-static IchiranExtendBunsetsu (uiContext);
+static int IchiranExtendBunsetsu (uiContext);
 
 static
-IchiranExtendBunsetsu(uiContext d)
+int IchiranExtendBunsetsu(uiContext d)
 {
   return IchiranQuitThenDo(d, CANNA_FN_Extend);
 }
 
-static IchiranShrinkBunsetsu (uiContext);
+static int IchiranShrinkBunsetsu (uiContext);
 
 static
-IchiranShrinkBunsetsu(uiContext d)
+int IchiranShrinkBunsetsu(uiContext d)
 {
   return IchiranQuitThenDo(d, CANNA_FN_Shrink);
 }
 
-static IchiranAdjustBunsetsu (uiContext);
+static int IchiranAdjustBunsetsu (uiContext);
 
 static
-IchiranAdjustBunsetsu(uiContext d)
+int IchiranAdjustBunsetsu(uiContext d)
 {
   return IchiranQuitThenDo(d, CANNA_FN_AdjustBunsetsu);
 }
 
-static IchiranKillToEndOfLine (uiContext);
+static int IchiranKillToEndOfLine (uiContext);
 
 static
-IchiranKillToEndOfLine(uiContext d)
+int IchiranKillToEndOfLine(uiContext d)
 {
   return IchiranKakuteiThenDo(d, CANNA_FN_KillToEndOfLine);
 }
 
-static IchiranDeleteNext (uiContext);
+static int IchiranDeleteNext (uiContext);
 
 static
-IchiranDeleteNext(uiContext d)
+int IchiranDeleteNext(uiContext d)
 {
   return IchiranKakuteiThenDo(d, CANNA_FN_DeleteNext);
 }
 
-static IchiranBubunMuhenkan (uiContext);
+static int IchiranBubunMuhenkan (uiContext);
 
 static
-IchiranBubunMuhenkan(uiContext d)
+int IchiranBubunMuhenkan(uiContext d)
 {
   return IchiranQuitThenDo(d, CANNA_FN_BubunMuhenkan);
 }
 
-static IchiranHiragana (uiContext);
+static int IchiranHiragana (uiContext);
 
 static
-IchiranHiragana(uiContext d)
+int IchiranHiragana(uiContext d)
 {
   return IchiranQuitThenDo(d, CANNA_FN_Hiragana);
 }
 
-static IchiranKatakana (uiContext);
+static int IchiranKatakana (uiContext);
 
 static
-IchiranKatakana(uiContext d)
+int IchiranKatakana(uiContext d)
 {
   return IchiranQuitThenDo(d, CANNA_FN_Katakana);
 }
 
-static IchiranZenkaku (uiContext);
+static int IchiranZenkaku (uiContext);
 
 static
-IchiranZenkaku(uiContext d)
+int IchiranZenkaku(uiContext d)
 {
   return IchiranQuitThenDo(d, CANNA_FN_Zenkaku);
 }
 
-static IchiranHankaku (uiContext);
+static int IchiranHankaku (uiContext);
 
 static
-IchiranHankaku(uiContext d)
+int IchiranHankaku(uiContext d)
 {
   return IchiranQuitThenDo(d, CANNA_FN_Hankaku);
 }
 
-static IchiranRomaji (uiContext);
+static int IchiranRomaji (uiContext);
 
 static
-IchiranRomaji(uiContext d)
+int IchiranRomaji(uiContext d)
 {
   return IchiranQuitThenDo(d, CANNA_FN_Romaji);
 }
 
-static IchiranToUpper (uiContext);
+static int IchiranToUpper (uiContext);
 
 static
-IchiranToUpper(uiContext d)
+int IchiranToUpper(uiContext d)
 {
   return IchiranQuitThenDo(d, CANNA_FN_ToUpper);
 }
 
-static IchiranToLower (uiContext);
+static int IchiranToLower (uiContext);
 
 static
-IchiranToLower(uiContext d)
+int IchiranToLower(uiContext d)
 {
   return IchiranQuitThenDo(d, CANNA_FN_ToLower);
 }
 
-static IchiranCapitalize (uiContext);
+static int IchiranCapitalize (uiContext);
 
 static
-IchiranCapitalize(uiContext d)
+int IchiranCapitalize(uiContext d)
 {
   return IchiranQuitThenDo(d, CANNA_FN_Capitalize);
 }
 
-static IchiranKanaRotate (uiContext);
+static int IchiranKanaRotate (uiContext);
 
 static
-IchiranKanaRotate(uiContext d)
+int IchiranKanaRotate(uiContext d)
 {
   return IchiranQuitThenDo(d, CANNA_FN_KanaRotate);
 }
 
-static IchiranRomajiRotate (uiContext);
+static int IchiranRomajiRotate (uiContext);
 
 static
-IchiranRomajiRotate(uiContext d)
+int IchiranRomajiRotate(uiContext d)
 {
   return IchiranQuitThenDo(d, CANNA_FN_RomajiRotate);
 }
 
-static IchiranCaseRotateForward (uiContext);
+static int IchiranCaseRotateForward (uiContext);
 
 static
-IchiranCaseRotateForward(uiContext d)
+int IchiranCaseRotateForward(uiContext d)
 {
   return IchiranQuitThenDo(d, CANNA_FN_CaseRotate);
 }

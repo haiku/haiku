@@ -22,7 +22,7 @@
 // Modified by T.Murai
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char tanmap_id[] = "@(#) 102.1 $Id: tanmap.h,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char tanmap_id[] = "@(#) 102.1 $Id$";
 #endif /* lint */
 
 #include "canna.h"
@@ -69,7 +69,7 @@ static struct funccfunc tan_funcs[] = {
   {0				,0			},
 };
 
-extern searchfunc(...);
+extern int searchfunc(...);
 KanjiModeRec tankouho_mode = {
   searchfunc,
   default_kmap,

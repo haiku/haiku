@@ -25,7 +25,7 @@
 /************************************************************************/
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "@(#) 102.1 $Id: parse.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char rcs_id[] = "@(#) 102.1 $Id$";
 #endif /* lint */
 
 #include <stdio.h>
@@ -50,7 +50,7 @@ static char CANNA_rcfilename[BUF_LEN] = "";
 
 extern int ckverbose;
 
-extern YYparse_by_rcfilename();
+extern int YYparse_by_rcfilename();
 
 /* cfuncdef
 
@@ -72,10 +72,10 @@ extern YYparse_by_rcfilename();
 #define OBSOLETE_FILEENVNAME "IROHAFILE"
 #define OBSOLETE_HOSTENVNAME "IROHAHOST"
 
-static DISPLAY_to_hostname(char *name, char *buf, int bufsize);
+static int DISPLAY_to_hostname(char *name, char *buf, int bufsize);
 
 static
-make_initfilename(void)
+int make_initfilename(void)
 {
   if(!CANNA_initfilename) {
     CANNA_initfilename = (char *)malloc(1024);

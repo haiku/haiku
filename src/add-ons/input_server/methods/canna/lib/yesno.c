@@ -21,7 +21,7 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static	char	rcs_id[] = "@(#) 102.1 $Id: yesno.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static	char	rcs_id[] = "@(#) 102.1 $Id$";
 #endif  /* lint */
 
 #include	<errno.h>
@@ -34,9 +34,9 @@ extern int errno;
 static coreContext newYesNoContext(void);
 static void freeYesNoContext(coreContext qc);
 static void popYesNoMode(uiContext d);
-static YesNoNop(uiContext d);
-static YesNo(uiContext d);
-static YesNoQuit(uiContext d);
+static int YesNoNop(uiContext d);
+static int YesNo(uiContext d);
+static int YesNoQuit(uiContext d);
 
 /* cfunc yesNoContext
  *
@@ -71,7 +71,7 @@ freeYesNoContext(coreContext qc)
 /*
  * ¸õÊä°ìÍ÷¹Ô¤òºî¤ë
  */
-getYesNoContext(uiContext d, canna_callback_t everyTimeCallback, canna_callback_t exitCallback, canna_callback_t quitCallback, canna_callback_t auxCallback)
+int getYesNoContext(uiContext d, canna_callback_t everyTimeCallback, canna_callback_t exitCallback, canna_callback_t quitCallback, canna_callback_t auxCallback)
 {
   extern KanjiModeRec tourokureibun_mode;
   coreContext qc;
@@ -135,7 +135,7 @@ YesNoNop(uiContext d)
 static int YesNo (uiContext);
 
 static
-YesNo(uiContext d)
+int YesNo(uiContext d)
 {
   if((d->ch == 'y') || (d->ch == 'Y')) {
     popYesNoMode(d);
@@ -154,7 +154,7 @@ YesNo(uiContext d)
 static int YesNoQuit (uiContext);
 
 static
-YesNoQuit(uiContext d)
+int YesNoQuit(uiContext d)
 {
   int retval = 0;
 

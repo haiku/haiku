@@ -26,7 +26,7 @@
 
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static	char	rcs_id[] = "@(#) 102.1 $Id: kigo.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static	char	rcs_id[] = "@(#) 102.1 $Id$";
 #endif /* lint */
 
 #include	"canna.h"
@@ -53,19 +53,19 @@ static	char	rcs_id[] = "@(#) 102.1 $Id: kigo.c,v 1.1 2004/12/23 21:23:49 korli E
 
 static void freeKigoContext(ichiranContext kc);
 static void makeKigoGlineStatus(uiContext d);
-static makeKigoInfo(uiContext d, int headkouho);
-static kigoIchiranExitCatch(uiContext d, int retval, mode_context env);
-static kigoIchiranQuitCatch(uiContext d, int retval, mode_context env);
-static KigoNop(uiContext d);
-static KigoForwardKouho(uiContext d);
-static KigoBackwardKouho(uiContext d);
-static KigoPreviousKouhoretsu(uiContext d);
-static KigoNextKouhoretsu(uiContext d);
-static KigoBeginningOfKouho(uiContext d);
-static KigoEndOfKouho(uiContext d);
-static KigoKakutei(uiContext d);
-static KigoBangoKouho(uiContext d);
-static KigoQuit(uiContext d);
+static int makeKigoInfo(uiContext d, int headkouho);
+static int kigoIchiranExitCatch(uiContext d, int retval, mode_context env);
+static int kigoIchiranQuitCatch(uiContext d, int retval, mode_context env);
+static int KigoNop(uiContext d);
+static int KigoForwardKouho(uiContext d);
+static int KigoBackwardKouho(uiContext d);
+static int KigoPreviousKouhoretsu(uiContext d);
+static int KigoNextKouhoretsu(uiContext d);
+static int KigoBeginningOfKouho(uiContext d);
+static int KigoEndOfKouho(uiContext d);
+static int KigoKakutei(uiContext d);
+static int KigoBangoKouho(uiContext d);
+static int KigoQuit(uiContext d);
 
 static int kigo_curIkouho;
 
@@ -128,7 +128,7 @@ freeKigoContext(ichiranContext kc)
  * µ­¹æ°ìÍ÷¹Ô¤òºî¤ë
  */
 inline
-getKigoContext(uiContext d, canna_callback_t everyTimeCallback, canna_callback_t exitCallback, canna_callback_t quitCallback, canna_callback_t auxCallback)
+int getKigoContext(uiContext d, canna_callback_t everyTimeCallback, canna_callback_t exitCallback, canna_callback_t quitCallback, canna_callback_t auxCallback)
 {
   extern KanjiModeRec kigo_mode;
   ichiranContext kc;
@@ -230,7 +230,7 @@ makeKigoGlineStatus(uiContext d)
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0
  */
 static
-makeKigoInfo(uiContext d, int headkouho)
+int makeKigoInfo(uiContext d, int headkouho)
 {
   ichiranContext kc = (ichiranContext)d->modec;
   WCHAR_T *gptr;
@@ -300,7 +300,7 @@ makeKigoInfo(uiContext d, int headkouho)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 static
-kigoIchiranExitCatch(uiContext d, int retval, mode_context env)
+int kigoIchiranExitCatch(uiContext d, int retval, mode_context env)
      /* ARGSUSED */
 {
   popCallback(d);
@@ -313,7 +313,7 @@ kigoIchiranExitCatch(uiContext d, int retval, mode_context env)
 }
 
 static
-kigoIchiranQuitCatch(uiContext d, int retval, mode_context env)
+int kigoIchiranQuitCatch(uiContext d, int retval, mode_context env)
      /* ARGSUSED */
 {
   popCallback(d);
@@ -323,7 +323,7 @@ kigoIchiranQuitCatch(uiContext d, int retval, mode_context env)
 }
 #endif /* NO_EXTEND_MENU */
 
-KigoIchiran(uiContext d)
+int KigoIchiran(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -349,7 +349,7 @@ KigoIchiran(uiContext d)
  * °ú¤­¿ô	uiContext
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0	°Û¾ï½ªÎ»»þ -1
  */
-makeKigoIchiran(uiContext d, int major_mode)
+int makeKigoIchiran(uiContext d, int major_mode)
 {
   ichiranContext kc;
   int            headkouho;
@@ -414,7 +414,7 @@ makeKigoIchiran(uiContext d, int major_mode)
 }
 
 static
-KigoNop(uiContext d)
+int KigoNop(uiContext d)
 {
   /* currentModeInfo ¤Ç¥â¡¼¥É¾ðÊó¤¬É¬¤ºÊÖ¤ë¤è¤¦¤Ë¥À¥ß¡¼¤Î¥â¡¼¥É¤òÆþ¤ì¤Æ¤ª¤¯ */
   d->majorMode = d->minorMode = CANNA_MODE_AlphaMode;
@@ -431,7 +431,7 @@ KigoNop(uiContext d)
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0
  */
 static
-KigoForwardKouho(uiContext d)
+int KigoForwardKouho(uiContext d)
 {
   ichiranContext kc = (ichiranContext)d->modec;
   int  headkouho;
@@ -463,7 +463,7 @@ KigoForwardKouho(uiContext d)
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0
  */
 static
-KigoBackwardKouho(uiContext d)
+int KigoBackwardKouho(uiContext d)
 {
   ichiranContext kc = (ichiranContext)d->modec;
   int  headkouho;
@@ -494,7 +494,7 @@ KigoBackwardKouho(uiContext d)
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0
  */
 static
-KigoPreviousKouhoretsu(uiContext d)
+int KigoPreviousKouhoretsu(uiContext d)
 {
   ichiranContext kc = (ichiranContext)d->modec;
   int headkouho;
@@ -524,7 +524,7 @@ KigoPreviousKouhoretsu(uiContext d)
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0
  */
 static
-KigoNextKouhoretsu(uiContext d)
+int KigoNextKouhoretsu(uiContext d)
 {
   ichiranContext kc = (ichiranContext)d->modec;
   int headkouho;
@@ -554,7 +554,7 @@ KigoNextKouhoretsu(uiContext d)
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0
  */
 static
-KigoBeginningOfKouho(uiContext d)
+int KigoBeginningOfKouho(uiContext d)
 {
   ichiranContext kc = (ichiranContext)d->modec;
 
@@ -575,7 +575,7 @@ KigoBeginningOfKouho(uiContext d)
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0
  */
 static
-KigoEndOfKouho(uiContext d)
+int KigoEndOfKouho(uiContext d)
 {
   ichiranContext kc = (ichiranContext)d->modec;
 
@@ -599,7 +599,7 @@ KigoEndOfKouho(uiContext d)
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0
  */
 static
-KigoKakutei(uiContext d)
+int KigoKakutei(uiContext d)
 {
   ichiranContext kc = (ichiranContext)d->modec;
 
@@ -685,7 +685,7 @@ KigoBangoKouho(uiContext d)
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0
  */
 static
-KigoQuit(uiContext d)
+int KigoQuit(uiContext d)
 {
   ichiranContext kc = (ichiranContext)d->modec;
   BYTE fl = kc->flags;

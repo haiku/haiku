@@ -25,7 +25,7 @@
 /************************************************************************/
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "@(#) 102.1 $Id: keydef.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char rcs_id[] = "@(#) 102.1 $Id$";
 #endif /* lint */
 
 #include "canna.h"
@@ -63,8 +63,8 @@ static void clearAllFuncSequence(void);
 static void freeKeySeqMode(KanjiMode m);
 static void freeMap(struct map *m);
 static void clearAllKeySequence(void);
-static specialen(unsigned char *block);
-static to_write_act(int depth, int keysize, int actsize, unsigned singleAct);
+static int specialen(unsigned char *block);
+static int to_write_act(int depth, int keysize, int actsize, unsigned singleAct);
 static struct map *regist_map(KanjiMode tbl, unsigned char *keybuff, unsigned char *actbuff, int depth);
 static int regist_key_hash(unsigned char *tbl_ptr, unsigned char *keybuff, unsigned char *actbuff);
 static int copyMultiSequence(unsigned char key, KanjiMode old_tbl, KanjiMode new_tbl);
@@ -133,7 +133,7 @@ unsigned char *alphamap, *emptymap;
 
 */
 
-initKeyTables(void)
+int initKeyTables(void)
 {
   int i;
   unsigned char *tbl;
@@ -204,7 +204,7 @@ restoreDefaultKeymaps(void)
 
 extern int nothermodes;
 
-changeKeyfunc(int modenum, int key, int fnum, unsigned char *actbuff, unsigned char *keybuff)
+int changeKeyfunc(int modenum, int key, int fnum, unsigned char *actbuff, unsigned char *keybuff)
 {
   int i, retval = 0;
   unsigned char *p, *q;
@@ -339,7 +339,7 @@ changeKeyOnSomeCondition(KanjiMode mode, int key, int fnum, unsigned char *actbu
  *
  */
 
-changeKeyfuncOfAll(int key, int fnum, unsigned char *actbuff, unsigned char *keybuff)
+int changeKeyfuncOfAll(int key, int fnum, unsigned char *actbuff, unsigned char *keybuff)
 {
   extern extraFunc *extrafuncp;
   extraFunc *ep;
@@ -583,7 +583,7 @@ clearAllKeySequence(void)
 }
 
 static
-specialen(unsigned char *block)
+int specialen(unsigned char *block)
 {
   int i;
   for (i = 0 ; block[i] != 255 ;) {
@@ -595,7 +595,7 @@ specialen(unsigned char *block)
 }
 
 static
-to_write_act(int depth, int keysize, int actsize, unsigned singleAct)
+int to_write_act(int depth, int keysize, int actsize, unsigned singleAct)
 {
   if (depth == (keysize -2)) {
     if (actsize > 1){
@@ -865,7 +865,7 @@ freeMultiSequence(unsigned char key, KanjiMode tbl)
   free(map);
 }
 
-askQuitKey(unsigned key)
+int askQuitKey(unsigned key)
 {
   if (defaultmap[key] == CANNA_FN_Quit) {
     return 1; /* ¼õ¤±¼è¤Ã¤¿key¤Ïquit¤À¤Ã¤¿¡£ */

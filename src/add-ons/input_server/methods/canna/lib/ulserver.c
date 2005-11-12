@@ -21,7 +21,7 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "@(#) 102.1 $Id: ulserver.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char rcs_id[] = "@(#) 102.1 $Id$";
 #endif
 
 #ifndef NO_EXTEND_MENU
@@ -32,10 +32,10 @@ static char rcs_id[] = "@(#) 102.1 $Id: ulserver.c,v 1.1 2004/12/23 21:23:49 kor
 extern int errno;
 #endif
 
-static uuServerChangeEveryTimeCatch(uiContext d, int retval, mode_context env);
-static uuServerChangeExitCatch(uiContext d, int retval, mode_context env);
-static uuServerChangeQuitCatch(uiContext d, int retval, mode_context env);
-static serverChangeDo(uiContext d, int len);
+static int uuServerChangeEveryTimeCatch(uiContext d, int retval, mode_context env);
+static int uuServerChangeExitCatch(uiContext d, int retval, mode_context env);
+static int uuServerChangeQuitCatch(uiContext d, int retval, mode_context env);
+static int serverChangeDo(uiContext d, int len);
 
 static int serverChangeDo();
 
@@ -43,7 +43,7 @@ static int serverChangeDo();
  * ¥µ¡¼¥Ð¤ÎÀÚ¤êÎ¥¤·                                                          *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-serverFin(uiContext d)
+int serverFin(uiContext d)
 {
   int retval = 0;
   yomiContext yc = (yomiContext)d->modec;
@@ -146,12 +146,12 @@ uuServerChangeQuitCatch(uiContext d, int retval, mode_context env)
 extern exp(char *) RkwGetServerName();
 #endif /* STANDALONE */
 
-serverChange(uiContext d)
+int serverChange(uiContext d)
 {
   int retval = 0;
   WCHAR_T *w;
   extern KanjiModeRec yomi_mode;
-  extern defaultContext;
+  extern int defaultContext;
   yomiContext yc = (yomiContext)d->modec;
 
 #ifndef STANDALONE

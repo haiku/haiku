@@ -21,7 +21,7 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "@(#) 102.1 $Id: uldefine.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char rcs_id[] = "@(#) 102.1 $Id$";
 #endif
 
 #include	<errno.h>
@@ -31,28 +31,28 @@ static char rcs_id[] = "@(#) 102.1 $Id: uldefine.c,v 1.1 2004/12/23 21:23:49 kor
 
 // static void clearTourokuContext(tourokuContext p);
 static tourokuContext newTourokuContext(void);
-static uuTTangoEveryTimeCatch(uiContext d, int retval, mode_context env);
-static uuTTangoExitCatch(uiContext d, int retval, mode_context env);
-static uuT2TangoEveryTimeCatch(uiContext d, int retval, mode_context env);
-static uuT2TangoExitCatch(uiContext d, int retval, mode_context nyc);
-static uuT2TangoQuitCatch(uiContext d, int retval, mode_context env);
-static uuTMakeDicYesCatch(uiContext d, int retval, mode_context env);
-static uuTMakeDicQuitCatch(uiContext d, int retval, mode_context env);
-static uuTMakeDicNoCatch(uiContext d, int retval, mode_context env);
-static dicTourokuDo(uiContext d);
+static int uuTTangoEveryTimeCatch(uiContext d, int retval, mode_context env);
+static int uuTTangoExitCatch(uiContext d, int retval, mode_context env);
+static int uuT2TangoEveryTimeCatch(uiContext d, int retval, mode_context env);
+static int uuT2TangoExitCatch(uiContext d, int retval, mode_context nyc);
+static int uuT2TangoQuitCatch(uiContext d, int retval, mode_context env);
+static int uuTMakeDicYesCatch(uiContext d, int retval, mode_context env);
+static int uuTMakeDicQuitCatch(uiContext d, int retval, mode_context env);
+static int uuTMakeDicNoCatch(uiContext d, int retval, mode_context env);
+static int dicTourokuDo(uiContext d);
 static struct dicname *findUsrDic(void);
-static checkUsrDic(uiContext d);
-static dicTourokuTangoPre(uiContext d);
-static acDicTourokuTangoPre(uiContext d, int dn, mode_context dm);
-static uuTYomiEveryTimeCatch(uiContext d, int retval, mode_context env);
-static uuTYomiExitCatch(uiContext d, int retval, mode_context env);
-static uuTYomiQuitCatch(uiContext d, int retval, mode_context env);
-static dicTourokuYomi(uiContext d);
-static acDicTourokuYomi(uiContext d, int dn, mode_context dm);
-static dicTourokuYomiDo(uiContext d, canna_callback_t quitfunc);
-static uuTHinshiExitCatch(uiContext d, int retval, mode_context env);
-static uuTHinshiQuitCatch(uiContext d, int retval, mode_context env);
-extern specialfunc (uiContext, int);
+static int checkUsrDic(uiContext d);
+static int dicTourokuTangoPre(uiContext d);
+static int acDicTourokuTangoPre(uiContext d, int dn, mode_context dm);
+static int uuTYomiEveryTimeCatch(uiContext d, int retval, mode_context env);
+static int uuTYomiExitCatch(uiContext d, int retval, mode_context env);
+static int uuTYomiQuitCatch(uiContext d, int retval, mode_context env);
+static int dicTourokuYomi(uiContext d);
+static int acDicTourokuYomi(uiContext d, int dn, mode_context dm);
+static int dicTourokuYomiDo(uiContext d, canna_callback_t quitfunc);
+static int uuTHinshiExitCatch(uiContext d, int retval, mode_context env);
+static int uuTHinshiQuitCatch(uiContext d, int retval, mode_context env);
+extern int specialfunc (uiContext, int);
 
 #if !defined(NO_EXTEND_MENU) && !defined(WIN)
 #ifdef luna88k
@@ -173,7 +173,7 @@ newTourokuContext(void)
   return tcxt;
 }
 
-getTourokuContext(uiContext d)
+int getTourokuContext(uiContext d)
 {
   tourokuContext tc;
   int retval = 0;
@@ -218,7 +218,7 @@ popTourokuMode(uiContext d)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 static
-uuTTangoEveryTimeCatch(uiContext d, int retval, mode_context env)
+int uuTTangoEveryTimeCatch(uiContext d, int retval, mode_context env)
 {
   tourokuContext tc = (tourokuContext)env;
   int len, echoLen, revPos;
@@ -286,7 +286,7 @@ uuTTangoEveryTimeCatch(uiContext d, int retval, mode_context env)
 }
 
 static
-uuTTangoExitCatch(uiContext d, int retval, mode_context env)
+int uuTTangoExitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   tourokuContext tc;
@@ -302,7 +302,7 @@ uuTTangoExitCatch(uiContext d, int retval, mode_context env)
   return(dicTourokuYomi(d));
 }
 
-uuTTangoQuitCatch(uiContext d, int retval, mode_context env)
+int uuTTangoQuitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   popCallback(d); /* ÆÉ¤ß¤ò pop */
@@ -314,7 +314,7 @@ uuTTangoQuitCatch(uiContext d, int retval, mode_context env)
 }
 
 static
-uuT2TangoEveryTimeCatch(uiContext d, int retval, mode_context env)
+int uuT2TangoEveryTimeCatch(uiContext d, int retval, mode_context env)
 {
   yomiContext nyc;
   int echoLen, pos, offset;
@@ -372,7 +372,7 @@ uuT2TangoEveryTimeCatch(uiContext d, int retval, mode_context env)
  *  Ã±¸ìÅÐÏ¿¥â¡¼¥É¤òÈ´¤±¤ëºÝ¤ËÉ¬Í×¤Ê½èÍý¤ò¹Ô¤¦  *
  ************************************************/
 static
-uuT2TangoExitCatch(uiContext d, int retval, mode_context nyc)
+int uuT2TangoExitCatch(uiContext d, int retval, mode_context nyc)
 /* ARGSUSED */
 {
   yomiContext yc;
@@ -392,7 +392,7 @@ uuT2TangoExitCatch(uiContext d, int retval, mode_context nyc)
 }
 
 static
-uuT2TangoQuitCatch(uiContext d, int retval, mode_context env)
+int uuT2TangoQuitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   popCallback(d); /* ÆÉ¤ß¤ò pop */
@@ -409,13 +409,13 @@ uuT2TangoQuitCatch(uiContext d, int retval, mode_context env)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 static
-uuTMakeDicYesCatch(uiContext d, int retval, mode_context env)
+int uuTMakeDicYesCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   int err = 0, perr = 0;
   tourokuContext tc;
   WCHAR_T **dp;
-  extern defaultContext;
+  extern int defaultContext;
 
   popCallback(d); /* yesNo ¤ò¥Ý¥Ã¥× */
 
@@ -475,7 +475,7 @@ uuTMakeDicYesCatch(uiContext d, int retval, mode_context env)
 }
 
 static
-uuTMakeDicQuitCatch(uiContext d, int retval, mode_context env)
+int uuTMakeDicQuitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   popCallback(d); /* yesNo ¤ò¥Ý¥Ã¥× */
@@ -486,7 +486,7 @@ uuTMakeDicQuitCatch(uiContext d, int retval, mode_context env)
 }
 
 static
-uuTMakeDicNoCatch(uiContext d, int retval, mode_context env)
+int uuTMakeDicNoCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   popCallback(d); /* yesNo ¤ò¥Ý¥Ã¥× */
@@ -510,7 +510,7 @@ getUserDicName(uiContext d)
   int nmudic; /* ¥Þ¥¦¥ó¥È¤µ¤ì¤Æ¤¤¤ë¥æ¡¼¥¶¼­½ñ¤Î¿ô */
   struct dicname *p;
   WCHAR_T **tourokup, **tp;
-  extern defaultContext;
+  extern int defaultContext;
 
   if(defaultContext < 0) {
     if((KanjiInit() < 0) || (defaultContext < 0)) {
@@ -553,7 +553,7 @@ getUserDicName(uiContext d)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /* »Ï¤á¤Ë¸Æ¤Ð¤ì¤ë´Ø¿ô */
 
-dicTouroku(uiContext d)
+int dicTouroku(uiContext d)
 {
   tourokuContext tc;
   yomiContext yc = (yomiContext)d->modec;
@@ -580,7 +580,7 @@ dicTouroku(uiContext d)
 }
 
 static
-dicTourokuDo(uiContext d)
+int dicTourokuDo(uiContext d)
 {
   tourokuContext tc;
   WCHAR_T **up;
@@ -639,7 +639,7 @@ findUsrDic(void)
  *   ¥Þ¥¦¥ó¥È¤µ¤ì¤Æ¤¤¤ë¼­½ñ¤¬¤Ê¤¤
  */
 static
-checkUsrDic(uiContext d)
+int checkUsrDic(uiContext d)
 {
   tourokuContext tc = (tourokuContext)d->modec;
   coreContext ync;
@@ -693,7 +693,7 @@ checkUsrDic(uiContext d)
   return(0);
 }
 
-dicTourokuTango(uiContext d, canna_callback_t quitfunc)
+int dicTourokuTango(uiContext d, canna_callback_t quitfunc)
 {
   tourokuContext tc = (tourokuContext)d->modec;
   yomiContext yc, yc2;
@@ -737,13 +737,13 @@ dicTourokuTango(uiContext d, canna_callback_t quitfunc)
 }
 
 static
-dicTourokuTangoPre(uiContext d)
+int dicTourokuTangoPre(uiContext d)
 {
   return dicTourokuTango(d, uuTTangoQuitCatch);
 }
 
 static
-acDicTourokuTangoPre(uiContext d, int dn, mode_context dm)
+int acDicTourokuTangoPre(uiContext d, int dn, mode_context dm)
 /* ARGSUSED */
 {
   popCallback(d);
@@ -755,7 +755,7 @@ acDicTourokuTangoPre(uiContext d, int dn, mode_context dm)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 static
-uuTYomiEveryTimeCatch(uiContext d, int retval, mode_context env)
+int uuTYomiEveryTimeCatch(uiContext d, int retval, mode_context env)
 {
   tourokuContext tc = (tourokuContext)env;
   int len, echoLen, revPos;
@@ -812,7 +812,7 @@ uuTYomiEveryTimeCatch(uiContext d, int retval, mode_context env)
 }
 
 static
-uuTYomiExitCatch(uiContext d, int retval, mode_context env)
+int uuTYomiExitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   tourokuContext tc;
@@ -828,10 +828,10 @@ uuTYomiExitCatch(uiContext d, int retval, mode_context env)
   return(dicTourokuHinshi(d));
 }
 
-static uuTYomiQuitCatch (uiContext, int, mode_context);
+static int uuTYomiQuitCatch (uiContext, int, mode_context);
 
 static
-uuTYomiQuitCatch(uiContext d, int retval, mode_context env)
+int uuTYomiQuitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   popCallback(d); /* ÆÉ¤ß¤ò pop */
@@ -843,13 +843,13 @@ uuTYomiQuitCatch(uiContext d, int retval, mode_context env)
 }
 
 static
-dicTourokuYomi(uiContext d)
+int dicTourokuYomi(uiContext d)
 {
   return(dicTourokuYomiDo(d, uuTYomiQuitCatch));
 }
 
 static
-acDicTourokuYomi(uiContext d, int dn, mode_context dm)
+int acDicTourokuYomi(uiContext d, int dn, mode_context dm)
 /* ARGSUSED */
 {
   popCallback(d);
@@ -857,7 +857,7 @@ acDicTourokuYomi(uiContext d, int dn, mode_context dm)
 }
 
 static
-dicTourokuYomiDo(uiContext d, canna_callback_t quitfunc)
+int dicTourokuYomiDo(uiContext d, canna_callback_t quitfunc)
 {
   yomiContext yc;
   tourokuContext tc = (tourokuContext)d->modec;
@@ -895,7 +895,7 @@ dicTourokuYomiDo(uiContext d, canna_callback_t quitfunc)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 static
-uuTHinshiExitCatch(uiContext d, int retval, mode_context env)
+int uuTHinshiExitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   forichiranContext fc;
@@ -929,7 +929,7 @@ uuTHinshiExitCatch(uiContext d, int retval, mode_context env)
 }
 
 static
-uuTHinshiQuitCatch(uiContext d, int retval, mode_context env)
+int uuTHinshiQuitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   popCallback(d); /* °ìÍ÷¤ò pop */
@@ -947,7 +947,7 @@ uuTHinshiQuitCatch(uiContext d, int retval, mode_context env)
   return(dicTourokuYomi(d));
 }
 
-dicTourokuHinshi(uiContext d)
+int dicTourokuHinshi(uiContext d)
 {
   tourokuContext tc = (tourokuContext)d->modec;
   forichiranContext fc;
@@ -1023,7 +1023,7 @@ dicTourokuHinshi(uiContext d)
  * jrKanjiControl ÍÑ                                                         *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-dicTourokuControl(uiContext d, WCHAR_T *tango, canna_callback_t quitfunc)
+int dicTourokuControl(uiContext d, WCHAR_T *tango, canna_callback_t quitfunc)
 {
   tourokuContext tc;
 

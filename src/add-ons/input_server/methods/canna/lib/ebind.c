@@ -26,7 +26,7 @@
 /************************************************************************/
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcsid[] = "$Id: ebind.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char rcsid[] = "$Id$";
 #endif
 
 #include "canna.h"
@@ -37,7 +37,7 @@ static WCHAR_T *inbuf = 0;
 static int inbufsize = 0;
 
 
-static
+static int
 StoreWCtoEUC(WCHAR_T *wbuf, int wbuflen, wcKanjiStatus *wks, char *ebuf, int maxebuf, jrKanjiStatus *ks, int ch, int nbytes)
 {
   int ret, rest, totallen = 0, len;
@@ -175,7 +175,7 @@ StoreWCtoEUC(WCHAR_T *wbuf, int wbuflen, wcKanjiStatus *wks, char *ebuf, int max
   return ret;
 }
 
-inline
+inline int
 XLookupKanji2(
 	unsigned int	dpy, 
 	unsigned int	win, 

@@ -21,7 +21,7 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcsid[]="@(#) 102.1 $Id: dic.c,v 1.1 2004/12/23 21:23:50 korli Exp $";
+static char rcsid[]="@(#) 102.1 $Id$";
 #endif
 /*LINTLIBRARY*/
 
@@ -309,7 +309,7 @@ RkwCreateDic(int cx_num, char *dicname, int mode)
   return ret;
 }
 
-copyFile(struct DM *src, struct DM *dst)
+int copyFile(struct DM *src, struct DM *dst)
 {
   struct DF	*srcF = src->dm_file;
   struct DD	*srcD = srcF->df_direct;
@@ -727,9 +727,9 @@ RkwCopyDic(int co, char *dir, char *from, char *to, int mode)
 
 		RkwSync(co, from); /* sometimes, this failes to an error */
 		ptemplate =
-		  (type == DF_FREQDIC) ? FREQ_TEMPLATE :
-		    (type == DF_TEMPDIC) ? USER_TEMPLATE :
-		      PERM_TEMPLATE;
+		  (type == DF_FREQDIC) ? (char*)FREQ_TEMPLATE :
+		    (type == DF_TEMPDIC) ? (char*)USER_TEMPLATE :
+		      (char*)PERM_TEMPLATE;
 
 		res = ACCES;
 		filename = _RkCreateUniquePath(userDDP[0], ptemplate);
@@ -885,7 +885,7 @@ popTdn(struct RkContext *cx)
   }
 }
 
-inline
+inline int
 GetLine(struct RkContext *cx, struct RkKxGram *gram, struct TD *tdp, WCHAR_T *line, int size)
 {
   struct TD	*vtd;

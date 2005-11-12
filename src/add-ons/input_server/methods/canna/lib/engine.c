@@ -25,7 +25,7 @@
 /************************************************************************/
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "$Id: engine.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char rcs_id[] = "$Id$";
 #endif
 
 #include "canna.h"
@@ -33,6 +33,7 @@ static char rcs_id[] = "$Id: engine.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
 #define CANNA_SERVER_NAME_LEN 128
 static char iroha_server_name[CANNA_SERVER_NAME_LEN] = {0, 0};
 
+int
 RkSetServerName(char *s)
 {
   if (s)

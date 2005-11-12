@@ -26,7 +26,7 @@
 
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static	char	rcs_id[] = "@(#) 102.1 $Id: henkan.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static	char	rcs_id[] = "@(#) 102.1 $Id$";
 #endif /* lint */
 
 #include	"canna.h"
@@ -59,7 +59,7 @@ extern int RkwGetServerVersion (int *, int *);
 #define DICERRORMESGLEN 78
 
 
-static doYomiHenkan(uiContext d, int len, WCHAR_T *kanji);
+static int doYomiHenkan(uiContext d, int len, WCHAR_T *kanji);
 
 static char dictmp[DICERRORMESGLEN];
 
@@ -132,14 +132,14 @@ autodicError(void)
  * °ú¤­¿ô	¤Ê¤·
  * Ìá¤êÃÍ	0:¤Þ¤¢Àµ¾ï¡¢ -1:¤È¤³¤È¤óÉÔÎÉ
  */
-KanjiInit()
+int KanjiInit()
 {
 char			*ptr, *getenv(), *kodmesg = ""/* ¼­½ñ¤Î¼ïÊÌËè¤Î¥á¥Ã¥»¡¼¥¸ */;
 int				con;
 static int		mountnottry = 1; /* ¥Þ¥¦¥ó¥È½èÍý¤ò¹Ô¤Ã¤Æ¤¤¤ë¤«¤É¤¦¤« */
 struct			dicname *stp;
 extern struct	dicname *kanjidicnames;
-extern			FirstTime;
+extern			int FirstTime;
 extern			jrUserInfoStruct *uinfo;
 extern char		*RkGetServerHost(void);
 extern char		basepath[];
@@ -396,7 +396,7 @@ char 			dichomedir[256];
  * °ú¤­¿ô	¤Ê¤·
  * Ìá¤êÃÍ	¤Ê¤·
  */
-KanjiFin(void)
+int KanjiFin(void)
 {
   struct dicname *dp, *np;
   int con;
@@ -1149,7 +1149,7 @@ prepareHenkanMode(uiContext d)
   return 1;
 }
 
-doHenkan(uiContext d, int len, WCHAR_T *kanji)
+int doHenkan(uiContext d, int len, WCHAR_T *kanji)
 {
   /* ¤è¤ß¤ò´Á»ú¤ËÊÑ´¹¤¹¤ë */
   if(doYomiHenkan(d, len, kanji) == NG) {
@@ -1173,12 +1173,12 @@ doHenkan(uiContext d, int len, WCHAR_T *kanji)
  *			  ¥«¥ì¥ó¥È¸õÊä¤ò kanji ¤Ç¼¨¤µ¤ì¤¿¸õÊä¤Ë¹ç¤ï¤»¤ë¡£
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0	°Û¾ï½ªÎ»»þ -1
  */
-static
+static int
 doYomiHenkan(uiContext d, int len, WCHAR_T *kanji)
 {
   unsigned int mode;
   yomiContext yc = (yomiContext)d->modec;
-  extern defaultContext;
+  extern int defaultContext;
 
 #if defined(DEBUG) && !defined(WIN)
   if (iroha_debug) {
@@ -1383,7 +1383,7 @@ TanBackwardBunsetsu(uiContext d)
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0	°Û¾ï½ªÎ»»þ -1
  */
 
-static
+static int
 tanNextKouho(uiContext d, yomiContext yc)
 {
 #ifdef MEASURE_TIME
@@ -1496,7 +1496,7 @@ enterTanHenkanMode(uiContext d, int fnum)
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0	°Û¾ï½ªÎ»»þ -1
  */
 
-TanKouhoIchiran(uiContext d)
+int TanKouhoIchiran(uiContext d)
 {
   if (d->modec->id != YOMI_CONTEXT) {
     return enterTanHenkanMode(d, CANNA_FN_KouhoIchiran);
@@ -1504,7 +1504,7 @@ TanKouhoIchiran(uiContext d)
   return tanKouhoIchiran(d, 1);
 }
 
-TanNextKouho(uiContext d)
+int TanNextKouho(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -1521,7 +1521,7 @@ TanNextKouho(uiContext d)
   TanHenkan -- ²ó¿ô¤ò¥Á¥§¥Ã¥¯¤¹¤ë°Ê³°¤Ï TanNextKouho ¤È¤Û¤ÜÆ±¤¸
 
  */
-static TanHenkan (uiContext);
+static int TanHenkan (uiContext);
 
 static int
 TanHenkan(uiContext d)
@@ -1547,7 +1547,7 @@ TanHenkan(uiContext d)
  * °ú¤­¿ô	uiContext
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0	°Û¾ï½ªÎ»»þ -1
  */
-TanPreviousKouho(uiContext d)
+int TanPreviousKouho(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -1588,58 +1588,58 @@ tanJishuHenkan(uiContext d, int fn)
   return d->nbytes;
 }
 
-TanHiragana(uiContext d)
+int TanHiragana(uiContext d)
 {
   return tanJishuHenkan(d, CANNA_FN_Hiragana);
 }
 
-TanKatakana(uiContext d)
+int TanKatakana(uiContext d)
 {
   return tanJishuHenkan(d, CANNA_FN_Katakana);
 }
 
-TanRomaji(uiContext d)
+int TanRomaji(uiContext d)
 {
   return tanJishuHenkan(d, CANNA_FN_Romaji);
 }
 
-TanUpper(uiContext d)
+int TanUpper(uiContext d)
 {
   return tanJishuHenkan(d, CANNA_FN_ToUpper);
 }
 
-TanCapitalize(uiContext d)
+int TanCapitalize(uiContext d)
 {
   return tanJishuHenkan(d, CANNA_FN_Capitalize);
 }
 
-TanZenkaku(uiContext d)
+int TanZenkaku(uiContext d)
 {
   return tanJishuHenkan(d, CANNA_FN_Zenkaku);
 }
 
-TanHankaku(uiContext d)
+int TanHankaku(uiContext d)
 {
   return tanJishuHenkan(d, CANNA_FN_Hankaku);
 }
 
 int TanKanaRotate (uiContext);
 
-TanKanaRotate(uiContext d)
+int TanKanaRotate(uiContext d)
 {
   return tanJishuHenkan(d, CANNA_FN_KanaRotate);
 }
 
 int TanRomajiRotate (uiContext);
 
-TanRomajiRotate(uiContext d)
+int TanRomajiRotate(uiContext d)
 {
   return tanJishuHenkan(d, CANNA_FN_RomajiRotate);
 }
 
 int TanCaseRotateForward (uiContext);
 
-TanCaseRotateForward(uiContext d)
+int TanCaseRotateForward(uiContext d)
 {
   return tanJishuHenkan(d, CANNA_FN_CaseRotate);
 }
@@ -1764,7 +1764,7 @@ tanMuhenkan(uiContext d, int kCurs)
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0	°Û¾ï½ªÎ»»þ -1
  */
 
-TanMuhenkan(uiContext d)
+int TanMuhenkan(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec, newyc;
   tanContext tan;
@@ -2027,7 +2027,7 @@ finishTanKakutei(uiContext d)
   }
 }
 
-TanKakutei(uiContext d)
+int TanKakutei(uiContext d)
 {
   return YomiKakutei(d);
 }
@@ -2042,7 +2042,7 @@ TanKakutei(uiContext d)
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0	°Û¾ï½ªÎ»»þ -1
  */
 
-static TanKakuteiYomiInsert (uiContext);
+static int TanKakuteiYomiInsert (uiContext);
 
 static int
 TanKakuteiYomiInsert(uiContext d)
@@ -2074,7 +2074,7 @@ TanKakuteiYomiInsert(uiContext d)
 	yc->ys = yc->ye = yc->cStartp;
 	return YomiInsert(d);
       }else{ /* Ãà¼¡¤¸¤ã¤Ê¤¤¾ì¹ç */
-	extern nKouhoBunsetsu;
+	extern int nKouhoBunsetsu;
     
 	yc->curbun = yc->nbunsetsu;
 	if (doTanBubunMuhenkan(d, yc) < 0) {
@@ -2155,7 +2155,7 @@ doTbResize(uiContext d, yomiContext yc, int n)
  * °ú¤­¿ô	uiContext
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0	°Û¾ï½ªÎ»»þ -1
  */
-static TanExtendBunsetsu (uiContext);
+static int TanExtendBunsetsu (uiContext);
 
 static int
 TanExtendBunsetsu(uiContext d)
@@ -2187,7 +2187,7 @@ TanExtendBunsetsu(uiContext d)
  * °ú¤­¿ô	uiContext
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0	°Û¾ï½ªÎ»»þ -1
  */
-static TanShrinkBunsetsu (uiContext);
+static int TanShrinkBunsetsu (uiContext);
 
 static int
 TanShrinkBunsetsu(uiContext d)
@@ -2226,7 +2226,7 @@ TanShrinkBunsetsu(uiContext d)
  * °ú¤­¿ô	uiContext
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0	°Û¾ï½ªÎ»»þ -1
  */
-TanPrintBunpou(uiContext d)
+int TanPrintBunpou(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
   static WCHAR_T mesg[512]; /* static! */
@@ -2310,7 +2310,7 @@ TanPrintTime(uiContext d)
 void
 jrKanjiPipeError(void)
 {
-  extern defaultContext, defaultBushuContext;
+  extern int defaultContext, defaultBushuContext;
 
   defaultContext = -1;
   defaultBushuContext = -1;
@@ -2332,9 +2332,9 @@ jrKanjiPipeError(void)
 
  */
 
-static TanBunsetsuMode (uiContext);
+static int TanBunsetsuMode (uiContext);
 
-static
+static int
 TanBunsetsuMode(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
@@ -2560,16 +2560,16 @@ TanChooseChar(uiContext d, int head)
   return retval;
 }
 
-static TanChooseHeadChar (uiContext);
-static TanChooseTailChar (uiContext);
+static int TanChooseHeadChar (uiContext);
+static int TanChooseTailChar (uiContext);
 
-static
+static int
 TanChooseHeadChar(uiContext d)
 {
   return TanChooseChar(d, 1);
 }
 
-static
+static int
 TanChooseTailChar(uiContext d)
 {
   return TanChooseChar(d, 0);

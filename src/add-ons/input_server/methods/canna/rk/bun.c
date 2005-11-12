@@ -26,7 +26,7 @@
 
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcsid[] = "$Id: bun.c,v 1.1 2004/12/23 21:23:50 korli Exp $";
+static char rcsid[] = "$Id$";
 #endif
 
 /* LINTLIBRARY */
@@ -920,7 +920,7 @@ getKanji(struct RkContext *cx, int cnum, WCHAR_T *dst, int maxdst)
   WCHAR_T		*yomi;
   int		i, ylen;
 
-  i = getIt(cx, cnum, addKanji, dst, maxdst - 1);
+  i = getIt(cx, cnum, (int(*)(...))addKanji, dst, maxdst - 1);
   if (i < 0) {
     yomi = cx->store->yomi + bun->nb_yoff;
     ylen = bun->nb_curlen;
@@ -1026,7 +1026,7 @@ RkwGetLex(int cx_num, RkLex *dst, int maxdst)
     RkSetErrno(RK_ERRNO_ECTXNO);
     return -1;
   }
-  i = getIt(cx, (int)bun->nb_curcand, addLex, (WCHAR_T *)dst, maxdst - 1);
+  i = getIt(cx, (int)bun->nb_curcand, (int(*)(...))addLex, (WCHAR_T *)dst, maxdst - 1);
   if (i < 0) {
     if (dst && 1 < maxdst) {
       dst[0].ylen = bun->nb_curlen;
@@ -1127,7 +1127,7 @@ RkwGetHinshi(int cx_num, WCHAR_T *dst, int maxdst)
     RkSetErrno(RK_ERRNO_ECTXNO);
     return(-1);
   }
-  i = getIt(cx, (int)bun->nb_curcand, addHinshi, dst, maxdst - 1);
+  i = getIt(cx, (int)bun->nb_curcand, (int(*)(...))addHinshi, dst, maxdst - 1);
   if (i < 0) {
     if (dst && 1 < maxdst) 
       dst[0] = (WCHAR_T)0;
@@ -1279,7 +1279,7 @@ RkwSync(int cx_num, char *dicname)
 }
 
 /*ARGSUSED*/
-RkwGetSimpleKanji(int cxnum, char *dicname, WCHAR_T *yomi, int maxyomi, WCHAR_T *kanjis, int maxkanjis, char *hinshis, int maxhinshis)
+int RkwGetSimpleKanji(int cxnum, char *dicname, WCHAR_T *yomi, int maxyomi, WCHAR_T *kanjis, int maxkanjis, char *hinshis, int maxhinshis)
 {
   return -1;
 }

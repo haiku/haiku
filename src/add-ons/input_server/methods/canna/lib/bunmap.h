@@ -21,11 +21,13 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char bunmap_id[] = "@(#) 102.1 $Id: bunmap.h,v 1.1 2004/12/23 21:23:48 korli Exp $";
+static char bunmap_id[] = "@(#) 102.1 $Id$";
 #endif /* lint */
 
-extern DoFuncSequence(),UseOtherKeymap();
-extern TanNop (uiContext), YomiKakutei (uiContext);
+extern int DoFuncSequence();
+extern int UseOtherKeymap();
+extern int TanNop (uiContext);
+extern int YomiKakutei (uiContext);
 
 static struct funccfunc bun_funcs[] = {
   {CANNA_FN_FunctionalInsert	,BunSelfInsert		},
@@ -50,7 +52,7 @@ static struct funccfunc bun_funcs[] = {
   {0				,0			},
 };
 
-extern searchfunc(...);
+extern int searchfunc(...);
 KanjiModeRec bunsetsu_mode = {
   searchfunc,
   default_kmap,

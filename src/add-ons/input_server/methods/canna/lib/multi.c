@@ -25,7 +25,7 @@
 /************************************************************************/
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char m_s_map_id[] = "@(#) 102.1 $Id: multi.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char m_s_map_id[] = "@(#) 102.1 $Id$";
 #endif /* lint */
 
 #include "canna.h"
@@ -34,7 +34,7 @@ static char m_s_map_id[] = "@(#) 102.1 $Id: multi.c,v 1.1 2004/12/23 21:23:49 ko
 #define NONE CANNA_FN_Undefined
 
 static unsigned char *showChar(int c);
-static _DoFuncSequence(uiContext d, BYTE *keytbl, BYTE key);
+static int _DoFuncSequence(uiContext d, BYTE *keytbl, BYTE key);
 
 extern int askQuitKey();
 extern int checkGLineLen();
@@ -100,7 +100,7 @@ showChar(int c)
   return Gkey;
 }
 
-UseOtherKeymap(uiContext d)
+int UseOtherKeymap(uiContext d)
 {
   struct map *p;
   unsigned char showKey[10];
@@ -125,7 +125,7 @@ UseOtherKeymap(uiContext d)
 }
 
 static
-_DoFuncSequence(uiContext d, BYTE *keytbl, BYTE key)
+int _DoFuncSequence(uiContext d, BYTE *keytbl, BYTE key)
 {
   int res, total_res, ginfo = 0;
   int prevEchoLen = -1, prevRevPos, prevRevLen;
@@ -233,7 +233,7 @@ _DoFuncSequence(uiContext d, BYTE *keytbl, BYTE key)
   return total_res;
 }
 
-DoFuncSequence(uiContext d)
+int DoFuncSequence(uiContext d)
 {
   return _DoFuncSequence(d, (BYTE *)NULL, (BYTE)NULL);
 }

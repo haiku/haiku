@@ -71,7 +71,7 @@
 #define MBstowcs CANNA_mbstowcs
 #define WCstombs CANNA_wcstombs
 
-extern CANNA_wcstombs (char *, WCHAR_T *, int);
+extern int CANNA_wcstombs (char *, WCHAR_T *, int);
 
 #endif
 
@@ -814,7 +814,7 @@ typedef struct _extra_func {
 #define canna_version(majv, minv) ((majv) * 1024 + (minv))
 
 /* ¤è¤¯¥¹¥Ú¥ë¥ß¥¹¤¹¤ë¤Î¤Ç¥³¥ó¥Ñ¥¤¥ë»þ¤Ë¤Ò¤Ã¤«¤«¤ë¤è¤¦¤ËÆþ¤ì¤ë */
-extern RkwGoto (char *, int);
+extern int RkwGoto (char *, int);
 
 /* storing customize configuration to the following structure. */
 struct CannaConfig { /* °Ê²¼¤Î¥³¥á¥ó¥È¤Ï¥À¥¤¥¢¥í¥°¤Ê¤É¤Ëµ­½Ò¤¹¤ë¤È¤­¤Ê¤É¤Ë

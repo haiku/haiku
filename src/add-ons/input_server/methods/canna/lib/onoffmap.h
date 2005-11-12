@@ -46,7 +46,7 @@ static struct funccfunc onoff_funcs[] = {
 };
 #endif /* NO_EXTEND_MENU */
 
-extern searchfunc(...);
+extern int searchfunc(...);
 KanjiModeRec onoff_mode = {
   searchfunc,
   default_kmap,

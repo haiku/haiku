@@ -26,7 +26,7 @@
 
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "@(#) 102.1 $Id: uiutil.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char rcs_id[] = "@(#) 102.1 $Id$";
 #endif
 
 #include "canna.h"
@@ -171,10 +171,10 @@ static menustruct *me[N_BUILTIN_MENU];
 #define MBUFSIZE 512
 
 static menustruct *copystruct(struct _e_menu *eucmenu);
-static makeUiUtilEchoStr(uiContext d);
+static int makeUiUtilEchoStr(uiContext d);
 static void pushmenu(uiContext d, menustruct *tab);
-static uuflExitCatch(uiContext d, int retval, mode_context env);
-static uuflQuitCatch(uiContext d, int retval, mode_context env);
+static int uuflExitCatch(uiContext d, int retval, mode_context env);
+static int uuflQuitCatch(uiContext d, int retval, mode_context env);
 static menuinfo *newMenuInfo(menustruct *tab);
 static menuinfo *findMenuInfo(menuinfo *p, menustruct *ms);
 
@@ -311,7 +311,7 @@ finExtMenu(void)
 #endif /* NO_EXTEND_MENU */
 
 static
-makeUiUtilEchoStr(uiContext d)
+int makeUiUtilEchoStr(uiContext d)
 {
   ichiranContext ic = (ichiranContext)d->modec;
 
@@ -344,7 +344,7 @@ pushmenu(uiContext d, menustruct *tab)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 static
-uuflExitCatch(uiContext d, int retval, mode_context env)
+int uuflExitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   forichiranContext fc;
@@ -406,7 +406,7 @@ uuflExitCatch(uiContext d, int retval, mode_context env)
   return NothingChangedWithBeep(d); /* ¤³¤³¤Ë¤ÏÍè¤Ê¤¤¤Ï¤º */
 }
 
-prevMenuIfExist(uiContext d)
+int prevMenuIfExist(uiContext d)
 {
   menustruct *m = d->prevMenu;
 
@@ -422,7 +422,7 @@ prevMenuIfExist(uiContext d)
 }
 
 static
-uuflQuitCatch(uiContext d, int retval, mode_context env)
+int uuflQuitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   popCallback(d); /* °ìÍ÷¤ò pop */
@@ -440,7 +440,7 @@ uuflQuitCatch(uiContext d, int retval, mode_context env)
   UiUtilMode -- UI¥æ¡¼¥Æ¥£¥ê¥Æ¥£¥â¡¼¥É¤Ë¤Ê¤ë¤È¤­¤Ë¸Æ¤Ð¤ì¤ë¡£
 
  */
-UiUtilMode(uiContext d)
+int UiUtilMode(uiContext d)
 {
 #ifdef NO_EXTEND_MENU
   d->kanji_status_return->info |= KanjiExtendInfo;

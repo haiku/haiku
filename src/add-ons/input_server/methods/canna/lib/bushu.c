@@ -25,7 +25,7 @@
 /************************************************************************/
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "@(#) 102.1 $Id: bushu.c,v 1.1 2004/12/23 21:23:48 korli Exp $";
+static char rcs_id[] = "@(#) 102.1 $Id$";
 #endif /* lint */
 
 #include	<errno.h>
@@ -202,15 +202,15 @@ char *bushu_skey[] =
 
 
 static forichiranContext newForIchiranContext(void);
-static vBushuMode(uiContext d, int major_mode);
-static vBushuIchiranQuitCatch(uiContext d, int retval, mode_context env);
-static vBushuExitCatch(uiContext d, int retval, mode_context env);
-static bushuEveryTimeCatch(uiContext d, int retval, mode_context env);
-static bushuExitCatch(uiContext d, int retval, mode_context env);
-static bushuQuitCatch(uiContext d, int retval, mode_context env);
-static convBushuQuitCatch(uiContext d, int retval, mode_context env);
-static bushuHenkan(uiContext d, int flag, int ext, int cur, int (*quitfunc )(uiContext, int, mode_context ));
-static makeBushuIchiranQuit(uiContext d, int flag);
+static int vBushuMode(uiContext d, int major_mode);
+static int vBushuIchiranQuitCatch(uiContext d, int retval, mode_context env);
+static int vBushuExitCatch(uiContext d, int retval, mode_context env);
+static int bushuEveryTimeCatch(uiContext d, int retval, mode_context env);
+static int bushuExitCatch(uiContext d, int retval, mode_context env);
+static int bushuQuitCatch(uiContext d, int retval, mode_context env);
+static int convBushuQuitCatch(uiContext d, int retval, mode_context env);
+static int bushuHenkan(uiContext d, int flag, int ext, int cur, int (*quitfunc )(uiContext, int, mode_context ));
+static int makeBushuIchiranQuit(uiContext d, int flag);
 
 static WCHAR_T *bushu_char[BUSHU_CNT];
 static WCHAR_T *bushu_key[BUSHU_CNT];
@@ -283,6 +283,7 @@ newForIchiranContext(void)
   return fcxt;
 }
 
+int
 getForIchiranContext(uiContext d)
 {
   forichiranContext fc;
@@ -326,7 +327,7 @@ popForIchiranMode(uiContext d)
  * Éô¼ó¥â¡¼¥ÉÆþÎÏ                                                            *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-static
+static int
 vBushuMode(uiContext d, int major_mode)
 {
   forichiranContext fc;
@@ -381,7 +382,7 @@ vBushuMode(uiContext d, int major_mode)
   return(retval);
 }
 
-static
+static int
 vBushuIchiranQuitCatch(uiContext d, int retval, mode_context env)
      /* ARGSUSED */
 {
@@ -398,7 +399,7 @@ vBushuIchiranQuitCatch(uiContext d, int retval, mode_context env)
   return(vBushuMode(d, CANNA_MODE_BushuMode));
 }
 
-static
+static int
 vBushuExitCatch(uiContext d, int retval, mode_context env)
      /* ARGSUSED */
 {
@@ -421,6 +422,7 @@ vBushuExitCatch(uiContext d, int retval, mode_context env)
   return res;
 }
 
+int
 BushuMode(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
@@ -438,9 +440,9 @@ BushuMode(uiContext d)
  * Éô¼ó¥â¡¼¥ÉÆþÎÏ¤Î°ìÍ÷É½¼¨                                                  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-static bushuEveryTimeCatch (uiContext, int, mode_context);
+static int bushuEveryTimeCatch (uiContext, int, mode_context);
 
-static
+static int
 bushuEveryTimeCatch(uiContext d, int retval, mode_context env)
      /* ARGSUSED */
 {
@@ -449,9 +451,9 @@ bushuEveryTimeCatch(uiContext d, int retval, mode_context env)
   return(retval);
 }
 
-static bushuExitCatch (uiContext, int, mode_context);
+static int bushuExitCatch (uiContext, int, mode_context);
 
-static
+static int
 bushuExitCatch(uiContext d, int retval, mode_context env)
 {
   yomiContext yc;
@@ -477,7 +479,7 @@ bushuExitCatch(uiContext d, int retval, mode_context env)
 }
 
 #ifndef NO_EXTEND_MENU
-static
+static int
 bushuQuitCatch(uiContext d, int retval, mode_context env)
      /* ARGSUSED */
 {
@@ -501,7 +503,7 @@ bushuQuitCatch(uiContext d, int retval, mode_context env)
  * Éô¼ó¤È¤·¤Æ¤ÎÊÑ´¹¤Î°ìÍ÷É½¼¨                                                *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-static
+static int
 convBushuQuitCatch(uiContext d, int retval, mode_context env)
 {
   popCallback(d); /* °ìÍ÷¤ò¥Ý¥Ã¥× */
@@ -528,6 +530,7 @@ convBushuQuitCatch(uiContext d, int retval, mode_context env)
  */
 int ConvertAsBushu (uiContext);
 
+int
 ConvertAsBushu(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
@@ -573,7 +576,7 @@ inline int
 bushuBgnBun(RkStat *st, WCHAR_T *yomi, int length)
 {
   int nbunsetsu;
-  extern defaultBushuContext;
+  extern int defaultBushuContext;
 
   /* Ï¢Ê¸ÀáÊÑ´¹¤ò³«»Ï¤¹¤ë *//* ¼­½ñ¤Ë¤¢¤ë¸õÊä¤Î¤ß¼è¤ê½Ð¤¹ */
   if ((defaultBushuContext == -1)) {
@@ -615,7 +618,7 @@ bushuBgnBun(RkStat *st, WCHAR_T *yomi, int length)
  * ¤³¤³¤ËÍè¤ë»þ¤Ï¤Þ¤À getForIchiranContext ¤¬¸Æ¤Ð¤ì¤Æ¤¤¤Ê¤¤¤â¤Î¤È¤¹¤ë
  */
 
-static
+static int
 bushuHenkan(uiContext d, int flag, int ext, int cur, int (*quitfunc )(uiContext, int, mode_context ))
 {
   forichiranContext fc;
@@ -624,7 +627,7 @@ bushuHenkan(uiContext d, int flag, int ext, int cur, int (*quitfunc )(uiContext,
   WCHAR_T *yomi, **allBushuCands;
   RkStat	st;
   int nelem, currentkouho, nbunsetsu, length, retval = 0;
-  extern defaultBushuContext;
+  extern int defaultBushuContext;
   
 
   if(flag) {
@@ -745,10 +748,10 @@ bushuHenkan(uiContext d, int flag, int ext, int cur, int (*quitfunc )(uiContext,
  *			BushuYomiHenkan¤«¤é¸Æ¤Ð¤ì¤¿ 1
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0	°Û¾ï½ªÎ»»þ -1
  */
-static
+static int
 makeBushuIchiranQuit(uiContext d, int flag)
 {
-  extern defaultBushuContext;
+  extern int defaultBushuContext;
 
   /* Éô¼óÊÑ´¹¤Ï³Ø½¬¤·¤Ê¤¤¡£ */
   if(RkwEndBun(defaultBushuContext, 0) == -1) { /* 0:³Ø½¬¤·¤Ê¤¤ */

@@ -21,7 +21,7 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static	char	rcs_id[] = "@(#) 102.1 $Id: onoff.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static	char	rcs_id[] = "@(#) 102.1 $Id$";
 #endif /* lint */
 
 #include	<errno.h>
@@ -31,9 +31,9 @@ static	char	rcs_id[] = "@(#) 102.1 $Id: onoff.c,v 1.1 2004/12/23 21:23:49 korli 
 #define ICHISIZE 9
 
 static void popOnOffMode(uiContext d);
-static makeOnOffIchiran(uiContext d, int nelem, int bangomax, int currentkouho, unsigned char *status);
-static OnOffSelect(uiContext d);
-static OnOffKakutei(uiContext d);
+static int makeOnOffIchiran(uiContext d, int nelem, int bangomax, int currentkouho, unsigned char *status);
+static int OnOffSelect(uiContext d);
+static int OnOffKakutei(uiContext d);
 
 static int makeOnOffIchiran();
 
@@ -70,7 +70,7 @@ popOnOffMode(uiContext d)
 /*
  * ¸õÊä°ìÍ÷¹Ô¤òºî¤ë
  */
-selectOnOff(uiContext d, WCHAR_T **buf, int *ck, int nelem, int bangomax, int currentkouho, unsigned char *status, int (*everyTimeCallback )(...), int (*exitCallback )(...), int (*quitCallback )(...), int (*auxCallback )(...))
+int selectOnOff(uiContext d, WCHAR_T **buf, int *ck, int nelem, int bangomax, int currentkouho, unsigned char *status, int (*everyTimeCallback )(...), int (*exitCallback )(...), int (*quitCallback )(...), int (*auxCallback )(...))
 {
   extern KanjiModeRec onoff_mode;
   ichiranContext oc;
@@ -78,7 +78,10 @@ selectOnOff(uiContext d, WCHAR_T **buf, int *ck, int nelem, int bangomax, int cu
   ichiranContext newIchiranContext();
 
   if(pushCallback(d, d->modec,
-	everyTimeCallback, exitCallback, quitCallback, auxCallback) == 0) {
+	(int(*)(_uiContext*, int, _coreContextRec*))everyTimeCallback,
+	(int(*)(_uiContext*, int, _coreContextRec*))exitCallback,
+	(int(*)(_uiContext*, int, _coreContextRec*))quitCallback,
+	(int(*)(_uiContext*, int, _coreContextRec*))auxCallback) == 0) {
     jrKanjiError = "malloc (pushCallback) \244\307\244\255\244\336\244\273\244\363\244\307\244\267\244\277";
                                        /* ¤Ç¤­¤Þ¤»¤ó¤Ç¤·¤¿ */
     return(NG);
@@ -256,7 +259,7 @@ makeOnOffIchiran(uiContext d, int nelem, int bangomax, int currentkouho, unsigne
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0	°Û¾ï½ªÎ»»þ -1
  */
 static
-OnOffSelect(uiContext d)
+int OnOffSelect(uiContext d)
 {
   ichiranContext oc = (ichiranContext)d->modec;
   mountContext mc = (mountContext)oc->next;
@@ -287,7 +290,7 @@ OnOffSelect(uiContext d)
  * Ìá¤êÃÍ	Àµ¾ï½ªÎ»»þ 0	°Û¾ï½ªÎ»»þ -1
  */
 static
-OnOffKakutei(uiContext d)
+int OnOffKakutei(uiContext d)
 {
   ichiranContext oc = (ichiranContext)d->modec;
   int retval = 0;

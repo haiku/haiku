@@ -22,7 +22,7 @@
 // Modified by T.Murai
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char jishumap_id[] = "@(#) 102.1 $Id: jishumap.h,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char jishumap_id[] = "@(#) 102.1 $Id$";
 #endif /* lint */
 
 #include "canna.h"
@@ -60,7 +60,7 @@ static struct funccfunc jishu_funcs[] = {
   {CANNA_FN_UseOtherKeymap	,UseOtherKeymap		},
   {0				,0			},
 };
-extern searchfunc(...);
+extern int searchfunc(...);
 
 KanjiModeRec jishu_mode = {
   searchfunc,

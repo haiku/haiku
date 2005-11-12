@@ -25,7 +25,7 @@
 /************************************************************************/
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcsid[] = "$Id: lisp.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char rcsid[] = "$Id$";
 #endif
 
 /* 
@@ -51,11 +51,11 @@ extern void (*keyconvCallback)(...);
 //static int CANNA_mbstowcs(WCHAR_T *dest, char *src, int destlen);
 static void fillMenuEntry(void);
 static void intr(int sig);
-static initIS(void);
+static int initIS(void);
 static void finIS(void);
-static identifySequence(unsigned c, int *val);
+static int identifySequence(unsigned c, int *val);
 static int alloccell(void);
-static allocarea(void);
+static int allocarea(void);
 static void freearea(void);
 static list getatmz(char *name);
 static list mkatm(char *name);
@@ -67,8 +67,8 @@ static void numerr(char *fn, list arg);
 static void lisp_strerr(char *fn, list arg);
 static list Lread(int n);
 static list read1(void);
-static skipspaces(void);
-static zaplin(void);
+static int skipspaces(void);
+static int zaplin(void);
 static list newcons(void);
 static list newsymbol(char *name);
 static void print(list l);
@@ -76,12 +76,12 @@ static list ratom(void);
 static list ratom2(int a);
 static list rstring(void);
 static list rcharacter(void);
-static isnum(char *name);
+static int isnum(char *name);
 static void untyi(int c);
 static int tyi(void);
 static int tyipeek(void);
 static void prins(char *s);
-static isterm(int c);
+static int isterm(int c);
 static void push(list value);
 static void pop(int x);
 static list pop1(void);
@@ -625,7 +625,7 @@ intr(int sig)
 
 */
 
-parse_string(char *str)
+int parse_string(char *str)
 {
   char *readbufbk;
 
@@ -808,7 +808,7 @@ static int nseq;
 static int seqline;
 
 static
-initIS(void)
+int initIS(void)
 {
   SeqToID *p;
   char *s;
@@ -926,7 +926,7 @@ finIS(void) /* identifySequence ¤ËÍÑ¤¤¤¿¥á¥â¥ê»ñ¸»¤ò³«Êü
 #define END	 0
 
 static
-identifySequence(unsigned c, int *val)
+int identifySequence(unsigned c, int *val)
 {
   int nextline;
 
@@ -971,7 +971,7 @@ alloccell(void)
 /* ¤¦¤Þ¤¯¹Ô¤«¤Ê¤«¤Ã¤¿¤é£°¤òÊÖ¤¹ */
 
 static
-allocarea(void)
+int allocarea(void)
 {
   /* ¤Þ¤º¤Ï¥»¥ëÎÎ°è */
   if (alloccell()) {
@@ -1058,8 +1058,8 @@ mkatm(char *name)
   newatom->value = (*name == ':') ? (list)temp : (list)UNBOUND;
   newatom->plist = NIL;			/* set null plist	*/
   newatom->ftype = UNDEF;		/* set undef func-type	*/
-  newatom->func  = (list (*)())0;	/* Don't kill this line	*/
-  newatom->valfunc  = (list (*)())0;	/* Don't kill this line	*/
+  newatom->func  = (list (*)(...))0;	/* Don't kill this line	*/
+  newatom->valfunc  = (list (*)(...))0;	/* Don't kill this line	*/
   newatom->hlink = NIL;		/* no hash linking	*/
   newatom->mid = -1;
   newatom->fid = -1;
@@ -1305,7 +1305,7 @@ read1(void)
 	if eof read then return NO	*/
 
 static
-skipspaces(void)
+int skipspaces(void)
 {
   int c;
 
@@ -1330,7 +1330,7 @@ skipspaces(void)
 	if eof read then return NO	*/
 
 static
-zaplin(void)
+int zaplin(void)
 {
 	int c;
 
@@ -1420,7 +1420,7 @@ ratom(void)
 /* read atom with the first one character -
 	check if the token is numeric or pure symbol & return proper value */
 
-static isnum();
+static int isnum();
 
 static list 
 ratom2(int a)
@@ -1688,7 +1688,7 @@ static void prins(char *s)
 /* isterm -
 	check if the character is terminating the lisp expression	*/
 
-static isterm(int c)
+static int isterm(int c)
 {
 	if (c <= ' ')
 		return(YES);
@@ -3062,16 +3062,16 @@ Lputd(int n)
   }
   if (null(body)) {
     symp->ftype = UNDEF;
-    symp->func = (list (*)())UNDEF;
+    symp->func = (list (*)(...))UNDEF;
   }
   else if (consp(body)) {
     if (car(body) == _MACRO) {
       symp->ftype = MACRO;
-      symp->func = (list (*)())body;
+      symp->func = (list (*)(...))body;
     }
     else {
       symp->ftype = EXPR;
-      symp->func = (list (*)())body;
+      symp->func = (list (*)(...))body;
     }
   }
   return(a);
@@ -3529,7 +3529,7 @@ Ldefsym(void)
   int i, ncand, group;
   WCHAR_T cand[1024], *p, *mcand, **acand, key, xkey;
   int mcandsize;
-  extern nkeysup;
+  extern int nkeysup;
   extern keySupplement keysup[];
 
   form = sp[0];
@@ -4557,57 +4557,57 @@ DEFVAR(Vchikuji_debug, VTorNIL, int, chikuji_debug)
 /* Lisp ¤Î´Ø¿ô¤È C ¤Î´Ø¿ô¤ÎÂÐ±þÉ½ */
 
 static struct atomdefs initatom[] = {
-  {"quote"		,SPECIAL,Lquote		},
-  {"setq"		,SPECIAL,Lsetq		},
-  {"set"		,SUBR	,Lset		},
-  {"equal"		,SUBR	,Lequal		},
-  {"="			,SUBR	,Lequal		},
-  {">"			,SUBR	,Lgreaterp	},
-  {"<"			,SUBR	,Llessp		},
-  {"progn"		,SPECIAL,Lprogn		},
-  {"eq"			,SUBR	,Leq   		},
-  {"cond"		,SPECIAL,Lcond		},
-  {"null"		,SUBR	,Lnull		},
-  {"not"		,SUBR	,Lnull		},
-  {"and"		,SPECIAL,Land		},
-  {"or"			,SPECIAL,Lor		},
-  {"+"			,SUBR	,Lplus		},
-  {"-"			,SUBR	,Ldiff		},
-  {"*"			,SUBR	,Ltimes		},
-  {"/"			,SUBR	,Lquo		},
-  {"%"			,SUBR	,Lrem		},
-  {"gc"			,SUBR	,Lgc		},
-  {"load"		,SUBR	,Lload		},
-  {"list"		,SUBR	,Llist		},
-  {"sequence"		,SUBR	,Llist		},
-  {"defun"		,SPECIAL,Ldefun		},
-  {"defmacro"		,SPECIAL,Ldefmacro	},
-  {"cons"		,SUBR	,Lcons		},
-  {"car"		,SUBR	,Lcar		},
-  {"cdr"		,SUBR	,Lcdr		},
-  {"atom"		,SUBR	,Latom		},
-  {"let"		,CMACRO	,Llet		},
-  {"if"			,CMACRO	,Lif		},
-  {"boundp"		,SUBR	,Lboundp	},
-  {"fboundp"		,SUBR	,Lfboundp	},
-  {"getenv"		,SUBR	,Lgetenv	},
-  {"copy-symbol"	,SUBR	,Lcopysym	},
-  {"concat"		,SUBR	,Lconcat	},
-  {S_FN_UseDictionary	,SUBR	,Lusedic	},
-  {S_SetModeDisp	,SUBR	,Lmodestr	},
-  {S_SetKey		,SUBR	,Lsetkey	},
-  {S_GSetKey		,SUBR	,Lgsetkey	},
-  {S_UnbindKey		,SUBR	,Lunbindkey	},
-  {S_GUnbindKey		,SUBR	,Lgunbindkey	},
-  {S_DefMode		,SPECIAL,Ldefmode	},
-  {S_DefSymbol		,SPECIAL,Ldefsym	},
+  {"quote"		,SPECIAL,(list(*)(...))Lquote		},
+  {"setq"		,SPECIAL,(list(*)(...))Lsetq		},
+  {"set"		,SUBR	,(list(*)(...))Lset		},
+  {"equal"		,SUBR	,(list(*)(...))Lequal		},
+  {"="			,SUBR	,(list(*)(...))Lequal		},
+  {">"			,SUBR	,(list(*)(...))Lgreaterp	},
+  {"<"			,SUBR	,(list(*)(...))Llessp		},
+  {"progn"		,SPECIAL,(list(*)(...))Lprogn		},
+  {"eq"			,SUBR	,(list(*)(...))Leq   		},
+  {"cond"		,SPECIAL,(list(*)(...))Lcond		},
+  {"null"		,SUBR	,(list(*)(...))Lnull		},
+  {"not"		,SUBR	,(list(*)(...))Lnull		},
+  {"and"		,SPECIAL,(list(*)(...))Land		},
+  {"or"			,SPECIAL,(list(*)(...))Lor		},
+  {"+"			,SUBR	,(list(*)(...))Lplus		},
+  {"-"			,SUBR	,(list(*)(...))Ldiff		},
+  {"*"			,SUBR	,(list(*)(...))Ltimes		},
+  {"/"			,SUBR	,(list(*)(...))Lquo		},
+  {"%"			,SUBR	,(list(*)(...))Lrem		},
+  {"gc"			,SUBR	,(list(*)(...))Lgc		},
+  {"load"		,SUBR	,(list(*)(...))Lload		},
+  {"list"		,SUBR	,(list(*)(...))Llist		},
+  {"sequence"		,SUBR	,(list(*)(...))Llist		},
+  {"defun"		,SPECIAL,(list(*)(...))Ldefun		},
+  {"defmacro"		,SPECIAL,(list(*)(...))Ldefmacro	},
+  {"cons"		,SUBR	,(list(*)(...))Lcons		},
+  {"car"		,SUBR	,(list(*)(...))Lcar		},
+  {"cdr"		,SUBR	,(list(*)(...))Lcdr		},
+  {"atom"		,SUBR	,(list(*)(...))Latom		},
+  {"let"		,CMACRO	,(list(*)(...))Llet		},
+  {"if"			,CMACRO	,(list(*)(...))Lif		},
+  {"boundp"		,SUBR	,(list(*)(...))Lboundp	},
+  {"fboundp"		,SUBR	,(list(*)(...))Lfboundp	},
+  {"getenv"		,SUBR	,(list(*)(...))Lgetenv	},
+  {"copy-symbol"	,SUBR	,(list(*)(...))Lcopysym	},
+  {"concat"		,SUBR	,(list(*)(...))Lconcat	},
+  {S_FN_UseDictionary	,SUBR	,(list(*)(...))Lusedic	},
+  {S_SetModeDisp	,SUBR	,(list(*)(...))Lmodestr	},
+  {S_SetKey		,SUBR	,(list(*)(...))Lsetkey	},
+  {S_GSetKey		,SUBR	,(list(*)(...))Lgsetkey	},
+  {S_UnbindKey		,SUBR	,(list(*)(...))Lunbindkey	},
+  {S_GUnbindKey		,SUBR	,(list(*)(...))Lgunbindkey	},
+  {S_DefMode		,SPECIAL,(list(*)(...))Ldefmode	},
+  {S_DefSymbol		,SPECIAL,(list(*)(...))Ldefsym	},
 #ifndef NO_EXTEND_MENU
-  {S_DefSelection	,SPECIAL,Ldefselection	},
-  {S_DefMenu		,SPECIAL,Ldefmenu	},
+  {S_DefSelection	,SPECIAL,(list(*)(...))Ldefselection	},
+  {S_DefMenu		,SPECIAL,(list(*)(...))Ldefmenu	},
 #endif
-  {S_SetInitFunc	,SUBR	,Lsetinifunc	},
-  {S_defEscSequence	,SUBR	,LdefEscSeq	},
-  {S_defXKeysym		,SUBR	,LdefXKeysym	},
+  {S_SetInitFunc	,SUBR	,(list(*)(...))Lsetinifunc	},
+  {S_defEscSequence	,SUBR	,(list(*)(...))LdefEscSeq	},
+  {S_defXKeysym		,SUBR	,(list(*)(...))LdefXKeysym	},
   {0			,UNDEF	,0		}, /* DUMMY */
 };
 
@@ -4633,66 +4633,66 @@ deflispfunc(void)
 /* ÊÑ¿ôÉ½ */
 
 static struct cannavardefs cannavars[] = {
-  {S_VA_RomkanaTable		,Vromkana},
-  {S_VA_EnglishTable		,Venglish},
-  {S_VA_CursorWrap		,Vcursorw},
-  {S_VA_SelectDirect		,Vselectd},
-  {S_VA_NumericalKeySelect	,Vnumeric},
-  {S_VA_BunsetsuKugiri		,Vbunsets},
-  {S_VA_CharacterBasedMove	,Vcharact},
-  {S_VA_ReverseWidely		,Vreverse},
-  {S_VA_ReverseWord		,VreverseWord},
-  {S_VA_Gakushu			,Vgakushu},
-  {S_VA_QuitIfEOIchiran		,Vquitich},
-  {S_VA_KakuteiIfEOBunsetsu	,Vkakutei},
-  {S_VA_StayAfterValidate	,Vstayaft},
-  {S_VA_BreakIntoRoman		,Vbreakin},
-  {S_VA_NHenkanForIchiran	,Vnhenkan},
-  {S_VA_GrammaticalQuestion	,Vgrammati},
-  {"gramatical-question"	,Vgrammati}, /* °ÊÁ°¤Î¥¹¥Ú¥ë¥ß¥¹¤ÎµßºÑ */
-  {S_VA_ForceKana		,Vforceka},
-  {S_VA_KouhoCount		,Vkouhoco},
-  {S_VA_Auto			,Vauto},
-  {S_VA_LearnNumericalType	,VlearnNumTy},
-  {S_VA_BackspaceBehavesAsQuit	,VBSasQuit},
-  {S_VA_InhibitListCallback	,Vinhibi},
-  {S_VA_nKouhoBunsetsu		,Vnkouhobunsetsu},
-  {S_VA_keepCursorPosition	,Vkeepcupos},
-  {S_VA_CannaVersion		,VCannaVersion},
-  {S_VA_Abandon			,VAbandon},
-  {S_VA_HexDirect		,VHexStyle},
-  {S_VA_ProtocolVersion		,VProtoVer},
-  {S_VA_ServerVersion		,VServVer},
-  {S_VA_ServerName		,VServName},
-  {S_VA_CannaDir		,VCannaDir},
-  {S_VA_Kojin			,VKojin},
-  {S_VA_IndexHankaku	       	,VIndexHankaku},
-  {S_VA_IndexSeparator	       	,VIndexSeparator},
-  {S_VA_AllowNextInput		,VAllowNext},
-  {S_VA_doKatakanaGakushu	,VkanaGaku},
-  {S_VA_doHiraganaGakushu	,VhiraGaku},
+  {S_VA_RomkanaTable		,(list(*)(...))Vromkana},
+  {S_VA_EnglishTable		,(list(*)(...))Venglish},
+  {S_VA_CursorWrap		,(list(*)(...))Vcursorw},
+  {S_VA_SelectDirect		,(list(*)(...))Vselectd},
+  {S_VA_NumericalKeySelect	,(list(*)(...))Vnumeric},
+  {S_VA_BunsetsuKugiri		,(list(*)(...))Vbunsets},
+  {S_VA_CharacterBasedMove	,(list(*)(...))Vcharact},
+  {S_VA_ReverseWidely		,(list(*)(...))Vreverse},
+  {S_VA_ReverseWord		,(list(*)(...))VreverseWord},
+  {S_VA_Gakushu			,(list(*)(...))Vgakushu},
+  {S_VA_QuitIfEOIchiran		,(list(*)(...))Vquitich},
+  {S_VA_KakuteiIfEOBunsetsu	,(list(*)(...))Vkakutei},
+  {S_VA_StayAfterValidate	,(list(*)(...))Vstayaft},
+  {S_VA_BreakIntoRoman		,(list(*)(...))Vbreakin},
+  {S_VA_NHenkanForIchiran	,(list(*)(...))Vnhenkan},
+  {S_VA_GrammaticalQuestion	,(list(*)(...))Vgrammati},
+  {"gramatical-question"	,(list(*)(...))Vgrammati}, /* °ÊÁ°¤Î¥¹¥Ú¥ë¥ß¥¹¤ÎµßºÑ */
+  {S_VA_ForceKana		,(list(*)(...))Vforceka},
+  {S_VA_KouhoCount		,(list(*)(...))Vkouhoco},
+  {S_VA_Auto			,(list(*)(...))Vauto},
+  {S_VA_LearnNumericalType	,(list(*)(...))VlearnNumTy},
+  {S_VA_BackspaceBehavesAsQuit	,(list(*)(...))VBSasQuit},
+  {S_VA_InhibitListCallback	,(list(*)(...))Vinhibi},
+  {S_VA_nKouhoBunsetsu		,(list(*)(...))Vnkouhobunsetsu},
+  {S_VA_keepCursorPosition	,(list(*)(...))Vkeepcupos},
+  {S_VA_CannaVersion		,(list(*)(...))VCannaVersion},
+  {S_VA_Abandon			,(list(*)(...))VAbandon},
+  {S_VA_HexDirect		,(list(*)(...))VHexStyle},
+  {S_VA_ProtocolVersion		,(list(*)(...))VProtoVer},
+  {S_VA_ServerVersion		,(list(*)(...))VServVer},
+  {S_VA_ServerName		,(list(*)(...))VServName},
+  {S_VA_CannaDir		,(list(*)(...))VCannaDir},
+  {S_VA_Kojin			,(list(*)(...))VKojin},
+  {S_VA_IndexHankaku	       	,(list(*)(...))VIndexHankaku},
+  {S_VA_IndexSeparator	       	,(list(*)(...))VIndexSeparator},
+  {S_VA_AllowNextInput		,(list(*)(...))VAllowNext},
+  {S_VA_doKatakanaGakushu	,(list(*)(...))VkanaGaku},
+  {S_VA_doHiraganaGakushu	,(list(*)(...))VhiraGaku},
 #ifdef	DEFINE_SOMETHING
-  {S_VA_chikuji_debug		,Vchikuji_debug},
+  {S_VA_chikuji_debug		,(list(*)(...))Vchikuji_debug},
 #endif	/* DEFINE_SOMETHING */
-  {S_VA_ChikujiContinue		,VChikujiContinue},
-  {S_VA_RenbunContinue		,VRenbunContinue},
-  {S_VA_MojishuContinue		,VMojishuContinue},
-  {S_VA_ChikujiRealBackspace	,VcRealBS},
-  {S_VA_nDisconnectServer	,Vndisconnect},
-  {S_VA_ignoreCase		,VIgnoreCase},
-  {S_VA_RomajiYuusen		,VRomajiYuusen},
-  {S_VA_AutoSync		,VAutoSync},
-  {S_VA_QuicklyEscape		,VQuicklyEscape},
-  {S_VA_InhibitHanKana		,VInhibitHankana},
-  {S_VA_CodeInput		,VCodeInput},
+  {S_VA_ChikujiContinue		,(list(*)(...))VChikujiContinue},
+  {S_VA_RenbunContinue		,(list(*)(...))VRenbunContinue},
+  {S_VA_MojishuContinue		,(list(*)(...))VMojishuContinue},
+  {S_VA_ChikujiRealBackspace	,(list(*)(...))VcRealBS},
+  {S_VA_nDisconnectServer	,(list(*)(...))Vndisconnect},
+  {S_VA_ignoreCase		,(list(*)(...))VIgnoreCase},
+  {S_VA_RomajiYuusen		,(list(*)(...))VRomajiYuusen},
+  {S_VA_AutoSync		,(list(*)(...))VAutoSync},
+  {S_VA_QuicklyEscape		,(list(*)(...))VQuicklyEscape},
+  {S_VA_InhibitHanKana		,(list(*)(...))VInhibitHankana},
+  {S_VA_CodeInput		,(list(*)(...))VCodeInput},
 #ifdef WIN_CANLISP
-  {"remote-group"		,VremoteGroup},
-  {"local-group"		,VlocalGroup},
-  {"candlist-initial-width"     ,VcandInitWidth},
-  {"candlist-initial-height"    ,VcandInitHeight},
-  {"candlist-max-width"         ,VcandMaxWidth},
-  {"candlist-max-height"        ,VcandMaxHeight},
-  {"toolbar-icon-size"          ,VstatusSize},
+  {"remote-group"		,(list(*)(...))VremoteGroup},
+  {"local-group"		,(list(*)(...))VlocalGroup},
+  {"candlist-initial-width"     ,(list(*)(...))VcandInitWidth},
+  {"candlist-initial-height"    ,(list(*)(...))VcandInitHeight},
+  {"candlist-max-width"         ,(list(*)(...))VcandMaxWidth},
+  {"candlist-max-height"        ,(list(*)(...))VcandMaxHeight},
+  {"toolbar-icon-size"          ,(list(*)(...))VstatusSize},
 #endif
   {0				,0},
 };

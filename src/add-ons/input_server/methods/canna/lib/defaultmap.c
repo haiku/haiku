@@ -21,7 +21,7 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "@(#) 102.1 $Id: defaultmap.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char rcs_id[] = "@(#) 102.1 $Id$";
 #endif	/* lint */
 
 #include "canna.h"
@@ -40,13 +40,13 @@ unsigned char f))(...)
 
   for (p = tbl ; p->funcid || p->cfunc ; p++) {
     if (p->funcid == (unsigned char)f) {
-      return p->cfunc;
+      return (int (*)(...))p->cfunc;
     }
   }
-  return (int (*)())0;
+  return (int (*)(...))0;
 }
 
-static
+static int
 simpleUndefBehavior(uiContext d)
 {
   switch (howToBehaveInCaseOfUndefKey)

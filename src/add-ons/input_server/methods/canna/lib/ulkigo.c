@@ -21,7 +21,7 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "@(#) 102.1 $Id: ulkigo.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char rcs_id[] = "@(#) 102.1 $Id$";
 #endif
 
 #include	<errno.h>
@@ -87,12 +87,12 @@ char *sgreek_data[] =
 
 #define	UUGD_SZ	(sizeof(sgreek_data) / sizeof(char *))
 
-static uuKigoExitDo(uiContext d, int retval);
-static uuKigoRExitCatch(uiContext d, int retval, mode_context env);
-static uuKigoGExitCatch(uiContext d, int retval, mode_context env);
-static uuKigoKExitCatch(uiContext d, int retval, mode_context env);
-static uuKigoQuitCatch(uiContext d, int retval, mode_context env);
-static kigoZenpan(uiContext d);
+static int uuKigoExitDo(uiContext d, int retval);
+static int uuKigoRExitCatch(uiContext d, int retval, mode_context env);
+static int uuKigoGExitCatch(uiContext d, int retval, mode_context env);
+static int uuKigoKExitCatch(uiContext d, int retval, mode_context env);
+static int uuKigoQuitCatch(uiContext d, int retval, mode_context env);
+static int kigoZenpan(uiContext d);
 
 static WCHAR_T *russia_data[UURD_SZ];
 static WCHAR_T *greek_data[UUGD_SZ];
@@ -173,7 +173,7 @@ initUlKeisenTable(void)
 }
 
 static
-uuKigoExitDo(uiContext d, int retval)
+int uuKigoExitDo(uiContext d, int retval)
 {
   popForIchiranMode(d);
   popCallback(d);
@@ -186,7 +186,7 @@ uuKigoExitDo(uiContext d, int retval)
 }
 
 static
-uuKigoRExitCatch(uiContext d, int retval, mode_context env)
+int uuKigoRExitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   forichiranContext fc;
@@ -200,7 +200,7 @@ uuKigoRExitCatch(uiContext d, int retval, mode_context env)
 }
 
 static
-uuKigoGExitCatch(uiContext d, int retval, mode_context env)
+int uuKigoGExitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   forichiranContext fc;
@@ -214,7 +214,7 @@ uuKigoGExitCatch(uiContext d, int retval, mode_context env)
 }
 
 static
-uuKigoKExitCatch(uiContext d, int retval, mode_context env)
+int uuKigoKExitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   forichiranContext fc;
@@ -227,7 +227,7 @@ uuKigoKExitCatch(uiContext d, int retval, mode_context env)
   return(uuKigoExitDo(d, retval));
 }
 
-uuKigoGeneralExitCatch(uiContext d, int retval, mode_context env)
+int uuKigoGeneralExitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   forichiranContext fc;
@@ -243,7 +243,7 @@ uuKigoGeneralExitCatch(uiContext d, int retval, mode_context env)
 }
 
 static
-uuKigoQuitCatch(uiContext d, int retval, mode_context env)
+int uuKigoQuitCatch(uiContext d, int retval, mode_context env)
 /* ARGSUSED */
 {
   popCallback(d); /* °ìÍ÷¤ò pop */
@@ -255,7 +255,7 @@ uuKigoQuitCatch(uiContext d, int retval, mode_context env)
   return prevMenuIfExist(d);
 }
 
-uuKigoMake(uiContext d, WCHAR_T **allkouho, int size, char cur, char mode, int (*exitfunc )(...), int *posp)
+int uuKigoMake(uiContext d, WCHAR_T **allkouho, int size, char cur, char mode, int (*exitfunc )(...), int *posp)
 {
   forichiranContext fc;
   ichiranContext ic;
@@ -277,7 +277,7 @@ uuKigoMake(uiContext d, WCHAR_T **allkouho, int size, char cur, char mode, int (
 
   if((retval = selectOne(d, fc->allkouho, &fc->curIkouho, size,
 		 KIGOBANGOMAX, inhibit, 0, WITH_LIST_CALLBACK,
-		 NO_CALLBACK, exitfunc,
+		 NO_CALLBACK, (int (*)(_uiContext*, int, _coreContextRec*))exitfunc,
 		 uuKigoQuitCatch, uiUtilIchiranTooSmall)) == NG) {
     return(GLineNGReturnFI(d));
   }
@@ -325,7 +325,7 @@ kigoZenpan(uiContext d)
  * ¥í¥·¥¢Ê¸»ú¤ÎÆþÎÏ                                                          *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-kigoRussia(uiContext d)
+int kigoRussia(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -337,7 +337,9 @@ kigoRussia(uiContext d)
   return 0;
 #else
   return(uuKigoMake(d, (WCHAR_T **)russia_data, UURD_SZ,
-           d->currussia, CANNA_MODE_RussianMode, uuKigoRExitCatch, (int *)0));
+           d->currussia,
+		   CANNA_MODE_RussianMode,
+		   (int(*)(...))uuKigoRExitCatch, (int *)0));
 #endif
 }
 
@@ -345,7 +347,7 @@ kigoRussia(uiContext d)
  * ¥®¥ê¥·¥ãÊ¸»ú¤ÎÆþÎÏ                                                        *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-kigoGreek(uiContext d)
+int kigoGreek(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -357,7 +359,7 @@ kigoGreek(uiContext d)
   return 0;
 #else
   return(uuKigoMake(d, (WCHAR_T **)greek_data, UUGD_SZ,
-           d->curgreek, CANNA_MODE_GreekMode, uuKigoGExitCatch, (int *)0));
+           d->curgreek, CANNA_MODE_GreekMode, (int(*)(...))uuKigoGExitCatch, (int *)0));
 #endif
 }
 
@@ -365,7 +367,7 @@ kigoGreek(uiContext d)
  * ·ÓÀþ¤ÎÆþÎÏ                                                                *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-kigoKeisen(uiContext d)
+int kigoKeisen(uiContext d)
 {
   yomiContext yc = (yomiContext)d->modec;
 
@@ -377,6 +379,6 @@ kigoKeisen(uiContext d)
   return 0;
 #else
   return(uuKigoMake(d, (WCHAR_T **)keisen_data, UUKD_SZ,
-           d->curkeisen, CANNA_MODE_LineMode, uuKigoKExitCatch, (int *)0));
+           d->curkeisen, CANNA_MODE_LineMode, (int(*)(...))uuKigoKExitCatch, (int *)0));
 #endif
 }

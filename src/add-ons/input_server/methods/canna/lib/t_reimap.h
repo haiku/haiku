@@ -22,7 +22,7 @@
 // Modified by T.Murai
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char t_reimap_id[] = "@(#) 102.1 $Id: t_reimap.h,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char t_reimap_id[] = "@(#) 102.1 $Id$";
 #endif	/* lint */
 
 #include "canna.h"
@@ -34,7 +34,7 @@ static struct funccfunc tourokureibun_funcs[] = {
   {0				,0		},
 };
 
-extern searchfunc(...);
+extern int searchfunc(...);
 KanjiModeRec tourokureibun_mode = {
   searchfunc,
   default_kmap,

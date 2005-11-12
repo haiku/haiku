@@ -21,7 +21,7 @@
 */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-	static char rcsid[]="$Id: tempdic.c,v 1.1 2004/12/23 21:23:50 korli Exp $";
+	static char rcsid[]="$Id$";
 #endif
 /*LINTLIBRARY*/
 
@@ -39,10 +39,10 @@
 static void freeTD(struct TD *td);
 static TD *newTD(void);
 static TN *extendTD(struct TD *tdic, WCHAR_T key, struct TW *tw);
-static yomi_equal(Wrec *x, Wrec *y, int n);
+static int yomi_equal(Wrec *x, Wrec *y, int n);
 static WCHAR_T nthKey(Wrec *w, int n);
 static TN *defineTD(struct DM *dm, struct TD *tab, int n, struct TW *newTW, int nlen);
-static enterTD(struct DM *dm, struct TD *td, struct RkKxGram *gram, WCHAR_T *word);
+static int enterTD(struct DM *dm, struct TD *td, struct RkKxGram *gram, WCHAR_T *word);
 static void shrinkTD(struct TD *td, WCHAR_T key);
 static int deleteTD(struct DM *dm, struct TD **tab, int n, Wrec *newW);
 
@@ -121,7 +121,7 @@ extendTD(struct TD *tdic, WCHAR_T key, struct TW *tw)
 }
 
 static
-yomi_equal(Wrec *x, Wrec *y, int n)
+int yomi_equal(Wrec *x, Wrec *y, int n)
 {
 	int l;
 	
@@ -216,7 +216,7 @@ defineTD(struct DM *dm, struct TD *tab, int n, struct TW *newTW, int nlen)
 }
 
 static
-enterTD(struct DM *dm, struct TD *td, struct RkKxGram *gram, WCHAR_T *word)
+int enterTD(struct DM *dm, struct TD *td, struct RkKxGram *gram, WCHAR_T *word)
 {
 	struct TW	tw;
 	int ret = -1;
