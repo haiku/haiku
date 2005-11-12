@@ -1,28 +1,15 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2004, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		TextControl.cpp
-//	Author:			Frans van Nispen (xlr8@tref.nl)
-//	Description:	BTextControl displays text that can act like a control.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Frans van Nispen (xlr8@tref.nl)
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
+
+/**	BTextControl displays text that can act like a control. */
+
+
 #include <stdio.h>
 
 #include <Message.h>
@@ -35,16 +22,18 @@
 BTextControl::BTextControl(BRect frame, const char *name, const char *label,
 						   const char *text, BMessage *message, uint32 mask,
 						   uint32 flags)
-	:	BControl(frame, name, label, message, mask, flags | B_FRAME_EVENTS)
+	: BControl(frame, name, label, message, mask, flags | B_FRAME_EVENTS)
 {
 	InitData(label, text);
 
+	float height;
+	GetPreferredSize(NULL, &height);
+
+	ResizeTo(Bounds().Width(), height);
+
 	float lineHeight = fText->LineHeight(0);
-
-	ResizeTo(Bounds().Width(), lineHeight + 8);
-
-	fText->ResizeTo(fText->Bounds().Width(), lineHeight + 4);
-	fText->MoveTo(fText->Frame().left, 2.0f);
+	fText->ResizeTo(fText->Bounds().Width(), lineHeight);
+	fText->MoveTo(fText->Frame().left, (height - lineHeight) / 2);
 }
 
 
@@ -221,15 +210,15 @@ BTextControl::Divider() const
 void
 BTextControl::Draw(BRect updateRect)
 {
-	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
-	lighten1 = tint_color(no_tint, B_LIGHTEN_1_TINT),
-	lighten2 = tint_color(no_tint, B_LIGHTEN_2_TINT),
-	lightenmax = tint_color(no_tint, B_LIGHTEN_MAX_TINT),
-	darken1 = tint_color(no_tint, B_DARKEN_1_TINT),
-	darken2 = tint_color(no_tint, B_DARKEN_2_TINT),
-	darken4 = tint_color(no_tint, B_DARKEN_4_TINT),
-	darkenmax = tint_color(no_tint, B_DARKEN_MAX_TINT),
-	nav = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
+	rgb_color noTint = ui_color(B_PANEL_BACKGROUND_COLOR),
+	lighten1 = tint_color(noTint, B_LIGHTEN_1_TINT),
+	lighten2 = tint_color(noTint, B_LIGHTEN_2_TINT),
+	lightenMax = tint_color(noTint, B_LIGHTEN_MAX_TINT),
+	darken1 = tint_color(noTint, B_DARKEN_1_TINT),
+	darken2 = tint_color(noTint, B_DARKEN_2_TINT),
+	darken4 = tint_color(noTint, B_DARKEN_4_TINT),
+	darkenMax = tint_color(noTint, B_DARKEN_MAX_TINT),
+	navigationColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 
 	bool enabled = IsEnabled();
 	bool active = false;
@@ -241,9 +230,8 @@ BTextControl::Draw(BRect updateRect)
 	rect.InsetBy(-1.0f, -1.0f);
 
 	if (active) {
-		SetHighColor(nav);
+		SetHighColor(navigationColor);
 		StrokeRect(rect);
-
 	} else {
 		if (enabled)
 			SetHighColor(darken4);
@@ -253,7 +241,7 @@ BTextControl::Draw(BRect updateRect)
 		StrokeLine(rect.LeftTop(), rect.LeftBottom());
 		StrokeLine(rect.LeftTop(), rect.RightTop());
 
-		SetHighColor(no_tint);
+		SetHighColor(noTint);
 		StrokeLine(BPoint(rect.left + 1.0f, rect.bottom), rect.RightBottom());
 		StrokeLine(BPoint(rect.right, rect.top + 1.0f));
 	}
@@ -263,7 +251,7 @@ BTextControl::Draw(BRect updateRect)
 	if (enabled)
 		SetHighColor(darken1);
 	else
-		SetHighColor(no_tint);
+		SetHighColor(noTint);
 
 	StrokeLine(rect.LeftBottom(), rect.LeftTop());
 	StrokeLine(rect.RightTop());
@@ -277,10 +265,10 @@ BTextControl::Draw(BRect updateRect)
 	StrokeLine(BPoint(rect.right, rect.top + 1.0f), rect.RightBottom());
 
 	if (Label()) {
-		font_height fh;
-		GetFontHeight(&fh);
+		font_height fontHeight;
+		GetFontHeight(&fontHeight);
 
-		float y = (float)ceil(fh.ascent + fh.descent + fh.leading) + 2.0f;
+		float y = fontHeight.ascent + fText->Frame().top + 1;
 		float x;
 
 		switch (fLabelAlign) {
@@ -296,9 +284,9 @@ BTextControl::Draw(BRect updateRect)
 				x = 3.0f;
 				break;
 		}
-		
-		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-					 IsEnabled() ? B_DARKEN_MAX_TINT : B_DISABLED_LABEL_TINT));
+
+		SetHighColor(IsEnabled() ? darkenMax
+			: tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DISABLED_LABEL_TINT));
 		DrawString(Label(), BPoint(x, y));
 	}
 }
@@ -401,23 +389,34 @@ BTextControl::SetEnabled(bool state)
 
 
 void
-BTextControl::GetPreferredSize(float *width, float *height)
+BTextControl::GetPreferredSize(float *_width, float *_height)
 {
-	if (height)
-		*height = fText->LineHeight(0) + 8.0f;
+	if (_height) {
+		// we need enough space for the label and the child text view
+		font_height fontHeight;
+		GetFontHeight(&fontHeight);
+		float labelHeight = ceil(fontHeight.ascent + fontHeight.descent
+			+ fontHeight.leading);
+		float textHeight = fText->LineHeight(0) + 4.0;
 
-	// TODO: this one I need to find out
-	if (width)
-		*width = 4.0f + ceilf(StringWidth(Label())) * 2.0f;
+		*_height = max_c(labelHeight, textHeight);
+	}
+
+	if (_width) {
+		// TODO: this one I need to find out
+		float width = 20.0f + ceilf(StringWidth(Label()));
+		if (width < Bounds().Width())
+			width = Bounds().Width();
+		*_width = width;
+	}
 }
 
 
 void
 BTextControl::ResizeToPreferred()
 {
-	float width, height;
-	GetPreferredSize(&width, &height);
-	BView::ResizeTo(width, height);
+	// TODO: change divider?
+	BView::ResizeToPreferred();
 }
 
 
@@ -601,7 +600,8 @@ BTextControl::InitData(const char *label, const char *initial_text,
 	if (label)
 		fDivider = floorf(bounds.Width() / 2.0f);
 
-	if (Flags() & B_NAVIGABLE) {
+	uint32 navigableFlags = Flags() & B_NAVIGABLE;
+	if (navigableFlags != 0) {
 		fSkipSetFlags = true;
 		SetFlags(Flags() & ~B_NAVIGABLE);
 		fSkipSetFlags = false;
@@ -612,19 +612,16 @@ BTextControl::InitData(const char *label, const char *initial_text,
 	else {
 		BRect frame(fDivider, bounds.top,
 					bounds.right, bounds.bottom);
-		// we are stroking the frame arround the text view, which
+		// we are stroking the frame around the text view, which
 		// is 2 pixels wide
-		frame.InsetBy(2.0, 2.0);
-
+		frame.InsetBy(3.0, 3.0);
 		BRect textRect(frame.OffsetToCopy(0.0f, 0.0f));
-		textRect.InsetBy(2.0, 2.0);
-	
-		fText = new _BTextInput_(frame, textRect,
-								 B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
-								 B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
 
+		fText = new _BTextInput_(frame, textRect,
+			B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+			B_WILL_DRAW | B_FRAME_EVENTS | navigableFlags);
 		AddChild(fText);
-		
+
 		SetText(initial_text);
 		fText->SetAlignment(B_ALIGN_LEFT);
 		fText->AlignTextRect();

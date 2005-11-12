@@ -84,12 +84,8 @@ void
 _BTextInput_::FrameResized(float width, float height)
 {
 	BTextView::FrameResized(width, height);
+
 	AlignTextRect();
-// TODO: just to get something working, it wouldn't be correct for
-// scrolled views
-BRect textRect(Bounds());
-textRect.InsetBy(2.0, 2.0);
-SetTextRect(textRect);
 }
 
 
@@ -174,7 +170,10 @@ _BTextInput_::MakeFocus(bool state)
 void
 _BTextInput_::AlignTextRect()
 {
-	
+	// TODO: just to get something working, it wouldn't be correct for
+	// scrolled views
+	BRect textRect(Bounds());
+	SetTextRect(textRect);
 }
 
 
