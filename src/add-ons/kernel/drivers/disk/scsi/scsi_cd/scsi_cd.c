@@ -556,7 +556,7 @@ cd_ioctl(cd_handle_info *handle, int op, void *buf, size_t len)
 		case B_GET_DEVICE_SIZE:
 			res = update_capacity(device);
 			if (res == B_OK)
-				(size_t *)buf = device->capacity * device->block_size;
+				*(size_t *)buf = device->capacity * device->block_size;
 			break;
 
 		case B_GET_GEOMETRY:
