@@ -35,6 +35,7 @@
 #include <MessageUtils.h>
 #include <WindowAux.h>
 
+#include <ctype.h>
 #include <stdio.h>
 #include <math.h>
 
@@ -1127,7 +1128,6 @@ void
 BWindow::AddShortcut(uint32 key, uint32 modifiers, BMessage *msg, BHandler *target)
 {
 	// NOTE: I'm not sure if it is OK to use 'key'
-	// TODO: What about locking?!?
 
 	if (msg == NULL)
 		return;
@@ -1135,8 +1135,8 @@ BWindow::AddShortcut(uint32 key, uint32 modifiers, BMessage *msg, BHandler *targ
 	int64 when = real_time_clock_usecs();
 	msg->AddInt64("when", when);
 
-	// TODO: make sure key is a lowercase char !!!
-
+	// TODO: support unicode here
+	key = tolower(key);
 	modifiers = modifiers | B_COMMAND_KEY;
 
 	_BCmdKey *cmdKey = new _BCmdKey(key, modifiers, msg);
@@ -1154,7 +1154,6 @@ BWindow::AddShortcut(uint32 key, uint32 modifiers, BMessage *msg, BHandler *targ
 void
 BWindow::RemoveShortcut(uint32 key, uint32 modifiers)
 {
-	// TODO: What about locking?!?
 	int32 index = findShortcut(key, modifiers | B_COMMAND_KEY);
 	if (index >=0) {
 		_BCmdKey *cmdKey = (_BCmdKey *)accelList.ItemAt(index);
@@ -1966,7 +1965,8 @@ BWindow::InitData(BRect frame, const char* title, window_look look,
 	AddShortcut('C', B_COMMAND_KEY, new BMessage(B_COPY), NULL);
 	AddShortcut('V', B_COMMAND_KEY, new BMessage(B_PASTE), NULL);
 	AddShortcut('A', B_COMMAND_KEY, new BMessage(B_SELECT_ALL), NULL);
-	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
+	if ((fFlags & B_NOT_CLOSABLE) == 0)
+		AddShortcut('W', B_COMMAND_KEY, new BMessage(B_CLOSE_REQUESTED));
 
 	fPulseEnabled = false;
 	fPulseRate = 0;
@@ -2436,12 +2436,6 @@ BWindow::_HandleKeyDown(char key, uint32 modifiers)
 		return true;
 	}
 
-	// Command+q has been pressed, so, we will quit
-	if ((key == 'Q' || key == 'q') && (modifiers & B_COMMAND_KEY) != 0) {
-		be_app->PostMessage(B_QUIT_REQUESTED);
-		return true;
-	}
-
 	// Keyboard navigation through views
 	// (B_OPTION_KEY makes BTextViews and friends navigable, even in editing mode)
 	if (key == B_TAB && (modifiers & (B_COMMAND_KEY | B_OPTION_KEY)) != 0) {
@@ -2450,42 +2444,56 @@ BWindow::_HandleKeyDown(char key, uint32 modifiers)
 	}
 
 	// Handle shortcuts
-	int index;
-	if ((index = findShortcut(key, modifiers)) >= 0) {
-		_BCmdKey *cmdKey = (_BCmdKey*)accelList.ItemAt(index);
-
-		// we'll give the message to the focus view
-		if (cmdKey->targetToken == B_ANY_TOKEN) {
-			fFocus->MessageReceived(cmdKey->message);
+	if ((modifiers & B_COMMAND_KEY) != 0) {
+		// Command+q has been pressed, so, we will quit
+		if (key == 'Q' || key == 'q') {
+			be_app->PostMessage(B_QUIT_REQUESTED);
 			return true;
-		} else {
-			BHandler *target = NULL;
-			int32 count = CountHandlers();
+		}
 
-			// ToDo: this looks wrong: why not just send a message to the
-			//	target? Only if the target is a handler of this looper we
-			//	can do what is done below.
+		// we only must consider temporary modifiers for the shortcuts
+		modifiers &= B_COMMAND_KEY | B_OPTION_KEY | B_SHIFT_KEY
+			| B_CONTROL_KEY | B_MENU_KEY;
 
-			// search for a match through BLooper's list of eligible handlers
-			for (int32 i = 0; i < count; i++) {
-				BHandler *handler = HandlerAt(i);
+		int32 index;
+		if ((index = findShortcut(key, modifiers)) >= 0) {
+			_BCmdKey *cmdKey = (_BCmdKey*)accelList.ItemAt(index);
 
-				// do we have a match?
-				if (_get_object_token_(handler) == cmdKey->targetToken) {
-					// yes, we do.
-					target = handler;
-					break;
+			// TODO: using MessageReceived() here removes the possibility to filter the messages!
+
+			// we'll give the message to the focus view
+			if (cmdKey->targetToken == B_ANY_TOKEN) {
+				fFocus->MessageReceived(cmdKey->message);
+				return true;
+			} else {
+				BHandler *target = NULL;
+				int32 count = CountHandlers();
+
+				// ToDo: this looks wrong: why not just send a message to the
+				//	target? Only if the target is a handler of this looper we
+				//	can do what is done below.
+
+				// search for a match through BLooper's list of eligible handlers
+				for (int32 i = 0; i < count; i++) {
+					BHandler *handler = HandlerAt(i);
+
+					// do we have a match?
+					if (_get_object_token_(handler) == cmdKey->targetToken) {
+						// yes, we do.
+						target = handler;
+						break;
+					}
+				}
+
+				if (target)
+					target->MessageReceived(cmdKey->message);
+				else {
+					// if no handler was found, BWindow will handle the message
+					PostMessage(cmdKey->message);
 				}
 			}
-
-			if (target)
-				target->MessageReceived(cmdKey->message);
-			else {
-				// if no handler was found, BWindow will handle the message
-				MessageReceived(cmdKey->message);
-			}
+			return true;
 		}
-		return true;
 	}
 
 	// if <ENTER> is pressed and we have a default button
@@ -2539,6 +2547,8 @@ int32
 BWindow::findShortcut(uint32 key, uint32 modifiers)
 {
 	int32 count = accelList.CountItems();
+	// TODO: support unicode here
+	key = tolower(key);
 
 	for (int32 index = 0; index < count; index++) {
 		_BCmdKey *cmdKey = (_BCmdKey *)accelList.ItemAt(index);
