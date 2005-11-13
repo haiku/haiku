@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 
+#include <Debug.h>
 #include <image.h>
 #include <OS.h>
 
@@ -19,6 +20,16 @@ debugger(const char *message)
 {
 	fprintf(stderr, "debugger() called: %s\n", message);
 	exit(1);
+}
+
+// _debuggerAssert
+int
+_debuggerAssert(const char *file, int line, char *expression)
+{
+	char buffer[2048];
+	snprintf(buffer, sizeof(buffer), "%s:%d: %s\n", file, line, expression);
+	debugger(buffer);
+	return 0;
 }
 
 // system_time
