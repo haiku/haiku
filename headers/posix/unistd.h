@@ -128,12 +128,12 @@ extern pid_t	tcgetpgrp(int fd);
 extern int		tcsetpgrp(int fd, pid_t pgrpid);
 extern void		*sbrk(long incr);
 
-extern uint		alarm(unsigned int seconds);
-extern uint		ualarm(unsigned int microSeconds, unsigned int interval);
-extern uint 	sleep(unsigned int seconds);
-extern int		usleep(unsigned int microSeconds);
-extern clock_t	clock(void);
-extern int 		pause(void);
+extern unsigned	int	alarm(unsigned int seconds);
+extern useconds_t	ualarm(unsigned int microSeconds, unsigned int interval);
+extern unsigned int	sleep(unsigned int seconds);
+extern int			usleep(unsigned int microSeconds);
+extern clock_t		clock(void);
+extern int 			pause(void);
 
 /* process */
 extern pid_t	getpid(void);
