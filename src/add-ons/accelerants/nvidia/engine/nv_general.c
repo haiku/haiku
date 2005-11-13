@@ -167,7 +167,6 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia Quadro FX 4000/4400 (NV40)\n"));
 		status = nvxx_general_powerup();
 		break;
-//fixme: reported, but yet untested card..
 	case 0x009210de: /* Nvidia Geforce 7800 GT PCIe */
 		si->ps.card_type = NV47;
 		si->ps.card_arch = NV40A;
