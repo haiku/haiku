@@ -31,6 +31,10 @@
 #include <OS.h>
 #include <Accelerant.h>
 
+#ifdef USING_MESSAGE4
+#include <MessagePrivate.h>
+#endif
+
 void SendMessage(port_id port, BMessage *message, int32 target=-1);
 const char *MsgCodeToString(int32 code);
 BString MsgCodeToBString(int32 code);

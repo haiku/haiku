@@ -31,10 +31,14 @@ SendMessage(port_id port, BMessage *message, int32 target)
 	if (!message)
 		return;
 
+#ifndef USING_MESSAGE4
 	if (target == -1)
 		_set_message_target_(message, target, true);
 	else
 		_set_message_target_(message, target, false);
+#else
+	BMessage::Private(message).SetTarget(target, target == -1);
+#endif
 
 	ssize_t size = message->FlattenedSize();
 	char *buffer = new char[size];
@@ -47,6 +51,7 @@ SendMessage(port_id port, BMessage *message, int32 target)
 }
 
 
+#ifndef USING_MESSAGE4
 /*
 	Below are friend functions for BMessage which currently are not in the Message.cpp 
 	that we need to send messages to BLoopers and such. Placed here to allow compilation.
@@ -79,6 +84,7 @@ _use_preferred_target_(BMessage *msg)
 {
 	return msg->fPreferred;
 }
+#endif
 
 
 const char *

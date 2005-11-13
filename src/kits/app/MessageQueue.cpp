@@ -71,7 +71,11 @@ BMessageQueue::~BMessageQueue()
 		BMessage *theMessage = fTheQueue;
 		while (theMessage != NULL) {
 			BMessage *messageToDelete = theMessage;
+#ifndef USING_MESSAGE4
 			theMessage = theMessage->link;
+#else
+			theMessage = theMessage->fQueueLink;
+#endif
 			delete messageToDelete;
 		}
 	}
@@ -112,7 +116,11 @@ BMessageQueue::AddMessage(BMessage *message)
 		
 		// The message passed in will be the last message on the queue so its
 		// link member should be set to null.
+#ifndef USING_MESSAGE4
 		message->link = NULL;
+#else
+		message->fQueueLink = NULL;
+#endif
 		
 		// We now have one more BMessage on the queue.
 		fMessageCount++;
@@ -127,7 +135,11 @@ BMessageQueue::AddMessage(BMessage *message)
 			// BMessage at the end.  The last BMessage prior to this AddMessage()
 			// is fQueueTail.  The BMessage at fQueueTail needs to point to the
 			// new last message, the one being added.
+#ifndef USING_MESSAGE4
 			fQueueTail->link = message;
+#else
+			fQueueTail->fQueueLink = message;
+#endif
 			
 			// Now update the fQueueTail to point to this new last message.
 			fQueueTail = message;
@@ -165,7 +177,11 @@ BMessageQueue::RemoveMessage(BMessage *message)
 		if (fTheQueue == message) {
 			// We need to special case the handling of removing the first element.
 			// First, the new front element will be the next one.
+#ifndef USING_MESSAGE4
 			fTheQueue = fTheQueue->link;
+#else
+			fTheQueue = fTheQueue->fQueueLink;
+#endif
 			
 			// Must decrement the count of elements since the front one is being
 			// removed.
@@ -191,7 +207,11 @@ BMessageQueue::RemoveMessage(BMessage *message)
 		while (messageIter != NULL) {
 			// If the next message after this (ie second, then third etc) is 
 			// the one we are looking for.
+#ifndef USING_MESSAGE4
 			if (messageIter->link == message) {
+#else
+			if (messageIter->fQueueLink == message) {
+#endif
 				// At this point, this is what we have:
 				//    messageIter - the BMessage in the queue just before the
 				//                  match
@@ -202,13 +222,21 @@ BMessageQueue::RemoveMessage(BMessage *message)
 				// The next step is to link the BMessage just before the match
 				// to the one just after the match.  This removes the match from
 				// the queue.
+#ifndef USING_MESSAGE4
 				messageIter->link = message->link;
+#else
+				messageIter->fQueueLink = message->fQueueLink;
+#endif
 				
 				// One less element on the queue.
 				fMessageCount--;
 				
 				// If there is no BMessage after the match is the
+#ifndef USING_MESSAGE4
 				if (message->link == NULL) {
+#else
+				if (message->fQueueLink == NULL) {
+#endif
 					// That means that we just removed the last element from the
 					// queue.  The new last element then must be messageIter.
 					fQueueTail = messageIter;
@@ -219,7 +247,11 @@ BMessageQueue::RemoveMessage(BMessage *message)
 			}
 			
 			// No match yet, go to the next element in the list.
+#ifndef USING_MESSAGE4
 			messageIter = messageIter->link;
+#else
+			messageIter = messageIter->fQueueLink;
+#endif
 		}
 	}
 }
@@ -290,7 +322,11 @@ BMessageQueue::FindMessage(int32 index) const
 		// reaches zero.
 		index--;
 		// Increment the messageIter to the next BMessage on the queue.
+#ifndef USING_MESSAGE4
 		messageIter = messageIter->link;
+#else
+		messageIter = messageIter->fQueueLink;
+#endif
 	}
 	
 	// If no match was found, messageIter will be NULL since that is the only
@@ -347,7 +383,11 @@ BMessageQueue::FindMessage(uint32 what,
 			index--;
 		}
 		// Increment the messageIter to the next BMessage on the queue.
+#ifndef USING_MESSAGE4
 		messageIter = messageIter->link;
+#else
+		messageIter = messageIter->fQueueLink;
+#endif
 	}
 	
 	// If no match was found, messageIter will be NULL since that is the only
@@ -422,7 +462,11 @@ BMessageQueue::NextMessage(void)
 			fMessageCount--;
 			// The new front of the list is moved forward thereby removing the
 			// first element from the queue.
+#ifndef USING_MESSAGE4
 			fTheQueue = fTheQueue->link;
+#else
+			fTheQueue = fTheQueue->fQueueLink;
+#endif
 			// If the queue is empty after removing the front element.
 			if (fTheQueue == NULL) {
 				// We need to set the tail of the queue to NULL since the queue

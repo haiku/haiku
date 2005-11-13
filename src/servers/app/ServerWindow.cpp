@@ -2094,6 +2094,7 @@ ServerWindow::SendMessageToClient(const BMessage* msg, int32 target, bool usePre
 	char* buffer = new(nothrow) char[size];
 	status_t ret;
 
+#ifndef USING_MESSAGE4
 	if ((ret = msg->Flatten(buffer, size)) == B_OK) {
 		ret = BMessage::Private::SendFlattenedMessage(buffer, size,
 					fClientLooperPort, target, usePreferred, 100000);
@@ -2101,6 +2102,12 @@ ServerWindow::SendMessageToClient(const BMessage* msg, int32 target, bool usePre
 			fprintf(stderr, "ServerWindow::SendMessageToClient(): %s\n", strerror(ret));
 	} else
 		printf("PANIC: ServerWindow %s: can't flatten message in 'SendMessageToClient()'\n", fTitle);
+#else
+	BMessenger reply;
+	BMessage::Private messagePrivate((BMessage *)msg);
+	ret = messagePrivate.SendMessage(fClientLooperPort, target, usePreferred,
+		100000, false, reply);
+#endif
 
 	delete[] buffer;
 

@@ -60,8 +60,24 @@ using BPrivate::BObjectLocker;
 using BPrivate::BLooperList;
 
 port_id _get_looper_port_(const BLooper* looper);
+#ifndef USING_MESSAGE4
 bool _use_preferred_target_(BMessage* msg) { return msg->fPreferred; }
 int32 _get_message_target_(BMessage* msg) { return msg->fTarget; }
+#else
+#include <MessagePrivate.h>
+
+inline bool
+_use_preferred_target_(BMessage *message)
+{
+	return BMessage::Private(message).UsePreferredTarget();
+}
+
+inline int32
+_get_message_target_(BMessage *message)
+{
+	return BMessage::Private(message).GetTarget();
+}
+#endif
 
 uint32 BLooper::sLooperID = (uint32)B_ERROR;
 team_id BLooper::sTeamID = (team_id)B_ERROR;

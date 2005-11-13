@@ -605,6 +605,7 @@ MessageDeliverer::DeliverMessage(BMessage *message, MessagingTargetSet &targets,
 	if (!message)
 		return B_BAD_VALUE;
 
+#ifndef USING_MESSAGE4
 	// Set the token now, so that the header contains room for it.
 	// It will be set when sending the message anyway, but if it is not set
 	// before flattening, the header will not contain room for it, and it
@@ -616,6 +617,13 @@ MessageDeliverer::DeliverMessage(BMessage *message, MessagingTargetSet &targets,
 	status_t error = message->Flatten(&mallocIO);
 	if (error != B_OK)
 		return error;
+#else
+	// flatten the message
+	BMallocIO mallocIO;
+	status_t error = BMessage::Private(message).NativeFlatten(&mallocIO, NULL);
+	if (error < B_OK)
+		return error;
+#endif
 
 	return DeliverMessage(mallocIO.Buffer(), mallocIO.BufferLength(), targets,
 		timeout);

@@ -42,6 +42,10 @@
 #include <PortLink.h>
 #include <ServerProtocol.h>
 
+#ifdef USING_MESSAGE4
+#include <MessagePrivate.h>
+#endif
+
 #include <stdio.h>
 
 
@@ -1261,7 +1265,11 @@ BView::DragMessage(BMessage *message, BRect dragRect, BHandler *replyTo)
 		message->AddInt32("buttons", buttons);		
 	}
 
+#ifndef USING_MESSAGE4
 	_set_message_reply_(message, BMessenger(replyTo, replyTo->Looper()));
+#else
+	BMessage::Private(message).SetReply(BMessenger(replyTo, replyTo->Looper()));
+#endif
 
 	int32 bufferSize = message->FlattenedSize();
 	char *buffer = new char[bufferSize];
@@ -1314,7 +1322,11 @@ BView::DragMessage(BMessage *message, BBitmap *image,
 		message->AddInt32("buttons", buttons);		
 	}
 
+#ifndef USING_MESSAGE4
 	_set_message_reply_(message, BMessenger(replyTo, replyTo->Looper()));
+#else
+	BMessage::Private(message).SetReply(BMessenger(replyTo, replyTo->Looper()));
+#endif
 
 	int32 bufferSize = message->FlattenedSize();
 	char *buffer = new char[bufferSize];
