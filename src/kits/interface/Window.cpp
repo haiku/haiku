@@ -42,6 +42,10 @@
 #include <stdio.h>
 #include <math.h>
 
+// TODO: I have no idea why this is, but the libbe_test target needs this
+#ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+extern "C" float roundf(float x);
+#endif
 
 //#define DEBUG_WIN
 #ifdef DEBUG_WIN
@@ -51,16 +55,6 @@
 #	define STRACE(x) ;
 #endif
 
-
-// TODO: move to some place public (used in View.cpp as well)
-static inline float
-roundf(float v)
-{
-	if (v >= 0.0)
-		return floorf(v + 0.5);
-	else
-		return ceilf(v - 0.5);
-}
 
 class BWindow::Shortcut {
 	public:
@@ -2957,7 +2951,6 @@ BWindow::PrintToStream() const
 TODO list:
 
 	*) take care of temporarely events mask!!!
-	*) what's with this flag B_ASYNCHRONOUS_CONTROLS ?
 	*) test arguments for SetWindowAligment
 	*) call hook functions: MenusBeginning, MenusEnded. Add menu activation code.
 */

@@ -46,8 +46,13 @@
 #include <MessagePrivate.h>
 #endif
 
+#include <math.h>
 #include <stdio.h>
 
+// TODO: I have no idea why this is, but the libbe_test target needs this
+#ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+extern "C" float roundf(float x);
+#endif
 
 //#define DEBUG_BVIEW
 #ifdef DEBUG_BVIEW
@@ -65,14 +70,6 @@
 
 #define MAX_ATTACHMENT_SIZE 49152
 
-static inline float
-roundf(float v)
-{
-	if (v >= 0.0)
-		return floorf(v + 0.5);
-	else
-		return ceilf(v - 0.5);
-}
 
 static property_info sViewPropInfo[] = {
 	{ "Frame", { B_GET_PROPERTY, 0 },
