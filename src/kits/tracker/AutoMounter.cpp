@@ -671,16 +671,16 @@ AutoMounter::WatchVolumes()
 }
 
 
+#if _INCLUDES_CLASS_DEVICE_MAP
 static Device *
 FindFloppyDevice(Device *_DEVICE_MAP_ONLY(device), void *)
 {
-#if _INCLUDES_CLASS_DEVICE_MAP
 	if (device->IsFloppy())
 		return device;
-#endif
 
 	return 0;
 }
+#endif
 
 
 void
@@ -957,11 +957,12 @@ struct UnmountDeviceParams {
 	status_t result;
 };
 
+
+#if _INCLUDES_CLASS_DEVICE_MAP
 static Partition *
 UnmountIfMatchingID(Partition *_DEVICE_MAP_ONLY(partition),
 	void *_DEVICE_MAP_ONLY(castToParams))
 {
-#if _INCLUDES_CLASS_DEVICE_MAP
 	UnmountDeviceParams *params = (UnmountDeviceParams *)castToParams;
 	
 	if (partition->VolumeDeviceID() == params->device) {
@@ -1008,9 +1009,9 @@ UnmountIfMatchingID(Partition *_DEVICE_MAP_ONLY(partition),
 		return partition;
 	}
 
-#endif
 	return NULL;
 }
+#endif
 
 
 void
