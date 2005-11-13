@@ -26,7 +26,7 @@ BEOS_PREFERENCES = Backgrounds DataTranslations FileTypes Fonts Media Menu
 ;
 BEOS_SYSTEM_LIB = libbe.so $(HAIKU_LIBSTDC++) libnet.so libmedia.so libtracker.so
 	libtranslation.so libbind.so libnetapi.so libsocket.so libdebug.so
-	libtextencoding.so libz.so libfreetype.so libpng.so libappserver.so
+	libtextencoding.so libz.so libfreetype.so libpng.so
 	libdevice.so libgame.so libscreensaver.so libroot.so
 ;
 BEOS_SYSTEM_SERVERS = registrar debug_server syslog_daemon media_server
