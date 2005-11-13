@@ -24,15 +24,17 @@
 //	Description:	BPrivateScreen is the class which does the real work
 //					for the proxy class BScreen (it interacts with the app server).
 //------------------------------------------------------------------------------
+#include "AppServerLink.h"
+#include "PrivateScreen.h"
+#include "ServerProtocol.h"
+
 #include <Bitmap.h>
 #include <Locker.h>
 #include <Window.h>
 
-#include <stdlib.h>
+#include <new>
 
-#include "AppServerLink.h"
-#include "PrivateScreen.h"
-#include "ServerProtocol.h"
+#include <stdlib.h>
 
 
 // TODO: We should define this somewhere else
@@ -197,13 +199,25 @@ BPrivateScreen::ColorMap()
 
 
 status_t
-BPrivateScreen::GetBitmap(BBitmap **bitmap, bool drawCursor, BRect *bound)
+BPrivateScreen::GetBitmap(BBitmap **_bitmap, bool drawCursor, BRect *bounds)
 {
-	if (bitmap == NULL)
+	if (_bitmap == NULL)
 		return B_BAD_VALUE;
-	
-	// TODO: Implement
-	return B_ERROR;
+
+	BBitmap* bitmap = new (std::nothrow) BBitmap(Frame(), ColorSpace());
+	if (bitmap == NULL)
+		return B_NO_MEMORY;
+
+	status_t status = bitmap->InitCheck();
+	if (status == B_OK)
+		status = ReadBitmap(bitmap, drawCursor, bounds);
+	if (status != B_OK) {
+		delete bitmap;
+		return status;
+	}
+
+	*_bitmap = bitmap;
+	return B_OK;
 }
 
 
