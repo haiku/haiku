@@ -1,11 +1,13 @@
 /*
- *	Copyright (c) 2001-2005, Haiku.
+ *	Copyright 2001-2005, Haiku.
+ *  Distributed under the terms of the MIT License.
  *
  *	Authors:
  *				Marc Flerackers (mflerackers@androme.be)
  *				Mike Wilber
  *				Stefano Ceccherini (burton666@libero.it)
  *				Ivan Tonizza
+ *				Stephan Aßmus, <superstippi@gmx.de>
  */
 
 #include <Button.h>
@@ -76,15 +78,15 @@ BButton::Draw(BRect updateRect)
 	
 	const bool enabled = IsEnabled();
 	const bool pushed = Value() == B_CONTROL_ON;
-
+#if 0
 	// Default indicator
 	if (IsDefault())
-		rect = DrawDefault(rect,enabled);
-	else 
-		rect.InsetBy(1.0f,1.0f);
+		rect = DrawDefault(rect, enabled);
+	else
+		rect.InsetBy(1.0f, 1.0f);
 
 	BRect fillArea = rect;
-	fillArea.InsetBy(3.0f,3.0f);
+	fillArea.InsetBy(3.0f, 3.0f);
 
 	BString text = Label();
 	
@@ -111,7 +113,7 @@ BButton::Draw(BRect updateRect)
 	*/
 	if (IsFocusChanging()) {	
 		if (pushed) {
-			rect.InsetBy(2.0,2.0);
+			rect.InsetBy(2.0, 2.0);
 			InvertRect(rect);
 		} else 
 			DrawFocusLine(x, focusLineY, stringWidth, IsFocus() && Window()->IsActive());
@@ -174,7 +176,7 @@ BButton::Draw(BRect updateRect)
 
 	// Invert if clicked
 	if (enabled && pushed) {
-		rect.InsetBy(-2.0f,-2.0f);
+		rect.InsetBy(-2.0f, -2.0f);
 		InvertRect(rect);
 	}
 
@@ -198,7 +200,174 @@ BButton::Draw(BRect updateRect)
 	// Focus line
 	if (enabled && IsFocus() && Window()->IsActive() && !pushed)
 		DrawFocusLine(x,focusLineY,stringWidth,true);
+#else
+	// Default indicator
+	if (IsDefault())
+		rect = DrawDefault(rect, enabled);
+
+	BRect fillArea = rect;
+	fillArea.InsetBy(3.0, 3.0);
+
+	BString text = Label();
 	
+#if 1
+	// Label truncation	
+	BFont font;
+	GetFont(&font);
+	font.TruncateString(&text, B_TRUNCATE_END, fillArea.Width() - 4);
+#endif
+
+	// Label position
+	const float stringWidth = StringWidth(text.String()); 	
+	const float x = (rect.right - stringWidth) / 2.0;
+	const float labelY = bounds.top
+		+ ((bounds.Height() - fh.ascent - fh.descent) / 2.0)
+		+ fh.ascent +  1.0;
+	const float focusLineY = labelY + fh.descent;
+
+	/* speed trick:
+	   if the focus changes but the button is not pressed then we can
+	   redraw only the focus line, 
+	   if the focus changes and the button is pressed invert the internal rect	
+	   this block takes care of all the focus changes 	
+	*/
+	if (IsFocusChanging()) {	
+		if (pushed) {
+			rect.InsetBy(2.0, 2.0);
+			InvertRect(rect);
+		} else 
+			DrawFocusLine(x, focusLineY, stringWidth, IsFocus() && Window()->IsActive());
+		
+		return;
+	}
+
+	// colors	
+	const rgb_color panelBgColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+	const rgb_color buttonBgColor = tint_color(panelBgColor, B_LIGHTEN_1_TINT);	
+	const rgb_color lightColor = tint_color(panelBgColor, enabled ? B_LIGHTEN_2_TINT
+																  : B_LIGHTEN_1_TINT);
+	const rgb_color maxLightColor = tint_color(panelBgColor, B_LIGHTEN_MAX_TINT);	
+	const rgb_color maxShadowColor = tint_color(panelBgColor, B_DARKEN_MAX_TINT);	
+
+	rgb_color dark1BorderColor = tint_color(panelBgColor, enabled ? B_DARKEN_3_TINT
+																  : B_DARKEN_1_TINT);
+	rgb_color dark2BorderColor = tint_color(panelBgColor, enabled ? B_DARKEN_4_TINT
+																  : B_DARKEN_2_TINT);
+
+	rgb_color bevelColor1 = enabled ? tint_color(panelBgColor, B_DARKEN_2_TINT) 
+									: panelBgColor;
+	rgb_color bevelColor2 = enabled ? panelBgColor : buttonBgColor;
+
+	rgb_color borderBevelShadow;
+	rgb_color borderBevelLight;
+	if (IsDefault()) {
+		rgb_color focusColor = dark1BorderColor;
+
+		borderBevelShadow = enabled ? tint_color(focusColor, (B_NO_TINT + B_DARKEN_1_TINT) / 2)
+									: focusColor;
+		borderBevelLight = enabled ? tint_color(focusColor, B_LIGHTEN_1_TINT) : focusColor;
+
+		borderBevelLight.red = (borderBevelLight.red + panelBgColor.red) / 2;
+		borderBevelLight.green = (borderBevelLight.green + panelBgColor.green) / 2;
+		borderBevelLight.blue = (borderBevelLight.blue + panelBgColor.blue) / 2;
+
+		dark1BorderColor = tint_color(focusColor, enabled ? B_DARKEN_3_TINT
+														  : B_DARKEN_1_TINT);
+		dark2BorderColor = tint_color(focusColor, enabled ? B_DARKEN_4_TINT
+														  : B_DARKEN_2_TINT);
+	} else {
+		borderBevelShadow = enabled ? tint_color(panelBgColor, (B_NO_TINT + B_DARKEN_1_TINT) / 2)
+									: panelBgColor;
+		borderBevelLight = enabled ? buttonBgColor : panelBgColor;
+	}
+	
+	// fill the button area
+	SetHighColor(buttonBgColor);
+	FillRect(fillArea);
+
+	BeginLineArray(16);
+	// bevel around external border
+	AddLine(BPoint(rect.left, rect.bottom),
+			BPoint(rect.left, rect.top), borderBevelShadow);
+	AddLine(BPoint(rect.left + 1, rect.top),
+			BPoint(rect.right, rect.top), borderBevelShadow);
+
+	AddLine(BPoint(rect.right, rect.top + 1),
+			BPoint(rect.right, rect.bottom), borderBevelLight);
+	AddLine(BPoint(rect.left + 1, rect.bottom),
+			BPoint(rect.right - 1, rect.bottom), borderBevelLight);
+
+	rect.InsetBy(1.0, 1.0);
+
+	// external border
+	AddLine(BPoint(rect.left, rect.bottom),
+			BPoint(rect.left, rect.top), dark1BorderColor);
+	AddLine(BPoint(rect.left + 1, rect.top),
+			BPoint(rect.right, rect.top), dark1BorderColor);
+	AddLine(BPoint(rect.right, rect.top + 1),
+			BPoint(rect.right, rect.bottom), dark2BorderColor);
+	AddLine(BPoint(rect.right - 1, rect.bottom),
+			BPoint(rect.left + 1, rect.bottom), dark2BorderColor);
+
+	rect.InsetBy(1.0, 1.0);
+	
+	// Light
+	AddLine(BPoint(rect.left, rect.top),
+			BPoint(rect.left, rect.bottom), lightColor);
+	AddLine(BPoint(rect.left + 1, rect.top),
+			BPoint(rect.right, rect.top), lightColor);	
+	// Shadow
+	AddLine(BPoint(rect.left + 1, rect.bottom),
+			BPoint(rect.right, rect.bottom), bevelColor1);
+	AddLine(BPoint(rect.right, rect.bottom - 1),
+			BPoint(rect.right, rect.top + 1), bevelColor1);
+	
+	rect.InsetBy(1.0, 1.0);
+	
+	// Light
+	AddLine(BPoint(rect.left, rect.top),
+			BPoint(rect.left, rect.bottom), maxLightColor);
+	AddLine(BPoint(rect.left + 1, rect.top),
+			BPoint(rect.right, rect.top), maxLightColor);	
+	// Shadow
+	AddLine(BPoint(rect.left + 1, rect.bottom),
+			BPoint(rect.right, rect.bottom), bevelColor2);
+	AddLine(BPoint(rect.right, rect.bottom - 1),
+			BPoint(rect.right, rect.top + 1), bevelColor2);
+	
+	rect.InsetBy(1.0,1.0);
+	
+	EndLineArray();	
+
+	// Invert if clicked
+	if (enabled && pushed) {
+		rect.InsetBy(-2.0, -2.0);
+		InvertRect(rect);
+	}
+
+	// Label color
+	if (enabled) {
+		if (pushed) {
+			SetHighColor(maxLightColor);
+			SetLowColor(255 - buttonBgColor.red,
+						255 - buttonBgColor.green,
+						255 - buttonBgColor.blue);
+		} else {
+			SetHighColor(maxShadowColor);	
+			SetLowColor(buttonBgColor);
+		}
+	} else {
+		SetHighColor(tint_color(panelBgColor, B_DISABLED_LABEL_TINT));
+		SetLowColor(buttonBgColor);	
+	}
+
+	// Draw the label
+	DrawString(text.String(), BPoint(x, labelY));
+
+	// Focus line
+	if (enabled && IsFocus() && Window()->IsActive() && !pushed)
+		DrawFocusLine(x, focusLineY, stringWidth, true);
+#endif	
 }
 
 
@@ -241,9 +410,12 @@ void
 BButton::AttachedToWindow()
 {
 	BControl::AttachedToWindow();
+		// low color will now be the parents view color
 
 	if (IsDefault())
 		Window()->SetDefaultButton(this);
+
+	SetViewColor(B_TRANSPARENT_COLOR);
 }
 
 
@@ -483,6 +655,7 @@ BButton::operator=(const BButton &)
 BRect
 BButton::DrawDefault(BRect bounds, bool enabled)
 {
+#if 0
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
 	lighten1 = tint_color(no_tint, B_LIGHTEN_1_TINT),
 	darken1 = tint_color(no_tint, B_DARKEN_1_TINT);
@@ -530,6 +703,22 @@ BButton::DrawDefault(BRect bounds, bool enabled)
 	bounds.InsetBy(inset,inset);
 
 	return bounds;
+#else
+	rgb_color low = LowColor();
+	rgb_color focusColor = tint_color(low, enabled ? (B_DARKEN_1_TINT + B_DARKEN_2_TINT) / 2
+												   : (B_NO_TINT + B_DARKEN_1_TINT) / 2);
+
+	SetHighColor(focusColor);
+
+	StrokeRect(bounds, B_SOLID_LOW);
+	bounds.InsetBy(1.0, 1.0);
+	StrokeRect(bounds);
+	bounds.InsetBy(1.0, 1.0);
+	StrokeRect(bounds);
+	bounds.InsetBy(1.0, 1.0);
+
+	return bounds;
+#endif
 }
 
 
