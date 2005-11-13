@@ -44,6 +44,7 @@ SECTIONS
 	__data_start = .;
 	.data : { *(.data .gnu.linkonce.d.*) }
 
+	. = ALIGN(0x4);
 	__ctor_list = .;
 	.ctors : { *(.ctors) }
 	__ctor_end = .;
