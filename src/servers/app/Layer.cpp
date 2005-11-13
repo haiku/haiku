@@ -1372,7 +1372,7 @@ Layer::GetWantedRegion(BRegion &reg)
 	BRegion screenReg(GetRootLayer()->Bounds());
 	reg.IntersectWith(&screenReg);
 
-
+/*
 	// 3) impose user constrained regions
 	DrawState *stackData = fDrawState;
 	while (stackData) {
@@ -1380,7 +1380,7 @@ Layer::GetWantedRegion(BRegion &reg)
 			reg.IntersectWith(stackData->ClippingRegion());
 		}
 		stackData = stackData->PreviousState();
-	}
+	}*/
 }
 
 void
