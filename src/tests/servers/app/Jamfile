@@ -16,6 +16,12 @@ UseHeaders [ FDirName $(appServerDir) drawing Painter drawing_modes ] ;
 UseHeaders [ FDirName $(appServerDir) drawing Painter font_support ] ;
 UseFreeTypeHeaders ;
 
+# This overrides the definitions in private/servers/app/ServerConfig.h
+local defines = [ FDefines TEST_MODE=1 ] ;
+
+SubDirCcFlags $(defines) ;
+SubDirC++Flags $(defines) ;
+
 SEARCH_SOURCE += $(appServerDir) [ FDirName $(appServerDir) drawing ] ;
 
 SharedLibrary libhwinterface.so :

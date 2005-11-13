@@ -1,0 +1,32 @@
+SubDir HAIKU_TOP src servers app drawing ;
+
+UseLibraryHeaders agg ;
+UsePrivateHeaders app interface shared [ FDirName servers app ] ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter font_support ] ;
+UseFreeTypeHeaders ;
+
+StaticLibrary libasdrawing.a :
+	AccelerantBuffer.cpp
+	AccelerantHWInterface.cpp
+	BitmapBuffer.cpp
+	DrawingEngine.cpp
+	MallocBuffer.cpp
+	UpdateQueue.cpp
+	PatternHandler.cpp
+
+	BitmapHWInterface.cpp
+	BBitmapBuffer.cpp
+	HWInterface.cpp
+
+	# libraries
+	:
+	libtranslation.so libz.so libpng.so libbe.so
+	libpainter.a libagg.a libfreetype.so
+	libtextencoding.so
+;
+
+SubInclude HAIKU_TOP src servers app drawing Painter ;

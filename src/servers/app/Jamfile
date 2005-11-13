@@ -2,102 +2,64 @@ SubDir HAIKU_TOP src servers app ;
 
 AddResources app_server : app_server.rdef ;
 
-UseLibraryHeaders agg png zlib ;
+UseLibraryHeaders png zlib ;
 UsePrivateHeaders app interface shared [ FDirName servers app ] ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter font_support ] ;
 UseFreeTypeHeaders ;
 
-SEARCH_SOURCE += [ FDirName $(SUBDIR) drawing ] ;
 
-# This overrides the definitions in private/servers/app/ServerConfig.h
-local defines = [ FDefines TEST_MODE=0 ] ;
-
-SubDirCcFlags $(defines) ;
-SubDirC++Flags $(defines) ;
-
-
-SharedLibrary libappserver.so :
+Server app_server :
 	Angle.cpp
+	AppServer.cpp
 	BGet++.cpp
 	BitmapManager.cpp
 	ColorSet.cpp
 	CursorData.cpp
+	CursorManager.cpp
 	CursorSet.cpp
+	DebugInfoManager.cpp
+	DecorManager.cpp
+	Decorator.cpp
+	DefaultDecorator.cpp
+	Desktop.cpp
+	DesktopSettings.cpp
 	DrawState.cpp
 	FontFamily.cpp
+	FontManager.cpp
 	HashTable.cpp
+	Layer.cpp
+	MessageLooper.cpp
+	MultiLocker.cpp
+	OffscreenServerWindow.cpp
+	OffscreenWinBorder.cpp
+	PNGDump.cpp
+	PicturePlayer.cpp
+	RAMLinkMsgReader.cpp
 	RGBColor.cpp
+	RootLayer.cpp
+	ScreenManager.cpp
+	ServerApp.cpp
 	ServerBitmap.cpp
 	ServerCursor.cpp
 	ServerFont.cpp
-	FontManager.cpp
+	ServerPicture.cpp
+	ServerScreen.cpp
+	ServerWindow.cpp
+	SubWindowList.cpp
 	SystemPalette.cpp
 	TokenHandler.cpp
 	Utils.cpp
-
-	# drawing
-	PatternHandler.cpp
-
-	# libraries
-	: libroot.so libbe.so libfreetype.so libtextencoding.so
-;
-
-Server app_server :
-	# Misc. Sources
-	Decorator.cpp
-	DebugInfoManager.cpp
-	SubWindowList.cpp
-	PicturePlayer.cpp
-	PNGDump.cpp
-	RAMLinkMsgReader.cpp
-	MessageLooper.cpp
-
-	# Manager Classes
-	CursorManager.cpp
-	DecorManager.cpp
-	ScreenManager.cpp
-
-	AppServer.cpp
-	Desktop.cpp
-	DesktopSettings.cpp
-
-	ServerApp.cpp
-	ServerWindow.cpp
-
-	# DrawingEngine Classes
-	AccelerantBuffer.cpp
-	AccelerantHWInterface.cpp
-	BitmapBuffer.cpp
-	DrawingEngine.cpp
-	MallocBuffer.cpp
-	UpdateQueue.cpp
-
-	BBitmapBuffer.cpp
-	HWInterface.cpp
-	MultiLocker.cpp
-
 	VirtualScreen.cpp
-	BitmapHWInterface.cpp
-	DefaultDecorator.cpp
-	Layer.cpp
-	OffscreenServerWindow.cpp
-	OffscreenWinBorder.cpp
-	RootLayer.cpp
-	ServerPicture.cpp
-	ServerScreen.cpp
 	WinBorder.cpp
 	Workspace.cpp
 	WorkspacesLayer.cpp
 
 	# libraries
 	:
-	libroot.so libtranslation.so libz.so libpng.so libbe.so
-	libappserver.so libpainter.a libagg.a libfreetype.so
+	libtranslation.so libz.so libpng.so libbe.so
+	libasdrawing.a libpainter.a libagg.a libfreetype.so
 	libtextencoding.so
 ;
 
-SubInclude HAIKU_TOP src servers app drawing Painter ;
+SubInclude HAIKU_TOP src servers app drawing ;

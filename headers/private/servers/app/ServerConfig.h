@@ -5,7 +5,7 @@
 // system keyboard shortcuts. Note that it is possible, though senseless, to place it in
 // regular mode and still use a display driver which depends on the R5 app_server
 #ifndef TEST_MODE
-	#define TEST_MODE 1
+	#define TEST_MODE 0
 #endif
 
 // Uncomment this if the DisplayDriver should only rely on drawing functions implemented
