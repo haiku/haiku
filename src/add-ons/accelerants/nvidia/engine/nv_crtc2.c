@@ -18,7 +18,7 @@ status_t nv_crtc2_update_fifo()
 	//fixme: re-enable or remove after general user confirmation of behaviour...
 	if (/*(si->settings.usebios) ||*/ (si->ps.card_type != NV11)) return B_OK;
 
-	/* enable access to primary head */
+	/* enable access to secondary head */
 	set_crtc_owner(1);
 
 	/* set CRTC FIFO low watermark according to memory drain */
