@@ -85,6 +85,7 @@ status_t nv_crtc_stop_tvout(void);
 status_t nv_crtc_start_tvout(void);
 
 /* CRTC2 functions */
+status_t nv_crtc2_update_fifo(void);
 status_t nv_crtc2_validate_timing(
 	uint16 *hd_e,uint16 *hs_s,uint16 *hs_e,uint16 *ht,
 	uint16 *vd_e,uint16 *vs_s,uint16 *vs_e,uint16 *vt);

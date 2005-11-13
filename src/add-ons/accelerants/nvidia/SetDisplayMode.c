@@ -304,6 +304,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 
 	/* update FIFO data fetching according to mode */
 	nv_crtc_update_fifo();
+	if (si->ps.secondary_head) nv_crtc2_update_fifo();
 
 	/* set up acceleration for this mode */
 	/* note:

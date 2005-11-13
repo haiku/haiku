@@ -7,6 +7,82 @@
 
 #include "nv_std.h"
 
+/* doing general fail-safe default setup here */
+//fixme: this is a _very_ basic setup, and it's preliminary...
+status_t nv_crtc2_update_fifo()
+{
+	uint8 bytes_per_pixel = 1;
+	uint32 drain;
+
+	/* we are only using this on >>coldstarted<< cards which really need this */
+	//fixme: re-enable or remove after general user confirmation of behaviour...
+	if (/*(si->settings.usebios) ||*/ (si->ps.card_type != NV11)) return B_OK;
+
+	/* enable access to primary head */
+	set_crtc_owner(1);
+
+	/* set CRTC FIFO low watermark according to memory drain */
+	switch(si->dm.space)
+	{
+	case B_CMAP8:
+		bytes_per_pixel = 1;
+		break;
+	case B_RGB15_LITTLE:
+	case B_RGB16_LITTLE:
+		bytes_per_pixel = 2;
+		break;
+	case B_RGB24_LITTLE:
+		bytes_per_pixel = 3;
+		break;
+	case B_RGB32_LITTLE:
+		bytes_per_pixel = 4;
+		break;
+	}
+	/* fixme:
+	 * - I should probably include the refreshrate as well;
+	 * - and the memory clocking speed, core clocking speed, RAM buswidth.. */
+	drain = si->dm.timing.h_display * si->dm.timing.v_display * bytes_per_pixel;
+
+	/* Doesn't work for other than 32bit space (yet?) */
+	if (si->dm.space != B_RGB32_LITTLE)
+	{
+		/* BIOS defaults */
+		CRTC2W(FIFO, 0x03);
+		CRTC2W(FIFO_LWM, 0x20);
+		LOG(4,("CRTC2: FIFO low-watermark set to $20, burst size 256 (BIOS defaults)\n"));
+		return B_OK;
+	}
+
+	if (drain > (((uint32)1280) * 1024 * 4))
+	{
+		/* set CRTC FIFO burst size for 'smaller' bursts */
+		CRTC2W(FIFO, 0x01);
+		/* Instruct CRTC to fetch new data 'earlier' */
+		CRTC2W(FIFO_LWM, 0x40);
+		LOG(4,("CRTC2: FIFO low-watermark set to $40, burst size 64\n"));
+	}
+	else
+	{
+		if (drain > (((uint32)1024) * 768 * 4))
+		{
+			/* BIOS default */
+			CRTC2W(FIFO, 0x02);
+			/* Instruct CRTC to fetch new data 'earlier' */
+			CRTC2W(FIFO_LWM, 0x40);
+			LOG(4,("CRTC2: FIFO low-watermark set to $40, burst size 128\n"));
+		}
+		else
+		{
+			/* BIOS defaults */
+			CRTC2W(FIFO, 0x03);
+			CRTC2W(FIFO_LWM, 0x20);
+			LOG(4,("CRTC2: FIFO low-watermark set to $20, burst size 256 (BIOS defaults)\n"));
+		}
+	}
+
+	return B_OK;
+}
+
 /* Adjust passed parameters to a valid mode line */
 status_t nv_crtc2_validate_timing(
 	uint16 *hd_e,uint16 *hs_s,uint16 *hs_e,uint16 *ht,

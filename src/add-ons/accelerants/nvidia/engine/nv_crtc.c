@@ -14,8 +14,9 @@ status_t nv_crtc_update_fifo()
 	uint8 bytes_per_pixel = 1;
 	uint32 drain;
 
-	/* we are only using this on coldstarted cards which really need this */
-	if ((si->settings.usebios) || (si->ps.card_type != NV05M64)) return B_OK;
+	/* we are only using this on >>coldstarted<< cards which really need this */
+	//fixme: re-enable or remove after general user confirmation of behaviour...
+	if (/*(si->settings.usebios) ||*/ (si->ps.card_type != NV05M64)) return B_OK;
 
 	/* enable access to primary head */
 	set_crtc_owner(0);
