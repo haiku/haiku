@@ -148,63 +148,6 @@ class BPose {
 };
 
 
-template<class Param1>
-void 
-EachTextWidget(BPose *pose, BPoseView *poseView,
-	void (*func)(BTextWidget *, BPose *, BPoseView *, BColumn *, Param1), Param1 p1)
-{
-	for (int32 index = 0; ;index++) {
-		BColumn *column = poseView->ColumnAt(index);
-		if (!column)
-			break;
-
-		BTextWidget *widget = pose->WidgetFor(column->AttrHash());
-		if (widget)
-			(func)(widget, pose, poseView, column, p1);
-	}
-}
-
-
-template<class Param1, class Param2>
-void 
-EachTextWidget(BPose *pose, BPoseView *poseView,
-	void (*func)(BTextWidget *, BPose *, BPoseView *, BColumn *,
-	Param1, Param2), Param1 p1, Param2 p2)
-{
-	for (int32 index = 0; ;index++) {
-		BColumn *column = poseView->ColumnAt(index);
-		if (!column)
-			break;
-
-		BTextWidget *widget = pose->WidgetFor(column->AttrHash());
-		if (widget)
-			(func)(widget, pose, poseView, column, p1, p2);
-	}
-}
-
-
-template<class Result, class Param1, class Param2>
-Result 
-WhileEachTextWidget(BPose *pose, BPoseView *poseView,
-	Result (*func)(BTextWidget *, BPose *, BPoseView *, BColumn *,
-	Param1, Param2), Param1 p1, Param2 p2)
-{
-	for (int32 index = 0; ;index++) {
-		BColumn *column = poseView->ColumnAt(index);
-		if (!column)
-			break;
-
-		BTextWidget *widget = pose->WidgetFor(column->AttrHash());
-		if (widget) {
-			Result result = (func)(widget, pose, poseView, column, p1, p2);
-			if (result)
-				return result;
-		}
-	}
-	return 0;
-}
-
-
 inline Model *
 BPose::TargetModel() const
 {

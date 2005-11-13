@@ -215,7 +215,7 @@ template<class T>
 void 
 LaunchInNewThread(const char *name, int32 priority, status_t (T::*function)(), T *onThis)
 {
-	Thread::Launch(new SimpleMemberFunctionObjectWorkaround<T>(func, onThis),
+	Thread::Launch(new SimpleMemberFunctionObjectWorkaround<T>(function, onThis),
 		priority, name);
 }
 

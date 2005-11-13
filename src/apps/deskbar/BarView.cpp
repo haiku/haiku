@@ -857,7 +857,8 @@ TBarView::SendDragMessage(const char *signature, entry_ref *ref)
 			//	can toss it after send
 			err = mess.SendMessage(fDragMessage);
 		} else if (ref) {
-			FSLaunchItem(ref, fDragMessage, true, true);
+			FSLaunchItem((const entry_ref*)ref, (const BMessage*)fDragMessage,
+				true, true);
 		} else if (signature && strlen(signature) > 0) {
 			roster.Launch(signature, fDragMessage);
 		}

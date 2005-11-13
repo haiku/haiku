@@ -424,7 +424,7 @@ extern void DeleteSubmenu(BMenuItem *submenuItem);
 extern bool BootedInSafeMode();
 
 // Now is in kits
-#if B_BEOS_VERSION <= B_BEOS_VERSION_MAUI
+#if B_BEOS_VERSION <= B_BEOS_VERSION_MAUI && !defined(__HAIKU__)
 
 // Should be in kits
 bool operator==(const rgb_color &, const rgb_color &);

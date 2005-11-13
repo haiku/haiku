@@ -194,7 +194,7 @@ public:
 	
 			
 	virtual void operator()()
-		{ result = (function)(p1.Pass()); }
+		{ FunctionObjectWithResult<Result>::result = (function)(p1.Pass()); }
 
 private:
 	Result (*function)(Param1);
@@ -258,7 +258,8 @@ public:
 		}
 			
 	virtual void operator()()
-		{ result = (function)(p1.Pass(), p2.Pass(), p3.Pass()); }
+		{ FunctionObjectWithResult<Result>::result
+			= (function)(p1.Pass(), p2.Pass(), p3.Pass()); }
 
 private:
 	Result (*function)(Param1, Param2, Param3);
@@ -305,7 +306,8 @@ public:
 		}
 			
 	virtual void operator()()
-		{ result = (function)(p1.Pass(), p2.Pass(), p3.Pass(), p4.Pass()); }
+		{ FunctionObjectWithResult<Result>::result
+			= (function)(p1.Pass(), p2.Pass(), p3.Pass(), p4.Pass()); }
 
 private:
 	Result (*function)(Param1, Param2, Param3, Param4);
@@ -365,7 +367,7 @@ public:
 		}
 
 	virtual void operator()()
-		{ result = (target->*function)(); }
+		{ FunctionObjectWithResult<R>::result = (target->*function)(); }
 
 
 private:
@@ -428,7 +430,7 @@ public:
 		}
 
 	virtual void operator()()
-		{ result = (target->*function)(p1.Pass()); }
+		{ FunctionObjectWithResult<R>::result = (target->*function)(p1.Pass()); }
 
 protected:
 	R (T::*function)(Param1);
@@ -449,7 +451,8 @@ public:
 		}
 
 	virtual void operator()()
-		{ result = (target->*function)(p1.Pass(), p2.Pass()); }
+		{ FunctionObjectWithResult<R>::result
+			= (target->*function)(p1.Pass(), p2.Pass()); }
 
 protected:
 	R (T::*function)(Param1, Param2);

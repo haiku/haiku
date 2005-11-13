@@ -66,6 +66,7 @@ All rights reserved.
 #include "TimeView.h"
 #include "BarApp.h"
 
+using std::max;
 
 #ifdef DB_ADDONS
 //	Add-on support

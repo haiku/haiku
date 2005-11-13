@@ -1067,7 +1067,7 @@ StringToScalar(const char *text)
 	return val;
 }
 
-#if B_BEOS_VERSION <= B_BEOS_VERSION_MAUI
+#if B_BEOS_VERSION <= B_BEOS_VERSION_MAUI && !defined(__HAIKU__)
 
 bool 
 operator==(const rgb_color &a, const rgb_color &b)

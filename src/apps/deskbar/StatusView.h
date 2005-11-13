@@ -70,6 +70,8 @@ struct DeskbarItemInfo {
 };
 #endif
 
+class TReplicantShelf;
+
 class TReplicantTray : public BView {
 public:
 	TReplicantTray(TBarView *bv, bool vertical);

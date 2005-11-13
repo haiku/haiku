@@ -50,7 +50,7 @@ class TTrackerState : public Settings {
 		~TTrackerState();
 
 	private:
-		friend TrackerSettings;
+		friend class BPrivate::TrackerSettings;
 
 		static void InitIfNeeded();
 		TTrackerState(const TTrackerState&);
