@@ -136,7 +136,7 @@ DrawState::ReadFontFromLink(BPrivate::LinkReceiver& link)
 
 	if (mask & B_FONT_FAMILY_AND_STYLE) {
 		uint32 fontID;
-		link.Read<int32>((int32*)&fontID);
+		link.Read<uint32>(&fontID);
 		fFont.SetFamilyAndStyle(fontID);
 	}
 
