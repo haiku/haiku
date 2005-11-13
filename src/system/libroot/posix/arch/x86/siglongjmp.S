@@ -16,8 +16,8 @@
 FUNCTION(siglongjmp):
 FUNCTION(longjmp):
 FUNCTION(_longjmp):
-	mov		4(%esp,1), %ecx
-	mov		8(%esp,1), %eax
+	mov		4(%esp), %ecx
+	mov		8(%esp), %eax
 
 	// restore registers
 	mov		JMP_REGS_EBX(%ecx), %ebx

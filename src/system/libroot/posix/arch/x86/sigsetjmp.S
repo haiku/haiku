@@ -1,7 +1,7 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "setjmp_internal.h"
@@ -30,7 +30,8 @@ FUNCTION(sigsetjmp):
 	// save stack and return address (because that's where we intend to jump to)
 	lea		4(%esp,1), %ecx
 	mov		%ecx, JMP_REGS_ESP(%eax)
-	mov		0(%esp,1), %ecx
+	mov		0(%esp), %ecx
 	mov		%ecx, JMP_REGS_PC(%eax)
 
 	jmp		__setjmp_save_sigs
+

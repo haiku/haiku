@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src system libroot posix arch x86 ;
 
 KernelMergeObject posix_arch_$(TARGET_ARCH).o :
-	setjmp.c
+	setjmp.S
 	setjmp_save_sigs.c
 	sigsetjmp.S
 	siglongjmp.S
