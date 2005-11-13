@@ -39,11 +39,6 @@
 #include "Painter.h"
 
 
-// TODO: I have no idea why this is, but the libbe_test target needs this
-#ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
-extern "C" float roundf(float x);
-#endif
-
 #if ALIASED_DRAWING
 // in this case, we _cannot_ use the outline rasterizer.
 # define USE_OUTLINE_RASTERIZER 0

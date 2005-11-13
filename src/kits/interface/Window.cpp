@@ -42,10 +42,6 @@
 #include <stdio.h>
 #include <math.h>
 
-// TODO: I have no idea why this is, but the libbe_test target needs this
-#ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
-extern "C" float roundf(float x);
-#endif
 
 //#define DEBUG_WIN
 #ifdef DEBUG_WIN

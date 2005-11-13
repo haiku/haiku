@@ -49,22 +49,14 @@
 #include <math.h>
 #include <stdio.h>
 
-// TODO: I have no idea why this is, but the libbe_test target needs this
-#ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
-extern "C" float roundf(float x);
-#endif
 
 //#define DEBUG_BVIEW
 #ifdef DEBUG_BVIEW
 #	include <stdio.h>
 #	define STRACE(x) printf x
-#else
-#	define STRACE(x) ;
-#endif
-
-#ifdef DEBUG_BVIEW
 #	define BVTRACE PrintToStream()
 #else
+#	define STRACE(x) ;
 #	define BVTRACE ;
 #endif
 

@@ -36,6 +36,8 @@ extern size_t   strlcpy(char *dest, const char *source, size_t length);
 
 extern char		*strcasestr(const char *string, const char *searchString);
 
+extern float	roundf(float value);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif
