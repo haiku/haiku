@@ -399,7 +399,7 @@ normalize_dir_path(const char *path, string &normalizedPath)
 {
 	// stat() the dir
 	struct stat st;
-	if (lstat(path, &st) < 0)
+	if (stat(path, &st) < 0)
 		return errno;
 		
 	return normalize_dir_path(path, NodeRef(st), normalizedPath);
@@ -617,11 +617,15 @@ open_dir(const char *path)
 
 	// stat the entry
 	struct stat st;
-	if (lstat(path, &st) < 0)
+	if (stat(path, &st) < 0) {
+		closedir(dir);
 		return errno;
+	}
 
-	if (!S_ISDIR(st.st_mode))
+	if (!S_ISDIR(st.st_mode)) {
+		closedir(dir);
 		return B_NOT_A_DIRECTORY;
+	}
 
 	// cache dir path
 	NodeRef ref(st);
@@ -670,7 +674,7 @@ _kern_open_parent_dir(int fd, char *name, size_t nameLength)
 
 	// stat the entry
 	struct stat st;
-	if (lstat(realPath.c_str(), &st) < 0)
+	if (stat(realPath.c_str(), &st) < 0)
 		return errno;
 
 	if (!S_ISDIR(st.st_mode))
