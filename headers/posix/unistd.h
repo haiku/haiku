@@ -129,7 +129,7 @@ extern int		tcsetpgrp(int fd, pid_t pgrpid);
 extern void		*sbrk(long incr);
 
 extern unsigned	int	alarm(unsigned int seconds);
-extern useconds_t	ualarm(unsigned int microSeconds, unsigned int interval);
+extern useconds_t	ualarm(useconds_t microSeconds, useconds_t interval);
 extern unsigned int	sleep(unsigned int seconds);
 extern int			usleep(unsigned int microSeconds);
 extern clock_t		clock(void);
