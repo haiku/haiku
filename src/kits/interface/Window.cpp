@@ -48,6 +48,16 @@
 #endif
 
 
+// TODO: move to some place public (used in View.cpp as well)
+static inline float
+roundf(float v)
+{
+	if (v >= 0.0)
+		return floorf(v + 0.5);
+	else
+		return ceilf(v - 0.5);
+}
+
 class BWindow::Shortcut {
 	public:
 		Shortcut(uint32 key, uint32 modifiers, BMenuItem* item);
@@ -1839,6 +1849,9 @@ BWindow::MoveTo(BPoint point)
 {
 	Lock();
 
+	point.x = roundf(point.x);
+	point.y = roundf(point.y);
+
 	if (fFrame.left != point.x || fFrame.top != point.y) {
 		float xOffset = point.x - fFrame.left;
 		float yOffset = point.y - fFrame.top;
@@ -1861,6 +1874,10 @@ void
 BWindow::ResizeBy(float dx, float dy)
 {
 	Lock();
+
+	dx = roundf(dx);
+	dy = roundf(dy);
+
 	// stay in minimum & maximum frame limits
 	if (fFrame.Width() + dx < fMinWidth)
 		dx = fMinWidth - fFrame.Width();
@@ -2004,7 +2021,6 @@ BWindow::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 
 //	#pragma mark - Private Methods
 
-
 void 
 BWindow::_InitData(BRect frame, const char* title, window_look look,
 	window_feel feel, uint32 flags,	uint32 workspace, int32 bitmapToken)
@@ -2015,6 +2031,11 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 		debugger("You need a valid BApplication object before interacting with the app_server");
 		return;
 	}
+
+	frame.left = roundf(frame.left);
+	frame.top = roundf(frame.top);
+	frame.right = roundf(frame.right);
+	frame.bottom = roundf(frame.bottom);
 
 	fFrame = frame;
 
