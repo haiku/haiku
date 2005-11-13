@@ -1,6 +1,7 @@
-/* 
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _MATH_H_
 #define _MATH_H_
 
@@ -75,6 +76,42 @@ extern int signgam;
 extern "C" {
 #endif
 
+/* float math functions */
+extern float	acosf(float x);
+extern float	acoshf(float x);
+extern float	asinf(float x);
+extern float	asinhf(float x);
+extern float	atan2f(float y, float x);
+extern float	atanf(float x);
+extern float	atanhf(float x);
+extern float	cbrtf(float x);
+extern float	ceilf(float x);
+extern float	cosf(float x);
+extern float	coshf(float x);
+extern float	expf(float x);
+extern float	expm1f(float x);
+extern float	fabsf(float x);
+extern float	floorf(float x);
+extern float	fmodf(float x, float y);
+extern float	frexpf(float x, int *_exponent);
+extern float	gammaf(float x);
+extern float	hypotf(float x, float y);
+extern float	ldexpf(float x, int exponent);
+extern float	lgammaf(float x);
+extern float	log10f(float x);
+extern float	log1pf(float x);
+extern float	logbf(float x);
+extern float	logf(float x);
+extern float	modff(float x, float *y);
+extern float	powf(float x, float y);
+extern float	roundf(float x);
+extern float	sinf(float x);
+extern float	sinhf(float x);
+extern float	sqrtf(float x);
+extern float	tanf(float x);
+extern float	tanhf(float x);
+
+/* double math functions */
 extern double	acos(double x);
 extern double	asin(double x);
 extern double	atan(double x);
@@ -87,16 +124,23 @@ extern double	fabs(double x);
 extern double	floor(double x);
 extern double	fmod(double x, double y);
 extern double	frexp(double x, int *_exponent);
+extern double	gamma(double x);
 extern double	ldexp(double x, int exponent);
 extern double	log(double x);
 extern double	log10(double x);
 extern double	modf(double x, double *y);
 extern double	pow(double x, double y);
+extern double	round(double x);
 extern double	sin(double x);
 extern double	sinh(double x);
 extern double	sqrt(double x);
 extern double	tan(double x);
 extern double	tanh(double x);
+
+/* long double math functions */
+extern long double	roundl(long double x);
+// TODO: add and fix those!
+extern /*long*/ double	lgamma(/*long*/ double x);
 
 /* some BSD non-ANSI or POSIX math functions */
 extern double	acosh(double x);
@@ -106,14 +150,12 @@ extern double	cbrt(double x);
 extern double	erf(double x);
 extern double	erfc(double x);
 extern double	expm1(double x);
-extern double	gamma(double x);
 extern double	gamma_r(double x, int *y);
 extern double	hypot(double x, double y);
 extern int		ilogb(double x);
 extern double	j0(double x);
 extern double	j1(double x);
 extern double	jn(int x, double y);
-extern double	lgamma(double x);
 extern double	lgamma_r(double x, int *y);
 extern double	log1p(double x);
 extern double	logb(double x);
@@ -126,43 +168,6 @@ extern double	y1(double x);
 extern double	yn(int x, double y);
 
 /* other stuff as defined in BeOS */
-extern double	significand(double x);
-extern double	copysign(double x, double y);
-extern double	scalbn(double x, int y);
-extern double	drem(double x, double y);
-extern int		isnan(double x);
-extern int		isfinite(double x);
-extern int		finite(double x);
-extern float	modff(float x, float *y);
-extern float	acosf(float x);
-extern float	asinf(float x);
-extern float	atanf(float x);
-extern float	atan2f(float y, float x);
-extern float	cosf(float x);
-extern float	sinf(float x);
-extern float	tanf(float x);
-extern float	coshf(float x);
-extern float	sinhf(float x);
-extern float	tanhf(float x);
-extern float	acoshf(float x);
-extern float	asinhf(float x);
-extern float	atanhf(float x);
-extern float	expf(float x);
-extern float	frexpf(float x, int *_exponent);
-extern float	ldexpf(float x, int exponent);
-extern float	logf(float x);
-extern float	log10f(float x);
-extern float	expm1f(float x);
-extern float	log1pf(float x);
-extern float	logbf(float x);
-extern float	powf(float x, float y);
-extern float	sqrtf(float x);
-extern float	hypotf(float x, float y);
-extern float	cbrtf(float x);
-extern float	ceilf(float x);
-extern float	fabsf(float x);
-extern float	floorf(float x);
-extern float	fmodf(float x, float y);
 extern int		isinff(float value);
 extern int		finitef(float value);
 extern float	infnanf(int error);
@@ -170,6 +175,13 @@ extern float	dremf(float x, float y);
 extern float	significandf(float x);
 extern float	copysignf(float x, float y);
 extern int		isnanf(float value);
+extern double	significand(double x);
+extern double	copysign(double x, double y);
+extern double	scalbn(double x, int y);
+extern double	drem(double x, double y);
+extern int		isnan(double x);
+extern int		isfinite(double x);
+extern int		finite(double x);
 extern float	j0f(float x);
 extern float	j1f(float x);
 extern float	jnf(int x, float y);
@@ -178,8 +190,6 @@ extern float	y1f(float x);
 extern float	ynf(int x, float y);
 extern float	erff(float x);
 extern float	erfcf(float x);
-extern float	gammaf(float x);
-extern float	lgammaf(float x);
 extern float	gammaf_r(float x, int *y);
 extern float	lgammaf_r(float x, int *y);
 extern float	rintf(float x);

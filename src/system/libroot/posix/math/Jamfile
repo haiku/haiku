@@ -34,6 +34,7 @@ KernelMergeObject posix_math.o :
 	log__L.c
 	math_globals.c
 	pow.c
+	round.c
 	sincos.c
 	sinh.c
 	tan.c 
