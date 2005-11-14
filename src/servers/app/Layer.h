@@ -203,7 +203,7 @@ class Layer {
 	inline	const BRegion&		FullVisible() const { return fFullVisible2; }
 	inline	const BRegion&		DrawingRegion() const { return fDrawingRegion; }
 
-	virtual	void				GetWantedRegion(BRegion& reg);
+	virtual	void				GetOnScreenRegion(BRegion& region);
 
 			void				MarkForRebuild(const BRegion &dirty);
 			void				TriggerRebuild();

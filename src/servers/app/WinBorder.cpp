@@ -798,20 +798,19 @@ WinBorder::_ReserveRegions(BRegion &reg)
 
 
 void
-WinBorder::GetWantedRegion(BRegion &reg)
+WinBorder::GetOnScreenRegion(BRegion& region)
 {
 	if (fRebuildDecRegion)
 		set_decorator_region(Bounds());
 
-	BRect screenFrame(Bounds());
-	ConvertToScreen(&screenFrame);
-	reg.Set(screenFrame);
+	BRect frame(Bounds());
+	ConvertToScreen(&frame);
+	region.Set(frame);
 
-	reg.Include(&fDecRegion);
+	region.Include(&fDecRegion);
 
-	BRegion screenReg(GetRootLayer()->Bounds());
-
-	reg.IntersectWith(&screenReg);
+	BRegion screenRegion(GetRootLayer()->Bounds());
+	region.IntersectWith(&screenRegion);
 }
 
 

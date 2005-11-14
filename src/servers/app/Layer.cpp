@@ -482,7 +482,7 @@ Layer::Show(bool invalidate)
 	if (invalidate) {
 		// compute the region this layer wants for itself
 		BRegion	invalid;
-		GetWantedRegion(invalid);
+		GetOnScreenRegion(invalid);
 		if (invalid.CountRects() > 0) {
 			fParent->MarkForRebuild(invalid);
 			GetRootLayer()->MarkForRedraw(invalid);
@@ -598,7 +598,7 @@ Layer::MoveBy(float x, float y)
 
 		// we'll invalidate the old position and the new, maxmial one.
 		BRegion invalid;
-		GetWantedRegion(invalid);
+		GetOnScreenRegion(invalid);
 		invalid.Include(&fFullVisible2);
 
 		fParent->MarkForRebuild(invalid);
@@ -673,7 +673,7 @@ Layer::ResizeBy(float x, float y)
 
 		// we'll invalidate the old area and the new, maxmial one.
 		BRegion invalid;
-		GetWantedRegion(invalid);
+		GetOnScreenRegion(invalid);
 		invalid.Include(&fFullVisible2);
 
 		fParent->MarkForRebuild(invalid);
@@ -1173,6 +1173,7 @@ Layer::do_Hide()
 	}
 }
 
+
 void
 Layer::do_Show()
 {
@@ -1181,7 +1182,7 @@ Layer::do_Show()
 	if (fParent && !fParent->IsHidden() && GetRootLayer()) {
 		BRegion invalid;
 
-		GetWantedRegion(invalid);
+		GetOnScreenRegion(invalid);
 
 		if (invalid.CountRects() > 0) {
 			fParent->MarkForRebuild(invalid);
@@ -1193,11 +1194,12 @@ Layer::do_Show()
 	}
 }
 
-inline void
+
+void
 Layer::_ResizeLayerFrameBy(float x, float y)
 {
-	uint16		rm = fResizeMode & 0x0000FFFF;
-	BRect		newFrame = fFrame;
+	uint16 rm = fResizeMode & 0x0000FFFF;
+	BRect newFrame = fFrame;
 
 	if ((rm & 0x0F00U) == _VIEW_LEFT_ << 8)
 		newFrame.left += 0.0f;
@@ -1254,12 +1256,12 @@ Layer::_ResizeLayerFrameBy(float x, float y)
 // TODO: the above code is CORRECT!!!
 // It's commented because BView::FrameResized()/Moved() be called twice a given view. FIX THIS!
 	if (newFrame != fFrame) {
-		float		dx, dy;
+		float dx, dy;
 
-		dx	= newFrame.Width() - fFrame.Width();
-		dy	= newFrame.Height() - fFrame.Height();
+		dx = newFrame.Width() - fFrame.Width();
+		dy = newFrame.Height() - fFrame.Height();
 
-		fFrame	= newFrame;
+		fFrame = newFrame;
 
 		if (dx != 0.0f || dy != 0.0f) {
 			// call hook function
@@ -1272,7 +1274,8 @@ Layer::_ResizeLayerFrameBy(float x, float y)
 	}
 }
 
-inline void
+
+void
 Layer::_RezizeLayerRedrawMore(BRegion &reg, float dx, float dy)
 {
 	if (dx == 0 && dy == 0)
@@ -1311,19 +1314,17 @@ Layer::_RezizeLayerRedrawMore(BRegion &reg, float dx, float dy)
 
 			// above, OR this:
 			// reg.Include(&child->fFullVisible2);
-		}
-		else
-		if (((rm & 0x0F0F) == (uint16)B_FOLLOW_RIGHT && dx != 0) ||
-			((rm & 0x0F0F) == (uint16)B_FOLLOW_H_CENTER && dx != 0) ||
-			((rm & 0xF0F0) == (uint16)B_FOLLOW_BOTTOM && dy != 0)||
-			((rm & 0xF0F0) == (uint16)B_FOLLOW_V_CENTER && dy != 0))
-		{
+		} else if (((rm & 0x0F0F) == (uint16)B_FOLLOW_RIGHT && dx != 0)
+			|| ((rm & 0x0F0F) == (uint16)B_FOLLOW_H_CENTER && dx != 0)
+			|| ((rm & 0xF0F0) == (uint16)B_FOLLOW_BOTTOM && dy != 0)
+			|| ((rm & 0xF0F0) == (uint16)B_FOLLOW_V_CENTER && dy != 0)) {
 			reg.Include(&child->fFullVisible2);
 		}
 	}
 }
 
-inline void
+
+void
 Layer::_ResizeLayerFullUpdateOnResize(BRegion &reg, float dx, float dy)
 {
 	if (dx == 0 && dy == 0)
@@ -1343,17 +1344,21 @@ Layer::_ResizeLayerFullUpdateOnResize(BRegion &reg, float dx, float dy)
 	}
 }
 
+
+/*!
+	\brief Returns the region of the layer that is within the screen region
+*/
 void
-Layer::GetWantedRegion(BRegion &reg)
+Layer::GetOnScreenRegion(BRegion &region)
 {
 	// 1) set to frame in screen coords
-	BRect screenFrame(Bounds());
-	ConvertToScreen(&screenFrame);
-	reg.Set(screenFrame);
+	BRect frame(Bounds());
+	ConvertToScreen(&frame);
+	region.Set(frame);
 
 	// 2) intersect with screen region
-	BRegion screenReg(GetRootLayer()->Bounds());
-	reg.IntersectWith(&screenReg);
+	BRegion screenRegion(GetRootLayer()->Bounds());
+	region.IntersectWith(&screenRegion);
 
 /*
 	// 3) impose user constrained regions
@@ -1366,10 +1371,10 @@ Layer::GetWantedRegion(BRegion &reg)
 	}*/
 }
 
+
 void
-Layer::_RebuildVisibleRegions(	const BRegion &invalid,
-								const BRegion &parentLocalVisible,
-								const Layer *startFrom)
+Layer::_RebuildVisibleRegions(const BRegion &invalid,
+	const BRegion &parentLocalVisible, const Layer *startFrom)
 {
 /*
 	// no point in continuing if this layer is hidden.
@@ -1385,7 +1390,7 @@ Layer::_RebuildVisibleRegions(	const BRegion &invalid,
 
 	// intersect maximum wanted region with the invalid region
 	BRegion common;
-	GetWantedRegion(common);
+	GetOnScreenRegion(common);
 	common.IntersectWith(&invalid);
 
 	// if the resulted region is not valid, this layer is not in the catchment area
@@ -1437,7 +1442,7 @@ Layer::_RebuildVisibleRegions(	const BRegion &invalid,
 		return;
 
 	BRegion common;
-	GetWantedRegion(common);
+	GetOnScreenRegion(common);
 
 	// see how much you can take
 	common.IntersectWith(&parentLocalVisible);

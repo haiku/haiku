@@ -625,7 +625,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			if (myRootLayer && !newLayer->IsHidden() && parent) {
 				BRegion invalidRegion;
-				newLayer->GetWantedRegion(invalidRegion);
+				newLayer->GetOnScreenRegion(invalidRegion);
 				parent->MarkForRebuild(invalidRegion);
 				parent->TriggerRebuild();
 				if (newLayer->VisibleRegion().Frame().IsValid()) {
@@ -1058,7 +1058,7 @@ if (myRootLayer)
 
 			if (myRootLayer && !(fCurrentLayer->IsHidden()) && !fWinBorder->InUpdate()) {
 				BRegion invalidRegion;
-				fCurrentLayer->GetWantedRegion(invalidRegion);
+				fCurrentLayer->GetOnScreenRegion(invalidRegion);
 
 				// TODO: this is broken! a smaller area may be invalidated!
 

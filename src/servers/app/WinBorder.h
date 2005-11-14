@@ -57,7 +57,7 @@ class WinBorder : public Layer {
 	virtual	bool				IsOffscreenWindow() const
 									{ return false; }
 
-	virtual	void				GetWantedRegion(BRegion &reg);
+	virtual	void				GetOnScreenRegion(BRegion& region);
 
 			void				UpdateStart();
 			void				UpdateEnd();

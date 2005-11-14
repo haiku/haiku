@@ -872,7 +872,7 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 				BRegion invalid;
 
 				// invalidate the maximum area which this layer/window can occupy.
-				layer->GetWantedRegion(invalid);
+				layer->GetOnScreenRegion(invalid);
 
 				MarkForRebuild(invalid);
 				MarkForRedraw(invalid);
@@ -893,7 +893,7 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 				BRegion invalid;
 
 				// start by invalidating the maximum area which this layer/window can occupy.
-				layer->GetWantedRegion(invalid);
+				layer->GetOnScreenRegion(invalid);
 
 				// no reason to invalidate what's currently visible.
 				invalid.Exclude(&layer->FullVisible());
@@ -1398,7 +1398,7 @@ RootLayer::ClearNotifyLayer()
 	}
 }
 
-// LayerRemoved
+
 void
 RootLayer::LayerRemoved(Layer* layer)
 {
