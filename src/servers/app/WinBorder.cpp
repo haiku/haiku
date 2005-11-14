@@ -26,7 +26,6 @@
 #include "RootLayer.h"
 #include "ServerApp.h"
 #include "ServerWindow.h"
-#include "TokenHandler.h"
 #include "WinBorder.h"
 #include "Workspace.h"
 

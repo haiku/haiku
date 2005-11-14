@@ -49,7 +49,6 @@ SharedLibrary libhwinterfaceimpl.so :
 SharedLibrary libhaikuappserver.so :
 	Angle.cpp
 	BGet++.cpp
-	BitmapManager.cpp
 	ColorSet.cpp
 	CursorData.cpp
 	CursorSet.cpp
@@ -57,14 +56,12 @@ SharedLibrary libhaikuappserver.so :
 	DrawState.cpp
 	FontFamily.cpp
 	HashTable.cpp
-	IPoint.cpp
 	RGBColor.cpp
 	ServerBitmap.cpp
 	ServerCursor.cpp
 	ServerFont.cpp
 	FontManager.cpp
 	SystemPalette.cpp
-	TokenHandler.cpp
 	Utils.cpp
 
 	# drawing
@@ -82,12 +79,12 @@ Server haiku_app_server :
 	Decorator.cpp
 	DebugInfoManager.cpp
 	SubWindowList.cpp
-	#PicturePlayer.cpp
 	PNGDump.cpp
 	RAMLinkMsgReader.cpp
 	MessageLooper.cpp
 
 	# Manager Classes
+	BitmapManager.cpp
 	CursorManager.cpp
 	DecorManager.cpp
 	ScreenManager.cpp

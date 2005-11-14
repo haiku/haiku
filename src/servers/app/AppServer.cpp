@@ -8,19 +8,8 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-#include <unistd.h>
 
-#include <Accelerant.h>
-#include <AppDefs.h>
-#include <Directory.h>
-#include <Entry.h>
-#include <File.h>
-#include <Message.h>
-#include <Path.h>
-#include <PortLink.h>
-#include <StopWatch.h>
-#include <RosterPrivate.h>
-#include <Autolock.h>
+#include "AppServer.h"
 
 #include "BitmapManager.h"
 #include "ColorSet.h"
@@ -30,10 +19,9 @@
 #include "Desktop.h"
 #include "FontManager.h"
 #include "HWInterface.h"
-#include "RegistrarDefs.h"
-#include "RGBColor.h"
 #include "Layer.h"
-#include "WinBorder.h"
+#include "RGBColor.h"
+#include "RegistrarDefs.h"
 #include "RootLayer.h"
 #include "ScreenManager.h"
 #include "ServerApp.h"
@@ -43,8 +31,21 @@
 #include "ServerWindow.h"
 #include "SystemPalette.h"
 #include "Utils.h"
+#include "WinBorder.h"
 
-#include "AppServer.h"
+#include <Accelerant.h>
+#include <AppDefs.h>
+#include <Autolock.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <File.h>
+#include <Message.h>
+#include <Path.h>
+#include <PortLink.h>
+#include <RosterPrivate.h>
+#include <StopWatch.h>
+
+#include <unistd.h>
 
 //#define DEBUG_KEYHANDLING
 //#define DEBUG_SERVER
@@ -67,9 +68,11 @@
 // Globals
 port_id gAppServerPort;
 static AppServer *sAppServer;
+BTokenSpace gTokenSpace;
 
 //! System-wide GUI color object
 ColorSet gGUIColorSet;
+
 
 /*!
 	\brief Constructor

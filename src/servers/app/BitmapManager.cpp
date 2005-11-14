@@ -8,6 +8,10 @@
 
 /**	Handler for allocating and freeing area memory for BBitmaps 
  *	on the server side. Utilizes the BGET pool allocator.
+ *
+ *	Whenever a ServerBitmap associated with a client-side BBitmap needs to be 
+ *	created or destroyed, the BitmapManager needs to handle it. It takes care of 
+ *	all memory management related to them.
  */
 
 
@@ -17,10 +21,12 @@
 
 #include <Autolock.h>
 
-#include "ServerBitmap.h"
 #include "BitmapManager.h"
+#include "ServerBitmap.h"
+#include "ServerTokenSpace.h"
 
 using std::nothrow;
+
 
 //! The bitmap allocator for the server. Memory is allocated/freed by the AppServer class
 BitmapManager *gBitmapManager = NULL;
@@ -28,16 +34,17 @@ BitmapManager *gBitmapManager = NULL;
 //! Number of bytes to allocate to each area used for bitmap storage
 #define BITMAP_AREA_SIZE	B_PAGE_SIZE * 2
 
+
 //! Sets up stuff to be ready to allocate space for bitmaps
 BitmapManager::BitmapManager()
 	:
 	fBitmapList(1024),
 	fBuffer(NULL),
-	fTokenizer(),
 	fLock("BitmapManager Lock"),
 	fMemPool("bitmap pool", BITMAP_AREA_SIZE)
 {
 }
+
 
 //! Deallocates everything associated with the manager
 BitmapManager::~BitmapManager()
@@ -50,6 +57,7 @@ BitmapManager::~BitmapManager()
 		}
 	}
 }
+
 
 /*!
 	\brief Allocates a new ServerBitmap.
@@ -80,7 +88,7 @@ BitmapManager::CreateBitmap(BRect bounds, color_space space, int32 flags,
 	if (buffer && fBitmapList.AddItem(bitmap)) {
 		bitmap->fArea = area_for(buffer);
 		bitmap->fBuffer = buffer;
-		bitmap->fToken = fTokenizer.GetToken();
+		bitmap->fToken = gTokenSpace.NewToken(kBitmapToken, bitmap);
 		bitmap->fInitialized = true;
 
 		// calculate area offset
@@ -96,6 +104,7 @@ BitmapManager::CreateBitmap(BRect bounds, color_space space, int32 flags,
 
 	return bitmap;
 }
+
 
 /*!
 	\brief Deletes a ServerBitmap.

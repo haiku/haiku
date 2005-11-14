@@ -50,7 +50,6 @@
 #include "ServerBitmap.h"
 #include "ServerPicture.h"
 #include "ServerProtocol.h"
-#include "TokenHandler.h"
 #include "Utils.h"
 #include "WinBorder.h"
 #include "Workspace.h"

@@ -4,9 +4,9 @@
  *
  * Author: DarkWyrm <bpmagic@columbus.rr.com>
  */
+#ifndef	APP_SERVER_H
+#define	APP_SERVER_H
 
-#ifndef	_HAIKU_APP_SERVER_H_
-#define	_HAIKU_APP_SERVER_H_
 
 #include <OS.h>
 #include <Locker.h>
@@ -15,6 +15,7 @@
 #include <Window.h>
 #include <String.h>
 #include <ObjectList.h>
+#include <TokenSpace.h>
 
 #include "ServerConfig.h"
 #include "MessageLooper.h"
@@ -24,18 +25,12 @@ class BitmapManager;
 class ColorSet;
 class Desktop;
 
+using BPrivate::BTokenSpace;
+
 namespace BPrivate {
 	class PortLink;
 };
 
-/*!
-	\class AppServer AppServer.h
-	\brief main manager object for the app_server
-	
-	File for the main app_server thread. This particular thread monitors for
-	application start and quit messages. It also starts the housekeeping threads
-	and initializes most of the server's globals.
-*/
 
 class AppServer : public MessageLooper  {
 	public:
@@ -77,4 +72,4 @@ extern BitmapManager *gBitmapManager;
 extern ColorSet gGUIColorSet;
 extern port_id gAppServerPort;
 
-#endif	/* _HAIKU_APP_SERVER_H_ */
+#endif	/* APP_SERVER_H */

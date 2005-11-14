@@ -48,7 +48,6 @@ Server app_server :
 	ServerWindow.cpp
 	SubWindowList.cpp
 	SystemPalette.cpp
-	TokenHandler.cpp
 	Utils.cpp
 	VirtualScreen.cpp
 	WinBorder.cpp

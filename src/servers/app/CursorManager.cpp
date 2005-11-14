@@ -1,46 +1,32 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		CursorManager.cpp
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Handles the system's cursor infrastructure
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ */
+
+/**	Handles the system's cursor infrastructure */
+
+
 #include <Directory.h>
 #include <String.h>
+
 #include "CursorData.h"
 #include "CursorManager.h"
+#include "HaikuSystemCursor.h"
 #include "ServerCursor.h"
 #include "ServerConfig.h"
-#include "HaikuSystemCursor.h"
+#include "ServerTokenSpace.h"
+
 
 //! Initializes the CursorManager
 CursorManager::CursorManager()
  :	BLocker("CursorManager")
 {
-	// Error code for AddCursor
-	fTokenizer.ExcludeValue(B_ERROR);
-
 	// Set system cursors to "unassigned"
 	// ToDo: decide about default cursor
+
 #if 1
 	fDefaultCursor = new ServerCursor(kHaikuCursorBits, kHaikuCursorWidth,
 		kHaikuCursorHeight, kHaikuCursorFormat);
@@ -100,7 +86,7 @@ CursorManager::~CursorManager()
 	\return The token assigned to the cursor or B_ERROR if sc is NULL
 */
 int32
-CursorManager::AddCursor(ServerCursor *cursor)
+CursorManager::AddCursor(ServerCursor* cursor)
 {
 	if (!cursor)
 		return B_ERROR;
@@ -108,7 +94,7 @@ CursorManager::AddCursor(ServerCursor *cursor)
 	Lock();
 
 	fCursorList.AddItem(cursor);
-	int32 token = fTokenizer.GetToken();
+	int32 token = fTokenSpace.NewToken(B_SERVER_TOKEN, cursor);
 	cursor->fToken = token;
 
 	Unlock();
@@ -347,77 +333,50 @@ CursorManager::ChangeCursor(cursor_which which, int32 token)
 	// Do the assignment
 	switch (which) {
 		case B_CURSOR_DEFAULT:
-		{
-			if (fDefaultCursor)
-				delete fDefaultCursor;
-
+			delete fDefaultCursor;
 			fDefaultCursor = cursor;
 			break;
-		}
-		case B_CURSOR_TEXT:
-		{
-			if(fTextCursor)
-				delete fTextCursor;
 
+		case B_CURSOR_TEXT:
+			delete fTextCursor;
 			fTextCursor = cursor;
 			break;
-		}
-		case B_CURSOR_MOVE:
-		{
-			if(fMoveCursor)
-				delete fMoveCursor;
 
+		case B_CURSOR_MOVE:
+			delete fMoveCursor;
 			fMoveCursor = cursor;
 			break;
-		}
-		case B_CURSOR_DRAG:
-		{
-			if(fDragCursor)
-				delete fDragCursor;
 
+		case B_CURSOR_DRAG:
+			delete fDragCursor;
 			fDragCursor = cursor;
 			break;
-		}
-		case B_CURSOR_RESIZE:
-		{
-			if(fResizeCursor)
-				delete fResizeCursor;
 
+		case B_CURSOR_RESIZE:
+			delete fResizeCursor;
 			fResizeCursor = cursor;
 			break;
-		}
-		case B_CURSOR_RESIZE_NWSE:
-		{
-			if(fNWSECursor)
-				delete fNWSECursor;
 
+		case B_CURSOR_RESIZE_NWSE:
+			delete fNWSECursor;
 			fNWSECursor = cursor;
 			break;
-		}
-		case B_CURSOR_RESIZE_NESW:
-		{
-			if(fNESWCursor)
-				delete fNESWCursor;
 
+		case B_CURSOR_RESIZE_NESW:
+			delete fNESWCursor;
 			fNESWCursor = cursor;
 			break;
-		}
-		case B_CURSOR_RESIZE_NS:
-		{
-			if(fNSCursor)
-				delete fNSCursor;
 
+		case B_CURSOR_RESIZE_NS:
+			delete fNSCursor;
 			fNSCursor = cursor;
 			break;
-		}
-		case B_CURSOR_RESIZE_EW:
-		{
-			if(fEWCursor)
-				delete fEWCursor;
 
+		case B_CURSOR_RESIZE_EW:
+			delete fEWCursor;
 			fEWCursor = cursor;
 			break;
-		}
+
 		default:
 			Unlock();
 			return;
@@ -439,11 +398,9 @@ CursorManager::ChangeCursor(cursor_which which, int32 token)
 ServerCursor *
 CursorManager::FindCursor(int32 token)
 {
-	for (int32 i = 0; i < fCursorList.CountItems(); i++) {
-		ServerCursor *cursor = (ServerCursor *)fCursorList.ItemAt(i);
-		if (cursor && cursor->fToken == token)
-			return cursor;
-	}
+	ServerCursor* cursor;
+	if (gTokenSpace.GetToken(token, kCursorToken, (void**)&cursor) == B_OK)
+		return cursor;
 
 	return NULL;
 }

@@ -1,38 +1,24 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		CursorManager.h
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Handles the system's cursor infrastructure
-//  
-//------------------------------------------------------------------------------
-#ifndef CURSORMANAGER_H_
-#define CURSORMANAGER_H_
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ */
+#ifndef CURSOR_MANAGER_H
+#define CURSOR_MANAGER_H
+
 
 #include <List.h>
 #include <Locker.h>
-#include "CursorSet.h"
-#include "TokenHandler.h"
 
+#include <TokenSpace.h>
+
+#include "CursorSet.h"
+
+using BPrivate::BTokenSpace;
 class ServerCursor;
+
 
 /*!
 	\class CursorManager CursorManager.h
@@ -43,22 +29,24 @@ class ServerCursor;
 	of an application's cursors whenever an application closes.
 */
 class CursorManager : public BLocker {
-public:
+	public:
 						CursorManager();
-						~CursorManager();
-		int32			AddCursor(ServerCursor *sc);
+		virtual			~CursorManager();
+
+		int32			AddCursor(ServerCursor* cursor);
 		void			DeleteCursor(int32 token);
 		void			RemoveAppCursors(team_id team);
-		void			SetCursorSet(const char *path);
-		ServerCursor	*GetCursor(cursor_which which);
+
+		void			SetCursorSet(const char* path);
+		ServerCursor*	GetCursor(cursor_which which);
 		cursor_which	GetCursorWhich();
 		void			ChangeCursor(cursor_which which, int32 token);
 		void			SetDefaults();
-		ServerCursor	*FindCursor(int32 token);
+		ServerCursor*	FindCursor(int32 token);
 
-private:
+	private:
 		BList			fCursorList;
-		TokenHandler	fTokenizer;
+		BTokenSpace		fTokenSpace;
 
 		// System cursor members
 		ServerCursor	*fDefaultCursor,
@@ -73,4 +61,4 @@ private:
 		cursor_which	fCurrentWhich;
 };
 
-#endif
+#endif	/* CURSOR_MANAGER_H */

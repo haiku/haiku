@@ -50,6 +50,7 @@
 #include "ServerCursor.h"
 #include "ServerPicture.h"
 #include "ServerScreen.h"
+#include "ServerTokenSpace.h"
 #include "ServerWindow.h"
 #include "SystemPalette.h"
 #include "Utils.h"
@@ -2404,13 +2405,11 @@ ServerApp::CountBitmaps() const
 ServerBitmap*
 ServerApp::FindBitmap(int32 token) const
 {
-	int32 count = fBitmapList.CountItems();
-	for (int32 i = 0; i < count; i++) {
-		ServerBitmap* bitmap = (ServerBitmap*)fBitmapList.ItemAt(i);
-		if (bitmap && bitmap->Token() == token)
-			return bitmap;
-	}
-
+	// TODO: we need to make sure the bitmap is ours?!
+	ServerBitmap* bitmap;
+	if (gTokenSpace.GetToken(token, kBitmapToken, (void**)&bitmap) == B_OK)
+		return bitmap;
+	
 	return NULL;
 }
 
@@ -2425,12 +2424,11 @@ ServerApp::CountPictures() const
 ServerPicture *
 ServerApp::FindPicture(int32 token) const
 {
-	for (int32 i = 0; i < fPictureList.CountItems(); i++) {
-		ServerPicture *picture = static_cast<ServerPicture *>(fPictureList.ItemAt(i));
-		if (picture && picture->GetToken() == token)
-			return picture;
-	}
-	
+	// TODO: we need to make sure the picture is ours?!
+	ServerPicture* picture;
+	if (gTokenSpace.GetToken(token, kPictureToken, (void**)&picture) == B_OK)
+		return picture;
+
 	return NULL;
 }
 
