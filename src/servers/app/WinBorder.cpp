@@ -792,7 +792,7 @@ WinBorder::_ReserveRegions(BRegion &reg)
 {
 	BRegion reserve(reg);
 	reserve.IntersectWith(&fDecRegion);
-	fVisible2.Include(&reserve);
+	fVisible.Include(&reserve);
 	reg.Exclude(&reserve);
 }
 

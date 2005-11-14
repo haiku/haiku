@@ -45,12 +45,6 @@ Layer::Layer(BRect frame, const char* name, int32 token,
 	:
 	fName(name),
 	fFrame(frame),
-//	fBoundsLeftTop(0.0, 0.0),
-
-	fVisible2(),
-	fFullVisible2(),
-	fDirtyForRebuild(),
-	fDrawingRegion(),
 
 	fDriver(driver),
 	fRootLayer(NULL),
@@ -377,10 +371,10 @@ Layer::LayerAt(const BPoint &pt, bool recursive)
 		return NULL;
 	}
 
-	if (fVisible2.Contains(pt))
+	if (fVisible.Contains(pt))
 		return this;
 
-	if (fFullVisible2.Contains(pt)) {
+	if (fFullVisible.Contains(pt)) {
 		for (Layer* child = LastChild(); child; child = PreviousChild()) {
 			if (Layer* layer = child->LayerAt(pt))
 				return layer;
@@ -509,8 +503,8 @@ Layer::Hide(bool invalidate)
 	}
 
 	fHidden	= true;
-	if (invalidate && fFullVisible2.CountRects() > 0) {
-		BRegion invalid(fFullVisible2);
+	if (invalidate && fFullVisible.CountRects() > 0) {
+		BRegion invalid(fFullVisible);
 
 		fParent->MarkForRebuild(invalid);
 		GetRootLayer()->MarkForRedraw(invalid);
@@ -564,7 +558,7 @@ Layer::PopState()
 
 //! Matches the BView call of the same name
 BRect
-Layer::Bounds(void) const
+Layer::Bounds() const
 {
 	BRect r(fFrame);
 //	r.OffsetTo(fBoundsLeftTop);
@@ -575,7 +569,7 @@ Layer::Bounds(void) const
 
 //! Matches the BView call of the same name
 BRect
-Layer::Frame(void) const
+Layer::Frame() const
 {
 	return fFrame;
 }
@@ -594,12 +588,12 @@ Layer::MoveBy(float x, float y)
 	if (fParent && !IsHidden() && GetRootLayer() && GetRootLayer()->Lock()) {
 		fFrame.OffsetBy(x, y);
 
-		BRegion oldFullVisible(fFullVisible2);
+		BRegion oldFullVisible(fFullVisible);
 
 		// we'll invalidate the old position and the new, maxmial one.
 		BRegion invalid;
 		GetOnScreenRegion(invalid);
-		invalid.Include(&fFullVisible2);
+		invalid.Include(&fFullVisible);
 
 		fParent->MarkForRebuild(invalid);
 		fParent->TriggerRebuild();
@@ -607,7 +601,7 @@ Layer::MoveBy(float x, float y)
 		// done rebuilding regions, now copy common parts and redraw regions that became visible
 
 		// include the actual and the old fullVisible regions. later, we'll exclude the common parts.
-		BRegion		redrawReg(fFullVisible2);
+		BRegion	redrawReg(fFullVisible);
 		redrawReg.Include(&oldFullVisible);
 
 		// offset to layer's new location so that we can calculate the common region.
@@ -618,7 +612,7 @@ Layer::MoveBy(float x, float y)
 
 		// by intersecting the old fullVisible offseted to layer's new location, with the current
 		// fullVisible, we'll have the common region which can be copied using HW acceleration.
-		oldFullVisible.IntersectWith(&fFullVisible2);
+		oldFullVisible.IntersectWith(&fFullVisible);
 
 		// offset back and instruct the HW to do the actual copying.
 		oldFullVisible.OffsetBy(-x, -y);
@@ -663,9 +657,9 @@ Layer::ResizeBy(float x, float y)
 		for (Layer *child = LastChild(); child != NULL; child = PreviousChild())
 			child->_ResizeLayerFrameBy(x, y);
 
-		BRegion oldFullVisible(fFullVisible2);
+		BRegion oldFullVisible(fFullVisible);
 		// this is required to invalidate the old border
-		BRegion oldVisible(fVisible2);
+		BRegion oldVisible(fVisible);
 
 		// in case they moved, bottom, right and center aligned layers must be redrawn
 		BRegion redrawMore;
@@ -674,7 +668,7 @@ Layer::ResizeBy(float x, float y)
 		// we'll invalidate the old area and the new, maxmial one.
 		BRegion invalid;
 		GetOnScreenRegion(invalid);
-		invalid.Include(&fFullVisible2);
+		invalid.Include(&fFullVisible);
 
 		fParent->MarkForRebuild(invalid);
 		fParent->TriggerRebuild();
@@ -683,11 +677,11 @@ Layer::ResizeBy(float x, float y)
 
 		// what's invalid, are the differences between to old and the new fullVisible region
 		// 1) in case we grow.
-		BRegion		redrawReg(fFullVisible2);
+		BRegion redrawReg(fFullVisible);
 		redrawReg.Exclude(&oldFullVisible);
 		// 2) in case we shrink
-		BRegion		redrawReg2(oldFullVisible);
-		redrawReg2.Exclude(&fFullVisible2);
+		BRegion redrawReg2(oldFullVisible);
+		redrawReg2.Exclude(&fFullVisible);
 		// 3) combine.
 		redrawReg.Include(&redrawReg2);
 
@@ -698,10 +692,10 @@ Layer::ResizeBy(float x, float y)
 		_RezizeLayerRedrawMore(redrawReg, x, y);
 
 		// include layer's visible region in case we want a full update on resize
-		if (fFlags & B_FULL_UPDATE_ON_RESIZE && fVisible2.Frame().IsValid()) {
+		if (fFlags & B_FULL_UPDATE_ON_RESIZE && fVisible.Frame().IsValid()) {
 			_ResizeLayerFullUpdateOnResize(redrawReg, x, y);
 
-			redrawReg.Include(&fVisible2);
+			redrawReg.Include(&fVisible);
 			redrawReg.Include(&oldVisible);
 		}
 
@@ -743,20 +737,20 @@ Layer::ScrollBy(float x, float y)
 		fDrawState->OffsetOrigin(BPoint(x, y));
 
 		// set the region to be invalidated.
-		BRegion		invalid(fFullVisible2);
+		BRegion invalid(fFullVisible);
 
 		MarkForRebuild(invalid);
 
 		TriggerRebuild();
 
 		// for the moment we say that the whole surface needs to be redraw.
-		BRegion		redrawReg(fFullVisible2);
+		BRegion redrawReg(fFullVisible);
 
 		// offset old region so that we can start comparing.
 		invalid.OffsetBy(x, y);
 
 		// compute the common region. we'll use HW acc to copy this to the new location.
-		invalid.IntersectWith(&fFullVisible2);
+		invalid.IntersectWith(&fFullVisible);
 		GetDrawingEngine()->CopyRegion(&invalid, -x, -y);
 
 		// common region goes back to its original location. then, by excluding
@@ -976,12 +970,12 @@ Layer::do_CopyBits(BRect& src, BRect& dst, int32 xOffset, int32 yOffset) {
 	BRegion copyRegion(src);
 	// apply the current clipping of the layer
 
-	copyRegion.IntersectWith(&fVisible2);
+	copyRegion.IntersectWith(&fVisible);
 
 	// offset the region to the destination
 	// and apply the current clipping there as well
 	copyRegion.OffsetBy(xOffset, yOffset);
-	copyRegion.IntersectWith(&fVisible2);
+	copyRegion.IntersectWith(&fVisible);
 
 	// the region at the destination that needs invalidation
 	BRegion redrawReg(dst);
@@ -989,7 +983,7 @@ Layer::do_CopyBits(BRect& src, BRect& dst, int32 xOffset, int32 yOffset) {
 // TODO: quick fix for our scrolling problem. FIX THIS!
 //	redrawReg.Exclude(&copyRegion);
 	// apply the current clipping as well
-	redrawReg.IntersectWith(&fVisible2);
+	redrawReg.IntersectWith(&fVisible);
 
 	// move the region back for the actual operation
 	copyRegion.OffsetBy(-xOffset, -yOffset);
@@ -1159,7 +1153,7 @@ Layer::do_Hide()
 
 	if (fParent && !fParent->IsHidden() && GetRootLayer()) {
 		// save fullVisible so we know what to invalidate
-		BRegion invalid(fFullVisible2);
+		BRegion invalid(fFullVisible);
 
 		_ClearVisibleRegions();
 
@@ -1305,7 +1299,7 @@ Layer::_RezizeLayerRedrawMore(BRegion &reg, float dx, float dy)
 			child->ConvertToScreen(&regZ);
 
 			// intersect that with this'(not child's) fullVisible region
-			regZ.IntersectWith(&fFullVisible2);
+			regZ.IntersectWith(&fFullVisible);
 			reg.Include(&regZ);
 
 			child->_RezizeLayerRedrawMore(reg,
@@ -1313,12 +1307,12 @@ Layer::_RezizeLayerRedrawMore(BRegion &reg, float dx, float dy)
 				(rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM? dy: 0);
 
 			// above, OR this:
-			// reg.Include(&child->fFullVisible2);
+			// reg.Include(&child->fFullVisible);
 		} else if (((rm & 0x0F0F) == (uint16)B_FOLLOW_RIGHT && dx != 0)
 			|| ((rm & 0x0F0F) == (uint16)B_FOLLOW_H_CENTER && dx != 0)
 			|| ((rm & 0xF0F0) == (uint16)B_FOLLOW_BOTTOM && dy != 0)
 			|| ((rm & 0xF0F0) == (uint16)B_FOLLOW_V_CENTER && dy != 0)) {
-			reg.Include(&child->fFullVisible2);
+			reg.Include(&child->fFullVisible);
 		}
 	}
 }
@@ -1334,8 +1328,8 @@ Layer::_ResizeLayerFullUpdateOnResize(BRegion &reg, float dx, float dy)
 		uint16 rm = child->fResizeMode & 0x0000FFFF;		
 
 		if ((rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM) {
-			if (child->fFlags & B_FULL_UPDATE_ON_RESIZE && child->fVisible2.CountRects() > 0)
-				reg.Include(&child->fVisible2);
+			if (child->fFlags & B_FULL_UPDATE_ON_RESIZE && child->fVisible.CountRects() > 0)
+				reg.Include(&child->fVisible);
 
 			child->_ResizeLayerFullUpdateOnResize(reg,
 				(rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT? dx: 0,
@@ -1383,7 +1377,7 @@ Layer::_RebuildVisibleRegions(const BRegion &invalid,
 
 	// no need to go deeper if the parent doesn't have a visible region anymore
 	// and our fullVisible region is also empty.
-	if (!parentLocalVisible.Frame().IsValid() && !(fFullVisible2.CountRects() > 0))
+	if (!parentLocalVisible.Frame().IsValid() && !(fFullVisible.CountRects() > 0))
 		return;
 
 	bool fullRebuild = false;
@@ -1402,11 +1396,11 @@ Layer::_RebuildVisibleRegions(const BRegion &invalid,
 	common.IntersectWith(&parentLocalVisible);
 
 	// exclude the invalid region
-	fFullVisible2.Exclude(&invalid);
-	fVisible2.Exclude(&invalid);
+	fFullVisible.Exclude(&invalid);
+	fVisible.Exclude(&invalid);
 
 	// put in what's really visible
-	fFullVisible2.Include(&common);
+	fFullVisible.Include(&common);
 
 	// allow this layer to hide some parts from its children
 	_ReserveRegions(common);
@@ -1419,11 +1413,11 @@ Layer::_RebuildVisibleRegions(const BRegion &invalid,
 			child->_RebuildVisibleRegions(invalid, common, child->LastChild());
 
 		// to let children know much they can take from parent's visible region
-		common.Exclude(&child->fFullVisible2);
+		common.Exclude(&child->fFullVisible);
 	}
 
 	// include what's left after all children took what they could.
-	fVisible2.Include(&common);
+	fVisible.Include(&common);
 */
 
 // NOTE: I modified this method for the moment because of some issues that I have
@@ -1446,8 +1440,8 @@ Layer::_RebuildVisibleRegions(const BRegion &invalid,
 
 	// see how much you can take
 	common.IntersectWith(&parentLocalVisible);
-	fFullVisible2 = common;
-	fVisible2.MakeEmpty();
+	fFullVisible = common;
+	fVisible.MakeEmpty();
 
 	// allow this layer to hide some parts from its children
 	_ReserveRegions(common);
@@ -1456,11 +1450,11 @@ Layer::_RebuildVisibleRegions(const BRegion &invalid,
 		child->_RebuildVisibleRegions(invalid, common, child->LastChild());
 
 		// to let children know much they can take from parent's visible region
-		common.Exclude(&child->fFullVisible2);
+		common.Exclude(&child->fFullVisible);
 	}
 
 	// include what's left after all children took what they could.
-	fVisible2.Include(&common);
+	fVisible.Include(&common);
 
 	_RebuildDrawingRegion();
 }
@@ -1469,7 +1463,7 @@ Layer::_RebuildVisibleRegions(const BRegion &invalid,
 void
 Layer::_RebuildDrawingRegion()
 {
-	fDrawingRegion = fVisible2;
+	fDrawingRegion = fVisible;
 	// apply user clipping which is in native coordinate system
 	if (const BRegion* userClipping = fDrawState->ClippingRegion()) {
 		BRegion screenUserClipping(*userClipping);
@@ -1488,11 +1482,11 @@ void
 Layer::_ClearVisibleRegions()
 {
 	// OPT: maybe we should uncomment these lines for performance
-	//if (fFullVisible2.CountRects() <= 0)
+	//if (fFullVisible.CountRects() <= 0)
 	//	return;
 
-	fVisible2.MakeEmpty();
-	fFullVisible2.MakeEmpty();
+	fVisible.MakeEmpty();
+	fFullVisible.MakeEmpty();
 	for (Layer *child = LastChild(); child; child = PreviousChild())
 		child->_ClearVisibleRegions();
 }
@@ -1515,7 +1509,7 @@ Layer::TriggerRebuild()
 	_GetAllRebuildDirty(&totalInvalidReg);
 
 	if (totalInvalidReg.CountRects() > 0) {
-		BRegion localFullVisible(fFullVisible2);
+		BRegion localFullVisible(fFullVisible);
 
 //		localFullVisible.IntersectWith(&totalInvalidReg);
 
@@ -1545,8 +1539,8 @@ Layer::_AllRedraw(const BRegion &invalid)
 	if (wb)
 		wb->RequestClientRedraw(invalid);
 
-	if (fVisible2.CountRects() > 0) {
-		BRegion	updateReg(fVisible2);
+	if (fVisible.CountRects() > 0) {
+		BRegion	updateReg(fVisible);
 		updateReg.IntersectWith(&invalid);
 
 		if (updateReg.CountRects() > 0) {
@@ -1558,7 +1552,7 @@ Layer::_AllRedraw(const BRegion &invalid)
 
 	for (Layer *child = LastChild(); child != NULL; child = PreviousChild()) {
 		if (!(child->IsHidden())) {
-			BRegion common(child->fFullVisible2);
+			BRegion common(child->fFullVisible);
 			common.IntersectWith(&invalid);
 			
 			if (common.CountRects() > 0)

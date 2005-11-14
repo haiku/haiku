@@ -199,8 +199,8 @@ class Layer {
 			void				SetUserClipping(const BRegion& region);
 				// region is expected in layer coordinates
 
-	inline	const BRegion&		VisibleRegion() const { return fVisible2; }
-	inline	const BRegion&		FullVisible() const { return fFullVisible2; }
+	inline	const BRegion&		VisibleRegion() const { return fVisible; }
+	inline	const BRegion&		FullVisible() const { return fFullVisible; }
 	inline	const BRegion&		DrawingRegion() const { return fDrawingRegion; }
 
 	virtual	void				GetOnScreenRegion(BRegion& region);
@@ -246,8 +246,8 @@ class Layer {
 // value.)
 //			BPoint				fBoundsLeftTop;
 
-			BRegion				fVisible2;
-			BRegion				fFullVisible2;
+			BRegion				fVisible;
+			BRegion				fFullVisible;
 			BRegion				fDirtyForRebuild;
 			BRegion				fDrawingRegion;
 

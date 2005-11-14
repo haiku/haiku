@@ -198,8 +198,8 @@ RootLayer::WorkingThread(void *data)
 	oneRootLayer->Lock();
 
 	// RootLayer starts with valid visible regions
-	oneRootLayer->fFullVisible2.Set(oneRootLayer->Bounds());
-	oneRootLayer->fVisible2.Set(oneRootLayer->Bounds());
+	oneRootLayer->fFullVisible.Set(oneRootLayer->Bounds());
+	oneRootLayer->fVisible.Set(oneRootLayer->Bounds());
 
 	oneRootLayer->MarkForRebuild(oneRootLayer->Bounds());
 	oneRootLayer->MarkForRedraw(oneRootLayer->Bounds());
@@ -305,8 +305,8 @@ RootLayer::ResizeBy(float x, float y)
 	fFrame.right += x;
 	fFrame.bottom += y;
 
-	fFullVisible2.Set(Bounds());
-	fVisible2.Set(Bounds());
+	fFullVisible.Set(Bounds());
+	fVisible.Set(Bounds());
 
 	BRegion region(fFrame);
 	MarkForRebuild(region);
