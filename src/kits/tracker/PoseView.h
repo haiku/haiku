@@ -303,8 +303,8 @@ class BPoseView : public BView {
 		void PlaceFolder(const entry_ref *, const BMessage *);
 
 		// clipboard handling for poses
-		bool HasPosesInClipboard();
-		void SetHasPosesInClipboard(bool hasPoses);
+		inline bool HasPosesInClipboard();
+		inline void SetHasPosesInClipboard(bool hasPoses);
 		void SetPosesClipboardMode(uint32 clipboardMode);
 		void UpdatePosesClipboardModeFromClipboard(BMessage *clipboardReport = NULL);
 
@@ -998,6 +998,20 @@ inline BPose *
 BPoseView::FindPose(const entry_ref *entry, int32 *index) const
 {
 	return fPoseList->FindPose(entry, index);
+}
+
+
+inline bool
+BPoseView::HasPosesInClipboard()
+{
+	return fHasPosesInClipboard;
+}
+
+
+inline void
+BPoseView::SetHasPosesInClipboard(bool hasPoses)
+{
+	fHasPosesInClipboard = hasPoses;
 }
 
 

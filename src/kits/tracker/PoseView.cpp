@@ -2761,20 +2761,6 @@ BPoseView::MapToNewIconMode(BPose *pose, BPoint oldGrid, BPoint oldOffset)
 }
 
 
-inline bool
-BPoseView::HasPosesInClipboard()
-{
-	return fHasPosesInClipboard;
-}
-
-
-inline void
-BPoseView::SetHasPosesInClipboard(bool hasPoses)
-{
-	fHasPosesInClipboard = hasPoses;
-}
-
-
 void
 BPoseView::SetPosesClipboardMode(uint32 clipboardMode)
 {

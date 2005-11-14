@@ -57,12 +57,15 @@ All rights reserved.
 // method from the TBarWindow::ShowBeMenu() method.
 // Don't do this at home -- but why the hell is this method private?
 #if __MWERKS__
-	extern "C" void StartMenuBar__8BMenuBarFlbbP5BRect(BMenuBar *,int32,bool,bool,BRect *);
-#elif __GCC__ <= 2
-	extern "C" void StartMenuBar__8BMenuBarlbT2P5BRect(BMenuBar *,int32,bool,bool,BRect *);
+	#define BMenuBar_StartMenuBar_Hack StartMenuBar__8BMenuBarFlbbP5BRect
+#elif __GNUC__ <= 2
+	#define BMenuBar_StartMenuBar_Hack StartMenuBar__8BMenuBarlbT2P5BRect
+#elif __GNUC__ > 2
+	#define BMenuBar_StartMenuBar_Hack _ZN8BMenuBar12StartMenuBarElbbP5BRect
 #else
 #	error "You may want to port this ugly hack to your compiler ABI"
 #endif
+extern "C" void BMenuBar_StartMenuBar_Hack(BMenuBar *,int32,bool,bool,BRect *);
 
 
 TBeMenu *TBarWindow::sBeMenu = NULL;
@@ -280,11 +283,7 @@ TBarWindow::ShowBeMenu()
 	if (menuBar == NULL)
 		return;
 
-#if __MWERKS__
-	StartMenuBar__8BMenuBarFlbbP5BRect(menuBar,0,true,true,NULL);
-#elif __GCC__ <= 2
-	StartMenuBar__8BMenuBarlbT2P5BRect(menuBar,0,true,true,NULL);
-#endif
+	BMenuBar_StartMenuBar_Hack(menuBar,0,true,true,NULL);
 }
 
 
@@ -298,11 +297,7 @@ TBarWindow::ShowTeamMenu()
 	if (KeyMenuBar() == NULL)
 		return;
 
-#if __MWERKS__
-	StartMenuBar__8BMenuBarFlbbP5BRect(KeyMenuBar(),index,true,true,NULL);
-#elif __GCC__ <= 2
-	StartMenuBar__8BMenuBarlbT2P5BRect(KeyMenuBar(),index,true,true,NULL);
-#endif
+	BMenuBar_StartMenuBar_Hack(KeyMenuBar(),index,true,true,NULL);
 }
 
 

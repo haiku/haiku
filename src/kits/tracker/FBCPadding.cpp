@@ -95,7 +95,7 @@ void BFilePanel::_ReservedFilePanel8() {}
 
 // deprecated cruft
 
-#if __GNUC__ || __MWERKS__
+#if __GNUC__ && __GNUC__ < 3 || __MWERKS__
 extern "C" {
 
 _EXPORT BFilePanel*
