@@ -116,3 +116,10 @@ __fpclassifyl(long double value)
 	// TODO: implement me!
 	return FP_NORMAL;
 }
+
+int
+finitef(float value)
+{
+	int clazz = __fpclassifyf(value);
+	return (clazz == FP_ZERO || clazz == FP_SUBNORMAL || clazz == FP_NORMAL);
+}
