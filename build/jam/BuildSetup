@@ -160,10 +160,12 @@ for level in $(HAIKU_DEBUG_LEVELS[2-]) {
 	HAIKU_KERNEL_DEBUG_$(level)_C++FLAGS	= $(flags) ;
 }
 
-# gcc version dependent defines
-# if $(HAIKU_GCC_VERSION[1]) >= 3 {
-# 	HAIKU_DEFINES += __FUNCTION__=__func__ ;
-# }
+if $(HAIKU_GCC_VERSION[1]) >= 3 {
+	# TODO: Temporary work-around. Should be defined in the compiler specs
+	HAIKU_LINKFLAGS += -Xlinker --no-undefined ;
+} else {
+	HAIKU_DEFINES += _BEOS_R5_COMPATIBLE_ ;
+}
 
 # private kernel headers do be used when compiling kernel code
 HAIKU_PRIVATE_KERNEL_HEADERS =
@@ -185,10 +187,12 @@ if $(HAIKU_SHARED_LIBSTDC++) {
 }
 
 # the C++ support library
-if $(HAIKU_GCC_VERSION[1]) < 3 {
-	HAIKU_LIBSUPC++ = ;
+if $(HAIKU_SHARED_LIBSUPC++) {
+	HAIKU_LIBSUPC++ = $(HAIKU_SHARED_LIBSUPC++) ;
+} else if $(HAIKU_STATIC_LIBSUPC++) {
+	HAIKU_LIBSUPC++ = $(HAIKU_STATIC_LIBSUPC++) ;
 } else {
-	HAIKU_LIBSUPC++ = supc++ ;
+	HAIKU_LIBSTDC++ = ;
 }
 
 # library and executable glue code
@@ -203,6 +207,8 @@ HAIKU_LIBRARY_BEGIN_GLUE_CODE =
 	<src!system!glue>init_term_dyn.o
 ;
 HAIKU_LIBRARY_END_GLUE_CODE =
+	# TODO: For the time being always link against libsupc++.a.
+	$(HAIKU_STATIC_LIBSUPC++)
 	crtend.o
 	<src!system!glue!arch!$(HAIKU_ARCH)>crtn.o
 ;

@@ -80,11 +80,13 @@ standard_gcc_settings()
 	HAIKU_GCC_HEADERS_DIR=${gccdir}/include
 	HAIKU_GCC_LIBGCC_OBJECTS=`ar t ${HAIKU_GCC_LIBGCC}`
 
-	# for gcc 4 we use the libstdc++ that comes with the compiler
+	# for gcc 4 we use the libstdc++ and libsupc++ that come with the compiler
 	case $haikuGCCVersion in
 		4.*)
 			haikuStaticLibStdCxx=`$HAIKU_CC -print-file-name=libstdc++.a`
 			haikuSharedLibStdCxx=`$HAIKU_CC -print-file-name=libstdc++.so`
+			haikuStaticLibSupCxx=`$HAIKU_CC -print-file-name=libsupc++.a`
+			haikuSharedLibSupCxx=`$HAIKU_CC -print-file-name=libsupc++.so`
 			local headers=$gccdir/../../../../include/c++/$haikuGCCVersion
 			haikuCxxHeadersDir=$headers
 			for d in $haikuGCCMachine backward ext debug; do
@@ -96,6 +98,12 @@ standard_gcc_settings()
 			fi
 			if [ $haikuSharedLibStdCxx = libstdc++.so ]; then
 				haikuSharedLibStdCxx=
+			fi
+			if [ $haikuStaticLibSupCxx = libsupc++.a ]; then
+				haikuStaticLibSupCxx=
+			fi
+			if [ $haikuSharedLibSupCxx = libsupc++.so ]; then
+				haikuSharedLibSupCxx=
 			fi
 		;;
 	esac
@@ -150,6 +158,8 @@ platform=`uname`
 haikuGCCVersion=
 haikuStaticLibStdCxx=
 haikuSharedLibStdCxx=
+haikuStaticLibSupCxx=
+haikuSharedLibSupCxx=
 haikuCxxHeadersDir=
 hostGCCVersion=`cc -dumpversion`
 floppy=
@@ -261,6 +271,8 @@ HAIKU_GCC_LIBGCC		?= ${HAIKU_GCC_LIBGCC} ;
 
 HAIKU_STATIC_LIBSTDC++	?= ${haikuStaticLibStdCxx} ;
 HAIKU_SHARED_LIBSTDC++	?= ${haikuSharedLibStdCxx} ;
+HAIKU_STATIC_LIBSUPC++	?= ${haikuStaticLibSupCxx} ;
+HAIKU_SHARED_LIBSUPC++	?= ${haikuSharedLibSupCxx} ;
 HAIKU_C++_HEADERS_DIR	?= ${haikuCxxHeadersDir} ;
 
 HAIKU_BUILD_ATTRIBUTES_DIR	?= ${buildAttributesDir} ;
