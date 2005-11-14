@@ -146,9 +146,9 @@ WinBorder::~WinBorder()
 {
 	STRACE(("WinBorder(%s)::~WinBorder()\n", Name()));
 
-	delete fTopLayer;
 	delete fDecorator;
 }
+
 
 //! redraws a certain section of the window border
 void
@@ -161,14 +161,15 @@ WinBorder::Draw(const BRect &r)
 	
 	// if we have a visible region, it is decorator's one.
 	if (fDecorator) {
-		WinBorder* wb = GetRootLayer()->Focus();
-		if (wb == this)
+		if (GetRootLayer()->Focus() == this)
 			fDecorator->SetFocus(true);
 		else
 			fDecorator->SetFocus(false);
+
 		fDecorator->Draw(r);
 	}
 }
+
 
 //! Moves the winborder with redraw
 void
@@ -278,7 +279,7 @@ WinBorder::ResizeBy(float x, float y)
 	Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
 }
 
-// SetName
+
 void
 WinBorder::SetName(const char* name)
 {
@@ -306,7 +307,7 @@ WinBorder::SetName(const char* name)
 	}
 }
 
-// UpdateStart
+
 void
 WinBorder::UpdateStart()
 {
@@ -488,8 +489,6 @@ WinBorder::MouseDown(const BMessage *msg)
 				GetRootLayer()->SetActive(this, false);
 			} else {
 				GetRootLayer()->SetNotifyLayer(this, B_POINTER_EVENTS, 0UL);
-	
-				activateWindow:
 				GetRootLayer()->SetActive(this);
 			}
 		} else if (target != NULL) {
@@ -632,7 +631,6 @@ WinBorder::Activated(bool active)
 }
 
 
-// SetTabLocation
 void
 WinBorder::SetTabLocation(float location)
 {
@@ -641,7 +639,6 @@ WinBorder::SetTabLocation(float location)
 }
 
 
-// TabLocation
 float
 WinBorder::TabLocation() const
 {
@@ -759,7 +756,7 @@ WinBorder::QuietlySetFeel(int32 feel)
 	}
 }
 
-// _ActionFor
+
 click_type
 WinBorder::_ActionFor(const BMessage *msg) const
 {
@@ -773,8 +770,8 @@ WinBorder::_ActionFor(const BMessage *msg) const
 
 	if (fDecorator)
 		return fDecorator->Clicked(where, buttons, modifiers);
-	else
-		return DEC_NONE;
+
+	return DEC_NONE;
 }
 
 

@@ -81,6 +81,8 @@ class Layer {
 			void				RemoveChild(Layer* child);
 			void				RemoveSelf();
 			bool				HasChild(Layer* layer);
+			Layer*				Parent() const
+									{ return fParent; }
 
 			uint32				CountChildren() const;
 			Layer*				FindLayer(const int32 token);
@@ -210,9 +212,6 @@ class Layer {
 	virtual	void				Draw(const BRect& r);
 			void				_AllRedraw(const BRegion &invalid);
 
-	// others
-			void				PruneTree();
-	
  private:
 	friend class RootLayer;
 	friend class WinBorder;

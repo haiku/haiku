@@ -113,9 +113,16 @@ Layer::~Layer()
 {
 	delete fDrawState;
 
-	// TODO: uncomment!
-	//PruneTree();
+	Layer* child = fFirstChild;
+
+	while (child != NULL) {
+		Layer* nextChild = child->fNextSibling;
+
+		delete child;
+		child = nextChild;
+	}
 }
+
 
 /*!
 	\brief Adds a child layer to the current one
@@ -889,31 +896,7 @@ Layer::Scale() const
 	return CurrentState()->Scale();
 }
 
-//! Recursively deletes all children of the calling layer
-void
-Layer::PruneTree(void)
-{
 
-	Layer* child;
-	Layer* nextChild;
-	
-	child = fFirstChild;
-	fFirstChild = NULL;
-	
-	while (child != NULL) {
-		if (child->fFirstChild != NULL)
-			child->PruneTree();
-		
-		nextChild = child->fNextSibling;
-		child->fNextSibling = NULL;
-		
-		delete child;
-		child = nextChild;
-	}
-	// Man, this thing is short. Elegant, ain't it? :P
-}
-
-// AddToViewsWithInvalidCoords
 void
 Layer::AddToViewsWithInvalidCoords() const
 {
@@ -925,7 +908,7 @@ Layer::AddToViewsWithInvalidCoords() const
 	}
 }
 
-// SendViewCoordUpdateMsg
+
 void
 Layer::SendViewCoordUpdateMsg() const
 {
@@ -935,14 +918,14 @@ Layer::SendViewCoordUpdateMsg() const
 	}
 }
 
-// SetViewColor
+
 void
 Layer::SetViewColor(const RGBColor& color)
 {
 	fViewColor = color;
 }
 
-// SetBackgroundBitmap
+
 void
 Layer::SetBackgroundBitmap(const ServerBitmap* bitmap)
 {

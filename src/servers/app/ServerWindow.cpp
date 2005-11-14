@@ -642,21 +642,19 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// layer, detach the layer itself, delete it, and invalidate the
 			// area assuming that the view was visible when removed
 
-			STRACE(("ServerWindow %s: AS_LAYER_DELETE(self)...\n", fTitle));			
-
 			Layer *parent = fCurrentLayer->fParent;
-//			BRegion *invalidRegion = NULL;
 
-			if (!fCurrentLayer->IsHidden() && parent && myRootLayer) {
-				if (fCurrentLayer->FullVisible().Frame().IsValid()) {
-					parent->MarkForRebuild(fCurrentLayer->FullVisible());
-					myRootLayer->MarkForRedraw(fCurrentLayer->FullVisible());
-				}
+			STRACE(("ServerWindow %s: AS_LAYER_DELETE view: %p, parent: %p\n", fTitle,
+				fCurrentLayer, parent));
+
+			if (!fCurrentLayer->IsHidden() && parent && myRootLayer
+				&& fCurrentLayer->FullVisible().Frame().IsValid()) {
+				parent->MarkForRebuild(fCurrentLayer->FullVisible());
+				myRootLayer->MarkForRedraw(fCurrentLayer->FullVisible());
 			}
 
 			// here we remove current layer from list.
 			fCurrentLayer->RemoveSelf();
-			fCurrentLayer->PruneTree();
 
 			if (parent)
 				parent->TriggerRebuild();			
@@ -665,14 +663,13 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				myRootLayer->LayerRemoved(fCurrentLayer);
 				myRootLayer->TriggerRedraw();
 			}
-			
+
 			#ifdef DEBUG_SERVERWINDOW
 			parent->PrintTree();
 			#endif
-			STRACE(("DONE: ServerWindow %s: Message AS_DELETE_LAYER: Parent: %s Layer: %s\n", fTitle, parent->Name(), fCurrentLayer->Name()));
 
 			delete fCurrentLayer;
-// TODO: It is necessary to do this, but I find it very obscure.
+			// TODO: It is necessary to do this, but I find it very obscure.
 			fCurrentLayer = parent;
 			break;
 		}
