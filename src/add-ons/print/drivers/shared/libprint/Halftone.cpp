@@ -1,5 +1,5 @@
 /*
- * HalftoneEngine.cpp
+ * Halftone.cpp
  * Copyright 1999-2000 Y.Takagi. All Rights Reserved.
  */
 
