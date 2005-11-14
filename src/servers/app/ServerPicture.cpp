@@ -19,7 +19,7 @@ ServerPicture::ServerPicture()
 
 	int8 *ptr;
 	fArea = create_area("ServerPicture", (void**)&ptr, B_ANY_ADDRESS,
-		B_PAGE_SIZE, B_NO_LOCK,B_READ_AREA | B_WRITE_AREA);
+		B_PAGE_SIZE, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 }
 
 
