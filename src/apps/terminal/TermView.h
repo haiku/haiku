@@ -178,7 +178,7 @@ public:
   //
   void	UpdateSIGWINCH();
   void	DeviceStatusReport (int);
-  inline void UpdateLine (void);
+  void	UpdateLine (void);
   void	ScrollScreen (void);
   void	ScrollScreenDraw (void);
   void  GetFrameSize (float *width, float *height);
