@@ -192,7 +192,7 @@ if $(HAIKU_SHARED_LIBSUPC++) {
 } else if $(HAIKU_STATIC_LIBSUPC++) {
 	HAIKU_LIBSUPC++ = $(HAIKU_STATIC_LIBSUPC++) ;
 } else {
-	HAIKU_LIBSTDC++ = ;
+	HAIKU_LIBSUPC++ = ;
 }
 
 # library and executable glue code
