@@ -72,17 +72,43 @@ DefaultDecorator::DefaultDecorator(DesktopSettings& settings, BRect rect,
 		rect.left, rect.top, rect.right, rect.bottom));
 }
 
-DefaultDecorator::~DefaultDecorator(void)
+
+DefaultDecorator::~DefaultDecorator()
 {
 	STRACE(("DefaultDecorator: ~DefaultDecorator()\n"));
 	delete [] fFrameColors;
 }
+
+
+void
+DefaultDecorator::SetTitle(const char* string, BRegion* updateRegion)
+{
+	BRect rect = GetTabRect();
+
+	Decorator::SetTitle(string);
+	
+	if (updateRegion == NULL)
+		return;
+
+	BRect updatedRect = GetTabRect();
+	if (rect.left > updatedRect.left)
+		rect.left = updatedRect.left;
+	if (rect.right < updatedRect.right)
+		rect.right = updatedRect.right;
+
+	rect.bottom++;
+		// the border will look differently when the title is adjacent
+
+	updateRegion->Set(rect);
+}
+
 
 void
 DefaultDecorator::MoveBy(float x, float y)
 {
 	MoveBy(BPoint(x,y));
 }
+
 
 void
 DefaultDecorator::MoveBy(BPoint pt)

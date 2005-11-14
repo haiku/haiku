@@ -289,20 +289,14 @@ WinBorder::SetName(const char* name)
 	// and redraw it.
 
 	if (fDecorator) {
-		// before the change
-		BRegion invalid(fDecorator->GetTabRect());
+		BRegion updateRegion;
+		fDecorator->SetTitle(name, &updateRegion);
 
-		fDecorator->SetTitle(name);
-
-		// after the change
-		invalid.Include(fDecorator->GetTabRect());
-
-		// TODO: still doesn't look good (visually), but at least it works
 		fRebuildDecRegion = true;
-		GetRootLayer()->MarkForRebuild(invalid);
+		GetRootLayer()->MarkForRebuild(updateRegion);
 		GetRootLayer()->TriggerRebuild();
 
-		GetRootLayer()->MarkForRedraw(invalid);
+		GetRootLayer()->MarkForRedraw(updateRegion);
 		GetRootLayer()->TriggerRedraw();
 	}
 }
@@ -443,7 +437,7 @@ WinBorder::MouseDown(const BMessage *msg)
 				action = DEC_DRAG;
 
 			// set decorator internals
-			switch(action) {
+			switch (action) {
 				case DEC_CLOSE:
 					fIsClosing = true;
 					fDecorator->SetClose(true);

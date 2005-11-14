@@ -190,17 +190,19 @@ Decorator::SetZoom(bool is_down)
 	}
 }
 
+
 /*!
 	\brief Updates the value of the decorator title
 	\param string New title value
 */
 void
-Decorator::SetTitle(const char *string)
+Decorator::SetTitle(const char* string, BRegion* updateRegion)
 {
 	fTitle.SetTo(string);
 	_DoLayout();
 	// TODO: redraw?
 }
+
 
 /*!
 	\brief Returns the decorator's window look

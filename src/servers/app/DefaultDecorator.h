@@ -22,6 +22,8 @@ public:
 								int32 look, int32 feel, int32 flags);
 	virtual					~DefaultDecorator();
 
+	virtual	void			SetTitle(const char* string, BRegion* updateRegion = NULL);
+
 	virtual	void			MoveBy(float x, float y);
 	virtual	void			MoveBy(BPoint pt);
 	virtual	void			ResizeBy(float x, float y);

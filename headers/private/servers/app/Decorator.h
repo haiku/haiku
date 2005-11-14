@@ -57,13 +57,13 @@ class Decorator {
 			void				SetFeel(int32 wfeel);
 			void				SetFont(ServerFont *font);
 			void				SetLook(int32 wlook);
-			
-			void				SetClose(bool is_down);
-			void				SetMinimize(bool is_down);
-			void				SetZoom(bool is_down);
 
-	virtual	void				SetTitle(const char *string);
-		
+			void				SetClose(bool pressed);
+			void				SetMinimize(bool pressed);
+			void				SetZoom(bool pressed);
+
+	virtual	void				SetTitle(const char* string, BRegion* updateRegion = NULL);
+
 			int32				GetLook() const;
 			int32				GetFeel() const;
 			int32				GetFlags() const;
