@@ -50,7 +50,7 @@ class ServerWindow : public MessageLooper {
 public:
 								ServerWindow(const char *title, ServerApp *app,
 									port_id clientPort, port_id looperPort, 
-									int32 handlerID);
+									int32 clientToken);
 	virtual						~ServerWindow();
 
 			status_t			Init(BRect frame, uint32 look,
@@ -97,8 +97,7 @@ public:
 			
 			void				HandleDirectConnection(int bufferState = -1, int driverState = -1);
 
-			// server "private" - try not to use.
-	inline	int32				ClientToken() const { return fHandlerToken; }
+	inline	int32				ClientToken() const { return fClientToken; }
 	inline	int32				ServerToken() const { return fServerToken; }
 
 			void				GetInfo(window_info& info);
@@ -143,7 +142,7 @@ private:
 			BMessage			fClientViewsWithInvalidCoords;
 
 			int32				fServerToken;
-			int32				fHandlerToken;
+			int32				fClientToken;
 
 			Layer*				fCurrentLayer;
 			

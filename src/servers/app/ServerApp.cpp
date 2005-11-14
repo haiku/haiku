@@ -146,7 +146,7 @@ ServerApp::~ServerApp(void)
 	// quit all server windows
 
 	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
-		ServerWindow* window = (ServerWindow*)fWindowList.ItemAt(i);
+		ServerWindow* window = fWindowList.ItemAt(i);
 		window->Quit();
 	}
 	int32 tries = fWindowList.CountItems() + 1;
@@ -177,7 +177,7 @@ ServerApp::~ServerApp(void)
 		fWindowListLock.Lock();
 
 		for (int32 i = 0; i < fWindowList.CountItems(); i++) {
-			ServerWindow* window = (ServerWindow*)fWindowList.ItemAt(i);
+			ServerWindow* window = fWindowList.ItemAt(i);
 			printf("kill window \"%s\"\n", window->Title());
 
 			kill_thread(window->Thread());
@@ -650,7 +650,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			STRACE(("ServerApp %s: Received decorator update notification\n", Signature()));
 
 			for (int32 i = 0; i < fWindowList.CountItems(); i++) {
-				ServerWindow *window = (ServerWindow*)fWindowList.ItemAt(i);
+				ServerWindow *window = fWindowList.ItemAt(i);
 				window->Lock();
 				const_cast<WinBorder *>(window->GetWinBorder())->UpdateDecorator();
 				window->Unlock();
@@ -1968,7 +1968,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				}
 			}
 
-			for (int32 i=0; i<numStrings; i++)
+			for (int32 i = 0; i < numStrings; i++)
 				free(stringArray[i]);
 
 			if (!success)
@@ -1979,6 +1979,37 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 
 		/* screen commands */
+
+		case AS_GET_SCREEN_ID_FROM_WINDOW:
+		{
+			status_t status = B_ENTRY_NOT_FOUND;
+
+			// Attached data
+			// 1) int32 - window client token
+			int32 clientToken;
+			if (link.Read<int32>(&clientToken) != B_OK)
+				status = B_BAD_DATA;
+			else {
+				BAutolock locker(fWindowListLock);
+
+				for (int32 i = fWindowList.CountItems(); i-- > 0;) {
+					ServerWindow* window = fWindowList.ItemAt(i);
+
+					if (window->ClientToken() == clientToken) {
+						// got it!
+						fLink.StartMessage(B_OK);
+						fLink.Attach<screen_id>(B_MAIN_SCREEN_ID);
+							// TODO: for now...
+						status = B_OK;
+					}
+				}
+			}
+
+			if (status != B_OK)
+				fLink.StartMessage(status);
+			fLink.Flush();
+			break;
+		}
 
 		case AS_SCREEN_GET_MODE:
 		{

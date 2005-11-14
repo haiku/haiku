@@ -17,17 +17,19 @@
 #include "SubWindowList.h"
 #include "BGet++.h"
 
+#include <ObjectList.h>
 #include <String.h>
 
 
 class AreaPool;
 class BMessage;
 class BList;
+class Desktop;
 class DrawingEngine;
 class ServerPicture;
 class ServerCursor;
 class ServerBitmap;
-class Desktop;
+class ServerWindow;
 
 namespace BPrivate {
 	class PortLink;
@@ -93,7 +95,7 @@ class ServerApp : public MessageLooper {
 		team_id fClientTeam;
 
 		BLocker fWindowListLock;
-		BList fWindowList;
+		BObjectList<ServerWindow> fWindowList;
 
 		// TODO:
 		// - Are really Bitmaps and Pictures stored per application and not globally ?

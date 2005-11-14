@@ -131,7 +131,7 @@ struct dw_sync_data {
 	monitor thread.
 */
 ServerWindow::ServerWindow(const char *title, ServerApp *app,
-						   port_id clientPort, port_id looperPort, int32 handlerID)
+	port_id clientPort, port_id looperPort, int32 clientToken)
 	: MessageLooper(title && *title ? title : "Unnamed Window"),
 	fTitle(NULL),
 	fDesktop(app->GetDesktop()),
@@ -142,7 +142,7 @@ ServerWindow::ServerWindow(const char *title, ServerApp *app,
 	fClientReplyPort(clientPort),
 	fClientLooperPort(looperPort),
 	fClientViewsWithInvalidCoords(B_VIEW_RESIZED),
-	fHandlerToken(handlerID),
+	fClientToken(clientToken),
 	fCurrentLayer(NULL),
 	fDirectWindowData(NULL)
 {
@@ -208,7 +208,7 @@ ServerWindow::Run()
 	// Send a reply to our window - it is expecting fMessagePort
 	// port and some other info
 
-	fLink.StartMessage(SERVER_TRUE);
+	fLink.StartMessage(B_OK);
 	fLink.Attach<port_id>(fMessagePort);
 
 	float minWidth, maxWidth, minHeight, maxHeight;

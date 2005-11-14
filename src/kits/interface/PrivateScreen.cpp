@@ -12,6 +12,7 @@
  */
 
 
+#include "AppMisc.h"
 #include "AppServerLink.h"
 #include "PrivateScreen.h"
 #include "ServerProtocol.h"
@@ -47,8 +48,19 @@ using namespace BPrivate;
 BPrivateScreen *
 BPrivateScreen::CheckOut(BWindow *window)
 {
-	// TODO: get screen ID from window!
-	return CheckOut(B_MAIN_SCREEN_ID);
+	screen_id id = B_MAIN_SCREEN_ID;
+
+	if (window != NULL) {
+		BPrivate::AppServerLink link;
+		link.StartMessage(AS_GET_SCREEN_ID_FROM_WINDOW);
+		link.Attach<int32>(_get_object_token_(window));
+
+		status_t status;
+		if (link.FlushWithReply(status) == B_OK && status == B_OK)
+			link.Read<screen_id>(&id);
+	}
+
+	return CheckOut(id);
 }
 
 

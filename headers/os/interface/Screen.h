@@ -85,7 +85,7 @@ private:
         void*			BaseAddress();
         uint32			BytesPerRow();
 
-        BPrivateScreen 	*screen;
+        BPrivateScreen 	*fScreen;
 };
 
 
