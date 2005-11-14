@@ -295,7 +295,27 @@ RootLayer::MoveBy(float x, float y)
 void
 RootLayer::ResizeBy(float x, float y)
 {
-	// TODO: implement
+	if (x == 0 && y == 0)
+		return;
+
+	// TODO: we should be able to update less here
+
+	//BRect previous = fFrame;
+
+	fFrame.right += x;
+	fFrame.bottom += y;
+
+	fFullVisible2.Set(Bounds());
+	fVisible2.Set(Bounds());
+
+	BRegion region(fFrame);
+	MarkForRebuild(region);
+	TriggerRebuild();
+
+	//region.Exclude(previous);
+
+	MarkForRedraw(region);
+	TriggerRedraw();
 }
 
 

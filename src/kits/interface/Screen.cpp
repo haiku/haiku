@@ -1,32 +1,19 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2003-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Screen.cpp
-//	Author:			Stefano Ceccherini (burton666@libero.it)
-//	Description:	BScreen lets you retrieve and change the display settings.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2003-2005, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Stefano Ceccherini (burton666@libero.it)
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+
+/**	BScreen lets you retrieve and change the display settings. */
+
+
+#include "PrivateScreen.h"
+
 #include <Screen.h>
 #include <Window.h>
-
-#include <PrivateScreen.h>
 
 
 /*!	\brief Creates a BScreen object which represents the display with the given screen_id
@@ -37,17 +24,17 @@
 */
 BScreen::BScreen(screen_id id)
 {
-	screen = BPrivateScreen::CheckOut(id);
+	fScreen = BPrivateScreen::CheckOut(id);
 }
 
 
 /*!	\brief Creates a BScreen object which represents the display which contains
 	the given BWindow.
-	\param win A BWindow.
+	\param window A BWindow.
 */
-BScreen::BScreen(BWindow *win)
+BScreen::BScreen(BWindow *window)
 {
-	screen = BPrivateScreen::CheckOut(win);
+	fScreen = BPrivateScreen::CheckOut(window);
 }
 
 
@@ -55,8 +42,8 @@ BScreen::BScreen(BWindow *win)
 */ 
 BScreen::~BScreen()
 {
-	if (screen != NULL)
-		BPrivateScreen::Return(screen);
+	if (fScreen != NULL)
+		BPrivateScreen::Return(fScreen);
 }
 
 
@@ -66,7 +53,7 @@ BScreen::~BScreen()
 bool
 BScreen::IsValid()
 {
-	return (screen != NULL);
+	return fScreen != NULL;
 }
 
 
@@ -76,8 +63,8 @@ BScreen::IsValid()
 status_t
 BScreen::SetToNext()
 {
-	if (screen != NULL)
-		return screen->SetToNext();
+	if (fScreen != NULL)
+		return fScreen->SetToNext();
 	return B_ERROR;
 }
 
@@ -89,8 +76,8 @@ BScreen::SetToNext()
 color_space
 BScreen::ColorSpace()
 {
-	if (screen != NULL)
-		return screen->ColorSpace();
+	if (fScreen != NULL)
+		return fScreen->ColorSpace();
 	return B_NO_COLOR_SPACE;
 }
 
@@ -101,8 +88,8 @@ BScreen::ColorSpace()
 BRect
 BScreen::Frame()
 {
-	if (screen != NULL)
-		return screen->Frame();
+	if (fScreen != NULL)
+		return fScreen->Frame();
 	return BRect(0, 0, 0, 0);	
 }
 
@@ -116,8 +103,8 @@ BScreen::Frame()
 screen_id
 BScreen::ID()
 {
-	if (screen != NULL)
-		return screen->ID();
+	if (fScreen != NULL)
+		return fScreen->ID();
 	return B_MAIN_SCREEN_ID;
 }
 
@@ -128,8 +115,8 @@ BScreen::ID()
 status_t
 BScreen::WaitForRetrace()
 {
-	if (screen != NULL)
-		return screen->WaitForRetrace(B_INFINITE_TIMEOUT);
+	if (fScreen != NULL)
+		return fScreen->WaitForRetrace(B_INFINITE_TIMEOUT);
 	return B_ERROR;
 }
 
@@ -143,8 +130,8 @@ BScreen::WaitForRetrace()
 status_t
 BScreen::WaitForRetrace(bigtime_t timeout)
 {
-	if (screen != NULL)
-		return screen->WaitForRetrace(timeout);
+	if (fScreen != NULL)
+		return fScreen->WaitForRetrace(timeout);
 	return B_ERROR;
 }
 
@@ -160,8 +147,8 @@ BScreen::WaitForRetrace(bigtime_t timeout)
 uint8
 BScreen::IndexForColor(uint8 r, uint8 g, uint8 b, uint8 a)
 {
-	if (screen != NULL)
-		return screen->IndexForColor(r, g, b, a);
+	if (fScreen != NULL)
+		return fScreen->IndexForColor(r, g, b, a);
 	return 0;
 }
 
@@ -173,8 +160,8 @@ BScreen::IndexForColor(uint8 r, uint8 g, uint8 b, uint8 a)
 rgb_color
 BScreen::ColorForIndex(const uint8 index)
 {
-	if (screen != NULL)
-		return screen->ColorForIndex(index);
+	if (fScreen != NULL)
+		return fScreen->ColorForIndex(index);
 	return rgb_color();
 }
 
@@ -186,8 +173,8 @@ BScreen::ColorForIndex(const uint8 index)
 uint8
 BScreen::InvertIndex(uint8 index)
 {
-	if (screen != NULL)
-		return screen->InvertIndex(index);
+	if (fScreen != NULL)
+		return fScreen->InvertIndex(index);
 	return 0;
 }
 
@@ -198,8 +185,8 @@ BScreen::InvertIndex(uint8 index)
 const color_map*
 BScreen::ColorMap()
 {
-	if (screen != NULL)
-		return screen->ColorMap();
+	if (fScreen != NULL)
+		return fScreen->ColorMap();
 	return NULL;
 }
 
@@ -213,8 +200,8 @@ BScreen::ColorMap()
 status_t
 BScreen::GetBitmap(BBitmap **screen_shot, bool draw_cursor, BRect *bound)
 {
-	if (screen != NULL)
-		return screen->GetBitmap(screen_shot, draw_cursor, bound);
+	if (fScreen != NULL)
+		return fScreen->GetBitmap(screen_shot, draw_cursor, bound);
 	return B_ERROR;
 }
 
@@ -231,8 +218,8 @@ BScreen::GetBitmap(BBitmap **screen_shot, bool draw_cursor, BRect *bound)
 status_t
 BScreen::ReadBitmap(BBitmap *buffer, bool draw_cursor, BRect *bound)
 {
-	if (screen != NULL)
-		return screen->ReadBitmap(buffer, draw_cursor, bound);
+	if (fScreen != NULL)
+		return fScreen->ReadBitmap(buffer, draw_cursor, bound);
 	return B_ERROR;
 }
 
@@ -243,8 +230,9 @@ BScreen::ReadBitmap(BBitmap *buffer, bool draw_cursor, BRect *bound)
 rgb_color
 BScreen::DesktopColor()
 {
-	if (screen != NULL)
-		return screen->DesktopColor(B_ALL_WORKSPACES);
+	if (fScreen != NULL)
+		return fScreen->DesktopColor(B_ALL_WORKSPACES);
+
 	return rgb_color();
 }
 
@@ -256,8 +244,9 @@ BScreen::DesktopColor()
 rgb_color
 BScreen::DesktopColor(uint32 workspace)
 {
-	if (screen != NULL)
-		return screen->DesktopColor(workspace);
+	if (fScreen != NULL)
+		return fScreen->DesktopColor(workspace);
+
 	return rgb_color();
 }
 
@@ -269,8 +258,8 @@ BScreen::DesktopColor(uint32 workspace)
 void
 BScreen::SetDesktopColor(rgb_color rgb, bool stick)
 {
-	if (screen != NULL)
-		screen->SetDesktopColor(rgb, B_ALL_WORKSPACES, stick);
+	if (fScreen != NULL)
+		fScreen->SetDesktopColor(rgb, B_ALL_WORKSPACES, stick);
 }
 
 
@@ -282,8 +271,8 @@ BScreen::SetDesktopColor(rgb_color rgb, bool stick)
 void
 BScreen::SetDesktopColor(rgb_color rgb, uint32 index, bool stick)
 {
-	if (screen != NULL)
-		screen->SetDesktopColor(rgb, index, stick);
+	if (fScreen != NULL)
+		fScreen->SetDesktopColor(rgb, index, stick);
 }
 
 
@@ -299,8 +288,8 @@ BScreen::SetDesktopColor(rgb_color rgb, uint32 index, bool stick)
 status_t
 BScreen::ProposeMode(display_mode *target, const display_mode *low, const display_mode *high)
 {
-	if (screen != NULL)
-		return screen->ProposeMode(target, low, high);
+	if (fScreen != NULL)
+		return fScreen->ProposeMode(target, low, high);
 	return B_ERROR;
 }
 
@@ -316,8 +305,8 @@ BScreen::ProposeMode(display_mode *target, const display_mode *low, const displa
 status_t
 BScreen::GetModeList(display_mode **mode_list, uint32 *count)
 {
-	if (screen != NULL)
-		return screen->GetModeList(mode_list, count);
+	if (fScreen != NULL)
+		return fScreen->GetModeList(mode_list, count);
 	return B_ERROR;
 }
 
@@ -330,8 +319,8 @@ BScreen::GetModeList(display_mode **mode_list, uint32 *count)
 status_t
 BScreen::GetMode(display_mode *mode)
 {
-	if (screen != NULL)
-		return screen->GetMode(B_ALL_WORKSPACES, mode);
+	if (fScreen != NULL)
+		return fScreen->GetMode(B_ALL_WORKSPACES, mode);
 	return B_ERROR;
 }
 
@@ -344,8 +333,8 @@ BScreen::GetMode(display_mode *mode)
 status_t
 BScreen::GetMode(uint32 workspace, display_mode *mode)
 {
-	if (screen != NULL)
-		return screen->GetMode(workspace, mode);
+	if (fScreen != NULL)
+		return fScreen->GetMode(workspace, mode);
 	return B_ERROR;
 }
 
@@ -358,8 +347,8 @@ BScreen::GetMode(uint32 workspace, display_mode *mode)
 status_t
 BScreen::SetMode(display_mode *mode, bool makeDefault)
 {
-	if (screen != NULL)
-		return screen->SetMode(B_ALL_WORKSPACES, mode, makeDefault);
+	if (fScreen != NULL)
+		return fScreen->SetMode(B_ALL_WORKSPACES, mode, makeDefault);
 	return B_ERROR;
 }
 
@@ -373,8 +362,8 @@ BScreen::SetMode(display_mode *mode, bool makeDefault)
 status_t
 BScreen::SetMode(uint32 workspace, display_mode *mode, bool makeDefault)
 {
-	if (screen != NULL)
-		return screen->SetMode(workspace, mode, makeDefault);
+	if (fScreen != NULL)
+		return fScreen->SetMode(workspace, mode, makeDefault);
 	return B_ERROR;
 }
 
@@ -386,8 +375,8 @@ BScreen::SetMode(uint32 workspace, display_mode *mode, bool makeDefault)
 status_t
 BScreen::GetDeviceInfo(accelerant_device_info *info)
 {
-	if (screen != NULL)
-		return screen->GetDeviceInfo(info);
+	if (fScreen != NULL)
+		return fScreen->GetDeviceInfo(info);
 	return B_ERROR;
 }
 
@@ -402,8 +391,8 @@ BScreen::GetDeviceInfo(accelerant_device_info *info)
 status_t
 BScreen::GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high)
 {
-	if (screen != NULL)
-		return screen->GetPixelClockLimits(mode, low, high);
+	if (fScreen != NULL)
+		return fScreen->GetPixelClockLimits(mode, low, high);
 	return B_ERROR;
 }
 
@@ -416,8 +405,8 @@ BScreen::GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high)
 status_t
 BScreen::GetTimingConstraints(display_timing_constraints *dtc)
 {
-	if (screen != NULL)
-		return screen->GetTimingConstraints(dtc);
+	if (fScreen != NULL)
+		return fScreen->GetTimingConstraints(dtc);
 	return B_ERROR;
 }
 
@@ -434,8 +423,8 @@ BScreen::GetTimingConstraints(display_timing_constraints *dtc)
 status_t
 BScreen::SetDPMS(uint32 dpms_state)
 {
-	if (screen != NULL)
-		return screen->SetDPMS(dpms_state);
+	if (fScreen != NULL)
+		return fScreen->SetDPMS(dpms_state);
 	return B_ERROR;
 }
 
@@ -445,8 +434,8 @@ BScreen::SetDPMS(uint32 dpms_state)
 uint32
 BScreen::DPMSState()
 {
-	if (screen != NULL)
-		return screen->DPMSState();
+	if (fScreen != NULL)
+		return fScreen->DPMSState();
 	return B_ERROR;
 }
 
@@ -456,8 +445,8 @@ BScreen::DPMSState()
 uint32
 BScreen::DPMSCapabilites()
 {
-	if (screen != NULL)
-		return screen->DPMSCapabilites();
+	if (fScreen != NULL)
+		return fScreen->DPMSCapabilites();
 	return B_ERROR;
 }
 
@@ -468,7 +457,7 @@ BScreen::DPMSCapabilites()
 BPrivateScreen*
 BScreen::private_screen()
 {
-	return screen;
+	return fScreen;
 }
 
 
@@ -503,8 +492,8 @@ BScreen::BScreen(const BScreen &screen)
 void*
 BScreen::BaseAddress()
 {
-	if (screen != NULL)
-		return screen->BaseAddress();
+	if (fScreen != NULL)
+		return fScreen->BaseAddress();
 	return NULL;
 }
 
@@ -514,7 +503,7 @@ BScreen::BaseAddress()
 uint32
 BScreen::BytesPerRow()
 {
-	if (screen != NULL)
-		return screen->BytesPerRow();
+	if (fScreen != NULL)
+		return fScreen->BytesPerRow();
 	return 0;
 }

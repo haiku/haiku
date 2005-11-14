@@ -2000,9 +2000,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// actually this isn't still enough as different workspaces can
 			// have different display_modes
 
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Attach<display_mode>(mode);
-			fLink.Attach<status_t>(B_OK);
 			fLink.Flush();
 			break;
 		}
@@ -2030,11 +2029,17 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 // TODO: lock RootLayer, set mode and tell it to update it's frame and all clipping
 // optionally put this into a message and let the root layer thread handle it.
-//			status_t ret = fDesktop->ScreenAt(0)->SetMode(mode);
-			status_t ret = B_ERROR;
+			RootLayer* rootLayer = fDesktop->ActiveRootLayer();
+			rootLayer->Lock();
+			status_t status = fDesktop->ScreenAt(0)->SetMode(mode);
+			if (status == B_OK) {
+				BRect bounds = rootLayer->Bounds();
+				rootLayer->ResizeBy(mode.virtual_width - 1 - bounds.Width(),
+					mode.virtual_height - 1 - bounds.Height());
+			}
+			rootLayer->Unlock();
 
-			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<status_t>(ret);
+			fLink.StartMessage(status);
 			fLink.Flush();
 			break;
 		}
@@ -2050,16 +2055,20 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<display_mode>(&low);
 			link.Read<display_mode>(&high);
 			status_t status = fDesktop->GetHWInterface()->ProposeMode(&target, &low, &high);
-			// TODO: We always return SERVER_TRUE and put the real
-			// error code in the message. FIX this.
-			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<display_mode>(target);
-			fLink.Attach<status_t>(status);
+
+			// ProposeMode() returns B_BAD_VALUE to hint that the candidate is
+			// not within the given limits (but is supported)
+			if (status == B_OK || status == B_BAD_VALUE) {
+				fLink.StartMessage(B_OK);
+				fLink.Attach<display_mode>(target);
+				fLink.Attach<bool>(status == B_OK);
+			} else
+				fLink.StartMessage(status);
+
 			fLink.Flush();
-						
 			break;
 		}
-		
+
 		case AS_GET_MODE_LIST:
 		{
 			screen_id id;
@@ -2068,14 +2077,15 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			display_mode* modeList;
 			uint32 count;
-			if (fDesktop->GetHWInterface()->GetModeList(&modeList, &count) == B_OK) {
-				fLink.StartMessage(SERVER_TRUE);
+			status_t status = fDesktop->GetHWInterface()->GetModeList(&modeList, &count);
+			if (status == B_OK) {
+				fLink.StartMessage(B_OK);
 				fLink.Attach<uint32>(count);
 				fLink.Attach(modeList, sizeof(display_mode) * count);
 
 				delete[] modeList;
 			} else
-				fLink.StartMessage(SERVER_FALSE);
+				fLink.StartMessage(status);
 
 			fLink.Flush();
 			break;
@@ -2087,14 +2097,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			screen_id id;
 			link.Read<screen_id>(&id);
-			
+
 			const color_map *colorMap = SystemColorMap();
 			if (colorMap != NULL) {
-				fLink.StartMessage(SERVER_TRUE);
+				fLink.StartMessage(B_OK);
 				fLink.Attach<color_map>(*colorMap);
 			} else 
-				fLink.StartMessage(SERVER_FALSE);
-			
+				fLink.StartMessage(B_ERROR);
+
 			fLink.Flush();
 			break;
 		}
@@ -2103,82 +2113,89 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			STRACE(("ServerApp %s: get desktop color\n", Signature()));
 
-			uint32 workspaceIndex = 0;
+			uint32 workspaceIndex;
 			link.Read<uint32>(&workspaceIndex);
-
-			// ToDo: for some reason, we currently get "1" as no. of workspace
-			workspaceIndex = 0;
 
 			// ToDo: locking is probably wrong - why the hell is there no (safe)
 			//		way to get to the workspace object directly?
 			RootLayer *root = fDesktop->ActiveRootLayer();
 			root->Lock();
 
-			Workspace *workspace = root->WorkspaceAt(workspaceIndex);
+			Workspace *workspace;
+
+			// we're nice to our children (and also take the default case
+			// into account which asks for the current workspace)
+			if (workspaceIndex > (uint32)root->WorkspaceCount())
+				workspace = root->ActiveWorkspace();
+			else
+				workspace = root->WorkspaceAt(workspaceIndex);
+
 			if (workspace != NULL) {
-				fLink.StartMessage(SERVER_TRUE);
+				fLink.StartMessage(B_OK);
 				fLink.Attach<rgb_color>(workspace->BGColor().GetColor32());
 			} else
-				fLink.StartMessage(SERVER_FALSE);
+				fLink.StartMessage(B_ERROR);
 
 			fLink.Flush();
 			root->Unlock();
 			break;
 		}
-		
+
 		case AS_GET_ACCELERANT_INFO:
 		{
 			STRACE(("ServerApp %s: get accelerant info\n", Signature()));
-			
+
 			// We aren't using the screen_id for now...
 			screen_id id;
 			link.Read<screen_id>(&id);
-			
+
 			accelerant_device_info accelerantInfo;
 			// TODO: I wonder if there should be a "desktop" lock...
-			if (fDesktop->GetHWInterface()->GetDeviceInfo(&accelerantInfo) == B_OK) {
-				fLink.StartMessage(SERVER_TRUE);
+			status_t status = fDesktop->GetHWInterface()->GetDeviceInfo(&accelerantInfo);
+			if (status == B_OK) {
+				fLink.StartMessage(B_OK);
 				fLink.Attach<accelerant_device_info>(accelerantInfo);
 			} else
-				fLink.StartMessage(SERVER_FALSE);
-			
+				fLink.StartMessage(status);
+
 			fLink.Flush();
 			break;
 		}
-		
+
 		case AS_GET_RETRACE_SEMAPHORE:
 		{
 			STRACE(("ServerApp %s: get retrace semaphore\n", Signature()));
-			
+
 			// We aren't using the screen_id for now...
 			screen_id id;
 			link.Read<screen_id>(&id);
-			
+
 			sem_id semaphore = fDesktop->GetHWInterface()->RetraceSemaphore();
-			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<sem_id>(semaphore);
+			fLink.StartMessage(semaphore);
 			fLink.Flush();
 			break;
 		}
-		
+
 		case AS_GET_TIMING_CONSTRAINTS:
 		{
 			STRACE(("ServerApp %s: get timing constraints\n", Signature()));
 			// We aren't using the screen_id for now...
 			screen_id id;
 			link.Read<screen_id>(&id);
-			
+
 			display_timing_constraints constraints;
-			if (fDesktop->GetHWInterface()->GetTimingConstraints(&constraints) == B_OK) {
-				fLink.StartMessage(SERVER_TRUE);
+			status_t status = fDesktop->GetHWInterface()->GetTimingConstraints(
+				&constraints);
+			if (status == B_OK) {
+				fLink.StartMessage(B_OK);
 				fLink.Attach<display_timing_constraints>(constraints);
 			} else
-				fLink.StartMessage(SERVER_FALSE);
-			
+				fLink.StartMessage(status);
+
 			fLink.Flush();
 			break;
 		}
-		
+
 		case AS_GET_PIXEL_CLOCK_LIMITS:
 		{
 			STRACE(("ServerApp %s: get pixel clock limits\n", Signature()));
@@ -2187,87 +2204,87 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<screen_id>(&id);
 			display_mode mode;
 			link.Read<display_mode>(&mode);
-			
+
 			uint32 low, high;
-			if (fDesktop->GetHWInterface()->GetPixelClockLimits(&mode, &low, &high) == B_OK) {
-				fLink.StartMessage(SERVER_TRUE);
+			status_t status = fDesktop->GetHWInterface()->GetPixelClockLimits(&mode,
+				&low, &high);
+			if (status == B_OK) {
+				fLink.StartMessage(B_OK);
 				fLink.Attach<uint32>(low);
 				fLink.Attach<uint32>(high);
 			} else
-				fLink.StartMessage(SERVER_FALSE);
-			
+				fLink.StartMessage(status);
+
 			fLink.Flush();
 			break;
 		}
-		
+
 		case AS_SET_DPMS:
 		{
 			STRACE(("ServerApp %s: AS_SET_DPMS\n", Signature()));
 			screen_id id;
 			link.Read<screen_id>(&id);
-			
+
 			uint32 mode;
 			link.Read<uint32>(&mode);
-			
-			if (fDesktop->GetHWInterface()->SetDPMSMode(mode) == B_OK)
-				fLink.StartMessage(SERVER_TRUE);
-			else
-				fLink.StartMessage(SERVER_FALSE);
-			
+
+			status_t status = fDesktop->GetHWInterface()->SetDPMSMode(mode);
+			fLink.StartMessage(status);
+
 			fLink.Flush();
 			break;
 		}
-		
+
 		case AS_GET_DPMS_STATE:
 		{
 			STRACE(("ServerApp %s: AS_GET_DPMS_STATE\n", Signature()));
-			
+
 			screen_id id;
 			link.Read<screen_id>(&id);
-			
+
 			uint32 state = fDesktop->GetHWInterface()->DPMSMode();
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Attach<uint32>(state);
 			fLink.Flush();
 			break;
 		}
-				
+
 		case AS_GET_DPMS_CAPABILITIES:
 		{
 			STRACE(("ServerApp %s: AS_GET_DPMS_CAPABILITIES\n", Signature()));
 			screen_id id;
 			link.Read<screen_id>(&id);
-			
+
 			uint32 capabilities = fDesktop->GetHWInterface()->DPMSCapabilities();
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Attach<uint32>(capabilities);
 			fLink.Flush();
 			break;
 		}
-		
+
 		case AS_READ_BITMAP:
 		{
 			STRACE(("ServerApp %s: AS_READ_BITMAP\n", Signature()));
 			int32 bitmapToken;
 			link.Read<int32>(&bitmapToken);
-			
+
 			bool drawCursor = true;
 			link.Read<bool>(&drawCursor);
-			
+
 			BRect bounds;
 			link.Read<BRect>(&bounds);
-			
+
 			ServerBitmap *bitmap = FindBitmap(bitmapToken);
 			if (bitmap != NULL) {
-				fLink.StartMessage(SERVER_TRUE);
+				fLink.StartMessage(B_OK);
 				// TODO: Implement for real
 			} else
-				fLink.StartMessage(SERVER_FALSE);
-			
+				fLink.StartMessage(B_BAD_VALUE);
+
 			fLink.Flush();
 			break;
 		}
-			
+
 		default:
 			printf("ServerApp %s received unhandled message code %ld\n",
 				Signature(), code);
