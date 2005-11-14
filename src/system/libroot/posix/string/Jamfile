@@ -35,6 +35,7 @@ KernelMergeObject posix_string.o :
 	strspn.c
 	strstr.c
 	strtok.c
+	strxfrm.c
 
 	: -fPIC -DPIC
 	;
