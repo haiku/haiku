@@ -1,16 +1,13 @@
-//------------------------------------------------------------------------------
-//
-// Copyright 2005, Haiku, Inc.
-// Distributed under the terms of the MIT License.
-//
-//
-//	File Name:		ViewHWInterface.h
-//	Author:			Stephan Aßmus <superstippi@gmx.de>
-//	Description:	BView/BWindow combination HWInterface implementation
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
 #ifndef VIEW_GRAPHICS_CARD_H
 #define VIEW_GRAPHICS_CARD_H
+
 
 #include "HWInterface.h"
 
@@ -18,6 +15,7 @@ class BBitmap;
 class BBitmapBuffer;
 class CardWindow;
 class UpdateQueue;
+
 
 class ViewHWInterface : public HWInterface {
  public:
@@ -30,8 +28,9 @@ class ViewHWInterface : public HWInterface {
 	virtual	status_t			SetMode(const display_mode &mode);
 	virtual	void				GetMode(display_mode *mode);
 
-
 	virtual status_t			GetDeviceInfo(accelerant_device_info *info);
+	virtual status_t			GetFrameBufferConfig(frame_buffer_config& config);
+
 	virtual status_t			GetModeList(display_mode **mode_list,
 											uint32 *count);
 	virtual status_t			GetPixelClockLimits(display_mode *mode,

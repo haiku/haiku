@@ -24,7 +24,7 @@
 */
 BScreen::BScreen(screen_id id)
 {
-	fScreen = BPrivateScreen::CheckOut(id);
+	fScreen = BPrivateScreen::Get(id);
 }
 
 
@@ -34,7 +34,7 @@ BScreen::BScreen(screen_id id)
 */
 BScreen::BScreen(BWindow *window)
 {
-	fScreen = BPrivateScreen::CheckOut(window);
+	fScreen = BPrivateScreen::Get(window);
 }
 
 
@@ -42,8 +42,7 @@ BScreen::BScreen(BWindow *window)
 */ 
 BScreen::~BScreen()
 {
-	if (fScreen != NULL)
-		BPrivateScreen::Return(fScreen);
+	BPrivateScreen::Put(fScreen);
 }
 
 
@@ -53,7 +52,7 @@ BScreen::~BScreen()
 bool
 BScreen::IsValid()
 {
-	return fScreen != NULL;
+	return fScreen != NULL && fScreen->IsValid();
 }
 
 
@@ -63,8 +62,13 @@ BScreen::IsValid()
 status_t
 BScreen::SetToNext()
 {
-	if (fScreen != NULL)
-		return fScreen->SetToNext();
+	if (fScreen != NULL) {
+		BPrivateScreen* screen = BPrivateScreen::GetNext(fScreen);
+		if (screen != NULL) {
+			fScreen = screen;
+			return B_OK;
+		}
+	}
 	return B_ERROR;
 }
 

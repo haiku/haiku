@@ -1980,6 +1980,34 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		/* screen commands */
 
+		case AS_VALID_SCREEN_ID:
+		{
+			// Attached data
+			// 1) screen_id screen
+			screen_id id;
+			if (link.Read<screen_id>(&id) == B_OK
+				&& id.id == B_MAIN_SCREEN_ID.id)
+				fLink.StartMessage(B_OK);
+			else
+				fLink.StartMessage(B_ERROR);
+
+			fLink.Flush();
+			break;
+		}
+
+		case AS_GET_NEXT_SCREEN_ID:
+		{
+			// Attached data
+			// 1) screen_id screen
+			screen_id id;
+			link.Read<screen_id>(&id);
+
+			// TODO: for now, just say we're the last one
+			fLink.StartMessage(B_ENTRY_NOT_FOUND);
+			fLink.Flush();
+			break;
+		}
+
 		case AS_GET_SCREEN_ID_FROM_WINDOW:
 		{
 			status_t status = B_ENTRY_NOT_FOUND;
@@ -2186,6 +2214,27 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (status == B_OK) {
 				fLink.StartMessage(B_OK);
 				fLink.Attach<accelerant_device_info>(accelerantInfo);
+			} else
+				fLink.StartMessage(status);
+
+			fLink.Flush();
+			break;
+		}
+
+		case AS_GET_FRAME_BUFFER_CONFIG:
+		{
+			STRACE(("ServerApp %s: get frame buffer config\n", Signature()));
+
+			// We aren't using the screen_id for now...
+			screen_id id;
+			link.Read<screen_id>(&id);
+
+			frame_buffer_config config;
+			// TODO: I wonder if there should be a "desktop" lock...
+			status_t status = fDesktop->GetHWInterface()->GetFrameBufferConfig(config);
+			if (status == B_OK) {
+				fLink.StartMessage(B_OK);
+				fLink.Attach<frame_buffer_config>(config);
 			} else
 				fLink.StartMessage(status);
 

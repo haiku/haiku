@@ -12,8 +12,9 @@
 
 #include <Accelerant.h>
 #include <GraphicsDefs.h>
+#include <ObjectList.h>
+#include <Rect.h>
 
-struct screen_desc;
 struct color_map;
 struct display_mode;
 struct display_timing_constraints;
@@ -26,15 +27,17 @@ class BPrivateScreen {
 	// Constructor and destructor are private. Use the static methods
 	// CheckOut() and Return() instead.
 	public:
-		static BPrivateScreen* CheckOut(BWindow *window);
-		static BPrivateScreen* CheckOut(screen_id id);
-		static void Return(BPrivateScreen *screen);
+		static BPrivateScreen* Get(BWindow *window);
+		static BPrivateScreen* Get(screen_id id);
+		static void Put(BPrivateScreen *screen);
 
-		status_t SetToNext();
+		static BPrivateScreen* GetNext(BPrivateScreen* screen);
 
+		bool IsValid() const;
 		color_space ColorSpace();
 		BRect Frame();
-		screen_id ID();
+		screen_id ID() const { return fID; }
+		status_t GetNextID(screen_id& id);
 
 		status_t WaitForRetrace(bigtime_t timeout);
 
@@ -68,18 +71,29 @@ class BPrivateScreen {
 		void* BaseAddress();
 		uint32 BytesPerRow();
 
-		status_t get_screen_desc(screen_desc *desc);
+	private:
+		friend class BObjectList<BPrivateScreen>;
 
-	private:	
-		BPrivateScreen();
+		BPrivateScreen(screen_id id);
 		~BPrivateScreen();
 
+		void _Acquire() { fRefCount++; }
+		bool _Release() { return --fRefCount == 0; }
+
 		sem_id _RetraceSemaphore();
+		status_t _GetFrameBufferConfig(frame_buffer_config& config);
+
+		static BPrivateScreen* _Get(screen_id id, bool check);
+		static bool _IsValid(screen_id id);
 
 	private:
-		color_map *fColorMap;
-		sem_id fRetraceSem;
-		bool fOwnsColorMap;
+		screen_id	fID;
+		int32		fRefCount;
+		color_map*	fColorMap;
+		sem_id		fRetraceSem;
+		bool		fOwnsColorMap;
+		BRect		fFrame;
+		bigtime_t	fLastUpdate;
 };
 
 #endif // _PRIVATE_SCREEN_H_

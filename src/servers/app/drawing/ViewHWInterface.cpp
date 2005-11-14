@@ -572,21 +572,34 @@ ViewHWInterface::GetDeviceInfo(accelerant_device_info *info)
 	// We really don't have to provide anything here because this is strictly
 	// a software-only driver, but we'll have some fun, anyway.
 	if (ReadLock()) {
-
-		info->version=100;
-		sprintf(info->name,"Haiku, Inc. ViewHWInterface");
-		sprintf(info->chipset,"Haiku, Inc. Chipset");
-		sprintf(info->serial_no,"3.14159265358979323846");
-		info->memory=134217728;	// 128 MB, not that we really have that much. :)
-		info->dac_speed=0xFFFFFFFF;	// *heh*
+		info->version = 100;
+		sprintf(info->name, "Haiku, Inc. ViewHWInterface");
+		sprintf(info->chipset, "Haiku, Inc. Chipset");
+		sprintf(info->serial_no, "3.14159265358979323846");
+		info->memory = 134217728;	// 128 MB, not that we really have that much. :)
+		info->dac_speed = 0xFFFFFFFF;	// *heh*
 
 		ReadUnlock();
 	}
-	
+
 	return B_OK;
 }
 
-// GetModeList
+
+status_t
+ViewHWInterface::GetFrameBufferConfig(frame_buffer_config& config)
+{
+	if (fFrontBuffer == NULL)
+		return B_ERROR;
+
+	config.frame_buffer = fFrontBuffer->Bits();
+	config.frame_buffer_dma = NULL;
+	config.bytes_per_row = fFrontBuffer->BytesPerRow();
+
+	return B_OK;
+}
+
+
 status_t
 ViewHWInterface::GetModeList(display_mode **_modes, uint32 *_count)
 {

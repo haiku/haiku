@@ -40,6 +40,7 @@ class HWInterface : public MultiLocker {
 	virtual	void				GetMode(display_mode *mode) = 0;
 
 	virtual status_t			GetDeviceInfo(accelerant_device_info *info) = 0;
+	virtual status_t			GetFrameBufferConfig(frame_buffer_config& config) = 0;
 	virtual status_t			GetModeList(display_mode **mode_list,
 											uint32 *count) = 0;
 	virtual status_t			GetPixelClockLimits(display_mode *mode,

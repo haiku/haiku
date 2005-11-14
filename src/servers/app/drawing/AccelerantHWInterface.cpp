@@ -1,16 +1,14 @@
-//------------------------------------------------------------------------------
-//
-// Copyright 2002-2005, Haiku, Inc. All rights reserved.
-// Distributed under the terms of the MIT License.
-//
-//
-//	File Name:		AccelerantHWInterface.cpp
-//	Authors:		Michael Lotz <mmlr@mlotz.ch>
-//					DarkWyrm <bpmagic@columbus.rr.com>
-//					Stephan Aßmus <superstippi@gmx.de>
-//	Description:	Accelerant based HWInterface implementation
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Michael Lotz <mmlr@mlotz.ch>
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
+
+/**	Accelerant based HWInterface implementation */
 
 #include <new>
 #include <stdio.h>
@@ -479,7 +477,7 @@ AccelerantHWInterface::_UpdateFrameBufferConfig()
 	return B_OK;
 }
 
-// GetDeviceInfo
+
 status_t
 AccelerantHWInterface::GetDeviceInfo(accelerant_device_info *info)
 {
@@ -492,7 +490,15 @@ AccelerantHWInterface::GetDeviceInfo(accelerant_device_info *info)
 	return GetAccelerantDeviceInfo(info);
 }
 
-// GetModeList
+
+status_t
+AccelerantHWInterface::GetFrameBufferConfig(frame_buffer_config& config)
+{
+	config = fFrameBufferConfig;
+	return B_OK;
+}
+
+
 status_t
 AccelerantHWInterface::GetModeList(display_mode** modes, uint32 *count)
 {

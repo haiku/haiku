@@ -20,6 +20,7 @@
 #include <Autolock.h>
 #include <Bitmap.h>
 #include <Locker.h>
+#include <ObjectList.h>
 #include <Window.h>
 
 #include <new>
@@ -27,17 +28,7 @@
 #include <stdlib.h>
 
 
-// TODO: We should define this somewhere else
-// We could find how R5 defines this, though it's not strictly necessary
-// AFAIK, R5 here keeps also the screen width, height, colorspace, and some other things
-// (it's 48 bytes big)
-struct screen_desc {
-	void *base_address;
-	uint32 bytes_per_row;
-};
-
-
-static BPrivateScreen *sScreen;
+static BObjectList<BPrivateScreen> sScreens(2, true);
 
 // used to synchronize creation/deletion of the sScreen object
 static BLocker sScreenLock("screen lock");
@@ -46,7 +37,7 @@ static BLocker sScreenLock("screen lock");
 using namespace BPrivate;
 
 BPrivateScreen *
-BPrivateScreen::CheckOut(BWindow *window)
+BPrivateScreen::Get(BWindow *window)
 {
 	screen_id id = B_MAIN_SCREEN_ID;
 
@@ -60,49 +51,112 @@ BPrivateScreen::CheckOut(BWindow *window)
 			link.Read<screen_id>(&id);
 	}
 
-	return CheckOut(id);
+	return _Get(id, false);
 }
 
 
 BPrivateScreen *
-BPrivateScreen::CheckOut(screen_id id)
+BPrivateScreen::Get(screen_id id)
+{
+	return _Get(id, true);
+}
+
+
+BPrivateScreen *
+BPrivateScreen::_Get(screen_id id, bool check)
 {
 	BAutolock locker(sScreenLock);
 
-	if (sScreen == NULL) {
-		// TODO: If we start supporting multiple monitors, we
-		// should return the right object for the given screen_id
-		sScreen = new BPrivateScreen();
+	// search for the screen ID
+
+	for (int32 i = sScreens.CountItems(); i-- > 0;) {
+		BPrivateScreen* screen = sScreens.ItemAt(i);
+
+		if (screen->ID().id == id.id) {
+			screen->_Acquire();
+			return screen;
+		}
 	}
 
-	return sScreen;
+	if (check) {
+		// check if ID is valid
+		if (!_IsValid(id))
+			return NULL;
+	}
+
+	// we need to allocate a new one
+
+	BPrivateScreen* screen = new (std::nothrow) BPrivateScreen(id);
+	if (screen == NULL)
+		return NULL;
+
+	sScreens.AddItem(screen);
+	return screen;
 }
 
 
 void
-BPrivateScreen::Return(BPrivateScreen *screen)
+BPrivateScreen::Put(BPrivateScreen* screen)
 {
-	// Never delete the sScreen object.
-	// system_colors() expects the colormap to be 
-	// permanently stored within libbe.
+	if (screen == NULL)
+		return;
+
+	BAutolock locker(sScreenLock);
+
+	if (screen->_Release()) {
+		if (screen->ID().id != B_MAIN_SCREEN_ID.id) {
+			// we always keep the main screen object around - it will
+			// never go away, even if you disconnect all monitors.
+			sScreens.RemoveItem(screen);
+		}
+	}
 }
 
 
-status_t
-BPrivateScreen::SetToNext()
+BPrivateScreen*
+BPrivateScreen::GetNext(BPrivateScreen* screen)
 {
-	// This function always returns B_ERROR
-	return B_ERROR;
+	BAutolock locker(sScreenLock);
+
+	screen_id id;
+	status_t status = screen->GetNextID(id);
+	if (status < B_OK)
+		return NULL;
+
+	BPrivateScreen* nextScreen = Get(id);
+	if (nextScreen == NULL)
+		return NULL;
+
+	Put(screen);
+	return nextScreen;
 }
 
-	
+
+bool
+BPrivateScreen::_IsValid(screen_id id)
+{
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_VALID_SCREEN_ID);
+	link.Attach<screen_id>(id);
+
+	status_t status;
+	if (link.FlushWithReply(status) != B_OK || status < B_OK)
+		return false;
+
+	return true;
+}
+
+
+//	#pragma mark -
+
+
 color_space
 BPrivateScreen::ColorSpace()
 {
 	display_mode mode;
 	if (GetMode(B_CURRENT_WORKSPACE, &mode) == B_OK)
 		return (color_space)mode.space;
-		
+
 	return B_NO_COLOR_SPACE;
 }
 
@@ -111,20 +165,42 @@ BRect
 BPrivateScreen::Frame()
 {
 	// If something goes wrong, we just return this rectangle.
-	BRect rect(0, 0, 0, 0);
-	display_mode mode;
-	if (GetMode(B_CURRENT_WORKSPACE, &mode) == B_OK)
-		rect.Set(0, 0, (float)mode.virtual_width - 1, (float)mode.virtual_height - 1);
-		
-	return rect;
+
+	if (system_time() > fLastUpdate + 100000) {
+		// invalidate the settings after 0.1 secs
+		display_mode mode;
+		if (GetMode(B_CURRENT_WORKSPACE, &mode) == B_OK) {
+			fFrame.Set(0, 0, (float)mode.virtual_width - 1,
+				(float)mode.virtual_height - 1);
+			fLastUpdate = system_time();
+		}
+	}
+
+	return fFrame;
 }
 
 
-screen_id 
-BPrivateScreen::ID()
+bool
+BPrivateScreen::IsValid() const
 {
-	// TODO: Change this if we start supporting multiple screens
-	return B_MAIN_SCREEN_ID;
+	return BPrivateScreen::_IsValid(ID());
+}
+
+
+status_t
+BPrivateScreen::GetNextID(screen_id& id)
+{
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_GET_NEXT_SCREEN_ID);
+	link.Attach<screen_id>(ID());
+
+	status_t status;
+	if (link.FlushWithReply(status) == B_OK && status == B_OK) {
+		link.Read<screen_id>(&id);
+		return B_OK;
+	}
+
+	return status;
 }
 
 
@@ -188,7 +264,7 @@ BPrivateScreen::ColorMap()
 {
 	if (fColorMap == NULL) {
 		BAutolock locker(sScreenLock);
-		
+
 		if (fColorMap != NULL) {
 			// someone could have been faster than us
 			return fColorMap;
@@ -512,42 +588,25 @@ BPrivateScreen::DPMSCapabilites()
 void *
 BPrivateScreen::BaseAddress()
 {
-	screen_desc desc;
-	if (get_screen_desc(&desc) == B_OK)
-		return desc.base_address;
+	frame_buffer_config config;
+	if (_GetFrameBufferConfig(config) != B_OK)
+		return NULL;
 
-	return NULL;
+	return config.frame_buffer;
 }
 
 
 uint32
 BPrivateScreen::BytesPerRow()
 {
-	screen_desc desc;
-	if (get_screen_desc(&desc) == B_OK)
-		return desc.bytes_per_row;
+	frame_buffer_config config;
+	if (_GetFrameBufferConfig(config) != B_OK)
+		return 0;
 
-	return 0;
+	return config.bytes_per_row;
 }
 
 	
-status_t
-BPrivateScreen::get_screen_desc(screen_desc *desc)
-{
-	status_t status = B_ERROR;
-	/*
-	BPrivate::AppServerLink link;
-	PortMessage reply;
-	link.SetOpCode(AS_GET_SCREEN_DESC);
-	link.Attach<screen_id>(ID());
-	link.FlushWithReply(&reply);
-	reply.Read<screen_desc>(*desc);
-	reply.Read<status_t>(&status);
-	*/
-	return status;
-}
-
-
 // #pragma mark - private methods
 
 
@@ -565,11 +624,31 @@ BPrivateScreen::_RetraceSemaphore()
 }
 
 
-BPrivateScreen::BPrivateScreen()
+status_t
+BPrivateScreen::_GetFrameBufferConfig(frame_buffer_config& config)
+{
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_GET_FRAME_BUFFER_CONFIG);
+	link.Attach<screen_id>(ID());
+
+	status_t status = B_ERROR;
+	if (link.FlushWithReply(status) == B_OK && status == B_OK) {
+		link.Read<frame_buffer_config>(&config);
+		return B_OK;
+	}
+
+	return status;
+}
+
+
+BPrivateScreen::BPrivateScreen(screen_id id)
 	:
+	fID(id),
 	fColorMap(NULL),
 	fRetraceSem(-1),
-	fOwnsColorMap(false)
+	fOwnsColorMap(false),
+	fFrame(0, 0, 0, 0),
+	fLastUpdate(0)
 {
 }
 

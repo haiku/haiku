@@ -1,16 +1,13 @@
-//------------------------------------------------------------------------------
-//
-// Copyright 2002-2005, Haiku, Inc. All rights reserved.
-// Distributed under the terms of the MIT License.
-//
-//
-//	File Name:		BitmapHWInterface.cpp
-//	Authors:		Michael Lotz <mmlr@mlotz.ch>
-//					DarkWyrm <bpmagic@columbus.rr.com>
-//					Stephan Aßmus <superstippi@gmx.de>
-//	Description:	Accelerant based HWInterface implementation
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2002-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Michael Lotz <mmlr@mlotz.ch>
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
+
 
 #include <new>
 #include <stdio.h>
@@ -24,7 +21,7 @@
 
 using std::nothrow;
 
-// constructor
+
 BitmapHWInterface::BitmapHWInterface(ServerBitmap* bitmap)
 	: HWInterface(),
 	  fBackBuffer(NULL),
@@ -32,14 +29,14 @@ BitmapHWInterface::BitmapHWInterface(ServerBitmap* bitmap)
 {
 }
 
-// destructor
+
 BitmapHWInterface::~BitmapHWInterface()
 {
 	delete fBackBuffer;
 	delete fFrontBuffer;
 }
 
-// Initialize
+
 status_t
 BitmapHWInterface::Initialize()
 {
@@ -54,9 +51,8 @@ BitmapHWInterface::Initialize()
 // TODO: Remove once unnecessary...
 	// fall back to double buffered mode until Painter knows how
 	// to draw onto non 32-bit surfaces...
-	if (fFrontBuffer->ColorSpace() != B_RGB32 &&
-		fFrontBuffer->ColorSpace() != B_RGBA32) {
-
+	if (fFrontBuffer->ColorSpace() != B_RGB32
+		&& fFrontBuffer->ColorSpace() != B_RGBA32) {
 		BBitmap* backBitmap = new BBitmap(fFrontBuffer->Bounds(),
 										  B_BITMAP_NO_SERVER_LINK,
 										  B_RGBA32);
@@ -80,21 +76,21 @@ BitmapHWInterface::Initialize()
 	return ret;
 }
 
-// Shutdown
+
 status_t
 BitmapHWInterface::Shutdown()
 {
 	return B_OK;
 }
 
-// SetMode
+
 status_t
 BitmapHWInterface::SetMode(const display_mode &mode)
 {
 	return B_UNSUPPORTED;
 }
 
-// GetMode
+
 void
 BitmapHWInterface::GetMode(display_mode *mode)
 {
@@ -103,14 +99,21 @@ BitmapHWInterface::GetMode(display_mode *mode)
 	}
 }
 
-// GetDeviceInfo
+
 status_t
 BitmapHWInterface::GetDeviceInfo(accelerant_device_info *info)
 {
 	return B_UNSUPPORTED;
 }
 
-// GetModeList
+
+status_t
+BitmapHWInterface::GetFrameBufferConfig(frame_buffer_config& config)
+{
+	return B_UNSUPPORTED;
+}
+
+
 status_t
 BitmapHWInterface::GetModeList(display_mode** modes, uint32 *count)
 {
