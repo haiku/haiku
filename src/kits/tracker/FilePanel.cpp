@@ -50,6 +50,10 @@ extern "C" _IMPEXP_ROOT int _kset_fd_limit_(int num);
 #undef _IMPEXP_ROOT
 #endif
 
+// these two calls are deprecated
+extern _IMPEXP_TRACKER void run_open_panel();
+extern _IMPEXP_TRACKER void run_save_panel();
+
 void
 run_open_panel()
 {
