@@ -1481,9 +1481,7 @@ Layer::_ReserveRegions(BRegion &reg)
 void
 Layer::_ClearVisibleRegions()
 {
-	// OPT: maybe we should uncomment these lines for performance
-	//if (fFullVisible.CountRects() <= 0)
-	//	return;
+	fDrawingRegion.MakeEmpty();
 
 	fVisible.MakeEmpty();
 	fFullVisible.MakeEmpty();
