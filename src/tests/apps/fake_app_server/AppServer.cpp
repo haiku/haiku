@@ -382,13 +382,13 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 			team_id	clientTeamID = -1;
 			port_id	clientLooperPort = -1;
 			port_id clientReplyPort = -1;
-			int32 htoken = B_NULL_TOKEN;
+			int32 clientToken;
 			char *appSignature = NULL;
 
 			msg.Read<port_id>(&clientReplyPort);
 			msg.Read<port_id>(&clientLooperPort);
 			msg.Read<team_id>(&clientTeamID);
-			msg.Read<int32>(&htoken);
+			msg.Read<int32>(&clientToken);
 			if (msg.ReadString(&appSignature) != B_OK)
 				break;
 
@@ -409,7 +409,7 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 			acquire_sem(fAppListLock);
 
 			ServerApp *app = new ServerApp(clientReplyPort, serverListen, clientLooperPort,
-				clientTeamID, htoken, appSignature);
+				clientTeamID, clientToken, appSignature);
 
 			// add the new ServerApp to the known list of ServerApps
 			fAppList->AddItem(app);
