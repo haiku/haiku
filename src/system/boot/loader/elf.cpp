@@ -213,18 +213,36 @@ elf_load_image(int fd, preloaded_image *image)
 			region->start, region->size, region->delta));
 	}
 
+	// get the segment order
+	elf_region *firstRegion;
+	elf_region *secondRegion;
+	if (image->text_region.start < image->data_region.start) {
+		firstRegion = &image->text_region;
+		secondRegion = &image->data_region;
+	} else {
+		firstRegion = &image->data_region;
+		secondRegion = &image->text_region;
+	}
+
+	// Check whether the segments have an unreasonable amount of unused space
+	// inbetween.
+	totalSize = secondRegion->start + secondRegion->size - firstRegion->start;
+	if (totalSize > image->text_region.size + image->data_region.size
+		+ 8 * 1024) {
+		status = B_BAD_DATA;
+		goto error1;
+	}
+
 	// if image->text_region.start == NULL (image is relocatable), 
 	// platform_allocate_region() automatically allocates an address
-	totalSize = image->text_region.size + image->data_region.size;
-	if (platform_allocate_region((void **)&image->text_region.start, totalSize,
+	if (platform_allocate_region((void **)&firstRegion->start, totalSize,
 			B_READ_AREA | B_WRITE_AREA) < B_OK) {
 		status = B_NO_MEMORY;
 		goto error1;
 	}
 
 	// initialize the region pointers to the allocated region
-	// (text region comes first)
-	image->data_region.start = image->text_region.start + image->text_region.size;
+	secondRegion->start += firstRegion->start + firstRegion->delta;
 
 	image->data_region.delta += image->data_region.start;
 	image->text_region.delta += image->text_region.start;
