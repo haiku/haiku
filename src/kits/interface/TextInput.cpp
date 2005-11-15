@@ -158,8 +158,9 @@ _BTextInput_::MakeFocus(bool state)
 // TODO: why do we have to invalidate here?
 // I'm leaving this in, but it looks suspicious... :-)
 		Invalidate(Bounds());
-		if (BView* parent = Parent()) {
-			BRect frame = Frame();
+		if (BTextControl* parent = dynamic_cast<BTextControl*>(Parent())) {
+			BRect frame = parent->Bounds();
+			frame.left = parent->Divider();
 			frame.InsetBy(-1.0, -1.0);
 			parent->Invalidate(frame);
 		}
