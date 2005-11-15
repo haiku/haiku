@@ -165,15 +165,16 @@ static uint16 nvidia_device_list[] = {
 	0x0151, /* Nvidia GeForce2 Ti DDR */
 	0x0152, /* Nvidia GeForce2 Ultra */
 	0x0153, /* Nvidia Quadro2 Pro */
-	0x0160, /* Nvidia unknown FX Go */
+	0x0160, /* Nvidia GeForce 6500 Go */
 	0x0161, /* Nvidia GeForce 6200 TurboCache */
 	0x0162, /* Nvidia GeForce 6200SE TurboCache */
-	0x0163, /* Nvidia unknown FX */
+	0x0163, /* Nvidia GeForce 6200LE */
 	0x0164, /* Nvidia GeForce FX 6200 Go */
 	0x0165, /* Nvidia Quadro FX NVS 285 */
-	0x0166, /* Nvidia unknown FX Go */
+	0x0166, /* Nvidia GeForce 6400 Go */
 	0x0167, /* Nvidia GeForce 6200 Go */
-	0x0168, /* Nvidia GeForce 6250 Go */
+	0x0168, /* Nvidia GeForce 6400 Go */
+	0x0169, /* Nvidia GeForce 6250 Go */
 	0x016e, /* Nvidia unknown FX */
 	0x0170, /* Nvidia GeForce4 MX 460 */
 	0x0171, /* Nvidia GeForce4 MX 440 */
@@ -195,7 +196,7 @@ static uint16 nvidia_device_list[] = {
 	0x0186, /* Nvidia GeForce4 448 Go */
 	0x0187, /* Nvidia GeForce4 488 Go */
 	0x0188, /* Nvidia Quadro4 580 XGL */
-	0x0189,	/* Nvidia GeForce4 MX AGP8X */
+	0x0189,	/* Nvidia GeForce4 MX AGP8X (PPC) */
 	0x018a, /* Nvidia Quadro4 280 NVS AGP8X */
 	0x018b, /* Nvidia Quadro4 380 XGL */
 	0x018c, /* Nvidia Quadro4 NVS 50 PCI */
@@ -278,26 +279,27 @@ static uint16 nvidia_device_list[] = {
 /*
 	not yet included nVidia ID's that are unknown, but used according to nvidia:
 	0x0049 //nv40
-	0x0142 //nv43
+	0x0098 //     go	>>> now known, setup
+	0x0142 //nv43		>>> now known, setup
 	0x0143 //nv43
-	0x0147 //nv43
-	0x0149 //nv43
+	0x0147 //nv43		>>> now known, setup
+	0x0149 //nv43		>>> now known, setup
 	0x014b //nv43
 	0x014c //nv43
 	0x014d //nv43
-	0x0169 //nv44 go
 	0x016b //nv44 go
 	0x016c //nv44 go
 	0x016d //nv44 go
-	0x0210 //nv48 (existing? not in nvidia list)
+	0x0210 //nv48		>>> checkout nv#
 	0x021d //nv48 (existing? not in nvidia list)
 	0x021e //nv48 (existing? not in nvidia list)
 	0x0220 //nv44
 	0x0222 //nv44
 	0x0228 //nv44 go
+	0x0329 //     go
 	0x0345 //nv36
 	0x0349 //nv36 go
-	0x034b //nv36.
+	0x034b //nv36 go.
 */
 
 static uint16 elsa_device_list[] = {
