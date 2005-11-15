@@ -619,7 +619,7 @@ void
 WinBorder::Activated(bool active)
 {
 	BMessage msg(B_WINDOW_ACTIVATED);
-	msg.AddBool("active", false);
+	msg.AddBool("active", active);
 	Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
 }
 
