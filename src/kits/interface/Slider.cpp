@@ -1710,7 +1710,7 @@ extern "C"
 void _ReservedSlider4__7BSlider(BSlider *slider, int32 minimum, int32 maximum)
 {
 #ifdef __HAIKU__
-	slider->SetLimits(minimum, maximum);
+	slider->BSlider::SetLimits(minimum, maximum);
 #endif
 }
 
