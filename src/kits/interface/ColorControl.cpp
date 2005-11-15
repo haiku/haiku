@@ -217,7 +217,7 @@ BColorControl::MouseDown(BPoint point)
 {
 	rgb_color color = ValueAsColor();
 
-	BRect rect(0.0f, 0.0f, fColumns * fCellSize, fRows * fCellSize);
+	BRect rect(0.0f, 0.0f, fColumns * fCellSize, Bounds().bottom);
 	float rampsize = rect.bottom / 4;
 
 	uint8 shade = (unsigned char)max_c(0,
@@ -334,7 +334,7 @@ BColorControl::MouseMoved(BPoint point, uint32 transit,
 
 	rgb_color color = ValueAsColor();
 
-	BRect rect(0.0f, 0.0f, fColumns * fCellSize, fRows * fCellSize);
+	BRect rect(0.0f, 0.0f, fColumns * fCellSize, Bounds().bottom);
 
 	uint8 shade = (unsigned char)max_c(0,
 	min_c((point.x - 2) * 255 / (rect.Width() - 4.0f), 255));
