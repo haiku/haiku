@@ -15,7 +15,7 @@ HWInterface::HWInterface(bool doubleBuffered)
 	: MultiLocker("hw interface lock"),
 	  fCursorAreaBackup(NULL),
 	  fCursor(NULL),
-	  fCursorVisible(true),
+	  fCursorVisible(false),
 	  fCursorLocation(0, 0),
 	  fDoubleBuffered(doubleBuffered),
 //	  fUpdateExecutor(new UpdateQueue(this))
@@ -48,15 +48,18 @@ HWInterface::SetCursor(ServerCursor* cursor)
 			delete fCursor;
 			delete fCursorAreaBackup;
 			fCursor = cursor;
-			Invalidate(oldFrame);
+			if (fCursorVisible)
+				Invalidate(oldFrame);
 			BRect r = _CursorFrame();
 			if (fCursor && !IsDoubleBuffered()) {
 				fCursorAreaBackup = new buffer_clip(r.IntegerWidth() + 1,
 													r.IntegerHeight() + 1);
-				_DrawCursor(r);
+				if (fCursorVisible)
+				 	_DrawCursor(r);
 			} else
 				fCursorAreaBackup = NULL;
-			Invalidate(r);
+			if (fCursorVisible)
+				Invalidate(r);
 		}
 		WriteUnlock();
 	}
@@ -80,9 +83,9 @@ bool
 HWInterface::IsCursorVisible()
 {
 	bool visible = true;
-	if (WriteLock()) {
+	if (ReadLock()) {
 		visible = fCursorVisible;
-		WriteUnlock();
+		ReadUnlock();
 	}
 	return visible;
 }
@@ -96,7 +99,7 @@ HWInterface::MoveCursorTo(const float& x, const float& y)
 		if (p != fCursorLocation) {
 			BRect oldFrame = _CursorFrame();
 			fCursorLocation = p;
-			if (fCursorAreaBackup) {
+			if (fCursorAreaBackup && fCursorVisible) {
 				// means we have a software cursor which we need to draw
 				_RestoreCursorArea();
 				_DrawCursor(_CursorFrame());
