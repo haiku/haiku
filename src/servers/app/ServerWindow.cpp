@@ -512,7 +512,7 @@ ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent)
 // TODO: rework the clipping stuff to remove RootLayer dependency and then
 // remove this hack:
 if (fWinBorder->IsOffscreenWindow()) {
-	newLayer->fVisible.Set(newLayer->fFrame);
+	newLayer->fDrawingRegion.Set(newLayer->fFrame);
 }
 
 	if (_parent) {
