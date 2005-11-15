@@ -162,7 +162,7 @@ CardView::CardView(BRect bounds)
 	SetViewColor(B_TRANSPARENT_32_BIT);
 
 #ifndef INPUTSERVER_TEST_MODE
-	fInputPort = find_port(SERVER_INPUT_PORT);
+	fInputPort = create_port(200, SERVER_INPUT_PORT);
 #else
 	fInputPort = create_port(100, "ViewInputDevice");
 #endif

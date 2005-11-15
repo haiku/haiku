@@ -83,30 +83,14 @@ ColorSet gGUIColorSet;
 AppServer::AppServer()
 	: MessageLooper("app_server"),
 	fMessagePort(-1),
-	fServerInputPort(-1),
-	fISThreadID(-1),
-	fCursorThreadID(-1),
-	fCursorSem(-1),
-	fCursorArea(-1),
-	fCursorAddr(NULL),
 	fDesktops(),
-	fDesktopLock("AppServerDesktopLock"),
-	fISASPort(-1),
-	fISPort(-1)
+	fDesktopLock("AppServerDesktopLock")
 {
 	fMessagePort = create_port(DEFAULT_MONITOR_PORT_SIZE, SERVER_PORT_NAME);
 	if (fMessagePort < B_OK)
 		debugger("app_server could not create message port");
 
 	fLink.SetReceiverPort(fMessagePort);
-	gAppServerPort = fMessagePort;
-
-	// Create the input port. The input_server will send it's messages here.
-	// TODO: If we want multiple user support we would need an individual
-	// port for each user and do the following for each RootLayer.
-	fServerInputPort = create_port(200, SERVER_INPUT_PORT);
-	if (fServerInputPort < B_OK)
-		debugger("app_server could not create input port");
 
 	sAppServer = this;
 
@@ -164,6 +148,7 @@ AppServer::RunLooper()
 }
 
 
+#if 0
 /*!
 	\brief Starts Input Server
 */
@@ -237,6 +222,7 @@ AppServer::_LaunchCursorThread()
 
 }
 
+
 /*!
 	\brief The Cursor Thread task
 */
@@ -262,6 +248,7 @@ AppServer::_CursorThread(void* data)
 
 	return B_OK;
 }
+#endif
 
 
 /*!
@@ -364,7 +351,6 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 				wait_for_thread(thread, &status);
 			}
 
-			kill_thread(fCursorThreadID);
 			delete this;
 
 			// we are now clear to exit

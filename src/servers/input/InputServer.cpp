@@ -9,6 +9,8 @@
 #include "kb_mouse_driver.h"
 #include "MethodReplicant.h"
 
+#include <AppServerLink.h>
+
 #include <Autolock.h>
 #include <Deskbar.h>
 #include <Directory.h>
@@ -139,7 +141,10 @@ InputServer::InputServer()
 	fChars(NULL),
 	fScreen(B_MAIN_SCREEN_ID),
 	fBLWindow(NULL),
-	fIMAware(false)
+	fIMAware(false),
+	fCursorSem(-1),
+	fAppServerPort(-1),
+	fCursorArea(-1)
 {
 #if DEBUG == 2
 	if (sLogFile == NULL)
@@ -168,7 +173,7 @@ InputServer::InputServer()
 
 	gDeviceManager.LoadState();
 
-#ifdef R5_CURSOR_COMM
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
 	if (has_data(find_thread(NULL))) {
 		PRINT(("HasData == YES\n")); 
 		int32 buffer[2];
@@ -183,28 +188,24 @@ InputServer::InputServer()
 		fCursorSem = buffer[0];
 		area_id appArea = buffer[1];
 
-		fCloneArea = clone_area("isClone", (void**)&fAppBuffer, B_ANY_ADDRESS, B_READ_AREA|B_WRITE_AREA, appArea);
-		if (fCloneArea < B_OK) {
+		fCursorArea = clone_area("isClone", (void**)&fCursorBuffer,
+			B_ANY_ADDRESS, B_READ_AREA|B_WRITE_AREA, appArea);
+		if (fCursorArea < B_OK) {
 			PRINTERR(("clone_area error : %s\n", strerror(fCloneArea)));
 		}
 
-		fAsPort = create_port(100, "is_as");
+		fAppServerPort = create_port(100, "is_as");
 
-		PRINT(("is_as port :%ld\n", fAsPort));
+		PRINT(("is_as port :%ld\n", fAppServerPort));
 
 		buffer[1] = fEventLooperPort;
-		buffer[0] = fAsPort;
+		buffer[0] = fAppServerPort;
 
 		status_t err;
 		if ((err = send_data(appThreadId, 0, buffer, sizeof(buffer)))!=B_OK)
 			PRINTERR(("error when send_data %s\n", strerror(err)));
 	}
 #endif
-#ifdef HAIKU_APPSERVER_COMM
-	fAsPort = find_port(SERVER_INPUT_PORT);
-	if (fAsPort == B_NAME_NOT_FOUND)
-		PRINTERR(("input_server couldn't find app_server's input port\n"));
-#endif 
 
 	_InitKeyboardMouseStates();
 
@@ -221,13 +222,8 @@ InputServer::~InputServer()
 	CALLED();
 	fAddOnManager->Lock();
 	fAddOnManager->Quit();
-	
-#ifdef R5_CURSOR_COMM
-	delete_port(fAsPort);
-	fAsPort = -1;
-	fAppBuffer = NULL;
-	delete_area(fCloneArea);
-#endif // R5_CURSOR_COMM
+
+	_ReleaseInput(NULL);
 
 #if DEBUG == 2
 	fclose(sLogFile);
@@ -264,8 +260,8 @@ InputServer::_InitKeyboardMouseStates()
 		fFrame = BRect(0, 0, 800, 600);
 	fMousePos = BPoint(fFrame.right / 2, fFrame.bottom / 2);
 
-	if (LoadKeymap() != B_OK)
-		LoadSystemKeymap();
+	if (_LoadKeymap() != B_OK)
+		_LoadSystemKeymap();
 
 	BMessage *msg = new BMessage(B_MOUSE_MOVED);
 	HandleSetMousePosition(msg, msg);
@@ -275,7 +271,7 @@ InputServer::_InitKeyboardMouseStates()
 
 
 status_t
-InputServer::LoadKeymap()
+InputServer::_LoadKeymap()
 {
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path)!=B_OK)
@@ -316,7 +312,7 @@ InputServer::LoadKeymap()
 
 
 status_t
-InputServer::LoadSystemKeymap()
+InputServer::_LoadSystemKeymap()
 {
 	delete[] fChars;
 	fKeys = sSystemKeymap;
@@ -381,8 +377,8 @@ InputServer::QuitRequested()
 	fAddOnManager->SaveState();
 	gDeviceManager.SaveState();
 
-	kill_thread(fISPortThread);
 	delete_port(fEventLooperPort);
+		// the event looper thread will exit after this
 	fEventLooperPort = -1;
 	return true;
 }
@@ -392,6 +388,75 @@ void
 InputServer::ReadyToRun()
 {
 	CALLED();
+
+	// say hello to the app_server
+
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_REGISTER_INPUT_SERVER);
+	link.Flush();
+}
+
+
+status_t
+InputServer::_AcquireInput(BMessage& message, BMessage& reply)
+{
+	// TODO: it currently just gets everything we have
+	area_id area;
+	if (message.FindInt32("cursor_area", &area) == B_OK) {
+		// try to clone the area
+		fCursorBuffer = NULL;
+
+		fCursorSem = create_sem(0, "cursor semaphore");
+		if (fCursorSem >= B_OK) {
+			fCursorArea = clone_area("input server cursor", (void**)&fCursorBuffer,
+				B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, area);
+		}
+	}
+
+	fAppServerPort = create_port(200, "input server target");
+	if (fAppServerPort < B_OK) {
+		_ReleaseInput(&message);
+		return fAppServerPort;
+	}
+
+	// TODO: would be nice if we could just reply to this message...
+#if 0
+	reply.AddBool("has_keyboard", true);
+	reply.AddBool("has_mouse", true);
+	reply.AddInt32("event port", fAppServerPort);
+
+	if (fCursorBuffer != NULL) {
+		// cursor shared buffer is supported
+		reply.AddInt32("cursor semaphore", fCursorSem);
+	}
+#else
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_ACQUIRED_INPUT_STREAM);
+	link.Attach<bool>(true);
+	link.Attach<bool>(true);
+	link.Attach<int32>(fAppServerPort);
+	link.Attach<int32>(fCursorSem);
+	link.Flush();
+#endif
+	return B_OK;
+}
+
+
+void
+InputServer::_ReleaseInput(BMessage* /*message*/)
+{
+	if (fCursorBuffer != NULL) {
+		fCursorBuffer = NULL;
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		delete_sem(fCursorSem);
+#endif
+		delete_area(fCursorArea);
+
+		fCursorSem = -1;
+		fCursorArea = -1;
+	}
+
+	delete_port(fAppServerPort);
 }
 
 
@@ -483,6 +548,14 @@ InputServer::MessageReceived(BMessage* message)
 			status = HandleFocusUnfocusIMAwareView(message, &reply);
 			break;
 
+		// app_server communication
+		case IS_ACQUIRE_INPUT:
+			_AcquireInput(*message, reply);
+			return;
+		case IS_RELEASE_INPUT:
+			_ReleaseInput(message);
+			return;
+
 		// device looper related
 		case IS_FIND_DEVICES:
 		case IS_WATCH_DEVICES:
@@ -494,6 +567,7 @@ InputServer::MessageReceived(BMessage* message)
 		case IS_METHOD_REGISTER:
 			fAddOnManager->PostMessage(message);
 			return;
+
 		case B_SOME_APP_LAUNCHED:
 		{
 			const char *signature;
@@ -686,7 +760,7 @@ InputServer::HandleGetSetMouseSpeed(BMessage* message, BMessage* reply)
 
 
 status_t
-InputServer::HandleSetMousePosition(BMessage *message, BMessage *outbound)
+InputServer::HandleSetMousePosition(BMessage* message, BMessage* outbound)
 {
 	CALLED();
 
@@ -719,18 +793,24 @@ InputServer::HandleSetMousePosition(BMessage *message, BMessage *outbound)
 				outbound->AddInt32("modifiers", fKeyInfo.modifiers);
 				PRINT(("new position : %f, %f\n", fMousePos.x, fMousePos.y));
 			}
-#ifdef R5_CURSOR_COMM
-			if (fAppBuffer) {
-				fAppBuffer[0] = (0x3 << 30L)
+
+			if (fCursorBuffer) {
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
+				fCursorBuffer[0] = (0x3 << 30L)
                		| ((uint32)fMousePos.x & 0x7fff) << 15
                		| ((uint32)fMousePos.y & 0x7fff);
 
-				PRINT(("released cursorSem with value : %08lx\n", fAppBuffer[0]));
+				PRINT(("released cursorSem with value : %08lx\n", fCursorBuffer[0]));
                 	release_sem(fCursorSem);
-        	}
+#else
+				atomic_set((int32*)&fCursorBuffer->pos, (uint32)fMousePos.x << 16UL
+					| ((uint32)fMousePos.y & 0xffff));
+				if (atomic_or(&fCursorBuffer->read, 1) == 0)
+					release_sem_etc(fCursorSem, 0, B_RELEASE_ALL);
 #endif
+        	}
 			break;
-    	
+
     	// some Key Down and up codes ..
 		case B_KEY_DOWN:
 		case B_KEY_UP:
@@ -833,8 +913,8 @@ InputServer::HandleGetSetKeyMap(BMessage* message, BMessage* reply)
 		return status;
 	}
 
-	if (LoadKeymap() != B_OK)
-		LoadSystemKeymap();
+	if (_LoadKeymap() != B_OK)
+		_LoadSystemKeymap();
 
 	BMessage msg(IS_CONTROL_DEVICES);
 	msg.AddInt32("type", B_KEYBOARD_DEVICE);
@@ -872,6 +952,9 @@ status_t
 InputServer::EnqueueDeviceMessage(BMessage* message)
 {
 	CALLED();
+
+	// TODO: message is not deleted???
+	// TODO: why use ports for in-house messaging???
 
 	ssize_t length = message->FlattenedSize();
 	char buffer[length];
@@ -980,23 +1063,31 @@ status_t
 InputServer::EventLoop()
 {
 	CALLED();
-	fEventLooperPort = create_port(100, "haiku_is_event_port");
+	fEventLooperPort = create_port(100, "input server event loop");
 	if (fEventLooperPort < 0) {
 		PRINTERR(("InputServer: create_port error: (0x%x) %s\n",
 			fEventLooperPort, strerror(fEventLooperPort)));
-	} 
+		return fEventLooperPort;
+	}
 
-	fISPortThread = spawn_thread(ISPortWatcher, "_input_server_event_loop_",
+	thread_id thread = spawn_thread(_PortWatcher, "_input_server_event_loop_",
 		B_REAL_TIME_DISPLAY_PRIORITY + 3, this);
-	resume_thread(fISPortThread);
-	return 0;
+	if (thread < B_OK || resume_thread(thread) < B_OK) {
+		if (thread >= B_OK)
+			kill_thread(thread);
+		delete_port(fEventLooperPort);
+		fEventLooperPort = -1;
+		return thread < B_OK ? thread : B_ERROR;
+	}
+
+	return B_OK;
 }
 
 
 bool 
 InputServer::EventLoopRunning()
 {
-	return fEventLooperPort > -1;
+	return fEventLooperPort >= B_OK;
 }
 
 
@@ -1070,8 +1161,8 @@ InputServer::DispatchEvent(BMessage* message)
 	if ((err = message->Flatten(buffer,length)) < B_OK)
 		return err;
 
-	if (fAsPort > 0)
-		write_port(fAsPort, 0, buffer, length);
+	if (fAppServerPort > 0)
+		write_port(fAppServerPort, 0, buffer, length);
 
     return B_OK;
 }
@@ -1481,21 +1572,26 @@ InputServer::SafeMode()
 
 
 int32 
-InputServer::ISPortWatcher(void* arg)
+InputServer::_PortWatcher(void* arg)
 {
 	InputServer* self = (InputServer*)arg;
-	self->WatchPort();
+	self->_WatchPort();
 
 	return B_OK;
 }
 
 
 void 
-InputServer::WatchPort()
+InputServer::_WatchPort()
 {
 	while (true) { 
 		// Block until we find the size of the next message
 		ssize_t length = port_buffer_size(fEventLooperPort);
+		if (length < B_OK) {
+			PRINT("[Event Looper] port gone, exiting.\n");
+			return;
+		}
+
 		PRINT(("[Event Looper] BMessage Size = %lu\n", length));
 
 		char buffer[length];
@@ -1522,7 +1618,7 @@ InputServer::WatchPort()
 			PRINTERR(("[InputServer] Unflatten() error: (0x%lx) %s\n", err, strerror(err)));
 			delete event;
 			continue;
-		} 
+		}
 
 		// This is where the message should be processed.	
 

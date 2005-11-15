@@ -46,26 +46,13 @@ class AppServer : public MessageLooper  {
 		Desktop*		_CreateDesktop(uid_t userID);
 		Desktop*		_FindDesktop(uid_t userID);
 
-		void			_LaunchCursorThread();
 		void			_LaunchInputServer();
-
-		static int32	_CursorThread(void *data);
 
 	private:
 		port_id			fMessagePort;
-		port_id			fServerInputPort;
-
-		thread_id		fISThreadID;
-		thread_id		fCursorThreadID;
-		sem_id			fCursorSem;
-		area_id			fCursorArea;
-		uint32			*fCursorAddr;
 
 		BObjectList<Desktop> fDesktops;
 		BLocker			fDesktopLock;
-
-		port_id			fISASPort;
-		port_id			fISPort;
 };
 
 extern BitmapManager *gBitmapManager;

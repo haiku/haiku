@@ -1,3 +1,11 @@
+/*
+ * Copyright 2001-2005, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef INPUT_SERVER_TYPES_H
+#define INPUT_SERVER_TYPES_H
+
+
 #define IS_GET_MOUSE_TYPE				'Igmt'
 #define IS_SET_MOUSE_TYPE 				'Ismt'
 #define IS_GET_MOUSE_ACCELERATION 		'Igma'
@@ -31,6 +39,10 @@
 #define IS_CONTROL_DEVICES				'Icnd'
 #define SYSTEM_SHUTTING_DOWN			'SSDn'
 
+// app_server communication
+#define IS_ACQUIRE_INPUT				'Iaqi'
+#define IS_RELEASE_INPUT				'Irli'
+
 // Method Replicant
 #define IS_SET_METHOD					'MRsm'
 #define IS_METHOD_REGISTER				'MRmr'
@@ -40,3 +52,5 @@
 #define IS_UPDATE_METHOD				'MRu!'
 #define IS_ADD_METHOD					'MRa!'
 #define IS_REMOVE_METHOD				'MRr!'
+
+#endif	/* INPUT_SERVER_TYPES_H */

@@ -130,15 +130,15 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	// Spawn our working thread
 	fThreadID = spawn_thread(WorkingThread, name, B_DISPLAY_PRIORITY, this);
 
-	fListenPort = find_port(SERVER_INPUT_PORT);
-	if (fListenPort == B_NAME_NOT_FOUND) {
-		fListenPort = -1;
-	}
 #if ON_SCREEN_DEBUGGING_INFO
 	DebugInfoManager::Default()->SetRootLayer(this);
 #endif
 
 	fFrame = desktop->VirtualScreen().Frame();
+
+	// RootLayer starts with valid visible regions
+	fFullVisible.Set(Bounds());
+	fVisible.Set(Bounds());
 }
 
 
@@ -194,12 +194,10 @@ RootLayer::WorkingThread(void *data)
 {
 	RootLayer *oneRootLayer = (RootLayer*)data;
 
-	// first make sure we are actualy visible
 	oneRootLayer->Lock();
+	oneRootLayer->fListenPort = oneRootLayer->fDesktop->InputServerPort();
 
-	// RootLayer starts with valid visible regions
-	oneRootLayer->fFullVisible.Set(oneRootLayer->Bounds());
-	oneRootLayer->fVisible.Set(oneRootLayer->Bounds());
+	// first make sure we are actualy visible
 
 	oneRootLayer->MarkForRebuild(oneRootLayer->Bounds());
 	oneRootLayer->MarkForRedraw(oneRootLayer->Bounds());
@@ -208,12 +206,10 @@ RootLayer::WorkingThread(void *data)
 	oneRootLayer->TriggerRedraw();
 
 	oneRootLayer->Unlock();
-	
+
 	STRACE(("info: RootLayer(%s)::WorkingThread listening on port %ld.\n", oneRootLayer->Name(), oneRootLayer->fListenPort));
-	while(!oneRootLayer->fQuiting) {
-
+	while (!oneRootLayer->fQuiting) {
 		BMessage *msg = oneRootLayer->ReadMessageFromPort(B_INFINITE_TIMEOUT);
-
 		if (msg)
 			oneRootLayer->fQueue.AddMessage(msg);
 
@@ -228,12 +224,11 @@ RootLayer::WorkingThread(void *data)
 		bool dispatchNextMessage = true;
 		while(dispatchNextMessage && !oneRootLayer->fQuiting) {
 			BMessage *currentMessage = oneRootLayer->fQueue.NextMessage();
-			
+
 			if (!currentMessage)
 				// no more messages
 				dispatchNextMessage = false;
 			else {
-
 				oneRootLayer->Lock();
 
 				switch (currentMessage->what) {
@@ -245,7 +240,7 @@ RootLayer::WorkingThread(void *data)
 					case B_MOUSE_MOVED:
 					case B_MOUSE_WHEEL_CHANGED:
 						oneRootLayer->MouseEventHandler(currentMessage);
-					break;
+						break;
 
 					case B_KEY_DOWN:
 					case B_KEY_UP:
@@ -253,15 +248,15 @@ RootLayer::WorkingThread(void *data)
 					case B_UNMAPPED_KEY_UP:
 					case B_MODIFIERS_CHANGED:
 						oneRootLayer->KeyboardEventHandler(currentMessage);
-					break;
+						break;
 
 					case B_QUIT_REQUESTED:
 						exit_thread(0);
-					break;
+						break;
 
 					default:
 						printf("RootLayer(%s)::WorkingThread received unexpected code %lx\n", oneRootLayer->Name(), msg->what);
-					break;
+						break;
 				}
 
 				oneRootLayer->Unlock();

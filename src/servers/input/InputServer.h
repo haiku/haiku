@@ -12,6 +12,8 @@
 #include "KeyboardSettings.h"
 #include "MouseSettings.h"
 
+#include "shared_cursor_area.h"
+
 #include <Application.h>
 #include <Debug.h>
 #include <FindDirectory.h>
@@ -30,19 +32,8 @@
 #include <unistd.h>
 
 
-#define HAIKU_APPSERVER_COMM
-#define R5_CURSOR_COMM
-	// define this when R5 cursor communication should be used
-//#define APPSERVER_R5_COMM
-	// define this when R5 app_server communication should be used
-
 #define INPUTSERVER_SIGNATURE "application/x-vnd.Be-input_server"
 	// use this when target should replace R5 input_server
-
-#ifdef APPSERVER_R5_COMM
-	#define R5_CURSOR_COMM
-	#undef HAIKU_APPSERVER_COMM
-#endif
 
 class InputDeviceListItem {
 	public:
@@ -185,13 +176,16 @@ class InputServer : public BApplication {
 	private:
 		typedef BApplication _inherited;
 
-		status_t LoadKeymap();
-		status_t LoadSystemKeymap();
+		status_t _LoadKeymap();
+		status_t _LoadSystemKeymap();
 		void _InitKeyboardMouseStates();
 
-		void WatchPort();
+		status_t _AcquireInput(BMessage& message, BMessage& reply);
+		void _ReleaseInput(BMessage* message);
 
-		static int32 ISPortWatcher(void *arg);
+		void _WatchPort();
+
+		static int32 _PortWatcher(void *arg);
 //		static bool doStartStopDevice(void*, void*);
 		InputDeviceListItem* _FindInputDeviceListItem(BInputServerDevice& device);
 
@@ -205,7 +199,6 @@ class InputServer : public BApplication {
 		BList			fInputDeviceList;
 		BLocker 		fInputDeviceListLocker;
 
-
 		KeyboardSettings	fKeyboardSettings;
 		MouseSettings		fMouseSettings;
 
@@ -216,7 +209,6 @@ class InputServer : public BApplication {
 		uint32			fCharsSize;		// current keymap char count
 
 		port_id      	fEventLooperPort;
-		thread_id    	fISPortThread;
 
 		AddOnManager*	fAddOnManager;
 
@@ -230,12 +222,14 @@ class InputServer : public BApplication {
 		const BMessenger*	fReplicantMessenger;
 		BottomlineWindow*	fBLWindow;
 		bool				fIMAware;
-	
-#ifdef R5_CURSOR_COMM
+
 		sem_id 			fCursorSem;
-		port_id			fAsPort;
-		area_id			fCloneArea;
-		uint32*			fAppBuffer;
+		port_id			fAppServerPort;
+		area_id			fCursorArea;
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		shared_cursor*	fCursorBuffer;
+#else
+		uint32*			fCursorBuffer;
 #endif
 
 #if DEBUG == 2

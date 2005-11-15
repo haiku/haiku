@@ -31,6 +31,8 @@
 #include <ServerProtocol.h>
 #include <FontPrivate.h>
 
+#include <InputServerTypes.h>
+
 #include "AppServer.h"
 #include "BGet++.h"
 #include "BitmapManager.h"
@@ -354,98 +356,6 @@ ServerApp::_MessageLooper()
 				fQuitting = true;
 				break;
 
-			case AS_CREATE_WINDOW:
-			case AS_CREATE_OFFSCREEN_WINDOW:
-			{
-				// Create a ServerWindow/OffscreenServerWindow
-				
-				// Attached data:
-				// 1) int32 bitmap token (only for AS_CREATE_OFFSCREEN_WINDOW)
-				// 2) BRect window frame
-				// 3) uint32 window look
-				// 4) uint32 window feel
-				// 5) uint32 window flags
-				// 6) uint32 workspace index
-				// 7) int32 BHandler token of the window
-				// 8) port_id window's reply port
-				// 9) port_id window's looper port
-				// 10) const char * title
-
-				BRect frame;
-				int32 bitmapToken;
-				uint32 look;
-				uint32 feel;
-				uint32 flags;
-				uint32 workspaces;
-				int32 token = B_NULL_TOKEN;
-				port_id	clientReplyPort = -1;
-				port_id looperPort = -1;
-				char *title = NULL;
-
-				if (code == AS_CREATE_OFFSCREEN_WINDOW)
-					receiver.Read<int32>(&bitmapToken);
-				
-				receiver.Read<BRect>(&frame);
-				receiver.Read<uint32>(&look);
-				receiver.Read<uint32>(&feel);
-				receiver.Read<uint32>(&flags);
-				receiver.Read<uint32>(&workspaces);
-				receiver.Read<int32>(&token);
-				receiver.Read<port_id>(&clientReplyPort);
-				receiver.Read<port_id>(&looperPort);
-				if (receiver.ReadString(&title) != B_OK)
-					break;
-
-				if (!frame.IsValid()) {
-					// make sure we pass a valid rectangle to ServerWindow
-					frame.right = frame.left + 1;
-					frame.bottom = frame.top + 1;
-				}
-
-				status_t status = B_ERROR;
-				ServerWindow *window = NULL;
-
-				if (code == AS_CREATE_OFFSCREEN_WINDOW) {
-					ServerBitmap* bitmap = FindBitmap(bitmapToken);
-
-					if (bitmap != NULL) {
-						window = new OffscreenServerWindow(title, this, clientReplyPort,
-							looperPort, token, bitmap);
-					}
-				} else {
-					window = new ServerWindow(title, this, clientReplyPort, looperPort, token);
-					STRACE(("\nServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
-						fSignature(), title, frame.left, frame.top, frame.right, frame.bottom));
-				}
-
-				free(title);
-
-				// NOTE: the reply to the client is handled in ServerWindow::Run()
-				if (window != NULL) {
-					status = window->Init(frame, look, feel, flags, workspaces);
-					if (status == B_OK && !window->Run())
-						status = B_ERROR;
-
-					// add the window to the list
-					if (status == B_OK && fWindowListLock.Lock()) {
-						status = fWindowList.AddItem(window) ? B_OK : B_NO_MEMORY;
-						fWindowListLock.Unlock();
-					}
-
-					if (status < B_OK)
-						delete window;
-				}
-
-				// if sucessful, ServerWindow::Run() will already have replied
-				if (status < B_OK) {
-					// window creation failed, we need to notify the client
-					BPrivate::LinkSender reply(clientReplyPort);
-					reply.StartMessage(status);
-					reply.Flush();
-				}
-				break;
-			}
-
 			case AS_QUIT_APP:
 			{
 				// This message is received only when the app_server is asked to shut down in
@@ -497,6 +407,117 @@ void
 ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 {
 	switch (code) {
+		case AS_REGISTER_INPUT_SERVER:
+		{
+			BMessage message(IS_ACQUIRE_INPUT);
+			SendMessageToClient(&message);
+			break;
+		}
+		case AS_ACQUIRED_INPUT_STREAM:
+		{
+			bool hasKeyboard, hasMouse;
+			link.Read<bool>(&hasKeyboard);
+			link.Read<bool>(&hasMouse);
+
+			port_id port;
+			link.Read<int32>(&port);
+			sem_id sem;
+			if (link.Read<int32>(&sem) == B_OK)
+				fDesktop->RegisterInputServer(port);
+			break;
+		}
+		case AS_CREATE_WINDOW:
+		case AS_CREATE_OFFSCREEN_WINDOW:
+		{
+			// Create a ServerWindow/OffscreenServerWindow
+
+			// Attached data:
+			// 1) int32 bitmap token (only for AS_CREATE_OFFSCREEN_WINDOW)
+			// 2) BRect window frame
+			// 3) uint32 window look
+			// 4) uint32 window feel
+			// 5) uint32 window flags
+			// 6) uint32 workspace index
+			// 7) int32 BHandler token of the window
+			// 8) port_id window's reply port
+			// 9) port_id window's looper port
+			// 10) const char * title
+
+			BRect frame;
+			int32 bitmapToken;
+			uint32 look;
+			uint32 feel;
+			uint32 flags;
+			uint32 workspaces;
+			int32 token = B_NULL_TOKEN;
+			port_id	clientReplyPort = -1;
+			port_id looperPort = -1;
+			char *title = NULL;
+
+			if (code == AS_CREATE_OFFSCREEN_WINDOW)
+				link.Read<int32>(&bitmapToken);
+			
+			link.Read<BRect>(&frame);
+			link.Read<uint32>(&look);
+			link.Read<uint32>(&feel);
+			link.Read<uint32>(&flags);
+			link.Read<uint32>(&workspaces);
+			link.Read<int32>(&token);
+			link.Read<port_id>(&clientReplyPort);
+			link.Read<port_id>(&looperPort);
+			if (link.ReadString(&title) != B_OK)
+				break;
+
+			if (!frame.IsValid()) {
+				// make sure we pass a valid rectangle to ServerWindow
+				frame.right = frame.left + 1;
+				frame.bottom = frame.top + 1;
+			}
+
+			status_t status = B_ERROR;
+			ServerWindow *window = NULL;
+
+			if (code == AS_CREATE_OFFSCREEN_WINDOW) {
+				ServerBitmap* bitmap = FindBitmap(bitmapToken);
+
+				if (bitmap != NULL) {
+					window = new OffscreenServerWindow(title, this, clientReplyPort,
+						looperPort, token, bitmap);
+				}
+			} else {
+				window = new ServerWindow(title, this, clientReplyPort, looperPort, token);
+				STRACE(("\nServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
+					fSignature(), title, frame.left, frame.top, frame.right, frame.bottom));
+			}
+
+			free(title);
+
+			// NOTE: the reply to the client is handled in ServerWindow::Run()
+			if (window != NULL) {
+				status = window->Init(frame, look, feel, flags, workspaces);
+				if (status == B_OK && !window->Run())
+					status = B_ERROR;
+
+				// add the window to the list
+				if (status == B_OK && fWindowListLock.Lock()) {
+					status = fWindowList.AddItem(window) ? B_OK : B_NO_MEMORY;
+					fWindowListLock.Unlock();
+				}
+
+				if (status < B_OK)
+					delete window;
+			}
+
+			// if sucessful, ServerWindow::Run() will already have replied
+			if (status < B_OK) {
+				// window creation failed, we need to notify the client
+				BPrivate::LinkSender reply(clientReplyPort);
+				reply.StartMessage(status);
+				reply.Flush();
+			}
+			break;
+		}
+
 		case AS_GET_WINDOW_LIST:
 			team_id team;
 			link.Read<team_id>(&team);

@@ -102,9 +102,12 @@ Desktop::Init()
 	// TODO: add user identity to the name
 	char name[32];
 	sprintf(name, "RootLayer %d", 1);
-
 	fRootLayer = new RootLayer(name, 4, this, GetDrawingEngine());
-	fRootLayer->RunThread();
+
+#if TEST_MODE
+	RegisterInputServer(find_port(SERVER_INPUT_PORT));
+		// this is where the ViewHWInterface will send its input events to
+#endif
 
 	// take care of setting the default cursor
 	ServerCursor *cursor = fCursorManager.GetCursor(B_CURSOR_DEFAULT);
@@ -336,6 +339,16 @@ Desktop::_ActivateApp(team_id team)
 	}
 
 	return status;
+}
+
+
+void
+Desktop::RegisterInputServer(port_id port)
+{
+	fInputPort = port;
+	fRootLayer->RunThread();
+
+	fVirtualScreen.HWInterface()->SetCursorVisible(true);
 }
 
 
