@@ -85,7 +85,6 @@ virtual status_t	GetSupportedSuites(BMessage *data);
 //----- Private or reserved -----------------------------------------
 virtual status_t	Perform(perform_code d, void *arg);
 
-// NOTE: this takes up another virtual slot compared to R5
 #if DISABLES_ON_WINDOW_DEACTIVATION
 virtual	void		WindowActivated(bool active);
 #endif
@@ -96,10 +95,7 @@ private:
 
 		friend status_t control_scrollbar(scroll_bar_info *info, BScrollBar *bar);		// for use within the preflet
 
-#if !DISABLES_ON_WINDOW_DEACTIVATION
 virtual	void		_ReservedScrollBar1();
-#endif
-
 virtual	void		_ReservedScrollBar2();
 virtual	void		_ReservedScrollBar3();
 virtual	void		_ReservedScrollBar4();

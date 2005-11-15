@@ -951,9 +951,7 @@ BScrollBar::WindowActivated(bool active)
 }
 #endif // DISABLES_ON_WINDOW_DEACTIVATION
 
-#if !DISABLES_ON_WINDOW_DEACTIVATION
 void BScrollBar::_ReservedScrollBar1() {}
-#endif
 void BScrollBar::_ReservedScrollBar2() {}
 void BScrollBar::_ReservedScrollBar3() {}
 void BScrollBar::_ReservedScrollBar4() {}
