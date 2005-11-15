@@ -676,7 +676,7 @@ status_t eng_crtc_cursor_define(uint8* andMask,uint8* xorMask)
 
 	return B_OK;
 //
-	for (y = 0; y < 1; y++)//hele hoogte invert
+/*	for (y = 0; y < 1; y++)//hele hoogte invert
 	{
 		cursor[0 + (y*4)] = 0xff;//linker helft invert
 		cursor[0 + (1*4)] = 0xff;//rechter helft invert
@@ -688,6 +688,7 @@ status_t eng_crtc_cursor_define(uint8* andMask,uint8* xorMask)
 //		cursor[64 + (y * 4)] = *xorMask++;
 //		cursor[96 + (y * 4)] = *xorMask++;
 	}
+*/
 }
 
 /* position the cursor */
