@@ -99,13 +99,13 @@ status_t eng_general_powerup()
 	switch(CFGR(DEVID))
 	{
 	/* Vendor Via */
-	case 0x31221106: /*  */
+/*	case 0x31221106:
 		si->ps.card_type = NV04;
 		si->ps.card_arch = NV04A;
 		LOG(4,("POWERUP: Detected Nvidia TNT1 (NV04)\n"));
 		status = engxx_general_powerup();
 		break;
-	default:
+*/	default:
 		LOG(8,("POWERUP: Failed to detect valid card 0x%08x\n",CFGR(DEVID)));
 		return B_ERROR;
 	}
