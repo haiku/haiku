@@ -427,8 +427,13 @@ BButton::KeyDown(const char *bytes, int32 numBytes)
 			return;
 
 		SetValue(B_CONTROL_ON);
+
+		// make sure the user saw that
+		Window()->UpdateIfNeeded();
+		snooze(25000);
+
 		Invoke();
-	
+
 	} else
 		BControl::KeyDown(bytes, numBytes);
 }
