@@ -25,7 +25,7 @@ You use this software at your own risk! Although I don't expect it to damage you
 	<li>GeForce FX/PCX 5200/5300/5600/5700/5750/5800/5900/5950/Go;
 	<li>GeForce FX/PCX 6200/6600/6800/Go;
 	<li>Quadro (2/4/FX/PCX/Go);
-	<li>Preliminary GeForce 7800 GT/GTX/Go support (without acceleration currently). If your card isn't recognized yet please report your CardID!
+	<li>Preliminary support for some GeForce 7800 GT/GTX/Go (without acceleration currently).
 </ul>
 <br>
 <hr>
@@ -42,7 +42,7 @@ You use this software at your own risk! Although I don't expect it to damage you
 	<li>Basic AGP mode support on AGP cards, using the new (seperate) Haiku AGP busmanager;
 	<li>Basic ('legacy') PCIe support;
 	<li>Coldstart support for analog connected screens on most cards except TNT1, GeForce 6200, 6600, 6800 and 7800;
-	<li>TVout support on cards with Brooktree BT868/BT869 and Conexant CX25870/CX25871 encoders (use 'Dualhead Setup' from BeBits for now). TVout support is still in development...
+	<li>TVout support on cards with Brooktree BT868/BT869 and Conexant CX25870/CX25871 encoders (use 'Dualhead Setup' <strong>0.04</strong> from BeBits for now).
 </ul>
 <strong>Known limitations:</strong> 
 <ul>
@@ -209,14 +209,13 @@ With the <strong>pgm_panel true</strong> setting, the driver will fix your panel
 This option only has an effect if you have a card with supported TV encoder chip when you use TV out modes. When set to <strong>true</strong> it provides a <strong>'tweaked'</strong> dualhead clone mode for singlehead cards and dualhead cards using singlehead modes on TV. Because this special mode can possibly destroy old VGA monitors it's disabled by default.
 	<ul>
 		<li><strong>false:</strong> (default setting)<br>
-If you select <strong>vga_on_tv false</strong> the driver will automatically shut-off your VGA monitor (by means of special internal DPMS settings) when a TVout mode is enabled on the head the VGA monitor is connected to. This means that on singlehead cards and on dualhead cards using singlehead TV modes your only output will be on TV. This is the standard way of doing things.
-		<li><strong>true:</strong> With this setting VGA output on a head is enabled concurrent with TV output on that head: that is if you select a TVout mode. This setting is a 'tweak' because the modeline used to drive your VGA monitor is the same modeline that is used for the TV output. This means that the VGA picture positioning is probably a bit odd, in some modes it might distort somewhat, and the refreshrate will be 50Hz for PAL modes, and 60Hz for NTSC modes. Make sure you only enable this tweak if you know your monitor supports down to 50Hz refreshrate, and preferably has a failsafe built in that blocks output when out-of-range signals are sent to it (almost every newer monitor has this feature).<br>
+If you select <strong>vga_on_tv false</strong> the driver will automatically shut-off your VGA (or DVI) monitor (by means of special internal DPMS settings) when a TVout mode is enabled on the head the monitor is connected to. This means that on singlehead cards and on dualhead cards using singlehead TV modes your only output will be on TV. This is the standard way of doing things.
+		<li><strong>true:</strong> With this setting VGA (or DVI) output on a head is enabled concurrent with TV output on that head: that is if you select a TVout mode. This setting is a 'tweak' because the modeline used to drive your monitor is the same modeline that is used for the TV output. This means that the monitor picture positioning is probably a bit odd, in some modes it might distort somewhat, and the refreshrate will be 50Hz for PAL modes, and 60Hz for NTSC modes. Make sure you only enable this tweak if you know your monitor supports down to 50Hz refreshrate, and preferably has a failsafe built in that blocks output when out-of-range signals are sent to it (almost every newer monitor has this feature).<br>
 	</ul>
 </ul>
-
 <hr>
 <br>
 <a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on November 13, 2005)</p>
+<p>(Page last updated on November 15, 2005)</p>
 </body>
 </html>
