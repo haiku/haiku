@@ -295,16 +295,19 @@ InputServer::LoadKeymap()
 	if (file.Read(&fKeys, sizeof(fKeys)) < (ssize_t)sizeof(fKeys))
 		return B_BAD_VALUE;
 	
-	for (uint32 i=0; i<sizeof(fKeys)/4; i++)
+	for (uint32 i = 0; i < sizeof(fKeys)/4; i++)
 		((uint32*)&fKeys)[i] = B_BENDIAN_TO_HOST_INT32(((uint32*)&fKeys)[i]);
 	
 	if (file.Read(&fCharsSize, sizeof(uint32)) < (ssize_t)sizeof(uint32))
 		return B_BAD_VALUE;
-	
+
 	fCharsSize = B_BENDIAN_TO_HOST_INT32(fCharsSize);
-	if (!fChars)
-		delete[] fChars;
-	fChars = new char[fCharsSize];
+
+	delete[] fChars;
+	fChars = new (nothrow) char[fCharsSize];
+	if (fChars == NULL)
+		return B_NO_MEMORY;
+
 	if (file.Read(fChars, fCharsSize) != (signed)fCharsSize)
 		return B_BAD_VALUE;
 	
@@ -315,11 +318,13 @@ InputServer::LoadKeymap()
 status_t
 InputServer::LoadSystemKeymap()
 {
-	if (!fChars)
-		delete[] fChars;
+	delete[] fChars;
 	fKeys = sSystemKeymap;
 	fCharsSize = sSystemKeyCharsSize;
-	fChars = new char[fCharsSize];
+	fChars = new (nothrow) char[fCharsSize];
+	if (fChars == NULL)
+		return B_NO_MEMORY;
+
 	memcpy(fChars, sSystemKeyChars, fCharsSize);
 
 	// we save this keymap to file
