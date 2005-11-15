@@ -128,6 +128,20 @@ refresh_rate_to_string(float refresh, BString &string,
 }
 
 
+static const char*
+screen_errors(status_t status)
+{
+	switch (status) {
+		case B_ENTRY_NOT_FOUND:
+			return "Unknown Mode";
+		// TODO: add more?
+
+		default:
+			return strerror(status);
+	}
+}
+
+
 //	#pragma mark -
 
 
@@ -921,10 +935,20 @@ ScreenWindow::Apply()
 			return;
 	}
 
-	if (fScreenMode.Set(fSelected) == B_OK)
+	status_t status = fScreenMode.Set(fSelected);
+	if (status == B_OK) {
 		fActive = fSelected;
 
-	// ToDo: only show alert when this is an unknown mode
-	BWindow *window = new AlertWindow(this);
-	window->Show();
+		// ToDo: only show alert when this is an unknown mode
+		BWindow* window = new AlertWindow(this);
+		window->Show();
+	} else {
+		char message[256];
+		snprintf(message, sizeof(message),
+			"The screen mode could not be set:\n\t%s\n", screen_errors(status));
+		BAlert* alert = new BAlert("Screen Alert", message, "Okay", NULL, NULL,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->Go();
+	}
 }
+
