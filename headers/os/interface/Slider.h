@@ -137,9 +137,7 @@ class BSlider : public BControl {
 
 		virtual void		SetFont(const BFont *font, uint32 properties = B_FONT_ALL);
 
-#ifdef __HAIKU__
-		virtual void		SetLimits(int32 minimum, int32 maximum); // Was _ReservedSlider4()
-#endif
+		virtual void		SetLimits(int32 minimum, int32 maximum);
 
 	private:
 				void		_DrawBlockThumb();
@@ -152,9 +150,6 @@ class BSlider : public BControl {
 				float		_MaxPosition() const;
 				bool		_ConstrainPoint(BPoint point, BPoint compare) const;
 
-#ifndef __HAIKU__
-		virtual	void		_ReservedSlider4();
-#endif
 		virtual	void		_ReservedSlider5();
 		virtual	void		_ReservedSlider6();
 		virtual	void		_ReservedSlider7();

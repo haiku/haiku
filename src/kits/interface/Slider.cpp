@@ -29,11 +29,15 @@ _long_to_color_(int32 color)
 	return *((rgb_color*)&color);
 }
 
+
 int32
 _color_to_long_(rgb_color color)
 {
 	return *((int32*)&color);
 }
+
+
+//	#pragma mark -
 
 
 BSlider::BSlider(BRect frame, const char *name, const char *label, BMessage *message, 
@@ -1442,7 +1446,6 @@ BSlider::SetFont(const BFont *font, uint32 properties)
 }
 
 
-#ifdef __HAIKU__
 void
 BSlider::SetLimits(int32 minimum, int32 maximum)
 {
@@ -1459,7 +1462,6 @@ BSlider::SetLimits(int32 minimum, int32 maximum)
 		}
 	}
 }
-#endif
 
 
 void
@@ -1691,8 +1693,8 @@ BSlider::_MinPosition() const
 {
 	if (fOrientation == B_HORIZONTAL)
 		return BarFrame().left + 1.0f;
-	else
-		return BarFrame().bottom - 1.0f;
+
+	return BarFrame().bottom - 1.0f;
 }
 
 
@@ -1701,17 +1703,15 @@ BSlider::_MaxPosition() const
 {
 	if (fOrientation == B_HORIZONTAL)
 		return BarFrame().right - 1.0f;
-	else
-		return BarFrame().top + 1.0f;
+
+	return BarFrame().top + 1.0f;
 }
 
 
 extern "C"
 void _ReservedSlider4__7BSlider(BSlider *slider, int32 minimum, int32 maximum)
 {
-#ifdef __HAIKU__
 	slider->BSlider::SetLimits(minimum, maximum);
-#endif
 }
 
 
