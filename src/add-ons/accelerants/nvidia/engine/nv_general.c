@@ -382,11 +382,11 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia Quadro2 Pro (NV15)\n"));
 		status = nvxx_general_powerup();
 		break;
-	case 0x016010de: /* Nvidia unknown FX Go */
+	case 0x016010de: /* Nvidia GeForce 6500 Go */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia unknown FX Go (NV44)\n"));
+		LOG(4,("POWERUP: Detected Nvidia GeForce 6500 Go (NV44)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x016110de: /* Nvidia GeForce 6200 TurboCache */
@@ -401,10 +401,10 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia GeForce 6200SE TurboCache (NV44)\n"));
 		status = nvxx_general_powerup();
 		break;
-	case 0x016310de: /* Nvidia unknown FX */
+	case 0x016310de: /* Nvidia GeForce 6200LE */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia unknown FX (NV44)\n"));
+		LOG(4,("POWERUP: Detected Nvidia GeForce 6200LE (NV44)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x016410de: /* Nvidia GeForce FX 6200 Go */
@@ -420,11 +420,11 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia Quadro FX NVS 285 (NV44)\n"));
 		status = nvxx_general_powerup();
 		break;
-	case 0x016610de: /* Nvidia unknown FX Go */
+	case 0x016610de: /* Nvidia GeForce 6400 Go */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia unknown FX Go (NV44)\n"));
+		LOG(4,("POWERUP: Detected Nvidia GeForce 6400 Go (NV44)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x016710de: /* Nvidia GeForce 6200 Go */
@@ -434,7 +434,14 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia GeForce 6200 Go (NV44)\n"));
 		status = nvxx_general_powerup();
 		break;
-	case 0x016810de: /* Nvidia GeForce 6250 Go */
+	case 0x016810de: /* Nvidia GeForce 6400 Go */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia GeForce 6400 Go (NV44)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x016910de: /* Nvidia GeForce 6250 Go */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
 		si->ps.laptop = true;
@@ -511,7 +518,7 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia Quadro4 (NV18)\n"));
 		status = nvxx_general_powerup();
 		break;
-	case 0x018910de: /* Nvidia GeForce4 MX AGP8X */
+	case 0x018910de: /* Nvidia GeForce4 MX AGP8X (PPC) */
 		si->ps.card_type = NV18;
 		si->ps.card_arch = NV10A;
 		LOG(4,("POWERUP: Detected Nvidia GeForce4 MX AGP8X (NV18)\n"));
