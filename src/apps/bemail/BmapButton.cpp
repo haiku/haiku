@@ -32,14 +32,19 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
 #include "BmapButton.h"
+
+#include <BeBuild.h>
 #include <Bitmap.h>
 #include <Autolock.h>
 #include <Application.h>
 #include <Resources.h>
+
 #include <stdlib.h>
 
-#ifndef B_BEOS_VERSION_5_0_4
+
+#ifndef B_BEOS_VERSION_DANO
 static rgb_color
 mix_color(rgb_color color1, rgb_color color2, float portion)
 {
@@ -56,13 +61,12 @@ disable_color(rgb_color color, rgb_color background)
 {
 	return mix_color(color, background, .5);
 }
-#endif // #ifndef B_BEOS_VERSION_5_0_4
+#endif // #ifndef B_BEOS_VERSION_DANO
 
 BList BmapButton::fBitmapCache;
 BLocker BmapButton::fBmCacheLock;
 		
-struct BitmapItem
-{
+struct BitmapItem {
 	BBitmap *bm;
 	int32 id;
 	int32 openCount;
@@ -178,10 +182,11 @@ BmapButton::Draw(BRect updateRect)
 {
 	BRect bounds(Bounds());
 	float labelHeight, labelWidth;
-	
-	#if F_SHOW_GEOMETRY
+
+#if F_SHOW_GEOMETRY
 	StrokeRect(bounds);
-	#endif
+#endif
+
 	// Draw Label
 	if (fShowLabel) {
 		font_height	fheight;
@@ -199,18 +204,18 @@ BmapButton::Draw(BRect updateRect)
 		textRect.right = textRect.left+labelWidth;
 		textRect.bottom = bounds.bottom;
 		textRect.top = textRect.bottom-fheight.descent-fheight.ascent-1;
-		
+
 		// Only draw if it's within the update rect
 		if (updateRect.Intersects(textRect)) {
 			float baseLine = textRect.bottom-fheight.descent;
-			
+
 			if (IsFocus() && fActive)
 				SetHighColor(0, 0, 255);
 			else
 				SetHighColor(ViewColor());
 			StrokeLine(BPoint(textRect.left, baseLine),
 				BPoint(textRect.right, baseLine));
-			
+
 			if (IsEnabled())
 				SetHighColor(0, 0, 0);
 			else {
@@ -219,13 +224,12 @@ BmapButton::Draw(BRect updateRect)
 			}
 			MovePenTo(textRect.left, baseLine);
 			DrawString(Label());
-			
-			#if F_SHOW_GEOMETRY
+
+#if F_SHOW_GEOMETRY
 			FrameRect(textRect);
-			#endif
+#endif
 		}
-	}
-	else {
+	} else {
 		labelHeight = 0;
 		labelWidth = 0;
 	}
@@ -256,12 +260,17 @@ BmapButton::Draw(BRect updateRect)
 		fBitmapRect.OffsetBy((bounds.right-bounds.left-fBitmapRect.right-fBitmapRect.left)/2,
 			(bounds.bottom-bounds.top-labelHeight-fBitmapRect.bottom-fBitmapRect.top)/2);
 		// Update if within update rect
+
+		SetDrawingMode(B_OP_OVER);
+
 		if (updateRect.Intersects(fBitmapRect)) {
 			DrawBitmap(bm, fBitmapRect);
 			#if F_SHOW_GEOMETRY
 			StrokeRect(fBitmapRect);
 			#endif
 		}
+
+		SetDrawingMode(B_OP_COPY);
 	}
 }
 
