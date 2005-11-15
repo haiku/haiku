@@ -1632,6 +1632,13 @@ status_t BT_stop_tvout(void)
 	 * a full encoder chip reset could be done here (so after decoupling crtc)... */
 	/* (but: beware of the 'locked SDA' syndrome then!) */
 
+	/* fixme if needed: we _could_ setup a TVout mode and apply the testsignal here... */
+	if (0)
+	{
+		//set mode (selecting PAL/NTSC according to board wiring for example) etc, then:
+		BT_testsignal();
+	}
+
 	return B_OK;
 }//end BT_stop_tvout.
 
@@ -1734,13 +1741,6 @@ status_t BT_setmode(display_mode target)
 		else
 			head1_set_timing(tv_target);
 	}
-
-//fixme: only testing older cards for now...
-if (si->ps.secondary_head && (si->ps.card_type > NV15))
-{
-	BT_testsignal();
-	return B_OK;
-}
 
 	/* now set GPU CRTC to slave mode */
 	BT_start_tvout(tv_target);

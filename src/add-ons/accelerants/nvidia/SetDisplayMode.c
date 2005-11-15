@@ -84,8 +84,8 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	if (si->ps.tvout) BT_stop_tvout();
 
 	/* turn off screen(s) _after_ TVout is disabled (if applicable) */
-	head1_dpms(false, false, false);
-	if (si->ps.secondary_head) head2_dpms(false, false, false);
+	head1_dpms(false, false, false, true);
+	if (si->ps.secondary_head) head2_dpms(false, false, false, true);
 	if (si->ps.tvout) BT_dpms(false);
 
 	/*where in framebuffer the screen is (should this be dependant on previous MOVEDISPLAY?)*/
@@ -479,14 +479,17 @@ void SET_INDEXED_COLORS(uint count, uint8 first, uint8 *color_data, uint32 flags
 /* Put the display into one of the Display Power Management modes. */
 status_t SET_DPMS_MODE(uint32 dpms_flags)
 {
-	bool display, h1h, h1v, h2h, h2v;
+	bool display, h1h, h1v, h2h, h2v, do_p1, do_p2;
 
 	interrupt_enable(false);
 
-	LOG(4,("SET_DPMS_MODE: 0x%08x\n", dpms_flags));
+	LOG(4,("SET_DPMS_MODE: $%08x\n", dpms_flags));
 
 	/* note current DPMS state for our reference */
 	si->dpms_flags = dpms_flags;
+
+	/* preset: DPMS for panels should be executed */
+	do_p1 = do_p2 = true;
 
 	/* determine signals to send to head(s) */
 	display = h1h = h1v = h2h = h2v = true;
@@ -504,7 +507,7 @@ status_t SET_DPMS_MODE(uint32 dpms_flags)
 		display = h1h = h1v = h2h = h2v = false;
 		break;
 	default:
-		LOG(8,("SET: Invalid DPMS settings (DH) 0x%08x\n", dpms_flags));
+		LOG(8,("SET: Invalid DPMS settings $%08x\n", dpms_flags));
 		interrupt_enable(true);
 		return B_ERROR;
 	}
@@ -530,6 +533,8 @@ status_t SET_DPMS_MODE(uint32 dpms_flags)
 					 * This leaves Hsync only for shutting off the VGA screen. */
 					h1h = false;
 					h1v = true;
+					/* block panel DPMS updates */
+					do_p1 = false;
 				}
 				else
 				{
@@ -551,6 +556,7 @@ status_t SET_DPMS_MODE(uint32 dpms_flags)
 				{
 					h2h = false;
 					h2v = true;
+					do_p2 = false;
 				}
 				else
 				{
@@ -569,6 +575,7 @@ status_t SET_DPMS_MODE(uint32 dpms_flags)
 				{
 					h2h = false;
 					h2v = true;
+					do_p2 = false;
 				}
 				else
 				{
@@ -582,6 +589,7 @@ status_t SET_DPMS_MODE(uint32 dpms_flags)
 				{
 					h1h = false;
 					h1v = true;
+					do_p1 = false;
 				}
 				else
 				{
@@ -593,9 +601,9 @@ status_t SET_DPMS_MODE(uint32 dpms_flags)
 	}
 
 	/* issue actual DPMS commands as far as applicable */
-	head1_dpms(display, h1h, h1v);
+	head1_dpms(display, h1h, h1v, do_p1);
 	if ((si->ps.secondary_head) && (si->dm.flags & DUALHEAD_BITS))
-		head2_dpms(display, h2h, h2v);
+		head2_dpms(display, h2h, h2v, do_p2);
 	if (si->dm.flags & TV_BITS)
 		BT_dpms(display);
 

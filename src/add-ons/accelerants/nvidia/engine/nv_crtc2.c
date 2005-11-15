@@ -531,11 +531,12 @@ status_t nv_crtc2_depth(int mode)
 	return B_OK;
 }
 
-status_t nv_crtc2_dpms(bool display, bool h, bool v)
+status_t nv_crtc2_dpms(bool display, bool h, bool v, bool do_panel)
 {
 	uint8 temp;
+	char msg[100];
 
-	LOG(4,("CRTC2: setting DPMS: "));
+	sprintf(msg, "CRTC2: setting DPMS: ");
 
 	/* enable access to secondary head */
 	set_crtc_owner(1);
@@ -552,7 +553,7 @@ status_t nv_crtc2_dpms(bool display, bool h, bool v)
 		/* end synchronous reset because display should be enabled */
 		SEQW(RESET, 0x03);
 
-		if (si->ps.tmds2_active && !si->ps.laptop)
+		if (do_panel && si->ps.tmds2_active && !si->ps.laptop)
 		{
 			/* restore original panelsync and panel-enable */
 			uint32 panelsync = 0x00000000;
@@ -573,16 +574,18 @@ status_t nv_crtc2_dpms(bool display, bool h, bool v)
 			/* ... and powerup external TMDS transmitter if it exists */
 			/* (confirmed OK on NV28 and NV34) */
 			//CRTC2W(0x59, (CRTC2R(0x59) | 0x01));
+
+			sprintf(msg, "%s(panel-)", msg);
 		}
 
-		LOG(4,("display on, "));
+		sprintf(msg, "%sdisplay on, ", msg);
 	}
 	else
 	{
 		/* turn screen off */
 		SEQW(CLKMODE, (temp | 0x20));
 
-		if (si->ps.tmds2_active && !si->ps.laptop)
+		if (do_panel && si->ps.tmds2_active && !si->ps.laptop)
 		{
 			/* shutoff panelsync and disable panel */
 			DAC2W(FP_TG_CTRL, ((DAC2R(FP_TG_CTRL) & 0xcfffffcc) | 0x20000022));
@@ -598,31 +601,35 @@ status_t nv_crtc2_dpms(bool display, bool h, bool v)
 			/* ... and powerdown external TMDS transmitter if it exists */
 			/* (confirmed OK on NV28 and NV34) */
 			//CRTC2W(0x59, (CRTC2R(0x59) & 0xfe));
+
+			sprintf(msg, "%s(panel-)", msg);
 		}
 
-		LOG(4,("display off, "));
+		sprintf(msg, "%sdisplay off, ", msg);
 	}
 
 	if (h)
 	{
 		CRTC2W(REPAINT1, (CRTC2R(REPAINT1) & 0x7f));
-		LOG(4,("hsync enabled, "));
+		sprintf(msg, "%shsync enabled, ", msg);
 	}
 	else
 	{
 		CRTC2W(REPAINT1, (CRTC2R(REPAINT1) | 0x80));
-		LOG(4,("hsync disabled, "));
+		sprintf(msg, "%shsync disabled, ", msg);
 	}
 	if (v)
 	{
 		CRTC2W(REPAINT1, (CRTC2R(REPAINT1) & 0xbf));
-		LOG(4,("vsync enabled\n"));
+		sprintf(msg, "%svsync enabled\n", msg);
 	}
 	else
 	{
 		CRTC2W(REPAINT1, (CRTC2R(REPAINT1) | 0x40));
-		LOG(4,("vsync disabled\n"));
+		sprintf(msg, "%svsync disabled\n", msg);
 	}
+
+	LOG(4, (msg));
 
 	return B_OK;
 }

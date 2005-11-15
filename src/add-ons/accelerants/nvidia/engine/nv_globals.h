@@ -15,7 +15,7 @@ extern nv_in_out_isa nv_isa_access;
 typedef status_t (*crtc_validate_timing)(uint16*, uint16*, uint16*, uint16*, uint16*, uint16*, uint16*, uint16*);
 typedef status_t (*crtc_set_timing)(display_mode);
 typedef status_t (*crtc_depth)(int);
-typedef status_t (*crtc_dpms)(bool, bool, bool);
+typedef status_t (*crtc_dpms)(bool, bool, bool, bool);
 typedef status_t (*crtc_set_display_pitch)(void);
 typedef status_t (*crtc_set_display_start)(uint32, uint8);
 typedef status_t (*crtc_cursor_init)(void);

@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-10/2005
+   Rudolf Cornelissen 7/2003-11/2005
 */
 
 #define MODULE_BIT 0x00002000
@@ -263,11 +263,11 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 	}
 
 	/* turn off both displays and the hardcursors (also disables transfers) */
-	nv_crtc_dpms(false, false, false);
+	nv_crtc_dpms(false, false, false, true);
 	nv_crtc_cursor_hide();
 	if (si->ps.secondary_head)
 	{
-		nv_crtc2_dpms(false, false, false);
+		nv_crtc2_dpms(false, false, false, true);
 		nv_crtc2_cursor_hide();
 	}
 
@@ -341,11 +341,11 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 	}
 
 	/* turn off both displays and the hardcursors (also disables transfers) */
-	nv_crtc_dpms(false, false, false);
+	nv_crtc_dpms(false, false, false, true);
 	nv_crtc_cursor_hide();
 	if (si->ps.secondary_head)
 	{
-		nv_crtc2_dpms(false, false, false);
+		nv_crtc2_dpms(false, false, false, true);
 		nv_crtc2_cursor_hide();
 	}
 

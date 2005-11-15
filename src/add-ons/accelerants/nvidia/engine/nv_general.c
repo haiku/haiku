@@ -91,7 +91,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.62 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.63 running.\n"));
 
 	/* log VBLANK INT usability status */
 	if (si->ps.int_assigned)
@@ -1267,11 +1267,11 @@ static status_t nv_general_bios_to_powergraphics()
 	unlock_card();
 
 	/* turn off both displays and the hardcursors (also disables transfers) */
-	head1_dpms(false, false, false);
+	head1_dpms(false, false, false, true);
 	head1_cursor_hide();
 	if (si->ps.secondary_head)
 	{
-		head2_dpms(false, false, false);
+		head2_dpms(false, false, false, true);
 		head2_cursor_hide();
 	}
 
