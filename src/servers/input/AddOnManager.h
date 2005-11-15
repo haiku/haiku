@@ -1,14 +1,16 @@
 /*
-** Copyright 2004, the Haiku project. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Author : Jérôme Duval
-** Original authors: Marcus Overhagen, Axel Dörfler
-*/
+ * Copyright 2004-2005, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Marcus Overhagen, Axel Dörfler
+ *		Jérôme Duval
+ */
 #ifndef _ADD_ON_MANAGER_H
 #define _ADD_ON_MANAGER_H
 
 // Manager for input_server add-ons (devices, filters, methods)
+
 
 #include <Locker.h>
 #include <Looper.h>
@@ -19,6 +21,7 @@
 #include "AddOnMonitorHandler.h"
 #include "TList.h"
 
+
 class AddOnManager : public BLooper {
 	public:
 		AddOnManager(bool safeMode);
@@ -27,6 +30,7 @@ class AddOnManager : public BLooper {
 		void		LoadState();
 		void		SaveState();
 		void 		MessageReceived(BMessage *message);
+
 	private:
 		status_t	RegisterAddOn(BEntry &entry);
 		status_t	UnregisterAddOn(BEntry &entry);
@@ -52,6 +56,9 @@ class AddOnManager : public BLooper {
 		status_t GetReplicantView(BMessenger target, int32 uid, BMessage *reply) const;
 	
 	private:
+		class InputServerMonitorHandler;
+		friend class InputServerMonitorHandler;
+
 		struct device_info {
 			entry_ref ref;
 			image_id addon_image;

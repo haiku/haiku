@@ -1,83 +1,58 @@
-/*****************************************************************************/
-// Haiku InputServer
-//
-// [Description]
-//
-//
-// This application and all source files used in its construction, except 
-// where noted, are licensed under the MIT License, and have been written 
-// and are:
-//
-// Copyright (c) 2002-2005 Haiku Project
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included 
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-/*****************************************************************************/
+/*
+ * Copyright 2002-2005, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
-
-#include <Deskbar.h>
-#include <Directory.h>
-#include <Entry.h>
-#include <File.h>
-#include <FindDirectory.h>
-#include <Path.h>
-#include <Roster.h>
-#include <Locker.h>
-#include <Message.h>
-#include <String.h>
-#include <OS.h>
-#include <driver_settings.h>
-
-#include <stdio.h>
 
 #include "InputServer.h"
 #include "InputServerTypes.h"
 #include "kb_mouse_driver.h"
 #include "MethodReplicant.h"
 
+#include <Autolock.h>
+#include <Deskbar.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <File.h>
+#include <FindDirectory.h>
+#include <Locker.h>
+#include <Message.h>
+#include <OS.h>
+#include <Path.h>
+#include <Roster.h>
+#include <String.h>
+#include <driver_settings.h>
+
+#include <stdio.h>
+
+#include "SystemKeymap.cpp"
+	// this is an automatically generated file
+
 #ifndef USE_R5_STYLE_COMM
 #include <ServerProtocol.h>
 #endif
 
-#define FAST_MOUSE_MOVED '_FMM'		// received from app_server when screen res changed, but could be sent to too. 
+#define FAST_MOUSE_MOVED '_FMM'
+	// received from app_server when screen res changed, but could be sent to too. 
 
-
-extern "C" void RegisterDevices(input_device_ref** devices)
-{
-	CALLED();
-};
 
 #ifdef COMPILE_FOR_R5
-extern "C" status_t _kget_safemode_option_(const char *parameter, char *buffer, size_t *_bufferSize);
+extern "C" status_t _kget_safemode_option_(const char *parameter,
+	char *buffer, size_t *_bufferSize);
 #else
-extern "C" status_t _kern_get_safemode_option(const char *parameter, char *buffer, size_t *_bufferSize);
+extern "C" status_t _kern_get_safemode_option(const char *parameter,
+	char *buffer, size_t *_bufferSize);
 #endif
 
 
-// Static InputServer member variables.
-//
-BList   InputServer::gInputDeviceList;
-BLocker InputServer::gInputDeviceListLocker("is_device_queue_sem");
+// Global InputServer member variables.
 
-BList   InputServer::gInputFilterList;
+InputServer* gInputServer;
+
+BList InputServer::gInputFilterList;
 BLocker InputServer::gInputFilterListLocker("is_filter_queue_sem");
 
-BList   InputServer::gInputMethodList;
+BList InputServer::gInputMethodList;
 BLocker InputServer::gInputMethodListLocker("is_method_queue_sem");
 
 DeviceManager InputServer::gDeviceManager;
@@ -91,32 +66,76 @@ FILE *InputServer::sLogFile = NULL;
 
 extern "C" _EXPORT BView* instantiate_deskbar_item();
 
-BView *
-instantiate_deskbar_item()
+
+InputDeviceListItem::InputDeviceListItem(BInputServerDevice& serverDevice,
+	input_device_ref& device)
+	:
+	fServerDevice(&serverDevice),
+	fDevice(device),
+	fRunning(false)
 {
-	return new MethodReplicant(INPUTSERVER_SIGNATURE);
 }
 
 
-/*
- *
- */
-int main()
+void
+InputDeviceListItem::Start()
 {
-	InputServer	*myInputServer = new InputServer;
-	
-	myInputServer->Run();
-	
-	delete myInputServer;
+	PRINT(("  Starting: %s\n", fDevice.name));
+	fServerDevice->Start(fDevice.name, fDevice.cookie);
+	fRunning = true;
 }
 
 
-/*
- *  Method: InputServer::InputServer()
- *   Descr: 
- */
-InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
-	sSafeMode(false),
+void
+InputDeviceListItem::Stop()
+{
+	PRINT(("  Stopping: %s\n", fDevice.name));
+	fServerDevice->Stop(fDevice.name, fDevice.cookie);
+	fRunning = false;
+}
+
+
+void
+InputDeviceListItem::Control(uint32 code, BMessage* message)
+{
+	fServerDevice->Control(fDevice.name, fDevice.cookie, code, message);
+}
+
+
+bool
+InputDeviceListItem::HasName(const char* name) const
+{
+	if (name == NULL)
+		return false;
+
+	return !strcmp(name, fDevice.name);
+}
+
+
+bool
+InputDeviceListItem::HasType(input_device_type type) const
+{
+	return type == fDevice.type;
+}
+
+
+bool
+InputDeviceListItem::Matches(const char* name, input_device_type type) const
+{
+	if (name != NULL)
+		return HasName(name);
+
+	return HasType(type);
+}
+
+
+//	#pragma mark -
+
+
+InputServer::InputServer()
+	: BApplication(INPUTSERVER_SIGNATURE),
+	fSafeMode(false),
+	fInputDeviceListLocker("input server device list"),
 	fChars(NULL),
 	fScreen(B_MAIN_SCREEN_ID),
 	fBLWindow(NULL),
@@ -128,6 +147,7 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 #endif
 
 	CALLED();
+	gInputServer = this;
 
 	EventLoop();
 
@@ -143,7 +163,7 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
 			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
 			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
-			sSafeMode = true;
+			fSafeMode = true;
 	}
 
 	gDeviceManager.LoadState();
@@ -186,7 +206,7 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 		PRINTERR(("input_server couldn't find app_server's input port\n"));
 #endif 
 
-	InitKeyboardMouseStates();
+	_InitKeyboardMouseStates();
 
 	fAddOnManager = new AddOnManager(SafeMode());
 	fAddOnManager->LoadState();
@@ -195,11 +215,8 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 	BRoster().StartWatching(messenger, B_REQUEST_LAUNCHED);
 }
 
-/*
- *  Method: InputServer::InputServer()
- *   Descr: 
- */
-InputServer::~InputServer(void)
+
+InputServer::~InputServer()
 {
 	CALLED();
 	fAddOnManager->Lock();
@@ -218,10 +235,6 @@ InputServer::~InputServer(void)
 }
 
 
-/*
- *  Method: InputServer::ArgvReceived()
- *   Descr: 
- */
 void
 InputServer::ArgvReceived(int32 argc, char** argv)
 {
@@ -239,33 +252,27 @@ InputServer::ArgvReceived(int32 argc, char** argv)
 }
 
 
-/*
- *  Method: InputServer::InitKeyboardMouseStates()
- *   Descr: 
- */
 void
-InputServer::InitKeyboardMouseStates(void)
+InputServer::_InitKeyboardMouseStates()
 {
 	CALLED();
 	// This is where we determine the screen resolution from the app_server and find the center of the screen
 	// fMousePos is then set to the center of the screen.
 
 	fFrame = fScreen.Frame();
-	if (fFrame == BRect(0,0,0,0))
-		fFrame = BRect(0,0,800,600);
-	fMousePos = BPoint(fFrame.right/2, fFrame.bottom/2);
-	
-	if (LoadKeymap()!=B_OK)
+	if (fFrame == BRect(0, 0, 0, 0))
+		fFrame = BRect(0, 0, 800, 600);
+	fMousePos = BPoint(fFrame.right / 2, fFrame.bottom / 2);
+
+	if (LoadKeymap() != B_OK)
 		LoadSystemKeymap();
-		
+
 	BMessage *msg = new BMessage(B_MOUSE_MOVED);
 	HandleSetMousePosition(msg, msg);
 
 	fActiveMethod = &gKeymapMethod;
 }
 
-
-#include "SystemKeymap.cpp"
 
 status_t
 InputServer::LoadKeymap()
@@ -314,107 +321,87 @@ InputServer::LoadSystemKeymap()
 	fCharsSize = sSystemKeyCharsSize;
 	fChars = new char[fCharsSize];
 	memcpy(fChars, sSystemKeyChars, fCharsSize);
-	
+
 	// we save this keymap to file
 	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path)!=B_OK)
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
 		return B_BAD_VALUE;
-	
+
 	path.Append("Key_map");
 
 	entry_ref ref;
 	get_ref_for_path(path.Path(), &ref);
-	
-	status_t err;
-	
-	BFile file(&ref, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE );
-	if ((err = file.InitCheck()) != B_OK) {
+
+	BFile file;
+	status_t err = file.SetTo(&ref, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	if (err != B_OK) {
 		PRINTERR(("error %s\n", strerror(err)));
 		return err;
 	}
-	
-	for (uint32 i=0; i<sizeof(fKeys)/4; i++)
+
+	for (uint32 i = 0; i < sizeof(fKeys) / 4; i++) {
 		((uint32*)&fKeys)[i] = B_HOST_TO_BENDIAN_INT32(((uint32*)&fKeys)[i]);
-		
-	if ((err = file.Write(&fKeys, sizeof(fKeys))) < (ssize_t)sizeof(fKeys)) {
+	}
+
+	if ((err = file.Write(&fKeys, sizeof(fKeys))) < (ssize_t)sizeof(fKeys))
 		return err;
-	}
-	
-	for (uint32 i=0; i<sizeof(fKeys)/4; i++)
+
+	for (uint32 i = 0; i < sizeof(fKeys) / 4; i++) {
 		((uint32*)&fKeys)[i] = B_BENDIAN_TO_HOST_INT32(((uint32*)&fKeys)[i]);
-	
-	fCharsSize = B_HOST_TO_BENDIAN_INT32(fCharsSize);
-	
-	if ((err = file.Write(&fCharsSize, sizeof(uint32))) < (ssize_t)sizeof(uint32)) {
-		return B_BAD_VALUE;
 	}
-	
+
+	fCharsSize = B_HOST_TO_BENDIAN_INT32(fCharsSize);
+
+	if ((err = file.Write(&fCharsSize, sizeof(uint32))) < (ssize_t)sizeof(uint32))
+		return B_BAD_VALUE;
+
 	fCharsSize = B_BENDIAN_TO_HOST_INT32(fCharsSize);
-	
+
 	if ((err = file.Write(fChars, fCharsSize)) < (ssize_t)fCharsSize)
 		return err;
-	
+
 	return B_OK;
-	
 }
 
 
-/*
- *  Method: InputServer::QuitRequested()
- *   Descr: 
- */
 bool
-InputServer::QuitRequested(void)
+InputServer::QuitRequested()
 {
 	CALLED();
 	if (!BApplication::QuitRequested())
 		return false;
-		
+
 	PostMessage(SYSTEM_SHUTTING_DOWN);
-	
+
 	fAddOnManager->SaveState();
 	gDeviceManager.SaveState();
-	
+
 	kill_thread(fISPortThread);
 	delete_port(fEventLooperPort);
 	fEventLooperPort = -1;
 	return true;
 }
 
-// ---------------------------------------------------------------
-// InputServer::ReadyToRun(void)
-//
-// Verifies to see if the input_server is able to start.
-//
-//
-// Parameters:
-//		None
-//
-// Returns:
-//		B_OK if the
-// ---------------------------------------------------------------
-void InputServer::ReadyToRun(void)
+
+void
+InputServer::ReadyToRun()
 {
 	CALLED();
 }
 
 
-/*
- *  Method: InputServer::MessageReceived()
- *   Descr: 
- */
 void
-InputServer::MessageReceived(BMessage *message)
+InputServer::MessageReceived(BMessage* message)
 {
 	CALLED();
-	
+
 	BMessage reply;
 	status_t status = B_OK;
 
-	PRINT(("%s what:%c%c%c%c\n", __PRETTY_FUNCTION__, message->what>>24, message->what>>16, message->what>>8, message->what));
-	
-	switch(message->what)
-	{
+	PRINT(("%s what:%c%c%c%c\n", __PRETTY_FUNCTION__, message->what >> 24,
+		message->what >> 16, message->what >> 8, message->what));
+
+	switch (message->what) {
 		case IS_SET_METHOD:
 			HandleSetMethod(message);
 			break;
@@ -502,35 +489,30 @@ InputServer::MessageReceived(BMessage *message)
 		case IS_METHOD_REGISTER:
 			fAddOnManager->PostMessage(message);
 			return;
-		case B_SOME_APP_LAUNCHED: {
+		case B_SOME_APP_LAUNCHED:
+		{
 			const char *signature;
+			// TODO: what's this for?
 			if (message->FindString("be:signature", &signature)==B_OK) {
 				PRINT(("input_server : %s\n", signature));
 				if (strcmp(signature, "application/x-vnd.Be-TSKB")==0) {
-				
+
 				}
 			}
 			return;
+		}
 
-		}
-			break;
 		default:
-		{
 			return;		
-		}
 	}
-	
+
 	reply.AddInt32("status", status);
 	message->SendReply(&reply);
 }
 
 
-/*
- *  Method: InputServer::HandleSetMethod()
- *   Descr: 
- */
 void
-InputServer::HandleSetMethod(BMessage *message)
+InputServer::HandleSetMethod(BMessage* message)
 {
 	CALLED();
 	uint32 cookie;
@@ -542,113 +524,78 @@ InputServer::HandleSetMethod(BMessage *message)
 }
 
 
-/*
- *  Method: InputServer::HandleGetSetMouseType()
- *   Descr: 
- */
 status_t
-InputServer::HandleGetSetMouseType(BMessage* message,
-                                     BMessage* reply)
+InputServer::HandleGetSetMouseType(BMessage* message, BMessage* reply)
 {
-	status_t status;
-	int32	type;
-	if (message->FindInt32("mouse_type", &type)==B_OK) {
+	int32 type;
+	if (message->FindInt32("mouse_type", &type) == B_OK) {
 		fMouseSettings.SetMouseType(type);
-		
+
 		BMessage msg(IS_CONTROL_DEVICES);
 		msg.AddInt32("type", B_POINTING_DEVICE);
 		msg.AddInt32("code", B_MOUSE_TYPE_CHANGED);
-		status = fAddOnManager->PostMessage(&msg);	
-	
-	} else
-		status = reply->AddInt32("mouse_type", 	fMouseSettings.MouseType());
-	return status;
+		return fAddOnManager->PostMessage(&msg);	
+	}
+
+	return reply->AddInt32("mouse_type", fMouseSettings.MouseType());
 }
 
 
-/*
- *  Method: InputServer::HandleGetSetMouseAcceleration()
- *   Descr: 
- */
 status_t
 InputServer::HandleGetSetMouseAcceleration(BMessage* message,
-                                             BMessage* reply)
+	BMessage* reply)
 {
-	status_t status;
 	int32 factor;
 	if (message->FindInt32("speed", &factor) == B_OK) {
 		fMouseSettings.SetAccelerationFactor(factor);
-		
+
 		BMessage msg(IS_CONTROL_DEVICES);
 		msg.AddInt32("type", B_POINTING_DEVICE);
 		msg.AddInt32("code", B_MOUSE_ACCELERATION_CHANGED);
-		status = fAddOnManager->PostMessage(&msg);	
-	} else
-		status = reply->AddInt32("speed", fMouseSettings.AccelerationFactor());
-	return status;
+		return fAddOnManager->PostMessage(&msg);	
+	}
+
+	return reply->AddInt32("speed", fMouseSettings.AccelerationFactor());
 }
 
 
-/*
- *  Method: InputServer::HandleGetSetKeyRepeatDelay()
- *   Descr: 
- */
 status_t
-InputServer::HandleGetSetKeyRepeatDelay(BMessage* message,
-                                          BMessage* reply)
+InputServer::HandleGetSetKeyRepeatDelay(BMessage* message, BMessage* reply)
 {
-	status_t status;
 	bigtime_t delay;
 	if (message->FindInt64("delay", &delay) == B_OK) {
 		fKeyboardSettings.SetKeyboardRepeatDelay(delay);
-		
+
 		BMessage msg(IS_CONTROL_DEVICES);
 		msg.AddInt32("type", B_KEYBOARD_DEVICE);
 		msg.AddInt32("code", B_KEY_REPEAT_DELAY_CHANGED);
-		status = fAddOnManager->PostMessage(&msg);
-	} else
-		status = reply->AddInt64("delay", fKeyboardSettings.KeyboardRepeatDelay());
-	return status;
+		return fAddOnManager->PostMessage(&msg);
+	}
+
+	return reply->AddInt64("delay", fKeyboardSettings.KeyboardRepeatDelay());
 }
 
 
-/*
- *  Method: InputServer::HandleGetKeyInfo()
- *   Descr: 
- */
 status_t
-InputServer::HandleGetKeyInfo(BMessage *message,
-                              BMessage *reply)
+InputServer::HandleGetKeyInfo(BMessage* message, BMessage* reply)
 {
-	return reply->AddData("key_info", B_ANY_TYPE, &fKey_info, sizeof(fKey_info));
+	return reply->AddData("key_info", B_ANY_TYPE, &fKeyInfo, sizeof(fKeyInfo));
 }
 
 
-/*
- *  Method: InputServer::HandleGetModifiers()
- *   Descr: 
- */
 status_t
-InputServer::HandleGetModifiers(BMessage *message,
-                                BMessage *reply)
+InputServer::HandleGetModifiers(BMessage* message, BMessage* reply)
 {
-	return reply->AddInt32("modifiers", fKey_info.modifiers);
+	return reply->AddInt32("modifiers", fKeyInfo.modifiers);
 }
 
 
-/*
- *  Method: InputServer::HandleSetModifierKey()
- *   Descr: 
- */
 status_t
-InputServer::HandleSetModifierKey(BMessage *message,
-                                  BMessage *reply)
+InputServer::HandleSetModifierKey(BMessage* message, BMessage* reply)
 {
-	status_t status = B_ERROR;
 	int32 modifier, key;
 	if (message->FindInt32("modifier", &modifier) == B_OK
 		&& message->FindInt32("key", &key) == B_OK) {
-	
 		switch (modifier) {
 			case B_CAPS_LOCK:
 				fKeys.caps_key = key;
@@ -689,77 +636,62 @@ InputServer::HandleSetModifierKey(BMessage *message,
 			default:
 				return B_ERROR;
 		}
-		
-		//TODO : unmap the key ?
-		
+
+		// TODO: unmap the key ?
+
 		BMessage msg(IS_CONTROL_DEVICES);
 		msg.AddInt32("type", B_KEYBOARD_DEVICE);
 		msg.AddInt32("code", B_KEY_MAP_CHANGED);
-		status = fAddOnManager->PostMessage(&msg);
+		return fAddOnManager->PostMessage(&msg);
 	}
-	return status;
+
+	return B_ERROR;
 }
 
 
-/*
- *  Method: InputServer::HandleSetKeyboardLocks()
- *   Descr: 
- */
 status_t
-InputServer::HandleSetKeyboardLocks(BMessage *message,
-                                    BMessage *reply)
+InputServer::HandleSetKeyboardLocks(BMessage* message, BMessage* reply)
 {
-	status_t status = B_ERROR;
 	if (message->FindInt32("locks", (int32*)&fKeys.lock_settings) == B_OK) {
 		BMessage msg(IS_CONTROL_DEVICES);
 		msg.AddInt32("type", B_KEYBOARD_DEVICE);
 		msg.AddInt32("code", B_KEY_LOCKS_CHANGED);
-		status = fAddOnManager->PostMessage(&msg);
+		return fAddOnManager->PostMessage(&msg);
 	}
-	
-	return status;
+
+	return B_ERROR;
 }
 
 
-/*
- *  Method: InputServer::HandleGetSetMouseSpeed()
- *   Descr: 
- */
 status_t
-InputServer::HandleGetSetMouseSpeed(BMessage* message,
-                                      BMessage* reply)
+InputServer::HandleGetSetMouseSpeed(BMessage* message, BMessage* reply)
 {
-	status_t status;
 	int32 speed;
 	if (message->FindInt32("speed", &speed) == B_OK) {
 		fMouseSettings.SetMouseSpeed(speed);
-		
+
 		BMessage msg(IS_CONTROL_DEVICES);
 		msg.AddInt32("type", B_POINTING_DEVICE);
 		msg.AddInt32("code", B_MOUSE_SPEED_CHANGED);
-		status = fAddOnManager->PostMessage(&msg);
-	} else
-		status = reply->AddInt32("speed", fMouseSettings.MouseSpeed());
-	return status;
+		return fAddOnManager->PostMessage(&msg);
+	}
+
+	return reply->AddInt32("speed", fMouseSettings.MouseSpeed());
 }
 
 
-/*
- *  Method: InputServer::HandleSetMousePosition()
- *   Descr: 
- */
 status_t
 InputServer::HandleSetMousePosition(BMessage *message, BMessage *outbound)
 {
 	CALLED();
-	
+
 	// this assumes that both supplied pointers are identical
-	
+
 	ASSERT(outbound == message);
-	
+
 	int32 xValue, yValue;	
-	
-   	switch(message->what){
+
+   	switch (message->what) {
    		case B_MOUSE_MOVED:
    		case B_MOUSE_DOWN:
    		case B_MOUSE_UP:
@@ -773,20 +705,18 @@ InputServer::HandleSetMousePosition(BMessage *message, BMessage *outbound)
 				outbound->RemoveName("x"); 
 				outbound->RemoveName("y");
 				outbound->AddPoint("where", fMousePos);
-				outbound->AddInt32("modifiers", fKey_info.modifiers);
+				outbound->AddInt32("modifiers", fKeyInfo.modifiers);
 				PRINT(("new position : %f, %f, %ld, %ld\n", fMousePos.x, fMousePos.y, xValue, yValue));
-	   		}
-		else if (outbound->FindPoint("where", &fMousePos) == B_OK) {
-			outbound->RemoveName("where");
-			fMousePos.ConstrainTo(fFrame);
-			outbound->AddPoint("where", fMousePos);
-			outbound->AddInt32("modifiers", fKey_info.modifiers);
-			PRINT(("new position : %f, %f\n", fMousePos.x, fMousePos.y));
-		}
+	   		} else if (outbound->FindPoint("where", &fMousePos) == B_OK) {
+				outbound->RemoveName("where");
+				fMousePos.ConstrainTo(fFrame);
+				outbound->AddPoint("where", fMousePos);
+				outbound->AddInt32("modifiers", fKeyInfo.modifiers);
+				PRINT(("new position : %f, %f\n", fMousePos.x, fMousePos.y));
+			}
 #ifdef R5_CURSOR_COMM
-		if (fAppBuffer) {
-				fAppBuffer[0] =
-       		    	(0x3 << 30)
+			if (fAppBuffer) {
+				fAppBuffer[0] = (0x3 << 30L)
                		| ((uint32)fMousePos.x & 0x7fff) << 15
                		| ((uint32)fMousePos.y & 0x7fff);
 
@@ -794,25 +724,28 @@ InputServer::HandleSetMousePosition(BMessage *message, BMessage *outbound)
                 	release_sem(fCursorSem);
         	}
 #endif
-		break;
+			break;
     	
     	// some Key Down and up codes ..
 		case B_KEY_DOWN:
 		case B_KEY_UP:
 		case B_UNMAPPED_KEY_DOWN:
 		case B_UNMAPPED_KEY_UP:
-		case B_MODIFIERS_CHANGED: {
+		case B_MODIFIERS_CHANGED:
+		{
 			ssize_t size = 0;
 			uint8 *data = NULL;
-			outbound->FindInt32("modifiers", (int32*)&fKey_info.modifiers);
-			if ((outbound->FindData("states", B_UINT8_TYPE, (const void**)&data, &size) == B_OK) 
-				&& (size == (ssize_t)sizeof(fKey_info.key_states))) {
+			outbound->FindInt32("modifiers", (int32*)&fKeyInfo.modifiers);
+			if (outbound->FindData("states", B_UINT8_TYPE,
+					(const void**)&data, &size) == B_OK
+				&& size == (ssize_t)sizeof(fKeyInfo.key_states)) {
 				PRINT(("updated keyinfo\n"));
-				memcpy(fKey_info.key_states, data, size);
+				memcpy(fKeyInfo.key_states, data, size);
 			}
-			PRINT(("keyinfo %ld %ld\n", size, (ssize_t)sizeof(fKey_info.key_states)));
-				
+			PRINT(("keyinfo %ld %ld\n", size, (ssize_t)sizeof(fKeyInfo.key_states)));
+			break;
 		}
+
    		default:
 			break;
 	}
@@ -821,134 +754,98 @@ InputServer::HandleSetMousePosition(BMessage *message, BMessage *outbound)
 }
 
 
-/*
- *  Method: InputServer::HandleGetMouseMap()
- *   Descr: 
- */
 status_t
-InputServer::HandleGetSetMouseMap(BMessage* message,
-                                    BMessage* reply)
+InputServer::HandleGetSetMouseMap(BMessage* message, BMessage* reply)
 {
-	status_t status;
 	mouse_map *map;
-	ssize_t    size;
-	
+	ssize_t size;
 	if (message->FindData("mousemap", B_RAW_TYPE, (const void**)&map, &size) == B_OK) {
 		fMouseSettings.SetMapping(*map);
-		
+
 		BMessage msg(IS_CONTROL_DEVICES);
 		msg.AddInt32("type", B_POINTING_DEVICE);
 		msg.AddInt32("code", B_MOUSE_MAP_CHANGED);
-		status = fAddOnManager->PostMessage(&msg);
-	
+		return fAddOnManager->PostMessage(&msg);
 	} else {
-		mouse_map 	map;
+		mouse_map map;
 		fMouseSettings.Mapping(map);
-		status = reply->AddData("mousemap", B_RAW_TYPE, &map, sizeof(mouse_map) );
-	} 
-	return status;
+		return reply->AddData("mousemap", B_RAW_TYPE, &map, sizeof(mouse_map));
+	}
 }
 
 
-/*
- *  Method: InputServer::HandleGetKeyboardID()
- *   Descr: 
- */
 status_t
-InputServer::HandleGetKeyboardID(BMessage *message,
-                                      BMessage *reply)
+InputServer::HandleGetKeyboardID(BMessage* message, BMessage* reply)
 {
-	return reply->AddInt16("id", sKeyboardID);
+	return reply->AddInt16("id", fKeyboardID);
 }
 
 
-/*
- *  Method: InputServer::HandleGetSetClickSpeed()
- *   Descr: 
- */
 status_t
-InputServer::HandleGetSetClickSpeed(BMessage *message,
-                                      BMessage *reply)
+InputServer::HandleGetSetClickSpeed(BMessage* message, BMessage* reply)
 {
-	status_t status = B_ERROR;
-	bigtime_t	click_speed;
-	if (message->FindInt64("speed", &click_speed) == B_OK) {
-		fMouseSettings.SetClickSpeed(click_speed);
-		
+	bigtime_t clickSpeed;
+	if (message->FindInt64("speed", &clickSpeed) == B_OK) {
+		fMouseSettings.SetClickSpeed(clickSpeed);
+
 		BMessage msg(IS_CONTROL_DEVICES);
 		msg.AddInt32("type", B_POINTING_DEVICE);
 		msg.AddInt32("code", B_CLICK_SPEED_CHANGED);
-		status = fAddOnManager->PostMessage(&msg);
-	
-	} else
-		status = reply->AddInt64("speed", fMouseSettings.ClickSpeed());
-	return status;
+		return fAddOnManager->PostMessage(&msg);
+	}
+
+	return reply->AddInt64("speed", fMouseSettings.ClickSpeed());
 }
 
 
-/*
- *  Method: InputServer::HandleGetSetKeyRepeatRate()
- *   Descr: 
- */
 status_t
-InputServer::HandleGetSetKeyRepeatRate(BMessage* message,
-                                         BMessage* reply)
+InputServer::HandleGetSetKeyRepeatRate(BMessage* message, BMessage* reply)
 {
-	status_t status;
-	int32	key_repeat_rate;
-	if (message->FindInt32("rate", &key_repeat_rate) == B_OK) {
-		fKeyboardSettings.SetKeyboardRepeatRate(key_repeat_rate);
-	
+	int32 keyRepeatRate;
+	if (message->FindInt32("rate", &keyRepeatRate) == B_OK) {
+		fKeyboardSettings.SetKeyboardRepeatRate(keyRepeatRate);
+
 		BMessage msg(IS_CONTROL_DEVICES);
 		msg.AddInt32("type", B_KEYBOARD_DEVICE);
 		msg.AddInt32("code", B_KEY_REPEAT_RATE_CHANGED);
-		status = fAddOnManager->PostMessage(&msg);
-	} else
-		status = reply->AddInt32("rate", fKeyboardSettings.KeyboardRepeatRate());
-	return status;
+		return fAddOnManager->PostMessage(&msg);
+	}
+
+	return reply->AddInt32("rate", fKeyboardSettings.KeyboardRepeatRate());
 }
 
 
-/*
- *  Method: InputServer::HandleGetSetKeyMap()
- *   Descr: 
- */
 status_t
-InputServer::HandleGetSetKeyMap(BMessage *message,
-                                     BMessage *reply)
-{	
+InputServer::HandleGetSetKeyMap(BMessage* message, BMessage* reply)
+{
 	CALLED();
-	status_t status;
+
 	if (message->what == IS_GET_KEY_MAP) {
-		status = reply->AddData("keymap", B_ANY_TYPE, &fKeys, sizeof(fKeys));
+		status_t status = reply->AddData("keymap", B_ANY_TYPE, &fKeys, sizeof(fKeys));
 		if (status == B_OK)
 			status = reply->AddData("key_buffer", B_ANY_TYPE, fChars, fCharsSize);
-	} else {
-		if (LoadKeymap()!=B_OK)
-			LoadSystemKeymap();
-		
-		BMessage msg(IS_CONTROL_DEVICES);
-		msg.AddInt32("type", B_KEYBOARD_DEVICE);
-		msg.AddInt32("code", B_KEY_MAP_CHANGED);
-		status = fAddOnManager->PostMessage(&msg);
+
+		return status;
 	}
-	return status;
+
+	if (LoadKeymap() != B_OK)
+		LoadSystemKeymap();
+
+	BMessage msg(IS_CONTROL_DEVICES);
+	msg.AddInt32("type", B_KEYBOARD_DEVICE);
+	msg.AddInt32("code", B_KEY_MAP_CHANGED);
+	return fAddOnManager->PostMessage(&msg);
 }
 
 
-/*
- *  Method: InputServer::HandleFocusUnfocusIMAwareView()
- *   Descr: 
- */
 status_t
-InputServer::HandleFocusUnfocusIMAwareView(BMessage *message,
-                                           BMessage *reply)
+InputServer::HandleFocusUnfocusIMAwareView(BMessage* message,
+	BMessage* reply)
 {
 	CALLED();
 
 	BMessenger messenger;
 	status_t status = message->FindMessenger("view", &messenger);
-
 	if (status != B_OK)
 		return status;
 
@@ -962,38 +859,32 @@ InputServer::HandleFocusUnfocusIMAwareView(BMessage *message,
 		fIMAware = false;
 	}
 
-	return status;
+	return B_OK;
 }
 
 
-/*
- *  Method: InputServer::EnqueueDeviceMessage()
- *   Descr: 
- */
-status_t 
-InputServer::EnqueueDeviceMessage(BMessage *message)
+status_t
+InputServer::EnqueueDeviceMessage(BMessage* message)
 {
 	CALLED();
-	
-	status_t  	err;
-	
+
 	ssize_t length = message->FlattenedSize();
 	char buffer[length];
+	status_t err;
 	if ((err = message->Flatten(buffer,length)) < B_OK)
 		return err;
+
 	return write_port(fEventLooperPort, 0, buffer, length);
 }
 
 
-/*
- *  Method: InputServer::EnqueueMethodMessage()
- *   Descr: 
- */
 status_t
-InputServer::EnqueueMethodMessage(BMessage *message)
+InputServer::EnqueueMethodMessage(BMessage* message)
 {
 	CALLED();
-	PRINT(("%s what:%c%c%c%c\n", __PRETTY_FUNCTION__, message->what>>24, message->what>>16, message->what>>8, message->what));
+	PRINT(("%s what:%c%c%c%c\n", __PRETTY_FUNCTION__, message->what >> 24,
+		message->what >> 16, message->what >> 8, message->what));
+
 #ifdef DEBUG
 	if (message->what == 'IMEV') {
 		int32 code;
@@ -1001,23 +892,17 @@ InputServer::EnqueueMethodMessage(BMessage *message)
 		PRINT(("%s be:opcode %li\n", __PRETTY_FUNCTION__, code));
 	}
 #endif
+
 	LockMethodQueue();
-
 	fMethodQueue.AddItem(message);
-
-	write_port_etc(fEventLooperPort, 0, NULL, 0, B_RELATIVE_TIMEOUT, 0);
-
 	UnlockMethodQueue();
 
+	write_port_etc(fEventLooperPort, 0, NULL, 0, B_RELATIVE_TIMEOUT, 0);
 	return B_OK;
 }
 
 
-/*
- *  Method: InputServer::UnlockMethodQueue()
- *   Descr: 
- */
-status_t 
+status_t
 InputServer::UnlockMethodQueue()
 {
 	gInputMethodListLocker.Unlock();
@@ -1025,11 +910,7 @@ InputServer::UnlockMethodQueue()
 }
 
 
-/*
- *  Method: InputServer::LockMethodQueue()
- *   Descr: 
- */
-status_t 
+status_t
 InputServer::LockMethodQueue()
 {
 	gInputMethodListLocker.Lock();
@@ -1037,18 +918,14 @@ InputServer::LockMethodQueue()
 }
 
 
-/*
- *  Method: InputServer::SetNextMethod()
- *   Descr: 
- */
 status_t
 InputServer::SetNextMethod(bool direction)
 {
 	LockMethodQueue();
-	
+
 	int32 index = gInputMethodList.IndexOf(fActiveMethod);
 	index += (direction ? 1 : -1);
-	
+
 	if (index < -1)
 		index = gInputMethodList.CountItems() - 1;
 	if (index >= gInputMethodList.CountItems())
@@ -1058,7 +935,7 @@ InputServer::SetNextMethod(bool direction)
 
 	if (index != -1)
 		method = (BInputServerMethod *)gInputMethodList.ItemAt(index);
-		
+
 	SetActiveMethod(method);
 
 	UnlockMethodQueue();
@@ -1066,28 +943,20 @@ InputServer::SetNextMethod(bool direction)
 }
 
 
-/*
- *  Method: InputServer::SetActiveMethod()
- *   Descr: 
- */
 void
-InputServer::SetActiveMethod(BInputServerMethod *method)
+InputServer::SetActiveMethod(BInputServerMethod* method)
 {
 	CALLED();
 	if (fActiveMethod)
 		fActiveMethod->fOwner->MethodActivated(false);
+
 	fActiveMethod = method;
-	
-	if (fActiveMethod) {
-                fActiveMethod->fOwner->MethodActivated(true);
-	}
+
+	if (fActiveMethod)
+		fActiveMethod->fOwner->MethodActivated(true);
 }
 
 
-/*
- *  Method: InputServer::MethodReplicant()
- *   Descr: 
- */
 const BMessenger* 
 InputServer::MethodReplicant()
 {
@@ -1096,71 +965,59 @@ InputServer::MethodReplicant()
 
 
 void
-InputServer::SetMethodReplicant(const BMessenger *messenger)
+InputServer::SetMethodReplicant(const BMessenger* messenger)
 {
 	fReplicantMessenger = messenger;
 }
 
 
-/*
- *  Method: InputServer::EventLoop()
- *   Descr: 
- */
 status_t
 InputServer::EventLoop()
 {
 	CALLED();
 	fEventLooperPort = create_port(100, "haiku_is_event_port");
-	if(fEventLooperPort < 0) {
-		PRINTERR(("InputServer: create_port error: (0x%x) %s\n", fEventLooperPort, strerror(fEventLooperPort)));
+	if (fEventLooperPort < 0) {
+		PRINTERR(("InputServer: create_port error: (0x%x) %s\n",
+			fEventLooperPort, strerror(fEventLooperPort)));
 	} 
-	fISPortThread = spawn_thread(ISPortWatcher, "_input_server_event_loop_", B_REAL_TIME_DISPLAY_PRIORITY+3, this);
-	resume_thread(fISPortThread);
 
+	fISPortThread = spawn_thread(ISPortWatcher, "_input_server_event_loop_",
+		B_REAL_TIME_DISPLAY_PRIORITY + 3, this);
+	resume_thread(fISPortThread);
 	return 0;
 }
 
 
-/*
- *  Method: InputServer::EventLoopRunning()
- *   Descr: 
- */
 bool 
-InputServer::EventLoopRunning(void)
+InputServer::EventLoopRunning()
 {
 	return fEventLooperPort > -1;
 }
 
 
-/*
- *  Method: InputServer::DispatchEvents()
- *   Descr: 
- */
 bool
-InputServer::DispatchEvents(BList *eventList)
+InputServer::DispatchEvents(BList* eventList)
 {
 	CALLED();
-	
+
 	CacheEvents(eventList);
 
-	if (fEventsCache.CountItems()>0) {
+	if (fEventsCache.CountItems() > 0) {
+		BMessage* event;
 
-		BMessage *event;
-		
-		for ( int32 i = 0; NULL != (event = (BMessage *)fEventsCache.ItemAt(i)); i++ ) {
+		for (int32 i = 0; NULL != (event = (BMessage *)fEventsCache.ItemAt(i)); i++) {
 			// now we must send each event to the app_server
 			if (event->what == B_INPUT_METHOD_EVENT && !fIMAware) {
 				SERIAL_PRINT(("IME received\n"));
 				int32 opcode = -1;
 				event->FindInt32("be:opcode", &opcode);
 				BList events;
-				if (!fBLWindow && opcode == B_INPUT_METHOD_STARTED) {
+				if (!fBLWindow && opcode == B_INPUT_METHOD_STARTED)
 					fBLWindow = new BottomlineWindow(be_plain_font);
-				}
-				
+
 				if (fBLWindow) {
 					fBLWindow->HandleInputMethodEvent(event, &events);
-				
+
 					if (!events.IsEmpty()) {
 						fBLWindow->PostMessage(B_QUIT_REQUESTED);
 						fBLWindow = NULL;
@@ -1168,21 +1025,21 @@ InputServer::DispatchEvents(BList *eventList)
 						fEventsCache.AddList(&events);
 					}
 				}
-			} else {
+			} else
 				DispatchEvent(event);
-			}
 
 			delete event;
 		}
-		
+
 		fEventsCache.MakeEmpty();
 	}
+
 	return true;
 }
 
 
-int 
-InputServer::DispatchEvent(BMessage *message)
+status_t
+InputServer::DispatchEvent(BMessage* message)
 {
 	CALLED();
 
@@ -1195,40 +1052,33 @@ InputServer::DispatchEvent(BMessage *message)
 			ssize_t size;
 			uint8 *data;	
 			if (message->FindData("states", B_UINT8_TYPE, (const void**)&data, &size) != B_OK)
-				message->AddData("states", B_UINT8_TYPE, fKey_info.key_states, 16);
-			if (message->FindInt32("modifiers", (int32*)&modifiers)!=B_OK)
-				message->AddInt32("modifiers", fKey_info.modifiers);
-
+				message->AddData("states", B_UINT8_TYPE, fKeyInfo.key_states, 16);
+			if (message->FindInt32("modifiers", (int32*)&modifiers) != B_OK)
+				message->AddInt32("modifiers", fKeyInfo.modifiers);
 			break;
 		}
 	}
-	
-	status_t  	err;
-	
+
 	ssize_t length = message->FlattenedSize();
 	char buffer[length];
+	status_t err;
 	if ((err = message->Flatten(buffer,length)) < B_OK)
 		return err;
-	
-	if (fAsPort>0)
+
+	if (fAsPort > 0)
 		write_port(fAsPort, 0, buffer, length);
 
-    return true;
+    return B_OK;
 }
 
-/*
- *  Method: InputServer::CacheEvents()
- *   Descr: 
- */
-bool 
-InputServer::CacheEvents(BList *eventsToCache)
+
+bool
+InputServer::CacheEvents(BList* eventsToCache)
 {
 	CALLED();
 
 	SanitizeEvents(eventsToCache);
-
 	MethodizeEvents(eventsToCache, true);
-	
 	FilterEvents(eventsToCache);
 
 	fEventsCache.AddList(eventsToCache);
@@ -1238,103 +1088,81 @@ InputServer::CacheEvents(BList *eventsToCache)
 }
 
 
-/*
- *  Method: InputServer::GetNextEvents()
- *   Descr: 
- */
-const BList* 
+const BList*
 InputServer::GetNextEvents(BList *)
 {
 	return NULL;
 }
 
 
-/*
- *  Method: InputServer::FilterEvents()
- *  Descr:  This method applies all defined filters to each event in the
- *          supplied list.  The supplied list is modified to reflect the
- *          output of the filters.
- *          The method returns true if the filters were applied to all
- *          events without error and false otherwise.
+/**	This method applies all defined filters to each event in the
+ *	supplied list.  The supplied list is modified to reflect the
+ *	output of the filters.
+ *	The method returns true if the filters were applied to all
+ *	events without error and false otherwise.
  */
+
 bool
-InputServer::FilterEvents(BList *eventsToFilter)
+InputServer::FilterEvents(BList* eventsToFilter)
 {
 	CALLED();
-	
+
 	if (NULL == eventsToFilter)
 		return false;
-	
-	BInputServerFilter *current_filter;
-	int32               filter_index  = 0;
 
-	while (NULL != (current_filter = (BInputServerFilter*)gInputFilterList.ItemAt(filter_index) ) ) {
+	BInputServerFilter* currentFilter;
+	int32 filterIndex = 0;
+
+	while ((currentFilter = (BInputServerFilter*)gInputFilterList.ItemAt(filterIndex)) != NULL) {
 		// Apply the current filter to all available event messages.
-		//		
-		int32 event_index = 0;
-		BMessage *current_event;
-		while (NULL != (current_event = (BMessage*)eventsToFilter->ItemAt(event_index) ) ) {
+		int32 eventIndex = 0;
+		BMessage *currentEvent;
+		while ((currentEvent = (BMessage*)eventsToFilter->ItemAt(eventIndex)) != NULL) {
 			// Storage for new event messages generated by the filter.
-			//
-			BList out_list;
-			
-			// Apply the current filter to the current event message.
-			//
-			PRINT(("InputServer::FilterEvents Filter called\n"));
-			filter_result result = current_filter->Filter(current_event, &out_list);
-			if (B_DISPATCH_MESSAGE == result) {
-				// Use the result in current_message; ignore out_list.
-				//
-				event_index++;
+			BList outList;
 
-				// Free resources associated with items in out_list.
-				//
-				void *out_item; 
-				for (int32 i = 0; NULL != (out_item = out_list.ItemAt(i) ); i++)
-					delete (BMessage*)out_item;
-			} else if (B_SKIP_MESSAGE == result) {
+			// Apply the current filter to the current event message.
+			PRINT(("InputServer::FilterEvents Filter called\n"));
+			filter_result result = currentFilter->Filter(currentEvent, &outList);
+
+			if (result == B_SKIP_MESSAGE) {
 				// Use the result in out_list (if any); ignore current message.
-				//
-				eventsToFilter->RemoveItem(event_index);
-				eventsToFilter->AddList(&out_list, event_index);
-				event_index += out_list.CountItems();
-				
-				// NOTE: eventsToFilter now owns out_list's items.
+				eventsToFilter->RemoveItem(eventIndex);
+				eventsToFilter->AddList(&outList, eventIndex);
+				eventIndex += outList.CountItems();
+
+				// NOTE: eventsToFilter now owns outList's items.
 			} else {
-				// Error - Free resources associated with items in out_list and return.
-				//
-				 void* out_item;
-				for (int32 i = 0; NULL != (out_item = out_list.ItemAt(i) ); i++)
-					delete (BMessage*)out_item;
+				// Free resources associated with items in outList.
+				void* outItem; 
+				for (int32 i = 0; (outItem = outList.ItemAt(i)) != NULL; i++) {
+					delete (BMessage*)outItem;
+				}
+			}
+			if (result == B_DISPATCH_MESSAGE) {
+				// Use the result in current_message; ignore outList.
+				eventIndex++;
+			} else {
+				// Error
 				return false;
 			}
-			
-			// NOTE: The BList destructor frees out_lists's resources here.
-			//       It does NOT free the resources associated with out_list's
-			//       member items - those should either already be deleted or
-			//       should be owned by eventsToFilter.
-		} // while()
-	
-		filter_index++;
-	
-	} // while()
-	
+		}
+
+		filterIndex++;
+	}
+
 	return true;	
 }
 
 
-/*
- *  Method: InputServer::SanitizeEvents()
- *   Descr: 
- */
-bool 
-InputServer::SanitizeEvents(BList *events)
+bool
+InputServer::SanitizeEvents(BList* events)
 {
 	CALLED();
 	int32 index = 0;
 	BMessage *event;
 	PRINT(("SanitizeEvents: %ld \n", events->CountItems()));
-	while (NULL != (event = (BMessage*)events->ItemAt(index) ) ) {
+	while ((event = (BMessage*)events->ItemAt(index)) != NULL) {
 		PRINT(("SanitizeEvents: what:%lx\n", event->what));
 		switch (event->what) {
 			case B_KEY_DOWN:
@@ -1342,12 +1170,14 @@ InputServer::SanitizeEvents(BList *events)
 				// we scan for Alt+Space key down events which means we change to next input method
 				// Note : Shift+Alt+Space key allows to change to the previous input method
 
-				PRINT(("SanitizeEvents: %lx, %lx\n",fKey_info.modifiers, fKey_info.key_states[KEY_Spacebar >> 3] ));
-				
-				if ((fKey_info.modifiers & B_COMMAND_KEY) 
-					&& (fKey_info.key_states[KEY_Spacebar >> 3] & (1 << (7 - (KEY_Spacebar % 8))))) {
-					SetNextMethod(!fKey_info.modifiers & B_SHIFT_KEY);
-				
+				PRINT(("SanitizeEvents: %lx, %lx\n", fKeyInfo.modifiers,
+					fKeyInfo.key_states[KEY_Spacebar >> 3]));
+
+				if ((fKeyInfo.modifiers & B_COMMAND_KEY) != 0
+					&& (fKeyInfo.key_states[KEY_Spacebar >> 3]
+						& (1 << (7 - (KEY_Spacebar % 8))))) {
+					SetNextMethod(!fKeyInfo.modifiers & B_SHIFT_KEY);
+
 					// this event isn't sent to the user
 					events->RemoveItem(index);
 					delete event;
@@ -1363,31 +1193,25 @@ InputServer::SanitizeEvents(BList *events)
 }
 
 
-/*
- *  Method: InputServer::MethodizeEvents()
- *   Descr: 
- */
 bool 
-InputServer::MethodizeEvents(BList *events,
-                             bool)
+InputServer::MethodizeEvents(BList* events, bool)
 {
 	CALLED();
-	
-	if (fActiveMethod) {
 
+	if (fActiveMethod) {
 		BList newList;
 		newList.AddList(&fMethodQueue);
 		fMethodQueue.MakeEmpty();
-		
+
 		for (int32 i=0; i<events->CountItems(); i++) {
 			BMessage *item = (BMessage *)events->ItemAt(i);
 			BList filterList;
-			filter_result res = fActiveMethod->Filter(item, &filterList);
-			switch (res) {
+			filter_result result = fActiveMethod->Filter(item, &filterList);
+			switch (result) {
 				case B_SKIP_MESSAGE:
 					delete item;
 				case B_DISPATCH_MESSAGE:
-					if (filterList.CountItems()>0) {
+					if (filterList.CountItems() > 0) {
 						newList.AddList(&filterList);
 						delete item;
 					} else
@@ -1406,103 +1230,147 @@ InputServer::MethodizeEvents(BList *events,
 }
 
 
-/*
- *  Method: InputServer::StartStopDevices()
- *   Descr: 
- */
-status_t 
-InputServer::StartStopDevices(const char *name, input_device_type type, bool doStart)
-{
-	CALLED();
+/**	The fInputDeviceListLocker must be locked when calling this function */
 
-	for (int i = gInputDeviceList.CountItems() - 1; i >= 0; i--) {
-		InputDeviceListItem* item = (InputDeviceListItem*)gInputDeviceList.ItemAt(i);
-		if (!item)
-			continue;
-			
-		if ((name && strcmp(name, item->mDev.name) == 0) || (!name && item->mDev.type == type)) {
-			if (!item->mIsd)
-				return B_ERROR;
-				
-			input_device_ref   dev = item->mDev;
-			
-			if (doStart) {
-				PRINT(("  Starting: %s\n", dev.name));
-				item->mIsd->Start(dev.name, dev.cookie);
-				item->mStarted = true;
-			} else {
-				PRINT(("  Stopping: %s\n", dev.name));
-				item->mIsd->Stop(dev.name, dev.cookie);
-				item->mStarted = false;
-			}
-			if (name)
-				return B_OK;
-		}
+InputDeviceListItem*
+InputServer::_FindInputDeviceListItem(BInputServerDevice& device)
+{
+	for (int32 i = fInputDeviceList.CountItems() - 1; i >= 0; i--) {
+		InputDeviceListItem* item = (InputDeviceListItem*)fInputDeviceList.ItemAt(i);
+
+		if (item->ServerDevice() == &device)
+			return item;
 	}
 
-	if (name)
-		return B_ERROR;
-	else
-		return B_OK;
+	return NULL;
 }
 
 
-
-/*
- *  Method: InputServer::StartStopDevices()
- *   Descr: 
- */
-status_t 
-InputServer::StartStopDevices(BInputServerDevice *isd,
-                                       bool              doStart)
+status_t
+InputServer::GetDeviceInfo(const char* name, input_device_type *_type,
+	bool *_isRunning)
 {
-	CALLED();
-	for (int i = gInputDeviceList.CountItems() - 1; i >= 0; i--)
-	{
-		PRINT(("%s Device #%d\n", __PRETTY_FUNCTION__, i));
-		InputDeviceListItem* item = (InputDeviceListItem*)gInputDeviceList.ItemAt(i);
-		if (NULL != item && isd == item->mIsd)
-		{
-			input_device_ref   dev = item->mDev;
-			
-			if (doStart) {
-				PRINT(("  Starting: %s\n", dev.name));
-				isd->Start(dev.name, dev.cookie);
-				item->mStarted = true;
-			} else {
-				PRINT(("  Stopping: %s\n", dev.name));
-				isd->Stop(dev.name, dev.cookie);
-				item->mStarted = false;
+    BAutolock lock(fInputDeviceListLocker);
+
+	for (int32 i = fInputDeviceList.CountItems() - 1; i >= 0; i--) {
+		InputDeviceListItem* item = (InputDeviceListItem*)fInputDeviceList.ItemAt(i);
+
+		if (item->HasName(name)) {
+			if (_type)
+				*_type = item->Type();
+			if (_isRunning)
+				*_isRunning = item->Running();
+
+			return B_OK;
+		}
+	}
+
+	return B_NAME_NOT_FOUND;
+}
+
+
+status_t
+InputServer::UnregisterDevices(BInputServerDevice& serverDevice,
+	input_device_ref **devices)
+{
+    CALLED();
+    BAutolock lock(fInputDeviceListLocker);
+
+	if (devices != NULL) {
+		// remove the devices as specified only
+		input_device_ref *device = NULL;
+		for (int32 i = 0; NULL != (device = devices[i]); i++) {
+			for (int32 j = fInputDeviceList.CountItems() - 1; j >= 0; j--) {
+				InputDeviceListItem* item = (InputDeviceListItem*)fInputDeviceList.ItemAt(j);
+	
+				if (item->ServerDevice() == &serverDevice && item->HasName(device->name)) {
+					item->Stop();
+					fInputDeviceList.RemoveItem(j);
+					delete item;
+					break;
+				}
+			}
+		}
+	} else {
+		// remove all devices from this BInputServerObject
+		for (int32 i = fInputDeviceList.CountItems() - 1; i >= 0; i--) {
+			InputDeviceListItem* item = (InputDeviceListItem*)fInputDeviceList.ItemAt(i);
+
+			if (item->ServerDevice() == &serverDevice) {
+				item->Stop();
+				fInputDeviceList.RemoveItem(i);
+				delete item;
 			}
 		}
 	}
-	EXIT();
-	
+
+    return B_OK;
+}
+
+
+status_t
+InputServer::RegisterDevices(BInputServerDevice& serverDevice,
+	input_device_ref** devices)
+{
+	if (devices == NULL)
+		return B_BAD_VALUE;
+
+	BAutolock lock(fInputDeviceListLocker);
+
+	input_device_ref *device = NULL;
+	for (int32 i = 0; (device = devices[i]) != NULL; i++) {
+		if (device->type != B_POINTING_DEVICE 
+			&& device->type != B_KEYBOARD_DEVICE 
+			&& device->type != B_UNDEFINED_DEVICE)
+			continue;
+
+		// find existing input server device
+
+		bool found = false;
+		for (int32 j = fInputDeviceList.CountItems() - 1; j >= 0; j--) {
+			InputDeviceListItem* item = (InputDeviceListItem*)fInputDeviceList.ItemAt(j);
+
+			if (item->HasName(device->name)) {
+				PRINT(("RegisterDevices found %s\n", device->name));
+				found = true;
+				break;
+			}
+		}
+
+		if (!found) {
+			PRINT(("RegisterDevices not found %s\n", device->name));
+			InputDeviceListItem* item = new (nothrow) InputDeviceListItem(serverDevice,
+				*device);
+			if (item != NULL && fInputDeviceList.AddItem(item)) {
+				item->Start();
+			} else {
+				delete item;
+				return B_NO_MEMORY;
+			}
+		}
+	}
+
 	return B_OK;
 }
 
 
-/*
- *  Method: InputServer::ControlDevices()
- *   Descr: 
- */
-status_t 
-InputServer::ControlDevices(const char* name, input_device_type type, uint32 code, BMessage* msg)
-{	
+status_t
+InputServer::StartStopDevices(const char* name, input_device_type type, bool doStart)
+{
 	CALLED();
-	for (int i = gInputDeviceList.CountItems() - 1; i >= 0; i--) {
-		InputDeviceListItem* item = (InputDeviceListItem*)gInputDeviceList.ItemAt(i);
+	BAutolock lock(fInputDeviceListLocker);
+
+	for (int32 i = fInputDeviceList.CountItems() - 1; i >= 0; i--) {
+		InputDeviceListItem* item = (InputDeviceListItem*)fInputDeviceList.ItemAt(i);
 		if (!item)
 			continue;
-			
-		if ((name && strcmp(name, item->mDev.name) == 0) || item->mDev.type == type) {
-			if (!item->mIsd)
-				return B_ERROR;
-				
-			input_device_ref   dev = item->mDev;
-			
-			item->mIsd->Control(dev.name, dev.cookie, code, msg);
-			
+
+		if (item->Matches(name, type)) {
+			if (doStart)
+				item->Start();
+			else
+				item->Stop();
+
 			if (name)
 				return B_OK;
 		}
@@ -1510,18 +1378,60 @@ InputServer::ControlDevices(const char* name, input_device_type type, uint32 cod
 
 	if (name)
 		return B_ERROR;
-	else
-		return B_OK;
+
+	return B_OK;
 }
 
 
-/*
- *  Method: InputServer::DoMouseAcceleration()
- *   Descr: 
- */
+
+status_t 
+InputServer::StartStopDevices(BInputServerDevice& serverDevice, bool doStart)
+{
+	CALLED();
+	BAutolock lock(fInputDeviceListLocker);
+
+	InputDeviceListItem* item = _FindInputDeviceListItem(serverDevice);
+	if (item != NULL) {
+		if (doStart)
+			item->Start();
+		else
+			item->Stop();
+	}
+	EXIT();
+
+	return B_OK;
+}
+
+
+status_t 
+InputServer::ControlDevices(const char* name, input_device_type type,
+	uint32 code, BMessage* message)
+{
+	CALLED();
+	BAutolock lock(fInputDeviceListLocker);
+	
+	for (int32 i = fInputDeviceList.CountItems() - 1; i >= 0; i--) {
+		InputDeviceListItem* item = (InputDeviceListItem*)fInputDeviceList.ItemAt(i);
+		if (!item)
+			continue;
+
+		if (item->Matches(name, type)) {
+			item->Control(code, message);
+
+			if (name)
+				return B_OK;
+		}
+	}
+
+	if (name)
+		return B_ERROR;
+
+	return B_OK;
+}
+
+
 bool
-InputServer::DoMouseAcceleration(int32 *x,
-                                 int32 *y)
+InputServer::DoMouseAcceleration(int32* _x, int32* _y)
 {
 	CALLED();
 	int32 speed = fMouseSettings.MouseSpeed() >> 15;
@@ -1534,85 +1444,60 @@ InputServer::DoMouseAcceleration(int32 *x,
 }
 
 
-/*
- *  Method: InputServer::SetMousePos()
- *   Descr: 
- */
-bool 
-InputServer::SetMousePos(long *,
-                         long *,
-                         long,
-                         long)
-{
-	CALLED();
-	return true;
-}
-
-
-/*
- *  Method: InputServer::SetMousePos()
- *   Descr: 
- */
-bool 
-InputServer::SetMousePos(long *,
-                         long *,
-                         BPoint)
-{
-	CALLED();
-	return true;
-}
-
-
-/*
- *  Method: InputServer::SetMousePos()
- *   Descr: 
- */
-bool 
-InputServer::SetMousePos(long *,
-                         long *,
-                         float,
-                         float)
-{
-	CALLED();
-	return true;
-}
-
-
-/*
- *  Method: InputServer::SafeMode()
- *   Descr: 
- */
 bool
-InputServer::SafeMode(void)
+InputServer::SetMousePos(long *, long *, long, long)
 {
-	return sSafeMode;
+	CALLED();
+	return true;
+}
+
+
+bool
+InputServer::SetMousePos(long *, long *, BPoint)
+{
+	CALLED();
+	return true;
+}
+
+
+bool
+InputServer::SetMousePos(long *, long *, float, float)
+{
+	CALLED();
+	return true;
+}
+
+
+bool
+InputServer::SafeMode()
+{
+	return fSafeMode;
 }
 
 
 int32 
-InputServer::ISPortWatcher(void *arg)
+InputServer::ISPortWatcher(void* arg)
 {
-	InputServer *self = (InputServer*)arg;
+	InputServer* self = (InputServer*)arg;
 	self->WatchPort();
-	return B_NO_ERROR;
+
+	return B_OK;
 }
 
 
 void 
 InputServer::WatchPort()
 {
-	
 	while (true) { 
 		// Block until we find the size of the next message
-		ssize_t    	length = port_buffer_size(fEventLooperPort);
+		ssize_t length = port_buffer_size(fEventLooperPort);
 		PRINT(("[Event Looper] BMessage Size = %lu\n", length));
-		
-		int32     	code;
+
 		char buffer[length];
-		
+		int32 code;
 		status_t err = read_port(fEventLooperPort, &code, buffer, length);
-		if(err != length) {
-			if(err >= 0) {
+		if (err != length) {
+			if (err >= 0) {
 				PRINTERR(("InputServer: failed to read full packet (read %lu of %lu)\n", err, length));
 			} else {
 				PRINTERR(("InputServer: read_port error: (0x%lx) %s\n", err, strerror(err)));
@@ -1625,9 +1510,9 @@ InputServer::WatchPort()
 			DispatchEvents(&list);
 			continue;
 		}
-		
-		BMessage *event = new BMessage;
-	
+
+		BMessage* event = new BMessage;
+
 		if ((err = event->Unflatten(buffer)) < 0) {
 			PRINTERR(("[InputServer] Unflatten() error: (0x%lx) %s\n", err, strerror(err)));
 			delete event;
@@ -1655,4 +1540,34 @@ InputServer::WatchPort()
 		PRINT(("Event written to port\n"));
 	}
 }
+
+
+//	#pragma mark -
+
+
+extern "C" void
+RegisterDevices(input_device_ref** devices)
+{
+	CALLED();
+};
+
+
+BView *
+instantiate_deskbar_item()
+{
+	return new MethodReplicant(INPUTSERVER_SIGNATURE);
+}
+
+
+int
+main()
+{
+	InputServer	*inputServer = new InputServer;
+
+	inputServer->Run();
+	delete inputServer;
+
+	return 0;
+}
+
 

@@ -1,10 +1,11 @@
 /*
-** Copyright 2004, the Haiku project. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Author : Jérôme Duval
-** Original authors: Marcus Overhagen, Axel Dörfler
-*/
+ * Copyright 2004-2005, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Marcus Overhagen, Axel Dörfler
+ *		Jérôme Duval
+ */
 
 
 #include <Autolock.h>
@@ -24,6 +25,54 @@
 #include "InputServer.h"
 #include "InputServerTypes.h"
 #include "MethodReplicant.h"
+
+
+class AddOnManager::InputServerMonitorHandler : public AddOnMonitorHandler {
+	public:
+		InputServerMonitorHandler(AddOnManager* manager)
+		{
+			fManager = manager;
+		}
+
+		virtual void
+		AddOnCreated(const add_on_entry_info * entry_info)
+		{
+		}
+
+		virtual void
+		AddOnEnabled(const add_on_entry_info * entry_info)
+		{
+			CALLED();
+			entry_ref ref;
+			make_entry_ref(entry_info->dir_nref.device, entry_info->dir_nref.node,
+			               entry_info->name, &ref);
+			BEntry entry(&ref, false);
+			fManager->RegisterAddOn(entry);
+		}
+
+		virtual void
+		AddOnDisabled(const add_on_entry_info * entry_info)
+		{
+			CALLED();
+			entry_ref ref;
+			make_entry_ref(entry_info->dir_nref.device, entry_info->dir_nref.node,
+				entry_info->name, &ref);
+			BEntry entry(&ref, false);
+			fManager->UnregisterAddOn(entry);
+		}
+
+		virtual void
+		AddOnRemoved(const add_on_entry_info * entry_info)
+		{
+		}
+
+	private:
+		AddOnManager* fManager;
+};
+
+
+//	#pragma mark -
+
 
 AddOnManager::AddOnManager(bool safeMode)
 	: BLooper("addon_manager"),
@@ -100,8 +149,6 @@ AddOnManager::RegisterAddOn(BEntry &entry)
 		}
 		
 		RegisterDevice(isd, ref, addon_image);
-		
-		
 	} else if (pathString.FindFirst("input_server/filters")>0) {
 		BInputServerFilter *(*instantiate_func)();
 
@@ -127,7 +174,6 @@ AddOnManager::RegisterAddOn(BEntry &entry)
 		}
 		
 		RegisterFilter(isf, ref, addon_image);
-	
 	} else if (pathString.FindFirst("input_server/methods")>0) {
 		BInputServerMethod *(*instantiate_func)();
 
@@ -153,16 +199,15 @@ AddOnManager::RegisterAddOn(BEntry &entry)
 		}
 		
 		RegisterMethod(ism, ref, addon_image);
-	
 	} else {
 		PRINTERR(("AddOnManager::RegisterAddOn(): addon type not found for \"%s\" \n", path.Path()));
 		goto exit_error;
 	}
 	
 	return B_OK;
+
 exit_error:
 	unload_add_on(addon_image);
-	
 	return status;
 }
 
@@ -183,14 +228,14 @@ AddOnManager::UnregisterAddOn(BEntry &entry)
 	entry.GetParent(&parent);
 	BPath parentPath(&parent);
 	BString pathString = parentPath.Path();
-	
+
 	BAutolock locker(fLock);
-	
+
 	if (pathString.FindFirst("input_server/devices")>0) {
 		device_info *pinfo;
 		for (fDeviceList.Rewind(); fDeviceList.GetNext(&pinfo);) {
 			if (!strcmp(pinfo->ref.name, ref.name)) {
-				InputServer::StartStopDevices(pinfo->isd, false);
+				gInputServer->StartStopDevices(*pinfo->isd, false);
 				delete pinfo->isd;
 				if (pinfo->addon_image >= B_OK)
 					unload_add_on(pinfo->addon_image);
@@ -224,17 +269,18 @@ AddOnManager::UnregisterAddOn(BEntry &entry)
 		if (fMethodList.CountItems()<=0) {
 			// we remove the method replicant
 			BDeskbar().RemoveItem(REPLICANT_CTL_NAME);
-			((InputServer*)be_app)->SetMethodReplicant(NULL);
+			gInputServer->SetMethodReplicant(NULL);
 		} else {
 			BMessage msg(IS_REMOVE_METHOD);
 			msg.AddInt32("cookie", (uint32)pinfo->ism);
-			if (((InputServer*)be_app)->MethodReplicant())
-				((InputServer*)be_app)->MethodReplicant()->SendMessage(&msg);
+			if (gInputServer->MethodReplicant())
+				gInputServer->MethodReplicant()->SendMessage(&msg);
 		}
 	} 
 
 	return B_OK;
 }
+
 
 void
 AddOnManager::RegisterAddOns()
@@ -242,45 +288,16 @@ AddOnManager::RegisterAddOns()
 	CALLED();
 	status_t err;
 
-	class IAHandler : public AddOnMonitorHandler {
-	private:
-		AddOnManager * fManager;
-	public:
-		IAHandler(AddOnManager * manager) {
-			fManager = manager;
-		}
-		virtual void	AddOnCreated(const add_on_entry_info * entry_info) {
-		}
-		virtual void	AddOnEnabled(const add_on_entry_info * entry_info) {
-			CALLED();
-			entry_ref ref;
-			make_entry_ref(entry_info->dir_nref.device, entry_info->dir_nref.node,
-			               entry_info->name, &ref);
-			BEntry entry(&ref, false);
-			fManager->RegisterAddOn(entry);
-		}
-		virtual void	AddOnDisabled(const add_on_entry_info * entry_info) {
-			CALLED();
-			entry_ref ref;
-			make_entry_ref(entry_info->dir_nref.device, entry_info->dir_nref.node,
-			               entry_info->name, &ref);
-			BEntry entry(&ref, false);
-			fManager->UnregisterAddOn(entry);
-		}
-		virtual void	AddOnRemoved(const add_on_entry_info * entry_info) {
-		}
-	};
-
-	fHandler = new IAHandler(this);
+	fHandler = new InputServerMonitorHandler(this);
 	fAddOnMonitor = new AddOnMonitor(fHandler);
 
 #ifndef APPSERVER_TEST_MODE
 	err = fAddOnMonitor->InitCheck();
-        if (err != B_OK) {
-                PRINTERR(("AddOnManager::RegisterAddOns(): fAddOnMonitor->InitCheck() returned %s\n",
-                        strerror(err)));
-                return;
-        }
+	if (err != B_OK) {
+		PRINTERR(("AddOnManager::RegisterAddOns(): fAddOnMonitor->InitCheck() returned %s\n",
+			strerror(err)));
+		return;
+	}
 
 	const directory_which directories[] = {
 		B_USER_ADDONS_DIRECTORY,
@@ -310,7 +327,6 @@ AddOnManager::RegisterAddOns()
 	BEntry entry("/boot/home/svnhaiku/trunk/tests/servers/input/view_input_device/input_server/devices/ViewInputDevice");
 	RegisterAddOn(entry);
 #endif
-
 }
 
 
@@ -330,7 +346,7 @@ AddOnManager::UnregisterAddOns()
 	{
 		device_info *pinfo;
 		for (fDeviceList.Rewind(); fDeviceList.GetNext(&pinfo);) {
-			InputServer::StartStopDevices(pinfo->isd, false);
+			gInputServer->StartStopDevices(*pinfo->isd, false);
 			delete pinfo->isd;
 			if (pinfo->addon_image >= B_OK)
 				unload_add_on(pinfo->addon_image);
@@ -361,7 +377,8 @@ AddOnManager::UnregisterAddOns()
 
 
 void
-AddOnManager::RegisterDevice(BInputServerDevice *device, const entry_ref &ref, image_id addon_image)
+AddOnManager::RegisterDevice(BInputServerDevice* device, const entry_ref& ref,
+	image_id addonImage)
 {
 	BAutolock locker(fLock);
 
@@ -377,15 +394,16 @@ AddOnManager::RegisterDevice(BInputServerDevice *device, const entry_ref &ref, i
 
 	device_info info;
 	info.ref = ref;
-	info.addon_image = addon_image;
+	info.addon_image = addonImage;
 	info.isd = device;
-	
+
 	fDeviceList.Insert(info);
 }
 
 
 void
-AddOnManager::RegisterFilter(BInputServerFilter *filter, const entry_ref &ref, image_id addon_image)
+AddOnManager::RegisterFilter(BInputServerFilter* filter, const entry_ref& ref,
+	image_id addonImage)
 {
 	BAutolock locker(fLock);
 
@@ -401,7 +419,7 @@ AddOnManager::RegisterFilter(BInputServerFilter *filter, const entry_ref &ref, i
 
 	filter_info info;
 	info.ref = ref;
-	info.addon_image = addon_image;
+	info.addon_image = addonImage;
 	info.isf = filter;
 
 	fFilterList.Insert(info);
@@ -413,7 +431,8 @@ AddOnManager::RegisterFilter(BInputServerFilter *filter, const entry_ref &ref, i
 
 
 void
-AddOnManager::RegisterMethod(BInputServerMethod *method, const entry_ref &ref, image_id addon_image)
+AddOnManager::RegisterMethod(BInputServerMethod* method, const entry_ref& ref,
+	image_id addonImage)
 {
 	BAutolock locker(fLock);
 
@@ -429,25 +448,24 @@ AddOnManager::RegisterMethod(BInputServerMethod *method, const entry_ref &ref, i
 
 	method_info info;
 	info.ref = ref;
-	info.addon_image = addon_image;
+	info.addon_image = addonImage;
 	info.ism = method;
-	
+
 	fMethodList.Insert(info);
-	
+
 	BAutolock lock2(InputServer::gInputMethodListLocker);
-	
 	InputServer::gInputMethodList.AddItem(method);
-	
-	if (((InputServer*)be_app)->MethodReplicant() == NULL) {
+
+	if (gInputServer->MethodReplicant() == NULL) {
 		LoadReplicant();
 
-		if (((InputServer*)be_app)->MethodReplicant()) {
+		if (gInputServer->MethodReplicant()) {
 			_BMethodAddOn_ *addon = InputServer::gKeymapMethod.fOwner;
 			addon->AddMethod();
 		}
 	}
 
-	if (((InputServer*)be_app)->MethodReplicant()) {
+	if (gInputServer->MethodReplicant()) {
 		_BMethodAddOn_ *addon = method->fOwner;
 		addon->AddMethod();
 	}
@@ -459,12 +477,12 @@ AddOnManager::LoadReplicant()
 {
 	CALLED();
 	app_info info;
-      	be_app->GetAppInfo(&info);
+	be_app->GetAppInfo(&info);
 
-      	status_t err = BDeskbar().AddItem(&info.ref);
-      	if (err!=B_OK) {
-              	PRINTERR(("Deskbar refuses to add method replicant: %s\n", strerror(err)));
-      	}
+	status_t err = BDeskbar().AddItem(&info.ref);
+	if (err != B_OK) {
+		PRINTERR(("Deskbar refuses to add method replicant: %s\n", strerror(err)));
+	}
 	BMessage request(B_GET_PROPERTY);
 	BMessenger to;
 	BMessenger status;
@@ -481,7 +499,6 @@ AddOnManager::LoadReplicant()
 
 	if ((to.SendMessage(&request, &reply) == B_OK) 
 		&& (reply.FindMessenger("result", &status) == B_OK)) {
-
 		// enum replicant in Status view
 		int32 index = 0;
 		int32 uid;
@@ -497,7 +514,7 @@ AddOnManager::LoadReplicant()
 				if (GetReplicantView(status, uid, &rep_view)==0) {
 					BMessenger result;
 					if (rep_view.FindMessenger("result", &result) == B_OK) {
-						((InputServer*)be_app)->SetMethodReplicant(new BMessenger(result));
+						gInputServer->SetMethodReplicant(new BMessenger(result));
 					}
 				} 
 			}
@@ -506,7 +523,6 @@ AddOnManager::LoadReplicant()
 }
 
 
-//
 int32 
 AddOnManager::GetReplicantAt(BMessenger target, int32 index) const
 {
@@ -514,7 +530,7 @@ AddOnManager::GetReplicantAt(BMessenger target, int32 index) const
 	 So here we want to get the Unique ID of the replicant at the given index
 	 in the target Shelf.
 	 */
- 
+
 	BMessage request(B_GET_PROPERTY);// We're getting the ID property
 	BMessage reply;
 	status_t err;
@@ -533,7 +549,6 @@ AddOnManager::GetReplicantAt(BMessenger target, int32 index) const
 }
 
 
-//
 status_t 
 AddOnManager::GetReplicantName(BMessenger target, int32 uid, BMessage *reply) const
 {
@@ -541,7 +556,7 @@ AddOnManager::GetReplicantName(BMessenger target, int32 uid, BMessage *reply) co
 	 We send a message to the target shelf, asking it for the Name of the 
 	 replicant with the given unique id.
 	 */
- 
+
 	BMessage request(B_GET_PROPERTY);
 	BMessage uid_specifier(B_ID_SPECIFIER);// specifying via ID
 	status_t err;
@@ -563,21 +578,23 @@ AddOnManager::GetReplicantName(BMessenger target, int32 uid, BMessage *reply) co
 	return B_OK;
 }
 
-//
-status_t 
-AddOnManager::GetReplicantView(BMessenger target, int32 uid, BMessage *reply) const
+
+status_t
+AddOnManager::GetReplicantView(BMessenger target, int32 uid,
+	BMessage* reply) const
 {
 	/*
 	 We send a message to the target shelf, asking it for the Name of the 
 	 replicant with the given unique id.
 	 */
- 
+
 	BMessage request(B_GET_PROPERTY);
 	BMessage uid_specifier(B_ID_SPECIFIER);// specifying via ID
 	status_t err;
 	status_t e;
 
-	request.AddSpecifier("View");// ask for the Name of the replicant
+	request.AddSpecifier("View");
+		// ask for the Name of the replicant
 
 	// IDs are specified using code like the following 3 lines:
 	uid_specifier.AddInt32("id", uid);
@@ -594,22 +611,18 @@ AddOnManager::GetReplicantView(BMessenger target, int32 uid, BMessage *reply) co
 }
 
 
-/*
- *  Method: AddOnManager::MessageReceived()
- *   Descr: 
- */
 void
 AddOnManager::MessageReceived(BMessage *message)
 {
 	CALLED();
 	
 	BMessage reply;
-	status_t status = B_OK;
+	status_t status;
 
-	PRINT(("%s what:%c%c%c%c\n", __PRETTY_FUNCTION__, message->what>>24, message->what>>16, message->what>>8, message->what));
-	
-	switch(message->what)
-	{
+	PRINT(("%s what:%c%c%c%c\n", __PRETTY_FUNCTION__, message->what >> 24,
+		message->what >> 16, message->what >> 8, message->what));
+
+	switch (message->what) {
 		case IS_FIND_DEVICES:
 			status = HandleFindDevices(message, &reply);
 			break;
@@ -634,155 +647,112 @@ AddOnManager::MessageReceived(BMessage *message)
 		case IS_METHOD_REGISTER:
 			status = HandleMethodReplicant(message, &reply);
 			break;
+
 		default:
-		{
-			return;		
-		}
+			return;
 	}
-	
+
 	reply.AddInt32("status", status);
 	message->SendReply(&reply);
 }
 
 
-/*
- *  Method: AddOnManager::HandleStartStopDevices()
- *   Descr: 
- */
 status_t
-AddOnManager::HandleStartStopDevices(BMessage *message,
-                                     BMessage *reply)
+AddOnManager::HandleStartStopDevices(BMessage* message,
+	BMessage* reply)
 {
 	const char *name = NULL;
 	int32 type = 0;
-	if (! ((message->FindInt32("type", &type)!=B_OK) ^ (message->FindString("device", &name)!=B_OK)))
+	if (!((message->FindInt32("type", &type) != B_OK)
+			^ (message->FindString("device", &name) != B_OK)))
 		return B_ERROR;
-		
-	return InputServer::StartStopDevices(name, (input_device_type)type, message->what == IS_START_DEVICE);
+
+	return gInputServer->StartStopDevices(name, (input_device_type)type,
+		message->what == IS_START_DEVICE);
 }
 
 
-/*
- *  Method: AddOnManager::HandleFindDevices()
- *   Descr: 
- */
 status_t
-AddOnManager::HandleFindDevices(BMessage *message,
-                                     BMessage *reply)
+AddOnManager::HandleFindDevices(BMessage* message, BMessage* reply)
 {
 	CALLED();
 	const char *name = NULL;
-	message->FindString("device", &name);
-	
-	for (int i = InputServer::gInputDeviceList.CountItems() - 1; i >= 0; i--) {
-		InputDeviceListItem* item = (InputDeviceListItem*)InputServer::gInputDeviceList.ItemAt(i);
-		if (!item)
-			continue;
-			
-		if (!name || strcmp(name, item->mDev.name) == 0) {
-			reply->AddString("device", item->mDev.name);
-			reply->AddInt32("type", item->mDev.type);
-			if (name)
-				return B_OK;	
-		}
-	}
+	input_device_type type;
+	if (message->FindString("device", &name) != B_OK
+		|| gInputServer->GetDeviceInfo(name, &type) != B_OK)
+		return B_NAME_NOT_FOUND;
+
+	reply->AddString("device", name);
+	reply->AddInt32("type", type);
 
 	return B_OK;
 }
 
 
-/*
- *  Method: AddOnManager::HandleWatchDevices()
- *   Descr: 
- */
 status_t
-AddOnManager::HandleWatchDevices(BMessage *message,
-                                     BMessage *reply)
+AddOnManager::HandleWatchDevices(BMessage* message, BMessage* reply)
 {
 	// TODO
 	return B_OK;
 }
 
 
-/*
- *  Method: AddOnManager::HandleIsDeviceRunning()
- *   Descr: 
- */
 status_t
-AddOnManager::HandleIsDeviceRunning(BMessage *message,
-                                     BMessage *reply)
+AddOnManager::HandleIsDeviceRunning(BMessage* message, BMessage* reply)
 {
-	const char *name = NULL;
-	if (message->FindString("device", &name)!=B_OK)
-		return B_ERROR;
-	
-	for (int i = InputServer::gInputDeviceList.CountItems() - 1; i >= 0; i--) {
-		InputDeviceListItem* item = (InputDeviceListItem*)InputServer::gInputDeviceList.ItemAt(i);
-		if (!item)
-			continue;
-			
-		if (strcmp(name, item->mDev.name) == 0)
-			return (item->mStarted) ? B_OK : B_ERROR;
-	}
+	const char *name;
+	bool running;
+	if (message->FindString("device", &name) != B_OK
+		|| gInputServer->GetDeviceInfo(name, NULL, &running) != B_OK)
+		return B_NAME_NOT_FOUND;
 
-	return B_ERROR;
+	return running ? B_OK : B_ERROR;
 }
 
 
-/*
- *  Method: AddOnManager::HandleControlDevices()
- *   Descr: 
- */
 status_t
-AddOnManager::HandleControlDevices(BMessage *message,
-                                     BMessage *reply)
+AddOnManager::HandleControlDevices(BMessage* message, BMessage* reply)
 {
 	CALLED();
 	const char *name = NULL;
 	int32 type = 0;
-	if (! ((message->FindInt32("type", &type)!=B_OK) ^ (message->FindString("device", &name)!=B_OK)))
+	if (!((message->FindInt32("type", &type) != B_OK)
+			^ (message->FindString("device", &name) != B_OK)))
 		return B_ERROR;
-	
+
 	uint32 code = 0;
-	BMessage msg;
-	bool isMessage = true;
-	if (message->FindInt32("code", (int32*)&code)!=B_OK)
+	BMessage controlMessage;
+	bool hasMessage = true;
+	if (message->FindInt32("code", (int32*)&code) != B_OK)
 		return B_ERROR;
-	if (message->FindMessage("message", &msg)!=B_OK)
-		isMessage = false;
-		
-	return InputServer::ControlDevices(name, (input_device_type)type, code, isMessage ? &msg : NULL);
+	if (message->FindMessage("message", &controlMessage) != B_OK)
+		hasMessage = false;
+
+	return gInputServer->ControlDevices(name, (input_device_type)type,
+		code, hasMessage ? &controlMessage : NULL);
 }
 
 
-/*
- *  Method: AddOnManager::HandleSystemShuttingDown()
- *   Descr: 
- */
 status_t
-AddOnManager::HandleSystemShuttingDown(BMessage *message,
-                                     BMessage *reply)
+AddOnManager::HandleSystemShuttingDown(BMessage* message,
+	BMessage* reply)
 {
 	CALLED();
-	
+
 	// TODO
 	return B_OK;
 }
 
-/*
- *  Method: AddOnManager::HandleMethodReplicant()
- *   Descr: 
- */
+
 status_t
-AddOnManager::HandleMethodReplicant(BMessage *message,
-                                     BMessage *reply)
+AddOnManager::HandleMethodReplicant(BMessage* message, BMessage* reply)
 {
 	CALLED();
 	LoadReplicant();
 	
 	BAutolock lock(InputServer::gInputMethodListLocker);
 	
-	if (((InputServer*)be_app)->MethodReplicant()) {
+	if (gInputServer->MethodReplicant()) {
 		_BMethodAddOn_ *addon = InputServer::gKeymapMethod.fOwner;
 		addon->AddMethod();
 		
