@@ -467,7 +467,7 @@ BScrollBar::MouseDown(BPoint where)
 		Invalidate(fPrivateData->fThumbFrame);
 		return;
 	}
-
+printf("check\n");
 	// hit test for arrows or empty area
 	float scrollValue = 0.0;
 	fPrivateData->fButtonDown = _ButtonFor(where);
@@ -534,7 +534,7 @@ BScrollBar::MouseUp(BPoint pt)
 void
 BScrollBar::MouseMoved(BPoint where, uint32 transit, const BMessage* message)
 {
-	if (!fPrivateData->fEnabled || fMin == fMax)
+	if (!fPrivateData->fEnabled || fMin >= fMax || fProportion >= 1.0)
 		return;
 
 	if (fPrivateData->fButtonDown != NOARROW) {
@@ -589,8 +589,10 @@ BScrollBar::Draw(BRect updateRect)
 	StrokeRect(bounds);
 	bounds.InsetBy(1.0, 1.0);
 
+	bool enabled = fPrivateData->fEnabled && fMin < fMax && fProportion < 1.0;
+
 	rgb_color light, light1, dark, dark1, dark2, dark4;
-	if (fPrivateData->fEnabled) {
+	if (enabled) {
 		light = tint_color(normal, B_LIGHTEN_MAX_TINT);
 		light1 = tint_color(normal, B_LIGHTEN_1_TINT);
 		dark = tint_color(normal, B_DARKEN_3_TINT);
@@ -598,33 +600,34 @@ BScrollBar::Draw(BRect updateRect)
 		dark2 = tint_color(normal, B_DARKEN_2_TINT);
 		dark4 = tint_color(normal, B_DARKEN_4_TINT);
 	} else {
-		light = tint_color(normal, B_LIGHTEN_1_TINT);
+		light = tint_color(normal, B_LIGHTEN_MAX_TINT);
 		light1 = normal;
 		dark = tint_color(normal, B_DARKEN_2_TINT);
-		dark1 = normal;
-		dark2 = tint_color(normal, B_DARKEN_1_TINT);
+		dark1 = tint_color(normal, B_LIGHTEN_2_TINT);
+		dark2 = tint_color(normal, B_LIGHTEN_1_TINT);
 		dark4 = tint_color(normal, B_DARKEN_3_TINT);
 	}
 	
 	SetDrawingMode(B_OP_OVER);
 
 	BRect thumbBG = bounds;
+	bool doubleArrows = _DoubleArrows();
 
 	// Draw arrows
 	if (fOrientation == B_HORIZONTAL) {
 		BRect buttonFrame(bounds.left, bounds.top, bounds.left + bounds.Height(), bounds.bottom);
 
-		_DrawArrowButton(ARROW_LEFT, buttonFrame, updateRect,
-			fPrivateData->fButtonDown == ARROW1);
+		_DrawArrowButton(ARROW_LEFT, doubleArrows, buttonFrame, updateRect,
+			enabled, fPrivateData->fButtonDown == ARROW1);
 
-		if (_DoubleArrows()) {
+		if (doubleArrows) {
 			buttonFrame.OffsetBy(bounds.Height() + 1, 0.0);
-			_DrawArrowButton(ARROW_RIGHT, buttonFrame, updateRect,
-				fPrivateData->fButtonDown == ARROW2);
+			_DrawArrowButton(ARROW_RIGHT, doubleArrows, buttonFrame, updateRect,
+				enabled, fPrivateData->fButtonDown == ARROW2);
 
 			buttonFrame.OffsetTo(bounds.right - ((bounds.Height() * 2) + 1), bounds.top);
-			_DrawArrowButton(ARROW_LEFT, buttonFrame, updateRect,
-				fPrivateData->fButtonDown == ARROW3);
+			_DrawArrowButton(ARROW_LEFT, doubleArrows, buttonFrame, updateRect,
+				enabled, fPrivateData->fButtonDown == ARROW3);
 		
 			thumbBG.left += bounds.Height() * 2 + 2;
 			thumbBG.right -= bounds.Height() * 2 + 2;
@@ -634,22 +637,22 @@ BScrollBar::Draw(BRect updateRect)
 		}
 
 		buttonFrame.OffsetTo(bounds.right - bounds.Height(), bounds.top);
-		_DrawArrowButton(ARROW_RIGHT, buttonFrame, updateRect,
-			fPrivateData->fButtonDown == ARROW4);
+		_DrawArrowButton(ARROW_RIGHT, doubleArrows, buttonFrame, updateRect,
+			enabled, fPrivateData->fButtonDown == ARROW4);
 	} else {
 		BRect buttonFrame(bounds.left, bounds.top, bounds.right, bounds.top + bounds.Width());
 
-		_DrawArrowButton(ARROW_UP, buttonFrame, updateRect,
-			fPrivateData->fButtonDown == ARROW1);
+		_DrawArrowButton(ARROW_UP, doubleArrows, buttonFrame, updateRect,
+			enabled, fPrivateData->fButtonDown == ARROW1);
 		
-		if (_DoubleArrows()) {
+		if (doubleArrows) {
 			buttonFrame.OffsetBy(0.0, bounds.Width() + 1);
-			_DrawArrowButton(ARROW_DOWN, buttonFrame, updateRect,
-				fPrivateData->fButtonDown == ARROW2);
+			_DrawArrowButton(ARROW_DOWN, doubleArrows, buttonFrame, updateRect,
+				enabled, fPrivateData->fButtonDown == ARROW2);
 
 			buttonFrame.OffsetTo(bounds.left, bounds.bottom - ((bounds.Width() * 2) + 1));
-			_DrawArrowButton(ARROW_UP, buttonFrame, updateRect,
-				fPrivateData->fButtonDown == ARROW3);
+			_DrawArrowButton(ARROW_UP, doubleArrows, buttonFrame, updateRect,
+				enabled, fPrivateData->fButtonDown == ARROW3);
 		
 			thumbBG.top += bounds.Width() * 2 + 2;
 			thumbBG.bottom -= bounds.Width() * 2 + 2;
@@ -659,8 +662,8 @@ BScrollBar::Draw(BRect updateRect)
 		}
 
 		buttonFrame.OffsetTo(bounds.left, bounds.bottom - bounds.Width());
-		_DrawArrowButton(ARROW_DOWN, buttonFrame, updateRect,
-			fPrivateData->fButtonDown == ARROW4);
+		_DrawArrowButton(ARROW_DOWN, doubleArrows, buttonFrame, updateRect,
+			enabled, fPrivateData->fButtonDown == ARROW4);
 	}
 
 	SetDrawingMode(B_OP_COPY);
@@ -753,12 +756,12 @@ BScrollBar::Draw(BRect updateRect)
 		}
 	}
 
-	thumbBG.InsetBy(1.0, 1.0);
 	SetHighColor(dark1);
 
 	// Draw scroll thumb
-	if (fPrivateData->fEnabled) {
+	if (enabled) {
 		// fill and additional dark lines
+		thumbBG.InsetBy(1.0, 1.0);
 		if (fOrientation == B_HORIZONTAL) {
 			BRect leftOfThumb(thumbBG.left + 1, thumbBG.top, rect.left - 1, thumbBG.bottom);
 			if (leftOfThumb.IsValid())
@@ -819,7 +822,46 @@ BScrollBar::Draw(BRect updateRect)
 
 		// TODO: Add the other thumb styles - dots and lines
 	} else {
-		FillRect(thumbBG);
+		if (fMin >= fMax || fProportion >= 1.0) {
+			// we cannot scroll at all
+			_DrawDisabledBackground(thumbBG, light, dark, dark1);
+		} else {
+			// we could scroll, but we're simply disabled
+			if (fOrientation == B_HORIZONTAL) {
+				// left of thumb
+				BRect besidesThumb(thumbBG);
+				besidesThumb.right = rect.left - 1;
+				_DrawDisabledBackground(besidesThumb, light, dark, dark1);
+				// right of thumb
+				besidesThumb.left = rect.right + 1;
+				besidesThumb.right = thumbBG.right;
+				_DrawDisabledBackground(besidesThumb, light, dark, dark1);
+			} else {
+				// above thumb
+				BRect besidesThumb(thumbBG);
+				besidesThumb.bottom = rect.top - 1;
+				_DrawDisabledBackground(besidesThumb, light, dark, dark1);
+				// below thumb
+				besidesThumb.top = rect.bottom + 1;
+				besidesThumb.bottom = thumbBG.bottom;
+				_DrawDisabledBackground(besidesThumb, light, dark, dark1);
+			}
+			// thumb
+			BeginLineArray(4);
+				AddLine(BPoint(rect.left, rect.bottom),
+						BPoint(rect.left, rect.top), light);
+				AddLine(BPoint(rect.left + 1, rect.top),
+						BPoint(rect.right, rect.top), light);
+				AddLine(BPoint(rect.right, rect.top + 1),
+						BPoint(rect.right, rect.bottom), dark2);
+				AddLine(BPoint(rect.right - 1, rect.bottom),
+						BPoint(rect.left + 1, rect.bottom), dark2);
+			EndLineArray();
+			// fill thumb
+			rect.InsetBy(1.0, 1.0);
+			SetHighColor(dark1);
+			FillRect(rect);
+		}
 	}
 }
 
@@ -849,7 +891,7 @@ BScrollBar::ResolveSpecifier(BMessage *msg,int32 index,
 void
 BScrollBar::ResizeToPreferred()
 {
-	// TODO: Implement
+	BView::ResizeToPreferred();
 }
 
 // GetPreferredSize
@@ -900,8 +942,18 @@ BScrollBar::Perform(perform_code d, void *arg)
 	return BView::Perform(d, arg);
 }
 
+#if DISABLES_ON_WINDOW_DEACTIVATION
+void
+BScrollBar::WindowActivated(bool active)
+{
+	fPrivateData->fEnabled = active;
+	Invalidate();
+}
+#endif // DISABLES_ON_WINDOW_DEACTIVATION
 
+#if !DISABLES_ON_WINDOW_DEACTIVATION
 void BScrollBar::_ReservedScrollBar1() {}
+#endif
 void BScrollBar::_ReservedScrollBar2() {}
 void BScrollBar::_ReservedScrollBar3() {}
 void BScrollBar::_ReservedScrollBar4() {}
@@ -961,8 +1013,11 @@ BScrollBar::_UpdateThumbFrame()
 	maxSize--;
 
 	float thumbSize = minSize;
+	float proportion = fProportion;
+	if (fMin == fMax)
+		proportion = 1.0;
 	if (fPrivateData->fScrollBarInfo.proportional)
-		thumbSize += (maxSize - minSize) * fProportion;
+		thumbSize += (maxSize - minSize) * proportion;
 	thumbSize = floorf(thumbSize + 0.5);
 	thumbSize--;
 
@@ -1117,10 +1172,10 @@ BScrollBar::_ButtonRectFor(int32 button) const
 				rect.OffsetBy(0.0, buttonSize);
 				break;
 			case ARROW3:
-				rect.OffsetTo(bounds.left, bounds.bottom - 2 * buttonSize);
+				rect.OffsetTo(bounds.left, bounds.bottom - 2 * buttonSize + 1);
 				break;
 			case ARROW4:
-				rect.OffsetTo(bounds.left, bounds.bottom - buttonSize);
+				rect.OffsetTo(bounds.left, bounds.bottom - buttonSize + 1);
 				break;
 		}
 	} else {
@@ -1131,10 +1186,10 @@ BScrollBar::_ButtonRectFor(int32 button) const
 				rect.OffsetBy(buttonSize, 0.0);
 				break;
 			case ARROW3:
-				rect.OffsetTo(bounds.right - 2 * buttonSize, bounds.top);
+				rect.OffsetTo(bounds.right - 2 * buttonSize + 1, bounds.top);
 				break;
 			case ARROW4:
-				rect.OffsetTo(bounds.right - buttonSize, bounds.top);
+				rect.OffsetTo(bounds.right - buttonSize + 1, bounds.top);
 				break;
 		}
 	}
@@ -1210,25 +1265,90 @@ control_scrollbar(scroll_bar_info *info, BScrollBar *bar)
 	return B_OK;
 }
 
+// _DrawDisabledBackground
+void
+BScrollBar::_DrawDisabledBackground(BRect area,
+									const rgb_color& light, const rgb_color& dark,
+									const rgb_color& fill)
+{
+	if (!area.IsValid())
+		return;
+
+	if (fOrientation == B_VERTICAL) {
+		int32 height = area.IntegerHeight();
+		if (height == 0) {
+			SetHighColor(dark);
+			StrokeLine(area.LeftTop(), area.RightTop());
+		} else if (height == 1) {
+			SetHighColor(dark);
+			FillRect(area);
+		} else {
+			BeginLineArray(4);
+				AddLine(BPoint(area.left, area.top),
+						BPoint(area.right, area.top), dark);
+				AddLine(BPoint(area.left, area.bottom - 1),
+						BPoint(area.left, area.top + 1), light);
+				AddLine(BPoint(area.left + 1, area.top + 1),
+						BPoint(area.right, area.top + 1), light);
+				AddLine(BPoint(area.right, area.bottom),
+						BPoint(area.left, area.bottom), dark);
+			EndLineArray();
+			area.left++;
+			area.top += 2;
+			area.bottom--;
+			if (area.IsValid()) {
+				SetHighColor(fill);
+				FillRect(area);
+			}
+		}
+	} else {
+		int32 width = area.IntegerWidth();
+		if (width == 0) {
+			SetHighColor(dark);
+			StrokeLine(area.LeftBottom(), area.LeftTop());
+		} else if (width == 1) {
+			SetHighColor(dark);
+			FillRect(area);
+		} else {
+			BeginLineArray(4);
+				AddLine(BPoint(area.left, area.bottom),
+						BPoint(area.left, area.top), dark);
+				AddLine(BPoint(area.left + 1, area.bottom),
+						BPoint(area.left + 1, area.top + 1), light);
+				AddLine(BPoint(area.left + 1, area.top),
+						BPoint(area.right - 1, area.top), light);
+				AddLine(BPoint(area.right, area.top),
+						BPoint(area.right, area.bottom), dark);
+			EndLineArray();
+			area.left += 2;
+			area.top ++;
+			area.right--;
+			if (area.IsValid()) {
+				SetHighColor(fill);
+				FillRect(area);
+			}
+		}
+	}
+}
+
 // _DrawArrowButton
 void
-BScrollBar::_DrawArrowButton(int32 direction, BRect r, const BRect& updateRect, bool down)
+BScrollBar::_DrawArrowButton(int32 direction, bool doubleArrows, BRect r,
+							 const BRect& updateRect, bool enabled, bool down)
 {
 	if (!updateRect.Intersects(r))
 		return;
 
 	rgb_color c = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color light, dark, normal,arrow,arrow2;
+	rgb_color light, dark, darker, normal, arrow;
 
 	if (down && fPrivateData->fDoRepeat) {	
 		light = tint_color(c, (B_DARKEN_1_TINT + B_DARKEN_2_TINT) / 2.0);
-		arrow2 = dark = tint_color(c, B_LIGHTEN_1_TINT);
+		dark = darker = c;
 		normal = tint_color(c, B_DARKEN_1_TINT);
 		arrow = tint_color(c, B_DARKEN_MAX_TINT);
 	
 	} else {
-		bool use_enabled_colors = fPrivateData->fEnabled;
-		
 		// Add a usability perk - disable buttons if they would not do anything - 
 		// like a left arrow if the value==fMin
 // NOTE: disabled because of too much visual noise/distraction
@@ -1237,15 +1357,17 @@ BScrollBar::_DrawArrowButton(int32 direction, BRect r, const BRect& updateRect, 
 		else if ((direction == ARROW_RIGHT || direction == ARROW_DOWN) && (fValue == fMax) )
 			use_enabled_colors = false;*/
 
-		if (use_enabled_colors) {
-			arrow2 = light = tint_color(c, B_LIGHTEN_MAX_TINT);
-			dark = tint_color(c, (B_DARKEN_1_TINT + B_DARKEN_2_TINT) / 2.0);
+		if (enabled) {
+			light = tint_color(c, B_LIGHTEN_MAX_TINT);
+			dark = tint_color(c, B_DARKEN_1_TINT);
+			darker = tint_color(c, B_DARKEN_2_TINT);
 			normal = c;
 			arrow = tint_color(c, (B_DARKEN_MAX_TINT + B_DARKEN_4_TINT) / 2.0);
 		} else {
-			arrow2 = light = tint_color(c, B_LIGHTEN_1_TINT);
-			dark = tint_color(c, B_DARKEN_1_TINT);
-			normal = c;
+			light = tint_color(c, B_LIGHTEN_MAX_TINT);
+			dark = tint_color(c, B_LIGHTEN_1_TINT);
+			darker = tint_color(c, B_DARKEN_2_TINT);
+			normal = tint_color(c, B_LIGHTEN_2_TINT);
 			arrow = tint_color(c, B_DARKEN_1_TINT);
 		}
 	}
@@ -1301,24 +1423,42 @@ BScrollBar::_DrawArrowButton(int32 direction, BRect r, const BRect& updateRect, 
 	BeginLineArray(4);
 	if (direction == ARROW_LEFT || direction == ARROW_RIGHT) {
 		// horizontal
+		if (doubleArrows && direction == ARROW_LEFT) {
+			// draw in such a way that the arrows are
+			// more visually separated
+			AddLine(BPoint(r.left + 1, r.top),
+					BPoint(r.right - 1, r.top), light);
+			AddLine(BPoint(r.right, r.top),
+					BPoint(r.right, r.bottom), darker);
+		} else {
+			AddLine(BPoint(r.left + 1, r.top),
+					BPoint(r.right, r.top), light);
+			AddLine(BPoint(r.right, r.top + 1),
+					BPoint(r.right, r.bottom), dark);
+		}
 		AddLine(BPoint(r.left, r.bottom),
 				BPoint(r.left, r.top), light);
-		AddLine(BPoint(r.left + 1, r.top),
-				BPoint(r.right - 1, r.top), light);
-		AddLine(BPoint(r.right, r.top),
-				BPoint(r.right, r.bottom), dark);
 		AddLine(BPoint(r.right - 1, r.bottom),
 				BPoint(r.left + 1, r.bottom), dark);
 	} else {
 		// vertical
-		AddLine(BPoint(r.left, r.bottom - 1),
-				BPoint(r.left, r.top), light);
+		if (doubleArrows && direction == ARROW_UP) {
+			// draw in such a way that the arrows are
+			// more visually separated
+			AddLine(BPoint(r.left, r.bottom - 1),
+					BPoint(r.left, r.top), light);
+			AddLine(BPoint(r.right, r.bottom),
+					BPoint(r.left, r.bottom), darker);
+		} else {
+			AddLine(BPoint(r.left, r.bottom),
+					BPoint(r.left, r.top), light);
+			AddLine(BPoint(r.right, r.bottom),
+					BPoint(r.left + 1, r.bottom), dark);
+		}
 		AddLine(BPoint(r.left + 1, r.top),
 				BPoint(r.right, r.top), light);
 		AddLine(BPoint(r.right, r.top + 1),
-				BPoint(r.right, r.bottom), dark);
-		AddLine(BPoint(r.right - 1, r.bottom),
-				BPoint(r.left, r.bottom), dark);
+				BPoint(r.right, r.bottom - 1), dark);
 	}
 	EndLineArray();
 }

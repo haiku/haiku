@@ -24,6 +24,8 @@
 #define SCROLL_BAR_MAXIMUM_KNOB_SIZE	50
 #define SCROLL_BAR_MINIMUM_KNOB_SIZE	9
 
+#define DISABLES_ON_WINDOW_DEACTIVATION 1
+
 //----------------------------------------------------------------
 //----- BScrollBar class -----------------------------------------
 
@@ -83,13 +85,21 @@ virtual status_t	GetSupportedSuites(BMessage *data);
 //----- Private or reserved -----------------------------------------
 virtual status_t	Perform(perform_code d, void *arg);
 
+// NOTE: this takes up another virtual slot compared to R5
+#if DISABLES_ON_WINDOW_DEACTIVATION
+virtual	void		WindowActivated(bool active);
+#endif
+
 private:
 		class Private;
 		friend class Private;
 
 		friend status_t control_scrollbar(scroll_bar_info *info, BScrollBar *bar);		// for use within the preflet
 
+#if !DISABLES_ON_WINDOW_DEACTIVATION
 virtual	void		_ReservedScrollBar1();
+#endif
+
 virtual	void		_ReservedScrollBar2();
 virtual	void		_ReservedScrollBar3();
 virtual	void		_ReservedScrollBar4();
@@ -103,10 +113,15 @@ virtual	void		_ReservedScrollBar4();
 		BRect		_ButtonRectFor(int32 button) const;
 		void		_UpdateTargetValue(BPoint where);
 		void		_UpdateArrowButtons();
+		void		_DrawDisabledBackground(BRect area,
+											const rgb_color& light,
+											const rgb_color& dark,
+											const rgb_color& fill);
 		void		_DrawArrowButton(int32 direction,
+									 bool doubleArrows,
 									 BRect frame,
 									 const BRect& updateRect,
-									 bool down);
+									 bool enabled, bool down);
 		
 		float		fMin;
 		float		fMax;
