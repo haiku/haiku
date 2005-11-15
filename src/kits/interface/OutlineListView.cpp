@@ -361,7 +361,7 @@ void BOutlineListView::Expand(BListItem *item)
 			items++;
 	}
 
-	FixupScrollBar();
+	_FixupScrollBar();
 	Invalidate();
 }
 //------------------------------------------------------------------------------
@@ -391,7 +391,7 @@ void BOutlineListView::Collapse(BListItem *item)
 		items++;
 	}
 
-	FixupScrollBar();
+	_FixupScrollBar();
 	Invalidate();
 }
 //------------------------------------------------------------------------------

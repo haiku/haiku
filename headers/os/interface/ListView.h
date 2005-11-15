@@ -148,21 +148,21 @@ class BListView : public BView, public BInvoker
 
 			BListView		&operator=(const BListView &);
 	
-			void			InitObject(list_view_type type);
-			void			FixupScrollBar();
-			void			InvalidateFrom(int32 index);
-			status_t		PostMsg(BMessage *msg);
-			void			FontChanged();
-			int32			RangeCheck(int32 index);
+			void			_InitObject(list_view_type type);
+			void			_FixupScrollBar();
+			void			_InvalidateFrom(int32 index);
+			status_t		_PostMessage(BMessage *msg);
+			void			_FontChanged();
+			int32			_RangeCheck(int32 index);
 			bool			_Select(int32 index, bool extend);
 			bool			_Select(int32 from, int32 to, bool extend);
 			bool			_Deselect(int32 index);
-			void			Deselect(int32 from, int32 to);
+//			void			_Deselect(int32 from, int32 to);
 			bool			_DeselectAll(int32 except_from, int32 except_to);
-			void			PerformDelayedSelect();
-			bool			TryInitiateDrag(BPoint where);
-			int32			CalcFirstSelected(int32 after);
-			int32			CalcLastSelected(int32 before);
+//			void			PerformDelayedSelect();
+			bool			_TryInitiateDrag(BPoint where);
+			int32			_CalcFirstSelected(int32 after);
+			int32			_CalcLastSelected(int32 before);
 		virtual void		DrawItem(BListItem *item, BRect itemRect, bool complete = false);
 	
 			bool			DoSwapItems(int32 a, int32 b);
@@ -178,9 +178,10 @@ class BListView : public BView, public BInvoker
 		int32				fLastSelected;
 		int32				fAnchorIndex;
 		float				fWidth;
-		BMessage			*fSelectMessage;
-		BScrollView			*fScrollView;
-		track_data			*fTrack;
+		BMessage*			fSelectMessage;
+		BScrollView*		fScrollView;
+		track_data*			fTrack;
+
 		uint32				_reserved[3];
 };
 
