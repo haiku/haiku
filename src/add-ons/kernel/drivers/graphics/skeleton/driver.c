@@ -106,7 +106,7 @@ static struct {
 	uint16	vendor;
 	uint16	*devices;
 } SupportedDevices[] = {
-	{VENDOR_ID_NVIDIA, nvidia_device_list},
+//	{VENDOR_ID_NVIDIA, nvidia_device_list},
 	{0x0000, NULL}
 };
 
