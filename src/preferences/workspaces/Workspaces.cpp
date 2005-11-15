@@ -1,35 +1,41 @@
 /*
- * Workspaces - OpenBeOS version by Francois Revol revol@free.fr
- * This file is distributed under the terms of the OpenBeOS license.
+ * Copyright 2002-2005, Haiku, Inc.
+ * Copyright 2002, François Revol, revol@free.fr.
+ * This file is distributed under the terms of the MIT License.
  *
- * Workspaces window trick found by Michael "Minox" Paine.
- * (using B_ALL_WORKSPACES as flags in BWindow)
- * Found out that using 0xffffffff as Flags was causing the window not to close on Alt-W
- * hey Workspaces get Flags of Window 0
- * gives 0x00008080 which makes it.
- *
- * Other authors: Axel Dörfler, Oliver "Madison" Kohl, Matt Madia
+ * Authors:
+ *		François Revol, revol@free.fr
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Oliver "Madison" Kohl,
+ *		Matt Madia
+ */
+
+/**	Workspaces window trick found by Michael "Minox" Paine.
+ *	(using B_ALL_WORKSPACES as flags in BWindow)
+ *	Found out that using 0xffffffff as Flags was causing the window not to close on Alt-W
+ *	hey Workspaces get Flags of Window 0
+ *	gives 0x00008080 which makes it.
  */
 
 
-#include <Application.h>
 #include <Alert.h>
-#include <File.h>
-#include <Window.h>
-#include <Screen.h>
+#include <Application.h>
 #include <Entry.h>
-#include <Roster.h>
-#include <Path.h>
+#include <File.h>
 #include <FindDirectory.h>
+#include <Path.h>
+#include <Roster.h>
+#include <Screen.h>
+#include <Window.h>
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 
 // here is the trick :)
-#define B_WORKSPACES_WINDOW 0x00008000
+static const uint32 kWorkspacesWindow = 0x00008000;
 
 static const char *kWorkspacesSignature = "application/x-vnd.Be-WORK";
 static const char *kWorkspacesSettingFile = "Workspace_data";
@@ -64,7 +70,7 @@ class WorkspacesWindow : public BWindow {
 		virtual void Zoom(BPoint origin, float width, float height);
 
 		virtual void MessageReceived(BMessage *msg);
-		virtual bool QuitRequested(void);
+		virtual bool QuitRequested();
 
 	private:
 		WorkspacesPreferences *fPreferences;
@@ -76,9 +82,9 @@ class WorkspacesApp : public BApplication {
 		WorkspacesApp();
 		virtual ~WorkspacesApp();
 
-		virtual void AboutRequested(void);
+		virtual void AboutRequested();
 		virtual void ArgvReceived(int32 argc, char **argv);
-		virtual void ReadyToRun(void);
+		virtual void ReadyToRun();
 
 		void Usage(const char *programName);
 
@@ -186,7 +192,9 @@ WorkspacesPreferences::SetWindowFrame(BRect frame)
 
 WorkspacesWindow::WorkspacesWindow(WorkspacesPreferences *preferences)
 	: BWindow(preferences->WindowFrame(), "Workspaces", B_TITLED_WINDOW_LOOK,
- 			B_NORMAL_WINDOW_FEEL, B_WORKSPACES_WINDOW | B_AVOID_FRONT, B_ALL_WORKSPACES),
+ 			B_NORMAL_WINDOW_FEEL,
+			kWorkspacesWindow | B_AVOID_FRONT | B_WILL_ACCEPT_FIRST_CLICK,
+ 			B_ALL_WORKSPACES),
  	fPreferences(preferences)
 {
 	fPreviousFrame = Frame();
@@ -258,7 +266,7 @@ WorkspacesWindow::MessageReceived(BMessage *msg)
 
 
 bool
-WorkspacesWindow::QuitRequested(void)
+WorkspacesWindow::QuitRequested()
 {
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
@@ -281,7 +289,7 @@ WorkspacesApp::~WorkspacesApp()
 
 
 void
-WorkspacesApp::AboutRequested(void)
+WorkspacesApp::AboutRequested()
 {
 	// blocking !! 
 	// the original does the same by the way =)
@@ -349,7 +357,7 @@ WorkspacesApp::ArgvReceived(int32 argc, char **argv)
 
 
 void
-WorkspacesApp::ReadyToRun(void)
+WorkspacesApp::ReadyToRun()
 {
 	fWindow->Show();
 }
