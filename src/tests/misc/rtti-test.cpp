@@ -54,9 +54,9 @@ main()
 	B b;
 	C c;
 
-	printf("A: %p\n", &a);
-	printf("B: %p\n", &b);
-	printf("C: %p\n", &c);
+	printf("A: %p (vtable: %p)\n", &a, *(void**)&a);
+	printf("B: %p (vtable: %p)\n", &b, *(void**)&b);
+	printf("C: %p (vtable: %p)\n", &c, *(void**)&c);
 
 	RTTI_TEST(&a, "A");
 	RTTI_TEST(&b, "B");
@@ -73,9 +73,9 @@ main()
 	BFile file;
 	BDirectory dir;
 
-	printf("BNode:      %p\n", &node);
-	printf("BFile:      %p\n", &file);
-	printf("BDirectory: %p\n", &dir);
+	printf("BNode:      %p (vtable: %p)\n", &node, *(void**)&node);
+	printf("BFile:      %p (vtable: %p)\n", &file, *(void**)&file);
+	printf("BDirectory: %p (vtable: %p)\n", &dir, *(void**)&dir);
 
 	RTTI_TEST(&node, "BNode");
 	RTTI_TEST(&file, "BFile");
