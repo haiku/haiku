@@ -476,7 +476,7 @@ BMessage& BMessage::operator=(const BMessage& msg)
 {
 	what = msg.what;
 
-	link = msg.link;
+	fQueueLink = msg.fQueueLink;
 	fTarget = msg.fTarget;
 	fOriginal = msg.fOriginal;
 	fChangeCount = msg.fChangeCount;
@@ -506,7 +506,7 @@ void BMessage::init_data()
 {
 	what = 0;
 
-	link = NULL;
+	fQueueLink = NULL;
 	fTarget = B_NULL_TOKEN;
 	fOriginal = NULL;
 	fChangeCount = 0;

@@ -399,7 +399,7 @@ static	BBlockCache	*sMsgCache;
 		void		da_swap_var_sized(dyn_array *da);
 		void		da_swap_fixed_sized(dyn_array *da);
 
-		BMessage			*link;
+		BMessage			*fQueueLink;
 		int32				fTarget;	
 		BMessage			*fOriginal;
 		uint32				fChangeCount;

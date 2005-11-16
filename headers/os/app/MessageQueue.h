@@ -1,65 +1,56 @@
-//
-//	$Id: MessageQueue.h 1686 2002-10-26 18:59:16Z beveloper $
-//
-//	This is the BMessageQueue interface for OpenBeOS.  It has been created
-//  to be source and binary compatible with the BeOS version of
-//  BMessageQueue.
-//
-
-
-#ifndef	_OPENBEOS_MESSAGEQUEUE_H
-#define	_OPENBEOS_MESSAGEQUEUE_H
+/*
+ * Copyright 2001-2005, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef	_MESSAGE_QUEUE_H
+#define	_MESSAGE_QUEUE_H
 
 
 #include <Locker.h>
-#include <Message.h>	/* For convenience */
+#include <Message.h>
+	/* For convenience */
 
-
-#ifdef USE_OPENBEOS_NAMESPACE
-namespace OpenBeOS {
-#endif
 
 class BMessageQueue {
-public:
-	BMessageQueue();
-	virtual ~BMessageQueue();
-	
-	void AddMessage(BMessage *message);
-	void RemoveMessage(BMessage *message);
-	
-	int32 CountMessages(void) const;
-	bool IsEmpty(void) const;
-	
-	BMessage *FindMessage(int32 index) const;
-	BMessage *FindMessage(uint32 what, int32 index=0) const;
-	
-	bool Lock(void);
-	void Unlock(void);
-	bool IsLocked(void);
+	public:
+		BMessageQueue();
+		virtual ~BMessageQueue();
 
-	BMessage *NextMessage(void);
+		void AddMessage(BMessage* message);
+		void RemoveMessage(BMessage* message);
 
-private:
+		int32 CountMessages() const;
+		bool IsEmpty() const;
 
-	// Reserved space in the vtable for future changes to BMessageQueue
-	virtual void _ReservedMessageQueue1(void);
-	virtual void _ReservedMessageQueue2(void);
-	virtual void _ReservedMessageQueue3(void);
-	
-	BMessageQueue(const BMessageQueue &);
-	BMessageQueue &operator=(const BMessageQueue &);
-	
-	BMessage *fTheQueue;
-	BMessage *fQueueTail;
-	int32 fMessageCount;
-	BLocker fLocker;
-	
-	// Reserved space for future changes to BMessageQueue
-	uint32 fReservedSpace[3];
+		BMessage* FindMessage(int32 index) const;
+		BMessage* FindMessage(uint32 what, int32 index = 0) const;
+
+		bool Lock();
+		void Unlock();
+		bool IsLocked() const;
+
+		BMessage *NextMessage();
+
+	private:
+		// Reserved space in the vtable for future changes to BMessageQueue
+		virtual void _ReservedMessageQueue1();
+		virtual void _ReservedMessageQueue2();
+		virtual void _ReservedMessageQueue3();
+
+		BMessageQueue(const BMessageQueue &);
+		BMessageQueue &operator=(const BMessageQueue &);
+
+		bool IsLocked();
+			// this needs to be exported for R5 compatibility and should
+			// be dropped as soon as possible
+
+	private:	
+		BMessage* fHead;
+		BMessage* fTail;
+		int32 fMessageCount;
+		mutable BLocker fLock;
+
+		uint32 _reserved[3];
 };
 
-#ifdef USE_OPENBEOS_NAMESPACE
-}
-#endif
-
-#endif // _OPENBEOS_MESSAGEQUEUE_H
+#endif	// _MESSAGE_QUEUE_H

@@ -1,501 +1,276 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		MessageQueue.cpp
-//	Author(s):		unknown
-//					
-//	Description:	Queue for holding BMessages
-//					
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Unknown? Eric?
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+
+/**	Queue for holding BMessages */
+
 
 #include <MessageQueue.h>
 #include <Autolock.h>
 #include <Message.h>
 
-#ifdef USE_OPENBEOS_NAMESPACE
-namespace OpenBeOS {
-#endif
 
-
-/*
- *  Method: BMessageQueue::BMessageQueue()
- *   Descr: This method is the only constructor for a BMessageQueue.  Once the
- *          constructor completes, the BMessageQueue is created with no BMessages
- *          in it.
- *
- */
 BMessageQueue::BMessageQueue()
- :	fTheQueue(NULL),
- 	fQueueTail(NULL),
+	:
+	fHead(NULL),
+ 	fTail(NULL),
  	fMessageCount(0),
- 	fLocker("BMessageQueue_fLocker")
+ 	fLock("BMessageQueue Lock")
 {
 }
 
 
-/*
- *  Method: BMessageQueue::~BMessageQueue()
- *   Descr: This is the desctructor for the BMessageQueue.  It iterates over
- *          any messages left on the queue and deletes them.
- *
- *		    The implementation is careful not to release the lock when the
- *          BMessageQueue is deconstructed.  If the lock is released, it is
- *          possible another thread will start an AddMessage() operation before
- *          the BLocker is deleted.  The safe thing to do is not to unlock the
- *          BLocker from the destructor once it is acquired. That way, any thread
- *          waiting to do a AddMessage() will fail to acquire the lock since the
- *          BLocker will be deleted before they can acquire it.
- *
- */
+/*!
+	\brief This is the desctructor for the BMessageQueue.  It iterates over
+		any messages left on the queue and deletes them.
+
+	The implementation is careful not to release the lock when the
+	BMessageQueue is deconstructed.  If the lock is released, it is
+	possible another thread will start an AddMessage() operation before
+	the BLocker is deleted.  The safe thing to do is not to unlock the
+	BLocker from the destructor once it is acquired. That way, any thread
+	waiting to do a AddMessage() will fail to acquire the lock since the
+	BLocker will be deleted before they can acquire it.
+*/
 BMessageQueue::~BMessageQueue()
 {
-	if (fLocker.Lock()) {
-		BMessage *theMessage = fTheQueue;
-		while (theMessage != NULL) {
-			BMessage *messageToDelete = theMessage;
-#ifndef USING_MESSAGE4
-			theMessage = theMessage->link;
-#else
-			theMessage = theMessage->fQueueLink;
-#endif
-			delete messageToDelete;
-		}
+	if (!Lock())
+		return;
+
+	BMessage* message = fHead;
+	while (message != NULL) {
+		BMessage *next = message->fQueueLink;
+
+		delete message;
+		message = next;
 	}
 }
 
 
-/*
- *  Method: BMessageQueue::AddMessage()
- *   Descr: This method adds a BMessage to the queue.  It makes a couple of
- *          assumptions:
- *             - The BMessage was allocated on the heap with new.  Since the
- *               destructor delete's BMessages left on the queue, this must be
- *               true.  The same assumption is made with Be's implementation.
- *             - The BMessage is not already on this or any other BMessageQueue.
- *               If it is, the queue it is already on will be corrupted.  Be's
- *               implementation makes this assumption also and does corrupt
- *               BMessageQueues where this is violated.
- *
- */
+/*!
+	\brief This method adds a BMessage to the queue.
+
+	It makes a couple of assumptions:
+		- The BMessage was allocated on the heap with new, since the
+		  destructor delete's BMessages left on the queue.
+		- The BMessage is not already on this or any other BMessageQueue.
+		  If it is, the queue it is already on will be corrupted.
+*/
 void
-BMessageQueue::AddMessage(BMessage *message)
+BMessageQueue::AddMessage(BMessage* message)
 {
-	if (message == NULL) {
+	if (message == NULL)
 		return;
-	}
-	
-	// The Be implementation does not seem to check that the lock acquisition
-	// was successful.  This will specifically cause problems when the
-	// message queue is deleted.  On delete, any thread waiting for the lock
-	// will be notified that the lock failed.  Be's implementation, because
-	// they do not check proceeds with the operation, potentially corrupting
-	// memory.  This implementation is different, but I can't imagine that
-	// Be's implementation is worth emulating.
-	//
-	BAutolock theAutoLocker(fLocker);
-	
-	if (theAutoLocker.IsLocked()) {
-		
-		// The message passed in will be the last message on the queue so its
-		// link member should be set to null.
-#ifndef USING_MESSAGE4
-		message->link = NULL;
-#else
-		message->fQueueLink = NULL;
-#endif
-		
-		// We now have one more BMessage on the queue.
-		fMessageCount++;
-		
-		// If there are no BMessages on the queue.
-		if (fQueueTail == NULL) {
-			// Then this message is both the start and the end of the queue.
-			fTheQueue = message;
-			fQueueTail = message;
-		} else {
-			// If there are already messages on the queue, then the put this
-			// BMessage at the end.  The last BMessage prior to this AddMessage()
-			// is fQueueTail.  The BMessage at fQueueTail needs to point to the
-			// new last message, the one being added.
-#ifndef USING_MESSAGE4
-			fQueueTail->link = message;
-#else
-			fQueueTail->fQueueLink = message;
-#endif
-			
-			// Now update the fQueueTail to point to this new last message.
-			fQueueTail = message;
-		}
+
+	BAutolock _(fLock);
+	if (!IsLocked())
+		return;
+
+	// The message passed in will be the last message on the queue so its
+	// link member should be set to null.
+	message->fQueueLink = NULL;
+
+	fMessageCount++;
+
+	if (fTail == NULL) {
+		// there are no messages in the queue yet
+		fHead = fTail = message;
+	} else {
+		// just add it after the tail
+		fTail->fQueueLink = message;
+		fTail = message;
 	}
 }
 
 
-/*
- *  Method: BMessageQueue::RemoveMessage()
- *   Descr: This method searches the queue for a particular BMessage.  If
- *          it is found, it is removed from the queue.
- * 
- */
+/*!
+	\brief This method searches the queue for a particular BMessage.
+ 		If it is found, it is removed from the queue.
+*/
 void
-BMessageQueue::RemoveMessage(BMessage *message)
+BMessageQueue::RemoveMessage(BMessage* message)
 {
-	if (message == NULL) {
+	if (message == NULL)
 		return;
-	}
-	
-	BAutolock theAutoLocker(fLocker);
-	
-	// The Be implementation does not seem to check that the lock acquisition
-	// was successful.  This will specifically cause problems when the
-	// message queue is deleted.  On delete, any thread waiting for the lock
-	// will be notified that the lock failed.  Be's implementation, because
-	// they do not check proceeds with the operation, potentially corrupting
-	// memory.  This implementation is different, but I can't imagine that
-	// Be's implementation is worth emulating.
-	//
-	if (theAutoLocker.IsLocked()) {
-		
-		// If the message to be removed is at the front of the queue.
-		if (fTheQueue == message) {
-			// We need to special case the handling of removing the first element.
-			// First, the new front element will be the next one.
-#ifndef USING_MESSAGE4
-			fTheQueue = fTheQueue->link;
-#else
-			fTheQueue = fTheQueue->fQueueLink;
-#endif
-			
-			// Must decrement the count of elements since the front one is being
-			// removed.
+
+	BAutolock _(fLock);
+	if (!IsLocked())
+		return;
+
+	BMessage* last = NULL;
+	for (BMessage* entry = fHead; entry != NULL; entry = entry->fQueueLink) {
+		if (entry == message) {
+			// remove this one
+			if (entry == fHead)
+				fHead = entry->fQueueLink;
+			if (entry == fTail)
+				fTail = last;
+
 			fMessageCount--;
-			
-			// If the new front element is NULL, then that means that the queue
-			// is now empty.  That means that fQueueTail must be set to NULL.
-			if (fTheQueue == NULL) {
-				fQueueTail = NULL;
-			}
-			
-			// We have found the message and removed it in this case.  We can
-			// bail out now.  The autolocker will take care of releasing the
-			// lock for us.
 			return;
 		}
-		
-		// The message to remove is not the first one, so we need to scan the
-		// queue.  Get a message iterator and set it to the first element.
-		BMessage *messageIter = fTheQueue;
-		
-		// While we are not at the end of the list.
-		while (messageIter != NULL) {
-			// If the next message after this (ie second, then third etc) is 
-			// the one we are looking for.
-#ifndef USING_MESSAGE4
-			if (messageIter->link == message) {
-#else
-			if (messageIter->fQueueLink == message) {
-#endif
-				// At this point, this is what we have:
-				//    messageIter - the BMessage in the queue just before the
-				//                  match
-				//    messageIter->link - the BMessage which matches message
-				//    message - the same as messageIter->link
-				//    message->link - the element after the match
-				//
-				// The next step is to link the BMessage just before the match
-				// to the one just after the match.  This removes the match from
-				// the queue.
-#ifndef USING_MESSAGE4
-				messageIter->link = message->link;
-#else
-				messageIter->fQueueLink = message->fQueueLink;
-#endif
-				
-				// One less element on the queue.
-				fMessageCount--;
-				
-				// If there is no BMessage after the match is the
-#ifndef USING_MESSAGE4
-				if (message->link == NULL) {
-#else
-				if (message->fQueueLink == NULL) {
-#endif
-					// That means that we just removed the last element from the
-					// queue.  The new last element then must be messageIter.
-					fQueueTail = messageIter;
-				}
-				
-				// We can return now because we have a match and removed it.
-				return;
-			}
-			
-			// No match yet, go to the next element in the list.
-#ifndef USING_MESSAGE4
-			messageIter = messageIter->link;
-#else
-			messageIter = messageIter->fQueueLink;
-#endif
-		}
+		last = entry;
 	}
 }
 
 
-/*
- *  Method: BMessageQueue::CountMessages()
- *   Descr: This method just returns the number of BMessages on the queue.
- */
+/*!
+	\brief This method just returns the number of BMessages on the queue.
+*/
 int32
-BMessageQueue::CountMessages(void) const
+BMessageQueue::CountMessages() const
 {
     return fMessageCount;
 }
 
 
-/*
- *  Method: BMessageQueue::IsEmpty()
- *   Descr: This method just returns true if there are no BMessages on the queue.
- */
+/*!
+	\brief This method just returns true if there are no BMessages on the queue.
+*/
 bool
-BMessageQueue::IsEmpty(void) const
+BMessageQueue::IsEmpty() const
 {
-    return (fMessageCount == 0);
+    return fMessageCount == 0;
 }
 
 
-/*
- *  Method: BMessageQueue::FindMessage()
- *   Descr: This method searches the queue for the index'th BMessage.  The first
- *          BMessage is at index 0, the second at index 1 etc.  The BMessage
- *          is returned if it is found.  If no BMessage exists at that index
- *          (ie the queue is not that long or the index is invalid) NULL is
- *          returned.
- *
- *          This method does not lock the BMessageQueue so there is risk that
- *          the queue could change in the course of the search.  Be's
- *          implementation must do the same, unless they do some funky casting.
- *          The method is declared const which means it cannot modify the data
- *          members.  Because it cannot modify the data members, it cannot
- *          acquire a lock.  So unless they are casting away the const-ness
- *          of the this pointer, this member in Be's implementation does no
- *          locking either.
- */
+/*!
+	\brief This method searches the queue for the index'th BMessage.
+	
+	The first BMessage is at index 0, the second at index 1 etc.
+	The BMessage is returned if it is found.  If no BMessage exists at that
+	index (ie the queue is not that long or the index is invalid) NULL is
+	returned.
+*/
 BMessage *
 BMessageQueue::FindMessage(int32 index) const
 {
-	// If the index is negative or larger than the number of messages on the
-	// queue.
-	if ((index < 0) || (index >= fMessageCount)) {
-		// No match is possible, bail out now.
+	BAutolock _(fLock);
+	if (!IsLocked())
 		return NULL;
-	}
+
+	if (index < 0 || index >= fMessageCount)
+		return NULL;
 	
-	// Get a message iterator and initialize it to the start of the queue.
-	BMessage *messageIter = fTheQueue;
-	
-	// While this is not the end of the queue.
-	while (messageIter != NULL) {
+	for (BMessage* message = fHead; message != NULL; message = message->fQueueLink) {
 		// If the index reaches zero, then we have found a match.
-		if (index == 0) {
-			// Because this is a match, break out of the while loop so we can
-			// return the message pointed to messageIter.		
-			break;
-		}
-		
-		// No match yet, decrement the index.  We will have a match once index
-		// reaches zero.
+		if (index == 0)
+			return message;
+
 		index--;
-		// Increment the messageIter to the next BMessage on the queue.
-#ifndef USING_MESSAGE4
-		messageIter = messageIter->link;
-#else
-		messageIter = messageIter->fQueueLink;
-#endif
 	}
-	
-	// If no match was found, messageIter will be NULL since that is the only
-	// way out of the loop.  If a match was found, the messageIter will point
-	// to that match.
-    return messageIter;
+
+    return NULL;
 }
 
 
-/*
- *  Method: BMessageQueue::FindMessage()
- *   Descr: This method searches the queue for the index'th BMessage that has a
- *          particular what code.  The first BMessage with that what value is at
- *          index 0, the second at index 1 etc.  The BMessage is returned if it
- *          is found.  If no matching BMessage exists at that index NULL is
- *          returned.
- *
- *          This method does not lock the BMessageQueue so there is risk that
- *          the queue could change in the course of the search.  Be's
- *          implementation must do the same, unless they do some funky casting.
- *          The method is declared const which means it cannot modify the data
- *          members.  Because it cannot modify the data members, it cannot
- *          acquire a lock.  So unless they are casting away the const-ness
- *          of the this pointer, this member in Be's implementation does no
- *          locking either.
- */
+/*!
+	\brief Searches the queue for the index'th BMessage that has a
+		particular what code.
+*/
 BMessage *
-BMessageQueue::FindMessage(uint32 what,
-                           int32 index) const
+BMessageQueue::FindMessage(uint32 what, int32 index) const
 {
-	// If the index is negative or larger than the number of messages on the
-	// queue.
-	if ((index < 0) || (index >= fMessageCount)) {
-		// No match is possible, bail out now.
+	BAutolock _(fLock);
+	if (!IsLocked())
 		return NULL;
-	}
-	
-	// Get a message iterator and initialize it to the start of the queue.
-	BMessage *messageIter = fTheQueue;
-	
-	// While this is not the end of the queue.
-	while (messageIter != NULL) {
-		// If the messageIter points to a BMessage with the what code we are
-		// looking for.
-		if (messageIter->what == what) {
+
+	if (index < 0 || index >= fMessageCount)
+		return NULL;
+
+	for (BMessage* message = fHead; message != NULL; message = message->fQueueLink) {
+		if (message->what == what) {
 			// If the index reaches zero, then we have found a match.
-			if (index == 0) {
-				// Because this is a match, break out of the while loop so we can
-				// return the message pointed to messageIter.	
-				break;
-			}
-			// No match yet, decrement the index.  We will have a match once index
-			// reaches zero.
+			if (index == 0)
+				return message;
+
 			index--;
 		}
-		// Increment the messageIter to the next BMessage on the queue.
-#ifndef USING_MESSAGE4
-		messageIter = messageIter->link;
-#else
-		messageIter = messageIter->fQueueLink;
-#endif
 	}
-	
-	// If no match was found, messageIter will be NULL since that is the only
-	// way out of the loop.  If a match was found, the messageIter will point
-	// to that match.
-    return messageIter;
+
+    return NULL;
 }
 
 
-/*
- *  Method: BMessageQueue::Lock()
- *   Descr: This member just locks the BMessageQueue so no other thread can acquire
- *          the lock nor make changes to the queue through members like
- *          AddMessage(), RemoveMessage(), NextMessage() or ~BMessageQueue().
- */
+/*!
+	\brief Locks the BMessageQueue so no other thread can change
+		or search the queue.
+*/
 bool
-BMessageQueue::Lock(void)
+BMessageQueue::Lock()
 {
-    return fLocker.Lock();
+    return fLock.Lock();
 }
 
 
-/*
- *  Method: BMessageQueue::Unlock()
- *   Descr: This member releases the lock which was acquired by Lock().
- */
+/*!
+	\brief Releases the lock which was acquired by Lock().
+*/
 void
-BMessageQueue::Unlock(void)
+BMessageQueue::Unlock()
 {
-	fLocker.Unlock();
+	fLock.Unlock();
 }
 
 
-/*
- *  Method: BMessageQueue::IsLocked()
- *   Descr: This member returns whether or not the queue is locked
- */
-bool 
-BMessageQueue::IsLocked(void)
+/*!
+	\brief Returns whether or not the queue is locked
+*/
+bool
+BMessageQueue::IsLocked() const
 {
-	return fLocker.IsLocked();
+	return fLock.IsLocked();
 }
 
 
-/*
- *  Method: BMessageQueue::NextMessage()
- *   Descr: This member removes the first BMessage on the queue and returns
- *          it to the caller.  If the queue is empty, NULL is returned.
- */
+/*!
+	\brief Removes the first BMessage on the queue and returns
+		it to the caller.  If the queue is empty, NULL is returned.
+*/
 BMessage *
-BMessageQueue::NextMessage(void)
+BMessageQueue::NextMessage()
 {
-	// By default, we will assume that no BMessage is on the queue.
-	BMessage *result = NULL;
-	BAutolock theAutoLocker(fLocker);
-	
-	// The Be implementation does not seem to check that the lock acquisition
-	// was successful.  This will specifically cause problems when the
-	// message queue is deleted.  On delete, any thread waiting for the lock
-	// will be notified that the lock failed.  Be's implementation, because
-	// they do not check proceeds with the operation, potentially corrupting
-	// memory.  This implementation is different, but I can't imagine that
-	// Be's implementation is worth emulating.
-	//
-	if (theAutoLocker.IsLocked()) {
-		// Store the first BMessage in the queue in result.
-		result = fTheQueue;
-		
-		// If the queue is not empty.
-		if (fTheQueue != NULL) {
-			// Decrement the message count since we are removing an element.
-			fMessageCount--;
-			// The new front of the list is moved forward thereby removing the
-			// first element from the queue.
-#ifndef USING_MESSAGE4
-			fTheQueue = fTheQueue->link;
-#else
-			fTheQueue = fTheQueue->fQueueLink;
-#endif
-			// If the queue is empty after removing the front element.
-			if (fTheQueue == NULL) {
-				// We need to set the tail of the queue to NULL since the queue
-				// is now empty.
-				fQueueTail = NULL;
-			}
-		}
+	BAutolock _(fLock);
+	if (!IsLocked())
+		return NULL;
+
+	// remove the head of the queue, if any, and return it
+
+	BMessage* head = fHead;
+	if (head == NULL)
+		return NULL;
+
+	fMessageCount--;
+	fHead = head->fQueueLink;
+
+	if (fHead == NULL) {
+		// If the queue is empty after removing the front element,
+		// we need to set the tail of the queue to NULL since the queue
+		// is now empty.
+		fTail = NULL;
 	}
-    return result;
+
+    return head;
 }
 
 
-void 
-BMessageQueue::_ReservedMessageQueue1(void)
+/*!
+	\brief This method is only here for R5 binary compatibility!
+		It should be dropped as soon as possible (it misses the const qualifier).
+*/
+bool
+BMessageQueue::IsLocked()
 {
+	return fLock.IsLocked();
 }
 
 
-void 
-BMessageQueue::_ReservedMessageQueue2(void)
-{
-}
+void BMessageQueue::_ReservedMessageQueue1() {}
+void BMessageQueue::_ReservedMessageQueue2() {}
+void BMessageQueue::_ReservedMessageQueue3() {}
 
-
-void 
-BMessageQueue::_ReservedMessageQueue3(void)
-{
-}
-
-#ifdef USE_OPENBEOS_NAMESPACE
-}
-#endif
