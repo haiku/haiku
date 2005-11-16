@@ -3,3 +3,5 @@ SubDir HAIKU_TOP src tests misc ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SimpleTest rtti-test : rtti-test.cpp : be ;
+
+SubInclude HAIKU_TOP src tests misc exception-test ;
