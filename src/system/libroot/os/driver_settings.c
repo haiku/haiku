@@ -379,12 +379,7 @@ free_settings(settings_handle *handle)
 		free_parameter(&handle->settings.parameters[i]);
 
 	free(handle->settings.parameters);
-
-#ifndef _BOOT_MODE
-	// in the boot loader we either don't care (because the heap is dumped anyway)
-	// or must not free the text if we want to pass the buffer over to the kernel
 	free(handle->text);
-#endif
 	free(handle);
 }
 
@@ -629,7 +624,7 @@ driver_settings_init(kernel_args *args)
 	// Move the preloaded driver settings over to the kernel
 
 	list_init(&sHandles);
-	
+
 	while (settings != NULL) {
 		settings_handle *handle = malloc(sizeof(settings_handle));
 		if (handle == NULL)
@@ -688,6 +683,7 @@ unload_driver_settings(void *handle)
 
 	if (handle != NULL)
 		free_settings(handle);
+
 	return B_OK;
 }
 
@@ -735,8 +731,14 @@ load_driver_settings(const char *driverName)
 		struct driver_settings_file *settings = gKernelArgs.driver_settings;
 		while (settings != NULL) {
 			if (!strcmp(settings->name, driverName)) {
-				// we have it
-				return new_settings(settings->buffer, driverName);
+				// we have it - since the buffer is clobbered, we have to
+				// copy its contents, though
+				char *text = malloc(settings->size + 1);
+				if (text == NULL)
+					return NULL;
+
+				memcpy(text, settings->buffer, settings->size + 1);
+				return new_settings(text, driverName);
 			}
 			settings = settings->next;
 		}
