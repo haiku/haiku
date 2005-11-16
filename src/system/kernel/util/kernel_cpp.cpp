@@ -28,6 +28,14 @@ __pure_virtual()
 	panic("pure virtual function call\n");
 }
 
+#elif __GNUC__ >= 3
+
+extern "C" void
+__cxa_pure_virtual()
+{
+	panic("pure virtual function call\n");
+}
+
 #endif
 
 // full C++ support in the kernel
