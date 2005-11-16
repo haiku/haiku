@@ -95,7 +95,7 @@ const uint32 at_keycode_map[] = {
 	0x46,	// '
 	0x11,	// `
 	0x4b,	// Left Shift
-	0x33, 	// \ 
+	0x33, 	// \ (backslash -- note: don't remove non-white-space after BS char)
 	0x4c,	// Z
 	0x4d,	// X
 	0x4e,	// C
