@@ -16,8 +16,6 @@
 #include <Rect.h>
 
 struct color_map;
-struct display_mode;
-struct display_timing_constraints;
 class BBitmap;
 class BApplication;
 class BWindow;

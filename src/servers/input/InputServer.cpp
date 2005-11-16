@@ -36,6 +36,8 @@
 #include <ServerProtocol.h>
 #endif
 
+using std::nothrow;
+
 #define FAST_MOUSE_MOVED '_FMM'
 	// received from app_server when screen res changed, but could be sent to too. 
 
