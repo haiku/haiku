@@ -177,8 +177,7 @@ AddFilesToHaikuImage home config settings kernel drivers
 AddSymlinkToHaikuImage home config settings
 	: /boot/beos/etc/timezones/Europe/Paris : timezone ;
 
-AddFilesToHaikuImage home config settings kernel drivers
-	: <keymap>US-International : Key_map ;
+AddFilesToHaikuImage home config settings : <keymap>US-International : Key_map ;
 
 # boot loader
 AddFilesToHaikuImage beos system : zbeos ;
