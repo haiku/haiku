@@ -80,6 +80,23 @@ fputc(int c, FILE *stream)
 	return 0;
 }
 
+extern "C"
+int
+printf(const char *format, ...)
+{
+	// TODO: Introduce a vdprintf()...
+	dprintf("printf(`%s',...)\n", format);
+	return 0;
+}
+
+extern "C"
+int
+puts(const char *string)
+{
+	return fputs(string, NULL);
+}
+
+
 #endif	// __GNUC__ >= 3
 
 extern "C"
