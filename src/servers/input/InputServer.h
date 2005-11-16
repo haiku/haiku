@@ -7,7 +7,6 @@
 
 
 #include "AddOnManager.h"
-#include "BottomlineWindow.h"
 #include "DeviceManager.h"
 #include "KeyboardSettings.h"
 #include "MouseSettings.h"
@@ -23,6 +22,7 @@
 #include <InterfaceDefs.h>
 #include <Locker.h>
 #include <Message.h>
+#include <ObjectList.h>
 #include <OS.h>
 #include <Screen.h>
 #include <SupportDefs.h>
@@ -34,6 +34,10 @@
 
 #define INPUTSERVER_SIGNATURE "application/x-vnd.Be-input_server"
 	// use this when target should replace R5 input_server
+
+typedef BObjectList<BMessage> EventList;
+
+class BottomlineWindow;
 
 class InputDeviceListItem {
 	public:
@@ -87,13 +91,11 @@ class _BMethodAddOn_ {
 		BMessenger fMessenger;
 };
 
-
 class KeymapMethod : public BInputServerMethod {
 	public:
 		KeymapMethod();
 		~KeymapMethod();
 };
-
 
 class InputServer : public BApplication {
 	public:
@@ -125,22 +127,11 @@ class InputServer : public BApplication {
 
 		status_t EnqueueDeviceMessage(BMessage* message);
 		status_t EnqueueMethodMessage(BMessage* message);
-		status_t UnlockMethodQueue();
-		status_t LockMethodQueue();
 		status_t SetNextMethod(bool direction);
 		void SetActiveMethod(BInputServerMethod* method);
 		const BMessenger* MethodReplicant();
 		void SetMethodReplicant(const BMessenger *replicant);
-		status_t EventLoop();
 		bool EventLoopRunning();
-
-		bool DispatchEvents(BList* eventList);
-		status_t DispatchEvent(BMessage* event);
-		bool CacheEvents(BList* eventList);
-		const BList* GetNextEvents(BList*);
-		bool FilterEvents(BList* eventList);
-		bool SanitizeEvents(BList* eventList);
-		bool MethodizeEvents(BList* eventList, bool);
 
 		status_t GetDeviceInfo(const char* name, input_device_type *_type,
 					bool *_isRunning = NULL);
@@ -180,13 +171,22 @@ class InputServer : public BApplication {
 		status_t _LoadSystemKeymap();
 		void _InitKeyboardMouseStates();
 
+		status_t _StartEventLoop();
+		void _EventLoop();
+		static status_t _EventLooper(void *arg);
+
+		bool _SanitizeEvents(EventList& events);
+		bool _MethodizeEvents(EventList& events);
+		bool _FilterEvents(EventList& events);
+		void _DispatchEvents(EventList& events);
+
+		void _FilterEvent(BInputServerFilter* filter, EventList& events,
+					int32& index, int32& count);
+		status_t _DispatchEvent(BMessage* event);
+
 		status_t _AcquireInput(BMessage& message, BMessage& reply);
 		void _ReleaseInput(BMessage* message);
 
-		void _WatchPort();
-
-		static int32 _PortWatcher(void *arg);
-//		static bool doStartStopDevice(void*, void*);
 		InputDeviceListItem* _FindInputDeviceListItem(BInputServerDevice& device);
 
 	private:
@@ -199,8 +199,8 @@ class InputServer : public BApplication {
 		BList			fInputDeviceList;
 		BLocker 		fInputDeviceListLocker;
 
-		KeyboardSettings	fKeyboardSettings;
-		MouseSettings		fMouseSettings;
+		KeyboardSettings fKeyboardSettings;
+		MouseSettings	fMouseSettings;
 
 		BPoint			fMousePos;		// current mouse position
 		key_info		fKeyInfo;		// current key info
@@ -212,16 +212,17 @@ class InputServer : public BApplication {
 
 		AddOnManager*	fAddOnManager;
 
-		BList			fEventsCache;
-
 		BScreen			fScreen;
 		BRect			fFrame;
 
+		BLocker			fEventQueueLock;
+		EventList 		fEventQueue;
+
 		BInputServerMethod*	fActiveMethod;
-		BList				fMethodQueue;
+		EventList			fMethodQueue;
 		const BMessenger*	fReplicantMessenger;
-		BottomlineWindow*	fBLWindow;
-		bool				fIMAware;
+		BottomlineWindow*	fInputMethodWindow;
+		bool				fInputMethodAware;
 
 		sem_id 			fCursorSem;
 		port_id			fAppServerPort;

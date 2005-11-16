@@ -6,10 +6,12 @@
 
 #include "InputServer.h"
 #include "InputServerTypes.h"
+#include "BottomlineWindow.h"
 #include "kb_mouse_driver.h"
 #include "MethodReplicant.h"
 
 #include <AppServerLink.h>
+#include <MessagePrivate.h>
 
 #include <Autolock.h>
 #include <Deskbar.h>
@@ -38,11 +40,11 @@
 	// received from app_server when screen res changed, but could be sent to too. 
 
 
-#ifdef COMPILE_FOR_R5
-extern "C" status_t _kget_safemode_option_(const char *parameter,
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+extern "C" status_t _kern_get_safemode_option(const char *parameter,
 	char *buffer, size_t *_bufferSize);
 #else
-extern "C" status_t _kern_get_safemode_option(const char *parameter,
+extern "C" status_t _kget_safemode_option_(const char *parameter,
 	char *buffer, size_t *_bufferSize);
 #endif
 
@@ -140,8 +142,8 @@ InputServer::InputServer()
 	fInputDeviceListLocker("input server device list"),
 	fChars(NULL),
 	fScreen(B_MAIN_SCREEN_ID),
-	fBLWindow(NULL),
-	fIMAware(false),
+	fInputMethodWindow(NULL),
+	fInputMethodAware(false),
 	fCursorSem(-1),
 	fAppServerPort(-1),
 	fCursorArea(-1)
@@ -154,15 +156,15 @@ InputServer::InputServer()
 	CALLED();
 	gInputServer = this;
 
-	EventLoop();
+	_StartEventLoop();
 
 	char parameter[32];
 	size_t parameterLength = sizeof(parameter);
 
-#ifdef COMPILE_FOR_R5
-	if (_kget_safemode_option_(B_SAFEMODE_SAFE_MODE, parameter, &parameterLength) == B_OK)
-#else
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (_kern_get_safemode_option(B_SAFEMODE_SAFE_MODE, parameter, &parameterLength) == B_OK)
+#else
+	if (_kget_safemode_option_(B_SAFEMODE_SAFE_MODE, parameter, &parameterLength) == B_OK)
 #endif
 	{
 		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
@@ -760,79 +762,25 @@ InputServer::HandleGetSetMouseSpeed(BMessage* message, BMessage* reply)
 
 
 status_t
-InputServer::HandleSetMousePosition(BMessage* message, BMessage* outbound)
+InputServer::HandleSetMousePosition(BMessage* message, BMessage* reply)
 {
 	CALLED();
 
-	// this assumes that both supplied pointers are identical
+	BPoint where;
+	if (message->FindPoint("where", &where) != B_OK)
+		return B_BAD_VALUE;
 
-	ASSERT(outbound == message);
+	// create a new event for this and enqueue it to the event list just like any other
 
-	int32 xValue, yValue;	
+	BMessage* event = new BMessage(B_MOUSE_MOVED);
+	if (event == NULL)
+		return B_NO_MEMORY;
 
-   	switch (message->what) {
-   		case B_MOUSE_MOVED:
-   		case B_MOUSE_DOWN:
-   		case B_MOUSE_UP:
-   		case FAST_MOUSE_MOVED:
-   			// get point and button from msg
-    		if ((outbound->FindInt32("x", &xValue) == B_OK) 
-    			&& (outbound->FindInt32("y", &yValue) == B_OK)) {
-				fMousePos.x += xValue;
-				fMousePos.y -= yValue;
-				fMousePos.ConstrainTo(fFrame);
-				outbound->RemoveName("x"); 
-				outbound->RemoveName("y");
-				outbound->AddPoint("where", fMousePos);
-				outbound->AddInt32("modifiers", fKeyInfo.modifiers);
-				PRINT(("new position : %f, %f, %ld, %ld\n", fMousePos.x, fMousePos.y, xValue, yValue));
-	   		} else if (outbound->FindPoint("where", &fMousePos) == B_OK) {
-				outbound->RemoveName("where");
-				fMousePos.ConstrainTo(fFrame);
-				outbound->AddPoint("where", fMousePos);
-				outbound->AddInt32("modifiers", fKeyInfo.modifiers);
-				PRINT(("new position : %f, %f\n", fMousePos.x, fMousePos.y));
-			}
-
-			if (fCursorBuffer) {
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
-				fCursorBuffer[0] = (0x3 << 30L)
-               		| ((uint32)fMousePos.x & 0x7fff) << 15
-               		| ((uint32)fMousePos.y & 0x7fff);
-
-				PRINT(("released cursorSem with value : %08lx\n", fCursorBuffer[0]));
-                	release_sem(fCursorSem);
-#else
-				atomic_set((int32*)&fCursorBuffer->pos, (uint32)fMousePos.x << 16UL
-					| ((uint32)fMousePos.y & 0xffff));
-				if (atomic_or(&fCursorBuffer->read, 1) == 0)
-					release_sem_etc(fCursorSem, 0, B_RELEASE_ALL);
-#endif
-        	}
-			break;
-
-    	// some Key Down and up codes ..
-		case B_KEY_DOWN:
-		case B_KEY_UP:
-		case B_UNMAPPED_KEY_DOWN:
-		case B_UNMAPPED_KEY_UP:
-		case B_MODIFIERS_CHANGED:
-		{
-			ssize_t size = 0;
-			uint8 *data = NULL;
-			outbound->FindInt32("modifiers", (int32*)&fKeyInfo.modifiers);
-			if (outbound->FindData("states", B_UINT8_TYPE,
-					(const void**)&data, &size) == B_OK
-				&& size == (ssize_t)sizeof(fKeyInfo.key_states)) {
-				PRINT(("updated keyinfo\n"));
-				memcpy(fKeyInfo.key_states, data, size);
-			}
-			PRINT(("keyinfo %ld %ld\n", size, (ssize_t)sizeof(fKeyInfo.key_states)));
-			break;
-		}
-
-   		default:
-			break;
+	event->AddPoint("where", where);
+	event->AddBool("be:set_mouse", true);
+	if (EnqueueDeviceMessage(event) != B_OK) {
+		delete event;
+		return B_NO_MEMORY;
 	}
 
 	return B_OK;
@@ -938,33 +886,40 @@ InputServer::HandleFocusUnfocusIMAwareView(BMessage* message,
 
 	if (message->what == IS_FOCUS_IM_AWARE_VIEW) {
 		PRINT(("HandleFocusUnfocusIMAwareView : entering\n"));
-		fIMAware = true;
+		fInputMethodAware = true;
 	} else {
 		PRINT(("HandleFocusUnfocusIMAwareView : leaving\n"));
-		fIMAware = false;
+		fInputMethodAware = false;
 	}
 
 	return B_OK;
 }
 
 
+/**	Enqueues the message into the event queue.
+ *	The message must only be deleted in case this method returns an error.
+ */
+
 status_t
 InputServer::EnqueueDeviceMessage(BMessage* message)
 {
 	CALLED();
 
-	// TODO: message is not deleted???
-	// TODO: why use ports for in-house messaging???
+	BAutolock _(fEventQueueLock);
+	if (!fEventQueue.AddItem(message))
+		return B_NO_MEMORY;
 
-	ssize_t length = message->FlattenedSize();
-	char buffer[length];
-	status_t err;
-	if ((err = message->Flatten(buffer,length)) < B_OK)
-		return err;
-
-	return write_port(fEventLooperPort, 0, buffer, length);
+	if (fEventQueue.CountItems() == 1) {
+		// notify event loop only if we haven't already done so
+		write_port_etc(fEventLooperPort, 1, NULL, 0, B_RELATIVE_TIMEOUT, 0);
+	}
+	return B_OK;
 }
 
+
+/**	Enqueues the message into the method queue.
+ *	The message must only be deleted in case this method returns an error.
+ */
 
 status_t
 InputServer::EnqueueMethodMessage(BMessage* message)
@@ -981,27 +936,14 @@ InputServer::EnqueueMethodMessage(BMessage* message)
 	}
 #endif
 
-	LockMethodQueue();
-	fMethodQueue.AddItem(message);
-	UnlockMethodQueue();
+	BAutolock _(fEventQueueLock);
+	if (!fMethodQueue.AddItem(message))
+		return B_NO_MEMORY;
 
-	write_port_etc(fEventLooperPort, 0, NULL, 0, B_RELATIVE_TIMEOUT, 0);
-	return B_OK;
-}
-
-
-status_t
-InputServer::UnlockMethodQueue()
-{
-	gInputMethodListLocker.Unlock();
-	return B_OK;
-}
-
-
-status_t
-InputServer::LockMethodQueue()
-{
-	gInputMethodListLocker.Lock();
+	if (fMethodQueue.CountItems() == 1) {
+		// notify event loop only if we haven't already done so
+		write_port_etc(fEventLooperPort, 0, NULL, 0, B_RELATIVE_TIMEOUT, 0);
+	}
 	return B_OK;
 }
 
@@ -1009,7 +951,7 @@ InputServer::LockMethodQueue()
 status_t
 InputServer::SetNextMethod(bool direction)
 {
-	LockMethodQueue();
+	gInputMethodListLocker.Lock();
 
 	int32 index = gInputMethodList.IndexOf(fActiveMethod);
 	index += (direction ? 1 : -1);
@@ -1026,7 +968,7 @@ InputServer::SetNextMethod(bool direction)
 
 	SetActiveMethod(method);
 
-	UnlockMethodQueue();
+	gInputMethodListLocker.Unlock();
 	return B_OK;
 }
 
@@ -1059,270 +1001,10 @@ InputServer::SetMethodReplicant(const BMessenger* messenger)
 }
 
 
-status_t
-InputServer::EventLoop()
-{
-	CALLED();
-	fEventLooperPort = create_port(100, "input server event loop");
-	if (fEventLooperPort < 0) {
-		PRINTERR(("InputServer: create_port error: (0x%x) %s\n",
-			fEventLooperPort, strerror(fEventLooperPort)));
-		return fEventLooperPort;
-	}
-
-	thread_id thread = spawn_thread(_PortWatcher, "_input_server_event_loop_",
-		B_REAL_TIME_DISPLAY_PRIORITY + 3, this);
-	if (thread < B_OK || resume_thread(thread) < B_OK) {
-		if (thread >= B_OK)
-			kill_thread(thread);
-		delete_port(fEventLooperPort);
-		fEventLooperPort = -1;
-		return thread < B_OK ? thread : B_ERROR;
-	}
-
-	return B_OK;
-}
-
-
 bool 
 InputServer::EventLoopRunning()
 {
 	return fEventLooperPort >= B_OK;
-}
-
-
-bool
-InputServer::DispatchEvents(BList* eventList)
-{
-	CALLED();
-
-	CacheEvents(eventList);
-
-	if (fEventsCache.CountItems() > 0) {
-		BMessage* event;
-
-		for (int32 i = 0; NULL != (event = (BMessage *)fEventsCache.ItemAt(i)); i++) {
-			// now we must send each event to the app_server
-			if (event->what == B_INPUT_METHOD_EVENT && !fIMAware) {
-				SERIAL_PRINT(("IME received\n"));
-				int32 opcode = -1;
-				event->FindInt32("be:opcode", &opcode);
-				BList events;
-				if (!fBLWindow && opcode == B_INPUT_METHOD_STARTED)
-					fBLWindow = new BottomlineWindow(be_plain_font);
-
-				if (fBLWindow) {
-					fBLWindow->HandleInputMethodEvent(event, &events);
-
-					if (!events.IsEmpty()) {
-						fBLWindow->PostMessage(B_QUIT_REQUESTED);
-						fBLWindow = NULL;
-
-						fEventsCache.AddList(&events);
-					}
-				}
-			} else
-				DispatchEvent(event);
-
-			delete event;
-		}
-
-		fEventsCache.MakeEmpty();
-	}
-
-	return true;
-}
-
-
-status_t
-InputServer::DispatchEvent(BMessage* message)
-{
-	CALLED();
-
-	switch (message->what) {
-		case B_KEY_DOWN:
-		case B_KEY_UP:
-		case B_UNMAPPED_KEY_UP:
-		case B_UNMAPPED_KEY_DOWN: {
-			uint32 modifiers;
-			ssize_t size;
-			uint8 *data;	
-			if (message->FindData("states", B_UINT8_TYPE, (const void**)&data, &size) != B_OK)
-				message->AddData("states", B_UINT8_TYPE, fKeyInfo.key_states, 16);
-			if (message->FindInt32("modifiers", (int32*)&modifiers) != B_OK)
-				message->AddInt32("modifiers", fKeyInfo.modifiers);
-			break;
-		}
-	}
-
-	ssize_t length = message->FlattenedSize();
-	char buffer[length];
-	status_t err;
-	if ((err = message->Flatten(buffer,length)) < B_OK)
-		return err;
-
-	if (fAppServerPort > 0)
-		write_port(fAppServerPort, 0, buffer, length);
-
-    return B_OK;
-}
-
-
-bool
-InputServer::CacheEvents(BList* eventsToCache)
-{
-	CALLED();
-
-	SanitizeEvents(eventsToCache);
-	MethodizeEvents(eventsToCache, true);
-	FilterEvents(eventsToCache);
-
-	fEventsCache.AddList(eventsToCache);
-	eventsToCache->MakeEmpty();
-
-	return true;
-}
-
-
-const BList*
-InputServer::GetNextEvents(BList *)
-{
-	return NULL;
-}
-
-
-/**	This method applies all defined filters to each event in the
- *	supplied list.  The supplied list is modified to reflect the
- *	output of the filters.
- *	The method returns true if the filters were applied to all
- *	events without error and false otherwise.
- */
-
-bool
-InputServer::FilterEvents(BList* eventsToFilter)
-{
-	CALLED();
-
-	if (NULL == eventsToFilter)
-		return false;
-
-	BInputServerFilter* currentFilter;
-	int32 filterIndex = 0;
-
-	while ((currentFilter = (BInputServerFilter*)gInputFilterList.ItemAt(filterIndex)) != NULL) {
-		// Apply the current filter to all available event messages.
-		int32 eventIndex = 0;
-		BMessage *currentEvent;
-		while ((currentEvent = (BMessage*)eventsToFilter->ItemAt(eventIndex)) != NULL) {
-			// Storage for new event messages generated by the filter.
-			BList outList;
-
-			// Apply the current filter to the current event message.
-			PRINT(("InputServer::FilterEvents Filter called\n"));
-			filter_result result = currentFilter->Filter(currentEvent, &outList);
-
-			if (result == B_SKIP_MESSAGE) {
-				// Use the result in out_list (if any); ignore current message.
-				eventsToFilter->RemoveItem(eventIndex);
-				eventsToFilter->AddList(&outList, eventIndex);
-				eventIndex += outList.CountItems();
-
-				// NOTE: eventsToFilter now owns outList's items.
-			} else {
-				// Free resources associated with items in outList.
-				void* outItem; 
-				for (int32 i = 0; (outItem = outList.ItemAt(i)) != NULL; i++) {
-					delete (BMessage*)outItem;
-				}
-			}
-			if (result == B_DISPATCH_MESSAGE) {
-				// Use the result in current_message; ignore outList.
-				eventIndex++;
-			} else {
-				// Error
-				return false;
-			}
-		}
-
-		filterIndex++;
-	}
-
-	return true;	
-}
-
-
-bool
-InputServer::SanitizeEvents(BList* events)
-{
-	CALLED();
-	int32 index = 0;
-	BMessage *event;
-	PRINT(("SanitizeEvents: %ld \n", events->CountItems()));
-	while ((event = (BMessage*)events->ItemAt(index)) != NULL) {
-		PRINT(("SanitizeEvents: what:%lx\n", event->what));
-		switch (event->what) {
-			case B_KEY_DOWN:
-			case B_UNMAPPED_KEY_DOWN:
-				// we scan for Alt+Space key down events which means we change to next input method
-				// Note : Shift+Alt+Space key allows to change to the previous input method
-
-				PRINT(("SanitizeEvents: %lx, %lx\n", fKeyInfo.modifiers,
-					fKeyInfo.key_states[KEY_Spacebar >> 3]));
-
-				if ((fKeyInfo.modifiers & B_COMMAND_KEY) != 0
-					&& (fKeyInfo.key_states[KEY_Spacebar >> 3]
-						& (1 << (7 - (KEY_Spacebar % 8))))) {
-					SetNextMethod(!fKeyInfo.modifiers & B_SHIFT_KEY);
-
-					// this event isn't sent to the user
-					events->RemoveItem(index);
-					delete event;
-					continue;
-				}
-				break;
-		}
-
-		index++;
-	}	
-
-	return true;
-}
-
-
-bool 
-InputServer::MethodizeEvents(BList* events, bool)
-{
-	CALLED();
-
-	if (fActiveMethod) {
-		BList newList;
-		newList.AddList(&fMethodQueue);
-		fMethodQueue.MakeEmpty();
-
-		for (int32 i=0; i<events->CountItems(); i++) {
-			BMessage *item = (BMessage *)events->ItemAt(i);
-			BList filterList;
-			filter_result result = fActiveMethod->Filter(item, &filterList);
-			switch (result) {
-				case B_SKIP_MESSAGE:
-					delete item;
-				case B_DISPATCH_MESSAGE:
-					if (filterList.CountItems() > 0) {
-						newList.AddList(&filterList);
-						delete item;
-					} else
-						newList.AddItem(item);
-			}
-
-			newList.AddList(&fMethodQueue);
-			fMethodQueue.MakeEmpty();
-		}
-
-		events->MakeEmpty();
-		events->AddList(&newList);
-	}
-
-	return true;
 }
 
 
@@ -1571,20 +1253,45 @@ InputServer::SafeMode()
 }
 
 
-int32 
-InputServer::_PortWatcher(void* arg)
+status_t
+InputServer::_StartEventLoop()
 {
-	InputServer* self = (InputServer*)arg;
-	self->_WatchPort();
+	CALLED();
+	fEventLooperPort = create_port(100, "input server events");
+	if (fEventLooperPort < 0) {
+		PRINTERR(("InputServer: create_port error: (0x%x) %s\n",
+			fEventLooperPort, strerror(fEventLooperPort)));
+		return fEventLooperPort;
+	}
+
+	thread_id thread = spawn_thread(_EventLooper, "_input_server_event_loop_",
+		B_REAL_TIME_DISPLAY_PRIORITY + 3, this);
+	if (thread < B_OK || resume_thread(thread) < B_OK) {
+		if (thread >= B_OK)
+			kill_thread(thread);
+		delete_port(fEventLooperPort);
+		fEventLooperPort = -1;
+		return thread < B_OK ? thread : B_ERROR;
+	}
 
 	return B_OK;
 }
 
 
-void 
-InputServer::_WatchPort()
+status_t
+InputServer::_EventLooper(void* arg)
 {
-	while (true) { 
+	InputServer* self = (InputServer*)arg;
+	self->_EventLoop();
+
+	return B_OK;
+}
+
+
+void
+InputServer::_EventLoop()
+{
+	while (true) {
 		// Block until we find the size of the next message
 		ssize_t length = port_buffer_size(fEventLooperPort);
 		if (length < B_OK) {
@@ -1606,40 +1313,353 @@ InputServer::_WatchPort()
 			continue;
 		}
 
-		if (length == 0) {
-			BList list;
-			DispatchEvents(&list);
-			continue;
+		EventList events;
+		if (fEventQueueLock.Lock()) {
+			// move the items to our own list to block the event queue as short as possible
+			events.AddList(&fEventQueue);
+			fEventQueue.MakeEmpty();
+			fEventQueueLock.Unlock();
 		}
 
-		BMessage* event = new BMessage;
+		if (length > 0) {
+			BMessage* event = new BMessage;
 
-		if ((err = event->Unflatten(buffer)) < 0) {
-			PRINTERR(("[InputServer] Unflatten() error: (0x%lx) %s\n", err, strerror(err)));
-			delete event;
-			continue;
+			if ((err = event->Unflatten(buffer)) < 0) {
+				PRINTERR(("[InputServer] Unflatten() error: (0x%lx) %s\n", err, strerror(err)));
+				delete event;
+			}
+
+			events.AddItem(event);
 		}
 
 		// This is where the message should be processed.	
 
-		// here we test for a message coming from app_server, screen resolution change could have happened
-		if (event->what == FAST_MOUSE_MOVED) {
-			BRect frame = fScreen.Frame();
-			if (frame != fFrame) {
-				fMousePos.x = fMousePos.x * frame.Width() / fFrame.Width();
-				fMousePos.y = fMousePos.y * frame.Height() / fFrame.Height();
-				fFrame = frame;
+		if (_SanitizeEvents(events)
+			&& _MethodizeEvents(events)
+			&& _FilterEvents(events))
+			_DispatchEvents(events);
+	}
+}
+
+
+/** Frees events from unwanted fields, adds missing fields, and removes
+ *	unwanted events altogether.
+ *	As a side effect, it will also update the internal mouse states.
+ */
+
+bool
+InputServer::_SanitizeEvents(EventList& events)
+{
+	CALLED();
+	int32 index = 0;
+	BMessage *event;
+
+	while ((event = (BMessage*)events.ItemAt(index)) != NULL) {
+		switch (event->what) {
+	   		case FAST_MOUSE_MOVED:
+	   		{
+				// here we test for a message coming from app_server,
+				// screen resolution change could have happened
+				BRect frame = fScreen.Frame();
+				if (frame != fFrame) {
+					fMousePos.x = fMousePos.x * frame.Width() / fFrame.Width();
+					fMousePos.y = fMousePos.y * frame.Height() / fFrame.Height();
+					fFrame = frame;
+				} else {
+					// TODO: discard event
+				}
+
+				event->what = B_MOUSE_MOVED;
+				event->AddPoint("where", fMousePos);
+				// supposed to fall through
 			}
+	   		case B_MOUSE_MOVED:
+	   		case B_MOUSE_DOWN:
+	   		{
+	   			int32 buttons;
+	   			if (event->FindInt32("buttons", &buttons) != B_OK)
+	   				event->AddInt32("buttons", 0);
+
+	   			// supposed to fall through
+	   		}
+	   		case B_MOUSE_UP:
+	   		{
+	   			BPoint where;
+				int32 x, y;
+
+	    		if (event->FindInt32("x", &x) == B_OK
+	    			&& event->FindInt32("y", &y) == B_OK) {
+					fMousePos.x += x;
+					fMousePos.y -= y;
+					fMousePos.ConstrainTo(fFrame);
+
+					event->RemoveName("x"); 
+					event->RemoveName("y");
+					event->AddPoint("where", fMousePos);
+
+					PRINT(("new position: %f, %f, %ld, %ld\n",
+						fMousePos.x, fMousePos.y, xValue, yValue));
+		   		} else if (event->FindPoint("where", &where) == B_OK) {
+		   			fMousePos = where;
+					fMousePos.ConstrainTo(fFrame);
+
+					event->ReplacePoint("where", fMousePos);
+					PRINT(("new position : %f, %f\n", fMousePos.x, fMousePos.y));
+				}
+
+				event->AddInt32("modifiers", fKeyInfo.modifiers);
+				break;
+	   		}
+			case B_KEY_DOWN:
+			case B_UNMAPPED_KEY_DOWN:
+				if (fActiveMethod == NULL)
+					break;
+
+				// we scan for Alt+Space key down events which means we change
+				// to next input method
+				// (pressing "shift" will let us switch to the previous method)
+
+				PRINT(("SanitizeEvents: %lx, %lx\n", fKeyInfo.modifiers,
+					fKeyInfo.key_states[KEY_Spacebar >> 3]));
+
+				if ((fKeyInfo.modifiers & B_COMMAND_KEY) != 0
+					&& (fKeyInfo.key_states[KEY_Spacebar >> 3]
+						& (1 << (7 - (KEY_Spacebar % 8))))) {
+					SetNextMethod(!fKeyInfo.modifiers & B_SHIFT_KEY);
+
+					// this event isn't sent to the user
+					events.RemoveItemAt(index);
+					delete event;
+					continue;
+				}
+				break;
 		}
 
-		HandleSetMousePosition(event, event);
+		index++;
+	}	
 
-		BList list;
-		list.AddItem(event);
-		DispatchEvents(&list);
+	return true;
+}
 
-		PRINT(("Event written to port\n"));
+
+/** Applies the filters of the active input method to the
+ *	incoming events. It will also move the events in the method
+ *	queue to the event list.
+ */
+
+bool
+InputServer::_MethodizeEvents(EventList& events)
+{
+	CALLED();
+
+	if (fActiveMethod == NULL)
+		return true;
+
+	int32 count = events.CountItems();
+	for (int32 i = 0; i < count;) {
+		_FilterEvent(fActiveMethod, events, i, count);
 	}
+
+	if (!fInputMethodAware) {
+		// special handling for non-input-method-aware views
+		for (int32 i = 0; i < count; i++) {
+			BMessage* event = events.ItemAt(i);
+
+			if (event->what != B_INPUT_METHOD_EVENT)
+				continue;
+
+			SERIAL_PRINT(("IME received\n"));
+
+			int32 opcode;
+			if (fInputMethodWindow == NULL
+				&& event->FindInt32("be:opcode", &opcode) == B_OK
+				&& opcode == B_INPUT_METHOD_STARTED)
+				fInputMethodWindow = new (nothrow) BottomlineWindow();
+
+			if (fInputMethodWindow != NULL) {
+				EventList newEvents;
+				fInputMethodWindow->HandleInputMethodEvent(event, newEvents);
+
+				if (!newEvents.IsEmpty()) {
+					fInputMethodWindow->PostMessage(B_QUIT_REQUESTED);
+					fInputMethodWindow = NULL;
+
+					// replace event with new events (but don't scan them again
+					// for input method messages)
+					events.RemoveItemAt(i);
+					delete event;
+
+					events.AddList(&newEvents, i);
+					i += newEvents.CountItems() - 1;
+					count = events.CountItems();
+				}
+			}
+		}
+	}
+
+	// move the method events into the event queue - they are not
+	// "methodized" either
+	BAutolock _(fEventQueueLock);
+	events.AddList(&fMethodQueue);
+	fMethodQueue.MakeEmpty();
+
+	return events.CountItems() > 0;
+}
+
+
+/**	This method applies all defined filters to each event in the
+ *	supplied list.  The supplied list is modified to reflect the
+ *	output of the filters.
+ *	The method returns true if the filters were applied to all
+ *	events without error and false otherwise.
+ */
+
+bool
+InputServer::_FilterEvents(EventList& events)
+{
+	CALLED();
+	BAutolock _(gInputFilterListLocker);
+
+	int32 count = gInputFilterList.CountItems();
+	int32 eventCount = events.CountItems();
+
+	for (int32 i = 0; i < count; i++) {
+		BInputServerFilter* filter = (BInputServerFilter*)gInputFilterList.ItemAt(i);
+
+		// Apply the current filter to all available event messages.
+
+		for (int32 eventIndex = 0; eventIndex < eventCount;) {
+			_FilterEvent(filter, events, eventIndex, eventCount);
+		}
+	}
+
+	return eventCount != 0;
+}
+
+
+void
+InputServer::_DispatchEvents(EventList& events)
+{
+	CALLED();
+
+	int32 count = events.CountItems();
+
+	for (int32 i = 0; i < count; i++) {
+		BMessage* event = events.ItemAt(i);
+
+		// now we must send each event to the app_server
+		_DispatchEvent(event);
+		delete event;
+	}
+
+	events.MakeEmpty();
+}
+
+
+/**	Applies the given filter to the event list.
+ *	For your convenience, it also alters the \a index and \a count arguments
+ *	ready for the next call to this method.
+ */
+
+void
+InputServer::_FilterEvent(BInputServerFilter* filter, EventList& events,
+	int32& index, int32& count)
+{
+	BMessage* event = events.ItemAt(index);
+
+	BList newEvents;
+	filter_result result = filter->Filter(event, &newEvents);
+
+	if (result == B_SKIP_MESSAGE || newEvents.CountItems() > 0) {
+		// we no longer need the current event
+		events.RemoveItemAt(index);
+		delete event;
+
+		if (result == B_DISPATCH_MESSAGE) {
+			// add the new events - but don't methodize them again
+			events.AsBList()->AddList(&newEvents, index);
+			index += newEvents.CountItems();
+			count = events.CountItems();
+		} else
+			count--;
+	} else
+		index++;
+}
+
+
+status_t
+InputServer::_DispatchEvent(BMessage* event)
+{
+	CALLED();
+
+   	switch (event->what) {
+		case B_MOUSE_MOVED:
+		case B_MOUSE_DOWN:
+		case B_MOUSE_UP:
+			if (fCursorBuffer) {
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
+				fCursorBuffer[0] = (0x3 << 30L)
+               		| ((uint32)fMousePos.x & 0x7fff) << 15
+               		| ((uint32)fMousePos.y & 0x7fff);
+
+				PRINT(("released cursorSem with value : %08lx\n", fCursorBuffer[0]));
+                	release_sem(fCursorSem);
+#else
+				atomic_set((int32*)&fCursorBuffer->pos, (uint32)fMousePos.x << 16UL
+					| ((uint32)fMousePos.y & 0xffff));
+				if (atomic_or(&fCursorBuffer->read, 1) == 0)
+					release_sem_etc(fCursorSem, 0, B_RELEASE_ALL);
+#endif
+        	}
+        	break;
+
+		case B_KEY_DOWN:
+		case B_KEY_UP:
+		case B_UNMAPPED_KEY_DOWN:
+		case B_UNMAPPED_KEY_UP:
+		case B_MODIFIERS_CHANGED:
+		{
+			// update or add modifiers
+			uint32 modifiers;
+			if (event->FindInt32("modifiers", (int32*)&modifiers) == B_OK)
+				fKeyInfo.modifiers = modifiers;
+			else
+				event->AddInt32("modifiers", fKeyInfo.modifiers);
+
+			// update or add key states
+			const uint8 *data;
+			ssize_t size;
+			if (event->FindData("states", B_UINT8_TYPE,
+					(const void**)&data, &size) == B_OK) {
+				PRINT(("updated keyinfo\n"));
+				if (size == sizeof(fKeyInfo.key_states))
+					memcpy(fKeyInfo.key_states, data, size);
+			} else {
+				event->AddData("states", B_UINT8_TYPE, fKeyInfo.key_states,
+					sizeof(fKeyInfo.key_states));
+			}
+
+			PRINT(("keyinfo %ld %ld\n", size, (ssize_t)sizeof(fKeyInfo.key_states)));
+			break;
+		}
+
+   		default:
+			break;
+	}
+
+#if defined(HAIKU_TARGET_PLATFORM_HAIKU) && defined(USING_MESSAGE4)
+	BMessenger reply;
+	BMessage::Private messagePrivate(event);
+	return messagePrivate.SendMessage(fAppServerPort, 0, true, 0, false, reply);
+#else
+	ssize_t length = event->FlattenedSize();
+	char buffer[length];
+	status_t err;
+	if ((err = event->Flatten(buffer,length)) < B_OK)
+		return err;
+
+	return write_port(fAppServerPort, 0, buffer, length);
+#endif
 }
 
 

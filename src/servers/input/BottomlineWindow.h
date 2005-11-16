@@ -1,38 +1,34 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2005, Haiku
-//
-//  This software is part of the Haiku distribution and is covered 
-//  by the Haiku license.
-//
-//
-//  File:        TMWindow.h
-//  Author:      Jérôme Duval
-//  Description: Input server bottomline window
-//  Created :    January 24, 2005
-// 
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2004-2005, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jérôme Duval
+ */
+#ifndef BOTTOMLINE_WINDOW_H
+#define BOTTOMLINE_WINDOW_H
 
-#ifndef BOTTOMLINEWINDOW_H
-#define BOTTOMLINEWINDOW_H
+
+#include "InputServer.h"
 
 #include <Message.h>
-#include <TextView.h>
 #include <Window.h>
 
-class BottomlineWindow : public BWindow 
-{
-public:
-	BottomlineWindow(const BFont *font);
-	~BottomlineWindow();
-	
-	void MessageReceived(BMessage *msg);
-	virtual bool QuitRequested();
+class BTextView;
 
-	void HandleInputMethodEvent(BMessage *msg, BList *list);
-//private:
-	BTextView *fTextView;
+
+class BottomlineWindow : public BWindow {
+	public:
+		BottomlineWindow();
+		virtual ~BottomlineWindow();
+
+		virtual void MessageReceived(BMessage* message);
+		virtual bool QuitRequested();
+
+		void HandleInputMethodEvent(BMessage* event, EventList& newEvents);
+
+	private:
+		BTextView *fTextView;
 };
 
-
-#endif //BOTTOMLINEWINDOW_H
+#endif	// BOTTOMLINE_WINDOW_H

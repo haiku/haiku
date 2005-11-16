@@ -1,41 +1,34 @@
-//
-// kb_mouse_settings.h
-//
-
-
+/*
+ * Copyright 2001-2005, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _KB_MOUSE_SETTINGS_H
 #define _KB_MOUSE_SETTINGS_H
 
-#include <SupportDefs.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <InterfaceDefs.h>
+
 
 typedef struct {
-	bigtime_t       key_repeat_delay;
-	int32           key_repeat_rate;
+	bigtime_t	key_repeat_delay;
+	int32		key_repeat_rate;
 } kb_settings;
 
 #define kb_settings_file "Keyboard_settings"
 
 typedef struct {
-	bool    enabled;
-	int32   accel_factor;
-	int32   speed;
+	bool		enabled;
+	int32		accel_factor;
+	int32		speed;
 } mouse_accel;
 
 typedef struct {
 	int32		type;
 	mouse_map	map;
-	mouse_accel     accel;
-	bigtime_t       click_speed;
+	mouse_accel	accel;
+	bigtime_t	click_speed;
 } mouse_settings;
 
 #define mouse_settings_file "Mouse_settings"
 
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+#endif	/* _KB_MOUSE_SETTINGS_H */
