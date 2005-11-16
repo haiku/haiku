@@ -32,7 +32,10 @@ relocate_rel(image_t *image, struct Elf32_Rel *rel, int rel_len)
 
 				status = resolve_symbol(image, sym, &S);
 				if (status < B_OK) {
-					printf("resolve symbol \"%s\" returned: %ld\n", SYMNAME(image, sym), status);
+					TRACE(("resolve symbol \"%s\" returned: %ld\n",
+						SYMNAME(image, sym), status));
+					printf("resolve symbol \"%s\" returned: %ld\n",
+						SYMNAME(image, sym), status);
 					return status;
 				}
 			}
