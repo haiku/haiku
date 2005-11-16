@@ -48,18 +48,16 @@ HWInterface::SetCursor(ServerCursor* cursor)
 			delete fCursor;
 			delete fCursorAreaBackup;
 			fCursor = cursor;
-			if (fCursorVisible)
-				Invalidate(oldFrame);
+			Invalidate(oldFrame);
 			BRect r = _CursorFrame();
 			if (fCursor && !IsDoubleBuffered()) {
-				fCursorAreaBackup = new buffer_clip(r.IntegerWidth() + 1,
-													r.IntegerHeight() + 1);
-				if (fCursorVisible)
-				 	_DrawCursor(r);
+				BRect cursorBounds = fCursor->Bounds();
+				fCursorAreaBackup = new buffer_clip(cursorBounds.IntegerWidth() + 1,
+													cursorBounds.IntegerHeight() + 1);
+			 	_DrawCursor(r);
 			} else
 				fCursorAreaBackup = NULL;
-			if (fCursorVisible)
-				Invalidate(r);
+			Invalidate(r);
 		}
 		WriteUnlock();
 	}
@@ -99,13 +97,19 @@ HWInterface::MoveCursorTo(const float& x, const float& y)
 		if (p != fCursorLocation) {
 			BRect oldFrame = _CursorFrame();
 			fCursorLocation = p;
-			if (fCursorAreaBackup && fCursorVisible) {
-				// means we have a software cursor which we need to draw
-				_RestoreCursorArea();
-				_DrawCursor(_CursorFrame());
+			if (fCursorVisible) {
+				// Invalidate and _DrawCursor would not draw
+				// anything if the cursor is hidden
+				// (invalid cursor frame), but explicitly
+				// testing for it here saves us some cycles
+				if (fCursorAreaBackup) {
+					// means we have a software cursor which we need to draw
+					_RestoreCursorArea();
+					_DrawCursor(_CursorFrame());
+				}
+				Invalidate(oldFrame);
+				Invalidate(_CursorFrame());
 			}
-			Invalidate(oldFrame);
-			Invalidate(_CursorFrame());
 		}
 		WriteUnlock();
 	}
@@ -248,7 +252,7 @@ void
 HWInterface::_DrawCursor(BRect area) const
 {
 	RenderingBuffer* backBuffer = DrawingBuffer();
-	if (!backBuffer)
+	if (!backBuffer || !area.IsValid())
 		return;
 
 	BRect cf = _CursorFrame();
@@ -289,7 +293,7 @@ HWInterface::_DrawCursor(BRect area) const
 
 		uint8* dst = buffer;
 
-		if (fCursorAreaBackup) {
+		if (fCursorAreaBackup && fCursorAreaBackup->buffer) {
 //printf("backup: BRect(%ld, %ld, %ld, %ld)\n", left, top, right, bottom);
 			fCursorAreaBackup->cursor_hidden = false;
 			// remember which area the backup contains
