@@ -839,7 +839,7 @@ relocate_image(image_t *image)
 {
 	status_t status = arch_relocate_image(image);
 	if (status < B_OK) {
-		FATAL("troubles relocating\n");
+		FATAL("troubles relocating: 0x%lx\n", status);
 		return status;
 	}
 
