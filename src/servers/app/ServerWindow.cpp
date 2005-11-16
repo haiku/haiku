@@ -2083,14 +2083,15 @@ ServerWindow::_MessageLooper()
 		// does not return
 }
 
+
 status_t
 ServerWindow::SendMessageToClient(const BMessage* msg, int32 target, bool usePreferred) const
 {
+#ifndef USING_MESSAGE4
 	ssize_t size = msg->FlattenedSize();
 	char* buffer = new(nothrow) char[size];
 	status_t ret;
 
-#ifndef USING_MESSAGE4
 	if ((ret = msg->Flatten(buffer, size)) == B_OK) {
 		ret = BMessage::Private::SendFlattenedMessage(buffer, size,
 					fClientLooperPort, target, usePreferred, 100000);
@@ -2098,19 +2099,18 @@ ServerWindow::SendMessageToClient(const BMessage* msg, int32 target, bool usePre
 			fprintf(stderr, "ServerWindow::SendMessageToClient(): %s\n", strerror(ret));
 	} else
 		printf("PANIC: ServerWindow %s: can't flatten message in 'SendMessageToClient()'\n", fTitle);
+
+	delete[] buffer;
+	return ret;
 #else
 	BMessenger reply;
 	BMessage::Private messagePrivate((BMessage *)msg);
-	ret = messagePrivate.SendMessage(fClientLooperPort, target, usePreferred,
+	return messagePrivate.SendMessage(fClientLooperPort, target, usePreferred,
 		100000, false, reply);
 #endif
-
-	delete[] buffer;
-
-	return ret;
 }
 
-// MakeWinBorder
+
 WinBorder*
 ServerWindow::MakeWinBorder(BRect frame, const char* name,
 							uint32 look, uint32 feel, uint32 flags,
