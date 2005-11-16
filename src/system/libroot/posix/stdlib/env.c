@@ -44,13 +44,14 @@ static int32
 add_variable(void)
 {
 	int32 count = count_variables() + 1;
-	char **newEnv = malloc((count + 1) * sizeof(char *));
+	char **newEnv = realloc(environ, (count + 1) * sizeof(char *));
 	if (newEnv == NULL)
 		return B_NO_MEMORY;
 
-	memcpy(newEnv, environ, count * sizeof(char *));
 	newEnv[count] = NULL;
 		// null terminate the array
+
+	environ = newEnv;
 
 	return count - 1;
 }
@@ -118,7 +119,10 @@ update_variable(const char *name, int32 length, const char *value, bool overwrit
 	} else if (env == NULL) {
 		// add variable
 		index = add_variable();
-		update = true;
+		if (index >= 0)
+			update = true;
+		else
+			status = index;
 	}
 
 	if (update) {
