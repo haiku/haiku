@@ -1,6 +1,8 @@
 SubDir HAIKU_TOP src system libroot posix math ;
 
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) glibc ] ;
+#SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) glibc ] ;
+#SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) glibc include ] ;
+#SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) glibc include arch $(TARGET_ARCH) ] ;
 SubDirCcFlags -Dnational ;
 
 KernelMergeObject posix_math.o :
@@ -8,20 +10,15 @@ KernelMergeObject posix_math.o :
 	asincos.c
 	asinh.c
 	atan.c
-	atan2.c
 	atanh.c
 	cabs.c
 	cbrt.c
-	ceilf.c
 	cosh.c
 	erf.c
 	exp.c
 	exp__E.c
 	expm1.c
 	floatmath.c
-	floor.c
-	floorf.c
-	fmod.c
 	gamma.c
 	ieee.c
 	j0.c

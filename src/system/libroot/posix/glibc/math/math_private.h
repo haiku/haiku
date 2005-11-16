@@ -149,7 +149,7 @@ do {								\
 } while (0)
 
 /* Get long double macros from a separate header.  */
-//#include <math_ldbl.h>
+#include <math_ldbl.h>
 
 /* ieee style elementary functions */
 extern double __ieee754_sqrt (double);

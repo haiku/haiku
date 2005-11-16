@@ -5,6 +5,5 @@ KernelMergeObject posix_arch_$(TARGET_ARCH).o :
 	setjmp_save_sigs.c
 	sigsetjmp.S
 	siglongjmp.S
-
 	: -fPIC -DPIC
 	;

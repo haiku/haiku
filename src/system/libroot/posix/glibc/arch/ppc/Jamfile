@@ -1,10 +1,14 @@
-SubDir HAIKU_TOP src system libroot posix arch x86 ;
+SubDir HAIKU_TOP src system libroot posix arch ppc ;
 
 KernelMergeObject posix_arch_$(TARGET_ARCH).o :
-	setjmp.c
-	setjmp_save_sigs.c
-	sigsetjmp.S
-	siglongjmp.S
-
+	s_ceilf.c
+	s_floorf.c
+	s_fpclassify.c
+	s_fpclassifyf.c
+	s_fpclassifyl.c
 	: -fPIC -DPIC
 	;
+
+SEARCH on [ FGristFiles
+        s_fpclassify.c s_fpclassifyf.c s_fpclassifyl.c
+        ] = [ FDirName $(SUBDIR) $(DOTDOT) ] ;

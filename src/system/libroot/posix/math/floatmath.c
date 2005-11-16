@@ -32,37 +32,11 @@ float logbf(float x) {return (float)logb((double)x);};
 float powf(float x, float y) {return (float)pow((double)x, (double)y);};
 float sqrtf(float x) {return (float)sqrt((double)x);};
 float hypotf(float x, float y) {return (float)hypot((double)x, (double)y);};
-float fabsf(float x) {return (float)fabs((double)x);};
-float fmodf(float x, float y) {return (float)fmod((double)x, (double)y);};
-float copysignf(float x, float y) {return (float)copysign((double)x, (double)y);};
 float erff(float x) {return (float)erf((double)x);};
 float erfcf(float x) {return (float)erfc((double)x);};
 float gammaf(float x) {return (float)gamma((double)x);};
 float lgammaf(float x) {return (float)lgamma((double)x);};
-float rintf(float x) {return (float)rint((double)x);};
 float scalbf(float x, float n) {return (float)scalb((double)x, (double)n);};
-
-// TODO: use optimized versions of these
-double
-modf(double x, double *y)
-{
-	// TODO: this truncates to int precision and is broken!
-	// this should be implemented arch dependent!
-	int integer = (int)x;
-	*y = (double)integer;
-	return x - integer;
-}
-
-float
-modff(float x, float *y)
-{
-	// TODO: this truncates to int precision and is broken!
-	// this should be implemented arch dependent!
-	double intpart = 0;
-	float result = (float)modf((double)x, &intpart);
-	*y = (float)intpart;
-	return result;
-}
 
 
 int
@@ -93,33 +67,3 @@ __signbitl(long double value)
 	return (u.i[2] & 0x8000) != 0;
 }
 
-
-int
-__fpclassifyf(float value)
-{
-	// TODO: implement me!
-	return FP_NORMAL;
-}
-
-
-int
-__fpclassify(double value)
-{
-	// TODO: implement me!
-	return FP_NORMAL;
-}
-
-
-int
-__fpclassifyl(long double value)
-{
-	// TODO: implement me!
-	return FP_NORMAL;
-}
-
-int
-finitef(float value)
-{
-	int clazz = __fpclassifyf(value);
-	return (clazz == FP_ZERO || clazz == FP_SUBNORMAL || clazz == FP_NORMAL);
-}

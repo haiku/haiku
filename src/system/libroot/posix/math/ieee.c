@@ -82,6 +82,7 @@
     static const double novf=1.7E308, nunf=3.0E-308,zero=0.0;
 #endif	/* defined(vax)||defined(tahoe) */
 
+
 double
 scalb(double x, double N)
 {
@@ -128,6 +129,7 @@ scalb(double x, double N)
         return(x);
 }
 
+#if 0
 
 double
 copysign(double x, double y)
@@ -190,6 +192,7 @@ finite(double x)
 #endif	/* national */
 #endif	/* defined(vax)||defined(tahoe) */
 }
+#endif
 
 double
 drem(double x, double p)
