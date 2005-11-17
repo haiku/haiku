@@ -82,6 +82,8 @@ Server haiku_app_server :
 	PNGDump.cpp
 	RAMLinkMsgReader.cpp
 	MessageLooper.cpp
+	EventDispatcher.cpp
+	EventStream.cpp
 
 	# Manager Classes
 	BitmapManager.cpp

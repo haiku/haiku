@@ -114,7 +114,12 @@ InputServerStream::GetNextCursorPosition(BPoint &where)
 		return false;
 	}
 
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	uint32 pos = atomic_get((int32*)&fCursorBuffer->pos);
+#else
+	uint32 pos = fCursorBuffer->pos;
+#endif
+
 	where.x = pos & 0xffff;
 	where.y = pos >> 16L;
 
