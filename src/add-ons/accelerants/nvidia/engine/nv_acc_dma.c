@@ -1,7 +1,7 @@
 /* NV Acceleration functions */
 
 /* Author:
-   Rudolf Cornelissen 8/2003-6/2005.
+   Rudolf Cornelissen 8/2003-11/2005.
 
    This code was possible thanks to:
     - the Linux XFree86 NV driver,
@@ -859,7 +859,6 @@ status_t nv_acc_init_dma()
 				}
 			}
 		}
-//fixme: still check rest down:
 
 		if (si->ps.card_arch >= NV40A)
 		{
@@ -868,8 +867,8 @@ status_t nv_acc_init_dma()
 				/* copy some RAM configuration info(?) */
  				ACCW(NV20_WHAT_T0, NV_REG32(NV32_PFB_CONFIG_0));
 				ACCW(NV20_WHAT_T1, NV_REG32(NV32_PFB_CONFIG_1));
-				ACCW(NV40_WHAT_T2, NV_REG32(NV32_PFB_CONFIG_0));//updated?
-				ACCW(NV40_WHAT_T3, NV_REG32(NV32_PFB_CONFIG_1));//updated?
+				ACCW(NV40_WHAT_T2, NV_REG32(NV32_PFB_CONFIG_0));
+				ACCW(NV40_WHAT_T3, NV_REG32(NV32_PFB_CONFIG_1));
 
 				/* setup location of active screen in framebuffer */
 				ACCW(NV20_OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
@@ -880,11 +879,23 @@ status_t nv_acc_init_dma()
 			}
 			else
 			{
+				/* NV41, 43, 44, 47 */
+
 				/* copy some RAM configuration info(?) */
-				ACCW(NV40P_WHAT_T0, NV_REG32(NV32_PFB_CONFIG_0));
-				ACCW(NV40P_WHAT_T1, NV_REG32(NV32_PFB_CONFIG_1));
-				ACCW(NV40P_WHAT_T2, NV_REG32(NV32_PFB_CONFIG_0));//updated?
-				ACCW(NV40P_WHAT_T3, NV_REG32(NV32_PFB_CONFIG_1));//updated?
+				if (si->ps.card_type == NV47)
+				/* or ID == 0x01dx or ID == 0x029x: but no cards defined yet */
+				{
+					ACCW(NV47_WHAT_T0, NV_REG32(NV32_PFB_CONFIG_0));
+					ACCW(NV47_WHAT_T1, NV_REG32(NV32_PFB_CONFIG_1));
+				}
+				else
+				{
+					/* NV41, 43, 44 */
+					ACCW(NV40P_WHAT_T0, NV_REG32(NV32_PFB_CONFIG_0));
+					ACCW(NV40P_WHAT_T1, NV_REG32(NV32_PFB_CONFIG_1));
+				}
+				ACCW(NV40P_WHAT_T2, NV_REG32(NV32_PFB_CONFIG_0));
+				ACCW(NV40P_WHAT_T3, NV_REG32(NV32_PFB_CONFIG_1));
 
 				/* setup location of active screen in framebuffer */
 				ACCW(NV40P_OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
