@@ -168,22 +168,63 @@ status_t nv_acc_init_dma()
 	else
 	{
 		/* setup acc engine 'source' tile adressranges */
-		ACCW(NV10_FBTIL0AD, 0);
-		ACCW(NV10_FBTIL1AD, 0);
-		ACCW(NV10_FBTIL2AD, 0);
-		ACCW(NV10_FBTIL3AD, 0);
-		ACCW(NV10_FBTIL4AD, 0);
-		ACCW(NV10_FBTIL5AD, 0);
-		ACCW(NV10_FBTIL6AD, 0);
-		ACCW(NV10_FBTIL7AD, 0);
-		ACCW(NV10_FBTIL0ED, (si->ps.memory_size - 1));
-		ACCW(NV10_FBTIL1ED, (si->ps.memory_size - 1));
-		ACCW(NV10_FBTIL2ED, (si->ps.memory_size - 1));
-		ACCW(NV10_FBTIL3ED, (si->ps.memory_size - 1));
-		ACCW(NV10_FBTIL4ED, (si->ps.memory_size - 1));
-		ACCW(NV10_FBTIL5ED, (si->ps.memory_size - 1));
-		ACCW(NV10_FBTIL6ED, (si->ps.memory_size - 1));
-		ACCW(NV10_FBTIL7ED, (si->ps.memory_size - 1));
+		if ((si->ps.card_type <= NV40) || (si->ps.card_type == NV45))
+		{
+			ACCW(NV10_FBTIL0AD, 0);
+			ACCW(NV10_FBTIL1AD, 0);
+			ACCW(NV10_FBTIL2AD, 0);
+			ACCW(NV10_FBTIL3AD, 0);
+			ACCW(NV10_FBTIL4AD, 0);
+			ACCW(NV10_FBTIL5AD, 0);
+			ACCW(NV10_FBTIL6AD, 0);
+			ACCW(NV10_FBTIL7AD, 0);
+			ACCW(NV10_FBTIL0ED, (si->ps.memory_size - 1));
+			ACCW(NV10_FBTIL1ED, (si->ps.memory_size - 1));
+			ACCW(NV10_FBTIL2ED, (si->ps.memory_size - 1));
+			ACCW(NV10_FBTIL3ED, (si->ps.memory_size - 1));
+			ACCW(NV10_FBTIL4ED, (si->ps.memory_size - 1));
+			ACCW(NV10_FBTIL5ED, (si->ps.memory_size - 1));
+			ACCW(NV10_FBTIL6ED, (si->ps.memory_size - 1));
+			ACCW(NV10_FBTIL7ED, (si->ps.memory_size - 1));
+		}
+		else
+		{
+			/* NV41, 43, 44, 47 */
+			ACCW(NV41_FBTIL0AD, 0);
+			ACCW(NV41_FBTIL1AD, 0);
+			ACCW(NV41_FBTIL2AD, 0);
+			ACCW(NV41_FBTIL3AD, 0);
+			ACCW(NV41_FBTIL4AD, 0);
+			ACCW(NV41_FBTIL5AD, 0);
+			ACCW(NV41_FBTIL6AD, 0);
+			ACCW(NV41_FBTIL7AD, 0);
+			ACCW(NV41_FBTIL8AD, 0);
+			ACCW(NV41_FBTIL9AD, 0);
+			ACCW(NV41_FBTILAAD, 0);
+			ACCW(NV41_FBTILBAD, 0);
+			ACCW(NV41_FBTIL0ED, (si->ps.memory_size - 1));
+			ACCW(NV41_FBTIL1ED, (si->ps.memory_size - 1));
+			ACCW(NV41_FBTIL2ED, (si->ps.memory_size - 1));
+			ACCW(NV41_FBTIL3ED, (si->ps.memory_size - 1));
+			ACCW(NV41_FBTIL4ED, (si->ps.memory_size - 1));
+			ACCW(NV41_FBTIL5ED, (si->ps.memory_size - 1));
+			ACCW(NV41_FBTIL6ED, (si->ps.memory_size - 1));
+			ACCW(NV41_FBTIL7ED, (si->ps.memory_size - 1));
+			ACCW(NV41_FBTIL8ED, (si->ps.memory_size - 1));
+			ACCW(NV41_FBTIL9ED, (si->ps.memory_size - 1));
+			ACCW(NV41_FBTILAED, (si->ps.memory_size - 1));
+			ACCW(NV41_FBTILBED, (si->ps.memory_size - 1));
+
+			if (si->ps.card_type == NV47)
+			{
+				ACCW(NV47_FBTILCAD, 0);
+				ACCW(NV47_FBTILDAD, 0);
+				ACCW(NV47_FBTILEAD, 0);
+				ACCW(NV47_FBTILCED, (si->ps.memory_size - 1));
+				ACCW(NV47_FBTILDED, (si->ps.memory_size - 1));
+				ACCW(NV47_FBTILEED, (si->ps.memory_size - 1));
+			}
+		}
 	}
 
 	/*** PRAMIN ***/
