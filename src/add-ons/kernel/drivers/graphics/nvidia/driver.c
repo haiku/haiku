@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-10/2005.
+	Rudolf Cornelissen 3/2002-11/2005.
 */
 
 /* standard kernel driver stuff */
@@ -120,14 +120,20 @@ static uint16 nvidia_device_list[] = {
 	0x0042, /* Nvidia GeForce FX 6800LE */
 	0x0043, /* Nvidia unknown FX */
 	0x0045, /* Nvidia GeForce FX 6800 GT */
+	0x0046, /* Nvidia GeForce FX 6800 GT */
+	0x0048, /* Nvidia GeForce FX 6800 XT */
 	0x004d, /* Nvidia Quadro FX 4400 */
 	0x004e, /* Nvidia Quadro FX 4000 */
+	0x0091, /* Nvidia GeForce 7800 GTX PCIe */
 	0x0092, /* Nvidia Geforce 7800 GT PCIe */
+	0x0098, /* Nvidia Geforce 7800 Go PCIe */
 	0x0099, /* Nvidia Geforce 7800 GTX Go PCIe */
+	0x009d, /* Nvidia Quadro FX 4500 */
 	0x00a0, /* Nvidia Aladdin TNT2 */
 	0x00c0,	/* Nvidia unknown FX */
 	0x00c1, /* Nvidia GeForce FX 6800 */
 	0x00c2, /* Nvidia GeForce FX 6800LE */
+	0x00c3, /* Nvidia GeForce FX 6800 XT */
 	0x00c8, /* Nvidia GeForce FX 6800 Go */
 	0x00c9, /* Nvidia GeForce FX 6800 Ultra Go */
 	0x00cc, /* Nvidia Quadro FX 1400 Go */
@@ -155,10 +161,13 @@ static uint16 nvidia_device_list[] = {
 	0x0113, /* Nvidia Quadro2 MXR/EX/Go */
 	0x0140, /* Nvidia GeForce FX 6600 GT */
 	0x0141, /* Nvidia GeForce FX 6600 */
+	0x0142, /* Nvidia GeForce FX 6600LE */
 	0x0144, /* Nvidia GeForce FX 6600 Go */
 	0x0145, /* Nvidia GeForce FX 6610 XL */
 	0x0146, /* Nvidia GeForce FX 6600 TE Go / 6200 TE Go */
+	0x0147, /* Nvidia GeForce FX 6700 XL */
 	0x0148, /* Nvidia GeForce FX 6600 Go */
+	0x0149, /* Nvidia GeForce FX 6600 GT Go */
 	0x014e, /* Nvidia Quadro FX 540 */
 	0x014f, /* Nvidia GeForce 6200 PCIe (128Mb) */
 	0x0150, /* Nvidia GeForce2 GTS/Pro */
@@ -279,24 +288,24 @@ static uint16 nvidia_device_list[] = {
 /*
 	not yet included nVidia ID's that are unknown, but used according to nvidia:
 	0x0049 //nv40
-	0x0098 //     go	>>> now known, setup
-	0x0142 //nv43		>>> now known, setup
+	0x0090 //nv47
+	0x0093 //nv47
+	0x0094 //nv47
+	0x009c //nv47
+	0x009e //nv47
 	0x0143 //nv43
-	0x0147 //nv43		>>> now known, setup
-	0x0149 //nv43		>>> now known, setup
 	0x014b //nv43
 	0x014c //nv43
 	0x014d //nv43
 	0x016b //nv44 go
 	0x016c //nv44 go
 	0x016d //nv44 go
-	0x0210 //nv48		>>> checkout nv#
+	0x0210 //nv48
 	0x021d //nv48 (existing? not in nvidia list)
 	0x021e //nv48 (existing? not in nvidia list)
 	0x0220 //nv44
 	0x0222 //nv44
 	0x0228 //nv44 go
-	0x0329 //     go
 	0x0345 //nv36
 	0x0349 //nv36 go
 	0x034b //nv36 go.
