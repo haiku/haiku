@@ -216,6 +216,7 @@ status_t nv_acc_init_dma()
 			ACCW(NV41_FBTILBED, (si->ps.memory_size - 1));
 
 			if (si->ps.card_type == NV47)
+			/* or ID == 0x01dx or ID == 0x029x: but no cards defined yet */
 			{
 				ACCW(NV47_FBTILCAD, 0);
 				ACCW(NV47_FBTILDAD, 0);
@@ -808,12 +809,57 @@ status_t nv_acc_init_dma()
 		}
 
 		/* NV20A, NV30A and NV40A: */
-		/* copy tile setup stuff from 'source' to acc engine (pattern colorRAM?) */
-		for (cnt = 0; cnt < 32; cnt++)
+		/* copy tile setup stuff from previous setup 'source' to acc engine
+		 * (pattern colorRAM?) */
+		if ((si->ps.card_type <= NV40) || (si->ps.card_type == NV45))
 		{
-			NV_REG32(NVACC_NV20_WHAT0 + (cnt << 2)) =
-				NV_REG32(NVACC_NV10_FBTIL0AD + (cnt << 2));
+			for (cnt = 0; cnt < 32; cnt++)
+			{
+				/* copy NV10_FBTIL0AD upto/including NV10_FBTIL7ST */
+				NV_REG32(NVACC_NV20_WHAT0 + (cnt << 2)) =
+					NV_REG32(NVACC_NV10_FBTIL0AD + (cnt << 2));
+
+				/* copy NV10_FBTIL0AD upto/including NV10_FBTIL7ST */
+				NV_REG32(NVACC_NV20_2_WHAT0 + (cnt << 2)) =
+					NV_REG32(NVACC_NV10_FBTIL0AD + (cnt << 2));
+			}
 		}
+		else
+		{
+			/* NV41, 43, 44, 47 */
+			if (si->ps.card_type == NV47)
+			/* or ID == 0x01dx or ID == 0x029x: but no cards defined yet */
+			{
+				for (cnt = 0; cnt < 60; cnt++)
+				{
+					/* copy NV41_FBTIL0AD upto/including NV47_FBTILEST */
+					NV_REG32(NVACC_NV41_WHAT0 + (cnt << 2)) =
+						NV_REG32(NVACC_NV41_FBTIL0AD + (cnt << 2));
+
+					/* copy NV41_FBTIL0AD upto/including NV47_FBTILEST */
+					NV_REG32(NVACC_NV20_2_WHAT0 + (cnt << 2)) =
+						NV_REG32(NVACC_NV41_FBTIL0AD + (cnt << 2));
+				}
+			}
+			else
+			{
+				/* NV41, 43, 44 */
+				for (cnt = 0; cnt < 48; cnt++)
+				{
+					/* copy NV41_FBTIL0AD upto/including NV41_FBTILBST */
+					NV_REG32(NVACC_NV20_WHAT0 + (cnt << 2)) =
+						NV_REG32(NVACC_NV41_FBTIL0AD + (cnt << 2));
+
+					if (si->ps.card_type != NV44)
+					{
+						/* copy NV41_FBTIL0AD upto/including NV41_FBTILBST */
+						NV_REG32(NVACC_NV20_2_WHAT0 + (cnt << 2)) =
+							NV_REG32(NVACC_NV41_FBTIL0AD + (cnt << 2));
+					}
+				}
+			}
+		}
+//fixme: still check rest down:
 
 		if (si->ps.card_arch >= NV40A)
 		{
@@ -822,8 +868,8 @@ status_t nv_acc_init_dma()
 				/* copy some RAM configuration info(?) */
  				ACCW(NV20_WHAT_T0, NV_REG32(NV32_PFB_CONFIG_0));
 				ACCW(NV20_WHAT_T1, NV_REG32(NV32_PFB_CONFIG_1));
-				ACCW(NV40_WHAT_T2, NV_REG32(NV32_PFB_CONFIG_0));
-				ACCW(NV40_WHAT_T3, NV_REG32(NV32_PFB_CONFIG_1));
+				ACCW(NV40_WHAT_T2, NV_REG32(NV32_PFB_CONFIG_0));//updated?
+				ACCW(NV40_WHAT_T3, NV_REG32(NV32_PFB_CONFIG_1));//updated?
 
 				/* setup location of active screen in framebuffer */
 				ACCW(NV20_OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
@@ -837,8 +883,8 @@ status_t nv_acc_init_dma()
 				/* copy some RAM configuration info(?) */
 				ACCW(NV40P_WHAT_T0, NV_REG32(NV32_PFB_CONFIG_0));
 				ACCW(NV40P_WHAT_T1, NV_REG32(NV32_PFB_CONFIG_1));
-				ACCW(NV40P_WHAT_T2, NV_REG32(NV32_PFB_CONFIG_0));
-				ACCW(NV40P_WHAT_T3, NV_REG32(NV32_PFB_CONFIG_1));
+				ACCW(NV40P_WHAT_T2, NV_REG32(NV32_PFB_CONFIG_0));//updated?
+				ACCW(NV40P_WHAT_T3, NV_REG32(NV32_PFB_CONFIG_1));//updated?
 
 				/* setup location of active screen in framebuffer */
 				ACCW(NV40P_OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));

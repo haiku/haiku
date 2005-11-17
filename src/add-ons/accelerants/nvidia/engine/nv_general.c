@@ -91,7 +91,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.63 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.64 running.\n"));
 
 	/* log VBLANK INT usability status */
 	if (si->ps.int_assigned)
@@ -1627,8 +1627,6 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	{
 		/* check if we can setup this mode with acceleration */
 		*acc_mode = true;
-//temporary disabling ACC on NV47:
-if (si->ps.card_type == NV47) *acc_mode = false;
 		/* virtual_width */
 		if (target->virtual_width > max_acc_width) *acc_mode = false;
 		/* virtual_height */
@@ -1661,8 +1659,6 @@ if (si->ps.card_type == NV47) *acc_mode = false;
 	{
 		/* check if we can setup this mode with acceleration */
 		*acc_mode = true;
-//temporary disabling ACC on NV47:
-if (si->ps.card_type == NV47) *acc_mode = false;
 		/* (we already know virtual_width will be no problem) */
 		/* virtual_height */
 		/* (NV cards can even do more than this(?)...
