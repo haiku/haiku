@@ -23,9 +23,8 @@ You use this software at your own risk! Although I don't expect it to damage you
 	<li>GeForce 4 Integrated GPU (Nforce 2);
 	<li>GeForce (4 MX) PCX 4300;
 	<li>GeForce FX/PCX 5200/5300/5600/5700/5750/5800/5900/5950/Go;
-	<li>GeForce FX/PCX 6200/6600/6800/Go;
+	<li>GeForce FX/PCX 6200/6600/6800/7800/Go;
 	<li>Quadro (2/4/FX/PCX/Go);
-	<li>Preliminary support for some GeForce 7800 GT/GTX/Go (without acceleration currently).
 </ul>
 <br>
 <hr>
@@ -49,7 +48,7 @@ You use this software at your own risk! Although I don't expect it to damage you
 	<li>If you want BScreen 'Sync_to_Retrace' capability make sure you enabled 'assign IRQ to VGA card' in your system BIOS (if available);
 	<li>If the driver still seems to create 'random' trouble make sure you have a fully functional VGA BIOS, or system BIOS for embedded cards (check for updates on the manufacturor's site). Make sure you mail me if you still have trouble but also if this version fixed that!
 	<li>If on a laptop the internal panel doesn't work when you connect an external monitor, make sure you set 'output device selection' to 'internal' (instead of 'auto') in the system BIOS if it has such an option. If you have this symptom on a normal card, or on a laptop without that BIOS option then you are probably out of luck for dualhead support;
-	<li><strong>NV40 architecture cards:</strong> (GeForce 6200 and 6600 at least, but 6800 AGP seems to be OK)<br>
+	<li><strong>NV40 architecture cards:</strong> (GeForce 6200, 6600 and 7800 at least, but 6800 AGP seems to be OK)<br>
  	Secondary analog monitor detection doesn't work and we can't control very well to which connector the card's output gets routed (lack of specs). This means you might have to experiment a bit with the way you connect your monitor to the card. A single analog or DVI screen should work OK, and two analog screens should be OK as well.
 </ul>
 <br>
@@ -166,9 +165,9 @@ Keep this option set to <strong>force_pci false</strong>, unless the graphics ca
 You can select one of two methods for (2D) acceleration here: PIO mode and DMA mode. DMA mode works 4-10 times as fast as PIO mode on modern CPU's (beyond 2Ghz or so), and should still be 2-3 times as fast as PIO mode on slower CPU's (below 500Mhz).
 	<ul>
 		<li><strong>false:</strong><br>
-If the default setting does not work as expected, you can try falling back to PIO mode acceleration. Note however that PIO mode is currently not working on NV40 and higher GPU's (GeForce 6200, 6600 and 6800 like types). Also, chances are that this method of acceleration will be removed in future driverversions (so be sure to let me know if you are having trouble with DMA mode!).
+If the default setting does not work as expected, you can try falling back to PIO mode acceleration. Note however that PIO mode is currently not working on NV40 and higher GPU's (GeForce 6200, 6600, 6800 and 7800 like types). Also, chances are that this method of acceleration will be removed in future driverversions (so be sure to let me know if you are having trouble with DMA mode!).
 		<li><strong>true:</strong> (default setting)<br>
-<strong>dma_acc true</strong> enables DMA cmd fetching by the GPU for (2D) acceleration instead of using the old PIO method (which directly programs acceleration commands inside the GPU). The DMA method works (much) faster than PIO mode depending on system CPU speed. Also the DMA method is the only method that works on NV40 and higher GPU's (GeForce 6200, 6600 and 6800 like types) currently.
+<strong>dma_acc true</strong> enables DMA cmd fetching by the GPU for (2D) acceleration instead of using the old PIO method (which directly programs acceleration commands inside the GPU). The DMA method works (much) faster than PIO mode depending on system CPU speed. Also the DMA method is the only method that works on NV40 and higher GPU's (GeForce 6200, 6600, 6800 and 7800 like types) currently.
 	</ul>
 	<li><strong>tv_output:</strong> (disabled by default: preceded by a '#')<br>
 		This option enables you to override the 'TV output signal cable autodetection' of the driver. If autodetection is working incorrect, you can manually select a signal type this way. Specify 0, 1 or 2 (if enabled).<br>
@@ -216,6 +215,6 @@ If you select <strong>vga_on_tv false</strong> the driver will automatically shu
 <hr>
 <br>
 <a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on November 15, 2005)</p>
+<p>(Page last updated on November 17, 2005)</p>
 </body>
 </html>
