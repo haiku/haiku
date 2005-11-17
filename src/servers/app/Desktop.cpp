@@ -65,9 +65,8 @@ Desktop::Desktop(uid_t userID)
 	fActiveScreen(NULL),
 	fCursorManager()
 {
-	// TODO: use user name
 	char name[B_OS_NAME_LENGTH];
-	snprintf(name, sizeof(name), "d:%s", "baron");
+	Desktop::_GetLooperName(name, sizeof(name));
 
 	fMessagePort = create_port(DEFAULT_MONITOR_PORT_SIZE, name);
 	if (fMessagePort < B_OK)
