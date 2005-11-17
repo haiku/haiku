@@ -10,9 +10,9 @@
 
 
 #include <Locker.h>
+#include <Messenger.h>
 
 class BMessageFilter;
-class BMessenger;
 
 class EventStream;
 class HWInterface;
@@ -40,7 +40,7 @@ class EventDispatcher : public BLocker {
 		status_t _Run();
 		void _Unset();
 
-		void _SendMessage(BMessenger* messenger, BMessage* message, float importance);
+		void _SendMessage(BMessenger& messenger, BMessage* message, float importance);
 		void _SetTransit(BMessage* message, int32 transit);
 
 		void _EventLoop();
@@ -54,8 +54,10 @@ class EventDispatcher : public BLocker {
 		thread_id		fThread;
 		thread_id		fCursorThread;
 
-		BMessenger*		fFocus;
-		BMessenger*		fLastFocus;
+		BMessenger		fFocus;
+		BMessenger		fLastFocus;
+		bool			fHasFocus;
+		bool			fHasLastFocus;
 		bool			fTransit;
 		BMessageFilter*	fMouseFilter;
 		BMessageFilter*	fKeyFilter;

@@ -13,7 +13,6 @@
 
 #include <Autolock.h>
 #include <MessageFilter.h>
-#include <Messenger.h>
 #include <View.h>
 
 #include <stdio.h>
@@ -29,8 +28,8 @@ EventDispatcher::EventDispatcher()
 	fStream(NULL),
 	fThread(-1),
 	fCursorThread(-1),
-	fFocus(NULL),
-	fLastFocus(NULL),
+	fHasFocus(false),
+	fHasLastFocus(false),
 	fTransit(false),
 	fMouseFilter(NULL),
 	fKeyFilter(NULL),
@@ -107,12 +106,17 @@ EventDispatcher::SetFocus(BMessenger* messenger)
 {
 	BAutolock _(this);
 
-	if (fFocus == messenger)
+	if (fFocus == *messenger)
 		return;
 
-	delete fLastFocus;
-	fLastFocus = fFocus;
-	fFocus = messenger;
+	fHasLastFocus = fHasFocus;
+	if (fHasFocus)
+		fLastFocus = fFocus;
+
+	fHasFocus = messenger != NULL;
+	if (fHasFocus)
+		fFocus = *messenger;
+
 	fTransit = true;
 }
 
@@ -164,15 +168,12 @@ EventDispatcher::SetHWInterface(HWInterface* interface)
 
 
 void
-EventDispatcher::_SendMessage(BMessenger* messenger, BMessage* message,
+EventDispatcher::_SendMessage(BMessenger& messenger, BMessage* message,
 	float importance)
 {
-	if (messenger == NULL)
-		return;
-
 	// TODO: add failed messages to a queue, and start dropping them by importance
 
-	status_t status = fFocus->SendMessage(message, (BHandler*)NULL, 100000);
+	status_t status = messenger.SendMessage(message, (BHandler*)NULL, 100000);
 	if (status != B_OK)
 		printf("failed to send message to target: %lx\n", message->what);
 }
@@ -198,6 +199,7 @@ EventDispatcher::_EventLoop()
 		}
 
 		BAutolock _(this);
+		bool sendToLastFocus = false;
 
 		switch (event->what) {
 			case B_MOUSE_MOVED:
@@ -213,19 +215,16 @@ EventDispatcher::_EventLoop()
 				if (fTransit) {
 					// target has changed, we need to add the be:transit field
 					// to the message
-					if (fLastFocus != NULL) {
+					if (fHasLastFocus) {
 						_SetTransit(event, B_EXITED_VIEW);
 						_SendMessage(fLastFocus, event, kMouseTransitImportance);
+						sendToLastFocus = true;
 
 						// we no longer need the last focus messenger
-						delete fLastFocus;
-						fLastFocus = NULL;
+						fHasLastFocus = false;
 					}
-					if (fFocus != NULL) {
+					if (fHasFocus)
 						_SetTransit(event, B_ENTERED_VIEW);
-						_SendMessage(fLastFocus, event, kMouseTransitImportance);
-					}
-					break;
 				}
 				// supposed to fall through
 			case B_MOUSE_DOWN:
@@ -234,8 +233,10 @@ EventDispatcher::_EventLoop()
 					&& fMouseFilter->Filter(event, NULL) == B_SKIP_MESSAGE)
 					break;
 
-				_SendMessage(fFocus, event, event->what == B_MOUSE_MOVED
-					? kMouseMovedImportance : kStandardImportance);
+				if (fHasFocus) {
+					_SendMessage(fFocus, event, event->what == B_MOUSE_MOVED
+						? kMouseMovedImportance : kStandardImportance);
+				}
 				break;
 
 			case B_KEY_DOWN:
@@ -248,7 +249,8 @@ EventDispatcher::_EventLoop()
 					break;
 
 			default:
-				_SendMessage(fLastFocus, event, kStandardImportance);
+				if (fHasFocus)
+					_SendMessage(fFocus, event, kStandardImportance);
 				break;
 		}
 
