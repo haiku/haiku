@@ -25,6 +25,8 @@ Server app_server :
 	Desktop.cpp
 	DesktopSettings.cpp
 	DrawState.cpp
+	EventDispatcher.cpp
+	EventStream.cpp
 	FontFamily.cpp
 	FontManager.cpp
 	HashTable.cpp

@@ -10,7 +10,9 @@
 #ifndef _DESKTOP_H_
 #define _DESKTOP_H_
 
+
 #include "CursorManager.h"
+#include "EventDispatcher.h"
 #include "ScreenManager.h"
 #include "ServerScreen.h"
 #include "VirtualScreen.h"
@@ -104,6 +106,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 			::VirtualScreen		fVirtualScreen;
 			DesktopSettings::Private* fSettings;
 			port_id				fMessagePort;
+			EventDispatcher		fEventDispatcher;
 			port_id				fInputPort;
 
 			BLocker				fAppListLock;
