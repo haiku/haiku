@@ -155,9 +155,11 @@ status_t nv_general_powerup()
 		status = nvxx_general_powerup();
 		break;
 	case 0x004510de: /* Nvidia GeForce FX 6800 GT */
+	case 0x004610de: /* Nvidia GeForce FX 6800 GT */
+	case 0x004810de: /* Nvidia GeForce FX 6800 XT */
 		si->ps.card_type = NV40;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6800 GT (NV40)\n"));
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6800 (NV40)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x004d10de: /* Nvidia Quadro FX 4400 */
@@ -167,18 +169,25 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia Quadro FX 4000/4400 (NV40)\n"));
 		status = nvxx_general_powerup();
 		break;
+	case 0x009110de: /* Nvidia GeForce 7800 GTX PCIe */
 	case 0x009210de: /* Nvidia Geforce 7800 GT PCIe */
 		si->ps.card_type = NV47;
 		si->ps.card_arch = NV40A;
 		LOG(4,("POWERUP: Detected Nvidia Geforce 7800 GT PCIe (NV47)\n"));
 		status = nvxx_general_powerup();
 		break;
-//fixme: reported, but yet untested card..
+	case 0x009810de: /* Nvidia Geforce 7800 Go PCIe */
 	case 0x009910de: /* Nvidia Geforce 7800 GTX Go PCIe */
 		si->ps.card_type = NV47;
 		si->ps.card_arch = NV40A;
 		si->ps.laptop = true;
 		LOG(4,("POWERUP: Detected Nvidia Geforce 7800 GTX Go PCIe (NV47)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x009d10de: /* Nvidia Quadro FX 4500 */
+		si->ps.card_type = NV47;
+		si->ps.card_arch = NV40A;
+		LOG(4,("POWERUP: Detected Nvidia Quadro FX 4500 (NV47)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x00a010de: /* Nvidia Aladdin TNT2 */
@@ -195,6 +204,7 @@ status_t nv_general_powerup()
 		break;
 	case 0x00c110de: /* Nvidia GeForce FX 6800 */
 	case 0x00c210de: /* Nvidia GeForce FX 6800LE */
+	case 0x00c310de: /* Nvidia GeForce FX 6800 XT */
 		si->ps.card_type = NV41;
 		si->ps.card_arch = NV40A;
 		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6800 (NV41)\n"));
@@ -330,6 +340,7 @@ status_t nv_general_powerup()
 		break;
 	case 0x014010de: /* Nvidia GeForce FX 6600 GT */
 	case 0x014110de: /* Nvidia GeForce FX 6600 */
+	case 0x014210de: /* Nvidia GeForce FX 6600LE */
 		si->ps.card_type = NV43;
 		si->ps.card_arch = NV40A;
 		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6600 (NV43)\n"));
@@ -348,8 +359,15 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6610 XL (NV43)\n"));
 		status = nvxx_general_powerup();
 		break;
+	case 0x014710de: /* Nvidia GeForce FX 6700 XL */
+		si->ps.card_type = NV43;
+		si->ps.card_arch = NV40A;
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6700 XL (NV43)\n"));
+		status = nvxx_general_powerup();
+		break;
 	case 0x014610de: /* Nvidia GeForce FX 6600 TE Go / 6200 TE Go */
 	case 0x014810de: /* Nvidia GeForce FX 6600 Go */
+	case 0x014910de: /* Nvidia GeForce FX 6600 GT Go */
 		si->ps.card_type = NV43;
 		si->ps.card_arch = NV40A;
 		si->ps.laptop = true;
