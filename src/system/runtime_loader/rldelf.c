@@ -573,7 +573,8 @@ map_image(int fd, char const *path, image_t *image, bool fixed)
 			if (image->regions[i].id < 0)
 				goto error;
 
-			TRACE(("\"%s\" at %p (%s)\n", path, (void *)loadAddress,
+			TRACE(("\"%s\" at %p, 0x%lx bytes (%s)\n", path,
+				(void *)loadAddress, image->regions[i].vmsize,
 				image->regions[i].flags & RFLAG_RW ? "rw" : "read-only"));
 
 			image->regions[i].delta = loadAddress - image->regions[i].vmstart;
@@ -827,9 +828,9 @@ register_image(image_t *image, int fd, const char *path)
 
 	strlcpy(info.name, path, sizeof(info.name));
 	info.text = (void *)image->regions[0].vmstart;
-	info.text_size = image->regions[0].size;
+	info.text_size = image->regions[0].vmsize;
 	info.data = (void *)image->regions[1].vmstart;
-	info.data_size = image->regions[1].size;
+	info.data_size = image->regions[1].vmsize;
 	image->id = _kern_register_image(&info, sizeof(image_info));
 }
 
