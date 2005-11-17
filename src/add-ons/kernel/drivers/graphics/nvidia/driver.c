@@ -311,7 +311,9 @@ static uint16 nvidia_device_list[] = {
 	0x034b //nv36 go.
 
 	The following ranges seem to exist as well, but no cards are defined yet:
-	0x01dx //nv47?
+	0x012x //nv41?
+	0x01dx //nv44?
+	0x023x //nv44 type 2? (0x022x is also type 2)
 	0x029x //nv47?
 */
 
