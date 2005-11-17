@@ -26,6 +26,7 @@
 #include <Looper.h>
 #include <Message.h>
 
+class BMidiProducer;
 class BMidiRoster;
 
 namespace BPrivate {
@@ -71,8 +72,8 @@ public:
 	
 private:
 
-	friend class BMidiRoster;
-	friend class BMidiProducer;
+	friend class ::BMidiRoster;
+	friend class ::BMidiProducer;
 
 	typedef BLooper super;
 

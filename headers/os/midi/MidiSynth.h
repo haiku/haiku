@@ -7,6 +7,8 @@
 #include <Synth.h>
 #include <MidiDefs.h>
 
+class BSynth;
+
 class BMidiSynth : public BMidi
 {
 public:

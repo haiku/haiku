@@ -21,8 +21,9 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <MidiSynth.h>
+
 #include "debug.h"
-#include "MidiSynth.h"
 #include "SoftSynth.h"
 
 using namespace BPrivate;

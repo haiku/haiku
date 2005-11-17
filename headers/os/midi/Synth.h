@@ -87,8 +87,8 @@ public:
 
 private:
 
-	friend BMidiSynth;
-	friend BMidiSynthFile;
+	friend class BMidiSynth;
+	friend class BMidiSynthFile;
 
 	virtual void _ReservedSynth1();
 	virtual void _ReservedSynth2();

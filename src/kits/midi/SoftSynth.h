@@ -59,6 +59,8 @@
 
 class BMidiConsumer;
 class BMidiLocalProducer;
+class BMidiSynth;
+class BSynth;
 
 namespace BPrivate {
 
@@ -118,8 +120,8 @@ public:
 
 private:
 
-	friend class BSynth;
-	friend class BMidiSynth;
+	friend class ::BSynth;
+	friend class ::BMidiSynth;
 
 	BSoftSynth();
 	~BSoftSynth();
