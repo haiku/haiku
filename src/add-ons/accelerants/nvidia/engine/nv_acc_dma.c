@@ -689,17 +689,21 @@ status_t nv_acc_init_dma()
 			/* set limit_viol_pix_adress(?): more likely something unknown.. */
 			ACCW(NV25_WHAT0, 0x00be3c5f);
 
+//new stuff needs to be inhere...
+
 			/* unknown.. */
 			switch (si->ps.card_type)
 			{
 			case NV40:
 			case NV45:
+			/* and NV48: but these are pgm'd as NV45 currently */
 				ACCW(NV40_WHAT0, 0x83280fff);
 				ACCW(NV40_WHAT1, 0x000000a0);
 				ACCW(NV40_WHAT2, 0x0078e366);
 				ACCW(NV40_WHAT3, 0x0000014c);
 				break;
 			case NV41:
+			/* and ID == 0x012x: but no cards defined yet */
 				ACCW(NV40P_WHAT0, 0x83280eff);
 				ACCW(NV40P_WHAT1, 0x000000a0);
 				ACCW(NV40P_WHAT2, 0x007596ff);
@@ -712,6 +716,7 @@ status_t nv_acc_init_dma()
 				ACCW(NV40P_WHAT3, 0x00000108);
 				break;
 			case NV44:
+			/* and ID == 0x01dx: but no cards defined yet */
 				ACCW(NV40P_WHAT0, 0x83280eff);
 				ACCW(NV40P_WHAT1, 0x000000a0);
 
@@ -722,6 +727,21 @@ status_t nv_acc_init_dma()
 
 				ACCW(NV44_WHAT2, 0x00000000);
 				ACCW(NV44_WHAT3, 0x00000000);
+				break;
+/*			case NV44 type 2:
+				//fixme if needed: doesn't seem to need the strapinfo thing..
+				ACCW(NV40P_WHAT0, 0x83280eff);
+				ACCW(NV40P_WHAT1, 0x000000a0);
+
+				ACCW(NV44_WHAT2, 0x00000000);
+				ACCW(NV44_WHAT3, 0x00000000);
+				break;
+*/			case NV47:
+			/* and ID == 0x029x: but no cards defined yet */
+				ACCW(NV40P_WHAT0, 0x83280eff);
+				ACCW(NV40P_WHAT1, 0x000000a0);
+				ACCW(NV40P_WHAT2, 0x07830610);
+				ACCW(NV40P_WHAT3, 0x0000016a);
 				break;
 			default:
 				ACCW(NV40P_WHAT0, 0x83280eff);
