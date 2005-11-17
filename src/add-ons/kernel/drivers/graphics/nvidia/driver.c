@@ -309,6 +309,10 @@ static uint16 nvidia_device_list[] = {
 	0x0345 //nv36
 	0x0349 //nv36 go
 	0x034b //nv36 go.
+
+	The following ranges seem to exist as well, but no cards are defined yet:
+	0x01dx //nv47?
+	0x029x //nv47?
 */
 
 static uint16 elsa_device_list[] = {
