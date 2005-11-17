@@ -103,7 +103,7 @@ be_output_message (j_common_ptr cinfo)
  */
 
 GLOBAL(struct jpeg_error_mgr *)
-be_jpeg_std_error (struct jpeg_error_mgr * err, SETTINGS *settings)
+be_jpeg_std_error (struct jpeg_error_mgr * err, jpeg_settings *settings)
 {
 	jpeg_std_error(err);
 

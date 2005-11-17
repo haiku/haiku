@@ -29,20 +29,9 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-//----------------------------------------------------------------------------
-//
-//	Include
-//
-//----------------------------------------------------------------------------
 
 #include "JPEGTranslator.h"
 
-
-//----------------------------------------------------------------------------
-//
-//	Global variables initialization
-//
-//----------------------------------------------------------------------------
 
 // Set these accordingly
 #define JPEG_ACRONYM "JPEG"
@@ -66,6 +55,7 @@ char translatorInfo[] = "© 2002-2003, Shard\n"
 "With some colorspace conversion routines by Magnus Hellman\n"
 "          http://www.bebits.com/app/802\n"
 "";
+
 int32 translatorVersion = 273;	// 256 = v1.0.0
 
 // Define the formats we know how to read
@@ -74,7 +64,7 @@ translation_format inputFormats[] = {
 		JPEG_MIME_STRING, JPEG_DESCRIPTION },
 	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.5, 0.5,
 		B_TRANSLATOR_BITMAP_MIME_STRING, B_TRANSLATOR_BITMAP_DESCRIPTION },
-	{ 0, 0, 0, 0, 0, 0 },
+	{}
 };
 
 // Define the formats we know how to write
@@ -83,23 +73,344 @@ translation_format outputFormats[] = {
 		JPEG_MIME_STRING, JPEG_DESCRIPTION },
 	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.5, 0.5,
 		B_TRANSLATOR_BITMAP_MIME_STRING, B_TRANSLATOR_BITMAP_DESCRIPTION },
-	{ 0, 0, 0, 0, 0, 0 },
+	{}
 };
 
-bool AreSettingsRunning = false;
+
+bool gAreSettingsRunning = false;
 
 
-//----------------------------------------------------------------------------
-//
-//	Functions :: SSlider
-//
-//----------------------------------------------------------------------------
+//!	Make settings to defaults
+void
+LoadDefaultSettings(jpeg_settings *settings)
+{
+	settings->Smoothing = 0;
+	settings->Quality = 95;
+	settings->Progressive = true;
+	settings->OptimizeColors = true;
+	settings->SmallerFile = false;
+	settings->B_GRAY1_as_B_RGB24 = false;
+	settings->Always_B_RGB32 = true;
+	settings->PhotoshopCMYK = true;
+	settings->ShowReadWarningBox = true;
+}
 
-//---------------------------------------------------
-//	Constructor
-//---------------------------------------------------
-SSlider::SSlider(BRect frame, const char *name, const char *label, BMessage *message, int32 minValue, int32 maxValue, orientation posture, thumb_style thumbType, uint32 resizingMode, uint32 flags)
-:	BSlider(frame, name, label, message, minValue, maxValue, posture, thumbType, resizingMode, flags)
+
+//!	Save settings to config file
+void
+SaveSettings(jpeg_settings *settings)
+{
+	// Make path to settings file
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK) {
+		path.SetTo(SETTINGS_PATH);
+		path.Append(SETTINGS_FILE);
+	} else
+		path.Append(SETTINGS_FILE);
+	
+	// Open settings file (create it if there's no file) and write settings			
+	FILE *file = NULL;
+	if ((file = fopen( path.Path(), "wb+"))) {
+		fwrite(settings, sizeof(jpeg_settings), 1, file);
+		fclose(file);
+	}
+}
+
+
+//!	Return true if settings were run, false if not
+bool
+SettingsChangedAlert()
+{
+	// If settings view wasn't already initialized (settings not running)
+	// and user wants to run settings
+	if (!gAreSettingsRunning
+		&& (new BAlert("Different settings file",
+					"JPEG settings were set to default because of incompatible settings file.",
+					"Configure settings", "OK", NULL, B_WIDTH_AS_USUAL,
+					B_WARNING_ALERT))->Go() == 0) {
+		// Create settings window (with no quit on close!), launch
+		// it and wait until it's closed
+		status_t err;
+		TranslatorWindow *window = new TranslatorWindow(false);
+		window->Show();
+		wait_for_thread(window->Thread(), &err);
+		return true;
+	}
+
+	return false;
+}
+
+
+/*!
+	Load settings from config file
+	If can't find it make them default and try to save
+*/
+void
+LoadSettings(jpeg_settings *settings)
+{
+	// Make path to settings file
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK) {
+		path.SetTo(SETTINGS_PATH);
+		path.Append(SETTINGS_FILE);
+	} else
+		path.Append(SETTINGS_FILE);
+
+	// Open settings file (create it if there's no file) and write settings			
+	FILE *file = NULL;
+	if ((file = fopen( path.Path(), "rb"))) {
+		if ( !fread(settings, sizeof(jpeg_settings), 1, file)) {
+			// settings struct has changed size
+			// Load default settings, and Save them
+			fclose(file);
+			LoadDefaultSettings(settings);
+			SaveSettings(settings);
+			// Tell user settings were changed to default, and ask to run settings panel or not
+			if (SettingsChangedAlert())
+				// User configured settings, load them again
+				LoadSettings(settings);
+		} else
+			fclose(file);
+	} else if ((file = fopen( path.Path(), "wb+"))) {
+		LoadDefaultSettings(settings);
+		fwrite(settings, sizeof(jpeg_settings), 1, file);
+		fclose(file);
+		// Tell user settings were changed to default, and ask to run settings panel or not
+		if (SettingsChangedAlert())
+			// User configured settings, load them again
+			LoadSettings(settings);
+	}
+}
+
+
+//	#pragma mark - conversion routines
+
+
+inline void
+convert_from_gray1_to_gray8(uchar *in, uchar *out, int in_bytes)
+{
+	int32 index = 0;
+	int32 index2 = 0;
+	while (index < in_bytes) {
+		unsigned char c = in[index++];
+		for (int b = 128; b; b = b>>1) {
+			unsigned char color;
+			if (c & b)
+				color = 0;
+			else
+				color = 255;
+			out[index2++] = color;
+		}
+	}
+}
+
+
+inline void
+convert_from_gray1_to_24(uchar *in, uchar *out, int in_bytes)
+{
+	int32 index = 0;
+	int32 index2 = 0;
+	while (index < in_bytes) {
+		unsigned char c = in[index++];
+		for (int b = 128; b; b = b>>1) {
+			unsigned char color;
+			if (c & b)
+				color = 0;
+			else
+				color = 255;
+			out[index2++] = color;
+			out[index2++] = color;
+			out[index2++] = color;
+		}
+	}
+}
+
+
+inline void
+convert_from_cmap8_to_24(uchar *in, uchar *out, int in_bytes)
+{
+	const color_map * map = system_colors();
+	int32 index = 0;
+	int32 index2 = 0;
+	while (index < in_bytes) {
+		rgb_color color = map->color_list[in[index++]];
+		
+		out[index2++] = color.red;
+		out[index2++] = color.green;
+		out[index2++] = color.blue;
+	}
+}
+
+
+inline void
+convert_from_15_to_24(uchar *in, uchar *out, int in_bytes)
+{
+	int32 index = 0;
+	int32 index2 = 0;
+	int16 in_pixel;
+	while (index < in_bytes) {
+		in_pixel = in[index] | (in[index+1] << 8);
+		index += 2;
+		
+		out[index2++] = (((in_pixel & 0x7c00)) >> 7) | (((in_pixel & 0x7c00)) >> 12);
+		out[index2++] = (((in_pixel & 0x3e0)) >> 2) | (((in_pixel & 0x3e0)) >> 7);
+		out[index2++] = (((in_pixel & 0x1f)) << 3) | (((in_pixel & 0x1f)) >> 2);
+	}
+}
+
+
+inline void
+convert_from_15b_to_24(uchar *in, uchar *out, int in_bytes)
+{
+	int32 index = 0;
+	int32 index2 = 0;
+	int16 in_pixel;
+	while (index < in_bytes) {
+		in_pixel = in[index+1] | (in[index] << 8);
+		index += 2;
+		
+		out[index2++] = (((in_pixel & 0x7c00)) >> 7) | (((in_pixel & 0x7c00)) >> 12);
+		out[index2++] = (((in_pixel & 0x3e0)) >> 2) | (((in_pixel & 0x3e0)) >> 7);
+		out[index2++] = (((in_pixel & 0x1f)) << 3) | (((in_pixel & 0x1f)) >> 2);
+	}
+}
+
+
+inline void
+convert_from_16_to_24(uchar *in, uchar *out, int in_bytes)
+{
+	int32 index = 0;
+	int32 index2 = 0;
+	int16 in_pixel;
+	while (index < in_bytes) {
+		in_pixel = in[index] | (in[index+1] << 8);
+		index += 2;
+		
+		out[index2++] = (((in_pixel & 0xf800)) >> 8) | (((in_pixel & 0xf800)) >> 13);
+		out[index2++] = (((in_pixel & 0x7e0)) >> 3) | (((in_pixel & 0x7e0)) >> 9);
+		out[index2++] = (((in_pixel & 0x1f)) << 3) | (((in_pixel & 0x1f)) >> 2);
+	}
+}
+
+
+inline void
+convert_from_16b_to_24(uchar *in, uchar *out, int in_bytes)
+{
+	int32 index = 0;
+	int32 index2 = 0;
+	int16 in_pixel;
+	while (index < in_bytes) {
+		in_pixel = in[index+1] | (in[index] << 8);
+		index += 2;
+		
+		out[index2++] = (((in_pixel & 0xf800)) >> 8) | (((in_pixel & 0xf800)) >> 13);
+		out[index2++] = (((in_pixel & 0x7e0)) >> 3) | (((in_pixel & 0x7e0)) >> 9);
+		out[index2++] = (((in_pixel & 0x1f)) << 3) | (((in_pixel & 0x1f)) >> 2);
+	}
+}
+
+
+inline void
+convert_from_24_to_24(uchar *in, uchar *out, int in_bytes)
+{
+	int32 index = 0;
+	int32 index2 = 0;
+	while (index < in_bytes) {
+		out[index2++] = in[index+2];
+		out[index2++] = in[index+1];
+		out[index2++] = in[index];
+		index+=3;
+	}
+}
+
+
+inline void
+convert_from_32_to_24(uchar *in, uchar *out, int in_bytes)
+{
+	int32 index = 0;
+	int32 index2 = 0;
+	while (index < in_bytes) {
+		out[index2++] = in[index+2];
+		out[index2++] = in[index+1];
+		out[index2++] = in[index];
+		index+=4;
+	}
+}
+
+
+inline void
+convert_from_32b_to_24(uchar *in, uchar *out, int in_bytes)
+{
+	int32 index = 0;
+	int32 index2 = 0;
+	while (index < in_bytes) {
+		index++;
+		out[index2++] = in[index++];
+		out[index2++] = in[index++];
+		out[index2++] = in[index++];
+	}
+}
+
+
+inline void
+convert_from_CMYK_to_32_photoshop(uchar *in, uchar *out, int out_bytes)
+{
+	int32 index = 0;
+	int32 index2 = 0;
+	int32 black = 0;
+	while (index < out_bytes) {
+		black = in[index2+3];
+		out[index++] = in[index2+2]*black/255;
+		out[index++] = in[index2+1]*black/255;
+		out[index++] = in[index2]*black/255;
+		out[index++] = 255;
+		index2 += 4;
+	}
+}
+
+
+//!	!!! UNTESTED !!!
+inline void
+convert_from_CMYK_to_32(uchar *in, uchar *out, int out_bytes)
+{
+	int32 index = 0;
+	int32 index2 = 0;
+	int32 black = 0;
+	while (index < out_bytes) {
+		black = 255 - in[index2+3];
+		out[index++] = ((255-in[index2+2])*black)/255;
+		out[index++] = ((255-in[index2+1])*black)/255;
+		out[index++] = ((255-in[index2])*black)/255;
+		out[index++] = 255;
+		index2 += 4;
+	}
+}
+
+
+//!	RGB24 8:8:8 to xRGB 8:8:8:8
+inline void
+convert_from_24_to_32(uchar *in, uchar *out, int out_bytes)
+{
+	int32 index = 0;
+	int32 index2 = 0;
+	while (index < out_bytes) {
+		out[index++] = in[index2+2];
+		out[index++] = in[index2+1];
+		out[index++] = in[index2];
+		out[index++] = 255;
+		index2 += 3;
+	}
+}
+
+
+//	#pragma mark -
+
+
+SSlider::SSlider(BRect frame, const char *name, const char *label,
+		BMessage *message, int32 minValue, int32 maxValue, orientation posture,
+		thumb_style thumbType, uint32 resizingMode, uint32 flags)
+	: BSlider(frame, name, label, message, minValue, maxValue,
+		posture, thumbType, resizingMode, flags)
 {
 	rgb_color bar_color = { 0, 0, 229, 255 };
 	UseFillColor(true, &bar_color);
@@ -129,36 +440,33 @@ SSlider::ResizeToPreferred()
 }
 
 
-//----------------------------------------------------------------------------
-//
-//	Functions :: TranslatorReadView
-//
-//----------------------------------------------------------------------------
+//	#pragma mark -
 
-//---------------------------------------------------
-//	Constructor
-//---------------------------------------------------
-TranslatorReadView::TranslatorReadView(const char *name, SETTINGS *settings, float x, float y)
-:	SView(name, x, y),
-	Settings(settings)
+
+TranslatorReadView::TranslatorReadView(const char *name, jpeg_settings *settings,
+		float x, float y)
+	: SView(name, x, y),
+	fSettings(settings)
 {
-	alwaysrgb32 = new BCheckBox( BRect(10, GetPreferredHeight(), 10, GetPreferredHeight()), "alwaysrgb32", VIEW_LABEL_ALWAYSRGB32, new BMessage(VIEW_MSG_SET_ALWAYSRGB32));
+	alwaysrgb32 = new BCheckBox( BRect(10, GetPreferredHeight(), 10,
+		GetPreferredHeight()), "alwaysrgb32", VIEW_LABEL_ALWAYSRGB32,
+		new BMessage(VIEW_MSG_SET_ALWAYSRGB32));
 	alwaysrgb32->SetFont(be_plain_font);
-	if (Settings->Always_B_RGB32)
+	if (fSettings->Always_B_RGB32)
 		alwaysrgb32->SetValue(1);
 
 	AddChild(alwaysrgb32);
 
 	photoshopCMYK = new BCheckBox( BRect(10, GetPreferredHeight(), 10, GetPreferredHeight()), "photoshopCMYK", VIEW_LABEL_PHOTOSHOPCMYK, new BMessage(VIEW_MSG_SET_PHOTOSHOPCMYK));
 	photoshopCMYK->SetFont(be_plain_font);
-	if (Settings->PhotoshopCMYK)
+	if (fSettings->PhotoshopCMYK)
 		photoshopCMYK->SetValue(1);
 
 	AddChild(photoshopCMYK);
 
 	showerrorbox = new BCheckBox( BRect(10, GetPreferredHeight(), 10, GetPreferredHeight()), "progress", VIEW_LABEL_SHOWREADERRORBOX, new BMessage(VIEW_MSG_SET_SHOWREADERRORBOX));
 	showerrorbox->SetFont(be_plain_font);
-	if (Settings->ShowReadWarningBox)
+	if (fSettings->ShowReadWarningBox)
 		showerrorbox->SetValue(1);
 
 	AddChild(showerrorbox);
@@ -189,8 +497,8 @@ TranslatorReadView::MessageReceived(BMessage *message)
 		{
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
-				Settings->Always_B_RGB32 = value;
-				SaveSettings(Settings);
+				fSettings->Always_B_RGB32 = value;
+				SaveSettings(fSettings);
 			}
 			break;
 		}
@@ -198,8 +506,8 @@ TranslatorReadView::MessageReceived(BMessage *message)
 		{
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
-				Settings->PhotoshopCMYK = value;
-				SaveSettings(Settings);
+				fSettings->PhotoshopCMYK = value;
+				SaveSettings(fSettings);
 			}
 			break;
 		}
@@ -207,8 +515,8 @@ TranslatorReadView::MessageReceived(BMessage *message)
 		{
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
-				Settings->ShowReadWarningBox = value;
-				SaveSettings(Settings);
+				fSettings->ShowReadWarningBox = value;
+				SaveSettings(fSettings);
 			}
 			break;
 		}
@@ -228,16 +536,16 @@ TranslatorReadView::MessageReceived(BMessage *message)
 //---------------------------------------------------
 //	Constructor
 //---------------------------------------------------
-TranslatorWriteView::TranslatorWriteView(const char *name, SETTINGS *settings, float x, float y)
+TranslatorWriteView::TranslatorWriteView(const char *name, jpeg_settings *settings, float x, float y)
 :	SView(name, x, y),
-	Settings(settings)
+	fSettings(settings)
 {
 	quality = new SSlider( BRect(10, GetPreferredHeight(), 10, GetPreferredHeight()), "quality", VIEW_LABEL_QUALITY, new BMessage(VIEW_MSG_SET_QUALITY), 0, 100);
 	quality->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	quality->SetHashMarkCount(10);
 	quality->SetLimitLabels("Low", "High");
 	quality->SetFont(be_plain_font);
-	quality->SetValue(Settings->Quality);
+	quality->SetValue(fSettings->Quality);
 
 	AddChild(quality);
 
@@ -246,36 +554,36 @@ TranslatorWriteView::TranslatorWriteView(const char *name, SETTINGS *settings, f
 	smoothing->SetHashMarkCount(10);
 	smoothing->SetLimitLabels("None", "High");
 	smoothing->SetFont(be_plain_font);
-	smoothing->SetValue(Settings->Smoothing);
+	smoothing->SetValue(fSettings->Smoothing);
 
 	AddChild(smoothing);
 
 	progress = new BCheckBox( BRect(10, GetPreferredHeight()+10, 10, GetPreferredHeight()), "progress", VIEW_LABEL_PROGRESSIVE, new BMessage(VIEW_MSG_SET_PROGRESSIVE));
 	progress->SetFont(be_plain_font);
-	if (Settings->Progressive)
+	if (fSettings->Progressive)
 		progress->SetValue(1);
 
 	AddChild(progress);
 
 	optimizecolors = new BCheckBox( BRect(10, GetPreferredHeight()+5, 10, GetPreferredHeight()+5), "optimizecolors", VIEW_LABEL_OPTIMIZECOLORS, new BMessage(VIEW_MSG_SET_OPTIMIZECOLORS));
 	optimizecolors->SetFont(be_plain_font);
-	if (Settings->OptimizeColors)
+	if (fSettings->OptimizeColors)
 		optimizecolors->SetValue(1);
 	
 	AddChild(optimizecolors);
 
 	smallerfile = new BCheckBox( BRect(25, GetPreferredHeight()+5, 25, GetPreferredHeight()+5), "smallerfile", VIEW_LABEL_SMALLERFILE, new BMessage(VIEW_MSG_SET_SMALLERFILE));
 	smallerfile->SetFont(be_plain_font);
-	if (Settings->SmallerFile)
+	if (fSettings->SmallerFile)
 		smallerfile->SetValue(1);
-	if (!Settings->OptimizeColors)
+	if (!fSettings->OptimizeColors)
 		smallerfile->SetEnabled(false);
 
 	AddChild(smallerfile);
 
 	gray1asrgb24 = new BCheckBox( BRect(10, GetPreferredHeight()+5, 25, GetPreferredHeight()+5), "gray1asrgb24", VIEW_LABEL_GRAY1ASRGB24, new BMessage(VIEW_MSG_SET_GRAY1ASRGB24));
 	gray1asrgb24->SetFont(be_plain_font);
-	if (Settings->B_GRAY1_as_B_RGB24)
+	if (fSettings->B_GRAY1_as_B_RGB24)
 		gray1asrgb24->SetValue(1);
 
 	AddChild(gray1asrgb24);
@@ -309,8 +617,8 @@ TranslatorWriteView::MessageReceived(BMessage *message)
 		{
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
-				Settings->Quality = value;
-				SaveSettings(Settings);
+				fSettings->Quality = value;
+				SaveSettings(fSettings);
 			}
 			break;
 		}
@@ -318,8 +626,8 @@ TranslatorWriteView::MessageReceived(BMessage *message)
 		{
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
-				Settings->Smoothing = value;
-				SaveSettings(Settings);
+				fSettings->Smoothing = value;
+				SaveSettings(fSettings);
 			}
 			break;
 		}
@@ -327,8 +635,8 @@ TranslatorWriteView::MessageReceived(BMessage *message)
 		{
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
-				Settings->Progressive = value;
-				SaveSettings(Settings);
+				fSettings->Progressive = value;
+				SaveSettings(fSettings);
 			}
 			break;
 		}
@@ -336,18 +644,18 @@ TranslatorWriteView::MessageReceived(BMessage *message)
 		{
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
-				Settings->OptimizeColors = value;
-				SaveSettings(Settings);
+				fSettings->OptimizeColors = value;
+				SaveSettings(fSettings);
 			}
-			smallerfile->SetEnabled(Settings->OptimizeColors);
+			smallerfile->SetEnabled(fSettings->OptimizeColors);
 			break;
 		}
 		case VIEW_MSG_SET_SMALLERFILE:
 		{
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
-				Settings->SmallerFile = value;
-				SaveSettings(Settings);
+				fSettings->SmallerFile = value;
+				SaveSettings(fSettings);
 			}
 			break;
 		}
@@ -355,8 +663,8 @@ TranslatorWriteView::MessageReceived(BMessage *message)
 		{
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
-				Settings->B_GRAY1_as_B_RGB24 = value;
-				SaveSettings(Settings);
+				fSettings->B_GRAY1_as_B_RGB24 = value;
+				SaveSettings(fSettings);
 			}
 			break;
 		}
@@ -367,17 +675,11 @@ TranslatorWriteView::MessageReceived(BMessage *message)
 }
 
 
-//----------------------------------------------------------------------------
-//
-//	Functions :: TranslatorAboutView
-//
-//----------------------------------------------------------------------------
+//	#pragma mark -
 
-//---------------------------------------------------
-//	Constructor
-//---------------------------------------------------
+
 TranslatorAboutView::TranslatorAboutView(const char *name, float x, float y)
-:	SView(name, x, y)
+	: SView(name, x, y)
 {
 	BStringView *title = new BStringView( BRect(10, 0, 10, 0), "Title", translatorName);
 	title->SetFont(be_bold_font);
@@ -388,9 +690,11 @@ TranslatorAboutView::TranslatorAboutView(const char *name, float x, float y)
 	float space = title->StringWidth("    ");
 
 	char versionString[16];
-	sprintf(versionString, "v%d.%d.%d", (int)(translatorVersion >> 8), (int)((translatorVersion >> 4) & 0xf), (int)(translatorVersion & 0xf));
-	
-	BStringView *version = new BStringView( BRect(rect.right+space, rect.top, rect.right+space, rect.top), "Version", versionString);
+	sprintf(versionString, "v%d.%d.%d", (int)(translatorVersion >> 8),
+		(int)((translatorVersion >> 4) & 0xf), (int)(translatorVersion & 0xf));
+
+	BStringView *version = new BStringView(BRect(rect.right+space, rect.top,
+		rect.right+space, rect.top), "Version", versionString);
 	version->SetFont(be_plain_font);
 	version->SetFontSize( 9);
 	// Make version be in the same line as title
@@ -410,7 +714,8 @@ TranslatorAboutView::TranslatorAboutView(const char *name, float x, float y)
 		if (temp)
 			*temp = 0;
 		// Add BStringView showing what's under current
-		copyright = new BStringView( BRect(10, GetPreferredHeight(), 10, GetPreferredHeight()), "Copyright", current);
+		copyright = new BStringView(BRect(10, GetPreferredHeight(),
+			10, GetPreferredHeight()), "Copyright", current);
 		copyright->SetFont(be_plain_font);
 		copyright->SetFontSize( 9);
 		AddChild(copyright);
@@ -428,52 +733,50 @@ TranslatorAboutView::TranslatorAboutView(const char *name, float x, float y)
 }
 
 
-//----------------------------------------------------------------------------
-//
-//	Functions :: TranslatorView
-//
-//----------------------------------------------------------------------------
+//	#pragma mark -
 
-//---------------------------------------------------
-//	Constructor
-//---------------------------------------------------
+
 TranslatorView::TranslatorView(const char *name)
-:	SView(name),tabWidth(30), tabHeight(7+be_plain_font->Size()), activeChild(0)
+	: SView(name),
+	fTabWidth(30),
+	fTabHeight(7 + (int32)be_plain_font->Size()),
+		// TODO: this apparently uses BFont::Size() as height in pixels!!!
+	fActiveChild(0)
 {
 	// Set global var to true
-	AreSettingsRunning = true;
+	gAreSettingsRunning = true;
 
 	// Without this strings are not correctly aliased
 	// THX to Jack Burton for info :)
 	SetLowColor( ViewColor());
 
-	// Load settings to global Settings struct
-	LoadSettings(&Settings);
+	// Load settings to global settings struct
+	LoadSettings(&fSettings);
 
 	// Add left and top margins
-	float top = tabHeight+15;
+	float top = fTabHeight+15;
 	float left = 0;
 
 	// This will remember longest string width
 	int32 nameWidth = 0;
 
-	SView *view = new TranslatorWriteView("Write", &Settings, left, top);
+	SView *view = new TranslatorWriteView("Write", &fSettings, left, top);
 	AddChild(view);
-	nameWidth = StringWidth(view->Name());
+	nameWidth = (int32)StringWidth(view->Name());
 
-	view = new TranslatorReadView("Read", &Settings, left, top);
+	view = new TranslatorReadView("Read", &fSettings, left, top);
 	AddChild(view);
 	if (nameWidth < StringWidth(view->Name()))
-		nameWidth = StringWidth(view->Name());
+		nameWidth = (int32)StringWidth(view->Name());
 
 	view = new TranslatorAboutView("About", left, top);
 	AddChild(view);
 	if (nameWidth < StringWidth(view->Name()))
-		nameWidth = StringWidth(view->Name());
+		nameWidth = (int32)StringWidth(view->Name());
 
-	tabWidth += nameWidth;
-	if (tabWidth * CountChildren() > GetPreferredWidth())
-		ResizePreferredBy((tabWidth * CountChildren()) - GetPreferredWidth(), 0);
+	fTabWidth += nameWidth;
+	if (fTabWidth * CountChildren() > GetPreferredWidth())
+		ResizePreferredBy((fTabWidth * CountChildren()) - GetPreferredWidth(), 0);
 
 	// Add right and bottom margins
 	ResizePreferredBy(10, 15);
@@ -484,18 +787,23 @@ TranslatorView::TranslatorView(const char *name)
 	SetFlags( Flags() | B_FOLLOW_ALL);
 }
 
-//---------------------------------------------------
-//	Attached to window - resize parent to preferred
-//---------------------------------------------------
+
+TranslatorView::~TranslatorView()
+{
+	gAreSettingsRunning = false;
+}
+
+
+//!	Attached to window - resize parent to preferred
 void
 TranslatorView::AttachedToWindow()
 {
 	// Hide all children except first one
-	BView *child = NULL;
+	BView *child;
 	int32 index = 1;
-	while (child = ChildAt(index++))
+	while ((child = ChildAt(index++)) != NULL)
 		child->Hide();
-	
+
 	// Hack for DataTranslations which doesn't resize visible area to requested by view
 	// which makes some parts of bigger than usual translationviews out of visible area
 	// so if it was loaded to DataTranslations resize window if needed
@@ -504,11 +812,14 @@ TranslatorView::AttachedToWindow()
 		BView *view = Parent();
 		if (view) {
 			BRect frame = view->Frame();
-			if (frame.Width() < GetPreferredWidth() || (frame.Height()-48) < GetPreferredHeight()) {
+			if (frame.Width() < GetPreferredWidth()
+				|| (frame.Height()-48) < GetPreferredHeight()) {
 				float x = ceil(GetPreferredWidth() - frame.Width());
 				float y = ceil(GetPreferredHeight() - (frame.Height()-48));
-				if (x < 0) x = 0;
-				if (y < 0) y = 0;
+				if (x < 0)
+					x = 0;
+				if (y < 0)	
+					y = 0;
 
 				// DataTranslations has main view called "Background"
 				// change it's resizing mode so it will always resize with window
@@ -524,7 +835,7 @@ TranslatorView::AttachedToWindow()
 				if (view)
 					view->SetResizingMode(B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 
-				window->ResizeBy( x, y);
+				window->ResizeBy(x, y);
 
 				// Let user resize window if resizing option is not already there...
 				uint32 flags = window->Flags();
@@ -541,16 +852,14 @@ TranslatorView::AttachedToWindow()
 	}
 }
 
-//---------------------------------------------------
-//	DrawTabs
-//---------------------------------------------------
+
 void
 TranslatorView::Draw(BRect updateRect)
 {
 	// This is needed because DataTranslations app hides children
 	// after user changes translator
-	if (ChildAt(activeChild)->IsHidden())
-		ChildAt(activeChild)->Show();
+	if (ChildAt(fActiveChild)->IsHidden())
+		ChildAt(fActiveChild)->Show();
 
 	// Prepare colors used for drawing "tabs"
 	rgb_color dark_line_color = tint_color( ViewColor(), B_DARKEN_2_TINT);
@@ -558,85 +867,83 @@ TranslatorView::Draw(BRect updateRect)
 	rgb_color light_line_color = tint_color( ViewColor(), B_LIGHTEN_MAX_TINT);
 	rgb_color text_color = ui_color(B_MENU_ITEM_TEXT_COLOR);
 
-	int32 index = 0;
-	BView *child = NULL;
-	float left = 0;
-
 	// Clear
 	SetHighColor( ViewColor());
-	FillRect( BRect(0, 0, Frame().right, tabHeight));
+	FillRect(BRect(0, 0, Frame().right, fTabHeight));
 
-	while (child = ChildAt(index)) {
+	int32 index = 0;
+	float left = 0;
+	BView *child;
+	while ((child = ChildAt(index)) != NULL) {
+		// TODO: this apparently uses BFont::Size() as height in pixels!!!
 		// Draw outline
 		SetHighColor(dark_line_color);
-		StrokeLine( BPoint(left, 10), BPoint(left, tabHeight));
-		StrokeArc( BPoint(left+10, 10), 10, 10, 90, 90);
-		StrokeLine( BPoint(left+10, 0), BPoint(left+tabWidth-10, 0));
-		StrokeArc( BPoint(left+tabWidth-10, 10), 9, 10, 0, 90);
-		StrokeLine( BPoint(left+tabWidth-1, 10), BPoint(left+tabWidth-1, tabHeight));
+		StrokeLine(BPoint(left, 10), BPoint(left, fTabHeight));
+		StrokeArc(BPoint(left + 10, 10), 10, 10, 90, 90);
+		StrokeLine(BPoint(left + 10, 0), BPoint(left + fTabWidth - 10, 0));
+		StrokeArc(BPoint(left + fTabWidth - 10, 10), 9, 10, 0, 90);
+		StrokeLine(BPoint(left + fTabWidth - 1, 10),
+			BPoint(left + fTabWidth - 1, fTabHeight));
 		// Draw "shadow" on the right side
 		SetHighColor(darkest_line_color);
-		StrokeArc( BPoint(left+tabWidth-10, 10), 10, 10, 0, 50);
-		StrokeLine( BPoint(left+tabWidth, 10), BPoint(left+tabWidth, tabHeight-1));
+		StrokeArc( BPoint(left+fTabWidth-10, 10), 10, 10, 0, 50);
+		StrokeLine( BPoint(left+fTabWidth, 10), BPoint(left + fTabWidth, fTabHeight - 1));
 		// Draw label
 		SetHighColor(text_color);
-		DrawString( child->Name(), BPoint(left+(tabWidth/2)-(StringWidth(child->Name())/2), 3+be_plain_font->Size()));
+		DrawString(child->Name(), BPoint(left + (fTabWidth / 2)
+			- (StringWidth(child->Name()) / 2), 3 + be_plain_font->Size()));
+
 		// Draw "light" on left and top side
 		SetHighColor(light_line_color);
-		StrokeArc( BPoint(left+10, 10), 9, 9, 90, 90);
-		StrokeLine( BPoint(left+1, 10), BPoint(left+1, tabHeight));
-		StrokeLine( BPoint(left+10, 1), BPoint(left+tabWidth-8, 1));
+		StrokeArc(BPoint(left + 10, 10), 9, 9, 90, 90);
+		StrokeLine(BPoint(left + 1, 10), BPoint(left + 1, fTabHeight));
+		StrokeLine(BPoint(left + 10, 1), BPoint(left + fTabWidth - 8, 1));
 		// Draw bottom edge
-		if (activeChild != index)
-			StrokeLine( BPoint(left-2,tabHeight), BPoint(left+tabWidth,tabHeight));
+		if (fActiveChild != index)
+			StrokeLine(BPoint(left - 2, fTabHeight), BPoint(left + fTabWidth, fTabHeight));
 		else
-			StrokeLine( BPoint(left-2,tabHeight), BPoint(left+1,tabHeight));
+			StrokeLine(BPoint(left - 2, fTabHeight), BPoint(left + 1, fTabHeight));
 
-		left += tabWidth+2;
+		left += fTabWidth + 2;
 		index++;
 	}
+
 	// Draw bottom edge to the rigth side
-	StrokeLine( BPoint(left-2,tabHeight), BPoint(Bounds().Width(),tabHeight));
+	StrokeLine(BPoint(left - 2, fTabHeight), BPoint(Bounds().Width(), fTabHeight));
 }
 
-//---------------------------------------------------
-//	MouseDown, check if on tab, if so change tab if needed
-//---------------------------------------------------
+
+//!	MouseDown, check if on tab, if so change tab if needed
 void
 TranslatorView::MouseDown(BPoint where)
 {
 	// If user clicked on tabs part of view
-	if (where.y <= tabHeight)
+	if (where.y <= fTabHeight) {
 		// If there is a tab (not whole width is occupied by tabs)
-		if (where.x < tabWidth*CountChildren()) {
+		if (where.x < fTabWidth*CountChildren()) {
 			// Which tab was selected?
-			int32 index = where.x / tabWidth;
-			if (activeChild != index) {
+			int32 index = int32(where.x / fTabWidth);
+			if (fActiveChild != index) {
 				// Hide current visible child
-				ChildAt(activeChild)->Hide();
+				ChildAt(fActiveChild)->Hide();
 				// This loop is needed because it looks like in DataTranslations
 				// view gets hidden more than one time when user changes translator
 				while (ChildAt(index)->IsHidden())
 					ChildAt(index)->Show();
 				// Remember which one is currently visible
-				activeChild = index;
+				fActiveChild = index;
 				// Redraw
 				Draw( Frame());
 			}
 		}
+	}
 }
 
 
-//----------------------------------------------------------------------------
-//
-//	Functions :: TranslatorWindow
-//
-//----------------------------------------------------------------------------
+//	#pragma mark -
 
-//---------------------------------------------------
-//	Constructor
-//---------------------------------------------------
-TranslatorWindow::TranslatorWindow(bool quit_on_close)
+
+TranslatorWindow::TranslatorWindow(bool quitOnClose)
 :	BWindow(BRect(100, 100, 100, 100), "JPEG Settings", B_TITLED_WINDOW, B_NOT_ZOOMABLE)
 {
 	BRect extent(0, 0, 0, 0);
@@ -647,34 +954,16 @@ TranslatorWindow::TranslatorWindow(bool quit_on_close)
 	ResizeTo(extent.Width(), extent.Height());
 
 	// Make application quit after this window close
-	if (quit_on_close)
+	if (quitOnClose)
 		SetFlags(Flags() | B_QUIT_ON_WINDOW_CLOSE);
 }
 
 
-//----------------------------------------------------------------------------
-//
-//	Functions :: main
-//
-//----------------------------------------------------------------------------
+//	#pragma mark - Translator Add-On
 
-//---------------------------------------------------
-//	main function
-//---------------------------------------------------
-int
-main() {
-	BApplication app("application/x-vnd.Shard.JPEGTranslator");
-	
-	TranslatorWindow *window = new TranslatorWindow();
-	window->Show();
-	
-	app.Run();
-	return 0;
-}
 
-//---------------------------------------------------
-//	Hook to create and return our configuration view
-//---------------------------------------------------
+
+/*! Hook to create and return our configuration view */
 status_t
 MakeConfig(BMessage *ioExtension, BView **outView, BRect *outExtent)
 {
@@ -683,22 +972,22 @@ MakeConfig(BMessage *ioExtension, BView **outView, BRect *outExtent)
 	return B_OK;
 }
 
-//---------------------------------------------------
-//	Determine whether or not we can handle this data
-//---------------------------------------------------
+/*! Determine whether or not we can handle this data */
 status_t
-Identify(BPositionIO *inSource, const translation_format *inFormat, BMessage *ioExtension, translator_info *outInfo, uint32 outType)
+Identify(BPositionIO *inSource, const translation_format *inFormat,
+	BMessage *ioExtension, translator_info *outInfo, uint32 outType)
 {
 
-	if ((outType != 0) && (outType != B_TRANSLATOR_BITMAP) && (outType != JPEG_FORMAT))
+	if (outType != 0 && outType != B_TRANSLATOR_BITMAP && outType != JPEG_FORMAT)
 		return B_NO_TRANSLATOR;
 
 	// !!! You might need to make this buffer bigger to test for your native format
 	off_t position = inSource->Position();
 	char header[sizeof(TranslatorBitmap)];
 	status_t err = inSource->Read(header, sizeof(TranslatorBitmap));
-	inSource->Seek( position, SEEK_SET);
-	if (err < B_OK) return err;
+	inSource->Seek(position, SEEK_SET);
+	if (err < B_OK)
+		return err;
 
 	if (B_BENDIAN_TO_HOST_INT32(((TranslatorBitmap *)header)->magic) == B_TRANSLATOR_BITMAP) {
 		outInfo->type = inputFormats[1].type;
@@ -743,11 +1032,10 @@ Identify(BPositionIO *inSource, const translation_format *inFormat, BMessage *io
 	return B_OK;
 }
 
-//---------------------------------------------------
-//	Arguably the most important method in the add-on
-//---------------------------------------------------
+/*!	Arguably the most important method in the add-on */
 status_t
-Translate(BPositionIO *inSource, const translator_info *inInfo, BMessage *ioExtension, uint32 outType, BPositionIO *outDestination)
+Translate(BPositionIO *inSource, const translator_info *inInfo,
+	BMessage *ioExtension, uint32 outType, BPositionIO *outDestination)
 {
 	// If no specific type was requested, convert to the interchange format
 	if (outType == 0) outType = B_TRANSLATOR_BITMAP;
@@ -764,9 +1052,7 @@ Translate(BPositionIO *inSource, const translator_info *inInfo, BMessage *ioExte
 	return B_NO_TRANSLATOR;
 }
 
-//---------------------------------------------------
-//	The user has requested the same format for input and output, so just copy
-//---------------------------------------------------
+/*!	The user has requested the same format for input and output, so just copy */
 status_t
 Copy(BPositionIO *in, BPositionIO *out)
 {
@@ -799,22 +1085,23 @@ Copy(BPositionIO *in, BPositionIO *out)
 	return (err >= 0) ? B_OK : err;
 }
 
-//---------------------------------------------------
-//	Encode into the native format
-//---------------------------------------------------
+
+/*!	Encode into the native format */
 status_t
 Compress(BPositionIO *in, BPositionIO *out)
 {
 	// Load Settings
-	SETTINGS Settings;
-	LoadSettings(&Settings);
+	jpeg_settings settings;
+	LoadSettings(&settings);
 
 	// Read info about bitmap
 	TranslatorBitmap header;
 	status_t err = in->Read(&header, sizeof(TranslatorBitmap));
-	if (err < B_OK) return err;
-	else if (err < (int)sizeof(TranslatorBitmap)) return B_ERROR;
-	
+	if (err < B_OK)
+		return err;
+	else if (err < (int)sizeof(TranslatorBitmap))
+		return B_ERROR;
+
 	// Grab dimension, color space, and size information from the stream
 	BRect bounds;
 	bounds.left = B_BENDIAN_TO_HOST_FLOAT(header.bounds.left);
@@ -837,17 +1124,14 @@ Compress(BPositionIO *in, BPositionIO *out)
 	int32 out_row_bytes;
 	int padding = 0;
 
-	switch ((color_space)B_BENDIAN_TO_HOST_INT32(header.colors))
-	{
+	switch ((color_space)B_BENDIAN_TO_HOST_INT32(header.colors)) {
 		case B_CMAP8:
-		{
 			converter = convert_from_cmap8_to_24;
 			padding = in_row_bytes - width;
 			break;
-		}
+
 		case B_GRAY1:
-		{
-			if (Settings.B_GRAY1_as_B_RGB24) {
+			if (settings.B_GRAY1_as_B_RGB24) {
 				converter = convert_from_gray1_to_24;
 			} else {
 				jpg_input_components = 1;
@@ -856,84 +1140,72 @@ Compress(BPositionIO *in, BPositionIO *out)
 			}
 			padding = in_row_bytes - (width/8);
 			break;
-		}
+
 		case B_GRAY8:
-		{
 			jpg_input_components = 1;
 			jpg_color_space = JCS_GRAYSCALE;
 			padding = in_row_bytes - width;
 			break;
-		}
+
 		case B_RGB15:
 		case B_RGBA15:
-		{
 			converter = convert_from_15_to_24;
 			padding = in_row_bytes - (width * 2);
 			break;
-		}
+
 		case B_RGB15_BIG:
 		case B_RGBA15_BIG:
-		{
 			converter = convert_from_15b_to_24;
 			padding = in_row_bytes - (width * 2);
 			break;
-		}
+
 		case B_RGB16:
-		{
 			converter = convert_from_16_to_24;
 			padding = in_row_bytes - (width * 2);
 			break;
-		}
+
 		case B_RGB16_BIG:
-		{
 			converter = convert_from_16b_to_24;
 			padding = in_row_bytes - (width * 2);
 			break;
-		}
+
 		case B_RGB24:
-		{
 			converter = convert_from_24_to_24;
 			padding = in_row_bytes - (width * 3);
 			break;
-		}
+
 		case B_RGB24_BIG:
-		{
 			padding = in_row_bytes - (width * 3);
 			break;
-		}
+
 		case B_RGB32:
 		case B_RGBA32:
-		{
 			converter = convert_from_32_to_24;
 			padding = in_row_bytes - (width * 4);
 			break;
-		}
+
 		case B_RGB32_BIG:
 		case B_RGBA32_BIG:
-		{
 			converter = convert_from_32b_to_24;
 			padding = in_row_bytes - (width * 4);
 			break;
-		}
+
 		case B_CMYK32:
-		{
 			jpg_color_space = JCS_CMYK;
 			jpg_input_components = 4;
 			padding = in_row_bytes - (width * 4);
 			break;
-		}
+
 		default:
-		{
 			fprintf(stderr, "Wrong type: Color space not implemented.\n");
 			return B_ERROR;
-		}
 	}
 	out_row_bytes = jpg_input_components * width;
 
 	// Set basic things needed for jpeg writing
 	struct jpeg_compress_struct cinfo;
 	struct jpeg_error_mgr jerr;
-	cinfo.err = be_jpeg_std_error(&jerr, &Settings);
+	cinfo.err = be_jpeg_std_error(&jerr, &settings);
 	jpeg_create_compress(&cinfo);
 	be_jpeg_stdio_dest(&cinfo, out);
 
@@ -949,15 +1221,15 @@ Compress(BPositionIO *in, BPositionIO *out)
 
 	// This is needed to prevent some colors loss
 	// With it generated jpegs are as good as from Fireworks (at last! :D)
-	if( Settings.OptimizeColors) {
+	if (settings.OptimizeColors) {
 		int index = 0;
-		while( index < cinfo.num_components) {
+		while (index < cinfo.num_components) {
 			cinfo.comp_info[index].h_samp_factor = 1;
 			cinfo.comp_info[index].v_samp_factor = 1;
 			// This will make file smaller, but with worse quality more or less
 			// like with 93%-94% (but it's subjective opinion) on tested images
 			// but with smaller size (between 92% and 93% on tested images)
-			if(Settings.SmallerFile)
+			if (settings.SmallerFile)
 				cinfo.comp_info[index].quant_tbl_no = 1;
 			// This will make bigger file, but also better quality ;]
 			// from my tests it seems like useless - better quality with smaller
@@ -969,17 +1241,17 @@ Compress(BPositionIO *in, BPositionIO *out)
 	}
 
 	// Set quality
-	jpeg_set_quality(&cinfo, Settings.Quality, true);
-	
+	jpeg_set_quality(&cinfo, settings.Quality, true);
+
 	// Set progressive compression if needed
 	// if not, turn on optimizing in libjpeg
-	if (Settings.Progressive)
+	if (settings.Progressive)
 		jpeg_simple_progression(&cinfo);
 	else
 		cinfo.optimize_coding = TRUE;
 
 	// Set smoothing (effect like Blur)
-	cinfo.smoothing_factor = Settings.Smoothing;
+	cinfo.smoothing_factor = settings.Smoothing;
 
 	// Initialize compression
 	jpeg_start_compress(&cinfo, TRUE);
@@ -991,13 +1263,15 @@ Compress(BPositionIO *in, BPositionIO *out)
 
 	// Allocate scanline
 	// Use libjpeg memory allocation functions, so in case of error it will free them itself
-	in_scanline = (unsigned char *) (cinfo.mem->alloc_large) ( (j_common_ptr)&cinfo, JPOOL_PERMANENT, in_row_bytes);
+	in_scanline = (unsigned char *)(cinfo.mem->alloc_large)((j_common_ptr)&cinfo,
+		JPOOL_PERMANENT, in_row_bytes);
 
 	// We need 2nd scanline storage ony for conversion
 	if (converter != NULL) {
 		// There will be conversion, allocate second scanline...
 		// Use libjpeg memory allocation functions, so in case of error it will free them itself
-	    out_scanline = (unsigned char *) (cinfo.mem->alloc_large) ( (j_common_ptr)&cinfo, JPOOL_PERMANENT, out_row_bytes);
+	    out_scanline = (unsigned char *)(cinfo.mem->alloc_large)((j_common_ptr)&cinfo,
+	    	JPOOL_PERMANENT, out_row_bytes);
 		// ... and make it the one to write to file
 		writeline = out_scanline;
 	} else
@@ -1007,7 +1281,8 @@ Compress(BPositionIO *in, BPositionIO *out)
 		// Read scanline
 		err = in->Read(in_scanline, in_row_bytes);
 		if (err < in_row_bytes)
-			return (err < B_OK) ? Error( (j_common_ptr)&cinfo, err) : Error( (j_common_ptr)&cinfo, B_ERROR);
+			return err < B_OK ? Error((j_common_ptr)&cinfo, err) 
+				: Error((j_common_ptr)&cinfo, B_ERROR);
 
 		// Convert if needed
 		if (converter != NULL)
@@ -1019,24 +1294,22 @@ Compress(BPositionIO *in, BPositionIO *out)
 
 	jpeg_finish_compress(&cinfo);
 	jpeg_destroy_compress(&cinfo);
-	
 	return B_OK;
 }
 
-//---------------------------------------------------
-//	Decode the native format
-//---------------------------------------------------
+
+/*!	Decode the native format */
 status_t
 Decompress(BPositionIO *in, BPositionIO *out)
 {
 	// Load Settings
-	SETTINGS Settings;
-	LoadSettings(&Settings);
+	jpeg_settings settings;
+	LoadSettings(&settings);
 
 	// Set basic things needed for jpeg reading
 	struct jpeg_decompress_struct cinfo;
 	struct jpeg_error_mgr jerr;
-	cinfo.err = be_jpeg_std_error(&jerr, &Settings);
+	cinfo.err = be_jpeg_std_error(&jerr, &settings);
 	jpeg_create_decompress(&cinfo);
 	be_jpeg_stdio_src(&cinfo, in);
 
@@ -1053,14 +1326,13 @@ Decompress(BPositionIO *in, BPositionIO *out)
 
 	// If color space isn't rgb
 	if (cinfo.out_color_space != JCS_RGB) {
-		switch (cinfo.out_color_space)
-		{
+		switch (cinfo.out_color_space) {
 			case JCS_UNKNOWN:		/* error/unspecified */
 				fprintf(stderr, "From Type: Jpeg uses unknown color type\n");
 				break;
 			case JCS_GRAYSCALE:		/* monochrome */
 				// Check if user wants to read only as RGB32 or not
-				if (!Settings.Always_B_RGB32) {
+				if (!settings.Always_B_RGB32) {
 					// Grayscale
 					out_color_space = B_GRAY8;
 					out_color_components = 1;
@@ -1082,7 +1354,7 @@ Decompress(BPositionIO *in, BPositionIO *out)
 				// Fall through to CMYK since we need the same settings
 			case JCS_CMYK:		/* C/M/Y/K */
 				// Use proper converter
-				if (Settings.PhotoshopCMYK)
+				if (settings.PhotoshopCMYK)
 					converter = convert_from_CMYK_to_32_photoshop;
 				else
 					converter = convert_from_CMYK_to_32;
@@ -1115,8 +1387,10 @@ Decompress(BPositionIO *in, BPositionIO *out)
 
 	// Write out the header
 	status_t err = out->Write(&header, sizeof(TranslatorBitmap));
-	if (err < B_OK) return Error( (j_common_ptr)&cinfo, err);
-	else if (err < (int)sizeof(TranslatorBitmap)) return Error( (j_common_ptr)&cinfo, B_ERROR);
+	if (err < B_OK)
+		return Error((j_common_ptr)&cinfo, err);
+	else if (err < (int)sizeof(TranslatorBitmap))
+		return Error((j_common_ptr)&cinfo, B_ERROR);
 
 	// Declare scanlines
 	JSAMPROW in_scanline = NULL;
@@ -1125,13 +1399,15 @@ Decompress(BPositionIO *in, BPositionIO *out)
 
 	// Allocate scanline
 	// Use libjpeg memory allocation functions, so in case of error it will free them itself
-    in_scanline = (unsigned char *) (cinfo.mem->alloc_large) ( (j_common_ptr)&cinfo, JPOOL_PERMANENT, row_bytes);
+    in_scanline = (unsigned char *)(cinfo.mem->alloc_large)((j_common_ptr)&cinfo,
+    	JPOOL_PERMANENT, row_bytes);
 
 	// We need 2nd scanline storage only for conversion
 	if (converter != NULL) {
 		// There will be conversion, allocate second scanline...
 		// Use libjpeg memory allocation functions, so in case of error it will free them itself
-	    out_scanline = (unsigned char *) (cinfo.mem->alloc_large) ( (j_common_ptr)&cinfo, JPOOL_PERMANENT, row_bytes);
+	    out_scanline = (unsigned char *)(cinfo.mem->alloc_large)((j_common_ptr)&cinfo,
+	    	JPOOL_PERMANENT, row_bytes);
 		// ... and make it the one to write to file
 		writeline = out_scanline;
 	} else
@@ -1142,28 +1418,44 @@ Decompress(BPositionIO *in, BPositionIO *out)
 		jpeg_read_scanlines(&cinfo, &in_scanline, 1);
 
 		// Convert if needed
-		if( converter != NULL)
+		if (converter != NULL)
 			converter(in_scanline, out_scanline, row_bytes);
 
   		// Write the scanline buffer to the output stream
 		err = out->Write(writeline, row_bytes);
 		if (err < row_bytes)
-			return (err < B_OK) ? Error( (j_common_ptr)&cinfo, err) : Error( (j_common_ptr)&cinfo, B_ERROR);
+			return err < B_OK ? Error((j_common_ptr)&cinfo, err)
+				: Error((j_common_ptr)&cinfo, B_ERROR);
 	}
 
 	jpeg_finish_decompress(&cinfo);
 	jpeg_destroy_decompress(&cinfo);
-
 	return B_OK;
 }
 
-//---------------------------------------------------
-//	Frees jpeg alocated memory
-//	Returns given error (B_ERROR by default)
-//---------------------------------------------------
+/*!
+	Frees jpeg alocated memory
+	Returns given error (B_ERROR by default)
+*/
 status_t
 Error(j_common_ptr cinfo, status_t error)
 {
 	jpeg_destroy(cinfo);
 	return error;
 }
+
+
+//	#pragma mark -
+
+
+int
+main() {
+	BApplication app("application/x-vnd.Shard.JPEGTranslator");
+	
+	TranslatorWindow *window = new TranslatorWindow();
+	window->Show();
+	
+	app.Run();
+	return 0;
+}
+
