@@ -116,7 +116,7 @@ status_t nv_acc_wait_idle_dma()
  * Engine required init. */
 status_t nv_acc_init_dma()
 {
-	uint32 cnt;
+	uint32 cnt, tmp;
 	uint32 surf_depth, cmd_depth;
 	/* reset the engine DMA stalls counter */
 	err = 0;
@@ -689,7 +689,12 @@ status_t nv_acc_init_dma()
 			/* set limit_viol_pix_adress(?): more likely something unknown.. */
 			ACCW(NV25_WHAT0, 0x00be3c5f);
 
-//new stuff needs to be inhere...
+			/* setup some unknown serially accessed registers (?) */
+			tmp = (NV_REG32(NV32_NV4X_WHAT0) & 0x000000ff);
+			for (cnt = 0; (tmp && !(tmp & 0x00000001)); tmp >>= 1, cnt++);
+			{
+				ACCW(NV4X_WHAT2, cnt);
+			}
 
 			/* unknown.. */
 			switch (si->ps.card_type)
