@@ -1587,7 +1587,7 @@ if (myRootLayer)
 			// 2) int32 button state
 
 			fLink.Attach<BPoint>(fDesktop->HWInterface()->GetCursorPosition());
-			fLink.Attach<int32>(fDesktop->ActiveRootLayer()->Buttons());
+			fLink.Attach<int32>(fDesktop->RootLayer()->Buttons());
 
 			fLink.Flush();
 			break;

@@ -36,7 +36,7 @@ class EventDispatcher : public BLocker {
 		void RemoveListener(BMessenger& messenger, int32 token);
 
 		void SetMouseFilter(BMessageFilter* filter);
-		void SetKeyFilter(BMessageFilter* filter);
+		void SetKeyboardFilter(BMessageFilter* filter);
 
 		bool HasCursorThread();
 		void SetHWInterface(HWInterface* interface);
@@ -81,7 +81,7 @@ class EventDispatcher : public BLocker {
 		bool			fSuspendFocus;
 
 		BMessageFilter*	fMouseFilter;
-		BMessageFilter*	fKeyFilter;
+		BMessageFilter*	fKeyboardFilter;
 
 		BObjectList<event_target> fListeners;
 

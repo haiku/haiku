@@ -30,6 +30,7 @@
 #include <WindowInfo.h>
 #include <ServerProtocol.h>
 
+#include <Entry.h>
 #include <Message.h>
 #include <MessageFilter.h>
 #include <Region.h>
@@ -46,6 +47,98 @@
 #else
 #	define STRACE(a) ;
 #endif
+
+
+class KeyboardFilter : public BMessageFilter {
+	public:
+		KeyboardFilter(Desktop* desktop);
+
+		virtual filter_result Filter(BMessage* message, BHandler** _target);
+
+	private:
+		Desktop* fDesktop;
+};
+
+
+KeyboardFilter::KeyboardFilter(Desktop* desktop)
+	: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
+	fDesktop(desktop)
+{
+}
+
+
+filter_result
+KeyboardFilter::Filter(BMessage* message, BHandler** /*_target*/)
+{
+	int32 key;
+	int32 modifiers;
+
+	if (message->what != B_KEY_DOWN
+		|| message->FindInt32("key", &key) != B_OK
+		|| message->FindInt32("modifiers", &modifiers) != B_OK)
+		return B_DISPATCH_MESSAGE;
+
+	// Check for safe video mode (F12 + l-cmd + l-ctrl + l-shift)
+	if (key == 0x0d
+		&& (modifiers & (B_LEFT_COMMAND_KEY
+				| B_LEFT_CONTROL_KEY | B_LEFT_SHIFT_KEY)) != 0)
+	{
+		// TODO: Set to Safe Mode in KeyboardEventHandler:B_KEY_DOWN.
+		STRACE(("Safe Video Mode invoked - code unimplemented\n"));
+		return B_SKIP_MESSAGE;
+	}
+
+	if (key > 0x01 && key < 0x0e) {
+		// workspace change, F1-F12
+
+#if !TEST_MODE
+		if (modifiers & B_COMMAND_KEY)
+#else
+		if (modifiers & B_CONTROL_KEY)
+#endif
+		{
+			STRACE(("Set Workspace %ld\n", key - 1));
+			RootLayer* root = fDesktop->RootLayer();
+
+			root->Lock();
+			root->SetActiveWorkspace(key - 2);
+
+#ifdef APPSERVER_ROOTLAYER_SHOW_WORKSPACE_NUMBER
+			// to draw the current Workspace index on screen.
+			BRegion region(VisibleRegion());
+			fDesktop->GetDrawingEngine()->ConstrainClippingRegion(&region);
+			root->Draw(region.Frame());
+			fDesktop->GetDrawingEngine()->ConstrainClippingRegion(NULL);
+#endif
+			root->Unlock();
+			return B_SKIP_MESSAGE;
+		}
+	}
+
+	// TODO: this should be moved client side!
+	// (that's how it is done in BeOS, clients could need this key for
+	// different purposes - also, it's preferrable to let the client
+	// write the dump within his own environment)
+	if (key == 0xe) {
+		// screen dump, PrintScreen
+		char filename[128];
+		BEntry entry;
+
+		int32 index = 1;
+		do {
+			sprintf(filename, "/boot/home/screen%ld.png", index++);
+			entry.SetTo(filename);
+		} while(entry.Exists());
+
+		fDesktop->GetDrawingEngine()->DumpToFile(filename);
+		return B_SKIP_MESSAGE;
+	}
+
+	return B_DISPATCH_MESSAGE;
+}
+
+
+//	#pragma mark -
 
 
 Desktop::Desktop(uid_t userID)
@@ -94,7 +187,7 @@ Desktop::Init()
 	// TODO: add user identity to the name
 	char name[32];
 	sprintf(name, "RootLayer %d", 1);
-	fRootLayer = new RootLayer(name, 4, this, GetDrawingEngine());
+	fRootLayer = new ::RootLayer(name, 4, this, GetDrawingEngine());
 
 #if TEST_MODE
 	gInputManager->AddStream(new InputServerStream);
@@ -105,7 +198,7 @@ Desktop::Init()
 	// temporary hack to get things started
 	class MouseFilter : public BMessageFilter {
 		public:
-			MouseFilter(RootLayer* layer)
+			MouseFilter(::RootLayer* layer)
 				: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
 				fRootLayer(layer)
 			{
@@ -121,9 +214,10 @@ Desktop::Init()
 			}
 
 		private:
-			RootLayer* fRootLayer;
+			::RootLayer* fRootLayer;
 	};
 	fEventDispatcher.SetMouseFilter(new MouseFilter(fRootLayer));
+	fEventDispatcher.SetKeyboardFilter(new KeyboardFilter(this));
 
 	// take care of setting the default cursor
 	ServerCursor *cursor = fCursorManager.GetCursor(B_CURSOR_DEFAULT);
@@ -394,20 +488,17 @@ Desktop::AddWinBorder(WinBorder *winBorder)
 	if (!winBorder)
 		return;
 
-	// R2: how to determine the RootLayer to which this window should be added???
-	// for now, use ActiveRootLayer() because we only have one instance.
-
 	int32 feel = winBorder->Feel();
 
 	// we are ServerApp thread, we need to lock RootLayer here.
-	ActiveRootLayer()->Lock();
+	RootLayer()->Lock();
 
 	// we're playing with window list. lock first.
 	Lock();
 
 	if (fWinBorderList.HasItem(winBorder)) {
 		Unlock();
-		ActiveRootLayer()->Unlock();
+		RootLayer()->Unlock();
 		debugger("AddWinBorder: WinBorder already in Desktop list\n");
 		return;
 	}
@@ -443,12 +534,12 @@ Desktop::AddWinBorder(WinBorder *winBorder)
 	}
 
 	// send WinBorder to be added to workspaces
-	ActiveRootLayer()->AddWinBorder(winBorder);
+	RootLayer()->AddWinBorder(winBorder);
 
 	// hey, unlock!
 	Unlock();
 
-	ActiveRootLayer()->Unlock();
+	RootLayer()->Unlock();
 }
 
 
@@ -459,7 +550,7 @@ Desktop::RemoveWinBorder(WinBorder *winBorder)
 		return;
 
 	// we are ServerApp thread, we need to lock RootLayer here.
-	ActiveRootLayer()->Lock();
+	RootLayer()->Lock();
 
 	// we're playing with window list. lock first.
 	Lock();
@@ -494,16 +585,16 @@ Desktop::RemoveWinBorder(WinBorder *winBorder)
 		}
 	} else {
 		Unlock();
-		ActiveRootLayer()->Unlock();
+		RootLayer()->Unlock();
 		debugger("RemoveWinBorder: WinBorder not found in Desktop list\n");
 		return;
 	}
 
 	// Tell to winBorder's RootLayer about this.
-	ActiveRootLayer()->RemoveWinBorder(winBorder);
+	RootLayer()->RemoveWinBorder(winBorder);
 
 	Unlock();
-	ActiveRootLayer()->Unlock();
+	RootLayer()->Unlock();
 }
 
 
@@ -538,7 +629,7 @@ Desktop::AddWinBorderToSubset(WinBorder *winBorder, WinBorder *toWinBorder)
 	}
 
 	// send WinBorder to be added to workspaces, if not already in there.
-	ActiveRootLayer()->AddSubsetWinBorder(winBorder, toWinBorder);
+	RootLayer()->AddSubsetWinBorder(winBorder, toWinBorder);
 
 	Unlock();
 }
@@ -562,7 +653,7 @@ Desktop::RemoveWinBorderFromSubset(WinBorder *winBorder, WinBorder *fromWinBorde
 	}
 
 	// remove WinBorder from workspace, if needed - some other windows may still have it in their subset
-	ActiveRootLayer()->RemoveSubsetWinBorder(winBorder, fromWinBorder);
+	RootLayer()->RemoveSubsetWinBorder(winBorder, fromWinBorder);
 
 	if (fromWinBorder->Feel() == B_NORMAL_WINDOW_FEEL) {
 		//remove from this normal_window's subset.

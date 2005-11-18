@@ -847,7 +847,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			STRACE(("ServerApp %s: get current workspace\n", Signature()));
 
 			// TODO: Locking this way is not nice
-			RootLayer *root = fDesktop->ActiveRootLayer();
+			RootLayer *root = fDesktop->RootLayer();
 			root->Lock();
 			
 			fLink.StartMessage(SERVER_TRUE);
@@ -865,7 +865,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// TODO: See above
 			int32 index;
 			link.Read<int32>(&index);
-			RootLayer *root = fDesktop->ActiveRootLayer();
+			RootLayer *root = fDesktop->RootLayer();
 			root->Lock();
 			root->SetActiveWorkspace(index);
 			root->Unlock();
@@ -2098,9 +2098,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			bool makedefault = false;
 			link.Read<bool>(&makedefault);
 
-// TODO: lock RootLayer, set mode and tell it to update it's frame and all clipping
-// optionally put this into a message and let the root layer thread handle it.
-			RootLayer* rootLayer = fDesktop->ActiveRootLayer();
+			RootLayer* rootLayer = fDesktop->RootLayer();
 			rootLayer->Lock();
 			status_t status = fDesktop->ScreenAt(0)->SetMode(mode);
 			if (status == B_OK) {
@@ -2189,7 +2187,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			// ToDo: locking is probably wrong - why the hell is there no (safe)
 			//		way to get to the workspace object directly?
-			RootLayer *root = fDesktop->ActiveRootLayer();
+			RootLayer *root = fDesktop->RootLayer();
 			root->Lock();
 
 			Workspace *workspace;

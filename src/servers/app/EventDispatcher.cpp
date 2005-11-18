@@ -61,7 +61,7 @@ EventDispatcher::EventDispatcher()
 	fTransit(false),
 	fSuspendFocus(false),
 	fMouseFilter(NULL),
-	fKeyFilter(NULL),
+	fKeyboardFilter(NULL),
 	fListeners(10, true),
 		// the list owns its items
 	fCursorLock("cursor loop lock"),
@@ -322,15 +322,15 @@ EventDispatcher::SetMouseFilter(BMessageFilter* filter)
 
 
 void
-EventDispatcher::SetKeyFilter(BMessageFilter* filter)
+EventDispatcher::SetKeyboardFilter(BMessageFilter* filter)
 {
 	BAutolock _(this);
 
-	if (fKeyFilter == filter)
+	if (fKeyboardFilter == filter)
 		return;
 
-	delete fKeyFilter;
-	fKeyFilter = filter;
+	delete fKeyboardFilter;
+	fKeyboardFilter = filter;
 }
 
 
@@ -501,8 +501,8 @@ EventDispatcher::_EventLoop()
 			case B_UNMAPPED_KEY_DOWN:
 			case B_UNMAPPED_KEY_UP:
 			case B_MODIFIERS_CHANGED:
-				if (fKeyFilter != NULL
-					&& fKeyFilter->Filter(event, NULL) == B_SKIP_MESSAGE)
+				if (fKeyboardFilter != NULL
+					&& fKeyboardFilter->Filter(event, NULL) == B_SKIP_MESSAGE)
 					break;
 
 				keyboardEvent = true;

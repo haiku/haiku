@@ -60,7 +60,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 									{ return fActiveScreen; }
 	inline	Screen*				ActiveScreen() const
 									{ return fActiveScreen; }
-	inline	RootLayer*			ActiveRootLayer() const { return fRootLayer; }
+	inline	::RootLayer*		RootLayer() const { return fRootLayer; }
 	inline	CursorManager&		GetCursorManager() { return fCursorManager; }
 
 	virtual void				ScreenRemoved(Screen* screen) {}
@@ -116,7 +116,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 
 			BObjectList<WinBorder> fWinBorderList;
 
-			RootLayer*			fRootLayer;
+			::RootLayer*		fRootLayer;
 			Screen*				fActiveScreen;
 			
 			CursorManager		fCursorManager;

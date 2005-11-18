@@ -18,7 +18,7 @@
 #include <Window.h>
 #include <List.h>
 #include <Message.h>
-#include <Entry.h>
+//#include <Entry.h>
 #include <File.h>
 #include <PortLink.h>
 
@@ -1052,134 +1052,6 @@ RootLayer::MouseEventHandler(BMessage *msg)
 			printf("RootLayer::MouseEventHandler(): WARNING: unknown message\n");
 			break;
 		}
-	}
-}
-
-
-void
-RootLayer::KeyboardEventHandler(BMessage *msg)
-{
-	switch (msg->what) {
-		case B_KEY_DOWN:
-		{
-			int32 scancode = 0;
-			int32 modifiers = 0;
-			
-			msg->FindInt32("key", &scancode);
-			msg->FindInt32("modifiers", &modifiers);
-
-			// F1-F12		
-			if (scancode > 0x01 && scancode < 0x0e) {
-				// Check for workspace change or safe video mode
-				if (scancode == 0x0d && (modifiers & (B_LEFT_COMMAND_KEY
-											| B_LEFT_CONTROL_KEY | B_LEFT_SHIFT_KEY)) != 0)
-				{
-					// TODO: Set to Safe Mode in KeyboardEventHandler:B_KEY_DOWN. (DrawingEngine API change)
-					STRACE(("Safe Video Mode invoked - code unimplemented\n"));
-					break;
-				}
-
-#if !TEST_MODE
-				if (modifiers & B_COMMAND_KEY)
-#else
-				if (modifiers & B_CONTROL_KEY)
-#endif
-				{
-					STRACE(("Set Workspace %ld\n",scancode-1));
-					SetActiveWorkspace(scancode - 2);
-				#ifdef APPSERVER_ROOTLAYER_SHOW_WORKSPACE_NUMBER
-					// to draw the current Workspace index on screen.
-					BRegion reg(VisibleRegion());
-					fDriver->ConstrainClippingRegion(&reg);
-					Draw(reg.Frame());
-					fDriver->ConstrainClippingRegion(NULL);
-				#endif
-					break;
-				}	
-			}
-
-			// Tab key
-			if (scancode == 0x26 && (modifiers & B_CONTROL_KEY)) {
-				STRACE(("Twitcher\n"));
-				//ServerApp *deskbar = app_server->FindApp("application/x-vnd.Be-TSKB");
-				//if(deskbar)
-				//{
-			// TODO: implement;
-					printf("Send Twitcher message key to Deskbar - unimplmemented\n");
-					break;
-				//}
-			}
-
-			// PrintScreen
-			if (scancode == 0xe) {
-				if (GetDrawingEngine()) {
-					char filename[128];
-					BEntry entry;
-
-					int32 index = 1;
-					do {
-						sprintf(filename, "/boot/home/screen%ld.png", index++);
-						entry.SetTo(filename);
-					} while(entry.Exists());
-
-					GetDrawingEngine()->DumpToFile(filename);
-
-					break;
-				}
-			}
-
-			// We got this far, so apparently it's safe to pass to the active
-			// window.
-
-			if (Focus())
-				Focus()->KeyDown(msg);
-
-			break;
-		}
-
-		case B_KEY_UP:
-		{
-			int32 scancode = 0;
-			int32 modifiers = 0;
-			
-			msg->FindInt32("key", &scancode);
-			msg->FindInt32("modifiers", &modifiers);
-
-			// Tab key
-			if (scancode == 0x26 && (modifiers & B_CONTROL_KEY)) {
-				//ServerApp *deskbar=app_server->FindApp("application/x-vnd.Be-TSKB");
-				//if(deskbar)
-				//{
-					printf("Send Twitcher message key to Deskbar - unimplmemented\n");
-					break;
-				//}
-			}
-
-			// We got this far, so apparently it's safe to pass to the active
-			// window.
-
-			if (Focus())
-				Focus()->KeyUp(msg);
-			break;
-		}
-
-		case B_UNMAPPED_KEY_DOWN:
-			if (Focus())
-				Focus()->UnmappedKeyDown(msg);
-			break;
-
-		case B_UNMAPPED_KEY_UP:
-			if (Focus())
-				Focus()->UnmappedKeyUp(msg);
-			break;
-
-		case B_MODIFIERS_CHANGED:
-			if (Focus())
-				Focus()->ModifiersChanged(msg);
-			break;
-
-		default:
-			break;
 	}
 }
 

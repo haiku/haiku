@@ -123,10 +123,6 @@ public:
 
 			thread_id			LockingThread() { return fAllRegionsLock.LockingThread(); }
 
-//			BRegion				fRedrawReg;
-//			BList				fCopyRegList;
-//			BList				fCopyList;
-
 private:
 friend class Desktop;
 
@@ -143,8 +139,6 @@ friend class Desktop;
 
 			// Input related methods
 			void				MouseEventHandler(BMessage *msg);
-			void				KeyboardEventHandler(BMessage *msg);
-
 			void				_ProcessMouseMovedEvent(BMessage *msg);
 
 			Desktop*			fDesktop;

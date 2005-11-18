@@ -806,45 +806,6 @@ Layer::MouseWheelChanged(const BMessage *msg)
 	}
 }
 
-void
-Layer::KeyDown(const BMessage *msg)
-{
-	if (Window() && !IsTopLayer()) {
-		Window()->SendMessageToClient(msg, B_NULL_TOKEN, true);
-	}
-}
-
-void
-Layer::KeyUp(const BMessage *msg)
-{
-	if (Window() && !IsTopLayer()) {
-		Window()->SendMessageToClient(msg, B_NULL_TOKEN, true);
-	}
-}
-
-void
-Layer::UnmappedKeyDown(const BMessage *msg)
-{
-	if (Window() && !IsTopLayer()) {
-		Window()->SendMessageToClient(msg, B_NULL_TOKEN, true);
-	}
-}
-
-void
-Layer::UnmappedKeyUp(const BMessage *msg)
-{
-	if (Window() && !IsTopLayer()) {
-		Window()->SendMessageToClient(msg, B_NULL_TOKEN, true);
-	}
-}
-
-void
-Layer::ModifiersChanged(const BMessage *msg)
-{
-	if (Window() && !IsTopLayer()) {
-		Window()->SendMessageToClient(msg, B_NULL_TOKEN, true);
-	}
-}
 
 void
 Layer::WorkspaceActivated(int32 index, bool active)
