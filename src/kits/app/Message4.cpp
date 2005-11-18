@@ -213,8 +213,10 @@ BMessage::GetInfo(type_code typeRequested, int32 index, char **nameFound,
 		if (index >= fHeader->fieldCount)
 			return B_BAD_INDEX;
 
-		*nameFound = (char *)fData + fFields[index].offset;
-		*typeFound = fFields[index].type;
+		if (nameFound)
+			*nameFound = (char *)fData + fFields[index].offset;
+		if (typeFound)
+			*typeFound = fFields[index].type;
 		if (countFound)
 			*countFound = fFields[index].count;
 		return B_OK;
@@ -227,8 +229,10 @@ BMessage::GetInfo(type_code typeRequested, int32 index, char **nameFound,
 			counter++;
 
 		if (counter == index) {
-			*nameFound = (char *)fData + field->offset;
-			*typeFound = field->type;
+			if (nameFound)
+				*nameFound = (char *)fData + field->offset;
+			if (typeFound)
+				*typeFound = field->type;
 			if (countFound)
 				*countFound = field->count;
 			return B_OK;
@@ -255,7 +259,8 @@ BMessage::GetInfo(const char *name, type_code *typeFound, int32 *countFound)
 	if (result < B_OK || !field)
 		return result;
 
-	*typeFound = field->type;
+	if (typeFound)
+		*typeFound = field->type;
 	if (countFound)
 		*countFound = field->count;
 
@@ -273,8 +278,10 @@ BMessage::GetInfo(const char *name, type_code *typeFound, bool *fixedSize)
 	if (result < B_OK || !field)
 		return result;
 
-	*typeFound = field->type;
-	*fixedSize = field->flags & FIELD_FLAG_FIXED_SIZE;
+	if (typeFound)
+		*typeFound = field->type;
+	if (fixedSize)
+		*fixedSize = field->flags & FIELD_FLAG_FIXED_SIZE;
 
 	return B_OK;
 }

@@ -128,21 +128,13 @@ status_t BMessageBody::GetInfo(const char* name, type_code* type,
 {
 	status_t err;
 	BMessageField* BMF = FindData(name, B_ANY_TYPE, err);
-	if (BMF)
-	{
-		*type = BMF->Type();
+	if (BMF) {
+		if (type)
+			*type = BMF->Type();
 		if (c)
-		{
 			*c = BMF->CountItems();
-		}
-	}
-	else
-	{
-		if (c)
-		{
-			*c = 0;
-		}
-	}
+	} else if (c)
+		*c = 0;
 
 	return err;
 }
