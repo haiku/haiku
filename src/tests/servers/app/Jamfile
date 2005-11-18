@@ -89,6 +89,7 @@ Server haiku_app_server :
 	BitmapManager.cpp
 	CursorManager.cpp
 	DecorManager.cpp
+	InputManager.cpp
 	ScreenManager.cpp
 
 	AppServer.cpp

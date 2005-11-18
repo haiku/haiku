@@ -10,6 +10,7 @@
 #include "EventDispatcher.h"
 #include "EventStream.h"
 #include "HWInterface.h"
+#include "InputManager.h"
 
 #include <Autolock.h>
 #include <MessageFilter.h>
@@ -17,6 +18,14 @@
 
 #include <new>
 #include <stdio.h>
+
+
+//#define TRACE_EVENTS
+#ifdef TRACE_EVENTS
+#	define ETRACE(x) printf x
+#else
+#	define ETRACE(x) ;
+#endif
 
 
 /*!
@@ -68,11 +77,16 @@ EventDispatcher::~EventDispatcher()
 
 
 status_t
-EventDispatcher::SetTo(EventStream& stream)
+EventDispatcher::SetTo(EventStream* stream)
 {
+	ETRACE(("event dispatcher: stream = %p\n", stream));
+
 	_Unset();
 
-	fStream = &stream;
+	if (stream == NULL)
+		return B_OK;
+
+	fStream = stream;
 	return _Run();
 }
 
@@ -93,12 +107,18 @@ EventDispatcher::InitCheck()
 void
 EventDispatcher::_Unset()
 {
+	if (fStream == NULL)
+		return;
+
 	fStream->SendQuit();
 
 	wait_for_thread(fThread, NULL);
 	wait_for_thread(fCursorThread, NULL);
 
 	fThread = fCursorThread = -1;
+
+	gInputManager->PutStream(fStream);
+	fStream = NULL;
 }
 
 
@@ -111,6 +131,8 @@ EventDispatcher::_Run()
 		return fThread;
 
 	if (fStream->SupportsCursorThread()) {
+		ETRACE(("event stream supports cursor thread!\n"));
+
 		fCursorThread = spawn_thread(_cursor_looper, "cursor loop",
 			B_REAL_TIME_DISPLAY_PRIORITY - 5, this);
 		if (resume_thread(fCursorThread) != B_OK) {
@@ -556,6 +578,7 @@ EventDispatcher::_event_looper(void* _dispatcher)
 {
 	EventDispatcher* dispatcher = (EventDispatcher*)_dispatcher;
 
+	ETRACE(("Start event loop\n"));
 	dispatcher->_EventLoop();
 	return B_OK;
 }
@@ -567,6 +590,7 @@ EventDispatcher::_cursor_looper(void* _dispatcher)
 {
 	EventDispatcher* dispatcher = (EventDispatcher*)_dispatcher;
 
+	ETRACE(("Start cursor loop\n"));
 	dispatcher->_CursorLoop();
 	return B_OK;
 }

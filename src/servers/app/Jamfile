@@ -30,6 +30,7 @@ Server app_server :
 	FontFamily.cpp
 	FontManager.cpp
 	HashTable.cpp
+	InputManager.cpp
 	Layer.cpp
 	MessageLooper.cpp
 	MultiLocker.cpp

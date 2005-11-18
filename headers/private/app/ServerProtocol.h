@@ -18,7 +18,9 @@
 // input messages from the Input Server. The other is the "main" port for
 // the server and is utilized mostly by BApplication objects.
 #define SERVER_PORT_NAME "OBappserver"
-#define SERVER_INPUT_PORT "OBinputport"
+#if TEST_MODE
+#	define SERVER_INPUT_PORT "OBinputport"
+#endif
 
 enum {
 	// Used for quick replies from the app_server
@@ -26,7 +28,6 @@ enum {
 	SERVER_FALSE = B_ERROR,
 
 	AS_REGISTER_INPUT_SERVER = 1,
-	AS_ACQUIRED_INPUT_STREAM,
 	AS_GET_DESKTOP,
 
 	// Desktop definitions

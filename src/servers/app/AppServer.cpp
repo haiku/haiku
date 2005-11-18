@@ -19,6 +19,7 @@
 #include "Desktop.h"
 #include "FontManager.h"
 #include "HWInterface.h"
+#include "InputManager.h"
 #include "Layer.h"
 #include "RGBColor.h"
 #include "RegistrarDefs.h"
@@ -47,16 +48,8 @@
 
 #include <unistd.h>
 
-//#define DEBUG_KEYHANDLING
+
 //#define DEBUG_SERVER
-
-#ifdef DEBUG_KEYHANDLING
-#	include <stdio.h>
-#	define KBTRACE(x) printf x
-#else
-#	define KBTRACE(x) ;
-#endif
-
 #ifdef DEBUG_SERVER
 #	include <stdio.h>
 #	define STRACE(x) printf x
@@ -93,6 +86,8 @@ AppServer::AppServer()
 	fLink.SetReceiverPort(fMessagePort);
 
 	sAppServer = this;
+
+	gInputManager = new InputManager();
 
 	// Create the font server and scan the proper directories.
 	gFontManager = new FontManager;
@@ -205,48 +200,6 @@ AppServer::_LaunchInputServer()
 
 	// if at any time, one of these ports is error prone, it might mean input_server is gone
 	// then relaunch input_server
-}
-
-
-/*!
-	\brief Starts the Cursor Thread
-*/
-void
-AppServer::_LaunchCursorThread()
-{
-	// Spawn our cursor thread
-	fCursorThreadID = spawn_thread(_CursorThread, "CursorThreadOfTheDeath",
-		B_REAL_TIME_DISPLAY_PRIORITY - 1, this);
-	if (fCursorThreadID >= 0)
-		resume_thread(fCursorThreadID);
-
-}
-
-
-/*!
-	\brief The Cursor Thread task
-*/
-int32
-AppServer::_CursorThread(void* data)
-{
-	AppServer *server = (AppServer *)data;
-
-	server->_LaunchInputServer();
-
-	do {
-		while (acquire_sem(server->fCursorSem) == B_OK) {
-			BPoint p;
-			p.y = *server->fCursorAddr & 0x7fff;
-			p.x = *server->fCursorAddr >> 15 & 0x7fff;
-
-			//sDesktop->GetHWInterface()->MoveCursorTo(p.x, p.y);
-			STRACE(("CursorThread : %f, %f\n", p.x, p.y));
-		}
-
-		snooze(100000);
-	} while (!server->IsQuitting());
-
-	return B_OK;
 }
 #endif
 

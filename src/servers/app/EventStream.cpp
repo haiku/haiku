@@ -9,6 +9,8 @@
 
 #include "EventStream.h"
 
+#include <InputServerTypes.h>
+#include <ServerProtocol.h>
 #include <shared_cursor_area.h>
 
 #include <new>
@@ -32,19 +34,53 @@ EventStream::SupportsCursorThread() const
 }
 
 
+bool
+EventStream::GetNextCursorPosition(BPoint& where)
+{
+	return false;
+}
+
+
 //	#pragma mark -
 
 
-InputServerStream::InputServerStream(port_id port, port_id inputServerPort)
+InputServerStream::InputServerStream(BMessenger& messenger)
 	:
-	fPort(port),
+	fInputServer(messenger),
+	fPort(-1),
 	fQuitting(false)
 {
+	BMessage message(IS_ACQUIRE_INPUT);
+	fCursorArea = create_area("shared cursor", (void **)&fCursorBuffer, B_ANY_ADDRESS,
+		B_PAGE_SIZE, B_LAZY_LOCK, B_READ_AREA | B_WRITE_AREA);
+	if (fCursorArea >= B_OK)
+		message.AddInt32("cursor area", fCursorArea);
+
+	BMessage reply;
+	if (messenger.SendMessage(&message, &reply) != B_OK)
+		return;
+
+	if (reply.FindInt32("event port", &fPort) != B_OK)
+		fPort = -1;
+	if (reply.FindInt32("cursor semaphore", &fCursorSemaphore) != B_OK)
+		fCursorSemaphore = -1;
 }
+
+
+#if TEST_MODE
+InputServerStream::InputServerStream()
+	:
+	fQuitting(false),
+	fCursorSemaphore(-1)
+{
+	fPort = find_port(SERVER_INPUT_PORT);
+}
+#endif
 
 
 InputServerStream::~InputServerStream()
 {
+	delete_area(fCursorArea);
 }
 
 

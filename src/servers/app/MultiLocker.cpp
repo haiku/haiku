@@ -53,7 +53,6 @@ MultiLocker::MultiLocker(const char* semaphoreBaseName)
 		system_info sys;
 		get_system_info(&sys);
 		fMaxThreads = sys.max_threads;
-		printf("max_threads: %ld used_threads: %ld\n", sys.max_threads, sys.used_threads);
 		fDebugArray = (int32 *) malloc(fMaxThreads * sizeof(int32));
 		for (int32 i = 0; i < fMaxThreads; i++) {
 			fDebugArray[i] = 0;

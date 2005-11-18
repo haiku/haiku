@@ -406,7 +406,7 @@ InputServer::_AcquireInput(BMessage& message, BMessage& reply)
 {
 	// TODO: it currently just gets everything we have
 	area_id area;
-	if (message.FindInt32("cursor_area", &area) == B_OK) {
+	if (message.FindInt32("cursor area", &area) == B_OK) {
 		// try to clone the area
 		fCursorBuffer = NULL;
 
@@ -423,25 +423,15 @@ InputServer::_AcquireInput(BMessage& message, BMessage& reply)
 		return fAppServerPort;
 	}
 
-	// TODO: would be nice if we could just reply to this message...
-#if 0
-	reply.AddBool("has_keyboard", true);
-	reply.AddBool("has_mouse", true);
+	reply.AddBool("has keyboard", true);
+	reply.AddBool("has mouse", true);
 	reply.AddInt32("event port", fAppServerPort);
 
 	if (fCursorBuffer != NULL) {
 		// cursor shared buffer is supported
 		reply.AddInt32("cursor semaphore", fCursorSem);
 	}
-#else
-	BPrivate::AppServerLink link;
-	link.StartMessage(AS_ACQUIRED_INPUT_STREAM);
-	link.Attach<bool>(true);
-	link.Attach<bool>(true);
-	link.Attach<int32>(fAppServerPort);
-	link.Attach<int32>(fCursorSem);
-	link.Flush();
-#endif
+
 	return B_OK;
 }
 
@@ -554,8 +544,8 @@ InputServer::MessageReceived(BMessage* message)
 
 		// app_server communication
 		case IS_ACQUIRE_INPUT:
-			_AcquireInput(*message, reply);
-			return;
+			status = _AcquireInput(*message, reply);
+			break;
 		case IS_RELEASE_INPUT:
 			_ReleaseInput(message);
 			return;

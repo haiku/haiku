@@ -69,9 +69,6 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 
 	  fDirtyForRedraw(),
 
-	  fThreadID(B_ERROR),
-	  fListenPort(-1),
-
 	  fButtons(0),
 	  fLastMousePosition(0.0, 0.0),
 
@@ -82,8 +79,7 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	  fWMState(),
 	  fWinBorderIndex(0),
 
-	  fScreenShotIndex(1),
-	  fQuiting(false)
+	  fScreenShotIndex(1)
 {
 	//NOTE: be careful about this one.
 	fRootLayer = this;
@@ -127,9 +123,6 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	fDrawState->SetHighColor(RGBColor(255, 255, 255));
 	fDrawState->SetLowColor(fWorkspace[fActiveWksIndex]->BGColor());
 
-	// Spawn our working thread
-	fThreadID = spawn_thread(WorkingThread, name, B_DISPLAY_PRIORITY, this);
-
 #if ON_SCREEN_DEBUGGING_INFO
 	DebugInfoManager::Default()->SetRootLayer(this);
 #endif
@@ -139,28 +132,18 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	// RootLayer starts with valid visible regions
 	fFullVisible.Set(Bounds());
 	fVisible.Set(Bounds());
+
+	// first make sure we are actualy visible
+	MarkForRebuild(Bounds());
+	MarkForRedraw(Bounds());
+
+	TriggerRebuild();
+	TriggerRedraw();
 }
 
 
 RootLayer::~RootLayer()
 {
-	fQuiting = true;
-
-	BMessage quitMsg(B_QUIT_REQUESTED);
-	ssize_t length = quitMsg.FlattenedSize();
-	char buffer[length];
-	if (quitMsg.Flatten(buffer,length) < B_OK) {
-		// failed to flatten?
-		kill_thread(fThreadID);
-	}
-	else{
-		write_port(fListenPort, 0, buffer, length);
-
-		status_t dummy;
-		wait_for_thread(fThreadID, &dummy);
-	}
-
-
 	delete fDragMessage;
 
 	for (int32 i = 0; i < fWsCount; i++)
@@ -174,103 +157,6 @@ RootLayer::~RootLayer()
 #endif
 }
 
-
-void
-RootLayer::RunThread()
-{
-	if (fThreadID > 0)
-		resume_thread(fThreadID);
-	else
-		CRITICAL("Can not create any more threads.\n");
-}
-
-/*!
-	\brief Thread function for handling input messages and calculating visible regions.
-	\param data Pointer to the app_server to which the thread belongs
-	\return Throwaway value - always 0
-*/
-int32
-RootLayer::WorkingThread(void *data)
-{
-	RootLayer *oneRootLayer = (RootLayer*)data;
-
-	oneRootLayer->Lock();
-	oneRootLayer->fListenPort = oneRootLayer->fDesktop->InputServerPort();
-
-	// first make sure we are actualy visible
-
-	oneRootLayer->MarkForRebuild(oneRootLayer->Bounds());
-	oneRootLayer->MarkForRedraw(oneRootLayer->Bounds());
-
-	oneRootLayer->TriggerRebuild();
-	oneRootLayer->TriggerRedraw();
-
-	oneRootLayer->Unlock();
-
-	STRACE(("info: RootLayer(%s)::WorkingThread listening on port %ld.\n", oneRootLayer->Name(), oneRootLayer->fListenPort));
-	while (!oneRootLayer->fQuiting) {
-		BMessage *msg = oneRootLayer->ReadMessageFromPort(B_INFINITE_TIMEOUT);
-		if (msg)
-			oneRootLayer->fQueue.AddMessage(msg);
-
-		int32 msgCount = port_count(oneRootLayer->fListenPort);
-		for (int32 i = 0; i < msgCount; ++i) {
-			msg = oneRootLayer->ReadMessageFromPort(0);
-			if (msg)
-				oneRootLayer->fQueue.AddMessage(msg);
-		}
-
-		//	loop as long as there are messages in the queue and the port is empty.
-		bool dispatchNextMessage = true;
-		while(dispatchNextMessage && !oneRootLayer->fQuiting) {
-			BMessage *currentMessage = oneRootLayer->fQueue.NextMessage();
-
-			if (!currentMessage)
-				// no more messages
-				dispatchNextMessage = false;
-			else {
-				oneRootLayer->Lock();
-
-				switch (currentMessage->what) {
-					// We don't need to do anything with these two, so just pass them
-					// onto the active application. Eventually, we will end up passing 
-					// them onto the window which is currently under the cursor.
-					case B_MOUSE_DOWN:
-					case B_MOUSE_UP:
-					case B_MOUSE_MOVED:
-					case B_MOUSE_WHEEL_CHANGED:
-						oneRootLayer->MouseEventHandler(currentMessage);
-						break;
-
-					case B_KEY_DOWN:
-					case B_KEY_UP:
-					case B_UNMAPPED_KEY_DOWN:
-					case B_UNMAPPED_KEY_UP:
-					case B_MODIFIERS_CHANGED:
-						oneRootLayer->KeyboardEventHandler(currentMessage);
-						break;
-
-					case B_QUIT_REQUESTED:
-						exit_thread(0);
-						break;
-
-					default:
-						printf("RootLayer(%s)::WorkingThread received unexpected code %lx\n", oneRootLayer->Name(), msg->what);
-						break;
-				}
-
-				oneRootLayer->Unlock();
-
-				delete currentMessage;
-
-				//	Are any messages on the port?
-				if (port_count(oneRootLayer->fListenPort) > 0)
-					dispatchNextMessage = false;
-			}
-		}
-	}
-	return 0;
-}
 
 void
 RootLayer::GoChangeWinBorderFeel(WinBorder *winBorder, int32 newFeel)
@@ -1598,72 +1484,6 @@ RootLayer::AddDebugInfo(const char* string)
 }
 #endif // ON_SCREEN_DEBUGGING_INFO
 
-
-// taken from BLooper
-void *
-RootLayer::ReadRawFromPort(int32 *msgCode, bigtime_t timeout)
-{
-	int8 *msgBuffer = NULL;
-	ssize_t bufferSize;
-
-	do {
-		bufferSize = port_buffer_size_etc(fListenPort, B_RELATIVE_TIMEOUT, timeout);
-	} while (bufferSize == B_INTERRUPTED);
-
-	if (bufferSize < B_OK)
-		return NULL;
-
-	if (bufferSize > 0)
-		msgBuffer = new int8[bufferSize];
-
-	// we don't want to wait again here, since that can only mean
-	// that someone else has read our message and our bufferSize
-	// is now probably wrong
-	bufferSize = read_port_etc(fListenPort, msgCode, msgBuffer, bufferSize,
-					  B_RELATIVE_TIMEOUT, 0);
-	if (bufferSize < B_OK) {
-		delete[] msgBuffer;
-		return NULL;
-	}
-
-	return msgBuffer;
-}
-
-
-BMessage *
-RootLayer::ReadMessageFromPort(bigtime_t tout)
-{
-	int32 msgcode;
-	BMessage* bmsg;
-
-	void* msgbuffer = ReadRawFromPort(&msgcode, tout);
-	if (!msgbuffer)
-		return NULL;
-
-	bmsg = ConvertToMessage(msgbuffer, msgcode);
-
-	delete[] (int8*)msgbuffer;
-
-	return bmsg;
-}
-
-
-BMessage*
-RootLayer::ConvertToMessage(void* raw, int32 code)
-{
-	BMessage* message = new BMessage(code);
-
-	if (raw != NULL) {
-		if (message->Unflatten((const char*)raw) != B_OK) {
-			printf("Convert To BMessage FAILED. port message code was: %ld - %c%c%c%c\n",
-				code, (int8)(code >> 24), (int8)(code >> 16), (int8)(code >> 8), (int8)code);
-			delete message;
-			return NULL;
-		}
-	}
-
-	return message;
-}
 
 void
 RootLayer::MarkForRedraw(const BRegion &dirty)

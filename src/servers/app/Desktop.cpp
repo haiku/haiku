@@ -11,47 +11,40 @@
 /**	Class used to encapsulate desktop management */
 
 
-#include <stdio.h>
+#include "Desktop.h"
 
-#include <Message.h>
-#include <Region.h>
+#include "AppServer.h"
+#include "DesktopSettingsPrivate.h"
+#include "DrawingEngine.h"
+#include "HWInterface.h"
+#include "InputManager.h"
+#include "Layer.h"
+#include "RootLayer.h"
+#include "ServerApp.h"
+#include "ServerConfig.h"
+#include "ServerScreen.h"
+#include "ServerWindow.h"
+#include "WinBorder.h"
+#include "Workspace.h"
 
 #include <WindowInfo.h>
 #include <ServerProtocol.h>
 
-#include "AppServer.h"
-#include "DrawingEngine.h"
-#include "Layer.h"
-#include "RootLayer.h"
-#include "ServerConfig.h"
-#include "ServerScreen.h"
-#include "ServerApp.h"
-#include "ServerWindow.h"
-#include "WinBorder.h"
-#include "Workspace.h"
-#include "DesktopSettingsPrivate.h"
+#include <Message.h>
+#include <MessageFilter.h>
+#include <Region.h>
 
+#include <stdio.h>
 
-#ifdef __HAIKU__
-#	define USE_ACCELERANT 1
-#else
-#	define USE_ACCELERANT 0
+#if TEST_MODE
+#	include "EventStream.h"
 #endif
-
-#if USE_ACCELERANT
-#	include "AccelerantHWInterface.h"
-#else
-#	include "ViewHWInterface.h"
-#endif
-
-#include "Desktop.h"
 
 //#define DEBUG_DESKTOP
-
 #ifdef DEBUG_DESKTOP
 #	define STRACE(a) printf(a)
 #else
-#	define STRACE(a) /* nothing */
+#	define STRACE(a) ;
 #endif
 
 
@@ -104,14 +97,60 @@ Desktop::Init()
 	fRootLayer = new RootLayer(name, 4, this, GetDrawingEngine());
 
 #if TEST_MODE
-	RegisterInputServer(find_port(SERVER_INPUT_PORT));
-		// this is where the ViewHWInterface will send its input events to
+	gInputManager->AddStream(new InputServerStream);
 #endif
+	fEventDispatcher.SetTo(gInputManager->GetStream());
+	fEventDispatcher.SetHWInterface(fVirtualScreen.HWInterface());
+
+	// temporary hack to get things started
+	class MouseFilter : public BMessageFilter {
+		public:
+			MouseFilter(RootLayer* layer)
+				: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
+				fRootLayer(layer)
+			{
+			}
+
+			virtual filter_result
+			Filter(BMessage* message, BHandler** /*_target*/)
+			{
+				fRootLayer->Lock();
+				fRootLayer->MouseEventHandler(message);
+				fRootLayer->Unlock();
+				return B_SKIP_MESSAGE;
+			}
+
+		private:
+			RootLayer* fRootLayer;
+	};
+	class KeyFilter : public BMessageFilter {
+		public:
+			KeyFilter(RootLayer* layer)
+				: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
+				fRootLayer(layer)
+			{
+			}
+
+			virtual filter_result
+			Filter(BMessage* message, BHandler** /*_target*/)
+			{
+				fRootLayer->Lock();
+				fRootLayer->KeyboardEventHandler(message);
+				fRootLayer->Unlock();
+				return B_SKIP_MESSAGE;
+			}
+
+		private:
+			RootLayer* fRootLayer;
+	};
+	fEventDispatcher.SetMouseFilter(new MouseFilter(fRootLayer));
+	fEventDispatcher.SetKeyFilter(new KeyFilter(fRootLayer));
 
 	// take care of setting the default cursor
 	ServerCursor *cursor = fCursorManager.GetCursor(B_CURSOR_DEFAULT);
 	if (cursor)
 		fVirtualScreen.HWInterface()->SetCursor(cursor);
+	fVirtualScreen.HWInterface()->SetCursorVisible(true);
 }
 
 
@@ -338,16 +377,6 @@ Desktop::_ActivateApp(team_id team)
 	}
 
 	return status;
-}
-
-
-void
-Desktop::RegisterInputServer(port_id port)
-{
-	fInputPort = port;
-	fRootLayer->RunThread();
-
-	fVirtualScreen.HWInterface()->SetCursorVisible(true);
 }
 
 

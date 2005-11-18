@@ -24,7 +24,7 @@ class EventDispatcher : public BLocker {
 		EventDispatcher();
 		~EventDispatcher();
 
-		status_t SetTo(EventStream& stream);
+		status_t SetTo(EventStream* stream);
 		status_t InitCheck();
 
 		void SetFocus(BMessenger* messenger);
@@ -40,8 +40,6 @@ class EventDispatcher : public BLocker {
 
 		bool HasCursorThread();
 		void SetHWInterface(HWInterface* interface);
-
-		EventStream* Stream();
 
 	private:
 		struct event_target;

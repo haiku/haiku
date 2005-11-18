@@ -28,10 +28,9 @@
 #include <String.h>
 
 #include <ColorSet.h>
-#include <ServerProtocol.h>
 #include <FontPrivate.h>
-
-#include <InputServerTypes.h>
+#include <MessengerPrivate.h>
+#include <ServerProtocol.h>
 
 #include "AppServer.h"
 #include "BGet++.h"
@@ -41,8 +40,10 @@
 #include "Desktop.h"
 #include "DecorManager.h"
 #include "DrawingEngine.h"
+#include "EventStream.h"
 #include "FontManager.h"
 #include "HWInterface.h"
+#include "InputManager.h"
 #include "OffscreenServerWindow.h"
 #include "RAMLinkMsgReader.h"
 #include "RootLayer.h"
@@ -86,13 +87,11 @@ static const uint32 kMsgAppQuit = 'appQ';
 	MIME fSignature.
 */
 ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
-	port_id clientLooperPort, team_id clientTeam, int32 handlerID,
+	port_id clientLooperPort, team_id clientTeam, int32 clientToken,
 	const char* signature)
 	: MessageLooper("application"),
 	fMessagePort(-1),
 	fClientReplyPort(clientReplyPort),
-	fClientLooperPort(clientLooperPort),
-	fClientToken(handlerID),
 	fDesktop(desktop),
 	fSignature(signature),
 	fClientTeam(clientTeam),
@@ -121,6 +120,9 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 		fMessagePort = -1;
 		return;
 	}
+
+	BMessenger::Private(fClientMessenger).SetTo(fClientTeam,
+		clientLooperPort, clientToken, false);
 
 	ServerCursor *defaultCursor = 
 		fDesktop->GetCursorManager().GetCursor(B_CURSOR_DEFAULT);
@@ -273,17 +275,9 @@ ServerApp::Quit(sem_id shutdownSemaphore)
 	\param msg The message to send
 */
 void
-ServerApp::SendMessageToClient(const BMessage *msg) const
+ServerApp::SendMessageToClient(BMessage *msg) const
 {
-	ssize_t size = msg->FlattenedSize();
-	char *buffer = new char[size];
-
-	if (msg->Flatten(buffer, size) == B_OK)
-		write_port(fClientLooperPort, msg->what, buffer, size);
-	else
-		printf("PANIC: ServerApp: '%s': can't flatten message in 'SendMessageToClient()'\n", Signature());
-
-	delete [] buffer;
+	fClientMessenger.SendMessage(msg);
 }
 
 
@@ -398,32 +392,31 @@ ServerApp::_MessageLooper()
 	\brief Handler function for BApplication API messages
 	\param code Identifier code for the message. Equivalent to BMessage::what
 	\param buffer Any attachments
-	
+
 	Note that the buffer's exact format is determined by the particular message. 
 	All attachments are placed in the buffer via a PortLink, so it will be a 
 	matter of casting and incrementing an index variable to access them.
 */
 void
-ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
+ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 {
 	switch (code) {
 		case AS_REGISTER_INPUT_SERVER:
 		{
-			BMessage message(IS_ACQUIRE_INPUT);
-			SendMessageToClient(&message);
-			break;
-		}
-		case AS_ACQUIRED_INPUT_STREAM:
-		{
-			bool hasKeyboard, hasMouse;
-			link.Read<bool>(&hasKeyboard);
-			link.Read<bool>(&hasMouse);
+			EventStream* stream = new (nothrow) InputServerStream(fClientMessenger);
+			if (stream != NULL
+				&& (!stream->IsValid() || !gInputManager->AddStream(stream))) {
+				delete stream;
+				break;
+			}
 
-			port_id port;
-			link.Read<int32>(&port);
-			sem_id sem;
-			if (link.Read<int32>(&sem) == B_OK)
-				fDesktop->RegisterInputServer(port);
+			// TODO: this should be done using notifications (so that an abandoned
+			//	stream will get noticed directly)
+			if (fDesktop->EventDispatcher().InitCheck() != B_OK) {
+				fDesktop->EventDispatcher().SetTo(gInputManager->GetStream());
+				fDesktop->EventDispatcher().SetHWInterface(fDesktop->GetHWInterface());
+				fDesktop->GetHWInterface()->SetCursorVisible(true);
+			}
 			break;
 		}
 		case AS_CREATE_WINDOW:

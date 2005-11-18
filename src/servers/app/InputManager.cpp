@@ -37,7 +37,6 @@ bool
 InputManager::AddStream(EventStream* stream)
 {
 	BAutolock _(this);
-printf("got stream: %p\n", stream);
 	return fFreeStreams.AddItem(stream);
 }
 
@@ -57,7 +56,6 @@ InputManager::GetStream()
 	
 	EventStream* stream = NULL;
 	do {
-printf("remove invalid stream: %p\n", stream);
 		delete stream;
 			// this deletes the previous invalid stream
 
@@ -68,7 +66,6 @@ printf("remove invalid stream: %p\n", stream);
 		return NULL;
 
 	fUsedStreams.AddItem(stream);
-printf("return stream: %p\n", stream);
 	return stream;
 }
 

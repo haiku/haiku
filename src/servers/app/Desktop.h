@@ -51,8 +51,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 			uid_t				UserID() const { return fUserID; }
 	virtual port_id				MessagePort() const { return fMessagePort; }
 
-			void				RegisterInputServer(port_id port);
-			port_id				InputServerPort() { return fInputPort; }
+			::EventDispatcher&	EventDispatcher() { return fEventDispatcher; }
 
 			void				BroadcastToAllApps(int32 code);
 
@@ -106,7 +105,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 			::VirtualScreen		fVirtualScreen;
 			DesktopSettings::Private* fSettings;
 			port_id				fMessagePort;
-			EventDispatcher		fEventDispatcher;
+			::EventDispatcher	fEventDispatcher;
 			port_id				fInputPort;
 
 			BLocker				fAppListLock;

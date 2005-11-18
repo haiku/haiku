@@ -9,6 +9,7 @@
 #define EVENT_STREAM_H
 
 
+#include <LinkReceiver.h>
 #include <MessageQueue.h>
 
 struct shared_cursor;
@@ -25,13 +26,17 @@ class EventStream {
 		virtual bool SupportsCursorThread() const;
 
 		virtual bool GetNextEvent(BMessage** _event) = 0;
-		virtual bool GetNextCursorPosition(BPoint& where) = 0;
+		virtual bool GetNextCursorPosition(BPoint& where);
 };
 
 
-class InputServerStream {
+class InputServerStream : public EventStream {
 	public:
-		InputServerStream(port_id port, port_id inputServerPort);
+		InputServerStream(BMessenger& inputServerMessenger);
+#if TEST_MODE
+		InputServerStream();
+#endif
+
 		virtual ~InputServerStream();
 
 		virtual bool IsValid();
@@ -46,6 +51,7 @@ class InputServerStream {
 		status_t _MessageFromPort(BMessage** _message,
 			bigtime_t timeout = B_INFINITE_TIMEOUT);
 
+		BMessenger fInputServer;
 		BMessageQueue fEvents;
 		port_id	fPort;
 		bool	fQuitting;

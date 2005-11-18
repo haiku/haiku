@@ -55,7 +55,7 @@ class ServerApp : public MessageLooper {
 		bool IsActive(void) const { return fIsActive; }
 		void Activate(bool value);
 
-		void SendMessageToClient(const BMessage* msg) const;
+		void SendMessageToClient(BMessage* msg) const;
 
 		void SetAppCursor(void);
 
@@ -86,6 +86,7 @@ class ServerApp : public MessageLooper {
 		port_id	fClientReplyPort;	
 			// our BApplication's event port
 
+		BMessenger fClientMessenger;
 		port_id	fClientLooperPort;
 		int32 fClientToken;
 			// To send a BMessage to the client (port + token)

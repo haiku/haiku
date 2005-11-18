@@ -109,13 +109,10 @@ public:
 
 			void				LayerRemoved(Layer* layer);
 
-	static	int32				WorkingThread(void *data);
-
 			// Other methods
 			bool				Lock() { return fAllRegionsLock.Lock(); }
 			void				Unlock() { fAllRegionsLock.Unlock(); }
 			bool				IsLocked() { return fAllRegionsLock.IsLocked(); }
-			void				RunThread();
 
 			void				GoChangeWinBorderFeel(WinBorder *winBorder, int32 newFeel);
 
@@ -153,10 +150,6 @@ friend class Desktop;
 	inline	HWInterface*		GetHWInterface() const
 									{ return fDesktop->GetHWInterface(); }
 
-			void*				ReadRawFromPort(int32 *msgCode, bigtime_t timeout);
-			BMessage*			ReadMessageFromPort(bigtime_t tout);
-			BMessage*			ConvertToMessage(void* raw, int32 code);
-
 			Desktop*			fDesktop;
 			BMessage*			fDragMessage;
 			Layer*				fLastLayerUnderMouse;
@@ -170,10 +163,6 @@ friend class Desktop;
 			BLocker				fAllRegionsLock;
 
 			BRegion				fDirtyForRedraw;
-
-			thread_id			fThreadID;
-			port_id				fListenPort;
-			BMessageQueue		fQueue;
 
 			int32				fButtons;
 			BPoint				fLastMousePosition;
@@ -190,7 +179,6 @@ friend class Desktop;
 	mutable int32				fWinBorderIndex;
 
 			int32				fScreenShotIndex;
-			bool				fQuiting;
 
 #if ON_SCREEN_DEBUGGING_INFO
 	friend	class DebugInfoManager;
