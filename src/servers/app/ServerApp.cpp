@@ -75,6 +75,7 @@
 #	define FTRACE(x) ;
 #endif
 
+using std::nothrow;
 
 static const uint32 kMsgAppQuit = 'appQ';
 
