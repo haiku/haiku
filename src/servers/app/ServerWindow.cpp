@@ -666,6 +666,11 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				rootLayer->TriggerRedraw();
 			}
 
+			if (fCurrentLayer->EventMask() != 0) {
+				fDesktop->EventDispatcher().RemoveListener(Messenger(),
+					fCurrentLayer->ViewToken());
+			}
+
 			#ifdef DEBUG_SERVERWINDOW
 			parent->PrintTree();
 			#endif
@@ -704,30 +709,42 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_MOUSE_EVENT_MASK: Layer name: %s\n", fTitle, fCurrentLayer->Name()));			
 
-			uint32		mask;
-			uint32		options;
+			uint32 eventMask, options;
 
-			link.Read<uint32>(&mask);
-			link.Read<uint32>(&options);
+			link.Read<uint32>(&eventMask);
+			if (link.Read<uint32>(&options) == B_OK) {
+				fCurrentLayer->QuietlySetEventMask(eventMask);
+				fCurrentLayer->QuietlySetEventOptions(options);
 
-			fCurrentLayer->QuietlySetEventMask(mask);
-			fCurrentLayer->QuietlySetEventOptions(options);
-
-			if (rootLayer)
-				rootLayer->AddToInputNotificationLists(fCurrentLayer, mask, options);
+				if (eventMask != 0 || options != 0) {
+					fDesktop->EventDispatcher().AddListener(Messenger(),
+						fCurrentLayer->ViewToken(), eventMask, options);
+				} else {
+					fDesktop->EventDispatcher().RemoveListener(Messenger(),
+						fCurrentLayer->ViewToken());
+				}
+			}
+			break;
 		}
 		case AS_LAYER_SET_MOUSE_EVENT_MASK:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_MOUSE_EVENT_MASK: Layer name: %s\n", fTitle, fCurrentLayer->Name()));			
 
-			uint32		mask;
-			uint32		options;
+			uint32 eventMask, options;
 
-			link.Read<uint32>(&mask);
-			link.Read<uint32>(&options);
+			link.Read<uint32>(&eventMask);
+			if (link.Read<uint32>(&options) == B_OK) {
+				if (eventMask != 0 || options != 0) {
+					fDesktop->EventDispatcher().AddTemporaryListener(Messenger(),
+						fCurrentLayer->ViewToken(), eventMask, options);
+				} else {
+					fDesktop->EventDispatcher().RemoveTemporaryListener(Messenger(),
+						fCurrentLayer->ViewToken());
+				}
+			}
 
 			if (rootLayer)
-				rootLayer->SetNotifyLayer(fCurrentLayer, mask, options);
+				rootLayer->SetNotifyLayer(fCurrentLayer, eventMask, options);
 			break;
 		}
 		case AS_LAYER_MOVE_TO:

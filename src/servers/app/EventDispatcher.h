@@ -29,11 +29,12 @@ class EventDispatcher : public BLocker {
 
 		void SetFocus(const BMessenger* messenger);
 
-		bool AddListener(BMessenger& messenger, int32 token,
+		bool AddListener(const BMessenger& messenger, int32 token,
 				uint32 events, uint32 options);
-		bool AddTemporaryListener(BMessenger& messenger, int32 token,
-				uint32 events, uint32 options);
-		void RemoveListener(BMessenger& messenger, int32 token);
+		bool AddTemporaryListener(const BMessenger& messenger,
+				int32 token, uint32 events, uint32 options);
+		void RemoveListener(const BMessenger& messenger, int32 token);
+		void RemoveTemporaryListener(const BMessenger& messenger, int32 token);
 
 		void SetMouseFilter(BMessageFilter* filter);
 		void SetKeyboardFilter(BMessageFilter* filter);
@@ -54,10 +55,10 @@ class EventDispatcher : public BLocker {
 		void _RemoveTokens(BMessage* message);
 		void _SetToken(BMessage* message, int32 token);
 
-		event_target* _FindListener(BMessenger& messenger, int32 token,
+		event_target* _FindListener(const BMessenger& messenger, int32 token,
 				int32* _index = NULL);
-		bool _AddListener(BMessenger& messenger, int32 token, uint32 events,
-				uint32 options, bool temporary);
+		bool _AddListener(const BMessenger& messenger, int32 token,
+				uint32 events, uint32 options, bool temporary);
 		void _RemoveTemporaryListeners();
 
 		void _EventLoop();

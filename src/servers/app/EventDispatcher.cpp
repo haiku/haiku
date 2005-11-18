@@ -183,7 +183,8 @@ EventDispatcher::SetFocus(const BMessenger* messenger)
 
 
 EventDispatcher::event_target*
-EventDispatcher::_FindListener(BMessenger& messenger, int32 token, int32* _index)
+EventDispatcher::_FindListener(const BMessenger& messenger, int32 token,
+	int32* _index)
 {
 	for (int32 i = fListeners.CountItems(); i-- > 0;) {
 		event_target* target = fListeners.ItemAt(i);
@@ -199,8 +200,15 @@ EventDispatcher::_FindListener(BMessenger& messenger, int32 token, int32* _index
 }
 
 
+/*!
+	\brief Adds the specified listener or updates its event mask and options
+		if already added.
+
+	It follows the BView semantics in that specifiying an event mask of zero
+	leaves the event mask untouched and just updates the options.
+*/
 bool
-EventDispatcher::_AddListener(BMessenger& messenger, int32 token,
+EventDispatcher::_AddListener(const BMessenger& messenger, int32 token,
 	uint32 events, uint32 options, bool temporary)
 {
 	BAutolock _(this);
@@ -208,15 +216,20 @@ EventDispatcher::_AddListener(BMessenger& messenger, int32 token,
 	if (target != NULL) {
 		// we already have this target, update its event mask
 		if (temporary) {
-			target->temporary_events = events;
+			if (events != 0)
+				target->temporary_events = events;
 			target->temporary_options = options;
 		} else {
-			target->events = events;
+			if (events != 0)
+				target->events = events;
 			target->options = options;
 		}
 
 		return true;
 	}
+
+	if (events == 0)
+		return false;
 
 	// we need a new target
 
@@ -278,7 +291,7 @@ EventDispatcher::_RemoveTemporaryListeners()
 
 
 bool
-EventDispatcher::AddListener(BMessenger& messenger, int32 token,
+EventDispatcher::AddListener(const BMessenger& messenger, int32 token,
 	uint32 events, uint32 options)
 {
 	return _AddListener(messenger, token, events, options, false);
@@ -286,15 +299,15 @@ EventDispatcher::AddListener(BMessenger& messenger, int32 token,
 
 
 bool
-EventDispatcher::AddTemporaryListener(BMessenger& messenger, int32 token,
-	uint32 events, uint32 options)
+EventDispatcher::AddTemporaryListener(const BMessenger& messenger,
+	int32 token, uint32 events, uint32 options)
 {
 	return _AddListener(messenger, token, events, options, true);
 }
 
 
 void
-EventDispatcher::RemoveListener(BMessenger& messenger, int32 token)
+EventDispatcher::RemoveListener(const BMessenger& messenger, int32 token)
 {
 	BAutolock _(this);
 
@@ -302,6 +315,35 @@ EventDispatcher::RemoveListener(BMessenger& messenger, int32 token)
 	event_target* target = _FindListener(messenger, token, &index);
 	if (target == NULL)
 		return;
+
+	if (target->temporary_events != 0) {
+		// we still need this event
+		target->events = 0;
+		target->options = 0;
+		return;
+	}
+
+	fListeners.RemoveItemAt(index);
+	delete target;
+}
+
+
+void
+EventDispatcher::RemoveTemporaryListener(const BMessenger& messenger, int32 token)
+{
+	BAutolock _(this);
+
+	int32 index;
+	event_target* target = _FindListener(messenger, token, &index);
+	if (target == NULL)
+		return;
+
+	if (target->events != 0) {
+		// we still need this event
+		target->temporary_events = 0;
+		target->temporary_options = 0;
+		return;
+	}
 
 	fListeners.RemoveItemAt(index);
 	delete target;

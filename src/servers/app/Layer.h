@@ -71,6 +71,8 @@ class Layer {
 	inline	const char*			Name() const
 									{ return fName.String(); }
 
+			int32				ViewToken() const { return fViewToken; }
+
 	// children handling
 			void				AddChild(Layer* child, ServerWindow* serverWin);
 			void				RemoveChild(Layer* child);
