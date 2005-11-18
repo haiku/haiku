@@ -275,7 +275,7 @@ HOST_AR				= $(HOST_AR[1]) ;
 HOST_UNARFLAGS		?= x ;
 
 # check the host platform compatibility
-SetPlatformCompatibilityFlagVariables HOST_PLATFORM : HOST : host : linux ;
+SetPlatformCompatibilityFlagVariables HOST_PLATFORM : HOST : host : linux freebsd ;
 
 if $(HOST_PLATFORM) = linux {
 	# don't use lex: otherwise rc will not work correctly
