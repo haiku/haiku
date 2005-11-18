@@ -9,6 +9,8 @@ fi
 haikuSourceDir=$1
 buildToolsDir=$2
 
+if [ $(uname) = "FreeBSD" ]; then make="gmake"; else make="make"; fi
+
 if [ $# \< 3 ]; then
 	haikuOutputDir=$haikuSourceDir/generated
 else
@@ -77,8 +79,8 @@ cd $binutilsObjDir
 CFLAGS="-O2" CXXFLAGS="-O2" $binutilsSourceDir/configure \
 	--prefix=$installDir --target=i586-pc-beos --disable-nls \
 	--enable-shared=yes || exit 1
-make || exit 1
-make install || exit 1
+$make || exit 1
+$make install || exit 1
 
 export PATH=$PATH:$installDir/bin
 
@@ -111,13 +113,13 @@ CFLAGS="-O2" CXXFLAGS="-O2" $gccSourceDir/configure --prefix=$installDir \
 	--with-libs=$tmpLibDir || exit 1
 
 # make gcc
-make || {
+$make || {
 	echo "ERROR: Building gcc failed." >&2
 	exit 1
 }
 
 # install gcc
-make install || {
+$make install || {
 	echo "ERROR: Installing the cross compiler failed." >&2
 	exit 1
 }

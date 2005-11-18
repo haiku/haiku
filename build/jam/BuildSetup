@@ -333,6 +333,7 @@ HOST_KERNEL_WARNING_C++FLAGS = -Wall ;
 switch $(HOST_PLATFORM) {
 	case haiku	: HOST_DEBUG_FLAGS ?= -ggdb ;
 	case linux	: HOST_DEBUG_FLAGS ?= -ggdb ;
+	case freebsd    : HOST_DEBUG_FLAGS ?= -ggdb ;
 	case *		: HOST_DEBUG_FLAGS ?= -g ;
 }
 
@@ -542,6 +543,7 @@ switch $(TARGET_PLATFORM) {
 	case dano		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_DANO ;
 	case haiku		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_HAIKU ;
 	case linux		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_LINUX ;
+	case freebsd            : TARGET_DEFINES        += HAIKU_TARGET_PLATFORM_FREEBSD ;
 	case libbe_test	: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_LIBBE_TEST ;
 }
 
@@ -552,6 +554,7 @@ switch $(HOST_PLATFORM) {
 	case dano		: TARGET_DEFINES	+= HAIKU_HOST_PLATFORM_DANO ;
 	case haiku		: TARGET_DEFINES	+= HAIKU_HOST_PLATFORM_HAIKU ;
 	case linux		: TARGET_DEFINES	+= HAIKU_HOST_PLATFORM_LINUX ;
+	case freebsd            : TARGET_DEFINES        += HAIKU_TARGET_PLATFORM_FREEBSD ;
 }
 
 
