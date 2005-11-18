@@ -91,13 +91,6 @@ AppServer::AppServer(void)
 
 	gAppServerPort = fMessagePort;
 
-	// Create the input port. The input_server will send it's messages here.
-	// TODO: If we want multiple user support we would need an individual
-	// port for each user and do the following for each RootLayer.
-	fServerInputPort = create_port(200, SERVER_INPUT_PORT);
-	if (fServerInputPort == B_NO_MORE_PORTS)
-		debugger("app_server could not create input port");
-
 	fAppList = new BList();
 	fQuittingServer = false;
 	make_decorator = NULL;
