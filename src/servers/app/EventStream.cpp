@@ -156,8 +156,8 @@ InputServerStream::GetNextCursorPosition(BPoint &where)
 	uint32 pos = fCursorBuffer->pos;
 #endif
 
-	where.x = pos & 0xffff;
-	where.y = pos >> 16L;
+	where.x = pos >> 16UL;
+	where.y = pos & 0xffff;
 
 	atomic_and(&fCursorBuffer->read, 0);
 		// this tells the input_server that we've read the

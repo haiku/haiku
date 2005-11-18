@@ -1599,8 +1599,11 @@ InputServer::_DispatchEvent(BMessage* event)
 #else
 				atomic_set((int32*)&fCursorBuffer->pos, (uint32)fMousePos.x << 16UL
 					| ((uint32)fMousePos.y & 0xffff));
-				if (atomic_or(&fCursorBuffer->read, 1) == 0)
-					release_sem_etc(fCursorSem, 0, B_RELEASE_ALL);
+				if (atomic_or(&fCursorBuffer->read, 1) == 0) {
+					release_sem(fCursorSem);
+					// TODO: this doesn't work for some reason...
+//					release_sem_etc(fCursorSem, 0, B_RELEASE_ALL);
+				}
 #endif
         	}
         	break;

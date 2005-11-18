@@ -934,9 +934,6 @@ RootLayer::MouseEventHandler(BMessage *msg)
 			where.ConstrainTo(Frame());
 
 			if (fLastMousePosition != where) {
-				// move cursor on screen
-				GetHWInterface()->MoveCursorTo(where.x, where.y);
-
 				// If this happens, it's input server's fault.
 				// There might be additional fields an application expects in B_MOUSE_MOVED
 				// message, and in this way it won't get them. 
@@ -988,9 +985,6 @@ RootLayer::MouseEventHandler(BMessage *msg)
 			where.ConstrainTo(fFrame);
 
 			if (fLastMousePosition != where) {
-				// move cursor on screen
-				GetHWInterface()->MoveCursorTo(where.x, where.y);
-
 				// If this happens, it's input server's fault.
 				// There might be additional fields an application expects in B_MOUSE_MOVED
 				// message, and in this way it won't get them. 
@@ -1032,21 +1026,10 @@ RootLayer::MouseEventHandler(BMessage *msg)
 			
 			break;
 		}
-		case B_MOUSE_MOVED: {
-			//printf("RootLayer::MouseEventHandler(B_MOUSE_MOVED)\n");
-
-			BPoint where(0,0);
-
-			msg->FindPoint("where", &where);
-
-			where.ConstrainTo(fFrame);
-			// move cursor on screen
-			GetHWInterface()->MoveCursorTo(where.x, where.y);
-
+		case B_MOUSE_MOVED:
 			_ProcessMouseMovedEvent(msg);
-
 			break;
-		}
+
 		case B_MOUSE_WHEEL_CHANGED: {
 			//printf("RootLayer::MouseEventHandler(B_MOUSE_WHEEL_CHANGED)\n");
 			// FEATURE: This is a tentative change: mouse wheel messages are always sent to the window
