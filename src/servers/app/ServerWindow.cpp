@@ -543,10 +543,10 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		return;
 	}
 
-	RootLayer *myRootLayer = fWinBorder->GetRootLayer();
+	RootLayer *rootLayer = fWinBorder->GetRootLayer();
 	// NOTE: is NULL when fWinBorder is offscreen!
-	if (myRootLayer)
-		myRootLayer->Lock();
+	if (rootLayer)
+		rootLayer->Lock();
 
 	switch (code) {
 		//--------- BView Messages -----------------
@@ -625,14 +625,14 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (parent != NULL)
 				parent->AddChild(newLayer, this);
 
-			if (myRootLayer && !newLayer->IsHidden() && parent) {
+			if (rootLayer && !newLayer->IsHidden() && parent) {
 				BRegion invalidRegion;
 				newLayer->GetOnScreenRegion(invalidRegion);
 				parent->MarkForRebuild(invalidRegion);
 				parent->TriggerRebuild();
 				if (newLayer->VisibleRegion().Frame().IsValid()) {
-					myRootLayer->MarkForRedraw(newLayer->VisibleRegion());
-					myRootLayer->TriggerRedraw();
+					rootLayer->MarkForRedraw(newLayer->VisibleRegion());
+					rootLayer->TriggerRedraw();
 				}
 			}
 			break;
@@ -649,10 +649,10 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			STRACE(("ServerWindow %s: AS_LAYER_DELETE view: %p, parent: %p\n", fTitle,
 				fCurrentLayer, parent));
 
-			if (!fCurrentLayer->IsHidden() && parent && myRootLayer
+			if (!fCurrentLayer->IsHidden() && parent && rootLayer
 				&& fCurrentLayer->FullVisible().Frame().IsValid()) {
 				parent->MarkForRebuild(fCurrentLayer->FullVisible());
-				myRootLayer->MarkForRedraw(fCurrentLayer->FullVisible());
+				rootLayer->MarkForRedraw(fCurrentLayer->FullVisible());
 			}
 
 			// here we remove current layer from list.
@@ -661,9 +661,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (parent)
 				parent->TriggerRebuild();			
 
-			if (myRootLayer) {
-				myRootLayer->LayerRemoved(fCurrentLayer);
-				myRootLayer->TriggerRedraw();
+			if (rootLayer) {
+				rootLayer->LayerRemoved(fCurrentLayer);
+				rootLayer->TriggerRedraw();
 			}
 
 			#ifdef DEBUG_SERVERWINDOW
@@ -713,8 +713,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			fCurrentLayer->QuietlySetEventMask(mask);
 			fCurrentLayer->QuietlySetEventOptions(options);
 
-			if (myRootLayer)
-				myRootLayer->AddToInputNotificationLists(fCurrentLayer, mask, options);
+			if (rootLayer)
+				rootLayer->AddToInputNotificationLists(fCurrentLayer, mask, options);
 		}
 		case AS_LAYER_SET_MOUSE_EVENT_MASK:
 		{
@@ -726,8 +726,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<uint32>(&mask);
 			link.Read<uint32>(&options);
 
-			if (myRootLayer)
-				myRootLayer->SetNotifyLayer(fCurrentLayer, mask, options);
+			if (rootLayer)
+				rootLayer->SetNotifyLayer(fCurrentLayer, mask, options);
 			break;
 		}
 		case AS_LAYER_MOVE_TO:
@@ -938,16 +938,16 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			rgb_color c;
 			
 			link.Read(&c, sizeof(rgb_color));
-if (myRootLayer)
-	myRootLayer->Lock();			
+if (rootLayer)
+	rootLayer->Lock();			
 			fCurrentLayer->SetViewColor(RGBColor(c));
 
-			if (myRootLayer) {
-				myRootLayer->MarkForRedraw(fCurrentLayer->VisibleRegion());
-				myRootLayer->TriggerRedraw();
+			if (rootLayer) {
+				rootLayer->MarkForRedraw(fCurrentLayer->VisibleRegion());
+				rootLayer->TriggerRedraw();
 			}
-if (myRootLayer)
-	myRootLayer->Unlock();
+if (rootLayer)
+	rootLayer->Unlock();
 			break;
 		}
 
@@ -1058,7 +1058,7 @@ if (myRootLayer)
 
 			fCurrentLayer->CurrentState()->SetClippingRegion(region);
 
-			if (myRootLayer && !(fCurrentLayer->IsHidden()) && !fWinBorder->InUpdate()) {
+			if (rootLayer && !(fCurrentLayer->IsHidden()) && !fWinBorder->InUpdate()) {
 				BRegion invalidRegion;
 				fCurrentLayer->GetOnScreenRegion(invalidRegion);
 
@@ -1066,8 +1066,8 @@ if (myRootLayer)
 
 				fCurrentLayer->fParent->MarkForRebuild(invalidRegion);
 				fCurrentLayer->fParent->TriggerRebuild();
-				myRootLayer->MarkForRedraw(invalidRegion);
-				myRootLayer->TriggerRedraw();
+				rootLayer->MarkForRedraw(invalidRegion);
+				rootLayer->TriggerRedraw();
 			}
 				
 			break;
@@ -1126,15 +1126,15 @@ if (myRootLayer)
 			
 			link.Read<BRect>(&invalRect);
 
-			if (myRootLayer) {
+			if (rootLayer) {
 				BRect converted(invalRect.LeftTop(), invalRect.RightBottom());
 
 				fCurrentLayer->ConvertToScreen(&converted);
 
 				BRegion invalidRegion(converted);
 				invalidRegion.IntersectWith(&fCurrentLayer->VisibleRegion());
-				myRootLayer->MarkForRedraw(invalidRegion);
-				myRootLayer->TriggerRedraw();
+				rootLayer->MarkForRedraw(invalidRegion);
+				rootLayer->TriggerRedraw();
 			}
 			break;
 		}
@@ -1155,11 +1155,11 @@ if (myRootLayer)
 				invalidReg.Include(rect);
 			}
 
-			if (myRootLayer) {
+			if (rootLayer) {
 				fCurrentLayer->ConvertToScreen(&invalidReg);
 
-				myRootLayer->MarkForRedraw(invalidReg);
-				myRootLayer->TriggerRedraw();
+				rootLayer->MarkForRedraw(invalidReg);
+				rootLayer->TriggerRedraw();
 			}
 
 			break;
@@ -1442,9 +1442,9 @@ if (myRootLayer)
 
 			link.Read<bool>(&activate);
 
-			if (myRootLayer && myRootLayer->Lock()) {
-				myRootLayer->SetActive(fWinBorder, activate);
-				myRootLayer->Unlock();
+			if (rootLayer && rootLayer->Lock()) {
+				rootLayer->SetActive(fWinBorder, activate);
+				rootLayer->Unlock();
 			}
 			break;
 		}
@@ -1622,8 +1622,8 @@ if (myRootLayer)
 			break;
 	}
 
-	if (myRootLayer)
-		myRootLayer->Unlock();
+	if (rootLayer)
+		rootLayer->Unlock();
 }
 
 // -------------------- Graphics messages ----------------------------------
@@ -2056,7 +2056,7 @@ ServerWindow::_MessageLooper()
 				// of that and stop for a moment.
 				// also we must wait a bit for the associated WinBorder to become hidden
 				//while(1) {
-				//	myRootLayer->Lock();
+				//	rootLayer->Lock();
 				//	if (IsHidden())
 				//		break;
 				//	else
