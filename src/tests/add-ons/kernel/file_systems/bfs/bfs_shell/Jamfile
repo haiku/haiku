@@ -64,8 +64,9 @@ SYSHDRS = $(HAIKU_HDRS) ;
 		$(malloc_debug_defines)
 		$(buildPlatformDefines)
 	] ;
-	SubDirCcFlags $(defines) $(malloc_debug_flags) ;
+	SubDirCcFlags $(defines) $(malloc_debug_flags) -nostdinc ;
 	SubDirC++Flags $(defines) -fno-exceptions -fno-rtti $(malloc_debug_flags)
+		-nostdinc
 		-include [ FDirName $(SUBDIR) Debug.h ] ;
 }
 
