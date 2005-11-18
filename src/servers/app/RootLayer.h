@@ -147,9 +147,6 @@ friend class Desktop;
 
 			void				_ProcessMouseMovedEvent(BMessage *msg);
 
-	inline	HWInterface*		GetHWInterface() const
-									{ return fDesktop->GetHWInterface(); }
-
 			Desktop*			fDesktop;
 			BMessage*			fDragMessage;
 			Layer*				fLastLayerUnderMouse;

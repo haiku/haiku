@@ -1,14 +1,13 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc. All rights reserved.
-//  Distributed under the terms of the MIT license.
-//
-//	File Name:		ServerScreen.cpp
-//	Author:			Adi Oanca <adioanca@myrealbox.com>
-//					Axel Dörfler, axeld@pinc-software.de
-//					Stephan Aßmus, <superstippi@gmx.de>
-//	Description:	Handles individual screens
-//
-//------------------------------------------------------------------------------
+/*
+ * Copyright (c) 2001-2005, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Adi Oanca <adioanca@myrealbox.com>
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Stephan Aßmus, <superstippi@gmx.de>
+ */
+
 
 #include <Accelerant.h>
 #include <Point.h>
@@ -23,12 +22,13 @@
 #include "ServerScreen.h"
 
 
-Screen::Screen(HWInterface *interface, int32 id)
+Screen::Screen(::HWInterface *interface, int32 id)
 	: fID(id),
 	  fDriver(interface ? new DrawingEngine(interface) : NULL),
 	  fHWInterface(interface)
 {
 }
+
 
 Screen::Screen()
 	: fID(-1),
@@ -180,7 +180,7 @@ Screen::_FindMode(uint16 width, uint16 height, uint32 colorspace,
 	return B_OK;
 }
 
-// _FindMode
+
 int32
 Screen::_FindMode(const display_mode* dm, uint32 count,
 				  uint16 width, uint16 height, uint32 colorspace,

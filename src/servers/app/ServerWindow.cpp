@@ -1583,7 +1583,7 @@ if (myRootLayer)
 			// 1) BPoint mouse location
 			// 2) int32 button state
 
-			fLink.Attach<BPoint>(fDesktop->GetHWInterface()->GetCursorPosition());
+			fLink.Attach<BPoint>(fDesktop->HWInterface()->GetCursorPosition());
 			fLink.Attach<int32>(fDesktop->ActiveRootLayer()->Buttons());
 
 			fLink.Flush();
@@ -2156,7 +2156,7 @@ ServerWindow::HandleDirectConnection(int bufferState, int driverState)
 	
 	if ((bufferState & B_DIRECT_MODE_MASK) != B_DIRECT_STOP) {
 		// TODO: Locking ?
-		RenderingBuffer *buffer = fDesktop->GetHWInterface()->FrontBuffer();
+		RenderingBuffer *buffer = fDesktop->HWInterface()->FrontBuffer();
 		fDirectWindowData->direct_info->bits = buffer->Bits();
 		fDirectWindowData->direct_info->pci_bits = NULL; // TODO	
 		fDirectWindowData->direct_info->bytes_per_row = buffer->BytesPerRow();

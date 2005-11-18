@@ -70,7 +70,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 	const	::VirtualScreen&	VirtualScreen() const { return fVirtualScreen; }
 	inline	DrawingEngine*		GetDrawingEngine() const
 									{ return fVirtualScreen.DrawingEngine(); }
-	inline	HWInterface*		GetHWInterface() const
+	inline	::HWInterface*		HWInterface() const
 									{ return fVirtualScreen.HWInterface(); }
 
 	// Methods for layer(WinBorder) manipulation.

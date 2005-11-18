@@ -298,10 +298,10 @@ ServerApp::Activate(bool value)
 
 //! Sets the cursor to the application cursor, if any.
 void
-ServerApp::SetAppCursor(void)
+ServerApp::SetAppCursor()
 {
 	if (fAppCursor)
-		fDesktop->GetHWInterface()->SetCursor(fAppCursor);
+		fDesktop->HWInterface()->SetCursor(fAppCursor);
 }
 
 
@@ -412,11 +412,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			// TODO: this should be done using notifications (so that an abandoned
 			//	stream will get noticed directly)
-			if (fDesktop->EventDispatcher().InitCheck() != B_OK) {
+			if (fDesktop->EventDispatcher().InitCheck() != B_OK)
 				fDesktop->EventDispatcher().SetTo(gInputManager->GetStream());
-				fDesktop->EventDispatcher().SetHWInterface(fDesktop->GetHWInterface());
-				fDesktop->GetHWInterface()->SetCursorVisible(true);
-			}
 			break;
 		}
 		case AS_CREATE_WINDOW:
@@ -881,7 +878,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			STRACE(("ServerApp %s: Show Cursor\n", Signature()));
 			// TODO: support nested showing/hiding
-			fDesktop->GetHWInterface()->SetCursorVisible(true);
+			fDesktop->HWInterface()->SetCursorVisible(true);
 			fCursorHidden = false;
 			break;
 		}
@@ -889,7 +886,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			STRACE(("ServerApp %s: Hide Cursor\n", Signature()));
 			// TODO: support nested showing/hiding
-			fDesktop->GetHWInterface()->SetCursorVisible(false);
+			fDesktop->HWInterface()->SetCursorVisible(false);
 			fCursorHidden = true;
 			break;
 		}
@@ -897,7 +894,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			STRACE(("ServerApp %s: Obscure Cursor\n", Signature()));
 			// ToDo: Enable ObscureCursor
-			//fDesktop->GetHWInterface()->ObscureCursor();
+			//fDesktop->HWInterface()->ObscureCursor();
 			break;
 		}
 		case AS_QUERY_CURSOR_HIDDEN:
@@ -928,7 +925,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			// ToDo: These two should probably both be done in Desktop directly
 			fDesktop->GetCursorManager().AddCursor(fAppCursor);
-			fDesktop->GetHWInterface()->SetCursor(fAppCursor);
+			fDesktop->HWInterface()->SetCursor(fAppCursor);
 			break;
 		}
 		case AS_SET_CURSOR_BCURSOR:
@@ -946,7 +943,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			ServerCursor *cursor = fDesktop->GetCursorManager().FindCursor(ctoken);
 			if (cursor)
-				fDesktop->GetHWInterface()->SetCursor(cursor);
+				fDesktop->HWInterface()->SetCursor(cursor);
 
 			if (sync) {
 				// the application is expecting a reply, but plans to do literally nothing
@@ -2128,7 +2125,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<display_mode>(&target);
 			link.Read<display_mode>(&low);
 			link.Read<display_mode>(&high);
-			status_t status = fDesktop->GetHWInterface()->ProposeMode(&target, &low, &high);
+			status_t status = fDesktop->HWInterface()->ProposeMode(&target, &low, &high);
 
 			// ProposeMode() returns B_BAD_VALUE to hint that the candidate is
 			// not within the given limits (but is supported)
@@ -2151,7 +2148,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			display_mode* modeList;
 			uint32 count;
-			status_t status = fDesktop->GetHWInterface()->GetModeList(&modeList, &count);
+			status_t status = fDesktop->HWInterface()->GetModeList(&modeList, &count);
 			if (status == B_OK) {
 				fLink.StartMessage(B_OK);
 				fLink.Attach<uint32>(count);
@@ -2225,7 +2222,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			accelerant_device_info accelerantInfo;
 			// TODO: I wonder if there should be a "desktop" lock...
-			status_t status = fDesktop->GetHWInterface()->GetDeviceInfo(&accelerantInfo);
+			status_t status = fDesktop->HWInterface()->GetDeviceInfo(&accelerantInfo);
 			if (status == B_OK) {
 				fLink.StartMessage(B_OK);
 				fLink.Attach<accelerant_device_info>(accelerantInfo);
@@ -2246,7 +2243,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			frame_buffer_config config;
 			// TODO: I wonder if there should be a "desktop" lock...
-			status_t status = fDesktop->GetHWInterface()->GetFrameBufferConfig(config);
+			status_t status = fDesktop->HWInterface()->GetFrameBufferConfig(config);
 			if (status == B_OK) {
 				fLink.StartMessage(B_OK);
 				fLink.Attach<frame_buffer_config>(config);
@@ -2265,7 +2262,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			screen_id id;
 			link.Read<screen_id>(&id);
 
-			sem_id semaphore = fDesktop->GetHWInterface()->RetraceSemaphore();
+			sem_id semaphore = fDesktop->HWInterface()->RetraceSemaphore();
 			fLink.StartMessage(semaphore);
 			fLink.Flush();
 			break;
@@ -2279,7 +2276,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<screen_id>(&id);
 
 			display_timing_constraints constraints;
-			status_t status = fDesktop->GetHWInterface()->GetTimingConstraints(
+			status_t status = fDesktop->HWInterface()->GetTimingConstraints(
 				&constraints);
 			if (status == B_OK) {
 				fLink.StartMessage(B_OK);
@@ -2301,7 +2298,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<display_mode>(&mode);
 
 			uint32 low, high;
-			status_t status = fDesktop->GetHWInterface()->GetPixelClockLimits(&mode,
+			status_t status = fDesktop->HWInterface()->GetPixelClockLimits(&mode,
 				&low, &high);
 			if (status == B_OK) {
 				fLink.StartMessage(B_OK);
@@ -2323,7 +2320,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			uint32 mode;
 			link.Read<uint32>(&mode);
 
-			status_t status = fDesktop->GetHWInterface()->SetDPMSMode(mode);
+			status_t status = fDesktop->HWInterface()->SetDPMSMode(mode);
 			fLink.StartMessage(status);
 
 			fLink.Flush();
@@ -2337,7 +2334,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			screen_id id;
 			link.Read<screen_id>(&id);
 
-			uint32 state = fDesktop->GetHWInterface()->DPMSMode();
+			uint32 state = fDesktop->HWInterface()->DPMSMode();
 			fLink.StartMessage(B_OK);
 			fLink.Attach<uint32>(state);
 			fLink.Flush();
@@ -2350,7 +2347,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			screen_id id;
 			link.Read<screen_id>(&id);
 
-			uint32 capabilities = fDesktop->GetHWInterface()->DPMSCapabilities();
+			uint32 capabilities = fDesktop->HWInterface()->DPMSCapabilities();
 			fLink.StartMessage(B_OK);
 			fLink.Attach<uint32>(capabilities);
 			fLink.Flush();

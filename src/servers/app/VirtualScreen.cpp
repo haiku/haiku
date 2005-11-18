@@ -105,7 +105,7 @@ VirtualScreen::AddScreen(Screen* screen)
 
 	// TODO: this works only for single screen configurations
 	fDrawingEngine = screen->GetDrawingEngine();
-	fHWInterface = screen->GetHWInterface();
+	fHWInterface = screen->HWInterface();
 	fFrame = screen->Frame();
 
 	fScreenList.AddItem(item);

@@ -1,26 +1,26 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc. All rights reserved.
-//  Distributed under the terms of the MIT license.
-//
-//	File Name:		ServerScreen.h
-//	Author:			Adi Oanca <adioanca@myrealbox.com>
-//					Axel Dörfler, axeld@pinc-software.de
-//					Stephan Aßmus, <superstippi@gmx.de>
-//	Description:	Handles individual screens
-//
-//------------------------------------------------------------------------------
+/*
+ * Copyright (c) 2001-2005, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Adi Oanca <adioanca@myrealbox.com>
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Stephan Aßmus, <superstippi@gmx.de>
+ */
 #ifndef _SCREEN_H_
 #define _SCREEN_H_
 
+
 #include <Accelerant.h>
 #include <Point.h>
+
 
 class DrawingEngine;
 class HWInterface;
 
 class Screen {
  public:
-								Screen(HWInterface *interface, int32 id);
+								Screen(::HWInterface *interface, int32 id);
 								Screen();
 	virtual						~Screen();
 
@@ -47,7 +47,7 @@ class Screen {
 
 	inline	DrawingEngine*		GetDrawingEngine() const
 									{ return fDriver; }
-	inline	HWInterface*		GetHWInterface() const
+	inline	::HWInterface*		HWInterface() const
 									{ return fHWInterface; }
 
  private:
@@ -64,7 +64,7 @@ class Screen {
 
 			int32				fID;
 			DrawingEngine*		fDriver;
-			HWInterface*		fHWInterface;
+			::HWInterface*		fHWInterface;
 };
 
 #endif	/* _SCREEN_H_ */

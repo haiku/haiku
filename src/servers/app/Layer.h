@@ -6,12 +6,7 @@
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Adi Oanca <adioanca@gmail.com>
  *		Stephan Aßmus <superstippi@gmx.de>
- *
- * Description:
- *		Class used for tracking drawing context and screen clipping.
- *		One Layer per client BWindow (WindowBorder) and each BView therein.
  */
-
 #ifndef _LAYER_H_
 #define _LAYER_H_
 
