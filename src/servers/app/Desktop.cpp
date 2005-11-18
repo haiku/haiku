@@ -123,33 +123,15 @@ Desktop::Init()
 		private:
 			RootLayer* fRootLayer;
 	};
-	class KeyFilter : public BMessageFilter {
-		public:
-			KeyFilter(RootLayer* layer)
-				: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
-				fRootLayer(layer)
-			{
-			}
-
-			virtual filter_result
-			Filter(BMessage* message, BHandler** /*_target*/)
-			{
-				fRootLayer->Lock();
-				fRootLayer->KeyboardEventHandler(message);
-				fRootLayer->Unlock();
-				return B_SKIP_MESSAGE;
-			}
-
-		private:
-			RootLayer* fRootLayer;
-	};
 	fEventDispatcher.SetMouseFilter(new MouseFilter(fRootLayer));
-	fEventDispatcher.SetKeyFilter(new KeyFilter(fRootLayer));
 
 	// take care of setting the default cursor
 	ServerCursor *cursor = fCursorManager.GetCursor(B_CURSOR_DEFAULT);
 	if (cursor)
 		fVirtualScreen.HWInterface()->SetCursor(cursor);
+
+	fVirtualScreen.HWInterface()->MoveCursorTo(fVirtualScreen.Frame().Width() / 2,
+		fVirtualScreen.Frame().Height() / 2);
 	fVirtualScreen.HWInterface()->SetCursorVisible(true);
 }
 

@@ -27,7 +27,7 @@ class EventDispatcher : public BLocker {
 		status_t SetTo(EventStream* stream);
 		status_t InitCheck();
 
-		void SetFocus(BMessenger* messenger);
+		void SetFocus(const BMessenger* messenger);
 
 		bool AddListener(BMessenger& messenger, int32 token,
 				uint32 events, uint32 options);

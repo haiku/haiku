@@ -146,11 +146,12 @@ EventDispatcher::_Run()
 
 
 void
-EventDispatcher::SetFocus(BMessenger* messenger)
+EventDispatcher::SetFocus(const BMessenger* messenger)
 {
 	BAutolock _(this);
 
-	if (fFocus == *messenger)
+	if ((messenger == NULL && !fHasFocus)
+		|| (messenger != NULL && fFocus == *messenger))
 		return;
 
 	fHasLastFocus = fHasFocus;
@@ -166,7 +167,7 @@ EventDispatcher::SetFocus(BMessenger* messenger)
 
 	if (fHasFocus) {
 		fFocus = *messenger;
-		
+
 		// add all B_POINTER_EVENTS tokens that target this messenger
 		for (int32 i = fListeners.CountItems(); i-- > 0;) {
 			event_target* target = fListeners.ItemAt(i);

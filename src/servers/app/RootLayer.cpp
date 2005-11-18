@@ -676,8 +676,11 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 	if (oldWMState.Active != fWMState.Active) {
 		if (oldWMState.Active)
 			oldWMState.Active->Activated(false);
-		if (fWMState.Active)
+		if (fWMState.Active) {
 			fWMState.Active->Activated(true);
+			fDesktop->EventDispatcher().SetFocus(&fWMState.Active->Window()->Messenger());
+		} else
+			fDesktop->EventDispatcher().SetFocus(NULL);
 	}
 
 	// calculate the region that must be invalidated/redrawn

@@ -13,18 +13,19 @@
 #define SERVER_WINDOW_H
 
 
-#include <GraphicsDefs.h>
+#include "MessageLooper.h"
+#include "SubWindowList.h"
+
 #include <PortLink.h>
+#include <TokenSpace.h>
+
+#include <GraphicsDefs.h>
 #include <Locker.h>
 #include <Message.h>
-#include <OS.h>
+#include <Messenger.h>
 #include <Rect.h>
 #include <String.h>
 #include <Window.h>
-
-#include "MessageLooper.h"
-#include "SubWindowList.h"
-#include "TokenSpace.h"
 
 class BString;
 class BMessenger;
@@ -70,7 +71,8 @@ public:
 			void				NotifyScreenModeChanged(const BRect frame,
 									const color_space cspace);
 
-			// util methods.	
+			// util methods.
+			const BMessenger&	Messenger() const { return fClientMessenger; }
 			status_t			SendMessageToClient(const BMessage* msg,
 													int32 target = B_NULL_TOKEN,
 													bool usePreferred = false) const;
@@ -138,6 +140,7 @@ private:
 			port_id				fMessagePort;
 			port_id				fClientReplyPort;
 			port_id				fClientLooperPort;
+			BMessenger			fClientMessenger;
 
 			BMessage			fClientViewsWithInvalidCoords;
 

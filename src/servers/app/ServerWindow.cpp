@@ -149,6 +149,9 @@ ServerWindow::ServerWindow(const char *title, ServerApp *app,
 
 	SetTitle(title);
 	fServerToken = BPrivate::gDefaultTokens.NewToken(B_SERVER_TOKEN, this);
+
+	BMessenger::Private(fClientMessenger).SetTo(fClientTeam,
+		looperPort, clientToken, false);
 }
 
 
