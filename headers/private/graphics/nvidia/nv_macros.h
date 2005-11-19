@@ -671,6 +671,8 @@
 #define NVDAC_FP_DEBUG1		0x00680884
 #define NVDAC_FP_DEBUG2		0x00680888
 #define NVDAC_FP_DEBUG3		0x0068088c
+#define NVDAC_FP_TMDS_CTRL	0x006808b0
+#define NVDAC_FP_TMDS_DATA	0x006808b4
 /* secondary head */
 #define NVDAC2_CURPOS		0x00682300
 #define NVDAC2_NV10_CURSYNC	0x00682404
@@ -702,6 +704,8 @@
 #define NVDAC2_FP_DEBUG1	0x00682884
 #define NVDAC2_FP_DEBUG2	0x00682888
 #define NVDAC2_FP_DEBUG3	0x0068288c
+#define NVDAC2_FP_TMDS_CTRL	0x006828b0//verify!!!
+#define NVDAC2_FP_TMDS_DATA	0x006828b4//verify!!!
 
 /* Nvidia CRTC indexed registers */
 /* VGA standard registers: */
