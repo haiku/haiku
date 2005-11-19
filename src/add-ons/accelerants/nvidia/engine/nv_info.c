@@ -2465,6 +2465,34 @@ static void detect_panels()
 		LOG(2,("DAC2: FUNCSEL: $%08x\n", NV_REG32(NV32_2FUNCSEL)));
 		LOG(2,("DAC2: PANEL_PWR: $%08x\n", NV_REG32(NV32_2PANEL_PWR)));
 	}
+
+	/* determine flatpanel(s) type(s) */
+	//fixme?: linux checks only on dualhead cards, and only on DAC1...
+//fixme: testing...
+	if (1)//si->ps.tmds1_active)
+	{
+		/* Read a indexed register to see if it indicates LVDS or TMDS panel presence.
+		 * b0-7 = adress, b16 = 1 = write_enable */
+		DACW(FP_TMDS_CTRL, ((1 << 16) | 0x04));
+		/* (b0-7 = data) */
+		if (DACR(FP_TMDS_DATA) & 0x01)
+			LOG(2,("INFO: Flatpanel on head 1 is LVDS type\n"));
+		else
+			LOG(2,("INFO: Flatpanel on head 1 is TMDS type\n"));
+	}
+//fixme: testing...
+	if (1)//si->ps.tmds2_active)
+	{
+		/* Read a indexed register to see if it indicates LVDS or TMDS panel presence.
+		 * b0-7 = adress, b16 = 1 = write_enable */
+		DAC2W(FP_TMDS_CTRL, ((1 << 16) | 0x04));
+		/* (b0-7 = data) */
+		if (DAC2R(FP_TMDS_DATA) & 0x01)
+			LOG(2,("INFO: Flatpanel on head 2 is LVDS type\n"));
+		else
+			LOG(2,("INFO: Flatpanel on head 2 is TMDS type\n"));
+	}
+
 	LOG(2,("INFO: End flatpanel registers dump.\n"));
 }
 
