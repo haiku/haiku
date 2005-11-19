@@ -19,10 +19,12 @@
 namespace BPrivate {
 
 BTokenSpace gDefaultTokens;
-	// the one and only token space object per team
+	// the default token space - all handlers will go into that one
 
 
 BTokenSpace::BTokenSpace()
+	:
+	fTokenCount(1)
 {
 }
 
@@ -38,16 +40,8 @@ BTokenSpace::NewToken(int16 type, void* object,
 {
 	BAutolock locker(this);
 
-	TTokenInfo tokenInfo = { type, object };
-	int32 token;
-
-	if (fTokenBin.empty()) {
-		token = fTokenCount;
-		++fTokenCount;
-	} else {
-		token = fTokenBin.top();
-		fTokenBin.pop();
-	}
+	token_info tokenInfo = { type, object };
+	int32 token = fTokenCount++;
 
 	fTokenMap[token] = tokenInfo;
 
@@ -63,16 +57,14 @@ BTokenSpace::RemoveToken(int32 token, remove_token_callback callback)
 {
 	BAutolock locker(this);
 
-	TTokenMap::iterator iter = fTokenMap.find(token);
-	if (iter == fTokenMap.end())
+	TokenMap::iterator iterator = fTokenMap.find(token);
+	if (iterator == fTokenMap.end())
 		return false;
 
 	if (callback)
-		callback(iter->second.type, iter->second.object);
+		callback(iterator->second.type, iterator->second.object);
 
-	fTokenMap.erase(iter);
-	fTokenBin.push(token);
-
+	fTokenMap.erase(iterator);
 	return true;
 }
 
@@ -86,8 +78,8 @@ BTokenSpace::CheckToken(int32 token, int16 type) const
 {
 	BAutolock locker(const_cast<BTokenSpace&>(*this));
 
-	TTokenMap::const_iterator iter = fTokenMap.find(token);
-	if (iter != fTokenMap.end() && iter->second.type == type)
+	TokenMap::const_iterator iterator = fTokenMap.find(token);
+	if (iterator != fTokenMap.end() && iterator->second.type == type)
 		return true;
 
 	return false;
@@ -95,44 +87,27 @@ BTokenSpace::CheckToken(int32 token, int16 type) const
 
 
 status_t
-BTokenSpace::GetToken(int32 token, int16 type, void** object,
+BTokenSpace::GetToken(int32 token, int16 type, void** _object,
 	get_token_callback callback) const
 {
 	BAutolock locker(const_cast<BTokenSpace&>(*this));
 
-	TTokenMap::const_iterator iter = fTokenMap.find(token);
-	if (iter == fTokenMap.end() || iter->second.type != type) {
-		*object = NULL;
+	if (token < 1)
+		return B_ENTRY_NOT_FOUND;
+
+	TokenMap::const_iterator iterator = fTokenMap.find(token);
+
+	if (iterator == fTokenMap.end() || iterator->second.type != type) {
+		*_object = NULL;
 		return B_ERROR;
 	}
 
-	if (callback && !callback(iter->second.type, iter->second.object)) {
-		*object = NULL;
+	if (callback && !callback(iterator->second.type, iterator->second.object)) {
+		*_object = NULL;
 		return B_ERROR;
 	}
 
-	*object = iter->second.object;
-
-	return B_OK;
-}
-
-
-status_t
-BTokenSpace::GetList(int32*& tokens, int32& count) const
-{
-	BAutolock locker(const_cast<BTokenSpace&>(*this));
-
-	count = fTokenMap.size();
-	tokens = (int32*)malloc(count * sizeof(int32));
-	if (tokens == NULL)
-		return B_NO_MEMORY;
-
-	TTokenMap::const_iterator iterator = fTokenMap.begin();
-	for (int32 i = 0; iterator != fTokenMap.end(); i++) {
-		tokens[i] = iterator->first;
-		iterator++;
-	}
-
+	*_object = iterator->second.object;
 	return B_OK;
 }
 

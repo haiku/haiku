@@ -40,40 +40,22 @@ class BTokenSpace : public BLocker {
 		~BTokenSpace();
 
 		int32		NewToken(int16 type, void* object,
-							 new_token_callback callback = NULL);
+						new_token_callback callback = NULL);
 		bool		RemoveToken(int32 token, remove_token_callback callback = NULL);
 		bool		CheckToken(int32 token, int16 type) const;
 		status_t	GetToken(int32 token, int16 type, void** object,
-							 get_token_callback callback = NULL) const;
-
-		status_t	GetList(int32*& tokens, int32& count) const;
-
-// Possible expansion
-//		void Dump(BDataIO&, bool) const;
-//		int32 NewToken(void*, BDirectMessageTarget*, void (*)(short, void*));
-//		bool SetTokenTarget(uint32, BDirectMessageTarget*);
-//		BDirectMessageTarget* TokenTarget(uint32 token, int16 type);
+						get_token_callback callback = NULL) const;
 
 	private:
-		struct TTokenInfo {
+		struct token_info {
 			int16	type;
 			void*	object;
 		};
+		typedef std::map<int32, token_info> TokenMap;
 
-		typedef std::map<int32, TTokenInfo>	TTokenMap;
-
-		TTokenMap			fTokenMap;
-		std::stack<int32>	fTokenBin;
-		int32				fTokenCount;
+		TokenMap	fTokenMap;
+		int32		fTokenCount;
 };
-
-// Possible expansion
-//_delete_tokens_();
-//_init_tokens_();
-//get_handler_token(short, void*);
-//get_token_list(long, long*);
-//new_handler_token(short, void*);
-//remove_handler_token(short, void*);
 
 extern _IMPEXP_BE BTokenSpace gDefaultTokens;
 
