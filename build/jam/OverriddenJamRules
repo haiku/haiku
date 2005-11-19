@@ -382,11 +382,11 @@ rule LibraryFromObjects
 	on $(_l) {
 		# set the tools according to the platform
 		if $(PLATFORM) = host {
-			AR on $(1) = $(HOST_AR) $(HOST_ARFLAGS) ;
-			RANLIB on $(1) = $(HOST_RANLIB) ;
+			AR on $(_l) = $(HOST_AR) $(HOST_ARFLAGS) ;
+			RANLIB on $(_l) = $(HOST_RANLIB) ;
 		} else {
-			AR on $(1) = $(TARGET_AR) $(TARGET_ARFLAGS) ;
-			RANLIB on $(1) = $(TARGET_RANLIB) ;
+			AR on $(_l) = $(TARGET_AR) $(TARGET_ARFLAGS) ;
+			RANLIB on $(_l) = $(TARGET_RANLIB) ;
 		}
 		
 		# library depends on its member objects
