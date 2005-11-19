@@ -1261,7 +1261,7 @@ BLooper::task_looper()
 				//	Get the target handler
 				//	Use BMessage friend functions to determine if we are using the
 				//	preferred handler, or if a target has been specified
-				BHandler* handler;
+				BHandler* handler = NULL;
 				if (_use_preferred_target_(fLastMessage)) {
 					PRINT(("LOOPER: use preferred target\n"));
 					handler = fPreferred;

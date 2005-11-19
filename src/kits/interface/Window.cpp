@@ -2247,13 +2247,13 @@ BWindow::task_looper()
 				//	Use the private BMessage accessor to determine if we are
 				//	using the preferred handler, or if a target has been
 				//	specified
-				BHandler *handler;
+				BHandler *handler = NULL;
 				BMessage::Private messagePrivate(fLastMessage);
 				bool usePreferred = messagePrivate.UsePreferredTarget();
 #else
 				//	Use BMessage friend functions to determine if we are using the
 				//	preferred handler, or if a target has been specified
-				BHandler* handler;
+				BHandler* handler = NULL;
 				bool usePreferred = _use_preferred_target_(fLastMessage);
 #endif
 				if (usePreferred) {
