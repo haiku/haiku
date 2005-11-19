@@ -471,8 +471,6 @@ Layer::Show(bool invalidate)
 	
 	fHidden	= false;
 
-	SendViewCoordUpdateMsg();
-
 	if (invalidate) {
 		// compute the region this layer wants for itself
 		BRegion	invalid;
@@ -630,7 +628,7 @@ Layer::MoveBy(float x, float y)
 
 	MovedByHook(x, y);
 
-	SendViewCoordUpdateMsg();
+	_SendViewCoordUpdateMsg();
 }
 
 
@@ -719,7 +717,7 @@ Layer::ResizeBy(float x, float y)
 			child->_ResizeLayerFrameBy(x, y);
 	}
 
-	SendViewCoordUpdateMsg();
+	_SendViewCoordUpdateMsg();
 }
 
 
@@ -903,29 +901,6 @@ Layer::Scale() const
 	return CurrentState()->Scale();
 }
 
-
-void
-Layer::AddToViewsWithInvalidCoords() const
-{
-	if (fServerWin) {
-		fServerWin->ClientViewsWithInvalidCoords().AddInt32("_token", fViewToken);
-		fServerWin->ClientViewsWithInvalidCoords().AddPoint("where", fFrame.LeftTop());
-		fServerWin->ClientViewsWithInvalidCoords().AddFloat("width", fFrame.Width());
-		fServerWin->ClientViewsWithInvalidCoords().AddFloat("height", fFrame.Height());
-	}
-}
-
-
-void
-Layer::SendViewCoordUpdateMsg() const
-{
-	if (fServerWin && !fServerWin->ClientViewsWithInvalidCoords().IsEmpty()) {
-		fServerWin->SendMessageToClient(&fServerWin->ClientViewsWithInvalidCoords());
-		fServerWin->ClientViewsWithInvalidCoords().MakeEmpty();
-	}
-}
-
-
 void
 Layer::SetViewColor(const RGBColor& color)
 {
@@ -954,14 +929,14 @@ void
 Layer::MovedByHook(float dx, float dy)
 {
 	if (Window() && !IsTopLayer())
-		AddToViewsWithInvalidCoords();
+		_AddToViewsWithInvalidCoords();
 }
 
 void
 Layer::ResizedByHook(float dx, float dy, bool automatic)
 {
 	if (Window() && !IsTopLayer())
-		AddToViewsWithInvalidCoords();
+		_AddToViewsWithInvalidCoords();
 }
 
 void
@@ -1133,7 +1108,7 @@ Layer::_ResizeLayerFrameBy(float x, float y)
 		newFrame.bottom += y;
 	else if ((rm & 0x00F0U) == _VIEW_CENTER_ << 4)
 		newFrame.bottom += y/2;
-/*
+
 	if (newFrame != fFrame) {
 		float offsetX, offsetY;
 		float dx, dy;
@@ -1154,28 +1129,8 @@ Layer::_ResizeLayerFrameBy(float x, float y)
 			ResizedByHook(dx, dy, true); // automatic
 
 			for (Layer* child = LastChild(); child; child = PreviousChild())
-				child->resize_layer_frame_by(dx, dy);
-		}
-	}
-*/
-// TODO: the above code is CORRECT!!!
-// It's commented because BView::FrameResized()/Moved() be called twice a given view. FIX THIS!
-	if (newFrame != fFrame) {
-		float dx, dy;
-
-		dx = newFrame.Width() - fFrame.Width();
-		dy = newFrame.Height() - fFrame.Height();
-
-		fFrame = newFrame;
-
-		if (dx != 0.0f || dy != 0.0f) {
-			// call hook function
-			ResizedByHook(dx, dy, true); // automatic
-
-			for (Layer *child = LastChild(); child != NULL; child = PreviousChild())
 				child->_ResizeLayerFrameBy(dx, dy);
-		} else
-			MovedByHook(dx, dy);
+		}
 	}
 }
 
@@ -1470,3 +1425,23 @@ Layer::_AllRedraw(const BRegion &invalid)
 	}
 }
 
+void
+Layer::_AddToViewsWithInvalidCoords() const
+{
+	if (fServerWin) {
+		fServerWin->ClientViewsWithInvalidCoords().AddInt32("_token", fViewToken);
+		fServerWin->ClientViewsWithInvalidCoords().AddPoint("where", fFrame.LeftTop());
+		fServerWin->ClientViewsWithInvalidCoords().AddFloat("width", fFrame.Width());
+		fServerWin->ClientViewsWithInvalidCoords().AddFloat("height", fFrame.Height());
+	}
+}
+
+
+void
+Layer::_SendViewCoordUpdateMsg() const
+{
+	if (fServerWin && !fServerWin->ClientViewsWithInvalidCoords().IsEmpty()) {
+		fServerWin->SendMessageToClient(&fServerWin->ClientViewsWithInvalidCoords());
+		fServerWin->ClientViewsWithInvalidCoords().MakeEmpty();
+	}
+}

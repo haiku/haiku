@@ -220,8 +220,8 @@ class Layer {
 			void				_ResizeLayerFullUpdateOnResize(BRegion &reg, float dx, float dy);
 
 	// for updating client-side coordinates
-			void				AddToViewsWithInvalidCoords() const;
-			void				SendViewCoordUpdateMsg() const;
+			void				_AddToViewsWithInvalidCoords() const;
+			void				_SendViewCoordUpdateMsg() const;
 
 
 			BString				fName;	
