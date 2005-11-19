@@ -208,11 +208,6 @@ class Layer {
 	friend class WinBorder;
 	friend class ServerWindow;
 
- 			void				do_Hide();
- 			void				do_Show();
-			void				do_CopyBits(BRect& src, BRect& dst,
-											int32 xOffset, int32 yOffset);
-
 	// private clipping stuff
 	virtual	void				_ReserveRegions(BRegion &reg);
 			void				_RebuildVisibleRegions( const BRegion &invalid,

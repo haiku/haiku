@@ -733,7 +733,7 @@ Layer::ScrollBy(float x, float y)
 		return;
 
 	// must lock, even if we change frame/origin coordinates
-	if (fParent && !IsHidden() && GetRootLayer() && GetRootLayer()->Lock()) {
+	if (!IsHidden() && GetRootLayer() && GetRootLayer()->Lock()) {
 		fDrawState->OffsetOrigin(BPoint(x, y));
 
 		// set the region to be invalidated.
@@ -773,6 +773,58 @@ Layer::ScrollBy(float x, float y)
 // TODO: I think we should update the client-side that bounds rect has modified
 //	SendViewCoordUpdateMsg();
 }
+
+void
+Layer::CopyBits(BRect& src, BRect& dst, int32 xOffset, int32 yOffset)
+{
+	// NOTE: The correct behaviour is this:
+	// * The region that is copied is the
+	//   src rectangle, no matter if it fits
+	//   into the dst rectangle. It is copied
+	//   by the offset dst.LeftTop() - src.LeftTop()
+	// * The dst rectangle is used for invalidation:
+	//   Any area in the dst rectangle that could
+	//   not be copied from src (because either the
+	//   src rectangle was not big enough, or because there
+	//   were parts cut off by the current layer clipping),
+	//   are triggering BView::Draw() to be called
+	//   and for these parts only.
+
+	if (!GetRootLayer())
+		return;
+
+	if (!IsHidden() && GetRootLayer()->Lock()) {
+		// the region that is going to be copied
+		BRegion copyRegion(src);
+
+		// apply the current clipping of the layer
+		copyRegion.IntersectWith(&fVisible);
+
+		// offset the region to the destination
+		// and apply the current clipping there as well
+		copyRegion.OffsetBy(xOffset, yOffset);
+		copyRegion.IntersectWith(&fVisible);
+
+		// the region at the destination that needs invalidation
+		BRegion redrawReg(dst);
+		// exclude the region drawn by the copy operation
+// TODO: quick fix for our scrolling problem. FIX THIS!
+//		redrawReg.Exclude(&copyRegion);
+		// apply the current clipping as well
+		redrawReg.IntersectWith(&fVisible);
+
+		// move the region back for the actual operation
+		copyRegion.OffsetBy(-xOffset, -yOffset);
+
+		GetDrawingEngine()->CopyRegion(&copyRegion, xOffset, yOffset);
+
+		// trigger the redraw			
+		GetRootLayer()->MarkForRedraw(redrawReg);
+		GetRootLayer()->TriggerRedraw();
+
+		GetRootLayer()->Unlock();
+	}
+}		
 
 void
 Layer::MouseDown(const BMessage *msg)
@@ -896,64 +948,6 @@ Layer::SetOverlayBitmap(const ServerBitmap* bitmap)
 	// TODO: What about reference counting?
 	// "Release" old fOverlayBitmap and "Aquire" new one?
 	fOverlayBitmap = bitmap;
-}
-
-void
-Layer::CopyBits(BRect& src, BRect& dst, int32 xOffset, int32 yOffset) {
-
-	GetRootLayer()->Lock();
-	do_CopyBits(src, dst, xOffset, yOffset);
-	GetRootLayer()->Unlock();
-}		
-
-void
-Layer::do_CopyBits(BRect& src, BRect& dst, int32 xOffset, int32 yOffset) {
-	// NOTE: The correct behaviour is this:
-	// * The region that is copied is the
-	//   src rectangle, no matter if it fits
-	//   into the dst rectangle. It is copied
-	//   by the offset dst.LeftTop() - src.LeftTop()
-	// * The dst rectangle is used for invalidation:
-	//   Any area in the dst rectangle that could
-	//   not be copied from src (because either the
-	//   src rectangle was not big enough, or because there
-	//   were parts cut off by the current layer clipping),
-	//   are triggering BView::Draw() to be called
-	//   and for these parts only.
-
-	// TODO: having moved this into Layer broke
-	// offscreen windows (bitmaps)
-	// -> move back into ServerWindow...
-	if (!GetRootLayer())
-		return;
-
-	// the region that is going to be copied
-	BRegion copyRegion(src);
-	// apply the current clipping of the layer
-
-	copyRegion.IntersectWith(&fVisible);
-
-	// offset the region to the destination
-	// and apply the current clipping there as well
-	copyRegion.OffsetBy(xOffset, yOffset);
-	copyRegion.IntersectWith(&fVisible);
-
-	// the region at the destination that needs invalidation
-	BRegion redrawReg(dst);
-	// exclude the region drawn by the copy operation
-// TODO: quick fix for our scrolling problem. FIX THIS!
-//	redrawReg.Exclude(&copyRegion);
-	// apply the current clipping as well
-	redrawReg.IntersectWith(&fVisible);
-
-	// move the region back for the actual operation
-	copyRegion.OffsetBy(-xOffset, -yOffset);
-
-	GetDrawingEngine()->CopyRegion(&copyRegion, xOffset, yOffset);
-
-	// trigger the redraw			
-	GetRootLayer()->MarkForRedraw(redrawReg);
-	GetRootLayer()->TriggerRedraw();
 }
 
 void
@@ -1105,50 +1099,6 @@ Layer::ConvertFromScreen(BRegion* reg) const
 		fParent->ConvertFromScreen(reg);
 	}
 }
-
-
-void
-Layer::do_Hide()
-{
-	fHidden = true;
-
-	if (fParent && !fParent->IsHidden() && GetRootLayer()) {
-		// save fullVisible so we know what to invalidate
-		BRegion invalid(fFullVisible);
-
-		_ClearVisibleRegions();
-
-		if (invalid.CountRects() > 0) {
-			fParent->MarkForRebuild(invalid);
-			GetRootLayer()->MarkForRedraw(invalid);
-
-			fParent->TriggerRebuild();
-			GetRootLayer()->TriggerRedraw();
-		}
-	}
-}
-
-
-void
-Layer::do_Show()
-{
-	fHidden = false;
-
-	if (fParent && !fParent->IsHidden() && GetRootLayer()) {
-		BRegion invalid;
-
-		GetOnScreenRegion(invalid);
-
-		if (invalid.CountRects() > 0) {
-			fParent->MarkForRebuild(invalid);
-			GetRootLayer()->MarkForRedraw(invalid);
-
-			fParent->TriggerRebuild();
-			GetRootLayer()->TriggerRedraw();
-		}
-	}
-}
-
 
 void
 Layer::_ResizeLayerFrameBy(float x, float y)
