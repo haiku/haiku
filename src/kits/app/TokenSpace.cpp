@@ -92,8 +92,10 @@ BTokenSpace::GetToken(int32 token, int16 type, void** _object,
 {
 	BAutolock locker(const_cast<BTokenSpace&>(*this));
 
-	if (token < 1)
+	if (token < 1) {
+		*_object = NULL;
 		return B_ENTRY_NOT_FOUND;
+	}
 
 	TokenMap::const_iterator iterator = fTokenMap.find(token);
 
