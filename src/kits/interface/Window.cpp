@@ -913,8 +913,8 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			// will show this message, and not what it used to be on R5. This might break apps and
 			// we need to fix this here or change the way this feature is implemented. However, this
 			// implementation shows what has to be done when Layers are moved or resized inside the
-			// app_server. This message is generated from Layer::move_by() and resize_by() in
-			// Layer::AddToViewsWithInvalidCoords().
+			// app_server. This message is generated from Layer::MoveByHook() and ResizeByHook() in
+			// Layer::_AddToViewsWithInvalidCoords().
 			int32 token;
 			BPoint frameLeftTop;
 			float width;
@@ -928,7 +928,6 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 					if ((view = findView(fTopView, token))) {
 						// update the views offset in parent
 						if (view->LeftTop() != frameLeftTop) {
-//printf("updating position (%.1f, %.1f): %s\n", frameLeftTop.x, frameLeftTop.y, view->Name());
 							view->fParentOffset = frameLeftTop;
 
 							// optionally call FrameMoved
@@ -940,7 +939,6 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 						}
 						// update the views width and height
 						if (view->fBounds.Width() != width || view->fBounds.Height() != height) {
-//printf("updating size (%.1f, %.1f): %s\n", width, height, view->Name());
 							// TODO: does this work when a views left/top side is resized?
 							view->fBounds.right = view->fBounds.left + width;
 							view->fBounds.bottom = view->fBounds.top + height;
@@ -2196,114 +2194,7 @@ BWindow::task_looper()
 {
 	STRACE(("info: BWindow::task_looper() started.\n"));
 
-	//	Check that looper is locked (should be)
-	AssertLocked();
-	//	Unlock the looper
-	Unlock();
-
-	if (IsLocked())
-		debugger("window must not be locked!");
-
-	//	loop: As long as we are not terminating.
-	while (!fTerminating) {
-		// TODO: timeout determination algo
-		//	Read from message port (how do we determine what the timeout is?)
-		BMessage* msg = MessageFromPort();
-
-		//	Did we get a message?
-		if (msg) {
-			//	Add to queue
-			fQueue->AddMessage(msg);
-		} else
-			continue;
-
-		//	Get message count from port
-		int32 msgCount = port_count(fMsgPort);
-		for (int32 i = 0; i < msgCount; ++i) {
-			//	Read 'count' messages from port (so we will not block)
-			//	We use zero as our timeout since we know there is stuff there
-			msg = MessageFromPort(0);
-			//	Add messages to queue
-			if (msg)
-				fQueue->AddMessage(msg);
-		}
-
-		//	loop: As long as there are messages in the queue and the port is
-		//		  empty... and we are not terminating, of course.
-		bool dispatchNextMessage = true;
-		while (!fTerminating && dispatchNextMessage) {
-			//	Get next message from queue (assign to fLastMessage)
-			fLastMessage = fQueue->NextMessage();
-
-			//	Lock the looper
-			Lock();
-			if (!fLastMessage) {
-				// No more messages: Unlock the looper and terminate the
-				// dispatch loop.
-				dispatchNextMessage = false;
-			} else {
-				//	Get the target handler
-#ifdef USING_MESSAGE4
-				//	Use the private BMessage accessor to determine if we are
-				//	using the preferred handler, or if a target has been
-				//	specified
-				BHandler *handler = NULL;
-				BMessage::Private messagePrivate(fLastMessage);
-				bool usePreferred = messagePrivate.UsePreferredTarget();
-#else
-				//	Use BMessage friend functions to determine if we are using the
-				//	preferred handler, or if a target has been specified
-				BHandler* handler = NULL;
-				bool usePreferred = _use_preferred_target_(fLastMessage);
-#endif
-				if (usePreferred) {
-					handler = PreferredHandler();
-				} else {
-#ifndef USING_MESSAGE4
-					gDefaultTokens.GetToken(_get_message_target_(fLastMessage),
-						B_HANDLER_TOKEN, (void **)&handler);
-#else
-					gDefaultTokens.GetToken(messagePrivate.GetTarget(),
-						B_HANDLER_TOKEN, (void **)&handler);
-#endif
-				}
-
-				// if a target was given, and we should not use the preferred
-				// handler, we can just use that one
-				if (handler == NULL || usePreferred)
-					handler = _DetermineTarget(fLastMessage, handler);
-				if (handler == NULL)
-					handler = this;
-
-				//	Is this a scripting message? (BMessage::HasSpecifiers())
-				if (fLastMessage->HasSpecifiers()) {
-					int32 index = 0;
-					// Make sure the current specifier is kosher
-					if (fLastMessage->GetCurrentSpecifier(&index) == B_OK)
-						handler = resolve_specifier(handler, fLastMessage);
-				}
-
-				if (handler) {
-					//	Do filtering and dispatch message
-					handler = top_level_filter(fLastMessage, handler);
-					if (handler && handler->Looper() == this)
-						DispatchMessage(fLastMessage, handler);
-				}
-			}
-
-			Unlock();
-
-			//	Delete the current message (fLastMessage)
-			delete fLastMessage;
-			fLastMessage = NULL;
-
-			//	Are any messages on the port?
-			if (port_count(fMsgPort) > 0) {
-				//	Do outer loop
-				dispatchNextMessage = false;
-			}
-		}
-	}
+	BLooper::task_looper();
 }
 
 
@@ -2457,57 +2348,6 @@ BWindow::handleActivation(bool active)
 	// for all views attached to this window.
 	fTopView->_Activate(active);
 }
-
-
-/*!
-	\brief Determines the target of a message received.
-*/
-BHandler *
-BWindow::_DetermineTarget(BMessage *message, BHandler *target)
-{
-	// TODO: this is mostly guessed; check for correctness.
-
-	switch (message->what) {
-		case B_KEY_DOWN:
-		case B_KEY_UP:
-		case B_UNMAPPED_KEY_DOWN:
-		case B_UNMAPPED_KEY_UP:
-		case B_MODIFIERS_CHANGED:
-			// these messages will be dispatched by the focus view later
-			return CurrentFocus();
-
-		case B_MOUSE_DOWN:
-		case B_MOUSE_UP:
-		case B_MOUSE_MOVED:
-		case B_MOUSE_WHEEL_CHANGED:
-			// TODO: the app_server should tell us which view is the target
-			break;
-
-		case B_PULSE:
-		case B_QUIT_REQUESTED:
-			// TODO: test wether R5 will let BView dispatch these messages
-			return this;
-		
-		case B_VIEW_RESIZED:
-		case B_VIEW_MOVED:
-		{
-			int32 token;
-			if (message->FindInt32("_token", &token) != B_OK)
-				token = B_NULL_TOKEN;
-
-			BView *view = findView(fTopView, token);
-			if (view)
-				return view;
-			break;
-		}
-
-		default: 
-			break;
-	}
-
-	return target;
-}
-
 
 bool
 BWindow::_HandleKeyDown(char key, uint32 modifiers)

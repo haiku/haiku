@@ -1259,10 +1259,20 @@ BLooper::task_looper()
 				DBG(fLastMessage->PrintToStream());
 
 				//	Get the target handler
+#ifdef USING_MESSAGE4
+				//	Use the private BMessage accessor to determine if we are
+				//	using the preferred handler, or if a target has been
+				//	specified
+				BHandler *handler = NULL;
+				BMessage::Private messagePrivate(fLastMessage);
+				bool usePreferred = messagePrivate.UsePreferredTarget();
+#else
 				//	Use BMessage friend functions to determine if we are using the
 				//	preferred handler, or if a target has been specified
 				BHandler* handler = NULL;
-				if (_use_preferred_target_(fLastMessage)) {
+				bool usePreferred = _use_preferred_target_(fLastMessage);
+#endif
+				if (usePreferred) {
 					PRINT(("LOOPER: use preferred target\n"));
 					handler = fPreferred;
 				} else {
@@ -1276,8 +1286,13 @@ BLooper::task_looper()
 								of BHandler pointers to int32s!
 					 */
 					PRINT(("LOOPER: use: %ld\n", _get_message_target_(fLastMessage)));
+#ifndef USING_MESSAGE4
 					gDefaultTokens.GetToken(_get_message_target_(fLastMessage),
 						B_HANDLER_TOKEN, (void **)&handler);
+#else
+					gDefaultTokens.GetToken(messagePrivate.GetTarget(),
+						B_HANDLER_TOKEN, (void **)&handler);
+#endif
 					PRINT(("LOOPER: handler: %p, this: %p\n", handler, this));
 				}
 

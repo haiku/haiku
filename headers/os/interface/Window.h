@@ -335,7 +335,6 @@ private:
 			//void		post_message(BMessage* message);
 			//void		SetLocalTitle(const char* new_title);
 			//void		enable_pulsing(bool enable);
-			BHandler	*_DetermineTarget(BMessage* message, BHandler* target);
 			//void		kb_navigate();
 			//void		navigate_to_next(int32 direction, bool group = false);
 			//void		set_focus(BView* focus, bool notify_input_server);		// what does notify_input_server mean??? why???
