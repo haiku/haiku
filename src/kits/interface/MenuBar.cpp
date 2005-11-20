@@ -478,13 +478,14 @@ BMenuBar::RestoreFocus()
 		if (BPrivate::gDefaultTokens.GetToken(fPrevFocusToken, B_HANDLER_TOKEN,
 				(void **)&handler, NULL) == B_OK) {
 			BView *view = dynamic_cast<BView *>(handler);
-			if (view != NULL)
+			if (view != NULL && view->Window() == window)
 				view->MakeFocus();
 		}
 		fPrevFocusToken = -1;
 		window->Unlock();
 	}
 }
+
 
 void 
 BMenuBar::InitData(menu_layout layout)
