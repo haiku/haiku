@@ -841,6 +841,8 @@
 #define NVBES_NV10_1SRCPTCH	0x0000895c
 /* Nvidia MPEG2 hardware decoder (GeForce4MX only) */
 #define NVBES_DEC_GENCTRL	0x00001588
+/* LVDS panel related registers */
+#define NV32_LVDS_PWR		0x0000130c
 /* unknown registers */
 #define NV32_NV4X_WHAT0		0x00001540
 #define NV32_NV44_WHAT10	0x00001700
