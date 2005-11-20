@@ -570,29 +570,45 @@ status_t nv_crtc_dpms(bool display, bool h, bool v, bool do_panel)
 		/* end synchronous reset because display should be enabled */
 		SEQW(RESET, 0x03);
 
-		if (do_panel && si->ps.tmds1_active && !si->ps.laptop)
+		if (do_panel && si->ps.tmds1_active)
 		{
-			/* restore original panelsync and panel-enable */
-			uint32 panelsync = 0x00000000;
-			if(si->ps.p1_timing.flags & B_POSITIVE_VSYNC) panelsync |= 0x00000001;
-			if(si->ps.p1_timing.flags & B_POSITIVE_HSYNC) panelsync |= 0x00000010;
-			/* display enable polarity (not an official flag) */
-			if(si->ps.p1_timing.flags & B_BLANK_PEDESTAL) panelsync |= 0x10000000;
-			DACW(FP_TG_CTRL, ((DACR(FP_TG_CTRL) & 0xcfffffcc) | panelsync));
+			if (!si->ps.laptop)
+			{
+				/* restore original panelsync and panel-enable */
+				uint32 panelsync = 0x00000000;
+				if(si->ps.p1_timing.flags & B_POSITIVE_VSYNC) panelsync |= 0x00000001;
+				if(si->ps.p1_timing.flags & B_POSITIVE_HSYNC) panelsync |= 0x00000010;
+				/* display enable polarity (not an official flag) */
+				if(si->ps.p1_timing.flags & B_BLANK_PEDESTAL) panelsync |= 0x10000000;
+				DACW(FP_TG_CTRL, ((DACR(FP_TG_CTRL) & 0xcfffffcc) | panelsync));
 
-			//fixme?: looks like we don't need this after all:
-			/* powerup both LVDS (laptop panellink) and TMDS (DVI panellink)
-			 * internal transmitters... */
-			/* note:
-			 * the powerbits in this register are hardwired to the DVI connectors,
-			 * instead of to the DACs! (confirmed NV34) */
-			//fixme...
-			//DACW(FP_DEBUG0, (DACR(FP_DEBUG0) & 0xcfffffff));
-			/* ... and powerup external TMDS transmitter if it exists */
-			/* (confirmed OK on NV28 and NV34) */
-			//CRTCW(0x59, (CRTCR(0x59) | 0x01));
+				//fixme?: looks like we don't need this after all:
+				/* powerup both LVDS (laptop panellink) and TMDS (DVI panellink)
+				 * internal transmitters... */
+				/* note:
+				 * the powerbits in this register are hardwired to the DVI connectors,
+				 * instead of to the DACs! (confirmed NV34) */
+				//fixme...
+				//DACW(FP_DEBUG0, (DACR(FP_DEBUG0) & 0xcfffffff));
+				/* ... and powerup external TMDS transmitter if it exists */
+				/* (confirmed OK on NV28 and NV34) */
+				//CRTCW(0x59, (CRTCR(0x59) | 0x01));
 
-			sprintf(msg, "%s(panel-)", msg);
+				sprintf(msg, "%s(panel-)", msg);
+			}
+			else
+			{
+				//fixme? linux only does this on dualhead cards...
+				//fixme: see if LVDS head can be determined with two panels there...
+				if (!si->ps.tmds2_active && (si->ps.card_type != NV11))
+				{
+					/* b2 = 0 = enable laptop panel backlight */
+					/* note: this seems to be a write-only register. */
+					NV_REG32(NV32_LVDS_PWR) = 0x00000003;
+
+					sprintf(msg, "%s(panel-)", msg);
+				}
+			}
 		}
 
 		sprintf(msg, "%sdisplay on, ", msg);
@@ -602,24 +618,40 @@ status_t nv_crtc_dpms(bool display, bool h, bool v, bool do_panel)
 		/* turn screen off */
 		SEQW(CLKMODE, (temp | 0x20));
 
-		if (do_panel && si->ps.tmds1_active && !si->ps.laptop)
+		if (do_panel && si->ps.tmds1_active)
 		{
-			/* shutoff panelsync and disable panel */
-			DACW(FP_TG_CTRL, ((DACR(FP_TG_CTRL) & 0xcfffffcc) | 0x20000022));
+			if (!si->ps.laptop)
+			{
+				/* shutoff panelsync and disable panel */
+				DACW(FP_TG_CTRL, ((DACR(FP_TG_CTRL) & 0xcfffffcc) | 0x20000022));
 
-			//fixme?: looks like we don't need this after all:
-			/* powerdown both LVDS (laptop panellink) and TMDS (DVI panellink)
-			 * internal transmitters... */
-			/* note:
-			 * the powerbits in this register are hardwired to the DVI connectors,
-			 * instead of to the DACs! (confirmed NV34) */
-			//fixme...
-			//DACW(FP_DEBUG0, (DACR(FP_DEBUG0) | 0x30000000));
-			/* ... and powerdown external TMDS transmitter if it exists */
-			/* (confirmed OK on NV28 and NV34) */
-			//CRTCW(0x59, (CRTCR(0x59) & 0xfe));
+				//fixme?: looks like we don't need this after all:
+				/* powerdown both LVDS (laptop panellink) and TMDS (DVI panellink)
+				 * internal transmitters... */
+				/* note:
+				 * the powerbits in this register are hardwired to the DVI connectors,
+				 * instead of to the DACs! (confirmed NV34) */
+				//fixme...
+				//DACW(FP_DEBUG0, (DACR(FP_DEBUG0) | 0x30000000));
+				/* ... and powerdown external TMDS transmitter if it exists */
+				/* (confirmed OK on NV28 and NV34) */
+				//CRTCW(0x59, (CRTCR(0x59) & 0xfe));
 
-			sprintf(msg, "%s(panel-)", msg);
+				sprintf(msg, "%s(panel-)", msg);
+			}
+			else
+			{
+				//fixme? linux only does this on dualhead cards...
+				//fixme: see if LVDS head can be determined with two panels there...
+				if (!si->ps.tmds2_active && (si->ps.card_type != NV11))
+				{
+					/* b2 = 1 = disable laptop panel backlight */
+					/* note: this seems to be a write-only register. */
+					NV_REG32(NV32_LVDS_PWR) = 0x00000007;
+
+					sprintf(msg, "%s(panel-)", msg);
+				}
+			}
 		}
 
 		sprintf(msg, "%sdisplay off, ", msg);
