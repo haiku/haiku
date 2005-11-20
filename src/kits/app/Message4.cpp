@@ -869,18 +869,21 @@ BMessage::Unflatten(const char *flatBuffer)
 			return convert_message(&message, this);
 		}
 
-		if (format == kMessageMagicR5)
+		if (format == kMessageMagicR5 || format == kMessageMagicR5Swapped)
 			return BPrivate::R5MessageUnflatten(this, flatBuffer);
 
-		if (format == kMessageMagicDano) {
+		if (format == kMessageMagicDano || format == kMessageMagicDanoSwapped) {
 			BMemoryIO stream(flatBuffer + sizeof(uint32),
 				BPrivate::dano_message_size(flatBuffer));
 			return BPrivate::unflatten_dano_message(format, stream, *this);
 		}
+
+		return B_NOT_A_MESSAGE;
 	}
 
+	// native message unflattening
+
 	free(fHeader);
-	fHeader = NULL;
 	fHeader = (MessageHeader *)malloc(sizeof(MessageHeader));
 	if (!fHeader)
 		return B_NO_MEMORY;
@@ -934,12 +937,16 @@ BMessage::Unflatten(BDataIO *stream)
 	uint32 format = 0;
 	stream->Read(&format, sizeof(uint32));
 	if (format != kMessageMagic4) {
-		if (format == kMessageMagicR5)
+		if (format == kMessageMagicR5 || format == kMessageMagicR5Swapped)
 			return BPrivate::R5MessageUnflatten(this, stream);
 
-		if (format == kMessageMagicDano)
+		if (format == kMessageMagicDano || format == kMessageMagicDanoSwapped)
 			return BPrivate::unflatten_dano_message(format, *stream, *this);
+
+		return B_NOT_A_MESSAGE;
 	}
+
+	// native message unflattening
 
 	free(fHeader);
 	fHeader = (MessageHeader *)malloc(sizeof(MessageHeader));
