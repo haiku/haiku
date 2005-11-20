@@ -231,6 +231,9 @@ EventDispatcher::_AddListener(const BMessenger& messenger, int32 token,
 	if (events == 0)
 		return false;
 
+	ETRACE(("events: add listener: token %ld, events = %ld, options = %ld, %s\n",
+		token, events, options, temporary ? "temporary" : "permanent"));
+
 	// we need a new target
 
 	target = new (std::nothrow) event_target;
@@ -277,6 +280,9 @@ EventDispatcher::_RemoveTemporaryListeners()
 		if (target->events == 0) {
 			// this is only a temporary target
 			fListeners.RemoveItemAt(i);
+			
+			ETRACE(("events: remove temp. listener: token %ld, events = %ld, options = %ld\n",
+				target->token, target->temporary_events, target->temporary_options));
 
 			if ((target->temporary_events & B_POINTER_EVENTS) != 0
 				&& fHasFocus && fFocus == target->messenger) {
@@ -285,6 +291,9 @@ EventDispatcher::_RemoveTemporaryListeners()
 			}
 
 			delete target;
+		} else {
+			target->temporary_events = 0;
+			target->temporary_options = 0;
 		}
 	}
 }
@@ -310,6 +319,7 @@ void
 EventDispatcher::RemoveListener(const BMessenger& messenger, int32 token)
 {
 	BAutolock _(this);
+	ETRACE(("events: remove listener token %ld\n", token));
 
 	int32 index;
 	event_target* target = _FindListener(messenger, token, &index);
@@ -552,8 +562,10 @@ EventDispatcher::_EventLoop()
 				// supposed to fall through
 
 			default:
-				if (fHasFocus && !fSuspendFocus)
+				if (fHasFocus && !fSuspendFocus) {
+					addedTokens |= _AddTokens(event, fFocusTokens);
 					_SendMessage(fFocus, event, kStandardImportance);
+				}
 				break;
 		}
 

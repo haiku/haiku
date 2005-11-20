@@ -11,6 +11,8 @@
 
 #include <LinkReceiver.h>
 #include <MessageQueue.h>
+#include <Messenger.h>
+
 
 struct shared_cursor;
 
