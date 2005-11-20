@@ -1655,14 +1655,14 @@ text_run_array *
 BTextView::RunArray(int32 startOffset, int32 endOffset, int32 *outSize) const
 {
 	CALLED();
-	STEStyleRangePtr styleRange = fStyles->GetStyleRange(startOffset, endOffset - 1);
 
+	STEStyleRange* styleRange = fStyles->GetStyleRange(startOffset, endOffset - 1);
 	if (styleRange == NULL)
 		return NULL;
 
-	text_run_array *res = (text_run_array *)malloc(sizeof(int32) +
-		(sizeof(text_run) * styleRange->count));
-	
+	text_run_array *res = (text_run_array *)malloc(sizeof(int32)
+		+ (sizeof(text_run) * styleRange->count));
+
 	if (!res) {
 		if (outSize)
 			*outSize = 0;
@@ -1720,7 +1720,7 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 	BPoint result;
 	int32 textLength = fText->Length();
 	int32 lineNum = LineAt(inOffset);
-	STELinePtr line = (*fLines)[lineNum];
+	STELine* line = (*fLines)[lineNum];
 	float height = 0;
 	
 	result.x = 0.0;
@@ -1810,7 +1810,7 @@ BTextView::OffsetAt(BPoint point) const
 		return 0;
 
 	int32 lineNum = LineAt(point);
-	STELinePtr line = (*fLines)[lineNum];
+	STELine* line = (*fLines)[lineNum];
 	
 	// special case: if point is within the text rect and PixelToLine()
 	// tells us that it's on the last line, but if point is actually  
@@ -2028,7 +2028,7 @@ BTextView::LineWidth(int32 lineNum) const
 	if (lineNum < 0 || lineNum >= fLines->NumLines())
 		return 0;
 	else {
-		STELinePtr line = (*fLines)[lineNum];
+		STELine* line = (*fLines)[lineNum];
 		return StyledWidth(line->offset, (line + 1)->offset - line->offset);
 	}
 }
@@ -3060,7 +3060,7 @@ BTextView::HandlePageKey(uint32 inPageKey)
 
 	bool shiftDown = mods & B_SHIFT_KEY;
 	
-	STELinePtr line = NULL; 
+	STELine* line = NULL; 
 	
 	int32 start = fSelStart, end = fSelEnd;
 	
@@ -3300,8 +3300,8 @@ BTextView::RecalculateLineBreaks(int32 *startLine, int32 *endLine)
 	int32 lineIndex = (*startLine > 0) ? *startLine - 1 : 0;
 	int32 recalThreshold = (*fLines)[*endLine + 1]->offset;
 	float width = fTextRect.Width();
-	STELinePtr curLine = (*fLines)[lineIndex];
-	STELinePtr nextLine = curLine + 1;
+	STELine* curLine = (*fLines)[lineIndex];
+	STELine* nextLine = curLine + 1;
 
 	do {
 		float ascent, descent;
@@ -3654,7 +3654,7 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 
 	BRect eraseRect = clipRect;
 	long startEraseLine = startLine;
-	STELinePtr line = (*fLines)[startLine];
+	STELine* line = (*fLines)[startLine];
 	if (erase && startOffset != -1) {
 		// erase only to the right of startOffset
 		startEraseLine++;
