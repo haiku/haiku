@@ -48,6 +48,7 @@ MergeObject <libbe>app_kit.o :
 	MessageUtils.cpp
 	PropertyInfo.cpp
 	PortLink.cpp
+	r5_message.cpp
 	RegistrarDefs.cpp
 	RegistrarThread.cpp
 	RegistrarThreadManager.cpp

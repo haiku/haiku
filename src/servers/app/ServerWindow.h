@@ -72,10 +72,11 @@ public:
 									const color_space cspace);
 
 			// util methods.
-			const BMessenger&	Messenger() const { return fClientMessenger; }
+			const BMessenger&	FocusMessenger() const { return fFocusMessenger; }
+			const BMessenger&	HandlerMessenger() const { return fHandlerMessenger; }
+
 			status_t			SendMessageToClient(const BMessage* msg,
-													int32 target = B_NULL_TOKEN,
-													bool usePreferred = false) const;
+													int32 target = B_NULL_TOKEN) const;
 
 	virtual	WinBorder*			MakeWinBorder(BRect frame,
 											  const char* name,
@@ -140,7 +141,8 @@ private:
 			port_id				fMessagePort;
 			port_id				fClientReplyPort;
 			port_id				fClientLooperPort;
-			BMessenger			fClientMessenger;
+			BMessenger			fFocusMessenger;
+			BMessenger			fHandlerMessenger;
 
 			BMessage			fClientViewsWithInvalidCoords;
 

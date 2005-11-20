@@ -1,3 +1,6 @@
+#ifdef USING_MESSAGE4
+#	include <MessageUtils4.h>
+#else
 //------------------------------------------------------------------------------
 //	MessageUtils.h
 //
@@ -199,11 +202,4 @@ template<> inline void byte_swap(entry_ref& data)
 //------------------------------------------------------------------------------
 
 #endif	// MESSAGEUTILS_H
-
-/*
- * $Log $
- *
- * $Id  $
- *
- */
-
+#endif	// USING_MESSAGE4

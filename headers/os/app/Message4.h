@@ -9,7 +9,10 @@
 #ifndef _MESSAGE_H
 #define _MESSAGE_H
 
-#define USING_MESSAGE4	1
+// this should be defined in your UserBuildConfig only
+#ifndef USING_MESSAGE4
+#	define USING_MESSAGE4	1
+#endif
 
 #include <BeBuild.h>
 #include <DataIO.h>
@@ -39,8 +42,7 @@ extern "C" int		_delete_message_();
 #define B_FIELD_NAME_LENGTH			255
 #define B_PROPERTY_NAME_LENGTH		255
 
-enum
-{
+enum {
 	B_NO_SPECIFIER = 0,
 	B_DIRECT_SPECIFIER = 1,
 	B_INDEX_SPECIFIER,
@@ -304,15 +306,13 @@ virtual	void			_ReservedMessage1();
 virtual	void			_ReservedMessage2();
 virtual	void			_ReservedMessage3();
 
-		status_t		_SendMessage(port_id port, int32 token, bool preferred,
-							bigtime_t timeout, bool replyRequired,
-							BMessenger &replyTo) const;
+		status_t		_SendMessage(port_id port, int32 token, bigtime_t timeout,
+							bool replyRequired, BMessenger &replyTo) const;
 		status_t		_SendMessage(port_id port, team_id portOwner,
-							int32 token, bool preferred, BMessage *reply,
-							bigtime_t sendTimeout, bigtime_t replyTimeout) const;
+							int32 token, BMessage *reply, bigtime_t sendTimeout,
+							bigtime_t replyTimeout) const;
 static	status_t		_SendFlattenedMessage(void *data, int32 size,
-							port_id port, int32 token, bool preferred,
-							bigtime_t timeout);
+							port_id port, int32 token, bigtime_t timeout);
 
 static	void			_StaticInit();
 static	void			_StaticCleanup();

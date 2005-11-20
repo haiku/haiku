@@ -86,7 +86,7 @@ class ServerApp : public MessageLooper {
 		port_id	fClientReplyPort;	
 			// our BApplication's event port
 
-		BMessenger fClientMessenger;
+		BMessenger fHandlerMessenger;
 		port_id	fClientLooperPort;
 		int32 fClientToken;
 			// To send a BMessage to the client (port + token)

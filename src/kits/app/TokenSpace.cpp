@@ -92,22 +92,16 @@ BTokenSpace::GetToken(int32 token, int16 type, void** _object,
 {
 	BAutolock locker(const_cast<BTokenSpace&>(*this));
 
-	if (token < 1) {
-		*_object = NULL;
+	if (token < 1)
 		return B_ENTRY_NOT_FOUND;
-	}
 
 	TokenMap::const_iterator iterator = fTokenMap.find(token);
 
-	if (iterator == fTokenMap.end() || iterator->second.type != type) {
-		*_object = NULL;
-		return B_ERROR;
-	}
+	if (iterator == fTokenMap.end() || iterator->second.type != type)
+		return B_ENTRY_NOT_FOUND;
 
-	if (callback && !callback(iterator->second.type, iterator->second.object)) {
-		*_object = NULL;
-		return B_ERROR;
-	}
+	if (callback && !callback(iterator->second.type, iterator->second.object))
+		return B_ENTRY_NOT_FOUND;
 
 	*_object = iterator->second.object;
 	return B_OK;

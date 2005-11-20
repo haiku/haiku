@@ -6,6 +6,7 @@
  *		Michael Lotz <mmlr@mlotz.ch>
  */
 
+
 #include <Message.h>
 #include <MessagePrivate.h>
 #include <MessageUtils.h>
@@ -343,58 +344,48 @@ BMessage::IsReply() const
 }
 
 
-#define PRINT_SOME_TYPE(type, typeCode)										\
-	case typeCode: {														\
-		sprintf(buffer + strlen(buffer), "size=%2ld, ", size);				\
-		printf("%s", buffer);												\
-		memset(buffer, ' ', strlen(buffer));								\
-																			\
-		type *item = (type *)(fData + field->offset + field->nameLength);	\
-		for (int32 i = 0; i < field->count; i++, item++) {					\
-			if (i > 0) /* indent */											\
-				printf(buffer);												\
-																			\
-			printf("data[%ld]: ", i);										\
-			item->PrintToStream();											\
-		}																	\
-	} break
+template<typename Type> static void
+print_to_stream_type(char* buffer, Type* item, int32 count,
+	uint32 size)
+{
+	sprintf(buffer + strlen(buffer), "size=%2ld, ", size);
+	printf("%s", buffer);
+	memset(buffer, ' ', strlen(buffer));
 
-#define PRINT_INT_TYPE(type, typeCode, format, swap)						\
-	case typeCode: {														\
-		sprintf(buffer + strlen(buffer), "size=%2ld, ", size);				\
-		printf("%s", buffer);												\
-		memset(buffer, ' ', strlen(buffer));								\
-																			\
-		type *item = (type *)(fData + field->offset + field->nameLength);	\
-		for (int32 i = 0; i < field->count; i++, item++) {					\
-			if (i > 0) /* indent */											\
-				printf(buffer);												\
-																			\
-			printf("data[%ld]: ", i);										\
-			type value = swap(*item);										\
-			printf(format, *item, *item, &value);							\
-		}																	\
-	} break
+	for (int32 i = 0; i < count; i++, item++) {
+		if (i > 0) /* indent */
+			printf(buffer);
+
+		printf("data[%ld]: ", i);
+		item->PrintToStream();
+	}
+}
 
 
-#define PRINT_FLOAT_TYPE(type, typeCode, format)							\
-	case typeCode: {														\
-		sprintf(buffer + strlen(buffer), "size=%2ld, ", size);				\
-		printf("%s", buffer);												\
-		memset(buffer, ' ', strlen(buffer));								\
-																			\
-		type *item = (type *)(fData + field->offset + field->nameLength);	\
-		for (int32 i = 0; i < field->count; i++, item++) {					\
-			if (i > 0) /* indent */											\
-				printf(buffer);												\
-																			\
-			printf("data[%ld]: ", i);										\
-			printf(format, *item);											\
-		}																	\
-	} break
+template<typename Type> static void
+print_type(char* buffer, const char* format, Type* item, int32 count,
+	uint32 size, type_code typeCode)
+{
+	sprintf(buffer + strlen(buffer), "size=%2ld, ", size);
+	printf("%s", buffer);
+	memset(buffer, ' ', strlen(buffer));
 
+	for (int32 i = 0; i < count; i++, item++) {
+		if (i > 0) /* indent */
+			printf(buffer);
 
-#define REMOVE_BELOW_20(x)	(x >= 0x20 ? x : 0x20)
+		printf("data[%ld]: ", i);
+		Type value = *item;
+		if (typeCode == B_BOOL_TYPE) {
+			printf("%s (%d)\n", value != 0 ? "true" : "false", (int8)value);
+		} else {
+			if (typeCode == B_INT8_TYPE && value < ' ')
+				value = ' ';
+			swap_data(typeCode, &value, sizeof(Type), B_SWAP_BENDIAN_TO_HOST);
+			printf(format, *item, *item, &value);
+		}
+	}
+}
 
 
 void
@@ -419,10 +410,20 @@ BMessage::PrintToStream() const
 			size = field->dataSize / field->count;
 
 		switch (field->type) {
-			PRINT_SOME_TYPE(BRect, B_RECT_TYPE);
-			PRINT_SOME_TYPE(BPoint, B_POINT_TYPE);
+			case B_RECT_TYPE:
+				print_to_stream_type<BRect>(buffer,
+					(BRect *)(fData + field->offset + field->nameLength),
+					field->count, size);
+				break;
 
-			case B_STRING_TYPE: {
+			case B_POINT_TYPE:
+				print_to_stream_type<BPoint>(buffer,
+					(BPoint *)(fData + field->offset + field->nameLength),
+					field->count, size);
+				break;
+
+			case B_STRING_TYPE:
+			{
 				printf("%s", buffer);
 				memset(buffer, ' ', strlen(buffer));
 
@@ -433,20 +434,54 @@ BMessage::PrintToStream() const
 
 					ssize_t size = *(ssize_t *)pointer;
 					pointer += sizeof(ssize_t);
-					printf("size=%ld, data[%ld]: ", size, i);
+					printf("size=%2ld, data[%ld]: ", size, i);
 					printf("\"%s\"\n", (char *)pointer);
 					pointer += size;
 				}
-			} break;
+				break;
+			}
 
-			PRINT_INT_TYPE(int8, B_INT8_TYPE, "0x%hx (%d \'%.1s\')\n", REMOVE_BELOW_20);
-			PRINT_INT_TYPE(int16, B_INT16_TYPE, "0x%lx (%d, \'%.2s\')\n", B_BENDIAN_TO_HOST_INT16);
-			PRINT_INT_TYPE(int32, B_INT32_TYPE, "0x%lx (%ld, \'%.4s\')\n", B_BENDIAN_TO_HOST_INT32);
-			PRINT_INT_TYPE(int64, B_INT64_TYPE, "0x%Lx (%lld, \'%.4s\')\n", B_BENDIAN_TO_HOST_INT64);
+			case B_INT8_TYPE:
+				print_type<int8>(buffer, "0x%hx (%d \'%.1s\')\n",
+					(int8 *)(fData + field->offset + field->nameLength),
+					field->count, size, B_INT8_TYPE);
+				break;
 
-			PRINT_FLOAT_TYPE(bool, B_BOOL_TYPE, "%d\n");
-			PRINT_FLOAT_TYPE(float, B_FLOAT_TYPE, "%.4f\n");
-			PRINT_FLOAT_TYPE(double, B_DOUBLE_TYPE, "%.8f\n");
+			case B_INT16_TYPE:
+				print_type<int16>(buffer, "0x%x (%d \'%.2s\')\n",
+					(int16 *)(fData + field->offset + field->nameLength),
+					field->count, size, B_INT16_TYPE);
+				break;
+
+			case B_INT32_TYPE:
+				print_type<int32>(buffer, "0x%lx (%ld \'%.4s\')\n",
+					(int32 *)(fData + field->offset + field->nameLength),
+					field->count, size, B_INT32_TYPE);
+				break;
+
+			case B_INT64_TYPE:
+				print_type<int64>(buffer, "0x%Lx (%Ld \'%.8s\')\n",
+					(int64 *)(fData + field->offset + field->nameLength),
+					field->count, size, B_INT64_TYPE);
+				break;
+
+			case B_BOOL_TYPE:
+				print_type<int8>(buffer, NULL,
+					(int8 *)(fData + field->offset + field->nameLength),
+					field->count, size, B_BOOL_TYPE);
+				break;
+
+			case B_FLOAT_TYPE:
+				print_type<float>(buffer, "%.4f\n",
+					(float *)(fData + field->offset + field->nameLength),
+					field->count, size, B_FLOAT_TYPE);
+				break;
+
+			case B_DOUBLE_TYPE:
+				print_type<double>(buffer, "%.8f\n",
+					(double *)(fData + field->offset + field->nameLength),
+					field->count, size, B_DOUBLE_TYPE);
+				break;
 
 			case B_REF_TYPE: {
 				printf("%s", buffer);
@@ -462,7 +497,7 @@ BMessage::PrintToStream() const
 					entry_ref ref;
 					BPrivate::entry_ref_unflatten(&ref, (char *)pointer, size);
 
-					printf("size=%ld, data[%ld]: ", size, i);
+					printf("size=%2ld, data[%ld]: ", size, i);
 					printf("device=%ld, directory=%lld, name=\"%s\", ",
 						ref.device, ref.directory, ref.name);
 
@@ -470,7 +505,8 @@ BMessage::PrintToStream() const
 					printf("path=\"%s\"\n", path.Path());
 					pointer += size;
 				}
-			} break;
+				break;
+			}
 
 			default: {
 				sprintf(buffer + strlen(buffer), "size=%2ld, \n", size);
@@ -479,11 +515,6 @@ BMessage::PrintToStream() const
 		}
 	}	
 }
-
-
-#undef PRINT_FLOAT_TYPE
-#undef PRINT_INT_TYPE
-#undef PRINT_SOME_TYPE
 
 
 status_t
@@ -559,8 +590,7 @@ BMessage::ReturnAddress() const
 	if (fHeader->flags & MESSAGE_FLAG_WAS_DELIVERED) {
 		BMessenger messenger;
 		BMessenger::Private(messenger).SetTo(fHeader->replyTeam,
-			fHeader->replyPort, fHeader->replyTarget,
-			fHeader->replyTarget == B_PREFERRED_TOKEN);
+			fHeader->replyPort, fHeader->replyTarget);
 		return messenger;
 	}
 
@@ -631,7 +661,7 @@ BMessage::SendReply(BMessage *reply, BMessenger replyTo, bigtime_t timeout)
 	BMessenger messenger;
 	BMessenger::Private messengerPrivate(messenger);
 	messengerPrivate.SetTo(fHeader->replyTeam, fHeader->replyPort,
-		fHeader->replyTarget, fHeader->replyTarget == B_PREFERRED_TOKEN);
+		fHeader->replyTarget);
 
 	if (fHeader->flags & MESSAGE_FLAG_REPLY_REQUIRED) {
 		if (fHeader->flags & MESSAGE_FLAG_REPLY_DONE)
@@ -682,7 +712,7 @@ BMessage::SendReply(BMessage *reply, BMessage *replyToReply,
 	BMessenger messenger;
 	BMessenger::Private messengerPrivate(messenger);
 	messengerPrivate.SetTo(fHeader->replyTeam, fHeader->replyPort,
-		fHeader->replyTarget, fHeader->replyTarget == B_PREFERRED_TOKEN);
+		fHeader->replyTarget);
 
 	if (fHeader->flags & MESSAGE_FLAG_REPLY_REQUIRED) {
 		if (fHeader->flags & MESSAGE_FLAG_REPLY_DONE)
@@ -843,7 +873,8 @@ BMessage::Unflatten(const char *flatBuffer)
 			return BPrivate::R5MessageUnflatten(this, flatBuffer);
 
 		if (format == kMessageMagicDano) {
-			BMemoryIO stream(flatBuffer, BPrivate::dano_message_size(flatBuffer));
+			BMemoryIO stream(flatBuffer + sizeof(uint32),
+				BPrivate::dano_message_size(flatBuffer));
 			return BPrivate::unflatten_dano_message(format, stream, *this);
 		}
 	}
@@ -1625,8 +1656,8 @@ BMessage::_StaticGetCachedReplyPort()
 
 
 status_t
-BMessage::_SendMessage(port_id port, int32 token, bool preferred,
-	bigtime_t timeout, bool replyRequired, BMessenger &replyTo) const
+BMessage::_SendMessage(port_id port, int32 token, bigtime_t timeout,
+	bool replyRequired, BMessenger &replyTo) const
 {
 	DEBUG_FUNCTION_ENTER;
 	uint32 oldFlags = fHeader->flags;
@@ -1637,8 +1668,7 @@ BMessage::_SendMessage(port_id port, int32 token, bool preferred,
 
 	if (!replyTo.IsValid()) {
 		BMessenger::Private(replyTo).SetTo(fHeader->replyTeam,
-			fHeader->replyPort, fHeader->replyTarget,
-			fHeader->replyTarget == B_PREFERRED_TOKEN);
+			fHeader->replyPort, fHeader->replyTarget);
 
 		if (!replyTo.IsValid())
 			replyTo = be_app_messenger;
@@ -1651,11 +1681,10 @@ BMessage::_SendMessage(port_id port, int32 token, bool preferred,
 	else
 		fHeader->flags &= ~MESSAGE_FLAG_REPLY_REQUIRED;
 
-	fHeader->target = (preferred ? B_PREFERRED_TOKEN : token);
+	fHeader->target = token;
 	fHeader->replyTeam = replyToPrivate.Team();
 	fHeader->replyPort = replyToPrivate.Port();
-	fHeader->replyTarget = (replyToPrivate.IsPreferredTarget()
-		? B_PREFERRED_TOKEN : replyToPrivate.Token());
+	fHeader->replyTarget = replyToPrivate.Token();
 	fHeader->flags |= MESSAGE_FLAG_WAS_DELIVERED;
 
 	/* ToDo: we can use _kern_writev_port to send the three parts directly:
@@ -1698,8 +1727,7 @@ error:
 
 status_t
 BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
-	bool preferred, BMessage *reply, bigtime_t sendTimeout,
-	bigtime_t replyTimeout) const
+	BMessage *reply, bigtime_t sendTimeout, bigtime_t replyTimeout) const
 {
 	DEBUG_FUNCTION_ENTER;
 	const int32 cachedReplyPort = _StaticGetCachedReplyPort();
@@ -1735,8 +1763,8 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 	{
 		BMessenger messenger;
 		BMessenger::Private(messenger).SetTo(team, replyPort,
-			B_PREFERRED_TOKEN, true);
-		result = _SendMessage(port, token, preferred, sendTimeout, true,
+			B_PREFERRED_TOKEN);
+		result = _SendMessage(port, token, sendTimeout, true,
 			messenger);
 	}
 
@@ -1766,7 +1794,7 @@ error:
 
 status_t
 BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
-	int32 token, bool preferred, bigtime_t timeout)
+	int32 token, bigtime_t timeout)
 {
 	DEBUG_FUNCTION_ENTER;
 	if (!data)
@@ -1776,16 +1804,16 @@ BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 
 	if (magic == kMessageMagic4 || magic == kMessageMagic4Swapped) {
 		MessageHeader *header = (MessageHeader *)data;
-		header->target = (preferred ? B_PREFERRED_TOKEN : token);
+		header->target = token;
 	} else if (magic == kMessageMagicR5) {
 		uint8 *header = (uint8 *)data;
 		header += sizeof(uint32) /* magic */ + sizeof(uint32) /* checksum */
 			+ sizeof(ssize_t) /* flattenedSize */ + sizeof(int32) /* what */
 			+ sizeof(uint8) /* flags */;
-		*(int32 *)header = (preferred ? B_PREFERRED_TOKEN : token);
+		*(int32 *)header = token;
 	} else if (((KMessage::Header *)data)->magic == KMessage::kMessageHeaderMagic) {
 		KMessage::Header *header = (KMessage::Header *)data;
-		header->targetToken = (preferred ? B_PREFERRED_TOKEN : token);
+		header->targetToken = token;
 	} else {
 		return B_NOT_A_MESSAGE;
 	}

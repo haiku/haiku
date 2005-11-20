@@ -925,7 +925,7 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 					msg->FindPoint("where", i, &frameLeftTop);
 					msg->FindFloat("width", i, &width);
 					msg->FindFloat("height", i, &height);
-					if ((view = findView(fTopView, token))) {
+					if ((view = _FindView(token)) != NULL) {
 						// update the views offset in parent
 						if (view->LeftTop() != frameLeftTop) {
 							view->fParentOffset = frameLeftTop;
@@ -1330,16 +1330,16 @@ BWindow::UpdateIfNeeded()
 BView *
 BWindow::FindView(const char *viewName) const
 {
-	// TODO: What about locking?!?
-	return findView(fTopView, viewName);
+	BAutolock _(const_cast<BWindow*>(this));
+	return fTopView->FindView(viewName);
 }
 
 
 BView *
 BWindow::FindView(BPoint point) const
 {
-	// TODO: What about locking?!?
-	return findView(fTopView, point);
+	BAutolock _(const_cast<BWindow*>(this));
+	return _FindView(fTopView, point);
 }
 
 
@@ -2134,7 +2134,7 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 	port_id sendPort;
 	int32 code;
 	if (fLink->FlushWithReply(code) == B_OK
-		&& code == SERVER_TRUE
+		&& code == B_OK
 		&& fLink->Read<port_id>(&sendPort) == B_OK) {
 		fLink->SetSenderPort(sendPort);
 
@@ -2194,7 +2194,118 @@ BWindow::task_looper()
 {
 	STRACE(("info: BWindow::task_looper() started.\n"));
 
-	BLooper::task_looper();
+	//	Check that looper is locked (should be)
+	AssertLocked();
+	//	Unlock the looper
+	Unlock();
+
+	if (IsLocked())
+		debugger("window must not be locked!");
+
+	//	loop: As long as we are not terminating.
+	while (!fTerminating) {
+		// TODO: timeout determination algo
+		//	Read from message port (how do we determine what the timeout is?)
+		BMessage* msg = MessageFromPort();
+
+		//	Did we get a message?
+		if (msg) {
+			//	Add to queue
+			fQueue->AddMessage(msg);
+		} else
+			continue;
+
+		//	Get message count from port
+		int32 msgCount = port_count(fMsgPort);
+		for (int32 i = 0; i < msgCount; ++i) {
+			//	Read 'count' messages from port (so we will not block)
+			//	We use zero as our timeout since we know there is stuff there
+			msg = MessageFromPort(0);
+			//	Add messages to queue
+			if (msg)
+				fQueue->AddMessage(msg);
+		}
+
+		//	loop: As long as there are messages in the queue and the port is
+		//		  empty... and we are not terminating, of course.
+		bool dispatchNextMessage = true;
+		while (!fTerminating && dispatchNextMessage) {
+			//	Get next message from queue (assign to fLastMessage)
+			fLastMessage = fQueue->NextMessage();
+
+			//	Lock the looper
+			Lock();
+			if (!fLastMessage) {
+				// No more messages: Unlock the looper and terminate the
+				// dispatch loop.
+				dispatchNextMessage = false;
+			} else {
+				//	Get the target handler
+#ifdef USING_MESSAGE4
+				//	Use the private BMessage accessor to determine if we are
+				//	using the preferred handler, or if a target has been
+				//	specified
+				BHandler *handler = NULL;
+				BMessage::Private messagePrivate(fLastMessage);
+				bool usePreferred = messagePrivate.UsePreferredTarget();
+#else
+				//	Use BMessage friend functions to determine if we are using the
+				//	preferred handler, or if a target has been specified
+				BHandler* handler = NULL;
+				bool usePreferred = _use_preferred_target_(fLastMessage);
+#endif
+				if (usePreferred) {
+					handler = PreferredHandler();
+				} else {
+#ifndef USING_MESSAGE4
+					gDefaultTokens.GetToken(_get_message_target_(fLastMessage),
+						B_HANDLER_TOKEN, (void **)&handler);
+#else
+					gDefaultTokens.GetToken(messagePrivate.GetTarget(),
+						B_HANDLER_TOKEN, (void **)&handler);
+#endif
+				}
+
+//printf("handler = %p, usePreferred = %s\n", handler, usePreferred ? "yes" : "no");
+
+				if (!usePreferred || _DistributeMessage(fLastMessage)) {
+					// if a target was given, and we should not use the preferred
+					// handler, we can just use that one
+					if (handler == NULL || usePreferred)
+						handler = _DetermineTarget(fLastMessage, handler);
+					if (handler == NULL)
+						handler = this;
+
+					//	Is this a scripting message? (BMessage::HasSpecifiers())
+					if (fLastMessage->HasSpecifiers()) {
+						int32 index = 0;
+						// Make sure the current specifier is kosher
+						if (fLastMessage->GetCurrentSpecifier(&index) == B_OK)
+							handler = resolve_specifier(handler, fLastMessage);
+					}
+
+					if (handler) {
+						//	Do filtering and dispatch message
+						handler = top_level_filter(fLastMessage, handler);
+						if (handler && handler->Looper() == this)
+							DispatchMessage(fLastMessage, handler);
+					}
+				}
+			}
+
+			Unlock();
+
+			//	Delete the current message (fLastMessage)
+			delete fLastMessage;
+			fLastMessage = NULL;
+
+			//	Are any messages on the port?
+			if (port_count(fMsgPort) > 0) {
+				//	Do outer loop
+				dispatchNextMessage = false;
+			}
+		}
+	}
 }
 
 
@@ -2349,6 +2460,85 @@ BWindow::handleActivation(bool active)
 	fTopView->_Activate(active);
 }
 
+
+/*!
+	\brief Determines the target of a message received.
+*/
+BHandler *
+BWindow::_DetermineTarget(BMessage *message, BHandler *target)
+{
+	// TODO: this is mostly guessed; check for correctness.
+
+	switch (message->what) {
+		case B_KEY_DOWN:
+		case B_KEY_UP:
+		case B_UNMAPPED_KEY_DOWN:
+		case B_UNMAPPED_KEY_UP:
+		case B_MODIFIERS_CHANGED:
+			// these messages will be dispatched by the focus view later
+			return CurrentFocus();
+
+		case B_MOUSE_DOWN:
+		case B_MOUSE_UP:
+		case B_MOUSE_MOVED:
+		case B_MOUSE_WHEEL_CHANGED:
+			// TODO: the app_server should tell us which view is the target
+			break;
+
+		case B_PULSE:
+		case B_QUIT_REQUESTED:
+			// TODO: test wether R5 will let BView dispatch these messages
+			return this;
+
+		case B_VIEW_RESIZED:
+		case B_VIEW_MOVED:
+		{
+			int32 token;
+			if (message->FindInt32("_token", &token) != B_OK)
+				token = B_NULL_TOKEN;
+
+			BView *view = _FindView(token);
+			if (view)
+				return view;
+			break;
+		}
+
+		default: 
+			break;
+	}
+
+	return target;
+}
+
+
+/*!
+	\brief Distributes the message to its intended targets. This is done for
+		all messages that should go to the preferred handler.
+
+	Returns \c false in case the message needs no more processing.
+*/
+bool
+BWindow::_DistributeMessage(BMessage* message)
+{
+message->PrintToStream();
+	int32 index = 0, count = 0;
+	int32 token;
+	for (; message->FindInt32("_token_", index, &token) == B_OK; index++) {
+printf("  token = %ld\n", token);
+		BView* target = _FindView(token);
+		if (target == NULL)
+			continue;
+
+printf("distribute message %lx to: %s\n", message->what, target->Name());
+		BMessenger messenger(target);
+		if (messenger.SendMessage(message) == B_OK)
+			count++;
+	}
+
+	return count == 0;
+}
+
+
 bool
 BWindow::_HandleKeyDown(char key, uint32 modifiers)
 {
@@ -2478,45 +2668,23 @@ BWindow::_FindShortcut(uint32 key, uint32 modifiers)
 
 
 BView *
-BWindow::findView(BView *view, int32 token)
+BWindow::_FindView(int32 token)
 {
-	if (_get_object_token_(view) == token)
+	BHandler* handler;
+	if (gDefaultTokens.GetToken(token, B_HANDLER_TOKEN, (void**)&handler) != B_OK)
+		return NULL;
+
+	// the view must belong to us in order to be found by this method
+	BView* view = dynamic_cast<BView*>(handler);
+	if (view != NULL && view->Window() == this)
 		return view;
-
-	BView *child = view->fFirstChild;
-
-	while (child != NULL) {
-		if ((view = findView(child, token)) != NULL)
-			return view;
-
-		child = child->fNextSibling;
-	}
 
 	return NULL;
 }
 
 
 BView *
-BWindow::findView(BView *view, const char *name) const
-{
-	if (!strcmp(name, view->Name()))
-		return view;
-
-	BView *child = view->fFirstChild;
-
-	while (child != NULL) {
-		if ((view = findView(child, name)) != NULL)
-			return view;
-
-		child = child->fNextSibling;
-	}
-
-	return NULL;
-}
-
-
-BView *
-BWindow::findView(BView *view, BPoint point) const
+BWindow::_FindView(BView *view, BPoint point) const
 {
 	if (view->Bounds().Contains(point) && !view->fFirstChild)
 		return view;
@@ -2524,7 +2692,7 @@ BWindow::findView(BView *view, BPoint point) const
 	BView *child = view->fFirstChild;
 
 	while (child != NULL) {
-		if ((view = findView(child, point)) != NULL)
+		if ((view = _FindView(child, point)) != NULL)
 			return view;
 
 		child = child->fNextSibling;
@@ -2577,7 +2745,7 @@ BWindow::_FindPreviousNavigable(BView *focus, uint32 flags)
 	// Search the tree for views that accept focus
 	while (true) {
 		BView *view;
-		if ((view = findLastChild(prevFocus)) != NULL)
+		if ((view = _LastViewChild(prevFocus)) != NULL)
 			prevFocus = view;
 		else if (prevFocus->fPreviousSibling)
 			prevFocus = prevFocus->fPreviousSibling;
@@ -2586,7 +2754,7 @@ BWindow::_FindPreviousNavigable(BView *focus, uint32 flags)
 				prevFocus = prevFocus->fParent;
 
 			if (prevFocus == fTopView)
-				prevFocus = findLastChild(prevFocus);
+				prevFocus = _LastViewChild(prevFocus);
 			else
 				prevFocus = prevFocus->fPreviousSibling;
 		}
@@ -2603,7 +2771,7 @@ BWindow::_FindPreviousNavigable(BView *focus, uint32 flags)
 
 
 BView *
-BWindow::findLastChild(BView *parent)
+BWindow::_LastViewChild(BView *parent)
 {
 	BView *last = parent->fFirstChild;
 	if (last == NULL)

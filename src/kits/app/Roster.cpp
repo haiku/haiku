@@ -1,31 +1,17 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Roster.cpp
-//	Author:			Ingo Weinhold (bonefish@users.sf.net)
-//	Description:	BRoster class lets you launch apps and keeps
-//					track of apps that are running. 
-//					Global be_roster represents the default BRoster.
-//					app_info structure provides info for a running app.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold (bonefish@users.sf.net)
+ */
+
+/*!	BRoster class lets you launch apps and keeps track of apps
+	that are running. 
+	Global be_roster represents the default BRoster.
+	app_info structure provides info for a running app.
+*/
+
 #include <new>
 #include <stdio.h>
 #include <stdlib.h>
@@ -80,23 +66,27 @@ static int32 compare_version_infos(const version_info &info1,
 static int32 compare_app_versions(const entry_ref *app1,
 								  const entry_ref *app2);
 
-/*-------------------------------------------------------------*/
-/* --------- app_info Struct and Values ------------------------ */
 
-// constructor
+const BRoster *be_roster;
+
+
+//	#pragma mark - app_info
+
+
 /*!	\brief Creates an uninitialized app_info.
 */
 app_info::app_info()
-		: thread(-1),
-		  team(-1),
-		  port(-1),
-		  flags(B_REG_DEFAULT_APP_FLAGS),
-		  ref()
+	:
+	thread(-1),
+	team(-1),
+	port(-1),
+	flags(B_REG_DEFAULT_APP_FLAGS),
+	ref()
 {
 	signature[0] = '\0';
 }
 
-// destructor
+
 /*!	\brief Does nothing.
 */
 app_info::~app_info()
@@ -104,37 +94,39 @@ app_info::~app_info()
 }
 
 
-/*-------------------------------------------------------------*/
-/* --------- BRoster::ArgVector class------------------------- */
+//	#pragma mark - BRoster::ArgVector
+
 
 class BRoster::ArgVector {
-public:
-	ArgVector();
-	~ArgVector();
-	status_t Init(int argc, const char *const *args, const entry_ref *appRef,
-				  const entry_ref *docRef);
-	void Unset();
-	inline int Count() const { return fArgc; }
-	inline const char *const *Args() const { return fArgs; }
-private:
-	int			fArgc;
-	const char	**fArgs;
-	BPath		fAppPath;
-	BPath		fDocPath;
+	public:
+		ArgVector();
+		~ArgVector();
+		status_t Init(int argc, const char *const *args, const entry_ref *appRef,
+					  const entry_ref *docRef);
+		void Unset();
+		inline int Count() const { return fArgc; }
+		inline const char *const *Args() const { return fArgs; }
+
+	private:
+		int			fArgc;
+		const char	**fArgs;
+		BPath		fAppPath;
+		BPath		fDocPath;
 };
 
-// constructor
+
 /*!	\brief Creates an uninitialized ArgVector.
 */
 BRoster::ArgVector::ArgVector()
-	: fArgc(0),
-	  fArgs(NULL),
-	  fAppPath(),
-	  fDocPath()
+	:
+	fArgc(0),
+	fArgs(NULL),
+	fAppPath(),
+	fDocPath()
 {
 }
 
-// destructor
+
 /*!	\brief Frees all resources associated with the ArgVector.
 */
 BRoster::ArgVector::~ArgVector()
@@ -142,7 +134,7 @@ BRoster::ArgVector::~ArgVector()
 	Unset();
 }
 
-// Init
+
 /*!	\brief Initilizes the object according to the supplied parameters.
 
 	If the initialization succeeds, the methods Count() and Args() grant
@@ -174,7 +166,7 @@ BRoster::ArgVector::~ArgVector()
 */
 status_t
 BRoster::ArgVector::Init(int argc, const char *const *args,
-						 const entry_ref *appRef, const entry_ref *docRef)
+	const entry_ref *appRef, const entry_ref *docRef)
 {
 	// unset old values
 	Unset();
@@ -226,30 +218,26 @@ BRoster::ArgVector::Unset()
 }
 
 
-/*-------------------------------------------------------------*/
-/* --------- BRoster class----------------------------------- */
+//	#pragma mark - BRoster
 
-// constructor
-/*!	\brief Creates and initializes a BRoster.
-*/
+
 BRoster::BRoster()
-	   : fMess(),
-		 fMimeMess()
+	:
+	fMess(),
+	fMimeMess()
 {
 	InitMessengers();
 }
 
-// destructor
-/*!	\brief Does nothing.
-*/
+
 BRoster::~BRoster()
 {
 }
 
 
-/* Querying for apps */
+//	#pragma mark - Querying for apps
 
-// IsRunning
+
 /*!	\brief Returns whether or not an application with the supplied signature
 		   is currently running.
 	\param mimeSig The app signature
@@ -605,7 +593,7 @@ BRoster::FindApp(entry_ref *ref, entry_ref *app) const
 }
 
 
-/* Launching, activating, and broadcasting to apps */
+//	#pragma mark - Launching, activating, and broadcasting to apps
 
 // Broadcast
 /*!	\brief Sends a message to all running applications.
@@ -1098,7 +1086,7 @@ BRoster::Launch(const entry_ref *ref, int argc, const char * const *args,
 }
 
 
-/* Recent document and app support */
+//	#pragma mark - Recent document and app support
 
 // GetRecentDocuments
 void
@@ -1324,9 +1312,9 @@ BRoster::AddToRecentFolders(const entry_ref *folder, const char *appSig) const
 }
 
 
-/*----- Private or reserved ------------------------------*/
+//	#pragma mark - Private or reserved
 
-// ShutDown
+
 /*!	\brief Shuts down the system.
 
 	When \c synchronous is \c true and the method succeeds, it doesn't return.
@@ -2222,7 +2210,7 @@ BRoster::send_to_running(team_id team, int argc, const char *const *args,
 	error = GetRunningAppInfo(team, &info);
 	if (error == B_OK) {
 		BMessenger messenger;
-		BMessenger::Private(messenger).SetTo(team, info.port, 0, true);
+		BMessenger::Private(messenger).SetTo(team, info.port, B_PREFERRED_TOKEN);
 		// send messages from the list
 		if (messageList) {
 			for (int32 i = 0;
@@ -2252,22 +2240,23 @@ BRoster::send_to_running(team_id team, int argc, const char *const *args,
 	return error;
 }
 
-// InitMessengers
+
 void
 BRoster::InitMessengers()
 {
-DBG(OUT("BRoster::InitMessengers()\n"));
+	DBG(OUT("BRoster::InitMessengers()\n"));
+
 	// find the registrar port
 	port_id rosterPort = find_port(BPrivate::get_roster_port_name());
 	port_info info;
 	if (rosterPort >= 0 && get_port_info(rosterPort, &info) == B_OK) {
-DBG(OUT("  found roster port\n"));
+		DBG(OUT("  found roster port\n"));
 		// ask for the MIME messenger
-		BMessenger::Private(fMess).SetTo(info.team, rosterPort, 0, true);
+		BMessenger::Private(fMess).SetTo(info.team, rosterPort, B_PREFERRED_TOKEN);
 		BMessage reply;
 		status_t error = fMess.SendMessage(B_REG_GET_MIME_MESSENGER, &reply);
 		if (error == B_OK && reply.what == B_REG_SUCCESS) {
-DBG(OUT("  got reply from roster\n"));
+			DBG(OUT("  got reply from roster\n"));
 			reply.FindMessenger("messenger", &fMimeMess);
 		} else {
 			DBG(OUT("  no (useful) reply from roster: error: %lx: %s\n", error,
@@ -2276,10 +2265,10 @@ DBG(OUT("  got reply from roster\n"));
 				DBG(reply.PrintToStream());
 		}
 	}
-DBG(OUT("BRoster::InitMessengers() done\n"));
+	DBG(OUT("BRoster::InitMessengers() done\n"));
 }
 
-// AddToRecentApps
+
 /*! \brief Sends a request to the roster to add the application with the
 	given signature to the front of the recent apps list.
 */
@@ -2402,16 +2391,10 @@ BRoster::SaveRecentLists(const char *filename) const
 	// return error;
 }
 
-/*-----------------------------------------------------*/
-/*----- Global be_roster ------------------------------*/
 
-const BRoster *be_roster;
+//	#pragma mark - Helper functions
 
 
-/*-----------------------------------------------------*/
-/*----- Helper functions ------------------------------*/
-
-// find_message_app_info
 /*!	\brief Extracts an app_info from a BMessage.
 
 	The function searchs for a field "app_info" typed B_REG_APP_INFO_TYPE

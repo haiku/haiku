@@ -35,6 +35,8 @@
 #include <WindowInfo.h>
 #include <WindowPrivate.h>
 
+#include <MessagePrivate.h>
+
 #include "AppServer.h"
 #include "BGet++.h"
 #include "DebugInfoManager.h"
@@ -42,7 +44,6 @@
 #include "DrawingEngine.h"
 #include "HWInterface.h"
 #include "Layer.h"
-#include "MessagePrivate.h"
 #include "RAMLinkMsgReader.h"
 #include "RenderingBuffer.h"
 #include "RootLayer.h"
@@ -50,7 +51,6 @@
 #include "ServerBitmap.h"
 #include "ServerPicture.h"
 #include "ServerProtocol.h"
-#include "Utils.h"
 #include "WinBorder.h"
 #include "Workspace.h"
 #include "WorkspacesLayer.h"
@@ -150,8 +150,10 @@ ServerWindow::ServerWindow(const char *title, ServerApp *app,
 	SetTitle(title);
 	fServerToken = BPrivate::gDefaultTokens.NewToken(B_SERVER_TOKEN, this);
 
-	BMessenger::Private(fClientMessenger).SetTo(fClientTeam,
-		looperPort, clientToken, false);
+	BMessenger::Private(fFocusMessenger).SetTo(fClientTeam,
+		looperPort, B_PREFERRED_TOKEN);
+	BMessenger::Private(fHandlerMessenger).SetTo(fClientTeam,
+		looperPort, clientToken);
 }
 
 
@@ -670,7 +672,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			}
 
 			if (fCurrentLayer->EventMask() != 0) {
-				fDesktop->EventDispatcher().RemoveListener(Messenger(),
+				fDesktop->EventDispatcher().RemoveListener(FocusMessenger(),
 					fCurrentLayer->ViewToken());
 			}
 
@@ -716,14 +718,15 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			link.Read<uint32>(&eventMask);
 			if (link.Read<uint32>(&options) == B_OK) {
+printf("got %s: eventMask = %ld, options = %ld\n", fCurrentLayer->Name(), eventMask, options);
 				fCurrentLayer->QuietlySetEventMask(eventMask);
 				fCurrentLayer->QuietlySetEventOptions(options);
 
 				if (eventMask != 0 || options != 0) {
-					fDesktop->EventDispatcher().AddListener(Messenger(),
+					fDesktop->EventDispatcher().AddListener(FocusMessenger(),
 						fCurrentLayer->ViewToken(), eventMask, options);
 				} else {
-					fDesktop->EventDispatcher().RemoveListener(Messenger(),
+					fDesktop->EventDispatcher().RemoveListener(FocusMessenger(),
 						fCurrentLayer->ViewToken());
 				}
 			}
@@ -738,10 +741,10 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<uint32>(&eventMask);
 			if (link.Read<uint32>(&options) == B_OK) {
 				if (eventMask != 0 || options != 0) {
-					fDesktop->EventDispatcher().AddTemporaryListener(Messenger(),
+					fDesktop->EventDispatcher().AddTemporaryListener(FocusMessenger(),
 						fCurrentLayer->ViewToken(), eventMask, options);
 				} else {
-					fDesktop->EventDispatcher().RemoveTemporaryListener(Messenger(),
+					fDesktop->EventDispatcher().RemoveTemporaryListener(FocusMessenger(),
 						fCurrentLayer->ViewToken());
 				}
 			}
@@ -2111,7 +2114,7 @@ ServerWindow::_MessageLooper()
 
 
 status_t
-ServerWindow::SendMessageToClient(const BMessage* msg, int32 target, bool usePreferred) const
+ServerWindow::SendMessageToClient(const BMessage* msg, int32 target) const
 {
 #ifndef USING_MESSAGE4
 	ssize_t size = msg->FlattenedSize();
@@ -2120,7 +2123,7 @@ ServerWindow::SendMessageToClient(const BMessage* msg, int32 target, bool usePre
 
 	if ((ret = msg->Flatten(buffer, size)) == B_OK) {
 		ret = BMessage::Private::SendFlattenedMessage(buffer, size,
-					fClientLooperPort, target, usePreferred, 100000);
+			fClientLooperPort, target, 100000);
 		if (ret < B_OK)
 			fprintf(stderr, "ServerWindow::SendMessageToClient(): %s\n", strerror(ret));
 	} else
@@ -2131,8 +2134,8 @@ ServerWindow::SendMessageToClient(const BMessage* msg, int32 target, bool usePre
 #else
 	BMessenger reply;
 	BMessage::Private messagePrivate((BMessage *)msg);
-	return messagePrivate.SendMessage(fClientLooperPort, target, usePreferred,
-		100000, false, reply);
+	return messagePrivate.SendMessage(fClientLooperPort, target, 100000,
+		false, reply);
 #endif
 }
 

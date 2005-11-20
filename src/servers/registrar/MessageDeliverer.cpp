@@ -610,7 +610,7 @@ MessageDeliverer::DeliverMessage(BMessage *message, MessagingTargetSet &targets,
 	// It will be set when sending the message anyway, but if it is not set
 	// before flattening, the header will not contain room for it, and it
 	// will not possible to send the message flattened later.
-	BMessage::Private(message).SetTarget(0, false);
+	BMessage::Private(message).SetTarget(B_NULL_TOKEN);
 
 	// flatten the message
 	BMallocIO mallocIO;
@@ -747,7 +747,7 @@ status_t
 MessageDeliverer::_SendMessage(Message *message, port_id portID, int32 token)
 {
 	status_t error = BMessage::Private::SendFlattenedMessage(message->Data(),
-		message->DataSize(), portID, token, (token < 0), 0);
+		message->DataSize(), portID, token, 0);
 //PRINT(("MessageDeliverer::_SendMessage(%p, port: %ld, token: %ld): %lx\n",
 //message, portID, token, error));
 	return error;

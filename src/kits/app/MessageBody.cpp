@@ -25,6 +25,8 @@
 //					BMessage.
 //------------------------------------------------------------------------------
 
+#ifndef USING_MESSAGE4
+
 // Standard Includes -----------------------------------------------------------
 #include <stdio.h>
 
@@ -395,10 +397,4 @@ BMessageField* BMessageBody::FindData(const char* name, type_code type,
 
 }	// namespace BPrivate
 
-/*
- * $Log $
- *
- * $Id  $
- *
- */
-
+#endif	// USING_MESSAGE4

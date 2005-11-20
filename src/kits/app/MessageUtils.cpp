@@ -6,6 +6,10 @@
  *		Erik Jaesler (erik@cgsoftware.com)
  */
 
+#ifdef USING_MESSAGE4
+#	include "MessageUtils4.cpp"
+#else
+
 /**	Extra messaging utility functions */
 
 #include <string.h>
@@ -128,3 +132,4 @@ TChecksumHelper::CheckSum()
 	 return _checksum_(fBuffer, fBufPtr - fBuffer);
 }
 
+#endif	// USING_MESSAGE4

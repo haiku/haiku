@@ -455,7 +455,7 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 		wks |= (0x00000001 << fActiveWksIndex);
 		changedMsg.AddInt32("new", wks);
 		draggedWinBorder->QuietlySetWorkspaces(wks);
-		draggedWinBorder->Window()->SendMessageToClient(&changedMsg, B_NULL_TOKEN, false);
+		draggedWinBorder->Window()->SendMessageToClient(&changedMsg, B_NULL_TOKEN);
 	}
 
 	RevealNewWMState(oldWMState);
@@ -678,7 +678,7 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 			oldWMState.Active->Activated(false);
 		if (fWMState.Active) {
 			fWMState.Active->Activated(true);
-			fDesktop->EventDispatcher().SetFocus(&fWMState.Active->Window()->Messenger());
+			fDesktop->EventDispatcher().SetFocus(&fWMState.Active->Window()->FocusMessenger());
 		} else
 			fDesktop->EventDispatcher().SetFocus(NULL);
 	}

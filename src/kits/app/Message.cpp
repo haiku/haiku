@@ -8,6 +8,10 @@
  *		Ingo Weinhold <bonefish@users.sf.net>
  */
 
+#ifdef USING_MESSAGE4
+#	include "Message4.cpp"
+#else
+
 /**	BMessage class creates objects that store data and that
  *	can be processed in a message loop.  BMessage objects
  *	are also used as data containers by the archiving and
@@ -108,7 +112,7 @@ public:
 	bool IsSwapped() const { return fSwapped; }
 
 	bool HasTarget() const { return (fFlags & MSG_FLAG_INCL_TARGET); }
-	void SetTarget(int32 token, bool preferred);
+	void SetTarget(int32 token);
 
 	void Dump() const;
 
@@ -398,7 +402,7 @@ BMessage::Header::CalculateHeaderSize() const
 
 // SetTarget
 void
-BMessage::Header::SetTarget(int32 token, bool preferred)
+BMessage::Header::SetTarget(int32 token)
 {
 	fTargetToken = token;
 	if (fTargetToken == B_NULL_TOKEN)
@@ -406,7 +410,7 @@ BMessage::Header::SetTarget(int32 token, bool preferred)
 	else
 		fFlags |= MSG_FLAG_INCL_TARGET;
 
-	fPreferredTarget = preferred;
+	fPreferredTarget = token == B_PREFERRED_TOKEN;
 }
 
 // Dump
@@ -623,7 +627,7 @@ BMessenger BMessage::ReturnAddress() const
 	{
 		BMessenger messenger;
 		BMessenger::Private(messenger).SetTo(fReplyTo.team, fReplyTo.port,
-			fReplyTo.target, fReplyTo.preferred);
+			fReplyTo.target);
 		return messenger;
 	}
 
@@ -754,8 +758,7 @@ status_t BMessage::SendReply(BMessage* the_reply, BMessenger reply_to,
 	BMessenger messenger;
 	
 	BMessenger::Private messengerPrivate(messenger);
-	messengerPrivate.SetTo(fReplyTo.team, fReplyTo.port, fReplyTo.target,
-		fReplyTo.preferred);
+	messengerPrivate.SetTo(fReplyTo.team, fReplyTo.port, fReplyTo.target);
 	if (fReplyRequired)
 	{
 		if (fReplyDone)
@@ -824,8 +827,7 @@ status_t BMessage::SendReply(BMessage* the_reply, BMessage* reply_to_reply,
 	// TODO: test
 	BMessenger messenger;
 	BMessenger::Private messengerPrivate(messenger);
-	messengerPrivate.SetTo(fReplyTo.team, fReplyTo.port, fReplyTo.target,
-		fReplyTo.preferred);
+	messengerPrivate.SetTo(fReplyTo.team, fReplyTo.port, fReplyTo.target);
 	if (fReplyRequired)
 	{
 		if (fReplyDone)
@@ -1873,12 +1875,11 @@ BMessage::calc_hdr_size(uchar flags) const
 
 
 status_t
-BMessage::_send_(port_id port, int32 token, bool preferred,
-	bigtime_t timeout, bool reply_required,
-	BMessenger& reply_to) const
+BMessage::_send_(port_id port, int32 token, bigtime_t timeout,
+	bool reply_required, BMessenger& reply_to) const
 {
-	PRINT(("BMessage::_send_(port: %ld, token: %ld, preferred: %d): "
-		"what: %lx (%.4s)\n", port, token, preferred, what, (char*)&what));
+	PRINT(("BMessage::_send_(port: %ld, token: %ld): "
+		"what: %lx (%.4s)\n", port, token, what, (char*)&what));
 
 	bool oldPreferred = fPreferred;
 	int32 oldTarget = fTarget;
@@ -1886,14 +1887,14 @@ BMessage::_send_(port_id port, int32 token, bool preferred,
 
 	if (!reply_to.IsValid()) {
 		BMessenger::Private(reply_to).SetTo(fReplyTo.team,
-			fReplyTo.port, fReplyTo.target, fReplyTo.preferred);
+			fReplyTo.port, fReplyTo.target);
 		if (!reply_to.IsValid())
 			reply_to = be_app_messenger;
 	}
 
 	BMessage* self = const_cast<BMessage*>(this);
 	BMessenger::Private replyToPrivate(reply_to);
-	self->fPreferred         = preferred;
+	self->fPreferred         = token == B_PREFERRED_TOKEN;
 	self->fTarget            = token;
 	self->fReplyRequired     = reply_required;
 	self->fReplyTo.team      = replyToPrivate.Team();
@@ -1926,7 +1927,7 @@ BMessage::_send_(port_id port, int32 token, bool preferred,
 
 status_t
 BMessage::send_message(port_id port, team_id port_owner, int32 token,
-	bool preferred, BMessage* reply, bigtime_t send_timeout,
+	BMessage* reply, bigtime_t send_timeout,
 	bigtime_t reply_timeout) const
 {
 	const int32 cached_reply_port = sGetCachedReplyPort();
@@ -1961,8 +1962,8 @@ BMessage::send_message(port_id port, team_id port_owner, int32 token,
 	{
 		BMessenger messenger;
 		BMessenger::Private(messenger).SetTo(team, reply_port,
-			B_PREFERRED_TOKEN, false);
-		err = _send_(port, token, preferred, send_timeout, true, messenger);
+			B_PREFERRED_TOKEN);
+		err = _send_(port, token, send_timeout, true, messenger);
 	}
 	if (err)
 		goto error;
@@ -1993,7 +1994,7 @@ error:
 // can be sent.
 status_t
 BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
-	int32 token, bool preferred, bigtime_t timeout)
+	int32 token, bigtime_t timeout)
 {
 	if (!data)
 		return B_BAD_VALUE;
@@ -2004,7 +2005,7 @@ BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 	if (((KMessage::Header*)data)->magic == KMessage::kMessageHeaderMagic) {
 		// a KMessage
 		KMessage::Header *header = (KMessage::Header*)data;
-		header->targetToken = (preferred ? B_PREFERRED_TOKEN : token);
+		header->targetToken = token;
 	} else if (magic == kMessageMagic || magic == kMessageMagicSwapped) {
 		// get the header
 		BMemoryIO stream(data, size);
@@ -2033,12 +2034,12 @@ BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 
 			// send the message
 			BMessenger messenger;
-			return message._send_(port, token, preferred, timeout, false,
+			return message._send_(port, token, timeout, false,
 				messenger);
 		}
 
 		// set the target token and replace the header
-		header.SetTarget(token, preferred);
+		header.SetTarget(token);
 		stream.Seek(0LL, SEEK_SET);
 		error = header.WriteTo(stream);
 		if (error != B_OK)
@@ -2235,3 +2236,5 @@ min_hdr_size()
 
 	return size;
 }
+
+#endif	// USING_MESSAGE4

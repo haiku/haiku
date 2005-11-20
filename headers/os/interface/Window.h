@@ -294,53 +294,23 @@ private:
 								int32 bitmapToken = -1);
 			status_t	ArchiveChildren(BMessage* data, bool deep) const;	
 			status_t	UnarchiveChildren(BMessage* data);
-			void		BitmapClose();							// to be implemented
-	virtual	void		task_looper();							// thread function - it's here where app_server messages are received
-	/*		void		start_drag(	BMessage* msg,
-									int32 token,
-									BPoint offset,
-									BRect track_rect,
-									BHandler* reply_to);
-			void		start_drag(	BMessage* msg,
-									int32 token,
-									BPoint offset,
-									int32 bitmap_token,
-									drawing_mode dragMode,
-									BHandler* reply_to);
-	*/
+			void		BitmapClose();						// to be implemented
+	virtual	void		task_looper();
 			void		prepareView(BView* aView);
 			void		attachView(BView* aView);
 			void		detachView(BView* aView);
-			//int32		get_server_token() const;
-			BMessage	*extract_drop(BMessage* an_event, BHandler* *target);
-			//void		movesize(uint32 opcode, float h, float v);
-
-			//int32		MessagesWaiting();
 
 			void		handle_activate(BMessage* an_event);
-			//void		do_view_frame(BMessage* an_event);
-			//void		do_value_change(BMessage* an_event, BHandler* handler);
-			//void		do_mouse_down(BMessage* an_event, BView* target);
-			//void		do_mouse_moved(BMessage* an_event, BView* target);
-			//void		do_key_down(BMessage* an_event, BHandler* handler);
-			//void		do_key_up(BMessage* an_event, BHandler* handler);
 			void		do_menu_event(BMessage* an_event);
-			//void		do_draw_views();
 	virtual BMessage	*ConvertToMessage(void* raw, int32 code);
-			//_cmd_key_	*allocShortcut(uint32 key, uint32 modifiers);
-			//_cmd_key_	*FindShortcut(uint32 key, uint32 modifiers);
-			void		AddShortcut(uint32 key,										// !!! - and menu shortcuts to list when a menu is added
-									uint32 modifiers,
-									BMenuItem* item);
-			//void		post_message(BMessage* message);
-			//void		SetLocalTitle(const char* new_title);
-			//void		enable_pulsing(bool enable);
-			//void		kb_navigate();
-			//void		navigate_to_next(int32 direction, bool group = false);
-			//void		set_focus(BView* focus, bool notify_input_server);		// what does notify_input_server mean??? why???
+
+			void		AddShortcut(uint32 key, uint32 modifiers,
+							BMenuItem* item);
+			BHandler*	_DetermineTarget(BMessage* message, BHandler* target);
+			bool		_DistributeMessage(BMessage* message);
+
 			bool		InUpdate();
 			void		DequeueAll();
-			//bool		find_token_and_handler(BMessage* msg, int32* token,	BHandler* *handler);
 			window_type	_ComposeType(window_look look,
 									 window_feel feel) const;
 			void		_DecomposeType(window_type type,
@@ -354,11 +324,9 @@ private:
 			void		setFocus(BView *focusView, bool notifyIputServer = false);
 
 			Shortcut*	_FindShortcut(uint32 key, uint32 modifiers);
-			bool		findHandler(BView* start, BHandler* handler);
-			BView*		findView(BView* aView, const char* viewName) const;
-			BView*		findView(BView* aView, BPoint point) const;
-			BView*		findView(BView* aView, int32 token);
-			BView*		findLastChild(BView *parent);
+			BView*		_FindView(BView* view, BPoint point) const;
+			BView*		_FindView(int32 token);
+			BView*		_LastViewChild(BView *parent);
 
 			BView*		_FindNextNavigable(BView *focus, uint32 flags);
 			BView*		_FindPreviousNavigable(BView *focus, uint32 flags);

@@ -1,3 +1,10 @@
+/*
+ * Copyright 2005, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Michael Lotz <mmlr@mlotz.ch>
+ */
 #ifndef _MESSAGE_PRIVATE_H_
 #define _MESSAGE_PRIVATE_H_
 
@@ -75,127 +82,139 @@ typedef struct message_header_s {
 
 
 class BMessage::Private {
+	public:
+		Private(BMessage *msg)
+			: fMessage(msg)
+		{
+		}
 
-public:
-						Private(BMessage *msg)
-							: fMessage(msg)
-						{
-						}
+		Private(BMessage &msg)
+			: fMessage(&msg)
+		{
+		}
 
-						Private(BMessage &msg)
-							: fMessage(&msg)
-						{
-						}
+		void
+		SetTarget(int32 token)
+		{
+			fMessage->fHeader->target = token;
+		}
 
-inline	void			SetTarget(int32 token, bool preferred)
-						{
-							fMessage->fHeader->target = (preferred
-								? B_PREFERRED_TOKEN : token);
-						}
+		void
+		SetReply(BMessenger messenger)
+		{
+			BMessenger::Private messengerPrivate(messenger);
+			fMessage->fHeader->replyPort = messengerPrivate.Port();
+			fMessage->fHeader->replyTarget = messengerPrivate.Token();
+			fMessage->fHeader->replyTeam = messengerPrivate.Team();
+		}
 
-inline	void			SetReply(BMessenger messenger)
-						{
-							BMessenger::Private messengerPrivate(messenger);
-							fMessage->fHeader->replyPort = messengerPrivate.Port();
-							fMessage->fHeader->replyTarget = messengerPrivate.Token();
-							fMessage->fHeader->replyTeam = messengerPrivate.Team();
-						}
+		int32
+		GetTarget()
+		{
+			return fMessage->fHeader->target;
+		}
 
-inline	int32			GetTarget()
-						{
-							return fMessage->fHeader->target;
-						}
+		bool
+		UsePreferredTarget()
+		{
+			return fMessage->fHeader->target == B_PREFERRED_TOKEN;
+		}
 
-inline	bool			UsePreferredTarget()
-						{
-							return fMessage->fHeader->target == B_PREFERRED_TOKEN;
-						}
+		status_t
+		Clear()
+		{
+			return fMessage->_Clear();
+		}
 
-inline	status_t		Clear()
-						{
-							return fMessage->_Clear();
-						}
+		status_t
+		InitHeader()
+		{
+			return fMessage->_InitHeader();
+		}
 
-inline	status_t		InitHeader()
-						{
-							return fMessage->_InitHeader();
-						}
+		MessageHeader*
+		GetMessageHeader()
+		{
+			return fMessage->fHeader;
+		}
 
-inline	MessageHeader	*GetMessageHeader()
-						{
-							return fMessage->fHeader;
-						}
+		FieldHeader*
+		GetMessageFields()
+		{
+			return fMessage->fFields;
+		}
 
-inline	FieldHeader		*GetMessageFields()
-						{
-							return fMessage->fFields;
-						}
+		uint8*
+		GetMessageData()
+		{
+			return fMessage->fData;
+		}
 
-inline	uint8			*GetMessageData()
-						{
-							return fMessage->fData;
-						}
+		ssize_t
+		NativeFlattenedSize() const
+		{
+			return fMessage->_NativeFlattenedSize();
+		}
 
-inline	ssize_t			NativeFlattenedSize() const
-						{
-							return fMessage->_NativeFlattenedSize();
-						}
+		status_t
+		NativeFlatten(char *buffer, ssize_t size) const
+		{
+			return fMessage->_NativeFlatten(buffer, size);
+		}
 
-inline	status_t		NativeFlatten(char *buffer, ssize_t size) const
-						{
-							return fMessage->_NativeFlatten(buffer, size);
-						}
+		status_t
+		NativeFlatten(BDataIO *stream, ssize_t *size) const
+		{
+			return fMessage->_NativeFlatten(stream, size);
+		}
 
-inline	status_t		NativeFlatten(BDataIO *stream, ssize_t *size) const
-						{
-							return fMessage->_NativeFlatten(stream, size);
-						}
+		status_t
+		SendMessage(port_id port, int32 token, bigtime_t timeout,
+			bool replyRequired, BMessenger &replyTo) const
+		{
+			return fMessage->_SendMessage(port, token,
+				timeout, replyRequired, replyTo);
+		}
 
-inline	status_t		SendMessage(port_id port, int32 token, bool preferred,
-							bigtime_t timeout, bool replyRequired,
-							BMessenger &replyTo) const
-						{
-							return fMessage->_SendMessage(port, token,
-								preferred, timeout, replyRequired, replyTo);
-						}
+		status_t
+		SendMessage(port_id port, team_id portOwner, int32 token,
+			BMessage *reply, bigtime_t sendTimeout,
+			bigtime_t replyTimeout) const
+		{
+			return fMessage->_SendMessage(port, portOwner, token,
+				reply, sendTimeout, replyTimeout);
+		}
 
-inline	status_t		SendMessage(port_id port, team_id portOwner,
-							int32 token, bool preferred, BMessage *reply,
-							bigtime_t sendTimeout, bigtime_t replyTimeout) const
-						{
-							return fMessage->_SendMessage(port, portOwner, token,
-								preferred, reply, sendTimeout, replyTimeout);
-						}
+		// static methods
 
-static
-inline	status_t		SendFlattenedMessage(void *data, int32 size,
-							port_id port, int32 token, bool preferred,
-							bigtime_t timeout)
-						{
-							return BMessage::_SendFlattenedMessage(data, size,
-								port, token, preferred, timeout);
-						}
+		static status_t
+		SendFlattenedMessage(void *data, int32 size, port_id port,
+			int32 token, bigtime_t timeout)
+		{
+			return BMessage::_SendFlattenedMessage(data, size,
+				port, token, timeout);
+		}
 
-static
-inline	void			StaticInit()
-						{
-							BMessage::_StaticInit();
-						}
+		static void
+		StaticInit()
+		{
+			BMessage::_StaticInit();
+		}
 
-static
-inline	void			StaticCleanup()
-						{
-							BMessage::_StaticCleanup();
-						}
+		static void
+		StaticCleanup()
+		{
+			BMessage::_StaticCleanup();
+		}
 
-static
-inline	void			StaticCacheCleanup()
-						{
-							BMessage::_StaticCacheCleanup();
-						}
+		static void
+		StaticCacheCleanup()
+		{
+			BMessage::_StaticCacheCleanup();
+		}
 
-private:
-		BMessage		*fMessage;
+	private:
+		BMessage* fMessage;
 };
 
 #endif	// _MESSAGE_PRIVATE_H_

@@ -1,10 +1,11 @@
 /*
  * Copyright 2001-2005, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
- *
- * TRoster is the incarnation of The Roster. It manages the running
- * applications.
  */
+
+/*!	TRoster is the incarnation of The Roster. It manages the running
+	applications.
+*/
 
 #include <new>
 
@@ -1444,7 +1445,7 @@ TRoster::_AppActivated(RosterAppInfo *info)
 			// send B_APP_ACTIVATED to the app
 			BMessenger messenger;
 			BMessenger::Private messengerPrivate(messenger);
-			messengerPrivate.SetTo(info->team, info->port, 0, true);
+			messengerPrivate.SetTo(info->team, info->port, B_NULL_TOKEN);
 			BMessage message(B_APP_ACTIVATED);
 			message.AddBool("active", true);
 			// not sure, if it makes sense to use the MessageDeliverer here
@@ -1472,7 +1473,7 @@ TRoster::_AppDeactivated(RosterAppInfo *info)
 			// send B_APP_ACTIVATED to the app
 			BMessenger messenger;
 			BMessenger::Private messengerPrivate(messenger);
-			messengerPrivate.SetTo(info->team, info->port, 0, true);
+			messengerPrivate.SetTo(info->team, info->port, B_NULL_TOKEN);
 			BMessage message(B_APP_ACTIVATED);
 			message.AddBool("active", false);
 			// not sure, if it makes sense to use the MessageDeliverer here

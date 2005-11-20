@@ -56,7 +56,6 @@
 #include "ServerTokenSpace.h"
 #include "ServerWindow.h"
 #include "SystemPalette.h"
-#include "Utils.h"
 #include "WinBorder.h"
 
 //#define DEBUG_SERVERAPP
@@ -122,8 +121,8 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 		return;
 	}
 
-	BMessenger::Private(fClientMessenger).SetTo(fClientTeam,
-		clientLooperPort, clientToken, false);
+	BMessenger::Private(fHandlerMessenger).SetTo(fClientTeam,
+		clientLooperPort, clientToken);
 
 	ServerCursor *defaultCursor = 
 		fDesktop->GetCursorManager().GetCursor(B_CURSOR_DEFAULT);
@@ -278,7 +277,9 @@ ServerApp::Quit(sem_id shutdownSemaphore)
 void
 ServerApp::SendMessageToClient(BMessage *msg) const
 {
-	fClientMessenger.SendMessage(msg);
+	status_t status = fHandlerMessenger.SendMessage(msg, (BHandler*)NULL, 100000);
+	if (status != B_OK)
+		printf("app %s send to client failed: %s\n", Signature(), strerror(status));
 }
 
 
@@ -404,7 +405,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 	switch (code) {
 		case AS_REGISTER_INPUT_SERVER:
 		{
-			EventStream* stream = new (nothrow) InputServerStream(fClientMessenger);
+			EventStream* stream = new (nothrow) InputServerStream(fHandlerMessenger);
 			if (stream != NULL
 				&& (!stream->IsValid() || !gInputManager->AddStream(stream))) {
 				delete stream;

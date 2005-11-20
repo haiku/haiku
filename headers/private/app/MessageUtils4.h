@@ -79,7 +79,7 @@ public:
 								throw fError;
 							}
 
-		status_t			Status() { return fError; };
+		status_t			Status() { return fError >= B_OK ? B_OK : fError; };
 
 		void				SetSwap(bool yesNo) { fSwap = yesNo; };
 		bool				IsSwapping() { return fSwap; };

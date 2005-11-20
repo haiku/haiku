@@ -71,18 +71,17 @@ enum {
 };
 
 
-// constructor
 /*!	\brief Creates an unitialized BMessenger.
 */
 BMessenger::BMessenger()
-		  : fPort(-1),
-			fHandlerToken(B_NULL_TOKEN),
-			fTeam(-1),
-			fPreferredTarget(false)
+	:
+	fPort(-1),
+	fHandlerToken(B_NULL_TOKEN),
+	fTeam(-1)
 {
 }
 
-// constructor
+
 /*!	\brief Creates a BMessenger and initializes it to target the already
 	running application identified by its signature and/or team ID.
 
@@ -98,15 +97,15 @@ BMessenger::BMessenger()
 		   the result of the initialization is written.
 */
 BMessenger::BMessenger(const char *signature, team_id team, status_t *result)
-		  : fPort(-1),
-			fHandlerToken(B_NULL_TOKEN),
-			fTeam(-1),
-			fPreferredTarget(false)
+	:
+	fPort(-1),
+	fHandlerToken(B_NULL_TOKEN),
+	fTeam(-1)
 {
-	InitData(signature, team, result);
+	_InitData(signature, team, result);
 }
 
-// constructor
+
 /*!	\brief Creates a BMessenger and initializes it to target the local
 	BHandler and/or BLooper.
 
@@ -121,12 +120,12 @@ BMessenger::BMessenger(const char *signature, team_id team, status_t *result)
 	\param result An optional pointer to a pre-allocated status_t into which
 		   the result of the initialization is written.
 */
-BMessenger::BMessenger(const BHandler *handler, const BLooper *looper,
-					   status_t *result)
-		  : fPort(-1),
-			fHandlerToken(B_NULL_TOKEN),
-			fTeam(-1),
-			fPreferredTarget(false)
+BMessenger::BMessenger(const BHandler* handler, const BLooper* looper,
+	status_t* _result)
+	:
+	fPort(-1),
+	fHandlerToken(B_NULL_TOKEN),
+	fTeam(-1)
 {
 	status_t error = (handler || looper ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
@@ -148,31 +147,30 @@ BMessenger::BMessenger(const BHandler *handler, const BLooper *looper,
 				fPort = looper->fMsgPort;
 				fHandlerToken = (handler
 					? _get_object_token_(handler) : B_PREFERRED_TOKEN);
-				fPreferredTarget = !handler;
 				fTeam = looper->Team();
 			} else
 				error = B_BAD_VALUE;
 		}
 	}
-	if (result)
-		*result = error;
+	if (_result)
+		*_result = error;
 }
 
-// copy constructor
+
 /*!	\brief Creates a BMessenger and initializes it to have the same target
 	as the supplied messemger.
 
 	\param from The messenger to be copied.
 */
-BMessenger::BMessenger(const BMessenger &from)
-		  : fPort(from.fPort),
-			fHandlerToken(from.fHandlerToken),
-			fTeam(from.fTeam),
-			fPreferredTarget(from.fPreferredTarget)
+BMessenger::BMessenger(const BMessenger& from)
+	:
+	fPort(from.fPort),
+	fHandlerToken(from.fHandlerToken),
+	fTeam(from.fTeam)
 {
 }
 
-// destructor
+
 /*!	\brief Frees all resources associated with this object.
 */
 BMessenger::~BMessenger()
@@ -180,9 +178,9 @@ BMessenger::~BMessenger()
 }
 
 
-// Target
+//	#pragma mark - Target
 
-// IsTargetLocal
+
 /*!	\brief Returns whether or not the messenger's target lives within the team
 	of the caller.
 
@@ -193,11 +191,11 @@ bool
 BMessenger::IsTargetLocal() const
 {
 	thread_info info;
-	return (get_thread_info(find_thread(NULL), &info) == B_OK
-			&& fTeam == info.team);
+	return get_thread_info(find_thread(NULL), &info) == B_OK
+		&& fTeam == info.team;
 }
 
-// Target
+
 /*!	\brief Returns the handler and looper targeted by the messenger, if the
 	target is local.
 
@@ -212,22 +210,21 @@ BMessenger::IsTargetLocal() const
 	\return The BHandler targeted by the messenger.
 */
 BHandler *
-BMessenger::Target(BLooper **looper) const
+BMessenger::Target(BLooper** _looper) const
 {
 	BHandler *handler = NULL;
-	if (IsTargetLocal()) {
-		if (!fPreferredTarget) {
-			gDefaultTokens.GetToken(fHandlerToken, B_HANDLER_TOKEN,
-									(void**)&handler);
-		}
-		if (looper)
-			*looper = BPrivate::gLooperList.LooperForPort(fPort);
-	} else if (looper)
-		*looper = NULL;
+	if (IsTargetLocal() && fHandlerToken > B_NULL_TOKEN) {
+		gDefaultTokens.GetToken(fHandlerToken, B_HANDLER_TOKEN,
+			(void**)&handler);
+		if (_looper)
+			*_looper = BPrivate::gLooperList.LooperForPort(fPort);
+	} else if (_looper)
+		*_looper = NULL;
+
 	return handler;
 }
 
-// LockTarget
+
 /*!	\brief Locks the BLooper targeted by the messenger, if the target is local.
 
 	This method is a shorthand for retrieving the targeted looper via
@@ -244,10 +241,10 @@ BMessenger::LockTarget() const
 {
 	BLooper *looper = NULL;
 	Target(&looper);
-	return (looper && looper->Lock());
+	return looper && looper->Lock();
 }
 
-// LockTargetWithTimeout
+
 /*!	\brief Locks the BLooper targeted by the messenger, if the target is local.
 
 	This method is a shorthand for retrieving the targeted looper via
@@ -266,14 +263,15 @@ BMessenger::LockTargetWithTimeout(bigtime_t timeout) const
 {
 	BLooper *looper = NULL;
 	Target(&looper);
-	status_t error = (looper ? B_OK : B_BAD_VALUE);
+	status_t error = looper ? B_OK : B_BAD_VALUE;
 	if (error == B_OK)
 		error = looper->LockWithTimeout(timeout);
+
 	return error;
 }
 
 
-// Message sending
+//	#pragma mark - Message sending
 
 // SendMessage
 /*! \brief Delivers a BMessage synchronously to the messenger's target.
@@ -358,11 +356,10 @@ BMessenger::SendMessage(BMessage *message, BMessenger replyTo,
 		return B_BAD_VALUE;
 
 #ifndef USING_MESSAGE4
-	return message->_send_(fPort, fHandlerToken, fPreferredTarget,
-		timeout, false, replyTo);
+	return message->_send_(fPort, fHandlerToken, timeout, false, replyTo);
 #else
 	return BMessage::Private(message).SendMessage(fPort, fHandlerToken,
-		fPreferredTarget, timeout, false, replyTo);
+		timeout, false, replyTo);
 #endif
 }
 
@@ -418,18 +415,16 @@ BMessenger::SendMessage(uint32 command, BMessage *reply) const
 */
 status_t
 BMessenger::SendMessage(BMessage *message, BMessage *reply,
-						bigtime_t deliveryTimeout, bigtime_t replyTimeout) const
+	bigtime_t deliveryTimeout, bigtime_t replyTimeout) const
 {
 	status_t error = (message && reply ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 #ifndef USING_MESSAGE4
 		error = message->send_message(fPort, fTeam, fHandlerToken,
-									  fPreferredTarget, reply, deliveryTimeout,
-									  replyTimeout);
+			reply, deliveryTimeout, replyTimeout);
 #else
 		error = BMessage::Private(message).SendMessage(fPort, fTeam,
-			fHandlerToken, fPreferredTarget, reply, deliveryTimeout,
-			replyTimeout);
+			fHandlerToken, reply, deliveryTimeout, replyTimeout);
 #endif
 		// Map this error for now:
 		if (error == B_BAD_TEAM_ID)
@@ -439,9 +434,9 @@ BMessenger::SendMessage(BMessage *message, BMessage *reply,
 }
 
 
-// Operators and misc
+//	#pragma mark - Operators and misc
 
-// =
+
 /*!	\brief Makes this BMessenger a copy of the supplied one.
 
 	\param from the messenger to be copied.
@@ -454,12 +449,11 @@ BMessenger::operator=(const BMessenger &from)
 		fPort = from.fPort;
 		fHandlerToken = from.fHandlerToken;
 		fTeam = from.fTeam;
-		fPreferredTarget = from.fPreferredTarget;
 	}
 	return *this;
 }
 
-// ==
+
 /*!	\brief Returns whether this and the supplied messenger have the same
 	target.
 
@@ -471,12 +465,11 @@ bool
 BMessenger::operator==(const BMessenger &other) const
 {
 	// Note: The fTeam fields are not compared.
-	return (fPort == other.fPort
-			&& fHandlerToken == other.fHandlerToken
-			&& fPreferredTarget == other.fPreferredTarget);
+	return fPort == other.fPort
+		&& fHandlerToken == other.fHandlerToken;
 }
 
-// IsValid
+
 /*!	\brief Returns whether the messenger's target looper does still exist.
 
 	It is not checked whether the target handler is also still existing.
@@ -488,10 +481,10 @@ bool
 BMessenger::IsValid() const
 {
 	port_info info;
-	return (fPort >= 0 && get_port_info(fPort, &info) == B_OK);
+	return fPort >= 0 && get_port_info(fPort, &info) == B_OK;
 }
 
-// Team
+
 /*!	\brief Returns the ID of the team the messenger's target lives in.
 
 	\return The team of the messenger's target.
@@ -503,29 +496,26 @@ BMessenger::Team() const
 }
 
 
-//----- Private or reserved -----------------------------------------
+//	#pragma mark - Private or reserved
 
-// SetTo
+
 /*!	\brief Sets the messenger's team, target looper port and handler token.
 
-	If \a preferred is \c true, \a token is ignored.
+	To target the preferred handler, use B_PREFERRED_TOKEN as token.
 
 	\param team The target's team.
 	\param port The target looper port.
 	\param token The target handler token.
-	\param preferred \c true to rather use the looper's preferred handler
-		   instead of the one specified by \a token.
 */
 void
-BMessenger::SetTo(team_id team, port_id port, int32 token, bool preferred)
+BMessenger::_SetTo(team_id team, port_id port, int32 token)
 {
 	fTeam = team;
 	fPort = port;
-	fHandlerToken = (preferred ? B_PREFERRED_TOKEN : token);
-	fPreferredTarget = preferred;
+	fHandlerToken = token;
 }
 
-// InitData
+
 /*!	\brief Initializes the BMessenger object's data given the signature and/or
 	team ID of a target.
 
@@ -541,7 +531,7 @@ BMessenger::SetTo(team_id team, port_id port, int32 token, bool preferred)
 		   the result of the initialization is written.
 */
 void
-BMessenger::InitData(const char *signature, team_id team, status_t *result)
+BMessenger::_InitData(const char* signature, team_id team, status_t* _result)
 {
 	status_t error = B_OK;
 	// get an app_info
@@ -576,14 +566,14 @@ BMessenger::InitData(const char *signature, team_id team, status_t *result)
 		fTeam = team;
 		fPort = info.port;
 		fHandlerToken = B_PREFERRED_TOKEN;
-		fPreferredTarget = true;
 	}
+
 	// return the error
-	if (result)
-		*result = error;
+	if (_result)
+		*_result = error;
 }
 
-// <
+
 /*!	\brief Returns whether the first one of two BMessengers is less than the
 	second one.
 
@@ -599,7 +589,6 @@ operator<(const BMessenger &_a, const BMessenger &_b)
 {
 	BMessenger::Private a(const_cast<BMessenger&>(_a));
 	BMessenger::Private b(const_cast<BMessenger&>(_b));
-	
 
 	// significance:
 	// 1. fPort
@@ -614,7 +603,7 @@ operator<(const BMessenger &_a, const BMessenger &_b)
 						&& b.IsPreferredTarget()));
 }
 
-// !=
+
 /*!	\brief Returns whether two BMessengers have not the same target.
 
 	\param a The first messenger.

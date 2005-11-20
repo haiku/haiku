@@ -3,6 +3,10 @@
 //
 //------------------------------------------------------------------------------
 
+#ifdef USING_MESSAGE4
+#	include <MessagePrivate4.h>
+#else
+
 #ifndef MESSAGEPRIVATE_H
 #define MESSAGEPRIVATE_H
 
@@ -11,24 +15,22 @@
 #include <MessengerPrivate.h>
 #include <TokenSpace.h>
 
-class BMessage::Private
-{
+class BMessage::Private {
 	public:
 		Private(BMessage* msg) : fMessage(msg) {;}
 		Private(BMessage& msg) : fMessage(&msg) {;}
 
-		inline void SetTarget(int32 token, bool preferred)
+		inline void SetTarget(int32 token)
 		{
 			fMessage->fTarget = token;
-			fMessage->fPreferred = preferred;
+			fMessage->fPreferred = token == B_PREFERRED_TOKEN;
 		}
 
 		inline void SetReply(BMessenger messenger)
 		{
 			BMessenger::Private mp(messenger);
 			fMessage->fReplyTo.port = mp.Port();
-			fMessage->fReplyTo.target
-				= (mp.IsPreferredTarget() ? B_PREFERRED_TOKEN : mp.Token());
+			fMessage->fReplyTo.target = mp.Token();
 			fMessage->fReplyTo.team = mp.Team();
 			fMessage->fReplyTo.preferred = mp.IsPreferredTarget();
 		}
@@ -44,10 +46,10 @@ class BMessage::Private
 		}
 
 		static inline status_t SendFlattenedMessage(void *data, int32 size,
-			port_id port, int32 token, bool preferred, bigtime_t timeout)
+			port_id port, int32 token, bigtime_t timeout)
 		{
 			return BMessage::_SendFlattenedMessage(data, size, port, token,
-				preferred, timeout);
+				timeout);
 		}
 
 		static inline void StaticInit()
@@ -70,11 +72,4 @@ class BMessage::Private
 };
 
 #endif	// MESSAGEPRIVATE_H
-
-/*
- * $Log $
- *
- * $Id  $
- *
- */
-
+#endif	// USING_MESSAGE4

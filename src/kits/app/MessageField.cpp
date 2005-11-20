@@ -1,3 +1,4 @@
+#ifndef USING_MESSAGE4
 //------------------------------------------------------------------------------
 //	MessageField.cpp
 //
@@ -41,10 +42,4 @@ void BMessageField::PrintToStream(const char* name) const
 
 }	// namespace BPrivate
 
-/*
- * $Log $
- *
- * $Id  $
- *
- */
-
+#endif	// USING_MESSAGE4

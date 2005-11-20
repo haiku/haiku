@@ -1,3 +1,5 @@
+#ifdef USING_MESSAGE4
+
 #include <DataIO.h>
 #include <MessagePrivate.h>
 #include <MessageUtils.h>
@@ -394,3 +396,5 @@ R5MessageUnflatten(BMessage *message, BDataIO *stream)
 }
 
 } // namespace BPrivate
+
+#endif	// USING_MESSAGE4

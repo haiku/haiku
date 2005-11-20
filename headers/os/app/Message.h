@@ -6,6 +6,10 @@
  *	Erik Jaesler (erik@cgsoftware.com)
  *	DarkWyrm <bpmagic@columbus.rr.com>
  */
+#ifdef USING_MESSAGE4
+#	include <Message4.h>
+#else
+
 #ifndef _MESSAGE_H
 #define _MESSAGE_H
 
@@ -309,20 +313,17 @@ virtual	void		_ReservedMessage3();
 
 		status_t	_send_(port_id port,
 							int32 token,
-							bool preferred,
 							bigtime_t timeout,
 							bool reply_required,
 							BMessenger &reply_to) const;
 		status_t	send_message(port_id port,
 								team_id port_owner,
 								int32 token,
-								bool preferred,
 								BMessage *reply,
 								bigtime_t send_timeout,
 								bigtime_t reply_timeout) const;
 static	status_t	_SendFlattenedMessage(void *data, int32 size,
-						port_id port, int32 token, bool preferred,
-						bigtime_t timeout);
+						port_id port, int32 token, bigtime_t timeout);
 
 static	void		_StaticInit();
 static	void		_StaticCleanup();
@@ -429,3 +430,5 @@ static	BBlockCache	*sMsgCache;
 };
 
 #endif	// _MESSAGE_H
+#endif	// USING_MESSAGE4
+
