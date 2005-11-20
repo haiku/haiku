@@ -80,7 +80,7 @@ pad_to_8(int32 value)
 
 
 ssize_t
-BPrivate::dano_message_size(const char *buffer)
+BPrivate::dano_message_flattened_size(const char *buffer)
 {
 	section_header *header = (section_header *)buffer;
 

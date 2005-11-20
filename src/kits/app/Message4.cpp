@@ -7,16 +7,12 @@
  */
 
 
-#include <Message.h>
-#include <MessagePrivate.h>
-#include <MessageUtils.h>
 #include "dano_message.h"
 #include "r5_message.h"
 
-#include <ctype.h>
-#include <malloc.h>
-#include <stdio.h>
-#include <string.h>
+#include <Message.h>
+#include <MessagePrivate.h>
+#include <MessageUtils.h>
 
 #include <Application.h>
 #include <AppMisc.h>
@@ -30,6 +26,11 @@
 #include <Rect.h>
 #include <String.h>
 #include <TokenSpace.h>
+
+#include <ctype.h>
+#include <malloc.h>
+#include <stdio.h>
+#include <string.h>
 
 
 #define DEBUG_FUNCTION_ENTER	//debug_printf("%ld: %s\n", __LINE__, __PRETTY_FUNCTION__);
@@ -100,21 +101,21 @@ BMessage::operator=(const BMessage &other)
 	DEBUG_FUNCTION_ENTER;
 	_Clear();
 
-	fHeader = (MessageHeader *)malloc(sizeof(MessageHeader));
-	memcpy(fHeader, other.fHeader, sizeof(MessageHeader));
+	fHeader = (message_header *)malloc(sizeof(message_header));
+	memcpy(fHeader, other.fHeader, sizeof(message_header));
 
-	if (fHeader->fieldsSize > 0) {
-		fFields = (FieldHeader *)malloc(fHeader->fieldsSize);
-		memcpy(fFields, other.fFields, fHeader->fieldsSize);
+	if (fHeader->fields_size > 0) {
+		fFields = (field_header *)malloc(fHeader->fields_size);
+		memcpy(fFields, other.fFields, fHeader->fields_size);
 	}
 
-	if (fHeader->dataSize > 0) {
-		fData = (uint8 *)malloc(other.fHeader->dataSize);
-		memcpy(fData, other.fData, other.fHeader->dataSize);
+	if (fHeader->data_size > 0) {
+		fData = (uint8 *)malloc(other.fHeader->data_size);
+		memcpy(fData, other.fData, other.fHeader->data_size);
 	}
 
-	fHeader->fieldsAvailable = 0;
-	fHeader->dataAvailable = 0;
+	fHeader->fields_available = 0;
+	fHeader->data_available = 0;
 	what = fHeader->what;
 	fQueueLink = other.fQueueLink;
 	return *this;
@@ -168,21 +169,21 @@ status_t
 BMessage::_InitHeader()
 {
 	DEBUG_FUNCTION_ENTER;
-	fHeader = (MessageHeader *)malloc(sizeof(MessageHeader));
-	memset(fHeader, 0, sizeof(MessageHeader));
+	fHeader = (message_header *)malloc(sizeof(message_header));
+	memset(fHeader, 0, sizeof(message_header));
 
 	fHeader->format = kMessageMagic4;
 	fHeader->flags = MESSAGE_FLAG_VALID;
-	fHeader->currentSpecifier = -1;
+	fHeader->current_specifier = -1;
 
 	fHeader->target = B_NULL_TOKEN;
-	fHeader->replyTarget = B_NULL_TOKEN;
-	fHeader->replyPort = -1;
-	fHeader->replyTeam = -1;
+	fHeader->reply_target = B_NULL_TOKEN;
+	fHeader->reply_port = -1;
+	fHeader->reply_team = -1;
 
 	// initializing the hash table to -1 because 0 is a valid index
-	fHeader->hashTableSize = MESSAGE_BODY_HASH_TABLE_SIZE;
-	memset(&fHeader->hashTable, 255, sizeof(fHeader->hashTable));
+	fHeader->hash_table_size = MESSAGE_BODY_HASH_TABLE_SIZE;
+	memset(&fHeader->hash_table, 255, sizeof(fHeader->hash_table));
 	return B_OK;
 }
 
@@ -211,7 +212,7 @@ BMessage::GetInfo(type_code typeRequested, int32 index, char **nameFound,
 {
 	DEBUG_FUNCTION_ENTER;
 	if (typeRequested == B_ANY_TYPE) {
-		if (index >= fHeader->fieldCount)
+		if (index >= fHeader->field_count)
 			return B_BAD_INDEX;
 
 		if (nameFound)
@@ -224,8 +225,8 @@ BMessage::GetInfo(type_code typeRequested, int32 index, char **nameFound,
 	}
 
 	int32 counter = -1;
-	FieldHeader *field = fFields;
-	for (int32 i = 0; i < fHeader->fieldCount; i++, field++) {
+	field_header *field = fFields;
+	for (int32 i = 0; i < fHeader->field_count; i++, field++) {
 		if (field->type == typeRequested)
 			counter++;
 
@@ -255,7 +256,7 @@ BMessage::GetInfo(const char *name, type_code *typeFound, int32 *countFound)
 	if (countFound)
 		*countFound = 0;
 
-	FieldHeader *field = NULL;
+	field_header *field = NULL;
 	status_t result = _FindField(name, B_ANY_TYPE, &field);
 	if (result < B_OK || !field)
 		return result;
@@ -274,7 +275,7 @@ BMessage::GetInfo(const char *name, type_code *typeFound, bool *fixedSize)
 	const
 {
 	DEBUG_FUNCTION_ENTER;
-	FieldHeader *field = NULL;
+	field_header *field = NULL;
 	status_t result = _FindField(name, B_ANY_TYPE, &field);
 	if (result < B_OK || !field)
 		return result;
@@ -293,11 +294,11 @@ BMessage::CountNames(type_code type) const
 {
 	DEBUG_FUNCTION_ENTER;
 	if (type == B_ANY_TYPE)
-		return fHeader->fieldCount;
+		return fHeader->field_count;
 
 	int32 count = 0;
-	FieldHeader *field = fFields;
-	for (int32 i = 0; i < fHeader->fieldCount; i++, field++) {
+	field_header *field = fFields;
+	for (int32 i = 0; i < fHeader->field_count; i++, field++) {
 		if (field->type == type)
 			count++;
 	}
@@ -310,7 +311,7 @@ bool
 BMessage::IsEmpty() const
 {
 	DEBUG_FUNCTION_ENTER;
-	return fHeader->fieldCount == 0;
+	return fHeader->field_count == 0;
 }
 
 
@@ -399,26 +400,26 @@ BMessage::PrintToStream() const
 	printf(" (0x%lx, or %ld)\n", what, what);
 
 	char buffer[1024];
-	FieldHeader *field = fFields;
-	for (int32 i = 0; i < fHeader->fieldCount; i++, field++) {
+	field_header *field = fFields;
+	for (int32 i = 0; i < fHeader->field_count; i++, field++) {
 		value = B_BENDIAN_TO_HOST_INT32(field->type);
 		sprintf(buffer, "    entry %14s, type='%.4s', c=%ld, ",
 			(char *)(fData + field->offset), (char *)&value, field->count);
 
 		ssize_t size = 0;
 		if (field->flags & FIELD_FLAG_FIXED_SIZE)
-			size = field->dataSize / field->count;
+			size = field->data_size / field->count;
 
 		switch (field->type) {
 			case B_RECT_TYPE:
 				print_to_stream_type<BRect>(buffer,
-					(BRect *)(fData + field->offset + field->nameLength),
+					(BRect *)(fData + field->offset + field->name_length),
 					field->count, size);
 				break;
 
 			case B_POINT_TYPE:
 				print_to_stream_type<BPoint>(buffer,
-					(BPoint *)(fData + field->offset + field->nameLength),
+					(BPoint *)(fData + field->offset + field->name_length),
 					field->count, size);
 				break;
 
@@ -427,7 +428,7 @@ BMessage::PrintToStream() const
 				printf("%s", buffer);
 				memset(buffer, ' ', strlen(buffer));
 
-				uint8 *pointer = fData + field->offset + field->nameLength;
+				uint8 *pointer = fData + field->offset + field->name_length;
 				for (int32 i = 0; i < field->count; i++) {
 					if (i > 0) /* indent */
 						printf("%s", buffer);
@@ -443,43 +444,43 @@ BMessage::PrintToStream() const
 
 			case B_INT8_TYPE:
 				print_type<int8>(buffer, "0x%hx (%d \'%.1s\')\n",
-					(int8 *)(fData + field->offset + field->nameLength),
+					(int8 *)(fData + field->offset + field->name_length),
 					field->count, size, B_INT8_TYPE);
 				break;
 
 			case B_INT16_TYPE:
 				print_type<int16>(buffer, "0x%x (%d \'%.2s\')\n",
-					(int16 *)(fData + field->offset + field->nameLength),
+					(int16 *)(fData + field->offset + field->name_length),
 					field->count, size, B_INT16_TYPE);
 				break;
 
 			case B_INT32_TYPE:
 				print_type<int32>(buffer, "0x%lx (%ld \'%.4s\')\n",
-					(int32 *)(fData + field->offset + field->nameLength),
+					(int32 *)(fData + field->offset + field->name_length),
 					field->count, size, B_INT32_TYPE);
 				break;
 
 			case B_INT64_TYPE:
 				print_type<int64>(buffer, "0x%Lx (%Ld \'%.8s\')\n",
-					(int64 *)(fData + field->offset + field->nameLength),
+					(int64 *)(fData + field->offset + field->name_length),
 					field->count, size, B_INT64_TYPE);
 				break;
 
 			case B_BOOL_TYPE:
 				print_type<int8>(buffer, NULL,
-					(int8 *)(fData + field->offset + field->nameLength),
+					(int8 *)(fData + field->offset + field->name_length),
 					field->count, size, B_BOOL_TYPE);
 				break;
 
 			case B_FLOAT_TYPE:
 				print_type<float>(buffer, "%.4f\n",
-					(float *)(fData + field->offset + field->nameLength),
+					(float *)(fData + field->offset + field->name_length),
 					field->count, size, B_FLOAT_TYPE);
 				break;
 
 			case B_DOUBLE_TYPE:
 				print_type<double>(buffer, "%.8f\n",
-					(double *)(fData + field->offset + field->nameLength),
+					(double *)(fData + field->offset + field->name_length),
 					field->count, size, B_DOUBLE_TYPE);
 				break;
 
@@ -487,7 +488,7 @@ BMessage::PrintToStream() const
 				printf("%s", buffer);
 				memset(buffer, ' ', strlen(buffer));
 
-				uint8 *pointer = fData + field->offset + field->nameLength;
+				uint8 *pointer = fData + field->offset + field->name_length;
 				for (int32 i = 0; i < field->count; i++) {
 					if (i > 0) /* indent */
 						printf("%s", buffer);
@@ -524,33 +525,33 @@ BMessage::Rename(const char *oldEntry, const char *newEntry)
 	if (!oldEntry || !newEntry)
 		return B_BAD_VALUE;
 
-	uint32 hash = _HashName(oldEntry) % fHeader->hashTableSize;
-	int32 *nextField = &fHeader->hashTable[hash];
+	uint32 hash = _HashName(oldEntry) % fHeader->hash_table_size;
+	int32 *nextField = &fHeader->hash_table[hash];
 
 	while (*nextField >= 0) {
-		FieldHeader *field = &fFields[*nextField];
+		field_header *field = &fFields[*nextField];
 
 		if (strncmp((const char *)(fData + field->offset), oldEntry,
-			field->nameLength) == 0) {
+			field->name_length) == 0) {
 			// nextField points to the field for oldEntry, save it and unlink
 			int32 index = *nextField;
-			*nextField = field->nextField;
-			field->nextField = -1;
+			*nextField = field->next_field;
+			field->next_field = -1;
 
-			hash = _HashName(newEntry) % fHeader->hashTableSize;
-			nextField = &fHeader->hashTable[hash];
+			hash = _HashName(newEntry) % fHeader->hash_table_size;
+			nextField = &fHeader->hash_table[hash];
 			while (*nextField >= 0)
-				nextField = &fFields[*nextField].nextField;
+				nextField = &fFields[*nextField].next_field;
 			*nextField = index;
 
-			int32 oldLength = field->nameLength;
-			field->nameLength = strlen(newEntry) + 1;
-			_ResizeData(field->offset, field->nameLength - oldLength);
-			memcpy(fData + field->offset, newEntry, field->nameLength);
+			int32 oldLength = field->name_length;
+			field->name_length = strlen(newEntry) + 1;
+			_ResizeData(field->offset, field->name_length - oldLength);
+			memcpy(fData + field->offset, newEntry, field->name_length);
 			return B_OK;
 		}
 
-		nextField = &field->nextField;
+		nextField = &field->next_field;
 	}
 
 	return B_NAME_NOT_FOUND;
@@ -579,7 +580,7 @@ BMessage::IsSourceRemote() const
 {
 	DEBUG_FUNCTION_ENTER;
 	return (fHeader->flags & MESSAGE_FLAG_WAS_DELIVERED)
-		&& (fHeader->replyTeam != BPrivate::current_team());
+		&& (fHeader->reply_team != BPrivate::current_team());
 }
 
 
@@ -589,8 +590,8 @@ BMessage::ReturnAddress() const
 	DEBUG_FUNCTION_ENTER;
 	if (fHeader->flags & MESSAGE_FLAG_WAS_DELIVERED) {
 		BMessenger messenger;
-		BMessenger::Private(messenger).SetTo(fHeader->replyTeam,
-			fHeader->replyPort, fHeader->replyTarget);
+		BMessenger::Private(messenger).SetTo(fHeader->reply_team,
+			fHeader->reply_port, fHeader->reply_target);
 		return messenger;
 	}
 
@@ -660,8 +661,8 @@ BMessage::SendReply(BMessage *reply, BMessenger replyTo, bigtime_t timeout)
 	DEBUG_FUNCTION_ENTER;
 	BMessenger messenger;
 	BMessenger::Private messengerPrivate(messenger);
-	messengerPrivate.SetTo(fHeader->replyTeam, fHeader->replyPort,
-		fHeader->replyTarget);
+	messengerPrivate.SetTo(fHeader->reply_team, fHeader->reply_port,
+		fHeader->reply_target);
 
 	if (fHeader->flags & MESSAGE_FLAG_REPLY_REQUIRED) {
 		if (fHeader->flags & MESSAGE_FLAG_REPLY_DONE)
@@ -711,8 +712,8 @@ BMessage::SendReply(BMessage *reply, BMessage *replyToReply,
 	DEBUG_FUNCTION_ENTER;
 	BMessenger messenger;
 	BMessenger::Private messengerPrivate(messenger);
-	messengerPrivate.SetTo(fHeader->replyTeam, fHeader->replyPort,
-		fHeader->replyTarget);
+	messengerPrivate.SetTo(fHeader->reply_team, fHeader->reply_port,
+		fHeader->reply_target);
 
 	if (fHeader->flags & MESSAGE_FLAG_REPLY_REQUIRED) {
 		if (fHeader->flags & MESSAGE_FLAG_REPLY_DONE)
@@ -753,7 +754,7 @@ BMessage::FlattenedSize() const
 {
 	DEBUG_FUNCTION_ENTER;
 	//return _NativeFlattenedSize();
-	return BPrivate::R5MessageFlattenedSize(this);
+	return BPrivate::r5_message_flattened_size(this);
 }
 
 
@@ -762,7 +763,7 @@ BMessage::Flatten(char *buffer, ssize_t size) const
 {
 	DEBUG_FUNCTION_ENTER;
 	//return _NativeFlatten(buffer, size);
-	return BPrivate::R5MessageFlatten(this, buffer, size);
+	return BPrivate::flatten_r5_message(this, buffer, size);
 }
 
 
@@ -771,7 +772,7 @@ BMessage::Flatten(BDataIO *stream, ssize_t *size) const
 {
 	DEBUG_FUNCTION_ENTER;
 	//return _NativeFlatten(stream, size);
-	return BPrivate::R5MessageFlatten(this, stream, size);
+	return BPrivate::flatten_r5_message(this, stream, size);
 }
 
 
@@ -779,7 +780,7 @@ ssize_t
 BMessage::_NativeFlattenedSize() const
 {
 	DEBUG_FUNCTION_ENTER;
-	return sizeof(MessageHeader) + fHeader->fieldsSize + fHeader->dataSize;
+	return sizeof(message_header) + fHeader->fields_size + fHeader->data_size;
 }
 
 
@@ -796,16 +797,16 @@ BMessage::_NativeFlatten(char *buffer, ssize_t size) const
 	/* we have to sync the what code as it is a public member */
 	fHeader->what = what;
 
-	memcpy(buffer, fHeader, min_c(sizeof(MessageHeader), (size_t)size));
-	buffer += sizeof(MessageHeader);
-	size -= sizeof(MessageHeader);
+	memcpy(buffer, fHeader, min_c(sizeof(message_header), (size_t)size));
+	buffer += sizeof(message_header);
+	size -= sizeof(message_header);
 
-	memcpy(buffer, fFields, min_c(fHeader->fieldsSize, size));
-	buffer += fHeader->fieldsSize;
-	size -= fHeader->fieldsSize;
+	memcpy(buffer, fFields, min_c(fHeader->fields_size, size));
+	buffer += fHeader->fields_size;
+	size -= fHeader->fields_size;
 
-	memcpy(buffer, fData, min_c(fHeader->dataSize, size));
-	if (size >= fHeader->dataSize)
+	memcpy(buffer, fData, min_c(fHeader->data_size, size));
+	if (size >= fHeader->data_size)
 		return B_OK;
 
 	return B_NO_MEMORY;
@@ -825,21 +826,21 @@ BMessage::_NativeFlatten(BDataIO *stream, ssize_t *size) const
 	/* we have to sync the what code as it is a public member */
 	fHeader->what = what;
 
-	ssize_t result1 = stream->Write(fHeader, sizeof(MessageHeader));
-	if (result1 != sizeof(MessageHeader))
+	ssize_t result1 = stream->Write(fHeader, sizeof(message_header));
+	if (result1 != sizeof(message_header))
 		return (result1 >= 0 ? B_ERROR : result1);
 
 	ssize_t result2 = 0;
-	if (fHeader->fieldsSize > 0) {
-		stream->Write(fFields, fHeader->fieldsSize);
-		if (result2 != fHeader->fieldsSize)
+	if (fHeader->fields_size > 0) {
+		stream->Write(fFields, fHeader->fields_size);
+		if (result2 != fHeader->fields_size)
 			return (result2 >= 0 ? B_ERROR : result2);
 	}
 
 	ssize_t result3 = 0;
-	if (fHeader->dataSize > 0) {
-		stream->Write(fData, fHeader->dataSize);
-		if (result3 != fHeader->dataSize)
+	if (fHeader->data_size > 0) {
+		stream->Write(fData, fHeader->data_size);
+		if (result3 != fHeader->data_size)
 			return (result3 >= 0 ? B_ERROR : result3);
 	}
 
@@ -870,11 +871,11 @@ BMessage::Unflatten(const char *flatBuffer)
 		}
 
 		if (format == kMessageMagicR5 || format == kMessageMagicR5Swapped)
-			return BPrivate::R5MessageUnflatten(this, flatBuffer);
+			return BPrivate::unflatten_r5_message(this, flatBuffer);
 
 		if (format == kMessageMagicDano || format == kMessageMagicDanoSwapped) {
 			BMemoryIO stream(flatBuffer + sizeof(uint32),
-				BPrivate::dano_message_size(flatBuffer));
+				BPrivate::dano_message_flattened_size(flatBuffer));
 			return BPrivate::unflatten_dano_message(format, stream, *this);
 		}
 
@@ -884,12 +885,12 @@ BMessage::Unflatten(const char *flatBuffer)
 	// native message unflattening
 
 	free(fHeader);
-	fHeader = (MessageHeader *)malloc(sizeof(MessageHeader));
+	fHeader = (message_header *)malloc(sizeof(message_header));
 	if (!fHeader)
 		return B_NO_MEMORY;
 
-	memcpy(fHeader, flatBuffer, sizeof(MessageHeader));
-	flatBuffer += sizeof(MessageHeader);
+	memcpy(fHeader, flatBuffer, sizeof(message_header));
+	flatBuffer += sizeof(message_header);
 
 	/* ToDo: better message validation (checksum) */
 	if (fHeader->format != kMessageMagic4 ||
@@ -901,27 +902,27 @@ BMessage::Unflatten(const char *flatBuffer)
 
 	free(fFields);
 	fFields = NULL;
-	if (fHeader->fieldsSize > 0) {
-		fFields = (FieldHeader *)malloc(fHeader->fieldsSize);
+	if (fHeader->fields_size > 0) {
+		fFields = (field_header *)malloc(fHeader->fields_size);
 		if (!fFields)
 			return B_NO_MEMORY;
 
-		memcpy(fFields, flatBuffer, fHeader->fieldsSize);
-		flatBuffer += fHeader->fieldsSize;
+		memcpy(fFields, flatBuffer, fHeader->fields_size);
+		flatBuffer += fHeader->fields_size;
 	}
 
 	free(fData);
 	fData = NULL;
-	if (fHeader->dataSize > 0) {
-		fData = (uint8 *)malloc(fHeader->dataSize);
+	if (fHeader->data_size > 0) {
+		fData = (uint8 *)malloc(fHeader->data_size);
 		if (!fData)
 			return B_NO_MEMORY;
 
-		memcpy(fData, flatBuffer, fHeader->dataSize);
+		memcpy(fData, flatBuffer, fHeader->data_size);
 	}
 
-	fHeader->fieldsAvailable = 0;
-	fHeader->dataAvailable = 0;
+	fHeader->fields_available = 0;
+	fHeader->data_available = 0;
 	what = fHeader->what;
 	return B_OK;
 }
@@ -938,7 +939,7 @@ BMessage::Unflatten(BDataIO *stream)
 	stream->Read(&format, sizeof(uint32));
 	if (format != kMessageMagic4) {
 		if (format == kMessageMagicR5 || format == kMessageMagicR5Swapped)
-			return BPrivate::R5MessageUnflatten(this, stream);
+			return BPrivate::unflatten_r5_message(this, stream);
 
 		if (format == kMessageMagicDano || format == kMessageMagicDanoSwapped)
 			return BPrivate::unflatten_dano_message(format, *stream, *this);
@@ -949,15 +950,15 @@ BMessage::Unflatten(BDataIO *stream)
 	// native message unflattening
 
 	free(fHeader);
-	fHeader = (MessageHeader *)malloc(sizeof(MessageHeader));
+	fHeader = (message_header *)malloc(sizeof(message_header));
 	if (!fHeader)
 		return B_NO_MEMORY;
 
 	fHeader->format = format;
 	uint8 *header = (uint8 *)fHeader;
 	ssize_t result = stream->Read(header + sizeof(uint32),
-		sizeof(MessageHeader) - sizeof(uint32));
-	if (result != sizeof(MessageHeader) - sizeof(uint32)) {
+		sizeof(message_header) - sizeof(uint32));
+	if (result != sizeof(message_header) - sizeof(uint32)) {
 		_Clear();
 		_InitHeader();
 		return (result >= 0 ? B_ERROR : result);
@@ -973,13 +974,13 @@ BMessage::Unflatten(BDataIO *stream)
 
 	free(fFields);
 	fFields = NULL;
-	if (fHeader->fieldsSize > 0) {
-		fFields = (FieldHeader *)malloc(fHeader->fieldsSize);
+	if (fHeader->fields_size > 0) {
+		fFields = (field_header *)malloc(fHeader->fields_size);
 		if (!fFields)
 			return B_NO_MEMORY;
 
-		result = stream->Read(fFields, fHeader->fieldsSize);
-		if (result != fHeader->fieldsSize) {
+		result = stream->Read(fFields, fHeader->fields_size);
+		if (result != fHeader->fields_size) {
 			_Clear();
 			_InitHeader();
 			return (result >= 0 ? B_ERROR : result);
@@ -988,21 +989,21 @@ BMessage::Unflatten(BDataIO *stream)
 
 	free(fData);
 	fData = NULL;
-	if (fHeader->dataSize > 0) {
-		fData = (uint8 *)malloc(fHeader->dataSize);
+	if (fHeader->data_size > 0) {
+		fData = (uint8 *)malloc(fHeader->data_size);
 		if (!fData)
 			return B_NO_MEMORY;
 
-		result = stream->Read(fData, fHeader->dataSize);
-		if (result != fHeader->dataSize) {
+		result = stream->Read(fData, fHeader->data_size);
+		if (result != fHeader->data_size) {
 			_Clear();
 			_InitHeader();
 			return (result >= 0 ? B_ERROR : result);
 		}
 	}
 
-	fHeader->fieldsAvailable = 0;
-	fHeader->dataAvailable = 0;
+	fHeader->fields_available = 0;
+	fHeader->data_available = 0;
 	what = fHeader->what;
 	return B_OK;
 }
@@ -1086,7 +1087,7 @@ BMessage::AddSpecifier(const BMessage *specifier)
 	if (result < B_OK)
 		return result;
 
-	fHeader->currentSpecifier++;
+	fHeader->current_specifier++;
 	fHeader->flags |= MESSAGE_FLAG_HAS_SPECIFIERS;
 	return B_OK;
 }
@@ -1108,7 +1109,7 @@ BMessage::SetCurrentSpecifier(int32 index)
 	if (index > count)
 		return B_BAD_INDEX;
 
-	fHeader->currentSpecifier = index;
+	fHeader->current_specifier = index;
 	return B_OK;
 }
 
@@ -1118,15 +1119,15 @@ BMessage::GetCurrentSpecifier(int32 *index, BMessage *specifier, int32 *what,
 	const char **property) const
 {
 	DEBUG_FUNCTION_ENTER;
-	if (fHeader->currentSpecifier < 0
+	if (fHeader->current_specifier < 0
 		|| !(fHeader->flags & MESSAGE_FLAG_WAS_DELIVERED))
 		return B_BAD_SCRIPT_SYNTAX;
 
 	if (index)
-		*index = fHeader->currentSpecifier;
+		*index = fHeader->current_specifier;
 
 	if (specifier) {
-		if (FindMessage(B_SPECIFIER_ENTRY, fHeader->currentSpecifier,
+		if (FindMessage(B_SPECIFIER_ENTRY, fHeader->current_specifier,
 			specifier) < B_OK)
 			return B_BAD_SCRIPT_SYNTAX;
 
@@ -1155,12 +1156,12 @@ status_t
 BMessage::PopSpecifier()
 {
 	DEBUG_FUNCTION_ENTER;
-	if (fHeader->currentSpecifier < 0 ||
+	if (fHeader->current_specifier < 0 ||
 		!(fHeader->flags & MESSAGE_FLAG_WAS_DELIVERED))
 		return B_BAD_VALUE;
 
-	if (fHeader->currentSpecifier >= 0)
-		fHeader->currentSpecifier--;
+	if (fHeader->current_specifier >= 0)
+		fHeader->current_specifier--;
 
 	return B_OK;
 }
@@ -1173,54 +1174,54 @@ BMessage::_ResizeData(int32 offset, int32 change)
 		return B_OK;
 
 	/* optimize for the most usual case: appending data */
-	if (offset < fHeader->dataSize) {
-		FieldHeader *field = fFields;
-		for (int32 i = 0; i < fHeader->fieldCount; i++, field++) {
+	if (offset < fHeader->data_size) {
+		field_header *field = fFields;
+		for (int32 i = 0; i < fHeader->field_count; i++, field++) {
 			if (field->offset >= offset)
 				field->offset += change;
 		}
 	}
 
 	if (change > 0) {
-		if (fHeader->dataAvailable >= change) {
-			if (offset < fHeader->dataSize) {
-				ssize_t length = fHeader->dataSize - offset;
+		if (fHeader->data_available >= change) {
+			if (offset < fHeader->data_size) {
+				ssize_t length = fHeader->data_size - offset;
 				memmove(fData + offset + change, fData + offset, length);
 			}
 
-			fHeader->dataAvailable -= change;
-			fHeader->dataSize += change;
+			fHeader->data_available -= change;
+			fHeader->data_size += change;
 			return B_OK;
 		}
 
-		ssize_t size = fHeader->dataSize * 2;
-		size = min_c(size, fHeader->dataSize + MAX_DATA_PREALLOCATION);
-		size = max_c(size, fHeader->dataSize + change);
+		ssize_t size = fHeader->data_size * 2;
+		size = min_c(size, fHeader->data_size + MAX_DATA_PREALLOCATION);
+		size = max_c(size, fHeader->data_size + change);
 
 		fData = (uint8 *)realloc(fData, size);
 		if (!fData)
 			return B_NO_MEMORY;
 
-		if (offset < fHeader->dataSize) {
+		if (offset < fHeader->data_size) {
 			memmove(fData + offset + change, fData + offset,
-				fHeader->dataSize - offset - change);
+				fHeader->data_size - offset - change);
 		}
 
-		fHeader->dataSize += change;
-		fHeader->dataAvailable = size - fHeader->dataSize;
+		fHeader->data_size += change;
+		fHeader->data_available = size - fHeader->data_size;
 	} else {
-		ssize_t size = fHeader->dataSize;
+		ssize_t size = fHeader->data_size;
 		memmove(fData + offset, fData + offset - change, size - offset + change);
-		fHeader->dataSize += change;
-		fHeader->dataAvailable -= change;
+		fHeader->data_size += change;
+		fHeader->data_available -= change;
 
-		if (fHeader->dataAvailable > MAX_DATA_PREALLOCATION) {
+		if (fHeader->data_available > MAX_DATA_PREALLOCATION) {
 			ssize_t available = MAX_DATA_PREALLOCATION / 2;
-			fData = (uint8 *)realloc(fData, fHeader->dataSize + available);
+			fData = (uint8 *)realloc(fData, fHeader->data_size + available);
 			if (!fData)
 				return B_NO_MEMORY;
 
-			fHeader->dataAvailable = available;
+			fHeader->data_available = available;
 		}
 	}
 
@@ -1245,7 +1246,7 @@ BMessage::_HashName(const char *name) const
 
 
 status_t
-BMessage::_FindField(const char *name, type_code type, FieldHeader **result) const
+BMessage::_FindField(const char *name, type_code type, field_header **result) const
 {
 	if (!name)
 		return B_BAD_VALUE;
@@ -1253,14 +1254,14 @@ BMessage::_FindField(const char *name, type_code type, FieldHeader **result) con
 	if (!fHeader || !fFields || !fData)
 		return B_NAME_NOT_FOUND;
 
-	uint32 hash = _HashName(name) % fHeader->hashTableSize;
-	int32 nextField = fHeader->hashTable[hash];
+	uint32 hash = _HashName(name) % fHeader->hash_table_size;
+	int32 nextField = fHeader->hash_table[hash];
 
 	while (nextField >= 0) {
-		FieldHeader *field = &fFields[nextField];
+		field_header *field = &fFields[nextField];
 
 		if (strncmp((const char *)(fData + field->offset), name,
-			field->nameLength) == 0) {
+			field->name_length) == 0) {
 			if (type != B_ANY_TYPE && field->type != type)
 				return B_BAD_TYPE;
 
@@ -1268,7 +1269,7 @@ BMessage::_FindField(const char *name, type_code type, FieldHeader **result) con
 			return B_OK;
 		}
 
-		nextField = field->nextField;
+		nextField = field->next_field;
 	}
 
 	return B_NAME_NOT_FOUND;
@@ -1277,92 +1278,92 @@ BMessage::_FindField(const char *name, type_code type, FieldHeader **result) con
 
 status_t
 BMessage::_AddField(const char *name, type_code type, bool isFixedSize,
-	FieldHeader **result)
+	field_header **result)
 {
 	if (!fHeader)
 		return B_ERROR;
 
-	if (fHeader->fieldsAvailable <= 0) {
-		int32 count = fHeader->fieldCount * 2 + 1;
-		count = min_c(count, fHeader->fieldCount + MAX_FIELD_PREALLOCATION);
+	if (fHeader->fields_available <= 0) {
+		int32 count = fHeader->field_count * 2 + 1;
+		count = min_c(count, fHeader->field_count + MAX_FIELD_PREALLOCATION);
 
-		fFields = (FieldHeader *)realloc(fFields, count * sizeof(FieldHeader));
+		fFields = (field_header *)realloc(fFields, count * sizeof(field_header));
 		if (!fFields)
 			return B_NO_MEMORY;
 
-		fHeader->fieldsAvailable = count - fHeader->fieldCount;
+		fHeader->fields_available = count - fHeader->field_count;
 	}
 
-	uint32 hash = _HashName(name) % fHeader->hashTableSize;
+	uint32 hash = _HashName(name) % fHeader->hash_table_size;
 
-	int32 *nextField = &fHeader->hashTable[hash];
+	int32 *nextField = &fHeader->hash_table[hash];
 	while (*nextField >= 0)
-		nextField = &fFields[*nextField].nextField;
-	*nextField = fHeader->fieldCount;
+		nextField = &fFields[*nextField].next_field;
+	*nextField = fHeader->field_count;
 
-	FieldHeader *field = &fFields[fHeader->fieldCount];
+	field_header *field = &fFields[fHeader->field_count];
 	field->type = type;
 	field->flags = FIELD_FLAG_VALID;
 	if (isFixedSize)
 		field->flags |= FIELD_FLAG_FIXED_SIZE;
 
 	field->count = 0;
-	field->dataSize = 0;
+	field->data_size = 0;
 	field->allocated = 0;
-	field->nextField = -1;
-	field->offset = fHeader->dataSize;
-	field->nameLength = strlen(name) + 1;
-	_ResizeData(field->offset, field->nameLength);
-	memcpy(fData + field->offset, name, field->nameLength);
+	field->next_field = -1;
+	field->offset = fHeader->data_size;
+	field->name_length = strlen(name) + 1;
+	_ResizeData(field->offset, field->name_length);
+	memcpy(fData + field->offset, name, field->name_length);
 
-	fHeader->fieldsAvailable--;
-	fHeader->fieldsSize += sizeof(FieldHeader);
-	fHeader->fieldCount++;
+	fHeader->fields_available--;
+	fHeader->fields_size += sizeof(field_header);
+	fHeader->field_count++;
 	*result = field;
 	return B_OK;
 }
 
 
 status_t
-BMessage::_RemoveField(FieldHeader *field)
+BMessage::_RemoveField(field_header *field)
 {
-	int32 index = ((uint8 *)field - (uint8 *)fFields) / sizeof(FieldHeader);
-	int32 nextField = field->nextField;
+	int32 index = ((uint8 *)field - (uint8 *)fFields) / sizeof(field_header);
+	int32 nextField = field->next_field;
 	if (nextField > index)
 		nextField--;
 
-	int32 *value = fHeader->hashTable;
-	for (int32 i = 0; i < fHeader->hashTableSize; i++, value++) {
+	int32 *value = fHeader->hash_table;
+	for (int32 i = 0; i < fHeader->hash_table_size; i++, value++) {
 		if (*value > index)
 			*value -= 1;
 		else if (*value == index)
 			*value = nextField;
 	}
 
-	FieldHeader *other = fFields;
-	for (int32 i = 0; i < fHeader->fieldCount; i++, other++) {
-		if (other->nextField > index)
-			other->nextField--;
-		else if (other->nextField == index)
-			other->nextField = nextField;
+	field_header *other = fFields;
+	for (int32 i = 0; i < fHeader->field_count; i++, other++) {
+		if (other->next_field > index)
+			other->next_field--;
+		else if (other->next_field == index)
+			other->next_field = nextField;
 	}
 
-	_ResizeData(field->offset, -(field->dataSize + field->nameLength));
+	_ResizeData(field->offset, -(field->data_size + field->name_length));
 
-	ssize_t size = fHeader->fieldsSize - (index + 1) * sizeof(FieldHeader);
+	ssize_t size = fHeader->fields_size - (index + 1) * sizeof(field_header);
 	memmove(fFields + index, fFields + index + 1, size);
-	fHeader->fieldsSize -= sizeof(FieldHeader);
-	fHeader->fieldCount--;
-	fHeader->fieldsAvailable++;
+	fHeader->fields_size -= sizeof(field_header);
+	fHeader->field_count--;
+	fHeader->fields_available++;
 
-	if (fHeader->fieldsAvailable > MAX_FIELD_PREALLOCATION) {
+	if (fHeader->fields_available > MAX_FIELD_PREALLOCATION) {
 		ssize_t available = MAX_FIELD_PREALLOCATION / 2;
-		fFields = (FieldHeader *)realloc(fFields, fHeader->fieldsSize
-			+ available * sizeof(FieldHeader));
+		fFields = (field_header *)realloc(fFields, fHeader->fields_size
+			+ available * sizeof(field_header));
 		if (!fFields)
 			return B_NO_MEMORY;
 
-		fHeader->fieldsAvailable = available;
+		fHeader->fields_available = available;
 	}
 
 	return B_OK;
@@ -1377,7 +1378,7 @@ BMessage::AddData(const char *name, type_code type, const void *data,
 	if (numBytes <= 0 || !data)
 		return B_BAD_VALUE;
 
-	FieldHeader *field = NULL;
+	field_header *field = NULL;
 	status_t result = _FindField(name, type, &field);
 	if (result == B_NAME_NOT_FOUND)
 		result = _AddField(name, type, isFixedSize, &field);
@@ -1385,23 +1386,23 @@ BMessage::AddData(const char *name, type_code type, const void *data,
 	if (result < B_OK || !field)
 		return result;
 
-	uint32 offset = field->offset + field->nameLength + field->dataSize;
+	uint32 offset = field->offset + field->name_length + field->data_size;
 	if (field->flags & FIELD_FLAG_FIXED_SIZE) {
 		if (field->count) {
-			ssize_t size = field->dataSize / field->count;
+			ssize_t size = field->data_size / field->count;
 			if (size != numBytes)
 				return B_BAD_VALUE;
 		}
 
 		_ResizeData(offset, numBytes);
 		memcpy(fData + offset, data, numBytes);
-		field->dataSize += numBytes;
+		field->data_size += numBytes;
 	} else {
 		int32 change = numBytes + sizeof(numBytes);
 		_ResizeData(offset, change);
 		memcpy(fData + offset, &numBytes, sizeof(numBytes));
 		memcpy(fData + offset + sizeof(numBytes), data, numBytes);
-		field->dataSize += change;
+		field->data_size += change;
 	}
 
 	field->count++;
@@ -1416,7 +1417,7 @@ BMessage::RemoveData(const char *name, int32 index)
 	if (index < 0)
 		return B_BAD_VALUE;
 
-	FieldHeader *field = NULL;
+	field_header *field = NULL;
 	status_t result = _FindField(name, B_ANY_TYPE, &field);
 
 	if (result < B_OK)
@@ -1431,11 +1432,11 @@ BMessage::RemoveData(const char *name, int32 index)
 	if (field->count == 1)
 		return _RemoveField(field);
 
-	uint32 offset = field->offset + field->nameLength;
+	uint32 offset = field->offset + field->name_length;
 	if (field->flags & FIELD_FLAG_FIXED_SIZE) {
-		ssize_t size = field->dataSize / field->count;
+		ssize_t size = field->data_size / field->count;
 		_ResizeData(offset + index * size, -size);
-		field->dataSize -= size;
+		field->data_size -= size;
 	} else {
 		uint8 *pointer = fData + offset;
 
@@ -1446,7 +1447,7 @@ BMessage::RemoveData(const char *name, int32 index)
 
 		ssize_t currentSize = *(ssize_t *)pointer + sizeof(ssize_t);
 		_ResizeData(offset, -currentSize);
-		field->dataSize -= currentSize;
+		field->data_size -= currentSize;
 	}
 
 	field->count--;
@@ -1458,7 +1459,7 @@ status_t
 BMessage::RemoveName(const char *name)
 {
 	DEBUG_FUNCTION_ENTER;
-	FieldHeader *field = NULL;
+	field_header *field = NULL;
 	status_t result = _FindField(name, B_ANY_TYPE, &field);
 
 	if (result < B_OK)
@@ -1481,17 +1482,17 @@ BMessage::MakeEmpty()
 	free(fData);
 	fData = NULL;
 
-	fHeader->fieldsSize = 0;
-	fHeader->dataSize = 0;
-	fHeader->fieldsAvailable = 0;
-	fHeader->dataAvailable = 0;
-	fHeader->currentSpecifier = -1;
-	fHeader->fieldCount = 0;
+	fHeader->fields_size = 0;
+	fHeader->data_size = 0;
+	fHeader->fields_available = 0;
+	fHeader->data_available = 0;
+	fHeader->current_specifier = -1;
+	fHeader->field_count = 0;
 
 	fHeader->flags &= ~MESSAGE_FLAG_HAS_SPECIFIERS;
 
 	// initializing the hash table to -1 because 0 is a valid index
-	memset(&fHeader->hashTable, 255, sizeof(fHeader->hashTable));
+	memset(&fHeader->hash_table, 255, sizeof(fHeader->hash_table));
 	return B_OK;
 }
 
@@ -1505,7 +1506,7 @@ BMessage::FindData(const char *name, type_code type, int32 index,
 		return B_BAD_VALUE;
 
 	*data = NULL;
-	FieldHeader *field = NULL;
+	field_header *field = NULL;
 	status_t result = _FindField(name, type, &field);
 
 	if (result < B_OK)
@@ -1518,10 +1519,10 @@ BMessage::FindData(const char *name, type_code type, int32 index,
 		return B_BAD_INDEX;
 
 	if (field->flags & FIELD_FLAG_FIXED_SIZE) {
-		*numBytes = field->dataSize / field->count;
-		*data = fData + field->offset + field->nameLength + index * *numBytes;
+		*numBytes = field->data_size / field->count;
+		*data = fData + field->offset + field->name_length + index * *numBytes;
 	} else {
-		uint8 *pointer = fData + field->offset + field->nameLength;
+		uint8 *pointer = fData + field->offset + field->name_length;
 
 		for (int32 i = 0; i < index; i++)
 			pointer += *(ssize_t *)pointer + sizeof(ssize_t);
@@ -1542,7 +1543,7 @@ BMessage::ReplaceData(const char *name, type_code type, int32 index,
 	if (numBytes <= 0 || !data)
 		return B_BAD_VALUE;
 
-	FieldHeader *field = NULL;
+	field_header *field = NULL;
 	status_t result = _FindField(name, type, &field);
 
 	if (result < B_OK)
@@ -1555,14 +1556,14 @@ BMessage::ReplaceData(const char *name, type_code type, int32 index,
 		return B_BAD_INDEX;
 
 	if (field->flags & FIELD_FLAG_FIXED_SIZE) {
-		ssize_t size = field->dataSize / field->count;
+		ssize_t size = field->data_size / field->count;
 		if (size != numBytes)
 			return B_BAD_VALUE;
 
-		memcpy(fData + field->offset + field->nameLength + index * size, data,
+		memcpy(fData + field->offset + field->name_length + index * size, data,
 			size);
 	} else {
-		uint32 offset = field->offset + field->nameLength;
+		uint32 offset = field->offset + field->name_length;
 		uint8 *pointer = fData + offset;
 
 		for (int32 i = 0; i < index; i++) {
@@ -1575,7 +1576,7 @@ BMessage::ReplaceData(const char *name, type_code type, int32 index,
 		_ResizeData(offset, change);
 		memcpy(fData + offset, &numBytes, sizeof(numBytes));
 		memcpy(fData + offset + sizeof(numBytes), data, numBytes);
-		field->dataSize += change;
+		field->data_size += change;
 	}
 
 	return B_OK;
@@ -1586,7 +1587,7 @@ bool
 BMessage::HasData(const char *name, type_code type, int32 index) const
 {
 	DEBUG_FUNCTION_ENTER;
-	FieldHeader *field = NULL;
+	field_header *field = NULL;
 	status_t result = _FindField(name, type, &field);
 
 	if (result < B_OK)
@@ -1669,13 +1670,13 @@ BMessage::_SendMessage(port_id port, int32 token, bigtime_t timeout,
 	DEBUG_FUNCTION_ENTER;
 	uint32 oldFlags = fHeader->flags;
 	int32 oldTarget = fHeader->target;
-	port_id oldReplyPort = fHeader->replyPort;
-	int32 oldReplyTarget = fHeader->replyTarget;
-	team_id oldReplyTeam = fHeader->replyTeam;
+	port_id oldReplyPort = fHeader->reply_port;
+	int32 oldReplyTarget = fHeader->reply_target;
+	team_id oldReplyTeam = fHeader->reply_team;
 
 	if (!replyTo.IsValid()) {
-		BMessenger::Private(replyTo).SetTo(fHeader->replyTeam,
-			fHeader->replyPort, fHeader->replyTarget);
+		BMessenger::Private(replyTo).SetTo(fHeader->reply_team,
+			fHeader->reply_port, fHeader->reply_target);
 
 		if (!replyTo.IsValid())
 			replyTo = be_app_messenger;
@@ -1689,19 +1690,19 @@ BMessage::_SendMessage(port_id port, int32 token, bigtime_t timeout,
 		fHeader->flags &= ~MESSAGE_FLAG_REPLY_REQUIRED;
 
 	fHeader->target = token;
-	fHeader->replyTeam = replyToPrivate.Team();
-	fHeader->replyPort = replyToPrivate.Port();
-	fHeader->replyTarget = replyToPrivate.Token();
+	fHeader->reply_team = replyToPrivate.Team();
+	fHeader->reply_port = replyToPrivate.Port();
+	fHeader->reply_target = replyToPrivate.Token();
 	fHeader->flags |= MESSAGE_FLAG_WAS_DELIVERED;
 
 	/* ToDo: we can use _kern_writev_port to send the three parts directly:
 		iovec vectors[3];
 		vectors[0].iov_base = fHeader;
-		vectors[0].iov_len = sizeof(MessageHeader);
+		vectors[0].iov_len = sizeof(message_header);
 		vectors[1].iov_base = fFields;
-		vectors[1].iov_len = fHeader->fieldsSize;
+		vectors[1].iov_len = fHeader->fields_size;
 		vectors[2].iov_base = fData;
-		vectors[2].iov_len = fHeader->dataSize;
+		vectors[2].iov_len = fHeader->data_size;
 		status_t result;
 
 		do {
@@ -1724,9 +1725,9 @@ BMessage::_SendMessage(port_id port, int32 token, bigtime_t timeout,
 error:
 	fHeader->flags = oldFlags;
 	fHeader->target = oldTarget;
-	fHeader->replyPort = oldReplyPort;
-	fHeader->replyTarget = oldReplyTarget;
-	fHeader->replyTeam = oldReplyTeam;
+	fHeader->reply_port = oldReplyPort;
+	fHeader->reply_target = oldReplyTarget;
+	fHeader->reply_team = oldReplyTeam;
 	delete[] buffer;
 	return result;
 }
@@ -1810,7 +1811,7 @@ BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 	uint32 magic = *(uint32*)data;
 
 	if (magic == kMessageMagic4 || magic == kMessageMagic4Swapped) {
-		MessageHeader *header = (MessageHeader *)data;
+		message_header *header = (message_header *)data;
 		header->target = token;
 	} else if (magic == kMessageMagicR5) {
 		uint8 *header = (uint8 *)data;

@@ -5,7 +5,6 @@
  * Authors:
  *	Michael Lotz <mmlr@mlotz.ch>
  */
-
 #ifndef _MESSAGE_H
 #define _MESSAGE_H
 
@@ -23,20 +22,16 @@
 #include <AppDefs.h>		/* For convenience */
 #include <TypeConstants.h>	/* For convenience */
 
-class	BBlockCache;
-class	BMessenger;
-class	BHandler;
-class	BString;
-
-struct message_header_s;
-struct field_header_s;
+class BBlockCache;
+class BMessenger;
+class BHandler;
+class BString;
 
 // Private or reserved ---------------------------------------------------------
 extern "C" void		_msg_cache_cleanup_();
 extern "C" int		_init_message_();
 extern "C" int		_delete_message_();
 //------------------------------------------------------------------------------
-
 
 // Name lengths and Scripting specifiers ---------------------------------------
 #define B_FIELD_NAME_LENGTH			255
@@ -55,18 +50,15 @@ enum {
 	B_SPECIFIERS_END = 128
 	// app-defined specifiers start at B_SPECIFIERS_END + 1
 };
-//------------------------------------------------------------------------------
-
 
 class BMessage {
-
-public:
+	public:
 		uint32			what;
 
 						BMessage();
 						BMessage(uint32 what);
 						BMessage(const BMessage &other);
-virtual					~BMessage();
+		virtual			~BMessage();
 
 		BMessage		&operator=(const BMessage &other);
 
@@ -265,11 +257,13 @@ virtual					~BMessage();
 		float			FindFloat(const char *, int32 n = 0) const;
 		double			FindDouble(const char *, int32 n = 0) const;
 
-		class	Private;
+		class Private;
+		struct message_header;
+		struct field_header;
 
-private:
-friend	class	Private;
-friend	class	BMessageQueue;
+	private:
+		friend class Private;
+		friend class BMessageQueue;
 
 		status_t		_InitCommon();
 		status_t		_InitHeader();
@@ -277,54 +271,55 @@ friend	class	BMessageQueue;
 
 		status_t		_ResizeData(int32 offset, int32 change);
 
-		uint32			_HashName(const char *name) const;
-		status_t		_FindField(const char *name, type_code type,
-							field_header_s **result) const;
-		status_t		_AddField(const char *name, type_code type,
-							bool isFixedSize, field_header_s **result);
-		status_t		_RemoveField(field_header_s *field);
+		uint32			_HashName(const char* name) const;
+		status_t		_FindField(const char* name, type_code type,
+							field_header** _result) const;
+		status_t		_AddField(const char* name, type_code type,
+							bool isFixedSize, field_header** _result);
+		status_t		_RemoveField(field_header* field);
 
 		ssize_t			_NativeFlattenedSize() const;
 		status_t		_NativeFlatten(char *buffer, ssize_t size) const;
 		status_t		_NativeFlatten(BDataIO *stream, ssize_t *size = NULL) const;
 
-		message_header_s*fHeader;
-		field_header_s	*fFields;
-		uint8			*fData;
+	private:
+		message_header*	fHeader;
+		field_header*	fFields;
+		uint8*			fData;
 
-mutable	BMessage		*fOriginal;
+		mutable	BMessage* fOriginal;
 
-		// fQueueLink is used by BMessageQueue to build a linked list
-		BMessage		*fQueueLink;
+		BMessage*		fQueueLink;
+			// fQueueLink is used by BMessageQueue to build a linked list
 
 		uint32			fReserved[11];
 
 						// deprecated
-						BMessage(BMessage *a_message);
+						BMessage(BMessage *message);
 
-virtual	void			_ReservedMessage1();
-virtual	void			_ReservedMessage2();
-virtual	void			_ReservedMessage3();
+		virtual	void	_ReservedMessage1();
+		virtual	void	_ReservedMessage2();
+		virtual	void	_ReservedMessage3();
 
 		status_t		_SendMessage(port_id port, int32 token, bigtime_t timeout,
 							bool replyRequired, BMessenger &replyTo) const;
 		status_t		_SendMessage(port_id port, team_id portOwner,
 							int32 token, BMessage *reply, bigtime_t sendTimeout,
 							bigtime_t replyTimeout) const;
-static	status_t		_SendFlattenedMessage(void *data, int32 size,
+		static status_t	_SendFlattenedMessage(void *data, int32 size,
 							port_id port, int32 token, bigtime_t timeout);
 
-static	void			_StaticInit();
-static	void			_StaticCleanup();
-static	void			_StaticCacheCleanup();
-static	int32			_StaticGetCachedReplyPort();
+		static void		_StaticInit();
+		static void		_StaticCleanup();
+		static void		_StaticCacheCleanup();
+		static int32	_StaticGetCachedReplyPort();
 
 		enum			{ sNumReplyPorts = 3 };
-static	port_id			sReplyPorts[sNumReplyPorts];
-static	long			sReplyPortInUse[sNumReplyPorts];
-static	int32			sGetCachedReplyPort();
+		static port_id	sReplyPorts[sNumReplyPorts];
+		static long		sReplyPortInUse[sNumReplyPorts];
+		static int32	sGetCachedReplyPort();
 
-static	BBlockCache		*sMsgCache;
+		static BBlockCache* sMsgCache;
 };
 
 #endif	// _MESSAGE_H

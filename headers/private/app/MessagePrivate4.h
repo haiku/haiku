@@ -37,40 +37,40 @@ enum {
 };
 
 
-typedef struct field_header_s {
+struct BMessage::field_header {
 	uint32		flags;
 	type_code	type;
-	int32		nameLength;
+	int32		name_length;
 	int32		count;
-	ssize_t		dataSize;
+	ssize_t		data_size;
 	ssize_t		allocated;
 	int32		offset;
-	int32		nextField;
-} FieldHeader;
+	int32		next_field;
+};
 
 
-typedef struct message_header_s {
+struct BMessage::message_header {
 	uint32		format;
 	uint32		what;
 	uint32		flags;
 
-	ssize_t		fieldsSize;
-	ssize_t		dataSize;
-	ssize_t		fieldsAvailable;
-	ssize_t		dataAvailable;
+	ssize_t		fields_size;
+	ssize_t		data_size;
+	ssize_t		fields_available;
+	ssize_t		data_available;
 
 	int32		target;
-	int32		currentSpecifier;
+	int32		current_specifier;
 
 	// reply info
-	port_id		replyPort;
-	int32		replyTarget;
-	team_id		replyTeam;
+	port_id		reply_port;
+	int32		reply_target;
+	team_id		reply_team;
 
 	// body info
-	int32		fieldCount;
-	int32		hashTableSize;
-	int32		hashTable[MESSAGE_BODY_HASH_TABLE_SIZE];
+	int32		field_count;
+	int32		hash_table_size;
+	int32		hash_table[MESSAGE_BODY_HASH_TABLE_SIZE];
 
 	/*	The hash table does contain indexes into the field list and
 		not direct offsets to the fields. This has the advantage
@@ -78,7 +78,7 @@ typedef struct message_header_s {
 		The hash table must be reevaluated when we remove a field
 		though.
 	*/
-} MessageHeader;
+};
 
 
 class BMessage::Private {
@@ -103,9 +103,9 @@ class BMessage::Private {
 		SetReply(BMessenger messenger)
 		{
 			BMessenger::Private messengerPrivate(messenger);
-			fMessage->fHeader->replyPort = messengerPrivate.Port();
-			fMessage->fHeader->replyTarget = messengerPrivate.Token();
-			fMessage->fHeader->replyTeam = messengerPrivate.Team();
+			fMessage->fHeader->reply_port = messengerPrivate.Port();
+			fMessage->fHeader->reply_target = messengerPrivate.Token();
+			fMessage->fHeader->reply_team = messengerPrivate.Team();
 		}
 
 		int32
@@ -132,13 +132,13 @@ class BMessage::Private {
 			return fMessage->_InitHeader();
 		}
 
-		MessageHeader*
+		BMessage::message_header*
 		GetMessageHeader()
 		{
 			return fMessage->fHeader;
 		}
 
-		FieldHeader*
+		BMessage::field_header*
 		GetMessageFields()
 		{
 			return fMessage->fFields;
