@@ -41,6 +41,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <ByteOrder.h>
 #include <KernelExport.h>
 #include <PCI.h>
 #include <string.h>
@@ -242,11 +243,11 @@ emuxki_pmem_alloc(emuxki_dev *card, size_t size)
 
 	for (i = 0; i < EMU_MAXPTE; i++) {
 		PRINT(("emuxki_pmem_alloc : %d\n", i));
-		if ((ptb[i] & EMU_CHAN_MAP_PTE_MASK) == silentpage) {
+		if ((B_LENDIAN_TO_HOST_INT32(ptb[i]) & EMU_CHAN_MAP_PTE_MASK) == silentpage) {
 			/* We look for a free PTE */
 			//s = splaudio();
 			for (j = 0; j < numblocks; j++)
-				if ((ptb[i + j] & EMU_CHAN_MAP_PTE_MASK)
+				if ((B_LENDIAN_TO_HOST_INT32(ptb[i + j]) & EMU_CHAN_MAP_PTE_MASK)
 				    != silentpage)
 					break;
 			if (j == numblocks) {
@@ -257,10 +258,10 @@ emuxki_pmem_alloc(emuxki_dev *card, size_t size)
 				}
 				PRINT(("emuxki_pmem_alloc : j == numblocks emuxki_mem_new ok\n"));
 				for (j = 0; j < numblocks; j++)
-					ptb[i + j] = (uint32) (
+					ptb[i + j] = B_HOST_TO_LENDIAN_INT32((uint32) (
 						(( ((uint32)mem->phy_base) +
 						 j * EMU_PTESIZE) << 1)
-						| (i + j));
+						| (i + j)));
 				LIST_INSERT_HEAD(&(card->mem), mem, next);
 				PRINT(("emuxki_pmem_alloc : j == numblocks returning\n"));
 				
@@ -316,7 +317,7 @@ emuxki_mem_free(emuxki_dev *card, void *ptr)
 				numblocks++;
 			for (i = 0; i < numblocks; i++)
 				ptb[mem->ptbidx + i] =
-					silentpage | (mem->ptbidx + i);
+					B_HOST_TO_LENDIAN_INT32(silentpage | (mem->ptbidx + i));
 		}
 		LIST_REMOVE(mem, next);
 		//splx(s);
@@ -2689,7 +2690,7 @@ emuxki_init(emuxki_dev * card)
 	silentpage = ((uint32)card->silentpage_phy_base) << 1;
 	ptb = card->ptb_log_base;
 	for (i = 0; i < EMU_MAXPTE; i++)
-		ptb[i] = silentpage | i;
+		ptb[i] = B_HOST_TO_LENDIAN_INT32(silentpage | i);
 
 	/* Write PTB address and set TCB to none */
 	emuxki_chan_write(&card->config, 0, EMU_PTB, (uint32)card->ptb_phy_base);
