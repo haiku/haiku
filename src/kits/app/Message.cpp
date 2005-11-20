@@ -125,7 +125,6 @@ private:
 	port_id	fReplyPort;
 	int32	fReplyToken;
 	team_id	fReplyTeam;
-	bool	fPreferredTarget;
 	bool	fReplyRequired;
 	bool	fReplyDone;
 	bool	fIsReply;
@@ -199,7 +198,8 @@ BMessage::Header::ReadFrom(BDataIO &stream)
 			// Get the preferred flag
 			read_helper(bigFlags);
 			checksum_helper.Cache(bigFlags);
-			fPreferredTarget = bigFlags;
+			if (bigFlags)
+				fTargetToken = B_PREFERRED_TOKEN;
 
 			// Get the reply requirement flag
 			read_helper(bigFlags);
@@ -253,7 +253,6 @@ BMessage::Header::ReadFrom(const BMessage &message)
 	fReplyPort = message.fReplyTo.port;
 	fReplyToken = message.fReplyTo.target;
 	fReplyTeam = message.fReplyTo.team;
-	fPreferredTarget = message.fPreferred;
 	fReplyRequired = message.fReplyRequired;
 	fReplyDone = message.fReplyDone;
 	fIsReply = message.fIsReply;
@@ -290,7 +289,7 @@ BMessage::Header::WriteTo(BDataIO &stream, bool calculateCheckSum) const
 
 	// Write targeting info if necessary
 	if (!err && (fFlags & MSG_FLAG_INCL_TARGET)) {
-		data = fPreferredTarget ? B_PREFERRED_TOKEN : fTargetToken;
+		data = fTargetToken;
 		write_helper(&stream, (const void*)&data, sizeof (data), err);
 	}
 
@@ -309,7 +308,7 @@ BMessage::Header::WriteTo(BDataIO &stream, bool calculateCheckSum) const
 
 		uint8 bigFlags;
 		if (!err) {
-			bigFlags = fPreferredTarget ? 1 : 0;
+			bigFlags = fTargetToken == B_PREFERRED_TOKEN ? 1 : 0;
 			write_helper(&stream, (const void*)&bigFlags, sizeof(bigFlags),
 				err);
 		}
@@ -344,13 +343,11 @@ BMessage::Header::WriteTo(BMessage &message) const
 	message.MakeEmpty();
 
 	message.what = fWhat;
-
 	message.fHasSpecifiers = fFlags & MSG_FLAG_SCRIPT_MSG;
 
-	if (fFlags & MSG_FLAG_INCL_TARGET) {
-		// Get the target data
-		message.fTarget = fTargetToken;
-	}
+	message.fPreferred = fTargetToken == B_PREFERRED_TOKEN;
+	message.fTarget = fTargetToken;
+
 	if (fFlags & MSG_FLAG_INCL_REPLY) {
 		// Get the reply port
 		message.fReplyTo.port = fReplyPort;
@@ -358,10 +355,6 @@ BMessage::Header::WriteTo(BMessage &message) const
 		message.fReplyTo.team = fReplyTeam;
 
 		message.fWasDelivered = true;
-
-		message.fPreferred = fPreferredTarget;
-		if (fPreferredTarget)
-			message.fTarget = B_PREFERRED_TOKEN;
 
 		message.fReplyRequired = fReplyRequired;
 		message.fReplyDone = fReplyDone;
@@ -409,8 +402,6 @@ BMessage::Header::SetTarget(int32 token)
 		fFlags &= ~MSG_FLAG_INCL_TARGET;
 	else
 		fFlags |= MSG_FLAG_INCL_TARGET;
-
-	fPreferredTarget = token == B_PREFERRED_TOKEN;
 }
 
 // Dump
@@ -426,7 +417,6 @@ BMessage::Header::Dump() const
 	printf("  reply port:       %ld\n", fReplyPort);
 	printf("  reply token:      %ld\n", fReplyToken);
 	printf("  reply team:       %ld\n", fReplyTeam);
-	printf("  preferred target: %d\n", fPreferredTarget);
 	printf("  reply required:   %d\n", fReplyRequired);
 	printf("  reply done:       %d\n", fReplyDone);
 	printf("  is reply:         %d\n", fIsReply);
@@ -1801,7 +1791,6 @@ BMessage::real_flatten(char* result, ssize_t size) const
 {
 	BMemoryIO stream((void*)result, size);
 	return real_flatten(&stream);
-
 }
 
 
