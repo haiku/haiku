@@ -1642,7 +1642,7 @@ InputServer::_DispatchEvent(BMessage* event)
 #if defined(HAIKU_TARGET_PLATFORM_HAIKU) && defined(USING_MESSAGE4)
 	BMessenger reply;
 	BMessage::Private messagePrivate(event);
-	return messagePrivate.SendMessage(fAppServerPort, 0, true, 0, false, reply);
+	return messagePrivate.SendMessage(fAppServerPort, 0, true, 0, reply);
 #else
 	ssize_t length = event->FlattenedSize();
 	char buffer[length];
