@@ -12,6 +12,5 @@ Server fake_app_server :
 	AppServer.cpp
 	ServerApp.cpp
 	BGet++.cpp
-	Utils.cpp
 	: libroot.so libbe.so
 	;

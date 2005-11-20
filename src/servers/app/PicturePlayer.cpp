@@ -34,9 +34,38 @@
 
 #include "DrawingEngine.h"
 #include "PictureProtocol.h"
-#include "Utils.h"
 
 #include "PicturePlayer.h"
+
+
+BRect
+CalculatePolygonBounds(BPoint *pts, int32 pointcount)
+{
+	if (!pts)
+		return BRect(0,0,0,0);
+
+	BRect r(0,0,0,0);
+
+	// shamelessly stolen from Marc's BPolygon code and tweaked to fit. :P
+	r = BRect(pts[0], pts[0]);
+
+	for (int32 i = 1; i < 4; i++) {
+		if (pts[i].x < r.left)
+			r.left = pts[i].x;
+		if (pts[i].y < r.top)
+			r.top = pts[i].y;
+		if (pts[i].x > r.right)
+			r.right = pts[i].x;
+		if (pts[i].y > r.bottom)
+			r.bottom = pts[i].y;
+	}
+
+	return r;
+}
+
+
+//	#pragma mark -
+
 
 PicturePlayer::PicturePlayer(DrawingEngine *d,void *data, int32 size)
  : fData(data, size)

@@ -42,7 +42,6 @@
 #include "ServerCursor.h"
 #include "ServerProtocol.h"
 #include "SystemPalette.h"
-#include "Utils.h"
 
 #include "AppServer.h"
 

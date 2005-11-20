@@ -51,7 +51,6 @@ Server app_server :
 	ServerWindow.cpp
 	SubWindowList.cpp
 	SystemPalette.cpp
-	Utils.cpp
 	VirtualScreen.cpp
 	WinBorder.cpp
 	Workspace.cpp

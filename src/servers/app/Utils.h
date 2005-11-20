@@ -27,17 +27,4 @@
 #ifndef UTILS_H_
 #define UTILS_H_
 
-#include <Message.h>
-#include <OS.h>
-#include <Accelerant.h>
-
-#ifdef USING_MESSAGE4
-#include <MessagePrivate.h>
-#endif
-
-void SendMessage(port_id port, BMessage *message, int32 target=-1);
-const char *MsgCodeToString(int32 code);
-BString MsgCodeToBString(int32 code);
-status_t ConvertModeToDisplayMode(uint32 mode, display_mode *dmode);
-BRect CalculatePolygonBounds(BPoint *pts, int32 pointcount);
 #endif

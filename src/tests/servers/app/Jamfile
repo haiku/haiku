@@ -62,7 +62,6 @@ SharedLibrary libhaikuappserver.so :
 	ServerFont.cpp
 	FontManager.cpp
 	SystemPalette.cpp
-	Utils.cpp
 
 	# drawing
 	PatternHandler.cpp
