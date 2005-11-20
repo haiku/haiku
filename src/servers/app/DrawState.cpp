@@ -301,6 +301,79 @@ DrawState::SetScale(float scale)
 	}
 }
 
+// Transform
+void
+DrawState::Transform(float* x, float* y) const
+{
+	*x += fOrigin.x;
+	*y += fOrigin.y;
+	*x *= fScale;
+	*y *= fScale;
+}
+
+// InverseTransform
+void
+DrawState::InverseTransform(float* x, float* y) const
+{
+	// TODO: watch out for fScale = 0?
+	*x /= fScale;
+	*y /= fScale;
+	*x -= fOrigin.x;
+	*y -= fOrigin.y;
+}
+
+// Transform
+void
+DrawState::Transform(BPoint* point) const
+{
+	Transform(&(point->x), &(point->y));
+}
+
+// Transform
+void
+DrawState::Transform(BRect* rect) const
+{
+	Transform(&(rect->left), &(rect->top));
+	Transform(&(rect->right), &(rect->bottom));
+}
+
+// Transform
+void
+DrawState::Transform(BRegion* region) const
+{
+	if (fScale == 1.0) {
+		if (fOrigin.x != 0.0 || fOrigin.y != 0.0)
+			region->OffsetBy((int32)fOrigin.x, (int32)fOrigin.y);
+	} else {
+		// TODO: optimize some more
+		BRegion converted;
+		int32 count = region->CountRects();
+		for (int32 i = 0; i < count; i++) {
+			BRect r = region->RectAt(i);
+			BPoint lt(r.LeftTop());
+			BPoint rb(r.RightBottom());
+			// offset to bottom right corner of pixel before transformation
+			rb.x++;
+			rb.y++;
+			// apply transformation
+			Transform(&lt.x, &lt.y);
+			Transform(&rb.x, &rb.y);
+			// reset bottom right to pixel "index"
+			rb.x++;
+			rb.y++;
+		}
+		*region = converted;
+	}
+}
+
+// InverseTransform
+void
+DrawState::InverseTransform(BPoint* point) const
+{
+	InverseTransform(&(point->x), &(point->y));
+}
+
+
 
 void
 DrawState::SetClippingRegion(const BRegion& region)

@@ -45,6 +45,7 @@ Layer::Layer(BRect frame, const char* name, int32 token,
 	:
 	fName(name),
 	fFrame(frame),
+	fScrollingOffset(0.0, 0.0),
 
 	fDriver(driver),
 	fRootLayer(NULL),
@@ -559,8 +560,7 @@ BRect
 Layer::Bounds() const
 {
 	BRect r(fFrame);
-//	r.OffsetTo(fBoundsLeftTop);
-	r.OffsetTo(BoundsOrigin());
+	r.OffsetTo(ScrollingOffset());
 	return r;
 }
 
@@ -730,9 +730,11 @@ Layer::ScrollBy(float x, float y)
 	if (x == 0.0f && y == 0.0f)
 		return;
 
+	fScrollingOffset.x += x;
+	fScrollingOffset.y += y;
+
 	// must lock, even if we change frame/origin coordinates
 	if (!IsHidden() && GetRootLayer() && GetRootLayer()->Lock()) {
-		fDrawState->OffsetOrigin(BPoint(x, y));
 
 		// set the region to be invalidated.
 		BRegion invalid(fFullVisible);
@@ -761,9 +763,6 @@ Layer::ScrollBy(float x, float y)
 		GetRootLayer()->TriggerRedraw();
 
 		GetRootLayer()->Unlock();
-	}
-	else {
-		fDrawState->OffsetOrigin(BPoint(x, y));	
 	}
 
 	ScrolledByHook(x, y);
@@ -877,21 +876,43 @@ Layer::Activated(bool active)
 
 
 BPoint
-Layer::BoundsOrigin() const
+Layer::ScrollingOffset() const
+{
+	return fScrollingOffset;
+}
+
+void
+Layer::SetDrawingOrigin(BPoint origin)
+{
+	fDrawState->SetOrigin(origin);
+
+	// rebuild clipping
+	if (fDrawState->ClippingRegion())
+		_RebuildDrawingRegion();
+}
+
+
+BPoint
+Layer::DrawingOrigin() const
 {
 	BPoint origin(fDrawState->Origin());
 	float scale = Scale();
-
-	// TODO: Figure this out, BoundsOrigin()
-	// is used for BView::Bounds(), but I think
-	// that the scale has nothing to do with it
-	// "local coordinate system origin" does have
-	// something to do with scale.
 
 	origin.x *= scale;
 	origin.y *= scale;
 
 	return origin;
+}
+
+
+void
+Layer::SetScale(float scale)
+{
+	fDrawState->SetScale(scale);
+
+	// rebuild clipping
+	if (fDrawState->ClippingRegion())
+		_RebuildDrawingRegion();
 }
 
 
@@ -950,7 +971,7 @@ void
 Layer::ConvertToParent(BPoint* pt) const
 {
 	if (fParent) {
-		BPoint origin = BoundsOrigin();
+		BPoint origin = ScrollingOffset();
 		pt->x -= origin.x;
 		pt->y -= origin.y;
 		pt->x += fFrame.left;
@@ -963,7 +984,7 @@ void
 Layer::ConvertToParent(BRect* rect) const
 {
 	if (fParent) {
-		BPoint origin = BoundsOrigin();
+		BPoint origin = ScrollingOffset();
 		rect->OffsetBy(-origin.x, -origin.y);
 		rect->OffsetBy(fFrame.left, fFrame.top);
 	}
@@ -974,7 +995,7 @@ void
 Layer::ConvertToParent(BRegion* reg) const
 {
 	if (fParent) {
-		BPoint origin = BoundsOrigin();
+		BPoint origin = ScrollingOffset();
 		reg->OffsetBy(-origin.x, -origin.y);
 		reg->OffsetBy(fFrame.left, fFrame.top);
 	}
@@ -985,7 +1006,7 @@ void
 Layer::ConvertFromParent(BPoint* pt) const
 {
 	if (fParent) {
-		BPoint origin = BoundsOrigin();
+		BPoint origin = ScrollingOffset();
 		pt->x += origin.x;
 		pt->y += origin.y;
 		pt->x -= fFrame.left;
@@ -998,7 +1019,7 @@ void
 Layer::ConvertFromParent(BRect* rect) const
 {
 	if (fParent) {
-		BPoint origin = BoundsOrigin();
+		BPoint origin = ScrollingOffset();
 		rect->OffsetBy(origin.x, origin.y);
 		rect->OffsetBy(-fFrame.left, -fFrame.top);
 	}
@@ -1009,7 +1030,7 @@ void
 Layer::ConvertFromParent(BRegion* reg) const
 {
 	if (fParent) {
-		BPoint origin = BoundsOrigin();
+		BPoint origin = ScrollingOffset();
 		reg->OffsetBy(origin.x, origin.y);
 		reg->OffsetBy(-fFrame.left, -fFrame.top);
 	}
@@ -1072,6 +1093,57 @@ Layer::ConvertFromScreen(BRegion* reg) const
 	if (fParent) {
 		ConvertFromParent(reg);
 		fParent->ConvertFromScreen(reg);
+	}
+}
+
+//! converts a point from local *drawing* to screen coordinate system 
+void
+Layer::ConvertToScreenForDrawing(BPoint* pt) const
+{
+	if (fParent) {
+		fDrawState->Transform(pt);
+		// NOTE: from here on, don't use the
+		// "*ForDrawing()" versions of the parent!
+		ConvertToParent(pt);
+		fParent->ConvertToScreen(pt);
+	}
+}
+
+//! converts a rect from local *drawing* to screen coordinate system 
+void
+Layer::ConvertToScreenForDrawing(BRect* rect) const
+{
+	if (fParent) {
+		fDrawState->Transform(rect);
+		// NOTE: from here on, don't use the
+		// "*ForDrawing()" versions of the parent!
+		ConvertToParent(rect);
+		fParent->ConvertToScreen(rect);
+	}
+}
+
+//! converts a region from local *drawing* to screen coordinate system 
+void
+Layer::ConvertToScreenForDrawing(BRegion* region) const
+{
+	if (fParent) {
+		fDrawState->Transform(region);
+		// NOTE: from here on, don't use the
+		// "*ForDrawing()" versions of the parent!
+		ConvertToParent(region);
+		fParent->ConvertToScreen(region);
+	}
+}
+
+//! converts a point from screen to local coordinate system 
+void
+Layer::ConvertFromScreenForDrawing(BPoint* pt) const
+{
+	if (fParent) {
+		ConvertFromParent(pt);
+		fParent->ConvertFromScreen(pt);
+
+		fDrawState->InverseTransform(pt);
 	}
 }
 
@@ -1333,7 +1405,7 @@ Layer::_RebuildDrawingRegion()
 	// apply user clipping which is in native coordinate system
 	if (const BRegion* userClipping = fDrawState->ClippingRegion()) {
 		BRegion screenUserClipping(*userClipping);
-		ConvertToScreen(&screenUserClipping);
+		ConvertToScreenForDrawing(&screenUserClipping);
 		fDrawingRegion.IntersectWith(&screenUserClipping);
 	}
 }

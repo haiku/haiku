@@ -59,6 +59,16 @@ class DrawState {
 		float				Scale() const
 								{ return fScale; }
 
+							// coordinate transformations
+				void		Transform(float* x, float* y) const;
+				void		InverseTransform(float* x, float* y) const;
+
+				void		Transform(BPoint* point) const;
+				void		Transform(BRect* rect) const;
+				void		Transform(BRegion* region) const;
+
+				void		InverseTransform(BPoint* point) const;
+
 							// additional clipping as requested by client
 		void				SetClippingRegion(const BRegion& region);
 		const BRegion*		ClippingRegion() const
@@ -124,8 +134,6 @@ class DrawState {
 								{ return fMiterLimit; }
 
 							// convenience functions
-		inline BPoint		Transform(const BPoint& point) const;
-		inline BRect		Transform(const BRect& rect) const;
 		void				PrintToStream() const;
 
 		void				SetSubPixelPrecise(bool precise);
@@ -177,24 +185,6 @@ class DrawState {
 
 // inline implementations
 
-// Transform
-BPoint
-DrawState::Transform(const BPoint& point) const
-{
-	BPoint p(point);
-	p += fOrigin;
-	p.x *= fScale;
-	p.y *= fScale;
-	return p;
-}
-
-// Transform
-BRect
-DrawState::Transform(const BRect& rect) const
-{
-	return BRect(Transform(rect.LeftTop()),
-				 Transform(rect.LeftBottom()));
-}
 /*
 // ClippingRectAt
 BRect

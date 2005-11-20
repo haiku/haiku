@@ -119,7 +119,12 @@ class Layer {
 	// coordinate system	
 			BRect				Bounds() const;
 			BRect				Frame() const;
-			BPoint				BoundsOrigin() const; // BoundsFrameDiff()?
+			BPoint				ScrollingOffset() const;
+
+			void				SetDrawingOrigin(BPoint origin);
+			BPoint				DrawingOrigin() const;
+
+			void				SetScale(float scale);
 			float				Scale() const;
 
 			void				ConvertToParent(BPoint* pt) const;
@@ -135,6 +140,12 @@ class Layer {
 			void				ConvertFromScreen(BPoint* pt) const;
 			void				ConvertFromScreen(BRect* rect) const;
 			void				ConvertFromScreen(BRegion* reg) const;
+
+			void				ConvertToScreenForDrawing(BPoint* pt) const;
+			void				ConvertToScreenForDrawing(BRect* rect) const;
+			void				ConvertToScreenForDrawing(BRegion* reg) const;
+
+			void				ConvertFromScreenForDrawing(BPoint* pt) const;
 
 	virtual	void				MoveBy(float x, float y);
 	virtual	void				ResizeBy(float x, float y);
@@ -226,11 +237,7 @@ class Layer {
 
 			BString				fName;	
 			BRect				fFrame;
-// TODO: should be removed or reused in a similar fashion
-// to hold the accumulated origins from the graphics state stack.
-// The same needs to be done for "scale". (Keeping an accumulated
-// value.)
-//			BPoint				fBoundsLeftTop;
+			BPoint				fScrollingOffset;
 
 			BRegion				fVisible;
 			BRegion				fFullVisible;

@@ -515,6 +515,7 @@ ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent)
 // TODO: rework the clipping stuff to remove RootLayer dependency and then
 // remove this hack:
 if (fWinBorder->IsOffscreenWindow()) {
+	newLayer->fVisible.Set(newLayer->fFrame);
 	newLayer->fDrawingRegion.Set(newLayer->fFrame);
 }
 
@@ -570,7 +571,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<BRect>(&src);
 			link.Read<BRect>(&dst);
 
-			// TODO: Are origin and scale handled in this conversion?
+			// TODO: confirm that in R5 this call is affected by origin and scale
+//	fCurrentLayer->ConvertToScreenForDrawing(&src);
+//	fCurrentLayer->ConvertToScreenForDrawing(&dst);
 			fCurrentLayer->ConvertToScreen(&src);
 			fCurrentLayer->ConvertToScreen(&dst);
 		
@@ -798,14 +801,16 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&x);
 			link.Read<float>(&y);
 			
-			fCurrentLayer->CurrentState()->SetOrigin(BPoint(x, y));
+			fCurrentLayer->SetDrawingOrigin(BPoint(x, y));
 			break;
 		}
 		case AS_LAYER_GET_ORIGIN:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_ORIGIN: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<BPoint>(fCurrentLayer->CurrentState()->Origin());
+			// TODO: rename this where it is used in the BView code!
+			// (it wants to know scrolling offset, not drawing origin)
+			fLink.Attach<BPoint>(fCurrentLayer->ScrollingOffset());
 			fLink.Flush();
 			break;
 		}
@@ -899,7 +904,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			float scale;
 			link.Read<float>(&scale);
 
-			fCurrentLayer->CurrentState()->SetScale(scale);
+			fCurrentLayer->SetScale(scale);
 			break;
 		}
 		case AS_LAYER_GET_SCALE:
@@ -1138,8 +1143,9 @@ if (rootLayer)
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			
-			// TODO: handle transformation (origin and scale) prior to converting to top
-			BRect		invalRect;
+			// NOTE: looks like this call is NOT affected by origin and scale on R5
+			// so this implementation is "correct"
+			BRect invalRect;
 			
 			link.Read<BRect>(&invalRect);
 
@@ -1159,8 +1165,8 @@ if (rootLayer)
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n", Title(), fCurrentLayer->Name()));
 			
-			// TODO: handle transformation (origin and scale) prior to converting to top
-			// TODO: Handle conversion to top
+			// NOTE: looks like this call is NOT affected by origin and scale on R5
+			// so this implementation is "correct"
 			BRegion invalidReg;
 			int32 noOfRects;
 			BRect rect;
@@ -1683,8 +1689,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			BPoint p1(x1, y1);
 			BPoint p2(x2, y2);
 			BPoint penPos = p2;
-			fCurrentLayer->ConvertToScreen(&p1);
-			fCurrentLayer->ConvertToScreen(&p2);
+			fCurrentLayer->ConvertToScreenForDrawing(&p1);
+			fCurrentLayer->ConvertToScreenForDrawing(&p2);
 			driver->StrokeLine(p1, p2, fCurrentLayer->CurrentState());
 			
 			// We update the pen here because many DrawingEngine calls which do not update the
@@ -1703,7 +1709,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			BRect rect;
 			link.Read<BRect>(&rect);
 			
-			fCurrentLayer->ConvertToScreen(&rect);
+			fCurrentLayer->ConvertToScreenForDrawing(&rect);
 			driver->InvertRect(rect);
 			break;
 		}
@@ -1718,7 +1724,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&bottom);
 			BRect rect(left,top,right,bottom);
 			
-			fCurrentLayer->ConvertToScreen(&rect);
+			fCurrentLayer->ConvertToScreenForDrawing(&rect);
 			driver->StrokeRect(rect, fCurrentLayer->CurrentState());
 
 			break;
@@ -1730,7 +1736,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			BRect rect;
 			link.Read<BRect>(&rect);
 
-			fCurrentLayer->ConvertToScreen(&rect);
+			fCurrentLayer->ConvertToScreenForDrawing(&rect);
 			driver->FillRect(rect, fCurrentLayer->CurrentState());
 			break;
 		}
@@ -1748,7 +1754,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (sbmp) {
 				BRect src = sbmp->Bounds();
 				BRect dst = src.OffsetToCopy(point);
-				fCurrentLayer->ConvertToScreen(&dst);
+				fCurrentLayer->ConvertToScreenForDrawing(&dst);
 
 				driver->DrawBitmap(sbmp, src, dst, fCurrentLayer->CurrentState());
 			}
@@ -1772,7 +1778,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			
 			ServerBitmap* sbmp = fServerApp->FindBitmap(bitmapToken);
 			if (sbmp) {
-				fCurrentLayer->ConvertToScreen(&dstRect);
+				fCurrentLayer->ConvertToScreenForDrawing(&dstRect);
 
 				driver->DrawBitmap(sbmp, srcRect, dstRect, fCurrentLayer->CurrentState());
 			}
@@ -1792,7 +1798,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&angle);
 			link.Read<float>(&span);
 
-			fCurrentLayer->ConvertToScreen(&r);
+			fCurrentLayer->ConvertToScreenForDrawing(&r);
 			driver->DrawArc(r, angle, span, fCurrentLayer->CurrentState(), code == AS_FILL_ARC);
 
 			break;
@@ -1805,7 +1811,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			BPoint pts[4];
 			for (int32 i = 0; i < 4; i++) {
 				link.Read<BPoint>(&(pts[i]));
-				fCurrentLayer->ConvertToScreen(&pts[i]);
+				fCurrentLayer->ConvertToScreenForDrawing(&pts[i]);
 			}
 				
 			driver->DrawBezier(pts, fCurrentLayer->CurrentState(), code == AS_FILL_BEZIER);
@@ -1820,7 +1826,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			BRect rect;
 			link.Read<BRect>(&rect);
 
-			fCurrentLayer->ConvertToScreen(&rect);
+			fCurrentLayer->ConvertToScreenForDrawing(&rect);
 			driver->DrawEllipse(rect, fCurrentLayer->CurrentState(), code == AS_FILL_ELLIPSE);
 
 			break;
@@ -1836,7 +1842,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&xrad);
 			link.Read<float>(&yrad);
 
-			fCurrentLayer->ConvertToScreen(&rect);
+			fCurrentLayer->ConvertToScreenForDrawing(&rect);
 			driver->DrawRoundRect(rect, xrad, yrad, fCurrentLayer->CurrentState(), code == AS_FILL_ROUNDRECT);
 
 			break;
@@ -1851,12 +1857,12 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			for (int32 i = 0; i < 3; i++) {
 				link.Read<BPoint>(&(pts[i]));
-				fCurrentLayer->ConvertToScreen(&pts[i]);
+				fCurrentLayer->ConvertToScreenForDrawing(&pts[i]);
 			}
 
 			link.Read<BRect>(&rect);
 
-			fCurrentLayer->ConvertToScreen(&rect);
+			fCurrentLayer->ConvertToScreenForDrawing(&rect);
 			driver->DrawTriangle(pts, rect, fCurrentLayer->CurrentState(), code == AS_FILL_TRIANGLE);
 
 			break;
@@ -1879,14 +1885,14 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (link.Read(pointList, pointCount * sizeof(BPoint)) >= B_OK) {
 
 				for (int32 i = 0; i < pointCount; i++)
-					fCurrentLayer->ConvertToScreen(&pointList[i]);
+					fCurrentLayer->ConvertToScreenForDrawing(&pointList[i]);
 	
 				driver->DrawPolygon(pointList, pointCount, polyFrame,
 									fCurrentLayer->CurrentState(), code == AS_FILL_POLYGON,
 									isClosed && pointCount > 2);
 	
-				delete[] pointList;
 			}
+			delete[] pointList;
 
 			break;
 		}
@@ -1909,7 +1915,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 				link.Read(ptList, ptCount * sizeof(BPoint)) >= B_OK) {
 
 				for (int32 i = 0; i < ptCount; i++)
-					fCurrentLayer->ConvertToScreen(&ptList[i]);
+					fCurrentLayer->ConvertToScreenForDrawing(&ptList[i]);
 	
 				driver->DrawShape(shapeFrame, opCount, opList, ptCount, ptList,
 								  fCurrentLayer->CurrentState(), code == AS_FILL_SHAPE);
@@ -1941,7 +1947,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 				region.Include(rects[i]);
 			}
 
-			fCurrentLayer->ConvertToScreen(&region);
+			fCurrentLayer->ConvertToScreenForDrawing(&region);
 			driver->FillRegion(region, fCurrentLayer->CurrentState());
 
 			delete[] rects;
@@ -1974,8 +1980,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 					link.Read<float>(&(index->pt2.y));
 					link.Read<rgb_color>(&(index->color));
 
-					fCurrentLayer->ConvertToScreen(&index->pt1);
-					fCurrentLayer->ConvertToScreen(&index->pt2);
+					fCurrentLayer->ConvertToScreenForDrawing(&index->pt1);
+					fCurrentLayer->ConvertToScreenForDrawing(&index->pt2);
 				}
 				driver->StrokeLineArray(linecount, linedata, fCurrentLayer->CurrentState());
 			}
@@ -1994,10 +2000,10 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<escapement_delta>(&delta);
 			link.ReadString(&string);
 			
-			fCurrentLayer->ConvertToScreen(&location);
+			fCurrentLayer->ConvertToScreenForDrawing(&location);
 			BPoint penLocation = driver->DrawString(string, length, location,
 													fCurrentLayer->CurrentState(), &delta);
-			fCurrentLayer->ConvertFromScreen(&penLocation);
+			fCurrentLayer->ConvertFromScreenForDrawing(&penLocation);
 			fCurrentLayer->CurrentState()->SetPenLocation(penLocation);
 			
 			free(string);
