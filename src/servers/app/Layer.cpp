@@ -827,7 +827,7 @@ void
 Layer::MouseDown(const BMessage *msg)
 {
 	if (Window() && !IsTopLayer()) {
-		Window()->SendMessageToClient(msg, fViewToken, false);
+		Window()->SendMessageToClient(msg, fViewToken);
 	}
 }
 
@@ -835,7 +835,7 @@ void
 Layer::MouseUp(const BMessage *msg)
 {
 	if (Window() && !IsTopLayer()) {
-		Window()->SendMessageToClient(msg, fViewToken, false);
+		Window()->SendMessageToClient(msg, fViewToken);
 	}
 }
 
@@ -843,7 +843,7 @@ void
 Layer::MouseMoved(const BMessage *msg)
 {
 	if (Window() && !IsTopLayer()) {
-		Window()->SendMessageToClient(msg, fViewToken, false);
+		Window()->SendMessageToClient(msg, fViewToken);
 	}
 }
 
@@ -851,7 +851,7 @@ void
 Layer::MouseWheelChanged(const BMessage *msg)
 {
 	if (Window() && !IsTopLayer()) {
-		Window()->SendMessageToClient(msg, fViewToken, false);
+		Window()->SendMessageToClient(msg, fViewToken);
 	}
 }
 

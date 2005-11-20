@@ -218,7 +218,7 @@ WinBorder::MoveBy(float x, float y)
 	BMessage msg(B_WINDOW_MOVED);
 	msg.AddInt64("when",  system_time());
 	msg.AddPoint("where", Frame().LeftTop());
-	Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
+	Window()->SendMessageToClient(&msg, B_NULL_TOKEN);
 }
 
 
@@ -275,7 +275,7 @@ WinBorder::ResizeBy(float x, float y)
 	msg.AddInt64("when", system_time());
 	msg.AddInt32("width", frame.IntegerWidth());
 	msg.AddInt32("height", frame.IntegerHeight());
-	Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
+	Window()->SendMessageToClient(&msg, B_NULL_TOKEN);
 }
 
 
@@ -597,7 +597,7 @@ WinBorder::WorkspaceActivated(int32 index, bool active)
 	activatedMsg.AddInt32("workspace", index);
 	activatedMsg.AddBool("active", active);
 
-	Window()->SendMessageToClient(&activatedMsg, B_NULL_TOKEN, false);
+	Window()->SendMessageToClient(&activatedMsg, B_NULL_TOKEN);
 }
 
 
@@ -611,7 +611,7 @@ WinBorder::WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces)
 	changedMsg.AddInt32("old", oldWorkspaces);
 	changedMsg.AddInt32("new", newWorkspaces);
 
-	Window()->SendMessageToClient(&changedMsg, B_NULL_TOKEN, false);
+	Window()->SendMessageToClient(&changedMsg, B_NULL_TOKEN);
 }
 
 
@@ -620,7 +620,7 @@ WinBorder::Activated(bool active)
 {
 	BMessage msg(B_WINDOW_ACTIVATED);
 	msg.AddBool("active", active);
-	Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
+	Window()->SendMessageToClient(&msg, B_NULL_TOKEN);
 }
 
 
