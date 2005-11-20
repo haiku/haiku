@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (SVN 0.65, Rudolf)</h1></p>
+<p><h1>head (SVN 0.66, Rudolf)</h1></p>
 <ul>
 <li>Added capability to driver to run without an INT assigned. Driver will now automatically disable the 'Sync_to_Retrace' function if no INT was assigned instead of not loading/running at all;
 <li>Fixed PLL reference recognition (used for refreshrate calculations) and dualhead detection for a number of 'newer' cards: most notably for a lot of GeForce 6200 types! Code is rewritten so it's much less breakable when new cards are added to the supported list in the future;
@@ -15,7 +15,8 @@
 <li>Added custom modeflag for users to be able to select TVout head on a 'per mode' basis. The Dualhead Setup preference panel needs to be updated (to a version newer than 0.03a) to correctly issue this flag;
 <li>Added rudimentary NV11 CRTC2 FIFO watermark/burst-size programming to remove/minimize vertical distortion stripes occuring on some cards due to data fetching errors (because of limited bandwidth);
 <li>Modified NV05M64 (TNT2-M64) watermark/burst-size programming to be executed independant of coldstart feature;
-<li>Updated acceleration engine DMA-mode initialisation code: This should fix trouble on some newer cards with acceleration, and also adds NV47 (G70) acceleration support.
+<li>Updated acceleration engine DMA-mode initialisation code: This should fix trouble on some newer cards with acceleration, and also adds NV47 (G70) acceleration support;
+<li>Added preliminary laptop panel DPMS support (except for NV11): currently only is use when no external DVI panels are connected. Please provide feedback on this item if you have a laptop (send a logfile along): only then can this feature be expanded/finalized!
 </ul>
 <p><h1>nv_driver 0.53 (Rudolf)</h1></p>
 <ul>
