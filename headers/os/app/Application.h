@@ -119,7 +119,6 @@ private:
 	virtual	bool			ScriptReceived(BMessage* msg, int32 index,
 								BMessage* specifier, int32 form,
 								const char* property);
-			void			run_task();
 			void			InitData(const char* signature, bool initGUI,
 								status_t* error);
 			void			BeginRectTracking(BRect r, bool trackWhole);

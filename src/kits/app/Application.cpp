@@ -484,7 +484,7 @@ BApplication::Run()
 
 	fRunCalled = true;
 
-	run_task();
+	task_looper();
 
 	delete fPulseRunner;
 	return thread;
@@ -971,14 +971,6 @@ BApplication::ScriptReceived(BMessage *message, int32 index,
 	printf("what: %ld\n", what);
 	printf("property: %s\n", property ? property : "");
 	return false;
-}
-
-
-void
-BApplication::run_task()
-{
-	// ToDo: run_task() could be removed completely
-	task_looper();
 }
 
 
