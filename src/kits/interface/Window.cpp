@@ -2228,25 +2228,17 @@ BWindow::task_looper()
 			} else {
 				//	Get the target handler
 				BHandler *handler = NULL;
-#ifdef USING_MESSAGE4
 				//	Use the private BMessage accessor to determine if we are
 				//	using the preferred handler, or if a target has been
 				//	specified
 				BMessage::Private messagePrivate(fLastMessage);
 				bool usePreferred = messagePrivate.UsePreferredTarget();
-#else
-				bool usePreferred = _use_preferred_target_(fLastMessage);
-#endif
+
 				if (usePreferred) {
 					handler = PreferredHandler();
 				} else {
-#ifndef USING_MESSAGE4
-					gDefaultTokens.GetToken(_get_message_target_(fLastMessage),
-						B_HANDLER_TOKEN, (void **)&handler);
-#else
 					gDefaultTokens.GetToken(messagePrivate.GetTarget(),
 						B_HANDLER_TOKEN, (void **)&handler);
-#endif
 				}
 
 				if (!usePreferred || _DistributeMessage(fLastMessage)) {
