@@ -68,8 +68,8 @@ _BTextInput_::Instantiate(BMessage *archive)
 {
 	if (validate_instantiation(archive, "_BTextInput_"))
 		return new _BTextInput_(archive);
-	else
-		return NULL;
+
+	return NULL;
 }
 
 
@@ -97,8 +97,8 @@ _BTextInput_::KeyDown(const char* bytes, int32 numBytes)
 		{
 			if (!TextControl()->IsEnabled())
 				break;
-			
-			if(strcmp(Text(), fPreviousText) != 0) {
+
+			if (fPreviousText == NULL || strcmp(Text(), fPreviousText) != 0) {
 				TextControl()->Invoke();
 				free(fPreviousText);
 				fPreviousText = strdup(Text());
@@ -106,12 +106,12 @@ _BTextInput_::KeyDown(const char* bytes, int32 numBytes)
 
 			SelectAll();
 			break;
-		}		
+		}
 
 		case B_TAB:
 			BView::KeyDown(bytes, numBytes);
 			break;
-	
+
 		default:
 			BTextView::KeyDown(bytes, numBytes);
 			break;
@@ -201,7 +201,7 @@ _BTextInput_::Paste(BClipboard *clipboard)
 
 void
 _BTextInput_::InsertText(const char *inText, int32 inLength,
-							  int32 inOffset, const text_run_array *inRuns)
+	int32 inOffset, const text_run_array *inRuns)
 {
 	char *buffer = NULL;
 
@@ -211,9 +211,10 @@ _BTextInput_::InsertText(const char *inText, int32 inLength,
 		if (buffer) {
 			strcpy(buffer, inText);
 
-			for (int32 i = 0; i < inLength; i++)
+			for (int32 i = 0; i < inLength; i++) {
 				if (buffer[i] == '\r' || buffer[i] == '\n')
 					buffer[i] = ' ';
+			}
 		}
 	}
 
