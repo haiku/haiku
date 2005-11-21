@@ -318,8 +318,15 @@ BHandler::MessageReceived(BMessage *message)
 	// ToDo: there is some more work needed here (someone in the know should fill in)!
 
 	if (fNextHandler) {
-		// ToDo: take the handler's message filter into account!
-		fNextHandler->MessageReceived(message);
+		// we need to apply the next handler's filters here, too
+		BHandler* target = Looper()->_HandlerFilter(message, fNextHandler);
+		if (target != NULL && target != this) {
+			// TODO: we also need to make sure that "target" is not before
+			//	us in the handler chain - at least in case it wasn't before
+			//	the handler actually targeted with this message - this could
+			//	get ugly, though.
+			target->MessageReceived(message);
+		}
 	} else if (message->what != B_MESSAGE_NOT_UNDERSTOOD
 		&& (message->WasDropped() || message->HasSpecifiers())) {
 		printf("BHandler::MessageReceived(): B_MESSAGE_NOT_UNDERSTOOD");
