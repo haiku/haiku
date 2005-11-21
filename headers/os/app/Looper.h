@@ -181,13 +181,12 @@ static	status_t		_task0_(void* arg);
 		BMessage*		ReadMessageFromPort(bigtime_t tout = B_INFINITE_TIMEOUT);
 virtual	BMessage*		ConvertToMessage(void* raw, int32 code);
 virtual	void			task_looper();
-		void			do_quit_requested(BMessage* msg);
+		void			_QuitRequested(BMessage* msg);
 		bool			AssertLocked() const;
-		BHandler*		top_level_filter(BMessage* msg, BHandler* t);
-		BHandler*		handler_only_filter(BMessage* msg, BHandler* t);
-		BHandler*		apply_filters(	BList* list,
-										BMessage* msg,
-										BHandler* target);
+		BHandler*		_TopLevelFilter(BMessage* msg, BHandler* target);
+		BHandler*		_HandlerFilter(BMessage* msg, BHandler* target);
+		BHandler*		_ApplyFilters(BList* list, BMessage* msg,
+							BHandler* target);
 		void			check_lock();
 		BHandler*		resolve_specifier(BHandler* target, BMessage* msg);
 		void			UnlockFully();

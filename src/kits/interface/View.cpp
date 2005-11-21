@@ -311,7 +311,7 @@ ViewState::UpdateFrom(BPrivate::PortLink &link)
 BView::BView(BRect frame, const char *name, uint32 resizingMode, uint32 flags)
 	: BHandler(name)
 {
-	InitData(frame, name, resizingMode, flags);
+	_InitData(frame, name, resizingMode, flags);
 }
 
 
@@ -329,7 +329,7 @@ BView::BView(BMessage *archive)
 	if (archive->FindInt32("_flags", (int32 *)&flags) != B_OK)
 		flags = 0;
 
-	InitData(frame, Name(), resizingMode, flags);
+	_InitData(frame, Name(), resizingMode, flags);
 
 	font_family family;
 	font_style style;
@@ -377,8 +377,8 @@ BView::BView(BMessage *archive)
 		SetPenSize(penSize);
 
 	BPoint penLocation;
-	if ( archive->FindPoint("_ploc", &penLocation) == B_OK )
-		MovePenTo( penLocation );
+	if (archive->FindPoint("_ploc", &penLocation) == B_OK)
+		MovePenTo(penLocation);
 
 	int16 lineCap;
 	int16 lineJoin;
@@ -526,27 +526,24 @@ BView::~BView()
 
 	// TODO: see about BShelf! must I delete it here? is it deleted by the window?
 	
-	// we also delete all its childern
+	// we also delete all our children
 
 	BView *child = fFirstChild;
 	while (child) {
 		BView *nextChild = child->fNextSibling;
 
-		deleteView(child);
+		delete child;
 		child = nextChild;
 	}
 
 	if (fVerScroller)
-		fVerScroller->SetTarget((BView *)NULL);
-
+		fVerScroller->SetTarget((BView*)NULL);
 	if (fHorScroller)
-		fHorScroller->SetTarget((BView *)NULL);
+		fHorScroller->SetTarget((BView*)NULL);
 
 	SetName(NULL);
 
-	delete fPermanentState;
 	delete fState;
-	free(pr_state);
 }
 
 
@@ -3025,7 +3022,7 @@ void
 BView::SetViewBitmap(const BBitmap *bitmap, BRect srcRect, BRect dstRect,
 	uint32 followFlags, uint32 options)
 {
-	setViewImage(bitmap, srcRect, dstRect, followFlags, options);
+	_SetViewImage(bitmap, srcRect, dstRect, followFlags, options);
 }
 
 
@@ -3038,14 +3035,14 @@ BView::SetViewBitmap(const BBitmap *bitmap, uint32 followFlags, uint32 options)
 
  	rect.OffsetTo(0, 0);
 
-	setViewImage(bitmap, rect, rect, followFlags, options);
+	_SetViewImage(bitmap, rect, rect, followFlags, options);
 }
 
 
 void
 BView::ClearViewBitmap()
 {
-	setViewImage(NULL, BRect(), BRect(), 0, 0);
+	_SetViewImage(NULL, BRect(), BRect(), 0, 0);
 }
 
 
@@ -3053,7 +3050,7 @@ status_t
 BView::SetViewOverlay(const BBitmap *overlay, BRect srcRect, BRect dstRect,
 	rgb_color *colorKey, uint32 followFlags, uint32 options)
 {
-	status_t err = setViewImage(overlay, srcRect, dstRect, followFlags,
+	status_t err = _SetViewImage(overlay, srcRect, dstRect, followFlags,
 		options | 0x4);
 
 	// TODO: Incomplete?
@@ -3075,7 +3072,7 @@ BView::SetViewOverlay(const BBitmap *overlay, rgb_color *colorKey,
 
  	rect.OffsetTo(0, 0);
 
-	status_t err = setViewImage(overlay, rect, rect, followFlags,
+	status_t err = _SetViewImage(overlay, rect, rect, followFlags,
 			options | 0x4);
 
 	// TODO: Incomplete?
@@ -3090,7 +3087,7 @@ BView::SetViewOverlay(const BBitmap *overlay, rgb_color *colorKey,
 void
 BView::ClearViewOverlay()
 {
-	setViewImage(NULL, BRect(), BRect(), 0, 0);
+	_SetViewImage(NULL, BRect(), BRect(), 0, 0);
 }
 
 
@@ -3271,10 +3268,10 @@ BView::AddChild(BView *child, BView *before)
 	if (child->fParent != NULL)
 		debugger("AddChild failed - the view already has a parent.");
 
-	bool lockedByAddChild = false;
+	bool lockedOwner = false;
 	if (fOwner && !fOwner->IsLocked()) {
 		fOwner->Lock();
-		lockedByAddChild = true;
+		lockedOwner = true;
 	}
 
 	if (!_AddChildToList(child, before))
@@ -3287,16 +3284,12 @@ BView::AddChild(BView *child, BView *before)
  			Name(), child ? child->Name() : "NULL", before ? before->Name() : "NULL"));
 
 		child->_SetOwner(fOwner);
-		attachView(child);
-		callAttachHooks(child);
+		child->_CreateSelf();
+		child->_Attach();
 
-		if (lockedByAddChild)
+		if (lockedOwner)
 			fOwner->Unlock();
 	}
-
-//	BVTRACE;
-//	PrintTree();
-//	PrintToStream();
 }
 
 
@@ -3366,6 +3359,7 @@ BView::RemoveSelf()
 
 	if (fOwner) {
 		_UpdateStateForRemove();
+		_Detach();
 	}
 
 	if (!fParent || !fParent->_RemoveChildFromList(this))
@@ -3381,6 +3375,9 @@ BView::RemoveSelf()
 
 		// make sure our owner doesn't need us anymore
 
+		if (fOwner->CurrentFocus() == this)
+			MakeFocus(false);
+
 		if (fOwner->fDefaultButton == this)
 			fOwner->SetDefaultButton(NULL);
 
@@ -3392,8 +3389,6 @@ BView::RemoveSelf()
 
 		if (fOwner->fLastViewToken == _get_object_token_(this))
 			fOwner->fLastViewToken = B_NULL_TOKEN;
-
-		callDetachHooks(this);
 
 		BWindow *owner = fOwner;
 		_SetOwner(NULL);
@@ -3410,7 +3405,7 @@ BView::RemoveSelf()
 BView *
 BView::Parent() const
 {
-	if (fParent && fParent->top_level_view)
+	if (fParent && fParent->fTopLevelView)
 		return NULL;
 
 	return fParent;
@@ -3739,7 +3734,7 @@ BView::Perform(perform_code d, void* arg)
 
 
 void
-BView::InitData(BRect frame, const char *name, uint32 resizingMode, uint32 flags)
+BView::_InitData(BRect frame, const char *name, uint32 resizingMode, uint32 flags)
 {
 	// Info: The name of the view is set by BHandler constructor
 	
@@ -3763,7 +3758,7 @@ BView::InitData(BRect frame, const char *name, uint32 resizingMode, uint32 flags
 	fFirstChild = NULL;
 
 	fShowLevel = 0;
-	top_level_view = false;
+	fTopLevelView = false;
 
 	cpicture = NULL;
 	comm = NULL;
@@ -3773,12 +3768,10 @@ BView::InitData(BRect frame, const char *name, uint32 resizingMode, uint32 flags
 
 	f_is_printing = false;
 
-	fPermanentState = NULL;
 	fState = new BPrivate::ViewState;
 
 	fBounds = frame.OffsetToCopy(B_ORIGIN);
 	fShelf = NULL;
-	pr_state = NULL;
 
 	fEventMask = 0;
 	fEventOptions = 0;
@@ -3819,7 +3812,7 @@ BView::_SetOwner(BWindow *newOwner)
 		if (fShelf)
 			newOwner->AddHandler(fShelf);
 
-		if (top_level_view)
+		if (fTopLevelView)
 			SetNextHandler(newOwner);
 		else
 			SetNextHandler(fParent);
@@ -3854,21 +3847,6 @@ BView::DoPictureClip(BPicture *picture, BPoint where,
 	}
 
 	fState->archiving_flags |= B_VIEW_CLIP_REGION_BIT;
-}
-
-
-void
-BView::callDetachHooks(BView *view)
-{
-	view->DetachedFromWindow();
-
-	BView *child = view->fFirstChild;	
-	while (child != NULL) {
-		view->callDetachHooks(child);
-		child = child->fNextSibling;
-	}
-
-	view->AllDetached();
 }
 
 
@@ -3942,74 +3920,50 @@ BView::_AddChildToList(BView* view, BView* before)
 	return true;
 }
 
-void
-BView::callAttachHooks(BView *view)
-{
-	view->AttachedToWindow();
 
-	BView *child = view->fFirstChild;
-	while (child != NULL) {
-		view->callAttachHooks(child);
-		child = child->fNextSibling;
-	}
-
-	view->AllAttached();
-}
-
-
+/*!	\brief Creates the server counterpart of this view.
+	This is only done for views that are part of the view hierarchy, ie. when
+	they are attached to a window.
+	RemoveSelf() deletes the server object again.
+*/
 bool
-BView::attachView(BView *view)
+BView::_CreateSelf()
 {
 	// AS_LAYER_CREATE & AS_LAYER_CREATE_ROOT do not use the
 	// current view mechanism via check_lock() - the token
 	// of the view and its parent are both send to the server.
 
-	if (view->top_level_view)
+	if (fTopLevelView)
 		fOwner->fLink->StartMessage(AS_LAYER_CREATE_ROOT);
 	else
  		fOwner->fLink->StartMessage(AS_LAYER_CREATE);
 
-	fOwner->fLink->Attach<int32>(_get_object_token_(view));
-	fOwner->fLink->AttachString(view->Name());
-		// send view's frame. the next line replaces: fOwner->fLink->Attach<BRect>(view->Frame());
-	fOwner->fLink->Attach<BRect>(view->fBounds.OffsetToCopy(view->fParentOffset));
-	fOwner->fLink->Attach<uint32>(view->ResizingMode());
-	fOwner->fLink->Attach<uint32>(view->fEventMask);
-	fOwner->fLink->Attach<uint32>(view->fEventOptions);
-	fOwner->fLink->Attach<uint32>(view->Flags());
-	fOwner->fLink->Attach<bool>(view->IsHidden(view));
-	fOwner->fLink->Attach<rgb_color>(view->fState->view_color);
 	fOwner->fLink->Attach<int32>(_get_object_token_(this));
+	fOwner->fLink->AttachString(Name());
+	fOwner->fLink->Attach<BRect>(Frame());
+	fOwner->fLink->Attach<uint32>(ResizingMode());
+	fOwner->fLink->Attach<uint32>(fEventMask);
+	fOwner->fLink->Attach<uint32>(fEventOptions);
+	fOwner->fLink->Attach<uint32>(Flags());
+	fOwner->fLink->Attach<bool>(IsHidden(this));
+	fOwner->fLink->Attach<rgb_color>(fState->view_color);
+	if (fTopLevelView)	
+		fOwner->fLink->Attach<int32>(B_NULL_TOKEN);
+	else
+		fOwner->fLink->Attach<int32>(_get_object_token_(fParent));
 	fOwner->fLink->Flush();
 
-	view->do_owner_check();
-	view->fState->UpdateServerState(*fOwner->fLink);
+	do_owner_check();
+	fState->UpdateServerState(*fOwner->fLink);
 
-	// we attach all its children
+	// we create all its children, too
 
-	BView *child = view->fFirstChild;
-	while (child != NULL) {
-		view->attachView(child);
-		child = child->fNextSibling;
+	for (BView *child = fFirstChild; child != NULL; child = child->fNextSibling) {
+		child->_CreateSelf();
 	}
 
 	fOwner->fLink->Flush();
-
 	return true;
-}
-
-
-void
-BView::deleteView(BView* view)
-{
-	BView *child = view->fFirstChild;
-	while (child != NULL) {
-		BView *nextChild = child->fNextSibling;
-		deleteView(child);
-		child = nextChild;
-	}
-
-	delete view;
 }
 
 
@@ -4018,8 +3972,79 @@ BView::_Activate(bool active)
 {
 	WindowActivated(active);
 
-	for (BView *child = fFirstChild; child != NULL; child = child->fNextSibling)
+	for (BView *child = fFirstChild; child != NULL; child = child->fNextSibling) {
 		child->_Activate(active);
+	}
+}
+
+
+void
+BView::_Attach()
+{
+	AttachedToWindow();
+
+	for (BView* child = fFirstChild; child != NULL; child = child->fNextSibling) {
+		child->_Attach();
+	}
+
+	AllAttached();
+}
+
+
+void
+BView::_Detach()
+{
+	DetachedFromWindow();
+
+	for (BView* child = fFirstChild; child != NULL; child = child->fNextSibling) {
+		child->_Detach();
+	}
+
+	AllDetached();
+}
+
+
+void
+BView::_Draw(BRect updateRect)
+{
+	if (IsHidden(this))
+		return;
+
+	check_lock();
+
+	if (Flags() & B_WILL_DRAW) {
+		// TODO: make states robust
+		PushState();
+		Draw(updateRect);
+		PopState();
+	} else {
+		// The code below is certainly not correct, because
+		// it redoes what the app_server already did
+		// Find out what happens on R5 if a view has ViewColor() = 
+		// B_TRANSPARENT_COLOR but not B_WILL_DRAW
+/*		rgb_color c = aView->HighColor();
+		aView->SetHighColor(aView->ViewColor());
+		aView->FillRect(aView->Bounds(), B_SOLID_HIGH);
+		aView->SetHighColor(c);*/
+	}
+
+	for (BView *child = fFirstChild; child != NULL; child = child->fNextSibling) {
+		BRect rect = child->Frame();
+		if (!updateRect.Intersects(rect))
+			continue;
+
+		// get new update rect in child coordinates
+		rect = updateRect & rect;
+		child->ConvertFromParent(&rect);
+
+		child->_Draw(rect);
+	}
+
+	if (Flags() & B_WILL_DRAW) {
+		PushState();
+		DrawAfterChildren(updateRect);
+		PopState();
+	}
 }
 
 
@@ -4029,8 +4054,9 @@ BView::_Pulse()
 	if (Flags() & B_PULSE_NEEDED)
 		Pulse();
 
-	for (BView *child = fFirstChild; child != NULL; child = child->fNextSibling)
+	for (BView *child = fFirstChild; child != NULL; child = child->fNextSibling) {
 		child->_Pulse();
+	}
 }
 
 
@@ -4046,10 +4072,8 @@ BView::_UpdateStateForRemove()
 
 	// update children as well
 
-	BView *child = fFirstChild;
-	while (child != NULL) {
+	for (BView *child = fFirstChild; child != NULL; child = child->fNextSibling) {
 		child->_UpdateStateForRemove();
-		child = child->fNextSibling;
 	}
 }
 
@@ -4057,8 +4081,19 @@ BView::_UpdateStateForRemove()
 inline void
 BView::_UpdatePattern(::pattern pattern)
 {
-	if (!fState->IsValid(B_VIEW_PATTERN_BIT) || pattern != fState->pattern)
-		SetPattern(pattern);
+	if (fState->IsValid(B_VIEW_PATTERN_BIT) && pattern == fState->pattern)
+		return;
+
+	if (fOwner) {
+		check_lock();
+
+		fOwner->fLink->StartMessage(AS_LAYER_SET_PATTERN);
+		fOwner->fLink->Attach< ::pattern>(pattern);
+
+		fState->valid_flags |= B_VIEW_PATTERN_BIT;
+	}
+
+	fState->pattern = pattern;
 }
 
 
@@ -4078,7 +4113,7 @@ BView::set_shelf(BShelf *shelf)
 
 
 status_t
-BView::setViewImage(const BBitmap *bitmap, BRect srcRect,
+BView::_SetViewImage(const BBitmap* bitmap, BRect srcRect,
 	BRect dstRect, uint32 followFlags, uint32 options)
 {
 	if (!do_owner_check())
@@ -4104,25 +4139,6 @@ BView::setViewImage(const BBitmap *bitmap, BRect srcRect,
 		fOwner->fLink->Read<status_t>(&status);
 
 	return status;
-}
- 
-
-void
-BView::SetPattern(::pattern pattern)
-{
-	if (fState->IsValid(B_VIEW_PATTERN_BIT) && pattern == fState->pattern)
-		return;
-
-	if (fOwner) {
-		check_lock();
-
-		fOwner->fLink->StartMessage(AS_LAYER_SET_PATTERN);
-		fOwner->fLink->Attach< ::pattern>(pattern);
-
-		fState->valid_flags |= B_VIEW_PATTERN_BIT;
-	}
-
-	fState->pattern = pattern;
 }
  
 
@@ -4267,7 +4283,7 @@ BView::PrintToStream()
 	fParentOffset.x, fParentOffset.y,
 	fBounds.left, fBounds.top, fBounds.right, fBounds.bottom,
 	fShowLevel,
-	top_level_view? "YES" : "NO",
+	fTopLevelView ? "YES" : "NO",
 	cpicture? "YES" : "NULL",
 	fVerScroller? "YES" : "NULL",
 	fHorScroller? "YES" : "NULL",

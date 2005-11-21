@@ -286,7 +286,7 @@ BLooper::DispatchMessage(BMessage *message, BHandler *handler)
 
 		case B_QUIT_REQUESTED:
 			if (handler == this) {
-				do_quit_requested(message);
+				_QuitRequested(message);
 				break;
 			}
 
@@ -1313,8 +1313,8 @@ BLooper::task_looper()
 
 				if (handler) {
 					//	Do filtering
-					handler = top_level_filter(fLastMessage, handler);
-					PRINT(("LOOPER: top_level_filter(): %p\n", handler));
+					handler = _TopLevelFilter(fLastMessage, handler);
+					PRINT(("LOOPER: _TopLevelFilter(): %p\n", handler));
 					if (handler && handler->Looper() == this)
 						DispatchMessage(fLastMessage, handler);
 				}
@@ -1341,7 +1341,7 @@ BLooper::task_looper()
 
 
 void
-BLooper::do_quit_requested(BMessage *msg)
+BLooper::_QuitRequested(BMessage *msg)
 {
 	bool isQuitting = QuitRequested();
 
@@ -1376,18 +1376,18 @@ BLooper::AssertLocked() const
 
 
 BHandler *
-BLooper::top_level_filter(BMessage* msg, BHandler* target)
+BLooper::_TopLevelFilter(BMessage* msg, BHandler* target)
 {
 	if (msg) {
 		// Apply the common filters first
-		target = apply_filters(CommonFilterList(), msg, target);
+		target = _ApplyFilters(CommonFilterList(), msg, target);
 		if (target) {
 			if (target->Looper() != this) {
 				debugger("Targeted handler does not belong to the looper.");
 				target = NULL;
 			} else {
 				// Now apply handler-specific filters
-				target = handler_only_filter(msg, target);
+				target = _HandlerFilter(msg, target);
 			}
 		}
 	}
@@ -1397,15 +1397,16 @@ BLooper::top_level_filter(BMessage* msg, BHandler* target)
 
 
 BHandler *
-BLooper::handler_only_filter(BMessage* msg, BHandler* target)
+BLooper::_HandlerFilter(BMessage* msg, BHandler* target)
 {
 	// Keep running filters until our handler is NULL, or until the filtering
 	// handler returns itself as the designated handler
-	BHandler* oldTarget = NULL;
-	while (target != NULL && target != oldTarget) {
-		oldTarget = target;
-		target = apply_filters(oldTarget->FilterList(), msg, oldTarget);
-		if (target && (target->Looper() != this)) {
+	BHandler* previousTarget = NULL;
+	while (target != NULL && target != previousTarget) {
+		previousTarget = target;
+
+		target = _ApplyFilters(target->FilterList(), msg, target);
+		if (target != NULL && target->Looper() != this) {
 			debugger("Targeted handler does not belong to the looper.");
 			target = NULL;
 		}
@@ -1416,7 +1417,7 @@ BLooper::handler_only_filter(BMessage* msg, BHandler* target)
 
 
 BHandler *
-BLooper::apply_filters(BList* list, BMessage* msg, BHandler* target)
+BLooper::_ApplyFilters(BList* list, BMessage* msg, BHandler* target)
 {
 	// This is where the action is!
 	// Check the parameters
@@ -1433,9 +1434,9 @@ BLooper::apply_filters(BList* list, BMessage* msg, BHandler* target)
 			// Check delivery conditions
 			message_delivery delivery = filter->MessageDelivery();
 			bool dropped = msg->WasDropped();
-			if (delivery == B_ANY_DELIVERY ||
-				((delivery == B_DROPPED_DELIVERY) && dropped) ||
-				((delivery == B_PROGRAMMED_DELIVERY) && !dropped)) {
+			if (delivery == B_ANY_DELIVERY
+				|| (delivery == B_DROPPED_DELIVERY && dropped)
+				|| (delivery == B_PROGRAMMED_DELIVERY && !dropped)) {
 				// Check source conditions
 				message_source source = filter->MessageSource();
 				bool remote = msg->IsSourceRemote();

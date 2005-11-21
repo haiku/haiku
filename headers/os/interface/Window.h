@@ -1,31 +1,13 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Window.h
-//	Author:			Adrian Oanca (adioanca@gmail.com)
-//	Description:	BWindow is the base class for all windows (graphic areas
-//					displayed on-screen).
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adrian Oanca <adioanca@cotty.iren.ro>
+ */
 #ifndef	_WINDOW_H
 #define	_WINDOW_H
+
 
 #include <BeBuild.h>
 #include <InterfaceDefs.h>
@@ -35,12 +17,18 @@
 #include <StorageDefs.h>
 #include <View.h>
 
+class BButton;
+class BMenuBar;
+class BMenuItem;
+class BMessage;
+class BMessageRunner;
+class BMessenger;
+class BView;
+
 namespace BPrivate {
 	class PortLink;
 };
 
-
-// window definitions ----------------------------------------------------------
 
 enum window_type {
 	B_UNTYPED_WINDOW	= 0,
@@ -51,8 +39,6 @@ enum window_type {
 	B_FLOATING_WINDOW	= 21
 };
 
-//----------------------------------------------------------------
-
 enum window_look {
 	B_BORDERED_WINDOW_LOOK	= 20,
 	B_NO_BORDER_WINDOW_LOOK	= 19,
@@ -61,8 +47,6 @@ enum window_look {
 	B_MODAL_WINDOW_LOOK		= 3,
 	B_FLOATING_WINDOW_LOOK	= 7
 };
-
-//----------------------------------------------------------------
 
 enum window_feel {
 	B_NORMAL_WINDOW_FEEL			= 0,	
@@ -74,15 +58,12 @@ enum window_feel {
 	B_FLOATING_ALL_WINDOW_FEEL		= 6
 };
 
-//----------------------------------------------------------------
-
 enum window_alignment {
 	B_BYTE_ALIGNMENT	= 0,
 	B_PIXEL_ALIGNMENT	= 1
 };
 
-//----------------------------------------------------------------
-
+// window flags
 enum {
 	B_NOT_MOVABLE				= 0x00000001,
 	B_NOT_CLOSABLE				= 0x00000020,
@@ -106,19 +87,6 @@ enum {
 
 //----------------------------------------------------------------
 
-class BButton;
-class BMenuBar;
-class BMenuItem;
-class BMessage;
-class BMessageRunner;
-class BMessenger;
-class BView;
-
-struct message;
-struct _cmd_key_;
-class ViewAttr;
-
-// BWindow class ---------------------------------------------------------------
 class BWindow : public BLooper {
 public:
 						BWindow(BRect frame, const char* title, 
@@ -256,7 +224,6 @@ public:
 	virtual	bool		QuitRequested();
 	virtual thread_id	Run();
 
-// Private or reserved ---------------------------------------------------------
 private:
 	typedef BLooper inherited;
 	class Shortcut;
@@ -292,16 +259,9 @@ private:
 								window_look look, window_feel feel,
 								uint32 flags, uint32 workspace,
 								int32 bitmapToken = -1);
-			status_t	ArchiveChildren(BMessage* data, bool deep) const;	
-			status_t	UnarchiveChildren(BMessage* data);
 			void		BitmapClose();						// to be implemented
 	virtual	void		task_looper();
-			void		prepareView(BView* aView);
-			void		attachView(BView* aView);
-			void		detachView(BView* aView);
 
-			void		handle_activate(BMessage* an_event);
-			void		do_menu_event(BMessage* an_event);
 	virtual BMessage	*ConvertToMessage(void* raw, int32 code);
 
 			void		AddShortcut(uint32 key, uint32 modifiers,
@@ -310,7 +270,7 @@ private:
 			bool		_DistributeMessage(BMessage* message);
 
 			bool		InUpdate();
-			void		DequeueAll();
+			void		_DequeueAll();
 			window_type	_ComposeType(window_look look,
 									 window_feel feel) const;
 			void		_DecomposeType(window_type type,
@@ -320,8 +280,8 @@ private:
 			void		SetIsFilePanel(bool yes);
 			bool		IsFilePanel() const;
 
-			void		BuildTopView();
-			void		setFocus(BView *focusView, bool notifyIputServer = false);
+			void		_CreateTopView();
+			void		_SetFocus(BView *focusView, bool notifyIputServer = false);
 
 			Shortcut*	_FindShortcut(uint32 key, uint32 modifiers);
 			BView*		_FindView(BView* view, BPoint point) const;
@@ -332,18 +292,11 @@ private:
 			BView*		_FindPreviousNavigable(BView *focus, uint32 flags);
 			bool		_HandleKeyDown(char key, uint32 modifiers);
 			void		_KeyboardNavigation();
-			void		handleActivation(bool active);
 
-			void		drawAllViews(BView* view);
 			void		DoUpdate(BView* view, BRect& area);
 
-			// Debug
+			// Debug (TODO: to be removed)
 			void		PrintToStream() const;
-	
-			// 3 deprecated calls
-			//void			AddFloater(BWindow* a_floating_window);
-			//void			RemoveFloater(BWindow* a_floating_window);
-			//window_type		WindowType() const;
 
 private:
 	char			*fTitle;
@@ -353,7 +306,6 @@ private:
 	short			fShowLevel;
 	uint32			fFlags;
 
-	uint32			_unused0[2];
 	BView			*fTopView;
 	BView			*fFocus;
 	BView			*fLastMouseMovedView;
@@ -378,17 +330,13 @@ private:
 	float			fMaxWidth;
 	BRect			fFrame;
 	window_look		fLook;
-	ViewAttr		*fCurDrawViewState;			// not yet used
 	window_feel		fFeel;
 	int32			fLastViewToken;
 	BPrivate::PortLink	*fLink;
 	BMessageRunner	*fPulseRunner;
 	BRect			fCurrentFrame;				// not yet used
 
-	uint32			_reserved[2];				// was 8
-#if !_PR3_COMPATIBLE_
-	uint32			_more_reserved[4];
-#endif
+	uint32			_reserved[9];
 };
 
 #endif	// _WINDOW_H 

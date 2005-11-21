@@ -9,34 +9,25 @@
  */
 
 
-#include <BeBuild.h>
-#include <InterfaceDefs.h>
-#include <PropertyInfo.h>
-#include <Handler.h>
-#include <Looper.h>
 #include <Application.h>
-#include <Window.h>
-#include <View.h>
+#include <Autolock.h>
+#include <Button.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
-#include <String.h>
-#include <Screen.h>
-#include <Button.h>
 #include <MessageQueue.h>
 #include <MessageRunner.h>
+#include <PropertyInfo.h>
 #include <Roster.h>
-#include <Autolock.h>
+#include <Screen.h>
+#include <String.h>
+#include <Window.h>
 
-#include <ApplicationPrivate.h>
 #include <AppMisc.h>
+#include <ApplicationPrivate.h>
+#include <MessagePrivate.h>
 #include <PortLink.h>
 #include <ServerProtocol.h>
 #include <TokenSpace.h>
-#include <MessageUtils.h>
-
-#ifdef USING_MESSAGE4
-#include <MessagePrivate.h>
-#endif
 
 #include <ctype.h>
 #include <stdio.h>
@@ -735,43 +726,52 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		}
 
 		case B_WINDOW_ACTIVATED:
-		{
-			bool active;
-			if (msg->FindBool("active", &active) == B_OK) {
-				fActive = active;
-				handleActivation(active);
-			}
+			if (target == this) {
+				bool active;
+				if (msg->FindBool("active", &active) == B_OK
+					&& active != fActive) {
+					fActive = active;
+					WindowActivated(active);
+	
+					// call hook function 'WindowActivated(bool)' for all
+					// views attached to this window.
+					fTopView->_Activate(active);
+				}
+			} else
+				target->MessageReceived(msg);
 			break;
-		}
 
 		case B_SCREEN_CHANGED:
-		{
-			BRect frame;
-			uint32 mode;
-			if (msg->FindRect("frame", &frame) == B_OK
-				&& msg->FindInt32("mode", (int32 *)&mode) == B_OK)
-				ScreenChanged(frame, (color_space)mode);
+			if (target == this) {
+				BRect frame;
+				uint32 mode;
+				if (msg->FindRect("frame", &frame) == B_OK
+					&& msg->FindInt32("mode", (int32 *)&mode) == B_OK)
+					ScreenChanged(frame, (color_space)mode);
+			} else
+				target->MessageReceived(msg);
 			break;
-		}
 
 		case B_WORKSPACE_ACTIVATED:
-		{
-			uint32 workspace;
-			bool active;
-			if (msg->FindInt32("workspace", (int32 *)&workspace) == B_OK
-				&& msg->FindBool("active", &active) == B_OK)
-				WorkspaceActivated(workspace, active);
+			if (target == this) {
+				uint32 workspace;
+				bool active;
+				if (msg->FindInt32("workspace", (int32 *)&workspace) == B_OK
+					&& msg->FindBool("active", &active) == B_OK)
+					WorkspaceActivated(workspace, active);
+			} else
+				target->MessageReceived(msg);
 			break;
-		}
 
 		case B_WORKSPACES_CHANGED:
-		{
-			uint32 oldWorkspace, newWorkspace;
-			if (msg->FindInt32("old", (int32 *)&oldWorkspace) == B_OK
-				&& msg->FindInt32("new", (int32 *)&newWorkspace) == B_OK)
-				WorkspacesChanged(oldWorkspace, newWorkspace);
+			if (target == this) {
+				uint32 oldWorkspace, newWorkspace;
+				if (msg->FindInt32("old", (int32 *)&oldWorkspace) == B_OK
+					&& msg->FindInt32("new", (int32 *)&newWorkspace) == B_OK)
+					WorkspacesChanged(oldWorkspace, newWorkspace);
+			} else
+				target->MessageReceived(msg);
 			break;
-		}
 
 		case B_KEY_DOWN:
 		{
@@ -782,12 +782,14 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			msg->FindInt32("raw_char", &rawChar);
 			msg->FindString("bytes", &string);
 
-// TODO: USE target !!!!
+			// TODO: cannot use "string" here if we support having different
+			//	font encoding per view (it's supposed to be converted by
+			//	_HandleKeyDown() one day)
 			if (!_HandleKeyDown(string[0], (uint32)modifiers)) {
-				if (fFocus)
-					fFocus->KeyDown(string, strlen(string));
+				if (BView* view = dynamic_cast<BView*>(target))
+					view->KeyDown(string, strlen(string));
 				else
-					printf("Adi: No Focus\n");
+					target->MessageReceived(msg);
 			}
 			break;
 		}
@@ -797,23 +799,13 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			const char *string = NULL;
 			msg->FindString("bytes", &string);
 
-// TODO: USE target !!!!
-			if (fFocus)
-				fFocus->KeyUp(string, strlen(string));
+			// TODO: same as above
+			if (BView* view = dynamic_cast<BView*>(target))
+				view->KeyUp(string, strlen(string));
+			else
+				target->MessageReceived(msg);
 			break;
 		}
-
-		case B_UNMAPPED_KEY_DOWN:
-		case B_UNMAPPED_KEY_UP:
-		case B_MODIFIERS_CHANGED:
-			if (target != this && target != fTopView)
-				target->MessageReceived(msg);
-			break;
-
-		case B_MOUSE_WHEEL_CHANGED:
-			if (target != this && target != fTopView)
-				target->MessageReceived(msg);
-			break;
 
 		case B_MOUSE_DOWN:
 		{
@@ -880,15 +872,11 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		}
 
 		case B_PULSE:
-			if (fPulseEnabled) {
+			if (target == this && fPulseEnabled) {
 				fTopView->_Pulse();
 				fLink->Flush();
-			}
-			break;
-
-		case B_QUIT_REQUESTED:
-			if (QuitRequested())
-				Quit();
+			} else
+				target->MessageReceived(msg);
 			break;
 
 		case _UPDATE_:
@@ -898,9 +886,10 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			int32 token;
 			msg->FindRect("_rect", &updateRect);
 			msg->FindInt32("_token", &token);
+			// TODO: why is "_token" ignored?
 
 			fLink->StartMessage(AS_BEGIN_UPDATE);
-			DoUpdate(fTopView, updateRect);
+			fTopView->_Draw(updateRect);
 			fLink->StartMessage(AS_END_UPDATE);
 			fLink->Flush();
 			break;
@@ -1302,7 +1291,7 @@ BWindow::UpdateIfNeeded()
 
 	// Since we're blocking the event loop, we need to retrieve 
 	// all messages that are pending on the port.
-	DequeueAll();
+	_DequeueAll();
 
 	BMessageQueue *queue = MessageQueue();
 	queue->Lock();
@@ -2013,6 +2002,7 @@ BWindow::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 
 //	#pragma mark - Private Methods
 
+
 void 
 BWindow::_InitData(BRect frame, const char* title, window_look look,
 	window_feel feel, uint32 flags,	uint32 workspace, int32 bitmapToken)
@@ -2158,16 +2148,13 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 	STRACE(("Server says that our send port is %ld\n", sendPort));
 	STRACE(("Window locked?: %s\n", IsLocked() ? "True" : "False"));
 
-	// build and register fTopView with app_server
-	BuildTopView();
+	_CreateTopView();
 }
 
 
-/**	Reads all pending messages from the window port and put them into the queue.
- */
-
+//!	Reads all pending messages from the window port and put them into the queue.
 void
-BWindow::DequeueAll()
+BWindow::_DequeueAll()
 {
 	//	Get message count from port
 	int32 count = port_count(fMsgPort);
@@ -2180,16 +2167,15 @@ BWindow::DequeueAll()
 }
 
 
-// TODO: This here is a nearly full code duplication to BLooper::task_loop
-// but with one little difference: It uses the _DetermineTarget() method
-// to tell what the later target of a message will be, if no explicit target
-// is supplied. This is important because we need to call the right targets
-// MessageFilter. For B_KEY_DOWN messages for example, not the BWindow but the
-// focus view will be the target of the message. This means that also the
-// focus views MessageFilters have to be checked before DispatchMessage and
-// not the ones of this BWindow.
-
-void 
+/*!	This here is a nearly full code duplication to BLooper::task_looper()
+	but with one little difference: It uses the _DetermineTarget() method
+	to tell what the later target of a message will be, if no explicit target
+	is supplied.
+	This is important because the app_server sends all events to the preferred
+	handler, and these must be correctly retargeted and eventually distributed
+	to several handlers using _DistributeMessage().
+*/
+void
 BWindow::task_looper()
 {
 	STRACE(("info: BWindow::task_looper() started.\n"));
@@ -2241,17 +2227,14 @@ BWindow::task_looper()
 				dispatchNextMessage = false;
 			} else {
 				//	Get the target handler
+				BHandler *handler = NULL;
 #ifdef USING_MESSAGE4
 				//	Use the private BMessage accessor to determine if we are
 				//	using the preferred handler, or if a target has been
 				//	specified
-				BHandler *handler = NULL;
 				BMessage::Private messagePrivate(fLastMessage);
 				bool usePreferred = messagePrivate.UsePreferredTarget();
 #else
-				//	Use BMessage friend functions to determine if we are using the
-				//	preferred handler, or if a target has been specified
-				BHandler* handler = NULL;
 				bool usePreferred = _use_preferred_target_(fLastMessage);
 #endif
 				if (usePreferred) {
@@ -2265,8 +2248,6 @@ BWindow::task_looper()
 						B_HANDLER_TOKEN, (void **)&handler);
 #endif
 				}
-
-//printf("handler = %p, usePreferred = %s\n", handler, usePreferred ? "yes" : "no");
 
 				if (!usePreferred || _DistributeMessage(fLastMessage)) {
 					// if a target was given, and we should not use the preferred
@@ -2286,7 +2267,7 @@ BWindow::task_looper()
 
 					if (handler) {
 						//	Do filtering and dispatch message
-						handler = top_level_filter(fLastMessage, handler);
+						handler = _TopLevelFilter(fLastMessage, handler);
 						if (handler && handler->Looper() == this)
 							DispatchMessage(fLastMessage, handler);
 					}
@@ -2383,14 +2364,14 @@ BWindow::_DecomposeType(window_type type, window_look *_look,
 
 
 void
-BWindow::BuildTopView()
+BWindow::_CreateTopView()
 {
-	STRACE(("BuildTopView(): enter\n"));
+	STRACE(("_CreateTopView(): enter\n"));
 
 	BRect frame = fFrame.OffsetToCopy(B_ORIGIN);
 	fTopView = new BView(frame, "fTopView",
 		B_FOLLOW_ALL, B_WILL_DRAW);
-	fTopView->top_level_view = true;
+	fTopView->fTopLevelView = true;
 
 	//inhibit check_lock()
 	fLastViewToken = _get_object_token_(fTopView);
@@ -2403,36 +2384,15 @@ BWindow::BuildTopView()
 
 	fTopView->_SetOwner(this);
 
-	//we can't use AddChild() because this is the fTopView
-  	fTopView->attachView(fTopView);
+	// we can't use AddChild() because this is the top view
+  	fTopView->_CreateSelf();
 
 	STRACE(("BuildTopView ended\n"));
 }
 
 
 void
-BWindow::prepareView(BView *view)
-{
-	// TODO: implement
-}
-
-
-void
-BWindow::attachView(BView *view)
-{
-	// TODO: implement
-}
-
-
-void
-BWindow::detachView(BView *view)
-{
-	// TODO: implement
-}
-
-
-void
-BWindow::setFocus(BView *focusView, bool notifyInputServer)
+BWindow::_SetFocus(BView *focusView, bool notifyInputServer)
 {
 	if (fFocus == focusView)
 		return;
@@ -2450,19 +2410,9 @@ BWindow::setFocus(BView *focusView, bool notifyInputServer)
 }
 
 
-void
-BWindow::handleActivation(bool active)
-{
-	WindowActivated(active);
-
-	// recursively call hook function 'WindowActivated(bool)'
-	// for all views attached to this window.
-	fTopView->_Activate(active);
-}
-
-
 /*!
-	\brief Determines the target of a message received.
+	\brief Determines the target of a message received for the
+		focus view.
 */
 BHandler *
 BWindow::_DetermineTarget(BMessage *message, BHandler *target)
@@ -2472,6 +2422,17 @@ BWindow::_DetermineTarget(BMessage *message, BHandler *target)
 	switch (message->what) {
 		case B_KEY_DOWN:
 		case B_KEY_UP:
+		{
+			// if we have a default button, it might want to hear
+			// about pressing the <enter> key
+			int32 rawChar;
+			if (DefaultButton() != NULL
+				&& message->FindInt32("raw_char", &rawChar) == B_OK
+				&& rawChar == B_ENTER)
+				return DefaultButton();
+
+			// supposed to fall through
+		}
 		case B_UNMAPPED_KEY_DOWN:
 		case B_UNMAPPED_KEY_UP:
 		case B_MODIFIERS_CHANGED:
@@ -2515,27 +2476,27 @@ BWindow::_DetermineTarget(BMessage *message, BHandler *target)
 	\brief Distributes the message to its intended targets. This is done for
 		all messages that should go to the preferred handler.
 
-	Returns \c false in case the message needs no more processing.
+	Returns \c true in case the message should still be dispatched
 */
 bool
 BWindow::_DistributeMessage(BMessage* message)
 {
-message->PrintToStream();
-	int32 index = 0, count = 0;
+	bool suspend;
+	if (message->FindBool("_suspend_focus", &suspend) != B_OK)
+		suspend = false;
+
+	int32 index = 0;
 	int32 token;
-	for (; message->FindInt32("_token_", index, &token) == B_OK; index++) {
-printf("  token = %ld\n", token);
+	for (; message->FindInt32("_token", index, &token) == B_OK; index++) {
 		BView* target = _FindView(token);
 		if (target == NULL)
 			continue;
 
-printf("distribute message %lx to: %s\n", message->what, target->Name());
 		BMessenger messenger(target);
-		if (messenger.SendMessage(message) == B_OK)
-			count++;
+		messenger.SendMessage(message);
 	}
 
-	return count == 0;
+	return !suspend;
 }
 
 
@@ -2600,16 +2561,6 @@ BWindow::_HandleKeyDown(char key, uint32 modifiers)
 
 	// TODO: convert keys to the encoding of the target view
 
-	// if <ENTER> is pressed and we have a default button
-	// TODO: what happens if we have a focus view? This code looks wrong
-	if (DefaultButton() && key == B_ENTER) {
-		const char *chars;
-		CurrentMessage()->FindString("bytes", &chars);
-
-		DefaultButton()->KeyDown(chars, strlen(chars));
-		return true;
-	}
-
 	return false;
 }
 
@@ -2637,7 +2588,7 @@ BWindow::_KeyboardNavigation()
 		nextFocus = _FindNextNavigable(fFocus, jumpGroups);
 
 	if (nextFocus && nextFocus != fFocus)
-		setFocus(nextFocus, false);
+		_SetFocus(nextFocus, false);
 }
 
 
@@ -2785,64 +2736,6 @@ BWindow::_LastViewChild(BView *parent)
 
 
 void
-BWindow::drawAllViews(BView* aView)
-{
-	if (Lock()) {
-		fTopView->Invalidate();
-		Unlock();
-	}
-	Sync();
-}
-
-
-void
-BWindow::DoUpdate(BView *view, BRect &area)
-{
-	STRACE(("info: BWindow::DoUpdate() BRect(%f,%f,%f,%f) called.\n",
-		area.left, area.top, area.right, area.bottom));
-
-	// don't draw hidden views or their children
-	if (view->IsHidden(view))
-		return;
-
-	view->check_lock();
-
-	if (view->Flags() & B_WILL_DRAW) {
-		// ToDo: make states robust
-		view->PushState();
-		view->Draw(area);
-		view->PopState();
-	} else {
-		// The code below is certainly not correct, because
-		// it redoes what the app_server already did
-		// Find out what happens on R5 if a view has ViewColor() = 
-		// B_TRANSPARENT_COLOR but not B_WILL_DRAW
-/*		rgb_color c = aView->HighColor();
-		aView->SetHighColor(aView->ViewColor());
-		aView->FillRect(aView->Bounds(), B_SOLID_HIGH);
-		aView->SetHighColor(c);*/
-	}
-
-	BView *child = view->fFirstChild;
-	while (child) {
-		if (area.Intersects(child->Frame())) {
-			BRect newArea = area & child->Frame();
-			child->ConvertFromParent(&newArea);
-
-			DoUpdate(child, newArea);
-		}
-		child = child->fNextSibling; 
-	}
-
-	if (view->Flags() & B_WILL_DRAW) {
-		view->PushState();
-		view->DrawAfterChildren(area);
-		view->PopState();
-	}
-}
-
-
-void
 BWindow::SetIsFilePanel(bool yes)
 {
 	// TODO: is this not enough?
@@ -2929,7 +2822,7 @@ BWindow::PrintToStream() const
 		look			= %d\
 		feel			= %d\
 		lastViewToken	= %ld\
-		pulseRUNNER		= %s\n",
+		pulseRunner		= %s\n",
 		fTopViewToken,
 		fPulseEnabled==true?"Yes":"No",
 		fIsFilePanel==true?"Yes":"No",
@@ -2948,13 +2841,11 @@ BWindow::PrintToStream() const
 		(int16)fLook,
 		(int16)fFeel,
 		fLastViewToken,
-		fPulseRunner!=NULL?"In place":"NULL");
+		fPulseRunner != NULL ? "In place" : "NULL");
 }
 
 /*
 TODO list:
-
-	*) take care of temporarely events mask!!!
 	*) test arguments for SetWindowAligment
 	*) call hook functions: MenusBeginning, MenusEnded. Add menu activation code.
 */

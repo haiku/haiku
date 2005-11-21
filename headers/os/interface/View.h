@@ -1,30 +1,10 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		View.h
-//	Author:			Erik Jaesler (erik@cgsoftware.com)
-//	Description:	BView is the base class for all views (clipped regions
-//					within a window).
-//------------------------------------------------------------------------------
-
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Erik Jaesler (erik@cgsoftware.com)
+ */
 #ifndef	_VIEW_H
 #define	_VIEW_H
 
@@ -36,14 +16,14 @@
 #include <Rect.h>
 
 
-// view definitions ------------------------------------------------------------
-
+// mouse button
 enum {
 	B_PRIMARY_MOUSE_BUTTON = 0x01,
 	B_SECONDARY_MOUSE_BUTTON = 0x02,
 	B_TERTIARY_MOUSE_BUTTON = 0x04
 };
 
+// mouse transit
 enum {
 	B_ENTERED_VIEW = 0,
 	B_INSIDE_VIEW,
@@ -51,11 +31,13 @@ enum {
 	B_OUTSIDE_VIEW
 };
 
+// event mask
 enum {
 	B_POINTER_EVENTS		= 0x00000001,
 	B_KEYBOARD_EVENTS		= 0x00000002
 };
 
+// event mask options
 enum {
 	B_LOCK_WINDOW_FOCUS		= 0x00000001,
 	B_SUSPEND_VIEW_FOCUS	= 0x00000002,
@@ -67,6 +49,7 @@ enum {
 	B_TRACK_RECT_CORNER
 };
 
+// set font mask
 enum {
 	B_FONT_FAMILY_AND_STYLE	= 0x00000001,
 	B_FONT_SIZE				= 0x00000002,
@@ -79,6 +62,7 @@ enum {
 	B_FONT_ALL				= 0x000000FF
 };
 
+// view flags
 const uint32 B_FULL_UPDATE_ON_RESIZE 	= 0x80000000UL;	/* 31 */
 const uint32 _B_RESERVED1_ 				= 0x40000000UL;	/* 30 */
 const uint32 B_WILL_DRAW 				= 0x20000000UL;	/* 29 */
@@ -90,12 +74,10 @@ const uint32 B_SUBPIXEL_PRECISE 		= 0x01000000UL;	/* 24 */
 const uint32 B_DRAW_ON_CHILDREN 		= 0x00800000UL;	/* 23 */
 const uint32 B_INPUT_METHOD_AWARE 		= 0x00400000UL;	/* 23 */
 const uint32 _B_RESERVED7_ 				= 0x00200000UL;	/* 22 */
-/*
-#define _RESIZE_MASK_ ~(B_FULL_UPDATE_ON_RESIZE|_B_RESERVED1_|B_WILL_DRAW|\
-		 	B_PULSE_NEEDED|B_NAVIGABLE_JUMP|B_FRAME_EVENTS|B_NAVIGABLE|\
-			B_SUBPIXEL_PRECISE|B_DRAW_ON_CHILDREN|B_INPUT_METHOD_AWARE|_B_RESERVED7_)
-*/
-#define _RESIZE_MASK_ ~(B_FULL_UPDATE_ON_RESIZE|_B_RESERVED1_|B_WILL_DRAW|B_PULSE_NEEDED|B_NAVIGABLE_JUMP|B_FRAME_EVENTS|B_NAVIGABLE|B_SUBPIXEL_PRECISE|B_DRAW_ON_CHILDREN|B_INPUT_METHOD_AWARE|_B_RESERVED7_)
+
+#define _RESIZE_MASK_ ~(B_FULL_UPDATE_ON_RESIZE | _B_RESERVED1_ | B_WILL_DRAW \
+	| B_PULSE_NEEDED | B_NAVIGABLE_JUMP | B_FRAME_EVENTS | B_NAVIGABLE \
+	| B_SUBPIXEL_PRECISE | B_DRAW_ON_CHILDREN | B_INPUT_METHOD_AWARE | _B_RESERVED7_)
 
 const uint32 _VIEW_TOP_ 	= 1UL;
 const uint32 _VIEW_LEFT_ 	= 2UL;
@@ -107,18 +89,18 @@ inline uint32 _rule_(uint32 r1, uint32 r2, uint32 r3, uint32 r4)
 	{ return ((r1 << 12) | (r2 << 8) | (r3 << 4) | r4); }
 
 #define B_FOLLOW_NONE 0
-#define B_FOLLOW_ALL_SIDES		_rule_(_VIEW_TOP_, _VIEW_LEFT_, _VIEW_BOTTOM_, _VIEW_RIGHT_)
-#define B_FOLLOW_ALL  			B_FOLLOW_ALL_SIDES
+#define B_FOLLOW_ALL_SIDES	_rule_(_VIEW_TOP_, _VIEW_LEFT_, _VIEW_BOTTOM_, _VIEW_RIGHT_)
+#define B_FOLLOW_ALL  		B_FOLLOW_ALL_SIDES
 
-#define B_FOLLOW_LEFT			_rule_(0, _VIEW_LEFT_, 0, _VIEW_LEFT_)
-#define B_FOLLOW_RIGHT			_rule_(0, _VIEW_RIGHT_, 0, _VIEW_RIGHT_)
-#define B_FOLLOW_LEFT_RIGHT		_rule_(0, _VIEW_LEFT_, 0, _VIEW_RIGHT_)
-#define B_FOLLOW_H_CENTER		_rule_(0, _VIEW_CENTER_, 0, _VIEW_CENTER_)
+#define B_FOLLOW_LEFT		_rule_(0, _VIEW_LEFT_, 0, _VIEW_LEFT_)
+#define B_FOLLOW_RIGHT		_rule_(0, _VIEW_RIGHT_, 0, _VIEW_RIGHT_)
+#define B_FOLLOW_LEFT_RIGHT	_rule_(0, _VIEW_LEFT_, 0, _VIEW_RIGHT_)
+#define B_FOLLOW_H_CENTER	_rule_(0, _VIEW_CENTER_, 0, _VIEW_CENTER_)
 
-#define B_FOLLOW_TOP			_rule_(_VIEW_TOP_, 0, _VIEW_TOP_, 0)
-#define B_FOLLOW_BOTTOM			_rule_(_VIEW_BOTTOM_, 0, _VIEW_BOTTOM_, 0)
-#define B_FOLLOW_TOP_BOTTOM		_rule_(_VIEW_TOP_, 0, _VIEW_BOTTOM_, 0)
-#define B_FOLLOW_V_CENTER		_rule_(_VIEW_CENTER_, 0, _VIEW_CENTER_, 0)
+#define B_FOLLOW_TOP		_rule_(_VIEW_TOP_, 0, _VIEW_TOP_, 0)
+#define B_FOLLOW_BOTTOM		_rule_(_VIEW_BOTTOM_, 0, _VIEW_BOTTOM_, 0)
+#define B_FOLLOW_TOP_BOTTOM	_rule_(_VIEW_TOP_, 0, _VIEW_BOTTOM_, 0)
+#define B_FOLLOW_V_CENTER	_rule_(_VIEW_CENTER_, 0, _VIEW_CENTER_, 0)
 
 class BBitmap;
 class BCursor;
@@ -166,7 +148,7 @@ public:
 			BView*			PreviousSibling() const;
 			bool			RemoveSelf();
 
-			BWindow			*Window() const;
+			BWindow*		Window() const;
 
 	virtual	void			Draw(BRect updateRect);
 	virtual	void			MouseDown(BPoint where);
@@ -514,11 +496,10 @@ public:
 
 	virtual	void			DrawAfterChildren(BRect r);
 
-		// added by OBOS - DO NOT use this when programming BeOS R5!!!
 			float			Scale() const;
+								// new for Haiku
 
 private:
-
 	friend class BScrollBar;
 	friend class BWindow;
 	friend class BBitmap;
@@ -533,8 +514,6 @@ private:
 	virtual	void			_ReservedView6();
 	virtual	void			_ReservedView7();
 	virtual	void			_ReservedView8();
-
-#if !_PR3_COMPATIBLE_
 	virtual	void			_ReservedView9();
 	virtual	void			_ReservedView10();
 	virtual	void			_ReservedView11();
@@ -543,57 +522,52 @@ private:
 	virtual	void			_ReservedView14();
 	virtual	void			_ReservedView15();
 	virtual	void			_ReservedView16();
-#endif
 
-						BView(const BView&);
-			BView&		operator=(const BView&);
+							BView(const BView&);
+			BView&			operator=(const BView&);
 
-			void		InitData(BRect f, const char* name, uint32 rs, uint32 fl);
-			status_t	ArchiveChildren(BMessage* data, bool deep) const;
-			status_t	UnarchiveChildren(BMessage* data, BWindow* w = NULL);
-			status_t	setViewImage(const BBitmap* bitmap,BRect srcRect, BRect dstRect,
-									 uint32 followFlags, uint32 options);
-			void		BeginPicture_pr(BPicture* a_picture, BRect r);
-			void		SetPattern(pattern pat);
-			void		DoBezier(int32 gr, BPoint* controlPoints, pattern p);
-			void		DoShape(int32 gr, BShape* shape, pattern p);
-			void		DoPictureClip(BPicture* picture, BPoint where, bool invert,
-									  bool sync);
+			void			_InitData(BRect frame, const char* name, uint32 resizeMask,
+								uint32 flags);
+			status_t		_SetViewImage(const BBitmap* bitmap,BRect srcRect,
+								BRect dstRect, uint32 followFlags, uint32 options);
+			void			DoBezier(int32 gr, BPoint* controlPoints, pattern p);
+			void			DoShape(int32 gr, BShape* shape, pattern p);
+			void			DoPictureClip(BPicture* picture, BPoint where, bool invert,
+								bool sync);
 
-			bool		do_owner_check() const;
-			void		_SetOwner(BWindow* newOwner);
-			void		check_lock() const;
-			void		check_lock_no_pick() const;
-			void		movesize(uint32 code, int32 h, int32 v);
-			void		handle_tick();
-			char		*test_area(int32 length);
-			void		removeCommArray();
-			_array_hdr_	*new_comm_array(int32 cnt);
-			void		SetScroller(BScrollBar* sb);
-			void		UnsetScroller(BScrollBar* sb);
-			void		RealScrollTo(BPoint);
-			void		fetch_font();
-			uchar		font_encoding() const;
-			BShelf*		shelf() const;
-			void		set_shelf(BShelf* shelf);
+			bool			do_owner_check() const;
+			bool			do_owner_check_no_pick() const;
+			void			check_lock() const;
+			void			check_lock_no_pick() const;
 
-			void		_Activate(bool state);
-			void		_Pulse();
+			void			_SetOwner(BWindow* newOwner);
+			void			handle_tick();
+			char*			test_area(int32 length);
+			void			removeCommArray();
+			void			SetScroller(BScrollBar* sb);
+			void			UnsetScroller(BScrollBar* sb);
+			void			RealScrollTo(BPoint);
+			void			fetch_font();
+			uchar			font_encoding() const;
+			BShelf*			shelf() const;
+			void			set_shelf(BShelf* shelf);
 
-			void		_UpdateStateForRemove();
-			void		_UpdatePattern(::pattern pattern);
+			void			_Activate(bool state);
+			void			_Attach();
+			void			_Detach();
+			void			_Draw(BRect updateRect);
+			void			_Pulse();
 
-			void		deleteView( BView* aView);
-			bool		do_owner_check_no_pick() const;
-			bool		attachView( BView *aView );
-			bool		_AddChildToList(BView* child, BView* before = NULL);
-			bool		_RemoveChildFromList(BView* child);
-			void		callAttachHooks( BView *aView );
-			void		callDetachHooks( BView *aView );
+			void			_UpdateStateForRemove();
+			void			_UpdatePattern(::pattern pattern);
+
+			bool			_CreateSelf();
+			bool			_AddChildToList(BView* child, BView* before = NULL);
+			bool			_RemoveChildFromList(BView* child);
 
 			// Debugging methods
-			void 		PrintToStream();
-			void		PrintTree();
+			void 			PrintToStream();
+			void			PrintTree();
 
 			int32			server_token;
 			uint32			fFlags;
@@ -605,28 +579,23 @@ private:
 			BView*			fFirstChild;
 
 			int16 			fShowLevel;
-			bool			top_level_view;	// used
+			bool			fTopLevelView;
 			bool			fNoISInteraction;
-			BPicture*		cpicture;		// used
-			_array_data_*	comm;			// used
+			BPicture*		cpicture;
+			_array_data_*	comm;
 
-			BScrollBar*		fVerScroller;	// used
-			BScrollBar*		fHorScroller;	// used
+			BScrollBar*		fVerScroller;
+			BScrollBar*		fHorScroller;
 			bool			f_is_printing;
-			bool			_unused_bool0;				// was: attached;
+			bool			_unused_bool0;
 			bool			_unused_bool1;
 			bool			_unused_bool2;
-			BPrivate::ViewState*	fPermanentState;	// not used
 			BPrivate::ViewState*	fState;
 			BRect			fBounds;
 			BShelf*			fShelf;
-			void*			pr_state;			// not used
 			uint32			fEventMask;
 			uint32			fEventOptions;
-			uint32			_reserved[4];
-#if !_PR3_COMPATIBLE_
-			uint32			_more_reserved[3];
-#endif
+			uint32			_reserved[9];
 };
 
 
