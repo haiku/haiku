@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src system libroot posix glibc stdlib ;
 
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch $(TARGET_ARCH) ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 
 KernelMergeObject posix_gnu_stdlib.o :
@@ -17,6 +18,9 @@ KernelMergeObject posix_gnu_stdlib.o :
 	lcong48_r.c
 	lrand48.c
 	lrand48_r.c
+	mblen.c
+	mbstowcs.c
+	mbtowc.c
 	mrand48.c
 	mrand48_r.c
 	nrand48.c
@@ -25,5 +29,7 @@ KernelMergeObject posix_gnu_stdlib.o :
 	seed48_r.c
 	srand48.c
 	srand48_r.c
+	wcstombs.c
+	wctomb.c
 	: -fPIC -DPIC
 	;

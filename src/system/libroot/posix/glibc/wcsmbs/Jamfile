@@ -7,22 +7,59 @@ SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc libio ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc wcsmbs ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc iconv ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc stdlib ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
+
+SubDirCcFlags -D_GNU_SOURCE -DUSE_IN_LIBIO ;
 
 # ToDo: for now, all wide character functions are disabled
 
 KernelMergeObject posix_gnu_wcsmbs.o :
+	btowc.c
 	mbrlen.c
 	mbrtowc.c
 	mbsinit.c
 	mbsnrtowcs.c
+	mbsrtowcs.c
+#	mbsrtowcs_l.c
+	wcpcpy.c
+	wcpncpy.c
 	wcrtomb.c
+	wcscasecmp.c
+#	wcscasecmp_l.c
+	wcscat.c
+	wcschr.c
+	wcschrnul.c
+	wcscmp.c
+#	wcscoll.c
+	wcscpy.c
+	wcscspn.c
+	wcsdup.c
 	wcslen.c
 	wcsmbsload.c
+	wcsncase.c
+	wcsncat.c
+	wcsncmp.c
+	wcsncpy.c
 	wcsnlen.c
+	wcspbrk.c
+	wcsrchr.c
 	wcsrtombs.c
+	wcsspn.c
+	wcsstr.c
+#	wcstod.c
+#	wcstof.c
+	wcstok.c
+#	wcstold.c
+	wcswidth.c
+#	wcsxfrm.c
+	wctob.c
+	wcwidth.c
+	wmemchr.c
+	wmemcmp.c
 	wmemcpy.c
-	wmempcpy.c
 	wmemmove.c
+	wmempcpy.c
+	wmemset.c
 	: -fPIC -DPIC
 	;

@@ -14,7 +14,7 @@ KernelMergeObject posix_stdlib.o :
 	heapsort.c 
 	merge.c
 	mktemp.c
-	multibyte.c 
+#	multibyte.c 
 	qsort.c 
 	radixsort.c 
 	rand.c 

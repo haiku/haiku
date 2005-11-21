@@ -1,6 +1,6 @@
 /* Read decimal floating point numbers.
    This file is part of the GNU C Library.
-   Copyright (C) 1995-2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1995,96,97,98,99,2000,2001 Free Software Foundation, Inc.
    Contributed by Ulrich Drepper <drepper@gnu.org>, 1995.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -64,11 +64,9 @@
 /* The gmp headers need some configuration frobs.  */
 #define HAVE_ALLOCA 1
 
-/* Include gmp-mparam.h first, such that definitions of _SHORT_LIMB
-   and _LONG_LONG_LIMB in it can take effect into gmp.h.  */
-#include <gmp-mparam.h>
 #include <gmp.h>
 #include <gmp-impl.h>
+#include <gmp-mparam.h>
 #include <longlong.h>
 #include "fpioconst.h"
 
@@ -159,7 +157,7 @@ extern FLOAT MPN2FLOAT (mp_srcptr mpn, int exponent, int negative);
 #  define MAX_FAC_PER_LIMB	1000000000UL
 #elif	BITS_PER_MP_LIMB == 64
 #  define MAX_DIG_PER_LIMB	19
-#  define MAX_FAC_PER_LIMB	10000000000000000000ULL
+#  define MAX_FAC_PER_LIMB	10000000000000000000UL
 #else
 #  error "mp_limb_t size " BITS_PER_MP_LIMB "not accounted for"
 #endif
@@ -168,14 +166,14 @@ extern FLOAT MPN2FLOAT (mp_srcptr mpn, int exponent, int negative);
 /* Local data structure.  */
 static const mp_limb_t _tens_in_limb[MAX_DIG_PER_LIMB + 1] =
 {    0,                   10,                   100,
-     1000,                10000,                100000L,
-     1000000L,            10000000L,            100000000L,
-     1000000000L
+     1000,                10000,                100000,
+     1000000,             10000000,             100000000,
+     1000000000
 #if BITS_PER_MP_LIMB > 32
-	        ,	  10000000000ULL,       100000000000ULL,
-     1000000000000ULL,    10000000000000ULL,    100000000000000ULL,
-     1000000000000000ULL, 10000000000000000ULL, 100000000000000000ULL,
-     1000000000000000000ULL, 10000000000000000000ULL
+	       ,	   10000000000U,          100000000000U,
+     1000000000000U,       10000000000000U,       100000000000000U,
+     1000000000000000U,    10000000000000000U,    100000000000000000U,
+     1000000000000000000U, 10000000000000000000U
 #endif
 #if BITS_PER_MP_LIMB > 64
   #error "Need to expand tens_in_limb table to" MAX_DIG_PER_LIMB
@@ -558,8 +556,7 @@ INTERNAL (STRTOF) (nptr, endptr, group LOCALE_PARAM)
   /* Return 0.0 if no legal string is found.
      No character is used even if a sign was found.  */
 #ifdef USE_WIDE_CHAR
-  if (c == (wint_t) decimal
-      && (wint_t) cp[1] >= L'0' && (wint_t) cp[1] <= L'9')
+  if (c == decimal && cp[1] >= L'0' && cp[1] <= L'9')
     {
       /* We accept it.  This funny construct is here only to indent
 	 the code directly.  */
@@ -651,7 +648,7 @@ INTERNAL (STRTOF) (nptr, endptr, group LOCALE_PARAM)
 
   /* Ignore leading zeroes.  This helps us to avoid useless computations.  */
 #ifdef USE_WIDE_CHAR
-  while (c == L'0' || ((wint_t) thousands != L'\0' && c == (wint_t) thousands))
+  while (c == L'0' || (thousands != L'\0' && c == thousands))
     c = *++cp;
 #else
   if (thousands == NULL)
@@ -678,19 +675,17 @@ INTERNAL (STRTOF) (nptr, endptr, group LOCALE_PARAM)
   /* If no other digit but a '0' is found the result is 0.0.
      Return current read pointer.  */
   if ((c < L_('0') || c > L_('9'))
-      && (base == 16 && (c < (CHAR_TYPE) TOLOWER (L_('a'))
-			 || c > (CHAR_TYPE) TOLOWER (L_('f'))))
+      && (base == 16 && (c < TOLOWER (L_('a')) || c > TOLOWER (L_('f'))))
 #ifdef USE_WIDE_CHAR
-      && c != (wint_t) decimal
+      && c != decimal
 #else
       && ({ for (cnt = 0; decimal[cnt] != '\0'; ++cnt)
 	      if (decimal[cnt] != cp[cnt])
 		break;
 	    decimal[cnt] != '\0'; })
 #endif
-      && (base == 16 && (cp == start_of_digits
-			 || (CHAR_TYPE) TOLOWER (c) != L_('p')))
-      && (base != 16 && (CHAR_TYPE) TOLOWER (c) != L_('e')))
+      && (base == 16 && (cp == start_of_digits || TOLOWER (c) != L_('p')))
+      && (base != 16 && TOLOWER (c) != L_('e')))
     {
       tp = correctly_grouped_prefix (start_of_digits, cp, thousands, grouping);
       /* If TP is at the start of the digits, there was no correctly
@@ -705,13 +700,12 @@ INTERNAL (STRTOF) (nptr, endptr, group LOCALE_PARAM)
   while (1)
     {
       if ((c >= L_('0') && c <= L_('9'))
-	  || (base == 16 && (wint_t) TOLOWER (c) >= L_('a')
-	      && (wint_t) TOLOWER (c) <= L_('f')))
+	  || (base == 16 && TOLOWER (c) >= L_('a') && TOLOWER (c) <= L_('f')))
 	++dig_no;
       else
 	{
 #ifdef USE_WIDE_CHAR
-	  if ((wint_t) thousands == L'\0' || c != (wint_t) thousands)
+	  if (thousands == L'\0' || c != thousands)
 	    /* Not a digit or separator: end of the integer part.  */
 	    break;
 #else
@@ -771,7 +765,7 @@ INTERNAL (STRTOF) (nptr, endptr, group LOCALE_PARAM)
      numbers like `16.' i.e. with decimal but without trailing digits.  */
   if (
 #ifdef USE_WIDE_CHAR
-      c == (wint_t) decimal
+      c == decimal
 #else
       ({ for (cnt = 0; decimal[cnt] != '\0'; ++cnt)
 	   if (decimal[cnt] != cp[cnt])
@@ -1193,10 +1187,10 @@ INTERNAL (STRTOF) (nptr, endptr, group LOCALE_PARAM)
                         ceil(BITS / 3) =: N
        digits we should have enough bits for the result.  The remaining
        decimal digits give us the information that more bits are following.
-       This can be used while rounding.  (Two added as a safety margin.)  */
-    if (dig_no - int_no > (MANT_DIG - bits + 2) / 3 + 2)
+       This can be used while rounding.  (One added as a safety margin.)  */
+    if (dig_no - int_no > (MANT_DIG - bits + 2) / 3 + 1)
       {
-        dig_no = int_no + (MANT_DIG - bits + 2) / 3 + 2;
+        dig_no = int_no + (MANT_DIG - bits + 2) / 3 + 1;
         more_bits = 1;
       }
     else
@@ -1475,6 +1469,9 @@ INTERNAL (STRTOF) (nptr, endptr, group LOCALE_PARAM)
 		      for (i = RETURN_LIMB_SIZE; i > empty; --i)
 			retval[i] = retval[i - empty];
 #endif
+#if RETURN_LIMB_SIZE > 1
+		      retval[1] = 0;
+#endif
 		      for (i = numsize; i > 0; --i)
 			num[i + empty] = num[i - 1];
 		      MPN_ZERO (num, empty + 1);
@@ -1563,10 +1560,6 @@ INTERNAL (STRTOF) (nptr, endptr, group LOCALE_PARAM)
 
   /* NOTREACHED */
 }
-#if defined _LIBC \
-    && !(defined USE_IN_EXTENDED_LOCALE_MODEL && defined USE_WIDE_CHAR)
-libc_hidden_def (INTERNAL (STRTOF))
-#endif
 
 /* External user entry point.  */
 

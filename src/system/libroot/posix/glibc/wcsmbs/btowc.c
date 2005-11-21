@@ -1,4 +1,4 @@
-/* Copyright (C) 1996,1997,1998,1999,2000,2002 Free Software Foundation, Inc.
+/* Copyright (C) 1996, 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@gnu.org>, 1996.
 
@@ -30,58 +30,44 @@ wint_t
 __btowc (c)
      int c;
 {
-  const struct gconv_fcts *fcts;
+  wchar_t result;
+  struct __gconv_step_data data;
+  unsigned char inbuf[1];
+  const unsigned char *inptr = inbuf;
+  size_t dummy;
+  int status;
 
   /* If the parameter does not fit into one byte or it is the EOF value
      we can give the answer now.  */
   if (c < SCHAR_MIN || c > UCHAR_MAX || c == EOF)
     return WEOF;
 
-  /* Get the conversion functions.  */
-  fcts = get_gconv_fcts (_NL_CURRENT_DATA (LC_CTYPE));
+  /* Tell where we want the result.  */
+  data.__outbuf = (unsigned char *) &result;
+  data.__outbufend = data.__outbuf + sizeof (wchar_t);
+  data.__invocation_counter = 0;
+  data.__internal_use = 1;
+  data.__flags = __GCONV_IS_LAST;
+  data.__statep = &data.__state;
+  data.__trans = NULL;
 
-  if (__builtin_expect (fcts->towc_nsteps == 1, 1)
-      && __builtin_expect (fcts->towc->__btowc_fct != NULL, 1))
-    {
-      /* Use the shortcut function.  */
-      return DL_CALL_FCT (fcts->towc->__btowc_fct,
-			  (fcts->towc, (unsigned char) c));
-    }
-  else
-    {
-      /* Fall back to the slow but generic method.  */
-      wchar_t result;
-      struct __gconv_step_data data;
-      unsigned char inbuf[1];
-      const unsigned char *inptr = inbuf;
-      size_t dummy;
-      int status;
+  /* Make sure we start in the initial state.  */
+  memset (&data.__state, '\0', sizeof (mbstate_t));
 
-      /* Tell where we want the result.  */
-      data.__outbuf = (unsigned char *) &result;
-      data.__outbufend = data.__outbuf + sizeof (wchar_t);
-      data.__invocation_counter = 0;
-      data.__internal_use = 1;
-      data.__flags = __GCONV_IS_LAST;
-      data.__statep = &data.__state;
-      data.__trans = NULL;
+  /* Make sure we use the correct function.  */
+  update_conversion_ptrs ();
 
-      /* Make sure we start in the initial state.  */
-      memset (&data.__state, '\0', sizeof (mbstate_t));
+  /* Create the input string.  */
+  inbuf[0] = c;
 
-      /* Create the input string.  */
-      inbuf[0] = c;
+  status = DL_CALL_FCT (__wcsmbs_gconv_fcts.towc->__fct,
+			(__wcsmbs_gconv_fcts.towc, &data, &inptr, inptr + 1,
+			 NULL, &dummy, 0, 1));
+  /* The conversion failed.  */
+  if (status != __GCONV_OK && status != __GCONV_FULL_OUTPUT
+      && status != __GCONV_EMPTY_INPUT)
+    result = WEOF;
 
-      status = DL_CALL_FCT (fcts->towc->__fct,
-			    (fcts->towc, &data, &inptr, inptr + 1,
-			     NULL, &dummy, 0, 1));
-
-      if (status != __GCONV_OK && status != __GCONV_FULL_OUTPUT
-	  && status != __GCONV_EMPTY_INPUT)
-	/* The conversion failed.  */
-	result = WEOF;
-
-      return result;
-    }
+  return result;
 }
 weak_alias (__btowc, btowc)

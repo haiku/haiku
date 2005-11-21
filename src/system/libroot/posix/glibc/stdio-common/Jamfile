@@ -44,7 +44,7 @@ KernelMergeObject posix_gnu_stdio.o : #_common.o :
 #	<$(SOURCE_GRIST)>vfprintf_stub.c
 #	<$(SOURCE_GRIST)>vfscanf_stub.c
 	<$(SOURCE_GRIST)>vfscanf.c
-#	<$(SOURCE_GRIST)>vfwprintf.c
+	<$(SOURCE_GRIST)>vfwprintf.c
 #	<$(SOURCE_GRIST)>vfwscanf.c
 	<$(SOURCE_GRIST)>vprintf.c
 	:

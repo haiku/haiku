@@ -87,33 +87,33 @@ KernelMergeObject posix_gnu_libio.o :
 
 	# wide character
 
-#	<$(SOURCE_GRIST)>fputwc.c
-#	<$(SOURCE_GRIST)>fputwc_u.c
-#	<$(SOURCE_GRIST)>fwprintf.c
+	<$(SOURCE_GRIST)>fputwc.c
+	<$(SOURCE_GRIST)>fputwc_u.c
+	<$(SOURCE_GRIST)>fwprintf.c
 #	<$(SOURCE_GRIST)>fwscanf.c
-#	<$(SOURCE_GRIST)>getwc.c
-#	<$(SOURCE_GRIST)>getwc_u.c
-#	<$(SOURCE_GRIST)>iofputws.c
-#	<$(SOURCE_GRIST)>iofputws_u.c
-#	<$(SOURCE_GRIST)>iogetwline.c
-#	<$(SOURCE_GRIST)>ioungetwc.c
+	<$(SOURCE_GRIST)>getwc.c
+	<$(SOURCE_GRIST)>getwc_u.c
+	<$(SOURCE_GRIST)>iofputws.c
+	<$(SOURCE_GRIST)>iofputws_u.c
+	<$(SOURCE_GRIST)>iogetwline.c
+	<$(SOURCE_GRIST)>ioungetwc.c
 #	<$(SOURCE_GRIST)>iovswscanf.c
 	<$(SOURCE_GRIST)>iowpadn.c
-#	<$(SOURCE_GRIST)>putwc.c
-#	<$(SOURCE_GRIST)>putwc_u.c
-#	<$(SOURCE_GRIST)>putwchar.c
-#	<$(SOURCE_GRIST)>putwchar_u.c
-#	<$(SOURCE_GRIST)>swprintf.c
+	<$(SOURCE_GRIST)>putwc.c
+	<$(SOURCE_GRIST)>putwc_u.c
+	<$(SOURCE_GRIST)>putwchar.c
+	<$(SOURCE_GRIST)>putwchar_u.c
+	<$(SOURCE_GRIST)>swprintf.c
 #	<$(SOURCE_GRIST)>swscanf.c
-#	<$(SOURCE_GRIST)>vswprintf.c
-#	<$(SOURCE_GRIST)>vwprintf.c
+	<$(SOURCE_GRIST)>vswprintf.c
+	<$(SOURCE_GRIST)>vwprintf.c
 #	<$(SOURCE_GRIST)>vwscanf.c
 #	<$(SOURCE_GRIST)>wfiledoalloc.c
 #	<$(SOURCE_GRIST)>wfileops.c
 	<$(SOURCE_GRIST)>wgenops.c
-#	<$(SOURCE_GRIST)>wprintf.c
+	<$(SOURCE_GRIST)>wprintf.c
 #	<$(SOURCE_GRIST)>wscanf.c
-#	<$(SOURCE_GRIST)>wstrops.c
+	<$(SOURCE_GRIST)>wstrops.c
 	:
 	-fPIC -DPIC
 	;

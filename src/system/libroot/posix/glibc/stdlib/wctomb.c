@@ -1,4 +1,4 @@
-/* Copyright (C) 1991, 1992, 1995-1999, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1991, 92, 95, 96, 97, 98, 99 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@
 #include <wcsmbs/wcsmbsload.h>
 
 
-extern mbstate_t __no_r_state attribute_hidden;	/* Defined in mbtowc.c.  */
+extern mbstate_t __no_r_state;	/* Defined in mbtowc.c.  */
 
 /* Convert WCHAR into its multibyte character representation,
    putting this in S and returning its length.
@@ -40,18 +40,15 @@ wctomb (char *s, wchar_t wchar)
      not.  */
   if (s == NULL)
     {
-      const struct gconv_fcts *fcts;
-
-      /* Get the conversion functions.  */
-      fcts = get_gconv_fcts (_NL_CURRENT_DATA (LC_CTYPE));
+      /* Make sure we use the correct value.  */
+      update_conversion_ptrs ();
 
       /* This is an extension in the Unix standard which does not directly
 	 violate ISO C.  */
       memset (&__no_r_state, '\0', sizeof __no_r_state);
 
-      return fcts->tomb->__stateful;
+      return __wcsmbs_gconv_fcts.tomb->__stateful;
     }
 
   return __wcrtomb (s, wchar, &__no_r_state);
 }
-libc_hidden_def (wctomb)

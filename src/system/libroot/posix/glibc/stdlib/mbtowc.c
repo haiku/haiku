@@ -1,4 +1,4 @@
-/* Copyright (C) 1991, 1992, 1995-1999, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1991, 92, 95, 96, 97, 98, 99 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -24,7 +24,7 @@
 
 
 /* Common state for all non-restartable conversion functions.  */
-mbstate_t __no_r_state attribute_hidden;
+mbstate_t __no_r_state;
 
 /* Convert the multibyte character at S, which is no longer
    than N characters, to its `wchar_t' representation, placing
@@ -44,16 +44,14 @@ mbtowc (wchar_t *pwc, const char *s, size_t n)
      not.  */
   if (s == NULL)
     {
-      const struct gconv_fcts *fcts;
-
-      /* Get the conversion functions.  */
-      fcts = get_gconv_fcts (_NL_CURRENT_DATA (LC_CTYPE));
+      /* Make sure we use the correct value.  */
+      update_conversion_ptrs ();
 
       /* This is an extension in the Unix standard which does not directly
 	 violate ISO C.  */
       memset (&__no_r_state, '\0', sizeof __no_r_state);
 
-      result = fcts->towc->__stateful;
+      result = __wcsmbs_gconv_fcts.towc->__stateful;
     }
   else if (*s == '\0')
     {

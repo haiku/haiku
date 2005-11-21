@@ -1,4 +1,4 @@
-/* Copyright (C) 1991-1999, 2000, 2001 Free Software Foundation, Inc.
+/* Copyright (C) 1991-1999, 2000, 2001, 2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -29,6 +29,7 @@
 #include <sys/param.h>
 #include "_itoa.h"
 #include <locale/localeinfo.h>
+#include <stdio.h>
 
 /* This code is shared between the standard stdio implementation found
    in GNU C library and the libio implementation originally found in
@@ -75,7 +76,7 @@
 #  define PUT(F, S, N)	_IO_sputn ((F), (S), (N))
 #  define PAD(Padchar) \
   if (width > 0)							      \
-    done += _IO_padn (s, (Padchar), width)
+    done += INTUSE(_IO_padn) (s, (Padchar), width)
 #  define PUTC(C, F)	_IO_putc_unlocked (C, F)
 #  define ORIENT	if (s->_vtable_offset == 0 && _IO_fwide (s, -1) != -1)\
 			  return -1
@@ -104,7 +105,6 @@
 # endif
 #else /* ! USE_IN_LIBIO */
 /* This code is for use in the GNU C library.  */
-# include <stdio.h>
 # define ARGCHECK(S, Format) \
   do									      \
     {									      \
@@ -253,6 +253,7 @@ vfprintf (FILE *s, const CHAR_T *format, va_list ap)
 
   /* Buffer intermediate results.  */
   CHAR_T work_buffer[1000];
+  CHAR_T *workstart = NULL;
   CHAR_T *workend;
 
   /* State for restartable multibyte character handling functions.  */
@@ -580,8 +581,10 @@ vfprintf (FILE *s, const CHAR_T *format, va_list ap)
 	  else								      \
 	    if (is_long_num)						      \
 	      signed_number = args_value[fspec->data_arg].pa_long_int;	      \
-	    else							      \
+	    else if (!is_short)						      \
 	      signed_number = args_value[fspec->data_arg].pa_int;	      \
+	    else	      						      \
+	      signed_number = args_value[fspec->data_arg].pa_short_int;	      \
 									      \
 	  is_negative = signed_number < 0;				      \
 	  number.word = is_negative ? (- signed_number) : signed_number;      \
@@ -935,8 +938,6 @@ vfprintf (FILE *s, const CHAR_T *format, va_list ap)
 	    *(long int *) va_arg (ap, void *) = done;			      \
 	  else if (is_char)						      \
 	    *(char *) va_arg (ap, void *) = done;			      \
-	  else if (is_long_num)						      \
-	    *(long int *) va_arg (ap, void *) = done;			      \
 	  else if (!is_short)						      \
 	    *(int *) va_arg (ap, void *) = done;			      \
 	  else								      \
@@ -945,8 +946,6 @@ vfprintf (FILE *s, const CHAR_T *format, va_list ap)
       else								      \
 	if (is_longlong)						      \
 	  *(long long int *) args_value[fspec->data_arg].pa_pointer = done;   \
-	else if (is_long_num)						      \
-	  *(long int *) args_value[fspec->data_arg].pa_pointer = done;	      \
 	else if (is_long_num)						      \
 	  *(long int *) args_value[fspec->data_arg].pa_pointer = done;	      \
 	else if (is_char)						      \
@@ -990,7 +989,7 @@ vfprintf (FILE *s, const CHAR_T *format, va_list ap)
 	if (!left)							      \
 	  PAD (L' ');							      \
         if (fspec == NULL)						      \
-	  outchar (va_arg (ap, wint_t));				      \
+	  outchar (va_arg (ap, wchar_t));				      \
 	else								      \
 	  outchar (args_value[fspec->data_arg].pa_wchar);		      \
 	if (left)							      \
@@ -1036,14 +1035,18 @@ vfprintf (FILE *s, const CHAR_T *format, va_list ap)
 	    const char *mbs = (const char *) string;			      \
 	    mbstate_t mbstate;						      \
 									      \
-	    len = prec != -1 ? prec : strlen (mbs);			      \
+	    len = prec != -1 ? (size_t) prec : strlen (mbs);		      \
 									      \
 	    /* Allocate dynamically an array which definitely is long	      \
 	       enough for the wide character version.  */		      \
-	    if (len < 8192						      \
-		|| ((string = (CHAR_T *) malloc (len * sizeof (wchar_t)))     \
-		    == NULL))						      \
+	    if (len < 8192)						      \
 	      string = (CHAR_T *) alloca (len * sizeof (wchar_t));	      \
+	    else if ((string = (CHAR_T *) malloc (len * sizeof (wchar_t)))    \
+		     == NULL)						      \
+	      {								      \
+		done = -1;						      \
+		goto all_done;						      \
+	      }								      \
 	    else							      \
 	      string_malloced = 1;					      \
 									      \
@@ -1077,7 +1080,7 @@ vfprintf (FILE *s, const CHAR_T *format, va_list ap)
 	outstring (string, len);					      \
 	if (left)							      \
 	  PAD (L' ');							      \
-	if (string_malloced)						      \
+	if (__builtin_expect (string_malloced, 0))			      \
 	  free (string);						      \
       }									      \
       break;
@@ -1106,7 +1109,7 @@ vfprintf (FILE *s, const CHAR_T *format, va_list ap)
 	size_t len;							      \
 									      \
 	memset (&mbstate, '\0', sizeof (mbstate_t));			      \
-	len = __wcrtomb (buf, (fspec == NULL ? va_arg (ap, wint_t)	      \
+	len = __wcrtomb (buf, (fspec == NULL ? va_arg (ap, wchar_t)	      \
 			       : args_value[fspec->data_arg].pa_wchar),	      \
 			 &mbstate);					      \
 	if (len == (size_t) -1)						      \
@@ -1198,9 +1201,13 @@ vfprintf (FILE *s, const CHAR_T *format, va_list ap)
 	    if (prec >= 0)						      \
 	      {								      \
 		/* The string `s2' might not be NUL terminated.  */	      \
-		if (prec < 32768					      \
-		    || (string = (char *) malloc (prec)) == NULL)	      \
+		if (prec < 32768)					      \
 		  string = (char *) alloca (prec);			      \
+		else if ((string = (char *) malloc (prec)) == NULL)	      \
+		  {							      \
+		    done = -1;						      \
+		    goto all_done;					      \
+		  }							      \
 		else							      \
 		  string_malloced = 1;					      \
 		len = __wcsrtombs (string, &s2, prec, &mbstate);	      \
@@ -1212,9 +1219,13 @@ vfprintf (FILE *s, const CHAR_T *format, va_list ap)
 		  {							      \
 		    assert (__mbsinit (&mbstate));			      \
 		    s2 = (const wchar_t *) string;			      \
-		    if (len + 1 < 32768					      \
-			|| (string = (char *) malloc (len + 1)) == NULL)      \
+		    if (len + 1 < 32768)				      \
 		      string = (char *) alloca (len + 1);		      \
+		    else if ((string = (char *) malloc (len + 1)) == NULL)    \
+		      {							      \
+			done = -1;					      \
+			goto all_done;					      \
+		      }							      \
 		    else						      \
 		      string_malloced = 1;				      \
 		    (void) __wcsrtombs (string, &s2, len + 1, &mbstate);      \
@@ -1240,7 +1251,7 @@ vfprintf (FILE *s, const CHAR_T *format, va_list ap)
 	outstring (string, len);					      \
 	if (left)							      \
 	  PAD (' ');							      \
-	if (string_malloced)						      \
+	if (__builtin_expect (string_malloced, 0))			      \
 	  free (string);						      \
       }									      \
       break;
@@ -1350,6 +1361,7 @@ vfprintf (FILE *s, const CHAR_T *format, va_list ap)
       UCHAR_T pad = L_(' ');/* Padding character.  */
       CHAR_T spec;
 
+      workstart = NULL;
       workend = &work_buffer[sizeof (work_buffer) / sizeof (CHAR_T)];
 
       /* Get current character in format string.  */
@@ -1431,11 +1443,25 @@ vfprintf (FILE *s, const CHAR_T *format, va_list ap)
 	    left = 1;
 	  }
 
-	if (width + 32 >= (int) (sizeof (work_buffer) / sizeof (work_buffer[0])))
-	  /* We have to use a special buffer.  The "32" is just a safe
-	     bet for all the output which is not counted in the width.  */
-	  workend = ((CHAR_T *) alloca ((width + 32) * sizeof (CHAR_T))
-		     + (width + 32));
+	if (width + 32 >= (int) (sizeof (work_buffer)
+				 / sizeof (work_buffer[0])))
+	  {
+	    /* We have to use a special buffer.  The "32" is just a safe
+	       bet for all the output which is not counted in the width.  */
+	    if (width < (int) (32768 / sizeof (CHAR_T)))
+	      workend = ((CHAR_T *) alloca ((width + 32) * sizeof (CHAR_T))
+			 + (width + 32));
+	    else
+	      {
+		workstart = (CHAR_T *) malloc ((width + 32) * sizeof (CHAR_T));
+		if (workstart == NULL)
+		  {
+		    done = -1;
+		    goto all_done;
+		  }
+		workend = workstart + (width + 32);
+	      }
+	  }
       }
       JUMP (*f, step1_jumps);
 
@@ -1444,10 +1470,23 @@ vfprintf (FILE *s, const CHAR_T *format, va_list ap)
       width = read_int (&f);
 
       if (width + 32 >= (int) (sizeof (work_buffer) / sizeof (work_buffer[0])))
-	/* We have to use a special buffer.  The "32" is just a safe
-	   bet for all the output which is not counted in the width.  */
-	workend = ((CHAR_T *) alloca ((width + 32) * sizeof (CHAR_T))
-		   + (width + 32));
+	{
+	  /* We have to use a special buffer.  The "32" is just a safe
+	     bet for all the output which is not counted in the width.  */
+	  if (width < (int) (32768 / sizeof (CHAR_T)))
+	    workend = ((CHAR_T *) alloca ((width + 32) * sizeof (CHAR_T))
+		       + (width + 32));
+	  else
+	    {
+	      workstart = (CHAR_T *) malloc ((width + 32) * sizeof (CHAR_T));
+	      if (workstart == NULL)
+		{
+		  done = -1;
+		  goto all_done;
+		}
+	      workend = workstart + (width + 32);
+	    }
+	}
       if (*f == L_('$'))
 	/* Oh, oh.  The argument comes from a positional parameter.  */
 	goto do_positional;
@@ -1476,7 +1515,20 @@ vfprintf (FILE *s, const CHAR_T *format, va_list ap)
 	prec = 0;
       if (prec > width
 	  && prec + 32 > (int)(sizeof (work_buffer) / sizeof (work_buffer[0])))
-	workend = alloca (spec + 32) + (spec + 32);
+	{
+	  if (prec < (int) (32768 / sizeof (CHAR_T)))
+	    workend = alloca (prec + 32) + (prec + 32);
+	  else
+	    {
+	      workstart = (CHAR_T *) malloc ((prec + 32) * sizeof (CHAR_T));
+	      if (workstart == NULL)
+		{
+		  done = -1;
+		  goto all_done;
+		}
+	      workend = workstart + (prec + 32);
+	    }
+	}
       JUMP (*f, step2_jumps);
 
       /* Process 'h' modifier.  There might another 'h' following.  */
@@ -1538,6 +1590,10 @@ vfprintf (FILE *s, const CHAR_T *format, va_list ap)
 
       /* The format is correctly handled.  */
       ++nspecs_done;
+
+      if (__builtin_expect (workstart != NULL, 0))
+	free (workstart);
+      workstart = NULL;
 
       /* Look for next format specifier.  */
 #ifdef COMPILE_WPRINTF
@@ -1739,6 +1795,7 @@ do_positional:
 	int use_outdigits = specs[nspecs_done].info.i18n;
 	char pad = specs[nspecs_done].info.pad;
 	CHAR_T spec = specs[nspecs_done].info.spec;
+	CHAR_T *workstart = NULL;
 
 	/* Fill in last information.  */
 	if (specs[nspecs_done].width_arg != -1)
@@ -1772,10 +1829,20 @@ do_positional:
 	  }
 
 	/* Maybe the buffer is too small.  */
-	if (MAX (prec, width) + 32 > (int) (sizeof (work_buffer) / sizeof (CHAR_T)))
-	  workend = ((CHAR_T *) alloca ((MAX (prec, width) + 32)
-					* sizeof (CHAR_T))
-		     + (MAX (prec, width) + 32));
+	if (MAX (prec, width) + 32 > (int) (sizeof (work_buffer)
+					    / sizeof (CHAR_T)))
+	  {
+	    if (MAX (prec, width) < (int) (32768 / sizeof (CHAR_T)))
+	      workend = ((CHAR_T *) alloca ((MAX (prec, width) + 32)
+					    * sizeof (CHAR_T))
+			 + (MAX (prec, width) + 32));
+	    else
+	      {
+		workstart = (CHAR_T *) malloc ((MAX (prec, width) + 32)
+					       * sizeof (CHAR_T));
+		workend = workstart + (MAX (prec, width) + 32);
+	      }
+	  }
 
 	/* Process format specifiers.  */
 	while (1)
@@ -1823,6 +1890,10 @@ do_positional:
 	    break;
 	  }
 
+	if (__builtin_expect (workstart != NULL, 0))
+	  free (workstart);
+	workstart = NULL;
+
 	/* Write the following constant string.  */
 	outstring (specs[nspecs_done].end_of_fmt,
 		   specs[nspecs_done].next_fmt
@@ -1831,6 +1902,8 @@ do_positional:
   }
 
 all_done:
+  if (__builtin_expect (workstart != NULL, 0))
+    free (workstart);
   /* Unlock the stream.  */
 #ifdef USE_IN_LIBIO
   _IO_funlockfile (s);
@@ -2006,18 +2079,18 @@ _IO_helper_overflow (_IO_FILE *s, int c)
 static const struct _IO_jump_t _IO_helper_jumps =
 {
   JUMP_INIT_DUMMY,
-  JUMP_INIT (finish, _IO_wdefault_finish),
+  JUMP_INIT (finish, INTUSE(_IO_wdefault_finish)),
   JUMP_INIT (overflow, _IO_helper_overflow),
   JUMP_INIT (underflow, _IO_default_underflow),
-  JUMP_INIT (uflow, _IO_default_uflow),
-  JUMP_INIT (pbackfail, (_IO_pbackfail_t) _IO_wdefault_pbackfail),
-  JUMP_INIT (xsputn, _IO_wdefault_xsputn),
-  JUMP_INIT (xsgetn, _IO_wdefault_xsgetn),
+  JUMP_INIT (uflow, INTUSE(_IO_default_uflow)),
+  JUMP_INIT (pbackfail, (_IO_pbackfail_t) INTUSE(_IO_wdefault_pbackfail)),
+  JUMP_INIT (xsputn, INTUSE(_IO_wdefault_xsputn)),
+  JUMP_INIT (xsgetn, INTUSE(_IO_wdefault_xsgetn)),
   JUMP_INIT (seekoff, _IO_default_seekoff),
   JUMP_INIT (seekpos, _IO_default_seekpos),
-  JUMP_INIT (setbuf,(_IO_setbuf_t)  _IO_wdefault_setbuf),
+  JUMP_INIT (setbuf, _IO_default_setbuf),
   JUMP_INIT (sync, _IO_default_sync),
-  JUMP_INIT (doallocate, _IO_wdefault_doallocate),
+  JUMP_INIT (doallocate, INTUSE(_IO_wdefault_doallocate)),
   JUMP_INIT (read, _IO_default_read),
   JUMP_INIT (write, _IO_default_write),
   JUMP_INIT (seek, _IO_default_seek),
@@ -2028,18 +2101,18 @@ static const struct _IO_jump_t _IO_helper_jumps =
 static const struct _IO_jump_t _IO_helper_jumps =
 {
   JUMP_INIT_DUMMY,
-  JUMP_INIT (finish, _IO_default_finish),
+  JUMP_INIT (finish, INTUSE(_IO_default_finish)),
   JUMP_INIT (overflow, _IO_helper_overflow),
   JUMP_INIT (underflow, _IO_default_underflow),
-  JUMP_INIT (uflow, _IO_default_uflow),
-  JUMP_INIT (pbackfail, _IO_default_pbackfail),
-  JUMP_INIT (xsputn, _IO_default_xsputn),
-  JUMP_INIT (xsgetn, _IO_default_xsgetn),
+  JUMP_INIT (uflow, INTUSE(_IO_default_uflow)),
+  JUMP_INIT (pbackfail, INTUSE(_IO_default_pbackfail)),
+  JUMP_INIT (xsputn, INTUSE(_IO_default_xsputn)),
+  JUMP_INIT (xsgetn, INTUSE(_IO_default_xsgetn)),
   JUMP_INIT (seekoff, _IO_default_seekoff),
   JUMP_INIT (seekpos, _IO_default_seekpos),
   JUMP_INIT (setbuf, _IO_default_setbuf),
   JUMP_INIT (sync, _IO_default_sync),
-  JUMP_INIT (doallocate, _IO_default_doallocate),
+  JUMP_INIT (doallocate, INTUSE(_IO_default_doallocate)),
   JUMP_INIT (read, _IO_default_read),
   JUMP_INIT (write, _IO_default_write),
   JUMP_INIT (seek, _IO_default_seek),
@@ -2083,7 +2156,11 @@ buffered_vfprintf (register _IO_FILE *s, const CHAR_T *format,
   _IO_JUMPS (&helper._f) = (struct _IO_jump_t *) &_IO_helper_jumps;
 
   /* Now print to helper instead.  */
+#if defined USE_IN_LIBIO && !defined COMPILE_WPRINTF
+  result = INTUSE(_IO_vfprintf) (hp, format, args);
+#else
   result = vfprintf (hp, format, args);
+#endif
 
   /* Lock stream.  */
   __libc_cleanup_region_start (1, (void (*) (void *)) &_IO_funlockfile, s);
@@ -2186,6 +2263,8 @@ strong_alias (_IO_vfwprintf, __vfwprintf);
 weak_alias (_IO_vfwprintf, vfwprintf);
 #  else
 strong_alias (_IO_vfprintf, vfprintf);
+libc_hidden_def (vfprintf)
+INTDEF(_IO_vfprintf)
 #  endif
 # else
 #  if defined __ELF__ || defined __GNU_LIBRARY__

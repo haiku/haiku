@@ -29,6 +29,7 @@ KernelMergeObject posix_gnu_arch_$(TARGET_ARCH).o :
 	e_fmodf.S
 	e_fmodl.c
 	ldbl2mpn.c
+	mpn2dbl.c
 	mul.c
 	mul_1.S
 	mul_n.c
@@ -79,6 +80,6 @@ KernelMergeObject posix_gnu_arch_$(TARGET_ARCH).o :
 	;
 
 SEARCH on [ FGristFiles
-	cmp.c divrem.c mul.c mul_n.c dbl2mpn.c s_fpclassify.c s_fpclassifyf.c s_fpclassifyl.c s_modf.c s_modff.c s_modfl.c 
+	cmp.c divrem.c mul.c mul_n.c dbl2mpn.c mpn2dbl.c s_fpclassify.c s_fpclassifyf.c s_fpclassifyl.c s_modf.c s_modff.c s_modfl.c 
 	w_atan2.c w_atan2f.c w_atan2l.c w_fmod.c w_fmodl.c w_fmodf.c
         ] = [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch ] ;

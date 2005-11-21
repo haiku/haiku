@@ -1,6 +1,6 @@
-/* Copyright (C) 1996, 1997, 1999, 2000, 2001 Free Software Foundation, Inc.
+/* Copyright (C) 1996, 2000 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
-   Contributed by Ulrich Drepper <drepper@cygnus.com>, 1996.
+   Contributed by Ulrich Drepper, <drepper@gnu.ai.mit.edu>.
 
    The GNU C Library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -17,25 +17,20 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#include <wchar.h>
-#include "../locale/coll-lookup.h"
+#include <ctype.h>
+#include <wctype.h>
 
-#define STRING_TYPE wchar_t
-#define USTRING_TYPE wint_t
-#ifdef USE_IN_EXTENDED_LOCALE_MODEL
-# define STRCOLL __wcscoll_l
-#else
-# define STRCOLL __wcscoll
-#endif
-#define STRCMP wcscmp
-#define STRLEN __wcslen
-#define WEIGHT_H "../locale/weightwc.h"
-#define SUFFIX	WC
-#define L(arg) L##arg
-#define WIDE_CHAR_VERSION 1
+#include "wchar-lookup.h"
 
-#include "../string/strcoll.c"
 
-#ifndef USE_IN_EXTENDED_LOCALE_MODEL
-weak_alias (__wcscoll, wcscoll)
-#endif
+int
+__iswctype (wint_t wc, wctype_t desc)
+{
+  /* If the user passes in an invalid DESC valid (the one returned from
+     `wctype' in case of an error) simply return 0.  */
+  if (desc == (wctype_t) 0)
+    return 0;
+
+  return wctype_table_lookup ((const char *) desc, wc);
+}
+weak_alias (__iswctype, iswctype)
