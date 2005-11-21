@@ -37,13 +37,13 @@
 struct EventDispatcher::event_target {
 	BMessenger	messenger;
 	int32		token;
-	uint32		events;
+	uint32		event_mask;
 	uint32		options;
-	uint32		temporary_events;
+	uint32		temporary_event_mask;
 	uint32		temporary_options;
 };
 
-static const char* kTokenName = "_token_";
+static const char* kTokenName = "_token";
 
 static const float kMouseMovedImportance = 0.1f;
 static const float kMouseTransitImportance = 1.0f;
@@ -168,12 +168,11 @@ EventDispatcher::SetFocus(const BMessenger* messenger)
 	if (fHasFocus) {
 		fFocus = *messenger;
 
-		// add all B_POINTER_EVENTS tokens that target this messenger
+		// add all tokens that target this messenger
 		for (int32 i = fListeners.CountItems(); i-- > 0;) {
 			event_target* target = fListeners.ItemAt(i);
 
-			if (((target->events | target->temporary_events) & B_POINTER_EVENTS) != 0
-				&& target->messenger == fFocus)
+			if (target->messenger == fFocus)
 				fFocusTokens.AddItem((void *)target->token);
 		}
 	}
@@ -209,30 +208,30 @@ EventDispatcher::_FindListener(const BMessenger& messenger, int32 token,
 */
 bool
 EventDispatcher::_AddListener(const BMessenger& messenger, int32 token,
-	uint32 events, uint32 options, bool temporary)
+	uint32 eventMask, uint32 options, bool temporary)
 {
 	BAutolock _(this);
 	event_target* target = _FindListener(messenger, token);
 	if (target != NULL) {
 		// we already have this target, update its event mask
 		if (temporary) {
-			if (events != 0)
-				target->temporary_events = events;
+			if (eventMask != 0)
+				target->temporary_event_mask = eventMask;
 			target->temporary_options = options;
 		} else {
-			if (events != 0)
-				target->events = events;
+			if (eventMask != 0)
+				target->event_mask = eventMask;
 			target->options = options;
 		}
 
 		return true;
 	}
 
-	if (events == 0)
+	if (eventMask == 0)
 		return false;
 
-	ETRACE(("events: add listener: token %ld, events = %ld, options = %ld, %s\n",
-		token, events, options, temporary ? "temporary" : "permanent"));
+	ETRACE(("events: add listener: token %ld, eventMask = %ld, options = %ld, %s\n",
+		token, eventMask, options, temporary ? "temporary" : "permanent"));
 
 	// we need a new target
 
@@ -244,24 +243,24 @@ EventDispatcher::_AddListener(const BMessenger& messenger, int32 token,
 	target->token = token;
 
 	if (temporary) {
-		target->events = 0;
+		target->event_mask = 0;
 		target->options = 0;
-		target->temporary_events = events;
+		target->temporary_event_mask = eventMask;
 		target->temporary_options = options;
 		if (options & B_SUSPEND_VIEW_FOCUS)
 			fSuspendFocus = true;
 	} else {
-		target->events = events;
+		target->event_mask = eventMask;
 		target->options = options;
-		target->temporary_events = 0;
+		target->temporary_event_mask = 0;
 		target->temporary_options = 0;
 	}
 
 	bool success = fListeners.AddItem(target);
 	if (success) {
-		if ((events & B_POINTER_EVENTS) != 0
-			&& fHasFocus && fFocus == messenger) {
+		if (fHasFocus && fFocus == messenger) {
 			// add this token to the current token list
+			ETRACE(("  add token %ld to focus list\n", token));
 			fFocusTokens.AddItem((void *)token);
 		}
 	} else
@@ -272,46 +271,60 @@ EventDispatcher::_AddListener(const BMessenger& messenger, int32 token,
 
 
 void
+EventDispatcher::_RemoveTemporaryListener(event_target* target, int32 index)
+{
+	if (target->event_mask == 0) {
+		// this is only a temporary target
+		fListeners.RemoveItemAt(index);
+
+		ETRACE(("events: remove temp. listener: token %ld, eventMask = %ld, options = %ld\n",
+			target->token, target->temporary_event_mask, target->temporary_options));
+
+		if (fHasFocus && fFocus == target->messenger) {
+			// remove this token from the current token list
+			ETRACE(("  remove token %ld from focus list\n",
+				target->token));
+			fFocusTokens.RemoveItem((void *)target->token);
+		}
+
+		delete target;
+	} else if (target->temporary_event_mask != 0) {
+		ETRACE(("events: clear temp. listener: token %ld, eventMask = %ld, options = %ld\n",
+			target->token, target->temporary_event_mask, target->temporary_options));
+
+		target->temporary_event_mask = 0;
+		target->temporary_options = 0;
+	}
+}
+
+
+void
 EventDispatcher::_RemoveTemporaryListeners()
 {
 	for (int32 i = fListeners.CountItems(); i-- > 0;) {
 		event_target* target = fListeners.ItemAt(i);
 
-		if (target->events == 0) {
-			// this is only a temporary target
-			fListeners.RemoveItemAt(i);
-			
-			ETRACE(("events: remove temp. listener: token %ld, events = %ld, options = %ld\n",
-				target->token, target->temporary_events, target->temporary_options));
-
-			if ((target->temporary_events & B_POINTER_EVENTS) != 0
-				&& fHasFocus && fFocus == target->messenger) {
-				// remove this token from the current token list
-				fFocusTokens.RemoveItem((void *)target->token);
-			}
-
-			delete target;
-		} else {
-			target->temporary_events = 0;
-			target->temporary_options = 0;
-		}
+		_RemoveTemporaryListener(target, i);
 	}
 }
 
 
 bool
 EventDispatcher::AddListener(const BMessenger& messenger, int32 token,
-	uint32 events, uint32 options)
+	uint32 eventMask, uint32 options)
 {
-	return _AddListener(messenger, token, events, options, false);
+	options &= B_NO_POINTER_HISTORY;
+		// that's currently the only allowed option
+
+	return _AddListener(messenger, token, eventMask, options, false);
 }
 
 
 bool
 EventDispatcher::AddTemporaryListener(const BMessenger& messenger,
-	int32 token, uint32 events, uint32 options)
+	int32 token, uint32 eventMask, uint32 options)
 {
-	return _AddListener(messenger, token, events, options, true);
+	return _AddListener(messenger, token, eventMask, options, true);
 }
 
 
@@ -326,11 +339,18 @@ EventDispatcher::RemoveListener(const BMessenger& messenger, int32 token)
 	if (target == NULL)
 		return;
 
-	if (target->temporary_events != 0) {
+	if (target->temporary_event_mask != 0) {
 		// we still need this event
-		target->events = 0;
+		target->event_mask = 0;
 		target->options = 0;
 		return;
+	}
+
+	if (fHasFocus && fFocus == target->messenger) {
+		// remove this token from the current token list
+		ETRACE(("  remove token %ld from focus list\n",
+			target->token));
+		fFocusTokens.RemoveItem((void *)target->token);
 	}
 
 	fListeners.RemoveItemAt(index);
@@ -348,15 +368,7 @@ EventDispatcher::RemoveTemporaryListener(const BMessenger& messenger, int32 toke
 	if (target == NULL)
 		return;
 
-	if (target->events != 0) {
-		// we still need this event
-		target->temporary_events = 0;
-		target->temporary_options = 0;
-		return;
-	}
-
-	fListeners.RemoveItemAt(index);
-	delete target;
+	_RemoveTemporaryListener(target, index);
 }
 
 
@@ -459,6 +471,7 @@ EventDispatcher::_AddTokens(BMessage* message, BList& tokens)
 	int32 count = tokens.CountItems();
 	for (int32 i = count; i-- > 0;) {
 		int32 token = (int32)tokens.ItemAt(i);
+		ETRACE(("  add token %ld\n", token));
 
 		if (message->AddInt32(kTokenName, token) != B_OK)
 			count--;
@@ -536,8 +549,15 @@ EventDispatcher::_EventLoop()
 			case B_MOUSE_DOWN:
 			case B_MOUSE_UP:
 				if (fMouseFilter != NULL
-					&& fMouseFilter->Filter(event, NULL) == B_SKIP_MESSAGE)
+					&& fMouseFilter->Filter(event, NULL) == B_SKIP_MESSAGE) {
+					// this is a work-around if the wrong B_MOUSE_UP
+					// event is filtered out
+					if (event->what == B_MOUSE_UP) {
+						fSuspendFocus = false;
+						_RemoveTemporaryListeners();
+					}
 					break;
+				}
 
 				pointerEvent = true;
 
@@ -559,13 +579,21 @@ EventDispatcher::_EventLoop()
 
 				keyboardEvent = true;
 
+				if (fHasFocus && _AddTokens(event, fFocusTokens)) {
+					// if tokens were added, we need to explicetly suspend
+					// focus in the event - if not, the event is simply not
+					// forwarded to the target
+					addedTokens = true;
+
+					if (fSuspendFocus)
+						event->AddBool("_suspend_focus", true);
+				}
+
 				// supposed to fall through
 
 			default:
-				if (fHasFocus && !fSuspendFocus) {
-					addedTokens |= _AddTokens(event, fFocusTokens);
+				if (fHasFocus && (!fSuspendFocus || addedTokens))
 					_SendMessage(fFocus, event, kStandardImportance);
-				}
 				break;
 		}
 
@@ -585,7 +613,7 @@ EventDispatcher::_EventLoop()
 					|| (sendToLastFocus && target->messenger == fLastFocus))
 					continue;
 
-				uint32 effectiveEvents = target->events | target->temporary_events;
+				uint32 effectiveEvents = target->event_mask | target->temporary_event_mask;
 
 				// make sure only those interested listeners get the message
 				if ((keyboardEvent && (effectiveEvents & B_KEYBOARD_EVENTS) == 0)
