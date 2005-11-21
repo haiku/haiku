@@ -926,7 +926,8 @@ BMessage::Unflatten(const char* buffer)
 
 	if (magic == kMessageMagicDano || magic == kMessageMagicDanoSwapped) {
 		// dano style message
-		BMemoryIO memoryStream(buffer, BPrivate::dano_message_size(buffer));
+		BMemoryIO memoryStream(buffer,
+			BPrivate::dano_message_flattened_size(buffer));
 		return Unflatten(&memoryStream);
 	}
 
