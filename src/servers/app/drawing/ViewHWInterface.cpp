@@ -205,10 +205,17 @@ CardView::ForwardMessage(BMessage* message)
 	if (message == NULL)
 		return;
 
-	size_t length = message->FlattenedSize();
+	// remove some fields that potentially mess up our own message processing
+	BMessage copy = *message;
+	copy.RemoveName("screen_where");
+	copy.RemoveName("be:transit");
+	copy.RemoveName("be:view_where");
+	copy.RemoveName("be:cursor_needed");
+
+	size_t length = copy.FlattenedSize();
 	char stream[length];
 
-	if (message->Flatten(stream, length) == B_OK)
+	if (copy.Flatten(stream, length) == B_OK)
 		write_port(fInputPort, 0, stream, length);
 }
 
