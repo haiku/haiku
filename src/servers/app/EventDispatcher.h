@@ -49,11 +49,14 @@ class EventDispatcher : public BLocker {
 		void _Unset();
 
 		bool _SendMessage(BMessenger& messenger, BMessage* message, float importance);
+
 		void _SetTransit(BMessage* message, int32 transit);
 		void _UnsetTransit(BMessage* message);
 		bool _AddTokens(BMessage* message, BList& tokens);
 		void _RemoveTokens(BMessage* message);
 		void _SetToken(BMessage* message, int32 token);
+		void _SetFeedFocus(BMessage* message);
+		void _UnsetFeedFocus(BMessage* message);
 
 		event_target* _FindListener(const BMessenger& messenger, int32 token,
 				int32* _index = NULL);

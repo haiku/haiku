@@ -2241,11 +2241,11 @@ BWindow::task_looper()
 						B_HANDLER_TOKEN, (void **)&handler);
 				}
 
-				if (!usePreferred || _DistributeMessage(fLastMessage)) {
-					// if a target was given, and we should not use the preferred
-					// handler, we can just use that one
-					if (handler == NULL || usePreferred)
-						handler = _DetermineTarget(fLastMessage, handler);
+				// if a target was given, and we should not use the preferred
+				// handler, we can just use that one
+				if (handler == NULL || usePreferred)
+					handler = _DetermineTarget(fLastMessage, handler);
+				if (!usePreferred || _DistributeMessage(fLastMessage, handler)) {
 					if (handler == NULL)
 						handler = this;
 
@@ -2471,15 +2471,19 @@ BWindow::_DetermineTarget(BMessage *message, BHandler *target)
 	Returns \c true in case the message should still be dispatched
 */
 bool
-BWindow::_DistributeMessage(BMessage* message)
+BWindow::_DistributeMessage(BMessage* message, BHandler* focus)
 {
-	bool suspend;
-	if (message->FindBool("_suspend_focus", &suspend) != B_OK)
-		suspend = false;
+	bool foundFocus = false;
+	int32 focusToken = B_NULL_TOKEN;
+	if (focus != NULL)
+		focusToken = _get_object_token_(focus);
 
 	int32 index = 0;
 	int32 token;
 	for (; message->FindInt32("_token", index, &token) == B_OK; index++) {
+		if (token == focusToken)
+			foundFocus = true;
+
 		BView* target = _FindView(token);
 		if (target == NULL)
 			continue;
@@ -2488,7 +2492,20 @@ BWindow::_DistributeMessage(BMessage* message)
 		messenger.SendMessage(message);
 	}
 
-	return !suspend;
+	if (index > 0) {
+		if (foundFocus) {
+			// the focus view already got this message
+			return false;
+		}
+
+		// should this message still be dispatched by the focus view?
+		bool feedFocus;
+		if (message->FindBool("_feed_focus", &feedFocus) != B_OK
+			|| feedFocus == false)
+			return false;
+	}
+
+	return true;
 }
 
 
@@ -2629,6 +2646,10 @@ BWindow::_FindView(int32 token)
 BView *
 BWindow::_FindView(BView *view, BPoint point) const
 {
+	// TODO: this is totally broken (bounds vs. frame) - since
+	//	BView::Bounds() potentially queries the app_server
+	//	anyway, we could just let the app_server answer this
+	//	query directly.
 	if (view->Bounds().Contains(point) && !view->fFirstChild)
 		return view;
 

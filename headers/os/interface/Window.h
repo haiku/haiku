@@ -267,7 +267,7 @@ private:
 			void		AddShortcut(uint32 key, uint32 modifiers,
 							BMenuItem* item);
 			BHandler*	_DetermineTarget(BMessage* message, BHandler* target);
-			bool		_DistributeMessage(BMessage* message);
+			bool		_DistributeMessage(BMessage* message, BHandler* target);
 
 			bool		InUpdate();
 			void		_DequeueAll();
@@ -292,8 +292,6 @@ private:
 			BView*		_FindPreviousNavigable(BView *focus, uint32 flags);
 			bool		_HandleKeyDown(char key, uint32 modifiers);
 			void		_KeyboardNavigation();
-
-			void		DoUpdate(BView* view, BRect& area);
 
 			// Debug (TODO: to be removed)
 			void		PrintToStream() const;

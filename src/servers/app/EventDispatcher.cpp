@@ -497,6 +497,21 @@ EventDispatcher::_SetToken(BMessage* message, int32 token)
 
 
 void
+EventDispatcher::_SetFeedFocus(BMessage* message)
+{
+	if (message->ReplaceBool("_feed_focus", true) != B_OK)
+		message->AddBool("_feed_focus", true);
+}
+
+
+void
+EventDispatcher::_UnsetFeedFocus(BMessage* message)
+{
+	message->RemoveName("_feed_focus");
+}
+
+
+void
 EventDispatcher::_EventLoop()
 {
 	BMessage* event;
@@ -563,6 +578,8 @@ EventDispatcher::_EventLoop()
 
 				if (fHasFocus) {
 					addedTokens |= _AddTokens(event, fFocusTokens);
+					if (addedTokens)
+						_SetFeedFocus(event);
 					_SendMessage(fFocus, event, event->what == B_MOUSE_MOVED
 						? kMouseMovedImportance : kStandardImportance);
 				}
@@ -585,8 +602,8 @@ EventDispatcher::_EventLoop()
 					// forwarded to the target
 					addedTokens = true;
 
-					if (fSuspendFocus)
-						event->AddBool("_suspend_focus", true);
+					if (!fSuspendFocus)
+						_SetFeedFocus(event);
 				}
 
 				// supposed to fall through
@@ -600,8 +617,10 @@ EventDispatcher::_EventLoop()
 		if (keyboardEvent || pointerEvent) {
 			// send the event to the additional listeners
 
-			if (addedTransit)
+			if (addedTransit) {
 				_UnsetTransit(event);
+				_UnsetFeedFocus(event);
+			}
 			if (addedTokens)
 				_RemoveTokens(event);
 
