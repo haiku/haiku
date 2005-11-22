@@ -3042,7 +3042,7 @@ static void getRAMsize_arch_nv10_20_30_40(void)
 	default:
 		LOG(8,("INFO: (Memory detection) Strapinfo value is: $%08x\n", strapinfo));
 
-		switch ((strapinfo & 0x1ff00000) >> 20)
+		switch ((strapinfo & 0x3ff00000) >> 20)
 		{
 		case 2:
 			si->ps.memory_size = 2 * 1024 * 1024;
@@ -3067,6 +3067,9 @@ static void getRAMsize_arch_nv10_20_30_40(void)
 			break;
 		case 256:
 			si->ps.memory_size = 256 * 1024 * 1024;
+			break;
+		case 512:
+			si->ps.memory_size = 512 * 1024 * 1024;
 			break;
 		default:
 			si->ps.memory_size = 16 * 1024 * 1024;
