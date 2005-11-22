@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-11/2003.
+	Rudolf Cornelissen 3/2002-11/2005.
 */
 
 /* standard kernel driver stuff */
@@ -304,7 +304,7 @@ static status_t map_device(device_info *di)
 //	#define G400_DMA_BUFFER_SIZE 1024*1024
 
 	/*variables for making copy of ROM*/
-	char * rom_temp;
+	uint8 *rom_temp;
 	area_id rom_area;
 
 	/* MIL1 has frame_buffer in [1], control_regs in [0], and nothing in [2], while
@@ -382,9 +382,44 @@ static status_t map_device(device_info *di)
 		return rom_area;
 	}
 
-	/* make a copy of ROM for future reference*/
-	memcpy (si->rom_mirror, rom_temp, 32768);
-	if (current_settings.dumprom) dumprom (rom_temp, 32768);
+	/* if we have a MMS card which only has a BIOS on the primary card, copy the
+	 * primary card's BIOS for our reference too if we aren't primary ourselves.
+	 * (confirmed OK on 'quad' G200MMS.) */
+	if ((di->pcii.class_base == PCI_display) &&
+		(di->pcii.class_sub == PCI_display_other) &&
+		((rom_temp[0] != 0x55) || (rom_temp[1] != 0xaa)) && di->pcii.device)
+	{
+		/* locate the main VGA adaptor on our bus, should sit on device #0
+		 * (MMS cards have a own bridge: so there are only graphics cards on it's bus). */
+		uint8 index = 0;
+		bool found = false;
+		for (index = 0; index < pd->count; index++)
+		{
+			if ((pd->di[index].pcii.bus == di->pcii.bus) &&
+				(pd->di[index].pcii.device == 0x00))
+			{
+				found = true;
+				break;
+			}
+		}
+		if (found)
+		{
+			/* make the copy from the primary VGA card */
+			memcpy (si->rom_mirror, pd->di[index].si->rom_mirror, 32768);
+		}
+		else
+		{
+			/* make a copy of 'non-ok' ROM area for future reference just in case */
+			memcpy (si->rom_mirror, rom_temp, 32768);
+		}
+	}
+	else
+	{
+		/* make a copy of ROM for future reference */
+		memcpy (si->rom_mirror, rom_temp, 32768);
+	}
+
+	if (current_settings.dumprom) dumprom (si->rom_mirror, 32768);
 
 	/*disable ROM and delete the area*/
 	set_pci(PCI_rom_base,4,0);
