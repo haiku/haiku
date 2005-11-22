@@ -165,8 +165,10 @@ void BStringView::ResizeToPreferred()
 //------------------------------------------------------------------------------
 void BStringView::GetPreferredSize(float* width, float* height)
 {
-	if (!fText)
-		return BView::GetPreferredSize(width, height);
+	if (!fText) {
+		BView::GetPreferredSize(width, height);
+		return;
+	}
 
 	BFont font;
 	GetFont(&font);
