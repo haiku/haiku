@@ -321,11 +321,8 @@ BLooper::CurrentMessage() const
 BMessage*
 BLooper::DetachCurrentMessage()
 {
-	Lock();
 	BMessage* msg = fLastMessage;
 	fLastMessage = NULL;
-	fQueue->RemoveMessage(msg);
-	Unlock();
 	return msg;
 }
 
