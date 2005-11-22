@@ -15,6 +15,8 @@
 
 #include <View.h>
 
+#include <stdio.h>
+
 
 _BStyleRunDescBuffer_::_BStyleRunDescBuffer_()
 	: _BTextViewSupportBuffer_<STEStyleRunDesc>(20)
@@ -288,9 +290,15 @@ _BStyleBuffer_::SetStyleRange(int32 fromOffset, int32 toOffset,
 		}
 
 		runIndex++;
-		offset = runEnd;	
+		if (offset == runEnd) {
+			// TODO: this hides a bug somewhere else in the code that
+			//	should probably be fixed...
+			printf("offset == runEnd!\n");
+			break;
+		}
+		offset = runEnd;
 	} while (offset < toOffset);
-	
+
 	if (offset == toOffset && runIndex < fStyleRunDesc.ItemCount()
 		&& fStyleRunDesc[runIndex]->index == styleIndex)
 		RemoveStyles(runIndex);
