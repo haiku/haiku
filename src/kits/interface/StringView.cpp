@@ -49,7 +49,7 @@ BStringView::BStringView(BRect frame, const char* name, const char* text,
 						 uint32 resizeMask, uint32 flags)
 	:	BView(frame, name, resizeMask, flags)
 {
-	fText = strdup(text);
+	fText = text ? strdup(text) : NULL;
 	fAlign = B_ALIGN_LEFT;
 }
 //------------------------------------------------------------------------------
@@ -99,7 +99,7 @@ BStringView::~BStringView()
 void BStringView::SetText(const char* text)
 {
 	free(fText);
-	fText = strdup(text);
+	fText = text ? strdup(text) : NULL;
 	Invalidate();
 }
 //------------------------------------------------------------------------------
@@ -128,6 +128,9 @@ void BStringView::AttachedToWindow()
 //------------------------------------------------------------------------------
 void BStringView::Draw(BRect bounds)
 {
+	if (!fText)
+		return;
+
 	SetLowColor(ViewColor());
 	BFont font;
 	GetFont(&font);
@@ -136,14 +139,13 @@ void BStringView::Draw(BRect bounds)
 	
 	float y = Bounds().bottom - ceil(fh.descent);
 	float x;
-	switch (fAlign)
-	{
+	switch (fAlign) {
 		case B_ALIGN_RIGHT:
 			x = Bounds().Width() - font.StringWidth(fText) - 2.0f;
 			break;
 
 		case B_ALIGN_CENTER:
-			x = (Bounds().Width() - font.StringWidth(fText))/2.0f;
+			x = (Bounds().Width() - font.StringWidth(fText)) / 2.0f;
 			break;
 
 		default:
@@ -151,7 +153,7 @@ void BStringView::Draw(BRect bounds)
 			break;
 	}
 
-	DrawString( fText, BPoint(x,y) );
+	DrawString(fText, BPoint(x,y));
 }
 //------------------------------------------------------------------------------
 void BStringView::ResizeToPreferred()
@@ -163,6 +165,9 @@ void BStringView::ResizeToPreferred()
 //------------------------------------------------------------------------------
 void BStringView::GetPreferredSize(float* width, float* height)
 {
+	if (!fText)
+		return BView::GetPreferredSize(width, height);
+
 	BFont font;
 	GetFont(&font);
 	font_height fh;
