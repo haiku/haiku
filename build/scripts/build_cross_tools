@@ -9,7 +9,7 @@ if [ $# \< 2 ]; then
 fi
 
 haikuSourceDir=$1
-buildToolsDir=$2
+buildToolsDir=$2/legacy
 
 if [ $# \< 3 ]; then
 	haikuOutputDir=$haikuSourceDir/generated
@@ -119,9 +119,6 @@ make cross || {
 # install gcc
 make install-gcc-cross || {
 	echo "ERROR: Installing the cross compiler failed." >&2
-	echo "ERROR: Note, that it is normal for the \"make cross\" to fail" >&2
-	echo "ERROR: at some point, but it must not fail before all" >&2
-	echo "ERROR: components we need have been built." >&2
 	exit 1
 }
 

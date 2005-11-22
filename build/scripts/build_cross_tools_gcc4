@@ -47,7 +47,7 @@ cd $haikuOutputDir
 haikuOutputDir=$(pwd)
 
 binutilsSourceDir=$buildToolsDir/binutils
-gccSourceDir=$buildToolsDir/gcc4
+gccSourceDir=$buildToolsDir/gcc
 
 
 # get gcc version
