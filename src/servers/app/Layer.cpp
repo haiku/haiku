@@ -833,25 +833,25 @@ Layer::CopyBits(BRect& src, BRect& dst, int32 xOffset, int32 yOffset)
 
 
 void
-Layer::MouseDown(const BMessage *msg)
+Layer::MouseDown(BMessage *msg, BPoint where)
 {
 }
 
 
 void
-Layer::MouseUp(const BMessage *msg)
+Layer::MouseUp(BMessage *msg, BPoint where)
 {
 }
 
 
 void
-Layer::MouseMoved(const BMessage *msg)
+Layer::MouseMoved(BMessage *msg, BPoint where)
 {
 }
 
 
 void
-Layer::MouseWheelChanged(const BMessage *msg)
+Layer::MouseWheelChanged(BMessage *msg, BPoint where)
 {
 }
 

@@ -154,10 +154,10 @@ class Layer {
 										 int32 xOffset, int32 yOffset);
 
 	// input handling
-	virtual	void				MouseDown(const BMessage *msg);
-	virtual	void				MouseUp(const BMessage *msg);
-	virtual	void				MouseMoved(const BMessage *msg);
-	virtual	void				MouseWheelChanged(const BMessage *msg);
+	virtual	void				MouseDown(BMessage *msg, BPoint where);
+	virtual	void				MouseUp(BMessage *msg, BPoint where);
+	virtual	void				MouseMoved(BMessage *msg, BPoint where);
+	virtual	void				MouseWheelChanged(BMessage *msg, BPoint where);
 
 	virtual	void				WorkspaceActivated(int32 index, bool active);
 	virtual	void				WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces);

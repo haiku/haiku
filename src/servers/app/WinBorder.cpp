@@ -410,107 +410,93 @@ WinBorder::GetSizeLimits(float* minWidth, float* maxWidth,
 
 
 void
-WinBorder::MouseDown(const BMessage *msg)
+WinBorder::MouseDown(BMessage *msg, BPoint where)
 {
-	DesktopSettings desktopSettings(GetRootLayer()->GetDesktop());
-	BPoint where(0, 0);
+	// default action is to drag the WinBorder
+	Layer *target = LayerAt(where);
+	if (target == this) {
+		// clicking WinBorder visible area
 
-	msg->FindPoint("where", &where);
+		click_type action = DEC_DRAG;
 
-	// not in FFM mode?
-	if (desktopSettings.MouseMode() == B_NORMAL_MOUSE) {
-		// default action is to drag the WinBorder
-		Layer *target = LayerAt(where);
-		if (target == this) {
-			// clicking WinBorder visible area
-			winBorderAreaHandle:
+		if (fDecorator)
+			action = _ActionFor(msg);
 
-			click_type action = DEC_DRAG;
+		// deactivate border buttons on first click(select)
+		if (GetRootLayer()->Focus() != this && action != DEC_MOVETOBACK
+			&& action != DEC_RESIZE && action != DEC_SLIDETAB)
+			action = DEC_DRAG;
 
-			if (fDecorator)
-				action = _ActionFor(msg);
+		// set decorator internals
+		switch (action) {
+			case DEC_CLOSE:
+				fIsClosing = true;
+				fDecorator->SetClose(true);
+				STRACE_CLICK(("===> DEC_CLOSE\n"));
+				break;
 
-			// deactivate border buttons on first click(select)
-			if (GetRootLayer()->Focus() != this && action != DEC_MOVETOBACK
-				&& action != DEC_RESIZE && action != DEC_SLIDETAB)
-				action = DEC_DRAG;
+			case DEC_ZOOM:
+				fIsZooming = true;
+				fDecorator->SetZoom(true);
+				STRACE_CLICK(("===> DEC_ZOOM\n"));
+				break;
 
-			// set decorator internals
-			switch (action) {
-				case DEC_CLOSE:
-					fIsClosing = true;
-					fDecorator->SetClose(true);
-					STRACE_CLICK(("===> DEC_CLOSE\n"));
-					break;
-	
-				case DEC_ZOOM:
-					fIsZooming = true;
-					fDecorator->SetZoom(true);
-					STRACE_CLICK(("===> DEC_ZOOM\n"));
-					break;
-	
-				case DEC_MINIMIZE:
-					fIsMinimizing = true;
-					fDecorator->SetMinimize(true);
-					STRACE_CLICK(("===> DEC_MINIMIZE\n"));
-					break;
+			case DEC_MINIMIZE:
+				fIsMinimizing = true;
+				fDecorator->SetMinimize(true);
+				STRACE_CLICK(("===> DEC_MINIMIZE\n"));
+				break;
 
-				case DEC_DRAG:
-					fIsDragging = true;
-					fLastMousePosition = where;
-					STRACE_CLICK(("===> DEC_DRAG\n"));
-					break;
+			case DEC_DRAG:
+				fIsDragging = true;
+				fLastMousePosition = where;
+				STRACE_CLICK(("===> DEC_DRAG\n"));
+				break;
 
-				case DEC_RESIZE:
-					fIsResizing = true;
-					fLastMousePosition = where;
-					STRACE_CLICK(("===> DEC_RESIZE\n"));
-					break;
+			case DEC_RESIZE:
+				fIsResizing = true;
+				fLastMousePosition = where;
+				STRACE_CLICK(("===> DEC_RESIZE\n"));
+				break;
 
-				case DEC_SLIDETAB:
-					fIsSlidingTab = true;
-					fLastMousePosition = where;
-					STRACE_CLICK(("===> DEC_SLIDETAB\n"));
-					break;
+			case DEC_SLIDETAB:
+				fIsSlidingTab = true;
+				fLastMousePosition = where;
+				STRACE_CLICK(("===> DEC_SLIDETAB\n"));
+				break;
 
-				default:
-					break;
-			}
+			default:
+				break;
+		}
 
-			// based on what the Decorator returned, properly place this window.
-			if (action == DEC_MOVETOBACK) {
-				GetRootLayer()->SetActive(this, false);
-			} else {
-				GetRootLayer()->SetMouseEventLayer(this);
+		// based on what the Decorator returned, properly place this window.
+		if (action == DEC_MOVETOBACK) {
+			GetRootLayer()->SetActive(this, false);
+		} else {
+			GetRootLayer()->SetMouseEventLayer(this);
+			GetRootLayer()->SetActive(this);
+		}
+	} else if (target != NULL) {
+		// clicking a simple Layer.
+		if (GetRootLayer()->ActiveWorkspace()->Active() != this) {
+			DesktopSettings desktopSettings(GetRootLayer()->GetDesktop());
+
+			// not in FFM mode?
+			if (desktopSettings.MouseMode() == B_NORMAL_MOUSE)
 				GetRootLayer()->SetActive(this);
-			}
-		} else if (target != NULL) {
-			// clicking a simple Layer.
-			if (GetRootLayer()->ActiveWorkspace()->Active() == this) {
-				target->MouseDown(msg);
-			} else {
-				if (WindowFlags() & B_WILL_ACCEPT_FIRST_CLICK)
-					target->MouseDown(msg);
-				else
-					GetRootLayer()->SetActive(this);
-			}
+
+			if ((WindowFlags() & B_WILL_ACCEPT_FIRST_CLICK) == 0)
+				return;
 		}
-	} else {
-		// in FFM mode
-		Layer *target = LayerAt(where);
-		if (target == this) {
-			// clicking inside our visible area.
-			goto winBorderAreaHandle;
-		} else if (target != NULL) {
-			// clicking a simple Layer; forward event.
-			target->MouseDown(msg);
-		}
+
+		msg->AddInt32("_view_token", target->ViewToken());
+		target->MouseDown(msg, where);
 	}
 }
 
 
 void
-WinBorder::MouseUp(const BMessage *msg)
+WinBorder::MouseUp(BMessage *msg, BPoint where)
 {
 	bool invalidate = false;
 	if (fDecorator) {
@@ -552,12 +538,8 @@ WinBorder::MouseUp(const BMessage *msg)
 
 
 void
-WinBorder::MouseMoved(const BMessage *msg)
+WinBorder::MouseMoved(BMessage *msg, BPoint where)
 {
-	BPoint where(0,0);
-
-	msg->FindPoint("where", &where);
-
 	if (fDecorator) {
 // TODO: present behavior is not fine!
 //		Decorator's Set*() methods _actualy draw_! on screen, not
@@ -586,6 +568,19 @@ WinBorder::MouseMoved(const BMessage *msg)
 	}
 
 	fLastMousePosition = where;
+
+	// change focus in FFM mode
+	DesktopSettings desktopSettings(GetRootLayer()->GetDesktop());
+	// TODO: Focus should be a RootLayer option/feature, NOT a Workspace one!!!
+	WinBorder* exFocus = GetRootLayer()->Focus();
+	if (desktopSettings.MouseMode() != B_NORMAL_MOUSE && exFocus != this) {
+		GetRootLayer()->ActiveWorkspace()->AttemptToSetFocus(this);
+		// Workspace::SetFocus() *attempts* to set a new focus WinBorder, it may not succeed
+//		if (exFocus != Focus()) {
+			// TODO: invalidate border area and send message to client for the widgets to light up
+			// What message? Is there a message on Focus change?
+//		}
+	}
 }
 
 

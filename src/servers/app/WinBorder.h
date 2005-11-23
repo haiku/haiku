@@ -81,9 +81,9 @@ class WinBorder : public Layer {
 											  float* minHeight,
 											  float* maxHeight) const;
 
-	virtual	void				MouseDown(const BMessage *msg);
-	virtual	void				MouseUp(const BMessage *msg);
-	virtual	void				MouseMoved(const BMessage *msg);
+	virtual	void				MouseDown(BMessage *msg, BPoint where);
+	virtual	void				MouseUp(BMessage *msg, BPoint where);
+	virtual	void				MouseMoved(BMessage *msg, BPoint where);
 
 //			click_type			ActionFor(const BMessage *msg)
 //									{ return _ActionFor(evt); }

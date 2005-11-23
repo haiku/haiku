@@ -132,9 +132,7 @@ friend class Desktop;
 
 			void				change_winBorder_feel(WinBorder *winBorder, int32 newFeel);
 
-			// Input related methods
 			void				MouseEventHandler(BMessage *msg);
-			void				_ProcessMouseMovedEvent(BMessage *msg, BPoint where, Layer* target);
 
 			Desktop*			fDesktop;
 			BMessage*			fDragMessage;

@@ -13,19 +13,11 @@
 /**	Class used for the top layer of each workspace's Layer tree */
 
 
-#include <stdio.h>
-
-#include <Window.h>
-#include <List.h>
-#include <Message.h>
-//#include <Entry.h>
-#include <File.h>
-#include <PortLink.h>
-
 #include "Decorator.h"
 #include "DrawingEngine.h"
 #include "HWInterface.h"
 #include "Layer.h"
+#include "RootLayer.h"
 #include "ServerApp.h"
 #include "ServerConfig.h"
 #include "ServerProtocol.h"
@@ -35,7 +27,13 @@
 #include "Workspace.h"
 #include "WorkspacesLayer.h"
 
-#include "RootLayer.h"
+#include <File.h>
+#include <List.h>
+#include <Message.h>
+#include <PortLink.h>
+#include <Window.h>
+
+#include <stdio.h>
 
 #if DISPLAY_HAIKU_LOGO
 #include "ServerBitmap.h"
@@ -234,20 +232,15 @@ RootLayer::AddWinBorder(WinBorder* winBorder)
 
 	// Subset modals also need to have a main window before appearing in workspace list.
 	int32 feel = winBorder->Feel();
-	if (feel != B_FLOATING_SUBSET_WINDOW_FEEL && feel != B_MODAL_SUBSET_WINDOW_FEEL)
-	{
-		uint32		wks = winBorder->Workspaces();
+	if (feel != B_FLOATING_SUBSET_WINDOW_FEEL && feel != B_MODAL_SUBSET_WINDOW_FEEL) {
+		uint32 workspaces = winBorder->Workspaces();
 		// add to current workspace
-		if (wks == 0)
-		{
+		if (workspaces == 0)
 			fWorkspace[fActiveWksIndex]->AddWinBorder(winBorder);
-		}
-		// add to desired workspaces
-		else
-		{
-			for (int32 i = 0; i < fWsCount; i++)
-			{
-				if (fWorkspace[i] && (wks & (0x00000001UL << i)))
+		else {
+			// add to desired workspaces
+			for (int32 i = 0; i < fWsCount; i++) {
+				if (fWorkspace[i] && (workspaces & (0x00000001UL << i)))
 					fWorkspace[i]->AddWinBorder(winBorder);
 			}
 		}
@@ -851,29 +844,6 @@ RootLayer::SetActive(WinBorder* newActive, bool activate)
 
 
 void
-RootLayer::_ProcessMouseMovedEvent(BMessage *msg, BPoint where, Layer* target)
-{
-	// change focus in FFM mode
-	WinBorder* winBorderTarget = dynamic_cast<WinBorder*>(target);
-	if (winBorderTarget) {
-		DesktopSettings desktopSettings(fDesktop);
-		// TODO: Focus should be a RootLayer option/feature, NOT a Workspace one!!!
-		WinBorder* exFocus = Focus();
-		if (desktopSettings.MouseMode() != B_NORMAL_MOUSE && exFocus != winBorderTarget) {
-			ActiveWorkspace()->AttemptToSetFocus(winBorderTarget);
-			// Workspace::SetFocus() *attempts* to set a new focus WinBorder, it may not succeed
-			if (exFocus != Focus()) {
-				// TODO: invalidate border area and send message to client for the widgets to light up
-				// What message? Is there a message on Focus change?
-			}
-		}
-	}
-
-	target->MouseMoved(msg);
-}
-
-
-void
 RootLayer::MouseEventHandler(BMessage *event)
 {
 	BPoint where;
@@ -882,30 +852,23 @@ RootLayer::MouseEventHandler(BMessage *event)
 
 	Layer* layer = fMouseEventLayer;
 	if (layer == NULL) {
-		if (fWMState.Focus != NULL) {
-			layer = fWMState.Focus->LayerAt(where);
-			if (layer != NULL)
-				event->AddInt32("_view_token", layer->ViewToken());
-		}
-		if (layer == NULL) {
-			layer = LayerAt(where);
-			if (layer == NULL)
-				return;
-		}
+		layer = LayerAt(where, false);
+		if (layer == NULL)
+			return;
 	}
 
 	switch (event->what) {
 		case B_MOUSE_DOWN:
-			layer->MouseDown(event);
+			layer->MouseDown(event, where);
 			break;
 
 		case B_MOUSE_UP:
-			layer->MouseUp(event);
+			layer->MouseUp(event, where);
 			SetMouseEventLayer(NULL);
 			break;
 
 		case B_MOUSE_MOVED:
-			_ProcessMouseMovedEvent(event, where, layer);
+			layer->MouseMoved(event, where);
 			break;
 	}
 }
@@ -961,15 +924,15 @@ RootLayer::show_winBorder(WinBorder *winBorder)
 	for (int32 i = 0; i < fWsCount; i++) {
 		invalid = false;
 
-		if (fWorkspace[i] &&
-				(fWorkspace[i]->HasWinBorder(winBorder) ||
-				// subset modals are a bit like floating windows, they are being added
-				// and removed from workspace when there's at least a normal window
-				// that uses them.
-				winBorder->Feel() == B_MODAL_SUBSET_WINDOW_FEEL ||
-				// floating windows are inserted/removed on-the-fly so this window,
-				// although needed may not be in workspace's list.
-				winBorder->Level() == B_FLOATING_APP))
+		if (fWorkspace[i]
+			&& (fWorkspace[i]->HasWinBorder(winBorder)
+				|| winBorder->Feel() == B_MODAL_SUBSET_WINDOW_FEEL
+					// subset modals are a bit like floating windows, they are being added
+					// and removed from workspace when there's at least a normal window
+					// that uses them.
+				|| winBorder->Level() == B_FLOATING_APP))
+					// floating windows are inserted/removed on-the-fly so this window,
+					// although needed may not be in workspace's list.
 		{
 			invalid = fWorkspace[i]->ShowWinBorder(winBorder);
 
