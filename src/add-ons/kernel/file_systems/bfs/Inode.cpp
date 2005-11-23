@@ -1190,8 +1190,6 @@ Inode::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 status_t 
 Inode::WriteAt(Transaction &transaction, off_t pos, const uint8 *buffer, size_t *_length)
 {
-	// call the right WriteAt() method, depending on the inode flags
-
 	// update the last modification time in memory, it will be written
 	// back to the inode, and the index when the file is closed
 	// ToDo: should update the internal last modified time only at this point!
@@ -1229,6 +1227,13 @@ Inode::WriteAt(Transaction &transaction, off_t pos, const uint8 *buffer, size_t 
 		// have to fill the gap between that position and the old file
 		// size with zeros.
 		FillGapWithZeros(oldSize, pos);
+
+		// we need to write back the inode here because it has to
+		// go into this transaction (we cannot wait until the file
+		// is closed)
+		status = WriteBack(transaction);
+		if (status < B_OK)
+			return status;
 	}
 
 	// If we don't want to write anything, we can now return (we may
@@ -1837,8 +1842,7 @@ Inode::SetFileSize(Transaction &transaction, off_t size)
 			// fails, so we should shrink the stream to its former size
 			ShrinkStream(transaction, oldSize);
 		}
-	}
-	else
+	} else
 		status = ShrinkStream(transaction, size);
 
 	if (status < B_OK)
