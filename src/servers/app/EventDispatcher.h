@@ -39,6 +39,8 @@ class EventDispatcher : public BLocker {
 		void SetMouseFilter(BMessageFilter* filter);
 		void SetKeyboardFilter(BMessageFilter* filter);
 
+		void GetMouse(BPoint& where, int32& buttons);
+
 		bool HasCursorThread();
 		void SetHWInterface(HWInterface* interface);
 
@@ -50,8 +52,6 @@ class EventDispatcher : public BLocker {
 
 		bool _SendMessage(BMessenger& messenger, BMessage* message, float importance);
 
-		void _SetTransit(BMessage* message, int32 transit);
-		void _UnsetTransit(BMessage* message);
 		bool _AddTokens(BMessage* message, BList& tokens);
 		void _RemoveTokens(BMessage* message);
 		void _SetToken(BMessage* message, int32 token);
@@ -89,6 +89,9 @@ class EventDispatcher : public BLocker {
 		BMessageFilter*	fKeyboardFilter;
 
 		BObjectList<event_target> fListeners;
+
+		BPoint			fLastCursorPosition;
+		int32			fLastButtons;
 
 		BLocker			fCursorLock;
 		HWInterface*	fHWInterface;

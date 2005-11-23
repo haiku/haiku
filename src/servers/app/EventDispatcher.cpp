@@ -398,6 +398,16 @@ EventDispatcher::SetKeyboardFilter(BMessageFilter* filter)
 }
 
 
+void
+EventDispatcher::GetMouse(BPoint& where, int32& buttons)
+{
+	BAutolock _(this);
+
+	where = fLastCursorPosition;
+	buttons = fLastButtons;
+}
+
+
 bool
 EventDispatcher::HasCursorThread()
 {
@@ -445,21 +455,6 @@ EventDispatcher::_SendMessage(BMessenger& messenger, BMessage* message,
 	}
 
 	return true;
-}
-
-
-void
-EventDispatcher::_SetTransit(BMessage* message, int32 transit)
-{
-	if (message->ReplaceInt32("be:transit", transit) != B_OK)
-		message->AddInt32("be:transit", transit);
-}
-
-
-void
-EventDispatcher::_UnsetTransit(BMessage* message)
-{
-	message->RemoveName("be:transit");
 }
 
 
@@ -532,6 +527,7 @@ EventDispatcher::_EventLoop()
 
 		switch (event->what) {
 			case B_MOUSE_MOVED:
+			{
 				if (!HasCursorThread()) {
 					// there is no cursor thread, we need to move the cursor ourselves
 					BAutolock _(fCursorLock);
@@ -545,7 +541,6 @@ EventDispatcher::_EventLoop()
 					// target has changed, we need to add the be:transit field
 					// to the message
 					if (fHasLastFocus) {
-						_SetTransit(event, B_EXITED_VIEW);
 						addedTokens = _AddTokens(event, fLastFocusTokens);
 						_SendMessage(fLastFocus, event, kMouseTransitImportance);
 						sendToLastFocus = true;
@@ -554,13 +549,17 @@ EventDispatcher::_EventLoop()
 						fHasLastFocus = false;
 						fLastFocusTokens.MakeEmpty();
 					}
-					if (fHasFocus)
-						_SetTransit(event, B_ENTERED_VIEW);
 
 					fTransit = false;
 					addedTransit = true;
 				}
+
+				BPoint where;
+				if (event->FindPoint("where", &where) == B_OK)
+					fLastCursorPosition = where;
+
 				// supposed to fall through
+			}
 			case B_MOUSE_DOWN:
 			case B_MOUSE_UP:
 				if (fMouseFilter != NULL
@@ -573,6 +572,17 @@ EventDispatcher::_EventLoop()
 					}
 					break;
 				}
+
+				int32 buttons;
+				if (event->FindInt32("buttons", &buttons) == B_OK)
+					fLastButtons = buttons;
+				else
+					fLastButtons = 0;
+
+				// the "where" field will be filled in by the receiver
+				// (it's supposed to be expressed in local window coordinates)
+				event->RemoveName("where");
+				event->AddPoint("screen_where", fLastCursorPosition);
 
 				pointerEvent = true;
 
@@ -617,12 +627,15 @@ EventDispatcher::_EventLoop()
 		if (keyboardEvent || pointerEvent) {
 			// send the event to the additional listeners
 
-			if (addedTransit) {
-				_UnsetTransit(event);
+			if (addedTokens) {
+				_RemoveTokens(event);
 				_UnsetFeedFocus(event);
 			}
-			if (addedTokens)
-				_RemoveTokens(event);
+			if (pointerEvent) {
+				// this is added in the RootLayer mouse processing
+				// but it's only intended for the focus view
+				event->RemoveName("_view_token");
+			}
 
 			for (int32 i = fListeners.CountItems(); i-- > 0;) {
 				event_target* target = fListeners.ItemAt(i);
