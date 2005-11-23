@@ -377,7 +377,7 @@ BBox::GetPreferredSize(float *_width, float *_height)
 	if (_width)
 		*_width = width;
 	if (_height)
-		*_height;
+		*_height = height;
 }
 
 
