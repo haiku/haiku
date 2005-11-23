@@ -1333,18 +1333,22 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 			break;
 	}
 
-	// This is for BMenuBar.
-	if ((ResizingMode() & B_FOLLOW_LEFT_RIGHT) == B_FOLLOW_LEFT_RIGHT) {
-		if (Parent())
-			*_width = Parent()->Frame().Width() + 1;
-		else if (Window())
-			*_width = Window()->Frame().Width() + 1;
-		else
-			*_width = Bounds().Width();
-	} else
-		*_width = frame.Width();
+	// This is for BMenuBar
 
-	*_height = frame.Height();
+	if (_width) {
+		if ((ResizingMode() & B_FOLLOW_LEFT_RIGHT) == B_FOLLOW_LEFT_RIGHT) {
+			if (Parent())
+				*_width = Parent()->Frame().Width() + 1;
+			else if (Window())
+				*_width = Window()->Frame().Width() + 1;
+			else
+				*_width = Bounds().Width();
+		} else
+			*_width = frame.Width();
+	}
+
+	if (_height)
+		*_height = frame.Height();
 }
 
 

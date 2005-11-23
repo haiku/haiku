@@ -1152,11 +1152,12 @@ BSlider::GetPreferredSize(float* _width, float* _height)
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 
+	float width, height;
 	int32 rows = 0;
 
 	if (Orientation() == B_HORIZONTAL) {
-		*_width = Frame().Width();
-		*_height = 12.0f + fBarThickness;
+		width = Frame().Width();
+		height = 12.0f + fBarThickness;
 
 		float labelWidth = 0;
 		if (Label()) {
@@ -1175,21 +1176,21 @@ BSlider::GetPreferredSize(float* _width, float* _height)
 			minWidth += StringWidth(MaxLimitLabel());
 		}
 
-		if (minWidth > *_width)
-			*_width = minWidth;
-		if (labelWidth > *_width)
-			*_width = labelWidth;
-		if (*_width < 32.0f)
-			*_width = 32.0f;
+		if (minWidth > width)
+			width = minWidth;
+		if (labelWidth > width)
+			width = labelWidth;
+		if (width < 32.0f)
+			width = 32.0f;
 
 		if (MinLimitLabel() || MaxLimitLabel())
 			rows++;
 
-		*_height += rows * ((float)ceil(fontHeight.ascent + fontHeight.descent) + 4.0f);
+		height += rows * ((float)ceil(fontHeight.ascent + fontHeight.descent) + 4.0f);
 	} else { 
 		// B_VERTICAL
-		*_width = 12.0f + fBarThickness;
-		*_height = Frame().Height();
+		width = 12.0f + fBarThickness;
+		height = Frame().Height();
 
 		// find largest label
 
@@ -1211,8 +1212,8 @@ BSlider::GetPreferredSize(float* _width, float* _height)
 			rows++;
 		}
 
-		if (minWidth > *_width)
-			*_width = minWidth;
+		if (minWidth > width)
+			width = minWidth;
 
 		float minHeight = 32.0f + rows
 			* ((float)ceil(fontHeight.ascent + fontHeight.descent) + 4.0f);
@@ -1220,9 +1221,14 @@ BSlider::GetPreferredSize(float* _width, float* _height)
 		if (Label() && MaxLimitLabel())
 			minHeight -= 4.0f;
 
-		if (minHeight > *_height)
-			*_height = minHeight;
+		if (minHeight > height)
+			height = minHeight;
 	}
+
+	if (_width)
+		*_width = width;
+	if (_height)
+		*_height = height;
 }
 
 

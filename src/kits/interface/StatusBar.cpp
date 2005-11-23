@@ -533,15 +533,20 @@ BStatusBar::ResizeToPreferred()
 
 
 void
-BStatusBar::GetPreferredSize(float *width, float *height)
+BStatusBar::GetPreferredSize(float* _width, float* _height)
 {
-	font_height fh;
-	GetFontHeight(&fh);
-	
-	*width = (fLabel ? (float)ceil(StringWidth(fLabel)) : 0.0f) +
-		(fTrailingLabel ? (float)ceil(StringWidth(fTrailingLabel)) : 0.0f) +
-		7.0f;
-	*height = fh.ascent + fh.descent + 5.0f + BarHeight();
+	if (_width) {
+		*_width = (fLabel ? (float)ceil(StringWidth(fLabel)) : 0.0f)
+			+ (fTrailingLabel ? (float)ceil(StringWidth(fTrailingLabel)) : 0.0f)
+			+ 7.0f;
+	}
+
+	if (_height) {
+		font_height fontHeight;
+		GetFontHeight(&fontHeight);
+
+		*_height = ceil(fontHeight.ascent + fontHeight.descent) + 5.0f + BarHeight();
+	}
 }
 
 

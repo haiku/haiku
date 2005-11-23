@@ -357,18 +357,22 @@ BCheckBox::SetValue(int32 value)
 
 
 void
-BCheckBox::GetPreferredSize(float *width, float *height)
+BCheckBox::GetPreferredSize(float* _width, float* _height)
 {
-	font_height fh;
-	GetFontHeight(&fh);
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
 
-	*height = (float)ceil(6.0f + fh.ascent + fh.descent);
-	*width = 12.0f + fh.ascent;
-	
-	if (Label())
-		*width += StringWidth(Label());
+	if (_width) {
+		float width = 12.0f + fontHeight.ascent;
 
-	*width = (float)ceil(*width);
+		if (Label())
+			width += StringWidth(Label());
+
+		*_width = (float)ceil(width);
+	}
+
+	if (_height)
+		*_height = (float)ceil(6.0f + fontHeight.ascent + fontHeight.descent);
 }
 
 

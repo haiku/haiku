@@ -5,11 +5,11 @@
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
  *		Stephan Aßmus <superstippi@gmx.de>
- *
- * Description:
- *		BRadioButton represents a single on/off button. 
- *		All sibling BRadioButton objects comprise a single
- *		 "multiple choice" control.
+ */
+
+/**	BRadioButton represents a single on/off button. 
+ *	All sibling BRadioButton objects comprise a single
+ *	"multiple choice" control.
  */
 
 #include <Box.h>
@@ -318,18 +318,23 @@ BRadioButton::SetValue(int32 value)
 
 
 void
-BRadioButton::GetPreferredSize(float *width, float *height)
+BRadioButton::GetPreferredSize(float* _width, float* _height)
 {
-	font_height fh;
-	GetFontHeight(&fh);
+	if (_width) {
+		float width = 22.0f; // TODO: check if ascent is included
 
-	*height = (float)ceil(fh.ascent + fh.descent) + 6.0f;
-	*width = 22.0f; // TODO: check if ascent is included
+		if (Label())
+			width += StringWidth(Label());
 	
-	if (Label())
-		*width += StringWidth(Label());
+		*_width = (float)ceil(width);
+	}
 
-	*width = (float)ceil(*width);
+	if (_height) {
+		font_height fontHeight;
+		GetFontHeight(&fontHeight);
+
+		*_height = (float)ceil(fontHeight.ascent + fontHeight.descent) + 6.0f;
+	}
 }
 
 

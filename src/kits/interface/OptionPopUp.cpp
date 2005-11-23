@@ -1,34 +1,19 @@
-//-----------------------------------------------------------------------------
-//	Copyright (c) 2003-2004 Haiku
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		OptionPopUp.cpp
-//	Author:			Stefano Ceccherini (burton666@libero.it)
-//	Description:	An option like control.  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2003-2005, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Stefano Ceccherini (burton666@libero.it)
+ */
+
+
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <OptionPopUp.h>
 #include <PopUpMenu.h>
 
-#include <cstdio>
+#include <stdio.h>
+
 
 // If enabled, behaves like in BeOS R5, in that when you call
 // SelectOptionFor() or SetValue(), the selected item isn't marked, and
@@ -49,9 +34,8 @@ const float kHeightModifier = 10.0;
 	\param flags View flags. They will be passed to the base class.
 */	
 BOptionPopUp::BOptionPopUp(BRect frame, const char *name, const char *label,
-							BMessage *message, uint32 resize, uint32 flags)
-	:
-	BOptionControl(frame, name, label, message, resize, flags)
+		BMessage *message, uint32 resize, uint32 flags)
+	: BOptionControl(frame, name, label, message, resize, flags)
 {
 	BPopUpMenu *popUp = new BPopUpMenu(label, true, true);
 	_mField = new BMenuField(Bounds(), "_menu", label, popUp);
@@ -70,9 +54,8 @@ BOptionPopUp::BOptionPopUp(BRect frame, const char *name, const char *label,
 	\param flags View flags. They will be passed to the base class.
 */
 BOptionPopUp::BOptionPopUp(BRect frame, const char *name, const char *label, 
-						   BMessage *message, bool fixed, uint32 resize, uint32 flags)
-	:
-	BOptionControl(frame, name, label, message, resize, flags)
+		BMessage *message, bool fixed, uint32 resize, uint32 flags)
+	: BOptionControl(frame, name, label, message, resize, flags)
 {
 	BPopUpMenu *popUp = new BPopUpMenu(label, true, true);
 	_mField = new BMenuField(Bounds(), "_menu", label, popUp, fixed);
@@ -80,9 +63,6 @@ BOptionPopUp::BOptionPopUp(BRect frame, const char *name, const char *label,
 }
 
 
-/*! \brief Frees the allocated resources.
-	It does nothing.
-*/
 BOptionPopUp::~BOptionPopUp()
 {
 }
@@ -112,7 +92,7 @@ BOptionPopUp::GetOptionAt(int32 index, const char **outName, int32 *outValue)
 {
 	bool result = false;
 	BMenu *menu = _mField->Menu();
-	
+
 	if (menu != NULL) {
 		BMenuItem *item = menu->ItemAt(index);
 		if (item != NULL) {
@@ -124,7 +104,7 @@ BOptionPopUp::GetOptionAt(int32 index, const char **outName, int32 *outValue)
 			result = true;
 		}
 	}
-	
+
 	return result;
 }
 
@@ -280,36 +260,38 @@ BOptionPopUp::SetEnabled(bool state)
 		preferred height.
 */
 void
-BOptionPopUp::GetPreferredSize(float *width, float *height)
+BOptionPopUp::GetPreferredSize(float* _width, float* _height)
 {
 	// Calculate control's height, looking at the BMenuField font's height
-	font_height fontHeight;
-	_mField->GetFontHeight(&fontHeight);		
-	
-	if (height != NULL)
-		*height = fontHeight.ascent + fontHeight.descent +
-					fontHeight.leading + kHeightModifier;
-	
-	float maxWidth = 0;
-	BMenu *menu = _mField->Menu();
-	if (menu == NULL)
-		return;
-	
-	// Iterate over all the entries in the control,
-	// and take the maximum width.
-	// TODO: Should we call BMenuField::GetPreferredSize() instead ?
-	int32 numItems = menu->CountItems();	
-	for (int32 i = 0; i < numItems; i++) {
-		BMenuItem *item = menu->ItemAt(i);
-		if (item != NULL) {		
-			float stringWidth = menu->StringWidth(item->Label());
-			maxWidth = max_c(maxWidth, stringWidth);
-		}	
+	if (_height != NULL) {
+		font_height fontHeight;
+		_mField->GetFontHeight(&fontHeight);
+
+		*_height = fontHeight.ascent + fontHeight.descent
+			+ fontHeight.leading + kHeightModifier;
 	}
-	
-	maxWidth += _mField->StringWidth(BControl::Label()) + kLabelSpace + kWidthModifier;
-	if (width != NULL)
-		*width = maxWidth;
+
+	if (_width != NULL) {
+		float maxWidth = 0;
+		BMenu *menu = _mField->Menu();
+		if (menu == NULL)
+			return;
+
+		// Iterate over all the entries in the control,
+		// and take the maximum width.
+		// TODO: Should we call BMenuField::GetPreferredSize() instead ?
+		int32 numItems = menu->CountItems();	
+		for (int32 i = 0; i < numItems; i++) {
+			BMenuItem *item = menu->ItemAt(i);
+			if (item != NULL) {		
+				float stringWidth = menu->StringWidth(item->Label());
+				maxWidth = max_c(maxWidth, stringWidth);
+			}	
+		}
+
+		maxWidth += _mField->StringWidth(BControl::Label()) + kLabelSpace + kWidthModifier;
+		*_width = maxWidth;
+	}
 }
 
 

@@ -328,24 +328,27 @@ BBox::ResizeToPreferred()
 
 
 void
-BBox::GetPreferredSize(float *width, float *height)
+BBox::GetPreferredSize(float *_width, float *_height)
 {
+	float width, height;
 	bool label = true;
+
 	// acount for label
 	if (fLabelView) {
-		fLabelView->GetPreferredSize(width, height);
-		*width += 10.0;
+		fLabelView->GetPreferredSize(&width, &height);
+		width += 10.0;
 			// the label view is placed 10 pixels from the left
 	} else if (fLabel) {
 		font_height fh;
 		GetFontHeight(&fh);
-		*width += ceilf(StringWidth(fLabel));
-		*height += ceilf(fh.ascent + fh.descent);
+		width += ceilf(StringWidth(fLabel));
+		height += ceilf(fh.ascent + fh.descent);
 	} else {
 		label = false;
-		*width = 0;
-		*height = 0;
+		width = 0;
+		height = 0;
 	}
+
 	// acount for border
 	switch (fStyle) {
 		case B_NO_BORDER:
@@ -353,23 +356,28 @@ BBox::GetPreferredSize(float *width, float *height)
 		case B_PLAIN_BORDER:
 			// label: (1 pixel for border + 1 pixel for padding) * 2
 			// no label: (1 pixel for border) * 2 + 1 pixel for padding
-			*width += label ? 4 : 3;
+			width += label ? 4 : 3;
 			// label: 1 pixel for bottom border + 1 pixel for padding
 			// no label: (1 pixel for border) * 2 + 1 pixel for padding
-			*height += label ? 2 : 3;
+			height += label ? 2 : 3;
 			break;
 		case B_FANCY_BORDER:
 			// label: (2 pixel for border + 1 pixel for padding) * 2
 			// no label: (2 pixel for border) * 2 + 1 pixel for padding
-			*width += label ? 6 : 5;
+			width += label ? 6 : 5;
 			// label: 2 pixel for bottom border + 1 pixel for padding
 			// no label: (2 pixel for border) * 2 + 1 pixel for padding
-			*height += label ? 3 : 5;
+			height += label ? 3 : 5;
 			break;
 	}
 	// NOTE: children are ignored, you can use BBox::GetPreferredSize()
 	// to get the minimum size of this object, then add the size
 	// of your child(ren) plus inner padding for the final size
+
+	if (_width)
+		*_width = width;
+	if (_height)
+		*_height;
 }
 
 

@@ -486,7 +486,7 @@ BMenuField::GetPreferredSize(float *_width, float *_height)
 {
 	BView::GetPreferredSize(_width, _height);
 
-	if (!fFixedSizeMB) {
+	if (!fFixedSizeMB && _width != NULL) {
 		BMenu* menu = Menu();
 		float width = 0;
 
@@ -507,13 +507,15 @@ BMenuField::GetPreferredSize(float *_width, float *_height)
 		}
 
 		// TODO: fix these values (they should match the visual appearance)
-		*_width = width + 45 + fDivider;
-
+		width += 45 + fDivider;
 		if (Label())
-			*_width += StringWidth(Label()) + 5;
+			width += StringWidth(Label()) + 5;
+
+		*_width = width;
 	}
 
-	*_height = fMenuBar->Bounds().Height();
+	if (_height)
+		*_height = fMenuBar->Bounds().Height();
 }
 
 

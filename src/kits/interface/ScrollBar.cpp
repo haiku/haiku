@@ -896,14 +896,18 @@ BScrollBar::ResizeToPreferred()
 
 // GetPreferredSize
 void
-BScrollBar::GetPreferredSize(float *width, float *height)
+BScrollBar::GetPreferredSize(float* _width, float* _height)
 {
 	if (fOrientation == B_VERTICAL) {
-		*width = B_V_SCROLL_BAR_WIDTH;
-		*height = Bounds().Height();
+		if (_width)
+			*_width = B_V_SCROLL_BAR_WIDTH;
+		if (_height)
+			*_height = Bounds().Height();
 	} else if (fOrientation == B_HORIZONTAL) {
-		*width = Bounds().Width();
-		*height = B_H_SCROLL_BAR_HEIGHT;
+		if (_width)
+			*_width = Bounds().Width();
+		if (_height)
+			*_height = B_H_SCROLL_BAR_HEIGHT;
 	}
 }
 
