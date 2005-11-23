@@ -694,8 +694,7 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 	// check to see if window count changed over states
 	if (oldWMState.WindowList.CountItems() != fWMState.WindowList.CountItems()) {
 		invalidate = true;
-	}
-	else if (memcmp(oldWMState.WindowList.Items(), fWMState.WindowList.Items(),
+	} else if (memcmp(oldWMState.WindowList.Items(), fWMState.WindowList.Items(),
 			fWMState.WindowList.CountItems()*sizeof(void*)) != 0) {
 		invalidate = true;
 	}
@@ -794,6 +793,7 @@ GetDrawingEngine()->ConstrainClippingRegion(NULL);
 	}
 }
 
+
 bool
 RootLayer::SetActive(WinBorder* newActive, bool activate)
 {
@@ -840,6 +840,21 @@ RootLayer::SetActive(WinBorder* newActive, bool activate)
 }
 
 
+Layer*
+RootLayer::_ChildAt(BPoint where)
+{
+	if (VisibleRegion().Contains(where))
+		return NULL;
+
+	for (Layer* child = LastChild(); child; child = PreviousChild()) {
+		if (child->FullVisible().Contains(where))
+			return child;
+	}
+
+	return NULL;
+}
+
+
 //	#pragma mark - Input related methods
 
 
@@ -852,7 +867,7 @@ RootLayer::MouseEventHandler(BMessage *event)
 
 	Layer* layer = fMouseEventLayer;
 	if (layer == NULL) {
-		layer = LayerAt(where, false);
+		layer = _ChildAt(where);
 		if (layer == NULL)
 			return;
 	}

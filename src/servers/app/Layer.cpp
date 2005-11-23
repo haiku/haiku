@@ -358,26 +358,14 @@ Layer::FindLayer(const int32 token)
 	\return The layer containing the point or NULL if no layer found
 */
 Layer*
-Layer::LayerAt(const BPoint &pt, bool recursive)
+Layer::LayerAt(BPoint where)
 {
-	//printf("%p:%s:LayerAt(x = %g, y = %g)\n", this, Name(), pt.x, pt.y);
-	if (!recursive)	{
-		if (VisibleRegion().Contains(pt))
-			return this;
-
-		for (Layer* child = LastChild(); child; child = PreviousChild())
-			if (child->FullVisible().Contains(pt))
-				return child;
-
-		return NULL;
-	}
-
-	if (fVisible.Contains(pt))
+	if (fVisible.Contains(where))
 		return this;
 
-	if (fFullVisible.Contains(pt)) {
+	if (fFullVisible.Contains(where)) {
 		for (Layer* child = LastChild(); child; child = PreviousChild()) {
-			if (Layer* layer = child->LayerAt(pt))
+			if (Layer* layer = child->LayerAt(where))
 				return layer;
 		}
 	}

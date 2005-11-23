@@ -83,7 +83,7 @@ class Layer {
 
 			uint32				CountChildren() const;
 			Layer*				FindLayer(const int32 token);
-			Layer*				LayerAt(const BPoint &pt, bool recursive = true);
+			Layer*				LayerAt(BPoint where);
 
 	virtual	Layer*				FirstChild() const;
 	virtual	Layer*				NextChild() const;

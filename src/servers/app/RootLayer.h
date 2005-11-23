@@ -133,6 +133,7 @@ friend class Desktop;
 			void				change_winBorder_feel(WinBorder *winBorder, int32 newFeel);
 
 			void				MouseEventHandler(BMessage *msg);
+			Layer*				_ChildAt(BPoint where);
 
 			Desktop*			fDesktop;
 			BMessage*			fDragMessage;
