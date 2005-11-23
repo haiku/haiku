@@ -292,8 +292,11 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 	size_t numBytes = *_numBytes;
 
 	status_t status = get_file_map(ref, offset, numBytes, fileVecs, &fileVecCount);
-	if (status < B_OK)
+	if (status < B_OK) {
+		TRACE(("get_file_map(offset = %Ld, numBytes = %lu) failed\n", offset,
+			numBytes));
 		return status;
+	}
 
 	// ToDo: handle array overflow gracefully!
 
@@ -454,9 +457,16 @@ read_chunk_into_cache(file_cache_ref *ref, off_t offset, size_t size,
 	// read file into reserved pages
 	status_t status = pages_io(ref, offset, vecs, vecCount, &size, false);
 	if (status < B_OK) {
-		// ToDo: remove allocated pages...
-		panic("file_cache: remove allocated pages! read pages failed: %s\n", strerror(status));
+		// reading failed, free allocated pages
+
+		dprintf("file_cache: read pages failed: %s\n", strerror(status));
+
 		mutex_lock(&cache->lock);
+		for (int32 i = 0; i < pageIndex; i++) {
+			vm_cache_remove_page(cache, pages[i]);
+			vm_page_set_state(pages[i], PAGE_STATE_FREE);
+		}
+
 		return status;
 	}
 
