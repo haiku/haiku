@@ -108,6 +108,9 @@ BMessageQueue::RemoveMessage(BMessage* message)
 			// remove this one
 			if (entry == fHead)
 				fHead = entry->fQueueLink;
+			else
+				last->fQueueLink = entry->fQueueLink;
+
 			if (entry == fTail)
 				fTail = last;
 
