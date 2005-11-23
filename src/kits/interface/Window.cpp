@@ -2243,6 +2243,8 @@ BWindow::task_looper()
 
 				if (usePreferred) {
 					handler = PreferredHandler();
+					if (handler == NULL)
+						handler = this;
 				} else {
 					gDefaultTokens.GetToken(messagePrivate.GetTarget(),
 						B_HANDLER_TOKEN, (void **)&handler);

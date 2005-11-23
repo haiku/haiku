@@ -46,6 +46,7 @@ static BLocker sDebugPrintLocker("BLooper debug print");
 #include <PropertyInfo.h>
 
 #include <LooperList.h>
+#include <MessagePrivate.h>
 #include <ObjectLocker.h>
 #include <TokenSpace.h>
 
@@ -60,24 +61,6 @@ using BPrivate::BObjectLocker;
 using BPrivate::BLooperList;
 
 port_id _get_looper_port_(const BLooper* looper);
-#ifndef USING_MESSAGE4
-bool _use_preferred_target_(BMessage* msg) { return msg->fPreferred; }
-int32 _get_message_target_(BMessage* msg) { return msg->fTarget; }
-#else
-#include <MessagePrivate.h>
-
-inline bool
-_use_preferred_target_(BMessage *message)
-{
-	return BMessage::Private(message).UsePreferredTarget();
-}
-
-inline int32
-_get_message_target_(BMessage *message)
-{
-	return BMessage::Private(message).GetTarget();
-}
-#endif
 
 uint32 BLooper::sLooperID = (uint32)B_ERROR;
 team_id BLooper::sTeamID = (team_id)B_ERROR;
@@ -1175,26 +1158,26 @@ BLooper::ReadMessageFromPort(bigtime_t tout)
 
 	delete[] (int8*)msgbuffer;
 
-PRINT(("BLooper::ReadMessageFromPort() done: %p\n", bmsg));
+	PRINT(("BLooper::ReadMessageFromPort() done: %p\n", bmsg));
 	return bmsg;
 }
-//------------------------------------------------------------------------------
-BMessage* BLooper::ConvertToMessage(void* raw, int32 code)
+
+
+BMessage*
+BLooper::ConvertToMessage(void* raw, int32 code)
 {
-PRINT(("BLooper::ConvertToMessage()\n"));
+	PRINT(("BLooper::ConvertToMessage()\n"));
 	BMessage* bmsg = new BMessage(code);
 
-	if (raw != NULL)
-	{
-		if (bmsg->Unflatten((const char*)raw) != B_OK)
-		{
-PRINT(("BLooper::ConvertToMessage(): unflattening message failed\n"));
+	if (raw != NULL) {
+		if (bmsg->Unflatten((const char*)raw) != B_OK) {
+			PRINT(("BLooper::ConvertToMessage(): unflattening message failed\n"));
 			delete bmsg;
 			bmsg = NULL;
 		}
 	}
 
-PRINT(("BLooper::ConvertToMessage(): %p\n", bmsg));
+	PRINT(("BLooper::ConvertToMessage(): %p\n", bmsg));
 	return bmsg;
 }
 
@@ -1203,17 +1186,16 @@ void
 BLooper::task_looper()
 {
 	PRINT(("BLooper::task_looper()\n"));
-	//	Check that looper is locked (should be)
+	// Check that looper is locked (should be)
 	AssertLocked();
-	//	Unlock the looper
+	// Unlock the looper
 	Unlock();
 
 	if (IsLocked())
 		debugger("looper must not be locked!");
 
-	//	loop: As long as we are not terminating.
-	while (!fTerminating)
-	{
+	// loop: As long as we are not terminating.
+	while (!fTerminating) {
 		PRINT(("LOOPER: outer loop\n"));
 		// TODO: timeout determination algo
 		//	Read from message port (how do we determine what the timeout is?)
@@ -1225,27 +1207,26 @@ BLooper::task_looper()
 		if (msg)
 			_AddMessagePriv(msg);
 
-		//	Get message count from port
+		// Get message count from port
 		int32 msgCount = port_count(fMsgPort);
 		for (int32 i = 0; i < msgCount; ++i) {
-			//	Read 'count' messages from port (so we will not block)
-			//	We use zero as our timeout since we know there is stuff there
+			// Read 'count' messages from port (so we will not block)
+			// We use zero as our timeout since we know there is stuff there
 			msg = MessageFromPort(0);
-			//	Add messages to queue
 			if (msg)
 				_AddMessagePriv(msg);
 		}
 
-		//	loop: As long as there are messages in the queue and the port is
-		//		  empty... and we are not terminating, of course.
+		// loop: As long as there are messages in the queue and the port is
+		//		 empty... and we are not terminating, of course.
 		bool dispatchNextMessage = true;
 		while (!fTerminating && dispatchNextMessage) {
 			PRINT(("LOOPER: inner loop\n"));
-			//	Get next message from queue (assign to fLastMessage)
+			// Get next message from queue (assign to fLastMessage)
 			fLastMessage = fQueue->NextMessage();
 
-			//	Lock the looper
 			Lock();
+
 			if (!fLastMessage) {
 				// No more messages: Unlock the looper and terminate the
 				// dispatch loop.
@@ -1255,61 +1236,34 @@ BLooper::task_looper()
 					(char*)&fLastMessage->what));
 				DBG(fLastMessage->PrintToStream());
 
-				//	Get the target handler
-#ifdef USING_MESSAGE4
-				//	Use the private BMessage accessor to determine if we are
-				//	using the preferred handler, or if a target has been
-				//	specified
+				// Get the target handler
 				BHandler *handler = NULL;
 				BMessage::Private messagePrivate(fLastMessage);
 				bool usePreferred = messagePrivate.UsePreferredTarget();
-#else
-				//	Use BMessage friend functions to determine if we are using the
-				//	preferred handler, or if a target has been specified
-				BHandler* handler = NULL;
-				bool usePreferred = _use_preferred_target_(fLastMessage);
-#endif
+
 				if (usePreferred) {
 					PRINT(("LOOPER: use preferred target\n"));
 					handler = fPreferred;
+					if (handler == NULL)
+						handler = this;
 				} else {
-					PRINT(("LOOPER: don't use preferred target\n"));
-					/**
-						@note	Here is where all the token stuff starts to
-								make sense.  How, exactly, do we determine
-								what the target BHandler is?  If we look at
-								BMessage, we see an int32 field, fTarget.
-								Amazingly, we happen to have a global mapping
-								of BHandler pointers to int32s!
-					 */
-					PRINT(("LOOPER: use: %ld\n", _get_message_target_(fLastMessage)));
-#ifndef USING_MESSAGE4
-					gDefaultTokens.GetToken(_get_message_target_(fLastMessage),
-						B_HANDLER_TOKEN, (void **)&handler);
-#else
 					gDefaultTokens.GetToken(messagePrivate.GetTarget(),
 						B_HANDLER_TOKEN, (void **)&handler);
-#endif
-					PRINT(("LOOPER: handler: %p, this: %p\n", handler, this));
+
+					PRINT(("LOOPER: use %ld, handler: %p, this: %p\n",
+						messagePrivate.GetTarget(), handler, this));
 				}
 
-				if (!handler) {
-					PRINT(("LOOPER: no target handler, use this\n"));
-					handler = this;
-				}
-
-				//	Is this a scripting message? (BMessage::HasSpecifiers())
-				if (fLastMessage->HasSpecifiers()) {
+				// Is this a scripting message? (BMessage::HasSpecifiers())
+				if (handler != NULL && fLastMessage->HasSpecifiers()) {
 					int32 index = 0;
 					// Make sure the current specifier is kosher
 					if (fLastMessage->GetCurrentSpecifier(&index) == B_OK)
 						handler = resolve_specifier(handler, fLastMessage);
-				} else {
-					PRINT(("LOOPER: no scripting message\n"));
 				}
 
 				if (handler) {
-					//	Do filtering
+					// Do filtering
 					handler = _TopLevelFilter(fLastMessage, handler);
 					PRINT(("LOOPER: _TopLevelFilter(): %p\n", handler));
 					if (handler && handler->Looper() == this)
@@ -1317,18 +1271,18 @@ BLooper::task_looper()
 				}
 			}
 
-			//	Unlock the looper
+			// Unlock the looper
 			Unlock();
 
-			//	Delete the current message (fLastMessage)
+			// Delete the current message (fLastMessage)
 			if (fLastMessage) {
 				delete fLastMessage;
 				fLastMessage = NULL;
 			}
 
-			//	Are any messages on the port?
+			// Are any messages on the port?
 			if (port_count(fMsgPort) > 0) {
-				//	Do outer loop
+				// Do outer loop
 				dispatchNextMessage = false;
 			}
 		}
