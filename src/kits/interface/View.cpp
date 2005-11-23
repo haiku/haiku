@@ -1353,12 +1353,9 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 				case B_MOUSE_UP:
 				case B_MOUSE_DOWN:
 				case B_MOUSE_MOVED:
-				{
-					msg->FindPoint("where", location);
+					msg->FindPoint("screen_where", location);
 					msg->FindInt32("buttons", (int32 *)buttons);
 
-					// ToDo: the "where" coordinates are screen coordinates
-					//	unlike R5 - this might break applications!
 					ConvertFromScreen(location);
 
 					queue->RemoveMessage(msg);
@@ -1366,7 +1363,6 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 
 					queue->Unlock();
 					return;
-				}
 			}
 		}
 		queue->Unlock();
@@ -1375,8 +1371,8 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 	// If no mouse update message has been found in the message queue, 
 	// we get the current mouse location and buttons from the app_server
 
-	fOwner->fLink->StartMessage(AS_LAYER_GET_MOUSE_COORDS);
-	
+	fOwner->fLink->StartMessage(AS_GET_MOUSE);
+
 	int32 code;
 	if (fOwner->fLink->FlushWithReply(code) == B_OK
 		&& code == SERVER_TRUE) {

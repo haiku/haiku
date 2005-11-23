@@ -718,9 +718,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			link.Read<uint32>(&eventMask);
 			if (link.Read<uint32>(&options) == B_OK) {
-printf("got %s: eventMask = %ld, options = %ld\n", fCurrentLayer->Name(), eventMask, options);
-				fCurrentLayer->QuietlySetEventMask(eventMask);
-				fCurrentLayer->QuietlySetEventOptions(options);
+				fCurrentLayer->SetEventMask(eventMask, options);
 
 				if (eventMask != 0 || options != 0) {
 					fDesktop->EventDispatcher().AddListener(FocusMessenger(),
@@ -749,8 +747,7 @@ printf("got %s: eventMask = %ld, options = %ld\n", fCurrentLayer->Name(), eventM
 				}
 			}
 
-			if (rootLayer)
-				rootLayer->SetNotifyLayer(fCurrentLayer, eventMask, options);
+			// TODO: support B_LOCK_WINDOW_FOCUS option in RootLayer
 			break;
 		}
 		case AS_LAYER_MOVE_TO:
@@ -1602,23 +1599,25 @@ if (rootLayer)
 			DTRACE(("ServerWindow %s: Message AS_DRAG_RECT unimplemented\n", Title()));
 			break;
 		}
-		case AS_LAYER_GET_MOUSE_COORDS:
+		case AS_GET_MOUSE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_GET_MOUSE_COORDS\n", fTitle));
-
-			fLink.StartMessage(SERVER_TRUE);
+			DTRACE(("ServerWindow %s: Message AS_GET_MOUSE\n", fTitle));
 
 			// Returns
 			// 1) BPoint mouse location
 			// 2) int32 button state
 
-			fLink.Attach<BPoint>(fDesktop->HWInterface()->GetCursorPosition());
-			fLink.Attach<int32>(fDesktop->RootLayer()->Buttons());
+			BPoint where;
+			int32 buttons;
+			fDesktop->EventDispatcher().GetMouse(where, buttons);
 
+			fLink.StartMessage(B_OK);
+			fLink.Attach<BPoint>(where);
+			fLink.Attach<int32>(buttons);
 			fLink.Flush();
 			break;
 		}
-		
+
 		case AS_DW_GET_SYNC_DATA:
 		{
 			// TODO: Use token or get rid of it.
@@ -2116,6 +2115,9 @@ ServerWindow::_MessageLooper()
 status_t
 ServerWindow::SendMessageToClient(const BMessage* msg, int32 target) const
 {
+	if (target == B_NULL_TOKEN)
+		target = fClientToken;
+
 #ifndef USING_MESSAGE4
 	ssize_t size = msg->FlattenedSize();
 	char* buffer = new(nothrow) char[size];

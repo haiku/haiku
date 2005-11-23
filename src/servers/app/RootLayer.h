@@ -96,16 +96,11 @@ public:
 	
 			void				SetBGColor(const RGBColor &col);
 			RGBColor			BGColor(void) const;
-	
-	inline	int32				Buttons(void) { return fButtons; }
-	
+
 			void				SetDragMessage(BMessage *msg);
 			BMessage*			DragMessage(void) const;
 
-			bool				AddToInputNotificationLists(Layer *lay, uint32 mask,
-									uint32 options);
-			bool				SetNotifyLayer(Layer *lay, uint32 mask, uint32 options);
-			void				ClearNotifyLayer();
+			void				SetMouseEventLayer(Layer* layer);
 
 			void				LayerRemoved(Layer* layer);
 
@@ -139,25 +134,19 @@ friend class Desktop;
 
 			// Input related methods
 			void				MouseEventHandler(BMessage *msg);
-			void				_ProcessMouseMovedEvent(BMessage *msg);
+			void				_ProcessMouseMovedEvent(BMessage *msg, BPoint where, Layer* target);
 
 			Desktop*			fDesktop;
 			BMessage*			fDragMessage;
-			Layer*				fLastLayerUnderMouse;
+			Layer*				fMouseEventLayer;
 
-			Layer*				fNotifyLayer;
 			uint32				fSavedEventMask;
 			uint32				fSavedEventOptions;
-			BList				fMouseNotificationList;
-			BList				fKeyboardNotificationList;
 
 			BLocker				fAllRegionsLock;
 
 			BRegion				fDirtyForRedraw;
 
-			int32				fButtons;
-			BPoint				fLastMousePosition;
-	
 			int32				fActiveWksIndex;
 			int32				fWsCount;
 			Workspace**			fWorkspace;

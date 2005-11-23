@@ -210,7 +210,7 @@ Desktop::Init()
 				fRootLayer->Lock();
 				fRootLayer->MouseEventHandler(message);
 				fRootLayer->Unlock();
-				return B_SKIP_MESSAGE;
+				return B_DISPATCH_MESSAGE;
 			}
 
 		private:

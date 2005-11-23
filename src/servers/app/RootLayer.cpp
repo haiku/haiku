@@ -61,16 +61,12 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 
 	  fDesktop(desktop),
 	  fDragMessage(NULL),
-	  fLastLayerUnderMouse(this),
-	  fNotifyLayer(NULL),
+	  fMouseEventLayer(NULL),
 	  fSavedEventMask(0),
 	  fSavedEventOptions(0),
 	  fAllRegionsLock("root layer region lock"),
 
 	  fDirtyForRedraw(),
-
-	  fButtons(0),
-	  fLastMousePosition(0.0, 0.0),
 
 	  fActiveWksIndex(0),
 	  fWsCount(0),
@@ -371,18 +367,17 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 		return false;
 
 	// you cannot switch workspaces on R5 if there is an event mask BView
-	if (fNotifyLayer && fNotifyLayer->Owner())
-		return false;
+//	if (fNotifyLayer && fNotifyLayer->Owner())
+//		return false;
 
 	// if you're dragging something you are allowed to change workspaces only if
 	// the Layer being dragged is a B_NORMAL_WINDOW_FEEL WinBorder.
-	WinBorder *draggedWinBorder = dynamic_cast<WinBorder*>(fNotifyLayer);
-	if (fNotifyLayer) {
+	WinBorder *draggedWinBorder = dynamic_cast<WinBorder*>(fMouseEventLayer);
+	if (fMouseEventLayer != NULL) {
 		if (draggedWinBorder) {
 			if (draggedWinBorder->Feel() != B_NORMAL_WINDOW_FEEL)
 				return false;
-		}
-		else
+		} else
 			return false;
 	}
 
@@ -478,9 +473,9 @@ RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldIndex, uint32 
 {
 	// if the active notify Layer is somehow related to winBorder, then
 	// this window/WinBorder is not allowed to leave this workspace.
-	if (fNotifyLayer && (fNotifyLayer == winBorder || fNotifyLayer->Owner() == winBorder)) {
-		newIndex |= (0x00000001UL << fActiveWksIndex);
-	}
+// TODO: this looks wrong: I doubt the window is supposed to open in two workspaces then
+//	if (fNotifyLayer && (fNotifyLayer == winBorder || fNotifyLayer->Owner() == winBorder))
+//		newIndex |= (0x00000001UL << fActiveWksIndex);
 
 	uint32 localOldIndex = oldIndex;
 	uint32 localNewIndex = newIndex;
@@ -851,25 +846,13 @@ RootLayer::SetActive(WinBorder* newActive, bool activate)
 	return returnValue;
 }
 
-//---------------------------------------------------------------------------
-//				Workspace related methods
-//---------------------------------------------------------------------------
 
-//---------------------------------------------------------------------------
-//				Input related methods
-//---------------------------------------------------------------------------
+//	#pragma mark - Input related methods
+
+
 void
-RootLayer::_ProcessMouseMovedEvent(BMessage *msg)
+RootLayer::_ProcessMouseMovedEvent(BMessage *msg, BPoint where, Layer* target)
 {
-	BPoint where(0,0);
-	msg->FindPoint("where", &where);
-
-	Layer* target = LayerAt(where);
-	if (target == NULL) {
-		CRITICAL("RootLayer::_ProcessMouseMovedEvent() 'target' can't be null.\n");
-		return;
-	}
-
 	// change focus in FFM mode
 	WinBorder* winBorderTarget = dynamic_cast<WinBorder*>(target);
 	if (winBorderTarget) {
@@ -886,266 +869,60 @@ RootLayer::_ProcessMouseMovedEvent(BMessage *msg)
 		}
 	}
 
-	// add the layer under mouse to the list of layers to be notified on mouse moved
-	bool alreadyPresent = fMouseNotificationList.HasItem(target);
-	if (!alreadyPresent)
-		fMouseNotificationList.AddItem(target);
+	target->MouseMoved(msg);
+}
 
-	int32 count = fMouseNotificationList.CountItems();
-	int32 viewAction;
-	Layer *lay;
-	for (int32 i = 0; i <= count; i++) {
-		lay = static_cast<Layer*>(fMouseNotificationList.ItemAt(i));
-		if (lay) {
-			// set transit state
-			if (lay == target)
-				if (lay == fLastLayerUnderMouse)
-					viewAction = B_INSIDE_VIEW;
-				else
-					viewAction = B_ENTERED_VIEW;
-			else
-				if (lay == fLastLayerUnderMouse)
-					viewAction = B_EXITED_VIEW;
-				else
-					viewAction = B_OUTSIDE_VIEW;
 
-			msg->AddInt32("transit", viewAction);
-			lay->MouseMoved(msg);
+void
+RootLayer::MouseEventHandler(BMessage *event)
+{
+	BPoint where;
+	if (event->FindPoint("where", &where) != B_OK)
+		return;
+
+	Layer* layer = fMouseEventLayer;
+	if (layer == NULL) {
+		if (fWMState.Focus != NULL) {
+			layer = fWMState.Focus->LayerAt(where);
+			if (layer != NULL)
+				event->AddInt32("_view_token", layer->ViewToken());
+		}
+		if (layer == NULL) {
+			layer = LayerAt(where);
+			if (layer == NULL)
+				return;
 		}
 	}
 
-	if (!alreadyPresent)
-		fMouseNotificationList.RemoveItem(target);
-
-	fLastLayerUnderMouse = target;
-	fLastMousePosition = where;
-}
-
-void
-RootLayer::MouseEventHandler(BMessage *msg)
-{
-	switch (msg->what) {
-		case B_MOUSE_DOWN: {
-			//printf("RootLayer::MouseEventHandler(B_MOUSE_DOWN)\n");
-
-			BPoint where(0,0);
-
-			msg->FindPoint("where", &where);
-			// We'll need this so that GetMouse can query for which buttons are down.
-			msg->FindInt32("buttons", &fButtons);
-
-			where.ConstrainTo(Frame());
-
-			if (fLastMousePosition != where) {
-				// If this happens, it's input server's fault.
-				// There might be additional fields an application expects in B_MOUSE_MOVED
-				// message, and in this way it won't get them. 
-				int64 when = 0;
-				int32 buttons = 0;
-
-				msg->FindInt64("when", &when);
-				msg->FindInt32("buttons", &buttons);
-
-				BMessage mouseMovedMsg(B_MOUSE_MOVED);
-				mouseMovedMsg.AddInt64("when", when);
-				mouseMovedMsg.AddInt32("buttons", buttons);
-				mouseMovedMsg.AddPoint("where", where);
-
-				_ProcessMouseMovedEvent(msg);
-			}
-
-			if (fLastLayerUnderMouse == NULL) {
-				CRITICAL("RootLayer::MouseEventHandler(B_MOUSE_DOWN) fLastLayerUnderMouse is null!\n");
-				break;
-			}
-
-			if (fLastLayerUnderMouse == this)
-				break;
-
-			int32 count = fMouseNotificationList.CountItems();
-			Layer *lay;
-			for (int32 i = 0; i <= count; i++) {
-				lay = static_cast<Layer*>(fMouseNotificationList.ItemAt(i));
-				if (lay)
-					// NOTE: testing under R5 shows that it doesn't matter if a window is created 
-					// with B_ASYNCHRONOUS_CONTROLS flag or not. B_MOUSE_DOWN is always transmited.
-					lay->MouseDown(msg);
-			}
-
-			// get the pointer for one of the first RootLayer's descendants
-			Layer *primaryTarget = LayerAt(where, false);
-			primaryTarget->MouseDown(msg);
-
+	switch (event->what) {
+		case B_MOUSE_DOWN:
+			layer->MouseDown(event);
 			break;
-		}
-		case B_MOUSE_UP: {
-			//printf("RootLayer::MouseEventHandler(B_MOUSE_UP)\n");
 
-			BPoint where(0,0);
-
-			msg->FindPoint("where", &where);
-
-			where.ConstrainTo(fFrame);
-
-			if (fLastMousePosition != where) {
-				// If this happens, it's input server's fault.
-				// There might be additional fields an application expects in B_MOUSE_MOVED
-				// message, and in this way it won't get them. 
-				int64 when = 0;
-				int32 buttons = 0;
-
-				msg->FindInt64("when", &when);
-				msg->FindInt32("buttons", &buttons);
-
-				BMessage mouseMovedMsg(B_MOUSE_MOVED);
-				mouseMovedMsg.AddInt64("when", when);
-				mouseMovedMsg.AddInt32("buttons", buttons);
-				mouseMovedMsg.AddPoint("where", where);
-
-				_ProcessMouseMovedEvent(msg);
-			}
-
-			if (fLastLayerUnderMouse == NULL) {
-				CRITICAL("RootLayer::MouseEventHandler(B_MOUSE_UP) fLastLayerUnderMouse is null!\n");
-				break;
-			}
-
-			bool foundCurrent = fMouseNotificationList.HasItem(fLastLayerUnderMouse);
-			int32 count = fMouseNotificationList.CountItems();
-			Layer *lay;
-			for (int32 i = 0; i <= count; i++) {
-				lay = static_cast<Layer*>(fMouseNotificationList.ItemAt(i));
-				if (lay)
-					lay->MouseUp(msg);
-			}
-			ClearNotifyLayer();
-
-			if (!foundCurrent)
-				fLastLayerUnderMouse->MouseUp(msg);
-
-			// TODO: This is a quick fix to avoid the endless loop with windows created
-			// with the B_ASYNCHRONOUS_CONTROLS flag, but please someone have a look into this.
-			fButtons = 0;
-			
+		case B_MOUSE_UP:
+			layer->MouseUp(event);
+			SetMouseEventLayer(NULL);
 			break;
-		}
+
 		case B_MOUSE_MOVED:
-			_ProcessMouseMovedEvent(msg);
+			_ProcessMouseMovedEvent(event, where, layer);
 			break;
-
-		case B_MOUSE_WHEEL_CHANGED: {
-			//printf("RootLayer::MouseEventHandler(B_MOUSE_WHEEL_CHANGED)\n");
-			// FEATURE: This is a tentative change: mouse wheel messages are always sent to the window
-			// under the cursor. It's pretty stupid to send it to the active window unless a particular
-			// view has locked focus via SetMouseEventMask
-						
-			if (fLastLayerUnderMouse == NULL) {
-				CRITICAL("RootLayer::MouseEventHandler(B_MOUSE_DOWN) fLastLayerUnderMouse is null!\n");
-				break;
-			}
-
-			fLastLayerUnderMouse->MouseWheelChanged(msg);
-			break;
-		}
-		default:
-		{
-			printf("RootLayer::MouseEventHandler(): WARNING: unknown message\n");
-			break;
-		}
 	}
 }
 
-
-bool
-RootLayer::AddToInputNotificationLists(Layer *lay, uint32 mask, uint32 options)
-{
-	if (!lay)
-		return false;
-
-	bool returnValue = true;
-
-	Lock();
-
-	if (mask & B_POINTER_EVENTS) {
-		if (!fMouseNotificationList.HasItem(lay))
-			fMouseNotificationList.AddItem(lay);
-	}
-	else {
-		if (options == 0)
-			fMouseNotificationList.RemoveItem(lay);
-	}
-
-	if (mask & B_KEYBOARD_EVENTS) {
-		if (!fKeyboardNotificationList.HasItem(lay))
-			fKeyboardNotificationList.AddItem(lay);
-	}
-	else {
-		if (options == 0)
-			fKeyboardNotificationList.RemoveItem(lay);
-	}
-
-	// TODO: set options!!!
-	// B_NO_POINTER_HISTORY only! How? By telling to the input_server?
-	
-	Unlock();
-
-	return returnValue;
-}
-
-bool
-RootLayer::SetNotifyLayer(Layer *lay, uint32 mask, uint32 options)
-{
-	if (!lay)
-		return false;
-
-	bool returnValue = true;
-
-	Lock();
-
-	fNotifyLayer = lay;
-	fSavedEventMask = lay->EventMask();
-	fSavedEventOptions = lay->EventOptions();
-
-	AddToInputNotificationLists(lay, mask, options);
-
-	// TODO: set other options!!!
-	// B_SUSPEND_VIEW_FOCUS
-	// B_LOCK_WINDOW_FOCUS
-	Unlock();
-
-	return returnValue;
-}
 
 void
-RootLayer::ClearNotifyLayer()
+RootLayer::SetMouseEventLayer(Layer* layer)
 {
-	if (fNotifyLayer) {
-		Lock();
-		// remove from notification list.
-		AddToInputNotificationLists(fNotifyLayer, 0UL, 0UL);
-		// set event masks
-		fNotifyLayer->QuietlySetEventMask(fSavedEventMask);
-		fNotifyLayer->QuietlySetEventOptions(fSavedEventOptions);
-		// add to notification list with event masks set my BView::SetEventMask()
-		AddToInputNotificationLists(fNotifyLayer, fSavedEventMask, fSavedEventOptions);
-
-		fNotifyLayer = NULL;
-		fSavedEventMask = 0UL;
-		fSavedEventOptions = 0UL;
-
-		Unlock();
-	}
+	fMouseEventLayer = layer;
 }
 
 
 void
 RootLayer::LayerRemoved(Layer* layer)
 {
-	if (layer == fNotifyLayer)
-		fNotifyLayer = NULL;
-// TODO: this must not happen!!! Fix this, quickly!
-	if (layer == fLastLayerUnderMouse)
-		fLastLayerUnderMouse = NULL;
+	if (fMouseEventLayer == layer)
+		fMouseEventLayer = NULL;
 }
 
 
@@ -1158,7 +935,7 @@ RootLayer::SetDragMessage(BMessage* msg)
 	}
 
 	if (msg)
-		fDragMessage	= new BMessage(*msg);
+		fDragMessage = new BMessage(*msg);
 }
 
 
@@ -1245,12 +1022,6 @@ RootLayer::hide_winBorder(WinBorder *winBorder)
 void
 RootLayer::change_winBorder_feel(WinBorder *winBorder, int32 newFeel)
 {
-	// if the notify Layer is somehow related to winBorder, then
-	// this window/WinBorder is not allowed to change feel.
-	if (fNotifyLayer && (fNotifyLayer == winBorder || fNotifyLayer->Owner() == winBorder)) {
-		return;
-	}
-
 	bool isVisible = false;
 	bool isVisibleInActiveWorkspace = false;
 

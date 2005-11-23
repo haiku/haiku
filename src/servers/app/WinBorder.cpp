@@ -481,7 +481,7 @@ WinBorder::MouseDown(const BMessage *msg)
 			if (action == DEC_MOVETOBACK) {
 				GetRootLayer()->SetActive(this, false);
 			} else {
-				GetRootLayer()->SetNotifyLayer(this, B_POINTER_EVENTS, 0UL);
+				GetRootLayer()->SetMouseEventLayer(this);
 				GetRootLayer()->SetActive(this);
 			}
 		} else if (target != NULL) {

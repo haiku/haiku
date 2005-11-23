@@ -424,7 +424,7 @@ Layer::SetName(const char* name)
 	fName.SetTo(name);
 }
 
-// SetUserClipping
+
 void
 Layer::SetUserClipping(const BRegion& region)
 {
@@ -434,7 +434,7 @@ Layer::SetUserClipping(const BRegion& region)
 	_RebuildDrawingRegion();
 }
 
-// SetFlags
+
 void
 Layer::SetFlags(uint32 flags)
 {
@@ -442,7 +442,15 @@ Layer::SetFlags(uint32 flags)
 	fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
 }
 
-// Draw
+
+void
+Layer::SetEventMask(uint32 eventMask, uint32 options)
+{
+	fEventMask = eventMask;
+	fEventOptions = options;
+}
+
+
 void
 Layer::Draw(const BRect &rect)
 {
@@ -823,55 +831,46 @@ Layer::CopyBits(BRect& src, BRect& dst, int32 xOffset, int32 yOffset)
 	}
 }		
 
+
 void
 Layer::MouseDown(const BMessage *msg)
 {
-	if (Window() && !IsTopLayer()) {
-		Window()->SendMessageToClient(msg, fViewToken);
-	}
 }
+
 
 void
 Layer::MouseUp(const BMessage *msg)
 {
-	if (Window() && !IsTopLayer()) {
-		Window()->SendMessageToClient(msg, fViewToken);
-	}
 }
+
 
 void
 Layer::MouseMoved(const BMessage *msg)
 {
-	if (Window() && !IsTopLayer()) {
-		Window()->SendMessageToClient(msg, fViewToken);
-	}
 }
+
 
 void
 Layer::MouseWheelChanged(const BMessage *msg)
 {
-	if (Window() && !IsTopLayer()) {
-		Window()->SendMessageToClient(msg, fViewToken);
-	}
 }
 
 
 void
 Layer::WorkspaceActivated(int32 index, bool active)
 {
-	// Empty
 }
+
 
 void
 Layer::WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces)
 {
-	// Empty
 }
+
 
 void
 Layer::Activated(bool active)
 {
-	// Empty
 }
 
 
@@ -880,6 +879,7 @@ Layer::ScrollingOffset() const
 {
 	return fScrollingOffset;
 }
+
 
 void
 Layer::SetDrawingOrigin(BPoint origin)
@@ -1496,6 +1496,7 @@ Layer::_AllRedraw(const BRegion &invalid)
 		}
 	}
 }
+
 
 void
 Layer::_AddToViewsWithInvalidCoords() const

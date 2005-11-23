@@ -226,6 +226,7 @@ public:
 
 private:
 	typedef BLooper inherited;
+	struct unpack_cookie;
 	class Shortcut;
 
 	friend class BApplication;
@@ -267,7 +268,10 @@ private:
 			void		AddShortcut(uint32 key, uint32 modifiers,
 							BMenuItem* item);
 			BHandler*	_DetermineTarget(BMessage* message, BHandler* target);
-			bool		_DistributeMessage(BMessage* message, BHandler* target);
+			bool		_UnpackMessage(unpack_cookie& state, BMessage** _message,
+							BHandler** _target, bool* _usePreferred);
+			void		_SanitizeMessage(BMessage* message, BHandler* target,
+							bool usePreferred);
 
 			bool		InUpdate();
 			void		_DequeueAll();

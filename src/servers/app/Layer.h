@@ -182,15 +182,12 @@ class Layer {
 			DrawingEngine*		GetDrawingEngine() const
 									{ return fDriver; }
 
-	// flags
+			void				SetEventMask(uint32 eventMask, uint32 options);
 			uint32				EventMask() const
 									{ return fEventMask; }
 			uint32				EventOptions() const
 									{ return fEventOptions; }
-	inline	void				QuietlySetEventMask(uint32 em)
-									{ fEventMask = em; }
-	inline	void				QuietlySetEventOptions(uint32 eo)
-									{ fEventOptions = eo; }
+
 	inline	uint32				ResizeMode() const
 									{ return fResizeMode; }
 	inline	uint32				Flags() const

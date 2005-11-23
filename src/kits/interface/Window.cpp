@@ -43,6 +43,18 @@
 #endif
 
 
+struct BWindow::unpack_cookie {
+	unpack_cookie();
+
+	BMessage*	message;
+	int32		index;
+	BHandler*	focus;
+	int32		focus_token;
+	int32		last_view_token;
+	bool		found_focus;
+	bool		tokens_scanned;
+};
+
 class BWindow::Shortcut {
 	public:
 		Shortcut(uint32 key, uint32 modifiers, BMenuItem* item);
@@ -129,6 +141,22 @@ _set_menu_sem_(BWindow *window, sem_id sem)
 {
 	if (window != NULL)
 		window->fMenuSem = sem;
+}
+
+
+//	#pragma mark -
+
+
+BWindow::unpack_cookie::unpack_cookie()
+	:
+	message((BMessage*)~0UL),
+		// message == NULL is our exit condition
+	index(0),
+	focus_token(B_NULL_TOKEN),
+	last_view_token(B_NULL_TOKEN),
+	found_focus(false),
+	tokens_scanned(false)
+{
 }
 
 
@@ -810,38 +838,24 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		case B_MOUSE_DOWN:
 		{
 			BPoint where;
-			uint32 modifiers;
-			uint32 buttons;
-			int32 clicks;
-			msg->FindPoint("where", &where);
-			msg->FindInt32("modifiers", (int32 *)&modifiers);
-			msg->FindInt32("buttons", (int32 *)&buttons);
-			msg->FindInt32("clicks", &clicks);
+			msg->FindPoint("be:view_where", &where);
 
-			if (target && target != this && target != fTopView) {
-				if (BView *view = dynamic_cast<BView *>(target)) {
-					view->ConvertFromScreen(&where);
-					view->MouseDown(where);
-				} else
-					target->MessageReceived(msg);
-			}
+			if (BView *view = dynamic_cast<BView *>(target))
+				view->MouseDown(where);
+			else
+				target->MessageReceived(msg);
 			break;
 		}
 
 		case B_MOUSE_UP:
 		{
 			BPoint where;
-			uint32 modifiers;
-			msg->FindPoint("where", &where);
-			msg->FindInt32("modifiers", (int32 *)&modifiers);
+			msg->FindPoint("be:view_where", &where);
 
-			if (target && target != this && target != fTopView) {
-				if (BView *view = dynamic_cast<BView *>(target)) {
-					view->ConvertFromScreen(&where);
-					view->MouseUp(where);
-				} else
-					target->MessageReceived(msg);
-			}
+			if (BView *view = dynamic_cast<BView *>(target))
+				view->MouseUp(where);
+			else
+				target->MessageReceived(msg);
 			break;
 		}
 
@@ -850,24 +864,14 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			BPoint where;
 			uint32 buttons;
 			uint32 transit;
-			msg->FindPoint("where", &where);
+			msg->FindPoint("be:view_where", &where);
 			msg->FindInt32("buttons", (int32 *)&buttons);
-			msg->FindInt32("transit", (int32 *)&transit);
-			if (target && target != this && target != fTopView) {
-				if (BView *view = dynamic_cast<BView *>(target)) {
-					if (fLastMouseMovedView != view) {
-						if (fLastMouseMovedView) {
-							BPoint p(where);
-							fLastMouseMovedView->ConvertFromScreen(&p);
-							fLastMouseMovedView->MouseMoved(p, B_EXITED_VIEW, NULL);
-						}
-						fLastMouseMovedView = view;
-					}
-					view->ConvertFromScreen(&where);
-					view->MouseMoved(where, transit, NULL);
-				} else
-					target->MessageReceived(msg);
-			}
+			msg->FindInt32("be:transit", (int32 *)&transit);
+
+			if (BView *view = dynamic_cast<BView *>(target))
+				view->MouseMoved(where, transit, NULL);
+			else
+				target->MessageReceived(msg);
 			break;
 		}
 
@@ -2167,36 +2171,39 @@ BWindow::_DequeueAll()
 }
 
 
-/*!	This here is a nearly full code duplication to BLooper::task_looper()
-	but with one little difference: It uses the _DetermineTarget() method
-	to tell what the later target of a message will be, if no explicit target
-	is supplied.
-	This is important because the app_server sends all events to the preferred
-	handler, and these must be correctly retargeted and eventually distributed
-	to several handlers using _DistributeMessage().
+/*!	This here is an almost complete code duplication to BLooper::task_looper()
+	but with some important differences:
+	 a)	it uses the _DetermineTarget() method to tell what the later target of
+		a message will be, if no explicit target is supplied.
+	 b)	it calls _UnpackMessage() and _SanitizeMessage() to duplicate the message
+	 	to all of its intended targets, and to add all fields the target would
+	 	expect in such a message.
+
+	This is important because the app_server sends all input events to the
+	preferred handler, and expects them to be correctly distributed to their
+	intended targets.
 */
 void
 BWindow::task_looper()
 {
 	STRACE(("info: BWindow::task_looper() started.\n"));
 
-	//	Check that looper is locked (should be)
+	// Check that looper is locked (should be)
 	AssertLocked();
-	//	Unlock the looper
 	Unlock();
 
 	if (IsLocked())
 		debugger("window must not be locked!");
 
-	//	loop: As long as we are not terminating.
+	// loop: As long as we are not terminating.
 	while (!fTerminating) {
 		// TODO: timeout determination algo
 		//	Read from message port (how do we determine what the timeout is?)
 		BMessage* msg = MessageFromPort();
 
-		//	Did we get a message?
+		// Did we get a message?
 		if (msg) {
-			//	Add to queue
+			// Add to queue
 			fQueue->AddMessage(msg);
 		} else
 			continue;
@@ -2204,22 +2211,22 @@ BWindow::task_looper()
 		//	Get message count from port
 		int32 msgCount = port_count(fMsgPort);
 		for (int32 i = 0; i < msgCount; ++i) {
-			//	Read 'count' messages from port (so we will not block)
-			//	We use zero as our timeout since we know there is stuff there
+			// Read 'count' messages from port (so we will not block)
+			// We use zero as our timeout since we know there is stuff there
 			msg = MessageFromPort(0);
-			//	Add messages to queue
+			// Add messages to queue
 			if (msg)
 				fQueue->AddMessage(msg);
 		}
 
-		//	loop: As long as there are messages in the queue and the port is
-		//		  empty... and we are not terminating, of course.
+		// loop: As long as there are messages in the queue and the port is
+		//		 empty... and we are not terminating, of course.
 		bool dispatchNextMessage = true;
 		while (!fTerminating && dispatchNextMessage) {
 			//	Get next message from queue (assign to fLastMessage)
 			fLastMessage = fQueue->NextMessage();
 
-			//	Lock the looper
+			// Lock the looper
 			Lock();
 			if (!fLastMessage) {
 				// No more messages: Unlock the looper and terminate the
@@ -2241,40 +2248,41 @@ BWindow::task_looper()
 						B_HANDLER_TOKEN, (void **)&handler);
 				}
 
-				// if a target was given, and we should not use the preferred
-				// handler, we can just use that one
 				if (handler == NULL || usePreferred)
 					handler = _DetermineTarget(fLastMessage, handler);
-				if (!usePreferred || _DistributeMessage(fLastMessage, handler)) {
-					if (handler == NULL)
-						handler = this;
 
-					//	Is this a scripting message? (BMessage::HasSpecifiers())
-					if (fLastMessage->HasSpecifiers()) {
-						int32 index = 0;
-						// Make sure the current specifier is kosher
-						if (fLastMessage->GetCurrentSpecifier(&index) == B_OK)
-							handler = resolve_specifier(handler, fLastMessage);
-					}
+				unpack_cookie cookie;
+				while (_UnpackMessage(cookie, &fLastMessage, &handler, &usePreferred)) {
+					// if there is no target handler, the message is dropped
+					if (handler != NULL) {
+						// Is this a scripting message?
+						if (fLastMessage->HasSpecifiers()) {
+							int32 index = 0;
+							// Make sure the current specifier is kosher
+							if (fLastMessage->GetCurrentSpecifier(&index) == B_OK)
+								handler = resolve_specifier(handler, fLastMessage);
+						}
 
-					if (handler) {
-						//	Do filtering and dispatch message
-						handler = _TopLevelFilter(fLastMessage, handler);
-						if (handler && handler->Looper() == this)
+						if (handler != NULL)
+							handler = _TopLevelFilter(fLastMessage, handler);
+
+						if (handler != NULL) {
+							_SanitizeMessage(fLastMessage, handler, usePreferred);
 							DispatchMessage(fLastMessage, handler);
+						}
 					}
+
+					// Delete the current message
+					delete fLastMessage;
+					fLastMessage = NULL;
 				}
 			}
 
 			Unlock();
 
-			//	Delete the current message (fLastMessage)
-			delete fLastMessage;
-			fLastMessage = NULL;
-
-			//	Are any messages on the port?
+			// Are any messages on the port?
 			if (port_count(fMsgPort) > 0) {
-				//	Do outer loop
+				// Do outer loop
 				dispatchNextMessage = false;
 			}
 		}
@@ -2409,8 +2417,6 @@ BWindow::_SetFocus(BView *focusView, bool notifyInputServer)
 BHandler *
 BWindow::_DetermineTarget(BMessage *message, BHandler *target)
 {
-	// TODO: this is mostly guessed; check for correctness.
-
 	switch (message->what) {
 		case B_KEY_DOWN:
 		case B_KEY_UP:
@@ -2428,33 +2434,30 @@ BWindow::_DetermineTarget(BMessage *message, BHandler *target)
 		case B_UNMAPPED_KEY_DOWN:
 		case B_UNMAPPED_KEY_UP:
 		case B_MODIFIERS_CHANGED:
-			// these messages will be dispatched by the focus view later
+			// these messages should be dispatched by the focus view
 			return CurrentFocus();
 
 		case B_MOUSE_DOWN:
 		case B_MOUSE_UP:
 		case B_MOUSE_MOVED:
 		case B_MOUSE_WHEEL_CHANGED:
-			// TODO: the app_server should tell us which view is the target
+			// is there a token of the view that is currently under the mouse?
+			int32 token;
+			if (message->FindInt32("_view_token", &token) == B_OK) {
+				BHandler* handler;
+				if (gDefaultTokens.GetToken(token, B_HANDLER_TOKEN,
+						(void**)&handler) == B_OK) {
+					BView* view = dynamic_cast<BView*>(handler);
+					if (view != NULL)
+						return view;
+				}
+			}
 			break;
 
 		case B_PULSE:
 		case B_QUIT_REQUESTED:
 			// TODO: test wether R5 will let BView dispatch these messages
 			return this;
-
-		case B_VIEW_RESIZED:
-		case B_VIEW_MOVED:
-		{
-			int32 token;
-			if (message->FindInt32("_token", &token) != B_OK)
-				token = B_NULL_TOKEN;
-
-			BView *view = _FindView(token);
-			if (view)
-				return view;
-			break;
-		}
 
 		default: 
 			break;
@@ -2471,41 +2474,147 @@ BWindow::_DetermineTarget(BMessage *message, BHandler *target)
 	Returns \c true in case the message should still be dispatched
 */
 bool
-BWindow::_DistributeMessage(BMessage* message, BHandler* focus)
+BWindow::_UnpackMessage(unpack_cookie& cookie, BMessage** _message, BHandler** _target,
+	bool* _usePreferred)
 {
-	bool foundFocus = false;
-	int32 focusToken = B_NULL_TOKEN;
-	if (focus != NULL)
-		focusToken = _get_object_token_(focus);
+	if (cookie.message == NULL)
+		return false;
 
-	int32 index = 0;
-	int32 token;
-	for (; message->FindInt32("_token", index, &token) == B_OK; index++) {
-		if (token == focusToken)
-			foundFocus = true;
+	if (cookie.index == 0 && !cookie.tokens_scanned) {
+		if (!*_usePreferred) {
+			// we only consider messages targeted at the preferred handler
+			cookie.message = NULL;
+			return true;
+		}
+
+		// initialize our cookie
+		cookie.message = *_message;
+		cookie.focus = *_target;
+
+		if (cookie.focus != NULL)
+			cookie.focus_token = _get_object_token_(*_target);
+
+		if (fLastMouseMovedView != NULL && cookie.message->what == B_MOUSE_MOVED)
+			cookie.last_view_token = _get_object_token_(fLastMouseMovedView);
+
+		*_usePreferred = false;
+	}
+
+	_DequeueAll();
+
+	// distribute the message to all targets specified in the
+	// message directly (but not to the focus view)
+
+	for (int32 token; !cookie.tokens_scanned
+			&& cookie.message->FindInt32("_token", cookie.index, &token) == B_OK;
+			cookie.index++) {
+		// focus view is preferred and should get its message directly
+		if (token == cookie.focus_token) {
+			cookie.found_focus = true;
+			continue;
+		}
+		if (token == cookie.last_view_token)
+			continue;
 
 		BView* target = _FindView(token);
 		if (target == NULL)
 			continue;
 
-		BMessenger messenger(target);
-		messenger.SendMessage(message);
+		*_message = new BMessage(*cookie.message);
+		*_target = target;
+		cookie.index++;
+		return true;
 	}
 
-	if (index > 0) {
-		if (foundFocus) {
-			// the focus view already got this message
-			return false;
-		}
+	cookie.tokens_scanned = true;
 
+	// if there is a last mouse moved view, and the new focus is
+	// different, the previous view wants to get its B_EXITED_VIEW
+	// message
+	if (cookie.last_view_token != B_NULL_TOKEN && fLastMouseMovedView != cookie.focus) {
+		*_message = new BMessage(*cookie.message);
+		*_target = fLastMouseMovedView;
+		cookie.last_view_token = B_NULL_TOKEN;
+		return true;
+	}
+
+	if (cookie.index > 0) {
 		// should this message still be dispatched by the focus view?
 		bool feedFocus;
-		if (message->FindBool("_feed_focus", &feedFocus) != B_OK
-			|| feedFocus == false)
+		if (!cookie.found_focus
+			&& (cookie.message->FindBool("_feed_focus", &feedFocus) != B_OK
+				|| feedFocus == false)) {
+			delete cookie.message;
+			cookie.message = NULL;
 			return false;
+		}
 	}
 
+	*_message = cookie.message;
+	*_target = cookie.focus;
+	*_usePreferred = true;
+	cookie.message = NULL;
 	return true;
+}
+
+
+void
+BWindow::_SanitizeMessage(BMessage* message, BHandler* target, bool usePreferred)
+{
+	if (target == NULL)
+		return;
+
+	switch (message->what) {
+		case B_MOUSE_MOVED:
+		case B_MOUSE_UP:
+		case B_MOUSE_DOWN:
+			BPoint where;
+			if (message->FindPoint("screen_where", &where) != B_OK)
+				break;
+
+			// add local window coordinates
+			message->AddPoint("where", ConvertFromScreen(where));
+
+			BView* view = dynamic_cast<BView*>(target);
+			if (view != NULL) {
+				// add local view coordinates
+				message->AddPoint("be:view_where", view->ConvertFromScreen(where));
+
+				// is there a token of the view that is currently under the mouse?
+				BView* viewUnderMouse = NULL;
+				int32 token;
+				if (message->FindInt32("_view_token", &token) == B_OK) {
+					BHandler* handler;
+					if (gDefaultTokens.GetToken(token, B_HANDLER_TOKEN,
+							(void**)&handler) == B_OK)
+						viewUnderMouse = dynamic_cast<BView*>(handler);
+				}
+
+				// add transit information
+				int32 transit;
+				if (message->FindInt32("be:transit", &transit) != B_OK) {
+					if (viewUnderMouse == view) {
+						// the mouse is over the target view
+						if (fLastMouseMovedView != view)
+							transit = B_ENTERED_VIEW;
+						else
+							transit = B_INSIDE_VIEW;
+					} else {
+						// the mouse is not over the target view
+						if (view == fLastMouseMovedView)
+							transit = B_EXITED_VIEW;
+						else
+							transit = B_OUTSIDE_VIEW;
+					}
+
+					message->AddInt32("be:transit", transit);
+				}
+
+				if (usePreferred || viewUnderMouse == NULL)
+					fLastMouseMovedView = viewUnderMouse;
+			}
+			break;
+	}
 }
 
 
