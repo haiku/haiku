@@ -3,17 +3,19 @@
  *  Distributed under the terms of the MIT License.
  *
  *	Authors:
- *				Marc Flerackers (mflerackers@androme.be)
- *				Mike Wilber
- *				Stefano Ceccherini (burton666@libero.it)
- *				Ivan Tonizza
- *				Stephan Aßmus, <superstippi@gmx.de>
+ *		Marc Flerackers (mflerackers@androme.be)
+ *		Mike Wilber
+ *		Stefano Ceccherini (burton666@libero.it)
+ *		Ivan Tonizza
+ *		Stephan Aßmus, <superstippi@gmx.de>
  */
+
 
 #include <Button.h>
 #include <Font.h>
 #include <String.h>
 #include <Window.h>
+
 
 BButton::BButton(BRect frame, const char *name, const char *label, BMessage *message,
 				  uint32 resizingMode, uint32 flags)
@@ -47,8 +49,8 @@ BButton::Instantiate(BMessage *archive)
 {
 	if (validate_instantiation(archive, "BButton"))
 		return new BButton(archive);
-	else
-		return NULL;
+
+	return NULL;
 }
 
 
@@ -382,14 +384,12 @@ BButton::MouseDown(BPoint point)
 	if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS) {
  		SetTracking(true);
  		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
- 	
  	} else {
 		BRect bounds = Bounds();
 		uint32 buttons;
 
 		do {
 			Window()->UpdateIfNeeded();
-			
 			snooze(40000);
 
 			GetMouse(&point, &buttons, true);
@@ -548,20 +548,25 @@ BButton::SetValue(int32 value)
 
 
 void
-BButton::GetPreferredSize(float *width, float *height)
+BButton::GetPreferredSize(float *_width, float *_height)
 {
-	font_height fh;
-	GetFontHeight(&fh);
+	if (_height) {
+		font_height fontHeight;
+		GetFontHeight(&fontHeight);
 
-	*height = 12.0f + (float)ceil(fh.ascent + fh.descent);
-	*width = 20.0f + (float)ceil(StringWidth(Label()));
-	
-	if (*width < 75.0f)
-		*width = 75.0f;
+		*_height = 12.0f + (float)ceil(fontHeight.ascent + fontHeight.descent)
+			+ (fDrawAsDefault ? 6.0f : 0);
+	}
 
-	if (fDrawAsDefault) {
-		*width += 6.0f;
-		*height += 6.0f;
+	if (_width) {
+		float width = 20.0f + (float)ceil(StringWidth(Label()));
+		if (width < 75.0f)
+			width = 75.0f;
+
+		if (fDrawAsDefault)
+			width += 6.0f;
+
+		*_width = width;
 	}
 }
 
@@ -743,9 +748,11 @@ BButton::DrawFocusLine(float x, float y, float width, bool visible)
 {
 	if (visible)
 		SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
-	else
+	else {
 		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 			B_LIGHTEN_1_TINT));
+	}
+
 	// Blue Line
 	StrokeLine(BPoint(x, y), BPoint(x + width, y));
 
