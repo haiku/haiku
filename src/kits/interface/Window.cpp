@@ -2454,6 +2454,11 @@ BWindow::_DetermineTarget(BMessage *message, BHandler *target)
 						return view;
 				}
 			}
+
+			// if there is no valid token in the message, we try our
+			// luck with the last target, if available
+			if (fLastMouseMovedView != NULL)
+				return fLastMouseMovedView;
 			break;
 
 		case B_PULSE:
@@ -2582,38 +2587,40 @@ BWindow::_SanitizeMessage(BMessage* message, BHandler* target, bool usePreferred
 				// add local view coordinates
 				message->AddPoint("be:view_where", view->ConvertFromScreen(where));
 
-				// is there a token of the view that is currently under the mouse?
-				BView* viewUnderMouse = NULL;
-				int32 token;
-				if (message->FindInt32("_view_token", &token) == B_OK) {
-					BHandler* handler;
-					if (gDefaultTokens.GetToken(token, B_HANDLER_TOKEN,
-							(void**)&handler) == B_OK)
-						viewUnderMouse = dynamic_cast<BView*>(handler);
-				}
-
-				// add transit information
-				int32 transit;
-				if (message->FindInt32("be:transit", &transit) != B_OK) {
-					if (viewUnderMouse == view) {
-						// the mouse is over the target view
-						if (fLastMouseMovedView != view)
-							transit = B_ENTERED_VIEW;
-						else
-							transit = B_INSIDE_VIEW;
-					} else {
-						// the mouse is not over the target view
-						if (view == fLastMouseMovedView)
-							transit = B_EXITED_VIEW;
-						else
-							transit = B_OUTSIDE_VIEW;
+				if (message->what == B_MOUSE_MOVED) {
+					// is there a token of the view that is currently under the mouse?
+					BView* viewUnderMouse = NULL;
+					int32 token;
+					if (message->FindInt32("_view_token", &token) == B_OK) {
+						BHandler* handler;
+						if (gDefaultTokens.GetToken(token, B_HANDLER_TOKEN,
+								(void**)&handler) == B_OK)
+							viewUnderMouse = dynamic_cast<BView*>(handler);
+					}
+	
+					// add transit information
+					int32 transit;
+					if (message->FindInt32("be:transit", &transit) != B_OK) {
+						if (viewUnderMouse == view) {
+							// the mouse is over the target view
+							if (fLastMouseMovedView != view)
+								transit = B_ENTERED_VIEW;
+							else
+								transit = B_INSIDE_VIEW;
+						} else {
+							// the mouse is not over the target view
+							if (view == fLastMouseMovedView)
+								transit = B_EXITED_VIEW;
+							else
+								transit = B_OUTSIDE_VIEW;
+						}
+	
+						message->AddInt32("be:transit", transit);
 					}
 
-					message->AddInt32("be:transit", transit);
+					if (usePreferred || viewUnderMouse == NULL)
+						fLastMouseMovedView = viewUnderMouse;
 				}
-
-				if (usePreferred || viewUnderMouse == NULL)
-					fLastMouseMovedView = viewUnderMouse;
 			}
 			break;
 	}
