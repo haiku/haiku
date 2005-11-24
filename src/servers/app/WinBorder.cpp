@@ -148,7 +148,7 @@ WinBorder::~WinBorder()
 
 //! redraws a certain section of the window border
 void
-WinBorder::Draw(const BRect &r)
+WinBorder::Draw(const BRect& updateRect)
 {
 	#ifdef DEBUG_WINBORDER
 	printf("WinBorder(%s)::Draw() : ", Name());
@@ -157,12 +157,8 @@ WinBorder::Draw(const BRect &r)
 	
 	// if we have a visible region, it is decorator's one.
 	if (fDecorator) {
-		if (GetRootLayer()->Focus() == this)
-			fDecorator->SetFocus(true);
-		else
-			fDecorator->SetFocus(false);
-
-		fDecorator->Draw(r);
+		fDecorator->SetFocus(GetRootLayer()->Focus() == this);
+		fDecorator->Draw(updateRect);
 	}
 }
 
@@ -200,9 +196,8 @@ WinBorder::MoveBy(float x, float y)
 
 			GetRootLayer()->Unlock();
 		}
-		
-		Window()->HandleDirectConnection(B_DIRECT_START|B_BUFFER_MOVED);
-		
+
+		Window()->HandleDirectConnection(B_DIRECT_START | B_BUFFER_MOVED);
 	} else {
 		// just offset to the new position
 		if (fDecorator)
@@ -215,7 +210,7 @@ WinBorder::MoveBy(float x, float y)
 	BMessage msg(B_WINDOW_MOVED);
 	msg.AddInt64("when",  system_time());
 	msg.AddPoint("where", Frame().LeftTop());
-	Window()->SendMessageToClient(&msg, B_NULL_TOKEN);
+	Window()->SendMessageToClient(&msg);
 }
 
 
@@ -257,8 +252,8 @@ WinBorder::ResizeBy(float x, float y)
 
 			GetRootLayer()->Unlock();
 		}
-		
-		Window()->HandleDirectConnection(B_DIRECT_START|B_BUFFER_RESIZED);
+
+		Window()->HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESIZED);
 	} else {
 		if (fDecorator)
 			fDecorator->ResizeBy(x, y);
@@ -272,7 +267,7 @@ WinBorder::ResizeBy(float x, float y)
 	msg.AddInt64("when", system_time());
 	msg.AddInt32("width", frame.IntegerWidth());
 	msg.AddInt32("height", frame.IntegerHeight());
-	Window()->SendMessageToClient(&msg, B_NULL_TOKEN);
+	Window()->SendMessageToClient(&msg);
 }
 
 
@@ -597,7 +592,7 @@ WinBorder::WorkspaceActivated(int32 index, bool active)
 	activatedMsg.AddInt32("workspace", index);
 	activatedMsg.AddBool("active", active);
 
-	Window()->SendMessageToClient(&activatedMsg, B_NULL_TOKEN);
+	Window()->SendMessageToClient(&activatedMsg);
 }
 
 
@@ -611,7 +606,7 @@ WinBorder::WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces)
 	changedMsg.AddInt32("old", oldWorkspaces);
 	changedMsg.AddInt32("new", newWorkspaces);
 
-	Window()->SendMessageToClient(&changedMsg, B_NULL_TOKEN);
+	Window()->SendMessageToClient(&changedMsg);
 }
 
 
@@ -620,7 +615,7 @@ WinBorder::Activated(bool active)
 {
 	BMessage msg(B_WINDOW_ACTIVATED);
 	msg.AddBool("active", active);
-	Window()->SendMessageToClient(&msg, B_NULL_TOKEN);
+	Window()->SendMessageToClient(&msg);
 }
 
 
@@ -811,30 +806,29 @@ void
 WinBorder::RequestClientRedraw(const BRegion &invalid)
 {
 	BRegion	updateReg(fTopLayer->FullVisible());
-
 	updateReg.IntersectWith(&invalid);
 
-	if (updateReg.CountRects() > 0) {
-		fCumulativeRegion.Include(&updateReg);			
-		if (fUpdateRequestsEnabled && !InUpdate() && !fRequestSent) {
-			fInUpdateRegion = fCumulativeRegion;
-			fRequestSent = true; // this is here to avoid a possible de-synchronization
+	if (updateReg.CountRects() == 0)
+		return;
 
-			BMessage msg;
-			msg.what = _UPDATE_;
+	fCumulativeRegion.Include(&updateReg);			
 
-			BRect	rect(fInUpdateRegion.Frame());
-			ConvertFromScreen(&rect);
-			msg.AddRect("_rect", rect );
-			msg.AddRect("debug_rect", fInUpdateRegion.Frame());
+	if (fUpdateRequestsEnabled && !InUpdate() && !fRequestSent) {
+		fInUpdateRegion = fCumulativeRegion;
+		fRequestSent = true; // this is here to avoid a possible de-synchronization
 
-			if (Window()->SendMessageToClient(&msg) == B_OK) {
-				fCumulativeRegion.MakeEmpty();
-			}
-			else {
-				fRequestSent = false;
-				fInUpdateRegion.MakeEmpty();
-			}
+		BRect rect(fInUpdateRegion.Frame());
+		ConvertFromScreen(&rect);
+
+		BMessage msg(_UPDATE_);
+		msg.AddRect("_rect", rect);
+		msg.AddRect("debug_rect", fInUpdateRegion.Frame());
+
+		if (Window()->SendMessageToClient(&msg) == B_OK) {
+			fCumulativeRegion.MakeEmpty();
+		} else {
+			fRequestSent = false;
+			fInUpdateRegion.MakeEmpty();
 		}
 	}
 }
