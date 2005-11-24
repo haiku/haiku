@@ -109,7 +109,7 @@ Desktop::MouseDown(BPoint where, uint32 buttons)
 			// complete redraw
 #if RUN_WITH_FRAME_BUFFER
 			// TODO: broken
-			BRegion region(Bounds());
+			BRegion region(fDrawingEngine->Bounds());
 			MarkDirty(&region);
 			region = fBackgroundRegion;
 			fBackgroundRegion.MakeEmpty();

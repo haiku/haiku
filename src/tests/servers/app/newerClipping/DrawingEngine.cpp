@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stack.h>
 
+#include <Bitmap.h>
 #include <Message.h>
 #include <Region.h>
 #include <Window.h>
@@ -226,7 +227,7 @@ DrawView::DrawView(BRect frame)
 
 #if RUN_WITH_FRAME_BUFFER
 	  fFrameBuffer(new BBitmap(Bounds(), B_RGB32, true)),
-	  fDrawingEngine(new DrawingEngine(Bounds(), this)),
+	  fDrawingEngine(new DrawingEngine(Bounds(), this))
 #else
 	  fDrawingEngine(this)
 #endif
