@@ -53,7 +53,6 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	uint8 colour_depth1 = 32;
 	status_t result;
 	uint32 startadd,startadd_right;
-	bool display, h, v;
 
 	/* Adjust mode to valid one and fail if invalid */
 	target /*= bounds*/ = *mode_to_set;
@@ -73,8 +72,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	/* disable interrupts using the kernel driver */
 	interrupt_enable(false);
 
-	/* find current DPMS state, then turn off screen(s) */
-	gx00_crtc_dpms_fetch(&display, &h, &v);
+	/* then turn off screen(s) */
 	gx00_crtc_dpms(false, false, false);
 	if (si->ps.secondary_head) g400_crtc2_dpms(false, false, false);
 
@@ -374,13 +372,11 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	/* update driver's mode store */
 	si->dm = target;
 
-	/* turn screen one on */
-	gx00_crtc_dpms(display, h, v);
-	/* turn screen two on if a dualhead mode is active */
-	if (target.flags & DUALHEAD_BITS) g400_crtc2_dpms(display, h, v);
-
 	/* set up acceleration for this mode */
 	gx00_acc_init();
+
+	/* restore screen(s) output state(s) */
+	SET_DPMS_MODE(si->dpms_flags);
 
 	/* clear line at bottom of screen if dualhead mode:
 	 * MAVEN hardware design fault 'fix'. */
@@ -538,11 +534,15 @@ void SET_INDEXED_COLORS(uint count, uint8 first, uint8 *color_data, uint32 flags
 }
 
 /* Put the display into one of the Display Power Management modes. */
-status_t SET_DPMS_MODE(uint32 dpms_flags) {
+status_t SET_DPMS_MODE(uint32 dpms_flags)
+{
 	interrupt_enable(false);
 
 	LOG(4,("SET_DPMS_MODE: 0x%08x\n", dpms_flags));
-	
+
+	/* note current DPMS state for our reference */
+	si->dpms_flags = dpms_flags;
+
 	if (si->dm.flags & DUALHEAD_BITS) /* dualhead */
 	{
 		switch(dpms_flags) 
@@ -690,21 +690,7 @@ uint32 DPMS_CAPABILITIES(void)
 }
 
 /* Return the current DPMS mode. */
-uint32 DPMS_MODE(void) {
-	bool display, h, v;
-
-	interrupt_enable(false);
-	gx00_crtc_dpms_fetch(&display, &h, &v);
-	interrupt_enable(true);
-
-	if (display && h && v)
-		return B_DPMS_ON;
-	else if (si->settings.greensync)
-		return B_DPMS_OFF;
-	else if (v)
-		return B_DPMS_STAND_BY;
-	else if (h)
-		return B_DPMS_SUSPEND;
-	else
-		return B_DPMS_OFF;
+uint32 DPMS_MODE(void)
+{
+	return si->dpms_flags;
 }

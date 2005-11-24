@@ -2,7 +2,7 @@
 /* Authors:
    Mark Watson 2/2000,
    Apsed,
-   Rudolf Cornelissen 11/2002-11/2004
+   Rudolf Cornelissen 11/2002-11/2005
 */
 
 #define MODULE_BIT 0x00040000
@@ -284,38 +284,42 @@ status_t gx00_crtc_depth(int mode)
 
 status_t gx00_crtc_dpms(bool display, bool h, bool v) // MIL2
 {
-	LOG(4,("CRTC: setting DPMS: "));
+	char msg[100];
+
+	sprintf(msg, "CRTC: setting DPMS: ");
 
 	if (display)
 	{
 		VGAW_I(SEQ,1, 0x00);
-		LOG(4,("display on, "));
+		sprintf(msg, "%sdisplay on, ", msg);
 	}
 	else
 	{
 		VGAW_I(SEQ,1, 0x20);
-		LOG(4,("display off, "));
+		sprintf(msg, "%sdisplay off, ", msg);
 	}
 	if (h)
 	{
 		VGAW_I(CRTCEXT, 1, (VGAR_I(CRTCEXT, 1) & 0xef));
-		LOG(4,("hsync enabled, "));
+		sprintf(msg, "%shsync enabled, ", msg);
 	}
 	else
 	{
 		VGAW_I(CRTCEXT, 1, (VGAR_I(CRTCEXT, 1) | 0x10));
-		LOG(4,("hsync disabled, "));
+		sprintf(msg, "%shsync disabled, ", msg);
 	}
 	if (v)
 	{
 		VGAW_I(CRTCEXT, 1, (VGAR_I(CRTCEXT, 1) & 0xdf));
-		LOG(4,("vsync enabled\n"));
+		sprintf(msg, "%svsync enabled\n", msg);
 	}
 	else
 	{
 		VGAW_I(CRTCEXT, 1, (VGAR_I(CRTCEXT, 1) | 0x20));
-		LOG(4,("vsync disabled\n"));
+		sprintf(msg, "%svsync disabled\n", msg);
 	}
+
+	LOG(4, (msg));
 
 	/* set some required fixed values for proper MGA mode initialisation */
 	VGAW_I(CRTC,0x17,0xC3);
@@ -335,23 +339,6 @@ status_t gx00_crtc_dpms(bool display, bool h, bool v) // MIL2
 			DXIW(SYNCCTRL, (DXIR(SYNCCTRL) & 0xf0));
 		}
 	}
-
-	return B_OK;
-}
-
-status_t gx00_crtc_dpms_fetch(bool *display, bool *h, bool *v) // MIL2
-{
-	*display=!(VGAR_I(SEQ, 1) & 0x20);
-	*h=!(VGAR_I(CRTCEXT, 1) & 0x10);
-	*v=!(VGAR_I(CRTCEXT, 1) & 0x20);
-
-	LOG(4,("CTRC: fetched DPMS state: "));
-	if (*display) LOG(4,("display on, "));
-	else LOG(4,("display off, "));
-	if (*h) LOG(4,("hsync enabled, "));
-	else LOG(4,("hsync disabled, "));
-	if (*v) LOG(4,("vsync enabled\n"));
-	else LOG(4,("vsync disabled\n"));
 
 	return B_OK;
 }
@@ -590,7 +577,7 @@ status_t gx00_crtc_cursor_init()
 	}
 
 	/* activate hardware cursor */
-	DXIW(CURCTRL,1);
+	gx00_crtc_cursor_show();
 
 	return B_OK;
 }

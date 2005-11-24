@@ -371,9 +371,6 @@ status_t g100_general_powerup()
 	/*enable writing to crtc registers*/
 	VGAW_I(CRTC,0x11,0);
 
-	/*turn on display one*/
-	gx00_crtc_dpms(true, true, true);
-
 	return B_OK;
 }
 
@@ -470,9 +467,6 @@ status_t g200_general_powerup()
 
 	/*enable writing to crtc registers*/
 	VGAW_I(CRTC,0x11,0);
-
-	/*turn on display one*/
-	gx00_crtc_dpms(true, true, true);
 
 	return B_OK;
 }
@@ -583,9 +577,6 @@ status_t g400_general_powerup()
 		MAVW(LOCK,0x01);
 		CR2W(DATACTL,0x00000000);
 	}
-
-	/*turn on display one*/
-	gx00_crtc_dpms(true, true, true);
 
 	return B_OK;
 }
@@ -739,9 +730,6 @@ status_t g450_general_powerup()
 
 	/* enable primary analog output */
 	gx50_general_output_select();
-
-	/*turn on display one*/
-	gx00_crtc_dpms(true, true, true);
 
 	/* enable 'straight-through' sync outputs on both analog output connectors and
 	 * make sure CRTC1 sync outputs are patched through! */

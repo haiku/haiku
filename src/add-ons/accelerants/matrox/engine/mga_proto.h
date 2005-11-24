@@ -87,11 +87,8 @@ status_t gx00_crtc_set_timing(display_mode target);
 status_t gx00_crtc_depth(int mode);
 status_t gx00_crtc_set_display_start(uint32 startadd,uint8 bpp); 
 status_t gx00_crtc_set_display_pitch(void);
-
 status_t gx00_crtc_dpms(bool display,bool h,bool v);
-status_t gx00_crtc_dpms_fetch(bool *display, bool *h, bool *v);
 status_t gx00_crtc_mem_priority(uint8);
-
 status_t gx00_crtc_cursor_init(void); /*Yes, cursor follows CRTC1 - not the DAC!*/
 status_t gx00_crtc_cursor_define(uint8*,uint8*);
 status_t gx00_crtc_cursor_position(uint16 x ,uint16 y);
@@ -104,9 +101,7 @@ status_t g400_crtc2_set_timing(display_mode target);
 status_t g400_crtc2_depth(int mode);
 status_t g400_crtc2_set_display_pitch(void); 
 status_t g400_crtc2_set_display_start(uint32 startadd,uint8 bpp); 
-
 status_t g400_crtc2_dpms(bool display, bool h, bool v);
-status_t g400_crtc2_dpms_fetch(bool *display, bool *h, bool *v);
 
 /*acceleration functions*/
 status_t check_acc_capability(uint32 feature);
