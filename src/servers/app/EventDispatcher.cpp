@@ -656,14 +656,6 @@ EventDispatcher::_RemoveTokens(BMessage* message)
 
 
 void
-EventDispatcher::_SetToken(BMessage* message, int32 token)
-{
-	if (message->ReplaceInt32(kTokenName, token) != B_OK)
-		message->AddInt32(kTokenName, token);
-}
-
-
-void
 EventDispatcher::_SetFeedFocus(BMessage* message)
 {
 	if (message->ReplaceBool("_feed_focus", true) != B_OK)

@@ -55,7 +55,6 @@ class EventDispatcher : public BLocker {
 
 		bool _AddTokens(BMessage* message, Target* target, uint32 eventMask);
 		void _RemoveTokens(BMessage* message);
-		void _SetToken(BMessage* message, int32 token);
 		void _SetFeedFocus(BMessage* message);
 		void _UnsetFeedFocus(BMessage* message);
 
@@ -65,11 +64,8 @@ class EventDispatcher : public BLocker {
 		Target* _AddTarget(const BMessenger& messenger);
 		void _RemoveTarget(Target* target);
 
-		event_listener* _FindListener(const BMessenger& messenger, int32 token,
-				int32* _index = NULL);
 		bool _AddListener(const BMessenger& messenger, int32 token,
 				uint32 eventMask, uint32 options, bool temporary);
-//		void _RemoveTemporaryListener(event_target* target, int32 index);
 		void _RemoveTemporaryListeners();
 
 		void _EventLoop();
