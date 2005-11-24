@@ -70,10 +70,7 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	  fWsCount(0),
 	  fWorkspace(new Workspace*[kMaxWorkspaceCount]),
 	  fWorkspacesLayer(NULL),
-	  fWMState(),
-	  fWinBorderIndex(0),
-
-	  fScreenShotIndex(1)
+	  fWMState()
 {
 	//NOTE: be careful about this one.
 	fRootLayer = this;
@@ -104,12 +101,6 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	// TODO: this should eventually be replaced by a method to convert the monitor
 	// number to an index in the name, i.e. workspace_settings_1 for screen #1
 //	ReadWorkspaceData(WORKSPACE_DATA_LIST);
-
-	// TODO: read these 4 from a configuration file.
-//	fScreenWidth = 0;
-//	fScreenHeight = 0;
-//	fColorSpace = B_RGB32;
-//	fFrequency = 60.f;
 
 	// init the first, default workspace
 	fWorkspace[fActiveWksIndex] = new Workspace(fActiveWksIndex, 0xFF00FF00,
@@ -143,6 +134,10 @@ RootLayer::~RootLayer()
 	for (int32 i = 0; i < fWsCount; i++)
 		delete fWorkspace[i];
 	delete[] fWorkspace;
+
+	fFirstChild = NULL;
+		// this prevents the Layer destructor from freeing our children again
+		// (the Desktop destructor already took care of that)
 
 	// RootLayer object just uses Screen objects, it is not allowed to delete them.
 
@@ -191,33 +186,6 @@ RootLayer::ResizeBy(float x, float y)
 
 	MarkForRedraw(region);
 	TriggerRedraw();
-}
-
-
-Layer*
-RootLayer::FirstChild() const
-{
-	fWinBorderIndex = 0;
-	return static_cast<Layer*>(fWMState.WindowList.ItemAt(fWinBorderIndex++));
-}
-
-Layer*
-RootLayer::NextChild() const
-{
-	return static_cast<Layer*>(fWMState.WindowList.ItemAt(fWinBorderIndex++));
-}
-
-Layer*
-RootLayer::PreviousChild() const
-{
-	return static_cast<Layer*>(fWMState.WindowList.ItemAt(fWinBorderIndex--));
-}
-
-Layer*
-RootLayer::LastChild() const
-{
-	fWinBorderIndex = fWMState.WindowList.CountItems()-1;
-	return static_cast<Layer*>(fWMState.WindowList.ItemAt(fWinBorderIndex--));
 }
 
 
@@ -584,43 +552,36 @@ void
 RootLayer::SaveWorkspaceData(const char *path)
 {
 	BMessage msg,dummy;
-	BFile file(path,B_READ_WRITE | B_CREATE_FILE);
-	
-	if(file.InitCheck()!=B_OK)
-	{
+	BFile file(path, B_READ_WRITE | B_CREATE_FILE);
+
+	if (file.InitCheck() != B_OK) {
 		printf("ERROR: Couldn't save workspace data in RootLayer\n");
 		return;
 	}
-	
-	char string[20];
-	int32 count=fWsCount;
 
-	if(msg.Unflatten(&file)==B_OK)
-	{
+	char string[20];
+	int32 count = fWsCount;
+
+	if (msg.Unflatten(&file) == B_OK) {
 		// if we were successful in unflattening the file, it means we're
 		// going to need to save over the existing data
-		for(int32 i=0; i<count; i++)
-		{
+		for(int32 i = 0; i < count; i++) {
 			sprintf(string,"workspace %ld",i);
 			if(msg.FindMessage(string,&dummy)==B_OK)
 				msg.RemoveName(string);
 		}
 	}
 		
-	for(int32 i=0; i<count; i++)
-	{
+	for (int32 i = 0; i < count; i++) {
 		sprintf(string,"workspace %ld",i);
 
-		Workspace *ws=(Workspace*)fWorkspace[i];
-		
-		if(!ws)
-		{
+		Workspace *ws = (Workspace*)fWorkspace[i];
+
+		if (!ws) {
 			dummy.MakeEmpty();
 			ws->PutSettings(&dummy,i);
 			msg.AddMessage(string,&dummy);
-		}
-		else
-		{
+		} else {
 			// We're not supposed to have this happen, but we'll suck it up, anyway. :P
 			Workspace::PutDefaultSettings(&msg,i);
 		}
@@ -631,25 +592,82 @@ RootLayer::SaveWorkspaceData(const char *path)
 void
 RootLayer::HideWinBorder(WinBorder* winBorder)
 {
-	Lock();
-	hide_winBorder(winBorder);
-	Unlock();
+	BAutolock _(fAllRegionsLock);
+
+	bool invalidate = false;
+	bool invalid;
+	Workspace::State oldWMState;
+	ActiveWorkspace()->GetState(&oldWMState);
+
+	winBorder->Hide(false);
+
+	for (int32 i = 0; i < fWsCount; i++) {
+		invalid = false;
+
+		if (fWorkspace[i] && fWorkspace[i]->HasWinBorder(winBorder))
+			invalid = fWorkspace[i]->HideWinBorder(winBorder);
+
+		if (fActiveWksIndex == i) {
+			invalidate = invalid;
+
+			if (dynamic_cast<class WorkspacesLayer *>(winBorder->FirstChild()) != NULL)
+				SetWorkspacesLayer(NULL);
+		}
+	}
+
+	if (invalidate)
+		RevealNewWMState(oldWMState);
 }
 
 
 void
 RootLayer::ShowWinBorder(WinBorder* winBorder)
 {
-	Lock();
-	show_winBorder(winBorder);
-	Unlock();
+	BAutolock _(fAllRegionsLock);
+
+	bool invalidate = false;
+	bool invalid;
+	Workspace::State oldWMState;
+	ActiveWorkspace()->GetState(&oldWMState);
+
+	winBorder->Show(false);
+
+	for (int32 i = 0; i < fWsCount; i++) {
+		invalid = false;
+
+		if (fWorkspace[i]
+			&& (fWorkspace[i]->HasWinBorder(winBorder)
+				|| winBorder->Feel() == B_MODAL_SUBSET_WINDOW_FEEL
+					// subset modals are a bit like floating windows, they are being added
+					// and removed from workspace when there's at least a normal window
+					// that uses them.
+				|| winBorder->Level() == B_FLOATING_APP))
+					// floating windows are inserted/removed on-the-fly so this window,
+					// although needed may not be in workspace's list.
+		{
+			invalid = fWorkspace[i]->ShowWinBorder(winBorder);
+
+			// ToDo: this won't work with FFM
+			fWorkspace[i]->AttemptToSetFocus(winBorder);
+		}
+
+		if (fActiveWksIndex == i) {
+			invalidate = invalid;
+
+			if (dynamic_cast<class WorkspacesLayer *>(winBorder->FirstChild()) != NULL)
+				SetWorkspacesLayer(winBorder->FirstChild());
+		}
+	}
+
+	if (invalidate)
+		RevealNewWMState(oldWMState);
 }
 
 
 void
 RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 {
-	// clean fWMState
+	// clear fWMState
 	fWMState.Focus = NULL;
 	fWMState.Front = NULL;
 	fWMState.Active = NULL;
@@ -657,9 +675,6 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 
 	ActiveWorkspace()->GetState(&fWMState);
 
-// BOOKMARK!
-// TODO: there can be more than one window active at a time! ex: a normal + floating_app, with
-// floating window having focus.
 	// send window activation messages
 	if (oldWMState.Active != fWMState.Active) {
 		if (oldWMState.Active)
@@ -710,22 +725,24 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 				continue;
 
 			bool stillPresent = false;
-			for (int32 j = 0; j < newWindowCount; ++j)
+			for (int32 j = 0; j < newWindowCount; ++j) {
 				if (layer == fWMState.WindowList.ItemAtFast(j)) {
 					stillPresent = true;
 					break;
 				}
+			}
 
 			if (!stillPresent) {
 				MarkForRebuild(layer->FullVisible());
 				MarkForRedraw(layer->FullVisible());
 
 				layer->_ClearVisibleRegions();
-			}
-			else {
+			} else
 				oldStrippedList.AddItem(layer);
-			}
 		}
+
+		fFirstChild = NULL;
+		fLastChild = NULL;
 
 		// for new windows, invalidate(rebuild & redraw) the maximum that it can occupy.
 		for (int32 i = 0; i < newWindowCount; ++i) {
@@ -733,12 +750,25 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 			if (!layer)
 				continue;
 
+			// insert layer into RootLayer list
+			if (i == 0)
+				fFirstChild = layer;
+
+			if (fLastChild != NULL)
+				fLastChild->fNextSibling = layer;
+			layer->fPreviousSibling = fLastChild;
+			layer->fNextSibling = NULL;
+
+			fLastChild = layer;
+
 			bool isNewWindow = true;
-			for (int32 j = 0; j < oldWindowCount; ++j)
+			for (int32 j = 0; j < oldWindowCount; ++j) {
 				if (layer == oldWMState.WindowList.ItemAtFast(j)) {
 					isNewWindow = false;
 					break;
 				}
+			}
+
 			if (isNewWindow) {
 				BRegion invalid;
 
@@ -747,10 +777,8 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 
 				MarkForRebuild(invalid);
 				MarkForRedraw(invalid);
-			}
-			else {
+			} else
 				newStrippedList.AddItem(layer);
-			}
 		}
 
 		// if a window came in front ot others, invalidate its previously hidden area.
@@ -786,8 +814,7 @@ GetDrawingEngine()->ConstrainClippingRegion(NULL);
 		// trigger region rebuilding and redraw
 		TriggerRebuild();
 		TriggerRedraw();
-	}
-	else if (redraw) {
+	} else if (redraw) {
 		MarkForRedraw(dirtyRegion);
 		TriggerRedraw();
 	}
@@ -814,8 +841,7 @@ RootLayer::SetActive(WinBorder* newActive, bool activate)
 					returnValue = ActiveWorkspace()->AttemptToMoveToBack(newActive);
 
 				RevealNewWMState(oldWMState);		
-			}
-			else {
+			} else {
 				fWorkspace[i]->AttemptToActivate(newActive);
 				// NOTE: for multiple monitor support, if a workspaces is mapped to
 				// a Screen, we must invalidate/redraw to see the change.
@@ -846,7 +872,7 @@ RootLayer::_ChildAt(BPoint where)
 	if (VisibleRegion().Contains(where))
 		return NULL;
 
-	for (Layer* child = LastChild(); child; child = PreviousChild()) {
+	for (Layer* child = LastChild(); child; child = child->PreviousLayer()) {
 		if (child->FullVisible().Contains(where))
 			return child;
 	}
@@ -926,76 +952,6 @@ RootLayer::DragMessage(void) const
 
 // PRIVATE methods
 
-void
-RootLayer::show_winBorder(WinBorder *winBorder)
-{
-	bool invalidate = false;
-	bool invalid;
-	Workspace::State oldWMState;
-	ActiveWorkspace()->GetState(&oldWMState);
-
-	winBorder->Show(false);
-
-	for (int32 i = 0; i < fWsCount; i++) {
-		invalid = false;
-
-		if (fWorkspace[i]
-			&& (fWorkspace[i]->HasWinBorder(winBorder)
-				|| winBorder->Feel() == B_MODAL_SUBSET_WINDOW_FEEL
-					// subset modals are a bit like floating windows, they are being added
-					// and removed from workspace when there's at least a normal window
-					// that uses them.
-				|| winBorder->Level() == B_FLOATING_APP))
-					// floating windows are inserted/removed on-the-fly so this window,
-					// although needed may not be in workspace's list.
-		{
-			invalid = fWorkspace[i]->ShowWinBorder(winBorder);
-
-			// ToDo: this won't work with FFM
-			fWorkspace[i]->AttemptToSetFocus(winBorder);
-		}
-
-		if (fActiveWksIndex == i) {
-			invalidate = invalid;
-
-			if (dynamic_cast<class WorkspacesLayer *>(winBorder->FirstChild()) != NULL)
-				SetWorkspacesLayer(winBorder->FirstChild());
-		}
-	}
-
-	if (invalidate)
-		RevealNewWMState(oldWMState);
-}
-
-
-void
-RootLayer::hide_winBorder(WinBorder *winBorder)
-{
-	bool invalidate = false;
-	bool invalid;
-	Workspace::State oldWMState;
-	ActiveWorkspace()->GetState(&oldWMState);
-
-	winBorder->Hide(false);
-
-	for (int32 i = 0; i < fWsCount; i++) {
-		invalid = false;
-
-		if (fWorkspace[i] && fWorkspace[i]->HasWinBorder(winBorder))
-			invalid = fWorkspace[i]->HideWinBorder(winBorder);
-
-		if (fActiveWksIndex == i) {
-			invalidate = invalid;
-
-			if (dynamic_cast<class WorkspacesLayer *>(winBorder->FirstChild()) != NULL)
-				SetWorkspacesLayer(NULL);
-		}
-	}
-
-	if (invalidate)
-		RevealNewWMState(oldWMState);
-}
-
 
 void
 RootLayer::change_winBorder_feel(WinBorder *winBorder, int32 newFeel)
@@ -1037,6 +993,7 @@ RootLayer::change_winBorder_feel(WinBorder *winBorder, int32 newFeel)
 			RevealNewWMState(oldWMState);
 	}
 }
+
 
 void
 RootLayer::Draw(const BRect &r)

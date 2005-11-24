@@ -49,7 +49,7 @@ Layer::Layer(BRect frame, const char* name, int32 token,
 
 	fDriver(driver),
 	fRootLayer(NULL),
-	fServerWin(NULL),
+	fWindow(NULL),
 	fOwner(NULL),
 
 	fDrawState(new DrawState),
@@ -59,8 +59,6 @@ Layer::Layer(BRect frame, const char* name, int32 token,
 	fNextSibling(NULL),
 	fFirstChild(NULL),
 	fLastChild(NULL),
-
-	fCurrent(NULL),
 
 	fViewToken(token),
 	fFlags(flags),
@@ -109,7 +107,6 @@ Layer::~Layer()
 	delete fDrawState;
 
 	Layer* child = fFirstChild;
-
 	while (child != NULL) {
 		Layer* nextChild = child->fNextSibling;
 
@@ -128,7 +125,7 @@ Layer::~Layer()
 	it spits an error to stdout and returns.
 */
 void
-Layer::AddChild(Layer* layer, ServerWindow* serverWin)
+Layer::AddChild(Layer* layer, ServerWindow* window)
 {
 	STRACE(("Layer(%s)::AddChild(%s) START\n", Name(), layer->Name()));
 	
@@ -172,18 +169,18 @@ Layer::AddChild(Layer* layer, ServerWindow* serverWin)
 		c->SetRootLayer(c->fParent->fRootLayer);
 		
 		// 2.2) this Layer must know if it has a ServerWindow object attached.
-		c->fServerWin=serverWin;
-		
+		c->fWindow = window;
+
 		// tree parsing algorithm
 		if (c->fFirstChild) {
 			// go deep
 			c = c->fFirstChild;
 		} else {
 			// go right or up
-			
+
 			if (c == stop) // our trip is over
 				break;
-				
+
 			if (c->fNextSibling) {
 				// go right
 				c = c->fNextSibling;
@@ -191,10 +188,10 @@ Layer::AddChild(Layer* layer, ServerWindow* serverWin)
 				// go up
 				while (!c->fParent->fNextSibling && c->fParent != stop)
 					c = c->fParent;
-				
+
 				if (c->fParent == stop) // that's enough!
 					break;
-				
+
 				c = c->fParent->fNextSibling;
 			}
 		}
@@ -202,6 +199,7 @@ Layer::AddChild(Layer* layer, ServerWindow* serverWin)
 
 	STRACE(("Layer(%s)::AddChild(%s) END\n", Name(), layer->Name()));
 }
+
 
 /*!
 	\brief Removes a child layer from the current one
@@ -259,7 +257,7 @@ Layer::RemoveChild(Layer *layer)
 			// 2.1) set the RootLayer for this object.
 			c->SetRootLayer(NULL);
 			// 2.2) this Layer must know if it has a ServerWindow object attached.
-			c->fServerWin = NULL;
+			c->fWindow = NULL;
 		}
 
 		// tree parsing algorithm
@@ -289,6 +287,7 @@ Layer::RemoveChild(Layer *layer)
 	STRACE(("Layer(%s)::RemoveChild(%s) END\n", Name(), layer->Name()));
 }
 
+
 //! Removes the calling layer from the tree
 void
 Layer::RemoveSelf()
@@ -301,18 +300,20 @@ Layer::RemoveSelf()
 	fParent->RemoveChild(this);
 }
 
+
 /*!
 	\return true if the child is owned by this Layer, false if not
 */
 bool
 Layer::HasChild(Layer* layer)
 {
-	for (Layer* child = FirstChild(); child; child = NextChild()) {
+	for (Layer* child = FirstChild(); child; child = child->NextLayer()) {
 		if (child == layer)
 			return true;
 	}
 	return false;
 }
+
 
 //! Returns the number of children
 uint32
@@ -321,7 +322,7 @@ Layer::CountChildren() const
 	uint32 count = 0;
 	Layer* child = FirstChild();
 	while (child != NULL) {
-		child = NextChild();
+		child = child->NextLayer();
 		count++;
 	}
 	return count;
@@ -338,17 +339,17 @@ Layer::FindLayer(const int32 token)
 	// (recursive) search for a layer based on its view token
 	
 	// iterate only over direct child layers first
-	for (Layer* child = FirstChild(); child; child = NextChild()) {
+	for (Layer* child = FirstChild(); child; child = child->NextLayer()) {
 		if (child->fViewToken == token)
 			return child;
 	}
-	
+
 	// try a recursive search
-	for (Layer* child = FirstChild(); child; child = NextChild()) {
+	for (Layer* child = FirstChild(); child; child = child->NextLayer()) {
 		if (Layer* layer = child->FindLayer(token))
 			return layer;
 	}
-	
+
 	return NULL;
 }
 
@@ -364,7 +365,7 @@ Layer::LayerAt(BPoint where)
 		return this;
 
 	if (fFullVisible.Contains(where)) {
-		for (Layer* child = LastChild(); child; child = PreviousChild()) {
+		for (Layer* child = LastChild(); child; child = child->PreviousLayer()) {
 			if (Layer* layer = child->LayerAt(where))
 				return layer;
 		}
@@ -373,39 +374,35 @@ Layer::LayerAt(BPoint where)
 	return NULL;
 }
 
-// FirstChild
+
 Layer*
 Layer::FirstChild() const
 {
-	fCurrent = fFirstChild;
-	return fCurrent;
+	return fFirstChild;
 }
 
-// NextChild
+
 Layer*
-Layer::NextChild() const
+Layer::NextLayer() const
 {
-	fCurrent = fCurrent->fNextSibling;
-	return fCurrent;
+	return fNextSibling;
 }
 
-// PreviousChild
+
 Layer*
-Layer::PreviousChild() const
+Layer::PreviousLayer() const
 {
-	fCurrent = fCurrent->fPreviousSibling;
-	return fCurrent;
+	return fPreviousSibling;
 }
 
-// LastChild
+
 Layer*
 Layer::LastChild() const
 {
-	fCurrent = fLastChild;
-	return fCurrent;
+	return fLastChild;
 }
 
-// SetName
+
 void
 Layer::SetName(const char* name)
 {
@@ -648,7 +645,7 @@ Layer::ResizeBy(float x, float y)
 // TODO: ResizedByHook(x,y,true) is called from inside _ResizeLayerFrameBy
 //		 Should call this AFTER region rebuilding and redrawing.
 		// resize children using their resize_mask.
-		for (Layer *child = LastChild(); child != NULL; child = PreviousChild())
+		for (Layer *child = LastChild(); child != NULL; child = child->PreviousLayer())
 			child->_ResizeLayerFrameBy(x, y);
 
 		BRegion oldFullVisible(fFullVisible);
@@ -709,7 +706,7 @@ Layer::ResizeBy(float x, float y)
 // TODO: ResizedByHook(x,y,true) is called from inside _ResizeLayerFrameBy
 //		 Should call this AFTER region rebuilding and redrawing.
 		// resize children using their resize_mask.
-		for (Layer *child = LastChild(); child != NULL; child = PreviousChild())
+		for (Layer *child = LastChild(); child != NULL; child = child->PreviousLayer())
 			child->_ResizeLayerFrameBy(x, y);
 	}
 
@@ -1188,7 +1185,7 @@ Layer::_ResizeLayerFrameBy(float x, float y)
 			// call hook function
 			ResizedByHook(dx, dy, true); // automatic
 
-			for (Layer* child = LastChild(); child; child = PreviousChild())
+			for (Layer* child = LastChild(); child; child = child->PreviousLayer())
 				child->_ResizeLayerFrameBy(dx, dy);
 		}
 	}
@@ -1201,7 +1198,7 @@ Layer::_RezizeLayerRedrawMore(BRegion &reg, float dx, float dy)
 	if (dx == 0 && dy == 0)
 		return;
 
-	for (Layer* child = LastChild(); child; child = PreviousChild()) {
+	for (Layer* child = LastChild(); child; child = child->PreviousLayer()) {
 		uint16 rm = child->fResizeMode & 0x0000FFFF;
 
 		if ((rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM) {
@@ -1250,7 +1247,7 @@ Layer::_ResizeLayerFullUpdateOnResize(BRegion &reg, float dx, float dy)
 	if (dx == 0 && dy == 0)
 		return;
 
-	for (Layer* child = LastChild(); child; child = PreviousChild()) {
+	for (Layer* child = LastChild(); child; child = child->PreviousLayer()) {
 		uint16 rm = child->fResizeMode & 0x0000FFFF;		
 
 		if ((rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM) {
@@ -1331,7 +1328,7 @@ Layer::_RebuildVisibleRegions(const BRegion &invalid,
 	// allow this layer to hide some parts from its children
 	_ReserveRegions(common);
 
-	for (Layer *child = LastChild(); child; child = PreviousChild()) {
+	for (Layer *child = LastChild(); child; child = child->PreviousLayer()) {
 		if (child == startFrom)
 			fullRebuild = true;
 
@@ -1372,7 +1369,7 @@ Layer::_RebuildVisibleRegions(const BRegion &invalid,
 	// allow this layer to hide some parts from its children
 	_ReserveRegions(common);
 
-	for (Layer *child = LastChild(); child; child = PreviousChild()) {
+	for (Layer *child = LastChild(); child; child = child->PreviousLayer()) {
 		child->_RebuildVisibleRegions(invalid, common, child->LastChild());
 
 		// to let children know much they can take from parent's visible region
@@ -1385,7 +1382,7 @@ Layer::_RebuildVisibleRegions(const BRegion &invalid,
 	_RebuildDrawingRegion();
 }
 
-// _RebuildDrawingRegion
+
 void
 Layer::_RebuildDrawingRegion()
 {
@@ -1398,11 +1395,13 @@ Layer::_RebuildDrawingRegion()
 	}
 }
 
+
 void
 Layer::_ReserveRegions(BRegion &reg)
 {
 	// Empty for Layer objects
 }
+
 
 void
 Layer::_ClearVisibleRegions()
@@ -1411,20 +1410,24 @@ Layer::_ClearVisibleRegions()
 
 	fVisible.MakeEmpty();
 	fFullVisible.MakeEmpty();
-	for (Layer *child = LastChild(); child; child = PreviousChild())
+	for (Layer *child = LastChild(); child; child = child->PreviousLayer())
 		child->_ClearVisibleRegions();
 }
 
-// mark a region dirty so that the next region rebuild for us
-// and our children will take this into account
+
+/*!	Mark a region dirty so that the next region rebuild for us
+	and our children will take this into account
+*/
 void
 Layer::MarkForRebuild(const BRegion &dirty)
 {
 	fDirtyForRebuild.Include(&dirty);
 }
 
-// this will trigger visible region recalculation for us and
-// our descendants.
+
+/*!	This will trigger visible region recalculation for us and
+	our descendants.
+*/
 void 
 Layer::TriggerRebuild()
 {
@@ -1443,17 +1446,19 @@ Layer::TriggerRebuild()
 	}
 }
 
-// find out the region for which we must rebuild the visible regions
+
+//! find out the region for which we must rebuild the visible regions
 void
 Layer::_GetAllRebuildDirty(BRegion *totalReg)
 {
 	totalReg->Include(&fDirtyForRebuild);
 
-	for (Layer *child = LastChild(); child; child = PreviousChild())
+	for (Layer *child = LastChild(); child; child = child->PreviousLayer())
 		child->_GetAllRebuildDirty(totalReg);
 
 	fDirtyForRebuild.MakeEmpty();
 }
+
 
 void
 Layer::_AllRedraw(const BRegion &invalid)
@@ -1474,11 +1479,11 @@ Layer::_AllRedraw(const BRegion &invalid)
 		}
 	}
 
-	for (Layer *child = LastChild(); child != NULL; child = PreviousChild()) {
-		if (!(child->IsHidden())) {
+	for (Layer *child = LastChild(); child != NULL; child = child->PreviousLayer()) {
+		if (!child->IsHidden()) {
 			BRegion common(child->fFullVisible);
 			common.IntersectWith(&invalid);
-			
+
 			if (common.CountRects() > 0)
 				child->_AllRedraw(invalid);
 		}
@@ -1489,11 +1494,11 @@ Layer::_AllRedraw(const BRegion &invalid)
 void
 Layer::_AddToViewsWithInvalidCoords() const
 {
-	if (fServerWin) {
-		fServerWin->ClientViewsWithInvalidCoords().AddInt32("_token", fViewToken);
-		fServerWin->ClientViewsWithInvalidCoords().AddPoint("where", fFrame.LeftTop());
-		fServerWin->ClientViewsWithInvalidCoords().AddFloat("width", fFrame.Width());
-		fServerWin->ClientViewsWithInvalidCoords().AddFloat("height", fFrame.Height());
+	if (fWindow) {
+		fWindow->ClientViewsWithInvalidCoords().AddInt32("_token", fViewToken);
+		fWindow->ClientViewsWithInvalidCoords().AddPoint("where", fFrame.LeftTop());
+		fWindow->ClientViewsWithInvalidCoords().AddFloat("width", fFrame.Width());
+		fWindow->ClientViewsWithInvalidCoords().AddFloat("height", fFrame.Height());
 	}
 }
 
@@ -1501,8 +1506,8 @@ Layer::_AddToViewsWithInvalidCoords() const
 void
 Layer::_SendViewCoordUpdateMsg() const
 {
-	if (fServerWin && !fServerWin->ClientViewsWithInvalidCoords().IsEmpty()) {
-		fServerWin->SendMessageToClient(&fServerWin->ClientViewsWithInvalidCoords());
-		fServerWin->ClientViewsWithInvalidCoords().MakeEmpty();
+	if (fWindow && !fWindow->ClientViewsWithInvalidCoords().IsEmpty()) {
+		fWindow->SendMessageToClient(&fWindow->ClientViewsWithInvalidCoords());
+		fWindow->ClientViewsWithInvalidCoords().MakeEmpty();
 	}
 }

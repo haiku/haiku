@@ -63,12 +63,6 @@ public:
 	virtual	void				ScrollBy(float x, float y)
 									{ /* not allowed */ }
 
-	// For the active workspaces
-	virtual	Layer*				FirstChild() const;
-	virtual	Layer*				NextChild() const;
-	virtual	Layer*				PreviousChild() const;
-	virtual	Layer*				LastChild() const;
-
 			void				HideWinBorder(WinBorder* winBorder);
 			void				ShowWinBorder(WinBorder* winBorder);
 			void				SetWinBorderWorskpaces(WinBorder *winBorder,
@@ -127,9 +121,6 @@ friend class Desktop;
 			void				AddSubsetWinBorder(WinBorder *winBorder, WinBorder *toWinBorder);
 			void				RemoveSubsetWinBorder(WinBorder *winBorder, WinBorder *fromWinBorder);
 
-			void				show_winBorder(WinBorder* winBorder);
-			void				hide_winBorder(WinBorder* winBorder);
-
 			void				change_winBorder_feel(WinBorder *winBorder, int32 newFeel);
 
 			void				MouseEventHandler(BMessage *msg);
@@ -155,9 +146,6 @@ friend class Desktop;
 //   with RootLayer, but after Axel's refractoring this should go in
 //   WorkspaceLayer, I think.
 			Workspace::State	fWMState;
-	mutable int32				fWinBorderIndex;
-
-			int32				fScreenShotIndex;
 
 #if ON_SCREEN_DEBUGGING_INFO
 	friend	class DebugInfoManager;

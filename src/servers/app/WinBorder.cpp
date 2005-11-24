@@ -104,10 +104,10 @@ WinBorder::WinBorder(const BRect &frame,
 	  cnt(0) // for debugging
 {
 	// unlike BViews, windows start off as hidden
-	fHidden			= true;
-	fServerWin		= window;
-	fAdFlags		= fAdFlags | B_LAYER_CHILDREN_DEPENDANT;
-	fFlags			= B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE;
+	fHidden = true;
+	fWindow = window;
+	fAdFlags = fAdFlags | B_LAYER_CHILDREN_DEPENDANT;
+	fFlags = B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE;
 
 	QuietlySetFeel(feel);
 

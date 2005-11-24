@@ -165,6 +165,7 @@ Desktop::Desktop(uid_t userID)
 
 Desktop::~Desktop()
 {
+	// root layer only knows the visible WinBorders, so we delete them all over here
 	for (int32 i = 0; WinBorder *border = (WinBorder *)fWinBorderList.ItemAt(i); i++)
 		delete border;
 

@@ -10,6 +10,10 @@
 #ifndef _LAYER_H_
 #define _LAYER_H_
 
+
+#include "RGBColor.h"
+#include "ServerWindow.h"
+
 #include <GraphicsDefs.h>
 #include <List.h>
 #include <Locker.h>
@@ -18,8 +22,6 @@
 #include <Rect.h>
 #include <Region.h>
 
-#include "RGBColor.h"
-#include "ServerWindow.h"
 
 enum {
 	B_LAYER_NONE		= 1,
@@ -85,10 +87,10 @@ class Layer {
 			Layer*				FindLayer(const int32 token);
 			Layer*				LayerAt(BPoint where);
 
-	virtual	Layer*				FirstChild() const;
-	virtual	Layer*				NextChild() const;
-	virtual	Layer*				PreviousChild() const;
-	virtual	Layer*				LastChild() const;
+			Layer*				FirstChild() const;
+			Layer*				LastChild() const;
+			Layer*				NextLayer() const;
+			Layer*				PreviousLayer() const;
 
 			void				SetAsTopLayer(bool option)
 									{ fIsTopLayer = option; }
@@ -170,9 +172,9 @@ class Layer {
 
 	// app_server objects getters
 			ServerWindow*		Window() const
-									{ return fServerWin; }
+									{ return fWindow; }
 			ServerApp*			App() const
-									{ return fServerWin? fServerWin->App(): NULL; }
+									{ return fWindow ? fWindow->App() : NULL; }
 	inline	WinBorder*			Owner() const
 									{ return fOwner; }
 			RootLayer*			GetRootLayer() const
@@ -243,7 +245,7 @@ class Layer {
 
 			DrawingEngine*		fDriver;
 			RootLayer*			fRootLayer;
-			ServerWindow*		fServerWin;
+			ServerWindow*		fWindow;
 			WinBorder*			fOwner;
 
 			DrawState*			fDrawState;
@@ -253,8 +255,6 @@ class Layer {
 			Layer*				fNextSibling;
 			Layer*				fFirstChild;
 			Layer*				fLastChild;
-	
-	mutable	Layer*				fCurrent;
 
 			int32				fViewToken;
 			uint32				fFlags;
