@@ -39,8 +39,6 @@
 #	define B_USER_CLONEABLE_AREA 0
 #endif
 
-#define DEVICE_FORMAT "%04X_%04X_%02X%02X%02X" // apsed
-
 /* Tell the kernel what revision of the driver API we support */
 int32	api_version = B_CUR_DRIVER_API_VERSION; // apsed, was 2, is 2 in R5
 
@@ -699,6 +697,9 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 	si->vendor_id = di->pcii.vendor_id;
 	si->device_id = di->pcii.device_id;
 	si->revision = di->pcii.revision;
+	si->bus = di->pcii.bus;
+	si->device = di->pcii.device;
+	si->function = di->pcii.function;
 
 	/* map the device */
 	result = map_device(di);
