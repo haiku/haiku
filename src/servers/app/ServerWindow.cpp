@@ -1364,7 +1364,7 @@ if (rootLayer)
 			int32 newFeel;
 			link.Read<int32>(&newFeel);
 
-			fWinBorder->GetRootLayer()->GoChangeWinBorderFeel(winBorder, newFeel);
+			fWinBorder->GetRootLayer()->ChangeWinBorderFeel(winBorder, newFeel);
 			break;
 		}
 		case AS_SET_ALIGNMENT:

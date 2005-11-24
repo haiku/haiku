@@ -103,7 +103,7 @@ public:
 			void				Unlock() { fAllRegionsLock.Unlock(); }
 			bool				IsLocked() { return fAllRegionsLock.IsLocked(); }
 
-			void				GoChangeWinBorderFeel(WinBorder *winBorder, int32 newFeel);
+			void				ChangeWinBorderFeel(WinBorder *winBorder, int32 newFeel);
 
 			void				MarkForRedraw(const BRegion &dirty);
 			void				TriggerRedraw();
@@ -120,8 +120,6 @@ friend class Desktop;
 			void				RemoveWinBorder(WinBorder* winBorder);
 			void				AddSubsetWinBorder(WinBorder *winBorder, WinBorder *toWinBorder);
 			void				RemoveSubsetWinBorder(WinBorder *winBorder, WinBorder *fromWinBorder);
-
-			void				change_winBorder_feel(WinBorder *winBorder, int32 newFeel);
 
 			void				MouseEventHandler(BMessage *msg);
 			Layer*				_ChildAt(BPoint where);

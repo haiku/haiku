@@ -148,15 +148,6 @@ RootLayer::~RootLayer()
 
 
 void
-RootLayer::GoChangeWinBorderFeel(WinBorder *winBorder, int32 newFeel)
-{
-	Lock();
-	change_winBorder_feel(winBorder, newFeel);
-	Unlock();
-}
-
-
-void
 RootLayer::MoveBy(float x, float y)
 {
 }
@@ -665,6 +656,50 @@ RootLayer::ShowWinBorder(WinBorder* winBorder)
 
 
 void
+RootLayer::ChangeWinBorderFeel(WinBorder *winBorder, int32 newFeel)
+{
+	BAutolock _(fAllRegionsLock);
+
+	bool isVisible = false;
+	bool isVisibleInActiveWorkspace = false;
+
+	Workspace::State oldWMState;
+	ActiveWorkspace()->GetState(&oldWMState);
+
+	if (!winBorder->IsHidden()) {
+		isVisible = true;
+		isVisibleInActiveWorkspace = ActiveWorkspace()->HasWinBorder(winBorder);
+		// just hide, don't invalidate
+		winBorder->Hide(false);
+		// all workspaces must be up-to-date with this change of feel.
+		for (int32 i = 0; i < kMaxWorkspaceCount; i++) {
+			if (fWorkspace[i]) {
+				fWorkspace[i]->HideWinBorder(winBorder);
+				fWorkspace[i]->RemoveWinBorder(winBorder);
+			}
+		}
+	}
+
+	fDesktop->SetWinBorderFeel(winBorder, newFeel);
+
+	if (isVisible) {
+		// just show, don't invalidate
+		winBorder->Show(false);
+		// all workspaces must be up-to-date with this change of feel.
+		for (int32 i = 0; i < kMaxWorkspaceCount; i++) {
+			if (fWorkspace[i]) {
+				fWorkspace[i]->AddWinBorder(winBorder);
+				fWorkspace[i]->ShowWinBorder(winBorder);
+			}
+		}
+
+		if (isVisibleInActiveWorkspace)
+			RevealNewWMState(oldWMState);
+	}
+}
+
+
+void
 RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 {
 	// clear fWMState
@@ -951,48 +986,6 @@ RootLayer::DragMessage(void) const
 
 
 // PRIVATE methods
-
-
-void
-RootLayer::change_winBorder_feel(WinBorder *winBorder, int32 newFeel)
-{
-	bool isVisible = false;
-	bool isVisibleInActiveWorkspace = false;
-
-	Workspace::State oldWMState;
-	ActiveWorkspace()->GetState(&oldWMState);
-
-	if (!winBorder->IsHidden()) {
-		isVisible = true;
-		isVisibleInActiveWorkspace = ActiveWorkspace()->HasWinBorder(winBorder);
-		// just hide, don't invalidate
-		winBorder->Hide(false);
-		// all workspaces must be up-to-date with this change of feel.
-		for (int32 i = 0; i < kMaxWorkspaceCount; i++) {
-			if (fWorkspace[i]) {
-				fWorkspace[i]->HideWinBorder(winBorder);
-				fWorkspace[i]->RemoveWinBorder(winBorder);
-			}
-		}
-	}
-
-	fDesktop->SetWinBorderFeel(winBorder, newFeel);
-
-	if (isVisible) {
-		// just show, don't invalidate
-		winBorder->Show(false);
-		// all workspaces must be up-to-date with this change of feel.
-		for (int32 i = 0; i < kMaxWorkspaceCount; i++) {
-			if (fWorkspace[i]) {
-				fWorkspace[i]->AddWinBorder(winBorder);
-				fWorkspace[i]->ShowWinBorder(winBorder);
-			}
-		}
-
-		if (isVisibleInActiveWorkspace)
-			RevealNewWMState(oldWMState);
-	}
-}
 
 
 void
