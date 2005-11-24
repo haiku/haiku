@@ -378,6 +378,12 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 		}
 	}
 
+	/* if not dualhead capable card clear dualhead flags */
+	if (!(target->flags & DUALHEAD_CAPABLE))
+	{
+		target->flags &= ~DUALHEAD_BITS;
+	}
+
 	/* set TV_CAPABLE if suitable: pixelclock is not important (defined by TVstandard) */
 	switch (si->ps.card_type)
 	{
@@ -412,6 +418,12 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 		break;
 	}
 
+	/* if not TVout capable card clear TVout flags */
+	if (!(target->flags & TV_CAPABLE))
+	{
+		target->flags &= ~TV_BITS;
+	}
+
 	/* fixme: currently the matrox driver can only do secondary TVout */
 	target->flags &= ~TV_PRIMARY;
 
@@ -423,7 +435,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	if (si->ps.card_type >= G200)
 		target->flags |= B_SUPPORTS_OVERLAYS;
 
-	LOG(1, ("PROPOSEMODE: validated status modeflags: $%08x\n", target->flags));
+	LOG(1, ("PROPOSEMODE: validated modeflags: $%08x\n", target->flags));
 
 	/* overrule timing command flags to be (fixed) blank_pedestal = 0.0IRE,
 	 * progressive scan (fixed), and setup sync_on_green flag according to

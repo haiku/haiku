@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-3/2004
+   Rudolf Cornelissen 10/2002-11/2005
 */
 
 #define MODULE_BIT 0x00008000
@@ -54,7 +54,13 @@ status_t gx00_general_powerup()
 	status_t status;
 	uint32 card_class;
 
-	LOG(1,("POWERUP: Haiku Matrox Accelerant 0.23 running.\n"));
+	LOG(1,("POWERUP: Haiku Matrox Accelerant 0.24 running.\n"));
+
+	/* log VBLANK INT usability status */
+	if (si->ps.int_assigned)
+		LOG(4,("POWERUP: Usable INT assigned to HW; Vblank semaphore enabled\n"));
+	else
+		LOG(4,("POWERUP: No (usable) INT assigned to HW; Vblank semaphore disabled\n"));
 
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))

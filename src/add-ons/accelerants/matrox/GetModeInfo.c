@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson
-	Rudolf Cornelissen 9-11/2002
+	Rudolf Cornelissen 9-11/2005
 */
 
 #define MODULE_BIT 0x02000000
@@ -140,5 +140,8 @@ status_t GET_PIXEL_CLOCK_LIMITS(display_mode *dm, uint32 *low, uint32 *high)
 /* Return the semaphore id that will be used to signal a vertical sync occured.  */
 sem_id ACCELERANT_RETRACE_SEMAPHORE(void)
 {
-	return si->vblank;
+	if (si->ps.int_assigned)
+		return si->vblank;
+	else
+		return B_ERROR;
 }

@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson,
 	Apsed,
-	Rudolf Cornelissen 11/2002-2/2004
+	Rudolf Cornelissen 11/2002-11/2005
 */
 
 #define MODULE_BIT 0x00200000
@@ -20,11 +20,14 @@ static void interrupt_enable(bool flag) {
 	status_t result;
 	gx00_set_bool_state sbs;
 
-	/* set the magic number so the driver knows we're for real */
-	sbs.magic = GX00_PRIVATE_DATA_MAGIC;
-	sbs.do_it = flag;
-	/* contact driver and get a pointer to the registers and shared data */
-	result = ioctl(fd, GX00_RUN_INTERRUPTS, &sbs, sizeof(sbs));
+	if (si->ps.int_assigned)
+	{
+		/* set the magic number so the driver knows we're for real */
+		sbs.magic = GX00_PRIVATE_DATA_MAGIC;
+		sbs.do_it = flag;
+		/* contact driver and get a pointer to the registers and shared data */
+		result = ioctl(fd, GX00_RUN_INTERRUPTS, &sbs, sizeof(sbs));
+	}
 }
 
 /* First validate the mode, then call lots of bit banging stuff to set the mode(s)! */
@@ -62,18 +65,6 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 
 	/* See BOUNDS WARNING above... */
 	if (PROPOSE_DISPLAY_MODE(&target, &target, &target) == B_ERROR)	return B_ERROR;
-
-	/* if not dualhead capable card clear dualhead flags */
-	if (!(target.flags & DUALHEAD_CAPABLE))
-	{
-		target.flags &= ~DUALHEAD_BITS;
-	}
-	/* if not TVout capable card clear TVout flags */
-	if (!(target.flags & TV_CAPABLE))
-	{
-		target.flags &= ~TV_BITS;
-	}
-	LOG(1, ("SETMODE: (CONT.) validated command modeflags: $%08x\n", target.flags));
 
 	/* overlay engine, cursor and MOVE_DISPLAY need to know the status even when
 	 * in singlehead mode */
