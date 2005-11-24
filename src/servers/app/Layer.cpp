@@ -588,8 +588,7 @@ Layer::MoveBy(float x, float y)
 		GetRootLayer()->TriggerRedraw();
 
 		GetRootLayer()->Unlock();
-	}
-	else {
+	} else {
 		// just offset to the new position
 		fFrame.OffsetBy(x, y);
 	}
@@ -669,9 +668,8 @@ Layer::ResizeBy(float x, float y)
 		GetRootLayer()->TriggerRedraw();
 
 		GetRootLayer()->Unlock();
-	}
-	// just resize our frame and those of out descendants if their resize mask says so
-	else {
+	} else {
+		// just resize our frame and those of out descendants if their resize mask says so
 		fFrame.Set(fFrame.left, fFrame.top, fFrame.right+x, fFrame.bottom+y);
 
 // TODO: you should call this hook function AFTER all region rebuilding
@@ -930,181 +928,146 @@ Layer::ScrolledByHook(float dx, float dy)
 void
 Layer::ConvertToParent(BPoint* pt) const
 {
-	if (fParent) {
-		BPoint origin = ScrollingOffset();
-		pt->x -= origin.x;
-		pt->y -= origin.y;
-		pt->x += fFrame.left;
-		pt->y += fFrame.top;
-	}
+	pt->x += fFrame.left - fScrollingOffset.x;
+	pt->y += fFrame.top - fScrollingOffset.y;
 }
 
 //! converts a rect from local to parent's coordinate system 
 void
 Layer::ConvertToParent(BRect* rect) const
 {
-	if (fParent) {
-		BPoint origin = ScrollingOffset();
-		rect->OffsetBy(-origin.x, -origin.y);
-		rect->OffsetBy(fFrame.left, fFrame.top);
-	}
+	rect->OffsetBy(fFrame.left - fScrollingOffset.x,
+				   fFrame.top - fScrollingOffset.y);
 }
 
 //! converts a region from local to parent's coordinate system 
 void
 Layer::ConvertToParent(BRegion* reg) const
 {
-	if (fParent) {
-		BPoint origin = ScrollingOffset();
-		reg->OffsetBy(-origin.x, -origin.y);
-		reg->OffsetBy(fFrame.left, fFrame.top);
-	}
+	reg->OffsetBy(fFrame.left - fScrollingOffset.x,
+				  fFrame.top - fScrollingOffset.y);
 }
 
 //! converts a point from parent's to local coordinate system 
 void
 Layer::ConvertFromParent(BPoint* pt) const
 {
-	if (fParent) {
-		BPoint origin = ScrollingOffset();
-		pt->x += origin.x;
-		pt->y += origin.y;
-		pt->x -= fFrame.left;
-		pt->y -= fFrame.top;
-	}
+	pt->x += fScrollingOffset.x - fFrame.left;
+	pt->y += fScrollingOffset.y - fFrame.top;
 }
 
 //! converts a rect from parent's to local coordinate system 
 void
 Layer::ConvertFromParent(BRect* rect) const
 {
-	if (fParent) {
-		BPoint origin = ScrollingOffset();
-		rect->OffsetBy(origin.x, origin.y);
-		rect->OffsetBy(-fFrame.left, -fFrame.top);
-	}
+	rect->OffsetBy(fScrollingOffset.x - fFrame.left,
+				   fScrollingOffset.y - fFrame.top);
 }
 
 //! converts a region from parent's to local coordinate system 
 void
 Layer::ConvertFromParent(BRegion* reg) const
 {
-	if (fParent) {
-		BPoint origin = ScrollingOffset();
-		reg->OffsetBy(origin.x, origin.y);
-		reg->OffsetBy(-fFrame.left, -fFrame.top);
-	}
+	reg->OffsetBy(fScrollingOffset.x - fFrame.left,
+				  fScrollingOffset.y - fFrame.top);
 }
 
 //! converts a point from local to screen coordinate system 
 void
 Layer::ConvertToScreen(BPoint* pt) const
 {
-	if (fParent) {
-		ConvertToParent(pt);
+	ConvertToParent(pt);
+
+	if (fParent)
 		fParent->ConvertToScreen(pt);
-	}
 }
 
 //! converts a rect from local to screen coordinate system 
 void
 Layer::ConvertToScreen(BRect* rect) const
 {
-	if (fParent) {
-		ConvertToParent(rect);
+	ConvertToParent(rect);
+
+	if (fParent)
 		fParent->ConvertToScreen(rect);
-	}
 }
 
 //! converts a region from local to screen coordinate system 
 void
 Layer::ConvertToScreen(BRegion* reg) const
 {
-	if (fParent) {
-		ConvertToParent(reg);
+	ConvertToParent(reg);
+
+	if (fParent)
 		fParent->ConvertToScreen(reg);
-	}
 }
 
 //! converts a point from screen to local coordinate system 
 void
 Layer::ConvertFromScreen(BPoint* pt) const
 {
-	if (fParent) {
-		ConvertFromParent(pt);
+	ConvertFromParent(pt);
+
+	if (fParent)
 		fParent->ConvertFromScreen(pt);
-	}
 }
 
 //! converts a rect from screen to local coordinate system 
 void
 Layer::ConvertFromScreen(BRect* rect) const
 {
-	if (fParent) {
-		ConvertFromParent(rect);
+	ConvertFromParent(rect);
+
+	if (fParent)
 		fParent->ConvertFromScreen(rect);
-	}
 }
 
 //! converts a region from screen to local coordinate system 
 void
 Layer::ConvertFromScreen(BRegion* reg) const
 {
-	if (fParent) {
-		ConvertFromParent(reg);
+	ConvertFromParent(reg);
+
+	if (fParent)
 		fParent->ConvertFromScreen(reg);
-	}
 }
 
 //! converts a point from local *drawing* to screen coordinate system 
 void
 Layer::ConvertToScreenForDrawing(BPoint* pt) const
 {
-	if (fParent) {
-		fDrawState->Transform(pt);
-		// NOTE: from here on, don't use the
-		// "*ForDrawing()" versions of the parent!
-		ConvertToParent(pt);
-		fParent->ConvertToScreen(pt);
-	}
+	fDrawState->Transform(pt);
+	// NOTE: from here on, don't use the
+	// "*ForDrawing()" versions of the parent!
+	ConvertToScreen(pt);
 }
 
 //! converts a rect from local *drawing* to screen coordinate system 
 void
 Layer::ConvertToScreenForDrawing(BRect* rect) const
 {
-	if (fParent) {
-		fDrawState->Transform(rect);
-		// NOTE: from here on, don't use the
-		// "*ForDrawing()" versions of the parent!
-		ConvertToParent(rect);
-		fParent->ConvertToScreen(rect);
-	}
+	fDrawState->Transform(rect);
+	// NOTE: from here on, don't use the
+	// "*ForDrawing()" versions of the parent!
+	ConvertToScreen(rect);
 }
 
 //! converts a region from local *drawing* to screen coordinate system 
 void
 Layer::ConvertToScreenForDrawing(BRegion* region) const
 {
-	if (fParent) {
-		fDrawState->Transform(region);
-		// NOTE: from here on, don't use the
-		// "*ForDrawing()" versions of the parent!
-		ConvertToParent(region);
-		fParent->ConvertToScreen(region);
-	}
+	fDrawState->Transform(region);
+	// NOTE: from here on, don't use the
+	// "*ForDrawing()" versions of the parent!
+	ConvertToScreen(region);
 }
 
 //! converts a point from screen to local coordinate system 
 void
 Layer::ConvertFromScreenForDrawing(BPoint* pt) const
 {
-	if (fParent) {
-		ConvertFromParent(pt);
-		fParent->ConvertFromScreen(pt);
-
-		fDrawState->InverseTransform(pt);
-	}
+	ConvertFromScreen(pt);
+	fDrawState->InverseTransform(pt);
 }
 
 void
@@ -1176,14 +1139,15 @@ Layer::_RezizeLayerRedrawMore(BRegion &reg, float dx, float dy)
 	for (Layer* child = LastChild(); child; child = child->PreviousLayer()) {
 		uint16 rm = child->fResizeMode & 0x0000FFFF;
 
-		if ((rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT || (rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM) {
+		if ((rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT ||
+			(rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM) {
 			// NOTE: this is not exactly corect, but it works :-)
 			// Normaly we shoud've used the child's old, required region - the one returned
 			// from get_user_region() with the old frame, and the current one. child->Bounds()
 			// works for the moment so we leave it like this.
 
 			// calculate the old bounds.
-			BRect	oldBounds(child->Bounds());		
+			BRect oldBounds(child->Bounds());		
 			if ((rm & 0x0F0F) == (uint16)B_FOLLOW_LEFT_RIGHT)
 				oldBounds.right -=dx;
 			if ((rm & 0xF0F0) == (uint16)B_FOLLOW_TOP_BOTTOM)
