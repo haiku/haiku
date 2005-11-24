@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-10/2005.
+	Rudolf Cornelissen 10/2002-11/2005.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -19,6 +19,7 @@
 #include "AGP.h"
 
 #define DRIVER_PREFIX "nv" // apsed
+#define DEVICE_FORMAT "%04X_%04X_%02X%02X%02X" // apsed
 
 /*
 	Internal driver state (also for sharing info between driver and accelerant)
