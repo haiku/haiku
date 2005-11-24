@@ -52,6 +52,22 @@ BTokenSpace::NewToken(int16 type, void* object,
 }
 
 
+/*!
+	Inserts the specified token into the token space. If that token
+	already exists, it will be overwritten.
+	Don't mix NewToken() and this method unless you know what you're
+	doing.
+*/
+void
+BTokenSpace::SetToken(int32 token, int16 type, void* object)
+{
+	BAutolock locker(this);
+	token_info tokenInfo = { type, object };
+
+	fTokenMap[token] = tokenInfo;
+}
+
+
 bool
 BTokenSpace::RemoveToken(int32 token, remove_token_callback callback)
 {

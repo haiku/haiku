@@ -41,6 +41,8 @@ class BTokenSpace : public BLocker {
 
 		int32		NewToken(int16 type, void* object,
 						new_token_callback callback = NULL);
+		void		SetToken(int32 token, int16 type, void* object);
+
 		bool		RemoveToken(int32 token, remove_token_callback callback = NULL);
 		bool		CheckToken(int32 token, int16 type) const;
 		status_t	GetToken(int32 token, int16 type, void** object,
