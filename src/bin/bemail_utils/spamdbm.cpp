@@ -13,8 +13,8 @@
  * which gives a better spread in spam ratios and slightly fewer
  * misclassifications.
  *
- * Note that this uses the AGMS coding style, not the OpenTracker one.  That
- * means no tabs, indents are two spaces, m_ is the prefix for member
+ * Note that this uses the AGMS vacation coding style, not the OpenTracker one.
+ * That means no tabs, indents are two spaces, m_ is the prefix for member
  * variables, g_ is the prefix for global names, C style comments, constants
  * are in all capital letters and most other things are mixed case, it's word
  * wrapped to fit in 79 characters per line to make proofreading on paper
@@ -63,7 +63,41 @@
  * gets the rating back from the server, and then the rest of the mail system
  * rule chain can delete the message or otherwise manipulate it.
  *
- * $Log: spamfilter.cpp,v $ (now manually updated due to SVN)
+ * Revision History (now manually updated due to SVN's philosophy)
+ * $Log: spamdbm.cpp,v $
+ * Revision 1.10  2005/11/24 02:08:39  agmsmith
+ * Fixed up prefix codes, Z for things that are inside other things.
+ *
+ * Revision 1.9  2005/11/21 03:28:03  agmsmith
+ * Added a function for extracting URLs.
+ *
+ * Revision 1.8  2005/11/09 03:36:18  agmsmith
+ * Removed noframes detection (doesn't show up in e-mails).  Now use
+ * just H for headers and Z for HTML tag junk.
+ *
+ * Revision 1.7  2005/10/24 00:00:08  agmsmith
+ * Adding HTML tag removal, which also affected the search function so it
+ * could search for single part things like &nbsp;.
+ *
+ * Revision 1.6  2005/10/17 01:55:08  agmsmith
+ * Remove HTML comments and a few other similar things.
+ *
+ * Revision 1.5  2005/10/16 18:35:36  agmsmith
+ * Under construction - looking into HTML not being in UTF-8.
+ *
+ * Revision 1.4  2005/10/11 01:51:21  agmsmith
+ * Starting on the tokenising passes.  Still need to test asian truncation.
+ *
+ * Revision 1.3  2005/10/06 11:54:07  agmsmith
+ * Not much.
+ *
+ * Revision 1.2  2005/09/12 01:49:37  agmsmith
+ * Enable case folding for the whole file tokenizer.
+ *
+ * r13961 | agmsmith | 2005-08-13 22:25:28 -0400 (Sat, 13 Aug 2005) | 2 lines
+ * Source code changes so that mboxtobemail now compiles and is in the build
+ * system.
+ *
  * r13959 | agmsmith | 2005-08-13 22:05:27 -0400 (Sat, 13 Aug 2005) | 2 lines
  * Rename the directory before doing anything else, otherwise svn dies badly.
  *
@@ -927,6 +961,14 @@ static BPoint g_DownPagePoints [] =
 };
 
 
+/* An array of flags to identify characters which are considered to be spaces.
+If character code X has g_SpaceCharacters[X] set to true then it is a
+space-like character.  Character codes 128 and above are always non-space since
+they are UTF-8 characters.  Initialised in the ABSApp constructor. */
+
+static bool g_SpaceCharacters [128];
+
+
 
 /******************************************************************************
  * Each word in the spam database gets one of these structures.  The database
@@ -1286,8 +1328,8 @@ private:
     char *ErrorMessage);
   status_t AddStringToDatabase (ClassificationTypes IsSpamOrWhat,
     const char *String, char *ErrorMessage);
-  void AddWordsToSet (const char *InputString,
-    size_t NumberOfBytes, set<string> &WordSet);
+  void AddWordsToSet (const char *InputString, size_t NumberOfBytes,
+    char PrefixCharacter, set<string> &WordSet);
   status_t CreateDatabaseFile (char *ErrorMessage);
   void DefaultSettings ();
   status_t DeleteDatabaseFile (char *ErrorMessage);
@@ -1313,7 +1355,8 @@ private:
   status_t PurgeOldWords (char *ErrorMessage);
   status_t RecursivelyTokenizeMailComponent (
     BMailComponent *ComponentPntr, const char *OptionalFileName,
-    set<string> &WordSet, char *ErrorMessage, int RecursionLevel);
+    set<string> &WordSet, char *ErrorMessage,
+    int RecursionLevel, int MaxRecursionLevel);
   status_t SaveDatabaseIfNeeded (char *ErrorMessage);
   status_t TokenizeParts (BPositionIO *PositionIOPntr,
     const char *OptionalFileName, set<string> &WordSet, char *ErrorMessage);
@@ -1381,12 +1424,6 @@ public:
     Intel i8087 and later math processors) has 64 bit numbers with 53 bits of
     mantissa, giving it an underflow starting at 0.5**1022 = 2.2e-308 where it
     rounds off to the nearest multiple of 0.5**1074 = 4.9e-324. */
-
-  bool m_SpaceCharacters [128];
-    /* An array of flags to identify characters which are considered to be
-    spaces.  If character code X has m_SpaceCharacters[X] set to true then it
-    is a space-like character.  Character codes 128 and above are always
-    non-space since they are UTF-8 characters. */
 
   TokenizeModes m_TokenizeMode;
     /* Controls how to convert the raw message text into words.  See the
@@ -1575,6 +1612,9 @@ ostream& PrintUsage (ostream& OutputStream)
 "Thanks go to Isaac Yonemoto for providing a better icon, which we can\n"
 "unfortunately no longer use, since the Hormel company wants people to\n"
 "avoid associating their meat product with junk e-mail.\n"
+"\n"
+"Tokenising code updated in 2005 to use some of the tricks that SpamBayes\n"
+"uses to extract words from messages.  In particular, HTML is now handled.\n"
 "\n"
 "Usage: Specify the operation as the first argument followed by more\n"
 "information as appropriate.  The program's configuration will affect the\n"
@@ -1880,6 +1920,440 @@ static status_t RemoveSpamPrefixFromSubjectAttribute (BNode *BNodePntr)
 
 
 /******************************************************************************
+ * The tokenizing functions.  To make tokenization of the text easier to
+ * understand, it is broken up into several passes.  Each pass goes over the
+ * text (can include NUL bytes) and extracts all the words it can recognise
+ * (can be none).  The extracted words are added to the WordSet, with the
+ * PrefixCharacter prepended (zero if none) so we can distinguish between words
+ * found in headers and in the text body.  It also modifies the input text
+ * buffer in-place to change the text that the next pass will see (blanking out
+ * words that it wants to delete, but not inserting much new text since the
+ * buffer can't be enlarged).  They all return the number of bytes remaining in
+ * InputString after it has been modified to be input for the next pass.
+ * Returns zero if it has exhausted the possibility of getting more words, or
+ * if something goes wrong.
+ */
+
+static size_t TokenizerPassLowerCase (
+  char *BufferPntr,
+  size_t NumberOfBytes,
+  char PrefixCharacter,
+  set<string> &WordSet)
+{
+  char *EndOfStringPntr;
+
+  EndOfStringPntr = BufferPntr + NumberOfBytes;
+
+  while (BufferPntr < EndOfStringPntr)
+  {
+    if ((unsigned char) *BufferPntr < 128)
+      /* If it is not a UTF-8 character code, convert to lower case ASCII. */
+      *BufferPntr = tolower (*BufferPntr);
+    BufferPntr++;
+  }
+  return NumberOfBytes;
+}
+
+
+/* Hunt through the text for various URLs and extract the components as
+separate words.  Doesn't affect the text in the buffer.  Looks for
+protocol://user:password@computer:port/path?query=key#anchor strings.  Also
+www.blah strings are detected and broken down.  Doesn't do HREF="" strings
+where the string has a relative path (no host computer name). */
+
+static size_t TokenizerPassExtractURLs (
+  char *BufferPntr,
+  size_t NumberOfBytes,
+  char PrefixCharacter,
+  set<string> &WordSet)
+{
+  char   *AtSignStringPntr;
+  char   *HostStringPntr;
+  char   *InputStringEndPntr;
+  char   *InputStringPntr;
+  char   *OptionsStringPntr;
+  char   *PathStringPntr;
+  char    PrefixString [2];
+  char   *ProtocolStringPntr;
+  string  Word;
+
+  InputStringPntr = BufferPntr;
+  InputStringEndPntr = BufferPntr + NumberOfBytes;
+  PrefixString [0] = PrefixCharacter;
+  PrefixString [1] = 0;
+
+  while (InputStringPntr < InputStringEndPntr - 4)
+  {
+    HostStringPntr = NULL;
+    if (memcmp (InputStringPntr, "www.", 4) == 0)
+      HostStringPntr = InputStringPntr;
+    else if (memcmp (InputStringPntr, "://", 3) == 0)
+    {
+      /* Find the protocol name, and add it as a word such as "ftp:" "http:" */
+      ProtocolStringPntr = InputStringPntr;
+      while (ProtocolStringPntr > BufferPntr &&
+      isalpha (ProtocolStringPntr[-1]))
+        ProtocolStringPntr--;
+      Word = PrefixString;
+      Word.append (ProtocolStringPntr,
+        (InputStringPntr - ProtocolStringPntr) + 1 /* for the colon */);
+      if (!Word.empty ())
+        WordSet.insert (Word);
+
+      HostStringPntr = InputStringPntr + 3; /* Skip past the "://" */
+    }
+    if (HostStringPntr == NULL)
+    {
+      InputStringPntr++;
+      continue;
+    }
+
+    /* Got a host name string starting at HostStringPntr.  It's everything
+    until the next slash or space, like "user:password@computer:port". */
+
+    InputStringPntr = HostStringPntr;
+    AtSignStringPntr = NULL;
+    while (InputStringPntr < InputStringEndPntr &&
+    (*InputStringPntr != '/' && !isspace (*InputStringPntr)))
+    {
+      if (*InputStringPntr == '@')
+        AtSignStringPntr = InputStringPntr;
+      InputStringPntr++;
+    }
+    if (AtSignStringPntr != NULL)
+    {
+      /* Add a word with the user and password, unseparated. */
+      Word = PrefixString;
+      Word.append (HostStringPntr,
+        AtSignStringPntr - HostStringPntr + 1 /* for the @ sign */);
+      if (!Word.empty ())
+        WordSet.insert (Word);
+      HostStringPntr = AtSignStringPntr + 1;
+    }
+
+    /* Add a word with the computer and port, unseparated. */
+
+    Word = PrefixString;
+    Word.append (HostStringPntr, InputStringPntr - HostStringPntr);
+    if (!Word.empty ())
+      WordSet.insert (Word);
+
+    /* Now get the path name, not including the extra junk after ?  and #
+    separators (they're stored as separate options).  Stops at white space or a
+    double quote mark. */
+
+    PathStringPntr = InputStringPntr;
+    OptionsStringPntr = NULL;
+    while (InputStringPntr < InputStringEndPntr &&
+    (*InputStringPntr != '"' && !isspace (*InputStringPntr)))
+    {
+      if (OptionsStringPntr == NULL &&
+      (*InputStringPntr == '?' || *InputStringPntr == '#'))
+        OptionsStringPntr = InputStringPntr;
+      InputStringPntr++;
+    }
+
+    if (OptionsStringPntr == NULL)
+    {
+      /* No options, all path. */
+      Word = PrefixString;
+      Word.append (PathStringPntr, InputStringPntr - PathStringPntr);
+      if (!Word.empty ())
+        WordSet.insert (Word);
+    }
+    else
+    {
+      /* Insert the path before the options. */
+      Word = PrefixString;
+      Word.append (PathStringPntr, OptionsStringPntr - PathStringPntr);
+      if (!Word.empty ())
+        WordSet.insert (Word);
+
+      /* Insert all the options as a word. */
+      Word = PrefixString;
+      Word.append (OptionsStringPntr, InputStringPntr - OptionsStringPntr);
+      if (!Word.empty ())
+        WordSet.insert (Word);
+    }
+  }
+  return NumberOfBytes;
+}
+
+
+/* Replace long Asian words (likely to actually be sentences) with the first
+character in the word. */
+
+static size_t TokenizerPassTruncateLongAsianWords (
+  char *BufferPntr,
+  size_t NumberOfBytes,
+  char PrefixCharacter,
+  set<string> &WordSet)
+{
+  char *EndOfStringPntr;
+  char *InputStringPntr;
+  int   Letter;
+  char *OutputStringPntr;
+  char *StartOfInputLongUnicodeWord;
+  char *StartOfOutputLongUnicodeWord;
+
+  InputStringPntr = BufferPntr;
+  EndOfStringPntr = InputStringPntr + NumberOfBytes;
+  OutputStringPntr = InputStringPntr;
+  StartOfInputLongUnicodeWord = NULL; /* Non-NULL flags it as started. */
+  StartOfOutputLongUnicodeWord = NULL;
+
+  /* Copy the text from the input to the output (same buffer), but when we find
+  a sequence of UTF-8 characters that is too long then truncate it down to one
+  character and reset the output pointer to be after that character, thus
+  deleting the word.  Replacing the deleted characters after it with spaces
+  won't work since we need to preserve the lack of space to handle those sneaky
+  HTML artificial word breakers.  So that Thelongword<blah>ing becomes
+  "T<blah>ing" rather than "T <blah>ing", so the next step joins them up into
+  "Ting" rather than "T" and "ing".  The first code in a UTF-8 character is
+  11xxxxxx and subsequent ones are 10xxxxxx. */
+
+  while (InputStringPntr < EndOfStringPntr)
+  {
+    Letter = (unsigned char) *InputStringPntr;
+    if (Letter < 128) // Got a regular ASCII letter?
+    {
+      if (StartOfInputLongUnicodeWord != NULL)
+      {
+        if (InputStringPntr - StartOfInputLongUnicodeWord >
+        (int) g_MaxWordLength * 2)
+        {
+          /* Need to truncate the long word (100 bytes or about 50 characters)
+          back down to the first UTF-8 character, so find out where the first
+          character ends (skip past the 10xxxxxx bytes), and rewind the output
+          pointer to be just after that (ignoring the rest of the long word in
+          effect). */
+
+          OutputStringPntr = StartOfOutputLongUnicodeWord + 1;
+          while (OutputStringPntr < InputStringPntr)
+          {
+            Letter = (unsigned char) *OutputStringPntr;
+            if (Letter < 128 || Letter >= 192)
+              break;
+            ++OutputStringPntr; // Still a UTF-8 middle of the character code.
+          }
+        }
+        StartOfInputLongUnicodeWord = NULL;
+      }
+    }
+    else if (Letter >= 192 && StartOfInputLongUnicodeWord == NULL)
+    {
+      /* Got the start of a UTF-8 character.  Remember the spot so we can see
+      if this is a too long UTF-8 word, which is often a whole sentence in
+      asian languages, since they sort of use a single character per word. */
+
+      StartOfInputLongUnicodeWord = InputStringPntr;
+      StartOfOutputLongUnicodeWord = OutputStringPntr;
+    }
+    *OutputStringPntr++ = *InputStringPntr++;
+  }
+  return OutputStringPntr - BufferPntr;
+}
+
+
+/* Find all the words in the string and add them to our local set of words.
+The characters considered white space are defined by g_SpaceCharacters.  This
+function is also used as a subroutine by other tokenizer functions when they
+have a bunch of presumably plain text they want broken into words and added. */
+
+static size_t TokenizerPassGetPlainWords (
+  char *BufferPntr,
+  size_t NumberOfBytes,
+  char PrefixCharacter,
+  set<string> &WordSet)
+{
+  string  AccumulatedWord;
+  char   *EndOfStringPntr;
+  size_t  Length;
+  int     Letter;
+
+  if (PrefixCharacter != 0)
+    AccumulatedWord = PrefixCharacter;
+  EndOfStringPntr = BufferPntr + NumberOfBytes;
+  while (true)
+  {
+    if (BufferPntr >= EndOfStringPntr)
+      Letter = EOF; // Usually a negative number.
+    else
+      Letter = (unsigned char) *BufferPntr++;
+
+    /* See if it is a letter we treat as white space.  Some word separators
+    like dashes and periods aren't considered as space.  Note that codes above
+    127 are UTF-8 characters, which we consider non-space. */
+
+    if (Letter < 0 /* EOF is -1 */ ||
+    (Letter < 128 && g_SpaceCharacters[Letter]))
+    {
+      /* That space finished off a word.  Remove trailing periods... */
+
+      while ((Length = AccumulatedWord.size()) > 0 &&
+      AccumulatedWord [Length-1] == '.')
+        AccumulatedWord.resize (Length - 1);
+
+      /* If there's anything left in the word, add it to the set.  Also ignore
+      words which are too big (it's probably some binary encoded data).  But
+      leave room for supercalifragilisticexpialidoceous.  According to one web
+      site, pneumonoultramicroscopicsilicovolcanoconiosis is the longest word
+      currently in English.  Note that some uuencoded data was seen with a 60
+      character line length. */
+
+      if (PrefixCharacter != 0)
+        Length--; // Don't count prefix when judging size or emptiness.
+      if (Length > 0 && Length <= g_MaxWordLength)
+        WordSet.insert (AccumulatedWord);
+
+      /* Empty out the string to get ready for the next word.  Not quite empty,
+      start it off with the prefix character if any. */
+
+      if (PrefixCharacter != 0)
+        AccumulatedWord = PrefixCharacter;
+      else
+        AccumulatedWord.resize (0);
+    }
+    else /* Not a space-like character, add it to the word. */
+      AccumulatedWord.append (1 /* one copy of the char */, (char) Letter);
+
+    if (Letter < 0)
+      break; /* End of data.  Exit here so that last word got processed. */
+  }
+  return NumberOfBytes;
+}
+
+
+/* Delete Things from the text.  The Thing is marked by a start string and an
+end string, such as "<!--" and "--> for HTML comment things.  All the text
+between the markers will be added to the word list before it gets deleted from
+the buffer.  The markers must be prepared in lower case.  You can specify an
+empty string for the end marker if you're just matching a string constant like
+"&nbsp;", which you would put in the starting marker.  This is a utility
+function used by other tokenizer functions. */
+
+static size_t TokenizerUtilRemoveStartEndThing (
+  char *BufferPntr,
+  size_t NumberOfBytes,
+  char PrefixCharacter,
+  set<string> &WordSet,
+  const char *ThingStartCode,
+  const char *ThingEndCode,
+  bool ReplaceWithSpace)
+{
+  char *EndOfStringPntr;
+  bool  FoundAndDeletedThing;
+  char *InputStringPntr;
+  char *OutputStringPntr;
+  int   ThingEndLength;
+  char *ThingEndPntr;
+  int   ThingStartLength;
+
+  InputStringPntr = BufferPntr;
+  EndOfStringPntr = InputStringPntr + NumberOfBytes;
+  OutputStringPntr = InputStringPntr;
+  ThingStartLength = strlen (ThingStartCode);
+  ThingEndLength = strlen (ThingEndCode);
+
+  if (ThingStartLength <= 0)
+    return NumberOfBytes; /* Need some things to look for first! */
+
+  while (InputStringPntr < EndOfStringPntr)
+  {
+    /* Search for the starting marker. */
+
+    FoundAndDeletedThing = false;
+    if (EndOfStringPntr - InputStringPntr >=
+    ThingStartLength + ThingEndLength /* space remains for start + end */ &&
+    tolower (*InputStringPntr) == *ThingStartCode &&
+    strncasecmp (InputStringPntr, ThingStartCode, ThingStartLength) == 0)
+    {
+      /* Found the start marker.  Look for the terminating string.  If it is an
+      empty string, then we've found it right now! */
+
+      ThingEndPntr = InputStringPntr + ThingStartLength;
+      while (EndOfStringPntr - ThingEndPntr >= ThingEndLength)
+      {
+        if (ThingEndLength == 0 ||
+        (tolower (*ThingEndPntr) == *ThingEndCode &&
+        strncasecmp (ThingEndPntr, ThingEndCode, ThingEndLength) == 0))
+        {
+          /* Got the end of the Thing.  First dump the text inbetween the start
+          and end markers into the words list. */
+
+          TokenizerPassGetPlainWords (InputStringPntr + ThingStartLength,
+            ThingEndPntr - (InputStringPntr + ThingStartLength),
+            PrefixCharacter, WordSet);
+
+          /* Delete by not updating the output pointer while moving the input
+          pointer to just after the ending tag. */
+
+          InputStringPntr = ThingEndPntr + ThingEndLength;
+          if (ReplaceWithSpace)
+            *OutputStringPntr++ = ' ';
+          FoundAndDeletedThing = true;
+          break;
+        }
+        ThingEndPntr++;
+      } /* End while ThingEndPntr */
+    }
+    if (!FoundAndDeletedThing)
+      *OutputStringPntr++ = *InputStringPntr++;
+  } /* End while InputStringPntr */
+
+  return OutputStringPntr - BufferPntr;
+}
+
+
+static size_t TokenizerPassRemoveHTMLComments (
+  char *BufferPntr,
+  size_t NumberOfBytes,
+  char PrefixCharacter,
+  set<string> &WordSet)
+{
+  return TokenizerUtilRemoveStartEndThing (BufferPntr, NumberOfBytes,
+    PrefixCharacter, WordSet, "<!--", "-->", false);
+}
+
+
+static size_t TokenizerPassRemoveHTMLStyle (
+  char *BufferPntr,
+  size_t NumberOfBytes,
+  char PrefixCharacter,
+  set<string> &WordSet)
+{
+  return TokenizerUtilRemoveStartEndThing (BufferPntr, NumberOfBytes,
+    PrefixCharacter, WordSet,
+    "<style", "/style>", false /* replace with space if true */);
+}
+
+
+/* Delete HTML tags from the text.  The contents of the tag are added as words
+before being deleted.  <P>, <BR> and &nbsp; are replaced by spaces at this
+stage while other HTML things get replaced by nothing. */
+
+static size_t TokenizerPassRemoveHTMLTags (
+  char *BufferPntr,
+  size_t NumberOfBytes,
+  char PrefixCharacter,
+  set<string> &WordSet)
+{
+  size_t BytesRemaining = NumberOfBytes;
+
+  BytesRemaining = TokenizerUtilRemoveStartEndThing (BufferPntr,
+    BytesRemaining, PrefixCharacter, WordSet, "&nbsp;", "", true);
+  BytesRemaining = TokenizerUtilRemoveStartEndThing (BufferPntr,
+    BytesRemaining, PrefixCharacter, WordSet, "<p", ">", true);
+  BytesRemaining = TokenizerUtilRemoveStartEndThing (BufferPntr,
+    BytesRemaining, PrefixCharacter, WordSet, "<br", ">", true);
+  BytesRemaining = TokenizerUtilRemoveStartEndThing (BufferPntr,
+    BytesRemaining, PrefixCharacter, WordSet, "<", ">", false);
+  return BytesRemaining;
+}
+
+
+
+/******************************************************************************
  * Implementation of the ABSApp class, constructor, destructor and the rest of
  * the member functions in mostly alphabetical order.
  */
@@ -1916,17 +2390,17 @@ ABSApp::ABSApp ()
   hyphenated words), dollar sign (for cash amounts), period (for IP addresses,
   we later remove trailing periods). */
 
-  memset (m_SpaceCharacters, 1, sizeof (m_SpaceCharacters));
-  m_SpaceCharacters['\''] = false;
-  m_SpaceCharacters['-'] = false;
-  m_SpaceCharacters['$'] = false;
-  m_SpaceCharacters['.'] = false;
+  memset (g_SpaceCharacters, 1, sizeof (g_SpaceCharacters));
+  g_SpaceCharacters['\''] = false;
+  g_SpaceCharacters['-'] = false;
+  g_SpaceCharacters['$'] = false;
+  g_SpaceCharacters['.'] = false;
   for (i = '0'; i <= '9'; i++)
-    m_SpaceCharacters[i] = false;
+    g_SpaceCharacters[i] = false;
   for (i = 'A'; i <= 'Z'; i++)
-    m_SpaceCharacters[i] = false;
+    g_SpaceCharacters[i] = false;
   for (i = 'a'; i <= 'z'; i++)
-    m_SpaceCharacters[i] = false;
+    g_SpaceCharacters[i] = false;
 
   /* Initialise the busy cursor from data in the application's resources. */
 
@@ -2001,6 +2475,9 @@ developed the even better chi-squared scoring method.\n\n"
 
 "Icon courtesy of Isaac Yonemoto, though it is no longer used since Hormel \
 doesn't want their meat product associated with junk e-mail.\n\n"
+
+"Tokenising code updated in 2005 to use some of the tricks that SpamBayes \
+uses to extract words from messages.  In particular, HTML is now handled.\n\n"
 
 "Released to the public domain, with no warranty.\n"
 "$Revision$\n"
@@ -2247,73 +2724,57 @@ status_t ABSApp::AddStringToDatabase (
 }
 
 
-/* Given a bunch of text, break it up into words without doing special
-decoding, and add them to the set.  Allow NULs in the text.  See also
+/* Given a bunch of text, find the words within it (doing special tricks to
+extract words from HTML), and add them to the set.  Allow NULs in the text.  If
+the PrefixCharacter isn't zero then it is prepended to all words found (so you
+can distinguish words as being from a header or from the body text).  See also
 TokenizeWhole which does something similar. */
 
 void ABSApp::AddWordsToSet (
   const char *InputString,
   size_t NumberOfBytes,
+  char PrefixCharacter,
   set<string> &WordSet)
 {
-  string      AccumulatedWord;
-  const char *EndOfStringPntr;
-  size_t      Length;
-  int         Letter = ' ';
+  char   *BufferPntr;
+  size_t  CurrentSize;
+  int     PassNumber;
 
-  /* Find all the words in the string and add them to our local set of words.
-  A set is used since we don't care how many times a word occurs. */
+  /* Copy the input buffer.  The code will be modifying it in-place as HTML
+  fragments and other junk are deleted. */
 
-  EndOfStringPntr = InputString + NumberOfBytes;
-  while (true)
+  BufferPntr = new char [NumberOfBytes];
+  if (BufferPntr == NULL)
+    return;
+  memcpy (BufferPntr, InputString, NumberOfBytes);
+
+  /* Do the tokenization.  Each pass does something to the text in the buffer,
+  and may add words to the word set. */
+
+  CurrentSize = NumberOfBytes;
+  for (PassNumber = 1; PassNumber <= 7 && CurrentSize > 0 ; PassNumber++)
   {
-    if (InputString >= EndOfStringPntr)
-      Letter = EOF;
-    else
-      Letter = (unsigned char) *InputString++;
-
-    /* Convert to lower case to improve word matches.  Of course this loses a
-    bit of information, such as MONEY vs Money, an indicator of spam.  Well,
-    apparently that is actually a useful distinction, so leave the case alone.
-    if (Letter >= 0 && Letter < 128)
-      Letter = tolower (Letter);
-    */
-
-    /* See if it is a letter we treat as white space - all control characters
-    and all punctuation except for: apostrophe (so "it's" and possessive
-    versions of words get stored), dash (for hyphenated words), dollar sign
-    (for cash amounts), period (for IP addresses, we later remove trailing
-    (periods).  Note that codes above 127 are UTF-8 characters, which we
-    consider non-space. */
-
-    if (Letter < 0 || (Letter < 128 && m_SpaceCharacters[Letter]))
+    switch (PassNumber)
     {
-      /* That space finished off a word.  Remove trailing periods... */
-
-      while ((Length = AccumulatedWord.size()) > 0 &&
-      AccumulatedWord [Length-1] == '.')
-        AccumulatedWord.resize (Length - 1);
-
-      /* If there's anything left in the word, add it to the set.  Also ignore
-      words which are too big (it's probably some binary encoded data).  But
-      leave room for supercalifragilisticexpialidoceous.  According to one web
-      site, pneumonoultramicroscopicsilicovolcanoconiosis is the longest word
-      currently in English.  Note that some uuencoded data was seen with a 60
-      character line length. */
-
-      if (Length > 0 && Length <= g_MaxWordLength)
-        WordSet.insert (AccumulatedWord);
-
-      /* Empty out the string to get ready for the next word. */
-
-      AccumulatedWord.resize (0);
+      case 1: CurrentSize = TokenizerPassLowerCase (
+        BufferPntr, CurrentSize, PrefixCharacter, WordSet); break;
+      case 2: CurrentSize = TokenizerPassTruncateLongAsianWords (
+        BufferPntr, CurrentSize, PrefixCharacter, WordSet); break;
+      case 3: CurrentSize = TokenizerPassRemoveHTMLComments (
+        BufferPntr, CurrentSize, 'Z', WordSet); break;
+      case 4: CurrentSize = TokenizerPassRemoveHTMLStyle (
+        BufferPntr, CurrentSize, 'Z', WordSet); break;
+      case 5: CurrentSize = TokenizerPassExtractURLs (
+        BufferPntr, CurrentSize, 'Z', WordSet); break;
+      case 6: CurrentSize = TokenizerPassRemoveHTMLTags (
+        BufferPntr, CurrentSize, 'Z', WordSet); break;
+      case 7: CurrentSize = TokenizerPassGetPlainWords (
+        BufferPntr, CurrentSize, PrefixCharacter, WordSet); break;
+      default: break;
     }
-    else /* Not a space-like character, add it to the word. */
-      AccumulatedWord.append (1 /* one copy of the char */, (char) Letter);
-
-    if (Letter < 0)
-      break; /* End of data.  Exit here so that last word got processed. */
   }
+
+  delete [] BufferPntr;
 }
 
 
@@ -3643,7 +4104,7 @@ void ABSApp::ProcessScriptingMessage (
   }
 
   if (g_BusyCursor != NULL)
-  	SetCursor (g_BusyCursor);
+    SetCursor (g_BusyCursor);
 
   ErrorCode = MessagePntr->FindData (g_DataName, B_STRING_TYPE,
     (const void **) &ArgumentString, &StringBufferSize);
@@ -4406,19 +4867,20 @@ void ABSApp::ReadyToRun ()
 /* Given a mail component (body text, attachment, whatever), look for words in
 it.  If the tokenize mode specifies that it isn't one of the ones we are
 looking for, just skip it.  For container type components, recursively examine
-their contents. */
+their contents, up to the maximum depth specified. */
 
 status_t ABSApp::RecursivelyTokenizeMailComponent (
   BMailComponent *ComponentPntr,
   const char *OptionalFileName,
   set<string> &WordSet,
   char *ErrorMessage,
-  int RecursionLevel)
+  int RecursionLevel,
+  int MaxRecursionLevel)
 {
   char                        AttachmentName [B_FILE_NAME_LENGTH];
-  BMailAttachment *AttachmentPntr;
+  BMailAttachment            *AttachmentPntr;
   BMimeType                   ComponentMIMEType;
-  BMailContainer  *ContainerPntr;
+  BMailContainer             *ContainerPntr;
   BMallocIO                   ContentsIO;
   const char                 *ContentsBufferPntr;
   size_t                      ContentsBufferSize;
@@ -4449,13 +4911,15 @@ status_t ABSApp::RecursivelyTokenizeMailComponent (
       HeaderKeyPntr = ComponentPntr->HeaderAt (i);
       if (HeaderKeyPntr == NULL)
         break;
-      AddWordsToSet (HeaderKeyPntr, strlen (HeaderKeyPntr), WordSet);
+      AddWordsToSet (HeaderKeyPntr, strlen (HeaderKeyPntr),
+        'H' /* Prefix for Headers, uppercase unlike normal words. */, WordSet);
       for (j = 0; j < 1000; j++)
       {
         HeaderValuePntr = ComponentPntr->HeaderField (HeaderKeyPntr, j);
         if (HeaderValuePntr == NULL)
           break;
-        AddWordsToSet (HeaderValuePntr, strlen (HeaderValuePntr), WordSet);
+        AddWordsToSet (HeaderValuePntr, strlen (HeaderValuePntr),
+          'H', WordSet);
       }
     }
   }
@@ -4480,8 +4944,7 @@ status_t ABSApp::RecursivelyTokenizeMailComponent (
       ComponentMIMEType.SetType ("text/plain");
   }
   if (!TextAnyMIMEType.Contains (&ComponentMIMEType) &&
-  NULL != (AttachmentPntr =
-  dynamic_cast<BMailAttachment *>(ComponentPntr)))
+  NULL != (AttachmentPntr = dynamic_cast<BMailAttachment *>(ComponentPntr)))
   {
     /* Sometimes spam doesn't give a text MIME type for text when they do an
     attachment (which is often base64 encoded).  Use the file name extension to
@@ -4536,14 +4999,15 @@ status_t ABSApp::RecursivelyTokenizeMailComponent (
       ContentsBufferPntr = (const char *) ContentsIO.Buffer ();
       ContentsBufferSize = ContentsIO.BufferLength ();
       if (ContentsBufferPntr != NULL /* can be empty */)
-        AddWordsToSet (ContentsBufferPntr, ContentsBufferSize, WordSet);
+        AddWordsToSet (ContentsBufferPntr, ContentsBufferSize,
+          0 /* no prefix character, this is body text */, WordSet);
     }
   }
 
   /* Examine any sub-components in the message. */
 
-  if (NULL != (ContainerPntr =
-  dynamic_cast<BMailContainer *>(ComponentPntr)))
+  if (RecursionLevel + 1 <= MaxRecursionLevel &&
+  NULL != (ContainerPntr = dynamic_cast<BMailContainer *>(ComponentPntr)))
   {
     NumComponents = ContainerPntr->CountComponents ();
 
@@ -4552,7 +5016,8 @@ status_t ABSApp::RecursivelyTokenizeMailComponent (
       ComponentPntr = ContainerPntr->GetComponent (i);
 
       ErrorCode = RecursivelyTokenizeMailComponent (ComponentPntr,
-        OptionalFileName, WordSet, ErrorMessage, RecursionLevel + 1);
+        OptionalFileName, WordSet, ErrorMessage, RecursionLevel + 1,
+        MaxRecursionLevel);
       if (ErrorCode != B_OK)
         break;
     }
@@ -4631,59 +5096,20 @@ status_t ABSApp::TokenizeParts (
   set<string> &WordSet,
   char *ErrorMessage)
 {
-  status_t                   ErrorCode = B_OK;
-  BMailComponent  HeaderComponent;
-  const char                *HeaderKeyPntr;
-  const char                *HeaderValuePntr;
-  int                        i;
-  int                        j;
-  BEmailMessage    WholeEMail;
+  status_t        ErrorCode = B_OK;
+  BEmailMessage   WholeEMail;
 
   sprintf (ErrorMessage, "ABSApp::TokenizeParts: While getting e-mail "
     "headers, had problems with \"%s\"", OptionalFileName);
 
-  /* Add the words in the header, if requested. */
+  ErrorCode = WholeEMail.SetToRFC822 (
+    PositionIOPntr /* it does its own seeking to the start */,
+    -1 /* length */, true /* parse_now */);
+  if (ErrorCode < 0) goto ErrorExit;
 
-  if (m_TokenizeMode == TM_PLAIN_TEXT_HEADER ||
-  m_TokenizeMode == TM_ANY_TEXT_HEADER ||
-  m_TokenizeMode == TM_ALL_PARTS_HEADER ||
-  m_TokenizeMode == TM_JUST_HEADER)
-  {
-    /* Load the message into a plain BMailComponent so that the headers are
-    decoded but not otherwise modified (the BEmailMessage class deletes most
-    of them so we can't reuse it). */
-
-    ErrorCode = PositionIOPntr->Seek (0, SEEK_SET);
-    if (ErrorCode < 0) goto ErrorExit;
-    ErrorCode = HeaderComponent.SetToRFC822 (PositionIOPntr,
-      -1 /* length */, true /* parse_now */);
-    if (ErrorCode < 0) goto ErrorExit;
-    for (i = 0; i < 1000; i++)
-    {
-      HeaderKeyPntr = HeaderComponent.HeaderAt (i);
-      if (HeaderKeyPntr == NULL)
-        break;
-      AddWordsToSet (HeaderKeyPntr, strlen (HeaderKeyPntr), WordSet);
-      for (j = 0; j < 1000; j++)
-      {
-        HeaderValuePntr = HeaderComponent.HeaderField (HeaderKeyPntr, j);
-        if (HeaderValuePntr == NULL)
-          break;
-        AddWordsToSet (HeaderValuePntr, strlen (HeaderValuePntr), WordSet);
-      }
-    }
-  }
-
-  if (m_TokenizeMode != TM_JUST_HEADER)
-  {
-    ErrorCode = WholeEMail.SetToRFC822 (
-      PositionIOPntr /* it does its own seeking to the start */,
-      -1 /* length */, true /* parse_now */);
-    if (ErrorCode < 0) goto ErrorExit;
-
-    ErrorCode = RecursivelyTokenizeMailComponent (&WholeEMail,
-      OptionalFileName, WordSet, ErrorMessage, 0 /* RecursionLevel */);
-  }
+  ErrorCode = RecursivelyTokenizeMailComponent (&WholeEMail,
+    OptionalFileName, WordSet, ErrorMessage, 0 /* Initial recursion level */,
+    (m_TokenizeMode == TM_JUST_HEADER) ? 0 : 500 /* Max recursion level */);
 
 ErrorExit:
   return ErrorCode;
@@ -4694,7 +5120,7 @@ ErrorExit:
 The file doesn't have to be an e-mail message since it isn't parsed for e-mail
 headers or MIME headers or anything.  It blindly adds everything that looks
 like a word, though it does convert quoted printable codes to the characters
-they represent.  See also AddWordsToSet which does something similar. */
+they represent.  See also AddWordsToSet which does something more advanced. */
 
 status_t ABSApp::TokenizeWhole (
   BPositionIO *PositionIOPntr,
@@ -4792,10 +5218,10 @@ status_t ABSApp::TokenizeWhole (
 
     /* Convert to lower case to improve word matches.  Of course this loses a
     bit of information, such as MONEY vs Money, an indicator of spam.  Well,
-    apparently that is actually a useful distinction, so leave the case alone.
-    if (Letter >= 0 && Letter < 128)
+    apparently that isn't all that useful a distinction, so do it. */
+
+    if (Letter >= 'A' && Letter < 'Z')
       Letter = tolower (Letter);
-    */
 
     /* See if it is a letter we treat as white space - all control characters
     and all punctuation except for: apostrophe (so "it's" and possessive
@@ -4804,7 +5230,7 @@ status_t ABSApp::TokenizeWhole (
     (periods).  Note that codes above 127 are UTF-8 characters, which we
     consider non-space. */
 
-    if (Letter < 0 /* EOF */ || (Letter < 128 && m_SpaceCharacters[Letter]))
+    if (Letter < 0 /* EOF */ || (Letter < 128 && g_SpaceCharacters[Letter]))
     {
       /* That space finished off a word.  Remove trailing periods... */
 
