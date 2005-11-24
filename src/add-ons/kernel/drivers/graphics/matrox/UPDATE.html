@@ -4,10 +4,17 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (SVN 0.23, Rudolf)</h1></p>
+<p><h1>head (SVN 0.24, Rudolf)</h1></p>
+<ul>
+<li><strong>G200-G550:</strong>
+<ul>
+<li>Added support for MMS cards by letting non-primary adaptors use the BIOS from the primary adaptor if they don't have their own. Confirmed a G200MMS working OK on all four heads using the 'test harness' application from Be's R4 graphics driver kit. A big thanks to Cale Lewis for donating this card!
+</ul>
+<li><strong>General:</strong>
 <ul>
 <li>Several ProposeMode updates and fixes making the Matrox driver better compatible with Dualhead Setup 0.04;
-<li>Added support for MMS cards by letting non-primary adaptors use the BIOS from the primary adaptor if they don't have their own. Confirmed a G200MMS working OK on all four heads using the 'test harness' application from Be's R4 graphics driver kit. A big thanks to Cale Lewis for donating this card!
+<li>Added capability to driver to run without an INT assigned. Driver will now automatically disable the 'Sync_to_Retrace' function if no INT was assigned instead of not loading/running at all.
+</ul>
 </ul>
 <p><h1>mga_driver 0.20 (Rudolf)</h1></p>
 <ul>
