@@ -166,8 +166,6 @@ class WinBorder : public Layer {
 			float				fMaxWidth;
 			float				fMinHeight;
 			float				fMaxHeight;
-
-			int cnt; // for debugging
 };
 
 #endif

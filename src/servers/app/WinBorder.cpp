@@ -99,9 +99,7 @@ WinBorder::WinBorder(const BRect &frame,
 	  fMinWidth(1.0),
 	  fMaxWidth(32768.0),
 	  fMinHeight(1.0),
-	  fMaxHeight(32768.0),
-
-	  cnt(0) // for debugging
+	  fMaxHeight(32768.0)
 {
 	// unlike BViews, windows start off as hidden
 	fHidden = true;
@@ -306,10 +304,6 @@ WinBorder::UpdateStart()
 	// During updates we only want to draw what's in the update region
 	fInUpdate = true;
 	fRequestSent = false;
-
-cnt--;
-if (cnt != 0)
-	CRITICAL("Layer::UpdateStart(): wb->cnt != 0 -> Not Allowed!");
 }
 
 
@@ -812,9 +806,6 @@ WinBorder::RequestClientRedraw(const BRegion &invalid)
 		fCumulativeRegion.Include(&updateReg);			
 		if (fUpdateRequestsEnabled && !InUpdate() && !fRequestSent) {
 			fInUpdateRegion = fCumulativeRegion;
-cnt++;
-if (cnt != 1)
-	CRITICAL("WinBorder::RequestClientRedraw(): cnt != 1 -> Not Allowed!");
 			fRequestSent = true; // this is here to avoid a possible de-synchronization
 
 			BMessage msg;
