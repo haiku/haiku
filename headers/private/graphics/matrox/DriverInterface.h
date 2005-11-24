@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-11/2004.
+	Rudolf Cornelissen 10/2002-11/2005.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -184,6 +184,7 @@ typedef struct {
 
 		/* general card information */
 		uint32 card_type;           /* see card_type enum above */
+		bool int_assigned;			/* card has a useable INT assigned to it */
 		status_t pins_status;		/* B_OK if read correctly, B_ERROR if faked */
 		bool sdram;					/* TRUE if SDRAM card: needed info for 2D acceleration */
 
