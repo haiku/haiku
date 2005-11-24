@@ -535,8 +535,9 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	if (si->settings.hardcursor)
 		target->flags |= B_HARDWARE_CURSOR;
 
-	/* set SUPPORTS_OVERLAYS */
-	target->flags |= B_SUPPORTS_OVERLAYS;
+	/* set SUPPORTS_OVERLAYS if suitable */
+	if ((si->ps.card_type <= NV40) || (si->ps.card_type == NV45))
+		target->flags |= B_SUPPORTS_OVERLAYS;
 
 	LOG(1, ("PROPOSEMODE: validated modeflags: $%08x\n", target->flags));
 
