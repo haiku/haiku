@@ -55,7 +55,7 @@ Desktop::~Desktop()
 void
 Desktop::Draw(BRect updateRect)
 {
-#if RUN_WITH_FRAME_BUFFER
+#if !RUN_WITH_FRAME_BUFFER
 	// since parts of the view might have been exposed,
 	// we need a clipping rebuild
 	if (LockClipping()) {
@@ -73,7 +73,7 @@ Desktop::Draw(BRect updateRect)
 		fDrawingEngine->Unlock();
 	}
 	
-#if RUN_WITH_FRAME_BUFFER
+#if !RUN_WITH_FRAME_BUFFER
 	// trigger redrawing windows
 	BRegion update(updateRect);
 	update.Exclude(&fBackgroundRegion);
