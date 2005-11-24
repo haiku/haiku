@@ -45,24 +45,31 @@ class EventDispatcher : public BLocker {
 		void SetHWInterface(HWInterface* interface);
 
 	private:
-		struct event_target;
+		struct event_listener;
+		class Target;
 
 		status_t _Run();
 		void _Unset();
 
 		bool _SendMessage(BMessenger& messenger, BMessage* message, float importance);
 
-		bool _AddTokens(BMessage* message, BList& tokens);
+		bool _AddTokens(BMessage* message, Target* target, uint32 eventMask);
 		void _RemoveTokens(BMessage* message);
 		void _SetToken(BMessage* message, int32 token);
 		void _SetFeedFocus(BMessage* message);
 		void _UnsetFeedFocus(BMessage* message);
 
-		event_target* _FindListener(const BMessenger& messenger, int32 token,
+		void _UnsetLastFocus();
+
+		Target* _FindTarget(const BMessenger& messenger, int32* _index = NULL);
+		Target* _AddTarget(const BMessenger& messenger);
+		void _RemoveTarget(Target* target);
+
+		event_listener* _FindListener(const BMessenger& messenger, int32 token,
 				int32* _index = NULL);
 		bool _AddListener(const BMessenger& messenger, int32 token,
 				uint32 eventMask, uint32 options, bool temporary);
-		void _RemoveTemporaryListener(event_target* target, int32 index);
+//		void _RemoveTemporaryListener(event_target* target, int32 index);
 		void _RemoveTemporaryListeners();
 
 		void _EventLoop();
@@ -76,19 +83,15 @@ class EventDispatcher : public BLocker {
 		thread_id		fThread;
 		thread_id		fCursorThread;
 
-		BMessenger		fFocus;
-		BMessenger		fLastFocus;
-		bool			fHasFocus;
-		bool			fHasLastFocus;
+		Target*			fFocus;
+		Target*			fLastFocus;
 		bool			fTransit;
-		BList			fLastFocusTokens;
-		BList			fFocusTokens;
 		bool			fSuspendFocus;
 
 		BMessageFilter*	fMouseFilter;
 		BMessageFilter*	fKeyboardFilter;
 
-		BObjectList<event_target> fListeners;
+		BObjectList<Target> fTargets;
 
 		BPoint			fLastCursorPosition;
 		int32			fLastButtons;

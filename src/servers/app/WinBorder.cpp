@@ -527,6 +527,12 @@ WinBorder::MouseUp(BMessage *msg, BPoint where)
 	fIsDragging = false;
 	fIsResizing = false;
 	fIsSlidingTab = false;
+
+	Layer* target = LayerAt(where);
+	if (target != NULL && target != this) {
+		msg->AddInt32("_view_token", target->ViewToken());
+		target->MouseUp(msg, where);
+	}
 }
 
 
@@ -573,6 +579,12 @@ WinBorder::MouseMoved(BMessage *msg, BPoint where)
 			// TODO: invalidate border area and send message to client for the widgets to light up
 			// What message? Is there a message on Focus change?
 //		}
+	}
+
+	Layer* target = LayerAt(where);
+	if (target != NULL && target != this) {
+		msg->AddInt32("_view_token", target->ViewToken());
+		target->MouseMoved(msg, where);
 	}
 }
 
