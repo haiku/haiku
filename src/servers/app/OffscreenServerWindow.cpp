@@ -6,12 +6,13 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-#include "OffscreenWinBorder.h"
+
+#include "OffscreenWindowLayer.h"
 #include "ServerBitmap.h"
 
 #include "OffscreenServerWindow.h"
 
-// constructor
+
 OffscreenServerWindow::OffscreenServerWindow(const char *title,
 											 ServerApp *app,
 											 port_id clientPort,
@@ -39,11 +40,11 @@ OffscreenServerWindow::SendMessageToClient(const BMessage* msg, int32 target,
 	// don't do anything in this implementation.
 }
 
-// MakeWinBorder
-WinBorder*
-OffscreenServerWindow::MakeWinBorder(BRect frame, const char* name,
+
+WindowLayer*
+OffscreenServerWindow::MakeWindowLayer(BRect frame, const char* name,
 									 uint32 look, uint32 feel, uint32 flags,
 									 uint32 workspace)
 {
-	return new OffscreenWinBorder(fBitmap, name, this);
+	return new OffscreenWindowLayer(fBitmap, name, this);
 }

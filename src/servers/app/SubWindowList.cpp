@@ -8,48 +8,49 @@
 
 /** List class for tracking floating and modal windows */
 
-#include <stdio.h>
-#include <List.h>
-
 #include "SubWindowList.h"
-#include "WinBorder.h"
+#include "WindowLayer.h"
 #include "ServerWindow.h"
 
+#include <List.h>
 
-SubWindowList::SubWindowList(void)
+#include <stdio.h>
+
+
+SubWindowList::SubWindowList()
 {
 }
 
 
-SubWindowList::~SubWindowList(void)
+SubWindowList::~SubWindowList()
 {
 }
 
 
 void
-SubWindowList::AddWinBorder(WinBorder *border)
+SubWindowList::AddWindowLayer(WindowLayer *windowLayer)
 {
-	if (HasItem(border))
+	if (HasItem(windowLayer))
 		return;
 
-	int32 borderFeel = border->Feel();;
+	int32 borderFeel = windowLayer->Feel();;
 	int32 location = 0;
 
 	for (; location < CountItems(); location++) {
-		int32 feelTemp = ((WinBorder*)ItemAt(location))->Feel();
+		int32 feelTemp = ((WindowLayer*)ItemAt(location))->Feel();
 
-		// in short: if 'border' is a floating window and 'temp' a modal one
+		// in short: if 'windowLayer' is a floating window and 'temp' a modal one
 		if ((borderFeel == B_FLOATING_SUBSET_WINDOW_FEEL
 				|| borderFeel == B_FLOATING_APP_WINDOW_FEEL
 				|| borderFeel == B_FLOATING_ALL_WINDOW_FEEL)
 			&& (feelTemp == B_MODAL_SUBSET_WINDOW_FEEL
 				|| feelTemp == B_MODAL_APP_WINDOW_FEEL
 				|| feelTemp == B_MODAL_ALL_WINDOW_FEEL)) {
-			// means we found the place for our window('wb')
+			// means we found the place for our window('windowLayer')
 			break;
 		}
 	}
-	AddItem(border, location);
+	AddItem(windowLayer, location);
 }
 
 
@@ -58,7 +59,7 @@ SubWindowList::AddSubWindowList(SubWindowList *list)
 {
 	int32 i = 0;
 	for (; i < CountItems(); i++) {
-		int32 feel = ((WinBorder*)ItemAt(i))->Feel();
+		int32 feel = ((WindowLayer*)ItemAt(i))->Feel();
 		if (feel == B_MODAL_SUBSET_WINDOW_FEEL
 			|| feel == B_MODAL_APP_WINDOW_FEEL
 			|| feel == B_MODAL_ALL_WINDOW_FEEL)
@@ -67,7 +68,7 @@ SubWindowList::AddSubWindowList(SubWindowList *list)
 
 	for (int32 j = 0; j < list->CountItems(); j++) {
 		void *item = list->ItemAt(j);
-		int32 feel = ((WinBorder*)item)->Feel();
+		int32 feel = ((WindowLayer*)item)->Feel();
 		if (feel == B_MODAL_SUBSET_WINDOW_FEEL
 			|| feel == B_MODAL_APP_WINDOW_FEEL
 			|| feel == B_MODAL_ALL_WINDOW_FEEL) {
@@ -84,33 +85,33 @@ void
 SubWindowList::PrintToStream() const
 {
 	printf("Floating and modal windows list:\n");
-	WinBorder* wb = NULL;
+	WindowLayer* windowLayer = NULL;
 
 	for (int32 i=0; i<CountItems(); i++) {
-		wb = (WinBorder*)ItemAt(i);
+		windowLayer = (WindowLayer*)ItemAt(i);
 
-		printf("\t%s", wb->Name());
+		printf("\t%s", windowLayer->Name());
 
-		if (wb->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL)
+		if (windowLayer->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL)
 			printf("\t%s\n", "B_FLOATING_SUBSET_WINDOW_FEEL");
 
-		if (wb->Feel() == B_FLOATING_APP_WINDOW_FEEL)
+		if (windowLayer->Feel() == B_FLOATING_APP_WINDOW_FEEL)
 			printf("\t%s\n", "B_FLOATING_APP_WINDOW_FEEL");
 
-		if (wb->Feel() == B_FLOATING_ALL_WINDOW_FEEL)
+		if (windowLayer->Feel() == B_FLOATING_ALL_WINDOW_FEEL)
 			printf("\t%s\n", "B_FLOATING_ALL_WINDOW_FEEL");
 
-		if (wb->Feel() == B_MODAL_SUBSET_WINDOW_FEEL)
+		if (windowLayer->Feel() == B_MODAL_SUBSET_WINDOW_FEEL)
 			printf("\t%s\n", "B_MODAL_SUBSET_WINDOW_FEEL");
 
-		if (wb->Feel() == B_MODAL_APP_WINDOW_FEEL)
+		if (windowLayer->Feel() == B_MODAL_APP_WINDOW_FEEL)
 			printf("\t%s\n", "B_MODAL_APP_WINDOW_FEEL");
 
-		if (wb->Feel() == B_MODAL_ALL_WINDOW_FEEL)
+		if (windowLayer->Feel() == B_MODAL_ALL_WINDOW_FEEL)
 			printf("\t%s\n", "B_MODAL_ALL_WINDOW_FEEL");
 
 		// this should NOT happen
-		if (wb->Feel() == B_NORMAL_WINDOW_FEEL)
+		if (windowLayer->Feel() == B_NORMAL_WINDOW_FEEL)
 			printf("\t%s\n", "B_NORMAL_WINDOW_FEEL");
 	}
 }

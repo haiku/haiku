@@ -29,7 +29,7 @@
 #include "ServerApp.h"
 #include "ServerProtocol.h"
 #include "ServerWindow.h"
-#include "WinBorder.h"
+#include "WindowLayer.h"
 #include "Layer.h"
 #include "ServerBitmap.h"
 
@@ -1440,9 +1440,9 @@ void
 Layer::_AllRedraw(const BRegion &invalid)
 {
 	// couldn't find a simpler way to send _UPDATE_ message to client.
-	WinBorder *wb = dynamic_cast<WinBorder*>(this);
-	if (wb)
-		wb->RequestClientRedraw(invalid);
+	WindowLayer *windowLayer = dynamic_cast<WindowLayer*>(this);
+	if (windowLayer)
+		windowLayer->RequestClientRedraw(invalid);
 
 	if (fVisible.CountRects() > 0) {
 		BRegion	updateReg(fVisible);

@@ -23,7 +23,7 @@
 #include "ServerProtocol.h"
 #include "ServerScreen.h"
 #include "ServerWindow.h"
-#include "WinBorder.h"
+#include "WindowLayer.h"
 #include "Workspace.h"
 #include "WorkspacesLayer.h"
 
@@ -181,46 +181,45 @@ RootLayer::ResizeBy(float x, float y)
 
 
 void
-RootLayer::AddWinBorder(WinBorder* winBorder)
+RootLayer::AddWindowLayer(WindowLayer* windowLayer)
 {
-	if (!winBorder->IsHidden())
-	{
-		CRITICAL("RootLayer::AddWinBorder - winBorder must be hidden\n");
+	if (!windowLayer->IsHidden()) {
+		CRITICAL("RootLayer::AddWindowLayer - windowLayer must be hidden\n");
 		return;
 	}
 
 	// Subset modals also need to have a main window before appearing in workspace list.
-	int32 feel = winBorder->Feel();
+	int32 feel = windowLayer->Feel();
 	if (feel != B_FLOATING_SUBSET_WINDOW_FEEL && feel != B_MODAL_SUBSET_WINDOW_FEEL) {
-		uint32 workspaces = winBorder->Workspaces();
+		uint32 workspaces = windowLayer->Workspaces();
 		// add to current workspace
 		if (workspaces == 0)
-			fWorkspace[fActiveWksIndex]->AddWinBorder(winBorder);
+			fWorkspace[fActiveWksIndex]->AddWindowLayer(windowLayer);
 		else {
 			// add to desired workspaces
 			for (int32 i = 0; i < fWsCount; i++) {
 				if (fWorkspace[i] && (workspaces & (0x00000001UL << i)))
-					fWorkspace[i]->AddWinBorder(winBorder);
+					fWorkspace[i]->AddWindowLayer(windowLayer);
 			}
 		}
 	}
 
-	// we _DO_NOT_ need to invalidate here. At this point our WinBorder is hidden!
+	// we _DO_NOT_ need to invalidate here. At this point our WindowLayer is hidden!
 
 	// set some internals
-	winBorder->SetRootLayer(this);
-	winBorder->fParent = this;
+	windowLayer->SetRootLayer(this);
+	windowLayer->fParent = this;
 }
 
 
 void
-RootLayer::RemoveWinBorder(WinBorder* winBorder)
+RootLayer::RemoveWindowLayer(WindowLayer* windowLayer)
 {
 	// Note: removing a subset window is also permited/performed.
 
-	if (!winBorder->IsHidden())
+	if (!windowLayer->IsHidden())
 	{
-		CRITICAL("RootLayer::RemoveWinBorder - winBorder must be hidden\n");
+		CRITICAL("RootLayer::RemoveWindowLayer - windowLayer must be hidden\n");
 		return;
 	}
 
@@ -229,32 +228,32 @@ RootLayer::RemoveWinBorder(WinBorder* winBorder)
 	// windows have 0 as a workspace index, this action is fully justified.
 	for (int32 i = 0; i < fWsCount; i++) {
 		if (fWorkspace[i])
-			fWorkspace[i]->RemoveWinBorder(winBorder);
+			fWorkspace[i]->RemoveWindowLayer(windowLayer);
 	}
 
-	// we _DO_NOT_ need to invalidate here. At this point our WinBorder is hidden!
+	// we _DO_NOT_ need to invalidate here. At this point our WindowLayer is hidden!
 
-	LayerRemoved(winBorder);
+	LayerRemoved(windowLayer);
 
 	// set some internals
-	winBorder->SetRootLayer(NULL);
-	winBorder->fParent = NULL;
+	windowLayer->SetRootLayer(NULL);
+	windowLayer->fParent = NULL;
 }
 
 
 void
-RootLayer::AddSubsetWinBorder(WinBorder *winBorder, WinBorder *toWinBorder)
+RootLayer::AddSubsetWindowLayer(WindowLayer *windowLayer, WindowLayer *toWindowLayer)
 {
 	// SUBSET windows _must_ have their workspaceIndex set to 0x0
-	if (winBorder->Workspaces() != 0UL)
+	if (windowLayer->Workspaces() != 0UL)
 	{
 		CRITICAL("SUBSET windows _must_ have their workspaceIndex set to 0x0\n");
 		return;
 	}
 
 	// there is no point in continuing - this subset window won't be shown,
-	// from 'toWinBorder's point of view
-	if (winBorder->IsHidden() || toWinBorder->IsHidden())
+	// from 'toWindowLayer's point of view
+	if (windowLayer->IsHidden() || toWindowLayer->IsHidden())
 	{
 		return;
 	}
@@ -264,13 +263,13 @@ RootLayer::AddSubsetWinBorder(WinBorder *winBorder, WinBorder *toWinBorder)
 	Workspace::State oldWMState;
 	ActiveWorkspace()->GetState(&oldWMState);
 
-	// we try to add WinBorders to all workspaces. If they are not needed, nothing will be done.
+	// we try to add WindowLayers to all workspaces. If they are not needed, nothing will be done.
 	// If they are needed, Workspace automaticaly allocates space and inserts them.
 	for (int32 i = 0; i < fWsCount; i++) {
 		invalid = false;
 
-		if (fWorkspace[i] && fWorkspace[i]->HasWinBorder(toWinBorder))
-			invalid = fWorkspace[i]->ShowWinBorder(winBorder, false);
+		if (fWorkspace[i] && fWorkspace[i]->HasWindowLayer(toWindowLayer))
+			invalid = fWorkspace[i]->ShowWindowLayer(windowLayer, false);
 
 		if (fActiveWksIndex == i)
 			invalidate = invalid;
@@ -282,11 +281,11 @@ RootLayer::AddSubsetWinBorder(WinBorder *winBorder, WinBorder *toWinBorder)
 
 
 void
-RootLayer::RemoveSubsetWinBorder(WinBorder *winBorder, WinBorder *fromWinBorder)
+RootLayer::RemoveSubsetWindowLayer(WindowLayer *windowLayer, WindowLayer *fromWindowLayer)
 {
 	// there is no point in continuing - this subset window is not visible
-	// at least not visible from 'fromWinBorder's point of view.
-	if (winBorder->IsHidden() || fromWinBorder->IsHidden())
+	// at least not visible from 'fromWindowLayer's point of view.
+	if (windowLayer->IsHidden() || fromWindowLayer->IsHidden())
 		return;
 
 	bool invalidate	= false;
@@ -294,12 +293,12 @@ RootLayer::RemoveSubsetWinBorder(WinBorder *winBorder, WinBorder *fromWinBorder)
 	Workspace::State oldWMState;
 	ActiveWorkspace()->GetState(&oldWMState);
 
-	// we try to remove from all workspaces. If winBorder is not in there, nothing will be done.
+	// we try to remove from all workspaces. If windowLayer is not in there, nothing will be done.
 	for (int32 i = 0; i < fWsCount; i++) {
 		invalid = false;
 
-		if (fWorkspace[i] && fWorkspace[i]->HasWinBorder(fromWinBorder))
-			invalid = fWorkspace[i]->HideWinBorder(winBorder);
+		if (fWorkspace[i] && fWorkspace[i]->HasWindowLayer(fromWindowLayer))
+			invalid = fWorkspace[i]->HideWindowLayer(windowLayer);
 
 		if (fActiveWksIndex == i)
 			invalidate = invalid;
@@ -323,17 +322,17 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 //		return false;
 
 	// if you're dragging something you are allowed to change workspaces only if
-	// the Layer being dragged is a B_NORMAL_WINDOW_FEEL WinBorder.
-	WinBorder *draggedWinBorder = dynamic_cast<WinBorder*>(fMouseEventLayer);
+	// the Layer being dragged is a B_NORMAL_WINDOW_FEEL WindowLayer.
+	WindowLayer *draggedWindowLayer = dynamic_cast<WindowLayer*>(fMouseEventLayer);
 	if (fMouseEventLayer != NULL) {
-		if (draggedWinBorder) {
-			if (draggedWinBorder->Feel() != B_NORMAL_WINDOW_FEEL)
+		if (draggedWindowLayer) {
+			if (draggedWindowLayer->Feel() != B_NORMAL_WINDOW_FEEL)
 				return false;
 		} else
 			return false;
 	}
 
-	// if fWorkspace[index] object does not exist, create and add allowed WinBorders
+	// if fWorkspace[index] object does not exist, create and add allowed WindowLayers
 	if (!fWorkspace[index]) {
 		// TODO: we NEED datas from a file!!!
 		fWorkspace[index] = new Workspace(index, 0xFF00FF00, kDefaultWorkspaceColor);
@@ -341,18 +340,18 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 		// we need to lock the window list here so no other window can be created 
 		fDesktop->Lock();
 
-		const BObjectList<WinBorder>& windowList = fDesktop->WindowList();
+		const BObjectList<WindowLayer>& windowList = fDesktop->WindowList();
 		int32 windowCount = windowList.CountItems();
 
 		for (int32 i = 0; i < windowCount; i++) {
-			WinBorder* winBorder = windowList.ItemAt(i);
+			WindowLayer* windowLayer = windowList.ItemAt(i);
 
-			// is WinBorder on this workspace?
-			if (winBorder->Workspaces() & (0x00000001UL << index)) {
-				fWorkspace[index]->AddWinBorder(winBorder);
+			// is WindowLayer on this workspace?
+			if (windowLayer->Workspaces() & (0x00000001UL << index)) {
+				fWorkspace[index]->AddWindowLayer(windowLayer);
 
-				if (!winBorder->IsHidden())
-					fWorkspace[index]->ShowWinBorder(winBorder);
+				if (!windowLayer->IsHidden())
+					fWorkspace[index]->ShowWindowLayer(windowLayer);
 			}
 		}
 
@@ -381,28 +380,28 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 
 	fActiveWksIndex	= index;
 
-	if (draggedWinBorder && !ActiveWorkspace()->HasWinBorder(draggedWinBorder)) {
+	if (draggedWindowLayer && !ActiveWorkspace()->HasWindowLayer(draggedWindowLayer)) {
 		// Workspace class expects a window to be hidden when it's about to be removed.
 		// As we surely know this windows is visible, we simply set fHidden to true and then
-		// change it back when adding winBorder to the current workspace.
-		draggedWinBorder->fHidden = true;
-		fWorkspace[exIndex]->HideWinBorder(draggedWinBorder);
-		fWorkspace[exIndex]->RemoveWinBorder(draggedWinBorder);
+		// change it back when adding windowLayer to the current workspace.
+		draggedWindowLayer->fHidden = true;
+		fWorkspace[exIndex]->HideWindowLayer(draggedWindowLayer);
+		fWorkspace[exIndex]->RemoveWindowLayer(draggedWindowLayer);
 
-		draggedWinBorder->fHidden = false;
-		ActiveWorkspace()->AddWinBorder(draggedWinBorder);
-		ActiveWorkspace()->ShowWinBorder(draggedWinBorder);
+		draggedWindowLayer->fHidden = false;
+		ActiveWorkspace()->AddWindowLayer(draggedWindowLayer);
+		ActiveWorkspace()->ShowWindowLayer(draggedWindowLayer);
 
-		// TODO: can you call SetWinBorderWorskpaces() instead of this?
-		uint32 wks = draggedWinBorder->Workspaces();
+		// TODO: can you call SetWindowLayerWorskpaces() instead of this?
+		uint32 wks = draggedWindowLayer->Workspaces();
 		BMessage changedMsg(B_WORKSPACES_CHANGED);
 		changedMsg.AddInt64("when", real_time_clock_usecs());
 		changedMsg.AddInt32("old", wks);
 		wks &= ~(0x00000001 << exIndex);
 		wks |= (0x00000001 << fActiveWksIndex);
 		changedMsg.AddInt32("new", wks);
-		draggedWinBorder->QuietlySetWorkspaces(wks);
-		draggedWinBorder->Window()->SendMessageToClient(&changedMsg, B_NULL_TOKEN);
+		draggedWindowLayer->QuietlySetWorkspaces(wks);
+		draggedWindowLayer->Window()->SendMessageToClient(&changedMsg, B_NULL_TOKEN);
 	}
 
 	RevealNewWMState(oldWMState);
@@ -421,12 +420,12 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 
 
 void
-RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldIndex, uint32 newIndex)
+RootLayer::SetWindowLayerWorskpaces(WindowLayer *windowLayer, uint32 oldIndex, uint32 newIndex)
 {
-	// if the active notify Layer is somehow related to winBorder, then
-	// this window/WinBorder is not allowed to leave this workspace.
+	// if the active notify Layer is somehow related to windowLayer, then
+	// this window/WindowLayer is not allowed to leave this workspace.
 // TODO: this looks wrong: I doubt the window is supposed to open in two workspaces then
-//	if (fNotifyLayer && (fNotifyLayer == winBorder || fNotifyLayer->Owner() == winBorder))
+//	if (fNotifyLayer && (fNotifyLayer == windowLayer || fNotifyLayer->Owner() == windowLayer))
 //		newIndex |= (0x00000001UL << fActiveWksIndex);
 
 	uint32 localOldIndex = oldIndex;
@@ -442,7 +441,7 @@ RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldIndex, uint32 
 
 	// you *cannot* set workspaces index for a window other than a normal one!
 	// Note: See ServerWindow class.
-	if (winBorder->Feel() != B_NORMAL_WINDOW_FEEL || localOldIndex == localNewIndex)
+	if (windowLayer->Feel() != B_NORMAL_WINDOW_FEEL || localOldIndex == localNewIndex)
 		return;
 
 	Workspace::State oldWMState;
@@ -452,20 +451,20 @@ RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldIndex, uint32 
 		if (fWorkspace[i]) {
 			invalid = false;
 
-			if (!(localNewIndex & (0x00000001UL << i)) && fWorkspace[i]->HasWinBorder(winBorder)) {
-				if (!winBorder->IsHidden()) {
+			if (!(localNewIndex & (0x00000001UL << i)) && fWorkspace[i]->HasWindowLayer(windowLayer)) {
+				if (!windowLayer->IsHidden()) {
 					// a little trick to force Workspace to properly pick the next front.
-					winBorder->fHidden = true;
-					invalid = fWorkspace[i]->HideWinBorder(winBorder);
-					winBorder->fHidden = false;
+					windowLayer->fHidden = true;
+					invalid = fWorkspace[i]->HideWindowLayer(windowLayer);
+					windowLayer->fHidden = false;
 				}
-				fWorkspace[i]->RemoveWinBorder(winBorder);
+				fWorkspace[i]->RemoveWindowLayer(windowLayer);
 			}
 
-			if ((localNewIndex & (0x00000001UL << i)) && !fWorkspace[i]->HasWinBorder(winBorder)) {
-				fWorkspace[i]->AddWinBorder(winBorder);
-				if (!winBorder->IsHidden())
-					invalid = fWorkspace[i]->ShowWinBorder(winBorder);
+			if ((localNewIndex & (0x00000001UL << i)) && !fWorkspace[i]->HasWindowLayer(windowLayer)) {
+				fWorkspace[i]->AddWindowLayer(windowLayer);
+				if (!windowLayer->IsHidden())
+					invalid = fWorkspace[i]->ShowWindowLayer(windowLayer);
 			}
 
 			if (fActiveWksIndex == i)
@@ -473,7 +472,7 @@ RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldIndex, uint32 
 		}
 	}
 
-	winBorder->WorkspacesChanged(oldIndex, newIndex);
+	windowLayer->WorkspacesChanged(oldIndex, newIndex);
 
 	if (invalidate)
 		RevealNewWMState(oldWMState);
@@ -581,7 +580,7 @@ RootLayer::SaveWorkspaceData(const char *path)
 
 
 void
-RootLayer::HideWinBorder(WinBorder* winBorder)
+RootLayer::HideWindowLayer(WindowLayer* windowLayer)
 {
 	BAutolock _(fAllRegionsLock);
 
@@ -590,18 +589,18 @@ RootLayer::HideWinBorder(WinBorder* winBorder)
 	Workspace::State oldWMState;
 	ActiveWorkspace()->GetState(&oldWMState);
 
-	winBorder->Hide(false);
+	windowLayer->Hide(false);
 
 	for (int32 i = 0; i < fWsCount; i++) {
 		invalid = false;
 
-		if (fWorkspace[i] && fWorkspace[i]->HasWinBorder(winBorder))
-			invalid = fWorkspace[i]->HideWinBorder(winBorder);
+		if (fWorkspace[i] && fWorkspace[i]->HasWindowLayer(windowLayer))
+			invalid = fWorkspace[i]->HideWindowLayer(windowLayer);
 
 		if (fActiveWksIndex == i) {
 			invalidate = invalid;
 
-			if (dynamic_cast<class WorkspacesLayer *>(winBorder->FirstChild()) != NULL)
+			if (dynamic_cast<class WorkspacesLayer *>(windowLayer->FirstChild()) != NULL)
 				SetWorkspacesLayer(NULL);
 		}
 	}
@@ -612,7 +611,7 @@ RootLayer::HideWinBorder(WinBorder* winBorder)
 
 
 void
-RootLayer::ShowWinBorder(WinBorder* winBorder)
+RootLayer::ShowWindowLayer(WindowLayer* windowLayer)
 {
 	BAutolock _(fAllRegionsLock);
 
@@ -621,32 +620,32 @@ RootLayer::ShowWinBorder(WinBorder* winBorder)
 	Workspace::State oldWMState;
 	ActiveWorkspace()->GetState(&oldWMState);
 
-	winBorder->Show(false);
+	windowLayer->Show(false);
 
 	for (int32 i = 0; i < fWsCount; i++) {
 		invalid = false;
 
 		if (fWorkspace[i]
-			&& (fWorkspace[i]->HasWinBorder(winBorder)
-				|| winBorder->Feel() == B_MODAL_SUBSET_WINDOW_FEEL
+			&& (fWorkspace[i]->HasWindowLayer(windowLayer)
+				|| windowLayer->Feel() == B_MODAL_SUBSET_WINDOW_FEEL
 					// subset modals are a bit like floating windows, they are being added
 					// and removed from workspace when there's at least a normal window
 					// that uses them.
-				|| winBorder->Level() == B_FLOATING_APP))
+				|| windowLayer->Level() == B_FLOATING_APP))
 					// floating windows are inserted/removed on-the-fly so this window,
 					// although needed may not be in workspace's list.
 		{
-			invalid = fWorkspace[i]->ShowWinBorder(winBorder);
+			invalid = fWorkspace[i]->ShowWindowLayer(windowLayer);
 
 			// ToDo: this won't work with FFM
-			fWorkspace[i]->AttemptToSetFocus(winBorder);
+			fWorkspace[i]->AttemptToSetFocus(windowLayer);
 		}
 
 		if (fActiveWksIndex == i) {
 			invalidate = invalid;
 
-			if (dynamic_cast<class WorkspacesLayer *>(winBorder->FirstChild()) != NULL)
-				SetWorkspacesLayer(winBorder->FirstChild());
+			if (dynamic_cast<class WorkspacesLayer *>(windowLayer->FirstChild()) != NULL)
+				SetWorkspacesLayer(windowLayer->FirstChild());
 		}
 	}
 
@@ -656,7 +655,7 @@ RootLayer::ShowWinBorder(WinBorder* winBorder)
 
 
 void
-RootLayer::ChangeWinBorderFeel(WinBorder *winBorder, int32 newFeel)
+RootLayer::ChangeWindowLayerFeel(WindowLayer *windowLayer, int32 newFeel)
 {
 	BAutolock _(fAllRegionsLock);
 
@@ -666,30 +665,30 @@ RootLayer::ChangeWinBorderFeel(WinBorder *winBorder, int32 newFeel)
 	Workspace::State oldWMState;
 	ActiveWorkspace()->GetState(&oldWMState);
 
-	if (!winBorder->IsHidden()) {
+	if (!windowLayer->IsHidden()) {
 		isVisible = true;
-		isVisibleInActiveWorkspace = ActiveWorkspace()->HasWinBorder(winBorder);
+		isVisibleInActiveWorkspace = ActiveWorkspace()->HasWindowLayer(windowLayer);
 		// just hide, don't invalidate
-		winBorder->Hide(false);
+		windowLayer->Hide(false);
 		// all workspaces must be up-to-date with this change of feel.
 		for (int32 i = 0; i < kMaxWorkspaceCount; i++) {
 			if (fWorkspace[i]) {
-				fWorkspace[i]->HideWinBorder(winBorder);
-				fWorkspace[i]->RemoveWinBorder(winBorder);
+				fWorkspace[i]->HideWindowLayer(windowLayer);
+				fWorkspace[i]->RemoveWindowLayer(windowLayer);
 			}
 		}
 	}
 
-	fDesktop->SetWinBorderFeel(winBorder, newFeel);
+	fDesktop->SetWindowLayerFeel(windowLayer, newFeel);
 
 	if (isVisible) {
 		// just show, don't invalidate
-		winBorder->Show(false);
+		windowLayer->Show(false);
 		// all workspaces must be up-to-date with this change of feel.
 		for (int32 i = 0; i < kMaxWorkspaceCount; i++) {
 			if (fWorkspace[i]) {
-				fWorkspace[i]->AddWinBorder(winBorder);
-				fWorkspace[i]->ShowWinBorder(winBorder);
+				fWorkspace[i]->AddWindowLayer(windowLayer);
+				fWorkspace[i]->ShowWindowLayer(windowLayer);
 			}
 		}
 
@@ -857,7 +856,7 @@ GetDrawingEngine()->ConstrainClippingRegion(NULL);
 
 
 bool
-RootLayer::SetActive(WinBorder* newActive, bool activate)
+RootLayer::SetActive(WindowLayer* newActive, bool activate)
 {
 	bool returnValue = false;
 	uint32 workspaceIndex = newActive->Workspaces();
@@ -884,7 +883,7 @@ RootLayer::SetActive(WinBorder* newActive, bool activate)
 		}
 	}
 
-	// If this WinBorder does not appear in current workspace,
+	// If this WindowLayer does not appear in current workspace,
 	// change to the first one who does.	
 	if (activate && !(workspaceIndex & (0x00000001UL << fActiveWksIndex))) {
 		// find an workspace index in which this Layer appears

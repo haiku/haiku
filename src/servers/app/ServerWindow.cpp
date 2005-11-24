@@ -16,7 +16,7 @@
 
 	A ServerWindow handles all the intraserver tasks required of it by its BWindow. There are 
 	too many tasks to list as being done by them, but they include handling View transactions, 
-	coordinating and linking a window's WinBorder half with its messaging half, dispatching 
+	coordinating and linking a window's WindowLayer half with its messaging half, dispatching 
 	mouse and key events from the server to its window, and other such things.
 */
 
@@ -51,7 +51,7 @@
 #include "ServerBitmap.h"
 #include "ServerPicture.h"
 #include "ServerProtocol.h"
-#include "WinBorder.h"
+#include "WindowLayer.h"
 #include "Workspace.h"
 #include "WorkspacesLayer.h"
 
@@ -123,11 +123,10 @@ struct dw_sync_data {
 	sem_id disableSemAck;
 };
 
+
 /*!
-	\brief Constructor
-	
-	Does a lot of stuff to set up for the window - new decorator, new winborder, spawn a 
-	monitor thread.
+	Sets up the basic BWindow counterpart - you have to call Init() before
+	you can actually use it, though.
 */
 ServerWindow::ServerWindow(const char *title, ServerApp *app,
 	port_id clientPort, port_id looperPort, int32 clientToken)
@@ -135,7 +134,7 @@ ServerWindow::ServerWindow(const char *title, ServerApp *app,
 	fTitle(NULL),
 	fDesktop(app->GetDesktop()),
 	fServerApp(app),
-	fWinBorder(NULL),
+	fWindowLayer(NULL),
 	fClientTeam(app->ClientTeam()),
 	fMessagePort(-1),
 	fClientReplyPort(clientPort),
@@ -162,10 +161,10 @@ ServerWindow::~ServerWindow()
 {
 	STRACE(("*ServerWindow(%s@%p):~ServerWindow()\n", fTitle, this));
 
-	if (!fWinBorder->IsOffscreenWindow())
-		fDesktop->RemoveWinBorder(fWinBorder);
+	if (!fWindowLayer->IsOffscreenWindow())
+		fDesktop->RemoveWindowLayer(fWindowLayer);
 
-	delete fWinBorder;
+	delete fWindowLayer;
 
 	free(fTitle);
 	delete_port(fMessagePort);
@@ -191,13 +190,13 @@ ServerWindow::Init(BRect frame, uint32 look, uint32 feel, uint32 flags, uint32 w
 	fLink.SetSenderPort(fClientReplyPort);
 	fLink.SetReceiverPort(fMessagePort);
 
-	// We cannot call MakeWinBorder in the constructor, since it 
-	fWinBorder = MakeWinBorder(frame, fTitle, look, feel, flags, workspace);
-	if (!fWinBorder)
+	// We cannot call MakeWindowLayer in the constructor, since it 
+	fWindowLayer = MakeWindowLayer(frame, fTitle, look, feel, flags, workspace);
+	if (!fWindowLayer)
 		return B_NO_MEMORY;
 
-	if (!fWinBorder->IsOffscreenWindow())
-		fDesktop->AddWinBorder(fWinBorder);
+	if (!fWindowLayer->IsOffscreenWindow())
+		fDesktop->AddWindowLayer(fWindowLayer);
 
 	return B_OK;
 }
@@ -216,9 +215,9 @@ ServerWindow::Run()
 	fLink.Attach<port_id>(fMessagePort);
 
 	float minWidth, maxWidth, minHeight, maxHeight;
-	fWinBorder->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
+	fWindowLayer->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
 
-	fLink.Attach<BRect>(fWinBorder->Frame());
+	fLink.Attach<BRect>(fWindowLayer->Frame());
 	fLink.Attach<float>(minWidth);
 	fLink.Attach<float>(maxWidth);
 	fLink.Attach<float>(minHeight);
@@ -253,7 +252,7 @@ ServerWindow::_GetLooperName(char* name, size_t length)
 }
 
 
-//! Forces the window border to update its decorator
+//! Forces the window layer to update its decorator
 void
 ServerWindow::ReplaceDecorator()
 {
@@ -261,23 +260,23 @@ ServerWindow::ReplaceDecorator()
 		debugger("you must lock a ServerWindow object before calling ::ReplaceDecorator()\n");
 
 	STRACE(("ServerWindow %s: Replace Decorator\n", fTitle));
-	fWinBorder->UpdateDecorator();
+	fWindowLayer->UpdateDecorator();
 }
 
 
-//! Shows the window's WinBorder
+//! Shows the window's WindowLayer
 void
 ServerWindow::Show()
 {
 	// NOTE: if you do something else, other than sending a port message, PLEASE lock
 	STRACE(("ServerWindow %s: Show\n", Title()));
 
-	if (fQuitting || !fWinBorder->IsHidden())
+	if (fQuitting || !fWindowLayer->IsHidden())
 		return;
 
-	RootLayer* rootLayer = fWinBorder->GetRootLayer();
+	RootLayer* rootLayer = fWindowLayer->GetRootLayer();
 	if (rootLayer && rootLayer->Lock()) {
-		rootLayer->ShowWinBorder(fWinBorder);
+		rootLayer->ShowWindowLayer(fWindowLayer);
 		rootLayer->Unlock();
 	}
 	
@@ -286,22 +285,22 @@ ServerWindow::Show()
 }
 
 
-//! Hides the window's WinBorder
+//! Hides the window's WindowLayer
 void
 ServerWindow::Hide()
 {
 	// NOTE: if you do something else, other than sending a port message, PLEASE lock
 	STRACE(("ServerWindow %s: Hide\n", Title()));
 
-	if (fWinBorder->IsHidden())
+	if (fWindowLayer->IsHidden())
 		return;
 
 	if (fDirectWindowData != NULL)
 		HandleDirectConnection(B_DIRECT_STOP);
 	
-	RootLayer* rootLayer = fWinBorder->GetRootLayer();
+	RootLayer* rootLayer = fWindowLayer->GetRootLayer();
 	if (rootLayer && rootLayer->Lock()) {
-		rootLayer->HideWinBorder(fWinBorder);
+		rootLayer->HideWindowLayer(fWindowLayer);
 		rootLayer->Unlock();
 	}
 }
@@ -330,8 +329,8 @@ ServerWindow::SetTitle(const char* newTitle)
 		rename_thread(Thread(), name);
 	}
 
-	if (fWinBorder != NULL)
-		fWinBorder->SetName(newTitle);
+	if (fWindowLayer != NULL)
+		fWindowLayer->SetName(newTitle);
 }
 
 
@@ -357,12 +356,12 @@ ServerWindow::NotifyMinimize(bool minimize)
 	bool sendMessages = false;
 
 	if (minimize) {
-		if (!fWinBorder->IsHidden()) {
+		if (!fWindowLayer->IsHidden()) {
 			Hide();
 			sendMessages = true;
 		}
 	} else {
-		if (fWinBorder->IsHidden()) {
+		if (fWindowLayer->IsHidden()) {
 			Show();
 			sendMessages = true;
 		}
@@ -413,18 +412,18 @@ ServerWindow::GetInfo(window_info& info)
 	info.thread = Thread();
 	info.client_token = ClientToken();
 	info.client_port = fClientLooperPort;
-	info.workspaces = fWinBorder->Workspaces();
+	info.workspaces = fWindowLayer->Workspaces();
 
 	info.layer = 0; // ToDo: what is this???
-	info.feel = fWinBorder->Feel();
-	info.flags = fWinBorder->WindowFlags();
-	info.window_left = (int)floor(fWinBorder->Frame().left);
-	info.window_top = (int)floor(fWinBorder->Frame().top);
-	info.window_right = (int)floor(fWinBorder->Frame().right);
-	info.window_bottom = (int)floor(fWinBorder->Frame().bottom);
+	info.feel = fWindowLayer->Feel();
+	info.flags = fWindowLayer->WindowFlags();
+	info.window_left = (int)floor(fWindowLayer->Frame().left);
+	info.window_top = (int)floor(fWindowLayer->Frame().top);
+	info.window_right = (int)floor(fWindowLayer->Frame().right);
+	info.window_bottom = (int)floor(fWindowLayer->Frame().bottom);
 
-	info.show_hide_level = fWinBorder->IsHidden() ? 1 : -1; // ???
-	info.is_mini = fWinBorder->IsHidden();
+	info.show_hide_level = fWindowLayer->IsHidden() ? 1 : -1; // ???
+	info.is_mini = fWindowLayer->IsHidden();
 }
 
 
@@ -488,13 +487,13 @@ ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent)
 	Layer *newLayer;
 
 	if (link.Code() == AS_LAYER_CREATE_ROOT
-		&& (fWinBorder->WindowFlags() & kWorkspacesWindowFlag) != 0) {
+		&& (fWindowLayer->WindowFlags() & kWorkspacesWindowFlag) != 0) {
 		// this is a workspaces window!
 		newLayer = new (nothrow) WorkspacesLayer(frame, name, token, resizeMask,
-			flags, fWinBorder->GetDrawingEngine());
+			flags, fWindowLayer->GetDrawingEngine());
 	} else {
 		newLayer = new (nothrow) Layer(frame, name, token, resizeMask, flags,
-			fWinBorder->GetDrawingEngine());
+			fWindowLayer->GetDrawingEngine());
 	}
 
 	if (newLayer == NULL)
@@ -507,7 +506,7 @@ ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent)
 	newLayer->fHidden = hidden;
 	newLayer->fEventMask = eventMask;
 	newLayer->fEventOptions = eventOptions;
-	newLayer->fOwner = fWinBorder;
+	newLayer->fOwner = fWindowLayer;
 
 	DesktopSettings settings(fDesktop);
 	ServerFont font;
@@ -516,7 +515,7 @@ ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent)
 
 // TODO: rework the clipping stuff to remove RootLayer dependency and then
 // remove this hack:
-if (fWinBorder->IsOffscreenWindow()) {
+if (fWindowLayer->IsOffscreenWindow()) {
 	newLayer->fVisible.Set(newLayer->fFrame);
 	newLayer->fDrawingRegion.Set(newLayer->fFrame);
 }
@@ -550,8 +549,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		return;
 	}
 
-	RootLayer *rootLayer = fWinBorder->GetRootLayer();
-	// NOTE: is NULL when fWinBorder is offscreen!
+	RootLayer *rootLayer = fWindowLayer->GetRootLayer();
+	// NOTE: is NULL when fWindowLayer is offscreen!
 	if (rootLayer)
 		rootLayer->Lock();
 
@@ -618,8 +617,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (fCurrentLayer != NULL)
 				break;
 
-			fWinBorder->SetTopLayer(CreateLayerTree(link, NULL));
-			fCurrentLayer = fWinBorder->TopLayer();
+			fWindowLayer->SetTopLayer(CreateLayerTree(link, NULL));
+			fCurrentLayer = fWindowLayer->TopLayer();
 			break;
 		}
 
@@ -777,7 +776,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&newHeight);
 			
 			// TODO: If fCurrentLayer is a window, check for minimum size allowed.
-			// Need WinBorder::GetSizeLimits
+			// Need WindowLayer::GetSizeLimits
 			float deltaWidth = newWidth - fCurrentLayer->fFrame.Width();
 			float deltaHeight = newHeight - fCurrentLayer->fFrame.Height();
 
@@ -1082,7 +1081,7 @@ if (rootLayer)
 
 			fCurrentLayer->CurrentState()->SetClippingRegion(region);
 
-			if (rootLayer && !(fCurrentLayer->IsHidden()) && !fWinBorder->InUpdate()) {
+			if (rootLayer && !(fCurrentLayer->IsHidden()) && !fWindowLayer->InUpdate()) {
 				BRegion invalidRegion;
 				fCurrentLayer->GetOnScreenRegion(invalidRegion);
 
@@ -1192,13 +1191,13 @@ if (rootLayer)
 		case AS_BEGIN_UPDATE:
 		{
 			DTRACE(("ServerWindowo %s: AS_BEGIN_UPDATE\n", Title()));
-			fWinBorder->UpdateStart();
+			fWindowLayer->UpdateStart();
 			break;
 		}
 		case AS_END_UPDATE:
 		{
 			DTRACE(("ServerWindowo %s: AS_END_UPDATE\n", Title()));
-			fWinBorder->UpdateEnd();
+			fWindowLayer->UpdateEnd();
 			break;
 		}
 
@@ -1235,12 +1234,12 @@ if (rootLayer)
 			link.Read<int32>(&token);
 			link.Read<team_id>(&teamID);
 
-			WinBorder *behindOf;
-			if ((behindOf = fDesktop->FindWinBorderByClientToken(token, teamID)) != NULL) {
-				fWinBorder->GetRootLayer()->Lock();
+			WindowLayer *behindOf;
+			if ((behindOf = fDesktop->FindWindowLayerByClientToken(token, teamID)) != NULL) {
+				fWindowLayer->GetRootLayer()->Lock();
 				// TODO: move to back ATM. Fix this later!
-				fWinBorder->GetRootLayer()->SetActive(fWinBorder, false);
-				fWinBorder->GetRootLayer()->Unlock();
+				fWindowLayer->GetRootLayer()->SetActive(fWindowLayer, false);
+				fWindowLayer->GetRootLayer()->Unlock();
 				status = B_OK;
 			}
 
@@ -1253,34 +1252,34 @@ if (rootLayer)
 			STRACE(("ServerWindow %s: Message AS_BEGIN_TRANSACTION unimplemented\n",
 				Title()));
 			// TODO: we could probably do a bit more here...
-			fWinBorder->DisableUpdateRequests();
+			fWindowLayer->DisableUpdateRequests();
 			break;
 		}
 		case AS_END_TRANSACTION:
 		{
 			STRACE(("ServerWindow %s: Message AS_END_TRANSACTION unimplemented\n",
 				Title()));
-			fWinBorder->EnableUpdateRequests();
+			fWindowLayer->EnableUpdateRequests();
 			break;
 		}
 		case AS_ENABLE_UPDATES:
 		{
 			STRACE(("ServerWindow %s: Message AS_ENABLE_UPDATES unimplemented\n",
 				Title()));
-			fWinBorder->EnableUpdateRequests();
+			fWindowLayer->EnableUpdateRequests();
 			break;
 		}
 		case AS_DISABLE_UPDATES:
 		{
 			STRACE(("ServerWindow %s: Message AS_DISABLE_UPDATES unimplemented\n",
 				Title()));
-			fWinBorder->DisableUpdateRequests();
+			fWindowLayer->DisableUpdateRequests();
 			break;
 		}
 		case AS_NEEDS_UPDATE:
 		{
 			STRACE(("ServerWindow %s: Message Needs_Update unimplemented\n", Title()));
-			if (fWinBorder->CulmulatedUpdateRegion().Frame().IsValid())
+			if (fWindowLayer->CulmulatedUpdateRegion().Frame().IsValid())
 				fLink.StartMessage(B_OK);
 			else
 				fLink.StartMessage(B_ERROR);
@@ -1300,21 +1299,21 @@ if (rootLayer)
 		case AS_ADD_TO_SUBSET:
 		{
 			STRACE(("ServerWindow %s: Message AS_ADD_TO_SUBSET\n", Title()));
-			WinBorder *windowBorder;
+			WindowLayer *windowLayer;
 			int32 mainToken;
 			team_id	teamID;
 
 			link.Read<int32>(&mainToken);
 			link.Read(&teamID, sizeof(team_id));
 
-			windowBorder = fDesktop->FindWinBorderByClientToken(mainToken, teamID);
-			if (windowBorder) {
+			windowLayer = fDesktop->FindWindowLayerByClientToken(mainToken, teamID);
+			if (windowLayer) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Flush();
 
-				fWinBorder->GetRootLayer()->Lock();
-				fDesktop->AddWinBorderToSubset(fWinBorder, windowBorder);
-				fWinBorder->GetRootLayer()->Unlock();
+				fWindowLayer->GetRootLayer()->Lock();
+				fDesktop->AddWindowLayerToSubset(fWindowLayer, windowLayer);
+				fWindowLayer->GetRootLayer()->Unlock();
 			} else {
 				fLink.StartMessage(SERVER_FALSE);
 				fLink.Flush();
@@ -1324,21 +1323,21 @@ if (rootLayer)
 		case AS_REM_FROM_SUBSET:
 		{
 			STRACE(("ServerWindow %s: Message AS_REM_FROM_SUBSET\n", Title()));
-			WinBorder *windowBorder;
+			WindowLayer *windowLayer;
 			int32 mainToken;
 			team_id teamID;
 
 			link.Read<int32>(&mainToken);
 			link.Read(&teamID, sizeof(team_id));
 			
-			windowBorder = fDesktop->FindWinBorderByClientToken(mainToken, teamID);
-			if (windowBorder) {
+			windowLayer = fDesktop->FindWindowLayerByClientToken(mainToken, teamID);
+			if (windowLayer) {
 				fLink.StartMessage(SERVER_TRUE);
 				fLink.Flush();
 
-				fWinBorder->GetRootLayer()->Lock();
-				fDesktop->RemoveWinBorderFromSubset(fWinBorder, windowBorder);
-				fWinBorder->GetRootLayer()->Unlock();
+				fWindowLayer->GetRootLayer()->Lock();
+				fDesktop->RemoveWindowLayerFromSubset(fWindowLayer, windowLayer);
+				fWindowLayer->GetRootLayer()->Unlock();
 			} else {
 				fLink.StartMessage(SERVER_FALSE);
 				fLink.Flush();
@@ -1364,7 +1363,7 @@ if (rootLayer)
 			int32 newFeel;
 			link.Read<int32>(&newFeel);
 
-			fWinBorder->GetRootLayer()->ChangeWinBorderFeel(winBorder, newFeel);
+			fWindowLayer->GetRootLayer()->ChangeWindowLayerFeel(winLayer, newFeel);
 			break;
 		}
 		case AS_SET_ALIGNMENT:
@@ -1384,7 +1383,7 @@ if (rootLayer)
 		{
 			STRACE(("ServerWindow %s: Message Get_Workspaces unimplemented\n", Title()));
 			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<uint32>(fWinBorder->Workspaces());
+			fLink.Attach<uint32>(fWindowLayer->Workspaces());
 			fLink.Flush();
 			break;
 		}
@@ -1394,11 +1393,10 @@ if (rootLayer)
 			uint32 newWorkspaces;
 			link.Read<uint32>(&newWorkspaces);
 
-			fWinBorder->GetRootLayer()->Lock();
-			fWinBorder->GetRootLayer()->SetWinBorderWorskpaces( fWinBorder,
-																fWinBorder->Workspaces(),
-																newWorkspaces);
-			fWinBorder->GetRootLayer()->Unlock();
+			fWindowLayer->GetRootLayer()->Lock();
+			fWindowLayer->GetRootLayer()->SetWindowLayerWorskpaces(fWindowLayer,
+				fWindowLayer->Workspaces(), newWorkspaces);
+			fWindowLayer->GetRootLayer()->Unlock();
 			break;
 		}
 		case AS_WINDOW_RESIZE:
@@ -1411,7 +1409,7 @@ if (rootLayer)
 
 			STRACE(("ServerWindow %s: Message AS_WINDOW_RESIZE %.1f, %.1f\n", Title(), xResizeBy, yResizeBy));
 			
-			fWinBorder->ResizeBy(xResizeBy, yResizeBy);
+			fWindowLayer->ResizeBy(xResizeBy, yResizeBy);
 			break;
 		}
 		case AS_WINDOW_MOVE:
@@ -1424,7 +1422,7 @@ if (rootLayer)
 
 			STRACE(("ServerWindow %s: Message AS_WINDOW_MOVE: %.1f, %.1f\n", Title(), xMoveBy, yMoveBy));
 
-			fWinBorder->MoveBy(xMoveBy, yMoveBy);
+			fWindowLayer->MoveBy(xMoveBy, yMoveBy);
 			break;
 		}
 		case AS_SET_SIZE_LIMITS:
@@ -1445,13 +1443,13 @@ if (rootLayer)
 			link.Read<float>(&minHeight);
 			link.Read<float>(&maxHeight);
 			
-			fWinBorder->SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
+			fWindowLayer->SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
 
 			// and now, sync the client to the limits that we were able to enforce
-			fWinBorder->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
+			fWindowLayer->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
 
 			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<BRect>(fWinBorder->Frame());
+			fLink.Attach<BRect>(fWindowLayer->Frame());
 			fLink.Attach<float>(minWidth);
 			fLink.Attach<float>(maxWidth);
 			fLink.Attach<float>(minHeight);
@@ -1468,7 +1466,7 @@ if (rootLayer)
 			link.Read<bool>(&activate);
 
 			if (rootLayer && rootLayer->Lock()) {
-				rootLayer->SetActive(fWinBorder, activate);
+				rootLayer->SetActive(fWindowLayer, activate);
 				rootLayer->Unlock();
 			}
 			break;
@@ -1663,10 +1661,10 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 	// checks both these conditions
 	BRegion rreg(fCurrentLayer->DrawingRegion());
 
-	if (fWinBorder->InUpdate())
-		rreg.IntersectWith(&fWinBorder->RegionToBeUpdated());
+	if (fWindowLayer->InUpdate())
+		rreg.IntersectWith(&fWindowLayer->RegionToBeUpdated());
 
-	DrawingEngine* driver = fWinBorder->GetDrawingEngine();
+	DrawingEngine* driver = fWindowLayer->GetDrawingEngine();
 	if (!driver) {
 		// ?!?
 		DTRACE(("ServerWindow %s: no display driver!!\n", Title()));
@@ -2077,11 +2075,11 @@ ServerWindow::_MessageLooper()
 				quitLoop = true;
 
 				// ToDo: what's this?
-				//RootLayer *rootLayer = fWinBorder->GetRootLayer();
+				//RootLayer *rootLayer = fWindowLayer->GetRootLayer();
 
 				// we are preparing to delete a ServerWindow, RootLayer should be aware
 				// of that and stop for a moment.
-				// also we must wait a bit for the associated WinBorder to become hidden
+				// also we must wait a bit for the associated WindowLayer to become hidden
 				//while(1) {
 				//	rootLayer->Lock();
 				//	if (IsHidden())
@@ -2091,7 +2089,7 @@ ServerWindow::_MessageLooper()
 				//}
 
 				// ServerWindow's destructor takes care of pulling this object off the desktop.
-				if (!fWinBorder->IsHidden())
+				if (!fWindowLayer->IsHidden())
 					CRITICAL("ServerWindow: a window must be hidden before it's deleted\n");
 				break;
 
@@ -2144,13 +2142,12 @@ ServerWindow::SendMessageToClient(const BMessage* msg, int32 target) const
 }
 
 
-WinBorder*
-ServerWindow::MakeWinBorder(BRect frame, const char* name,
-							uint32 look, uint32 feel, uint32 flags,
-							uint32 workspace)
+WindowLayer*
+ServerWindow::MakeWindowLayer(BRect frame, const char* name,
+	uint32 look, uint32 feel, uint32 flags, uint32 workspace)
 {
 	// The non-offscreen ServerWindow uses the DrawingEngine instance from the desktop.
-	return new(nothrow) WinBorder(frame, name, look, feel, flags,
+	return new(nothrow) WindowLayer(frame, name, look, feel, flags,
 		workspace, this, fDesktop->GetDrawingEngine());
 }
 
@@ -2198,28 +2195,30 @@ ServerWindow::HandleDirectConnection(int bufferState, int driverState)
 		fDirectWindowData->direct_info->layout = B_BUFFER_NONINTERLEAVED;
 		fDirectWindowData->direct_info->orientation = B_BUFFER_TOP_TO_BOTTOM; // TODO
 		
-		WinBorder *border = const_cast<WinBorder *>(GetWinBorder());
-		fDirectWindowData->direct_info->window_bounds = to_clipping_rect(border->Frame());
-		
+		WindowLayer *layer = const_cast<WindowLayer *>(GetWindowLayer());
+		fDirectWindowData->direct_info->window_bounds = to_clipping_rect(layer->Frame());
+
 		// TODO: Review this
-		const int32 kMaxClipRectsCount = (B_PAGE_SIZE - sizeof(direct_buffer_info)) / sizeof(clipping_rect);
-	
+		const int32 kMaxClipRectsCount = (B_PAGE_SIZE - sizeof(direct_buffer_info))
+			/ sizeof(clipping_rect);
+
 		// TODO: Is there a simpler way to obtain this result ?
 		// We just want the region INSIDE the window, border excluded.
-		BRegion clipRegion = const_cast<BRegion &>(border->FullVisible());
-		BRegion exclude = const_cast<BRegion &>(border->VisibleRegion());
+		BRegion clipRegion = const_cast<BRegion &>(layer->FullVisible());
+		BRegion exclude = const_cast<BRegion &>(layer->VisibleRegion());
 		clipRegion.Exclude(&exclude);
-		
-		fDirectWindowData->direct_info->clip_list_count = min_c(clipRegion.CountRects(), kMaxClipRectsCount);
+
+		fDirectWindowData->direct_info->clip_list_count = min_c(clipRegion.CountRects(),
+			kMaxClipRectsCount);
 		fDirectWindowData->direct_info->clip_bounds = clipRegion.FrameInt();
-		
+
 		for (uint32 i = 0; i < fDirectWindowData->direct_info->clip_list_count; i++)
 			fDirectWindowData->direct_info->clip_list[i] = clipRegion.RectAtInt(i);
 	}
-	
+
 	// Releasing this sem causes the client to call BDirectWindow::DirectConnected()
 	release_sem(fDirectWindowData->direct_sem);
-	
+
 	// TODO: Waiting half a second in this thread is not a problem,
 	// but since we are called from the RootLayer's thread too, very bad things could happen.
 	// Find some way to call this method only within ServerWindow's thread (messaging ?)
@@ -2229,7 +2228,7 @@ ServerWindow::HandleDirectConnection(int bufferState, int driverState)
 		// Test, but I think half a second is enough.
 		status = acquire_sem_etc(fDirectWindowData->direct_sem_ack, 1, B_TIMEOUT, 500000);
 	} while (status == B_INTERRUPTED);
-	
+
 	if (status < B_OK) {
 		// The client application didn't release the semaphore
 		// within the given timeout. Or something else went wrong.
@@ -2242,7 +2241,7 @@ ServerWindow::HandleDirectConnection(int bufferState, int driverState)
 
 status_t
 ServerWindow::PictureToRegion(ServerPicture *picture, BRegion &region,
-							bool inverse, BPoint where)
+	bool inverse, BPoint where)
 {
 	fprintf(stderr, "ServerWindow::PictureToRegion() not implemented\n");
 	region.MakeEmpty();

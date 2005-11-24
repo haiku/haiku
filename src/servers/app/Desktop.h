@@ -33,7 +33,7 @@ class DrawingEngine;
 class HWInterface;
 class Layer;
 class RootLayer;
-class WinBorder;
+class WindowLayer;
 
 namespace BPrivate {
 	class LinkSender;
@@ -73,21 +73,21 @@ class Desktop : public MessageLooper, public ScreenOwner {
 	inline	::HWInterface*		HWInterface() const
 									{ return fVirtualScreen.HWInterface(); }
 
-	// Methods for layer(WinBorder) manipulation.
-			void				AddWinBorder(WinBorder *winBorder);
-			void				RemoveWinBorder(WinBorder *winBorder);
-			void				SetWinBorderFeel(WinBorder *winBorder,
+	// Methods for layer(WindowLayer) manipulation.
+			void				AddWindowLayer(WindowLayer *winBorder);
+			void				RemoveWindowLayer(WindowLayer *winBorder);
+			void				SetWindowLayerFeel(WindowLayer *winBorder,
 												 uint32 feel);
-			void				AddWinBorderToSubset(WinBorder *winBorder,
-													 WinBorder *toWinBorder);
-			void				RemoveWinBorderFromSubset(WinBorder *winBorder,
-														  WinBorder *fromWinBorder);
+			void				AddWindowLayerToSubset(WindowLayer *winBorder,
+													 WindowLayer *toWindowLayer);
+			void				RemoveWindowLayerFromSubset(WindowLayer *winBorder,
+														  WindowLayer *fromWindowLayer);
 
-			WinBorder*			FindWinBorderByClientToken(int32 token, team_id teamID);
-			//WinBorder*		FindWinBorderByServerToken(int32 token);
+			WindowLayer*			FindWindowLayerByClientToken(int32 token, team_id teamID);
+			//WindowLayer*		FindWindowLayerByServerToken(int32 token);
 
 			// get list of registed windows
-			const BObjectList<WinBorder>& WindowList() const;
+			const BObjectList<WindowLayer>& WindowList() const;
 
 			void				WriteWindowList(team_id team, BPrivate::LinkSender& sender);
 			void				WriteWindowInfo(int32 serverToken, BPrivate::LinkSender& sender);
@@ -114,7 +114,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 			sem_id				fShutdownSemaphore;
 			int32				fShutdownCount;
 
-			BObjectList<WinBorder> fWinBorderList;
+			BObjectList<WindowLayer> fWindowLayerList;
 
 			::RootLayer*		fRootLayer;
 			Screen*				fActiveScreen;

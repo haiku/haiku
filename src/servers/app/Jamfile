@@ -35,7 +35,7 @@ Server app_server :
 	MessageLooper.cpp
 	MultiLocker.cpp
 	OffscreenServerWindow.cpp
-	OffscreenWinBorder.cpp
+	OffscreenWindowLayer.cpp
 	PNGDump.cpp
 	PicturePlayer.cpp
 	RAMLinkMsgReader.cpp
@@ -52,7 +52,7 @@ Server app_server :
 	SubWindowList.cpp
 	SystemPalette.cpp
 	VirtualScreen.cpp
-	WinBorder.cpp
+	WindowLayer.cpp
 	Workspace.cpp
 	WorkspacesLayer.cpp
 

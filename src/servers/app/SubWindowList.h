@@ -13,14 +13,14 @@
 #include <Window.h>
 
 
-class WinBorder;
+class WindowLayer;
 
 class SubWindowList : public BList {
 	public:
 		SubWindowList(void);
 		virtual ~SubWindowList(void);
 
-		void AddWinBorder(WinBorder *border);
+		void AddWindowLayer(WindowLayer *windowLayer);
 
 		// special
 		void AddSubWindowList(SubWindowList *list);

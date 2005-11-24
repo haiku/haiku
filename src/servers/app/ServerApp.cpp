@@ -56,7 +56,7 @@
 #include "ServerTokenSpace.h"
 #include "ServerWindow.h"
 #include "SystemPalette.h"
-#include "WinBorder.h"
+#include "WindowLayer.h"
 
 //#define DEBUG_SERVERAPP
 
@@ -535,7 +535,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			
 			for(int32 i = 0; i < fWindowList.CountItems(); i++) {
 				win=(ServerWindow*)fWindowList.ItemAt(i);
-				win->GetWinBorder()->UpdateColors();
+				win->GetWindowLayer()->UpdateColors();
 				win->SendMessageToClient(AS_UPDATE_COLORS, msg);
 			}
 */			break;
@@ -552,7 +552,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			for(int32 i=0; i<fSWindowList->CountItems(); i++)
 			{
 				win=(ServerWindow*)fSWindowList->ItemAt(i);
-				win->GetWinBorder()->UpdateFont();
+				win->GetWindowLayer()->UpdateFont();
 				win->SendMessageToClient(AS_UPDATE_FONTS, msg);
 			}
 */			break;
@@ -666,7 +666,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			for (int32 i = 0; i < fWindowList.CountItems(); i++) {
 				ServerWindow *window = fWindowList.ItemAt(i);
 				window->Lock();
-				const_cast<WinBorder *>(window->GetWinBorder())->UpdateDecorator();
+				const_cast<WindowLayer *>(window->GetWindowLayer())->UpdateDecorator();
 				window->Unlock();
 			}
 			break;

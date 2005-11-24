@@ -31,7 +31,6 @@
 #include "ServerProtocol.h"
 #include "ServerWindow.h"
 #include "SystemPalette.h"
-#include "WinBorder.h"
 
 #include <Accelerant.h>
 #include <AppDefs.h>

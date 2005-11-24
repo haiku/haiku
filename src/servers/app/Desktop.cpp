@@ -24,7 +24,7 @@
 #include "ServerConfig.h"
 #include "ServerScreen.h"
 #include "ServerWindow.h"
-#include "WinBorder.h"
+#include "WindowLayer.h"
 #include "Workspace.h"
 
 #include <WindowInfo.h>
@@ -147,7 +147,7 @@ Desktop::Desktop(uid_t userID)
 	fSettings(new DesktopSettings::Private()),
 	fAppListLock("application list"),
 	fShutdownSemaphore(-1),
-	fWinBorderList(64),
+	fWindowLayerList(64),
 	fActiveScreen(NULL),
 	fCursorManager()
 {
@@ -165,8 +165,8 @@ Desktop::Desktop(uid_t userID)
 
 Desktop::~Desktop()
 {
-	// root layer only knows the visible WinBorders, so we delete them all over here
-	for (int32 i = 0; WinBorder *border = (WinBorder *)fWinBorderList.ItemAt(i); i++)
+	// root layer only knows the visible WindowLayers, so we delete them all over here
+	for (int32 i = 0; WindowLayer *border = (WindowLayer *)fWindowLayerList.ItemAt(i); i++)
 		delete border;
 
 	delete fRootLayer;
@@ -435,8 +435,8 @@ Desktop::_ActivateApp(team_id team)
 	// search for an unhidden window to give focus to
 	int32 windowCount = WindowList().CountItems();
 	for (int32 i = 0; i < windowCount; ++i) {
-		// is this layer in fact a WinBorder?
-		WinBorder *winBorder = WindowList().ItemAt(i);
+		// is this layer in fact a WindowLayer?
+		WindowLayer *winBorder = WindowList().ItemAt(i);
 
 		// if winBorder is valid and not hidden, then we've found our target
 		if (winBorder != NULL && !winBorder->IsHidden()
@@ -480,11 +480,11 @@ Desktop::BroadcastToAllApps(int32 code)
 }
 
 
-//	#pragma mark - Methods for WinBorder manipulation
+//	#pragma mark - Methods for WindowLayer manipulation
 
 
 void
-Desktop::AddWinBorder(WinBorder *winBorder)
+Desktop::AddWindowLayer(WindowLayer *winBorder)
 {
 	if (!winBorder)
 		return;
@@ -497,45 +497,45 @@ Desktop::AddWinBorder(WinBorder *winBorder)
 	// we're playing with window list. lock first.
 	Lock();
 
-	if (fWinBorderList.HasItem(winBorder)) {
+	if (fWindowLayerList.HasItem(winBorder)) {
 		Unlock();
 		RootLayer()->Unlock();
-		debugger("AddWinBorder: WinBorder already in Desktop list\n");
+		debugger("AddWindowLayer: WindowLayer already in Desktop list\n");
 		return;
 	}
 
 	// we have a new window. store a record of it.
-	fWinBorderList.AddItem(winBorder);
+	fWindowLayerList.AddItem(winBorder);
 
 	// add FLOATING_APP windows to the local list of all normal windows.
 	// This is to keep the order all floating windows (app or subset) when we go from
 	// one normal window to another.
 	if (feel == B_FLOATING_APP_WINDOW_FEEL || feel == B_NORMAL_WINDOW_FEEL) {
-		WinBorder *wb = NULL;
-		int32 count = fWinBorderList.CountItems();
+		WindowLayer *wb = NULL;
+		int32 count = fWindowLayerList.CountItems();
 		int32 feelToLookFor = (feel == B_NORMAL_WINDOW_FEEL ?
 			B_FLOATING_APP_WINDOW_FEEL : B_NORMAL_WINDOW_FEEL);
 
 		for (int32 i = 0; i < count; i++) {
-			wb = (WinBorder *)fWinBorderList.ItemAt(i);
+			wb = (WindowLayer *)fWindowLayerList.ItemAt(i);
 
 			if (wb->App()->ClientTeam() == winBorder->App()->ClientTeam()
 				&& wb->Feel() == feelToLookFor) {
 				// R2: RootLayer comparison is needed.
 				feel == B_NORMAL_WINDOW_FEEL ?
-					winBorder->fSubWindowList.AddWinBorder(wb) :
-					wb->fSubWindowList.AddWinBorder(winBorder);
+					winBorder->fSubWindowList.AddWindowLayer(wb) :
+					wb->fSubWindowList.AddWindowLayer(winBorder);
 			}
 		}
 	}
 
 	// add application's list of modal windows.
 	if (feel == B_MODAL_APP_WINDOW_FEEL) {
-		winBorder->App()->fAppSubWindowList.AddWinBorder(winBorder);
+		winBorder->App()->fAppSubWindowList.AddWindowLayer(winBorder);
 	}
 
-	// send WinBorder to be added to workspaces
-	RootLayer()->AddWinBorder(winBorder);
+	// send WindowLayer to be added to workspaces
+	RootLayer()->AddWindowLayer(winBorder);
 
 	// hey, unlock!
 	Unlock();
@@ -545,7 +545,7 @@ Desktop::AddWinBorder(WinBorder *winBorder)
 
 
 void
-Desktop::RemoveWinBorder(WinBorder *winBorder)
+Desktop::RemoveWindowLayer(WindowLayer *winBorder)
 {
 	if (!winBorder)
 		return;
@@ -556,8 +556,8 @@ Desktop::RemoveWinBorder(WinBorder *winBorder)
 	// we're playing with window list. lock first.
 	Lock();
 
-	// remove from main WinBorder list.
-	if (fWinBorderList.RemoveItem(winBorder)) {
+	// remove from main WindowLayer list.
+	if (fWindowLayerList.RemoveItem(winBorder)) {
 		int32 feel = winBorder->Feel();
 
 		// floating app/subset and modal_subset windows require special atention because
@@ -566,11 +566,11 @@ Desktop::RemoveWinBorder(WinBorder *winBorder)
 			|| feel == B_MODAL_SUBSET_WINDOW_FEEL
 			|| feel == B_FLOATING_APP_WINDOW_FEEL)
 		{
-			WinBorder *wb = NULL;
-			int32 count = fWinBorderList.CountItems();
+			WindowLayer *wb = NULL;
+			int32 count = fWindowLayerList.CountItems();
 
 			for (int32 i = 0; i < count; i++) {
-				wb = (WinBorder*)fWinBorderList.ItemAt(i);
+				wb = (WindowLayer*)fWindowLayerList.ItemAt(i);
 
 				if (wb->Feel() == B_NORMAL_WINDOW_FEEL
 					&& wb->App()->ClientTeam() == winBorder->App()->ClientTeam()) {
@@ -587,12 +587,12 @@ Desktop::RemoveWinBorder(WinBorder *winBorder)
 	} else {
 		Unlock();
 		RootLayer()->Unlock();
-		debugger("RemoveWinBorder: WinBorder not found in Desktop list\n");
+		debugger("RemoveWindowLayer: WindowLayer not found in Desktop list\n");
 		return;
 	}
 
 	// Tell to winBorder's RootLayer about this.
-	RootLayer()->RemoveWinBorder(winBorder);
+	RootLayer()->RemoveWindowLayer(winBorder);
 
 	Unlock();
 	RootLayer()->Unlock();
@@ -600,7 +600,7 @@ Desktop::RemoveWinBorder(WinBorder *winBorder)
 
 
 void
-Desktop::AddWinBorderToSubset(WinBorder *winBorder, WinBorder *toWinBorder)
+Desktop::AddWindowLayerToSubset(WindowLayer *winBorder, WindowLayer *toWindowLayer)
 {
 	// NOTE: we can safely lock the entire method body, because this method is called from
 	//		 RootLayer's thread only.
@@ -608,36 +608,36 @@ Desktop::AddWinBorderToSubset(WinBorder *winBorder, WinBorder *toWinBorder)
 	// we're playing with window list. lock first.
 	Lock();
 
-	if (!winBorder || !toWinBorder
-		|| !fWinBorderList.HasItem(winBorder)
-		|| !fWinBorderList.HasItem(toWinBorder)) {
+	if (!winBorder || !toWindowLayer
+		|| !fWindowLayerList.HasItem(winBorder)
+		|| !fWindowLayerList.HasItem(toWindowLayer)) {
 		Unlock();
-		debugger("AddWinBorderToSubset: NULL WinBorder or not found in Desktop list\n");
+		debugger("AddWindowLayerToSubset: NULL WindowLayer or not found in Desktop list\n");
 		return;
 	}
 
 	if ((winBorder->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL
 			|| winBorder->Feel() == B_MODAL_SUBSET_WINDOW_FEEL)
-		&& toWinBorder->Feel() == B_NORMAL_WINDOW_FEEL
-		&& toWinBorder->App()->ClientTeam() == winBorder->App()->ClientTeam()
-		&& !toWinBorder->fSubWindowList.HasItem(winBorder)) {
+		&& toWindowLayer->Feel() == B_NORMAL_WINDOW_FEEL
+		&& toWindowLayer->App()->ClientTeam() == winBorder->App()->ClientTeam()
+		&& !toWindowLayer->fSubWindowList.HasItem(winBorder)) {
 		// add to normal_window's list
-		toWinBorder->fSubWindowList.AddWinBorder(winBorder);
+		toWindowLayer->fSubWindowList.AddWindowLayer(winBorder);
 	} else {
 		Unlock();
-		debugger("AddWinBorderToSubset: you must add a subset_window to a normal_window's subset with the same team_id\n");
+		debugger("AddWindowLayerToSubset: you must add a subset_window to a normal_window's subset with the same team_id\n");
 		return;
 	}
 
-	// send WinBorder to be added to workspaces, if not already in there.
-	RootLayer()->AddSubsetWinBorder(winBorder, toWinBorder);
+	// send WindowLayer to be added to workspaces, if not already in there.
+	RootLayer()->AddSubsetWindowLayer(winBorder, toWindowLayer);
 
 	Unlock();
 }
 
 
 void
-Desktop::RemoveWinBorderFromSubset(WinBorder *winBorder, WinBorder *fromWinBorder)
+Desktop::RemoveWindowLayerFromSubset(WindowLayer *winBorder, WindowLayer *fromWindowLayer)
 {
 	// NOTE: we can safely lock the entire method body, because this method is called from
 	//		 RootLayer's thread only.
@@ -645,23 +645,23 @@ Desktop::RemoveWinBorderFromSubset(WinBorder *winBorder, WinBorder *fromWinBorde
 	// we're playing with window list. lock first.
 	Lock();
 
-	if (!winBorder || !fromWinBorder
-		|| !fWinBorderList.HasItem(winBorder)
-		|| !fWinBorderList.HasItem(fromWinBorder)) {
+	if (!winBorder || !fromWindowLayer
+		|| !fWindowLayerList.HasItem(winBorder)
+		|| !fWindowLayerList.HasItem(fromWindowLayer)) {
 		Unlock();
-		debugger("RemoveWinBorderFromSubset: NULL WinBorder or not found in Desktop list\n");
+		debugger("RemoveWindowLayerFromSubset: NULL WindowLayer or not found in Desktop list\n");
 		return;
 	}
 
-	// remove WinBorder from workspace, if needed - some other windows may still have it in their subset
-	RootLayer()->RemoveSubsetWinBorder(winBorder, fromWinBorder);
+	// remove WindowLayer from workspace, if needed - some other windows may still have it in their subset
+	RootLayer()->RemoveSubsetWindowLayer(winBorder, fromWindowLayer);
 
-	if (fromWinBorder->Feel() == B_NORMAL_WINDOW_FEEL) {
+	if (fromWindowLayer->Feel() == B_NORMAL_WINDOW_FEEL) {
 		//remove from this normal_window's subset.
-		fromWinBorder->fSubWindowList.RemoveItem(winBorder);
+		fromWindowLayer->fSubWindowList.RemoveItem(winBorder);
 	} else {
 		Unlock();
-		debugger("RemoveWinBorderFromSubset: you must remove a subset_window from a normal_window's subset\n");
+		debugger("RemoveWindowLayerFromSubset: you must remove a subset_window from a normal_window's subset\n");
 		return;
 	}
 
@@ -670,28 +670,28 @@ Desktop::RemoveWinBorderFromSubset(WinBorder *winBorder, WinBorder *fromWinBorde
 
 
 void
-Desktop::SetWinBorderFeel(WinBorder *winBorder, uint32 feel)
+Desktop::SetWindowLayerFeel(WindowLayer *winBorder, uint32 feel)
 {
 	// NOTE: this method is called from RootLayer thread only
 
 	// we're playing with window list. lock first.
 	Lock();
 
-	RemoveWinBorder(winBorder);
+	RemoveWindowLayer(winBorder);
 	winBorder->QuietlySetFeel(feel);
-	AddWinBorder(winBorder);
+	AddWindowLayer(winBorder);
 
 	Unlock();
 }
 
 
-WinBorder *
-Desktop::FindWinBorderByClientToken(int32 token, team_id teamID)
+WindowLayer *
+Desktop::FindWindowLayerByClientToken(int32 token, team_id teamID)
 {
 	BAutolock locker(this);
 
-	WinBorder *wb;
-	for (int32 i = 0; (wb = (WinBorder *)fWinBorderList.ItemAt(i)); i++) {
+	WindowLayer *wb;
+	for (int32 i = 0; (wb = (WindowLayer *)fWindowLayerList.ItemAt(i)); i++) {
 		if (wb->Window()->ClientToken() == token
 			&& wb->Window()->ClientTeam() == teamID)
 			return wb;
@@ -701,13 +701,13 @@ Desktop::FindWinBorderByClientToken(int32 token, team_id teamID)
 }
 
 
-const BObjectList<WinBorder> &
+const BObjectList<WindowLayer> &
 Desktop::WindowList() const
 {
 	if (!IsLocked())
 		debugger("You must lock before getting registered windows list\n");
 
-	return fWinBorderList;
+	return fWindowLayerList;
 }
 
 
@@ -720,22 +720,22 @@ Desktop::WriteWindowList(team_id team, BPrivate::LinkSender& sender)
 
 	int32 count = 0;
 	if (team >= B_OK) {
-		for (int32 i = 0; i < fWinBorderList.CountItems(); i++) {
-			WinBorder* border = fWinBorderList.ItemAt(i);
+		for (int32 i = 0; i < fWindowLayerList.CountItems(); i++) {
+			WindowLayer* border = fWindowLayerList.ItemAt(i);
 
 			if (border->Window()->ClientTeam() == team)
 				count++;
 		}
 	} else
-		count = fWinBorderList.CountItems();
+		count = fWindowLayerList.CountItems();
 
 	// write list
 
 	sender.StartMessage(SERVER_TRUE);
 	sender.Attach<int32>(count);
 
-	for (int32 i = 0; i < fWinBorderList.CountItems(); i++) {
-		WinBorder* border = fWinBorderList.ItemAt(i);
+	for (int32 i = 0; i < fWindowLayerList.CountItems(); i++) {
+		WindowLayer* border = fWindowLayerList.ItemAt(i);
 
 		if (team >= B_OK && border->Window()->ClientTeam() != team)
 			continue;

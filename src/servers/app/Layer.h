@@ -170,7 +170,7 @@ class Layer {
 									{ return fWindow; }
 			ServerApp*			App() const
 									{ return fWindow ? fWindow->App() : NULL; }
-	inline	WinBorder*			Owner() const
+	inline	WindowLayer*		Owner() const
 									{ return fOwner; }
 			RootLayer*			GetRootLayer() const
 									{ return fRootLayer; }
@@ -208,9 +208,8 @@ class Layer {
 	virtual	void				Draw(const BRect& r);
 			void				_AllRedraw(const BRegion &invalid);
 
- private:
-	friend class RootLayer;
-	friend class WinBorder;
+ protected:
+ 	friend class RootLayer;
 	friend class ServerWindow;
 
 	// private clipping stuff
@@ -241,7 +240,7 @@ class Layer {
 			DrawingEngine*		fDriver;
 			RootLayer*			fRootLayer;
 			ServerWindow*		fWindow;
-			WinBorder*			fOwner;
+			WindowLayer*			fOwner;
 
 			DrawState*			fDrawState;
 

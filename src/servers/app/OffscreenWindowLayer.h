@@ -2,23 +2,25 @@
  * Copyright 2005, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
- * Author:  Stephan Aßmus <superstippi@gmx.de>
+ * Author:
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef OFFSCREEN_WINBORDER_H
 #define OFFSCREEN_WINBORDER_H
 
-#include "WinBorder.h"
+
+#include "WindowLayer.h"
+
 
 class BitmapHWInterface;
 class ServerBitmap;
 
-class OffscreenWinBorder : public WinBorder {
+class OffscreenWindowLayer : public WindowLayer {
  public:
-								OffscreenWinBorder(ServerBitmap* bitmap,
+								OffscreenWindowLayer(ServerBitmap* bitmap,
 												   const char* name,
 												   ServerWindow* window);
-	virtual						~OffscreenWinBorder();
+	virtual						~OffscreenWindowLayer();
 	
 	virtual	void				Draw(const BRect &r);
 	
@@ -28,11 +30,9 @@ class OffscreenWinBorder : public WinBorder {
 	virtual	bool				IsOffscreenWindow() const
 									{ return true; }
 
-	virtual	void				SetTopLayer(Layer* layer);
-
  private:
 		ServerBitmap*			fBitmap;
 		BitmapHWInterface*		fHWInterface;
 };
 
-#endif
+#endif	// OFFSCREEN_WINBORDER_H

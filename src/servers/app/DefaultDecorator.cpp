@@ -212,7 +212,7 @@ DefaultDecorator::GetFootprint(BRegion *region)
 {
 	STRACE(("DefaultDecorator: Get Footprint\n"));
 	// This function calculates the decorator's footprint in coordinates
-	// relative to the layer. This is most often used to set a WinBorder
+	// relative to the layer. This is most often used to set a WindowLayer
 	// object's visible region.
 	if (!region)
 		return;

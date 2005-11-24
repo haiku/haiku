@@ -6,14 +6,17 @@
  *			Adi Oanca <adioanca@gmail.com>
  *			Stephan Aßmus <superstippi@gmx.de>
  */
-#ifndef _WINBORDER_H_
-#define _WINBORDER_H_
+#ifndef WINDOW_LAYER_H
+#define WINDOW_LAYER_H
+
+
+#include "Decorator.h"
+#include "Layer.h"
+#include "SubWindowList.h"
 
 #include <Rect.h>
 #include <String.h>
-#include "Layer.h"
-#include "SubWindowList.h"
-#include "Decorator.h"
+
 
 // these are used by window manager to properly place window.
 enum {
@@ -33,9 +36,9 @@ class Decorator;
 class DrawingEngine;
 class Desktop;
 
-class WinBorder : public Layer {
+class WindowLayer : public Layer {
  public:
-								WinBorder(const BRect &frame,
+								WindowLayer(const BRect &frame,
 										  const char *name,
 										  const uint32 look,
 										  const uint32 feel, 
@@ -43,7 +46,7 @@ class WinBorder : public Layer {
 										  const uint32 workspaces,
 										  ServerWindow *window,
 										  DrawingEngine *driver);
-	virtual						~WinBorder();
+	virtual						~WindowLayer();
 	
 	virtual	void				Draw(const BRect &r);
 	
@@ -168,4 +171,4 @@ class WinBorder : public Layer {
 			float				fMaxHeight;
 };
 
-#endif
+#endif	// WINDOW_LAYER_H

@@ -35,7 +35,7 @@ class BMessage;
 class Desktop;
 class ServerApp;
 class Decorator;
-class WinBorder;
+class WindowLayer;
 class Workspace;
 class RootLayer;
 class Layer;
@@ -78,11 +78,9 @@ public:
 			status_t			SendMessageToClient(const BMessage* msg,
 													int32 target = B_NULL_TOKEN) const;
 
-	virtual	WinBorder*			MakeWinBorder(BRect frame,
-											  const char* name,
-											  uint32 look, uint32 feel,
-											  uint32 flags, uint32 workspace);
-
+	virtual	WindowLayer*		MakeWindowLayer(BRect frame, const char* name,
+									uint32 look, uint32 feel, uint32 flags,
+									uint32 workspace);
 			
 			// TODO: Ouch, that's not exactly a nice name
 			inline BMessage		&ClientViewsWithInvalidCoords()
@@ -90,7 +88,7 @@ public:
 		
 			// to who we belong. who do we own. our title.
 	inline	ServerApp*			App() const { return fServerApp; }
-	inline	const WinBorder*	GetWinBorder() const { return fWinBorder; }
+	inline	const WindowLayer*	GetWindowLayer() const { return fWindowLayer; }
 
 			void				SetTitle(const char* newTitle);
 	inline	const char*			Title() const { return fTitle; }
@@ -134,7 +132,7 @@ private:
 
 			Desktop*			fDesktop;
 			ServerApp*			fServerApp;
-			WinBorder*			fWinBorder;
+			WindowLayer*		fWindowLayer;
 
 			team_id				fClientTeam;
 

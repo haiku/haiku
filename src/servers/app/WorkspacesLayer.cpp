@@ -14,7 +14,7 @@
 #include "AppServer.h"
 #include "DrawingEngine.h"
 #include "RootLayer.h"
-#include "WinBorder.h"
+#include "WindowLayer.h"
 #include "Workspace.h"
 
 #include "WorkspacesLayer.h"
@@ -94,7 +94,7 @@ WorkspacesLayer::_WindowFrame(const BRect& workspaceFrame,
 
 void
 WorkspacesLayer::_DrawWindow(const BRect& workspaceFrame,
-	const BRect& screenFrame, WinBorder* window,
+	const BRect& screenFrame, WindowLayer* window,
 	BRegion& backgroundRegion, bool active)
 {
 	if (window->Feel() == kDesktopWindowFeel)
@@ -170,9 +170,9 @@ WorkspacesLayer::_DrawWorkspace(int32 index)
 		// ToDo: would be nice to get the real update region here
 
 	if (workspace != NULL) {
-		WinBorder* windows[256];
+		WindowLayer* windows[256];
 		int32 count = 256;
-		if (!workspace->GetWinBorderList((void **)&windows, &count))
+		if (!workspace->GetWindowLayerList((void **)&windows, &count))
 			return;
 
 		uint16 width, height;

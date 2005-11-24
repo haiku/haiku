@@ -11,6 +11,7 @@
 
 #include "ServerWindow.h"
 
+
 class OffscreenServerWindow : public ServerWindow {
  public:
 								OffscreenServerWindow(const char *title,
@@ -26,10 +27,10 @@ class OffscreenServerWindow : public ServerWindow {
 													int32 target = B_NULL_TOKEN,
 													bool usePreferred = false) const;
 
-	virtual	WinBorder*			MakeWinBorder(BRect frame,
-											  const char* name,
-											  uint32 look, uint32 feel,
-											  uint32 flags, uint32 workspace);
+	virtual	WindowLayer*		MakeWindowLayer(BRect frame, const char* name,
+									uint32 look, uint32 feel, uint32 flags,
+									uint32 workspace);
+
  private:
 			ServerBitmap*		fBitmap;
 };

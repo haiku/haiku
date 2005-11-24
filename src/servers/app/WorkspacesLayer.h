@@ -11,7 +11,7 @@
 
 #include "Layer.h"
 
-class WinBorder;
+class WindowLayer;
 
 
 class WorkspacesLayer : public Layer {
@@ -29,7 +29,7 @@ class WorkspacesLayer : public Layer {
 					const BRect& screenFrame, const BRect& windowFrame);
 
 		void _DrawWindow(const BRect& workspaceFrame,
-					const BRect& screenFrame, WinBorder* window,
+					const BRect& screenFrame, WindowLayer* window,
 					BRegion& backgroundRegion, bool active);
 		void _DrawWorkspace(int32 index);
 

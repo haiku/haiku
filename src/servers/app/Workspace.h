@@ -37,12 +37,12 @@
 
 #include "RGBColor.h"
 
-class WinBorder;
+class WindowLayer;
 
 struct ListData
 {
 	bool isFree;
-	WinBorder *layerPtr;
+	WindowLayer *layerPtr;
 	ListData *upperItem;
 	ListData *lowerItem;
 };
@@ -55,9 +55,9 @@ class Workspace {
 
 				void		PrintToStream();
 
-				WinBorder*	Front;
-				WinBorder*	Focus;
-				WinBorder*	Active;
+				WindowLayer* Front;
+				WindowLayer* Focus;
+				WindowLayer* Active;
 				BList		WindowList;
 		};
 								Workspace(	const int32 ID,
@@ -67,26 +67,26 @@ class Workspace {
 
 			int32				ID() const { return fID; }
 
-			void				AddWinBorder(WinBorder *winBorder);
-			void				RemoveWinBorder(WinBorder *winBorder);
-			bool				HasWinBorder(const WinBorder *winBorder) const;
+			void				AddWindowLayer(WindowLayer *winBorder);
+			void				RemoveWindowLayer(WindowLayer *winBorder);
+			bool				HasWindowLayer(const WindowLayer *winBorder) const;
 
-			WinBorder*			Focus() const;
-			WinBorder*			Front() const;
-			WinBorder*			Active() const;
+			WindowLayer*			Focus() const;
+			WindowLayer*			Front() const;
+			WindowLayer*			Active() const;
 			void				GetState(Workspace::State *state) const;
-			bool				AttemptToSetFront(WinBorder *newFront);
-			int32				AttemptToSetFocus(WinBorder *newFocus);
-			bool				AttemptToMoveToBack(WinBorder *newBack);
-			bool				AttemptToActivate(WinBorder *toActivate);
+			bool				AttemptToSetFront(WindowLayer *newFront);
+			int32				AttemptToSetFocus(WindowLayer *newFocus);
+			bool				AttemptToMoveToBack(WindowLayer *newBack);
+			bool				AttemptToActivate(WindowLayer *toActivate);
 
-			bool				GetWinBorderList(void **list, int32 *itemCount ) const;
+			bool				GetWindowLayerList(void **list, int32 *itemCount ) const;
 
-			bool				MoveToBack(WinBorder *newLast);
-			bool				MoveToFront(WinBorder *newFront, bool doNotDisturb = false);
+			bool				MoveToBack(WindowLayer *newLast);
+			bool				MoveToFront(WindowLayer *newFront, bool doNotDisturb = false);
 
-			bool				HideWinBorder(WinBorder *winBorder);
-			bool				ShowWinBorder(WinBorder *winBorder, bool userBusy = false);
+			bool				HideWindowLayer(WindowLayer *winBorder);
+			bool				ShowWindowLayer(WindowLayer *winBorder, bool userBusy = false);
 
 			// resolution related methods.
 			status_t			SetDisplayMode(const display_mode &mode);
@@ -109,7 +109,7 @@ private:
 			void				InsertItem(ListData *item, ListData *before);
 			void				RemoveItem(ListData *item);
 			ListData*			HasItem(const ListData *item, int32 *index = NULL) const;
-			ListData*			HasItem(const WinBorder *layer, int32 *index = NULL) const;
+			ListData*			HasItem(const WindowLayer *layer, int32 *index = NULL) const;
 			int32				IndexOf(const ListData *item) const;
 
 			bool				placeToBack(ListData *newLast);
@@ -117,13 +117,13 @@ private:
 
 			int32				_SetFocus(ListData *newFocusItem);
 
-			bool				removeAndPlaceBefore(const WinBorder *wb, ListData *beforeItem);
+			bool				removeAndPlaceBefore(const WindowLayer *wb, ListData *beforeItem);
 			bool				removeAndPlaceBefore(ListData *item, ListData *beforeItem);
 
-			WinBorder*			searchFirstMainWindow(WinBorder *wb) const;
-			WinBorder*			searchANormalWindow(WinBorder *wb) const;
+			WindowLayer*			searchFirstMainWindow(WindowLayer *wb) const;
+			WindowLayer*			searchANormalWindow(WindowLayer *wb) const;
 
-			bool				windowHasVisibleModals(const WinBorder *winBorder) const;
+			bool				windowHasVisibleModals(const WindowLayer *winBorder) const;
 			ListData*			putModalsInFront(ListData *item);
 			void				putFloatingInFront(ListData *item);
 			void				saveFloatingWindows(ListData *itemNormal);
@@ -135,7 +135,7 @@ private:
 	public:
 					MemoryPool();
 					~MemoryPool();
-		ListData*	GetCleanMemory(WinBorder* winborder);
+		ListData*	GetCleanMemory(WindowLayer* winborder);
 		void		ReleaseMemory(ListData* mem);
 	private:
 		void		expandBuffer(int32 start);
@@ -152,7 +152,7 @@ private:
 			// the last visible(or covered by other Layers)
 			ListData			*fTopItem;
 
-			// the focus WinBorder - for keyboard events
+			// the focus WindowLayer - for keyboard events
 			ListData			*fFocusItem;
 
 			// pointer for which "big" actions are intended

@@ -26,16 +26,12 @@
 #include "RootLayer.h"
 #include "ServerApp.h"
 #include "ServerWindow.h"
-#include "WinBorder.h"
+#include "WindowLayer.h"
 #include "Workspace.h"
 
 
-
-// Toggle general function call output
+// Toggle debug output
 //#define DEBUG_WINBORDER
-
-// toggle
-//#define DEBUG_WINBORDER_MOUSE
 //#define DEBUG_WINBORDER_CLICK
 
 #ifdef DEBUG_WINBORDER
@@ -45,13 +41,6 @@
 #	define STRACE(x) ;
 #endif
 
-#ifdef DEBUG_WINBORDER_MOUSE
-#	include <stdio.h>
-#	define STRACE_MOUSE(x) printf x
-#else
-#	define STRACE_MOUSE(x) ;
-#endif
-
 #ifdef DEBUG_WINBORDER_CLICK
 #	include <stdio.h>
 #	define STRACE_CLICK(x) printf x
@@ -59,7 +48,8 @@
 #	define STRACE_CLICK(x) ;
 #endif
 
-WinBorder::WinBorder(const BRect &frame,
+
+WindowLayer::WindowLayer(const BRect &frame,
 					 const char *name,
 					 const uint32 look,
 					 const uint32 feel,
@@ -127,20 +117,20 @@ WinBorder::WinBorder(const BRect &frame,
 		if (window->App()->GetDesktop()->ScreenAt(0)) {
 			window->App()->GetDesktop()->ScreenAt(0)->GetMode(width, height, colorSpace, frequency);
 // TODO: MOVE THIS AWAY!!! RemoveBy contains calls to virtual methods! Also, there is not TopLayer()!
-			WinBorder::ResizeBy(width - frame.Width(), height - frame.Height());
+			WindowLayer::ResizeBy(width - frame.Width(), height - frame.Height());
 		}
 	}
 
-	STRACE(("WinBorder %p, %s:\n", this, Name()));
+	STRACE(("WindowLayer %p, %s:\n", this, Name()));
 	STRACE(("\tFrame: (%.1f, %.1f, %.1f, %.1f)\n", fFrame.left, fFrame.top,
 		fFrame.right, fFrame.bottom));
 	STRACE(("\tWindow %s\n", window ? window->Title() : "NULL"));
 }
 
 
-WinBorder::~WinBorder()
+WindowLayer::~WindowLayer()
 {
-	STRACE(("WinBorder(%s)::~WinBorder()\n", Name()));
+	STRACE(("WindowLayer(%s)::~WindowLayer()\n", Name()));
 
 	delete fDecorator;
 }
@@ -148,10 +138,10 @@ WinBorder::~WinBorder()
 
 //! redraws a certain section of the window border
 void
-WinBorder::Draw(const BRect& updateRect)
+WindowLayer::Draw(const BRect& updateRect)
 {
 	#ifdef DEBUG_WINBORDER
-	printf("WinBorder(%s)::Draw() : ", Name());
+	printf("WindowLayer(%s)::Draw() : ", Name());
 	r.PrintToStream();
 	#endif
 	
@@ -165,7 +155,7 @@ WinBorder::Draw(const BRect& updateRect)
 
 //! Moves the winborder with redraw
 void
-WinBorder::MoveBy(float x, float y)
+WindowLayer::MoveBy(float x, float y)
 {
 	if (x == 0.0f && y == 0.0f)
 		return;
@@ -215,7 +205,7 @@ WinBorder::MoveBy(float x, float y)
 
 
 void
-WinBorder::ResizeBy(float x, float y)
+WindowLayer::ResizeBy(float x, float y)
 {
 	float wantWidth = fFrame.Width() + x;
 	float wantHeight = fFrame.Height() + y;
@@ -272,7 +262,7 @@ WinBorder::ResizeBy(float x, float y)
 
 
 void
-WinBorder::SetName(const char* name)
+WindowLayer::SetName(const char* name)
 {
 	Layer::SetName(name);
 
@@ -294,7 +284,7 @@ WinBorder::SetName(const char* name)
 
 
 void
-WinBorder::UpdateStart()
+WindowLayer::UpdateStart()
 {
 	// During updates we only want to draw what's in the update region
 	fInUpdate = true;
@@ -303,7 +293,7 @@ WinBorder::UpdateStart()
 
 
 void
-WinBorder::UpdateEnd()
+WindowLayer::UpdateEnd()
 {
 	// The usual case. Drawing is permitted in the whole visible area.
 
@@ -319,7 +309,7 @@ WinBorder::UpdateEnd()
 
 
 void
-WinBorder::EnableUpdateRequests()
+WindowLayer::EnableUpdateRequests()
 {
 	fUpdateRequestsEnabled = true;
 	if (fCumulativeRegion.CountRects() > 0) {
@@ -331,7 +321,7 @@ WinBorder::EnableUpdateRequests()
 
 //! Sets the minimum and maximum sizes of the window
 void
-WinBorder::SetSizeLimits(float minWidth, float maxWidth,
+WindowLayer::SetSizeLimits(float minWidth, float maxWidth,
 						 float minHeight, float maxHeight)
 {
 	if (minWidth < 0)
@@ -387,7 +377,7 @@ WinBorder::SetSizeLimits(float minWidth, float maxWidth,
 
 
 void
-WinBorder::GetSizeLimits(float* minWidth, float* maxWidth,
+WindowLayer::GetSizeLimits(float* minWidth, float* maxWidth,
 	float* minHeight, float* maxHeight) const
 {
 	*minWidth = fMinWidth;
@@ -398,12 +388,12 @@ WinBorder::GetSizeLimits(float* minWidth, float* maxWidth,
 
 
 void
-WinBorder::MouseDown(BMessage *msg, BPoint where)
+WindowLayer::MouseDown(BMessage *msg, BPoint where)
 {
-	// default action is to drag the WinBorder
+	// default action is to drag the WindowLayer
 	Layer *target = LayerAt(where);
 	if (target == this) {
-		// clicking WinBorder visible area
+		// clicking WindowLayer visible area
 
 		click_type action = DEC_DRAG;
 
@@ -484,7 +474,7 @@ WinBorder::MouseDown(BMessage *msg, BPoint where)
 
 
 void
-WinBorder::MouseUp(BMessage *msg, BPoint where)
+WindowLayer::MouseUp(BMessage *msg, BPoint where)
 {
 	bool invalidate = false;
 	if (fDecorator) {
@@ -532,7 +522,7 @@ WinBorder::MouseUp(BMessage *msg, BPoint where)
 
 
 void
-WinBorder::MouseMoved(BMessage *msg, BPoint where)
+WindowLayer::MouseMoved(BMessage *msg, BPoint where)
 {
 	if (fDecorator) {
 // TODO: present behavior is not fine!
@@ -566,10 +556,10 @@ WinBorder::MouseMoved(BMessage *msg, BPoint where)
 	// change focus in FFM mode
 	DesktopSettings desktopSettings(GetRootLayer()->GetDesktop());
 	// TODO: Focus should be a RootLayer option/feature, NOT a Workspace one!!!
-	WinBorder* exFocus = GetRootLayer()->Focus();
+	WindowLayer* exFocus = GetRootLayer()->Focus();
 	if (desktopSettings.MouseMode() != B_NORMAL_MOUSE && exFocus != this) {
 		GetRootLayer()->ActiveWorkspace()->AttemptToSetFocus(this);
-		// Workspace::SetFocus() *attempts* to set a new focus WinBorder, it may not succeed
+		// Workspace::SetFocus() *attempts* to set a new focus WindowLayer, it may not succeed
 //		if (exFocus != Focus()) {
 			// TODO: invalidate border area and send message to client for the widgets to light up
 			// What message? Is there a message on Focus change?
@@ -585,7 +575,7 @@ WinBorder::MouseMoved(BMessage *msg, BPoint where)
 
 
 void
-WinBorder::WorkspaceActivated(int32 index, bool active)
+WindowLayer::WorkspaceActivated(int32 index, bool active)
 {
 	BMessage activatedMsg(B_WORKSPACE_ACTIVATED);
 	activatedMsg.AddInt64("when", real_time_clock_usecs());
@@ -597,7 +587,7 @@ WinBorder::WorkspaceActivated(int32 index, bool active)
 
 
 void
-WinBorder::WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces)
+WindowLayer::WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces)
 {
 	fWorkspaces = newWorkspaces;
 
@@ -611,7 +601,7 @@ WinBorder::WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces)
 
 
 void
-WinBorder::Activated(bool active)
+WindowLayer::Activated(bool active)
 {
 	BMessage msg(B_WINDOW_ACTIVATED);
 	msg.AddBool("active", active);
@@ -620,7 +610,7 @@ WinBorder::Activated(bool active)
 
 
 void
-WinBorder::SetTabLocation(float location)
+WindowLayer::SetTabLocation(float location)
 {
 	if (fDecorator)
 		fDecorator->SetTabLocation(location);
@@ -628,7 +618,7 @@ WinBorder::SetTabLocation(float location)
 
 
 float
-WinBorder::TabLocation() const
+WindowLayer::TabLocation() const
 {
 	if (fDecorator)
 		return fDecorator->TabLocation();
@@ -638,7 +628,7 @@ WinBorder::TabLocation() const
 
 //! Sets the decorator focus to active or inactive colors
 void
-WinBorder::HighlightDecorator(bool active)
+WindowLayer::HighlightDecorator(bool active)
 {
 	STRACE(("Decorator->Highlight\n"));
 	if (fDecorator)
@@ -647,39 +637,39 @@ WinBorder::HighlightDecorator(bool active)
 
 
 void
-WinBorder::UpdateColors()
+WindowLayer::UpdateColors()
 {
 	// Unimplemented. Hook function for handling when system GUI colors change
-	STRACE(("WinBorder %s: UpdateColors unimplemented\n", Name()));
+	STRACE(("WindowLayer %s: UpdateColors unimplemented\n", Name()));
 }
 
 
 void
-WinBorder::UpdateDecorator()
+WindowLayer::UpdateDecorator()
 {
 	// Unimplemented. Hook function for handling when the system decorator changes
-	STRACE(("WinBorder %s: UpdateDecorator unimplemented\n", Name()));
+	STRACE(("WindowLayer %s: UpdateDecorator unimplemented\n", Name()));
 }
 
 
 void
-WinBorder::UpdateFont()
+WindowLayer::UpdateFont()
 {
 	// Unimplemented. Hook function for handling when a system font changes
-	STRACE(("WinBorder %s: UpdateFont unimplemented\n", Name()));
+	STRACE(("WindowLayer %s: UpdateFont unimplemented\n", Name()));
 }
 
 
 void
-WinBorder::UpdateScreen()
+WindowLayer::UpdateScreen()
 {
 	// Unimplemented. Hook function for handling when the screen resolution changes
-	STRACE(("WinBorder %s: UpdateScreen unimplemented\n", Name()));
+	STRACE(("WindowLayer %s: UpdateScreen unimplemented\n", Name()));
 }
 
 
 void
-WinBorder::QuietlySetFeel(int32 feel)
+WindowLayer::QuietlySetFeel(int32 feel)
 {
 	fFeel = feel;
 
@@ -746,7 +736,7 @@ WinBorder::QuietlySetFeel(int32 feel)
 
 
 click_type
-WinBorder::_ActionFor(const BMessage *msg) const
+WindowLayer::_ActionFor(const BMessage *msg) const
 {
 	BPoint where(0,0);
 	int32 buttons = 0;
@@ -764,7 +754,7 @@ WinBorder::_ActionFor(const BMessage *msg) const
 
 
 void
-WinBorder::set_decorator_region(BRect bounds)
+WindowLayer::set_decorator_region(BRect bounds)
 {
 	fRebuildDecRegion = false;
 
@@ -776,7 +766,7 @@ WinBorder::set_decorator_region(BRect bounds)
 
 
 void
-WinBorder::_ReserveRegions(BRegion &reg)
+WindowLayer::_ReserveRegions(BRegion &reg)
 {
 	BRegion reserve(reg);
 	reserve.IntersectWith(&fDecRegion);
@@ -786,7 +776,7 @@ WinBorder::_ReserveRegions(BRegion &reg)
 
 
 void
-WinBorder::GetOnScreenRegion(BRegion& region)
+WindowLayer::GetOnScreenRegion(BRegion& region)
 {
 	if (fRebuildDecRegion)
 		set_decorator_region(Bounds());
@@ -803,7 +793,7 @@ WinBorder::GetOnScreenRegion(BRegion& region)
 
 
 void
-WinBorder::RequestClientRedraw(const BRegion &invalid)
+WindowLayer::RequestClientRedraw(const BRegion &invalid)
 {
 	BRegion	updateReg(fTopLayer->FullVisible());
 	updateReg.IntersectWith(&invalid);
@@ -835,7 +825,7 @@ WinBorder::RequestClientRedraw(const BRegion &invalid)
 
 
 void
-WinBorder::SetTopLayer(Layer* layer)
+WindowLayer::SetTopLayer(Layer* layer)
 {
 	if (fTopLayer != NULL) {
 		RemoveChild(fTopLayer);
