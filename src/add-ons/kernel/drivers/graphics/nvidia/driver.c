@@ -41,8 +41,6 @@
 #	define B_USER_CLONEABLE_AREA 0
 #endif
 
-#define DEVICE_FORMAT "%04X_%04X_%02X%02X%02X" // apsed
-
 /* Tell the kernel what revision of the driver API we support */
 int32	api_version = B_CUR_DRIVER_API_VERSION; // apsed, was 2, is 2 in R5
 
