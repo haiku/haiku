@@ -131,9 +131,16 @@ static settings current_settings = { // see comments in mga.settings
 	false,		// greensync
 };
 
-static void dumprom (void *rom, size_t size)
+static void dumprom (void *rom, size_t size, pci_info pcii)
 {
-	int fd = open ("/boot/home/" DRIVER_PREFIX ".rom", O_WRONLY | O_CREAT, 0666);
+	int fd;
+	char fname[64];
+
+	/* determine the romfile name: we need split-up per card in the system */
+	sprintf (fname, "/boot/home/" DRIVER_PREFIX "." DEVICE_FORMAT ".rom",
+		pcii.vendor_id, pcii.device_id, pcii.bus, pcii.device, pcii.function);
+
+	fd = open (fname, O_WRONLY | O_CREAT, 0666);
 	if (fd < 0) return;
 	write (fd, rom, size);
 	close (fd);
@@ -417,7 +424,7 @@ static status_t map_device(device_info *di)
 		memcpy (si->rom_mirror, rom_temp, 32768);
 	}
 
-	if (current_settings.dumprom) dumprom (si->rom_mirror, 32768);
+	if (current_settings.dumprom) dumprom (si->rom_mirror, 32768, di->pcii);
 
 	/*disable ROM and delete the area*/
 	set_pci(PCI_rom_base,4,0);
