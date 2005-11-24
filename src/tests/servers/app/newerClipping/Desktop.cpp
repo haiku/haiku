@@ -55,6 +55,7 @@ Desktop::~Desktop()
 void
 Desktop::Draw(BRect updateRect)
 {
+#if RUN_WITH_FRAME_BUFFER
 	// since parts of the view might have been exposed,
 	// we need a clipping rebuild
 	if (LockClipping()) {
@@ -64,16 +65,20 @@ Desktop::Draw(BRect updateRect)
 
 		UnlockClipping();
 	}
+#endif
+
 	if (fDrawingEngine->Lock()) {
 		fDrawingEngine->SetHighColor(51, 102, 152);
 		fDrawingEngine->FillRegion(&fBackgroundRegion);
 		fDrawingEngine->Unlock();
 	}
 	
+#if RUN_WITH_FRAME_BUFFER
 	// trigger redrawing windows
 	BRegion update(updateRect);
 	update.Exclude(&fBackgroundRegion);
 	MarkDirty(&update);
+#endif
 }
 
 // MouseDown
@@ -108,12 +113,15 @@ Desktop::MouseDown(BPoint where, uint32 buttons)
 		} else {
 			// complete redraw
 #if RUN_WITH_FRAME_BUFFER
-			// TODO: broken
-			BRegion region(fDrawingEngine->Bounds());
-			MarkDirty(&region);
-			region = fBackgroundRegion;
-			fBackgroundRegion.MakeEmpty();
-			_SetBackground(&region);
+			if (fDrawingEngine->Lock()) {
+				BRegion region(fDrawingEngine->Bounds());
+				fDrawingEngine->Unlock();
+
+				MarkDirty(&region);
+				region = fBackgroundRegion;
+				fBackgroundRegion.MakeEmpty();
+				_SetBackground(&region);
+			}
 #else
 			fDrawingEngine->MarkDirty();
 #endif
