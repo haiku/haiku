@@ -37,10 +37,6 @@ enum {
 	B_LAYER_ACTION_RESIZE
 };
 
-enum {
-	B_LAYER_CHILDREN_DEPENDANT = 0x1000U,
-};
-
 class ServerApp;
 class RootLayer;
 class DrawingEngine;
@@ -258,7 +254,6 @@ class Layer {
 
 			int32				fViewToken;
 			uint32				fFlags;
-			uint16				fAdFlags;
 			uint32				fResizeMode;
 			uint32				fEventMask;
 			uint32				fEventOptions;

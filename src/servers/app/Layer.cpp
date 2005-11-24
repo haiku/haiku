@@ -62,7 +62,6 @@ Layer::Layer(BRect frame, const char* name, int32 token,
 
 	fViewToken(token),
 	fFlags(flags),
-	fAdFlags(0),
 	fResizeMode(resize),
 	fEventMask(0UL),
 	fEventOptions(0UL),
