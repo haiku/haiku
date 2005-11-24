@@ -33,14 +33,16 @@
 
 #include <cstdio>
 
-const uint32 kTableCount = 128;
+const static uint32 kTableCount = 128;
+const static uint32 kInvalidCode = 0xFFFFFFFF;
+
 
 struct hashed_escapement
 {
 	uint32 code;
 	float escapement;
 	hashed_escapement() {
-		code = (uint32)-1;
+		code = kInvalidCode;
 		escapement = 0;
 	}
 };
@@ -58,8 +60,7 @@ CharToCode(const char *text, const int32 charLen)
 	uint32 value = 0;
 	int32 shiftVal = 24;
 	for (int32 c = 0; c < charLen; c++) {
-		uchar ch = text[c];
-		value |= (ch << shiftVal);
+		value |= (text[c] << shiftVal);
 		shiftVal -= 8;				
 	}
 	return value;
@@ -80,7 +81,7 @@ _BWidthBuffer_::_BWidthBuffer_()
 _BWidthBuffer_::~_BWidthBuffer_()
 {
 	for (int32 x = 0; x < fItemCount; x++)
-		delete[] (hashed_escapement*)fBuffer[x].widths;
+		delete[] (hashed_escapement *)fBuffer[x].widths;
 }
 
 
@@ -106,7 +107,7 @@ _BWidthBuffer_::StringWidth(const char *inText, int32 fromOffset, int32 length,
 	int32 numChars = 0;
 	int32 textLen = 0;
 	
-	float fontSize = inStyle->Size();
+	const float fontSize = inStyle->Size();
 	float stringWidth = 0;
 	if (length > 0) {		
 		for (int32 charLen = 0, currentOffset = fromOffset;
@@ -119,7 +120,7 @@ _BWidthBuffer_::StringWidth(const char *inText, int32 fromOffset, int32 length,
 				break;
 			
 			// Some magic, to uniquely identify this charachter	
-			uint32 value = CharToCode(inText + currentOffset, charLen);
+			const uint32 value = CharToCode(inText + currentOffset, charLen);
 			
 			float escapement;
 			if (GetEscapement(value, index, &escapement)) {
@@ -221,7 +222,7 @@ _BWidthBuffer_::InsertTable(const BFont *font)
 	table.tableCount = kTableCount;
 	table.widths = deltas;
 	
-	int32 position = fItemCount;
+	uint32 position = fItemCount;
 	InsertItemsAt(1, position, &table);
 	
 	return position;
@@ -238,22 +239,22 @@ _BWidthBuffer_::InsertTable(const BFont *font)
 bool 
 _BWidthBuffer_::GetEscapement(uint32 value, int32 index, float *escapement)
 {
-	_width_table_ *table = &fBuffer[index];	
-	hashed_escapement *widths = static_cast<hashed_escapement *>(table->widths);
-	uint32 hashed = Hash(value) & (table->tableCount - 1);
+	const _width_table_ &table = fBuffer[index];	
+	const hashed_escapement *widths = static_cast<hashed_escapement *>(table.widths);
+	uint32 hashed = Hash(value) & (table.tableCount - 1);
 	
 	DEBUG_ONLY(uint32 iterations = 1;)
 	uint32 found;
-	while ((found = widths[hashed].code) != (uint32)-1) {
+	while ((found = widths[hashed].code) != kInvalidCode) {
 		if (found == value)
 			break;	
 		
-		if (++hashed >= (uint32)table->tableCount)
+		if (++hashed >= (uint32)table.tableCount)
 			hashed = 0;
 		DEBUG_ONLY(iterations++;)
 	}
 	
-	if (found == (uint32)-1)
+	if (found == kInvalidCode)
 		return false;
 	
 	PRINT(("Value found with %d iterations\n", iterations));
@@ -296,63 +297,63 @@ _BWidthBuffer_::HashEscapements(const char *inText, int32 numChars, int32 textLe
 	float *escapements = new float[numChars];
 	inStyle->GetEscapements(inText, numChars, escapements);
 	
-	_width_table_ *table = &fBuffer[tableIndex];	
-	hashed_escapement *widths = static_cast<hashed_escapement *>(table->widths);
+	_width_table_ &table = fBuffer[tableIndex];	
+	hashed_escapement *widths = static_cast<hashed_escapement *>(table.widths);
 	
 	int32 offset = 0;
 	int32 charCount = 0;
 	
 	// Insert the escapements into the hash table
 	do {
-		int32 charLen = UTF8NextCharLen(inText + offset);
+		const int32 charLen = UTF8NextCharLen(inText + offset);
 		if (charLen == 0)
 			break;
 			
-		uint32 value = CharToCode(inText + offset, charLen);
+		const uint32 value = CharToCode(inText + offset, charLen);
 				
-		uint32 hashed = Hash(value) & (table->tableCount - 1);
+		uint32 hashed = Hash(value) & (table.tableCount - 1);
 		uint32 found = widths[hashed].code;
 		
 		// Check if the value is already in the table
 		if (found != value) {
-			while ((found = widths[hashed].code) != (uint32)-1) {
+			while ((found = widths[hashed].code) != kInvalidCode) {
 				if (found == value)
 					break;
-				if (++hashed >= (uint32)table->tableCount)
+				if (++hashed >= (uint32)table.tableCount)
 					hashed = 0;
 			}
 			
-			if (found == (uint32)-1) {
+			if (found == kInvalidCode) {
 				// The value is not in the table. Add it.
 				widths[hashed].code = value;
 				widths[hashed].escapement = escapements[charCount];
-				table->hashCount++;
+				table.hashCount++;
 			
 				// We always keep some free space in the hash table
 				// TODO: Not sure how much space, currently we double
 				// the current size when hashCount is at least 2/3 of
 				// the total size.
-				if (table->tableCount * 2 / 3 <= table->hashCount) {
-					table->hashCount = 0;
-					int32 newSize = table->tableCount * 2;
+				if (table.tableCount * 2 / 3 <= table.hashCount) {
+					table.hashCount = 0;
+					const int32 newSize = table.tableCount * 2;
 					
 					// Create and initialize a new hash table
 					hashed_escapement *newWidths = new hashed_escapement[newSize];
 
 					// Rehash the values, and put them into the new table
-					for (int32 oldPos = 0; oldPos < table->tableCount; oldPos++) {
-						if (widths[oldPos].code != (uint32) -1) {
+					for (int32 oldPos = 0; oldPos < table.tableCount; oldPos++) {
+						if (widths[oldPos].code != kInvalidCode) {
 							uint32 newPos = Hash(widths[oldPos].code) & (newSize - 1);
-							while (newWidths[newPos].code != (uint32)-1) {
+							while (newWidths[newPos].code != kInvalidCode) {
 								if (++newPos >= (uint32)newSize)
 									newPos = 0;
 							}					
 							newWidths[newPos].code = widths[oldPos].code;
 							newWidths[newPos].escapement = widths[oldPos].escapement;
-							table->hashCount++;
+							table.hashCount++;
 						}
 					}
-					table->tableCount = newSize;
+					table.tableCount = newSize;
 					
 					// Delete the old table, and put the new pointer into the _width_table_
 					delete[] widths;
