@@ -1,5 +1,12 @@
 SubDir HAIKU_TOP src kits opengl mesa ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os opengl ] : true ;
+		# We need the public GL headers also when not compiling for Haiku.
+}
+
 UsePrivateHeaders opengl ;
 
 UseHeaders [ FDirName $(SUBDIR) main ] ;

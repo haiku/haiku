@@ -4,6 +4,12 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders opengl ;
 
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os opengl ] : true ;
+		# We need the public GL headers also when not compiling for Haiku.
+}
+
+
 UseHeaders [ FDirName $(SUBDIR) mesa ] ;
 UseHeaders [ FDirName $(SUBDIR) mesa main ] ;
 UseHeaders [ FDirName $(SUBDIR) mesa glapi ] ;
@@ -43,9 +49,11 @@ SharedLibrary libGL.so :
 	# GLUT API is included in libGL.so under Haiku, not a separate libglut.so library
 	<opengl>glut.o 
 
-	libbe.so 
-	libgame.so		# BWindowScreen needed by BGLScreen stub class 
 	libmesa.a		# For GL API dispatching, mostly 
+
+	# External libs:
+	be 
+	game			# BWindowScreen needed by BGLScreen stub class 
 ;
 
 Package haiku-opengl-cvs :
