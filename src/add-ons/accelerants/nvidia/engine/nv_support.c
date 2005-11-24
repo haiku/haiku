@@ -1,6 +1,6 @@
 /* Some commmon support functions */
 /* Mark Watson 2/2000;
- * Rudolf Cornelissen 1/2004 */
+ * Rudolf Cornelissen 1/2004-11/2005 */
 
 #define MODULE_BIT 0x00000800
 
@@ -22,7 +22,11 @@ void nv_log(char *fmt, ...)
 	FILE    *myhand;
 	va_list  args;
 
-	sprintf (fname, "/boot/home/" DRIVER_PREFIX ".accelerant.%d.log", accelerantIsClone);
+	/* determine the logfile name:
+	 * we need split-up logging per card and instance of the accelerant */
+	sprintf (fname, "/boot/home/" DRIVER_PREFIX ".accelerant." DEVICE_FORMAT ".%d.log",
+		si->vendor_id, si->device_id, si->bus, si->device, si->function,
+		accelerantIsClone);
 	myhand=fopen(fname,"a+");
 
 	if (myhand == NULL) return;
