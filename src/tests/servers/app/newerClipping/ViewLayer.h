@@ -46,6 +46,10 @@ class ViewLayer {
 			uint32			CountChildren() const;
 
 			// coordinate conversion
+			void			ConvertToParent(BPoint* point) const;
+			void			ConvertToParent(BRect* rect) const;
+			void			ConvertToParent(BRegion* region) const; 
+
 			void			ConvertToTop(BPoint* point) const;
 			void			ConvertToTop(BRect* rect) const;
 			void			ConvertToTop(BRegion* region) const; 
@@ -58,6 +62,9 @@ class ViewLayer {
 			void			MoveBy(int32 dx, int32 dy);
 			void			ResizeBy(int32 dx, int32 dy, BRegion* dirtyRegion);
 			void			ScrollBy(int32 dx, int32 dy);
+
+			void			ParentResized(int32 dx, int32 dy,
+										  BRegion* dirtyRegion);
 
 			void			Draw(DrawingEngine* drawingEngine,
 								 BRegion* effectiveClipping,

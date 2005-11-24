@@ -54,6 +54,8 @@ class Desktop : public BLooper {
 			void				BringToFront(WindowLayer* window);
 			void				SendToBack(WindowLayer* window);
 
+			void				SetFocusWindow(WindowLayer* window);
+
 #if MULTI_LOCKER
 #  if 0
 			bool				ReadLockClipping() { return fClippingLock.ReadLock(); }
@@ -105,6 +107,9 @@ private:
 			DrawingEngine*		fDrawingEngine;
 
 			BList				fWindows;
+
+			bool				fFocusFollowsMouse;
+			WindowLayer*		fFocusWindow;
 };
 
 #endif // DESKTOP_H

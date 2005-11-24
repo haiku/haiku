@@ -28,7 +28,10 @@ Desktop::Desktop(DrawView* drawView)
 	  fDrawView(drawView),
 	  fDrawingEngine(fDrawView->GetDrawingEngine()),
 
-	  fWindows(64)
+	  fWindows(64),
+
+	  fFocusFollowsMouse(true),
+	  fFocusWindow(NULL)
 {
 	fDrawView->SetDesktop(this);
 
@@ -134,6 +137,10 @@ Desktop::MouseUp(BPoint where)
 void
 Desktop::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 {
+	WindowLayer* window;
+	if (!fTracking && fFocusFollowsMouse && (window = WindowAt(where))) {
+		SetFocusWindow(window);
+	}
 	if (fTracking) {
 		int32 dx = (int32)(where.x - fLastMousePos.x);
 		int32 dy = (int32)(where.y - fLastMousePos.y);
@@ -239,6 +246,8 @@ Desktop::AddWindow(WindowLayer* window)
 
 			UnlockClipping();
 		}
+		SetFocusWindow(window);
+
 		success = true;
 	}
 	return success;
@@ -436,6 +445,9 @@ Desktop::BringToFront(WindowLayer* window)
 
 		UnlockClipping();
 	}
+
+	if (!fFocusFollowsMouse)
+		SetFocusWindow(TopWindow());
 }
 
 // SendToBack
@@ -467,7 +479,30 @@ Desktop::SendToBack(WindowLayer* window)
 
 		UnlockClipping();
 	}
+
+	if (!fFocusFollowsMouse)
+		SetFocusWindow(TopWindow());
 }
+
+// SetFocusWindow
+void
+Desktop::SetFocusWindow(WindowLayer* window)
+{
+	// TODO: find bug, this invalidates too many regions
+
+	if (fFocusWindow == window)
+		return;
+
+	if (fFocusWindow)
+		fFocusWindow->SetFocus(false);
+
+	fFocusWindow = window;
+
+	if (fFocusWindow)
+		fFocusWindow->SetFocus(true);
+}
+
+
 
 #pragma mark -
 
@@ -554,6 +589,11 @@ Desktop::_TriggerWindowRedrawing(BRegion* newDirtyRegion)
 void
 Desktop::_SetBackground(BRegion* background)
 {
+	// NOTE: the drawing operation is caried out
+	// in the clipping region rebuild, but it is
+	// ok actually, because it also avoids trails on
+	// moving windows
+
 	// remember the region not covered by any windows
 	// and redraw the dirty background 
 	BRegion dirtyBackground(*background);

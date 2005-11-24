@@ -14,7 +14,6 @@
 class App : public BApplication {
  public:
 						App();
-						~App();
 
 	virtual void		ReadyToRun();
 };
@@ -22,7 +21,7 @@ class App : public BApplication {
 class Window : public BWindow {
  public:
 						Window(const char* title);
-						~Window();
+	virtual				~Window();
 
 			void		AddWindow(BRect frame, const char* name);
 			void		Test();
@@ -31,16 +30,14 @@ class Window : public BWindow {
 			Desktop*	fDesktop;
 };
 
+// constructor
 App::App()
 	: BApplication("application/x-vnd.stippi.ClippingTest")
 {
 	srand(real_time_clock_usecs());
 }
 
-App::~App()
-{
-}
-
+// ReadyToRun
 void
 App::ReadyToRun()
 {
@@ -50,6 +47,7 @@ App::ReadyToRun()
 	win->Test();
 }
 
+// constructor
 Window::Window(const char* title)
 	: BWindow(BRect(50, 50, 800, 650), title,
 			  B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
@@ -62,6 +60,7 @@ Window::Window(const char* title)
 	fView->MakeFocus(true);
 }
 
+// destructor
 Window::~Window()
 {
 	fDesktop->Lock();
@@ -75,6 +74,41 @@ Window::AddWindow(BRect frame, const char* name)
 	WindowLayer* window = new WindowLayer(frame, name,
 										  fDesktop->GetDrawingEngine(),
 										  fDesktop);
+
+	// add a coupld children
+	frame.OffsetTo(B_ORIGIN);
+	frame.InsetBy(5.0, 5.0);
+	if (frame.IsValid()) {
+		ViewLayer* layer1 = new ViewLayer(frame, "View 1",
+										  B_FOLLOW_ALL,
+										  B_FULL_UPDATE_ON_RESIZE, 
+										  (rgb_color){ 180, 180, 180, 255 });
+
+		frame.OffsetTo(B_ORIGIN);
+		frame.InsetBy(15.0, 15.0);
+		if (frame.IsValid()) {
+			frame.bottom = (frame.top + frame.bottom) / 2 - 5;
+
+			ViewLayer* layer2 = new ViewLayer(frame, "View 2",
+											  B_FOLLOW_ALL,
+											  0, 
+											  (rgb_color){ 120, 120, 120, 255 });
+	
+			frame.OffsetBy(0.0, frame.Height() + 10);
+
+			ViewLayer* layer3 = new ViewLayer(frame, "View 3",
+											  B_FOLLOW_BOTTOM,
+											  0, 
+											  (rgb_color){ 120, 120, 120, 255 });
+	
+
+			layer1->AddChild(layer2);
+			layer1->AddChild(layer3);
+		}
+
+		window->AddChild(layer1);
+	}
+
 	window->Run();
 
 	BMessage message(MSG_ADD_WINDOW);

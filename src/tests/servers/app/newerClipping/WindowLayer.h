@@ -31,6 +31,9 @@ class WindowLayer : public BLooper {
 										{ return fVisibleRegion; }
 			void					GetFullRegion(BRegion* region) const;
 			void					GetBorderRegion(BRegion* region) const;
+			void					GetContentRegion(BRegion* region) const;
+
+			void					SetFocus(bool focus);
 
 			void					MoveBy(int32 x, int32 y);
 			void					ResizeBy(int32 x, int32 y, BRegion* dirtyRegion);
@@ -50,7 +53,13 @@ class WindowLayer : public BLooper {
 			// has to be called
 			BRegion					fVisibleRegion;
 
-			rgb_color				fBorderColor;
+			// caching local regions
+			BRegion					fBorderRegion;
+			bool					fBorderRegionValid;
+			BRegion					fContentRegion;
+			bool					fContentRegionValid;
+
+			bool					fFocus;
 
 			ViewLayer*				fTopLayer;
 
