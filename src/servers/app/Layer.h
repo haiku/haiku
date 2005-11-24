@@ -80,7 +80,6 @@ class Layer {
 									{ return fParent; }
 
 			uint32				CountChildren() const;
-			Layer*				FindLayer(const int32 token);
 			Layer*				LayerAt(BPoint where);
 
 			Layer*				FirstChild() const;

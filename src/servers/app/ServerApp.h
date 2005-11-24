@@ -17,8 +17,10 @@
 #include "SubWindowList.h"
 #include "BGet++.h"
 
-#include <ObjectList.h>
 #include <String.h>
+
+#include <ObjectList.h>
+#include <TokenSpace.h>
 
 
 class AreaPool;
@@ -74,6 +76,8 @@ class ServerApp : public MessageLooper {
 
 		Desktop* GetDesktop() const { return fDesktop; }
 
+		BPrivate::BTokenSpace& ViewTokens() { return fViewTokens; }
+
 		// ToDo: public?
 		SubWindowList fAppSubWindowList;
 
@@ -97,6 +101,7 @@ class ServerApp : public MessageLooper {
 
 		BLocker fWindowListLock;
 		BObjectList<ServerWindow> fWindowList;
+		BPrivate::BTokenSpace fViewTokens;
 
 		// TODO:
 		// - Are really Bitmaps and Pictures stored per application and not globally ?

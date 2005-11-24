@@ -157,7 +157,7 @@ ServerWindow::ServerWindow(const char *title, ServerApp *app,
 }
 
 
-//!Tears down all connections the main app_server objects, and deletes some internals.
+//! Tears down all connections the main app_server objects, and deletes some internals.
 ServerWindow::~ServerWindow()
 {
 	STRACE(("*ServerWindow(%s@%p):~ServerWindow()\n", fTitle, this));
@@ -522,9 +522,13 @@ if (fWinBorder->IsOffscreenWindow()) {
 }
 
 	if (_parent) {
-		Layer *parent = fWinBorder->FindLayer(parentToken);
-		if (parent == NULL)
+		Layer *parent;
+		if (App()->ViewTokens().GetToken(parentToken, B_HANDLER_TOKEN,
+				(void**)&parent) != B_OK
+			|| parent->Window() != this) {
 			CRITICAL("View token not found!\n");
+			parent = NULL;
+		}
 
 		*_parent = parent;
 	}
@@ -583,7 +587,6 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			int32 yOffset = (int32)(dst.top - src.top);
 
 			fCurrentLayer->CopyBits(src, dst, xOffset, yOffset);
-
 			break;
 		}
 		case AS_SET_CURRENT_LAYER:
@@ -592,18 +595,17 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			
 			link.Read<int32>(&token);
 
-			Layer *current = fWinBorder->FindLayer(token);
-			if (current) {
-				DTRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: %s, token %ld\n", fTitle, current->Name(), token));
-			} else {
+			Layer *current;
+			if (App()->ViewTokens().GetToken(token, B_HANDLER_TOKEN,
+					(void**)&current) != B_OK
+				|| current->Window() != this) {
+				// ToDo: if this happens, we probably want to kill the app and clean up
 				DTRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: layer not found, token %ld\n", fTitle, token));
-			}
-
-			if (current)
+				current = NULL;
+			} else {
+				DTRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: %s, token %ld\n", fTitle, current->Name(), token));
 				fCurrentLayer = current;
-			else // hope this NEVER happens! :-)
-				CRITICAL("Server PANIC: window cannot find Layer with ID\n");
-			// ToDo: if this happens, we probably want to kill the app and clean up
+			}
 			break;
 		}
 

@@ -831,12 +831,16 @@ WinBorder::RequestClientRedraw(const BRegion &invalid)
 void
 WinBorder::SetTopLayer(Layer* layer)
 {
-	if (layer) {
-		fTopLayer = layer;
-		fTopLayer->SetAsTopLayer(true);
+	if (fTopLayer != NULL) {
+		RemoveChild(fTopLayer);
+		fTopLayer->SetAsTopLayer(false);
+	}
 
-		// connect decorator and top layer. (?)
-		AddChild(fTopLayer, NULL);
+	fTopLayer = layer;
+
+	if (layer != NULL) {
+		AddChild(fTopLayer, Window());
+		fTopLayer->SetAsTopLayer(true);
 	}
 }
 

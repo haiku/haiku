@@ -26,6 +26,7 @@
 #include "DrawState.h"
 #include "PortLink.h"
 #include "RootLayer.h"
+#include "ServerApp.h"
 #include "ServerProtocol.h"
 #include "ServerWindow.h"
 #include "WinBorder.h"
@@ -105,6 +106,9 @@ Layer::~Layer()
 {
 	delete fDrawState;
 
+	if (fWindow != NULL)
+		fWindow->App()->ViewTokens().RemoveToken(ViewToken());
+
 	Layer* child = fFirstChild;
 	while (child != NULL) {
 		Layer* nextChild = child->fNextSibling;
@@ -124,79 +128,79 @@ Layer::~Layer()
 	it spits an error to stdout and returns.
 */
 void
-Layer::AddChild(Layer* layer, ServerWindow* window)
+Layer::AddChild(Layer* child, ServerWindow* window)
 {
-	STRACE(("Layer(%s)::AddChild(%s) START\n", Name(), layer->Name()));
-	
-	if (layer->fParent != NULL) {
+	STRACE(("Layer(%s)::AddChild(%s)\n", Name(), child->Name()));
+
+	if (child->fParent != NULL) {
 		printf("ERROR: AddChild(): Layer already has a parent\n");
 		return;
 	}
-	
+
 	// 1) attach layer to the tree structure
-	layer->fParent = this;
-	
+	child->fParent = this;
+
 	// if we have children already, bump the current last child back one and
 	// make the new child the last layer
 	if (fLastChild) {
-		layer->fPreviousSibling = fLastChild;
-		fLastChild->fNextSibling = layer;
+		child->fPreviousSibling = fLastChild;
+		fLastChild->fNextSibling = child;
 	} else {
-		fFirstChild = layer;
+		fFirstChild = child;
 	}
-	fLastChild = layer;
+	fLastChild = child;
 
 	// if we have no RootLayer yet, then there is no need to set any parameters --
 	// they will be set when the RootLayer for this tree will be added
 	// to the main tree structure.
 	if (!fRootLayer) {
-		STRACE(("Layer(%s)::AddChild(%s) END\n", Name(), layer->Name()));
+		STRACE(("Layer(%s)::AddChild(%s) END\n", Name(), child->Name()));
 		return;
 	}
 
 	// 2) Iterate over the newly-added layer and all its children, setting the 
 	//	root layer and server window and also rebuilding the full-size region
 	//	for every descendant of the newly-added layer
-	
-	//c = short for: current
-	Layer* c = layer;
-	Layer* stop = layer;
+
+	Layer* stop = child;
 	while (true) {
 		// action block
 
 		// 2.1) set the RootLayer for this object.
-		c->SetRootLayer(c->fParent->fRootLayer);
+		child->SetRootLayer(child->fParent->fRootLayer);
 		
 		// 2.2) this Layer must know if it has a ServerWindow object attached.
-		c->fWindow = window;
+		child->fWindow = window;
+
+		// insert view into local token space
+		window->App()->ViewTokens().SetToken(child->ViewToken(),
+			B_HANDLER_TOKEN, child);
 
 		// tree parsing algorithm
-		if (c->fFirstChild) {
+		if (child->fFirstChild) {
 			// go deep
-			c = c->fFirstChild;
+			child = child->fFirstChild;
 		} else {
 			// go right or up
 
-			if (c == stop) // our trip is over
+			if (child == stop) // our trip is over
 				break;
 
-			if (c->fNextSibling) {
+			if (child->fNextSibling) {
 				// go right
-				c = c->fNextSibling;
+				child = child->fNextSibling;
 			} else {
 				// go up
-				while (!c->fParent->fNextSibling && c->fParent != stop)
-					c = c->fParent;
+				while (child->fParent->fNextSibling == NULL && child->fParent != stop)
+					child = child->fParent;
 
-				if (c->fParent == stop) // that's enough!
+				if (child->fParent == stop) // that's enough!
 					break;
 
-				c = c->fParent->fNextSibling;
+				child = child->fParent->fNextSibling;
 			}
 		}
 	}
-
-	STRACE(("Layer(%s)::AddChild(%s) END\n", Name(), layer->Name()));
 }
 
 
@@ -208,16 +212,15 @@ Layer::AddChild(Layer* layer, ServerWindow* window)
 	spits out an error to stdout and returns
 */
 void
-Layer::RemoveChild(Layer *layer)
+Layer::RemoveChild(Layer *child)
 {
-	STRACE(("Layer(%s)::RemoveChild(%s) START\n", Name(), layer->Name()));
-	
-	if (!layer->fParent) {
+	STRACE(("Layer(%s)::RemoveChild(%s)\n", Name(), child->Name()));
+
+	if (!child->fParent) {
 		printf("ERROR: RemoveChild(): Layer doesn't have a parent\n");
 		return;
 	}
-	
-	if (layer->fParent != this) {
+	if (child->fParent != this) {
 		printf("ERROR: RemoveChild(): Layer is not a child of this layer\n");
 		return;
 	}
@@ -225,65 +228,63 @@ Layer::RemoveChild(Layer *layer)
 	// 1) remove this layer from the main tree.
 	
 	// Take care of fParent
-	layer->fParent = NULL;
+	child->fParent = NULL;
 	
-	if (fFirstChild == layer)
-		fFirstChild = layer->fNextSibling;
+	if (fFirstChild == child)
+		fFirstChild = child->fNextSibling;
 	
-	if (fLastChild == layer)
-		fLastChild = layer->fPreviousSibling;
+	if (fLastChild == child)
+		fLastChild = child->fPreviousSibling;
 	
 	// Take care of siblings
-	if (layer->fPreviousSibling != NULL)
-		layer->fPreviousSibling->fNextSibling	= layer->fNextSibling;
-	
-	if (layer->fNextSibling != NULL)
-		layer->fNextSibling->fPreviousSibling = layer->fPreviousSibling;
-	
-	layer->fPreviousSibling = NULL;
-	layer->fNextSibling = NULL;
-	layer->_ClearVisibleRegions();
+	if (child->fPreviousSibling != NULL)
+		child->fPreviousSibling->fNextSibling = child->fNextSibling;
+
+	if (child->fNextSibling != NULL)
+		child->fNextSibling->fPreviousSibling = child->fPreviousSibling;
+
+	child->fPreviousSibling = NULL;
+	child->fNextSibling = NULL;
+	child->_ClearVisibleRegions();
 
 	// 2) Iterate over all of the removed-layer's descendants and unset the
 	//	root layer, server window, and all redraw-related regions
-	
-	Layer* c = layer; //c = short for: current
-	Layer* stop = layer;
-	
+
+	Layer* stop = child;
 	while (true) {
 		// action block
-		{
-			// 2.1) set the RootLayer for this object.
-			c->SetRootLayer(NULL);
-			// 2.2) this Layer must know if it has a ServerWindow object attached.
-			c->fWindow = NULL;
-		}
+
+		// 2.1) set the RootLayer for this object.
+		child->SetRootLayer(NULL);
+		// 2.2) this Layer must know if it has a ServerWindow object attached.
+		if (child->Window())
+			child->Window()->App()->ViewTokens().RemoveToken(child->ViewToken());
+		child->fWindow = NULL;
 
 		// tree parsing algorithm
-		if (c->fFirstChild) {	
+		if (child->fFirstChild) {	
 			// go deep
-			c = c->fFirstChild;
+			child = child->fFirstChild;
 		} else {	
 			// go right or up
-			if (c == stop) // out trip is over
+			if (child == stop) // out trip is over
 				break;
 
-			if (c->fNextSibling) {
+			if (child->fNextSibling) {
 				// go right
-				c = c->fNextSibling;
+				child = child->fNextSibling;
 			} else {
 				// go up
-				while(!c->fParent->fNextSibling && c->fParent != stop)
-					c = c->fParent;
-				
-				if (c->fParent == stop) // that enough!
+				while (child->fParent->fNextSibling == NULL && child->fParent != stop)
+					child = child->fParent;
+
+				if (child->fParent == stop) // that enough!
 					break;
-				
-				c = c->fParent->fNextSibling;
+
+				child = child->fParent->fNextSibling;
 			}
 		}
 	}
-	STRACE(("Layer(%s)::RemoveChild(%s) END\n", Name(), layer->Name()));
 }
 
 
@@ -327,30 +328,6 @@ Layer::CountChildren() const
 	return count;
 }
 
-/*!
-	\brief Finds a child of the caller based on its token ID
-	\param token ID of the layer to find
-	\return Pointer to the layer or NULL if not found
-*/
-Layer*
-Layer::FindLayer(const int32 token)
-{
-	// (recursive) search for a layer based on its view token
-	
-	// iterate only over direct child layers first
-	for (Layer* child = FirstChild(); child; child = child->NextLayer()) {
-		if (child->fViewToken == token)
-			return child;
-	}
-
-	// try a recursive search
-	for (Layer* child = FirstChild(); child; child = child->NextLayer()) {
-		if (Layer* layer = child->FindLayer(token))
-			return layer;
-	}
-
-	return NULL;
-}
 
 /*!
 	\brief Returns the layer at the given point
