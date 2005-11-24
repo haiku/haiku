@@ -110,11 +110,11 @@ Server haiku_app_server :
 	DefaultDecorator.cpp
 	Layer.cpp
 	OffscreenServerWindow.cpp
-	OffscreenWinBorder.cpp
+	OffscreenWindowLayer.cpp
 	RootLayer.cpp
 	ServerPicture.cpp
 	ServerScreen.cpp
-	WinBorder.cpp
+	WindowLayer.cpp
 	Workspace.cpp
 	WorkspacesLayer.cpp
 
