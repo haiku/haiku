@@ -506,7 +506,6 @@ ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent)
 	newLayer->fHidden = hidden;
 	newLayer->fEventMask = eventMask;
 	newLayer->fEventOptions = eventOptions;
-	newLayer->fOwner = fWindowLayer;
 
 	DesktopSettings settings(fDesktop);
 	ServerFont font;

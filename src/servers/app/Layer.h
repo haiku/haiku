@@ -170,8 +170,6 @@ class Layer {
 									{ return fWindow; }
 			ServerApp*			App() const
 									{ return fWindow ? fWindow->App() : NULL; }
-	inline	WindowLayer*		Owner() const
-									{ return fOwner; }
 			RootLayer*			GetRootLayer() const
 									{ return fRootLayer; }
 			void				SetRootLayer(RootLayer* rl)
@@ -240,7 +238,6 @@ class Layer {
 			DrawingEngine*		fDriver;
 			RootLayer*			fRootLayer;
 			ServerWindow*		fWindow;
-			WindowLayer*		fOwner;
 
 			DrawState*			fDrawState;
 

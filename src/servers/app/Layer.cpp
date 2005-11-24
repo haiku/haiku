@@ -8,9 +8,10 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-/**	Class used for tracking drawing context and screen clipping.
- *	One Layer per client BWindow (WindowBorder) and each BView therein.
- */
+/*!
+	Class used for tracking drawing context and screen clipping.
+	One Layer per client BWindow (WindowLayer) and each BView therein.
+*/
 
 #include <string.h>
 #include <stdio.h>
@@ -50,7 +51,6 @@ Layer::Layer(BRect frame, const char* name, int32 token,
 	fDriver(driver),
 	fRootLayer(NULL),
 	fWindow(NULL),
-	fOwner(NULL),
 
 	fDrawState(new DrawState),
 
