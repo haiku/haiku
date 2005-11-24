@@ -825,6 +825,16 @@ WindowLayer::RequestClientRedraw(const BRegion &invalid)
 
 
 void
+WindowLayer::_AllRedraw(const BRegion &invalid)
+{
+	// send _UPDATE_ message to client
+	RequestClientRedraw(invalid);
+
+	Layer::_AllRedraw(invalid);
+}
+
+
+void
 WindowLayer::SetTopLayer(Layer* layer)
 {
 	if (fTopLayer != NULL) {

@@ -113,15 +113,16 @@ class WindowLayer : public Layer {
 			float				TabLocation() const;
 
 			void				HighlightDecorator(bool active);
-	
+
 	inline	void				QuietlySetWorkspaces(uint32 wks) { fWorkspaces = wks; }	
 			void				QuietlySetFeel(int32 feel);	
 
 			SubWindowList		fSubWindowList;
 
-			void				RequestClientRedraw(const BRegion &invalid);
+			void				RequestClientRedraw(const BRegion& invalid);
+	virtual void				_AllRedraw(const BRegion& invalid);
 
-	virtual	void				SetTopLayer(Layer* layer);
+			void				SetTopLayer(Layer* layer);
 	inline	Layer*				TopLayer() const
 									{ return fTopLayer; }
 

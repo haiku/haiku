@@ -205,8 +205,8 @@ class Layer {
 			void				TriggerRebuild();
 			void				_GetAllRebuildDirty(BRegion *totalReg);
 
-	virtual	void				Draw(const BRect& r);
-			void				_AllRedraw(const BRegion &invalid);
+	virtual	void				Draw(const BRect& updateRect);
+	virtual void				_AllRedraw(const BRegion& invalid);
 
  protected:
  	friend class RootLayer;
@@ -240,7 +240,7 @@ class Layer {
 			DrawingEngine*		fDriver;
 			RootLayer*			fRootLayer;
 			ServerWindow*		fWindow;
-			WindowLayer*			fOwner;
+			WindowLayer*		fOwner;
 
 			DrawState*			fDrawState;
 
