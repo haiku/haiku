@@ -369,12 +369,17 @@ static nv_settings current_settings = { // see comments in nv.settings
 	false,		// vga_on_tv
 };
 
-static void dumprom (void *rom, uint32 size)
+static void dumprom (void *rom, uint32 size, pci_info pcii)
 {
 	int fd;
 	uint32 cnt;
-	
-	fd = open ("/boot/home/" DRIVER_PREFIX ".rom", O_WRONLY | O_CREAT, 0666);
+	char fname[64];
+
+	/* determine the romfile name: we need split-up per card in the system */
+	sprintf (fname, "/boot/home/" DRIVER_PREFIX "." DEVICE_FORMAT ".rom",
+		pcii.vendor_id, pcii.device_id, pcii.bus, pcii.device, pcii.function);
+
+	fd = open (fname, O_WRONLY | O_CREAT, 0666);
 	if (fd < 0) return;
 
 	/* apparantly max. 32kb may be written at once;
@@ -700,7 +705,7 @@ static status_t map_device(device_info *di)
 
 	/* dump ROM to file if selected in nv.settings
 	 * (ROM always fits in 64Kb: checked TNT1 - FX5950) */
-	if (current_settings.dumprom) dumprom (rom_temp, 65536);
+	if (current_settings.dumprom) dumprom (rom_temp, 65536, di->pcii);
 	/* make a copy of ROM for future reference */
 	memcpy (si->rom_mirror, rom_temp, 65536);
 
