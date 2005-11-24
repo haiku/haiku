@@ -2597,26 +2597,24 @@ BWindow::_SanitizeMessage(BMessage* message, BHandler* target, bool usePreferred
 								(void**)&handler) == B_OK)
 							viewUnderMouse = dynamic_cast<BView*>(handler);
 					}
-	
+
 					// add transit information
 					int32 transit;
-					if (message->FindInt32("be:transit", &transit) != B_OK) {
-						if (viewUnderMouse == view) {
-							// the mouse is over the target view
-							if (fLastMouseMovedView != view)
-								transit = B_ENTERED_VIEW;
-							else
-								transit = B_INSIDE_VIEW;
-						} else {
-							// the mouse is not over the target view
-							if (view == fLastMouseMovedView)
-								transit = B_EXITED_VIEW;
-							else
-								transit = B_OUTSIDE_VIEW;
-						}
-	
-						message->AddInt32("be:transit", transit);
+					if (viewUnderMouse == view) {
+						// the mouse is over the target view
+						if (fLastMouseMovedView != view)
+							transit = B_ENTERED_VIEW;
+						else
+							transit = B_INSIDE_VIEW;
+					} else {
+						// the mouse is not over the target view
+						if (view == fLastMouseMovedView)
+							transit = B_EXITED_VIEW;
+						else
+							transit = B_OUTSIDE_VIEW;
 					}
+
+					message->AddInt32("be:transit", transit);
 
 					if (usePreferred || viewUnderMouse == NULL)
 						fLastMouseMovedView = viewUnderMouse;
