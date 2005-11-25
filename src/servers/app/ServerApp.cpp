@@ -146,51 +146,51 @@ ServerApp::~ServerApp(void)
 	if (!fQuitting)
 		CRITICAL("ServerApp: destructor called after Run()!\n");
 
-	fWindowListLock.Lock();
-
 	// quit all server windows
 
+	fWindowListLock.Lock();
 	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
 		ServerWindow* window = fWindowList.ItemAt(i);
 		window->Quit();
 	}
-	int32 tries = fWindowList.CountItems() + 1;
-
 	fWindowListLock.Unlock();
 
 	// wait for the windows to quit
-	while (tries-- > 0) {
-		fWindowListLock.Lock();
-		if (fWindowList.CountItems() == 0) {
-			// we leave the list locked, doesn't matter anymore
-			break;
-		}
 
+	snooze(20000);
+
+	fWindowListLock.Lock();
+	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
+		sem_id deathSemaphore = fWindowList.ItemAt(i)->DeathSemaphore();
 		fWindowListLock.Unlock();
-		snooze(10000);
-	}
 
-	if (tries < 0) {
-		// This really shouldn't happen, as it shows we're buggy
+		// wait 3 seconds for our window to quit - that's quite a long
+		// time, but killing it might have desastrous effects
+		if (MessageLooper::WaitForQuit(deathSemaphore, 3000000) != B_OK) {
+			// This really shouldn't happen, as it shows we're buggy
 #if __HAIKU__
-		syslog(LOG_ERR, "ServerApp %s needs to kill some server windows...\n", Signature());
+			syslog(LOG_ERR, "ServerApp %s needs to kill some server windows!\n",
+				Signature());
 #else
-		fprintf(stderr, "ServerApp %s needs to kill some server windows...\n", Signature());
+			printf("ServerApp %s needs to kill some server windows!\n",
+				Signature());
 #endif
 
-		// there still seem to be some windows left - kill them!
-		fWindowListLock.Lock();
+			// there still seem to be some windows left - kill them!
+			fWindowListLock.Lock();
 
-		for (int32 i = 0; i < fWindowList.CountItems(); i++) {
-			ServerWindow* window = fWindowList.ItemAt(i);
-			printf("kill window \"%s\"\n", window->Title());
+			for (int32 i = 0; i < fWindowList.CountItems(); i++) {
+				ServerWindow* window = fWindowList.ItemAt(i);
+				printf("kill window \"%s\"\n", window->Title());
 
-			kill_thread(window->Thread());
-			window->Hide();
-			delete window;
+				kill_thread(window->Thread());
+				window->Hide();
+				delete window;
+			}
+
+			fWindowListLock.Unlock();
 		}
-
-		fWindowListLock.Unlock();
+		fWindowListLock.Lock();
 	}
 
 	// first, make sure our monitor thread doesn't 

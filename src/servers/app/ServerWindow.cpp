@@ -153,6 +153,8 @@ ServerWindow::ServerWindow(const char *title, ServerApp *app,
 		looperPort, B_PREFERRED_TOKEN);
 	BMessenger::Private(fHandlerMessenger).SetTo(fClientTeam,
 		looperPort, clientToken);
+
+	fDeathSemaphore = create_sem(0, "window death");
 }
 
 
@@ -173,6 +175,8 @@ ServerWindow::~ServerWindow()
 
 	delete fDirectWindowData;
 	STRACE(("#ServerWindow(%p) will exit NOW\n", this));
+
+	delete_sem(fDeathSemaphore);
 }
 
 

@@ -22,11 +22,15 @@ class MessageLooper : public BLocker {
 		virtual	bool	Run();
 		virtual	void	Quit();
 
-		void			PostMessage(int32 code);
+		status_t		PostMessage(int32 code);
 		thread_id		Thread() const { return fThread; }
 		bool			IsQuitting() const { return fQuitting; }
+		sem_id			DeathSemaphore() const { return fDeathSemaphore; }
 
 		virtual port_id	MessagePort() const = 0;
+
+		static status_t	WaitForQuit(sem_id semaphore,
+							bigtime_t timeout = B_INFINITE_TIMEOUT);
 
 	private:
 		virtual void	_PrepareQuit();
@@ -41,6 +45,7 @@ class MessageLooper : public BLocker {
 		thread_id		fThread;
 		BPrivate::PortLink fLink;
 		bool			fQuitting;
+		sem_id			fDeathSemaphore;
 };
 
 static const int32 kMsgQuitLooper = 'quit';

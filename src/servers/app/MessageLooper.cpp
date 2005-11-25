@@ -81,12 +81,28 @@ MessageLooper::Quit()
 	\brief Send a message to the looper without any attachments
 	\param code ID code of the message to post
 */
-void
+status_t
 MessageLooper::PostMessage(int32 code)
 {
 	BPrivate::LinkSender link(MessagePort());
 	link.StartMessage(code);
-	link.Flush();
+	return link.Flush();
+}
+
+
+/*static*/
+status_t
+MessageLooper::WaitForQuit(sem_id semaphore, bigtime_t timeout)
+{
+	status_t status;
+	do {
+		status = acquire_sem_etc(semaphore, 1, B_RELATIVE_TIMEOUT, timeout);
+	} while (status == B_INTERRUPTED);
+
+	if (status == B_TIMED_OUT)
+		return status;
+
+	return B_OK;
 }
 
 
