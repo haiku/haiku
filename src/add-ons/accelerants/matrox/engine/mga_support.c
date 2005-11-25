@@ -24,7 +24,7 @@ void mga_log(char *fmt, ...)
 
 	/* determine the logfile name:
 	 * we need split-up logging per card and instance of the accelerant */
-	sprintf (fname, "/boot/home/" DRIVER_PREFIX ".accelerant." DEVICE_FORMAT ".%d.log",
+	sprintf (fname, "/boot/home/" DRIVER_PREFIX "." DEVICE_FORMAT ".%d.log",
 		si->vendor_id, si->device_id, si->bus, si->device, si->function,
 		accelerantIsClone);
 	myhand=fopen(fname,"a+");
