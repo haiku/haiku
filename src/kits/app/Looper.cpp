@@ -1250,6 +1250,10 @@ BLooper::task_looper()
 					gDefaultTokens.GetToken(messagePrivate.GetTarget(),
 						B_HANDLER_TOKEN, (void **)&handler);
 
+					// if this handler doesn't belong to us, we drop the message
+					if (handler != NULL && handler->Looper() != this)
+						handler = NULL;
+
 					PRINT(("LOOPER: use %ld, handler: %p, this: %p\n",
 						messagePrivate.GetTarget(), handler, this));
 				}
@@ -1269,6 +1273,11 @@ BLooper::task_looper()
 					if (handler && handler->Looper() == this)
 						DispatchMessage(fLastMessage, handler);
 				}
+			}
+
+			if (fTerminating) {
+				// we leave the looper locked when we quit
+				return;
 			}
 
 			// Unlock the looper

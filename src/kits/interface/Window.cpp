@@ -2248,6 +2248,10 @@ BWindow::task_looper()
 				} else {
 					gDefaultTokens.GetToken(messagePrivate.GetTarget(),
 						B_HANDLER_TOKEN, (void **)&handler);
+
+					// if this handler doesn't belong to us, we drop the message
+					if (handler != NULL && handler->Looper() != this)
+						handler = NULL;
 				}
 
 				if (handler == NULL || usePreferred)
@@ -2278,6 +2282,11 @@ BWindow::task_looper()
 					delete fLastMessage;
 					fLastMessage = NULL;
 				}
+			}
+
+			if (fTerminating) {
+				// we leave the looper locked when we quit
+				return;
 			}
 
 			Unlock();
