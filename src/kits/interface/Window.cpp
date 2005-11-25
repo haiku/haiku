@@ -2448,7 +2448,8 @@ BWindow::_DetermineTarget(BMessage *message, BHandler *target)
 			if (message->FindInt32("_view_token", &token) == B_OK) {
 				BHandler* handler;
 				if (gDefaultTokens.GetToken(token, B_HANDLER_TOKEN,
-						(void**)&handler) == B_OK) {
+						(void**)&handler) == B_OK
+					&& handler->Looper() == this) {
 					BView* view = dynamic_cast<BView*>(handler);
 					if (view != NULL)
 						return view;
@@ -2594,7 +2595,8 @@ BWindow::_SanitizeMessage(BMessage* message, BHandler* target, bool usePreferred
 					if (message->FindInt32("_view_token", &token) == B_OK) {
 						BHandler* handler;
 						if (gDefaultTokens.GetToken(token, B_HANDLER_TOKEN,
-								(void**)&handler) == B_OK)
+								(void**)&handler) == B_OK
+							&& handler->Looper() == this)
 							viewUnderMouse = dynamic_cast<BView*>(handler);
 					}
 
