@@ -2327,7 +2327,7 @@ vm_page_fault(addr_t address, addr_t fault_address, bool is_write, bool is_user,
 			acquire_sem_etc(map->sem, READ_COUNT, 0, 0);
 			area = vm_virtual_map_lookup(map, fault_address);
 
-			dprintf("vm_page_fault: killing team 0x%lx, ip %#lx (\"%s\" +%#lx)\n",
+			dprintf("vm_page_fault: sending team 0x%lx SIGSEGV, ip %#lx (\"%s\" +%#lx)\n",
 				thread_get_current_thread()->team->id, fault_address,
 				area ? area->name : "???", fault_address - (area ? area->base : 0x0));
 
