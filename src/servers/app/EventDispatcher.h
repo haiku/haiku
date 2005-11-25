@@ -92,6 +92,8 @@ class EventDispatcher : public BLocker {
 		BPoint			fLastCursorPosition;
 		int32			fLastButtons;
 
+		BLocker			fListenerLock;
+			// temporary locker until we have an actual locking model
 		BLocker			fCursorLock;
 		HWInterface*	fHWInterface;
 };

@@ -18,6 +18,7 @@
 
 #include <new>
 #include <stdio.h>
+#include <string.h>
 
 
 //#define TRACE_EVENTS
@@ -238,6 +239,7 @@ EventDispatcher::EventDispatcher()
 	fKeyboardFilter(NULL),
 	fTargets(10, true),
 		// the list owns its items
+	fListenerLock("listener lock"),
 	fCursorLock("cursor loop lock"),
 	fHWInterface(NULL)
 {
@@ -337,6 +339,8 @@ void
 EventDispatcher::SetFocus(const BMessenger* messenger)
 {
 	BAutolock _(this);
+	BAutolock _temp(fListenerLock);
+
 	ETRACE(("EventDispatcher::SetFocus(messenger = %p)\n", messenger));
 
 	if ((messenger == NULL && fFocus == NULL)
@@ -425,7 +429,7 @@ bool
 EventDispatcher::_AddListener(const BMessenger& messenger, int32 token,
 	uint32 eventMask, uint32 options, bool temporary)
 {
-	BAutolock _(this);
+	BAutolock _(fListenerLock);
 	Target* target = _FindTarget(messenger);
 	if (target == NULL) {
 		// we need a new target for this messenger
@@ -504,7 +508,7 @@ EventDispatcher::AddTemporaryListener(const BMessenger& messenger,
 void
 EventDispatcher::RemoveListener(const BMessenger& messenger, int32 token)
 {
-	BAutolock _(this);
+	BAutolock _(fListenerLock);
 	ETRACE(("events: remove listener token %ld\n", token));
 
 	int32 index;
@@ -522,7 +526,7 @@ EventDispatcher::RemoveListener(const BMessenger& messenger, int32 token)
 void
 EventDispatcher::RemoveTemporaryListener(const BMessenger& messenger, int32 token)
 {
-	BAutolock _(this);
+	BAutolock _(fListenerLock);
 
 	int32 index;
 	Target* target = _FindTarget(messenger, &index);
@@ -565,7 +569,7 @@ EventDispatcher::SetKeyboardFilter(BMessageFilter* filter)
 void
 EventDispatcher::GetMouse(BPoint& where, int32& buttons)
 {
-	BAutolock _(this);
+	//BAutolock _(this);
 
 	where = fLastCursorPosition;
 	buttons = fLastButtons;
@@ -613,8 +617,10 @@ EventDispatcher::_SendMessage(BMessenger& messenger, BMessage* message,
 	// TODO: add failed messages to a queue, and start dropping them by importance
 
 	status_t status = messenger.SendMessage(message, (BHandler*)NULL, 100000);
-	if (status != B_OK)
-		printf("failed to send message to target: %lx\n", message->what);
+	if (status != B_OK) {
+		printf("EventDispatcher: failed to send message '%.4s' to target: %s\n",
+			(char*)&message->what, strerror(status));
+	}
 
 	if (status == B_BAD_PORT_ID) {
 		// the target port is gone
@@ -629,6 +635,9 @@ bool
 EventDispatcher::_AddTokens(BMessage* message, Target* target, uint32 eventMask)
 {
 	_RemoveTokens(message);
+
+	BAutolock _(fListenerLock);
+		// temporary lock
 
 	int32 count = target->CountListeners();
 	for (int32 i = count; i-- > 0;) {
@@ -807,6 +816,8 @@ EventDispatcher::_EventLoop()
 				// but it's only intended for the focus view
 				event->RemoveName("_view_token");
 			}
+
+			BAutolock _temp(fListenerLock);
 
 			for (int32 i = fTargets.CountItems(); i-- > 0;) {
 				Target* target = fTargets.ItemAt(i);
