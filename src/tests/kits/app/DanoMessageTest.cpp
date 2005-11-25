@@ -47,8 +47,11 @@ main(int argc, char** argv)
 		}
 
 		BMessage message;
-		if (BPrivate::unflatten_dano_message(magic, file, message) == B_OK)
+		status_t status = BPrivate::unflatten_dano_message(magic, file, message);
+		if (status == B_OK)
 			message.PrintToStream();
+		else
+			fprintf(stderr, "Could not unflatten message: %s\n", strerror(status));
 	}
 
 	return 0;
