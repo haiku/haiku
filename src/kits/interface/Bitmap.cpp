@@ -369,6 +369,8 @@ PaletteConverter::SetTo(const rgb_color *palette)
 		// init color list
 		memcpy(fOwnColorMap->color_list, palette, sizeof(rgb_color) * 256);
 		// init index map
+// TODO: build this list takes about 2 seconds in qemu on my system
+//		(because of color_distance())
 		for (int32 color = 0; color < 32768; color++) {
 			// get components
 			uint8 red = (color & 0x7c00) >> 7;
