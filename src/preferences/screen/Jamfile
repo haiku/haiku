@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src preferences screen ;
 
+AddSubDirSupportedPlatforms libbe_test ;
+
 UsePrivateHeaders [ FDirName graphics radeon ] ;
 
 Preference Screen : 
@@ -15,6 +17,11 @@ Preference Screen :
 	ScreenSettings.cpp
 	ScreenWindow.cpp
 	Utility.cpp
-	: libbe.so
+	: be
 	: Screen.rdef
 	;
+
+if $(TARGET_PLATFORM) = libbe_test {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Screen
+		: tests!apps ;
+}

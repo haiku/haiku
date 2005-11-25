@@ -1,8 +1,15 @@
 SubDir HAIKU_TOP src preferences workspaces ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
 Preference Workspaces : 
 	Workspaces.cpp 
-	: libbe.so 
+	: be
 	: Workspaces.rdef 
 	;
 
+if $(TARGET_PLATFORM) = libbe_test {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Workspaces
+		: tests!apps ;
+}
