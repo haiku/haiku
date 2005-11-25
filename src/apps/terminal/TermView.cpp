@@ -7,6 +7,8 @@
  * Authors:
  *		Kian Duffy <myob@users.sourceforge.net>
  */
+
+
 #include <support/Debug.h>
 #include <PopUpMenu.h>
 #include <ScrollBar.h>
@@ -44,156 +46,160 @@ extern char *function_key_char_table[];
 extern int gNowCoding;	/* defined TermParse.cpp */
 
 rgb_color gTermColorTable[16] = {
-  {  0,   0,   0, 0},
-  {255,   0,   0, 0},
-  {  0, 255,   0, 0},
-  {255, 255,   0, 0},
-  {  0,   0, 255, 0},
-  {255,   0, 255, 0},
-  {  0, 255, 255, 0},
-  {255, 255, 255, 0},
+	{  0,   0,   0, 0},
+	{255,   0,   0, 0},
+	{  0, 255,   0, 0},
+	{255, 255,   0, 0},
+	{  0,   0, 255, 0},
+	{255,   0, 255, 0},
+	{  0, 255, 255, 0},
+	{255, 255, 255, 0},
 };
 
 // Global Preference Handler
 extern PrefHandler *gTermPref;
 
 TermView::TermView(BRect frame, CodeConv *inCodeConv)
-  :BView(frame, "termview",
-	  B_FOLLOW_NONE, B_WILL_DRAW  | B_FRAME_EVENTS)
+	: BView(frame, "termview", B_FOLLOW_NONE,
+		B_WILL_DRAW | B_FRAME_EVENTS)
 {
 	int rows, cols;
-	
+
 	// Cursor reset.
 	fCurPos.Set(0, 0);
 	fCurStack.Set(0, 0);
 	fBufferStartPos = -1;
-	
+
 	rows = gTermPref->getInt32(PREF_ROWS);
 	cols = gTermPref->getInt32(PREF_COLS);
-	
+
 	fTermRows = rows;
 	fTermColumns = cols;
-	
+
 	fCodeConv = inCodeConv;
-	
+
 	// scroll pointer.
 	fTop = 0;
-	
+
 	// create TermBuffer and CodeConv Class.
 	fTextBuffer = new TermBuffer(rows, cols);
-	
+
 	// cursor Blinking and draw flag.
 	fCursorStatus = CURON;
 	fCursorDrawFlag = CURON;
 	fUpdateFlag = false;
 	fCursorBlinkingFlag = CURON;
-	
+
 	fSelStart.Set(-1, -1);
 	fSelEnd.Set(-1, -1);
 	fSelected = false;
 	fMouseTracking = false;
-	
-	// scroll bar varriables.
+
+	// scroll bar variables.
 	fScrollUpCount = 0;
 	fScrollBarRange = 0;
 	fScrRegionSet = 0;
 	fScrBufSize = gTermPref->getInt32(PREF_HISTORY_SIZE);
-	
+
 	// resize flag.
 	fFrameResized = 0;
-	
+
 	// terminal mode flag.
 	fInsertModeFlag = MODE_OVER;
 	fInverseFlag = fBoldFlag = fUnderlineFlag = 0;
-	
+
 	// terminal scroll flag.
 	fScrTop = 0;
 	fScrBot = rows - 1;
-	
+
 	fPopMenu = NULL;
 	SetMouseButton();
 	SetMouseCursor();
 	fPreviousMousePoint.Set(0, 0);
-	
-	// SetIMAware(gTermPref->getInt32(PREF_IM_AWARE));
+
+	//SetIMAware(gTermPref->getInt32(PREF_IM_AWARE));
 	fIMflag = false;
-	
+
 	fViewThread = -1;
 	fMouseThread = -1;
 	fQuitting = 1;
 	InitViewThread();
-	
-	fDrawRect_p = 0;
 
+	fDrawRect_p = 0;
 }
+
 
 TermView::~TermView()
 {
-//  delete InputMessenger;
-  delete fTextBuffer;
-  fQuitting = 0;
-  kill_thread(fViewThread);
-  kill_thread(fMouseThread);
-  delete_sem(fDrawRectSem);
+	delete fTextBuffer;
+	fQuitting = 0;
+	kill_thread(fViewThread);
+	kill_thread(fMouseThread);
+	delete_sem(fDrawRectSem);
 }
 
-// Get width and height for terminal font
+
+//! Get width and height for terminal font
 void
-TermView::GetFontSize(int *width, int *height)
+TermView::GetFontSize(int* _width, int* _height)
 {
-  *width = fFontWidth;
-  *height = fFontHeight;
+	*_width = fFontWidth;
+	*_height = fFontHeight;
 }
 
-// Set number of rows and columns in terminal
+
+//! Set number of rows and columns in terminal
 BRect
-TermView::SetTermSize(int rows, int cols, bool flag)
+TermView::SetTermSize(int rows, int cols, bool resize)
 {
-	if(rows)
+	if (rows)
 		fTermRows = rows;
-	if(cols)
+	if (cols)
 		fTermColumns = cols;
-	
+
 	fTextBuffer->ResizeTo(fTermRows, fTermColumns, 0);
-	
+
 	fScrTop = 0;
 	fScrBot = fTermRows - 1;
-	
-	BRect r(0, 0,
-	fTermColumns * fFontWidth,
-	fTermRows * fFontHeight);
-	
-	if(flag) {
+
+	BRect rect(0, 0,
+		fTermColumns * fFontWidth,
+		fTermRows * fFontHeight);
+
+	if (resize) {
 		ResizeTo(fTermColumns * fFontWidth -1,
-		fTermRows * fFontHeight -1);
+			fTermRows * fFontHeight -1);
 	}
 	Invalidate(Frame());
-	
-	return r;
+
+	return rect;
 }
 
-// Set mouse button assignments
+
+//! Set mouse button assignments
 void
-TermView::SetMouseButton(void)
+TermView::SetMouseButton()
 {
 	mSelectButton = SetupMouseButton(gTermPref->getString(PREF_SELECT_MBUTTON));
 	mSubMenuButton = SetupMouseButton(gTermPref->getString(PREF_SUBMENU_MBUTTON));
 	mPasteMenuButton = SetupMouseButton(gTermPref->getString(PREF_PASTE_MBUTTON));
 }
 
-// Sets the mouse cursor image
+
+//! Sets the mouse cursor image
 void
-TermView::SetMouseCursor(void)
+TermView::SetMouseCursor()
 {
-	if(!strcmp(gTermPref->getString(PREF_MOUSE_IMAGE), "Hand cursor"))
+	if (!strcmp(gTermPref->getString(PREF_MOUSE_IMAGE), "Hand cursor"))
 		fMouseImage = false;
 	else
 		fMouseImage = true;
 }
 
-// Sets colors for the terminal
+
+//! Sets colors for the terminal
 void
-TermView::SetTermColor(void)
+TermView::SetTermColor()
 {
 	fTextForeColor = gTermPref->getRGB(PREF_TEXT_FORE_COLOR);
 	fTextBackColor = gTermPref->getRGB(PREF_TEXT_BACK_COLOR);
@@ -201,140 +207,150 @@ TermView::SetTermColor(void)
 	fSelectBackColor = gTermPref->getRGB(PREF_SELECT_BACK_COLOR);
 	fCursorForeColor = gTermPref->getRGB(PREF_CURSOR_FORE_COLOR);
 	fCursorBackColor = gTermPref->getRGB(PREF_CURSOR_BACK_COLOR);
-	
+
 	SetLowColor(fTextBackColor);
 	SetViewColor(fTextBackColor);
 }
 
-// Sets half and full fonts for terminal
+
+//! Sets half and full fonts for terminal
 void
 TermView::SetTermFont(BFont *halfFont, BFont *fullFont)
 {
-	char  buf[4];
-	int  halfWidth = 0;
-	
+	char buf[4];
+	int halfWidth = 0;
+
 	fHalfFont = halfFont;
 	fFullFont = fullFont;
-	
+
 	// calculate half font's max width
 	// Not Bounding, check only A-Z(For case of fHalfFont is KanjiFont. )
-	for(int c = 0x20 ; c <= 0x7e; c++){
+	for (int c = 0x20 ; c <= 0x7e; c++){
 		sprintf(buf, "%c", c);
-		int  tmpWidth =(int)fHalfFont.StringWidth(buf);
-		if(tmpWidth > halfWidth)
+		int tmpWidth = (int)fHalfFont.StringWidth(buf);
+		if (tmpWidth > halfWidth)
 			halfWidth = tmpWidth;
 	}
+
 	// How to calculate FullWidth ?
 	fFontWidth = halfWidth;
-	
+
 	// Second, Calc Font Height
-	font_height  fh, hh;
+	font_height fh, hh;
 	fHalfFont.GetHeight(&hh);
 	fFullFont.GetHeight(&fh);
-	
+
 	int font_ascent, font_descent,font_leading;
-	
-	font_ascent  =(int)((fh.ascent > hh.ascent) ? fh.ascent : hh.ascent);
+
+	font_ascent =(int)((fh.ascent > hh.ascent) ? fh.ascent : hh.ascent);
 	font_descent =(int)((fh.descent > hh.descent) ? fh.descent : hh.descent);
 	font_leading =(int)((fh.leading > hh.leading) ? fh.leading : hh.leading);
-	
-	if(font_leading == 0)
+
+	if (font_leading == 0)
 		font_leading = 1;
-	
-	if(fTop)
+
+	if (fTop)
 		fTop = fTop / fFontHeight;
-	
+
 	fFontHeight = font_ascent + font_descent + font_leading + 1;
-	
+
 	fTop = fTop * fFontHeight;
-	
+
 	fFontAscent = font_ascent;
 	fCursorHeight = font_ascent + font_descent + font_leading + 1;
 }
 
-// set scrollbar object to assigned value
+
 void
-TermView::SetScrollBar(BScrollBar *scrbar)
+TermView::SetScrollBar(BScrollBar *scrollBar)
 {
-	fScrollBar = scrbar;
+	fScrollBar = scrollBar;
 }
 
-// Print one character
+
+//! Print one character
 void
 TermView::PutChar(uchar *string, ushort attr, int width)
 {
-	if(width == FULL_WIDTH)
+	if (width == FULL_WIDTH)
 		attr |= A_WIDTH;
-	
+
 	// check column over flow.
-	if((fCurPos.x + width) > fTermColumns) {
+	if (fCurPos.x + width > fTermColumns) {
 		UpdateLine();
 		fCurPos.x = 0;
-		
-		if(fCurPos.y == fTermRows -1)
+
+		if (fCurPos.y == fTermRows -1)
 			ScrollScreen();
 		else
 			fCurPos.y++;
 	}
-	
-	if(fInsertModeFlag == MODE_INSERT)
+
+	if (fInsertModeFlag == MODE_INSERT)
 		fTextBuffer->InsertSpace(fCurPos, width);
+
 	fTextBuffer->WriteChar(fCurPos, string, attr);
-	
-	if(fUpdateFlag == false)
+
+	if (!fUpdateFlag)
 		fBufferStartPos = fCurPos.x;
-	
+
 	fCurPos.x += width;
 	fUpdateFlag = true;
 }
 
-// Print a CR and move the cursor
+
+//! Print a CR and move the cursor
 void
-TermView::PutCR(void)
+TermView::PutCR()
 {
 	UpdateLine();
 	fTextBuffer->WriteCR(fCurPos);
 	fCurPos.x = 0;
 }
 
-// Print a LF and move the cursor
+
+//! Print a LF and move the cursor
 void
-TermView::PutLF(void)
+TermView::PutLF()
 {
 	UpdateLine();
-	
-	if(fScrRegionSet)
-		if(fCurPos.y == fScrBot) {
+
+	if (fScrRegionSet) {
+		if (fCurPos.y == fScrBot) {
 			ScrollRegion(-1, -1, SCRUP, 1);
 			return;
 		}
-	
-	if(fCurPos.x != fTermColumns){
-		if(fCurPos.y == fTermRows -1)
+	}
+
+	if (fCurPos.x != fTermColumns){
+		if (fCurPos.y == fTermRows -1)
 			ScrollScreen();
 		else
 			fCurPos.y++;
 	}
 }
 
-// Print a NL and move the cursor
+
+//! Print a NL and move the cursor
 void
 TermView::PutNL(int num)
 {
 	ScrollRegion(fCurPos.y, -1, SCRDOWN, num);
 }
 
-// Print a space
+
+//! Print a space
 void
 TermView::InsertSpace(int num)
 {
 	UpdateLine();
-	
+
 	fTextBuffer->InsertSpace(fCurPos, num);
 	TermDraw(fCurPos, CurPos(fTermColumns - 1, fCurPos.y));
 }
 
-// Set or reset Insert mode
+
+//! Set or reset Insert mode
 void
 TermView::SetInsertMode(int flag)
 {
@@ -342,7 +358,8 @@ TermView::SetInsertMode(int flag)
 	fInsertModeFlag = flag;
 }
 
-// Draw region
+
+//! Draw region
 inline int
 TermView::TermDraw(const CurPos &start, const CurPos &end)
 {
@@ -350,151 +367,157 @@ TermView::TermDraw(const CurPos &start, const CurPos &end)
 	int y1 = start.y;
 	int x2 = end.x;
 	int y2 = end.y;
-	
+
 	// Send Draw Rectangle data to Draw Engine thread.
 	SendDataToDrawEngine(x1, y1 + fTop / fFontHeight,
-							x2, y2 + fTop / fFontHeight);
+		x2, y2 + fTop / fFontHeight);
 	return 0;
 }
 
-// Draw region
+
+//! Draw region
 int
 TermView::TermDrawSelectedRegion(CurPos start, CurPos end)
 {
 	CurPos inPos;
-	
-	if(end < start) {
+
+	if (end < start) {
 		inPos = start;
 		start = end;
 		end = inPos;
 	}
-	
-	if(start.y == end.y) {
+
+	if (start.y == end.y) {
 		SendDataToDrawEngine(start.x, start.y,
 		end.x, end.y);
 	} else {
 		SendDataToDrawEngine(start.x, start.y,
 		fTermColumns, start.y);
-	
-		if(end.y - start.y > 0)
+
+		if (end.y - start.y > 0)
 			SendDataToDrawEngine(0, start.y + 1, fTermColumns, end.y - 1);
-		
-		SendDataToDrawEngine(0, end.y,
-		end.x, end.y);
+
+		SendDataToDrawEngine(0, end.y, end.x, end.y);
 	}
-	
+
 	return 0;
 }
 
-// Draw region
+
+//! Draw region
 int
 TermView::TermDrawRegion(CurPos start, CurPos end)
 {
 	CurPos inPos;
 	int top = fTop / fFontHeight;
-	
-	if(end < start) {
+
+	if (end < start) {
 		inPos = start;
 		start = end;
 		end = inPos;
 	}
-	
+
 	start.y += top;
 	end.y += top;
-	
-	if(start.y == end.y) {
+
+	if (start.y == end.y) {
 		SendDataToDrawEngine(start.x, start.y,
 		end.x, end.y);
 	} else {
 		SendDataToDrawEngine(start.x, start.y,
 		fTermColumns - 1, start.y);
-		
-		if(end.y - start.y > 0) {
+
+		if (end.y - start.y > 0) {
 			SendDataToDrawEngine(0, start.y + 1,
 			fTermColumns - 1, end.y - 1);
 		}
 		SendDataToDrawEngine(0, end.y,
 		end.x, end.y);
 	}
-	
+
 	return 0;
 }
 
 
-// Erase below cursor below.
+//! Erase below cursor below.
 void
-TermView::EraseBelow(void)
+TermView::EraseBelow()
 {
 	UpdateLine();
-	
+
 	fTextBuffer->EraseBelow(fCurPos);
 	TermDraw(fCurPos, CurPos(fTermColumns - 1, fCurPos.y));
-	if(fCurPos.y != fTermRows - 1)
+	if (fCurPos.y != fTermRows - 1)
 		TermDraw(CurPos(0, fCurPos.y + 1), CurPos(fTermColumns - 1, fTermRows - 1));
 }
 
-// Delete num characters from current position.
+
+//! Delete num characters from current position.
 void
 TermView::DeleteChar(int num)
 {
 	UpdateLine();
-	
+
 	fTextBuffer->DeleteChar(fCurPos, num);
 	TermDraw(fCurPos, CurPos(fTermColumns - 1, fCurPos.y));
 }
 
-// Delete cursor right characters.
+
+//! Delete cursor right characters.
 void
-TermView::DeleteColumns(void)
+TermView::DeleteColumns()
 {
 	UpdateLine();
-	
+
 	fTextBuffer->DeleteChar(fCurPos, fTermColumns - fCurPos.x);
 	TermDraw(fCurPos, CurPos(fTermColumns - 1, fCurPos.y));
 }
 
-// Delete 'num' lines from current position with scrolling. 
+
+//! Delete 'num' lines from current position with scrolling. 
 void
 TermView::DeleteLine(int num)
 {
 	ScrollRegion(fCurPos.y, -1, SCRUP, num);
 }
 
-// Sets cursor position
+
+//! Sets cursor position
 void
 TermView::SetCurPos(int x, int y)
 {
-  UpdateLine();
+	UpdateLine();
 
-  if(x >= 0 && x < fTermColumns)
-    fCurPos.x = x;
-  if(y >= 0 && y < fTermRows)
-    fCurPos.y = y;
-
-  return;
+	if (x >= 0 && x < fTermColumns)
+		fCurPos.x = x;
+	if (y >= 0 && y < fTermRows)
+		fCurPos.y = y;
 }
 
-// Sets cursor x position
+
+//! Sets cursor x position
 void
 TermView::SetCurX(int x)
 {
-	if(x >= 0 && x < fTermRows) {
+	if (x >= 0 && x < fTermRows) {
 		UpdateLine();
 		fCurPos.x = x;
 	}
 }
 
-// Sets cursor y position
+
+//! Sets cursor y position
 void
 TermView::SetCurY(int y)
 {
-	if(y >= 0 && y < fTermColumns) {
+	if (y >= 0 && y < fTermColumns) {
 		UpdateLine();
 		fCurPos.y = y;
 	}
 }
 
-// Gets cursor position
+
+//! Gets cursor position
 void
 TermView::GetCurPos(CurPos *inCurPos)
 {
@@ -502,42 +525,47 @@ TermView::GetCurPos(CurPos *inCurPos)
 	inCurPos->y = fCurPos.y;
 }
 
-// Gets cursor x position
+
+//! Gets cursor x position
 int
-TermView::GetCurX(void)
+TermView::GetCurX()
 {
 	return fCurPos.x;
 }
 
-// Gets cursor y position
+
+//! Gets cursor y position
 int
-TermView::GetCurY(void)
+TermView::GetCurY()
 {
 	return fCurPos.y;
 }
 
-// Saves cursor position
+
+//! Saves cursor position
 void
-TermView::SaveCursor(void)
+TermView::SaveCursor()
 {
 	fCurStack = fCurPos;
 }
 
-// Restores cursor position
+
+//! Restores cursor position
 void
-TermView::RestoreCursor(void)
+TermView::RestoreCursor()
 {
 	UpdateLine();
 	fCurPos = fCurStack;
 }
 
-// Move cursor right by 'num' steps.
+
+//! Move cursor right by 'num' steps.
 void
 TermView::MoveCurRight(int num)
 {
 	UpdateLine();
-	
-	if(fCurPos.x + num >= fTermColumns) {
+
+	if (fCurPos.x + num >= fTermColumns) {
 		// Wrap around
 		fCurPos.x = 0;
 		PutCR();
@@ -547,109 +575,112 @@ TermView::MoveCurRight(int num)
 	}
 }
 
-// Move cursor left by 'num' steps.
+
+//! Move cursor left by 'num' steps.
 void
 TermView::MoveCurLeft(int num)
 {
 	UpdateLine();
-	
+
 	fCurPos.x -= num;
-	if(fCurPos.x < 0)
+	if (fCurPos.x < 0)
 		fCurPos.x = 0;
 }
 
-// Move cursor up by 'num' steps.
+
+//! Move cursor up by 'num' steps.
 void
 TermView::MoveCurUp(int num)
 {
 	UpdateLine();
-	
+
 	fCurPos.y -= num;
-	
-	if(fCurPos.y < 0)
+
+	if (fCurPos.y < 0)
 		fCurPos.y = 0;
 }
 
-// Move cursor down by 'num' steps.
+
+//! Move cursor down by 'num' steps.
 void
 TermView::MoveCurDown(int num)
 {
 	UpdateLine();
-	
+
 	fCurPos.y += num;
-	
-	if(fCurPos.y >= fTermRows)
+
+	if (fCurPos.y >= fTermRows)
 		fCurPos.y = fTermRows - 1;
 }
 
+
 void
-TermView::DrawCursor(void)
+TermView::DrawCursor()
 {
 	CURSOR_RECT;
 	uchar buf[4];
 	ushort attr;
-	
+
 	int top = fTop / fFontHeight;
 	int m_flag = false;
-	
+
 	m_flag = CheckSelectedRegion(CurPos(fCurPos.x,
 	fCurPos.y + fTop / fFontHeight));
-	if(fTextBuffer->
-		GetChar(fCurPos.y + top, fCurPos.x, buf, &attr) == A_CHAR) {
-		
+	if (fTextBuffer->GetChar(fCurPos.y + top, fCurPos.x, buf, &attr) == A_CHAR) {
 		int width;
-		if(IS_WIDTH(attr))
+		if (IS_WIDTH(attr))
 			width = 2;
 		else
 			width = 1;
-		
+
 		DrawLines(fCurPos.x * fFontWidth,
-		fCurPos.y * fFontHeight + fTop,
-		attr, buf, width, m_flag, true, this);
+			fCurPos.y * fFontHeight + fTop,
+			attr, buf, width, m_flag, true, this);
 	} else {
-		if(m_flag)
+		if (m_flag)
 			SetHighColor(fSelectBackColor);
 		else
 			SetHighColor(fCursorBackColor);
-		
+
 		FillRect(r);
 	}
-	
+
 	Sync();
 }
 
+
 void
-TermView::BlinkCursor(void)
+TermView::BlinkCursor()
 {
-	if(fCursorDrawFlag == CURON
+	if (fCursorDrawFlag == CURON
 		&& fCursorBlinkingFlag == CURON
 		&& Window()->IsActive()) {
-		
-		if(fCursorStatus == CURON)
+		if (fCursorStatus == CURON)
 			TermDraw(fCurPos, fCurPos);
 		else
 			DrawCursor();
-		
-		fCursorStatus =(fCursorStatus == CURON) ? CUROFF : CURON;
+
+		fCursorStatus = fCursorStatus == CURON ? CUROFF : CURON;
 	}
 }
 
-// Draw / Clear cursor.
+
+//! Draw / Clear cursor.
 void
 TermView::SetCurDraw(bool flag)
 {
-	if(flag == CUROFF) {
-		if(fCursorStatus == CURON)
+	if (flag == CUROFF) {
+		if (fCursorStatus == CURON)
 			TermDraw(fCurPos, fCurPos);
-		
+
 		fCursorStatus = CUROFF;
 		fCursorDrawFlag = CUROFF;
 	} else {
-		if(fCursorDrawFlag == CUROFF) {
+		if (fCursorDrawFlag == CUROFF) {
 			fCursorDrawFlag = CURON;
 			fCursorStatus = CURON;
-			
-			if(LockLooper()) {
+
+			if (LockLooper()) {
 				DrawCursor();
 				UnlockLooper();
 			}
@@ -657,64 +688,66 @@ TermView::SetCurDraw(bool flag)
 	}
 }
 
-// Sets cursor Blinking flag.
+
+//! Sets cursor Blinking flag.
 void
 TermView::SetCurBlinking(bool flag)
 {
 	fCursorBlinkingFlag = flag;
 }
 
-// Scroll terminal dir directory by 'num' steps.
+
+//! Scroll terminal dir directory by 'num' steps.
 void
 TermView::ScrollRegion(int top, int bot, int dir, int num)
 {
 	UpdateLine();
-	
-	if(top == -1)
+
+	if (top == -1)
 		top = fScrTop;
-	
-	if(bot == -1)
+
+	if (bot == -1)
 		bot = fScrBot;
-	
-	if(top < fScrTop)
+
+	if (top < fScrTop)
 		top = fScrTop;
-	
-	if(bot > fScrBot)
+
+	if (bot > fScrBot)
 		bot = fScrBot; 
-	
+
 	fTextBuffer->ScrollRegion(top, bot , dir ,num);
 	TermDraw(CurPos(0, top), CurPos(fTermColumns - 1, bot));
 }
 
-// Sets terminal scroll region.
+
+//! Sets terminal scroll region.
 void
 TermView::SetScrollRegion(int top, int bot)
 {
-	if(top >= 0 && top < fTermRows) {
-		if(bot >= 0 && bot < fTermRows) {
-			if(top > bot) {
+	if (top >= 0 && top < fTermRows) {
+		if (bot >= 0 && bot < fTermRows) {
+			if (top > bot) {
 				fScrTop = bot;
 				fScrBot = top;
-			}
-			else if( top < bot ) {
+			} else if (top < bot ) {
 				fScrTop = top;
 				fScrBot = bot;
 			}
 		}
 	}
-	
-	if(fScrTop != 0 || fScrBot != fTermRows -1 )
+
+	if (fScrTop != 0 || fScrBot != fTermRows -1 )
 		fScrRegionSet = 1;
 	else
 		fScrRegionSet = 0;
-  
 }
 
-// Scroll to cursor position.
+
+//! Scroll to cursor position.
 void
-TermView::ScrollAtCursor(void)
+TermView::ScrollAtCursor()
 {
-	if(LockLooper()) {
+	if (LockLooper()) {
 		ResizeScrBarRange();
 		fScrollUpCount = 0;
 		ScrollTo(0, fTop);
@@ -722,68 +755,65 @@ TermView::ScrollAtCursor(void)
 	}
 }
 
+
 thread_id
-TermView::InitViewThread(void)
+TermView::InitViewThread()
 {
 	// spwan Draw Engine thread.
-	if(fViewThread < 0) {
+	if (fViewThread < 0) {
 		fViewThread = spawn_thread(ViewThread, "DrawEngine",
-									B_DISPLAY_PRIORITY, this);
-	}
-	else
+			B_DISPLAY_PRIORITY, this);
+	} else
 		return B_BAD_THREAD_ID;
-	
+
 	fDrawRectSem = create_sem(0, "draw_engine_sem");
 	resume_thread(fViewThread);
-	
-	
+
 	// spawn Mouse Tracking thread.
-	if(fMouseThread < 0) {
+	if (fMouseThread < 0) {
 		fMouseThread = spawn_thread(MouseTracking, "MouseTracking",
-									B_NORMAL_PRIORITY,this);
-	}
-	else
+			B_NORMAL_PRIORITY,this);
+	} else
 		return B_BAD_THREAD_ID;
-	
+
 	resume_thread(fMouseThread);
-	
-	return(fViewThread);
+
+	return fViewThread;
 }
 
 
-// Thread of Draw Character to View.
+//! Thread of Draw Character to View.
 int32
 TermView::ViewThread(void *data)
 {
 	int width, height;
 	sDrawRect pos;
-	
-	//#define INVALIDATE
-	#ifndef INVALIDATE
-		int i, j, count;
-		int m_flag;
-		ushort attr;
-		uchar buf[256];
-		BRect eraseRect;
-	#endif
-	
+
+//#define INVALIDATE
+#ifndef INVALIDATE
+	int i, j, count;
+	int m_flag;
+	ushort attr;
+	uchar buf[256];
+	BRect eraseRect;
+#endif
+
 	int inDrawRect_p = 0;
-	
+
 	TermView *theObj =(TermView *)data;
-	
-	while(theObj->fQuitting) {
-	
-	// Wait semaphore
-	acquire_sem(theObj->fDrawRectSem);
-	
-	pos = theObj->fDrawRectBuffer[inDrawRect_p];
-	inDrawRect_p++;
-	inDrawRect_p %= RECT_BUF_SIZE;
-	
-	width = theObj->fFontWidth;
-	height = theObj->fFontHeight;
-	
-	#ifdef INVALIDATE
+
+	while (theObj->fQuitting) {
+		// Wait semaphore
+		acquire_sem(theObj->fDrawRectSem);
+
+		pos = theObj->fDrawRectBuffer[inDrawRect_p];
+		inDrawRect_p++;
+		inDrawRect_p %= RECT_BUF_SIZE;
+
+		width = theObj->fFontWidth;
+		height = theObj->fFontHeight;
+
+#ifdef INVALIDATE
 		BRect r(pos.x1 * width, pos.y1 * height,
 		(pos.x2 + 1) * width -1,(pos.y2 + 1) * height -1);
 		
@@ -791,49 +821,43 @@ TermView::ViewThread(void *data)
 			theObj->Invalidate(r);
 			theObj->UnlockLooper();
 		}
-	#else
-	
-		if(theObj->LockLooper()) {
-	
-			for(j = pos.y1; j <= pos.y2; j++) {
-			
-				for(i = pos.x1; i <= pos.x2;) {
-				
+#else
+		
+		if (theObj->LockLooper()) {
+			for (j = pos.y1; j <= pos.y2; j++) {
+				for (i = pos.x1; i <= pos.x2;) {
 					count = theObj->fTextBuffer->GetString(j, i, pos.x2, buf, &attr);
 					m_flag = theObj->CheckSelectedRegion(CurPos(i, j));
-					
-					if(count < 0) {
-							eraseRect.Set(width  * i,
-							height * j,
-							width  *(i - count) - 1,
-							height *(j + 1) - 1);
-							
-							if(m_flag)
-								theObj->SetHighColor(theObj->fSelectBackColor);
-							else
-								theObj->SetHighColor(theObj->fTextBackColor);
-							
-							theObj->FillRect(eraseRect);
-							count = -count;
-						
+
+					if (count < 0) {
+						eraseRect.Set(width * i, height * j,
+							width  *(i - count) - 1, height *(j + 1) - 1);
+
+						if (m_flag)
+							theObj->SetHighColor(theObj->fSelectBackColor);
+						else
+							theObj->SetHighColor(theObj->fTextBackColor);
+
+						theObj->FillRect(eraseRect);
+						count = -count;
 					} else {
-						theObj->DrawLines( width * i, height * j,
-						attr, buf, count, m_flag, false, theObj);
+						theObj->DrawLines(width * i, height * j,
+							attr, buf, count, m_flag, false, theObj);
 					}
 					i += count;
 				}
 			}
 			theObj->UnlockLooper();
 		}
-	#endif
-	
-	} // end while()
-	
+#endif
+	}
+
 	exit_thread(B_OK);
 	return 0;
 }
 
-// 	Thread for tracking mouse.
+
+//!	Thread for tracking mouse.
 int32
 TermView::MouseTracking(void *data)
 {
@@ -880,8 +904,7 @@ TermView::MouseTracking(void *data)
 		}
 		snooze(50 * 1000);
 		continue;
-	}
-	else {
+	} else {
 #endif
 		code = receive_data(&sender,(void *)&stpoint, sizeof(BPoint));
 	}
@@ -967,112 +990,109 @@ TermView::MouseTracking(void *data)
 	return 0;
 }
 
-// Draw character on offscreen bitmap.
+
+//! Draw character on offscreen bitmap.
 void
 TermView::DrawLines(int x1, int y1, ushort attr, uchar *buf,
-			     	int width, int mouse, int cursor, BView *inView)
+	int width, int mouse, int cursor, BView *inView)
 {
-	//  int width;
 	int x2, y2;
 	int forecolor, backcolor;
 	rgb_color rgb_fore = fTextForeColor, rgb_back = fTextBackColor, rgb_tmp;
-	
+
 	// Set Font.
-	if(IS_WIDTH(attr))
+	if (IS_WIDTH(attr))
 		inView->SetFont(&fFullFont);
 	else
 		inView->SetFont(&fHalfFont);
-	
+
 	// Set pen point
 	x2 = x1 + fFontWidth * width;
 	y2 = y1 + fFontHeight;
-	
+
 	// color attribute
 	forecolor = IS_FORECOLOR(attr);
 	backcolor = IS_BACKCOLOR(attr);
-	
-	if(IS_FORESET(attr))
+
+	if (IS_FORESET(attr))
 		rgb_fore = gTermColorTable[forecolor];
-	
-	if(IS_BACKSET(attr))
+
+	if (IS_BACKSET(attr))
 		rgb_back = gTermColorTable[backcolor];
-	
+
 	// Selection check.
-	if(cursor) {
+	if (cursor) {
 		rgb_fore = fCursorForeColor;
 		rgb_back = fCursorBackColor;
-	}
-	else
-	if(mouse){
+	} else if (mouse){
 		rgb_fore = fSelectForeColor;
 		rgb_back = fSelectBackColor;
-	
 	} else {
-	
 		// Reverse attribute(If selected area, don't reverse color).
-		if(IS_INVERSE(attr)) {
+		if (IS_INVERSE(attr)) {
 			rgb_tmp = rgb_fore;
 			rgb_fore = rgb_back;
 			rgb_back = rgb_tmp;
 		}
 	}
-	
+
 	// Fill color at Background color and set low color.
 	inView->SetHighColor(rgb_back);
 	inView->FillRect(BRect(x1, y1, x2 - 1, y2 - 1));
 	inView->SetLowColor(rgb_back);
-	
+
 	inView->SetHighColor(rgb_fore);
-	
+
 	// Draw character.
 	inView->MovePenTo(x1, y1 + fFontAscent);
 	inView->DrawString((char *) buf);
-	
+
 	// bold attribute.
-	if(IS_BOLD(attr)) {
-	inView->MovePenTo(x1 + 1, y1 + fFontAscent);
-	
-	inView->SetDrawingMode(B_OP_OVER);
-	inView->DrawString((char *)buf);
-	inView->SetDrawingMode(B_OP_COPY);
+	if (IS_BOLD(attr)) {
+		inView->MovePenTo(x1 + 1, y1 + fFontAscent);
+
+		inView->SetDrawingMode(B_OP_OVER);
+		inView->DrawString((char *)buf);
+		inView->SetDrawingMode(B_OP_COPY);
 	}
-	
+
 	// underline attribute
-	if(IS_UNDER(attr)) {
+	if (IS_UNDER(attr)) {
 		inView->MovePenTo(x1, y1 + fFontAscent);
 		inView->StrokeLine(BPoint(x1 , y1 + fFontAscent),
-		BPoint(x2 , y1 + fFontAscent));
+			BPoint(x2 , y1 + fFontAscent));
 	}
 }
 
-// Resize scroll bar range and knob size.
+
+//! Resize scroll bar range and knob size.
 void
-TermView::ResizeScrBarRange(void)
+TermView::ResizeScrBarRange()
 {
 	float viewheight, start_pos; 
-	
+
 	viewheight = fTermRows * fFontHeight;
 	start_pos = fTop -(fScrBufSize - fTermRows *2) * fFontHeight;
-	
-	if(start_pos > 0) {
+
+	if (start_pos > 0) {
 		fScrollBar->SetRange(start_pos, viewheight + fTop - fFontHeight);
-		
 	} else {
 		fScrollBar->SetRange(0, viewheight + fTop - fFontHeight);
 		fScrollBar->SetProportion( viewheight /(viewheight + fTop));
 	}
 }
 
-// Scrolls screen.
+
+//! Scrolls screen.
 void
-TermView::ScrollScreen(void)
+TermView::ScrollScreen()
 {
 	fTop += fFontHeight;
 	fScrollUpCount++;
 	fTextBuffer->ScrollLine();
-	
-	if(fScrollUpCount > fTermRows ) {
-		if(LockLooper()) {
+
+	if (fScrollUpCount > fTermRows ) {
+		if (LockLooper()) {
 			ResizeScrBarRange();
 			fScrollBarRange += fScrollUpCount;
 			fScrollUpCount = 0;
@@ -1082,14 +1102,15 @@ TermView::ScrollScreen(void)
 	}
 }
 
-// Scrolls screen.
+
+//! Scrolls screen.
 void
-TermView::ScrollScreenDraw(void)
+TermView::ScrollScreenDraw()
 {
-	if(fScrollUpCount){
-		if(LockLooper()) {
+	if (fScrollUpCount){
+		if (LockLooper()) {
 			ResizeScrBarRange();
-			
+
 			fScrollBarRange += fScrollUpCount;
 			fScrollUpCount = 0;
 			ScrollTo(0, fTop);
@@ -1098,45 +1119,48 @@ TermView::ScrollScreenDraw(void)
 	}
 }
 
-// 	Handler for SIGWINCH
+
+//!	Handler for SIGWINCH
 void
 TermView::UpdateSIGWINCH()
 {
 	struct winsize ws;
-	
-	if(fFrameResized) {
-		if(fSelected)
+
+	if (fFrameResized) {
+		if (fSelected)
 			TermDrawSelectedRegion(fSelStart, fSelEnd);
 		ScrollTo(0, fTop);
 		ResizeScrBarRange();
-		
+
 		ws.ws_row = fTermRows;
 		ws.ws_col = fTermColumns;
 		ioctl(pfd, TIOCSWINSZ, &ws);
 		kill(-sh_pid, SIGWINCH);
-		
+
 		fFrameResized = 0;
-		if(fScrRegionSet == 0)
+		if (fScrRegionSet == 0)
 			fScrBot = fTermRows - 1;
 	}
 }
-  
-// Device Status.
-// Q & D hack by Y.Hayakawa(hida@sawada.riec.tohoku.ac.jp)
-// 21-JUL-99
+
+
+/*!	Device Status.
+	Q & D hack by Y.Hayakawa(hida@sawada.riec.tohoku.ac.jp)
+	21-JUL-99
+*/
 void
 TermView::DeviceStatusReport(int n)
 {
 	char sbuf[16] ;
 	int len;
-	
-	switch(n) {
+
+	switch (n) {
 		case 5:
 			len = sprintf(sbuf,"\033[0n") ;
 			write(pfd, sbuf, len);
 			break ;
 		case 6:
-			len = sprintf(sbuf,"\033[%d;%dR",fTermRows,fTermColumns) ;
+			len = sprintf(sbuf,"\033[%d;%dR", fTermRows, fTermColumns) ;
 			write(pfd, sbuf, len);
 			break ;
 		default:
@@ -1144,159 +1168,153 @@ TermView::DeviceStatusReport(int n)
 	}
 }
 
-// 	Update line buffer.
+
+//!	Update line buffer.
 void
-TermView::UpdateLine(void)
+TermView::UpdateLine()
 {
-	if(fUpdateFlag == true) {
-		
-		if(fInsertModeFlag == MODE_INSERT) {
+	if (fUpdateFlag == true) {
+		if (fInsertModeFlag == MODE_INSERT) {
 			TermDraw(CurPos(fBufferStartPos, fCurPos.y),
-			CurPos(fTermColumns - 1, fCurPos.y));
-		
+				CurPos(fTermColumns - 1, fCurPos.y));
 		} else {
 			TermDraw(CurPos(fBufferStartPos, fCurPos.y),
-			CurPos(fCurPos.x - 1, fCurPos.y));
+				CurPos(fCurPos.x - 1, fCurPos.y));
 		}
 		fUpdateFlag = false;
 	}
 }
 
+
 void
-TermView::AttachedToWindow(void)
+TermView::AttachedToWindow()
 {
 	SetFont(&fHalfFont);
 	MakeFocus(true);
 	fScrollBar->SetSteps(fFontHeight, fFontHeight * fTermRows);
 }
 
+
 void
 TermView::Draw(BRect updateRect)
 {
-	if(IsPrinting()) {
+	if (IsPrinting()) {
 		DoPrint(updateRect);
 		return;
 	}
-	
+
 	int x1, x2, y1, y2;
 	int i, j, k, count;
 	ushort attr;
 	uchar buf[256];
 	int m_flag;
 	BRect eraseRect;
-	
+
 	x1 =(int)updateRect.left / fFontWidth;
 	x2 =(int)updateRect.right / fFontWidth;
-	
+
 	y1 =(int)updateRect.top / fFontHeight;
 	y2 =(int)updateRect.bottom / fFontHeight;
-	
-	Window()->BeginViewTransaction();
-	
-	for(j = y1; j <= y2; j++) {
 
+	Window()->BeginViewTransaction();
+
+	for (j = y1; j <= y2; j++) {
 		// If(x1, y1) Buffer is in string full width character,
 		// alignment start position.
-	
+
 		k = x1;
-		if(fTextBuffer->GetChar(j, k, buf, &attr) == IN_STRING)
+		if (fTextBuffer->GetChar(j, k, buf, &attr) == IN_STRING)
 			k--;
-	
-		if(k < 0)
+
+		if (k < 0)
 			k = 0;
-		
-		for(i = k; i <= x2;) {
-		
+
+		for (i = k; i <= x2;) {
 			count = fTextBuffer->GetString(j, i, x2, buf, &attr);
 			m_flag = CheckSelectedRegion(CurPos(i, j));
-			
-			if(count < 0) {
-			
-				if(m_flag) {
-				
+
+			if (count < 0) {
+				if (m_flag) {
 					eraseRect.Set(fFontWidth * i,
-					fFontHeight * j,
-					fFontWidth *(i - count) -1,
-					fFontHeight *(j + 1) -1);
-					
+						fFontHeight * j,
+						fFontWidth *(i - count) -1,
+						fFontHeight *(j + 1) -1);
+
 					SetHighColor(fSelectBackColor);
 					FillRect(eraseRect);
 				}
 				i += abs(count);
 				continue;
 			}
-			
+
 			DrawLines(fFontWidth * i, fFontHeight * j,
-			attr, buf, count, m_flag, false, this);
+				attr, buf, count, m_flag, false, this);
 			i += count;
-			if(i >= fTermColumns)
+			if (i >= fTermColumns)
 				break;
-		
 		}
 	}
-	
-	if(fCursorStatus == CURON)
+
+	if (fCursorStatus == CURON)
 		DrawCursor();
-	
+
 	Window()->EndViewTransaction();
 }
 
 
-void 
+void
 TermView::DoPrint(BRect updateRect)
 {
 	ushort attr;
 	uchar buf[256];
-	
+
 	const int numLines =(int)((updateRect.Height()) / fFontHeight);
-	
+
 	int y1 =(int)updateRect.top / fFontHeight;
 	y1 = y1 -(fScrBufSize - numLines * 2);
-	if(y1 < 0)
+	if (y1 < 0)
 		y1 = 0;
-	
+
 	const int y2 = y1 + numLines -1;
-	
+
 	const int x1 =(int)updateRect.left / fFontWidth;
 	const int x2 =(int)updateRect.right / fFontWidth;
-	
-	for(int j = y1; j <= y2; j++) {
-	
+
+	for (int j = y1; j <= y2; j++) {
 		// If(x1, y1) Buffer is in string full width character,
 		// alignment start position.
-		
+
 		int k = x1;
-		if(fTextBuffer->GetChar(j, k, buf, &attr) == IN_STRING)
+		if (fTextBuffer->GetChar(j, k, buf, &attr) == IN_STRING)
 			k--;
-	
-		if(k < 0)
+
+		if (k < 0)
 			k = 0;
-		
-		for(int i = k; i <= x2;) {
-		
+
+		for (int i = k; i <= x2;) {
 			int count = fTextBuffer->GetString(j, i, x2, buf, &attr);
-			if(count < 0) {
+			if (count < 0) {
 				i += abs(count);
 				continue;
 			}
-			
+
 			DrawLines(fFontWidth * i, fFontHeight * j,
-			attr, buf, count, false, false, this);
+				attr, buf, count, false, false, this);
 			i += count;
 		}
 	}
 } 
 
+
 void
 TermView::WindowActivated(bool active)
 {
-	if(active == false) {
+	if (active == false) {
 		// DoIMConfirm();
 	}
-	
-	if(active && fMouseImage) {
+
+	if (active && fMouseImage)
 		be_app->SetCursor(B_I_BEAM_CURSOR);
-	}
 }
 
 
@@ -1306,187 +1324,171 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 	char c;
 	struct termios tio;
 	int32 key, mod;
-	
+
 	uchar dstbuf[1024];
 	Looper()->CurrentMessage()->FindInt32("modifiers", &mod);
 	Looper()->CurrentMessage()->FindInt32("key", &key);
-	
-	if(fIMflag)
+
+	if (fIMflag)
 		return;
-	
+
 	// If bytes[0] equal intr charactor,
 	// send signal to shell process group.
 	tcgetattr(pfd, &tio);
-	if(*bytes == tio.c_cc[VINTR]) {
-	
+	if (*bytes == tio.c_cc[VINTR]) {
 		if(tio.c_lflag & ISIG)
 			kill(-sh_pid, SIGINT);
 	}
-	
+
 	// Terminal changes RET, ENTER, F1...F12, and ARROW key code.
-	
-	if(numBytes == 1) {
-	
-		if(mod & B_OPTION_KEY) {
+
+	if (numBytes == 1) {
+		if (mod & B_OPTION_KEY) {
 			c = *bytes;
-			c  |= 0x80;
+			c |= 0x80;
 			write(pfd, &c, 1);
 			return;
 		}
-	
-		switch(*bytes) {
-		
+
+		switch (*bytes) {
 			case B_RETURN:
 				c = 0x0d;
-				
-				if(key == RETURN_KEY || key == ENTER_KEY) {
+				if (key == RETURN_KEY || key == ENTER_KEY) {
 					write(pfd, &c, 1);
 					return;
-					
 				} else {
 					write(pfd, bytes, numBytes);
 					return;
 				}
-				
 				break;
-				
+
 			case B_LEFT_ARROW:
-				
-				if(key == LEFT_ARROW_KEY) {
+				if (key == LEFT_ARROW_KEY) {
 					write(pfd, LEFT_ARROW_KEY_CODE, sizeof(LEFT_ARROW_KEY_CODE)-1);
 					return;
 				}
 				break;
-			
+
 			case B_RIGHT_ARROW:
-				
-				if(key == RIGHT_ARROW_KEY) {
+				if (key == RIGHT_ARROW_KEY) {
 					write(pfd, RIGHT_ARROW_KEY_CODE, sizeof(RIGHT_ARROW_KEY_CODE)-1);
 					return;
 				}
 				break;
-			
+
 			case B_UP_ARROW:
-				
-				if(mod & B_SHIFT_KEY) {
-					if(Bounds().top <= 0)
+				if (mod & B_SHIFT_KEY) {
+					if (Bounds().top <= 0)
 						return;
 					ScrollBy(0, -fFontHeight);
 					Window()->UpdateIfNeeded();
 					return;
 				}
-				
-				if(key == UP_ARROW_KEY) {
+
+				if (key == UP_ARROW_KEY) {
 					write(pfd, UP_ARROW_KEY_CODE, sizeof(UP_ARROW_KEY_CODE)-1);
 					return;
 				}
 				break;
-			
+
 			case B_DOWN_ARROW:
-				
-				if(mod & B_SHIFT_KEY) {
+				if (mod & B_SHIFT_KEY) {
 					ScrollBy(0, fFontHeight);
 					Window()->UpdateIfNeeded();
 					return;
 				}
-			
-				if(key == DOWN_ARROW_KEY) {
+
+				if (key == DOWN_ARROW_KEY) {
 					write(pfd, DOWN_ARROW_KEY_CODE, sizeof(DOWN_ARROW_KEY_CODE)-1);
 					return;
 				}
 				break;
-			
+
 			case B_INSERT:
-			
-				if(key == INSERT_KEY) {
+				if (key == INSERT_KEY) {
 					write(pfd, INSERT_KEY_CODE, sizeof(INSERT_KEY_CODE)-1);
 					return;
 				}
 				break;
-			
+
 			case B_HOME:
-			
-				if(key == HOME_KEY) {
+				if (key == HOME_KEY) {
 					write(pfd, HOME_KEY_CODE, sizeof(HOME_KEY_CODE)-1);
 					return;
 				}
 				break;
-				
+
 			case B_PAGE_UP:
-			
-				if(mod & B_SHIFT_KEY) {
-					if(Bounds().top <= 0)
+				if (mod & B_SHIFT_KEY) {
+					if (Bounds().top <= 0)
 						return;
 					ScrollBy(0, -fFontHeight * fTermRows );
 					Window()->UpdateIfNeeded();
 					return;
 				}
-				
-				if(key == PAGE_UP_KEY) {
+
+				if (key == PAGE_UP_KEY) {
 					write(pfd, PAGE_UP_KEY_CODE, sizeof(PAGE_UP_KEY_CODE)-1);
 					return;
 				}
 				break;
-				
+
 			case B_PAGE_DOWN:
-				
-				if(mod & B_SHIFT_KEY) {
+				if (mod & B_SHIFT_KEY) {
 					ScrollBy(0, fFontHeight * fTermRows);
 					Window()->UpdateIfNeeded();
 					return;
 				}
-				
-				if(key == PAGE_DOWN_KEY) {
+
+				if (key == PAGE_DOWN_KEY) {
 					write(pfd, PAGE_DOWN_KEY_CODE, sizeof(PAGE_DOWN_KEY_CODE)-1);
 					return;
 				}
 				break;
-				
+
 			case B_END:
-				
-				if(key == END_KEY) {
+				if (key == END_KEY) {
 					write(pfd, END_KEY_CODE, sizeof(END_KEY_CODE)-1);
 					return;
 				}
 				break;
-			
+
 			case B_FUNCTION_KEY:
-				
-				for(c = 0; c < 12; c++) {
-					if(key == function_keycode_table[c]) {
+				for (c = 0; c < 12; c++) {
+					if (key == function_keycode_table[c]) {
 						write(pfd, function_key_char_table[c], 5);
 						return;
 					}
 				}
 				break;
-			
+
 			default:
 				break;
 		}
-		
 	} else {
 		// input multibyte character
-		
-		if(gNowCoding != M_UTF8) {
-			int cnum = fCodeConv->ConvertFromInternal
-			((uchar *)bytes, dstbuf, gNowCoding);
+
+		if (gNowCoding != M_UTF8) {
+			int cnum = fCodeConv->ConvertFromInternal(bytes, numBytes,
+				(char *)dstbuf, gNowCoding);
 			write(pfd, dstbuf, cnum);
 			return;
 		}
 	}
-	
+
 	write(pfd, bytes, numBytes);
 }
+
 
 void
 TermView::FrameResized(float width, float height)
 {
 	const int cols =((int)width + 1) / fFontWidth;
 	const int rows =((int)height + 1) / fFontHeight;
-	
+
 	int offset = 0;
-	
-	if(rows < fCurPos.y + 1) {
+
+	if (rows < fCurPos.y + 1) {
 		fTop +=(fCurPos.y  + 1 - rows) * fFontHeight;
 		offset = fCurPos.y + 1 - rows;
 		fCurPos.y = rows - 1;
@@ -1494,85 +1496,74 @@ TermView::FrameResized(float width, float height)
 	fTextBuffer->ResizeTo(rows, cols, offset);
 	fTermRows = rows;
 	fTermColumns = cols;
-	
+
 	fFrameResized = 1;
 }
+
 
 void 
 TermView::MessageReceived(BMessage *msg)
 {
 	entry_ref ref;
 	char *ctrl_l = "";
-	
-	switch(msg->what){
-	
+
+	switch (msg->what){
 		case B_SIMPLE_DATA:
 		{
-			int32 i=0;
-			if(msg->FindRef("refs", i++, &ref) == B_OK)
-			{
+			int32 i = 0;
+			if (msg->FindRef("refs", i++, &ref) == B_OK) {
 				DoFileDrop(ref);
-				
-				while(msg->FindRef("refs", i++, &ref) == B_OK)
-				{
-					WritePTY((const uchar*)" ",1);
+
+				while (msg->FindRef("refs", i++, &ref) == B_OK) {
+					WritePTY((const uchar*)" ", 1);
 					DoFileDrop(ref);
 				}
-			}
-			else
-			{
+			} else
 				BView::MessageReceived(msg);
-			}
 			break;
 		}
+
 		case B_MIME_DATA:
 		{
 			char *text;
-			int32 num_bytes;
+			int32 numBytes;
 			status_t sts;
-			
-			if(msg->WasDropped())
-			{
-				sts = msg->FindData((const char *)"text/plain",
-									(type_code)B_MIME_TYPE,
-									(const void **)&text, &num_bytes);
-				if(sts != B_OK)
+
+			if (msg->WasDropped()) {
+				sts = msg->FindData("text/plain",
+					B_MIME_TYPE, (const void **)&text, &numBytes);
+				if (sts != B_OK)
 					break;
-			
-				// Clipboard text doesn't attached EOF?
-				text[num_bytes] = '\0';
-				WritePTY((uchar *)text, num_bytes);
+
+				WritePTY((uchar *)text, numBytes);
 			}
 			break;
-		}	
+		}
+
 		case B_COPY:
-		{
 			DoCopy();
 			break;
-		}	
+
 		case B_PASTE:
 		{
 			int32 code;
-			if(msg->FindInt32("index", &code) == B_OK)
+			if (msg->FindInt32("index", &code) == B_OK)
 				DoPaste();
 			break;
-		}	
+		}
+
 		case B_SELECT_ALL:
-		{
 			DoSelectAll();
 			break;
-		}	
+
 		case MENU_CLEAR_ALL:
-		{
 			DoClearAll();
 			write(pfd, ctrl_l, 1);
 			break;
-		}	
+
 		case MSGRUN_CURSOR:
-		{
 			BlinkCursor();
 			break;
-		}	
 		
 //  case B_INPUT_METHOD_EVENT:
 //    {
@@ -1597,50 +1588,47 @@ TermView::MessageReceived(BMessage *msg)
     //  }
    // }
 		default:
-		{
 			BView::MessageReceived(msg);
 			break;
-		}	
 	}
 }  
 
-// Gets dropped file full path and display it at cursor position.
+
+//! Gets dropped file full path and display it at cursor position.
 void 
 TermView::DoFileDrop(entry_ref &ref)
 {
 	BEntry ent(&ref); 
 	BPath path(&ent);
 	BString string(path.Path());
-	
+
 	string.CharacterEscape(" ~`#$&*()\\|[]{};'\"<>?!",'\\');
 	WritePTY((const uchar *)string.String(), string.Length());
 }
 
-// Copy selected text to Clipboard.
+
+//! Copy selected text to Clipboard.
 void 
 TermView::DoCopy()
 {
-	if(!fSelected)
+	if (!fSelected)
 		return;
-	
-	BString copyStr(""); 
-	
+
+	BString copyStr;
 	fTextBuffer->GetStringFromRegion(copyStr);
-	
-	if(be_clipboard->Lock()) { 
-		
-		BMessage *clipMsg = NULL; 
-		be_clipboard->Clear(); 
-		
-		if((clipMsg = be_clipboard->Data()) != NULL) { 
-		
-			clipMsg->AddData("text/plain", B_MIME_TYPE, copyStr.String(), 
-							copyStr.Length()); 
-			be_clipboard->Commit(); 
-		} 
-		be_clipboard->Unlock(); 
+
+	if (be_clipboard->Lock()) {
+		BMessage *clipMsg = NULL;
+		be_clipboard->Clear();
+
+		if ((clipMsg = be_clipboard->Data()) != NULL) {
+			clipMsg->AddData("text/plain", B_MIME_TYPE, copyStr.String(),
+				copyStr.Length());
+			be_clipboard->Commit();
+		}
+		be_clipboard->Unlock();
 	}
-	
+
 	// Deselecting the current selection is not the behavior that
 	// R5's Terminal app displays. We want to mimic the behavior, so we will
 	// no longer do the deselection
@@ -1648,32 +1636,28 @@ TermView::DoCopy()
 //		DeSelect();
 }
 
-// Paste clipboard text at cursor position.
+
+//! Paste clipboard text at cursor position.
 void 
-TermView::DoPaste(void)
+TermView::DoPaste()
 {
-	if( be_clipboard->Lock() ) { 
-		
-		BMessage *clipMsg = be_clipboard->Data(); 
+	if (be_clipboard->Lock()) {
+		BMessage *clipMsg = be_clipboard->Data();
 		char *text;
-		ssize_t num_bytes;
-		
-		if( clipMsg->FindData((const char *)"text/plain",
-								(type_code) B_MIME_TYPE,
-								(const void **)&text,
-								&num_bytes) == B_OK ) {
-		
+		ssize_t numBytes;
+		if (clipMsg->FindData("text/plain", B_MIME_TYPE,
+				(const void **)&text, &numBytes) == B_OK ) {
 			// Clipboard text doesn't attached EOF?
-			text[num_bytes] = '\0';
-			
-			WritePTY((uchar *)text, num_bytes);
-		}    
-		
-		be_clipboard->Unlock(); 
+			text[numBytes] = '\0';
+			WritePTY((uchar *)text, numBytes);
+		}
+
+		be_clipboard->Unlock();
 	}
 }
 
-// Select all displayed text and text /in buffer.
+
+//! Select all displayed text and text /in buffer.
 void 
 TermView::DoSelectAll(void)
 {
@@ -1752,26 +1736,29 @@ TermView::SubstMetaChar(const char *p, char *q)
 	
 	// Add null string
 	*q = *p;
-	return(num_char + 1);
+	return num_char + 1;
 }
 
-// Write strings to PTY device. If encoding system isn't UTF8, change
-// encoding to UTF8 before writing PTY.
+
+/*!	Write strings to PTY device. If encoding system isn't UTF8, change
+	encoding to UTF8 before writing PTY.
+*/
 void
-TermView::WritePTY(const uchar *text, int num_bytes)
+TermView::WritePTY(const uchar *text, int numBytes)
 {
-	if(gNowCoding != M_UTF8) {
-		uchar *dstbuf =(uchar *)malloc(num_bytes * 3);
-		num_bytes = fCodeConv->ConvertFromInternal(text, dstbuf, gNowCoding);
-		write(pfd, dstbuf, num_bytes);
-		free(dstbuf);
-	
+	if (gNowCoding != M_UTF8) {
+		uchar *destBuffer = (uchar *)malloc(numBytes * 3);
+		numBytes = fCodeConv->ConvertFromInternal((char*)text, numBytes,
+			(char*)destBuffer, gNowCoding);
+		write(pfd, destBuffer, numBytes);
+		free(destBuffer);
 	} else {
-		write(pfd, text, num_bytes);
+		write(pfd, text, numBytes);
 	}
 }
 
-// Make encoding pop up menu (make copy of window's one.)
+
+//! Make encoding pop up menu (make copy of window's one.)
 void
 TermView::SetupPop(void)
 {

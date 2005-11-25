@@ -3,34 +3,42 @@
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
  * Distributed under the terms of the MIT license.
- *
- * Authors:
- *		Kian Duffy <myob@users.sourceforge.net>
  */
+
+/*!	This view is a shell for the TermView and makes sure it's always
+	resized in whole character sizes.
+	It doesn't serve any other purpose (and could possibly removed
+	with a tiny bit smarter programming).
+*/
+
+
 #include "TermBaseView.h"
 #include "TermView.h"
 
-TermBaseView::TermBaseView (BRect frame, TermView *inTermView)
- :BView(frame, "baseview", B_FOLLOW_ALL_SIDES,
+
+TermBaseView::TermBaseView(BRect frame, TermView *inTermView)
+	: BView(frame, "baseview", B_FOLLOW_ALL_SIDES,
 		B_WILL_DRAW | B_FRAME_EVENTS)
 {
 	fTermView = inTermView;
 }
 
-TermBaseView::~TermBaseView ()
+
+TermBaseView::~TermBaseView()
 {
 }
 
+
 void
-TermBaseView::FrameResized (float width, float height)
+TermBaseView::FrameResized(float width, float height)
 {
-	int font_width, font_height;
+	int fontWidth, fontHeight;
 	int cols, rows;
-	
-	fTermView->GetFontInfo (&font_width, &font_height);
-	
-	cols = (int)(width - VIEW_OFFSET * 2) / font_width;
-	rows = (int)(height - VIEW_OFFSET * 2)/ font_height;
-	
-	fTermView->ResizeTo (cols * font_width - 1, rows * font_height - 1);
+
+	fTermView->GetFontInfo(&fontWidth, &fontHeight);
+
+	cols = (int)(width - VIEW_OFFSET * 2) / fontWidth;
+	rows = (int)(height - VIEW_OFFSET * 2) / fontHeight;
+
+	fTermView->ResizeTo(cols * fontWidth - 1, rows * fontHeight - 1);
 }
