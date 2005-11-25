@@ -63,6 +63,7 @@ using std::nothrow;
 
 //#define DEBUG_SERVERWINDOW
 //#define DEBUG_SERVERWINDOW_GRAPHICS
+//#define PROFILE_MESSAGE_LOOP
 
 
 #ifdef DEBUG_SERVERWINDOW
@@ -77,6 +78,10 @@ using std::nothrow;
 #	define DTRACE(x) printf x
 #else
 #	define DTRACE(x) ;
+#endif
+
+#ifdef PROFILE_MESSAGE_LOOP
+static struct profile { int32 count; bigtime_t time; } sMessageProfile[AS_LAST_CODE];
 #endif
 
 struct dw_data {
@@ -177,6 +182,16 @@ ServerWindow::~ServerWindow()
 	STRACE(("#ServerWindow(%p) will exit NOW\n", this));
 
 	delete_sem(fDeathSemaphore);
+
+#ifdef PROFILE_MESSAGE_LOOP
+	for (int32 i = 0; i < AS_LAST_CODE; i++) {
+		if (sMessageProfile[i].count == 0)
+			continue;
+		printf("[%ld] called %ld times, %g secs (%Ld usecs per call)\n",
+			i, sMessageProfile[i].count, sMessageProfile[i].time / 1000000.0,
+			sMessageProfile[i].time / sMessageProfile[i].count);
+	}
+#endif
 }
 
 
@@ -554,8 +569,17 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 	RootLayer *rootLayer = fWindowLayer->GetRootLayer();
 	// NOTE: is NULL when fWindowLayer is offscreen!
-	if (rootLayer)
+	if (rootLayer) {
+#ifdef PROFILE_MESSAGE_LOOP
+		bigtime_t start = system_time();
+#endif
 		rootLayer->Lock();
+#ifdef PROFILE_MESSAGE_LOOP
+		bigtime_t diff = system_time() - start;
+		if (diff > 10000)
+			printf("ServerWindow %s: root lock acquisition took %Ld usecs\n", Title(), diff);
+#endif
+	}
 
 	switch (code) {
 		//--------- BView Messages -----------------
@@ -1749,21 +1773,20 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_LAYER_DRAW_BITMAP_ASYNC_AT_POINT:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_(A)SYNC_AT_POINT: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
-			int32		bitmapToken;
-			BPoint 		point;
-			
+			int32 bitmapToken;
+			BPoint point;
 			link.Read<int32>(&bitmapToken);
 			link.Read<BPoint>(&point);
-			
-			ServerBitmap* sbmp = fServerApp->FindBitmap(bitmapToken);
-			if (sbmp) {
-				BRect src = sbmp->Bounds();
+
+			ServerBitmap* bitmap = fServerApp->FindBitmap(bitmapToken);
+			if (bitmap) {
+				BRect src = bitmap->Bounds();
 				BRect dst = src.OffsetToCopy(point);
 				fCurrentLayer->ConvertToScreenForDrawing(&dst);
 
-				driver->DrawBitmap(sbmp, src, dst, fCurrentLayer->CurrentState());
+				driver->DrawBitmap(bitmap, src, dst, fCurrentLayer->CurrentState());
 			}
-			
+
 			// TODO: how should AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT sync with the client?
 			// It Doesn't have to. Sync means: force a sync of the view/link, so that
 			// the bitmap is already drawn when the "BView::DrawBitmap()" call returns.
@@ -1776,18 +1799,18 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_(A)SYNC_IN_RECT: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
 			int32 bitmapToken;
 			BRect srcRect, dstRect;
-			
+
 			link.Read<int32>(&bitmapToken);
 			link.Read<BRect>(&dstRect);
 			link.Read<BRect>(&srcRect);
-			
-			ServerBitmap* sbmp = fServerApp->FindBitmap(bitmapToken);
-			if (sbmp) {
+
+			ServerBitmap* bitmap = fServerApp->FindBitmap(bitmapToken);
+			if (bitmap) {
 				fCurrentLayer->ConvertToScreenForDrawing(&dstRect);
 
-				driver->DrawBitmap(sbmp, srcRect, dstRect, fCurrentLayer->CurrentState());
+				driver->DrawBitmap(bitmap, srcRect, dstRect, fCurrentLayer->CurrentState());
 			}
-			
+
 			// TODO: how should AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT sync with the client?
 			break;
 		}
@@ -2066,7 +2089,17 @@ ServerWindow::_MessageLooper()
 			break;
 		}
 
+#ifdef PROFILE_MESSAGE_LOOP
+		bigtime_t start = system_time();
+#endif
+
 		Lock();
+
+#ifdef PROFILE_MESSAGE_LOOP
+		bigtime_t diff = system_time() - start;
+		if (diff > 10000)
+			printf("ServerWindow %s: lock acquisition took %Ld usecs\n", Title(), diff);
+#endif
 
 		switch (code) {
 			case AS_DELETE_WINDOW:
@@ -2105,6 +2138,20 @@ ServerWindow::_MessageLooper()
 				_DispatchMessage(code, receiver);
 				break;
 		}
+
+#ifdef PROFILE_MESSAGE_LOOP
+		if (code >= 0 && code < AS_LAST_CODE) {
+			diff = system_time() - start;
+			atomic_add(&sMessageProfile[code].count, 1);
+#ifdef __HAIKU__
+			atomic_add64(&sMessageProfile[code].time, diff);
+#else
+			sMessageProfile[code].time += diff;
+#endif
+			if (diff > 10000)
+				printf("ServerWindow %s: message %ld took %Ld usecs\n", Title(), code, diff);
+		}
+#endif
 
 		Unlock();
 	}
