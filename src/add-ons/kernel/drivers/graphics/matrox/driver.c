@@ -119,16 +119,19 @@ static struct {
 	{0x0000, NULL}
 };
 
-static settings current_settings = { // see comments in mga.settings 
-	// for driver
+/* see comments in mga.settings */
+static settings current_settings =
+{
+	/* for kerneldriver */
 	DRIVER_PREFIX ".accelerant",
-	false,      // dumprom
-	// for accelerant
-	0x00000000, // logmask
-	0,          // memory
-	false,      // usebios
-	false,      // hardcursor
-	false,		// greensync
+	"none",					// primary
+	false,      			// dumprom
+	/* for accelerant */
+	0x00000000, 			// logmask
+	0,          			// memory
+	false,      			// usebios
+	false,      			// hardcursor
+	false,					// greensync
 };
 
 static void dumprom (void *rom, size_t size, pci_info pcii)
@@ -226,11 +229,15 @@ init_driver(void) {
 		const char *item;
 		char       *end;
 		uint32      value;
-		
+
 		// for driver
 		item = get_driver_parameter (settings_handle, "accelerant", "", "");
 		if ((strlen (item) > 0) && (strlen (item) < sizeof (current_settings.accelerant) - 1)) {
 			strcpy (current_settings.accelerant, item);
+		}
+		item = get_driver_parameter (settings_handle, "primary", "", "");
+		if ((strlen (item) > 0) && (strlen (item) < sizeof (current_settings.primary) - 1)) {
+			strcpy (current_settings.primary, item);
 		}
 		current_settings.dumprom = get_driver_boolean_parameter (settings_handle, "dumprom", false, false);
 
@@ -562,28 +569,41 @@ static void unmap_device(device_info *di) {
 	di->regs = NULL;
 }
 
-static void probe_devices(void) {
+static void probe_devices(void)
+{
 	uint32 pci_index = 0;
 	uint32 count = 0;
 	device_info *di = pd->di;
+	char tmp_name[B_OS_NAME_LENGTH];
 
 	/* while there are more pci devices */
-	while ((count < MAX_DEVICES) && ((*pci_bus->get_nth_pci_info)(pci_index, &(di->pcii)) == B_NO_ERROR)) {
+	while ((count < MAX_DEVICES) && ((*pci_bus->get_nth_pci_info)(pci_index, &(di->pcii)) == B_NO_ERROR))
+	{
 		int vendor = 0;
-		
+
 		/* if we match a supported vendor */
-		while (SupportedDevices[vendor].vendor) {
-			if (SupportedDevices[vendor].vendor == di->pcii.vendor_id) {
+		while (SupportedDevices[vendor].vendor)
+		{
+			if (SupportedDevices[vendor].vendor == di->pcii.vendor_id)
+			{
 				uint16 *devices = SupportedDevices[vendor].devices;
 				/* while there are more supported devices */
-				while (*devices) {
+				while (*devices)
+				{
 					/* if we match a supported device */
-					if (*devices == di->pcii.device_id ) {
+					if (*devices == di->pcii.device_id )
+					{
 						/* publish the device name */
-						sprintf(di->name, "graphics/" DEVICE_FORMAT,
+						sprintf(tmp_name, DEVICE_FORMAT,
 							di->pcii.vendor_id, di->pcii.device_id,
 							di->pcii.bus, di->pcii.device, di->pcii.function);
-
+						/* tweak the exported name to show first in the alphabetically ordered /dev/
+						 * hierarchy folder, so the system will use it as primary adaptor if requested
+						 * via mga.settings. */
+						if (strcmp(tmp_name, current_settings.primary) == 0)
+							sprintf(tmp_name, "-%s", current_settings.primary);
+						/* add /dev/ hierarchy path */
+						sprintf(di->name, "graphics/%s", tmp_name);
 						/* remember the name */
 						pd->device_names[count] = di->name;
 						/* mark the driver as available for R/W open */
@@ -609,6 +629,7 @@ next_device:
 		/* next pci_info struct, please */
 		pci_index++;
 	}
+
 	/* propagate count */
 	pd->count = count;
 	/* terminate list of device names with a null pointer */

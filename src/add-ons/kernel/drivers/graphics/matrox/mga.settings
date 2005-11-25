@@ -4,18 +4,19 @@
 # ~/config/settings/kernel/drivers/
 #
 
-# mga.driver parameters
-# accelerant "mga.accelerant"
+# mga.driver parameters:
+#accelerant "mga.accelerant"	# if enabled selects accelerant filename to be used
+#primary	"102b_0521_020000"	# if enabled selects device to be used as primary device ('hack')
+dumprom    false        			# dump bios rom to file (in home folder)
 
-# mga.accelerant parameters
-usebios    false			# if true rely on bios to coldstart the card instead of driver
-#memory     2			# in MB, override builtin memory size detection
-hardcursor true			# if true use on-chip cursor capabilities
-#logmask   0x00000000	# nothing logged, except errors, is default
-#logmask   0x08000604	# log overlay use in full
-#logmask 	0xffffffff		# log everything
-dumprom    false        		# dump bios rom in ~/mga.rom
-greensync	false			# if true generate sync on green output signal
+# mga.accelerant parameters:
+usebios    false				# if true rely on bios to coldstart the card instead of driver
+#memory     2				# in MB, override builtin memory size detection
+hardcursor true				# if true use on-chip cursor capabilities
+#logmask   0x00000000		# nothing logged, is default
+#logmask   0x08000604		# log overlay use in full to file (in home folder)
+#logmask 	0xffffffff			# log everything to file (in home folder)
+greensync	false				# if true generate sync on green output signal
 
 #--------- that's all.
 
