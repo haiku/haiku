@@ -96,16 +96,17 @@ TermBuffer::TermBuffer(int rows, int cols)
 	mRowSize = rows;
 	
 	mRowOffset = 0;
-	
+
 	//buffer_size = ARRAY_SIZE;
 	buffer_size  = gTermPref->getInt32 (PREF_HISTORY_SIZE);
-	
+
 	// Allocate buffer
 	mBase = (term_buffer**)  malloc (sizeof (term_buffer*)  * buffer_size);
-	
-	for(int i = 0; i < buffer_size; i++)
+
+	for (int i = 0; i < buffer_size; i++)
 		mBase[i] = (term_buffer *) calloc (mColSize + 1, sizeof (term_buffer));
 }
+
 
 TermBuffer::~TermBuffer()
 {
@@ -115,26 +116,29 @@ TermBuffer::~TermBuffer()
   free(mBase);
 }
 
-// Gets a character from TermBuffer
+
+//! Gets a character from TermBuffer
 int
-TermBuffer::GetChar (int row, int col, uchar *buf, ushort *attr)
+TermBuffer::GetChar(int row, int col, uchar *buf, ushort *attr)
 {
-	term_buffer *ptr;
-	
-	ptr = (mBase[row % buffer_size] + col);
-	
+	if (row < 0 || col < 0)
+		return -1;
+
+	term_buffer *ptr = (mBase[row % buffer_size] + col);
+
 	if (ptr->status == A_CHAR)
-		memcpy (buf, (char *)(ptr->code), 4);
-	
+		memcpy(buf, (char *)(ptr->code), 4);
+
 	*attr = ptr->attr;
-	
+
 	return ptr->status;
 }
 
-// Get a string (length = num) from given position.
+
+//! Get a string (length = num) from given position.
 int
-TermBuffer::GetString (int row, int col, int num, uchar *buf, 
-						ushort *attr)
+TermBuffer::GetString(int row, int col, int num, uchar *buf, 
+	ushort *attr)
 {
 	int count = 0, all_count = 0;
 	term_buffer *ptr;

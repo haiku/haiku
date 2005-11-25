@@ -904,7 +904,9 @@ TermView::MouseTracking(void *data)
 		}
 	
 	edpos = theObj->BPointToCurPos(edpoint);
-	
+	if (edpos.y < 0)
+		continue;
+
 		if(stpoint == edpoint) {
 			continue;
 		} else {
