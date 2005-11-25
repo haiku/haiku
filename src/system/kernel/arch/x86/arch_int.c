@@ -334,6 +334,9 @@ i386_handle_trap(struct iframe frame)
 	struct thread *thread = thread_get_current_thread();
 	int ret = B_HANDLED_INTERRUPT;
 
+	// all exceptions besides 3 (breakpoint), and 99 (syscall) enter this
+	// function with interrupts disabled
+
 	if (thread)
 		x86_push_iframe(&thread->arch_info.iframes, &frame);
 	else
@@ -530,6 +533,9 @@ i386_handle_trap(struct iframe frame)
 	}
 
 	if (frame.cs == USER_CODE_SEG) {
+		enable_interrupts();
+			// interrupts are not enabled at this point if we came from
+			// a hardware interrupt
 		thread_at_kernel_exit();
 		i386_init_user_debug_at_kernel_exit(&frame);
 	}

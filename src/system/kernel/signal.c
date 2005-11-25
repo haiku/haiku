@@ -169,11 +169,6 @@ handle_signals(struct thread *thread)
 						&& !notify_debugger(thread, signal, handler, true))
 						continue;
 
-					// ToDo: when we have more than a thread per process,
-					// it can likely happen (for any thread other than the first)
-					// that here, interrupts are still disabled.
-					// Just search for the cause if it still happens!
-
 					thread_exit();
 						// won't return
 			}
