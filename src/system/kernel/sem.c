@@ -642,6 +642,10 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 		goto err;
 	}
 
+#ifdef DEBUG_LAST_ACQUIRER
+	sSems[slot].u.used.last_acquirer = -1;
+#endif
+
 	// clear out a queue we will use to hold all of the threads that we will have to
 	// put back into the run list. This is done so the thread lock wont be held
 	// while this sems lock is held since the two locks are grabbed in the other
