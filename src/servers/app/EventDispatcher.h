@@ -82,6 +82,7 @@ class EventDispatcher : public BLocker {
 		Target*			fFocus;
 		Target*			fLastFocus;
 		bool			fTransit;
+		bool			fFocusGotExitTransit;
 		bool			fSuspendFocus;
 
 		BMessageFilter*	fMouseFilter;

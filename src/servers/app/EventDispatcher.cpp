@@ -369,6 +369,7 @@ EventDispatcher::SetFocus(const BMessenger* messenger)
 	} else
 		fFocus = NULL;
 
+	fFocusGotExitTransit = true;
 	fTransit = true;
 }
 
@@ -765,9 +766,24 @@ EventDispatcher::_EventLoop()
 				pointerEvent = true;
 
 				if (fFocus != NULL) {
+					int32 viewToken;
+
 					addedTokens |= _AddTokens(event, fFocus, B_POINTER_EVENTS);
 					if (addedTokens)
 						_SetFeedFocus(event);
+					else if (fFocusGotExitTransit) {
+						// TODO: this is a temporary hack to not continue to
+						// send mouse messages to the client when the mouse
+						// pointer is not over it
+						if (event->FindInt32("_view_token", &viewToken) != B_OK)
+							break;
+
+						fFocusGotExitTransit = false;
+					} else if (event->what == B_MOUSE_MOVED) {
+						if (event->FindInt32("_view_token", &viewToken) != B_OK)
+							fFocusGotExitTransit = true;
+					}
+
 					_SendMessage(fFocus->Messenger(), event, event->what == B_MOUSE_MOVED
 						? kMouseMovedImportance : kStandardImportance);
 				}
