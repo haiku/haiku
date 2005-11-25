@@ -84,6 +84,7 @@ typedef	struct
 typedef struct settings {  // apsed, see comments in mga.settings
 	// for driver
 	char   accelerant[B_FILE_NAME_LENGTH];
+	char   primary[B_FILE_NAME_LENGTH];
 	bool   dumprom;
 	// for accelerant
 	uint32 logmask;
