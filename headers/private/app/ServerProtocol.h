@@ -27,6 +27,9 @@ enum {
 	SERVER_TRUE = B_OK,
 	SERVER_FALSE = B_ERROR,
 
+	// NOTE: all defines have to start with "AS_" to let the "code_to_name"
+	// utility work correctly
+
 	AS_REGISTER_INPUT_SERVER = 1,
 	AS_GET_DESKTOP,
 
@@ -101,7 +104,6 @@ enum {
 	AS_ACTIVATE_WINDOW,
 	AS_WINDOW_MINIMIZE,
 	AS_UPDATE_IF_NEEDED,
-	_ALL_UPDATED_,	// this should be moved in place of _UPDATE_IF_NEEDED_ in AppDefs.h
 
 	// BPicture definitions
 	AS_CREATE_PICTURE,
@@ -316,7 +318,8 @@ enum {
 	AS_DW_GET_SYNC_DATA,
 	AS_DW_SUPPORTS_WINDOW_MODE,
 	AS_DW_SET_FULLSCREEN,
-	
+
+	AS_LAST_CODE
 };
 
 #define AS_PATTERN_SIZE 8
