@@ -2087,7 +2087,7 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 
 	// Create the server-side window
 
-	port_id receivePort = create_port(B_LOOPER_PORT_DEFAULT_CAPACITY, "w_rcv_port");
+	port_id receivePort = create_port(B_LOOPER_PORT_DEFAULT_CAPACITY, "w<app_server");
 	if (receivePort < B_OK) {
 		debugger("Could not create BWindow's receive port, used for interacting with the app_server!");
 		delete this;
