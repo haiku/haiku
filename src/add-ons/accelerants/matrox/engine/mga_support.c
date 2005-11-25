@@ -7,14 +7,14 @@
 #include <stdarg.h>
 #include "mga_std.h"
 
-/*delays in multiple of microseconds*/
+/* delays in multiple of microseconds */
 void delay(bigtime_t i)
 {
 	bigtime_t start=system_time();
 	while(system_time()-start<i);
 }
 
-/*debug logging*/
+/* debug logging */
 void mga_log(char *fmt, ...)
 {
 	char     buffer[1024];
