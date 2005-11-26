@@ -114,6 +114,8 @@ Desktop::MouseDown(BPoint where, uint32 buttons)
 			// complete redraw
 #if RUN_WITH_FRAME_BUFFER
 			if (fDrawingEngine->Lock()) {
+				fDirtyRegion.MakeEmpty();
+
 				BRegion region(fDrawingEngine->Bounds());
 				fDrawingEngine->Unlock();
 
@@ -123,6 +125,7 @@ Desktop::MouseDown(BPoint where, uint32 buttons)
 				_SetBackground(&region);
 			}
 #else
+			fDirtyRegion.MakeEmpty();
 			fDrawingEngine->MarkDirty();
 #endif
 		}
@@ -156,10 +159,13 @@ Desktop::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 
 		if (dx != 0 || dy != 0) {
 			if (fClickedWindow) {
+//bigtime_t now = system_time();
 				if (fResizing) {
 					ResizeWindowBy(fClickedWindow, dx, dy);
+//printf("resizing: %lld\n", system_time() - now);
 				} else {
 					MoveWindowBy(fClickedWindow, dx, dy);
+//printf("moving: %lld\n", system_time() - now);
 				}
 			}
 		}
@@ -355,9 +361,9 @@ Desktop::MoveWindowBy(WindowLayer* window, int32 x, int32 y)
 	if (LockClipping()) {
 		// the dirty region starts with the visible area of the window being moved
 		BRegion newDirtyRegion(window->VisibleRegion());
-		BRegion alreadyDirtyRegion(fDirtyRegion);
 		// we have to move along the part of the current dirty region
 		// that intersects with the window being moved
+		BRegion alreadyDirtyRegion(fDirtyRegion);
 		alreadyDirtyRegion.IntersectWith(&window->VisibleRegion());
 
 		window->MoveBy(x, y);

@@ -2,10 +2,11 @@
 #ifndef	VIEW_LAYER_H
 #define VIEW_LAYER_H
 
+#include <GraphicsDefs.h>
 #include <Region.h>
 #include <String.h>
 
-
+class BList;
 class DrawingEngine;
 class WindowLayer;
 
@@ -26,7 +27,8 @@ class ViewLayer {
 	inline	rgb_color		ViewColor() const
 								{ return fViewColor; }
 
-			void			AttachedToWindow(WindowLayer* window);
+			void			AttachedToWindow(WindowLayer* window,
+											 bool topLayer = false);
 			void			DetachedFromWindow();
 
 			// tree stuff
@@ -43,7 +45,8 @@ class ViewLayer {
 
 			ViewLayer*		TopLayer();
 
-			uint32			CountChildren() const;
+			uint32			CountChildren(bool deep = false) const;
+			void			CollectTokensForChildren(BList* tokenMap) const;
 
 			// coordinate conversion
 			void			ConvertToParent(BPoint* point) const;
@@ -66,23 +69,30 @@ class ViewLayer {
 			void			ParentResized(int32 dx, int32 dy,
 										  BRegion* dirtyRegion);
 
+			// for background clearing
 			void			Draw(DrawingEngine* drawingEngine,
 								 BRegion* effectiveClipping,
 								 bool deep = false);
+
+			// to simulate drawing done from client side
+			void			ClientDraw(DrawingEngine* drawingEngine,
+									   BRegion* effectiveClipping);
 
 			bool			IsHidden() const;
 			void			Hide();
 			void			Show();
 
 			// clipping
-			void			RebuildClipping(bool deep = false);
+			void			RebuildClipping(bool deep);
 			BRegion&		ScreenClipping() const;
 
 			// debugging
 			void			PrintToStream() const;
 
 private:
-			void			_InvalidateScreenClipping(bool deep = false);
+			void			_InvalidateScreenClipping(bool deep);
+			void			_MoveScreenClipping(int32 x, int32 y,
+												bool deep);
 
 			BString			fName;
 			// area within parent coordinate space
@@ -98,6 +108,7 @@ private:
 
 			WindowLayer*	fWindow;
 			ViewLayer*		fParent;
+			bool			fIsTopLayer;
 
 			ViewLayer*		fFirstChild;
 			ViewLayer*		fPreviousSibling;

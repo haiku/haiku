@@ -65,7 +65,8 @@ class Desktop : public BLooper {
 			void				ReadUnlockClipping() { fClippingLock.WriteUnlock(); }
 #  endif
 #else
-			bool				ReadLockClipping() { return fClippingLock.LockWithTimeout(10000) >= B_OK; }
+			bool				ReadLockClipping() { return fClippingLock.Lock(); }
+			bool				ReadLockClippingWithTimeout() { return fClippingLock.LockWithTimeout(10000) >= B_OK; }
 			void				ReadUnlockClipping() { fClippingLock.Unlock(); }
 #endif
 

@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 
+#include <List.h>
 #include <View.h> // for resize modes
 
 #include "Desktop.h"
@@ -28,6 +29,7 @@ ViewLayer::ViewLayer(BRect frame, const char* name,
 
 	  fWindow(NULL),
 	  fParent(NULL),
+	  fIsTopLayer(false),
 
 	  fFirstChild(NULL),
 	  fPreviousSibling(NULL),
@@ -70,9 +72,11 @@ ViewLayer::Bounds() const
 
 // AttachedToWindow
 void
-ViewLayer::AttachedToWindow(WindowLayer* window)
+ViewLayer::AttachedToWindow(WindowLayer* window, bool topLayer)
 {
 	fWindow = window;
+	fIsTopLayer = topLayer;
+
 	for (ViewLayer* child = FirstChild(); child; child = NextChild())
 		child->AttachedToWindow(window);
 }
@@ -200,17 +204,26 @@ ViewLayer::TopLayer()
 
 // CountChildren
 uint32
-ViewLayer::CountChildren() const
+ViewLayer::CountChildren(bool deep) const
 {
 	uint32 count = 0;
-	if (ViewLayer* layer = fFirstChild) {
+	for (ViewLayer* child = FirstChild(); child; child = NextChild()) {
 		count++;
-		while (layer->fNextSibling) {
-			count++;
-			layer = layer->fNextSibling;
+		if (deep) {
+			count += child->CountChildren(deep);
 		}
 	}
 	return count;	
+}
+
+// CollectTokensForChildren
+void
+ViewLayer::CollectTokensForChildren(BList* tokenMap) const
+{
+	for (ViewLayer* child = FirstChild(); child; child = NextChild()) {
+		tokenMap->AddItem((void*)child);
+		child->CollectTokensForChildren(tokenMap);
+	}
 }
 
 // ConvertToParent
@@ -277,41 +290,130 @@ ViewLayer::SetName(const char* string)
 	fName.SetTo(string);
 }
 
+#define HW_MOVE 0
+
 // MoveBy
 void
 ViewLayer::MoveBy(int32 x, int32 y)
 {
+	if (x == 0 && y == 0)
+		return;
+
+#if HW_MOVE
+	if (!fIsTopLayer && fWindow) {
+		// blit to new location (children as well)
+		BRect screenRect;
+if (fParent) {
+	screenRect = fFrame & fParent->Bounds();
+	fParent->ConvertToTop(&screenRect);
+} else {
+	screenRect = Bounds();
+	ConvertToTop(&screenRect);
+}
+
+		BRegion effectiveClippingRegion;
+		fWindow->GetContentRegion(&effectiveClippingRegion);
+		effectiveClippingRegion.IntersectWith(&fWindow->VisibleRegion());
+
+		BRegion copyRegion(screenRect);
+		copyRegion.IntersectWith(&effectiveClippingRegion);
+
+		copyRegion.OffsetBy(x, y);
+		copyRegion.IntersectWith(&effectiveClippingRegion);
+
+		BRegion alreadyDirty(screenRect);
+		{
+			BRegion windowDirty(fWindow->DirtyRegion());
+			alreadyDirty.IntersectWith(&windowDirty);
+		}
+
+		fFrame.OffsetBy(x, y);
+		_MoveScreenClipping(x, y, true);
+
+if (fParent) {
+	screenRect = fFrame & fParent->Bounds();
+	fParent->ConvertToTop(&screenRect);
+} else {
+	screenRect = Bounds();
+	ConvertToTop(&screenRect);
+}
+		BRegion dirtyRegion(screenRect);
+		dirtyRegion.Exclude(&copyRegion);
+
+		alreadyDirty.OffsetBy(x, y);
+		dirtyRegion.Include(&alreadyDirty);
+
+		fWindow->MarkDirty(&dirtyRegion);
+
+		copyRegion.OffsetBy(-x, -y);
+
+		if (fWindow->GetDrawingEngine()->Lock()) {
+			fWindow->GetDrawingEngine()->CopyRegion(&copyRegion, x, y);
+			fWindow->GetDrawingEngine()->Unlock();
+		}
+	} else {
+		fFrame.OffsetBy(x, y);
+		_MoveScreenClipping(x, y, true);
+	}
+#else // HW_MOVE
 	fFrame.OffsetBy(x, y);
 
-	_InvalidateScreenClipping(true);
-	// TODO: ...
+	_MoveScreenClipping(x, y, true);
+
+	if (!fIsTopLayer && fWindow) {
+		BRect screenRect(Bounds());
+		ConvertToTop(&screenRect);
+		screenRect = screenRect | screenRect.OffsetByCopy(-x, -y);
+		BRegion dirty(screenRect);
+
+		fWindow->MarkDirty(&dirty);
+	}
+#endif // !HW_MOVE
 }
 
 // ResizeBy
 void
 ViewLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 {
+	if (x == 0 && y == 0)
+		return;
+
 	BRect oldBounds(Bounds());
 
 	fFrame.right += x;
 	fFrame.bottom += y;
 
-	// layout the children
-	for (ViewLayer* child = FirstChild(); child; child = NextChild())
-		child->ParentResized(x, y, dirtyRegion);
-
-	// TODO: the dirty region must not include children!
 	BRegion dirty(Bounds());
-	if (!(fFlags & B_FULL_UPDATE_ON_RESIZE))
-		dirty.Exclude(oldBounds);
+	dirty.Include(oldBounds);
+	if (!(fFlags & B_FULL_UPDATE_ON_RESIZE)) {
+		// the dirty region is just the difference of
+		// old and new bounds
+		dirty.Exclude(oldBounds & Bounds());
+	}
+
+	_InvalidateScreenClipping(true);
 
 	if (dirty.CountRects() > 0) {
+		// exclude children, they are expected to
+		// have included their own dirty regions
+		for (ViewLayer* child = FirstChild(); child; child = NextChild()) {
+			BRect previousChildVisible(child->Frame() & oldBounds);
+			if (dirty.Frame().Intersects(previousChildVisible)) {
+				dirty.Exclude(previousChildVisible);
+			}
+		}
+
 		ConvertToTop(&dirty);
 		dirtyRegion->Include(&dirty);
 	}
 
+	// layout the children
+	for (ViewLayer* child = FirstChild(); child; child = NextChild())
+		child->ParentResized(x, y, dirtyRegion);
+
+	// at this point, children are at their new locations,
+	// so we can rebuild the clipping
 	RebuildClipping(false);
-	_InvalidateScreenClipping(true);
 }
 
 // ScrollBy
@@ -378,22 +480,11 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping, bool d
 	redraw.IntersectWith(effectiveClipping);
 
 	if (drawingEngine->Lock()) {
-		drawingEngine->ConstrainClippingRegion(&redraw);
-
 		// fill visible region with white
 		drawingEngine->SetHighColor(255, 255, 255);
 		BRect b(Bounds());
 		ConvertToTop(&b);
-		drawingEngine->FillRect(b);
-
-		// draw a frame with the view color
-		b.OffsetTo(0.0, 0.0);
-		ConvertToTop(&b);
-		drawingEngine->SetHighColor(fViewColor);
-		drawingEngine->StrokeRect(b);
-		drawingEngine->StrokeLine(b.LeftTop(), b.RightBottom());
-
-		drawingEngine->ConstrainClippingRegion(NULL);
+		drawingEngine->FillRegion(&redraw);
 
 		drawingEngine->MarkDirty(&redraw);
 		drawingEngine->Unlock();
@@ -408,6 +499,28 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping, bool d
 		for (ViewLayer* child = FirstChild(); child; child = NextChild()) {
 			child->Draw(drawingEngine, effectiveClipping, deep);
 		}
+	}
+}
+
+// ClientDraw
+void
+ViewLayer::ClientDraw(DrawingEngine* drawingEngine, BRegion* effectiveClipping)
+{
+	if (drawingEngine->Lock()) {
+		drawingEngine->ConstrainClippingRegion(effectiveClipping);
+
+		// draw a frame with the view color
+		BRect b(Bounds());
+		b.OffsetTo(0.0, 0.0);
+		ConvertToTop(&b);
+		drawingEngine->SetHighColor(fViewColor);
+		drawingEngine->StrokeRect(b);
+		drawingEngine->StrokeLine(b.LeftTop(), b.RightBottom());
+
+		drawingEngine->ConstrainClippingRegion(NULL);
+
+		drawingEngine->MarkDirty(effectiveClipping);
+		drawingEngine->Unlock();
 	}
 }
 
@@ -495,6 +608,20 @@ ViewLayer::_InvalidateScreenClipping(bool deep)
 			child->_InvalidateScreenClipping(deep);
 		}
 	}
+}
 
+// _MoveScreenClipping
+void
+ViewLayer::_MoveScreenClipping(int32 x, int32 y, bool deep)
+{
+	if (fScreenClippingValid)
+		fScreenClipping.OffsetBy(x, y);
+
+	if (deep) {
+		// invalidate the childrens screen clipping as well
+		for (ViewLayer* child = FirstChild(); child; child = NextChild()) {
+			child->_MoveScreenClipping(x, y, deep);
+		}
+	}
 }
 

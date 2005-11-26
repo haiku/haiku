@@ -5,6 +5,7 @@
 #include <Message.h>
 #include <MessageQueue.h>
 
+#include "ClientLooper.h"
 #include "Desktop.h"
 #include "DrawingEngine.h"
 
@@ -29,7 +30,15 @@ WindowLayer::WindowLayer(BRect frame, const char* name,
 	  fTopLayer(NULL),
 
 	  fDrawingEngine(drawingEngine),
-	  fDesktop(desktop)
+	  fDesktop(desktop),
+
+	  fTokenViewMap(64),
+
+	  fClient(new ClientLooper(name, this)),
+	  fCurrentUpdateSession(NULL),
+	  fPendingUpdateSession(NULL),
+	  fUpdateRequested(false),
+	  fInUpdate(false)
 {
 	// the top layer is special, it has a coordinate system
 	// as if it was attached directly to the desktop, therefor,
@@ -38,6 +47,9 @@ WindowLayer::WindowLayer(BRect frame, const char* name,
 	// fFrame as if it had
 	fTopLayer = new(nothrow) ViewLayer(fFrame, "top view", B_FOLLOW_ALL, 0,
 									   (rgb_color){ 255, 255, 255, 255 });
+	fTopLayer->AttachedToWindow(this, true);
+
+	fClient->Run();
 }
 
 // destructor
@@ -53,7 +65,7 @@ WindowLayer::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case MSG_REDRAW: {
 			if (!MessageQueue()->FindMessage(MSG_REDRAW, 0)) {
-				while (!fDesktop->ReadLockClipping()) {
+				while (!fDesktop->ReadLockClippingWithTimeout()) {
 //printf("%s MSG_REDRAW -> timeout\n", Name());
 					if (MessageQueue()->FindMessage(MSG_REDRAW, 0)) {
 //printf("%s MSG_REDRAW -> timeout - leaving because there are pending redraws\n", Name());
@@ -62,10 +74,23 @@ WindowLayer::MessageReceived(BMessage* message)
 				}
 				_DrawContents(fTopLayer);
 				_DrawBorder();
+
 				fDesktop->ReadUnlockClipping();
 			} else {
 //printf("%s MSG_REDRAW -> pending redraws\n", Name());
 			}
+			break;
+		}
+		case MSG_BEGIN_UPDATE:
+			_BeginUpdate();
+			break;
+		case MSG_END_UPDATE:
+			_EndUpdate();
+			break;
+		case MSG_DRAWING_COMMAND: {
+			int32 token;
+			if (message->FindInt32("token", &token) >= B_OK)
+				_DrawClient(token);
 			break;
 		}
 		default:
@@ -174,6 +199,11 @@ WindowLayer::MoveBy(int32 x, int32 y)
 	if (fContentRegionValid)
 		fContentRegion.OffsetBy(x, y);
 
+	if (fCurrentUpdateSession)
+		fCurrentUpdateSession->MoveBy(x, y);
+	if (fPendingUpdateSession)
+		fPendingUpdateSession->MoveBy(x, y);
+
 	fTopLayer->MoveBy(x, y);
 
 	// TODO: move a local dirty region!
@@ -210,6 +240,14 @@ WindowLayer::AddChild(ViewLayer* layer)
 {
 	fTopLayer->AddChild(layer);
 
+	// inform client about the view
+	// (just a part of the simulation)
+	fTokenViewMap.MakeEmpty();
+	fTopLayer->CollectTokensForChildren(&fTokenViewMap);
+	BMessage message(MSG_VIEWS_ADDED);
+	message.AddInt32("count", fTokenViewMap.CountItems());
+	fClient->PostMessage(&message);
+
 	// TODO: trigger redraw for dirty regions
 }
 
@@ -219,6 +257,18 @@ WindowLayer::MarkDirty(BRegion* regionOnScreen)
 {
 	if (fDesktop)
 		fDesktop->MarkDirty(regionOnScreen);
+}
+
+// DirtyRegion
+BRegion
+WindowLayer::DirtyRegion()
+{
+	BRegion dirty;
+	if (fDesktop->ReadLockClipping()) {
+		dirty = *fDesktop->DirtyRegion();
+		fDesktop->ReadUnlockClipping();
+	}
+	return dirty;
 }
 
 # pragma mark -
@@ -244,20 +294,50 @@ WindowLayer::_DrawContents(ViewLayer* layer)
 	// TODO: simplify
 	// ideally, there would only be a local fDirtyRegion,
 	// that we need to intersect with. fDirtyRegion would
-	// alread only include fVisibleRegion
+	// already only include fVisibleRegion
 	effectiveWindowClipping.IntersectWith(&fVisibleRegion);
 	effectiveWindowClipping.IntersectWith(fDesktop->DirtyRegion());
 	if (effectiveWindowClipping.Frame().IsValid()) {
+		// send UPDATE message to the client here
+		_MarkContentDirty(&effectiveWindowClipping);
+
 		layer->Draw(fDrawingEngine, &effectiveWindowClipping, true);
 
 		fDesktop->MarkClean(&fContentRegion);
-
-		// send UPDATE message to the client here
 	}
 //else {
 //printf("  nothing to do\n");
 //}
 
+}
+
+// _DrawClient
+void
+WindowLayer::_DrawClient(int32 token)
+{
+	ViewLayer* layer = (ViewLayer*)fTokenViewMap.ItemAt(token);
+	if (!layer)
+		return;
+
+	BRegion effectiveClipping(layer->ScreenClipping());
+	if (fInUpdate) {
+		// enforce the dirty region of the update session
+		effectiveClipping.IntersectWith(&fCurrentUpdateSession->DirtyRegion());
+	} else {
+printf("%s - _DrawClient(token: %ld) - not in update\n", Name(), token);
+	}
+
+	if (effectiveClipping.CountRects() > 0 && fDesktop->ReadLockClipping()) {
+		effectiveClipping.IntersectWith(&fVisibleRegion);
+		// TODO: This step seems too much
+		BRegion contentRegion;
+		GetContentRegion(&contentRegion);
+		effectiveClipping.IntersectWith(&contentRegion);
+
+		layer->ClientDraw(fDrawingEngine, &effectiveClipping);
+
+		fDesktop->ReadUnlockClipping();
+	}
 }
 
 // _DrawBorder
@@ -297,4 +377,91 @@ WindowLayer::_DrawBorder()
 //printf("  nothing to do\n");
 //}
 }
+
+// _MarkContentDirty
+void
+WindowLayer::_MarkContentDirty(BRegion* localDirty)
+{
+	if (localDirty->CountRects() <= 0)
+		return;
+	if (!fPendingUpdateSession) {
+		// create new pending
+		fPendingUpdateSession = new UpdateSession(*localDirty);
+	} else {
+		// add to pending
+		fPendingUpdateSession->Include(localDirty);
+	}
+
+	if (!fUpdateRequested) {
+		// send this to client
+		fClient->PostMessage(MSG_UPDATE);
+		fUpdateRequested = true;
+	}
+}
+
+// _BeginUpdate
+void
+WindowLayer::_BeginUpdate()
+{
+	if (fUpdateRequested && !fCurrentUpdateSession) {
+		fCurrentUpdateSession = fPendingUpdateSession;
+		fPendingUpdateSession = NULL;
+
+		if (fCurrentUpdateSession) {
+			// all drawing command from the client
+			// will have the dirty region from the update
+			// session enforced
+			fInUpdate = true;
+		}
+	}
+}
+
+// _EndUpdate
+void
+WindowLayer::_EndUpdate()
+{
+	if (fInUpdate) {
+		delete fCurrentUpdateSession;
+		fCurrentUpdateSession = NULL;
+	
+		fInUpdate = false;
+	}
+	if (fPendingUpdateSession) {
+		// send this to client
+		fClient->PostMessage(MSG_UPDATE);
+		fUpdateRequested = true;
+	} else {
+		fUpdateRequested = false;
+	}
+}
+
+#pragma mark -
+
+// constructor
+UpdateSession::UpdateSession(const BRegion& dirtyRegion)
+	: fDirtyRegion(dirtyRegion)
+{
+}
+
+// destructor
+UpdateSession::~UpdateSession()
+{
+}
+
+// Include
+void
+UpdateSession::Include(BRegion* additionalDirty)
+{
+	fDirtyRegion.Include(additionalDirty);
+}
+
+// MoveBy
+void
+UpdateSession::MoveBy(int32 x, int32 y)
+{
+	fDirtyRegion.OffsetBy(x, y);
+}
+
+
+
 

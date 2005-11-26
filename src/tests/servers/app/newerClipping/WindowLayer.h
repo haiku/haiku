@@ -2,17 +2,39 @@
 #ifndef WINDOW_LAYER_H
 #define WINDOW_LAYER_H
 
+#include <List.h>
 #include <Looper.h>
 #include <Region.h>
 #include <String.h>
 
 #include "ViewLayer.h"
 
+class ClientLooper;
 class Desktop;
 class DrawingEngine;
 
 enum {
-	MSG_REDRAW		= 'rdrw',
+	MSG_REDRAW			= 'rdrw',
+
+	MSG_BEGIN_UPDATE	= 'bgud',
+	MSG_END_UPDATE		= 'edud',
+	MSG_DRAWING_COMMAND	= 'draw',
+};
+
+class UpdateSession {
+ public:
+									UpdateSession(const BRegion& dirtyRegion);
+	virtual							~UpdateSession();
+
+			void					Include(BRegion* additionalDirty);
+
+	inline	BRegion&				DirtyRegion()
+										{ return fDirtyRegion; }
+
+			void					MoveBy(int32 x, int32 y);
+
+ private:
+			BRegion					fDirtyRegion;
 };
 
 class WindowLayer : public BLooper {
@@ -42,9 +64,19 @@ class WindowLayer : public BLooper {
 
 			void					MarkDirty(BRegion* regionOnScreen);
 
+			DrawingEngine*			GetDrawingEngine() const
+										{ return fDrawingEngine; }
+
+			BRegion					DirtyRegion();
+
  private:
 			void					_DrawContents(ViewLayer* layer = NULL);
+			void					_DrawClient(int32 token);
 			void					_DrawBorder();
+
+			void					_MarkContentDirty(BRegion* localDirty);
+			void					_BeginUpdate();
+			void					_EndUpdate();
 
 
 			BRect					fFrame;
@@ -65,6 +97,14 @@ class WindowLayer : public BLooper {
 
 			DrawingEngine*			fDrawingEngine;
 			Desktop*				fDesktop;
+
+			BList					fTokenViewMap;
+
+			ClientLooper*			fClient;
+			UpdateSession*			fCurrentUpdateSession;
+			UpdateSession*			fPendingUpdateSession;
+			bool					fUpdateRequested;
+			bool					fInUpdate;
 };
 
 #endif // WINDOW_LAYER_H
