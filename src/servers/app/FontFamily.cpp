@@ -21,6 +21,8 @@
 
 const uint32 kInvalidFamilyFlags = ~0UL;
 
+static BLocker sFontLock("font lock");
+
 
 static int
 font_score(const FontStyle* style)
@@ -56,7 +58,7 @@ compare_font_styles(const FontStyle* a, const FontStyle* b)
 	\param face FreeType handle for the font file after it is loaded - it will be kept open until the FontStyle is destroied
 */
 FontStyle::FontStyle(node_ref& nodeRef, const char* path, FT_Face face)
-	: BLocker(BString("FontStyle_").Append(face->style_name).String()),
+	: //BLocker(BString("FontStyle_").Append(face->style_name).String()),
 	fFreeTypeFace(face),
 	fName(face->style_name),
 	fPath(path),
@@ -104,6 +106,20 @@ FontStyle::CompareTo(Hashable& other) const
 {
 	// our hash values are unique (unless you have more than 65536 font families installed...)
 	return Hash() == other.Hash();
+}
+
+
+bool
+FontStyle::Lock()
+{
+	return sFontLock.Lock();
+}
+
+
+void
+FontStyle::Unlock()
+{
+	return sFontLock.Unlock();
 }
 
 
@@ -171,7 +187,7 @@ FontStyle::PreservedFace(uint16 face) const
 status_t
 FontStyle::UpdateFace(FT_Face face)
 {
-	if (!IsLocked()) {
+	if (!sFontLock.IsLocked()) {
 		debugger("UpdateFace() called without having locked FontStyle!");
 		return B_ERROR;
 	}

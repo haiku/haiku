@@ -66,7 +66,7 @@ class FontKey : public Hashable {
 	FontStyle objects help abstract a lot of the font engine details while
 	still offering plenty of information the style in question.
 */
-class FontStyle : public ReferenceCounting, public Hashable, public BLocker {
+class FontStyle : public ReferenceCounting, public Hashable/*, public BLocker*/ {
 	public:
 						FontStyle(node_ref& nodeRef, const char* path, FT_Face face);
 		virtual			~FontStyle();
@@ -75,6 +75,9 @@ class FontStyle : public ReferenceCounting, public Hashable, public BLocker {
 		virtual bool	CompareTo(Hashable& other) const;
 
 		const node_ref& NodeRef() const { return fNodeRef; }
+
+		bool			Lock();
+		void			Unlock();
 
 /*!
 	\fn bool FontStyle::IsFixedWidth(void)
