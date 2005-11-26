@@ -30,7 +30,8 @@ KernelAddon ipcp : kernel obos_network ppp :
 	Protocol.cpp
 ;
 
-SEARCH on [ FGristFiles inet_addr.c ] = [ FDirName $(HAIKU_TOP) src kits network libnet ] ;
+SEARCH on [ FGristFiles inet_addr.c ]
+	= [ FDirName $(HAIKU_TOP) src kits network compat libnet ] ;
 
 LinkAgainst ipcp : libkernelppp.a ;
 

@@ -155,7 +155,8 @@ AddDirectoryToHaikuImage beos etc KanBe dic user ;
 
 local libnetFiles = networks protocols resolv.conf services ;
 libnetFiles = $(libnetFiles:G=libnet-files) ;
-SEARCH on $(libnetFiles) = [ FDirName $(HAIKU_TOP) src kits network libnet ] ;
+SEARCH on $(libnetFiles)
+	= [ FDirName $(HAIKU_TOP) src kits network compat libnet ] ;
 AddFilesToHaikuImage beos etc : $(libnetFiles) ;
 
 local keymapFiles = [ GLOB [ FDirName $(HAIKU_TOP) src data etc keymaps ] : *.keymap ] ;

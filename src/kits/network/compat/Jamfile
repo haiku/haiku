@@ -1,0 +1,6 @@
+SubDir HAIKU_TOP src kits network compat ;
+
+SubInclude HAIKU_TOP src kits network compat libbind ;
+SubInclude HAIKU_TOP src kits network compat libnet ;
+SubInclude HAIKU_TOP src kits network compat libnetapi ;
+SubInclude HAIKU_TOP src kits network compat libsocket ;
