@@ -2176,8 +2176,10 @@ ServerWindow::SendMessageToClient(const BMessage* msg, int32 target) const
 	if ((ret = msg->Flatten(buffer, size)) == B_OK) {
 		ret = BMessage::Private::SendFlattenedMessage(buffer, size,
 			fClientLooperPort, target, 100000);
-		if (ret < B_OK)
-			fprintf(stderr, "ServerWindow::SendMessageToClient(): %s\n", strerror(ret));
+		if (ret < B_OK) {
+			fprintf(stderr, "ServerWindow(\"%s\")::SendMessageToClient('%.4s'): %s\n",
+				Title(), (char*)&msg->what, strerror(ret));
+		}
 	} else
 		printf("PANIC: ServerWindow %s: can't flatten message in 'SendMessageToClient()'\n", fTitle);
 
