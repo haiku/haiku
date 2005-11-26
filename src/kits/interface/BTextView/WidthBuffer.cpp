@@ -242,7 +242,7 @@ _BWidthBuffer_::GetEscapement(uint32 value, int32 index, float *escapement)
 	const _width_table_ &table = fBuffer[index];	
 	const hashed_escapement *widths = static_cast<hashed_escapement *>(table.widths);
 	uint32 hashed = Hash(value) & (table.tableCount - 1);
-	
+
 	DEBUG_ONLY(uint32 iterations = 1;)
 	uint32 found;
 	while ((found = widths[hashed].code) != kInvalidCode) {
@@ -253,15 +253,15 @@ _BWidthBuffer_::GetEscapement(uint32 value, int32 index, float *escapement)
 			hashed = 0;
 		DEBUG_ONLY(iterations++;)
 	}
-	
+
 	if (found == kInvalidCode)
 		return false;
-	
-	PRINT(("Value found with %d iterations\n", iterations));
-		
+
+	//PRINT(("Value found with %d iterations\n", iterations));
+
 	if (escapement != NULL)
 		*escapement = widths[hashed].escapement;
-	
+
 	return true;
 }
 
