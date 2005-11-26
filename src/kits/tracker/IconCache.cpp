@@ -349,6 +349,8 @@ IconCacheEntry *
 IconCache::GetIconFromMetaMime(const char *fileType, IconDrawMode mode,
 	icon_size size, LazyBitmapAllocator *lazyBitmap, IconCacheEntry *entry)
 {
+	ASSERT(fSharedCache.IsLocked());
+
 	if (!entry)
 		entry = fSharedCache.FindItem(fileType);
 
@@ -505,7 +507,7 @@ IconCache::GetVolumeIcon(AutoLock<SimpleIconCache> *nodeCacheLocker,
 	IconDrawMode mode, icon_size size, LazyBitmapAllocator *lazyBitmap)
 {	
 	*resultingOpenCache = nodeCacheLocker;
-	(*resultingOpenCache)->Lock();
+	nodeCacheLocker->Lock();
 
 	IconCacheEntry *entry = 0;
 	if (source != kUnknownSource) {
@@ -519,7 +521,7 @@ IconCache::GetVolumeIcon(AutoLock<SimpleIconCache> *nodeCacheLocker,
 				// this could be done a little cleaner if entry had a way to reach
 				// the cache it is in
 				*resultingOpenCache = sharedCacheLocker;
-				(*resultingOpenCache)->Lock();
+				sharedCacheLocker->Lock();
 			}
 
 			if (entry->HaveIconBitmap(mode, size)) 
@@ -555,6 +557,9 @@ IconCache::GetVolumeIcon(AutoLock<SimpleIconCache> *nodeCacheLocker,
 			entry->SetIcon(bitmap, kNormalIcon, size);
 			source = kVolume;
 		} else {
+			*resultingOpenCache = sharedCacheLocker;
+			sharedCacheLocker->Lock();
+
 			// If the volume doesnt have a device it should have the generic icon
 			entry = GetIconFromMetaMime(B_VOLUME_MIMETYPE, mode,
 				size, lazyBitmap, entry);
