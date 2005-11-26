@@ -19,6 +19,8 @@ enum {
 };
 
 #define MULTI_LOCKER 0
+#define SHOW_GLOBAL_DIRTY_REGION 0
+#define SHOW_WINDOW_CONTENT_DIRTY_REGION 0
 
 class Desktop : public BLooper {
  public:

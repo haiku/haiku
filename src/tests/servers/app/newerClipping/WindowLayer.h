@@ -27,6 +27,7 @@ class UpdateSession {
 	virtual							~UpdateSession();
 
 			void					Include(BRegion* additionalDirty);
+			void					Exclude(BRegion* dirtyInNextSession);
 
 	inline	BRegion&				DirtyRegion()
 										{ return fDirtyRegion; }

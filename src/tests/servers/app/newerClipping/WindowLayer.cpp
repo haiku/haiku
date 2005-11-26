@@ -322,6 +322,8 @@ WindowLayer::_DrawContents(ViewLayer* layer)
 		dirtyContentRegion.IntersectWith(fDesktop->DirtyRegion());
 
 		if (dirtyContentRegion.CountRects() > 0) {
+
+#if SHOW_WINDOW_CONTENT_DIRTY_REGION
 if (fDrawingEngine->Lock()) {
 	fDrawingEngine->SetHighColor(0, 0, 255);
 	fDrawingEngine->FillRegion(&dirtyContentRegion);
@@ -329,7 +331,7 @@ if (fDrawingEngine->Lock()) {
 	fDrawingEngine->Unlock();
 	snooze(100000);
 }
-
+#endif
 			// send UPDATE message to the client
 			_MarkContentDirty(&dirtyContentRegion);
 
@@ -435,6 +437,14 @@ WindowLayer::_MarkContentDirty(BRegion* contentDirtyRegion)
 		fPendingUpdateSession->Include(contentDirtyRegion);
 	}
 
+	// clip pending update session from current,
+	// current update session, because the backgrounds have been
+	// cleared again already 
+	if (fCurrentUpdateSession) {
+		fCurrentUpdateSession->Exclude(contentDirtyRegion);
+		fEffectiveDrawingRegionValid = false;
+	}
+
 	if (!fUpdateRequested) {
 		// send this to client
 		fClient->PostMessage(MSG_UPDATE);
@@ -456,6 +466,7 @@ WindowLayer::_BeginUpdate()
 			// session enforced
 			fInUpdate = true;
 		}
+		fEffectiveDrawingRegionValid = false;
 	}
 }
 
@@ -468,6 +479,7 @@ WindowLayer::_EndUpdate()
 		fCurrentUpdateSession = NULL;
 	
 		fInUpdate = false;
+		fEffectiveDrawingRegionValid = false;
 	}
 	if (fPendingUpdateSession) {
 		// send this to client
@@ -496,6 +508,13 @@ void
 UpdateSession::Include(BRegion* additionalDirty)
 {
 	fDirtyRegion.Include(additionalDirty);
+}
+
+// Exclude
+void
+UpdateSession::Exclude(BRegion* dirtyInNextSession)
+{
+	fDirtyRegion.Exclude(dirtyInNextSession);
 }
 
 // MoveBy
