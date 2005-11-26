@@ -109,7 +109,11 @@ AddFilesToHaikuImage beos bin			: $(BEOS_BIN) consoled <bin>route ;
 AddFilesToHaikuImage beos apps			: $(BEOS_APPS) ;
 AddFilesToHaikuImage beos preferences	: $(BEOS_PREFERENCES) ;
 
-AddSymlinkToHaikuImage beos bin : more : less ;
+AddDirectoryToHaikuImage home config be ;
+AddSymlinkToHaikuImage home config be : /boot/beos/apps : Applications ;
+AddSymlinkToHaikuImage home config be : /boot/beos/preferences : Preferences ;
+
+AddSymlinkToHaikuImage beos bin : less : more ;
 
 
 # scripts and data files
