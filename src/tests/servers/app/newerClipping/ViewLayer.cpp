@@ -545,17 +545,25 @@ void
 ViewLayer::ClientDraw(DrawingEngine* drawingEngine, BRegion* effectiveClipping)
 {
 	if (drawingEngine->Lock()) {
-		drawingEngine->ConstrainClippingRegion(effectiveClipping);
 
 		// draw a frame with the view color
 		BRect b(Bounds());
 		b.OffsetTo(0.0, 0.0);
 		ConvertToTop(&b);
+		drawingEngine->PushState();
+		drawingEngine->ConstrainClippingRegion(effectiveClipping);
+
 		drawingEngine->SetHighColor(fViewColor);
+		drawingEngine->SetDrawingMode(B_OP_BLEND);
 		drawingEngine->StrokeRect(b);
+		b.InsetBy(1, 1);
+		drawingEngine->StrokeRect(b);
+		b.InsetBy(1, 1);
+		drawingEngine->StrokeRect(b);
+		b.InsetBy(1, 1);
 		drawingEngine->StrokeLine(b.LeftTop(), b.RightBottom());
 
-		drawingEngine->ConstrainClippingRegion(NULL);
+		drawingEngine->PopState();
 
 		drawingEngine->MarkDirty(effectiveClipping);
 		drawingEngine->Unlock();
