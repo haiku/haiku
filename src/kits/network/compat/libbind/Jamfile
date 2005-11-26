@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src kits network libbind ;
+SubDir HAIKU_TOP src kits network compat libbind ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
@@ -6,7 +6,7 @@ UsePrivateHeaders net ;
 UseHeaders [ FDirName $(SUBDIR) headers ] : true ;
 SubDirSysHdrs $(SUBDIR) ;
 
-if $(TARGET_PLATFORM) != haiku {
+if ( $(TARGET_PLATFORM) != haiku ) {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
 		# We need the public network headers also when not compiling for Haiku.
 		# Unfortunately we get more than we want, namely all POSIX headers.
