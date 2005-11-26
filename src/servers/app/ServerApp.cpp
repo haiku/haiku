@@ -2109,6 +2109,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 					mode.virtual_height - 1 - bounds.Height());
 
 				gInputManager->UpdateScreenBounds(rootLayer->Bounds());
+				fDesktop->ScreenChanged(fDesktop->ScreenAt(0));
 			}
 			rootLayer->Unlock();
 

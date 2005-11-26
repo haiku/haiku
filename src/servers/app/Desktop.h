@@ -63,6 +63,8 @@ class Desktop : public MessageLooper, public ScreenOwner {
 	inline	::RootLayer*		RootLayer() const { return fRootLayer; }
 	inline	CursorManager&		GetCursorManager() { return fCursorManager; }
 
+			void				ScreenChanged(Screen* screen);
+
 	virtual void				ScreenRemoved(Screen* screen) {}
 	virtual void				ScreenAdded(Screen* screen) {}
 	virtual bool				ReleaseScreen(Screen* screen) { return false; }

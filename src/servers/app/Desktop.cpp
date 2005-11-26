@@ -480,6 +480,28 @@ Desktop::BroadcastToAllApps(int32 code)
 }
 
 
+void
+Desktop::ScreenChanged(Screen* screen)
+{
+	BMessage update(B_SCREEN_CHANGED);
+	update.AddInt64("when", real_time_clock_usecs());
+	update.AddRect("frame", screen->Frame());
+	update.AddInt32("mode", screen->ColorSpace());
+
+	BAutolock locker(this);
+
+	// send B_SCREEN_CHANGED to windows on that screen
+	// TODO: currently ignores the screen argument!
+
+	for (int32 i = fWindowLayerList.CountItems(); i-- > 0;) {
+		WindowLayer* layer = fWindowLayerList.ItemAt(i);
+		ServerWindow* window = layer->Window();
+
+		window->SendMessageToClient(&update);
+	}
+}
+
+
 //	#pragma mark - Methods for WindowLayer manipulation
 
 
@@ -721,9 +743,9 @@ Desktop::WriteWindowList(team_id team, BPrivate::LinkSender& sender)
 	int32 count = 0;
 	if (team >= B_OK) {
 		for (int32 i = 0; i < fWindowLayerList.CountItems(); i++) {
-			WindowLayer* border = fWindowLayerList.ItemAt(i);
+			WindowLayer* layer = fWindowLayerList.ItemAt(i);
 
-			if (border->Window()->ClientTeam() == team)
+			if (layer->Window()->ClientTeam() == team)
 				count++;
 		}
 	} else
@@ -735,12 +757,12 @@ Desktop::WriteWindowList(team_id team, BPrivate::LinkSender& sender)
 	sender.Attach<int32>(count);
 
 	for (int32 i = 0; i < fWindowLayerList.CountItems(); i++) {
-		WindowLayer* border = fWindowLayerList.ItemAt(i);
+		WindowLayer* layer = fWindowLayerList.ItemAt(i);
 
-		if (team >= B_OK && border->Window()->ClientTeam() != team)
+		if (team >= B_OK && layer->Window()->ClientTeam() != team)
 			continue;
 
-		sender.Attach<int32>(border->Window()->ServerToken());
+		sender.Attach<int32>(layer->Window()->ServerToken());
 	}
 
 	sender.Flush();
