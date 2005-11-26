@@ -105,6 +105,16 @@ InputServerStream::SendQuit()
 }
 
 
+void
+InputServerStream::UpdateScreenBounds(BRect bounds)
+{
+	BMessage update(IS_SCREEN_BOUNDS_UPDATED);
+	update.AddRect("screen_bounds", bounds);
+
+	fInputServer.SendMessage(&update);
+}
+
+
 bool
 InputServerStream::GetNextEvent(BMessage** _event)
 {

@@ -32,14 +32,9 @@
 #include "SystemKeymap.cpp"
 	// this is an automatically generated file
 
-#ifndef USE_R5_STYLE_COMM
 #include <ServerProtocol.h>
-#endif
 
 using std::nothrow;
-
-#define FAST_MOUSE_MOVED '_FMM'
-	// received from app_server when screen res changed, but could be sent to too. 
 
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
@@ -549,6 +544,26 @@ InputServer::MessageReceived(BMessage* message)
 		case IS_RELEASE_INPUT:
 			_ReleaseInput(message);
 			return;
+   		case IS_SCREEN_BOUNDS_UPDATED:
+   		{
+			// This is what the R5 app_server sends us when the screen
+			// configuration changes
+			BRect frame;
+			if (message->FindRect("screen_bounds", &frame) != B_OK)
+				frame = fScreen.Frame();
+
+			if (frame == fFrame)
+				break;
+
+			BPoint pos(fMousePos.x * frame.Width() / fFrame.Width(),
+				fMousePos.y * frame.Height() / fFrame.Height());
+			fFrame = frame;
+
+			BMessage set;
+			set.AddPoint("where", pos);
+			HandleSetMousePosition(&set, NULL);
+			break;
+		}
 
 		// device looper related
 		case IS_FIND_DEVICES:
@@ -1348,11 +1363,15 @@ InputServer::_SanitizeEvents(EventList& events)
 
 	while ((event = (BMessage*)events.ItemAt(index)) != NULL) {
 		switch (event->what) {
-	   		case FAST_MOUSE_MOVED:
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
+	   		case IS_SCREEN_BOUNDS_UPDATED:
 	   		{
-				// here we test for a message coming from app_server,
-				// screen resolution change could have happened
-				BRect frame = fScreen.Frame();
+				// This is what the R5 app_server sends us when the screen
+				// configuration changes
+				BRect frame;
+				if (event->FindRect("screen_bounds", &frame) != B_OK)
+					frame = fScreen.Frame();
+
 				if (frame != fFrame) {
 					fMousePos.x = fMousePos.x * frame.Width() / fFrame.Width();
 					fMousePos.y = fMousePos.y * frame.Height() / fFrame.Height();
@@ -1365,6 +1384,7 @@ InputServer::_SanitizeEvents(EventList& events)
 				event->AddPoint("where", fMousePos);
 				// supposed to fall through
 			}
+#endif
 	   		case B_MOUSE_MOVED:
 	   		case B_MOUSE_DOWN:
 	   		{

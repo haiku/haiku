@@ -53,4 +53,8 @@
 #define IS_ADD_METHOD					'MRa!'
 #define IS_REMOVE_METHOD				'MRr!'
 
+// Change screen resolution
+#define IS_SCREEN_BOUNDS_UPDATED		'_FMM'
+	// R5 compatible definition
+
 #endif	/* INPUT_SERVER_TYPES_H */

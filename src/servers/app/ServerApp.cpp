@@ -2107,6 +2107,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				BRect bounds = rootLayer->Bounds();
 				rootLayer->ResizeBy(mode.virtual_width - 1 - bounds.Width(),
 					mode.virtual_height - 1 - bounds.Height());
+
+				gInputManager->UpdateScreenBounds(rootLayer->Bounds());
 			}
 			rootLayer->Unlock();
 

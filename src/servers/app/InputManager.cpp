@@ -85,3 +85,19 @@ InputManager::PutStream(EventStream* stream)
 		delete stream;
 }
 
+
+void
+InputManager::UpdateScreenBounds(BRect bounds)
+{
+	BAutolock _(this);
+
+	for (int32 i = fUsedStreams.CountItems(); i-- > 0;) {
+		fUsedStreams.ItemAt(i)->UpdateScreenBounds(bounds);
+	}
+
+	for (int32 i = fFreeStreams.CountItems(); i-- > 0;) {
+		fFreeStreams.ItemAt(i)->UpdateScreenBounds(bounds);
+	}
+}
+
+
