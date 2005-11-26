@@ -135,6 +135,16 @@ Screen::Frame() const
 }
 
 
+color_space
+Screen::ColorSpace() const
+{
+	display_mode mode;
+	fHWInterface->GetMode(&mode);
+
+	return (color_space)mode.space;
+}
+
+
 status_t
 Screen::_FindMode(uint16 width, uint16 height, uint32 colorspace,
 				  float frequency, display_mode* mode) const

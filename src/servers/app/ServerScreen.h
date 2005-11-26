@@ -12,6 +12,7 @@
 
 
 #include <Accelerant.h>
+#include <GraphicsDefs.h>
 #include <Point.h>
 
 
@@ -41,6 +42,7 @@ class Screen {
 										uint32 &colorspace,
 										float &frequency) const;
 			BRect				Frame() const;
+			color_space			ColorSpace() const;
 
 	inline	int32				ScreenNumber() const
 									{ return fID; }
