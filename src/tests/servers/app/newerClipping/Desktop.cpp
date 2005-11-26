@@ -538,6 +538,15 @@ Desktop::MarkDirty(BRegion* region)
 	if (LockClipping()) {
 		// add the new dirty region to the culmulative dirty region
 		fDirtyRegion.Include(region);
+
+if (fDrawingEngine->Lock()) {
+	fDrawingEngine->SetHighColor(255, 0, 0);
+	fDrawingEngine->FillRegion(region);
+	fDrawingEngine->MarkDirty(region);
+	fDrawingEngine->Unlock();
+	snooze(100000);
+}
+
 		// send redraw messages to all windows intersecting the dirty region
 		_TriggerWindowRedrawing(region);
 

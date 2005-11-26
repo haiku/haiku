@@ -313,26 +313,22 @@ void
 WindowLayer::_DrawContents(ViewLayer* layer)
 {
 //printf("%s - DrawContents()\n", Name());
-#if SLOW_DRAWING
-	snooze(10000);
-#endif
-
 	if (!layer)
 		layer = fTopLayer;
 
 	if (fDesktop->ReadLockClipping()) {
 	
-		BRegion effectiveWindowClipping(fVisibleContentRegion);
-		effectiveWindowClipping.IntersectWith(fDesktop->DirtyRegion());
+		BRegion dirtyContentRegion(fVisibleContentRegion);
+		dirtyContentRegion.IntersectWith(fDesktop->DirtyRegion());
 
-		if (effectiveWindowClipping.Frame().IsValid()) {
+		if (dirtyContentRegion.CountRects() > 0) {
 			// send UPDATE message to the client
-			_MarkContentDirty(&effectiveWindowClipping);
+			_MarkContentDirty(&dirtyContentRegion);
 	
-			layer->Draw(fDrawingEngine, &effectiveWindowClipping,
+			layer->Draw(fDrawingEngine, &dirtyContentRegion,
 						&fVisibleContentRegion, true);
 	
-			fDesktop->MarkClean(&fContentRegion);
+			fDesktop->MarkClean(&dirtyContentRegion);
 		}
 
 		fDesktop->ReadUnlockClipping();
