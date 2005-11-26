@@ -460,7 +460,7 @@ ViewLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 		// exclude children, they are expected to
 		// have included their own dirty regions
 		for (ViewLayer* child = FirstChild(); child; child = NextChild()) {
-			BRect previousChildVisible(child->Frame() & oldBounds);
+			BRect previousChildVisible(child->Frame() & oldBounds & Bounds());
 			if (dirty.Frame().Intersects(previousChildVisible)) {
 				dirty.Exclude(previousChildVisible);
 			}
