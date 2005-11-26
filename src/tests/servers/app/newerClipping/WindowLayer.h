@@ -75,7 +75,7 @@ class WindowLayer : public BLooper {
 			void					_DrawClient(int32 token);
 			void					_DrawBorder();
 
-			void					_MarkContentDirty(BRegion* localDirty);
+			void					_MarkContentDirty(BRegion* contentDirtyRegion);
 			void					_BeginUpdate();
 			void					_EndUpdate();
 

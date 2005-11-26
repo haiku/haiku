@@ -76,8 +76,8 @@ WindowLayer::MessageReceived(BMessage* message)
 						return;
 					}
 				}
-				_DrawContents(fTopLayer);
 				_DrawBorder();
+				_DrawContents(fTopLayer);
 
 				fDesktop->ReadUnlockClipping();
 			} else {
@@ -171,7 +171,7 @@ WindowLayer::GetContentRegion(BRegion* region)
 		// resize handle
 		// if (B_DOCUMENT_WINDOW_LOOK)
 			fContentRegion.Exclude(BRect(fFrame.right - 10, fFrame.bottom - 10,
-								   fFrame.right, fFrame.bottom));
+										 fFrame.right, fFrame.bottom));
 
 		fContentRegionValid = true;
 	}
@@ -189,7 +189,7 @@ WindowLayer::SetFocus(bool focus)
 		if (fDesktop->ReadLockClipping()) {
 			BRegion dirty(fBorderRegion);
 			dirty.IntersectWith(&fVisibleRegion);
-			MarkDirty(&dirty);
+			fDesktop->MarkDirty(&dirty);
 
 			fDesktop->ReadUnlockClipping();
 		}
@@ -281,7 +281,7 @@ WindowLayer::MarkDirty(BRegion* regionOnScreen)
 		fDesktop->MarkDirty(regionOnScreen);
 }
 
-// MarkDirty
+// MarkContentDirty
 void
 WindowLayer::MarkContentDirty(BRegion* regionOnScreen)
 {
@@ -322,13 +322,21 @@ WindowLayer::_DrawContents(ViewLayer* layer)
 		dirtyContentRegion.IntersectWith(fDesktop->DirtyRegion());
 
 		if (dirtyContentRegion.CountRects() > 0) {
+if (fDrawingEngine->Lock()) {
+	fDrawingEngine->SetHighColor(0, 0, 255);
+	fDrawingEngine->FillRegion(&dirtyContentRegion);
+	fDrawingEngine->MarkDirty(&dirtyContentRegion);
+	fDrawingEngine->Unlock();
+	snooze(100000);
+}
+
 			// send UPDATE message to the client
 			_MarkContentDirty(&dirtyContentRegion);
-	
+
+			fDesktop->MarkClean(&dirtyContentRegion);
+
 			layer->Draw(fDrawingEngine, &dirtyContentRegion,
 						&fVisibleContentRegion, true);
-	
-			fDesktop->MarkClean(&dirtyContentRegion);
 		}
 
 		fDesktop->ReadUnlockClipping();
@@ -385,13 +393,23 @@ WindowLayer::_DrawBorder()
 		// intersect with the Desktop's dirty region
 		dirtyBorderRegion.IntersectWith(fDesktop->DirtyRegion());
 	
-		if (dirtyBorderRegion.Frame().IsValid()) {
+		if (dirtyBorderRegion.CountRects() > 0) {
 			if (fDrawingEngine->Lock()) {
-				if (fFocus)
-					fDrawingEngine->SetHighColor(255, 203, 0, 255);
-				else
-					fDrawingEngine->SetHighColor(216, 216, 216, 0);
-				fDrawingEngine->FillRegion(&dirtyBorderRegion);
+
+				fDrawingEngine->ConstrainClippingRegion(&dirtyBorderRegion);
+
+				if (fFocus) {
+					fDrawingEngine->SetLowColor(255, 203, 0, 255);
+					fDrawingEngine->SetHighColor(0, 0, 0, 255);
+				} else {
+					fDrawingEngine->SetLowColor(216, 216, 216, 0);
+					fDrawingEngine->SetHighColor(0, 0, 0, 255);
+				}
+
+				fDrawingEngine->FillRect(dirtyBorderRegion.Frame(), B_SOLID_LOW);
+				fDrawingEngine->DrawString(Name(), BPoint(fFrame.left, fFrame.top - 5));
+
+				fDrawingEngine->ConstrainClippingRegion(NULL);
 				fDrawingEngine->MarkDirty(&dirtyBorderRegion);
 				fDrawingEngine->Unlock();
 			}
@@ -404,16 +422,17 @@ WindowLayer::_DrawBorder()
 
 // _MarkContentDirty
 void
-WindowLayer::_MarkContentDirty(BRegion* localDirty)
+WindowLayer::_MarkContentDirty(BRegion* contentDirtyRegion)
 {
-	if (localDirty->CountRects() <= 0)
+	if (contentDirtyRegion->CountRects() <= 0)
 		return;
+
 	if (!fPendingUpdateSession) {
 		// create new pending
-		fPendingUpdateSession = new UpdateSession(*localDirty);
+		fPendingUpdateSession = new UpdateSession(*contentDirtyRegion);
 	} else {
 		// add to pending
-		fPendingUpdateSession->Include(localDirty);
+		fPendingUpdateSession->Include(contentDirtyRegion);
 	}
 
 	if (!fUpdateRequested) {
