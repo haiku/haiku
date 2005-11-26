@@ -456,7 +456,7 @@ WindowLayer::MouseDown(BMessage *msg, BPoint where)
 		}
 	} else if (target != NULL) {
 		// clicking a simple Layer.
-		if (GetRootLayer()->ActiveWorkspace()->Active() != this) {
+		if (GetRootLayer()->ActiveWorkspace()->Focus() != this) {
 			DesktopSettings desktopSettings(GetRootLayer()->GetDesktop());
 
 			// not in FFM mode?

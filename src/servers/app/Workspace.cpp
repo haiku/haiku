@@ -96,7 +96,6 @@ Workspace::State::PrintToStream()
 {
 	printf("WS::State - Front: %s\n", Front? Front->Name(): "NULL");
 	printf("WS::State - Focus: %s\n", Focus? Focus->Name(): "NULL");
-	printf("WS::State - Active: %s\n", Active? Active->Name(): "NULL");
 
 	for (int32 i = 0; i < WindowList.CountItems(); ++i) {
 		Layer *l = (Layer*)WindowList.ItemAt(i);
@@ -215,17 +214,9 @@ Workspace::Front() const
 WindowLayer *
 Workspace::Active() const
 {
-	// in case of a normal or modal window
-	if (fFrontItem && fFrontItem == fFocusItem)
-		return fFrontItem->layerPtr;
-
-	// a floating window is considered active if it has focus.
-	if (fFocusItem &&  (fFocusItem->layerPtr->Level() == B_FLOATING_APP ||
-						fFocusItem->layerPtr->Level() == B_FLOATING_ALL))
-		return fFocusItem->layerPtr;
-
-	return NULL;
+	return fFocusItem ? fFocusItem->layerPtr : NULL;
 }
+
 
 /*!
 	\brief Method that returns the state of window manager.
@@ -233,15 +224,14 @@ Workspace::Active() const
 	\return void
 
 	Fills the state structure with the most important window manager attibutes:
-front window, focus window, active window and the list of windows starting from
-the backmost one at position 0 and ending with the most visible window.
+	front window, focus window, active window and the list of windows starting from
+	the backmost one at position 0 and ending with the most visible window.
 */
 void
 Workspace::GetState(Workspace::State *state) const
 {
 	state->Front = Front();
 	state->Focus = Focus();
-	state->Active = Active();
 
 	ListData *cursor = fTopItem;
 	while (cursor) {
@@ -250,11 +240,14 @@ Workspace::GetState(Workspace::State *state) const
 		cursor = cursor->lowerItem;
 	}
 }
+
+
 bool
 Workspace::AttemptToSetFront(WindowLayer *newFront)
 {
 	return MoveToFront(newFront);
 }
+
 
 int32
 Workspace::AttemptToSetFocus(WindowLayer *newFocus)

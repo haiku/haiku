@@ -57,7 +57,6 @@ class Workspace {
 
 				WindowLayer* Front;
 				WindowLayer* Focus;
-				WindowLayer* Active;
 				BList		WindowList;
 		};
 								Workspace(	const int32 ID,

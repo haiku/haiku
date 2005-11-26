@@ -70,7 +70,7 @@ public:
 // TODO: we need to replace Winborder* with Layer*
 	inline	WindowLayer*			Focus() const { return fWMState.Focus; }
 	inline	WindowLayer*			Front() const { return fWMState.Front; }
-	inline	WindowLayer*			Active() const { return fWMState.Active; }
+	inline	WindowLayer*			Active() const { return fWMState.Focus; }
 			bool				SetActive(WindowLayer* newActive, bool activate = true);
 
 	inline	void				SetWorkspaceCount(int32 wksCount);

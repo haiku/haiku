@@ -704,18 +704,17 @@ RootLayer::RevealNewWMState(Workspace::State &oldWMState)
 	// clear fWMState
 	fWMState.Focus = NULL;
 	fWMState.Front = NULL;
-	fWMState.Active = NULL;
 	fWMState.WindowList.MakeEmpty();
 
 	ActiveWorkspace()->GetState(&fWMState);
 
 	// send window activation messages
-	if (oldWMState.Active != fWMState.Active) {
-		if (oldWMState.Active)
-			oldWMState.Active->Activated(false);
-		if (fWMState.Active) {
-			fWMState.Active->Activated(true);
-			fDesktop->EventDispatcher().SetFocus(&fWMState.Active->Window()->FocusMessenger());
+	if (oldWMState.Focus != fWMState.Focus) {
+		if (oldWMState.Focus)
+			oldWMState.Focus->Activated(false);
+		if (fWMState.Focus) {
+			fWMState.Focus->Activated(true);
+			fDesktop->EventDispatcher().SetFocus(&fWMState.Focus->Window()->FocusMessenger());
 		} else
 			fDesktop->EventDispatcher().SetFocus(NULL);
 	}
