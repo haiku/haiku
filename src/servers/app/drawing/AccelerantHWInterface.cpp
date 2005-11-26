@@ -343,26 +343,12 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 	// prevent from doing the unnecessary
 	if (fModeCount > 0 && fBackBuffer && fFrontBuffer
 		&& fDisplayMode == mode) {
+		// TODO: better comparison of display modes
 		return B_OK;
 	}
 
-	if (fModeCount <= 0 || !fModeList) {
-		if (_UpdateModeList() != B_OK || fModeCount <= 0) {
-			ATRACE(("unable to update mode list\n"));
-			return B_ERROR;
-		}
-	}
-
-	// check if the mode is in our list
-	bool found = false;
-	for (int32 i = 0; i < fModeCount; i++) {
-		if (fModeList[i] == mode) {
-			found = true;
-			break;
-		}
-	}
-	if (!found)
-		return B_BAD_VALUE;
+	// just try to set the mode - we let the graphics driver
+	// approve or deny the request, as it should know best
 
 	fDisplayMode = mode;
 
