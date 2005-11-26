@@ -1,7 +1,4 @@
 SubDir HAIKU_TOP src system boot ;
 
-BuildPlatformMain bin2h : bin2h.c ;
-BuildPlatformMain bin2asm : bin2asm.c ;
-
 SubInclude HAIKU_TOP src system boot platform ;
 SubInclude HAIKU_TOP src system boot loader ;

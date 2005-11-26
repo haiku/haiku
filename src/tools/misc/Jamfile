@@ -1,0 +1,5 @@
+SubDir HAIKU_TOP src tools misc ;
+
+BuildPlatformMain bin2h : bin2h.c ;
+BuildPlatformMain bin2asm : bin2asm.c ;
+
