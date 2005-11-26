@@ -266,6 +266,33 @@ ViewLayer::ConvertToParent(BRegion* region) const
 					 fFrame.top - fScrollingOffset.y);
 }
 
+// ConvertFromParent
+void
+ViewLayer::ConvertFromParent(BPoint* point) const
+{
+	// remove scrolling offset and convert to parent coordinate space
+	point->x += fScrollingOffset.x - fFrame.left;
+	point->y += fScrollingOffset.y - fFrame.top;
+}
+
+// ConvertFromParent
+void
+ViewLayer::ConvertFromParent(BRect* rect) const
+{
+	// remove scrolling offset and convert to parent coordinate space
+	rect->OffsetBy(fScrollingOffset.x - fFrame.left,
+				   fScrollingOffset.y - fFrame.top);
+}
+
+// ConvertFromParent
+void
+ViewLayer::ConvertFromParent(BRegion* region) const
+{
+	// remove scrolling offset and convert to parent coordinate space
+	region->OffsetBy(fScrollingOffset.x - fFrame.left,
+					 fScrollingOffset.y - fFrame.top);
+}
+
 // ConvertToTop
 void
 ViewLayer::ConvertToTop(BPoint* point) const
@@ -637,6 +664,12 @@ ViewLayer::ScreenClipping(BRegion* windowContentClipping, bool force) const
 {
 	if (!fScreenClippingValid || force) {
 		fScreenClipping = fLocalClipping;
+		if (fParent) {
+			BRect parentWindow = fParent->Bounds();
+			ConvertFromParent(&parentWindow);
+			BRegion visibleInParent(parentWindow);
+			fScreenClipping.IntersectWith(&visibleInParent);
+		}
 		ConvertToTop(&fScreenClipping);
 		fScreenClipping.IntersectWith(windowContentClipping);
 		fScreenClippingValid = true;

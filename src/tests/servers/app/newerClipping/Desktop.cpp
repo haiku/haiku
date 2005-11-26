@@ -388,14 +388,14 @@ Desktop::MoveWindowBy(WindowLayer* window, int32 x, int32 y)
 			// could move by blitting
 			copyRegion.OffsetBy(x, y);
 			newDirtyRegion.Exclude(&copyRegion);
+			MarkClean(&copyRegion);
 			fDrawingEngine->MarkDirty(&copyRegion);
 	
 			fDrawingEngine->Unlock();
 		}
 		// include the moved peviously dirty region
-// TODO: redesign dirty regions to be located in
-// each window -> less intersecting
 		alreadyDirtyRegion.OffsetBy(x, y);
+		alreadyDirtyRegion.IntersectWith(&window->VisibleRegion());
 		newDirtyRegion.Include(&alreadyDirtyRegion);
 
 		MarkDirty(&newDirtyRegion);

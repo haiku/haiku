@@ -53,6 +53,10 @@ class ViewLayer {
 			void			ConvertToParent(BRect* rect) const;
 			void			ConvertToParent(BRegion* region) const; 
 
+			void			ConvertFromParent(BPoint* point) const;
+			void			ConvertFromParent(BRect* rect) const;
+			void			ConvertFromParent(BRegion* region) const; 
+
 			void			ConvertToTop(BPoint* point) const;
 			void			ConvertToTop(BRect* rect) const;
 			void			ConvertToTop(BRegion* region) const; 
