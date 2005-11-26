@@ -62,21 +62,27 @@ class ViewLayer {
 	inline	const char*		Name() const
 								{ return fName.String(); }
 
-			void			MoveBy(int32 dx, int32 dy);
-			void			ResizeBy(int32 dx, int32 dy, BRegion* dirtyRegion);
-			void			ScrollBy(int32 dx, int32 dy);
+			void			MoveBy(			int32 dx, int32 dy,
+											BRegion* dirtyRegion);
 
-			void			ParentResized(int32 dx, int32 dy,
-										  BRegion* dirtyRegion);
+			void			ResizeBy(		int32 dx, int32 dy,
+											BRegion* dirtyRegion);
+
+			void			ScrollBy(		int32 dx, int32 dy,
+											BRegion* dirtyRegion);
+
+			void			ParentResized(	int32 dx, int32 dy,
+											BRegion* dirtyRegion);
 
 			// for background clearing
-			void			Draw(DrawingEngine* drawingEngine,
-								 BRegion* effectiveClipping,
-								 bool deep = false);
+			void			Draw(			DrawingEngine* drawingEngine,
+											BRegion* effectiveClipping,
+											BRegion* windowContentClipping,
+											bool deep = false);
 
-			// to simulate drawing done from client side
-			void			ClientDraw(DrawingEngine* drawingEngine,
-									   BRegion* effectiveClipping);
+			// to simulate drawing triggered from client side
+			void			ClientDraw(		DrawingEngine* drawingEngine,
+											BRegion* effectiveClipping);
 
 			bool			IsHidden() const;
 			void			Hide();
@@ -84,13 +90,15 @@ class ViewLayer {
 
 			// clipping
 			void			RebuildClipping(bool deep);
-			BRegion&		ScreenClipping() const;
+			BRegion&		ScreenClipping(BRegion* windowContentClipping,
+										   bool force = false) const;
 
 			// debugging
 			void			PrintToStream() const;
 
+			void			InvalidateScreenClipping(bool deep);
+
 private:
-			void			_InvalidateScreenClipping(bool deep);
 			void			_MoveScreenClipping(int32 x, int32 y,
 												bool deep);
 

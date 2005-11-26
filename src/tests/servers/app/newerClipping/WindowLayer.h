@@ -52,8 +52,8 @@ class WindowLayer : public BLooper {
 	inline	BRegion&				VisibleRegion()
 										{ return fVisibleRegion; }
 			void					GetFullRegion(BRegion* region) const;
-			void					GetBorderRegion(BRegion* region) const;
-			void					GetContentRegion(BRegion* region) const;
+			void					GetBorderRegion(BRegion* region);
+			void					GetContentRegion(BRegion* region);
 
 			void					SetFocus(bool focus);
 
@@ -63,11 +63,12 @@ class WindowLayer : public BLooper {
 			void					AddChild(ViewLayer* layer);
 
 			void					MarkDirty(BRegion* regionOnScreen);
+			void					MarkContentDirty(BRegion* regionOnScreen);
 
 			DrawingEngine*			GetDrawingEngine() const
 										{ return fDrawingEngine; }
 
-			BRegion					DirtyRegion();
+//			BRegion					DirtyRegion();
 
  private:
 			void					_DrawContents(ViewLayer* layer = NULL);
@@ -84,12 +85,15 @@ class WindowLayer : public BLooper {
 			// Desktop thread, when using it, Desktop::LockClipping()
 			// has to be called
 			BRegion					fVisibleRegion;
+			BRegion					fVisibleContentRegion;
 
 			// caching local regions
 			BRegion					fBorderRegion;
 			bool					fBorderRegionValid;
 			BRegion					fContentRegion;
 			bool					fContentRegionValid;
+			BRegion					fEffectiveDrawingRegion;
+			bool					fEffectiveDrawingRegionValid;
 
 			bool					fFocus;
 

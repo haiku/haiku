@@ -38,7 +38,7 @@ ClientLooper::MessageReceived(BMessage* message)
 
 			for (int32 i = 0; i < fViewCount; i++) {
 				// the client is slow
-				snooze(1000L);
+//				snooze(20000L);
 				// send the command to redraw a view
 				BMessage command(MSG_DRAWING_COMMAND);
 				command.AddInt32("token", i);

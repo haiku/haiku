@@ -116,7 +116,19 @@ ViewLayer::AddChild(ViewLayer* layer)
 
 	if (fWindow) {
 		layer->AttachedToWindow(fWindow);
-		fWindow->MarkDirty(&layer->ScreenClipping());
+
+		// TODO: not correct... need something like
+		// ViewLayer::ClipToParent(BRect frame)
+		// {
+		//     	frame = frame & Bounds();
+		//      ConvertToParent(&frame);
+		//      fParent->ClipToParent(&frame);
+		// }
+		BRect dirty(layer->Frame());
+		dirty = dirty & Bounds();
+		ConvertToTop(&dirty);
+		BRegion dirtyRegion(dirty);
+		fWindow->MarkContentDirty(&dirtyRegion);
 	}
 }
 
@@ -155,6 +167,7 @@ ViewLayer::RemoveChild(ViewLayer* layer)
 	}
 	if (fWindow) {
 		layer->DetachedFromWindow();
+		// TODO: handle exposed area
 	}
 
 	return true;
@@ -290,16 +303,14 @@ ViewLayer::SetName(const char* string)
 	fName.SetTo(string);
 }
 
-#define HW_MOVE 0
-
+#if 0
 // MoveBy
 void
-ViewLayer::MoveBy(int32 x, int32 y)
+ViewLayer::MoveBy(int32 x, int32 y, BRegion* dirtyRegion)
 {
 	if (x == 0 && y == 0)
 		return;
 
-#if HW_MOVE
 	if (!fIsTopLayer && fWindow) {
 		// blit to new location (children as well)
 		BRect screenRect;
@@ -355,21 +366,46 @@ if (fParent) {
 		fFrame.OffsetBy(x, y);
 		_MoveScreenClipping(x, y, true);
 	}
-#else // HW_MOVE
 	fFrame.OffsetBy(x, y);
-
-	_MoveScreenClipping(x, y, true);
-
-	if (!fIsTopLayer && fWindow) {
-		BRect screenRect(Bounds());
-		ConvertToTop(&screenRect);
-		screenRect = screenRect | screenRect.OffsetByCopy(-x, -y);
-		BRegion dirty(screenRect);
-
-		fWindow->MarkDirty(&dirty);
-	}
-#endif // !HW_MOVE
 }
+#else // 0
+
+// MoveBy
+void
+ViewLayer::MoveBy(int32 x, int32 y, BRegion* dirtyRegion)
+{
+	if (x == 0 && y == 0)
+		return;
+
+	fFrame.OffsetBy(x, y);
+	InvalidateScreenClipping(true);
+
+	if (!fIsTopLayer && dirtyRegion) {
+		if (fParent) {
+			// clip to parent
+			BRect oldScreenRect(Bounds());
+			oldScreenRect.OffsetByCopy(-x, -y);
+			ConvertToParent(&oldScreenRect);
+
+			BRect screenRect(Bounds());
+			ConvertToParent(&screenRect);
+
+			// TODO: see AddLayer
+			BRect dirty = oldScreenRect | screenRect;
+			dirty = dirty & fParent->Bounds();
+			fParent->ConvertToTop(&dirty);
+			
+			dirtyRegion->Include(dirty);
+		} else {
+			BRect screenRect(Bounds());
+			screenRect = screenRect | screenRect.OffsetByCopy(-x, -y);
+			ConvertToTop(&screenRect);
+
+			dirtyRegion->Include(screenRect);
+		}
+	}
+}
+#endif // 0
 
 // ResizeBy
 void
@@ -391,7 +427,7 @@ ViewLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 		dirty.Exclude(oldBounds & Bounds());
 	}
 
-	_InvalidateScreenClipping(true);
+	InvalidateScreenClipping(true);
 
 	if (dirty.CountRects() > 0) {
 		// exclude children, they are expected to
@@ -418,14 +454,14 @@ ViewLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 
 // ScrollBy
 void
-ViewLayer::ScrollBy(int32 x, int32 y)
+ViewLayer::ScrollBy(int32 x, int32 y, BRegion* dirtyRegion)
 {
 	fScrollingOffset.x += x;
 	fScrollingOffset.y += y;
 	// TODO: CopyRegion...
 	// TODO: ...
 
-	_InvalidateScreenClipping(true);
+	InvalidateScreenClipping(true);
 }
 
 // ParentResized
@@ -463,7 +499,7 @@ ViewLayer::ParentResized(int32 x, int32 y, BRegion* dirtyRegion)
 		// MoveBy will change fFrame, so cache it
 		BRect oldFrame = fFrame;
 		MoveBy(newFrame.left - oldFrame.left,
-			   newFrame.top - oldFrame.top);
+			   newFrame.top - oldFrame.top, dirtyRegion);
 
 		ResizeBy(newFrame.Width() - oldFrame.Width(),
 				 newFrame.Height() - oldFrame.Height(), dirtyRegion);
@@ -472,10 +508,11 @@ ViewLayer::ParentResized(int32 x, int32 y, BRegion* dirtyRegion)
 
 // Draw
 void
-ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping, bool deep)
+ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
+				BRegion* windowContentClipping,bool deep)
 {
 	// we can only draw within our own area
-	BRegion redraw(ScreenClipping());
+	BRegion redraw(ScreenClipping(windowContentClipping));
 	// add the current clipping
 	redraw.IntersectWith(effectiveClipping);
 
@@ -494,10 +531,11 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping, bool d
 	if (deep) {
 		// before passing the clipping on to children, exclude our
 		// own region from the available clipping
-		effectiveClipping->Exclude(&ScreenClipping());
+		effectiveClipping->Exclude(&ScreenClipping(windowContentClipping));
 
 		for (ViewLayer* child = FirstChild(); child; child = NextChild()) {
-			child->Draw(drawingEngine, effectiveClipping, deep);
+			child->Draw(drawingEngine, effectiveClipping,
+						windowContentClipping, deep);
 		}
 	}
 }
@@ -587,25 +625,26 @@ ViewLayer::RebuildClipping(bool deep)
 
 // ScreenClipping
 BRegion&
-ViewLayer::ScreenClipping() const
+ViewLayer::ScreenClipping(BRegion* windowContentClipping, bool force) const
 {
-	if (!fScreenClippingValid) {
+	if (!fScreenClippingValid || force) {
 		fScreenClipping = fLocalClipping;
 		ConvertToTop(&fScreenClipping);
+		fScreenClipping.IntersectWith(windowContentClipping);
 		fScreenClippingValid = true;
 	}
 	return fScreenClipping;
 }
 
-// _InvalidateScreenClipping
+// InvalidateScreenClipping
 void
-ViewLayer::_InvalidateScreenClipping(bool deep)
+ViewLayer::InvalidateScreenClipping(bool deep)
 {
 	fScreenClippingValid = false;
 	if (deep) {
 		// invalidate the childrens screen clipping as well
 		for (ViewLayer* child = FirstChild(); child; child = NextChild()) {
-			child->_InvalidateScreenClipping(deep);
+			child->InvalidateScreenClipping(deep);
 		}
 	}
 }
@@ -618,7 +657,7 @@ ViewLayer::_MoveScreenClipping(int32 x, int32 y, bool deep)
 		fScreenClipping.OffsetBy(x, y);
 
 	if (deep) {
-		// invalidate the childrens screen clipping as well
+		// move the childrens screen clipping as well
 		for (ViewLayer* child = FirstChild(); child; child = NextChild()) {
 			child->_MoveScreenClipping(x, y, deep);
 		}

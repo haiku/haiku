@@ -18,12 +18,16 @@ WindowLayer::WindowLayer(BRect frame, const char* name,
 						 DrawingEngine* drawingEngine, Desktop* desktop)
 	: BLooper(name),
 	  fFrame(frame),
+
 	  fVisibleRegion(),
+	  fVisibleContentRegion(),
 
 	  fBorderRegion(),
 	  fBorderRegionValid(false),
 	  fContentRegion(),
 	  fContentRegionValid(false),
+	  fEffectiveDrawingRegion(),
+	  fEffectiveDrawingRegionValid(false),
 
 	  fFocus(false),
 
@@ -103,10 +107,18 @@ WindowLayer::MessageReceived(BMessage* message)
 void
 WindowLayer::SetClipping(BRegion* stillAvailableOnScreen)
 {
+	// this function is only called from the Desktop thread
+
 	// start from full region (as if the window was fully visible)
 	GetFullRegion(&fVisibleRegion);
 	// clip to region still available on screen
 	fVisibleRegion.IntersectWith(stillAvailableOnScreen);
+
+	GetContentRegion(&fVisibleContentRegion);
+	fVisibleContentRegion.IntersectWith(&fVisibleRegion);
+
+	fEffectiveDrawingRegionValid = false;
+	fTopLayer->InvalidateScreenClipping(true);
 }
 
 // GetFullRegion
@@ -123,45 +135,48 @@ WindowLayer::GetFullRegion(BRegion* region) const
 
 // GetBorderRegion
 void
-WindowLayer::GetBorderRegion(BRegion* region) const
+WindowLayer::GetBorderRegion(BRegion* region)
 {
-	if (fBorderRegionValid) {
-		*region = fBorderRegion;
+	if (!fBorderRegionValid) {
+		// TODO: speed up by avoiding "Exclude()"
+		// start from the frame, extend to include decorator border
+		fBorderRegion.Set(BRect(fFrame.left - 4, fFrame.top - 4,
+						  fFrame.right + 4, fFrame.bottom + 4));
+	
+		fBorderRegion.Exclude(fFrame);
+	
+		// add the title tab
+		fBorderRegion.Include(BRect(fFrame.left - 4, fFrame.top - 20,
+							  (fFrame.left + fFrame.right) / 2, fFrame.top - 5));
+	
+		// resize handle
+		// if (B_DOCUMENT_WINDOW_LOOK)
+			fBorderRegion.Include(BRect(fFrame.right - 10, fFrame.bottom - 10,
+								  fFrame.right, fFrame.bottom));
+		fBorderRegionValid = true;
 	}
 
-	// TODO: speed up by avoiding "Exclude()"
-	// start from the frame, extend to include decorator border
-	region->Set(BRect(fFrame.left - 4, fFrame.top - 4,
-					  fFrame.right + 4, fFrame.bottom + 4));
-
-	region->Exclude(fFrame);
-
-	// add the title tab
-	region->Include(BRect(fFrame.left - 4, fFrame.top - 20,
-						  (fFrame.left + fFrame.right) / 2, fFrame.top - 5));
-
-	// resize handle
-	// if (B_DOCUMENT_WINDOW_LOOK)
-		region->Include(BRect(fFrame.right - 10, fFrame.bottom - 10,
-							  fFrame.right, fFrame.bottom));
+	*region = fBorderRegion;
 }
 
 // GetContentRegion
 void
-WindowLayer::GetContentRegion(BRegion* region) const
+WindowLayer::GetContentRegion(BRegion* region)
 {
-	if (fContentRegionValid) {
-		*region = fContentRegion;
+	if (!fContentRegionValid) {
+		// TODO: speed up by avoiding "Exclude()"
+		// start from the frame, extend to include decorator border
+		fContentRegion.Set(fFrame);
+	
+		// resize handle
+		// if (B_DOCUMENT_WINDOW_LOOK)
+			fContentRegion.Exclude(BRect(fFrame.right - 10, fFrame.bottom - 10,
+								   fFrame.right, fFrame.bottom));
+
+		fContentRegionValid = true;
 	}
 
-	// TODO: speed up by avoiding "Exclude()"
-	// start from the frame, extend to include decorator border
-	region->Set(fFrame);
-
-	// resize handle
-	// if (B_DOCUMENT_WINDOW_LOOK)
-		region->Exclude(BRect(fFrame.right - 10, fFrame.bottom - 10,
-							  fFrame.right, fFrame.bottom));
+	*region = fContentRegion;
 }
 
 // SetFocus
@@ -189,6 +204,8 @@ WindowLayer::SetFocus(bool focus)
 void
 WindowLayer::MoveBy(int32 x, int32 y)
 {
+	// this function is only called from the desktop thread
+
 	if (x == 0 && y == 0)
 		return;
 
@@ -204,9 +221,11 @@ WindowLayer::MoveBy(int32 x, int32 y)
 	if (fPendingUpdateSession)
 		fPendingUpdateSession->MoveBy(x, y);
 
-	fTopLayer->MoveBy(x, y);
+	fEffectiveDrawingRegionValid = false;
 
-	// TODO: move a local dirty region!
+	fTopLayer->MoveBy(x, y, NULL);
+
+	// the desktop will take care of dirty regions
 }
 
 // ResizeBy
@@ -219,18 +238,21 @@ WindowLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 	fFrame.right += x;
 	fFrame.bottom += y;
 
+	// put the previous border region into the dirty region as well
+	// to handle the part that was overlapping a layer
+	dirtyRegion->Include(&fBorderRegion);
+
 	fBorderRegionValid = false;
 	fContentRegionValid = false;
+	fEffectiveDrawingRegionValid = false;
 
 	// the border is dirty, put it into
 	// dirtyRegion for a start
-	GetBorderRegion(dirtyRegion);
+	BRegion newBorderRegion;
+	GetBorderRegion(&newBorderRegion);
+	dirtyRegion->Include(&newBorderRegion);
 
-	// put the previous border region into the dirty region as well
-	// to handle the part that was overlapping a layer
-//	if B_DOCUMENT_WINDOW_LOOK
-		dirtyRegion->Include(&fBorderRegion);
-
+	// TODO: should this be clipped to the content region?
 	fTopLayer->ResizeBy(x, y, dirtyRegion);
 }
 
@@ -259,6 +281,19 @@ WindowLayer::MarkDirty(BRegion* regionOnScreen)
 		fDesktop->MarkDirty(regionOnScreen);
 }
 
+// MarkDirty
+void
+WindowLayer::MarkContentDirty(BRegion* regionOnScreen)
+{
+	if (fDesktop && fDesktop->LockClipping()) {
+
+		regionOnScreen->IntersectWith(&fVisibleContentRegion);
+		fDesktop->MarkDirty(regionOnScreen);
+
+		fDesktop->UnlockClipping();
+	}
+}
+/*
 // DirtyRegion
 BRegion
 WindowLayer::DirtyRegion()
@@ -270,7 +305,7 @@ WindowLayer::DirtyRegion()
 	}
 	return dirty;
 }
-
+*/
 # pragma mark -
 
 // _DrawContents
@@ -285,30 +320,23 @@ WindowLayer::_DrawContents(ViewLayer* layer)
 	if (!layer)
 		layer = fTopLayer;
 
-	if (!fContentRegionValid) {
-		GetContentRegion(&fContentRegion);
-		fContentRegionValid = true;
+	if (fDesktop->ReadLockClipping()) {
+	
+		BRegion effectiveWindowClipping(fVisibleContentRegion);
+		effectiveWindowClipping.IntersectWith(fDesktop->DirtyRegion());
+
+		if (effectiveWindowClipping.Frame().IsValid()) {
+			// send UPDATE message to the client
+			_MarkContentDirty(&effectiveWindowClipping);
+	
+			layer->Draw(fDrawingEngine, &effectiveWindowClipping,
+						&fVisibleContentRegion, true);
+	
+			fDesktop->MarkClean(&fContentRegion);
+		}
+
+		fDesktop->ReadUnlockClipping();
 	}
-
-	BRegion effectiveWindowClipping(fContentRegion);
-	// TODO: simplify
-	// ideally, there would only be a local fDirtyRegion,
-	// that we need to intersect with. fDirtyRegion would
-	// already only include fVisibleRegion
-	effectiveWindowClipping.IntersectWith(&fVisibleRegion);
-	effectiveWindowClipping.IntersectWith(fDesktop->DirtyRegion());
-	if (effectiveWindowClipping.Frame().IsValid()) {
-		// send UPDATE message to the client here
-		_MarkContentDirty(&effectiveWindowClipping);
-
-		layer->Draw(fDrawingEngine, &effectiveWindowClipping, true);
-
-		fDesktop->MarkClean(&fContentRegion);
-	}
-//else {
-//printf("  nothing to do\n");
-//}
-
 }
 
 // _DrawClient
@@ -319,22 +347,25 @@ WindowLayer::_DrawClient(int32 token)
 	if (!layer)
 		return;
 
-	BRegion effectiveClipping(layer->ScreenClipping());
-	if (fInUpdate) {
-		// enforce the dirty region of the update session
-		effectiveClipping.IntersectWith(&fCurrentUpdateSession->DirtyRegion());
-	} else {
-printf("%s - _DrawClient(token: %ld) - not in update\n", Name(), token);
-	}
+	if (fDesktop->ReadLockClipping()) {
 
-	if (effectiveClipping.CountRects() > 0 && fDesktop->ReadLockClipping()) {
-		effectiveClipping.IntersectWith(&fVisibleRegion);
-		// TODO: This step seems too much
-		BRegion contentRegion;
-		GetContentRegion(&contentRegion);
-		effectiveClipping.IntersectWith(&contentRegion);
+		if (!fEffectiveDrawingRegionValid) {
+			fEffectiveDrawingRegion = fVisibleContentRegion;
+			if (fInUpdate) {
+				// enforce the dirty region of the update session
+				fEffectiveDrawingRegion.IntersectWith(&fCurrentUpdateSession->DirtyRegion());
+			} else {
+				printf("%s - _DrawClient(token: %ld) - not in update\n", Name(), token);
+			}
+			fEffectiveDrawingRegionValid = true;
+		}
 
-		layer->ClientDraw(fDrawingEngine, &effectiveClipping);
+		BRegion effectiveClipping(fEffectiveDrawingRegion);
+		effectiveClipping.IntersectWith(&layer->ScreenClipping(&fVisibleContentRegion));
+		
+		if (effectiveClipping.CountRects() > 0) {
+			layer->ClientDraw(fDrawingEngine, &effectiveClipping);
+		}
 
 		fDesktop->ReadUnlockClipping();
 	}
@@ -348,34 +379,31 @@ WindowLayer::_DrawBorder()
 #if SLOW_DRAWING
 	snooze(10000);
 #endif
-
-	if (!fBorderRegionValid) {
-		GetBorderRegion(&fBorderRegion);
-		fBorderRegionValid = true;
-	}
-
-	// construct the region of the border that needs redrawing
-	BRegion dirtyBorderRegion(fBorderRegion);
-	// intersect with our visible region
-	dirtyBorderRegion.IntersectWith(&fVisibleRegion);
-	// intersect with the Desktop's dirty region
-	dirtyBorderRegion.IntersectWith(fDesktop->DirtyRegion());
-
-	if (dirtyBorderRegion.Frame().IsValid()) {
-		if (fDrawingEngine->Lock()) {
-			if (fFocus)
-				fDrawingEngine->SetHighColor(255, 203, 0, 255);
-			else
-				fDrawingEngine->SetHighColor(216, 216, 216, 0);
-			fDrawingEngine->FillRegion(&dirtyBorderRegion);
-			fDrawingEngine->MarkDirty(&dirtyBorderRegion);
-			fDrawingEngine->Unlock();
+	if (fDesktop->ReadLockClipping()) {
+	
+		// construct the region of the border that needs redrawing
+		BRegion dirtyBorderRegion;
+		GetBorderRegion(&dirtyBorderRegion);
+		// intersect with our visible region
+		dirtyBorderRegion.IntersectWith(&fVisibleRegion);
+		// intersect with the Desktop's dirty region
+		dirtyBorderRegion.IntersectWith(fDesktop->DirtyRegion());
+	
+		if (dirtyBorderRegion.Frame().IsValid()) {
+			if (fDrawingEngine->Lock()) {
+				if (fFocus)
+					fDrawingEngine->SetHighColor(255, 203, 0, 255);
+				else
+					fDrawingEngine->SetHighColor(216, 216, 216, 0);
+				fDrawingEngine->FillRegion(&dirtyBorderRegion);
+				fDrawingEngine->MarkDirty(&dirtyBorderRegion);
+				fDrawingEngine->Unlock();
+			}
+			fDesktop->MarkClean(&dirtyBorderRegion);
 		}
-		fDesktop->MarkClean(&dirtyBorderRegion);
+
+		fDesktop->ReadUnlockClipping();
 	}
-//else {
-//printf("  nothing to do\n");
-//}
 }
 
 // _MarkContentDirty
