@@ -156,10 +156,14 @@ void MyView::MouseMoved(BPoint where, uint32 code, const BMessage *a_message)
 		{
 			if (fMovingLayer)
 			{
-				if (fIsResize)
+bigtime_t now = system_time();
+				if (fIsResize) {
 					fMovingLayer->ResizeBy(dx, dy);
-				else
+printf("resizing: %lld\n", system_time() - now);
+				} else {
 					fMovingLayer->MoveBy(dx, dy);
+printf("moving: %lld\n", system_time() - now);
+				}
 			}
 		}
 	}

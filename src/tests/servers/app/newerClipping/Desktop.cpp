@@ -159,13 +159,13 @@ Desktop::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 
 		if (dx != 0 || dy != 0) {
 			if (fClickedWindow) {
-//bigtime_t now = system_time();
+bigtime_t now = system_time();
 				if (fResizing) {
 					ResizeWindowBy(fClickedWindow, dx, dy);
-//printf("resizing: %lld\n", system_time() - now);
+printf("resizing: %lld\n", system_time() - now);
 				} else {
 					MoveWindowBy(fClickedWindow, dx, dy);
-//printf("moving: %lld\n", system_time() - now);
+printf("moving: %lld\n", system_time() - now);
 				}
 			}
 		}

@@ -87,23 +87,72 @@ Window::AddWindow(BRect frame, const char* name)
 		frame.OffsetTo(B_ORIGIN);
 		frame.InsetBy(15.0, 15.0);
 		if (frame.IsValid()) {
-			frame.bottom = (frame.top + frame.bottom) / 2 - 5;
 
-			ViewLayer* layer2 = new ViewLayer(frame, "View 2",
-											  B_FOLLOW_ALL,
-											  0, 
-											  (rgb_color){ 120, 120, 120, 255 });
-	
-			frame.OffsetBy(0.0, frame.Height() + 10);
+			BRect f = frame;
+			f.bottom = f.top + f.Height() / 3 - 3;
+			f.right = f.left + f.Width() / 3 - 3;
 
-			ViewLayer* layer3 = new ViewLayer(frame, "View 3",
-											  B_FOLLOW_BOTTOM,
-											  0, 
-											  (rgb_color){ 120, 120, 120, 255 });
-	
+			// top row of views
+			ViewLayer* layer;
+			layer = new ViewLayer(f, "View", B_FOLLOW_LEFT | B_FOLLOW_TOP,
+								  B_FULL_UPDATE_ON_RESIZE, (rgb_color){ 120, 120, 120, 255 });
+			layer1->AddChild(layer);
 
-			layer1->AddChild(layer2);
-			layer1->AddChild(layer3);
+			f.OffsetBy(f.Width() + 6, 0);
+
+			layer = new ViewLayer(f, "View", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+								  B_FULL_UPDATE_ON_RESIZE, (rgb_color){ 120, 120, 120, 255 });
+			layer1->AddChild(layer);
+
+			f.OffsetBy(f.Width() + 6, 0);
+
+			layer = new ViewLayer(f, "View", B_FOLLOW_RIGHT | B_FOLLOW_TOP,
+								  B_FULL_UPDATE_ON_RESIZE, (rgb_color){ 120, 120, 120, 255 });
+			layer1->AddChild(layer);
+
+			// middle row of views
+			f = frame;
+			f.bottom = f.top + f.Height() / 3 - 3;
+			f.right = f.left + f.Width() / 3 - 3;
+			f.OffsetBy(0, f.Height() + 6);
+
+			layer = new ViewLayer(f, "View", B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM,
+								  B_FULL_UPDATE_ON_RESIZE, (rgb_color){ 120, 120, 120, 255 });
+			layer1->AddChild(layer);
+
+			f.OffsetBy(f.Width() + 6, 0);
+
+			layer = new ViewLayer(f, "View", B_FOLLOW_ALL,
+								  B_FULL_UPDATE_ON_RESIZE, (rgb_color){ 120, 120, 120, 255 });
+			layer1->AddChild(layer);
+
+			f.OffsetBy(f.Width() + 6, 0);
+
+			layer = new ViewLayer(f, "View", B_FOLLOW_RIGHT | B_FOLLOW_TOP_BOTTOM,
+								  B_FULL_UPDATE_ON_RESIZE, (rgb_color){ 120, 120, 120, 255 });
+			layer1->AddChild(layer);
+
+			// bottom row of views
+			f = frame;
+			f.bottom = f.top + f.Height() / 3 - 3;
+			f.right = f.left + f.Width() / 3 - 3;
+			f.OffsetBy(0, 2 * f.Height() + 12);
+
+			layer = new ViewLayer(f, "View", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
+								  B_FULL_UPDATE_ON_RESIZE, (rgb_color){ 120, 120, 120, 255 });
+			layer1->AddChild(layer);
+
+			f.OffsetBy(f.Width() + 6, 0);
+
+			layer = new ViewLayer(f, "View", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM,
+								  B_FULL_UPDATE_ON_RESIZE, (rgb_color){ 120, 120, 120, 255 });
+			layer1->AddChild(layer);
+
+			f.OffsetBy(f.Width() + 6, 0);
+
+			layer = new ViewLayer(f, "View", B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM,
+								  B_FULL_UPDATE_ON_RESIZE, (rgb_color){ 120, 120, 120, 255 });
+			layer1->AddChild(layer);
 		}
 
 		window->AddChild(layer1);
@@ -120,16 +169,47 @@ Window::AddWindow(BRect frame, const char* name)
 void
 Window::Test()
 {
-	AddWindow(BRect(20, 20, 80, 80), "Window 1");
-	AddWindow(BRect(60, 60, 220, 180), "Window 2");
-	AddWindow(BRect(120, 160, 500, 380), "Window 3");
-	AddWindow(BRect(40, 210, 400, 280), "Window 4");
-	AddWindow(BRect(180, 410, 400, 680), "Window 5");
-	AddWindow(BRect(30, 350, 100, 440), "Window 6");
-	AddWindow(BRect(80, 10, 200, 120), "Window 7");
-	AddWindow(BRect(480, 40, 670, 320), "Window 8");
-	AddWindow(BRect(250, 500, 310, 600), "Window 9");
-	AddWindow(BRect(130, 450, 230, 500), "Window 10");
+	BRect frame(20, 20, 330, 230);
+	for (int32 i = 0; i < 20; i++) {
+		BString name("Window ");
+		frame.OffsetBy(20, 15);
+		name << i + 1;
+		AddWindow(frame, name.String());
+	}
+
+	frame.Set(10, 80, 320, 290);
+	for (int32 i = 20; i < 40; i++) {
+		BString name("Window ");
+		frame.OffsetBy(20, 15);
+		name << i + 1;
+		AddWindow(frame, name.String());
+	}
+
+/*	frame.Set(20, 140, 330, 230);
+	for (int32 i = 40; i < 60; i++) {
+		BString name("Window ");
+		frame.OffsetBy(20, 15);
+		name << i + 1;
+		AddWindow(frame, name.String());
+	}
+
+	frame.Set(20, 200, 330, 230);
+	for (int32 i = 60; i < 80; i++) {
+		BString name("Window ");
+		frame.OffsetBy(20, 15);
+		name << i + 1;
+		AddWindow(frame, name.String());
+	}
+
+	frame.Set(20, 260, 330, 230);
+// 99 windows are ok, the 100th looper does not run anymore,
+// I guess I'm hitting a BeOS limit (max loopers per app?)
+	for (int32 i = 80; i < 99; i++) {
+		BString name("Window ");
+		frame.OffsetBy(20, 15);
+		name << i + 1;
+		AddWindow(frame, name.String());
+	}*/
 }
 
 // main

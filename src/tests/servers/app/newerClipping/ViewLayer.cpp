@@ -458,7 +458,7 @@ ViewLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 
 	if (dirty.CountRects() > 0) {
 		// exclude children, they are expected to
-		// have included their own dirty regions
+		// include their own dirty regions in ParentResized()
 		for (ViewLayer* child = FirstChild(); child; child = NextChild()) {
 			BRect previousChildVisible(child->Frame() & oldBounds & Bounds());
 			if (dirty.Frame().Intersects(previousChildVisible)) {
@@ -523,13 +523,14 @@ ViewLayer::ParentResized(int32 x, int32 y, BRegion* dirtyRegion)
 		newFrame.bottom += y / 2;
 
 	if (newFrame != fFrame) {
-		// MoveBy will change fFrame, so cache it
-		BRect oldFrame = fFrame;
-		MoveBy(newFrame.left - oldFrame.left,
-			   newFrame.top - oldFrame.top, dirtyRegion);
+		// careful, MoveBy will change fFrame
+		int32 widthDiff = (int32)(newFrame.Width() - fFrame.Width());
+		int32 heightDiff = (int32)(newFrame.Height() - fFrame.Height());
 
-		ResizeBy(newFrame.Width() - oldFrame.Width(),
-				 newFrame.Height() - oldFrame.Height(), dirtyRegion);
+		MoveBy(newFrame.left - fFrame.left,
+			   newFrame.top - fFrame.top, dirtyRegion);
+
+		ResizeBy(widthDiff, heightDiff, dirtyRegion);
 	}
 }
 
