@@ -4,7 +4,4 @@ Package haiku-networkingkit-cvs :
 	README.html install.sh 
 ;
 
-# TODO: remove R5 target support
-# if ( $(TARGET_PLATFORM) != r5 ) {
-	SubInclude HAIKU_TOP src kits network compat ;
-# }
+SubInclude HAIKU_TOP src kits network compat ;

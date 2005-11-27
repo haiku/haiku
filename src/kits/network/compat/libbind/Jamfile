@@ -44,20 +44,15 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) resolv ] ;
 	SubDirC++Flags $(defines) ;
 }
 	
-if ( $(TARGET_PLATFORM) = haiku ) {
-	PLATFORM_LIBS = libroot.so libbe.so ;
-} else {
-	PLATFORM_LIBS = root be ;
-}
 
-SharedLibrary libbind.so :
-	# dst
+MergeObject <compatlibbind>dst.o :
 	dst_api.c
 	hmac_link.c
 	md5_dgst.c
 	support.c
-	
-	# inet
+;
+
+MergeObject <compatlibbind>inet.o :
 	inet_addr.c
 	inet_cidr_ntop.c
 	inet_cidr_pton.c
@@ -73,8 +68,9 @@ SharedLibrary libbind.so :
 	inet_ntop.c
 	inet_pton.c
 	nsap_addr.c
-	
-	# irs
+;
+
+MergeObject <compatlibbind>irs.o :
 	dns.c
 	dns_gr.c
 	dns_ho.c
@@ -136,8 +132,9 @@ SharedLibrary libbind.so :
 	nis_sv.c
 	nul_ng.c
 	util.c
-	
-	# isc (not used)
+;
+
+MergeObject <compatlibbind>isc.o :
 	assertions.c
 	base64.c
 	bitncmp.c
@@ -156,8 +153,9 @@ SharedLibrary libbind.so :
 	memcluster.c
 	movefile.c
 	tree.c
-	
-	# nameser
+;
+
+MergeObject <compatlibbind>nameser.o :
 	ns_date.c
 	ns_name.c
 	ns_netint.c
@@ -167,8 +165,9 @@ SharedLibrary libbind.so :
 	ns_sign.c
 	ns_ttl.c
 	ns_verify.c
-	
-	# resolv
+;
+
+MergeObject <compatlibbind>resolv.o :
 	herror.c
 	res_comp.c
 	res_data.c
@@ -181,6 +180,24 @@ SharedLibrary libbind.so :
 	res_send.c
 	res_sendsigned.c
 	res_update.c
+;
+
+Depends libbind.so :
+	<compatlibbind>dst.o
+	<compatlibbind>inet.o
+	<compatlibbind>irs.o
+	<compatlibbind>isc.o # (not used)
+	<compatlibbind>nameser.o
+	<compatlibbind>resolv.o
+;
+
+SharedLibrary libbind.so :
+	<compatlibbind>dst.o
+	<compatlibbind>inet.o
+	<compatlibbind>irs.o
+	<compatlibbind>isc.o # (not used)
+	<compatlibbind>nameser.o
+	<compatlibbind>resolv.o
 	
 	# functions from our libroot
 	# ToDo: these can be removed for the Haiku build
@@ -198,9 +215,10 @@ SharedLibrary libbind.so :
 ;
 
 LinkAgainst libbind.so :
-	$(PLATFORM_LIBS)
-	libsocket.so 
+	libsocket.so
 	libnet.so # for gethostname()
+	be
+	root
 ;
 
 # Installation -- in the test directory for the time being
