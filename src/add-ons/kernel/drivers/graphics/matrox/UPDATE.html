@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (SVN 0.24, Rudolf)</h1></p>
+<p><h1>head (SVN 0.25, Rudolf)</h1></p>
 <ul>
 <li><strong>G200-G550:</strong>
 <ul>
@@ -13,7 +13,12 @@
 <li><strong>General:</strong>
 <ul>
 <li>Several ProposeMode updates and fixes making the Matrox driver better compatible with Dualhead Setup 0.04;
-<li>Added capability to driver to run without an INT assigned. Driver will now automatically disable the 'Sync_to_Retrace' function if no INT was assigned instead of not loading/running at all.
+<li>Added capability to driver to run without an INT assigned. Driver will now automatically disable the 'Sync_to_Retrace' function if no INT was assigned instead of not loading/running at all;
+<li>Added new mga.setting ("primary") to force a certain card to be primary card in a system with multiple graphics cards: so it will display your desktop. To enable this (hack) feature uncomment this item and fill in the exact name of the card that is to be primary (as exported by the kerneldriver in /dev/graphics/). If you are going to select a card other than the one displaying your system's POST messages at bootup, make sure you also keep the default 'usebios false' setting as otherwise the card(s) aren't coldstarted by the driver.<br>
+<strong>Note please:</strong>
+<ul>
+<li>Coldstarting doesn't work on Millenium I and Millenium II cards yet.
+</ul>
 </ul>
 </ul>
 <p><h1>mga_driver 0.20 (Rudolf)</h1></p>
