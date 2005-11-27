@@ -4,17 +4,18 @@
 # ~/config/settings/kernel/drivers/
 #
 
-# nv.driver parameters
-# accelerant "nv.accelerant"
+# nv.driver parameters:
+# accelerant "nv.accelerant"		# if enabled selects accelerant filename to be used
+#primary	"10de_0110_000000"	# if enabled selects device to be used as primary device ('hack')
+dumprom	false        			# dump bios rom to file (in home folder)
 
-# nv.accelerant parameters
+# nv.accelerant parameters:
 usebios	true			# if true rely on bios to coldstart the card
 #memory	2			# in MB, override builtin memory size detection
 hardcursor	true			# if true use on-chip cursor capabilities
 #logmask	0x00000000	# nothing logged, is default
-#logmask	0x08000604	# log overlay use in full
-#logmask	0xffffffff		# log everything
-dumprom	false        		# dump bios rom in ~/nv.rom
+#logmask	0x08000604	# log overlay use in full to file (in home folder)
+#logmask	0xffffffff		# log everything to file (in home folder)
 switchhead	false			# switch head assignment (dualhead cards only)
 force_pci	false			# block AGP mode use if true (AGP cards only)
 dma_acc	true			# if true enable DMA cmd fetching for 2D acc (instead of using PIO)
