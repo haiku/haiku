@@ -5,8 +5,8 @@
 #
 
 # nv.driver parameters:
-# accelerant "nv.accelerant"		# if enabled selects accelerant filename to be used
-#primary	"10de_0110_000000"	# if enabled selects device to be used as primary device ('hack')
+#accelerant "nv.accelerant"		# if enabled selects accelerant filename to be used
+#primary	"10de_0110_010000"	# if enabled selects device to be used as primary device ('hack')
 dumprom	false        			# dump bios rom to file (in home folder)
 
 # nv.accelerant parameters:
