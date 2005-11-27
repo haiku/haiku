@@ -63,6 +63,11 @@ class WindowLayer : public BLooper {
 
 			void					AddChild(ViewLayer* layer);
 
+	inline	bool					IsHidden() const
+										{ return fHidden; }
+			void					Hide();
+			void					Show();
+
 			void					MarkDirty(BRegion* regionOnScreen);
 			void					MarkContentDirty(BRegion* regionOnScreen);
 
@@ -99,6 +104,8 @@ class WindowLayer : public BLooper {
 			bool					fFocus;
 
 			ViewLayer*				fTopLayer;
+
+			bool					fHidden;
 
 			DrawingEngine*			fDrawingEngine;
 			Desktop*				fDesktop;

@@ -116,7 +116,7 @@ private:
 
 			uint32			fResizeMode;
 			uint32			fFlags;
-			int32			fShowLevel;
+			bool			fHidden;
 
 			WindowLayer*	fWindow;
 			ViewLayer*		fParent;

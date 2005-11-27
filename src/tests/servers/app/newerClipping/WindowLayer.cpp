@@ -33,6 +33,11 @@ WindowLayer::WindowLayer(BRect frame, const char* name,
 
 	  fTopLayer(NULL),
 
+// TODO: windows must start hidden!
+	  fHidden(false),
+	  // windows start hidden
+//	  fHidden(true),
+
 	  fDrawingEngine(drawingEngine),
 	  fDesktop(desktop),
 
@@ -271,6 +276,31 @@ WindowLayer::AddChild(ViewLayer* layer)
 	fClient->PostMessage(&message);
 
 	// TODO: trigger redraw for dirty regions
+}
+
+void
+WindowLayer::Hide()
+{
+	if (fHidden)
+		return;
+
+	fHidden = true;
+
+	// TODO: notify window manager
+	// TODO: call RevealNewWMState
+}
+
+void
+WindowLayer::Show()
+{
+	if (!fHidden)
+		return;
+
+	fHidden = false;
+
+	// TODO: notify window manager
+	// TODO: call RevealNewWMState
+
 }
 
 // MarkDirty

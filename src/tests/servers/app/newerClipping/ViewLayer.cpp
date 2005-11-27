@@ -25,7 +25,9 @@ ViewLayer::ViewLayer(BRect frame, const char* name,
 
 	  fResizeMode(resizeMode),
 	  fFlags(flags),
-	  fShowLevel(1),
+
+	  // ViewLayers start visible by default
+	  fHidden(false),
 
 	  fWindow(NULL),
 	  fParent(NULL),
@@ -209,10 +211,13 @@ ViewLayer::LastChild() const
 ViewLayer*
 ViewLayer::TopLayer()
 {
+	if (fIsTopLayer)
+		return this;
+
 	if (fParent)
 		return fParent->TopLayer();
-
-	return this;
+	else
+		return NULL;
 }
 
 // CountChildren
@@ -407,29 +412,23 @@ ViewLayer::MoveBy(int32 x, int32 y, BRegion* dirtyRegion)
 	fFrame.OffsetBy(x, y);
 	InvalidateScreenClipping(true);
 
-	if (!fIsTopLayer && dirtyRegion) {
-		if (fParent) {
-			// clip to parent
-			BRect oldScreenRect(Bounds());
-			oldScreenRect.OffsetByCopy(-x, -y);
-			ConvertToParent(&oldScreenRect);
+	// to move on screen, we must not be hidden and we must have a parent
+	if (!IsHidden() && fParent && !fIsTopLayer && dirtyRegion) {
+		// clip to parent
+		BRect oldScreenRect(Bounds());
+		oldScreenRect.OffsetByCopy(-x, -y);
+		ConvertToParent(&oldScreenRect);
 
-			BRect screenRect(Bounds());
-			ConvertToParent(&screenRect);
+		BRect screenRect(Bounds());
+		ConvertToParent(&screenRect);
 
-			// TODO: see AddLayer
-			BRect dirty = oldScreenRect | screenRect;
-			dirty = dirty & fParent->Bounds();
-			fParent->ConvertToTop(&dirty);
+		// TODO: see AddChild
+		// TODO: shouldn't we use regions?
+		BRect dirty = oldScreenRect | screenRect;
+		dirty = dirty & fParent->Bounds();
+		fParent->ConvertToTop(&dirty);
 			
-			dirtyRegion->Include(dirty);
-		} else {
-			BRect screenRect(Bounds());
-			screenRect = screenRect | screenRect.OffsetByCopy(-x, -y);
-			ConvertToTop(&screenRect);
-
-			dirtyRegion->Include(screenRect);
-		}
+		dirtyRegion->Include(dirty);
 	}
 }
 #endif // 0
@@ -441,54 +440,51 @@ ViewLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 	if (x == 0 && y == 0)
 		return;
 
-	BRect oldBounds(Bounds());
-
 	fFrame.right += x;
 	fFrame.bottom += y;
 
-	BRegion dirty(Bounds());
-	dirty.Include(oldBounds);
-	if (!(fFlags & B_FULL_UPDATE_ON_RESIZE)) {
-		// the dirty region is just the difference of
-		// old and new bounds
-		dirty.Exclude(oldBounds & Bounds());
-	}
+	if (!IsHidden() && dirtyRegion) {
+		BRect oldBounds(Bounds());
+		oldBounds.right -= x;
+		oldBounds.bottom -= y;
 
-	InvalidateScreenClipping(true);
+		BRegion dirty(Bounds());
+		dirty.Include(oldBounds);
 
-	if (dirty.CountRects() > 0) {
-		// exclude children, they are expected to
-		// include their own dirty regions in ParentResized()
-		for (ViewLayer* child = FirstChild(); child; child = NextChild()) {
-			BRect previousChildVisible(child->Frame() & oldBounds & Bounds());
-			if (dirty.Frame().Intersects(previousChildVisible)) {
-				dirty.Exclude(previousChildVisible);
-			}
+		if (!(fFlags & B_FULL_UPDATE_ON_RESIZE)) {
+			// the dirty region is just the difference of
+			// old and new bounds
+			dirty.Exclude(oldBounds & Bounds());
 		}
 
-		ConvertToTop(&dirty);
-		dirtyRegion->Include(&dirty);
+		InvalidateScreenClipping(true);
+
+		if (dirty.CountRects() > 0) {
+			// exclude children, they are expected to
+			// include their own dirty regions in ParentResized()
+			for (ViewLayer* child = FirstChild(); child; child = NextChild()) {
+				BRect previousChildVisible(child->Frame() & oldBounds & Bounds());
+				if (dirty.Frame().Intersects(previousChildVisible)) {
+					dirty.Exclude(previousChildVisible);
+				}
+			}
+
+			ConvertToTop(&dirty);
+			dirtyRegion->Include(&dirty);
+		}
+
+		// layout the children
+		for (ViewLayer* child = FirstChild(); child; child = NextChild())
+			child->ParentResized(x, y, dirtyRegion);
+
+		// at this point, children are at their new locations,
+		// so we can rebuild the clipping
+		RebuildClipping(false);
+	} else {
+		// just layout the children
+		for (ViewLayer* child = FirstChild(); child; child = NextChild())
+			child->ParentResized(x, y, NULL);
 	}
-
-	// layout the children
-	for (ViewLayer* child = FirstChild(); child; child = NextChild())
-		child->ParentResized(x, y, dirtyRegion);
-
-	// at this point, children are at their new locations,
-	// so we can rebuild the clipping
-	RebuildClipping(false);
-}
-
-// ScrollBy
-void
-ViewLayer::ScrollBy(int32 x, int32 y, BRegion* dirtyRegion)
-{
-	fScrollingOffset.x += x;
-	fScrollingOffset.y += y;
-	// TODO: CopyRegion...
-	// TODO: ...
-
-	InvalidateScreenClipping(true);
 }
 
 // ParentResized
@@ -532,6 +528,18 @@ ViewLayer::ParentResized(int32 x, int32 y, BRegion* dirtyRegion)
 
 		ResizeBy(widthDiff, heightDiff, dirtyRegion);
 	}
+}
+
+// ScrollBy
+void
+ViewLayer::ScrollBy(int32 x, int32 y, BRegion* dirtyRegion)
+{
+	fScrollingOffset.x += x;
+	fScrollingOffset.y += y;
+	// TODO: CopyRegion...
+	// TODO: ...
+
+	InvalidateScreenClipping(true);
 }
 
 // Draw
@@ -602,11 +610,16 @@ ViewLayer::ClientDraw(DrawingEngine* drawingEngine, BRegion* effectiveClipping)
 bool
 ViewLayer::IsHidden() const
 {
-	// if we're explicitely hidden, then we're hidden...
-	if (fShowLevel < 1)
+	// if we're explicitely hidden...
+	if (fHidden)
 		return true;
 
-	// ...but if we're not hidden, we might still be hidden if our parent is
+	// if we don't have a window, or our window is hidden,
+	// then yes, we're hidden too
+	if (fWindow == NULL || (fWindow && fWindow->IsHidden()))
+		return true;
+
+	// if we're not hidden yet, we might still be hidden if our parent is
 	if (fParent)
 		return fParent->IsHidden();
 
@@ -618,7 +631,7 @@ ViewLayer::IsHidden() const
 void
 ViewLayer::Hide()
 {
-	fShowLevel--;
+	fHidden = true;
 
 	// TODO: track regions
 }
@@ -627,7 +640,7 @@ ViewLayer::Hide()
 void
 ViewLayer::Show()
 {
-	fShowLevel++;
+	fHidden = false;
 
 	// TODO: track regions
 }
