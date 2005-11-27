@@ -109,6 +109,7 @@ typedef	struct {
 typedef struct { // apsed, see comments in nv.settings
 	// for driver
 	char   accelerant[B_FILE_NAME_LENGTH];
+	char   primary[B_FILE_NAME_LENGTH];
 	bool   dumprom;
 	// for accelerant
 	uint32 logmask;
