@@ -1,18 +1,12 @@
 SubDir HAIKU_TOP src system libroot os arch ppc ;
 
-KernelMergeObject os_arch_$(TARGET_ARCH).o :
-	<$(SOURCE_GRIST)>atomic.S
-	<$(SOURCE_GRIST)>byteorder.S
-#	<$(SOURCE_GRIST)>systeminfo.c
-	<$(SOURCE_GRIST)>system_time.S
-	<$(SOURCE_GRIST)>thread.c
-	<$(SOURCE_GRIST)>tls.c
-	:
-	-fPIC -DPIC
-	;
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
-MergeObjectFromObjects kernel_os_arch_$(TARGET_ARCH).o :
-	<$(SOURCE_GRIST)>atomic.o
-	<$(SOURCE_GRIST)>byteorder.o
-	<$(SOURCE_GRIST)>system_time.o
-	;
+MergeObject os_arch_$(TARGET_ARCH).o :
+	atomic.S
+	byteorder.S
+#	systeminfo.c
+	system_time.S
+	thread.c
+	tls.c
+;

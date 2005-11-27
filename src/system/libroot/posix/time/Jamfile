@@ -4,8 +4,9 @@ SubDir HAIKU_TOP src system libroot posix time ;
 SubDirCcFlags -DNOID -DTZDIR='\"/etc/timezones\"' -DUSG_COMPAT -DTM_GMTOFF=tm_gmtoff -DTM_ZONE=tm_zone -DPCTS=1 ;
 
 UsePrivateHeaders [ FDirName libroot time ] ;
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
-KernelMergeObject posix_time.o :
+MergeObject posix_time.o :
 	asctime.c
 	clock.c
 	ctime.c
@@ -16,8 +17,7 @@ KernelMergeObject posix_time.o :
 #	strptime.c
 #	timelocal.c
 	time.c
-	: -fPIC -DPIC
-	;
+;
 
 # Explanations of flags:
 #

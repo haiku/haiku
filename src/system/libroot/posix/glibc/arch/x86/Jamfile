@@ -15,7 +15,7 @@ DEBUG = 0 ;
 
 SubDirCcFlags -D_GNU_SOURCE -D_IEEE_LIBM ;
 
-KernelMergeObject posix_gnu_arch_$(TARGET_ARCH).o :
+MergeObject posix_gnu_arch_$(TARGET_ARCH).o :
 	add_n.S
 	addmul_1.S
 	cmp.c
@@ -76,8 +76,7 @@ KernelMergeObject posix_gnu_arch_$(TARGET_ARCH).o :
 	w_fmod.c
 	w_fmodf.c
 	w_fmodl.c
-	: -fPIC -DPIC
-	;
+;
 
 SEARCH on [ FGristFiles
 	cmp.c divrem.c mul.c mul_n.c dbl2mpn.c mpn2dbl.c s_fpclassify.c s_fpclassifyf.c s_fpclassifyl.c s_modf.c s_modff.c s_modfl.c 

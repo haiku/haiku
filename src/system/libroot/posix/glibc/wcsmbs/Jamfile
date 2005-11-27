@@ -14,7 +14,7 @@ SubDirCcFlags -D_GNU_SOURCE -DUSE_IN_LIBIO ;
 
 # ToDo: for now, all wide character functions are disabled
 
-KernelMergeObject posix_gnu_wcsmbs.o :
+MergeObject posix_gnu_wcsmbs.o :
 	btowc.c
 	mbrlen.c
 	mbrtowc.c
@@ -61,5 +61,4 @@ KernelMergeObject posix_gnu_wcsmbs.o :
 	wmemmove.c
 	wmempcpy.c
 	wmemset.c
-	: -fPIC -DPIC
-	;
+;

@@ -1,8 +1,7 @@
 SubDir HAIKU_TOP src system libroot posix locale ;
 
-KernelMergeObject posix_locale.o :
+MergeObject posix_locale.o :
 	#ctype.c
 	localeconv.c
 	setlocale.c
-	: -fPIC -DPIC
-	;
+;

@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src system libroot posix math arch x86 ;
 
-KernelMergeObject posix_math_arch_$(TARGET_ARCH).o :
+MergeObject posix_math_arch_$(TARGET_ARCH).o :
 	cos.S
 	frexp.c
 	isinf.c
@@ -8,6 +8,4 @@ KernelMergeObject posix_math_arch_$(TARGET_ARCH).o :
 	sin.S
 	sqrt.S
 	sqrtf.S
-	:
-	-fPIC -DPIC
-	;
+;

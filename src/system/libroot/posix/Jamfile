@@ -1,8 +1,9 @@
 SubDir HAIKU_TOP src system libroot posix ;
 
 UsePrivateHeaders [ FDirName syslog_daemon ] ;
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
-KernelMergeObject posix_main.o :
+MergeObject posix_main.o :
  	assert.c
  	dlfcn.c
  	dirent.c
@@ -16,10 +17,9 @@ KernelMergeObject posix_main.o :
  	syslog.cpp
  	termios.c
  	utime.c
- 	: -fPIC -DPIC
-	;
+;
 
-SubInclude HAIKU_TOP src system libroot posix arch ;
+SubInclude HAIKU_TOP src system libroot posix arch $(TARGET_ARCH) ;
 
 SubInclude HAIKU_TOP src system libroot posix crypt ;
 SubInclude HAIKU_TOP src system libroot posix locale ;

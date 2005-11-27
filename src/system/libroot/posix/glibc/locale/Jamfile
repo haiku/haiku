@@ -6,7 +6,7 @@ SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 
-KernelMergeObject posix_gnu_locale.o :
+MergeObject posix_gnu_locale.o :
 	C-ctype.c
 	C-monetary.c
 	C_name.c
@@ -15,5 +15,4 @@ KernelMergeObject posix_gnu_locale.o :
 	lc-monetary.c
 	lc-numeric.c
 	mb_cur_max.c
-	: -fPIC -DPIC
-	;
+;

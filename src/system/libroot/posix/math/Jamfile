@@ -1,11 +1,12 @@
 SubDir HAIKU_TOP src system libroot posix math ;
 
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 #SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) glibc ] ;
 #SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) glibc include ] ;
 #SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) glibc include arch $(TARGET_ARCH) ] ;
 SubDirCcFlags -Dnational ;
 
-KernelMergeObject posix_math.o :
+MergeObject posix_math.o :
 	acosh.c
 	asincos.c
 	asinh.c
@@ -36,8 +37,6 @@ KernelMergeObject posix_math.o :
 	sinh.c
 	tan.c 
 	tanh.c
-	:
-	-fPIC -DPIC
-	;
+;
 
-SubInclude HAIKU_TOP src system libroot posix math arch ;  
+SubInclude HAIKU_TOP src system libroot posix math arch $(TARGET_ARCH) ;

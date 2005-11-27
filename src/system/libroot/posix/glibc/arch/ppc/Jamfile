@@ -1,13 +1,12 @@
 SubDir HAIKU_TOP src system libroot posix arch ppc ;
 
-KernelMergeObject posix_arch_$(TARGET_ARCH).o :
+MergeObject posix_arch_$(TARGET_ARCH).o :
 	s_ceilf.c
 	s_floorf.c
 	s_fpclassify.c
 	s_fpclassifyf.c
 	s_fpclassifyl.c
-	: -fPIC -DPIC
-	;
+;
 
 SEARCH on [ FGristFiles
         s_fpclassify.c s_fpclassifyf.c s_fpclassifyl.c

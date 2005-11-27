@@ -38,6 +38,8 @@ local librootObjects =
 	posix_unistd.o
 ;
 
+DONT_LINK_AGAINST_LIBROOT on libroot.so = true ;
+
 SharedLibrary libroot.so
 	:
 	libroot_init.c

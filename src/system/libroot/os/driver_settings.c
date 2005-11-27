@@ -22,10 +22,9 @@
  *	_BOOT_MODE for the boot loader, and _KERNEL_MODE for the kernel).
  */
 
-#ifndef KERNEL_OS_MAIN
-// ToDo: our build system is broken and compiles libroot.so stuff using kernel
-//	build rules - we use this mechanism to make sure we only get what we want.
-//	This can be removed once the build system works as it should.
+// The boot loader is compiled with kernel rules, but we want to explicitely
+// discriminate between the two here.
+#ifdef _BOOT_MODE
 #	undef _KERNEL_MODE
 #endif
 

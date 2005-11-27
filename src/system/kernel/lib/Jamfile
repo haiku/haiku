@@ -1,17 +1,11 @@
 SubDir HAIKU_TOP src system kernel lib ;
 
-#UsePrivateHeaders libroot ;
-
 # kernel libroot os files
-
-# until the build system is fixed (and no longer uses kernel build rules
-# for libroot.so), the KERNEL_OS_MAIN is needed to differentiate between
-# kernel and userland builds here
 
 KernelMergeObject kernel_os_main.o :
 	driver_settings.c
 	fs_info.c
-	: -fno-pic -DKERNEL_OS_MAIN
+	: -fno-pic
 ;
 
 SEARCH on [ FGristFiles driver_settings.c fs_info.c ]
@@ -19,7 +13,8 @@ SEARCH on [ FGristFiles driver_settings.c fs_info.c ]
 
 # kernel libroot posix files
 
-local posixSources = [ FDirName $(HAIKU_TOP) src system libroot posix ] ;
+local librootSources = [ FDirName $(HAIKU_TOP) src system libroot ] ;
+local posixSources = [ FDirName $(librootSources) posix ] ;
 
 SEARCH_SOURCE += [ FDirName $(posixSources) ] ;
 SEARCH_SOURCE += [ FDirName $(posixSources) locale ] ;
@@ -107,6 +102,16 @@ KernelMergeObject kernel_posix.o :
 	strspn.c
 	strstr.c
 	strtok.c
+
+	: -fno-pic
+;
+
+SEARCH_SOURCE += [ FDirName $(librootSources) os arch $(TARGET_ARCH) ] ;
+
+KernelMergeObject kernel_os_arch_$(TARGET_ARCH).o :
+	atomic.S
+	byteorder.S
+	system_time.S
 
 	: -fno-pic
 ;

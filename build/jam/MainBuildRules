@@ -5,30 +5,33 @@ rule AddSharedObjectGlueCode
 	
 	# we link with -nostdlib and add the required libs manually, when building
 	# for Haiku
-	local platform = [ on $(1) return $(PLATFORM) ] ;
-	if $(platform) = haiku {
-		local stdLibs = libroot.so ;
-		local beginGlue ;
-		local endGlue ;
-		if $(2) = true {
-			beginGlue += $(HAIKU_EXECUTABLE_BEGIN_GLUE_CODE) ;
-			endGlue += $(HAIKU_EXECUTABLE_END_GLUE_CODE) ;
-		} else {
-			beginGlue += $(HAIKU_LIBRARY_BEGIN_GLUE_CODE) ;
-			endGlue += $(HAIKU_LIBRARY_END_GLUE_CODE) ;
+	local platform ;
+	on $(1) {
+		platform = $(PLATFORM) ;
+		if $(platform) = haiku {
+			local stdLibs = libroot.so ;
+			local beginGlue ;
+			local endGlue ;
+			if $(2) = true {
+				beginGlue += $(HAIKU_EXECUTABLE_BEGIN_GLUE_CODE) ;
+				endGlue += $(HAIKU_EXECUTABLE_END_GLUE_CODE) ;
+			} else {
+				beginGlue += $(HAIKU_LIBRARY_BEGIN_GLUE_CODE) ;
+				endGlue += $(HAIKU_LIBRARY_END_GLUE_CODE) ;
 
-			# special case for libroot: don't link it against itself
-			if $(1) = libroot.so {
-				stdLibs = ;
+				# special case for libroot: don't link it against itself
+				if $(DONT_LINK_AGAINST_LIBROOT) {
+					stdLibs = ;
+				}
 			}
-		}
 
-		LINK_BEGIN_GLUE on $(1) = $(beginGlue) ;
-		LINK_END_GLUE on $(1) = $(endGlue) ;
-	
-		NEEDLIBS on $(1) = $(stdLibs) [ on $(1) return $(NEEDLIBS) ] ;
-		Depends $(1) : $(stdLibs) $(beginGlue) $(endGlue) ;
-		LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ] -nostdlib ;
+			LINK_BEGIN_GLUE on $(1) = $(beginGlue) ;
+			LINK_END_GLUE on $(1) = $(endGlue) ;
+
+			NEEDLIBS on $(1) = $(stdLibs) [ on $(1) return $(NEEDLIBS) ] ;
+			Depends $(1) : $(stdLibs) $(beginGlue) $(endGlue) ;
+			LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ] -nostdlib ;
+		}
 	}
 
 	# link against the compatibility libraries needed for the target
@@ -139,13 +142,15 @@ rule ScreenSaver
 
 rule StaticLibrary
 {
-	# StaticLibrary <lib> : <sources> ;
+	# StaticLibrary <lib> : <sources> : <otherObjects> ;
 	# Creates a static library from sources.
 	# <lib>: The static library to be built.
-	# <source>: List of source files.
+	# <sources>: List of source files.
+	# <otherObjects>: List of additional object files.
 	#	
 	local lib = $(1) ;
 	local sources = [ FGristFiles $(2) ] ;
+	local otherObjects = $(3) ;
 	local objects = $(sources:S=$(SUFOBJ)) ;
 
 	if ! [ IsPlatformSupportedForTarget $(1) ] {
@@ -154,7 +159,7 @@ rule StaticLibrary
 
 	InheritPlatform $(objects) : $(lib) ;
 
-	StaticLibraryFromObjects $(lib) : $(objects) ;
+	StaticLibraryFromObjects $(lib) : $(objects) $(otherObjects) ;
 	Objects $(2) ;
 }
 
@@ -166,6 +171,46 @@ rule StaticLibraryFromObjects
 
 	LibraryFromObjects $(1) : $(2) ;
 }
+
+rule Ld
+{
+	# Ld <name> : <objs> : <linkerscript> : <flags> ;
+	#
+	local target = $(1) ;
+	local objects = $(2) ;
+	local linkerScript = $(3) ;
+	local linkerFlags = $(4) ;
+
+	if $(linkerScript) {
+		linkerFlags += --script=$(linkerScript) ;
+	}
+
+	on $(target) {
+		if $(PLATFORM) = host {
+			LINK on $(target) = $(HOST_LD) ;
+			LINKFLAGS on $(target) = $(HOST_LDFLAGS) $(LINKFLAGS) $(linkerFlags) ;
+		} else {
+			LINK on $(target) = $(TARGET_LD) ;
+			LINKFLAGS on $(target) = $(TARGET_LDFLAGS) $(LINKFLAGS)
+				$(linkerFlags) ;
+		}
+
+		NEEDLIBS on $(target) = $(NEEDLIBS) ;
+		LINKLIBS on $(target) = $(LINKLIBS) ;
+	}
+		
+	LocalClean clean : $(target) ;
+	LocalDepends all : $(target) ;
+	Depends $(target) : $(objects) ;
+
+	MakeLocateDebug $(target) ; 
+}
+
+actions Ld
+{
+	$(LINK) $(LINKFLAGS) -o "$(1)" "$(2)" "$(NEEDLIBS)" $(LINKLIBS)
+}
+
 
 rule MergeObjectFromObjects
 {

@@ -1,6 +1,8 @@
 SubDir HAIKU_TOP src system libroot posix signal ;
 
-KernelMergeObject posix_signal.o :
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
+
+MergeObject posix_signal.o :
 	kill.c
 	raise.c
 	send_signal.c
@@ -11,13 +13,4 @@ KernelMergeObject posix_signal.o :
 	sigset.c
 	sigsuspend.c
 	strsignal.c
-	: -fPIC -DPIC
-	;
-
-# there are no files in the kernel
-
-#MergeObjectFromObjects kernel_posix_signal.o :
-#	:
-#	-fPIC -DPIC
-#	;
-
+;

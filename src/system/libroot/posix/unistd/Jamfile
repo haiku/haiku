@@ -1,6 +1,8 @@
 SubDir HAIKU_TOP src system libroot posix unistd ;
 
-KernelMergeObject posix_unistd.o :
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
+
+MergeObject posix_unistd.o :
 	access.c
 	alarm.c
 	chown.c
@@ -34,5 +36,4 @@ KernelMergeObject posix_unistd.o :
 	usergroup.c
 	usleep.c
 	write.c
-	: -fPIC -DPIC
-	;
+;

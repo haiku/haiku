@@ -1,3 +1,0 @@
-SubDir HAIKU_TOP src system libroot posix arch ;
-
-SubInclude HAIKU_TOP src system libroot posix arch $(TARGET_ARCH) ;

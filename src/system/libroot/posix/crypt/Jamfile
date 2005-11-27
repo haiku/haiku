@@ -1,20 +1,10 @@
 SubDir HAIKU_TOP src system libroot posix crypt ;
 
 # filter warnings we don't want here
-# Note: TARGET_KERNEL_WARNING_CCFLAGS is no config variable, therefore we need
-# to save and restore the original value.
-TARGET_WARNING_CCFLAGS = [ FFilter $(CTARGET_WARNING_CCFLAGS)
+TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
-local original_TARGET_KERNEL_WARNING_CCFLAGS = $(TARGET_KERNEL_WARNING_CCFLAGS) ;
-TARGET_KERNEL_WARNING_CCFLAGS = [ FFilter $(TARGET_KERNEL_WARNING_CCFLAGS)
-	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
-
-KernelMergeObject posix_crypt.o :
+MergeObject posix_crypt.o :
 	crypt.c
 	crypt_util.c
-	: -fPIC -DPIC
-	;
-
-# restore TARGET_KERNEL_WARNING_CCFLAGS
-TARGET_KERNEL_WARNING_CCFLAGS = $(original_TARGET_KERNEL_WARNING_CCFLAGS) ;
+;

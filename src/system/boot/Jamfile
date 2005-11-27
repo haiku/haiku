@@ -1,11 +1,7 @@
 SubDir HAIKU_TOP src system boot ;
 
-KernelObjects byteorder.S ;
-
-SEARCH on [ FGristFiles byteorder.S ]
-	= [ FDirName $(HAIKU_TOP) src system libroot os arch $(TARGET_ARCH) ] ;
-
 local librootFunctions =
+	byteorder.o
 	ctype.o
 	qsort.o
 	kernel_vsprintf.o
@@ -44,14 +40,12 @@ KernelLd boot_loader :
 	# kernel)
 	$(librootFunctions:G=src!system!kernel!lib)
 
-	[ FGristFiles byteorder.o ]
-
 	# other kernel objects
 	<src!system!kernel!arch!$(TARGET_ARCH)>cpuid.o
 
 	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/boot_loader.ld 
 	: -Bstatic
-	;
+;
 
 rule BuildZbeos {
 	local zbeos = $(1) ;

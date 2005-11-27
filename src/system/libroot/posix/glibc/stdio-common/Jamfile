@@ -12,41 +12,39 @@ SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 
 # ToDo: for now, all wide character functions are disabled
 
-KernelMergeObject posix_gnu_stdio.o : #_common.o :
-	<$(SOURCE_GRIST)>_itoa.c
-	<$(SOURCE_GRIST)>_itowa.c
-	<$(SOURCE_GRIST)>asprintf.c
-	<$(SOURCE_GRIST)>dprintf.c
-	<$(SOURCE_GRIST)>fprintf.c
-	<$(SOURCE_GRIST)>fscanf.c
-	<$(SOURCE_GRIST)>getline.c
-	<$(SOURCE_GRIST)>getw.c
-	<$(SOURCE_GRIST)>itoa-digits.c
-	<$(SOURCE_GRIST)>itoa-udigits.c
-	<$(SOURCE_GRIST)>itowa-digits.c
-	<$(SOURCE_GRIST)>perror.c
-	<$(SOURCE_GRIST)>printf-prs.c
-	<$(SOURCE_GRIST)>printf.c
-	<$(SOURCE_GRIST)>printf_fp.c
-	<$(SOURCE_GRIST)>printf_fphex.c
-#	<$(SOURCE_GRIST)>printf_size.c
-	<$(SOURCE_GRIST)>putw.c
-	<$(SOURCE_GRIST)>reg-printf.c
-	<$(SOURCE_GRIST)>scanf.c
-	<$(SOURCE_GRIST)>snprintf.c
-	<$(SOURCE_GRIST)>sprintf.c
-	<$(SOURCE_GRIST)>sscanf.c
-	<$(SOURCE_GRIST)>tempnam.c
-	<$(SOURCE_GRIST)>tempname.c
-	<$(SOURCE_GRIST)>tmpnam.c
-	<$(SOURCE_GRIST)>tmpnam_r.c
-	<$(SOURCE_GRIST)>vfprintf.c
-#	<$(SOURCE_GRIST)>vfprintf_stub.c
-#	<$(SOURCE_GRIST)>vfscanf_stub.c
-	<$(SOURCE_GRIST)>vfscanf.c
-	<$(SOURCE_GRIST)>vfwprintf.c
-#	<$(SOURCE_GRIST)>vfwscanf.c
-	<$(SOURCE_GRIST)>vprintf.c
-	:
-	-fPIC -DPIC
-	;
+MergeObject posix_gnu_stdio.o : #_common.o :
+	_itoa.c
+	_itowa.c
+	asprintf.c
+	dprintf.c
+	fprintf.c
+	fscanf.c
+	getline.c
+	getw.c
+	itoa-digits.c
+	itoa-udigits.c
+	itowa-digits.c
+	perror.c
+	printf-prs.c
+	printf.c
+	printf_fp.c
+	printf_fphex.c
+#	printf_size.c
+	putw.c
+	reg-printf.c
+	scanf.c
+	snprintf.c
+	sprintf.c
+	sscanf.c
+	tempnam.c
+	tempname.c
+	tmpnam.c
+	tmpnam_r.c
+	vfprintf.c
+#	vfprintf_stub.c
+#	vfscanf_stub.c
+	vfscanf.c
+	vfwprintf.c
+#	vfwscanf.c
+	vprintf.c
+;

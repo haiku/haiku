@@ -1,6 +1,8 @@
 SubDir HAIKU_TOP src system libroot posix sys ;
 
-KernelMergeObject posix_sys.o :
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
+
+MergeObject posix_sys.o :
 	chmod.c
 	getrusage.c
  	gettimeofday.c
@@ -17,5 +19,4 @@ KernelMergeObject posix_sys.o :
  	umask.c
  	uname.c
 	wait.c
-	: -fPIC -DPIC
-	;
+;

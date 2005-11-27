@@ -7,11 +7,10 @@ SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc libio ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 
-KernelMergeObject posix_gnu_ext.o :
+MergeObject posix_gnu_ext.o :
 	getopt.c
 	getopt1.c
 	getopt_init.c
 
 	obstack.c
-	: -fPIC -DPIC
-	;
+;

@@ -1,1 +1,0 @@
-SubInclude HAIKU_TOP src system libroot os arch $(TARGET_ARCH) ;

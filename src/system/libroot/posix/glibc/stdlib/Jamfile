@@ -5,7 +5,7 @@ SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 
-KernelMergeObject posix_gnu_stdlib.o :
+MergeObject posix_gnu_stdlib.o :
 	drand48.c
 	drand48_r.c
 	drand48-iter.c
@@ -31,5 +31,4 @@ KernelMergeObject posix_gnu_stdlib.o :
 	srand48_r.c
 	wcstombs.c
 	wctomb.c
-	: -fPIC -DPIC
-	;
+;

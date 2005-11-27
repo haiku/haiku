@@ -2,24 +2,17 @@ SubDir HAIKU_TOP src system runtime_loader ;
 
 SubDirHdrs [ FDirName $(SUBDIR) arch ] ;
 UsePrivateHeaders runtime_loader ;
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
-KernelObjects 
-	rld.c
-	rldexport.c
-	rldelf.c
-	rldheap.c
-	rldaux.c
-	
+# Don't let gcc inject built-in function code. This will cause dependencies
+# to libroot, which we don't link against.
+SubDirCcFlags -fno-builtin ;
+SubDirC++Flags -fno-builtin ;
+
+# needed for rld.so only
+StaticLibrary librld.a :
 	kernel_vsprintf.c
-	
-	: -fpic
-;
-
-SEARCH on [ FGristFiles kernel_vsprintf.c ]
-	= [ FDirName $(HAIKU_TOP) src system kernel lib ] ;
-
-KernelStaticLibraryObjects librld.a :
-	# needed for rld.so only
+	:
 	<src!system!libroot!os>syscalls.o
 	<src!system!libroot!os>sem.o
 	<src!system!libroot!os!arch!$(TARGET_ARCH)>atomic.o
@@ -54,13 +47,24 @@ KernelStaticLibraryObjects librld.a :
 	<src!system!libroot!posix!string>strrchr.o
 	<src!system!libroot!posix!string>strspn.o
 	<src!system!libroot!posix!string>strstr.o
+
+	[ FGristFiles kernel_vsprintf.o ]
 ;
 
-KernelLd rld.so :
-	[ FGristFiles rld.o rldelf.o rldexport.o rldheap.o rldaux.o
-		kernel_vsprintf.o ]
+SEARCH on [ FGristFiles kernel_vsprintf.c ]
+	= [ FDirName $(HAIKU_TOP) src system kernel lib ] ;
+
+Objects
+	rld.c
+	rldexport.c
+	rldelf.c
+	rldheap.c
+	rldaux.c
+;
+
+Ld rld.so :
+	[ FGristFiles rld.o rldelf.o rldexport.o rldheap.o rldaux.o ]
 	librld.a
+	$(TARGET_GCC_LIBGCC)
 	: $(SUBDIR)/arch/$(TARGET_ARCH)/rld.ld
-	:
-	:
 ;

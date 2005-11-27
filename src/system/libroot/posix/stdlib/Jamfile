@@ -1,8 +1,9 @@
 SubDir HAIKU_TOP src system libroot posix stdlib ;
 
 UsePrivateHeaders libroot ;
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
-KernelMergeObject posix_stdlib.o :
+MergeObject posix_stdlib.o :
 	abs.c
 	atfork.c
 	atof.c 
@@ -24,5 +25,4 @@ KernelMergeObject posix_stdlib.o :
 	strtoll.c
 	strtoul.c
 	strtoull.c
-	: -fPIC -DPIC
-	;
+;

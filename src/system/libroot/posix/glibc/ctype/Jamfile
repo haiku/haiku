@@ -7,8 +7,7 @@ SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 
-KernelMergeObject posix_gnu_ctype.o :
+MergeObject posix_gnu_ctype.o :
 	ctype.c
 	ctype-info.c
-	: -fPIC -DPIC
-	;
+;

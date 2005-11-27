@@ -2,10 +2,9 @@ SubDir HAIKU_TOP src system libroot posix pthread ;
 
 UsePrivateHeaders libroot ;
 
-KernelMergeObject posix_pthread.o :
+MergeObject posix_pthread.o :
 	pthread_atfork.c
 	pthread_mutex.c
 	pthread_mutexattr.c
- 	: -fPIC -DPIC
-	;
+;
 

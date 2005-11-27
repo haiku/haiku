@@ -1,6 +1,8 @@
 SubDir HAIKU_TOP src system libroot os ;
 
-KernelMergeObject os_main.o :
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
+
+MergeObject os_main.o :
 	area.c
 	atomic.c
 	debug.c
@@ -21,11 +23,9 @@ KernelMergeObject os_main.o :
 	thread.c
 	time.c
 	syscalls.S
-	:
-	-fPIC -DPIC
-	;
+;
 
 # We need to specify the dependency on the generated syscalls file explicitly.
 Depends [ FGristFiles syscalls.o ] : <syscalls>syscalls.S.inc ;
 
-SubInclude HAIKU_TOP src system libroot os arch ;
+SubInclude HAIKU_TOP src system libroot os arch $(TARGET_ARCH) ;

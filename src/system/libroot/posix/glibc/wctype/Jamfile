@@ -9,10 +9,9 @@ SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 
-KernelMergeObject posix_gnu_wctype.o :
+MergeObject posix_gnu_wctype.o :
 	iswctype.c
 	wcfuncs.c
 	wctrans.c
 	wctype.c
-	: -fPIC -DPIC
-	;
+;

@@ -1,9 +1,11 @@
 SubDir HAIKU_TOP src system libroot posix stdio ;
 
-KernelMergeObject posix_stdio.o :
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
+
+MergeObject posix_stdio.o :
 	_fseek.c
-	<$(SOURCE_GRIST)>remove.c
-	<$(SOURCE_GRIST)>rename.c
+	remove.c
+	rename.c
 # The other files are superseded by the glibc libio/stdio stuff
 # 	<$(SOURCE_GRIST)>fclose.c
 # 	<$(SOURCE_GRIST)>feof.c
@@ -49,5 +51,4 @@ KernelMergeObject posix_stdio.o :
 #  	<$(SOURCE_GRIST)>vsprintf.c
 # 	<$(SOURCE_GRIST)>wbuf.c
 # 	<$(SOURCE_GRIST)>wsetup.c
- 	: -fPIC -DPIC
- 	;
+;

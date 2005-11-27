@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src system libroot posix string ;
 
-KernelMergeObject posix_string.o :
+MergeObject posix_string.o :
 	bcmp.c
 	bcopy.c
 	bzero.c
@@ -36,6 +36,4 @@ KernelMergeObject posix_string.o :
 	strstr.c
 	strtok.c
 	strxfrm.c
-
-	: -fPIC -DPIC
-	;
+;
