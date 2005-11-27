@@ -9,7 +9,14 @@ KernelObjects
 	rldelf.c
 	rldheap.c
 	rldaux.c
-	: -fpic ;
+	
+	kernel_vsprintf.c
+	
+	: -fpic
+;
+
+SEARCH on [ FGristFiles kernel_vsprintf.c ]
+	= [ FDirName $(HAIKU_TOP) src system kernel lib ] ;
 
 KernelStaticLibraryObjects librld.a :
 	# needed for rld.so only
@@ -23,7 +30,6 @@ KernelStaticLibraryObjects librld.a :
  	<src!system!libroot!posix!glibc!ctype>ctype-info.o
 	<src!system!libroot!posix!glibc!locale>C-ctype.o
 	<src!system!libroot!posix!glibc!locale>C_name.o
-  	<src!system!libroot>kernel_vsprintf.o
   	<src!system!libroot!posix!unistd>open.o
 
 	<src!system!libroot!posix!string>memchr.o
@@ -48,16 +54,13 @@ KernelStaticLibraryObjects librld.a :
 	<src!system!libroot!posix!string>strrchr.o
 	<src!system!libroot!posix!string>strspn.o
 	<src!system!libroot!posix!string>strstr.o
-	;
+;
 
 KernelLd rld.so :
-	<$(SOURCE_GRIST)>rld.o
-	<$(SOURCE_GRIST)>rldelf.o
-	<$(SOURCE_GRIST)>rldexport.o
-	<$(SOURCE_GRIST)>rldheap.o
-	<$(SOURCE_GRIST)>rldaux.o
+	[ FGristFiles rld.o rldelf.o rldexport.o rldheap.o rldaux.o
+		kernel_vsprintf.o ]
 	librld.a
 	: $(SUBDIR)/arch/$(TARGET_ARCH)/rld.ld
 	:
 	:
-	;
+;

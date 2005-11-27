@@ -1,119 +1,51 @@
 SubDir HAIKU_TOP src system libroot ;
 
 UsePrivateHeaders libroot ;
+UsePrivateHeaders kernel ;
 
-KernelObjects
-	<$(SOURCE_GRIST)>libroot_init.c
-	: -fPIC -DPIC
-	;
+UnarchiveObjects $(TARGET_GCC_LIBGCC_OBJECTS) : $(TARGET_GCC_LIBGCC) ;
+	# we need to link against libgcc.a objects and make
+	# it available to other applications as in BeOS
 
-# kernel libroot os files
+local librootObjects = 
+	os_main.o
+	os_arch_$(TARGET_ARCH).o
 
-# until the build system is fixed (and no longer uses kernel build rules
-# for libroot.so), the KERNEL_OS_MAIN is needed to differentiate between
-# kernel and userland builds here
+	posix_arch_$(TARGET_ARCH).o
+	posix_crypt.o
+	posix_locale.o
+	posix_main.o
+	posix_malloc.o
+	posix_math.o
+	posix_math_arch_$(TARGET_ARCH).o
+	posix_pthread.o
+	posix_signal.o
+	posix_stdio.o
+	posix_gnu_arch_$(TARGET_ARCH).o
+	posix_gnu_ctype.o
+	posix_gnu_ext.o
+	posix_gnu_libio.o
+	posix_gnu_locale.o
+	posix_gnu_regex.o
+	posix_gnu_stdio.o
+	posix_gnu_stdlib.o
+	posix_gnu_wcsmbs.o
+	posix_gnu_wctype.o
+	posix_stdlib.o
+	posix_string.o
+	posix_sys.o
+	posix_time.o
+	posix_unistd.o
+;
 
-KernelMergeObject kernel_os_main.o :
-	driver_settings.c
-	fs_info.c
-	: -fno-pic -DKERNEL_OS_MAIN
-	;
+SharedLibrary libroot.so
+	:
+	libroot_init.c
+	:
+	$(TARGET_GCC_LIBGCC_OBJECTS)
 
-SEARCH on [ FGristFiles
-		driver_settings.c fs_info.c
-	] = [ FDirName $(HAIKU_TOP) src system libroot os ] ;
-
-# kernel libroot posix files
-
-SEARCH_SOURCE += [ FDirName $(SUBDIR) posix ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) posix locale ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) posix stdio ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) posix stdlib ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) posix string ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) posix sys ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) posix time ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) posix unistd ] ;
-
-KernelMergeObject kernel_posix.o :
-	# main
- 	kerrno.c
- 	dirent.c
- 	poll.c
- 	utime.c
- 	# locale
-	ctype.c
-	# stdio
-	kernel_vsprintf.c
-	# stdlib
-	abs.c
-	atoi.c
-	bsearch.c
-	merge.c
-	qsort.c
-	rand.c
-	random.c
-	strtol.c
-	strtoll.c
-	strtoul.c
-	strtoull.c
-	# sys
-	chmod.c
-	stat.c
-	mkdir.c
-	select.c
-	gettimeofday.c
- 	uio.c
-	# time
-	time.c
-	# unistd
-	access.c
-	chown.c
-	close.c
-	conf.c
-	directory.c
-	dup.c
-	fcntl.c
-	hostname.c
-	ioctl.c
-	link.c
-	lseek.c
-	mount.c
-	open.c
-	read.c
-	sync.c
-	truncate.c
-	usergroup.c
-	write.c
-	# string
-	memchr.c
-	memcmp.c
-	memcpy.c
-	memmove.c
-	memset.c
-	strcasecmp.c
-	strcasestr.c
-	strcat.c
-	strchr.c
-	strcmp.c
-	strcpy.c
-	strcspn.c
-	strdup.c
-	strerror.c
-	strlcat.c
-	strlcpy.c
-	strlen.c
-	strncat.c
-	strncmp.c
-	strncpy.c
-	strnlen.c
-	strpbrk.c
-	strrchr.c
-	strspn.c
-	strstr.c
-	strtok.c
-
-	: -fno-pic
-	;
+	$(librootObjects:G=nogrist)
+;
 
 SubInclude HAIKU_TOP src system libroot os ;
 SubInclude HAIKU_TOP src system libroot posix ;

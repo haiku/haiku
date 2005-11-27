@@ -38,7 +38,7 @@ KernelMergeObject kernel_core.o :
 	timer.c
 
 	: -fno-pic
-	;
+;
 
 # We need to specify the dependency on the generated syscalls files explicitly.
 Includes [ FGristFiles syscalls.c ]
@@ -49,7 +49,66 @@ KernelLd linkhack.so :
 	:
 	:
 	-shared -Bdynamic
-	;
+;
+
+KernelLd kernel_$(TARGET_ARCH) :
+	kernel_core.o
+	kernel_fs.o
+	kernel_vm.o
+	kernel_cache.o
+	kernel_device_manager.o
+	kernel_disk_device_manager.o
+	kernel_util.o
+	kernel_messaging.o
+	kernel_debug.o
+
+	lib$(TARGET_ARCH).a
+
+	linkhack.so
+
+	# kernel libroot parts
+	kernel_os_main.o
+	kernel_os_arch_$(TARGET_ARCH).o
+	kernel_posix.o
+
+	$(HAIKU_STATIC_LIBSUPC++)
+
+	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/kernel.ld 
+	: -Bdynamic -export-dynamic -dynamic-linker /foo/bar
+	:
+;
+
+KernelLd kernel.so :
+	kernel_core.o
+	kernel_fs.o
+	kernel_vm.o
+	kernel_cache.o
+	kernel_device_manager.o
+	kernel_disk_device_manager.o
+	kernel_util.o
+	kernel_messaging.o
+	kernel_debug.o
+
+	lib$(TARGET_ARCH).a
+
+	linkhack.so
+
+	# kernel libroot parts
+	kernel_os_main.o
+	kernel_os_arch_$(TARGET_ARCH).o
+	kernel_posix.o
+
+	$(HAIKU_STATIC_LIBSUPC++)
+
+	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/kernel.ld 
+	: -Bdynamic -shared -export-dynamic -dynamic-linker /foo/bar
+;
+
+NotFile kernel ;
+Depends kernel : kernel_$(TARGET_ARCH) ;
+Depends kernel.so : kernel ;
+	# kernel.so will be rebuilt with the kernel
+
 
 SubInclude HAIKU_TOP src system kernel arch ;
 SubInclude HAIKU_TOP src system kernel cache ;
@@ -57,6 +116,7 @@ SubInclude HAIKU_TOP src system kernel device_manager ;
 SubInclude HAIKU_TOP src system kernel debug ;
 SubInclude HAIKU_TOP src system kernel disk_device_manager ;
 SubInclude HAIKU_TOP src system kernel fs ;
+SubInclude HAIKU_TOP src system kernel lib ;
 SubInclude HAIKU_TOP src system kernel messaging ;
 SubInclude HAIKU_TOP src system kernel util ;
 SubInclude HAIKU_TOP src system kernel vm ;

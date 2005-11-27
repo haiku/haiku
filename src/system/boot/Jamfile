@@ -1,4 +1,72 @@
 SubDir HAIKU_TOP src system boot ;
 
+KernelObjects byteorder.S ;
+
+SEARCH on [ FGristFiles byteorder.S ]
+	= [ FDirName $(HAIKU_TOP) src system libroot os arch $(TARGET_ARCH) ] ;
+
+local librootFunctions =
+	ctype.o
+	qsort.o
+	kernel_vsprintf.o
+	memset.o
+	memcmp.o
+	memcpy.o
+	memmove.o
+	strdup.o
+	strlen.o
+	strnlen.o
+	strcmp.o
+	strcasecmp.o
+	strncmp.o
+	strcat.o
+	strcpy.o
+	strlcat.o
+	strlcpy.o
+	strchr.o
+	strrchr.o
+	strtol.o
+;
+
+KernelLd boot_loader :
+	boot_platform_$(TARGET_BOOT_PLATFORM).o
+	boot_loader.a
+	boot_partitions.a
+
+	# file systems
+	boot_bfs.a
+	boot_amiga_ffs.a
+	boot_tarfs.a
+
+	libz.a
+
+	# libroot functions needed by the stage2 boot loader (compiled for the
+	# kernel)
+	$(librootFunctions:G=src!system!kernel!lib)
+
+	[ FGristFiles byteorder.o ]
+
+	# other kernel objects
+	<src!system!kernel!arch!$(TARGET_ARCH)>cpuid.o
+
+	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/boot_loader.ld 
+	: -Bstatic
+	;
+
+rule BuildZbeos {
+	local zbeos = $(1) ;
+	local bootLoader = $(2) ;
+
+	Depends $(zbeos) : $(bootLoader) ;
+	MakeLocateDebug $(zbeos) ;
+}
+
+actions BuildZbeos {
+	rm -f $(1)
+	$(TARGET_OBJCOPY) -O binary $(2) $(1)
+}
+
+BuildZbeos zbeos : boot_loader ;
+
 SubInclude HAIKU_TOP src system boot platform ;
 SubInclude HAIKU_TOP src system boot loader ;
