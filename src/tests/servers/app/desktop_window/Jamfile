@@ -1,0 +1,19 @@
+SubDir HAIKU_TOP src tests servers app desktop_window ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
+UseHeaders [ FDirName os app ] ;
+UseHeaders [ FDirName os interface ] ;
+UsePrivateHeaders interface ;
+
+Application DesktopWindow :
+	DesktopWindow.cpp
+	: be
+;
+
+if $(TARGET_PLATFORM) = libbe_test {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : DesktopWindow
+		: tests!apps ;
+}
+
