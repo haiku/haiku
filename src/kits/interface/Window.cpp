@@ -487,12 +487,12 @@ BWindow::SendBehind(const BWindow *window)
 	fLink->Attach<int32>(_get_object_token_(window));
 	fLink->Attach<team_id>(Team());
 
-	int32 code = B_OK;
-	fLink->FlushWithReply(code);
+	status_t status = B_ERROR;
+	fLink->FlushWithReply(status);
 
 	Unlock();
 
-	return code;
+	return status;
 }
 
 
@@ -1047,7 +1047,7 @@ BWindow::SetSizeLimits(float minWidth, float maxWidth,
 
 		int32 code;
 		if (fLink->FlushWithReply(code) == B_OK
-			&& code == SERVER_TRUE) {
+			&& code == B_OK) {
 			// read the values that were really enforced on
 			// the server side (the window frame could have
 			// been changed, too)
@@ -1548,12 +1548,12 @@ BWindow::AddToSubset(BWindow *window)
 	fLink->Attach<int32>(_get_object_token_(window));
 	fLink->Attach<team_id>(team);
 
-	int32 code = SERVER_FALSE;
-	fLink->FlushWithReply(code);
+	status_t status = B_ERROR;
+	fLink->FlushWithReply(status);
 
 	Unlock();
 
-	return code == SERVER_TRUE ? B_OK : B_ERROR;
+	return status;
 }
 
 
@@ -1572,11 +1572,11 @@ BWindow::RemoveFromSubset(BWindow *window)
 	fLink->Attach<int32>(_get_object_token_(window));
 	fLink->Attach<team_id>(team);
 
-	int32 code;
-	fLink->FlushWithReply(code);
+	status_t status = B_ERROR;
+	fLink->FlushWithReply(status);
 	Unlock();
 
-	return code == SERVER_TRUE ? B_OK : B_ERROR;
+	return status;
 }
 
 
@@ -1617,16 +1617,13 @@ BWindow::SetLook(window_look look)
 	fLink->StartMessage(AS_SET_LOOK);
 	fLink->Attach<int32>((int32)look);
 
-	int32 code;
-	status_t status = fLink->FlushWithReply(code);
-
-	// ToDo: the server should probably return something more meaningful, anyway
-	if (status == B_OK && code == SERVER_TRUE) {
+	status_t status = B_ERROR;
+	if (fLink->FlushWithReply(status) == B_OK && status == B_OK) {
 		fLook = look;
 		return B_OK;
 	}
 
-	return B_ERROR;
+	return status;
 }
 
 
@@ -1673,22 +1670,18 @@ BWindow::Feel() const
 status_t
 BWindow::SetFlags(uint32 flags)
 {
+	Lock();
 
-	Lock();	
 	fLink->StartMessage(AS_SET_FLAGS);
 	fLink->Attach<uint32>(flags);
 
-	int32 code = SERVER_FALSE;
-	fLink->FlushWithReply(code);
+	int32 status = B_ERROR;
+	if (fLink->FlushWithReply(status) == B_OK && status == B_OK)
+		fFlags = flags;
 
 	Unlock();
 
-	if (code == SERVER_TRUE) {
-		fFlags = flags;
-		return B_OK;
-	}
-
-	return B_ERROR;
+	return status;
 }
 
 
@@ -1725,15 +1718,12 @@ BWindow::SetWindowAlignment(window_alignment mode,
 	fLink->Attach<int32>(height);
 	fLink->Attach<int32>(heightOffset);
 
-	int32 code = SERVER_FALSE;
-	fLink->FlushWithReply(code);
+	status_t status = B_ERROR;
+	fLink->FlushWithReply(status);
 
 	Unlock();
 
-	if (code == SERVER_TRUE)
-		return B_OK;
-
-	return B_ERROR;
+	return status;
 }
 
 
@@ -1745,9 +1735,8 @@ BWindow::GetWindowAlignment(window_alignment *mode,
 	const_cast<BWindow *>(this)->Lock();
 	fLink->StartMessage(AS_GET_ALIGNMENT);
 
-	int32 code = SERVER_FALSE;
-	if (fLink->FlushWithReply(code) == B_OK
-		&& code == SERVER_TRUE) {
+	status_t status = B_ERROR;
+	if (fLink->FlushWithReply(status) == B_OK && status == B_OK) {
 		fLink->Read<int32>((int32 *)mode);
 		fLink->Read<int32>(h);
 		fLink->Read<int32>(hOffset);
@@ -1760,11 +1749,7 @@ BWindow::GetWindowAlignment(window_alignment *mode,
 	}
 
 	const_cast<BWindow *>(this)->Unlock();
-
-	if (code != SERVER_TRUE)
-		return B_ERROR;
-
-	return B_OK;
+	return status;
 }
 
 
@@ -1776,14 +1761,11 @@ BWindow::Workspaces() const
 	const_cast<BWindow *>(this)->Lock();
 	fLink->StartMessage(AS_GET_WORKSPACES);
 
-	int32 code;
-	if (fLink->FlushWithReply(code) == B_OK
-		&& code == SERVER_TRUE)
+	status_t status;
+	if (fLink->FlushWithReply(status) == B_OK && status == B_OK)
 		fLink->Read<uint32>(&workspaces);
 
 	const_cast<BWindow *>(this)->Unlock();
-
-	// TODO: shouldn't we cache?
 	return workspaces;
 }
 
