@@ -210,6 +210,9 @@ class Layer {
  	friend class RootLayer;
 	friend class ServerWindow;
 
+			bool				_AddChildToList(Layer* child, Layer* before = NULL);
+			void				_RemoveChildFromList(Layer* child);
+
 	// private clipping stuff
 	virtual	void				_ReserveRegions(BRegion &reg);
 			void				_RebuildVisibleRegions( const BRegion &invalid,

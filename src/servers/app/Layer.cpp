@@ -136,18 +136,8 @@ Layer::AddChild(Layer* child, ServerWindow* window)
 		return;
 	}
 
-	// 1) attach layer to the tree structure
-	child->fParent = this;
-
-	// if we have children already, bump the current last child back one and
-	// make the new child the last layer
-	if (fLastChild) {
-		child->fPreviousSibling = fLastChild;
-		fLastChild->fNextSibling = child;
-	} else {
-		fFirstChild = child;
-	}
-	fLastChild = child;
+	// attach layer to the tree structure
+	_AddChildToList(child);
 
 	// if we have no RootLayer yet, then there is no need to set any parameters --
 	// they will be set when the RootLayer for this tree will be added
@@ -224,30 +214,13 @@ Layer::RemoveChild(Layer *child)
 		return;
 	}
 
-	// 1) remove this layer from the main tree.
-	
-	// Take care of fParent
-	child->fParent = NULL;
-	
-	if (fFirstChild == child)
-		fFirstChild = child->fNextSibling;
-	
-	if (fLastChild == child)
-		fLastChild = child->fPreviousSibling;
-	
-	// Take care of siblings
-	if (child->fPreviousSibling != NULL)
-		child->fPreviousSibling->fNextSibling = child->fNextSibling;
+	// remove this layer from the main tree.
 
-	if (child->fNextSibling != NULL)
-		child->fNextSibling->fPreviousSibling = child->fPreviousSibling;
-
-	child->fPreviousSibling = NULL;
-	child->fNextSibling = NULL;
+	_RemoveChildFromList(child);
 	child->_ClearVisibleRegions();
 
-	// 2) Iterate over all of the removed-layer's descendants and unset the
-	//	root layer, server window, and all redraw-related regions
+	// iterate over all of the removed-layer's descendants and unset the
+	// root layer, server window, and all redraw-related regions
 
 	Layer* stop = child;
 	while (true) {
@@ -284,6 +257,76 @@ Layer::RemoveChild(Layer *child)
 			}
 		}
 	}
+}
+
+
+bool
+Layer::_AddChildToList(Layer* child, Layer* before)
+{
+	if (!child)
+		return false;
+	if (child->fParent != NULL) {
+		debugger("Layer already belongs to someone else");
+		return false;
+	}
+	if (before != NULL && before->fParent != this) {
+		debugger("Invalid before layer");
+		return false;
+	}
+
+	if (before != NULL) {
+		// add view before this one
+		child->fNextSibling = before;
+		child->fPreviousSibling = before->fPreviousSibling;
+		if (child->fPreviousSibling != NULL)
+			child->fPreviousSibling->fNextSibling = child;
+
+		before->fPreviousSibling = child;
+		if (fFirstChild == before)
+			fFirstChild = child;
+	} else {
+		// add view to the end of the list
+		if (fLastChild != NULL) {
+			fLastChild->fNextSibling = child;
+			child->fPreviousSibling = fLastChild;
+		} else {
+			fFirstChild = child;
+			child->fPreviousSibling = NULL;
+		}
+
+		child->fNextSibling = NULL;
+		fLastChild = child;
+	}
+
+	child->fParent = this;
+	return true;
+}
+
+
+void
+Layer::_RemoveChildFromList(Layer* child)
+{
+	// update first/last layers
+
+	if (fFirstChild == child) {
+		// it's the first child
+		fFirstChild = child->fNextSibling;
+	} else {
+		// it must have a previous sibling
+		child->fPreviousSibling->fNextSibling = child->fNextSibling;
+	}
+
+	if (fLastChild == child) {
+		// it's the last child
+		fLastChild = child->fPreviousSibling;
+	} else {
+		// it must have a next sibling
+		child->fNextSibling->fPreviousSibling = child->fPreviousSibling;
+	}
+
+	child->fPreviousSibling = NULL;
+	child->fNextSibling = NULL;
+	child->fParent = NULL;
 }
 
 
@@ -488,9 +531,9 @@ Layer::IsHidden(void) const
 	if (fHidden)
 		return true;
 
-	if (fParent)
-			return fParent->IsHidden();
-	
+	if (fParent != NULL)
+		return fParent->IsHidden();
+
 	return fHidden;
 }
 
