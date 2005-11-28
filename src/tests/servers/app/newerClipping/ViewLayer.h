@@ -23,12 +23,14 @@ class ViewLayer {
 	inline	BRect			Frame() const
 								{ return fFrame; }
 			BRect			Bounds() const;
+			// converts the given frame up the view hirarchy and
+			// clips to each views bounds
+			void			ConvertToVisibleInTopView(BRect* bounds) const;
 
 	inline	rgb_color		ViewColor() const
 								{ return fViewColor; }
 
-			void			AttachedToWindow(WindowLayer* window,
-											 bool topLayer = false);
+			void			AttachedToWindow(WindowLayer* window);
 			void			DetachedFromWindow();
 
 			// tree stuff
@@ -60,6 +62,10 @@ class ViewLayer {
 			void			ConvertToTop(BPoint* point) const;
 			void			ConvertToTop(BRect* rect) const;
 			void			ConvertToTop(BRegion* region) const; 
+
+			void			ConvertFromTop(BPoint* point) const;
+			void			ConvertFromTop(BRect* rect) const;
+			void			ConvertFromTop(BRegion* region) const; 
 
 			// settings
 			void			SetName(const char* string);
@@ -120,7 +126,6 @@ private:
 
 			WindowLayer*	fWindow;
 			ViewLayer*		fParent;
-			bool			fIsTopLayer;
 
 			ViewLayer*		fFirstChild;
 			ViewLayer*		fPreviousSibling;

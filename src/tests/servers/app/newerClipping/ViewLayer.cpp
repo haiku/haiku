@@ -31,7 +31,6 @@ ViewLayer::ViewLayer(BRect frame, const char* name,
 
 	  fWindow(NULL),
 	  fParent(NULL),
-	  fIsTopLayer(false),
 
 	  fFirstChild(NULL),
 	  fPreviousSibling(NULL),
@@ -72,12 +71,23 @@ ViewLayer::Bounds() const
 	return bounds;
 }
 
+// ConvertToVisibleInTopView
+void
+ViewLayer::ConvertToVisibleInTopView(BRect* bounds) const
+{
+	*bounds = *bounds & Bounds();
+	// NOTE: this step is necessary even if we don't have a parent!
+	ConvertToParent(bounds);
+
+	if (fParent)
+		fParent->ConvertToVisibleInTopView(bounds);
+}
+
 // AttachedToWindow
 void
-ViewLayer::AttachedToWindow(WindowLayer* window, bool topLayer)
+ViewLayer::AttachedToWindow(WindowLayer* window)
 {
 	fWindow = window;
-	fIsTopLayer = topLayer;
 
 	for (ViewLayer* child = FirstChild(); child; child = NextChild())
 		child->AttachedToWindow(window);
@@ -211,13 +221,13 @@ ViewLayer::LastChild() const
 ViewLayer*
 ViewLayer::TopLayer()
 {
-	if (fIsTopLayer)
-		return this;
+	// returns the top level view of the hirarchy,
+	// it doesn't have to be the top level of a window
 
 	if (fParent)
 		return fParent->TopLayer();
-	else
-		return NULL;
+
+	return this;
 }
 
 // CountChildren
@@ -328,6 +338,36 @@ ViewLayer::ConvertToTop(BRegion* region) const
 		fParent->ConvertToTop(region);
 }
 
+// ConvertFromTop
+void
+ViewLayer::ConvertFromTop(BPoint* point) const
+{
+	ConvertFromParent(point);
+
+	if (fParent)
+		fParent->ConvertFromTop(point);
+}
+
+// ConvertFromTop
+void
+ViewLayer::ConvertFromTop(BRect* rect) const
+{
+	ConvertFromParent(rect);
+
+	if (fParent)
+		fParent->ConvertFromTop(rect);
+}
+
+// ConvertFromTop
+void
+ViewLayer::ConvertFromTop(BRegion* region) const
+{
+	ConvertFromParent(region);
+
+	if (fParent)
+		fParent->ConvertFromTop(region);
+}
+
 // SetName
 void
 ViewLayer::SetName(const char* string)
@@ -335,72 +375,7 @@ ViewLayer::SetName(const char* string)
 	fName.SetTo(string);
 }
 
-#if 0
-// MoveBy
-void
-ViewLayer::MoveBy(int32 x, int32 y, BRegion* dirtyRegion)
-{
-	if (x == 0 && y == 0)
-		return;
-
-	if (!fIsTopLayer && fWindow) {
-		// blit to new location (children as well)
-		BRect screenRect;
-if (fParent) {
-	screenRect = fFrame & fParent->Bounds();
-	fParent->ConvertToTop(&screenRect);
-} else {
-	screenRect = Bounds();
-	ConvertToTop(&screenRect);
-}
-
-		BRegion effectiveClippingRegion;
-		fWindow->GetContentRegion(&effectiveClippingRegion);
-		effectiveClippingRegion.IntersectWith(&fWindow->VisibleRegion());
-
-		BRegion copyRegion(screenRect);
-		copyRegion.IntersectWith(&effectiveClippingRegion);
-
-		copyRegion.OffsetBy(x, y);
-		copyRegion.IntersectWith(&effectiveClippingRegion);
-
-		BRegion alreadyDirty(screenRect);
-		{
-			BRegion windowDirty(fWindow->DirtyRegion());
-			alreadyDirty.IntersectWith(&windowDirty);
-		}
-
-		fFrame.OffsetBy(x, y);
-		_MoveScreenClipping(x, y, true);
-
-if (fParent) {
-	screenRect = fFrame & fParent->Bounds();
-	fParent->ConvertToTop(&screenRect);
-} else {
-	screenRect = Bounds();
-	ConvertToTop(&screenRect);
-}
-		BRegion dirtyRegion(screenRect);
-		dirtyRegion.Exclude(&copyRegion);
-
-		alreadyDirty.OffsetBy(x, y);
-		dirtyRegion.Include(&alreadyDirty);
-
-		fWindow->MarkDirty(&dirtyRegion);
-
-		copyRegion.OffsetBy(-x, -y);
-
-		if (fWindow->GetDrawingEngine()->Lock()) {
-			fWindow->GetDrawingEngine()->CopyRegion(&copyRegion, x, y);
-			fWindow->GetDrawingEngine()->Unlock();
-		}
-	} else {
-		fFrame.OffsetBy(x, y);
-		_MoveScreenClipping(x, y, true);
-	}
-	fFrame.OffsetBy(x, y);
-}
-#else // 0
+#pragma mark -
 
 // MoveBy
 void
@@ -410,28 +385,64 @@ ViewLayer::MoveBy(int32 x, int32 y, BRegion* dirtyRegion)
 		return;
 
 	fFrame.OffsetBy(x, y);
-	InvalidateScreenClipping(true);
 
 	// to move on screen, we must not be hidden and we must have a parent
-	if (!IsHidden() && fParent && !fIsTopLayer && dirtyRegion) {
-		// clip to parent
-		BRect oldScreenRect(Bounds());
-		oldScreenRect.OffsetByCopy(-x, -y);
-		ConvertToParent(&oldScreenRect);
+	if (!IsHidden() && fParent && dirtyRegion) {
+#if 0
+// based on redraw on new location
+		// the place were we are now visible
+		BRect newVisibleBounds = Bounds();
+		// we can use the frame of the old
+		// local clipping to see which parts need invalidation
+		BRect oldVisibleBounds(Bounds());
+		oldVisibleBounds.OffsetBy(-x, -y);
+		ConvertToTop(&oldVisibleBounds);
 
-		BRect screenRect(Bounds());
-		ConvertToParent(&screenRect);
+		ConvertToVisibleInTopView(&newVisibleBounds);
 
-		// TODO: see AddChild
-		// TODO: shouldn't we use regions?
-		BRect dirty = oldScreenRect | screenRect;
-		dirty = dirty & fParent->Bounds();
-		fParent->ConvertToTop(&dirty);
-			
-		dirtyRegion->Include(dirty);
+		dirtyRegion->Include(oldVisibleBounds);
+		// newVisibleBounds already is in screen coords
+		dirtyRegion->Include(newVisibleBounds);
+#else
+// blitting version, invalidates
+// old contents
+		BRect oldVisibleBounds(Bounds());
+		oldVisibleBounds.OffsetBy(-x, -y);
+		ConvertToTop(&oldVisibleBounds);
+
+		BRect newVisibleBounds(Bounds());
+		// NOTE: using ConvertToVisibleInTopView()
+		// instead of ConvertToTop()! see below
+		ConvertToVisibleInTopView(&newVisibleBounds);
+
+		newVisibleBounds.OffsetBy(-x, -y);
+
+		// clipping oldVisibleBounds to newVisibleBounds
+		// makes sure we don't copy parts hidden under
+		// parent views
+		BRegion copyRegion(oldVisibleBounds & newVisibleBounds);
+		fWindow->CopyContents(&copyRegion, x, y);
+
+		BRegion dirty(oldVisibleBounds);
+		newVisibleBounds.OffsetBy(x, y);
+		dirty.Exclude(newVisibleBounds);
+		dirtyRegion->Include(&dirty);
+#endif
+	}
+
+	if (!fParent) {
+		// the top view's screen clipping does not change,
+		// because no parts are clipped away from parent
+		// views
+		_MoveScreenClipping(x, y, true);
+	} else {
+		// parts might have been revealed from underneath
+		// the parent, or might now be hidden underneath
+		// the parent, this is taken care of when building
+		// the screen clipping
+		InvalidateScreenClipping(true);
 	}
 }
-#endif // 0
 
 // ResizeBy
 void
@@ -472,19 +483,17 @@ ViewLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 			ConvertToTop(&dirty);
 			dirtyRegion->Include(&dirty);
 		}
-
-		// layout the children
-		for (ViewLayer* child = FirstChild(); child; child = NextChild())
-			child->ParentResized(x, y, dirtyRegion);
-
-		// at this point, children are at their new locations,
-		// so we can rebuild the clipping
-		RebuildClipping(false);
-	} else {
-		// just layout the children
-		for (ViewLayer* child = FirstChild(); child; child = NextChild())
-			child->ParentResized(x, y, NULL);
 	}
+
+	// layout the children
+	for (ViewLayer* child = FirstChild(); child; child = NextChild())
+		child->ParentResized(x, y, dirtyRegion);
+
+	// at this point, children are at their new locations,
+	// so we can rebuild the clipping
+	// TODO: when the implementation of Hide() and Show() is
+	// complete, see if this should be avoided
+	RebuildClipping(false);
 }
 
 // ParentResized
@@ -541,6 +550,8 @@ ViewLayer::ScrollBy(int32 x, int32 y, BRegion* dirtyRegion)
 
 	InvalidateScreenClipping(true);
 }
+
+#pragma mark -
 
 // Draw
 void
@@ -606,20 +617,17 @@ ViewLayer::ClientDraw(DrawingEngine* drawingEngine, BRegion* effectiveClipping)
 	}
 }
 
+#pragma mark -
+
 // IsHidden
 bool
 ViewLayer::IsHidden() const
 {
-	// if we're explicitely hidden...
+	// if we're explicitely hidden, then we're hidden...
 	if (fHidden)
 		return true;
 
-	// if we don't have a window, or our window is hidden,
-	// then yes, we're hidden too
-	if (fWindow == NULL || (fWindow && fWindow->IsHidden()))
-		return true;
-
-	// if we're not hidden yet, we might still be hidden if our parent is
+	// ...but if we're not hidden, we might still be hidden if our parent is
 	if (fParent)
 		return fParent->IsHidden();
 
@@ -631,18 +639,30 @@ ViewLayer::IsHidden() const
 void
 ViewLayer::Hide()
 {
-	fHidden = true;
+	if (!fHidden) {
+		fHidden = true;
 
-	// TODO: track regions
+		if (fParent && !fParent->IsHidden()) {
+			// TODO: track regions
+			// RebuildClipping()
+			// ...
+		}
+	}
 }
 
 // Show
 void
 ViewLayer::Show()
 {
-	fHidden = false;
+	if (fHidden) {
+		fHidden = false;
 
-	// TODO: track regions
+		if (fParent && !fParent->IsHidden()) {
+			// TODO: track regions
+			// RebuildClipping()
+			// ...
+		}
+	}
 }
 
 // PrintToStream
@@ -655,9 +675,6 @@ ViewLayer::PrintToStream() const
 void
 ViewLayer::RebuildClipping(bool deep)
 {
-	// remember current local clipping in dirty region
-	BRegion oldLocalClipping(fLocalClipping);
-
 	// the clipping spans over the bounds area
 	fLocalClipping.Set(Bounds());
 
@@ -678,13 +695,18 @@ ViewLayer::ScreenClipping(BRegion* windowContentClipping, bool force) const
 {
 	if (!fScreenClippingValid || force) {
 		fScreenClipping = fLocalClipping;
-		if (fParent) {
-			BRect parentWindow = fParent->Bounds();
-			ConvertFromParent(&parentWindow);
-			BRegion visibleInParent(parentWindow);
-			fScreenClipping.IntersectWith(&visibleInParent);
-		}
 		ConvertToTop(&fScreenClipping);
+
+		// see if we parts of our bounds are hidden underneath
+		// the parent, the local clipping does not account for this
+		BRect clippedBounds = Bounds();
+		ConvertToVisibleInTopView(&clippedBounds);
+		if (clippedBounds.Width() < fScreenClipping.Frame().Width() ||
+			clippedBounds.Height() < fScreenClipping.Frame().Height()) {
+			BRegion temp(clippedBounds);
+			fScreenClipping.IntersectWith(&temp);
+		}
+
 		fScreenClipping.IntersectWith(windowContentClipping);
 		fScreenClippingValid = true;
 	}

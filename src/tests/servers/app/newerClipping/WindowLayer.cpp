@@ -56,7 +56,7 @@ WindowLayer::WindowLayer(BRect frame, const char* name,
 	// fFrame as if it had
 	fTopLayer = new(nothrow) ViewLayer(fFrame, "top view", B_FOLLOW_ALL, 0,
 									   (rgb_color){ 255, 255, 255, 255 });
-	fTopLayer->AttachedToWindow(this, true);
+	fTopLayer->AttachedToWindow(this);
 
 	fClient->Run();
 }
@@ -82,7 +82,7 @@ WindowLayer::MessageReceived(BMessage* message)
 					}
 				}
 				_DrawBorder();
-				_DrawContents(fTopLayer);
+				_TriggerContentRedraw();
 
 				fDesktop->ReadUnlockClipping();
 			} else {
@@ -307,6 +307,7 @@ WindowLayer::Show()
 void
 WindowLayer::MarkDirty(BRegion* regionOnScreen)
 {
+	// for triggering MSG_REDRAW
 	if (fDesktop)
 		fDesktop->MarkDirty(regionOnScreen);
 }
@@ -315,6 +316,7 @@ WindowLayer::MarkDirty(BRegion* regionOnScreen)
 void
 WindowLayer::MarkContentDirty(BRegion* regionOnScreen)
 {
+	// for triggering MSG_REDRAW
 	if (fDesktop && fDesktop->LockClipping()) {
 
 		regionOnScreen->IntersectWith(&fVisibleContentRegion);
@@ -323,29 +325,65 @@ WindowLayer::MarkContentDirty(BRegion* regionOnScreen)
 		fDesktop->UnlockClipping();
 	}
 }
-/*
-// DirtyRegion
-BRegion
-WindowLayer::DirtyRegion()
-{
-	BRegion dirty;
-	if (fDesktop->ReadLockClipping()) {
-		dirty = *fDesktop->DirtyRegion();
-		fDesktop->ReadUnlockClipping();
-	}
-	return dirty;
-}
-*/
+
 # pragma mark -
 
-// _DrawContents
+// CopyContents
 void
-WindowLayer::_DrawContents(ViewLayer* layer)
+WindowLayer::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
+{
+	// this function takes care of invalidating parts that could not be copied
+
+	if (fDesktop->LockClipping()) {
+
+		BRegion newDirty(*region);
+
+		region->IntersectWith(&fVisibleContentRegion);
+		region->OffsetBy(xOffset, yOffset);
+		region->IntersectWith(&fVisibleContentRegion);
+
+		region->OffsetBy(-xOffset, -yOffset);
+
+		newDirty.Exclude(region);
+
+		_ShiftPartOfRegion(fDesktop->DirtyRegion(), region, xOffset, yOffset);
+		if (fDrawingEngine->Lock()) {
+			fDrawingEngine->CopyRegion(region, xOffset, yOffset);
+			fDrawingEngine->Unlock();
+		}
+
+		if (fCurrentUpdateSession)
+			_ShiftPartOfRegion(&fCurrentUpdateSession->DirtyRegion(), region, xOffset, yOffset);
+		if (fPendingUpdateSession)
+			_ShiftPartOfRegion(&fPendingUpdateSession->DirtyRegion(), region, xOffset, yOffset);
+
+		newDirty.OffsetBy(xOffset, yOffset);
+		newDirty.IntersectWith(&fVisibleContentRegion);
+		fDesktop->MarkDirty(&newDirty);
+
+		fDesktop->UnlockClipping();
+	}
+}
+
+# pragma mark -
+
+// _ShiftPartOfRegion
+void
+WindowLayer::_ShiftPartOfRegion(BRegion* region, BRegion* regionToShift,
+								int32 xOffset, int32 yOffset)
+{
+	BRegion common(*region);
+	common.IntersectWith(regionToShift);
+	region->Exclude(&common);
+	common.OffsetBy(xOffset, yOffset);
+	region->Include(&common);
+}
+
+// _TriggerContentRedraw
+void
+WindowLayer::_TriggerContentRedraw()
 {
 //printf("%s - DrawContents()\n", Name());
-	if (!layer)
-		layer = fTopLayer;
-
 	if (fDesktop->ReadLockClipping()) {
 	
 		BRegion dirtyContentRegion(fVisibleContentRegion);
@@ -367,8 +405,8 @@ if (fDrawingEngine->Lock()) {
 
 			fDesktop->MarkClean(&dirtyContentRegion);
 
-			layer->Draw(fDrawingEngine, &dirtyContentRegion,
-						&fVisibleContentRegion, true);
+			fTopLayer->Draw(fDrawingEngine, &dirtyContentRegion,
+							&fVisibleContentRegion, false);
 		}
 
 		fDesktop->ReadUnlockClipping();
@@ -398,8 +436,14 @@ WindowLayer::_DrawClient(int32 token)
 
 		BRegion effectiveClipping(fEffectiveDrawingRegion);
 		effectiveClipping.IntersectWith(&layer->ScreenClipping(&fVisibleContentRegion));
-		
+
 		if (effectiveClipping.CountRects() > 0) {
+			// clear the back ground
+			// TODO: only if this is the first drawing command for
+			// this layer of course!
+			layer->Draw(fDrawingEngine, &effectiveClipping,
+						&fVisibleContentRegion, false);
+
 			layer->ClientDraw(fDrawingEngine, &effectiveClipping);
 		}
 
@@ -456,6 +500,8 @@ WindowLayer::_DrawBorder()
 void
 WindowLayer::_MarkContentDirty(BRegion* contentDirtyRegion)
 {
+if (fDesktop->ReadLockClipping()) {
+
 	if (contentDirtyRegion->CountRects() <= 0)
 		return;
 
@@ -480,12 +526,17 @@ WindowLayer::_MarkContentDirty(BRegion* contentDirtyRegion)
 		fClient->PostMessage(MSG_UPDATE);
 		fUpdateRequested = true;
 	}
+
+fDesktop->ReadUnlockClipping();
+}
 }
 
 // _BeginUpdate
 void
 WindowLayer::_BeginUpdate()
 {
+if (fDesktop->ReadLockClipping()) {
+
 	if (fUpdateRequested && !fCurrentUpdateSession) {
 		fCurrentUpdateSession = fPendingUpdateSession;
 		fPendingUpdateSession = NULL;
@@ -498,12 +549,17 @@ WindowLayer::_BeginUpdate()
 		}
 		fEffectiveDrawingRegionValid = false;
 	}
+
+fDesktop->ReadUnlockClipping();
+}
 }
 
 // _EndUpdate
 void
 WindowLayer::_EndUpdate()
 {
+if (fDesktop->ReadLockClipping()) {
+
 	if (fInUpdate) {
 		delete fCurrentUpdateSession;
 		fCurrentUpdateSession = NULL;
@@ -518,6 +574,9 @@ WindowLayer::_EndUpdate()
 	} else {
 		fUpdateRequested = false;
 	}
+
+fDesktop->ReadUnlockClipping();
+}
 }
 
 #pragma mark -

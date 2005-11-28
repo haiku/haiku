@@ -144,13 +144,15 @@ Window::AddWindow(BRect frame, const char* name)
 
 			f.OffsetBy(f.Width() + 6, 0);
 
-			layer = new ViewLayer(f, "View", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM,
+//			layer = new ViewLayer(f, "View", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM,
+			layer = new ViewLayer(f, "View", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
 								  B_FULL_UPDATE_ON_RESIZE, (rgb_color){ 120, 120, 120, 255 });
 			layer1->AddChild(layer);
 
 			f.OffsetBy(f.Width() + 6, 0);
 
-			layer = new ViewLayer(f, "View", B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM,
+//			layer = new ViewLayer(f, "View", B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM,
+			layer = new ViewLayer(f, "View", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
 								  B_FULL_UPDATE_ON_RESIZE, (rgb_color){ 120, 120, 120, 255 });
 			layer1->AddChild(layer);
 		}

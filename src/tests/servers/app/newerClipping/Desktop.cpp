@@ -159,13 +159,13 @@ Desktop::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 
 		if (dx != 0 || dy != 0) {
 			if (fClickedWindow) {
-bigtime_t now = system_time();
+//bigtime_t now = system_time();
 				if (fResizing) {
 					ResizeWindowBy(fClickedWindow, dx, dy);
-printf("resizing: %lld\n", system_time() - now);
+//printf("resizing: %lld\n", system_time() - now);
 				} else {
 					MoveWindowBy(fClickedWindow, dx, dy);
-printf("moving: %lld\n", system_time() - now);
+//printf("moving: %lld\n", system_time() - now);
 				}
 			}
 		}
@@ -358,6 +358,9 @@ Desktop::BottomWindow() const
 void
 Desktop::MoveWindowBy(WindowLayer* window, int32 x, int32 y)
 {
+	if (!Lock())
+		return;
+
 	if (LockClipping()) {
 		// the dirty region starts with the visible area of the window being moved
 		BRegion newDirtyRegion(window->VisibleRegion());
@@ -403,12 +406,17 @@ Desktop::MoveWindowBy(WindowLayer* window, int32 x, int32 y)
 	
 		UnlockClipping();
 	}
+
+	Unlock();
 }
 
 // ResizeWindowBy
 void
 Desktop::ResizeWindowBy(WindowLayer* window, int32 x, int32 y)
 {
+	if (!Lock())
+		return;
+
 	if (LockClipping()) {
 		BRegion newDirtyRegion;
 		BRegion previouslyOccupiedRegion(window->VisibleRegion());
@@ -428,6 +436,8 @@ Desktop::ResizeWindowBy(WindowLayer* window, int32 x, int32 y)
 	
 		UnlockClipping();
 	}
+
+	Unlock();
 }
 
 // BringToFront
