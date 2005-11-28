@@ -601,7 +601,7 @@ ViewLayer::ClientDraw(DrawingEngine* drawingEngine, BRegion* effectiveClipping)
 		drawingEngine->ConstrainClippingRegion(effectiveClipping);
 
 		drawingEngine->SetHighColor(fViewColor);
-		drawingEngine->SetDrawingMode(B_OP_BLEND);
+//		drawingEngine->SetDrawingMode(B_OP_BLEND);
 		drawingEngine->StrokeRect(b);
 		b.InsetBy(1, 1);
 		drawingEngine->StrokeRect(b);
