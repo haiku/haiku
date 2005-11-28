@@ -304,6 +304,7 @@ ServerApp::SetAppCursor()
 {
 	if (fAppCursor)
 		fDesktop->HWInterface()->SetCursor(fAppCursor);
+	fDesktop->HWInterface()->SetCursorVisible(!fCursorHidden);
 }
 
 
