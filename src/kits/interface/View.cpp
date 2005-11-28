@@ -3872,47 +3872,48 @@ BView::_RemoveChildFromList(BView* child)
 
 
 bool
-BView::_AddChildToList(BView* view, BView* before)
+BView::_AddChildToList(BView* child, BView* before)
 {
-	if (!view)
+	if (!child)
 		return false;
-
-	BView *current = fFirstChild;
-	BView *last = current;
-
-	while (current && current != before) {
-		last = current;
-		current = current->fNextSibling;
+	if (child->fParent != NULL) {
+		debugger("View already belongs to someone else");
+		return false;
+	}
+	if (before != NULL && before->fParent != this) {
+		debugger("Invalid before view");
+		return false;
 	}
 
-	if (!current && before)
-		return false;
+	if (before != NULL) {
+		// add view before this one
+		child->fNextSibling = before;
+		child->fPreviousSibling = before->fPreviousSibling;
+		if (child->fPreviousSibling != NULL)
+			child->fPreviousSibling->fNextSibling = child;
 
-	// we're at begining of the list, OR between two elements
-	if (current) {
-		if (current == fFirstChild) {
-			view->fNextSibling = current;
-			current->fPreviousSibling = view;
-			fFirstChild = view;
-		} else {
-			view->fNextSibling = current;
-			view->fPreviousSibling = current->fPreviousSibling;
-			current->fPreviousSibling->fNextSibling = view;
-			current->fPreviousSibling = view;
-		}
+		before->fPreviousSibling = child;
+		if (fFirstChild == before)
+			fFirstChild = child;
 	} else {
-		// we have reached the end of the list
+		// add view to the end of the list
+		BView *last = fFirstChild;
+		while (last != NULL && last->fNextSibling != NULL) {
+			last = last->fNextSibling;
+		}
 
-		// if last!=NULL then we add to the end. Otherwise, view is the
-		// first chiild in the list
-		if (last) {
-			last->fNextSibling = view;
-			view->fPreviousSibling = last;
-		} else
-			fFirstChild = view;
+		if (last != NULL) {
+			last->fNextSibling = child;
+			child->fPreviousSibling = last;
+		} else {
+			fFirstChild = child;
+			child->fPreviousSibling = NULL;
+		}
+
+		child->fNextSibling = NULL;
 	}
 
-	view->fParent = this;
+	child->fParent = this;
 	return true;
 }
 
