@@ -48,8 +48,8 @@ BEOS_ADD_ONS_MEDIA = mixer.media_addon legacy.media_addon
 ;
 BEOS_ADD_ONS_MEDIA_PLUGINS = aiff_reader mp3_decoder musepack
 	raw_decoder wav_reader mov_reader au_reader avi_reader mp3_reader ogg
-	speex vorbis
-	# ac3_decoder avcodec theora matroska
+	speex vorbis matroska
+	# ac3_decoder avcodec theora
 ;
 BEOS_ADD_ONS_SCREENSAVERS = Haiku ;
 BEOS_ADD_ONS_DRIVERS_AUDIO = ich_ac97 auvia emuxki ;
