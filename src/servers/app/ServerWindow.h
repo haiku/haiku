@@ -14,7 +14,6 @@
 
 
 #include "MessageLooper.h"
-#include "SubWindowList.h"
 
 #include <PortLink.h>
 #include <TokenSpace.h>
@@ -68,8 +67,6 @@ public:
 			void				NotifyQuitRequested();
 			void				NotifyMinimize(bool minimize);
 			void				NotifyZoom();
-			void				NotifyScreenModeChanged(const BRect frame,
-									const color_space cspace);
 
 			// util methods.
 			const BMessenger&	FocusMessenger() const { return fFocusMessenger; }
@@ -102,9 +99,6 @@ public:
 	inline	int32				ServerToken() const { return fServerToken; }
 
 			void				GetInfo(window_info& info);
-
-			// ToDo: public??
-			SubWindowList	fSubWindowList;
 
 private:
 			// methods for retrieving and creating a tree strcture of Layers.

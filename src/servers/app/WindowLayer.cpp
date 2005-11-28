@@ -117,6 +117,7 @@ WindowLayer::WindowLayer(const BRect &frame,
 		if (window->App()->GetDesktop()->ScreenAt(0)) {
 			window->App()->GetDesktop()->ScreenAt(0)->GetMode(width, height, colorSpace, frequency);
 // TODO: MOVE THIS AWAY!!! RemoveBy contains calls to virtual methods! Also, there is not TopLayer()!
+			fFrame.OffsetTo(B_ORIGIN);
 			WindowLayer::ResizeBy(width - frame.Width(), height - frame.Height());
 		}
 	}
@@ -390,6 +391,8 @@ WindowLayer::GetSizeLimits(float* minWidth, float* maxWidth,
 void
 WindowLayer::MouseDown(BMessage *msg, BPoint where)
 {
+	Desktop* desktop = Window()->App()->GetDesktop();
+
 	// default action is to drag the WindowLayer
 	Layer *target = LayerAt(where);
 	if (target == this) {
@@ -449,19 +452,19 @@ WindowLayer::MouseDown(BMessage *msg, BPoint where)
 
 		// based on what the Decorator returned, properly place this window.
 		if (action == DEC_MOVETOBACK) {
-			GetRootLayer()->SetActive(this, false);
+			desktop->SendBehindWindow(this, NULL);
 		} else {
 			GetRootLayer()->SetMouseEventLayer(this);
-			GetRootLayer()->SetActive(this);
+			desktop->ActivateWindow(this);
 		}
 	} else if (target != NULL) {
 		// clicking a simple Layer.
-		if (GetRootLayer()->ActiveWorkspace()->Focus() != this) {
-			DesktopSettings desktopSettings(GetRootLayer()->GetDesktop());
+		if (GetRootLayer()->Focus() != this) {
+			DesktopSettings desktopSettings(desktop);
 
 			// not in FFM mode?
 			if (desktopSettings.MouseMode() == B_NORMAL_MOUSE)
-				GetRootLayer()->SetActive(this);
+				desktop->ActivateWindow(this);
 
 			if ((WindowFlags() & B_WILL_ACCEPT_FIRST_CLICK) == 0)
 				return;
@@ -554,17 +557,11 @@ WindowLayer::MouseMoved(BMessage *msg, BPoint where)
 	fLastMousePosition = where;
 
 	// change focus in FFM mode
-	DesktopSettings desktopSettings(GetRootLayer()->GetDesktop());
-	// TODO: Focus should be a RootLayer option/feature, NOT a Workspace one!!!
-	WindowLayer* exFocus = GetRootLayer()->Focus();
-	if (desktopSettings.MouseMode() != B_NORMAL_MOUSE && exFocus != this) {
-		GetRootLayer()->ActiveWorkspace()->AttemptToSetFocus(this);
-		// Workspace::SetFocus() *attempts* to set a new focus WindowLayer, it may not succeed
-//		if (exFocus != Focus()) {
-			// TODO: invalidate border area and send message to client for the widgets to light up
-			// What message? Is there a message on Focus change?
-//		}
-	}
+	Desktop* desktop = Window()->App()->GetDesktop();
+	DesktopSettings desktopSettings(desktop);
+
+	if (desktopSettings.MouseMode() != B_NORMAL_MOUSE && GetRootLayer()->Focus() != this)
+		GetRootLayer()->SetFocus(this);
 
 	Layer* target = LayerAt(where);
 	if (target != NULL && target != this) {
@@ -665,6 +662,16 @@ WindowLayer::UpdateScreen()
 {
 	// Unimplemented. Hook function for handling when the screen resolution changes
 	STRACE(("WindowLayer %s: UpdateScreen unimplemented\n", Name()));
+}
+
+
+bool
+WindowLayer::SupportsFront()
+{
+	if (fFeel == kDesktopWindowFeel)
+		return false;
+
+	return true;
 }
 
 

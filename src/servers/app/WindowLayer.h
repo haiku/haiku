@@ -107,6 +107,10 @@ class WindowLayer : public Layer {
 	inline	int32				Level() const { return fLevel; }
 	inline	uint32				WindowFlags() const { return fWindowFlags; }
 	inline	uint32				Workspaces() const { return fWorkspaces; }
+			void				SetWorkspaces(uint32 workspaces)
+									{ fWorkspaces = workspaces; }
+
+			bool				SupportsFront();
 
 								// 0.0 -> left .... 1.0 -> right
 			void				SetTabLocation(float location);

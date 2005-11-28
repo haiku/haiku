@@ -849,18 +849,12 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			STRACE(("ServerApp %s: get current workspace\n", Signature()));
 
-			// TODO: Locking this way is not nice
-			RootLayer *root = fDesktop->RootLayer();
-			root->Lock();
-			
-			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<int32>(root->ActiveWorkspaceIndex());
+			fLink.StartMessage(B_OK);
+			fLink.Attach<int32>(fDesktop->CurrentWorkspace());
 			fLink.Flush();
-			
-			root->Unlock();
 			break;
 		}
-		
+
 		case AS_ACTIVATE_WORKSPACE:
 		{
 			STRACE(("ServerApp %s: activate workspace\n", Signature()));
@@ -868,15 +862,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// TODO: See above
 			int32 index;
 			link.Read<int32>(&index);
-			RootLayer *root = fDesktop->RootLayer();
-			root->Lock();
-			root->SetActiveWorkspace(index);
-			root->Unlock();
-			// no reply
-		
+
+			fDesktop->SetWorkspace(index);
 			break;
 		}
-		
+
 		case AS_SHOW_CURSOR:
 		{
 			STRACE(("ServerApp %s: Show Cursor\n", Signature()));
@@ -2188,31 +2178,22 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			STRACE(("ServerApp %s: get desktop color\n", Signature()));
 
-			uint32 workspaceIndex;
-			link.Read<uint32>(&workspaceIndex);
+			uint32 index;
+			link.Read<uint32>(&index);
 
-			// ToDo: locking is probably wrong - why the hell is there no (safe)
-			//		way to get to the workspace object directly?
-			RootLayer *root = fDesktop->RootLayer();
-			root->Lock();
-
-			Workspace *workspace;
+			fLink.StartMessage(B_OK);
+			fDesktop->Lock();
 
 			// we're nice to our children (and also take the default case
 			// into account which asks for the current workspace)
-			if (workspaceIndex > (uint32)root->WorkspaceCount())
-				workspace = root->ActiveWorkspace();
-			else
-				workspace = root->WorkspaceAt(workspaceIndex);
+			if (index >= (uint32)kMaxWorkspaces)
+				index = fDesktop->CurrentWorkspace();
 
-			if (workspace != NULL) {
-				fLink.StartMessage(B_OK);
-				fLink.Attach<rgb_color>(workspace->BGColor().GetColor32());
-			} else
-				fLink.StartMessage(B_ERROR);
+			Workspace& workspace = fDesktop->WorkspaceAt(index);
+			fLink.Attach<rgb_color>(workspace.Color().GetColor32());
 
+			fDesktop->Unlock();
 			fLink.Flush();
-			root->Unlock();
 			break;
 		}
 

@@ -98,19 +98,8 @@ KeyboardFilter::Filter(BMessage* message, BHandler** /*_target*/)
 #endif
 		{
 			STRACE(("Set Workspace %ld\n", key - 1));
-			RootLayer* root = fDesktop->RootLayer();
 
-			root->Lock();
-			root->SetActiveWorkspace(key - 2);
-
-#ifdef APPSERVER_ROOTLAYER_SHOW_WORKSPACE_NUMBER
-			// to draw the current Workspace index on screen.
-			BRegion region(VisibleRegion());
-			fDesktop->GetDrawingEngine()->ConstrainClippingRegion(&region);
-			root->Draw(region.Frame());
-			fDesktop->GetDrawingEngine()->ConstrainClippingRegion(NULL);
-#endif
-			root->Unlock();
+			fDesktop->SetWorkspace(key - 2);
 			return B_SKIP_MESSAGE;
 		}
 	}
@@ -188,7 +177,7 @@ Desktop::Init()
 	// TODO: add user identity to the name
 	char name[32];
 	sprintf(name, "RootLayer %d", 1);
-	fRootLayer = new ::RootLayer(name, 4, this, GetDrawingEngine());
+	fRootLayer = new ::RootLayer(name, this, GetDrawingEngine());
 
 #if TEST_MODE
 	gInputManager->AddStream(new InputServerStream);
@@ -436,20 +425,13 @@ Desktop::_ActivateApp(team_id team)
 	int32 windowCount = WindowList().CountItems();
 	for (int32 i = 0; i < windowCount; ++i) {
 		// is this layer in fact a WindowLayer?
-		WindowLayer *winBorder = WindowList().ItemAt(i);
+		WindowLayer *windowLayer = WindowList().ItemAt(i);
 
 		// if winBorder is valid and not hidden, then we've found our target
-		if (winBorder != NULL && !winBorder->IsHidden()
-			&& winBorder->App()->ClientTeam() == team) {
-			if (fRootLayer->Lock()) {
-				fRootLayer->SetActive(winBorder);
-				fRootLayer->Unlock();
-
-				if (fRootLayer->Active() == winBorder)
-					return B_OK;
-
-				status = B_ERROR;
-			}
+		if (windowLayer != NULL && !windowLayer->IsHidden()
+			&& windowLayer->App()->ClientTeam() == team) {
+			fRootLayer->ActivateWindow(windowLayer);
+			return B_OK;
 		}
 	}
 
@@ -481,6 +463,19 @@ Desktop::BroadcastToAllApps(int32 code)
 
 
 void
+Desktop::SetWorkspace(int32 index)
+{
+	BAutolock _(this);
+	DesktopSettings settings(this);
+
+	if (index < 0 || index >= settings.WorkspacesCount())
+		return;
+
+	fRootLayer->SetWorkspace(index, fWorkspaces[index]);
+}
+
+
+void
 Desktop::ScreenChanged(Screen* screen)
 {
 	BMessage update(B_SCREEN_CHANGED);
@@ -506,204 +501,72 @@ Desktop::ScreenChanged(Screen* screen)
 
 
 void
-Desktop::AddWindowLayer(WindowLayer *winBorder)
+Desktop::ActivateWindow(WindowLayer* windowLayer)
 {
-	if (!winBorder)
-		return;
+	fRootLayer->ActivateWindow(windowLayer);
+}
 
-	int32 feel = winBorder->Feel();
 
-	// we are ServerApp thread, we need to lock RootLayer here.
-	RootLayer()->Lock();
+void
+Desktop::SendBehindWindow(WindowLayer* windowLayer, WindowLayer* front)
+{
+	fRootLayer->SendBehindWindow(windowLayer, front);
+}
 
-	// we're playing with window list. lock first.
+
+void
+Desktop::SetWindowWorkspaces(WindowLayer* windowLayer, uint32 workspaces)
+{
+	BAutolock _(this);
+
+	windowLayer->SetWorkspaces(workspaces);
+
+	// is the window still visible on screen?
+	bool remove = (workspaces & (1UL << CurrentWorkspace())) == 0;
+
+	if (remove && windowLayer->Parent() != NULL) {
+		// the window is no longer visible on screen
+		fRootLayer->RemoveWindowLayer(windowLayer);
+	} else if (!remove && windowLayer->Parent() == NULL) {
+		// the window is now visible on screen
+		fRootLayer->AddWindowLayer(windowLayer);
+	}
+}
+
+
+void
+Desktop::AddWindowLayer(WindowLayer *windowLayer)
+{
 	Lock();
 
-	if (fWindowLayerList.HasItem(winBorder)) {
+	if (fWindowLayerList.HasItem(windowLayer)) {
 		Unlock();
-		RootLayer()->Unlock();
 		debugger("AddWindowLayer: WindowLayer already in Desktop list\n");
 		return;
 	}
 
-	// we have a new window. store a record of it.
-	fWindowLayerList.AddItem(winBorder);
-
-	// add FLOATING_APP windows to the local list of all normal windows.
-	// This is to keep the order all floating windows (app or subset) when we go from
-	// one normal window to another.
-	if (feel == B_FLOATING_APP_WINDOW_FEEL || feel == B_NORMAL_WINDOW_FEEL) {
-		WindowLayer *wb = NULL;
-		int32 count = fWindowLayerList.CountItems();
-		int32 feelToLookFor = (feel == B_NORMAL_WINDOW_FEEL ?
-			B_FLOATING_APP_WINDOW_FEEL : B_NORMAL_WINDOW_FEEL);
-
-		for (int32 i = 0; i < count; i++) {
-			wb = (WindowLayer *)fWindowLayerList.ItemAt(i);
-
-			if (wb->App()->ClientTeam() == winBorder->App()->ClientTeam()
-				&& wb->Feel() == feelToLookFor) {
-				// R2: RootLayer comparison is needed.
-				feel == B_NORMAL_WINDOW_FEEL ?
-					winBorder->fSubWindowList.AddWindowLayer(wb) :
-					wb->fSubWindowList.AddWindowLayer(winBorder);
-			}
-		}
-	}
-
-	// add application's list of modal windows.
-	if (feel == B_MODAL_APP_WINDOW_FEEL) {
-		winBorder->App()->fAppSubWindowList.AddWindowLayer(winBorder);
-	}
-
-	// send WindowLayer to be added to workspaces
-	RootLayer()->AddWindowLayer(winBorder);
-
-	// hey, unlock!
+	fWindowLayerList.AddItem(windowLayer);
 	Unlock();
 
-	RootLayer()->Unlock();
+	RootLayer()->AddWindowLayer(windowLayer);
 }
 
 
 void
-Desktop::RemoveWindowLayer(WindowLayer *winBorder)
+Desktop::RemoveWindowLayer(WindowLayer *windowLayer)
 {
-	if (!winBorder)
-		return;
-
-	// we are ServerApp thread, we need to lock RootLayer here.
-	RootLayer()->Lock();
-
-	// we're playing with window list. lock first.
 	Lock();
-
-	// remove from main WindowLayer list.
-	if (fWindowLayerList.RemoveItem(winBorder)) {
-		int32 feel = winBorder->Feel();
-
-		// floating app/subset and modal_subset windows require special atention because
-		// they are/may_be added to the list of a lot normal windows.
-		if (feel == B_FLOATING_SUBSET_WINDOW_FEEL
-			|| feel == B_MODAL_SUBSET_WINDOW_FEEL
-			|| feel == B_FLOATING_APP_WINDOW_FEEL)
-		{
-			WindowLayer *wb = NULL;
-			int32 count = fWindowLayerList.CountItems();
-
-			for (int32 i = 0; i < count; i++) {
-				wb = (WindowLayer*)fWindowLayerList.ItemAt(i);
-
-				if (wb->Feel() == B_NORMAL_WINDOW_FEEL
-					&& wb->App()->ClientTeam() == winBorder->App()->ClientTeam()) {
-					// R2: RootLayer comparison is needed. We'll see.
-					wb->fSubWindowList.RemoveItem(winBorder);
-				}
-			}
-		}
-
-		// remove from application's list
-		if (feel == B_MODAL_APP_WINDOW_FEEL) {
-			winBorder->App()->fAppSubWindowList.RemoveItem(winBorder);
-		}
-	} else {
-		Unlock();
-		RootLayer()->Unlock();
-		debugger("RemoveWindowLayer: WindowLayer not found in Desktop list\n");
-		return;
-	}
-
-	// Tell to winBorder's RootLayer about this.
-	RootLayer()->RemoveWindowLayer(winBorder);
-
+	fWindowLayerList.RemoveItem(windowLayer);
 	Unlock();
-	RootLayer()->Unlock();
-}
 
-
-void
-Desktop::AddWindowLayerToSubset(WindowLayer *winBorder, WindowLayer *toWindowLayer)
-{
-	// NOTE: we can safely lock the entire method body, because this method is called from
-	//		 RootLayer's thread only.
-
-	// we're playing with window list. lock first.
-	Lock();
-
-	if (!winBorder || !toWindowLayer
-		|| !fWindowLayerList.HasItem(winBorder)
-		|| !fWindowLayerList.HasItem(toWindowLayer)) {
-		Unlock();
-		debugger("AddWindowLayerToSubset: NULL WindowLayer or not found in Desktop list\n");
-		return;
-	}
-
-	if ((winBorder->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL
-			|| winBorder->Feel() == B_MODAL_SUBSET_WINDOW_FEEL)
-		&& toWindowLayer->Feel() == B_NORMAL_WINDOW_FEEL
-		&& toWindowLayer->App()->ClientTeam() == winBorder->App()->ClientTeam()
-		&& !toWindowLayer->fSubWindowList.HasItem(winBorder)) {
-		// add to normal_window's list
-		toWindowLayer->fSubWindowList.AddWindowLayer(winBorder);
-	} else {
-		Unlock();
-		debugger("AddWindowLayerToSubset: you must add a subset_window to a normal_window's subset with the same team_id\n");
-		return;
-	}
-
-	// send WindowLayer to be added to workspaces, if not already in there.
-	RootLayer()->AddSubsetWindowLayer(winBorder, toWindowLayer);
-
-	Unlock();
-}
-
-
-void
-Desktop::RemoveWindowLayerFromSubset(WindowLayer *winBorder, WindowLayer *fromWindowLayer)
-{
-	// NOTE: we can safely lock the entire method body, because this method is called from
-	//		 RootLayer's thread only.
-
-	// we're playing with window list. lock first.
-	Lock();
-
-	if (!winBorder || !fromWindowLayer
-		|| !fWindowLayerList.HasItem(winBorder)
-		|| !fWindowLayerList.HasItem(fromWindowLayer)) {
-		Unlock();
-		debugger("RemoveWindowLayerFromSubset: NULL WindowLayer or not found in Desktop list\n");
-		return;
-	}
-
-	// remove WindowLayer from workspace, if needed - some other windows may still have it in their subset
-	RootLayer()->RemoveSubsetWindowLayer(winBorder, fromWindowLayer);
-
-	if (fromWindowLayer->Feel() == B_NORMAL_WINDOW_FEEL) {
-		//remove from this normal_window's subset.
-		fromWindowLayer->fSubWindowList.RemoveItem(winBorder);
-	} else {
-		Unlock();
-		debugger("RemoveWindowLayerFromSubset: you must remove a subset_window from a normal_window's subset\n");
-		return;
-	}
-
-	Unlock();
+	RootLayer()->RemoveWindowLayer(windowLayer);
 }
 
 
 void
 Desktop::SetWindowLayerFeel(WindowLayer *winBorder, uint32 feel)
 {
-	// NOTE: this method is called from RootLayer thread only
-
-	// we're playing with window list. lock first.
-	Lock();
-
-	RemoveWindowLayer(winBorder);
-	winBorder->QuietlySetFeel(feel);
-	AddWindowLayer(winBorder);
-
-	Unlock();
+	// TODO: implement
 }
 
 

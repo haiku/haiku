@@ -40,116 +40,103 @@ namespace BPrivate {
 class UtilityBitmap;
 #endif
 
-/*!
-	\class RootLayer RootLayer.h
-	\brief Class used for the top layer of each workspace's Layer tree
-	
-	RootLayers are used to head up the top of each Layer tree and reimplement certain 
-	Layer functions to act accordingly. There is only one for each workspace class.
-	
-*/
+
 class RootLayer : public Layer {
-public:
-								RootLayer(const char *name,	int32 workspaceCount,
-									Desktop *desktop, DrawingEngine *driver);
-	virtual						~RootLayer(void);
+	public:
+							RootLayer(const char *name,	Desktop *desktop,
+								DrawingEngine *driver);
+		virtual				~RootLayer();
 
-	Desktop*					GetDesktop() const { return fDesktop; }
+		Desktop*			GetDesktop() const { return fDesktop; }
 
-	virtual	void				MoveBy(float x, float y);
-	virtual	void				ResizeBy(float x, float y);
-	virtual	void				ScrollBy(float x, float y)
-									{ /* not allowed */ }
+		virtual	void		MoveBy(float x, float y);
+		virtual	void		ResizeBy(float x, float y);
+		virtual	void		ScrollBy(float x, float y)
+								{ /* not allowed */ }
 
-			void				HideWindowLayer(WindowLayer* windowLayer);
-			void				ShowWindowLayer(WindowLayer* windowLayer);
-			void				SetWindowLayerWorskpaces(WindowLayer *windowLayer,
-									uint32 oldIndex, uint32 newIndex);
+		void				HideWindowLayer(WindowLayer* windowLayer);
+		void				ShowWindowLayer(WindowLayer* windowLayer, bool toFront = true);
 
-			void				RevealNewWMState(Workspace::State &oldWMState);
-// TODO: we need to replace Winborder* with Layer*
-	inline	WindowLayer*			Focus() const { return fWMState.Focus; }
-	inline	WindowLayer*			Front() const { return fWMState.Front; }
-	inline	WindowLayer*			Active() const { return fWMState.Focus; }
-			bool				SetActive(WindowLayer* newActive, bool activate = true);
+//		void				RevealNewWMState(Workspace::State &oldWMState);
+		bool				SetFocus(WindowLayer* focus);
+		WindowLayer*		Focus() const { return fFocus; }
+		WindowLayer*		Front() const { return fFront; }
+		WindowLayer*		Back() const { return fBack; }
 
-	inline	void				SetWorkspaceCount(int32 wksCount);
-	inline	int32				WorkspaceCount() const { return fWsCount; }
-	inline	Workspace*			WorkspaceAt(int32 index) const { return fWorkspace[index]; }
-	inline	Workspace*			ActiveWorkspace() const { return fWorkspace[fActiveWksIndex]; }
-	inline	int32				ActiveWorkspaceIndex() const { return fActiveWksIndex; }
-			bool				SetActiveWorkspace(int32 index);
+		void				SetWorkspace(int32 index, Workspace& workspace);
+		void				SetWorkspacesLayer(Layer* layer) { fWorkspacesLayer = layer; }
+		Layer*				WorkspacesLayer() const { return fWorkspacesLayer; }
 
-			void				ReadWorkspaceData(const char *path);
-			void				SaveWorkspaceData(const char *path);
+#if 0
+			void			SetBGColor(const RGBColor &col);
+			RGBColor		BGColor(void) const;
+#endif
 
-			void				SetWorkspacesLayer(Layer* layer) { fWorkspacesLayer = layer; }
-			Layer*				WorkspacesLayer() const { return fWorkspacesLayer; }
-	
-			void				SetBGColor(const RGBColor &col);
-			RGBColor			BGColor(void) const;
+		void				SetDragMessage(BMessage *msg);
+		BMessage*			DragMessage() const;
 
-			void				SetDragMessage(BMessage *msg);
-			BMessage*			DragMessage(void) const;
+		void				SetMouseEventLayer(Layer* layer);
 
-			void				SetMouseEventLayer(Layer* layer);
+		void				LayerRemoved(Layer* layer);
 
-			void				LayerRemoved(Layer* layer);
+		// Other methods
+		bool				Lock() { return fAllRegionsLock.Lock(); }
+		void				Unlock() { fAllRegionsLock.Unlock(); }
+		bool				IsLocked() { return fAllRegionsLock.IsLocked(); }
 
-			// Other methods
-			bool				Lock() { return fAllRegionsLock.Lock(); }
-			void				Unlock() { fAllRegionsLock.Unlock(); }
-			bool				IsLocked() { return fAllRegionsLock.IsLocked(); }
+		void				ActivateWindow(WindowLayer* window);
+		void				SendBehindWindow(WindowLayer* window, WindowLayer* front);
 
-			void				ChangeWindowLayerFeel(WindowLayer *windowLayer, int32 newFeel);
+		void				SetWindowLayerFeel(WindowLayer *windowLayer, int32 newFeel);
+		void				SetWindowLayerLook(WindowLayer *windowLayer, int32 newLook);
 
-			void				MarkForRedraw(const BRegion &dirty);
-			void				TriggerRedraw();
+		void				MarkForRedraw(const BRegion &dirty);
+		void				TriggerRedraw();
 
-	virtual	void				Draw(const BRect &r);
+		void				Draw(const BRect &r);
 
-			thread_id			LockingThread() { return fAllRegionsLock.LockingThread(); }
+		thread_id			LockingThread() { return fAllRegionsLock.LockingThread(); }
 
-private:
-friend class Desktop;
+		void				AddWindowLayer(WindowLayer* windowLayer);
+		void				RemoveWindowLayer(WindowLayer* windowLayer);
 
-			// these are meant for Desktop class only!
-			void				AddWindowLayer(WindowLayer* windowLayer);
-			void				RemoveWindowLayer(WindowLayer* windowLayer);
-			void				AddSubsetWindowLayer(WindowLayer *windowLayer, WindowLayer *toWindowLayer);
-			void				RemoveSubsetWindowLayer(WindowLayer *windowLayer, WindowLayer *fromWindowLayer);
+		void				MouseEventHandler(BMessage *msg);
 
-			void				MouseEventHandler(BMessage *msg);
-			Layer*				_ChildAt(BPoint where);
+	private:
+		bool				_SetFocus(WindowLayer* focus, BRegion& update);
+		void				_SetFront(WindowLayer* front, BRegion& update);
+		void				_UpdateBack();
+		void				_UpdateFront();
+		void				_UpdateFronts();
 
-			Desktop*			fDesktop;
-			BMessage*			fDragMessage;
-			Layer*				fMouseEventLayer;
+		void				_WindowsChanged(BRegion& region);
+		void				_UpdateWorkspace(Workspace& workspace);
 
-			uint32				fSavedEventMask;
-			uint32				fSavedEventOptions;
+		Layer*				_ChildAt(BPoint where);
 
-			BLocker				fAllRegionsLock;
+		Desktop*			fDesktop;
+		BMessage*			fDragMessage;
+		Layer*				fMouseEventLayer;
 
-			BRegion				fDirtyForRedraw;
+		BLocker				fAllRegionsLock;
 
-			int32				fActiveWksIndex;
-			int32				fWsCount;
-			Workspace**			fWorkspace;
-			Layer*				fWorkspacesLayer;
+		BRegion				fDirtyForRedraw;
 
-// TODO: fWMState MUST be associated with a surface. This is the case now
-//   with RootLayer, but after Axel's refractoring this should go in
-//   WorkspaceLayer, I think.
-			Workspace::State	fWMState;
+		int32				fWorkspace;
+		RGBColor			fColor;
+		Layer*				fWorkspacesLayer;
+
+		WindowLayer*		fFocus;
+		WindowLayer*		fFront;
+		WindowLayer*		fBack;
 
 #if ON_SCREEN_DEBUGGING_INFO
-	friend	class DebugInfoManager;
-			void				AddDebugInfo(const char* string);
-			BString				fDebugInfo;
+		friend	class DebugInfoManager;
+		void				AddDebugInfo(const char* string);
+		BString				fDebugInfo;
 #endif
 #if DISPLAY_HAIKU_LOGO
-			UtilityBitmap*		fLogoBitmap;
+		UtilityBitmap*		fLogoBitmap;
 #endif
 };
 

@@ -17,8 +17,8 @@ class WindowLayer;
 
 class SubWindowList : public BList {
 	public:
-		SubWindowList(void);
-		virtual ~SubWindowList(void);
+		SubWindowList();
+		virtual ~SubWindowList();
 
 		void AddWindowLayer(WindowLayer *windowLayer);
 

@@ -7,8 +7,8 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Axel Dörfler, axeld@pinc-software.de
  */
-#ifndef _DESKTOP_H_
-#define _DESKTOP_H_
+#ifndef DESKTOP_H
+#define DESKTOP_H
 
 
 #include "CursorManager.h"
@@ -18,6 +18,7 @@
 #include "VirtualScreen.h"
 #include "DesktopSettings.h"
 #include "MessageLooper.h"
+#include "Workspace.h"
 
 #include <InterfaceDefs.h>
 #include <List.h>
@@ -41,87 +42,103 @@ namespace BPrivate {
 
 
 class Desktop : public MessageLooper, public ScreenOwner {
- public:
-	// startup methods
+	public:
 								Desktop(uid_t userID);
-	virtual						~Desktop();
+		virtual					~Desktop();
 
-			void				Init();
+		void					Init();
 
-			uid_t				UserID() const { return fUserID; }
-	virtual port_id				MessagePort() const { return fMessagePort; }
+		uid_t					UserID() const { return fUserID; }
+		virtual port_id			MessagePort() const { return fMessagePort; }
 
-			::EventDispatcher&	EventDispatcher() { return fEventDispatcher; }
+		::EventDispatcher&		EventDispatcher() { return fEventDispatcher; }
 
-			void				BroadcastToAllApps(int32 code);
+		void					BroadcastToAllApps(int32 code);
 
-	// Methods for multiple monitors.
-	inline	Screen*				ScreenAt(int32 index) const
+		// Screen and drawing related methods
+
+		Screen*					ScreenAt(int32 index) const
 									{ return fActiveScreen; }
-	inline	Screen*				ActiveScreen() const
+		Screen*					ActiveScreen() const
 									{ return fActiveScreen; }
-	inline	::RootLayer*		RootLayer() const { return fRootLayer; }
-	inline	CursorManager&		GetCursorManager() { return fCursorManager; }
+		::RootLayer*			RootLayer() const { return fRootLayer; }
+		CursorManager&			GetCursorManager() { return fCursorManager; }
 
-			void				ScreenChanged(Screen* screen);
+		void					ScreenChanged(Screen* screen);
 
-	virtual void				ScreenRemoved(Screen* screen) {}
-	virtual void				ScreenAdded(Screen* screen) {}
-	virtual bool				ReleaseScreen(Screen* screen) { return false; }
+		void					ScreenRemoved(Screen* screen) {}
+		void					ScreenAdded(Screen* screen) {}
+		bool					ReleaseScreen(Screen* screen) { return false; }
 
-	const	::VirtualScreen&	VirtualScreen() const { return fVirtualScreen; }
-	inline	DrawingEngine*		GetDrawingEngine() const
+		const ::VirtualScreen&	VirtualScreen() const { return fVirtualScreen; }
+		DrawingEngine*			GetDrawingEngine() const
 									{ return fVirtualScreen.DrawingEngine(); }
-	inline	::HWInterface*		HWInterface() const
+		::HWInterface*			HWInterface() const
 									{ return fVirtualScreen.HWInterface(); }
 
-	// Methods for layer(WindowLayer) manipulation.
-			void				AddWindowLayer(WindowLayer *winBorder);
-			void				RemoveWindowLayer(WindowLayer *winBorder);
-			void				SetWindowLayerFeel(WindowLayer *winBorder,
-												 uint32 feel);
-			void				AddWindowLayerToSubset(WindowLayer *winBorder,
-													 WindowLayer *toWindowLayer);
-			void				RemoveWindowLayerFromSubset(WindowLayer *winBorder,
-														  WindowLayer *fromWindowLayer);
+		// Workspace methods
 
-			WindowLayer*			FindWindowLayerByClientToken(int32 token, team_id teamID);
-			//WindowLayer*		FindWindowLayerByServerToken(int32 token);
+		void					SetWorkspace(int32 index);
+		int32					CurrentWorkspace()
+									{ return fCurrentWorkspace; }
+		::Workspace&			WorkspaceAt(int32 index)
+									{ return fWorkspaces[index]; }
 
-			// get list of registed windows
-			const BObjectList<WindowLayer>& WindowList() const;
+		// WindowLayer methods
 
-			void				WriteWindowList(team_id team, BPrivate::LinkSender& sender);
-			void				WriteWindowInfo(int32 serverToken, BPrivate::LinkSender& sender);
+		void					ActivateWindow(WindowLayer* window);
+		void					SendBehindWindow(WindowLayer* window, WindowLayer* front);
 
- private:
- 			status_t			_ActivateApp(team_id team);
-	virtual void				_GetLooperName(char* name, size_t size);
-	virtual void				_PrepareQuit();
-	virtual void				_DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
+		void					SetWindowWorkspaces(WindowLayer* window, uint32 workspaces);
 
- private:
-			friend class DesktopSettings;
+		void					AddWindowLayer(WindowLayer *windowLayer);
+		void					RemoveWindowLayer(WindowLayer *windowLayer);
+		void					SetWindowLayerFeel(WindowLayer *windowLayer,
+									uint32 feel);
 
-			uid_t				fUserID;
-			::VirtualScreen		fVirtualScreen;
-			DesktopSettings::Private* fSettings;
-			port_id				fMessagePort;
-			::EventDispatcher	fEventDispatcher;
-			port_id				fInputPort;
+		WindowLayer*			FindWindowLayerByClientToken(int32 token, team_id teamID);
+		//WindowLayer*			FindWindowLayerByServerToken(int32 token);
 
-			BLocker				fAppListLock;
-			BList				fAppList;
+		// get list of registed windows
+		const BObjectList<WindowLayer>& WindowList() const;
 
-			sem_id				fShutdownSemaphore;
-			int32				fShutdownCount;
+		void					WriteWindowList(team_id team,
+									BPrivate::LinkSender& sender);
+		void					WriteWindowInfo(int32 serverToken,
+									BPrivate::LinkSender& sender);
 
-			BObjectList<WindowLayer> fWindowLayerList;
+	private:
+ 		status_t				_ActivateApp(team_id team);
+		void					_GetLooperName(char* name, size_t size);
+		void					_PrepareQuit();
+		void					_DispatchMessage(int32 code,
+									BPrivate::LinkReceiver &link);
 
-			::RootLayer*		fRootLayer;
-			Screen*				fActiveScreen;
-			
-			CursorManager		fCursorManager;
+	private:
+		friend class DesktopSettings;
+
+		uid_t					fUserID;
+		::VirtualScreen			fVirtualScreen;
+		DesktopSettings::Private* fSettings;
+		port_id					fMessagePort;
+		::EventDispatcher		fEventDispatcher;
+		port_id					fInputPort;
+
+		BLocker					fAppListLock;
+		BList					fAppList;
+
+		sem_id					fShutdownSemaphore;
+		int32					fShutdownCount;
+
+		::Workspace				fWorkspaces[32];//kMaxWorkspaces];
+		int32					fCurrentWorkspace;
+
+		BObjectList<WindowLayer> fWindowLayerList;
+
+		::RootLayer*			fRootLayer;
+		Screen*					fActiveScreen;
+
+		CursorManager			fCursorManager;
 };
 
-#endif	// _DESKTOP_H_
+#endif	// DESKTOP_H

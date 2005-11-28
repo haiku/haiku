@@ -34,7 +34,7 @@ WorkspacesLayer::~WorkspacesLayer()
 void
 WorkspacesLayer::_GetGrid(int32& columns, int32& rows)
 {
-	int32 count = GetRootLayer()->WorkspaceCount();
+	int32 count = 4; //GetRootLayer()->WorkspaceCount();
 
 	rows = 1;
 	for (int32 i = 2; i < count; i++) {
@@ -140,8 +140,8 @@ WorkspacesLayer::_DrawWorkspace(int32 index)
 {
 	BRect rect = _WorkspaceAt(index);
 
-	Workspace* workspace = GetRootLayer()->WorkspaceAt(index);
-	bool active = workspace == GetRootLayer()->ActiveWorkspace();
+	Workspace* workspace = NULL;
+	bool active = index == 0;
 	if (active) {
 		// draw active frame
 		RGBColor black(0, 0, 0);
@@ -155,7 +155,7 @@ WorkspacesLayer::_DrawWorkspace(int32 index)
 
 	// ToDo: fix me - workspaces must always exist, not only on first visit!
 	if (workspace != NULL)
-		color = workspace->BGColor();
+		color = workspace->Color();
 	else
 		color.SetColor(51, 102, 152);
 
@@ -171,9 +171,9 @@ WorkspacesLayer::_DrawWorkspace(int32 index)
 
 	if (workspace != NULL) {
 		WindowLayer* windows[256];
-		int32 count = 256;
-		if (!workspace->GetWindowLayerList((void **)&windows, &count))
-			return;
+		int32 count = 0;
+//		if (!workspace->GetWindowLayerList((void **)&windows, &count))
+//			return;
 
 		uint16 width, height;
 		uint32 colorSpace;
@@ -244,7 +244,7 @@ WorkspacesLayer::Draw(const BRect& updateRect)
 
 	// draw workspaces
 
-	int32 count = GetRootLayer()->WorkspaceCount();
+	int32 count = 4; //GetRootLayer()->WorkspaceCount();
 
 	for (int32 i = 0; i < count; i++) {
 		_DrawWorkspace(i);

@@ -14,7 +14,6 @@
 
 
 #include "MessageLooper.h"
-#include "SubWindowList.h"
 #include "BGet++.h"
 
 #include <String.h>
@@ -77,9 +76,6 @@ class ServerApp : public MessageLooper {
 		Desktop* GetDesktop() const { return fDesktop; }
 
 		BPrivate::BTokenSpace& ViewTokens() { return fViewTokens; }
-
-		// ToDo: public?
-		SubWindowList fAppSubWindowList;
 
 	private:
 		virtual void _DispatchMessage(int32 code, BPrivate::LinkReceiver &link);

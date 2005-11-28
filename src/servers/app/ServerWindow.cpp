@@ -294,13 +294,11 @@ ServerWindow::Show()
 		return;
 
 	RootLayer* rootLayer = fWindowLayer->GetRootLayer();
-	if (rootLayer && rootLayer->Lock()) {
+	if (rootLayer)
 		rootLayer->ShowWindowLayer(fWindowLayer);
-		rootLayer->Unlock();
-	}
-	
+
 	if (fDirectWindowData != NULL)
-		HandleDirectConnection(B_DIRECT_START|B_BUFFER_RESET);
+		HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESET);
 }
 
 
@@ -316,12 +314,10 @@ ServerWindow::Hide()
 
 	if (fDirectWindowData != NULL)
 		HandleDirectConnection(B_DIRECT_STOP);
-	
+
 	RootLayer* rootLayer = fWindowLayer->GetRootLayer();
-	if (rootLayer && rootLayer->Lock()) {
+	if (rootLayer)
 		rootLayer->HideWindowLayer(fWindowLayer);
-		rootLayer->Unlock();
-	}
 }
 
 
@@ -401,23 +397,6 @@ ServerWindow::NotifyZoom()
 {
 	// NOTE: if you do something else, other than sending a port message, PLEASE lock
 	BMessage msg(B_ZOOM);
-	SendMessageToClient(&msg);
-}
-
-/*!
-	\brief Notifies window of a change in screen resolution
-	\param frame Size of the new resolution
-	\param color_space Color space of the new screen mode
-*/
-void
-ServerWindow::NotifyScreenModeChanged(const BRect frame, const color_space colorSpace)
-{
-	STRACE(("ServerWindow %s: ScreenModeChanged\n", fTitle));
-
-	BMessage msg(B_SCREEN_CHANGED);
-	msg.AddRect("frame", frame);
-	msg.AddInt32("mode", (int32)colorSpace);
-
 	SendMessageToClient(&msg);
 }
 
@@ -696,7 +675,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			if (rootLayer) {
 				rootLayer->LayerRemoved(fCurrentLayer);
-				rootLayer->TriggerRedraw();
+				if (!fCurrentLayer->IsHidden())
+					rootLayer->TriggerRedraw();
 			}
 
 			if (fCurrentLayer->EventMask() != 0) {
@@ -992,7 +972,7 @@ if (rootLayer)
 	rootLayer->Lock();			
 			fCurrentLayer->SetViewColor(RGBColor(c));
 
-			if (rootLayer) {
+			if (rootLayer && !fCurrentLayer->IsHidden()) {
 				rootLayer->MarkForRedraw(fCurrentLayer->VisibleRegion());
 				rootLayer->TriggerRedraw();
 			}
@@ -1177,7 +1157,7 @@ if (rootLayer)
 			
 			link.Read<BRect>(&invalRect);
 
-			if (rootLayer) {
+			if (rootLayer && !fCurrentLayer->IsHidden()) {
 				BRect converted(invalRect.LeftTop(), invalRect.RightBottom());
 
 				fCurrentLayer->ConvertToScreen(&converted);
@@ -1206,13 +1186,12 @@ if (rootLayer)
 				invalidReg.Include(rect);
 			}
 
-			if (rootLayer) {
+			if (rootLayer && !fCurrentLayer->IsHidden()) {
 				fCurrentLayer->ConvertToScreen(&invalidReg);
 
 				rootLayer->MarkForRedraw(invalidReg);
 				rootLayer->TriggerRedraw();
 			}
-
 			break;
 		}
 		case AS_BEGIN_UPDATE:
@@ -1237,41 +1216,6 @@ if (rootLayer)
 			
 			// TODO: Implement AS_LAYER_DELETE_ROOT
 			STRACE(("ServerWindow %s: Message Delete_Layer_Root unimplemented\n", Title()));
-			break;
-		}
-		case AS_SHOW_WINDOW:
-		{
-			STRACE(("ServerWindow %s: Message AS_SHOW_WINDOW\n", Title()));
-			Show();
-			break;
-		}
-		case AS_HIDE_WINDOW:
-		{
-			STRACE(("ServerWindow %s: Message AS_HIDE_WINDOW\n", Title()));		
-			Hide();
-			break;
-		}
-		case AS_SEND_BEHIND:
-		{
-			STRACE(("ServerWindow %s: Message  Send_Behind unimplemented\n", Title()));
-			int32 token;
-			team_id teamID;
-			status_t status = B_NAME_NOT_FOUND;
-
-			link.Read<int32>(&token);
-			link.Read<team_id>(&teamID);
-
-			WindowLayer *behindOf;
-			if ((behindOf = fDesktop->FindWindowLayerByClientToken(token, teamID)) != NULL) {
-				fWindowLayer->GetRootLayer()->Lock();
-				// TODO: move to back ATM. Fix this later!
-				fWindowLayer->GetRootLayer()->SetActive(fWindowLayer, false);
-				fWindowLayer->GetRootLayer()->Unlock();
-				status = B_OK;
-			}
-
-			fLink.StartMessage(status);
-			fLink.Flush();
 			break;
 		}
 		case AS_BEGIN_TRANSACTION:
@@ -1333,16 +1277,14 @@ if (rootLayer)
 			link.Read<int32>(&mainToken);
 			link.Read(&teamID, sizeof(team_id));
 
-			windowLayer = fDesktop->FindWindowLayerByClientToken(mainToken, teamID);
+			windowLayer = NULL; //fDesktop->FindWindowLayerByClientToken(mainToken, teamID);
 			if (windowLayer) {
-				fLink.StartMessage(SERVER_TRUE);
+				fLink.StartMessage(B_OK);
 				fLink.Flush();
 
-				fWindowLayer->GetRootLayer()->Lock();
-				fDesktop->AddWindowLayerToSubset(fWindowLayer, windowLayer);
-				fWindowLayer->GetRootLayer()->Unlock();
+				//fDesktop->AddWindowLayerToSubset(fWindowLayer, windowLayer);
 			} else {
-				fLink.StartMessage(SERVER_FALSE);
+				fLink.StartMessage(B_ERROR);
 				fLink.Flush();
 			}
 			break;
@@ -1357,16 +1299,14 @@ if (rootLayer)
 			link.Read<int32>(&mainToken);
 			link.Read(&teamID, sizeof(team_id));
 			
-			windowLayer = fDesktop->FindWindowLayerByClientToken(mainToken, teamID);
+			windowLayer = NULL; //fDesktop->FindWindowLayerByClientToken(mainToken, teamID);
 			if (windowLayer) {
-				fLink.StartMessage(SERVER_TRUE);
+				fLink.StartMessage(B_OK);
 				fLink.Flush();
 
-				fWindowLayer->GetRootLayer()->Lock();
-				fDesktop->RemoveWindowLayerFromSubset(fWindowLayer, windowLayer);
-				fWindowLayer->GetRootLayer()->Unlock();
+				//fDesktop->RemoveWindowLayerFromSubset(fWindowLayer, windowLayer);
 			} else {
-				fLink.StartMessage(SERVER_FALSE);
+				fLink.StartMessage(B_ERROR);
 				fLink.Flush();
 			}
 			break;
@@ -1420,10 +1360,7 @@ if (rootLayer)
 			uint32 newWorkspaces;
 			link.Read<uint32>(&newWorkspaces);
 
-			fWindowLayer->GetRootLayer()->Lock();
-			fWindowLayer->GetRootLayer()->SetWindowLayerWorskpaces(fWindowLayer,
-				fWindowLayer->Workspaces(), newWorkspaces);
-			fWindowLayer->GetRootLayer()->Unlock();
+			fDesktop->SetWindowWorkspaces(fWindowLayer, newWorkspaces);
 			break;
 		}
 		case AS_WINDOW_RESIZE:
@@ -1483,19 +1420,6 @@ if (rootLayer)
 			fLink.Attach<float>(maxHeight);
 
 			fLink.Flush();
-			break;
-		}
-		case AS_ACTIVATE_WINDOW:
-		{
-			DTRACE(("ServerWindow %s: Message AS_ACTIVATE_WINDOW: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			bool activate = true;
-
-			link.Read<bool>(&activate);
-
-			if (rootLayer && rootLayer->Lock()) {
-				rootLayer->SetActive(fWindowLayer, activate);
-				rootLayer->Unlock();
-			}
 			break;
 		}
 		// Some BView drawing messages, but which don't need clipping
@@ -2128,6 +2052,52 @@ ServerWindow::_MessageLooper()
 				if (!fWindowLayer->IsHidden())
 					CRITICAL("ServerWindow: a window must be hidden before it's deleted\n");
 				break;
+
+			// TODO: these are here temporarily, as they don't lock the root layer
+			case AS_SHOW_WINDOW:
+				STRACE(("ServerWindow %s: Message AS_SHOW_WINDOW\n", Title()));
+				Show();
+				break;
+
+			case AS_HIDE_WINDOW:
+				STRACE(("ServerWindow %s: Message AS_HIDE_WINDOW\n", Title()));		
+				Hide();
+				break;
+
+			case AS_ACTIVATE_WINDOW:
+			{
+				DTRACE(("ServerWindow %s: Message AS_ACTIVATE_WINDOW: Layer: %s\n", Title(), fCurrentLayer->Name()));
+				bool activate = true;
+	
+				receiver.Read<bool>(&activate);
+	
+				if (activate)
+					fDesktop->ActivateWindow(fWindowLayer);
+				else
+					fDesktop->SendBehindWindow(fWindowLayer, NULL);
+				break;
+			}
+			case AS_SEND_BEHIND:
+			{
+				STRACE(("ServerWindow %s: Message  Send_Behind unimplemented\n", Title()));
+				int32 token;
+				team_id teamID;
+				status_t status;
+		
+				receiver.Read<int32>(&token);
+				receiver.Read<team_id>(&teamID);
+		
+				WindowLayer *behindOf;
+				if ((behindOf = fDesktop->FindWindowLayerByClientToken(token, teamID)) != NULL) {
+					fDesktop->SendBehindWindow(fWindowLayer, behindOf);
+					status = B_OK;
+				} else
+					status = B_NAME_NOT_FOUND;
+		
+				fLink.StartMessage(status);
+				fLink.Flush();
+				break;
+			}
 
 			case B_QUIT_REQUESTED:
 				STRACE(("ServerWindow %s received quit request\n", Title()));
