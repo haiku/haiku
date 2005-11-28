@@ -1,20 +1,74 @@
 SubDir HAIKU_TOP src tools gensyscalls ;
 
-# build gensyscallinfos
+# preprocess the syscalls header
 
-BuildPlatformMain gensyscallinfos : gensyscallinfos.cpp ;
-LinkAgainst gensyscallinfos : $(HOST_LIBSTDC++) ;
+rule PreprocessSyscalls
+{
+	# PreprocessSyscalls <preprocessedHeader> : <header> : <parsable> ;
+	#
+	local parsable = $(3) ;
+	local parsableDefine ;
 
+	if $(parsable) {
+		parsableDefine = GEN_SYSCALL_INFOS_PROCESSING ;
+	}
 
-# generate the syscall infos source file
+	Depends $(<) : $(>) ;
+
+	local headers = [ on $(1) return $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ] ;
+	local sysHeaders =
+		[ PrivateHeaders kernel ]
+		[ ArchHeaders $(TARGET_ARCH) ]
+		[ on $(1) return $(SUBDIRSYSHDRS) $(SYSHDRS) ]
+		$(HAIKU_HDRS) ;
+
+	HDRS on $(<) = $(headers) ;
+	SYSHDRS on $(<) = $(sysHeaders) ;
+
+	HDRRULE on $(>) = HdrRule ;
+	HDRSCAN on $(>) = $(HDRPATTERN) ;
+	HDRSEARCH on $(>) = $(headers) $(sysHeaders) $(STDHDRS) ;
+	HDRGRIST on $(>) = $(HDRGRIST) ;
+
+	DEFINES on $(<) += $(HAIKU_DEFINES) $(parsableDefine) ;
+
+	CCFLAGS on $(<) += $(HAIKU_CCFLAGS) $(SUBDIRCCFLAGS) $(OPTIM) ;
+	CCHDRS on $(<) = [ FIncludes $(headers) : $(HAIKU_LOCAL_INCLUDES_OPTION) ]
+		$(HAIKU_INCLUDES_SEPARATOR)
+		[ FSysIncludes $(sysHeaders) : $(HAIKU_SYSTEM_INCLUDES_OPTION) ] ;
+	CCDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
+}
+
+actions PreprocessSyscalls
+{
+	$(HAIKU_C++) -xc++ -E "$(2)" $(CCFLAGS) $(CCDEFS) $(CCHDRS) -o "$(1)" ;
+}
 
 local syscallsHeader = [ FGristFiles syscalls.h ] ;
 SEARCH on $(syscallsHeader) = [ FDirName $(HAIKU_TOP) headers private kernel ] ;
 
+# We generate two preprocessed headers. One for parsing by gensyscallinfos
+# (it contains #pragmas) and one for inclusion by the generated
+# gensyscalls_infos.cpp.
+local syscallsHeaderPPParsable = [ FGristFiles syscalls.h.pp.parsable ] ;
 local syscallsHeaderPP = [ FGristFiles syscalls.h.pp ] ;
-MakeLocateArch $(syscallsHeaderPP) ;
+MakeLocateArch $(syscallsHeaderPPParsable) $(syscallsHeaderPP) ;
 
-local syscallInfos = [ FGristFiles gensyscalls_infos.c ] ;
+PreprocessSyscalls $(syscallsHeaderPPParsable) : $(syscallsHeader) : true ;
+PreprocessSyscalls $(syscallsHeaderPP) : $(syscallsHeader) ;
+
+
+# build gensyscallinfos
+
+BuildPlatformMain gensyscallinfos
+	: gensyscallinfos.cpp
+	: $(HOST_LIBSTDC++)
+;
+
+
+# generate the syscall infos source file
+
+local syscallInfos = [ FGristFiles gensyscalls_infos.cpp ] ;
 MakeLocateArch $(syscallInfos) ;
 
 rule GenSyscallInfos {
@@ -26,27 +80,29 @@ actions GenSyscallInfos1 {
 	$(2[1]) $(2[2]) $(1)
 }
 
-GenSyscallInfos $(syscallInfos) : $(syscallsHeaderPP) ;
+GenSyscallInfos $(syscallInfos) : $(syscallsHeaderPPParsable) ;
+
+SubDirHdrs [ FDirName $(SUBDIR) arch $(TARGET_ARCH) ] ;
 
 
 # build gensyscalls
 
-BuildPlatformMain gensyscalls : gensyscalls.cpp $(syscallInfos:S=$(SUFOBJ)) ;
+BuildPlatformMain gensyscalls : gensyscalls.cpp $(syscallInfos) ;
 LinkAgainst gensyscalls : $(HOST_LIBSTDC++) ;
-UsePrivateObjectHeaders gensyscalls.cpp : kernel ;
-UseArchObjectHeaders gensyscalls.cpp : $(TARGET_ARCH) ;
+
+# Explicitly tell jam that gensyscalls.cpp includes the generated header.
+Includes [ FGristFiles gensyscalls.cpp ] : $(syscallsHeaderPP) ;
 
 
 # generate the output files
 
-# place them where there are needed
+# place them where they are needed
 local dir = $(HAIKU_COMMON_DEBUG_OBJECT_DIR) ;
 MakeLocate <syscalls>syscalls.S.inc : [ FDirName $(dir) system libroot os ] ;
 MakeLocate <syscalls>syscall_dispatcher.h : [ FDirName $(dir) system kernel ] ;
 MakeLocate <syscalls>syscall_numbers.h : [ FDirName $(dir) system kernel ] ;
 MakeLocate <syscalls>syscall_table.h : [ FDirName $(dir) system kernel ] ;
 MakeLocate <syscalls>strace_syscalls.h : [ FDirName $(dir) bin strace ] ;
-
 
 rule GenSyscallsFile {
 	Depends $(1) : gensyscalls ;
@@ -98,49 +154,3 @@ GenSyscallsDispatcher <syscalls>syscall_dispatcher.h ;
 GenSyscallsNumbers <syscalls>syscall_numbers.h ;
 GenSyscallsTable <syscalls>syscall_table.h ;
 GenSyscallsSTrace <syscalls>strace_syscalls.h ;
-
-
-# preprocess the syscalls header
-
-UsePrivateHeaders kernel ;
-UseArchHeaders $(TARGET_ARCH) ;
-
-rule PreprocessSyscalls
-{
-	Depends $(<) : $(>) ;
-
-	local headers = [ on $(1) return $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ] ;
-	local sysHeaders = [ on $(1) return $(SUBDIRSYSHDRS) $(SYSHDRS) ]
-		$(HAIKU_HDRS) ;
-
-	HDRS on $(<) = $(headers) ;
-	SYSHDRS on $(<) = $(sysHeaders) ;
-
-	HDRRULE on $(>) = HdrRule ;
-	HDRSCAN on $(>) = $(HDRPATTERN) ;
-	HDRSEARCH on $(>) = $(headers) $(sysHeaders) $(STDHDRS) ;
-	HDRGRIST on $(>) = $(HDRGRIST) ;
-
-	DEFINES on $(<) += $(HAIKU_DEFINES) GEN_SYSCALL_INFOS_PROCESSING ;
-
-	CCFLAGS on $(<) += $(HAIKU_CCFLAGS) $(SUBDIRCCFLAGS) $(OPTIM) ;
-	CCHDRS on $(<) = [ FIncludes $(headers) : $(HAIKU_LOCAL_INCLUDES_OPTION) ]
-		$(HAIKU_INCLUDES_SEPARATOR)
-		[ FSysIncludes $(sysHeaders) : $(HAIKU_SYSTEM_INCLUDES_OPTION) ] ;
-	CCDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
-}
-
-actions PreprocessSyscalls
-{
-	$(HAIKU_C++) -xc++ -E "$(2)" $(CCFLAGS) $(CCDEFS) $(CCHDRS) -o "$(1)" ;
-}
-
-PreprocessSyscalls $(syscallsHeaderPP) : $(syscallsHeader) ;
-
-
-# compile the syscall infos source file
-
-# TODO: Clean this mess up!
-SYSHDRS on $(syscallInfos:S=$(SUFOBJ)) = $(HAIKU_HDRS) ;
-Object $(syscallInfos:S=$(SUFOBJ)) : $(syscallInfos) ;
-CCFLAGS on $(syscallInfos:S=$(SUFOBJ)) += -nostdinc ;

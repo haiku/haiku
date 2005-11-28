@@ -15,7 +15,7 @@
 
 // usage
 const char *kUsage =
-"Usage: gensyscallinfos <header> <calls> <dispatcher>\n"
+"Usage: gensyscallinfos <header> <syscall infos>\n"
 "\n"
 "Given the (preprocessed) header file that defines the syscall prototypes the\n"
 "command generates a source file consisting of syscall infos, which is needed\n"
@@ -322,16 +322,6 @@ private:
 		tokenizer.ExpectNextToken("pragma");
 		tokenizer.ExpectNextToken("syscalls");
 		tokenizer.ExpectNextToken("end");
-
-//		for (int i = 0; i < (int)fSyscalls.size(); i++) {
-//			const Syscall &syscall = fSyscalls[i];
-//			printf("syscall: `%s'\n", syscall.GetName().c_str());
-//			for (int k = 0; k < (int)syscall.CountParameters(); k++)
-//				printf("  arg: `%s'\n", syscall.ParameterAt(k).type.c_str());
-//			printf("  return type: `%s'\n",
-//				syscall.GetReturnType().type.c_str());
-//		}
-//		printf("Found %lu syscalls.\n", fSyscalls.size());
 	}
 
 	void _WriteSyscallInfoFile(const char *filename)
@@ -340,86 +330,49 @@ private:
 		ofstream file(filename, ofstream::out | ofstream::trunc);
 		if (!file.is_open())
 			throw new IOException(string("Failed to open `") + filename + "'.");
+
 		// write preamble
 		file << "#include \"gensyscalls.h\"" << endl;
-		file << "#include \"syscalls.h\"" << endl;
+		file << "#include \"syscalls.h.pp\"" << endl;
 		file << endl;
-		// output the case statements
+
+		file << "SyscallVector* create_syscall_vector() {" << endl;
+		file << "\tSyscallVector* syscallVector = SyscallVector::Create();"
+			<< endl;
+		file << "\tSyscall* syscall;" << endl;
+
+		// syscalls
 		for (int i = 0; i < (int)fSyscalls.size(); i++) {
 			const Syscall &syscall = fSyscalls[i];
-			string name = string("gensyscall_") + syscall.GetName();
-			string paramInfoName = name + "_parameter_info";
+
+			// syscall = syscallVector->CreateSyscall("syscallName",
+			//	"syscallKernelName");
+			file << "\tsyscall = syscallVector->CreateSyscall(\""
+				<< syscall.GetName() << "\", \""
+				<< syscall.GetKernelName() << "\");" << endl;
+	
+			const Type &returnType = syscall.GetReturnType();
+
+			// syscall->SetReturnType<ReturnType>("returnType");
+			file << "\tsyscall->SetReturnType<" << returnType.type
+				<< ">(\"" << returnType.type << "\");" << endl;
+
+			// parameters
 			int paramCount = syscall.CountParameters();
-			// write the parameter infos
-			file << "static gensyscall_parameter_info " << paramInfoName
-				<< "[] = {" << endl;
 			for (int k = 0; k < paramCount; k++) {
 				const NamedType &param = syscall.ParameterAt(k);
-				file << "\t{ \"" << param.type << "\", \"" << param.name
-				<< "\", 0, " << "sizeof(" << syscall.ParameterAt(k).type
-				<< "), 0 }," << endl;
+				// syscall->AddParameter<ParameterType>("parameterTypeName",
+				//	"parameterName");
+				file << "\tsyscall->AddParameter<"
+					<< param.type << ">(\""
+					<< param.type << "\", \""
+					<< param.name << "\");" << endl;
 			}
-			file << "};" << endl;
-			file << endl;
-			// write the initialization function
-			file << "static void " << name << "(";
-			for (int k = 0; k < paramCount; k++) {
-				if (k > 0)
-					file << ", ";
-				string type = syscall.ParameterAt(k).type;
-				string::size_type pos = type.find(")");
-				if (pos == string::npos) {
-					file << type << " arg" << k;
-				} else {
-					// function pointer
-					file << string(type, 0, pos) << " arg" << k
-						<< string(type, pos, type.length() - pos);
-				}
-			}
-			if (paramCount > 0)
-				file << ", ";
-			file << "int arg" << paramCount << ") {" << endl;
-			for (int k = 0; k < paramCount; k++) {
-				file << "\t" << paramInfoName << "[" << k << "].offset = "
-					<< "(char*)&arg" << k << " - (char*)&arg0;" << endl;
-				file << "\t" << paramInfoName << "[" << k << "].actual_size = "
-					<< "(char*)&arg" << (k + 1) << " - (char*)&arg" << k << ";"
-					<< endl;
-			}
-			file << "}" << endl;
 			file << endl;
 		}
-		// write the syscall infos
-		file << "static gensyscall_syscall_info "
-			"gensyscall_syscall_infos[] = {" << endl;
-		for (int i = 0; i < (int)fSyscalls.size(); i++) {
-			const Syscall &syscall = fSyscalls[i];
-			string name = string("gensyscall_") + syscall.GetName();
-			string paramInfoName = name + "_parameter_info";
-			file << "\t{ \"" << syscall.GetName() << "\", "
-				<< "\"" << syscall.GetKernelName() << "\", "
-				<< "\"" << syscall.GetReturnType().type << "\", "
-				<< syscall.CountParameters() << ", "
-				<< paramInfoName << " }," << endl;
-		}
-		file << "};" << endl;
-		file << endl;
-		// write the initialization function
-		file << "gensyscall_syscall_info *gensyscall_get_infos(int *count);";
-		file << "gensyscall_syscall_info *gensyscall_get_infos(int *count) {"
-			<< endl;
-		for (int i = 0; i < (int)fSyscalls.size(); i++) {
-			const Syscall &syscall = fSyscalls[i];
-			string name = string("gensyscall_") + syscall.GetName();
-			file << "\t" << name << "(";
-			int paramCount = syscall.CountParameters();
-			// write the dummy parameters
-			for (int k = 0; k < paramCount; k++)
-				file << "(" << syscall.ParameterAt(k).type << ")0, ";
-			file << "0);" << endl;
-		}
-		file << "\t*count = " << fSyscalls.size() << ";" << endl;
-		file << "\treturn gensyscall_syscall_infos;" << endl;
+
+		// postamble
+		file << "\treturn syscallVector;" << endl;
 		file << "}" << endl;
 	}
 
