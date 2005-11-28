@@ -1166,11 +1166,14 @@ InputServer::StartStopDevices(const char* name, input_device_type type, bool doS
 			continue;
 
 		if (item->Matches(name, type)) {
+			if (!doStart ^ item->Running())
+				return B_ERROR;
+				
 			if (doStart)
 				item->Start();
 			else
 				item->Stop();
-
+			
 			if (name)
 				return B_OK;
 		}
@@ -1192,6 +1195,9 @@ InputServer::StartStopDevices(BInputServerDevice& serverDevice, bool doStart)
 
 	InputDeviceListItem* item = _FindInputDeviceListItem(serverDevice);
 	if (item != NULL) {
+		if (!doStart ^ item->Running())
+			return B_ERROR;
+		
 		if (doStart)
 			item->Start();
 		else
