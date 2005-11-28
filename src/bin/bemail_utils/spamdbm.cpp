@@ -65,6 +65,12 @@
  *
  * Revision History (now manually updated due to SVN's philosophy)
  * $Log: spamdbm.cpp,v $
+ * r15098 | agmsmith | 2005-11-23 23:17:00 -0500 (Wed, 23 Nov 2005) | 5 lines
+ * Added better tokenization so that HTML is parsed and things like tags
+ * between letters of a word no longer hide that word.  After testing, the
+ * result seems to be a tighter spread of ratings when done in full text plus
+ * header mode.
+ *
  * Revision 1.10  2005/11/24 02:08:39  agmsmith
  * Fixed up prefix codes, Z for things that are inside other things.
  *
@@ -1946,12 +1952,35 @@ static size_t TokenizerPassLowerCase (
 
   while (BufferPntr < EndOfStringPntr)
   {
-    if ((unsigned char) *BufferPntr < 128)
-      /* If it is not a UTF-8 character code, convert to lower case ASCII. */
-      *BufferPntr = tolower (*BufferPntr);
+    /* Do our own lower case conversion; tolower () has problems with UTF-8
+    characters that have the high bit set. */
+
+    if (*BufferPntr >= 'A' && *BufferPntr <= 'Z')
+      *BufferPntr = *BufferPntr + ('a' - 'A');
     BufferPntr++;
   }
   return NumberOfBytes;
+}
+
+
+/* A utility function for some commonly repeated code.  If this was Modula-2,
+we could use a nested procedure.  But it's not.  Adds the given word to the set
+of words, checking for maximum word length and prepending the prefix to the
+word, which gets modified by this function to reflect the word actually added
+to the set. */
+
+static void AddWordAndPrefixToSet (
+  string &Word,
+  const char *PrefixString,
+  set<string> &WordSet)
+{
+  if (Word.empty ())
+    return;
+
+  if (Word.size () > g_MaxWordLength)
+    Word.resize (g_MaxWordLength);
+  Word.insert (0, PrefixString);
+  WordSet.insert (Word);
 }
 
 
@@ -1959,7 +1988,8 @@ static size_t TokenizerPassLowerCase (
 separate words.  Doesn't affect the text in the buffer.  Looks for
 protocol://user:password@computer:port/path?query=key#anchor strings.  Also
 www.blah strings are detected and broken down.  Doesn't do HREF="" strings
-where the string has a relative path (no host computer name). */
+where the string has a relative path (no host computer name).  Assumes the
+input buffer is already in lower case. */
 
 static size_t TokenizerPassExtractURLs (
   char *BufferPntr,
@@ -1994,12 +2024,9 @@ static size_t TokenizerPassExtractURLs (
       while (ProtocolStringPntr > BufferPntr &&
       isalpha (ProtocolStringPntr[-1]))
         ProtocolStringPntr--;
-      Word = PrefixString;
-      Word.append (ProtocolStringPntr,
+      Word.assign (ProtocolStringPntr,
         (InputStringPntr - ProtocolStringPntr) + 1 /* for the colon */);
-      if (!Word.empty ())
-        WordSet.insert (Word);
-
+      AddWordAndPrefixToSet (Word, PrefixString, WordSet);
       HostStringPntr = InputStringPntr + 3; /* Skip past the "://" */
     }
     if (HostStringPntr == NULL)
@@ -2023,20 +2050,16 @@ static size_t TokenizerPassExtractURLs (
     if (AtSignStringPntr != NULL)
     {
       /* Add a word with the user and password, unseparated. */
-      Word = PrefixString;
-      Word.append (HostStringPntr,
+      Word.assign (HostStringPntr,
         AtSignStringPntr - HostStringPntr + 1 /* for the @ sign */);
-      if (!Word.empty ())
-        WordSet.insert (Word);
+      AddWordAndPrefixToSet (Word, PrefixString, WordSet);
       HostStringPntr = AtSignStringPntr + 1;
     }
 
     /* Add a word with the computer and port, unseparated. */
 
-    Word = PrefixString;
-    Word.append (HostStringPntr, InputStringPntr - HostStringPntr);
-    if (!Word.empty ())
-      WordSet.insert (Word);
+    Word.assign (HostStringPntr, InputStringPntr - HostStringPntr);
+    AddWordAndPrefixToSet (Word, PrefixString, WordSet);
 
     /* Now get the path name, not including the extra junk after ?  and #
     separators (they're stored as separate options).  Stops at white space or a
@@ -2056,24 +2079,18 @@ static size_t TokenizerPassExtractURLs (
     if (OptionsStringPntr == NULL)
     {
       /* No options, all path. */
-      Word = PrefixString;
-      Word.append (PathStringPntr, InputStringPntr - PathStringPntr);
-      if (!Word.empty ())
-        WordSet.insert (Word);
+      Word.assign (PathStringPntr, InputStringPntr - PathStringPntr);
+      AddWordAndPrefixToSet (Word, PrefixString, WordSet);
     }
     else
     {
       /* Insert the path before the options. */
-      Word = PrefixString;
-      Word.append (PathStringPntr, OptionsStringPntr - PathStringPntr);
-      if (!Word.empty ())
-        WordSet.insert (Word);
+      Word.assign (PathStringPntr, OptionsStringPntr - PathStringPntr);
+      AddWordAndPrefixToSet (Word, PrefixString, WordSet);
 
       /* Insert all the options as a word. */
-      Word = PrefixString;
-      Word.append (OptionsStringPntr, InputStringPntr - OptionsStringPntr);
-      if (!Word.empty ())
-        WordSet.insert (Word);
+      Word.assign (OptionsStringPntr, InputStringPntr - OptionsStringPntr);
+      AddWordAndPrefixToSet (Word, PrefixString, WordSet);
     }
   }
   return NumberOfBytes;
@@ -2171,6 +2188,9 @@ static size_t TokenizerPassGetPlainWords (
   size_t  Length;
   int     Letter;
 
+  if (NumberOfBytes <= 0)
+    return 0; /* Nothing to process. */
+
   if (PrefixCharacter != 0)
     AccumulatedWord = PrefixCharacter;
   EndOfStringPntr = BufferPntr + NumberOfBytes;
@@ -2227,8 +2247,9 @@ static size_t TokenizerPassGetPlainWords (
 /* Delete Things from the text.  The Thing is marked by a start string and an
 end string, such as "<!--" and "--> for HTML comment things.  All the text
 between the markers will be added to the word list before it gets deleted from
-the buffer.  The markers must be prepared in lower case.  You can specify an
-empty string for the end marker if you're just matching a string constant like
+the buffer.  The markers must be prepared in lower case and the buffer is
+assumed to have already been converted to lower case.  You can specify an empty
+string for the end marker if you're just matching a string constant like
 "&nbsp;", which you would put in the starting marker.  This is a utility
 function used by other tokenizer functions. */
 
@@ -2265,8 +2286,8 @@ static size_t TokenizerUtilRemoveStartEndThing (
     FoundAndDeletedThing = false;
     if (EndOfStringPntr - InputStringPntr >=
     ThingStartLength + ThingEndLength /* space remains for start + end */ &&
-    tolower (*InputStringPntr) == *ThingStartCode &&
-    strncasecmp (InputStringPntr, ThingStartCode, ThingStartLength) == 0)
+    *InputStringPntr == *ThingStartCode &&
+    memcmp (InputStringPntr, ThingStartCode, ThingStartLength) == 0)
     {
       /* Found the start marker.  Look for the terminating string.  If it is an
       empty string, then we've found it right now! */
@@ -2275,8 +2296,8 @@ static size_t TokenizerUtilRemoveStartEndThing (
       while (EndOfStringPntr - ThingEndPntr >= ThingEndLength)
       {
         if (ThingEndLength == 0 ||
-        (tolower (*ThingEndPntr) == *ThingEndCode &&
-        strncasecmp (ThingEndPntr, ThingEndCode, ThingEndLength) == 0))
+        (*ThingEndPntr == *ThingEndCode &&
+        memcmp (ThingEndPntr, ThingEndCode, ThingEndLength) == 0))
         {
           /* Got the end of the Thing.  First dump the text inbetween the start
           and end markers into the words list. */
@@ -2325,6 +2346,21 @@ static size_t TokenizerPassRemoveHTMLStyle (
   return TokenizerUtilRemoveStartEndThing (BufferPntr, NumberOfBytes,
     PrefixCharacter, WordSet,
     "<style", "/style>", false /* replace with space if true */);
+}
+
+
+/* Convert Japanese periods (a round hollow dot symbol) to spaces so that the
+start of the next sentence is recognised at least as the start of a very long
+word. */
+
+static size_t TokenizerPassJapanesePeriodsToSpaces (
+  char *BufferPntr,
+  size_t NumberOfBytes,
+  char PrefixCharacter,
+  set<string> &WordSet)
+{
+  return TokenizerUtilRemoveStartEndThing (BufferPntr,
+    NumberOfBytes, PrefixCharacter, WordSet, "。", "", true);
 }
 
 
@@ -2752,23 +2788,27 @@ void ABSApp::AddWordsToSet (
   and may add words to the word set. */
 
   CurrentSize = NumberOfBytes;
-  for (PassNumber = 1; PassNumber <= 7 && CurrentSize > 0 ; PassNumber++)
+  for (PassNumber = 1; PassNumber <= 8 && CurrentSize > 0 ; PassNumber++)
   {
     switch (PassNumber)
     {
-      case 1: CurrentSize = TokenizerPassLowerCase (
+      case 1: /* Lowercase first, rest of them assume lower case inputs. */
+        CurrentSize = TokenizerPassLowerCase (
+          BufferPntr, CurrentSize, PrefixCharacter, WordSet);
+        break;
+      case 2: CurrentSize = TokenizerPassJapanesePeriodsToSpaces (
         BufferPntr, CurrentSize, PrefixCharacter, WordSet); break;
-      case 2: CurrentSize = TokenizerPassTruncateLongAsianWords (
+      case 3: CurrentSize = TokenizerPassTruncateLongAsianWords (
         BufferPntr, CurrentSize, PrefixCharacter, WordSet); break;
-      case 3: CurrentSize = TokenizerPassRemoveHTMLComments (
+      case 4: CurrentSize = TokenizerPassRemoveHTMLComments (
         BufferPntr, CurrentSize, 'Z', WordSet); break;
-      case 4: CurrentSize = TokenizerPassRemoveHTMLStyle (
+      case 5: CurrentSize = TokenizerPassRemoveHTMLStyle (
         BufferPntr, CurrentSize, 'Z', WordSet); break;
-      case 5: CurrentSize = TokenizerPassExtractURLs (
+      case 6: CurrentSize = TokenizerPassExtractURLs (
         BufferPntr, CurrentSize, 'Z', WordSet); break;
-      case 6: CurrentSize = TokenizerPassRemoveHTMLTags (
+      case 7: CurrentSize = TokenizerPassRemoveHTMLTags (
         BufferPntr, CurrentSize, 'Z', WordSet); break;
-      case 7: CurrentSize = TokenizerPassGetPlainWords (
+      case 8: CurrentSize = TokenizerPassGetPlainWords (
         BufferPntr, CurrentSize, PrefixCharacter, WordSet); break;
       default: break;
     }
@@ -5221,7 +5261,7 @@ status_t ABSApp::TokenizeWhole (
     apparently that isn't all that useful a distinction, so do it. */
 
     if (Letter >= 'A' && Letter < 'Z')
-      Letter = tolower (Letter);
+      Letter = Letter + ('a' - 'A');
 
     /* See if it is a letter we treat as white space - all control characters
     and all punctuation except for: apostrophe (so "it's" and possessive
