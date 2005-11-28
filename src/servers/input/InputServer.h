@@ -135,6 +135,7 @@ class InputServer : public BApplication {
 
 		status_t GetDeviceInfo(const char* name, input_device_type *_type,
 					bool *_isRunning = NULL);
+		status_t GetDeviceInfos(BMessage *msg);
 		status_t UnregisterDevices(BInputServerDevice& serverDevice,
 					input_device_ref** devices = NULL);
 		status_t RegisterDevices(BInputServerDevice& serverDevice,

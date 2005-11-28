@@ -678,13 +678,14 @@ AddOnManager::HandleFindDevices(BMessage* message, BMessage* reply)
 	CALLED();
 	const char *name = NULL;
 	input_device_type type;
-	if (message->FindString("device", &name) != B_OK
-		|| gInputServer->GetDeviceInfo(name, &type) != B_OK)
-		return B_NAME_NOT_FOUND;
-
-	reply->AddString("device", name);
-	reply->AddInt32("type", type);
-
+	if (message->FindString("device", &name) == B_OK) {
+		if (gInputServer->GetDeviceInfo(name, &type) != B_OK)
+			return B_NAME_NOT_FOUND;
+		reply->AddString("device", name);
+		reply->AddInt32("type", type);
+	} else {
+		gInputServer->GetDeviceInfos(reply);
+	}
 	return B_OK;
 }
 

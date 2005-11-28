@@ -1055,6 +1055,21 @@ InputServer::GetDeviceInfo(const char* name, input_device_type *_type,
 
 
 status_t
+InputServer::GetDeviceInfos(BMessage *msg)
+{
+	CALLED();
+	BAutolock lock(fInputDeviceListLocker);
+
+	for (int32 i = fInputDeviceList.CountItems() - 1; i >= 0; i--) {
+		InputDeviceListItem* item = (InputDeviceListItem*)fInputDeviceList.ItemAt(i);
+		msg->AddString("device", item->Name());
+		msg->AddInt32("type", item->Type());
+	}
+	return B_OK;
+}
+
+
+status_t
 InputServer::UnregisterDevices(BInputServerDevice& serverDevice,
 	input_device_ref **devices)
 {
