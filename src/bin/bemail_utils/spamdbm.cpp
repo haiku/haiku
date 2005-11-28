@@ -2351,7 +2351,7 @@ static size_t TokenizerPassRemoveHTMLStyle (
 
 /* Convert Japanese periods (a round hollow dot symbol) to spaces so that the
 start of the next sentence is recognised at least as the start of a very long
-word. */
+word.  The Japanese comma also does the same job. */
 
 static size_t TokenizerPassJapanesePeriodsToSpaces (
   char *BufferPntr,
@@ -2359,8 +2359,13 @@ static size_t TokenizerPassJapanesePeriodsToSpaces (
   char PrefixCharacter,
   set<string> &WordSet)
 {
-  return TokenizerUtilRemoveStartEndThing (BufferPntr,
-    NumberOfBytes, PrefixCharacter, WordSet, "。", "", true);
+  size_t BytesRemaining = NumberOfBytes;
+
+  BytesRemaining = TokenizerUtilRemoveStartEndThing (BufferPntr,
+    BytesRemaining, PrefixCharacter, WordSet, "。" /* period */, "", true);
+  BytesRemaining = TokenizerUtilRemoveStartEndThing (BufferPntr,
+    BytesRemaining, PrefixCharacter, WordSet, "、" /* comma */, "", true);
+  return BytesRemaining;
 }
 
 
