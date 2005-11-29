@@ -157,6 +157,7 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 	//	triggered yourself (like a pop-up window in your browser while
 	//	you're typing a password in another window) - maybe this should
 	//	be done differently, though (using something like B_LOCK_WINDOW_FOCUS)
+	//	(at least B_WINDOW_ACTIVATED must be postponed)
 
 	if (focus != fLastFocus && now - fTimestamp > 100000) {
 		// if the time span between the key presses is very short

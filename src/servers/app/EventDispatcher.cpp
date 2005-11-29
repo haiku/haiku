@@ -32,11 +32,26 @@
 
 
 /*!
-	The differentiation between messenger and token looks odd, but it
-	really has a reason as well:
+	The EventDispatcher is a per Desktop object that handles all input
+	events for that desktop.
+
+	The events are processed as needed in the Desktop class (via EventFilters),
+	and then forwarded to the actual target of the event, a client window
+	(or more correctly, to its EventTarget).
+	You cannot set the target of an event directly - the event filters need
+	to specify the targets.
+	The event loop will make sure that every target and interested listener
+	will get the event - it also delivers mouse moved events to the previous
+	target once so that this target can then spread the B_EXITED_VIEW transit
+	to the local target handler (usually a BView).
+
+	If you look at the event_listener structure below, the differentiation
+	between target and token may look odd, but it really has a reason as
+	well:
 	All events are sent to the preferred window handler only - the window
 	may then use the token or token list to identify the specific target
-	view(s).
+	view(s). This makes it possible to send every event only once, no
+	matter how many local target handlers there are.
 */
 
 struct event_listener {
