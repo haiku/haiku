@@ -109,7 +109,7 @@ To make things look even more complex the driver might actually use the BIOS to 
 	<strong>Notes:</strong>
  	<ul>
  		<li>On driverversion 0.23 and before usebios had no effect at all. The cards were never coldstarted;
-		<li>Coldstarting should work on most cards except TNT1, GeForce 6600 and GeForce 6800;
+		<li>Coldstarting should work on most cards except TNT1, GeForce 6xxx and GeForce 7xxx;
 		<li>Coldstarting will not yet work with laptop- and DVI panels.
  	</ul> 
 	<li><strong>memory:</strong> (disabled by default)<br>
@@ -123,8 +123,8 @@ This option is disabled by default (preceded by a '#').<br>
 		<li><strong>true:</strong> (default setting)<br>
 		A software cursor 'flickers' a bit sometimes because it has to be redrawn constantly. So <strong>hardcursor true</strong> is the preferred setting. For DirectWindow windowed mode functionality you need to use this setting also (Chart demo app for instance).
 	</ul>
-<li><strong>logmask:</strong> (set to minimal by default)<br>
-The logmask option is very handy to track down trouble in the driver. You should only enable this if you are doing so, otherwise keep it turned off because it slows down your system. (All lines have a '#' preceding 'logmask' by default.) Logging creates a logfile called <strong>nv.accelerant.0.log</strong> in your <strong>~ (home)</strong> folder. A second logfile may get created depending on how the driver is used (on cloning; for BWindowScreen for example). The second file is called <strong>nv.accelerant.1.log</strong>, and it will also be in your home folder.<br>
+<li><strong>logmask:</strong> (set to disabled by default)<br>
+The logmask option is very handy to track down trouble in the driver. You should only enable this if you are doing so, otherwise keep it turned off because it slows down your system. (All lines have a '#' preceding 'logmask' by default.) Logging creates a logfile called <strong>nv.(/dev/graphics name).0.log</strong> in your <strong>~ (home)</strong> folder. A second logfile may get created depending on how the driver is used (on cloning; for BWindowScreen for example). The second file is called <strong>nv.(/dev/graphics name).1.log</strong>, and it will also be in your home folder.<br>
 <strong>Note:</strong>
 <ul>
 <li>You may only enable *one* logmask-line. The value you place after it (hexadecimal 32bit) determines what will be logged. The first 7 digits determine the part of the driver that will be logging, the last single digit determines the level of logging (like 'all messages', or only 'error messages').
@@ -135,7 +135,7 @@ Dumprom is another 'tool' for bug-tracking purposes.
 		<li><strong>false:</strong> (default setting)<br>
 		Keep it set to <strong>dumprom false</strong>, unless you want the driver to dump the contents of your VGA BIOS ROM in a file.
 		<li><strong>true:</strong><br>
-		<strong>dumprom true</strong> lets the driver dump a copy of your VGA BIOS in a file called <strong>nv.rom</strong> in your <strong>~ (home)</strong> folder.
+		<strong>dumprom true</strong> lets the driver dump a copy of your VGA BIOS in a file called <strong>nv.(/dev/graphics name).rom</strong> in your <strong>~ (home)</strong> folder.
 	</ul>
 <li><strong>switchhead:</strong><br>
 The driver always autodetects which output should be used as primary one, but you can let the driver 'invert' the outcome of that detection with this option (only for dualhead cards).
@@ -211,10 +211,18 @@ This option only has an effect if you have a card with supported TV encoder chip
 If you select <strong>vga_on_tv false</strong> the driver will automatically shut-off your VGA (or DVI) monitor (by means of special internal DPMS settings) when a TVout mode is enabled on the head the monitor is connected to. This means that on singlehead cards and on dualhead cards using singlehead TV modes your only output will be on TV. This is the standard way of doing things.
 		<li><strong>true:</strong> With this setting VGA (or DVI) output on a head is enabled concurrent with TV output on that head: that is if you select a TVout mode. This setting is a 'tweak' because the modeline used to drive your monitor is the same modeline that is used for the TV output. This means that the monitor picture positioning is probably a bit odd, in some modes it might distort somewhat, and the refreshrate will be 50Hz for PAL modes, and 60Hz for NTSC modes. Make sure you only enable this tweak if you know your monitor supports down to 50Hz refreshrate, and preferably has a failsafe built in that blocks output when out-of-range signals are sent to it (almost every newer monitor has this feature).<br>
 	</ul>
+<li><strong>primary:</strong> (set to disabled by default)<br>
+Primary lets you force a certain card to be used as primary card in your system if you have multiple graphics cards installed: so it will display your desktop. To enable this (hack) feature uncomment this item and fill in the exact name of the card that is to be primary (as exported by the kerneldriver in /dev/graphics/). If you are going to select a card other than the one displaying your system's POST messages at bootup, make sure you also set 'usebios false' as otherwise the card(s) aren't coldstarted by the driver.<br>
+<strong>Note please:</strong>
+<ul>
+<li>DVI and laptop panels don't work yet with the 'usebios false' setting. Analog connected screens should work though. 
+<li>Coldstarting doesn't work on TNT1 and GeForce 6xxx/7xxx cards yet.
+<li>Primary forces the primary card by preceding the exported name by a minus-sign (-) for the selected device. This ensures that this device will be listed at the top in the /dev/graphics/ folder, which is alphabetically ordered. Please make sure you enable the 'primary' feature on just one graphics driver, otherwise it's effect isn't 'guaranteed'.
+</ul>
 </ul>
 <hr>
 <br>
 <a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on November 20, 2005)</p>
+<p>(Page last updated on November 29, 2005)</p>
 </body>
 </html>
