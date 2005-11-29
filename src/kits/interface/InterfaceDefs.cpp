@@ -11,6 +11,7 @@
 /**	Global functions and variables for the Interface Kit */
 
 #include <Application.h>
+#include <Font.h>
 #include <InterfaceDefs.h>
 #include <Menu.h>
 #include <Roster.h>
@@ -21,6 +22,7 @@
 #include <stdlib.h>
 // TODO: remove this header
 #include <stdio.h>
+#include <string.h>
 
 #include <AppServerLink.h>
 #include <WindowInfo.h>
@@ -31,8 +33,6 @@
 #include <ColorSet.h>	// for private system colors stuff
 #include <ColorTools.h>
 
-#include <string.h>
-#include <Font.h>
 #include "moreUTF8.h"
 #include "truncate_string.h"
 
@@ -111,18 +111,18 @@ mode2parms(uint32 space, uint32 *out_space, int32 *width, int32 *height)
 			*out_space = B_RGB32;
 			*width = 1600; *height = 1200;
 			break;
-    	case B_8_BIT_1152x900:
-    		*out_space = B_CMAP8;
-    		*width = 1152; *height = 900;
-    		break;
-    	case B_16_BIT_1152x900:
-    		*out_space = B_RGB16;
-    		*width = 1152; *height = 900;
-    		break;
-    	case B_32_BIT_1152x900:
-    		*out_space = B_RGB32;
-    		*width = 1152; *height = 900;
-    		break;
+    		case B_8_BIT_1152x900:
+    			*out_space = B_CMAP8;
+    			*width = 1152; *height = 900;
+    			break;
+    		case B_16_BIT_1152x900:
+    			*out_space = B_RGB16;
+    			*width = 1152; *height = 900;
+    			break;
+    		case B_32_BIT_1152x900:
+    			*out_space = B_RGB32;
+    			*width = 1152; *height = 900;
+    			break;
 		case B_15_BIT_640x480:
 			*out_space = B_RGB15;
 			*width = 640; *height = 480;
@@ -143,13 +143,13 @@ mode2parms(uint32 space, uint32 *out_space, int32 *width, int32 *height)
 			*out_space = B_RGB15;
 			*width = 1600; *height = 1200;
 			break;
-    	case B_15_BIT_1152x900:
-    		*out_space = B_RGB15;
-    		*width = 1152; *height = 900;
-    		break;
-    	default:
-    		status = B_BAD_VALUE;
-    		break;
+    		case B_15_BIT_1152x900:
+    			*out_space = B_RGB15;
+    			*width = 1152; *height = 900;
+    			break;
+    		default:
+    			status = B_BAD_VALUE;
+    			break;
 	}
 	
 	return status;
@@ -161,6 +161,7 @@ system_colors()
 {
 	return BScreen(B_MAIN_SCREEN_ID).ColorMap();
 }
+
 
 _IMPEXP_BE status_t
 set_screen_space(int32 index, uint32 space, bool stick)
@@ -230,6 +231,7 @@ set_scroll_bar_info(scroll_bar_info *info)
 	return B_ERROR;
 }
 
+
 _IMPEXP_BE status_t
 get_mouse_type(int32 *type)
 {
@@ -266,7 +268,7 @@ get_mouse_map(mouse_map *map)
 	
 	_control_input_server_(&command, &reply);
 	
-	if(reply.FindData("mousemap", B_ANY_TYPE, &data, &count) != B_OK)
+	if (reply.FindData("mousemap", B_ANY_TYPE, &data, &count) != B_OK)
 		return B_ERROR;
 	
 	memcpy(map, data, count);
@@ -294,7 +296,7 @@ get_click_speed(bigtime_t *speed)
 	
 	_control_input_server_(&command, &reply);
 	
-	if(reply.FindInt64("speed", speed) != B_OK)
+	if (reply.FindInt64("speed", speed) != B_OK)
 		return B_ERROR;
 	
 	return B_OK;
@@ -319,7 +321,7 @@ get_mouse_speed(int32 *speed)
 	
 	_control_input_server_(&command, &reply);
 	
-	if(reply.FindInt32("speed", speed) != B_OK)
+	if (reply.FindInt32("speed", speed) != B_OK)
 		return B_ERROR;
 	
 	return B_OK;
@@ -344,7 +346,7 @@ get_mouse_acceleration(int32 *speed)
 	
 	_control_input_server_(&command, &reply);
 	
-	if(reply.FindInt32("speed", speed) != B_OK)
+	if (reply.FindInt32("speed", speed) != B_OK)
 		return B_ERROR;
 	
 	return B_OK;
@@ -369,7 +371,7 @@ get_key_repeat_rate(int32 *rate)
 	
 	_control_input_server_(&command, &reply);
 	
-	if(reply.FindInt32("rate", rate) != B_OK)
+	if (reply.FindInt32("rate", rate) != B_OK)
 		return B_ERROR;
 	
 	return B_OK;
@@ -394,7 +396,7 @@ get_key_repeat_delay(bigtime_t *delay)
 	
 	_control_input_server_(&command, &reply);
 	
-	if(reply.FindInt64("delay", delay) != B_OK)
+	if (reply.FindInt64("delay", delay) != B_OK)
 		return B_ERROR;
 	
 	return B_OK;
@@ -420,10 +422,10 @@ modifiers()
 	
 	_control_input_server_(&command, &reply);
 	
-	if(reply.FindInt32("status", &err) != B_OK)
+	if (reply.FindInt32("status", &err) != B_OK)
 		return 0;
 	
-	if(reply.FindInt32("modifiers", &modifier) != B_OK)
+	if (reply.FindInt32("modifiers", &modifier) != B_OK)
 		return 0;
 
 	return modifier;
@@ -441,10 +443,10 @@ get_key_info(key_info *info)
 	
 	_control_input_server_(&command, &reply);
 	
-	if(reply.FindInt32("status", &err) != B_OK)
+	if (reply.FindInt32("status", &err) != B_OK)
 		return B_ERROR;
 	
-	if(reply.FindData("key_info", B_ANY_TYPE, &data, &count) != B_OK)
+	if (reply.FindData("key_info", B_ANY_TYPE, &data, &count) != B_OK)
 		return B_ERROR;
 	
 	memcpy(info, data, count);
@@ -462,14 +464,12 @@ get_key_map(key_map **map, char **key_buffer)
 	
 	_control_input_server_(&command, &reply);
 	
-	if(reply.FindData("keymap", B_ANY_TYPE, &map_array, &map_count) != B_OK)
-	{
+	if (reply.FindData("keymap", B_ANY_TYPE, &map_array, &map_count) != B_OK) {
 		*map = 0; *key_buffer = 0;
 		return;
 	}
 	
-	if(reply.FindData("key_buffer", B_ANY_TYPE, &key_array, &key_count) != B_OK)
-	{
+	if (reply.FindData("key_buffer", B_ANY_TYPE, &key_array, &key_count) != B_OK) {
 		*map = 0; *key_buffer = 0;
 		return;
 	}
