@@ -58,6 +58,7 @@ struct device_info {
 	vuint32		*regs;				/* kernel's pointer to memory mapped registers */
 	pci_info	pcii;					/* a convenience copy of the pci info for this device */
 	char		name[B_OS_NAME_LENGTH];	/* where we keep the name of the device for publishing and comparing */
+	uint8 		rom_mirror[32768];	/* mirror of the ROM (is needed for MMS cards) */
 };
 
 typedef struct {
@@ -76,6 +77,7 @@ static status_t write_hook (void* dev, off_t pos, const void* buf, size_t* len);
 static status_t control_hook (void* dev, uint32 msg, void *buf, size_t len);
 static status_t map_device(device_info *di);
 static void unmap_device(device_info *di);
+static void copy_rom(device_info *di);
 static void probe_devices(void);
 static int32 gx00_interrupt(void *data);
 
@@ -416,8 +418,8 @@ static status_t map_device(device_info *di)
 		}
 		if (found)
 		{
-			/* make the copy from the primary VGA card */
-			memcpy (si->rom_mirror, pd->di[index].si->rom_mirror, 32768);
+			/* make the copy from the primary VGA card on our bus */
+			memcpy (si->rom_mirror, pd->di[index].rom_mirror, 32768);
 		}
 		else
 		{
@@ -569,6 +571,62 @@ static void unmap_device(device_info *di) {
 	di->regs = NULL;
 }
 
+static void copy_rom(device_info *di)
+{
+	char buffer[B_OS_NAME_LENGTH];
+	uint8 *rom_temp;
+	area_id rom_area;
+	uint32 tmpUlong;
+	pci_info *pcii = &(di->pcii);
+
+	/* MIL1 has frame_buffer in [1], while MIL2 and later have frame_buffer in [0] */
+	int frame_buffer = 0;
+	/* correct layout for MIL1 */
+	//fixme: checkout Mystique 170 and 220...
+	if (di->pcii.device_id == 0x0519) frame_buffer = 1;
+
+	/* enable memory mapped IO, disable VGA I/O - this is standard*/
+	tmpUlong = get_pci(PCI_command, 4);
+	tmpUlong |= 0x00000002;
+	tmpUlong &= 0xfffffffe;
+	set_pci(PCI_command, 4, tmpUlong);
+
+	/* work out a name for the ROM mapping*/
+	sprintf(buffer, DEVICE_FORMAT " rom",
+		di->pcii.vendor_id, di->pcii.device_id,
+		di->pcii.bus, di->pcii.device, di->pcii.function);
+
+	/*place ROM over the fbspace (this is definately safe)*/
+	tmpUlong = di->pcii.u.h0.base_registers[frame_buffer];
+	tmpUlong |= 0x00000001;
+	set_pci(PCI_rom_base, 4, tmpUlong);
+
+	rom_area = map_physical_memory(
+		buffer,
+		(void *)di->pcii.u.h0.base_registers[frame_buffer],
+		32768,
+		B_ANY_KERNEL_ADDRESS,
+		B_READ_AREA,
+		(void **)&(rom_temp)
+	);
+
+	/* if mapping ROM to vmem was successfull copy it */
+	if (rom_area >= 0)
+	{
+		/* copy ROM for future reference (MMS cards) */
+		memcpy (di->rom_mirror, rom_temp, 32768);
+
+		/* disable ROM and delete the area */
+		set_pci(PCI_rom_base, 4, 0);
+		delete_area(rom_area);
+	}
+
+	/* disable memory mapped IO */
+	tmpUlong = get_pci(PCI_command, 4);
+	tmpUlong &= 0xfffffffc;
+	set_pci(PCI_command, 4, tmpUlong);
+}
+
 static void probe_devices(void)
 {
 	uint32 pci_index = 0;
@@ -612,6 +670,10 @@ static void probe_devices(void)
 						di->shared_area = -1;
 						/* mark pointer to shared data as invalid */
 						di->si = NULL;
+						/* copy ROM for MMS (multihead with multiple GPU) cards:
+						 * they might only have a ROM on the primary adaptor.
+						 * (Confirmed G200MMS.) */
+						copy_rom(di);
 						/* inc pointer to device info */
 						di++;
 						/* inc count */
