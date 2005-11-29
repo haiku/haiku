@@ -96,7 +96,11 @@ View::MouseDown(BPoint where)
 void
 View::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 {
-	SetHighColor(0, 0, 150);
+	if (transit == B_ENTERED_VIEW)
+		SetHighColor(0, 150, 150);
+	else
+		SetHighColor(0, 0, 150);
+
 	Invalidate();
 	Window()->SetPulseRate(10000);
 }
