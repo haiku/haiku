@@ -22,7 +22,6 @@ Desktop::Desktop(DrawView* drawView)
 	  fIs2ndButton(false),
 
 	  fClippingLock("clipping lock"),
-	  fDirtyRegion(),
 	  fBackgroundRegion(),
 
 	  fDrawView(drawView),
@@ -102,33 +101,19 @@ Desktop::MouseDown(BPoint where, uint32 buttons)
 
 		fIs2ndButton = true;
 	} else if (buttons == B_TERTIARY_MOUSE_BUTTON) {
-		if (modifiers() & B_SHIFT_KEY) {
-			// render global dirty region
-			if (fDrawingEngine->Lock()) {
-				fDrawingEngine->SetHighColor(255, 0, 0);
-				fDrawingEngine->FillRegion(&fDirtyRegion);
-				fDrawingEngine->MarkDirty(&fDirtyRegion);
-				fDrawingEngine->Unlock();
-			}
-		} else {
-			// complete redraw
 #if RUN_WITH_FRAME_BUFFER
-			if (fDrawingEngine->Lock()) {
-				fDirtyRegion.MakeEmpty();
+		if (fDrawingEngine->Lock()) {
+			BRegion region(fDrawingEngine->Bounds());
+			fDrawingEngine->Unlock();
 
-				BRegion region(fDrawingEngine->Bounds());
-				fDrawingEngine->Unlock();
-
-				MarkDirty(&region);
-				region = fBackgroundRegion;
-				fBackgroundRegion.MakeEmpty();
-				_SetBackground(&region);
-			}
-#else
-			fDirtyRegion.MakeEmpty();
-			fDrawingEngine->MarkDirty();
-#endif
+			MarkDirty(&region);
+			region = fBackgroundRegion;
+			fBackgroundRegion.MakeEmpty();
+			_SetBackground(&region);
 		}
+#else
+		fDrawingEngine->MarkDirty();
+#endif
 	}
 }
 
@@ -245,7 +230,7 @@ Desktop::MessageReceived(BMessage* message)
 	}
 }
 
-#pragma mark -
+// #pragma mark -
 
 // AddWindow
 bool
@@ -367,10 +352,6 @@ Desktop::MoveWindowBy(WindowLayer* window, int32 x, int32 y)
 	if (LockClipping()) {
 		// the dirty region starts with the visible area of the window being moved
 		BRegion newDirtyRegion(window->VisibleRegion());
-		// we have to move along the part of the current dirty region
-		// that intersects with the window being moved
-		BRegion alreadyDirtyRegion(fDirtyRegion);
-		alreadyDirtyRegion.IntersectWith(&window->VisibleRegion());
 
 		window->MoveBy(x, y);
 
@@ -394,15 +375,10 @@ Desktop::MoveWindowBy(WindowLayer* window, int32 x, int32 y)
 			// could move by blitting
 			copyRegion.OffsetBy(x, y);
 			newDirtyRegion.Exclude(&copyRegion);
-			MarkClean(&copyRegion);
 			fDrawingEngine->MarkDirty(&copyRegion);
 	
 			fDrawingEngine->Unlock();
 		}
-		// include the moved peviously dirty region
-		alreadyDirtyRegion.OffsetBy(x, y);
-		alreadyDirtyRegion.IntersectWith(&window->VisibleRegion());
-		newDirtyRegion.Include(&alreadyDirtyRegion);
 
 		MarkDirty(&newDirtyRegion);
 		_SetBackground(&background);
@@ -531,7 +507,7 @@ Desktop::SetFocusWindow(WindowLayer* window)
 
 
 
-#pragma mark -
+// #pragma mark -
 
 // MarkDirty
 void
@@ -540,28 +516,7 @@ Desktop::MarkDirty(BRegion* region)
 	if (region->CountRects() == 0)
 		return;
 		
-	// NOTE: the idea is that for all dirty areas ever included
-	// in the culmulative dirty region, redraw messages have been
-	// sent to the windows affected by just the newly included
-	// area. Therefor, _TriggerWindowRedrawing() is not called
-	// with "fDirtyRegion", but with just the new "region" instead.
-	// Whenever a window is actually carrying out a redraw request,
-	// it is expected to remove the redrawn area from the dirty region.
-
 	if (LockClipping()) {
-		// add the new dirty region to the culmulative dirty region
-		fDirtyRegion.Include(region);
-
-#if SHOW_GLOBAL_DIRTY_REGION
-if (fDrawingEngine->Lock()) {
-	fDrawingEngine->SetHighColor(255, 0, 0);
-	fDrawingEngine->FillRegion(region);
-	fDrawingEngine->MarkDirty(region);
-	fDrawingEngine->Unlock();
-	snooze(100000);
-}
-#endif
-
 		// send redraw messages to all windows intersecting the dirty region
 		_TriggerWindowRedrawing(region);
 
@@ -569,29 +524,7 @@ if (fDrawingEngine->Lock()) {
 	}
 }
 
-// MarkClean
-void
-Desktop::MarkClean(BRegion* region)
-{
-	// NOTE: when a window owns the read lock for
-	// the clipping, it means the Desktop thread is currently
-	// not messing with the regions. Since a window is expected
-	// to only remove parts from the dirty region that intersect
-	// it's own visible region, it cannot remove the wrong parts 
-	// of the dirty region (ie parts intersecting another window)
-	// writelocking would therefor not be needed, but of course
-	// BRegion is not threadsafe, and therefor, it would be cool
-	// if the dirty region was moved into each window again.
-
-	if (LockClipping()) {
-		// remove the clean region from the culmulative dirty region
-		fDirtyRegion.Exclude(region);
-
-		UnlockClipping();
-	}
-}
-
-#pragma mark -
+// #pragma mark -
 
 // _RebuildClippingForAllWindows
 void
@@ -629,7 +562,8 @@ Desktop::_TriggerWindowRedrawing(BRegion* newDirtyRegion)
 	for (int32 i = count - 1; i >= 0; i--) {
 		WindowLayer* window = WindowAtFast(i);
 		if (newDirtyRegion->Intersects(window->VisibleRegion().Frame()))
-			window->PostMessage(MSG_REDRAW);
+//			window->PostMessage(MSG_REDRAW);
+window->ProcessDirtyRegion(newDirtyRegion);
 	}
 }
 
@@ -656,6 +590,5 @@ Desktop::_SetBackground(BRegion* background)
 	
 			fDrawingEngine->Unlock();
 		}
-		MarkClean(&dirtyBackground);
 	}
 }

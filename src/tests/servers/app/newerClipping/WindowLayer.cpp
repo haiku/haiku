@@ -30,6 +30,7 @@ WindowLayer::WindowLayer(BRect frame, const char* name,
 
 	  fVisibleRegion(),
 	  fVisibleContentRegion(),
+	  fDirtyRegion(),
 
 	  fBorderRegion(),
 	  fBorderRegionValid(false),
@@ -92,6 +93,15 @@ WindowLayer::MessageReceived(BMessage* message)
 				}
 				_DrawBorder();
 				_TriggerContentRedraw();
+
+				// reset the dirty region, since
+				// we're fully clean. If the desktop
+				// thread wanted to mark something
+				// dirty in the mean time, it was
+				// blocking on the global region lock to
+				// get write access, since we held the
+				// read lock for the whole time.
+				fDirtyRegion.MakeEmpty();
 
 				fDesktop->ReadUnlockClipping();
 			} else {
@@ -225,6 +235,10 @@ WindowLayer::MoveBy(int32 x, int32 y)
 
 	fFrame.OffsetBy(x, y);
 
+	// take along the dirty region which have not
+	// processed yet
+	fDirtyRegion.OffsetBy(x, y);
+
 	if (fBorderRegionValid)
 		fBorderRegion.OffsetBy(x, y);
 	if (fContentRegionValid)
@@ -315,6 +329,22 @@ WindowLayer::Show()
 
 }
 
+// ProcessDirtyRegion
+void
+WindowLayer::ProcessDirtyRegion(BRegion* region)
+{
+	// this is exectuted in the desktop thread,
+	// and it means that the window thread currently
+	// blocks on the global region lock
+	if (fDirtyRegion.CountRects() == 0) {
+		// the window needs to be informed
+		// when the dirty region was empty
+		PostMessage(MSG_REDRAW, this);
+	}
+	// this is executed from the desktop thread
+	fDirtyRegion.Include(region);
+}
+
 // MarkDirty
 void
 WindowLayer::MarkDirty(BRegion* regionOnScreen)
@@ -370,7 +400,7 @@ WindowLayer::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 
 				// move along the already dirty regions that are common
 				// with the region that we could copy
-				_ShiftPartOfRegion(fDesktop->DirtyRegion(), region, xOffset, yOffset);
+				_ShiftPartOfRegion(&fDirtyRegion, region, xOffset, yOffset);
 				if (fCurrentUpdateSession)
 					_ShiftPartOfRegion(&fCurrentUpdateSession->DirtyRegion(), region, xOffset, yOffset);
 				if (fPendingUpdateSession)
@@ -390,7 +420,7 @@ WindowLayer::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 	}
 }
 
-# pragma mark -
+// #pragma mark -
 
 // _ShiftPartOfRegion
 void
@@ -415,7 +445,7 @@ WindowLayer::_TriggerContentRedraw()
 {
 //printf("%s - DrawContents()\n", Name());
 	BRegion dirtyContentRegion(fVisibleContentRegion);
-	dirtyContentRegion.IntersectWith(fDesktop->DirtyRegion());
+	dirtyContentRegion.IntersectWith(&fDirtyRegion);
 
 	if (dirtyContentRegion.CountRects() > 0) {
 
@@ -430,8 +460,6 @@ snooze(100000);
 #endif
 		// send UPDATE message to the client
 		_MarkContentDirty(&dirtyContentRegion);
-
-		fDesktop->MarkClean(&dirtyContentRegion);
 
 #if DELAYED_BACKGROUND_CLEARING
 		fTopLayer->Draw(fDrawingEngine, &dirtyContentRegion,
@@ -505,10 +533,13 @@ WindowLayer::_DrawBorder()
 	// construct the region of the border that needs redrawing
 	BRegion dirtyBorderRegion;
 	GetBorderRegion(&dirtyBorderRegion);
+// TODO: why is it not enough to only intersect with the dirty region?
+// is it faster to intersect the dirty region with the visible when it
+// is set in ProcessDirtyRegion()?
 	// intersect with our visible region
 	dirtyBorderRegion.IntersectWith(&fVisibleRegion);
-	// intersect with the Desktop's dirty region
-	dirtyBorderRegion.IntersectWith(fDesktop->DirtyRegion());
+	// intersect with the dirty region
+	dirtyBorderRegion.IntersectWith(&fDirtyRegion);
 
 	if (dirtyBorderRegion.CountRects() > 0) {
 		if (fDrawingEngine->Lock()) {
@@ -564,8 +595,6 @@ WindowLayer::_DrawBorder()
 			fDrawingEngine->MarkDirty(&dirtyBorderRegion);
 			fDrawingEngine->Unlock();
 		}
-
-		fDesktop->MarkClean(&dirtyBorderRegion);
 	}
 }
 
@@ -667,7 +696,7 @@ WindowLayer::_EndUpdate()
 	}
 }
 
-#pragma mark -
+// #pragma mark -
 
 // constructor
 UpdateSession::UpdateSession(const BRegion& dirtyRegion)

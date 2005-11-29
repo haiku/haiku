@@ -375,7 +375,7 @@ ViewLayer::SetName(const char* string)
 	fName.SetTo(string);
 }
 
-#pragma mark -
+// #pragma mark -
 
 // MoveBy
 void
@@ -551,7 +551,7 @@ ViewLayer::ScrollBy(int32 x, int32 y, BRegion* dirtyRegion)
 	InvalidateScreenClipping(true);
 }
 
-#pragma mark -
+// #pragma mark -
 
 // Draw
 void
@@ -617,7 +617,7 @@ ViewLayer::ClientDraw(DrawingEngine* drawingEngine, BRegion* effectiveClipping)
 	}
 }
 
-#pragma mark -
+// #pragma mark -
 
 // IsHidden
 bool

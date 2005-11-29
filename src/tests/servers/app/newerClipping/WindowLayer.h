@@ -71,6 +71,8 @@ class WindowLayer : public BLooper {
 			void					MarkDirty(BRegion* regionOnScreen);
 			void					MarkContentDirty(BRegion* regionOnScreen);
 
+			void					ProcessDirtyRegion(BRegion* region);
+
 			DrawingEngine*			GetDrawingEngine() const
 										{ return fDrawingEngine; }
 
@@ -93,11 +95,18 @@ class WindowLayer : public BLooper {
 
 
 			BRect					fFrame;
+
 			// the visible region is only recalculated from the
-			// Desktop thread, when using it, Desktop::LockClipping()
+			// Desktop thread, when using it, Desktop::ReadLockClipping()
 			// has to be called
 			BRegion					fVisibleRegion;
 			BRegion					fVisibleContentRegion;
+			// our part of the "global" dirty region
+			// it is calculated from the desktop thread,
+			// but we can write to it when we read locked
+			// the clipping, since it is local and the desktop
+			// thread is blocked
+			BRegion					fDirtyRegion;
 
 			// caching local regions
 			BRegion					fBorderRegion;

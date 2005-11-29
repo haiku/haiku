@@ -91,11 +91,7 @@ class Desktop : public BLooper {
 			void				UnlockClipping() { fClippingLock.Unlock(); }
 #endif
 
-
 			void				MarkDirty(BRegion* region);
-			void				MarkClean(BRegion* region);
-			BRegion*			DirtyRegion()
-									{ return &fDirtyRegion; }
 
 			DrawingEngine*		GetDrawingEngine() const
 									{ return fDrawingEngine; }
@@ -122,7 +118,6 @@ private:
 #else
 			BLocker				fClippingLock;
 #endif
-			BRegion				fDirtyRegion;
 			BRegion				fBackgroundRegion;
 
 			DrawView*			fDrawView;
