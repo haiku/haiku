@@ -93,6 +93,7 @@ class WindowLayer : public BLooper {
 			void					_BeginUpdate();
 			void					_EndUpdate();
 
+			void					_UpdateContentRegion();
 
 			BRect					fFrame;
 

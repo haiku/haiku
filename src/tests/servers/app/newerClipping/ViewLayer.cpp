@@ -556,7 +556,7 @@ ViewLayer::ScrollBy(int32 x, int32 y, BRegion* dirtyRegion)
 // Draw
 void
 ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
-				BRegion* windowContentClipping,bool deep)
+				BRegion* windowContentClipping, bool deep)
 {
 	// we can only draw within our own area
 	BRegion redraw(ScreenClipping(windowContentClipping));

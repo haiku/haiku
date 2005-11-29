@@ -137,7 +137,6 @@ WindowLayer::SetClipping(BRegion* stillAvailableOnScreen)
 	fVisibleContentRegion.IntersectWith(&fVisibleRegion);
 
 	fEffectiveDrawingRegionValid = false;
-	fTopLayer->InvalidateScreenClipping(true);
 }
 
 // GetFullRegion
@@ -183,16 +182,7 @@ void
 WindowLayer::GetContentRegion(BRegion* region)
 {
 	if (!fContentRegionValid) {
-		// TODO: speed up by avoiding "Exclude()"
-		// start from the frame, extend to include decorator border
-		fContentRegion.Set(fFrame);
-	
-		// resize handle
-		// if (B_DOCUMENT_WINDOW_LOOK)
-			fContentRegion.Exclude(BRect(fFrame.right - 10, fFrame.bottom - 10,
-										 fFrame.right, fFrame.bottom));
-
-		fContentRegionValid = true;
+		_UpdateContentRegion();
 	}
 
 	*region = fContentRegion;
@@ -219,7 +209,6 @@ void
 WindowLayer::MoveBy(int32 x, int32 y)
 {
 	// this function is only called from the desktop thread
-	// TODO: this fact needs review maybe
 
 	if (x == 0 && y == 0)
 		return;
@@ -252,7 +241,6 @@ void
 WindowLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 {
 	// this function is only called from the desktop thread
-	// TODO: this fact needs review maybe
 
 	if (x == 0 && y == 0)
 		return;
@@ -274,7 +262,6 @@ WindowLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 	GetBorderRegion(&newBorderRegion);
 	dirtyRegion->Include(&newBorderRegion);
 
-	// TODO: should this be clipped to the content region?
 	fTopLayer->ResizeBy(x, y, dirtyRegion);
 }
 
@@ -349,14 +336,14 @@ WindowLayer::MarkDirty(BRegion* regionOnScreen)
 void
 WindowLayer::MarkContentDirty(BRegion* regionOnScreen)
 {
-/*	// for triggering MSG_REDRAW
-	if (fDesktop && fDesktop->LockClipping()) {
+	// for triggering MSG_REDRAW
+	if (fDesktop && fDesktop->ReadLockClipping()) {
 
 		regionOnScreen->IntersectWith(&fVisibleContentRegion);
-		fDesktop->MarkDirty(regionOnScreen);
+		ProcessDirtyRegion(regionOnScreen);
 
-		fDesktop->UnlockClipping();
-	}*/
+		fDesktop->ReadUnlockClipping();
+	}
 }
 
 //# pragma mark -
@@ -367,7 +354,7 @@ WindowLayer::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 {
 	// this function takes care of invalidating parts that could not be copied
 
-	if (fDesktop->LockClipping()) {
+	if (fDesktop->ReadLockClipping()) {
 
 		BRegion newDirty(*region);
 
@@ -405,9 +392,9 @@ WindowLayer::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 		newDirty.OffsetBy(xOffset, yOffset);
 		newDirty.IntersectWith(&fVisibleContentRegion);
 		if (newDirty.CountRects() > 0)
-			fDesktop->MarkDirty(&newDirty);
+			ProcessDirtyRegion(&newDirty);
 
-		fDesktop->UnlockClipping();
+		fDesktop->ReadUnlockClipping();
 	}
 }
 
@@ -452,12 +439,15 @@ snooze(100000);
 		// send UPDATE message to the client
 		_MarkContentDirty(&dirtyContentRegion);
 
+		if (!fContentRegionValid)
+			_UpdateContentRegion();
+
 #if DELAYED_BACKGROUND_CLEARING
 		fTopLayer->Draw(fDrawingEngine, &dirtyContentRegion,
-						&fVisibleContentRegion, false);
+						&fContentRegion, false);
 #else
 		fTopLayer->Draw(fDrawingEngine, &dirtyContentRegion,
-						&fVisibleContentRegion, true);
+						&fContentRegion, true);
 #endif
 	}
 }
@@ -494,7 +484,9 @@ WindowLayer::_DrawClient(int32 token)
 		// it for the comming drawing commands until the current layer changes
 		// again or fEffectiveDrawingRegionValid is suddenly false.
 		BRegion effectiveClipping(fEffectiveDrawingRegion);
-		effectiveClipping.IntersectWith(&layer->ScreenClipping(&fVisibleContentRegion));
+		if (!fContentRegionValid)
+			_UpdateContentRegion();
+		effectiveClipping.IntersectWith(&layer->ScreenClipping(&fContentRegion));
 
 		if (effectiveClipping.CountRects() > 0) {
 #if DELAYED_BACKGROUND_CLEARING
@@ -503,7 +495,7 @@ WindowLayer::_DrawClient(int32 token)
 			// this layer of course! in the simulation, all client
 			// drawing is done from a single command yet
 			layer->Draw(fDrawingEngine, &effectiveClipping,
-						&fVisibleContentRegion, false);
+						&fContentRegion, false);
 #endif
 
 			layer->ClientDraw(fDrawingEngine, &effectiveClipping);
@@ -685,6 +677,22 @@ WindowLayer::_EndUpdate()
 	
 	fDesktop->ReadUnlockClipping();
 	}
+}
+
+// _UpdateContentRegion
+void
+WindowLayer::_UpdateContentRegion()
+{
+	// TODO: speed up by avoiding "Exclude()"
+	// start from the frame, extend to include decorator border
+	fContentRegion.Set(fFrame);
+
+	// resize handle
+	// if (B_DOCUMENT_WINDOW_LOOK)
+		fContentRegion.Exclude(BRect(fFrame.right - 10, fFrame.bottom - 10,
+									 fFrame.right, fFrame.bottom));
+
+	fContentRegionValid = true;
 }
 
 // #pragma mark -
