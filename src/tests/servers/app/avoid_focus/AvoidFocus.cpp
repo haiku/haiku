@@ -8,8 +8,9 @@
 
 
 #include <Application.h>
-#include <Window.h>
+#include <String.h>
 #include <View.h>
+#include <Window.h>
 
 #include <ctype.h>
 #include <stdio.h>
