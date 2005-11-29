@@ -1,0 +1,18 @@
+SubDir HAIKU_TOP src tests servers app avoid_focus ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
+UseHeaders [ FDirName os app ] ;
+UseHeaders [ FDirName os interface ] ;
+
+Application AvoidFocus :
+	AvoidFocus.cpp
+	: be
+;
+
+if $(TARGET_PLATFORM) = libbe_test {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : AvoidFocus
+		: tests!apps ;
+}
+
