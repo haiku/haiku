@@ -83,14 +83,9 @@ WindowLayer::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_REDRAW: {
-			if (!MessageQueue()->FindMessage(MSG_REDRAW, 0)) {
-				while (!fDesktop->ReadLockClippingWithTimeout()) {
-//printf("%s MSG_REDRAW -> timeout\n", Name());
-					if (MessageQueue()->FindMessage(MSG_REDRAW, 0)) {
-//printf("%s MSG_REDRAW -> timeout - leaving because there are pending redraws\n", Name());
-						return;
-					}
-				}
+			// there is only one MSG_REDRAW in the queue at anytime
+			if (fDesktop->ReadLockClipping()) {
+
 				_DrawBorder();
 				_TriggerContentRedraw();
 
@@ -208,19 +203,15 @@ void
 WindowLayer::SetFocus(bool focus)
 {
 	// executed from Desktop thread
+	// it holds the clipping write lock,
+	// so the window thread cannot be
+	// accessing fFocus
 
-	// since we don't mark parts dirty that
-	// don't intersect with our own visible
-	// region, readlocking is fine
-	if (fDesktop->ReadLockClipping()) {
-		BRegion dirty(fBorderRegion);
-		dirty.IntersectWith(&fVisibleRegion);
-		fDesktop->MarkDirty(&dirty);
+	BRegion dirty(fBorderRegion);
+	dirty.IntersectWith(&fVisibleRegion);
+	fDesktop->MarkDirty(&dirty);
 
-		fFocus = focus;
-
-		fDesktop->ReadUnlockClipping();
-	}
+	fFocus = focus;
 }
 
 // MoveBy

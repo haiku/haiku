@@ -491,18 +491,21 @@ Desktop::SendToBack(WindowLayer* window)
 void
 Desktop::SetFocusWindow(WindowLayer* window)
 {
-	// TODO: find bug, this invalidates too many regions
-
 	if (fFocusWindow == window)
 		return;
 
-	if (fFocusWindow)
-		fFocusWindow->SetFocus(false);
+	if (LockClipping()) {
 
-	fFocusWindow = window;
+		if (fFocusWindow)
+			fFocusWindow->SetFocus(false);
+	
+		fFocusWindow = window;
+	
+		if (fFocusWindow)
+			fFocusWindow->SetFocus(true);
 
-	if (fFocusWindow)
-		fFocusWindow->SetFocus(true);
+		UnlockClipping();
+	}
 }
 
 

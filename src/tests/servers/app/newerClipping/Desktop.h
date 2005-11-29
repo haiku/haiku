@@ -12,13 +12,10 @@
 #define SHOW_GLOBAL_DIRTY_REGION 0
 #define SHOW_WINDOW_CONTENT_DIRTY_REGION 0
 
-#define MULTI_LOCKER 0
-#define RW_LOCKER 0
+#define MULTI_LOCKER 1
 
 #if MULTI_LOCKER
 #  include "MultiLocker.h"
-#elif RW_LOCKER
-#  include "RWLocker.h"
 #else
 #  include <Locker.h>
 #endif
@@ -68,23 +65,14 @@ class Desktop : public BLooper {
 
 			void				SetFocusWindow(WindowLayer* window);
 
-#if RW_LOCKER
+#if MULTI_LOCKER
 			bool				ReadLockClipping() { return fClippingLock.ReadLock(); }
-			bool				ReadLockClippingWithTimeout() { return fClippingLock.ReadLockWithTimeout(10000) >= B_OK; }
-			void				ReadUnlockClipping() { fClippingLock.ReadUnlock(); }
-
-			bool				LockClipping() { return fClippingLock.WriteLock(); }
-			void				UnlockClipping() { fClippingLock.WriteUnlock(); }
-#elif MULTI_LOCKER
-			bool				ReadLockClipping() { return fClippingLock.ReadLock(); }
-			bool				ReadLockClippingWithTimeout() { return fClippingLock.ReadLock(); }
 			void				ReadUnlockClipping() { fClippingLock.ReadUnlock(); }
 
 			bool				LockClipping() { return fClippingLock.WriteLock(); }
 			void				UnlockClipping() { fClippingLock.WriteUnlock(); }
 #else // BLocker
 			bool				ReadLockClipping() { return fClippingLock.Lock(); }
-			bool				ReadLockClippingWithTimeout() { return fClippingLock.LockWithTimeout(10000) >= B_OK; }
 			void				ReadUnlockClipping() { fClippingLock.Unlock(); }
 
 			bool				LockClipping() { return fClippingLock.Lock(); }
