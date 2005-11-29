@@ -615,7 +615,6 @@ void
 BTextView::MouseMoved(BPoint where, uint32 code, const BMessage *message)
 {
 	// Check if it's a "click'n'move
-	// TODO: Currently always returns false
 	if (PerformMouseMoved(where, code))
 		return;
 		
@@ -1542,22 +1541,7 @@ void
 BTextView::SetFontAndColor(const BFont *inFont, uint32 inMode,
 								const rgb_color *inColor)
 {
-	CALLED();
-	CancelInputMethod();
-	
-	BFont newFont = *inFont;
-	NormalizeFont(&newFont);
-	
-	// add the style to the style buffer
-	fStyles->SetStyleRange(fSelStart, fSelEnd, fText->Length(),
-						  inMode, &newFont, inColor);
-						
-	if (inMode & B_FONT_FAMILY_AND_STYLE || inMode & B_FONT_SIZE)
-		// recalc the line breaks and redraw with new style
-		Refresh(fSelStart, fSelEnd, fSelStart != fSelEnd, false);
-	else
-		// the line breaks wont change, simply redraw
-		DrawLines(LineAt(fSelStart), LineAt(fSelEnd), fSelStart, true);
+	SetFontAndColor(fSelStart, fSelEnd, inFont, inMode, inColor);
 }
 
 
@@ -1586,8 +1570,7 @@ BTextView::SetFontAndColor(int32 startOffset, int32 endOffset,
 
 
 void
-BTextView::GetFontAndColor(int32 inOffset, BFont *outFont,
-								rgb_color *outColor) const
+BTextView::GetFontAndColor(int32 inOffset, BFont *outFont, rgb_color *outColor) const
 {
 	CALLED();
 	fStyles->GetStyle(inOffset, outFont, outColor);
@@ -1595,36 +1578,42 @@ BTextView::GetFontAndColor(int32 inOffset, BFont *outFont,
 
 
 void
-BTextView::GetFontAndColor(BFont *outFont, uint32 *outMode,
-								rgb_color *outColor, bool *outEqColor) const
+BTextView::GetFontAndColor(BFont *outFont, uint32 *outMode, rgb_color *outColor, bool *outEqColor) const
 {
 	CALLED();	
-	fStyles->ContinuousGetStyle(outFont, outMode, outColor, outEqColor,
-								fSelStart, fSelEnd);
+	fStyles->ContinuousGetStyle(outFont, outMode, outColor, outEqColor, fSelStart, fSelEnd);
 }
 
 
 void
-BTextView::SetRunArray(int32 startOffset, int32 endOffset,
-							const text_run_array *inRuns)
+BTextView::SetRunArray(int32 startOffset, int32 endOffset, const text_run_array *inRuns)
 {
 	CALLED();
-	
+	if (startOffset > endOffset)
+		return;
+
 	CancelInputMethod();
 	
+	int32 textLength = fText->Length();
+		
 	// pin offsets at reasonable values
-	startOffset = (startOffset < 0) ? 0 : startOffset;
-	endOffset = (endOffset < 0) ? 0 : endOffset;
-	endOffset = (endOffset > fText->Length()) ? fText->Length() : endOffset;
+	if (startOffset < 0)
+		startOffset = 0;
+	else if (startOffset > textLength)
+		startOffset = textLength;
+
+	if (endOffset < 0)
+		endOffset = 0;
+	else if (endOffset > textLength)
+		endOffset = textLength;
 	
 	long numStyles = inRuns->count;
 	if (numStyles > 0) {	
-		int32 textLength = fText->Length();
 		const text_run *theRun = &inRuns->runs[0];
 		for (long index = 0; index < numStyles; index++) {
 			long fromOffset = theRun->offset + startOffset;
 			long toOffset = endOffset;
-			if ((index + 1) < numStyles) {
+			if (index + 1 < numStyles) {
 				toOffset = (theRun + 1)->offset + startOffset;
 				toOffset = (toOffset > endOffset) ? endOffset : toOffset;
 			}
@@ -2027,10 +2016,9 @@ BTextView::LineWidth(int32 lineNum) const
 {
 	if (lineNum < 0 || lineNum >= fLines->NumLines())
 		return 0;
-	else {
-		STELine* line = (*fLines)[lineNum];
-		return StyledWidth(line->offset, (line + 1)->offset - line->offset);
-	}
+
+	STELine* line = (*fLines)[lineNum];
+	return StyledWidth(line->offset, (line + 1)->offset - line->offset);	
 }
 
 
@@ -2062,9 +2050,7 @@ BTextView::TextHeight(int32 startLine, int32 endLine) const
 	if (endLine == numLines - 1 && (*fText)[fText->Length() - 1] == '\n')
 		height += (*fLines)[endLine + 1]->origin - (*fLines)[endLine]->origin;
 	
-	height = ceil(height);
-	
-	return height;
+	return ceil(height);
 }
 
 
@@ -2779,8 +2765,7 @@ BTextView::UndoState(bool *isRedo) const
 
 
 void
-BTextView::GetDragParameters(BMessage *drag, BBitmap **bitmap,
-								  BPoint *point, BHandler **handler)
+BTextView::GetDragParameters(BMessage *drag, BBitmap **bitmap, BPoint *point, BHandler **handler)
 {
 	CALLED();
 	if (drag == NULL)
@@ -3542,9 +3527,7 @@ BTextView::FindLineBreak(int32 fromOffset, float *outAscent,
 		}
 	}
 	
-	offset = min_c(offset, limit);
-	
-	return offset;
+	return min_c(offset, limit);
 }
 
 
@@ -3616,16 +3599,14 @@ BTextView::DoInsertText(const char *inText, int32 inLength, int32 inOffset,
 
 
 void
-BTextView::DoDeleteText(int32 fromOffset, int32 toOffset,
-	_BTextChangeResult_ *outResult)
+BTextView::DoDeleteText(int32 fromOffset, int32 toOffset, _BTextChangeResult_ *outResult)
 {
 	CALLED();
 }
 
 
 void
-BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
-	bool erase)
+BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool erase)
 {
 	// clip the text
 	BRect clipRect = Bounds() & fTextRect;
@@ -3955,10 +3936,8 @@ void
 BTextView::TrackDrag(BPoint where)
 {
 	CALLED();
-	if (Bounds().Contains(where)) {
-		int32 offset = OffsetAt(where);
-		DragCaret(offset);
-	}
+	if (Bounds().Contains(where))
+		DragCaret(OffsetAt(where));
 }
 
 
@@ -4460,7 +4439,7 @@ BTextView::HandleInputMethodLocationRequest()
 		return;
 	
 	int32 offset = fInline->Offset();
-	int32 limit = offset + fInline->Length();
+	const int32 limit = offset + fInline->Length();
 	
 	BMessage message(B_INPUT_METHOD_EVENT);
 	message.AddInt32("be:opcode", B_INPUT_METHOD_LOCATION_REQUEST);
