@@ -172,6 +172,8 @@ void
 Window::Test()
 {
 	BRect frame(20, 20, 330, 230);
+//	AddWindow(frame, "Window 1");
+//	AddWindow(frame, "Window 2");
 	for (int32 i = 0; i < 20; i++) {
 		BString name("Window ");
 		frame.OffsetBy(20, 15);
@@ -179,7 +181,7 @@ Window::Test()
 		AddWindow(frame, name.String());
 	}
 
-	frame.Set(10, 80, 320, 290);
+/*	frame.Set(10, 80, 320, 290);
 	for (int32 i = 20; i < 40; i++) {
 		BString name("Window ");
 		frame.OffsetBy(20, 15);
@@ -187,7 +189,7 @@ Window::Test()
 		AddWindow(frame, name.String());
 	}
 
-/*	frame.Set(20, 140, 330, 230);
+	frame.Set(20, 140, 330, 230);
 	for (int32 i = 40; i < 60; i++) {
 		BString name("Window ");
 		frame.OffsetBy(20, 15);

@@ -35,6 +35,7 @@ SRCS= ClientLooper.cpp \
 	  DrawingEngine.cpp \
 	  main.cpp \
 	  MultiLocker.cpp \
+	  RWLocker.cpp \
 	  ViewLayer.cpp \
 	  WindowLayer.cpp
 

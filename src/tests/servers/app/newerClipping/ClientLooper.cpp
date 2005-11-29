@@ -13,7 +13,7 @@
 
 // constructor
 ClientLooper::ClientLooper(const char* name, WindowLayer* serverWindow)
-	: BLooper(""),
+	: BLooper("", B_DISPLAY_PRIORITY),
 	  fServerWindow(serverWindow),
 	  fViewCount(0)
 {

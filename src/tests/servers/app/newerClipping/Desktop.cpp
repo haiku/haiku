@@ -231,12 +231,15 @@ Desktop::MessageReceived(BMessage* message)
 			if (message->FindRect("area", &area) >= B_OK)
 				Draw(area);
 		}
+
+
 		case MSG_ADD_WINDOW: {
 			WindowLayer* window;
 			if (message->FindPointer("window", (void**)&window) >= B_OK)
 				AddWindow(window);
 			break;
 		}
+
 		default:
 			BLooper::MessageReceived(message);
 	}
@@ -570,6 +573,16 @@ if (fDrawingEngine->Lock()) {
 void
 Desktop::MarkClean(BRegion* region)
 {
+	// NOTE: when a window owns the read lock for
+	// the clipping, it means the Desktop thread is currently
+	// not messing with the regions. Since a window is expected
+	// to only remove parts from the dirty region that intersect
+	// it's own visible region, it cannot remove the wrong parts 
+	// of the dirty region (ie parts intersecting another window)
+	// writelocking would therefor not be needed, but of course
+	// BRegion is not threadsafe, and therefor, it would be cool
+	// if the dirty region was moved into each window again.
+
 	if (LockClipping()) {
 		// remove the clean region from the culmulative dirty region
 		fDirtyRegion.Exclude(region);

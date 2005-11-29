@@ -11,12 +11,21 @@
 
 #include "WindowLayer.h"
 
-#define SLOW_DRAWING 0
+// if the background clearing is delayed until
+// the client draws the view, we have less flickering
+// when contents have to be redrawn because of resizing
+// a window or because the client invalidates parts.
+// when redrawing something that has been exposed from underneath
+// other windows, the other window will be seen longer at
+// its previous position though if the exposed parts are not
+// cleared right away. maybe there ought to be a flag in
+// the update session, which tells us the cause of the update
+#define DELAYED_BACKGROUND_CLEARING 1
 
 // constructor
 WindowLayer::WindowLayer(BRect frame, const char* name,
 						 DrawingEngine* drawingEngine, Desktop* desktop)
-	: BLooper(name),
+	: BLooper(name, B_DISPLAY_PRIORITY),
 	  fFrame(frame),
 
 	  fVisibleRegion(),
@@ -188,20 +197,19 @@ WindowLayer::GetContentRegion(BRegion* region)
 void
 WindowLayer::SetFocus(bool focus)
 {
-	if (Lock()) {
-		// executed from Desktop thread, so it's fine
-		// to use the clipping without locking
-		if (fDesktop->ReadLockClipping()) {
-			BRegion dirty(fBorderRegion);
-			dirty.IntersectWith(&fVisibleRegion);
-			fDesktop->MarkDirty(&dirty);
+	// executed from Desktop thread
 
-			fDesktop->ReadUnlockClipping();
-		}
+	// since we don't mark parts dirty that
+	// don't intersect with our own visible
+	// region, readlocking is fine
+	if (fDesktop->ReadLockClipping()) {
+		BRegion dirty(fBorderRegion);
+		dirty.IntersectWith(&fVisibleRegion);
+		fDesktop->MarkDirty(&dirty);
 
 		fFocus = focus;
 
-		Unlock();
+		fDesktop->ReadUnlockClipping();
 	}
 }
 
@@ -210,6 +218,7 @@ void
 WindowLayer::MoveBy(int32 x, int32 y)
 {
 	// this function is only called from the desktop thread
+	// TODO: this fact needs review maybe
 
 	if (x == 0 && y == 0)
 		return;
@@ -237,6 +246,9 @@ WindowLayer::MoveBy(int32 x, int32 y)
 void
 WindowLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 {
+	// this function is only called from the desktop thread
+	// TODO: this fact needs review maybe
+
 	if (x == 0 && y == 0)
 		return;
 
@@ -316,17 +328,17 @@ WindowLayer::MarkDirty(BRegion* regionOnScreen)
 void
 WindowLayer::MarkContentDirty(BRegion* regionOnScreen)
 {
-	// for triggering MSG_REDRAW
+/*	// for triggering MSG_REDRAW
 	if (fDesktop && fDesktop->LockClipping()) {
 
 		regionOnScreen->IntersectWith(&fVisibleContentRegion);
 		fDesktop->MarkDirty(regionOnScreen);
 
 		fDesktop->UnlockClipping();
-	}
+	}*/
 }
 
-# pragma mark -
+//# pragma mark -
 
 // CopyContents
 void
@@ -338,28 +350,41 @@ WindowLayer::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 
 		BRegion newDirty(*region);
 
+		// clip the region to the visible contents at the
+		// source and destination location
 		region->IntersectWith(&fVisibleContentRegion);
-		region->OffsetBy(xOffset, yOffset);
-		region->IntersectWith(&fVisibleContentRegion);
+		if (region->CountRects() > 0) {
+			region->OffsetBy(xOffset, yOffset);
+			region->IntersectWith(&fVisibleContentRegion);
+			if (region->CountRects() > 0) {
+				// if the region still contains any rects
+				// offset to source location again
+				region->OffsetBy(-xOffset, -yOffset);
+				// the part which we can copy is not dirty
+				newDirty.Exclude(region);
+		
+				if (fDrawingEngine->Lock()) {
+					fDrawingEngine->CopyRegion(region, xOffset, yOffset);
+					fDrawingEngine->Unlock();
+				}
 
-		region->OffsetBy(-xOffset, -yOffset);
-
-		newDirty.Exclude(region);
-
-		_ShiftPartOfRegion(fDesktop->DirtyRegion(), region, xOffset, yOffset);
-		if (fDrawingEngine->Lock()) {
-			fDrawingEngine->CopyRegion(region, xOffset, yOffset);
-			fDrawingEngine->Unlock();
+				// move along the already dirty regions that are common
+				// with the region that we could copy
+				_ShiftPartOfRegion(fDesktop->DirtyRegion(), region, xOffset, yOffset);
+				if (fCurrentUpdateSession)
+					_ShiftPartOfRegion(&fCurrentUpdateSession->DirtyRegion(), region, xOffset, yOffset);
+				if (fPendingUpdateSession)
+					_ShiftPartOfRegion(&fPendingUpdateSession->DirtyRegion(), region, xOffset, yOffset);
+		
+			}
 		}
-
-		if (fCurrentUpdateSession)
-			_ShiftPartOfRegion(&fCurrentUpdateSession->DirtyRegion(), region, xOffset, yOffset);
-		if (fPendingUpdateSession)
-			_ShiftPartOfRegion(&fPendingUpdateSession->DirtyRegion(), region, xOffset, yOffset);
-
+		// what is left visible from the original region
+		// at the destination after the region which could be
+		// copied has been excluded, is considered dirty
 		newDirty.OffsetBy(xOffset, yOffset);
 		newDirty.IntersectWith(&fVisibleContentRegion);
-		fDesktop->MarkDirty(&newDirty);
+		if (newDirty.CountRects() > 0)
+			fDesktop->MarkDirty(&newDirty);
 
 		fDesktop->UnlockClipping();
 	}
@@ -372,11 +397,16 @@ void
 WindowLayer::_ShiftPartOfRegion(BRegion* region, BRegion* regionToShift,
 								int32 xOffset, int32 yOffset)
 {
-	BRegion common(*region);
-	common.IntersectWith(regionToShift);
-	region->Exclude(&common);
-	common.OffsetBy(xOffset, yOffset);
-	region->Include(&common);
+	BRegion common(*regionToShift);
+	// see if there is a common part at all
+	common.IntersectWith(region);
+	if (common.CountRects() > 0) {
+		// cut the common part from the region,
+		// offset that to destination and include again
+		region->Exclude(&common);
+		common.OffsetBy(xOffset, yOffset);
+		region->Include(&common);
+	}
 }
 
 // _TriggerContentRedraw
@@ -384,32 +414,32 @@ void
 WindowLayer::_TriggerContentRedraw()
 {
 //printf("%s - DrawContents()\n", Name());
-	if (fDesktop->ReadLockClipping()) {
-	
-		BRegion dirtyContentRegion(fVisibleContentRegion);
-		dirtyContentRegion.IntersectWith(fDesktop->DirtyRegion());
+	BRegion dirtyContentRegion(fVisibleContentRegion);
+	dirtyContentRegion.IntersectWith(fDesktop->DirtyRegion());
 
-		if (dirtyContentRegion.CountRects() > 0) {
+	if (dirtyContentRegion.CountRects() > 0) {
 
 #if SHOW_WINDOW_CONTENT_DIRTY_REGION
 if (fDrawingEngine->Lock()) {
-	fDrawingEngine->SetHighColor(0, 0, 255);
-	fDrawingEngine->FillRegion(&dirtyContentRegion);
-	fDrawingEngine->MarkDirty(&dirtyContentRegion);
-	fDrawingEngine->Unlock();
-	snooze(100000);
+fDrawingEngine->SetHighColor(0, 0, 255);
+fDrawingEngine->FillRegion(&dirtyContentRegion);
+fDrawingEngine->MarkDirty(&dirtyContentRegion);
+fDrawingEngine->Unlock();
+snooze(100000);
 }
 #endif
-			// send UPDATE message to the client
-			_MarkContentDirty(&dirtyContentRegion);
+		// send UPDATE message to the client
+		_MarkContentDirty(&dirtyContentRegion);
 
-			fDesktop->MarkClean(&dirtyContentRegion);
+		fDesktop->MarkClean(&dirtyContentRegion);
 
-			fTopLayer->Draw(fDrawingEngine, &dirtyContentRegion,
-							&fVisibleContentRegion, false);
-		}
-
-		fDesktop->ReadUnlockClipping();
+#if DELAYED_BACKGROUND_CLEARING
+		fTopLayer->Draw(fDrawingEngine, &dirtyContentRegion,
+						&fVisibleContentRegion, false);
+#else
+		fTopLayer->Draw(fDrawingEngine, &dirtyContentRegion,
+						&fVisibleContentRegion, true);
+#endif
 	}
 }
 
@@ -417,6 +447,11 @@ if (fDrawingEngine->Lock()) {
 void
 WindowLayer::_DrawClient(int32 token)
 {
+	// This function is only executed in the window thread.
+	// It still needs to block on the clipping lock, since
+	// We have to be sure that the clipping is up to date.
+	// If true readlocking would work correctly, this would
+	// not be an issue
 	ViewLayer* layer = (ViewLayer*)fTokenViewMap.ItemAt(token);
 	if (!layer)
 		return;
@@ -434,15 +469,23 @@ WindowLayer::_DrawClient(int32 token)
 			fEffectiveDrawingRegionValid = true;
 		}
 
+		// TODO: this is a region that needs to be cached later in the server
+		// when the current layer in ServerWindow is set, and we are currently
+		// in an update (fInUpdate), than we can set this region and remember
+		// it for the comming drawing commands until the current layer changes
+		// again or fEffectiveDrawingRegionValid is suddenly false.
 		BRegion effectiveClipping(fEffectiveDrawingRegion);
 		effectiveClipping.IntersectWith(&layer->ScreenClipping(&fVisibleContentRegion));
 
 		if (effectiveClipping.CountRects() > 0) {
+#if DELAYED_BACKGROUND_CLEARING
 			// clear the back ground
 			// TODO: only if this is the first drawing command for
-			// this layer of course!
+			// this layer of course! in the simulation, all client
+			// drawing is done from a single command yet
 			layer->Draw(fDrawingEngine, &effectiveClipping,
 						&fVisibleContentRegion, false);
+#endif
 
 			layer->ClientDraw(fDrawingEngine, &effectiveClipping);
 		}
@@ -455,53 +498,86 @@ WindowLayer::_DrawClient(int32 token)
 void
 WindowLayer::_DrawBorder()
 {
-//printf("%s - DrawBorder()\n", Name());
-#if SLOW_DRAWING
-	snooze(10000);
-#endif
-	if (fDesktop->ReadLockClipping()) {
-	
-		// construct the region of the border that needs redrawing
-		BRegion dirtyBorderRegion;
-		GetBorderRegion(&dirtyBorderRegion);
-		// intersect with our visible region
-		dirtyBorderRegion.IntersectWith(&fVisibleRegion);
-		// intersect with the Desktop's dirty region
-		dirtyBorderRegion.IntersectWith(fDesktop->DirtyRegion());
-	
-		if (dirtyBorderRegion.CountRects() > 0) {
-			if (fDrawingEngine->Lock()) {
+	// this is executed in the window thread, but only
+	// in respond to MSG_REDRAW having been received, the
+	// clipping lock is held for reading
 
-				fDrawingEngine->ConstrainClippingRegion(&dirtyBorderRegion);
+	// construct the region of the border that needs redrawing
+	BRegion dirtyBorderRegion;
+	GetBorderRegion(&dirtyBorderRegion);
+	// intersect with our visible region
+	dirtyBorderRegion.IntersectWith(&fVisibleRegion);
+	// intersect with the Desktop's dirty region
+	dirtyBorderRegion.IntersectWith(fDesktop->DirtyRegion());
 
-				if (fFocus) {
-					fDrawingEngine->SetLowColor(255, 203, 0, 255);
-					fDrawingEngine->SetHighColor(0, 0, 0, 255);
-				} else {
-					fDrawingEngine->SetLowColor(216, 216, 216, 0);
-					fDrawingEngine->SetHighColor(0, 0, 0, 255);
-				}
+	if (dirtyBorderRegion.CountRects() > 0) {
+		if (fDrawingEngine->Lock()) {
 
-				fDrawingEngine->FillRect(dirtyBorderRegion.Frame(), B_SOLID_LOW);
-				fDrawingEngine->DrawString(Name(), BPoint(fFrame.left, fFrame.top - 5));
+			fDrawingEngine->ConstrainClippingRegion(&dirtyBorderRegion);
 
-				fDrawingEngine->ConstrainClippingRegion(NULL);
-				fDrawingEngine->MarkDirty(&dirtyBorderRegion);
-				fDrawingEngine->Unlock();
+			if (fFocus) {
+				fDrawingEngine->SetLowColor(255, 203, 0, 255);
+				fDrawingEngine->SetHighColor(0, 0, 0, 255);
+			} else {
+				fDrawingEngine->SetLowColor(216, 216, 216, 0);
+				fDrawingEngine->SetHighColor(30, 30, 30, 255);
 			}
-			fDesktop->MarkClean(&dirtyBorderRegion);
+			rgb_color light = tint_color(fDrawingEngine->LowColor(), B_LIGHTEN_2_TINT);
+			rgb_color shadow = tint_color(fDrawingEngine->LowColor(), B_DARKEN_2_TINT);
+
+			fDrawingEngine->FillRect(dirtyBorderRegion.Frame(), B_SOLID_LOW);
+
+			fDrawingEngine->DrawString(Name(), BPoint(fFrame.left, fFrame.top - 5));
+
+			BRect frame(fFrame);
+			fDrawingEngine->BeginLineArray(12);
+			frame.InsetBy(-1, -1);
+			fDrawingEngine->AddLine(BPoint(frame.left, frame.bottom),
+									BPoint(frame.left, frame.top), shadow);
+			fDrawingEngine->AddLine(BPoint(frame.left + 1, frame.top),
+									BPoint(frame.right, frame.top), shadow);
+			fDrawingEngine->AddLine(BPoint(frame.right, frame.top + 1),
+									BPoint(frame.right, frame.bottom - 11), light);
+			fDrawingEngine->AddLine(BPoint(frame.right - 1, frame.bottom - 11),
+									BPoint(frame.right - 11, frame.bottom - 11), light);
+			fDrawingEngine->AddLine(BPoint(frame.right - 11, frame.bottom - 10),
+									BPoint(frame.right - 11, frame.bottom), light);
+			fDrawingEngine->AddLine(BPoint(frame.right - 12, frame.bottom),
+									BPoint(frame.left + 1, frame.bottom), light);
+
+			frame.InsetBy(-3, -3);
+			fDrawingEngine->AddLine(BPoint(frame.left, frame.bottom),
+									BPoint(frame.left, frame.top - 16), light);
+			fDrawingEngine->AddLine(BPoint(frame.left + 1, frame.top - 16),
+									BPoint((frame.left + frame.right) / 2, frame.top - 16), light);
+			fDrawingEngine->AddLine(BPoint((frame.left + frame.right) / 2, frame.top - 15),
+									BPoint((frame.left + frame.right) / 2, frame.top), shadow);
+			fDrawingEngine->AddLine(BPoint((frame.left + frame.right) / 2 + 1, frame.top),
+									BPoint(frame.left + frame.right, frame.top), light);
+			fDrawingEngine->AddLine(BPoint(frame.right, frame.top + 1),
+									BPoint(frame.right, frame.bottom), shadow);
+			fDrawingEngine->AddLine(BPoint(frame.right, frame.bottom),
+									BPoint(frame.left + 1, frame.bottom), shadow);
+			fDrawingEngine->EndLineArray();
+
+			fDrawingEngine->ConstrainClippingRegion(NULL);
+			fDrawingEngine->MarkDirty(&dirtyBorderRegion);
+			fDrawingEngine->Unlock();
 		}
 
-		fDesktop->ReadUnlockClipping();
+		fDesktop->MarkClean(&dirtyBorderRegion);
 	}
 }
 
 // _MarkContentDirty
+//
+// pre: the clipping is readlocked (this function is
+// only called from _TriggerContentRedraw()), which
+// in turn is only called from MessageReceived() with
+// the clipping lock held
 void
 WindowLayer::_MarkContentDirty(BRegion* contentDirtyRegion)
 {
-if (fDesktop->ReadLockClipping()) {
-
 	if (contentDirtyRegion->CountRects() <= 0)
 		return;
 
@@ -513,9 +589,12 @@ if (fDesktop->ReadLockClipping()) {
 		fPendingUpdateSession->Include(contentDirtyRegion);
 	}
 
-	// clip pending update session from current,
-	// current update session, because the backgrounds have been
-	// cleared again already 
+	// clip pending update session from current
+	// update session, it makes no sense to draw stuff
+	// already needing a redraw anyways. Theoretically,
+	// this could be done smarter (clip layers from pending
+	// that have not yet been redrawn in the current update
+	// session)
 	if (fCurrentUpdateSession) {
 		fCurrentUpdateSession->Exclude(contentDirtyRegion);
 		fEffectiveDrawingRegionValid = false;
@@ -525,58 +604,67 @@ if (fDesktop->ReadLockClipping()) {
 		// send this to client
 		fClient->PostMessage(MSG_UPDATE);
 		fUpdateRequested = true;
+		// as long as we have not received
+		// the "begin update" command, the
+		// pending session does not become the
+		// current
 	}
-
-fDesktop->ReadUnlockClipping();
-}
 }
 
 // _BeginUpdate
 void
 WindowLayer::_BeginUpdate()
 {
-if (fDesktop->ReadLockClipping()) {
+	// TODO: since we might "shift" parts of the
+	// internal dirty regions from the desktop thread
+	// in respond to WindowLayer::ResizeBy(), which
+	// might move arround views, this function needs to block
+	// on the global clipping lock so that the internal
+	// dirty regions are not messed with from both threads
+	// at the same time.
+	if (fDesktop->ReadLockClipping()) {
 
-	if (fUpdateRequested && !fCurrentUpdateSession) {
-		fCurrentUpdateSession = fPendingUpdateSession;
-		fPendingUpdateSession = NULL;
-
-		if (fCurrentUpdateSession) {
-			// all drawing command from the client
-			// will have the dirty region from the update
-			// session enforced
-			fInUpdate = true;
+		if (fUpdateRequested && !fCurrentUpdateSession) {
+			fCurrentUpdateSession = fPendingUpdateSession;
+			fPendingUpdateSession = NULL;
+	
+			if (fCurrentUpdateSession) {
+				// all drawing command from the client
+				// will have the dirty region from the update
+				// session enforced
+				fInUpdate = true;
+			}
+			fEffectiveDrawingRegionValid = false;
 		}
-		fEffectiveDrawingRegionValid = false;
-	}
 
-fDesktop->ReadUnlockClipping();
-}
+	fDesktop->ReadUnlockClipping();
+	}
 }
 
 // _EndUpdate
 void
 WindowLayer::_EndUpdate()
 {
-if (fDesktop->ReadLockClipping()) {
-
-	if (fInUpdate) {
-		delete fCurrentUpdateSession;
-		fCurrentUpdateSession = NULL;
+	// TODO: see comment in _BeginUpdate()
+	if (fDesktop->ReadLockClipping()) {
 	
-		fInUpdate = false;
-		fEffectiveDrawingRegionValid = false;
+		if (fInUpdate) {
+			delete fCurrentUpdateSession;
+			fCurrentUpdateSession = NULL;
+		
+			fInUpdate = false;
+			fEffectiveDrawingRegionValid = false;
+		}
+		if (fPendingUpdateSession) {
+			// send this to client
+			fClient->PostMessage(MSG_UPDATE);
+			fUpdateRequested = true;
+		} else {
+			fUpdateRequested = false;
+		}
+	
+	fDesktop->ReadUnlockClipping();
 	}
-	if (fPendingUpdateSession) {
-		// send this to client
-		fClient->PostMessage(MSG_UPDATE);
-		fUpdateRequested = true;
-	} else {
-		fUpdateRequested = false;
-	}
-
-fDesktop->ReadUnlockClipping();
-}
 }
 
 #pragma mark -

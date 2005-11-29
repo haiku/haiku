@@ -3,24 +3,34 @@
 #define DESKTOP_H
 
 #include <List.h>
-#include <Locker.h>
 #include <Region.h>
 #include <View.h>
 #include <Window.h>
 
 #include "DrawingEngine.h"
-#include "MultiLocker.h"
+
+#define SHOW_GLOBAL_DIRTY_REGION 0
+#define SHOW_WINDOW_CONTENT_DIRTY_REGION 0
+
+#define MULTI_LOCKER 0
+#define RW_LOCKER 0
+
+#if MULTI_LOCKER
+#  include "MultiLocker.h"
+#elif RW_LOCKER
+#  include "RWLocker.h"
+#else
+#  include <Locker.h>
+#endif
 
 class WindowLayer;
 
 enum {
 	MSG_ADD_WINDOW		= 'addw',
 	MSG_DRAW			= 'draw',
-};
 
-#define MULTI_LOCKER 0
-#define SHOW_GLOBAL_DIRTY_REGION 0
-#define SHOW_WINDOW_CONTENT_DIRTY_REGION 0
+	MSG_MARK_CLEAN		= 'mcln',
+};
 
 class Desktop : public BLooper {
  public:
@@ -58,22 +68,29 @@ class Desktop : public BLooper {
 
 			void				SetFocusWindow(WindowLayer* window);
 
-#if MULTI_LOCKER
-#  if 0
+#if RW_LOCKER
 			bool				ReadLockClipping() { return fClippingLock.ReadLock(); }
+			bool				ReadLockClippingWithTimeout() { return fClippingLock.ReadLockWithTimeout(10000) >= B_OK; }
 			void				ReadUnlockClipping() { fClippingLock.ReadUnlock(); }
-#  else
-			bool				ReadLockClipping() { return fClippingLock.WriteLock(); }
-			void				ReadUnlockClipping() { fClippingLock.WriteUnlock(); }
-#  endif
-#else
+
+			bool				LockClipping() { return fClippingLock.WriteLock(); }
+			void				UnlockClipping() { fClippingLock.WriteUnlock(); }
+#elif MULTI_LOCKER
+			bool				ReadLockClipping() { return fClippingLock.ReadLock(); }
+			bool				ReadLockClippingWithTimeout() { return fClippingLock.ReadLock(); }
+			void				ReadUnlockClipping() { fClippingLock.ReadUnlock(); }
+
+			bool				LockClipping() { return fClippingLock.WriteLock(); }
+			void				UnlockClipping() { fClippingLock.WriteUnlock(); }
+#else // BLocker
 			bool				ReadLockClipping() { return fClippingLock.Lock(); }
 			bool				ReadLockClippingWithTimeout() { return fClippingLock.LockWithTimeout(10000) >= B_OK; }
 			void				ReadUnlockClipping() { fClippingLock.Unlock(); }
-#endif
 
 			bool				LockClipping() { return fClippingLock.Lock(); }
 			void				UnlockClipping() { fClippingLock.Unlock(); }
+#endif
+
 
 			void				MarkDirty(BRegion* region);
 			void				MarkClean(BRegion* region);
@@ -100,6 +117,8 @@ private:
 
 #if MULTI_LOCKER
 			MultiLocker			fClippingLock;
+#elif RW_LOCKER
+			RWLocker			fClippingLock;
 #else
 			BLocker				fClippingLock;
 #endif
