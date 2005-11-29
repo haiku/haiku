@@ -10,14 +10,52 @@
 
 
 #include <Locker.h>
+#include <MessageFilter.h>
 #include <Messenger.h>
 #include <ObjectList.h>
 
-class BMessageFilter;
 
 class EventStream;
 class HWInterface;
 
+struct event_listener;
+
+
+class EventTarget {
+	public:
+		EventTarget();
+		~EventTarget();
+
+		void SetTo(const BMessenger& messenger);
+		BMessenger& Messenger() { return fMessenger; }
+
+		event_listener* FindListener(int32 token, int32* _index = NULL);
+		bool AddListener(int32 token, uint32 eventMask, uint32 options,
+				bool temporary);
+		void RemoveListener(event_listener* listener, bool temporary);
+
+		bool RemoveListener(int32 token);
+		bool RemoveTemporaryListener(int32 token);
+		void RemoveTemporaryListeners();
+
+		bool IsEmpty() const { return fListeners.IsEmpty(); }
+
+		int32 CountListeners() const { return fListeners.CountItems(); }
+		event_listener* ListenerAt(int32 index) const
+				{ return fListeners.ItemAt(index); }
+
+	private:
+		bool _RemoveTemporaryListener(event_listener* listener, int32 index);
+
+		BObjectList<event_listener> fListeners;
+		BMessenger	fMessenger;
+};
+
+class EventFilter {
+	public:
+		virtual filter_result Filter(BMessage* event, EventTarget** _target,
+			int32* _viewToken = NULL) = 0;
+};
 
 class EventDispatcher : public BLocker {
 	public:
@@ -27,17 +65,17 @@ class EventDispatcher : public BLocker {
 		status_t SetTo(EventStream* stream);
 		status_t InitCheck();
 
-		void SetFocus(const BMessenger* messenger);
+		void RemoveTarget(EventTarget& target);
 
-		bool AddListener(const BMessenger& messenger, int32 token,
+		bool AddListener(EventTarget& target, int32 token,
 				uint32 eventMask, uint32 options);
-		bool AddTemporaryListener(const BMessenger& messenger,
+		bool AddTemporaryListener(EventTarget& target,
 				int32 token, uint32 eventMask, uint32 options);
-		void RemoveListener(const BMessenger& messenger, int32 token);
-		void RemoveTemporaryListener(const BMessenger& messenger, int32 token);
+		void RemoveListener(EventTarget& target, int32 token);
+		void RemoveTemporaryListener(EventTarget& target, int32 token);
 
-		void SetMouseFilter(BMessageFilter* filter);
-		void SetKeyboardFilter(BMessageFilter* filter);
+		void SetMouseFilter(EventFilter* filter);
+		void SetKeyboardFilter(EventFilter* filter);
 
 		void GetMouse(BPoint& where, int32& buttons);
 
@@ -45,26 +83,20 @@ class EventDispatcher : public BLocker {
 		void SetHWInterface(HWInterface* interface);
 
 	private:
-		struct event_listener;
-		class Target;
-
 		status_t _Run();
 		void _Unset();
 
 		bool _SendMessage(BMessenger& messenger, BMessage* message, float importance);
 
-		bool _AddTokens(BMessage* message, Target* target, uint32 eventMask);
+		bool _AddTokens(BMessage* message, EventTarget* target, uint32 eventMask);
 		void _RemoveTokens(BMessage* message);
 		void _SetFeedFocus(BMessage* message);
 		void _UnsetFeedFocus(BMessage* message);
 
-		void _UnsetLastFocus();
+		void _SetMouseTarget(const BMessenger* messenger);
+		void _UnsetLastMouseTarget();
 
-		Target* _FindTarget(const BMessenger& messenger, int32* _index = NULL);
-		Target* _AddTarget(const BMessenger& messenger);
-		void _RemoveTarget(Target* target);
-
-		bool _AddListener(const BMessenger& messenger, int32 token,
+		bool _AddListener(EventTarget& target, int32 token,
 				uint32 eventMask, uint32 options, bool temporary);
 		void _RemoveTemporaryListeners();
 
@@ -79,22 +111,18 @@ class EventDispatcher : public BLocker {
 		thread_id		fThread;
 		thread_id		fCursorThread;
 
-		Target*			fFocus;
-		Target*			fLastFocus;
-		bool			fTransit;
-		bool			fFocusGotExitTransit;
+		EventTarget*	fPreviousMouseTarget;
+		EventTarget*	fFocus;
 		bool			fSuspendFocus;
 
-		BMessageFilter*	fMouseFilter;
-		BMessageFilter*	fKeyboardFilter;
+		EventFilter*	fMouseFilter;
+		EventFilter*	fKeyboardFilter;
 
-		BObjectList<Target> fTargets;
+		BObjectList<EventTarget> fTargets;
 
 		BPoint			fLastCursorPosition;
 		int32			fLastButtons;
 
-		BLocker			fListenerLock;
-			// temporary locker until we have an actual locking model
 		BLocker			fCursorLock;
 		HWInterface*	fHWInterface;
 };

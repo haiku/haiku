@@ -49,26 +49,46 @@
 #endif
 
 
-class KeyboardFilter : public BMessageFilter {
+class KeyboardFilter : public EventFilter {
 	public:
 		KeyboardFilter(Desktop* desktop);
 
-		virtual filter_result Filter(BMessage* message, BHandler** _target);
+		virtual filter_result Filter(BMessage* message, EventTarget** _target,
+			int32* _viewToken);
 
 	private:
-		Desktop* fDesktop;
+		Desktop*		fDesktop;
+		EventTarget*	fLastFocus;
+		bigtime_t		fTimestamp;
+};
+
+class MouseFilter : public EventFilter {
+	public:
+		MouseFilter(Desktop* desktop);
+
+		virtual filter_result Filter(BMessage* message, EventTarget** _target,
+			int32* _viewToken);
+
+	private:
+		Desktop*	fDesktop;
 };
 
 
+//	#pragma mark -
+
+
 KeyboardFilter::KeyboardFilter(Desktop* desktop)
-	: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
-	fDesktop(desktop)
+	:
+	fDesktop(desktop),
+	fLastFocus(NULL),
+	fTimestamp(0)
 {
 }
 
 
 filter_result
-KeyboardFilter::Filter(BMessage* message, BHandler** /*_target*/)
+KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
+	int32* /*_viewToken*/)
 {
 	int32 key;
 	int32 modifiers;
@@ -122,6 +142,93 @@ KeyboardFilter::Filter(BMessage* message, BHandler** /*_target*/)
 		fDesktop->GetDrawingEngine()->DumpToFile(filename);
 		return B_SKIP_MESSAGE;
 	}
+
+	bigtime_t now = system_time();
+
+	::RootLayer* rootLayer = fDesktop->RootLayer();
+	rootLayer->Lock();
+
+	EventTarget* focus = NULL;
+	if (rootLayer->Focus() != NULL)
+		focus = &rootLayer->Focus()->Window()->EventTarget();
+
+	// TODO: this is a try to not steal focus from the current window
+	//	in case you enter some text and a window pops up you haven't
+	//	triggered yourself (like a pop-up window in your browser while
+	//	you're typing a password in another window) - maybe this should
+	//	be done differently, though (using something like B_LOCK_WINDOW_FOCUS)
+
+	if (focus != fLastFocus && now - fTimestamp > 100000) {
+		// if the time span between the key presses is very short
+		// we keep our previous focus alive - this is save even
+		// if the target doesn't exist anymore, as we don't reset
+		// it, and the event focus passed in is always valid (or NULL)
+		*_target = focus;
+		fLastFocus = focus;
+	}	
+
+	rootLayer->Unlock();
+
+	// we always allow to switch focus after the enter key has pressed
+	if (key == B_ENTER)
+		fTimestamp = 0;
+	else
+		fTimestamp = now;
+
+	return B_DISPATCH_MESSAGE;
+}
+
+
+//	#pragma mark -
+
+
+MouseFilter::MouseFilter(Desktop* desktop)
+	:
+	fDesktop(desktop)
+{
+}
+
+
+filter_result
+MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken)
+{
+	BPoint where;
+	if (message->FindPoint("where", &where) != B_OK)
+		return B_DISPATCH_MESSAGE;
+
+	::RootLayer* rootLayer = fDesktop->RootLayer();
+
+	rootLayer->Lock();
+
+	WindowLayer* window = rootLayer->MouseEventWindow();
+	if (window == NULL)
+		window = rootLayer->WindowAt(where);
+
+	if (window != NULL) {
+		// dispatch event in the window layers
+		switch (message->what) {
+			case B_MOUSE_DOWN:
+				window->MouseDown(message, where, _viewToken);
+				break;
+	
+			case B_MOUSE_UP:
+				window->MouseUp(message, where, _viewToken);
+				rootLayer->SetMouseEventWindow(NULL);
+				break;
+	
+			case B_MOUSE_MOVED:
+				window->MouseMoved(message, where, _viewToken);
+				break;
+		}
+
+		if (*_viewToken != B_NULL_TOKEN)
+			*_target = &window->Window()->EventTarget();
+		else
+			*_target = NULL;
+	} else
+		*_target = NULL;
+
+	rootLayer->Unlock();
 
 	return B_DISPATCH_MESSAGE;
 }
@@ -185,28 +292,7 @@ Desktop::Init()
 	fEventDispatcher.SetTo(gInputManager->GetStream());
 	fEventDispatcher.SetHWInterface(fVirtualScreen.HWInterface());
 
-	// temporary hack to get things started
-	class MouseFilter : public BMessageFilter {
-		public:
-			MouseFilter(::RootLayer* layer)
-				: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
-				fRootLayer(layer)
-			{
-			}
-
-			virtual filter_result
-			Filter(BMessage* message, BHandler** /*_target*/)
-			{
-				fRootLayer->Lock();
-				fRootLayer->MouseEventHandler(message);
-				fRootLayer->Unlock();
-				return B_DISPATCH_MESSAGE;
-			}
-
-		private:
-			::RootLayer* fRootLayer;
-	};
-	fEventDispatcher.SetMouseFilter(new MouseFilter(fRootLayer));
+	fEventDispatcher.SetMouseFilter(new MouseFilter(this));
 	fEventDispatcher.SetKeyboardFilter(new KeyboardFilter(this));
 
 	// take care of setting the default cursor
@@ -560,6 +646,9 @@ Desktop::RemoveWindowLayer(WindowLayer *windowLayer)
 	Unlock();
 
 	RootLayer()->RemoveWindowLayer(windowLayer);
+
+	if (windowLayer->Window() != NULL)
+		EventDispatcher().RemoveTarget(windowLayer->Window()->EventTarget());
 }
 
 

@@ -84,9 +84,9 @@ class WindowLayer : public Layer {
 											  float* minHeight,
 											  float* maxHeight) const;
 
-	virtual	void				MouseDown(BMessage *msg, BPoint where);
-	virtual	void				MouseUp(BMessage *msg, BPoint where);
-	virtual	void				MouseMoved(BMessage *msg, BPoint where);
+	virtual	void				MouseDown(BMessage *msg, BPoint where, int32* _viewToken);
+	virtual	void				MouseUp(BMessage *msg, BPoint where, int32* _viewToken);
+	virtual	void				MouseMoved(BMessage *msg, BPoint where, int32* _viewToken);
 
 //			click_type			ActionFor(const BMessage *msg)
 //									{ return _ActionFor(evt); }
@@ -99,6 +99,9 @@ class WindowLayer : public Layer {
 			void				UpdateDecorator();
 			void				UpdateFont();
 			void				UpdateScreen();
+
+			bool				IsFocus() const { return fIsFocus; }
+			void				SetFocus(bool focus) { fIsFocus = focus; }
 
 	inline	Decorator*			GetDecorator() const { return fDecorator; }
 
@@ -150,6 +153,8 @@ class WindowLayer : public Layer {
 			int32				fMouseButtons;
 			BPoint				fLastMousePosition;
 			BPoint				fResizingClickOffset;
+
+			bool				fIsFocus;
 
 			bool				fIsClosing;
 			bool				fIsMinimizing;

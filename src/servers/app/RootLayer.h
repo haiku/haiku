@@ -57,7 +57,6 @@ class RootLayer : public Layer {
 		void				HideWindowLayer(WindowLayer* windowLayer);
 		void				ShowWindowLayer(WindowLayer* windowLayer, bool toFront = true);
 
-//		void				RevealNewWMState(Workspace::State &oldWMState);
 		bool				SetFocus(WindowLayer* focus);
 		WindowLayer*		Focus() const { return fFocus; }
 		WindowLayer*		Front() const { return fFront; }
@@ -67,15 +66,13 @@ class RootLayer : public Layer {
 		void				SetWorkspacesLayer(Layer* layer) { fWorkspacesLayer = layer; }
 		Layer*				WorkspacesLayer() const { return fWorkspacesLayer; }
 
-#if 0
-			void			SetBGColor(const RGBColor &col);
-			RGBColor		BGColor(void) const;
-#endif
-
 		void				SetDragMessage(BMessage *msg);
 		BMessage*			DragMessage() const;
 
-		void				SetMouseEventLayer(Layer* layer);
+		WindowLayer*		WindowAt(BPoint where);
+
+		WindowLayer*		MouseEventWindow() const { return fMouseEventWindow; }
+		void				SetMouseEventWindow(WindowLayer* layer);
 
 		void				LayerRemoved(Layer* layer);
 
@@ -100,8 +97,6 @@ class RootLayer : public Layer {
 		void				AddWindowLayer(WindowLayer* windowLayer);
 		void				RemoveWindowLayer(WindowLayer* windowLayer);
 
-		void				MouseEventHandler(BMessage *msg);
-
 	private:
 		bool				_SetFocus(WindowLayer* focus, BRegion& update);
 		void				_SetFront(WindowLayer* front, BRegion& update);
@@ -112,11 +107,9 @@ class RootLayer : public Layer {
 		void				_WindowsChanged(BRegion& region);
 		void				_UpdateWorkspace(Workspace& workspace);
 
-		Layer*				_ChildAt(BPoint where);
-
 		Desktop*			fDesktop;
 		BMessage*			fDragMessage;
-		Layer*				fMouseEventLayer;
+		WindowLayer*		fMouseEventWindow;
 
 		BLocker				fAllRegionsLock;
 

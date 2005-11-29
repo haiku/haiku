@@ -70,6 +70,8 @@ WindowLayer::WindowLayer(const BRect &frame,
 	  fMouseButtons(0),
 	  fLastMousePosition(-1.0, -1.0),
 
+	  fIsFocus(false),
+
 	  fIsClosing(false),
 	  fIsMinimizing(false),
 	  fIsZooming(false),
@@ -148,7 +150,7 @@ WindowLayer::Draw(const BRect& updateRect)
 	
 	// if we have a visible region, it is decorator's one.
 	if (fDecorator) {
-		fDecorator->SetFocus(GetRootLayer()->Focus() == this);
+		fDecorator->SetFocus(IsFocus());
 		fDecorator->Draw(updateRect);
 	}
 }
@@ -389,7 +391,7 @@ WindowLayer::GetSizeLimits(float* minWidth, float* maxWidth,
 
 
 void
-WindowLayer::MouseDown(BMessage *msg, BPoint where)
+WindowLayer::MouseDown(BMessage *msg, BPoint where, int32* _viewToken)
 {
 	Desktop* desktop = Window()->App()->GetDesktop();
 
@@ -403,8 +405,8 @@ WindowLayer::MouseDown(BMessage *msg, BPoint where)
 		if (fDecorator)
 			action = _ActionFor(msg);
 
-		// deactivate border buttons on first click(select)
-		if (GetRootLayer()->Focus() != this && action != DEC_MOVETOBACK
+		// deactivate border buttons on first click (select)
+		if (!IsFocus() && action != DEC_MOVETOBACK
 			&& action != DEC_RESIZE && action != DEC_SLIDETAB)
 			action = DEC_DRAG;
 
@@ -454,12 +456,12 @@ WindowLayer::MouseDown(BMessage *msg, BPoint where)
 		if (action == DEC_MOVETOBACK) {
 			desktop->SendBehindWindow(this, NULL);
 		} else {
-			GetRootLayer()->SetMouseEventLayer(this);
+			GetRootLayer()->SetMouseEventWindow(this);
 			desktop->ActivateWindow(this);
 		}
 	} else if (target != NULL) {
 		// clicking a simple Layer.
-		if (GetRootLayer()->Focus() != this) {
+		if (!IsFocus()) {
 			DesktopSettings desktopSettings(desktop);
 
 			// not in FFM mode?
@@ -470,14 +472,13 @@ WindowLayer::MouseDown(BMessage *msg, BPoint where)
 				return;
 		}
 
-		msg->AddInt32("_view_token", target->ViewToken());
-		target->MouseDown(msg, where);
+		target->MouseDown(msg, where, _viewToken);
 	}
 }
 
 
 void
-WindowLayer::MouseUp(BMessage *msg, BPoint where)
+WindowLayer::MouseUp(BMessage *msg, BPoint where, int32* _viewToken)
 {
 	bool invalidate = false;
 	if (fDecorator) {
@@ -517,15 +518,13 @@ WindowLayer::MouseUp(BMessage *msg, BPoint where)
 	fIsSlidingTab = false;
 
 	Layer* target = LayerAt(where);
-	if (target != NULL && target != this) {
-		msg->AddInt32("_view_token", target->ViewToken());
-		target->MouseUp(msg, where);
-	}
+	if (target != NULL && target != this)
+		target->MouseUp(msg, where, _viewToken);
 }
 
 
 void
-WindowLayer::MouseMoved(BMessage *msg, BPoint where)
+WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken)
 {
 	if (fDecorator) {
 // TODO: present behavior is not fine!
@@ -560,14 +559,12 @@ WindowLayer::MouseMoved(BMessage *msg, BPoint where)
 	Desktop* desktop = Window()->App()->GetDesktop();
 	DesktopSettings desktopSettings(desktop);
 
-	if (desktopSettings.MouseMode() != B_NORMAL_MOUSE && GetRootLayer()->Focus() != this)
+	if (desktopSettings.MouseMode() != B_NORMAL_MOUSE && !IsFocus())
 		GetRootLayer()->SetFocus(this);
 
 	Layer* target = LayerAt(where);
-	if (target != NULL && target != this) {
-		msg->AddInt32("_view_token", target->ViewToken());
-		target->MouseMoved(msg, where);
-	}
+	if (target != NULL && target != this)
+		target->MouseMoved(msg, where, _viewToken);
 }
 
 

@@ -159,6 +159,8 @@ ServerWindow::ServerWindow(const char *title, ServerApp *app,
 	BMessenger::Private(fHandlerMessenger).SetTo(fClientTeam,
 		looperPort, clientToken);
 
+	fEventTarget.SetTo(fFocusMessenger);
+
 	fDeathSemaphore = create_sem(0, "window death");
 }
 
@@ -680,7 +682,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			}
 
 			if (fCurrentLayer->EventMask() != 0) {
-				fDesktop->EventDispatcher().RemoveListener(FocusMessenger(),
+				fDesktop->EventDispatcher().RemoveListener(EventTarget(),
 					fCurrentLayer->ViewToken());
 			}
 
@@ -721,6 +723,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_LAYER_SET_EVENT_MASK:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_MOUSE_EVENT_MASK: Layer name: %s\n", fTitle, fCurrentLayer->Name()));			
+			rootLayer->Unlock();
+				// we don't want RootLayer to be locked while we play with the events
 
 			uint32 eventMask, options;
 
@@ -729,33 +733,38 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				fCurrentLayer->SetEventMask(eventMask, options);
 
 				if (eventMask != 0 || options != 0) {
-					fDesktop->EventDispatcher().AddListener(FocusMessenger(),
+					fDesktop->EventDispatcher().AddListener(EventTarget(),
 						fCurrentLayer->ViewToken(), eventMask, options);
 				} else {
-					fDesktop->EventDispatcher().RemoveListener(FocusMessenger(),
+					fDesktop->EventDispatcher().RemoveListener(EventTarget(),
 						fCurrentLayer->ViewToken());
 				}
 			}
+
+			rootLayer->Lock();
 			break;
 		}
 		case AS_LAYER_SET_MOUSE_EVENT_MASK:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_MOUSE_EVENT_MASK: Layer name: %s\n", fTitle, fCurrentLayer->Name()));			
+			rootLayer->Unlock();
+				// we don't want RootLayer to be locked while we play with the events
 
 			uint32 eventMask, options;
 
 			link.Read<uint32>(&eventMask);
 			if (link.Read<uint32>(&options) == B_OK) {
 				if (eventMask != 0 || options != 0) {
-					fDesktop->EventDispatcher().AddTemporaryListener(FocusMessenger(),
+					fDesktop->EventDispatcher().AddTemporaryListener(EventTarget(),
 						fCurrentLayer->ViewToken(), eventMask, options);
 				} else {
-					fDesktop->EventDispatcher().RemoveTemporaryListener(FocusMessenger(),
+					fDesktop->EventDispatcher().RemoveTemporaryListener(EventTarget(),
 						fCurrentLayer->ViewToken());
 				}
 			}
 
 			// TODO: support B_LOCK_WINDOW_FOCUS option in RootLayer
+			rootLayer->Lock();
 			break;
 		}
 		case AS_LAYER_MOVE_TO:

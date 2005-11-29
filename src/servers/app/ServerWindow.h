@@ -13,6 +13,7 @@
 #define SERVER_WINDOW_H
 
 
+#include "EventDispatcher.h"
 #include "MessageLooper.h"
 
 #include <PortLink.h>
@@ -58,6 +59,8 @@ public:
 									 uint32 workspace);
 	virtual bool				Run();
 	virtual port_id				MessagePort() const { return fMessagePort; }
+
+			::EventTarget&		EventTarget() { return fEventTarget; }
 
 			void				ReplaceDecorator();
 			void				Show();
@@ -135,6 +138,7 @@ private:
 			port_id				fClientLooperPort;
 			BMessenger			fFocusMessenger;
 			BMessenger			fHandlerMessenger;
+			::EventTarget		fEventTarget;
 
 			BMessage			fClientViewsWithInvalidCoords;
 

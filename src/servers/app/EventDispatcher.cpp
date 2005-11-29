@@ -12,6 +12,8 @@
 #include "HWInterface.h"
 #include "InputManager.h"
 
+#include <TokenSpace.h>
+
 #include <Autolock.h>
 #include <MessageFilter.h>
 #include <View.h>
@@ -29,11 +31,6 @@
 #endif
 
 
-// TODO: the Target class could be made public, and ServerWindow could inherit
-//	from it - this would especially be nice if we didn't have to lock the root
-//	layer when messing with ServerWindow children (because then, RootLayer's
-//	mouse filter could almost be moved completely to the window).
-
 /*!
 	The differentiation between messenger and token looks odd, but it
 	really has a reason as well:
@@ -42,40 +39,7 @@
 	view(s).
 */
 
-class EventDispatcher::Target {
-	public:
-		Target(const BMessenger& messenger);
-		~Target();
-
-		BMessenger& Messenger() { return fMessenger; }
-
-		event_listener* FindListener(int32 token, int32* _index = NULL);
-		bool AddListener(int32 token, uint32 eventMask, uint32 options,
-				bool temporary);
-		void RemoveListener(event_listener* listener, bool temporary);
-
-		bool RemoveListener(int32 token);
-		bool RemoveTemporaryListener(int32 token);
-		void RemoveTemporaryListeners();
-
-		bool IsNeeded() const { return fFocusOrLastFocus || !fListeners.IsEmpty(); }
-
-		void SetFocusOrLastFocus(bool focus) { fFocusOrLastFocus = focus; }
-		bool FocusOrLastFocus() const { return fFocusOrLastFocus; }
-
-		int32 CountListeners() const { return fListeners.CountItems(); }
-		event_listener* ListenerAt(int32 index) const { return fListeners.ItemAt(index); }
-
-	private:
-		bool _RemoveTemporaryListener(event_listener* listener, int32 index);
-
-		BObjectList<event_listener> fListeners;
-		BMessenger	fMessenger;
-		bool		fFocusOrLastFocus;
-
-};
-
-struct EventDispatcher::event_listener {
+struct event_listener {
 	int32		token;
 	uint32		event_mask;
 	uint32		options;
@@ -93,22 +57,27 @@ static const float kStandardImportance = 0.9f;
 static const float kListenerImportance = 0.8f;
 
 
-EventDispatcher::Target::Target(const BMessenger& messenger)
+EventTarget::EventTarget()
 	:
-	fListeners(2, true),
-	fMessenger(messenger),
-	fFocusOrLastFocus(false)
+	fListeners(2, true)
 {
 }
 
 
-EventDispatcher::Target::~Target()
+EventTarget::~EventTarget()
 {
 }
 
 
-EventDispatcher::event_listener*
-EventDispatcher::Target::FindListener(int32 token, int32* _index)
+void
+EventTarget::SetTo(const BMessenger& messenger)
+{
+	fMessenger = messenger;
+}
+
+
+event_listener*
+EventTarget::FindListener(int32 token, int32* _index)
 {
 	for (int32 i = fListeners.CountItems(); i-- > 0;) {
 		event_listener* listener = fListeners.ItemAt(i);
@@ -125,7 +94,7 @@ EventDispatcher::Target::FindListener(int32 token, int32* _index)
 
 
 bool
-EventDispatcher::Target::_RemoveTemporaryListener(event_listener* listener, int32 index)
+EventTarget::_RemoveTemporaryListener(event_listener* listener, int32 index)
 {
 	if (listener->event_mask == 0) {
 		// this is only a temporary target
@@ -150,7 +119,7 @@ EventDispatcher::Target::_RemoveTemporaryListener(event_listener* listener, int3
 
 
 void
-EventDispatcher::Target::RemoveTemporaryListeners()
+EventTarget::RemoveTemporaryListeners()
 {
 	for (int32 index = CountListeners(); index-- > 0;) {
 		event_listener* listener = ListenerAt(index);
@@ -161,7 +130,7 @@ EventDispatcher::Target::RemoveTemporaryListeners()
 
 
 bool
-EventDispatcher::Target::RemoveTemporaryListener(int32 token)
+EventTarget::RemoveTemporaryListener(int32 token)
 {
 	int32 index;
 	event_listener* listener = FindListener(token, &index);
@@ -173,7 +142,7 @@ EventDispatcher::Target::RemoveTemporaryListener(int32 token)
 
 
 bool
-EventDispatcher::Target::RemoveListener(int32 token)
+EventTarget::RemoveListener(int32 token)
 {
 	int32 index;
 	event_listener* listener = FindListener(token, &index);
@@ -194,7 +163,7 @@ EventDispatcher::Target::RemoveListener(int32 token)
 
 
 bool
-EventDispatcher::Target::AddListener(int32 token, uint32 eventMask,
+EventTarget::AddListener(int32 token, uint32 eventMask,
 	uint32 options, bool temporary)
 {
 	event_listener* listener = new (std::nothrow) event_listener;
@@ -231,15 +200,12 @@ EventDispatcher::EventDispatcher()
 	fStream(NULL),
 	fThread(-1),
 	fCursorThread(-1),
+	fPreviousMouseTarget(NULL),
 	fFocus(NULL),
-	fLastFocus(NULL),
-	fTransit(false),
 	fSuspendFocus(false),
 	fMouseFilter(NULL),
 	fKeyboardFilter(NULL),
-	fTargets(10, true),
-		// the list owns its items
-	fListenerLock("listener lock"),
+	fTargets(10),
 	fCursorLock("cursor loop lock"),
 	fHWInterface(NULL)
 {
@@ -321,101 +287,20 @@ EventDispatcher::_Run()
 }
 
 
+/*!
+	\brief Removes any reference to the target, but doesn't delete it.
+*/
 void
-EventDispatcher::_UnsetLastFocus()
-{
-	if (fLastFocus == NULL)
-		return;
-
-	fLastFocus->SetFocusOrLastFocus(false);
-	if (!fLastFocus->IsNeeded())
-		_RemoveTarget(fLastFocus);
-
-	fLastFocus = NULL;
-}
-
-
-void
-EventDispatcher::SetFocus(const BMessenger* messenger)
+EventDispatcher::RemoveTarget(EventTarget& target)
 {
 	BAutolock _(this);
-	BAutolock _temp(fListenerLock);
 
-	ETRACE(("EventDispatcher::SetFocus(messenger = %p)\n", messenger));
-
-	if ((messenger == NULL && fFocus == NULL)
-		|| (messenger != NULL && fFocus != NULL && fFocus->Messenger() == *messenger))
-		return;
-
-	// update last focus
-
-	if (fLastFocus != NULL)
-		_UnsetLastFocus();
-
-	fLastFocus = fFocus;
-
-	// update focus
-
-	if (messenger != NULL) {
-		fFocus = _FindTarget(*messenger);
-		if (fFocus == NULL) {
-			// we need a new target for this focus
-			fFocus = _AddTarget(*messenger);
-			if (fFocus == NULL)
-				printf("EventDispatcher: could not set focus!\n");
-		}
-		if (fFocus != NULL)
-			fFocus->SetFocusOrLastFocus(true);
-	} else
+	if (fFocus == &target)
 		fFocus = NULL;
+	if (fPreviousMouseTarget == &target)
+		fPreviousMouseTarget = NULL;
 
-	fFocusGotExitTransit = true;
-	fTransit = true;
-}
-
-
-EventDispatcher::Target*
-EventDispatcher::_FindTarget(const BMessenger& messenger, int32* _index)
-{
-	for (int32 i = fTargets.CountItems(); i-- > 0;) {
-		Target* target = fTargets.ItemAt(i);
-
-		if (target->Messenger() == messenger) {
-			if (_index)
-				*_index = i;
-			return target;
-		}
-	}
-
-	return NULL;
-}
-
-
-EventDispatcher::Target*
-EventDispatcher::_AddTarget(const BMessenger& messenger)
-{
-	Target* target = new (std::nothrow) Target(messenger);
-	if (target == NULL) {
-		printf("EventDispatcher: could not create new target!\n");
-		return NULL;
-	}
-
-	bool success = fTargets.AddItem(target);
-	if (!success) {
-		printf("EventDispatcher: could not add new target!\n");
-		delete target;
-		return NULL;
-	}
-
-	return target;
-}
-
-
-void
-EventDispatcher::_RemoveTarget(Target* target)
-{
-	// the list owns its items and will delete the target itself
-	fTargets.RemoveItem(target);
+	fTargets.RemoveItem(&target);
 }
 
 
@@ -427,19 +312,15 @@ EventDispatcher::_RemoveTarget(Target* target)
 	leaves the event mask untouched and just updates the options.
 */
 bool
-EventDispatcher::_AddListener(const BMessenger& messenger, int32 token,
+EventDispatcher::_AddListener(EventTarget& target, int32 token,
 	uint32 eventMask, uint32 options, bool temporary)
 {
-	BAutolock _(fListenerLock);
-	Target* target = _FindTarget(messenger);
-	if (target == NULL) {
-		// we need a new target for this messenger
-		target = _AddTarget(messenger);
-		if (target == NULL)
-			return false;
-	}
+	BAutolock _(this);
 
-	event_listener* listener = target->FindListener(token);
+	if (!fTargets.HasItem(&target))
+		fTargets.AddItem(&target);
+
+	event_listener* listener = target.FindListener(token);
 	if (listener != NULL) {
 		// we already have this target, update its event mask
 		if (temporary) {
@@ -463,10 +344,10 @@ EventDispatcher::_AddListener(const BMessenger& messenger, int32 token,
 
 	// we need a new target
 
-	bool success = target->AddListener(token, eventMask, options, temporary);
+	bool success = target.AddListener(token, eventMask, options, temporary);
 	if (!success) {
-		if (!target->IsNeeded())
-			_RemoveTarget(target);
+		if (target.IsEmpty())
+			fTargets.RemoveItem(&target);
 	} else {
 		if (options & B_SUSPEND_VIEW_FOCUS)
 			fSuspendFocus = true;
@@ -480,7 +361,7 @@ void
 EventDispatcher::_RemoveTemporaryListeners()
 {
 	for (int32 i = fTargets.CountItems(); i-- > 0;) {
-		Target* target = fTargets.ItemAt(i);
+		EventTarget* target = fTargets.ItemAt(i);
 
 		target->RemoveTemporaryListeners();
 	}
@@ -488,61 +369,48 @@ EventDispatcher::_RemoveTemporaryListeners()
 
 
 bool
-EventDispatcher::AddListener(const BMessenger& messenger, int32 token,
+EventDispatcher::AddListener(EventTarget& target, int32 token,
 	uint32 eventMask, uint32 options)
 {
 	options &= B_NO_POINTER_HISTORY;
 		// that's currently the only allowed option
 
-	return _AddListener(messenger, token, eventMask, options, false);
+	return _AddListener(target, token, eventMask, options, false);
 }
 
 
 bool
-EventDispatcher::AddTemporaryListener(const BMessenger& messenger,
+EventDispatcher::AddTemporaryListener(EventTarget& target,
 	int32 token, uint32 eventMask, uint32 options)
 {
-	return _AddListener(messenger, token, eventMask, options, true);
+	return _AddListener(target, token, eventMask, options, true);
 }
 
 
 void
-EventDispatcher::RemoveListener(const BMessenger& messenger, int32 token)
+EventDispatcher::RemoveListener(EventTarget& target, int32 token)
 {
-	BAutolock _(fListenerLock);
+	BAutolock _(this);
 	ETRACE(("events: remove listener token %ld\n", token));
 
-	int32 index;
-	Target* target = _FindTarget(messenger, &index);
-	if (target == NULL)
-		return;
-
-	if (target->RemoveListener(token) && !target->IsNeeded()) {
-		fTargets.RemoveItemAt(index);
-		delete target;
-	}
+	if (target.RemoveListener(token) && target.IsEmpty())
+		fTargets.RemoveItem(&target);
 }
 
 
 void
-EventDispatcher::RemoveTemporaryListener(const BMessenger& messenger, int32 token)
+EventDispatcher::RemoveTemporaryListener(EventTarget& target, int32 token)
 {
-	BAutolock _(fListenerLock);
+	BAutolock _(this);
+	ETRACE(("events: remove temporary listener token %ld\n", token));
 
-	int32 index;
-	Target* target = _FindTarget(messenger, &index);
-	if (target == NULL)
-		return;
-
-	if (target->RemoveTemporaryListener(token) && !target->IsNeeded()) {
-		fTargets.RemoveItemAt(index);
-		delete target;
-	}
+	if (target.RemoveTemporaryListener(token) && target.IsEmpty())
+		fTargets.RemoveItem(&target);
 }
 
 
 void
-EventDispatcher::SetMouseFilter(BMessageFilter* filter)
+EventDispatcher::SetMouseFilter(EventFilter* filter)
 {
 	BAutolock _(this);
 
@@ -555,7 +423,7 @@ EventDispatcher::SetMouseFilter(BMessageFilter* filter)
 
 
 void
-EventDispatcher::SetKeyboardFilter(BMessageFilter* filter)
+EventDispatcher::SetKeyboardFilter(EventFilter* filter)
 {
 	BAutolock _(this);
 
@@ -633,12 +501,9 @@ EventDispatcher::_SendMessage(BMessenger& messenger, BMessage* message,
 
 
 bool
-EventDispatcher::_AddTokens(BMessage* message, Target* target, uint32 eventMask)
+EventDispatcher::_AddTokens(BMessage* message, EventTarget* target, uint32 eventMask)
 {
 	_RemoveTokens(message);
-
-	BAutolock _(fListenerLock);
-		// temporary lock
 
 	int32 count = target->CountListeners();
 	for (int32 i = count; i-- > 0;) {
@@ -696,7 +561,8 @@ EventDispatcher::_EventLoop()
 
 		BAutolock _(this);
 
-		bool sendToLastFocus = false;
+		EventTarget* current = NULL;
+		EventTarget* previous = NULL;
 		bool pointerEvent = false;
 		bool keyboardEvent = false;
 		bool addedTokens = false;
@@ -704,45 +570,37 @@ EventDispatcher::_EventLoop()
 		switch (event->what) {
 			case B_MOUSE_MOVED:
 			{
+				BPoint where;
+				if (event->FindPoint("where", &where) == B_OK)
+					fLastCursorPosition = where;
+
 				if (!HasCursorThread()) {
 					// there is no cursor thread, we need to move the cursor ourselves
 					BAutolock _(fCursorLock);
 
-					BPoint where;
-					if (fHWInterface != NULL && event->FindPoint("where", &where) == B_OK)
-						fHWInterface->MoveCursorTo(where.x, where.y);
-				}
-
-				if (fTransit) {
-					// target has changed, we need to add the be:transit field
-					// to the message
-					if (fLastFocus != NULL) {
-						addedTokens = _AddTokens(event, fLastFocus, B_POINTER_EVENTS);
-						_SendMessage(fLastFocus->Messenger(), event,
-							kMouseTransitImportance);
-						sendToLastFocus = true;
-
-						// we no longer need the last focus messenger
-						_UnsetLastFocus();
+					if (fHWInterface != NULL) {
+						fHWInterface->MoveCursorTo(fLastCursorPosition.x,
+							fLastCursorPosition.y);
 					}
-
-					fTransit = false;
 				}
-
-				BPoint where;
-				if (event->FindPoint("where", &where) == B_OK)
-					fLastCursorPosition = where;
 
 				// supposed to fall through
 			}
 			case B_MOUSE_DOWN:
 			case B_MOUSE_UP:
+			{
 #ifdef TRACE_EVENTS
 				if (event->what != B_MOUSE_MOVED)
-					printf("mouse up/down event, focus = %p\n", fFocus);
+					printf("mouse up/down event, previous target = %p\n", fPreviousMouseTarget);
 #endif
-				if (fMouseFilter != NULL
-					&& fMouseFilter->Filter(event, NULL) == B_SKIP_MESSAGE) {
+				pointerEvent = true;
+
+				if (fMouseFilter == NULL)
+					break;
+
+				EventTarget* mouseTarget = fPreviousMouseTarget;
+				int32 viewToken = B_NULL_TOKEN;
+				if (fMouseFilter->Filter(event, &mouseTarget, &viewToken) == B_SKIP_MESSAGE) {
 					// this is a work-around if the wrong B_MOUSE_UP
 					// event is filtered out
 					if (event->what == B_MOUSE_UP) {
@@ -763,31 +621,30 @@ EventDispatcher::_EventLoop()
 				event->RemoveName("where");
 				event->AddPoint("screen_where", fLastCursorPosition);
 
-				pointerEvent = true;
+				if (event->what == B_MOUSE_MOVED
+					&& fPreviousMouseTarget != NULL
+					&& mouseTarget != fPreviousMouseTarget) {
+					// target has changed, we need to notify the previous target
+					// that the mouse has exited its views
+					addedTokens = _AddTokens(event, fPreviousMouseTarget,
+						B_POINTER_EVENTS);
+					_SendMessage(fPreviousMouseTarget->Messenger(), event,
+						kMouseTransitImportance);
+					previous = fPreviousMouseTarget;
+				}
 
-				if (fFocus != NULL) {
-					int32 viewToken;
+				current = fPreviousMouseTarget = mouseTarget;
 
-					addedTokens |= _AddTokens(event, fFocus, B_POINTER_EVENTS);
-					if (addedTokens)
-						_SetFeedFocus(event);
-					else if (fFocusGotExitTransit) {
-						// TODO: this is a temporary hack to not continue to
-						// send mouse messages to the client when the mouse
-						// pointer is not over it
-						if (event->FindInt32("_view_token", &viewToken) != B_OK)
-							break;
+				if (current != NULL) {
+					addedTokens |= _AddTokens(event, current, B_POINTER_EVENTS);
+					if (viewToken != B_NULL_TOKEN)
+						event->AddInt32("_view_token", viewToken);
 
-						fFocusGotExitTransit = false;
-					} else if (event->what == B_MOUSE_MOVED) {
-						if (event->FindInt32("_view_token", &viewToken) != B_OK)
-							fFocusGotExitTransit = true;
-					}
-
-					_SendMessage(fFocus->Messenger(), event, event->what == B_MOUSE_MOVED
+					_SendMessage(current->Messenger(), event, event->what == B_MOUSE_MOVED
 						? kMouseMovedImportance : kStandardImportance);
 				}
 				break;
+			}
 
 			case B_KEY_DOWN:
 			case B_KEY_UP:
@@ -797,12 +654,12 @@ EventDispatcher::_EventLoop()
 				ETRACE(("key event, focus = %p\n", fFocus));
 
 				if (fKeyboardFilter != NULL
-					&& fKeyboardFilter->Filter(event, NULL) == B_SKIP_MESSAGE)
+					&& fKeyboardFilter->Filter(event, &fFocus) == B_SKIP_MESSAGE)
 					break;
 
 				keyboardEvent = true;
 
-				if (fFocus != NULL && _AddTokens(event, fFocus, B_KEYBOARD_EVENTS)) {
+				if (current != NULL && _AddTokens(event, fFocus, B_KEYBOARD_EVENTS)) {
 					// if tokens were added, we need to explicetly suspend
 					// focus in the event - if not, the event is simply not
 					// forwarded to the target
@@ -815,8 +672,10 @@ EventDispatcher::_EventLoop()
 				// supposed to fall through
 
 			default:
-				if (fFocus != NULL && (!fSuspendFocus || addedTokens))
-					_SendMessage(fFocus->Messenger(), event, kStandardImportance);
+				current = fFocus;
+
+				if (current != NULL && (!fSuspendFocus || addedTokens))
+					_SendMessage(current->Messenger(), event, kStandardImportance);
 				break;
 		}
 
@@ -833,13 +692,11 @@ EventDispatcher::_EventLoop()
 				event->RemoveName("_view_token");
 			}
 
-			BAutolock _temp(fListenerLock);
-
 			for (int32 i = fTargets.CountItems(); i-- > 0;) {
-				Target* target = fTargets.ItemAt(i);
+				EventTarget* target = fTargets.ItemAt(i);
 
 				// we already sent the event to the all focus and last focus tokens
-				if (fFocus == target || (sendToLastFocus && fLastFocus == target))
+				if (current == target || previous == target)
 					continue;
 
 				// don't send the message if there are no tokens for this event
@@ -851,7 +708,6 @@ EventDispatcher::_EventLoop()
 						? kMouseMovedImportance : kListenerImportance)) {
 					// the target doesn't seem to exist anymore, let's remove it
 					fTargets.RemoveItemAt(i);
-					delete target;
 				}
 			}
 

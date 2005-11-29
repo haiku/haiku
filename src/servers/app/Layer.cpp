@@ -834,26 +834,23 @@ Layer::CopyBits(BRect& src, BRect& dst, int32 xOffset, int32 yOffset)
 
 
 void
-Layer::MouseDown(BMessage *msg, BPoint where)
+Layer::MouseDown(BMessage *msg, BPoint where, int32* _viewToken)
 {
+	*_viewToken = ViewToken();
 }
 
 
 void
-Layer::MouseUp(BMessage *msg, BPoint where)
+Layer::MouseUp(BMessage *msg, BPoint where, int32* _viewToken)
 {
+	*_viewToken = ViewToken();
 }
 
 
 void
-Layer::MouseMoved(BMessage *msg, BPoint where)
+Layer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken)
 {
-}
-
-
-void
-Layer::MouseWheelChanged(BMessage *msg, BPoint where)
-{
+	*_viewToken = ViewToken();
 }
 
 

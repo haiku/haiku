@@ -55,7 +55,7 @@ RootLayer::RootLayer(const char *name, Desktop *desktop, DrawingEngine *driver)
 	: Layer(BRect(0, 0, 0, 0), name, 0, B_FOLLOW_ALL, B_WILL_DRAW, driver),
 	fDesktop(desktop),
 	fDragMessage(NULL),
-	fMouseEventLayer(NULL),
+	fMouseEventWindow(NULL),
 	fAllRegionsLock("root layer region lock"),
 
 	fDirtyForRedraw(),
@@ -172,20 +172,15 @@ RootLayer::_SetFocus(WindowLayer* focus, BRegion& update)
 
 	if (fFocus != NULL) {
 		update.Include(&fFocus->VisibleRegion());
-		//fFocus->SetFocus(false);
+		fFocus->SetFocus(false);
 	}
 
 	fFocus = focus;
 
 	if (focus != NULL) {
-		// TODO: the unlocking is evil, but there is currently no cleaner way to do this, ugh...
-		// (this is also responsible for an occasional crash on quit)
-		Unlock();
-		fDesktop->EventDispatcher().SetFocus(&focus->Window()->FocusMessenger());
-		Lock();
 		update.Include(&focus->VisibleRegion());
-	} else
-		fDesktop->EventDispatcher().SetFocus(NULL);
+		focus->SetFocus(true);
+	}
 
 	return true;
 }
@@ -194,6 +189,8 @@ RootLayer::_SetFocus(WindowLayer* focus, BRegion& update)
 bool
 RootLayer::SetFocus(WindowLayer* focus)
 {
+	BAutolock _(fAllRegionsLock);
+
 	BRegion update;
 	bool success = _SetFocus(focus, update);
 	if (!success)
@@ -524,15 +521,15 @@ RootLayer::_WindowsChanged(BRegion& region)
 }
 
 
-Layer*
-RootLayer::_ChildAt(BPoint where)
+WindowLayer*
+RootLayer::WindowAt(BPoint where)
 {
 	if (VisibleRegion().Contains(where))
 		return NULL;
 
 	for (Layer* child = LastChild(); child; child = child->PreviousLayer()) {
 		if (child->FullVisible().Contains(where))
-			return child;
+			return dynamic_cast<WindowLayer*>(child);
 	}
 
 	return NULL;
@@ -543,48 +540,17 @@ RootLayer::_ChildAt(BPoint where)
 
 
 void
-RootLayer::MouseEventHandler(BMessage *event)
+RootLayer::SetMouseEventWindow(WindowLayer* window)
 {
-	BPoint where;
-	if (event->FindPoint("where", &where) != B_OK)
-		return;
-
-	Layer* layer = fMouseEventLayer;
-	if (layer == NULL) {
-		layer = _ChildAt(where);
-		if (layer == NULL)
-			return;
-	}
-
-	switch (event->what) {
-		case B_MOUSE_DOWN:
-			layer->MouseDown(event, where);
-			break;
-
-		case B_MOUSE_UP:
-			layer->MouseUp(event, where);
-			SetMouseEventLayer(NULL);
-			break;
-
-		case B_MOUSE_MOVED:
-			layer->MouseMoved(event, where);
-			break;
-	}
-}
-
-
-void
-RootLayer::SetMouseEventLayer(Layer* layer)
-{
-	fMouseEventLayer = layer;
+	fMouseEventWindow = window;
 }
 
 
 void
 RootLayer::LayerRemoved(Layer* layer)
 {
-	if (fMouseEventLayer == layer)
-		fMouseEventLayer = NULL;
+	if (fMouseEventWindow == layer)
+		fMouseEventWindow = NULL;
 }
 
 
