@@ -1,9 +1,8 @@
 #include "NodeMessage.h"
 #include <StorageKit.h> 
 #include <fs_attr.h>
-#include <vector>
+#include <stdlib.h>
 
-using std::vector;
 /*
    These functions gives a nice BMessage interface to node attributes,
    by letting you transfer attributes to and from BMessages.  It makes
@@ -43,18 +42,27 @@ _EXPORT BNode& operator>>(BNode& n, BMessage& m)
 {
 	char        name[B_ATTR_NAME_LENGTH];
 	attr_info	info;
-	vector<char> buf(4);
+	char *buf = NULL;
 	
 	n.RewindAttrs();
 	while (n.GetNextAttrName(name)==B_OK)
 	{
-		n.GetAttrInfo(name,&info);
-		buf.resize(info.size);
-		info.size=n.ReadAttr(name,info.type,0,buf.begin(),info.size);
+		if (n.GetAttrInfo(name,&info) != B_OK)
+			continue;
+
+		// resize the buffer
+		if (char *newBuffer = (char*)realloc(buf, info.size))
+			buf = newBuffer;
+		else
+			continue;
+
+		info.size=n.ReadAttr(name,info.type,0,buf,info.size);
 		if (info.size >= 0)
-			m.AddData(name,info.type,buf.begin(),info.size);
+			m.AddData(name,info.type,buf,info.size);
 	}
 	n.RewindAttrs();
-	
+
+	free(buf);
+
 	return n;
 }
