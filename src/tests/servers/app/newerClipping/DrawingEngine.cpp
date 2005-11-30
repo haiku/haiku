@@ -37,7 +37,10 @@ DrawingEngine::Unlock()
 #if RUN_WITH_FRAME_BUFFER
 	Sync();
 #else
-//	Flush();
+// Flush() takes some time, but we
+// need to do that, since we draw
+// at any time, outside actual updates
+	Flush();
 #endif
 	Window()->Unlock();
 }

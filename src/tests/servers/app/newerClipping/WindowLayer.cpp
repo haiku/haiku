@@ -778,6 +778,7 @@ UpdateSession&
 UpdateSession::operator=(const UpdateSession& other)
 {
 	fDirtyRegion = other.fDirtyRegion;
+	fInUse = other.fInUse;
 }
 
 
