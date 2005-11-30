@@ -151,8 +151,8 @@ private:
 			BWindow*		window_at(uint32 index, bool incl_menus) const;
 			status_t		get_window_list(BList* list, bool incl_menus) const;
 	static	int32			async_quit_entry(void*);
-	static	BResources*		_app_resources;
-	static	BLocker			_app_resources_lock;
+	static	BResources*		sAppResources;
+	static	BLocker			sAppResourcesLock;
 
 			const char*		fAppName;
 			BPrivate::PortLink* fServerLink;

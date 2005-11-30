@@ -44,8 +44,8 @@ using namespace BPrivate;
 BApplication *be_app = NULL;
 BMessenger be_app_messenger;
 
-BResources *BApplication::_app_resources = NULL;
-BLocker BApplication::_app_resources_lock("_app_resources_lock");
+BResources *BApplication::sAppResources = NULL;
+BLocker BApplication::sAppResourcesLock("_app_resources_lock");
 
 
 static property_info sPropertyInfo[] = {
@@ -566,12 +566,8 @@ BApplication::MessageReceived(BMessage *message)
 			BMessage specifier;
 			int32 what;
 			const char *property = NULL;
-			bool scriptHandled = false;
-			if (message->GetCurrentSpecifier(&index, &specifier, &what, &property) == B_OK) {
-				if (ScriptReceived(message, index, &specifier, what, property))
-					scriptHandled = true;
-			}
-			if (!scriptHandled)
+			if (message->GetCurrentSpecifier(&index, &specifier, &what, &property) < B_OK) 
+				|| !ScriptReceived(message, index, &specifier, what, property))
 				BLooper::MessageReceived(message);
 			break;
 		}
@@ -761,15 +757,12 @@ BApplication::GetAppInfo(app_info *info) const
 BResources *
 BApplication::AppResources()
 {
-	if (!_app_resources_lock.Lock())
-		return NULL;
-
+	BObjectLocker<BLocker> lock(sAppResourcesLock);
+	
 	// BApplication caches its resources, so check
 	// if it already happened.
-	if (_app_resources != NULL) {
-		_app_resources_lock.Unlock();
-		return _app_resources;
-	}
+	if (sAppResources != NULL)
+		return sAppResources;
 
 	entry_ref ref;
 	bool found = false;
@@ -792,13 +785,11 @@ BApplication::AppResources()
 			if (resources->SetTo(&file, false) < B_OK)
 				delete resources;
 			else
-				_app_resources = resources;			
+				sAppResources = resources;			
 		}
 	}
 
-	_app_resources_lock.Unlock();
-
-	return _app_resources;
+	return sAppResources;
 }
 
 
@@ -878,8 +869,6 @@ BApplication::DispatchMessage(BMessage *message, BHandler *handler)
 		}
 		
 		// TODO: Handle these as well
-		// These two are handled by BTextView classes, so
-		// BApplication probably forwards these messages to them.
 		case _DISPOSE_DRAG_: 
 		case _PING_:	
 			puts("not yet handled message:");

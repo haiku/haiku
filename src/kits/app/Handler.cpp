@@ -673,7 +673,8 @@ BMessage: what =  (0x0, or 0)
 status_t
 BHandler::StartWatching(BMessenger messenger, uint32 what)
 {
-	fObserverList ? fObserverList : fObserverList = new _ObserverList;
+	if (fObserverList == NULL)
+		fObserverList = new _ObserverList;
 	return fObserverList->StartObserving(messenger, what);
 }
 
@@ -681,15 +682,15 @@ BHandler::StartWatching(BMessenger messenger, uint32 what)
 status_t
 BHandler::StartWatchingAll(BMessenger messenger)
 {
-	fObserverList ? fObserverList : fObserverList = new _ObserverList;
-	return fObserverList->StartObserving(messenger, B_OBSERVER_OBSERVE_ALL);
+	return StartWatching(messenger, B_OBSERVER_OBSERVE_ALL);
 }
 
 
 status_t
 BHandler::StopWatching(BMessenger messenger, uint32 what)
 {
-	fObserverList ? fObserverList : fObserverList = new _ObserverList;
+	if (fObserverList == NULL)
+		fObserverList = new _ObserverList;
 	return fObserverList->StopObserving(messenger, what);
 }
 
@@ -697,8 +698,7 @@ BHandler::StopWatching(BMessenger messenger, uint32 what)
 status_t
 BHandler::StopWatchingAll(BMessenger messenger)
 {
-	fObserverList ? fObserverList : fObserverList = new _ObserverList;
-	return fObserverList->StopObserving(messenger, B_OBSERVER_OBSERVE_ALL);
+	return StopWatching(messenger, B_OBSERVER_OBSERVE_ALL);
 }
 
 
@@ -721,7 +721,8 @@ BHandler::StartWatchingAll(BHandler *handler)
 status_t
 BHandler::StopWatching(BHandler *handler, uint32 what)
 {
-	fObserverList ? fObserverList : fObserverList = new _ObserverList;
+	if (fObserverList == NULL)
+		fObserverList = new _ObserverList;
 	return fObserverList->StopObserving(handler, what);
 }
 
@@ -729,8 +730,7 @@ BHandler::StopWatching(BHandler *handler, uint32 what)
 status_t
 BHandler::StopWatchingAll(BHandler *handler)
 {
-	fObserverList ? fObserverList : fObserverList = new _ObserverList;
-	return fObserverList->StopObserving(handler, B_OBSERVER_OBSERVE_ALL);
+	return StopWatching(handler, B_OBSERVER_OBSERVE_ALL);
 }
 
 

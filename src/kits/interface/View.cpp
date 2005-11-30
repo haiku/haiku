@@ -3556,7 +3556,7 @@ BView::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 				BMessage replyMsg(B_MESSAGE_NOT_UNDERSTOOD);
 
 				replyMsg.AddInt32("error", B_NAME_NOT_FOUND);
-				replyMsg.AddString("message", "This window doesn't have a self");
+				replyMsg.AddString("message", "This window doesn't have a shelf");
 				msg->SendReply(&replyMsg);
 				return NULL;
 			}

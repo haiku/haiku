@@ -1538,17 +1538,15 @@ BTextView::GetSelection(int32 *outStart, int32 *outEnd) const
 
 
 void
-BTextView::SetFontAndColor(const BFont *inFont, uint32 inMode,
-								const rgb_color *inColor)
+BTextView::SetFontAndColor(const BFont *inFont, uint32 inMode, const rgb_color *inColor)
 {
 	SetFontAndColor(fSelStart, fSelEnd, inFont, inMode, inColor);
 }
 
 
 void
-BTextView::SetFontAndColor(int32 startOffset, int32 endOffset,
-								const BFont *inFont, uint32 inMode,
-								const rgb_color	*inColor)
+BTextView::SetFontAndColor(int32 startOffset, int32 endOffset, const BFont *inFont,
+					uint32 inMode, const rgb_color *inColor)
 {
 	CALLED();
 	
@@ -2679,10 +2677,7 @@ BTextView::UnflattenRunArray(const void	*data, int32 *outSize)
 		run_array->runs[i].font.SetSize(array->styles[i].size);
 		run_array->runs[i].font.SetShear(array->styles[i].shear);
 		run_array->runs[i].font.SetFace(array->styles[i].face);
-		run_array->runs[i].color.red = array->styles[i].red;
-		run_array->runs[i].color.green = array->styles[i].green;
-		run_array->runs[i].color.blue = array->styles[i].blue;
-		run_array->runs[i].color.alpha = array->styles[i].alpha;
+		run_array->runs[i].color = array->styles[i];
 	}
 
 	if (outSize)
