@@ -311,12 +311,24 @@ WindowLayer::Show()
 void
 WindowLayer::ProcessDirtyRegion(BRegion* region)
 {
-	// this is exectuted in the desktop thread,
-	// and it means that the window thread currently
-	// blocks on the global region lock
+	// if this is exectuted in the desktop thread,
+	// it means that the window thread currently
+	// blocks to get the read lock, if it is
+	// executed from the window thread, it should
+	// have the read lock and the desktop thread
+	// is blocking to get the write lock. IAW, this
+	// is only executed in one thread.
 	if (fDirtyRegion.CountRects() == 0) {
 		// the window needs to be informed
-		// when the dirty region was empty
+		// when the dirty region was empty.
+		// NOTE: when the window thread has processed
+		// the dirty region in MessageReceived(),
+		// it will make the region empty again, 
+		// when it is empty here, we need to send
+		// the message to initiate the next update round.
+		// Until the message is processed in the window
+		// thread, the desktop thread can add parts to
+		// the region as it likes.
 		PostMessage(MSG_REDRAW, this);
 	}
 	// this is executed from the desktop thread
@@ -327,7 +339,10 @@ WindowLayer::ProcessDirtyRegion(BRegion* region)
 void
 WindowLayer::MarkDirty(BRegion* regionOnScreen)
 {
-	// for triggering MSG_REDRAW
+	// for marking any part of the desktop dirty
+	// this will get write access to the global
+	// region lock, and result in ProcessDirtyRegion()
+	// to be called for any windows affected
 	if (fDesktop)
 		fDesktop->MarkDirty(regionOnScreen);
 }
@@ -337,6 +352,9 @@ void
 WindowLayer::MarkContentDirty(BRegion* regionOnScreen)
 {
 	// for triggering MSG_REDRAW
+	// since this won't affect other windows, read locking
+	// is sufficient. If there was no dirty region before,
+	// an update message is triggered
 	if (fDesktop && fDesktop->ReadLockClipping()) {
 
 		regionOnScreen->IntersectWith(&fVisibleContentRegion);
@@ -389,6 +407,10 @@ WindowLayer::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 		// what is left visible from the original region
 		// at the destination after the region which could be
 		// copied has been excluded, is considered dirty
+		// NOTE: it may look like dirty regions are not moved
+		// if no region could be copied, but that's alright,
+		// since these parts will now be in newDirty anyways
+		// (with the right offset)
 		newDirty.OffsetBy(xOffset, yOffset);
 		newDirty.IntersectWith(&fVisibleContentRegion);
 		if (newDirty.CountRects() > 0)
