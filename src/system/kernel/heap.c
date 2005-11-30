@@ -280,7 +280,8 @@ check_wall_daemon(void *arg, int iteration)
 
 #endif	/* USE_CHECKING_WALL */
 
-static void dump_bin(int bin_index)
+static void
+dump_bin(int bin_index)
 {
 	struct heap_bin *bin = &bins[bin_index];
 	unsigned int *temp;
@@ -375,8 +376,10 @@ raw_alloc(unsigned int size, int bin_index)
 	addr_t addr;
 
 	new_heap_ptr = heap_base_ptr + PAGE_ALIGN(size);
-	if (new_heap_ptr > heap_base + heap_size)
+	if (new_heap_ptr > heap_base + heap_size) {
 		panic("heap overgrew itself!\n");
+		return NULL;
+	}
 
 	for (addr = heap_base_ptr; addr < new_heap_ptr; addr += B_PAGE_SIZE) {
 		page = &heap_alloc_table[(addr - heap_base) / B_PAGE_SIZE];
@@ -448,10 +451,9 @@ memalign(size_t alignment, size_t size)
 			break;
 
 	if (bin_index == bin_count) {
-		// XXX fix the raw alloc later.
-		//address = raw_alloc(size, bin_index);
-		panic("malloc: asked to allocate too much for now (%lu bytes)!\n", size);
-		goto out;
+		address = raw_alloc(size, bin_index);
+		dprintf("heap: allocated big chunk (%ld bytes), it will never be freed!\n",
+			size);
 	} else {
 		if (bins[bin_index].free_list != NULL) {
 			address = bins[bin_index].free_list;
@@ -480,7 +482,6 @@ memalign(size_t alignment, size_t size)
 		}
 	}
 
-out:
 	mutex_unlock(&heap_lock);
 
 	TRACE(("kmalloc: asked to allocate size %d, returning ptr = %p\n", size, address));
@@ -551,48 +552,55 @@ free(void *address)
 
 	TRACE(("free(): page %p: bin_index %d, free_count %d\n", page, page->bin_index, page->free_count));
 
-	if (page[0].bin_index >= bin_count)
+	if (page[0].bin_index > bin_count)
 		panic("free(): page %p: invalid bin_index %d\n", page, page->bin_index);
 
-	bin = &bins[page[0].bin_index];
+	if (page[0].bin_index < bin_count) {
+		bin = &bins[page[0].bin_index];
 
-	if (bin->element_size <= B_PAGE_SIZE && (addr_t)address % bin->element_size != 0)
-		panic("kfree: passed invalid pointer %p! Supposed to be in bin for esize 0x%x\n", address, bin->element_size);
-
-#if PARANOID_KFREE
-	// mark the free space as freed
-	{
-		uint32 deadbeef = 0xdeadbeef;
-		uint8 *dead = (uint8 *)address;
-		uint32 i;
-
-		// the first 4 bytes are overwritten with the next free list pointer later
-		for (i = 4; i < bin->element_size; i++)
-			dead[i] = ((uint8 *)&deadbeef)[i % 4];
-	}
-#endif
-
-	for (i = 0; i < bin->element_size / B_PAGE_SIZE; i++) {
-		if (page[i].bin_index != page[0].bin_index)
-			panic("free(): not all pages in allocation match bin_index\n");
-		page[i].free_count++;
-	}
+		if (bin->element_size <= B_PAGE_SIZE && (addr_t)address % bin->element_size != 0)
+			panic("kfree: passed invalid pointer %p! Supposed to be in bin for esize 0x%x\n", address, bin->element_size);
 
 #if PARANOID_KFREE
-	// walk the free list on this bin to make sure this address doesn't exist already
-	{
-		unsigned int *temp;
-		for (temp = bin->free_list; temp != NULL; temp = (unsigned int *)*temp) {
-			if (temp == (unsigned int *)address)
-				panic("free(): address %p already exists in bin free list\n", address);
+		// mark the free space as freed
+		{
+			uint32 deadbeef = 0xdeadbeef;
+			uint8 *dead = (uint8 *)address;
+			uint32 i;
+
+			// the first 4 bytes are overwritten with the next free list pointer later
+			for (i = 4; i < bin->element_size; i++)
+				dead[i] = ((uint8 *)&deadbeef)[i % 4];
 		}
-	}
 #endif
 
-	*(unsigned int *)address = (unsigned int)bin->free_list;
-	bin->free_list = address;
-	bin->alloc_count--;
-	bin->free_count++;
+		for (i = 0; i < bin->element_size / B_PAGE_SIZE; i++) {
+			if (page[i].bin_index != page[0].bin_index)
+				panic("free(): not all pages in allocation match bin_index\n");
+			page[i].free_count++;
+		}
+
+#if PARANOID_KFREE
+		// walk the free list on this bin to make sure this address doesn't exist already
+		{
+			unsigned int *temp;
+			for (temp = bin->free_list; temp != NULL; temp = (unsigned int *)*temp) {
+				if (temp == (unsigned int *)address)
+					panic("free(): address %p already exists in bin free list\n", address);
+			}
+		}
+#endif
+
+		*(unsigned int *)address = (unsigned int)bin->free_list;
+		bin->free_list = address;
+		bin->alloc_count--;
+		bin->free_count++;
+	} else {
+		// this chunk has been allocated via raw_alloc() directly
+		// TODO: since the heap must be replaced anyway, we don't
+		//	free this allocation anymore... (tracking them would
+		//	require some extra stuff)
+	}
 
 	mutex_unlock(&heap_lock);
 }
