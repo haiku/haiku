@@ -89,6 +89,9 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		void					ActivateWindow(WindowLayer* window);
 		void					SendBehindWindow(WindowLayer* window, WindowLayer* front);
 
+		void					ShowWindow(WindowLayer* window);
+		void					HideWindow(WindowLayer* window);
+
 		void					SetWindowWorkspaces(WindowLayer* window, uint32 workspaces);
 
 		void					AddWindowLayer(WindowLayer *windowLayer);

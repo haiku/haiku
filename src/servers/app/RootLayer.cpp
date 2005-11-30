@@ -41,7 +41,7 @@
 static const float kGoldenProportion = (sqrtf(5.0) - 1.0) / 2.0;
 #endif
 
-#define DEBUG_ROOT_LAYER
+//#define DEBUG_ROOT_LAYER
 #define APPSERVER_ROOTLAYER_SHOW_WORKSPACE_NUMBER
 
 #ifdef DEBUG_ROOT_LAYER

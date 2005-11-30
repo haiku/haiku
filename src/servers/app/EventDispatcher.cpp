@@ -453,10 +453,24 @@ EventDispatcher::SetKeyboardFilter(EventFilter* filter)
 void
 EventDispatcher::GetMouse(BPoint& where, int32& buttons)
 {
-	//BAutolock _(this);
+	BAutolock _(this);
 
 	where = fLastCursorPosition;
 	buttons = fLastButtons;
+}
+
+
+void
+EventDispatcher::SendFakeMouseMoved(EventTarget& target, int32 viewToken)
+{
+	BAutolock _(this);
+
+	BMessage moved(B_MOUSE_MOVED);
+	moved.AddPoint("screen_where", fLastCursorPosition);
+	moved.AddInt32("buttons", fLastButtons);
+	moved.AddInt32("_view_token", viewToken);
+	
+	_SendMessage(target.Messenger(), &moved, kMouseTransitImportance);
 }
 
 

@@ -602,6 +602,44 @@ Desktop::SendBehindWindow(WindowLayer* windowLayer, WindowLayer* front)
 
 
 void
+Desktop::ShowWindow(WindowLayer* window)
+{
+	if (!window->IsHidden())
+		return;
+
+	fRootLayer->ShowWindowLayer(window);
+
+	// If the mouse cursor is directly over the newly visible window,
+	// we'll send a fake mouse moved message to the window, so that
+	// it knows the mouse is over it.
+
+	BPoint where;
+	int32 buttons;
+	EventDispatcher().GetMouse(where, buttons);
+
+	int32 viewToken = B_NULL_TOKEN;
+
+	fRootLayer->Lock();
+	if (fRootLayer->WindowAt(where) == window) {
+		Layer* layer = window->LayerAt(where);
+		if (layer != NULL && layer != window)
+			viewToken = layer->ViewToken();
+	}
+	fRootLayer->Unlock();
+
+	if (viewToken != B_NULL_TOKEN)
+		EventDispatcher().SendFakeMouseMoved(window->Window()->EventTarget(), viewToken);
+}
+
+
+void
+Desktop::HideWindow(WindowLayer* window)
+{
+	fRootLayer->HideWindowLayer(window);
+}
+
+
+void
 Desktop::SetWindowWorkspaces(WindowLayer* windowLayer, uint32 workspaces)
 {
 	BAutolock _(this);

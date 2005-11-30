@@ -295,9 +295,9 @@ ServerWindow::Show()
 	if (fQuitting || !fWindowLayer->IsHidden())
 		return;
 
-	RootLayer* rootLayer = fWindowLayer->GetRootLayer();
-	if (rootLayer)
-		rootLayer->ShowWindowLayer(fWindowLayer);
+	// TODO: that check is just there for offscreen-windows - this should be made better
+	if (fWindowLayer->GetRootLayer() != NULL)
+		fDesktop->ShowWindow(fWindowLayer);
 
 	if (fDirectWindowData != NULL)
 		HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESET);
@@ -317,9 +317,9 @@ ServerWindow::Hide()
 	if (fDirectWindowData != NULL)
 		HandleDirectConnection(B_DIRECT_STOP);
 
-	RootLayer* rootLayer = fWindowLayer->GetRootLayer();
-	if (rootLayer)
-		rootLayer->HideWindowLayer(fWindowLayer);
+	// TODO: that check is just there for offscreen-windows - this should be made better
+	if (fWindowLayer->GetRootLayer() != NULL)
+		fDesktop->HideWindow(fWindowLayer);
 }
 
 
