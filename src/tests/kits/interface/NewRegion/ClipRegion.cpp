@@ -267,13 +267,10 @@ ClipRegion::Exclude(const BRect &rect)
 void
 ClipRegion::Exclude(const ClipRegion &region)
 {
-	if (fCount == 0)
+	if (fCount == 0 || region.fCount == 0 || !rects_intersect(fBound, region.fBound))
 		return;
-	
-	if (region.fCount == 0 || !rects_intersect(fBound, region.fBound))
-		*this = region;
-	else
-		_ExcludeComplex(region);	
+
+	_ExcludeComplex(region);	
 }
 	
 
@@ -296,7 +293,7 @@ ClipRegion::operator=(const ClipRegion &region)
 void
 ClipRegion::_IntersectWithComplex(const ClipRegion &region)
 {
-	ClipRegion dest(*this);
+	ClipRegion dest;
 			
 	for (int32 f = 0; f < fCount; f++) {
 		for (int32 s = 0; s < region.fCount; s++) {
