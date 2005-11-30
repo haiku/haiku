@@ -714,7 +714,6 @@ Desktop::AddWindow(WindowLayer *window)
 	BAutolock _(this);
 
 	if (fWindowLayerList.HasItem(window)) {
-		Unlock();
 		debugger("AddWindowLayer: WindowLayer already in Desktop list\n");
 		return;
 	}
