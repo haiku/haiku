@@ -269,8 +269,9 @@ EventDispatcher::_Unset()
 
 	fStream->SendQuit();
 
-	wait_for_thread(fThread, NULL);
-	wait_for_thread(fCursorThread, NULL);
+	status_t status;
+	wait_for_thread(fThread, &status);
+	wait_for_thread(fCursorThread, &status);
 
 	fThread = fCursorThread = -1;
 

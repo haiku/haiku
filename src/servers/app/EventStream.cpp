@@ -213,13 +213,8 @@ InputServerStream::_MessageFromPort(BMessage** _message, bigtime_t timeout)
 	}
 
 	if (code == 'quit') {
-		// special code to tell our client to quit
-		BMessage* message = new BMessage(B_QUIT_REQUESTED);
-		if (message == NULL)
-			return B_NO_MEMORY;
-
-		*_message = message;
-		return B_OK;
+		// this will cause GetNextEvent() to return false
+		return B_BAD_PORT_ID;
 	}
 
 	// we have the message, now let's unflatten it
