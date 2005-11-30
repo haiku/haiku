@@ -977,16 +977,13 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			rgb_color c;
 			
 			link.Read(&c, sizeof(rgb_color));
-if (rootLayer)
-	rootLayer->Lock();			
+
 			fCurrentLayer->SetViewColor(RGBColor(c));
 
 			if (rootLayer && !fCurrentLayer->IsHidden()) {
 				rootLayer->MarkForRedraw(fCurrentLayer->VisibleRegion());
 				rootLayer->TriggerRedraw();
 			}
-if (rootLayer)
-	rootLayer->Unlock();
 			break;
 		}
 
@@ -1566,6 +1563,7 @@ if (rootLayer)
 			// Returns
 			// 1) BPoint mouse location
 			// 2) int32 button state
+			rootLayer->Unlock();
 
 			BPoint where;
 			int32 buttons;
@@ -1575,6 +1573,8 @@ if (rootLayer)
 			fLink.Attach<BPoint>(where);
 			fLink.Attach<int32>(buttons);
 			fLink.Flush();
+
+			rootLayer->Lock();
 			break;
 		}
 
