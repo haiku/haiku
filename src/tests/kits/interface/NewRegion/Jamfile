@@ -1,0 +1,11 @@
+SubDir HAIKU_TOP src tests kits interface NewRegion ;
+
+UsePrivateHeaders interface ;
+
+SimpleTest NewRegionTest
+	: Region.cpp
+	  ClipRegion.cpp
+	  main.cpp
+	: root be
+;
+
