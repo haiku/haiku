@@ -566,7 +566,7 @@ BApplication::MessageReceived(BMessage *message)
 			BMessage specifier;
 			int32 what;
 			const char *property = NULL;
-			if (message->GetCurrentSpecifier(&index, &specifier, &what, &property) < B_OK) 
+			if (message->GetCurrentSpecifier(&index, &specifier, &what, &property) < B_OK
 				|| !ScriptReceived(message, index, &specifier, what, property))
 				BLooper::MessageReceived(message);
 			break;
