@@ -56,7 +56,7 @@ DesktopSettings::Private::_SetDefaults()
 	fMenuInfo.click_to_open = true;
 	fMenuInfo.triggers_always_shown = false;
 
-	fWorkspacesCount = 1;
+	fWorkspacesCount = 4;
 }
 
 

@@ -34,7 +34,8 @@ WorkspacesLayer::~WorkspacesLayer()
 void
 WorkspacesLayer::_GetGrid(int32& columns, int32& rows)
 {
-	int32 count = 4; //GetRootLayer()->WorkspaceCount();
+	DesktopSettings settings(Window()->Desktop());
+	int32 count = settings.WorkspacesCount();
 
 	rows = 1;
 	for (int32 i = 2; i < count; i++) {
@@ -141,7 +142,7 @@ WorkspacesLayer::_DrawWorkspace(int32 index)
 	BRect rect = _WorkspaceAt(index);
 
 	Workspace* workspace = NULL;
-	bool active = index == 0;
+	bool active = index == Window()->Desktop()->CurrentWorkspace();
 	if (active) {
 		// draw active frame
 		RGBColor black(0, 0, 0);
@@ -244,7 +245,11 @@ WorkspacesLayer::Draw(const BRect& updateRect)
 
 	// draw workspaces
 
-	int32 count = 4; //GetRootLayer()->WorkspaceCount();
+	int32 count;
+	{
+		DesktopSettings settings(Window()->Desktop());
+		count = settings.WorkspacesCount();
+	}
 
 	for (int32 i = 0; i < count; i++) {
 		_DrawWorkspace(i);

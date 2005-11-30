@@ -238,6 +238,23 @@ MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken)
 //	#pragma mark -
 
 
+static inline uint32
+workspace_to_workspaces(int32 index)
+{
+	return 1UL << index;
+}
+
+
+static inline bool
+workspaces_on_workspace(int32 index, uint32 workspaces)
+{
+	return (workspaces & (1UL << index)) != 0;
+}
+
+
+//	#pragma mark -
+
+
 Desktop::Desktop(uid_t userID)
 	: MessageLooper("desktop"),
 	fUserID(userID),
@@ -540,10 +557,6 @@ Desktop::BroadcastToAllApps(int32 code)
 	for (int32 i = 0; i < fAppList.CountItems(); i++) {
 		ServerApp *app = (ServerApp *)fAppList.ItemAt(i);
 
-		if (!app) {
-			printf("PANIC in Broadcast()\n");
-			continue;
-		}
 		app->PostMessage(code);
 	}
 }
@@ -555,10 +568,14 @@ Desktop::SetWorkspace(int32 index)
 	BAutolock _(this);
 	DesktopSettings settings(this);
 
-	if (index < 0 || index >= settings.WorkspacesCount())
+	if (index < 0 || index >= settings.WorkspacesCount() || index == fCurrentWorkspace)
 		return;
 
-	fRootLayer->SetWorkspace(index, fWorkspaces[index]);
+	int32 previousIndex = fCurrentWorkspace;
+	fCurrentWorkspace = index;
+
+	fRootLayer->SetWorkspace(index, fWorkspaces[previousIndex],
+		fWorkspaces[index]);
 }
 
 
@@ -604,8 +621,10 @@ Desktop::SendBehindWindow(WindowLayer* windowLayer, WindowLayer* front)
 void
 Desktop::ShowWindow(WindowLayer* window)
 {
-	if (!window->IsHidden())
+	if (!window->IsHidden() || window->Parent() == NULL) {
+		window->Show(false);
 		return;
+	}
 
 	fRootLayer->ShowWindowLayer(window);
 
@@ -635,64 +654,104 @@ Desktop::ShowWindow(WindowLayer* window)
 void
 Desktop::HideWindow(WindowLayer* window)
 {
+	if (window->IsHidden() || window->Parent() == NULL) {
+		window->Hide(false);
+		return;
+	}
+
 	fRootLayer->HideWindowLayer(window);
 }
 
 
+/*!
+	\brief Adds or removes the window to or from the workspaces it's on.
+*/
 void
-Desktop::SetWindowWorkspaces(WindowLayer* windowLayer, uint32 workspaces)
+Desktop::_ChangeWindowWorkspaces(WindowLayer* window, uint32 oldWorkspaces,
+	uint32 newWorkspaces)
 {
-	BAutolock _(this);
+	// apply changes to the workspaces' window list
+	// (and RootLayer, for the current workspace)
 
-	windowLayer->SetWorkspaces(workspaces);
-
-	// is the window still visible on screen?
-	bool remove = (workspaces & (1UL << CurrentWorkspace())) == 0;
-
-	if (remove && windowLayer->Parent() != NULL) {
-		// the window is no longer visible on screen
-		fRootLayer->RemoveWindowLayer(windowLayer);
-	} else if (!remove && windowLayer->Parent() == NULL) {
-		// the window is now visible on screen
-		fRootLayer->AddWindowLayer(windowLayer);
+	for (int32 i = 0; i < kMaxWorkspaces; i++) {
+		if (workspaces_on_workspace(i, oldWorkspaces)) {
+			// window is on this workspace, is it anymore?
+			if (!workspaces_on_workspace(i, newWorkspaces)) {
+				if (i == CurrentWorkspace())
+					RootLayer()->RemoveWindowLayer(window);
+				else
+					fWorkspaces[i].RemoveWindow(window);
+			}
+		} else {
+			// window was not on this workspace, is it now?
+			if (workspaces_on_workspace(i, newWorkspaces)) {
+				if (i == CurrentWorkspace())
+					RootLayer()->AddWindowLayer(window);
+				else
+					fWorkspaces[i].AddWindow(window);
+			}
+		}
 	}
 }
 
 
 void
-Desktop::AddWindowLayer(WindowLayer *windowLayer)
+Desktop::SetWindowWorkspaces(WindowLayer* window, uint32 workspaces)
 {
-	Lock();
+	BAutolock _(this);
+	
+	if (workspaces == B_CURRENT_WORKSPACE)
+		workspaces = workspace_to_workspaces(CurrentWorkspace());
 
-	if (fWindowLayerList.HasItem(windowLayer)) {
+	_ChangeWindowWorkspaces(window, window->Workspaces(), workspaces);
+	window->SetWorkspaces(workspaces);
+}
+
+
+void
+Desktop::AddWindow(WindowLayer *window)
+{
+	BAutolock _(this);
+
+	if (fWindowLayerList.HasItem(window)) {
 		Unlock();
 		debugger("AddWindowLayer: WindowLayer already in Desktop list\n");
 		return;
 	}
 
-	fWindowLayerList.AddItem(windowLayer);
-	Unlock();
+	fWindowLayerList.AddItem(window);
 
-	RootLayer()->AddWindowLayer(windowLayer);
+	if (window->Workspaces() == B_CURRENT_WORKSPACE)
+		window->SetWorkspaces(workspace_to_workspaces(CurrentWorkspace()));
+
+	_ChangeWindowWorkspaces(window, 0, window->Workspaces());
 }
 
 
 void
-Desktop::RemoveWindowLayer(WindowLayer *windowLayer)
+Desktop::RemoveWindow(WindowLayer *window)
 {
-	Lock();
-	fWindowLayerList.RemoveItem(windowLayer);
-	Unlock();
+	BAutolock _(this);
 
-	RootLayer()->RemoveWindowLayer(windowLayer);
+	fWindowLayerList.RemoveItem(window);
+	_ChangeWindowWorkspaces(window, window->Workspaces(), 0);
 
-	if (windowLayer->Window() != NULL)
-		EventDispatcher().RemoveTarget(windowLayer->Window()->EventTarget());
+	// make sure this window won't get any events anymore
+
+	if (window->Window() != NULL)
+		EventDispatcher().RemoveTarget(window->Window()->EventTarget());
 }
 
 
 void
-Desktop::SetWindowLayerFeel(WindowLayer *winBorder, uint32 feel)
+Desktop::SetWindowFeel(WindowLayer *window, uint32 feel)
+{
+	// TODO: implement
+}
+
+
+void
+Desktop::SetWindowLook(WindowLayer *window, uint32 look)
 {
 	// TODO: implement
 }

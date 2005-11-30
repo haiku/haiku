@@ -61,19 +61,19 @@
 
 using std::nothrow;
 
-//#define DEBUG_SERVERWINDOW
-//#define DEBUG_SERVERWINDOW_GRAPHICS
+//#define TRACE_SERVER_WINDOW
+//#define TRACE_SERVER_WINDOW_MESSAGES
 //#define PROFILE_MESSAGE_LOOP
 
 
-#ifdef DEBUG_SERVERWINDOW
+#ifdef TRACE_SERVER_WINDOW
 #	include <stdio.h>
 #	define STRACE(x) printf x
 #else
 #	define STRACE(x) ;
 #endif
 
-#ifdef DEBUG_SERVERWINDOW_GRAPHICS
+#ifdef TRACE_SERVER_WINDOW_MESSAGES
 #	include <stdio.h>
 #	define DTRACE(x) printf x
 #else
@@ -168,10 +168,10 @@ ServerWindow::ServerWindow(const char *title, ServerApp *app,
 //! Tears down all connections the main app_server objects, and deletes some internals.
 ServerWindow::~ServerWindow()
 {
-	STRACE(("*ServerWindow(%s@%p):~ServerWindow()\n", fTitle, this));
+	STRACE(("ServerWindow(%s@%p):~ServerWindow()\n", fTitle, this));
 
 	if (!fWindowLayer->IsOffscreenWindow())
-		fDesktop->RemoveWindowLayer(fWindowLayer);
+		fDesktop->RemoveWindow(fWindowLayer);
 
 	delete fWindowLayer;
 
@@ -181,7 +181,7 @@ ServerWindow::~ServerWindow()
 	BPrivate::gDefaultTokens.RemoveToken(fServerToken);
 
 	delete fDirectWindowData;
-	STRACE(("#ServerWindow(%p) will exit NOW\n", this));
+	STRACE(("ServerWindow(%p) will exit NOW\n", this));
 
 	delete_sem(fDeathSemaphore);
 
@@ -217,7 +217,7 @@ ServerWindow::Init(BRect frame, uint32 look, uint32 feel, uint32 flags, uint32 w
 		return B_NO_MEMORY;
 
 	if (!fWindowLayer->IsOffscreenWindow())
-		fDesktop->AddWindowLayer(fWindowLayer);
+		fDesktop->AddWindow(fWindowLayer);
 
 	return B_OK;
 }
@@ -544,7 +544,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 	if ((fCurrentLayer == NULL || fCurrentLayer->CurrentState() == NULL) &&
 		code != AS_LAYER_CREATE_ROOT && code != AS_LAYER_CREATE) {
 
-		printf("ServerWindow %s received unexpected code - message offset %ld before top_view attached.\n", Title(), code - SERVER_TRUE);
+		printf("ServerWindow %s received unexpected code - message offset %ld before top_view attached.\n", Title(), code - B_OK);
 		return;
 	}
 
@@ -713,7 +713,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_STATE: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
 
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 
 			// attach state data
 			fCurrentLayer->CurrentState()->WriteToLink(fLink.Sender());
@@ -802,7 +802,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_LAYER_GET_COORD:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			// our offset in the parent -> will be originX and originY in BView
 			fLink.Attach<float>(fCurrentLayer->fFrame.left);
 			fLink.Attach<float>(fCurrentLayer->fFrame.top);
@@ -824,7 +824,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_LAYER_GET_ORIGIN:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_ORIGIN: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			// TODO: rename this where it is used in the BView code!
 			// (it wants to know scrolling offset, not drawing origin)
 			fLink.Attach<BPoint>(fCurrentLayer->ScrollingOffset());
@@ -891,7 +891,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_LAYER_GET_LINE_MODE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_LINE_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Attach<int8>((int8)(fCurrentLayer->CurrentState()->LineCapMode()));
 			fLink.Attach<int8>((int8)(fCurrentLayer->CurrentState()->LineJoinMode()));
 			fLink.Attach<float>(fCurrentLayer->CurrentState()->MiterLimit());
@@ -928,7 +928,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_SCALE: Layer: %s\n", Title(), fCurrentLayer->Name()));		
 
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Attach<float>(fCurrentLayer->CurrentState()->Scale());
 			fLink.Flush();
 			break;
@@ -947,7 +947,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_LAYER_GET_PEN_LOC:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Attach<BPoint>(fCurrentLayer->CurrentState()->PenLocation());
 			fLink.Flush();
 		
@@ -965,7 +965,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_LAYER_GET_PEN_SIZE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Attach<float>(fCurrentLayer->CurrentState()->PenSize());
 			fLink.Flush();
 		
@@ -994,7 +994,7 @@ if (rootLayer)
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_HIGH_COLOR: Layer: %s\n",
 				Title(), fCurrentLayer->Name()));
 
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Attach<rgb_color>(fCurrentLayer->CurrentState()->HighColor().GetColor32());
 			fLink.Flush();
 			break;
@@ -1003,7 +1003,7 @@ if (rootLayer)
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_LOW_COLOR: Layer: %s\n",
 				Title(), fCurrentLayer->Name()));
 
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Attach<rgb_color>(fCurrentLayer->CurrentState()->LowColor().GetColor32());
 			fLink.Flush();
 			break;
@@ -1012,7 +1012,7 @@ if (rootLayer)
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_VIEW_COLOR: Layer: %s\n",
 				Title(), fCurrentLayer->Name()));
 
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Attach<rgb_color>(fCurrentLayer->ViewColor().GetColor32());
 			fLink.Flush();
 			break;
@@ -1033,7 +1033,7 @@ if (rootLayer)
 		case AS_LAYER_GET_BLEND_MODE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_BLEND_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Attach<int8>((int8)(fCurrentLayer->CurrentState()->AlphaSrcMode()));
 			fLink.Attach<int8>((int8)(fCurrentLayer->CurrentState()->AlphaFncMode()));
 			fLink.Flush();
@@ -1054,7 +1054,7 @@ if (rootLayer)
 		case AS_LAYER_GET_DRAW_MODE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_DRAW_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Attach<int8>((int8)(fCurrentLayer->CurrentState()->GetDrawingMode()));
 			fLink.Flush();
 		
@@ -1118,14 +1118,14 @@ if (rootLayer)
 			
 			// if this Layer is hidden, it is clear that its visible region is void.
 			if (fCurrentLayer->IsHidden()) {
-				fLink.StartMessage(SERVER_TRUE);
+				fLink.StartMessage(B_OK);
 				fLink.Attach<int32>(0L);
 				fLink.Flush();
 			} else {
 				BRegion drawingRegion = fCurrentLayer->DrawingRegion();
 				int32 rectCount = drawingRegion.CountRects();
 
-				fLink.StartMessage(SERVER_TRUE);
+				fLink.StartMessage(B_OK);
 				fLink.Attach<int32>(rectCount);
 
 				for (int32 i = 0; i < rectCount; i++) {
@@ -1358,7 +1358,7 @@ if (rootLayer)
 		case AS_GET_WORKSPACES:
 		{
 			STRACE(("ServerWindow %s: Message Get_Workspaces unimplemented\n", Title()));
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Attach<uint32>(fWindowLayer->Workspaces());
 			fLink.Flush();
 			break;
@@ -1421,7 +1421,7 @@ if (rootLayer)
 			// and now, sync the client to the limits that we were able to enforce
 			fWindowLayer->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
 
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Attach<BRect>(fWindowLayer->Frame());
 			fLink.Attach<float>(minWidth);
 			fLink.Attach<float>(maxWidth);
@@ -1541,7 +1541,7 @@ if (rootLayer)
 		case AS_SYNC:
 		{
 			// TODO: AS_SYNC is a no-op for now, just to get things working
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Flush();
 			break;
 		}
@@ -1585,7 +1585,7 @@ if (rootLayer)
 			link.Read<int32>(&serverToken);
 			
 			if (_EnableDirectWindowMode() == B_OK) {
-				fLink.StartMessage(SERVER_TRUE);
+				fLink.StartMessage(B_OK);
 				struct dw_sync_data syncData = { 
 					fDirectWindowData->direct_area,
 					fDirectWindowData->direct_sem,
@@ -1595,7 +1595,7 @@ if (rootLayer)
 				fLink.Attach(&syncData, sizeof(syncData));
 				 
 			} else
-				fLink.StartMessage(SERVER_FALSE);
+				fLink.StartMessage(B_ERROR);
 			
 			fLink.Flush();
 			
@@ -1982,11 +1982,11 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		default:
 			printf("ServerWindow %s received unexpected code - message offset %ld\n",
-				Title(), code - SERVER_TRUE);
+				Title(), code - B_OK);
 
 			if (link.NeedsReply()) {
 				// the client is now blocking and waiting for a reply!
-				fLink.StartMessage(SERVER_FALSE);
+				fLink.StartMessage(B_ERROR);
 				fLink.Flush();
 			}
 			break;

@@ -109,9 +109,12 @@ class WindowLayer : public Layer {
 	inline	int32				Feel() const { return fFeel; }
 	inline	int32				Level() const { return fLevel; }
 	inline	uint32				WindowFlags() const { return fWindowFlags; }
-	inline	uint32				Workspaces() const { return fWorkspaces; }
+
+			uint32				Workspaces() const { return fWorkspaces; }
 			void				SetWorkspaces(uint32 workspaces)
 									{ fWorkspaces = workspaces; }
+			bool				OnWorkspace(int32 index) const
+									{ return (fWorkspaces & (1UL << index)) != 0; }
 
 			bool				SupportsFront();
 

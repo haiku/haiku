@@ -17,7 +17,7 @@
 
 
 static RGBColor kDefaultColor = RGBColor(51, 102, 152);
-const BPoint kInvalidWindowPosition = BPoint(NAN, NAN);
+const BPoint kInvalidWindowPosition = BPoint(INFINITY, INFINITY);
 
 
 Workspace::Workspace()
@@ -34,22 +34,14 @@ Workspace::~Workspace()
 }
 
 
-void
-Workspace::SetWindows(const BObjectList<window_layer_info>& windows)
-{
-	fWindows.MakeEmpty();
-	fWindows.AddList((BObjectList<window_layer_info> *)&windows);
-}
-
-
 bool
-Workspace::AddWindow(WindowLayer* window)
+Workspace::AddWindow(WindowLayer* window, BPoint* position)
 {
 	window_layer_info* info = new (nothrow) window_layer_info;
 	if (info == NULL)
 		return false;
 
-	info->position = kInvalidWindowPosition;
+	info->position = position ? *position : kInvalidWindowPosition;
 	info->window = window;
 
 	bool success = fWindows.AddItem(info);
@@ -72,6 +64,14 @@ Workspace::RemoveWindow(WindowLayer* window)
 			return;
 		}
 	}
+}
+
+
+void
+Workspace::RemoveWindowAt(int32 index)
+{
+	window_layer_info* info = fWindows.RemoveItemAt(index);
+	delete info;
 }
 
 

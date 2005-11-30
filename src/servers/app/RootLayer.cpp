@@ -41,13 +41,11 @@
 static const float kGoldenProportion = (sqrtf(5.0) - 1.0) / 2.0;
 #endif
 
-//#define DEBUG_ROOT_LAYER
-#define APPSERVER_ROOTLAYER_SHOW_WORKSPACE_NUMBER
-
-#ifdef DEBUG_ROOT_LAYER
-	#define STRACE(a) printf a
+//#define TRACE_ROOT_LAYER
+#ifdef TRACE_ROOT_LAYER
+#	define STRACE(a) printf a
 #else
-	#define STRACE(a) ;
+#	define STRACE(a) ;
 #endif
 
 
@@ -367,30 +365,35 @@ RootLayer::_UpdateWorkspace(Workspace& workspace)
 {
 	fColor = workspace.Color();
 
-	// TODO: for on-screen debugging stuff only
+#if ON_SCREEN_DEBUGGING_INFO
 	fDrawState->SetLowColor(fColor);
+#endif
 }
 
 
 void
-RootLayer::SetWorkspace(int32 index, Workspace& workspace)
+RootLayer::SetWorkspace(int32 index, Workspace& previousWorkspace,
+	Workspace& workspace)
 {
 	BAutolock _(fAllRegionsLock);
 
 	int32 previousIndex = fWorkspace;
 
 	// build region of windows that are no longer visible in the new workspace
+	// and move windows to the previous workspace's window list
 
 	BRegion changed;
-	for (Layer* layer = FirstChild(); layer != NULL; layer = layer->NextLayer()) {
-		_RemoveChildFromList(layer);
+	while (WindowLayer* window = (WindowLayer*)FirstChild()) {
+		// move the window into the workspace's window list
+		_RemoveChildFromList(window);
 
-		// TODO: we should only allow WindowLayer as our children, anyway
-		WindowLayer* window = dynamic_cast<WindowLayer*>(layer);
-		if (window == NULL || window->IsHidden())
+		BPoint position = window->Frame().LeftTop();
+		previousWorkspace.AddWindow(window, &position);
+
+		if (window->IsHidden())
 			continue;
 
-		if ((window->Workspaces() & (1UL << index)) == 0) {
+		if (!window->OnWorkspace(index)) {
 			// this window will no longer be visible
 			changed.Include(&window->FullVisible());
 		}
@@ -402,20 +405,27 @@ RootLayer::SetWorkspace(int32 index, Workspace& workspace)
 	// add new windows, and include them in the changed region - but only
 	// those that were not visible before (or whose position changed)
 
-	for (int32 i = 0; i < workspace.CountWindows(); i++) {
-		window_layer_info* info = workspace.WindowAt(i);
+	while (workspace.CountWindows() != 0) {
+		window_layer_info* info = workspace.WindowAt(0);
 		WindowLayer* window = info->window;
+		BPoint position = info->position;
+
+		// move window into the RootLayer's list
+		workspace.RemoveWindowAt(0);
+		_AddChildToList(window);
 
 		if (window->IsHidden())
 			continue;
 
-		if (info->position == kInvalidWindowPosition) {
+		if (position == kInvalidWindowPosition) {
 			// if you enter a workspace for the first time, the position
 			// of the window in the previous workspace is adopted
-			info->position = window->Frame().LeftTop();
+			position = window->Frame().LeftTop();
+				// TODO: make sure the window is still on-screen if it
+				//	was before!
 		}
 
-		if ((window->Workspaces() & (1UL << previousIndex)) == 0) {
+		if (!window->OnWorkspace(previousIndex)) {
 			// this window was not visible before
 
 			// TODO: what we really want here is the visible region of the window
@@ -423,11 +433,11 @@ RootLayer::SetWorkspace(int32 index, Workspace& workspace)
 			window->GetOnScreenRegion(region);
 
 			changed.Include(&region);
-		} else if (window->Frame().LeftTop() != info->position) {
+		} else if (window->Frame().LeftTop() != position) {
 			// the window was visible before, but its on-screen location changed
-			BPoint offset = info->position - window->Frame().LeftTop();
+			BPoint offset = position - window->Frame().LeftTop();
 			window->MoveBy(offset.x, offset.y);
-			
+
 			// TODO: we're playing dumb here - what we need is a MoveBy() that
 			//	gives us a dirty region back, and since the new clipping code
 			//	will give us just that, we don't take any special measurement
@@ -437,9 +447,10 @@ RootLayer::SetWorkspace(int32 index, Workspace& workspace)
 			// the window is still visible and on the same location
 			continue;
 		}
-
-		_AddChildToList(window);
 	}
+
+	_UpdateFronts();
+	_SetFocus(Front(), changed);
 
 	MarkForRebuild(changed);
 	TriggerRebuild();
@@ -458,6 +469,9 @@ RootLayer::HideWindowLayer(WindowLayer* windowLayer)
 	BRegion changed = windowLayer->FullVisible();
 	windowLayer->Hide();
 	_UpdateFronts();
+
+	if (dynamic_cast<WorkspacesLayer*>(windowLayer->TopLayer()) != NULL)
+		fWorkspacesLayer = NULL;
 
 	// TODO: if this window has any floating windows, remove them here
 
@@ -499,6 +513,9 @@ RootLayer::ShowWindowLayer(WindowLayer* windowLayer, bool toFront)
 	_WindowsChanged(changed);
 	MarkForRedraw(changed);
 	TriggerRedraw();
+
+	if (dynamic_cast<WorkspacesLayer*>(windowLayer->TopLayer()) != NULL)
+		fWorkspacesLayer = windowLayer->TopLayer();
 }
 
 
@@ -560,6 +577,8 @@ RootLayer::LayerRemoved(Layer* layer)
 {
 	if (fMouseEventWindow == layer)
 		fMouseEventWindow = NULL;
+	if (fWorkspacesLayer == layer)
+		fWorkspacesLayer = NULL;
 }
 
 
@@ -577,7 +596,7 @@ RootLayer::SetDragMessage(BMessage* msg)
 
 
 BMessage *
-RootLayer::DragMessage(void) const
+RootLayer::DragMessage() const
 {
 	return fDragMessage;
 }
@@ -587,13 +606,6 @@ void
 RootLayer::Draw(const BRect& rect)
 {
 	fDriver->FillRect(rect, fColor);
-
-#ifdef APPSERVER_ROOTLAYER_SHOW_WORKSPACE_NUMBER
-	char	string[30];
-	sprintf(string, "Workspace %ld", fWorkspace + 1);
-	fDriver->DrawString(string, strlen(string), BPoint(5, 15),
-		fDrawState);
-#endif // APPSERVER_ROOTLAYER_SHOW_WORKSPACE_NUMBER
 
 #if ON_SCREEN_DEBUGGING_INFO
 	BPoint location(5, 40);

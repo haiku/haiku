@@ -88,6 +88,7 @@ public:
 		
 			// to who we belong. who do we own. our title.
 	inline	ServerApp*			App() const { return fServerApp; }
+			::Desktop*			Desktop() const { return fDesktop; }
 	inline	const WindowLayer*	GetWindowLayer() const { return fWindowLayer; }
 
 			void				SetTitle(const char* newTitle);
@@ -127,7 +128,7 @@ private:
 private:
 			char*				fTitle;
 
-			Desktop*			fDesktop;
+			::Desktop*			fDesktop;
 			ServerApp*			fServerApp;
 			WindowLayer*		fWindowLayer;
 

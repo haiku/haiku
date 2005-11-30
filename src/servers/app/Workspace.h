@@ -35,9 +35,9 @@ class Workspace {
 		Workspace();
 		~Workspace();
 
-		void				SetWindows(const BObjectList<window_layer_info>& windows);
-		bool				AddWindow(WindowLayer* window);
+		bool				AddWindow(WindowLayer* window, BPoint* point = NULL);
 		void				RemoveWindow(WindowLayer* window);
+		void				RemoveWindowAt(int32 index);
 
 		int32				CountWindows() const { return fWindows.CountItems(); }
 		window_layer_info*	WindowAt(int32 index) const { return fWindows.ItemAt(index); }

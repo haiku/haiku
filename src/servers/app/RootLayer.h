@@ -62,9 +62,8 @@ class RootLayer : public Layer {
 		WindowLayer*		Front() const { return fFront; }
 		WindowLayer*		Back() const { return fBack; }
 
-		void				SetWorkspace(int32 index, Workspace& workspace);
-		void				SetWorkspacesLayer(Layer* layer) { fWorkspacesLayer = layer; }
-		Layer*				WorkspacesLayer() const { return fWorkspacesLayer; }
+		void				SetWorkspace(int32 index, Workspace& previousWorkspace,
+								Workspace& workspace);
 
 		void				SetDragMessage(BMessage *msg);
 		BMessage*			DragMessage() const;

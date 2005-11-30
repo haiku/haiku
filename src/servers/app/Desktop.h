@@ -92,12 +92,13 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		void					ShowWindow(WindowLayer* window);
 		void					HideWindow(WindowLayer* window);
 
-		void					SetWindowWorkspaces(WindowLayer* window, uint32 workspaces);
+		void					SetWindowWorkspaces(WindowLayer* window,
+									uint32 workspaces);
 
-		void					AddWindowLayer(WindowLayer *windowLayer);
-		void					RemoveWindowLayer(WindowLayer *windowLayer);
-		void					SetWindowLayerFeel(WindowLayer *windowLayer,
-									uint32 feel);
+		void					AddWindow(WindowLayer *window);
+		void					RemoveWindow(WindowLayer *window);
+		void					SetWindowFeel(WindowLayer *window, uint32 feel);
+		void					SetWindowLook(WindowLayer *window, uint32 look);
 
 		WindowLayer*			FindWindowLayerByClientToken(int32 token, team_id teamID);
 		//WindowLayer*			FindWindowLayerByServerToken(int32 token);
@@ -111,6 +112,8 @@ class Desktop : public MessageLooper, public ScreenOwner {
 									BPrivate::LinkSender& sender);
 
 	private:
+		void					_ChangeWindowWorkspaces(WindowLayer* window,
+									uint32 oldWorkspaces, uint32 newWorkspaces);
  		status_t				_ActivateApp(team_id team);
 		void					_GetLooperName(char* name, size_t size);
 		void					_PrepareQuit();
