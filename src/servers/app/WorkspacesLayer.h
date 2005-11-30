@@ -21,16 +21,19 @@ class WorkspacesLayer : public Layer {
 		virtual ~WorkspacesLayer();
 
 		virtual	void Draw(const BRect& updateRect);
+		virtual void MouseDown(BMessage* message, BPoint where, int32* _viewToken);
 
 	private:
 		void _GetGrid(int32& columns, int32& rows);
 		BRect _WorkspaceAt(int32 i);
 		BRect _WindowFrame(const BRect& workspaceFrame,
-					const BRect& screenFrame, const BRect& windowFrame);
+					const BRect& screenFrame, const BRect& windowFrame,
+					BPoint windowPosition);
 
 		void _DrawWindow(const BRect& workspaceFrame,
 					const BRect& screenFrame, WindowLayer* window,
-					BRegion& backgroundRegion, bool active);
+					BPoint windowPosition, BRegion& backgroundRegion,
+					bool active);
 		void _DrawWorkspace(int32 index);
 
 		void _DarkenColor(RGBColor& color) const;

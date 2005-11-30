@@ -76,9 +76,11 @@ WorkspacesLayer::_WorkspaceAt(int32 i)
 
 BRect
 WorkspacesLayer::_WindowFrame(const BRect& workspaceFrame,
-	const BRect& screenFrame, const BRect& windowFrame)
+	const BRect& screenFrame, const BRect& windowFrame,
+	BPoint windowPosition)
 {
 	BRect frame = windowFrame;
+	frame.OffsetTo(windowPosition);
 
 	float factor = workspaceFrame.Width() / screenFrame.Width();
 	frame.left = rintf(frame.left * factor);
@@ -95,15 +97,18 @@ WorkspacesLayer::_WindowFrame(const BRect& workspaceFrame,
 
 void
 WorkspacesLayer::_DrawWindow(const BRect& workspaceFrame,
-	const BRect& screenFrame, WindowLayer* window,
+	const BRect& screenFrame, WindowLayer* window, BPoint windowPosition,
 	BRegion& backgroundRegion, bool active)
 {
 	if (window->Feel() == kDesktopWindowFeel)
 		return;
 
-	BRect frame = _WindowFrame(workspaceFrame, screenFrame, window->Frame());
-	BRect tabFrame = _WindowFrame(workspaceFrame, screenFrame,
-		window->GetDecorator()->GetTabRect());
+	BPoint offset = window->Frame().LeftTop() - windowPosition;
+	BRect frame = _WindowFrame(workspaceFrame, screenFrame, window->Frame(),
+		windowPosition);
+	BRect tabFrame = window->GetDecorator()->GetTabRect();
+	tabFrame = _WindowFrame(workspaceFrame, screenFrame,
+		tabFrame, tabFrame.LeftTop() - offset);
 
 	// ToDo: let decorator do this!
 	RGBColor yellow = window->GetDecorator()->GetColors().window_tab;
@@ -141,55 +146,45 @@ WorkspacesLayer::_DrawWorkspace(int32 index)
 {
 	BRect rect = _WorkspaceAt(index);
 
-	Workspace* workspace = NULL;
-	bool active = index == Window()->Desktop()->CurrentWorkspace();
+	Workspace workspace(*Window()->Desktop(), index);
+	bool active = workspace.IsCurrent();
 	if (active) {
 		// draw active frame
 		RGBColor black(0, 0, 0);
 		GetDrawingEngine()->StrokeRect(rect, black);
 	}
 
-	// draw background
-
 	rect.InsetBy(1, 1);
-	RGBColor color;
 
-	// ToDo: fix me - workspaces must always exist, not only on first visit!
-	if (workspace != NULL)
-		color = workspace->Color();
-	else
-		color.SetColor(51, 102, 152);
-
-	if (!active) {
+	RGBColor color = workspace.Color();
+	if (!active)
 		_DarkenColor(color);
-	}
 
 	// draw windows
 
 	BRegion backgroundRegion = VisibleRegion();
 
-		// ToDo: would be nice to get the real update region here
+	// ToDo: would be nice to get the real update region here
 
-	if (workspace != NULL) {
-		WindowLayer* windows[256];
-		int32 count = 0;
-//		if (!workspace->GetWindowLayerList((void **)&windows, &count))
-//			return;
+	uint16 width, height;
+	uint32 colorSpace;
+	float frequency;
+	Window()->Desktop()->ScreenAt(0)->GetMode(width, height,
+		colorSpace, frequency);
+	BRect screenFrame(0, 0, width - 1, height - 1);
 
-		uint16 width, height;
-		uint32 colorSpace;
-		float frequency;
-		GetRootLayer()->GetDesktop()->ScreenAt(0)->GetMode(width, height, colorSpace, frequency);
-		BRect screenFrame(0, 0, width - 1, height - 1);
+	BRegion workspaceRegion(rect);
+	backgroundRegion.IntersectWith(&workspaceRegion);
+	GetDrawingEngine()->ConstrainClippingRegion(&backgroundRegion);
 
-		BRegion workspaceRegion(rect);
-		backgroundRegion.IntersectWith(&workspaceRegion);
-		GetDrawingEngine()->ConstrainClippingRegion(&backgroundRegion);
-
-		for (int32 i = count; i-- > 0;) {
-			_DrawWindow(rect, screenFrame, windows[i], backgroundRegion, active);
-		}
+	WindowLayer* window;
+	BPoint leftTop;
+	while (workspace.GetNextWindow(window, leftTop) == B_OK) {
+		_DrawWindow(rect, screenFrame, window, leftTop,
+			backgroundRegion, active);
 	}
+
+	// draw background
 
 	GetDrawingEngine()->ConstrainClippingRegion(&backgroundRegion);
 	GetDrawingEngine()->FillRect(rect, color);
@@ -245,14 +240,28 @@ WorkspacesLayer::Draw(const BRect& updateRect)
 
 	// draw workspaces
 
-	int32 count;
-	{
-		DesktopSettings settings(Window()->Desktop());
-		count = settings.WorkspacesCount();
-	}
-
-	for (int32 i = 0; i < count; i++) {
+	for (int32 i = rows * columns; i-- > 0;) {
 		_DrawWorkspace(i);
 	}
 }
+
+
+void
+WorkspacesLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
+{
+	int32 columns, rows;
+	_GetGrid(columns, rows);
+
+	for (int32 i = columns * rows; i-- > 0;) {
+		BRect rect = _WorkspaceAt(i);
+
+		if (rect.Contains(where)) {
+			Window()->Desktop()->SetWorkspace(i);
+			break;
+		}
+	}
+
+	Layer::MouseDown(message, where, _viewToken);
+}
+
 

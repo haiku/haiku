@@ -20,7 +20,7 @@ static RGBColor kDefaultColor = RGBColor(51, 102, 152);
 const BPoint kInvalidWindowPosition = BPoint(INFINITY, INFINITY);
 
 
-Workspace::Workspace()
+Workspace::Private::Private()
 	:
 	fWindows(20, true)
 		// this list owns its items
@@ -29,13 +29,13 @@ Workspace::Workspace()
 }
 
 
-Workspace::~Workspace()
+Workspace::Private::~Private()
 {
 }
 
 
 bool
-Workspace::AddWindow(WindowLayer* window, BPoint* position)
+Workspace::Private::AddWindow(WindowLayer* window, BPoint* position)
 {
 	window_layer_info* info = new (nothrow) window_layer_info;
 	if (info == NULL)
@@ -53,7 +53,7 @@ Workspace::AddWindow(WindowLayer* window, BPoint* position)
 
 
 void
-Workspace::RemoveWindow(WindowLayer* window)
+Workspace::Private::RemoveWindow(WindowLayer* window)
 {
 	for (int32 i = fWindows.CountItems(); i-- > 0;) {
 		window_layer_info* info = fWindows.ItemAt(i);
@@ -68,7 +68,7 @@ Workspace::RemoveWindow(WindowLayer* window)
 
 
 void
-Workspace::RemoveWindowAt(int32 index)
+Workspace::Private::RemoveWindowAt(int32 index)
 {
 	window_layer_info* info = fWindows.RemoveItemAt(index);
 	delete info;
@@ -76,33 +76,95 @@ Workspace::RemoveWindowAt(int32 index)
 
 
 void
-Workspace::SetDisplaysFromDesktop(Desktop* desktop)
+Workspace::Private::SetDisplaysFromDesktop(Desktop* desktop)
 {
 }
 
 
 void
-Workspace::SetColor(const RGBColor& color)
+Workspace::Private::SetColor(const RGBColor& color)
 {
 	fColor = color;
 }
 
 
 void
-Workspace::SetSettings(BMessage& settings)
+Workspace::Private::SetSettings(BMessage& settings)
 {
 }
 
 
 void
-Workspace::GetSettings(BMessage& settings)
+Workspace::Private::GetSettings(BMessage& settings)
 {
 }
 
 
 void
-Workspace::_SetDefaults()
+Workspace::Private::_SetDefaults()
 {
 	fColor.SetColor(kDefaultColor);
+}
+
+
+//	#pragma mark -
+
+
+Workspace::Workspace(Desktop& desktop, int32 index)
+	:
+	fWorkspace(desktop.WorkspaceAt(index)),
+	fDesktop(desktop),
+	fCurrentWorkspace(index == desktop.CurrentWorkspace())
+{
+	fDesktop.Lock();
+	RewindWindows();
+}
+
+
+Workspace::~Workspace()
+{
+	fDesktop.Unlock();
+}
+
+
+const RGBColor&
+Workspace::Color() const
+{
+	return fWorkspace.Color();
+}
+
+
+status_t
+Workspace::GetNextWindow(WindowLayer*& _window, BPoint& _leftTop)
+{
+	if (fCurrentWorkspace) {
+		if (fCurrent == NULL)
+			fCurrent = (WindowLayer*)fDesktop.RootLayer()->FirstChild();
+		else
+			fCurrent = (WindowLayer*)fCurrent->NextLayer();
+		
+		if (fCurrent == NULL)
+			return B_ENTRY_NOT_FOUND;
+
+		_window = fCurrent;
+		_leftTop = fCurrent->Frame().LeftTop();
+		return B_OK;
+	}
+
+	window_layer_info* info = fWorkspace.WindowAt(fIndex++);
+	if (info == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	_window = info->window;
+	_leftTop = info->position;
+	return B_OK;
+}
+
+
+void
+Workspace::RewindWindows()
+{
+	fIndex = 0;
+	fCurrent = NULL;
 }
 

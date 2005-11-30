@@ -2189,7 +2189,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (index >= (uint32)kMaxWorkspaces)
 				index = fDesktop->CurrentWorkspace();
 
-			Workspace& workspace = fDesktop->WorkspaceAt(index);
+			Workspace workspace(*fDesktop, index);
 			fLink.Attach<rgb_color>(workspace.Color().GetColor32());
 
 			fDesktop->Unlock();

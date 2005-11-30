@@ -19,6 +19,7 @@
 #include "DesktopSettings.h"
 #include "MessageLooper.h"
 #include "Workspace.h"
+#include "WorkspacePrivate.h"
 
 #include <InterfaceDefs.h>
 #include <List.h>
@@ -81,7 +82,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		void					SetWorkspace(int32 index);
 		int32					CurrentWorkspace()
 									{ return fCurrentWorkspace; }
-		::Workspace&			WorkspaceAt(int32 index)
+		Workspace::Private&		WorkspaceAt(int32 index)
 									{ return fWorkspaces[index]; }
 
 		// WindowLayer methods
@@ -136,7 +137,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		sem_id					fShutdownSemaphore;
 		int32					fShutdownCount;
 
-		::Workspace				fWorkspaces[32];//kMaxWorkspaces];
+		::Workspace::Private	fWorkspaces[32];
 		int32					fCurrentWorkspace;
 
 		BObjectList<WindowLayer> fWindowLayerList;

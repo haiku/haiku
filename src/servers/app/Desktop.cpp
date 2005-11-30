@@ -802,7 +802,7 @@ Desktop::WriteWindowList(team_id team, BPrivate::LinkSender& sender)
 
 	// write list
 
-	sender.StartMessage(SERVER_TRUE);
+	sender.StartMessage(B_OK);
 	sender.Attach<int32>(count);
 
 	for (int32 i = 0; i < fWindowLayerList.CountItems(); i++) {

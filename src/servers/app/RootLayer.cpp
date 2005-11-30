@@ -24,7 +24,7 @@
 #include "ServerScreen.h"
 #include "ServerWindow.h"
 #include "WindowLayer.h"
-#include "Workspace.h"
+#include "WorkspacePrivate.h"
 #include "WorkspacesLayer.h"
 
 #include <File.h>
@@ -361,7 +361,7 @@ RootLayer::RemoveWindowLayer(WindowLayer* windowLayer)
 
 
 void
-RootLayer::_UpdateWorkspace(Workspace& workspace)
+RootLayer::_UpdateWorkspace(Workspace::Private& workspace)
 {
 	fColor = workspace.Color();
 
@@ -372,8 +372,8 @@ RootLayer::_UpdateWorkspace(Workspace& workspace)
 
 
 void
-RootLayer::SetWorkspace(int32 index, Workspace& previousWorkspace,
-	Workspace& workspace)
+RootLayer::SetWorkspace(int32 index, Workspace::Private& previousWorkspace,
+	Workspace::Private& workspace)
 {
 	BAutolock _(fAllRegionsLock);
 

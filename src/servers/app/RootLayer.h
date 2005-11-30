@@ -62,8 +62,9 @@ class RootLayer : public Layer {
 		WindowLayer*		Front() const { return fFront; }
 		WindowLayer*		Back() const { return fBack; }
 
-		void				SetWorkspace(int32 index, Workspace& previousWorkspace,
-								Workspace& workspace);
+		void				SetWorkspace(int32 index,
+								Workspace::Private& previousWorkspace,
+								Workspace::Private& workspace);
 
 		void				SetDragMessage(BMessage *msg);
 		BMessage*			DragMessage() const;
@@ -104,7 +105,7 @@ class RootLayer : public Layer {
 		void				_UpdateFronts();
 
 		void				_WindowsChanged(BRegion& region);
-		void				_UpdateWorkspace(Workspace& workspace);
+		void				_UpdateWorkspace(Workspace::Private& workspace);
 
 		Desktop*			fDesktop;
 		BMessage*			fDragMessage;
