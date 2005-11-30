@@ -400,17 +400,42 @@ RootLayer::SetWorkspace(int32 index, Workspace& workspace)
 	_UpdateWorkspace(workspace);
 
 	// add new windows, and include them in the changed region - but only
-	// those that were not visible before
+	// those that were not visible before (or whose position changed)
 
 	for (int32 i = 0; i < workspace.CountWindows(); i++) {
-		WindowLayer* window = workspace.WindowAt(i);
+		window_layer_info* info = workspace.WindowAt(i);
+		WindowLayer* window = info->window;
 
-		if (!window->IsHidden()
-			&& (window->Workspaces() & (1UL << previousIndex)) == 0) {
+		if (window->IsHidden())
+			continue;
+
+		if (info->position == kInvalidWindowPosition) {
+			// if you enter a workspace for the first time, the position
+			// of the window in the previous workspace is adopted
+			info->position = window->Frame().LeftTop();
+		}
+
+		if ((window->Workspaces() & (1UL << previousIndex)) == 0) {
 			// this window was not visible before
+
+			// TODO: what we really want here is the visible region of the window
 			BRegion region;
 			window->GetOnScreenRegion(region);
+
 			changed.Include(&region);
+		} else if (window->Frame().LeftTop() != info->position) {
+			// the window was visible before, but its on-screen location changed
+			BPoint offset = info->position - window->Frame().LeftTop();
+			window->MoveBy(offset.x, offset.y);
+			
+			// TODO: we're playing dumb here - what we need is a MoveBy() that
+			//	gives us a dirty region back, and since the new clipping code
+			//	will give us just that, we don't take any special measurement
+			//	here
+			GetOnScreenRegion(changed);
+		} else {
+			// the window is still visible and on the same location
+			continue;
 		}
 
 		_AddChildToList(window);
@@ -494,22 +519,6 @@ RootLayer::SetWindowLayerLook(WindowLayer *windowLayer, int32 newLook)
 	// TODO
 }
 
-#if 0
-void
-RootLayer::RevealNewWMState(Workspace::State &oldWMState)
-{
-	// send window activation messages
-	if (oldWMState.Focus != fWMState.Focus) {
-		if (oldWMState.Focus)
-			oldWMState.Focus->Activated(false);
-		if (fWMState.Focus) {
-			fWMState.Focus->Activated(true);
-			fDesktop->EventDispatcher().SetFocus(&fWMState.Focus->Window()->FocusMessenger());
-		} else
-			fDesktop->EventDispatcher().SetFocus(NULL);
-	}
-}
-#endif
 
 void
 RootLayer::_WindowsChanged(BRegion& region)

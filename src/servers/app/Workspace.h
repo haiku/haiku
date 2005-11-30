@@ -25,17 +25,22 @@ struct display_info {
 	display_mode	mode;
 };
 
+struct window_layer_info {
+	BPoint			position;
+	WindowLayer*	window;
+};
+
 class Workspace {
 	public:
 		Workspace();
 		~Workspace();
 
-		void				SetWindows(const BObjectList<WindowLayer>& windows);
+		void				SetWindows(const BObjectList<window_layer_info>& windows);
 		bool				AddWindow(WindowLayer* window);
 		void				RemoveWindow(WindowLayer* window);
 
 		int32				CountWindows() const { return fWindows.CountItems(); }
-		WindowLayer*		WindowAt(int32 index) const { return fWindows.ItemAt(index); }
+		window_layer_info*	WindowAt(int32 index) const { return fWindows.ItemAt(index); }
 
 		// displays
 
@@ -55,7 +60,7 @@ class Workspace {
 	private:
 		void				_SetDefaults();
 
-		BObjectList<WindowLayer> fWindows;
+		BObjectList<window_layer_info> fWindows;
 		WindowLayer*		fFront;
 		WindowLayer*		fFocus;
 
@@ -63,5 +68,7 @@ class Workspace {
 
 		RGBColor			fColor;
 };
+
+extern const BPoint kInvalidWindowPosition;
 
 #endif	/* WORKSPACE_H */

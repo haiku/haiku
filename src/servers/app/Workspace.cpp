@@ -11,16 +11,19 @@
 #include "Workspace.h"
 #include "WindowLayer.h"
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 
 static RGBColor kDefaultColor = RGBColor(51, 102, 152);
+const BPoint kInvalidWindowPosition = BPoint(NAN, NAN);
 
 
 Workspace::Workspace()
 	:
-	fWindows(20)
+	fWindows(20, true)
+		// this list owns its items
 {
 	_SetDefaults();
 }
@@ -32,24 +35,43 @@ Workspace::~Workspace()
 
 
 void
-Workspace::SetWindows(const BObjectList<WindowLayer>& windows)
+Workspace::SetWindows(const BObjectList<window_layer_info>& windows)
 {
 	fWindows.MakeEmpty();
-	fWindows.AddList((BObjectList<WindowLayer> *)&windows);
+	fWindows.AddList((BObjectList<window_layer_info> *)&windows);
 }
 
 
 bool
 Workspace::AddWindow(WindowLayer* window)
 {
-	return fWindows.AddItem(window);
+	window_layer_info* info = new (nothrow) window_layer_info;
+	if (info == NULL)
+		return false;
+
+	info->position = kInvalidWindowPosition;
+	info->window = window;
+
+	bool success = fWindows.AddItem(info);
+	if (!success)
+		delete info;
+
+	return success;
 }
 
 
 void
 Workspace::RemoveWindow(WindowLayer* window)
 {
-	fWindows.RemoveItem(window);
+	for (int32 i = fWindows.CountItems(); i-- > 0;) {
+		window_layer_info* info = fWindows.ItemAt(i);
+
+		if (info->window == window) {
+			fWindows.RemoveItemAt(i);
+			delete info;
+			return;
+		}
+	}
 }
 
 
