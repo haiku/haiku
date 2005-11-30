@@ -203,7 +203,7 @@ get_scroll_bar_info(scroll_bar_info *info)
 
 	int32 code;
 	if (link.FlushWithReply(code) == B_OK
-		&& code == SERVER_TRUE) {
+		&& code == B_OK) {
 		link.Read<scroll_bar_info>(info);
 		return B_OK;
 	}
@@ -225,7 +225,7 @@ set_scroll_bar_info(scroll_bar_info *info)
 	link.Attach<scroll_bar_info>(*info);
 	
 	if (link.FlushWithReply(code) == B_OK
-		&& code == SERVER_TRUE)
+		&& code == B_OK)
 		return B_OK;
 
 	return B_ERROR;
@@ -546,8 +546,8 @@ count_workspaces()
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_COUNT_WORKSPACES);
 
-	int32 code;
-	if (link.FlushWithReply(code) == B_OK && code == SERVER_TRUE)
+	status_t status;
+	if (link.FlushWithReply(status) == B_OK && status == B_OK)
 		link.Read<int32>(&count);
 
 	return count;
@@ -568,12 +568,12 @@ _IMPEXP_BE int32
 current_workspace()
 {
 	int32 index = 0;
-	
+
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_CURRENT_WORKSPACE);	
 
-	int32 code;
-	if (link.FlushWithReply(code) == B_OK && code == SERVER_TRUE)
+	int32 status;
+	if (link.FlushWithReply(status) == B_OK && status == B_OK)
 		link.Read<int32>(&index);
 
 	return index;
@@ -599,7 +599,7 @@ idle_time()
 	link.StartMessage(AS_IDLE_TIME);
 
 	int32 code;
-	if (link.FlushWithReply(code) == B_OK && code == SERVER_TRUE)
+	if (link.FlushWithReply(code) == B_OK && code == B_OK)
 		link.Read<int64>(&idletime);
 
 	return idletime;
@@ -666,7 +666,7 @@ mouse_mode()
 	link.StartMessage(AS_GET_MOUSE_MODE);
 
 	int32 code;
-	if (link.FlushWithReply(code) == B_OK && code == SERVER_TRUE)
+	if (link.FlushWithReply(code) == B_OK && code == B_OK)
 		link.Read<mode_mouse>(&mode);
 	
 	return mode;
@@ -730,7 +730,7 @@ ui_color(color_which which)
 	link.Attach<color_which>(which);
 
 	int32 code;
-	if (link.FlushWithReply(code) == B_OK && code == SERVER_TRUE)
+	if (link.FlushWithReply(code) == B_OK && code == B_OK)
 		link.Read<rgb_color>(&color);
 
 	return color;
@@ -958,7 +958,7 @@ get_system_colors(ColorSet *colors)
 	link.StartMessage(AS_GET_UI_COLORS);
 
 	int32 code;
-	if (link.FlushWithReply(code) == B_OK && code == SERVER_TRUE)
+	if (link.FlushWithReply(code) == B_OK && code == B_OK)
 		link.Read<ColorSet>(colors);
 }
 
