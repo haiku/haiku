@@ -2677,7 +2677,10 @@ BTextView::UnflattenRunArray(const void	*data, int32 *outSize)
 		run_array->runs[i].font.SetSize(array->styles[i].size);
 		run_array->runs[i].font.SetShear(array->styles[i].shear);
 		run_array->runs[i].font.SetFace(array->styles[i].face);
-		run_array->runs[i].color = array->styles[i];
+		run_array->runs[i].color.red = array->styles[i].red;
+		run_array->runs[i].color.green = array->styles[i].green;
+		run_array->runs[i].color.blue = array->styles[i].blue;
+		run_array->runs[i].color.alpha = array->styles[i].alpha;
 	}
 
 	if (outSize)
