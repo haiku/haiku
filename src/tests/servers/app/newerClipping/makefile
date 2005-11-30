@@ -36,7 +36,8 @@ SRCS= ClientLooper.cpp \
 	  main.cpp \
 	  MultiLocker.cpp \
 	  ViewLayer.cpp \
-	  WindowLayer.cpp
+	  WindowLayer.cpp \
+#	  trace.c
 
 #	specify the resource files to use
 #	full path or a relative path to the resource file can be used.
@@ -105,7 +106,7 @@ SYMBOLS =
 DEBUGGER = 
 
 #	specify additional compiler flags for all files
-COMPILER_FLAGS =
+COMPILER_FLAGS = #-finstrument-functions
 
 #	specify additional linker flags
 LINKER_FLAGS =

@@ -30,6 +30,7 @@ WindowLayer::WindowLayer(BRect frame, const char* name,
 
 	  fVisibleRegion(),
 	  fVisibleContentRegion(),
+	  fVisibleContentRegionValid(false),
 	  fDirtyRegion(),
 
 	  fBorderRegion(),
@@ -54,8 +55,8 @@ WindowLayer::WindowLayer(BRect frame, const char* name,
 	  fTokenViewMap(64),
 
 	  fClient(new ClientLooper(name, this)),
-	  fCurrentUpdateSession(NULL),
-	  fPendingUpdateSession(NULL),
+	  fCurrentUpdateSession(),
+	  fPendingUpdateSession(),
 	  fUpdateRequested(false),
 	  fInUpdate(false)
 {
@@ -133,9 +134,7 @@ WindowLayer::SetClipping(BRegion* stillAvailableOnScreen)
 	// clip to region still available on screen
 	fVisibleRegion.IntersectWith(stillAvailableOnScreen);
 
-	GetContentRegion(&fVisibleContentRegion);
-	fVisibleContentRegion.IntersectWith(&fVisibleRegion);
-
+	fVisibleContentRegionValid = false;
 	fEffectiveDrawingRegionValid = false;
 }
 
@@ -188,6 +187,18 @@ WindowLayer::GetContentRegion(BRegion* region)
 	*region = fContentRegion;
 }
 
+// VisibleContentRegion
+BRegion&
+WindowLayer::VisibleContentRegion()
+{
+	// regions expected to be locked
+	if (!fVisibleContentRegionValid) {
+		GetContentRegion(&fVisibleContentRegion);
+		fVisibleContentRegion.IntersectWith(&fVisibleRegion);
+	}
+	return fVisibleContentRegion;
+}
+
 // SetFocus
 void
 WindowLayer::SetFocus(bool focus)
@@ -224,10 +235,10 @@ WindowLayer::MoveBy(int32 x, int32 y)
 	if (fContentRegionValid)
 		fContentRegion.OffsetBy(x, y);
 
-	if (fCurrentUpdateSession)
-		fCurrentUpdateSession->MoveBy(x, y);
-	if (fPendingUpdateSession)
-		fPendingUpdateSession->MoveBy(x, y);
+	if (fCurrentUpdateSession.IsUsed())
+		fCurrentUpdateSession.MoveBy(x, y);
+	if (fPendingUpdateSession.IsUsed())
+		fPendingUpdateSession.MoveBy(x, y);
 
 	fEffectiveDrawingRegionValid = false;
 
@@ -357,7 +368,7 @@ WindowLayer::MarkContentDirty(BRegion* regionOnScreen)
 	// an update message is triggered
 	if (fDesktop && fDesktop->ReadLockClipping()) {
 
-		regionOnScreen->IntersectWith(&fVisibleContentRegion);
+		regionOnScreen->IntersectWith(&VisibleContentRegion());
 		ProcessDirtyRegion(regionOnScreen);
 
 		fDesktop->ReadUnlockClipping();
@@ -377,8 +388,10 @@ WindowLayer::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 		BRegion newDirty(*region);
 
 		// clip the region to the visible contents at the
-		// source and destination location
-		region->IntersectWith(&fVisibleContentRegion);
+		// source and destination location (not that VisibleContentRegion()
+		// is used once to make sure it is valid, then fVisibleContentRegion
+		// is used directly)
+		region->IntersectWith(&VisibleContentRegion());
 		if (region->CountRects() > 0) {
 			region->OffsetBy(xOffset, yOffset);
 			region->IntersectWith(&fVisibleContentRegion);
@@ -397,10 +410,10 @@ WindowLayer::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 				// move along the already dirty regions that are common
 				// with the region that we could copy
 				_ShiftPartOfRegion(&fDirtyRegion, region, xOffset, yOffset);
-				if (fCurrentUpdateSession)
-					_ShiftPartOfRegion(&fCurrentUpdateSession->DirtyRegion(), region, xOffset, yOffset);
-				if (fPendingUpdateSession)
-					_ShiftPartOfRegion(&fPendingUpdateSession->DirtyRegion(), region, xOffset, yOffset);
+				if (fCurrentUpdateSession.IsUsed())
+					_ShiftPartOfRegion(&fCurrentUpdateSession.DirtyRegion(), region, xOffset, yOffset);
+				if (fPendingUpdateSession.IsUsed())
+					_ShiftPartOfRegion(&fPendingUpdateSession.DirtyRegion(), region, xOffset, yOffset);
 		
 			}
 		}
@@ -444,7 +457,7 @@ void
 WindowLayer::_TriggerContentRedraw()
 {
 //printf("%s - DrawContents()\n", Name());
-	BRegion dirtyContentRegion(fVisibleContentRegion);
+	BRegion dirtyContentRegion(VisibleContentRegion());
 	dirtyContentRegion.IntersectWith(&fDirtyRegion);
 
 	if (dirtyContentRegion.CountRects() > 0) {
@@ -490,10 +503,10 @@ WindowLayer::_DrawClient(int32 token)
 	if (fDesktop->ReadLockClipping()) {
 
 		if (!fEffectiveDrawingRegionValid) {
-			fEffectiveDrawingRegion = fVisibleContentRegion;
+			fEffectiveDrawingRegion = VisibleContentRegion();
 			if (fInUpdate) {
 				// enforce the dirty region of the update session
-				fEffectiveDrawingRegion.IntersectWith(&fCurrentUpdateSession->DirtyRegion());
+				fEffectiveDrawingRegion.IntersectWith(&fCurrentUpdateSession.DirtyRegion());
 			} else {
 				printf("%s - _DrawClient(token: %ld) - not in update\n", Name(), token);
 			}
@@ -615,13 +628,9 @@ WindowLayer::_MarkContentDirty(BRegion* contentDirtyRegion)
 	if (contentDirtyRegion->CountRects() <= 0)
 		return;
 
-	if (!fPendingUpdateSession) {
-		// create new pending
-		fPendingUpdateSession = new UpdateSession(*contentDirtyRegion);
-	} else {
-		// add to pending
-		fPendingUpdateSession->Include(contentDirtyRegion);
-	}
+	// add to pending
+	fPendingUpdateSession.SetUsed(true);
+	fPendingUpdateSession.Include(contentDirtyRegion);
 
 	// clip pending update session from current
 	// update session, it makes no sense to draw stuff
@@ -629,8 +638,8 @@ WindowLayer::_MarkContentDirty(BRegion* contentDirtyRegion)
 	// this could be done smarter (clip layers from pending
 	// that have not yet been redrawn in the current update
 	// session)
-	if (fCurrentUpdateSession) {
-		fCurrentUpdateSession->Exclude(contentDirtyRegion);
+	if (fCurrentUpdateSession.IsUsed()) {
+		fCurrentUpdateSession.Exclude(contentDirtyRegion);
 		fEffectiveDrawingRegionValid = false;
 	}
 
@@ -658,11 +667,14 @@ WindowLayer::_BeginUpdate()
 	// at the same time.
 	if (fDesktop->ReadLockClipping()) {
 
-		if (fUpdateRequested && !fCurrentUpdateSession) {
-			fCurrentUpdateSession = fPendingUpdateSession;
-			fPendingUpdateSession = NULL;
-	
-			if (fCurrentUpdateSession) {
+		if (fUpdateRequested && !fCurrentUpdateSession.IsUsed()) {
+			if (fPendingUpdateSession.IsUsed()) {
+
+				// TODO: the toggling between the update sessions is too
+				// expensive, optimize with some pointer tricks
+				fCurrentUpdateSession = fPendingUpdateSession;
+				fPendingUpdateSession.SetUsed(false);
+		
 				// all drawing command from the client
 				// will have the dirty region from the update
 				// session enforced
@@ -671,7 +683,7 @@ WindowLayer::_BeginUpdate()
 			fEffectiveDrawingRegionValid = false;
 		}
 
-	fDesktop->ReadUnlockClipping();
+		fDesktop->ReadUnlockClipping();
 	}
 }
 
@@ -683,13 +695,12 @@ WindowLayer::_EndUpdate()
 	if (fDesktop->ReadLockClipping()) {
 	
 		if (fInUpdate) {
-			delete fCurrentUpdateSession;
-			fCurrentUpdateSession = NULL;
+			fCurrentUpdateSession.SetUsed(false);
 		
 			fInUpdate = false;
 			fEffectiveDrawingRegionValid = false;
 		}
-		if (fPendingUpdateSession) {
+		if (fPendingUpdateSession.IsUsed()) {
 			// send this to client
 			fClient->PostMessage(MSG_UPDATE);
 			fUpdateRequested = true;
@@ -720,8 +731,9 @@ WindowLayer::_UpdateContentRegion()
 // #pragma mark -
 
 // constructor
-UpdateSession::UpdateSession(const BRegion& dirtyRegion)
-	: fDirtyRegion(dirtyRegion)
+UpdateSession::UpdateSession()
+	: fDirtyRegion(),
+	  fInUse(false)
 {
 }
 
@@ -751,6 +763,22 @@ UpdateSession::MoveBy(int32 x, int32 y)
 	fDirtyRegion.OffsetBy(x, y);
 }
 
+// SetUsed
+void
+UpdateSession::SetUsed(bool used)
+{
+	fInUse = used;
+	if (!fInUse) {
+		fDirtyRegion.MakeEmpty();
+	}
+}
+
+// operator=
+UpdateSession&
+UpdateSession::operator=(const UpdateSession& other)
+{
+	fDirtyRegion = other.fDirtyRegion;
+}
 
 
 

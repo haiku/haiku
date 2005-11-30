@@ -23,7 +23,7 @@ enum {
 
 class UpdateSession {
  public:
-									UpdateSession(const BRegion& dirtyRegion);
+									UpdateSession();
 	virtual							~UpdateSession();
 
 			void					Include(BRegion* additionalDirty);
@@ -34,8 +34,15 @@ class UpdateSession {
 
 			void					MoveBy(int32 x, int32 y);
 
+			void					SetUsed(bool used);
+	inline	bool					IsUsed() const
+										{ return fInUse; }
+
+			UpdateSession&			operator=(const UpdateSession& other);
+
  private:
 			BRegion					fDirtyRegion;
+			bool					fInUse;
 };
 
 class WindowLayer : public BLooper {
@@ -49,9 +56,12 @@ class WindowLayer : public BLooper {
 
 	inline	BRect					Frame() const
 										{ return fFrame; }
+			// setting and getting the "hard" clipping
 			void					SetClipping(BRegion* stillAvailableOnScreen);
 	inline	BRegion&				VisibleRegion()
 										{ return fVisibleRegion; }
+			BRegion&				VisibleContentRegion();
+
 			void					GetFullRegion(BRegion* region) const;
 			void					GetBorderRegion(BRegion* region);
 			void					GetContentRegion(BRegion* region);
@@ -102,6 +112,7 @@ class WindowLayer : public BLooper {
 			// has to be called
 			BRegion					fVisibleRegion;
 			BRegion					fVisibleContentRegion;
+			bool					fVisibleContentRegionValid;
 			// our part of the "global" dirty region
 			// it is calculated from the desktop thread,
 			// but we can write to it when we read locked
@@ -142,8 +153,8 @@ class WindowLayer : public BLooper {
 			// this is the current update session. All new
 			// redraw requests from the root layer will go
 			// into the pending update session.
-			UpdateSession*			fCurrentUpdateSession;
-			UpdateSession*			fPendingUpdateSession;
+			UpdateSession			fCurrentUpdateSession;
+			UpdateSession			fPendingUpdateSession;
 			// these two flags are supposed to ensure a sane
 			// and consistent update session
 			bool					fUpdateRequested;

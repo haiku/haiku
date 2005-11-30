@@ -37,7 +37,7 @@ DrawingEngine::Unlock()
 #if RUN_WITH_FRAME_BUFFER
 	Sync();
 #else
-	Flush();
+//	Flush();
 #endif
 	Window()->Unlock();
 }
