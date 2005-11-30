@@ -845,15 +845,42 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 #endif
-		case AS_CURRENT_WORKSPACE:
+		case AS_COUNT_WORKSPACES:
 		{
+			DesktopSettings settings(fDesktop);
+
+			fLink.StartMessage(B_OK);
+			fLink.Attach<int32>(settings.WorkspacesCount());
+			fLink.Flush();
+			break;
+		}
+
+		case AS_SET_WORKSPACE_COUNT:
+		{
+			DesktopSettings settings(fDesktop);
+
+			int32 newCount;
+			if (link.Read<int32>(&newCount) == B_OK) {
+				settings.SetWorkspacesCount(newCount);
+
+				// either update the workspaces window, or switch to
+				// the last available workspace - which will update
+				// the workspaces window automatically
+				if (fDesktop->CurrentWorkspace() >= newCount)
+					fDesktop->SetWorkspace(newCount - 1);
+				else
+					fDesktop->RootLayer()->UpdateWorkspaces();
+			}
+			break;
+		}
+
+		case AS_CURRENT_WORKSPACE:
 			STRACE(("ServerApp %s: get current workspace\n", Signature()));
 
 			fLink.StartMessage(B_OK);
 			fLink.Attach<int32>(fDesktop->CurrentWorkspace());
 			fLink.Flush();
 			break;
-		}
 
 		case AS_ACTIVATE_WORKSPACE:
 		{

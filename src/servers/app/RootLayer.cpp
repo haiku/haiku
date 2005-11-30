@@ -547,6 +547,22 @@ RootLayer::_WindowsChanged(BRegion& region)
 }
 
 
+void
+RootLayer::UpdateWorkspaces()
+{
+	BAutolock _(fAllRegionsLock);
+
+	if (fWorkspacesLayer == NULL)
+		return;
+
+	BRegion changed;
+	_WindowsChanged(changed);
+
+	MarkForRedraw(changed);
+	TriggerRedraw();
+}
+
+
 WindowLayer*
 RootLayer::WindowAt(BPoint where)
 {
@@ -560,9 +576,6 @@ RootLayer::WindowAt(BPoint where)
 
 	return NULL;
 }
-
-
-//	#pragma mark - Input related methods
 
 
 void

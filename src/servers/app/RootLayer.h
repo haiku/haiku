@@ -87,6 +87,8 @@ class RootLayer : public Layer {
 		void				SetWindowLayerFeel(WindowLayer *windowLayer, int32 newFeel);
 		void				SetWindowLayerLook(WindowLayer *windowLayer, int32 newLook);
 
+		void				UpdateWorkspaces();
+
 		void				MarkForRedraw(const BRegion &dirty);
 		void				TriggerRedraw();
 
