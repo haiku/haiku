@@ -14,7 +14,7 @@
 
 // constructor
 Desktop::Desktop(DrawView* drawView)
-	: BLooper("desktop"),
+	: BLooper("desktop", B_URGENT_DISPLAY_PRIORITY),
 	  fTracking(false),
 	  fLastMousePos(-1.0, -1.0),
 	  fClickedWindow(NULL),
@@ -144,13 +144,13 @@ Desktop::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 
 		if (dx != 0 || dy != 0) {
 			if (fClickedWindow) {
-bigtime_t now = system_time();
+//bigtime_t now = system_time();
 				if (fResizing) {
 					ResizeWindowBy(fClickedWindow, dx, dy);
-printf("resizing: %lld\n", system_time() - now);
+//printf("resizing: %lld\n", system_time() - now);
 				} else {
 					MoveWindowBy(fClickedWindow, dx, dy);
-printf("moving: %lld\n", system_time() - now);
+//printf("moving: %lld\n", system_time() - now);
 				}
 			}
 		}

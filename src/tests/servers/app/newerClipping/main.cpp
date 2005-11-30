@@ -181,14 +181,14 @@ Window::Test()
 		AddWindow(frame, name.String());
 	}
 
-	frame.Set(10, 80, 320, 290);
+/*	frame.Set(10, 80, 320, 290);
 	for (int32 i = 20; i < 40; i++) {
 		BString name("Window ");
 		frame.OffsetBy(20, 15);
 		name << i + 1;
 		AddWindow(frame, name.String());
 	}
-/*
+
 	frame.Set(20, 140, 330, 230);
 	for (int32 i = 40; i < 60; i++) {
 		BString name("Window ");

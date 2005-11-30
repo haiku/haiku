@@ -155,7 +155,19 @@ void
 WindowLayer::GetBorderRegion(BRegion* region)
 {
 	if (!fBorderRegionValid) {
-		// TODO: speed up by avoiding "Exclude()"
+		fBorderRegion.Set(BRect(fFrame.left - 4, fFrame.top - 20,
+							  	(fFrame.left + fFrame.right) / 2, fFrame.top - 5));
+		fBorderRegion.Include(BRect(fFrame.left - 4, fFrame.top - 4,
+									fFrame.right + 4, fFrame.top - 1));
+		fBorderRegion.Include(BRect(fFrame.left - 4, fFrame.top,
+									fFrame.left - 1, fFrame.bottom));
+		fBorderRegion.Include(BRect(fFrame.right + 1, fFrame.top,
+									fFrame.right + 4, fFrame.bottom - 11));
+		fBorderRegion.Include(BRect(fFrame.left - 4, fFrame.bottom + 1,
+									fFrame.right - 11, fFrame.bottom + 4));
+		fBorderRegion.Include(BRect(fFrame.right - 10, fFrame.bottom - 10,
+									fFrame.right + 4, fFrame.bottom + 4));
+/*		// TODO: speed up by avoiding "Exclude()"
 		// start from the frame, extend to include decorator border
 		fBorderRegion.Set(BRect(fFrame.left - 4, fFrame.top - 4,
 						  fFrame.right + 4, fFrame.bottom + 4));
@@ -169,7 +181,7 @@ WindowLayer::GetBorderRegion(BRegion* region)
 		// resize handle
 		// if (B_DOCUMENT_WINDOW_LOOK)
 			fBorderRegion.Include(BRect(fFrame.right - 10, fFrame.bottom - 10,
-								  fFrame.right, fFrame.bottom));
+								  fFrame.right, fFrame.bottom));*/
 		fBorderRegionValid = true;
 	}
 
@@ -779,6 +791,7 @@ UpdateSession::operator=(const UpdateSession& other)
 {
 	fDirtyRegion = other.fDirtyRegion;
 	fInUse = other.fInUse;
+	return *this;
 }
 
 
