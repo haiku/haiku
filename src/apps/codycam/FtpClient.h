@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <NetworkKit.h>
 
+using std::string;
+
 class FtpClient
 {
 public:

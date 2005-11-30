@@ -62,6 +62,7 @@ All rights reserved.
 #include <CharacterSetRoster.h>
 
 using namespace BPrivate;
+using std::map;
 
 #include "Mail.h"
 #include "Header.h"
@@ -131,7 +132,8 @@ THeaderView::THeaderView (
 		fResending(resending),
 		fBccMenu(NULL),
 		fCcMenu(NULL),
-		fToMenu(NULL)
+		fToMenu(NULL),
+		fEmailList(NULL)
 {
 	BMenuField	*field;
 	BMessage *msg;

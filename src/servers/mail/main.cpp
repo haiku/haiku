@@ -51,6 +51,8 @@
 	} bsppp_status_t;
 	#include <unistd.h>
 #endif
+
+using std::map;
 	
 typedef struct glorbal {
 	size_t bytes;

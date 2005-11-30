@@ -1,7 +1,9 @@
 #include "NodeMessage.h"
 #include <StorageKit.h> 
 #include <fs_attr.h>
-#include <vector.h>
+#include <vector>
+
+using std::vector;
 /*
    These functions gives a nice BMessage interface to node attributes,
    by letting you transfer attributes to and from BMessages.  It makes

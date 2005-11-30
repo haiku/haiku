@@ -8,7 +8,10 @@ Author: Sikosis (beos@gravity24hr.com)
 
 */
 
+#include <stdlib.h>
+
 #include "ModemWindow.h"
+
 
 // CenterWindowOnScreen -- Centers the BWindow to the Current Screen
 static void CenterWindowOnScreen(BWindow* w)

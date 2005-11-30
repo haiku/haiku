@@ -9,7 +9,12 @@ Authors: Misza (misza@ihug.com.au)
 
 */
 
+
 #include "LocationView.h"
+
+using std::cout;
+using std::endl;
+
 
 // LocationView -- View inside DUNWindow
 LocationView::LocationView() : BView(BRect(55,31,285,87),"locationview",B_FOLLOW_NONE,B_WILL_DRAW)

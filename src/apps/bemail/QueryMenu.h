@@ -45,10 +45,12 @@ class BQuery;
 class BVolume;
 class QHandler;
 
+using std::vector;
+
 typedef vector<BQuery *> query_t;
 
 class QueryMenu : public BPopUpMenu {
-	friend QHandler;
+	friend class QHandler;
 	
 	public:
 		QueryMenu(const char *title, bool popUp=false,

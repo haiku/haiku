@@ -196,7 +196,7 @@ class TTextView : public BTextView
 		void ContentChanged(void);
 
 		class Reader;
-		friend TTextView::Reader;
+		friend class TTextView::Reader;
 
 		char *fYankBuffer;
 		int32 fLastPosition;

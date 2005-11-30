@@ -10,4 +10,4 @@ Application CodyCam :
 	VideoConsumer.cpp
 ;
 
-LinkAgainst CodyCam : be media translation netapi stdc++.r4 ;
+LinkAgainst CodyCam : be media translation netapi $(TARGET_LIBSTDC++) ;

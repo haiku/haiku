@@ -9,6 +9,8 @@
 #include <List.h>
 #include "CDAudioDevice.h"
 
+using std::vector;
+
 class CDDBData
 {
 public:

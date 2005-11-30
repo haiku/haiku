@@ -11,7 +11,7 @@
 #define B_GREY 216,216,216
 
 
-void BackupWin::Flatten_bak(const char *bak_name = NULL)
+void BackupWin::Flatten_bak(const char *bak_name)
 {
 /*To understand what follows, u'd better open the 
  /boot/home/config/settings/network textfile */
@@ -155,7 +155,7 @@ void NetworkWindow::Get_Configs_List()
 		}
 }
 
-void NetworkWindow::GetEverything(const char *bakname = NULL)
+void NetworkWindow::GetEverything(const char *bakname)
 {
 //The configuration is saved in the /boot/home/config/settings/network
 //text file so the config is static. Maybe we could switch to dynamic by
@@ -163,8 +163,9 @@ void NetworkWindow::GetEverything(const char *bakname = NULL)
 	
 	if (bakname == NULL 
 	    && BEntry("/boot/home/config/settings/network").Exists() == false){
-		BAlert *alert = new BAlert("Network Alert","Your network config file doesn't exists.\n 
-		It should be located at/boot/home/config/settings/network "
+		BAlert *alert = new BAlert("Network Alert",
+		"Your network config file doesn't exists.\n"
+		"It should be located at/boot/home/config/settings/network "
 		,"Oups...",NULL,NULL,B_WIDTH_FROM_WIDEST,B_INFO_ALERT);
 		alert->Go();
 	}

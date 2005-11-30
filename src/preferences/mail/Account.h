@@ -77,7 +77,7 @@ class Account
 		void		Delete(int32 type = IN_AND_OUTBOUND_TYPE);
 
 	private:
-		friend Accounts;
+		friend class Accounts;
 		void		AddToListView();
 	private:
 		void		CreateInbound();

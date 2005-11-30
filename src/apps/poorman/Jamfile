@@ -13,7 +13,7 @@ Application PoorMan : PoorMan.cpp
 	PoorManPreferencesWindow.cpp 
 	PoorManApplication.cpp
 	constants.cpp
-	: be tracker stdc++.r4
+	: be tracker $(TARGET_LIBSTDC++)
 	;
 
 

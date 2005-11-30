@@ -19,7 +19,7 @@ Server mail_daemon :
 	main.cpp
 ;
 
-LinkAgainst mail_daemon : be libmail.so tracker stdc++.r4 $(NETWORK_LIBS) ;
+LinkAgainst mail_daemon : be libmail.so tracker $(TARGET_LIBSTDC++) $(NETWORK_LIBS) ;
 
 Package haiku-maildaemon-cvs :
 	mail_daemon :

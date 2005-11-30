@@ -1833,7 +1833,7 @@ void BComboBox::MakeFocus(bool state)
 //	#pragma mark -
 
 
-BDefaultChoiceList::BDefaultChoiceList(BComboBox *owner = NULL)
+BDefaultChoiceList::BDefaultChoiceList(BComboBox *owner)
 {
 	fOwner = owner;
 	fList = new StringObjectList();

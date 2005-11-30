@@ -13,4 +13,4 @@ Preference DialUpNetworking :
 	DUNWindow.cpp
 	NewConnectionWindow.cpp ;
 
-LinkAgainst DialUpNetworking : be tracker stdc++.r4 ;
+LinkAgainst DialUpNetworking : be tracker $(TARGET_LIBSTDC++) ;

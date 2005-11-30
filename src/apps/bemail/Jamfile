@@ -29,7 +29,7 @@ Application BeMail :
 	Words.cpp
 	KUndoBuffer.cpp ;
 
-LinkAgainst BeMail : be tracker stdc++.r4 libmail.so libtextencoding.so ;
+LinkAgainst BeMail : be tracker $(TARGET_LIBSTDC++) libmail.so libtextencoding.so ;
 
 Package haiku-maildaemon-cvs :
 	BeMail : 

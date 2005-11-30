@@ -8,7 +8,11 @@ Author: Misza (misza@ihug.com.au)
 
 */
 
+
 #include "DetailsView.h"
+
+using std::cout;
+using std::endl;
 
 DetailsView::DetailsView() : 
 BView(BRect(40,31,290,157),"detailsview",B_FOLLOW_NONE,B_WILL_DRAW)

@@ -54,7 +54,7 @@ class FilterConfigView : public BBox
 		virtual void AttachedToWindow();
 
 	protected:
-		friend FiltersConfigView;
+		friend class FiltersConfigView;
 
 		void		Load(BMessage *msg,entry_ref *ref);
 		void		Remove(bool deleteMessage = true);

@@ -14,6 +14,8 @@ class _EXPORT BRemoteMailStorageProtocol;
 #include <ChainRunner.h>
 #include <E-mail.h>
 
+using std::map;
+
 namespace {
 
 void GetSubFolders(BDirectory *of, BStringList *folders, const char *prepend = "");
