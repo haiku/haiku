@@ -45,10 +45,10 @@
 #include <new>
 
 #include <Debug.h>
-#include <Region.h>
+#include "Region.h"
 
-#include <clipping.h>
-#include <ClipRegion.h>
+#include "clipping.h"
+#include "ClipRegion.h"
 
 
 

@@ -449,6 +449,22 @@ ClipRegion::_RecalculateBounds(const clipping_rect &rect)
 }
 
 
+int32
+ClipRegion::_FindSmallestBottom(const int32 &top, const int32 &startIndex) const
+{
+	int32 bottom = kMaxVerticalExtent;
+	for (int32 i = startIndex; i < fCount; i++) {
+		const int32 n = fData[i].top - 1;
+		if (n >= top && n < bottom)
+			bottom = n;
+		if (fData[i].bottom >= top && fData[i].bottom < bottom)
+			bottom = fData[i].bottom;
+	}
+	
+	return bottom;
+}
+
+
 void
 ClipRegion::_Append(const ClipRegion &region, const bool &aboveThis)
 {

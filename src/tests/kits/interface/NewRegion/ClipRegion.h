@@ -17,13 +17,7 @@ public:
 	~ClipRegion();
 	
 	clipping_rect Frame() const { return fBound; }
-	clipping_rect RectAt(const int32 &index) const 
-	{
-		if (index >= 0 && index < fCount)
-			return fData[index];
-		clipping_rect rect = { 0, 0, -1, -1 };
-		return rect;
-	}
+	clipping_rect RectAt(const int32 &index) const;
 	
 	int32 CountRects() const { return fCount; }
 	
@@ -75,9 +69,21 @@ private:
 	void _AddRect(const clipping_rect &rect);
 	void _RecalculateBounds(const clipping_rect &newRect);
 	
+	int32 _FindSmallestBottom(const int32 &top, const int32 &startIndex) const;
+
 	void _Invalidate();
 	bool _Resize(const int32 &newSize, const bool &keepOld = true);
 	void _Adopt(ClipRegion &region);
 };
+
+
+inline clipping_rect
+ClipRegion::RectAt(const int32 &index) const 
+{
+	if (index >= 0 && index < fCount)
+		return fData[index];
+	clipping_rect rect = { 0, 0, -1, -1 };
+	return rect;
+}
 
 #endif // __CLIPREGION_H
