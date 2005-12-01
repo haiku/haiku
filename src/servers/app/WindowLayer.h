@@ -18,19 +18,6 @@
 #include <String.h>
 
 
-// these are used by window manager to properly place window.
-enum {
-	B_SYSTEM_LAST	= -10L,
-
-	B_FLOATING_APP	= 0L,
-	B_MODAL_APP		= 1L,
-	B_NORMAL		= 2L,
-	B_FLOATING_ALL	= 3L,
-	B_MODAL_ALL		= 4L,
-
-	B_SYSTEM_FIRST	= 10L,
-};
-
 class ServerWindow;
 class Decorator;
 class DrawingEngine;
@@ -39,17 +26,14 @@ class Desktop;
 class WindowLayer : public Layer {
  public:
 								WindowLayer(const BRect &frame,
-										  const char *name,
-										  const uint32 look,
-										  const uint32 feel, 
-										  const uint32 flags,
-										  const uint32 workspaces,
-										  ServerWindow *window,
-										  DrawingEngine *driver);
+									const char *name, window_look look,
+									window_feel feel, uint32 flags,
+									uint32 workspaces, ServerWindow *window,
+									DrawingEngine *driver);
 	virtual						~WindowLayer();
-	
+
 	virtual	void				Draw(const BRect &r);
-	
+
 	virtual	void				MoveBy(float x, float y);
 	virtual	void				ResizeBy(float x, float y);
 	virtual	void				ScrollBy(float x, float y)
@@ -84,9 +68,9 @@ class WindowLayer : public Layer {
 											  float* minHeight,
 											  float* maxHeight) const;
 
-	virtual	void				MouseDown(BMessage *msg, BPoint where, int32* _viewToken);
-	virtual	void				MouseUp(BMessage *msg, BPoint where, int32* _viewToken);
-	virtual	void				MouseMoved(BMessage *msg, BPoint where, int32* _viewToken);
+	virtual	void				MouseDown(BMessage* message, BPoint where, int32* _viewToken);
+	virtual	void				MouseUp(BMessage* message, BPoint where, int32* _viewToken);
+	virtual	void				MouseMoved(BMessage* message, BPoint where, int32* _viewToken);
 
 //			click_type			ActionFor(const BMessage *msg)
 //									{ return _ActionFor(evt); }
@@ -105,10 +89,9 @@ class WindowLayer : public Layer {
 
 	inline	Decorator*			GetDecorator() const { return fDecorator; }
 
-	inline	int32				Look() const { return fLook; }
-	inline	int32				Feel() const { return fFeel; }
-	inline	int32				Level() const { return fLevel; }
-	inline	uint32				WindowFlags() const { return fWindowFlags; }
+			window_look			Look() const { return fLook; }
+			window_feel			Feel() const { return fFeel; }
+			uint32				WindowFlags() const { return fWindowFlags; }
 
 			uint32				Workspaces() const { return fWorkspaces; }
 			void				SetWorkspaces(uint32 workspaces)
@@ -124,17 +107,19 @@ class WindowLayer : public Layer {
 
 			void				HighlightDecorator(bool active);
 
-	inline	void				QuietlySetWorkspaces(uint32 wks) { fWorkspaces = wks; }	
-			void				QuietlySetFeel(int32 feel);	
+			void				SetFeel(window_feel feel);
+			void				SetLook(window_look look);
 
 			SubWindowList		fSubWindowList;
 
 			void				RequestClientRedraw(const BRegion& invalid);
-	virtual void				_AllRedraw(const BRegion& invalid);
 
 			void				SetTopLayer(Layer* layer);
 	inline	Layer*				TopLayer() const
 									{ return fTopLayer; }
+
+ protected:
+	virtual void				_AllRedraw(const BRegion& invalid);
 
  private:
 			void				set_decorator_region(BRect frame);
@@ -172,10 +157,9 @@ class WindowLayer : public Layer {
 			bool				fInUpdate;
 			bool				fRequestSent;
 
-			int32				fLook;
-			int32				fFeel;
-			int32				fLevel;
-			int32				fWindowFlags;
+			window_look			fLook;
+			window_feel			fFeel;
+			uint32				fWindowFlags;
 			uint32				fWorkspaces;
 
 			float				fMinWidth;

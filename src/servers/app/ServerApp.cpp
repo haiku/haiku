@@ -479,15 +479,17 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				}
 			} else {
 				window = new ServerWindow(title, this, clientReplyPort, looperPort, token);
-				STRACE(("\nServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
-					fSignature(), title, frame.left, frame.top, frame.right, frame.bottom));
+				STRACE(("\nServerApp %s: New Window %s (%g:%g, %g:%g)\n",
+					fSignature(), title, frame.left, frame.top,
+					frame.right, frame.bottom));
 			}
 
 			free(title);
 
 			// NOTE: the reply to the client is handled in ServerWindow::Run()
 			if (window != NULL) {
-				status = window->Init(frame, look, feel, flags, workspaces);
+				status = window->Init(frame, (window_look)look, (window_feel)feel,
+					flags, workspaces);
 				if (status == B_OK && !window->Run())
 					status = B_ERROR;
 

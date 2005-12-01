@@ -54,9 +54,9 @@ public:
 									int32 clientToken);
 	virtual						~ServerWindow();
 
-			status_t			Init(BRect frame, uint32 look,
-									 uint32 feel, uint32 flags,
-									 uint32 workspace);
+			status_t			Init(BRect frame, window_look look,
+									window_feel feel, uint32 flags,
+									uint32 workspace);
 	virtual bool				Run();
 	virtual port_id				MessagePort() const { return fMessagePort; }
 
@@ -76,12 +76,12 @@ public:
 			const BMessenger&	HandlerMessenger() const { return fHandlerMessenger; }
 
 			status_t			SendMessageToClient(const BMessage* msg,
-													int32 target = B_NULL_TOKEN) const;
+									int32 target = B_NULL_TOKEN) const;
 
 	virtual	WindowLayer*		MakeWindowLayer(BRect frame, const char* name,
-									uint32 look, uint32 feel, uint32 flags,
+									window_look look, window_feel feel, uint32 flags,
 									uint32 workspace);
-			
+
 			// TODO: Ouch, that's not exactly a nice name
 			inline BMessage		&ClientViewsWithInvalidCoords()
 									{ return fClientViewsWithInvalidCoords; };

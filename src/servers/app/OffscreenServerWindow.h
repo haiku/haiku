@@ -28,7 +28,7 @@ class OffscreenServerWindow : public ServerWindow {
 													bool usePreferred = false) const;
 
 	virtual	WindowLayer*		MakeWindowLayer(BRect frame, const char* name,
-									uint32 look, uint32 feel, uint32 flags,
+									window_look look, window_feel feel, uint32 flags,
 									uint32 workspace);
 
  private:

@@ -50,13 +50,9 @@
 
 
 WindowLayer::WindowLayer(const BRect &frame,
-					 const char *name,
-					 const uint32 look,
-					 const uint32 feel,
-					 const uint32 flags,
-					 const uint32 workspaces,
-					 ServerWindow *window,
-					 DrawingEngine *driver)
+		const char *name, window_look look, window_feel feel,
+		uint32 flags, uint32 workspaces,
+		ServerWindow *window, DrawingEngine *driver)
 	: Layer(frame, name, B_NULL_TOKEN, B_FOLLOW_NONE, 0UL, driver),
 	  fDecorator(NULL),
 	  fTopLayer(NULL),
@@ -84,7 +80,7 @@ WindowLayer::WindowLayer(const BRect &frame,
 	  fRequestSent(false),
 
 	  fLook(look),
-	  fLevel(-100),
+	  fFeel(feel),
 	  fWindowFlags(flags),
 	  fWorkspaces(workspaces),
 
@@ -98,9 +94,7 @@ WindowLayer::WindowLayer(const BRect &frame,
 	fWindow = window;
 	fFlags = B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE;
 
-	QuietlySetFeel(feel);
-
-	if (fFeel != B_NO_BORDER_WINDOW_LOOK) {
+	if (fLook != B_NO_BORDER_WINDOW_LOOK) {
 		fDecorator = gDecorManager.AllocateDecorator(window->App()->GetDesktop(), frame,
 			name, fLook, fFeel,  fWindowFlags);
 		if (fDecorator)
@@ -673,48 +667,11 @@ WindowLayer::SupportsFront()
 
 
 void
-WindowLayer::QuietlySetFeel(int32 feel)
+WindowLayer::SetFeel(window_feel feel)
 {
 	fFeel = feel;
 
-	switch (fFeel) {
-		case B_FLOATING_SUBSET_WINDOW_FEEL:
-		case B_FLOATING_APP_WINDOW_FEEL:
-			fLevel = B_FLOATING_APP;
-			break;
-
-		case B_MODAL_SUBSET_WINDOW_FEEL:
-		case B_MODAL_APP_WINDOW_FEEL:
-			fLevel = B_MODAL_APP;
-			break;
-
-		case B_NORMAL_WINDOW_FEEL:
-			fLevel = B_NORMAL;
-			break;
-
-		case B_FLOATING_ALL_WINDOW_FEEL:
-			fLevel = B_FLOATING_ALL;
-			break;
-
-		case B_MODAL_ALL_WINDOW_FEEL:
-			fLevel = B_MODAL_ALL;
-			break;
-			
-// TODO: This case is bogus, since I'm sure "feel"
-// is being represented by uint32 somewhere before
-// this function is used. And B_SYSTEM_LAST is defined -10. -Stephan
-		case B_SYSTEM_LAST:
-		case kDesktopWindowFeel:
-			fLevel = B_SYSTEM_LAST;
-			break;
-
-		case B_SYSTEM_FIRST:
-			fLevel = B_SYSTEM_FIRST;
-			break;
-
-		default:
-			fLevel = B_NORMAL;
-	}
+	// TODO: this shouldn't be necessary, but we'll see :)
 
 	// floating and modal windows must appear in every workspace where
 	// their main window is present. Thus their fWorkspaces will be set to
@@ -729,8 +686,6 @@ WindowLayer::QuietlySetFeel(int32 feel)
 			break;
 		case B_MODAL_ALL_WINDOW_FEEL:
 		case B_FLOATING_ALL_WINDOW_FEEL:
-		case B_SYSTEM_LAST:
-		case B_SYSTEM_FIRST:
 			fWorkspaces = 0xffffffffUL;
 			break;
 		case B_NORMAL_WINDOW_FEEL:

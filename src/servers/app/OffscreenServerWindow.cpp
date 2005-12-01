@@ -43,8 +43,7 @@ OffscreenServerWindow::SendMessageToClient(const BMessage* msg, int32 target,
 
 WindowLayer*
 OffscreenServerWindow::MakeWindowLayer(BRect frame, const char* name,
-									 uint32 look, uint32 feel, uint32 flags,
-									 uint32 workspace)
+	window_look look, window_feel feel, uint32 flags, uint32 workspace)
 {
 	return new OffscreenWindowLayer(fBitmap, name, this);
 }

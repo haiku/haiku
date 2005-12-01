@@ -198,7 +198,8 @@ ServerWindow::~ServerWindow()
 
 
 status_t
-ServerWindow::Init(BRect frame, uint32 look, uint32 feel, uint32 flags, uint32 workspace)
+ServerWindow::Init(BRect frame, window_look look, window_feel feel,
+	uint32 flags, uint32 workspace)
 {
 	if (fTitle == NULL)
 		return B_NO_MEMORY;
@@ -2175,10 +2176,10 @@ ServerWindow::SendMessageToClient(const BMessage* msg, int32 target) const
 
 WindowLayer*
 ServerWindow::MakeWindowLayer(BRect frame, const char* name,
-	uint32 look, uint32 feel, uint32 flags, uint32 workspace)
+	window_look look, window_feel feel, uint32 flags, uint32 workspace)
 {
 	// The non-offscreen ServerWindow uses the DrawingEngine instance from the desktop.
-	return new(nothrow) WindowLayer(frame, name, look, feel, flags,
+	return new (nothrow) WindowLayer(frame, name, look, feel, flags,
 		workspace, this, fDesktop->GetDrawingEngine());
 }
 
