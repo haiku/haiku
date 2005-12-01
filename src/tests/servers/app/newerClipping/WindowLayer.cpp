@@ -22,6 +22,9 @@
 // the update session, which tells us the cause of the update
 #define DELAYED_BACKGROUND_CLEARING 1
 
+// IMPORTANT: nested ReadLockClipping()s are not supported (by MultiLocker)
+
+
 // constructor
 WindowLayer::WindowLayer(BRect frame, const char* name,
 						 DrawingEngine* drawingEngine, Desktop* desktop)
@@ -75,6 +78,9 @@ WindowLayer::WindowLayer(BRect frame, const char* name,
 // destructor
 WindowLayer::~WindowLayer()
 {
+	fClient->Lock();
+	fClient->Quit();
+
 	delete fTopLayer;
 }
 
@@ -115,6 +121,27 @@ WindowLayer::MessageReceived(BMessage* message)
 			int32 token;
 			if (message->FindInt32("token", &token) >= B_OK)
 				_DrawClient(token);
+			break;
+		}
+		case MSG_DRAW_POLYGON: {
+			int32 token;
+			BPoint polygon[4];
+			if (message->FindInt32("token", &token) >= B_OK &&
+				message->FindPoint("point", 0, &polygon[0]) >= B_OK &&
+				message->FindPoint("point", 1, &polygon[1]) >= B_OK &&
+				message->FindPoint("point", 2, &polygon[2]) >= B_OK &&
+				message->FindPoint("point", 3, &polygon[3]) >= B_OK) {
+
+				_DrawClientPolygon(token, polygon);
+			}
+			break;
+			
+		}
+
+		case MSG_INVALIDATE_VIEW: {
+			int32 token;
+			if (message->FindInt32("token", &token) >= B_OK)
+				InvalidateView(token);
 			break;
 		}
 
@@ -386,6 +413,26 @@ WindowLayer::MarkContentDirty(BRegion* regionOnScreen)
 	}
 }
 
+// InvalidateView
+void
+WindowLayer::InvalidateView(int32 token)
+{
+	if (fDesktop && fDesktop->ReadLockClipping()) {
+
+		ViewLayer* layer = (ViewLayer*)fTokenViewMap.ItemAt(token);
+		if (!layer || !layer->IsVisible()) {
+			fDesktop->ReadUnlockClipping();
+			return;
+		}
+		if (!fContentRegionValid)
+			_UpdateContentRegion();
+
+		_MarkContentDirty(&layer->ScreenClipping(&fContentRegion));
+
+		fDesktop->ReadUnlockClipping();
+	}
+}
+
 //# pragma mark -
 
 // CopyContents
@@ -507,11 +554,13 @@ WindowLayer::_DrawClient(int32 token)
 	// We have to be sure that the clipping is up to date.
 	// If true readlocking would work correctly, this would
 	// not be an issue
-	ViewLayer* layer = (ViewLayer*)fTokenViewMap.ItemAt(token);
-	if (!layer || !layer->IsVisible())
-		return;
-
 	if (fDesktop->ReadLockClipping()) {
+
+		ViewLayer* layer = (ViewLayer*)fTokenViewMap.ItemAt(token);
+		if (!layer || !layer->IsVisible()) {
+			fDesktop->ReadUnlockClipping();
+			return;
+		}
 
 		if (!fEffectiveDrawingRegionValid) {
 			fEffectiveDrawingRegion = VisibleContentRegion();
@@ -550,6 +599,68 @@ WindowLayer::_DrawClient(int32 token)
 		fDesktop->ReadUnlockClipping();
 	}
 }
+
+// _DrawClientPolygon
+void
+WindowLayer::_DrawClientPolygon(int32 token, BPoint polygon[4])
+{
+	if (fDesktop->ReadLockClipping()) {
+
+		ViewLayer* layer = (ViewLayer*)fTokenViewMap.ItemAt(token);
+		if (!layer || !layer->IsVisible()) {
+			fDesktop->ReadUnlockClipping();
+			return;
+		}
+
+		if (!fEffectiveDrawingRegionValid) {
+			fEffectiveDrawingRegion = VisibleContentRegion();
+			if (fInUpdate) {
+				// enforce the dirty region of the update session
+				fEffectiveDrawingRegion.IntersectWith(&fCurrentUpdateSession.DirtyRegion());
+			} else {
+				printf("%s - _DrawClient(token: %ld) - not in update\n", Name(), token);
+			}
+			fEffectiveDrawingRegionValid = true;
+		}
+
+		BRegion effectiveClipping(fEffectiveDrawingRegion);
+		if (!fContentRegionValid)
+			_UpdateContentRegion();
+		effectiveClipping.IntersectWith(&layer->ScreenClipping(&fContentRegion));
+
+		if (effectiveClipping.CountRects() > 0) {
+#if DELAYED_BACKGROUND_CLEARING
+			layer->Draw(fDrawingEngine, &effectiveClipping,
+						&fContentRegion, false);
+#endif
+
+			if (fDrawingEngine->Lock()) {
+
+				fDrawingEngine->PushState();
+				fDrawingEngine->ConstrainClippingRegion(&effectiveClipping);
+				fDrawingEngine->SetPenSize(3);
+//				fDrawingEngine->SetDrawingMode(B_OP_BLEND);
+				layer->ConvertToTop(&polygon[0]);
+				layer->ConvertToTop(&polygon[1]);
+				layer->ConvertToTop(&polygon[2]);
+				layer->ConvertToTop(&polygon[3]);
+				fDrawingEngine->BeginLineArray(4);
+					fDrawingEngine->AddLine(polygon[0], polygon[1], layer->ViewColor());
+					fDrawingEngine->AddLine(polygon[1], polygon[2], layer->ViewColor());
+					fDrawingEngine->AddLine(polygon[2], polygon[3], layer->ViewColor());
+					fDrawingEngine->AddLine(polygon[3], polygon[0], layer->ViewColor());
+				fDrawingEngine->EndLineArray();
+
+				fDrawingEngine->PopState();
+				fDrawingEngine->MarkDirty(&effectiveClipping);
+				fDrawingEngine->Unlock();
+			}
+		}
+
+		fDesktop->ReadUnlockClipping();
+	}
+}
+
 
 // _DrawBorder
 void

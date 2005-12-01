@@ -12,6 +12,15 @@ enum {
 	MSG_VIEWS_REMOVED	= 'vwrm',
 
 	MSG_WINDOW_HIDDEN	= 'whdn',
+
+	MSG_TICK			= 'tick',
+};
+
+struct point {
+	double x;
+	double y;
+	double direction_x;
+	double direction_y;
 };
 
 class ClientLooper : public BLooper {
@@ -25,6 +34,13 @@ class ClientLooper : public BLooper {
  private:
 			WindowLayer*			fServerWindow;
 			int32					fViewCount;
+
+			BMessageRunner*			fTicker;
+
+
+			void					_DrawAnimatedLayer(int32 token);
+
+			point					fPolygon[4];
 };
 
 #endif // CLIENT_LOOPER_H

@@ -220,6 +220,8 @@ Window::Test()
 int
 main(int argc, const char* argv[])
 {
+	srand((long int)system_time());
+
 	App app;
 	app.Run();
 	return 0;
