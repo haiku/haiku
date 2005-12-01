@@ -117,6 +117,12 @@ WindowLayer::MessageReceived(BMessage* message)
 				_DrawClient(token);
 			break;
 		}
+
+		case MSG_SHOW:
+			if (IsHidden()) {
+				fDesktop->ShowWindow(this);
+			}
+			break;
 		default:
 			BLooper::MessageReceived(message);
 			break;
@@ -306,28 +312,21 @@ WindowLayer::AddChild(ViewLayer* layer)
 }
 
 void
-WindowLayer::Hide()
+WindowLayer::SetHidden(bool hidden)
 {
-	if (fHidden)
-		return;
+	// the desktop takes care of
+	// dirty regions
+	if (fHidden != hidden) {
+		fHidden = hidden;
 
-	fHidden = true;
+		fTopLayer->SetHidden(hidden);
 
-	// TODO: notify window manager
-	// TODO: call RevealNewWMState
-}
+		// this is only for simulation purposes:
+		if (fHidden)
+			fClient->PostMessage(MSG_WINDOW_HIDDEN);
 
-void
-WindowLayer::Show()
-{
-	if (!fHidden)
-		return;
-
-	fHidden = false;
-
-	// TODO: notify window manager
-	// TODO: call RevealNewWMState
-
+		// TODO: anything else?
+	}
 }
 
 // ProcessDirtyRegion
@@ -509,7 +508,7 @@ WindowLayer::_DrawClient(int32 token)
 	// If true readlocking would work correctly, this would
 	// not be an issue
 	ViewLayer* layer = (ViewLayer*)fTokenViewMap.ItemAt(token);
-	if (!layer)
+	if (!layer || !layer->IsVisible())
 		return;
 
 	if (fDesktop->ReadLockClipping()) {

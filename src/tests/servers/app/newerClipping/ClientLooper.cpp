@@ -61,6 +61,14 @@ ClientLooper::MessageReceived(BMessage* message)
 				fViewCount -= count;
 			break;
 		}
+
+		case MSG_WINDOW_HIDDEN:
+			// there is no way we're going to accept this
+			// discrimination for longer than 2 seconds!
+			snooze(2000000);
+			fServerWindow->PostMessage(MSG_SHOW);
+			break;
+
 		default:
 			BLooper::MessageReceived(message);
 			break;

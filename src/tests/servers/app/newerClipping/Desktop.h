@@ -37,7 +37,8 @@ class Desktop : public BLooper {
 			// functions for the DrawView
 			void				Draw(BRect updateRect);
 
-			void				MouseDown(BPoint where, uint32 buttons); 
+			void				MouseDown(BPoint where, uint32 buttons,
+										  int32 clicks); 
 			void				MouseUp(BPoint where); 
 			void				MouseMoved(BPoint where, uint32 code,
 										   const BMessage* dragMessage);
@@ -59,6 +60,10 @@ class Desktop : public BLooper {
 			// doing something with the windows
 			void				MoveWindowBy(WindowLayer* window, int32 x, int32 y);
 			void				ResizeWindowBy(WindowLayer* window, int32 x, int32 y);
+
+			void				ShowWindow(WindowLayer* window);
+			void				HideWindow(WindowLayer* window);
+			void				SetWindowHidden(WindowLayer* window, bool hidden);
 
 			void				BringToFront(WindowLayer* window);
 			void				SendToBack(WindowLayer* window);

@@ -82,7 +82,7 @@ Desktop::Draw(BRect updateRect)
 
 // MouseDown
 void
-Desktop::MouseDown(BPoint where, uint32 buttons)
+Desktop::MouseDown(BPoint where, uint32 buttons, int32 clicks)
 {
 	fLastMousePos = where;
 	fClickedWindow = WindowAt(where);
@@ -90,10 +90,15 @@ Desktop::MouseDown(BPoint where, uint32 buttons)
 	if (buttons == B_PRIMARY_MOUSE_BUTTON) {
 		fTracking = true;
 		if (fClickedWindow) {
-			BRect frame(fClickedWindow->Frame());
-			BRect resizeRect(frame.right - 10, frame.bottom - 10,
-							 frame.right + 4, frame.bottom + 4);
-			fResizing = resizeRect.Contains(where);
+			if (clicks >= 2) {
+				HideWindow(fClickedWindow);
+				fClickedWindow = NULL;
+			} else {
+				BRect frame(fClickedWindow->Frame());
+				BRect resizeRect(frame.right - 10, frame.bottom - 10,
+								 frame.right + 4, frame.bottom + 4);
+				fResizing = resizeRect.Contains(where);
+			}
 		}
 	} else if (buttons == B_SECONDARY_MOUSE_BUTTON) {
 		if (fClickedWindow)
@@ -184,10 +189,12 @@ Desktop::MessageReceived(BMessage* message)
 		case B_MOUSE_DOWN: {
 			BPoint where;
 			uint32 buttons;
+			int32 clicks;
 			if (message->FindPoint("where", &where) >= B_OK &&
-				message->FindInt32("buttons", (int32*)&buttons) >= B_OK) {
+				message->FindInt32("buttons", (int32*)&buttons) >= B_OK &&
+				message->FindInt32("clicks", &clicks) >= B_OK) {
 
-				MouseDown(where, buttons);
+				MouseDown(where, buttons, clicks);
 			}
 			break;
 		}
@@ -320,7 +327,7 @@ Desktop::WindowAt(const BPoint& where) const
 	int32 count = CountWindows();
 	for (int32 i = count - 1; i >= 0; i--) {
 		WindowLayer* window = WindowAtFast(i);
-		if (window->VisibleRegion().Contains(where))
+		if (!window->IsHidden() && window->VisibleRegion().Contains(where))
 			return window;
 	}
 	return NULL;
@@ -418,6 +425,66 @@ Desktop::ResizeWindowBy(WindowLayer* window, int32 x, int32 y)
 
 	Unlock();
 }
+
+// ShowWindow
+void
+Desktop::ShowWindow(WindowLayer* window)
+{
+	SetWindowHidden(window, false);
+}
+
+// HideWindow
+void
+Desktop::HideWindow(WindowLayer* window)
+{
+	SetWindowHidden(window, true);
+}
+
+// SetWindowHidden
+void
+Desktop::SetWindowHidden(WindowLayer* window, bool hidden)
+{
+	if (LockClipping()) {
+
+		if (window->IsHidden() != hidden) {
+
+			window->SetHidden(hidden);
+
+			BRegion dirty;
+
+			if (hidden) {
+				// after rebuilding the clipping,
+				// this window will not have a visible
+				// region anymore, so we need to remember
+				// it now
+				// (actually that's not true, since
+				// hidden windows are excluded from the
+				// clipping calculation, but anyways)
+				dirty = window->VisibleRegion();
+			}
+
+			BRegion background;
+			_RebuildClippingForAllWindows(&background);
+			_SetBackground(&background);
+
+			if (!hidden) {
+				// everything that is now visible in the
+				// window needs a redraw, but other windows
+				// are not affected, we can call ProcessDirtyRegion()
+				// of the window, and don't have to use MarkDirty()
+				dirty = window->VisibleRegion();
+				window->ProcessDirtyRegion(&dirty);
+			} else {
+				// when the window was hidden, the dirty region
+				// affects other windows
+				MarkDirty(&dirty);
+			}
+		}
+
+		UnlockClipping();
+	}
+}
+
 
 // BringToFront
 void
@@ -550,9 +617,11 @@ Desktop::_RebuildClippingForAllWindows(BRegion* stillAvailableOnScreen)
 	int32 count = CountWindows();
 	for (int32 i = count - 1; i >= 0; i--) {
 		WindowLayer* window = WindowAtFast(i);
-		window->SetClipping(stillAvailableOnScreen);
-		// that windows region is not available on screen anymore
-		stillAvailableOnScreen->Exclude(&window->VisibleRegion());
+		if (!window->IsHidden()) {
+			window->SetClipping(stillAvailableOnScreen);
+			// that windows region is not available on screen anymore
+			stillAvailableOnScreen->Exclude(&window->VisibleRegion());
+		}
 	}
 }
 
@@ -564,9 +633,8 @@ Desktop::_TriggerWindowRedrawing(BRegion* newDirtyRegion)
 	int32 count = CountWindows();
 	for (int32 i = count - 1; i >= 0; i--) {
 		WindowLayer* window = WindowAtFast(i);
-		if (newDirtyRegion->Intersects(window->VisibleRegion().Frame()))
-//			window->PostMessage(MSG_REDRAW);
-window->ProcessDirtyRegion(newDirtyRegion);
+		if (!window->IsHidden() && newDirtyRegion->Intersects(window->VisibleRegion().Frame()))
+			window->ProcessDirtyRegion(newDirtyRegion);
 	}
 }
 

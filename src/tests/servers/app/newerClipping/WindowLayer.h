@@ -16,9 +16,12 @@ class DrawingEngine;
 enum {
 	MSG_REDRAW			= 'rdrw',
 
+	// client messages
 	MSG_BEGIN_UPDATE	= 'bgud',
 	MSG_END_UPDATE		= 'edud',
 	MSG_DRAWING_COMMAND	= 'draw',
+
+	MSG_SHOW			= 'show',
 };
 
 class UpdateSession {
@@ -73,10 +76,9 @@ class WindowLayer : public BLooper {
 
 			void					AddChild(ViewLayer* layer);
 
+			void					SetHidden(bool hidden);
 	inline	bool					IsHidden() const
 										{ return fHidden; }
-			void					Hide();
-			void					Show();
 
 			void					MarkDirty(BRegion* regionOnScreen);
 			void					MarkContentDirty(BRegion* regionOnScreen);

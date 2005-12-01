@@ -28,6 +28,7 @@ ViewLayer::ViewLayer(BRect frame, const char* name,
 
 	  // ViewLayers start visible by default
 	  fHidden(false),
+	  fVisible(true),
 
 	  fWindow(NULL),
 	  fParent(NULL),
@@ -124,23 +125,19 @@ ViewLayer::AddChild(ViewLayer* layer)
 	}
 	fLastChild = layer;
 
-	RebuildClipping(false);
+	if (layer->IsVisible())
+		RebuildClipping(false);
 
 	if (fWindow) {
 		layer->AttachedToWindow(fWindow);
 
-		// TODO: not correct... need something like
-		// ViewLayer::ClipToParent(BRect frame)
-		// {
-		//     	frame = frame & Bounds();
-		//      ConvertToParent(&frame);
-		//      fParent->ClipToParent(&frame);
-		// }
-		BRect dirty(layer->Frame());
-		dirty = dirty & Bounds();
-		ConvertToTop(&dirty);
-		BRegion dirtyRegion(dirty);
-		fWindow->MarkContentDirty(&dirtyRegion);
+		if (fVisible && layer->IsVisible()) {
+			// trigger redraw
+			BRect clippedFrame = layer->Frame();
+			ConvertToVisibleInTopView(&clippedFrame);
+			BRegion dirty(clippedFrame);
+			fWindow->MarkContentDirty(&dirty);
+		}
 	}
 }
 
@@ -174,12 +171,19 @@ ViewLayer::RemoveChild(ViewLayer* layer)
 	layer->fPreviousSibling = NULL;
 	layer->fNextSibling = NULL;
 
-	if (fParent) {
+	if (layer->IsVisible())
 		RebuildClipping(false);
-	}
+
 	if (fWindow) {
 		layer->DetachedFromWindow();
-		// TODO: handle exposed area
+
+		if (fVisible && layer->IsVisible()) {
+			// trigger redraw
+			BRect clippedFrame = layer->Frame();
+			ConvertToVisibleInTopView(&clippedFrame);
+			BRegion dirty(clippedFrame);
+			fWindow->MarkContentDirty(&dirty);
+		}
 	}
 
 	return true;
@@ -387,7 +391,7 @@ ViewLayer::MoveBy(int32 x, int32 y, BRegion* dirtyRegion)
 	fFrame.OffsetBy(x, y);
 
 	// to move on screen, we must not be hidden and we must have a parent
-	if (!IsHidden() && fParent && dirtyRegion) {
+	if (fVisible && fParent && dirtyRegion) {
 #if 0
 // based on redraw on new location
 		// the place were we are now visible
@@ -454,7 +458,7 @@ ViewLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 	fFrame.right += x;
 	fFrame.bottom += y;
 
-	if (!IsHidden() && dirtyRegion) {
+	if (fVisible && dirtyRegion) {
 		BRect oldBounds(Bounds());
 		oldBounds.right -= x;
 		oldBounds.bottom -= y;
@@ -474,9 +478,11 @@ ViewLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 			// exclude children, they are expected to
 			// include their own dirty regions in ParentResized()
 			for (ViewLayer* child = FirstChild(); child; child = NextChild()) {
-				BRect previousChildVisible(child->Frame() & oldBounds & Bounds());
-				if (dirty.Frame().Intersects(previousChildVisible)) {
-					dirty.Exclude(previousChildVisible);
+				if (child->IsVisible()) {
+					BRect previousChildVisible(child->Frame() & oldBounds & Bounds());
+					if (dirty.Frame().Intersects(previousChildVisible)) {
+						dirty.Exclude(previousChildVisible);
+					}
 				}
 			}
 
@@ -619,50 +625,50 @@ ViewLayer::ClientDraw(DrawingEngine* drawingEngine, BRegion* effectiveClipping)
 
 // #pragma mark -
 
+// SetHidden
+void
+ViewLayer::SetHidden(bool hidden)
+{
+	// TODO: test...
+
+	if (fHidden != hidden) {
+		fHidden = hidden;
+
+		// recurse into children and update their visible flag
+		if (fParent) {
+			bool olfVisible = fVisible;
+			UpdateVisibleDeep(fParent->IsVisible());
+			if (olfVisible != fVisible) {
+				// include or exclude us from the parent area
+				fParent->RebuildClipping(false);
+				if (fWindow) {
+					// trigger a redraw
+					BRect clippedBounds = Bounds();
+					ConvertToVisibleInTopView(&clippedBounds);
+					BRegion dirty(clippedBounds);
+					fWindow->MarkContentDirty(&dirty);
+				}
+			}
+		} else {
+			UpdateVisibleDeep(true);
+		}
+	}
+}
+
 // IsHidden
 bool
 ViewLayer::IsHidden() const
 {
-	// if we're explicitely hidden, then we're hidden...
-	if (fHidden)
-		return true;
-
-	// ...but if we're not hidden, we might still be hidden if our parent is
-	if (fParent)
-		return fParent->IsHidden();
-
-	// nope, definitely not hidden
-	return false;
+	return fHidden;
 }
 
-// Hide
+// UpdateVisibleDeep
 void
-ViewLayer::Hide()
+ViewLayer::UpdateVisibleDeep(bool parentVisible)
 {
-	if (!fHidden) {
-		fHidden = true;
-
-		if (fParent && !fParent->IsHidden()) {
-			// TODO: track regions
-			// RebuildClipping()
-			// ...
-		}
-	}
-}
-
-// Show
-void
-ViewLayer::Show()
-{
-	if (fHidden) {
-		fHidden = false;
-
-		if (fParent && !fParent->IsHidden()) {
-			// TODO: track regions
-			// RebuildClipping()
-			// ...
-		}
-	}
+	fVisible = parentVisible && !fHidden;
+	for (ViewLayer* child = FirstChild(); child; child = NextChild())
+		child->UpdateVisibleDeep(fVisible);
 }
 
 // PrintToStream
@@ -680,7 +686,8 @@ ViewLayer::RebuildClipping(bool deep)
 
 	// exclude all childs from the clipping
 	for (ViewLayer* child = FirstChild(); child; child = NextChild()) {
-		fLocalClipping.Exclude(child->Frame());
+		if (child->IsVisible())
+			fLocalClipping.Exclude(child->Frame());
 
 		if (deep)
 			child->RebuildClipping(deep);

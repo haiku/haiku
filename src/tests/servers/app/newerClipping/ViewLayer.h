@@ -94,19 +94,24 @@ class ViewLayer {
 			void			ClientDraw(		DrawingEngine* drawingEngine,
 											BRegion* effectiveClipping);
 
+			void			SetHidden(bool hidden);
 			bool			IsHidden() const;
-			void			Hide();
-			void			Show();
+
+			// takes into account parent views hidden status
+			bool			IsVisible() const
+								{ return fVisible; }
+			// update visible status for this view and all children
+			// according to the parents visibility
+			void			UpdateVisibleDeep(bool parentVisible);
 
 			// clipping
 			void			RebuildClipping(bool deep);
 			BRegion&		ScreenClipping(BRegion* windowContentClipping,
 										   bool force = false) const;
+			void			InvalidateScreenClipping(bool deep);
 
 			// debugging
 			void			PrintToStream() const;
-
-			void			InvalidateScreenClipping(bool deep);
 
 private:
 			void			_MoveScreenClipping(int32 x, int32 y,
@@ -123,6 +128,7 @@ private:
 			uint32			fResizeMode;
 			uint32			fFlags;
 			bool			fHidden;
+			bool			fVisible;
 
 			WindowLayer*	fWindow;
 			ViewLayer*		fParent;

@@ -10,6 +10,8 @@ enum {
 	MSG_UPDATE			= 'updt',
 	MSG_VIEWS_ADDED		= 'vwad',
 	MSG_VIEWS_REMOVED	= 'vwrm',
+
+	MSG_WINDOW_HIDDEN	= 'whdn',
 };
 
 class ClientLooper : public BLooper {
