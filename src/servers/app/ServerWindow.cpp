@@ -1361,7 +1361,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			uint32 flags;
 			if (link.Read<uint32>(&flags) == B_OK) {
 				// test if flags are valid
-				status = (flags & ~WindowLayer::ValidWindowFlags()) != 0
+				status = (flags & ~WindowLayer::ValidWindowFlags()) == 0
 					? B_OK : B_BAD_VALUE;
 			}
 
