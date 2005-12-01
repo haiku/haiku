@@ -205,18 +205,24 @@ WorkspacesLayer::_DarkenColor(RGBColor& color) const
 void
 WorkspacesLayer::Draw(const BRect& updateRect)
 {
-	// ToDo: either draw into an off-screen bitmap, or turn off flickering...
-
 	int32 columns, rows;
 	_GetGrid(columns, rows);
 
 	// draw grid
-	// horizontal lines
+
+	// make sure the grid around the active workspace is not drawn
+	// to reduce flicker
+	BRect activeRect = _WorkspaceAt(Window()->Desktop()->CurrentWorkspace());
+	BRegion gridRegion(VisibleRegion());
+	gridRegion.Exclude(activeRect);
+	GetDrawingEngine()->ConstrainClippingRegion(&gridRegion);
 
 	BRect frame = Frame();
 	BPoint pt(0,0);
 	ConvertToScreen(&pt);
 	frame.OffsetBy(pt);
+
+	// horizontal lines
 
 	GetDrawingEngine()->StrokeLine(BPoint(frame.left, frame.top),
 		BPoint(frame.right, frame.top), ViewColor());
@@ -237,6 +243,9 @@ WorkspacesLayer::Draw(const BRect& updateRect)
 		GetDrawingEngine()->StrokeLine(BPoint(rect.right, frame.top),
 			BPoint(rect.right, frame.bottom), ViewColor());
 	}
+
+	BRegion cRegion(VisibleRegion());
+	GetDrawingEngine()->ConstrainClippingRegion(&cRegion);
 
 	// draw workspaces
 
