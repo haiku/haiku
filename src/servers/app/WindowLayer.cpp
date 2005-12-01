@@ -667,6 +667,13 @@ WindowLayer::SupportsFront()
 
 
 void
+WindowLayer::SetLook(window_look look, BRegion* updateRegion)
+{
+	// TODO: implement settings window look
+}
+
+
+void
 WindowLayer::SetFeel(window_feel feel)
 {
 	fFeel = feel;
@@ -691,6 +698,13 @@ WindowLayer::SetFeel(window_feel feel)
 		case B_NORMAL_WINDOW_FEEL:
 			break;
 	}
+}
+
+
+void
+WindowLayer::SetWindowFlags(uint32 flags, BRegion* updateRegion)
+{
+	// TODO: implement settings window flags
 }
 
 

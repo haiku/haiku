@@ -1318,28 +1318,74 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			}
 			break;
 		}
-#if 0
+
 		case AS_SET_LOOK:
 		{
-			// TODO: Implement AS_SET_LOOK
-			STRACE(("ServerWindow %s: Message Set_Look unimplemented\n", Title()));
-			break;
-		}
-		case AS_SET_FLAGS:
-		{
-			// TODO: Implement AS_SET_FLAGS
-			STRACE(("ServerWindow %s: Message Set_Flags unimplemented\n", Title()));
+			STRACE(("ServerWindow %s: Message AS_SET_LOOK\n", Title()));
+
+			int32 look;
+			if (link.Read<int32>(&look) != B_OK) {
+				fLink.StartMessage(B_ERROR);
+				fLink.Flush();
+				break;
+			}
+
+			// TODO: filter out invalid looks
+
+			if (!fWindowLayer->IsOffscreenWindow())
+				fDesktop->SetWindowLook(fWindowLayer, (window_look)look);
+
+			fLink.StartMessage(B_OK);
+			fLink.Flush();
 			break;
 		}
 		case AS_SET_FEEL:
 		{
-			STRACE(("ServerWindow %s: Message AS_SET_FEEL\n", Title()));
-			int32 newFeel;
-			link.Read<int32>(&newFeel);
+			STRACE(("ServerWindow %s: Message AS_SET_LOOK\n", Title()));
 
-			fWindowLayer->GetRootLayer()->ChangeWindowLayerFeel(winLayer, newFeel);
-			break;
+			status_t status = B_ERROR;
+			int32 feel;
+			if (link.Read<int32>(&feel) == B_OK) {
+				// test if "feel" is valid
+				status = (feel == B_NORMAL_WINDOW_FEEL
+						|| feel == B_MODAL_SUBSET_WINDOW_FEEL
+						|| feel == B_MODAL_APP_WINDOW_FEEL
+						|| feel == B_MODAL_ALL_WINDOW_FEEL
+						|| feel == B_FLOATING_SUBSET_WINDOW_FEEL
+						|| feel == B_FLOATING_APP_WINDOW_FEEL
+						|| feel == B_FLOATING_ALL_WINDOW_FEEL
+						|| feel == kDesktopWindowFeel
+						|| feel == kMenuWindowFeel
+						|| feel == kWindowScreenFeel)
+					? B_BAD_VALUE : B_OK;
+			}
+
+			if (status == B_OK && !fWindowLayer->IsOffscreenWindow())
+				fDesktop->SetWindowFeel(fWindowLayer, (window_feel)feel);
+
+			fLink.StartMessage(status);
+			fLink.Flush();
 		}
+		case AS_SET_FLAGS:
+		{
+			STRACE(("ServerWindow %s: Message AS_SET_LOOK\n", Title()));
+
+			uint32 flags;
+			if (link.Read<uint32>(&flags) != B_OK) {
+				fLink.StartMessage(B_ERROR);
+				fLink.Flush();
+				break;
+			}
+
+			// TODO: filter out invalid flags
+
+			if (!fWindowLayer->IsOffscreenWindow())
+				fDesktop->SetWindowFlags(fWindowLayer, flags);
+
+			fLink.StartMessage(B_OK);
+			fLink.Flush();
+		}
+#if 0
 		case AS_SET_ALIGNMENT:
 		{
 			// TODO: Implement AS_SET_ALIGNMENT

@@ -87,8 +87,9 @@ class RootLayer : public Layer {
 		void				ActivateWindow(WindowLayer* window);
 		void				SendBehindWindow(WindowLayer* window, WindowLayer* front);
 
-		void				SetWindowLayerFeel(WindowLayer *windowLayer, int32 newFeel);
-		void				SetWindowLayerLook(WindowLayer *windowLayer, int32 newLook);
+		void				SetWindowLook(WindowLayer *window, window_look newLook);
+		void				SetWindowFeel(WindowLayer *window, window_feel newFeel);
+		void				SetWindowFlags(WindowLayer *window, uint32 newFlags);
 
 		void				UpdateWorkspaces();
 

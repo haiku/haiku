@@ -757,16 +757,23 @@ Desktop::RemoveWindow(WindowLayer *window)
 
 
 void
-Desktop::SetWindowFeel(WindowLayer *window, uint32 feel)
+Desktop::SetWindowLook(WindowLayer *window, window_look look)
 {
-	// TODO: implement
+	fRootLayer->SetWindowLook(window, look);
 }
 
 
 void
-Desktop::SetWindowLook(WindowLayer *window, uint32 look)
+Desktop::SetWindowFeel(WindowLayer *window, window_feel feel)
 {
-	// TODO: implement
+	fRootLayer->SetWindowFeel(window, feel);
+}
+
+
+void
+Desktop::SetWindowFlags(WindowLayer *window, uint32 flags)
+{
+	fRootLayer->SetWindowFlags(window, flags);
 }
 
 

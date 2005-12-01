@@ -27,6 +27,7 @@
 #include <Menu.h>
 #include <Autolock.h>
 #include <ObjectList.h>
+#include <Window.h>
 
 
 class BMessage;
@@ -99,10 +100,12 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		void					SetWindowWorkspaces(WindowLayer* window,
 									uint32 workspaces);
 
-		void					AddWindow(WindowLayer *window);
-		void					RemoveWindow(WindowLayer *window);
-		void					SetWindowFeel(WindowLayer *window, uint32 feel);
-		void					SetWindowLook(WindowLayer *window, uint32 look);
+		void					AddWindow(WindowLayer* window);
+		void					RemoveWindow(WindowLayer* window);
+
+		void					SetWindowLook(WindowLayer* window, window_look look);
+		void					SetWindowFeel(WindowLayer* window, window_feel feel);
+		void					SetWindowFlags(WindowLayer* window, uint32 flags);
 
 		WindowLayer*			FindWindowLayerByClientToken(int32 token, team_id teamID);
 		//WindowLayer*			FindWindowLayerByServerToken(int32 token);

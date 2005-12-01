@@ -531,8 +531,6 @@ RootLayer::MoveWindowBy(WindowLayer* window, float x, float y)
 
 	// TODO: the MoveBy() should just return a dirty region
 	window->MoveBy(x, y);
-	if (window->Parent() == NULL)
-		return;
 
 	BRegion changed;
 	_WindowsChanged(changed);
@@ -551,8 +549,6 @@ RootLayer::ResizeWindowBy(WindowLayer* window, float x, float y)
 
 	// TODO: the MoveBy() should just return a dirty region
 	window->ResizeBy(x, y);
-	if (window->Parent() == NULL)
-		return;
 
 	BRegion changed;
 	_WindowsChanged(changed);
@@ -565,20 +561,47 @@ RootLayer::ResizeWindowBy(WindowLayer* window, float x, float y)
 
 
 void
-RootLayer::SetWindowLayerFeel(WindowLayer *windowLayer, int32 newFeel)
+RootLayer::SetWindowLook(WindowLayer *window, window_look newLook)
 {
 	BAutolock _(fAllRegionsLock);
 
-	// TODO
+	BRegion changed;
+	window->SetLook(newLook, window->Parent() ? &changed : NULL);
+
+	_WindowsChanged(changed);
+
+	if (changed.CountRects() > 0) {
+		MarkForRedraw(changed);
+		TriggerRedraw();
+	}
 }
 
 
 void
-RootLayer::SetWindowLayerLook(WindowLayer *windowLayer, int32 newLook)
+RootLayer::SetWindowFeel(WindowLayer *window, window_feel newFeel)
 {
 	BAutolock _(fAllRegionsLock);
 
-	// TODO
+	window->SetFeel(newFeel);
+
+	// TODO: implement window feels!
+}
+
+
+void
+RootLayer::SetWindowFlags(WindowLayer *window, uint32 newFlags)
+{
+	BAutolock _(fAllRegionsLock);
+
+	BRegion changed;
+	window->SetWindowFlags(newFlags, window->Parent() ? &changed : NULL);
+
+	_WindowsChanged(changed);
+
+	if (changed.CountRects() > 0) {
+		MarkForRedraw(changed);
+		TriggerRedraw();
+	}
 }
 
 

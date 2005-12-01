@@ -93,6 +93,10 @@ class WindowLayer : public Layer {
 			window_feel			Feel() const { return fFeel; }
 			uint32				WindowFlags() const { return fWindowFlags; }
 
+			void				SetLook(window_look look, BRegion* updateRegion);
+			void				SetFeel(window_feel feel);
+			void				SetWindowFlags(uint32 flags, BRegion* updateRegion);
+
 			uint32				Workspaces() const { return fWorkspaces; }
 			void				SetWorkspaces(uint32 workspaces)
 									{ fWorkspaces = workspaces; }
@@ -106,9 +110,6 @@ class WindowLayer : public Layer {
 			float				TabLocation() const;
 
 			void				HighlightDecorator(bool active);
-
-			void				SetFeel(window_feel feel);
-			void				SetLook(window_look look);
 
 			SubWindowList		fSubWindowList;
 
