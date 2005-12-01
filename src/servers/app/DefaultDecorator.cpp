@@ -136,6 +136,23 @@ DefaultDecorator::SetLook(DesktopSettings& settings,
 void
 DefaultDecorator::SetFlags(uint32 flags, BRegion* updateRegion)
 {
+	// TODO: we could be much smarter about the update region
+
+	// get previous extent
+	if (updateRegion != NULL) {
+		BRegion extent;
+		GetFootprint(&extent);
+		updateRegion->Include(&extent);
+	}
+
+	Decorator::SetFlags(flags, updateRegion);
+	_DoLayout();
+
+	if (updateRegion != NULL) {
+		BRegion extent;
+		GetFootprint(&extent);
+		updateRegion->Include(&extent);
+	}
 }
 
 

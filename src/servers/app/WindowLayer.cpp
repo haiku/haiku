@@ -725,7 +725,16 @@ WindowLayer::SetFeel(window_feel feel)
 void
 WindowLayer::SetWindowFlags(uint32 flags, BRegion* updateRegion)
 {
-	// TODO: implement settings window flags
+	fWindowFlags = flags;
+
+	if (fDecorator == NULL)
+		return;
+
+	fDecorator->SetFlags(flags, updateRegion);
+	fRebuildDecRegion = true;
+
+	// TODO: we might need to resize the window!
+	//fDecorator->GetSizeLimits(&fMinWidth, &fMinHeight, &fMaxWidth, &fMaxHeight);
 }
 
 
