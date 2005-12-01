@@ -165,8 +165,13 @@ RootLayer::_SetFocus(WindowLayer* focus, BRegion& update)
 {
 	// TODO: test for FFM and B_LOCK_WINDOW_FOCUS
 
-	if (focus == fFocus)
+	if (focus == fFocus && (focus->WindowFlags() & B_AVOID_FOCUS) == 0)
 		return true;
+
+	// make sure no window is chosen that doesn't want focus
+	while (focus != NULL && (focus->WindowFlags() & B_AVOID_FOCUS) != 0) {
+		focus = (WindowLayer*)focus->PreviousLayer();
+	}
 
 	if (fFocus != NULL) {
 		update.Include(&fFocus->VisibleRegion());
@@ -507,7 +512,7 @@ RootLayer::ShowWindowLayer(WindowLayer* windowLayer, bool toFront)
 
 	// TODO: if this window has any floating windows, remove them here
 
-	// TODO: support FFM and B_AVOID_FOCUS
+	// TODO: support FFM
 	if (Front() == windowLayer || Focus() == NULL)
 		_SetFocus(windowLayer, changed);
 	_WindowsChanged(changed);

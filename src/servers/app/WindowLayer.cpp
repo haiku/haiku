@@ -462,7 +462,7 @@ WindowLayer::MouseDown(BMessage *msg, BPoint where, int32* _viewToken)
 			if (desktopSettings.MouseMode() == B_NORMAL_MOUSE)
 				desktop->ActivateWindow(this);
 
-			if ((WindowFlags() & B_WILL_ACCEPT_FIRST_CLICK) == 0)
+			if ((WindowFlags() & (B_WILL_ACCEPT_FIRST_CLICK | B_AVOID_FOCUS)) == 0)
 				return;
 		}
 
