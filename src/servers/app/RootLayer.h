@@ -57,6 +57,9 @@ class RootLayer : public Layer {
 		void				HideWindowLayer(WindowLayer* windowLayer);
 		void				ShowWindowLayer(WindowLayer* windowLayer, bool toFront = true);
 
+		void				MoveWindowBy(WindowLayer* window, float x, float y);
+		void				ResizeWindowBy(WindowLayer* window, float x, float y);
+
 		bool				SetFocus(WindowLayer* focus);
 		WindowLayer*		Focus() const { return fFocus; }
 		WindowLayer*		Front() const { return fFront; }

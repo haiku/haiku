@@ -93,6 +93,9 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		void					ShowWindow(WindowLayer* window);
 		void					HideWindow(WindowLayer* window);
 
+		void					MoveWindowBy(WindowLayer* window, float x, float y);
+		void					ResizeWindowBy(WindowLayer* window, float x, float y);
+
 		void					SetWindowWorkspaces(WindowLayer* window,
 									uint32 workspaces);
 

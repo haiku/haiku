@@ -663,6 +663,20 @@ Desktop::HideWindow(WindowLayer* window)
 }
 
 
+void
+Desktop::MoveWindowBy(WindowLayer* window, float x, float y)
+{
+	fRootLayer->MoveWindowBy(window, x, y);
+}
+
+
+void
+Desktop::ResizeWindowBy(WindowLayer* window, float x, float y)
+{
+	fRootLayer->ResizeWindowBy(window, x, y);
+}
+
+
 /*!
 	\brief Adds or removes the window to or from the workspaces it's on.
 */

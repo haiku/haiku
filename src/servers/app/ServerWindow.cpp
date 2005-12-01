@@ -1373,26 +1373,24 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			float xResizeBy;
 			float yResizeBy;
-			
 			link.Read<float>(&xResizeBy);
 			link.Read<float>(&yResizeBy);
 
 			STRACE(("ServerWindow %s: Message AS_WINDOW_RESIZE %.1f, %.1f\n", Title(), xResizeBy, yResizeBy));
-			
-			fWindowLayer->ResizeBy(xResizeBy, yResizeBy);
+
+			fDesktop->ResizeWindowBy(fWindowLayer, xResizeBy, yResizeBy);
 			break;
 		}
 		case AS_WINDOW_MOVE:
 		{
 			float xMoveBy;
 			float yMoveBy;
-			
 			link.Read<float>(&xMoveBy);
 			link.Read<float>(&yMoveBy);
 
 			STRACE(("ServerWindow %s: Message AS_WINDOW_MOVE: %.1f, %.1f\n", Title(), xMoveBy, yMoveBy));
 
-			fWindowLayer->MoveBy(xMoveBy, yMoveBy);
+			fDesktop->MoveWindowBy(fWindowLayer, xMoveBy, yMoveBy);
 			break;
 		}
 		case AS_SET_SIZE_LIMITS:
@@ -1402,17 +1400,19 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// 2) float maximum width
 			// 3) float minimum height
 			// 4) float maximum height
-			
+
 			float minWidth;
 			float maxWidth;
 			float minHeight;
 			float maxHeight;
-			
+
 			link.Read<float>(&minWidth);
 			link.Read<float>(&maxWidth);
 			link.Read<float>(&minHeight);
 			link.Read<float>(&maxHeight);
-			
+
+			// TODO: setting size limits can change the window size, and therefore,
+			//	it should be done by the Desktop class as well.
 			fWindowLayer->SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
 
 			// and now, sync the client to the limits that we were able to enforce

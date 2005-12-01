@@ -520,6 +520,46 @@ RootLayer::ShowWindowLayer(WindowLayer* windowLayer, bool toFront)
 
 
 void
+RootLayer::MoveWindowBy(WindowLayer* window, float x, float y)
+{
+	BAutolock _(fAllRegionsLock);
+
+	// TODO: the MoveBy() should just return a dirty region
+	window->MoveBy(x, y);
+	if (window->Parent() == NULL)
+		return;
+
+	BRegion changed;
+	_WindowsChanged(changed);
+
+	if (changed.CountRects() > 0) {
+		MarkForRedraw(changed);
+		TriggerRedraw();
+	}
+}
+
+
+void
+RootLayer::ResizeWindowBy(WindowLayer* window, float x, float y)
+{
+	BAutolock _(fAllRegionsLock);
+
+	// TODO: the MoveBy() should just return a dirty region
+	window->ResizeBy(x, y);
+	if (window->Parent() == NULL)
+		return;
+
+	BRegion changed;
+	_WindowsChanged(changed);
+
+	if (changed.CountRects() > 0) {
+		MarkForRedraw(changed);
+		TriggerRedraw();
+	}
+}
+
+
+void
 RootLayer::SetWindowLayerFeel(WindowLayer *windowLayer, int32 newFeel)
 {
 	BAutolock _(fAllRegionsLock);

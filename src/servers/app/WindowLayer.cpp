@@ -543,11 +543,11 @@ WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken)
 
 	if (fIsDragging) {
 		BPoint delta = where - fLastMousePosition;
-		MoveBy(delta.x, delta.y);
+		Window()->Desktop()->MoveWindowBy(this, delta.x, delta.y);
 	}
 	if (fIsResizing) {
 		BPoint delta = where - fLastMousePosition;
-		ResizeBy(delta.x, delta.y);
+		Window()->Desktop()->ResizeWindowBy(this, delta.x, delta.y);
 	}
 	if (fIsSlidingTab) {
 		// TODO: implement
@@ -556,7 +556,7 @@ WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken)
 	fLastMousePosition = where;
 
 	// change focus in FFM mode
-	Desktop* desktop = Window()->App()->GetDesktop();
+	Desktop* desktop = Window()->Desktop();
 	DesktopSettings desktopSettings(desktop);
 
 	if (desktopSettings.MouseMode() != B_NORMAL_MOUSE && !IsFocus())
