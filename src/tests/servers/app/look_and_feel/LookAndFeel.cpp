@@ -114,7 +114,9 @@ Window::Window(BRect frame, window_look look, window_feel feel)
 
 	rect.OffsetBy(0, menuField->Bounds().Height() + 10);
 	BButton* button = new BButton(rect, "normal", "Add Normal Window",
-		AddWindowMessage(B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL));
+		AddWindowMessage(B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL),
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+		B_WILL_DRAW | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE);
 	float width, height;
 	button->GetPreferredSize(&width, &height);
 	button->ResizeTo(rect.Width(), height);
@@ -125,17 +127,23 @@ Window::Window(BRect frame, window_look look, window_feel feel)
 	rect = button->Frame();
 	rect.OffsetBy(0, rect.Height() + 5);
 	button = new BButton(rect, "modal_subset", "Add Modal Subset",
-		AddWindowMessage(B_MODAL_WINDOW_LOOK, B_MODAL_SUBSET_WINDOW_FEEL));
+		AddWindowMessage(B_MODAL_WINDOW_LOOK, B_MODAL_SUBSET_WINDOW_FEEL),
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+		B_WILL_DRAW | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE);
 	view->AddChild(button);
 
 	rect.OffsetBy(0, rect.Height() + 5);
 	button = new BButton(rect, "app_modal", "Add Application Modal",
-		AddWindowMessage(B_MODAL_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL));
+		AddWindowMessage(B_MODAL_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL),
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+		B_WILL_DRAW | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE);
 	view->AddChild(button);
 
 	rect.OffsetBy(0, rect.Height() + 5);
 	button = new BButton(rect, "all_modal", "Add All Modal",
-		AddWindowMessage(B_MODAL_WINDOW_LOOK, B_MODAL_ALL_WINDOW_FEEL));
+		AddWindowMessage(B_MODAL_WINDOW_LOOK, B_MODAL_ALL_WINDOW_FEEL),
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+		B_WILL_DRAW | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE);
 	view->AddChild(button);
 
 	// floating
@@ -143,27 +151,36 @@ Window::Window(BRect frame, window_look look, window_feel feel)
 	rect = button->Frame();
 	rect.OffsetBy(0, rect.Height() + 5);
 	button = new BButton(rect, "floating_subset", "Add Floating Subset",
-		AddWindowMessage(B_FLOATING_WINDOW_LOOK, B_FLOATING_SUBSET_WINDOW_FEEL));
+		AddWindowMessage(B_FLOATING_WINDOW_LOOK, B_FLOATING_SUBSET_WINDOW_FEEL),
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+		B_WILL_DRAW | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE);
 	view->AddChild(button);
 
 	rect.OffsetBy(0, rect.Height() + 5);
 	button = new BButton(rect, "app_floating", "Add Application Floating",
-		AddWindowMessage(B_FLOATING_WINDOW_LOOK, B_FLOATING_APP_WINDOW_FEEL));
+		AddWindowMessage(B_FLOATING_WINDOW_LOOK, B_FLOATING_APP_WINDOW_FEEL),
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+		B_WILL_DRAW | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE);
 	view->AddChild(button);
 
 	rect.OffsetBy(0, rect.Height() + 5);
 	button = new BButton(rect, "all_floating", "Add All Floating",
-		AddWindowMessage(B_FLOATING_WINDOW_LOOK, B_FLOATING_ALL_WINDOW_FEEL));
+		AddWindowMessage(B_FLOATING_WINDOW_LOOK, B_FLOATING_ALL_WINDOW_FEEL),
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+		B_WILL_DRAW | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE);
 	view->AddChild(button);
 
 	// close
 
 	rect.OffsetBy(0, rect.Height() + 15);
 	button = new BButton(rect, "close", "Close Window",
-		new BMessage(B_QUIT_REQUESTED));
+		new BMessage(B_QUIT_REQUESTED), B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+		B_WILL_DRAW | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE);
 	button->ResizeToPreferred();
 	button->MoveTo((rect.Width() - button->Bounds().Width()) / 2, rect.top);
 	view->AddChild(button);
+
+	ResizeTo(Bounds().Width(), button->Frame().bottom + 10);
 }
 
 
