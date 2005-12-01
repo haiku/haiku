@@ -143,6 +143,7 @@ SubInclude HAIKU_TOP src tests servers app code_to_name ;
 SubInclude HAIKU_TOP src tests servers app copy_bits ;
 SubInclude HAIKU_TOP src tests servers app desktop_window ;
 SubInclude HAIKU_TOP src tests servers app event_mask ;
+SubInclude HAIKU_TOP src tests servers app look_and_feel ;
 SubInclude HAIKU_TOP src tests servers app painter ;
 SubInclude HAIKU_TOP src tests servers app playground ;
 SubInclude HAIKU_TOP src tests servers app resize_limits ;
