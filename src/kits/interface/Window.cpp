@@ -1618,10 +1618,8 @@ BWindow::SetLook(window_look look)
 	fLink->Attach<int32>((int32)look);
 
 	status_t status = B_ERROR;
-	if (fLink->FlushWithReply(status) == B_OK && status == B_OK) {
+	if (fLink->FlushWithReply(status) == B_OK && status == B_OK)
 		fLook = look;
-		return B_OK;
-	}
 
 	return status;
 }
@@ -1637,26 +1635,16 @@ BWindow::Look() const
 status_t
 BWindow::SetFeel(window_feel feel)
 {
-	// ToDo: that should probably be done by the server, not the window
-	if (feel != B_NORMAL_WINDOW_FEEL
-		&& feel != B_MODAL_SUBSET_WINDOW_FEEL
-		&& feel != B_MODAL_APP_WINDOW_FEEL
-		&& feel != B_MODAL_ALL_WINDOW_FEEL
-		&& feel != B_FLOATING_SUBSET_WINDOW_FEEL
-		&& feel != B_FLOATING_APP_WINDOW_FEEL
-		&& feel != B_FLOATING_ALL_WINDOW_FEEL)
-		return B_BAD_VALUE;
+	BAutolock locker(this);
 
-	Lock();
 	fLink->StartMessage(AS_SET_FEEL);
 	fLink->Attach<int32>((int32)feel);
-	fLink->Flush();
-	Unlock();
 
-	// ToDo: return code from server?
-	fFeel = feel;
+	status_t status = B_ERROR;
+	if (fLink->FlushWithReply(status) == B_OK && status == B_OK)
+		fFeel = feel;
 
-	return B_OK;
+	return status;
 }
 
 
@@ -1670,7 +1658,7 @@ BWindow::Feel() const
 status_t
 BWindow::SetFlags(uint32 flags)
 {
-	Lock();
+	BAutolock locker(this);
 
 	fLink->StartMessage(AS_SET_FLAGS);
 	fLink->Attach<uint32>(flags);
@@ -1678,8 +1666,6 @@ BWindow::SetFlags(uint32 flags)
 	int32 status = B_ERROR;
 	if (fLink->FlushWithReply(status) == B_OK && status == B_OK)
 		fFlags = flags;
-
-	Unlock();
 
 	return status;
 }
