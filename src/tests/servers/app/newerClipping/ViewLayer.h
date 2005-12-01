@@ -50,6 +50,9 @@ class ViewLayer {
 			uint32			CountChildren(bool deep = false) const;
 			void			CollectTokensForChildren(BList* tokenMap) const;
 
+			ViewLayer*		ViewAt(const BPoint& where,
+								   BRegion* windowContentClipping);
+
 			// coordinate conversion
 			void			ConvertToParent(BPoint* point) const;
 			void			ConvertToParent(BRect* rect) const;

@@ -3,8 +3,8 @@
 #define CLIENT_LOOPER_H
 
 #include <Looper.h>
-#include <MessageRunner.h>
 
+class BMessageRunner;
 class WindowLayer;
 
 enum {

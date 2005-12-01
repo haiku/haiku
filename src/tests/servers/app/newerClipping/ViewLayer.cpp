@@ -258,6 +258,24 @@ ViewLayer::CollectTokensForChildren(BList* tokenMap) const
 	}
 }
 
+// ViewAt
+ViewLayer*
+ViewLayer::ViewAt(const BPoint& where, BRegion* windowContentClipping)
+{
+	if (!fVisible)
+		return NULL;
+
+	if (ScreenClipping(windowContentClipping).Contains(where))
+		return this;
+
+	for (ViewLayer* child = FirstChild(); child; child = NextChild()) {
+		ViewLayer* layer = child->ViewAt(where, windowContentClipping);
+		if (layer)
+			return layer;
+	}
+	return NULL;
+}
+
 // ConvertToParent
 void
 ViewLayer::ConvertToParent(BPoint* point) const
@@ -549,12 +567,43 @@ ViewLayer::ParentResized(int32 x, int32 y, BRegion* dirtyRegion)
 void
 ViewLayer::ScrollBy(int32 x, int32 y, BRegion* dirtyRegion)
 {
+	// blitting version, invalidates
+	// old contents
+
+	// remember old bounds for tracking dirty region
+	BRect oldBounds(Bounds());
+	// find the area of the view that can be scrolled,
+	// contents are shifted in the opposite direction from scrolling
+	BRect stillVisibleBounds(oldBounds);
+	stillVisibleBounds.OffsetBy(x, y);
+
+	// NOTE: using ConvertToVisibleInTopView()
+	// instead of ConvertToTop(), this makes
+	// sure we don't try to move or invalidate an
+	// area hidden underneath the parent view
+	ConvertToVisibleInTopView(&oldBounds);
+	ConvertToVisibleInTopView(&stillVisibleBounds);
+
 	fScrollingOffset.x += x;
 	fScrollingOffset.y += y;
-	// TODO: CopyRegion...
-	// TODO: ...
 
+	// do the blit, this will make sure
+	// that other more complex dirty regions
+	// are taken care of
+	BRegion copyRegion(stillVisibleBounds);
+	fWindow->CopyContents(&copyRegion, -x, -y);
+
+	// find the dirty region as far as we are
+	// concerned
+	BRegion dirty(oldBounds);
+	stillVisibleBounds.OffsetBy(-x, -y);
+	dirty.Exclude(stillVisibleBounds);
+	dirtyRegion->Include(&dirty);
+
+	// the screen clipping of this view and it's
+	// childs is no longer valid
 	InvalidateScreenClipping(true);
+	RebuildClipping(false);
 }
 
 // #pragma mark -
@@ -572,8 +621,6 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 	if (drawingEngine->Lock()) {
 		// fill visible region with white
 		drawingEngine->SetHighColor(255, 255, 255);
-		BRect b(Bounds());
-		ConvertToTop(&b);
 		drawingEngine->FillRegion(&redraw);
 
 		drawingEngine->MarkDirty(&redraw);

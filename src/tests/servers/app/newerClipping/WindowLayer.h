@@ -77,7 +77,11 @@ class WindowLayer : public BLooper {
 			void					MoveBy(int32 x, int32 y);
 			void					ResizeBy(int32 x, int32 y, BRegion* dirtyRegion);
 
+			void					ScrollViewBy(ViewLayer* view, int32 dx, int32 dy);
+
 			void					AddChild(ViewLayer* layer);
+
+			ViewLayer*				ViewAt(const BPoint& where);
 
 			void					SetHidden(bool hidden);
 	inline	bool					IsHidden() const

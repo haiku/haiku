@@ -21,6 +21,7 @@
 #endif
 
 class WindowLayer;
+class ViewLayer;
 
 enum {
 	MSG_ADD_WINDOW		= 'addw',
@@ -100,14 +101,13 @@ private:
 			bool				fTracking;
 			BPoint				fLastMousePos;
 			WindowLayer*		fClickedWindow;
+			ViewLayer*			fScrollingView;
 			bool				fResizing;
 			bigtime_t			fClickTime;
 			bool				fIs2ndButton;
 
 #if MULTI_LOCKER
 			MultiLocker			fClippingLock;
-#elif RW_LOCKER
-			RWLocker			fClippingLock;
 #else
 			BLocker				fClippingLock;
 #endif

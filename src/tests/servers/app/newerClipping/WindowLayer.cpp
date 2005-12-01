@@ -321,6 +321,30 @@ WindowLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 	fTopLayer->ResizeBy(x, y, dirtyRegion);
 }
 
+// ScrollViewBy
+void
+WindowLayer::ScrollViewBy(ViewLayer* view, int32 dx, int32 dy)
+{
+	// this can be executed from any thread, but if the
+	// desktop thread is executing this, it should have
+	// the write lock, otherwise it is not prevented
+	// from executing this at the same time as the window
+	// is doing something else here!
+
+	if (!view || (dx == 0 && dy == 0))
+		return;
+
+	if (fDesktop && fDesktop->ReadLockClipping()) {
+
+		BRegion dirty;
+		view->ScrollBy(dx, dy, &dirty);
+
+		_MarkContentDirty(&dirty);
+
+		fDesktop->ReadUnlockClipping();
+	}
+}
+
 // AddChild
 void
 WindowLayer::AddChild(ViewLayer* layer)
@@ -338,11 +362,21 @@ WindowLayer::AddChild(ViewLayer* layer)
 	// TODO: trigger redraw for dirty regions
 }
 
+// ViewAt
+ViewLayer*
+WindowLayer::ViewAt(const BPoint& where)
+{
+	if (!fContentRegionValid)
+		_UpdateContentRegion();
+
+	return fTopLayer->ViewAt(where, &fContentRegion);
+}
+
+// SetHidden
 void
 WindowLayer::SetHidden(bool hidden)
 {
-	// the desktop takes care of
-	// dirty regions
+	// the desktop takes care of dirty regions
 	if (fHidden != hidden) {
 		fHidden = hidden;
 
@@ -618,7 +652,7 @@ WindowLayer::_DrawClientPolygon(int32 token, BPoint polygon[4])
 				// enforce the dirty region of the update session
 				fEffectiveDrawingRegion.IntersectWith(&fCurrentUpdateSession.DirtyRegion());
 			} else {
-				printf("%s - _DrawClient(token: %ld) - not in update\n", Name(), token);
+				printf("%s - _DrawClientPolygon(token: %ld) - not in update\n", Name(), token);
 			}
 			fEffectiveDrawingRegionValid = true;
 		}

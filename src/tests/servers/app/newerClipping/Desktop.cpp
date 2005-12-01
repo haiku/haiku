@@ -18,6 +18,7 @@ Desktop::Desktop(DrawView* drawView)
 	  fTracking(false),
 	  fLastMousePos(-1.0, -1.0),
 	  fClickedWindow(NULL),
+	  fScrollingView(NULL),
 	  fResizing(false),
 	  fIs2ndButton(false),
 
@@ -90,7 +91,9 @@ Desktop::MouseDown(BPoint where, uint32 buttons, int32 clicks)
 	if (buttons == B_PRIMARY_MOUSE_BUTTON) {
 		fTracking = true;
 		if (fClickedWindow) {
-			if (clicks >= 2) {
+			if (modifiers() & B_SHIFT_KEY) {
+				fScrollingView = fClickedWindow->ViewAt(where);
+			} else if (clicks >= 2) {
 				HideWindow(fClickedWindow);
 				fClickedWindow = NULL;
 			} else {
@@ -132,6 +135,7 @@ Desktop::MouseUp(BPoint where)
 	fTracking = false;
 	fIs2ndButton = false;
 	fClickedWindow = NULL;
+	fScrollingView = NULL;
 }
 
 // MouseMoved
@@ -149,8 +153,13 @@ Desktop::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 
 		if (dx != 0 || dy != 0) {
 			if (fClickedWindow) {
+				if (fScrollingView) {
+					if (LockClipping()) {
+						fClickedWindow->ScrollViewBy(fScrollingView, -dx, -dy);
+						UnlockClipping();
+					}
+				} else if (fResizing) {
 //bigtime_t now = system_time();
-				if (fResizing) {
 					ResizeWindowBy(fClickedWindow, dx, dy);
 //printf("resizing: %lld\n", system_time() - now);
 				} else {
