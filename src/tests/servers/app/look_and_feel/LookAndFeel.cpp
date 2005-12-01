@@ -7,6 +7,7 @@
  */
 
 
+#include <Alert.h>
 #include <Application.h>
 #include <Button.h>
 #include <MenuField.h>
@@ -16,6 +17,7 @@
 #include <Window.h>
 
 #include <stdio.h>
+#include <string.h>
 
 
 const uint32 kMsgUpdateLook = 'uplk';
@@ -218,8 +220,18 @@ Window::MessageReceived(BMessage* message)
 			BWindow* window = new Window(Frame().OffsetByCopy(20, 20),
 				(window_look)look, (window_feel)feel);
 
-			if (message->what == kMsgAddSubsetWindow)
-				window->AddToSubset(this);
+			if (message->what == kMsgAddSubsetWindow) {
+				status_t status = window->AddToSubset(this);
+				if (status != B_OK) {
+					char text[512];
+					snprintf(text, sizeof(text),
+						"Window could not be added to subset:\n\n\%s", strerror(status));
+					(new BAlert("Alert", text, "Ok"))->Go(NULL);
+
+					delete window;
+					break;
+				}
+			}
 
 			window->Show();
 			break;
@@ -237,7 +249,7 @@ Window::QuitRequested()
 	if (!IsModal() && !IsFloating())
 		gNormalWindowCount--;
 
-	if (gNormalWindowCount < 2)
+	if (gNormalWindowCount < 1)
 		be_app->PostMessage(B_QUIT_REQUESTED);
 
 	return true;
