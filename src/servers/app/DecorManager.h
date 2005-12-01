@@ -27,8 +27,8 @@ class DecorManager : public BLocker {
 		void		RescanDecorators();
 
 		Decorator*	AllocateDecorator(Desktop* desktop, BRect rect,
-						const char *title, int32 look, int32 feel,
-						int32 flags);
+						const char *title, window_look look,
+						uint32 flags);
 
 		int32		CountDecorators() const;
 

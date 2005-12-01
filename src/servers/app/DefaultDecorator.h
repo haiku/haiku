@@ -19,10 +19,13 @@ class Desktop;
 class DefaultDecorator: public Decorator {
 public:
 							DefaultDecorator(DesktopSettings& settings, BRect frame,
-								int32 look, int32 feel, int32 flags);
+								window_look look, uint32 flags);
 	virtual					~DefaultDecorator();
 
 	virtual	void			SetTitle(const char* string, BRegion* updateRegion = NULL);
+	virtual void			SetLook(DesktopSettings& settings,
+								window_look look, BRegion* updateRegion = NULL);
+	virtual void			SetFlags(uint32 flags, BRegion* updateRegion = NULL);
 
 	virtual	void			MoveBy(float x, float y);
 	virtual	void			MoveBy(BPoint pt);

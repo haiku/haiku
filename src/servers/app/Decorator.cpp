@@ -28,31 +28,32 @@
 	Does general initialization of internal data members and creates a colorset
 	object. 
 */
-Decorator::Decorator(DesktopSettings& settings, BRect rect, int32 look,
-	int32 feel, int32 flags)
-	: _colors(new ColorSet()),
-	  _driver(NULL),
-	  fDrawState(),
+Decorator::Decorator(DesktopSettings& settings, BRect rect,
+		window_look look, uint32 flags)
+	:
+	_colors(new ColorSet()),
+	_driver(NULL),
+	fDrawState(),
 
-	  _look(look),
-	  _feel(feel),
-	  _flags(flags),
+	fLook(look),
+	fFlags(flags),
 
-	  _zoomrect(),
-	  _closerect(),
-	  _minimizerect(),
-	  _tabrect(),
-	  _frame(rect),
-	  _resizerect(),
-	  _borderrect(),
+	_zoomrect(),
+	_closerect(),
+	_minimizerect(),
+	_tabrect(),
+	_frame(rect),
+	_resizerect(),
+	_borderrect(),
 
-	  fClosePressed(false),
-	  fZoomPressed(false),
-	  fMinimizePressed(false),
-	  fIsFocused(false),
-	  fTitle("")
+	fClosePressed(false),
+	fZoomPressed(false),
+	fMinimizePressed(false),
+	fIsFocused(false),
+	fTitle("")
 {
 }
+
 
 /*!
 	\brief Destructor
@@ -64,6 +65,7 @@ Decorator::~Decorator()
 	delete _colors;
 }
 
+
 /*!
 	\brief Updates the decorator's color set
 	\param cset The color set to update from
@@ -74,6 +76,7 @@ Decorator::SetColors(const ColorSet &cset)
 	_colors->SetColors(cset);
 	_SetColors();
 }
+
 
 /*!
 	\brief Assigns a display driver to the decorator
@@ -90,31 +93,20 @@ Decorator::SetDriver(DrawingEngine *driver)
 	}
 }
 
-/*!
-	\brief Sets the decorator's window flags
-	\param wflags New value for the flags
-	
-	While this call will not update the screen, it will affect how future
-	updates work and immediately affects input handling.
-*/
-void
-Decorator::SetFlags(int32 wflags)
-{
-	_flags = wflags;
-}
 
 /*!
-	\brief Sets the decorator's window feel
-	\param wflags New value for the feel
-	
+	\brief Sets the decorator's window flags
+	\param flags New value for the flags
+
 	While this call will not update the screen, it will affect how future
 	updates work and immediately affects input handling.
 */
 void
-Decorator::SetFeel(int32 wfeel)
+Decorator::SetFlags(uint32 flags, BRegion* updateRegion)
 {
-	_feel = wfeel;
+	fFlags = flags;
 }
+
 
 /*
 	\brief Sets the decorator's font
@@ -123,24 +115,22 @@ Decorator::SetFeel(int32 wfeel)
 void
 Decorator::SetFont(ServerFont *font)
 {
-	if (font) {
+	if (font)
 		fDrawState.SetFont(*font);
-	}
 }
+
 
 /*!
 	\brief Sets the decorator's window look
-	\param wflags New value for the look
-	
-	While this call will not update the screen, it will affect how future
-	updates work and immediately affects input handling.
+	\param look New value for the look
 */
 void
-Decorator::SetLook(int32 wlook)
+Decorator::SetLook(DesktopSettings& settings, window_look look,
+	BRegion* updateRect)
 {
-	_look = wlook;
-	// TODO: relayout and redraw, no?
+	fLook = look;
 }
+
 
 /*!
 	\brief Sets the close button's value.
@@ -208,60 +198,52 @@ Decorator::SetTitle(const char* string, BRegion* updateRegion)
 	\brief Returns the decorator's window look
 	\return the decorator's window look
 */
-int32
-Decorator::GetLook() const
+window_look
+Decorator::Look() const
 {
-	return _look;
+	return fLook;
 }
 
-/*!
-	\brief Returns the decorator's window feel
-	\return the decorator's window feel
-*/
-int32
-Decorator::GetFeel() const
-{
-	return _feel;
-}
 
 /*!
 	\brief Returns the decorator's window flags
 	\return the decorator's window flags
 */
-int32
-Decorator::GetFlags() const
+uint32
+Decorator::Flags() const
 {
-	return _flags;
+	return fFlags;
 }
+
 
 /*!
 	\brief Returns the decorator's title
 	\return the decorator's title
 */
 const char*
-Decorator::GetTitle() const
+Decorator::Title() const
 {
 	return fTitle.String();
 }
+
 
 /*!
 	\brief Returns the decorator's border rectangle
 	\return the decorator's border rectangle
 */
-
 BRect
-Decorator::GetBorderRect() const
+Decorator::BorderRect() const
 {
 	return _borderrect;
 }
+
 
 /*!
 	\brief Returns the decorator's tab rectangle
 	\return the decorator's tab rectangle
 */
-
 BRect
-Decorator::GetTabRect() const
+Decorator::TabRect() const
 {
 	return _tabrect;
 }

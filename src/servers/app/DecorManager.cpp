@@ -39,7 +39,7 @@ class DecorInfo {
 		const char*			Name() const { return fName.String(); }
 
 		Decorator*			Instantiate(Desktop* desktop, BRect rect, const char* title,
-								int32 look, int32 feel, int32 flags);
+								window_look look, uint32 flags);
 
 	private:
 		image_id			fID;
@@ -73,16 +73,16 @@ DecorInfo::~DecorInfo()
 
 Decorator *
 DecorInfo::Instantiate(Desktop* desktop, BRect rect, const char *title,
-	int32 look, int32 feel, int32 flags)
+	window_look look, uint32 flags)
 {
 	DesktopSettings settings(desktop);
 	Decorator *decorator;
 	
 	try {
 		if (fAllocator != NULL)
-			decorator = fAllocator(settings, rect, look, feel, flags);
+			decorator = fAllocator(settings, rect, look, flags);
 		else
-			decorator = new DefaultDecorator(settings, rect, look, feel, flags);
+			decorator = new DefaultDecorator(settings, rect, look, flags);
 	} catch (...) {
 		return NULL;
 	}
@@ -192,7 +192,7 @@ DecorManager::RescanDecorators()
 
 Decorator *
 DecorManager::AllocateDecorator(Desktop* desktop, BRect rect, const char *title, 
-	int32 look, int32 feel, int32 flags)
+	window_look look, uint32 flags)
 {
 	// Create a new instance of the current decorator. Ownership is that of the caller
 
@@ -202,7 +202,7 @@ DecorManager::AllocateDecorator(Desktop* desktop, BRect rect, const char *title,
 		return NULL;
 	}
 
-	return fCurrentDecor->Instantiate(desktop, rect, title, look, feel, flags);
+	return fCurrentDecor->Instantiate(desktop, rect, title, look, flags);
 }
 
 

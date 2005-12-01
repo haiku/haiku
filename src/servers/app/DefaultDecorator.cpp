@@ -36,19 +36,15 @@
 #endif
 
 
-DefaultDecorator::DefaultDecorator(DesktopSettings& settings, BRect rect,
-	int32 look, int32 feel, int32 flags)
-	: Decorator(settings, rect, look, feel, flags)
-{
-	ServerFont font;
-	if (_look == B_FLOATING_WINDOW_LOOK)
-		settings.GetDefaultPlainFont(font);
-	else
-		settings.GetDefaultBoldFont(font);
+// TODO: get rid of DesktopSettings here, and introduce private accessor
+//	methods to the Decorator base class
 
-	font.SetFlags(B_FORCE_ANTIALIASING);
-	font.SetSpacing(B_STRING_SPACING);
-	SetFont(&font);
+
+DefaultDecorator::DefaultDecorator(DesktopSettings& settings, BRect rect,
+	window_look look, uint32 flags)
+	: Decorator(settings, rect, look, flags)
+{
+	DefaultDecorator::SetLook(settings, look);
 
 	fFrameColors = new RGBColor[6];
 	fFrameColors[0].SetColor(152, 152, 152);
@@ -57,7 +53,7 @@ DefaultDecorator::DefaultDecorator(DesktopSettings& settings, BRect rect,
 	fFrameColors[3].SetColor(136, 136, 136);
 	fFrameColors[4].SetColor(152, 152, 152);
 	fFrameColors[5].SetColor(96, 96, 96);
-	
+
 	// Set appropriate colors based on the current focus value. In this case, each decorator
 	// defaults to not having the focus.
 	_SetFocus();
@@ -83,14 +79,14 @@ DefaultDecorator::~DefaultDecorator()
 void
 DefaultDecorator::SetTitle(const char* string, BRegion* updateRegion)
 {
-	BRect rect = GetTabRect();
+	BRect rect = TabRect();
 
 	Decorator::SetTitle(string);
 	
 	if (updateRegion == NULL)
 		return;
 
-	BRect updatedRect = GetTabRect();
+	BRect updatedRect = TabRect();
 	if (rect.left > updatedRect.left)
 		rect.left = updatedRect.left;
 	if (rect.right < updatedRect.right)
@@ -99,14 +95,54 @@ DefaultDecorator::SetTitle(const char* string, BRegion* updateRegion)
 	rect.bottom++;
 		// the border will look differently when the title is adjacent
 
-	updateRegion->Set(rect);
+	updateRegion->Include(rect);
+}
+
+
+void
+DefaultDecorator::SetLook(DesktopSettings& settings,
+	window_look look, BRegion* updateRegion)
+{
+	// TODO: we could be much smarter about the update region
+
+	// get previous extent
+	if (updateRegion != NULL) {
+		BRegion extent;
+		GetFootprint(&extent);
+		updateRegion->Include(&extent);
+	}
+
+	ServerFont font;
+	if (look == B_FLOATING_WINDOW_LOOK)
+		settings.GetDefaultPlainFont(font);
+	else
+		settings.GetDefaultBoldFont(font);
+
+	font.SetFlags(B_FORCE_ANTIALIASING);
+	font.SetSpacing(B_STRING_SPACING);
+	SetFont(&font);
+
+	Decorator::SetLook(settings, look, updateRegion);
+	_DoLayout();
+
+	if (updateRegion != NULL) {
+		BRegion extent;
+		GetFootprint(&extent);
+		updateRegion->Include(&extent);
+	}
+}
+
+
+void
+DefaultDecorator::SetFlags(uint32 flags, BRegion* updateRegion)
+{
 }
 
 
 void
 DefaultDecorator::MoveBy(float x, float y)
 {
-	MoveBy(BPoint(x,y));
+	MoveBy(BPoint(x, y));
 }
 
 
@@ -219,7 +255,7 @@ DefaultDecorator::GetFootprint(BRegion *region)
 
 	region->MakeEmpty();
 
-	if (_look == B_NO_BORDER_WINDOW_LOOK)
+	if (fLook == B_NO_BORDER_WINDOW_LOOK)
 		return;
 
 	region->Include(fLeftBorder);
@@ -227,78 +263,37 @@ DefaultDecorator::GetFootprint(BRegion *region)
 	region->Include(fTopBorder);
 	region->Include(fBottomBorder);
 	
-	if (_look == B_BORDERED_WINDOW_LOOK)
+	if (fLook == B_BORDERED_WINDOW_LOOK)
 		return;
 
 	region->Include(_tabrect);
 
-	if (_look == B_DOCUMENT_WINDOW_LOOK) {
+	if (fLook == B_DOCUMENT_WINDOW_LOOK) {
 		// include the rectangular resize knob on the bottom right
 		region->Include(BRect(_frame.right - 13.0f, _frame.bottom - 13.0f,
 							  _frame.right, _frame.bottom));
 	}
 }
 
+
 click_type
 DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 {
 #ifdef DEBUG_DECORATOR
 	printf("DefaultDecorator: Clicked\n");
-	printf("\tPoint: (%.1f,%.1f)\n",pt.x,pt.y);
-	printf("\tButtons:\n");
-
-	if (buttons == 0) {
-		printf("\t\tNone\n");
-	} else {
-		if(buttons & B_PRIMARY_MOUSE_BUTTON)
-			printf("\t\tPrimary\n");
-		if(buttons & B_SECONDARY_MOUSE_BUTTON)
-			printf("\t\tSecondary\n");
-		if(buttons & B_TERTIARY_MOUSE_BUTTON)
-			printf("\t\tTertiary\n");
-	}
-
-	printf("\tModifiers:\n");
-
-	if (modifiers == 0) {
-		printf("\t\tNone\n");
-	} else {
-		if(modifiers & B_CAPS_LOCK)
-			printf("\t\tCaps Lock\n");
-		if(modifiers & B_NUM_LOCK)
-			printf("\t\tNum Lock\n");
-		if(modifiers & B_SCROLL_LOCK)
-			printf("\t\tScroll Lock\n");
-		if(modifiers & B_LEFT_COMMAND_KEY)
-			printf("\t\t Left Command\n");
-		if(modifiers & B_RIGHT_COMMAND_KEY)
-			printf("\t\t Right Command\n");
-		if(modifiers & B_LEFT_CONTROL_KEY)
-			printf("\t\tLeft Control\n");
-		if(modifiers & B_RIGHT_CONTROL_KEY)
-			printf("\t\tRight Control\n");
-		if(modifiers & B_LEFT_OPTION_KEY)
-			printf("\t\tLeft Option\n");
-		if(modifiers & B_RIGHT_OPTION_KEY)
-			printf("\t\tRight Option\n");
-		if(modifiers & B_LEFT_SHIFT_KEY)
-			printf("\t\tLeft Shift\n");
-		if(modifiers & B_RIGHT_SHIFT_KEY)
-			printf("\t\tRight Shift\n");
-		if(modifiers & B_MENU_KEY)
-			printf("\t\tMenu\n");
-	}
+	printf("\tPoint: (%.1f,%.1f)\n", pt.x,pt.y);
+	printf("\tButtons: %ld, Modifiers: 0x%lx\n", buttons, modifiers);
 #endif // DEBUG_DECORATOR
-	
+
 	// In checking for hit test stuff, we start with the smallest rectangles the user might
 	// be clicking on and gradually work our way out into larger rectangles.
-	if (!(_flags & B_NOT_CLOSABLE) && _closerect.Contains(pt))
+	if (!(fFlags & B_NOT_CLOSABLE) && _closerect.Contains(pt))
 		return DEC_CLOSE;
 
-	if (!(_flags & B_NOT_ZOOMABLE) && _zoomrect.Contains(pt))
+	if (!(fFlags & B_NOT_ZOOMABLE) && _zoomrect.Contains(pt))
 		return DEC_ZOOM;
 	
-	if (_look == B_DOCUMENT_WINDOW_LOOK && _resizerect.Contains(pt))
+	if (fLook == B_DOCUMENT_WINDOW_LOOK && _resizerect.Contains(pt))
 		return DEC_RESIZE;
 
 	// Clicking in the tab?
@@ -316,14 +311,16 @@ DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 	if (fLeftBorder.Contains(pt) || fRightBorder.Contains(pt)
 		|| fTopBorder.Contains(pt) || fBottomBorder.Contains(pt)) {
 		// check resize area
-		if (!(_flags & B_NOT_RESIZABLE) &&
-			(_look == B_TITLED_WINDOW_LOOK || _look == B_FLOATING_WINDOW_LOOK)) {
-
+		if (!(fFlags & B_NOT_RESIZABLE)
+			&& (fLook == B_TITLED_WINDOW_LOOK
+				|| fLook == B_FLOATING_WINDOW_LOOK
+				|| fLook == B_MODAL_WINDOW_LOOK)) {
 			BRect temp(BPoint(fBottomBorder.right - 18, fBottomBorder.bottom - 18),
 					   fBottomBorder.RightBottom());
 			if (temp.Contains(pt))
 				return DEC_RESIZE;
 		}
+
 		// NOTE: On R5, windows are not moved to back if clicked inside the resize area with
 		// the second mouse button. So we check this after the check above
 		if (buttons == B_SECONDARY_MOUSE_BUTTON)
@@ -336,6 +333,7 @@ DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 	return DEC_NONE;
 }
 
+
 void
 DefaultDecorator::_DoLayout()
 {
@@ -345,7 +343,7 @@ DefaultDecorator::_DoLayout()
 
 	bool hasTab = false;
 
-	switch (GetLook()) {
+	switch (Look()) {
 		case B_MODAL_WINDOW_LOOK:
 			fBorderWidth = 5;
 			break;
@@ -374,7 +372,7 @@ DefaultDecorator::_DoLayout()
 		fTabOffset = 0;
 		// distance from one item of the tab bar to another.
 		// In this case the text and close/zoom rects
-		fTextOffset = (_look == B_FLOATING_WINDOW_LOOK) ? 10 : 18;
+		fTextOffset = (fLook == B_FLOATING_WINDOW_LOOK) ? 10 : 18;
 
 		font_height fontHeight;
 		fDrawState.Font().GetHeight(fontHeight);
@@ -387,7 +385,7 @@ DefaultDecorator::_DoLayout()
 					 _frame.top - fBorderWidth);
 
 		// format tab rect for a floating window - make the rect smaller
-		if (_look == B_FLOATING_WINDOW_LOOK) {
+		if (fLook == B_FLOATING_WINDOW_LOOK) {
 			_tabrect.InsetBy(0, 2);
 			_tabrect.OffsetBy(0, 2);
 		}
@@ -398,13 +396,13 @@ DefaultDecorator::_DoLayout()
 
 		// fMinTabWidth contains just the room for the buttons
 		fMinTabWidth = 4.0 + fTextOffset;
-		if (!(_flags & B_NOT_CLOSABLE))
+		if (!(fFlags & B_NOT_CLOSABLE))
 			fMinTabWidth += offset + size;
-		if (!(_flags & B_NOT_ZOOMABLE))
+		if (!(fFlags & B_NOT_ZOOMABLE))
 			fMinTabWidth += offset + size;
 
 		// fMaxTabWidth contains fMinWidth + the width required for the title
-		fMaxTabWidth = _driver ? _driver->StringWidth(GetTitle(), strlen(GetTitle()),
+		fMaxTabWidth = _driver ? _driver->StringWidth(Title(), strlen(Title()),
 			&fDrawState) : 0.0;
 		if (fMaxTabWidth > 0.0)
 			fMaxTabWidth += fTextOffset;
@@ -466,7 +464,7 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 		_driver->FillRect(_frame, fDrawState.HighColor());
 	#endif
 
-	if (_look == B_NO_BORDER_WINDOW_LOOK)
+	if (fLook == B_NO_BORDER_WINDOW_LOOK)
 		return;
 
 	if (fBorderWidth <= 0)
@@ -474,7 +472,7 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 
 	// Draw the border frame
 	BRect r = BRect(fTopBorder.LeftTop(), fBottomBorder.RightBottom());
-	switch (_look) {
+	switch (fLook) {
 		case B_TITLED_WINDOW_LOOK:
 		case B_DOCUMENT_WINDOW_LOOK:
 		case B_MODAL_WINDOW_LOOK: {
@@ -543,11 +541,11 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 	}
 
 	// Draw the resize thumb if we're supposed to
-	if (!(_flags & B_NOT_RESIZABLE)) {
+	if (!(fFlags & B_NOT_RESIZABLE)) {
 
 		r = _resizerect;
 
-		switch (_look){
+		switch (fLook){
 			case B_DOCUMENT_WINDOW_LOOK: {
 
 				// Explicitly locking the driver is normally unnecessary. However, we need to do
@@ -637,9 +635,9 @@ DefaultDecorator::_DrawTab(BRect r)
 	_DrawTitle(_tabrect);
 
 	// Draw the buttons if we're supposed to	
-	if (!(_flags & B_NOT_CLOSABLE))
+	if (!(fFlags & B_NOT_CLOSABLE))
 		_DrawClose(_closerect);
-	if (!(_flags & B_NOT_ZOOMABLE))
+	if (!(fFlags & B_NOT_ZOOMABLE))
 		_DrawZoom(_zoomrect);
 }
 
@@ -774,7 +772,7 @@ DefaultDecorator::_DrawBlendedRect(BRect r, bool down)
 void
 DefaultDecorator::_GetButtonSizeAndOffset(const BRect& tabRect, float* offset, float* size) const
 {
-	*offset = _look == B_FLOATING_WINDOW_LOOK ? 4.0 : 5.0;
+	*offset = fLook == B_FLOATING_WINDOW_LOOK ? 4.0 : 5.0;
 	// "+ 2" so that the rects are centered within the solid area
 	// (without the 2 pixels for the top border)
 	*size = tabRect.Height() - 2.0 * *offset + 2.0;
@@ -789,7 +787,7 @@ DefaultDecorator::_LayoutTabItems(const BRect& tabRect)
 	_GetButtonSizeAndOffset(tabRect, &offset, &size);
 
 	// calulate close rect based on the tab rectangle
-	if (GetFlags() & B_NOT_CLOSABLE) {
+	if (Flags() & B_NOT_CLOSABLE) {
 		_closerect.Set(tabRect.left + offset, tabRect.top + offset,
 			tabRect.left + offset, tabRect.top + offset + size);
 	} else {
@@ -798,7 +796,7 @@ DefaultDecorator::_LayoutTabItems(const BRect& tabRect)
 	}
 
 	// calulate zoom rect based on the tab rectangle
-	if (GetFlags() & B_NOT_ZOOMABLE) {
+	if (Flags() & B_NOT_ZOOMABLE) {
 		_zoomrect.Set(tabRect.right, tabRect.top + offset,
 			tabRect.right, tabRect.top + offset + size);
 	} else {
@@ -811,7 +809,7 @@ DefaultDecorator::_LayoutTabItems(const BRect& tabRect)
 	//	truncated for no apparent reason - OTOH the title does
 	//	also not appear perfectly in the middle
 	float width = (_zoomrect.left - _closerect.right) - fTextOffset * 2 + 2;
-	fTruncatedTitle = GetTitle();
+	fTruncatedTitle = Title();
 	fDrawState.Font().TruncateString(&fTruncatedTitle, B_TRUNCATE_END, width);
 	fTruncatedTitleLength = fTruncatedTitle.Length();
 }

@@ -563,10 +563,18 @@ RootLayer::ResizeWindowBy(WindowLayer* window, float x, float y)
 void
 RootLayer::SetWindowLook(WindowLayer *window, window_look newLook)
 {
+	if (window->Look() == newLook)
+		return;
+
 	BAutolock _(fAllRegionsLock);
 
 	BRegion changed;
 	window->SetLook(newLook, window->Parent() ? &changed : NULL);
+
+	if (window->Parent() != NULL) {
+		MarkForRebuild(changed);
+		TriggerRebuild();
+	}
 
 	_WindowsChanged(changed);
 
@@ -580,6 +588,9 @@ RootLayer::SetWindowLook(WindowLayer *window, window_look newLook)
 void
 RootLayer::SetWindowFeel(WindowLayer *window, window_feel newFeel)
 {
+	if (window->Feel() == newFeel)
+		return;
+
 	BAutolock _(fAllRegionsLock);
 
 	window->SetFeel(newFeel);
@@ -591,10 +602,18 @@ RootLayer::SetWindowFeel(WindowLayer *window, window_feel newFeel)
 void
 RootLayer::SetWindowFlags(WindowLayer *window, uint32 newFlags)
 {
+	if (window->WindowFlags() == newFlags)
+		return;
+
 	BAutolock _(fAllRegionsLock);
 
 	BRegion changed;
 	window->SetWindowFlags(newFlags, window->Parent() ? &changed : NULL);
+
+	if (window->Parent() != NULL) {
+		MarkForRebuild(changed);
+		TriggerRebuild();
+	}
 
 	_WindowsChanged(changed);
 

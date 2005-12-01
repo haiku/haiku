@@ -95,8 +95,8 @@ WindowLayer::WindowLayer(const BRect &frame,
 	fFlags = B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE;
 
 	if (fLook != B_NO_BORDER_WINDOW_LOOK) {
-		fDecorator = gDecorManager.AllocateDecorator(window->App()->GetDesktop(), frame,
-			name, fLook, fFeel,  fWindowFlags);
+		fDecorator = gDecorManager.AllocateDecorator(window->Desktop(), frame,
+			name, fLook, fWindowFlags);
 		if (fDecorator)
 			fDecorator->GetSizeLimits(&fMinWidth, &fMinHeight, &fMaxWidth, &fMaxHeight);
 	}
@@ -110,8 +110,8 @@ WindowLayer::WindowLayer(const BRect &frame,
 		uint16 width, height;
 		uint32 colorSpace;
 		float frequency;
-		if (window->App()->GetDesktop()->ScreenAt(0)) {
-			window->App()->GetDesktop()->ScreenAt(0)->GetMode(width, height, colorSpace, frequency);
+		if (window->Desktop()->ScreenAt(0)) {
+			window->Desktop()->ScreenAt(0)->GetMode(width, height, colorSpace, frequency);
 // TODO: MOVE THIS AWAY!!! RemoveBy contains calls to virtual methods! Also, there is not TopLayer()!
 			fFrame.OffsetTo(B_ORIGIN);
 			WindowLayer::ResizeBy(width - frame.Width(), height - frame.Height());
@@ -669,7 +669,28 @@ WindowLayer::SupportsFront()
 void
 WindowLayer::SetLook(window_look look, BRegion* updateRegion)
 {
-	// TODO: implement settings window look
+	if (fDecorator == NULL && look != B_NO_BORDER_WINDOW_LOOK) {
+		// we need a new decorator
+		fDecorator = gDecorManager.AllocateDecorator(Window()->Desktop(), Frame(),
+			Name(), fLook, fWindowFlags);
+	}
+
+	fLook = look;
+	fRebuildDecRegion = true;
+
+	if (fDecorator != NULL) {
+		DesktopSettings settings(Window()->Desktop());
+		fDecorator->SetLook(settings, look, updateRegion);
+
+		// TODO: we might need to resize the window!
+		//fDecorator->GetSizeLimits(&fMinWidth, &fMinHeight, &fMaxWidth, &fMaxHeight);
+	}
+
+	if (look == B_NO_BORDER_WINDOW_LOOK) {
+		// we don't need a decorator for this window
+		delete fDecorator;
+		fDecorator = NULL;
+	}
 }
 
 

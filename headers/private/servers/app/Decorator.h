@@ -48,15 +48,16 @@ typedef enum {
 class Decorator {
  public:
 								Decorator(DesktopSettings& settings, BRect rect,
-									int32 look, int32 feel, int32 flags);
+									window_look look, uint32 flags);
 	virtual						~Decorator();
 
 			void				SetColors(const ColorSet &cset);
 			void				SetDriver(DrawingEngine *driver);
-			void				SetFlags(int32 wflags);
-			void				SetFeel(int32 wfeel);
 			void				SetFont(ServerFont *font);
-			void				SetLook(int32 wlook);
+
+	virtual void				SetLook(DesktopSettings& settings,
+									window_look look, BRegion* updateRegion = NULL);
+	virtual void				SetFlags(uint32 flags, BRegion* updateRegion = NULL);
 
 			void				SetClose(bool pressed);
 			void				SetMinimize(bool pressed);
@@ -64,17 +65,16 @@ class Decorator {
 
 	virtual	void				SetTitle(const char* string, BRegion* updateRegion = NULL);
 
-			int32				GetLook() const;
-			int32				GetFeel() const;
-			int32				GetFlags() const;
+			window_look			Look() const;
+			uint32				Flags() const;
 
-			const char*			GetTitle() const;
+			const char*			Title() const;
 
 			// we need to know its border(frame). WinBorder's _frame rect
 			// must expand to include Decorator borders. Otherwise we can't
-			// draw the border. We also add GetTabRect because I feel we'll need it
-			BRect				GetBorderRect() const;
-			BRect				GetTabRect() const;
+			// draw the border. We also add TabRect because I feel we'll need it
+			BRect				BorderRect() const;
+			BRect				TabRect() const;
 		
 			bool				GetClose();
 			bool				GetMinimize();
@@ -140,9 +140,8 @@ class Decorator {
 			DrawingEngine*		_driver;
 			DrawState			fDrawState;
 
-			int32				_look;
-			int32				_feel;
-			int32				_flags;
+			window_look			fLook;
+			uint32				fFlags;
 
 			BRect				_zoomrect;
 			BRect				_closerect;
@@ -165,6 +164,6 @@ class Decorator {
 // add-on stuff
 typedef float get_version(void);
 typedef Decorator* create_decorator(DesktopSettings& desktopSettings, BRect rect,
-	int32 look, int32 feel, int32 flags);
+	window_look look, uint32 flags);
 
 #endif	/* _DECORATOR_H_ */

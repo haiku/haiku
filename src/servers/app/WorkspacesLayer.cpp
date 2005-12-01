@@ -108,7 +108,7 @@ WorkspacesLayer::_DrawWindow(const BRect& workspaceFrame,
 	BPoint offset = window->Frame().LeftTop() - windowPosition;
 	BRect frame = _WindowFrame(workspaceFrame, screenFrame, window->Frame(),
 		windowPosition);
-	BRect tabFrame = window->GetDecorator()->GetTabRect();
+	BRect tabFrame = window->GetDecorator()->TabRect();
 	tabFrame = _WindowFrame(workspaceFrame, screenFrame,
 		tabFrame, tabFrame.LeftTop() - offset);
 
